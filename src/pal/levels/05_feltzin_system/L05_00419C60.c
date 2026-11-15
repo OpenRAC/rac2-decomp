@@ -1,27 +1,28 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern void func_00282C88(char *block);
-extern int func_002A77E0(int kind);
-extern char *func_002ED688(char *object);
-extern int func_L00_00367720(char *object);
-extern void func_L05_00379E60(char *object, int a1, int a2, int a3);
+extern void vec_clear_128(char *block);
+extern int math_random_int_below(int kind);
+extern char *moby_get_motion_data(char *object);
+extern int state_get_stored_pointer_value(char *object);
+extern void level_append_object(char *object, int a1, int a2, int a3);
 extern void func_PAL_L05_0037E8E0(char *object);
-extern void func_L05_0037B538(char *object, int a1, int a2, int a3);
-extern void func_L05_0037B948(char *object, int a1, float a2);
-extern int func_L05_0037B888(char *object);
+extern void moby_process_collision_hit(char *object, int a1, int a2, int a3);
+extern void moby_check_player_in_view_and_range(char *object, int a1, float a2);
+extern int moby_can_take_next_step(char *object);
 extern void func_PAL_L05_0037DE20(char *object);
-extern void func_00282948(char *block);
+extern void math_fast_float_d(char *block);
 extern char *D_L05_001B251C __attribute__((sda));
-extern char D_00188660[];
-extern int func_002E5DA0(int, int, char *, int);
+extern char g_sound_state[];
+extern int snd_play_from_class_bank(int, int, char *, int);
 typedef struct {
     char pad0[0x104];
     int x104, x108, pad10C, mode, pad114, pad118;
     int has_target;
     char *target;
 } Target05;
-extern float func_00282E48(char *a, char *b);
+extern float fast_vec_dist(char *a, char *b);
 extern void func_PAL_L05_0041A480(char *obj);
 extern void func_PAL_L05_0041A580(char *object);
 extern void func_PAL_L05_0041A628(char *obj);
@@ -38,48 +39,48 @@ void func_PAL_L05_0041A270(char *object)
 
     if (*(unsigned char *)(object + 0x20) == 0) {
         *(unsigned char *)(object + 0x30) = 0xFF;
-        if (func_L00_00367720(object) == 0)
+        if (state_get_stored_pointer_value(object) == 0)
             return;
         func_PAL_L05_0041A480(object);
-        func_00282C88(buf);
+        vec_clear_128(buf);
         if (*(int *)(state + 0x264) != 0)
-            func_L05_00379E60(object, 0, 0, 0);
+            level_append_object(object, 0, 0, 0);
         return;
     }
-    r = (Target05 *)func_002ED688(object);
+    r = (Target05 *)moby_get_motion_data(object);
     if (r->mode == 0)
         return;
     {
         int one = 1;
 
         func_PAL_L05_0037E8E0(object);
-        func_L05_0037B538(object, 0, 0, 0);
-        func_L05_0037B948(object, one, 32.0f);
+        moby_process_collision_hit(object, 0, 0, 0);
+        moby_check_player_in_view_and_range(object, one, 32.0f);
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
                 r->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
-                if (func_00282E48(r->target + 0x10, object + 0x10) < 10.0f) {
-                    rec2 = D_00188660 + *(int *)(state + 0x270) * 0x70;
+                if (fast_vec_dist(r->target + 0x10, object + 0x10) < 10.0f) {
+                    rec2 = g_sound_state + *(int *)(state + 0x270) * 0x70;
                     if (*(char **)(rec2 + 0x88) != object ||
                         *(unsigned char *)(rec2 + 0x74) == 0) {
-                        if (func_002A77E0(0x190) == 0)
+                        if (math_random_int_below(0x190) == 0)
                             *(int *)(state + 0x270) =
-                                func_002E5DA0(0xE, 0, object, 0xFBF);
+                                snd_play_from_class_bank(0xE, 0, object, 0xFBF);
                     }
                 }
             }
             if (r->x104 != 0)
                 func_PAL_L05_0041A580(object);
-            if (func_L05_0037B888(object) != 0)
+            if (moby_can_take_next_step(object) != 0)
                 func_PAL_L05_0037DE20(object);
-            func_00282948(state + 0x268);
+            math_fast_float_d(state + 0x268);
             func_PAL_L05_0041A628(object);
         }
     }
-    rec = D_00188660 + *(int *)(state + 0x26C) * 0x70;
+    rec = g_sound_state + *(int *)(state + 0x26C) * 0x70;
     if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
-        *(int *)(state + 0x26C) = func_002E5DA0(0, 6, object, 0xF73);
+        *(int *)(state + 0x26C) = snd_play_from_class_bank(0, 6, object, 0xF73);
 }
 
 
@@ -138,14 +139,14 @@ void func_PAL_L05_0041A580(char *object)
 }
 
 
-extern char *func_L05_00416D68(char *a0, int a1);
-extern void func_L00_002E6EF8(void *fn, char *object);
-extern void func_L05_00415D70(void);
+extern char *feltzin_helper_create(char *a0, int a1);
+extern void gfx_add_draw_callback_third(void *fn, char *object);
+extern void beam_clear_record_owners(void);
 extern void func_PAL_L05_0041AA78(char *obj);
 extern void func_PAL_L05_0041ABE8(char *object);
 extern void func_PAL_L05_0041ACA0(char *object);
 extern void func_PAL_L05_0041AE80(char *obj);
-extern void func_L00_003BAAD0(void);
+extern void heavy_lancer_update(void);
 extern char D_L05_002659E0[];
 
 /* func_L05_00415958 is defined in L05_00415958-qcopy.c. */
@@ -163,16 +164,16 @@ void func_PAL_L05_0041A808(char *object)
 
     if (*(unsigned char *)(object + 0x20) == 0) {
         *(unsigned char *)(object + 0x30) = 0xFF;
-        if (func_L00_00367720(object) == 0)
+        if (state_get_stored_pointer_value(object) == 0)
             return;
         func_PAL_L05_0041AA78(object);
-        func_00282C88(buf);
+        vec_clear_128(buf);
         if (*(int *)(state + 0x264) != 0) {
             char *base;
             int *p;
             int i;
 
-            func_L05_00379E60(object, (int)func_L05_00415D70, 0, 0);
+            level_append_object(object, (int)beam_clear_record_owners, 0, 0);
             base = D_L05_002659E0;
             p = (int *)(base + 0x27F0);
             i = 0x7F;
@@ -184,12 +185,12 @@ void func_PAL_L05_0041A808(char *object)
         }
         return;
     }
-    r = (Target05 *)func_002ED688(object);
+    r = (Target05 *)moby_get_motion_data(object);
     if (r->mode == 0)
         return;
     if (*(int *)(state + 0x26C) == 0 && *(int *)(state + 0x270) == 0) {
-        *(int *)(state + 0x26C) = (int)func_L05_00416D68(object, 0);
-        *(int *)(state + 0x270) = (int)func_L05_00416D68(object, 1);
+        *(int *)(state + 0x26C) = (int)feltzin_helper_create(object, 0);
+        *(int *)(state + 0x270) = (int)feltzin_helper_create(object, 1);
         *(float *)(*(int *)(state + 0x26C) + 0x2C) = *(float *)(object + 0x2C);
         *(float *)(*(int *)(state + 0x270) + 0x2C) = *(float *)(object + 0x2C);
     }
@@ -197,8 +198,8 @@ void func_PAL_L05_0041A808(char *object)
         int one = 1;
 
         func_PAL_L05_0037E8E0(object);
-        func_L05_0037B538(object, 0, 0, 0);
-        func_L05_0037B948(object, one, 32.0f);
+        moby_process_collision_hit(object, 0, 0, 0);
+        moby_check_player_in_view_and_range(object, one, 32.0f);
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
@@ -206,16 +207,16 @@ void func_PAL_L05_0041A808(char *object)
             }
             if (r->x108 != 0 && r->x104 != 0)
                 func_PAL_L05_0041ABE8(object);
-            if (func_L05_0037B888(object) != 0)
+            if (moby_can_take_next_step(object) != 0)
                 func_PAL_L05_0037DE20(object);
-            func_00282948(state + 0x268);
+            math_fast_float_d(state + 0x268);
             func_PAL_L05_0041ACA0(object);
         }
     }
-    rec = D_00188660 + *(int *)(state + 0x274) * 0x70;
+    rec = g_sound_state + *(int *)(state + 0x274) * 0x70;
     if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
-        *(int *)(state + 0x274) = func_002E5DA0(1, 6, object, 0xF76);
+        *(int *)(state + 0x274) = snd_play_from_class_bank(1, 6, object, 0xF76);
     func_PAL_L05_0041AE80(object);
-    func_L00_002E6EF8(func_L00_003BAAD0, object);
+    gfx_add_draw_callback_third(heavy_lancer_update, object);
 }
 

@@ -4,7 +4,7 @@
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 #define H(p, o) (*(u16 *)((char *)(p) + (o)))
-extern char *D_L06_001FE500[];
+extern char *g_path_list[];
 typedef struct {
     char pad[0x1F0];
     u16 moveFlags;
@@ -17,31 +17,31 @@ typedef struct {
     char pad22A0[0x15];
     u8 flag;
 } HeroState;
-extern HeroState D_00189E20;
-extern s32 D_001A79F0;
+extern HeroState g_hero_state;
+extern s32 g_current_map_index;
 extern float D_L06_001B0090 __attribute__((sda));
 extern float D_L06_001B9858 NOT_SDA;
-extern s32 func_00283CF0(float);
-extern void func_0029F338(void *);
-extern s32 func_002A77E0(s32);
-extern void func_002A7470(void *, s32, s32, s32);
-extern float func_00283248(float, float);
-extern float func_002AAA00(float *, float, float, float, float, float *, s32);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern s32 func_00282948(s32 *);
-extern float func_00282C48(float);
-extern s32 func_002ACBC8(void *, s32);
-extern float func_00283B98(float,float);
-extern void func_002833F0(void *,void *);
-extern s32 func_002E5CF8(s32,s32,void *);
-extern void func_L06_00403DA8(void *,void *);
-extern void func_L00_002B9D60(void *,void *,s32,s32);
-extern s32 func_002A8AF0(void *,void *,s32);
-extern s32 func_002B3868(void *);
-extern void func_L00_002B30E8(void);
+extern s32 FloatToInt(float);
+extern void moby_mark_spawned(void *);
+extern s32 math_random_int_below(s32);
+extern void anim_start_blended(void *, s32, s32, s32);
+extern float mat_fast_helper_a(float, float);
+extern float math_approach_target_with_direction_mode(float *, float, float, float, float, float *, s32);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern s32 math_fast_float_d(s32 *);
+extern float math_fabs(float);
+extern s32 IsPointInCuboid(void *, s32);
+extern float FastAddRotations(float,float);
+extern void euler_rotation_basis(void *,void *);
+extern s32 PlayMobySound(s32,s32,void *);
+extern void part_spawn_splash_burst(void *,void *);
+extern void hero_reset_position_and_direction(void *,void *,s32,s32);
+extern s32 point_in_path_xy(void *,void *,s32);
+extern s32 flag_set_first_pending(void *);
+extern void hero_record_play_counters(void);
 typedef struct {
     char p0[0x48];
     u8 timerA;
@@ -64,7 +64,7 @@ typedef struct {
 } LaunchData;
 
 /* Updates a moby (class 2375) that patrols a path, grabs the hero when he is in range, lifts him up and lets him go. */
-void func_L06_00403710(char *obj)
+void hero_lift_update(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -86,63 +86,63 @@ void func_L06_00403710(char *obj)
             }
         } else {
             if (data->path == -1) {
-                MarkMobySpawned(obj);
+                moby_mark_spawned(obj);
                 return;
             }
-            data->point = RandomIntBelow(I(gPathList[data->path],0));
+            data->point = math_random_int_below(I(g_path_list[data->path],0));
             data->timeout = 600;
-            if (B(obj,0x43) != 1) StartAnimationBlended(obj,1,0,10);
-            F(obj,0x18) = F(gPathList[data->path],0x18) - D_L06_001B0090;
+            if (B(obj,0x43) != 1) anim_start_blended(obj,1,0,10);
+            F(obj,0x18) = F(g_path_list[data->path],0x18) - D_L06_001B0090;
             data->pathZ = F(obj,0x18);
             B(obj,0x20) = 1;
         }
         break;
     case 1:
-        qcopy(pos,gPathList[data->path] + 0x10 + data->point*16);
-        ApproachTargetWithDirectionMode((float *)(obj+0xF8),FastMatrixHelperA(pos[0]-F(obj,0x10),pos[1]-F(obj,0x14)),0.0008726647356525064f,0.0008726647356525064f,0.05235988646745682f,&data->turn,0);
+        qcopy(pos,g_path_list[data->path] + 0x10 + data->point*16);
+        math_approach_target_with_direction_mode((float *)(obj+0xF8),mat_fast_helper_a(pos[0]-F(obj,0x10),pos[1]-F(obj,0x14)),0.0008726647356525064f,0.0008726647356525064f,0.05235988646745682f,&data->turn,0);
         vec_scale_to_length(step,obj+0xC0,0.05000000447034836f);
         FastVecAdd(obj+0x10,obj+0x10,step);
-        if (fast_vec_dist(obj+0x10,pos)<3.0f || FastFloatHelperD(&data->timeout)) {
-            data->point = (data->point+RandomIntBelow(I(gPathList[data->path],0))) % I(gPathList[data->path],0);
+        if (fast_vec_dist(obj+0x10,pos)<3.0f || math_fast_float_d(&data->timeout)) {
+            data->point = (data->point+math_random_int_below(I(g_path_list[data->path],0))) % I(g_path_list[data->path],0);
             data->timeout = 600;
         }
         break;
     case 2:
-        FastFloatHelperD(&data->wait);
-        if (FloatAbs(gHeroState.height-data->homeZ)<0.8f && gHeroState.action==18 && !IsPointInCuboid((char *)&gHeroState+0x80,data->range)) {
+        math_fast_float_d(&data->wait);
+        if (math_fabs(g_hero_state.height-data->homeZ)<0.8f && g_hero_state.action==18 && !IsPointInCuboid((char *)&g_hero_state+0x80,data->range)) {
             if (data->wait == 0) {
                 F(obj,0xF4) = -1.5533431768417358f;
                 F(obj,0xF8) = FastAddRotations(D_L06_001B9858,1.5707964897155762f);
                 euler_rotation_basis(obj+0xC0,obj+0xF0);
-                qcopy(obj+0x10,(char *)&gHeroState+0x80);
+                qcopy(obj+0x10,(char *)&g_hero_state+0x80);
                 vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
                 FastVecSub(obj+0x10,obj+0x10,pos);
                 data->speed = 0.13333334028720856f;
                 H(obj,0x34) &= 0xFFFE;
                 PlayMobySound(1,0,obj);
-                if (B(obj,0x43) != 2) StartAnimationBlended(obj,2,10,5);
+                if (B(obj,0x43) != 2) anim_start_blended(obj,2,10,5);
                 B(obj,0x20) = 3;
-                qcopy(step,(char *)&gHeroState+0x80);
-                step[2] = gHeroState.height;
-                SpawnSplashBurst(obj,step);
-                ResetHeroPositionAndDirection((char *)&gHeroState+0x80,(char *)&gHeroState+0x90,111,0);
-                gHeroState.flag = 1;
+                qcopy(step,(char *)&g_hero_state+0x80);
+                step[2] = g_hero_state.height;
+                part_spawn_splash_burst(obj,step);
+                hero_reset_position_and_direction((char *)&g_hero_state+0x80,(char *)&g_hero_state+0x90,111,0);
+                g_hero_state.flag = 1;
             }
-        } else if (gHeroState.mode!=18) {
-            if (point_in_path_xy((char *)&gHeroState+0x80,gPathList[data->path]+0x10,I(gPathList[data->path],0))) data->wait=data->insideWait;
+        } else if (g_hero_state.mode!=18) {
+            if (point_in_path_xy((char *)&g_hero_state+0x80,g_path_list[data->path]+0x10,I(g_path_list[data->path],0))) data->wait=data->insideWait;
             else data->wait=data->outsideWait;
         }
         break;
     case 3:
-        if (SetFirstPendingFlag(obj)) PlayMobySound(1,0,obj);
-        qzero_nc((char *)&gHeroState+0xF0);
-        qzero_nc((char *)&gHeroState+0x110);
-        qzero_nc((char *)&gHeroState+0x120);
-        qzero_nc((char *)&gHeroState+0x130);
-        gHeroState.moveFlags = 3;
-        gHeroState.flag = 1;
+        if (flag_set_first_pending(obj)) PlayMobySound(1,0,obj);
+        qzero_nc((char *)&g_hero_state+0xF0);
+        qzero_nc((char *)&g_hero_state+0x110);
+        qzero_nc((char *)&g_hero_state+0x120);
+        qzero_nc((char *)&g_hero_state+0x130);
+        g_hero_state.moveFlags = 3;
+        g_hero_state.flag = 1;
         {
-            s32 level = gCurrentMapIndex;
+            s32 level = g_current_map_index;
             F(obj,0x18) += data->speed;
             if (level != 9)
                 data->speed -= 0.0027777778450399637f;
@@ -151,19 +151,19 @@ void func_L06_00403710(char *obj)
         }
         if (data->speed<0.03333333507180214f) {
             vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
-            ApproachTargetWithDirectionMode((float *)(obj+0xF4),1.5533431768417358f,0.0034906589426100254f,0.0034906589426100254f,0.41887909173965454f,&data->turn,0);
+            math_approach_target_with_direction_mode((float *)(obj+0xF4),1.5533431768417358f,0.0034906589426100254f,0.0034906589426100254f,0.41887909173965454f,&data->turn,0);
             euler_rotation_basis(obj+0xC0,obj+0xF0);
             vec_scale_to_length(step,obj+0xE0,D_L06_001B0090);
             FastVecSub(delta,step,pos);
             FastVecSub(obj+0x10,obj+0x10,delta);
         }
-        if (data->speed<0.0f && F(obj,0x18)<gHeroState.height) {
-            qcopy_nc(pos,(char *)&gHeroState+0x80);
-            pos[2]=gHeroState.height;
-            SpawnSplashBurst(obj,pos);
+        if (data->speed<0.0f && F(obj,0x18)<g_hero_state.height) {
+            qcopy_nc(pos,(char *)&g_hero_state+0x80);
+            pos[2]=g_hero_state.height;
+            part_spawn_splash_burst(obj,pos);
         }
-        if (data->speed<0.0f && F(obj,0x18)<data->homeZ) RecordHeroPlayCounters();
-        if ((B(obj,0x60)&2) && B(obj,0x43)!=1) StartAnimationBlended(obj,1,0,10);
+        if (data->speed<0.0f && F(obj,0x18)<data->homeZ) hero_record_play_counters();
+        if ((B(obj,0x60)&2) && B(obj,0x43)!=1) anim_start_blended(obj,1,0,10);
         break;
     }
 }

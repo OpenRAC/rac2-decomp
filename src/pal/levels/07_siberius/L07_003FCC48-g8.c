@@ -7,7 +7,7 @@ extern void func_31B090(void *,void *,void *,s32);
 extern void func_313DD8(void *,f32,f32);
 extern f32 func_2E4508(void *,void *);
 extern s32 func_2E3F80(s32 *);
-extern f32 func_L07_003F90E8(s32,s32,f32,f32);
+extern f32 math_interpolate_between_limits(s32,s32,f32,f32);
 extern s32 func_2E5470(f32);
 extern s32 func_310AD8(s32,s32);
 extern f32 func_310B30(f32,f32);
@@ -57,7 +57,7 @@ void func_PAL_L07_003FCC48(u8 *obj)
    else if(dist>D_L07_001B1098) change=1;
    if(func_2E3F80((s32 *)(p+0x440))) {
     change=1;
-    *(s32 *)(p+0x440)=((s32)(func_2E5470(func_L07_003F90E8(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC))) * 5 + 2) / 6;
+    *(s32 *)(p+0x440)=((s32)(func_2E5470(math_interpolate_between_limits(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC))) * 5 + 2) / 6;
     *(s32 *)(p+0x440)+=((s32)(func_310AD8(0,60)) * 5 + 2) / 6;
    }
    if(change) {

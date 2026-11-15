@@ -17,26 +17,26 @@ extern int D_L22_001AFF18_gp[] __asm__("D_L22_001AFF18__gp") __attribute__((sect
 extern float D_L22_001AFF20[] __attribute__((sda));
 extern float D_L22_001A7CD8[] __attribute__((sda));
 extern unsigned int D_001A7390[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 
 /* The per-subtitle history src/game/00289178.c updates (12-byte rows). */
 typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
-extern SubtitleHistory D_0018C958[];
+extern SubtitleHistory g_subtitle_history[];
 
-extern void func_002A7750(void *, int, int);
-extern f32 func_002A7878(f32 low, f32 high);
-extern int func_002E5CF8(int index, int a1, char *a2);
-extern void func_00288E18(int, int);
-extern f32 func_00282DB0(void *, void *);
-extern void func_L22_003C9B60(char *);
-extern void func_L22_003C9D48(u8 *);
-extern void func_L00_002E6CF0(void (*)(u8 *), void *);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern int func_00283D38(int, int, f32);
+extern void moby_set_state(void *, int, int);
+extern f32 math_random_float_range(f32 low, f32 high);
+extern int PlayMobySound(int index, int a1, char *a2);
+extern void subtitle_request_voice_line(int, int);
+extern f32 FastVecDot(void *, void *);
+extern void spark_emit_random(char *);
+extern void spark_lane_draw(u8 *);
+extern void gfx_add_draw_callback_first(void (*)(u8 *), void *);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern int FastTweenColor(int, int, f32);
 
 /* Family cbc1388ebe801e68 (116 B, 2 placements): arm one animation slot on a
  * resident object.  Two global guards, a "current slot" guard, then five
@@ -56,10 +56,10 @@ extern u8 D_001A63A8_4[];
 
 /* func_L22_003A5F90 is matched in L22_003A5F90.c. */
 
-extern int func_L22_003A48F8(int);
+extern int list_is_key_missing(int);
 
 /* Checks that exactly one bit is set in the given value and that the matching entry passes its test; returns 1 if so, otherwise 0. */
-int func_L22_003A6128(f32 maskValue) {
+int mask_is_single_bit_set_and_valid(f32 maskValue) {
     union { f32 f; unsigned int u; } bits;
     int bitCount = 0;
     int i;
@@ -78,7 +78,7 @@ int func_L22_003A6128(f32 maskValue) {
     if (bitCount == 0)
         return 0;
     if (bitCount == 1) {
-        if (IsKeyMissingFromList(bitIndex) == 0)
+        if (list_is_key_missing(bitIndex) == 0)
             return 1;
     }
     return 0;
@@ -88,7 +88,7 @@ int func_L22_003A6128(f32 maskValue) {
 
 /* shared native body of family cbc1388ebe801e68 */
 /* Starts the animation in the given slot on an object, unless another one is already running, and sets its timer. */
-void func_L22_003A6470(u8 *moby, int slot) {
+void anim_start_slot(u8 *moby, int slot) {
     u8 *animState = D_001A63A8_4;
     u8 *vars = *(u8 **)(moby + 104);
     int bit;
@@ -103,9 +103,9 @@ void func_L22_003A6470(u8 *moby, int slot) {
     *(int *)(vars + 1248) |= bit;
 }
 
-extern int func_002A77E0(int a0);
+extern int math_random_int_below(int a0);
 
-extern void func_L22_003A64E8(u8 *a0, int a1, int a2);
+extern void anim_start_free_slot_in_range(u8 *a0, int a1, int a2);
 
 /* Arm one animation slot in the range [a1, a2]: a random slot of the range is
  * tried first and the next one after it, wrapping around, until a free slot
@@ -114,7 +114,7 @@ extern void func_L22_003A64E8(u8 *a0, int a1, int a2);
  *
  * The mask lives in the controller at +0x4E0 of the object at +0x68.
  */
-void func_L22_003A64E8(u8 *moby, int first, int last) {
+void anim_start_free_slot_in_range(u8 *moby, int first, int last) {
     u8 *ctl = *(u8 **)(moby + 0x68);
     int count;
     int offset;
@@ -123,11 +123,11 @@ void func_L22_003A64E8(u8 *moby, int first, int last) {
     if (last < first)
         return;
     count = last - first + 1;
-    offset = RandomIntBelow(count);
+    offset = math_random_int_below(count);
     for (i = 0; i < count; i++) {
         int slot = first + offset;
         if (((*(int *)(ctl + 0x4E0) >> slot) ^ 1) & 1) {
-            StartAnimationSlot(moby, slot);
+            anim_start_slot(moby, slot);
             return;
         }
         offset = (offset + 1) % count;
@@ -140,14 +140,14 @@ void func_L22_003A64E8(u8 *moby, int first, int last) {
         }
         *(int *)(ctl + 0x4E0) = mask;
     }
-    StartAnimationSlot(moby, first + offset);
+    anim_start_slot(moby, first + offset);
 }
 
 /* A three-label switch, the third one sharing the default's body: with only two cases cc1
  * emits a comparison chain, and the third label is what makes it build the decision tree
  * (`beq` on the high case, then an `slti` guard on the range, then `bne` on the low one). */
 /* Returns a float setting from the object's private data, picked by the object's class. */
-f32 func_L22_003A65E0(u8 *moby) {
+f32 moby_get_class_setting_value(u8 *moby) {
     switch (*(short *)(moby + 0xAA)) {
     case 0xE3A /* moby class 3642 */: return *(f32 *)(*(u8 **)(moby + 0x68) + 0x2C);
     case 0xE3B /* moby class 3643 */: return *(f32 *)(*(u8 **)(moby + 0x68) + 0x44);
@@ -158,28 +158,28 @@ f32 func_L22_003A65E0(u8 *moby) {
 
 /* func_L22_003A6640 is defined in L22_003A6640-g8.c. */
 
-extern u8 D_00189E20[];
-extern f32 func_00282E48(void *a0, void *a1);
-extern void func_L22_002B70F8(int a0, int a1, void *a2);
+extern u8 g_hero_state[];
+extern f32 fast_vec_dist(void *a0, void *a1);
+extern void hero_restart_in_mode(int a0, int a1, void *a2);
 
 /* Per-frame update for moby class 637: when the player is close, it starts an effect on this object. */
-void func_L22_003A8BA0(u8 *moby) {
-    if (gHeroState[0x22B4] != 0) return;
-    if (fast_vec_dist(gHeroState + 0x80, moby + 0x10) < 4.0f) {
-        RestartHeroInMode(2, 0x56, moby);
+void proximity_effect_update(u8 *moby) {
+    if (g_hero_state[0x22B4] != 0) return;
+    if (fast_vec_dist(g_hero_state + 0x80, moby + 0x10) < 4.0f) {
+        hero_restart_in_mode(2, 0x56, moby);
     }
 }
 
-extern int func_00283CF0(f32);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
-extern void func_002A8C28(void *, void *, int, f32, f32, f32, int, int, int);
+extern int FloatToInt(f32);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
+extern void coll_sweep_from_object(void *, void *, int, f32, f32, f32, int, int, int);
 
 /* Halves whatever the two floats say, doubles it back, rescales it by the
  * controller's rate, then hands the result to the placement call as the alpha;
  * the controller's counter also drives the byte at +0x23 (a 127/40 ramp). */
 /* Per-frame update for moby class 1427: rescales the object, fades it in with a timer, places an effect on it and removes it when the timer ends. */
-void func_L22_003AD090(u8 *moby) {
+void fading_scaled_moby_update(u8 *moby) {
     u8 *obj = moby;
     u8 *sub = *(u8 **)(obj + 0x24);
     u8 *ctl = *(u8 **)(obj + 0x68);
@@ -193,11 +193,11 @@ void func_L22_003AD090(u8 *moby) {
     *(f32 *)(obj + 0x2C) = *(f32 *)(obj + 0x2C) * *(f32 *)(sub + 0x24);
     n = *(int *)(ctl + 0x8);
     if (n < 0x28) *(u8 *)(obj + 0x23) = n * 127 / 40;
-    resident = gHeroState;
-    SweepCollisionFromObject(*(void **)(resident + 0x2290), obj + 0x10, 0x30000, v,
+    resident = g_hero_state;
+    coll_sweep_from_object(*(void **)(resident + 0x2290), obj + 0x10, 0x30000, v,
                   (f32)FloatToInt(*(f32 *)(ctl + 0xC)), 1.0f, 0, 1, 0);
-    if (FastFloatHelperD(ctl + 0x8))
-        MarkMobySpawned(obj);
+    if (math_fast_float_d(ctl + 0x8))
+        moby_mark_spawned(obj);
 }
 
 /* State 0 seeds four lanes (phase offsets, random rates and values); state 1
@@ -207,7 +207,7 @@ void func_L22_003AD090(u8 *moby) {
  * lets cse derive the first one from the position address the distance call
  * took (`addiu $a0,$s1,-0x80`) and rebuild the second, as retail does. */
 /* Per-frame update for moby class 2489: sets up four flickering lanes, reacts to the player being near, throws sparks and pulses its colour. */
-void func_L22_003C9880(u8 *obj)
+void spark_lane_update(u8 *obj)
 {
     u8 *ctl = *(u8 **)(obj + 0x68);
     int state = obj[0x20];
@@ -215,7 +215,7 @@ void func_L22_003C9880(u8 *obj)
 
     switch (state) {
     case 0:
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         *(short *)(obj + 0x32) = 255;
         {
             float *offset, *rate, *radius;
@@ -225,8 +225,8 @@ void func_L22_003C9880(u8 *obj)
             offset = (float *)(ctl + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
-                *rate++ = RandomFloatRange(D_L22_001AFF08[0], D_L22_001AFF08[1]) * (1.0f / 60.0f);
-                *radius++ = RandomFloatRange(D_L22_001AFF10[0], D_L22_001AFF10[1]);
+                *rate++ = math_random_float_range(D_L22_001AFF08[0], D_L22_001AFF08[1]) * (1.0f / 60.0f);
+                *radius++ = math_random_float_range(D_L22_001AFF10[0], D_L22_001AFF10[1]);
             }
         }
         break;
@@ -234,18 +234,18 @@ void func_L22_003C9880(u8 *obj)
         u8 *player;
         SubtitleHistory *history;
 
-        if (fast_vec_dist(gHeroState + 0x80, obj + 0x10) < 3.0f)
+        if (fast_vec_dist(g_hero_state + 0x80, obj + 0x10) < 3.0f)
             D_L22_001A7CD8[0] = *(float *)ctl;
-        player = gHeroState;
+        player = g_hero_state;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
             PlayMobySound(0, 0, (char *)obj);
-        history = gSubtitleHistory;
+        history = g_subtitle_history;
         {
             /* unsigned int snapshot: retail tests the u16 with an andi and
              * increments the unmasked value */
             unsigned int count = history[31].count;
             if ((unsigned short)count <= 65534) {
-                u8 *player2 = gHeroState;
+                u8 *player2 = g_hero_state;
                 if (*(int *)(player2 + 0x2294) == 0x81)
                     history[31].count = 65535;
                 else if (*(u8 **)(player2 + 0x33C) == obj) {
@@ -254,7 +254,7 @@ void func_L22_003C9880(u8 *obj)
                     if ((unsigned short)count != 0) {
                         unsigned int last = history[31].time;
                         if (D_001A7390[0] - last > 1080 || last == 0)
-                            RequestSubtitleVoiceLine(2504, 31);
+                            subtitle_request_voice_line(2504, 31);
                         else if (last < D_001A7390[0])
                             history[31].time = D_001A7390[0];
                     } else {
@@ -262,14 +262,14 @@ void func_L22_003C9880(u8 *obj)
                         if (history[31].time < D_001A7390[0])
                             history[31].time = D_001A7390[0];
                         history[31].levels =
-                            (history[31].levels | (1 << gCurrentMapIndex[0])) | 0x80000000;
+                            (history[31].levels | (1 << g_current_map_index[0])) | 0x80000000;
                     }
                 }
             }
         }
-        if (FastVecDot(obj + 0xE0, gHeroState + 0x2C0) < -0.6f) {
-            EmitRandomSpark((char *)obj);
-            AddDrawCallbackToList1(DrawSparkLanes, obj);
+        if (FastVecDot(obj + 0xE0, g_hero_state + 0x2C0) < -0.6f) {
+            spark_emit_random((char *)obj);
+            gfx_add_draw_callback_first(spark_lane_draw, obj);
         }
         break;
     }
@@ -278,7 +278,7 @@ void func_L22_003C9880(u8 *obj)
         float f;
         *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
                                             D_L22_001AFF20[0] * 0.0002908882452175021f);
-        f = FastSinOrCosB(*(float *)(ctl + 4));
+        f = math_fast_sin_or_cos_b(*(float *)(ctl + 4));
         f = f * f;
         f = f * f;
         *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
@@ -289,32 +289,32 @@ void func_L22_003C9880(u8 *obj)
 
 /* func_L22_003C9D48 is in L22_003C9D48-g8.c. */
 
-extern void *func_002A9640(void *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(void *a0, int a1, int a2);
 
-extern int func_002A77E0(int a0);
+extern int math_random_int_below(int a0);
 
-extern int func_002E5DA0(int index, int value, char *object, int kind);
+extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
 
-extern void func_002AC728(void *a0, void *a1, int a2, float f12, float f13);
+extern void part_spawn_explosion_with_sparks(void *a0, void *a1, int a2, float f12, float f13);
 
-extern int func_002E5CF8(int index, int a1, char *a2);
+extern int PlayMobySound(int index, int a1, char *a2);
 
-extern void func_00282F20(float *a0, void *a1, float f12);
+extern void vec_scale_to_length(float *a0, void *a1, float f12);
 
-extern void func_002B0A68(void *a0, int a1, void *a2, unsigned char a3,
+extern void part_spawn_masked_debris(void *a0, int a1, void *a2, unsigned char a3,
                            float f12, float f13, float f14, float f15);
 
-extern void func_0029F338(void *object);
+extern void moby_mark_spawned(void *object);
 
 /* Blows the object up: plays a random sound, adds an effect and a burst of sparks, then removes it. */
-void func_L22_003D4320(u8 *moby, int a1, int a2) {
+void moby_explode(u8 *moby, int a1, int a2) {
     u8 *obj = moby;
     void *target;
     int soundBase;
     int soundId;
     float offset[4];
 
-    target = FindOwnedEffectSlot(moby, -1, 0);
+    target = part_find_owned_effect_slot(moby, -1, 0);
     if (target == 0)
         return;
     if (*(short *)(obj + 0xAA) == 0x1213 /* moby class 4627 */) {
@@ -324,20 +324,20 @@ void func_L22_003D4320(u8 *moby, int a1, int a2) {
         soundBase = 0xC;
         soundId = 0xE0B;
     }
-    PlaySoundFromClassBank(soundBase + RandomIntBelow(3), 0, obj, soundId);
-    SpawnExplosionWithSparks(obj, obj + 0x10, -1, 2.0f, 13.0f);
+    snd_play_from_class_bank(soundBase + math_random_int_below(3), 0, obj, soundId);
+    part_spawn_explosion_with_sparks(obj, obj + 0x10, -1, 2.0f, 13.0f);
     PlayMobySound(0, 0, obj);
     vec_scale_to_length(offset, target + 0x10, 0.23333335f);
-    SpawnDebrisForMaskedParts(obj, 3, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    MarkMobySpawned(obj);
+    part_spawn_masked_debris(obj, 3, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    moby_mark_spawned(obj);
 }
 
-extern void func_L22_003D4320(u8 *a0, int a1, int a2);
+extern void moby_explode(u8 *a0, int a1, int a2);
 
 /* Runs the explosion routine for the object and makes it fully visible. */
-void func_L22_003D4428(u8 *moby) {
+void moby_trigger_explosion(u8 *moby) {
     int vars = *(int *)(moby + 0x68);
-    ExplodeObject(moby, vars, vars);
+    moby_explode(moby, vars, vars);
     *(u8 *)(moby + 0x30) = 0xFF;
 }
 
@@ -383,13 +383,13 @@ void func_L22_003D4428(u8 *moby) {
 
 /* func_L22_0040DD40 is defined in L22_0040DD40-helper-g8.c. */
 
-extern f32 func_002A7878(f32 low, f32 high);
+extern f32 math_random_float_range(f32 low, f32 high);
 
-extern void func_0032C700(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern void SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           int a8, int a9, int a10, int a11, f32 f12, f32 f13);
 
 /* Starts an effect on the object with a random size between 0.8 and 1.2. */
-void func_L22_0040E2B0(u8 *moby) {
-    f32 scale = RandomFloatRange(0.8f, 1.2f);
+void part_start_random_scale_effect(u8 *moby) {
+    f32 scale = math_random_float_range(0.8f, 1.2f);
     SpawnExplosion(moby, 0, 5, 4, 4, 4, 4, 0, 0, 0, 0, 0, scale, 20.0f);
 }

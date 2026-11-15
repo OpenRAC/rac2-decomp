@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,10 +25,10 @@
  */
 #include "common.h"
 
-extern s8 D_00189E20[];
+extern s8 g_hero_state[];
 /* Returns 1 if the given object is the one the hero is standing on (or holding). */
-s32 func_L06_003E3ED0(s32 moby) {
-    s8 *hero = gHeroState;
+s32 hero_is_on_moby(s32 moby) {
+    s8 *hero = g_hero_state;
     if (*(s32 *)(hero + 0x229C) == 3 || *(s32 *)(hero + 0x2294) == 0x1B) {
         if (*(s32 *)(hero + 0x588) != moby) goto failure;
         return 1;

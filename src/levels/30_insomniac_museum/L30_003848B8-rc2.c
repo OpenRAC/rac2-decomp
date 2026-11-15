@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,10 +26,10 @@
 
 extern s32 ref_L30_003848B8_00 __attribute__((sda));
 extern s32 ref_L30_003848B8_01[];
-extern s8 D_001A63A8[];
+extern s8 g_music_state[];
 
 /* Picks the next time value for the chosen entry and stores it in the game state; returns 1 if it did, 0 if not. */
-s32 func_L30_003848B8(void *moby) {
+s32 museum_schedule_next_exhibit_entry(void *moby) {
     s8 *vars;
     s8 *gameState;
     s8 *state;
@@ -39,7 +40,7 @@ s32 func_L30_003848B8(void *moby) {
     s32 firstOffset;
     s32 secondOffset;
 
-    gameState = gMusicState;
+    gameState = g_music_state;
     vars = *(s8 **)((s8 *)moby + 0x68);
     slot = *(s32 *)(vars + 0x144);
     kind = ref_L30_003848B8_01[slot];
@@ -61,7 +62,7 @@ s32 func_L30_003848B8(void *moby) {
             } else {
                 value = *(s32 *)(vars + 0x124);
             }
-            state = gMusicState;
+            state = g_music_state;
             *(s32 *)(state + 0x24) = (value & 0x3FFF) + 0xBB8;
             *(s32 *)(state + 0x28) = 0;
             return 1;

@@ -3,6 +3,6 @@
 
 /* rac1-decomp src/core/00118A40.c: func_001191C0 */
 /* Always returns 1. */
-int func_003506A8(void) {
+int mpeg_return_true(void) {
     return 1;
 }

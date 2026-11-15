@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #include "include_asm.h"
 
@@ -10,15 +11,15 @@ typedef signed short s16;
 typedef signed int s32;
 typedef float f32;
 
-extern u8 *D_L04_001FB1E0[];
-extern u8 *D_L04_001B24DC __attribute__((sda));
+extern u8 *g_moby_l04_group_lists[];
+extern u8 *g_moby_l04_pool __attribute__((sda));
 
-extern void func_00282CF0(char *a0, char *a1, char *a2);
-extern float func_00282DB0(char *a0, char *a1);
-extern void func_L00_00323F70(void *input, int *out_x, int *out_y);
-extern int func_L00_002EA668(s32 a0, u16 a1, u16 a2, s32 a3, s32 a4, s32 a5, f32 *a6);
-extern s32 D_001A7340 __attribute__((sda));
-extern s32 D_001A7344;
+extern void FastVecSub(char *a0, char *a1, char *a2);
+extern float FastVecDot(char *a0, char *a1);
+extern void coll_world_pos_to_grid_cell(void *input, int *out_x, int *out_y);
+extern int part_l00_alloc_effect_slot(s32 a0, u16 a1, u16 a2, s32 a3, s32 a4, s32 a5, f32 *a6);
+extern s32 g_screen_width __attribute__((sda));
+extern s32 g_screen_height;
 extern f32 D_L04_001B31EC __attribute__((sda));
 extern char D_L04_001B9680[];
 
@@ -34,18 +35,18 @@ extern u8 D_L04_001B17D8[8] __attribute__((sda));
 extern u8 D_L04_001B17D0[8] __attribute__((sda));
 extern s32 D_L04_001B1800 __attribute__((sda));
 
-extern void func_002A7750(void *a0, s32 a1, s32 a2);
-extern void *func_002A9640(void *a0, s32 a1, s32 a2);
-extern void func_L00_0032A530(void *a0, void *a1, void *a2, void *a3, s32 a4, s32 a5, s32 a6,
+extern void moby_set_state(void *a0, s32 a1, s32 a2);
+extern void *part_find_owned_effect_slot(void *a0, s32 a1, s32 a2);
+extern void ScatterObjectPieces(void *a0, void *a1, void *a2, void *a3, s32 a4, s32 a5, s32 a6,
                               s32 a7, s32 a8, s32 a9, s32 a10);
-extern void func_L00_00326110(void *a0, s32 a1, f32 f12);
-extern void func_L00_00324F18(void *a0, void *a1, f32 f12, f32 f13, f32 f14);
+extern void part_spawn_scaled_bolts(void *a0, s32 a1, f32 f12);
+extern void vec_local_offset_to_world(void *a0, void *a1, f32 f12, f32 f13, f32 f14);
 /* Integer and float arguments take separate registers, so the interleaving below changes no
    register, only the order the caller loads them in; this is the measured order. */
-extern void func_002ABBB8(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
+extern void SpawnExplosionEffects(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
                           f32 f2, f32 f3, f32 f4, f32 f5, s32 i3, f32 f6, s32 i4, s32 i5, s32 i6,
                           s32 i7, s32 i8);
-extern void func_0029F338(void *a0);
+extern void moby_mark_spawned(void *a0);
 
 extern s32 D_L04_001A8F00;
 extern u8 D_001A7A40;
@@ -72,7 +73,7 @@ extern L04Base004 D_L04_001BD380;
 /* Walks the level's list of objects and, for the one with the object's own id, asks the
    level's helper to clear it and sets the level's three timers. */
 /* Same body as func_L04_00439870, with this function's own callees. */
-void func_L04_00423178(u8 *moby) {
+void moby_reset_matching_effects(u8 *moby) {
     u32 *elem;
     s32 i;
 

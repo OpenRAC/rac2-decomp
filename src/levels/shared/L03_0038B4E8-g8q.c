@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern int D_001AEF60 __attribute__((sda));
 
 /* Sets the starting values (colors, sizes, timers and position) of an effect moby when it is created. */
-void func_L03_0038B4E8(unsigned char *object) {
+void effect_init_moby_state(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *source = object;
     int value;

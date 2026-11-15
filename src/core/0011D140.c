@@ -8,7 +8,7 @@ extern int r1_func_0011D960(void);
 extern void r1_func_0011D9A8(void);
 
        /* sceSifSetReg */
-extern void func_0011D238(char *);
+extern void sif_rpc_finish_request(char *);
 
 /*
  * sifrpc's _request_end: the completion handler for a request block. Two
@@ -33,9 +33,9 @@ extern void func_0011D238(char *);
  */
 extern int r1_func_00118CA0(int);
 
-extern void func_0011D2F0(void *, void *);
+extern void sif_rpc_handle_read_data(void *, void *);
 
-extern void func_0011D3A0(void *, void *);
+extern void sif_rpc_handle_bind(void *, void *);
 
 typedef struct {
     int packet;
@@ -71,13 +71,13 @@ extern s32_1B4C8 r1_func_00118C70();
 
 extern s32_1B4C8 r1_func_00118CB0();
 
-extern s32_1B4C8 func_0011CD20();
+extern s32_1B4C8 sceSifSendCmd();
 
 extern s32 r1_func_00118CB0(s32);
 
-extern int func_0011D450(void *, int, int);
+extern int sceSifBindRpc(void *, int, int);
 
-extern void func_0011D590(void *, void *);
+extern void sif_rpc_handle_call(void *, void *);
 
 extern void r1_func_00119678(int thread_id);
 
@@ -102,7 +102,7 @@ extern void r1_func_00119678(int thread_id);
    the function comes out 4 bytes short. Giving the two arms their own
    assignments to `id` keeps both definitions alive. */
 /* Finds a free packet slot in the RPC packet table and hands it out with a fresh id. Returns 0 if the table is full. */
-void *func_0011D140(void *tablePtr) {
+void *sif_rpc_alloc_packet(void *tablePtr) {
     char *table = (char *)tablePtr;
     int slotCount;
     char *slot;
@@ -139,7 +139,7 @@ void *func_0011D140(void *tablePtr) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011B090 */
 /* Gives a packet slot back by clearing its id and its in-use flag. */
-void func_0011D1E8(void *slotPtr) {
+void sif_rpc_free_packet(void *slotPtr) {
     char *slot = (char *)slotPtr;
     unsigned int flags = *(unsigned int *)(slot + 0x10);
     *(int *)(slot + 0x18) = 0;
@@ -173,7 +173,7 @@ void func_0011D1E8(void *slotPtr) {
 /* The slot address is computed into a local before next = i + 1 is
    stored. */
 /* Hands out the next response packet from a ring of packets, wrapping around at the end. */
-void *func_0011D208(void *ringPtr) {
+void *sif_rpc_get_next_response_packet(void *ringPtr) {
     char *ring = (char *)ringPtr;
     int index = *(int *)(ring + 0x24) % *(int *)(ring + 0x18);
     char *slot = *(char **)(ring + 0x14) + index * 0x40;
@@ -183,7 +183,7 @@ void *func_0011D208(void *ringPtr) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011B0E0 */
 /* Finishes an RPC request: runs any end callback, wakes the waiting thread and frees the packet. */
-void func_0011D238(char *request) {
+void sif_rpc_finish_request(char *request) {
     char *client;
     int semaId;
 
@@ -210,7 +210,7 @@ void func_0011D238(char *request) {
     if (semaId >= 0) {
         r1_func_00118CA0(semaId);
     }
-    FreeRpcPacket(*(void **)client);
+    sif_rpc_free_packet(*(void **)client);
     *(int *)client = 0;
 }
 
@@ -228,21 +228,21 @@ void func_0011D238(char *request) {
    reads, one field hoisted, or reversed declaration order -- swaps that
    allocation or reloads recvbuf late). */
 /* Answers a data request from the IOP by building a reply packet and sending it back. */
-void func_0011D2F0(void *rdata, void *data) {
+void sif_rpc_handle_read_data(void *rdata, void *data) {
     int *request = (int *)rdata;
-    int *response = (int *)GetNextRpcResponsePacket(data);
+    int *response = (int *)sif_rpc_get_next_response_packet(data);
     int pkt_addr = request[5];
     int recvbuf = request[7];
 
     response[5] = pkt_addr;
     response[7] = recvbuf;
     response[8] = 0x8000000C;
-    SendSifCmdFromInterrupt(0x80000008, (int)response, 0x40, request[8], request[9], request[10]);
+    isceSifSendCmd(0x80000008, (int)response, 0x40, request[8], request[9], request[10]);
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011B1F8 */
 /* Searches the list of servers for the one with the given id. Returns 0 if none is found. */
-void *func_0011D350(int key, void *dataTable) {
+void *sif_rpc_find_server_by_id(int key, void *dataTable) {
     void *queue = *(void **)((char *)dataTable + 0x28);
     while (queue != 0) {
         void *serverData = *(void **)((char *)queue + 8);
@@ -275,9 +275,9 @@ void *func_0011D350(int key, void *dataTable) {
    (retail branches on `sd == 0` being false, i.e. `bnel`; writing the
    found case first inverts the branch, as in func_0011D590). */
 /* Answers a bind request from the IOP by looking up the server and sending its details back. */
-void func_0011D3A0(void *bind, void *data) {
+void sif_rpc_handle_bind(void *bind, void *data) {
     int *request = (int *)bind;
-    int *response = (int *)GetNextRpcResponsePacket(data);
+    int *response = (int *)sif_rpc_get_next_response_packet(data);
     int pkt_addr = request[5];
     int cd = request[7];
     int *serverData;
@@ -285,7 +285,7 @@ void func_0011D3A0(void *bind, void *data) {
     response[7] = cd;
     response[5] = pkt_addr;
     response[8] = 0x80000009;
-    serverData = (int *)FindRpcServerById(request[8], data);
+    serverData = (int *)sif_rpc_find_server_by_id(request[8], data);
     if (serverData == 0) {
         response[9] = 0;
         response[10] = 0;
@@ -295,7 +295,7 @@ void func_0011D3A0(void *bind, void *data) {
         response[10] = serverData[2];
         response[11] = serverData[5];
     }
-    SendSifCmdFromInterrupt(0x80000008, (int)response, 0x40, 0, 0, 0);
+    isceSifSendCmd(0x80000008, (int)response, 0x40, 0, 0, 0);
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011B2F8 */
@@ -303,7 +303,7 @@ void func_0011D3A0(void *bind, void *data) {
 
 /* sceSifBindRpc. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Connects a client to a server on the IOP and waits until the server answers. */
-int func_0011D450(void *clientArg, int serviceId, int mode) {
+int sceSifBindRpc(void *clientArg, int serviceId, int mode) {
     BindClient *client = clientArg;
     int sema_param[6];
     int semaId;
@@ -311,7 +311,7 @@ int func_0011D450(void *clientArg, int serviceId, int mode) {
 
     client->unk10 = 0;
     client->server = 0;
-    packet = (BindPacket *)AllocRpcPacket(r1_D_00156900);
+    packet = (BindPacket *)sif_rpc_alloc_packet(r1_D_00156900);
     if (packet == 0) {
         return -1;
     }
@@ -330,13 +330,13 @@ int func_0011D450(void *clientArg, int serviceId, int mode) {
     if (semaId >= 0) {
         goto block_4;
     }
-    FreeRpcPacket(packet);
+    sif_rpc_free_packet(packet);
     return -3;
 block_4:
-    if (SendSifCmd(0x80000009, (int)packet, 0x40, 0, 0, 0) != 0) {
+    if (sceSifSendCmd(0x80000009, (int)packet, 0x40, 0, 0, 0) != 0) {
         goto block_6;
     }
-    FreeRpcPacket(packet);
+    sif_rpc_free_packet(packet);
     r1_func_00118C80(client->semaphoreId);
     return -2;
 block_6:
@@ -345,10 +345,10 @@ block_6:
     return 0;
 block_7:
     client->semaphoreId = -1;
-    if (SendSifCmd(0x80000009, (int)packet, 0x40, 0, 0, 0) != 0) {
+    if (sceSifSendCmd(0x80000009, (int)packet, 0x40, 0, 0, 0) != 0) {
         return 0;
     }
-    FreeRpcPacket(packet);
+    sif_rpc_free_packet(packet);
     return -2;
 }
 
@@ -372,7 +372,7 @@ block_7:
    allocator lever as func_0011D2F0 -- or the pair's load/store order
    swaps or its two registers trade places. */
 /* Adds an incoming call request to its server queue and wakes the server thread. */
-void func_0011D590(void *request, void *data) {
+void sif_rpc_handle_call(void *request, void *data) {
     int *req = (int *)request;
     int *sd = (int *)req[13];
     int *base = (int *)sd[16];
@@ -443,7 +443,7 @@ extern s32_1B4C8 r1_func_0011AD70_1B4C8() __asm__("r1_func_0011AD70");
 
 /* rac1-decomp src/core/00119D88.c: func_0011D620 */
 /* Sends a call to a server on the IOP, and waits for the answer unless asked not to. */
-s32_1B4C8 func_0011D620(struct SifRpcClient_1B4C8 *client, s32_1B4C8 rpc_number, s32_1B4C8 mode, s32_1B4C8 send_buf, s32_1B4C8 send_size,
+s32_1B4C8 sceSifCallRpc(struct SifRpcClient_1B4C8 *client, s32_1B4C8 rpc_number, s32_1B4C8 mode, s32_1B4C8 send_buf, s32_1B4C8 send_size,
                           s32_1B4C8 recv_buf, s32_1B4C8 recv_size, s32_1B4C8 end_func, s32_1B4C8 end_data) {
     s32_1B4C8 semaphore_parameters[6];
     struct SifRpcPacket_1B4C8 *packet;
@@ -542,7 +542,7 @@ s32_1B4C8 func_0011D620(struct SifRpcClient_1B4C8 *client, s32_1B4C8 rpc_number,
    form returning 1 merges the exits; early returns give bnel. */
 /* One test for the three failure cases, then return 1. */
 /* Checks that an RPC handle still points to a packet that is in use. */
-int func_0011D810(void *handlePtr) {
+int sif_rpc_is_handle_valid(void *handlePtr) {
     char *handle = (char *)handlePtr;
     char *slot = *(char **)handle;
 

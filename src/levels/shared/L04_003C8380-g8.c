@@ -1,21 +1,21 @@
 #include "common.h"
 
-extern unsigned int D_L04_001B24DC;
+extern unsigned int g_moby_l04_pool;
 
-extern int func_00282948(void *a0);
+extern int math_fast_float_d(void *a0);
 
-extern void func_L04_003F8FA0(unsigned char *a0);
+extern void glow_ring_init_variant(unsigned char *a0);
 
-extern void func_L04_003F9078(unsigned char *a0);
+extern void glow_ring_update_variant(unsigned char *a0);
 
 /* Update for the hoverbike race item box: waits for its owner slot to be active, then shows or hides itself. */
-void func_L04_003F9270(unsigned char *moby) {
+void hoverbike_race_item_box_update(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int ownerIndex = *(int *)(vars + 8);
     unsigned char *ownerEntry;
 
     if (ownerIndex != -1) {
-        ownerEntry = (unsigned char *)((ownerIndex << 8) + gMobyPool_L04);
+        ownerEntry = (unsigned char *)((ownerIndex << 8) + g_moby_l04_pool);
         if ((unsigned int)(ownerEntry[0x20] - 2) >= 2) {
             return;
         }
@@ -25,10 +25,10 @@ void func_L04_003F9270(unsigned char *moby) {
         moby[0x30] = 0xFF;
         *(unsigned short *)(moby + 0x32) = 0x7F;
         moby[0x20] = 1;
-        InitGlowRingMobyVariant(moby);
+        glow_ring_init_variant(moby);
     }
-    if (FastFloatHelperD(vars) != 0) {
-        UpdateGlowRingMobyVariant(moby);
+    if (math_fast_float_d(vars) != 0) {
+        glow_ring_update_variant(moby);
         *(unsigned short *)(moby + 0x34) &= 0xFFBE;
     } else {
         *(unsigned short *)(moby + 0x34) |= 0x41;
@@ -49,7 +49,7 @@ typedef struct {
 extern unsigned char *ref_L04_003FBD80_00(int kind);
 extern int ref_L04_003FBD80_01(int a0, int a1, void *owner);
 extern float ref_L04_003FBD80_02(float low, float high);
-extern void func_L04_003FB990(unsigned char *object, L04_FBD80Vars *vars);
+extern void moby_damage_in_firing_cone(unsigned char *object, L04_FBD80Vars *vars);
 extern int D_L04_001B0488 __attribute__((sda));
 
 /* Spawns a kind-0xABE object for an entity of kind 0xBBC: it takes the entity's 8-byte
@@ -58,7 +58,7 @@ extern int D_L04_001B0488 __attribute__((sda));
    points back at the entity with a 0.5 scale and a jitter table of 28 random floats in
    [-10, 10] / 75, the first and last zero. Returns the object, or 0. */
 /* Creates a shield dome effect around the given object at the given position. */
-unsigned char *func_L04_003FBD80(unsigned char *owner, L04_FBD80Quad *posIn)
+unsigned char *shield_dome_spawn(unsigned char *owner, L04_FBD80Quad *posIn)
 {
     float spawnPos[4] __attribute__((aligned(16)));
     unsigned char *dome;
@@ -96,7 +96,7 @@ unsigned char *func_L04_003FBD80(unsigned char *owner, L04_FBD80Quad *posIn)
             if (i == 0 || i == 27)
                 domeVars->jitter[i] = 0;
         }
-        DamageMobysInFiringCone(dome, domeVars);
+        moby_damage_in_firing_cone(dome, domeVars);
     }
     return dome;
 }
@@ -104,41 +104,41 @@ unsigned char *func_L04_003FBD80(unsigned char *owner, L04_FBD80Quad *posIn)
 typedef int UpdateQuad __attribute__((mode(TI)));
 typedef float L04_EE090Vec[4] __attribute__((aligned(16)));
 extern int D_L04_001B2008 MACRO_ADDR;
-extern L04_EE090Vec D_L04_001B9680, D_00189EA0;
+extern L04_EE090Vec D_L04_001B9680, g_hero_position;
 extern unsigned char D_L04_001A8F20[] MACRO_ADDR;
 /* Table of 0x80-byte target records; targets[] below holds indices into it. */
 extern unsigned char *D_L04_001B25CC __attribute__((sda));
-extern unsigned char *D_L04_001FE340[];
-extern void func_L04_003EDF80(unsigned char *, unsigned char *);
-extern int func_L04_003EDFF0(unsigned char *, unsigned char *);
-extern void func_0029F338(void *);
-extern int func_002A8600(unsigned char **, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_002A7470(void *, int, int, int);
-extern int func_00282978(short *);
-extern int func_002A77E0(int);
-extern void func_L04_003429F8(void *, void *, void *, int, void *, int, float);
-extern int func_002A7820(int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282FB8(void *, void *, float);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_L02_0031E9E8(void *, float);
-extern float func_002A7878(float, float);
-extern float func_002A89A8(void *, int, float);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002ACB48(void *, float);
-extern float func_L00_0031CDD0(void *, void *, int, float, float);
-extern unsigned char *func_L04_003EDD40(void *, void *);
-extern void func_002A7A00(void *, float, float);
-extern void *func_L04_0030C4C0(void *, void *, void *, void *, void *, void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern char *func_0032C700(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern void func_002A6C58(void *, int, int);
+extern unsigned char *g_route_path_table[];
+extern void moby_start_timed_effect(unsigned char *, unsigned char *);
+extern int moby_count_slot_objects_find_free(unsigned char *, unsigned char *);
+extern void moby_mark_spawned(void *);
+extern int GetFirstMobyInGroup(unsigned char **, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern int FastDecTimer(short *);
+extern int math_random_int_below(int);
+extern void FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
+extern int math_random_int_range(int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_fast_divide_helper(void *, void *, float);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_random_planar_offset(void *, float);
+extern float math_random_float_range(float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_add_random_offset(void *, float);
+extern float weapon_compute_shot_launch_speed(void *, void *, int, float, float);
+extern unsigned char *SpawnChildMoby(void *, void *);
+extern void vec_random_direction(void *, float, float);
+extern void *level_build_spawn_record(void *, void *, void *, void *, void *, void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern void SetDeathBits(void *, int, int);
 
 typedef struct {
     char pad0[0x20];
@@ -170,7 +170,7 @@ typedef struct {
 /* Launcher: pick a target point near a record (nearest to the player, or a
  * random one), fire a child towards it, and retire after enough shots. */
 /* Update for a launcher: picks a target point near a record or the player and fires a shot at it, until it runs out of shots. */
-void func_L04_003EE090(unsigned char *moby)
+void LaunchSpawnerMobyUpdate(unsigned char *moby)
 {
     float target[4], delta[4], rotation[4], axis[4], position[4], velocity[4];
     L04_EE090Vars *vars = *(L04_EE090Vars **)(moby + 0x68);
@@ -178,9 +178,9 @@ void func_L04_003EE090(unsigned char *moby)
     int foundCount, slot;
     float speedScale, groundZ;
 
-    StartMobyTimedEffect(moby, (unsigned char *)vars);
+    moby_start_timed_effect(moby, (unsigned char *)vars);
     if (moby[0x31] && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
     switch (moby[0x20]) {
@@ -192,7 +192,7 @@ void func_L04_003EE090(unsigned char *moby)
             cursorMoby = 0;
             foundCount = 0;
             while (!GetFirstMobyInGroup(&cursorMoby, vars->group, 0, 0)) {
-                MarkMobySpawned(cursorMoby);
+                moby_mark_spawned(cursorMoby);
                 foundCount++;
             }
             if (foundCount < vars->limit)
@@ -203,12 +203,12 @@ void func_L04_003EE090(unsigned char *moby)
     case 1: {
         float best, distance;
 
-        StartMobyTimedEffect(moby, (unsigned char *)vars);
+        moby_start_timed_effect(moby, (unsigned char *)vars);
         if (moby[0x43] == 1 && (moby[0x60] & 2))
-            StartAnimationBlended(moby, 0, 0, 5);
+            anim_start_blended(moby, 0, 0, 5);
         if (!FastDecTimer(&vars->timer))
             break;
-        if (!RandomIntBelow(7)) {
+        if (!math_random_int_below(7)) {
             void *ids, *path;
             int n, pathCount;
             ids = 0;
@@ -220,7 +220,7 @@ void func_L04_003EE090(unsigned char *moby)
                 n = 1;
             }
             if (vars->pathIndex != -1) {
-                unsigned char *d = gRoutePathTable[vars->pathIndex];
+                unsigned char *d = g_route_path_table[vars->pathIndex];
                 path = d + 0x10;
                 pathCount = *(int *)d;
             }
@@ -236,7 +236,7 @@ void func_L04_003EE090(unsigned char *moby)
         }
         if (vars->linkState == 2)
             break;
-        slot = CountSlotObjectsAndFindFreeSlot(moby, (unsigned char *)vars);
+        slot = moby_count_slot_objects_find_free(moby, (unsigned char *)vars);
         if (vars->fired >= vars->limit || slot == -1)
             break;
         chosenTarget = 0;
@@ -249,7 +249,7 @@ void func_L04_003EE090(unsigned char *moby)
                 int id = ((int *)((unsigned char *)vars + 0x90))[i];
                 if (id != -1) {
                     unsigned char *q = D_L04_001B25CC + id * 128;
-                    distance = fast_vec_dist(gHeroPosition, q + 0x30);
+                    distance = fast_vec_dist(g_hero_position, q + 0x30);
                     if (distance < best) {
                         chosenTarget = q;
                         best = distance;
@@ -260,7 +260,7 @@ void func_L04_003EE090(unsigned char *moby)
                 FastVecSub(target, &vars->goal, moby + 0x10);
                 FastVecScale(target, target, 0.5f);
                 if (vars->range > 1.0f)
-                    FastVectorDivideHelper(target, target, 1.0f);
+                    vec_fast_divide_helper(target, target, 1.0f);
                 if (FastVecLength(target) < 1.0f)
                     vec_scale_to_length(target, target, 1.0f);
                 FastVecAdd(target, target, moby + 0x10);
@@ -269,7 +269,7 @@ void func_L04_003EE090(unsigned char *moby)
             }
         } else {
             int i;
-            int start = RandomIntRange(0, 3);
+            int start = math_random_int_range(0, 3);
             /* targets[k] is read twice (cse merges the loads), keeping the
              * exit test short enough that jump1 does not peel an iteration. */
             for (i = 0; i < 4; i++) {
@@ -283,45 +283,45 @@ void func_L04_003EE090(unsigned char *moby)
                 float radius = vars->range;
                 if (radius < 1.0f)
                     radius = 1.0f;
-                RandomPlanarOffset(target, radius);
+                math_random_planar_offset(target, radius);
                 FastVecAdd(target, target, moby + 0x10);
             } else {
                 qcopy_nc(target, chosenTarget + 0x30);
             }
         }
         if (chosenTarget) {
-            FastVecScale(delta, chosenTarget, RandomFloatRange(-0.5f, 0.5f));
+            FastVecScale(delta, chosenTarget, math_random_float_range(-0.5f, 0.5f));
             FastVecAdd(target, target, delta);
-            FastVecScale(delta, chosenTarget + 0x10, RandomFloatRange(-0.5f, 0.5f));
+            FastVecScale(delta, chosenTarget + 0x10, math_random_float_range(-0.5f, 0.5f));
             FastVecAdd(target, target, delta);
         }
-        groundZ = ProbeGroundHeightBelow(target, 0, 3.0f);
+        groundZ = coll_probe_ground_height_below(target, 0, 3.0f);
         if (groundZ != 0)
             target[2] = groundZ;
         FastVecSub(delta, target, moby + 0x10);
         speedScale = FastVecLength(delta) * 0.0100000007f;
         vec_scale_to_length(delta, delta, speedScale);
-        TransformMobyJointToWorld(moby, 0, rotation);
+        moby_transform_joint_to_world(moby, 0, rotation);
         vec_scale_to_length(axis, delta, 0.05f);
-        AddRandomOffsetToVector(axis, 0.025f);
-        delta[2] = ComputeShotLaunchSpeed(rotation, target, 0, speedScale, -0.00272222236f);
+        vec_add_random_offset(axis, 0.025f);
+        delta[2] = weapon_compute_shot_launch_speed(rotation, target, 0, speedScale, -0.00272222236f);
         *(UpdateQuad *)position = *(UpdateQuad *)(moby + 0x10);
         shot = SpawnChildMoby(moby, position);
         *(float *)(shot + 0x2C) = *(float *)(*(unsigned char **)(shot + 0x24) + 0x24);
-        RandomDirectionVector(position, 2.0f, 3.0f);
+        vec_random_direction(position, 2.0f, 3.0f);
         position[2] = 0;
         FastVecAdd(position, position, target);
         rotation[2] += 1.0f;
         *(UpdateQuad *)velocity = 0;
         velocity[2] = 3.0f;
-        BuildSpawnRecordFromBlocks(shot, rotation, velocity, position, velocity, D_L04_001A8F20, 60, 0, 0);
+        level_build_spawn_record(shot, rotation, velocity, position, velocity, D_L04_001A8F20, 60, 0, 0);
         vars->fired++;
         vars->timer = vars->delay;
         if (++vars->shots >= 19)
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         PlayMobySound(0, 0, moby);
         if (moby[0x43] != 1)
-            StartAnimationBlended(moby, 1, 0, 5);
+            anim_start_blended(moby, 1, 0, 5);
         break;
     }
     case 2:
@@ -329,7 +329,7 @@ void func_L04_003EE090(unsigned char *moby)
         vars->speed = 0;
         PlayMobySound(1, 0, moby);
         SetDeathBits(moby, 0, 3);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         break;
     }
 }

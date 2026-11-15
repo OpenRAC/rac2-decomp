@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -28,7 +29,7 @@ extern s32 ref_L07_003F90E8_00 __attribute__((sda));
 extern f32 ref_L07_003F90E8_01(s32);
 
 /* Blends smoothly between two values depending on where a global value sits between two limits. */
-f32 func_L07_003F90E8(s32 lowLimit, s32 highLimit, f32 lowValue, f32 highValue) {
+f32 math_interpolate_between_limits(s32 lowLimit, s32 highLimit, f32 lowValue, f32 highValue) {
     f32 highTerm;
     f32 currentTerm;
     f32 lowTerm;

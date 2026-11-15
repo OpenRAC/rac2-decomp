@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_003395F0, the USA v2.00 copy of func_00338718: the same C, where rename func_00337E30 becomes func_US2_00338CD8. */
 
 typedef int s32;
@@ -11,9 +12,9 @@ typedef unsigned int u32;
  /* text width */
 
 /* Text box laid out by func_00337C10/func_US2_00338CD8: text at +0xA8, its line table at +0x1D8. */
-extern int func_00115DA8(char *, char *, ...); /* formats into a buffer */
+extern int sprintf(char *, char *, ...); /* formats into a buffer */
  /* screen size: [1] = height */
-extern void func_003384C0(char *, unsigned int, unsigned int, float, float, float, float);
+extern void text_box_draw_frame(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields. */
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
@@ -47,11 +48,11 @@ extern ViewState D_001B9040;
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
    ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed
    from the frame's height, then from its width. Colour = alpha << 24 | color. */
-void func_003384C0(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right);
+void text_box_draw_frame(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right);
 
-extern char *func_00288FB8(int);
+extern char *GetLocalizedString(int);
 
-extern int func_00115DA8(char *, char *, ...);
+extern int sprintf(char *, char *, ...);
 
 /* Writes the localised text `text_id` (with `value` as its only argument) into the
    buffer at +0x1E14 of the object, then initialises the sub-object at +0x1D6C with a
@@ -63,6 +64,6 @@ void func_US2_003395F0(char *object, int text_id, int value, int count)
     int limit = (count == -1) ? 120 : count;
     char *buffer = object + 0x1e34;
 
-    func_00115DA8(buffer, func_00288FB8(text_id), value);
+    sprintf(buffer, GetLocalizedString(text_id), value);
     func_US2_00338CD8(sub, 2, limit, 255.0f, 135.0f);
 }

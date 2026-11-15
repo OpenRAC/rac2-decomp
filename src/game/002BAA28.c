@@ -25,17 +25,17 @@ typedef struct {
         s16 scaleB;
     } trail;
 } Particle;
-extern Particle *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern void func_002AE730(float *, int *);
-extern void func_002AE838(void *, void *);
+extern Particle *part_alloc(int);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern void vec_pack_direction(float *, int *);
+extern void vec_decode_byte_color(void *, void *);
 extern u8 *D_001F2540[];
 extern u8 *D_001F259C;
 
-Particle *func_002BAA28(void *position, float *from, float *to, int startColor, int endColor, int kind, int duration, int size, int flags)
+Particle *part_spawn_trail(void *position, float *from, float *to, int startColor, int endColor, int kind, int duration, int size, int flags)
 {
-    Particle *particle = AllocParticle(2);
+    Particle *particle = part_alloc(2);
     float packedVecA[4], packedVecB[4];
     struct ParticleTrail *trailData;
     if (particle != 0) {
@@ -45,7 +45,7 @@ Particle *func_002BAA28(void *position, float *from, float *to, int startColor, 
         particle->phase = 0.0f;
         particle->flag1 = 0;
         particle->mode = 0x44;
-        particle->alpha = FloatToInt(RandomFloatRange(particle->phase, 255.0f));
+        particle->alpha = FloatToInt(math_random_float_range(particle->phase, 255.0f));
         if (flags == -1) {
             particle->texture = *D_001F259C;
         } else {
@@ -57,10 +57,10 @@ Particle *func_002BAA28(void *position, float *from, float *to, int startColor, 
         trailData = &particle->trail;
         trailData->scaleA = FloatToInt(from[3] * 210.00002f);
         trailData->scaleB = FloatToInt(to[3] * 210.00002f);
-        PackDirectionVector(from, &trailData->packedA);
-        PackDirectionVector(to, &trailData->packedB);
-        DecodeByteColorVector(packedVecA, &trailData->packedA);
-        DecodeByteColorVector(packedVecB, &trailData->packedB);
+        vec_pack_direction(from, &trailData->packedA);
+        vec_pack_direction(to, &trailData->packedB);
+        vec_decode_byte_color(packedVecA, &trailData->packedA);
+        vec_decode_byte_color(packedVecB, &trailData->packedB);
         trailData->startColor = startColor;
         trailData->endColor = endColor;
         trailData->kind = kind;

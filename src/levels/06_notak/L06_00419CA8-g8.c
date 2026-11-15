@@ -34,10 +34,10 @@ typedef struct {
     char pad2298[0x1C];
     unsigned char disabled;
 } CrankPlayer;
-extern CrankPlayer D_00189E20;
+extern CrankPlayer g_hero_state;
 extern float D_00189EB8[];
 extern char D_0019B4A8[], D_0019B2E8[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned char D_001A7A45;
 typedef struct { char pad[0x464]; unsigned char collected[0]; } CrankLevelState;
 extern CrankLevelState D_L06_0021E830;
@@ -49,43 +49,43 @@ extern int D_L06_001B9890[];
 extern int D_001A79F0_gp SDATA(D_001A79F0);
 extern float D_L06_001B06E8 SDATA(D_L06_001B06E8);
 extern char *D_L06_001B290C_sda SDATA(D_L06_001B290C);
-extern float func_00283B98(float,float);
-extern float func_00282E80(void *,void *);
-extern float func_00283C80(float,float);
-extern float func_00283248(float,float);
-extern float func_00282C48(float);
-extern int func_L00_0032EF10(int,int,int);
-extern float func_00282E48(void *,void *);
-extern int func_L00_002C42E0(int,int);
-extern void func_00335438(void *,void *,int,int,int);
-extern void func_003353C8(void *);
-extern void func_00335370(void *);
-extern void func_L06_00478548(float,float);
-extern void func_003355A8(int);
-extern float func_002AA2E8(void *,float,float);
-extern float func_00283BE0(float,float);
-extern void func_L06_0039A2F0(void *,int,void *,int,void *);
-extern void func_002A0430(int);
-extern void func_002DF3F8(void *,void *);
-extern int func_002E5CF8(int,int,void *);
-extern float func_00282E20(void *);
-extern void func_00282D90(void *,void *,float);
-extern void func_00283410(void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282DB0(void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_L00_002D2168(int,int,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern float func_002AA3A8(void *,void *,float,float,float,float);
+extern float FastAddRotations(float,float);
+extern float vec_distance_xy(void *,void *);
+extern float FastDiffRots(float,float);
+extern float mat_fast_helper_a(float,float);
+extern float math_fabs(float);
+extern int PadPressedWithin(int,int,int);
+extern float fast_vec_dist(void *,void *);
+extern int hero_l00_set_action(int,int);
+extern void SetCamera5Pose(void *,void *,int,int,int);
+extern void cam_set_state_rotation(void *);
+extern void object_copy_vector_to_selected(void *);
+extern void object_set_kind_five_settings(float,float);
+extern void cam_set_mode_state(int);
+extern float ApproachValue(void *,float,float);
+extern float fast_subtract_rotations(float,float);
+extern void record_add_or_update_entry(void *,int,void *,int,void *);
+extern void moby_mark_table_entry_flagged(int);
+extern void level_capture_checkpoint_state(void *,void *);
+extern int PlayMobySound(int,int,void *);
+extern float vec_length_xy(void *);
+extern void divide_vector_xyz(void *,void *,float);
+extern void euler_to_matrix(void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastVecDot(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void set_hero_animation(int,int,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern float math_spring_float_to_goal(void *,void *,float,float,float,float);
 /* EE argument banks preserve this ordering of the two integers and two floats. */
-extern void func_002AA800(void *angle, float target, int direction, float step);
-extern float func_002A89A8(void *,int,float);
-extern void func_00282A88(void *,int);
+extern void StepAngleTowardTarget(void *angle, float target, int direction, float step);
+extern float coll_probe_ground_height_below(void *,int,float);
+extern void mem_fast_helper_b(void *,int);
 /* Bolt crank interaction, completion tracking and player motion around the crank. */
-void func_L06_00419CA8(char *obj)
+void UpdateBoltCrank(char *obj)
 {
     float matrix[16];
     V input, motion, facing, axis, temp, delta;
@@ -98,9 +98,9 @@ void func_L06_00419CA8(char *obj)
     char *nearby;
     int packed;
     if (!ctx) { F(obj,0xF8)=FastAddRotations(F(obj,0xF8),0.10471977f); return; }
-    if (gHeroState.moveState!=0x37 && U(obj,0x20)==3) {
+    if (g_hero_state.moveState!=0x37 && U(obj,0x20)==3) {
         U(obj,0x20)=1;
-        if (D_L06_001B9890[0]) SetCameraModeState(4);
+        if (D_L06_001B9890[0]) cam_set_mode_state(4);
         return;
     }
     switch (U(obj,0x20)) {
@@ -109,26 +109,26 @@ void func_L06_00419CA8(char *obj)
     case 1:
         id=*(unsigned short *)(obj+0xB2);
         if (D_L06_0021E830.collected[(short)id]) goto used;
-        packed=U(D_0019B4A8,((short)id>>1)+(gCurrentMapIndex<<10));
+        packed=U(D_0019B4A8,((short)id>>1)+(g_current_map_index<<10));
         if ((id&1) ? ((packed>>4)&7) : (packed&7)) {
 used:
             U(obj,0x20)=5; F(obj,0x18)-=0.5f; F(ctx,0)=1.0f; break;
         }
-        if (vec_distance_xy(obj+0x10,gHeroState.position)<1.75f && !gHeroState.interactBusy && !gHeroState.disabled
-            && FastDiffRots(gHeroState.yaw,FastMatrixHelperA(F(obj,0x10)-gHeroState.position[0],F(obj,0x14)-gHeroState.position[1]))<1.5707965f
-            && FloatAbs(gHeroState.position[2]-0.3f-F(obj,0x18))<0.2f && gHeroState.groundState==10
-            && gHeroState.canInteract && PadPressedWithin(0x80,7,0) && (unsigned)I(ctx,0x14)>=31
+        if (vec_distance_xy(obj+0x10,g_hero_state.position)<1.75f && !g_hero_state.interactBusy && !g_hero_state.disabled
+            && FastDiffRots(g_hero_state.yaw,mat_fast_helper_a(F(obj,0x10)-g_hero_state.position[0],F(obj,0x14)-g_hero_state.position[1]))<1.5707965f
+            && math_fabs(g_hero_state.position[2]-0.3f-F(obj,0x18))<0.2f && g_hero_state.groundState==10
+            && g_hero_state.canInteract && PadPressedWithin(0x80,7,0) && (unsigned)I(ctx,0x14)>=31
             && F(obj,0x18)==F(ctx,0x3C) && F(ctx,0)<1.0f) {
             I(ctx,0x14)=0; clear=1; D_L06_001B06E8=0;
             for(i=0,nearby=D_L06_001FB760[0]; nearby; nearby=D_L06_001FB760[++i]) {
                 if(fast_vec_dist(obj+0x10,nearby+0x10)<3.25f) {clear=0;break;}
             }
             if(clear) {
-                SetHeroAction_L00(0x37,1);
+                hero_l00_set_action(0x37,1);
                 SetCamera5Pose(D_L06_001B9840.position,D_L06_001B9840.rotation,3,0xB4,0);
-                SetCameraStateRotation(D_L06_001B290C+(I(ctx,0x20)<<7)+0x70);
-                CopyVectorToSelectedObject(D_L06_001B290C+(I(ctx,0x20)<<7)+0x30);
-                SetKindFiveSettings(F(ctx,0x28),F(ctx,0x2C));
+                cam_set_state_rotation(D_L06_001B290C+(I(ctx,0x20)<<7)+0x70);
+                object_copy_vector_to_selected(D_L06_001B290C+(I(ctx,0x20)<<7)+0x30);
+                object_set_kind_five_settings(F(ctx,0x28),F(ctx,0x2C));
                 U(obj,0x20)=3; I(ctx,0x24)=0; F(ctx,0x18)=F(ctx,0)*6.2831854820251465f*F(ctx,0x30);
             }
             break;
@@ -141,8 +141,8 @@ used:
             if(F(obj,0x18)>=F(ctx,0x3C)) F(obj,0x18)=F(ctx,0x3C);
         } else if(I(ctx,0x38)) {
             if(I(ctx,0x34)!=-1 && !(U(D_0019B2E8,U(obj,0xB0)+(D_001A79F0_gp<<4))&0x80)) {
-                AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); MarkTableEntryFlagged(U(obj,0xB0));
-                if(I(ctx,0x34)!=-1) CaptureCheckpointState(D_L06_001B290C+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C+(I(ctx,0x34)<<7)+0x70);
+                record_add_or_update_entry(ctx,4,obj,2,D_L06_0021DC20); moby_mark_table_entry_flagged(U(obj,0xB0));
+                if(I(ctx,0x34)!=-1) level_capture_checkpoint_state(D_L06_001B290C+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C+(I(ctx,0x34)<<7)+0x70);
             }
             F(obj,0x18)-=0.008333334f;
             if(F(obj,0x18)<=F(ctx,0x3C)-0.5f) F(obj,0x18)=F(ctx,0x3C)-0.5f;
@@ -150,60 +150,60 @@ used:
         break;
     case 3:
         temp.q=0; temp.f[2]=D_L06_001B9840.rotation[2]; axis.q=temp.q;
-        angle=FastMatrixHelperA(gHeroState.position[0]-F(obj,0x10),gHeroState.position[1]-F(obj,0x14));
-        if((PadPressedWithin(0x80,7,0) && gHeroState.modeTimer>=61) || F(ctx,0)==1.0f) {
-            SetHeroAction_L00(0,1);
+        angle=mat_fast_helper_a(g_hero_state.position[0]-F(obj,0x10),g_hero_state.position[1]-F(obj,0x14));
+        if((PadPressedWithin(0x80,7,0) && g_hero_state.modeTimer>=61) || F(ctx,0)==1.0f) {
+            hero_l00_set_action(0,1);
             if(I(ctx,0x38)) {U(obj,0x20)=1;}
             else
             if(F(ctx,0)==1.0f) {
-                AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); U(obj,0x20)=4;
+                record_add_or_update_entry(ctx,4,obj,2,D_L06_0021DC20); U(obj,0x20)=4;
                 id=*(unsigned short *)(obj+0xB2);
                 if(id&1) {
-                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));
+                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));
                     if(((*save>>4)&7)!=7) *save+=16;
                 } else {
-                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));
+                    save=(unsigned char *)D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));
                     if((*save&7)!=7) ++*save;
                 }
                 PlayMobySound(0,0,obj);
                 if(I(ctx,0x34)!=-1 && !(U(D_0019B2E8,U(obj,0xB0)+(D_001A79F0_gp<<4))&0x80)) {
-                    AddOrUpdateRecordEntry(ctx,4,obj,2,D_L06_0021DC20); MarkTableEntryFlagged(U(obj,0xB0));
-                    if(I(ctx,0x34)!=-1) CaptureCheckpointState(D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x70);
+                    record_add_or_update_entry(ctx,4,obj,2,D_L06_0021DC20); moby_mark_table_entry_flagged(U(obj,0xB0));
+                    if(I(ctx,0x34)!=-1) level_capture_checkpoint_state(D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x30,D_L06_001B290C_sda+(I(ctx,0x34)<<7)+0x70);
                 }
             }
-            SetCameraModeState(3); break;
+            cam_set_mode_state(3); break;
         }
-        input.f[1]=-gHeroState.stickY; input.f[0]=-gHeroState.stickX;
+        input.f[1]=-g_hero_state.stickY; input.f[0]=-g_hero_state.stickX;
         inputLength=vec_length_xy(&input);
         if(inputLength>1.0f) divide_vector_xyz(&input,&input,inputLength);
         euler_to_matrix(matrix,&axis); transform_vector(&input,&input,matrix);
-        facing.f[0]=FastSinOrCosA(F(gHeroState.moby,0xF8));
-        facing.f[1]=FastSinOrCosB(F(gHeroState.moby,0xF8)); I(&facing,8)=0;
+        facing.f[0]=math_fast_sin_or_cos_a(F(g_hero_state.moby,0xF8));
+        facing.f[1]=math_fast_sin_or_cos_b(F(g_hero_state.moby,0xF8)); I(&facing,8)=0;
         difference=FastVecDot(&facing,&input)-F(ctx,0x1C);
         if(difference>0.001527777872979641f) difference=0.001527777872979641f;
         if(difference< -0.001527777872979641f) difference= -0.001527777872979641f;
         F(ctx,0x1C)+=difference;
         if(F(ctx,0x1C)>0.06166667118668556f) F(ctx,0x1C)=0.06166667118668556f;
         if(F(ctx,0x1C)<0) F(ctx,0x1C)=0;
-        if(FloatAbs(F(ctx,0x1C))<0.00038194446824491024f) F(ctx,0x1C)=0;
+        if(math_fabs(F(ctx,0x1C))<0.00038194446824491024f) F(ctx,0x1C)=0;
         vec_scale_to_length(&motion,&facing,F(ctx,0x1C));
-        if((gHeroState.animFlags&2) && U(gHeroState.moby,0x43)==0x44) set_hero_animation(0x3F,0,7.0f);
-        if(U(gHeroState.moby,0x43)!=0x44 && !gHeroState.animBusy) {
-            if(U(gHeroState.moby,0x42)==0x40 && FloatAbs(F(ctx,0x1C))==0) set_hero_animation(0x3F,0,14.0f);
-            else if(U(gHeroState.moby,0x42)==0x3F) {if(F(ctx,0x1C)>0) set_hero_animation(0x40,0,14.0f);}
-            else if(U(gHeroState.moby,0x42)==0x40 && F(ctx,0x1C)>0.03700000420212746f) set_hero_animation(0x41,0,14.0f);
-            else if(U(gHeroState.moby,0x42)==0x41 && F(ctx,0x1C)<0.024666668847203255f) set_hero_animation(0x40,0,16.0f);
+        if((g_hero_state.animFlags&2) && U(g_hero_state.moby,0x43)==0x44) set_hero_animation(0x3F,0,7.0f);
+        if(U(g_hero_state.moby,0x43)!=0x44 && !g_hero_state.animBusy) {
+            if(U(g_hero_state.moby,0x42)==0x40 && math_fabs(F(ctx,0x1C))==0) set_hero_animation(0x3F,0,14.0f);
+            else if(U(g_hero_state.moby,0x42)==0x3F) {if(F(ctx,0x1C)>0) set_hero_animation(0x40,0,14.0f);}
+            else if(U(g_hero_state.moby,0x42)==0x40 && F(ctx,0x1C)>0.03700000420212746f) set_hero_animation(0x41,0,14.0f);
+            else if(U(g_hero_state.moby,0x42)==0x41 && F(ctx,0x1C)<0.024666668847203255f) set_hero_animation(0x40,0,16.0f);
         }
-        heroZ=gHeroState.position[2]; FastVecAdd(gHeroState.position,gHeroState.position,&motion);
-        turn=FastMatrixHelperA(gHeroState.position[0]-F(obj,0x10),gHeroState.position[1]-F(obj,0x14));
-        motion.f[0]=FastSinOrCosA(turn)*1.05f; motion.f[1]=FastSinOrCosB(turn)*1.05f; I(&motion,8)=0;
-        FastVecAdd(&temp,obj+0x10,&motion); FastVecSub(&delta,&temp,gHeroState.position);
+        heroZ=g_hero_state.position[2]; FastVecAdd(g_hero_state.position,g_hero_state.position,&motion);
+        turn=mat_fast_helper_a(g_hero_state.position[0]-F(obj,0x10),g_hero_state.position[1]-F(obj,0x14));
+        motion.f[0]=math_fast_sin_or_cos_a(turn)*1.05f; motion.f[1]=math_fast_sin_or_cos_b(turn)*1.05f; I(&motion,8)=0;
+        FastVecAdd(&temp,obj+0x10,&motion); FastVecSub(&delta,&temp,g_hero_state.position);
         I(&delta,8)=0; distance=-vec_length_xy(&delta);
-        SpringFloatToGoal(&distance,&D_L06_001B06E8,0.0f,0.015f,0.3f,0.116666675f);
-        vec_scale_to_length(&delta,&delta,D_L06_001B06E8); FastVecAdd(gHeroState.position,gHeroState.position,&delta);
-        gHeroState.position[2]=heroZ;
-        if (D_001A7A45) gHeroState.targetYaw=FastAddRotations(-1.5707964f,turn);
-        else gHeroState.targetYaw=FastAddRotations(1.5707964f,turn);
+        math_spring_float_to_goal(&distance,&D_L06_001B06E8,0.0f,0.015f,0.3f,0.116666675f);
+        vec_scale_to_length(&delta,&delta,D_L06_001B06E8); FastVecAdd(g_hero_state.position,g_hero_state.position,&delta);
+        g_hero_state.position[2]=heroZ;
+        if (D_001A7A45) g_hero_state.targetYaw=FastAddRotations(-1.5707964f,turn);
+        else g_hero_state.targetYaw=FastAddRotations(1.5707964f,turn);
         {
         /* The yaw is part of the player state at offset 0x98. */
         float *playerYaw=D_00189EB8;
@@ -211,7 +211,7 @@ used:
         StepAngleTowardTarget(playerYaw,player->targetYaw,0,0.10471977f);
         F(ctx,0x24)+=0.0027222223579883575f;
         player->position[2]-=F(ctx,0x24)-2.0f;
-        groundHeight=ProbeGroundHeightBelow(player->position,0,0.5f);
+        groundHeight=coll_probe_ground_height_below(player->position,0,0.5f);
         player->position[2]-=2.0f;
         if(player->position[2]<groundHeight) {player->position[2]=groundHeight; I(ctx,0x24)=0;}
         if(U(player->moby,0x43)!=0x44) {
@@ -224,7 +224,7 @@ used:
         F(ctx,0)=F(ctx,0x18)/(F(ctx,0x30)*6.2831854820251465f);
         if(F(ctx,0)>1) F(ctx,0)=1;
         if(F(ctx,0)<0) F(ctx,0)=0;
-        FastMemoryHelperB(gHeroState.motionState,0xA0);
+        mem_fast_helper_b(g_hero_state.motionState,0xA0);
         }
         break;
     case 4: {

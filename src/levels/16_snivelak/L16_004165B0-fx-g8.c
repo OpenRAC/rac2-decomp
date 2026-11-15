@@ -23,7 +23,7 @@ typedef struct {
     char pad5[0x234];
     int flag;
 } Global;
-extern Global D_00189E20;
+extern Global g_hero_state;
 extern char D_001B9B00[];
 /* Field view at the effect table's original base, not its record stride. */
 
@@ -33,7 +33,7 @@ typedef struct {
     char pad[0x13];
     char *owner;
 } Effect;
-extern char D_00188660[];
+extern char g_sound_state[];
 extern int D_L16_001B1704, D_00138324 __attribute__((nosda));
 extern unsigned short D_001941DC __attribute__((nosda)), D_0018CDF0 __attribute__((nosda));
 extern char *D_L16_001B2B1C;
@@ -49,14 +49,14 @@ extern float func_002E73F8(float), func_002E7680(char *, char *), func_002E7B60(
 extern void func_00317348(float *, float *, float, float, float, float);
 /* EE integer and FP argument banks retain their original order independently. */
 extern void func_00317800(float *, float *, float, float, float, float, int);
-extern void func_00356F88(int), func_L16_00416E30(char *), func_L16_00416FB0(char *), func_L16_00416EC8(char *), func_L16_00417210(char *), func_L16_00416E88(char *), func_L16_00416D08(char *);
+extern void func_00356F88(int), turret_set_camera_matrices(char *), FireAlternatingMuzzleShot(char *), cam_update_turret_follow(char *), UpdateSnivelakSteering(char *), turret_reset_camera_state(char *), turret_explode_into_debris(char *);
 extern void func_002D43B0(char *, unsigned, int, int, int, int, float, float, float);
 extern char *func_003162B8(char *, int, int);
 extern void func_003170E8(float *, float, float), func_002A6750(int), func_00305FC0(int);
 extern int func_002E8648(float);
 
 /* Updates the turret the player can climb into: waiting, being used, aiming, firing and being destroyed. This is the per-frame update of moby class 4334. */
-void func_L16_004165B0(char *self) {
+void snivelak_turret_update(char *self) {
     char buf[16];
     char *vars = P(self, 0x68), *hit;
     float angle;
@@ -82,13 +82,13 @@ void func_L16_004165B0(char *self) {
         if (func_00321930(self))
             func_00357288(3, 0, self);
         state = B(self, 0x20);
-        if ((state == 4 && gHeroState.target != self) || ((heroView = &gHeroState), H(heroView, 0x34e) >= 20))
+        if ((state == 4 && g_hero_state.target != self) || ((heroView = &g_hero_state), H(heroView, 0x34e) >= 20))
             B(self, 0x20) = 1;
         else if (state == 1 && heroView->target == self && heroView->active) {
             func_002E7968(buf, (char *)&D_L16_001B1A80, self + 0xc0);
             func_002E7488(buf, buf, self + 0x10);
             func_002B9578(buf, self + 0xf0, 0x31, 0);
-            gHeroState.owner = self;
+            g_hero_state.owner = self;
             func_00433528(D_001B9B00, D_001B9B00 + 0x10, 3, 60, 0);
             D_0018CDF0 = 0xffff;
             D_L16_001B16C0 = (int)self;
@@ -97,8 +97,8 @@ void func_L16_004165B0(char *self) {
         }
         if (func_002E73F8(F(self, 0x18) - F(vars, 0x78) + D_L16_001B1A90) > 0.01f)
             func_00317348((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78) - D_L16_001B1A90, 0.0005555555690079927f, 0.0005555555690079927f, 0.03333333507180214f);
-        if (func_002E7680(self + 0x10, (char *)&gHeroState.x) > D_L16_001B1A94) {
-            angle = func_002E84F0(func_002E7B60(gHeroState.x - F(self, 0x10), gHeroState.y - F(self, 0x14)), 3.1415927410125732f);
+        if (func_002E7680(self + 0x10, (char *)&g_hero_state.x) > D_L16_001B1A94) {
+            angle = func_002E84F0(func_002E7B60(g_hero_state.x - F(self, 0x10), g_hero_state.y - F(self, 0x14)), 3.1415927410125732f);
             func_00317800((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.10471977293491364f, 0);
         }
         break;
@@ -112,33 +112,33 @@ void func_L16_004165B0(char *self) {
         func_00317800((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, 0);
         if (func_002E73F8(func_002E8538(F(self, 0xf8), angle)) < 0.174532949924469f) {
             if (I(vars, 0xa4) != -1) {
-                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)gSoundState);
+                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
                 if (effect->owner == self && effect->active)
                     func_00356F88(I(vars, 0xa4));
             }
             I(vars, 0xa4) = -1;
         } else {
-            Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)gSoundState);
+            Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
             if (effect->owner != self || !effect->active) I(vars, 0xa4) =
                 func_00357288(4, 4, self);
         }
         if (func_002E73F8(F(self, 0x18) - F(vars, 0x78)) <= F(vars, 0x98) && func_002E85D8(F(self, 0xf8), angle) <= 0.0872664749622345f)
             func_00313DD0(self, 3, -1);
         D_0018CDF0 = 0xffff;
-        SetCameraMatricesFromMoby(self);
+        turret_set_camera_matrices(self);
         FireAlternatingMuzzleShot(self);
-        UpdateTurretFollowCamera(self);
+        cam_update_turret_follow(self);
         break;
     case 5:
     case 6:
         break;
     case 3:
         func_002D43B0(self, 0x600fff0f, 0, 0x26, -1, 4, 1.0f, 0.0f, 90.0f);
-        if ((D_00138324 & 16) || gHeroState.mode != 0x31) {
-            ResetTurretCameraState(self);
+        if ((D_00138324 & 16) || g_hero_state.mode != 0x31) {
+            turret_reset_camera_state(self);
             func_00313DD0(self, 4, -1);
             if (I(vars, 0xa4) != -1) {
-                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)gSoundState);
+                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
                 if (effect->owner == self && effect->active)
                     func_00356F88(I(vars, 0xa4));
             }
@@ -148,8 +148,8 @@ void func_L16_004165B0(char *self) {
         } else {
             UpdateSnivelakSteering(self);
             FireAlternatingMuzzleShot(self);
-            UpdateTurretFollowCamera(self);
-            SetCameraMatricesFromMoby(self);
+            cam_update_turret_follow(self);
+            turret_set_camera_matrices(self);
         }
         break;
     }
@@ -162,17 +162,17 @@ void func_L16_004165B0(char *self) {
         U(self, 0x34) = (U(self, 0x34) | 0x41) & 0xefff;
         I(self, 0x98) = 0;
         if ((unsigned)(B(self, 0x20) - 2) < 2)
-            ResetTurretCameraState(self);
+            turret_reset_camera_state(self);
         func_00313DD0(self, 6, -1);
         B(self, 0xa8) = 0xff;
-        ExplodeTurretIntoDebris(self);
-    } else if ((!P(hit, 0x20) || H(P(hit, 0x20), 0xaa) != 0xea7) && B(self, 0x20) == 3 && gHeroState.mode == 0x31 && gHeroState.timer == 0) {
+        turret_explode_into_debris(self);
+    } else if ((!P(hit, 0x20) || H(P(hit, 0x20), 0xaa) != 0xea7) && B(self, 0x20) == 3 && g_hero_state.mode == 0x31 && g_hero_state.timer == 0) {
         func_002A6750(func_002E8648(F(hit, 0x2c)));
-        if (gHeroState.flag == 0) {
-            ResetTurretCameraState(self);
+        if (g_hero_state.flag == 0) {
+            turret_reset_camera_state(self);
             func_00313DD0(self, 4, -1);
         } else {
-            gHeroState.timer = 60;
+            g_hero_state.timer = 60;
         }
         func_00305FC0(360);
     }

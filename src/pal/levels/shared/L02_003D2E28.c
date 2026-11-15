@@ -1,25 +1,25 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283198(float);
-extern char *D_L02_001B359C __attribute__((sda));
-extern char *D_L02_001FC060[];
-extern float func_00283B98(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern char *g_entity_group_lists[];
+extern float FastAddRotations(float, float);
 extern int D_L02_001B35B8 __attribute__((sda));
 typedef int L02Word;
 extern L02Word D_L02_001B35B8 __attribute__((sda));
 extern int D_L02_001B35B8 __attribute__((sda));
-extern void func_L02_003CEFD8(char *);
-extern int D_L02_001B30C8 __attribute__((sda));
+extern void chickenbot_emit_sparks(char *);
+extern int g_frame_l02_counter __attribute__((sda));
 struct L02PairWord {
     int a;
     int b;
 };
 extern struct L02PairWord D_L02_001B00C0;
-extern float func_00283B98(float, float);
-extern int func_00283D38(int, int, float);
-extern void func_0029FC20(char *, int, void *);
-extern void func_L00_002E6CF0(void *, void *);
+extern float FastAddRotations(float, float);
+extern int FastTweenColor(int, int, float);
+extern void moby_transform_joint_point(char *, int, void *);
+extern void gfx_add_draw_callback_first(void *, void *);
 struct L02Kind330 {
     char pad[0x328];
     float f328;
@@ -56,26 +56,26 @@ void func_PAL_L02_003D2E28(struct L02Kind330Object *a0) {
     struct L02Kind330Entity *e;
     struct L02Kind330 *s0;
 
-    f = func_00283B98(o->f328, 0.25132746f);
+    f = FastAddRotations(o->f328, 0.25132746f);
     o->f328 = f;
-    f = func_00283198(f);
+    f = math_fast_sin_or_cos_b(f);
     o->f32C = f * 0.5f + 0.5f;
-    a0->f78 = func_00283D38(v.a, v.b, o->f32C);
-    if (o->f330 != D_L02_001B30C8) {
-        for (q = (unsigned short *)D_L02_001FC060[a0->group];
+    a0->f78 = FastTweenColor(v.a, v.b, o->f32C);
+    if (o->f330 != g_frame_l02_counter) {
+        for (q = (unsigned short *)g_entity_group_lists[a0->group];
              a0->group != 0xFF && a0->group <= D_L02_001B35B8 && q != 0 &&
-             ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[a0->group]);
+             ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[a0->group]);
              q++) {
-            e = (struct L02Kind330Entity *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
+            e = (struct L02Kind330Entity *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
             if (e == 0)
                 break;
             if (e->f31 != 0 && e->type == 0xA4E && e->state != 0xFE && e->state != 0xFD) {
                 s0 = e->obj;
-                func_0029FC20((char *)e, 0, (char *)s0 + 0x220);
-                s0->f330 = D_L02_001B30C8;
+                moby_transform_joint_point((char *)e, 0, (char *)s0 + 0x220);
+                s0->f330 = g_frame_l02_counter;
             }
         }
-        func_L00_002E6CF0((void *)func_L02_003CEFD8, a0);
+        gfx_add_draw_callback_first((void *)chickenbot_emit_sparks, a0);
     }
 }
 

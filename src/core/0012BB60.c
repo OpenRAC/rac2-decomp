@@ -1,28 +1,28 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_0012C3B0(void *);
+extern void mpeg_wait_ipu_idle(void *);
 
 extern void r1_func_0012C468(void *, void *);
 
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
-extern short func_0012C508(int, int);
+extern short mpeg_read_ipu_vlc_code(int, int);
 
-extern void func_0012C788(void *, int);
+extern void mpeg_skip_bits(void *, int);
 
-extern int func_0012BB60(void *, int *, int *, int *, void *, void *, void *);
+extern int mpeg_decode_macroblock_modes(void *, int *, int *, int *, void *, void *, void *);
 
 extern char r1_D_00153998[];
 
-extern int func_0012C878(void *, int);
+extern int mpeg_read_bits(void *, int);
 
-extern void func_0012C230(void *, int *, int *, int, int, int, int, int);
+extern void mpeg_read_motion_vector(void *, int *, int *, int, int, int, int, int);
 
 extern void r1_func_00128270_x(void *, int *, int *, int *, int, int, int, int, int, int, int) __asm__("func_0012C090");
 
-extern void func_0012E088(void *, int);
+extern void mpeg_start_ipu_to_memory_dma(void *, int);
 
-extern void func_0012C380(char *, unsigned int);
+extern void mpeg_send_ipu_command(char *, unsigned int);
 
 typedef struct {
     char pad000[0x11C];
@@ -50,11 +50,11 @@ typedef struct {
     int unk848;
 } MbDec;
 
-extern void func_0012C008(int *, int, int, int, int);
+extern void mpeg_decode_motion_vector(int *, int, int, int, int);
 
 /* rac1-decomp src/core/00125630.c: func_00127D40 */
 /* Decodes one macroblock's modes and motion vectors through the IPU VLC engine (libmpeg _decMB0). Adapted from Lombyte (GPL-3.0) for PAL: sdk/library/_decMB0.c, _decMB0. */
-int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dctTypeOut, void *pmvArg, void *mvfsOut, void *dmvectorOut) {
+int mpeg_decode_macroblock_modes(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dctTypeOut, void *pmvArg, void *mvfsOut, void *dmvectorOut) {
     MbDec *d = decoderPtr;
     int *mb = pmvArg;
     int *dctTypePtr;
@@ -75,7 +75,7 @@ int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dct
     IPU_CTRL = (IPU_CTRL & 0xF8FFFFFF) | (d->pictureCodingType << 24);
     dctTypePtr = dctTypeOut;
     mvfsPtr = mvfsOut;
-    mbTypeBits = ReadIpuVlcCode((int)d, 1);
+    mbTypeBits = mpeg_read_ipu_vlc_code((int)d, 1);
     *mbTypeOut = mbTypeBits;
     if (mbTypeBits == 0) {
         r1_func_0012C468(d, r1_D_00153998);
@@ -86,7 +86,7 @@ int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dct
         if (d->pictureStructure == 3 && d->framePredFrameDct != 0) {
             *motionTypeOut = 2;
         } else {
-            *motionTypeOut = ReadMpegBits(d, 2);
+            *motionTypeOut = mpeg_read_bits(d, 2);
         }
     } else if ((mbTypeBits & 1) && d->concealmentMvs != 0) {
         *motionTypeOut = ((d->pictureStructure ^ 3) == 0) ? 2 : 1;
@@ -106,20 +106,20 @@ int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dct
     }
     dctTypeValue = 0;
     if (d->pictureStructure == 3 && d->framePredFrameDct == 0 && (*mbTypeOut & 3) != 0) {
-        dctTypeValue = ReadMpegBits(d, 1);
+        dctTypeValue = mpeg_read_bits(d, 1);
     } else {
         dctTypeValue = 0;
     }
     *dctTypePtr = dctTypeValue;
     if (*mbTypeOut & 0x10) {
-        d->quantScale = ReadMpegBits(d, 5);
+        d->quantScale = mpeg_read_bits(d, 5);
     }
     if ((*mbTypeOut & 8) || ((*mbTypeOut & 1) && d->concealmentMvs != 0)) {
         if (d->unk848 != 0) {
             r1_func_00128270_x(d, mb, dmvectorOut, mvfsPtr, 0, motionVectorCount, mvFormat, d->fCode00 - 1, d->fCode01 - 1, dualPrime, mvScale);
         } else {
             fCodeFwd = d->forwardFCode - 1;
-            ReadMpegMotionVector(d, mb, dmvectorOut, fCodeFwd, fCodeFwd, 0, 0, d->fullPelForward);
+            mpeg_read_motion_vector(d, mb, dmvectorOut, fCodeFwd, fCodeFwd, 0, 0, d->fullPelForward);
         }
     }
     if (d->errorFlag != 0) {
@@ -130,21 +130,21 @@ int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dct
             r1_func_00128270_x(d, mb, dmvectorOut, mvfsPtr, 1, motionVectorCount, mvFormat, d->fCode10 - 1, d->fCode11 - 1, 0, mvScale);
         } else {
             fCodeBwd = d->backwardFCode - 1;
-            ReadMpegMotionVector(d, mb + 2, dmvectorOut, fCodeBwd, fCodeBwd, 0, 0, d->fullPelBackward);
+            mpeg_read_motion_vector(d, mb + 2, dmvectorOut, fCodeBwd, fCodeBwd, 0, 0, d->fullPelBackward);
         }
     }
     if (d->errorFlag != 0) {
         return 0;
     }
     if ((*mbTypeOut & 1) && d->concealmentMvs != 0) {
-        SkipMpegBits(d, 1);
+        mpeg_skip_bits(d, 1);
     }
     if ((*mbTypeOut & 3) != 0) {
-        StartIpuToMemoryDma(*(void **)((char *)d + d->curSlot * 0x140 + 0x594), 0x300);
-        WaitIpuIdle(d);
+        mpeg_start_ipu_to_memory_dma(*(void **)((char *)d + d->curSlot * 0x140 + 0x594), 0x300);
+        mpeg_wait_ipu_idle(d);
         g1 = ((*mbTypeOut & 1) << 27) | (d->quantScale << 16);
         g2 = (d->unk1B0 << 26) | 0x20000000;
-        SendIpuCommand((char *)d, (g1 | g2) | (*dctTypePtr << 25));
+        mpeg_send_ipu_command((char *)d, (g1 | g2) | (*dctTypePtr << 25));
     } else {
         *(int *)((char *)d + d->curSlot * 0x140 + 0x6CC) = 1;
     }
@@ -185,7 +185,7 @@ int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dct
  * (motionVector, already matched in this file).
  */
 /* Adds a motion vector change read from the stream to the previous vector, wrapping it around when it goes out of range. */
-void func_0012C008(int *pred, int r_size, int motion_code, int motion_residual, int full_pel_vector) {
+void mpeg_decode_motion_vector(int *pred, int r_size, int motion_code, int motion_residual, int full_pel_vector) {
     int lim, vec;
 
     lim = 16 << r_size;
@@ -212,20 +212,20 @@ void func_0012C008(int *pred, int r_size, int motion_code, int motion_residual, 
  * in this file); func_0012C878 is Get_Bits.
  */
 /* Reads the motion vectors of one macroblock for forward or backward prediction and stores them in the vector table. */
-void func_0012C090(void *decoderPtr, int PMV[][2][2], int *dmvector, int mvfs[][2],
+void mpeg_read_motion_vectors(void *decoderPtr, int PMV[][2][2], int *dmvector, int mvfs[][2],
                     int s_idx, int motion_vector_count, int mv_format,
                     int h_r_size, int v_r_size, int dmv, int mvscale) {
     if (motion_vector_count == 1) {
         if (mv_format == 0 && dmv == 0) {
-            mvfs[1][s_idx] = mvfs[0][s_idx] = ReadMpegBits(decoderPtr, 1);
+            mvfs[1][s_idx] = mvfs[0][s_idx] = mpeg_read_bits(decoderPtr, 1);
         }
-        ReadMpegMotionVector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        mpeg_read_motion_vector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
         PMV[1][s_idx][0] = PMV[0][s_idx][0];
         PMV[1][s_idx][1] = PMV[0][s_idx][1];
     } else {
-        mvfs[0][s_idx] = ReadMpegBits(decoderPtr, 1);
-        ReadMpegMotionVector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
-        mvfs[1][s_idx] = ReadMpegBits(decoderPtr, 1);
-        ReadMpegMotionVector(decoderPtr, PMV[1][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        mvfs[0][s_idx] = mpeg_read_bits(decoderPtr, 1);
+        mpeg_read_motion_vector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        mvfs[1][s_idx] = mpeg_read_bits(decoderPtr, 1);
+        mpeg_read_motion_vector(decoderPtr, PMV[1][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
     }
 }

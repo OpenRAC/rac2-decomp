@@ -34,20 +34,20 @@ typedef struct {
     f32 damage;                 /* 0x2C */
 } MobyHit;
 
-extern MobyHit *func_002A9640(Moby *moby, u32 flags, s32 clear);
-extern void func_002AB8C0(Moby *moby, ColorFlash *flash);
-extern void func_002AB800(Moby *moby, ColorFlash *flash);
-extern s32 func_00282948(s32 *timer);
-extern f32 func_002A7878(f32 min, f32 max);
-extern s32 func_00283CF0(f32 value);
-extern void func_L05_00424990(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
+extern MobyHit *part_find_owned_effect_slot(Moby *moby, u32 flags, s32 clear);
+extern void gfx_update_color_fade(Moby *moby, ColorFlash *flash);
+extern void gfx_start_color_fade(Moby *moby, ColorFlash *flash);
+extern s32 math_fast_float_d(s32 *timer);
+extern f32 math_random_float_range(f32 min, f32 max);
+extern s32 FloatToInt(f32 value);
+extern void part_spawn_shockwave_burst(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                               s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, f32 scale);
 /* Defined with (object, bonus) in L10_00424028-reward-g8.c; this call also passes 10. */
-extern void func_L10_00425508(Moby *moby, s32 bonus, s32 a2);
-extern s32 func_L05_0037BBB8(Moby *moby);
-extern void func_L05_0037BE98(Moby *moby);
-extern void func_L05_0037AE40(Moby *moby);
-extern s32 func_002E5DA0(s32 index, s32 value, Moby *moby, s32 kind);
+extern void hrugis_drop_reward(Moby *moby, s32 bonus, s32 a2);
+extern s32 moby_is_in_use(Moby *moby);
+extern void moby_release_from_group(Moby *moby);
+extern void moby_reset_action_state(Moby *moby);
+extern s32 snd_play_from_class_bank(s32 index, s32 value, Moby *moby, s32 kind);
 
 /* Counted down by func_00282948 on each hit: class 0xF8E plays its hit sound when it has
    run out, and sets it to 10 to 20 again. */
@@ -57,19 +57,19 @@ extern s32 D_L10_001B354C __attribute__((sda));
    of the hit it took off its health (class 0xCBE only from a class 0xF93 moby) with a
    sound, and at zero health blows it up and drops a reward; the moby is then retired
    unless keep is set. Returns 1 when the hit destroyed it. */
-s32 func_L10_00423788(Moby *moby, s32 keep)
+s32 ProcessObjectCollisionDamage(Moby *moby, s32 keep)
 {
     ColorFlash *flash;
     f32 *health;
     MobyHit *hit;
     s32 destroyed = 0;
 
-    hit = FindOwnedEffectSlot(moby, 0x230000, 0);
+    hit = part_find_owned_effect_slot(moby, 0x230000, 0);
     moby->hitSlot = 0xFF;
     flash = moby->vars->flash;
     health = moby->vars->health;
     if (flash != 0)
-        UpdateColorFade(moby, flash);
+        gfx_update_color_fade(moby, flash);
     if (*health <= 0.0f)
         return 0;
 
@@ -80,23 +80,23 @@ s32 func_L10_00423788(Moby *moby, s32 keep)
         }
         if (flash != 0) {
             flash->flashColor[0] = 0xFF;
-            StartColorFade(moby, flash);
+            gfx_start_color_fade(moby, flash);
         }
         *health -= hit->damage;
         if (moby->oClass != 0xB73 /* moby class 2931 */ && moby->oClass != 0xF8E /* moby class 3982 */)
-            PlaySoundFromClassBank(0xD, 0, moby, 0xFBF);
-        if (FastFloatHelperD(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E /* moby class 3982 */) {
-            PlaySoundFromClassBank(3, 0, moby, 0xF8E);
-            D_L10_001B354C = FloatToInt(RandomFloatRange(10.0f, 20.0f));
+            snd_play_from_class_bank(0xD, 0, moby, 0xFBF);
+        if (math_fast_float_d(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E /* moby class 3982 */) {
+            snd_play_from_class_bank(3, 0, moby, 0xF8E);
+            D_L10_001B354C = FloatToInt(math_random_float_range(10.0f, 20.0f));
         }
         if (*health <= 0.0f) {
             *health = 0.0f;
-            SpawnShockwaveBurst(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
-            DropRewardAtObject(moby, 0, 0xA);
-            if (IsObjectInUse(moby) != 0)
-                ReleaseObjectFromGroup(moby);
+            part_spawn_shockwave_burst(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
+            hrugis_drop_reward(moby, 0, 0xA);
+            if (moby_is_in_use(moby) != 0)
+                moby_release_from_group(moby);
             if (keep == 0)
-                ResetObjectActionState(moby);
+                moby_reset_action_state(moby);
             destroyed = 1;
         }
     }

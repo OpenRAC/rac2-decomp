@@ -13,7 +13,7 @@ struct SpawnHeader {
     u16 kind;
 };
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 extern void func_002A0F48(void *);
 
@@ -23,7 +23,7 @@ char *func_PAL_L02_00405E88(TI128 *a0, TI128 *a1, TI128 *a2, unsigned char a3,
     char *v1;
     struct SpawnHeader *header;
 
-    s0 = func_0029EFD0(0xB5A);
+    s0 = CreateMoby(0xB5A);
     if (s0 == 0)
         goto end;
     qcopy(s0 + 0x10, a0);

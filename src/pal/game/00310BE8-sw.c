@@ -10,23 +10,23 @@ typedef struct {
     f32 f1C;
     f32 f20;
 } FollowVars;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern u32 D_00138320;
 extern unsigned int func_PAL_0026F580(int);
 extern unsigned int func_PAL_0026F5B8(int, int);
-extern void func_0026F770(int, int, float);
-extern void func_00273318(void *, float, u32, void *, int, float, int, float, int);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_0027CDC8(void (*)(char *), char *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_0029FCC0(void *, int, void *);
+extern void stub_empty_13(int, int, float);
+extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void gfx_register_world_draw_callback(void (*)(char *), char *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern s32 func_PAL_00311D98(s32 arg0, f32 fparg0);
-extern void func_0030F408(char *);
+extern void gfx_draw_wavy_link_strip(char *);
 
 

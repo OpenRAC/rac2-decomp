@@ -5,7 +5,7 @@
    carries its own size in word 0 and the chain ends at a zero size, exactly
    as the catalogue walker func_00123978 next door. */
 /* Counts how many records in a chain are usable. */
-int func_00123930(int *record) {
+int eh_count_fde_records(int *record) {
     int count = 0;
     if (record[0] != 0) {
         do {

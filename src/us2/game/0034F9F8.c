@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -28,7 +29,7 @@ typedef struct {
     char *f58;
     char *f5c;
 } SlotObject;
-extern void func_0026F790(char *, long long);
+extern void stub_empty_17(char *, long long);
 extern void func_002A05A8(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
@@ -38,7 +39,7 @@ void func_US2_0034F9F8(char *obj)
     char *sub = obj + 0xC00;
     SlotObject *s = (SlotObject *)sub;
 
-    func_0026F790(sub, 0);
+    stub_empty_17(sub, 0);
     func_002A05A8(sub);
     if (s->f42 != 0xFF) {
         EntryTable *table = s->f24;

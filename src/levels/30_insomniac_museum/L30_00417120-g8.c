@@ -36,18 +36,18 @@ extern float D_L30_001B1FA4 __attribute__((sda));
 extern float D_L30_001B1FA8 __attribute__((sda));
 extern char D_L30_001B9DC0[];
 extern float D_L30_001B1FB0[];
-extern void func_L11_0045FFB0(void *);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00280B90(void *, int, int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, int, int, float, float, float);
+extern void part_reset_quad_record_c(void *);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void draw_world_quad(void *, int, int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
 
 typedef struct {
     float vertices[4][4];
@@ -66,7 +66,7 @@ typedef struct {
 } BeamState;
 
 /* Draws the glowing scrolling beam of the museum projectile as layered textured strips, then adds two glow sprites. */
-void func_L30_00417120(int unused0, int unused1, int unused2, int unused3,
+void museum_projectile_draw_beam(int unused0, int unused1, int unused2, int unused3,
                       int unused4, char *moby)
 {
     RenderQuad quad;
@@ -77,8 +77,8 @@ void func_L30_00417120(int unused0, int unused1, int unused2, int unused3,
     float *vCoords;
     float angle, cosine, sine, glow;
     int i, j;
-    ResetEffectQuadRecordC(&quad);
-    InitQuadPacketState(&quad, D_L30_001B1F44, 1, 0x80);
+    part_reset_quad_record_c(&quad);
+    gfx_init_quad_packet_state(&quad, D_L30_001B1F44, 1, 0x80);
     vertices = quad.vertices[1];
     uCoords = quad.tex.uv;
     vCoords = quad.tex.uv + 1;
@@ -142,8 +142,8 @@ void func_L30_00417120(int unused0, int unused1, int unused2, int unused3,
     quad.tex.uv[6] = 1;
     quad.tex.uv[7] = 1;
     angle = state->angle;
-    cosine = FastSinOrCosA(angle);
-    sine = FastSinOrCosB(angle);
+    cosine = math_fast_sin_or_cos_a(angle);
+    sine = math_fast_sin_or_cos_b(angle);
     {
         float *vPtr = vCoords;
         float *uPtr = uCoords;
@@ -159,7 +159,7 @@ void func_L30_00417120(int unused0, int unused1, int unused2, int unused3,
         }
     }
     state->angle = FastAddRotations(state->angle, D_L30_001B1F38 * 0.017453294f);
-    InitQuadPacketState(&quad, D_L30_001B1F48, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, D_L30_001B1F48, 1, 0x80);
     quad.colors[1] = D_L30_001B1F2C << 24;
     quad.colors[1] |= D_L30_001B1F7C << 16;
     quad.colors[1] |= D_L30_001B1F78 << 8;
@@ -238,10 +238,10 @@ void func_L30_00417120(int unused0, int unused1, int unused2, int unused3,
     FastVecAdd(quad.vertices[2], center, width);
     FastVecSub(quad.vertices[3], center, width);
     draw_world_quad(&quad, 0, 0);
-    DrawBillboardQuad_00281EB8(moby + 0x10, D_L30_001B1F20, D_L30_001B1F28, 1,
-                   D_L30_001B1F24, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(moby + 0x10, D_L30_001B1F20, D_L30_001B1F28, 1,
+                   D_L30_001B1F24, 0.08f, math_random_angle());
     glow = D_L30_001B1F24;
     glow *= 0.4f;
-    DrawBillboardQuad_00281EB8(moby + 0x10, D_L30_001B1F20, 0x80808080, 1,
-                   glow, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(moby + 0x10, D_L30_001B1F20, 0x80808080, 1,
+                   glow, 0.08f, math_random_angle());
 }

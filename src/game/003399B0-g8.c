@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
-extern void func_003369A8(void *, void *, void *);
-extern void func_00336A30(void *, int);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern int func_00288FB8(int);
-extern void func_00336A38(void *, int);
-extern int func_00339F28(void *, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
+extern void hud_set_widget_field_a(void *, int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern int GetLocalizedString(int);
+extern void hud_set_widget_field_b(void *, int);
+extern int list_screen_layout(void *, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADC30[];
 extern char D_001ADC38[], D_001ADC40[], D_001ADC50[];
 extern char D_001ADCA8[], D_001ADCB8[], D_001ADCC0[], D_001ADCC8[], D_001ADCD0[];
@@ -21,12 +21,12 @@ extern char D_001ADCA0[8] __attribute__((sda));
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
    colours, fonts and labels, marks the "  Exit" label with glyph 0x12 and lays them out.
    The block's four zero stores are written 1, 2, 3, 0 for retail's 0, 4, 8, C order. */
-void func_00339AD0(char *obj, void *arg)
+void list_screen_init(char *obj, void *arg)
 {
     *(void **)obj = arg;
     *(int *)(obj + 0x400) = 1;
     if (arg) {
-        int *position = ReturnSecondArgument(16, AllocPoolCell(arg));
+        int *position = ui_return_second_arg(16, pool_alloc_cell(arg));
         *(int **)(obj + 4) = position;
         position[1] = 0;
         position[2] = 0;
@@ -35,70 +35,70 @@ void func_00339AD0(char *obj, void *arg)
     }
     (*(float **)(obj + 4))[0] = 256.0f;
     (*(float **)(obj + 4))[1] = 198.0f;
-    InitDerivedArrays(obj + 0x8, D_001ADC10, arg);
-    InitDerivedArrays(obj + 0x54, D_001ADC18, arg);
-    InitDerivedArrays(obj + 0xA0, D_001ADC20, arg);
-    InitDerivedArrays(obj + 0xEC, D_001ADC28, arg);
-    InitWidgetDefaults(obj + 0x138, D_001ADC30, arg);
-    InitWidgetDefaults(obj + 0x180, D_001ADCA8, arg);
-    InitWidgetDefaults(obj + 0x1C8, D_001ADCB8, arg);
-    InitWidgetDefaults(obj + 0x210, D_001ADCC0, arg);
-    InitWidgetDefaults(obj + 0x258, D_001ADCC8, arg);
-    InitWidgetDefaults(obj + 0x2A0, D_001ADCD0, arg);
-    InitWidgetDefaults(obj + 0x2E8, D_001ADC38, arg);
-    InitWidgetDefaults(obj + 0x330, D_001ADC40, arg);
-    InitWidgetDefaults(obj + 0x378, D_001ADC50, arg);
-    SetWidgetField44(obj + 0x180, 0);
-    SetWidgetField44(obj + 0x1C8, 0);
-    SetWidgetField44(obj + 0x210, 0);
-    SetWidgetField44(obj + 0x258, 0);
-    SetWidgetField44(obj + 0x2A0, 0);
-    SetWidgetField44(obj + 0x2E8, 0);
-    SetWidgetField44(obj + 0x330, 0);
-    SetWidgetField44(obj + 0x378, 2);
-    *GetFieldC(obj + 0x8) = 0x60442D00;
-    *GetFieldC(obj + 0x54) = 0x60241700;
-    *GetFieldC(obj + 0xA0) = 0x55F0C070;
-    *GetFieldC(obj + 0xEC) = 0x55F0C070;
-    *GetFieldC(obj + 0x138) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x180) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x1C8) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x210) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x258) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x2A0) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x2E8) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x330) = 0x80F0F0F0;
-    *GetFieldC(obj + 0x378) = 0x80F0F0F0;
-    SetFieldAt40(obj + 0x8, D_001A8CFC[0] + 0x8710, 0x5F);
-    SetFieldAt40(obj + 0x54, D_001A8CFC[0] + 0x8710, 0x60);
-    SetFieldAt40(obj + 0xA0, D_001A8CFC[0] + 0x8710, 0x61);
-    SetFieldAt40(obj + 0xEC, D_001A8CFC[0] + 0x8710, 0x62);
+    object_init_derived_arrays(obj + 0x8, D_001ADC10, arg);
+    object_init_derived_arrays(obj + 0x54, D_001ADC18, arg);
+    object_init_derived_arrays(obj + 0xA0, D_001ADC20, arg);
+    object_init_derived_arrays(obj + 0xEC, D_001ADC28, arg);
+    hud_init_widget_defaults(obj + 0x138, D_001ADC30, arg);
+    hud_init_widget_defaults(obj + 0x180, D_001ADCA8, arg);
+    hud_init_widget_defaults(obj + 0x1C8, D_001ADCB8, arg);
+    hud_init_widget_defaults(obj + 0x210, D_001ADCC0, arg);
+    hud_init_widget_defaults(obj + 0x258, D_001ADCC8, arg);
+    hud_init_widget_defaults(obj + 0x2A0, D_001ADCD0, arg);
+    hud_init_widget_defaults(obj + 0x2E8, D_001ADC38, arg);
+    hud_init_widget_defaults(obj + 0x330, D_001ADC40, arg);
+    hud_init_widget_defaults(obj + 0x378, D_001ADC50, arg);
+    hud_set_widget_field_a(obj + 0x180, 0);
+    hud_set_widget_field_a(obj + 0x1C8, 0);
+    hud_set_widget_field_a(obj + 0x210, 0);
+    hud_set_widget_field_a(obj + 0x258, 0);
+    hud_set_widget_field_a(obj + 0x2A0, 0);
+    hud_set_widget_field_a(obj + 0x2E8, 0);
+    hud_set_widget_field_a(obj + 0x330, 0);
+    hud_set_widget_field_a(obj + 0x378, 2);
+    *object_get_fourth_field(obj + 0x8) = 0x60442D00;
+    *object_get_fourth_field(obj + 0x54) = 0x60241700;
+    *object_get_fourth_field(obj + 0xA0) = 0x55F0C070;
+    *object_get_fourth_field(obj + 0xEC) = 0x55F0C070;
+    *object_get_fourth_field(obj + 0x138) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x180) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x1C8) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x210) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x258) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x2A0) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x2E8) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x330) = 0x80F0F0F0;
+    *object_get_fourth_field(obj + 0x378) = 0x80F0F0F0;
+    object_set_helper_result(obj + 0x8, D_001A8CFC[0] + 0x8710, 0x5F);
+    object_set_helper_result(obj + 0x54, D_001A8CFC[0] + 0x8710, 0x60);
+    object_set_helper_result(obj + 0xA0, D_001A8CFC[0] + 0x8710, 0x61);
+    object_set_helper_result(obj + 0xEC, D_001A8CFC[0] + 0x8710, 0x62);
     D_001ADCA0[0] = 0x12;
-    SetWidgetField40(obj + 0x138, GetLocalizedString(0x2D65));
-    SetWidgetField40(obj + 0x180, GetLocalizedString(0x2D5D));
-    SetWidgetField40(obj + 0x1C8, GetLocalizedString(0x3293));
-    SetWidgetField40(obj + 0x210, GetLocalizedString(0x2D69));
-    SetWidgetField40(obj + 0x258, GetLocalizedString(0x2D6A));
-    SetWidgetField40(obj + 0x2A0, GetLocalizedString(0x2D6B));
-    SetWidgetField40(obj + 0x2E8, GetLocalizedString(0x2D4F));
-    SetWidgetField40(obj + 0x330, (int)(obj + 0x3C0));
-    LayoutListScreen(obj, 0);
+    hud_set_widget_field_b(obj + 0x138, GetLocalizedString(0x2D65));
+    hud_set_widget_field_b(obj + 0x180, GetLocalizedString(0x2D5D));
+    hud_set_widget_field_b(obj + 0x1C8, GetLocalizedString(0x3293));
+    hud_set_widget_field_b(obj + 0x210, GetLocalizedString(0x2D69));
+    hud_set_widget_field_b(obj + 0x258, GetLocalizedString(0x2D6A));
+    hud_set_widget_field_b(obj + 0x2A0, GetLocalizedString(0x2D6B));
+    hud_set_widget_field_b(obj + 0x2E8, GetLocalizedString(0x2D4F));
+    hud_set_widget_field_b(obj + 0x330, (int)(obj + 0x3C0));
+    list_screen_layout(obj, 0);
 }
 
 /* The X bias lives in small data, so this file is built with -G8. */
 extern float ref_L00_0033A688_00 __attribute__((sda));
 extern float D_001ADD0C;
-extern void func_00335E38(char *, float, float, float, float);
+extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
    shared spawn helper with no rotation. */
 /* Moves the circle menu label to sit next to the menu centre. */
-void func_0033A688(char *menu)
+void circle_menu_position_label(char *menu)
 {
     if (*(int *)(menu + 0x20C) != 0) {
         float *position = *(float **)(menu + 0x1FC);
 
-        SetFirstFloat4(menu + 0x170, position[0] + ref_L00_0033A688_00,
+        object_set_first_float4(menu + 0x170, position[0] + ref_L00_0033A688_00,
                       position[1] + D_001ADD0C, 0.0f, 0.0f);
     }
 }
@@ -108,10 +108,10 @@ void func_0033A688(char *menu)
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC88[];
 extern int D_001ADD30 __attribute__((sda));
-extern void func_00335E68(char *, int);
+extern void object_set_flag_value(char *, int);
 
 /* Sets up the four button icons of the circle menu and counts how many entries its table has. */
-void func_0033AA00(char *obj, int *iconIds, char *table)
+void circle_menu_init_entries(char *obj, int *iconIds, char *table)
 {
     char *icon = obj + 4;
     int *iconColor = (int *)&D_001ADD30;
@@ -122,12 +122,12 @@ void func_0033AA00(char *obj, int *iconIds, char *table)
 
     for (i = 3; i >= 0; i--) {
         if (*iconIds != 0) {
-            InitDerivedArrays(icon, D_001ADC88, *(int *)(obj + 0x200));
-            *(int *)GetFieldC(icon) = *iconColor;
-            SetFieldAt40(icon, D_001A8CFC[0] + 0x8710, *iconIds);
+            object_init_derived_arrays(icon, D_001ADC88, *(int *)(obj + 0x200));
+            *(int *)object_get_fourth_field(icon) = *iconColor;
+            object_set_helper_result(icon, D_001A8CFC[0] + 0x8710, *iconIds);
         } else {
-            SetFieldAt40(icon, D_001A8CFC[0] + 0x8710, 0);
-            SetFlagValue(icon, 0);
+            object_set_helper_result(icon, D_001A8CFC[0] + 0x8710, 0);
+            object_set_flag_value(icon, 0);
         }
         icon += 76;
         iconColor += 1;
@@ -153,14 +153,14 @@ void func_0033AA00(char *obj, int *iconIds, char *table)
     }
 }
 
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00335F88(char *, float, float, float, float);
-extern int *func_00335E20(void *);
-extern void func_00336828(char *);
-extern void func_00336920(char *, int, int);
-extern int func_00288FB8(int);
-extern void func_00336A78(char *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void object_set_second_float4(char *, float, float, float, float);
+extern int *object_get_fourth_field(void *);
+extern void hud_draw_colored_quad_widget(char *);
+extern void hud_set_widget_value_pair(char *, int, int);
+extern int GetLocalizedString(int);
+extern void text_label_draw(char *);
 extern float D_001ADD20 __attribute__((sda));
 extern float D_001ADD24;
 extern int D_001ADD10 __attribute__((sda));
@@ -183,7 +183,7 @@ typedef struct { char pad[8]; short n; void (*fn)(char *); } Vtable_0033A6D8;
    hoisted out of the loop. The pointer to the modes is assigned where it is first used, and the
    cursor sprite (self + 4) reaches its virtual call through a variable: these decide which
    induction variable and which register the compiler picks. */
-void func_0033A6D8(char *self)
+void circle_menu_draw(char *self)
 {
     if (*(int *)(self + 0x20C) != 0) {
         char *rec0 = self + 0x50;
@@ -191,12 +191,12 @@ void func_0033A6D8(char *self)
         float *position = *(float **)(self + 0x1FC);
         int i;
 
-        SetFirstFloat4(rec0, position[0], position[1], 0.0f, 0.0f);
-        SetSecondFloat4(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_first_float4(rec0, position[0], position[1], 0.0f, 0.0f);
+        object_set_second_float4(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0x80))->fn(rec0 + (*(Vtable_0033A6D8 **)(self + 0x80))->n);
         position = *(float **)(self + 0x1FC);
-        SetFirstFloat4(rec1, position[0], position[1], 0.0f, 0.0f);
-        SetSecondFloat4(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_first_float4(rec1, position[0], position[1], 0.0f, 0.0f);
+        object_set_second_float4(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0xCC))->fn(rec1 + (*(Vtable_0033A6D8 **)(self + 0xCC))->n);
         for (i = 0; i < *(int *)(self + 0x1F8); i++) {
             char *rec = self + 0x134;
@@ -204,34 +204,34 @@ void func_0033A6D8(char *self)
             int one = 1;
             float cs, sn;
 
-            cs = *(float *)(self + 0x204) * FastSinOrCosA(ENTRY_0033A6D8.angle);
-            sn = *(float *)(self + 0x204) * FastSinOrCosB(ENTRY_0033A6D8.angle);
-            SetWidgetValuePair(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
+            cs = *(float *)(self + 0x204) * math_fast_sin_or_cos_a(ENTRY_0033A6D8.angle);
+            sn = *(float *)(self + 0x204) * math_fast_sin_or_cos_b(ENTRY_0033A6D8.angle);
+            hud_set_widget_value_pair(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
             position = *(float **)(self + 0x1FC);
-            SetFirstFloat4(rec, position[0] + (float)D_001ADD10 + cs,
+            object_set_first_float4(rec, position[0] + (float)D_001ADD10 + cs,
                           position[1] + (float)D_001ADD14 + D_001ADD18 * sn, 0.0f, 0.0f);
             mode = (int *)(self + 0x1B8) + i;
-            *GetFieldC(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
-            SetFlagValue(rec, *mode != 2);
-            DrawColoredQuadWidget(rec);
+            *object_get_fourth_field(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
+            object_set_flag_value(rec, *mode != 2);
+            hud_draw_colored_quad_widget(rec);
             if (i == *(int *)(self + 0x208)) {
                 char *cursor;
 
-                SetSecondFloat4(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+                object_set_second_float4(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
                 if (*mode != 2) {
                     position = *(float **)(self + 0x1FC);
-                    SetFirstFloat4(self + 4, position[0] + D_001ADD28 + cs,
+                    object_set_first_float4(self + 4, position[0] + D_001ADD28 + cs,
                                   position[1] + D_001ADD2C + D_001ADD18 * sn, 0.0f, 0.0f);
                     {
                         int text = ENTRY_0033A6D8.text;
 
                         if (text != 0) {
-                            SetWidgetField40(self + 0x170, text);
+                            hud_set_widget_field_b(self + 0x170, text);
                         } else {
                             text = GetLocalizedString(ENTRY_0033A6D8.id);
-                            SetWidgetField40(self + 0x170, text);
+                            hud_set_widget_field_b(self + 0x170, text);
                         }
-                        DrawAlignedTextLabel(self + 0x170);
+                        text_label_draw(self + 0x170);
                     }
                 }
                 cursor = self + 4;
@@ -242,13 +242,13 @@ void func_0033A6D8(char *self)
 }
 #undef ENTRY_0033A6D8
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
-extern void func_003369A8(void *, void *, void *);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern void func_00115484(void *, int, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern void memset(void *, int, int);
 extern char D_001ADC80[], D_001ADC88[];
 extern int D_001ADD40[2] __attribute__((sda));
 
@@ -257,7 +257,7 @@ extern int D_001ADD40[2] __attribute__((sda));
    and +0x228, each with an 8-byte offset beside it at +0x278, +0x280 and +0x288.  The blank name
    is D_001ADC88; the slot loop reaches it as D_001ADC80 + 8 and the three sprites through the
    spent list pointer, which keeps the compiler from hoisting it across the loop. */
-void func_0033ABD8(char *object, char *owner, short *list)
+void prompt_bar_init(char *object, char *owner, short *list)
 {
     char *slotRecord, *rec198, *rec1E0, *rec228, *vel278, *vel280, *vel288;
     short *slotFlags, *slotIds;
@@ -266,7 +266,7 @@ void func_0033ABD8(char *object, char *owner, short *list)
 
     *(char **)(object + 8) = owner;
     if (owner) {
-        int *allocation = ReturnSecondArgument(16, AllocPoolCell(owner));
+        int *allocation = ui_return_second_arg(16, pool_alloc_cell(owner));
         *(int **)object = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -285,9 +285,9 @@ void func_0033ABD8(char *object, char *owner, short *list)
     slotIds = list;
     for (i = 4; i >= 0; i--) {
         if (*slotIds != 0) {
-            InitDerivedArrays(slotRecord, D_001ADC80 + 8, owner);
-            *GetFieldC(slotRecord) = *slotColor;
-            SetFieldAt40(slotRecord, D_001A8CFC[0] + 0x8710, *slotIds);
+            object_init_derived_arrays(slotRecord, D_001ADC80 + 8, owner);
+            *object_get_fourth_field(slotRecord) = *slotColor;
+            object_set_helper_result(slotRecord, D_001A8CFC[0] + 0x8710, *slotIds);
         }
         *slotFlags = *slotIds;
         slotColor++;
@@ -296,18 +296,18 @@ void func_0033ABD8(char *object, char *owner, short *list)
         slotFlags++;
     }
     slotIds = (short *)D_001ADC88;
-    InitWidgetDefaults(rec198, slotIds, owner);
+    hud_init_widget_defaults(rec198, slotIds, owner);
     memset(vel278, 0, 8);
-    SetFirstFloat4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
-    *GetFieldC(rec198) = 0x80F0F0F0;
-    InitWidgetDefaults(rec228, slotIds, owner);
+    object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec198) = 0x80F0F0F0;
+    hud_init_widget_defaults(rec228, slotIds, owner);
     memset(vel288, 0, 8);
-    SetFirstFloat4(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
-    *GetFieldC(rec228) = 0x80F0F0F0;
-    InitWidgetDefaults(rec1E0, slotIds, owner);
+    object_set_first_float4(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec228) = 0x80F0F0F0;
+    hud_init_widget_defaults(rec1E0, slotIds, owner);
     memset(vel280, 0, 8);
-    SetFirstFloat4(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
-    *GetFieldC(rec1E0) = 0x80F0F0F0;
+    object_set_first_float4(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec1E0) = 0x80F0F0F0;
     *(float *)(object + 0x274) = 0.0f;
     *(int *)(object + 0x290) = 1;
     *(int *)(object + 0x294) = 1;

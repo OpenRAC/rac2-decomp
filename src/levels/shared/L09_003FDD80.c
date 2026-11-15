@@ -37,11 +37,11 @@ typedef struct {
 
 extern Path3FDD80 *D_L09_001FE6C0[];
 
-extern f32 func_002AA3A8(f32 *, f32 *, f32, f32, f32, f32);
-extern s32 func_L00_00341820(void *path, void *out, s32 *index, f32 *offset, s32 wrap, f32 step);
+extern f32 math_spring_float_to_goal(f32 *, f32 *, f32, f32, f32, f32);
+extern s32 Spline_AdvanceByDistance(void *path, void *out, s32 *index, f32 *offset, s32 wrap, f32 step);
 
 /* Moves the object smoothly toward a point on its path that depends on how far along it should be. */
-void func_L09_003FDD80(Moby3FDD80 *self) {
+void path_move_moby_smooth(Moby3FDD80 *self) {
     f32 out[4] __attribute__((aligned(16)));
     s32 index;
     f32 offset;
@@ -57,7 +57,7 @@ void func_L09_003FDD80(Moby3FDD80 *self) {
     index = 0;
     offset = 0.0f;
     Spline_AdvanceByDistance(D_L09_001FE6C0[vars->dest], out, &index, &offset, vars->wrap, total / vars->speed * vars->scale);
-    SpringFloatToGoal(&self->pos[0], &vars->vel[0], out[0], 0.02f, 0.2f, 0.0f);
-    SpringFloatToGoal(&self->pos[1], &vars->vel[1], out[1], 0.02f, 0.2f, 0.0f);
-    SpringFloatToGoal(&self->pos[2], &vars->vel[2], out[2], 0.02f, 0.2f, 0.0f);
+    math_spring_float_to_goal(&self->pos[0], &vars->vel[0], out[0], 0.02f, 0.2f, 0.0f);
+    math_spring_float_to_goal(&self->pos[1], &vars->vel[1], out[1], 0.02f, 0.2f, 0.0f);
+    math_spring_float_to_goal(&self->pos[2], &vars->vel[2], out[2], 0.02f, 0.2f, 0.0f);
 }

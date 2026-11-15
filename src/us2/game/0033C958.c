@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern unsigned char D_001A7B9E __attribute__((sda));
 extern unsigned char D_001A7BBA __attribute__((sda));
 
@@ -126,14 +127,14 @@ int func_US2_0033DB60(char *a0, int a1)
 }
 
 
-extern void func_0033AB50(int);
+extern void prompt_bar_destroy(int);
 
 char *func_US2_0033DDC8(char *object)
 {
-    extern void func_003363D0(void *);
-    func_0033AB50((int)(object + 8));
-    func_003363D0(object + 0x2DC);
-    func_003363D0(object + 0x324);
+    extern void object_construct_derived_b(void *);
+    prompt_bar_destroy((int)(object + 8));
+    object_construct_derived_b(object + 0x2DC);
+    object_construct_derived_b(object + 0x324);
     return object;
 }
 
@@ -141,18 +142,18 @@ char *func_US2_0033DDC8(char *object)
 typedef struct { int ids[2]; } SolTextPair;
 extern SolTextPair D_L00_001AE1A8;
 extern char D_L00_001AE1B0[];
-extern void func_00336548(void *);
-extern void func_0027FA10(int, int, unsigned long, char *, int);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
+extern void hud_draw_progress_bar(void *);
+extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 extern char D_L00_001AE118[];
 extern void func_US2_0033BF90(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 extern SolTextPair D_L00_001AE110;
 extern char D_L00_001AE118[];
 extern void func_US2_0033BF90(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
@@ -167,21 +168,21 @@ void func_US2_0033E308(char *object)
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE1A8;
     format = D_L00_001AE1B0;
-    first = func_00288FB8(0x2DA5);
-    func_00115DA8(buffer, format, first);
-    func_0027FA10(0x100, 0x91, color, buffer, -1);
-    func_00336548(object + 0x2DC);
+    first = GetLocalizedString(0x2DA5);
+    sprintf(buffer, format, first);
+    text_draw_right_aligned_medium(0x100, 0x91, color, buffer, -1);
+    hud_draw_progress_bar(object + 0x2DC);
     color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    middle = func_00288FB8(0x2DA6);
-    func_00115DA8(buffer, format, middle);
-    func_0027FA10(0x100, 0xBE, color, buffer, -1);
-    func_00336548(object + 0x324);
+    middle = GetLocalizedString(0x2DA6);
+    sprintf(buffer, format, middle);
+    text_draw_right_aligned_medium(0x100, 0xBE, color, buffer, -1);
+    hud_draw_progress_bar(object + 0x324);
     color = *(int *)(object + 0x2D8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     format2 = D_L00_001AE118;
-    last = func_00288FB8(0x2DA7);
-    second = func_00288FB8(pair.ids[*(int *)0x1A7BA0 != 0]);
-    func_00115DA8(buffer, format2, last, second);
-    func_0027FB40(0x100, 0xE1, color, buffer, -1);
+    last = GetLocalizedString(0x2DA7);
+    second = GetLocalizedString(pair.ids[*(int *)0x1A7BA0 != 0]);
+    sprintf(buffer, format2, last, second);
+    text_draw_centered_medium(0x100, 0xE1, color, buffer, -1);
 }
 
 
@@ -216,7 +217,7 @@ int func_US2_0033E5E8 (char *object, int flags)
 }
 
 
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern void text_draw_centered_small(int, int, unsigned long, char *, int);
 
 void func_US2_0033E680(char *object)
 {
@@ -230,10 +231,10 @@ void func_US2_0033E680(char *object)
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
-    first = func_00288FB8(0x2C2F);
-    second = func_00288FB8(pair.ids[*(unsigned char *)0x1A7B9E != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(0x100, 0xAA, color, buffer, -1);
+    first = GetLocalizedString(0x2C2F);
+    second = GetLocalizedString(pair.ids[*(unsigned char *)0x1A7B9E != 0]);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_small(0x100, 0xAA, color, buffer, -1);
 }
 
 
@@ -364,11 +365,11 @@ void func_US2_0033F3B8(unsigned char *owner, float *records)
 
 
 extern void func_US2_0033BE70(char *);
-extern void func_0033B018(char *, float, float);
+extern void menu_set_anchor_pos(char *, float, float);
 extern char *func_US2_00348CB8(char *, int);
 extern void func_US2_00348E28(char *, float, float);
 extern void func_US2_0033BE70(char *p);
-extern void func_0033B018(char *p, float x, float y);
+extern void menu_set_anchor_pos(char *p, float x, float y);
 
 int func_US2_0033F3F0(char *object, int flags)
 {
@@ -378,7 +379,7 @@ int func_US2_0033F3F0(char *object, int flags)
     func_US2_0033BE70(first);
     second = object + 0x2E0;
     position = *(float **)(object + 0x3BC);
-    func_0033B018(first, position[0], position[1]);
+    menu_set_anchor_pos(first, position[0], position[1]);
     func_US2_00348CB8(second, flags);
     func_US2_00348E28(second, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
     return (flags >> 6) & 1;
@@ -394,37 +395,37 @@ int func_US2_0033F610(char *object, int flags)
     float *v;
     func_US2_0033BE70(p);
     v = *(float **)(object + 0x2D8);
-    func_0033B018(p, v[0], v[1]);
+    menu_set_anchor_pos(p, v[0], v[1]);
     return (flags >> 6) & 1;
 }
 
 
-void func_0033AF48(int);
+void prompt_bar_draw(int);
 
 void func_US2_0033F670(int param_1) {
-  func_0033AF48(param_1 + 8);
+  prompt_bar_draw(param_1 + 8);
 }
 
 extern void func_0033AB50_1(void *);
-extern void func_L00_0042BFF8(void *);
-extern void func_L00_0042C290(void *);
-extern void func_L00_0042BAD0(void *);
+extern void cam_init_object_table_c(void *);
+extern void cam_init_object_table_d(void *);
+extern void cam_init_object_table_a(void *);
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
 char *func_US2_0033F690(char *object)
 {
     func_0033AB50_1(object + 8);
-    func_L00_0042BFF8(object + 732);
-    func_L00_0042C290(object + 792);
-    func_L00_0042C290(object + 880);
-    func_L00_0042C290(object + 968);
-    func_L00_0042BAD0(object + 1056);
-    func_L00_0042C290(object + 1136);
-    func_L00_0042C290(object + 1224);
-    func_L00_0042C290(object + 1312);
-    func_L00_0042C290(object + 1400);
-    func_L00_0042C290(object + 1488);
-    func_L00_0042C290(object + 1576);
+    cam_init_object_table_c(object + 732);
+    cam_init_object_table_d(object + 792);
+    cam_init_object_table_d(object + 880);
+    cam_init_object_table_d(object + 968);
+    cam_init_object_table_a(object + 1056);
+    cam_init_object_table_d(object + 1136);
+    cam_init_object_table_d(object + 1224);
+    cam_init_object_table_d(object + 1312);
+    cam_init_object_table_d(object + 1400);
+    cam_init_object_table_d(object + 1488);
+    cam_init_object_table_d(object + 1576);
     return object;
 }
 

@@ -7,34 +7,34 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_0029F338(int);
-extern float func_002A7940();
-extern void func_002A7750(char *, int, int);
-extern int func_002ACBC8(char *, int);
-extern void func_L07_003EECE0(char *);
-extern int func_002B3868(char *);
-extern float func_L07_003EEE28(char *);
-extern int func_002A8508(int, int);
-extern int func_00282948(void *);
-extern int func_002B38B8(char *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L07_003E7380(char *, void *, void *, char *, int);
-extern void func_L07_003EBBE8(char *, void *, void *, char *, int);
-extern float func_002AA2E8(void *, float, float);
-extern int func_002A9640(char *, int, int);
-extern float func_002A96A0(char *, int);
-extern void func_002B0A68(char *, int, void *, int, float, float, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_0032DA58(char *, void *, void *, float);
+extern void moby_mark_spawned(int);
+extern float math_random_angle();
+extern void moby_set_state(char *, int, int);
+extern int IsPointInCuboid(char *, int);
+extern void path_reset_follower_to_point(char *);
+extern int flag_set_first_pending(char *);
+extern float SteerTowardTarget(char *);
+extern int moby_count_group_not_in_state(int, int);
+extern int math_fast_float_d(void *);
+extern int flag_is_third_pending_set(char *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int PlayMobySound(int, int, char *);
+extern void entity_launch_member_a(char *, void *, void *, char *, int);
+extern void entity_launch_member_b(char *, void *, void *, char *, int);
+extern float ApproachValue(void *, float, float);
+extern int part_find_owned_effect_slot(char *, int, int);
+extern float moby_update_aim_target_strength(char *, int);
+extern void part_spawn_masked_debris(char *, int, void *, int, float, float, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void part_spawn_blast_effect_moby(char *, void *, void *, float);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L07_001B9200[];
 extern int D_L07_001B0C50 __attribute__((sda));
-extern unsigned short *D_L07_001FAD60[];
-extern char *D_L07_001B22DC[] __attribute__((sda));
+extern unsigned short *g_moby_l07_group_lists[];
+extern char *g_moby_l07_array[] __attribute__((sda));
 extern int D_L07_001B22F8[] __attribute__((sda));
 extern void *D_L07_002A3380[];
 
@@ -66,7 +66,7 @@ typedef struct {
    the order 0, 1, 4, 2, 3, 5); `cases` only keeps the labels alive. */
 /* Per-frame update for moby class 3396: steps through its list of linked objects, throws
    launchers at them and fades out when hurt. */
-void func_L07_003EE708(char *mobyArg)
+void launcher_sequence_update(char *mobyArg)
 {
     static void *cases[6] = {&&c0, &&c1, &&c4, &&c2, &&c3, &&c5};
     char *moby = mobyArg;
@@ -83,33 +83,33 @@ c0:
         vars->h24 = 0x28;
         vars->f20 = 40.0f;
     }
-    vars->f104 = RandomAngle();
-    vars->f108 = RandomAngle();
+    vars->f104 = math_random_angle();
+    vars->f108 = math_random_angle();
     *(TI128 *)vars->b0F0 = *(TI128 *)(moby + 0x10);
-    SetMobyState(moby, 1, -1);
+    moby_set_state(moby, 1, -1);
     *(int *)(moby + 0x98) = 0;
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
     goto tail;
 c1:
     if (vars->f90 != -1) {
-        if (IsPointInCuboid(gHeroPosition, vars->f90))
-            ResetPathFollowerToPathPoint(moby);
+        if (IsPointInCuboid(g_hero_position, vars->f90))
+            path_reset_follower_to_point(moby);
     }
     goto tail;
 c4: {
     int i;
 
-    if (SetFirstPendingFlag(moby))
+    if (flag_set_first_pending(moby))
         vars->f124 = 0x3C;
     SteerTowardTarget(moby);
     i = vars->idx;
     if (i >= 6 || vars->ids[i + 1] == -1) {
-        SetMobyState(moby, 5, -1);
+        moby_set_state(moby, 5, -1);
     } else {
-        if (CountMobysInGroupNotInState(vars->ids[i], -1) == 0) {
-            if (FastFloatHelperD(&vars->f124)) {
+        if (moby_count_group_not_in_state(vars->ids[i], -1) == 0) {
+            if (math_fast_float_d(&vars->f124)) {
                 vars->idx = vars->idx + 1;
-                SetMobyState(moby, 3, -1);
+                moby_set_state(moby, 3, -1);
             }
         }
     }
@@ -117,8 +117,8 @@ c4: {
 }
 c2:
     SteerTowardTarget(moby);
-    if (IsThirdPendingFlagSet(moby))
-        SetMobyState(moby, 3, -1);
+    if (flag_is_third_pending_set(moby))
+        moby_set_state(moby, 3, -1);
     goto tail;
 c3: {
     float distance;
@@ -131,12 +131,12 @@ c3: {
         if (vars->ids[vars->idx] != -1) {
             matrix_mul_vec3(launchPos, &D_L07_001B0C50, moby + 0xC0);
             FastVecAdd(launchPos, launchPos, moby + 0x10);
-            for (p = gMobyGroupLists_L07[vars->ids[vars->idx]];
+            for (p = g_moby_l07_group_lists[vars->ids[vars->idx]];
                  (vars->ids[vars->idx] & 0xFF) != 0xFF &&
                  vars->ids[vars->idx] <= D_L07_001B22F8[0] && p != 0 &&
-                 ((short)p[-1] >= 0 || p == gMobyGroupLists_L07[vars->ids[vars->idx]]);
+                 ((short)p[-1] >= 0 || p == g_moby_l07_group_lists[vars->ids[vars->idx]]);
                  p++) {
-                member = gMobyArray_L07[0] + ((*p & 0x7FFF) << 8);
+                member = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
                 if (member == 0)
                     break;
                 if (*(unsigned char *)(member + 0x20) != 0xFE) {
@@ -144,18 +144,18 @@ c3: {
                         switch (*(short *)(member + 0xAA)) {
                         case 0xD29 /* moby class 3369 */:
                             PlayMobySound(0, 0, moby);
-                            LaunchGroupMemberMode10(member, launchPos, member + 0x10, moby, vars->f110);
+                            entity_launch_member_a(member, launchPos, member + 0x10, moby, vars->f110);
                             break;
                         case 0xD2A /* moby class 3370 */:
                             PlayMobySound(0, 0, moby);
-                            LaunchGroupMemberMode8(member, launchPos, member + 0x10, moby, vars->f110);
+                            entity_launch_member_b(member, launchPos, member + 0x10, moby, vars->f110);
                             break;
                         }
                     }
                 }
             }
         }
-        SetMobyState(moby, 4, -1);
+        moby_set_state(moby, 4, -1);
     }
     goto tail;
 }
@@ -165,7 +165,7 @@ c5: {
     vars->f118 += vars->f114;
     if (30.0f < vars->f118) {
         if (*(unsigned char *)(moby + 0x31) == 0) {
-            MarkMobySpawned((int)moby);
+            moby_mark_spawned((int)moby);
             return;
         }
     }
@@ -180,17 +180,17 @@ tail:
         int hitId;
         float damage;
 
-        hitId = FindOwnedEffectSlot(moby, 0x10000, 0);
-        damage = UpdateAimTargetStrength(moby, hitId);
+        hitId = part_find_owned_effect_slot(moby, 0x10000, 0);
+        damage = moby_update_aim_target_strength(moby, hitId);
         ApproachValue(&vars->f20, 0.0f, damage);
         *(unsigned char *)(moby + 0xA8) = 0xFF;
         if (vars->f20 == 0.0f) {
-            SpawnDebrisForMaskedParts(moby, 0x7F7, vars->b60, 0xFF, 5.0f, 10.0f, 5.0f, 10.0f);
+            part_spawn_masked_debris(moby, 0x7F7, vars->b60, 0xFF, 5.0f, 10.0f, 5.0f, 10.0f);
             FastVecSub(awayDir, D_L07_001B9200, moby + 0x10);
             vec_scale_to_length(awayDir, awayDir, 1.0f);
-            SpawnBlastEffectMoby(moby, moby + 0x10, awayDir, 0.0f);
+            part_spawn_blast_effect_moby(moby, moby + 0x10, awayDir, 0.0f);
             PlayMobySound(2, 0, moby);
-            MarkMobySpawned((int)moby);
+            moby_mark_spawned((int)moby);
         }
     }
 }

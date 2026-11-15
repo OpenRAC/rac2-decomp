@@ -1,8 +1,8 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *func_0029EFD0(int);
-extern void func_0026FEB8(const char *, ...);
+extern u8 *CreateMoby(int);
+extern void STUB_printf(const char *, ...);
 extern char ref_L02_003C0890_00[];
 
 /* Known actor prefix; later fields and complete extent remain unspecified. */
@@ -14,7 +14,7 @@ struct ActorPrefix {
 };
 
 /* Update for the moby class 2163 rotating piece. On the first frame it remembers its start angle and spawns a linked helper object that copies its flags and position. */
-void func_L02_003C0890(u8 *object) {
+void rotating_piece_update(u8 *object) {
     u8 *data = *(u8 **)(object + 0x68);
     u8 *child;
     if (object[0x20] == 0) {

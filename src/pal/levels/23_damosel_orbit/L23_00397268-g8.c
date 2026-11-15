@@ -122,19 +122,19 @@ extern s32 ref_L23_003BF9B0_00;
 extern s32 D_L23_001B1650 __attribute__((sda));
 extern s32 D_L23_001B36AC;
 extern s32 D_L23_001B36F0;
-extern u8 D_L23_001BA640[];
-extern Moby_003BF9B0 *func_0029EFD0(s32);
-extern void func_00283360(void *);
-extern void func_L23_003C0028(Moby_003BF9B0 *);
-extern s32 func_00283CF0(f32);
+extern u8 g_camera_l23_position[];
+extern Moby_003BF9B0 *CreateMoby(s32);
+extern void set_identity_rotation_rows(void *);
+extern void moby_reset_idle_clear_links(Moby_003BF9B0 *);
+extern s32 FloatToInt(f32);
 extern void func_PAL_L23_003C5480(Moby_003BF9B0 *);
-extern void func_002B60B0(Moby_003BF9B0 *, f32, f32, f32, f32);
-extern f32 func_00282E48(void *, void *);
-extern void func_002A93B0(Moby_003BF9B0 *);
-extern Found_003BF9B0 *func_002A9640(Moby_003BF9B0 *, s32, s32);
+extern void moby_set_controller_speed_limits(Moby_003BF9B0 *, f32, f32, f32, f32);
+extern f32 fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(Moby_003BF9B0 *);
+extern Found_003BF9B0 *part_find_owned_effect_slot(Moby_003BF9B0 *, s32, s32);
 extern void func_PAL_002B1A50(Moby_003BF9B0 *, void *, s32);
-extern void func_002AFFD8(void *, void *, s32);
-extern void func_L00_00325600(void *, void *, s32);
+extern void cam_compute_view_direction(void *, void *, s32);
+extern void vec_negate_and_forward(void *, void *, s32);
 
 void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
 {
@@ -196,12 +196,12 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
         vars->f88 |= 0x81;
         moby->f32 = 0xFF;
         moby->f30 = 0xFF;
-        vars->child = func_0029EFD0(0x7E6);
-        func_00283360(vars->child->fC0);
+        vars->child = CreateMoby(0x7E6);
+        set_identity_rotation_rows(vars->child->fC0);
         vars->f258 = 0;
-        func_L23_003C0028(moby);
-        vars->f48 = func_00283CF0(12.0f);
-        vars->f4A = func_00283CF0(14.4f);
+        moby_reset_idle_clear_links(moby);
+        vars->f48 = FloatToInt(12.0f);
+        vars->f4A = FloatToInt(14.4f);
     } else if (ref_L23_003BF9B0_00 != 0 && D_L23_001B1424 == 0) {
         if (D_L23_001B36AC < 10)
             func_PAL_L23_003C5480(moby);
@@ -210,7 +210,7 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
     }
     if (moby->state == 13)
         return;
-    func_002B60B0(moby, 0.0064000003f, 0.16000001f, 0.0025132746f, 0.25132746f);
+    moby_set_controller_speed_limits(moby, 0.0064000003f, 0.16000001f, 0.0025132746f, 0.25132746f);
     k = 1.4f;
     if (moby->state == 2)
         k = 0.7f;
@@ -222,17 +222,17 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
         vars->child->scale = vars->child->pClass->scale * k;
-        if (vars->child->f31 != 0 && func_00282E48(vars->child->pos, D_L23_001BA640) < 24.0f) {
-            func_002A93B0(vars->child);
+        if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, g_camera_l23_position) < 24.0f) {
+            moby_update_ground_check(vars->child);
             vars->child->f6F = 22;
         }
     }
-    if (moby->f31 != 0 && func_00282E48(moby->pos, D_L23_001BA640) < 24.0f) {
-        func_002A93B0(moby);
+    if (moby->f31 != 0 && fast_vec_dist(moby->pos, g_camera_l23_position) < 24.0f) {
+        moby_update_ground_check(moby);
         moby->f6F = 22;
     }
     {
-        Found_003BF9B0 *found = func_002A9640(moby, 0x30000, 1);
+        Found_003BF9B0 *found = part_find_owned_effect_slot(moby, 0x30000, 1);
 
         if (found != 0 && found->info != 0 && found->info->fAA == 0x1190)
             vars->f20 = 0;
@@ -240,6 +240,6 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
     if (moby->state == 2)
         vars->f178 = 0;
     func_PAL_002B1A50(moby, vars->f140, 0);
-    func_002AFFD8(moby->pos, vars->f280, 0);
-    func_L00_00325600(moby->fC0, vars->f280, 0);
+    cam_compute_view_direction(moby->pos, vars->f280, 0);
+    vec_negate_and_forward(moby->fC0, vars->f280, 0);
 }

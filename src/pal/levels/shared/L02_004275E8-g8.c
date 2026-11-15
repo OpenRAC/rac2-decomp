@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float D_L02_001B1FC4 __attribute__((sda));
-extern void func_00282F20(void *, void *, float);
-extern void func_002AB668(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283BE0(float, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L02_00422638(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_draw_beam_effect_passes(int);
 
 /* Rebuilds the record's second frame and folds the resident angle step in. */
 void func_PAL_L02_004275E8(char *s2) {
@@ -17,16 +18,16 @@ void func_PAL_L02_004275E8(char *s2) {
     char *s3 = s2 + 0x10;
     char *s1 = s0 + 0x10;
 
-    func_00282F20(buf, s0 + 0x40, 1.0f);
-    func_002AB668(buf, buf, *(float *)(s0 + 0x30));
-    func_00282D30(s1, s0, *(float *)(s0 + 0x60));
-    func_002ACDE8(s1, s1, buf);
+    vec_scale_to_length(buf, s0 + 0x40, 1.0f);
+    math_build_axis_angle_quat(buf, buf, *(float *)(s0 + 0x30));
+    FastVecScale(s1, s0, *(float *)(s0 + 0x60));
+    vec_rotate_by_quaternion(s1, s1, buf);
     *(float *)(s0 + 0x20) = -*(float *)(s0 + 0x10);
     *(float *)(s0 + 0x24) = -*(float *)(s0 + 0x14);
     *(float *)(s0 + 0x28) = -*(float *)(s0 + 0x18);
-    func_00282CC0(s1, s3, s1);
-    func_00282CC0(s0 + 0x20, s3, s0 + 0x20);
+    FastVecAdd(s1, s3, s1);
+    FastVecAdd(s0 + 0x20, s3, s0 + 0x20);
     *(float *)(s0 + 0x30) =
-        func_00283BE0(*(float *)(s0 + 0x30), D_L02_001B1FC4 * 0.0003490659f);
-    func_L00_002E6CF0(func_L02_00422638, s2);
+        fast_subtract_rotations(*(float *)(s0 + 0x30), D_L02_001B1FC4 * 0.0003490659f);
+    gfx_add_draw_callback_first(gfx_draw_beam_effect_passes, s2);
 }

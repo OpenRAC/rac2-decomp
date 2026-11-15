@@ -11,19 +11,19 @@ extern float D_L02_001B0410 __attribute__((sda));
 extern float D_L02_001B0414 __attribute__((sda));
 extern int D_L02_001B0420 __attribute__((sda));
 extern float D_L02_001B0430 __attribute__((sda));
-extern float D_L02_001BA500[4];
+extern float g_camera_l02_position[4];
 
-extern void *func_0029FCC0(char *, int, void *);
-extern void func_0029FC20(char *, int, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_point(char *, int, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 /* Draws a glow at a joint of the boss, brighter when it faces the camera. */
-void func_L02_003DAE60(char *moby, int jointIndex) {
+void boss_draw_joint_glow_facing_cam(char *moby, int jointIndex) {
     float jointPos[4];
     float jointPosCopy[4];
     float jointMatrix[16];
@@ -34,19 +34,19 @@ void func_L02_003DAE60(char *moby, int jointIndex) {
     unsigned int color;
     char *vars = *(char **)(*(char **)(moby + 0xB8) + 0x68);
 
-    TransformMobyJointToWorld(moby, jointIndex, jointPos);
+    moby_transform_joint_to_world(moby, jointIndex, jointPos);
     *(TI128 *)jointPosCopy = *(TI128 *)jointPos;
-    TransformMobyJointPoint(moby, jointIndex, jointMatrix);
+    moby_transform_joint_point(moby, jointIndex, jointMatrix);
     transform_vector(localOffset, &D_L02_001B0420, jointMatrix);
     FastVecAdd(jointPos, jointPos, localOffset);
-    FastVecSub(toCamera, gCameraPosition_L02, jointPos);
+    FastVecSub(toCamera, g_camera_l02_position, jointPos);
     vec_scale_to_length(toCamera, toCamera, 1.0f);
     *(TI128 *)axisCopy = *(TI128 *)jointMatrix;
     alignment = FastVecDot(toCamera, axisCopy);
     if (D_L02_001B0430 < alignment) {
         color = *(unsigned int *)(vars + 0x250);
         alignment = alignment * alignment;
-        DrawBillboardQuad_L00(jointPos, (color & 0xFFFFFF) | ((int)(alignment * (float)(int)(color >> 24)) << 24),
+        gfx_l00_draw_billboard_quad(jointPos, (color & 0xFFFFFF) | ((int)(alignment * (float)(int)(color >> 24)) << 24),
                           D_L02_001B0414, D_L02_001B0410);
     }
 }

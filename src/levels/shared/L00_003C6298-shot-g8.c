@@ -8,50 +8,50 @@ typedef struct { char pad[112]; float value; char tail[108]; } DamageClass;
 typedef struct { char pad[0x2290]; char *player; } PlayerRef;
 typedef struct { char pad[132]; int value; } SoundRecord;
 
-extern char D_L00_001C3280[];
+extern char g_area_hit_targets[];
 extern const QueryParams D_L00_001B0140;
-extern char D_00139568[];
+extern char g_item_slot_to_record[];
 extern char D_L00_001BF220[];
-extern char D_00188660[];
-extern char D_00189E20[];
-extern char D_L00_00262570[];
+extern char g_sound_state[];
+extern char g_hero_state[];
+extern char g_weapon_l00_table[];
 extern int D_L00_001B0134 SDATA(D_L00_001B0134);
 
-extern void func_00300190(void *, void *);
-extern void func_002FEE70(int, void *, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002E5F40(int, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282C88(void *);
-extern void func_L00_003252A8(void *, void *, int);
-extern void func_0031F6E8(void *, int, int);
-extern void func_0032D758(void *, int, int);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_0031DC18(void *, void *, int);
-extern void func_0031E960(void *);
-extern void func_0031E6E8(void *);
-extern void func_002E59F8(int);
-extern void func_0031DEE8(void *);
-extern void func_0031E3A8(void *);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void part_steer_effect_direction(int, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void snd_set_voice_pitch_bend(int, int);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void vec_clear_128(void *);
+extern void moby_forward_position_call(void *, void *, int);
+extern void part_spawn_hit_sparks(void *, int, int);
+extern void StartAttachedEffect(void *, int, int);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void spark_spawn_targeted(void *, void *, int);
+extern void part_spawn_spark_burst(void *);
+extern void spark_destroy_moby_free_slot(void *);
+extern void snd_stop_voice(int);
+extern void spark_update_targeted(void *);
+extern void glow_ring_update_entries(void *);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
 extern void ref_L00_003CA730_00(void *, void *);
-extern int func_002A7820(int, int);
-extern int func_00277F48(void *, int, void *, int, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00277258(void *, int, void *, float);
-extern int func_00282948(void *);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002E59B0(void *, int);
-extern int func_002B4038(int, int);
-extern char *func_002AB1F0(void *);
-extern char *func_002AF580(void *, void *, float, float, int *, void *, int, void *,
+extern int math_random_int_range(int, int);
+extern int coll_process_hit(void *, int, void *, int, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern int coll_test_point(void *, int, void *, float);
+extern int math_fast_float_d(void *);
+extern int PlayMobySound(int, int, void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int save_is_record_value(int, int);
+extern char *moby_get_private_value_0(void *);
+extern char *SelectBestTargetInCone(void *, void *, float, float, int *, void *, int, void *,
                            float, float, float, int, void *);
 
 /* Per-frame update of a thrown shot. It flies forward, sticks to or hits things it touches, explodes to damage nearby enemies, plays its sound and removes itself when its time runs out. */
-void func_L00_003CA730(char *self)
+void thrown_shot_update(char *self)
 {
     char prevPos[16] __attribute__((aligned(16)));
     union { char v[16]; QueryParams params; } scratch __attribute__((aligned(16)));
@@ -62,7 +62,7 @@ void func_L00_003CA730(char *self)
     int count, i, j, hitCount;
     char *vars = *(char **)(self + 0x68), *hitObject, *hitInfo;
 
-    TransformVectorOrCopy(self + 0x10, self + 0x10);
+    vec_transform_or_copy(self + 0x10, self + 0x10);
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         *(unsigned char *)(self + 0x20) = 1;
@@ -70,19 +70,19 @@ void func_L00_003CA730(char *self)
         *(int *)(vars + 0x24) = -1;
     case 1:
         qcopy(prevPos, self + 0x10);
-        SteerEffectDirection(*(int *)(vars + 0x44), vars, 0);
+        part_steer_effect_direction(*(int *)(vars + 0x44), vars, 0);
         FastVecAdd(self + 0x10, self + 0x10, vars);
-        SetVoicePitchBend(*(int *)(vars + 0x20), *(int *)(vars + 0x24) + RandomIntRange(-200, 200));
-        hitCount = ProcessCollisionHit(self + 0x10, 0, self, 0, 0.45f);
+        snd_set_voice_pitch_bend(*(int *)(vars + 0x20), *(int *)(vars + 0x24) + math_random_int_range(-200, 200));
+        hitCount = coll_process_hit(self + 0x10, 0, self, 0, 0.45f);
         for (i = 0; i < hitCount; i++) {
-            hitObject = ((Candidate *)gAreaHitTargets)[i].item;
-            hitInfo = GetMobyPrivateValue0(hitObject);
-            if (*(short *)(hitObject + 0xAA) == 0xC4A /* Plasma Coil */ || hitObject == ((PlayerRef *)gHeroState)->player
+            hitObject = ((Candidate *)g_area_hit_targets)[i].item;
+            hitInfo = moby_get_private_value_0(hitObject);
+            if (*(short *)(hitObject + 0xAA) == 0xC4A /* Plasma Coil */ || hitObject == ((PlayerRef *)g_hero_state)->player
                 || !(*(short *)(hitObject + 0x34) & 0x1000))
                 continue;
             if (hitInfo) {
                 qcopy(self + 0x10, hitObject + 0x10);
-                ForwardObjectPositionCall(hitObject, scratch.v, 1);
+                moby_forward_position_call(hitObject, scratch.v, 1);
                 FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
                 FastVecAdd(self + 0x10, self + 0x10, scratch.v);
             }
@@ -90,15 +90,15 @@ void func_L00_003CA730(char *self)
             *(int *)(vars + 0x10) = 15;
             *(unsigned char *)(self + 0x20) = 2;
             qcopy(scratch.v, vars);
-            ClearVector128(vars);
+            vec_clear_128(vars);
             vec_scale_to_length(scratch.v, scratch.v, 0.033333335f);
             make_hit_descriptor(message.raw, self, 0x210000, scratch.v,
-                          ((DamageClass *)gWeaponTable_L00)[((DamageClasses *)gItemSlotToRecord)->entry].value);
+                          ((DamageClass *)g_weapon_l00_table)[((DamageClasses *)g_item_slot_to_record)->entry].value);
             *(unsigned char *)(message.raw + 24) = 1;
             *(unsigned char *)(message.raw + 25) = 3;
             *(short *)(message.raw + 26) = *(short *)(self + 0xAA);
             QueueMobyImpact(hitObject, message.raw);
-            SpawnHitSparks_0031F6E8(self + 0x10, 10, 1);
+            part_spawn_hit_sparks(self + 0x10, 10, 1);
             StartAttachedEffect(hitObject, 28, *(int *)(self + 0xB8));
             break;
         }
@@ -107,7 +107,7 @@ void func_L00_003CA730(char *self)
             if (CollLine(prevPos, self + 0x10, 2, self, 0))
                 didHit = 1;
             else
-                didHit = TestPointAgainstCollision(self + 0x10, 2, self, 0.1f) != 0;
+                didHit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
             if (didHit == 1) {
                 qcopy(self + 0x10, D_L00_001BF220);
                 FastVecScale(scratch.v, D_L00_001BF220 + 0x20, 0.0009765625f);
@@ -115,10 +115,10 @@ void func_L00_003CA730(char *self)
                 FastVecAdd(self + 0x10, scratch.v, self + 0x10);
                 *(int *)(vars + 0x10) = 15;
                 *(unsigned char *)(self + 0x20) = 2;
-                SpawnHitSparks_0031F6E8(self + 0x10, 15, 0);
+                part_spawn_hit_sparks(self + 0x10, 15, 0);
             }
         }
-        if (FastFloatHelperD(vars + 0x10)) {
+        if (math_fast_float_d(vars + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
             *(int *)(vars + 0x10) = 161;
         }
@@ -126,14 +126,14 @@ void func_L00_003CA730(char *self)
     case 2: {
         char *hitInfo;
         if (*(char **)(vars + 0x38)) {
-            hitInfo = GetMobyPrivateValue0(*(char **)(vars + 0x38));
+            hitInfo = moby_get_private_value_0(*(char **)(vars + 0x38));
             if (hitInfo) {
-                ForwardObjectPositionCall(*(char **)(vars + 0x38), scratch.v, 1);
+                moby_forward_position_call(*(char **)(vars + 0x38), scratch.v, 1);
                 FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
                 FastVecAdd(self + 0x10, scratch.v, *(char **)(vars + 0x38) + 0x10);
             }
         }
-        if (FastFloatHelperD(vars + 0x10)) {
+        if (math_fast_float_d(vars + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
             scratch.params = D_L00_001B0140;
             message.query.exclude = (QueryExclude){*(char **)(vars + 0x38), 0};
@@ -142,7 +142,7 @@ void func_L00_003CA730(char *self)
                           10.0f, 0.0f, 0.0f, 0, &scratch.params);
             for (i = 0; i < count; i++) {
                 for (j = 4; j >= 0; j--)
-                    SpawnTargetedSpark(self, message.query.targets[i], 10);
+                    spark_spawn_targeted(self, message.query.targets[i], 10);
                 PlayMobySound(1, 0, self);
             }
         }
@@ -157,41 +157,41 @@ void func_L00_003CA730(char *self)
                 D_L00_001B0134 = 1;
                 PlayMobySound(3, 0, self);
             }
-            hitInfo = GetMobyPrivateValue0(*(char **)(vars + 0x38));
+            hitInfo = moby_get_private_value_0(*(char **)(vars + 0x38));
             if (hitInfo) {
-                ForwardObjectPositionCall(*(char **)(vars + 0x38), scratch.v, 1);
+                moby_forward_position_call(*(char **)(vars + 0x38), scratch.v, 1);
                 FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
                 FastVecAdd(self + 0x10, scratch.v, *(char **)(vars + 0x38) + 0x10);
             }
         }
         if (!*(int *)(vars + 0x1C)) {
-            DestroyMobyAndFreeSparkSlot(self);
+            spark_destroy_moby_free_slot(self);
             if (!*(char **)(vars + 0x38)) {
-                SpawnHitSparks_0031F6E8(self + 0x10, 10, 1);
+                part_spawn_hit_sparks(self + 0x10, 10, 1);
                 PlayMobySound(2, 0, self);
             }
         }
     }
     }
     if (*(unsigned char *)(self + 0x20) != 4) {
-        if (!IsVoicePlayingForOwner(self, *(int *)(vars + 0x20)))
+        if (!snd_is_voice_playing_for_owner(self, *(int *)(vars + 0x20)))
             *(int *)(vars + 0x20) = PlayMobySound(0, 4, self);
         if (*(int *)(vars + 0x24) == -1) {
-            char *soundEntry = gSoundState + *(int *)(vars + 0x20) * 112;
+            char *soundEntry = g_sound_state + *(int *)(vars + 0x20) * 112;
             *(int *)(vars + 0x24) = ((SoundRecord *)soundEntry)->value;
         }
     } else if (*(int *)(vars + 0x20) != -1) {
-        char *soundEntry = gSoundState + *(int *)(vars + 0x20) * 112;
+        char *soundEntry = g_sound_state + *(int *)(vars + 0x20) * 112;
         if (*(char **)(soundEntry + 0x88) == self && *(unsigned char *)(soundEntry + 0x74))
-            StopSoundVoice(*(int *)(vars + 0x20));
+            snd_stop_voice(*(int *)(vars + 0x20));
         *(int *)(vars + 0x20) = -1;
     }
-    UpdateTargetedSparks(self);
-    UpdateGlowRingEntries(self);
-    if (!IsSavedRecordValue(*(int *)(vars + 0x40), *(int *)(vars + 0x3C))) {
-        ClearEntryFlag(*(int *)(vars + 0x44));
-        MarkMobySpawned(self);
+    spark_update_targeted(self);
+    glow_ring_update_entries(self);
+    if (!save_is_record_value(*(int *)(vars + 0x40), *(int *)(vars + 0x3C))) {
+        table_clear_entry_flag(*(int *)(vars + 0x44));
+        moby_mark_spawned(self);
     } else {
-        ref_L00_003CA730_00((void *)SpawnSparkBurst_0031E960, self);
+        ref_L00_003CA730_00((void *)part_spawn_spark_burst, self);
     }
 }

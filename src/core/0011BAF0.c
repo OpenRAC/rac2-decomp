@@ -36,7 +36,7 @@ extern char r1_D_00152850[];
 
 extern char r1_D_00152868[];
 
-extern void func_0011BB38();
+extern void tty_handle_deci2_event();
 
 struct TtyState {
     volatile s32 unk0; /* deci2 handle from sceDeci2Open */
@@ -84,7 +84,7 @@ extern struct TtyInitState r1_D_00154B50;
 
 /* rac1-decomp src/core/00119868.c: func_00119890 */
 /* Moves the ring buffer write position forward by one and wraps it at the end. */
-void func_0011BAF0(char *ring) {
+void tty_ring_advance_write_ptr(char *ring) {
     char *writePtr;
     *(int *)(ring + 0x4) += 1;
     writePtr = *(char **)(ring + 0xC) + 1;
@@ -97,7 +97,7 @@ void func_0011BAF0(char *ring) {
 /* rac1-decomp src/core/00119868.c: func_00119910 */
 /* sceTtyHandler: the DECI2 event callback (1/2 read, 3 write, 4 write done). */
 /* Handles debug-network events for the text console: receives typed text and sends queued output. */
-void func_0011BB38(int event, int param, TtyHandlerState *state) {
+void tty_handle_deci2_event(int event, int param, TtyHandlerState *state) {
     int count;
 
     switch (event) {
@@ -121,7 +121,7 @@ void func_0011BB38(int event, int param, TtyHandlerState *state) {
 
             for (count = 0xC; count < header->len; count++) {
                 *state->queue->wp = state->rbuf[count];
-                AdvanceCharRingWritePtr((char *)state->queue);
+                tty_ring_advance_write_ptr((char *)state->queue);
             }
             state->rlen = 0;
         }
@@ -150,7 +150,7 @@ void func_0011BB38(int event, int param, TtyHandlerState *state) {
 /* rac1-decomp src/core/00119868.c: func_00119AA8 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/debug/sce_tty_write.c, sceTtyWrite. */
 /* Sends a block of text to the debug console. Newlines become carriage return plus newline. Returns how many characters were sent, or -1 if busy or failed. */
-s32 func_0011BCD0(s8 *text, s32 text_len) {
+s32 tty_write_text(s8 *text, s32 text_len) {
     s32 written_count; /* characters consumed -> return value */
     s32 remaining; /* countdown, hits -1 after len+1 tests */
     s32 window_bytes; /* bytes resident in the payload window */

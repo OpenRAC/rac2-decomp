@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,17 +25,17 @@
 #include "common.h"
 
 typedef int TI __attribute__((mode(TI)));
-extern s32 func_00282978();
-extern void func_00282CC0();
-extern void func_00282CF0();
-extern void func_00282D30(void *, void *, f32);
-extern f32 func_00282E48();
-extern void func_002B9180();
+extern s32 FastDecTimer();
+extern void FastVecAdd();
+extern void FastVecSub();
+extern void FastVecScale(void *, void *, f32);
+extern f32 fast_vec_dist();
+extern void part_kill();
 extern f32 D_001AA364 __attribute__((sda));
 extern f32 D_001AA368 __attribute__((sda));
 
 /* Pulls two points of an effect towards the object it is tied to. It disappears when that object is gone or the points get too close. */
-void func_002BF390(s32 effect) {
+void part_update_tethered(s32 effect) {
     s32 scaled[4];
     TI result;
     s32 target;
@@ -44,7 +45,7 @@ void func_002BF390(s32 effect) {
 
     target = (*(s32 *)((s8 *)(effect) + (0x30)));
     if (target == 0 || (targetState = (*(u8 *)((s8 *)(target) + (0x20))), targetState == 0xFE) || targetState == 0xFD || FastDecTimer(effect + 0xA) != 0) {
-        KillParticle(effect);
+        part_kill(effect);
         return;
     }
     pointA = effect + 0x10;
@@ -60,6 +61,6 @@ void func_002BF390(s32 effect) {
     FastVecAdd(&result, scaled, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(effect) + (0x20))) = result;
     if (fast_vec_dist(pointA, pointB) < 0.1f || fast_vec_dist(pointA, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10) < 1.0f) {
-        KillParticle(effect);
+        part_kill(effect);
     }
 }

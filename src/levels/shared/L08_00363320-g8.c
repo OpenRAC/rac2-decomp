@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -11,7 +12,7 @@ extern int * volatile D_L08_001AA830 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L08_001CA0E0;
 
 /* Fills the level menu rows from the level order list and selects the row for the current level. */
-int func_L08_00363320(char *obj) {
+int menu_l08_init_level_select_rows(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

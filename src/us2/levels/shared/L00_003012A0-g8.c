@@ -175,15 +175,15 @@ extern int D_L00_001B20B8 MACRO_ADDR;
 extern int D_L00_001B20BC MACRO_ADDR;
 
 extern LoadCtx00618 D_L00_001BF140;
-extern Boot00618 D_0014B540;
+extern Boot00618 g_copy_setup_data;
 typedef struct { int stage, busy; int *archive0; int archive1; } ArchiveLoad;
 extern ArchiveLoad D_001A7280 MACRO_ADDR;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char D_L00_001B8C80[];
 extern char D_L00_001D1740[];
-extern int D_001A7B90 MACRO_ADDR;
+extern int g_is_pal_video MACRO_ADDR;
 extern float D_001A790C MACRO_ADDR;
-extern Coll00618 D_L00_001BF200;
+extern Coll00618 g_collision_result;
 extern char D_L00_001BF280[];
 extern char D_L00_001B1A80[];
 extern char D_L00_001DE860[];
@@ -202,7 +202,7 @@ extern float D_L00_001B1B10 MACRO_ADDR;
 extern float D_L00_001B1B14 MACRO_ADDR;
 extern float D_L00_001B1B18 MACRO_ADDR;
 extern float D_L00_001B1B1C MACRO_ADDR;
-extern Sel00618 D_00152C00;
+extern Sel00618 g_hero_moby_default;
 extern Tutorial00618 D_L00_001C9340;
 extern int D_L00_001A8F0C MACRO_ADDR;
 extern int D_L00_001B20C0 MACRO_ADDR;
@@ -248,7 +248,7 @@ extern unsigned char D_L00_0021EBA0[];
 typedef struct { float f0, f4, f8; int iC; float f10, f14, f18; int i1C; } Cam00618;
 extern Cam00618 *D_L00_001B1844 MACRO_ADDR;
 extern int D_L00_001B1848 MACRO_ADDR;
-extern Slots00618 D_00188660;
+extern Slots00618 g_sound_state;
 extern int D_L00_001C5480[][3];
 extern int D_L00_001C5540[][3];
 extern Moby00618 *D_L00_001B1E9C[] MACRO_ADDR; /* moby array start (array: in-struct for alias analysis) */
@@ -257,7 +257,7 @@ extern Moby00618 *D_L00_001B1EA0 MACRO_ADDR;
 extern Moby00618 *D_L00_001B1EA4 MACRO_ADDR;
 extern char *D_L00_001B1EAC MACRO_ADDR;
 extern short D_L00_001FB660[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned char D_0019B2E8[];
 extern unsigned char D_0019B4A8[];
 typedef struct { unsigned char pad[0x464]; unsigned char byUid[0]; } Progress00618;
@@ -282,7 +282,7 @@ extern short D_L00_001B1FB0 MACRO_ADDR;
 extern short D_L00_001B1FF0 MACRO_ADDR;
 extern short D_L00_001B2030 MACRO_ADDR;
 extern int D_L00_00220DA0[];
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 extern int D_L00_001B1AEC MACRO_ADDR;
 extern int D_L00_001AA0F8 MACRO_ADDR;
 extern char D_L00_001A8A78[] __attribute__((sda));
@@ -290,53 +290,53 @@ extern char D_L00_001A8A48[] __attribute__((sda));
 extern char *D_L00_001B18D0 MACRO_ADDR;
 extern char *D_L00_001A8AA8 MACRO_ADDR;
 
-extern int func_002B7C80(void *, int, int);
-extern void func_0011AEA0(int);
+extern int load_read_disc_with_pause(void *, int, int);
+extern void FlushCache(int);
 extern void func_US2_0029E308(void *, void *);
-extern void func_00282A60(void *, int, int);
-extern void func_0029FAE0(void);
+extern void mem_clear(void *, int, int);
+extern void moby_clear_object_slots(void);
 extern void func_001163A0(int);
-extern void func_L00_00322428(int);
-extern void func_00282A88(void *, int);
-extern void func_00279FF0(void);
-extern void func_00284E18(int, int, int);
-extern void func_002FC070(void *);
-extern void func_0026FEB8(const char *, ...);
-extern void func_00282AB0(void *, void *, int);
+extern void SetFrameTimingMode(int);
+extern void mem_fast_helper_b(void *, int);
+extern void gfx_apply_display_config(void);
+extern void SetBackgroundColor(int, int, int);
+extern void gfx_start_dma_channel0_and_wait(void *);
+extern void STUB_printf(const char *, ...);
+extern void mem_copy_aligned(void *, void *, int);
 extern void func_002F0468(void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_L00_002EE050(float, float);
-extern void func_00282D60(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282B50(void *, void *, int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern void func_002E2C38(void *);
-extern void func_L00_0035F7E8(void *);
-extern int func_L00_002E3B38(int);
-extern void func_0029F0C8(void *, int);
-extern float func_002A89A8(void *, int, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float math_max_float(float, float);
+extern void scale_vector(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void mem_fast_helper_c(void *, void *, int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern void shrub_process_render_data(void *);
+extern void resolve_lookup_record(void *);
+extern int level_get_difficulty_scaled(int);
+extern void moby_init_instance(void *, int);
+extern float coll_probe_ground_height_below(void *, int, float);
 extern void func_002A0F48(void *);
-extern void func_002A0468(void *, u64, u64, u64, u64);
-extern void func_L00_00309140(void *, int);
-extern Moby00618 *func_0029EFD0(int);
-extern void func_0027B7E0(void);
+extern void gfx_pack_render_command_fields(void *, u64, u64, u64, u64);
+extern void level_store_value_in_table_slot(void *, int);
+extern Moby00618 *CreateMoby(int);
+extern void counter_clear_group(void);
 extern void func_US2_L00_002A4928(void);
-extern void func_L00_002A4D18(void);
-extern void func_L00_002D9E80(void);
-extern void func_00272368(void);
-extern void func_002B8518(void);
+extern void hero_reset_start_aim_speed(void);
+extern void SetupLevelCameras(void);
+extern void cam_update_state(void);
+extern void pad_clear_port_state(void);
 extern void func_US2_L00_0037F858(void);
-extern void func_L00_00367308(void);
-extern void func_L00_0032A0E8(void);
-extern void func_L00_0032A138(void);
-extern void func_L00_0032A170(void);
-extern void func_L00_003E8150(void);
-extern void func_L00_002E9098(void);
-extern void func_L00_00403BF8(void);
-extern void func_00272198(float);
-extern void func_L00_003603C0(unsigned char *);
+extern void menu_reset_state(void);
+extern void level_clear_slot_table(void);
+extern void level_l00_clear_counter_list(void);
+extern void level_l00_clear_counter_list_2(void);
+extern void moby_clear_fading_list(void);
+extern void gfx_enable_draw_flag(void);
+extern void sheep_clear_active_list(void);
+extern void cam_set_transition_frames(float);
+extern void pickup_update_interactive(unsigned char *);
 
 char *func_US2_L00_003012A0(int reload)
 {
@@ -348,31 +348,31 @@ char *func_US2_L00_003012A0(int reload)
     char *p;
 
     if (!reload) {
-        func_002B7C80(heap, D_0014B540.i52B8 + D_0014B540.i529C, D_0014B540.i52BC);
+        load_read_disc_with_pause(heap, g_copy_setup_data.i52B8 + g_copy_setup_data.i529C, g_copy_setup_data.i52BC);
         D_001A7280.archive1 = (int)heap;
     }
-    func_0011AEA0(0);
+    FlushCache(0);
     func_US2_0029E308((void *)D_001A7280.archive1, hdr);
-    func_0011AEA0(0);
-    func_00282A60(D_00189E20, 0, 0x2540);
-    func_00282A60(D_L00_001B8C80, 0, 0x410);
-    func_00282A60(D_L00_001D1740, 0, 0x180);
-    func_0029FAE0();
+    FlushCache(0);
+    mem_clear(g_hero_state, 0, 0x2540);
+    mem_clear(D_L00_001B8C80, 0, 0x410);
+    mem_clear(D_L00_001D1740, 0, 0x180);
+    moby_clear_object_slots();
     func_001163A0(1234);
-    if (D_001A7B90) {
+    if (g_is_pal_video) {
         if (D_001A790C == 1.0f)
-            func_L00_00322428(1);
+            SetFrameTimingMode(1);
     } else {
         if (D_001A790C != 1.0f)
-            func_L00_00322428(0);
+            SetFrameTimingMode(0);
     }
-    D_L00_001BF200.p4 = D_L00_001BF280;
-    D_L00_001BF200.p8 = D_L00_001B1A80;
-    D_L00_001BF200.iC = 0;
-    D_L00_001BF200.i10 = 0;
-    D_L00_001BF200.i14 = 0;
-    func_00282A88(D_L00_001DE860, 0x1C000);
-    func_00282A88(D_L00_001FA860, 0xC0);
+    g_collision_result.p4 = D_L00_001BF280;
+    g_collision_result.p8 = D_L00_001B1A80;
+    g_collision_result.iC = 0;
+    g_collision_result.i10 = 0;
+    g_collision_result.i14 = 0;
+    mem_fast_helper_b(D_L00_001DE860, 0x1C000);
+    mem_fast_helper_b(D_L00_001FA860, 0xC0);
 
     /* section 0: the level header */
     p = SECTION_00618(0);
@@ -404,9 +404,9 @@ char *func_US2_L00_003012A0(int reload)
     }
     startPos = (float *)(p + 0x10);
     p += 0x20;
-    D_00152C00.i40 = *(int *)p;
-    D_00152C00.i44 = *(int *)(p + 4);
-    D_00152C00.i48 = *(int *)(p + 8);
+    g_hero_moby_default.i40 = *(int *)p;
+    g_hero_moby_default.i44 = *(int *)(p + 4);
+    g_hero_moby_default.i48 = *(int *)(p + 8);
     D_L00_001C9340.count = 0;
     p += 0x10;
     if (*(int *)(p + 0xC)) {
@@ -428,17 +428,17 @@ char *func_US2_L00_003012A0(int reload)
         p += 0x20;
     }
     D_L00_001A8F0C = *(int *)p;
-    func_00279FF0();
+    gfx_apply_display_config();
     D_L00_001B2500 = 983040.0f;
     D_L00_001B2408 = 500.0f;
     D_L00_001B255C = 0x3C0;
     D_L00_001B1EB4 = 0x3C0;
     D_L00_001B20C0 = 0x1F4000;
-    func_00284E18(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
-    func_002FC070(D_00100AE0);
-    func_00282A88(D_L00_001C6F40, 0x100);
-    func_00282A88(D_L00_001C7040, 0x180);
-    func_00282A88(D_L00_001C6B40, 0x400);
+    SetBackgroundColor(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
+    gfx_start_dma_channel0_and_wait(D_00100AE0);
+    mem_fast_helper_b(D_L00_001C6F40, 0x100);
+    mem_fast_helper_b(D_L00_001C7040, 0x180);
+    mem_fast_helper_b(D_L00_001C6B40, 0x400);
 
     /* section 4: up to twelve 64-byte records */
     {
@@ -447,11 +447,11 @@ char *func_US2_L00_003012A0(int reload)
 
         s += 0x10;
         if (n >= 12) {
-            func_0026FEB8(D_L00_002A0ED0);
+            STUB_printf(D_L00_002A0ED0);
             n = 12;
         }
         if (n)
-            func_00282AB0(D_L00_001C6B40, s, n << 6);
+            mem_copy_aligned(D_L00_001C6B40, s, n << 6);
     }
 
     /* section 0x84 */
@@ -464,9 +464,9 @@ char *func_US2_L00_003012A0(int reload)
         if (n) {
             char *entries;
 
-            func_00282AB0(D_L00_001C5940, s, n << 4);
+            mem_copy_aligned(D_L00_001C5940, s, n << 4);
             entries = D_L00_001C5B40;
-            func_00282AB0(entries, s + (D_L00_001B1CDC << 4), D_L00_001B1CDC << 7);
+            mem_copy_aligned(entries, s + (D_L00_001B1CDC << 4), D_L00_001B1CDC << 7);
             if (D_L00_001B1CDC > 0) {
                 char *e = entries;
                 int left = D_L00_001B1CDC;
@@ -525,7 +525,7 @@ char *func_US2_L00_003012A0(int reload)
         size += 3;
         size &= ~3;
         size -= 8;
-        func_00282AB0(heap, s, size);
+        mem_copy_aligned(heap, s, size);
         for (i = 0; i < D_L00_0027D848.count; i++) {
             int delta = (int)D_L00_001B1B80 - 8;
 
@@ -554,12 +554,12 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B2544 = 0;
         D_L00_001B2548 = 0;
         if (D_L00_001B2520)
-            func_00282A60(D_L00_001B2514, 0, D_L00_001B2520 << 5);
+            mem_clear(D_L00_001B2514, 0, D_L00_001B2520 << 5);
         heap = ALIGN64_00618(heap);
         D_L00_001B251C = (Matrix00618 *)heap;
         heap += D_L00_001B2520 << 6;
         if (D_L00_001B2520)
-            func_00282A60(D_L00_001B251C, 0, D_L00_001B2520 << 6);
+            mem_clear(D_L00_001B251C, 0, D_L00_001B2520 << 6);
         mark = heap;
         last = -1;
         D_L00_001B2518 = D_L00_001B2514 + D_L00_001B2520;
@@ -597,15 +597,15 @@ char *func_US2_L00_003012A0(int reload)
             s += 0x50;
             tie->h12 = i;
             m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            func_00283098(tie, &D_L00_00226700[tie->b1D]->sphere, m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(tie, tie, m->row[3].f[3]);
-            func_00282CC0(tie, tie, &m->row[3]);
-            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[0]);
-            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[1]);
-            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[2]);
+            matrix_mul_vec3(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            scale = FastVecLength(&m->row[0]);
+            scale = math_max_float(scale, FastVecLength(&m->row[1]));
+            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * math_max_float(scale, FastVecLength(&m->row[2]));
+            scale_vector(tie, tie, m->row[3].f[3]);
+            FastVecAdd(tie, tie, &m->row[3]);
+            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[0]);
+            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[1]);
+            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[2]);
             tie->h18 = *(unsigned short *)s;
             s += 0x10;
         }
@@ -624,7 +624,7 @@ char *func_US2_L00_003012A0(int reload)
                 Tie00618 *tie = D_L00_001B2514 + idx;
                 TieClass00618 *cls = D_L00_00226700[tie->b1D];
 
-                func_00282AB0(cls->table + ((((cls->h38 + 3) >> 1) * (tie - cls->first)) << 2), s + 1, *s << 1);
+                mem_copy_aligned(cls->table + ((((cls->h38 + 3) >> 1) * (tie - cls->first)) << 2), s + 1, *s << 1);
             }
             s += *s + 1;
             idx = *s++;
@@ -661,7 +661,7 @@ char *func_US2_L00_003012A0(int reload)
             }
         }
         if (size)
-            func_00282B50(base, (char *)(((int)s + 0xF) & ~0xF), size);
+            mem_fast_helper_c(base, (char *)(((int)s + 0xF) & ~0xF), size);
     }
     D_L00_001BF140.mark54 = heap;
 
@@ -677,17 +677,17 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B23F4 = n;
         heap += n << 5;
         if (n)
-            func_00282A60(D_L00_001B23F8, 0, n << 5);
+            mem_clear(D_L00_001B23F8, 0, n << 5);
         heap = ALIGN64_00618(heap);
         D_L00_001B2400 = (Matrix00618 *)heap;
         heap += D_L00_001B23F4 << 6;
         if (D_L00_001B23F4)
-            func_00282A60(D_L00_001B2400, 0, D_L00_001B23F4 << 6);
+            mem_clear(D_L00_001B2400, 0, D_L00_001B23F4 << 6);
         D_L00_001B2404 = (unsigned char *)heap;
         heap += D_L00_001B23F4 * 0x60;
         heap = ALIGN64_00618(heap);
         if (D_L00_001B23F4)
-            func_00282A60(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
+            mem_clear(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
         last = -1;
         D_L00_001ACE90[1] = (int)D_L00_001B2404;
         D_L00_001B23FC = D_L00_001B23F8 + D_L00_001B23F4;
@@ -715,8 +715,8 @@ char *func_US2_L00_003012A0(int reload)
             if (D_L00_0021EA20[cls]->p1C) {
                 float t;
 
-                shrub->b17 = func_00283CF0(*D_L00_0021EA20[cls]->p1C);
-                t = func_00283CE0(shrub->b17) + 24.0f;
+                shrub->b17 = FloatToInt(*D_L00_0021EA20[cls]->p1C);
+                t = IntToFloat(shrub->b17) + 24.0f;
                 if (shrub->f10 < t)
                     shrub->f10 = t;
             }
@@ -726,10 +726,10 @@ char *func_US2_L00_003012A0(int reload)
             qcopy(&m->row[3], s + 0x40);
             s += 0x50;
             m->row[3].f[3] = D_L00_0021EA20[cls]->f20;
-            a = (func_00282DF0(&m->row[0]) + func_00282DF0(&m->row[1])) * 0.5f;
-            b = func_00282DF0(&m->row[2]);
-            w = func_00283CF0(a * 4096.0f);
-            h = func_00283CF0(b * 4096.0f);
+            a = (FastVecLength(&m->row[0]) + FastVecLength(&m->row[1])) * 0.5f;
+            b = FastVecLength(&m->row[2]);
+            w = FloatToInt(a * 4096.0f);
+            h = FloatToInt(b * 4096.0f);
             if (h > 0x10000)
                 h = 0x10000;
             if (w > 0x10000)
@@ -745,12 +745,12 @@ char *func_US2_L00_003012A0(int reload)
             m->row[0].i[3] = (bl << 16) | g | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
-            func_00283098(shrub, D_L00_0021EA20[cls], m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(shrub, shrub, m->row[3].f[3]);
-            func_00282CC0(shrub, shrub, &m->row[3]);
+            matrix_mul_vec3(shrub, D_L00_0021EA20[cls], m);
+            scale = FastVecLength(&m->row[0]);
+            scale = math_max_float(scale, FastVecLength(&m->row[1]));
+            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * math_max_float(scale, FastVecLength(&m->row[2]));
+            scale_vector(shrub, shrub, m->row[3].f[3]);
+            FastVecAdd(shrub, shrub, &m->row[3]);
         }
     }
     {
@@ -760,7 +760,7 @@ char *func_US2_L00_003012A0(int reload)
         for (i = 0; i < D_L00_001B23F4; i++)
             *q++ = i;
         *q = 0xFFFF;
-        func_002E2C38((void *)0x70000000);
+        shrub_process_render_data((void *)0x70000000);
     }
     {
         int i;
@@ -815,7 +815,7 @@ char *func_US2_L00_003012A0(int reload)
             }
         }
         if (size)
-            func_00282B50((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
+            mem_fast_helper_c((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
     }
 
     /* section 8: 32-byte records */
@@ -828,7 +828,7 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B1848 = n;
         heap += n << 5;
         if (n)
-            func_00282A60(D_L00_001B1844, 0, n << 5);
+            mem_clear(D_L00_001B1844, 0, n << 5);
         heap = ALIGN64_00618(heap);
         if (D_L00_001B1848 > 0) {
             Cam00618 *e = D_L00_001B1844;
@@ -859,24 +859,24 @@ char *func_US2_L00_003012A0(int reload)
         int n = *(int *)s;
 
         s += 0x10;
-        D_00188660.count = n;
+        g_sound_state.count = n;
         if (n) {
             int size = n * 0x90;
             int i;
 
-            D_00188660.table = (Sound00618 *)heap;
+            g_sound_state.table = (Sound00618 *)heap;
             heap += size;
             heap = ALIGN64_00618(heap);
-            func_00282A60(D_00188660.table, 0, size);
-            for (i = 0; i < D_00188660.count; i++) {
-                Sound00618 *e = D_00188660.table + i;
+            mem_clear(g_sound_state.table, 0, size);
+            for (i = 0; i < g_sound_state.count; i++) {
+                Sound00618 *e = g_sound_state.table + i;
 
-                func_00282AB0(e, s, 0x90);
+                mem_copy_aligned(e, s, 0x90);
                 s += 0x90;
-                func_L00_0035F7E8(e);
+                resolve_lookup_record(e);
             }
         } else {
-            D_00188660.table = 0;
+            g_sound_state.table = 0;
         }
     }
 
@@ -896,9 +896,9 @@ char *func_US2_L00_003012A0(int reload)
         n2 = *(int *)p;
         p += 0xC;
         D_L00_001B1E9C[0] = (Moby00618 *)heap;
-        func_00282A60(heap, 0, (n + n2) << 8);
-        func_00282A60(D_L00_001C5480, 0, 0xC0);
-        func_00282A60(D_L00_001C5540, 0, 0xC0);
+        mem_clear(heap, 0, (n + n2) << 8);
+        mem_clear(D_L00_001C5480, 0, 0xC0);
+        mem_clear(D_L00_001C5540, 0, 0xC0);
         for (i = 0; i < n; i++) {
             int cls;
             int w2;
@@ -936,11 +936,11 @@ char *func_US2_L00_003012A0(int reload)
             b1 = bolts;
             x1 = xp;
             if (cls >= 0 && w9 > 0) {
-                int k = cls + D_001A79F0 * 16;
+                int k = cls + g_current_map_index * 16;
                 int lvl = (*(unsigned char *)(k + levels) >> (w2 * 2)) & 3;
 
                 if (lvl == 0)
-                    lvl = func_L00_002E3B38(cls);
+                    lvl = level_get_difficulty_scaled(cls);
                 if (*(int *)p == 0x1F5 || *(int *)p == 0x200) {
                     skip = w9 < lvl;
                 } else if (lvl < w9) {
@@ -1015,7 +1015,7 @@ char *func_US2_L00_003012A0(int reload)
 
                 idx[i] = count;
                 m = D_L00_001B1E9C[0] + count;
-                func_0029F0C8(m, *(int *)p);
+                moby_init_instance(m, *(int *)p);
                 p += 4;
                 m->hB2 = uid;
                 m->bB0 = cls;
@@ -1046,7 +1046,7 @@ char *func_US2_L00_003012A0(int reload)
                 lift = *(float *)p;
                 p += 4;
                 if (snap) {
-                    float h = func_002A89A8(&m->pos, 0, 0.5f);
+                    float h = coll_probe_ground_height_below(&m->pos, 0, 0.5f);
 
                     if (0.0f < h)
                         m->pos.f[2] = h + lift;
@@ -1073,11 +1073,11 @@ char *func_US2_L00_003012A0(int reload)
                 p += 4;
                 upd = *(int *)p;
                 p += 4;
-                func_002A0468(m, (b << 16) + (g << 8) + r, 0, 0, 0);
+                gfx_pack_render_command_fields(m, (b << 16) + (g << 8) + r, 0, 0, 0);
                 m->i38 = upd;
                 m->b7E &= 0xFE;
-                if (D_001A79F0 >= 0 && *(int *)p != -1)
-                    func_L00_00309140(m, *(int *)p);
+                if (g_current_map_index >= 0 && *(int *)p != -1)
+                    level_store_value_in_table_slot(m, *(int *)p);
                 count++;
             }
             p = next;
@@ -1087,7 +1087,7 @@ char *func_US2_L00_003012A0(int reload)
             int total = (count + n2) << 8;
 
             D_L00_001B18DC = tail;
-            func_0029F0C8(tail, 0);
+            moby_init_instance(tail, 0);
             heap += total;
             tail->state = 0xFD;
             D_L00_001B1EA0 = D_L00_001B18DC + 1;
@@ -1117,22 +1117,22 @@ char *func_US2_L00_003012A0(int reload)
                 char *src = pv + tbl[k].offset;
 
                 D_L00_001B1844[i].i1C = (int)heap;
-                func_00282B50(heap, src, size);
+                mem_fast_helper_c(heap, src, size);
                 tbl[k].offset = (int)heap;
                 heap += size;
             }
         }
-        for (i = 0; i < D_00188660.count; i++) {
-            int k = D_00188660.table[i].i8;
+        for (i = 0; i < g_sound_state.count; i++) {
+            int k = g_sound_state.table[i].i8;
 
             if (k < 0) {
-                D_00188660.table[i].i8 = 0;
+                g_sound_state.table[i].i8 = 0;
             } else {
                 int size = tbl[k].size;
                 char *src = pv + tbl[k].offset;
 
-                D_00188660.table[i].i8 = (int)heap;
-                func_00282B50(heap, src, size);
+                g_sound_state.table[i].i8 = (int)heap;
+                mem_fast_helper_c(heap, src, size);
                 tbl[k].offset = (int)heap;
                 heap += size;
             }
@@ -1150,7 +1150,7 @@ char *func_US2_L00_003012A0(int reload)
                     char *src = pv + tbl[k].offset;
 
                     m->i68 = (int)heap;
-                    func_00282B50(heap, src, size);
+                    mem_fast_helper_c(heap, src, size);
                     tbl[k].offset = (int)heap;
                     heap += size;
                 }
@@ -1214,8 +1214,8 @@ char *func_US2_L00_003012A0(int reload)
         q = (char *)offs + (n << 2);
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, q, size);
-        func_00282A60(D_L00_001FA920, 0, 0x3C0);
+            mem_fast_helper_c(base, q, size);
+        mem_clear(D_L00_001FA920, 0, 0x3C0);
         for (i = 0; i < n; i++, offs++) {
             tmp = *offs;
             if (tmp >= 0) {
@@ -1267,7 +1267,7 @@ char *func_US2_L00_003012A0(int reload)
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, q, size);
+            mem_fast_helper_c(base, q, size);
         q += size;
         tbl = (Blob00618 *)SECTION_00618(0x5C);
         for (i = 0; i < n; i++) {
@@ -1296,7 +1296,7 @@ char *func_US2_L00_003012A0(int reload)
         q += 0x10;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(D_L00_001B1FA8, src, size);
+            mem_fast_helper_c(D_L00_001B1FA8, src, size);
         for (i = 0; i < D_L00_001B1FA4; i++) {
             D_L00_001FDA80[i] = D_L00_001B1FA8 + *(int *)q;
             q += 4;
@@ -1336,7 +1336,7 @@ char *func_US2_L00_003012A0(int reload)
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(copy, src, size);
+            mem_fast_helper_c(copy, src, size);
         for (i = 0; i < D_L00_001B16C4; i++) {
             D_L00_001B16C0[i].data = copy + *(int *)q;
             q += 4;
@@ -1355,9 +1355,9 @@ char *func_US2_L00_003012A0(int reload)
         heap += n * 0x90;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84, 0, n * 0x90);
+            mem_clear(D_L00_001B1F84, 0, n * 0x90);
         for (i = 0; i < D_L00_001B1F88; i++) {
-            func_00282AB0(D_L00_001B1F84 + i * 0x90, q, 0x90);
+            mem_copy_aligned(D_L00_001B1F84 + i * 0x90, q, 0x90);
             q += 0x80;
         }
     }
@@ -1374,9 +1374,9 @@ char *func_US2_L00_003012A0(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F8C, 0, n << 7);
+            mem_clear(D_L00_001B1F8C, 0, n << 7);
         for (i = 0; i < D_L00_001B1F90; i++) {
-            func_00282AB0(D_L00_001B1F8C + (i << 7), q, 0x80);
+            mem_copy_aligned(D_L00_001B1F8C + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1391,9 +1391,9 @@ char *func_US2_L00_003012A0(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F94, 0, n << 7);
+            mem_clear(D_L00_001B1F94, 0, n << 7);
         for (i = 0; i < D_L00_001B1F98; i++) {
-            func_00282AB0(D_L00_001B1F94 + (i << 7), q, 0x80);
+            mem_copy_aligned(D_L00_001B1F94 + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1408,9 +1408,9 @@ char *func_US2_L00_003012A0(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F9C, 0, n << 7);
+            mem_clear(D_L00_001B1F9C, 0, n << 7);
         for (i = 0; i < D_L00_001B1FA0; i++) {
-            func_00282AB0(D_L00_001B1F9C + (i << 7), q, 0x80);
+            mem_copy_aligned(D_L00_001B1F9C + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1424,7 +1424,7 @@ char *func_US2_L00_003012A0(int reload)
         s += 0x10;
         size += 0x4000;
         heap += size;
-        func_00282AB0(D_L00_001B1880, s, size);
+        mem_copy_aligned(D_L00_001B1880, s, size);
         heap = ALIGN64_00618(heap);
     }
 
@@ -1438,9 +1438,9 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B1CD4 = n;
         heap = (char *)(((int)heap + (n << 4) + 0x83F) & 0xFFFFFFC0u);
         if (n)
-            func_00282AB0(D_L00_001B1CD8, s, (n << 4) + 0x800);
+            mem_copy_aligned(D_L00_001B1CD8, s, (n << 4) + 0x800);
         else
-            func_00282AB0(D_L00_001B1CD8, s, 0x800);
+            mem_copy_aligned(D_L00_001B1CD8, s, 0x800);
     }
 
     /* section 0x8C */
@@ -1454,7 +1454,7 @@ char *func_US2_L00_003012A0(int reload)
         heap += n << 5;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282AB0(D_L00_001B1F40, s, n << 5);
+            mem_copy_aligned(D_L00_001B1F40, s, n << 5);
     }
     D_L00_001B20B0 = heap;
     D_L00_001BF140.mark64 = heap;
@@ -1462,12 +1462,12 @@ char *func_US2_L00_003012A0(int reload)
     D_L00_001B20B8 = -1;
     D_L00_001B20B4 = 0;
     D_L00_001B20BC = 0;
-    func_00282A88(D_L00_001FE140, 0x200);
+    mem_fast_helper_b(D_L00_001FE140, 0x200);
 
-    if (D_001A79F0 >= 0) {
-        D_00152C00.hero = 0;
+    if (g_current_map_index >= 0) {
+        g_hero_moby_default.hero = 0;
         if (0.0f < startPos[0]) {
-            Moby00618 *m = func_0029EFD0(0xD54);
+            Moby00618 *m = CreateMoby(0xD54);
 
             m->pos.f[0] = startPos[0];
             m->pos.f[1] = startPos[1];
@@ -1475,13 +1475,13 @@ char *func_US2_L00_003012A0(int reload)
             m->rot[2] = startPos[3];
             m->h32 = 0xFF;
             m->b30 = 0x10;
-            m->i64 = (int)func_L00_003603C0;
+            m->i64 = (int)pickup_update_interactive;
             m->h34 &= 0xFFFD;
             if (m->b63)
                 m->b63 = 8;
             func_002A0F48(m);
-            D_00152C00.hero = m;
-            func_L00_00309140(m, 0);
+            g_hero_moby_default.hero = m;
+            level_store_value_in_table_slot(m, 0);
         }
     }
     heap = (char *)(((int)heap + 0xF) & ~0xF);
@@ -1496,7 +1496,7 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B1B00 = (Groups00618 *)heap;
         size = *(int *)s;
         heap += size;
-        func_00282AB0(D_L00_001B1B00, s + 4, size);
+        mem_copy_aligned(D_L00_001B1B00, s + 4, size);
         if (D_L00_001B1B00->p4)
             D_L00_001B1B00->p4 += (int)D_L00_001B1B00;
         else
@@ -1552,7 +1552,7 @@ char *func_US2_L00_003012A0(int reload)
             D_L00_001B1AFC = (int)heap;
             bytes = D_L00_001B1B00->count * 0x1C;
             heap += bytes;
-            func_00282A60((void *)D_L00_001B1AFC, 0, bytes);
+            mem_clear((void *)D_L00_001B1AFC, 0, bytes);
         }
         {
             int j;
@@ -1615,7 +1615,7 @@ char *func_US2_L00_003012A0(int reload)
             unsigned short *table;
 
             table = (unsigned short *)(D_L00_001B2600[1] + D_L00_001B2610 - 0x10000);
-            func_00282A60(table, -1, 0x10000);
+            mem_clear(table, -1, 0x10000);
             for (i = 0; i < n3; i++) {
                 if ((unsigned)(q[i * 2 + 1] + 0x4000) < 0x8000)
                     table[q[i * 2 + 1] + 0x4000] = q[i * 2];
@@ -1672,7 +1672,7 @@ char *func_US2_L00_003012A0(int reload)
 
             table = (unsigned short *)(D_L00_001B2600[1] + D_L00_001B2610 - 0x10000);
             q = &q0[n1 * 2 + 4];
-            func_00282A60(table, 0xFFFEFFFE, 0x8000);
+            mem_clear(table, 0xFFFEFFFE, 0x8000);
             for (i = 0; i < n2; i++) {
                 if ((unsigned)q[i * 2 + 1] < 0x4000)
                     table[q[i * 2 + 1]] = q[i * 2];
@@ -1723,42 +1723,42 @@ char *func_US2_L00_003012A0(int reload)
         D_L00_001B1A50 = 0;
         D_L00_001C9340.i1C = 0;
     }
-    func_0027B7E0();
+    counter_clear_group();
     func_US2_L00_002A4928();
-    func_L00_002A4D18();
-    func_L00_002D9E80();
-    func_00272368();
-    func_002B8518();
+    hero_reset_start_aim_speed();
+    SetupLevelCameras();
+    cam_update_state();
+    pad_clear_port_state();
     func_US2_L00_0037F858();
-    func_L00_00367308();
-    func_L00_0032A0E8();
-    func_L00_0032A138();
-    func_L00_0032A170();
-    func_L00_003E8150();
-    func_L00_002E9098();
+    menu_reset_state();
+    level_clear_slot_table();
+    level_l00_clear_counter_list();
+    level_l00_clear_counter_list_2();
+    moby_clear_fading_list();
+    gfx_enable_draw_flag();
     D_L00_001FDE78 = 0;
     D_L00_001FDEF8 = 0;
     D_L00_001B1FB0 = 0;
     D_L00_001B1FF0 = 0;
     D_L00_001B2030 = 0;
-    func_L00_00403BF8();
+    sheep_clear_active_list();
     {
         int i;
 
         for (i = 0x13; i >= 0; i--)
             D_L00_00220DA0[i] = 0;
     }
-    D_L00_001B19C8 = 0;
+    g_frame_l00_counter = 0;
     D_L00_001B1AEC = 0;
     D_L00_001AA0F8 = 0xE0;
-    if (D_00152C00.hero) {
-        Moby00618 *m = D_00152C00.hero;
-        char *hero = D_00189E20;
+    if (g_hero_moby_default.hero) {
+        Moby00618 *m = g_hero_moby_default.hero;
+        char *hero = g_hero_state;
 
         *(long long *)((char *)m + 0x38) = *(long long *)(*(char **)(hero + 0x2290) + 0x38);
     }
-    func_00272198(8.0f);
-    switch (D_001A79F0) {
+    cam_set_transition_frames(8.0f);
+    switch (g_current_map_index) {
     case 2:
     case 5:
     case 6:

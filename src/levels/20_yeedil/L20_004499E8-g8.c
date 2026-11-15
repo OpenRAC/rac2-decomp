@@ -5,10 +5,10 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern float D_L20_001B23E8 __attribute__((sda));
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 /* Starts the object moving along a path from a given start position. */
-void func_L20_004499E8(char *moby, char *path, char *startPos)
+void moby_start_path_movement(char *moby, char *path, char *startPos)
 {
     char *state = *(char **)(moby + 0x68);
 
@@ -20,5 +20,5 @@ void func_L20_004499E8(char *moby, char *path, char *startPos)
     qcopy((moby + 0x10), startPos);
     *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + 0.5f;
     qzero((state + 0x50));
-    SetMobyState(moby, 2, -1);
+    moby_set_state(moby, 2, -1);
 }

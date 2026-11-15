@@ -3,7 +3,7 @@
 #include "common.h"
 typedef unsigned int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern u32 D_00138320;
 extern s32 D_L18_001AFBB0 MACRO_ADDR;
 extern void func_PAL_L00_002D2668(s32, s32, float);

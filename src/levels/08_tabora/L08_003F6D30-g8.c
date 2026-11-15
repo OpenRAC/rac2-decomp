@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int TaboraReplacementQuad __attribute__((mode(TI)));
 extern char *D_L08_001B29DC SDATA(D_L08_001B29DC);
-extern void *func_0029EFD0(int);
-extern void func_002A0F48(void *), func_0029F338(void *);
+extern void *CreateMoby(int);
+extern void func_002A0F48(void *), moby_mark_spawned(void *);
 
 /* Replaces a tracked object with a fresh one of another kind that copies its position, rotation and size, then removes the old one. */
-void func_L08_003F6D30(char *object)
+void moby_replace_tracked(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *source, *replacement;
@@ -27,7 +27,7 @@ void func_L08_003F6D30(char *object)
         *(TaboraReplacementQuad *)(replacement + 0x10) = *(TaboraReplacementQuad *)(source + 0x10);
         func_002A0F48(replacement);
         if (*(int *)(state + 0x2c) != -1)
-            MarkMobySpawned(D_L08_001B29DC + *(int *)(state + 0x2c) * 256);
+            moby_mark_spawned(D_L08_001B29DC + *(int *)(state + 0x2c) * 256);
         *(int *)(state + 0x2c) = -1;
     }
 }

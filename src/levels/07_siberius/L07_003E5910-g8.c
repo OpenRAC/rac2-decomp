@@ -21,18 +21,18 @@ typedef struct {
     f32 rot[4];
 } Moby_L07_003E5910;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern f32 D_L07_001B0AA0 __attribute__((sda));
 extern f32 D_L07_001B0AA4 __attribute__((sda));
 extern f32 D_L07_001B0AA8 __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_002A89A8(void *, int, float);
-extern void func_002AAC80(void *, float, float, float, float);
-extern int func_002B4FF0(void *, float *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void math_approach_target_with_braking(void *, float, float, float, float);
+extern int moby_turn_toward_target_and_step(void *, float *, float);
 
 /* Follow the camera height between the moby's home and the hero, never under the floor. */
-float func_L07_003E5910(Moby_L07_003E5910 *moby, float *goalPos, float turnRate)
+float entity_move_to_tracked_height(Moby_L07_003E5910 *moby, float *goalPos, float turnRate)
 {
     f32 homePos[4] __attribute__((aligned(16)));
     Vars_L07_003E5910 *vars = moby->vars;
@@ -46,13 +46,13 @@ float func_L07_003E5910(Moby_L07_003E5910 *moby, float *goalPos, float turnRate)
     }
     lo = homePos[2] - 2.0f;
     hi = lo + 5.0f;
-    h = ((Hero *)gHeroState)->f[0x2D8 / 4] + D_L07_001B0AA8;
+    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + D_L07_001B0AA8;
     if (hi < h) h = hi;
     else if (h < lo) h = lo;
-    floor = ProbeGroundHeightBelow(moby->pos, 0, 0.5f) + D_L07_001B0AA8;
+    floor = coll_probe_ground_height_below(moby->pos, 0, 0.5f) + D_L07_001B0AA8;
     if (h < floor) h = floor;
-    ApproachTargetWithBraking(vars->cam, h - moby->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
+    math_approach_target_with_braking(vars->cam, h - moby->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
                   D_L07_001B0AA4 * 0.0166666675f);
-    TurnTowardTargetAndStepMovement(moby, goalPos, turnRate);
+    moby_turn_toward_target_and_step(moby, goalPos, turnRate);
     return vars->f1EC;
 }

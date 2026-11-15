@@ -3,7 +3,7 @@
 /* func_L00_003D40D8 has a unit of its own: -g keeps retail's padding before its final div.s
  * (config/cflags.txt). */
 extern int ref_L00_003D40D8_00(float *);
-extern int D_L00_001B19C8 __attribute__((sda));
+extern int g_frame_l00_counter __attribute__((sda));
 extern float D_L00_001B0250 __attribute__((sda));
 extern float D_L00_001B0254 __attribute__((sda));
 extern float D_L00_001B0258 __attribute__((sda));
@@ -14,9 +14,9 @@ extern float D_L00_001B02A0 __attribute__((sda));
 extern float D_L00_001B02A4 __attribute__((sda));
 extern float D_L00_001B02A8 __attribute__((sda));
 extern char D_L00_001B8FF0[];
-extern char D_00189EA0[];                       /* the hero's position */
+extern char g_hero_position[];                       /* the hero's position */
 extern char D_L00_001A8F20[] __attribute__((sda));
-extern char D_L00_00262570[];                   /* weapon table, 0xE0 bytes per entry */
+extern char g_weapon_l00_table[];                   /* weapon table, 0xE0 bytes per entry */
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern unsigned char D_00139587 __attribute__((nosda)); /* weapon index of slot 0x1F */
 extern unsigned char *D_L00_001FEA14 __attribute__((nosda));
@@ -50,7 +50,7 @@ typedef struct {
 /* Per-frame fire step: on its cooldown and frame slot, looks for a target (skipping some
  * classes), aims, spawns two particles, fires one of two shot kinds (the first while charges
  * remain) and restarts the cooldown from the weapon table's rate at +0x54. */
-void func_L00_003D40D8(unsigned char *moby, EffectLauncherState *state)
+void kilonoid_fire_shot(unsigned char *moby, EffectLauncherState *state)
 {
     float pos[4], delta[4], target[4], step[4], velocity[4];
     char *obj;
@@ -59,7 +59,7 @@ void func_L00_003D40D8(unsigned char *moby, EffectLauncherState *state)
 
     if (!ref_L00_003D40D8_00(&state->cooldown))
         return;
-    if (gFrameCounter_L00 % 4 != state->frame)
+    if (g_frame_l00_counter % 4 != state->frame)
         return;
     ref_L00_003D40D8_01(moby, 1, pos);
     state->alternate ^= 1;
@@ -81,7 +81,7 @@ void func_L00_003D40D8(unsigned char *moby, EffectLauncherState *state)
         state->target = obj;
         if ((unsigned char)moby[0x43] != 2)
             ref_L00_003D40D8_03(moby, 2, 0, 5);
-        ref_L00_003D40D8_04(delta, moby + 0x10, gHeroPosition);
+        ref_L00_003D40D8_04(delta, moby + 0x10, g_hero_position);
         angle = ref_L00_003D40D8_05(delta, moby + 0xe0);
         if (D_L00_001A8F00 == 2 || moby[0x42] != moby[0x43] || (unsigned char)moby[0x42] != 2
             || !(angle > 1.1f))
@@ -133,7 +133,7 @@ void func_L00_003D40D8(unsigned char *moby, EffectLauncherState *state)
             ref_L00_003D40D8_13(0, 0, moby);
         }
         {
-            char *v = gWeaponTable_L00 + D_00139587 * 0xe0;
+            char *v = g_weapon_l00_table + D_00139587 * 0xe0;
             float f = ref_L00_003D40D8_15(0.0f, 0.17f);
             float delay = 1.0f / *(float *)(v + 0x54);
 

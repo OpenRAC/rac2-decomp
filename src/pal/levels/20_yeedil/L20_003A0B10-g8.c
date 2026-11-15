@@ -17,7 +17,7 @@ extern struct {
     float position[4];
 } D_00189E20;
 extern int func_PAL_L20_003A0C40(void *, const void *, void *);
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
 /* Finds the first object of the group whose state is 6, makes parent its parent and
    sets it up at pos; returns it, or 0 if there is none or the setup fails. */
@@ -70,8 +70,8 @@ end:
 
         qzero(&buf);
 
-        ((float *)&buf)[2] = func_00283248(D_00189E20.position[0] - pos[0],
-                                           D_00189E20.position[1] - pos[1]);
+        ((float *)&buf)[2] = mat_fast_helper_a(g_hero_state.position[0] - pos[0],
+                                           g_hero_state.position[1] - pos[1]);
         if (func_PAL_L20_003A0C40(found, pos, &buf) == 0) {
             found = 0;
         }

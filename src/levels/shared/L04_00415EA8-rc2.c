@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 ref_L04_00415EA8_00[];
 
 /* Switches off the table entries owned by the given owner, or all of them when the owner is 0. */
-void func_L04_00415EA8(s32 owner) {
+void trail_clear_by_owner(s32 owner) {
     s32 remaining;
     s8 *table;
     s8 *entry;

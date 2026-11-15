@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_PAL_L16_004114A0, the PAL copy of func_L16_0040C5F0: the same C, where rename func_002C6DD8 becomes func_PAL_002C7B18; wrap func_002A7820(D_L16_001B15E8,D_L16_001B15EC[0]) (((int). */
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 rows[3]; } Triangle;
-extern float func_002A7878(float,float);
-extern int func_002A7820(int,int);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00283098(void *,void *,void *);
+extern float math_random_float_range(float,float);
+extern int math_random_int_range(int,int);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void matrix_mul_vec3(void *,void *,void *);
 extern char *func_PAL_002C7B18(void *,void *,int,float);
 extern float D_L16_001B15F0 __attribute__((sda));
 extern float D_L16_001B15F4[] __attribute__((sda));
@@ -25,12 +26,12 @@ void func_PAL_L16_004114A0(char *object)
     float amount,reciprocal;
     char *effect;
     char *translation, *matrix;
-    amount=-(func_002A7878(D_L16_001B15F0,D_L16_001B15F4[0])*0.00040000002f);
-    lifetime=(((int)(func_002A7820(D_L16_001B15E8,D_L16_001B15EC[0])) * 5 + 2) / 6);
+    amount=-(math_random_float_range(D_L16_001B15F0,D_L16_001B15F4[0])*0.00040000002f);
+    lifetime=(((int)(math_random_int_range(D_L16_001B15E8,D_L16_001B15EC[0])) * 5 + 2) / 6);
     {
         float *weight=weights;
         int i;
-        for(i=2;i>=0;i--) *weight++=func_002A7878(0.0f,1.0f);
+        for(i=2;i>=0;i--) *weight++=math_random_float_range(0.0f,1.0f);
     }
     matrix=object+0xc0;
     translation=object+0x10;
@@ -43,13 +44,13 @@ void func_PAL_L16_004114A0(char *object)
     triangle.rows[0]=D_L16_001B1600.rows[0];
     triangle.rows[1]=D_L16_001B1600.rows[1];
     triangle.rows[2]=D_L16_001B1600.rows[2];
-    func_00282D30(point,&triangle.rows[0],weights[0]);
-    func_00282D30(temporary,&triangle.rows[1],weights[1]);
-    func_00282CC0(point,point,temporary);
-    func_00282D30(temporary,&triangle.rows[2],weights[2]);
-    func_00282CC0(point,point,temporary);
-    func_00283098(point,point,matrix);
-    func_00282CC0(point,point,translation);
+    FastVecScale(point,&triangle.rows[0],weights[0]);
+    FastVecScale(temporary,&triangle.rows[1],weights[1]);
+    FastVecAdd(point,point,temporary);
+    FastVecScale(temporary,&triangle.rows[2],weights[2]);
+    FastVecAdd(point,point,temporary);
+    matrix_mul_vec3(point,point,matrix);
+    FastVecAdd(point,point,translation);
     effect=func_PAL_002C7B18(point,D_L16_001A8F20,lifetime,amount);
     if(effect!=0) {
         *(int *)(effect+4)=D_L16_001B15E0;

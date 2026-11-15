@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_001A8CFC;
-extern void func_0033E620(void *);
+extern void menu_draw_frame(void *);
 
 void func_US2_0029D448(void) {
     if (D_001A8CFC != 0)
-        func_0033E620(D_001A8CFC + 0x3C7E8);
+        menu_draw_frame(D_001A8CFC + 0x3C7E8);
 }

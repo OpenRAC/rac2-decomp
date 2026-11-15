@@ -76,14 +76,14 @@ extern f32 D_L22_001AF2B0 __attribute__((sda));
 extern f32 D_L22_001AF2C8 __attribute__((sda));
 /* Incomplete: read here with retail's absolute lui/lw, not through $gp. */
 extern ProjectileObject *ref_L22_0039CDC0_12[] __attribute__((sda));
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern Quad D_L22_001B1930 __attribute__((sda));
 
 /* Allocates a kind-0x1F record for a handle. Three vector helpers combine the given point
    with the handle's vector at +0x10, one step scaled by 0.25; the record takes the result,
    the point, the colour word and its low 24 bits, a helper's result plus 0x70, a 0x44 byte,
    a 2, a halfword and the handle. Does nothing when the allocation fails. */
-void func_L22_003398B8(u32 colour, Vector point, u8 *handle)
+void part_spawn_homing_trail(u32 colour, Vector point, u8 *handle)
 {
     Vector target;
     Vector step;
@@ -112,7 +112,7 @@ void func_L22_003398B8(u32 colour, Vector point, u8 *handle)
 /* Spawns a class-0x100 moby at `position` with the owner's orientation and a 150-frame
    timer, picks its target (the argument, else the level's fallback), then drops the
    target when it is out of range or behind, and points the hero's aim at the shot. */
-ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
+ProjectileObject *homing_projectile_spawn(ProjectileObject *owner, Quad *position,
                                     ProjectileObject *target, s32 a3, s32 a4)
 {
     Quad offset, targetpos, start, direction, facing;
@@ -153,7 +153,7 @@ ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
                 data->mode = 0;
             }
         }
-        if (owner == gHeroState.moby)
+        if (owner == g_hero_state.moby)
             data->player = 1;
         if (!data->mode && data->target) {
             ref_L22_0039CDC0_2(&offset, &data->target->basis[2], 5.0f);
@@ -174,16 +174,16 @@ ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
                 reject = 1;
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);
-            if ((owner == gHeroState.moby && !data->target->targetable)
+            if ((owner == g_hero_state.moby && !data->target->targetable)
                 || dot < D_L22_001AF2C8 || distance > 50.0f || reject)
                 data->target = 0;
-            if (owner == gHeroState.moby) {
+            if (owner == g_hero_state.moby) {
                 if (data->target) {
-                    gHeroState.aim = &data->direction;
-                } else if (gHeroState.state == 0x5b) {
+                    g_hero_state.aim = &data->direction;
+                } else if (g_hero_state.state == 0x5b) {
                     qcopy(&D_L22_001B1930, &owner->basis[2]);
                     ref_L22_0039CDC0_2(&D_L22_001B1930, &D_L22_001B1930, -1.0f);
-                    gHeroState.aim = &D_L22_001B1930;
+                    g_hero_state.aim = &D_L22_001B1930;
                     qcopy(&data->direction, &D_L22_001B1930);
                     data->mode = 0;
                     data->target = (ProjectileObject *)1;

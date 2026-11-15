@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s32 ref_L00_003FE8D0_00 __attribute__((sda));
 
 /* First-frame setup: clears the object's private data and moves it to the running state. */
-void func_L00_003FE8D0(void *object) {
+void moby_init_private_data(void *object) {
     s8 *vars ;
     s32 count ;
     s8 *slot;

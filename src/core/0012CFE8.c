@@ -47,7 +47,7 @@ struct M2c_arg0
 };
 
 /* Keeps track of the frame order numbers of pictures so they stay in step when a new group starts. */
-void func_0012CFE8(struct M2c_arg0 *decoder, s32 tempRefDelta)
+void mpeg_update_temporal_tracking(struct M2c_arg0 *decoder, s32 tempRefDelta)
 {
   s32 unusedTemp;
   s32 adjustedRef;
@@ -76,21 +76,21 @@ void func_0012CFE8(struct M2c_arg0 *decoder, s32 tempRefDelta)
   decoder->tempRefMax = (s32) ((decoder->tempRefMax < currentRef) ? (currentRef) : (decoder->tempRefMax));
 }
 
-extern int func_0012C878(void *, int);
-extern void func_0012CC88(void *);
+extern int mpeg_read_bits(void *, int);
+extern void mpeg_read_extension_data(void *);
 
 /* Reads a group of pictures header and resets the frame order tracking. */
-void func_0012D060(char *decoderBytes) {
+void mpeg_read_gop_header(char *decoderBytes) {
     *(int *)(decoderBytes + 0xE8) = 0;
     *(int *)(decoderBytes + 0x854) = 1;
     *(int *)(decoderBytes + 0x84C) = *(int *)(decoderBytes + 0x850) + 1;
-    ReadMpegBits(decoderBytes, 1);
-    ReadMpegBits(decoderBytes, 5);
-    ReadMpegBits(decoderBytes, 6);
-    ReadMpegBits(decoderBytes, 1);
-    ReadMpegBits(decoderBytes, 6);
-    ReadMpegBits(decoderBytes, 6);
-    *(int *)(decoderBytes + 0x1A4) = ReadMpegBits(decoderBytes, 1);
-    *(int *)(decoderBytes + 0x1A8) = ReadMpegBits(decoderBytes, 1);
-    ReadMpegExtensionData(decoderBytes);
+    mpeg_read_bits(decoderBytes, 1);
+    mpeg_read_bits(decoderBytes, 5);
+    mpeg_read_bits(decoderBytes, 6);
+    mpeg_read_bits(decoderBytes, 1);
+    mpeg_read_bits(decoderBytes, 6);
+    mpeg_read_bits(decoderBytes, 6);
+    *(int *)(decoderBytes + 0x1A4) = mpeg_read_bits(decoderBytes, 1);
+    *(int *)(decoderBytes + 0x1A8) = mpeg_read_bits(decoderBytes, 1);
+    mpeg_read_extension_data(decoderBytes);
 }

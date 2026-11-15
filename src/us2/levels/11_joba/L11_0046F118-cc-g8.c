@@ -13,22 +13,22 @@ typedef struct {
     union { int word; signed char low; struct { char pad[1]; unsigned char quiet; char pad2; unsigned char had; } b; } tail; /* 0xC */
 } TriggerVars;
 
-extern void func_0026FEB8(const char *, ...);
-extern int func_00288AA0(void *, int);
-extern int func_00288BE8(void *);  /* its result is tested elsewhere */
-extern void func_00288CB0(int, int);
-extern void func_0029B3E0(int, int);
-extern void func_0029F338(void *);
-extern void func_002A0430(int);
-extern void func_002A7750(void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_002AD7B8(int);
+extern void STUB_printf(const char *, ...);
+extern int req_push_queue(void *, int);
+extern int req_launch_queued(void *);  /* its result is tested elsewhere */
+extern void data_set_small_value_and_refresh(int, int);
+extern void MemcardSave(int, int);
+extern void moby_mark_spawned(void *);
+extern void moby_mark_table_entry_flagged(int);
+extern void moby_set_state(void *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void moby_mark_flag_and_append_to_list(int);
 extern void func_US2_002AFF10(int);
-extern int func_002B38B8(void *);
-extern void func_002DF3F8(void *, void *);
-extern void func_002F5CC8(void);
-extern int func_002F5D10(void);
-extern void func_L00_002B9D60(void *, void *, int, int);
+extern int flag_is_third_pending_set(void *);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void game_set_slowdown_factor(void);
+extern int game_is_either_mode_two(void);
+extern void hero_reset_position_and_direction(void *, void *, int, int);
 
 extern unsigned int D_00139768[];
 typedef struct {
@@ -36,10 +36,10 @@ typedef struct {
     int mode; char pad2298[0x24CC - 0x2298];
     int health;
 } HeroView;
-extern HeroView D_00189E20;
-extern char D_00189EA0[];
+extern HeroView g_hero_state;
+extern char g_hero_position[];
 extern unsigned char D_0019B2E8[];
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_001A7BC8[] MACRO_ADDR;
 extern int D_L11_001A8F00;
 extern char D_L11_001B2818[];
@@ -68,34 +68,34 @@ void func_US2_L11_0046F118(Thing *m)
     switch (m->state) {
     case 0:
         if ((p->item != -1 && D_001A7BC8[p->item] != 0)
-            || (m->group != 0xFF && (D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80))) {
-            func_0029F338(m);
+            || (m->group != 0xFF && (D_0019B2E8[m->group + g_current_map_index * 16] & 0x80))) {
+            moby_mark_spawned(m);
             break;
         }
-        func_002A7750(m, 1, -1);
+        moby_set_state(m, 1, -1);
     case 1:
-        if (p->on == 0 && func_002B38B8(m) == 0 && m->hit == 0)
+        if (p->on == 0 && flag_is_third_pending_set(m) == 0 && m->hit == 0)
             break;
         p->on = 1;
-        func_002A7750(m, 2, -1);
+        moby_set_state(m, 2, -1);
     case 2:
         if (p->on == 0) {
-            func_002A7750(m, 1, -1);
+            moby_set_state(m, 1, -1);
             break;
         }
-        if (D_00189E20.mode == 0x1C)
+        if (g_hero_state.mode == 0x1C)
             break;
-        if (D_00189E20.health <= 0)
+        if (g_hero_state.health <= 0)
             break;
         if (D_L11_001A8F00 != 0)
             break;
-        if (p->msg != -1 && func_002ACBC8(D_00189E20.body, p->msg) == 0)
+        if (p->msg != -1 && IsPointInCuboid(g_hero_state.body, p->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L11_002B7800[D_001A79F0] != 0 && D_L11_002B7800[D_001A79F0][p->idx] != 0) {
-            for (i = 0; D_L11_002B7800[D_001A79F0][p->idx][i] != -1; i++) {
-                int e = D_L11_002B7800[D_001A79F0][p->idx][i];
+        if (D_L11_002B7800[g_current_map_index] != 0 && D_L11_002B7800[g_current_map_index][p->idx] != 0) {
+            for (i = 0; D_L11_002B7800[g_current_map_index][p->idx][i] != -1; i++) {
+                int e = D_L11_002B7800[g_current_map_index][p->idx][i];
 
                 missing = 0;
                 if (p->tail.b.quiet == 0) {
@@ -103,8 +103,8 @@ void func_US2_L11_0046F118(Thing *m)
                     if (D_00139768[(unsigned int)e >> 2] & bit)
                         continue;
                 }
-                if (func_00288AA0(D_L11_001C0AC0, e) == 0 && i == 0) {
-                    func_0026FEB8(D_L11_002BBE70, m->id, m->oclass, D_001A79F0, p->idx, e);
+                if (req_push_queue(D_L11_001C0AC0, e) == 0 && i == 0) {
+                    STUB_printf(D_L11_002BBE70, m->id, m->oclass, g_current_map_index, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,80 +116,80 @@ void func_US2_L11_0046F118(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                func_0026FEB8(D_L11_001B2818, D_001A79F0, p->idx);
+                STUB_printf(D_L11_001B2818, g_current_map_index, p->idx);
         } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
-            func_002A7750(m, 4, -1);
+            moby_set_state(m, 4, -1);
             break;
         }
         p->tail.b.had = 1;
-        func_00288BE8(D_L11_001C0AC0);
-        if (D_L11_001B30C8 < 5 || (D_001A79F0 == 6 && p->idx == 0))
-            func_002F5CC8();
-        func_002A7750(m, 3, -1);
+        req_launch_queued(D_L11_001C0AC0);
+        if (D_L11_001B30C8 < 5 || (g_current_map_index == 6 && p->idx == 0))
+            game_set_slowdown_factor();
+        moby_set_state(m, 3, -1);
         break;
     case 3:
-        if (func_002F5D10() == 0) {
+        if (game_is_either_mode_two() == 0) {
             if (p->link != -1) {
                 char *o = D_L11_001B368C + (p->link << 7);
-                func_L00_002B9D60(o + 0x30, o + 0x70, 0, 1);
+                hero_reset_position_and_direction(o + 0x30, o + 0x70, 0, 1);
             }
-            func_002A7750(m, 4, -1);
+            moby_set_state(m, 4, -1);
         }
-        if (D_001A79F0 != 0)
+        if (g_current_map_index != 0)
             break;
         if (p->item == -1)
             break;
-        if (func_002F5D10() != 0)
+        if (game_is_either_mode_two() != 0)
             break;
         notify = 0;
         if (p->item != -1) {
-            func_002AD7B8(p->item);
+            moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
                 func_US2_002AFF10(p->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
-            func_002A0430(m->group);
+        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(m->group);
             notify = 1;
         }
         if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
                 char *o = D_L11_001B368C + (p->link << 7);
-                func_002DF3F8(o + 0x30, o + 0x70);
+                level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
-                func_002DF3F8(m->pos, m->dir);
+                level_capture_checkpoint_state(m->pos, m->dir);
         }
         if (p->tail.low != -1)
-            func_00288CB0(p->tail.low, 1);
+            data_set_small_value_and_refresh(p->tail.low, 1);
         else if (notify != 0 || p->tail.b.had != 0)
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
         if (p->item != -1) {
-            func_002AD7B8(p->item);
+            moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
                 func_US2_002AFF10(p->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
-            func_002A0430(m->group);
+        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(m->group);
             played = 1;
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
                 char *o = D_L11_001B368C + (p->link << 7);
-                func_002DF3F8(o + 0x30, o + 0x70);
+                level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
-                func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
+                level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }
         if (p->tail.low != -1)
-            func_00288CB0(p->tail.low, 1);
+            data_set_small_value_and_refresh(p->tail.low, 1);
         else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
-            func_0029B3E0(0, -1);
-        func_0029F338(m);
+            MemcardSave(0, -1);
+        moby_mark_spawned(m);
         break;
     }
 }

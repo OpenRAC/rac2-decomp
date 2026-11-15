@@ -8,13 +8,13 @@
      stored -1 stay two registers and 0.0f is loaded after the test;
    - the slots are read by index: walking a pointer swaps the counter and pointer registers. */
 
-extern char *D_L23_001B1484 __attribute__((sda));
+extern char *g_mothership_boss_moby __attribute__((sda));
 
 extern float D_L23_001B13CC __attribute__((nosda));
 
 /* Stores the index of the live slot with the greatest measure above the threshold (or -1). */
-void func_L23_0041B968(void) {
-    char *state = *(char **)(gMothershipBossMoby + 0x68);
+void boss_pick_strongest_generator(void) {
+    char *state = *(char **)(g_mothership_boss_moby + 0x68);
     int index;
     float best;
     int i;

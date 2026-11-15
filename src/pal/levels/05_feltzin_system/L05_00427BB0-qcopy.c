@@ -3,11 +3,11 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern u8 *func_PAL_L05_0037DB90(s32 a0, s32 a1);
-extern s32 func_002A7820(s32 a0, s32 a1);
-extern void func_0029FCC0(u8 *a0, s32 a1, u8 *a2);
-extern void func_0029FC20(u8 *a0, s32 a1, u8 *a2);
-extern void func_00282DD8(u8 *a0, u8 *a1, u8 *a2);
-extern void func_00282F20(u8 *a0, u8 *a1, f32 f12);
+extern s32 math_random_int_range(s32 a0, s32 a1);
+extern void moby_transform_joint_to_world(u8 *a0, s32 a1, u8 *a2);
+extern void moby_transform_joint_point(u8 *a0, s32 a1, u8 *a2);
+extern void FastVecCross(u8 *a0, u8 *a1, u8 *a2);
+extern void vec_scale_to_length(u8 *a0, u8 *a1, f32 f12);
 extern void func_PAL_002EF708(u8 *a0);
 
 void func_PAL_L05_00427D70(u8 *arg0) {
@@ -22,15 +22,15 @@ void func_PAL_L05_00427D70(u8 *arg0) {
     ((f32 *)&v[0])[2] = 1.0f;
     if (p == 0)
         return;
-    t = func_002A7820(0, 4);
+    t = math_random_int_range(0, 4);
     pw = (u8 *)&v[1];
-    func_0029FCC0(arg0, t, pw);
+    moby_transform_joint_to_world(arg0, t, pw);
     px = (u8 *)&v[2];
-    func_0029FC20(arg0, t, px);
+    moby_transform_joint_point(arg0, t, px);
     qcopy(p + 0x10, pw);
     qcopy(p + 0xC0, px);
-    func_00282DD8(p + 0xD0, p + 0xC0, (u8 *)&v[0]);
-    func_00282F20(p + 0xD0, p + 0xD0, 1.0f);
-    func_00282DD8(p + 0xE0, p + 0xD0, p + 0xC0);
+    FastVecCross(p + 0xD0, p + 0xC0, (u8 *)&v[0]);
+    vec_scale_to_length(p + 0xD0, p + 0xD0, 1.0f);
+    FastVecCross(p + 0xE0, p + 0xD0, p + 0xC0);
     func_PAL_002EF708(p);
 }

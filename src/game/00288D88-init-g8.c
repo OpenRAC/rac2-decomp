@@ -16,34 +16,34 @@ typedef struct {
     unsigned char pad80[0x10];
 } HudSlot;
 
-extern HudSlot D_00255330[13];
-extern int D_001B1870;
+extern HudSlot g_hud_elements[13];
+extern int g_hud_state;
 extern int D_001B1874;
 extern char *D_001B18D8;
 extern char *D_001B18E0_1;
 extern int D_001B18E4;
 extern char ref_L00_0028AB70_00[];
 extern char *D_001B18DC_1 __attribute__((sda));
-extern char *func_0028B2B8(int, int, char *, int);
-extern void func_0028B3D0(int, int, int, int, int, int, int);
-extern char *func_00282A88(char *, int);
-extern void func_0028BCE8(void);
-extern void func_0028A278(void);
+extern char *hud_alloc_mem(int, int, char *, int);
+extern void hud_set_slot_contents(int, int, int, int, int, int, int);
+extern char *mem_fast_helper_b(char *, int);
+extern void weapon_menu_init_slots(void);
+extern void hud_reset_bolt_counter_display(void);
 
 /* Clears the thirteen HUD slots and lazily allocates their drawing buffers. */
-void func_0028AB70(void)
+void InitializeHudSlotsAndBuffers(void)
 {
-    int *cursor = (int *)gHudElements;
+    int *cursor = (int *)g_hud_elements;
     int *slotWords;
     int i = 0;
 
-    gHudState = 0;
+    g_hud_state = 0;
     D_001B1874 = 0;
     do {
         slotWords = cursor + 9;
         slotWords[16] = -1;
         slotWords[-1] = 0x10000;
-        SetHudSlotContents(i, 0xffff, 0, 0, 0, 0, 1);
+        hud_set_slot_contents(i, 0xffff, 0, 0, 0, 0, 1);
         i++;
         slotWords[22] = 0;
         slotWords[18] = -6;
@@ -53,13 +53,13 @@ void func_0028AB70(void)
     } while (i < 13);
     if (D_001B18D8 == 0) {
         char *sourceFile = ref_L00_0028AB70_00;
-        D_001B18D8 = AllocHudMemory(0x2800, 0, sourceFile, 0x2AB);
-        D_001B18E4 = (int)AllocHudMemory(0x1400, 0, sourceFile, 0x2AC);
+        D_001B18D8 = hud_alloc_mem(0x2800, 0, sourceFile, 0x2AB);
+        D_001B18E4 = (int)hud_alloc_mem(0x1400, 0, sourceFile, 0x2AC);
     }
     D_001B18E0_1 = D_001B18D8 + 0x2800;
     D_001B18DC_1 = D_001B18D8;
-    FastMemoryHelperB(D_001B18D8, 0x2800);
+    mem_fast_helper_b(D_001B18D8, 0x2800);
     *((unsigned char *)D_001B18D8 + 0x20) = 0xFF;
-    InitWeaponMenuSlots();
-    ResetBoltCounterDisplay();
+    weapon_menu_init_slots();
+    hud_reset_bolt_counter_display();
 }

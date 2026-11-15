@@ -1,9 +1,9 @@
 #include "common.h"
-extern unsigned char D_00188660[];
+extern unsigned char g_sound_state[];
 extern void func_00382AF8(int);
 extern float func_0030EFA8(void *,void *);
 typedef struct { char data[256]; } L04MoverTrigger;
-extern L04MoverTrigger *D_L04_001B24DC[] __attribute__((sda));
+extern L04MoverTrigger *g_moby_l04_pool[] __attribute__((sda));
 extern int func_0034C4C8(void *);
 extern int func_0030E9D8(void *);
 extern void func_0030EDC8(void *, void *, void *);
@@ -11,13 +11,13 @@ extern void func_0030F090(void *, void *, float);
 extern void func_0030ED98(void *, void *, void *);
 extern int func_00382DF8(int, int, void *);
 /* Moves the object to a target point when triggered, plays a sound while it moves, then moves it back to where it started. */
-void func_L04_003ED3D8(char *moby)
+void triggered_l04_mover_update(char *moby)
 {
     float delta[4], step[4];
     char *vars = *(char **)(moby+0x68);
     switch ((unsigned char)moby[0x20]) {
     case 0:
-        *(char **)(vars+0xc) = (char *)&gMobyPool_L04[0][*(int *)vars];
+        *(char **)(vars+0xc) = (char *)&g_moby_l04_pool[0][*(int *)vars];
         moby[0x20] = 1;
         qcopy(vars+0x10,moby+0x10);
         *(float *)(vars+0x20)=340.57f;
@@ -28,7 +28,7 @@ void func_L04_003ED3D8(char *moby)
     case 1:
         if (func_0034C4C8(*(void **)(vars+0xc)) && func_0030E9D8(vars+8)) {
             moby[0x20]=3;
-            *(char **)(vars+0xc)=(char *)&gMobyPool_L04[0][*(int *)(vars+4)];
+            *(char **)(vars+0xc)=(char *)&g_moby_l04_pool[0][*(int *)(vars+4)];
         }
         break;
     case 3: {
@@ -36,7 +36,7 @@ void func_L04_003ED3D8(char *moby)
         func_0030F090(step,delta,0.07f);
         func_0030ED98(moby+0x10,moby+0x10,step);
         if (*(int *)(vars+0x38)==1) {
-            char *sound=(char *)gSoundState+*(int *)(vars+0x34)*0x70;
+            char *sound=(char *)g_sound_state+*(int *)(vars+0x34)*0x70;
             if (*(char **)(sound+0x88)!=moby || !*(unsigned char *)(sound+0x74))
                 *(int *)(vars+0x34)=func_00382DF8(0,4,moby);
         }
@@ -45,7 +45,7 @@ void func_L04_003ED3D8(char *moby)
             if (*(int *)(vars+0x38)==1) {
                 func_00382DF8(1,0,moby);
                 if (*(int *)(vars+0x34)!=-1) {
-                    char *sound=(char *)gSoundState+*(int *)(vars+0x34)*0x70;
+                    char *sound=(char *)g_sound_state+*(int *)(vars+0x34)*0x70;
                     if (*(char **)(sound+0x88)==moby && *(unsigned char *)(sound+0x74)) func_00382AF8(*(int *)(vars+0x34));
                 }
                 *(int *)(vars+0x34)=-1;
@@ -65,7 +65,7 @@ void func_L04_003ED3D8(char *moby)
         func_0030F090(step,delta,0.07f);
         func_0030ED98(moby+0x10,moby+0x10,step);
         if (*(int *)(vars+0x38)==1) {
-            char *sound=(char *)gSoundState+*(int *)(vars+0x34)*0x70;
+            char *sound=(char *)g_sound_state+*(int *)(vars+0x34)*0x70;
             if (*(char **)(sound+0x88)!=moby || !*(unsigned char *)(sound+0x74))
                 *(int *)(vars+0x34)=func_00382DF8(0,4,moby);
         }
@@ -75,7 +75,7 @@ void func_L04_003ED3D8(char *moby)
             if (*(int *)(vars+0x38)==1) {
                 func_00382DF8(1,0,moby);
                 if (*(int *)(vars+0x34)!=-1) {
-                    char *sound=(char *)gSoundState+*(int *)(vars+0x34)*0x70;
+                    char *sound=(char *)g_sound_state+*(int *)(vars+0x34)*0x70;
                     if (*(char **)(sound+0x88)==moby && *(unsigned char *)(sound+0x74)) func_00382AF8(*(int *)(vars+0x34));
                 }
                 *(int *)(vars+0x34)=-1;

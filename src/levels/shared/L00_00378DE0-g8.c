@@ -9,22 +9,22 @@ typedef struct {
     char pad88[0xBC];
     struct { int first; int limit; int third; int fourth; } cells[0]; /* Variable-length trailing table. */
 } LimitModel;
-extern LimitModel D_L00_0022F7C0;
+extern LimitModel g_purchase_menu_model;
 
 extern int D_L00_001AD7A0 __attribute__((sda));
 
 extern int D_L00_001AD7A4;
 
-extern int func_002B0D70(void);
+extern int save_count_items_above_baseline(void);
 
-extern unsigned char *func_00288FB8(int);
+extern unsigned char *GetLocalizedString(int);
 
-extern int func_0027FB40(int, int, long, unsigned char *, int);
+extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
 /* Shows one of two messages depending on whether the player has reached the limit for the selected item. */
-void func_L00_00378DE0(void)
+void DrawSelectedItemLimitStatus(void)
 {
-    LimitModel *base = &gPurchaseMenuModel;
+    LimitModel *base = &g_purchase_menu_model;
     int index;
     int limit;
     int currentAmount;
@@ -33,9 +33,9 @@ void func_L00_00378DE0(void)
         return;
     index = base->index;
     limit = base->cells[index].limit;
-    currentAmount = CountItemsAboveBaseline();
+    currentAmount = save_count_items_above_baseline();
     if (currentAmount >= limit)
-        DrawTextCenteredMediumFont(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x1129), -1);
+        text_draw_centered_medium(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x1129), -1);
     else
-        DrawTextCenteredMediumFont(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x1128), -1);
+        text_draw_centered_medium(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x1128), -1);
 }

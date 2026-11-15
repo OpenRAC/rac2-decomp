@@ -14,37 +14,37 @@ extern unsigned int D_001BAD08;
 extern int D_001BAD14;
 
 /* Returns the saved menu state value. */
-unsigned int func_00285840(void)
+unsigned int menu_get_saved_state(void)
 {
     return D_001BACC0;
 }
 
 /* Returns the second saved menu value. */
-unsigned int func_00285850(void)
+unsigned int menu_get_second_value(void)
 {
     return D_001BAD08;
 }
 
-extern int func_002B49C8(int);
-extern void func_00132B28(int);
-extern void func_002B7320(void);
-extern void func_00132028(void);
-extern void func_002B8518(void);
+extern int request_is_current_slot(int);
+extern void snd_send_cmd23(int);
+extern void music_Unpause(void);
+extern void snd_Pump(void);
+extern void pad_clear_port_state(void);
 
 /* Ends the menu: undoes the pause sounds when needed and clears the saved menu state. */
-void func_00285860(void)
+void menu_end(void)
 {
-    if (IsCurrentRequestSlot(3) == 0) {
-        SendSoundCommand23(0x5D);
+    if (request_is_current_slot(3) == 0) {
+        snd_send_cmd23(0x5D);
         music_Unpause();
         snd_Pump();
     }
-    ClearPadPortState();
+    pad_clear_port_state();
     D_001BACC0 = 0;
 }
 
 /* Stores a number into a global menu setting. */
-void func_002858B0(int value)
+void menu_set_setting(int value)
 {
   D_001BAD14 = value;
 }

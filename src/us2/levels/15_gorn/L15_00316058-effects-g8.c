@@ -19,30 +19,30 @@ typedef struct Stage {
 } Stage;
 
 extern Stage D_L15_001BD4C0;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern float D_L15_00293010[][8];
 extern char D_L15_001A9420[16] SDATA(D_L15_001A9420);
 extern char D_L15_001A9430[16] SDATA(D_L15_001A9430);
 extern char D_L15_001A9440[16] SDATA(D_L15_001A9440);
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_US2_002E72D8(void *);
-extern void func_L00_00326048(void *, void *, int, int, float);
-extern void func_00283AF0(void *, void *);
-extern void func_00283958(void *, void *);
-extern void func_L01_0031A278(void *, void *, float, float, float);
-extern void func_L05_00424990(void *, int, int, int, int, int, int, int, int, int, int, float);
-extern int func_002A77E0(int);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_L05_00419CC8(void *, void *, void *, int, int, int, int, int, float);
-extern void func_0029FC20(void *, int, void *);
-extern void func_00283678(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACB48(void *, float);
-extern void func_L00_0033C0D0(void *, void *, void *, void *, int);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
+extern void vec_fast_to_int_helper(void *, void *);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void moby_compute_local_point(void *, void *, float, float, float);
+extern void part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, int, int, int, float);
+extern int math_random_int_below(int);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_spawn_shot_effect(void *, void *, void *, int, int, int, int, int, float);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void copy_matrix3x4(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_add_random_offset(void *, float);
+extern void part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 
 /* Updates the stage objects and emits effects at the scripted frame counts. */
 void func_US2_L15_00316058(void)
@@ -58,7 +58,7 @@ void func_US2_L15_00316058(void)
     float sign;
     float *row;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (n = 0; n < D_L15_001BD4C0.count; n++) {
         /* Stage.objects[n], word 99 of the stage. */
         char **slot = (char **)&D_L15_001BD4C0 + n;
@@ -69,70 +69,70 @@ void func_US2_L15_00316058(void)
         if (FIELD(short, p, 0xAA) == 0xD54) {
             func_US2_002E72D8(p);
         }
-        if (p && FIELD(short, p, 0xAA) == 0xFA0 && D_001A79F0 != 0x33) {
+        if (p && FIELD(short, p, 0xAA) == 0xFA0 && g_current_map_index != 0x33) {
             if (FIELD(char *, p, 0x68)) {
-                func_L00_00326048(p, FIELD(char *, p, 0x68) + 0xC,
+                math_store_angle_update_result(p, FIELD(char *, p, 0x68) + 0xC,
                                  0x80AAAAD2, 0x80396464, 0.061086535f);
             }
         }
     }
-    if (D_001A79F0 != 15 || D_L15_001BD4C0.busy) {
+    if (g_current_map_index != 15 || D_L15_001BD4C0.busy) {
         return;
     }
 
     p = D_L15_001BD4C0.objects[2];
     if (D_L15_001BD4C0.frame == 13) {
-        func_00283AF0(FIELD(char *, p, 0x58) + 0x10, &scratch.effect.b);
-        func_00283958(&scratch.effect.b, p + 0xC0);
-        func_L01_0031A278(p, &scratch.effect.a, 4, 3, 5);
-        func_L05_00424990(&scratch.effect.a, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
+        vec_fast_to_int_helper(FIELD(char *, p, 0x58) + 0x10, &scratch.effect.b);
+        quaternion_to_rotation_basis(&scratch.effect.b, p + 0xC0);
+        moby_compute_local_point(p, &scratch.effect.a, 4, 3, 5);
+        part_spawn_shockwave_burst(&scratch.effect.a, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
     }
-    if ((unsigned)(D_L15_001BD4C0.frame - 20) >= 31 && !func_002A77E0(3)) {
+    if ((unsigned)(D_L15_001BD4C0.frame - 20) >= 31 && !math_random_int_below(3)) {
         sign = 1;
-        if (func_002A77E0(2)) {
+        if (math_random_int_below(2)) {
             sign = -1;
         }
-        row = D_L15_00293010[func_002A77E0(3)];
-        func_L01_0031A278(p, &scratch.effect.a, row[0], row[1], row[2]);
-        func_L01_0031A278(p, &scratch.effect.b, row[4], row[5], row[6]);
-        scratch.effect.b.f[0] += func_002A78D8(.5f, 1.5f);
-        scratch.effect.b.f[1] += func_002A78D8(.5f, 1.5f);
-        scratch.effect.b.f[2] += func_002A78D8(.5f, 1.5f);
-        func_00282CF0(&scratch.effect.c, &scratch.effect.b, &scratch.effect.a);
-        func_00282F20(&scratch.effect.c, &scratch.effect.c, 1.1666667f);
-        func_L05_00419CC8(p, &scratch.effect.a, &scratch.effect.c, 0xbe4620, 0x783214, 1, 0, 1, sign);
+        row = D_L15_00293010[math_random_int_below(3)];
+        moby_compute_local_point(p, &scratch.effect.a, row[0], row[1], row[2]);
+        moby_compute_local_point(p, &scratch.effect.b, row[4], row[5], row[6]);
+        scratch.effect.b.f[0] += math_random_signed_float_range(.5f, 1.5f);
+        scratch.effect.b.f[1] += math_random_signed_float_range(.5f, 1.5f);
+        scratch.effect.b.f[2] += math_random_signed_float_range(.5f, 1.5f);
+        FastVecSub(&scratch.effect.c, &scratch.effect.b, &scratch.effect.a);
+        vec_scale_to_length(&scratch.effect.c, &scratch.effect.c, 1.1666667f);
+        moby_spawn_shot_effect(p, &scratch.effect.a, &scratch.effect.c, 0xbe4620, 0x783214, 1, 0, 1, sign);
     }
     if (D_L15_001BD4C0.frame < 140) {
         char *p = D_L15_001BD4C0.objects[3];
         float strength = .4f;
-        func_0029FC20(p, 0, scratch.joint);
+        moby_transform_joint_point(p, 0, scratch.joint);
         /* Only the three rotation rows are needed by the following transforms. */
-        func_00283678(matrix, scratch.joint);
+        copy_matrix3x4(matrix, scratch.joint);
         offset.q = 0;
         offset.f[0] = -.3f;
         offset.f[3] = 1;
         velocity.q = 0;
-        func_00283098(&first, &offset, matrix);
-        func_00282CC0(&first, &first, p + 0x10);
+        matrix_mul_vec3(&first, &offset, matrix);
+        FastVecAdd(&first, &first, p + 0x10);
         first.f[3] = 0;
         second.q = first.q;
         third.q = first.q;
         fourth.q = first.q;
-        func_002ACB48(&first, .3f);
-        func_002ACB48(&second, .3f);
-        func_002ACB48(&third, .3f);
-        func_002ACB48(&fourth, .3f);
-        velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
-        func_L00_0033C0D0(p, &first, &velocity, D_L15_001A9420, 1);
-        velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
-        func_L00_0033C0D0(p, &second, &velocity, D_L15_001A9420, 1);
-        velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
-        func_L00_0033C0D0(p, &third, &velocity, D_L15_001A9430, 1);
-        velocity.f[0] = -(func_002A7878(30, 40) * 0.016666668f) * strength;
-        func_00283098(&velocity, &velocity, matrix);
-        func_L00_0033C0D0(p, &fourth, &velocity, D_L15_001A9440, 1);
+        vec_add_random_offset(&first, .3f);
+        vec_add_random_offset(&second, .3f);
+        vec_add_random_offset(&third, .3f);
+        vec_add_random_offset(&fourth, .3f);
+        velocity.f[0] = -(math_random_float_range(30, 40) * 0.016666668f) * strength;
+        matrix_mul_vec3(&velocity, &velocity, matrix);
+        part_spawn_object_relative_particle(p, &first, &velocity, D_L15_001A9420, 1);
+        velocity.f[0] = -(math_random_float_range(30, 40) * 0.016666668f) * strength;
+        matrix_mul_vec3(&velocity, &velocity, matrix);
+        part_spawn_object_relative_particle(p, &second, &velocity, D_L15_001A9420, 1);
+        velocity.f[0] = -(math_random_float_range(30, 40) * 0.016666668f) * strength;
+        matrix_mul_vec3(&velocity, &velocity, matrix);
+        part_spawn_object_relative_particle(p, &third, &velocity, D_L15_001A9430, 1);
+        velocity.f[0] = -(math_random_float_range(30, 40) * 0.016666668f) * strength;
+        matrix_mul_vec3(&velocity, &velocity, matrix);
+        part_spawn_object_relative_particle(p, &fourth, &velocity, D_L15_001A9440, 1);
     }
 }

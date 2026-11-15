@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_002B20F8, the PAL copy of func_L00_002B2200: the same C, where the call ids
  * move up four, 300 becomes 250, and the last call runs once, behind a byte at +0xAB of
  * D_001395B8 that it sets. */
@@ -8,9 +9,9 @@ extern int D_L00_001A7F8C __attribute__((sda));
 extern u8 D_001A7BE0;
 extern u8 D_001A7A60[] MACRO_ADDR;
 extern u8 D_001395B8[];
-extern int func_00282948(char *);
-extern int func_002B0E90(void);
-extern int func_L00_002F43D0(void);
+extern int math_fast_float_d(char *);
+extern int save_count_nonzero_flags(void);
+extern int level_get_resident_byte(void);
 extern void func_PAL_002B1588(int, int);
 
 void func_PAL_L00_002B20F8(void)
@@ -22,10 +23,10 @@ void func_PAL_L00_002B20F8(void)
 
     if (D_L00_001A903C == 0)
         return;
-    if (func_00282948((char *)&D_L00_001A7F8C) == 0)
+    if (math_fast_float_d((char *)&D_L00_001A7F8C) == 0)
         return;
-    count = func_002B0E90();
-    selector = func_L00_002F43D0();
+    count = save_count_nonzero_flags();
+    selector = level_get_resident_byte();
     flag = D_001A7BE0;
     if (flag != 0 || selector > 0) {
         if (count == 3 || count == 10 || count == 15 || count == 19 || count == 25 || count == 29)

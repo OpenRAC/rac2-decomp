@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from public Newlib _strtol_r:
  * https://github.com/mirror/newlib-cygwin/blob/039e8a3c16964d02838b204b72bfdd4b7529107c/newlib/libc/stdlib/strtol.c
  * The retained body differs from that public body only in redundant condition
@@ -59,7 +60,7 @@ extern const char _ctype_[];
 #define ERANGE 34
 
 /* Turns a text string of digits into a whole number in the given number base. */
-long func_00117278(struct _reent *rptr, const char *nptr, char **endptr, int base) {
+long _strtol_r(struct _reent *rptr, const char *nptr, char **endptr, int base) {
     register const char *s = nptr;
     register unsigned long acc;
     register int c;

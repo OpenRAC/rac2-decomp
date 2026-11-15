@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
 /* Adjust a non-aligned count through the integer/float conversion helpers. */
 /* Rounds a size up to the next multiple of 16. */
-int func_L00_003E4B80(int n)
+int mem_align_size_16(int n)
 {
     int alignment;
     int blocks;

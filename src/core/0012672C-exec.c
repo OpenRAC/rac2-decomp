@@ -8,7 +8,7 @@
  * an int: the 64-bit views give other registers or a longer body.
  * The byte tail uses a real 16-byte FIFO buffer, shared with the drain loop.
  */
-extern void func_0011C820(const char *, ...);
+extern void printf_to_deci2_console(const char *, ...);
 
 typedef int u128_si __attribute__((mode(TI)));
 typedef struct {
@@ -34,11 +34,11 @@ extern char D_0013B558[];
 extern char D_0013B588[];
 extern char D_0013B5C8[];
 extern u128_si D_00137E10;
-extern unsigned long func_0011AF40(void);
-extern int func_0011AF60(unsigned long);
+extern unsigned long GsGetIMR(void);
+extern int GsPutIMR(unsigned long);
 
 /* Runs an image read-back from graphics memory into main memory and waits for each step. */
-int func_0012672C(SiStoreImage *packet, u128_si *dest)
+int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
 {
     unsigned int pollCount = 0;
     int nfull = 0, nrem = 0, nbyte = 0, nrest = 0;
@@ -139,7 +139,7 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
 
     while (D1_CHCR & 0x100) {
         if (pollCount++ > 0x1000000) {
-            PrintFormattedToDeci2Console(D_0013B520);
+            printf_to_deci2_console(D_0013B520);
             return -1;
         }
     }
@@ -155,14 +155,14 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
     D1_CHCR = 0x101;
     while (D1_CHCR & 0x100) {
         if (pollCount++ > 0x1000000) {
-            PrintFormattedToDeci2Console(D_0013B520);
+            printf_to_deci2_console(D_0013B520);
             return -1;
         }
     }
 
     while (!(GS_CSR & 2)) {
         if (pollCount++ > 0x1000000) {
-            PrintFormattedToDeci2Console(D_0013B558);
+            printf_to_deci2_console(D_0013B558);
             VIF1_FIFO = D_00137E10;
             return -1;
         }
@@ -181,7 +181,7 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
         D1_CHCR = 0x100;
         while (D1_CHCR & 0x100) {
             if (pollCount++ > 0x1000000) {
-                PrintFormattedToDeci2Console(D_0013B588);
+                printf_to_deci2_console(D_0013B588);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -194,7 +194,7 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
     for (i = 0; i < nrem; i++) {
         while (!(VIF1_STAT & 0x1F000000)) {
             if (pollCount++ > 0x1000000) {
-                PrintFormattedToDeci2Console(D_0013B5C8);
+                printf_to_deci2_console(D_0013B5C8);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -208,7 +208,7 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
     if (nbyte) {
         while (!(VIF1_STAT & 0x1F000000)) {
             if (pollCount++ > 0x1000000) {
-                PrintFormattedToDeci2Console(D_0013B5C8);
+                printf_to_deci2_console(D_0013B5C8);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -223,7 +223,7 @@ int func_0012672C(SiStoreImage *packet, u128_si *dest)
         for (i = 0; i < nrest; i++) {
             while (!(VIF1_STAT & 0x1F000000)) {
                 if (pollCount++ > 0x1000000) {
-                    PrintFormattedToDeci2Console(D_0013B5C8);
+                    printf_to_deci2_console(D_0013B5C8);
                     GS_CSR = 0x100;
                     GS_BUSDIR = 0;
                     GIF_CTRL = 1;

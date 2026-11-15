@@ -16,9 +16,9 @@ typedef struct { int c[5]; } Colors;
 
 extern Colors D_L00_001B0EC8 NOT_SDA;
 
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 extern char D_0018A0E0[];
-extern Collision D_L00_001BF200;
+extern Collision g_collision_result;
 extern float D_L00_001A8F20;
 extern unsigned char *D_L00_001FEAC4[];
 extern signed char D_L00_001B0EBF;
@@ -60,37 +60,37 @@ extern Vec D_L00_00254B20[];
 extern Vec D_L00_00254BE0[];
 extern Vec D_L00_00254CA0[][20];
 
-extern void func_L00_00406040(char *);
-extern void func_L00_00406FB0();
+extern void sheepinator_reset_beam(char *);
+extern void DrawScrollingRingMesh();
 extern void ref_L00_00406150_00(void *, void *);
-extern Particle *func_002C2210(void *, int, float, float, int, int, int, void *, float, int);
-extern Particle *func_L00_0033C638(float, float, void *, int, int, int, int, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern float func_00282DF0(void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern float func_002ABB18(float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_00282948(void *);
-extern void func_00300190(void *, void *);
-extern void func_002AF000(void *, float, float, float);
-extern char *func_002AB1F0(char *);
-extern float func_002A7878(float, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern Particle *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, float, int);
+extern Particle *part_spawn_owned_particle(float, float, void *, int, int, int, int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern float FastVecLength(void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern float math_wrap_angle_to_pi(float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern void transform_vector(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern int math_fast_float_d(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern char *moby_get_private_value_0(char *);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* Moves and bends the Sheepinator beam toward its target, adds sparks along it, and moves three travelling sparks. */
-void func_L00_00406150(char *object)
+void sheepinator_update_beam_shape(char *object)
 {
     float sag[4], segment[4], ringOffset[4], beamEnd[4], temp[4];
     char *disabled[128];
@@ -104,15 +104,15 @@ void func_L00_00406150(char *object)
     ringOffset[3] = 1.0f;
     obj = *(char **)(object + 0x68);
     *(int *)ringOffset = 0;
-    ResetSheepinatorBeam(object);
-    D_L00_001B2C84 = WrapAngleToPi(D_L00_001B2C84 + D_L00_001B0E54);
+    sheepinator_reset_beam(object);
+    D_L00_001B2C84 = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E54);
     FastVecScale(sag, object + 0xD0, -D_L00_001B2C80);
-    if (*(char **)(obj + 0x10) != 0 && (def = GetMobyPrivateValue0(*(char **)(obj + 0x10))) != 0) {
+    if (*(char **)(obj + 0x10) != 0 && (def = moby_get_private_value_0(*(char **)(obj + 0x10))) != 0) {
         FastVecScale(temp, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
         FastVecAdd(beamEnd, *(char **)(obj + 0x10) + 0x10, temp);
     } else {
         float x = *(float *)(obj + 0x48), y = *(float *)(obj + 0x4C);
-        BuildSphericalOffset(beamEnd, D_L00_001B0E38, x, y);
+        vec_build_spherical_offset(beamEnd, D_L00_001B0E38, x, y);
         FastVecAdd(beamEnd, beamEnd, obj);
     }
     n = 0;
@@ -120,24 +120,24 @@ void func_L00_00406150(char *object)
     tries = 0;
     if (*(char **)(obj + 0x10) == 0) {
         qcopy(temp, obj);
-        while (CollLine(temp, beamEnd, 0x14, gHeroState.object, 0)) {
+        while (CollLine(temp, beamEnd, 0x14, g_hero_state.object, 0)) {
             Collision *col;
             char *hit;
             if (++tries >= 7) break;
-            col = &gCollisionResult;
-            if (gCollisionResult.hit != 0 && (*(short *)(gCollisionResult.hit + 0xAA) == 0xE7D || *(short *)(gCollisionResult.hit + 0xAA) == 0xEB0)) {
-                disabled[n++] = gCollisionResult.hit;
-                *(int *)(gCollisionResult.hit + 0x98) = 0;
+            col = &g_collision_result;
+            if (g_collision_result.hit != 0 && (*(short *)(g_collision_result.hit + 0xAA) == 0xE7D || *(short *)(g_collision_result.hit + 0xAA) == 0xEB0)) {
+                disabled[n++] = g_collision_result.hit;
+                *(int *)(g_collision_result.hit + 0x98) = 0;
                 if (n < 128) {
-                    qcopy(temp, &gCollisionResult.point);
+                    qcopy(temp, &g_collision_result.point);
                     continue;
                 }
             }
             {
                 float sample[4];
-                FastVecSub(edge, obj, &gCollisionResult.point);
-                dot = FastVecDot(gHeroState.object + 0xE0, edge);
-                FastVecScale(side, gHeroState.object + 0xE0, dot);
+                FastVecSub(edge, obj, &g_collision_result.point);
+                dot = FastVecDot(g_hero_state.object + 0xE0, edge);
+                FastVecScale(side, g_hero_state.object + 0xE0, dot);
                 FastVecSub(sample, edge, side);
                 dist = FastVecLength(sample);
             }
@@ -148,8 +148,8 @@ void func_L00_00406150(char *object)
         }
     } else {
         FastVecSub(temp, obj, *(char **)(obj + 0x10) + 0x10);
-        dot = FastVecDot(gHeroState.object + 0xE0, temp);
-        FastVecScale(edge, gHeroState.object + 0xE0, dot);
+        dot = FastVecDot(g_hero_state.object + 0xE0, temp);
+        FastVecScale(edge, g_hero_state.object + 0xE0, dot);
         FastVecSub(side, temp, edge);
         dist = FastVecLength(side);
     }
@@ -160,7 +160,7 @@ void func_L00_00406150(char *object)
     {
     int i;
     for (i = 1; i < 12; i++) {
-        TransformVectorOrCopy(&D_L00_00254A60[i], &D_L00_00254A60[i]);
+        vec_transform_or_copy(&D_L00_00254A60[i], &D_L00_00254A60[i]);
         FastVecSub(segment, &D_L00_00254A60[i], &D_L00_00254A60[i - 1]);
         progress = IntToFloat(i) * D_L00_001B0E4C;
         pull = progress * -0.49999997f + 0.9f;
@@ -184,7 +184,7 @@ void func_L00_00406150(char *object)
         float sample[4];
         float m[4][4];
         for (j = 0; j < 20; j++) {
-            ApplyAxisRotationToQuaternion(sample, side, edge, (float)j * D_L00_001B0E60);
+            math_apply_axis_rotation_to_quat(sample, side, edge, (float)j * D_L00_001B0E60);
             FastVecAdd(&D_L00_00254CA0[i][j], sample, &D_L00_00254A60[i]);
         }
         qcopy(m[3], &D_L00_00254A60[i]);
@@ -192,9 +192,9 @@ void func_L00_00406150(char *object)
         vec_scale_to_length(m[1], side, 1.0f);
         FastVecCross(m[2], m[1], m[0]);
         radius = D_L00_001B0E88 + (D_L00_001B0E8C - D_L00_001B0E88) * progress;
-        angle = WrapAngleToPi(D_L00_001B2C84 + D_L00_001B0E58 * IntToFloat(i));
-        ringOffset[1] = radius * FastSinOrCosB(angle);
-        ringOffset[2] = radius * FastSinOrCosA(angle);
+        angle = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E58 * IntToFloat(i));
+        ringOffset[1] = radius * math_fast_sin_or_cos_b(angle);
+        ringOffset[2] = radius * math_fast_sin_or_cos_a(angle);
         transform_vector(&D_L00_00254B20[i], ringOffset, m);
         ringOffset[2] = -ringOffset[2];
         transform_vector(&D_L00_00254BE0[i], ringOffset, m);
@@ -202,28 +202,28 @@ void func_L00_00406150(char *object)
     }
     }
     ref_L00_00406150_00(DrawScrollingRingMesh, object);
-    scale = RandomFloatRange(0.1f, 1.7f);
-    sign = RandomIntBelow(2);
+    scale = math_random_float_range(0.1f, 1.7f);
+    sign = math_random_int_below(2);
     if (sign == 0) sign = sign - 1;
-    if (RandomIntBelow(2) == 0) {
+    if (math_random_int_below(2) == 0) {
         qcopy_nc(temp, &D_L00_00254B20[11]);
-        p = SpawnGroundEffectParticle(temp, 0x1E, scale * 0.1f, scale, 0x7F103FFF, 0, sign, &D_L00_001A8F20, 0.003f, 1);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x7F103FFF, 0, sign, &D_L00_001A8F20, 0.003f, 1);
         if (p) p->b2 = D_L00_001FEAC4[0][7];
         sign = -sign;
-        p = SpawnGroundEffectParticle(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
         if (p) p->b2 = D_L00_001FEAC4[0][7];
     }
-    if (RandomIntBelow(2) == 0) {
+    if (math_random_int_below(2) == 0) {
         qcopy_nc(temp, &D_L00_00254BE0[11]);
-        p = SpawnGroundEffectParticle(temp, 0x1E, scale * 0.1f, scale, 0x80FF4F10, 0, sign, &D_L00_001A8F20, 0.003f, 1);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x80FF4F10, 0, sign, &D_L00_001A8F20, 0.003f, 1);
         if (p) p->b2 = D_L00_001FEAC4[0][7];
         sign = -sign;
-        p = SpawnGroundEffectParticle(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
         if (p) p->b2 = D_L00_001FEAC4[0][7];
     }
     FastVecSub(edge, &D_L00_00254A60[1], &D_L00_00254A60[0]);
     vec_scale_to_length(edge, edge, D_L00_001B0E90);
-    if (RandomIntBelow(2) == 0) {
+    if (math_random_int_below(2) == 0) {
         vec_scale_to_length(side, object + 0xD0, D_L00_001B0E9C);
         FastVecAdd(temp, &D_L00_00254A60[0], side);
         {
@@ -231,21 +231,21 @@ void func_L00_00406150(char *object)
             float up[4], side[4];
             int color, count;
             float a, b;
-        color = colors.c[RandomIntBelow(5)];
-        a = RandomSignedFloatRange(0.0f, D_L00_001B0E98);
-        b = RandomSignedFloatRange(0.0f, D_L00_001B0E98);
-        ApplyAxisRotationToQuaternion(up, edge, D_0018A0E0, b);
+        color = colors.c[math_random_int_below(5)];
+        a = math_random_signed_float_range(0.0f, D_L00_001B0E98);
+        b = math_random_signed_float_range(0.0f, D_L00_001B0E98);
+        math_apply_axis_rotation_to_quat(up, edge, D_0018A0E0, b);
         FastVecCross(side, edge, D_0018A0E0);
-        ApplyAxisRotationToQuaternion(up, up, side, a);
+        math_apply_axis_rotation_to_quat(up, up, side, a);
         count = FloatToInt(dist * 1.2f / D_L00_001B0E90);
         if (*(char **)(obj + 0x10) != 0) count *= 3;
-        p = SpawnOwnedParticle(scale * 0.1f, scale, temp, count, color, 0, sign, up, *(int *)(obj + 0x10));
+        p = part_spawn_owned_particle(scale * 0.1f, scale, temp, count, color, 0, sign, up, *(int *)(obj + 0x10));
         if (p) p->b2 = D_L00_001FEAC4[0][6];
-        p = SpawnOwnedParticle(scale * 0.07f, scale * 0.7f, temp, count, 0x7F7F7F7F, 1, -sign, up, *(int *)(obj + 0x10));
+        p = part_spawn_owned_particle(scale * 0.07f, scale * 0.7f, temp, count, 0x7F7F7F7F, 1, -sign, up, *(int *)(obj + 0x10));
         if (p) p->b2 = D_L00_001FEAC4[0][6];
         }
     }
-    if (FastFloatHelperD(&D_L00_001B2D3C)) {
+    if (math_fast_float_d(&D_L00_001B2D3C)) {
         D_L00_001B2D3C = D_L00_001B0EA0;
         for (k = 0; k < 3; k++) {
             if (D_L00_001B2D30[k] == 0) {
@@ -264,7 +264,7 @@ void func_L00_00406150(char *object)
     {
     for (kk = 0; kk < 3; kk++) {
         if (D_L00_001B2D30[kk] != 0) {
-            if (FastFloatHelperD(&D_L00_001B2CF0[kk]) != 0) {
+            if (math_fast_float_d(&D_L00_001B2CF0[kk]) != 0) {
                 D_L00_001B2D30[kk] = 0;
             } else {
                 float step, u, rem, inv;

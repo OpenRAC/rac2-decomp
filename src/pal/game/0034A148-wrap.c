@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 typedef struct {
     u8 pad00[0x60];
     int selection;
@@ -32,7 +33,7 @@ int func_PAL_0034A148(SelectionMenu *object, int flags)
     }
     if (direction != 0) {
         original = object->selection;
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         last = object->count - 1;
         do {
             int index = object->selection + direction;

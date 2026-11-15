@@ -63,12 +63,12 @@ struct Rac1Cpr8InputView {
     s32 unk174;
 };
 
-extern s32 func_0011F5E0();
+extern s32 DIntr();
 
 extern s32 func_0011F628();
 
 /* Copies a decoded video picture to the screen buffer in chunks using two DMA channels. */
-void func_0012D808(struct Rac1Cpr8Input *input, struct Rac1Cpr8Output *output) {
+void mpeg_copy_picture_to_screen(struct Rac1Cpr8Input *input, struct Rac1Cpr8Output *output) {
     struct Rac1Cpr8InputView *view;
     s32 passCount;
     s32 srcBase;

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,10 +25,10 @@
  */
 #include "common.h"
 
-extern void func_00132DF0(s32 a0, s32 a1, void *a2, s32 a3, s64 t0);
+extern void snd_queue_command(s32 a0, s32 a1, void *a2, s32 a3, s64 t0);
 
 /* Packs eight sound values and sends command 0x2C with a reply callback. */
-void func_00133340(s32 p0, s32 p1, s32 lo0, s32 lo1, s32 hi0, s32 hi1, s32 p4, s32 p5, s32 p6, s32 p7, s32 callback, s64 callbackData) {
+void snd_send_cmd2c_packed(s32 p0, s32 p1, s32 lo0, s32 lo1, s32 hi0, s32 hi1, s32 p4, s32 p5, s32 p6, s32 p7, s32 callback, s64 callbackData) {
     s32 payload[8];
     s32 packed02;
     s32 packed13;
@@ -42,5 +43,5 @@ void func_00133340(s32 p0, s32 p1, s32 lo0, s32 lo1, s32 hi0, s32 hi1, s32 p4, s
     payload[5] = p5;
     payload[6] = p6;
     payload[7] = p7;
-    QueueSoundCommand(0x2C, 0x20, payload, callback, callbackData);
+    snd_queue_command(0x2C, 0x20, payload, callback, callbackData);
 }

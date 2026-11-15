@@ -3,10 +3,10 @@
 
 typedef unsigned char u8;
 typedef unsigned int u32;
-extern u8 D_001A63A8[];
-extern void func_002B66F0(void);
-extern void func_002B6938(void);
-extern void func_0026FEB8(void *);
+extern u8 g_music_state[];
+extern void snd_run_setup_sequence(void);
+extern void load_register_disc_read_callback(void);
+extern void STUB_printf(void *);
 extern char D_001AA198[];
 
 /* Resident file-load state and three streaming channel records. */
@@ -18,12 +18,12 @@ typedef struct {
 } InitState;
 
 /* Sets the music and file-load state to its starting values and registers the load callbacks. */
-void func_002B68C8(void)
+void InitFileLoadSystem(void)
 {
     InitState *s;
     int mode;
     STUB_printf(D_001AA198);
-    s = (InitState *)gMusicState;
+    s = (InitState *)g_music_state;
     mode = -1;
     s->mode = mode;
     s->flags[0] = 0x20;
@@ -37,6 +37,6 @@ void func_002B68C8(void)
     s->busy2 = 0;
     s->step2 = 0;
     s->handle = mode;
-    RunSoundSetupSequence();
-    RegisterDiscReadCallback();
+    snd_run_setup_sequence();
+    load_register_disc_read_callback();
 }

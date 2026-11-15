@@ -20,10 +20,10 @@ typedef struct {
 extern Slot_2FCF18 D_L00_001C7040[];
 extern Info_2FCF18 D_L00_001C6F40[];
 extern char D_L00_001C71C0[][0x400];
-extern void func_00282A88(void *, int);
+extern void mem_fast_helper_b(void *, int);
 
 /* Finds a free slot out of eight, stores a position and five values in it, and returns the slot number (or -1 if all are used). */
-int func_L00_002FCF18(void *pos, float a, float b, float c, float d, float e)
+int part_l00_alloc_effect_slot_2(void *pos, float a, float b, float c, float d, float e)
 {
     int i;
     Info_2FCF18 *info;
@@ -43,7 +43,7 @@ int func_L00_002FCF18(void *pos, float a, float b, float c, float d, float e)
     info->f4 = d;
     info->f8 = e;
     info->fC = b;
-    FastMemoryHelperB(slot, 0x30);
+    mem_fast_helper_b(slot, 0x30);
     slot->used = 1;
     slot->buf = D_L00_001C71C0[i];
     return i;

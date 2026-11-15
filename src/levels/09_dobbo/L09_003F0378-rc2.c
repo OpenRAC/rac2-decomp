@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -34,7 +35,7 @@ extern void ref_L09_003F0378_07(void *, s32);
 extern void ref_L09_003F0378_08(void *, s32, s32, s32, f32, f32);
 
 /* Handles damage to a Dobbo moby: when hit it loses health, flashes and reacts, or dies when health runs out. */
-void func_L09_003F0378(void *moby) {
+void dobbo_handle_damage(void *moby) {
     void *vars;
     s32 hitDamage;
     s32 hitResult;

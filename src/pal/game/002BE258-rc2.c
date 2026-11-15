@@ -30,18 +30,18 @@ typedef struct Fr {
     TI m2;
     TI pad;
 } Fr;
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern void func_002830C0(f32 *, f32 *, s8 *);
-extern void func_00282CF0(f32 *, f32 *, f32 *);
-extern void func_0029FCC0(s8 *, s32, f32 *);
-extern void func_00282F20(f32 *, f32 *, f32);
-extern void func_00282CC0(f32 *, f32 *, f32 *);
-extern f32 func_00283B98(f32, f32);
-extern s32 func_00283CF0(f32);
-extern f32 func_002AB0E8(f32 *, s8 *, f32 *, s32);
-extern s32 func_00282978(s8 *);
-extern void func_002B9180(Obj *);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void transform_vector(f32 *, f32 *, s8 *);
+extern void FastVecSub(f32 *, f32 *, f32 *);
+extern void moby_transform_joint_to_world(s8 *, s32, f32 *);
+extern void vec_scale_to_length(f32 *, f32 *, f32);
+extern void FastVecAdd(f32 *, f32 *, f32 *);
+extern f32 FastAddRotations(f32, f32);
+extern s32 FloatToInt(f32);
+extern f32 mat_get_product_element(f32 *, s8 *, f32 *, s32);
+extern s32 FastDecTimer(s8 *);
+extern void part_kill(Obj *);
 
 void func_PAL_002BE258(Obj *o)
 {
@@ -54,38 +54,38 @@ void func_PAL_002BE258(Obj *o)
         fr.m0 = *(TI *)m;
         fr.m1 = *(TI *)(m + 0x10);
         fr.m2 = *(TI *)(m + 0x20);
-        fr.a[1] = func_00283198(s->f14) * s->f10;
-        fr.a[2] = func_00283180(s->f14) * s->f10;
+        fr.a[1] = math_fast_sin_or_cos_b(s->f14) * s->f10;
+        fr.a[2] = math_fast_sin_or_cos_a(s->f14) * s->f10;
         fr.a[0] = 0.0f;
         fr.a[3] = 0.0f;
-        func_002830C0(fr.b, fr.a, (s8 *)&fr.m0);
-        func_00282CF0(vec, vec, fr.b);
+        transform_vector(fr.b, fr.a, (s8 *)&fr.m0);
+        FastVecSub(vec, vec, fr.b);
         s->f1C = s->f1C + 0.07201201f;
-        func_0029FCC0(s->p18, 0, fr.c);
-        func_00282CF0(fr.a, fr.c, vec);
-        func_00282F20(fr.a, fr.a, s->f1C);
-        func_00282CC0(vec, vec, fr.a);
-        s->f14 = func_00283B98(s->f14, 0.62831855f);
+        moby_transform_joint_to_world(s->p18, 0, fr.c);
+        FastVecSub(fr.a, fr.c, vec);
+        vec_scale_to_length(fr.a, fr.a, s->f1C);
+        FastVecAdd(vec, vec, fr.a);
+        s->f14 = FastAddRotations(s->f14, 0.62831855f);
         s->f10 = s->f10 * 0.88f;
-        fr.a[1] = func_00283198(s->f14) * s->f10;
-        fr.a[2] = func_00283180(s->f14) * s->f10;
+        fr.a[1] = math_fast_sin_or_cos_b(s->f14) * s->f10;
+        fr.a[2] = math_fast_sin_or_cos_a(s->f14) * s->f10;
         fr.a[0] = 0.0f;
         fr.a[3] = 0.0f;
-        func_002830C0(fr.b, fr.a, (s8 *)&fr.m0);
-        func_00282CC0(vec, vec, fr.b);
-        if (func_002AB0E8(fr.c, s->p18 + 0xC0, vec, 1) > 0.0f) {
-            func_002B9180(o);
+        transform_vector(fr.b, fr.a, (s8 *)&fr.m0);
+        FastVecAdd(vec, vec, fr.b);
+        if (mat_get_product_element(fr.c, s->p18 + 0xC0, vec, 1) > 0.0f) {
+            part_kill(o);
             return;
         }
     }
 
     s->f04 = s->f04 + s->f0C * 0.013200001f;
     if (s->f04 <= 0.0f) {
-        func_002B9180(o);
+        part_kill(o);
         return;
     }
-    if (func_00282978((s8 *)o + 0xA) != 0) {
-        func_002B9180(o);
+    if (FastDecTimer((s8 *)o + 0xA) != 0) {
+        part_kill(o);
         return;
     }
     if (1.0f <= s->f04) {
@@ -93,7 +93,7 @@ void func_PAL_002BE258(Obj *o)
         s->f04 = s->f04 + s->f0C * 0.013200001f;
     }
     o->f0C = o->f0C + (-3528.0002f);
-    o->w04 = (o->w04 & 0x00FFFFFF) | (func_00283CF0(s->f04 * 255.0f) << 24);
+    o->w04 = (o->w04 & 0x00FFFFFF) | (FloatToInt(s->f04 * 255.0f) << 24);
     s->f08 = s->f08 + 0.0072000003f;
     if (1.0f < s->f08) s->f08 = s->f08 - 1.0f;
     o->b08 = (s32)(s->f08 * 255.0f);

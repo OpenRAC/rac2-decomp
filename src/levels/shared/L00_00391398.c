@@ -2,15 +2,15 @@
 /* A union keeps the vector field at a fixed stack offset without extending
  * the lifetime of a cast-derived pointer across the matrix helper calls. */
 typedef int Quad __attribute__((mode(TI)));
-extern void func_00283410(void *, void *);
-extern void func_00283658(void *, void *);
-extern void func_00283788(void *, void *, void *);
-extern void func_00283678(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void euler_to_matrix(void *, void *);
+extern void copy_matrix_rotation(void *, void *);
+extern void multiply_matrix(void *, void *, void *);
+extern void copy_matrix3x4(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_002A10E8(void *);
 /* Keeps the attached piece in place next to its parent, easing its height and copying the parent's turn. */
-void func_L00_00391398(char *parent, char *context)
+void tether_attach_to_parent(char *parent, char *context)
 {
     Quad matrices[12];
     union { Quad quad; float f[4]; } offset;

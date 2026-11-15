@@ -1,11 +1,11 @@
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
-extern int func_00283CF0(float);
-extern void func_0026FEB8(const char *,...);
-extern void func_00282CF0(float *,float *,float *);
-extern float func_00282E20(float *);
-extern int func_L00_002DB4B8(float *,float *,float);
+extern int FloatToInt(float);
+extern void STUB_printf(const char *,...);
+extern void FastVecSub(float *,float *,float *);
+extern float vec_length_xy(float *);
+extern int IsPointInCollisionPrimitive(float *,float *,float);
 extern char D_L00_001A8988[];
 typedef struct CollisionPrimitive {
     float position[3], radius;
@@ -23,7 +23,7 @@ extern char *D_L00_001B1880[] __attribute__((sda));
 
 /* Returns the first cell primitive intersecting the position and radius. */
 /* Looks up the collision grid cell at a position and returns the first shape that touches it. */
-float *func_L00_002DB350(float radius, Quad *position)
+float *FindIntersectingGridPrimitive(float radius, Quad *position)
 {
     union { Quad q; float f[4]; } origin;
     float delta[4];

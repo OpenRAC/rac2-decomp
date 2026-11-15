@@ -2,13 +2,13 @@
 typedef int Quad_0031D3E0 __attribute__((mode(TI)));
 
 extern int D_L00_001B1DC0 __attribute__((sda));
-extern void func_00282F20(void *dst, void *src, float scale);
-extern char *func_0029EFD0(int kind);
-extern int func_002FED90(void *object, void *position, float x, float y, float z);
+extern void vec_scale_to_length(void *dst, void *src, float scale);
+extern char *CreateMoby(int kind);
+extern int part_alloc_effect_slot(void *object, void *position, float x, float y, float z);
 extern void func_002A0F48(void *object);
 
 /* Initialize a kind-0xA82 object and its private record. */
-char *func_0031D3E0(void *position, void *direction,
+char *shot_moby_create(void *position, void *direction,
                   float value60, float value68, float value70, float value74,
                   unsigned char color0, unsigned char color1,
                   unsigned char color2, unsigned char color3,
@@ -48,7 +48,7 @@ char *func_0031D3E0(void *position, void *direction,
             data[0x7C] = 1;
         else
             data[0x7C] = 0;
-        *(short *)(data + 0x6E) = AllocEffectSlot_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
+        *(short *)(data + 0x6E) = part_alloc_effect_slot(object, 0, 1.0f, 1.0f, 1.0f);
         func_002A0F48(object);
     }
     return object;

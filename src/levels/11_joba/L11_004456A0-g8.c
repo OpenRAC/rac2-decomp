@@ -4,16 +4,16 @@
 typedef unsigned char u8;
 typedef short s16;
 
-extern void func_L11_00443940(char *, int);
-extern int func_00288FB8(int);
-extern long long func_0027C878(int);
-extern void func_0027F640(float, float, long long, char *, float, int, long long, char *);
-extern void func_002802E0(char *, int, int, int, int, int, int, int, int);
-extern int func_L11_0043E108(int);
+extern void joba_menu_draw_help_prompts(char *, int);
+extern int GetLocalizedString(int);
+extern long long GetEffectTextureDescriptor(int);
+extern void FontPrintScaled(float, float, long long, char *, float, int, long long, char *);
+extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);
+extern int arena_get_challenge_flag_index(int);
 extern unsigned int func_001157AC(char *);
-extern void func_00280270(char *, long long, char *, int);
-extern void func_00280190(char *, long long, char *, int);
-extern int func_00115DA8(char *, char *, ...);
+extern void text_draw_window_large(char *, long long, char *, int);
+extern void text_draw_window_small(char *, long long, char *, int);
+extern int sprintf(char *, char *, ...);
 
 extern float D_L11_001B1808 __attribute__((sda));
 extern int D_L11_001B180C __attribute__((sda));
@@ -51,7 +51,7 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
 }
 
 /* Draws the Joba menu header and the count box with its message. */
-void func_L11_004456A0(char *moby) {
+void joba_menu_draw_header_count_box(char *moby) {
     char boxBuf[0x20];
     char lineBuf[0x70];
     char *state;
@@ -60,7 +60,7 @@ void func_L11_004456A0(char *moby) {
     float titleX, scale, half;
     int titleY, boxX, boxY, boxH, one;
 
-    DrawJobaMenuHelpPrompts(moby, 0);
+    joba_menu_draw_help_prompts(moby, 0);
     half = 0.5f;
     state = *(char **)(moby + 0x68);
     text = (char *)GetLocalizedString(0x2F45);
@@ -76,17 +76,17 @@ void func_L11_004456A0(char *moby) {
     boxH = scaled_coord(D_L11_001B1820, scale, half, one);
     FontSetWindow(boxBuf, boxX, boxY, D_L11_001B1838, D_L11_001B183C, D_L11_001B181C, boxH,
                   D_L11_001B1840, 3);
-    if (*(s16 *)(state + 0x1E8) == 0 && D_001395B8[GetChallengeFlagIndex(0)] < 2) {
+    if (*(s16 *)(state + 0x1E8) == 0 && D_001395B8[arena_get_challenge_flag_index(0)] < 2) {
         text = (char *)GetLocalizedString(0x2F96);
-        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, text, strlen_001157AC(text));
-    } else if (*(s16 *)(state + 0x1E8) == 1 && D_001395B8[GetChallengeFlagIndex(1)] < 2) {
+        text_draw_window_large(boxBuf, D_L11_001B1818, text, func_001157AC(text));
+    } else if (*(s16 *)(state + 0x1E8) == 1 && D_001395B8[arena_get_challenge_flag_index(1)] < 2) {
         text = (char *)GetLocalizedString(0x2F97);
-        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, text, strlen_001157AC(text));
+        text_draw_window_large(boxBuf, D_L11_001B1818, text, func_001157AC(text));
     } else {
         text = (char *)GetLocalizedString(0x2F62);
         unitText = (char *)GetLocalizedString(0x2F5E);
-        Sprintf(lineBuf, D_L11_001B15A0, text, *(int *)(state + 0x1E0), unitText);
-        DrawTextWindowLargeFont(boxBuf, D_L11_001B1818, lineBuf, strlen_001157AC(lineBuf));
+        sprintf(lineBuf, D_L11_001B15A0, text, *(int *)(state + 0x1E0), unitText);
+        text_draw_window_large(boxBuf, D_L11_001B1818, lineBuf, func_001157AC(lineBuf));
     }
     text = (char *)GetLocalizedString(0x2F47);
     {
@@ -100,5 +100,5 @@ void func_L11_004456A0(char *moby) {
         FontSetWindow(boxBuf, boxX, boxY, D_L11_001B1838, D_L11_001B183C, D_L11_001B1828, boxH,
                       D_L11_001B1840, 3);
     }
-    DrawTextWindowSmallFont(boxBuf, D_L11_001B1824, text, strlen_001157AC(text));
+    text_draw_window_small(boxBuf, D_L11_001B1824, text, func_001157AC(text));
 }

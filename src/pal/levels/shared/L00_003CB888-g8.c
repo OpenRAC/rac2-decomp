@@ -14,13 +14,13 @@ extern int D_L00_001B0074 __attribute__((sda)), D_L00_001B0078 __attribute__((sd
 extern float D_L00_001AFFEC __attribute__((sda)), D_L00_001AFFF0 __attribute__((sda)), D_L00_001AFFF4 __attribute__((sda)), D_L00_001AFFF8 __attribute__((sda));
 extern float D_L00_001AFFFC __attribute__((sda)), D_L00_001B0000 __attribute__((sda)), D_L00_001B0004 __attribute__((sda));
 extern SurfaceVector D_L00_00240480[], D_L00_00240540[], D_L00_00240600[][20], D_L00_002404C0[][20];
-extern char D_L00_001B8DC0[];
-extern void func_L00_003C7DF0(void *, int, int, float, float, float, int, int);
-extern void func_L00_003C83E0(void *), func_L00_003C8608(void *);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern char g_camera_l00_position[];
+extern void DrawScrollingRibbonColored(void *, int, int, float, float, float, int, int);
+extern void DrawLightningArcSparks2(void *), DrawBeamOriginCameraFacingQuads(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void draw_world_quad(void *, void *, int);
 void func_PAL_L00_003CB888(void *object)
 {
     SurfacePacket packet;
@@ -29,13 +29,13 @@ void func_PAL_L00_003CB888(void *object)
     float u, v, w;
     D_L00_001B007C -= D_L00_001B0080 * 1.2f;
     if (D_L00_001B007C <= -8.0f) D_L00_001B007C += 8.0f;
-    func_L00_003C7DF0(D_L00_00240480, D_L00_001B005C, D_L00_001B0060, D_L00_001B0064, D_L00_001B0068, D_L00_001B006C, 12, D_L00_001B0074);
-    func_L00_003C7DF0(D_L00_00240540, D_L00_001B005C, D_L00_001B0060, D_L00_001B0064, D_L00_001B0068, D_L00_001B006C, 12, D_L00_001B0078);
-    func_L00_003C83E0(object);
-    func_L00_003C8608(object);
+    DrawScrollingRibbonColored(D_L00_00240480, D_L00_001B005C, D_L00_001B0060, D_L00_001B0064, D_L00_001B0068, D_L00_001B006C, 12, D_L00_001B0074);
+    DrawScrollingRibbonColored(D_L00_00240540, D_L00_001B005C, D_L00_001B0060, D_L00_001B0064, D_L00_001B0068, D_L00_001B006C, 12, D_L00_001B0078);
+    DrawLightningArcSparks2(object);
+    DrawBeamOriginCameraFacingQuads(object);
     {
         int color = D_L00_001B0084;
-        packet.texture = func_0027C878(D_L00_001B008C);
+        packet.texture = GetEffectTextureDescriptor(D_L00_001B008C);
         u = D_L00_001AFFF4;
         packet.mode = 0xFF9000000260ULL;
         packet.flags = 0x8000000048ULL;
@@ -58,11 +58,11 @@ void func_PAL_L00_003CB888(void *object)
                 qcopy_nc(&packet.vertex[1], &D_L00_00240600[row][(i + 1) % 20]);
                 qcopy_nc(point2 = &packet.vertex[2], &D_L00_002404C0[row][i]);
                 qcopy_nc(&packet.vertex[3], &D_L00_002404C0[row][(i + 1) % 20]);
-                func_00282CF0(&edge, &packet.vertex[0], &packet.vertex[1]);
-                func_00282CF0(&side, point2, &packet.vertex[1]);
-                func_00282DD8(&normal, &side, &edge);
-                func_00282CF0(&eye, &packet.vertex[1], D_L00_001B8DC0);
-                if (func_00282DB0(&normal, &eye) >= 0) {
+                FastVecSub(&edge, &packet.vertex[0], &packet.vertex[1]);
+                FastVecSub(&side, point2, &packet.vertex[1]);
+                FastVecCross(&normal, &side, &edge);
+                FastVecSub(&eye, &packet.vertex[1], g_camera_l00_position);
+                if (FastVecDot(&normal, &eye) >= 0) {
                     v += D_L00_001AFFF0; w += D_L00_001AFFF0;
                 } else {
                     if (row == 11) { packet.color[1] = D_L00_001B0084 & 0xFFFFFF; packet.color[0] = D_L00_001B0084 & 0xFFFFFF; }
@@ -75,7 +75,7 @@ void func_PAL_L00_003CB888(void *object)
                     packet.uv[7] = v + D_L00_001AFFF0;
                     packet.uv[6] = u - D_L00_001AFFEC;
                     v = v + D_L00_001AFFF0;
-                    func_00280B90(&packet, 0, 0);
+                    draw_world_quad(&packet, 0, 0);
                     packet.uv[0] = u;
                     packet.uv[1] = w;
                     packet.uv[2] = u;
@@ -85,7 +85,7 @@ void func_PAL_L00_003CB888(void *object)
                     packet.uv[6] = u - D_L00_001AFFEC;
                     packet.uv[7] = w + D_L00_001AFFF0;
                     w = w + D_L00_001AFFF0;
-                    func_00280B90(&packet, 0, 0);
+                    draw_world_quad(&packet, 0, 0);
                 }
             }
             row = nextRow;

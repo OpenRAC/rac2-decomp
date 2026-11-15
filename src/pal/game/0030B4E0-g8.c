@@ -11,8 +11,8 @@ extern short D_001B2400[] MACRO_ADDR;
 extern short D_001B23FA[] MACRO_ADDR;
 extern short D_001B2402[] MACRO_ADDR;
 extern short D_001B2404[] MACRO_ADDR;
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float), func_00282C88(void *);
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float), vec_clear_128(void *);
 extern int D_001AEDF0 __attribute__((sda));
 extern float D_001AEDF4 __attribute__((sda));
 extern int D_001AEE84 __attribute__((sda));
@@ -37,13 +37,13 @@ void func_PAL_0030B4E0(char *obj) {
         D_001B240C = 0;
         D_001B2408 = ((s32)D_001AEE84 * 5 + 2) / 6;
         D_001AEE58 = 0x7F2020;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEDF4 * 0.05f);
+        FastVecSub(&delta, state + 1, state);
+        vec_scale_to_length(&step, &delta, D_001AEDF4 * 0.05f);
         qcopy(&D_00229170[0], state);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&D_00229170[i], &D_00229160[i], &step);
+            FastVecAdd(&D_00229170[i], &D_00229160[i], &step);
             D_002293F0[i] = 0;
-            func_00282C88(&D_00229440[i]);
+            vec_clear_128(&D_00229440[i]);
             D_00229580[i] = 0;
         }
         { int j; for (j = 0; j < 4; j++) D_001B23E8[j] = -1; }

@@ -3,7 +3,7 @@
 extern char *D_L20_001FBB20[];
 extern int D_L20_001B2FB8;
 extern char *D_L20_001B2F9C;
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 /* Walks the id lists that arg0's state names for arg1's class (0xD0F: two lists,
    0x119E/0x12EF: one) and returns the last moby, not flagged at +0x34 bit 0, for which
@@ -11,7 +11,7 @@ extern float func_00282E80(void *, void *);
    split addresses: the list limit and the moby bank are single absolute loads, the
    list table is reached through a %hi/%lo pair. */
 /* Looks through the groups linked to the given object and returns the last enabled member that is close to this enemy, or 0 if none is. */
-char *func_L20_004448A8(char *moby, char *owner) {
+char *FindLastGroupMemberInRange(char *moby, char *owner) {
     char *state = *(char **)(moby + 0x68);
     /* Retail's frame has 0x20 bytes of locals for this list; only two slots are used. */
     int groupIds[8];

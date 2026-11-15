@@ -1,3 +1,4 @@
+#include "names.h"
 /* Copies the xyz of the first vector of the object's 32-byte entry in the D_L05_001B1EC4
    table (index at +0x84) to its record's +0x20 with w cleared and on into +0x30, then
    hands the entry's second vector, w cleared, to func_002833F0. */
@@ -9,7 +10,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern char *D_L05_001B1EC4 MACRO_ADDR;
-extern int func_002833F0(void *, void *);
+extern int euler_rotation_basis(void *, void *);
 
 typedef struct {
     float x;
@@ -18,7 +19,7 @@ typedef struct {
     unsigned int w;
 } V4;
 
-void func_L05_00441EA0(char *object)
+void cam_load_entry_vectors(char *object)
 {
     char buf[16];
     int table = (int)D_L05_001B1EC4;

@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_PAL_L02_00445550, the PAL copy of func_L02_0043FA98: the same C, where rename func_002A7470 becomes func_PAL_002A7E68; scale func_002F3158(func_0031E808(135.0f, 225.0f)); rename func_002F1BE0 becomes func_00282978; rename func_0031E808 becomes func_002A7878; rename func_0031E3C0 becomes func_PAL_002A7E68; rename func_002F3158 becomes func_00283CF0. */
 
 typedef unsigned char u8;
 
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int func_00282978(void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
+extern int FastDecTimer(void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
 
 /* func_L02_00410450 is defined in L02_00410450-controller-g8.c. */
 
@@ -51,9 +52,9 @@ void func_PAL_L02_00445550(u8 *a0) {
     u8 *s1 = *(u8 **)(s0 + 0x68);
     int m;
 
-    if (func_00282978(s1 + 0x48) == 0)
+    if (FastDecTimer(s1 + 0x48) == 0)
         return;
-    if (*(int *)(s1 + 0x44) != 0 || func_002A7878(0.0f, 1.0f) < 0.8f) {
+    if (*(int *)(s1 + 0x44) != 0 || math_random_float_range(0.0f, 1.0f) < 0.8f) {
         if (*(u8 *)(s0 + 0x42) != 1)
             m = 1;
         else
@@ -64,5 +65,5 @@ void func_PAL_L02_00445550(u8 *a0) {
         if (*(u8 *)(s0 + 0x43) != 0)
             func_PAL_002A7E68(s0, 0, 0, 0x19);
     }
-    *(short *)(s1 + 0x48) = (((int)(func_00283CF0(func_002A7878(135.0f, 225.0f))) * 5 + 2) / 6);
+    *(short *)(s1 + 0x48) = (((int)(FloatToInt(math_random_float_range(135.0f, 225.0f))) * 5 + 2) / 6);
 }

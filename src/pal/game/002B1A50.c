@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -6,8 +7,8 @@ typedef unsigned char u8;
 extern u8 D_00139648;
 extern int F9a90bcc4_FUN_002A77E0(int count);
 extern u8 D_001A7A47 __attribute__((sda));
-extern u8 D_00139568[];
-extern u8 D_00239BA0[];
+extern u8 g_item_slot_to_record[];
+extern u8 g_weapon_table[];
 extern u8 D_001A7A60[] __attribute__((sda));
 
 /* func_002B1350 is defined in 002B00B0-reaction-g8.c. */

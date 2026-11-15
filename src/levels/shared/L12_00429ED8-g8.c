@@ -37,17 +37,17 @@ extern float D_L12_001B2384 __attribute__((sda));
 extern char D_L12_001B9E00[];
 extern float D_L12_001B238C[];
 extern void ref_L12_00429ED8_00(void *);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00280B90(void *, int, int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, int, int, float, float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void draw_world_quad(void *, int, int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
 
 typedef struct {
     float vertices[4][4];
@@ -66,7 +66,7 @@ typedef struct {
 } BeamState;
 
 /* Draws a glowing laser beam from flat strips with a scrolling texture and a spinning glow at its end. */
-void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
+void gfx_draw_laser_beam(int unused0, int unused1, int unused2, int unused3,
                       int unused4, char *obj)
 {
     RenderQuad quad;
@@ -78,7 +78,7 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     float angle, cosine, sine, glow;
     int i, j;
     ref_L12_00429ED8_00(&quad);
-    InitQuadPacketState(&quad, D_L12_001B2320, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, D_L12_001B2320, 1, 0x80);
     vertices = quad.vertices[1];
     u = quad.tex.uv;
     v = quad.tex.uv + 1;
@@ -142,8 +142,8 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.tex.uv[6] = 1;
     quad.tex.uv[7] = 1;
     angle = state->angle;
-    cosine = FastSinOrCosA(angle);
-    sine = FastSinOrCosB(angle);
+    cosine = math_fast_sin_or_cos_a(angle);
+    sine = math_fast_sin_or_cos_b(angle);
     {
         float *q = v;
         float *p = u;
@@ -159,7 +159,7 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
         }
     }
     state->angle = FastAddRotations(state->angle, D_L12_001B2314 * 0.017453294f);
-    InitQuadPacketState(&quad, D_L12_001B2324, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, D_L12_001B2324, 1, 0x80);
     quad.colors[1] = D_L12_001B2308 << 24;
     quad.colors[1] |= D_L12_001B2358 << 16;
     quad.colors[1] |= D_L12_001B2354 << 8;
@@ -238,10 +238,10 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     FastVecAdd(quad.vertices[2], center, width);
     FastVecSub(quad.vertices[3], center, width);
     draw_world_quad(&quad, 0, 0);
-    DrawBillboardQuad_00281EB8(obj + 0x10, D_L12_001B22FC, D_L12_001B2304, 1,
-                   D_L12_001B2300, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(obj + 0x10, D_L12_001B22FC, D_L12_001B2304, 1,
+                   D_L12_001B2300, 0.08f, math_random_angle());
     glow = D_L12_001B2300;
     glow *= 0.4f;
-    DrawBillboardQuad_00281EB8(obj + 0x10, D_L12_001B22FC, 0x80808080, 1,
-                   glow, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(obj + 0x10, D_L12_001B22FC, 0x80808080, 1,
+                   glow, 0.08f, math_random_angle());
 }

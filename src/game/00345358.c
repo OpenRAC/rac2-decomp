@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float *func_00335E10(char *);
-extern void func_0034AA30(char *);
-extern void func_00349680(char *, int);
+extern float *object_get_first_field(char *);
+extern void hud_meter_bar_update(char *);
+extern void anim_update_keyframe(char *, int);
 extern float ref_L00_001AEAC8_00 __attribute__((section(".sdata")));
 extern float ref_L00_001AEACC_00 __attribute__((section(".sdata")));
 extern float ref_L00_001AEAD0_00 __attribute__((section(".sdata")));
@@ -50,9 +50,9 @@ extern void F5a9e4f98_FUN_00336968(char *p);
 
 extern void F5a9e4f98_FUN_003366D0(char *p);
 
-extern unsigned long long func_00347EA0(unsigned long long);
+extern unsigned long long menu_pass_through_handle(unsigned long long);
 
-extern unsigned long long func_00336968(unsigned long long);
+extern unsigned long long hud_construct_widget_base(unsigned long long);
 
 typedef int s32;
 
@@ -60,9 +60,9 @@ typedef unsigned char u8;
 
 typedef float f32;
 
-extern void func_00348068(unsigned char *owner, float *records);
+extern void menu_set_entry_table(unsigned char *owner, float *records);
 
-extern int func_00348128(unsigned char *);
+extern int menu_get_selected_index(unsigned char *);
 
 extern void Faac80289_FUN_003361A8(char *p);
 
@@ -70,7 +70,7 @@ extern void Faac80289_FUN_00336968(char *p);
 
 extern char *D_L00_001A904C_3 __attribute__((sda));
 
-extern void func_00336390(char *dst, char *src, int value);
+extern void object_set_helper_result(char *dst, char *src, int value);
 
 extern int func_00288FB8_2(int a);
 
@@ -78,7 +78,7 @@ extern void func_L00_0042C360_1(char *a, int b);
 
 extern void func_003495D8_1(char *o, int n, float a, float b, float c, float d, float e);
 
-extern void func_00349610(char *o, int n, float a, float b);
+extern void anim_set_key_range(char *o, int n, float a, float b);
 
 typedef struct { f32 x, y, z, w; } JammingParameterRow;
 
@@ -128,7 +128,7 @@ extern unsigned char D_0018C0D4[];
 extern void func_00349630_2(char *, int);
 
 /* func_0034CA68: owner ABI/declaration review retained. */
-extern int func_00335E20(unsigned char *field);
+extern int object_get_fourth_field(unsigned char *field);
 
 extern void F72a1dff5_FUN_00349AB8(char *p, int a);
 
@@ -144,16 +144,16 @@ extern void F01bd4546_FUN_00349678(char *p, float v);
 
 extern void F076896f4_FUN_00349AB8(void *, int);
 
-extern int func_002A9588(int, int, int, int, int);
-extern void func_00336320(char *);
-extern void func_00336548(char *);
-extern void func_0034A808(char *, int, int, float *, float *, float *, int *);
-extern void func_00335E38(char *, float, float, float, float);
-extern void func_00335F88(char *, float, float, float, float);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern void gfx_draw_screen_element_stored(char *);
+extern void hud_draw_progress_bar(char *);
+extern void menu_grid_compute_tile_placement(char *, int, int, float *, float *, float *, int *);
+extern void object_set_first_float4(char *, float, float, float, float);
+extern void object_set_second_float4(char *, float, float, float, float);
 extern char *D_001A8CFC __attribute__((section(".sdata")));
 
 /* Draws every part of a menu screen (labels, icons and buttons) when the screen is switched on. */
-void func_00345358(char *menu)
+void menu_screen_draw_parts(char *menu)
 {
     if (*(int *)(menu + 1080) != 0) {
         char *titleLabel = menu + 456;
@@ -176,7 +176,7 @@ void func_00345358(char *menu)
 }
 
 /* Sets up all the sprites and labels of a menu screen. */
-char *func_00345400(char *menu)
+char *menu_screen_init_parts(char *menu)
 {
     F449e2f67_FUN_003361A8(menu);
     F449e2f67_FUN_003361A8(menu + 76);
@@ -207,7 +207,7 @@ char *func_00345400(char *menu)
 
 
 /* Draws every part of a bigger menu screen when it is switched on. */
-void func_003465D0(char *menu)
+void menu_screen_large_draw_parts(char *menu)
 {
     if (*(int *)(menu + 1160) == 0)
         return;
@@ -228,7 +228,7 @@ void func_003465D0(char *menu)
 }
 
 /* Sets up all the sprites and labels of a menu screen with many parts. */
-void *func_00346670(char *menu)
+void *menu_screen_large_init_parts(char *menu)
 {
     F5a9e4f98_FUN_003361A8(menu);
     F5a9e4f98_FUN_003361A8(menu + 0x4c);
@@ -255,12 +255,12 @@ void *func_00346670(char *menu)
 typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
 extern MenuGridEntry D_00259F58[];
-extern u8 D_001A7AF8[] __attribute__((section(".sdata")));
+extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
 extern u8 D_001A7A80[] __attribute__((section(".sdata")));
 extern MenuLabelOffset ref_003472B8_00;
-extern void func_00335E68(void *, int);
+extern void object_set_flag_value(void *, int);
 
-void func_003472B8(char *obj)
+void UpdateMenuGridLabels(char *obj)
 {
     MenuLabelOffset pad;
     char *a;
@@ -270,24 +270,24 @@ void func_003472B8(char *obj)
     int bits;
     int index = D_00259F58[*(int *)(obj + 0x4FC) + *(int *)(obj + 0x500) * 4].id;
 
-    if (gItemOwnedFlags[index] == 0)
+    if (g_item_owned_flags[index] == 0)
         return;
     a = obj + 0x2E8;
     pad = ref_003472B8_00;
     flags = &D_001A7A80[index];
     b = obj + 0x330;
     bits = flags[0] & 4;
-    SetFlagValue(a, (flags[0] & 1) | (bits != 0));
+    object_set_flag_value(a, (flags[0] & 1) | (bits != 0));
     {
         int b2 = flags[0] & 0x10;
-        SetFlagValue(b, b2 != 0);
+        object_set_flag_value(b, b2 != 0);
     }
-    x = (*(float **)(obj + 0x498))[0] + GetFirstField(a)[0] + (float)pad.x;
-    y = (*(float **)(obj + 0x498))[1] + GetFirstField(a)[1] + (float)pad.y;
-    SetFirstFloat4(a, x, y, 0.0f, 0.0f);
-    x2 = (*(float **)(obj + 0x498))[0] + GetFirstField(b)[0] + (float)pad.x;
-    y2 = (*(float **)(obj + 0x498))[1] + GetFirstField(b)[1] + (float)pad.y;
-    SetFirstFloat4(b, x2, y2, 0.0f, 0.0f);
+    x = (*(float **)(obj + 0x498))[0] + object_get_first_field(a)[0] + (float)pad.x;
+    y = (*(float **)(obj + 0x498))[1] + object_get_first_field(a)[1] + (float)pad.y;
+    object_set_first_float4(a, x, y, 0.0f, 0.0f);
+    x2 = (*(float **)(obj + 0x498))[0] + object_get_first_field(b)[0] + (float)pad.x;
+    y2 = (*(float **)(obj + 0x498))[1] + object_get_first_field(b)[1] + (float)pad.y;
+    object_set_first_float4(b, x2, y2, 0.0f, 0.0f);
 }
 
 /* func_00347468 is built from 00345358-selection-g8.c. */
@@ -295,30 +295,30 @@ void func_003472B8(char *obj)
 /* func_003478F0 is defined in 003478F0-grid-g8.c. */
 
 /* Passes a value to a helper and gives the same value back. */
-unsigned long long func_00347EA0(unsigned long long handle)
+unsigned long long menu_pass_through_handle(unsigned long long handle)
 {
-    ConstructWidgetBase(handle);
+    hud_construct_widget_base(handle);
     return handle;
 }
 
-extern int func_00336E40(void *);
-extern void *func_00336DA8(int, int);
-extern void *func_003369A8(void *, void *, void *);
+extern int pool_alloc_cell(void *);
+extern void *ui_return_second_arg(int, int);
+extern void *hud_init_widget_defaults(void *, void *, void *);
 extern char D_001AE5A8[];
 
 /* Resets a list menu to its start state and attaches its item data. */
-void func_00347EC8(char *menu, void *items)
+void list_menu_reset_attach_items(char *menu, void *items)
 {
     int *cursorPos;
     *(int *)(menu + 0x50) = 0;
     *(int *)(menu + 0xB0) = 0;
     *(void **)(menu + 0x48) = items;
     if (items) {
-        cursorPos = ReturnSecondArgument(16, AllocPoolCell(items));
+        cursorPos = ui_return_second_arg(16, pool_alloc_cell(items));
         *(int **)(menu + 0x4C) = cursorPos;
         cursorPos[1] = 0; cursorPos[2] = 0; cursorPos[3] = 0; cursorPos[0] = 0;
     }
-    InitWidgetDefaults(menu, D_001AE5A8, items);
+    hud_init_widget_defaults(menu, D_001AE5A8, items);
     *(int *)(menu + 0x9C) = 0x70FFFEED;
     *(int *)(menu + 0xA0) = 0x80F0F0F0;
     *(int *)(menu + 0xA4) = 0x80808080;
@@ -333,7 +333,7 @@ void func_00347EC8(char *menu, void *items)
 
 
 /* Points the menu at a table of entries and counts how many are in use. */
-void func_00348068(u8 *menu,f32 *entries) {
+void menu_set_entry_table(u8 *menu,f32 *entries) {
  f32 *end;
  *(f32 **)(menu+0x58)=entries;
  *(s32 *)(menu+0xb0)=0;
@@ -348,17 +348,17 @@ void func_00348068(u8 *menu,f32 *entries) {
 }
 
 /* Stores two settings on a menu object. */
-void func_003480D8(u8 *menu, s32 first, s32 second) { *(s32 *)(menu + 0xa8) = first; *(s32 *)(menu + 0xac) = second; }
+void menu_set_settings(u8 *menu, s32 first, s32 second) { *(s32 *)(menu + 0xa8) = first; *(s32 *)(menu + 0xac) = second; }
 
 /* Stores a value in a menu field. */
-void func_003480E8(int menu, unsigned int value)
+void menu_set_field_b8(int menu, unsigned int value)
 {
   *(unsigned int *)(menu + 0xb8) = value;
   return;
 }
 
 /* Sets the first two numbers of the menu's position and clears the other two. */
-void func_003480F0(u8 *menu,f32 posX,f32 posY) {
+void menu_set_position(u8 *menu,f32 posX,f32 posY) {
  (*(f32 **)(menu+0x4c))[0]=posX;
  (*(f32 **)(menu+0x4c))[1]=posY;
  (*(s32 **)(menu+0x4c))[2]=0;
@@ -367,24 +367,24 @@ void func_003480F0(u8 *menu,f32 posX,f32 posY) {
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Sets the selected entry number of a menu. */
-void func_00348118(u8 *menu, s32 index) { *(s32 *)(menu + 0x50) = index; }
+void menu_set_selected_index(u8 *menu, s32 index) { *(s32 *)(menu + 0x50) = index; }
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a menu field. */
-void func_00348120(u8 *menu, s32 value) { *(s32 *)(menu + 0xbc) = value; }
+void menu_set_field_bc(u8 *menu, s32 value) { *(s32 *)(menu + 0xbc) = value; }
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Gives back the selected entry number of a menu. */
-s32 func_00348128(u8 *menu) { return *(s32 *)(menu + 0x50); }
+s32 menu_get_selected_index(u8 *menu) { return *(s32 *)(menu + 0x50); }
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Gives back how many entries a menu has. */
-s32 func_00348130(u8 *menu) { return *(s32 *)(menu + 0xb0); }
+s32 menu_get_entry_count(u8 *menu) { return *(s32 *)(menu + 0xb0); }
 
 /* func_00348138 is built from 00345358-menu.c. */
 
 /* Sets up the seven sprites and seven labels of a menu screen. */
-char *func_003484C8(char *menu)
+char *menu_init_seven_labels(char *menu)
 {
     char *label = menu + 536;
     int i;
@@ -407,29 +407,29 @@ char *func_003484C8(char *menu)
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a menu field. */
-void func_00348570(u8 *menu, s32 value) { *(s32 *)(menu + 0x448) = value; }
+void menu_set_field_448(u8 *menu, s32 value) { *(s32 *)(menu + 0x448) = value; }
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in another menu field. */
-void func_00348578(u8 *menu, s32 value) { *(s32 *)(menu + 0x44c) = value; }
+void menu_set_field_44c(u8 *menu, s32 value) { *(s32 *)(menu + 0x44c) = value; }
 
 /* Forwards one shared global pointer plus a fixed byte offset, together with five distinct fixed offsets of the first object, into the same callee five times, reading one distinct word of the second object each call. */
 /* Loads five menu sprites from the shared sprite data, one for each given value. */
-void func_00348580(char *menu, int *spriteIds)
+void menu_load_sprites_from_values(char *menu, int *spriteIds)
 {
-    SetFieldAt40(menu,       D_L00_001A904C_3 + 0x8710, spriteIds[0]);
-    SetFieldAt40(menu + 304, D_L00_001A904C_3 + 0x8710, spriteIds[2]);
-    SetFieldAt40(menu + 76,  D_L00_001A904C_3 + 0x8710, spriteIds[4]);
-    SetFieldAt40(menu + 152, D_L00_001A904C_3 + 0x8710, spriteIds[8]);
-    SetFieldAt40(menu + 228, D_L00_001A904C_3 + 0x8710, spriteIds[6]);
+    object_set_helper_result(menu,       D_L00_001A904C_3 + 0x8710, spriteIds[0]);
+    object_set_helper_result(menu + 304, D_L00_001A904C_3 + 0x8710, spriteIds[2]);
+    object_set_helper_result(menu + 76,  D_L00_001A904C_3 + 0x8710, spriteIds[4]);
+    object_set_helper_result(menu + 152, D_L00_001A904C_3 + 0x8710, spriteIds[8]);
+    object_set_helper_result(menu + 228, D_L00_001A904C_3 + 0x8710, spriteIds[6]);
 }
 
 /* Stores a value in a slot of a small table in the menu. */
-void func_00348630(u8 *menu, s32 slot, s32 value) { menu += slot * 4; *(s32 *)(menu + 0x418) = value; }
+void menu_set_table_slot(u8 *menu, s32 slot, s32 value) { menu += slot * 4; *(s32 *)(menu + 0x418) = value; }
 
 /* stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper. */
 /* Sets how many icons the menu shows and prepares each icon from a list. */
-void func_00348640(char *menu, int count, int *iconIds)
+void menu_set_icon_count_and_icons(char *menu, int count, int *iconIds)
 {
     int i;
 
@@ -444,12 +444,12 @@ void func_00348640(char *menu, int count, int *iconIds)
 
 
 /* Gives back the object it was given. */
-void *func_00349148(void *object) {
+void *menu_return_object(void *object) {
     return object;
 }
 
 /* Clears a menu and sets all its sixteen entries to empty. */
-void func_00349150(s32 *menu) {
+void menu_clear_entries(s32 *menu) {
  u8 *entry=(u8 *)menu+0x50; s32 empty=-1; s32 i=15;
  menu[0]=0;menu[0x52]=0;
  do {
@@ -462,17 +462,17 @@ void func_00349150(s32 *menu) {
 /* func_00349190 is built from 00345358-input-g8.c. */
 
 /* Clears a menu field. */
-void func_00349488(int *menu)
+void menu_clear_field_150(int *menu)
 {
     menu[0x150 / sizeof(int)] = 0;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a menu field. */
-void func_00349490(u8 *menu, s32 value) { *(s32 *)(menu + 0x144) = value; }
+void menu_set_field_144(u8 *menu, s32 value) { *(s32 *)(menu + 0x144) = value; }
 
 /* Clears sixteen words of a block to zero and gives the block back. */
-u8 *func_00349498(u8 *block) {
+u8 *menu_clear_sixteen_words(u8 *block) {
  s32 *word=(s32 *)(block+0x30);s32 i=3;
  do {
   word[0]=0;word[1]=0;word[2]=0;word[3]=0;
@@ -483,7 +483,7 @@ u8 *func_00349498(u8 *block) {
 
 /* Zeroes six word fields of an object, reads back the first one as a float, calls a helper twice with that float (then with 1.0f) over five float arguments, sets two more int fields, and calls a second helper with two float arguments. */
 /* Sets up a fade effect with its starting values. */
-void func_003494D0(char *fade)
+void fade_init(char *fade)
 {
     float start;
 
@@ -496,7 +496,7 @@ void func_003494D0(char *fade)
     func_003495D8_1(fade, 0, start, start, start, start, start);
     func_003495D8_1(fade, 1, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
     *(int *)(fade + 132) = 2;
-    SetAnimationKeyRange(fade, 0, start, start);
+    anim_set_key_range(fade, 0, start, start);
     *(int *)(fade + 32) = 0;
     *(int *)(fade + 28) = 1;
 }
@@ -504,7 +504,7 @@ void func_003494D0(char *fade)
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a fade field. */
-void func_00349590(u8 *fade, s32 value) { *(s32 *)(fade + 0x2c) = value; }
+void fade_set_field_2c(u8 *fade, s32 value) { *(s32 *)(fade + 0x2c) = value; }
 
 
 typedef struct {
@@ -515,7 +515,7 @@ typedef struct {
 } Value_3495A0;
 
 /* Resets the fade amount to zero and returns the old amount. */
-float func_003495A0(Value_3495A0 *fade) {
+float fade_reset_amount(Value_3495A0 *fade) {
     float previous = fade->value;
     fade->value = 0.0f;
     fade->mode = 1;
@@ -524,13 +524,13 @@ float func_003495A0(Value_3495A0 *fade) {
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a fade field. */
-void func_003495C0(u8 *fade, s32 value) { *(s32 *)(fade + 0x80) = value; }
+void fade_set_field_80(u8 *fade, s32 value) { *(s32 *)(fade + 0x80) = value; }
 
 /* Swaps in a new value and returns the old one. */
-s32 func_003495C8(u8 *fade, s32 newValue) { s32 oldValue = *(s32 *)(fade + 0x28); *(s32 *)(fade + 0x28) = newValue; return oldValue; }
+s32 fade_swap_field_28(u8 *fade, s32 newValue) { s32 oldValue = *(s32 *)(fade + 0x28); *(s32 *)(fade + 0x28) = newValue; return oldValue; }
 
 /* Store an indexed four-component parameter row and its float weight */
-void func_003495D8(f32 weight, f32 x, f32 y, f32 z, f32 w, JammingParameterRows *object, s32 index) {
+void fade_set_parameter_row(f32 weight, f32 x, f32 y, f32 z, f32 w, JammingParameterRows *object, s32 index) {
     object->rows[index].x = x;
     object->rows[index].y = y;
     object->rows[index].z = z;
@@ -539,12 +539,12 @@ void func_003495D8(f32 weight, f32 x, f32 y, f32 z, f32 w, JammingParameterRows 
 }
 
 /* Stores a value in a field of an effect. */
-void func_00349628(int effect, int value) {
+void effect_set_field_84(int effect, int value) {
     *(int *)(effect + 0x84) = value;
 }
 
 /* Starts a fade in one direction, unless one is already running. */
-void func_00349630(u8 *fade,s32 direction) {
+void fade_start_direction(u8 *fade,s32 direction) {
  *(s32 *)(fade+0x1c)=direction;
  if(*(s32 *)(fade+0x28)==0) {
   if(direction==1) *(f32 *)(fade+0x18)=0.0f;
@@ -554,7 +554,7 @@ void func_00349630(u8 *fade,s32 direction) {
 }
 
 /* Stores a value in a field of an effect. */
-void func_00349670(int effect, unsigned int value)
+void effect_set_field_20(int effect, unsigned int value)
 {
   *(unsigned int *)(effect + 32) = value;
   return;
@@ -562,12 +562,12 @@ void func_00349670(int effect, unsigned int value)
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Sets the speed of a fade. */
-void func_00349678(u8 *fade, f32 speed) { *(f32 *)(fade + 0x24) = speed; }
+void fade_set_speed(u8 *fade, f32 speed) { *(f32 *)(fade + 0x24) = speed; }
 
 /* func_00349680 is built with float min/max in 00345358-interpolation.c. */
 
 /* Clears two groups of three rows to zero and gives the block back. */
-u8 *func_00349918(u8 *block) {
+u8 *effect_clear_row_groups(u8 *block) {
  s32 *word=(s32 *)(block+0x2c); s32 i=1;
  do {
   s32 *groupEnd=word+12;
@@ -585,7 +585,7 @@ u8 *func_00349918(u8 *block) {
 
 /* Initialises a record of four 1.0 floats, one zero, one small constant and four zero words, then runs the same four-argument setup four times with two selector flags swept over 0 and 1. */
 /* Sets up a color effect with default values for all four combinations of its two switches. */
-void func_00349970(S_F49afcbfe *effect)
+void color_effect_init(S_F49afcbfe *effect)
 {
     float zero;
 
@@ -608,10 +608,10 @@ void func_00349970(S_F49afcbfe *effect)
 
 
 /* Stores a value in a slot of a small table. */
-void func_00349A60(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x20) = value; }
+void effect_set_table_slot(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x20) = value; }
 
 /* Store four float components in a selected row of a parameter group */
-void func_00349A70(f32 x, f32 y, f32 z, f32 w, JammingGridObject *object, s32 row, s32 group) {
+void color_effect_set_grid_row(f32 x, f32 y, f32 z, f32 w, JammingGridObject *object, s32 row, s32 group) {
     object->groups[group].rows[row].x = x;
     object->groups[group].rows[row].y = y;
     object->groups[group].rows[row].z = z;
@@ -619,10 +619,10 @@ void func_00349A70(f32 x, f32 y, f32 z, f32 w, JammingGridObject *object, s32 ro
 }
 
 /* Stores a value in a slot of a small table. */
-void func_00349AA8(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x8C) = value; }
+void effect_set_table_slot_8c(u8 *effect, s32 slot, s32 value) { effect += slot * 4; *(s32 *)(effect + 0x8C) = value; }
 
 /* Starts a fade-in or fade-out going forward, from fully off or fully on. */
-void func_00349AB8(u8 *fade,s32 startFull) {
+void fade_start_forward(u8 *fade,s32 startFull) {
  if(startFull!=0) *(f32 *)(fade+0x10)=1.0f;
  else *(f32 *)(fade+0x10)=0.0f;
  *(s32 *)(fade+0x14)=1;
@@ -630,7 +630,7 @@ void func_00349AB8(u8 *fade,s32 startFull) {
 }
 
 /* Starts a fade going backward, from fully on or fully off. */
-void func_00349AE0(u8 *fade,s32 startEmpty) {
+void fade_start_backward(u8 *fade,s32 startEmpty) {
  if(startEmpty!=0) *(f32 *)(fade+0x10)=0.0f;
  else *(f32 *)(fade+0x10)=1.0f;
  *(s32 *)(fade+0x14)=-1;
@@ -639,40 +639,40 @@ void func_00349AE0(u8 *fade,s32 startEmpty) {
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Sets the current amount of a fade. */
-void func_00349B18(u8 *fade, f32 amount) { *(f32 *)(fade + 0x18) = amount; }
+void fade_set_amount(u8 *fade, f32 amount) { *(f32 *)(fade + 0x18) = amount; }
 
-extern void func_003361A8(char *);
-extern void func_003363D0(char *);
-extern char *func_00335AC8(char *);
+extern void object_construct_derived_a(char *);
+extern void object_construct_derived_b(char *);
+extern char *object_init_type_pointer(char *);
 extern char D_001AD908[] __attribute__((sda));
 extern char D_001AD928[] __attribute__((sda));
 
 /* Sets up the sprites, labels and fade effects of a meter screen. */
-char *func_00349CB8(char *meter)
+char *meter_screen_init_parts(char *meter)
 {
-    ConstructDerivedObjectA(meter + 0x10);
-    ConstructDerivedObjectA(meter + 0x5C);
-    ConstructDerivedObjectA(meter + 0xA8);
-    ConstructDerivedObjectB(meter + 0xF4);
-    ClearSixteenWords(meter + 0x140);
-    InitObjectTypePointer(meter + 0x1CC);
+    object_construct_derived_a(meter + 0x10);
+    object_construct_derived_a(meter + 0x5C);
+    object_construct_derived_a(meter + 0xA8);
+    object_construct_derived_b(meter + 0xF4);
+    menu_clear_sixteen_words(meter + 0x140);
+    object_init_type_pointer(meter + 0x1CC);
     *(char **)(meter + 0x1CC) = D_001AD908;
-    InitObjectTypePointer(meter + 0x1D0);
+    object_init_type_pointer(meter + 0x1D0);
     *(char **)(meter + 0x1D0) = D_001AD928;
-    ClearSixteenWords(meter + 0x1D4);
-    ClearSixteenWords(meter + 0x25C);
-    ClearSixteenWords(meter + 0x2E4);
-    ClearSixteenWords(meter + 0x36C);
+    menu_clear_sixteen_words(meter + 0x1D4);
+    menu_clear_sixteen_words(meter + 0x25C);
+    menu_clear_sixteen_words(meter + 0x2E4);
+    menu_clear_sixteen_words(meter + 0x36C);
     return meter;
 }
 
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in the first field of an object. */
-void func_0034A4A8(u8 *object, s32 value) { *(s32 *)(object + 0x0) = value; }
+void menu_set_first_field(u8 *object, s32 value) { *(s32 *)(object + 0x0) = value; }
 
 /* Replace the value at offset 0x04 and, when it changes while the bound debug byte is zero, retain the previous value and set the two counters to 180 and 300; original game role is unknown. */
-void func_0034A4B0(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int value)
+void meter_set_value_start_timers(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int value)
 {
     int previous = owner->value_04;
     if (previous != value && D_0018C0D4[0] == 0) {
@@ -689,10 +689,10 @@ typedef struct { float values[3]; } StageFloatTable;
 typedef struct { int values[3]; } StageIntTable;
 extern const StageFloatTable D_001AE628, D_001AE638;
 extern const StageIntTable D_001AE648, D_001AE658;
-extern void func_003363C0(char *widget, float position);
+extern void object_set_value_float(char *widget, float position);
 
 /* Works out the layout of the item grid for the given item number and sets up its two arrow sprites. */
-float func_0034A4E0(char *screen, int type, int *columns, int *rows,
+float item_grid_layout(char *screen, int type, int *columns, int *rows,
                     float *spacing, int *xOffset, int *yOffset, int *flag,
                     float *extra)
 {
@@ -720,10 +720,10 @@ float func_0034A4E0(char *screen, int type, int *columns, int *rows,
         *yOffset = yOffsets.values[0];
         result = results.values[0];
         *extra = 0.0f;
-        SetFloatAt38((char *)&owner->left, position);
-        SetFloatAt38((char *)&owner->right, position);
-        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 17);
-        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 18);
+        object_set_value_float((char *)&owner->left, position);
+        object_set_value_float((char *)&owner->right, position);
+        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 17);
+        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 18);
     } else if (type >= 21 && type <= 40) {
         int row = index / 4 - 5;
         if (row < 0) row = 0;
@@ -734,10 +734,10 @@ float func_0034A4E0(char *screen, int type, int *columns, int *rows,
         *yOffset = yOffsets.values[1];
         *extra = -0.5f;
         result = results.values[1];
-        SetFloatAt38((char *)&owner->left, position);
-        SetFloatAt38((char *)&owner->right, position);
-        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 19);
-        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 20);
+        object_set_value_float((char *)&owner->left, position);
+        object_set_value_float((char *)&owner->right, position);
+        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 19);
+        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 20);
     } else if (type >= 41 && type <= 80) {
         int row = index / 4 - 10;
         if (row < 0) row = 0;
@@ -749,10 +749,10 @@ float func_0034A4E0(char *screen, int type, int *columns, int *rows,
         *extra = -0.5f;
         *flag = 1;
         result = results.values[2];
-        SetFloatAt38((char *)&owner->left, position);
-        SetFloatAt38((char *)&owner->right, position);
-        SetFieldAt40((char *)&owner->left, D_001A8CFC + 0x8710, 21);
-        SetFieldAt40((char *)&owner->right, D_001A8CFC + 0x8710, 22);
+        object_set_value_float((char *)&owner->left, position);
+        object_set_value_float((char *)&owner->right, position);
+        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 21);
+        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 22);
     }
     return result;
 }
@@ -762,9 +762,9 @@ float func_0034A4E0(char *screen, int type, int *columns, int *rows,
 /* func_0034AA30 is built from 0034AA30.c. */
 
 /* Moves the labels to follow the screen position, updates the meter and counts down the show timer. */
-void func_0034AC10(char *meter)
+void meter_screen_update(char *meter)
 {
-    float *labelPos = GetFirstField(meter + 0x5C);
+    float *labelPos = object_get_first_field(meter + 0x5C);
 
     {
         float x = ref_L00_001AEAC8_00;
@@ -774,7 +774,7 @@ void func_0034AC10(char *meter)
         labelPos[1] = y + (*(float **)(meter + 8))[1];
     }
 
-    labelPos = GetFirstField(meter + 0xA8);
+    labelPos = object_get_first_field(meter + 0xA8);
     {
         float x = ref_L00_001AEAD0_00;
         float px = (*(float **)(meter + 8))[0];
@@ -783,8 +783,8 @@ void func_0034AC10(char *meter)
         labelPos[1] = y + (*(float **)(meter + 8))[1];
     }
 
-    UpdateHudMeterBar(meter);
-    UpdateKeyframeAnimation(meter + 0x140, 1);
+    hud_meter_bar_update(meter);
+    anim_update_keyframe(meter + 0x140, 1);
 
     if (*(int *)(meter + 0x3F4) != 0) {
         int timeLeft = *(int *)(meter + 0x3F4) - 1;
@@ -801,21 +801,21 @@ void func_0034AC10(char *meter)
     }
 }
 
-void func_0034AD10(char *o)
+void DrawSegmentedRingMeter(char *o)
 {
     if (*(int *)(o + 0xC)) {
         float x, y, size;
         int mode, color = 0, i;
 
-        DrawScreenElementAtStoredPosition(o + 0x5C);
-        DrawScreenElementAtStoredPosition(o + 0xA8);
-        DrawProgressBar(o + 0xF4);
+        gfx_draw_screen_element_stored(o + 0x5C);
+        gfx_draw_screen_element_stored(o + 0xA8);
+        hud_draw_progress_bar(o + 0xF4);
         x = 0;
         y = 0;
         size = 0;
         mode = 0;
         if (*(int *)(o + 0x3F8)) {
-            color = PingPongBlendValues(-1, 0x22222222, 10, 0, 0);
+            color = math_ping_pong_blend_values(-1, 0x22222222, 10, 0, 0);
             --*(int *)(o + 0x3F8);
         }
         for (i = 0; i < *(int *)(o + 4); i++) {
@@ -824,8 +824,8 @@ void func_0034AD10(char *o)
 
             if (*(int *)(o + 0x3F8) && i >= *(int *)(o + 0x3FC))
                 flash = 1;
-            ComputeGridTilePlacement(o, *(int *)(o + 4), i, &x, &y, &size, &mode);
-            SetFirstFloat4(o + 0x10, x, y, 0, 0);
+            menu_grid_compute_tile_placement(o, *(int *)(o + 4), i, &x, &y, &size, &mode);
+            object_set_first_float4(o + 0x10, x, y, 0, 0);
             sx = size;
             sy = size;
             switch (mode) {
@@ -842,45 +842,45 @@ void func_0034AD10(char *o)
                 sx = -sx;
                 break;
             }
-            SetSecondFloat4(o + 0x10, sx, sy, 0, 0);
+            object_set_second_float4(o + 0x10, sx, sy, 0, 0);
             if (*(int *)(o + 4) < 21) {
                 if (*(int *)o >= i + 1) {
-                    SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 26);
+                    object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 26);
                     if (flash)
-                        *(int *)GetFieldC((unsigned char *)o + 0x10) = color;
+                        *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = color;
                     else
-                        *(float *)GetFieldC((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
-                    DrawScreenElementAtStoredPosition(o + 0x10);
+                        *(float *)object_get_fourth_field((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
+                    gfx_draw_screen_element_stored(o + 0x10);
                 }
-                SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 25);
-                *(int *)GetFieldC((unsigned char *)o + 0x10) = 0x55F0C070;
-                DrawScreenElementAtStoredPosition(o + 0x10);
+                object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 25);
+                *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = 0x55F0C070;
+                gfx_draw_screen_element_stored(o + 0x10);
             } else {
                 if (*(int *)o >= i + 1) {
-                    SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 27);
+                    object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 27);
                     if (flash)
-                        *(int *)GetFieldC((unsigned char *)o + 0x10) = color;
+                        *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = color;
                     else
-                        *(float *)GetFieldC((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
-                    DrawScreenElementAtStoredPosition(o + 0x10);
+                        *(float *)object_get_fourth_field((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
+                    gfx_draw_screen_element_stored(o + 0x10);
                 }
-                SetFieldAt40(o + 0x10, D_001A8CFC + 0x8710, 24);
-                *(int *)GetFieldC((unsigned char *)o + 0x10) = 0x55F0C070;
-                DrawScreenElementAtStoredPosition(o + 0x10);
+                object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 24);
+                *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = 0x55F0C070;
+                gfx_draw_screen_element_stored(o + 0x10);
             }
         }
     }
 }
 
 /* Sets the position of the object to the two given numbers. */
-void func_0034AFE8(u8 *object, f32 posX, f32 posY) {
+void menu_set_object_position(u8 *object, f32 posX, f32 posY) {
     *(f32 *)*(u8 **)(object + 0x8) = posX;
     *(f32 *)(*(u8 **)(object + 0x8) + 0x4) = posY;
 }
 
 /* Stores an argument at +1012; if the word at +1024 is zero it returns, else it clears +1024, sets +12 to 1 and calls one callee four times on this+468/604/740/876 with argument 1. */
 /* Stores a value, and if a pending flag is set, clears it and restarts four fades. */
-void func_0034B000(char *menu, int value)
+void menu_set_flag_restart_fades(char *menu, int value)
 {
     *(int *)(menu + 1012) = value;
     if (*(int *)(menu + 1024) == 0)
@@ -898,29 +898,29 @@ void func_0034B000(char *menu, int value)
 /* func_0034B2C8 is defined in 0034B2C8-hud.c. */
 
 /* Reads the top byte of the color of the label at the end of the screen. */
-unsigned int func_0034CA68(unsigned char *screen)
+unsigned int menu_get_label_color_alpha(unsigned char *screen)
 {
-    unsigned int address = (unsigned int)GetFieldC(screen + 0x358);
+    unsigned int address = (unsigned int)object_get_fourth_field(screen + 0x358);
     return *(unsigned int *)address & 0xff000000u;
 }
 
-extern void func_00336920(char *, int, int);
+extern void hud_set_widget_value_pair(char *, int, int);
 /* Switches the screen mode and starts the matching sound. */
-void func_0034CA90(char *screen, int mode)
+void menu_set_screen_mode_and_sound(char *screen, int mode)
 {
     *(int *)(screen + 0x1584) = mode;
     switch (mode) {
     case 0:
-        SetWidgetValuePair(screen + 0x280, 0x7567, 0);
+        hud_set_widget_value_pair(screen + 0x280, 0x7567, 0);
         break;
     case 1:
-        SetWidgetValuePair(screen + 0x280, 0xEAA2, 0);
+        hud_set_widget_value_pair(screen + 0x280, 0xEAA2, 0);
         break;
     }
 }
 
 /* Stores a value and, when a pending flag is set, restarts the screen fades and sound. */
-void func_0034CAE8(char *screen, void *sound, int value)
+void menu_set_screen_value_restart_fades(char *screen, void *sound, int value)
 {
     *(int *)(screen + 0x1564) = value;
     if (*(int *)(screen + 0x1568) != 0) {
@@ -938,7 +938,7 @@ void func_0034CAE8(char *screen, void *sound, int value)
 }
 
 /* Stores a value and, when a pending flag is set, restarts six fades with a speed that depends on a setting. */
-void func_0034CB88(char *screen, int value)
+void menu_set_screen_value_restart_six_fades(char *screen, int value)
 {
     char *fade1, *fade2, *fade3, *fade4, *fade5, *fade6;
 
@@ -968,26 +968,26 @@ void func_0034CB88(char *screen, int value)
 }
 
 extern int D_00138344;
-extern int func_002A9588(int, int, int, int, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
 
-extern float *func_00336318(void *);
-extern void func_00335E68(void *, int);
+extern float *object_get_field_a(void *);
+extern void object_set_flag_value(void *, int);
 /* Shows a label with a new color and value, and makes a sound if a button is held. */
-void func_0034CD70(char *screen, int text, float value)
+void menu_show_colored_label(char *screen, int text, float value)
 {
     int *color;
     char *label;
     if (D_00138344 & 0xF000)
-        PingPongBlendValues(0, 0, 1, 0, 1);
+        math_ping_pong_blend_values(0, 0, 1, 0, 1);
     label = screen + 0x5B8;
-    color = (int *)GetFieldC((unsigned char *)label);
-    *color = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    *GetFieldAt38(label) = value;
-    SetFlagValue(label, text);
+    color = (int *)object_get_fourth_field((unsigned char *)label);
+    *color = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    *object_get_field_a(label) = value;
+    object_set_flag_value(label, text);
 }
 
 /* Stores a value and, when a pending flag is set, restarts four fades. */
-void func_0034CE28(int *screen, int value)
+void menu_set_screen_value_restart_four_fades(int *screen, int value)
 {
     screen[1371] = value;
     if (screen[1372] != 0) {
@@ -1001,4 +1001,4 @@ void func_0034CE28(int *screen, int value)
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Stores a value in a screen field. */
-void func_0034CE98(u8 *screen, s32 value) { *(s32 *)(screen + 0x2bc) = value; }
+void menu_set_screen_field_2bc(u8 *screen, s32 value) { *(s32 *)(screen + 0x2bc) = value; }

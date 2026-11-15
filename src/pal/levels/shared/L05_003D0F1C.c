@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* func_PAL_L05_003D1160, the PAL copy of func_L05_003CD4C0: the same C, where the alpha steps take PAL's 50 Hz scale. */
 void func_PAL_L05_003D1160(char *object)
@@ -13,7 +14,7 @@ void func_PAL_L05_003D1160(char *object)
     int j;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_002A77E0(0xFF);
+        *f++ = (float)math_random_int_below(0xFF);
     *(float *)(state + 0x10) = -1.0f;
     *(float *)(state + 0x14) = -2.25f;
     *(float *)(state + 0x18) = 1.25f;
@@ -30,16 +31,16 @@ void func_PAL_L05_003D1160(char *object)
 
 typedef int V4_L05_003CD598 __attribute__((mode(TI)));
 extern unsigned char ref_L05_003CD598_00[];
-extern void func_00282CF0(float *, void *, float *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282CC0(float *, float *, float *);
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern void *func_00283D38(unsigned int, unsigned int, float);
-extern int func_00283CF0(float);
+extern void FastVecSub(float *, void *, float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecAdd(float *, float *, float *);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern void *FastTweenColor(unsigned int, unsigned int, float);
+extern int FloatToInt(float);
 typedef struct { unsigned char pad[9]; unsigned char fade; } Sprite_L05_003CD598;
-extern Sprite_L05_003CD598 *func_002C2FD8(void *, void *, int, int, int, int, int, float);
+extern Sprite_L05_003CD598 *part_spawn_fading(void *, void *, int, int, int, int, int, float);
 typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowState_L05_003CD598;
 
 void func_PAL_L05_003D1248(unsigned char *a0)
@@ -52,10 +53,10 @@ void func_PAL_L05_003D1248(unsigned char *a0)
 
     *(V4_L05_003CD598 *)src = *(V4_L05_003CD598 *)(a0 + 0x10);
     src[2] += 0.25f;
-    func_00282CF0(m, ref_L05_003CD598_00, src);
-    func_00282F20(m, m, -0.3f);
-    func_00282F20(q, m, 0.1f);
-    func_00282CC0(m, m, src);
+    FastVecSub(m, ref_L05_003CD598_00, src);
+    vec_scale_to_length(m, m, -0.3f);
+    vec_scale_to_length(q, m, 0.1f);
+    FastVecAdd(m, m, src);
 
     for (i = 0; i < 4; i++) {
         float v = st->phase[i] + st->rate[i];
@@ -66,14 +67,14 @@ void func_PAL_L05_003D1248(unsigned char *a0)
             st->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
             st->phase[i] = v + 255.0f;
-        if (func_00282948(&st->alpha[i]))
+        if (math_fast_float_d(&st->alpha[i]))
             st->alpha[i] = 0xD4;
-        v = func_00282C48(0.5f - func_00283CE0(0xD4 - st->alpha[i]) * 0.004716981f);
-        color = func_00283D38(0x50FF4040, 0x10FF4040, v);
-        s = func_002C2FD8(m, color, func_00283CF0(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
+        v = math_fabs(0.5f - IntToFloat(0xD4 - st->alpha[i]) * 0.004716981f);
+        color = FastTweenColor(0x50FF4040, 0x10FF4040, v);
+        s = part_spawn_fading(m, color, FloatToInt(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
         if (s)
-            s->fade = func_00283CF0(1.0f) + 0x60;
-        func_00282CC0(m, m, q);
+            s->fade = FloatToInt(1.0f) + 0x60;
+        FastVecAdd(m, m, q);
     }
 }
 

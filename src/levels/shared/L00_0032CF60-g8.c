@@ -1,3 +1,4 @@
+#include "names.h"
 /* Links the live entries of the object table into the update list, then runs
    each live object: animation unless flag 0x40 is set, its update hook
    (call_hook, as in RAC1's update_visible_resident_objects), and bounds refresh
@@ -12,7 +13,7 @@ extern void func_002A05A8(void *object);
 extern void func_002A0F48(void *object);
 
 /* Updates every live object in the table each frame. */
-void func_L00_0032CF60(void)
+void moby_update_live_mobys(void)
 {
     char *scan, *object, *last = 0;
 

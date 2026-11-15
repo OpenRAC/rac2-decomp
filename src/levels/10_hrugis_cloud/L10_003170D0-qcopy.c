@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -22,7 +23,7 @@ extern float func_00309C80(int);
 
 /* Throws out one dark puff of smoke from the object, flying away at a random angle. The
    radius sets how far and how fast it goes. */
-void func_L10_00417A38(char *object, int joint, float radius) {
+void part_spawn_dark_smoke_radius(char *object, int joint, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;

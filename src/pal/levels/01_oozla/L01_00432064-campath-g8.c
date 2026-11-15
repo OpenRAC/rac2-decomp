@@ -22,10 +22,10 @@ extern PathGlobals D_L01_001BD9C0;
 extern PathTransformGlobal D_L01_001B9380;
 extern PathRecord *D_L01_001FE180[];
 extern u8 *D_L01_001B264C __attribute__((sda));
-extern f32 func_00283248(f32,f32);
-extern f32 func_00282E48(void *,void *);
-extern f32 func_00283CE0(s32);
-extern void func_00282C88(void *);
+extern f32 mat_fast_helper_a(f32,f32);
+extern f32 fast_vec_dist(void *,void *);
+extern f32 IntToFloat(s32);
+extern void vec_clear_128(void *);
 extern void func_PAL_L01_002BEC60(s32,s32);
 extern void func_PAL_L00_002B9CD8(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
@@ -56,7 +56,7 @@ void func_PAL_L01_00432064(void *arg) {
     }
     factor=D_L01_001BD9C0.value;
     scale=&obj->transform[3]; pos=&obj->transform[1]; angles=&obj->transform[2];
-    marks->factor=func_00283248(1.0f,factor)*2.0f;
+    marks->factor=mat_fast_helper_a(1.0f,factor)*2.0f;
     if(settings->positionPath>=0) {
         s32 i, marked=0; PathRecord *path;
         path=D_L01_001FE180[settings->positionPath];
@@ -66,28 +66,28 @@ void func_PAL_L01_00432064(void *arg) {
                 marks->indices[marked]=i;
                 marked++;
             }
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->distance+=distance;
         }
     }
     if(settings->duration>0)
-        settings->speed=(motion->distance/func_00283CE0(((s32)settings->duration * 5 + 2) / 6))*60.0f;
+        settings->speed=(motion->distance/IntToFloat(((s32)settings->duration * 5 + 2) / 6))*60.0f;
     if(settings->rotationPath>=0) {
         s32 i; PathRecord *path;
         path=D_L01_001FE180[settings->rotationPath];
         for(i=0;i<path->count;i++) {
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->angleDistance+=distance;
         }
     }
     spring=&obj->state->position;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    func_00282C88(&spring->value);
+    vec_clear_128(&spring->value);
     spring=&obj->state->rotation;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    func_00282C88(&spring->value);
+    vec_clear_128(&spring->value);
     { u8 *template=D_L01_001B9380.transform;
     qcopy(scale,template+0x30);
     qcopy(obj,template);

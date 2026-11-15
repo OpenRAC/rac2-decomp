@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_002A7398(char *, int, int);
-extern float func_00283C80(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_002E5CF8(int, int, char *);
+extern void anim_start_immediate(char *, int, int);
+extern float FastDiffRots(float, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int PlayMobySound(int, int, char *);
 extern char *D_L06_001B281C __attribute__((nosda));
 extern float D_L06_001AFE40 __attribute__((sda));
 
@@ -17,7 +18,7 @@ void func_PAL_L06_00404194(char *object)
     if (state == 0)
         return;
     if (*(unsigned char *)(object + 0x20) == 0) {
-        func_002A7398(object, 0, 0);
+        anim_start_immediate(object, 0, 0);
         *(int *)(object + 0x48) = 0;
         *(float *)(state + 0xc) = *(float *)(state + 4);
         *(unsigned char *)(object + 0x20) = 1;
@@ -29,11 +30,11 @@ void func_PAL_L06_00404194(char *object)
         if (parent != 0 && *(unsigned char *)(*(char **)(parent + 0x68) + 0x14) != 0)
             advance = 0;
     }
-    if (func_00283C80(*(float *)(state + 0xc), 0.0f) < D_L06_001AFE40 * 0.0003490659f ||
-        func_00283C80(*(float *)(state + 0xc), 3.14159297943115234375f) < D_L06_001AFE40 * 0.0003490659f)
-        func_002E5CF8(0, 0, object);
+    if (FastDiffRots(*(float *)(state + 0xc), 0.0f) < D_L06_001AFE40 * 0.0003490659f ||
+        FastDiffRots(*(float *)(state + 0xc), 3.14159297943115234375f) < D_L06_001AFE40 * 0.0003490659f)
+        PlayMobySound(0, 0, object);
     if (advance)
-        *(float *)(state + 0xc) = func_00283B98(*(float *)(state + 0xc), D_L06_001AFE40 * 0.0003490659f);
-    wave = func_00283198(*(float *)(state + 0xc));
+        *(float *)(state + 0xc) = FastAddRotations(*(float *)(state + 0xc), D_L06_001AFE40 * 0.0003490659f);
+    wave = math_fast_sin_or_cos_b(*(float *)(state + 0xc));
     *(float *)(object + 0x18) = (*(float *)(state + 8) - 2.0f) + (wave + wave);
 }

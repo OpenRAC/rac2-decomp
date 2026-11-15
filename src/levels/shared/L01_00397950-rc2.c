@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s32 ref_L01_00397950_00(s32);
 
 /* Sets up a moby's private data when it is created: three random values and some preset limits. */
-void func_L01_00397950(void *moby) {
+void moby_init_randomized_vars(void *moby) {
     s32 *vars  = *(s32 **)((u8 *)moby + 0x68);
     f32 *values  = (f32 *)((u8 *)vars + 0x20);
     s32 count  = 3;

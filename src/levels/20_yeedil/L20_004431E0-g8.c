@@ -1,3 +1,4 @@
+#include "names.h"
 /* Finds the first entity of the group state+0x218 (if func_00312B58 accepts it), moves it to
    arg1, and spawns func_L20_0039BDF0 0.5 below it.  The group walk is the usual macro shape
    (see src/game/0031F210-group-g8.c); its redundant inner `rec != 0` keeps jump1 from
@@ -10,13 +11,13 @@ typedef union { TI128 quad; float component[4]; } Vector431E0;
 extern u16 *D_L20_001FBB20[];
 extern char *D_L20_001B2F9C;
 extern int D_L20_001B2FB8 __attribute__((sda));
-extern int func_00312B58(char *);
-extern void func_L02_003A6FE8(char *);
-extern int func_L02_002EF388(char *, char *, char *, char **, int);
-extern char *func_L20_0039BDF0(char *, char *, int, int);
+extern int moby_is_state_six(char *);
+extern void nanotech_crate_init(char *);
+extern int moby_fuse_linked_objects(char *, char *, char *, char **, int);
+extern char *glow_effect_create(char *, char *, int, int);
 
 /* Takes the first usable object of the enemy group, moves it to the given place and starts it with a small effect. Returns that object. */
-char *func_L20_004431E0(char *moby, TI128 *position) {
+char *yeedil_boss_place_group_member(char *moby, TI128 *position) {
     char *state = *(char **)(moby + 0x68);
     u16 *rec;
     char *found = 0;
@@ -28,7 +29,7 @@ char *func_L20_004431E0(char *moby, TI128 *position) {
          rec++) {
         char *e = D_L20_001B2F9C + ((*rec & 0x7FFF) << 8);
 
-        if (e != 0 && IsMobyInState6(e) != 0)
+        if (e != 0 && moby_is_state_six(e) != 0)
             found = e;
         break;
     }
@@ -37,13 +38,13 @@ char *func_L20_004431E0(char *moby, TI128 *position) {
         char *foundVars;
 
         qcopy(p, position);
-        InitNanotechCrateMoby(found);
-        FuseObjectWithLinkedObjects(found, p, found + 0xF0, 0, 0);
+        nanotech_crate_init(found);
+        moby_fuse_linked_objects(found, p, found + 0xF0, 0, 0);
         foundVars = *(char **)(found + 0x68);
         *(int *)(foundVars + 0xAC) |= 8;
         qcopy(&buf, p);
         buf.component[2] -= 0.5f;
-        CreateGlowEffectMoby(found, (char *)&buf, 0x168, 0);
+        glow_effect_create(found, (char *)&buf, 0x168, 0);
     }
     return found;
 }

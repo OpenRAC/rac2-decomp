@@ -15,37 +15,37 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
     unsigned char e,f;
 };
 extern AimQueryConfig D_L00_001B0810;
-extern AimTuning D_L00_00262570[];
+extern AimTuning g_weapon_l00_table[];
 extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029AE70[];
-extern unsigned char D_00189E20[];
-extern unsigned char D_00138180[];
+extern unsigned char g_hero_state[];
+extern unsigned char g_pad_state[];
 extern unsigned char D_00139592[];
 extern float D_L00_001B0800 __attribute__((sda));
 extern float D_L00_001B0804 __attribute__((sda));
 extern float D_L00_001B0808 __attribute__((sda));
 extern float D_L00_001B080C __attribute__((sda));
 extern int D_L00_001B2BB0;
-extern void func_0029FCC0(char *, int, char *);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_002AB1F0(unsigned char *);
-extern int func_00282948(void *);
-extern unsigned char *func_002AF580(void *, void *, void *, float, float, int, int, int, float, float, float, int, AimQueryConfig *);
-extern void func_002FDF40(void *, void *, void *, int, float, float, float, float);
-extern int func_002FE5A0(void *, void *, void *, void *, void *, int, int, float);
-extern void func_L00_002AF7D0(void);
-extern int func_L00_002D3F30(int, int);
-extern void func_L00_002AF568(void);
-extern int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern int func_002E5CF8(int, int, char *);
-extern char *func_L00_003EED10(int, char *, char *);
-extern int func_L00_002D4040(int);
-extern void func_L00_002D6B70(int);
-extern int func_002829D8(void *);
-extern void func_L00_003EE8E8(void *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int moby_get_private_value_0(unsigned char *);
+extern int math_fast_float_d(void *);
+extern unsigned char *SelectBestTargetInCone(void *, void *, void *, float, float, int, int, int, float, float, float, int, AimQueryConfig *);
+extern void CalculateAimedLaunchVelocity(void *, void *, void *, int, float, float, float, float);
+extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void *, int, int, float);
+extern void cancel_hero_item_animation(void);
+extern int weapon_spend_ammo(int, int);
+extern void start_equipped_item_animation(void);
+extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern int PlayMobySound(int, int, char *);
+extern char *gravity_bomb_spawn_projectile(int, char *, char *);
+extern int get_ammo(int);
+extern void slot_reset_active(int);
+extern int vec_fast_helper_b(void *);
+extern void weapon_draw_aim_effect(void *);
 extern void ref_L00_003EE4C0_00(void (*)(void *), void *);
 
 /* Updates the Gravity Bomb launcher held by the hero: it picks an aim target, and when fire is pressed it launches a bomb and starts the cooldown. */
-void func_L00_003EE4C0(unsigned char *object) {
+void gravity_bomb_launcher_update(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *target;
     char *info;
@@ -53,18 +53,18 @@ void func_L00_003EE4C0(unsigned char *object) {
     AimQueryConfig config;
     AimVector scratch;
     int allowed;
-    TransformMobyJointToWorld((char *)object, 0, (char *)&position);
+    moby_transform_joint_to_world((char *)object, 0, (char *)&position);
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
-        StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
+        anim_start_blended_with_flags(object, 1, 0, 2, 0);
     target = 0;
     if (H->ptr[0x1450 / 4] && H->ptr[0x1450 / 4][0x20] != 0xFE && H->ptr[0x1450 / 4][0x20] != 0xFD) {
-        info = (char *)GetMobyPrivateValue0(H->ptr[0x1450 / 4]);
+        info = (char *)moby_get_private_value_0(H->ptr[0x1450 / 4]);
         if (info && *(float *)info > 0.0f)
             target = H->ptr[0x1450 / 4];
     }
     allowed = 1;
     if (H->i[0x2294 / 4] == 0x1D || H->i[0x2294 / 4] == 1) {
-        if (FastFloatHelperD(&H->i[0x2534 / 4]) == 0)
+        if (math_fast_float_d(&H->i[0x2534 / 4]) == 0)
             allowed = 0;
     } else {
         H->i[0x2534 / 4] = 0x28;
@@ -76,7 +76,7 @@ void func_L00_003EE4C0(unsigned char *object) {
     }
     CalculateAimedLaunchVelocity(&config, &position, target, 0, D_L00_001B0804, D_L00_001B0800,
                    D_L00_001B080C * 0.016666668f, D_L00_001B0808 * 0.00027777778f);
-    *(int *)(state + 0x24) = TraceProjectileToImpact(&position, &config, state, state + 0x10, object, 0, 0,
+    *(int *)(state + 0x24) = coll_trace_projectile_to_impact(&position, &config, state, state + 0x10, object, 0, 0,
                                           D_L00_001B0808 * 0.00027777778f);
     switch (object[0x20]) {
     case 0:
@@ -87,15 +87,15 @@ void func_L00_003EE4C0(unsigned char *object) {
         if (H->i[0x1D8 / 4] >= 21)
             cancel_hero_item_animation();
         if (*(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && allowed && H->i[0x1240 / 4] >= 23) {
-            if (SpendWeaponAmmo(-1, 1)) {
+            if (weapon_spend_ammo(-1, 1)) {
                 D_L00_001B2BB0 = 1;
                 start_equipped_item_animation();
-                *(int *)(state + 0x2C) = CopyRecordsToFreeSlots(D_L00_0029AE70);
-                StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
-                SpawnGravityBombProjectile((int)object, (char *)&position, (char *)&config);
+                *(int *)(state + 0x2C) = slot_copy_records_to_free(D_L00_0029AE70);
+                anim_start_blended_with_flags(object, 2, 0, 2, 0);
+                gravity_bomb_spawn_projectile((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
                 {
-                AimTuning *tu = &gWeaponTable_L00[D_00139592[0]];
+                AimTuning *tu = &g_weapon_l00_table[D_00139592[0]];
                 *(float *)(state + 0x20) = 1.0f / tu->cooldown;
             }
             } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B2BB0 == 1) {
@@ -104,13 +104,13 @@ void func_L00_003EE4C0(unsigned char *object) {
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(state + 0x2C) >= 0) {
-                    ResetActiveSlots(*(int *)(state + 0x2C));
+                    slot_reset_active(*(int *)(state + 0x2C));
                     *(int *)(state + 0x2C) = -1;
                 }
             }
             object[0x20] = 1;
         }
     }
-    FastVectorHelperB(state + 0x20);
-    ref_L00_003EE4C0_00(DrawWeaponAimEffect, object);
+    vec_fast_helper_b(state + 0x20);
+    ref_L00_003EE4C0_00(weapon_draw_aim_effect, object);
 }

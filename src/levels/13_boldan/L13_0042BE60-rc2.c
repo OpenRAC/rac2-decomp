@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -25,7 +26,7 @@
 #include "common.h"
 
 /* Sets a flag on the object the first time it runs, then does nothing. */
-void func_L13_0042BE60(s8 *moby) {
+void moby_init_flag_once(s8 *moby) {
     if ((*(u8 *)((char *)(moby) + (0x20))) == 0) {
         (*(u8 *)((char *)(moby) + (0x20))) = 1;
         (*(u16 *)((char *)(moby) + (0x34))) = (u16) ((*(u16 *)((char *)(moby) + (0x34))) | 0x800);

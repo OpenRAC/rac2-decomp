@@ -12,13 +12,13 @@ extern float D_L02_001A8D7C __attribute__((nosda));
 extern int D_L02_001A8D5C __attribute__((nosda));
 extern int D_L02_001A8D60 __attribute__((nosda));
 extern int D_L02_001A8D64 __attribute__((nosda));
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern void *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern void lerp_vector(void *, void *, void *, float);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 void func_PAL_L02_002F1100(void *owner, void *from, void *to, int count, int *colour, float speed) {
     Vec4 direction;
@@ -30,21 +30,21 @@ void func_PAL_L02_002F1100(void *owner, void *from, void *to, int count, int *co
     int *rgb = &D_L02_001A8D68;
     if (colour) rgb = colour;
     for (i = 0; i < count; i++) {
-        brightness = func_002A7878(0.7f, 1.3f);
-        r = func_00283CF0(((float)rgb[0] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
-        g = func_00283CF0(((float)rgb[1] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
-        b = func_00283CF0(((float)rgb[2] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
-        func_00282D08(&direction, from, to, func_002A7878(0.0f, 1.0f));
+        brightness = math_random_float_range(0.7f, 1.3f);
+        r = FloatToInt(((float)rgb[0] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
+        g = FloatToInt(((float)rgb[1] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
+        b = FloatToInt(((float)rgb[2] * brightness * 5.0f + 2.0f) * (1.0f / 6.0f));
+        lerp_vector(&direction, from, to, math_random_float_range(0.0f, 1.0f));
         qcopy(&position, &direction);
-        position.f[3] = func_002A7878(D_L02_001A8D78[0], D_L02_001A8D7C);
-        func_00282C88(&velocity);
+        position.f[3] = math_random_float_range(D_L02_001A8D78[0], D_L02_001A8D7C);
+        vec_clear_128(&velocity);
         velocity.f[2] = -gravity * (float)(r + g + b);
-        func_00282CC0(&velocity, &velocity, &direction);
+        FastVecAdd(&velocity, &velocity, &direction);
         velocity.f[3] = position.f[3];
-        t = func_002A7878(0.0f, 1.0f);
-        first = func_00283D38(D_L02_001A8D58, D_L02_001A8D5C, t);
-        t = func_002A7878(0.0f, 1.0f);
-        second = func_00283D38(D_L02_001A8D60, D_L02_001A8D64, t);
-        func_002BAA28(owner, &position, &velocity, first, second, r, g, b, D_L02_001A8D50);
+        t = math_random_float_range(0.0f, 1.0f);
+        first = FastTweenColor(D_L02_001A8D58, D_L02_001A8D5C, t);
+        t = math_random_float_range(0.0f, 1.0f);
+        second = FastTweenColor(D_L02_001A8D60, D_L02_001A8D64, t);
+        part_spawn_trail(owner, &position, &velocity, first, second, r, g, b, D_L02_001A8D50);
     }
 }

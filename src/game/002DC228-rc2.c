@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,13 +26,13 @@
 
 extern s8 *D_001F2854;
 extern s8 D_00262BE0[];
-extern void func_0027C540(s32);
-extern void func_0027C660(void);
-extern void func_0027FAA8(s32, s32, u64, s32, s32);
-extern s32 func_00288FB8(s32);
+extern void SetupGifPaging(s32);
+extern void DoGifPaging(void);
+extern void text_draw_centered_small(s32, s32, u64, s32, s32);
+extern s32 GetLocalizedString(s32);
 
 /* Shows a message in the middle of the screen. With no item chosen it shows one line, otherwise two lines for the chosen item. */
-s32 func_002DC228(s8 *menu) {
+s32 menu_entry_message_draw(s8 *menu) {
     s8 *screen;
     s32 entryIndex;
 
@@ -39,11 +40,11 @@ s32 func_002DC228(s8 *menu) {
     entryIndex = (*(s32 *)((s8 *)((*(s8 **)((s8 *)(screen) + (0x34))) + (*(s32 *)((s8 *)(screen) + (0x40))) * 12) + (4)));
     SetupGifPaging(0);
     if (entryIndex == -1) {
-        DrawTextCenteredSmallFont((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) / 2 - 8, 0x80FFA888ULL, GetLocalizedString(0x2E65), -1);
+        text_draw_centered_small((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) / 2 - 8, 0x80FFA888ULL, GetLocalizedString(0x2E65), -1);
     } else {
         s32 entryOffset = entryIndex * 12;
-        DrawTextCenteredSmallFont((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + entryOffset) + (0)))), -1);
-        DrawTextCenteredSmallFont((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) * 2 / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + entryOffset) + (4)))), -1);
+        text_draw_centered_small((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + entryOffset) + (0)))), -1);
+        text_draw_centered_small((*(s32 *)((s8 *)(menu) + (0x20))) / 2, (*(s32 *)((s8 *)(menu) + (0x24))) * 2 / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + entryOffset) + (4)))), -1);
     }
     DoGifPaging();
     return 2;

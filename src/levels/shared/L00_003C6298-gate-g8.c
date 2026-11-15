@@ -11,22 +11,22 @@ typedef struct {
 } GateObject;
 extern short *D_L00_001FA920[];
 extern GateObject *D_L00_001B1E9C;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
-extern int func_002A8508(int,int);
-extern float func_00282E80(void *,void *);
-extern int func_002ACBC8(void *,int);
-extern void func_002A7470(void *,int,int,int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_00277258(void *,float,int,void *);
-extern int func_002E5CF8(int,int,void *);
-extern void func_002ABBB8(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-extern void func_002B0A68(void *,int,void *,float,float,float,float,int);
-extern void func_0029F338(void *);
+extern int moby_count_group_not_in_state(int,int);
+extern float vec_distance_xy(void *,void *);
+extern int IsPointInCuboid(void *,int);
+extern void anim_start_blended(void *,int,int,int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *,void *,void *);
+extern int coll_test_point(void *,float,int,void *);
+extern int PlayMobySound(int,int,void *);
+extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,int);
+extern void moby_mark_spawned(void *);
 /* Updates a gate: opens when the player is near, closes again, and breaks if a linked object is destroyed. */
-void func_L00_003CED50(GateObject *gate)
+void gate_l00_update(GateObject *gate)
 {
     GateContext *context=gate->context;
     int i;
@@ -37,7 +37,7 @@ void func_L00_003CED50(GateObject *gate)
     float vb[4] __attribute__((aligned(16)));
     float vc[4] __attribute__((aligned(16)));
     if(gate->state==0) {
-        if(D_L00_001FA920[context->group] && CountMobysInGroupNotInState(context->group,-1)>=2) {
+        if(D_L00_001FA920[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
             GateObject *base=D_L00_001B1E9C;
             short *p=D_L00_001FA920[context->group];
             do {
@@ -46,13 +46,13 @@ void func_L00_003CED50(GateObject *gate)
                 o->collision=0;
             } while(*p++>=0);
         }
-        if(vec_distance_xy(gate->position,gHeroPosition)<6.0f &&
-           !IsPointInCuboid(gHeroPosition,context->close_volume) &&
-           !IsPointInCuboid(gHeroPosition,context->block_volume)) {
+        if(vec_distance_xy(gate->position,g_hero_position)<6.0f &&
+           !IsPointInCuboid(g_hero_position,context->close_volume) &&
+           !IsPointInCuboid(g_hero_position,context->block_volume)) {
             gate->state=1; gate->render_flags=0x24c102;
-            if(gate->animation!=1) StartAnimationBlended(gate,1,0,0);
+            if(gate->animation!=1) anim_start_blended(gate,1,0,0);
             gate->collision=0;
-            if(D_L00_001FA920[context->group] && CountMobysInGroupNotInState(context->group,-1)>=2) {
+            if(D_L00_001FA920[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
                 GateObject *base=D_L00_001B1E9C;
                 short *p=D_L00_001FA920[context->group];
                 do {
@@ -61,7 +61,7 @@ void func_L00_003CED50(GateObject *gate)
                     o->collision=o->object_class->collision;
                 } while(*p++>=0);
             }
-        } else if(IsPointInCuboid(gHeroPosition,context->close_volume)) gate->state=5;
+        } else if(IsPointInCuboid(g_hero_position,context->close_volume)) gate->state=5;
         for(i=0;i<4;i++) {
             if(context->child[i]!=-1) {
                 GateObject *o=D_L00_001B1E9C+context->child[i];
@@ -71,16 +71,16 @@ void func_L00_003CED50(GateObject *gate)
     gate->state=12;
     qcopy(v,gate->position);v[2]+=1.0f;
     PlayMobySound(2,0,gate);
-    a[0]=FastSinOrCosA(gate->angle-1.5707964897155762f)*0.3f;
-    a[1]=FastSinOrCosB(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
+    a[0]=math_fast_sin_or_cos_a(gate->angle-1.5707964897155762f)*0.3f;
+    a[1]=math_fast_sin_or_cos_b(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
     SpawnExplosionEffects(gate,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
-    SpawnDebrisForMaskedParts(gate,255,a,3,6,3,6,255);
+    part_spawn_masked_debris(gate,255,a,3,6,3,6,255);
 
-    MarkMobySpawned(gate);return;
+    moby_mark_spawned(gate);return;
 }
                     }
                     gate->state=1;
-                    if(gate->animation!=1)StartAnimationBlended(gate,1,0,0);
+                    if(gate->animation!=1)anim_start_blended(gate,1,0,0);
                     gate->collision=0;
                 }
             }
@@ -88,24 +88,24 @@ void func_L00_003CED50(GateObject *gate)
     }
     if(gate->state==1 && (gate->anim_flags&2)) {
         gate->state=3;gate->render_flags=0x224c1;
-        if(gate->animation!=2)StartAnimationBlended(gate,2,0,0);
+        if(gate->animation!=2)anim_start_blended(gate,2,0,0);
     }
     if(gate->state==2) {
-        v[0]=FastSinOrCosA(gate->angle-1.5707964897155762f)*0.3f;
-        v[1]=FastSinOrCosB(gate->angle-1.5707964897155762f)*0.3f;v[2]=0;
+        v[0]=math_fast_sin_or_cos_a(gate->angle-1.5707964897155762f)*0.3f;
+        v[1]=math_fast_sin_or_cos_b(gate->angle-1.5707964897155762f)*0.3f;v[2]=0;
         FastVecAdd(gate->position,gate->position,v);
         qcopy(a,gate->position);qcopy(b,gate->position);qcopy(c,gate->position);
         a[2]+=0.75f;b[2]+=0.75f;c[2]+=0.75f;
-        v[0]=FastSinOrCosA(gate->angle)*0.8f;
-        v[1]=FastSinOrCosB(gate->angle)*0.8f;v[2]=0;
-        v[0]=FastSinOrCosA(gate->angle+3.1415929794311523f)*0.8f;
-        v[1]=FastSinOrCosB(gate->angle+3.1415929794311523f)*0.8f;v[2]=0;
+        v[0]=math_fast_sin_or_cos_a(gate->angle)*0.8f;
+        v[1]=math_fast_sin_or_cos_b(gate->angle)*0.8f;v[2]=0;
+        v[0]=math_fast_sin_or_cos_a(gate->angle+3.1415929794311523f)*0.8f;
+        v[1]=math_fast_sin_or_cos_b(gate->angle+3.1415929794311523f)*0.8f;v[2]=0;
         FastVecAdd(b,b,vb);FastVecAdd(c,c,vc);
-        if(TestPointAgainstCollision(a,0.6f,0,gate) || TestPointAgainstCollision(b,0.68f,0,gate) || TestPointAgainstCollision(c,0.68f,0,gate)) {
+        if(coll_test_point(a,0.6f,0,gate) || coll_test_point(b,0.68f,0,gate) || coll_test_point(c,0.68f,0,gate)) {
             PlayMobySound(2,0,gate);
             SpawnExplosionEffects(gate,D_L00_001A8F20,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
             {
-    MarkMobySpawned(gate);return;
+    moby_mark_spawned(gate);return;
 }
         }
     }
@@ -113,18 +113,18 @@ void func_L00_003CED50(GateObject *gate)
     gate->state=12;
     qcopy(v,gate->position);v[2]+=1.0f;
     PlayMobySound(2,0,gate);
-    a[0]=FastSinOrCosA(gate->angle-1.5707964897155762f)*0.3f;
-    a[1]=FastSinOrCosB(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
+    a[0]=math_fast_sin_or_cos_a(gate->angle-1.5707964897155762f)*0.3f;
+    a[1]=math_fast_sin_or_cos_b(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
     SpawnExplosionEffects(gate,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
-    SpawnDebrisForMaskedParts(gate,255,a,3,6,3,6,255);
-    MarkMobySpawned(gate);return;
+    part_spawn_masked_debris(gate,255,a,3,6,3,6,255);
+    moby_mark_spawned(gate);return;
 closing:
-    if(gate->state==3 && IsPointInCuboid(gHeroPosition,context->close_volume)) {
+    if(gate->state==3 && IsPointInCuboid(g_hero_position,context->close_volume)) {
         gate->state=4;
-        if(gate->animation!=3)StartAnimationBlended(gate,3,0,0);
+        if(gate->animation!=3)anim_start_blended(gate,3,0,0);
     }
     if(gate->state==4 && (gate->anim_flags&2)) {
         gate->state=5;gate->collision=gate->object_class->collision;
-        if(gate->animation!=0)StartAnimationBlended(gate,0,0,0);
+        if(gate->animation!=0)anim_start_blended(gate,0,0,0);
     }
 }

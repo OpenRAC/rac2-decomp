@@ -13,28 +13,28 @@ typedef struct {
 
 extern int D_L04_001B092C SDATA(D_L04_001B092C);
 extern u8 *D_L04_001B0914 SDATA(D_L04_001B0914);
-extern u8 *D_L04_001B24DC;
+extern u8 *g_moby_l04_pool;
 extern Collision D_L04_001BFAC0;
 
 extern void func_001290E0(void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E20(void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern int func_00277258(void *, float, int, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern void func_002AC9F8(void *, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_L04_0040C0C0(void *, void *, int, int);
+extern float FastVecLength(void *);
+extern float vec_length_xy(void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern int coll_test_point(void *, float, int, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern void vec_clamp_length(void *, float);
+extern int PlayMobySound(int, int, void *);
+extern void anim_start_blended(void *, int, int, int);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void part_l04_spawn_burst(void *, void *, int, int);
 
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
@@ -44,7 +44,7 @@ extern void func_L04_0040C0C0(void *, void *, int, int);
 
 /* Moves a vehicle along its velocity in steps shorter than its collision radius,
    handles each hit by what was struck, and slides the velocity along the surface. */
-int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
+int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                       Vec *bounce, Vec *normalOut, int *flag, int mode, int *wall,
                       float friction, float slope, float slopeLimit, float height, float radius)
 {
@@ -80,7 +80,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
             remaining = 0;
         }
         FastVecAdd(&cur, &cur, &step);
-        if (TestPointAgainstCollision(&cur, radius, 4, object)) {
+        if (coll_test_point(&cur, radius, 4, object)) {
             vec_scale_to_length(&normal, &D_L04_001BFAC0.normal, 1.0f);
             if (D_L04_001BFAC0.object) {
                 vertical = cur.f[2];
@@ -106,7 +106,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                     FastVecScale(a + 0x100, &horizontal, 0.05f);
                 } else if ((mode && S(D_L04_001BFAC0.object, 0xAA) == 0xB2D /* Enemy Hoverbike */)
                            || (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xBBC /* moby class 3004 */)) {
-                    SpawnParticleBurst_L04(&D_L04_001BFAC0.point, vel, 2, 0);
+                    part_l04_spawn_burst(&D_L04_001BFAC0.point, vel, 2, 0);
                     if (mode) {
                         b = P(object, 0x68);
                         other = D_L04_001BFAC0.object;
@@ -121,8 +121,8 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                         FastVecScale(b + 0x2F0, &horizontal, -0.04f);
                         FastVecScale(a + 0x100, &horizontal, 0.04f);
                         if (I(b, 0x1DC) != -1) {
-                            anim = gMobyPool_L04 + (I(b, 0x1DC) << 8);
-                            angle = FastMatrixHelperA(D_L04_001BFAC0.point.f[0] - F(object, 0x10),
+                            anim = g_moby_l04_pool + (I(b, 0x1DC) << 8);
+                            angle = mat_fast_helper_a(D_L04_001BFAC0.point.f[0] - F(object, 0x10),
                                                   D_L04_001BFAC0.point.f[1] - F(object, 0x14));
                             angle = fast_subtract_rotations(F(P(a, 0x164), 0xF8), angle);
                             if (angle > 0.52359885f && angle < 2.61799407f) {
@@ -136,7 +136,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                             } else {
                                 I(b, 0x36C) = 30;
                                 S(b, 0x34A) = animation;
-                                StartAnimationBlended(anim, animation, 3, 3);
+                                anim_start_blended(anim, animation, 3, 3);
                             }
                         }
                     }
@@ -197,7 +197,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                 else *wall = 0;
                 if ((slopeLimit < slope && dot < -0.866f) || GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) {
                     cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
-                    FastVectorNormalize(bounce, vel, &normal);
+                    vec_fast_normalize(bounce, vel, &normal);
                     result = 2;
                     ground = 0;
                     break;
@@ -211,7 +211,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                 FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
-                ClampVectorLength(vel, friction);
+                vec_clamp_length(vel, friction);
                 if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
                 prev->f[2] = vel->f[2];
                 ground = 0;
@@ -242,10 +242,10 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
     pos->q = cur.q;
     if (ground) {
         pos->f[2] -= height;
-        if (TestPointAgainstCollision(pos, radius, 4, object)) {
+        if (coll_test_point(pos, radius, 4, object)) {
             if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) result = 2;
             pos->q = ((Vec *)(&D_L04_001BFAC0.position))->q;
-            angle = FastMatrixHelperA(D_L04_001BFAC0.normal.f[2], vec_length_xy(&D_L04_001BFAC0.normal));
+            angle = mat_fast_helper_a(D_L04_001BFAC0.normal.f[2], vec_length_xy(&D_L04_001BFAC0.normal));
             if (angle < 0.785398245f) {
                 oldVertical = vel->f[2];
                 vec_scale_to_length(normalOut, &D_L04_001BFAC0.normal, 1.0f);
@@ -254,7 +254,7 @@ int func_L04_00413A38(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
                 FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
-                ClampVectorLength(vel, friction);
+                vec_clamp_length(vel, friction);
                 if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
                 if (oldVertical < 0 && vel->f[2] > 0) vel->f[2] = 0;
                 prev->f[2] = vel->f[2];

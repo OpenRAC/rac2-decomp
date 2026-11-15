@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_0033AE28(char *p);
+extern void prompt_bar_update(char *p);
 
 extern void func_L00_00430948_1(char *p, float x, float y);
 
@@ -9,30 +9,30 @@ extern int func_002E5E58_1(int a, int b, int c);
 
 extern volatile unsigned char D_001A7BB2 __attribute__((sda));
 
-extern void func_0033AB50(char *p);
+extern void prompt_bar_destroy(char *p);
 
-void* func_L00_00433AA0(void* param_1);
+void* menu_init_two_sub_objects(void* param_1);
 
 extern void func_0033AB50_1(int);
 
 extern unsigned long long func_00347EA0_1(unsigned long long);
 
-extern int func_00342BC0(unsigned char *owner);
+extern int menu_list_get_selected_id(unsigned char *owner);
 
-extern void func_00343058(unsigned char *owner);
+extern void menu_list_clear_state(unsigned char *owner);
 
-extern void func_L00_0042BAD0(char *p);
+extern void cam_init_object_table_a(char *p);
 
-extern void func_L00_0042C290(char *p);
+extern void cam_init_object_table_d(char *p);
 
-extern void func_L00_0042BFF8(char *p);
+extern void cam_init_object_table_c(char *p);
 
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
-int func_L00_00433560(char *object, int flags)
+int menu_update_two_part_flags_a(char *object, int flags)
 {
     float *vec;
 
-    UpdateButtonPromptBar(object + 8);
+    prompt_bar_update(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -46,19 +46,19 @@ int func_L00_00433560(char *object, int flags)
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_004336B0(char *object)
+char *menu_init_sub_object_a(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
-int func_L00_00433810(char *object, int flags)
+int menu_update_two_part_flags_b(char *object, int flags)
 {
     float *vec;
 
-    UpdateButtonPromptBar(object + 8);
+    prompt_bar_update(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -72,19 +72,19 @@ int func_L00_00433810(char *object, int flags)
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_004338A8(char *object)
+char *menu_init_sub_object_b(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
-int func_L00_00433A08(char *object, int flags)
+int menu_update_two_part_flags_c(char *object, int flags)
 {
     float *vec;
 
-    UpdateButtonPromptBar(object + 8);
+    prompt_bar_update(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -98,7 +98,7 @@ int func_L00_00433A08(char *object, int flags)
 }
 
 /* Initialize the owner subviews at 8 and 0x 2B 0, then return the supplied owner pointer. */
-void* func_L00_00433AA0(void* param_1)
+void* menu_init_two_sub_objects(void* param_1)
 {
   func_0033AB50_1((int)param_1 + 8);
   func_00347EA0_1((int)param_1 + 0x2b0);
@@ -110,40 +110,40 @@ extern void func_430480(void *);
 extern void func_42C290(void *);
 
 /* Visits both sub-objects, then hands back the same pointer. */
-char *func_L00_00433DB0(char *a0) {
+char *menu_visit_two_sub_objects(char *a0) {
     func_430480(a0 + 0x8);
     func_42C290(a0 + 0x2B0);
     return a0;
 }
 
 
-extern int func_0033AF48(char *p);
+extern int prompt_bar_draw(char *p);
 
 /* Asks the sub-object 8 bytes in for a value and passes it back. */
-int func_L00_00433F50(char *p)
+int menu_get_sub_object_value(char *p)
 {
-    return DrawButtonPromptBar(p + 8);
+    return prompt_bar_draw(p + 8);
 }
 
 
 
 /* Does nothing. */
-void func_L00_004370F8(void)
+void noop_a(void)
 {
 }
 
 
 
-extern int func_00348128(char *p);
+extern int menu_get_selected_index(char *p);
 
 /* Asks the sub-object 16 bytes in for a value and passes it back. */
-int func_L00_004377C0(char *p)
+int sub_object_get_value_near(char *p)
 {
-    return GetMenuSelectedIndex(p + 16);
+    return menu_get_selected_index(p + 16);
 }
 
 /* Does nothing. */
-void func_L00_00437D50(void)
+void stub_l00_noop(void)
 {
 }
 
@@ -152,7 +152,7 @@ void func_L00_00437D50(void)
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_L00_004380E0(unsigned long param_1)
+unsigned long stub_l00_return_arg(unsigned long param_1)
 {
   return param_1;
 }
@@ -160,77 +160,77 @@ unsigned long func_L00_004380E0(unsigned long param_1)
 
 
 /* Store the two scalar floating arguments through the supplied pointer cell; original game role is unknown. */
-void func_L00_00438970(float first, float second, float **cell)
+void stub_store_two_floats(float first, float second, float **cell)
 {
     (*cell)[0] = first;
     (*cell)[1] = second;
 }
 
-extern int func_00342F70(char *p);
+extern int menu_list_build_ids(char *p);
 
 /* Asks a sub-object for a value and passes it back. */
-int func_L00_00438E68(char *p)
+int sub_object_get_value_far(char *p)
 {
-    return BuildMenuListIds(p + 664);
+    return menu_list_build_ids(p + 664);
 }
 
 
 /* Return the measured signed-word getter result for the owner subview at 0x 298. */
-int func_L00_00438E90(unsigned char *owner)
+int sub_object_get_signed_word(unsigned char *owner)
 {
-    return GetSelectedMenuListId(owner + 0x298);
+    return menu_list_get_selected_id(owner + 0x298);
 }
 
 /* Invoke the measured cleanup helper on the owner subview at 0x 298. */
-void func_L00_00438EB0(unsigned char *owner)
+void sub_object_cleanup(unsigned char *owner)
 {
-    ClearMenuListState(owner + 0x298);
+    menu_list_clear_state(owner + 0x298);
 }
 
 
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
-char *func_L00_004392D0(char *p)
+char *sub_object_init_chain(char *p)
 {
-    InitCameraObjectTableA(p);
-    InitCameraObjectTableA(p + 76);
-    InitCameraObjectTableA(p + 152);
-    InitCameraObjectTableA(p + 228);
-    InitCameraObjectTableA(p + 304);
-    InitCameraObjectTableA(p + 380);
-    InitCameraObjectTableD(p + 456);
-    InitCameraObjectTableD(p + 528);
-    InitCameraObjectTableC(p + 600);
-    InitCameraObjectTableD(p + 664);
-    InitCameraObjectTableD(p + 736);
-    InitCameraObjectTableD(p + 808);
-    InitCameraObjectTableD(p + 880);
-    InitCameraObjectTableD(p + 952);
+    cam_init_object_table_a(p);
+    cam_init_object_table_a(p + 76);
+    cam_init_object_table_a(p + 152);
+    cam_init_object_table_a(p + 228);
+    cam_init_object_table_a(p + 304);
+    cam_init_object_table_a(p + 380);
+    cam_init_object_table_d(p + 456);
+    cam_init_object_table_d(p + 528);
+    cam_init_object_table_c(p + 600);
+    cam_init_object_table_d(p + 664);
+    cam_init_object_table_d(p + 736);
+    cam_init_object_table_d(p + 808);
+    cam_init_object_table_d(p + 880);
+    cam_init_object_table_d(p + 952);
     return p;
 }
 
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
-char *func_L00_0043AD30(char *p)
+char *sub_object_init_chain_copy(char *p)
 {
-    InitCameraObjectTableA(p);
-    InitCameraObjectTableA(p + 76);
-    InitCameraObjectTableA(p + 152);
-    InitCameraObjectTableA(p + 228);
-    InitCameraObjectTableA(p + 304);
-    InitCameraObjectTableA(p + 380);
-    InitCameraObjectTableD(p + 456);
-    InitCameraObjectTableD(p + 528);
-    InitCameraObjectTableC(p + 600);
-    InitCameraObjectTableD(p + 664);
-    InitCameraObjectTableD(p + 736);
-    InitCameraObjectTableD(p + 808);
-    InitCameraObjectTableD(p + 880);
-    InitCameraObjectTableD(p + 952);
+    cam_init_object_table_a(p);
+    cam_init_object_table_a(p + 76);
+    cam_init_object_table_a(p + 152);
+    cam_init_object_table_a(p + 228);
+    cam_init_object_table_a(p + 304);
+    cam_init_object_table_a(p + 380);
+    cam_init_object_table_d(p + 456);
+    cam_init_object_table_d(p + 528);
+    cam_init_object_table_c(p + 600);
+    cam_init_object_table_d(p + 664);
+    cam_init_object_table_d(p + 736);
+    cam_init_object_table_d(p + 808);
+    cam_init_object_table_d(p + 880);
+    cam_init_object_table_d(p + 952);
     return p;
 }
 
 
 /* Store the supplied unsigned 32-bit word at owner byte offset 0xB 8. */
-void func_L00_0043DA18(int param_1, unsigned int param_2)
+void owner_set_word(int param_1, unsigned int param_2)
 {
   *(unsigned int *)(param_1 + 0xb8) = param_2;
   return;
@@ -243,7 +243,7 @@ void func_L00_0043DA18(int param_1, unsigned int param_2)
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_L00_0043EA78(unsigned long param_1)
+unsigned long stub_l00_return_arg_2(unsigned long param_1)
 {
   return param_1;
 }
@@ -254,35 +254,35 @@ unsigned long func_L00_0043EA78(unsigned long param_1)
 
 
 /* Stores a value in one of the object's fields. */
-void func_L00_004427C8(char *object, int value) {
+void object_set_field_first(char *object, int value) {
     *(int *)(object + 0x157C) = value;
 }
 
 /* Stores a value in the next field after the one set by the previous function. */
-void func_L00_004427D0(char *object, int value) {
+void object_set_field_next(char *object, int value) {
     *(int *)(object + 0x1580) = value;
 }
 
 
 /* Does nothing. */
-void func_L00_00443B58(void)
+void stub_l00_noop_2(void)
 {
 }
 
-extern int func_00338A60(char *p);
+extern int text_panel_update_mode(char *p);
 
 /* Asks a sub-object for a value and passes it back. */
-int func_L00_00443DF8(char *p)
+int sub_object_get_value_first(char *p)
 {
-    return UpdateTextPanelByMode(p + 0x1D6C);
+    return text_panel_update_mode(p + 0x1D6C);
 }
 
-extern int func_00338F58(char *p);
+extern int text_panel_draw_scaled(char *p);
 
 /* Asks the same sub-object for a different value and passes it back. */
-int func_L00_00443E18(char *p)
+int sub_object_get_value_second(char *p)
 {
-    return DrawTextPanelScaled(p + 0x1D6C);
+    return text_panel_draw_scaled(p + 0x1D6C);
 }
 
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */
@@ -290,7 +290,7 @@ int func_L00_00443E18(char *p)
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_L00_00443EF8(unsigned long param_1)
+unsigned long stub_l00_return_arg_3(unsigned long param_1)
 {
   return param_1;
 }
@@ -301,50 +301,50 @@ extern char D_L00_001AEB60[];
 extern void func_2A48F0(void *a0, void *a1);
 
 /* Passes a fixed resident address, and the argument, on to the callee. */
-void func_L00_004450C0(void *arg)
+void load_forward_resident_address(void *arg)
 {
     func_2A48F0(D_L00_001AEB60, arg);
 }
 
 
 /* Does nothing. */
-void func_L00_00445EE8(void)
+void stub_l00_noop_3(void)
 {
 }
 
 /* Return the constant signed integer one. */
 /* Returns the constant integer 1. Matches FUN_0012F940 disassembly and decompilation. */
-int func_L00_00445FE8(void) {
+int stub_l00_return_one_2(void) {
     return 1;
 }
 
 
-extern int func_00350A78(char *p);
+extern int mpeg_vibuf_get_free_regions(char *p);
 
 /* Asks a sub-object for a value and passes it back. */
-int func_L00_00447188(char *p)
+int sub_object_get_value_a(char *p)
 {
-    return ViBufGetFreeRegions(p + 0x48);
+    return mpeg_vibuf_get_free_regions(p + 0x48);
 }
 
-extern int func_00350B70(char *p);
+extern int mpeg_vibuf_add_pending_bytes(char *p);
 
 /* Asks the same sub-object for another value and passes it back. */
-int func_L00_004471A8(char *p)
+int sub_object_get_value_b(char *p)
 {
-    return ViBufAddPendingBytes(p + 0x48);
+    return mpeg_vibuf_add_pending_bytes(p + 0x48);
 }
 
-extern int func_00351268(char *p);
+extern int mpeg_vibuf_get_queued_bytes(char *p);
 
 /* Asks the same sub-object for yet another value and passes it back. */
-int func_L00_00447278(char *p)
+int sub_object_get_value_c(char *p)
 {
-    return ViBufGetQueuedBytes(p + 0x48);
+    return mpeg_vibuf_get_queued_bytes(p + 0x48);
 }
 
 
 /* Does nothing. */
-void func_L00_00447780(void)
+void stub_l00_noop_4(void)
 {
 }

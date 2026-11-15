@@ -16,15 +16,15 @@ typedef struct {
     int second;
 } CallbackToggleState;
 
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
 extern void func_0029C450(void);
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 extern int F750245c6_D_001A7340 __attribute__((sda));
 
@@ -32,11 +32,11 @@ extern void F750245c6_FUN_0028FC48(int a, int b, int c, int d, char *e, int f);
 
 extern char *D_001A8CFC[] __attribute__((sda));
 
-extern void func_00341550(void *, int);
+extern void tab_menu_set_enabled(void *, int);
 
-extern void func_00341540(char *, char *, char *, char *);
+extern void tab_menu_set_tables(char *, char *, char *, char *);
 
-extern void func_00341610(char *, int);
+extern void tab_menu_switch_tab(char *, int);
 
 extern char D_002615F8[];
 
@@ -48,25 +48,25 @@ extern int D_001AB9B0 __attribute__((sda));
 
 extern char *D_001A8CFC[] __attribute__((sda));
 
-extern void *func_00341558(void *);
+extern void *tab_menu_get_selected_value(void *);
 
 extern char *D_001A8CFC[] __attribute__((sda));
 
 extern int D_0025CADC;
 
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 
 extern int D_00138344;
 
 extern int D_001A7908 __attribute__((sda));
 
-extern CallbackToggleState D_00189E20;
+extern CallbackToggleState g_hero_state;
 
 extern float D_0018B300[];
 
-extern int func_002E5E58(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
 extern int D_00138344;
 
@@ -88,9 +88,9 @@ extern void func_0029C6B0(int);
  *   - Returns 0
  */
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 /*
  * Function: func_002D2EE0
@@ -113,7 +113,7 @@ void func_0027C660(void);
 /* External functions declared with exact aliases from task.externals */
 
 /* Draws a menu screen through the shared screen-drawing helper and reports that nothing was chosen. */
-long long func_002CD8C0(void)
+long long menu_draw_screen_via_helper(void)
 {
     SetupGifPaging(0LL);
     func_0029C450();
@@ -122,17 +122,17 @@ long long func_002CD8C0(void)
 }
 
 /* Sets up the menu list widget and hands the object its text-list pointer. */
-int func_002CD8F0(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { SetTabbedMenuEnabled(root+0x3BE08,1); *(void **)((char *)object+0x34)=GetSelectedTabEntryValue(D_001A8CFC[0]+0x3BE08); } return 0; }
+int menu_init_list_object(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { tab_menu_set_enabled(root+0x3BE08,1); *(void **)((char *)object+0x34)=tab_menu_get_selected_value(D_001A8CFC[0]+0x3BE08); } return 0; }
 
 /* func_002CDA20 is defined in 002CDA20.c. */
 
 /* Builds the three-entry Extras menu list and selects its first entry. */
-int func_002CDAB0(void)
+int menu_build_extras_list(void)
 {
     if (D_001A8CFC[0] != 0) {
-        SetTabbedMenuEnabled(D_001A8CFC[0] + 0x3BE08, 1);
-        SetTabbedMenuTables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        SwitchTabbedMenuTab(D_001A8CFC[0] + 0x3BE08, 0);
+        tab_menu_set_enabled(D_001A8CFC[0] + 0x3BE08, 1);
+        tab_menu_set_tables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
+        tab_menu_switch_tab(D_001A8CFC[0] + 0x3BE08, 0);
     }
     return 0;
 }
@@ -142,13 +142,13 @@ int func_002CDAB0(void)
 /* func_002CDD88 is built from 002CDD88-g8.c. */
 
 /* Marks the menu cursor as reset. */
-int func_002CE5B8(void) {
+int menu_reset_cursor_flag(void) {
     D_001AB9B0 = 1;
     return 0;
 }
 
 /* Menu callback that does nothing. */
-int func_002CE5C8(void) {
+int menu_noop_callback(void) {
     return 0;
 }
 
@@ -157,7 +157,7 @@ int func_002CE5C8(void) {
 /* func_002CEBD0 is built from 002CEBD0-g8.c. */
 
 /* Draws a thin box frame around the highlighted menu text, sized to the text width. */
-void func_002CF0A0(int textWidth, char *color)
+void menu_draw_text_highlight_frame(int textWidth, char *color)
 {
     int centerX, halfWidth, right, left;
     halfWidth = textWidth / 2 + 5;
@@ -171,9 +171,9 @@ void func_002CF0A0(int textWidth, char *color)
 }
 
 /* Gives the object its text-list pointer when the menu list exists. */
-int func_002CF188(char *object) {
+int menu_assign_list_text_pointer(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = GetSelectedTabEntryValue(D_001A8CFC[0] + 0x3BE08);
+        *(void **)(object + 0x34) = tab_menu_get_selected_value(D_001A8CFC[0] + 0x3BE08);
     return 0;
 }
 
@@ -186,7 +186,7 @@ int func_002CF188(char *object) {
 /* func_002CF7F0 is built from 002CF7F0-g8.c. */
 
 /* Menu callback that does nothing. */
-int func_002CFBE0(void) {
+int menu_noop_callback_b(void) {
     return 0;
 }
 
@@ -194,7 +194,7 @@ int func_002CFBE0(void) {
 /* func_002CFDA8 is built from 002CFDA8-g8.c. */
 
 /* Menu callback that does nothing. */
-int func_002D01C8(void) {
+int menu_noop_callback_c(void) {
     return 0;
 }
 
@@ -226,7 +226,7 @@ extern unsigned char D_001ABA36[] __attribute__((sda));
 extern unsigned char D_001ABA37[] __attribute__((sda));
 
 /* Remembers which special items the player has just collected by setting their flags. */
-int func_002D1590(void)
+int menu_record_collected_special_items(void)
 {
     if (D_001A8CFC[0] != 0 && ((unsigned char *)D_001A7A00)[0xA] != 0) {
         if (D_001A7BB0[0x3A] != 0 && D_001395E9 != 0)
@@ -258,14 +258,14 @@ int func_002D1590(void)
 
 
 /* Menu callback that does nothing. */
-int func_002D2010(void) {
+int menu_noop_callback_d(void) {
     return 0;
 }
 
 
 
 /* Sets the menu scroll timer back to its start value. */
-int func_002D23D8(void) {
+int menu_reset_scroll_timer(void) {
     if (D_001A8CFC[0] != 0) D_0025CADC = -300;
     return 0;
 }
@@ -274,20 +274,20 @@ int func_002D23D8(void) {
 
 
 /* Menu callback that does nothing. */
-int func_002D2830(void) {
+int menu_noop_callback_e(void) {
     return 0;
 }
 
 /* Handles menu input for the page: closes on cancel, and on confirm toggles between two display states. */
-int func_002D2838(void)
+int menu_handle_page_toggle_input(void)
 {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -298,12 +298,12 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else if (flags & 0x40) {
-        PlaySoundFromGlobalBank(4, 0, 0);
+        snd_play_from_global_bank(4, 0, 0);
         switch (D_001A7908) {
         default:
             D_001A7908 = 0;
-            gHeroState.second = 0;
-            gHeroState.first = 0;
+            g_hero_state.second = 0;
+            g_hero_state.first = 0;
             break;
         case 0:
             D_001A7908 = 1;
@@ -317,13 +317,13 @@ return_value:
 /* func_002D2918 is built from 002D2918-g8.c. */
 
 /* Passes the current pad buttons to the menu update helper. */
-int func_002D2BD8(void) {
+int menu_forward_pad_buttons(void) {
     func_0029C640(D_00138344);
     return 0;
 }
 
 /* Draws a menu screen through the shared screen-drawing helper and reports that nothing was chosen. */
-int func_002D2C00(void) {
+int menu_draw_screen_via_helper_b(void) {
     SetupGifPaging(0);
     func_0029C610();
     DoGifPaging();
@@ -331,14 +331,14 @@ int func_002D2C00(void) {
 }
 
 /* Handles menu input: closes on cancel, otherwise passes the buttons on to the page handler. */
-int func_002D2C30(void) {
+int menu_handle_page_input(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }

@@ -2,9 +2,9 @@
 
 #include "common.h"
 typedef u64 TI128 __attribute__((mode(TI)));
-extern u8 *D_0018C0B0;
+extern u8 *g_hero_moby;
 extern f32 D_L08_001BE0B0;
-extern u64 func_0027C878(int);
+extern u64 GetEffectTextureDescriptor(int);
 extern u8 D_L08_00296CD0[];
 extern u8 D_L08_001DB5E7;
 extern s32 D_L08_001DAC40[];
@@ -13,9 +13,9 @@ extern u8 *D_L08_001B29DC __attribute__((sda));
 extern u8 *D_L08_001B29E0 __attribute__((sda));
 extern u8 *D_L08_001B29DC __attribute__((sda));
 extern u32 D_L08_001FB660[];
-extern f32 func_00283248(f32, f32);
-extern f32 func_00282E20(void *);
-extern u8 *D_0018C0B0;
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 vec_length_xy(void *);
+extern u8 *g_hero_moby;
 
 s32 func_PAL_L08_0033B2D0(u8 *p, s32 a1, s32 a2, u8 *out, f32 f1, f32 f2) {
     u8 *q;

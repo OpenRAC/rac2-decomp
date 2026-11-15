@@ -31,13 +31,13 @@ typedef struct {
     int a;
     int b;
 } L06ColorPair;
-extern void func_L06_00444300(L06Obj *);
+extern void marker_draw_group(L06Obj *);
 extern L06ColorPair D_L06_001B1098[];
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern void func_0029FC20(void *moby, int joint, void *out);
-extern void func_L00_002E6CF0(void *, void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern void moby_transform_joint_point(void *moby, int joint, void *out);
+extern void gfx_add_draw_callback_first(void *, void *);
 
 /* Advances the owner's pulse (the angle, then the blend it gives), tints the owner with the
    colour pair and, when its stamp is not the current one, refreshes every live class-0xDB0
@@ -53,11 +53,11 @@ void func_PAL_L06_00448CF0(L06Obj *self)
     float angle;
     float blend;
 
-    angle = func_00283B98(state->angle, 0.25132746f);
+    angle = FastAddRotations(state->angle, 0.25132746f);
     state->angle = angle;
-    blend = func_00283198(angle) * 0.5f + 0.5f;
+    blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     state->blend = blend;
-    self->tint = func_00283D38(colors.a, colors.b, blend);
+    self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (state->stamp != D_L06_001B2348) {
         for (p = (unsigned short *)D_L06_001FB3A0[self->group];
              self->group != 0xFF && self->group <= D_L06_001B2838 && p != 0 &&
@@ -72,13 +72,13 @@ void func_PAL_L06_00448CF0(L06Obj *self)
                     if (e->kind != 0xFE) {
                         if (e->kind != 0xFD) {
                             s0 = e->cfg;
-                            func_0029FC20(e, 0, &s0->vec);
+                            moby_transform_joint_point(e, 0, &s0->vec);
                             s0->stamp = D_L06_001B2348;
                         }
                     }
                 }
             }
         }
-        func_L00_002E6CF0((void *)func_L06_00444300, self);
+        gfx_add_draw_callback_first((void *)marker_draw_group, self);
     }
 }

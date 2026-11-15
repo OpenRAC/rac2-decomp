@@ -15,7 +15,7 @@ extern void func_002D96D0(void);
 extern void func_00371A70(void);
 
 /* Finishes the water wave drawing by writing the draw settings into the graphics packet. */
-void func_L01_003CB540(void)
+void gfx_finish_wave_grid_packet(void)
 {
     u8 *state;
     u8 *cursor = D_L01_001B2CC8[0];

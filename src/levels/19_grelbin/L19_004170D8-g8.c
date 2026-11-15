@@ -35,11 +35,11 @@ typedef struct GrelbinMoby {
 } GrelbinMoby;
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
-extern int D_001A79F0 __attribute__((sda));
-extern u8 D_00189EA0[];
+extern int g_current_map_index __attribute__((sda));
+extern u8 g_hero_position[];
 typedef struct { u8 pad0[0x464]; u8 active[0]; } GrelbinEntityFlags;
 extern GrelbinEntityFlags D_L19_0021EA30;
-extern GrelbinMoby *D_L19_001B2A1C __attribute__((sda));
+extern GrelbinMoby *g_moby_l19_array __attribute__((sda));
 extern void func_00318240(GrelbinMoby *,int,int);
 extern void func_0030DFE8(GrelbinMoby *);
 extern void *func_0031A8C8(GrelbinMoby *,int,int);
@@ -58,7 +58,7 @@ extern void func_0031CDC8(void *,void *);
 extern int func_002EB5C0(void *);
 extern float func_0031A928(void *,void *);
 extern void func_0031CD08(void *,void *);
-extern int D_L19_001B1D20 MACRO_ADDR;
+extern int g_active_yeti_count MACRO_ADDR;
 typedef struct {
     u8 pad0[0x80];
     float position[4];
@@ -68,7 +68,7 @@ typedef struct {
     GrelbinMoby *object;
     int mode;
 } GrelbinPlayer;
-extern GrelbinPlayer D_00189E20;
+extern GrelbinPlayer g_hero_state;
 extern GrelbinMoby *D_L19_001B2A28 MACRO_ADDR;
 extern int func_00326D70(void *,int,float,int,float,int);
 extern float func_002EBB00(void *,void *);
@@ -135,7 +135,7 @@ typedef struct {
     int w304;
 } GrelbinUpdateState;
 /* Sets up the Leviathan's helper object on its first frame, takes hit damage, and watches for a Y.E.T.I. to grab. Returns 1 when the object should be removed. */
-int func_L19_004170D8(GrelbinMoby *moby)
+int leviathan_update_helper(GrelbinMoby *moby)
 {
     GrelbinUpdateState *vars=moby->pvars;
     void *otherMoby;
@@ -148,7 +148,7 @@ int func_L19_004170D8(GrelbinMoby *moby)
         moby->w98=0;
         moby->flags=(moby->flags|1)&0xEFFF;
         vars->w304=0;
-        if (vars->sourceIndex!=-1) vars->source=gMobyArray_L19+vars->sourceIndex;
+        if (vars->sourceIndex!=-1) vars->source=g_moby_l19_array+vars->sourceIndex;
         else {
             vars->source=func_0030DC80(0x1178 /* moby class 4472 */);
             if (!vars->source) {
@@ -185,7 +185,7 @@ int func_L19_004170D8(GrelbinMoby *moby)
         u16 id=moby->uid;
         int value;
         if (D_L19_0021EA30.active[(s16)id]) goto replace;
-        value=D_0019B4A8[((s16)id>>1)+(gCurrentMapIndex<<10)];
+        value=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
         if ((id&1) ? ((value>>4)&7) : (value&7)) {
         replace:
         {
@@ -210,8 +210,8 @@ int func_L19_004170D8(GrelbinMoby *moby)
         spawn=func_0030DC80(0x1266 /* moby class 4710 */);
         if(!spawn) goto success;
         id=moby->uid;
-        if(id&1) { count=((s16)id>>1)+(gCurrentMapIndex<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
-        else { count=((s16)id>>1)+(gCurrentMapIndex<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
+        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
+        else { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
         spawn->opacity=80;spawn->flags|=0x800;spawn->drawDistance=255;spawn->group=255;
         spawn->state=0;spawn->bBC=0;spawn->b31=1;
         qcopy(spawn->position,vars->source->position);
@@ -243,10 +243,10 @@ int func_L19_004170D8(GrelbinMoby *moby)
             func_00318240(moby,12,3);
             target=vars->target;
             if(target && target->classId==0x10D0 /* Y.E.T.I. */) {
-                gActiveYetiCount=gActiveYetiCount-1;
+                g_active_yeti_count=g_active_yeti_count-1;
                 func_0030DFE8(target);
-                vars->target=gHeroState.object;
-                vars->targetSet=1;qcopy(vars->targetPosition,gHeroState.previousPosition);
+                vars->target=g_hero_state.object;
+                vars->targetSet=1;qcopy(vars->targetPosition,g_hero_state.previousPosition);
             }
         }
         moby->hitFlash=255;
@@ -257,11 +257,11 @@ int func_L19_004170D8(GrelbinMoby *moby)
     if(moby->aiMode) {
         vars->w2F8=func_00326D70(moby,vars->w2F4,vars->f214*1.5f,0,0.f,0);
         if(vars->w2F4==-1) {
-            if(func_002EBB00(moby->position,gHeroPosition)<32.f) vars->w2F8=1;
+            if(func_002EBB00(moby->position,g_hero_position)<32.f) vars->w2F8=1;
             else vars->w2F8=0;
         }
     }
-    if(gHeroState.mode==49) qcopy(vars->targetPosition,gHeroState.position);
+    if(g_hero_state.mode==49) qcopy(vars->targetPosition,g_hero_state.position);
     otherMoby=D_L19_001B2A28;
     while(otherMoby) {
         if(((GrelbinMoby *)otherMoby)->classId==0x10D0 /* Y.E.T.I. */ && moby->state!=4 && moby->state!=9 && moby->state!=8 && vars->health>0.f) {

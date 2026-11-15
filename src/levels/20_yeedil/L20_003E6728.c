@@ -13,20 +13,20 @@ typedef struct {
     long reserved, texture, state, flags;
 } QuadPacket;
 extern Vector D_L20_001B9FC0;
-extern void func_00281DE8(QuadPacket *,int,int,int);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern float func_00283CE0(int);
-extern unsigned int func_00283D38(unsigned int,unsigned int,float);
-extern void func_00280B90(QuadPacket *,void *,int);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_002FC560(unsigned int,unsigned long long);
+extern void gfx_init_quad_packet_state(QuadPacket *,int,int,int);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern float IntToFloat(int);
+extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
+extern void draw_world_quad(QuadPacket *,void *,int);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *,void *,float);
+extern void VU1_addGSregister(unsigned int,unsigned long long);
 
 /* Draws a ribbon along a loop of points, with a second narrower bevel strip drawn on the inside edge. */
-void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
+void gfx_draw_ribbon_along_points(Vector *points,int count,int texture1,int texture2,
     unsigned int colorEnd1,unsigned int colorStart1,unsigned int colorEnd2,unsigned int colorStart2,
     int first,int last,int segments,float width1,float width2,float inset)
 {
@@ -34,11 +34,11 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
     Vector cross, scaledCross, radial, tangent, left, right, nextRadial, previousRadial, scaledRadial, equalRadial1, equalRadial2, offset;
     float step, fraction, previousLength, nextLength;
     int current, previous, next;
-    InitQuadPacketState(&strip,texture1,1,128);
+    gfx_init_quad_packet_state(&strip,texture1,1,128);
     strip.color[0]=strip.color[1]=strip.color[2]=strip.color[3]=colorStart1;
     strip.uv[0]=0; strip.uv[1]=0; strip.uv[2]=0; strip.uv[3]=1;
     strip.uv[4]=1; strip.uv[5]=0; strip.uv[6]=1; strip.uv[7]=1;
-    InitQuadPacketState(&bevel,texture2,1,128);
+    gfx_init_quad_packet_state(&bevel,texture2,1,128);
     bevel.color[0]=bevel.color[1]=bevel.color[2]=bevel.color[3]=colorStart2;
     bevel.uv[0]=0; bevel.uv[1]=0; bevel.uv[2]=0; bevel.uv[3]=1;
     bevel.uv[4]=1; bevel.uv[5]=0; bevel.uv[6]=1; bevel.uv[7]=1;

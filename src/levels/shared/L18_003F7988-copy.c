@@ -5,11 +5,11 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 typedef int Quad __attribute__((mode(TI)));
-extern void func_002833F0(char *, char *);
-extern void func_002A7750(u8 *, u8, s32);
+extern void euler_rotation_basis(char *, char *);
+extern void moby_set_state(u8 *, u8, s32);
 
 /* Restores the saved spawn transform and starts the object in its idle state. */
-void func_L18_003F7988(u8 *self) {
+void protopet_reset_to_spawn(u8 *self) {
     u8 *state = *(u8 **)(self + 0x68);
     state[0x2E] = 1;
     *(f32 *)(state + 0x20) = *(s16 *)(state + 0x24);
@@ -17,11 +17,11 @@ void func_L18_003F7988(u8 *self) {
     *(Quad *)(self + 0x10) = *(Quad *)(state + 0x210);
     *(Quad *)(self + 0xF0) = *(Quad *)(state + 0x220);
     euler_rotation_basis((char *)self + 0xC0, (char *)self + 0xF0);
-    SetMobyState(self, 0, -1);
+    moby_set_state(self, 0, -1);
 }
 
 /* Restores the second object's saved transform and collision settings. */
-void func_L18_003FC9B8(u8 *self) {
+void moby_reset_to_saved_transform(u8 *self) {
     u8 *state = *(u8 **)(self + 0x68);
     u8 *model = *(u8 **)(self + 0x24);
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & 0xFFBE) | 0x1000;
@@ -30,5 +30,5 @@ void func_L18_003FC9B8(u8 *self) {
     *(Quad *)(self + 0x10) = *(Quad *)(state + 0x60);
     *(Quad *)(self + 0xF0) = *(Quad *)(state + 0x70);
     euler_rotation_basis((char *)self + 0xC0, (char *)self + 0xF0);
-    SetMobyState(self, 0, -1);
+    moby_set_state(self, 0, -1);
 }

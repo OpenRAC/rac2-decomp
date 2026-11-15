@@ -11,20 +11,20 @@ typedef struct {
     int option[6];
 } SoundState_2E48E8;
 
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern int D_001A7B98 __attribute__((sda));
-extern int func_00131DE8(int);
-extern void func_00132938(int);
+extern int snd_StartSoundSystem(int);
+extern void snd_send_cmd11_one_value(int);
 extern void func_00132978(int, int);
-extern void func_001329B0(int, int, int);
-extern void func_002E4860(void);
-extern void func_00132888(int, int);
-extern void func_001328C0(int, int *);
+extern void snd_send_cmd78(int, int, int);
+extern void snd_set_default_group_volumes(void);
+extern void snd_send_cmd9(int, int);
+extern void snd_send_cmd96_with_settings(int, int *);
 
 #define SOUND ((SoundState_2E48E8 *)D_00188660)
 
 /* Clears the sound state and sets the volume and channel options again. */
-void func_002E48E8(void)
+void ResetSoundState(void)
 {
     int i;
     u8 *slot;
@@ -35,31 +35,31 @@ void func_002E48E8(void)
     SOUND->field40 = 0;
     SOUND->field44 = 0;
     /* 52 slots of 0x70 bytes follow the header. */
-    slot = gSoundState;
+    slot = g_sound_state;
     do {
         *(int *)(slot + 0x70) = 0;
         slot[0x74] = 0;
         slot += 0x70;
-    } while ((int)slot < (int)(gSoundState + 0x16C0));
+    } while ((int)slot < (int)(g_sound_state + 0x16C0));
     snd_StartSoundSystem(2);
-    SendSoundCommand11_00132938(!D_001A7B98);
+    snd_send_cmd11_one_value(!D_001A7B98);
     func_00132978(0, 1);
-    SendSoundCommand78(1, 24, 47);
-    SendSoundCommand78(2, 24, 47);
-    SendSoundCommand78(4, 24, 47);
-    SendSoundCommand78(5, 24, 47);
-    SendSoundCommand78(6, 24, 47);
-    SetDefaultSoundGroupVolumes();
-    SendSoundCommand9(0, SOUND->option[0]);
-    SendSoundCommand9(1, SOUND->option[1]);
-    SendSoundCommand9(2, SOUND->option[2]);
-    SendSoundCommand9(3, SOUND->option[3]);
-    SendSoundCommand9(4, SOUND->option[4]);
-    SendSoundCommand9(5, SOUND->option[5]);
-    SendSoundCommand9(6, SOUND->option[2]);
+    snd_send_cmd78(1, 24, 47);
+    snd_send_cmd78(2, 24, 47);
+    snd_send_cmd78(4, 24, 47);
+    snd_send_cmd78(5, 24, 47);
+    snd_send_cmd78(6, 24, 47);
+    snd_set_default_group_volumes();
+    snd_send_cmd9(0, SOUND->option[0]);
+    snd_send_cmd9(1, SOUND->option[1]);
+    snd_send_cmd9(2, SOUND->option[2]);
+    snd_send_cmd9(3, SOUND->option[3]);
+    snd_send_cmd9(4, SOUND->option[4]);
+    snd_send_cmd9(5, SOUND->option[5]);
+    snd_send_cmd9(6, SOUND->option[2]);
     settings[0] = 6;
     settings[1] = 59;
     settings[2] = 0x6666;
     settings[4] = settings[3] = 0x8000;
-    SendSoundCommand96(0, settings);
+    snd_send_cmd96_with_settings(0, settings);
 }

@@ -1,22 +1,23 @@
+#include "names.h"
 /* func_PAL_L07_003EF670, the PAL copy of func_L07_003EB2C0: the same C, where 0x7C becomes 0.008f
    and the two timers at 0x132 and 0x134 are word values scaled to 50 Hz. */
 #include "common.h"
 #define INT_AT(p,n) (*(int *)((p)+(n)))
 #define U16_AT(p,n) (*(unsigned short *)((p)+(n)))
 #define FLOAT_AT(p,n) (*(float *)((p)+(n)))
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_002A7750(void *,int,int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void moby_set_state(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);
-extern void func_002B0178(void *,void *,void *);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *);
-extern char *func_002A9640(void *,int,int);
-extern int func_002761F8(void *,void *,int,void *,void *);
+extern void coll_get_ground_distance_below(void *,void *,void *);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *);
+extern char *part_find_owned_effect_slot(void *,int,int);
+extern int CollLine(void *,void *,int,void *,void *);
 extern int func_PAL_002B1A50(void *,void *,int);
-extern int func_002B3BA8(void *,int,float,float,int,int);
-extern void func_0029F338(void *);
-extern void func_L07_003EB790(void *);
+extern int weapon_select_aim_target(void *,int,float,float,int,int);
+extern void moby_mark_spawned(void *);
+extern void entity_set_group_alert_c(void *);
 extern void func_PAL_L07_003EFEA0(void *);
 extern float D_L07_001B0BA8 __attribute__((sda));
 extern int D_L07_001B0BB0 __attribute__((sda));
@@ -34,10 +35,10 @@ void func_PAL_L07_003EF670(unsigned char *o)
     char *hit;
     float turn;
     if (!o[0x20]) {
-        p[0x48]=func_00283CF0(15.0f);
-        p[0x4A]=func_00283CF0(9.6f);
+        p[0x48]=FloatToInt(15.0f);
+        p[0x4A]=FloatToInt(9.6f);
 
-        if (func_002A77E0(2)) U16_AT(o,0x34)|=0x8000;
+        if (math_random_int_below(2)) U16_AT(o,0x34)|=0x8000;
         else U16_AT(o,0x34)&=0x7FFF;
         p[0x150]=6;
         INT_AT(p,0x188)=3;
@@ -51,7 +52,7 @@ void func_PAL_L07_003EF670(unsigned char *o)
         FLOAT_AT(p,0x54)=0.3f;
         FLOAT_AT(p,0x50)=1.0f;
         FLOAT_AT(p,0x60)=3.1415927f;
-        if (func_002A77E0(2)) turn=-turn;
+        if (math_random_int_below(2)) turn=-turn;
         FLOAT_AT(p,0x12C)=turn;
         U16_AT(p,0x132)=((s32)(D_L07_001B0BB0)*5+2)/6;
         U16_AT(p,0x134)=((s32)(D_L07_001B0BB4[0])*5+2)/6;
@@ -67,7 +68,7 @@ void func_PAL_L07_003EF670(unsigned char *o)
             INT_AT(p,0x320)=1;
         }
         FLOAT_AT(o,0x18)+=0.5f;
-        func_002B0178(o+0x10,o,o+0x10);
+        coll_get_ground_distance_below(o+0x10,o,o+0x10);
         if (INT_AT(p,0x2B0)!=-1) {
             char *entry=D_L07_001B1F40[0]+INT_AT(p,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(p,0x8C)=**(int **)(entry+0x3C);
@@ -76,38 +77,38 @@ void func_PAL_L07_003EF670(unsigned char *o)
         if (!INT_AT(p,0x2BC)) {
             INT_AT(o,0x98)=0;
             U16_AT(o,0x34)=(U16_AT(o,0x34)|0x41)&0xEFFF;
-            func_002A7750(o,11,4);
+            moby_set_state(o,11,4);
             if (o[0x43]) func_PAL_002A7E68(o,0,0,0);
         } else if (INT_AT(p,0x2B8)==-1) {
-            func_002A7750(o,1,0);
+            moby_set_state(o,1,0);
             if (o[0x43]!=2) func_PAL_002A7E68(o,2,0,0);
         } else {
-            func_002A7750(o,7,4);
+            moby_set_state(o,7,4);
             if (o[0x43]) func_PAL_002A7E68(o,0,0,0);
         }
     }
-    if (o[0x31] && func_00282E48(o+0x10,D_L07_001B9200)<24.0f) {
-        func_002A93B0(o);
+    if (o[0x31] && fast_vec_dist(o+0x10,D_L07_001B9200)<24.0f) {
+        moby_update_ground_check(o);
         o[0x6F]=22;
     }
-    hit=func_002A9640(o,0x10000,0);
+    hit=part_find_owned_effect_slot(o,0x10000,0);
     if (hit && *(char **)(hit+0x20)) {
         if (*(short *)(*(char **)(hit+0x20)+0xAA)==0xB7F) o[0xA8]=255;
-        else if (func_00282E48(*(char **)(hit+0x20)+0x10,o+0x10)<32.0f) {
+        else if (fast_vec_dist(*(char **)(hit+0x20)+0x10,o+0x10)<32.0f) {
             qcopy(from,*(char **)(hit+0x20)+0x10);
             from[2]+=0.5f;
             qcopy(to,o+0x10);
             to[2]+=0.5f;
-            if (func_002761F8(from,to,2,o,0)) o[0xA8]=255;
+            if (CollLine(from,to,2,o,0)) o[0xA8]=255;
         }
     }
     if (func_PAL_002B1A50(o,p+0x140,0)) {
-        func_L07_003EB790(o);
+        entity_set_group_alert_c(o);
         if (FLOAT_AT(p,0x20)<=0) {
             func_PAL_L07_003EFEA0(o);
-            func_0029F338(o);
+            moby_mark_spawned(o);
             return;
         }
     }
-    INT_AT(p,0x2DC)=func_002B3BA8(o,INT_AT(p,0x2B0),FLOAT_AT(p,0x2B4),0,0,0);
+    INT_AT(p,0x2DC)=weapon_select_aim_target(o,INT_AT(p,0x2B0),FLOAT_AT(p,0x2B4),0,0,0);
 }

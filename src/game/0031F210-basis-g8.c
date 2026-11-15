@@ -7,9 +7,9 @@ extern char D_0022AFA0[];
 extern char D_001B27B0[] __attribute__((section(".sdata")));
 extern float D_001B010C __attribute__((sda));
 extern float D_001B0108 __attribute__((sda));
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Builds the eight-vector table D_0022AFA0 from the object's two axis rows
    (+0xC0, +0xD0): entries 4-7 are row0, -row0, -row1, row1, entries 0-3 the
@@ -17,7 +17,7 @@ extern void func_00282F20(void *, void *, float);
    moved to the object's position (+0x10) and offset by D_001B27B0. The axis
    rows are written through `table` before the loop and the entries through
    `out` inside it; the two pointers must stay separate. */
-void func_00326EC0(char *object)
+void BuildEightDirectionOffsets(char *object)
 {
     char vectors[4][16] __attribute__((aligned(16)));
     char temp[16] __attribute__((aligned(16)));

@@ -6,25 +6,25 @@
 typedef int Quad __attribute__((mode(TI)));
 /* Known effect header and payload prefix; total allocation extent is unspecified. */
 typedef struct { unsigned char b0,b1,b2,b3; int color; unsigned char seed,alpha; unsigned short size; float life; union { Quad q; float f[4]; } position; float payload[8]; } Particle;
-extern Particle *func_002B9030(int);
-extern int func_00283CF0(float);
+extern Particle *part_alloc(int);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern float func_00283CE0(int);
-extern float func_00282E80(void *,void *);
-extern float func_002A7878(float,float);
-extern int func_002A77E0(int);
-extern s32 func_002AB1F0(u8 *);
-extern void func_00282CF0(float *,void *,void *);
-extern void func_00283698(void *,void *);
-extern void func_002830C0(float *,float *,void *);
+extern float IntToFloat(int);
+extern float vec_distance_xy(void *,void *);
+extern float math_random_float_range(float,float);
+extern int math_random_int_below(int);
+extern s32 moby_get_private_value_0(u8 *);
+extern void FastVecSub(float *,void *,void *);
+extern void matrix_from_basis_rows(void *,void *);
+extern void transform_vector(float *,float *,void *);
 extern unsigned char *ref_L00_0033C0D0_00;
 
 /* Creates a particle that is tied to an object. It remembers where it sits relative to that object. */
-Particle *func_L00_0033C0D0(char *object,Quad *position,float *velocity,int *config,int flag)
+Particle *part_spawn_object_relative_particle(char *object,Quad *position,float *velocity,int *config,int flag)
 {
     float relative[4];
     Quad matrix[4];
-    Particle *p=AllocParticle(0x4a);
+    Particle *p=part_alloc(0x4a);
     if(p) {
         float *out;
         p->alpha=FloatToInt(0.04f)-96;
@@ -32,7 +32,7 @@ Particle *func_L00_0033C0D0(char *object,Quad *position,float *velocity,int *con
         p->b1=0;
         out=p->payload;
         p->b2=*ref_L00_0033C0D0_00;
-        p->seed=Rand();
+        p->seed=func_001163B0();
         p->life=0;
         qcopy(&p->position, position);
         out[0]=velocity[0];out[1]=velocity[1];out[2]=velocity[2];

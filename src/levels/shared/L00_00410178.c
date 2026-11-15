@@ -14,14 +14,14 @@ typedef struct {
 typedef struct { char pad0[0xc]; short light; short timer; } FlashState;
 typedef struct { float color[4]; float position[4]; } LightRecord;
 
-extern EffectResident D_00189E20;
+extern EffectResident g_hero_state;
 extern LightRecord D_L00_001C6F40[];
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
-extern void func_00291450(int);
-extern int func_00282978(void *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
+extern void gfx_free_point_light(int);
+extern int FastDecTimer(void *);
 
 /* Drives a short light flash from a countdown timer: while the timer is 13 or more the
    intensity ramps up as (15 - timer) / 3, below that it fades as timer / 12 (the three
@@ -32,7 +32,7 @@ extern int func_00282978(void *);
    released. Each branch keeps its own reciprocal, which is what lets 1.0f share the
    reciprocal's register. */
 /* Shows a short flash of light near the object that quickly brightens and then fades away. */
-void func_L00_00410178(char *object, void *origin)
+void light_flash_update(char *object, void *origin)
 {
     float position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -40,7 +40,7 @@ void func_L00_00410178(char *object, void *origin)
     float scale[4] __attribute__((aligned(16)));
     FlashState *state;
     float *axis;
-    int disabled = gHeroState.mode == 3;
+    int disabled = g_hero_state.mode == 3;
     float red, green, blue;
 
     state = *(FlashState **)(object + 0x68);
@@ -56,21 +56,21 @@ void func_L00_00410178(char *object, void *origin)
             green = IntToFloat(state->timer) * (inverse * 0.8f);
             blue = IntToFloat(state->timer) * (inverse * 0.5f);
         }
-        if (gHeroState.alternate) {
+        if (g_hero_state.alternate) {
             FastVecScale(direction, object + 0xd0, -1.0f);
             qcopy(position, origin);
             axis = direction;
         } else {
-            qcopy(direction, gHeroState.axis);
+            qcopy(direction, g_hero_state.axis);
             qcopy(position, origin);
             axis = direction;
         }
-        FastVecScale(offset, gHeroState.object + 0xe0, 0.3f);
+        FastVecScale(offset, g_hero_state.object + 0xe0, 0.3f);
         FastVecAdd(position, position, offset);
         FastVecScale(scale, axis, 1.75f);
         FastVecAdd(position, position, scale);
         if (state->light == -1) {
-            state->light = AllocateEffectSlot_L00_2(position, 14.0f, 0.0f, red, green, blue);
+            state->light = part_l00_alloc_effect_slot_2(position, 14.0f, 0.0f, red, green, blue);
         } else {
             LightRecord *light = &D_L00_001C6F40[state->light];
             qcopy(light->position, position);
@@ -81,13 +81,13 @@ void func_L00_00410178(char *object, void *origin)
         }
         FastDecTimer(&state->timer);
     } else if (state->light != -1) {
-        FreePointLight(state->light);
+        gfx_free_point_light(state->light);
         state->light = -1;
         state->timer = 0;
     }
     if (disabled) {
         if (state->light != -1) {
-            FreePointLight(state->light);
+            gfx_free_point_light(state->light);
             state->light = -1;
         }
         state->timer = 0;

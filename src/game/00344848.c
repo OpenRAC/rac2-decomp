@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_00335E38(char *p, float x, float y, float zero, float zero2);
+extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
 
 extern float D_L04_001AE540 __attribute__((sda));
 
@@ -25,24 +25,24 @@ struct pos54dfe946 {
 };
 
 /* Moves four parts of the grid menu to their places next to the menu position. */
-void func_00344848(char *menu)
+void grid_menu_reposition_widgets(char *menu)
 {
     float zero = 0.0f;
 
-    SetFirstFloat4(menu + 808, D_L04_001AE540 + (*(struct pos54dfe946 **)(menu + 1072))->x,
+    object_set_first_float4(menu + 808, D_L04_001AE540 + (*(struct pos54dfe946 **)(menu + 1072))->x,
             D_L04_001AE544 + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    SetFirstFloat4(menu + 880, D_L04_001AE548 + (*(struct pos54dfe946 **)(menu + 1072))->x,
+    object_set_first_float4(menu + 880, D_L04_001AE548 + (*(struct pos54dfe946 **)(menu + 1072))->x,
             D_L04_001AE54C + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    SetFirstFloat4(menu + 952, D_L04_001AE550 + (*(struct pos54dfe946 **)(menu + 1072))->x,
+    object_set_first_float4(menu + 952, D_L04_001AE550 + (*(struct pos54dfe946 **)(menu + 1072))->x,
             D_L04_001AE554 + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    SetFirstFloat4(menu + 736, D_L04_001AE558 + (*(struct pos54dfe946 **)(menu + 1072))->x,
+    object_set_first_float4(menu + 736, D_L04_001AE558 + (*(struct pos54dfe946 **)(menu + 1072))->x,
             D_L04_001AE55C + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
 }
 
 /* These four fill func_00337210's 23-word descriptor, defaults first. f[21] defaults to 1
    before it takes the mode test, as in func_003462A8, whose object still holds that default
    store; here the store is dead and goes, and the later f[22] = 1 reuses its register. */
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 
 extern char D_0025E328[];
 extern int D_001AE304 __attribute__((sda));
@@ -54,7 +54,7 @@ extern int D_001AE328 __attribute__((sda));
 extern int D_001AE330 __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the third mode of the menu and draws it. */
-void func_00344F98(char *menu)
+void item_grid_draw_third_mode(char *menu)
 {
     int f[23];
 
@@ -96,7 +96,7 @@ extern int D_001AE358 __attribute__((sda));
 extern int D_001AE360 __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the second mode of the menu and draws it. */
-void func_00345088(char *menu)
+void item_grid_draw_second_mode(char *menu)
 {
     int f[23];
 
@@ -138,7 +138,7 @@ extern int D_001AE388 __attribute__((sda));
 extern int D_001AE390 __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the fourth mode of the menu and draws it. */
-void func_00345178(char *menu)
+void item_grid_draw_fourth_mode(char *menu)
 {
     int f[23];
 
@@ -180,7 +180,7 @@ extern int D_001AE3B8 __attribute__((sda));
 extern int D_001AE3C0 __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the first mode of the menu and draws it. */
-void func_00345268(char *menu)
+void item_grid_draw_first_mode(char *menu)
 {
     int f[23];
 

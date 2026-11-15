@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002CC6B0 (2,076 bytes, boot): the HUD scroll window. A FAKEMATCH unit (owner ruling,
  * 13 November 2026; config/fakematch.tsv): RAC1's win_shift/win_unshift pairs on stand-in globals
  * and reused locals, each site marked below. It builds with the switches of
@@ -6,11 +7,11 @@
 typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
 extern char D_001AB988[], D_001AB990[], D_001AB998[], D_001AB9A0[];
-extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], D_00139568[];
-extern unsigned char D_001A7AF8[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
+extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], g_item_slot_to_record[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
 extern int D_001C51D0 NOT_SDA;
-extern int D_001A7B90[] MACRO_ADDR;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_is_pal_video[] MACRO_ADDR;
+extern int g_current_map_index __attribute__((sda));
 extern int D_001AA440 __attribute__((sda));
 extern int D_001AB984 __attribute__((sda));
 extern int D_001AB9A8 __attribute__((sda));
@@ -19,19 +20,19 @@ extern int D_001AB9AC __attribute__((sda));
 extern int D_00138320[];
 extern char *D_001F2854 NOT_SDA;
 extern char D_0025A498[];
-extern void func_002FC560(int, long);
-extern int func_0029DB28(int *, unsigned int *, int *, int);
-extern int func_00289FC8(short, int, unsigned short *);
+extern void VU1_addGSregister(int, long);
+extern int menu_list_active_entries(int *, unsigned int *, int *, int);
+extern int text_find_pair_in_table(short, int, unsigned short *);
 typedef struct { unsigned char pad[4]; unsigned char available; unsigned char tail[0xDB]; } ItemConfig;
-extern ItemConfig D_00239BA0[];
-extern int func_00115DA8(char *, const char *, ...);
-extern void *func_00115484(void *, int, int);
-extern void func_0027C540(int);
-extern long func_0027C878(int);
-extern void func_0027C660(void), func_0027F120(void), func_0027F110(void);
-extern char *func_00288FB8(int);
-extern void func_0027FC70(void *, long, char *, long, long, unsigned char *);
-extern void func_0027ECC8(int, int, int, int, int);
+extern ItemConfig g_weapon_table[];
+extern int sprintf(char *, const char *, ...);
+extern void *memset(void *, int, int);
+extern void SetupGifPaging(int);
+extern long GetEffectTextureDescriptor(int);
+extern void DoGifPaging(void), gfx_disable_screen_flag(void), gfx_enable_screen_flag(void);
+extern char *GetLocalizedString(int);
+extern void FontPrintWindow(void *, long, char *, long, long, unsigned char *);
+extern void gfx_draw_box_outline(int, int, int, int, int);
 #define ST (*(char **)(D_001F2854 + 0xE8))
 #define TEXT(id) func_00288FB8(id)
 #define DRAW(c,t) func_0027FC70(&win,c,t,-1,tex,glyphs)
@@ -40,7 +41,7 @@ static inline void set_anchor(Win *p, unsigned short anchor) { p->s[5] = anchor;
 static inline void set_top(Win *p, unsigned short top) { p->s[0] = top; }
 static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
 /* Draws one line of help or item text inside a menu label box, and scrolls it when it is too long to fit. */
-int func_002CC6B0(unsigned char *label) {
+int render_configured_text_label(unsigned char *label) {
     char buf[0x40];
     int id;
     int helpResult;
@@ -72,7 +73,7 @@ int func_002CC6B0(unsigned char *label) {
 
     contentFlags = *(int *)(label + 0x30);
     if (contentFlags & 0x20) {
-        content = gCurrentMapIndex - 1;
+        content = g_current_map_index - 1;
         if ((unsigned int)content >= 0x12) {
             content = -1;
         }
@@ -89,14 +90,14 @@ int func_002CC6B0(unsigned char *label) {
     } else if (contentFlags & 0x80) {
         content = *(int *)(ST + 0x40);
         if (contentFlags & 0x8000) {
-            variant = gIsPalVideo[0] != 0;
+            variant = g_is_pal_video[0] != 0;
         }
     } else if (contentFlags & 0x100) {
         char *cell;
         content = *(int *)(ST + 0x3C);
         cell = *(char **)(ST + 0x48) + content * 10;
         if (*(short *)(cell + 4) == 0) {
-            id = gItemOwnedFlags[*(short *)(cell + 6)];
+            id = g_item_owned_flags[*(short *)(cell + 6)];
         } else {
             id = D_001395B8[*(short *)(cell + 6)];
         }
@@ -109,7 +110,7 @@ int func_002CC6B0(unsigned char *label) {
         content = *(int *)(st + 0x40);
         id = *(short *)(*(char **)(st + 0x34) + content * 12);
         *(int *)(label + 0x34) = 0xFFFF;
-        FindPairInTextTable(id, 0, (unsigned short *)(label + 0x34));
+        text_find_pair_in_table(id, 0, (unsigned short *)(label + 0x34));
     } else {
         char *cell;
         int k;
@@ -117,7 +118,7 @@ int func_002CC6B0(unsigned char *label) {
         k = *(short *)(cell + 6);
         variant = 0;
         if (*(short *)(cell + 4) == 0)
-            variant = ((ItemConfig *)(gItemSlotToRecord[k] * 0xE0 + (int)gWeaponTable_00239BA0))->available != 0;
+            variant = ((ItemConfig *)(g_item_slot_to_record[k] * 0xE0 + (int)g_weapon_table))->available != 0;
         content = k;
     }
 
@@ -169,7 +170,7 @@ int func_002CC6B0(unsigned char *label) {
         char *table = *(char **)(label + 0x34);
         text = TEXT(*(int *)(at + (unsigned int)(table + variant * 4)));
     }
-    if ((*(int *)(label + 0x30) & 0x11E4) == 0 && ((unsigned char *)&gItemOwnedFlags)[content] == 0) {
+    if ((*(int *)(label + 0x30) & 0x11E4) == 0 && ((unsigned char *)&g_item_owned_flags)[content] == 0) {
         text = D_001AB990;
     }
     if (*(int *)(label + 0x30) & 0x200) {
@@ -177,7 +178,7 @@ int func_002CC6B0(unsigned char *label) {
         char *table = *(char **)(label + 0x34);
         int id = *(int *)(at + (unsigned int)table);
         if (id != 0xB4B && id != 0xB52 && id != 0xB56) {
-            Sprintf(buf, D_001AB998, TEXT(0xB44), text);
+            sprintf(buf, D_001AB998, TEXT(0xB44), text);
             text = buf;
         }
     }
@@ -185,7 +186,7 @@ int func_002CC6B0(unsigned char *label) {
     centerX = *(int *)(label + 0x18) + *(int *)(label + 0x20) / 2;
     centerY = *(int *)(label + 0x1C) + *(int *)(label + 0x24) / 2;
     if ((f & 0x4004) == 0x4004 && *(int *)(label + 0x34) == 0x112D) {
-        ListActiveMenuEntries((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
+        menu_list_active_entries((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
         if (helpResult < 0) text = TEXT(0x112C);
         centerY += 8;
     }
@@ -220,7 +221,7 @@ int func_002CC6B0(unsigned char *label) {
     tmp.s[9] = wflags;
     tmp.s[11] = -(*(unsigned short *)(label + 0x3C) & 0xF);
     win = tmp;
-    if (D_001AB9AC) DrawBoxOutline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
+    if (D_001AB9AC) gfx_draw_box_outline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
     if (*(int *)(label + 0x30) & 0x10000) {
         win.s[1] = *(unsigned short *)(label + 0x24) - 1;
     }
@@ -258,11 +259,11 @@ int func_002CC6B0(unsigned char *label) {
        block head (no code, one issue slot each); k and g are set again below, so the USEs
        anti-depend on `lui s0` / `lw v1,0x30` and fill retail's two empty slots. */
     if (g) {
-        DisableScreenFlag();
+        gfx_disable_screen_flag();
     }
     DRAW(colour, text);
     if (*(int *)(label + 0x30) & 0x20000) {
-        EnableScreenFlag();
+        gfx_enable_screen_flag();
     }
     if (*(int *)(label + 0x30) & 0x400) {
         /* FAKEMATCH: y holds gap*3 and then the s[0] copy, so the lhu waits for the add that

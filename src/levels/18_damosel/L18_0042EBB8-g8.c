@@ -1,32 +1,32 @@
 #include "common.h"
 
-extern void func_0029F338(void *);
-extern int func_002E59B0(u8 *, int);
-extern int func_002E5CF8(int, int, u8 *);
-extern void func_002E59F8(int);
-extern u8 D_00188660[];
-extern int func_002A9640(u8 *, int, int);
-extern float func_002A96A0(u8 *, int);
-extern void func_002B3380(void *, void *, void *);
-extern char *func_0032C700(void *, int, int, int, float, float, int, int, int, int, int, int, int, void *);
-extern u8 *D_L18_001B281C;
-extern void func_L18_004329B0(u8 *);
-extern void func_L18_00432B30(u8 *, int);
-extern void func_L18_00432D08(u8 *);
-extern void func_L18_0042F768(u8 *);
-extern void func_L18_0042F308(u8 *, int, int);
-extern int func_L18_0042F688(u8 *, void *, int, void *, int, float);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B0A68(u8 *, int, void *, int, float, float, float, float);
-extern void func_002A7470(u8 *, int, int, int);
-extern void func_002A7750(u8 *, int, int);
-extern int func_002ACBC8(u8 *, int);
-extern u8 D_00189EA0[];
-extern float func_0029F530(u8 *);
-extern int func_002B3868(u8 *);
+extern void moby_mark_spawned(void *);
+extern int snd_is_voice_playing_for_owner(u8 *, int);
+extern int PlayMobySound(int, int, u8 *);
+extern void snd_stop_voice(int);
+extern u8 g_sound_state[];
+extern int part_find_owned_effect_slot(u8 *, int, int);
+extern float moby_update_aim_target_strength(u8 *, int);
+extern void part_spawn_damage_debris(void *, void *, void *);
+extern char *SpawnExplosion(void *, int, int, int, float, float, int, int, int, int, int, int, int, void *);
+extern u8 *g_moby_l18_table;
+extern void extermibot_destroy_piece_and_parts(u8 *);
+extern void extermibot_shrink_piece_and_parts(u8 *, int);
+extern void extermibot_advance_piece_to_state(u8 *);
+extern void leader_start_moving(u8 *);
+extern void leader_steer(u8 *, int, int);
+extern int path_step_along_point(u8 *, void *, int, void *, int, float);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_masked_debris(u8 *, int, void *, int, float, float, float, float);
+extern void anim_start_blended(u8 *, int, int, int);
+extern void moby_set_state(u8 *, int, int);
+extern int IsPointInCuboid(u8 *, int);
+extern u8 g_hero_position[];
+extern float moby_get_anim_value(u8 *);
+extern int flag_set_first_pending(u8 *);
 extern int *D_L18_001FE480[];
-extern int func_L09_0033E690(void *, int, float);
+extern int path_measure_moby_against_entry(void *, int, float);
 
 typedef struct {
     u8 pad00[0x20];
@@ -52,43 +52,43 @@ typedef struct {
 static inline void ReleaseVoice(u8 *moby, LeaderState *vars) {
     int slot = vars->voice;
     if (slot != -1) {
-        u8 *record = gSoundState + slot * 0x70;
+        u8 *record = g_sound_state + slot * 0x70;
         if (*(u8 **)(record + 0x88) == moby && record[0x74])
-            StopSoundVoice(slot);
+            snd_stop_voice(slot);
     }
     vars->voice = -1;
 }
 
 /* Updates the leader boss: it takes damage, follows its paths, drops pieces in
    stages, and explodes when its health runs out. */
-void func_L18_0042EBB8(u8 *moby) {
+void leader_update(u8 *moby) {
     LeaderState *vars = *(LeaderState **)(moby + 0x68);
     float hit;
     float vec[4];
 
     if (moby[0x20] >= 2) {
-        if (!IsVoicePlayingForOwner(moby, vars->voice))
+        if (!snd_is_voice_playing_for_owner(moby, vars->voice))
             vars->voice = PlayMobySound(0, 4, moby);
-    } else if (IsVoicePlayingForOwner(moby, vars->voice)) {
+    } else if (snd_is_voice_playing_for_owner(moby, vars->voice)) {
         ReleaseVoice(moby, vars);
     }
-    hit = UpdateAimTargetStrength(moby, FindOwnedEffectSlot(moby, 0x10000, 0));
+    hit = moby_update_aim_target_strength(moby, part_find_owned_effect_slot(moby, 0x10000, 0));
     if (moby[0x20] >= 2) {
         vars->health -= hit;
-        SpawnDamageDebrisOnHealthLoss(moby, vars->hit, &vars->health);
+        part_spawn_damage_debris(moby, vars->hit, &vars->health);
         if (vars->health <= 0.0f || vars->state == 2) {
             int i;
             SpawnExplosion(moby + 0x10, 1, 0x19, 20, 1.0f, 20.0f, 20, 20, 45, 1, 1, 1, 0, 0);
             for (i = 0; i < 6; i++) {
                 if (vars->ids[i] != -1)
-                    DestroyPieceAndParts(gMobyTable_L18 + (vars->ids[i] << 8));
+                    extermibot_destroy_piece_and_parts(g_moby_l18_table + (vars->ids[i] << 8));
             }
-            if (IsVoicePlayingForOwner(moby, vars->voice))
+            if (snd_is_voice_playing_for_owner(moby, vars->voice))
                 ReleaseVoice(moby, vars);
-            RandomDirectionVector(vec, 0.10000000894069672f, 0.25f);
+            vec_random_direction(vec, 0.10000000894069672f, 0.25f);
             FastVecAdd(vec, vec, vars->velocity);
-            SpawnDebrisForMaskedParts(moby, 63, vec, 255, 3.0f, 6.0f, 3.0f, 6.0f);
-            MarkMobySpawned(moby);
+            part_spawn_masked_debris(moby, 63, vec, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+            moby_mark_spawned(moby);
             return;
         }
     }
@@ -97,14 +97,14 @@ void func_L18_0042EBB8(u8 *moby) {
         int i;
         int all;
         u8 *base;
-        StartAnimationBlended(moby, 1, 0, 0);
+        anim_start_blended(moby, 1, 0, 0);
         *(int *)(moby + 0x48) = 0;
         *(int *)(moby + 0x98) = 0;
         *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         vars->state = 1;
         ReleaseVoice(moby, vars);
-        base = gMobyTable_L18;
+        base = g_moby_l18_table;
         *(u16 *)(moby + 0x34) |= 0x1000;
         all = 1;
         for (i = 0; i < 6; i++) {
@@ -122,33 +122,33 @@ void func_L18_0042EBB8(u8 *moby) {
             break;
         }
         if (all) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
     case 1:
-        if (vars->trigger != -1 && IsPointInCuboid(gHeroPosition, vars->trigger))
-            StartLeaderMoving(moby);
+        if (vars->trigger != -1 && IsPointInCuboid(g_hero_position, vars->trigger))
+            leader_start_moving(moby);
         break;
     case 2: {
-        float damage = GetMobyAnimationValue(moby);
-        if (SetFirstPendingFlag(moby)) {
+        float damage = moby_get_anim_value(moby);
+        if (flag_set_first_pending(moby)) {
             int i;
             moby[0xBC] = 0;
             *(float *)(moby + 0x48) = 1.0f;
             for (i = 0; i < 6; i++) {
                 if (vars->ids[i] != -1)
-                    ShrinkPieceAndLinkedParts(gMobyTable_L18 + (vars->ids[i] << 8), (int)moby);
+                    extermibot_shrink_piece_and_parts(g_moby_l18_table + (vars->ids[i] << 8), (int)moby);
             }
         } else if (moby[0xBC] == 0) {
-            SteerLeaderMoby(moby, 1, 1);
+            leader_steer(moby, 1, 1);
             if (damage > 8.0f) {
                 int i;
                 moby[0xBC] = 1;
                 for (i = 0; i < 6; i++) {
                     if (vars->ids[i] != -1 && vars->groups[i] == vars->group) {
-                        AdvancePieceToState3(gMobyTable_L18 + (vars->ids[i] << 8));
+                        extermibot_advance_piece_to_state(g_moby_l18_table + (vars->ids[i] << 8));
                         vars->ids[i] = -1;
                     }
                 }
@@ -156,50 +156,50 @@ void func_L18_0042EBB8(u8 *moby) {
                 *(int *)(moby + 0x48) = 0;
             }
         } else if (moby[0xBC] == 1) {
-            SteerLeaderMoby(moby, 1, 1);
+            leader_steer(moby, 1, 1);
             if (*(u16 *)(moby + 0x96) >= 31) {
                 moby[0xBC] = 2;
                 *(float *)(moby + 0x48) = 1.0f;
             }
         } else if (moby[0xBC] == 2) {
-            SteerLeaderMoby(moby, 1, 1);
+            leader_steer(moby, 1, 1);
             if (damage > 59.0f) {
                 *(int *)(moby + 0x48) = 0;
-                SetMobyState(moby, moby[0x94], -1);
+                moby_set_state(moby, moby[0x94], -1);
             }
         }
         break;
     }
     case 3:
-        if (SetFirstPendingFlag(moby)) {
-            vars->waypoint = MeasureMobyAgainstPathEntry(moby + 0x10, vars->paths[vars->group], 0.0f);
+        if (flag_set_first_pending(moby)) {
+            vars->waypoint = path_measure_moby_against_entry(moby + 0x10, vars->paths[vars->group], 0.0f);
             break;
         } else {
             int id = vars->paths[vars->group];
             float speed = 5.0f;
             if (vars->waypoint == D_L18_001FE480[id][0] - 1)
                 speed = 0.3f;
-            if (!StepAlongPathPoint(moby, vars->movement, id, &vars->waypoint, 0, speed)) {
+            if (!path_step_along_point(moby, vars->movement, id, &vars->waypoint, 0, speed)) {
                 if (vars->group <= 0 && vars->paths[1] != -1)
-                    SetMobyState(moby, 3, -1);
+                    moby_set_state(moby, 3, -1);
                 else
-                    SetMobyState(moby, 4, -1);
-                SetMobyState(moby, 2, -1);
+                    moby_set_state(moby, 4, -1);
+                moby_set_state(moby, 2, -1);
             }
         }
-        SteerLeaderMoby(moby, 1, 1);
+        leader_steer(moby, 1, 1);
         break;
     case 4:
-        if (SetFirstPendingFlag(moby)) {
-            vars->waypoint = MeasureMobyAgainstPathEntry(moby + 0x10, vars->escapePath, 0.0f);
+        if (flag_set_first_pending(moby)) {
+            vars->waypoint = path_measure_moby_against_entry(moby + 0x10, vars->escapePath, 0.0f);
             break;
-        } else if (!StepAlongPathPoint(moby, vars->movement, vars->escapePath, &vars->waypoint, 0, 2.0f)) {
-            if (IsVoicePlayingForOwner(moby, vars->voice))
+        } else if (!path_step_along_point(moby, vars->movement, vars->escapePath, &vars->waypoint, 0, 2.0f)) {
+            if (snd_is_voice_playing_for_owner(moby, vars->voice))
                 ReleaseVoice(moby, vars);
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
-        SteerLeaderMoby(moby, 1, 1);
+        leader_steer(moby, 1, 1);
         break;
     }
     if (*(u16 *)(moby + 0x96) <= 0xFFFE)

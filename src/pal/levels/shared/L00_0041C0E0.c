@@ -2,11 +2,11 @@
 
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00282DD8(void *, void *, void *);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void FastVecCross(void *, void *, void *);
 extern char D_L00_001B8C80[];
 typedef struct SpawnState {
     short life;
@@ -39,7 +39,7 @@ extern Vector128 D_L00_001BF220;
 char *func_PAL_L00_0041C0E0(Vector128 *position, int kind, char *parent)
 {
     Vector128 direction[1], up[1];
-    char *object = func_0029EFD0(0x139E);
+    char *object = CreateMoby(0x139E);
     if (object != 0) {
         SpawnObject *m = (SpawnObject *)object;
         AttachedSpawnState *state = (AttachedSpawnState *)m->state;
@@ -52,14 +52,14 @@ char *func_PAL_L00_0041C0E0(Vector128 *position, int kind, char *parent)
         qcopy(first, position);
         *(float *)(object + 0x1c) = 1.0f;
         second = object + 0xc0;
-        func_00282CF0(direction, D_L00_001B8C80 + 0x140, first);
-        func_00282F20(direction, direction, 1.0f);
-        func_002AFFD8(first, (char *)up, 1);
+        FastVecSub(direction, D_L00_001B8C80 + 0x140, first);
+        vec_scale_to_length(direction, direction, 1.0f);
+        cam_compute_view_direction(first, (char *)up, 1);
         qcopy(second, direction);
         third = object + 0xd0;
-        func_00282DD8(third, second, up);
-        func_00282F20(third, third, 1.0f);
-        func_00282DD8(object + 0xe0, third, second);
+        FastVecCross(third, second, up);
+        vec_scale_to_length(third, third, 1.0f);
+        FastVecCross(object + 0xe0, third, second);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         state->life = 50;
         state->kind = kind;
@@ -70,16 +70,16 @@ char *func_PAL_L00_0041C0E0(Vector128 *position, int kind, char *parent)
 
 
 
-extern float func_00283248(float, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *func_PAL_L00_00342480(void *, void *, int);
 extern char D_L00_001A8F20[] __attribute__((sda));
 typedef struct { char pad[0x140]; float x, y; } CameraHead;
-extern void func_L00_00417218(char *);
+extern void part_spawn_drifting_particles(char *);
 
 /* Spawns 25 particles around the object, each drifting away from the camera at a random angle. */
 void func_PAL_L00_0041C390(char *object)
@@ -90,18 +90,18 @@ void func_PAL_L00_0041C390(char *object)
     int i;
 
     for (i = 24; i >= 0; i--) {
-        heading = func_00283248(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
+        heading = mat_fast_helper_a(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
                                 ((CameraHead *)D_L00_001B8C80)->y - *(float *)(object + 0x14));
-        speed = func_002A78D8(1.0f, 2.0f);
-        func_00283CF0(speed);
-        spawn[0] = *(float *)(object + 0x10) + func_002A78D8(-0.25f, 0.25f);
-        spawn[1] = *(float *)(object + 0x14) + func_002A78D8(-0.25f, 0.25f);
-        spawn[2] = *(float *)(object + 0x18) + func_002A78D8(-0.25f, 0.25f);
+        speed = math_random_signed_float_range(1.0f, 2.0f);
+        FloatToInt(speed);
+        spawn[0] = *(float *)(object + 0x10) + math_random_signed_float_range(-0.25f, 0.25f);
+        spawn[1] = *(float *)(object + 0x14) + math_random_signed_float_range(-0.25f, 0.25f);
+        spawn[2] = *(float *)(object + 0x18) + math_random_signed_float_range(-0.25f, 0.25f);
         spread = 0.0f;
-        angle = func_00283B98(heading, func_002A78D8(spread, -1.5707965f));
+        angle = FastAddRotations(heading, math_random_signed_float_range(spread, -1.5707965f));
         speed = 4.0f;
-        spawn[4] = func_00283180(angle) * 0.020000001f * speed;
-        spawn[5] = func_00283198(angle) * 0.020000001f * speed;
+        spawn[4] = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
+        spawn[5] = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
         spawn[6] = 0.09f;
         func_PAL_L00_00342480(spawn, D_L00_001A8F20, 250);
     }

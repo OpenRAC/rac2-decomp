@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s8 D_00189EA0[];
+extern s8 g_hero_position[];
 extern s32 ref_L00_003CF438_00(s32, s32);
 extern void ref_L00_003CF438_01(s32, s32, void *);
 extern f32 ref_L00_003CF438_02(f32);
@@ -17,7 +17,7 @@ void func_PAL_L00_003D3380(void *object) {
     f32 ratio ;
     StackArgs args;
     s32 count;
-    if (*(volatile u8 *)((s8 *)object + 0x20) == 0 && ref_L00_003CF438_00((s32)D_00189EA0, state[0]) != 0) {
+    if (*(volatile u8 *)((s8 *)object + 0x20) == 0 && ref_L00_003CF438_00((s32)g_hero_position, state[0]) != 0) {
         *(volatile u8 *)((s8 *)object + 0x20) = 1;
         state[1] = 0;
         ref_L00_003CF438_01(0, 0, object);

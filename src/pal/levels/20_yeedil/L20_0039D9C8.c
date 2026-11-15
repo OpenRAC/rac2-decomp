@@ -14,11 +14,11 @@ extern YeedilEffectState D_L20_001BDCC0;
 extern int D_L20_001A8F00[] __attribute__((sda));
 extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002A77E0(int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int math_random_int_below(int);
 extern void func_PAL_002BEF58(void *, void *, int, float);
 
 void func_PAL_L20_0039D9C8(unsigned char *object)
@@ -42,14 +42,14 @@ void func_PAL_L20_0039D9C8(unsigned char *object)
             func_PAL_L00_003FB330(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
                           1, 1, 0, 0, 1.5f, 20.0f);
         if ((unsigned int)(state->frame - 143) < 124) {
-            func_0029FCC0(state->first, 0, position);
+            moby_transform_joint_to_world(state->first, 0, position);
             position[2] += 0.03f;
-            speed = func_002A7878(0.034f, 0.060000002f);
-            heading = func_002A7940();
-            tilt = func_002A7878(0.523598849773407f, 2.6179940700531006f);
-            func_002AF000(velocity, speed, heading, tilt);
-            if (func_002A77E0(2))
-                func_PAL_002BEF58(position, velocity, 0, func_002A7878(1470.0f, 7350.0f));
+            speed = math_random_float_range(0.034f, 0.060000002f);
+            heading = math_random_angle();
+            tilt = math_random_float_range(0.523598849773407f, 2.6179940700531006f);
+            vec_build_spherical_offset(velocity, speed, heading, tilt);
+            if (math_random_int_below(2))
+                func_PAL_002BEF58(position, velocity, 0, math_random_float_range(1470.0f, 7350.0f));
         }
         break;
     }

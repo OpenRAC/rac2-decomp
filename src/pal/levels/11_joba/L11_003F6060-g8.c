@@ -1,23 +1,23 @@
 #include "include_asm.h"
 #include "common.h"
-extern void func_002A7750(u8 *arg0, s32 arg1, s32 arg2);
-extern s32 func_002A77E0(s32 arg0);
-extern s32 func_L11_00440C80(s32 arg0);
+extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
+extern s32 math_random_int_below(s32 arg0);
+extern s32 arena_get_fighter_count(s32 arg0);
 extern s32 D_L11_001B056C __attribute__((sda));
 extern s32 D_L11_001B058C __attribute__((sda));
 extern f32 D_L11_001B0670;
-extern u8 *func_002A9640(s32 arg0, s32 arg1, s32 arg2);
-extern f32 func_002A96A0(u8 *arg0, u8 *arg1);
-extern void func_002AB800(u8 *arg0, u8 *arg1);
-extern s32 func_002B3380(u8 *arg0, u8 *arg1, u8 *arg2);
-extern s32 func_002B3BA8(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4, f32 arg5);
-extern void func_L11_003F3098(u8 *arg0);
+extern u8 *part_find_owned_effect_slot(s32 arg0, s32 arg1, s32 arg2);
+extern f32 moby_update_aim_target_strength(u8 *arg0, u8 *arg1);
+extern void gfx_start_color_fade(u8 *arg0, u8 *arg1);
+extern s32 part_spawn_damage_debris(u8 *arg0, u8 *arg1, u8 *arg2);
+extern s32 weapon_select_aim_target(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4, f32 arg5);
+extern void joba_enemy_reset(u8 *arg0);
 extern f32 D_L11_001B0570 __attribute__((sda));
 extern s32 D_L11_001FFA78[];
-extern f32 func_00283248(f32 a0, f32 a1);
-extern s32 func_00283CF0(f32 a0);
+extern f32 mat_fast_helper_a(f32 a0, f32 a1);
+extern s32 FloatToInt(f32 a0);
 extern u32 D_L11_001B0D9C __attribute__((sda));
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 
 /* Runs the object's timer down, keeps the shared step counter in step with it, and retires
    the object when the timed effect is over. */
@@ -33,8 +33,8 @@ void func_PAL_L11_003F6060(u8 *arg0) {
         return;
     }
     s1 = *(u8 **)(s0 + 0x68);
-    s2 = func_002A9640(s0, 0x10000, 0);
-    f2 = func_002A96A0(s0, s2);
+    s2 = part_find_owned_effect_slot(s0, 0x10000, 0);
+    f2 = moby_update_aim_target_strength(s0, s2);
     if (s2 != 0) {
         if (*(u8 *)(s0 + 0x20) >= 3) {
             *(f32 *)(s1 + 0x20) = *(f32 *)(s1 + 0x20) - f2;
@@ -44,19 +44,19 @@ void func_PAL_L11_003F6060(u8 *arg0) {
             *(s32 *)((u8 *)D_L11_001FFA78 + off) += (s32)(f2 * 32.0f);
             if (*(f32 *)(s2 + 0x2C) != 0.0f) {
                 s3 = s1 + 0x70;
-                func_002AB800(s0, s3);
+                gfx_start_color_fade(s0, s3);
                 if (*(f32 *)(s2 + 0x2C) >= D_L11_001B0570 || *(f32 *)(s1 + 0x20) <= 0.0f) {
-                    func_002AB800(s0, s3);
-                    func_002A7750(s0, 8, -1);
+                    gfx_start_color_fade(s0, s3);
+                    moby_set_state(s0, 8, -1);
                 }
             }
         }
     }
     *(u8 *)(s0 + 0xA8) = 0xFF;
-    func_002B3380(s0, s1 + 0x50, s1 + 0x20);
+    part_spawn_damage_debris(s0, s1 + 0x50, s1 + 0x20);
     if (*(u8 *)(s0 + 0x20) >= 2 && *(u8 *)(s1 + 0x2E) == 2) {
         *(s32 *)(s1 + 0x20) = 0;
-        func_L11_003F3098(s0);
+        joba_enemy_reset(s0);
     }
-    *(s32 *)(s1 + 0x258) = func_002B3BA8(s0, *(s32 *)(s1 + 0x25C), 0, 0, 200.0f, 200.0f);
+    *(s32 *)(s1 + 0x258) = weapon_select_aim_target(s0, *(s32 *)(s1 + 0x25C), 0, 0, 200.0f, 200.0f);
 }

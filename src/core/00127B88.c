@@ -7,7 +7,7 @@ extern int r1_func_0011B6B8(void *);
 
 extern int r1_D_00132EAC;
 
-extern int func_00127B88(int, int *, int *);
+extern int sceMcSync(int, int *, int *);
 
 extern char r1_D_00159B00[];
 
@@ -15,7 +15,7 @@ extern char r1_D_0015B0C0[];
 
 extern int r1_D_00132EA8;
 
-extern void func_00127B40(int);
+extern void mc_delay_thread(int);
 
 extern int *r1_D_00159B28;
 
@@ -66,16 +66,16 @@ extern char r1_D_0015B580[];
 extern void r1_func_001138B8(int) __attribute__((noreturn));
 
  /* exit */
-extern void func_00128898(void *, ...);
+extern void debug_print_stub(void *, ...);
 
-extern int func_00128440(int);
+extern int dbc_set_dma_buffer(int);
 
 /* rac1-decomp src/core/001236F0.c: func_00123F30 */
 /* sceMcSync(mode, &cmd, &result): polls the pending memory card command
    (or waits for it when mode is 0) and hands back its result. Exact
    only under 2.9-ee: 2.95.3's gcse leaves two extra %hi copies. */
 /* Checks whether the last memory card command has finished, and can wait for it to finish. */
-int func_00127B88(int mode, int *cmd, int *result) {
+int sceMcSync(int mode, int *cmd, int *result) {
     int r;
 
     if (r1_D_00132EA8 == 0) {
@@ -84,7 +84,7 @@ int func_00127B88(int mode, int *cmd, int *result) {
     r = r1_func_0011B6B8(r1_D_00159B00);
     if (mode == 0 && r != 0) {
         while (r1_func_0011B6B8(r1_D_00159B00) != 0) {
-            McDelayThread(0x3C);
+            mc_delay_thread(0x3C);
         }
         r = 0;
     }
@@ -104,7 +104,7 @@ int func_00127B88(int mode, int *cmd, int *result) {
 
 /* rac1-decomp src/core/001236F0.c: func_00124010 */
 /* Copies the card type, free space and format state out of the reply to the caller's variables. */
-void func_00127C68(int replyAddr) {
+void mc_copy_get_info_reply(int replyAddr) {
     char *reply = (char *)(replyAddr | 0x20000000);
     if (r1_D_00159B28 != 0) *r1_D_00159B28 = *(int *)(reply + 0x0);
     if (r1_D_00159B2C != 0) *r1_D_00159B2C = *(int *)(reply + 0x4);
@@ -116,7 +116,7 @@ void func_00127C68(int replyAddr) {
    and format state (each only when its result pointer is given); the
    reply lands in r1_D_0015A000 and func_00127C68 copies it out. */
 /* Asks the memory card for its type, free space and format state. */
-int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
+int sceMcGetInfo(int port, int slot, int *type, int *free, int *format) {
     int rpcResult;
 
     {
@@ -150,7 +150,7 @@ int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
     r1_D_00159B2C = free;
     r1_D_00159B30 = format;
     r1_func_0011AD70(r1_D_0015A000, 0xC0);
-    rpcResult = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, CopyMcGetInfoReply, r1_D_0015A000);
+    rpcResult = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, mc_copy_get_info_reply, r1_D_0015A000);
     if (rpcResult == 0) {
         r1_D_00132EA8 = 1;
     } else {
@@ -170,7 +170,7 @@ int func_00127CC0(int port, int slot, int *type, int *free, int *format) {
    handle; 0 records the command and returns 0 -- the same idiom as
    func_00127888/sceMcRead. */
 /* Deletes a file on a memory card. */
-int func_00128068(int port, int slot, char *fname) {
+int sceMcDelete(int port, int slot, char *fname) {
     char *client = r1_D_00159B00;
     char *request;
     int rpcResult;
@@ -203,7 +203,7 @@ int func_00128068(int port, int slot, char *fname) {
 /* rac1-decomp src/core/001236F0.c: func_00124528 */
 /* RPC 0x11, the same shape with two request words. */
 /* Sends a memory card command that takes a port and a slot (probably the unformat command). */
-int func_00128180(int port, int slot) {
+int sceMcUnformat(int port, int slot) {
     char *client = r1_D_00159B00;
     int *request;
     int rpcResult;
@@ -228,7 +228,7 @@ int func_00128180(int port, int slot) {
 
 /* rac1-decomp src/core/001236F0.c: func_001245F8 */
 /* Asks the controller server for its version number. */
-int func_00128250(void) {
+int dbc_get_server_version(void) {
     r1_func_0011B4C8(r1_D_0015B108, 0x80000963, 0, &r1_D_0015B180, 0x400,
                   &r1_D_0015B180, 0x400, 0, 0);
     return r1_D_0015B180;
@@ -241,14 +241,14 @@ int func_00128250(void) {
    the configuration into r1_D_0015B580. Returns 1, or 0 on a version
    mismatch. */
 /* Connects to the controller servers, checks their version and sets up the shared tables. */
-int func_001282A8(void) {
+int sceDbcInit(void) {
     int i;
     int version;
 
     r1_func_0011AE20(0);
     for (;;) {
         if (r1_func_0011B2F8(r1_D_0015B108, 0x80000900, 0) < 0) {
-            DebugPrintStub(r1_D_001535D8);
+            debug_print_stub(r1_D_001535D8);
             r1_func_001138B8(-1);
         }
         if (*(int *)(r1_D_0015B108 + 0x24) != 0) {
@@ -260,7 +260,7 @@ int func_001282A8(void) {
     }
     for (;;) {
         if (r1_func_0011B2F8(r1_D_0015B130, 0x8000091B, 0) < 0) {
-            DebugPrintStub(r1_D_001535D8);
+            debug_print_stub(r1_D_001535D8);
             r1_func_001138B8(-1);
         }
         if (*(int *)(r1_D_0015B130 + 0x24) != 0) {
@@ -270,7 +270,7 @@ int func_001282A8(void) {
         while (i--) {
         }
     }
-    version = GetDbcServerVersion();
+    version = dbc_get_server_version();
     if (version >> 8 != 2) {
         r1_func_0011A6C8(r1_D_001535F0);
         r1_func_0011A6C8(r1_D_00153618, 2, 0, version >> 8, version & 0xFF);
@@ -279,7 +279,7 @@ int func_001282A8(void) {
     for (i = 15; i >= 0; i--) {
         r1_D_0015B600[i] = 0;
     }
-    DebugPrintStub(r1_D_00153640, r1_D_0015B580);
-    SetDbcDmaBuffer((int)r1_D_0015B580);
+    debug_print_stub(r1_D_00153640, r1_D_0015B580);
+    dbc_set_dma_buffer((int)r1_D_0015B580);
     return 1;
 }

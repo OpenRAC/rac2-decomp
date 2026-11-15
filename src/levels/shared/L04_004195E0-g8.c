@@ -14,18 +14,18 @@ extern char D_L04_001B31B0[] __attribute__((sda));
 extern char D_L04_002605D0[];
 extern char D_L04_002C63C4[];
 extern int D_L04_001B31D0;
-extern int D_L04_001B090C __attribute__((sda));
-extern char *D_L04_001B24DC[] __attribute__((sda));
-extern void func_L04_0040A3B8(void *, int);
-extern void func_L04_0040A628(void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_002A8600(char **, int, int, int);
-extern int func_002A86E8(char **, char *, int, int);
+extern int g_current_race_index __attribute__((sda));
+extern char *g_moby_l04_pool[] __attribute__((sda));
+extern void racer_reset_state(void *, int);
+extern void InitRaceParticipants(void *);
+extern void FastVecScale(void *, void *, float);
+extern int GetFirstMobyInGroup(char **, int, int, int);
+extern int GetNextMobyInGroup(char **, char *, int, int);
 
 /* Reset the controller state, snapshot the object's position and matrix,
  * seed the nine-entry value table, then enable or disable the mobys of two
  * groups and four indexed mobys according to the current record's flags. */
-void func_L04_004195E0(char *obj)
+void hoverbike_init_race_course(char *obj)
 {
     InitValues vals = D_L04_001B0B98;
     char *data = *(char **)(obj + 0x68);
@@ -36,7 +36,7 @@ void func_L04_004195E0(char *obj)
     char *mobys;
     int j;
 
-    ResetRacerState(obj, 0);
+    racer_reset_state(obj, 0);
     *(int *)(data + 0x494) = -1;
     *(int *)(data + 0x498) = 0;
     *(float *)(data + 0x4A4) = -1;
@@ -62,7 +62,7 @@ void func_L04_004195E0(char *obj)
         GetFirstMobyInGroup(&moby, *(int *)(data + 0x260), 0, 0);
         if (moby) do {
             if (*(short *)(moby + 0xAA) == 0xAB8 /* Hoverbike Race Item Box */) {
-                if (*(int *)(D_L04_002C63C4 + (gCurrentRaceIndex << 6)) & 1) {
+                if (*(int *)(D_L04_002C63C4 + (g_current_race_index << 6)) & 1) {
                     **(int **)(moby + 0x68) = 0;
                     *(unsigned short *)(moby + 0x34) &= 0xFFBE;
                     *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
@@ -89,10 +89,10 @@ void func_L04_004195E0(char *obj)
     }
 
     {
-        int record = gCurrentRaceIndex;
+        int record = g_current_race_index;
         int i;
 
-        mobys = gMobyPool_L04[0];
+        mobys = g_moby_l04_pool[0];
         for (i = 0; i < 4; i++) {
             if (indices[i] != -1) {
                 char *target = mobys + (indices[i] << 8);

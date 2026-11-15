@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern float D_L00_001A7FA4 __attribute__((sda));
 
 extern float D_L00_001A7F9C __attribute__((sda));
 
 /* Gives the camera values for hero states 98 to 100 and 17. Returns 1 if it filled them in, otherwise 0. */
-int func_L00_002D64B8(float *heightOut, float *pitchOut, float *yawOut)
+int hero_get_camera_params(float *heightOut, float *pitchOut, float *yawOut)
 {
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
     int heroState = *(int *)(heroBase + 8852);
 
     if (heroState >= 98 && heroState <= 100) {
@@ -31,11 +31,11 @@ extern void func_0031DB00(void *, void *, float, float, float, float);
 extern void func_L00_002EE3D0(void *, void *, float);
 extern void func_L00_002EE108(void *, void *, void *);
 extern void func_L00_002EE220(void *, void *, void *);
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_0018B2F0[];
 /* Eases the camera height behind the hero and copies the hero camera data into the level camera block. */
-void func_L00_002D6588(void) {
-    char *hero = gHeroState;
+void hero_update_camera_block(void) {
+    char *hero = g_hero_state;
     char *cameraBlock;
     float targetHeight;
     if (*(float *)(hero + 0x151C) == 0.0f) *(float *)(hero + 0x151C) = 1.5f;
@@ -48,7 +48,7 @@ void func_L00_002D6588(void) {
         float minHeight = *(float *)(hero + 0x334) + 0.75f;
         if (*(float *)(hero + 0x14D8) < minHeight) *(float *)(hero + 0x14D8) = minHeight;
     }
-    cameraBlock = gCameraPosition_L00;
+    cameraBlock = g_camera_l00_position;
     qcopy(cameraBlock, D_0018B2F0);
     qcopy(cameraBlock + 0x230, D_0018B2F0 + 0x10);
     func_L00_002EE220(cameraBlock + 0x240, cameraBlock + 0x230, D_0018B2F0 - 0x14B0);

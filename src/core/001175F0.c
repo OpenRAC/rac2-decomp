@@ -9,9 +9,9 @@
 extern void *D_00133E74;
 
 struct _reent;
-extern long func_00117278(struct _reent *, const char *, char **, int);
+extern long _strtol_r(struct _reent *, const char *, char **, int);
 
 /* Turns a text string into a whole number, using the library state record. */
-long func_001175F0(int text, int endPtr, int base) {
-    return StrtolReentrant(D_00133E74, (const char *)text, (char **)endPtr, base);
+long strtol(int text, int endPtr, int base) {
+    return _strtol_r(D_00133E74, (const char *)text, (char **)endPtr, base);
 }

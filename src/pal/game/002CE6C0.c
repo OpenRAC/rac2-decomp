@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
 extern void func_0029C450(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
-void func_0027C540(long);
-void func_0027C660(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
+void SetupGifPaging(long);
+void DoGifPaging(void);
 
 /*
  * Function: func_002D2EE0
@@ -30,9 +31,9 @@ void func_0027C660(void);
 
 long long func_PAL_002CE860(void)
 {
-    func_0027C540(0LL);
+    SetupGifPaging(0LL);
     func_0029C450();
-    func_0027C660();
+    DoGifPaging();
     return 0LL;
 }
 

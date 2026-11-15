@@ -31,12 +31,12 @@ extern float D_L01_00290030[][4];
 extern float D_L01_002900C0[][2];
 extern int D_L01_00290108[];
 
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern long func_0027C878(int);
-extern void func_00280B90(void *, int, int);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, int, int);
 
-void func_L01_003801B8(char *moby)
+void DrawVendorEffects(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     BeamQuad beamQuad;

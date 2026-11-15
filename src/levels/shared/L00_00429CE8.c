@@ -1,13 +1,14 @@
+#include "names.h"
 /* Test the camera trigger volumes, marking the descriptor done when none apply. */
 #include "common.h"
 extern char *D_L00_001B1844 __attribute__((section(".sdata")));
-extern char *D_L00_001B8E10;
-extern char D_00189EA0[];
-extern float func_00282C48(float);
-extern float func_00282E80(char *, char *);
-extern int func_002ACBC8(char *, int);
-extern int func_L00_003206B8(char *, int);
-extern int func_002ACCA8(char *, int);
+extern char *g_follow_camera_object;
+extern char g_hero_position[];
+extern float math_fabs(float);
+extern float vec_distance_xy(char *, char *);
+extern int IsPointInCuboid(char *, int);
+extern int coll_point_inside_record_volume(char *, int);
+extern int coll_is_point_inside_unit_sphere(char *, int);
 typedef struct { char pad[0x30]; char pos[16]; char rest[0x40]; } Entry_b0898;
 extern Entry_b0898 *D_L00_001B1F8C __attribute__((section(".sdata")));
 typedef struct {
@@ -15,9 +16,9 @@ typedef struct {
  char pad2298[0x22B4-0x2298]; unsigned char flag;
 } Global_b0898;
 extern Global_b0898 D_00189E20_b0898;
-int func_L00_00429CE8(char *trigger)
+int cam_test_trigger_volumes(char *trigger)
 {
-    char *owner = gFollowCameraObject;
+    char *owner = g_follow_camera_object;
     char *sub = *(char **)(owner + 0x70);
     char *move = sub + 0x160;
     char *rot = sub + 0x1C0;
@@ -28,21 +29,21 @@ int func_L00_00429CE8(char *trigger)
     if (*(short *)(desc + 0x4A) && !mode) return 0;
     if (*(short *)(desc + 0x48) && mode) return 0;
     if (*(int *)(desc + 0x34)) {
-        if (FloatAbs(*(float *)(move + 0x34)) > 0.01f) return 0;
-        if (FloatAbs(*(float *)(rot + 8)) > 0.01f) return 0;
+        if (math_fabs(*(float *)(move + 0x34)) > 0.01f) return 0;
+        if (math_fabs(*(float *)(rot + 8)) > 0.01f) return 0;
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.016666668f) return 0;
     if (*(int *)(desc + 0xC) >= 0) {
         if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 0xC)].pos) < 3.0f) return 1;
-        if (IsPointInCuboid(gHeroPosition, *(int *)(desc + 0xC))) return 1;
+        if (IsPointInCuboid(g_hero_position, *(int *)(desc + 0xC))) return 1;
     }
     if (*(int *)(desc + 0x10) >= 0) {
         if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 0x10)].pos) < 3.0f) return 1;
-        if (IsPointInsideRecordVolume(gHeroPosition, *(int *)(desc + 0x10))) return 1;
+        if (coll_point_inside_record_volume(g_hero_position, *(int *)(desc + 0x10))) return 1;
     }
     if (*(int *)(desc + 8) >= 0) {
         if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 8)].pos) < 3.0f) return 1;
-        if (IsPointInsideUnitSphereOfRecord(gHeroPosition, *(int *)(desc + 8))) return 1;
+        if (coll_is_point_inside_unit_sphere(g_hero_position, *(int *)(desc + 8))) return 1;
     }
     *(short *)(desc + 0x26) = 1;
     return 0;

@@ -25,12 +25,12 @@ void func_PAL_L03_003D6150(char *a0)
 }
 
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern f32  func_00283B98(f32 a0, f32 a1);
+extern f32  FastAddRotations(f32 a0, f32 a1);
 extern void func_PAL_L00_002B9CD8(char *a0, char *a1, s32 a2, s32 a3);
 extern void func_PAL_L00_002B2958(s32 a0, s32 a1, char *a2);
-extern void func_L00_0042A500(s32 a0);
-extern void func_L01_00323310(s32 a0, s32 a1);
-extern char D_00189E20[];
+extern void cam_reset_entry(s32 a0);
+extern void script_queue_keyed_request(s32 a0, s32 a1);
+extern char g_hero_state[];
 extern u8   D_001395BF;
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -52,13 +52,13 @@ void func_PAL_L03_003D61B8(char *a0)
     *(s32 *)(s0 + 0x98) = *(s32 *)(v0 + 0x10);
     qcopy(&v2, p);
     f = (f32 *)((char *)&v2 + 8);
-    *f = func_00283B98(*f, -1.0471977f);
+    *f = FastAddRotations(*f, -1.0471977f);
     func_PAL_L00_002B9CD8(s0 + 0x10, (char *)&v2, 0, 1);
     func_PAL_L00_002B2958(1, 0x3F, s0);
-    base = D_00189E20;
-    *(f32 *)(base + 0x98) = func_00283B98(*(f32 *)(base + 0x98), 1.0471977f);
-    func_L00_0042A500(*(s32 *)(s1 + 0x28));
-    func_L01_00323310(*(s32 *)(s1 + 0x20), -1);
+    base = g_hero_state;
+    *(f32 *)(base + 0x98) = FastAddRotations(*(f32 *)(base + 0x98), 1.0471977f);
+    cam_reset_entry(*(s32 *)(s1 + 0x28));
+    script_queue_keyed_request(*(s32 *)(s1 + 0x20), -1);
     D_001395BF = 1;
 }
 

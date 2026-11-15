@@ -6,13 +6,13 @@
 
 
 #include "common.h"
-extern void func_L20_0039F268(char *);
-extern void func_L20_0039F560(char *);
-extern void func_L20_0039F968(char *);
+extern void electric_orb_draw_arms(char *);
+extern void electric_orb_draw_ball(char *);
+extern void electric_orb_update_trails(char *);
 
 void func_PAL_L20_003A21A0(char *arg0) {
-    func_L20_0039F268(arg0);
-    func_L20_0039F560(arg0);
-    func_L20_0039F968(arg0);
+    electric_orb_draw_arms(arg0);
+    electric_orb_draw_ball(arg0);
+    electric_orb_update_trails(arg0);
 }
 

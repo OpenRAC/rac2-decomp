@@ -34,17 +34,17 @@ typedef struct {
 extern s32 D_L00_001B0FE4 __attribute__((sda));
 extern s16 D_L00_001B2D40[3];
 extern s16 D_L00_001B2D50[3];
-extern Moby40B838 *func_0029EFD0(int);
-extern Link40B838 *func_002AB1F0(void *);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
+extern Moby40B838 *CreateMoby(int);
+extern Link40B838 *moby_get_private_value_0(void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
 extern f32 func_002EF240(int);
-extern f32 func_002A7940(void);
+extern f32 math_random_angle(void);
 extern void func_002A0F48(void *);
 
 /* Creates a Clank Zapper at a position, attached to a parent object, with random spin. */
-Moby40B838 *func_L00_0040B838(f32 *pos, int param, f32 *parent, int extra)
+Moby40B838 *clank_zapper_spawn(f32 *pos, int param, f32 *parent, int extra)
 {
     f32 parentPos[4] __attribute__((aligned(16)));
     f32 offset[4] __attribute__((aligned(16)));
@@ -63,12 +63,12 @@ Moby40B838 *func_L00_0040B838(f32 *pos, int param, f32 *parent, int extra)
         moby->fB8 = param;
         moby->state = 0;
         qcopy(vars->anchorPos, parent + 4);
-        vars->anchorPos[2] += GetMobyPrivateValue0(parent)->f10;
+        vars->anchorPos[2] += moby_get_private_value_0(parent)->f10;
         if (parent != 0) {
             qcopy(parentPos, parent + 4);
-            link = GetMobyPrivateValue0(parent);
+            link = moby_get_private_value_0(parent);
             if (link != 0) {
-                ComputeViewDirection(parent + 4, offset, 1);
+                cam_compute_view_direction(parent + 4, offset, 1);
                 FastVecScale(offset, offset, link->f10);
                 FastVecAdd(parentPos, parentPos, offset);
             }
@@ -79,16 +79,16 @@ Moby40B838 *func_L00_0040B838(f32 *pos, int param, f32 *parent, int extra)
         vars->f1C = extra;
         *(f32 **)((char *)vars + 0xC) = parent;
         if (parent != 0) {
-            link = GetMobyPrivateValue0(parent);
+            link = moby_get_private_value_0(parent);
             if (link != 0)
                 link->flags |= 0x80;
         }
-        moby->rot[0] = RandomAngle();
-        moby->rot[1] = RandomAngle();
-        moby->rot[2] = RandomAngle();
-        vars->dir[0] = RandomAngle();
-        vars->dir[1] = RandomAngle();
-        vars->dir[2] = RandomAngle();
+        moby->rot[0] = math_random_angle();
+        moby->rot[1] = math_random_angle();
+        moby->rot[2] = math_random_angle();
+        vars->dir[0] = math_random_angle();
+        vars->dir[1] = math_random_angle();
+        vars->dir[2] = math_random_angle();
         for (i = 0; i < 3; i++) {
             D_L00_001B2D40[i] = -1;
             D_L00_001B2D50[i] = 0x18;

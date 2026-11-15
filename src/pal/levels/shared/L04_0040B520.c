@@ -3,33 +3,33 @@
 
 
 #include "common.h"
-extern void func_00282CF0(void *, void *, void *);
-extern int func_00283CF0(float);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_00282CF0(void *, void *, void *);
-extern int func_00282978(void *);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern void func_002833F0(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern int FloatToInt(float);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void FastVecSub(void *, void *, void *);
+extern int FastDecTimer(void *);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_L00_00322198(void *, void *, float, float, int);
 extern void func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
-extern void func_0029F338(void *);
-extern int func_00277258(void *, int, float, void *);
-extern void func_002AB668(void *, void *, float);
-extern void func_002839D0(void *, void *);
-extern void func_002AB6D8(void *, void *);
+extern void moby_mark_spawned(void *);
+extern int coll_test_point(void *, int, float, void *);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void mat_from_rotation(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
 extern float D_L04_001BFB00[];
 extern void func_PAL_L04_0040B8B8(void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 void func_PAL_L04_0040BC70(unsigned char *m)
 {
@@ -47,54 +47,54 @@ void func_PAL_L04_0040BC70(unsigned char *m)
     *(unsigned short *)(p + 0x32) += 1;
     switch (m[0x20]) {
     case 1:
-        if (func_00282978(p + 0x30)) {
+        if (FastDecTimer(p + 0x30)) {
             m[0x20] = (*(int *)(p + 0x34) & 1) ? 3 : 2;
-            *(short *)(p + 0x30) = func_00283CF0(8.666667f);
+            *(short *)(p + 0x30) = FloatToInt(8.666667f);
             return;
         }
-        if (*(int *)(p + 0x34) & 4) func_L00_002E6EF8(func_PAL_L04_0040B8B8, m);
+        if (*(int *)(p + 0x34) & 4) gfx_add_draw_callback_third(func_PAL_L04_0040B8B8, m);
         break;
     case 2:
-        func_00283098(oldpoint, p + 0x20, m + 0xc0);
-        func_00282CC0(oldpoint, oldpoint, m + 0x10);
+        matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
+        FastVecAdd(oldpoint, oldpoint, m + 0x10);
         if (*(int *)(p + 0x34) & 2) func_PAL_L00_00322198(m, oldpoint, 0.3f, 10.0f, -1);
         else func_PAL_L00_003FB330(m + 0x10, 0.5f, 0.0f, 0, 25, 20, 20, 20, 45, 0, 0, 0, 0, 0);
         goto destroy;
     case 3:
-        if (func_00282978(p + 0x30)) {
+        if (FastDecTimer(p + 0x30)) {
         case 0:
         destroy:
-            func_0029F338(m);
+            moby_mark_spawned(m);
             return;
         }
-        m[0x23] = func_00283CF0((float)*(short *)(p + 0x30) * 14.76923f);
+        m[0x23] = FloatToInt((float)*(short *)(p + 0x30) * 14.76923f);
         break;
     }
-    func_002833F0(rot, p + 0x10);
-    func_00283098(oldpoint, p + 0x20, m + 0xc0);
-    func_00283738(m + 0xc0, rot, m + 0xc0);
-    func_00283098(point, p + 0x20, m + 0xc0);
-    func_00282CF0(delta, point, oldpoint);
-    func_00282CF0(m + 0x10, m + 0x10, delta);
-    func_00282CC0(m + 0x10, m + 0x10, p);
+    euler_rotation_basis(rot, p + 0x10);
+    matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
+    multiply_matrix3x3(m + 0xc0, rot, m + 0xc0);
+    matrix_mul_vec3(point, p + 0x20, m + 0xc0);
+    FastVecSub(delta, point, oldpoint);
+    FastVecSub(m + 0x10, m + 0x10, delta);
+    FastVecAdd(m + 0x10, m + 0x10, p);
     *(float *)(p + 8) -= *(float *)(p + 0x38);
     radius = *(float *)(p + 0x2c);
-    func_00283098(probe, p + 0x20, m + 0xc0);
-    func_00282CC0(probe, probe, m + 0x10);
-    if (func_00277258(probe, 0, radius, m)) {
-        func_00282F20(D_L04_001BFB00, D_L04_001BFB00, 1.0f);
-        speed = func_00282DF0(p);
-        dot = func_00282DB0(p, D_L04_001BFB00);
+    matrix_mul_vec3(probe, p + 0x20, m + 0xc0);
+    FastVecAdd(probe, probe, m + 0x10);
+    if (coll_test_point(probe, 0, radius, m)) {
+        vec_scale_to_length(D_L04_001BFB00, D_L04_001BFB00, 1.0f);
+        speed = FastVecLength(p);
+        dot = FastVecDot(p, D_L04_001BFB00);
         if (dot < 0.0f) {
-            func_00283028(p, p, D_L04_001BFB00);
-            func_00282F20(bounce, D_L04_001BFB00, dot * 0.5f);
-            func_00282CC0(p, p, bounce);
-            func_00282F20(p, p, speed);
-            func_00282DD8(axis, D_L04_001BFB00, p);
-            func_00282F20(axis, axis, 1.0f);
-            func_002AB668(axis, axis, func_00282DF0(p + 0x10));
-            func_002839D0(axis, matrix);
-            func_002AB6D8(matrix, p + 0x10);
+            vec_fast_normalize(p, p, D_L04_001BFB00);
+            vec_scale_to_length(bounce, D_L04_001BFB00, dot * 0.5f);
+            FastVecAdd(p, p, bounce);
+            vec_scale_to_length(p, p, speed);
+            FastVecCross(axis, D_L04_001BFB00, p);
+            vec_scale_to_length(axis, axis, 1.0f);
+            math_build_axis_angle_quat(axis, axis, FastVecLength(p + 0x10));
+            mat_from_rotation(axis, matrix);
+            mat_get_euler_angles(matrix, p + 0x10);
             if (*(short *)(p + 0x32) >= 13) *(short *)(p + 0x30) = 0;
         }
     }

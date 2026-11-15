@@ -25,9 +25,9 @@ typedef struct {
     V4_L00_00338D28 v20;
 } Obj_L00_00338D28;
 
-extern void *func_002B9030(s32 kind);
-extern s32 func_002A77E0(s32 limit);
-extern s32 func_00283CF0(f32 value);
+extern void *part_alloc(s32 kind);
+extern s32 math_random_int_below(s32 limit);
+extern s32 FloatToInt(f32 value);
 
 /* The level's pointer to the byte the record carries in its second flag byte: its
    address differs per level, so it is a per-level symbol. */
@@ -36,20 +36,20 @@ extern unsigned char *ref_L00_00338D28_00;
 /* Allocates the 0x2F record, copies the two sixteen-byte blocks into it, and fills
    its flag bytes, its tag word and its two level-derived fields. */
 /* Creates a short-lived visual effect between two points, with a random start color and a random shade. */
-Obj_L00_00338D28 *func_L00_00338D28(char *src1, char *src2, f32 value)
+Obj_L00_00338D28 *part_spawn_two_point_effect(char *src1, char *src2, f32 value)
 {
-    Obj_L00_00338D28 *o = (Obj_L00_00338D28 *)AllocParticle(0x2F);
+    Obj_L00_00338D28 *o = (Obj_L00_00338D28 *)part_alloc(0x2F);
 
     if (o != 0) {
         o->v10 = *(V4_L00_00338D28 *)src1;
-        o->w4 = ((RandomIntBelow(8) + 0x28) << 24) | 0x00808080;
+        o->w4 = ((math_random_int_below(8) + 0x28) << 24) | 0x00808080;
         o->b9 = FloatToInt(2.0f) + 0x20;
         o->b3 = 0x48;
         o->b1 = 0;
         o->b2 = *ref_L00_00338D28_00;
         o->f_c = value;
         o->v20 = *(V4_L00_00338D28 *)src2;
-        o->b8 = RandomIntBelow(0x100);
+        o->b8 = math_random_int_below(0x100);
     }
     return o;
 }

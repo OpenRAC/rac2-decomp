@@ -24,14 +24,14 @@ typedef struct {
     f32 rotX;
     f32 rotZ;
 } L11Moby;
-extern void func_002A7750(u8 *arg0, s32 arg1, s32 arg2);
-extern void func_002A0488(void *, int, int, int);
+extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
+extern void set_moby_color(void *, int, int, int);
 extern int func_PAL_002B3F18(char *, char *, char *);
-extern f32 func_00283180(f32 a0);
-extern f32 func_00283198(f32 a0);
-extern f32 func_00283B98(f32 a0, f32 a1);
-extern void func_002833F0(void *a0, void *a1);
-extern f32 *func_L11_004417E8(s32 a0);
+extern f32 math_fast_sin_or_cos_a(f32 a0);
+extern f32 math_fast_sin_or_cos_b(f32 a0);
+extern f32 FastAddRotations(f32 a0, f32 a1);
+extern void euler_rotation_basis(void *a0, void *a1);
+extern f32 *arena_get_center_point(s32 a0);
 extern f32 D_L11_001B0558 __attribute__((sda));
 extern f32 D_L11_001B0540 __attribute__((sda));
 
@@ -55,22 +55,22 @@ void func_PAL_L11_003F72D0(u8 *arg0) {
     func_PAL_002B3F18((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
     if (*(s16 *)(s1 + 0x70) != 0) {
         *(s16 *)(s1 + 0x70) = 0;
-        func_002A0488(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
+        set_moby_color(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
                       *(u32 *)(s1 + 0x288));
         *(s16 *)(s1 + 0x72) = 1;
     }
-    func_002A7750(arg0, 2, 2);
+    moby_set_state(arg0, 2, 2);
     *(s32 *)(s1 + 0x250) = 0;
-    f20 = func_00283180(*(f32 *)(s1 + 0x250));
-    p = func_L11_004417E8(m->slot);
+    f20 = math_fast_sin_or_cos_a(*(f32 *)(s1 + 0x250));
+    p = arena_get_center_point(m->slot);
     m->x = D_L11_001B0558 * f20 + p[0];
-    f20 = func_00283198(*(f32 *)(s1 + 0x250));
-    p = func_L11_004417E8(m->slot);
+    f20 = math_fast_sin_or_cos_b(*(f32 *)(s1 + 0x250));
+    p = arena_get_center_point(m->slot);
     y = D_L11_001B0558 * f20 + p[1];
     m->z = D_L11_001B0540;
     m->rotX = -1.5707965f;
     m->rotW = 0;
     m->y = y;
-    m->rotZ = func_00283B98(3.1415927f, *(f32 *)(s1 + 0x250));
-    func_002833F0(m->mtx, &m->rotW);
+    m->rotZ = FastAddRotations(3.1415927f, *(f32 *)(s1 + 0x250));
+    euler_rotation_basis(m->mtx, &m->rotW);
 }

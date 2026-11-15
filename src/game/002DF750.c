@@ -2,15 +2,15 @@
 #include "names.h"
 
 /* Handles one shadow record according to its kind and returns a pointer to the next record. */
-char *func_002DF750(char *record)
+char *gfx_shadow_process_record(char *record)
 {
-    extern void func_002E0408(char *);
-    extern void func_002E0558(char *);
+    extern void build_shadow_sphere_outline(char *);
+    extern void shadow_build_box_outline(char *);
     if (*(short *)record == 0) {
         build_shadow_sphere_outline(record);
         record += 0x20;
     } else if (*(short *)record == 1) {
-        BuildShadowBoxOutline(record);
+        shadow_build_box_outline(record);
         record += 0x30;
     }
     return record;

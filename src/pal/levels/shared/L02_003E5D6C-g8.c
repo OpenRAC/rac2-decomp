@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L02_003E5D6C, the PAL copy of func_L02_003E1A40: the same C at 50 Hz (timers, rates and fades rescaled, the particle life
    scaled by 5/6), with text ids 4893 and 4894. Built with -g: retail pads the division after the call with the line-label nop pair.
    Multi-stage switch: hero target clear keeps the candidate pointer a named local, read after its index. */
@@ -5,10 +6,10 @@
 typedef struct { char pad[0x464]; unsigned char flags[0]; } L02E1A40Progress;
 extern L02E1A40Progress D_L02_0021F4F0;
 extern unsigned char D_0019B4A8[];
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern int currentLevel_gp SDATA(D_001A79F0);
 typedef struct L02E1A40Object L02E1A40Object;
-extern L02E1A40Object *D_L02_001B359C[] __attribute__((sda));
+extern L02E1A40Object *g_moby_l02_pool[] __attribute__((sda));
 extern L02E1A40Object *entityPool_gp SDATA(D_L02_001B359C);
 extern char *D_0018A15C[];
 
@@ -16,7 +17,7 @@ typedef struct {
     char pad0[0x24]; int message; int timer;
     char pad1[0x3c]; int disabled; short f6c; char pad2[4]; short f72;
 } L02E1A40Hud;
-extern L02E1A40Hud D_001A63A8;
+extern L02E1A40Hud g_music_state;
 extern float D_L02_001B0760 SDATA(D_L02_001B0760);
 extern float D_L02_001B0764 SDATA(D_L02_001B0764);
 extern float D_L02_001B0768 SDATA(D_L02_001B0768);
@@ -28,30 +29,30 @@ extern int D_L02_001B0780 SDATA(D_L02_001B0780);
 extern int D_L02_001B0780_abs[] __asm__("D_L02_001B0780") __attribute__((sda));
 extern int D_L02_001B0788 SDATA(D_L02_001B0788);
 extern int D_L02_001B0788_abs[] __asm__("D_L02_001B0788") __attribute__((sda));
-extern int D_L02_001B30C8[] __attribute__((sda));
-extern void func_L00_003294F0(void *,int);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *,int,int);
-extern float func_00283B98(float,float);
-extern void func_L00_002E6CF0(void *,void *);
-extern void func_L02_003E2150(void *);
-extern float func_002AA2E8(void *,float,float);
-extern int func_002A77E0(int);
-extern float func_002A7940(void);
-extern float func_00283180(float),func_00283198(float);
-extern void func_00282CC0(void *,void *,void *);
-extern float func_002A7878(float,float);
-extern int func_00283D38(int,int,float);
-extern int func_002A7820(int,int);
-extern void func_00282C88(void *);
-extern float func_00283CE0(int);
-extern void func_002C3150(void *,void *,int,float,int,int,int);
-extern void func_L00_002D40A0(void *,int,float);
-extern float func_00282E80(void *,void *),func_00282C48(float);
-extern int func_002B3868(void *);
-extern int func_002E5CF8(int,int,char *);
-extern void func_002B0A18(int,int);
-extern void func_002B6D28(void);
+extern int g_frame_l02_counter[] __attribute__((sda));
+extern void moby_set_flag_bit(void *,int);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *,int,int);
+extern float FastAddRotations(float,float);
+extern void gfx_add_draw_callback_first(void *,void *);
+extern void DrawPulsingRingEffect(void *);
+extern float ApproachValue(void *,float,float);
+extern int math_random_int_below(int);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *,void *,void *);
+extern float math_random_float_range(float,float);
+extern int FastTweenColor(int,int,float);
+extern int math_random_int_range(int,int);
+extern void vec_clear_128(void *);
+extern float IntToFloat(int);
+extern void part_spawn_hero_relative(void *,void *,int,float,int,int,int);
+extern void hero_start_target_state(void *,int,float);
+extern float vec_distance_xy(void *,void *),math_fabs(float);
+extern int flag_set_first_pending(void *);
+extern int PlayMobySound(int,int,char *);
+extern void value_set_entry_by_index(int,int);
+extern void snd_resume_music_stream(void);
 typedef struct {
     int other, first, second; char pad0[8]; int auxiliary;
     float angle, angle2, fade; char pad1[4]; int color0, color1, alpha;
@@ -64,7 +65,7 @@ struct L02E1A40Object {
     char padb4[0x44]; float radius; char padfc[4];
 };
 typedef struct { char pad[0x5c0]; L02E1A40Object *target; } L02E1A40Hero;
-extern L02E1A40Hero D_00189E20;
+extern L02E1A40Hero g_hero_state;
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
 {
@@ -84,98 +85,98 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
         d->f38=0; d->f3c=0; d->count=0;
         index=obj->index;
         if(D_L02_0021F4F0.flags[(short)index] ||
-           ((initialPacked=D_0019B4A8[((short)index>>1)+(D_001A79F0[0]<<10)]),
+           ((initialPacked=D_0019B4A8[((short)index>>1)+(g_current_map_index[0]<<10)]),
             (index&1) ? ((initialPacked>>4)&7) : (initialPacked&7))) {
-            func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
-            func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
-            if(d->auxiliary!=-1) func_0029F338(entityPool_gp+d->auxiliary);
-            func_002A7750(obj,5,-1);
-        } else func_002A7750(obj,1,-1);
+            moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
+            moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
+            if(d->auxiliary!=-1) moby_mark_spawned(entityPool_gp+d->auxiliary);
+            moby_set_state(obj,5,-1);
+        } else moby_set_state(obj,1,-1);
         break;
     case 1:
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0003490659f);
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        if(d->fade!=0.0f) func_002AA2E8(&d->fade,0.0f,0.040000003f);
-        if(obj->active && !func_002A77E0(5)) {
-            angle=func_002A7940();
-            pos[0]=func_00283180(angle)*1.15f;
-            pos[1]=func_00283198(angle)*1.15f;
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
+        gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
+        if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.040000003f);
+        if(obj->active && !math_random_int_below(5)) {
+            angle=math_random_angle();
+            pos[0]=math_fast_sin_or_cos_a(angle)*1.15f;
+            pos[1]=math_fast_sin_or_cos_b(angle)*1.15f;
             pos[2]=0;
-            func_00282CC0(pos,pos,obj->position);
+            FastVecAdd(pos,pos,obj->position);
             pos[2]+=0.1f;
-            size=func_002A7878(D_L02_001B0768,D_L02_001B0768_abs[1]);
-            color=func_00283D38(D_L02_001B0770,D_L02_001B0770_abs[1],func_002A7878(0,1));
-            speed=func_002A7878(1,2);
-            duration=func_002A7820(60,180);
+            size=math_random_float_range(D_L02_001B0768,D_L02_001B0768_abs[1]);
+            color=FastTweenColor(D_L02_001B0770,D_L02_001B0770_abs[1],math_random_float_range(0,1));
+            speed=math_random_float_range(1,2);
+            duration=math_random_int_range(60,180);
             duration=(duration*5+2)/6;
-            func_00282C88(vel);
-            vel[2]=speed/func_00283CE0(duration);
-            func_002C3150(pos,vel,color,size,(unsigned char)duration,(unsigned char)func_002A77E0(255),0);
+            vec_clear_128(vel);
+            vel[2]=speed/IntToFloat(duration);
+            part_spawn_hero_relative(pos,vel,color,size,(unsigned char)duration,(unsigned char)math_random_int_below(255),0);
         }
         if(D_0018A15C[0]==(char *)obj) {
-            func_002A7750(obj,2,-1);
+            moby_set_state(obj,2,-1);
             if(!D_L02_001B0778) {
                 D_L02_001B0778=1;
-                func_L00_002D40A0(obj->position,1,obj->radius);
+                hero_start_target_state(obj->position,1,obj->radius);
             }
         } else {
-            other=(D_L02_001B359C[0]+d->other);
-            if(func_00282E80(obj->position,other->position)<1.5f && func_00282C48(obj->position[2]-other->position[2])<0.5f)
-                func_002A7750(obj,3,-1);
+            other=(g_moby_l02_pool[0]+d->other);
+            if(vec_distance_xy(obj->position,other->position)<1.5f && math_fabs(obj->position[2]-other->position[2])<0.5f)
+                moby_set_state(obj,3,-1);
         }
         break;
     case 2:
-        if(func_002B3868(obj)) {
-            func_002E5CF8(1,0,(char *)obj);
+        if(flag_set_first_pending(obj)) {
+            PlayMobySound(1,0,(char *)obj);
             d->color0=D_L02_001B0780;
             d->color1=D_L02_001B0780_abs[1];
             d->fade=0;d->alpha=0;
-            func_002B0A18(4893,180);
-            if(!D_001A63A8.disabled && D_001A63A8.message==-1) {
+            value_set_entry_by_index(4893,180);
+            if(!g_music_state.disabled && g_music_state.message==-1) {
                 message0=d->message0;
-                D_001A63A8.timer=0;
-                D_001A63A8.message=(message0&0x3fff)+2000;
+                g_music_state.timer=0;
+                g_music_state.message=(message0&0x3fff)+2000;
             }
         }
-        if(D_0018A15C[0]!=(char *)obj) func_002A7750(obj,1,-1);
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0003490659f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0003490659f);
-        frame=D_L02_001B30C8[0];
+        if(D_0018A15C[0]!=(char *)obj) moby_set_state(obj,1,-1);
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0003490659f);
+        frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.040000003f);
+        gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.040000003f);
         break;
     case 3:
-        if(func_002B3868(obj)) {
+        if(flag_set_first_pending(obj)) {
             I(d,0x40)++;
             d->color0=D_L02_001B0788;
             d->color1=D_L02_001B0788_abs[1];
             d->fade=0;d->alpha=0;
-            func_002B0A18(4894,180);
+            value_set_entry_by_index(4894,180);
             message1=d->message1;
-            D_001A63A8.timer=0;
-            D_001A63A8.message=(message1&0x3fff)+2000;
+            g_music_state.timer=0;
+            g_music_state.message=(message1&0x3fff)+2000;
         }
         ticks = obj->ticks;
         obj->ticks = ticks + 1;
-        if(ticks>150) func_002A7750(obj,4,-1);
+        if(ticks>150) moby_set_state(obj,4,-1);
         else if(obj->ticks>50) {
-{ L02E1A40Object *candidate; int i=d->other; candidate=D_L02_001B359C[0]+i; if(D_00189E20.target==candidate) D_00189E20.target=0; }
-            func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
-            func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
+{ L02E1A40Object *candidate; int i=d->other; candidate=g_moby_l02_pool[0]+i; if(g_hero_state.target==candidate) g_hero_state.target=0; }
+            moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
+            moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
         }
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0003490659f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0003490659f);
-        frame=D_L02_001B30C8[0];
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0003490659f);
+        frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.040000003f);
+        gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.040000003f);
         break;
     case 4:
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,0,0.040000003f);
+        gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,0,0.040000003f);
         if(d->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {
@@ -187,9 +188,9 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
                 savedByte=*save;
                 if((savedByte&7)!=7) *save=savedByte+1;
             }
-            func_002A7750(obj,5,-1);
+            moby_set_state(obj,5,-1);
         }
         break;
     }
-    if(D_001A63A8.f72==3 && D_001A63A8.f6c<6000) func_002B6D28();
+    if(g_music_state.f72==3 && g_music_state.f6c<6000) snd_resume_music_stream();
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,8 +24,8 @@
  */
 #include "common.h"
 
-extern s32 func_002E5E58(s32 a, s32 b, s32 c);
-extern void func_003407F8(void *o, void *p, s32 n);
+extern s32 snd_play_from_global_bank(s32 a, s32 b, s32 c);
+extern void AddMenuItemToRing(void *o, void *p, s32 n);
 extern s16 D_00259F58[][5];
 
 struct Obj {
@@ -36,19 +37,19 @@ struct Obj {
 };
 
 /* Moves the selection around the four-column item grid and remembers the selected value. */
-void func_003409C8(struct Obj *o, s32 flags) {
+void radial_menu_move_grid_selection(struct Obj *o, s32 flags) {
     if (flags & 0x1000) {
         s32 minusOne;
         s32 newPage;
         s32 nextValue;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         minusOne = -1;
         nextValue = o->page - 1;
         newPage = (minusOne < nextValue) ? nextValue : 5;
         o->page = newPage;
     } else if (flags & 0x4000) {
         s32 nextValue;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = o->page + 1;
         nextValue = (5 < nextValue) ? 0 : nextValue;
         o->page = nextValue;
@@ -56,7 +57,7 @@ void func_003409C8(struct Obj *o, s32 flags) {
         s32 nextValue;
         s32 savedPage;
         s32 pageOffset;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = o->column - 1;
         o->column = nextValue;
         if (nextValue < 0) {
@@ -72,7 +73,7 @@ void func_003409C8(struct Obj *o, s32 flags) {
     } else if (flags & 0x2000) {
         s32 nextValue;
         s32 currentPage;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = o->column + 1;
         o->column = nextValue;
         if (nextValue >= 4) {

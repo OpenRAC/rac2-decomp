@@ -11,7 +11,7 @@ extern char D_L00_0023BB78[];
 
 extern int D_L00_001AF82C __attribute__((sda));
 extern int D_L00_001AF830 __attribute__((sda));
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 /* One 28-byte entry of the slot table (layout as in L00_003B0CE8-g8.c): used holds the frame it was taken. */
 typedef struct { unsigned char pad0[0xC]; int used; unsigned char pad10[4]; unsigned char id[8]; } SlotEntry1270;
 /* The hero record: its position at 0x80, the pad buttons word at 0x1230 and the hero moby at 0x2290. */
@@ -23,14 +23,14 @@ typedef struct {
     char pad1234[0x105C];
     char *moby;
 } HeroL00;
-extern HeroL00 D_00189E20;
+extern HeroL00 g_hero_state;
 extern int D_00138320 NOT_SDA;
 extern float D_L00_001AF838[4];
 extern float D_L00_001AF848[4];
-extern void func_L00_003B0CE8(int);
-extern char *func_L00_003B0DA0(void *);
+extern void node_free_slot(int);
+extern char *RecordHeroTrailNode(void *);
 extern int func_001163B0(void);
-extern int func_002C56B0(void *,int,int,int,int,int,void *,float,float);
+extern int part_spawn_debris_two_mode(void *,int,int,int,int,int,void *,float,float);
 extern void ref_L00_003B1270_0(int,int,int,void *,int);
 
 /* Releases slot-table entries taken 400 or more frames ago, steps the moby's state 0, 1, 2, and in
@@ -46,10 +46,10 @@ void func_PAL_L00_003B4AD8(char *m)
     char *entry;
 
     while (!stop && D_L00_001AF811 != D_L00_001AF810) {
-        if (D_L00_001B19C8 - ((SlotEntry1270 *)D_L00_0023BB78)[D_L00_001AF811].used < 400)
+        if (g_frame_l00_counter - ((SlotEntry1270 *)D_L00_0023BB78)[D_L00_001AF811].used < 400)
             stop = 1;
         else
-            func_L00_003B0CE8(D_L00_001AF811);
+            node_free_slot(D_L00_001AF811);
     }
     switch ((unsigned char)m[0x20]) {
     case 0:
@@ -59,16 +59,16 @@ void func_PAL_L00_003B4AD8(char *m)
         m[0x20] = 2;
         break;
     case 2:
-        if (D_00138320 & D_00189E20.buttons) {
-            entry = func_L00_003B0DA0(D_00189E20.position);
+        if (D_00138320 & g_hero_state.buttons) {
+            entry = RecordHeroTrailNode(g_hero_state.position);
             if (entry) {
                 slot = D_L00_001AF810 - 1;
                 random = ((s32)(D_L00_001AF82C + (func_001163B0() & 7)) * 5 + 2) / 6;
-                result = func_002C56B0(D_00189E20.position, slot, 0, random, 1, (unsigned char)(((s32)(D_L00_001AF830 + (func_001163B0() & 3)) * 5 + 2) / 6), m, 1, 1);
+                result = part_spawn_debris_two_mode(g_hero_state.position, slot, 0, random, 1, (unsigned char)(((s32)(D_L00_001AF830 + (func_001163B0() & 3)) * 5 + 2) / 6), m, 1, 1);
                 *(int *)(entry + 0x10) = result;
             } else {
                 random2 = ((s32)(D_L00_001AF82C + (func_001163B0() & 7)) * 5 + 2) / 6;
-                func_002C56B0(D_00189E20.position, 0, 1, random2, 1, (unsigned char)(((s32)(D_L00_001AF830 + (func_001163B0() & 3)) * 5 + 2) / 6), m, 1, 1);
+                part_spawn_debris_two_mode(g_hero_state.position, 0, 1, random2, 1, (unsigned char)(((s32)(D_L00_001AF830 + (func_001163B0() & 3)) * 5 + 2) / 6), m, 1, 1);
             }
         }
         break;

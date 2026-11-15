@@ -5,10 +5,10 @@ typedef int Quad_3fca40 __attribute__((mode(TI)));
 /* The allocator, the two vector helpers and the int-to-float helper the retail calls;
    each sits at another address in the other levels, so the level's own copies are named
    here with the address they have in level 00. */
-extern void *func_0029EFD0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
+extern void *CreateMoby(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
 
 extern int D_L00_001B0BB4 __attribute__((sda));
 
@@ -22,7 +22,7 @@ extern void ref_L00_003FCA40_02(void);
    twice and added to the first argument, and the level's own copy of func_L00_003FD178 runs
    on it. */
 /* Creates a short-lived trail object from a start point, direction and position, and returns it. */
-char *func_L00_003FCA40(char *origin, char *direction, Quad_3fca40 *position, int owner)
+char *large_spark_trail_create(char *origin, char *direction, Quad_3fca40 *position, int owner)
 {
     Quad_3fca40 local;
     char *object;

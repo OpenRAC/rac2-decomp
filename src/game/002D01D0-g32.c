@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002D01D0 in its own unit: retail reaches its small data through $gp, so the
    file is compiled at -G32 (config/cflags.txt). D_001A7478 is read absolute (lui/lw)
    and written through $gp, so it has a plain name and an sda name. */
@@ -8,9 +9,9 @@ typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; in
 
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
-extern int func_002E5E58(int, unsigned int, void *);
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int D_001ABA04 __attribute__((sda));
 extern short D_001A63AC[];
 typedef struct { char reserved00[0x10]; int flags; } FlagTarget;
@@ -22,33 +23,33 @@ extern int D_001B1580;
 extern int D_001A7478;
 extern int D_0025C2B8[];
 extern char D_001BAD40[];
-extern void func_002C9E60(int);
-extern int func_002B49E0(int, int, int, int, int);
-extern int func_00288AA0(char *, int);
-extern int func_00288BE8(char *);
+extern void menu_restore_saved_screen_image(int);
+extern int request_begin_slot(int, int, int, int, int);
+extern int req_push_queue(char *, int);
+extern int req_launch_queued(char *);
 extern MenuFields D_0025C250;
 extern FlagTarget *D_0025C210[];
 typedef struct { char p00[8]; int f08; char p0c[8]; int f14; int f18; char pad[0xE4]; int f100; int f104; char pad2[0x38]; int f140; } GameObj;
 
 
 /* Handles input on the five-entry Extras page and starts the chosen entry or plays an error sound if it is locked. */
-int func_002D01D0(void)
+int menu_handle_extras_page_input(void)
 {
     int sound = -1;
     int firstId = -1;
     int secondId = -1;
     int result = 0;
-    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int flags = ((CallbackMenuState *)&g_pad_state)->flags;
     int oldCursor = D_001ABA04;
 
     if (flags & 0x10) {
         int value;
         int returnCode;
         D_001ABA04 = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             returnCode = -1;
             goto finish;
         }
@@ -61,15 +62,15 @@ finish:
         result = 1;
     } else {
         if (flags & 0x1000) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             if (--D_001ABA04 < 0)
                 D_001ABA04 = 4;
         } else if (flags & 0x4000) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             if (++D_001ABA04 >= 5)
                 D_001ABA04 = 0;
         }
-        if (((CallbackMenuState *)&gPadState)->flags & 0x40) {
+        if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
             switch (D_001ABA04) {
             case 2:
                 if (D_001ABA08[D_001ABA04] != 0) { sound = 4; firstId = 0xBF; } else sound = 5;
@@ -82,16 +83,16 @@ finish:
                 break;
             case 1:
                 if (D_001ABA08[D_001ABA04] != 0) {
-                    RestoreSavedScreenImage(1);
+                    menu_restore_saved_screen_image(1);
                     sound = 4;
                     D_001B1580 = 2;
-                    ((GameObj *)&gPauseMenuState)->f100 = ((GameObj *)&gPauseMenuState)->f14;
-                    ((GameObj *)&gPauseMenuState)->f104 = ((GameObj *)&gPauseMenuState)->f08;
-                    BeginSlotRequest(9, 1, 0, 0, 0);
+                    ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
+                    ((GameObj *)&g_pause_menu_state)->f104 = ((GameObj *)&g_pause_menu_state)->f08;
+                    request_begin_slot(9, 1, 0, 0, 0);
                 } else sound = 5;
                 break;
             case 0:
-                gPauseMenuState.value = (int)D_0025C2B8;
+                g_pause_menu_state.value = (int)D_0025C2B8;
                 sound = 4;
                 break;
             default:
@@ -99,19 +100,19 @@ finish:
             }
             if (firstId != -1) {
                 char *obj;
-                RestoreSavedScreenImage(0);
-                ((GameObj *)&gPauseMenuState)->f100 = ((GameObj *)&gPauseMenuState)->f14;
-                ((GameObj *)&gPauseMenuState)->f104 = ((GameObj *)&gPauseMenuState)->f08;
-                ((GameObj *)&gPauseMenuState)->f140 = D_001A7478;
+                menu_restore_saved_screen_image(0);
+                ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
+                ((GameObj *)&g_pause_menu_state)->f104 = ((GameObj *)&g_pause_menu_state)->f08;
+                ((GameObj *)&g_pause_menu_state)->f140 = D_001A7478;
                 D_001A7478_sda = 2;
                 obj = D_001BAD40;
-                PushRequestQueue(obj, firstId);
+                req_push_queue(obj, firstId);
                 if (secondId != -1)
-                    PushRequestQueue(obj, secondId);
-                LaunchQueuedRequest(obj);
+                    req_push_queue(obj, secondId);
+                req_launch_queued(obj);
             }
             if (sound != -1)
-                PlaySoundFromGlobalBank(sound, 0, 0);
+                snd_play_from_global_bank(sound, 0, 0);
         }
         {
             MenuFields *menu = &D_0025C250;

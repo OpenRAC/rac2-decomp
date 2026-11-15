@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002D3FA0 (2,468 bytes, 28 places): the options page with three rectangles and labels.
  * Own unit: -O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness -frac2-la-fp-const-first
  * (config/cflags.txt; docs/build/compiler-notes.md). Rectangle 2's two y values go through
@@ -9,35 +10,35 @@
 #include "include_asm.h"
 #include "names.h"
 typedef struct { char pad[0x1CC]; unsigned char *entries; int count; int timer; } MenuEntryState;
-extern MenuEntryState D_001F2840;
+extern MenuEntryState g_pause_menu_state;
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
 extern PreviewChoice D_0026CFD0[];
-extern unsigned int D_001A7AF0[] __attribute__((sda));
+extern unsigned int g_equipment_bits[] __attribute__((sda));
 extern int D_001ABA74 __attribute__((sda));
-extern int D_001A7340[] __attribute__((sda)), D_001A7344[] __attribute__((sda));
+extern int g_screen_width[] __attribute__((sda)), g_screen_height[] __attribute__((sda));
 extern float D_001B23A4[] __attribute__((sda));
 typedef struct { unsigned char bytes[16]; } MenuCorners;
 extern MenuCorners D_001ABA78;
 extern char D_001AB998[];
-extern int func_002A9588(int, int, int, int, int);
-extern int func_00336D50(char *, int);
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
-extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, MenuCorners *);
-extern void func_0028E868(int, int, int, int, int, int);
-extern char *func_00288FB8(int);
-extern int func_0027FB40(int, int, unsigned long long, char *, int);
-extern int func_0027FAA8(int, int, unsigned long long, char *, int);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_002D3D88(int, int);
-extern void func_002FC620(int, int, int, int);
-extern void func_002A0250(void), func_002A01C8(void), func_002A01F0(void);
-extern void func_002A0300(char *, int), func_002A0220(void), func_002A0380(void);
-extern void func_002ECB70(char *);
-extern void func_0027C540(int), func_0027C660(void);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern int table_find_by_id(char *, int);
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
+extern int GetIconFrame(int, int);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, MenuCorners *);
+extern void hud_draw_sprite(int, int, int, int, int, int);
+extern char *GetLocalizedString(int);
+extern int text_draw_centered_medium(int, int, unsigned long long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long long, char *, int);
+extern int sprintf(char *, char *, ...);
+extern int DrawPreviewChoiceIcon(int, int);
+extern void gfx_set_scissor_clamped(int, int, int, int);
+extern void DrawMobysSetup(void), mem_fill_scratch_area(void), mem_save_scratch_area(void);
+extern void tex_upload_object_textures(char *, int), mem_restore_scratch_area(void), tex_run_upload_and_setup(void);
+extern void render_environment_mapped_object(char *);
+extern void SetupGifPaging(int), DoGifPaging(void);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int D_001B23A0;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -119,11 +120,11 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
     return result;
 }
 /* Draws the options screen: the titles, the framed boxes, the row of choice icons around the selected one, the help text and the live model preview. */
-int func_002D3FA0(void)
+int options_menu_draw(void)
 {
     MenuCorners corners = D_001ABA78;
     char text[32];
-    int color = PingPongBlendValues(0x60241700, 0x55F0C070, 30, 0, 0);
+    int color = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
     char *first, *second;
     int texture, hintResult, textResult;
@@ -137,10 +138,10 @@ int func_002D3FA0(void)
     unsigned long cC;
     float px, py;
     SetupGifPaging(0);
-    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     ya = hud_coord(326.0f, D_001B23A4[0], 0.5f, one);
     yb = hud_coord(387.0f, D_001B23A4[0], 0.5f, one);
     cB = color;
@@ -149,27 +150,27 @@ int func_002D3FA0(void)
     AppendScreenRectPacket(286, hud_coord5(326.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord5(387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
     AppendScreenRectPacket(228, hud_coord(325.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
     AppendScreenRectPacket(228, hud_coord(386.0f, D_001B23A4[0], 0.5f, one2), 288, hud_coord(388.0f, D_001B23A4[0], 0.5f, one2), cB, 0);
-    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 16, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 400, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 16, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 400, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 1); DrawHudSprite(texture, 402, label_y((void *)texture, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)texture, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 1); hud_draw_sprite(texture, 402, label_y((void *)texture, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)texture, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
     y1 = hud_coord(116.0f, D_001B23A4[0], 0.5f, one2);
-    textResult = DrawTextCenteredMediumFont(445, y1, 0x80F0F0F0ULL, GetLocalizedString(0x3212), -1);
+    textResult = text_draw_centered_medium(445, y1, 0x80F0F0F0ULL, GetLocalizedString(0x3212), -1);
     y2 = hud_coord(134.0f, D_001B23A4[0], 0.5f, one2);
-    textResult = DrawTextCenteredMediumFont(445, y2, 0x80F0F0F0ULL, GetLocalizedString(0x3213), -1);
-    textResult = Sprintf(text, D_001AB998, GetLocalizedString(0x3213), GetLocalizedString(0x2D55));
-    textResult = DrawTextCenteredSmallFont(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
+    textResult = text_draw_centered_medium(445, y2, 0x80F0F0F0ULL, GetLocalizedString(0x3213), -1);
+    textResult = sprintf(text, D_001AB998, GetLocalizedString(0x3213), GetLocalizedString(0x2D55));
+    textResult = text_draw_centered_small(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
     do {
     y3 = label_y3((void *)textResult, 187.0f, D_001B23A4[0], 0.5f, on3);
     } while (0);
-    hintResult = DrawTextCenteredSmallFont(445, y3, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
+    hintResult = text_draw_centered_small(445, y3, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
         index = D_001ABA74 - i;
         if (index >= 0 && index < 12) {
             while (index >= 0) {
-                if ((gEquipmentBits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
                     break;
                 index--;
                 i++;
@@ -185,7 +186,7 @@ int func_002D3FA0(void)
         index = D_001ABA74 + i;
         if (index >= 0 && index < 12) {
             while (index < 12) {
-                if ((gEquipmentBits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
                     break;
                 index++;
                 i++;
@@ -197,16 +198,16 @@ int func_002D3FA0(void)
         x += 56;
     }
     DoGifPaging();
-    SetGsScissorClamped(30, 385, label_y2((void *)hintResult, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
+    gfx_set_scissor_clamped(30, 385, label_y2((void *)hintResult, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
     DrawMobysSetup();
-    FillScratchArea();
-    SaveScratchArea();
-    UploadObjectTextures(gPauseMenuState.entries, gPauseMenuState.count);
-    RestoreScratchArea();
-    RunTextureUploadAndSetup();
+    mem_fill_scratch_area();
+    mem_save_scratch_area();
+    tex_upload_object_textures(g_pause_menu_state.entries, g_pause_menu_state.count);
+    mem_restore_scratch_area();
+    tex_run_upload_and_setup();
     SetupGifPaging(0);
-    render_environment_mapped_object(gPauseMenuState.entries);
+    render_environment_mapped_object(g_pause_menu_state.entries);
     DoGifPaging();
-    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
+    gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
     return 0;
 }

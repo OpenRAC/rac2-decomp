@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad0[0x8];
@@ -23,11 +24,11 @@ typedef struct {
 } HudElem;
 typedef unsigned char u8;
 
-void func_PAL_0028C418(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A = 0; func_0028B950((u8 *)a0); }
+void func_PAL_0028C418(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A = 0; hud_init_counter_values((u8 *)a0); }
 
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00282C10(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float square_root(float);
 extern void func_PAL_0028E800(void *);
 
 void func_PAL_0028C450(HudElem *p)
@@ -45,7 +46,7 @@ void func_PAL_0028C450(HudElem *p)
         if (p->unk6C >= 24) {
             delta = __builtin_abs(p->unk74 - p->unk78);
             if (delta) {
-                step = func_00283CF0(func_00282C10(func_00283CE0(delta) * 0.04f) * 5.0f);
+                step = FloatToInt(square_root(IntToFloat(delta) * 0.04f) * 5.0f);
                 limit = delta / 4;
                 if (step < limit) step = limit;
                 if (step > 121) step = 121;

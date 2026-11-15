@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -21,7 +22,7 @@ extern Rac2Native_571a3580c10e935f_u8 ref_L00_002F0930_01[];
 extern int ref_L00_002F0DA8_00;
 
 /* Adds a small command to the graphics packet list. */
-void func_L00_002F08D0(void)
+void gfx_append_gs_packet_tag_a(void)
 {
     *(Rac2Native_73f23b7222fbc541_u32 *)(ref_L00_002F08D0_00 + 0) = 0x30000026u;
     *(Rac2Native_73f23b7222fbc541_u32 *)(ref_L00_002F08D0_00 + 4) = (Rac2Native_73f23b7222fbc541_u32)ref_L00_002F08D0_01;
@@ -31,7 +32,7 @@ void func_L00_002F08D0(void)
 }
 
 /* Adds a small command to the graphics packet list. */
-void func_L00_002F0930(void)
+void gfx_append_gs_packet_tag_b(void)
 {
     *(Rac2Native_571a3580c10e935f_u32 *)(ref_L00_002F0930_00 + 0) = 0x30000029u;
     *(Rac2Native_571a3580c10e935f_u32 *)(ref_L00_002F0930_00 + 4) = (Rac2Native_571a3580c10e935f_u32)ref_L00_002F0930_01;
@@ -41,7 +42,7 @@ void func_L00_002F0930(void)
 }
 
 /* Returns a stored global value. */
-int func_L00_002F0DA8(void)
+int level_get_stored_global(void)
 {
     return ref_L00_002F0DA8_00;
 }

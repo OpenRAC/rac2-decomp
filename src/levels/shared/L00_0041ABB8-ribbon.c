@@ -19,20 +19,20 @@ typedef union {
     RibbonPayload view;
 } RibbonPacket;
 
-extern void func_00281DE8(QuadPacket *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_00280B90(void *, void *, int);
-extern char D_L00_001B8DC0[];
+extern void gfx_init_quad_packet_state(QuadPacket *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void draw_world_quad(void *, void *, int);
+extern char g_camera_l00_position[];
 
 /* Draws two fading textured ribbons along a list of weighted points. */
-void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int count,
+void DrawFadingDualRibbon(Quad128 *points, int firstTexture, int secondTexture, int count,
                        unsigned int firstColor, unsigned int secondColor, float unused,
                        float width, float uv)
 {
@@ -45,7 +45,7 @@ void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int
     float fade, zero;
     unsigned int firstAlpha = firstColor >> 24, secondAlpha = secondColor >> 24;
 
-    InitQuadPacketState(&frame.first.raw, firstTexture, 1, 128);
+    gfx_init_quad_packet_state(&frame.first.raw, firstTexture, 1, 128);
     /* Clear the template U word before capturing its float zero. */
     *(u32 *)&frame.first.view.uv[0][0] = 0;
     zero = frame.first.view.uv[0][0];
@@ -62,7 +62,7 @@ void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int
     frame.first.view.uv[3][0] = uv + 1;
     frame.first.view.uv[2][0] = uv + 1;
 
-    InitQuadPacketState(&frame.second.raw, secondTexture, 1, 128);
+    gfx_init_quad_packet_state(&frame.second.raw, secondTexture, 1, 128);
     frame.second.view.colors[3] = secondColor;
     frame.second.view.colors[2] = secondColor;
     frame.second.view.colors[1] = secondColor;
@@ -76,7 +76,7 @@ void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int
     frame.second.view.uv[0][0] = uv;
     frame.second.view.uv[2][0] = uv + 1;
 
-    FastVecSub(&frame.eye, points, gCameraPosition_L00);
+    FastVecSub(&frame.eye, points, g_camera_l00_position);
     FastVecSub(&frame.tangent, points + 1, points);
     FastVecCross(&frame.side, &frame.tangent, &frame.eye);
     vec_scale_to_length(&frame.offset, &frame.side, ((float *)points)[3]);
@@ -87,7 +87,7 @@ void func_L00_0041F820(Quad128 *points, int firstTexture, int secondTexture, int
     FastVecSub(&frame.second.view.vertices[1], points, &frame.offset);
 
     for (index = 1; index < count; index++) {
-        FastVecSub(&frame.eye, &points[index], gCameraPosition_L00);
+        FastVecSub(&frame.eye, &points[index], g_camera_l00_position);
         FastVecSub(&frame.tangent, &points[index], &points[index - 1]);
         FastVecCross(&frame.side, &frame.tangent, &frame.eye);
         vec_scale_to_length(&frame.offset, &frame.side, ((float *)&points[index])[3]);

@@ -1,47 +1,48 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
 extern void func_0029CB20(void);
 
 int func_US2_002D6380(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CB20();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_00341CD8(char *, int);
-extern void func_00341EB0(char *, char *);
+extern void menu_set_value(char *, int);
+extern void list_menu_set_records(char *, char *);
 extern char D_00261540[];
 
 int func_US2_002D63B0(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_00341CD8(D_001A8CFC[0] + 0x3E9C8, 1);
-        func_00341EB0(D_001A8CFC[0] + 0x3E9C8, D_00261540);
+        menu_set_value(D_001A8CFC[0] + 0x3E9C8, 1);
+        list_menu_set_records(D_001A8CFC[0] + 0x3E9C8, D_00261540);
     }
     return 0;
 }
 
-extern int D_00138180[];
-extern char D_001F2840[];
+extern int g_pad_state[];
+extern char g_pause_menu_state[];
 extern int func_0029CA70(int);
-extern int func_003423B0(unsigned char *);
-extern void func_002D5E98(int);
+extern int list_menu_get_selected_record(unsigned char *);
+extern void menu_start_action(int);
 
 int func_US2_002D6408(void)
 {
     int result = 0;
-    int *state = D_00138180;
+    int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = g_pause_menu_state;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -64,11 +65,11 @@ finish:
     else {
         func_0029CA70(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC[0]) {
-            char *entry = (char *)func_003423B0((unsigned char *)(D_001A8CFC[0] + 0x3E760));
+            char *entry = (char *)list_menu_get_selected_record((unsigned char *)(D_001A8CFC[0] + 0x3E760));
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            func_002D5E98((int)&request);
+            menu_start_action((int)&request);
         }
     }
     return result;

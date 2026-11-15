@@ -4,14 +4,14 @@ extern s32 D_L09_001B2388 MACRO_ADDR;
 extern char D_L09_00189EA0[];
 extern char D_L09_001B9A00[];
 extern s32 func_325E78(char *a0, s32 a1);
-extern void func_L09_00408250(char *a0, char *a1, s32 a2, s32 a3);
-extern void func_L09_004081F0(char *a0, s32 a1, char *a2, s32 a3);
+extern void dobbo_apply_setting_group(char *a0, char *a1, s32 a2, s32 a3);
+extern void dobbo_apply_setting_by_index(char *a0, s32 a1, char *a2, s32 a3);
 typedef int TQ_L09_004082D0 __attribute__((mode(TI)));
 
 /* Decides whether the object is on (state 0: any of its four ids passes func_325E78 against one
    of two positions; state 1: always) and, when that changed or +0x20 is still clear, records it
    and passes it to the ids of both of its lists. */
-void func_L09_004082D0(u8 *obj) {
+void trigger_switch_update(u8 *obj) {
     char *vars;
     s32 *secondList;
     s32 i;
@@ -66,13 +66,13 @@ update:
         for (i = 0; i < 29; i++) {
             s32 id = ((s32 *)(vars + 0x10))[i];
             if (id != -1) {
-                ApplySettingToMobyGroup(obj, vars, id, flag);
+                dobbo_apply_setting_group(obj, vars, id, flag);
             }
         }
         for (i = 0; i < 14; i++) {
             s32 id = secondList[i];
             if (id != -1) {
-                ApplySettingToMobyByIndex(obj, id, vars, flag);
+                dobbo_apply_setting_by_index(obj, id, vars, flag);
             }
         }
     }

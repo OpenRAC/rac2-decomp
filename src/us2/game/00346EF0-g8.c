@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 extern char D_001AA7D8[];
 extern int D_001AE470 __attribute__((sda));
 extern int D_001AE474 __attribute__((sda));
@@ -38,7 +39,7 @@ void func_US2_00347348(char *o)
     f[6] = (int)&D_001AE480;
     f[5] = (int)&D_001AE478;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern char D_001AA898[];
@@ -78,16 +79,16 @@ void func_US2_00347450(char *o)
     f[6] = (int)&D_001AE4B0;
     f[5] = (int)&D_001AE4A8;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern void func_US2_00346878(char *, int);
 extern void func_US2_00346AF8(char *, int);
-extern void func_00345D58(char *, int);
+extern void HandleColumnSelectionInput(char *, int);
 extern int D_00138344 __attribute__((section(".data")));
-extern int func_002A9588(int,int,int,int,int);
-extern int *func_00335E20(void *);
-extern void func_00335E38(void *,float,float,float,float);
+extern int math_ping_pong_blend_values(int,int,int,int,int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_first_float4(void *,float,float,float,float);
 extern int ref_L00_00345F70_00 __attribute__((sda));
 typedef struct {float x,y;} LayoutPair;
 extern LayoutPair ref_L00_00345F70_01 __attribute__((section(".data")));
@@ -125,22 +126,22 @@ int func_US2_00346EF0(char *o,int buttons,int *out)
  switch(mode) {
  case 0:*out=0;func_US2_00346878(o,buttons);break;
  case 3:*out=mode;func_US2_00346AF8(o,buttons);break;
- case 1:*out=mode;func_00345D58(o,buttons);break;
+ case 1:*out=mode;HandleColumnSelectionInput(o,buttons);break;
  }
- if(D_00138344&0xf000) func_002A9588(0,0,1,0,1);
- color=func_00335E20(o+0x17c);
- *color=func_002A9588(0x60442d00,0x70fffeed,20,0,0);
- func_00335E38(o+0x0,ref_L00_00345F70_02+(*(float **)(o+0x470))[0],ref_L00_00345F70_12[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x4c,ref_L00_00345F70_03+(*(float **)(o+0x470))[0],ref_L00_00345F70_13[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x98,ref_L00_00345F70_04+(*(float **)(o+0x470))[0],ref_L00_00345F70_14[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0xe4,ref_L00_00345F70_05+(*(float **)(o+0x470))[0],ref_L00_00345F70_15[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x130,ref_L00_00345F70_06+(*(float **)(o+0x470))[0],ref_L00_00345F70_16[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x1c8,offset.x+(*(float **)(o+0x470))[0],offset.y+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x310,ref_L00_00345F70_07+(*(float **)(o+0x470))[0],ref_L00_00345F70_17[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x2B8,ref_L00_00345F70_08+(*(float **)(o+0x470))[0],ref_L00_00345F70_18[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x368,ref_L00_00345F70_09+(*(float **)(o+0x470))[0],ref_L00_00345F70_19[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x3C0,ref_L00_00345F70_10+(*(float **)(o+0x470))[0],ref_L00_00345F70_20[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
- func_00335E38(o+0x418,ref_L00_00345F70_11+(*(float **)(o+0x470))[0],ref_L00_00345F70_21[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ if(D_00138344&0xf000) math_ping_pong_blend_values(0,0,1,0,1);
+ color=object_get_fourth_field(o+0x17c);
+ *color=math_ping_pong_blend_values(0x60442d00,0x70fffeed,20,0,0);
+ object_set_first_float4(o+0x0,ref_L00_00345F70_02+(*(float **)(o+0x470))[0],ref_L00_00345F70_12[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x4c,ref_L00_00345F70_03+(*(float **)(o+0x470))[0],ref_L00_00345F70_13[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x98,ref_L00_00345F70_04+(*(float **)(o+0x470))[0],ref_L00_00345F70_14[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0xe4,ref_L00_00345F70_05+(*(float **)(o+0x470))[0],ref_L00_00345F70_15[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x130,ref_L00_00345F70_06+(*(float **)(o+0x470))[0],ref_L00_00345F70_16[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x1c8,offset.x+(*(float **)(o+0x470))[0],offset.y+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x310,ref_L00_00345F70_07+(*(float **)(o+0x470))[0],ref_L00_00345F70_17[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x2B8,ref_L00_00345F70_08+(*(float **)(o+0x470))[0],ref_L00_00345F70_18[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x368,ref_L00_00345F70_09+(*(float **)(o+0x470))[0],ref_L00_00345F70_19[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x3C0,ref_L00_00345F70_10+(*(float **)(o+0x470))[0],ref_L00_00345F70_20[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
+ object_set_first_float4(o+0x418,ref_L00_00345F70_11+(*(float **)(o+0x470))[0],ref_L00_00345F70_21[0]+(*(float **)(o+0x470))[1],0.0f,0.0f);
  return 0;
 }
 
@@ -186,5 +187,5 @@ void func_US2_00347228(char *o)
     local.f[13] = 0;
     local.f[20] = (int)&local.q;
     local.f[22] = 1;
-    func_00337210(local.f);
+    DrawItemGrid(local.f);
 }

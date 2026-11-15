@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 extern u8 D_001A7BC8[] __attribute__((sda));
 extern u8 D_001A7BE0 __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern int D_L06_001B2348 __attribute__((sda));
-extern void func_002A7750(void *, int, int);
-extern float func_00282E80(void *, void *);
-extern float func_00282DF0(void *);
-extern void func_002AD7B8(int);
-extern float func_002AA2E8(float *, float, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L06_003E1040(void);
-extern int func_00282948(int *);
-extern void func_0029F338(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282C48(float);
-extern u8 D_00189E20[];
+extern void moby_set_state(void *, int, int);
+extern float vec_distance_xy(void *, void *);
+extern float FastVecLength(void *);
+extern void moby_mark_flag_and_append_to_list(int);
+extern float ApproachValue(float *, float, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void hud_show_pickup_notice(void);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fabs(float);
+extern u8 g_hero_state[];
 
 void func_PAL_L06_003E4348(u8 *moby)
 {
@@ -26,44 +27,44 @@ void func_PAL_L06_003E4348(u8 *moby)
     switch ((u8)moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        if (!D_001A7BC8[*(int *)st]) func_002A7750(moby, 1, -1);
-        else func_0029F338(moby);
+        if (!D_001A7BC8[*(int *)st]) moby_set_state(moby, 1, -1);
+        else moby_mark_spawned(moby);
         break;
     case 1:
-        if (func_00282E80(moby + 0x10, D_00189EA0) < 2.0f &&
-            func_00282C48(*(float *)(moby + 0x18) - *(float *)(D_00189EA0 + 8)) < 2.0f) {
-            func_002AD7B8(*(int *)st);
-            func_002A7750(moby, 2, -1);
+        if (vec_distance_xy(moby + 0x10, g_hero_position) < 2.0f &&
+            math_fabs(*(float *)(moby + 0x18) - *(float *)(g_hero_position + 8)) < 2.0f) {
+            moby_mark_flag_and_append_to_list(*(int *)st);
+            moby_set_state(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
             *(int *)(st + 8) = 150;
         }
         if (*(int *)st == 24 && D_001A7BE0) {
-            func_002AD7B8(24);
-            func_002A7750(moby, 2, -1);
+            moby_mark_flag_and_append_to_list(24);
+            moby_set_state(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
             *(int *)(st + 8) = 150;
         }
         break;
     case 2:
         if ((*(u16 *)(moby + 0x34) ^ 1) & 1) {
-            scale = func_00282DF0(moby + 0xC0);
-            func_002AA2E8(&scale, 0, 0.080000006f);
+            scale = FastVecLength(moby + 0xC0);
+            ApproachValue(&scale, 0, 0.080000006f);
             inverse = 2.0f - scale;
-            func_00282F20(moby + 0xC0, moby + 0xC0, scale);
-            func_00282F20(moby + 0xD0, moby + 0xD0, scale);
-            func_00282F20(moby + 0xE0, moby + 0xE0, inverse);
+            vec_scale_to_length(moby + 0xC0, moby + 0xC0, scale);
+            vec_scale_to_length(moby + 0xD0, moby + 0xD0, scale);
+            vec_scale_to_length(moby + 0xE0, moby + 0xE0, inverse);
             if (scale <= 0) {
                 moby[0x31] = 0;
                 *(u16 *)(moby + 0x34) |= 1;
             }
         }
-        func_L00_002E6CF0(func_L06_003E1040, moby);
+        gfx_add_draw_callback_first(hud_show_pickup_notice, moby);
         if ((D_L06_001B2348 ^ 1) & 1) (*(int *)(st + 4))++;
-        if (func_00282948((int *)(st + 8))) {
-            func_002AA2E8((float *)(st + 12), 0, 0.060000002f);
-            if (*(float *)(st + 12) <= 0) func_0029F338(moby);
+        if (math_fast_float_d((int *)(st + 8))) {
+            ApproachValue((float *)(st + 12), 0, 0.060000002f);
+            if (*(float *)(st + 12) <= 0) moby_mark_spawned(moby);
         } else {
-            func_002AA2E8((float *)(st + 12), 1, 0.060000002f);
+            ApproachValue((float *)(st + 12), 1, 0.060000002f);
         }
         break;
     }

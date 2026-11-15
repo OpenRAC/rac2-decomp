@@ -1,16 +1,17 @@
 #include "include_asm.h"
-extern void func_003480D8(void *, int, int);
-extern void func_003363C0(void *, float);
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
+#include "names.h"
+extern void menu_set_settings(void *, int, int);
+extern void object_set_value_float(void *, float);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[];
 extern char *D_001A8CFC[] __attribute__((sda));
 extern float D_001AE12C __attribute__((sda));
-extern void func_003361E0(void *, void *, void *);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern void func_00347EC8(void *, void *);
-extern void func_00341EE8(void *, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern void list_menu_reset_attach_items(void *, void *);
+extern void list_menu_set_selection(void *, int);
 
 void func_US2_00342BF0(char *object, void *argument)
 {
@@ -18,7 +19,7 @@ void func_US2_00342BF0(char *object, void *argument)
     char *first, *second, *widget;
     *(void **)(object + 4) = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)object = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -30,15 +31,15 @@ void func_US2_00342BF0(char *object, void *argument)
     first = object + 0xEC;
     second = object + 0x138;
     widget = object + 0x10;
-    func_003361E0(first, D_001ADC10, argument);
-    func_003361E0(second, D_001ADC18, argument);
-    *func_00335E20(first) = 0x60442D00;
-    *func_00335E20(second) = 0x55F0C070;
-    func_00336390(first, D_001A8CFC[0] + 0x8710, 0x73);
-    func_00336390(second, D_001A8CFC[0] + 0x8710, 0x74);
-    func_003363C0(first, D_001AE12C);
-    func_003363C0(second, D_001AE12C);
-    func_00347EC8(widget, argument);
-    func_003480D8(widget, 11, 60);
-    func_00341EE8(object, 0);
+    object_init_derived_arrays(first, D_001ADC10, argument);
+    object_init_derived_arrays(second, D_001ADC18, argument);
+    *object_get_fourth_field(first) = 0x60442D00;
+    *object_get_fourth_field(second) = 0x55F0C070;
+    object_set_helper_result(first, D_001A8CFC[0] + 0x8710, 0x73);
+    object_set_helper_result(second, D_001A8CFC[0] + 0x8710, 0x74);
+    object_set_value_float(first, D_001AE12C);
+    object_set_value_float(second, D_001AE12C);
+    list_menu_reset_attach_items(widget, argument);
+    menu_set_settings(widget, 11, 60);
+    list_menu_set_selection(object, 0);
 }

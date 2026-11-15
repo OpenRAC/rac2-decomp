@@ -2,7 +2,7 @@
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
 typedef struct { int a,b,c,d; } __attribute__((aligned(16))) Quad16;
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern char ref_00305798_00[][0x30];
 
 typedef struct {
@@ -24,19 +24,19 @@ typedef struct { u8 prefix[0x70]; float damage; u8 remainder[0xe0 - 0x74]; } Par
 typedef struct { u8 prefix[0x18]; char *hit; u8 pad1C[4]; ParticleVector position; } ParticleHit;
 extern ParticleHit ref_003054E8_00;
 extern ParticleDamageDescriptor ref_003054E8_02[];
-extern u8 D_00139568[];
+extern u8 g_item_slot_to_record[];
 typedef struct { u8 prefix[0x2290]; char *moby; } ParticlePlayer;
-extern ParticlePlayer D_00189E20;
-extern int func_002829D8(float *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8C00(char *, int, int, float, Quad16 *);
-extern void func_002A8E20(char *, void *);
-extern int func_00334160(char *, int, int);
-extern void func_00306680(void *, int);
+extern ParticlePlayer g_hero_state;
+extern int vec_fast_helper_b(float *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void make_hit_descriptor(char *, int, int, float, Quad16 *);
+extern void QueueMobyImpact(char *, void *);
+extern int weapon_start_health_drain(char *, int, int);
+extern void part_spawn_impact_burst(void *, int);
 
 /* Advance owned particle trails and turn a collision into a contact and impact. */
-void func_003054E8(char *object)
+void UpdateOwnedParticleTrails(char *object)
 {
     char *state = *(char **)(object+0x68);
     ParticleVector previous, normal;
@@ -51,7 +51,7 @@ void func_003054E8(char *object)
         trail = (ParticleTrail *)table[index];
         if (trail->owner != object) continue;
         hit = (char *)&trail->position; /* one temporary: snapshot source, then the hit moby */
-        if (FastVectorHelperB(&trail->timer)) {
+        if (vec_fast_helper_b(&trail->timer)) {
             trail->owner=0;
             --*(int *)(state+0x64);
             continue;
@@ -70,30 +70,30 @@ void func_003054E8(char *object)
         hit=collision->hit;
         if (hit) {
             if (((*(unsigned short *)(hit+0x34)&0x1000) || *(short *)(*(char **)(hit+0x24)+0x46)==5) &&
-                hit!=gHeroState.moby && *(short *)(hit+0xaa)!=0x1366 /* Miniturret */) {
+                hit!=g_hero_state.moby && *(short *)(hit+0xaa)!=0x1366 /* Miniturret */) {
                 ParticleDamageDescriptor *descriptor;
                 vec_scale_to_length(&normal,&trail->velocity,1.0f);
-                descriptor = &ref_003054E8_02[gItemSlotToRecord[0x29]];
+                descriptor = &ref_003054E8_02[g_item_slot_to_record[0x29]];
                 make_hit_descriptor((char *)&contact,(int)object,0x210000,
                     descriptor->damage,(Quad16 *)&normal);
                 contact.objectClass=*(unsigned short *)(object+0xaa);
                 contact.source=3; contact.kind=5;
                 QueueMobyImpact(hit,&contact);
-                StartHealthDrainOnTarget(hit,0x29,*(int *)(object+0xb8));
+                weapon_start_health_drain(hit,0x29,*(int *)(object+0xb8));
                 trail->owner=0;
                 --*(int *)(state+0x64);
-                SpawnImpactParticleBurst_00306680(&ref_003054E8_00.position,6);
+                part_spawn_impact_burst(&ref_003054E8_00.position,6);
             } else {
                 /* Set at the top of the arm; func_00306680 takes it after the release. */
             void *position = &ref_003054E8_00.position;
                 trail->owner=0;
                 --*(int *)(state+0x64);
-                SpawnImpactParticleBurst_00306680(position,3);
+                part_spawn_impact_burst(position,3);
             }
         } else {
             trail->owner=0;
             --*(int *)(state+0x64);
-            SpawnImpactParticleBurst_00306680(&ref_003054E8_00.position,3);
+            part_spawn_impact_burst(&ref_003054E8_00.position,3);
         }
     }
 }

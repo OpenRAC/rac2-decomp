@@ -25,7 +25,7 @@ static __inline__ int fde_compare(fde *x, fde *y) {
 }
 
 /* Merges two sorted lists of frame records into the first list. */
-void func_001235C8(fde_vector *v1, const fde_vector *v2) {
+void eh_merge_fde_vectors(fde_vector *v1, const fde_vector *v2) {
     u32 i1, i2;
     fde *fde2;
 

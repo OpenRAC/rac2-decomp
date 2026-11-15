@@ -10,7 +10,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern s32 D_L01_001AFE44 __attribute__((sda));
 extern s32 D_L01_001AFE48 __attribute__((sda));
 extern s32 D_L01_001A8F40 __attribute__((sda));
@@ -54,7 +54,7 @@ extern void func_003BE628(u8 *);
 extern void func_003E9CF8(u8 *, s32, s32);
 
 /* Updates the Mutant Firefly. It wanders, chases and attacks the player, and is removed when it dies or leaves the level. */
-void func_L01_003BEA08(u8 *moby)
+void mutant_firefly_update(u8 *moby)
 {
     f32 vec[4] __attribute__((aligned(16)));
     u8 *vars;
@@ -68,7 +68,7 @@ void func_L01_003BEA08(u8 *moby)
     s32 inRange;
 
     vars = *(u8 **)(moby + 0x68);
-    if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x6F) {
+    if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
         if (*(s16 *)(vars + 0x202) != -1) {
             *(s32 *)(vars + 0x204) = 0;
             func_002F2A30(*(s16 *)(vars + 0x202));
@@ -296,9 +296,9 @@ void func_L01_003BEA08(u8 *moby)
         }
         *(f32 *)(vars + 0x22C) = *(f32 *)(vars + 0x20C);
         *(s32 *)(vars + 0x29C) = *(s32 *)(vars + 0x298);
-        if (*(s32 *)(vars + 0x114) == 0 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x31 ||
-            ((Hero *)gHeroState)->i[0x229C / 4] == 0x11 || ((Hero *)gHeroState)->i[0x229C / 4] == 0x12 ||
-            D_L01_001A8F40 == 2 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x6F) {
+        if (*(s32 *)(vars + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
+            ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
+            D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             *(s32 *)(vars + 0x114) = 0;
             if (*(s32 *)(vars + 0x238) == 0) {
                 *(f32 *)(vars + 0x22C) = 0;
@@ -381,9 +381,9 @@ void func_L01_003BEA08(u8 *moby)
         *(f32 *)(vars + 0x22C) = 0;
         *(s32 *)(vars + 0x29C) = *(s32 *)(vars + 0x298);
         inRange = func_003165E8(moby + 0x10, *(s32 *)(vars + 0x210), *(s32 *)(vars + 0x218), *(s32 *)(vars + 0x21C), -1) != 0;
-        if (*(s32 *)(vars + 0x114) == 0 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x31 ||
-            ((Hero *)gHeroState)->i[0x229C / 4] == 0x11 || ((Hero *)gHeroState)->i[0x229C / 4] == 0x12 ||
-            !inRange || D_L01_001A8F40 == 2 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x6F) {
+        if (*(s32 *)(vars + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
+            ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
+            !inRange || D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             if (*(s32 *)(vars + 0x238) != 0) {
                 func_003BDBB0(moby);
                 *(s32 *)(vars + 0x230) = 0;

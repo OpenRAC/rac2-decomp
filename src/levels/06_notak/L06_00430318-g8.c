@@ -5,12 +5,12 @@
 #define F(p,o) (*(float *)((p)+(o)))
 extern char D_00189F00[], D_L06_001BFA40[], D_L06_001B0B80[];
 typedef struct { char pad0[0x80]; float position[4]; char pad90[0x50]; float vector_e0[4]; } PlayerView;
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 #define PLAYER_POSITION ((char *)&D_00189E20.position)
 extern unsigned char D_001A7BCF, D_001A7C8F, D_001A7A40;
 extern unsigned char D_001395CD NOT_SDA;
 extern int D_001397B0 NOT_SDA, D_00138324 NOT_SDA, D_L06_001A8F00;
-extern int D_001A79F8 MACRO_ADDR;
+extern int g_player_bolts MACRO_ADDR;
 /* Only +4 is accessed; the object's real base is not known. */
 extern struct { int pad; int flag; } D_L06_001B2564 MACRO_ADDR;
 extern struct { int normal, challenge; } D_L06_002958D0 NOT_SDA;
@@ -30,7 +30,7 @@ static __inline__ void joint_step(char *obj,char *joint,int index,float speed,fl
 }
 
 /* Updates a coin-gated door: waits for the hero, asks for payment, takes the coins and opens. */
-void func_L06_00430318(char *moby)
+void coin_gated_door_update(char *moby)
 {
     float target[4], origin[4], delta[4];
     char *vars=*(char **)(moby+0x68);
@@ -63,7 +63,7 @@ void func_L06_00430318(char *moby)
         func_2F94E0(target,origin,0,1);
         {
             int challenge = D_001A7C8F;
-            int coins = gPlayerBolts;
+            int coins = g_player_bolts;
             if(challenge) {
                 if(coins>=D_L06_002958D0.challenge) {func_35A550(moby,4,-1);break;}
             } else if(coins>=D_L06_002958D0.normal) goto state4;
@@ -75,7 +75,7 @@ void func_L06_00430318(char *moby)
     }
     case 3: {
         int challenge = D_001A7C8F;
-        int coins = gPlayerBolts;
+        int coins = g_player_bolts;
         if(challenge ? D_L06_002958D0.challenge<coins : D_L06_002958D0.normal<coins) {
             func_35A550(moby,4,-1); break;
         }
@@ -88,7 +88,7 @@ void func_L06_00430318(char *moby)
     }
     case 4: {
         int challenge = D_001A7C8F;
-        int coins = gPlayerBolts;
+        int coins = g_player_bolts;
         if(challenge ? coins<D_L06_002958D0.challenge : coins<D_L06_002958D0.normal) {
             func_34BC10(180);func_35A550(moby,3,-1);break;
         }
@@ -114,11 +114,11 @@ void func_L06_00430318(char *moby)
             func_3623D0(7);func_364178(7);
             {
                 int challenge = D_001A7C8F;
-                int coins = gPlayerBolts;
+                int coins = g_player_bolts;
                 int left;
                 if(challenge) left=coins-D_L06_002958D0.challenge;
                 else left=coins-D_L06_002958D0.normal;
-                gPlayerBolts=left;
+                g_player_bolts=left;
             }
             func_34BC10(180);
         }
@@ -144,7 +144,7 @@ void func_L06_00430318(char *moby)
     active=0;
     if(B(moby,0x43)==2) {
         active=1;
-        if(func_32D7C0(moby+0x10,PLAYER_POSITION)<8.0f && func_32E6B8(F(moby,0xf8),func_32DC80(gHeroState.vector_e0[0]-F(moby,0x10),gHeroState.vector_e0[1]-F(moby,0x14)))<1.5707964897155762f) {
+        if(func_32D7C0(moby+0x10,PLAYER_POSITION)<8.0f && func_32E6B8(F(moby,0xf8),func_32DC80(g_hero_state.vector_e0[0]-F(moby,0x10),g_hero_state.vector_e0[1]-F(moby,0x14)))<1.5707964897155762f) {
             if(func_32D710(PLAYER_POSITION+0x90)>0.01f) I(vars,0x114)=120;
             else func_32D238(vars+0x114);
         } else if(I(vars,0x114)) {I(vars,0x114)=0;qcopy(vars+0x100,D_00189F00);}

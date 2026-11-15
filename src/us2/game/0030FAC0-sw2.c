@@ -9,38 +9,38 @@ typedef struct {
     u8 pad2294[0x24A4-0x2294]; f32 reach_distance, reach_height;
     u8 pad24AC[0x20]; s32 health;
 } AmmoHero;
-extern AmmoHero D_00189E20;
+extern AmmoHero g_hero_state;
 typedef struct {
     u8 pad00[0x38]; s16 sound_multiple, sound_single;
     u8 pad3C[0x8E - 0x3C]; u16 max_ammo; u8 pad90[0x50];
 } AmmoDef;
-extern u8 D_00239BA0[];
-extern u8 D_00139568[];
-extern s32 D_00139688[];
-extern void *D_0018C0B0 NOT_SDA;
-extern s32 D_001B1688[] __attribute__((sda));
+extern u8 g_weapon_table[];
+extern u8 g_item_slot_to_record[];
+extern s32 g_item_ammo_counts[];
+extern void *g_hero_moby NOT_SDA;
+extern s32 g_game_time[] __attribute__((sda));
 extern s32 D_001B24A8[] __attribute__((sda));
 extern s32 D_001B24A8_gp SDATA(D_001B24A8);
-extern s32 func_00282948(s32 *);
-extern u32 func_0026F748(s32, s32);
-extern s32 func_002E5DA0(s32, s32, void *, s32);
-extern f32 func_002AA2E8(f32 *, f32, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282C88(void *);
-extern void func_00282F20(void *, void *, f32);
+extern s32 math_fast_float_d(s32 *);
+extern u32 stub_empty_8(s32, s32);
+extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
+extern f32 ApproachValue(f32 *, f32, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void vec_scale_to_length(void *, void *, f32);
 extern void func_US2_002B18B0(s32, s32, s32);
-extern void func_0029F338(void *);
-extern f32 func_00282DF0(void *);
-extern f32 func_00282C48(f32);
-extern f32 func_00282E80(void *, void *);
+extern void moby_mark_spawned(void *);
+extern f32 FastVecLength(void *);
+extern f32 math_fabs(f32);
+extern f32 vec_distance_xy(void *, void *);
 extern f32 func_002A0558(void *, void *);
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283180(f32);
-extern s32 func_00277258(void *, s32, s32, f32);
-extern s32 func_002761F8(void *, void *, s32, s32, s32);
-extern s32 func_00283CF0(f32);
-extern s32 func_00282C30(s32);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern s32 coll_test_point(void *, s32, s32, f32);
+extern s32 CollLine(void *, void *, s32, s32, s32);
+extern s32 FloatToInt(f32);
+extern s32 subtract_integer_with_clamp(s32);
 #define EF(p, n) (*(f32 *)((u8 *)(p) + (n)))
 #define EI(p, n) (*(s32 *)((u8 *)(p) + (n)))
 extern u32 ref_US2_0030FAC0_00(s32, s32);
@@ -50,23 +50,23 @@ void func_US2_0030FAC0(u8 *object)
     VecE start, next;
     f32 alpha;
     u8 *state = *(u8 **)(object+0x68);
-    func_00282948((s32 *)(state+0x20));
+    math_fast_float_d((s32 *)(state+0x20));
     if (object[0x20] == 1 || object[0x20] == 4 || object[0x20] == 3) {
-        if (func_00282DF0(state+0x10) != 0.0f) {
+        if (FastVecLength(state+0x10) != 0.0f) {
             qcopy(start, object+0x10);
             start[2] += 0.5f;
-            if (func_00277258(start,2,0,0.4f)) {
+            if (coll_test_point(start,2,0,0.4f)) {
                 qcopy(object+0x10,D_001BAFB0);
                 EF(object,0x18) -= 0.5f;
             }
         }
         EF(state,0x18) -= 0.0013611112f;
-        func_00282CC0(next,object+0x10,state+0x10);
+        FastVecAdd(next,object+0x10,state+0x10);
         EF(state,0x18) -= 0.0013611112f;
         qcopy(start,object+0x10);
         start[2] += 0.1f;
-        if (func_002761F8(start,next,2,0,0)) {
-            func_00282C88(state+0x10);
+        if (CollLine(start,next,2,0,0)) {
+            vec_clear_128(state+0x10);
             qcopy(object+0x10,D_001BAFA0);
         } else qcopy(object+0x10,next);
     }
@@ -81,22 +81,22 @@ void func_US2_0030FAC0(u8 *object)
         s32 eligible, old, current, difference, item, sound_item, sound;
         s32 elapsed;
         alpha = (f32)object[0x23];
-        func_002AA2E8(&alpha,128.0f,4.0f);
-        object[0x23] = func_00283CF0(alpha);
+        ApproachValue(&alpha,128.0f,4.0f);
+        object[0x23] = FloatToInt(alpha);
         if (EI(state,0x20)>0) break;
-        if (func_00282DF0(state+0x10) != 0.0f) break;
+        if (FastVecLength(state+0x10) != 0.0f) break;
         eligible=1;
-        if (func_00282C48(EF(object,0x18)-D_00189E20.position[2]) > D_00189E20.reach_height) eligible=0;
-        else if (func_00282E80(object+0x10,D_00189E20.position)>D_00189E20.reach_distance) eligible=0;
+        if (math_fabs(EF(object,0x18)-g_hero_state.position[2]) > g_hero_state.reach_height) eligible=0;
+        else if (vec_distance_xy(object+0x10,g_hero_state.position)>g_hero_state.reach_distance) eligible=0;
         item=EI(state,8);
-        mapping=D_00139568;
-        counts=D_00139688;
-        defs=(AmmoDef *)D_00239BA0;
+        mapping=g_item_slot_to_record;
+        counts=g_item_ammo_counts;
+        defs=(AmmoDef *)g_weapon_table;
         entry=&defs[mapping[item]];
         old=counts[item];
         if (old >= entry->max_ammo) eligible=0;
         if (EF(object,0x18)<EF(state,0x28)-2.0f) eligible=1;
-        if (!D_00189E20.health) eligible=0;
+        if (!g_hero_state.health) eligible=0;
         if (eligible) {
             ref_US2_0030FAC0_00(item,EI(state,0));
             sound_item=EI(state,8);
@@ -109,17 +109,17 @@ void func_US2_0030FAC0(u8 *object)
             }
             object[0x20]=2;
             EF(object,0x2C)*=1.2f;
-            func_00282C88(state+0x10);
-            elapsed=D_001B1688[0]-D_001B24A8[0];
+            vec_clear_128(state+0x10);
+            elapsed=g_game_time[0]-D_001B24A8[0];
             EF(state,0x24)=0.13333334f;
-            if (func_00282C30(elapsed)>=11) {
-                func_002E5DA0(0,0,object,0xD5);
+            if (subtract_integer_with_clamp(elapsed)>=11) {
+                snd_play_from_class_bank(0,0,object,0xD5);
                 /* Last pickup-sound frame. */
-                D_001B24A8_gp=D_001B1688[0];
+                D_001B24A8_gp=g_game_time[0];
             }
         } else {
             if (object[0x23]<255) object[0x23]++;
-            if (func_002A0558(object,D_00189E20.moby)<=-0.2f) {
+            if (func_002A0558(object,g_hero_state.moby)<=-0.2f) {
                 object[0x20]=3;
                 *(s16 *)(state+6)=60;
             }
@@ -128,18 +128,18 @@ void func_US2_0030FAC0(u8 *object)
     }
     case 2: {
         f32 speed, f;
-        func_002AA2E8((f32 *)(state+0x24),0.0f,0.006666667f);
+        ApproachValue((f32 *)(state+0x24),0.0f,0.006666667f);
         EF(object,0x18)+=EF(state,0x24);
-        speed=func_00282DF0(state+0x10);
-        func_002AA2E8(&speed,1.0666667f,0.006666667f);
-        func_00282CF0(state+0x10,D_00189E20.pickup_target,object+0x10);
-        if (EF(object,0x2C)==0.0f || func_00282DF0(state+0x10)<speed) { func_0029F338(object); break; }
-        func_00282F20(state+0x10,state+0x10,speed);
-        func_00282CC0(object+0x10,object+0x10,state+0x10);
-        f=func_00282E48(object+0x10,D_00189E20.pickup_target)/(speed*30.0f+0.01f);
+        speed=FastVecLength(state+0x10);
+        ApproachValue(&speed,1.0666667f,0.006666667f);
+        FastVecSub(state+0x10,g_hero_state.pickup_target,object+0x10);
+        if (EF(object,0x2C)==0.0f || FastVecLength(state+0x10)<speed) { moby_mark_spawned(object); break; }
+        vec_scale_to_length(state+0x10,state+0x10,speed);
+        FastVecAdd(object+0x10,object+0x10,state+0x10);
+        f=fast_vec_dist(object+0x10,g_hero_state.pickup_target)/(speed*30.0f+0.01f);
         if (f>1.0f) f=1.0f;
         else if (f<0.3f) f=0.3f;
-        func_002AA2E8((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*f,EF(*(u8 **)(object+0x24),0x24)*0.1f);
+        ApproachValue((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*f,EF(*(u8 **)(object+0x24),0x24)*0.1f);
         break;
     }
     case 3: {
@@ -148,17 +148,17 @@ void func_US2_0030FAC0(u8 *object)
         AmmoDef *entry, *defs;
         u8 *mapping;
         s32 *counts;
-        phase = D_001B1688[0]%60;
+        phase = g_game_time[0]%60;
         alpha=(f32)object[0x23];
-        f=func_00283180((f32)phase*0.104719676f-3.1415901f);
-        pulse=func_00283CF0(f*5.0f+5.0f)+10;
-        func_002AA2E8(&alpha,(f32)pulse,4.0f);
-        object[0x23]=func_00283CF0(alpha);
-        if (func_002A0558(object,D_0018C0B0)>=0.0f) goto reactivate;
+        f=math_fast_sin_or_cos_a((f32)phase*0.104719676f-3.1415901f);
+        pulse=FloatToInt(f*5.0f+5.0f)+10;
+        ApproachValue(&alpha,(f32)pulse,4.0f);
+        object[0x23]=FloatToInt(alpha);
+        if (func_002A0558(object,g_hero_moby)>=0.0f) goto reactivate;
         item=EI(state,8);
-        mapping=D_00139568;
-        counts=D_00139688;
-        defs=(AmmoDef *)D_00239BA0;
+        mapping=g_item_slot_to_record;
+        counts=g_item_ammo_counts;
+        defs=(AmmoDef *)g_weapon_table;
         entry=&defs[mapping[item]];
         if (counts[item]>=entry->max_ammo) break;
     reactivate:

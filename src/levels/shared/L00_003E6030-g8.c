@@ -20,20 +20,20 @@ extern int *D_L00_001B2B58 MACRO_ADDR;
 extern short D_L00_0029A090[][4][2];
 extern RenderVec6030 D_L00_00299830[];
 extern float D_L00_0029A990[][2];
-extern RenderVec6030 D_L00_001B8DC0;
-extern unsigned long func_0027C878(int);
-extern void func_00282C88(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00282E20(void *);
-extern float func_002A7798(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_L00_003E6778(char *, int, float, float, void *);
-extern void func_00280B90(void *, int, int);
+extern RenderVec6030 g_camera_l00_position;
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern float math_ease_out_quad(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern int AllocateOwnedEffectParticle(char *, int, float, float, void *);
+extern void draw_world_quad(void *, int, int);
 /* func_L00_003E6030 builds and submits the 143 quads listed in D_L00_0029A090: each corner is
    scaled, pushed along its own z by a ripple, moved to OBJECT and summed for the quad's centre. A
    quad whose normal has a positive dot product with (centre - D_L00_001B8DC0) keeps an effect in
@@ -43,7 +43,7 @@ extern void func_00280B90(void *, int, int);
    a pseudo at its declaration, and PRE's reaching registers take their stack slots in the order of
    the hash of the base register, so these declarations decide the order of the spill slots. */
 /* Draws the rippling inner blast shell as 143 quads and starts a spark effect on each quad that faces the camera. */
-void func_L00_003E6030(char *object)
+void blast_draw_ripple_mesh(char *object)
 {
     Quad6030 q;
     RenderVec6030 matrix[3];
@@ -76,9 +76,9 @@ void func_L00_003E6030(char *object)
     frame_reg = 0xFF9000000260UL;
     q.gs[2] = frame_reg;
     q.gs[0] = 0;
-    ClearVector128(matrix[0]);
-    ClearVector128(matrix[1]);
-    ClearVector128(matrix[2]);
+    vec_clear_128(matrix[0]);
+    vec_clear_128(matrix[1]);
+    vec_clear_128(matrix[2]);
     scale_x = *(float *)(data + 16) * 0.0625f + 1.0f;
     matrix[0][0] = scale_x;
     scale_y = *(float *)(data + 16) * 0.0625f + 1.0f;
@@ -101,14 +101,14 @@ void func_L00_003E6030(char *object)
             v = base_v - scroll;
             q.uv[i][1] = v;
         }
-        ClearVector128(center);
+        vec_clear_128(center);
         for (i = 0; i < 4; i++) {
             matrix_mul_vec3(q.vertices[i], q.vertices[i], matrix);
             length = vec_length_xy(q.vertices[i]);
             height = 1.5f - length * (2.0f / 3.0f);
             clamped = height > 0.0f ? height : 0.0f;
             amount = clamped * (2.0f / 3.0f);
-            swell = EaseOutQuad(amount);
+            swell = math_ease_out_quad(amount);
             ripple = *(float *)(data + 16) * 1.5f;
             swell *= ripple;
             swell *= 0.00825f;
@@ -126,7 +126,7 @@ void func_L00_003E6030(char *object)
         }
         FastVecScale(center, center, 0.25f);
         qcopy(saved_center, center);
-        FastVecSub(normal, center, gCameraPosition_L00);
+        FastVecSub(normal, center, g_camera_l00_position);
         vec_scale_to_length(normal, normal, 1.0f);
         FastVecSub(edge1, q.vertices[2], q.vertices[0]);
         FastVecSub(edge2, q.vertices[2], q.vertices[1]);

@@ -1,6 +1,7 @@
 /* func_PAL_L00_002AB0C0, the PAL copy of func_L00_002AB1D8: the same C, where 0.05f becomes
    0.072000004f; 0.3f becomes 0.43200004f. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -30,11 +31,11 @@ typedef struct {
 
 extern ResidentState_Fd160fb9c D_00189E20_16;
 
-extern float func_00282E48(void *source, void *table);
+extern float fast_vec_dist(void *source, void *table);
 
-extern int func_002ABB78(void *object);
+extern int moby_is_in_special_class_range(void *object);
 
-extern int func_L00_002ADEA0(int index);
+extern int hero_slot_item_id(int index);
 
 extern void *D_L00_001BF218;
 
@@ -45,7 +46,7 @@ typedef struct {
 } HeroBlock_2ab1d8;
 #endif
 
-extern HeroBlock_2ab1d8 D_00189EA0;
+extern HeroBlock_2ab1d8 g_hero_position;
 
 extern short D_L00_001BF220_2[];
 
@@ -68,7 +69,7 @@ typedef struct {
 
 extern FloatBlock_2ab1d8 D_L00_0025BE10_1;
 
-extern int func_L00_002AB108(float *out, float scale, float amount);
+extern int hero_test_reach_blend(float *out, float scale, float amount);
 void func_PAL_L00_002AB0C0(void)
 {
     float ret;
@@ -86,19 +87,19 @@ void func_PAL_L00_002AB0C0(void)
     if (D_00189E20_16.b22BF != 0)
         return;
 
-    if (func_L00_002AB108(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
+    if (hero_test_reach_blend(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
         return;
 
     if (D_00189E20_16.b22B8 != 0 && D_L00_001BF218 != 0) {
-        if (func_002ABB78(D_L00_001BF218) != 0)
+        if (moby_is_in_special_class_range(D_L00_001BF218) != 0)
             return;
     }
 
     D_L00_0025BE10_1.f6D4 = 0.072000004f;
     D_L00_0025BE10_1.f6D8 = 0.43200004f;
 
-    ret = func_00282E48(&D_00189EA0, D_L00_001BF220_2);
-    f1 = 1.3f - (ret - D_00189EA0.f1E4);
+    ret = fast_vec_dist(&g_hero_position, D_L00_001BF220_2);
+    f1 = 1.3f - (ret - g_hero_position.f1E4);
     f22 = f1 * 0.9615385f;
     f20 = f22 * (-70.0f * 0.017453294f);
     if (-30.0f * 0.017453294f < f20)
@@ -107,7 +108,7 @@ void func_PAL_L00_002AB0C0(void)
         f20 = -70.0f * 0.017453294f;
 
     f21 = 0.0f;
-    v = func_L00_002ADEA0(0);
+    v = hero_slot_item_id(0);
     if (v == 27 || v == 44) {
         float f0 = 40.0f * 0.017453294f;
 

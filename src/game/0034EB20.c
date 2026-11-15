@@ -1,9 +1,9 @@
 #include "names.h"
-extern void func_002FC3C0(int);
+extern void gfx_wait_for_dma_status_bits(int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
-extern int func_001265B0(void *, void *);
-extern int func_001244B8(int, int);
-extern int func_0011AEA0(int);
+extern int sceGsExecLoadImage(void *, void *);
+extern int gfx_wait_paths_idle(int, int);
+extern int FlushCache(int);
 
 typedef struct {
     short value;
@@ -18,17 +18,17 @@ typedef struct {
 } UploadQueue;
 
 /* Sends every waiting texture block to the graphics chip and empties the queue. */
-void func_0034EB20(UploadQueue *queue)
+void tex_upload_queued_blocks(UploadQueue *queue)
 {
     unsigned char buffer[0x60];
     int i;
 
-    WaitForDmaStatusBits(1);
+    gfx_wait_for_dma_status_bits(1);
     for (i = 0; i < queue->count; i++) {
         func_00126288(buffer, queue->slots[i].value, 1, 0, 0, 0, 0x10, 0x10);
         FlushCache(0);
-        ExecGsLoadImage(buffer, queue->blocks[i]);
-        WaitGsPathsIdle(0, 0);
+        sceGsExecLoadImage(buffer, queue->blocks[i]);
+        gfx_wait_paths_idle(0, 0);
     }
     queue->count = 0;
 }

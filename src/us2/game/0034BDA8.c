@@ -1,26 +1,27 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern int func_00335E20(unsigned char *field);
+extern int object_get_fourth_field(unsigned char *field);
 
 unsigned int func_US2_0034D7A8(unsigned char *owner)
 {
-    unsigned int address = (unsigned int)func_00335E20(owner + 0x378);
+    unsigned int address = (unsigned int)object_get_fourth_field(owner + 0x378);
     return *(unsigned int *)address & 0xff000000u;
 }
 
 
-extern void func_00336920(char *, int, int);
+extern void hud_set_widget_value_pair(char *, int, int);
 
 void func_US2_0034D7D0(char *self, int mode)
 {
     *(int *)(self + 0x15A4) = mode;
     switch (mode) {
     case 0:
-        func_00336920(self + 0x2A0, 0x7567, 0);
+        hud_set_widget_value_pair(self + 0x2A0, 0x7567, 0);
         break;
     case 1:
-        func_00336920(self + 0x2A0, 0xEAA2, 0);
+        hud_set_widget_value_pair(self + 0x2A0, 0xEAA2, 0);
         break;
     }
 }
@@ -83,24 +84,24 @@ void func_US2_0034D8C8(char *self, int x)
 }
 
 
-extern int func_002A9588(int, int, int, int, int);
-extern void func_00335E68(void *, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern void object_set_flag_value(void *, int);
 extern int D_00138344;
-extern int func_002A9588(int, int, int, int, int);
-extern float *func_00336318(void *);
-extern void func_00335E68(void *, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern float *object_get_field_a(void *);
+extern void object_set_flag_value(void *, int);
 
 void func_US2_0034DAB0(char *object, int arg, float value)
 {
     int *result;
     char *child;
     if (D_00138344 & 0xF000)
-        func_002A9588(0, 0, 1, 0, 1);
+        math_ping_pong_blend_values(0, 0, 1, 0, 1);
     child = object + 0x5D8;
-    result = (int *)func_00335E20((unsigned char *)child);
-    *result = func_002A9588(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    *func_00336318(child) = value;
-    func_00335E68(child, arg);
+    result = (int *)object_get_fourth_field((unsigned char *)child);
+    *result = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    *object_get_field_a(child) = value;
+    object_set_flag_value(child, arg);
 }
 
 
@@ -121,10 +122,10 @@ void func_US2_0034DB68(int *self, int value)
 
 
 
-extern void func_003363D0(void *p);
+extern void object_construct_derived_b(void *p);
 extern void func_US2_0034BDB0(void *p);
-extern void func_003366D0(void *p);
-extern void func_00337BD8(void *p);
+extern void object_construct_derived_c(void *p);
+extern void text_panel_shutdown(void *p);
 
 /* walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer */
 unsigned char *func_US2_0034ED28(unsigned char *a0)
@@ -133,14 +134,14 @@ unsigned char *func_US2_0034ED28(unsigned char *a0)
     int i;
 
     for (i = 25, p = a0; i != -1; i--) {
-        func_003363D0(p);
+        object_construct_derived_b(p);
         p += 72;
     }
-    func_003363D0(a0 + 1872);
+    object_construct_derived_b(a0 + 1872);
     func_US2_0034BDB0(a0 + 1952);
-    func_003366D0(a0 + 7504);
-    func_00337BD8(a0 + 7564);
-    func_00337BD8(a0 + 8156);
+    object_construct_derived_c(a0 + 7504);
+    text_panel_shutdown(a0 + 7564);
+    text_panel_shutdown(a0 + 8156);
     return a0;
 }
 

@@ -14,7 +14,7 @@ extern float ref_L00_003DC3E0_09(float, float);
 extern float ref_L00_003DC3E0_10(int);
 extern int ref_L00_003DC3E0_11(int, int);
 extern unsigned char *ref_L00_003DC3E0_12(char *, float *, float, int, int);
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
 /* func_L00_003DBF50 lives in L00_003D37E8-g8.c. */
 
@@ -38,7 +38,7 @@ void func_PAL_L00_003E05B0(char *object, int unused, char *pos, char *direction)
     ref_L00_003DC3E0_04(c, direction, 0.0009765625f);
     ref_L00_003DC3E0_01(c, c, 1.0f);
     colors = ref_L00_003DC3E0_05;
-    angle = func_002A7940();
+    angle = math_random_angle();
     i = 23;
     do {
         ref_L00_003DC3E0_06(e, d, direction, angle);

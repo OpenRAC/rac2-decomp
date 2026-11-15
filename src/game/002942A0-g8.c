@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac3-decomp (src/boot_elf/text/39AC98.c, func_0039AC98) with rac2's
    offsets; the source's volatile stores are plain here. Starts loading entry A0 of the
    table in D_0014B540 when the load slot (D_001A9330) is free: records the entry, A1 and
@@ -26,17 +27,17 @@ typedef struct {
     s32 f34[3];
 } LoadOwners;
 
-extern LoadTable D_0014B540;
+extern LoadTable g_copy_setup_data;
 extern LoadOwners D_00152CD0;
 extern s32 D_001A9330 __attribute__((sda));
 extern s32 D_001A9334[] __attribute__((sda));
-extern s32 func_002B7BC0();
-extern void func_00294130();
-extern void func_00294180();
+extern s32 load_start_disc_read_with_callback();
+extern void load_release_class_cache_slot();
+extern void load_continue_stream();
 
-s32 func_002942A0(s32 entryIndex, s32 owner, s32 dest, s32 firstPartOnly) {
+s32 load_start_disc_entry(s32 entryIndex, s32 owner, s32 dest, s32 firstPartOnly) {
     s32 oldSlot;
-    if (gCopySetupData.el[entryIndex].f8 != 0) {
+    if (g_copy_setup_data.el[entryIndex].f8 != 0) {
         oldSlot = D_001A9330;
         if (oldSlot == -1) {
             D_001A9330 = entryIndex;
@@ -45,10 +46,10 @@ s32 func_002942A0(s32 entryIndex, s32 owner, s32 dest, s32 firstPartOnly) {
             if (owner >= 0) {
                 D_00152CD0.f34[owner] = oldSlot;
             }
-            if (gCopySetupData.el[entryIndex].f10 != 0 && firstPartOnly == 0) {
-                return StartDiscReadWithCallback(dest, gCopySetupData.el[entryIndex].fC + gCopySetupData.base, gCopySetupData.el[entryIndex].f10, ContinueStreamLoad, &D_001A9330);
+            if (g_copy_setup_data.el[entryIndex].f10 != 0 && firstPartOnly == 0) {
+                return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entryIndex].fC + g_copy_setup_data.base, g_copy_setup_data.el[entryIndex].f10, load_continue_stream, &D_001A9330);
             }
-            return StartDiscReadWithCallback(dest, gCopySetupData.el[entryIndex].f4 + gCopySetupData.base, gCopySetupData.el[entryIndex].f8, ReleaseClassCacheSlot, &D_001A9330);
+            return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entryIndex].f4 + g_copy_setup_data.base, g_copy_setup_data.el[entryIndex].f8, load_release_class_cache_slot, &D_001A9330);
         }
         return 0;
     }

@@ -17,7 +17,7 @@ extern int ref_002F0FA0_05;
 extern int ref_002F0FA0_06 __attribute__((sda));
 
 /* Resets a list of records: clears the counters and sets every record back to its empty values. */
-void func_002F0FA0(void)
+void gfx_reset_record_list(void)
 {
     Record002F0FA0 *entry = ref_002F0FA0_00;
     int startValue = ref_002F0FA0_02;

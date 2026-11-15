@@ -1,16 +1,16 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_002A7790(float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern void func_00300190(char *, char *);
-extern int func_00282978(char *);
-extern void func_002B9180(char *);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282F20(float *, float *, float);
+extern float math_square(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern void vec_transform_or_copy(char *, char *);
+extern int FastDecTimer(char *);
+extern void part_kill(char *);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
 /* func_002C8A38 is defined in 002C8A38.c. */
 
@@ -32,35 +32,35 @@ void func_PAL_002C9A98(char *p)
     color |= (color << 16) | (color << 8);
     spin = *(unsigned char *)(d + 13) >> 4;
     fading = *(unsigned char *)(d + 13) & 15;
-    size0 = func_00283CE0(*(unsigned char *)(d + 30)) * 1640.625f;
-    size1 = func_00283CE0(*(unsigned char *)(d + 31)) * 1640.625f;
-    speed0 = func_00283CE0(*(unsigned char *)(d + 28)) * (1.0f / 128);
-    speed1 = func_00283CE0(*(unsigned char *)(d + 29)) * (1.0f / 128);
-    scale = func_00283CE0(*(unsigned char *)(d + 15)) * (1.0f / 128);
-    func_00300190(p + 16, p + 16);
-    t = func_00283CE0(*(short *)(p + 10));
-    t /= func_00283CE0(*(unsigned char *)(d + 14)); inverse = 1.0f - t;
+    size0 = IntToFloat(*(unsigned char *)(d + 30)) * 1640.625f;
+    size1 = IntToFloat(*(unsigned char *)(d + 31)) * 1640.625f;
+    speed0 = IntToFloat(*(unsigned char *)(d + 28)) * (1.0f / 128);
+    speed1 = IntToFloat(*(unsigned char *)(d + 29)) * (1.0f / 128);
+    scale = IntToFloat(*(unsigned char *)(d + 15)) * (1.0f / 128);
+    vec_transform_or_copy(p + 16, p + 16);
+    t = IntToFloat(*(short *)(p + 10));
+    t /= IntToFloat(*(unsigned char *)(d + 14)); inverse = 1.0f - t;
     if (!fading) {
-        *(int *)(p + 4) = func_00283D38(0x103080, color, inverse) | (alpha << 24);
+        *(int *)(p + 4) = FastTweenColor(0x103080, color, inverse) | (alpha << 24);
         *(float *)(p + 12) = size0 + (size1 - size0) * inverse;
         speed0 += (speed1 - speed0) * inverse;
-        func_00282D30((char *)scaled, (char *)w, scale * func_002A7790(inverse));
+        FastVecScale((char *)scaled, (char *)w, scale * math_square(inverse));
     } else {
         speed0 = speed1;
-        a = func_00283CE0(alpha); b = func_00283CE0(alpha);
-        b *= func_002A7790(inverse);
-        *(int *)(p + 4) = color | (func_00283CF0(a - b) << 24);
-        func_00282D30((char *)scaled, (char *)w, scale);
+        a = IntToFloat(alpha); b = IntToFloat(alpha);
+        b *= math_square(inverse);
+        *(int *)(p + 4) = color | (FloatToInt(a - b) << 24);
+        FastVecScale((char *)scaled, (char *)w, scale);
     }
-    func_00282F20(tmp, v, speed0);
-    func_00282CC0(p + 16, p + 16, (char *)tmp);
-    func_00282CC0(p + 16, (char *)scaled, p + 16);
+    vec_scale_to_length(tmp, v, speed0);
+    FastVecAdd(p + 16, p + 16, (char *)tmp);
+    FastVecAdd(p + 16, (char *)scaled, p + 16);
     *(unsigned char *)(p + 8) += spin;
-    if (func_00282978(p + 10)) {
+    if (FastDecTimer(p + 10)) {
         if (!fading) {
             *(unsigned char *)(d + 14) = 17;
             *(unsigned char *)(d + 13) |= 1;
             *(short *)(p + 10) = 17;
-        } else func_002B9180(p);
+        } else part_kill(p);
     }
 }

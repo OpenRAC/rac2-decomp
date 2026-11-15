@@ -26,10 +26,10 @@ extern Moby_L05_003CD1A8 *D_L05_001AFAA0 __attribute__((sda));
 /* The head of the moby list. */
 extern Moby_L05_003CD1A8 *D_L05_001B2528;
 
-extern Moby_L05_003CD1A8 *func_0029EFD0(int);
-extern void func_00282C88(float *);
-extern float func_002A7940(void);
-extern void func_L05_003CD4C0(Moby_L05_003CD1A8 *);
+extern Moby_L05_003CD1A8 *CreateMoby(int);
+extern void vec_clear_128(float *);
+extern float math_random_angle(void);
+extern void moby_init_private_vars(Moby_L05_003CD1A8 *);
 
 /* Spawns a moby of class 0x946 at the caller's position with a random turn, remembers the
    last moby of class 0xFBF in the list the first time, and sets up the new moby's state. */
@@ -46,15 +46,15 @@ Moby_L05_003CD1A8 *func_L05_003CD1A8(Moby_L05_003CD1A8 *object)
         moby->drawDist = 0xFF;
         moby->drawn = 1;
         qcopy(moby->position, object->position);
-        ClearVector128(moby->rot);
-        moby->rot[2] = RandomAngle();
+        vec_clear_128(moby->rot);
+        moby->rot[2] = math_random_angle();
         if (D_L05_001AFAA0 == 0) {
             for (m = D_L05_001B2528; m != 0; m = m->pChain) {
                 if (m->oClass == 0xFBF)
                     D_L05_001AFAA0 = m;
             }
         }
-        InitObjectPrivateVars(moby);
+        moby_init_private_vars(moby);
         moby->scale = *(float *)(moby->pClass + 0x24);
         return moby;
     }

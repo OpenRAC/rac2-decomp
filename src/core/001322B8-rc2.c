@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,12 +24,12 @@
  */
 #include "common.h"
 
-extern void func_0011B3D0();
+extern void kernel_process_request_b();
 extern s32 *D_001A7480 __attribute__((sda));
 extern s32 D_001A7484 __attribute__((sda));
 
 /* Sets up a reply buffer for the next sound request and flushes it from the cache. */
-void func_001322B8(s32 *buffer, s32 count) {
+void snd_prepare_reply_buffer(s32 *buffer, s32 count) {
     s8 *base;
     s32 byteOffset;
     s32 endAddr;
@@ -40,8 +41,8 @@ void func_001322B8(s32 *buffer, s32 count) {
     D_001A7480 = base;
     (*(s32 *)((s8 *)(&((s32 *)base)[count]) + (4))) = 0;
     *(s32 *)base = 0;
-    ProcessKernelRequestB(buffer, base + 3);
+    kernel_process_request_b(buffer, base + 3);
     byteOffset += 4;
     base += byteOffset;
-    ProcessKernelRequestB(base, base + 3);
+    kernel_process_request_b(base, base + 3);
 }

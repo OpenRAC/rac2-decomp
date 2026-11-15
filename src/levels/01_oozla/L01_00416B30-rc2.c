@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s32 ref_L01_00416B30_00(s32);
 
 /* Sets up the gold bolt glow values and brightness steps. */
-void func_L01_00416B30(void *moby) {
+void gold_bolt_glow_init(void *moby) {
     s32 *vars  = *(s32 **)((u8 *)moby + 0x68);
     f32 *valuePtr  = (f32 *)((u8 *)vars + 0x20);
     s32 count  = 3;

@@ -6,13 +6,13 @@ typedef short s16;
 
 /* The hero state block, and the second block the frame counter lives in. Both are
    resident (below 0x1A7C80), so every level sees them at the same address. */
-extern char D_00189E20[];
-extern char D_0018C958[];
+extern char g_hero_state[];
+extern char g_subtitle_history[];
 
 /* A byte global read as an absolute (its low half has bit 15 set, so it needs the
    %hi/%lo pair), and the two counters read the same way. */
 extern unsigned char D_0013965E __attribute__((nosda));
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern int D_001A7390;
 
 /* The counter the level publishes in its literal pool: read absolutely in the
@@ -23,22 +23,22 @@ extern int D_L18_001AFBB0_sda __attribute__((sda));
 /* The resident counter, likewise read absolutely once and through $gp once. */
 extern int D_001A7390_sda __attribute__((sda));
 
-extern void func_L00_002D24E8(void);
-extern void func_L18_002D0C00(void);
+extern void AdvanceHeroAnimation(void);
+extern void hero_update_frame_input(void);
 extern void ref_L18_002C41F0_00(void);
-extern int func_00282978(int a0);
+extern int FastDecTimer(int a0);
 extern void ref_L18_002C41F0_01(int a0, int a1);
-extern int func_00288E18(int a0, int a1);
+extern int subtitle_request_voice_line(int a0, int a1);
 extern void ref_L18_002C41F0_02(void);
-extern void func_L00_002AE0C8(void);
-extern void func_L00_002B9CA8(void);
-extern void func_L00_002A5368(void);
-extern void func_L00_002A9600(void);
-extern void func_L00_002A7958(void);
-extern void func_L00_002A7748(void);
-extern void func_L00_003080D0(void *a0);
-extern void func_L18_00428100(void *a0);
-extern void func_L00_002A9760(void);
+extern void RebuildRegionObjectMembership(void);
+extern void UpdateDelayedSounds(void);
+extern void attachment_update_all(void);
+extern void hero_update_moby_from_hero(void);
+extern void gfx_fade_screen_effect(void);
+extern void ApplyHeroAxisScales(void);
+extern void coll_clear_map_bits_around_pos(void *a0);
+extern void receiver_bot_start_sequence(void *a0);
+extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_002A677C(void *a0);
 
 /* One frame of level 18's hero update. Three openers run, then the hero block
@@ -50,7 +50,7 @@ extern void func_002A677C(void *a0);
    sub-updates are gated twice more by the state byte, and the last of them hands
    the hero's record to a helper. */
 /* Runs one frame of the player update for this level. */
-void func_L18_002C41F0(void)
+void hero_l18_update_frame(void)
 {
     char *base;
     char *hero;
@@ -59,10 +59,10 @@ void func_L18_002C41F0(void)
     unsigned int then;
 
     AdvanceHeroAnimation();
-    UpdateHeroFrameInput();
+    hero_update_frame_input();
     ref_L18_002C41F0_00();
 
-    base = gHeroState;
+    base = g_hero_state;
     if (*(u8 *)(base + 0x22B4) == 4) {
         if (D_L18_001AFBB0 == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
@@ -71,11 +71,11 @@ void func_L18_002C41F0(void)
                         *(int *)(base + 0x24CC) = 0;
                         ref_L18_002C41F0_01(0x91, 1);
                     }
-                    if (gCurrentMapIndex == 0x14) {
+                    if (g_current_map_index == 0x14) {
                         if (D_0013965E == 0) {
-                            blk = gSubtitleHistory;
+                            blk = g_subtitle_history;
                             if (D_001A7390 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
-                                if (RequestSubtitleVoiceLine(0xA15, 0x6C) != 0) {
+                                if (subtitle_request_voice_line(0xA15, 0x6C) != 0) {
                                     now = D_001A7390_sda;
                                     then = *(unsigned int *)(blk + 0x7900);
                                     if (then < now) {
@@ -92,39 +92,39 @@ void func_L18_002C41F0(void)
 
     ref_L18_002C41F0_02();
 
-    base = gHeroState;
+    base = g_hero_state;
     RebuildRegionObjectMembership();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
     UpdateDelayedSounds();
-    UpdateAllAttachmentRecords();
+    attachment_update_all();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    UpdateHeroMobyFromHero();
-    FadeScreenEffect();
+    hero_update_moby_from_hero();
+    gfx_fade_screen_effect();
     ApplyHeroAxisScales();
-    ClearMapBitsAroundPosition(base + 0x80);
+    coll_clear_map_bits_around_pos(base + 0x80);
     if (*(u8 *)(base + 0x22B4) == 4 && D_L18_001AFBB0_sda == 0 && *(s16 *)(base + 0x1E0) == 0 &&
         *(int *)(base + 0x2294) != 0x6F) {
-        StartReceiverBotSequence(*(int *)(base + 0x2290));
+        receiver_bot_start_sequence(*(int *)(base + 0x2290));
     }
     UpdateHeroMobyProbedHeightBounds();
-    hero = gHeroState;
+    hero = g_hero_state;
     func_002A677C(*(int *)(hero + 0x2290));
 }
 
 /* The group id lists and the entity bank base are read absolutely, the resident group count
    through $gp. */
 extern unsigned int D_L18_001FB320[];
-extern char *D_L18_001B281C;
+extern char *g_moby_l18_table;
 extern int D_L18_001B2838 __attribute__((sda));
-extern void func_L18_003F7A88(unsigned char *a0);
+extern void protopet_choose_anim_if_active(unsigned char *a0);
 
 /* Walks the id list of the object's group and hands every entity it names to
    func_L18_003F7A88. Retail's loop is not rotated (the test sits below the body); the second
    `q != 0` in the condition keeps the test from being copied in front of the loop. */
 /* Goes through every object in the same group as this one and updates each of them. */
-void func_L18_003F7AB8(unsigned char *object)
+void group_update_members(unsigned char *object)
 {
     unsigned short *idList;
     unsigned char *member;
@@ -134,10 +134,10 @@ void func_L18_003F7AB8(unsigned char *object)
     idList = (unsigned short *)D_L18_001FB320[object[0x21]];
     while (object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838 && idList != 0 &&
            ((idList != 0 && (short)idList[-1] >= 0) || idList == (unsigned short *)D_L18_001FB320[object[0x21]])) {
-        member = (unsigned char *)(gMobyTable_L18 + ((*idList & 0x7FFF) << 8));
+        member = (unsigned char *)(g_moby_l18_table + ((*idList & 0x7FFF) << 8));
         if (member == 0)
             break;
-        ChooseAnimationIfActive(member);
+        protopet_choose_anim_if_active(member);
         idList++;
     }
 }

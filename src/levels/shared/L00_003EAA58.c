@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_L00_003EAC88(char *);
+extern void miniturret_glove_draw(char *);
 /* Partial resident state layout measured from this handler's accesses. */
 typedef struct {
     char p0[0xBF8];
@@ -19,16 +19,16 @@ typedef struct {
     char p6[0x2534 - 0x22BD];
     int cooldown;
 } HeroState;
-extern HeroState D_00189E20;
+extern HeroState g_hero_state;
 
-extern char D_00138180[];
-extern void func_0029FCC0(char *, int, void *), func_002FDF40(void *, void *, float, float, float, float, int, int);
-extern int func_002FE5A0(void *, void *, void *, void *, char *, int, int, float);
-extern int func_00282948(void *), func_L00_002D3F30(int, int);
-extern void func_L00_002AF568(void), func_002E5CF8(int, int, char *), func_L00_002AF7D0(void), ref_L00_003EAA58_00(void *, char *);
-extern char *func_L00_00387CA8(void *, void *);
+extern char g_pad_state[];
+extern void moby_transform_joint_to_world(char *, int, void *), CalculateAimedLaunchVelocity(void *, void *, float, float, float, float, int, int);
+extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, char *, int, int, float);
+extern int math_fast_float_d(void *), weapon_spend_ammo(int, int);
+extern void start_equipped_item_animation(void), PlayMobySound(int, int, char *), cancel_hero_item_animation(void), ref_L00_003EAA58_00(void *, char *);
+extern char *miniturret_spawn_shot(void *, void *);
 /* Updates the Miniturret Glove: it aims, then shoots a miniturret after a short wind-up. */
-void func_L00_003EAA58(char *self)
+void miniturret_l00_glove_update(char *self)
 {
     char muzzlePos[16], aimPos[16];
     char *aimPosPtr;
@@ -36,24 +36,24 @@ void func_L00_003EAA58(char *self)
     int ready;
     float reach;
     char *shot;
-    TransformMobyJointToWorld(self, 0, muzzlePos);
+    moby_transform_joint_to_world(self, 0, muzzlePos);
     aimPosPtr = aimPos;
-    reach  =  gHeroState.mode == 29 ? 11.0f : 4.5f;
+    reach  =  g_hero_state.mode == 29 ? 11.0f : 4.5f;
     CalculateAimedLaunchVelocity(aimPosPtr, muzzlePos, 1.5f, reach, 0.25f, 0.003055555745959282f, 0, 0);
-    *(int *)(vars + 0x24) = TraceProjectileToImpact(muzzlePos, aimPosPtr, vars, vars + 0x10, self, 0, 0, 0.003055555745959282f);
+    *(int *)(vars + 0x24) = coll_trace_projectile_to_impact(muzzlePos, aimPosPtr, vars, vars + 0x10, self, 0, 0, 0.003055555745959282f);
     ready = 1;
-    if (gHeroState.mode == 29) {
-        if (!FastFloatHelperD(&gHeroState.cooldown)) ready = 0;
-    } else gHeroState.cooldown = 40;
+    if (g_hero_state.mode == 29) {
+        if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0;
+    } else g_hero_state.cooldown = 40;
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         self[0x20] = 1;
         *(int *)(vars + 0x24) = 0;
         /* Fall through. */
     case 1:
-        if ((*(int *)(gPadState + 0x1A4) & gHeroState.buttonMask) &&
-            !gHeroState.locked && ready) {
-            if (SpendWeaponAmmo(-1, 1)) {
+        if ((*(int *)(g_pad_state + 0x1A4) & g_hero_state.buttonMask) &&
+            !g_hero_state.locked && ready) {
+            if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
                 self[0x20] = 2;
                 *(int *)(vars + 0x20) = 20;
@@ -61,9 +61,9 @@ void func_L00_003EAA58(char *self)
         }
         break;
     case 2:
-        if (FastFloatHelperD(vars + 0x20)) {
+        if (math_fast_float_d(vars + 0x20)) {
             PlayMobySound(0, 0, self);
-            shot = SpawnMiniturretShot(muzzlePos, aimPosPtr);
+            shot = miniturret_spawn_shot(muzzlePos, aimPosPtr);
             *(char **)(shot + 0xB8) = self;
             cancel_hero_item_animation();
             self[0x20] = 3;
@@ -71,8 +71,8 @@ void func_L00_003EAA58(char *self)
         }
         break;
     case 3:
-        if (FastFloatHelperD(vars + 0x20)) self[0x20] = 1;
+        if (math_fast_float_d(vars + 0x20)) self[0x20] = 1;
         break;
     }
-    ref_L00_003EAA58_00(DrawMiniturretGloveEffect, self);
+    ref_L00_003EAA58_00(miniturret_glove_draw, self);
 }

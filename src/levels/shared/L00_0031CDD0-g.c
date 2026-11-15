@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_00282CF0(float *, const float *, const float *);
-extern float func_00282E20(const float *);
+extern void FastVecSub(float *, const float *, const float *);
+extern float vec_length_xy(const float *);
 
 /* Works out how long a shot takes to reach a target and the upward speed it needs to get there. */
-float func_L00_0031CDD0(const float *pos, const float *target, float *outTime, float speed, float gravity) {
+float weapon_compute_shot_launch_speed(const float *pos, const float *target, float *outTime, float speed, float gravity) {
     float delta[4];
     float time;
     float distance;

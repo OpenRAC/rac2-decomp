@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L01_003D1A48: builds GS packet words for a quad strip, then for five
  * passes (a switch over i, which owns the unit's five-entry jump table) sets a
  * base point, colour and v offset, and walks t from step to 1 emitting quads
@@ -15,16 +16,16 @@
 
 typedef float Vec[4] __attribute__((aligned(16)));
 typedef struct { Vec p[4]; int color[4]; float uv[4][2]; long gs[4]; } Quad;
-extern long func_0027C878(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern u32 func_002AAE98(float, float, float, float);
-extern float func_00283CC8(float *, float);
-extern float func_00283198(float);
-extern float func_002A7798(float);
-extern int func_00283CF0(float);
-extern void func_00280B90(void *, int, int);
+extern long GetEffectTextureDescriptor(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern u32 gfx_pack_color_floats(float, float, float, float);
+extern float SplitFloatFraction(float *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_ease_out_quad(float);
+extern int FloatToInt(float);
+extern void draw_world_quad(void *, int, int);
 extern float D_L01_001B04D4 __attribute__((sda));
 extern float D_L01_001B04D8 __attribute__((sda));
 extern float D_L01_001B04DC __attribute__((sda));
@@ -54,7 +55,7 @@ extern float D_L01_001B0538 __attribute__((sda));
 extern float D_L01_001B053C __attribute__((sda));
 
 /* Draws a scrolling, fading ribbon of quads along the platform path. */
-void func_L01_003D1A48(u8 *moby)
+void gfx_draw_scrolling_ribbon(u8 *moby)
 {
     Quad q;
     Vec origin,stepAlong,cursorPos,sideVec,offsetVec;
@@ -88,20 +89,20 @@ void func_L01_003D1A48(u8 *moby)
         case 0:
             origin[2]+=D_L01_001B0528;
             qcopy(cursorPos,origin);
-            color=PackColorFloatsToWord(D_L01_001B04F8,D_L01_001B04FC,D_L01_001B0500,0.0f);
+            color=gfx_pack_color_floats(D_L01_001B04F8,D_L01_001B04FC,D_L01_001B0500,0.0f);
             q.color[2]=q.color[3]=color;
             v=SplitFloatFraction(&phase,*(float *)(vars+0xB8));
             break;
         case 1:
             qcopy(cursorPos,origin);
-            color=PackColorFloatsToWord(D_L01_001B0504,D_L01_001B0508,D_L01_001B050C,0.0f);
+            color=gfx_pack_color_floats(D_L01_001B0504,D_L01_001B0508,D_L01_001B050C,0.0f);
             q.color[2]=q.color[3]=color;
             v=SplitFloatFraction(&phase,*(float *)(vars+0xB8)+0.5f);
             break;
         case 2:
             origin[2]+=D_L01_001B0528;
             qcopy(cursorPos,origin);
-            color=PackColorFloatsToWord(D_L01_001B0510,D_L01_001B0514,D_L01_001B0518,0.0f);
+            color=gfx_pack_color_floats(D_L01_001B0510,D_L01_001B0514,D_L01_001B0518,0.0f);
             q.color[2]=q.color[3]=color;
             vec_scale_to_length(sideVec,sideVec,D_L01_001B04DC*(D_L01_001B052C*0.5f));
             width*=D_L01_001B0530;
@@ -111,7 +112,7 @@ void func_L01_003D1A48(u8 *moby)
             break;
         case 3:
             v=SplitFloatFraction(&phase,(D_L01_001B0538 * *(float *)(vars+0xB8))/D_L01_001B0530);
-            color=PackColorFloatsToWord(D_L01_001B051C,D_L01_001B0520,D_L01_001B0524,0.0f);
+            color=gfx_pack_color_floats(D_L01_001B051C,D_L01_001B0520,D_L01_001B0524,0.0f);
             q.color[2]=q.color[3]=color;
             FastVecAdd(cursorPos,origin,offsetVec);
             break;
@@ -129,7 +130,7 @@ void func_L01_003D1A48(u8 *moby)
         q.uv[3][1]=q.uv[2][1]=v+1.0f;
         while(t<1.0f) {
             int rgb = 0xFFFFFF;
-            angle=EaseOutQuad(FastSinOrCosB(t*3.14159274f))*128.0f;
+            angle=math_ease_out_quad(math_fast_sin_or_cos_b(t*3.14159274f))*128.0f;
             q.color[0]=q.color[1]=q.color[2];
             color=FloatToInt((D_L01_001B04F4*angle)* *(float *)(vars+0xAC));
             q.color[2]=q.color[3]=(q.color[0]&rgb)|(color<<24);

@@ -28,16 +28,16 @@ struct malloc_chunk {
     struct malloc_chunk *bk;
 };
 
-extern void func_00116300(struct _reent *);
-extern void func_00116360(struct _reent *);
-extern void *func_00115C90(struct _reent *ptr, s32 delta);
+extern void malloc_lock_acquire(struct _reent *);
+extern void malloc_lock_release(struct _reent *);
+extern void *sbrk_reentrant(struct _reent *ptr, s32 delta);
 
 extern u32 D_001341E8[]; /* __malloc_av_ bins */
 extern u32 D_00134600[]; /* sbrk_base */
 extern u32 D_00134618[]; /* sbrked_mem */
 
-extern s64 func_00121B20(s64, s64);
-extern s64 func_00121AB8(s64, s64);
+extern s64 __udivdi3(s64, s64);
+extern s64 __muldi3(s64, s64);
 
 #define SIZE_SZ               4
 #define MINSIZE               16
@@ -55,25 +55,25 @@ extern s64 func_00121AB8(s64, s64);
 #define sbrked_mem (D_00134618[0])
 
 /* Hands unused memory at the end of the heap back to the system. */
-s32 func_00117108(struct _reent *ptr, u32 pad) {
+s32 malloc_trim_reentrant(struct _reent *ptr, u32 pad) {
     s64 top_size;
     s64 extra;
     u8 *current_brk;
     u8 *new_brk;
     u64 pagesz = malloc_getpagesize;
 
-    AcquireMallocLock(ptr);
+    malloc_lock_acquire(ptr);
 
     top_size = chunksize(top);
     extra = ((top_size - pad - MINSIZE + (pagesz - 1)) / pagesz - 1) * pagesz;
 
     if (extra < (s64)pagesz) {
-        ReleaseMallocLock(ptr);
+        malloc_lock_release(ptr);
         return 0;
     } else {
         current_brk = (u8 *)MORECORE(0);
         if (current_brk != (u8 *)(top) + top_size) {
-            ReleaseMallocLock(ptr);
+            malloc_lock_release(ptr);
             return 0;
         } else {
             new_brk = (u8 *)MORECORE(-extra);
@@ -84,12 +84,12 @@ s32 func_00117108(struct _reent *ptr, u32 pad) {
                     sbrked_mem = (u32)(current_brk - (u8 *)sbrk_base);
                     set_head(top, top_size | 1);
                 }
-                ReleaseMallocLock(ptr);
+                malloc_lock_release(ptr);
                 return 0;
             } else {
                 set_head(top, (top_size - extra) | 1);
                 sbrked_mem -= (u32)extra;
-                ReleaseMallocLock(ptr);
+                malloc_lock_release(ptr);
                 return 1;
             }
         }

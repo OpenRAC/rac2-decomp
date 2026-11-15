@@ -9,14 +9,14 @@ extern float D_L13_001B1700[4][2] __attribute__((sda));
 extern float D_L13_001B1704[] __attribute__((sda));
 extern float D_L13_001B1720 __attribute__((sda));
 extern unsigned char D_0018C0D5[];
-extern void func_00283658(void *, void *);
-extern unsigned long long func_0027C878(int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00280B90(void *, void *, int);
+extern void copy_matrix_rotation(void *, void *);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws the growing glowing ring effect of the warp ring as a circle of flat strips. */
-void func_L13_0041BAE0(void *opaque) {
+void DrawMobyRadiusRing(void *opaque) {
     char *object = opaque;
     int uvIndex;
     RingPacket packet;
@@ -69,8 +69,8 @@ void func_L13_0041BAE0(void *opaque) {
         vertex = packet.vertex;
         for (; j < 4; j++, vertex++) {
             angle = (float)(i + j / 2) * 0.19637252f - 3.14159f;
-            vertex->x = FastSinOrCosA(angle) * *(float *)(private + 0x34);
-            vertex->y = FastSinOrCosB(angle) * *(float *)(private + 0x34);
+            vertex->x = math_fast_sin_or_cos_a(angle) * *(float *)(private + 0x34);
+            vertex->y = math_fast_sin_or_cos_b(angle) * *(float *)(private + 0x34);
             vertex->z = 0.0f;
             vertex->z = (j & 1) ? D_L13_001B1720 + thickness : D_L13_001B1720 - thickness;
             vertex->w = 1.0f;

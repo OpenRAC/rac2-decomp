@@ -1,3 +1,4 @@
+#include "names.h"
 /* Per-frame update of a Maktar Nebula object. State 0 sets up its timers; state 1 runs a
    series of tests on its state record and two global records, calling func_0028A180,
    func_00288E18 and func_L01_002EABA8 with the ids listed below.
@@ -8,7 +9,7 @@
 #include "common.h"
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define B(p,o) (*(u8 *)((char *)(p)+(o)))
-extern char D_00189EA0[], D_L02_0027FD48[];
+extern char g_hero_position[], D_L02_0027FD48[];
 typedef struct HintFlags { u8 pad[0x75]; u8 intro, timers; u8 pad77[5]; u8 hint; } HintFlags;
 extern HintFlags D_001395B8;
 typedef struct HintHistory {
@@ -63,99 +64,99 @@ typedef struct HintState {
     s32 value98;
     s32 value9C;
 } HintState;
-extern HintHistory D_0018C958;
-extern PlayerHistory D_0018C750;
-extern u32 D_001A79F0[] __attribute__((sda));
+extern HintHistory g_subtitle_history;
+extern PlayerHistory g_progress_statistics;
+extern u32 g_current_map_index[] __attribute__((sda));
 extern u32 D_001A7390[] __attribute__((sda));
 extern u32 timer_sda SDATA(D_001A7390);
-extern u8 D_001A7AF8[] MACRO_ADDR;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern int D_L02_001A8FF0 MACRO_ADDR;
 extern int unlock_sda SDATA(D_L02_001A9010);
-extern char *D_L02_001B359C MACRO_ADDR;
+extern char *g_moby_l02_pool MACRO_ADDR;
 extern char *objects_sda SDATA(D_L02_001B359C);
 extern char *D_L02_001B368C MACRO_ADDR;
-extern int D_L02_001B30C8 MACRO_ADDR;
-extern void func_002A7750(void *,int,int);
-extern int func_L01_00305E18(int),func_002ACBC8(void *,int);
-extern void func_0028A180(int,int),func_00288E18(int,int),func_L01_002EABA8(int,int,int,int,int);
-extern int func_L02_00400CC8(void *),func_00282948(void *),func_L02_003D6BB0(void *),func_002B38B8(void *);
-extern void func_L00_003672F8(void),func_L00_002B9D60(void *,void *,int,int);
+extern int g_frame_l02_counter MACRO_ADDR;
+extern void moby_set_state(void *,int,int);
+extern int level_get_table_entry_short(int),IsPointInCuboid(void *,int);
+extern void hud_queue_hint_message(int,int),subtitle_request_voice_line(int,int),TriggerSubtitleInCuboid(int,int,int,int,int);
+extern int arena_is_challenge_running(void *),math_fast_float_d(void *),chainblade_is_state_active(void *),flag_is_third_pending_set(void *);
+extern void state_set_flag_one(void),hero_reset_position_and_direction(void *,void *,int,int);
 /* Watches how the player is doing and shows a help hint or message when the player seems stuck and has not seen it recently. Update handler of moby class 3108. */
-void func_L02_00409D78(char *moby) {
+void hint_trigger_update(char *moby) {
     HintState *hints=*(HintState **)(moby+0x68);
 
     switch(B(moby,0x20)) { default: return; case 0: {
         B(moby,0x30)=255; hints->value60=0;hints->value64=0;hints->value50=0;hints->value90=0;
         hints->value94=1200;hints->value2C=180;hints->value98=600;
-        SetMobyState(moby,1,-1);
+        moby_set_state(moby,1,-1);
     break; } case 1: {
         HintHistory *base;
-        int mode=GetTableEntryShort(2);
-        if(mode==2 && GetTableEntryShort(0)!=mode) {
+        int mode=level_get_table_entry_short(2);
+        if(mode==2 && level_get_table_entry_short(0)!=mode) {
             base=(HintHistory *)&D_001395B8;
-            if(!(((HintFlags *)base)->intro&4) && IsPointInCuboid(gHeroPosition,hints->value9C) && (D_001A7390[0]-gProgressStatistics.time1CC>432000 || !gProgressStatistics.count1C8)) {
-                ((HintFlags *)base)->intro|=4;QueueHintMessage(0xa3c,0x93);
+            if(!(((HintFlags *)base)->intro&4) && IsPointInCuboid(g_hero_position,hints->value9C) && (D_001A7390[0]-g_progress_statistics.time1CC>432000 || !g_progress_statistics.count1C8)) {
+                ((HintFlags *)base)->intro|=4;hud_queue_hint_message(0xa3c,0x93);
             }
         }
-        base=&gSubtitleHistory;
+        base=&g_subtitle_history;
         if(base->countF0<65535) {
-            if(gItemOwnedFlags[0x2E]) base->countF0=65535;
-            else if(IsPointInCuboid(gHeroPosition,I(hints,0))) {
+            if(g_item_owned_flags[0x2E]) base->countF0=65535;
+            else if(IsPointInCuboid(g_hero_position,I(hints,0))) {
                 if(base->countF0) {
-                    if(timer_sda-base->timeF4>1080 || !base->timeF4)RequestSubtitleVoiceLine(0x9bd,0x14);
+                    if(timer_sda-base->timeF4>1080 || !base->timeF4)subtitle_request_voice_line(0x9bd,0x14);
                     else if(base->timeF4<timer_sda)base->timeF4=timer_sda;
                 } else {
                     base->countF0++; if(base->timeF4<timer_sda)base->timeF4=timer_sda;
-                    base->levelsF8=(base->levelsF8|(1<<gCurrentMapIndex[0]))|0x80000000;
+                    base->levelsF8=(base->levelsF8|(1<<g_current_map_index[0]))|0x80000000;
                 }
             }
         }
         if(D_L02_001A8FF0 && !I(D_L02_0027FD48,0) && I(D_L02_0027FD48,0x24)==-1) {
-            base=&gSubtitleHistory;
-            if(base->flags158>=0)RequestSubtitleVoiceLine(0x9c5,0x1c);
+            base=&g_subtitle_history;
+            if(base->flags158>=0)subtitle_request_voice_line(0x9c5,0x1c);
             if(base->time154+base->count152>=D_001A7390[0]-2) {
                 int count = base->count152+1;
                 base->count152=count;
-                if((count&0xffff)>=3600){RequestSubtitleVoiceLine(0x9c5,0x1c);base->count152=0;}
+                if((count&0xffff)>=3600){subtitle_request_voice_line(0x9c5,0x1c);base->count152=0;}
             } else {if(base->time154<D_001A7390[0])base->time154=D_001A7390[0];base->count152=0;}
         }
         TriggerSubtitleInCuboid(0x9bf,0x16,2,hints->value10,hints->value14);
-        if(gSubtitleHistory.count120<65535) {
-            if(gProgressStatistics.count54>=3 || IsPointInCuboid(gHeroPosition,hints->value24))gSubtitleHistory.count120=65535;
-            else if(IsPointInCuboid(gHeroPosition,hints->value20)) {
-                if(timer_sda-gSubtitleHistory.time124>1080 || !gSubtitleHistory.time124)RequestSubtitleVoiceLine(0x9c1,0x18);
-                else if(gSubtitleHistory.time124<timer_sda)gSubtitleHistory.time124=timer_sda;
+        if(g_subtitle_history.count120<65535) {
+            if(g_progress_statistics.count54>=3 || IsPointInCuboid(g_hero_position,hints->value24))g_subtitle_history.count120=65535;
+            else if(IsPointInCuboid(g_hero_position,hints->value20)) {
+                if(timer_sda-g_subtitle_history.time124>1080 || !g_subtitle_history.time124)subtitle_request_voice_line(0x9c1,0x18);
+                else if(g_subtitle_history.time124<timer_sda)g_subtitle_history.time124=timer_sda;
             }
         }
         TriggerSubtitleInCuboid(0x9c2,0x19,1,hints->value30,hints->value34);
-        if(!gSubtitleHistory.count138) {
+        if(!g_subtitle_history.count138) {
             if(!hints->value3C && unlock_sda)hints->value3C=1;
-            if(gItemOwnedFlags[0x26])gSubtitleHistory.count138=65535;
-            if(hints->value3C && IsPointInCuboid(gHeroPosition,hints->value38))RequestSubtitleVoiceLine(0x9c3,0x1a);
+            if(g_item_owned_flags[0x26])g_subtitle_history.count138=65535;
+            if(hints->value3C && IsPointInCuboid(g_hero_position,hints->value38))subtitle_request_voice_line(0x9c3,0x1a);
         }
         TriggerSubtitleInCuboid(0x9c4,0x1b,0,hints->value44,-1);
-        if(IsArenaChallengeRunning(gMobyPool_L02+(hints->value68<<8))) {
-            if(FastFloatHelperD(&hints->value94) && (((D_001395B8.timers>>gCurrentMapIndex[0])^1)&1)) {
-                if(!gProgressStatistics.countF0 || D_001A7390[0]-gProgressStatistics.timeF4>42000)QueueHintMessage(0x9c9,0x20);
-                D_001395B8.timers|=1<<gCurrentMapIndex[0];
+        if(arena_is_challenge_running(g_moby_l02_pool+(hints->value68<<8))) {
+            if(math_fast_float_d(&hints->value94) && (((D_001395B8.timers>>g_current_map_index[0])^1)&1)) {
+                if(!g_progress_statistics.countF0 || D_001A7390[0]-g_progress_statistics.timeF4>42000)hud_queue_hint_message(0x9c9,0x20);
+                D_001395B8.timers|=1<<g_current_map_index[0];
             }
-            if(IsChainbladeStateActive(gMobyPool_L02+(hints->value6C<<8)) && (!gProgressStatistics.count1BC || D_001A7390[0]-gProgressStatistics.time1C0>72000) && FastFloatHelperD(&hints->value98) && gSubtitleHistory.value2C0>=0)RequestSubtitleVoiceLine(0x9e3,0x3a);
+            if(chainblade_is_state_active(g_moby_l02_pool+(hints->value6C<<8)) && (!g_progress_statistics.count1BC || D_001A7390[0]-g_progress_statistics.time1C0>72000) && math_fast_float_d(&hints->value98) && g_subtitle_history.value2C0>=0)subtitle_request_voice_line(0x9e3,0x3a);
         }
         if(D_L02_001A8FF0) {
-            if(IsPointInCuboid(gHeroPosition,hints->value4C) && !gSubtitleHistory.count15C) {QueueHintMessage(0x9c6,0x1d);hints->value90=216000;}
-            if(FastFloatHelperD(&hints->value90)){QueueHintMessage(0x9c6,0x1d);hints->value90=216000;}
-            if(D_001A7390[0]-gProgressStatistics.time1A8<60)hints->value90=216000;
+            if(IsPointInCuboid(g_hero_position,hints->value4C) && !g_subtitle_history.count15C) {hud_queue_hint_message(0x9c6,0x1d);hints->value90=216000;}
+            if(math_fast_float_d(&hints->value90)){hud_queue_hint_message(0x9c6,0x1d);hints->value90=216000;}
+            if(D_001A7390[0]-g_progress_statistics.time1A8<60)hints->value90=216000;
         }
-        if(IsPointInCuboid(gHeroPosition,hints->value78) && (!gProgressStatistics.count1BC || D_001A7390[0]-gProgressStatistics.time1C0>72000) && !D_001395B8.hint && gSubtitleHistory.value2C0>=0)RequestSubtitleVoiceLine(0x9e3,0x3a);
-        if(IsPointInCuboid(gHeroPosition,hints->value38))D_001395B8.hint=1;
-        if(gItemOwnedFlags[0x2E])TriggerSubtitleInCuboid(0x9f1,0x48,2,hints->value7C,-1);
-        if(gFrameCounter_L02<3 && gItemOwnedFlags[0x26] && !IsThirdPendingFlagSet(objects_sda+(hints->value88<<8)) && IsPointInCuboid(gHeroPosition,hints->value80)) {
+        if(IsPointInCuboid(g_hero_position,hints->value78) && (!g_progress_statistics.count1BC || D_001A7390[0]-g_progress_statistics.time1C0>72000) && !D_001395B8.hint && g_subtitle_history.value2C0>=0)subtitle_request_voice_line(0x9e3,0x3a);
+        if(IsPointInCuboid(g_hero_position,hints->value38))D_001395B8.hint=1;
+        if(g_item_owned_flags[0x2E])TriggerSubtitleInCuboid(0x9f1,0x48,2,hints->value7C,-1);
+        if(g_frame_l02_counter<3 && g_item_owned_flags[0x26] && !flag_is_third_pending_set(objects_sda+(hints->value88<<8)) && IsPointInCuboid(g_hero_position,hints->value80)) {
             char *q;
-            SetFlagToOne();q=D_L02_001B368C+(hints->value84<<7);ResetHeroPositionAndDirection(q+0x30,q+0x70,0,1);
+            state_set_flag_one();q=D_L02_001B368C+(hints->value84<<7);hero_reset_position_and_direction(q+0x30,q+0x70,0,1);
         }
-        if(IsPointInCuboid(gHeroPosition,hints->value28)) {
-            if(D_001A7390[0]-gSubtitleHistory.time61C>120 || !gSubtitleHistory.time61C)RequestSubtitleVoiceLine(0xa2b,0x82);
-            else if(gSubtitleHistory.time61C<D_001A7390[0])gSubtitleHistory.time61C=D_001A7390[0];
+        if(IsPointInCuboid(g_hero_position,hints->value28)) {
+            if(D_001A7390[0]-g_subtitle_history.time61C>120 || !g_subtitle_history.time61C)subtitle_request_voice_line(0xa2b,0x82);
+            else if(g_subtitle_history.time61C<D_001A7390[0])g_subtitle_history.time61C=D_001A7390[0];
         }
     }
     }

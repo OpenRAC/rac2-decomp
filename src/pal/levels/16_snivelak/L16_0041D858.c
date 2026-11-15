@@ -4,14 +4,14 @@
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 position,angles,delta,step; } RotatingMoverWorkspace;
 extern char *D_L16_001B2B1C MACRO_ADDR;
-extern char D_00188660[];
-extern float func_00283BE0(float,float);
-extern float func_00283B98(float,float);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_002E5CF8(int,int,char *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AD6F0(void *,void *,void *,void *);
+extern char g_sound_state[];
+extern float fast_subtract_rotations(float,float);
+extern float FastAddRotations(float,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int PlayMobySound(int,int,char *);
+extern void FastVecSub(void *,void *,void *);
+extern void mat_combine_and_store(void *,void *,void *,void *);
 
 void func_PAL_L16_0041D858(char *object)
 {
@@ -34,47 +34,47 @@ void func_PAL_L16_0041D858(char *object)
     if(*(unsigned char *)(object+0x20)==2) {
         if(*(int *)(state+0x68)==0) {
             if(*(short *)(object+0xaa)==0x10fe) {
-                *(float *)(object+0xf8)=func_00283BE0(*(float *)(object+0xf8),0.0054454277f);
-                func_00282F20(&local.step,object+0xC0,0.064f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
+                *(float *)(object+0xf8)=fast_subtract_rotations(*(float *)(object+0xf8),0.0054454277f);
+                vec_scale_to_length(&local.step,object+0xC0,0.064f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
             }
             if(*(short *)(object+0xaa)==0x10fd) {
-                *(float *)(object+0xf8)=func_00283BE0(*(float *)(object+0xf8),0.00540354f);
-                func_00282F20(&local.step,object+0xC0,0.040000003f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
+                *(float *)(object+0xf8)=fast_subtract_rotations(*(float *)(object+0xf8),0.00540354f);
+                vec_scale_to_length(&local.step,object+0xC0,0.040000003f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
             }
             if(*(short *)(object+0xaa)==0x10fc) {
-                *(float *)(object+0xf8)=func_00283BE0(*(float *)(object+0xf8),0.0054454277f);
-                func_00282F20(&local.step,object+0xC0,0.052f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
-                func_00282CC0(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
-                sound=D_00188660+0x70**(int *)(state+0x70);
-                if((*(char **)(sound+0x88))!=object || (*(unsigned char *)(sound+0x74))==0) *(int *)(state+0x70)=func_002E5CF8(0,4,object);
+                *(float *)(object+0xf8)=fast_subtract_rotations(*(float *)(object+0xf8),0.0054454277f);
+                vec_scale_to_length(&local.step,object+0xC0,0.052f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
+                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
+                sound=g_sound_state+0x70**(int *)(state+0x70);
+                if((*(char **)(sound+0x88))!=object || (*(unsigned char *)(sound+0x74))==0) *(int *)(state+0x70)=PlayMobySound(0,4,object);
             }
         } else {
             if(*(short *)(object+0xaa)==0x10fe) {
-                *(float *)(object+0xf8)=func_00283B98(*(float *)(object+0xf8),0.0054454277f);
-                func_00282F20(&local.step,object+0xC0,-1.0f);
-                func_00282F20(&local.step,&local.step,0.064f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
+                *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),0.0054454277f);
+                vec_scale_to_length(&local.step,object+0xC0,-1.0f);
+                vec_scale_to_length(&local.step,&local.step,0.064f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
             }
             if(*(short *)(object+0xaa)==0x10fd) {
-                *(float *)(object+0xf8)=func_00283B98(*(float *)(object+0xf8),0.0054454277f);
-                func_00282F20(&local.step,object+0xC0,-1.0f);
-                func_00282F20(&local.step,&local.step,0.040000003f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
+                *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),0.0054454277f);
+                vec_scale_to_length(&local.step,object+0xC0,-1.0f);
+                vec_scale_to_length(&local.step,&local.step,0.040000003f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
             }
             if(*(short *)(object+0xaa)==0x10fc) {
-                *(float *)(object+0xf8)=func_00283B98(*(float *)(object+0xf8),0.0054454277f);
-                func_00282F20(&local.step,object+0xC0,-1.0f);
-                func_00282F20(&local.step,&local.step,0.052f);
-                func_00282CC0(object+0x10,&local.step,object+0x10);
-                func_00282CC0(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
+                *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),0.0054454277f);
+                vec_scale_to_length(&local.step,object+0xC0,-1.0f);
+                vec_scale_to_length(&local.step,&local.step,0.052f);
+                FastVecAdd(object+0x10,&local.step,object+0x10);
+                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
             }
         }
     }
-    func_00282CF0(&local.delta,object+0x10,&local.position);
-    func_002AD6F0(state+0x20,&local.delta,&local.angles,object+0xF0);
+    FastVecSub(&local.delta,object+0x10,&local.position);
+    mat_combine_and_store(state+0x20,&local.delta,&local.angles,object+0xF0);
 }
 
 

@@ -14,7 +14,7 @@ typedef struct {
 } SpawnSlots_L00_003FEAC8;
 
 extern u8 D_00139581[];
-extern TableEntry_L00_003FEAC8 D_L00_00262570[];
+extern TableEntry_L00_003FEAC8 g_weapon_l00_table[];
 extern float D_L00_001B0C14 __attribute__((sda));
 
 extern void ref_L00_003FEAC8_00(void *unused, void *pos, void *direction);
@@ -34,7 +34,7 @@ void func_PAL_L00_004033A8(char *obj, char *pos, void *direction, int slot)
     char *spawned;
 
     qcopy(dir, direction);
-    entry = D_L00_00262570 + D_00139581[0];
+    entry = g_weapon_l00_table + D_00139581[0];
     scale = entry->scale;
     ref_L00_003FEAC8_00(obj, pos, direction);
     length = ref_L00_003FEAC8_01(dir);

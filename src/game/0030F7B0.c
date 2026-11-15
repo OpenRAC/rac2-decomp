@@ -22,12 +22,12 @@ typedef struct {
 
 extern PoolEffect D_0022AA10[3];
 extern char D_001B2520[] MACRO_ADDR;
-extern float func_002A7878(float min, float max);
-extern float func_002A78D8(float min, float max);
-extern void func_00282C88(void *vector);
-extern char *func_002AB1F0(void *object);
-extern void func_002B00B0(void *object, void *out, int);
-extern void func_00282D30(void *out, void *vector, float scale);
+extern float math_random_float_range(float min, float max);
+extern float math_random_signed_float_range(float min, float max);
+extern void vec_clear_128(void *vector);
+extern char *moby_get_private_value_0(void *object);
+extern void gravity_get_dir_at_object(void *object, void *out, int);
+extern void FastVecScale(void *out, void *vector, float scale);
 
 extern char *Ffc961fca_FUN_002AD0B0(char *a1);
 
@@ -66,12 +66,12 @@ typedef struct {
 
 extern unsigned char D_0018C0DF;
 extern int D_L00_002A27F0[];
-extern void func_002A7470(void *, int, int, int);
-extern void func_0029F338(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_mark_spawned(void *);
 extern void func_002A10E8(void *);
 
 /* Updates the Swingshot hook. It copies the Swingshot's state into matching animations and removes itself when the Swingshot is gone. */
-void func_00310A40(unsigned char *self)
+void swingshot_hook_update(unsigned char *self)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     unsigned char *peer;
@@ -98,7 +98,7 @@ void func_00310A40(unsigned char *self)
 c0:
     if (self[0x60] & 2) {
         if (self[0x43] != 1)
-            StartAnimationBlended(self, 1, 0, 10);
+            anim_start_blended(self, 1, 0, 10);
         self[0x20] = 1;
         *(float *)(self + 0x48) = 1.0f;
     }
@@ -106,12 +106,12 @@ c0:
 c1:
     if ((*(unsigned char **)data)[0x20] == 2) {
         if (self[0x43] != 3)
-            StartAnimationBlended(self, 3, 0, 10);
+            anim_start_blended(self, 3, 0, 10);
         self[0x20] = 3;
         *(float *)(self + 0x48) = 1.0f;
     } else if ((*(unsigned char **)data)[0x20] == 8) {
         if (self[0x43] != 2)
-            StartAnimationBlended(self, 2, 0, 10);
+            anim_start_blended(self, 2, 0, 10);
         self[0x20] = 2;
         *(float *)(self + 0x48) = 1.0f;
     }
@@ -120,19 +120,19 @@ c2:
     if (!(self[0x60] & 2))
         goto finish;
 destroy:
-    MarkMobySpawned(self);
+    moby_mark_spawned(self);
     return;
 c3:
     if (self[0x60] & 2) {
         if (self[0x43] != 4)
-            StartAnimationBlended(self, 4, 0, 10);
+            anim_start_blended(self, 4, 0, 10);
         self[0x20] = 4;
     }
     goto finish;
 c4:
     if ((unsigned int)((*(unsigned char **)data)[0x20] - 3) < 3) {
         if (self[0x43] != 5)
-            StartAnimationBlended(self, 5, 0, 10);
+            anim_start_blended(self, 5, 0, 10);
         self[0x20] = 5;
     }
     goto finish;
@@ -142,7 +142,7 @@ c5:
     if ((unsigned int)((*(unsigned char **)data)[0x20] - 6) < 2) {
         *(float *)(self + 0x48) = 1.0f;
         if (self[0x43] != 7)
-            StartAnimationBlended(self, 7, 0, 10);
+            anim_start_blended(self, 7, 0, 10);
         self[0x20] = 7;
     }
     goto finish;
@@ -151,7 +151,7 @@ c7:
         goto finish;
 activate_one:
     if (self[0x43] != 1)
-        StartAnimationBlended(self, 1, 0, 10);
+        anim_start_blended(self, 1, 0, 10);
     self[0x20] = 1;
 c6:
 finish:
@@ -160,29 +160,29 @@ finish:
 
 extern char *D_001AD7EC __attribute__((sda));
 extern float D_001B1690[] __attribute__((sda));
-extern void func_00310D78(char *, char *);
-extern int func_00273B70(unsigned char *);
-extern int func_002A77E0(int);
-extern void func_002A7750(unsigned char *, unsigned char, int);
-extern void func_0029F338(void *);
+extern void moby_carry_with_surface(char *, char *);
+extern int cam_moby_update(unsigned char *);
+extern int math_random_int_below(int);
+extern void moby_set_state(unsigned char *, unsigned char, int);
+extern void moby_mark_spawned(void *);
 
 /* Waits to be hit or set off at random, then fades out and removes itself. */
-void func_00310C88(unsigned char *self)
+void moby_fade_out_update(unsigned char *self)
 {
     if (D_001AD7EC != 0)
-        CarryObjectWithSurface((char *)self, D_001AD7EC);
+        moby_carry_with_surface((char *)self, D_001AD7EC);
     switch (self[0x20]) {
     case 0:
-        if (UpdateCameraMoby(self) != 0 ||
-            (D_001B1690[0] > 0.949999988079071044921875f && RandomIntBelow(10) == 0)) {
-            SetMobyState(self, 1, -1);
+        if (cam_moby_update(self) != 0 ||
+            (D_001B1690[0] > 0.949999988079071044921875f && math_random_int_below(10) == 0)) {
+            moby_set_state(self, 1, -1);
             *(unsigned short *)(self + 0x34) |= 0x2800;
         }
         break;
     case 1:
-        UpdateCameraMoby(self);
+        cam_moby_update(self);
         if (self[0x23] < 2)
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
         else
             self[0x23] -= 2;
         break;
@@ -191,7 +191,7 @@ void func_00310C88(unsigned char *self)
 
 
 /* Moves the first object along with the moving surface the second one stands on, so it keeps its place on it. */
-void func_00310D78(char *o0, char *o1)
+void moby_carry_with_surface(char *o0, char *o1)
 {
     char b0[64];
     char b1[64];
@@ -220,9 +220,9 @@ void func_00310D78(char *o0, char *o1)
 /* func_003116E8: per-frame update of ground-attached crates and their stacks, after RAC1's
  * ground_attached_update (OpenRAC/rac1-decomp, GPL-3.0); RAC2 adds class 0x200 and drops iCC.
  * The group==255 path passes the uninitialized member slot, as retail and RAC1 do. */
-extern int func_002A77E0(int);
-extern void func_0029F338(void *);
-extern void func_00282CC0(void *,void *,void *);
+extern int math_random_int_below(int);
+extern void moby_mark_spawned(void *);
+extern void FastVecAdd(void *,void *,void *);
 typedef struct SupportMoby SupportMoby;
 typedef struct SupportVars SupportVars;
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) SupportVector;
@@ -270,19 +270,19 @@ typedef struct {
 typedef struct { int pad[3], state; } SupportPathEntry;
 typedef struct { int count, pad[3]; SupportPathEntry entries[1]; } SupportPath;
 extern int D_001A73E0[] MACRO_ADDR;
-extern char D_001BAF80[];
+extern char g_collision_hit[];
 #define HIT (*(SupportHit *)D_001BAF80)
-extern SupportPath *D_001F1700[];
-extern float func_00283B98(float,float);
-extern int func_002761F8(void *,void *,int,void *,int);
-extern int func_002ABB78(void *);
-extern char *func_002AD0B0(void *);
-extern void func_002AD5F8(void *,void *,void *,void *,void *,void *);
-extern int func_002A8600(void *,int,int,int);
-extern int func_002A86E8(void *,void *,int,int);
-extern void func_00282A28(void);
-extern float func_00282E48(void *,void *);
-void func_003116E8(SupportMoby *moby) {
+extern SupportPath *g_path_table[];
+extern float FastAddRotations(float,float);
+extern int CollLine(void *,void *,int,void *,int);
+extern int moby_is_in_special_class_range(void *);
+extern char *moby_get_private_value_2(void *);
+extern void moby_get_attachment_rotation_angles(void *,void *,void *,void *,void *,void *);
+extern int GetFirstMobyInGroup(void *,int,int,int);
+extern int GetNextMobyInGroup(void *,void *,int,int);
+extern void math_trap_always(void);
+extern float fast_vec_dist(void *,void *);
+void GroundAttachedUpdate(SupportMoby *moby) {
     SupportVector probe_top;
     SupportVector probe_bottom;
     SupportVector probe_up;
@@ -300,11 +300,11 @@ void func_003116E8(SupportMoby *moby) {
     group = moby->group;
     vars->flags |= 4;
     if (group == 0xFF) {
-        if (moby->oclass == 0x1F4 /* Crate */ && RandomIntBelow(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+        if (moby->oclass == 0x1F4 /* Crate */ && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
             moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
         }
         if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
         flags_before = vars->flags;
@@ -325,12 +325,12 @@ void func_003116E8(SupportMoby *moby) {
             vars->support = 0;
             return;
         }
-        if (IsMobyInSpecialClassRange(HIT.moby) != 0) return;
+        if (moby_is_in_special_class_range(HIT.moby) != 0) return;
         vars->support = 0;
         vars->flags |= 8;
-        if (GetMobyPrivateValue2(HIT.moby) != 0) {
+        if (moby_get_private_value_2(HIT.moby) != 0) {
             if (moby != 0) moby->occlusion = 0x7F80;
-            GetAttachmentRotationAngles(member, HIT.moby, &moby->position, &moby->rotation[0], &vars->link_pos, &vars->link_rot);
+            moby_get_attachment_rotation_angles(member, HIT.moby, &moby->position, &moby->rotation[0], &vars->link_pos, &vars->link_rot);
             vars->stack_level = 0;
             vars->standing_on = HIT.moby;
         }
@@ -340,12 +340,12 @@ void func_003116E8(SupportMoby *moby) {
     GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
         vars = moby->vars;
-        if (IsMobyInSpecialClassRange(moby) != 0) {
-            if (moby->oclass == 0x1F4 /* Crate */ && RandomIntBelow(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+        if (moby_is_in_special_class_range(moby) != 0) {
+            if (moby->oclass == 0x1F4 /* Crate */ && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
                 moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
             }
             if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
-                MarkMobySpawned(moby);
+                moby_mark_spawned(moby);
             } else {
                 member_flags = vars->flags;
                 vars->model = moby->model;
@@ -362,7 +362,7 @@ void func_003116E8(SupportMoby *moby) {
                     if (HIT.moby == 0) {
                         moby->position.z = HIT.point_z;
                         vars->support = 0;
-                    } else if (IsMobyInSpecialClassRange(HIT.moby) == 0 && (u16)(HIT.moby->oclass - 0x128) >= 2) {
+                    } else if (moby_is_in_special_class_range(HIT.moby) == 0 && (u16)(HIT.moby->oclass - 0x128) >= 2) {
                         vars->support = 0;
                         moby->update_distance = 0xFF;
                         vars->flags |= 8;
@@ -370,17 +370,17 @@ void func_003116E8(SupportMoby *moby) {
                         vars->support = 0;
                     } else if (HIT.moby->group != moby->group) {
                         vars->support = 0;
-                    } else if (IsMobyInSpecialClassRange(HIT.moby) != 0) {
+                    } else if (moby_is_in_special_class_range(HIT.moby) != 0) {
                         vars->support = HIT.moby;
                         src3 = &moby->position;
                         below = HIT.moby;
                         qcopy_nc(src3, &below->position);
                         FastVecAdd(src3, src3, &below->offset);
                         vars = HIT.moby->vars;
-                        if (IsMobyInSpecialClassRange(moby) != 0) {
+                        if (moby_is_in_special_class_range(moby) != 0) {
                             vars->above = moby;
                         } else {
-                            TrapAlways();
+                            math_trap_always();
                             vars->above = 0;
                         }
                     } else {
@@ -396,16 +396,16 @@ void func_003116E8(SupportMoby *moby) {
     GetFirstMobyInGroup(&member, group, 0, 0);
     while (member != 0) {
         vars = member->vars;
-        if (IsMobyInSpecialClassRange(member) != 0 && vars->support == 0) {
+        if (moby_is_in_special_class_range(member) != 0 && vars->support == 0) {
             src4 = &member->position;
             qcopy_nc(&probe_up, src4);
             qcopy_nc(&probe_down, src4);
             probe_up.z += vars->height * 0.5f;
             probe_down.z = 0.1f;
             if (CollLine(&probe_up, &probe_down, 2, moby, 0) != 0) {
-                if (HIT.moby != 0 && GetMobyPrivateValue2(HIT.moby) != 0) {
+                if (HIT.moby != 0 && moby_get_private_value_2(HIT.moby) != 0) {
                     if (moby != 0) moby->occlusion = 0x7F80;
-                    GetAttachmentRotationAngles(member, HIT.moby, &member->position, &member->rotation[0], &vars->link_pos, &vars->link_rot);
+                    moby_get_attachment_rotation_angles(member, HIT.moby, &member->position, &member->rotation[0], &vars->link_pos, &vars->link_rot);
                     vars->stack_level = 0;
                     vars->standing_on = HIT.moby;
                     vars->flags |= 8;
@@ -426,7 +426,7 @@ void func_003116E8(SupportMoby *moby) {
                     }
                 }
                 if ((vars->hC6 != 0 || (moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */)) && vars->above != 0 && vars->route_index != -1) {
-                    route = gPathTable_001F1700[vars->route_index];
+                    route = g_path_table[vars->route_index];
                     if (route->count == 0) {
                         vars->route_index = -1;
                     } else {
@@ -443,8 +443,8 @@ void func_003116E8(SupportMoby *moby) {
                             }
                         } else {
                             route->entries[0].state = 0x11;
-                            for (i = 0; i < gPathTable_001F1700[vars->route_index]->count; i++) {
-                                gPathTable_001F1700[vars->route_index]->entries[i].state = 0;
+                            for (i = 0; i < g_path_table[vars->route_index]->count; i++) {
+                                g_path_table[vars->route_index]->entries[i].state = 0;
                             }
                         }
                     }
@@ -456,10 +456,10 @@ void func_003116E8(SupportMoby *moby) {
 
     GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
-        if (IsMobyInSpecialClassRange(moby) != 0) {
+        if (moby_is_in_special_class_range(moby) != 0) {
             GetNextMobyInGroup(&other, moby, 0, 0);
             while (other != 0) {
-                if (IsMobyInSpecialClassRange(other) != 0) {
+                if (moby_is_in_special_class_range(other) != 0) {
                     fast_vec_dist(&moby->position, &other->position);
                 }
                 GetNextMobyInGroup(&other, other, 0, 0);
@@ -477,7 +477,7 @@ void func_003116E8(SupportMoby *moby) {
 /* func_00312600 is in 0030F7B0-crate-g8.c. */
 
 /* Returns 1 when the object is in state 6. */
-int func_00312B58(Level16VendorMoby *moby) {
+int moby_is_state_six(Level16VendorMoby *moby) {
     return moby->state == 6;
 }
 
@@ -487,7 +487,7 @@ int func_00312B58(Level16VendorMoby *moby) {
 
 
 /* Returns 1 when the object is in state 1. */
-int func_00312E10(unsigned char *p) { return p[0x20] == 1; }
+int moby_is_state_one(unsigned char *p) { return p[0x20] == 1; }
 
 
 
@@ -496,19 +496,19 @@ int func_00312E10(unsigned char *p) { return p[0x20] == 1; }
 /* func_00313210 is in 0030F7B0-g16.c. */
 
 extern char D_L00_0023A670[][16];
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 typedef struct { char pad[0x30]; char *entries[1]; } SolEmitterData;
 
 /* Finds the position of one of the emitter's slots, turned by the emitter's angle and lifted by its height. */
-void func_00313548(unsigned char *object, float *out, int index)
+void emitter_get_slot_position(unsigned char *object, float *out, int index)
 {
     char local[16];
     char *data = *(char **)(object + 0x68);
     char *entry;
-    ApplyAxisRotationToQuaternion(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
+    math_apply_axis_rotation_to_quat(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
     entry = ((SolEmitterData *)data)->entries[index];
     if (entry && object[0x20] == 2)
         vec_scale_to_length(local, local, *(float *)(entry + 0x28));
@@ -538,7 +538,7 @@ void func_00313548(unsigned char *object, float *out, int index)
 
 /* Fills the first free effect slot for owner: random angles, speeds and amplitudes, a timer
  * of duration frames, and the object's position as the start (offset when it has a record). */
-void func_00316400(void *owner, char *object, int duration)
+void AllocEffectSlot(void *owner, char *object, int duration)
 {
     PoolEffect *pool = D_0022AA10;
     int i = 0;
@@ -554,35 +554,35 @@ void func_00316400(void *owner, char *object, int duration)
 
         effect->owner = owner;
         qcopy(effect->origin, origin);
-        effect->angle[0] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->angle[1] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->angle[2] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->angle2[0] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->angle2[1] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->angle2[2] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        effect->speed[0] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->speed[1] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->speed[2] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->speed2[0] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->speed2[1] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->speed2[2] = RandomSignedFloatRange(0.001f, 0.005f);
-        effect->amplitude[0] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        effect->amplitude[1] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        effect->amplitude[2] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[0] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[1] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[2] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
-        ClearVector128(effect->offset);
-        ClearVector128(effect->rotation);
+        effect->angle[0] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->angle[1] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->angle[2] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->angle2[0] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->angle2[1] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->angle2[2] = math_random_float_range(-3.1415927f, 3.1415927f);
+        effect->speed[0] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->speed[1] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->speed[2] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->speed2[0] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->speed2[1] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->speed2[2] = math_random_signed_float_range(0.001f, 0.005f);
+        effect->amplitude[0] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        effect->amplitude[1] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        effect->amplitude[2] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[0] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[1] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[2] = math_random_float_range(3.25f, 4.75f) * 0.5f;
+        vec_clear_128(effect->offset);
+        vec_clear_128(effect->rotation);
         effect->timer = duration;
         effect->duration = duration;
         effect->fade = 15;
         effect->object = object;
         effect->expired = 0;
 
-        info = GetMobyPrivateValue0(object);
+        info = moby_get_private_value_0(object);
         if (info != 0) {
-            GetGravityDirectionAtObject(object, displacement, 1);
+            gravity_get_dir_at_object(object, displacement, 1);
             FastVecScale(displacement, displacement, *(float *)(info + 16));
             FastVecAdd(effect->position, displacement, object + 16);
         } else {
@@ -594,17 +594,17 @@ void func_00316400(void *owner, char *object, int duration)
     }
 }
 
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282D08(void *, void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00282948(void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void lerp_vector(void *, void *, void *, float);
+extern float IntToFloat(int);
+extern int math_fast_float_d(void *);
 
 /* Advances the owner's effect slots. p is set only after the owner test, in the block of the
  * origin copy: there p + 0x20 is not anticipatable, so gcse leaves the last call's own address
  * instead of keeping it in a saved register. */
-void func_003166C8(void *owner)
+void UpdateEffectSlots(void *owner)
 {
     int i;
     PoolEffect *p, *slot;
@@ -631,16 +631,16 @@ void func_003166C8(void *owner)
             p->angle2[1] = FastAddRotations(p->angle2[1], p->speed2[1] * 50.0f);
             p->angle2[2] = FastAddRotations(p->angle2[2], p->speed2[2] * 50.0f);
         }
-        p->offset[0] = FastSinOrCosA(p->angle[0]) * p->amplitude[0];
-        p->offset[1] = FastSinOrCosB(p->angle[1]) * p->amplitude[1];
-        p->offset[2] = -FastSinOrCosB(p->angle[2]) * p->amplitude[2];
-        p->rotation[0] = FastSinOrCosA(p->angle2[0]) * p->amplitude2[0];
-        p->rotation[1] = FastSinOrCosB(p->angle2[1]) * p->amplitude2[1];
-        p->rotation[2] = -FastSinOrCosB(p->angle2[2]) * p->amplitude2[2];
+        p->offset[0] = math_fast_sin_or_cos_a(p->angle[0]) * p->amplitude[0];
+        p->offset[1] = math_fast_sin_or_cos_b(p->angle[1]) * p->amplitude[1];
+        p->offset[2] = -math_fast_sin_or_cos_b(p->angle[2]) * p->amplitude[2];
+        p->rotation[0] = math_fast_sin_or_cos_a(p->angle2[0]) * p->amplitude2[0];
+        p->rotation[1] = math_fast_sin_or_cos_b(p->angle2[1]) * p->amplitude2[1];
+        p->rotation[2] = -math_fast_sin_or_cos_b(p->angle2[2]) * p->amplitude2[2];
         if (p->object) {
-            info = GetMobyPrivateValue0(p->object);
+            info = moby_get_private_value_0(p->object);
             if (info) {
-                GetGravityDirectionAtObject(p->object, local, 1);
+                gravity_get_dir_at_object(p->object, local, 1);
                 FastVecScale(local, local, *(float *)(info + 16));
                 FastVecAdd(p->position, local, p->object + 16);
             } else {
@@ -650,16 +650,16 @@ void func_003166C8(void *owner)
             ratio /= IntToFloat(p->duration);
             lerp_vector(p->position, p->origin, p->position, 1.0f - ratio);
         }
-        if (FastFloatHelperD(&p->timer)) {
+        if (math_fast_float_d(&p->timer)) {
             if (!p->expired) p->expired = 1;
-            if (FastFloatHelperD(&p->fade)) p->owner = 0;
+            if (math_fast_float_d(&p->fade)) p->owner = 0;
         }
     }
 }
 
 
 /* Fills a draw packet with its default corner positions, colors and settings. */
-void func_00316B40(char *p)
+void gfx_init_draw_packet_defaults(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -692,7 +692,7 @@ void func_00316B40(char *p)
 /* func_00316BC8 is defined in 00316BC8-qcopy.c. */
 
 /* Adds one more point to the end of a curve by continuing the direction of the last two points. */
-void func_00316DA0(Vec16_Fc936841d *object, int index)
+void gfx_extrapolate_curve_end(Vec16_Fc936841d *object, int index)
 {
     char local[16];
 

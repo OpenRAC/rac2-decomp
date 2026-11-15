@@ -3,13 +3,13 @@ typedef int Quad __attribute__((mode(TI)));
 #define I32(p,o) (*(int *)((p)+(o)))
 #define F32(p,o) (*(float *)((p)+(o)))
 #define S16(p,o) (*(short *)((p)+(o)))
-extern u8 D_00189E20[],D_00189EA0[];
+extern u8 g_hero_state[],g_hero_position[];
 extern float D_001A7928;
-extern int func_002ACBC8(void *,int);
-extern void func_00282CF0(void *,void *,void *),func_00282D30(void *,void *,float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int),func_00283198(float);
-extern void func_L00_002E6DB8(void (*)(void *),void *);
+extern int IsPointInCuboid(void *,int);
+extern void FastVecSub(void *,void *,void *),FastVecScale(void *,void *,float);
+extern int FloatToInt(float);
+extern float IntToFloat(int),math_fast_sin_or_cos_b(float);
+extern void gfx_add_draw_callback_second(void (*)(void *),void *);
 extern Quad D_L01_001B2FC0 SDATA(D_L01_001B2FC0);
 extern u8 D_L01_001B94C0[];
 extern u8 *D_L01_001B264C;
@@ -30,7 +30,7 @@ typedef struct { char pad0[0x1FE]; short f1FE; char pad200[0x2294-0x200]; int f2
 #define RES ((ResidentE20 *)D_00189E20)
 extern int D_L01_001B2088;
 extern float *D_L01_001AA174;
-extern void func_L01_003BAFB8(void *);
+extern void DrawWaterSheet(void *);
 /*
  * Ocean update, the counterpart of RAC1's ocean_pokitaru_update (homing_missile_and_water_sheet.c):
  * returns early when func_002ACBC8 accepts one of the two ids at state+0x30, takes the tide
@@ -39,7 +39,7 @@ extern void func_L01_003BAFB8(void *);
  * draw callback func_L01_003BAFB8. The `1.0f < x || x < 1.0f` tests are as written in RAC1.
  */
 /* Updates the Oozla water sheet. It scrolls the wave layers, sets the water height and queues the water to be drawn. */
-void func_L01_003BB9D0(u8 *moby)
+void UpdateWaterSheet(u8 *moby)
 {
     u8 *state=*(u8 **)(moby+0x68);
     float delta[4] __attribute__((aligned(16))),scaled[4] __attribute__((aligned(16)));
@@ -64,8 +64,8 @@ void func_L01_003BB9D0(u8 *moby)
                 RES->f1FE=0;
                 blocked=1; break;
             }
-            if(IsPointInCuboid(gHeroPosition,((OceanContacts *)state)->contacts[i])) {
-                S16(gHeroPosition,0x17e)=0;
+            if(IsPointInCuboid(g_hero_position,((OceanContacts *)state)->contacts[i])) {
+                S16(g_hero_position,0x17e)=0;
                 blocked=1; break;
             }
         }
@@ -79,7 +79,7 @@ void func_L01_003BB9D0(u8 *moby)
             D_L01_001AFE1C=F32(D_L01_001B264C+regions[i]*128,0x38)+0.15f;
             break;
         }
-        if(IsPointInCuboid(gHeroPosition,regions[i])) {
+        if(IsPointInCuboid(g_hero_position,regions[i])) {
             D_L01_001AFE1C=F32(D_L01_001B264C+regions[i]*128,0x38)+0.15f;
             break;
         }
@@ -102,7 +102,7 @@ void func_L01_003BB9D0(u8 *moby)
         if(1.0f<D_L01_001B2FD0[i].v) D_L01_001B2FD0[i].v-=1.0f;
         if(D_L01_001B2FD0[i].v<-1.0f) D_L01_001B2FD0[i].v+=1.0f;
     }
-    D_L01_001AFE18=D_L01_001AFE1C+FastSinOrCosB(IntToFloat(D_L01_001B2088%360)*0.017444445f-3.14f)*0.1f;
+    D_L01_001AFE18=D_L01_001AFE1C+math_fast_sin_or_cos_b(IntToFloat(D_L01_001B2088%360)*0.017444445f-3.14f)*0.1f;
     D_L01_001AA174=&D_L01_001AFE18;
     for(i=0;i<2;i++) {
         float sum=D_L01_001B2FD0[i].u+D_L01_001AFE00_gp[i].u*D_001A7928;
@@ -114,5 +114,5 @@ void func_L01_003BB9D0(u8 *moby)
         if(1.0f<sum) D_L01_001B2FD0[i].v=sum-1.0f;
         if(D_L01_001B2FD0[i].v<-1.0f) D_L01_001B2FD0[i].v=D_L01_001B2FD0[i].v+1.0f;
     }
-    AddDrawCallbackToList2(DrawWaterSheet,moby);
+    gfx_add_draw_callback_second(DrawWaterSheet,moby);
 }

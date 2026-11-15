@@ -1,7 +1,8 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned char u8;
 /* Copies the position and orientation (three direction vectors) from one object to another. */
-void func_L05_00432158(u8 *source, u8 *dest) {
+void moby_copy_transform(u8 *source, u8 *dest) {
     TI128 *srcVec;
     TI128 *dstVec;
     int i;

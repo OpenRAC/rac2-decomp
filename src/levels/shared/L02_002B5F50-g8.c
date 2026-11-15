@@ -4,7 +4,7 @@
 extern unsigned int D_L02_001A8F00;
 
 /* Report whether the resident flag word is still clear. */
-int func_L02_002F1658(void) {
+int level_is_resident_flag_clear(void) {
     return D_L02_001A8F00 == 0;
 }
 
@@ -24,8 +24,8 @@ typedef struct Ent {
     int f98;
 } Ent;
 
-extern unsigned int D_L02_001FC060[];
-extern char *D_L02_001B359C;
+extern unsigned int g_entity_group_lists[];
+extern char *g_moby_l02_pool;
 extern int D_L02_001B35B8 __attribute__((sda));
 extern int D_L02_001A9048;
 extern float D_L02_001AEF50 __attribute__((sda));
@@ -33,28 +33,28 @@ extern float D_L02_001AEE50[2] __attribute__((sda));
 extern float D_L02_001AEE48[2] __attribute__((sda));
 extern float D_L02_001AEE40[2] __attribute__((sda));
 extern int D_L02_001AEE70 __attribute__((sda));
-extern float func_00283198(float x);
-extern float func_00283B98(float a, float b);
-extern float func_00283BE0(float a, float b);
-extern void func_002C9828(int *path, int seg, void *pos, void *rot, int flags, float t);
-extern int func_002A9640(void *e, int a1, int a2);
-extern void func_L00_0032A258(void *a0, void *a1, void *a2, void *a3, int t0, int t1, int t2, int t3,
+extern float math_fast_sin_or_cos_b(float x);
+extern float FastAddRotations(float a, float b);
+extern float fast_subtract_rotations(float a, float b);
+extern void path_sample_position(int *path, int seg, void *pos, void *rot, int flags, float t);
+extern int part_find_owned_effect_slot(void *e, int a1, int a2);
+extern void part_explode_object_into_pieces(void *a0, void *a1, void *a2, void *a3, int t0, int t1, int t2, int t3,
                               int s0, int s1, int s2);
-extern void func_L01_0031A278(char *a0, float *a1, float f12, float f13, float f14);
-extern void func_002E5CF8(int a0, int a1, void *a2);
-extern void func_002ABBB8(void *a0, float f12, void *a1, float f13, void *a2, float f14, int a3,
+extern void moby_compute_local_point(char *a0, float *a1, float f12, float f13, float f14);
+extern void PlayMobySound(int a0, int a1, void *a2);
+extern void SpawnExplosionEffects(void *a0, float f12, void *a1, float f13, void *a2, float f14, int a3,
                           float f15, int t0, int t1, float f16, float f17, int t2, float f18,
                           int t3, int s0, int s1, int s2, int s3);
-extern void func_002AA2E8(float *p, float a, float b);
-extern void func_L02_0038CDE8(void *e);
-extern void func_L02_0038D978(void *e);
+extern void ApproachValue(float *p, float a, float b);
+extern void UpdateLampGlowEffects(void *e);
+extern void blinking_lamp_update(void *e);
 extern void func_002A0F48(void *e);
 
 /* Walks the group's entity list: each one moves along the path object (func_002C9828), turns its
    angle and advances its phase; a hit by the player while it is active switches it off and spawns
    the debris (func_L00_0032A258, func_002ABBB8); a live one tilts toward its turning speed
    (func_002AA2E8) and runs the level's two update calls. */
-void func_L02_0038C998(unsigned char *moby) {
+void target_update_moving_on_path(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int *path = *(int **)(vars + 0x60);
     float range = (float)*path;
@@ -67,27 +67,27 @@ void func_L02_0038C998(unsigned char *moby) {
     float prev;
     float h;
 
-    q = (unsigned short *)gEntityGroupLists[moby[0x21]];
+    q = (unsigned short *)g_entity_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)gEntityGroupLists[moby[0x21]])) {
-        target = (unsigned char *)(gMobyPool_L02 + ((*q & 0x7FFF) << 8));
+           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[moby[0x21]])) {
+        target = (unsigned char *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
         if (target == 0)
             break;
         targetVars = *(unsigned char **)(target + 0x68);
         prev = *(float *)(target + 0xF8);
-        h = *(float *)(targetVars + 0x10) + *(float *)(targetVars + 0x7C) * FastSinOrCosB(*(float *)(targetVars + 0x80));
+        h = *(float *)(targetVars + 0x10) + *(float *)(targetVars + 0x7C) * math_fast_sin_or_cos_b(*(float *)(targetVars + 0x80));
         if (range <= h)
             h -= range;
         else if (h < 0.0f)
             h += range;
-        SamplePathPosition(path, seg, target + 0x10, target + 0xF0, 0, h);
+        path_sample_position(path, seg, target + 0x10, target + 0xF0, 0, h);
         *(float *)(targetVars + 0x68) = FastAddRotations(*(float *)(targetVars + 0x68), *(float *)(targetVars + 0x6C));
-        *(float *)(target + 0x18) += FastSinOrCosB(*(float *)(targetVars + 0x68));
+        *(float *)(target + 0x18) += math_fast_sin_or_cos_b(*(float *)(targetVars + 0x68));
         *(float *)(targetVars + 0x10) += step;
         if (range <= *(float *)(targetVars + 0x10))
             *(float *)(targetVars + 0x10) -= range;
         *(float *)(targetVars + 0x80) = FastAddRotations(*(float *)(targetVars + 0x80), *(float *)(targetVars + 0x84));
-        if (FindOwnedEffectSlot(target, 0x4010000, 0) != 0) {
+        if (part_find_owned_effect_slot(target, 0x4010000, 0) != 0) {
             if (target[0x31] != 0) {
                 Vec4 dir;
                 float pos[4] __attribute__((aligned(16)));
@@ -96,11 +96,11 @@ void func_L02_0038C998(unsigned char *moby) {
                 ((Ent *)target)->f34 |= 1;
                 ((Ent *)target)->f98 = 0;
                 D_L02_001A9048++;
-                ExplodeObjectIntoPieces(target, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
+                part_explode_object_into_pieces(target, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
                                   D_L02_001AEE70, 0, 0xFFFF, 0xFF, 0);
                 dir.q = 0;
                 dir.f[2] = 0.05000000447f;
-                ComputeMobyLocalPoint((char *)target, pos, 0.0f, 0.0f, 0.0f);
+                moby_compute_local_point((char *)target, pos, 0.0f, 0.0f, 0.0f);
                 if (*(short *)(target + 0xAA) == 0x1290 /* moby class 4752 */)
                     PlayMobySound(0, 0, target);
                 if (*(short *)(target + 0xAA) == 0x134B /* moby class 4939 */)
@@ -124,7 +124,7 @@ void func_L02_0038C998(unsigned char *moby) {
                 ApproachValue((float *)(target + 0xF0), h, rate);
                 if (*(short *)(targetVars + 0x72) != 0)
                     UpdateLampGlowEffects(target);
-                UpdateBlinkingLampMoby(target);
+                blinking_lamp_update(target);
             }
         }
         func_002A0F48(target);

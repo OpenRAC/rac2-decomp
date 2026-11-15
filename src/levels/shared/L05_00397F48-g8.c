@@ -18,11 +18,11 @@ typedef struct {
     s32 s20;
 } SpawnRecord97F48;
 
-extern void func_00282F20(SpawnRecord97F48 *a, SpawnRecord97F48 *b, f32 c);
-extern void func_00277F48(char *a, s32 b, s32 c, SpawnRecord97F48 *d, f32 e);
+extern void vec_scale_to_length(SpawnRecord97F48 *a, SpawnRecord97F48 *b, f32 c);
+extern void coll_process_hit(char *a, s32 b, s32 c, SpawnRecord97F48 *d, f32 e);
 
 /* Build and submit the projectile hit record from its owner and flight state. */
-void func_L05_00397F48(s32 owner, char *state, char *position)
+void SubmitFlightStateHitRecord(s32 owner, char *state, char *position)
 {
     SpawnRecord97F48 t;
     u16 id;
@@ -41,6 +41,6 @@ void func_L05_00397F48(s32 owner, char *state, char *position)
     t.b18 = 3;
     t.b19 = 2;
     t.h1A = id;
-    ProcessCollisionHit(position, 1, *(s32 *)(state + 0x20), &t,
+    coll_process_hit(position, 1, *(s32 *)(state + 0x20), &t,
                   *(s32 *)(state + 0x24) ? D_L05_001AEBE0 : D_L05_001AEBDC);
 }

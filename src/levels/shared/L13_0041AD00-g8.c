@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L13_0041AD00: electric beam draw (RAC1 draw_electric_beam shape).
  * Spill slots follow gcse's PRE hash-bucket order, S = (insns at gcse / 2) | 1;
  * retail's order needs S = 181. The set-once constant locals and copies of d
@@ -26,17 +27,17 @@ typedef struct {
     float seg[4][4][4];
 } Beam;
 
-extern void func_00283410(void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282C88(void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern void euler_to_matrix(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 extern char D_L13_001B98C0[];
 extern int D_L13_001B163C __attribute__((sda));
 extern int D_L13_001B1640 __attribute__((sda));
@@ -46,7 +47,7 @@ extern int D_L13_001B164C __attribute__((sda));
 extern float D_L13_001B1660[4][2] SDATA(D_L13_001B1660);
 
 /* Draws the electric beam as a few glowing strips running through its points. */
-void func_L13_0041AD00(char *m) {
+void gfx_draw_electric_beam(char *m) {
     Beam *d = *(Beam **)(m + 0x68);
     Pkt P[3];
     float M1[16] __attribute__((aligned(16)));
@@ -92,7 +93,7 @@ void func_L13_0041AD00(char *m) {
         P[1].color[t] = col;
         P[0].color[t] = col;
     }
-    ClearVector128(v250);
+    vec_clear_128(v250);
     {
         int i;
         int segs = 31;
@@ -114,7 +115,7 @@ void func_L13_0041AD00(char *m) {
                 FastVecCross(v250, v260, v270);
                 vec_scale_to_length(v250, v250, 0.1f);
             } else {
-                ClearVector128(v250);
+                vec_clear_128(v250);
             }
             for (k = 0; k < 4; k++) {
                 if (k < kh) {
@@ -150,7 +151,7 @@ void func_L13_0041AD00(char *m) {
         Beam *mid2 = d;
         Beam *ahead2 = d;
         for (j = 0; j < beams; j++) {
-            ClearVector128(v250);
+            vec_clear_128(v250);
             c = cnt->cnt[j];
             if (c >= cmax)
                 continue;
@@ -164,7 +165,7 @@ void func_L13_0041AD00(char *m) {
                     FastVecCross(v250, v260, v270);
                     vec_scale_to_length(v250, v250, 0.1f);
                 } else {
-                    ClearVector128(v250);
+                    vec_clear_128(v250);
                 }
                 if (n == 0)
                     qcopy(v240, v250);

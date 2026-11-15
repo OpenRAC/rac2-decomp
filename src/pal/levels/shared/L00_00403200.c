@@ -43,15 +43,15 @@ void func_PAL_L00_004040D8(char *self)
 }
 
 
-extern void func_002A7750(char *arg, int mode, int value);
+extern void moby_set_state(char *arg, int mode, int value);
 extern void func_PAL_L00_004040D8(char *arg);
 extern void func_PAL_L00_004041C0(char *arg);
-extern float func_00282E80(char *arg, char *table);
-extern float func_00282C48(float value);
+extern float vec_distance_xy(char *arg, char *table);
+extern float math_fabs(float value);
 extern void func_PAL_002B1588(int arg, int value);
-extern void func_00288308(int arg);
-extern void func_002AD860(int arg);
-extern void func_0029F338(char *arg);
+extern void help_unlock_entry(int arg);
+extern void moby_handle_request_slot_state(int arg);
+extern void moby_mark_spawned(char *arg);
 extern char D_00189EA0_2[];
 extern unsigned char D_001A7B2E __attribute__((sda));
 extern void func_002E6EF8(void (*f)(char *), char *arg);
@@ -66,24 +66,24 @@ void func_PAL_L00_004043A0(char *arg)
     case 0:
         *(unsigned char *)(arg + 48) = 255;
         if (D_001A7B2E != 0 && object[17] != 0) {
-            func_0029F338((char *)object[17]);
-            func_0029F338(arg);
+            moby_mark_spawned((char *)object[17]);
+            moby_mark_spawned(arg);
             return;
         } else {
-            func_002A7750(arg, 1, -1);
+            moby_set_state(arg, 1, -1);
             func_PAL_L00_004040D8(arg);
         }
         break;
     case 1:
         func_PAL_L00_004041C0(arg);
-        if (func_00282E80(arg + 16, D_00189EA0_2) < 2.0f) {
-            if (func_00282C48(*(float *)(arg + 24) - *(float *)(D_00189EA0_2 + 8)) < 2.0f) {
+        if (vec_distance_xy(arg + 16, D_00189EA0_2) < 2.0f) {
+            if (math_fabs(*(float *)(arg + 24) - *(float *)(D_00189EA0_2 + 8)) < 2.0f) {
                 func_PAL_002B1588(4658, -1);
-                func_00288308(54);
-                func_002AD860(54);
+                help_unlock_entry(54);
+                moby_handle_request_slot_state(54);
                 if (object[17] != 0) {
-                    func_0029F338((char *)object[17]);
-                    func_0029F338(arg);
+                    moby_mark_spawned((char *)object[17]);
+                    moby_mark_spawned(arg);
                     return;
                 }
                 object[16] = 100;

@@ -8,13 +8,13 @@ extern char *D_L00_001B2B4C_gp SDATA(D_L00_001B2B4C);
 extern int D_L00_001B2B44;
 extern int D_L00_001B2B48;
 extern float D_L00_001B0438 __attribute__((sda)), D_L00_001B0448 __attribute__((sda)), D_L00_001B044C __attribute__((sda));
-extern int D_L00_001B043C __attribute__((sda)), D_L00_001B0440 __attribute__((sda));
+extern int g_spider_bot_moby __attribute__((sda)), D_L00_001B0440 __attribute__((sda));
 extern int D_L00_001A8F00 __attribute__((sda));
 extern int D_L00_001A904C[] MACRO_ADDR;
 extern int D_0018C0B4[], D_00138324[];
 extern char *D_L00_001ADB2C[] MACRO_ADDR;
-extern char *D_L00_001B8E10[];
-extern char D_L00_001BF240[], D_L00_001BF200[];
+extern char *g_follow_camera_object[];
+extern char D_L00_001BF240[], g_collision_result[];
 typedef struct { char pad[0x2290]; char *target; int state; } PlayerState;
 extern PlayerState D_00189E20_9;
 extern float D_L00_002474F0[][2];
@@ -121,7 +121,7 @@ void func_PAL_L01_003E4058(char *object)
         ref_L00_003DD6A8_15(data, data);
         ref_L00_003DD6A8_16(object + 0x10, data, 0.0044f);
         if (ref_L00_003DD6A8_04(oldpos, object + 0x10, 2, object, 0)) {
-            char *hitinfo = D_L00_001BF200;
+            char *hitinfo = g_collision_result;
             char *hit = *(char **)(hitinfo + 0x18);
             if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
@@ -243,8 +243,8 @@ void func_PAL_L01_003E4058(char *object)
     }
     case 8: {
         if (D_0018C0B4[0] == 28) ref_L00_003DD6A8_18(0, 1);
-        if (*(short *)(D_L00_001B8E10[0] + 0x86) == 27) ref_L00_003DD6A8_11();
-        D_L00_001B043C = 0;
+        if (*(short *)(g_follow_camera_object[0] + 0x86) == 27) ref_L00_003DD6A8_11();
+        g_spider_bot_moby = 0;
         ref_L00_003DD6A8_10(0, 0);
         ref_L00_003DD6A8_33((int)D_L00_001B2B4C_gp);
         ref_L00_003DD6A8_34(object);

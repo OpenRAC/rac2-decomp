@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs.h"
 
-extern int func_00127040(void *);
+extern int sceDmaPutEnv(void *);
 
 typedef struct {
     unsigned char sts;
@@ -28,7 +28,7 @@ extern int r1_func_0011D960(void);
 
 extern void r1_func_0011D9A8(void);
 
-extern int func_001272A8(void *);
+extern int sceDmaPause(void *);
 
 extern void r1_func_00118C90(int);
 
@@ -48,12 +48,12 @@ extern void *r1_func_00116B00(void *, const void *, int);
 
 extern int r1_D_00132EA8;
 
-extern int func_00127508(int, int, int, int);
+extern int sceMcOpen(int, int, int, int);
 
 /* rac1-decomp src/core/00123168.c: func_001233E8 */
 /* sceDmaPutEnv. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Applies a DMA settings block to the DMA controller registers, and returns a negative number if any value is out of range. */
-int func_00127040(void *envPtr) {
+int sceDmaPutEnv(void *envPtr) {
     sceDmaEnv *env = envPtr;
     unsigned int ctrl;
     unsigned int pcr;
@@ -100,15 +100,15 @@ int func_00127040(void *envPtr) {
     return 0;
 }
 
-extern int func_00126ED8(int);
+extern int dma_convert_scratchpad_address(int);
 
-extern void func_00126E60(void *);
+extern void dma_wait_channel_done(void *);
 
 /* Resets a DMA channel record and stores a converted value in it. */
-void func_00127218(int *channel, int input) {
-    int converted = ConvertScratchpadDmaAddress(input);
+void dma_reset_channel_state(int *channel, int input) {
+    int converted = dma_convert_scratchpad_address(input);
 
-    WaitDmaChannelDone(channel);
+    dma_wait_channel_done(channel);
     if ((unsigned int)channel[12] != 0xFFFFFFFFU) {
         channel[12] = converted;
     }
@@ -132,7 +132,7 @@ void func_00127218(int *channel, int input) {
  * 2.95.3 the same C differs in the prologue order only (8/152).
  */
 /* Pauses a DMA channel with interrupts off and returns its old control value. */
-int func_001272A8(void *channelAddr) {
+int sceDmaPause(void *channelAddr) {
     volatile unsigned int *chcr = channelAddr;
     int intWasOn;
     unsigned int savedEnable, oldChcr;
@@ -173,7 +173,7 @@ extern char r1_D_00153590[];
    handshake/version query) and validates the two version words in the reply,
    printing and clearing serve on any failure. */
 /* Starts up the memory card library: finds the memory card server and checks its version. */
-int func_00127340(void) {
+int sceMcInit(void) {
     int semaParam[8];
     int *reply;
     int i;
@@ -222,7 +222,7 @@ int func_00127340(void) {
    sceMcDelete (func_00128068) but with the flags/mode argument stored to
    the descriptor's +0x8 word instead of a hardcoded 0, and RPC command 2. */
 /* Opens a file on a memory card and returns a request handle, or a negative error. */
-int func_00127508(int port, int slot, int fnameAddr, int mode) {
+int sceMcOpen(int port, int slot, int fnameAddr, int mode) {
     char *client = r1_D_00159B00;
     char *fname = (char *)fnameAddr;
     char *request;

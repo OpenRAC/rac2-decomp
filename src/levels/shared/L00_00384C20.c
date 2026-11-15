@@ -3,10 +3,10 @@
 
 extern void *D_L00_00232A60[24];
 
-extern void func_0029F338(void *arg);
+extern void moby_mark_spawned(void *arg);
 
 /* Removes the two Synthenoids and the 24 sheep that the board created. */
-void func_L00_00384C20(char *owner)
+void sheep_board_destroy_objects(char *owner)
 {
     void **slot = (void **)(*(char **)(owner + 0x68) + 0x48);
     int remaining = 1;
@@ -15,7 +15,7 @@ void func_L00_00384C20(char *owner)
         slot++;
         remaining--;
         if (object) {
-            MarkMobySpawned((void *)object);
+            moby_mark_spawned((void *)object);
         }
     } while (remaining >= 0);
     slot = D_L00_00232A60;
@@ -25,7 +25,7 @@ void func_L00_00384C20(char *owner)
         slot++;
         remaining--;
         if (object) {
-            MarkMobySpawned((void *)object);
+            moby_mark_spawned((void *)object);
         }
     } while (remaining >= 0);
 }

@@ -40,25 +40,25 @@ extern int r1_func_00118E70(int);
 extern int r1_func_00118E60(int, int);
 
        /* sceSifSetReg */
-extern void func_0011D238(char *);
+extern void sif_rpc_finish_request(char *);
 
-extern void func_0011D3A0(void *, void *);
+extern void sif_rpc_handle_bind(void *, void *);
 
-extern void func_0011D590(void *, void *);
+extern void sif_rpc_handle_call(void *, void *);
 
-extern void func_0011D2F0(void *, void *);
+extern void sif_rpc_handle_read_data(void *, void *);
 
 extern char r1_D_00156900[];
 
 typedef signed int s32_1B4C8;
 
-extern s32_1B4C8 func_0011CD20();
+extern s32_1B4C8 sceSifSendCmd();
 
 /* rac1-decomp src/core/00119D88.c: func_0011AE20 */
 /* sceSifInitRpc: once, set up the RPC tables and command handlers, then
    tell the IOP (SIF register 0x80000002) and wait for it. Adapted from
    Lombyte (GPL-3.0) for PAL. */
-void func_0011CF78(int mode) {
+void sceSifInitRpc(int mode) {
     int *packet;
 
     r1_func_0011D960();
@@ -80,18 +80,18 @@ void func_0011CF78(int mode) {
     r1_D_00156900_d.client_table_len = 32;
     r1_D_00156900_d.rdata_table_idx = 0;
     r1_D_00156900_d.pid = 1;
-    SetSifCmdHandler(0x80000008, (int)FinishRpcRequest, (int)&r1_D_00156900_d);
-    SetSifCmdHandler(0x80000009, (int)HandleRpcBindRequest, (int)&r1_D_00156900_d);
-    SetSifCmdHandler(0x8000000A, (int)HandleRpcCallRequest, (int)&r1_D_00156900_d);
-    SetSifCmdHandler(0x8000000C, (int)HandleRpcReadDataRequest, (int)&r1_D_00156900_d);
+    sceSifAddCmdHandler(0x80000008, (int)sif_rpc_finish_request, (int)&r1_D_00156900_d);
+    sceSifAddCmdHandler(0x80000009, (int)sif_rpc_handle_bind, (int)&r1_D_00156900_d);
+    sceSifAddCmdHandler(0x8000000A, (int)sif_rpc_handle_call, (int)&r1_D_00156900_d);
+    sceSifAddCmdHandler(0x8000000C, (int)sif_rpc_handle_read_data, (int)&r1_D_00156900_d);
     r1_func_0011D9A8();
     if (r1_func_00118E70(0x80000002)) {
         return;
     }
     packet = (int *)(r1_D_00155100 + 64);
     packet[3] = 1;
-    SendSifCmd(0x80000002, (int)packet, 16, 0, 0, 0);
-    while (GetSifCmdSlotValue(0) == 0) {
+    sceSifSendCmd(0x80000002, (int)packet, 16, 0, 0, 0);
+    while (sif_cmd_get_slot_value(0) == 0) {
     }
     r1_func_00118E60(0x80000002, 1);
 }

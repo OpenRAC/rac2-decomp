@@ -34,24 +34,24 @@ typedef struct {
     float u, v;
 } TrailState;
 
-extern TrailPoint *D_L00_001B144C __attribute__((sda));
-extern TrailVector D_L00_001B8DC0;
+extern TrailPoint *g_lava_gun_ring_entries __attribute__((sda));
+extern TrailVector g_camera_l00_position;
 
-extern long long func_0027C878(int);
-extern float func_002A7878(float low, float high);
-extern void func_00280B90(void *packet, int, int);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00282D30(void *dst, void *src, float scale);
-extern void func_00282DD8(void *dst, void *a, void *b);
-extern void func_00282F20(void *dst, void *src, float length);
-extern void func_002830C0(void *dst, void *src, void *matrix);
+extern long long GetEffectTextureDescriptor(int);
+extern float math_random_float_range(float low, float high);
+extern void draw_world_quad(void *packet, int, int);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void FastVecScale(void *dst, void *src, float scale);
+extern void FastVecCross(void *dst, void *a, void *b);
+extern void vec_scale_to_length(void *dst, void *src, float length);
+extern void transform_vector(void *dst, void *src, void *matrix);
 /* Not the same function in every level. */
 extern void ref_L00_0041B1B8_00(void *packet);
 
 /* Draw the three layers. The outer layer is six times wider, and both widths
  * taper by 0.94 per segment. */
 /* Draws a glowing three-layer trail behind an object, following its recent positions. */
-void func_L00_0041B1B8(char *self, float width)
+void DrawPositionRingTrail(char *self, float width)
 {
     TrailPacket core, streak, glow;
     /* func_002830C0 consumes all four consecutive columns. */
@@ -85,7 +85,7 @@ void func_L00_0041B1B8(char *self, float width)
     half = width * 0.5f;
     narrowOffset.q = 0;
     narrowOffset.f[3] = 1.0f;
-    narrowOffset.f[2] = RandomFloatRange(half, width);
+    narrowOffset.f[2] = math_random_float_range(half, width);
     wideOffset.q = 0;
     wideOffset.f[3] = 1.0f;
     wideOffset.f[2] = narrowOffset.f[2] * 6.0f;
@@ -121,10 +121,10 @@ void func_L00_0041B1B8(char *self, float width)
     /* Basis at the trail's head. */
     qcopy_nc(&first, &state->position);
     index = state->index;
-    qcopy_nc(&second, &gLavaGunRingEntries[index].position);
+    qcopy_nc(&second, &g_lava_gun_ring_entries[index].position);
     FastVecSub(&basis[0], &second, &first);
     vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-    FastVecSub(&basis[1], &gCameraPosition_L00, &first);
+    FastVecSub(&basis[1], &g_camera_l00_position, &first);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1.0f);
     FastVecCross(&basis[1], &basis[0], &basis[2]);
@@ -155,12 +155,12 @@ void func_L00_0041B1B8(char *self, float width)
             if (next < 0) {
                 next = 34;
             }
-            first.q = gLavaGunRingEntries[index].position.q;
-            second.q = gLavaGunRingEntries[next].position.q;
+            first.q = g_lava_gun_ring_entries[index].position.q;
+            second.q = g_lava_gun_ring_entries[next].position.q;
 
             FastVecSub(&basis[0], &second, &first);
             vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-            FastVecSub(&basis[1], &gCameraPosition_L00, &first);
+            FastVecSub(&basis[1], &g_camera_l00_position, &first);
             FastVecCross(&basis[2], &basis[1], &basis[0]);
             vec_scale_to_length(&basis[2], &basis[2], 1.0f);
             FastVecCross(&basis[1], &basis[0], &basis[2]);
@@ -191,7 +191,7 @@ void func_L00_0041B1B8(char *self, float width)
             core.color[0] = core.color[1] = core.color[2];
             streak.color[0] = streak.color[1] = streak.color[2];
             glow.color[0] = glow.color[1] = glow.color[2];
-            narrowOffset.f[2] = RandomFloatRange(half, width);
+            narrowOffset.f[2] = math_random_float_range(half, width);
             wideOffset.f[2] = narrowOffset.f[2] * 6.0f;
         }
     }

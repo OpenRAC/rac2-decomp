@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002A89A8: both copies of the object position are qcopy(), so the destinations
  * are held in registers and the 0.01f store sits between them, as in retail. */
 #include "common.h"
@@ -6,10 +7,10 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
 extern float D_001BAFA8;
-extern int func_002761F8(void *, void *, int, void *, int);
+extern int CollLine(void *, void *, int, void *, int);
 
 /* Checks for ground just below the object and returns the ground height offset, or 0 if none is found. */
-float func_002A89A8(char *object, int mode, float amount)
+float coll_probe_ground_height_below(char *object, int mode, float amount)
 {
     Vector local;
     Vector query;

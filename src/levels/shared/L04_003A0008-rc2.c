@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -32,7 +33,7 @@ extern s32 ref_L04_003A0008_04;
 extern f32 ref_L04_003A0008_05 __attribute__((sda));
 
 /* Advances the water ripple animation by one step and blends the patches. */
-void func_L04_003A0008(void *patches, s32 count) {
+void water_advance_ripple_step(void *patches, s32 count) {
     f32 step = *(f32*)(&ref_L04_003A0008_literal_0);
 
     if ((1.0f - step) <= ref_L04_003A0008_05) {

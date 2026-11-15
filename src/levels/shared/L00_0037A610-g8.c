@@ -26,7 +26,7 @@ typedef struct {
     char padf0[0x654];
     int auxiliary;
 } MenuState;
-extern char D_L00_0022F7C0[];
+extern char g_purchase_menu_model[];
 
 #define menu ((MenuState *)D_L00_0022F7C0)
 typedef struct {
@@ -46,8 +46,8 @@ typedef struct {
     int words[2];
 } Pair;
 extern Pair D_L00_001AD858[];
-extern int D_001A7340[] __attribute__((sda));
-extern int D_001A7344[] __attribute__((sda));
+extern int g_screen_width[] __attribute__((sda));
+extern int g_screen_height[] __attribute__((sda));
 extern int D_001A72DC[] __attribute__((sda));
 extern int D_L00_001B25E4[] __attribute__((sda));
 extern int D_L00_001B25E8[] __attribute__((sda));
@@ -64,62 +64,62 @@ extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_L00_001B18D4 MACRO_ADDR;
 extern int D_L00_001B18D8 MACRO_ADDR;
 extern int D_L00_001B2610 __attribute__((sda));
-extern int func_001261F0(int);
-extern void func_L00_002D5000();
-extern int func_00279D18();
-extern void func_0027AB40(void);
-extern void func_0027B858();
-extern void func_0027BD70();
-extern int func_0027C540();
-extern void func_0027C660();
-extern void func_L00_002E73E0();
-extern void func_00282A88();
-extern int func_00283678();
-extern void func_00284F40();
-extern void func_0028E458();
-extern void func_0029BF08();
-extern void func_L00_003116A8();
-extern void func_0029FEE0();
-extern void func_002A01C8();
-extern void func_002A01F0();
-extern void func_002A0220();
-extern int func_002A0250();
-extern void func_002A0300();
-extern int func_002A0380();
-extern void func_002A0468();
+extern int sceGsSyncV(int);
+extern void level_init_record_from_object();
+extern int gfx_build_view_matrices();
+extern void UpdateViewContext(void);
+extern void gfx_write_clear_color_packets();
+extern void RenderFrame();
+extern int SetupGifPaging();
+extern void DoGifPaging();
+extern void gfx_draw_item_with_pass();
+extern void mem_fast_helper_b();
+extern int copy_matrix3x4();
+extern void gfx_append_draw_list_buffer_tag();
+extern void hud_update_record_handlers();
+extern void level_run_callbacks_and_draw();
+extern void mat_transform_array();
+extern void PatchMobyGifs();
+extern void mem_fill_scratch_area();
+extern void mem_save_scratch_area();
+extern void mem_restore_scratch_area();
+extern int DrawMobysSetup();
+extern void tex_upload_object_textures();
+extern int tex_run_upload_and_setup();
+extern void gfx_pack_render_command_fields();
 extern void func_002A0F48();
 extern int func_002A10E8();
-extern int func_002A9588();
-extern void func_L00_00375718();
-extern int func_002F9C80();
-extern int func_002FA270();
-extern int func_L00_00376600();
-extern int func_L00_003769C0();
-extern int func_002FA880();
-extern void func_L00_00377330();
-extern int func_L00_00377580();
-extern int func_L00_003778F0();
-extern int func_L00_00377C50();
-extern int func_L00_003781B0();
-extern int func_L00_00378388();
-extern int func_L00_00378578();
-extern int func_L00_00378818();
-extern int func_L00_00378C18();
-extern int func_L00_00378DE0();
-extern void func_L00_00378E90();
-extern void func_002FAE68();
-extern int func_002FB1A0();
+extern int math_ping_pong_blend_values();
+extern void text_draw_scrolling_help();
+extern int DrawVendorItemSelectList();
+extern int DrawAmmoSelectList();
+extern int shop_draw_item_icon_strip();
+extern int shop_draw_vendor_item_list();
+extern int DrawVendorPurchasePrompt();
+extern void shop_draw_price_and_description();
+extern int shop_draw_upgrade_price_lines();
+extern int DrawSelectedItemInfoPanel();
+extern int DrawPurchaseActionPrompts();
+extern int DrawItemPurchaseButtonLabels();
+extern int shop_draw_buy_back_labels();
+extern int DrawSelectedItemPurchasePanel();
+extern int DrawVendorPurchasePanel();
+extern int DrawPurchaseAffordabilityPrompt();
+extern int DrawSelectedItemLimitStatus();
+extern void shop_draw_item_limit_text_box();
+extern void shop_step_message_states();
+extern int PrepareVendorSelectionPreview();
 extern void ref_L00_0037A610_00();
-extern void func_002FC220();
-extern void func_002FC280(void);
-extern void func_002FC3C0();
-extern void func_002FC560(int, unsigned long long);
-extern void func_002FC620();
-extern void func_002FC990();
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern int func_00336D50();
+extern void gfx_swap_packet_buffer();
+extern void SubmitBufferedDmaChain(void);
+extern void gfx_wait_for_dma_status_bits();
+extern void VU1_addGSregister(int, unsigned long long);
+extern void gfx_set_scissor_clamped();
+extern void gfx_upload_image_to_gs_packets();
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern int table_find_by_id();
 /* Initialize the selected menu view, draw its layered background, then render its models. */
-void func_L00_0037A610(void)
+void shop_draw_purchase_menu_scene(void)
 {
     int ids[4];
     Pair pair;
@@ -127,7 +127,7 @@ void func_L00_0037A610(void)
     int red, green, blue, color;
     float scale;
     int handle;
-    AppendDrawListBufferTag(0);
+    gfx_append_draw_list_buffer_tag(0);
     D_L00_001BD370[0] = 0.62f;
     UpdateViewContext();
 
@@ -145,13 +145,13 @@ void func_L00_0037A610(void)
         {
             menu->state = 1;
             menu->initialize = 0;
-            WaitForDmaStatusBits(1);
-            GetGsCurrentField(0);
+            gfx_wait_for_dma_status_bits(1);
+            sceGsSyncV(0);
             D_L00_001B18D8 = D_L00_001B18D8 + 1;
             SubmitBufferedDmaChain();
-            SwapPacketBuffer();
+            gfx_swap_packet_buffer();
             D_L00_001B2610 = 0x60000;
-            DrawItemWithPass(menu->capture);
+            gfx_draw_item_with_pass(menu->capture);
             if (menu->use_camera) {
                 qcopy(&menu->saved, D_L00_001B8DD0);
                 /* Save the three camera basis vectors before resetting the view. */
@@ -169,7 +169,7 @@ void func_L00_0037A610(void)
                 D_L00_001B8C80.y = 1;
                 D_L00_001B8C80.z = 1;
                 D_L00_001B8C80.w = 1;
-                BuildViewMatrices();
+                gfx_build_view_matrices();
             }
             {
                 char * base = menu->buffer;
@@ -177,7 +177,7 @@ void func_L00_0037A610(void)
                 menu->preview0 = base;
                 menu->models = base + 0x1000;
                 menu->text = base + 0x2400;
-                FastMemoryHelperB(base + 0x2400, 0x400);
+                mem_fast_helper_b(base + 0x2400, 0x400);
             }
             menu->field94 = 0;
             menu->field90 = 0;
@@ -186,14 +186,14 @@ void func_L00_0037A610(void)
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
-        UploadImageToGsPackets(menu->capture, D_001A72DC[0], gScreenHeight[0] << 11);
+        gfx_upload_image_to_gs_packets(menu->capture, D_001A72DC[0], g_screen_height[0] << 11);
         SetupGifPaging(0);
-        BuildViewMatrices();
-        WriteClearColorPackets();
+        gfx_build_view_matrices();
+        gfx_write_clear_color_packets();
         if (D_L00_001AD570 >= 1.0f && menu->draw) {
             DrawMobysSetup();
-            FillScratchArea();
-            SaveScratchArea();
+            mem_fill_scratch_area();
+            mem_save_scratch_area();
         }
         VU1_addGSregister(0x42, 0x8000000044ULL);
         {
@@ -228,19 +228,19 @@ void func_L00_0037A610(void)
             ids[1] = 0x7a;
             ids[2] = 0x7b;
         }
-        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[0]);
-        DrawScaledObjectTwoAxes(handle, (red << 24) | 0x442d00, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
-        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[1]);
-        DrawScaledObjectTwoAxes(handle, (green << 24) | 0x241700, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
-        handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[2]);
+        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[0]);
+        gfx_draw_scaled_object_two_axes(handle, (red << 24) | 0x442d00, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
+        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[1]);
+        gfx_draw_scaled_object_two_axes(handle, (green << 24) | 0x241700, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
+        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[2]);
         color = (blue << 24) | 0xf0c070;
-        DrawScaledObjectTwoAxes(handle, color, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
+        gfx_draw_scaled_object_two_axes(handle, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         if (menu->mode != 1) {
-            handle = FindTableEntryById(D_L00_001A904C + 0x8710, ids[3]);
-            DrawScaledObjectTwoAxes(handle, color, (float)(gScreenWidth[0] >> 1), (float)(gScreenHeight[0] >> 1), scale, scale, 0.0f);
+            handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[3]);
+            gfx_draw_scaled_object_two_axes(handle, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         }
-        UpdateHudRecordHandlers();
-        RunLevelCallbacksAndDraw();
+        hud_update_record_handlers();
+        level_run_callbacks_and_draw();
         if (D_L00_001AD570 >= 1.0f) {
             ref_L00_0037A610_00();
             if (menu->mode == 0) {
@@ -248,26 +248,26 @@ void func_L00_0037A610(void)
                 DrawPurchaseActionPrompts();
                 DrawVendorPurchasePanel();
                 DrawVendorItemSelectList();
-                DrawScrollingHelpText();
+                text_draw_scrolling_help();
                 if (menu->auxiliary)
-                    StepShopMessageStates();
+                    shop_step_message_states();
                 if (menu->draw) {
-                    SetGsScissorClamped(158, 360, 115, 206);
-                    UploadObjectTextures(menu->models, 1);
-                    RestoreScratchArea();
-                    RunTextureUploadAndSetup();
+                    gfx_set_scissor_clamped(158, 360, 115, 206);
+                    tex_upload_object_textures(menu->models, 1);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 3) {
-                DrawSelectedItemPriceAndDescription();
+                shop_draw_price_and_description();
                 DrawItemPurchaseButtonLabels();
                 DrawPurchaseAffordabilityPrompt();
-                DrawItemIconStrip();
-                DrawScrollingHelpText();
+                shop_draw_item_icon_strip();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
-                    InitRecordFromObject(menu->models, menu->models + 0x100);
+                    gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
+                    level_init_record_from_object(menu->models, menu->models + 0x100);
                     pair = D_L00_001AD858[0];
-                    TransformMatrixArray(menu->models, 2, &pair, matrices);
+                    mat_transform_array(menu->models, 2, &pair, matrices);
                     {
                         char * models = menu->models;
                         qcopy(models + 0x210, matrices + 0x30);
@@ -278,45 +278,45 @@ void func_L00_0037A610(void)
                     copy_matrix3x4(menu->models + 0x3c0, matrices + 0x40);
                     func_002A10E8(menu->models + 0x200);
                     func_002A10E8(menu->models + 0x300);
-                    UploadObjectTextures(menu->models, menu->count + 2);
-                    RestoreScratchArea();
-                    RunTextureUploadAndSetup();
+                    tex_upload_object_textures(menu->models, menu->count + 2);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 2) {
                 DrawSelectedItemPurchasePanel();
-                DrawItemLimitTextBox();
-                DrawVendorItemList();
-                DrawScrollingHelpText();
+                shop_draw_item_limit_text_box();
+                shop_draw_vendor_item_list();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    SetGsScissorClamped(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
-                    handle = PingPongBlendValues(0xffffff, 0x606060, 30, 1, 0);
+                    gfx_set_scissor_clamped(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
+                    handle = math_ping_pong_blend_values(0xffffff, 0x606060, 30, 1, 0);
                     if (menu->selected0 != -1)
-                        PackRenderCommandFields(menu->models + (menu->selected0 << 8), handle, 14, 14, 0);
+                        gfx_pack_render_command_fields(menu->models + (menu->selected0 << 8), handle, 14, 14, 0);
                     if (menu->selected1 != -1)
-                        PackRenderCommandFields(menu->models + (menu->selected1 << 8), handle, 14, 14, 0);
-                    UploadObjectTextures(menu->models, menu->count);
-                    RestoreScratchArea();
-                    RunTextureUploadAndSetup();
-                    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
+                        gfx_pack_render_command_fields(menu->models + (menu->selected1 << 8), handle, 14, 14, 0);
+                    tex_upload_object_textures(menu->models, menu->count);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
+                    gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
                     DrawSelectedItemInfoPanel();
                 }
             } else if (menu->mode == 1) {
-                DrawUpgradePriceLines();
-                DrawBuyBackLabelsByBolts();
+                shop_draw_upgrade_price_lines();
+                shop_draw_buy_back_labels();
                 DrawSelectedItemLimitStatus();
                 DrawAmmoSelectList();
-                DrawScrollingHelpText();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    SetGsScissorClamped(158, 360, 115, 206);
-                    UploadObjectTextures(menu->models, 1);
-                    RestoreScratchArea();
-                    RunTextureUploadAndSetup();
+                    gfx_set_scissor_clamped(158, 360, 115, 206);
+                    tex_upload_object_textures(menu->models, 1);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             }
-            SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
+            gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
         }
         DoGifPaging();
-        WaitForDmaStatusBits(16);
+        gfx_wait_for_dma_status_bits(16);
         PatchMobyGifs();
         break;
     }

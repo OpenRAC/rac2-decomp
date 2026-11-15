@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned char D_L05_001B2000;
 extern unsigned char D_L05_001B2001;
@@ -18,7 +19,7 @@ extern float D_L05_001B3640 __attribute__((sda));
 extern int D_L05_001B3644;
 
 /* Saves a copy of the ship's current settings so they can be put back later. */
-void func_L05_00442720(void)
+void ship_save_settings(void)
 {
     unsigned int byte0 = D_L05_001B2000;
     unsigned int byte1 = D_L05_001B2001;

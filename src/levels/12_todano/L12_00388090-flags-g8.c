@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 extern double D_L12_001AEC40 __attribute__((sda));
@@ -15,7 +16,7 @@ extern void func_00364DF8(int, int, void *);
 extern void func_00329F80(void *, int, int);
 extern void func_314008(void *);
 /* Moby class 4871 update. Waits for a hit, then plays its effect and sound. */
-void func_L12_00388090(unsigned char *a0) {
+void hit_trigger_update(unsigned char *a0) {
     unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
 
     switch (a0[0x20]) {

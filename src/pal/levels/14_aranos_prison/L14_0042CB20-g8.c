@@ -65,21 +65,21 @@ typedef struct {
     char pad32C[0x338 - 0x32C];
     short h338;
 } PrisonGuardVars;
-extern float func_002B0178(void *position, void *owner, void *output);
-extern float func_00282E48(void *, void *);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(void *, int, int);
+extern float coll_get_ground_distance_below(void *position, void *owner, void *output);
+extern float fast_vec_dist(void *, void *);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_002A93B0(void *);
+extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(char *object, char *state, int special);
-extern void func_L14_004286F8(unsigned char *);
-extern int func_002B3BA8(char *self, int index, void *point, int force, float range, float height);
-extern void func_002AFFD8(char *a0, char *a1, int a2);
-extern int D_001A79F0[] __attribute__((sda));
+extern void group_marker_alert_guards(unsigned char *);
+extern int weapon_select_aim_target(char *self, int index, void *point, int force, float range, float height);
+extern void cam_compute_view_direction(char *a0, char *a1, int a2);
+extern int g_current_map_index[] __attribute__((sda));
 extern int D_L14_001A8FF0;
 extern float D_L14_001B18B0 __attribute__((sda));
 extern char *D_L14_001B2200[] __attribute__((sda));
@@ -92,20 +92,20 @@ void func_PAL_L14_0042D918(char *self)
     int hit;
 
     if (B(self, 0x20) == 0) {
-        if (D_001A79F0[0] == 2 && F(self, 0x18) > 400.0f) {
+        if (g_current_map_index[0] == 2 && F(self, 0x18) > 400.0f) {
             if (D_L14_001A8FF0 == 0)
                 return;
-            func_002B0178(self + 0x10, self, self + 0x10);
+            coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
             s->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
-            s->f90 = func_00282E48(self + 0x10, D_L14_001B2210) - 1.5f;
+            s->f90 = fast_vec_dist(self + 0x10, D_L14_001B2210) - 1.5f;
         } else {
             W(self, 0x9C) = 12;
             s->f90 = F(self, 0x18) - 1.0f;
         }
         if (s->i210 == -1) {
-            func_0029F338(self);
+            moby_mark_spawned(self);
             return;
         }
         {
@@ -116,10 +116,10 @@ void func_PAL_L14_0042D918(char *self)
                 s->i218 = -1;
             }
         }
-        s->f324 = func_002A7878(1.0f, 1.333f);
+        s->f324 = math_random_float_range(1.0f, 1.333f);
         F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * s->f324;
-        s->b48 = func_00283CF0(15.0f);
-        s->b4A = func_00283CF0(6.4f);
+        s->b48 = FloatToInt(15.0f);
+        s->b4A = FloatToInt(6.4f);
         s->i98 = 3;
         s->f80 = 0.2f;
         s->f84 = 0.2f;
@@ -135,22 +135,22 @@ void func_PAL_L14_0042D918(char *self)
         s->f110 = 1.5707964897155762f;
         s->f130 = 0.523598849773407f;
         s->i138 |= 0x280;
-        s->f1DC = func_002A78D8(18.0f, 22.0f) * 0.01745329424738884f;
+        s->f1DC = math_random_signed_float_range(18.0f, 22.0f) * 0.01745329424738884f;
         s->b1E8 = 7;
         s->b1E9 = 6;
         s->h1E2 = 100;
         s->h1E4 = 150;
         s->f1D4 = 3.0f;
         s->f1D0 = D_L14_001B18B0 * 0.020000001f;
-        s->f328 = func_002A7940();
+        s->f328 = math_random_angle();
         if (s->i214 != 0) {
             UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
             W(self, 0x98) = 0;
-            func_002A7750(self, 13, 4);
+            moby_set_state(self, 13, 4);
             if (B(self, 0x43) != 10)
                 func_PAL_002A7E68(self, 10, 0, 0);
         } else {
-            func_002A7750(self, 1, 0);
+            moby_set_state(self, 1, 0);
             if (B(self, 0x43) != 0)
                 func_PAL_002A7E68(self, 0, 0, 0);
         }
@@ -158,21 +158,21 @@ void func_PAL_L14_0042D918(char *self)
     }
 
     if (B(self, 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L14_001B9500) < 24.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
+            moby_update_ground_check(self);
             B(self, 0x6F) = 22;
         }
     }
     hit = func_PAL_002B1A50(self, s->area50, 0);
     if (hit != 0) {
-        func_L14_004286F8((unsigned char *)self);
+        group_marker_alert_guards((unsigned char *)self);
         if (hit >= 4)
-            func_002A7750(self, 12, -1);
+            moby_set_state(self, 12, -1);
     }
     if (B(self, 0x20) != 12 && s->i1D8 == 1)
-        func_002A7750(self, 12, -1);
+        moby_set_state(self, 12, -1);
     if ((u8)(B(self, 0x95) - 3) >= 2)
-        s->h314 = func_002B3BA8(self, s->i210, 0, 0, 16.0f, 0.0f);
+        s->h314 = weapon_select_aim_target(self, s->i210, 0, 0, 16.0f, 0.0f);
     if (s->h338 != 0)
-        func_002AFFD8(self + 0x10, s->area300, 0);
+        cam_compute_view_direction(self + 0x10, s->area300, 0);
 }

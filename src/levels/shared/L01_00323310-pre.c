@@ -1,3 +1,4 @@
+#include "names.h"
 /* Unless 0x48 already holds the key with no pending value at 0x3C, stores the key at 0x48
    when 0x4E and 0x96 are clear, and otherwise queues it at 0x3C/0x3E. Own unit:
    -frac2-gcse-unsplit-edges lets PRE share the table's high half between the head and
@@ -7,7 +8,7 @@ typedef unsigned char u8;
 extern u8 D_L01_001A63A8[];
 
 /* Queues a request key and value in a small table, unless the same key is already set and nothing is waiting. */
-void func_L01_00323310(int requestKey, int requestValue)
+void script_queue_keyed_request(int requestKey, int requestValue)
 {
     u8 *requestTable = D_L01_001A63A8;
 

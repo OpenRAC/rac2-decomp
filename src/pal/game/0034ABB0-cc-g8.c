@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_0034ABB0, the PAL copy of func_003489E8: the same C, where rename func_002A9588 becomes func_PAL_002A9FA0. */
 
 /* Menu list update: shows the widgets for the current mode, places the five fixed widgets and
@@ -22,13 +23,13 @@ typedef struct { int enabled[7]; } EnabledSet; /* at menu + 0x418, one per list 
 extern float D_001AE5EC __attribute__((sda));
 extern const float D_001AE760[10] __attribute__((section(".sdata")));
 
-extern void func_00335E68(void *, int);
-extern void func_003363C0(void *, float);
-extern int func_00335E10(void *);
-extern int func_00335E20(void *);
-extern void func_00335F88(void *, float, float, float, float);
+extern void object_set_flag_value(void *, int);
+extern void object_set_value_float(void *, float);
+extern int object_get_first_field(void *);
+extern int object_get_fourth_field(void *);
+extern void object_set_second_float4(void *, float, float, float, float);
 extern int func_PAL_002A9FA0(int, int, int, int, int);
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 
 static inline void WrapLow(int *index, int last)
 {
@@ -51,71 +52,71 @@ int func_PAL_0034ABB0(u8 *m, int pad)
     EnabledSet *flags;
     int step, i = 0, v = 0, start = 0, lim = 0;
 
-    func_00335E68(m, MODE == 0);
-    func_00335E68(w98, MODE == 0);
-    func_00335E68(w4C, MODE == 0);
-    func_00335E68(m + 0xE4, MODE == 0);
-    func_00335E68(w130, MODE == 0);
-    func_00335E68(w17C, MODE == 1);
-    func_00335E68(w1C8, MODE == 1);
-    func_003363C0(w17C, D_001AE5EC);
-    func_003363C0(w1C8, D_001AE5EC);
+    object_set_flag_value(m, MODE == 0);
+    object_set_flag_value(w98, MODE == 0);
+    object_set_flag_value(w4C, MODE == 0);
+    object_set_flag_value(m + 0xE4, MODE == 0);
+    object_set_flag_value(w130, MODE == 0);
+    object_set_flag_value(w17C, MODE == 1);
+    object_set_flag_value(w1C8, MODE == 1);
+    object_set_value_float(w17C, D_001AE5EC);
+    object_set_value_float(w1C8, D_001AE5EC);
 
     if (MODE == 0 && *(int *)(m + 0x4b8) != 0) {
-        func_003363C0(m, 1.0f);
-        func_003363C0(m + 0x98, 1.0f);
-        func_003363C0(m + 0x4C, 1.0f);
-        func_003363C0(m + 0x130, 1.0f);
+        object_set_value_float(m, 1.0f);
+        object_set_value_float(m + 0x98, 1.0f);
+        object_set_value_float(m + 0x4C, 1.0f);
+        object_set_value_float(m + 0x130, 1.0f);
         c = m + 0x98;
         b = m + 0x4C;
         a = m + 0x130;
         ORG[1] = 170.0f;
     } else {
-        func_003363C0(m, 0.0f);
-        func_003363C0(m + 0x98, 0.0f);
-        func_003363C0(m + 0x4C, 0.0f);
-        func_003363C0(m + 0x130, 0.0f);
+        object_set_value_float(m, 0.0f);
+        object_set_value_float(m + 0x98, 0.0f);
+        object_set_value_float(m + 0x4C, 0.0f);
+        object_set_value_float(m + 0x130, 0.0f);
         c = m + 0x98;
         b = m + 0x4C;
         a = m + 0x130;
         ORG[1] = 190.0f;
     }
 
-    p = ((float *)func_00335E10(m));
+    p = ((float *)object_get_first_field(m));
     p[0] = D_001AE760[0] + ORG[0];
     p[1] = D_001AE760[1] + ORG[1];
-    p = ((float *)func_00335E10(a));
+    p = ((float *)object_get_first_field(a));
     p[0] = D_001AE760[2] + ORG[0];
     p[1] = D_001AE760[3] + ORG[1];
-    p = ((float *)func_00335E10(b));
+    p = ((float *)object_get_first_field(b));
     p[0] = D_001AE760[4] + ORG[0];
     p[1] = D_001AE760[5] + ORG[1];
-    p = ((float *)func_00335E10(c));
+    p = ((float *)object_get_first_field(c));
     p[0] = D_001AE760[6] + ORG[0];
     p[1] = D_001AE760[7] + ORG[1];
-    p = ((float *)func_00335E10(m + 0xE4));
+    p = ((float *)object_get_first_field(m + 0xE4));
     p[0] = D_001AE760[8] + ORG[0];
     p[1] = D_001AE760[9] + ORG[1];
 
     for (i = 0; i < *(int *)(m + 0x4b4); i++) {
         u8 *row = m + 0x218 + i * 0x58;
 
-        p = ((float *)func_00335E10(row));
+        p = ((float *)object_get_first_field(row));
         p[0] = ((float *)(*(int *)(m + 0x484) + i * 12))[0] + ORG[0];
         p[1] = ((float *)(*(int *)(m + 0x484) + i * 12))[1] + ORG[1];
-        func_00335F88(row, ((float *)(*(int *)(m + 0x484) + i * 12))[2], 0.0f, 0.0f, 0.0f);
+        object_set_second_float4(row, ((float *)(*(int *)(m + 0x484) + i * 12))[2], 0.0f, 0.0f, 0.0f);
         if (*(int *)(m + 0x488 + i * 4) != 0)
-            *((unsigned int *)func_00335E20(row)) = 0x80F0F0F0;
+            *((unsigned int *)object_get_fourth_field(row)) = 0x80F0F0F0;
         else
-            *((unsigned int *)func_00335E20(row)) = 0x80808080;
+            *((unsigned int *)object_get_fourth_field(row)) = 0x80808080;
     }
 
     step = 0;
     if (pad & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         step = -1;
     } else if (pad & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         step = 1;
     }
     if (step != 0) {
@@ -135,7 +136,7 @@ int func_PAL_0034ABB0(u8 *m, int pad)
                 break;
         } while (start != *(int *)(m + 0x4ac));
     }
-    func_003363C0(m + 0xE4, (float)*(int *)(m + 0x4ac));
-    *((unsigned int *)func_00335E20(m + (*(int *)(m + 0x4ac) * 0x58 + 0x218))) = 0x70FFFEED;
+    object_set_value_float(m + 0xE4, (float)*(int *)(m + 0x4ac));
+    *((unsigned int *)object_get_fourth_field(m + (*(int *)(m + 0x4ac) * 0x58 + 0x218))) = 0x70FFFEED;
     return *(int *)(m + 0x4ac);
 }

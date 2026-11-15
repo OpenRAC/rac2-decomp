@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002900B8 (1,388 bytes, 28 places): a HUD panel with two scale bars and three text rows.
  * Own unit: -O2 -G8 -fno-expensive-optimizations -ffunction-sections -frac2-keep-block-order
  * -frac2-cse2-keep-multi-set-reg -frac2-cse-arg-hard-reg -frac2-reload-cse-branch-to-next
@@ -8,11 +9,11 @@
  */
 #include "common.h"
 
-extern int D_001A9000 __attribute__((sda));
-extern int D_001A9004 __attribute__((sda));
-extern float D_001A9008 __attribute__((sda));
-extern int D_001A900C __attribute__((sda));
-extern int D_001A9010 __attribute__((sda));
+extern int g_gauge_popup_blend __attribute__((sda));
+extern int g_gauge_popup_mode __attribute__((sda));
+extern float g_gauge_popup_amount __attribute__((sda));
+extern int g_gauge_popup_color_a __attribute__((sda));
+extern int g_gauge_popup_color_b __attribute__((sda));
 
 typedef struct {
     int active;
@@ -28,16 +29,16 @@ typedef struct {
 } Hud_002900B8;
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern Subtitle_002900B8 D_00254E78;
+extern Subtitle_002900B8 g_subtitle_state;
 extern Hud_002900B8 D_001B9040;
 extern float D_001B23A4[] __attribute__((sda));
 extern int D_001A8D40 __attribute__((sda));
-extern void func_0027AB40(void);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
-extern char *func_00336D50(char *, int);
-extern void func_00300A00(char *, int, float, float, float, float, float);
-extern void func_0027DE50(int, int, int, int, unsigned long);
+extern void UpdateViewContext(void);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
+extern char *table_find_by_id(char *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
+extern void gfx_draw_colored_rectangle(int, int, int, int, unsigned long);
 
 extern int D_001B23A0;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -75,7 +76,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 }
 
 /* Draws the gauge pop-up: a dark panel with scale bars filled up to the current amount. */
-int func_002900B8(void)
+int gauge_popup_draw(void)
 {
     float savedOpacity;
     float blend;
@@ -88,25 +89,25 @@ int func_002900B8(void)
     int one;
     float half;
 
-    if (D_001A8CFC[0] != 0 && gSubtitleState.active == 0 && gSubtitleState.unk24 == -1) {
+    if (D_001A8CFC[0] != 0 && g_subtitle_state.active == 0 && g_subtitle_state.unk24 == -1) {
         one = 1;
         half = 0.5f;
         savedOpacity = D_001B9040.opacity;
         D_001B9040.opacity = 0.62f;
         UpdateViewContext();
-        blend = IntToFloat(gGaugePopupBlend) * 0.1f;
+        blend = IntToFloat(g_gauge_popup_blend) * 0.1f;
         backColor = FastTweenColor(0x442D00, 0x60442D00, blend);
         frameColor = FastTweenColor(0xF0C070, 0x55F0C070, blend);
-        panelTexture = FindTableEntryById(D_001A8CFC[0] + 0x8710, 0xA6);
+        panelTexture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA6);
         y = (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one);
         scale = 1.0f;
         zero = 0.0f;
-        DrawScaledObjectTwoAxes(panelTexture, backColor, 484.0f, y, scale, scale, zero);
-        panelTexture = FindTableEntryById(D_001A8CFC[0] + 0x8710, 0xA7);
-        DrawScaledObjectTwoAxes(panelTexture, frameColor, 484.0f, (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
-        switch (gGaugePopupMode) {
+        gfx_draw_scaled_object_two_axes(panelTexture, backColor, 484.0f, y, scale, scale, zero);
+        panelTexture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA7);
+        gfx_draw_scaled_object_two_axes(panelTexture, frameColor, 484.0f, (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
+        switch (g_gauge_popup_mode) {
         case 0:
-            if (zero <= gGaugePopupAmount && gGaugePopupAmount <= scale) {
+            if (zero <= g_gauge_popup_amount && g_gauge_popup_amount <= scale) {
                 int color1;
                 int color2;
                 int top;
@@ -118,10 +119,10 @@ int func_002900B8(void)
                 float edge2;
                 float s;
 
-                color1 = FastTweenColor(gGaugePopupColorA & 0xFFFFFF, gGaugePopupColorA, blend);
-                color2 = FastTweenColor(gGaugePopupColorB & 0xFFFFFF, gGaugePopupColorB, blend);
+                color1 = FastTweenColor(g_gauge_popup_color_a & 0xFFFFFF, g_gauge_popup_color_a, blend);
+                color2 = FastTweenColor(g_gauge_popup_color_b & 0xFFFFFF, g_gauge_popup_color_b, blend);
                 s = D_001B23A4[0];
-                top = hud_coord((float)(285 - (int)((scale - gGaugePopupAmount) * 157.0f)), s, half, one);
+                top = hud_coord((float)(285 - (int)((scale - g_gauge_popup_amount) * 157.0f)), s, half, one);
                 s = (float)hud_coord(128.0f, D_001B23A4[0], half, one);
                 step = s * 0.25f;
                 lower = (float)hud_coord(285.0f, D_001B23A4[0], half, one);
@@ -131,7 +132,7 @@ int func_002900B8(void)
                     scale = (float)top;
                     if (upper <= scale)
                         upper = scale;
-                    DrawColoredRectangle((int)upper, (int)lower, 477, 489, color1);
+                    gfx_draw_colored_rectangle((int)upper, (int)lower, 477, 489, color1);
                     lower -= step;
                     upper -= step;
                     if (lower <= scale)
@@ -144,7 +145,7 @@ int func_002900B8(void)
                 for (i = 0; i < 5; i++) {
                                         if ((float)top <= lower)
                         lower = (float)top;
-                    DrawColoredRectangle((int)upper, (int)lower, 476, 488, color2);
+                    gfx_draw_colored_rectangle((int)upper, (int)lower, 476, 488, color2);
                     upper += step;
                     lower += step;
                     if ((float)top <= upper)
@@ -164,9 +165,9 @@ int func_002900B8(void)
             float s;
             float edge;
 
-            color = FastTweenColor(gGaugePopupColorA & 0xFFFFFF, gGaugePopupColorA, blend);
+            color = FastTweenColor(g_gauge_popup_color_a & 0xFFFFFF, g_gauge_popup_color_a, blend);
             s = D_001B23A4[0];
-            top = hud_coord((float)(285 - (int)((1.0f - gGaugePopupAmount) * 157.0f)), s, 0.5f, 1);
+            top = hud_coord((float)(285 - (int)((1.0f - g_gauge_popup_amount) * 157.0f)), s, 0.5f, 1);
             s = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, 1);
             step = s * 0.25f;
             lower = (float)hud_coord(285.0f, D_001B23A4[0], 0.5f, 1);
@@ -176,7 +177,7 @@ int func_002900B8(void)
                 limit = (float)top;
                 if (upper <= limit)
                     upper = limit;
-                DrawColoredRectangle((int)upper, (int)lower, 476, 488, color);
+                gfx_draw_colored_rectangle((int)upper, (int)lower, 476, 488, color);
                 lower -= step;
                 upper -= step;
                 if (lower <= limit)

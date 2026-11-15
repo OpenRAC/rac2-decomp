@@ -1,31 +1,31 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
-extern char D_00189E20[];
+extern char g_hero_state[];
 typedef union { u8 b[0x2600]; short h[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; Quad q[0x260]; } Hero;
 #define H ((Hero *)D_00189E20)
 extern int D_001A8CA0 __attribute__((sda)), D_001A8CA4;
 extern unsigned int D_00138320 __attribute__((section(".data")));
-extern float D_001B5340[];
+extern float g_camera_eye_state[];
 #define CAMERA_BASIS (&D_001B5340[0x230 / 4])
-extern void func_00282D30(void *,void *,float);
-extern void func_002AFFD8(char *,char *,int);
-extern unsigned int func_0026F748(int,int);
-extern void func_00282F20(void *,void *,float);
-extern float func_00282DB0(void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern float func_00283198(float), func_00283180(float);
-extern void func_00283958(void *,void *);
-extern void func_00283738(void *,void *,void *);
-extern float func_00282DF0(void *);
-extern float func_002A7798(float);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_002AB1F0(u8 *);
+extern void FastVecScale(void *,void *,float);
+extern void cam_compute_view_direction(char *,char *,int);
+extern unsigned int stub_empty_8(int,int);
+extern void vec_scale_to_length(void *,void *,float);
+extern float FastVecDot(void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *,void *);
+extern void multiply_matrix3x3(void *,void *,void *);
+extern float FastVecLength(void *);
+extern float math_ease_out_quad(float);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern int moby_get_private_value_0(u8 *);
 
 /* Works out the launch velocity to throw something from a start point to a target (or where the player aims). */
-void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
+void CalculateAimedLaunchVelocity(Vector *output, Vector *origin, char *targetObject,
                    float minimum, float maximum,
                    float speed, float acceleration, char *sourceObject)
 {
@@ -53,10 +53,10 @@ void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
     output->f[0]=1.0f; output->f[1]=0.0f; output->f[2]=0.0f; output->f[3]=0.0f;
     if(H->h[0x348/2]!=0 && D_001A8CA4==0)
         FastVecScale(&normal,H->ptr[0x2290/4]+0xe0,-1.0f);
-    else ComputeViewDirection((char *)&sourcePosition,(char *)&normal,0);
+    else cam_compute_view_direction((char *)&sourcePosition,(char *)&normal,0);
     reach=maximum;
     if(!targetObject) {
-        if(H->i[0x2294/4]==1) EmptyStubF748(29,1);
+        if(H->i[0x2294/4]==1) stub_empty_8(29,1);
         if((D_00138320&4)!=0 && H->b[0x22bc]==0) {
             vec_scale_to_length(&forward,CAMERA_BASIS,1.0f);
             projection=FastVecDot(&forward,&normal);
@@ -65,25 +65,25 @@ void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
             vec_scale_to_length(&projected,&projected,1.0f);
             FastVecCross(&axis,&forward,&projected);
             angle=FastVecDot(&forward,&projected)*0.5f;
-            FastVecScale(&quaternion,&axis,FastSinOrCosB(angle));
-            quaternion.f[3]=FastSinOrCosA(angle);
+            FastVecScale(&quaternion,&axis,math_fast_sin_or_cos_b(angle));
+            quaternion.f[3]=math_fast_sin_or_cos_a(angle);
             quaternion_to_rotation_basis(&quaternion,rotation);
             multiply_matrix3x3(orientedBasis,rotation,CAMERA_BASIS);
             planeOffset=-FastVecDot(&sourcePosition,&normal);
             vec_scale_to_length(&testVector,CAMERA_BASIS,1.0f);
             projection=FastVecDot(&normal,&testVector);
             if(projection>0.0f) {
-                factor=(FastVecDot(&normal,gCameraState_001B5340)+planeOffset)/projection;
+                factor=(FastVecDot(&normal,g_camera_eye_state)+planeOffset)/projection;
                 FastVecScale(&testVector,&testVector,factor);
-                FastVecSub(&testVector,gCameraState_001B5340,&testVector);
-                FastVecSub(&testVector,&testVector,gCameraState_001B5340);
+                FastVecSub(&testVector,g_camera_eye_state,&testVector);
+                FastVecSub(&testVector,&testVector,g_camera_eye_state);
                 FastVecScale(&temporary,&normal,FastVecDot(&testVector,&normal));
                 FastVecSub(&projected,&testVector,&temporary);
                 reach=FastVecLength(&projected);
                 if(maximum<reach) reach=maximum;
                 else if(reach<minimum) reach=minimum;
             }
-            reach=maximum*EaseOutQuad(reach/maximum);
+            reach=maximum*math_ease_out_quad(reach/maximum);
             matrix_mul_vec3(output,output,orientedBasis);
         } else {
             matrix_mul_vec3(output,output,sourceBasis);
@@ -92,7 +92,7 @@ void func_002FDF40(Vector *output, Vector *origin, char *targetObject,
         FastVecAdd(&target,output,&sourcePosition);
     } else {
         if((unsigned)(*(unsigned short *)(targetObject+0xaa)-0xa8d /* Swamp Monster I Arm or Eye */)<=1 &&
-            (targetData=(float *)GetMobyPrivateValue0((u8 *)targetObject))!=0 && targetData[0]>0.0f) {
+            (targetData=(float *)moby_get_private_value_0((u8 *)targetObject))!=0 && targetData[0]>0.0f) {
             if(D_001A8CA0!=0 || H->h[0x348/2]!=0) {
                 FastVecScale(&quaternion,targetObject+0xe0,targetData[4]);
                 FastVecAdd(&target,targetObject+0x10,&quaternion);

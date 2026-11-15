@@ -22,7 +22,7 @@ extern u32 D_001AF24C __attribute__((sda));
 extern u32 D_001AF254 __attribute__((sda));
 extern u32 D_001AF258 __attribute__((sda));
 extern u32 D_001AF25C __attribute__((sda));
-extern char D_001B5340[];
+extern char g_camera_eye_state[];
 extern char D_001B24C0[] MACRO_ADDR;
 extern char D_002668D0[];
 extern char D_00267AF0[];
@@ -33,17 +33,17 @@ extern char D_00268C10[];
 extern char D_00229C70[];
 extern short D_001AF210[] SDATA(D_001AF210);
 extern int D_001B24D0;
-extern s64 func_0027C878(int);
-extern void func_002FC560(int,u64);
-extern void func_00282CC0(void *,void *,void *), func_00282CF0(void *,void *,void *), func_00282DD8(void *,void *,void *), func_002830C0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float), func_00282D30(void *,void *,float), func_00282F70(void *,void *,float);
-extern void func_00280328(void), func_00281810(int,void *,void *,void *,int), func_00280B90(void *,void *,int);
-extern int func_00283CF0(float), func_00312E10(unsigned char *);
-extern float func_00283D00(float,float);
-extern void func_002B00D8(void *,void *,void *,float);
+extern s64 GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(int,u64);
+extern void FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *), FastVecCross(void *,void *,void *), transform_vector(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float), FastVecScale(void *,void *,float), vec_fast_normalize_helper(void *,void *,float);
+extern void font_queue_vu_state(void), part_draw_glint_effect(int,void *,void *,void *,int), draw_world_quad(void *,void *,int);
+extern int FloatToInt(float), moby_is_state_one(unsigned char *);
+extern float fast_fmod(float,float);
+extern void gravity_offset_position(void *,void *,void *,float);
 /* Adapted from RAC1 draw_nanotech_ball (GPL-3.0); RAC2 selects alternate colors and owner geometry. */
 /* Draws a nanotech ball: a glowing sphere with a pulsing halo and a shiny environment reflection. */
-void func_003146C0(unsigned char *moby) {
+void draw_nanotech_ball(unsigned char *moby) {
     BallQuad quad;
     float basis[4] __attribute__((aligned(16)));
     float *forward;
@@ -79,16 +79,16 @@ void func_003146C0(unsigned char *moby) {
         unsigned char *parent = *(unsigned char **)(moby + 0xB8);
         qcopy(moby + 0x10, parent + 0x10);
         qcopy(vars + 0x10, parent + 0x10);
-        OffsetPositionAlongGravity(moby + 0x10, vars + 0x10, vars + 0x10, -0.5f);
+        gravity_offset_position(moby + 0x10, vars + 0x10, vars + 0x10, -0.5f);
     }
     forward = basis;
     center[0] = *(float *)(moby + 0x10);
     center[1] = *(float *)(moby + 0x14);
     center[2] = *(float *)(moby + 0x18);
-    OffsetPositionAlongGravity(moby + 0x10, center, center, -0.5f - *(float *)vars);
+    gravity_offset_position(moby + 0x10, center, center, -0.5f - *(float *)vars);
     center[3] = 1.0f;
     FastVecAdd(&center, &center, D_001B24C0);
-    FastVecSub(&to_camera, gCameraState_001B5340, &center);
+    FastVecSub(&to_camera, g_camera_eye_state, &center);
     vec_scale_to_length(forward, &to_camera, 1.0f);
     owner = *(unsigned char **)(moby + 0xB8);
     FastVecCross(&side, forward, owner + 0xE0);
@@ -121,9 +121,9 @@ void func_003146C0(unsigned char *moby) {
             sphere_colors[j] = quad.colors[0];
         }
     }
-    DrawGlintEffect(0x94, D_00229C70, sphere_colors, D_00267AF0, 1);
-    DrawGlintEffect(0x6d, D_00229C70 + 0x6d8, sphere_colors + 0x92, D_00267AF0 + 0x490, 1);
-    DrawGlintEffect(0x24, D_00229C70 + 0xbe8, sphere_colors + 0xFE, D_00267AF0 + 0x7f0, 1);
+    part_draw_glint_effect(0x94, D_00229C70, sphere_colors, D_00267AF0, 1);
+    part_draw_glint_effect(0x6d, D_00229C70 + 0x6d8, sphere_colors + 0x92, D_00267AF0 + 0x490, 1);
+    part_draw_glint_effect(0x24, D_00229C70 + 0xbe8, sphere_colors + 0xFE, D_00267AF0 + 0x7f0, 1);
     quad.texture[1] = GetEffectTextureDescriptor(0xb);
     quad.texture[3] = 0x8000000048ULL;
     color = FloatToInt(pulse * 64.0f + 128.0f);
@@ -163,7 +163,7 @@ void func_003146C0(unsigned char *moby) {
         quad.texcoords[7] = 1.0f;
         draw_world_quad(&quad, basis, 0);
     }
-    if (IsMobyInState1_00312E10(moby)) {
+    if (moby_is_state_one(moby)) {
         unsigned char *surface_owner;
         quad.texture[1] = GetEffectTextureDescriptor(D_001AF25C);
         quad.colors[3] = 0x107f7f7f;
@@ -194,10 +194,10 @@ void func_003146C0(unsigned char *moby) {
             corner = (char *)quad.points;
             for (j = 3; j >= 0; j--) {
                 transform_vector(corner, env_corners + (*row++) * 16, basis);
-                FastVecSub(view_dir, corner, gCameraState_001B5340);
+                FastVecSub(view_dir, corner, g_camera_eye_state);
                 corner += 16;
                 view_dir[1] = view_dir[2];
-                FastVectorNormalizeHelper(view_dir, view_dir, D_001AF260);
+                vec_fast_normalize_helper(view_dir, view_dir, D_001AF260);
                 *v = view_dir[0] * 0.5f + 0.5f;
                 *v = fast_fmod(*v, 8.0f);
                 v += 2;

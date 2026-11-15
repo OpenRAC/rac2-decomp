@@ -9,7 +9,7 @@ extern void func_002830C0_2(void *a, void *b, void *c);
 
 extern void func_00282D30_4(void *a, void *b, float value);
 
-extern void func_L00_002B8F00(void *a, void *b, int c, float p, float q, float r);
+extern void hero_apply_reference_tilt_rotation(void *a, void *b, int c, float p, float q, float r);
 
 extern void func_00282CF0_3(void *a, void *b, void *c);
 
@@ -113,20 +113,20 @@ typedef struct {
     float f24b8;
 } State9598;
 extern State9598 D_00189E20_9598;
-extern void func_L00_002B39F0(int, float);
-extern void func_L00_002B3EF8(int, float, float, float);
-extern void func_L00_002B54F8(float, float);
+extern void hero_resolve_stick_direction(int, float);
+extern void hero_steer_heading(int, float, float, float);
+extern void hero_build_move_impulse(float, float);
 extern void ref_L00_002B9598_0(int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282C48(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fabs(float);
 extern int D_00138354;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
-void func_L00_002B91C0(void)
+void hero_update_lean_reference(void)
 {
     u8 scratch[64];
     Vec4_F41eb487e A, B, C;
@@ -156,7 +156,7 @@ void func_L00_002B91C0(void)
         hi = lo;
     }
 
-    ApplyHeroReferenceTiltRotation(&A, scratch, 0, hi, lo, 0.0f);
+    hero_apply_reference_tilt_rotation(&A, scratch, 0, hi, lo, 0.0f);
 
     if (D_00189E20_5.b22C3 == 1 && D_00189E20_5.h34E != 0) {
         func_002830C0_2(&C, &C, scratch);
@@ -167,7 +167,7 @@ void func_L00_002B91C0(void)
 
 
 /* reads a scalar through DATA0 and, when it exceeds 0.001f, re-normalises the vector at DATA0 (and DATA0-112) from the elapsed float, clamping the amount at zero; otherwise it runs the plain refresh entry point. */
-void func_L00_002B94D8(float a0)
+void hero_shrink_vector_by_amount(float a0)
 {
     char *p = D_00189F80;
     float x = a0;
@@ -187,7 +187,7 @@ void func_L00_002B94D8(float a0)
 }
 
 /* Moves the hero's reference point toward where the stick points, correcting it so it stays on the ground and not in walls. */
-void func_L00_002B9598(void)
+void hero_steer_reference_point(void)
 {
     float desired[4] __attribute__((aligned(16)));
     float original[4] __attribute__((aligned(16)));
@@ -195,18 +195,18 @@ void func_L00_002B9598(void)
     float delta[4] __attribute__((aligned(16)));
     float correction[4] __attribute__((aligned(16)));
     float x, limit, t, angle, scale, step, length, adjustment;
-    ResolveStickInputToDirection(0, 1.0f);
-    SteerHeroHeading(0, 0.02f, 0.2f, 0.061086535f);
+    hero_resolve_stick_direction(0, 1.0f);
+    hero_steer_heading(0, 0.02f, 0.2f, 0.061086535f);
     if (D_00189E20_9598.f2294 == 19) {
         if (D_00189E20_9598.f24b8 < 0.2f) D_00189E20_9598.f1a0 = D_00189E20_9598.f98;
         D_00189E20_9598.f1b0 = 0.4f;
     } else if (D_00189E20_9598.f2294 == 21) D_00189E20_9598.f1b0 = 0.0f;
-    desired[0] = FastSinOrCosA(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
-    desired[1] = FastSinOrCosB(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
+    desired[0] = math_fast_sin_or_cos_a(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
+    desired[1] = math_fast_sin_or_cos_b(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
     desired[2] = 0.0f;
     qcopy_nc(original, desired);
     if (D_00189E20_9598.fa70 > 0.0f) {
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy_nc(previous, D_00189E20_9598.va60);
         func_00282CC0_3(desired, desired, D_00189E20_9598.va60);
         func_00282C88_5(D_00189E20_9598.va60);
@@ -241,8 +241,8 @@ void func_L00_002B9598(void)
         angle = func_00283248_5(D_00189E20_9598.v2a0[0], D_00189E20_9598.v2a0[1]);
         scale = D_00189E20_9598.f320 * 0.16976526f;
         step = D_00189E20_9598.f320 * 0.0030062596779316664f;
-        delta[0] = FastSinOrCosA(angle) * scale;
-        delta[1] = FastSinOrCosB(angle) * scale;
+        delta[0] = math_fast_sin_or_cos_a(angle) * scale;
+        delta[1] = math_fast_sin_or_cos_b(angle) * scale;
         delta[2] = 0.0f;
         func_00282CF0_3(correction, delta, D_00189E20_9598.vf0);
         correction[2] = 0.0f;
@@ -256,9 +256,9 @@ void func_L00_002B9598(void)
     if (t > 0.0f) D_00189E20_9598.f400 /= t * 0.09833333641290665f;
     ref_L00_002B9598_0(0);
     if (D_00189E20_9598.f404 < 0.017453294f && D_00189E20_9598.f324 > 0.087266475f)
-        func_00282D30_4(D_00189E20_9598.vf0, D_00189E20_9598.vf0, FastSinOrCosA(D_00189E20_9598.f324));
+        func_00282D30_4(D_00189E20_9598.vf0, D_00189E20_9598.vf0, math_fast_sin_or_cos_a(D_00189E20_9598.f324));
     D_00189E20_9598.f404 = D_00189E20_9598.f324;
-    if (FloatAbs(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
+    if (math_fabs(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
 }
 
 
@@ -267,37 +267,37 @@ extern char D_00189E20_2[];
 
 extern char D_00189E60[];
 
-extern void func_002830C0(void *a0, void *a1, void *a2);
+extern void transform_vector(void *a0, void *a1, void *a2);
 
-extern float func_00283248(float a, float b);
+extern float mat_fast_helper_a(float a, float b);
 
-extern float func_002AA738(float from, int selector, float to);
+extern float math_shortest_angle_delta(float from, int selector, float to);
 
 /* Transform the direction into resident space and return its selected angle delta. */
-float func_L00_002B9B38(void *a0, int selector)
+float hero_get_direction_angle_delta(void *a0, int selector)
 {
     float v[4];
 
     transform_vector(v, a0, D_00189E60);
-    return GetShortestAngleDelta(FastMatrixHelperA(v[0], v[1]), selector, 0.0f);
+    return math_shortest_angle_delta(mat_fast_helper_a(v[0], v[1]), selector, 0.0f);
 }
 
 /* The resident id this forwards, and the helper it calls. */
-extern int D_0018C0B0;
+extern int g_hero_moby;
 
-extern int func_002E5CF8(int index, int flags, char *object);
+extern int PlayMobySound(int index, int flags, char *object);
 
 /* Forward the sound index, flags and resident object pointer; return the result. */
-int func_L00_002B9B88(int index, int flags)
+int hero_play_sound(int index, int flags)
 {
-    return PlayMobySound(index, flags, (char *)gHeroMoby_0018C0B0);
+    return PlayMobySound(index, flags, (char *)g_hero_moby);
 }
 
 
 /* Claims the first free slot of the eight 8-byte entries at resident +0x23EC: a slot whose
    leading short is clear takes the three arguments, a pending marker and its two extra
    fields, and the search stops at the first one taken. */
-void func_L00_002B9C58(int a0, int a1, int a2)
+void hero_queue_delayed_event(int a0, int a1, int a2)
 {
     char *base = D_00189E20_2;
     short *slot = (short *)(base + 0x23EC);
@@ -329,13 +329,13 @@ extern struct {
     DelayedSlot_9CA8 slots[8];
 } D_00189E20_9CA8;
 
-extern int func_00282978(void *);
-extern void func_L00_002A61C8(int, int, int, int);
+extern int FastDecTimer(void *);
+extern void hero_play_footstep_sound_dust(int, int, int, int);
 
 /* Ticks the timer of each of the eight entries; one whose timer reports 2 is cleared and
    fires: id 0x16 calls func_L00_002A61C8 with the resident byte at +0x149D, any other id
    goes to func_L00_002B9B88 with the entry's argument. */
-void func_L00_002B9CA8(void)
+void UpdateDelayedSounds(void)
 {
     int i;
     short id;
@@ -345,14 +345,14 @@ void func_L00_002B9CA8(void)
             id = D_00189E20_9CA8.slots[i].id;
             D_00189E20_9CA8.slots[i].pending = 0;
             if (id == 0x16)
-                PlayFootstepSoundAndDust(D_00189E20_9CA8.b149D, 1, 1, 0x32);
+                hero_play_footstep_sound_dust(D_00189E20_9CA8.b149D, 1, 1, 0x32);
             else
-                PlayHeroSound(id, D_00189E20_9CA8.slots[i].arg);
+                hero_play_sound(id, D_00189E20_9CA8.slots[i].arg);
         }
     }
 }
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 extern int D_L00_001B9080;
 
@@ -360,29 +360,29 @@ extern void func_00283410_1(void *a, void *b);
 
 extern void func_002833F0_1(void *a, void *b);
 
-extern void func_L00_002B2BD0(void);
+extern void hero_reset_speeds_and_vectors(void);
 
-extern void func_L00_00322EC8(void *p);
+extern void level_release_slot_list(void *p);
 
-extern void func_L00_002AF7D0(void);
+extern void cancel_hero_item_animation(void);
 
-extern void func_L00_002A53B8(void);
+extern void attachment_reset_all(void);
 
-extern void func_L00_002C42E0(int a0, int a1);
+extern void hero_l00_set_action(int a0, int a1);
 
-extern void func_L00_002D23C0(int a0, int a1);
+extern void anim_start_object_at_frame(int a0, int a1);
 
-extern void func_L00_002B4900(void);
+extern void hero_l00_update_ground_contact(void);
 
 extern float func_00282E48_1(void *a, void *b);
 
-extern void func_L00_003DF6B0(int a0, int a1);
+extern void tracked_moby_set_state(int a0, int a1);
 
-extern void func_L00_004028C0(void *a, int b);
+extern void global_object_start(void *a, int b);
 
-extern void func_L00_002D9D98(void);
+extern void cam_reset_default(void);
 
-extern void func_L00_00311DC0(void *p);
+extern void level_apply_nearest_env_preset(void *p);
 
 /* The resident block, as far as func_L00_002B9D60 touches it. */
 typedef struct {
@@ -400,10 +400,10 @@ typedef struct {
 } ResidentState_9D60;
 
 /* Reset the hero position and direction, the resident movement state and the related level objects. */
-void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
+void hero_reset_position_and_direction(void *position, void *direction, int sound, int refresh)
 {
     ResidentState_9D60 *res;
-    char *hero = gHeroPosition;
+    char *hero = g_hero_position;
 
     qcopy(hero, position);
     res = (ResidentState_9D60 *)(hero - 0x80);
@@ -412,9 +412,9 @@ void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
 
     func_00283410_1(res, hero + 0x10);
     func_002833F0_1(res->object + 0xC0, hero + 0x10);
-    ResetHeroSpeedsAndVectors();
-    ReleaseSlotList(hero + 0x1860);
-    ReleaseSlotList(hero + 0x19B0);
+    hero_reset_speeds_and_vectors();
+    level_release_slot_list(hero + 0x1860);
+    level_release_slot_list(hero + 0x19B0);
 
     res->flags3A4 &= ~1;
     res->flags3A4 &= ~2;
@@ -423,35 +423,35 @@ void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
     res->b24EF = 0;
 
     cancel_hero_item_animation();
-    ResetAllAttachmentRecords();
+    attachment_reset_all();
 
     if (sound != -1)
-        SetHeroAction_L00(sound, 2);
+        hero_l00_set_action(sound, 2);
 
-    StartObjectAnimationAtFrame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
+    anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
     if (res->i229C == 0x11)
         D_L00_001B9080 = 1;
     else
         D_L00_001B9080 = 0;
 
-    UpdateHeroGroundContact_L00();
+    hero_l00_update_ground_contact();
 
-    if (func_00282E48_1(gHeroPosition, gHeroPosition + 0x250) < 1.0f)
-        qcopy(gHeroPosition, gHeroPosition + 0x250);
+    if (func_00282E48_1(g_hero_position, g_hero_position + 0x250) < 1.0f)
+        qcopy(g_hero_position, g_hero_position + 0x250);
 
-    SetTrackedObjectState(0, 0);
-    StartGlobalObject(0, 0);
+    tracked_moby_set_state(0, 0);
+    global_object_start(0, 0);
 
     if (refresh != 0)
-        ResetDefaultCamera();
+        cam_reset_default();
 
-    ApplyNearestEnvironmentPreset(*(void **)(gHeroPosition + 0x2210));
+    level_apply_nearest_env_preset(*(void **)(g_hero_position + 0x2210));
 }
 
 /* queries a resident table with a stack request and blends a vector back into the resident record */
 /* Probes the ground in front of the hero and stores the slope angle of what it finds. */
-int func_L00_002BA410(void)
+int hero_probe_ground_slope_ahead(void)
 {
     char buf[48];
     char *base = D_L00_001B8C80_2;
@@ -507,24 +507,24 @@ extern struct {
     float x, y, z;
 } D_L00_001B8C80_A508;
 
-extern float func_00283B98(float a, float b);
-extern int func_L00_002B3248(void *obj);
-extern void func_00282C88(void *m);
-extern void func_L00_002D3798(void *dst, void *src, float f);
-extern void func_002AF000(void *m, float a, float b, float c);
-extern void func_002833F0(void *dst, void *v);
-extern void func_00283738(void *dst, void *a, void *b);
-extern void func_00283658(void *dst, void *src);
-extern void func_002AB6D8(void *src, void *dst);
-extern void func_L00_00322A98(void *obj, void *area);
-extern void func_L00_00322AC0(void *area, int a, int b, float f);
-extern void func_002A7470(void *obj, int a, int b, int c);
+extern float FastAddRotations(float a, float b);
+extern int moby_is_class_71(void *obj);
+extern void vec_clear_128(void *m);
+extern void cam_offset_point_by_side_direction(void *dst, void *src, float f);
+extern void vec_build_spherical_offset(void *m, float a, float b, float c);
+extern void euler_rotation_basis(void *dst, void *v);
+extern void multiply_matrix3x3(void *dst, void *a, void *b);
+extern void copy_matrix_rotation(void *dst, void *src);
+extern void mat_get_euler_angles(void *src, void *dst);
+extern void level_init_pending_slot(void *obj, void *area);
+extern void level_append_record_to_table(void *area, int a, int b, float f);
+extern void anim_start_blended(void *obj, int a, int b, int c);
 
 /* Once per hero state, set up the object at resident +0x1220 (the special case uses a stored angle
    and the level vector at +0x150 of the block func_L00_002BA410 queries, otherwise the unit scale
    and the parent transform) and pass the composed transform to the object at +0xF0.
    Does nothing once the byte at +0x123A is set. */
-void func_L00_002BA508(void)
+void hero_setup_attached_object_transform(void)
 {
     float scratch[4];
     u8 transform[48], level_transform[48], composed[64];
@@ -543,17 +543,17 @@ void func_L00_002BA508(void)
             special = 1;
     }
 
-    if (special && !ProbeGroundSlopeAhead()) {
+    if (special && !hero_probe_ground_slope_ahead()) {
         D_00189E20_A508.fC04 = D_L00_001B8C80_A508.z;
         D_00189E20_A508.fC08 = FastAddRotations(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
     }
 
     object = D_00189E20_A508.p1220;
-    if (!IsMobyClass71(object))
+    if (!moby_is_class_71(object))
         return;
     D_00189E20_A508.b123A = 1;
     if (special)
-        PlayHeroSound(17, 0);
+        hero_play_sound(17, 0);
 
     *(u8 *)(object + 0x20) = 10;
     record = *(char **)(object + 0x68);
@@ -562,13 +562,13 @@ void func_L00_002BA508(void)
         *(short *)(record + 0x76) = 1;
 
     matrix = record + 0x40;
-    ClearVector128(matrix);
+    vec_clear_128(matrix);
     if (!special)
-        OffsetPointBySideDirection(matrix, matrix, 1.0f);
+        cam_offset_point_by_side_direction(matrix, matrix, 1.0f);
     else
-        BuildSphericalOffset(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
+        vec_build_spherical_offset(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
 
-    ClearVector128(scratch);
+    vec_clear_128(scratch);
     euler_rotation_basis(transform, scratch);
     if (special) {
         scratch[0] = D_L00_001B8C80_A508.x;
@@ -580,14 +580,14 @@ void func_L00_002BA508(void)
         multiply_matrix3x3(transform, D_00189E20_A508.p2290 + 0xC0, transform);
     }
     copy_matrix_rotation(composed, transform);
-    GetEulerAnglesFromMatrix(composed, object + 0xF0);
+    mat_get_euler_angles(composed, object + 0xF0);
 
     *(int *)(record + 0x64) = 0;
     *(float *)(record + 0x60) = 0.38333335518836975f;
     if (D_00189E20_A508.f184 < 0.3333333432674408f) {
-        InitPendingSlot(object, D_00189E20_A508.area1A30);
-        AppendRecordToFourEntryTable(D_00189E20_A508.area1A30, 48, 3, 0.0f);
-        AppendRecordToFourEntryTable(D_00189E20_A508.area1A30, 23, 5, 0.0f);
+        level_init_pending_slot(object, D_00189E20_A508.area1A30);
+        level_append_record_to_table(D_00189E20_A508.area1A30, 48, 3, 0.0f);
+        level_append_record_to_table(D_00189E20_A508.area1A30, 23, 5, 0.0f);
     }
-    StartAnimationBlended(object, 6, 0, 5);
+    anim_start_blended(object, 6, 0, 5);
 }

@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int s32;
 typedef int TI16 __attribute__((mode(TI)));
-extern void func_002A7750(void *, s32, s32);
-extern s32 func_L00_0035F5A0(s32, s32, s32);
-extern void func_0029F338(u8 *object);
+extern void moby_set_state(void *, s32, s32);
+extern s32 snd_start_in_slot(s32, s32, s32);
+extern void moby_mark_spawned(u8 *object);
 typedef struct {
     u8 pad0[0x18];
     u8 b18;
@@ -35,7 +36,7 @@ typedef struct {
     float vel[4];
 } L23Flight;
 extern L23Game D_00189E20_2;
-extern L23RayHit D_L23_001C0A80;
+extern L23RayHit g_last_ray_hit;
 extern float D_L23_001B36C0[4] __attribute__((sda));
 extern float D_L23_001B1A10 __attribute__((sda));
 extern float D_L23_001B1A18 __attribute__((sda));
@@ -47,18 +48,18 @@ extern float D_L23_001B1A34 __attribute__((sda));
 extern float D_L23_001B1A3C __attribute__((sda));
 extern float D_L23_001B1A40 __attribute__((sda));
 extern float D_L23_001B1ADC __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282C88(void *);
-extern float func_00282E48(void *, void *);
-extern void func_002A8C00(void *, u8 *, s32, void *, float);
-extern s32 func_002761F8(void *, void *, s32, void *, s32);
-extern void *func_0032C700(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
-extern void func_L16_00406080(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
-extern void func_L23_0041E5B0(u8 *, s32, s32, void *, s32, s32);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L12_004081F8(u8 *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_clear_128(void *);
+extern float fast_vec_dist(void *, void *);
+extern void make_hit_descriptor(void *, u8 *, s32, void *, float);
+extern s32 CollLine(void *, void *, s32, void *, s32);
+extern void *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
+extern void part_create_flash(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
+extern void cam_play_effect_on_target(u8 *, s32, s32, void *, s32, s32);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void blast_projectile_draw_glow(u8 *);
 
 /* per-frame update of the object whose state at +0x68 holds a direction vector, a frame counter
    and a clamped velocity: it ends the object after 0xF0 frames; in state 0 it casts a ray along
@@ -78,47 +79,47 @@ void func_PAL_L23_0042D230(u8 *moby) {
         vars->frames += 1;
         if (vars->frames > 0xF0) {
             if (moby[0xBC] == 0) {
-                func_002A7750(moby, 1, -1);
+                moby_set_state(moby, 1, -1);
             }
         }
         switch (moby[0x20]) {
         case 0: {
-            func_00282CC0(target, moby + 0x10, vars);
-            func_002A8C00(&q1, moby, 0x90003, vars, vars->radius);
+            FastVecAdd(target, moby + 0x10, vars);
+            make_hit_descriptor(&q1, moby, 0x90003, vars, vars->radius);
             q1.id = *(u16 *)(moby + 0xAA);
-            if (func_002761F8(moby + 0x10, target, 0, moby, 0) != 0) {
-                float dist = func_00282E48(D_L23_001B36C0, D_L23_001C0A80.point);
+            if (CollLine(moby + 0x10, target, 0, moby, 0) != 0) {
+                float dist = fast_vec_dist(D_L23_001B36C0, g_last_ray_hit.point);
                 u8 *player = D_00189E20_2.player;
-                s32 isPlayer = D_L23_001C0A80.hit == player;
+                s32 isPlayer = g_last_ray_hit.hit == player;
 
                 if (isPlayer || dist < D_L23_001B1ADC) {
                     TI16 t;
                     s32 radius;
 
-                    func_00282D30(vecA, player + 0xE0, 3.5f);
-                    func_00282CC0(vecA, vecA, D_00189E20_2.camera);
-                    func_0032C700(vecA, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
+                    FastVecScale(vecA, player + 0xE0, 3.5f);
+                    FastVecAdd(vecA, vecA, D_00189E20_2.camera);
+                    SpawnExplosion(vecA, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
                     radius = (s32)vars->radius;
                     t = *(TI16 *)(moby + 0x10);
                     vecB[0] = t;
-                    func_L23_0041E5B0(moby, 0x10007, radius, vecB, 0, 0);
+                    cam_play_effect_on_target(moby, 0x10007, radius, vecB, 0, 0);
                     if (isPlayer) {
-                        func_L00_0035F5A0(0x20, 0, 0);
+                        snd_start_in_slot(0x20, 0, 0);
                     }
                     if (moby[0xBC] == 0) {
-                        func_002A7750(moby, 1, -1);
+                        moby_set_state(moby, 1, -1);
                     }
                 } else {
                     vecA[0] = *(TI16 *)vars;
-                    func_00282D30(vecA, vecA, 3.0f);
+                    FastVecScale(vecA, vecA, 3.0f);
                     ((float *)vecA)[2] = 1.0f;
                     ((float *)vecA)[3] = 5627.9248046875f;
-                    func_002A8C00(&q2, moby, 0x90003, vecA, vars->radius);
+                    make_hit_descriptor(&q2, moby, 0x90003, vecA, vars->radius);
                     q2.b19 = 1;
                     q2.id = *(u16 *)(moby + 0xAA);
                     q2.b18 = 0;
                     if (moby[0xBC] == 0) {
-                        func_002A7750(moby, 1, -1);
+                        moby_set_state(moby, 1, -1);
                     }
                 }
                 return;
@@ -126,13 +127,13 @@ void func_PAL_L23_0042D230(u8 *moby) {
             if (moby[0xBC] == 0) {
                 *(TI16 *)(moby + 0x10) = target[0];
             }
-            func_00282D30(vecA, vars, -0.5f);
-            func_00282C88(vecB);
+            FastVecScale(vecA, vars, -0.5f);
+            vec_clear_128(vecB);
             break;
         }
         case 1:
-            func_L16_00406080(moby + 0x10, 0, 0x19, 0x19, 0x19, 0x19, 0, 0, 4.5f, 1, 0);
-            func_0029F338(moby);
+            part_create_flash(moby + 0x10, 0, 0x19, 0x19, 0x19, 0x19, 0, 0, 4.5f, 1, 0);
+            moby_mark_spawned(moby);
             return;
         }
     }
@@ -152,7 +153,7 @@ void func_PAL_L23_0042D230(u8 *moby) {
     if (vars->vel[3] > D_L23_001B1A1C) {
         vars->vel[3] = D_L23_001B1A1C;
     }
-    func_002ACEC0(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
-    func_002ACEC0(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
-    func_L00_002E6EF8((void *)func_L12_004081F8, moby);
+    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
+    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
+    gfx_add_draw_callback_third((void *)blast_projectile_draw_glow, moby);
 }

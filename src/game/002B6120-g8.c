@@ -9,7 +9,7 @@ extern float ref_L00_002B62A0_01 __attribute__((sda));
 
 /* Counts one tick and folds the hardware timer, converted from unsigned, into
    the small-data float accumulator. */
-void func_002B62A0(void)
+void thread_accumulate_timer_ticks(void)
 {
     unsigned int ticks = T0_COUNT;
 
@@ -40,7 +40,7 @@ extern Node *ref_002B6658_00 __attribute__((sda));
    hook (call_hook, as RAC1's update_visible_resident_objects does) and refreshes
    its bounds unless flag 4 is set. */
 /* Updates every visible object once per frame. */
-void func_002B6658(void)
+void moby_update_visible_objects(void)
 {
     Node *node;
 

@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_002A77E0(int x);
-extern float func_002A7878(float, float);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern void func_002A7A00(char *, float, float);
+extern int math_random_int_below(int x);
+extern float math_random_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern void vec_random_direction(char *, float, float);
 extern char *func_PAL_002BE9A8(float, float, float, float, char *, int, char *,
                      unsigned int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00312B70(void *, void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_spawn_template_effect(void *, void *, void *, void *);
 extern char ref_L00_003FE310_00[];
 
 /* Twenty rounds that spawn a particle at the second argument: each round draws a radius
@@ -27,14 +28,14 @@ void func_PAL_L00_00402B98(void *a0, void *a1, void *a2)
     char *r;
 
     for (i = 19; i >= 0; i--) {
-        func_002A77E0(2);
-        func_002A77E0(2);
-        f = func_002A7878(70000.0f, 1.5e+05f);
-        v = func_002A7820(10, 127);
+        math_random_int_below(2);
+        math_random_int_below(2);
+        f = math_random_float_range(70000.0f, 1.5e+05f);
+        v = math_random_int_range(10, 127);
         w = (v << 8) | 0x7f000000U;
         x = (v << 16) | w;
         v = x | v;
-        func_002A7A00(local, 2.0000003e-05f,
+        vec_random_direction(local, 2.0000003e-05f,
                 0.008f);
         r = func_PAL_002BE9A8(0.3f, 1.0f, 1.01f, f, a1, 0, local, v, 1);
         if (r != 0) {
@@ -46,8 +47,8 @@ void func_PAL_L00_00402B98(void *a0, void *a1, void *a2)
             *(char *)(q + 11) = *(unsigned char *)(r + 10);
         }
     }
-    func_00282F20(ref_L00_003FE310_00, a2, 1.5f);
-    func_00312B70(ref_L00_003FE310_00, a1, 0, 0);
+    vec_scale_to_length(ref_L00_003FE310_00, a2, 1.5f);
+    moby_spawn_template_effect(ref_L00_003FE310_00, a1, 0, 0);
 }
 
 

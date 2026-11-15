@@ -24,22 +24,22 @@ extern const EffectQuad D_L02_001B1B80;
 extern const EffectQuad D_L02_001B1BC0;
 extern u32 D_L02_001B1C00 __attribute__((sda));
 extern u32 D_L02_001B1C04 __attribute__((sda));
-extern EffectVector D_L02_001BA500;
-extern void func_00283658(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AFDD8(char *, char *, char *, char *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283198(float);
-extern u32 func_00283D38(u32, u32, float);
-extern void func_L02_002EF968(EffectPacket *, u32, u32, float *, EffectVector *, s32);
-extern void *func_00115484(void *, s32, u32);
-extern void func_002833F0(void *, void *);
-extern void func_L01_002E1510(EffectPacket *, s32, void *, s32, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern EffectVector g_camera_l02_position;
+extern void copy_matrix_rotation(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern u32 FastTweenColor(u32, u32, float);
+extern void FillQuadPacket(EffectPacket *, u32, u32, float *, EffectVector *, s32);
+extern void *memset(void *, s32, u32);
+extern void euler_rotation_basis(void *, void *);
+extern void gfx_transform_and_draw_entries(EffectPacket *, s32, void *, s32, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Render seven related quads with scrolling UVs and two expanding wave pairs. */
-void func_L02_00411D18(u8 *object)
+void energy_gate_draw_effect(u8 *object)
 {
     EffectUV primary_uv = D_L02_001B1AE0;
     EffectUV secondary_uv = D_L02_001B1B00;
@@ -81,11 +81,11 @@ void func_L02_00411D18(u8 *object)
     context[3].f[3] = 1.0f;
     vec_scale_to_length(context, context, 4.0f);
     vec_scale_to_length(&context[1], &context[1], 10.0f);
-    FastVecSub(&direction, &gCameraPosition_L02, position);
-    TransformVectorByObjectOrGiven((char *)object, (char *)&direction, (char *)&direction, 0);
+    FastVecSub(&direction, &g_camera_l02_position, position);
+    vec_transform_by_object_or_given((char *)object, (char *)&direction, (char *)&direction, 0);
     if (direction.f[0] < 0.0f)
         FastVecScale(context, context, -1.0f);
-    phase = FastSinOrCosB(*(float *)(state + 0x2C)) * 0.5f + 0.5f;
+    phase = math_fast_sin_or_cos_b(*(float *)(state + 0x2C)) * 0.5f + 0.5f;
     primary_color = FastTweenColor(palette.word[0], palette.word[1], phase);
     secondary_color = FastTweenColor(palette.word[2], palette.word[3], phase);
     fade = *(float *)(state + 0x20);
@@ -129,7 +129,7 @@ void func_L02_00411D18(u8 *object)
     expansion[0].quad = zero_expansion[0].quad;
     expansion[1].quad = zero_expansion[1].quad;
     euler_rotation_basis(matrix, transform_parameters);
-    TransformAndDrawEntries(packets, 7, matrix, 16, context);
+    gfx_transform_and_draw_entries(packets, 7, matrix, 16, context);
     for (j = 0; j < 4; j++) {
         FastVecAdd(&packets[0].vertex[j], &primary.vertex[j], &transform_parameters[1]);
         FastVecAdd(&packets[1].vertex[j], &left.vertex[j], &transform_parameters[1]);
@@ -144,5 +144,5 @@ void func_L02_00411D18(u8 *object)
         FastVecAdd(&packets[6].vertex[j], &packets[6].vertex[j], &expansion[1]);
     }
     euler_rotation_basis(matrix, transform_parameters);
-    TransformAndDrawEntries(packets, 7, matrix, 16, context);
+    gfx_transform_and_draw_entries(packets, 7, matrix, 16, context);
 }

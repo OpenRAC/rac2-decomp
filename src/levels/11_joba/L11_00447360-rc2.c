@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -40,7 +41,7 @@ extern void ref_L11_00447360_11(void *);
 extern void ref_L11_00447360_12(void *);
 
 /* Goes through every game object in the world and calls the special update for its type (decoy, sheep, turrets, robots and so on). */
-void func_L11_00447360(s32 param) {
+void moby_update_class_specials(s32 param) {
     s8 *moby;
     s16 classId;
 

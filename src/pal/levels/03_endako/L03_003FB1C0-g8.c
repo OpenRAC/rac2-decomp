@@ -3,12 +3,12 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
-extern void func_L03_003F6918(u8 *, int);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void endako_boss_remove_target(u8 *, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 extern Vector D_L03_001B10A0[4] __attribute__((sda));
 extern float D_L03_001B10E0[8] __attribute__((sda));
 extern float D_L03_001B10E4[] MACRO_ADDR;
@@ -28,11 +28,11 @@ void func_PAL_L03_003FB1C0(u8 *self) {
     for (i = 0; i < *(int *)(st + 0x3BC); i++) {
         u8 *obj = *(u8 **)(st + 0x340 + i * 4);
         if (!obj || *(s16 *)(obj + 0xAA) != 0xA72 || obj[0x20] == 0xFE || obj[0x20] == 0xFD)
-            func_L03_003F6918(self, i);
+            endako_boss_remove_target(self, i);
     }
     if (*(int *)(st + 0x3BC) == 0)
         return;
-    func_00281DE8(&packet, 5, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, 5, 1, 0x80);
     for (j = 0; j < 4; j++) {
         qcopy(&packet.v[j], &D_L03_001B10A0[j]);
         packet.color[j] = D_L03_001B1100[j >> 1];
@@ -45,11 +45,11 @@ void func_PAL_L03_003FB1C0(u8 *self) {
         u8 *data = *(u8 **)(obj + 0x68);
         qcopy(&frame.pos, obj + 0x10);
         frame.pos.f[3] = 1.0f;
-        func_00282CF0(&frame.a, D_L03_001B9980, &frame.pos);
-        func_00282F20(&frame.b, data, (float)*(s16 *)(data + 0x12) * scale);
-        func_00282DD8(&frame.c, &frame.b, &frame.a);
-        func_00282F20(&frame.c, &frame.c, 1.0f);
-        func_00282DD8(&frame.a, &frame.b, &frame.c);
-        func_00280B90(&packet, &frame.a, 0);
+        FastVecSub(&frame.a, D_L03_001B9980, &frame.pos);
+        vec_scale_to_length(&frame.b, data, (float)*(s16 *)(data + 0x12) * scale);
+        FastVecCross(&frame.c, &frame.b, &frame.a);
+        vec_scale_to_length(&frame.c, &frame.c, 1.0f);
+        FastVecCross(&frame.a, &frame.b, &frame.c);
+        draw_world_quad(&packet, &frame.a, 0);
     }
 }

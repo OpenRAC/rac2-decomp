@@ -9,13 +9,13 @@ typedef struct {
     int pad4[3];
     float keys[1][4];
 } KeyTrack2C96F8;
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
-void func_002C96F8(float time, float step, KeyTrack2C96F8 *track, int *keyIndex, float *fraction, float *result)
+void anim_sample_key_track(float time, float step, KeyTrack2C96F8 *track, int *keyIndex, float *fraction, float *result)
 {
     float delta[4];
     int i;

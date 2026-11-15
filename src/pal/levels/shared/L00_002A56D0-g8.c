@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 extern char D_00189E20_2[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern float D_L00_001A7CF8 __attribute__((sda));
 extern float D_L00_0025CFEC __attribute__((nosda));
 extern void func_2D24E8(void);
@@ -14,15 +15,15 @@ extern void func_2CB3A8(void);
 extern void func_2AE0C8(void);
 extern void func_2B9CA8(void);
 extern void func_2A5368(void);
-extern void func_L00_002A9600(void);
-extern void func_L00_002A7958(void);
-extern void func_L00_002A7748(void);
+extern void hero_update_moby_from_hero(void);
+extern void gfx_fade_screen_effect(void);
+extern void ApplyHeroAxisScales(void);
 extern void func_2A5840(void);
 extern void func_2A5CB0(void);
 extern void func_2A6008(void);
 extern void func_35F3A8(void *a0, void *a1, void *a2);
 extern void func_3080D0(void *a0);
-extern void func_L00_002A9760(void);
+extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_319684(void *a0);
 
 /* One frame of the level's frame update: three openers, a block that runs while the mode
@@ -54,9 +55,9 @@ void func_PAL_L00_002A6468(void)
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
 
-    func_L00_002A9600();
-    func_L00_002A7958();
-    func_L00_002A7748();
+    hero_update_moby_from_hero();
+    gfx_fade_screen_effect();
+    ApplyHeroAxisScales();
 
     if (*(u8 *)(base + 0x22B4) == 1) {
         int record;
@@ -74,8 +75,8 @@ void func_PAL_L00_002A6468(void)
         *(int *)(base + 0x24E4) = 0;
     }
 
-    hero = D_00189EA0;
+    hero = g_hero_position;
     func_3080D0(hero);
-    func_L00_002A9760();
+    UpdateHeroMobyProbedHeightBounds();
     func_319684(*(void **)(hero + 0x2210));
 }

@@ -1,35 +1,35 @@
 #include "include_asm.h"
 #include "common.h"
-extern s16 D_001A63A8[];
-extern void func_002B7578(void);
-extern void func_00133230(void);
-extern void func_00132028(void);
-extern void func_00133220(void);
-extern void func_00282A38(s32);
+extern s16 g_music_state[];
+extern void snd_update_music_system(void);
+extern void snd_clear_flag_and_update(void);
+extern void snd_Pump(void);
+extern void snd_set_current_buffer_flag(void);
+extern void mem_fast_helper_a(s32);
 
 s16 func_PAL_002B8898(s32 arg0) {
     s16 *q;
 
     if (arg0 != 0) {
         while (1) {
-            func_002B7578();
-            func_00133230();
-            func_00132028();
-            func_00133220();
-            if (D_001A63A8[2] == 0) {
+            snd_update_music_system();
+            snd_clear_flag_and_update();
+            snd_Pump();
+            snd_set_current_buffer_flag();
+            if (g_music_state[2] == 0) {
                 break;
             }
-            func_00282A38(10000);
-            if (D_001A63A8[2] == 0) {
+            mem_fast_helper_a(10000);
+            if (g_music_state[2] == 0) {
                 break;
             }
         }
     } else {
-        func_002B7578();
-        func_00133230();
-        func_00132028();
-        func_00133220();
+        snd_update_music_system();
+        snd_clear_flag_and_update();
+        snd_Pump();
+        snd_set_current_buffer_flag();
     }
-    q = D_001A63A8;
+    q = g_music_state;
     return q[2];
 }

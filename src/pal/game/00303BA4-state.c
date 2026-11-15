@@ -1,21 +1,22 @@
+#include "names.h"
 /* func_PAL_00303BA4, the PAL copy of func_00302A88: the same C, with the timers scaled to 50 Hz and
  * three callees taking their PAL names, as in src/pal/levels/shared/L00_0038822C-cc.c. */
 #include "include_asm.h"
 #include "common.h"
 
 #define FIELD(type,p,off) (*(type *)((char *)(p)+(off)))
-extern float func_002A7878(float,float);
-extern int func_00282948(int *);
-extern void func_00303210(void *);
+extern float math_random_float_range(float,float);
+extern int math_fast_float_d(int *);
+extern void surface_grid_build_control(void *);
 extern void func_PAL_00304D90(void *);
-extern void func_00303AC8(void *);
+extern void surface_grid_update_heights(void *);
 extern void func_PAL_00303F38(void *);
 extern void func_PAL_00305348(void *);
-extern void func_00303070(void *);
-extern void func_0027CE90(void (*)(void *),void *);
-extern void func_002A7750(unsigned char *,unsigned char,int);
-extern int func_002B3868(unsigned char *);
-extern float func_002AA548(float *,float *,float,float,float,float);
+extern void surface_grid_draw(void *);
+extern void gfx_register_early_draw_callback(void (*)(void *),void *);
+extern void moby_set_state(unsigned char *,unsigned char,int);
+extern int flag_set_first_pending(unsigned char *);
+extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 typedef struct { float x,y,a,b; float pad[4]; } Spark;
 extern Spark D_002222E0[];
 void func_PAL_00303BA4(unsigned char *object)
@@ -30,7 +31,7 @@ void func_PAL_00303BA4(unsigned char *object)
         FIELD(int,work,0x1C)=ticks;
         FIELD(float,work,0x14)=(FIELD(float,work,0x18)+FIELD(float,work,0x18))/(float)ticks;
         FIELD(float,work,0)=FIELD(float,work,0x18)*4/(float)(ticks*ticks);
-        func_00303210(object);
+        surface_grid_build_control(object);
         FIELD(int,work,0x8C)=(FIELD(int,work,0x84)*5+2)/6;
         FIELD(float,work,0x30)=1/FIELD(float,work,0x30);
         FIELD(int,work,0x98)=-1;
@@ -40,33 +41,33 @@ void func_PAL_00303BA4(unsigned char *object)
                 object[0x30]=alpha;
             }
             for(i=0;i<64;++i) {
-                D_002222E0[i].a=func_002A7878(0.5f,2);
-                D_002222E0[i].b=func_002A7878(0.002f,0.006f);
+                D_002222E0[i].a=math_random_float_range(0.5f,2);
+                D_002222E0[i].b=math_random_float_range(0.002f,0.006f);
             }
         }
-        func_002A7750(object,1,-1);return;
+        moby_set_state(object,1,-1);return;
     case 1:
-        if(func_002B3868(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,2,-1);
-        func_002AA548((float *)(work+4),(float *)(work+8),FIELD(float,work,0x18),FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
+        if(flag_set_first_pending(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
+        if(math_fast_float_d((int *)(work+0x20)))moby_set_state(object,2,-1);
+        math_step_value_toward_target((float *)(work+4),(float *)(work+8),FIELD(float,work,0x18),FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
         break;
     case 2:
-        if(func_002B3868(object)){FIELD(int,work,0x20)=(FIELD(int,work,12)*5+2)/6;FIELD(float,work,4)=FIELD(float,work,0x18);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,3,-1);
+        if(flag_set_first_pending(object)){FIELD(int,work,0x20)=(FIELD(int,work,12)*5+2)/6;FIELD(float,work,4)=FIELD(float,work,0x18);}
+        if(math_fast_float_d((int *)(work+0x20)))moby_set_state(object,3,-1);
         break;
     case 3:
-        if(func_002B3868(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,4,-1);
-        func_002AA548((float *)(work+4),(float *)(work+8),0,FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
+        if(flag_set_first_pending(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
+        if(math_fast_float_d((int *)(work+0x20)))moby_set_state(object,4,-1);
+        math_step_value_toward_target((float *)(work+4),(float *)(work+8),0,FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
         break;
     case 4:
-        if(func_002B3868(object)){FIELD(int,work,0x20)=(FIELD(int,work,16)*5+2)/6;FIELD(int,work,4)=0;}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,1,-1);
+        if(flag_set_first_pending(object)){FIELD(int,work,0x20)=(FIELD(int,work,16)*5+2)/6;FIELD(int,work,4)=0;}
+        if(math_fast_float_d((int *)(work+0x20)))moby_set_state(object,1,-1);
         break;
     case 5:break;
     default:break;
     }
     if(!FIELD(int,work,0x40))func_PAL_00304D90(object);
-    func_00303AC8(object);func_PAL_00303F38(object);func_PAL_00305348(object);
-    func_0027CE90(func_00303070,object);
+    surface_grid_update_heights(object);func_PAL_00303F38(object);func_PAL_00305348(object);
+    gfx_register_early_draw_callback(surface_grid_draw,object);
 }

@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern s32 func_002B38B8(void);
-extern void func_002E59F8(s32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_0029F338(void *);
-extern void func_002A0488(void *, s32, s32, s32);
-extern void func_L12_00412548(void *, void *);
-extern s32 func_00283CF0(f32);
-extern void func_00291450(s32);
-extern void func_L00_00310838(void *, s32, s32);
+extern s32 flag_is_third_pending_set(void);
+extern void snd_stop_voice(s32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void moby_mark_spawned(void *);
+extern void set_moby_color(void *, s32, s32, s32);
+extern void coll_push_out_of_rectangle(void *, void *);
+extern s32 FloatToInt(f32);
+extern void gfx_free_point_light(s32);
+extern void offset_moby_class_point_pairs(void *, s32, s32);
 
 extern char D_0019B4A8[];
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern u8 D_001395DA[];
 
 typedef struct {
@@ -20,7 +20,7 @@ typedef struct {
 } TodanoObjectFlags;
 
 extern TodanoObjectFlags D_L12_0021EDF0;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern u8 *D_L12_001B2E9C __attribute__((sda));
 extern f32 D_L12_001B17C0 __attribute__((sda));
 extern s32 D_L12_001B17E0 __attribute__((sda));
@@ -39,18 +39,18 @@ extern s32 D_L12_001B29C8 MACRO_ADDR;
 
 /* Shows a looping effect until the object it is linked to has been used up, then fades itself
    out and removes itself. */
-void func_L12_00412898(u8 *object) {
+void UpdateLinkedMobyFade(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     s32 delta;
     u16 index;
     s32 bits;
     TodanoObjectFlags *record;
 
-    if (IsThirdPendingFlagSet()) goto kill;
+    if (flag_is_third_pending_set()) goto kill;
     index = *(u16 *)(object + 0xB2);
     record = &D_L12_0021EDF0;
     if (record->flags[(s16)index]) goto kill;
-    bits = (u8)D_0019B4A8[((s16)index >> 1) + (gCurrentMapIndex << 10)];
+    bits = (u8)D_0019B4A8[((s16)index >> 1) + (g_current_map_index << 10)];
     if (index & 1) {
         if ((bits >> 4) & 7) goto kill;
     } else if (bits & 7) {
@@ -66,12 +66,12 @@ kill: {
         INCREMENT_OBJECT_COUNTER(object);
         id = *(s32 *)(state + 0x10);
         if (id != -1) {
-            effect = gSoundState + id * 0x70;
+            effect = g_sound_state + id * 0x70;
             if (*(u8 **)(effect + 0x88) == object && effect[0x74])
-                StopSoundVoice(id);
+                snd_stop_voice(id);
         }
         *(s32 *)(state + 0x10) = -1;
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
 
@@ -90,7 +90,7 @@ dispatch:
         u16 index;
         s32 bits;
 
-        effect = gSoundState + *(s32 *)(state + 0x10) * 0x70;
+        effect = g_sound_state + *(s32 *)(state + 0x10) * 0x70;
         if (*(u8 **)(effect + 0x88) != object || !effect[0x74])
             *(s32 *)(state + 0x10) = PlayMobySound(0, 4, object);
         {
@@ -102,7 +102,7 @@ dispatch:
                 if (!linked || linked[0x20] == 0xFE || linked[0x20] == 0xFD)
                     goto activate;
                 index = *(u16 *)(linked + 0xB2);
-                bits = (u8)D_0019B4A8[((s16)index >> 1) + (gCurrentMapIndex << 10)];
+                bits = (u8)D_0019B4A8[((s16)index >> 1) + (g_current_map_index << 10)];
                 if (index & 1) {
                     if ((bits >> 4) & 7) goto activate;
                     else goto update;
@@ -117,7 +117,7 @@ activate: {
             }
         }
 update:
-        PushObjectsOutOfRectangle(object, state);
+        coll_push_out_of_rectangle(object, state);
         break;
     }
     case 2:
@@ -133,16 +133,16 @@ update:
 
         id = *(s32 *)(state + 0x10);
         if (id != -1) {
-            effect = gSoundState + id * 0x70;
+            effect = g_sound_state + id * 0x70;
             if (*(u8 **)(effect + 0x88) == object && effect[0x74])
-                StopSoundVoice(id);
+                snd_stop_voice(id);
         }
         *(s32 *)(state + 0x10) = -1;
         if (*(s16 *)(state + 0xE) != -1) {
-            FreePointLight(*(s16 *)(state + 0xE));
+            gfx_free_point_light(*(s16 *)(state + 0xE));
             *(s16 *)(state + 0xE) = -1;
         }
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
     }

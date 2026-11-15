@@ -2,9 +2,9 @@
 
 
 #include "common.h"
-extern u8 *func_0029EFD0(s32);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
+extern u8 *CreateMoby(s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
 #define L10_PARTNER(state) (*(u8 **)((state) + 4))
 
 /* Two-state update of a cloud body with a kind-0x11CD partner. State 0 sets the body up
@@ -26,7 +26,7 @@ void func_PAL_L10_00431A50(u8 *object)
         *(f32 *)(object + 0x18) = 512.0f;
         *(s32 *)(object + 0x1C) = 0;
         *(f32 *)(object + 0x2C) = *(f32 *)(*(u8 **)(object + 0x24) + 0x24) * 4.0f;
-        L10_PARTNER(state) = func_0029EFD0(0x11CD);
+        L10_PARTNER(state) = CreateMoby(0x11CD);
         L10_PARTNER(state)[0x30] = 0xFF;
         *(u16 *)(L10_PARTNER(state) + 0x32) = 0x1FF;
         *(f32 *)(L10_PARTNER(state) + 0x2C) =
@@ -39,9 +39,9 @@ void func_PAL_L10_00431A50(u8 *object)
         }
     case 1:
         if (*(s32 *)state != 0)
-            *(f32 *)(object + 0xF8) = func_00283B98(*(f32 *)(object + 0xF8), 0.005890487f);
+            *(f32 *)(object + 0xF8) = FastAddRotations(*(f32 *)(object + 0xF8), 0.005890487f);
         else
-            *(f32 *)(object + 0xF8) = func_00283BE0(*(f32 *)(object + 0xF8), 0.005890487f);
+            *(f32 *)(object + 0xF8) = fast_subtract_rotations(*(f32 *)(object + 0xF8), 0.005890487f);
         *(f32 *)(L10_PARTNER(state) + 0xF0) = *(f32 *)(object + 0xF0);
         *(f32 *)(L10_PARTNER(state) + 0xF8) = *(f32 *)(object + 0xF8);
         qcopy(L10_PARTNER(state) + 0x10, object + 0x10);

@@ -15,14 +15,14 @@ typedef int s32;
 
 typedef int TI16 __attribute__((mode(TI)));
 
-extern void func_00282F20(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
 typedef struct {
     u8 pad[0x18];
     u8 *f18;
 } L23Block1C0A80;
 
-extern L23Block1C0A80 D_L23_001C0A80;
+extern L23Block1C0A80 g_last_ray_hit;
 
 /* a 16-byte vector, aligned for the quadword copies */
 typedef struct {
@@ -38,22 +38,22 @@ typedef struct {
     u8 pad1C[0x14];
 } L23Hit;
 
-extern u8 *D_0018C0B0;
+extern u8 *g_hero_moby;
 
-extern s32 func_002761F8(void *, void *, s32, void *, s32);
+extern s32 CollLine(void *, void *, s32, void *, s32);
 
-extern void func_002A8C00(float, L23Hit *, u8 *, s32, L23Vec *);
+extern void make_hit_descriptor(float, L23Hit *, u8 *, s32, L23Vec *);
 
-extern void func_002A8E20(u8 *, L23Hit *);
+extern void QueueMobyImpact(u8 *, L23Hit *);
 
-extern void func_L00_002D6900(s32);
+extern void queue_copy_record_by_index(s32);
 
-extern void func_L22_0040E2B0(void *, s32, s32);
+extern void part_start_random_scale_effect(void *, s32, s32);
 
 /* the object's first record is set up against the table entry, then its marker byte is set */
 /* Checks if a shot has hit something. On a hit it damages the target, plays a sound and
    spark, then moves the shot to its next state. */
-void func_L23_00422668(u8 *moby, void *origin) {
+void shot_update_hit_check(u8 *moby, void *origin) {
     u8 *payload = *(u8 **)(moby + 0x68);
     L23Vec dir;
     L23Hit hit;
@@ -62,7 +62,7 @@ void func_L23_00422668(u8 *moby, void *origin) {
     if (CollLine(origin, moby + 0x10, 0, moby, 0) == 0) {
         return;
     }
-    hitMoby = gLastRayHit.f18;
+    hitMoby = g_last_ray_hit.f18;
     if (hitMoby != 0) {
         if (*(s16 *)(hitMoby + 0xAA) == 0x7E5 /* moby class 2021 */) {
             return;
@@ -72,14 +72,14 @@ void func_L23_00422668(u8 *moby, void *origin) {
         hit.b18 = 5;
         hit.b19 = 3;
         hit.h1A = *(u16 *)(moby + 0xAA);
-        if (gLastRayHit.f18 == gHeroMoby_0018C0B0) {
-            QueueMobyImpact(gLastRayHit.f18, &hit);
-            QueueRecordsByIndex(0x2B);
+        if (g_last_ray_hit.f18 == g_hero_moby) {
+            QueueMobyImpact(g_last_ray_hit.f18, &hit);
+            queue_copy_record_by_index(0x2B);
         }
-        StartRandomScaleEffect(moby + 0x10, 0xA, 1);
+        part_start_random_scale_effect(moby + 0x10, 0xA, 1);
     } else {
         *(TI16 *)&dir = *(TI16 *)(moby + 0x10);
-        StartRandomScaleEffect(&dir, 0xF, 0);
+        part_start_random_scale_effect(&dir, 0xF, 0);
     }
     moby[0x20] = 2;
 }

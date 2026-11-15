@@ -1,18 +1,19 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L02_001B01E0 __attribute__((sda));
 extern int D_L02_001FF6B8[];
-extern float D_L02_001BA500[4];
-extern int func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
-extern void *func_002A9640(char *, int, int);
+extern float g_camera_l02_position[4];
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern int func_PAL_002B1A50(char *, void *, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
-extern void func_L02_003DB880(char *);
-extern void func_L02_003FC020(void *, void *);
-extern void func_L02_003D4900(char *);
-extern int func_002B3BA8(char *, int, int, int, float, float);
+extern void brawler_advance_damage_stage(char *);
+extern void arena_set_current_boss(void *, void *);
+extern void chainblade_reset_to_idle(char *);
+extern int weapon_select_aim_target(char *, int, int, int, float, float);
 
 void func_PAL_L02_003D8388(char *self) {
     char *state = *(char **)(self + 0x68);
@@ -20,8 +21,8 @@ void func_PAL_L02_003D8388(char *self) {
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         D_L02_001B01E0 = 1;
-        *(unsigned char *)(state + 0x48) = func_00283CF0(15.0f);
-        *(unsigned char *)(state + 0x4A) = func_00283CF0(24.0f);
+        *(unsigned char *)(state + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(state + 0x4A) = FloatToInt(24.0f);
         *(unsigned char *)(state + 0xD7) = 1;
         *(unsigned char *)(state + 0x29) = 1;
         *(unsigned char *)(state + 0x1F9) = 1;
@@ -43,16 +44,16 @@ void func_PAL_L02_003D8388(char *self) {
         *(float *)(state + 0x140) = 0.52359885f;
         *(float *)(state + 0x144) = 0.01f;
         *(float *)(state + 0x13C) = 0.008f;
-        func_L02_003D4900(self);
+        chainblade_reset_to_idle(self);
     }
     if (*(unsigned char *)(self + 0x31)) {
-        if (func_00282E48(self + 0x10, D_L02_001BA500) < 60.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, g_camera_l02_position) < 60.0f) {
+            moby_update_ground_check(self);
             *(unsigned char *)(self + 0x6F) = 0x38;
         }
     }
     if (*(short *)(state + 0x330) == 0) {
-        damage = func_002A9640(self, 0x10000, 0);
+        damage = part_find_owned_effect_slot(self, 0x10000, 0);
         if (damage) {
             if (*(unsigned char *)(self + 0x20) < 5 ||
                 (*(unsigned char *)(self + 0x20) == 10 && *(short *)(state + 0x324) < 5))
@@ -87,12 +88,12 @@ void func_PAL_L02_003D8388(char *self) {
             char *source = *(char **)(state + 0x310);
             if (source && *(unsigned char *)(source + 0x20) != 0xFE &&
                 *(unsigned char *)(source + 0x20) != 0xFD && *(unsigned char *)(source + 0x20) >= 3) {
-                func_L02_003DB880(source);
-                func_L02_003FC020(*(void **)(self + 0xB8), *(void **)(state + 0x310));
+                brawler_advance_damage_stage(source);
+                arena_set_current_boss(*(void **)(self + 0xB8), *(void **)(state + 0x310));
             }
-            func_L02_003D4900(self);
+            chainblade_reset_to_idle(self);
         }
     }
-    *(short *)(state + 0x322) = func_002B3BA8(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
+    *(short *)(state + 0x322) = weapon_select_aim_target(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
     *(int *)(state + 0x30C) = *(int *)(state + 0x210);
 }

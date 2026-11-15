@@ -9,7 +9,7 @@ extern unsigned short *D_L20_001FBB20[];
 /* For each entity of the object's group that has class 0xD0F and whose state has bit 0 set and
    word 0x420 equal to 1, sets the state byte to 2 and clears bit 1 of the entity's flags. */
 /* Wakes up the troopers of this group that were waiting, switching them to their next state. */
-void func_L20_004450D8(unsigned char *moby) {
+void yeedil_wake_group_troopers(unsigned char *moby) {
     unsigned short *q;
     char *member;
 

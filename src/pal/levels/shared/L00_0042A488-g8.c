@@ -26,9 +26,9 @@ extern float D_00138280[];
 extern float D_00138284[];
 extern s32 D_001A7BA8 MACRO_ADDR;
 extern s32 D_001A7BA4 MACRO_ADDR;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern unsigned int D_001A7390 MACRO_ADDR;
-extern L00_00424F98_Counter D_0018C750;
+extern L00_00424F98_Counter g_progress_statistics;
 extern s32 ref_L00_00424F98_00 __attribute__((sda));
 extern s32 ref_L00_00424F98_01 __attribute__((sda));
 extern float ref_L00_00424F98_02 __attribute__((sda));
@@ -57,7 +57,7 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
             *x = t->steer;
     } else {
         t->steer_out = ref_L00_00424F98_02;
-        c = &D_0018C750;
+        c = &g_progress_statistics;
         n = c->count;
         if ((unsigned short)n < 3U) {
             ref_L00_00424F98_00++;
@@ -67,7 +67,7 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
                 if (((s32)(D_001A7390) * 5 + 2) / 6 > c->best)
                     c->best = ((s32)(D_001A7390) * 5 + 2) / 6;
                 ref_L00_00424F98_01 = 1;
-                c->flags = (c->flags | (1u << D_001A79F0)) | 0x80000000u;
+                c->flags = (c->flags | (1u << g_current_map_index)) | 0x80000000u;
             }
         }
     }

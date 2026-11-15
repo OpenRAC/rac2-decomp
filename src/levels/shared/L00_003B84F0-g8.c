@@ -58,8 +58,8 @@ typedef struct {
     unsigned char f22B4;
 } Hero_L00_003B84F0;
 
-extern Hero_L00_003B84F0 D_00189E20;
-extern int D_00138180[];
+extern Hero_L00_003B84F0 g_hero_state;
+extern int g_pad_state[];
 
 extern int D_L00_001AFCE0 __attribute__((sda));
 extern float D_L00_001AFCF4 __attribute__((sda));
@@ -96,26 +96,26 @@ extern float D_L00_001AFD6C __attribute__((sda));
 extern float D_L00_001AFD70 __attribute__((sda));
 extern float D_L00_001AFD74 __attribute__((sda));
 extern Ctl_L00_003B84F0 *D_L00_001AFD78 __attribute__((sda));
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 
-extern long long func_0027C878(int);
-extern float func_00282E80(void *, void *);
-extern void func_L00_003294F0(void *, int);
-extern void func_002DF3F8(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00283CE0(int);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_002A7798(float);
-extern float func_L00_0031A6C8(float, int);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern long long GetEffectTextureDescriptor(int);
+extern float vec_distance_xy(void *, void *);
+extern void moby_set_flag_bit(void *, int);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float IntToFloat(int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_ease_out_quad(float);
+extern float math_complement_power(float, int);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
-void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
+void target_tether_draw_beam(Moby_L00_003B84F0 *obj)
 {
     Packet_L00_003B84F0 pkt;
     Vec4_L00_003B84F0 b;
@@ -173,7 +173,7 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     pkt.col[3] = D_L00_001AFD10;
     pkt.col[2] = D_L00_001AFD10;
     pkt.col[1] = D_L00_001AFD10;
-    on = (gPadState[0x1A0 / 4] & gHeroState.f1230) != 0;
+    on = (g_pad_state[0x1A0 / 4] & g_hero_state.f1230) != 0;
     pkt.col[0] = D_L00_001AFD10;
     pkt.q88 = alpha0;
     pkt.uv[0] = D_L00_001AFD34;
@@ -188,7 +188,7 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     pkt.uv[7] = inv;
 
     dist = D_L00_001AFCF4;
-    if (gHeroState.f340 == 0 || gHeroState.f34E != 0 || D_L00_001AFCE0 != 0 || gHeroState.f1E0 != 0) {
+    if (g_hero_state.f340 == 0 || g_hero_state.f34E != 0 || D_L00_001AFCE0 != 0 || g_hero_state.f1E0 != 0) {
         on = 0;
     }
     if (ctl->moby != 0 && ctl->moby->f31 != 0) {
@@ -204,13 +204,13 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     } else {
         ctl->f44 = dist;
     }
-    if (on != 0 && D_L00_001AFCE0 == 0 && gHeroState.f1E0 == 0 && ctl->f44 > dist - 0.5f && ctl->moby != 0) {
+    if (on != 0 && D_L00_001AFCE0 == 0 && g_hero_state.f1E0 == 0 && ctl->f44 > dist - 0.5f && ctl->moby != 0) {
         ctl->f44 = 0.0f;
         ctl->f40 = 0.0f;
-        gHeroState.f1E0 = 30;
-        SetObjectFlagBit(ctl->moby, 1);
-        if (gHeroState.f22B4 == 0) {
-            CaptureCheckpointState(&gHeroState.v80, &gHeroState.v90);
+        g_hero_state.f1E0 = 30;
+        moby_set_flag_bit(ctl->moby, 1);
+        if (g_hero_state.f22B4 == 0) {
+            level_capture_checkpoint_state(&g_hero_state.v80, &g_hero_state.v90);
         }
     }
     if (ctl->f44 > dist) {
@@ -245,13 +245,13 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
                     t = 0.0f;
                 }
                 phase = x * D_L00_001AFD68;
-                u = (FastSinOrCosB(WrapAngleToPi(phase + IntToFloat(gFrameCounter_L00) * D_L00_001AFD6C)) + 1.0f) * 0.5f;
+                u = (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(phase + IntToFloat(g_frame_l00_counter) * D_L00_001AFD6C)) + 1.0f) * 0.5f;
                 if (u > 0.99999f) {
                     u = 0.99999f;
                 } else if (u < 0.01f) {
                     u = 0.01f;
                 }
-                w = D_L00_001AFD74 + range * EaseOutQuad(u);
+                w = D_L00_001AFD74 + range * math_ease_out_quad(u);
             } else {
                 t = x / ctl->f44;
                 if (t > 1.0f) {
@@ -259,20 +259,20 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
                 } else if (t < 0.0f) {
                     t = 0.0f;
                 }
-                w = D_L00_001AFD70 * FastSinOrCosB(t * 3.1415927f);
+                w = D_L00_001AFD70 * math_fast_sin_or_cos_b(t * 3.1415927f);
                 if (t > D_L00_001AFD70) {
                     t = D_L00_001AFD70;
                 } else if (t < 0.01f) {
                     t = 0.01f;
                 }
             }
-            s = ComputeComplementPower(FastSinOrCosB(t * 3.1415927f), 2);
+            s = math_complement_power(math_fast_sin_or_cos_b(t * 3.1415927f), 2);
             alpha = FloatToInt((flag ? D_L00_001AFD28 : D_L00_001AFD24) * s);
-            r = FloatToInt(D_L00_001AFD5C * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD38 * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD44), D_L00_001AFD50 * 0.017453294f)) + 1.0f));
-            g = FloatToInt(D_L00_001AFD60 * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD3C * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD48), D_L00_001AFD54 * 0.017453294f)) + 1.0f));
-            bl = FloatToInt(D_L00_001AFD64 * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD40 * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD4C), D_L00_001AFD58 * 0.017453294f)) + 1.0f));
-            if ((gPadState[0x1A0 / 4] & 8) || gHeroState.f2294 == 0x1D) {
-                alpha = FloatToInt((flag ? D_L00_001AFD30 : D_L00_001AFD2C) * ComputeComplementPower(FastSinOrCosB(t * 3.1415927f), 2));
+            r = FloatToInt(D_L00_001AFD5C * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(D_L00_001AFD38 * IntToFloat(g_frame_l00_counter) + x * D_L00_001AFD44), D_L00_001AFD50 * 0.017453294f)) + 1.0f));
+            g = FloatToInt(D_L00_001AFD60 * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(D_L00_001AFD3C * IntToFloat(g_frame_l00_counter) + x * D_L00_001AFD48), D_L00_001AFD54 * 0.017453294f)) + 1.0f));
+            bl = FloatToInt(D_L00_001AFD64 * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(D_L00_001AFD40 * IntToFloat(g_frame_l00_counter) + x * D_L00_001AFD4C), D_L00_001AFD58 * 0.017453294f)) + 1.0f));
+            if ((g_pad_state[0x1A0 / 4] & 8) || g_hero_state.f2294 == 0x1D) {
+                alpha = FloatToInt((flag ? D_L00_001AFD30 : D_L00_001AFD2C) * math_complement_power(math_fast_sin_or_cos_b(t * 3.1415927f), 2));
                 if (x < ctl->f44 * 0.5f) {
                     alpha = FloatToInt(flag ? D_L00_001AFD30 : D_L00_001AFD2C);
                 }

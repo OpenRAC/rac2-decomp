@@ -4,12 +4,12 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
 extern char D_0018A0E0[];
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 
 /* Builds a set of three axis vectors (a rotation basis) from two input vectors and a fixed direction. */
-void func_L14_00390DF8(char *output, char *first, char *second) {
+void mat_build_basis_from_vecs(char *output, char *first, char *second) {
     Vector direction;
     qcopy(&direction, D_0018A0E0);
     FastVecScale(&direction, &direction, -1.0f);

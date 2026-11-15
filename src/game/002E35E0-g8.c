@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002E35E0 in its own unit (flags in config/cflags.txt: -O2 -G8 -ffunction-sections
  * -fmove-all-movables). The loop's first pass needs the constant 3 and the copy addresses hoisted
  * together: with the default heuristic the 56-insn loop leaves 3 for the second pass, which gives
@@ -11,25 +12,25 @@ extern char ref_L00_002E35E0_02[] __attribute__((sda));
 extern char ref_L00_002E35E0_03[] __attribute__((sda));
 extern float ref_L00_002E35E0_04 __attribute__((sda));
 extern int D_001A72E0;
-extern void func_002E37B0(void);
-extern void func_00283388(void *);
-extern void func_00282C88(void *);
-extern float func_00283B98(float, float);
-extern void func_00283430(void *, void *);
-extern void func_002E3940(int);
-extern void func_002E3820(void);
-extern void func_002FC560(int, unsigned long long);
+extern void gfx_resident_table_reset(void);
+extern void set_identity_matrix(void *);
+extern void vec_clear_128(void *);
+extern float FastAddRotations(float, float);
+extern void mat_fast_helper_b(void *, void *);
+extern void gfx_process_view_entry(int);
+extern void gfx_link_packet_chain(void);
+extern void VU1_addGSregister(int, unsigned long long);
 
 /* Builds the transform for each view, hands each to the view routine, then finishes the render setup. */
-void func_002E35E0(void)
+void cam_build_view_transforms(void)
 {
     float vec[4];
     int i = 0;
 
-    ResetResidentTable();
+    gfx_resident_table_reset();
     *(short *)(ref_L00_002E35E0_00 + 4) = 0;
     set_identity_matrix(ref_L00_002E35E0_01);
-    ClearVector128(vec);
+    vec_clear_128(vec);
     for (; i < *(short *)(ref_L00_002E35E0_00 + 6); i++) {
         switch (i) {
         case 0:
@@ -49,11 +50,11 @@ void func_002E35E0(void)
             vec[2] = FastAddRotations(ref_L00_002E35E0_04, 0.125f);
             break;
         }
-        FastMatrixHelperB(ref_L00_002E35E0_01, vec);
+        mat_fast_helper_b(ref_L00_002E35E0_01, vec);
         qcopy(ref_L00_002E35E0_03, ref_L00_002E35E0_02);
-        ProcessViewEntry(i);
+        gfx_process_view_entry(i);
     }
-    LinkRenderPacketChain();
+    gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x4E, 0x1000000 | (D_001A72E0 >> 13));
 }

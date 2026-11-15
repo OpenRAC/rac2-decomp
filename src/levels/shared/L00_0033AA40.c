@@ -14,24 +14,24 @@ typedef struct {
     float payload[8];
 } L00_0033AA40_Particle;
 
-extern L00_0033AA40_Particle *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00282E80(void *, void *);
-extern float func_002A7878(float, float);
+extern L00_0033AA40_Particle *part_alloc(int);
+extern int FloatToInt(float);
+extern float vec_distance_xy(void *, void *);
+extern float math_random_float_range(float, float);
 extern unsigned char *ref_L00_0033AA40_00[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 /* Creates a moving particle that is brighter when it is close to the camera. */
-L00_0033AA40_Particle *func_L00_0033AA40(Quad *position, Quad *velocity, unsigned int size,
+L00_0033AA40_Particle *SpawnDistanceFadedParticle(Quad *position, Quad *velocity, unsigned int size,
                                          float life, float a, int color, float b, int value, int flag)
 {
-    L00_0033AA40_Particle *p = AllocParticle(0x40);
+    L00_0033AA40_Particle *p = part_alloc(0x40);
 
     if (p) {
         float *out = p->payload;
 
         qcopy(&p->position, position);
-        if (vec_distance_xy(gHeroPosition, position) < 80.0f)
+        if (vec_distance_xy(g_hero_position, position) < 80.0f)
             p->alpha = FloatToInt(1.0f) + 48;
         else
             p->alpha = FloatToInt(1.0f) + 32;
@@ -41,7 +41,7 @@ L00_0033AA40_Particle *func_L00_0033AA40(Quad *position, Quad *velocity, unsigne
         p->color = color;
         p->life = life * 210000.0f;
         {
-            float random = RandomFloatRange(0.0f, 255.0f);
+            float random = math_random_float_range(0.0f, 255.0f);
 
             p->size = size;
             p->seed = (int)random;

@@ -26,24 +26,24 @@ typedef struct {
     unsigned char pad24a0[44];
     int f24cc;
 } Root;
-extern Root D_00189E20;
+extern Root g_hero_state;
 extern char D_L00_001C3480[];
 extern int D_L00_001A8F00 __attribute__((sda));
 extern unsigned char D_001A7A33 __attribute__((sda));
-extern unsigned char D_001A7A32 __attribute__((sda));
-extern float func_L00_0037E668(void);
+extern unsigned char g_bolt_multiplier __attribute__((sda));
+extern float fade_get_value(void);
 extern float func_PAL_L00_00381328(float);
-extern void func_L00_002A6708(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_L00_002D36E0(void *, int, float, float, float);
+extern void hero_clear_tracked_slots(void);
+extern void FastVecSub(void *, void *, void *);
+extern void hero_build_relative_point(void *, int, float, float, float);
 extern void ref_L00_002B2CC8_0(int, int);
-extern void *func_002A9640(void *, int, int);
-extern int func_00283CF0(float);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern int FloatToInt(float);
 extern void func_PAL_L00_002A4D58(int);
-extern void func_L00_002B9B88(int, int);
-extern void func_L00_002B2C58(void *, int, float, float);
-extern void func_L00_002D3C68(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void hero_play_sound(int, int);
+extern void hero_flatten_push_vector(void *, int, float, float);
+extern void cam_scale_view_space_height(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 #define SI(o) (*(int *)(slot + (o)))
 #define SF(o) (*(float *)(slot + (o)))
 
@@ -54,18 +54,18 @@ int func_PAL_L00_002B2BE0(int apply)
     int special;
     float scale;
 
-    if (D_00189E20.f229c == 20)
+    if (g_hero_state.f229c == 20)
         return 0;
-    if (D_00189E20.f229c == 7)
+    if (g_hero_state.f229c == 7)
         return 0;
-    if (D_00189E20.f2294 == 49)
+    if (g_hero_state.f2294 == 49)
         return 0;
-    if (D_00189E20.f1dc)
+    if (g_hero_state.f1dc)
         return 0;
     if (D_L00_001A8F00)
         return 0;
-    D_00189E20.f249c = 0;
-    obj = D_00189E20.f2290;
+    g_hero_state.f249c = 0;
+    obj = g_hero_state.f2290;
     if ((unsigned char)obj[0xa8] == 255)
         return 0;
     slot = D_L00_001C3480 + (unsigned char)obj[0xa8] * 64;
@@ -73,81 +73,81 @@ int func_PAL_L00_002B2BE0(int apply)
         return 0;
     if (SF(0x2c) != 0.0f) {
         D_001A7A33 = 0;
-        D_001A7A32 = 1;
+        g_bolt_multiplier = 1;
     }
-    if (func_L00_0037E668() != 0.0f && !D_00189E20.f22b4) {
+    if (fade_get_value() != 0.0f && !g_hero_state.f22b4) {
         SF(0x2c) = func_PAL_L00_00381328(SF(0x2c));
         if (SF(0x2c) == 0.0f)
             return 0;
     }
-    D_00189E20.f249c = SI(0x20);
-    if (D_00189E20.f229c == 15) {
-        D_00189E20.f6c4 = (int)slot;
-        D_00189E20.f68e = 1;
+    g_hero_state.f249c = SI(0x20);
+    if (g_hero_state.f229c == 15) {
+        g_hero_state.f6c4 = (int)slot;
+        g_hero_state.f68e = 1;
         return 0;
     }
     if (!apply)
         return 1;
-    func_L00_002A6708();
+    hero_clear_tracked_slots();
     special = 0;
     if (SI(0x30) & 1) {
         qcopy(v, slot + 0x10);
         if (SF(0x1c) == 5627.925f)
             special = 1;
     } else if (SI(0x20)) {
-        func_00282CF0(v, (char *)&D_00189E20 + 0x80,
+        FastVecSub(v, (char *)&g_hero_state + 0x80,
                      *(char **)(slot + 0x20) + 0x10);
     } else {
-        func_L00_002D36E0(v, 0, -1.0f, 0.0f, 0.0f);
+        hero_build_relative_point(v, 0, -1.0f, 0.0f, 0.0f);
     }
-    switch (D_00189E20.f22b4) {
+    switch (g_hero_state.f22b4) {
     case 0: {
-        p = D_00189E20.f249c;
+        p = g_hero_state.f249c;
         if (p && (*(short *)(p + 0xaa) == 1259 || *(short *)(p + 0xaa) == 1368)) {
             ref_L00_002B2CC8_0(125, 1);
             return 1;
         }
-        if ((D_00189E20.f2294 == 1 || D_00189E20.f2294 == 29 || D_00189E20.f1500) &&
+        if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 29 || g_hero_state.f1500) &&
             !(SI(0x24) & 8)) {
-            p = func_002A9640(D_00189E20.f2290, 1, 0);
+            p = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
             if (p)
-                func_PAL_L00_002A4D58(func_00283CF0(*(float *)(p + 0x2c)));
-            if (!D_00189E20.f24cc)
+                func_PAL_L00_002A4D58(FloatToInt(*(float *)(p + 0x2c)));
+            if (!g_hero_state.f24cc)
                 ref_L00_002B2CC8_0(22, 1);
-            D_00189E20.f1dc = 64;
-            if (!D_00189E20.f21c)
-                D_00189E20.f21c = 15;
-            func_L00_002B9B88(20, 0);
+            g_hero_state.f1dc = 64;
+            if (!g_hero_state.f21c)
+                g_hero_state.f21c = 15;
+            hero_play_sound(20, 0);
             return 0;
         }
-        if (D_00189E20.f229c == 18)
+        if (g_hero_state.f229c == 18)
             ref_L00_002B2CC8_0(114, 1);
-        else if (D_00189E20.f229c == 17)
+        else if (g_hero_state.f229c == 17)
             ref_L00_002B2CC8_0(115, 1);
         else if (SI(0x24) & 8)
             ref_L00_002B2CC8_0(140, 1);
         else
             ref_L00_002B2CC8_0(22, 1);
-        if (D_00189E20.f2294 == 140) {
+        if (g_hero_state.f2294 == 140) {
             qzero(v);
         } else {
             scale = 0.06600001f;
-            if (D_00189E20.f1497)
+            if (g_hero_state.f1497)
                 scale = 0.0f;
-            func_L00_002B2C58(v, special, scale, 0.034f);
+            hero_flatten_push_vector(v, special, scale, 0.034f);
             if (special && (unsigned char)slot[0x28] == 4)
-                func_L00_002D3C68(v, v, 2.0f);
+                cam_scale_view_space_height(v, v, 2.0f);
         }
         break;
     }
     case 1: {
         ref_L00_002B2CC8_0(66, 1);
-        func_L00_002B2C58(v, special, 0.10000001f, 0.060000002f);
+        hero_flatten_push_vector(v, special, 0.10000001f, 0.060000002f);
         break;
     }
     }
-    func_00282CC0((char *)&D_00189E20 + 0xf0, (char *)&D_00189E20 + 0xf0, v);
-    func_00282CC0((char *)&D_00189E20 + 0x110, (char *)&D_00189E20 + 0x110, v);
+    FastVecAdd((char *)&g_hero_state + 0xf0, (char *)&g_hero_state + 0xf0, v);
+    FastVecAdd((char *)&g_hero_state + 0x110, (char *)&g_hero_state + 0x110, v);
     return 1;
 }
 

@@ -2,14 +2,14 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int func_0029EFD0(int);
-extern f32 func_002A7940(void);
-extern void func_00283360(void *);
-extern void func_L22_003FBBF0(void *);
+extern int CreateMoby(int);
+extern f32 math_random_angle(void);
+extern void set_identity_rotation_rows(void *);
+extern void part_init_effect_slots(void *);
 extern int D_L22_001AF37C;
 
 /* Creates a moby of class 3642 linked to the owner at the given position, with a size scale; a nonzero flag gives it a staggered timer. */
-char *func_L22_003FB1F8(char *owner, TI128 *pos, int staggered, f32 scale) {
+char *SpawnLinkedScaledObject(char *owner, TI128 *pos, int staggered, f32 scale) {
     char *created = (char *)CreateMoby(0xE3A /* moby class 3642 */);
     if (created != 0) {
         u8 *ctl = *(u8 **)(created + 0x68);
@@ -27,11 +27,11 @@ char *func_L22_003FB1F8(char *owner, TI128 *pos, int staggered, f32 scale) {
         *(u8 *)(created + 0x20) = 0;
         *(f32 *)(created + 0x2C) = *(f32 *)(*(u32 *)(created + 0x24) + 0x24) * scale;
         *(u32 *)(ctl + 0x20) = (u32)owner;
-        *(f32 *)(ctl + 0x4C) = RandomAngle();
+        *(f32 *)(ctl + 0x4C) = math_random_angle();
         qcopy(created + 0x10, pos);
         *(u16 *)(created + 0x34) |= 0x41;
         set_identity_rotation_rows(created + 0xC0);
-        InitEffectParticleSlots(created);
+        part_init_effect_slots(created);
     }
     return created;
 }

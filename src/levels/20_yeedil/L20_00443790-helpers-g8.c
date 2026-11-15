@@ -6,20 +6,20 @@ extern float D_L20_001B2168 __attribute__((sda));
 extern float D_L20_001B216C __attribute__((sda));
 extern float D_L20_001B2170 __attribute__((sda));
 
-extern void *func_0029EFD0(int);
-extern void func_002B37E8(char *, char *);
-extern void func_002833F0(char *, char *);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282DD8(char *, char *, char *);
-extern float func_00283198(float);
-extern void func_002ACE78(float *, float *, float);
-extern float func_L00_0031CDD0(char *, char *, float *, float, float);
-extern int func_00283CF0(float);
-extern void func_L20_00443908(char *);
+extern void *CreateMoby(int);
+extern void moby_init_child_from_parent(char *, char *);
+extern void euler_rotation_basis(char *, char *);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecCross(char *, char *, char *);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_set_direction_with_complement(float *, float *, float);
+extern float weapon_compute_shot_launch_speed(char *, char *, float *, float, float);
+extern int FloatToInt(float);
+extern void tumbling_debris_update(char *);
 
 /* Creates an object of the given class at the owner and throws it in an arc toward the target. Returns the new object. */
-char *func_L20_00443790(char *owner, int classId, char *aimTarget) {
+char *yeedil_boss_spawn_lobbed_object(char *owner, int classId, char *aimTarget) {
     char *obj = (char *)CreateMoby(classId);
     char *state;
     char *velocity;
@@ -29,7 +29,7 @@ char *func_L20_00443790(char *owner, int classId, char *aimTarget) {
     unsigned short flags;
 
     if (obj != 0) {
-        InitChildObjectFromParent(obj, owner);
+        moby_init_child_from_parent(obj, owner);
         qcopy(obj + 0xF0, owner + 0xF0);
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         flags = *(unsigned short *)(obj + 0x34);
@@ -45,11 +45,11 @@ char *func_L20_00443790(char *owner, int classId, char *aimTarget) {
         *(float *)(state + 8) = 0.0f;
         vec_scale_to_length(state, state, speed);
         FastVecCross(velocity, state, obj + 0xE0);
-        SetDirectionWithComplement((float *)velocity, (float *)velocity, FastSinOrCosB(D_L20_001B2170 * 0.000290888245f));
-        *(float *)(state + 8) = ComputeShotLaunchSpeed(obj + 0x10, aimTarget, &flightTime, speed, -acceleration);
+        vec_set_direction_with_complement((float *)velocity, (float *)velocity, math_fast_sin_or_cos_b(D_L20_001B2170 * 0.000290888245f));
+        *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, aimTarget, &flightTime, speed, -acceleration);
         *(float *)(state + 0x20) = acceleration;
         *(int *)(state + 0x24) = FloatToInt(flightTime);
-        *(void (**)(char *))(obj + 0x64) = UpdateTumblingDebrisMoby;
+        *(void (**)(char *))(obj + 0x64) = tumbling_debris_update;
     }
     return obj;
 }

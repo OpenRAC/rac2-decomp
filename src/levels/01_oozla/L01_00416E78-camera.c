@@ -1,34 +1,34 @@
 #include "names.h"
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4]; } Vector;
-extern float func_0029F530(char *);
-extern float func_00283B98(float, float), func_00283BE0(float, float);
-extern float func_00283180(float), func_00283198(float);
-extern void func_00282CC0(void *, void *, void *), func_00282C88(void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_00335370(void *), func_003353C8(void *);
+extern float moby_get_anim_value(char *);
+extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *), vec_clear_128(void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void object_copy_vector_to_selected(void *), cam_set_state_rotation(void *);
 extern char *D_L01_001B264C __attribute__((sda));
-extern struct { unsigned char prefix[0x80]; Vector position; unsigned char unused90[8]; float heading; } D_00189E20;
+extern struct { unsigned char prefix[0x80]; Vector position; unsigned char unused90[8]; float heading; } g_hero_state;
 
 /* Blend the configured cameras, or orbit the player when either endpoint is absent. */
-void func_L01_00416E78(char *object)
+void gold_bolt_cam_update(char *object)
 {
     int *state = *(int **)(object + 0x68);
     Vector position, rotation, first, second;
     float weight, heading, value;
     if (*(unsigned char *)(object + 0x42) == 1)
-        value = GetMobyAnimationValue(object);
+        value = moby_get_anim_value(object);
     else
         value = 170.0f;
     weight = value * 0.0058823530562222003937f;
     if (state[1] == -1 || state[2] == -1) {
-        heading = FastAddRotations(weight * 0.69813179969787597656f - 0.34906589984893798828f, gHeroState.heading);
-        position.f[0] = FastSinOrCosA(heading) * 5.0f;
-        position.f[1] = FastSinOrCosB(heading) * 5.0f;
+        heading = FastAddRotations(weight * 0.69813179969787597656f - 0.34906589984893798828f, g_hero_state.heading);
+        position.f[0] = math_fast_sin_or_cos_a(heading) * 5.0f;
+        position.f[1] = math_fast_sin_or_cos_b(heading) * 5.0f;
         position.f[2] = 0;
-        FastVecAdd(&position, &position, &gHeroState.position);
+        FastVecAdd(&position, &position, &g_hero_state.position);
         position.f[2] += 1.0f;
-        ClearVector128(&rotation);
+        vec_clear_128(&rotation);
         rotation.f[2] = FastAddRotations(heading, 3.141590118408203125f);
         rotation.f[1] = weight * -0.17000000178813934326f;
     } else {
@@ -39,6 +39,6 @@ void func_L01_00416E78(char *object)
         rotation.f[1] = FastAddRotations(fast_subtract_rotations(second.f[1], first.f[1]) * weight, first.f[1]);
         rotation.f[0] = FastAddRotations(fast_subtract_rotations(second.f[0], first.f[0]) * weight, first.f[0]);
     }
-    CopyVectorToSelectedObject(&position);
-    SetCameraStateRotation(&rotation);
+    object_copy_vector_to_selected(&position);
+    cam_set_state_rotation(&rotation);
 }

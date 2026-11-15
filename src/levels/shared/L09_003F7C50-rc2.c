@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ extern s32 ref_L09_003F7C50_00(s8 *, s32, s32, s32);
 extern s32 ref_L09_003F7C50_01(s8 *, s32, f32);
 
 /* Chooses a path for the enemy to follow and returns its current point, or -1 if there is no path. */
-s32 func_L09_003F7C50(s8 *moby, s32 pathIndex, s32 mode) {
+s32 enemy_select_path(s8 *moby, s32 pathIndex, s32 mode) {
     s8 *vars;
     s32 pathParam;
 

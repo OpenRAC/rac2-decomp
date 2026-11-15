@@ -17,13 +17,13 @@ extern void func_31BEC0(int, int);
 
 extern int D_L01_001A79F0;
 
-extern void *func_L01_002F1FD0(float, float, float);
+extern void *tv_screen_find_nearest(float, float, float);
 
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 extern char D_L01_0027F810[];
 
@@ -42,7 +42,7 @@ typedef struct {
 extern L01_002F2098_STATE D_L01_001BD1C0;
 
 /* Builds the ship's four trail slices for the level's current colour. */
-void func_L01_002F2098(void)
+void ship_build_trail_slices(void)
 {
     int index;
     void *obj;
@@ -55,7 +55,7 @@ void func_L01_002F2098(void)
         return;
 
     index = -1;
-    obj = FindNearestTvScreen(0.0f, 0.0f, 0.0f);
+    obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
     if (D_L01_001BD1C0.mode == 3)
         index = 1;
     if (index != -1 && obj != 0) {

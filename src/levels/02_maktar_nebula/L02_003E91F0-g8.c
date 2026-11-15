@@ -12,23 +12,23 @@ extern int D_L02_001B0C7C __attribute__((sda));
 extern float D_L02_00249090[2][20][4];
 extern float D_L02_00249310[20], D_L02_00249360[20][4], D_L02_002494A0[20];
 typedef union { char b[0x2600]; float f[0x980]; Quad q[0x260]; } Hero;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char D_L02_001A8F20[] __attribute__((sda));
-extern float func_00283B98(float, float), func_00283BE0(float, float);
-extern int func_002AB1F0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283CE0(int), func_002ABB18(float), func_00283198(float), func_00283180(float), func_002A78D8(float, float);
-extern void func_00282D08(void *, void *, void *, float);
-extern float func_00282DF0(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283248(float, float), func_002A7878(float, float);
-extern int func_002A7820(int, int), func_002A77E0(int);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
+extern int moby_get_private_value_0(void *);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float IntToFloat(int), math_wrap_angle_to_pi(float), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float), math_random_signed_float_range(float, float);
+extern void lerp_vector(void *, void *, void *, float);
+extern float FastVecLength(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float mat_fast_helper_a(float, float), math_random_float_range(float, float);
+extern int math_random_int_range(int, int), math_random_int_below(int);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 typedef struct {
     char pad[0x20];
     float start[4];
@@ -38,7 +38,7 @@ typedef struct {
     int count;
 } TetherState;
 /* Relaxes and animates a pair of twenty-point tether strands, then emits sparks. */
-void func_L02_003E91F0(char *actor) {
+void tether_animate_strands(char *actor) {
     TetherState *state = *(TetherState **)(actor + 0x68);
     float endpoint[4], direction[4], delta[4], blended[4], tangent[4], sideways[4], toward[4];
     float length = D_L02_001B0BA8 * 0.05f;
@@ -48,7 +48,7 @@ void func_L02_003E91F0(char *actor) {
     D_L02_001B0C30 = fast_subtract_rotations(D_L02_001B0C30, D_L02_001B0C34);
     D_L02_001B0C44 = FastAddRotations(D_L02_001B0C44, D_L02_001B0C48);
     if (state->target) {
-        char *settings = (char *)GetMobyPrivateValue0(state->target);
+        char *settings = (char *)moby_get_private_value_0(state->target);
         qcopy(endpoint, state->target + 0x10);
         endpoint[2] += *(float *)(settings + 0x10);
         length = fast_vec_dist(state->start, endpoint) * 0.05f;
@@ -57,8 +57,8 @@ void func_L02_003E91F0(char *actor) {
     FastVecSub(direction, state->end, state->start);
     vec_scale_to_length(direction, direction, 1.0f);
     if (state->target) {
-        FastVecCross(delta, direction, &((Hero *)gHeroState)->q[0x2C0 / 16]);
-        ApplyAxisRotationToQuaternion(direction, direction, delta, 0.17453295f);
+        FastVecCross(delta, direction, &((Hero *)g_hero_state)->q[0x2C0 / 16]);
+        math_apply_axis_rotation_to_quat(direction, direction, delta, 0.17453295f);
     }
     FastVecScale(tangent, direction, length);
     qcopy(D_L02_00249090[0][0], state->start);
@@ -71,8 +71,8 @@ void func_L02_003E91F0(char *actor) {
         float *point;
         height = IntToFloat(i);
         height = D_L02_001B0C20 + (D_L02_001B0C24 - D_L02_001B0C20) * (height * 0.05f);
-        height *= FastSinOrCosB(WrapAngleToPi(D_L02_001B0C28 + (float)i * D_L02_001B0C1C));
-        height += RandomSignedFloatRange(D_L02_001B0C60, D_L02_001B0C64);
+        height *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L02_001B0C28 + (float)i * D_L02_001B0C1C));
+        height += math_random_signed_float_range(D_L02_001B0C60, D_L02_001B0C64);
         D_L02_00249090[0][i][2] -= D_L02_00249310[i];
         D_L02_00249310[i] = height;
         FastVecSub(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
@@ -102,36 +102,36 @@ void func_L02_003E91F0(char *actor) {
                 lerp_vector(tangent, tangent, toward, height);
             }
         }
-        value = WrapAngleToPi(D_L02_001B0C30 + (float)i * D_L02_001B0C38);
-        oscillation = WrapAngleToPi(D_L02_001B0C44 + (float)i * D_L02_001B0C4C);
-        height = D_L02_001B0C3C * FastSinOrCosB(oscillation);
+        value = math_wrap_angle_to_pi(D_L02_001B0C30 + (float)i * D_L02_001B0C38);
+        oscillation = math_wrap_angle_to_pi(D_L02_001B0C44 + (float)i * D_L02_001B0C4C);
+        height = D_L02_001B0C3C * math_fast_sin_or_cos_b(oscillation);
         qcopy(D_L02_00249090[1][i], D_L02_00249090[0][i]);
-        height *= FastSinOrCosB(value);
+        height *= math_fast_sin_or_cos_b(value);
         D_L02_002494A0[i] = height;
         point = D_L02_00249090[0][i];
         point[82] += height;
-        height = FastAddRotations(FastMatrixHelperA(delta[0], delta[1]), 1.5707965f);
-        lateral = D_L02_001B0C40 * FastSinOrCosA(value);
-        sideways[0] = FastSinOrCosA(height) * lateral;
-        sideways[1] = FastSinOrCosB(height) * lateral;
+        height = FastAddRotations(mat_fast_helper_a(delta[0], delta[1]), 1.5707965f);
+        lateral = D_L02_001B0C40 * math_fast_sin_or_cos_a(value);
+        sideways[0] = math_fast_sin_or_cos_a(height) * lateral;
+        sideways[1] = math_fast_sin_or_cos_b(height) * lateral;
         sideways[2] = 0;
         qcopy(D_L02_00249360[i], sideways);
         FastVecAdd(D_L02_00249090[1][i], D_L02_00249090[1][i], sideways);
     }
     }
     qcopy(state->end, D_L02_00249090[0][19]);
-    oscillation = RandomSignedFloatRange(0.52359885f, 1.0471977f);
-    phase = RandomFloatRange(-0.52359885f, 1.0471977f);
+    oscillation = math_random_signed_float_range(0.52359885f, 1.0471977f);
+    phase = math_random_float_range(-0.52359885f, 1.0471977f);
     FastVecScale(toward, direction, D_L02_001B0CAC);
-    ApplyAxisRotationToQuaternion(toward, toward, &((Hero *)gHeroState)->q[0x740 / 16], phase);
-    ApplyAxisRotationToQuaternion(toward, toward, &((Hero *)gHeroState)->q[0x750 / 16], oscillation);
-    spin = RandomIntRange(1, 8);
-    if (RandomIntBelow(2)) spin = -spin;
-    radius = RandomFloatRange(0.2f, 0.6f);
-    SpawnGroundEffectParticle(state->start, 15, radius * 0.3f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, toward, 0, 0.0f);
-    SpawnGroundEffectParticle(state->start, 15, radius * 0.15f, radius * 0.5f, 0x307F7F7F, 0, -spin, toward, 0, 0.0f);
-    spin = RandomIntRange(1, 8);
-    if (RandomIntBelow(2)) spin = -spin;
-    radius = RandomFloatRange(0.15f, 3.0f);
-    SpawnGroundEffectParticle(state->end, 12, radius * 0.1f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, D_L02_001A8F20, 0, 0.0f);
+    math_apply_axis_rotation_to_quat(toward, toward, &((Hero *)g_hero_state)->q[0x740 / 16], phase);
+    math_apply_axis_rotation_to_quat(toward, toward, &((Hero *)g_hero_state)->q[0x750 / 16], oscillation);
+    spin = math_random_int_range(1, 8);
+    if (math_random_int_below(2)) spin = -spin;
+    radius = math_random_float_range(0.2f, 0.6f);
+    part_spawn_ground_effect(state->start, 15, radius * 0.3f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, toward, 0, 0.0f);
+    part_spawn_ground_effect(state->start, 15, radius * 0.15f, radius * 0.5f, 0x307F7F7F, 0, -spin, toward, 0, 0.0f);
+    spin = math_random_int_range(1, 8);
+    if (math_random_int_below(2)) spin = -spin;
+    radius = math_random_float_range(0.15f, 3.0f);
+    part_spawn_ground_effect(state->end, 12, radius * 0.1f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, D_L02_001A8F20, 0, 0.0f);
 }

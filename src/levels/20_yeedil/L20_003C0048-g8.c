@@ -5,22 +5,22 @@
    D_001A79F0 read the assembler finds in a delay slot), and -g (retail has the two
    nops -g leaves before the div.s). */
 
-extern void func_0029F338(void *);
-extern int func_002B38B8(void *);
-extern int func_002A0430(u8);
-extern float func_00283CE0(int);
-extern int func_00282948(void *);
-extern void func_L20_003C0350(void *);
-extern void func_L20_002C5A48(void *);
-extern void func_002DF3F8(void *, void *);
-extern void func_L20_003C02D0(void *);
-extern void func_L00_00429020(s32);
+extern void moby_mark_spawned(void *);
+extern int flag_is_third_pending_set(void *);
+extern int moby_mark_table_entry_flagged(u8);
+extern float IntToFloat(int);
+extern int math_fast_float_d(void *);
+extern void group_raise_from_saved_heights(void *);
+extern void hero_exit_vehicle_mode(void *);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void group_lower_save_heights(void *);
+extern void cam_lock_entry(s32);
 
 extern char *D_L20_001B2F9C;
 extern u8 D_0019B4A8[] NOT_SDA;
 extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
-extern char D_00189E20[];
-extern s32 D_001A79F0[] __attribute__((sda));
+extern char g_hero_state[];
+extern s32 g_current_map_index[] __attribute__((sda));
 
 typedef struct {
     s32 group, timer;
@@ -39,7 +39,7 @@ typedef struct {
 } ScriptMoby;
 
 /* Updates moby class 1352: a scripted pickup. It waits for a linked moby to reach a state, records it in the save data, plays a sound, and finishes after two seconds. */
-void func_L20_003C0048(ScriptMoby *self) {
+void scripted_pickup_update(ScriptMoby *self) {
     ScriptState *state = self->script;
 
     switch (self->mode) {
@@ -48,7 +48,7 @@ void func_L20_003C0048(ScriptMoby *self) {
         int bits;
 
         if (state->target < 0 || state->group < 0 || state->parameter < 0) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             break;
         }
         uid = self->uid;
@@ -56,13 +56,13 @@ void func_L20_003C0048(ScriptMoby *self) {
             self->mode = 3;
             break;
         }
-        bits = D_0019B4A8[((s16)uid >> 1) + (gCurrentMapIndex[0] << 10)];
+        bits = D_0019B4A8[((s16)uid >> 1) + (g_current_map_index[0] << 10)];
         if ((uid & 1) ? (bits >> 4) & 7 : bits & 7) {
             self->mode = 3;
             break;
         }
         self->mode = 1;
-        LowerGroupAndSaveHeights(self);
+        group_lower_save_heights(self);
         break;
     }
     case 1: {
@@ -71,44 +71,44 @@ void func_L20_003C0048(ScriptMoby *self) {
         if (*(u8 *)((state->target << 8) + (s32)D_L20_001B2F9C + 0x20) == state->expectedState) {
             uid = self->uid;
         } else {
-            if (!state->flag15 || !IsThirdPendingFlagSet(self))
+            if (!state->flag15 || !flag_is_third_pending_set(self))
                 break;
             uid = self->uid;
         }
         if (uid & 1) {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (gCurrentMapIndex[0] << 10));
+            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if (((*entry >> 4) & 7) != 7)
                 *entry += 0x10;
         } else {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (gCurrentMapIndex[0] << 10));
+            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if ((*entry & 7) != 7)
                 ++*entry;
         }
         if (state->flag17)
-            MarkTableEntryFlagged(self->channel);
+            moby_mark_table_entry_flagged(self->channel);
         self->mode = 2;
         state->timer = 120;
         {
             float duration = IntToFloat(120);
             state->inverseDuration = 1.0f / duration;
         }
-        LockCameraEntry(state->parameter);
+        cam_lock_entry(state->parameter);
         break;
     }
     case 2:
-        FastFloatHelperD(&state->timer);
-        RaiseGroupFromSavedHeights(self);
+        math_fast_float_d(&state->timer);
+        group_raise_from_saved_heights(self);
         if (state->timer == 0) {
-            char *hero = gHeroState;
+            char *hero = g_hero_state;
 
             if (*(s32 *)(hero + 0x2294) == 0x6F)
                 break;
             if (state->exitVehicle)
-                ExitYeedilHeroVehicleMode(0);
+                hero_exit_vehicle_mode(0);
             if (state->flag17)
-                CaptureCheckpointState(hero + 0x80, hero + 0x90);
+                level_capture_checkpoint_state(hero + 0x80, hero + 0x90);
             self->mode = 3;
         }
         break;

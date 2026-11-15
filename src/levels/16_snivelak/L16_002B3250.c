@@ -54,48 +54,48 @@ typedef struct {
     u8 pad3C[4];
 } PlayerContactEntry;
 
-extern PlayerContactState D_00189E20;
+extern PlayerContactState g_hero_state;
 extern PlayerContactEntry D_L16_001C41C0[];
 extern s32 D_L16_001A8F00 __attribute__((sda));
-extern u8 D_001A7A32 __attribute__((sda));
+extern u8 g_bolt_multiplier __attribute__((sda));
 extern u8 D_001A7A33 __attribute__((sda));
 
-extern float func_L00_0037E668(void);
-extern float func_L00_0037E5F0(float);
-extern s32 func_00283CF0(float);
-extern void func_L00_002A6708(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_L00_002D36E0(void *, s32, float, float, float);
-extern void func_L16_002C0BC8(unsigned long, unsigned long);
-extern u8 *func_002A9640(u8 *, s32, s32);
-extern void func_L00_002A4EF8(s32);
-extern void func_L00_002B9B88(s32, s32);
-extern void func_L00_002B2C58(void *, s32, float, float);
-extern void func_L00_002D3C68(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float fade_get_value(void);
+extern float fade_reduce_value(float);
+extern s32 FloatToInt(float);
+extern void hero_clear_tracked_slots(void);
+extern void FastVecSub(void *, void *, void *);
+extern void hero_build_relative_point(void *, s32, float, float, float);
+extern void hero_l16_enter_state(unsigned long, unsigned long);
+extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
+extern void AdjustPlayerHealth(s32);
+extern void hero_play_sound(s32, s32);
+extern void hero_flatten_push_vector(void *, s32, float, float);
+extern void cam_scale_view_space_height(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Handles the player touching a damaging or pushing object: picks the hurt reaction and shoves the player away. */
-s32 func_L16_002B3250(s32 applyReaction) {
+s32 hero_handle_contact_reaction(s32 applyReaction) {
     TI16 impulse;
     PlayerContactEntry *entry;
     u8 *moby;
     u8 *contactMoby;
     s32 fixedDirection;
 
-    if (gHeroState.f229C == 20 || gHeroState.f229C == 7) {
+    if (g_hero_state.f229C == 20 || g_hero_state.f229C == 7) {
         return 0;
     }
-    if (gHeroState.f2294 == 0x31) {
+    if (g_hero_state.f2294 == 0x31) {
         return 0;
     }
-    if (gHeroState.f1DC != 0) {
+    if (g_hero_state.f1DC != 0) {
         return 0;
     }
     if (D_L16_001A8F00 != 0) {
         return 0;
     }
-    gHeroState.f249C = 0;
-    moby = gHeroState.f2290;
+    g_hero_state.f249C = 0;
+    moby = g_hero_state.f2290;
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
@@ -108,75 +108,75 @@ s32 func_L16_002B3250(s32 applyReaction) {
     }
     if (entry->f2C != 0.0f) {
         D_001A7A33 = 0;
-        gBoltMultiplier = 1;
+        g_bolt_multiplier = 1;
     }
-    if (GetFadeValue() != 0.0f && gHeroState.f22B4 == 0) {
-        entry->f2C = ReduceFadeValue(entry->f2C);
+    if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
+        entry->f2C = fade_reduce_value(entry->f2C);
         if (entry->f2C == 0.0f) {
             return 0;
         }
     }
-    gHeroState.f249C = entry->f20;
-    if (gHeroState.f229C == 15) {
-        gHeroState.f6C4 = entry;
-        gHeroState.f68E = 1;
+    g_hero_state.f249C = entry->f20;
+    if (g_hero_state.f229C == 15) {
+        g_hero_state.f6C4 = entry;
+        g_hero_state.f68E = 1;
         return 0;
     }
     if (applyReaction == 0) {
         return 1;
     }
     fixedDirection = 0;
-    ClearTrackedSlots();
+    hero_clear_tracked_slots();
     if (entry->f30 & 1) {
         qcopy(&impulse, &entry->f10);
         if (entry->f1C == 5627.9248046875f) {
             fixedDirection = 1;
         }
     } else if (entry->f20 != 0) {
-        FastVecSub(&impulse, &gHeroState.f80, entry->f20 + 0x10);
+        FastVecSub(&impulse, &g_hero_state.f80, entry->f20 + 0x10);
     } else {
-        BuildHeroRelativePoint(&impulse, 0, -1.0f, 0.0f, 0.0f);
+        hero_build_relative_point(&impulse, 0, -1.0f, 0.0f, 0.0f);
     }
-    switch (gHeroState.f22B4) {
+    switch (g_hero_state.f22B4) {
     case 0:
-        contactMoby = gHeroState.f249C;
+        contactMoby = g_hero_state.f249C;
         if (contactMoby != 0 && (*(s16 *)(contactMoby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(contactMoby + 0xAA) == 0x558 /* moby class 1368 */)) {
-            EnterPlayerState(0x7D, 1);
+            hero_l16_enter_state(0x7D, 1);
             return 1;
         }
-        if ((gHeroState.f2294 == 1 || gHeroState.f2294 == 0x1D || gHeroState.f1500 != 0)
+        if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
             && !(entry->f24 & 8)) {
-            u8 *hitInfo = FindOwnedEffectSlot(gHeroState.f2290, 1, 0);
+            u8 *hitInfo = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
             if (hitInfo != 0) {
                 AdjustPlayerHealth(FloatToInt(*(float *)(hitInfo + 0x2C)));
             }
-            if (gHeroState.f24CC == 0) {
-                EnterPlayerState(0x16, 1);
+            if (g_hero_state.f24CC == 0) {
+                hero_l16_enter_state(0x16, 1);
             }
-            gHeroState.f1DC = 0x4D;
-            if (gHeroState.f21C == 0) {
-                gHeroState.f21C = 0x12;
+            g_hero_state.f1DC = 0x4D;
+            if (g_hero_state.f21C == 0) {
+                g_hero_state.f21C = 0x12;
             }
-            PlayHeroSound(0x14, 0);
+            hero_play_sound(0x14, 0);
             return 0;
         }
         if (entry->f24 & 8) {
-            EnterPlayerState(0x8C, 1);
+            hero_l16_enter_state(0x8C, 1);
         } else {
-            EnterPlayerState(0x16, 1);
+            hero_l16_enter_state(0x16, 1);
         }
-        if (gHeroState.f2294 == 0x8C) {
+        if (g_hero_state.f2294 == 0x8C) {
             qzero(&impulse);
         } else {
-            FlattenPushVectorAndSetStrength(&impulse, fixedDirection, gHeroState.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
+            hero_flatten_push_vector(&impulse, fixedDirection, g_hero_state.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
             if (fixedDirection != 0 && entry->f28 == 4) {
-                ScaleViewSpaceHeight(&impulse, &impulse, 2.0f);
+                cam_scale_view_space_height(&impulse, &impulse, 2.0f);
             }
         }
         break;
     }
-    FastVecAdd(&gHeroState.fF0, &gHeroState.fF0, &impulse);
-    FastVecAdd(&gHeroState.f110, &gHeroState.f110, &impulse);
+    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &impulse);
+    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &impulse);
     return 1;
 }

@@ -1,13 +1,13 @@
 #include "common.h"
-extern int func_001256D8(void *);
-extern void func_00131A98(u8 *);
-extern u8 *func_0029EFD0(int);
-extern void func_002833F0(void *, void *);
-extern int func_00283CF0(float);
-extern float func_00283D00(float, float);
-extern int func_L00_0035F5A0(int, int, void *);
-extern int func_00282948(void *);
-extern int func_002E59B0(void *, int);
+extern int sceCdReadClock(void *);
+extern void clock_to_local_time(u8 *);
+extern u8 *CreateMoby(int);
+extern void euler_rotation_basis(void *, void *);
+extern int FloatToInt(float);
+extern float fast_fmod(float, float);
+extern int snd_start_in_slot(int, int, void *);
+extern int math_fast_float_d(void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
 typedef struct {
     u8 pad00[0x24];
     u8 *classData;
@@ -26,7 +26,7 @@ extern u8 *D_L13_001B291C_gp SDATA(D_L13_001B291C);
 /* Initialize the clock from the console RTC, then advance its hands and hourly sound.
  * The GP view and ordinary view refer to the same moby-array pointer.
  */
-void func_L13_004067F8(u8 *moby) {
+void UpdateBoldanClock(u8 *moby) {
     u8 *vars=P(moby,0x68), *a;
     u8 time[16];
     int slo, mlo, hlo, sec, min, hour, hour12;
@@ -35,7 +35,7 @@ void func_L13_004067F8(u8 *moby) {
         int initialHour;
         H(moby,0x96)=0; moby[0x20]=1; moby[0x30]=255; H(moby,0x32)=800;
         I(vars,0xC)=0; I(vars,0x20)=0;
-        ReadCdClock(time); ClockToLocalTime(time);
+        sceCdReadClock(time); clock_to_local_time(time);
         P(vars,0x10)=CreateMoby(0xE9F);
         if (P(vars,0x10)) {
             P(vars,0x10)[0x30]=255; H(P(vars,0x10),0x32)=800;
@@ -94,7 +94,7 @@ void func_L13_004067F8(u8 *moby) {
             if(I(vars,0x24)!=-1) { u8 *a=P(D_L13_001B291C_gp+(I(vars,0x24)<<8),0x68); if(I(a,0x38)) I(a,0x38)=0; }
         }
         if(I(vars,4)==0 && I(vars,8)==0) {
-            I(vars,0x18)=StartEffectInSlot(0x10,0x21,moby); I(vars,0xC)=10; I(vars,0x20)=FloatToInt(hourValue);
+            I(vars,0x18)=snd_start_in_slot(0x10,0x21,moby); I(vars,0xC)=10; I(vars,0x20)=FloatToInt(hourValue);
         }
         H(moby,0x96)=0;
     }
@@ -105,7 +105,7 @@ void func_L13_004067F8(u8 *moby) {
     hourAngle += (float)I(vars,8)*0.5f;
     F(P(vars,0x14),0xF0)=hourAngle*0.01745329424738884f;
     if(H(moby,0x96)<65535) ++H(moby,0x96);
-    if(FastFloatHelperD(vars+0xC) && I(vars,0x20) && !IsVoicePlayingForOwner(moby,I(vars,0x18))) {
-        I(vars,0x18)=-1; StartEffectInSlot(0x11,0x21,moby); I(vars,0xC)=120; --I(vars,0x20);
+    if(math_fast_float_d(vars+0xC) && I(vars,0x20) && !snd_is_voice_playing_for_owner(moby,I(vars,0x18))) {
+        I(vars,0x18)=-1; snd_start_in_slot(0x11,0x21,moby); I(vars,0xC)=120; --I(vars,0x20);
     }
 }

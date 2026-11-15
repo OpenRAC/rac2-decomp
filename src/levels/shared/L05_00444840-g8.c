@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern void func_L05_00444D60(void *, int *, int *, int);
-extern int func_002AB1F0(u8 *);
-extern int func_00282C30(int);
-extern float func_00283CE0(int);
-extern float func_00282E48(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void gfx_convert_float_pair_bias_coords(void *, int *, int *, int);
+extern int moby_get_private_value_0(u8 *);
+extern int subtract_integer_with_clamp(int);
+extern float IntToFloat(int);
+extern float fast_vec_dist(void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 extern u8 *D_L05_001FB5E0[];
 typedef struct { int object_class, screen_range; float world_range; } TargetRule;
 extern TargetRule D_L05_002B87F0[];
 extern float D_L05_001B1B1C_gp SDATA(D_L05_001B1B1C);
 extern float D_L05_001B1B18_gp SDATA(D_L05_001B1B18);
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern float D_L05_001B96C0[];
 extern int D_L05_001B2048[] __attribute__((sda));
 
@@ -26,7 +26,7 @@ static __inline__ int target_class(u8 *object)
  * rows terminated by class -1; neither rule nor object-list extent is invented.
  * The parameter accessor returns a 32-bit target address, matching its C def. */
 /* Finds the next enemy the ship can lock onto, one close enough and in clear view. Returns it, or zero if there is none. */
-u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
+u8 *ship_find_lock_target(void *position, u8 **excluded, u8 *current)
 {
     int source_x, source_y, target_x, target_y;
     int i, kind, range;
@@ -35,12 +35,12 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
     int levelId;
     int n, j;
 
-    ConvertFloatPairToBiasCoords(position, &source_x, &source_y, 0);
+    gfx_convert_float_pair_bias_coords(position, &source_x, &source_y, 0);
     cursor = D_L05_001FB5E0;
     while ((object = *cursor) != 0) {
         if (!object[0x31])
             goto next;
-        parameters = (u8 *)GetMobyPrivateValue0(object);
+        parameters = (u8 *)moby_get_private_value_0(object);
         if (!parameters || *(float *)parameters <= 0.0f)
             goto next;
         kind = target_class(object);
@@ -51,7 +51,7 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
             if (excluded[n])
                 goto next;
         }
-        ConvertFloatPairToBiasCoords(object + 0x10, &target_x, &target_y, 0);
+        gfx_convert_float_pair_bias_coords(object + 0x10, &target_x, &target_y, 0);
         dx = IntToFloat(subtract_integer_with_clamp(target_x - source_x));
         dy = IntToFloat(subtract_integer_with_clamp(target_y - source_y));
         do {
@@ -73,7 +73,7 @@ scan1_done:
         distance = D_L05_001B1B18_gp;
         do {
             j = 0;
-            levelId = gCurrentMapIndex[0];
+            levelId = g_current_map_index[0];
 scan2:
             if (D_L05_002B87F0[j].object_class == -1)
                 goto scan2_done;

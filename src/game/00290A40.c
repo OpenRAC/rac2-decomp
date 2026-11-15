@@ -2,7 +2,7 @@
 #include "names.h"
 #include "include_asm.h"
 
-extern void *func_00115484(void *, int, int);
+extern void *memset(void *, int, int);
 extern char D_001BAEC0[];
 extern char D_02000000[];
 extern int D_001B22B0[] __attribute__((sda));
@@ -15,38 +15,38 @@ typedef struct {
 
 extern unsigned char ref_L00_00291640_01[];
 extern unsigned short *func_002F4FA0(unsigned short *, unsigned short *, int, ParserScratch *);
-extern unsigned short *func_002E31E8(unsigned short *, unsigned short *, int, ParserScratch *);
+extern unsigned short *vec_transform_vectors_vu0(unsigned short *, unsigned short *, int, ParserScratch *);
 extern unsigned short *func_002F0B78(unsigned short *, unsigned short *, int, ParserScratch *);
 
 
-extern int func_002886C8(int a, char *b);
+extern int help_is_id_value_in_mapping_range(int a, char *b);
 
-extern void func_002883E8(int a);
+extern void help_store_id_in_slot_list(int a);
 
 /* Qwen draft (branch qwen/autonomy, d969a356), checked by tools/check.py */
-void func_00278EB0(void);
+void cam_init_scene_state(void);
 
 /* loops 56 times calling a two-argument helper and, unless the current index is zero, a second one-argument helper with that index. */
-void func_00290A40(char *query)
+void gfx_run_filter_over_all_slots(char *query)
 {
     int i;
 
     for (i = 0; i < 56; i++) {
-        if (IsHelpIdValueInMappingRange(i, query) == 0)
+        if (help_is_id_value_in_mapping_range(i, query) == 0)
             continue;
         if (i != 0)
-            StoreHelpIdInSlotList(i);
+            help_store_id_in_slot_list(i);
     }
 }
 
 
 typedef struct { int source, length, destination, flags; } Request_290AB0;
-extern int func_0011AFE0(Request_290AB0 *, int);
-extern int func_0011AFC0(int);
-extern int func_0011ED08(int, int, int);
+extern int sceSifSetDma(Request_290AB0 *, int);
+extern int sceSifDmaStat(int);
+extern int iop_load_module_buffer_no_result(int, int, int);
 
 /* Sends a block of memory to the IOP with a DMA request and waits until it is done. Returns 1 on success, 0 on failure. */
-int func_00290AB0(int source, int destination, int length)
+int iop_send_block(int source, int destination, int length)
 {
     Request_290AB0 request;
     int handle;
@@ -58,14 +58,14 @@ int func_00290AB0(int source, int destination, int length)
     handle = sceSifSetDma(&request, 1);
     if (handle) {
         while (sceSifDmaStat(handle) >= 0) {}
-        if (LoadModuleBufferNoResult(length, 0, 0) < 0)
+        if (iop_load_module_buffer_no_result(length, 0, 0) < 0)
             result = 0;
     }
     return result;
 }
 
 /* Works out where each big memory area starts and stores the addresses in one table. */
-void func_00290B48(void)
+void InitMemSlots(void)
 {
     int *state = (int *)D_001BAEC0;
     unsigned int start, size;
@@ -96,53 +96,53 @@ void func_00290B48(void)
 }
 
 extern void func_00124418(void);
-extern void func_00126F60(int);
-extern void func_00284000(void);
+extern void sceDmaReset(int);
+extern void gfx_update_display_mode_from_screen_type(void);
 extern void func_0029D050(void);
-extern void func_0027B440(int);
-extern void func_0011AE70(int);
+extern void SetPalMode(int);
+extern void EnableCache(int);
 extern void func_00126DC0(int (*)(void));
-extern int func_001339B0(void);
-extern void func_002FC138(void);
-extern void func_002FC1D8(void);
-extern void func_002FCD18(void);
-extern void func_0027B858(void);
-extern int func_00124E08(int);
-extern int func_001250E8(int);
-extern int func_0011EED8(char *);
-extern int func_0011EEA0(void);
-extern void func_0026FEB8(char *);
-extern void func_0011CF78(int);
-extern void func_0011F5E0(void);
+extern int timer_update_vsync_counters(void);
+extern void gfx_select_packet_buffer_setup(void);
+extern void gfx_reset_packet_buffer(void);
+extern void gfx_install_dma_handlers(void);
+extern void gfx_write_clear_color_packets(void);
+extern int sceCdInit(int);
+extern int sce_cd_disk_ready(int);
+extern int sceSifRebootIop(char *);
+extern int iop_is_reset_done(void);
+extern void STUB_printf(char *);
+extern void sceSifInitRpc(int);
+extern void DIntr(void);
 extern void func_0011E7A0(void);
 extern void func_0011F628(void);
-extern void func_0011EAC8(void);
-extern void func_001252E0(int);
-extern void func_0011E0A0(void);
-extern void func_00133A28(int, int, void *);
-extern void func_0011AEA0(int);
-extern void func_00298BB8(void *);
-extern void func_002FC070(void *);
+extern void iop_loadfile_reset_state(void);
+extern void sceCdMmode(int);
+extern void iop_file_reset_state(void);
+extern void load_start_request(int, int, void *);
+extern void FlushCache(int);
+extern void save_build_file_names(void *);
+extern void gfx_start_dma_channel0_and_wait(void *);
 /* Takes an address in retail's call, though its body (src/core/001339F0.c) never reads it. */
-extern void func_00133A78(void *);
-extern void func_0029D4D0(void *, void *);
-extern int func_0011E828(int, int, int);
-extern void func_0011E8A8(int);
-extern void func_002EEBC8(void);
-extern void func_002B8548(void);
-extern void func_0029AE48(void);
-extern void func_0027A9F0(void);
-extern void func_0027AB40(void);
-extern void func_002E48E8(void);
-extern void func_002B68C8(void);
-extern void func_002940C0(void);
+extern void load_default_copy_setup(void *);
+extern void fast_decompress(void *, void *);
+extern int iop_remote_cmd_send3(int, int, int);
+extern void iop_remote_cmd_send1(int);
+extern void iop_init_remote_buffer_server(void);
+extern void pad_init_ports(void);
+extern void mc_show_message_on_problem(void);
+extern void gfx_init_view_context(void);
+extern void UpdateViewContext(void);
+extern void ResetSoundState(void);
+extern void InitFileLoadSystem(void);
+extern void load_clear_class_cache_table(void);
 extern int func_00131628(void);
-extern void func_00282A60(void *, int, int);
+extern void mem_clear(void *, int, int);
 extern void func_00126288(void *, int, int, int, int, int, int, int);
-extern void func_001265B0(void *, void *);
-extern void func_001244B8(int, int);
-extern void func_0026FE48(void);
-extern void func_002889B8(void *);
+extern void sceGsExecLoadImage(void *, void *);
+extern void gfx_wait_paths_idle(int, int);
+extern void tex_load_pif_from_disc_table(void);
+extern void req_reset_queue(void *);
 
 extern char D_001A9048[];   /* path of the IOP reboot image */
 extern char D_001A9060[];   /* "Rebooted IOP" */
@@ -150,13 +150,13 @@ extern char D_001A9070[];   /* "loaded irx modules" */
 extern char D_0010E9E0[];
 extern char D_001BB000[];
 extern char D_001BAD40[];
-extern int D_001A7BB8[] __attribute__((sda));
+extern int g_widescreen_flag[] __attribute__((sda));
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern int D_001A7B90 __attribute__((sda));
+extern int g_is_pal_video __attribute__((sda));
 extern int D_001A7290[] __attribute__((sda));
 extern int D_001A72F8 __attribute__((sda));
 extern int D_001A72FC __attribute__((sda));
-extern int D_00152C00[];
+extern int g_hero_moby_default[];
 
 typedef struct {
     char pad000[0x32C];
@@ -165,12 +165,12 @@ typedef struct {
     int offset;
     int count;
 } Toc_00290C60;
-extern Toc_00290C60 D_0014B540;
+extern Toc_00290C60 g_copy_setup_data;
 
 /* The boot's one-time setup, RAC1's InitOnce: reboots the IOP, sets up video and the VU, loads
    the compressed module table from the disc and starts the IOP modules in it, sets up the
    memory areas and sound, and clears a small image. */
-void func_00290C60(void)
+void InitOnce(void)
 {
     char buffer[2048];
     char *image;
@@ -180,64 +180,64 @@ void func_00290C60(void)
     int mode;
 
     func_00124418();
-    ResetDma(1);
-    gWidescreenFlag[0] = 0;
+    sceDmaReset(1);
+    g_widescreen_flag[0] = 0;
     D_001A7BB0[1] = 0;
-    UpdateDisplayModeFromScreenType();
+    gfx_update_display_mode_from_screen_type();
     func_0029D050();
     SetPalMode(1);
     EnableCache(3);
-    func_00126DC0(UpdateVsyncTimerCounters);
-    SelectPacketBufferSetup();
+    func_00126DC0(timer_update_vsync_counters);
+    gfx_select_packet_buffer_setup();
     InitMemSlots();
-    SelectPacketBufferSetup();
-    ResetPacketBuffer();
-    InstallDmaHandlers();
-    WriteClearColorPackets();
-    InitCdSystem(0);
+    gfx_select_packet_buffer_setup();
+    gfx_reset_packet_buffer();
+    gfx_install_dma_handlers();
+    gfx_write_clear_color_packets();
+    sceCdInit(0);
     sce_cd_disk_ready(0);
-    while (!RebootIop(D_001A9048)) {
+    while (!sceSifRebootIop(D_001A9048)) {
     }
-    while (!IsIopResetDone()) {
+    while (!iop_is_reset_done()) {
     }
     STUB_printf(D_001A9060);
-    InitSifRpc(0);
+    sceSifInitRpc(0);
     DIntr();
     func_0011E7A0();
     func_0011F628();
-    ResetLoadFileState();
-    InitCdSystem(0);
+    iop_loadfile_reset_state();
+    sceCdInit(0);
     sce_cd_disk_ready(0);
-    SetCdMediaMode(2);
-    ResetFileIoState();
-    StartLoadRequest(1000, 1, buffer);
+    sceCdMmode(2);
+    iop_file_reset_state();
+    load_start_request(1000, 1, buffer);
     FlushCache(0);
-    gIsPalVideo = 0;
-    BuildSaveFileNames(buffer);
-    StartDmaChannel0AndWait(D_0010E9E0);
-    LoadDefaultCopySetup(D_02000000 - 0xFE8C);
+    g_is_pal_video = 0;
+    save_build_file_names(buffer);
+    gfx_start_dma_channel0_and_wait(D_0010E9E0);
+    load_default_copy_setup(D_02000000 - 0xFE8C);
     image = (char *)((((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF) + 0x2C0000);
-    scratch = D_02000000 - 0x8000 - (gCopySetupData.count << 11);
-    StartLoadRequest(gCopySetupData.offset + gCopySetupData.base, gCopySetupData.count, scratch);
+    scratch = D_02000000 - 0x8000 - (g_copy_setup_data.count << 11);
+    load_start_request(g_copy_setup_data.offset + g_copy_setup_data.base, g_copy_setup_data.count, scratch);
     FlushCache(0);
     fast_decompress(scratch, image);
     FlushCache(0);
-    handle = SendRemoteCommand3(1, 0x55730, 0);
-    SendBlockToIop(*(int *)(image + 0x50) + (int)image, *(int *)(image + 0x54), handle);
-    SendBlockToIop(*(int *)(image + 0x48) + (int)image, *(int *)(image + 0x4C), handle);
-    SendBlockToIop(*(int *)(image + 0x18) + (int)image, *(int *)(image + 0x1C), handle);
-    SendBlockToIop(*(int *)(image + 0x20) + (int)image, *(int *)(image + 0x24), handle);
-    SendBlockToIop(*(int *)(image + 0x28) + (int)image, *(int *)(image + 0x2C), handle);
-    SendBlockToIop(*(int *)(image + 0x30) + (int)image, *(int *)(image + 0x34), handle);
-    SendBlockToIop(*(int *)(image + 0x38) + (int)image, *(int *)(image + 0x3C), handle);
-    SendBlockToIop(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
-    SendBlockToIop(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
-    SendBlockToIop(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
-    SendRemoteCommand1(handle);
+    handle = iop_remote_cmd_send3(1, 0x55730, 0);
+    iop_send_block(*(int *)(image + 0x50) + (int)image, *(int *)(image + 0x54), handle);
+    iop_send_block(*(int *)(image + 0x48) + (int)image, *(int *)(image + 0x4C), handle);
+    iop_send_block(*(int *)(image + 0x18) + (int)image, *(int *)(image + 0x1C), handle);
+    iop_send_block(*(int *)(image + 0x20) + (int)image, *(int *)(image + 0x24), handle);
+    iop_send_block(*(int *)(image + 0x28) + (int)image, *(int *)(image + 0x2C), handle);
+    iop_send_block(*(int *)(image + 0x30) + (int)image, *(int *)(image + 0x34), handle);
+    iop_send_block(*(int *)(image + 0x38) + (int)image, *(int *)(image + 0x3C), handle);
+    iop_send_block(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
+    iop_send_block(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
+    iop_send_block(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
+    iop_remote_cmd_send1(handle);
     STUB_printf(D_001A9070);
-    InitRemoteBufferServer();
+    iop_init_remote_buffer_server();
     sce_cd_disk_ready(0);
-    InitPadPorts();
+    pad_init_ports();
     state = (int *)D_001BAEC0;
     D_001A7290[0] = -1;
     D_001A7290[12] = -1;
@@ -249,17 +249,17 @@ void func_00290C60(void)
     D_001A7290[31] = 0x1D0000;
     D_001A7290[32] = 0x1E0000;
     D_001A7290[1] = state[0x78 / 4];
-    gHeroMoby_00152C00[12] = -1;
-    gHeroMoby_00152C00[6] = -1;
+    g_hero_moby_default[12] = -1;
+    g_hero_moby_default[6] = -1;
     sce_cd_disk_ready(0);
-    ShowMemoryCardMessageOnProblem();
-    InitViewContext();
+    mc_show_message_on_problem();
+    gfx_init_view_context();
     UpdateViewContext();
-    ResetPacketBuffer();
+    gfx_reset_packet_buffer();
     sce_cd_disk_ready(0);
     ResetSoundState();
     InitFileLoadSystem();
-    ClearClassCacheTable();
+    load_clear_class_cache_table();
     mode = func_00131628();
     switch (mode) {
     case 1:
@@ -270,29 +270,29 @@ void func_00290C60(void)
         D_001A7BB0[1] = 0;
         break;
     }
-    ClearMemory(D_001BB000, 0x80808080, 0x100);
+    mem_clear(D_001BB000, 0x80808080, 0x100);
     func_00126288(buffer, 0x3FFB, 1, 0, 0, 0, 8, 8);
     FlushCache(0);
-    ExecGsLoadImage(buffer, D_001BB000);
-    WaitGsPathsIdle(0, 0);
-    LoadPifTextureFromDiscTable();
+    sceGsExecLoadImage(buffer, D_001BB000);
+    gfx_wait_paths_idle(0, 0);
+    tex_load_pif_from_disc_table();
     T1_MODE = 0x82;
     T1_COUNT = 0;
-    ResetRequestQueue(D_001BAD40);
+    req_reset_queue(D_001BAD40);
 }
 
 /* Calls func_00278EB0, which fills the lighting data block. */
-void func_00291108(void)
+void gfx_lighting_init_wrapper(void)
 {
-  InitSceneCameraState();
+  cam_init_scene_state();
   return;
 }
 
-extern void func_00278F80(void);
+extern void gfx_restore_draw_position(void);
 
 /* Calls func_00278F80. */
-void func_00291128(void) {
-    RestoreGraphicsDrawPosition();
+void gfx_lighting_wrapper(void) {
+    gfx_restore_draw_position();
 }
 
 
@@ -302,7 +302,7 @@ void func_00291128(void) {
 
 
 /* Does nothing. */
-void func_002912F0(void)
+void gfx_empty_stub(void)
 {
 }
 
@@ -326,14 +326,14 @@ typedef struct {
     char pad14[0x30 - 0x14];
 } LightSlot;
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 extern char D_001C2DC0[];
 extern char D_001C2B40[];
 extern char D_001C2C40[];
-extern void func_00282A88(void *, int);
+extern void mem_fast_helper_b(void *, int);
 
 /* Adds a point light with the given position, range, radius and color. Returns its slot number, or -1 if all 8 slots are used. */
-int func_00291308(float *position, float range, float radius, int color)
+int gfx_add_point_light(float *position, float range, float radius, int color)
 {
     LightDef *def;
     LightSlot *slot;
@@ -355,31 +355,31 @@ int func_00291308(float *position, float range, float radius, int color)
     def->color[1] = IntToFloat((color >> 8) & 0xFF) * 0.0078125f;
     def->color[2] = IntToFloat((color >> 16) & 0xFF) * 0.0078125f;
     def->radius = radius;
-    FastMemoryHelperB(slot, 0x30);
+    mem_fast_helper_b(slot, 0x30);
     slot->active = 1;
     slot->buffer = D_001C2DC0 + (i << 10);
     return i;
 }
 
 
-extern void func_00291788(int index);
-extern void func_00282A88(void *, int);
+extern void gfx_flush_light_part_indices(int index);
+extern void mem_fast_helper_b(void *, int);
 extern char D_001C2B40[];
 extern char D_001C2C40[];
 
 /* Frees a point light slot and clears its data. */
-void func_00291450(int index) {
+void gfx_free_point_light(int index) {
     if ((unsigned int)index >= 8)
         return;
-    FlushLightPartIndices(index);
-    FastMemoryHelperB((void *)(D_001C2B40 + (index << 5)), 0x20);
-    FastMemoryHelperB((void *)(D_001C2C40 + index * 0x30), 0x30);
+    gfx_flush_light_part_indices(index);
+    mem_fast_helper_b((void *)(D_001C2B40 + (index << 5)), 0x20);
+    mem_fast_helper_b((void *)(D_001C2C40 + index * 0x30), 0x30);
 }
 
 /* func_002914B8 is in 00290A40-g16.c. */
 
 /* Splits the light's data into its three sections and records where each one starts and how long it is. */
-void func_00291640(int index)
+void CreatePointLight(int index)
 {
     unsigned char *record = ref_L00_00291640_01 + index * 0x30;
     unsigned short *position = *(unsigned short **)(record + 0xC);
@@ -395,7 +395,7 @@ void func_00291640(int index)
         *(short *)(record + 2) = (position - *(unsigned short **)(record + 0xC));
         if (position < end) {
             *(short *)(record + 4) = (position - *(unsigned short **)(record + 0xC));
-            position = TransformVectorsVu0(position, end, index, scratch);
+            position = vec_transform_vectors_vu0(position, end, index, scratch);
             *(short *)(record + 6) = (position - *(unsigned short **)(record + 0xC)) - *(unsigned short *)(record + 4);
             if (position < end) {
                 *(short *)(record + 8) = (position - *(unsigned short **)(record + 0xC));

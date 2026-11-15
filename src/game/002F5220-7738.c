@@ -11,13 +11,13 @@ extern Table13_7738 ref_L00_002F7738_06;
 typedef struct { int a, b, mask, expected, extra; char *text; int id; } Entry_7738;
 typedef struct { char pad[0x140]; Entry_7738 entries[54]; char tail[24]; int count; } State_7738;
 extern State_7738 ref_L00_002F7738_08;
-extern unsigned int D_001A7AF0 MACRO_ADDR;
-extern int func_002B0E90(void);
-extern char *func_00288FB8(int);
+extern unsigned int g_equipment_bits MACRO_ADDR;
+extern int save_count_nonzero_flags(void);
+extern char *GetLocalizedString(int);
 /* The initial values of i, j and k are dead; they set gcse's hash table size, which
  * orders the spilled frame addresses in their retail stack slots. */
 /* Builds the list of vendor entries to show for this menu mode: entries that are still available by the saved game flags and the player's progress. */
-void func_002F7738(void)
+void shop_build_vendor_list_by_flags(void)
 {
     Table36_7738 ids = ref_L00_002F7738_00;
     Table36_7738 extra = ref_L00_002F7738_01;
@@ -29,24 +29,24 @@ void func_002F7738(void)
     Table36_7738 b = ref_L00_002F7738_07;
     int selected[20];
     int count = 0, i = 0, k = 0;
-    int progress = CountNonZeroFlags();
-    if (((gEquipmentBits & masks.value[0]) >> 4) == 0) selected[count++] = 0;
-    if (((gEquipmentBits & masks.value[2]) >> 6) == 0) selected[count++] = 2;
-    switch ((gEquipmentBits & masks.value[3]) >> 7) {
+    int progress = save_count_nonzero_flags();
+    if (((g_equipment_bits & masks.value[0]) >> 4) == 0) selected[count++] = 0;
+    if (((g_equipment_bits & masks.value[2]) >> 6) == 0) selected[count++] = 2;
+    switch ((g_equipment_bits & masks.value[3]) >> 7) {
     case 0: selected[count++] = 3; break;
     case 1: selected[count++] = 4; break;
     }
-    if (((gEquipmentBits & masks.value[5]) >> 9) == 0) selected[count++] = 6;
-    switch ((gEquipmentBits & masks.value[7]) >> 10) {
+    if (((g_equipment_bits & masks.value[5]) >> 9) == 0) selected[count++] = 6;
+    switch ((g_equipment_bits & masks.value[7]) >> 10) {
     case 0: selected[count++] = 7; break;
     case 1: selected[count++] = 8; break;
     }
-    switch ((gEquipmentBits & masks.value[9]) >> 14) {
+    switch ((g_equipment_bits & masks.value[9]) >> 14) {
     case 0: selected[count++] = 9; break;
     case 1: selected[count++] = 10; break;
     }
-    if (((gEquipmentBits & masks.value[11]) >> 12) == 0) selected[count++] = 11;
-    if (((gEquipmentBits & masks.value[12]) >> 13) == 0) selected[count++] = 12;
+    if (((g_equipment_bits & masks.value[11]) >> 12) == 0) selected[count++] = 11;
+    if (((g_equipment_bits & masks.value[12]) >> 13) == 0) selected[count++] = 12;
     ref_L00_002F7738_08.count = 0;
     for (i = 0; i < count; i++) {
         k = selected[i];
@@ -62,7 +62,7 @@ void func_002F7738(void)
     {
         int j = 0;
         for (j = 13; j < 36; j++) {
-            if ((masks.value[j] & gEquipmentBits) != expected.value[j] && progress >= limits.value[j]) {
+            if ((masks.value[j] & g_equipment_bits) != expected.value[j] && progress >= limits.value[j]) {
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].b = b.value[j];
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].a = a.value[j];
                 ref_L00_002F7738_08.entries[ref_L00_002F7738_08.count].text = GetLocalizedString(ids.value[j]);

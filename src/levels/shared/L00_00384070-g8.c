@@ -4,11 +4,11 @@ typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword bits; float f[4]; } Vector4;
 #define FIELD(type, p, off) (*(type *)((char *)(p) + (off)))
 
-extern int func_002A77E0(int);
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(void *, void *);
-extern void func_002A7398(signed char *, int, int);
-extern void func_002AEC18(void *, int);
+extern int math_random_int_below(int);
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(void *, void *);
+extern void anim_start_immediate(signed char *, int, int);
+extern void moby_set_light_color(void *, int);
 
 extern Vector4 D_L00_001AED70[2] __attribute__((sda));
 extern Vector4 D_L00_001AED90 __attribute__((sda));
@@ -18,7 +18,7 @@ extern Vector4 D_L00_001AED50 __attribute__((sda));
 extern char *D_L00_00232A60[24];
 
 /* Create the two attached objects and the twenty-four optional table entries. */
-int func_L00_00384070(char *owner)
+int sheep_board_create_objects(char *owner)
 {
     char *work = FIELD(char *, owner, 0x68);
     char **slot = (char **)(work + 0x48);
@@ -26,11 +26,11 @@ int func_L00_00384070(char *owner)
     int j;
     Vector4 *basis;
 
-    FIELD(int, work, 0x68) = RandomIntBelow(255);
+    FIELD(int, work, 0x68) = math_random_int_below(255);
     do {
         *slot = CreateMoby(0xCB2 /* Synthenoid */);
-        InitChildObjectFromParent(*slot, 0);
-        StartAnimationImmediate((signed char *)*slot, 1, 0);
+        moby_init_child_from_parent(*slot, 0);
+        anim_start_immediate((signed char *)*slot, 1, 0);
         FIELD(unsigned short, *slot, 0x34) |= 0x4002;
         FIELD(unsigned char, *slot, 0xBC) = i;
         qcopy(*slot + 0xF0, &D_L00_001AED90);
@@ -38,7 +38,7 @@ int func_L00_00384070(char *owner)
         qzero(work + 0x20 + i * 16);
         FIELD(float, *slot, 0x2C) =
             FIELD(float, FIELD(char *, *slot, 0x24), 0x24) * D_L00_001AEDA0[i];
-        SetMobyLightColor(*slot, D_L00_001AEDA8[i]);
+        moby_set_light_color(*slot, D_L00_001AEDA8[i]);
         ++i;
         ++slot;
     } while (i < 2);
@@ -49,10 +49,10 @@ int func_L00_00384070(char *owner)
     do {
         *slot = CreateMoby(0xE7D /* Sheep */);
         if (*slot) {
-            InitChildObjectFromParent(*slot, 0);
-            result = RandomIntBelow(FIELD(unsigned char,
+            moby_init_child_from_parent(*slot, 0);
+            result = math_random_int_below(FIELD(unsigned char,
                 FIELD(char *, FIELD(char *, *slot, 0x24), 0x50), 0x10));
-            StartAnimationImmediate((signed char *)*slot, 2, result);
+            anim_start_immediate((signed char *)*slot, 2, result);
             FIELD(unsigned short, *slot, 0x34) |= 0x4002;
             qcopy(*slot + 0xF0, basis);
         }

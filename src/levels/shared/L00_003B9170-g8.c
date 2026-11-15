@@ -7,12 +7,12 @@ extern int D_L00_001AFD7C __attribute__((sda));
 extern char *D_L00_0023DBA0[];
 extern int D_L00_0023DCA0[];
 extern char D_L00_001AFD80[];
-extern int D_001A79F0;
-extern void func_0026FEB8(const char *,...);
+extern int g_current_map_index;
+extern void STUB_printf(const char *,...);
 
 /* Collects up to 64 mobys of a fixed set of classes into a table, saving each one's value at +0x98.
    Reports an error if the table fills up. */
-void func_L00_003B9170(void)
+void moby_collect_special_into_table(void)
 {
     char *moby;
     D_L00_001AFD7C=0;
@@ -23,7 +23,7 @@ void func_L00_003B9170(void)
             D_L00_0023DCA0[D_L00_001AFD7C]=*(int *)(moby+0x98);
             D_L00_001AFD7C++;
             if (D_L00_001AFD7C>=64) {
-                STUB_printf(D_L00_001AFD80,64,gCurrentMapIndex);
+                STUB_printf(D_L00_001AFD80,64,g_current_map_index);
                 return;
             }
         }

@@ -16,9 +16,9 @@ typedef struct Hero_003A15D0 {
     void *field2290;
     int field2294;
 } Hero_003A15D0;
-extern Hero_003A15D0 D_00189E20;
+extern Hero_003A15D0 g_hero_state;
 typedef struct Input_003A15D0 { char pad000[0x1A4]; int buttons; } Input_003A15D0;
-extern Input_003A15D0 D_00138180;
+extern Input_003A15D0 g_pad_state;
 typedef struct Sub_15D0 {
     char pad0[0x8];
     signed char f8;
@@ -172,29 +172,29 @@ extern float D_L22_001B2AA4;
 extern char D_L22_001B1910[], D_L22_001B9C80[];
 extern char D_L22_001AF5D0[] MACRO_ADDR;
 extern char *D_L22_001B211C, *D_L22_001B2120;
-extern void func_L22_003A6230(void *);
-extern void func_L00_0042A500(void *);
+extern void anim_choose_next(void *);
+extern void cam_reset_entry(void *);
 extern void func_001163A0(unsigned int);
-extern void func_00282CF0(void *,void *,void *);
-extern float func_00282DF0(void *);
-extern int func_002A77E0(int);
-extern void func_L22_003A3368(void *),func_L22_003A36A0(char *);
-extern char *func_0029EFD0(int);
-extern void func_00283360(void *);
-extern void func_0029B758(void *,void *);
-extern int func_L22_003A4FF8(void);
-extern void func_L22_003A5018(void);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *),func_002A0F48(void *);
-extern void func_002AFFD8(void *,void *,int),func_L00_00325600(void *,void *,int),func_002B0ED8(void *,void *,int);
-extern void func_002A7750(void *,int,int),func_L00_002AF7D0(void),func_L00_00310C88(void *,void *),func_L22_002C9898(int,int);
+extern void FastVecSub(void *,void *,void *);
+extern float FastVecLength(void *);
+extern int math_random_int_below(int);
+extern void lane_build_connection_masks(void *),pickup_spawn_initial(char *);
+extern char *CreateMoby(int);
+extern void set_identity_rotation_rows(void *);
+extern void level_store_value_pair(void *,void *);
+extern int level_call_helper_return_true(void);
+extern void DrawSpaceCombatHud(void);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *),func_002A0F48(void *);
+extern void cam_compute_view_direction(void *,void *,int),vec_negate_and_forward(void *,void *,int),moby_apply_damage_to_object(void *,void *,int);
+extern void moby_set_state(void *,int,int),cancel_hero_item_animation(void),release_moby_animation_slot(void *,void *),hero_l22_set_action(int,int);
 
 /* Sets the record up on the first update (health scaled by difficulty, the object table
    scan, then the tuning block) and keeps the three child objects in step. The tuning
    block's order matters to the scheduler: f11C is the 34th memory reference after the
    call, so it flushes the pending list, and f1F8 and f1F9 precede the second health read. */
 /* Sets up the space combat ship on its first update. After that it keeps the attached parts, health and start-up controls up to date. */
-void func_L22_003A15D0(Obj_15D0 *obj) {
+void space_ship_init_and_update(Obj_15D0 *obj) {
     Vars_15D0 *p = obj->f68;
     Obj_15D0 *found = 0;
     Obj_15D0 *it;
@@ -202,7 +202,7 @@ void func_L22_003A15D0(Obj_15D0 *obj) {
     char *base;
     typedef int Quad __attribute__((mode(TI)));
     union { Quad q; float f[4]; } vec;
-    ChooseNextAnimation(obj);
+    anim_choose_next(obj);
     if (obj->f20 == 0) {
         float factor, health, damageScale, rangeScale;
         short x380;
@@ -216,9 +216,9 @@ void func_L22_003A15D0(Obj_15D0 *obj) {
 full_health:
         D_L22_001B2AA8 = p->f326;
 health_done:
-        ResetCameraEntry(p->f46C);
+        cam_reset_entry(p->f46C);
         D_L22_001AF304 = 1;
-        Srand(T1_COUNT);
+        func_001163A0(T1_COUNT);
         p->f4EC=1;
         D_L22_001B2A8C=0; D_L22_001B2AB4=D_L22_001B1910;
         D_L22_001B2A90=0;
@@ -249,12 +249,12 @@ health_done:
             base=D_L22_001B211C;
         } while(base+i*256<D_L22_001B2120);
         vec.q=0; vec.f[0]=0.00161f; vec.f[1]=0.29459f; vec.f[2]=1.57105f;
-        qcopy(&gHeroState.rotation,&vec); qcopy(&gHeroState.position,(char *)found+0x10);
-        gHeroState.health=p->f324;
-        FastVecSub(&vec,(char *)obj+0x10,(char *)&gHeroState.rotation+0x20);
+        qcopy(&g_hero_state.rotation,&vec); qcopy(&g_hero_state.position,(char *)found+0x10);
+        g_hero_state.health=p->f324;
+        FastVecSub(&vec,(char *)obj+0x10,(char *)&g_hero_state.rotation+0x20);
         D_L22_001B2AA4=FastVecLength(&vec);
         obj->f34|=0x100;
-        x380=RandomIntBelow(30);
+        x380=math_random_int_below(30);
         eight=8;
         p->fD7=1; p->f70=37; p->f71=4;
         p->f77=eight; p->f72=eight; p->f76=eight;
@@ -283,12 +283,12 @@ health_done:
         p->f35E=0; p->f350=0;
         obj->f34|=0x4000;
         obj->f2C=obj->f24->f24*D_L22_001AF39C;
-        BuildLaneConnectionMasks(obj); SpawnInitialPickups((char *)obj);
+        lane_build_connection_masks(obj); pickup_spawn_initial((char *)obj);
         p->f440=CreateMoby(0xE0A /* moby class 3594 */); set_identity_rotation_rows((char *)p->f440+0xC0);
         p->f444=CreateMoby(0xE0C /* moby class 3596 */); p->f448=CreateMoby(0xF8F /* moby class 3983 */);
         p->f384=30; p->f43A=0;
     }
-    StoreLevelObjectValuePair(CallLevelHelperReturnTrue,DrawSpaceCombatHud);
+    level_store_value_pair(level_call_helper_return_true,DrawSpaceCombatHud);
     if(p->f440) {
         p->f440->f32=obj->f32; p->f440->f30=obj->f30;
         p->f440->f38=obj->f38;
@@ -297,7 +297,7 @@ health_done:
         it=p->f440; it->f2C=it->f24->f24*D_L22_001AF39C;
         it=p->f440;
         if(it->f31 && fast_vec_dist((char *)it+0x10,D_L22_001B9C80)<24.0f) {
-            UpdateMobyGroundCheck(p->f440); p->f440->f6F=22;
+            moby_update_ground_check(p->f440); p->f440->f6F=22;
         }
     }
     if(p->f444) {
@@ -315,26 +315,26 @@ health_done:
         it=p->f448; it->f2C=it->f24->f24*D_L22_001AF330;
         func_002A0F48(p->f448);
     }
-    ComputeViewDirection((char *)obj+0x10,(char *)p+0x200,0); NegateAndForwardVector((char *)obj+0xC0,(char *)p+0x200,0); ApplyDamageToObject(obj,(char *)p+0x60,0);
+    cam_compute_view_direction((char *)obj+0x10,(char *)p+0x200,0); vec_negate_and_forward((char *)obj+0xC0,(char *)p+0x200,0); moby_apply_damage_to_object(obj,(char *)p+0x60,0);
     obj->f2C=obj->f24->f24*D_L22_001AF39C;
     if(D_L22_001AF304) {
         if(++D_L22_001AF304>32000) D_L22_001AF304=1;
-        gHeroState.mode=10;
+        g_hero_state.mode=10;
         if(obj->f95!=1) {
-            p->f350=0; p->f3E4=p->f3E8=0.0f; SetMobyState(obj,1,1);
+            p->f350=0; p->f3E4=p->f3E8=0.0f; moby_set_state(obj,1,1);
         }
-        if(gPadState.buttons&0x50) {
-            D_L22_001AF304=0; SetMobyState(obj,5,0); gPadState.buttons=0; gHeroState.mode=20;
+        if(g_pad_state.buttons&0x50) {
+            D_L22_001AF304=0; moby_set_state(obj,5,0); g_pad_state.buttons=0; g_hero_state.mode=20;
         } else if(D_L22_001AF304<30) {
-            gHeroState.field2294=0; cancel_hero_item_animation();
-            release_moby_animation_slot(gHeroState.field2290,&gHeroState.field1870);
-            gHeroState.field187C=0; SetHeroAction_L22(0,1);
+            g_hero_state.field2294=0; cancel_hero_item_animation();
+            release_moby_animation_slot(g_hero_state.field2290,&g_hero_state.field1870);
+            g_hero_state.field187C=0; hero_l22_set_action(0,1);
         }
-    } else if(gHeroState.health<=0 && obj->f95!=1) {
+    } else if(g_hero_state.health<=0 && obj->f95!=1) {
         p->f350=0; p->f3E4=p->f3E8=0.0f;
-        SetMobyState(obj,2,1); p->f384=30;
+        moby_set_state(obj,2,1); p->f384=30;
     }
     if(obj->f31 && fast_vec_dist((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
-        UpdateMobyGroundCheck(obj); obj->f6F=22;
+        moby_update_ground_check(obj); obj->f6F=22;
     }
 }

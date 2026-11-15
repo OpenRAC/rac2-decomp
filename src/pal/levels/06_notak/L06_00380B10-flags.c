@@ -29,10 +29,10 @@ typedef struct {
     f32 field1C;
 } L06RecordTail;
 
-extern void *func_002B9030(s32 kind);
-extern s32 func_00283CF0(f32 value);
-extern f32 func_00283CE0(s32 value);
-extern s32 func_002A77E0(s32 limit);
+extern void *part_alloc(s32 kind);
+extern s32 FloatToInt(f32 value);
+extern f32 IntToFloat(s32 value);
+extern s32 math_random_int_below(s32 limit);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u8 *D_L06_001FF50C;
@@ -40,7 +40,7 @@ extern u8 *D_L06_001FF50C;
 /* func_PAL_L06_00380B10, the PAL copy of func_L06_0037E6B0: the same C, where the
    spin halfword a2 is scaled for 50 Hz once before its two uses. */
 void func_PAL_L06_00380B10(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
-    L06Record *p = (L06Record *)(u32)func_002B9030(0x53);
+    L06Record *p = (L06Record *)(u32)part_alloc(0x53);
     L06RecordTail *q;
     L06Quad t;
 
@@ -48,21 +48,21 @@ void func_PAL_L06_00380B10(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
         p->field10 = *(L06Quad *)a0;
         q = (L06RecordTail *)((u8 *)p + 0x20);
         p->field04 = 0x50502010;
-        p->field09 = (u8)(func_00283CF0(2.0f) + 0x40);
+        p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
         p->field03 = 0x48;
         p->field01 = 0;
         p->field02 = *D_L06_001FF50C;
         p->field0C = f3 * 105000.0f;
-        p->field08 = (u8)func_002A77E0(0xFF);
+        p->field08 = (u8)math_random_int_below(0xFF);
         a2 = ((s32)a2 * 5 + 2) / 6;
         p->field0A = (u16)a2;
         t = *(L06Quad *)a1;
         p->field20 = t;
-        q->field0C = func_00283CE0((s16)a2);
+        q->field0C = IntToFloat((s16)a2);
         q->field10 = 0.5f;
         q->field14 = f3;
         q->field18 = 0;
         q->field1C = f4;
-        q->field1A = (s16)(func_002A77E0(6) - 3);
+        q->field1A = (s16)(math_random_int_below(6) - 3);
     }
 }

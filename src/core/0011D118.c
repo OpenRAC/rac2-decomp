@@ -2,14 +2,14 @@
 
 
 /* func_0011D118: owner ABI/declaration review retained. */
-void func_0011CB58(void);
+void sceSifExitCmd(void);
 
 extern int D_001346A0;
 
 /* Shuts down the command channel and clears its ready flag. */
-void func_0011D118(void)
+void sif_cmd_shutdown(void)
 {
-  ExitSifCmd();
+  sceSifExitCmd();
   D_001346A0 = 0;
   return;
 }

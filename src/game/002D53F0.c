@@ -1,14 +1,14 @@
 #include "common.h"
 
 extern float D_001B23A4[] __attribute__((sda));
-extern void func_0027C540(int);
+extern void SetupGifPaging(int);
 extern void func_0029C530(void);
-extern s32 func_00288FB8(s32);
-extern int func_0027FAA8(int, int, u64, u8 *, int);
-extern void func_0027C660(void);
+extern s32 GetLocalizedString(s32);
+extern int text_draw_centered_small(int, int, u64, u8 *, int);
+extern void DoGifPaging(void);
 
 /* Draw centered text in scaled screen coordinates. */
-int func_002D53F0(void)
+int menu_draw_centered_text(void)
 {
     float position;
     int y;
@@ -19,7 +19,7 @@ int func_002D53F0(void)
     y = (int)(D_001B23A4[0] * position + 0.5f);
     /* One-pass text draw group after coordinate conversion. */
     do {
-        DrawTextCenteredSmallFont(0x1A6, y, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);
+        text_draw_centered_small(0x1A6, y, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);
     } while (0);
     DoGifPaging();
     return 0;

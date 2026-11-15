@@ -42,17 +42,17 @@ typedef struct {
     Moby *objects[0];
 } ScenePrefix;
 
-extern void func_L00_002FC980(void);
-extern void func_002E64A0(Moby *);
-extern void func_L00_00326048(void *, void *, int, int, float);
+extern void anim_start_startup_animations(void);
+extern void UpdateEquipmentPieces(Moby *);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern ScenePrefix D_L06_001BD540;
-extern int D_001A79F0 MACRO_ADDR;
-extern void func_0029FCC0(void *, int, void *);
-extern int func_002A77E0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern Particle *func_002BDCE8(void *, float, float, float, int, void *, float, int, int);
-extern int func_00283CF0(float);
+extern int g_current_map_index MACRO_ADDR;
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int math_random_int_below(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, int, int);
+extern int FloatToInt(float);
 
 /* func_PAL_L06_0033D990, the PAL copy of func_L06_0033BDC0: the same C, where the rates scale by 6/5,
    the particle timer 7 becomes 6 at 50 Hz, and state 0x33 skips the 0xFA0 objects. */
@@ -64,7 +64,7 @@ void func_PAL_L06_0033D990(void)
     Particle *first, *second, *spark;
     int i, rotation;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
 
     for (i = 0; i < D_L06_001BD540.count; i++) {
         Moby *obj = D_L06_001BD540.objects[i];
@@ -72,91 +72,91 @@ void func_PAL_L06_0033D990(void)
         if (obj && obj->class_id == 0xE29)
             obj->flags |= 0x800;
         if (obj->class_id == 0xD54)
-            func_002E64A0(obj);
-        if (obj && obj->class_id == 0xFA0 && D_001A79F0 != 0x33) {
+            UpdateEquipmentPieces(obj);
+        if (obj && obj->class_id == 0xFA0 && g_current_map_index != 0x33) {
             char *state = obj->state;
 
             if (state)
-                func_L00_00326048(obj, state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+                math_store_angle_update_result(obj, state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
 
-    if (D_001A79F0 != 6 || D_L06_001BD540.active)
+    if (g_current_map_index != 6 || D_L06_001BD540.active)
         return;
 
     ship = D_L06_001BD540.objects[2];
     if (ship->class_id != 0xE29)
         return;
 
-    func_0029FCC0(ship, 0, left);
-    func_0029FCC0(ship, 1, right);
-    rotation = func_002A77E0(16);
-    func_00282F20(velocity, ship->velocity, 0.88000005f);
-    if (func_002A77E0(2))
+    moby_transform_joint_to_world(ship, 0, left);
+    moby_transform_joint_to_world(ship, 1, right);
+    rotation = math_random_int_below(16);
+    vec_scale_to_length(velocity, ship->velocity, 0.88000005f);
+    if (math_random_int_below(2))
         rotation = -rotation;
     qcopy(position, left);
 
-    first = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
+    first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
         first->f0A.word = 6;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    second = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
+    second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
         first->f0A.word = 6;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    spark = func_002BDCE8(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
+    spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
-        spark->life = func_00283CF0(4.0f) + 0x70;
+        spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 6;
-        spark->f08 = func_002A77E0(255);
+        spark->f08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
     *(VectorBits *)shift = *(VectorBits *)ship->offset;
-    func_00282F20(shift, shift, 0.3f);
-    func_00282CC0(position, position, shift);
+    vec_scale_to_length(shift, shift, 0.3f);
+    FastVecAdd(position, position, shift);
 
-    first = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
+    first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
         first->f0A.word = 6;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    second = func_002BDCE8(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
+    second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
         first->f0A.word = 6;
-        first->life = func_00283CF0(4.0f) + 0x70;
+        first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
     }
 
-    spark = func_002BDCE8(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
+    spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
-        spark->life = func_00283CF0(4.0f) + 0x70;
+        spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 6;
-        spark->f08 = func_002A77E0(255);
+        spark->f08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;

@@ -13,22 +13,22 @@ extern unsigned short ref_L22_003FBBF0_00 __attribute__((sda));
 extern float ref_L22_003FBBF0_01 __attribute__((sda));
 extern u8 * D_L22_001B1D6C;
 extern u8 D_L22_00255820[], D_L22_002558A0[];
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float), func_002A78D8(float, float);
-extern void func_002833F0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002AF000(void *, float, float, float);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_build_spherical_offset(void *, float, float, float);
 
 /* Initialize the particle slots and their direction tables. */
-void func_L22_003FBBF0(u8 * obj) {
+void part_init_effect_slots(u8 * obj) {
     Controller * ctl = *(Controller **)(obj + 0x68);
     int i;
     float heading, elevation;
 
-    for (i = 0; i < 4; i++) ctl->randomValues[i] = (float)RandomIntBelow(255);
+    for (i = 0; i < 4; i++) ctl->randomValues[i] = (float)math_random_int_below(255);
     {
         unsigned short v = ref_L22_003FBBF0_00;
         for (i = 3; i >= 0; i--)
@@ -66,8 +66,8 @@ void func_L22_003FBBF0(u8 * obj) {
         vec_scale_to_length(v + 0x70, v + 0x70, ref_L22_003FBBF0_01);
         FastVecCross(w + 0x70, v + 0x70, z);
     }
-    heading = RandomFloatRange(0.0f, 6.2831855f);
-    elevation = RandomFloatRange(-1.5707964f, 1.5707964f);
-    BuildSphericalOffset((u8 *)ctl + 0x10, 1.0f, heading, elevation);
-    *(float *)((u8 *)ctl + 0x1C) = RandomSignedFloatRange(0.785398f, 1.5707964f);
+    heading = math_random_float_range(0.0f, 6.2831855f);
+    elevation = math_random_float_range(-1.5707964f, 1.5707964f);
+    vec_build_spherical_offset((u8 *)ctl + 0x10, 1.0f, heading, elevation);
+    *(float *)((u8 *)ctl + 0x1C) = math_random_signed_float_range(0.785398f, 1.5707964f);
 }

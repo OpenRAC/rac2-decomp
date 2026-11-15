@@ -1,25 +1,25 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_00277F48(float, void *, int, int, int);
-extern int func_002AAE98(float, float, float, float);
-void func_002B9180(void *);
-int func_00282978(short *);
+extern int coll_process_hit(float, void *, int, int, int);
+extern int gfx_pack_color_floats(float, float, float, float);
+void part_kill(void *);
+int FastDecTimer(short *);
 typedef int V4_Fc3cb9262 __attribute__((mode(TI)));
-extern float func_00283CE0(int);
-extern void func_002C96F8(float, float, void *, int *, float *, void *);
-extern int func_00277F48(float, void *, int, int, int);
-extern float func_00283CE0(int);
-extern int func_002AAE98(float, float, float, float);
+extern float IntToFloat(int);
+extern void anim_sample_key_track(float, float, void *, int *, float *, void *);
+extern int coll_process_hit(float, void *, int, int, int);
+extern float IntToFloat(int);
+extern int gfx_pack_color_floats(float, float, float, float);
 typedef struct {
     float x;
     float y;
     float z;
     float w;
 } Vec16_F5621621c;
-extern void func_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
+extern void moby_queue_knockback_for_nodes(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
 extern int D_001BF000[];
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
 /* Updates one object: it copies its vector into a local, adds the two motion
    floats and hands the result with the motion's third float to a helper, then
@@ -41,11 +41,11 @@ void func_PAL_002C3368(char *obj)
 
     local[0] = *(V4_Fc3cb9262 *)(obj + 0x10);
     *(float *)(motion + 4) = *(float *)(motion + 4) + *(float *)(motion + 8);
-    func_002C96F8(*(float *)(motion + 4), *(float *)(motion + 0xC),
+    anim_sample_key_track(*(float *)(motion + 4), *(float *)(motion + 0xC),
                   (void *)*(int *)(obj + 0x20), &n, &f, vec);
 
-    if (func_00282978((short *)(obj + 0xA)) != 0) {
-        func_002B9180(obj);
+    if (FastDecTimer((short *)(obj + 0xA)) != 0) {
+        part_kill(obj);
         return;
     }
 
@@ -53,12 +53,12 @@ void func_PAL_002C3368(char *obj)
         int index = *(short *)(obj + 0xA);
 
         if ((float)index < 6.25f)
-            *(int *)(obj + 4) = func_002AAE98(0.7f, 0.7f, 0.7f,
-                                             func_00283CE0(index) * 0.0128f);
+            *(int *)(obj + 4) = gfx_pack_color_floats(0.7f, 0.7f, 0.7f,
+                                             IntToFloat(index) * 0.0128f);
     }
 
-    count = func_00277F48(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
+    count = coll_process_hit(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
     local[1] = *(V4_Fc3cb9262 *)(obj + 0x10);
-    func_002A9850((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
+    moby_queue_knockback_for_nodes((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
                    D_001BF000, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
 }

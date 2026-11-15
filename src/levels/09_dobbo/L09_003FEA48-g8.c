@@ -13,7 +13,7 @@ extern U16S32 D_L09_001B13C0 __attribute__((sda));
 extern void func_2EA110(char *p);
 
 /* Switches the creature to its fast-moving animation and sets its turn speed. */
-void func_L09_00404B90(char *moby, s32 param) {
+void dobbo_start_fast_move_anim(char *moby, s32 param) {
     char *self = moby;
     f32 speed = D_L09_001B13F0 * 0.0166666675f;
     char *vars = *(char **)(self + 0x68);
@@ -26,7 +26,7 @@ void func_L09_00404B90(char *moby, s32 param) {
 }
 
 /* Switches the creature to its slow-moving animation and sets its turn speed. */
-void func_L09_00404BF0(char *moby, s32 param) {
+void dobbo_start_slow_move_anim(char *moby, s32 param) {
     char *self = moby;
     f32 speed = D_L09_001B13F4 * 0.0166666675f;
     char *vars = *(char **)(self + 0x68);
@@ -39,7 +39,7 @@ void func_L09_00404BF0(char *moby, s32 param) {
 }
 
 /* Ticks the object's two timers and its age counter, refilling the timers when needed. */
-void func_L09_004031D8(char *moby) {
+void dobbo_tick_timers_age(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
     u16 age;
@@ -65,13 +65,13 @@ extern s32 D_L09_001A9040 __attribute__((sda));
 extern char *D_L09_001B285C __attribute__((sda));
 
 extern s32 func_323340(char *a0, char *a1, s32 a2);
-extern char *func_L09_00326E90(char *a0);
-extern void func_L09_003FE978(char *a0);
+extern char *moby_is_hero_or_special(char *a0);
+extern void group_flag_peers(char *a0);
 extern void func_326368(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 
 /* Drops the record the sub-object points at, once, when the resident mode word says 9,
    then rebuilds the sub-object's effect with both blend weights at zero. */
-void func_L09_003FEA48(char *moby) {
+void record_release_rebuild_effect(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     s16 recordIndex;
 
@@ -79,102 +79,102 @@ void func_L09_003FEA48(char *moby) {
         if (D_L09_001A79F0 == 9) {
             recordIndex = *(s16 *)(vars + 0x1D0);
             if (recordIndex != -1) {
-                if (IsHeroOrSpecialStateMoby(D_L09_001B285C + (recordIndex << 8)) == 0) {
+                if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
                     D_L09_001A9040 = 0;
                 }
                 *(s16 *)(vars + 0x1D0) = -1;
             }
         }
-        FlagGroupPeers(moby);
+        group_flag_peers(moby);
     }
     func_326368(moby, *(s32 *)(vars + 0x448), 0, 0, 0.0f, 0.0f);
 }
 
 /* The same resident mode word, read here as an ordinary global (lui + lw) rather than
    through $gp: the two references name the same word, one small and one not. */
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 
-extern void func_L09_00404C50(void);
-extern float func_00282E48(char *a0, char *a1);
-extern void func_002A93B0(void *a0);
-extern s32 func_002B0ED8(char *a0, char *a1, s32 a2);
-extern void func_L09_00405060(char *a0);
-extern void func_L09_004050E0(char *a0);
-extern s32 func_002B3BA8(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
+extern void dobbo_wandering_init_vars(void);
+extern float fast_vec_dist(char *a0, char *a1);
+extern void moby_update_ground_check(void *a0);
+extern s32 moby_apply_damage_to_object(char *a0, char *a1, s32 a2);
+extern void dobbo_alert_wandering_group(char *a0);
+extern void dobbo_destroy_with_debris(char *a0);
+extern s32 weapon_select_aim_target(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 extern char D_L09_001B9A00[];
 
 /* Releases the record the sub-object holds once the resident mode word says 9, then
    rebuilds the sub-object's effect. */
-void func_L09_00404E58(char *moby) {
+void dobbo_update_release_record(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
     s32 hitLevel;
     s16 recordIndex;
 
     if (*(u8 *)(self + 0x20) == 0) {
-        InitDobboWanderingMobyVars();
+        dobbo_wandering_init_vars();
     }
     if (*(u8 *)(self + 0x31) != 0) {
         if (fast_vec_dist(self + 0x10, D_L09_001B9A00) < 24.0f) {
-            UpdateMobyGroundCheck(self);
+            moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x16;
         }
     }
-    hitLevel = ApplyDamageToObject(self, vars + 0x50, 0);
-    if (gCurrentMapIndex == 9) {
+    hitLevel = moby_apply_damage_to_object(self, vars + 0x50, 0);
+    if (g_current_map_index == 9) {
         recordIndex = *(s16 *)(vars + 0xC0);
         if (recordIndex != -1) {
-            if (IsHeroOrSpecialStateMoby(D_L09_001B285C + (recordIndex << 8)) == 0) {
+            if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
                 D_L09_001A9040 = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
     }
     if (hitLevel != 0) {
-        AlertGroupMobyClass3472(self);
+        dobbo_alert_wandering_group(self);
         if (hitLevel >= 4) {
-            DestroyMobyWithDebris(self);
+            dobbo_destroy_with_debris(self);
         }
     }
     if (*(u8 *)(self + 0x95) != 3 && *(u8 *)(self + 0x95) != 4) {
-        *(s16 *)(vars + 0x334) = SelectAimTarget_002B3BA8(self, *(s32 *)(vars + 0x230), 0, 0, 16.0f, 0.0f);
+        *(s16 *)(vars + 0x334) = weapon_select_aim_target(self, *(s32 *)(vars + 0x230), 0, 0, 16.0f, 0.0f);
     }
 }
 
-extern void func_L09_00402D50(void);
-extern void func_L09_00403100(char *a0, s32 a1);
+extern void dobbo_init_enemy_vars(void);
+extern void dobbo_alert_group_wake_first(char *a0, s32 a1);
 
 /* The same release as func_L09_00404E58, with this level's own calls: when the
    resident mode word says 9 the record the sub-object holds is released, then the
    record's update runs with the value func_002B0ED8 returned, and the sub-object's
    effect is rebuilt from the sub-object's own index and position. */
-void func_L09_00403270(char *moby) {
+void dobbo_update_large_release_record(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
     s32 hitLevel;
     s16 recordIndex;
 
     if (*(u8 *)(self + 0x20) == 0) {
-        InitDobboEnemyVars();
+        dobbo_init_enemy_vars();
     }
     if (*(u8 *)(self + 0x31) != 0) {
         if (fast_vec_dist(self + 0x10, D_L09_001B9A00) < 48.0f) {
-            UpdateMobyGroundCheck(self);
+            moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x2D;
         }
     }
-    hitLevel = ApplyDamageToObject(self, vars + 0x50, 0);
-    if (gCurrentMapIndex == 9) {
+    hitLevel = moby_apply_damage_to_object(self, vars + 0x50, 0);
+    if (g_current_map_index == 9) {
         recordIndex = *(s16 *)(vars + 0xC0);
         if (recordIndex != -1) {
-            if (IsHeroOrSpecialStateMoby(D_L09_001B285C + (recordIndex << 8)) == 0) {
+            if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
                 D_L09_001A9040 = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
     }
-    AlertGroupAndWakeFirstMember(self, hitLevel);
-    SelectAimTarget_002B3BA8(self, *(s32 *)(vars + 0x28C), 0, 0, *(f32 *)(vars + 0x24C), 0.0f);
+    dobbo_alert_group_wake_first(self, hitLevel);
+    weapon_select_aim_target(self, *(s32 *)(vars + 0x28C), 0, 0, *(f32 *)(vars + 0x24C), 0.0f);
 }
 
 /* The walks below read the group table of id lists absolute. The group count and the entity base
@@ -193,13 +193,13 @@ extern char D_L09_001B1410[1] __attribute__((sda));
 /* The colour pair func_00283D38 blends. */
 extern s32 D_L09_001B1420[2];
 
-extern void func_00282D30(char *, char *, f32);
+extern void FastVecScale(char *, char *, f32);
 
-extern void func_002830C0(char *, char *, char *);
+extern void transform_vector(char *, char *, char *);
 
-extern s32 func_00283D38(s32, s32, f32);
+extern s32 FastTweenColor(s32, s32, f32);
 
-extern void func_L00_00325AE8(char *, s32, f32, f32);
+extern void gfx_l00_draw_billboard_quad(char *, s32, f32, f32);
 
 typedef struct {
     s32 a, b;
@@ -216,15 +216,15 @@ extern ColorPair D_L09_001B1400[2];
 
 extern s32 D_L09_001B2388;
 
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 
-extern f32 func_00283198(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
 
-extern void func_0029FC20(u8 *, s32, u8 *);
+extern void moby_transform_joint_point(u8 *, s32, u8 *);
 
-extern void func_L00_002E6CF0(void *, u8 *);
+extern void gfx_add_draw_callback_first(void *, u8 *);
 
-void func_L09_00405490(u8 *a0);
+void dobbo_draw_pulsing_glows(u8 *a0);
 
 /* Steps the object's pulse: the angle at +0x348 advances by 2*pi/30 through the resident angle
    blend, its sine is mapped to 0..1 and kept at +0x34C, and the colour pair D_L09_001B1400 is
@@ -232,7 +232,7 @@ void func_L09_00405490(u8 *a0);
    D_L09_001B2388, every visible class-0xD90 entity of the object's group that is not in state
    0xFE or 0xFD gets its point refreshed (func_0029FC20, selector 0) into its vector at +0x240
    and the same stamp; then func_L09_00405490 is registered as the object's callback. */
-void func_L09_004052F8(u8 *moby) {
+void dobbo_update_pulsing_tint(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
     ColorPair color = D_L09_001B1400[0];
     u16 *idPtr;
@@ -243,7 +243,7 @@ void func_L09_004052F8(u8 *moby) {
 
     angle = FastAddRotations(*(f32 *)(state + 0x348), 0.20943954f);
     *(f32 *)(state + 0x348) = angle;
-    wave = FastSinOrCosB(angle) * 0.5f + 0.5f;
+    wave = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     *(f32 *)(state + 0x34C) = wave;
     ((TintedObject *)moby)->colour = FastTweenColor(color.a, color.b, wave);
     if (*(s32 *)(state + 0x350) != D_L09_001B2388) {
@@ -258,13 +258,13 @@ void func_L09_004052F8(u8 *moby) {
                 if (entity[0x20] != 0xFE) {
                     if (entity[0x20] != 0xFD) {
                         entityVars = *(u8 **)(entity + 0x68);
-                        TransformMobyJointPoint(entity, 0, entityVars + 0x240);
+                        moby_transform_joint_point(entity, 0, entityVars + 0x240);
                         *(s32 *)(entityVars + 0x350) = D_L09_001B2388;
                     }
                 }
             }
         }
-        AddDrawCallbackToList1((void *)DrawPulsingEntityGlows, moby);
+        gfx_add_draw_callback_first((void *)dobbo_draw_pulsing_glows, moby);
     }
 }
 
@@ -272,7 +272,7 @@ void func_L09_004052F8(u8 *moby) {
    hidden (byte 0x31) or in state 0xFE or 0xFD: scales the sub-object's vector by its float at
    +0x344, transforms it by the matrix at +0x240, blends the colour pair by the float at +0x34C
    and hands the result to func_L00_00325AE8 with the +0x344 float scaled by 0.2. */
-void func_L09_00405490(u8 *moby) {
+void dobbo_draw_pulsing_glows(u8 *moby) {
     f32 point[4];
     u16 *idPtr;
     u16 *groupList;
@@ -300,7 +300,7 @@ void func_L09_00405490(u8 *moby) {
                     transform_vector((char *)point, (char *)point, (char *)(entityVars + 0x240));
                     color = FastTweenColor(D_L09_001B1420[0], D_L09_001B1420[1],
                                       *(f32 *)(entityVars + 0x34C));
-                    DrawBillboardQuad_L00((char *)point, color, *(f32 *)(entityVars + 0x344) * 0.2f, 0.08f);
+                    gfx_l00_draw_billboard_quad((char *)point, color, *(f32 *)(entityVars + 0x344) * 0.2f, 0.08f);
                 }
             }
         }
@@ -323,7 +323,7 @@ extern int D_L09_001B15B4 __attribute__((sda));
 extern u8 D_L09_001B15B0 __attribute__((sda));
 
 /* Spins a moving object around and sets its direction, facing and blend from its path values. */
-void func_L09_0040B0C8(char *moby) {
+void dobbo_update_spin_direction(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *velocity;
     float dir[3];
@@ -359,7 +359,7 @@ extern char *D_L09_001B294C[] __attribute__((sda));
 extern void func_317B40(int a0, int a1, int a2, int a3);
 
 /* Updates the indicator on a linked object, lighting it up once the item it needs has been collected. */
-void func_L09_00406E78(char *moby) {
+void dobbo_update_item_indicator(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *linked;
     char *linkedVars;
@@ -380,7 +380,7 @@ void func_L09_00406E78(char *moby) {
     if (*(s32 *)(vars + 0x50) != -1
         && (itemId = *(u16 *)((*(s32 *)(vars + 0x50) << 8) + (int)D_L09_001B285C + 0xB2),
             D_L09_0021E9F0.spent[(s16)itemId] != 0
-            || (flags = D_0019B4A8[((s16)itemId >> 1) + (gCurrentMapIndex << 10)],
+            || (flags = D_0019B4A8[((s16)itemId >> 1) + (g_current_map_index << 10)],
                 (itemId & 1) ? (flags >> 4) & 7 : flags & 7) != 0)) {
         *(float *)((*(s32 *)(linkedVars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.25f;
         func_317B40(*(s32 *)(vars + 0x4C), 1, 1, 1);
@@ -394,10 +394,10 @@ extern s32 D_0018C0B4 __attribute__((nosda));
 extern u8 D_0019B278[];
 extern u8 D_001A7A28[] __attribute__((sda));
 extern void func_30C790(char *a0);
-extern void func_L09_00406C90(char *a0);
+extern void dobbo_release_linked(char *a0);
 
 /* Checks whether every requirement is met and, if so, releases the two linked objects and finishes. Returns 1 when done. */
-s32 func_L09_00406CC0(char *moby) {
+s32 dobbo_release_linked_if_ready(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     s32 none;
     s32 linkedIndex;
@@ -409,7 +409,7 @@ s32 func_L09_00406CC0(char *moby) {
         char *linked = (char *)((*(s32 *)(vars + 0x2C) << 8) + (s32)D_L09_001B285C);
         if (*(u8 *)(linked + 0x20) != 0xFE) {
             if (*(u8 *)(linked + 0x20) != 0xFD) {
-                if (D_0019B278[*(s32 *)*(char **)(linked + 0x68) + (gCurrentMapIndex << 2)] == 0)
+                if (D_0019B278[*(s32 *)*(char **)(linked + 0x68) + (g_current_map_index << 2)] == 0)
                     return 0;
             }
         }
@@ -427,7 +427,7 @@ s32 func_L09_00406CC0(char *moby) {
     if (linkedIndex != -1) {
         itemId = *(u16 *)((linkedIndex << 8) + (s32)D_L09_001B285C + 0xB2);
         if (D_L09_0021E9F0.spent[(s16)itemId] == 0) {
-            s32 flags = D_0019B4A8[((s16)itemId >> 1) + (gCurrentMapIndex << 10)];
+            s32 flags = D_0019B4A8[((s16)itemId >> 1) + (g_current_map_index << 10)];
             if (itemId & 1)
                 flags = (flags >> 4) & 7;
             else
@@ -447,6 +447,6 @@ s32 func_L09_00406CC0(char *moby) {
         func_30C790((linkedIndex << 8) + D_L09_001B285C);
         *(s32 *)(vars + 0x68) = none;
     }
-    ReleaseLinkedMoby(moby);
+    dobbo_release_linked(moby);
     return 1;
 }

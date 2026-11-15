@@ -35,17 +35,17 @@ extern int D_L02_001B0C30 __attribute__((sda));
 
 extern int D_L02_001B0C44 __attribute__((sda));
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
 /* Sets up the tether strand points the first time it runs, laying them out in
    a straight line and clearing their motion. */
-void func_L02_003E9040(char *actor) {
+void tether_reset_strands(char *actor) {
     char *state;
     float span[4];
     float stepVec[4];
@@ -64,7 +64,7 @@ void func_L02_003E9040(char *actor) {
         for (i = 1; i < 20; i++) {
             FastVecAdd(D_L02_00249090[i], D_L02_00249090[i - 1], stepVec);
             D_L02_00249310[i] = 0;
-            ClearVector128(D_L02_00249360[i]);
+            vec_clear_128(D_L02_00249360[i]);
             D_L02_002494A0[i] = 0;
         }
         minusOne = -1;

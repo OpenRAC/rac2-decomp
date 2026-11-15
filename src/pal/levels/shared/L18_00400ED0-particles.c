@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef float f32;
@@ -13,14 +14,14 @@ typedef struct ParticleSettings {
 } ParticleSettings;
 extern f32 D_L18_001B0610[4] __attribute__((sda));
 extern ParticleSettings D_L18_001B06F8 __attribute__((sda));
-extern s32 func_002A77E0(s32);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_002A7878(f32, f32);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_002ACB48(f32 *, f32);
-extern void *func_L02_003449D8(void *, void *, void *, void *, int);
+extern s32 math_random_int_below(s32);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_random_float_range(f32, f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void vec_add_random_offset(f32 *, f32);
+extern void *enemy_spawn_record(void *, void *, void *, void *, int);
 
 /* Spawns a few upward-moving particles from the object's transformed effect point. */
 void func_PAL_L18_00400ED0(char *self) {
@@ -29,15 +30,15 @@ void func_PAL_L18_00400ED0(char *self) {
     s32 count, i, kind;
     *(Quad *)direction = 0;
     direction[2] = 1.0f;
-    count = func_002A77E0(2);
+    count = math_random_int_below(2);
     for (i = 0; i < count + 1; i++) {
-        func_00283098(point, D_L18_001B0610, self + 0xC0);
-        func_00282CC0(point, point, self + 0x10);
-        func_002ACB48(point, 0.5f);
-        func_00282F20(direction, direction, func_002A7878(8.0f, 12.0f) * 0.020000001f);
-        func_002ACB48(direction, 0.080000006f);
-        kind = func_002A77E0(2);
-        func_L02_003449D8(point, direction, &D_L18_001B06F8, (void *)kind, func_002A7820(-2, 2));
+        matrix_mul_vec3(point, D_L18_001B0610, self + 0xC0);
+        FastVecAdd(point, point, self + 0x10);
+        vec_add_random_offset(point, 0.5f);
+        vec_scale_to_length(direction, direction, math_random_float_range(8.0f, 12.0f) * 0.020000001f);
+        vec_add_random_offset(direction, 0.080000006f);
+        kind = math_random_int_below(2);
+        enemy_spawn_record(point, direction, &D_L18_001B06F8, (void *)kind, math_random_int_range(-2, 2));
     }
 }
 
@@ -50,11 +51,11 @@ void func_PAL_L18_00400FF8(char *self) {
     char *state = *(char **)(self + 0x68);
     s32 count, i;
     *(Quad *)direction = 0;
-    count = func_002A77E0(5);
+    count = math_random_int_below(5);
     for (i = 0; i < count + 1; i++) {
         *(Quad *)point = *(Quad *)(state + 0x90);
-        func_002ACB48(point, 0.5f);
-        func_002ACB48(direction, 0.010000001f);
-        func_L02_003449D8(point, direction, &D_L18_001B0730, (void *)1, func_002A7820(-5, 5));
+        vec_add_random_offset(point, 0.5f);
+        vec_add_random_offset(direction, 0.010000001f);
+        enemy_spawn_record(point, direction, &D_L18_001B0730, (void *)1, math_random_int_range(-5, 5));
     }
 }

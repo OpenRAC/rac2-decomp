@@ -18,23 +18,23 @@ typedef struct {
     int selected;
 } Slots_002DC900;
 
-extern Slots_002DC900 D_001393E0;
-extern char D_001F2840[];
+extern Slots_002DC900 g_memcard_state;
+extern char g_pause_menu_state[];
 extern int D_00258D70[];
 extern int D_001ABBEC __attribute__((sda));
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-extern char *func_00288FB8(int);
-extern char *func_002DF1F8(char *, int);
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+extern char *GetLocalizedString(int);
+extern char *text_format_location_name(char *, int);
+extern void text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Menu line for the current slot: prints its name (and the follow-up line)
    while the menu is in its listing state. */
-int func_002DC900(int *box)
+int save_slot_location_text_draw(int *box)
 {
     char buf[64];
-    char *menuRoot = gPauseMenuState;
-    Slots_002DC900 *saveInfo = &gMemcardState;
+    char *menuRoot = g_pause_menu_state;
+    Slots_002DC900 *saveInfo = &g_memcard_state;
     int locationIndex;
     int extraText;
     int lineOffset;
@@ -43,14 +43,14 @@ int func_002DC900(int *box)
     SetupGifPaging(0);
     if (saveInfo->mode < 3 && saveInfo->selected < 0 && *(int *)(menuRoot + 0x164) >= 11 && saveInfo->state == 2) {
         if (locationIndex == -1) {
-            DrawTextCenteredSmallFont(box[6], box[7] + D_001ABBEC / 2, 0x80F0F0F0, GetLocalizedString(0x2F14), -1);
+            text_draw_centered_small(box[6], box[7] + D_001ABBEC / 2, 0x80F0F0F0, GetLocalizedString(0x2F14), -1);
         } else {
             extraText = D_00258D70[locationIndex * 2 + 1];
             lineOffset = 0;
             if (extraText < 0) lineOffset = D_001ABBEC >> 1;
-            DrawTextCenteredSmallFont(box[6], box[7] + lineOffset, 0x80F0F0F0, FormatLocationName(buf, locationIndex), -1);
+            text_draw_centered_small(box[6], box[7] + lineOffset, 0x80F0F0F0, text_format_location_name(buf, locationIndex), -1);
             if (extraText >= 0) {
-                DrawTextCenteredSmallFont(box[6], box[7] + D_001ABBEC, 0x80F0F0F0, GetLocalizedString(D_00258D70[locationIndex * 2 + 1]), -1);
+                text_draw_centered_small(box[6], box[7] + D_001ABBEC, 0x80F0F0F0, GetLocalizedString(D_00258D70[locationIndex * 2 + 1]), -1);
             }
         }
     }

@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char *func_002ED688(char *object, int flag);
+extern char *moby_get_motion_data(char *object, int flag);
 extern void func_00282C88_2(char *target);
-extern void func_L05_0037BB28(char *object);
-extern void func_002EE678(char *object, int value);
-extern void func_L05_0037CDD8(char *object, int value);
-extern void func_002EE7B8(char *object);
-extern void func_L05_0037AE40(char *object);
+extern void moby_clear_links(char *object);
+extern void follower_set_state(char *object, int value);
+extern void moby_l05_set_state_value(char *object, int value);
+extern void follower_start_random_push(char *object);
+extern void moby_reset_action_state(char *object);
 extern int D_L05_00221D10[];
 
 /* Initialises a spawned sub-object from the owner's fields and increments a shared counter, then runs three follow-up calls and conditionally two more. */
@@ -15,7 +16,7 @@ void func_PAL_L05_0037D610(char *object, int flag)
     char *s;
     int **slot;
 
-    s = func_002ED688(object, flag);
+    s = moby_get_motion_data(object, flag);
     if (s == 0)
         return;
 
@@ -35,12 +36,12 @@ void func_PAL_L05_0037D610(char *object, int flag)
     slot = *(int ***)(object + 104);
     *(float *)*slot = (float)*(int *)(s + 328);
     D_L05_00221D10[4] = D_L05_00221D10[4] + 1;
-    func_L05_0037BB28(object);
-    func_002EE678(object, 1);
-    func_L05_0037CDD8(object, 1);
+    moby_clear_links(object);
+    follower_set_state(object, 1);
+    moby_l05_set_state_value(object, 1);
     if (flag)
-        func_002EE7B8(object);
+        follower_start_random_push(object);
     if (D_L05_00221D10[13] == 1)
-        func_L05_0037AE40(object);
+        moby_reset_action_state(object);
 }
 

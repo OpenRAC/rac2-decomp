@@ -1,8 +1,8 @@
 #include "common.h"
-extern unsigned char *func_0029EFD0(int type);
-extern int func_00283CF0(float value);
-extern void func_00282F20(void *out, void *in, float scale);
-extern void func_00282DD8(void *out, void *a, void *b);
+extern unsigned char *CreateMoby(int type);
+extern int FloatToInt(float value);
+extern void vec_scale_to_length(void *out, void *in, float scale);
+extern void FastVecCross(void *out, void *a, void *b);
 extern float D_L05_001AFC34 __attribute__((sda));
 extern float D_L05_001AFC38 __attribute__((sda));
 extern float D_L05_001AFC3C __attribute__((sda));

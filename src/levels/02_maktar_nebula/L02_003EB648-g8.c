@@ -7,19 +7,19 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002A7750(void *, int, int);
+extern void moby_set_state(void *, int, int);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
 typedef struct {
     char pad0[0x20];
@@ -46,13 +46,13 @@ typedef struct {
     float vel[4];
 } Actor;
 
-extern int func_002E5CF8(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
-extern void func_L02_003EB8F8();
+extern void elevator_l02_update();
 
-extern char D_00188660[];
+extern char g_sound_state[];
 
 extern char *D_L02_001B368C;
 
@@ -62,7 +62,7 @@ extern float D_L02_001B0DBC __attribute__((sda));
 
 /* Attaches the actor to a moving surface, then makes it bob up and down on it
    and passes its movement on. */
-void func_L02_003EB648(Actor *actor) {
+void platform_rider_update(Actor *actor) {
     State *state = actor->state;
     float prevPos[4];
     float prevVel[4];
@@ -76,11 +76,11 @@ void func_L02_003EB648(Actor *actor) {
     switch (actor->kind) {
     case 0:
         if (state->index == -1) {
-            SetMobyState(actor, 3, -1);
+            moby_set_state(actor, 3, -1);
             return;
         }
-        if (FloatAbs(*(float *)((char *)((state->index << 7) + (int)D_L02_001B368C) + 0x28) - 2.0f) < 0.01f) {
-            actor->update = (int)UpdateElevatorMoby_L02;
+        if (math_fabs(*(float *)((char *)((state->index << 7) + (int)D_L02_001B368C) + 0x28) - 2.0f) < 0.01f) {
+            actor->update = (int)elevator_l02_update;
             return;
         }
         state->flags |= 0x10;
@@ -90,12 +90,12 @@ void func_L02_003EB648(Actor *actor) {
         state->lx = offset[0];
         state->lz = offset[2];
         state->slot = -1;
-        SetMobyState(actor, 2, -1);
+        moby_set_state(actor, 2, -1);
         break;
     case 2:
         state->angle = FastAddRotations(state->angle, D_L02_001B0DBC * 0.0002908882452175021f);
-        state->ly = D_L02_001B0DB8 * FastSinOrCosB(state->angle);
-        soundSlot = gSoundState + state->slot * 0x70;
+        state->ly = D_L02_001B0DB8 * math_fast_sin_or_cos_b(state->angle);
+        soundSlot = g_sound_state + state->slot * 0x70;
         if (*(int *)(soundSlot + 0x88) != (int)actor || *(unsigned char *)(soundSlot + 0x74) == 0)
             state->slot = PlayMobySound(0, 4, actor);
         *(TI128 *)localPoint = 0;
@@ -109,5 +109,5 @@ void func_L02_003EB648(Actor *actor) {
         break;
     }
     FastVecSub(offset, actor->pos, prevPos);
-    CombineTransformsAndStore(state->x20, offset, prevVel, actor->vel);
+    mat_combine_and_store(state->x20, offset, prevVel, actor->vel);
 }

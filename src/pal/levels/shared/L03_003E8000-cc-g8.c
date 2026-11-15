@@ -50,7 +50,7 @@ extern float D_L03_001B3284_1 __attribute__((sda));
 extern PuzzleNode D_L03_0029BBF0[14];
 extern int D_0024A7B0[14][6];
 extern u8 *D_L03_001A904C;
-extern int D_L03_001B2548;
+extern int g_frame_l03_counter;
 extern int D_L03_001B3280;
 /* Absolute views of the cell colours, the bar box and the cell box, whose first words are read
    through $gp. */
@@ -61,22 +61,22 @@ extern Vec D_L03_001B0BF8, D_L03_001B0C08;
 extern float D_L03_001B0BDC[] MACRO_ADDR;
 extern char D_L03_001B0C18[];
 
-extern void func_L03_003E4148(u8 *, u32, u32, void *, void *, float, int);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACE78(void *, void *, float);
-extern void func_00283958(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern char *func_00336D50(void *, int);
-extern void func_00300A00(char *, u32, float, float, float, float, float);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern u32 func_00283D38(u32, u32, float);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_0027FB40(int, int, u64, char *, int);
+extern void path_puzzle_draw_link_strip(u8 *, u32, u32, void *, void *, float, int);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_set_direction_with_complement(void *, void *, float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern char *table_find_by_id(void *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, u32, float, float, float, float, float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern u32 FastTweenColor(u32, u32, float);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, char *, ...);
+extern int text_draw_centered_medium(int, int, u64, char *, int);
 
 /* A size scaled for the display and rounded (hud_size, as in src/levels/08_tabora/
    L08_0041D808-g8.c): scaled_coord's test in its float form, on the display mode its caller
@@ -145,7 +145,7 @@ void func_PAL_L03_003E8000(u8 *p)
         if (q->route[1] != 255)
             do {
                 j = i + 1;
-                func_L03_003E4148(p, color, color, &D_L03_0029BBF0[q->route[i]],
+                path_puzzle_draw_link_strip(p, color, color, &D_L03_0029BBF0[q->route[i]],
                                   &D_L03_0029BBF0[q->route[j]], q->phase, D_L03_001B0B94);
                 i = j;
                 if (i >= 15)
@@ -167,13 +167,13 @@ void func_PAL_L03_003E8000(u8 *p)
                         found = 1;
                         break;
                     }
-                func_00282DD8(&axis, &D_L03_0029BBF0[q->node], &D_L03_0029BBF0[k]);
-                func_002ACE78(&axis, &axis, 0.17453294992446899f);
-                func_00283958(&axis, &rotation);
-                func_00283098(&tip, &D_L03_0029BBF0[q->node], &rotation);
-                func_00282F20(&tip, &tip, 1.0f);
+                FastVecCross(&axis, &D_L03_0029BBF0[q->node], &D_L03_0029BBF0[k]);
+                vec_set_direction_with_complement(&axis, &axis, 0.17453294992446899f);
+                quaternion_to_rotation_basis(&axis, &rotation);
+                matrix_mul_vec3(&tip, &D_L03_0029BBF0[q->node], &rotation);
+                vec_scale_to_length(&tip, &tip, 1.0f);
                 if (found)
-                    func_L03_003E4148(p, D_L03_001B0B8C & 0xFFFFFF, D_L03_001B0B8C, &tip,
+                    path_puzzle_draw_link_strip(p, D_L03_001B0B8C & 0xFFFFFF, D_L03_001B0B8C, &tip,
                                       &D_L03_0029BBF0[q->node], -q->phase, 0);
             }
         }
@@ -184,51 +184,51 @@ void func_PAL_L03_003E8000(u8 *p)
         float z, half;
 
         half = 0.5f;
-        s = func_00336D50(D_L03_001A904C + entry, 0xCB);
+        s = table_find_by_id(D_L03_001A904C + entry, 0xCB);
         y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
         z = 0.0f;
-        func_00300A00(s, 0x60442D00, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
-        s = func_00336D50(D_L03_001A904C + entry, 0xCC);
+        gfx_draw_scaled_object_two_axes(s, 0x60442D00, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
+        s = table_find_by_id(D_L03_001A904C + entry, 0xCC);
         y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
-        func_00300A00(s, 0x55F0C070, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
+        gfx_draw_scaled_object_two_axes(s, 0x55F0C070, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
     }
     half = 0.5f;
     {
         int x, left, top, right, bottom;
         int pulse;
 
-        pulse = func_00283D38(0x80F0C070, 0x40F0C070,
-                          func_00283198(func_00283CE0(D_L03_001B2548 % 50) * 0.12483149f
+        pulse = FastTweenColor(0x80F0C070, 0x40F0C070,
+                          math_fast_sin_or_cos_b(IntToFloat(g_frame_l03_counter % 50) * 0.12483149f
                                         - 3.14159274f) * half + half);
-        a = func_00283CE0(q->amount);
-        b = func_00283CE0(D_L03_001B0B58);
+        a = IntToFloat(q->amount);
+        b = IntToFloat(D_L03_001B0B58);
         left = D_L03_001B0BA8 + 2;
-        x = func_00283CF0((float)(D_L03_001B0BA8_1[1] - D_L03_001B0BA8_1[3] - 4) * a / b
+        x = FloatToInt((float)(D_L03_001B0BA8_1[1] - D_L03_001B0BA8_1[3] - 4) * a / b
                           + (float)(D_L03_001B0BA8_1[3] - 2));
         t = D_L03_001B3284[0];
         top = scaled_coord(x, t, half, 1);
         right = D_L03_001B0BA8_1[2] - 2;
         bottom = scaled_coord(D_L03_001B0BA8_1[3] - 2, t, half, 1);
-        func_0028FC48(left, top, right, bottom, pulse, 0);
+        AppendScreenRectPacket(left, top, right, bottom, pulse, 0);
     }
     {
         int x, end, top, bottom, left, right;
         float step, fx;
 
-        a = func_00283CE0(D_L03_001B0BB8_1[1] - D_L03_001B0BB8_1[3]);
-        b = func_00283CE0(D_L03_001B0B50);
+        a = IntToFloat(D_L03_001B0BB8_1[1] - D_L03_001B0BB8_1[3]);
+        b = IntToFloat(D_L03_001B0B50);
         step = a / b;
         for (i = 0; i < D_L03_001B0B50; i++) {
             float scale;
 
-            x = func_00283CF0((float)D_L03_001B0BB8_1[3] + (float)i * step);
+            x = FloatToInt((float)D_L03_001B0BB8_1[3] + (float)i * step);
             fx = (float)x;
-            end = func_00283CF0(fx + step + 3.0f);
+            end = FloatToInt(fx + step + 3.0f);
             scale = D_L03_001B3284_1;
             if (i >= q->count) {
                 bottom = scaled_coord(end, scale, half, 1);
                 top = hud_size(D_L03_001B3280, fx, scale, half);
-                func_0028FC48(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
+                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
                 {
                     float t;
 
@@ -237,12 +237,12 @@ void func_PAL_L03_003E8000(u8 *p)
                     bottom = scaled_coord(end + 2, t, half, 1);
                     right = D_L03_001B0BB8_1[2] - 2;
                     top = scaled_coord(x - 2, t, half, 1);
-                    func_0028FC48(left, bottom, right, top, D_L03_001B0B98, 0);
+                    AppendScreenRectPacket(left, bottom, right, top, D_L03_001B0B98, 0);
                 }
             } else {
                 bottom = scaled_coord(end, scale, half, 1);
                 top = hud_size(D_L03_001B3280, fx, scale, half);
-                func_0028FC48(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
+                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
             }
         }
     }
@@ -256,16 +256,16 @@ void func_PAL_L03_003E8000(u8 *p)
         for (i = 0; i < 4; i++) {
             float a, offset;
 
-            func_00115DA8(text, D_L03_001B0C18, func_00288FB8(ids.x[i]));
-            x = func_00283CF0(D_L03_001B0BD8[i * 2]);
+            sprintf(text, D_L03_001B0C18, GetLocalizedString(ids.x[i]));
+            x = FloatToInt(D_L03_001B0BD8[i * 2]);
             offset = (float)offs.x[i];
             a = D_L03_001B0BDC[i * 2] * D_L03_001B3284[0] + 0.5f;
             if (D_L03_001B3280 == 1)
                 y = (int)(a + offset);
             else
                 y = (int)a;
-            y = func_00283CF0((float)y);
-            func_0027FB40(x, y, 0x80808080, text, 128);
+            y = FloatToInt((float)y);
+            text_draw_centered_medium(x, y, 0x80808080, text, 128);
         }
     }
 }

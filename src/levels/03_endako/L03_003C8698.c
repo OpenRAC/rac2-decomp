@@ -28,17 +28,17 @@ typedef struct {
     TI128 q80;
 } L03_003C8698_Body;
 
-extern void func_002A8BD0(void *moby, void *a1, u32 a2, f32 a3);
-extern void func_002A8C28(void *moby, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
+extern void part_init_effect_record(void *moby, void *a1, u32 a2, f32 a3);
+extern void coll_sweep_from_object(void *moby, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
                           s32 a6, s32 a7, s32 a8);
-extern void func_00283658(void *moby, void *a1);
-extern void func_002830C0(void *moby, void *a1, void *a2);
-extern void func_002761F8(void *moby, void *a1, void *a2, void *a3, void *a4);
+extern void copy_matrix_rotation(void *moby, void *a1);
+extern void transform_vector(void *moby, void *a1, void *a2);
+extern void CollLine(void *moby, void *a1, void *a2, void *a3, void *a4);
 extern L03_V4 D_L03_0029A8D0[];
 
 /* Seeds the actor's effect: the state, the aim, the effect track and then the
    four corners of the level's table. */
-void func_L03_003C8698(char *moby)
+void moby_init_effect_track(char *moby)
 {
     L03_003C8698_Body b;
     f32 one = 1.0f;
@@ -46,8 +46,8 @@ void func_L03_003C8698(char *moby)
     L03_V4 *p;
     int i;
 
-    InitEffectRecord_002A8BD0(&b.st, moby, 0x10000, 2.0f);
-    SweepCollisionFromObject(moby, aim, 0x10000, 1.25f, 100.0f, one, 0, 1, 0);
+    part_init_effect_record(&b.st, moby, 0x10000, 2.0f);
+    coll_sweep_from_object(moby, aim, 0x10000, 1.25f, 100.0f, one, 0, 1, 0);
     copy_matrix_rotation(&b.v[0], moby + 0xC0);
     qcopy(&b.q80, aim);
     *(f32 *)((u8 *)&b.q80 + 12) = one;

@@ -2,21 +2,21 @@
 
 /* This unit is built with -G8: every body here reaches a global through $gp. */
 
-extern int func_00283CF0(f32);
+extern int FloatToInt(f32);
 
-extern s32 func_L17_00340DD0(f32, s32, s32, s32);
+extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
 
 extern f32 D_L17_001B04B8 __attribute__((sda));
 
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 
-extern s32 func_002A9640(void *, s32, s32);
+extern s32 part_find_owned_effect_slot(void *, s32, s32);
 
-extern void func_L00_0032A258(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 
-extern void func_0032C700(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 extern s32 D_L17_001B1E00 __attribute__((sda));
 
@@ -30,7 +30,7 @@ extern s32 D_L17_001B1DD0 __attribute__((sda));
    colour bytes and the measured scale to the level's own setter. */
 /* Every so often creates a small light effect with its own colour and size, then waits and
    does it again (moby class 2477). */
-void func_L17_003CC6A8(s32 moby)
+void effect_l17_spawner_update(s32 moby)
 {
     s32 mobyAddr = moby;
     u32 *vars = *(u32 **)(mobyAddr + 0x68);
@@ -58,7 +58,7 @@ void func_L17_003CC6A8(s32 moby)
     packed |= vars[0];
     scale = *(f32 *)&vars[4] * 210000.0f;
     frames = FloatToInt(D_L17_001B04B8 * 60.0f);
-    if (SpawnFadingParticle_L17(scale, mobyAddr, packed, frames) != 0)
+    if (part_l17_spawn_fading(scale, mobyAddr, packed, frames) != 0)
         *(u16 *)(mobyAddr + 0x96) = FloatToInt(D_L17_001B04B8 * 60.0f);
     else
         *(u16 *)(mobyAddr + 0x96) = 1;
@@ -67,32 +67,32 @@ void func_L17_003CC6A8(s32 moby)
 /* Sets the object's stage up: the first stage asks the level's own spawner for a child and
    gives up its handle, the second one only releases the handle. */
 /* Waits until something hits it, then bursts into an effect and removes itself. */
-void func_L17_00418D10(s32 moby)
+void hit_l17_burst_update(s32 moby)
 {
     u8 state = *(u8 *)(moby + 0x20);
 
     switch (state) {
     case 0:
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (FindOwnedEffectSlot(moby, 0x4010001, 0) != 0) {
-            SetMobyState(moby, 2, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010001, 0) != 0) {
+            moby_set_state(moby, 2, -1);
             *(u8 *)(moby + 0xA8) = 0xFF;
         }
         break;
     case 2:
-        ExplodeObjectIntoPieces(moby, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
+        part_explode_object_into_pieces(moby, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
                           0xFFFF, 0, D_L17_001B1E00, 0, 0xFFFF, 0xFF, 0);
         SpawnExplosion(moby + 0x10, 0, 12, 10, 10, 10, 0, 0,
                       *(f32 *)(moby + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         break;
     }
 }
 
 
-extern char *D_L17_001B2C1C __attribute__((sda));
+extern char *g_moby_l17_pool __attribute__((sda));
 
 typedef int Quad __attribute__((mode(TI)));
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
@@ -191,24 +191,24 @@ extern float D_L17_001B0CA8 __attribute__((sda));
 extern u8 D_L17_001B0CB8[4] __attribute__((sda));
 extern u8 D_L17_001B9BC0[];
 extern char D_L17_001B0CC8[]; /* "returned null\n" */
-extern u8 *D_0018C0B0 NOT_SDA;
-extern float func_002A89A8(void *, int, float);
-extern void func_L04_0033CB88(void *);
-extern int func_002A7820(int, int);
-extern void func_002AB650(void *);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_L17_003E4860(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern void func_0026FEB8(void *, ...);
+extern u8 *g_hero_moby NOT_SDA;
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void MoveCtl_Init(void *);
+extern int math_random_int_range(int, int);
+extern void hero_copy_field_to_moby(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void moby_l17_set_group_alert_flag(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern void STUB_printf(void *, ...);
 
 /* Sets the state record up on the first update (the tuning block in field order), then
    handles damage and keeps a target, falling back to D_0018C0B0 when the record has none. */
 /* Sets up a Smolgian creature the first time it updates (speeds, turn rates, timers),
    then checks for hits and picks the target it will chase. */
-void func_L17_003E41A8(u8 *obj)
+void grulch_init_state_check_hits(u8 *obj)
 {
     L17Vars *vars = *(L17Vars **)(obj + 0x68);
     u8 *hit;
@@ -217,14 +217,14 @@ void func_L17_003E41A8(u8 *obj)
 
     obj[0x23] = 128;
     if (obj[0x20] == 0) {
-        float ground = ProbeGroundHeightBelow(obj + 0x10, 0, 0.5f);
+        float ground = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
         float radius = F(*(u8 **)(obj + 0x24), 0x24);
 
         F(obj, 0x18) = ground;
         F(obj, 0x2C) = radius;
         qzero_nc(obj + 0xF0);
         if (vars->i428 != -1) {
-            F(obj, 0x18) = F((u8 *)gMobyPool_L17 + vars->i428 * 256, 0x18) + 1.4f;
+            F(obj, 0x18) = F((u8 *)g_moby_l17_pool + vars->i428 * 256, 0x18) + 1.4f;
             H(obj, 0x34) |= 0x41;
             I(obj, 0x98) = 0;
         }
@@ -264,42 +264,42 @@ void func_L17_003E41A8(u8 *obj)
         }
         qcopy_nc(&vars->v110, &vars->v3D0);
         vars->f120 = 0.5f;
-        vars->h400 = RandomIntRange(120, 700);
+        vars->h400 = math_random_int_range(120, 700);
         vars->i41C = 0;
-        CopyHeroField38ToMoby(obj);
+        hero_copy_field_to_moby(obj);
         vars->f340 = F(obj, 0x2C);
         vars->f330 = vars->f30;
         vars->b28 = 0;
         vars->i418 = 0;
         vars->p310 = D_L17_001B0CB8;
         vars->f430 = (float)vars->b34;
-        SetMobyState(obj, 1, 0);
+        moby_set_state(obj, 1, 0);
         if (obj[0x43])
-            StartAnimationBlended(obj, 0, 0, 0);
+            anim_start_blended(obj, 0, 0, 0);
         vars->i450 = vars->i428;
     }
     if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
-        UpdateMobyGroundCheck(obj);
+        moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }
-    hit = (u8 *)FindOwnedEffectSlot(obj, 0x230000, 0);
+    hit = (u8 *)part_find_owned_effect_slot(obj, 0x230000, 0);
     if (hit && hit[0x28] == 8) {
         obj[0x20] = 9;
         obj[0xBC] = 4;
     }
-    result = ApplyDamageToObject(obj, vars->ai, 0);
+    result = moby_apply_damage_to_object(obj, vars->ai, 0);
     if (result) {
         if (result == 5) {
             vars->iF0 = 0;
             vars->fF4 = 0.8377582f;
         }
-        SetGroupMobyAlertFlagL17(obj);
+        moby_l17_set_group_alert_flag(obj);
     }
-    vars->h404 = SelectAimTarget_002B3BA8(obj, -1, 0, 0, 15.0f, 3.0f);
+    vars->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
     target = vars->target;
     if (!target) {
         STUB_printf(D_L17_001B0CC8);
-        target = gHeroMoby_0018C0B0;
+        target = g_hero_moby;
     }
     vars->p408 = target;
 }
@@ -320,7 +320,7 @@ typedef struct {
     u8 pad5BC[0x1CD8];
     s32 mode;                   /* 0x2294 */
 } L17Player;
-extern L17Player D_00189E20;
+extern L17Player g_hero_state;
 
 /* The level's save record: one collected flag per object id from 0x464. */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } L17SaveState;
@@ -328,25 +328,25 @@ extern L17SaveState D_L17_0021EBB0;
 
 /* The current level, read with the lw macro: absolute in ordinary flow, $gp in a
    delay slot. */
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 /* Per-level save nibbles, 0x400 bytes a level, two object ids a byte. */
 extern u8 D_0019B4A8[];
 /* Per-level object flags, 16 bytes a level. */
 extern u8 D_0019B2E8[];
 
 /* Paths: a count, then 16-byte points from 0x10. */
-extern u8 *D_L17_001FE880[];
+extern u8 *g_path_l17_table[];
 
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern f32 func_002A7940(void);
-extern s32 func_002B3868(void *);
-extern s32 func_002ACBC8(void *, s32);
-extern void func_002B0CE0(s32, s32, s32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_L00_003294F0(void *, s32);
-extern void func_L00_00429020(s32);
-extern void func_L13_002CEF00(s32, s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_random_angle(void);
+extern s32 flag_set_first_pending(void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern void ForceClaimNotice(s32, s32, s32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void moby_set_flag_bit(void *, s32);
+extern void cam_lock_entry(s32);
+extern void hero_change_action(s32, s32);
 
 /* func_L17_0041EAA8's state record. */
 typedef struct {
@@ -363,7 +363,7 @@ typedef struct {
    counts the id in its save nibble and passes the linked record to func_L00_003294F0.
    With the player inside its cuboid in mode 0x82 it calls func_L13_002CEF00(6, 1). */
 /* A glowing pad that pulses its colour and reacts when the player targets it. */
-void func_L17_0041EAA8(u8 *obj)
+void target_pad_update(u8 *obj)
 {
     L17PadVars *padVars = *(L17PadVars **)(obj + 0x68);
     s32 shade, nibble;
@@ -371,57 +371,57 @@ void func_L17_0041EAA8(u8 *obj)
     u8 *counter;
 
     padVars->phase = FastAddRotations(padVars->phase, 0.10471977f);
-    shade = FloatToInt(FastSinOrCosB(padVars->phase) * 128.0f);
+    shade = FloatToInt(math_fast_sin_or_cos_b(padVars->phase) * 128.0f);
     if (shade > 128)
         shade = 128;
     else if (shade < 32)
         shade = 32;
     switch (obj[0x20]) {
     case 0:
-        if (SetFirstPendingFlag(obj))
+        if (flag_set_first_pending(obj))
             *(u16 *)(obj + 0x34) |= 0x10;
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        SetFirstPendingFlag(obj);
-        if (gHeroState.target == obj) {
+        flag_set_first_pending(obj);
+        if (g_hero_state.target == obj) {
             if (padVars->group != -1) {
                 id = *(u16 *)(obj + 0xB2);
                 if (!D_L17_0021EBB0.collected[(s16)id]) {
-                    nibble = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
+                    nibble = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
                     nibble = ((id & 1) ? nibble >> 4 : nibble) & 7;
                     if (!nibble) {
                         u16 slot;
 
-                        LockCameraEntry(padVars->group);
+                        cam_lock_entry(padVars->group);
                         slot = *(u16 *)(obj + 0xB2);
                         if (slot & 1) {
-                            counter = D_0019B4A8 + (((s16)slot >> 1) + (gCurrentMapIndex << 10));
+                            counter = D_0019B4A8 + (((s16)slot >> 1) + (g_current_map_index << 10));
                             if (((*counter >> 4) & 7) != 7)
                                 *counter += 16;
                         } else {
-                            counter = D_0019B4A8 + (((s16)slot >> 1) + (gCurrentMapIndex << 10));
+                            counter = D_0019B4A8 + (((s16)slot >> 1) + (g_current_map_index << 10));
                             if ((*counter & 7) != 7)
                                 *counter += 1;
                         }
                         if (padVars->linked != -1)
-                            SetObjectFlagBit(gMobyPool_L17 + (padVars->linked << 8), 1);
+                            moby_set_flag_bit(g_moby_l17_pool + (padVars->linked << 8), 1);
                         padVars->group = -1;
                     }
                 }
             }
             ForceClaimNotice(12, 0x27F7, 1);
             *(s32 *)(obj + 0x78) = (0x80 << 24) | (shade << 8);
-            gHeroState.status = 2;
+            g_hero_state.status = 2;
             if (padVars->speed != 0)
-                gHeroState.speed = padVars->speed;
+                g_hero_state.speed = padVars->speed;
         } else
             *(s32 *)(obj + 0x78) = (0x80 << 24) | shade;
         break;
     }
-    if (padVars->cuboid >= 0 && IsPointInCuboid(gHeroState.pos, padVars->cuboid)
-        && gHeroState.mode == 0x82)
-        ChangeHeroAction(6, 1);
+    if (padVars->cuboid >= 0 && IsPointInCuboid(g_hero_state.pos, padVars->cuboid)
+        && g_hero_state.mode == 0x82)
+        hero_change_action(6, 1);
 }
 
 /* func_L17_00420E08's state record. */
@@ -442,7 +442,7 @@ typedef struct { u8 header[0x10]; f32 x, y, z, w; } L17PathPoint;
    its path that equals the marker. */
 /* A glowing switch that pulses until the player targets it, then lights up and opens
    its path. */
-void func_L17_00420E08(u8 *obj)
+void switch_l17_update(u8 *obj)
 {
     L17SwitchVars *vars = *(L17SwitchVars **)(obj + 0x68);
     s32 shade;
@@ -451,8 +451,8 @@ void func_L17_00420E08(u8 *obj)
     case 0: {
         s32 level;
 
-        vars->phase = RandomAngle();
-        level = gCurrentMapIndex;
+        vars->phase = math_random_angle();
+        level = g_current_map_index;
         *(f32 *)(obj + 0x18) -= 0.35f;
         if (D_0019B2E8[obj[0xB0] + level * 16] & 0x80) {
             obj[0xBC] = 2;
@@ -461,9 +461,9 @@ void func_L17_00420E08(u8 *obj)
             if (vars->path != -1) {
                 s32 i;
 
-                for (i = 0; i < *(s32 *)gPathTable_L17[vars->path]; i++) {
-                    if (((L17PathPoint *)(gPathTable_L17[vars->path] + (i << 4)))->w == vars->marker)
-                        ((L17PathPoint *)(gPathTable_L17[vars->path] + (i << 4)))->w = 0;
+                for (i = 0; i < *(s32 *)g_path_l17_table[vars->path]; i++) {
+                    if (((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w == vars->marker)
+                        ((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w = 0;
                 }
             }
         } else
@@ -472,7 +472,7 @@ void func_L17_00420E08(u8 *obj)
     }
     case 1:
         vars->phase = FastAddRotations(vars->phase, 0.10471977f);
-        shade = FloatToInt((FastSinOrCosB(vars->phase) * 4.0f - 3.0f) * 128.0f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128)
             shade = 128;
         else if (shade < 32)
@@ -482,8 +482,8 @@ void func_L17_00420E08(u8 *obj)
 
             *(u32 *)(obj + 0x78) = ((shade << 16) | green) | shade;
         }
-        if ((gHeroState.target == obj && !gHeroState.state)
-            || (vars->trigger && (D_0019B2E8[obj[0xB0] + gCurrentMapIndex * 16] & 0x80))) {
+        if ((g_hero_state.target == obj && !g_hero_state.state)
+            || (vars->trigger && (D_0019B2E8[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
             obj[0x20] = 2;
             obj[0xBC] = 1;
             *(u32 *)(obj + 0x78) = 0x80208020;
@@ -491,9 +491,9 @@ void func_L17_00420E08(u8 *obj)
             if (vars->path != -1) {
                 s32 i;
 
-                for (i = 0; i < *(s32 *)gPathTable_L17[vars->path]; i++) {
-                    if (((L17PathPoint *)(gPathTable_L17[vars->path] + (i << 4)))->w == vars->marker)
-                        ((L17PathPoint *)(gPathTable_L17[vars->path] + (i << 4)))->w = 0;
+                for (i = 0; i < *(s32 *)g_path_l17_table[vars->path]; i++) {
+                    if (((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w == vars->marker)
+                        ((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w = 0;
                 }
             }
         }

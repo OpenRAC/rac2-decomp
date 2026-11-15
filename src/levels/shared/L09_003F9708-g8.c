@@ -3,20 +3,20 @@
 extern float D_L09_001B0F28 __attribute__((sda));
 extern float D_L09_001B0F2C __attribute__((sda));
 extern int D_L09_001B0F40 __attribute__((sda));
-extern float func_00282E80(void *, void *);
-extern int func_00282978(void *);
-extern int func_L09_003F9568(void *, int, int, int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(float *, float *, float);
-extern int func_002E5CF8(int, int, void *);
-extern char *func_L09_003A06B0(void *, float, void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int FastDecTimer(void *);
+extern int enemy_check_line_of_sight(void *, int, int, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern int PlayMobySound(int, int, void *);
+extern char *moby_spawn_aimed_effect(void *, float, void *, void *);
 
 typedef struct { char gap[0x2F0]; char *parts[2]; } Parts9708;
 
 /* Fire from a valid linked part after its timer and parent flags permit it. */
 /* Fires a shot from one of the arm parts when its timer is ready. */
-void func_L09_003F9708(char *obj)
+void trooper_fire_arm_shot(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
@@ -32,7 +32,7 @@ void func_L09_003F9708(char *obj)
     shift = side ? 5 : 4;
     if (!((*(unsigned short *)(*(char **)(state + 0x2F8)+0x7C) >> shift) & 1))
         goto invalid;
-    if (!CheckLineOfSightBlocked(obj, 1, 0, *(u8 *)(state + 0x30D) != 0))
+    if (!enemy_check_line_of_sight(obj, 1, 0, *(u8 *)(state + 0x30D) != 0))
         return;
     part = ((Parts9708 *)state)->parts[side];
     if (!part || *(short *)(part + 0xAA) != 0xD66 /* moby class 3430 */)
@@ -43,7 +43,7 @@ void func_L09_003F9708(char *obj)
         return;
     {
         *(short *)(state + 0x2E4) = D_L09_001B0F40;
-        TransformMobyJointToWorld(((Parts9708 *)state)->parts[side], 0, pos);
+        moby_transform_joint_to_world(((Parts9708 *)state)->parts[side], 0, pos);
         FastVecSub(dir, (float *)(state + 0x1F0), pos);
         vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.016666668f);
         if (!close && !*(u8 *)(state + 0x30D)) {
@@ -54,7 +54,7 @@ void func_L09_003F9708(char *obj)
         }
         vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.016666668f);
         PlayMobySound(1, 0, *(void **)(state + 0x2F8));
-        SpawnAimedEffectMoby(obj, (float)*(u8 *)(state + 0x34), dir, pos);
+        moby_spawn_aimed_effect(obj, (float)*(u8 *)(state + 0x34), dir, pos);
     }
     return;
 invalid:

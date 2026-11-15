@@ -12,15 +12,15 @@ typedef struct {
 } Group;
 
 extern Group D_L08_001BD800;
-extern void func_L00_00311DC0(s32);
+extern void level_apply_nearest_env_preset(s32);
 
 /* hands the group's first member on, then copies its 8-byte word at +0x38 to every other member */
-void func_L08_0037E6D8(void)
+void moby_copy_group_word_to_members(void)
 {
     s32 first = D_L08_001BD800.items[0];
     s32 i;
 
-    ApplyNearestEnvironmentPreset(first);
+    level_apply_nearest_env_preset(first);
     for (i = 1; i < D_L08_001BD800.count; i++)
         *(u64 *)(D_L08_001BD800.items[i] + 0x38) = *(u64 *)(first + 0x38);
 }

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void func_306630(char *dst, char *src, char *src2);
-extern char *func_L05_00416D68(char *a0, int a1);
+extern char *feltzin_helper_create(char *a0, int a1);
 extern float func_332B50(float a, float b);
 extern float func_332C18(void);
 extern void func_33B330(char *dst, float a, float b, float c);
@@ -33,8 +33,8 @@ void func_PAL_L05_0041AA78(char *obj)
     func_33B330(obj + 0x10, a, b, c);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
     if (*(int *)(r + 0x110) == 1) {
-        *(int *)(sub + 0x26C) = func_L05_00416D68(obj, 0);
-        *(int *)(sub + 0x270) = func_L05_00416D68(obj, 1);
+        *(int *)(sub + 0x26C) = feltzin_helper_create(obj, 0);
+        *(int *)(sub + 0x270) = feltzin_helper_create(obj, 1);
     } else {
         *(int *)(sub + 0x26C) = 0;
         *(int *)(sub + 0x270) = 0;

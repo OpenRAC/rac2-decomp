@@ -1,13 +1,13 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *func_002ED688(u8 *);
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_002831B0(f32);
-extern f32 func_00282DF0(void *);
+extern u8 *moby_get_motion_data(u8 *);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 FastVecDot(void *, void *);
+extern f32 math_fast_angle_helper(f32);
+extern f32 FastVecLength(void *);
 extern u8 D_L10_001B9680[];
 extern f32 func_00335320(void);
 extern u8 *func_0037B670();
@@ -18,13 +18,13 @@ extern u8 *D_001B251C;
 extern u8 D_L10_00265BA0[];
 extern u8 D_L10_00188660[];
 extern u8 D_L10_00221CD0[];
-extern u8 D_00188660[];
-extern f32 func_002A7878(f32, f32);
-extern f32 func_002A7940(void);
+extern u8 g_sound_state[];
+extern f32 math_random_float_range(f32, f32);
+extern f32 math_random_angle(void);
 extern u8 *D_001B2614 __attribute__((sda));
-extern u8 *func_002ED688(u8 *arg0);
-extern f32 func_002A7940(void);
-extern f32 func_00283180(f32 f12);
+extern u8 *moby_get_motion_data(u8 *arg0);
+extern f32 math_random_angle(void);
+extern f32 math_fast_sin_or_cos_a(f32 f12);
 extern f32 func_00309B38(f32 f12, f32 f13);
 extern u8 func_L10_00423780(void);
 

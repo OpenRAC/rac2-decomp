@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
+extern void FastVecAdd(char *, char *, char *);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
 extern int D_L13_001B1624 __attribute__((sda));
 extern int D_L13_001B1628 __attribute__((sda));
 extern int D_L13_001B1650 __attribute__((sda));
 extern int D_L13_001B1654 __attribute__((sda));
 extern int D_L13_001B1658 __attribute__((sda));
 /* Steps the streak effect each frame: moves its trail points and fades its brightness as the timer runs down. */
-void func_L13_0041AB30(char *obj)
+void streak_effect_update(char *obj)
 {
     char *s = *(char **)(obj + 0x68);
     int j;

@@ -6,17 +6,17 @@ typedef struct BeamPacket72E8 {
     float uv[4][2];
     u64 state[4];
 } BeamPacket72E8;
-extern float func_002A7878(float,float);
-extern int func_00283D38(int,int,float);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *,int,int,int,float,float,float);
-extern void func_00282C98(void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00281DE8(void *,int,int,int);
-extern float func_00283CE0(int);
-extern void func_00280B90(void *,void *,int);
+extern float math_random_float_range(float,float);
+extern int FastTweenColor(int,int,float);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *,int,int,int,float,float,float);
+extern void vec_copy_helper_a(void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void gfx_init_quad_packet_state(void *,int,int,int);
+extern float IntToFloat(int);
+extern void draw_world_quad(void *,void *,int);
 extern char D_L07_001B9200[];
 extern float D_L07_001AFF00[][2] SDATA(D_L07_001AFF00);
 extern float D_L07_001AFF04[][2] __attribute__((sda));
@@ -29,7 +29,7 @@ extern int D_L07_001AFF30_gp[] SDATA(D_L07_001AFF30);
    step, fading between the state's two phase colours. `alpha` also supplies the w of both end vectors. */
 /* Draws a glowing beam effect that fades its colours over time, with a few sparks at the
    object. */
-void func_L07_003B72E8(char *moby)
+void gfx_draw_fading_beam_pair(char *moby)
 {
     float matrix[4][4] __attribute__((aligned(16)));
     BeamPacket72E8 beam[2] __attribute__((aligned(16)));
@@ -40,27 +40,27 @@ void func_L07_003B72E8(char *moby)
     char *pos=moby+0x10;
     int color;
     float rotation,step,alpha;
-    color=FastTweenColor(0x50103080,0x60103080,RandomFloatRange(0,1));
-    rotation=RandomAngle();
-    DrawBillboardQuad_00281EB8(pos,0x31,color,1,1,0,rotation);
-    color=FastTweenColor(0x50FFFFFF,0x60FFFFFF,RandomFloatRange(0,1));
-    rotation=RandomAngle();
-    DrawBillboardQuad_00281EB8(pos,0x31,color,1,0.6f,0,rotation);
-    color=FastTweenColor(0x08803010,0x18803010,RandomFloatRange(0,1));
-    rotation=RandomAngle();
-    DrawBillboardQuad_00281EB8(pos,0xB,color,1,1.4f,0,rotation);
-    color=FastTweenColor(0x20803010,0x40803010,RandomFloatRange(0,1));
-    rotation=RandomAngle();
-    DrawBillboardQuad_00281EB8(pos,0xB,color,1,0.9f,0,rotation);
+    color=FastTweenColor(0x50103080,0x60103080,math_random_float_range(0,1));
+    rotation=math_random_angle();
+    gfx_draw_billboard_quad(pos,0x31,color,1,1,0,rotation);
+    color=FastTweenColor(0x50FFFFFF,0x60FFFFFF,math_random_float_range(0,1));
+    rotation=math_random_angle();
+    gfx_draw_billboard_quad(pos,0x31,color,1,0.6f,0,rotation);
+    color=FastTweenColor(0x08803010,0x18803010,math_random_float_range(0,1));
+    rotation=math_random_angle();
+    gfx_draw_billboard_quad(pos,0xB,color,1,1.4f,0,rotation);
+    color=FastTweenColor(0x20803010,0x40803010,math_random_float_range(0,1));
+    rotation=math_random_angle();
+    gfx_draw_billboard_quad(pos,0xB,color,1,0.9f,0,rotation);
     qcopy(matrix[3],pos);
     matrix[3][3]=1;
-    VectorCopyHelperA(matrix[2]);
+    vec_copy_helper_a(matrix[2]);
     FastVecSub(matrix[1],D_L07_001B9200,pos);
     matrix[1][2]=0;
     vec_scale_to_length(matrix[1],matrix[1],1);
     FastVecCross(matrix[0],matrix[1],matrix[2]);
-    InitQuadPacketState(&beam[0],0x2F,1,0x80);
-    InitQuadPacketState(&beam[1],0x2F,1,0x80);
+    gfx_init_quad_packet_state(&beam[0],0x2F,1,0x80);
+    gfx_init_quad_packet_state(&beam[1],0x2F,1,0x80);
     phase[0]=*(float *)(vars+0x30);
     phase[1]=*(float *)(vars+0x30)+0.5f;
     if(phase[1]>1) phase[1]-=1;

@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
-extern int func_002ACBC8(char *, int);
+extern int IsPointInCuboid(char *, int);
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
-extern int D_001A79F0[] MACRO_ADDR;
+extern int g_current_map_index[] MACRO_ADDR;
 extern int D_001A79F0_gp SDATA(D_001A79F0);
 
-extern unsigned char D_00189EA0[];
+extern unsigned char g_hero_position[];
 
 extern unsigned char D_0019B4A8[];
 
@@ -20,27 +20,27 @@ extern struct {
 } D_L19_0021EA30;
 
 /* Waits for the player to come near, then marks the object as used in the level's saved data and moves to its finished state. */
-void func_L19_00423CC0(char *moby)
+void UpdateRegionTriggeredObject(char *moby)
 {
     char *classInfoA, *classInfoB;
     int vars = *(int *)(moby + 0x68);
 
     if (vars == 0) {
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(int *)(moby + 0x98) = 0;
         *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         *(unsigned char *)(moby + 0x30) = 0xFF;
         break;
     case 2:
     default:
         break;
     case 1:
-        if (IsPointInCuboid(gHeroPosition, *(int *)vars) != 0) {
+        if (IsPointInCuboid(g_hero_position, *(int *)vars) != 0) {
             int uid = *(unsigned short *)(moby + 0xB2);
             if (uid & 1) {
                 unsigned char *counterByte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
@@ -57,13 +57,13 @@ void func_L19_00423CC0(char *moby)
             classInfoA = *(char **)(moby + 0x24);
             *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
             *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         {
             int uid = *(unsigned short *)(moby + 0xB2);
 
             if (D_L19_0021EA30.state[(short)uid] == 0) {
-                int savedCount = D_0019B4A8[((short)uid >> 1) + (gCurrentMapIndex[0] << 10)];
+                int savedCount = D_0019B4A8[((short)uid >> 1) + (g_current_map_index[0] << 10)];
 
                 if (!((uid & 1) ? ((savedCount >> 4) & 7) : (savedCount & 7)))
                     return;
@@ -73,7 +73,7 @@ void func_L19_00423CC0(char *moby)
         classInfoB = *(char **)(moby + 0x24);
         *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
         *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
-        SetMobyState(moby, 2, -1);
+        moby_set_state(moby, 2, -1);
         break;
     }
 }

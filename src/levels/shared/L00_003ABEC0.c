@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003ABEC0 (retail begins at 0x003ABEC8 in level 00; the catalogue keeps the old name).
    Own unit, `-O2 -G0 -ffunction-sections -g`: -g gives the nop pair before each div.s, and
    D_L00_001B1FB0 uses the `.sdata` macro form so its `la` stays out of the bounds checks' slots.
@@ -23,53 +24,53 @@ typedef struct {
 } ShotInfo;
 typedef struct { char pad[4]; unsigned char piercing; char pad5[0x6B]; float damage; char tail[0x6C]; } Material;
 
-extern Collision D_L00_001BF200;
+extern Collision g_collision_result;
 extern Vector D_L00_0023B710[][4];
-extern Material D_L00_00262570[];
+extern Material g_weapon_l00_table[];
 extern unsigned short D_L00_001B1FB0[] MACRO_ADDR;
-extern char D_L00_001B8DC0[];
-extern unsigned char D_00139568[];
-extern char *D_0018C0B0;
-extern char D_00189EA0[];
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern char g_camera_l00_position[];
+extern unsigned char g_item_slot_to_record[];
+extern char *g_hero_moby;
+extern char g_hero_position[];
+extern int CollLine(void *, void *, int, void *, void *);
 /* func_L00_002E6EF8 in most levels; the callee differs in levels 08, 09, 19 and 30. */
 extern void ref_L00_003ABEC0_00(void *, void *);
-extern int func_00282978(void *);
-extern float func_00282C48(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283198(float);
-extern float func_002831B0(float);
-extern void func_0029F338(void *);
-extern float func_002A89A8(void *, int, float);
-extern void func_002A8E20(void *, void *);
-extern char *func_002AB1F0(char *);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACAD0(void *, unsigned short *);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_002AFFD8(void *, void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002FEE50(int);
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_L00_003AC8E8(char *, void *, char *);
-extern void func_L00_003ACA60(char *, void *);
-extern void func_L00_003ACC88(char *, void *);
-extern void func_L00_003ACCF8(void);
-extern void func_0032D758(void *, int, int);
-extern void func_0032DA58(char *, char *, void *, float);
+extern int FastDecTimer(void *);
+extern float math_fabs(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_angle_helper(float);
+extern void moby_mark_spawned(void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void QueueMobyImpact(void *, void *);
+extern char *moby_get_private_value_0(char *);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void RemoveMobyFromIndexList(void *, unsigned short *);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern int PlayMobySound(int, int, void *);
+extern void table_clear_entry_flag(int);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void homing_shot_spawn_explosion(char *, void *, char *);
+extern void part_emit_shot_trail(char *, void *);
+extern void moby_transform_offset_to_world(char *, void *);
+extern void shot_save_trail_transform(void);
+extern void StartAttachedEffect(void *, int, int);
+extern void part_spawn_blast_effect_moby(char *, char *, void *, float);
 
 /* A homing shot: follows its target (turning at most as far as its speed allows), records
    its path, tests the step for a hit and explodes on contact, out of the arena or too far
    from the hero. */
-void func_L00_003ABEC0(char *object)
+void homing_l00_shot_update(char *object)
 {
     Vector start;
     Vector forward;
@@ -98,9 +99,9 @@ void func_L00_003ABEC0(char *object)
     state = *(char **)(object + 0x68);
     target = *(char **)(state + 0x10);
     qcopy(start, object + 0x10);
-    ComputeViewDirection(object + 0x10, forward, 1);
+    cam_compute_view_direction(object + 0x10, forward, 1);
     if (target != 0) {
-        info = GetMobyPrivateValue0(target);
+        info = moby_get_private_value_0(target);
         kind = *(unsigned char *)(target + 0x20);
         if (kind == 0xFE || (kind == 0xFD || (info != 0 && *(float *)info <= 0.0f))) {
             *(char **)(state + 0x10) = 0;
@@ -127,15 +128,15 @@ void func_L00_003ABEC0(char *object)
         length = FastVecLength(offset);
         if (length != 0.0f && distance != 0.0f) {
             angle = FastVecDot(offset, delta);
-            angle = 1.5707964f - FastAngleHelper(angle / (length * distance));
+            angle = 1.5707964f - math_fast_angle_helper(angle / (length * distance));
             FastVecCross(u.t.axis, delta, offset);
             FastVecCross(u.t.side, delta, u.t.axis);
             if (FastVecDot(offset, u.t.side) < 0.0f) {
                 angle = -angle;
             }
             length = distance / *(float *)(state + 0x18);
-            angle = length * FastSinOrCosB(angle);
-            if (FloatAbs(angle) > 100.0f) {
+            angle = length * math_fast_sin_or_cos_b(angle);
+            if (math_fabs(angle) > 100.0f) {
                 angle = 0.0f;
             }
             while (angle > 1.0f) {
@@ -144,28 +145,28 @@ void func_L00_003ABEC0(char *object)
             while (angle < -1.0f) {
                 angle += 1.0f;
             }
-            angle = FastAngleHelper(angle);
+            angle = math_fast_angle_helper(angle);
             FastVecScale(offset, offset, -1.0f);
             vec_scale_to_length(offset, offset, 1.0f);
-            if (FloatAbs(angle) > 1e-05f) {
+            if (math_fabs(angle) > 1e-05f) {
                 vec_scale_to_length(u.t.turn, u.t.axis, 1.0f);
-                BuildAxisAngleQuaternion(u.t.turn, u.t.turn, angle);
-                RotateVectorByQuaternion(object + 0xC0, offset, u.t.turn);
+                math_build_axis_angle_quat(u.t.turn, u.t.turn, angle);
+                vec_rotate_by_quaternion(object + 0xC0, offset, u.t.turn);
                 FastVecCross(object + 0xD0, object + 0xC0, forward);
                 vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
                 FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
                 qcopy(state + 0x30, object + 0xC0);
             }
             if (fast_vec_dist(aim, object + 0x10) <= *(float *)(state + 0x18)
-                && CollLine(object + 0x10, aim, 0x12, gHeroMoby_0018C0B0, 0) == 0) {
+                && CollLine(object + 0x10, aim, 0x12, g_hero_moby, 0) == 0) {
                 locked = 1;
-                qcopy(gCollisionResult.point, aim);
-                gCollisionResult.count = -1;
-                gCollisionResult.hit = target;
+                qcopy(g_collision_result.point, aim);
+                g_collision_result.count = -1;
+                g_collision_result.hit = target;
             }
         }
     } else {
-        SteerEffectDirection(*(int *)(state + 0x50), state + 0x30, 0);
+        part_steer_effect_direction(*(int *)(state + 0x50), state + 0x30, 0);
         qcopy(object + 0xC0, state + 0x30);
         FastVecCross(object + 0xD0, object + 0xC0, forward);
         vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
@@ -180,7 +181,7 @@ void func_L00_003ABEC0(char *object)
     *(float *)(object + 0xCC) = *(float *)(object + 0xDC) = *(float *)(object + 0xEC) = 0.0f;
     FastVecScale(step, object + 0xC0, *(float *)(state + 0x18));
     FastVecAdd(object + 0x10, object + 0x10, step);
-    TransformVectorOrCopy(object + 0x10, object + 0x10);
+    vec_transform_or_copy(object + 0x10, object + 0x10);
     if (target != 0 && *(short *)(target + 0xAA) == 0xCEA) {
         FastVecSub(delta, aim, object + 0x10);
         if (FastVecDot(delta, object + 0xC0) < 0.0f) {
@@ -193,11 +194,11 @@ void func_L00_003ABEC0(char *object)
         || *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
         RemoveMobyFromIndexList(object, D_L00_001B1FB0);
-        ClearEntryFlag(*(int *)(state + 0x50));
-        MarkMobySpawned(object);
+        table_clear_entry_flag(*(int *)(state + 0x50));
+        moby_mark_spawned(object);
         return;
     }
-    TransformOffsetToWorld(object, delta);
+    moby_transform_offset_to_world(object, delta);
     {
         Vector *trail = D_L00_0023B710[*(int *)(state + 0x2C)];
         int k;
@@ -208,21 +209,21 @@ void func_L00_003ABEC0(char *object)
         qcopy(trail[0], delta);
     }
     if (++*(unsigned char *)(state + 0x27) >= 4) {
-        ref_L00_003ABEC0_00(SaveShotTrailTransform, object);
+        ref_L00_003ABEC0_00(shot_save_trail_transform, object);
     }
-    EmitShotTrailParticles(object, start);
+    part_emit_shot_trail(object, start);
     qcopy(lead, object + 0x10);
     FastVecScale(offset, forward, -0.25f);
     FastVecAdd(offset, object + 0x10, offset);
     if (CollLine(lead, offset, 2, 0, 0) != 0) {
         FastVecScale(lead, forward, 0.25f);
-        FastVecAdd(object + 0x10, gCollisionResult.point, lead);
+        FastVecAdd(object + 0x10, g_collision_result.point, lead);
     }
     u.shot.owner = object;
     u.shot.count = 1;
     u.shot.flags = 0x830000;
     {
-        Material *material = &gWeaponTable_L00[gItemSlotToRecord[0x1B]];
+        Material *material = &g_weapon_l00_table[g_item_slot_to_record[0x1B]];
 
         u.shot.damage = material->damage;
     }
@@ -233,20 +234,20 @@ void func_L00_003ABEC0(char *object)
     u.shot.one = 1;
     u.shot.id = *(unsigned short *)(object + 0xAA);
     if (locked == 0) {
-        if (CollLine(start, object + 0x10, 0, gHeroMoby_0018C0B0, &u.shot) == 0) {
+        if (CollLine(start, object + 0x10, 0, g_hero_moby, &u.shot) == 0) {
             goto checked;
         }
     } else if (target != 0) {
         QueueMobyImpact(target, &u.shot);
     }
-    hit = &gCollisionResult;
+    hit = &g_collision_result;
     if (hit->hit != 0) {
-        if (hit->hit != gHeroMoby_0018C0B0) {
+        if (hit->hit != g_hero_moby) {
             if (hit->hit != *(char **)(state + 0xC)) {
                 *(unsigned char *)(object + 0xBC) = 2;
                 qcopy(object + 0x10, hit->point);
                 owner = object;
-                if (gWeaponTable_L00[gItemSlotToRecord[0x1B]].piercing != 0) {
+                if (g_weapon_l00_table[g_item_slot_to_record[0x1B]].piercing != 0) {
                     StartAttachedEffect(hit->hit, 0x45, *(int *)(object + 0xB8));
                 } else {
                     StartAttachedEffect(hit->hit, 0x1B, *(int *)(object + 0xB8));
@@ -266,31 +267,31 @@ checked:
 
         PlayMobySound(0, 0, object);
         bounce = 1;
-        ComputeViewDirection(object + 0x10, up, 1);
-        if (gCollisionResult.hit != 0 && gCollisionResult.count <= 0) {
-            FastVecSub(normal, gCameraPosition_L00, object + 0x10);
+        cam_compute_view_direction(object + 0x10, up, 1);
+        if (g_collision_result.hit != 0 && g_collision_result.count <= 0) {
+            FastVecSub(normal, g_camera_l00_position, object + 0x10);
             vec_scale_to_length(normal, normal, 1.0f);
         } else {
-            vec_scale_to_length(normal, gCollisionResult.normal, 1.0f);
-            if (FloatAbs(FastVecDot(normal, up)) >= 0.1f) {
+            vec_scale_to_length(normal, g_collision_result.normal, 1.0f);
+            if (math_fabs(FastVecDot(normal, up)) >= 0.1f) {
                 bounce = 0;
             }
         }
         spin = 0.0f;
         if (bounce) {
-            spin = ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
+            spin = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         }
-        SpawnBlastEffectMoby(object, object + 0x10, normal, spin);
-        SpawnHomingShotExplosion(object, up, owner);
+        part_spawn_blast_effect_moby(object, object + 0x10, normal, spin);
+        homing_shot_spawn_explosion(object, up, owner);
     }
     RemoveMobyFromIndexList(object, D_L00_001B1FB0);
-    ClearEntryFlag(*(int *)(state + 0x50));
-    MarkMobySpawned(object);
+    table_clear_entry_flag(*(int *)(state + 0x50));
+    moby_mark_spawned(object);
     return;
 far:
-    if (FastDecTimer(state + 0x24) != 0 || vec_distance_xy(object + 0x10, gHeroPosition) > 75.0f) {
+    if (FastDecTimer(state + 0x24) != 0 || vec_distance_xy(object + 0x10, g_hero_position) > 75.0f) {
         RemoveMobyFromIndexList(object, D_L00_001B1FB0);
-        ClearEntryFlag(*(int *)(state + 0x50));
-        MarkMobySpawned(object);
+        table_clear_entry_flag(*(int *)(state + 0x50));
+        moby_mark_spawned(object);
     }
 }

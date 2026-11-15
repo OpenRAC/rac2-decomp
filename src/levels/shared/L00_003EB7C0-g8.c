@@ -4,15 +4,15 @@
 typedef int OrbitQuad __attribute__((mode(TI)));
 typedef union { OrbitQuad q; float v[4]; } OrbitVector;
 
-extern char D_00189E20[] __attribute__((nosda));
-extern float func_00283CE0(int value);
-extern float func_00283180(float angle);
-extern float func_00283198(float angle);
-extern void func_00282F20(void *out, void *vector, float scale);
-extern void func_00282CC0(void *out, void *left, void *right);
+extern char g_hero_state[] __attribute__((nosda));
+extern float IntToFloat(int value);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float math_fast_sin_or_cos_b(float angle);
+extern void vec_scale_to_length(void *out, void *vector, float scale);
+extern void FastVecAdd(void *out, void *left, void *right);
 
 /* Works out where a Synthenoid should hover as it circles around the player. */
-void func_L00_003EB7C0(void *unused, char *vars)
+void synthenoid_compute_orbit_point(void *unused, char *vars)
 {
     OrbitVector offset;
     float scale = 1.2f;
@@ -23,17 +23,17 @@ void func_L00_003EB7C0(void *unused, char *vars)
     wave = IntToFloat(3);
     wave = 3.1415927f / wave;
     angle *= wave;
-    hero = gHeroState;
+    hero = g_hero_state;
     axis0 = *(char **)(hero + 0x2290) + 0xd0;
-    wave = FastSinOrCosA(angle);
+    wave = math_fast_sin_or_cos_a(angle);
     vec_scale_to_length(&offset, axis0, wave * scale);
     FastVecAdd(vars, &offset, hero + 0x80);
     axis1 = *(char **)(hero + 0x2290) + 0xe0;
-    wave = FastSinOrCosB(angle);
+    wave = math_fast_sin_or_cos_b(angle);
     vec_scale_to_length(&offset, axis1, wave * scale + 2.2f);
     FastVecAdd(vars, vars, &offset);
     axis2 = *(char **)(hero + 0x2290) + 0xc0;
-    wave = FastSinOrCosB(angle);
+    wave = math_fast_sin_or_cos_b(angle);
     vec_scale_to_length(&offset, axis2, wave + wave);
     FastVecAdd(vars, vars, &offset);
 }

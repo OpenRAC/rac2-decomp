@@ -4,22 +4,22 @@
 /* The grouped quadword copy: the R5900 lq/sq pair with both addresses in registers. */
 typedef int Rac2TI128 __attribute__((mode(TI)));
 
-extern float func_00283CE0(int a);
+extern float IntToFloat(int a);
 
-extern void func_00282CC0(void *out, void *in1, void *in2);
+extern void FastVecAdd(void *out, void *in1, void *in2);
 
 extern void ref_L00_003BCE28_00(void *out, void *a, void *b, void *c, void *d, float f);
 
-extern unsigned int func_002A7820(int a, int b);
+extern unsigned int math_random_int_range(int a, int b);
 
-extern void func_L00_003BCF88(void *a0, unsigned int a1, void *a2, int a3);
+extern void DrawTaperedTwoLayerRibbon(void *a0, unsigned int a1, void *a2, int a3);
 
 /* Walks eight steps of a state block. Each step adds the block's two constant vectors
    to its two moving ones, then the shared helper builds the step's own vector from the
    four of them, scaled by the step's share of the whole. The block's two counts choose
    the range the block is finally emitted with. */
 /* Builds a bendy lightning ribbon from eight points and draws it. The brightness depends on how far along the effect is. */
-void func_L00_003BCE28(char *owner, char *state)
+void lightning_build_and_draw_ribbon(char *owner, char *state)
 {
     Rac2TI128 pts[8];
     Rac2TI128 tmp[3];
@@ -47,9 +47,9 @@ void func_L00_003BCE28(char *owner, char *state)
     halfCount = *(int *)(state + 0x9C) >> 1;
     progress = *(int *)(state + 0x98);
     if (progress >= halfCount)
-        DrawTaperedTwoLayerRibbon(owner, RandomIntRange(0x40, 0x80), pts, 9);
+        DrawTaperedTwoLayerRibbon(owner, math_random_int_range(0x40, 0x80), pts, 9);
     else
-        DrawTaperedTwoLayerRibbon(owner, RandomIntRange(0, 0x40), pts, 9);
+        DrawTaperedTwoLayerRibbon(owner, math_random_int_range(0, 0x40), pts, 9);
 }
 
 /* One of the thirty 0xA0-byte records at D_L00_0023DDA0 that func_L00_003BBB68 updates for
@@ -82,8 +82,8 @@ typedef struct {
     char pad_78[0xE0 - 0x78];
 } Class3BBB68;
 
-extern unsigned char D_00139568[];
-extern Class3BBB68 D_L00_00262570[];
+extern unsigned char g_item_slot_to_record[];
+extern Class3BBB68 g_weapon_l00_table[];
 
 extern void func_00282D30_6(void *out, void *in, float scale);
 extern void func_00282CC0_6(void *out, void *in1, void *in2);
@@ -93,7 +93,7 @@ extern float func_00283B98_8(float angle, float step);
 extern float func_00283180_8(float angle);
 extern float func_00283198_8(float angle);
 extern char *func_002AB1F0_8(char *object);
-extern void func_L00_003252A8(char *object, void *out, int mode);
+extern void moby_forward_position_call(char *object, void *out, int mode);
 extern void func_00282D08_8(void *out, void *from, void *to, float t);
 extern float func_00283CE0_8(int ticks);
 extern int func_00282948_8(void *timer);
@@ -101,11 +101,11 @@ extern void func_002A8C00_8(void *packet, char *owner, int flags, void *directio
 extern void func_002A8E20_8(char *target, void *packet);
 extern void func_0032D758_8(char *target, int kind, int value);
 extern int func_002E5CF8_8(int index, int mode, char *object);
-extern void func_L00_003BD510(void *pos, void *direction, int count, unsigned int color);
+extern void part_l00_spawn_spark_burst_2(void *pos, void *direction, int count, unsigned int color);
 
 static inline Class3BBB68 *Class3BBB68At(int index)
 {
-    return &gWeaponTable_L00[index];
+    return &g_weapon_l00_table[index];
 }
 
 /* Steps every record the owner holds: refreshes its start from the owner, advances the two
@@ -115,7 +115,7 @@ static inline Class3BBB68 *Class3BBB68At(int index)
    timer expires the record is released and the owner's count drops. */
 /* Updates every spark slot owned by this effect: it spins them, moves them toward the target,
    deals damage when they arrive, and frees them when their time runs out. */
-void func_L00_003BBB68(char *owner)
+void effect_update_spark_slots(char *owner)
 {
     float v[4];
     struct {
@@ -160,7 +160,7 @@ void func_L00_003BBB68(char *owner)
         if (slot->target) {
             other = func_002AB1F0_8(slot->target);
             if (other) {
-                ForwardObjectPositionCall(slot->target, v, 1);
+                moby_forward_position_call(slot->target, v, 1);
                 func_00282D30_6(v, v, *(float *)(other + 0x10));
                 func_00282CC0_6(&slot->pos, v, slot->target + 0x10);
             } else {
@@ -175,7 +175,7 @@ void func_L00_003BBB68(char *owner)
         if (*(int *)(slot->target + 0x98) && !slot->hit) {
             func_00282CF0_9((char *)v, (char *)&slot->pos, (char *)&slot->start);
             func_00282F20_2(v, v, 0.033333335f);
-            func_002A8C00_8(&packet, owner, 0x210000, v, Class3BBB68At(gItemSlotToRecord[0x1C])->f74);
+            func_002A8C00_8(&packet, owner, 0x210000, v, Class3BBB68At(g_item_slot_to_record[0x1C])->f74);
             packet.kind = 1;
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
@@ -183,7 +183,7 @@ void func_L00_003BBB68(char *owner)
             func_0032D758_8(slot->target, 0x3E, *(int *)(owner + 0xB8));
             func_002E5CF8_8(1, 0, owner);
             func_00282F20_2(v, v, -1.0f);
-            SpawnSparkBurst_L00_3(&slot->pos, v, 9, 0xFF0000);
+            part_l00_spawn_spark_burst_2(&slot->pos, v, 9, 0xFF0000);
             slot->hit = 1;
         }
         if (func_00282948_8(&slot->life)) {

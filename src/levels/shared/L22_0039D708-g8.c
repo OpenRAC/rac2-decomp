@@ -12,7 +12,7 @@ extern void ref_L22_003A1E50_00(char *, char *);
 extern void ref_L22_003A1E50_01(void *);
 extern void ref_L22_003A3C70_00(void *, int, int, int);
 
-void func_L22_003A1E50(char *moby) {
+void moby_update_timed(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     unsigned short *ageCounter;
     ref_L22_003A1E50_00(moby, vars + 0x50);
@@ -24,13 +24,13 @@ void func_L22_003A1E50(char *moby) {
 }
 
 /* Counts down a timer in the first entry of a small table until it reaches zero. */
-void func_L22_003A2A08(void) {
+void table_decrement_timer(void) {
     int *p = D_L22_001B2AB4[0];
     if (p[3] > 0) p[3] = p[3] - 1;
 }
 
 /* Forwards two values, with a fixed zero, to a helper on the stored object. */
-void func_L22_003A3C70(int a0, int a1) {
+void stored_object_forward(int a0, int a1) {
     ref_L22_003A3C70_00(D_L22_001AF314, a0, a1, 0);
 }
 
@@ -44,7 +44,7 @@ extern int D_L22_001B2AD4 __attribute__((nosda));
 extern int D_L22_001AF3B0[1] __attribute__((sda));
 
 /* Returns 0 when the key is in the list, 1 when it is not. */
-int func_L22_003A48F8(int key) {
+int list_is_key_missing(int key) {
     int i;
     for (i = 0; i < D_L22_001B2AD4; i++) {
         if (D_L22_001AF3B0[i] == key) return 0;
@@ -54,7 +54,7 @@ int func_L22_003A48F8(int key) {
 
 /* The same scan, looking for the second argument and reporting the opposite
  * way. */
-int func_L22_003A4C68(int unused, int key) {
+int list_has_key(int unused, int key) {
     int i;
     for (i = 0; i < D_L22_001B2AD4; i++) {
         if (D_L22_001AF3B0[i] == key) return 1;
@@ -80,7 +80,7 @@ extern void ref_L22_003A45F0_01(void *, int, int, int);               /* func_00
 
 /* One turn of the orbit: the first flag bit runs the object's own update, the
  * second one hands the result over to the child object. */
-void func_L22_003A45F0(char *moby, int newState, int stateArg1, int stateArg2, int flags, float defaultScale) {
+void orbit_update(char *moby, int newState, int stateArg1, int stateArg2, int flags, float defaultScale) {
     char *obj = moby;
     char *vars = *(char **)(moby + 0x68);
     char *child;
@@ -148,24 +148,24 @@ typedef struct Hero3B50 {
 } Hero3B50;
 
 /* In .data, so that -G8 keeps the split lui/lw the entry block allocates around. */
-extern Hero3B50 *D_0018C0B0 __attribute__((section(".data")));
+extern Hero3B50 *g_hero_moby __attribute__((section(".data")));
 extern int D_L22_0023B530[3][60];
 /* The target object: the same $gp slot in both levels, under a name each level binds itself. */
 extern int ref_L22_003A3B50_00 __attribute__((sda));
-extern int func_002A77E0(int);
-extern int func_L22_003A39C8(char *, char *, int, int);
+extern int math_random_int_below(int);
+extern int pickup_spawn_in_free_slot(char *, char *, int, int);
 
 /* Picks a kind at random (one of two when the hero's or the target's state says so), scans that
  * kind's row of 50 slots and spawns the object at POS. */
-void func_L22_003A3B50(char *pos, int arg) {
+void SpawnRandomKindAt(char *pos, int arg) {
     int kindCount;
     int mode = 0;
     int i;
     int *row;
 
     kindCount = 3;
-    if (gHeroMoby_0018C0B0->state == 6 || ((Hero3B50 *)ref_L22_003A3B50_00)->state == 4) kindCount = 2;
-    switch (RandomIntBelow(kindCount)) {
+    if (g_hero_moby->state == 6 || ((Hero3B50 *)ref_L22_003A3B50_00)->state == 4) kindCount = 2;
+    switch (math_random_int_below(kindCount)) {
     case 0:
         mode = 1;
         break;
@@ -187,5 +187,5 @@ void func_L22_003A3B50(char *pos, int arg) {
             if (*slot == 0) break;
         } while (i != 0x31);
     }
-    SpawnPickupInFreeSlot((char *)ref_L22_003A3B50_00, pos, mode, arg);
+    pickup_spawn_in_free_slot((char *)ref_L22_003A3B50_00, pos, mode, arg);
 }

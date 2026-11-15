@@ -6,21 +6,21 @@ typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { float vertices[4][4]; unsigned int colors[4]; float uv[4][2]; u64 registers[4]; } __attribute__((aligned(16))) BeamQuad;
 typedef struct { float x, y, z, w; } Vec16_Fc936841d;
 
-extern u64 func_0027C878(int);
+extern u64 GetEffectTextureDescriptor(int);
 /* Levels 05, 10, 15 and 25 call a distinct copy of the point helper. */
 extern void ref_L00_003A2668_00(Vec16_Fc936841d *, int);
-extern void func_L00_003A2B28(char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
-extern void func_00282DD8(char *, char *, char *);
-extern float D_L00_001B8DC0[4];
+extern void gfx_reset_draw_quad(char *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
+extern void FastVecCross(char *, char *, char *);
+extern float g_camera_l00_position[4];
 
 /* Draw a two-layer ribbon along a sequence of sampled beam points. */
-void func_L00_003A2668(void *owner, unsigned int opacity, float points[][4], int count)
+void beam_draw_ribbon(void *owner, unsigned int opacity, float points[][4], int count)
 {
     BeamQuad outer, inner __attribute__((aligned(16)));
     Vector frame[4];
@@ -47,8 +47,8 @@ void func_L00_003A2668(void *owner, unsigned int opacity, float points[][4], int
     innerWidth.f[2] = 0.053125f;
     innerWidth.f[3] = 1.0f;
     ref_L00_003A2668_00((Vec16_Fc936841d *)points, count);
-    ResetDrawQuad((char *)&outer);
-    ResetDrawQuad((char *)&inner);
+    gfx_reset_draw_quad((char *)&outer);
+    gfx_reset_draw_quad((char *)&inner);
     outer.uv[0][0] = 0.0f; outer.uv[0][1] = 0.0f;
     outer.uv[1][0] = 0.0f; outer.uv[1][1] = 1.0f;
     outer.uv[2][0] = 1.0f; outer.uv[2][1] = 0.0f;
@@ -59,7 +59,7 @@ void func_L00_003A2668(void *owner, unsigned int opacity, float points[][4], int
     inner.uv[3][0] = 0.33f; inner.uv[3][1] = 1.0f;
     FastVecSub(frame[0], initial, points[0]);
     vec_scale_to_length(frame[0], frame[0], 1.0f);
-    FastVecSub(frame[1], gCameraPosition_L00, points[0]);
+    FastVecSub(frame[1], g_camera_l00_position, points[0]);
     FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1.0f);
     FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);
@@ -79,7 +79,7 @@ void func_L00_003A2668(void *owner, unsigned int opacity, float points[][4], int
         FastVecScale(inner.vertices[3], inner.vertices[2], -1.0f);
         FastVecSub(frame[0], points[index + 1], points[index]);
         vec_scale_to_length(frame[0], frame[0], 1.0f);
-        FastVecSub(frame[1], gCameraPosition_L00, points[index]);
+        FastVecSub(frame[1], g_camera_l00_position, points[index]);
         FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
         vec_scale_to_length(frame[2], frame[2], 1.0f);
         FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);

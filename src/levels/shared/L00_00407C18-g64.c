@@ -15,21 +15,21 @@ extern float D_L00_001B0F64 __attribute__((sda));
 extern float D_L00_001B0F68 __attribute__((sda));
 extern int D_L00_001B0F6C __attribute__((sda));
 extern char D_L00_00254A60[];
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_0018A0E0[];
-extern u64 func_0027C878(int);
-extern void func_00282F20(void *, void *, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_002EE108(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 /* Two passes of a camera-facing quad placed from object + 0xD0 (scaled by D_L00_001B0F68) and
    D_L00_00254A60: first with colour D_L00_001B0F6C and corner scale D_L00_001B0F60, then
    white with corner scale D_L00_001B0F64. */
 /* Draws the glowing flare at the start of the Sheepinator beam. */
-void func_L00_00407C18(char *object)
+void DrawTwoPassCameraQuad(char *object)
 {
     DrawPacket7C18 packet;
     float basis[4][4];
@@ -45,7 +45,7 @@ void func_L00_00407C18(char *object)
         packet.colours[2] = packet.colours[3] = D_L00_001B0F6C;
     vec_scale_to_length(offset, object + 0xD0, D_L00_001B0F68);
     func_002EE108(basis[3], D_L00_00254A60, offset);
-    FastVecSub(offset, gCameraPosition_L00, basis[3]);
+    FastVecSub(offset, g_camera_l00_position, basis[3]);
     vec_scale_to_length(basis[0], offset, 1.0f);
     FastVecCross(basis[1], basis[0], D_0018A0E0);
     vec_scale_to_length(basis[1], basis[1], -1.0f);

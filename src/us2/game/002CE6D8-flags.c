@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char reserved00[0x14];
     char *source;
@@ -6,7 +7,7 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 typedef struct {
     char pad0[0x44];
@@ -21,7 +22,7 @@ extern char *D_0025E284;
 extern int D_0025E464;
 extern short D_001A63AC;
 extern char *D_001A8CFC[] __attribute__((sda));
-extern int func_00336EF0(void);
+extern int menu_get_setting_value(void);
 extern int func_0029C480(int);
 extern char *D_001A8CFC[] __attribute__((sda));
 
@@ -37,13 +38,13 @@ int func_US2_002CE6D8(void) {
     int flags;
     int value;
 
-    result1 = func_00336EF0();
+    result1 = menu_get_setting_value();
     flags = D_00138344;
     if (flags & 0x10) {
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             result = -1;
             goto after_first;
         }
@@ -56,7 +57,7 @@ int func_US2_002CE6D8(void) {
 after_first:
     if (D_001A8CFC[0] == 0)
         return result;
-    result2 = func_00336EF0();
+    result2 = menu_get_setting_value();
     if (result1 == result2 && D_001A63AC == 0 &&
         ((D_0025E2B8.f50 == result1 && D_0025E2B8.f44 == 2) ||
          (D_0025E2B8.f54 == result1 && D_0025E2B8.f44 == 4)))
@@ -65,14 +66,14 @@ after_first:
         *(int *)(D_0025E284 + 0x10) |= 4;
     if (result2 != result1)
         D_0025E464 = -0x22C;
-    D_0025E2B8.f58 = func_00336EF0();
+    D_0025E2B8.f58 = menu_get_setting_value();
     return result;
 }
 
-extern void *func_00344378(void *);
+extern void *grid_menu_get_selected_text_id(void *);
 
 int func_US2_002CE830(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = func_00344378(D_001A8CFC[0] + 0x3A000);
+        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(D_001A8CFC[0] + 0x3A000);
     return 0;
 }

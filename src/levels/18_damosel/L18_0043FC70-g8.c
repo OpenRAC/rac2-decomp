@@ -1,69 +1,69 @@
 #include "common.h"
 
-extern u8 D_001395B8[], D_00189EA0[];
+extern u8 D_001395B8[], g_hero_position[];
 /* Read as D_001A7AF8[0x37] (0x001A7B2F): an sda incomplete array with a nonzero
  * index gives retail's unsplit `lui; lbu` pair, kept out of the delay slot. */
-extern u8 D_001A7AF8[] __attribute__((sda));
-extern u8 *D_L18_001B281C;
-extern float func_00283B98(float, float), func_002A7878(float, float), func_002A7940(void), func_002A78D8(float, float), func_00282E80(void *, void *);
-extern int func_002A77E0(int), func_002A7750(void *, int, int);
-extern void func_002AF000(void *, float, float, float), func_0029F338(void *), func_002B0A18(int, int), func_00288E18(int, int);
-extern void *func_002C2210(void *, int, int, int, int, void *, float, float, float, int);
+extern u8 g_item_owned_flags[] __attribute__((sda));
+extern u8 *g_moby_l18_table;
+extern float FastAddRotations(float, float), math_random_float_range(float, float), math_random_angle(void), math_random_signed_float_range(float, float), vec_distance_xy(void *, void *);
+extern int math_random_int_below(int), moby_set_state(void *, int, int);
+extern void vec_build_spherical_offset(void *, float, float, float), moby_mark_spawned(void *), value_set_entry_by_index(int, int), subtitle_request_voice_line(int, int);
+extern void *part_spawn_ground_effect(void *, int, int, int, int, void *, float, float, float, int);
 
 /* State 0: unless already collected, spin and emit two particle pairs per frame;
  * within 1.5 units of D_00189EA0, set the collected flag and signal the linked
  * moby (or delete itself). Otherwise, once the linked moby is in state 0xFE/0xFD
  * (or there is none), wait 41 frames, make the two closing calls and delete itself. */
 /* Updates the ship part pickup (moby class 4682): it spins and sparkles, is collected when the hero gets close, then shows a message and removes itself. */
-void func_L18_0043FC70(u8 *obj) {
+void ship_part_pickup_update(u8 *obj) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(obj + 0x68);
     int i, sign, n;
     float size, angle, pitch;
     if (obj[0x20] == 0) {
-        if (D_001395B8[0x86] || gItemOwnedFlags[0x37]) {
-            MarkMobySpawned(obj);
+        if (D_001395B8[0x86] || g_item_owned_flags[0x37]) {
+            moby_mark_spawned(obj);
         } else {
             *(float *)(obj + 0xf8) = FastAddRotations(*(float *)(obj + 0xf8), 0.087266475f);
             for (i = 0; i < 2; i++) {
-                size = RandomFloatRange(2.0f, 5.0f);
-                sign = RandomIntBelow(2);
+                size = math_random_float_range(2.0f, 5.0f);
+                sign = math_random_int_below(2);
                 if (!sign) sign--;
-                angle = RandomAngle();
-                pitch = RandomFloatRange(0.3490659f, 1.5358898639678955f);
-                BuildSphericalOffset(velocity, RandomFloatRange(0.05f, 0.1f), angle, pitch);
+                angle = math_random_angle();
+                pitch = math_random_float_range(0.3490659f, 1.5358898639678955f);
+                vec_build_spherical_offset(velocity, math_random_float_range(0.05f, 0.1f), angle, pitch);
                 qcopy(point, obj + 0x10);
-                point[0] += RandomSignedFloatRange(0.0f, 0.15f);
-                point[1] += RandomSignedFloatRange(0.0f, 0.15f);
-                point[2] += RandomSignedFloatRange(0.0f, 0.15f);
-                SpawnGroundEffectParticle(point, 3, 0x208020ff, 0, sign, velocity, size * 0.1f, size, 0.006f, 0);
-                SpawnGroundEffectParticle(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
+                point[0] += math_random_signed_float_range(0.0f, 0.15f);
+                point[1] += math_random_signed_float_range(0.0f, 0.15f);
+                point[2] += math_random_signed_float_range(0.0f, 0.15f);
+                part_spawn_ground_effect(point, 3, 0x208020ff, 0, sign, velocity, size * 0.1f, size, 0.006f, 0);
+                part_spawn_ground_effect(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
             }
-            if (vec_distance_xy(obj + 0x10, gHeroPosition) < 1.5f) {
+            if (vec_distance_xy(obj + 0x10, g_hero_position) < 1.5f) {
                 D_001395B8[0x86] = 1;
                 if (*(int *)state != -1) {
-                    gMobyTable_L18[(*(int *)state << 8) + 0xbc] = 1;
+                    g_moby_l18_table[(*(int *)state << 8) + 0xbc] = 1;
                     obj[0x31] = 0;
                     *(u16 *)(obj + 0x34) |= 1;
-                    SetMobyState(obj, 1, -1);
+                    moby_set_state(obj, 1, -1);
                 } else {
-                    MarkMobySpawned(obj);
+                    moby_mark_spawned(obj);
                 }
             }
         }
-    } else if (*(int *)state == -1 || gMobyTable_L18[(*(int *)state << 8) + 0x20] == 0xfe ||
-               gMobyTable_L18[(*(int *)state << 8) + 0x20] == 0xfd) {
+    } else if (*(int *)state == -1 || g_moby_l18_table[(*(int *)state << 8) + 0x20] == 0xfe ||
+               g_moby_l18_table[(*(int *)state << 8) + 0x20] == 0xfd) {
         u32 timer = *(u16 *)(obj + 0x96);
         u32 old = timer++;
         *(u16 *)(obj + 0x96) = timer;
         if (old > 40) {
-            SetEntryValueByIndex(0x1293, 120);
+            value_set_entry_by_index(0x1293, 120);
             n = D_001395B8[0x86] ? 1 : 2;
             if (D_001395B8[0x89]) n--;
-            if (n > 0) RequestSubtitleVoiceLine(0xa0f, 0x66);
-            else RequestSubtitleVoiceLine(0xa10, 0x67);
-            MarkMobySpawned(obj);
+            if (n > 0) subtitle_request_voice_line(0xa0f, 0x66);
+            else subtitle_request_voice_line(0xa10, 0x67);
+            moby_mark_spawned(obj);
         }
     }
 }

@@ -47,7 +47,7 @@ typedef struct {
 #define PAD_RIGHT  0x2000
 #define PAD_LEFT   0x8000
 
-extern PadState D_00138180;     /* controller 1 */
+extern PadState g_pad_state;     /* controller 1 */
 extern PadState D_00138500;     /* controller 2 */
 
 extern float D_L00_001B8FF0[12];                    /* frame of the y-z plane the actors move in */
@@ -60,20 +60,20 @@ extern Vector D_L00_001AFAC0 __attribute__((sda));  /* muzzle offset in the acto
 extern float D_L00_001AFA40 __attribute__((sda));   /* central pull, per second^2 */
 extern int D_L00_001AFA48 __attribute__((sda));     /* frames between shots */
 
-extern void func_00283698(void *out, void *matrix);
-extern void func_00283098(void *out, void *vector, void *matrix);
-extern void func_00282F20(void *out, void *in, float length);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern float func_002AA2E8(float *value, float target, float step);
-extern float func_00283B98(float angle, float delta);
-extern int func_00282948(int *timer);   /* counts down; nonzero once it has run out */
-extern void func_L00_003B74A8(Moby *actor, void *position);
-extern void *func_L00_003B7410(Moby *owner, void *position, void *velocity, void *player);
-extern void func_L00_003B7260(float y, float z, float strength, float *vy, float *vz);
-extern void func_002AC9F8(float *vector, float limit);
+extern void matrix_from_basis_rows(void *out, void *matrix);
+extern void matrix_mul_vec3(void *out, void *vector, void *matrix);
+extern void vec_scale_to_length(void *out, void *in, float length);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern float ApproachValue(float *value, float target, float step);
+extern float FastAddRotations(float angle, float delta);
+extern int math_fast_float_d(int *timer);   /* counts down; nonzero once it has run out */
+extern void part_spawn_two_colored_sparkles(Moby *actor, void *position);
+extern void *pair_game_spawn_shot(Moby *owner, void *position, void *velocity, void *player);
+extern void pair_game_apply_centre_pull(float y, float z, float strength, float *vy, float *vz);
+extern void vec_clamp_length(float *vector, float limit);
 
 /* Steers both actors from their controllers, applies thrust and firing, and moves them. */
-void func_L00_003B6B70(Moby *object)
+void UpdatePairedActorMovement(Moby *object)
 {
     float axes[2];
     u32 held[2];
@@ -86,19 +86,19 @@ void func_L00_003B6B70(Moby *object)
     Moby *actor;
     int i;
 
-    axes[0] = -gPadState.analog[2];
-    if (gPadState.held & PAD_LEFT)
+    axes[0] = -g_pad_state.analog[2];
+    if (g_pad_state.held & PAD_LEFT)
         axes[0] = 1.0f;
-    else if (gPadState.held & PAD_RIGHT)
+    else if (g_pad_state.held & PAD_RIGHT)
         axes[0] = -1.0f;
     axes[1] = -D_00138500.analog[2];
     if (D_00138500.held & PAD_LEFT)
         axes[1] = 1.0f;
     else if (D_00138500.held & PAD_RIGHT)
         axes[1] = -1.0f;
-    held[0] = gPadState.held;
+    held[0] = g_pad_state.held;
     held[1] = D_00138500.held;
-    pressed[0] = gPadState.pressed;
+    pressed[0] = g_pad_state.pressed;
     pressed[1] = D_00138500.pressed;
 
     matrix_from_basis_rows(inverse, D_L00_001B8FF0);
@@ -122,11 +122,11 @@ void func_L00_003B6B70(Moby *object)
             local.v[0] = -0.4f;
             matrix_mul_vec3(&local, &local, actor->matrix);
             FastVecAdd(&local, &local, actor->position);
-            SpawnTwoColoredSparkles(actor, &local);
+            part_spawn_two_colored_sparkles(actor, &local);
         }
 
         /* Fire on circle or square once the reload timer has run out. */
-        if (!context->phase && FastFloatHelperD(&context->timers[i])
+        if (!context->phase && math_fast_float_d(&context->timers[i])
             && (pressed[i] & (PAD_CIRCLE | PAD_SQUARE))) {
             muzzle.q = 0;
             muzzle.v[1] = context->velocities[i].v[1];
@@ -137,15 +137,15 @@ void func_L00_003B6B70(Moby *object)
             vec_scale_to_length(&impulse, actor->matrix[0], D_L00_001AFAB8 * 0.016666668f);
             matrix_mul_vec3(&local, &local, D_L00_001B8FF0);
             FastVecAdd(&impulse, &impulse, &local);
-            SpawnPairGameShot(actor, &muzzle, &impulse, (void *)i);
+            pair_game_spawn_shot(actor, &muzzle, &impulse, (void *)i);
             context->timers[i] = D_L00_001AFA48;
         }
 
         /* Pull toward the centre, cap the speed and move. */
-        ApplyCentrePullToVelocity(context->positions[i].v[1], context->positions[i].v[2],
+        pair_game_apply_centre_pull(context->positions[i].v[1], context->positions[i].v[2],
                           D_L00_001AFA40 * 0.00027777778f,
                           &context->velocities[i].v[1], &context->velocities[i].v[2]);
-        ClampVectorLength(context->velocities[i].v, D_L00_001AFAB4 * 0.016666668f);
+        vec_clamp_length(context->velocities[i].v, D_L00_001AFAB4 * 0.016666668f);
         FastVecAdd(&context->positions[i], &context->positions[i], &context->velocities[i]);
     }
 }

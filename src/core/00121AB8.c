@@ -1,3 +1,4 @@
+#include "names.h"
 /* GCC libgcc2.c and longlong.h: the L_muldi3 module (__muldi3), carried from
  * rac3-decomp's src/boot_elf/core/libgcc/_muldi3.c (func_00127F48), the same
  * instructions there. __mips__ umul_ppmm is the original runtime-library target
@@ -6,11 +7,11 @@
  * project THIRD_PARTY_NOTICES.md. No proprietary SDK source is used.
  */
 /* longlong.h -- definitions for mixed size 32/64 bit arithmetic.
-   Copyright (C) 1991, 92, 94, 95, 96, 1997, 1998 Free Software Foundation, Inc.
+   Copyright (C) 1991, 92, 94, 95, 96, 1997, 1998 free Software Foundation, Inc.
 
    This definition file is free software; you can redistribute it
    and/or modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
+   License as published by the free Software Foundation; either
    version 2, or (at your option) any later version.
 
    This definition file is distributed in the hope that it will be
@@ -19,20 +20,20 @@
    See the GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   along with this program; if not, write to the free Software
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
 
 /* More subroutines needed by GCC output code on some machines.  */
 /* Compile this one with gcc.  */
-/* Copyright (C) 1989, 92-98, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1989, 92-98, 1999 free Software Foundation, Inc.
 
 This file is part of GNU CC.
 
 GNU CC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
+the free Software Foundation; either version 2, or (at your option)
 any later version.
 
 GNU CC is distributed in the hope that it will be useful,
@@ -42,7 +43,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -79,7 +80,7 @@ typedef union {
 
 /* __muldi3 */
 /* Multiplies two 64-bit whole numbers. */
-DItype func_00121AB8 (DItype u, DItype v)
+DItype __muldi3 (DItype u, DItype v)
 {
   DIunion w;
   DIunion uu, vv;

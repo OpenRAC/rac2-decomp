@@ -1,30 +1,30 @@
 #include "names.h"
 /* List-entry alpha falls off with scaled distance from the upper bound. */
-extern double func_001234F0(float);
-extern int func_00123028(double, double);
-extern double func_00122A98(double, double);
-extern double func_00122B00(double, double);
-extern float func_00123298(double);
+extern double __extendsfdf2(float);
+extern int __cmpdf2(double, double);
+extern double __subdf3(double, double);
+extern double __muldf3(double, double);
+extern float __truncdfsf2(double);
 
-int func_003427C0(void *unused, int limit, float start, float offset, float end, float scale)
+int ComputeListEntryAlpha(void *unused, int limit, float start, float offset, float end, float scale)
 {
-    double width = FloatToDouble(end - offset);
+    double width = __extendsfdf2(end - offset);
     float scaled;
     float ratio;
     double value;
     int result;
 
-    if (CompareDoubles(width, 0.0) < 0)
-        width = SubtractDoubles(0.0, width);
-    scaled = DoubleToFloat(MultiplyDoubles(width, FloatToDouble(scale)));
+    if (__cmpdf2(width, 0.0) < 0)
+        width = __subdf3(0.0, width);
+    scaled = __truncdfsf2(__muldf3(width, __extendsfdf2(scale)));
 
     ratio = end - start;
     if (ratio < scaled)
         scaled = ratio;
-    value = FloatToDouble(scaled / ratio);
-    if (CompareDoubles(value, 0.0) < 0)
-        value = SubtractDoubles(0.0, value);
-    ratio = DoubleToFloat(value);
+    value = __extendsfdf2(scaled / ratio);
+    if (__cmpdf2(value, 0.0) < 0)
+        value = __subdf3(0.0, value);
+    ratio = __truncdfsf2(value);
 
     scaled = (1.0f - ratio) * 255.0f;
     result = (int)scaled;

@@ -6,13 +6,13 @@
    label_y after the row count is read; that block end is what gives retail's count, spacing and
    0.5 registers. Standalone declarations, the boot's addresses. */
 
-extern int func_002A9588(int, int, int, int, int);
-extern void func_00336320(char *);
-extern int func_00335E10(char *);
-extern int func_00335E20(char *);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern void gfx_draw_screen_element_stored(char *);
+extern int object_get_first_field(char *);
+extern int object_get_fourth_field(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
-extern int D_001A7344[] MACRO_ADDR;
+extern int g_screen_height[] MACRO_ADDR;
 extern float D_001AE5D0 __attribute__((sda));
 extern float D_001AE5D4[] MACRO_ADDR;
 extern float D_001AE5D8 __attribute__((sda));
@@ -71,22 +71,22 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 
 void func_US2_00349C00(char *o)
 {
-    int color = func_002A9588(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
+    int color = math_ping_pong_blend_values(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
     int start, i, sp, h, n;
     float half, spf;
     ListMenu *menu = (ListMenu *)o;
 
     if (menu->enabled) {
-        func_00336320(o);
-        func_00336320(o + 0x130);
-        func_00336320(o + 0x4C);
-        func_00336320(o + 0x98);
-        func_00336320(o + 0xE4);
+        gfx_draw_screen_element_stored(o);
+        gfx_draw_screen_element_stored(o + 0x130);
+        gfx_draw_screen_element_stored(o + 0x4C);
+        gfx_draw_screen_element_stored(o + 0x98);
+        gfx_draw_screen_element_stored(o + 0xE4);
         n = menu->count;
         half = (float)n * 0.5f;
         sp = label_y(o, D_001AE5F0, D_001B23A4[0], 0.5f, 1);
         spf = (float)sp;
-        h = D_001A7344[0] >> 1;
+        h = g_screen_height[0] >> 1;
         start = (int)((float)h - spf * half);
         for (i = 0; i < menu->count; i++) {
             ListRect *p;
@@ -96,18 +96,18 @@ void func_US2_00349C00(char *o)
 
             if (i == 7 && !menu->showSpecial)
                 continue;
-            p = (ListRect *)((float *)func_00335E10(o + 0x17C));
+            p = (ListRect *)((float *)object_get_first_field(o + 0x17C));
             p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
             c = i == menu->selected ? color : 0x55F0C070;
-            *((int *)func_00335E20(o + 0x1C8)) = c;
-            func_00336320(o + 0x17C);
-            p = (ListRect *)((float *)func_00335E10(o + 0x1C8));
+            *((int *)object_get_fourth_field(o + 0x1C8)) = c;
+            gfx_draw_screen_element_stored(o + 0x17C);
+            p = (ListRect *)((float *)object_get_first_field(o + 0x1C8));
             p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
-            func_00336320(o + 0x1C8);
+            gfx_draw_screen_element_stored(o + 0x1C8);
             slot = (char *)&((ListSlot *)(o + 0x218))[i];
-            p = (ListRect *)((float *)func_00335E10(slot));
+            p = (ListRect *)((float *)object_get_first_field(slot));
             p->x = D_001AE5E0 + menu->origin->x;
             p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
             v = *(ListVtable **)(o + i * 88 + 0x248);

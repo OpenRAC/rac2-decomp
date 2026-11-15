@@ -10,19 +10,19 @@ extern u8 D_L07_001B9200[];
    expands absolute outside a delay slot, as retail has it. */
 extern u8 *D_L07_001B24B0[] __attribute__((sda));
 extern u8 D_L07_001FE3B8[];
-extern void func_002A7750(void *, s32, s32);
-extern void func_00282A60(void *, s32, s32);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void moby_set_state(void *, s32, s32);
+extern void mem_clear(void *, s32, s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_002A0F48(void *);
-extern f32 func_L07_003F90E8(s32, s32, f32, f32);
-extern s32 func_00283CF0(f32);
+extern f32 math_interpolate_between_limits(s32, s32, f32, f32);
+extern s32 FloatToInt(f32);
 
 /* Clears flags 0x41 and 0x80 and sets 0x1000 on the object and its two children, enters state 3
    with or without a target (with one, the tier clamped to 0..1 picks the quadword copied to
    +0x3E0), then sets +0x430 and +0x20 from the tier's share of the duration at +0x24. */
 /* Starts the boss's moving state: clears flags on it and its two helpers, remembers the target, and sets the timers for the given tier. */
-void func_L07_003F7968(u8 *obj, void *target, s32 tier)
+void boss_start_move_tier(u8 *obj, void *target, s32 tier)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     f32 duration, start, end;
@@ -49,14 +49,14 @@ void func_L07_003F7968(u8 *obj, void *target, s32 tier)
         else if (tier < 0) tierIndex = 0;
         qcopy(state + 0x3E0, D_L07_001B1020 + tierIndex * 16);
         *(void **)(state + 0x418) = target;
-        SetMobyState(obj, 3, 0);
+        moby_set_state(obj, 3, 0);
     } else {
         *(void **)(state + 0x418) = 0;
-        SetMobyState(obj, 3, 1);
+        moby_set_state(obj, 3, 1);
     }
     if (!D_L07_001B24B0[0]) {
         D_L07_001B24B0[0] = obj;
-        ClearMemory(D_L07_001FE3B8, 0, 0xE0);
+        mem_clear(D_L07_001FE3B8, 0, 0xE0);
     }
     start = (tier + 1) * 0.166944921f;
     duration = *(s16 *)(state + 0x24);
@@ -72,6 +72,6 @@ void func_L07_003F7968(u8 *obj, void *target, s32 tier)
     qzero(state + 0x3F0);
     if (tier >= 0) {
         *(s32 *)(state + 0x420) = tier;
-        *(s32 *)(state + 0x458) = FloatToInt(InterpolateBetweenLimits(3, 7, 4.0f, 1.0f));
+        *(s32 *)(state + 0x458) = FloatToInt(math_interpolate_between_limits(3, 7, 4.0f, 1.0f));
     }
 }

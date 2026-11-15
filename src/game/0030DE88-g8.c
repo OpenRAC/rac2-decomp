@@ -9,17 +9,17 @@ typedef union {
 extern float D_001AF044 __attribute__((sda));
 extern char D_0018A550[];
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A7A00(void *, float, float);
-extern float func_00282C48(float);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern int func_0030CAA0(void);
-extern void func_002C2210(void *, float, float, s32, s32, s32, s32, void *, float, s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_random_direction(void *, float, float);
+extern float math_fabs(float);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern int beam_get_glow_color(void);
+extern void part_spawn_ground_effect(void *, float, float, s32, s32, s32, s32, void *, float, s32);
 
 /* Sprays a burst of small coloured spark particles from just in front of the object. */
-void func_0030DE88(u8 *moby, int count)
+void SpawnEffectBurst(u8 *moby, int count)
 {
     Vec4_0030DE88 origin;
     Vec4_0030DE88 velocity;
@@ -35,16 +35,16 @@ void func_0030DE88(u8 *moby, int count)
         float inner;
         float size;
         float life;
-        RandomDirectionVector(&velocity, 0.0f, D_001AF044);
-        velocity.f[0] = FloatAbs(velocity.f[0]);
+        vec_random_direction(&velocity, 0.0f, D_001AF044);
+        velocity.f[0] = math_fabs(velocity.f[0]);
         matrix_mul_vec3(&velocity, &velocity, D_0018A550);
-        spin = RandomIntRange(-8, 8);
+        spin = math_random_int_range(-8, 8);
         inner = 0.3f;
-        size = RandomFloatRange(0.2f, 0.6f);
+        size = math_random_float_range(0.2f, 0.6f);
         life = size * inner;
-        colour = GetBeamGlowColor() | 0x7F000000;
-        SpawnGroundEffectParticle(&origin, life, size, 0xF, colour, 0, spin, &velocity, 0.0f, 0);
+        colour = beam_get_glow_color() | 0x7F000000;
+        part_spawn_ground_effect(&origin, life, size, 0xF, colour, 0, spin, &velocity, 0.0f, 0);
         colour = 0x307F7F7F;
-        SpawnGroundEffectParticle(&origin, size * 0.15f, size * 0.5f, 0xF, colour, 0, -spin, &velocity, 0.0f, 0);
+        part_spawn_ground_effect(&origin, size * 0.15f, size * 0.5f, 0xF, colour, 0, -spin, &velocity, 0.0f, 0);
     }
 }

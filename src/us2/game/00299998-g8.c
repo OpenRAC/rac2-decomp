@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_00299998, the USA v2.00 copy of func_00298BB8: the same C, with one more region test. */
 
 extern unsigned char D_001A7930[];
@@ -6,7 +7,7 @@ extern unsigned char D_001A7960[];
 extern unsigned char D_001A7980[];
 extern unsigned char D_001A79A0[];
 extern unsigned char D_001A79D0[];
-extern void func_00115AC0(void *, int, int);
+extern void strncpy(void *, int, int);
 
 void func_US2_00299998(unsigned char *source)
 {
@@ -24,10 +25,10 @@ void func_US2_00299998(unsigned char *source)
         D_001A7930[i] = source[i + 0xd];
     for (i = 11; i < 13; i++)
         D_001A7930[i] = source[i + 0xe];
-    func_00115AC0(D_001A7948, (int)D_001A7930, 13);
-    func_00115AC0(D_001A7960, (int)D_001A7930, 13);
-    func_00115AC0(D_001A7980, (int)D_001A7930, 13);
-    func_00115AC0(D_001A79A0, (int)D_001A7930, 13);
-    func_00115AC0(D_001A79A0 + 0x14, (int)D_001A7930, 13);
-    func_00115AC0(D_001A79D0, (int)D_001A7930, 13);
+    strncpy(D_001A7948, (int)D_001A7930, 13);
+    strncpy(D_001A7960, (int)D_001A7930, 13);
+    strncpy(D_001A7980, (int)D_001A7930, 13);
+    strncpy(D_001A79A0, (int)D_001A7930, 13);
+    strncpy(D_001A79A0 + 0x14, (int)D_001A7930, 13);
+    strncpy(D_001A79D0, (int)D_001A7930, 13);
 }

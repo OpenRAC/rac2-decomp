@@ -26,22 +26,22 @@ typedef struct {
     Vec4458 normal;     /* 0x40 */
 } Hit4458;
 
-extern Hero4458 D_00189E20;
-extern Hit4458 D_L00_001BF200;
+extern Hero4458 g_hero_state;
+extern Hit4458 g_collision_result;
 
-extern float func_L00_002D3A58(Vec4458 *);
+extern float cam_get_view_space_vector_length(Vec4458 *);
 /* Called as (vector, flag, x, y, z); declared with the flag last so the EE passes the
  * floats in f12-f14 and the flag in a1. */
-extern void func_L00_002D36E0(Vec4458 *, float, float, float, int);
-extern float func_00282E20(Vec4458 *);
-extern void func_00282F20(Vec4458 *, Vec4458 *, float);
-extern void func_L00_002D3B58(Vec4458 *, Vec4458 *, float);
-extern void func_00282D30(Vec4458 *, Vec4458 *, float);
-extern void func_00282CC0(Vec4458 *, Vec4458 *, Vec4458 *);
-extern int func_002761F8(Vec4458 *, Vec4458 *, int, s32, int);
-extern int func_00278E78(void);
-extern float func_L00_002D3EA8(Vec4458 *);
-extern float func_00282DB0(Vec4458 *, Vec4458 *);
+extern void hero_build_relative_point(Vec4458 *, float, float, float, int);
+extern float vec_length_xy(Vec4458 *);
+extern void vec_scale_to_length(Vec4458 *, Vec4458 *, float);
+extern void cam_set_view_space_height(Vec4458 *, Vec4458 *, float);
+extern void FastVecScale(Vec4458 *, Vec4458 *, float);
+extern void FastVecAdd(Vec4458 *, Vec4458 *, Vec4458 *);
+extern int CollLine(Vec4458 *, Vec4458 *, int, s32, int);
+extern int GetCollHitMaterial(void);
+extern float cam_get_view_space_angle(Vec4458 *);
+extern float FastVecDot(Vec4458 *, Vec4458 *);
 
 /* While the hero moves, casts two short rays ahead of it (along its velocity, or along
  * the direction at +0x0 when nearly still or when forced): one from a point at the mode's
@@ -50,7 +50,7 @@ extern float func_00282DB0(Vec4458 *, Vec4458 *);
  * at +0x18 in +0x270 and removes the part of the velocity at +0xF0 that runs into the
  * flattened surface normal. */
 /* Looks ahead of the moving hero for a steep wall and removes the speed that would push into it. */
-void func_L00_002B4458(int force)
+void DeflectHeroOffSteepSurface(int force)
 {
     Vec4458 upper;
     Vec4458 upperEnd;
@@ -62,43 +62,43 @@ void func_L00_002B4458(int force)
     float dot;
     int type;
 
-    if (GetViewSpaceVectorLength(&gHeroState.velocity) < 0.0016666668f)
+    if (cam_get_view_space_vector_length(&g_hero_state.velocity) < 0.0016666668f)
         return;
     height = 0.37f;
     reach = 0.5f;
-    if ((unsigned int)(gHeroState.x229C - 17) < 2) {
+    if ((unsigned int)(g_hero_state.x229C - 17) < 2) {
         height = 0.0f;
         reach = 0.7f;
-    } else if (gHeroState.mode == 1) {
+    } else if (g_hero_state.mode == 1) {
         height = 0.35f;
         reach = 0.27f;
     }
-    BuildHeroRelativePoint(&upper, 0.0f, 0.0f, height, 1);
-    BuildHeroRelativePoint(&lower, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || vec_length_xy(&gHeroState.velocity) < 0.01f) {
-        vec_scale_to_length(&upperEnd, &gHeroState.dir0, reach);
-        vec_scale_to_length(&lowerEnd, &gHeroState.dir0, reach * 1.4f);
+    hero_build_relative_point(&upper, 0.0f, 0.0f, height, 1);
+    hero_build_relative_point(&lower, 0.0f, 0.0f, height * 0.3f, 1);
+    if (force || vec_length_xy(&g_hero_state.velocity) < 0.01f) {
+        vec_scale_to_length(&upperEnd, &g_hero_state.dir0, reach);
+        vec_scale_to_length(&lowerEnd, &g_hero_state.dir0, reach * 1.4f);
     } else {
-        SetViewSpaceHeight(&upperEnd, &gHeroState.velocity, 0.0f);
+        cam_set_view_space_height(&upperEnd, &g_hero_state.velocity, 0.0f);
         vec_scale_to_length(&upperEnd, &upperEnd, reach);
         FastVecScale(&lowerEnd, &upperEnd, 1.4f);
     }
     type = -1;
     FastVecAdd(&upperEnd, &upperEnd, &upper);
     FastVecAdd(&lowerEnd, &lowerEnd, &lower);
-    if (CollLine(&lower, &lowerEnd, 2, gHeroState.moby, 0) && gCollisionResult.hits > 0)
+    if (CollLine(&lower, &lowerEnd, 2, g_hero_state.moby, 0) && g_collision_result.hits > 0)
         type = GetCollHitMaterial();
     slope = 0.0f;
-    if (CollLine(&upper, &upperEnd, 2, gHeroState.moby, 0) && gCollisionResult.hits > 0)
-        slope = GetViewSpaceAngle(&gCollisionResult.normal);
+    if (CollLine(&upper, &upperEnd, 2, g_hero_state.moby, 0) && g_collision_result.hits > 0)
+        slope = cam_get_view_space_angle(&g_collision_result.normal);
     if (slope >= 0.87266469f || type == 8 || type == 12) {
-        gHeroState.x270 = gCollisionResult.x18;
-        SetViewSpaceHeight(&gCollisionResult.normal, &gCollisionResult.normal, 0.0f);
-        vec_scale_to_length(&gCollisionResult.normal, &gCollisionResult.normal, 1.0f);
-        dot = FastVecDot(&gCollisionResult.normal, &gHeroState.velocity);
+        g_hero_state.x270 = g_collision_result.x18;
+        cam_set_view_space_height(&g_collision_result.normal, &g_collision_result.normal, 0.0f);
+        vec_scale_to_length(&g_collision_result.normal, &g_collision_result.normal, 1.0f);
+        dot = FastVecDot(&g_collision_result.normal, &g_hero_state.velocity);
         if (dot < 0.0f) {
-            FastVecScale(&gCollisionResult.normal, &gCollisionResult.normal, -dot);
-            FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &gCollisionResult.normal);
+            FastVecScale(&g_collision_result.normal, &g_collision_result.normal, -dot);
+            FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &g_collision_result.normal);
         }
     }
 }

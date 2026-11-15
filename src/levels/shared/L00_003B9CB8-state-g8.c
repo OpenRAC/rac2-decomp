@@ -47,43 +47,43 @@ typedef struct {
 } EffectMaterialSelector;
 
 extern EffectAngles D_L00_001AFDA8;
-extern EffectMaterialSelector D_00139568;
-extern EffectMaterialEntry D_L00_00262570[];
+extern EffectMaterialSelector g_item_slot_to_record;
+extern EffectMaterialEntry g_weapon_l00_table[];
 extern int D_L00_001AFDA0 __attribute__((sda));
-extern char *func_L00_003BB1F8(EffectObject *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8C00(void *, void *, int, float, void *);
+extern char *spark_move_projectile(EffectObject *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void make_hit_descriptor(void *, void *, int, float, void *);
 
-extern void func_002A8E20(void *, void *);
-extern void func_0032D758(void *, int, int);
+extern void QueueMobyImpact(void *, void *);
+extern void StartAttachedEffect(void *, int, int);
 /* The integer and FP register banks retain their own argument order. */
-extern void func_002AF580(void *, float, void *, float, float, float, void *,
+extern void SelectBestTargetInCone(void *, float, void *, float, float, float, void *,
                           void *, int, int, float, int, void *);
-extern int func_L00_0037DD80(void *, void *);
-extern void func_L00_0037DD18(void *, void *, int);
-extern void func_L00_003BB8B8(void *, void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern void func_00282C88(void *);
-extern void func_002C2210(void *, float, float, int, unsigned int, int, int,
+extern int pair_is_owner_key_free(void *, void *);
+extern void KeyOwnerTableInsert(void *, void *, int);
+extern void spark_spawn_orbiting_record(void *, void *, int);
+extern int PlayMobySound(int, int, void *);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern void vec_clear_128(void *);
+extern void part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int,
                           void *, float, int);
-extern void func_002FE8D8(void *, void *);
-extern void func_L00_003BD510(void *, void *, int, int);
-extern void func_002FEE50(int);
-extern void func_L00_0037E0C0(void *);
-extern void func_00291450(int);
-extern void func_0029F338(void *);
-extern void func_L00_003BBB68(void *);
-extern void func_L00_003BCC10(void *);
+extern void moby_get_facing_direction(void *, void *);
+extern void part_l00_spawn_spark_burst_2(void *, void *, int, int);
+extern void table_clear_entry_flag(int);
+extern void pair_clear_owner_key_entries(void *);
+extern void gfx_free_point_light(int);
+extern void moby_mark_spawned(void *);
+extern void effect_update_spark_slots(void *);
+extern void spark_update_orbit(void *);
 extern void ref_L00_003BAC30_00(void *, EffectObject *);
-extern void func_L00_003BB668(void *);
+extern void spark_draw_projectile(void *);
 
 /* Updates motion and hits, then shrinks, emits particles and releases resources. */
 /* Per-frame update of the moby class 2473 effect: it hurts and pushes nearby things, fades out,
    then removes itself. */
-void func_L00_003BAC30(EffectObject *self)
+void UpdateMovingEffectState(EffectObject *self)
 {
     EffectAngles angles;
     char *hits[16];
@@ -104,12 +104,12 @@ void func_L00_003BAC30(EffectObject *self)
     case 0:
     case 1:
         state->intensity += (0.6f - state->intensity) * 0.125f;
-        hitTarget = MoveSparkProjectile(self);
+        hitTarget = spark_move_projectile(self);
         if (hitTarget) {
             qcopy(vector, state);
             vec_scale_to_length(vector, vector, 0.033333335f);
-            classIndex = gItemSlotToRecord.index;
-            classEntry = gWeaponTable_L00 + classIndex;
+            classIndex = g_item_slot_to_record.index;
+            classEntry = g_weapon_l00_table + classIndex;
             scale = classEntry->scale;
             make_hit_descriptor(&packet, self, 0x210000, scale, vector);
             packet.field_18 = 1;
@@ -121,47 +121,47 @@ void func_L00_003BAC30(EffectObject *self)
         SelectBestTargetInCone(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
                       &hitCount, hits, 15, 0, 0.0f, 0, &angles);
         for (i = 0; i < hitCount; i++) {
-            if (state->f54 < 15 && IsOwnerKeyPairFree(self, hits[i])) {
+            if (state->f54 < 15 && pair_is_owner_key_free(self, hits[i])) {
                 KeyOwnerTableInsert(self, hits[i], 120);
-                SpawnOrbitingSparkRecord(self, hits[i], 10);
+                spark_spawn_orbiting_record(self, hits[i], 10);
                 PlayMobySound(0, 0, self);
             }
         }
-        if (FastFloatHelperD(&state->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             self->phase = 2;
             state->timer = 40;
         }
         break;
     case 2:
-        MoveSparkProjectile(self);
+        spark_move_projectile(self);
         ratio = IntToFloat(state->timer) / IntToFloat(40);
         state->intensity = ratio * 0.5900000333786011f + 0.01f;
-        self->position[0] += RandomFloatRange(-0.1f, 0.1f);
-        self->position[1] += RandomFloatRange(-0.1f, 0.1f);
-        self->position[2] += RandomFloatRange(-0.1f, 0.1f);
-        ClearVector128(vector);
-        SpawnGroundEffectParticle(self->position, 0.15f, 1.5f, 60, 0x4FFF0000, 0, 2, vector, 0.0013888889225199819f, 1);
-        SpawnGroundEffectParticle(self->position, 0.125f, 1.25f, 60, 0x7FFFFFFF, 0, 2, vector, 0.0013888889225199819f, 1);
-        if (FastFloatHelperD(&state->timer))
+        self->position[0] += math_random_float_range(-0.1f, 0.1f);
+        self->position[1] += math_random_float_range(-0.1f, 0.1f);
+        self->position[2] += math_random_float_range(-0.1f, 0.1f);
+        vec_clear_128(vector);
+        part_spawn_ground_effect(self->position, 0.15f, 1.5f, 60, 0x4FFF0000, 0, 2, vector, 0.0013888889225199819f, 1);
+        part_spawn_ground_effect(self->position, 0.125f, 1.25f, 60, 0x7FFFFFFF, 0, 2, vector, 0.0013888889225199819f, 1);
+        if (math_fast_float_d(&state->timer))
             self->phase = 3;
         break;
     case 3:
         if (state->f54 == 0 && state->f58 == 0) {
-            GetObjectFacingDirection(self->position, &packet);
-            SpawnSparkBurst_L00_3(self->position, &packet, 6, 0x72FF);
-            SpawnSparkBurst_L00_3(self->position, &packet, 6, 0xFF0000);
-            ClearEntryFlag(state->f50);
-            ClearOwnerKeyEntries(self);
+            moby_get_facing_direction(self->position, &packet);
+            part_l00_spawn_spark_burst_2(self->position, &packet, 6, 0x72FF);
+            part_l00_spawn_spark_burst_2(self->position, &packet, 6, 0xFF0000);
+            table_clear_entry_flag(state->f50);
+            pair_clear_owner_key_entries(self);
             lightHandle = state->light_index;
             D_L00_001AFDA0--;
             if (lightHandle != -1)
-                FreePointLight(lightHandle);
-            MarkMobySpawned(self);
+                gfx_free_point_light(lightHandle);
+            moby_mark_spawned(self);
             return;
         }
         break;
     }
-    UpdateEffectSparkSlots(self);
-    UpdateOrbitSparks(self);
-    ref_L00_003BAC30_00(DrawSparkProjectile, self);
+    effect_update_spark_slots(self);
+    spark_update_orbit(self);
+    ref_L00_003BAC30_00(spark_draw_projectile, self);
 }

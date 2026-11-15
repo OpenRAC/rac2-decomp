@@ -3,19 +3,19 @@
 /* Quadword copies, the spelling -frac2-qcopy lowers to lq/sq through address registers. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern f32 func_00282E48(void *a, void *b);
-extern void func_L07_00410588(u8 *a);
-extern void func_L07_0040F598(u8 *a);
-extern void func_L07_0040F6B8(u8 *a);
+extern f32 fast_vec_dist(void *a, void *b);
+extern void ship_build_joint_pointers(u8 *a);
+extern void group_walk_entities(u8 *a);
+extern void boss_place_attached_parts(u8 *a);
 extern u8 *D_L07_001FDEC0[];
-extern u16 *D_L07_001FAD60[];
+extern u16 *g_moby_l07_group_lists[];
 extern f32 D_L07_001B1700 __attribute__((sda));
 extern f32 D_L07_001B1704 __attribute__((sda));
 extern f32 D_L07_001B1770[5] SDATA(D_L07_001B1770);
 extern s32 D_L07_001B22F8;
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it. */
-extern u8 *D_L07_001B22DC[] __attribute__((sda));
+extern u8 *g_moby_l07_array[] __attribute__((sda));
 
 /* The chain of the state record: five times at +0xE0 and the five members at +0xF4. Indexing
    the member arrays (not pointer arithmetic) keeps `times[i - 1]`'s own scaled index and the
@@ -30,7 +30,7 @@ typedef struct {
    record D_L07_001FDEC0[state + 0x90] (its points at +0x10 and +0x20), then for i = 1 to 4 every
    entity of the group whose class is 0x11D9 + i: shown, scaled like the object, its time
    accumulated from D_L07_001B1770, stored as member i and set up. */
-void func_L07_0040E980(u8 *moby)
+void ship_start_chain(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *base;
@@ -52,17 +52,17 @@ void func_L07_0040E980(u8 *moby)
     *(f32 *)(state + 0x1A4) = slow;
     *(f32 *)(state + 0x1A0) = fast;
     *(TI128 *)(state + 0x40) = *(TI128 *)(moby + 0xF0);
-    BuildShipJointPointers(moby);
+    ship_build_joint_pointers(moby);
     *(u16 *)(moby + 0x34) |= 1;
     moby[0x31] = 0;
     scale = *(f32 *)(moby + 0x2C) / *(f32 *)(*(u8 **)(moby + 0x24) + 0x24);
     if (moby[0x21] != 0xFF) {
         for (i = 1; i < 5; i++) {
-            for (entry = gMobyGroupLists_L07[moby[0x21]];
+            for (entry = g_moby_l07_group_lists[moby[0x21]];
                  moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8 && entry != 0 &&
-                 ((entry != 0 && (s16)entry[-1] >= 0) || entry == gMobyGroupLists_L07[moby[0x21]]);
+                 ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_moby_l07_group_lists[moby[0x21]]);
                  entry++) {
-                member = gMobyArray_L07[0] + ((*entry & 0x7FFF) << 8);
+                member = g_moby_l07_array[0] + ((*entry & 0x7FFF) << 8);
                 if (member == 0)
                     break;
                 if (*(s16 *)(member + 0xAA) == i + 0x11D9 /* moby class 4569 + i */) {
@@ -77,9 +77,9 @@ void func_L07_0040E980(u8 *moby)
                     ((SiberiusChain *)state)->times[i] =
                         ((SiberiusChain *)state)->times[i - 1] + D_L07_001B1770[i];
                     ((SiberiusChain *)state)->ents[i] = member;
-                    WalkGroupEntities(member);
-                    PlaceAttachedParts(member);
-                    BuildShipJointPointers(member);
+                    group_walk_entities(member);
+                    boss_place_attached_parts(member);
+                    ship_build_joint_pointers(member);
                 }
             }
         }

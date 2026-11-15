@@ -21,10 +21,10 @@ typedef struct File_00115DA8 {
 
 extern void *D_00133E74;
 
-extern int func_00118CC8(void *arg0, char *arg1, void *arg2);
+extern int vfprintf_dispatch(void *arg0, char *arg1, void *arg2);
 
 /* Writes formatted text into a memory buffer and ends it with a zero. */
-int func_00115DA8(char *buffer, char *format, ...) {
+int sprintf(char *buffer, char *format, ...) {
     File_00115DA8 f;
     int result;
 
@@ -34,7 +34,7 @@ int func_00115DA8(char *buffer, char *format, ...) {
     f.base = buffer;
     f.size = 0x7FFFFFFF;
     f.data = D_00133E74;
-    result = VfprintfDispatch(&f, format, (char *)__builtin_next_arg(format) - 0x30);
+    result = vfprintf_dispatch(&f, format, (char *)__builtin_next_arg(format) - 0x30);
     *f.p = '\0';
     return result;
 }

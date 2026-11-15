@@ -33,8 +33,8 @@ typedef struct {
 } AimObject;
 
 /* Encoded entity id lists per group, the entity pool pointer and the group count. */
-extern u16 *D_L11_001FC420[];
-extern Entity *D_L11_001B359C[] __attribute__((sda));
+extern u16 *g_group_id_lists[];
+extern Entity *g_moby_l11_table[] __attribute__((sda));
 extern s32 D_L11_001B35B8 __attribute__((sda));
 
 /* Range, cone angle and turn angle (degrees) of this variant. */
@@ -42,20 +42,20 @@ extern float D_L11_001B1230 __attribute__((sda));
 extern float D_L11_001B1234 __attribute__((sda));
 extern float D_L11_001B1238 __attribute__((sda));
 
-extern int func_00283DB8(void *vec, float radius);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00283BE0(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern int func_L01_00321178(void *, void *);
-extern int func_L02_003D7300(void *);
+extern int math_fast_helper_a(void *vec, float radius);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern int moby_l01_turn_toward_target(void *, void *);
+extern int moby_get_busy_flag(void *);
 
 /* Looks for an entity of the object's group that is in range and inside its view cone, and if
    found turns the object toward it and runs the follow-up call with a tiny turn rate. */
-s32 func_L11_00436D08(AimObject *obj)
+s32 enemy_aim_at_group_entity_in_cone_short(AimObject *obj)
 {
     AimState *state = obj->state;
     float copy[4];
@@ -72,24 +72,24 @@ s32 func_L11_00436D08(AimObject *obj)
     vec[2] = obj->position[2];
     vec[3] = 2.0f;
     *(TI128 *)copy = *(TI128 *)vec;
-    if (FastMathHelperA(copy, 128.0f) <= 0)
+    if (math_fast_helper_a(copy, 128.0f) <= 0)
         return 0;
     if (state->group == -1)
         return 0;
 
-    for (ids = gGroupIdLists[state->group];
+    for (ids = g_group_id_lists[state->group];
          (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && ids != 0 &&
-         ((ids != 0 && (s16)ids[-1] >= 0) || ids == gGroupIdLists[state->group]);
+         ((ids != 0 && (s16)ids[-1] >= 0) || ids == g_group_id_lists[state->group]);
          ids++) {
-        entity = gMobyTable_L11[0] + (*ids & 0x7FFF);
+        entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
         if (entity == 0)
             return 0;
-        if (!GetMobyBusyFlag(entity))
+        if (!moby_get_busy_flag(entity))
             continue;
         if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1230))
             continue;
 
-        angle = FastMatrixHelperA(entity->position[0] - obj->position[0],
+        angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
         if (!(FastDiffRots(obj->heading, angle) < D_L11_001B1234 * 0.017453294f))
             continue;
@@ -98,15 +98,15 @@ s32 func_L11_00436D08(AimObject *obj)
 
         FastVecSub(vec, obj->position, entity->position);
         turn = D_L11_001B1238 * 0.017453294f;
-        angle = FastMatrixHelperA(entity->position[0] - obj->position[0],
+        angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        ApplyAxisRotationToQuaternion(vec, vec, obj->axis,
+        math_apply_axis_rotation_to_quat(vec, vec, obj->axis,
                       fast_subtract_rotations(obj->heading, angle) >= 0.0f ? -turn : turn);
         FastVecAdd(vec, vec, entity->position);
 
         savedTurnRate = state->turnRate;
         state->turnRate = 0.0001f;
-        TurnMobyTowardTarget(obj, vec);
+        moby_l01_turn_toward_target(obj, vec);
         state->turnRate = savedTurnRate;
         return 1;
     }

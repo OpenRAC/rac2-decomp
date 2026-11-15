@@ -6,8 +6,8 @@ extern char *D_L05_001B3018[] MACRO_ADDR;
 extern int D_L05_001B3030[] MACRO_ADDR;
 extern int D_L05_001B2FA0[] MACRO_ADDR;
 extern int D_L05_001B2048 MACRO_ADDR;
-extern void func_0029F338(void *object);
-extern unsigned char *func_0029EFD0(int type);
+extern void moby_mark_spawned(void *object);
+extern unsigned char *CreateMoby(int type);
 
 /* Spawns a 0x986 object into the first free one of five slots, passing VALUE and its slot in its
    state. The slot table is reset on first use (count -1); when all five are taken and EVICT is
@@ -42,7 +42,7 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
                 }
             }
             if (selected >= 0) {
-                MarkMobySpawned(D_L05_001B3018[selected]);
+                moby_mark_spawned(D_L05_001B3018[selected]);
                 D_L05_001B3018[selected] = 0;
                 D_L05_001B2FA0[selected] = 0;
                 D_L05_001AFCB8 -= 1.0f;

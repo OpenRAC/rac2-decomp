@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern void ref_L30_004185E0_03(s32, s32, s8 *);
 extern void ref_L30_004185E0_04(s8 *);
 
 /* Updates the helper effect object this object owns and runs the effect's own update callback if it has one. */
-void func_L30_004185E0(s8 *moby) {
+void museum_effect_holder_update(s8 *moby) {
     s8 *vars;
     s8 *effect;
     s8 *holder;

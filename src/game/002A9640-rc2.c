@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 D_001BF200;
 
 /* Finds the effect slot owned by this object. Returns it if it matches the flag mask, otherwise releases the slot when allowed. */
-void *func_002A9640(void *object, u32 flagMask, s32 keepSlot) {
+void *part_find_owned_effect_slot(void *object, u32 flagMask, s32 keepSlot) {
     u8 slotIndex;
     s8 *entry;
     void *owner;

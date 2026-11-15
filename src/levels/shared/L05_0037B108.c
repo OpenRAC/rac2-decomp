@@ -1,9 +1,9 @@
 #include "names.h"
 extern unsigned char *D_L05_001B2528;
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 /* Retire each active object belonging to this effect family. */
-void func_L05_0037B108(void) {
+void effect_remove_family_mobys(void) {
     unsigned char *object = D_L05_001B2528;
     int kind;
     while (object) {
@@ -11,7 +11,7 @@ void func_L05_0037B108(void) {
         if (kind == 0x1173 || kind == 0x12D8 || kind == 0x974 || kind == 0x1161 ||
             kind == 0x1182 || kind == 0x1191 || kind == 0x10F9 || kind == 0x946 ||
             kind == 0x10CF || kind == 0x117C || kind == 0x117D || kind == 0x117F)
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
         object = *(unsigned char **)(object + 0x28);
     }
 }

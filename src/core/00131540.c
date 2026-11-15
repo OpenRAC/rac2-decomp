@@ -27,11 +27,11 @@ extern signed char r1_D_001331D8[];
 
 extern char r1_D_00153D00[], r1_D_00153D10[], r1_D_00153D28[];
 
-extern char *func_00131540(void);
+extern char *console_get_rom_version(void);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D2A0 */
 /* Reads the console ROM version record once and returns it. */
-char *func_00131540(void) {
+char *console_get_rom_version(void) {
     int fd;
     if (r1_D_001331D8[0] == 0) {
         fd = r1_func_0011BF80(r1_D_00153D00, 1);

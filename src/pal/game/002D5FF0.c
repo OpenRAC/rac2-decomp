@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_002D6058, the PAL copy of func_002D5480: the same C, where the object offset 0x3BE08
    becomes 0x3C210 and the callees are PAL's own. */
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_00287E80(void);
+extern void menu_clear_counter(void);
 extern void func_PAL_003435C0(char *, char *, char *, char *);
 extern void func_PAL_00343690(char *, int);
 extern char D_002615F8[], D_00261698[], D_00261750[];
 
 int func_PAL_002D6058(void)
 {
-    func_00287E80();
+    menu_clear_counter();
     if (D_001A8CFC[0] != 0) {
         func_PAL_003435C0(D_001A8CFC[0] + 0x3C210, D_002615F8, D_00261698, D_00261750);
         func_PAL_00343690(D_001A8CFC[0] + 0x3C210, 1);
@@ -43,9 +44,9 @@ extern void func_PAL_0029D870(void);
 
 int func_PAL_002D6118(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_PAL_0029D870();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
@@ -57,22 +58,22 @@ extern void func_PAL_0029D4B8(void);
 
 int func_PAL_002D62F0(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_PAL_0029D4B8();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_00341CD8(char *, int);
+extern void menu_set_value(char *, int);
 extern void func_PAL_00343F18(char *, char *);
 extern char D_00261540[];
 
 int func_PAL_002D6320(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_00341CD8(D_001A8CFC[0] + 0x3EA78, 1);
+        menu_set_value(D_001A8CFC[0] + 0x3EA78, 1);
         func_PAL_00343F18(D_001A8CFC[0] + 0x3EA78, D_00261540);
     }
     return 0;
@@ -84,14 +85,14 @@ extern void func_PAL_0029D448(void);
 
 int func_PAL_002D6448(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_PAL_0029D448();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
 
-extern void func_003423A8(char *, int);
+extern void list_menu_set_enabled(char *, int);
 extern void func_PAL_003443E8(char *, char *);
 
 extern char D_PAL_00261330[];
@@ -99,7 +100,7 @@ extern char D_PAL_00261330[];
 int func_PAL_002D6478(void)
 {
     if (D_001A8CFC[0] != 0) {
-        func_003423A8(D_001A8CFC[0] + 0x3E810, 1);
+        list_menu_set_enabled(D_001A8CFC[0] + 0x3E810, 1);
         func_PAL_003443E8(D_001A8CFC[0] + 0x3E810, D_PAL_00261330);
     }
     return 0;
@@ -109,19 +110,19 @@ int func_PAL_002D6478(void)
 
 
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
 extern void func_0029CED8(void);
 
 long long func_PAL_002D64F8(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CED8();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -134,20 +135,20 @@ int func_PAL_002D6528(void) {
 
 
 
-extern char D_001F2840[];
-extern int D_001A79F0 __attribute__((sda));
+extern char g_pause_menu_state[];
+extern int g_current_map_index __attribute__((sda));
 extern volatile unsigned char D_001A7C01 __attribute__((sda));
 extern int D_001C51D0;
-extern int D_001C4FA0[];
-extern void func_0027D330(int);
-extern void func_002C9C60(float);
-extern int func_002E5E58(int, unsigned int, void *);
-extern int func_0026F7D8(void);
-extern int func_0026F7D8(void);
-extern void func_00288CB0(int, int);
-extern void func_002B49E0(int, int, int, int, int);
+extern int g_map_overlay_state[];
+extern void FadeToBlack(int);
+extern void menu_set_pause_scale_inverse(float);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern int stub_empty_25(void);
+extern int stub_empty_25(void);
+extern void data_set_small_value_and_refresh(int, int);
+extern void request_begin_slot(int, int, int, int, int);
 extern int func_PAL_0029CDA8(int);
-extern int func_0026F7D0(void);
+extern int stub_empty_24(void);
 
 int func_PAL_002D6548(void)
 {
@@ -156,9 +157,9 @@ int func_PAL_002D6548(void)
     if (flags & 0x10) {
         char *root;
         int value;
-        func_0027D330(4);
-        func_002C9C60(4.0f);
-        root = D_001F2840;
+        FadeToBlack(4);
+        menu_set_pause_scale_inverse(4.0f);
+        root = g_pause_menu_state;
         value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         if (value != 0) {
             *(int *)(root + 0x18) = value;
@@ -174,23 +175,23 @@ int func_PAL_002D6548(void)
         result = 0;
     } else if (flags & 0xD00) {
         result = 1;
-        D_001C51D0 = D_001A79F0;
+        D_001C51D0 = g_current_map_index;
     } else if (flags & 0x40) {
-        int *base = D_001C4FA0;
-        if (D_001A79F0 != base[0x230 / 4]) {
+        int *base = g_map_overlay_state;
+        if (g_current_map_index != base[0x230 / 4]) {
             result = 1;
-            func_002E5E58(4, 0, 0);
+            snd_play_from_global_bank(4, 0, 0);
             if (base[0x230 / 4] != 0 && D_001A7C01 == 0 && base[0x230 / 4] == 2) {
-                func_002B49E0(6, 2, 1, 0x19, 0);
-            } else if (func_0026F7D0() && func_0026F7D8()) {
-                func_00288CB0(D_001C4FA0[0x230 / 4], 1);
+                request_begin_slot(6, 2, 1, 0x19, 0);
+            } else if (stub_empty_24() && stub_empty_25()) {
+                data_set_small_value_and_refresh(g_map_overlay_state[0x230 / 4], 1);
             } else {
-                func_002B49E0(6, 2, 1, D_001C4FA0[0x230 / 4], 0);
+                request_begin_slot(6, 2, 1, g_map_overlay_state[0x230 / 4], 0);
             }
         } else {
             result = 1;
-            func_002E5E58(4, 0, 0);
-            func_0027D330(4);
+            snd_play_from_global_bank(4, 0, 0);
+            FadeToBlack(4);
         }
     } else {
         func_PAL_0029CDA8(flags);
@@ -203,9 +204,9 @@ finish:
 extern void func_0029CB20(void);
 
 int func_PAL_002D66E0(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CB20();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -218,7 +219,7 @@ void func_PAL_002D6710(int first, int second) {
 }
 
 
-extern int func_002D5B58(int, int, int *);
+extern int menu_process_request(int, int, int *);
 typedef struct {
     char pad0[8];
     int f08;
@@ -233,15 +234,15 @@ typedef struct {
     int f100;
     int f104;
 } Func002D5B58Root;
-extern int D_001A7424 __attribute__((sda));
+extern int g_save_menu_flags __attribute__((sda));
 extern char D_001A7BB4 __attribute__((sda));
 extern int D_001C1220[];
 extern int D_001F29A0;
 extern void *D_0026CD60[];
-extern void func_00287EA8(void);
-extern void func_00285828(int, int, int, int);
-extern void func_00285788(int, int);
-extern void func_002DF190(int, int);
+extern void menu_clear_confirm_pending(void);
+extern void settings_store_four(int, int, int, int);
+extern void menu_set_size_limits(int, int);
+extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Handles a request by type (0 and 1 do nothing): the others set a state code and its parameters in
    the block at D_001F2840, change the flags of D_001A7424 or call the helpers. Types 6 to 11 store 0
@@ -257,76 +258,76 @@ int func_PAL_002D6730(int type, int value, int *result)
         goto done;
     goto *D_0026CD60[type];
 L3:
-    ((Func002D5B58Root *)D_001F2840)->f18 = value;
+    ((Func002D5B58Root *)g_pause_menu_state)->f18 = value;
     goto done;
 L4:
-    func_002E5E58(4, 0, 0);
-    func_00287EA8();
-    D_001A7424 = (D_001A7424 | 2) & ~4;
+    snd_play_from_global_bank(4, 0, 0);
+    menu_clear_confirm_pending();
+    g_save_menu_flags = (g_save_menu_flags | 2) & ~4;
     D_001F29A0 = 0;
-    func_002B49E0(4, 1, 1, value, 0);
+    request_begin_slot(4, 1, 1, value, 0);
     goto done;
 L5:
-    func_002E5E58(4, 0, 0);
-    D_001A7424 = (D_001A7424 | 4) & ~2;
-    func_002B49E0(4, 1, 1, value, 0);
+    snd_play_from_global_bank(4, 0, 0);
+    g_save_menu_flags = (g_save_menu_flags | 4) & ~2;
+    request_begin_slot(4, 1, 1, value, 0);
     D_001F29A0 = 1;
     goto done;
 L6: {
     Func002D5B58Root *root;
     int index = value >> 16;
     if (index != 0) {
-        Func002D5B58Root *first = (Func002D5B58Root *)D_001F2840;
+        Func002D5B58Root *first = (Func002D5B58Root *)g_pause_menu_state;
         first->fFC = D_001C1220[index];
     }
-    root = (Func002D5B58Root *)D_001F2840;
+    root = (Func002D5B58Root *)g_pause_menu_state;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 5;
     root->fF4 = value & 0xFFFF;
     ret = 1;
-    func_002DF190(0, 0x11);
+    snd_play_menu_sound_if_enabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L7: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)g_pause_menu_state;
     root->fF4 = value;
     root->f100 = root->f14;
     root->f1C = 3;
     root->f104 = root->f08;
-    func_002DF190(0, 0x11);
+    snd_play_menu_sound_if_enabled(0, 0x11);
     *result = 0;
 }
 L8: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)g_pause_menu_state;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 4;
     root->fF4 = value;
     ret = 1;
-    func_002DF190(0, 0x11);
+    snd_play_menu_sound_if_enabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L10: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)g_pause_menu_state;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 6;
     root->fF4 = value;
     ret = 1;
-    func_002DF190(0, 0x11);
+    snd_play_menu_sound_if_enabled(0, 0x11);
     *result = 0;
     goto done;
 }
 L11: {
-    Func002D5B58Root *root = (Func002D5B58Root *)D_001F2840;
+    Func002D5B58Root *root = (Func002D5B58Root *)g_pause_menu_state;
     root->f100 = root->f14;
     root->f104 = root->f08;
     root->f1C = 7;
     ret = 1;
-    func_002DF190(0, 0x11);
+    snd_play_menu_sound_if_enabled(0, 0x11);
     *result = 0;
     goto done;
 }
@@ -336,16 +337,16 @@ L9:
     *result = 0;
     goto done;
 L2:
-    func_002DF190(2, 0x11);
+    snd_play_menu_sound_if_enabled(2, 0x11);
     goto done;
 L12:
-    func_002E5E58(4, 0, 0);
-    func_00285828(0, 0, 0, 0);
-    func_00285788(0, 0);
-    func_002B49E0(4, 1, 9, ((Func002D5B58Root *)D_001F2840)->f14, 0);
+    snd_play_from_global_bank(4, 0, 0);
+    settings_store_four(0, 0, 0, 0);
+    menu_set_size_limits(0, 0);
+    request_begin_slot(4, 1, 9, ((Func002D5B58Root *)g_pause_menu_state)->f14, 0);
     goto done;
 L13:
-    func_002B49E0(4, 1, 11, ((Func002D5B58Root *)D_001F2840)->f14, 0);
+    request_begin_slot(4, 1, 11, ((Func002D5B58Root *)g_pause_menu_state)->f14, 0);
 done:
     return ret;
 }

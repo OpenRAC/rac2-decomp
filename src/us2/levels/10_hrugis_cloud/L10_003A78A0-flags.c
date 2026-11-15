@@ -1,66 +1,66 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
 extern unsigned char D_001A7A33 MACRO_ADDR;
-extern unsigned char D_001A7A32 MACRO_ADDR;
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern u32 func_00282978(u8 *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283CF0(float);
-extern void func_00282F20(float *, float *, float);
-extern float func_00282DB0(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern unsigned char g_bolt_multiplier MACRO_ADDR;
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern u32 FastDecTimer(u8 *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FloatToInt(float);
+extern void vec_scale_to_length(float *, float *, float);
+extern float FastVecDot(void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 extern int D_001A8FF0 MACRO_ADDR;
 extern float D_001A7DC0 MACRO_ADDR;
-extern f32 func_002AA898(f32 *position, f32 target, f32 *velocity,
+extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 #define NOT_SDA __attribute__((section(".data")))
 extern int r1_D_0012FCF0 NOT_SDA;
-extern s32 func_00283CF0(f32 value);
-extern s32 func_002A77E0(s32 limit);
-extern void func_00282F20(f32 *dst, f32 *a, f32 len);
+extern s32 FloatToInt(f32 value);
+extern s32 math_random_int_below(s32 limit);
+extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
 extern u32 ref_L04_00362768_00;
 extern u32 ref_L04_00362940_00;
-extern s32 func_002A8600(u32 *out, s32 kind, s32 arg2, s32 arg3);
-extern s32 func_002A86E8(u32 *out, u32 value, s32 arg2, s32 arg3);
-extern f32 func_00282DB0(void *a, void *b);
-extern f32 func_00282C10(f32 x);
-extern f32 func_00283248(f32 a, f32 b);
+extern s32 GetFirstMobyInGroup(u32 *out, s32 kind, s32 arg2, s32 arg3);
+extern s32 GetNextMobyInGroup(u32 *out, u32 value, s32 arg2, s32 arg3);
+extern f32 FastVecDot(void *a, void *b);
+extern f32 square_root(f32 x);
+extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern s32 func_001163B0(void);
 extern u8 *ref_L04_00358868_00[];
-extern s32 func_00283CF0(f32);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_002A77E0(s32);
-extern void func_00282CC0(void *, void *, void *);
+extern s32 FloatToInt(f32);
+extern f32 math_random_float_range(f32, f32);
+extern s32 math_random_int_below(s32);
+extern void FastVecAdd(void *, void *, void *);
 extern f32 D_002A7A40[];
 extern f32 D_002A7BC0[];
 extern s32 D_002A7D90[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
-extern u32 func_00282978(u8 *ptr);
+extern u32 FastDecTimer(u8 *ptr);
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_0038E880(void *, void *, void *);
-extern void func_L00_0038F3D8(void *);
+extern void FastVecScale(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
+extern void part_spawn_spark_puff(void *);
 typedef unsigned int B352Quad __attribute__((mode(TI)));
 typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 extern int D_L04_001AC790 __attribute__((sda));
 extern Collision D_L04_001BFAC0;
 extern Material D_L04_0027B470[];
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
 extern f32 D_L04_0023CA50[];
 extern f32 D_L04_0023CD70[];
 extern f32 D_L04_0023D220[];
@@ -72,8 +72,8 @@ extern u16 D_L04_0023DB80[];
 #define MACRO_ADDR __attribute__((section(".sdata")))
 extern s32 D_L04_001B2E70 MACRO_ADDR;
 extern u16 D_L04_001B2E74 MACRO_ADDR;
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 extern f32 D_L04_0023CA50[];
 extern f32 D_L04_0023CD70[];
 extern f32 D_L04_0023D220[];
@@ -84,8 +84,8 @@ extern u16 D_L04_0023D9F0[];
 extern u16 D_L04_0023DB80[];
 extern s32 D_L04_001B2E70;
 extern u16 D_L04_001B2E74;
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 extern u32 D_L04_001B2E84 __attribute__((sda));
 
 void func_US2_L10_003A7CB8(char *obj) {
@@ -111,10 +111,10 @@ void func_US2_L10_003A7CB8(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
+    FastVecAdd(position, position, ctx);
+    cam_compute_view_direction(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    part_spawn_spark_puff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
@@ -122,20 +122,20 @@ void func_US2_L10_003A7CB8(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L04_0027B470)->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L04_001BFAC0;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L04_001BFAC0;
             model = reread->hit;
@@ -147,29 +147,29 @@ void func_US2_L10_003A7CB8(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            vec_fast_normalize(&frame.velocity, ctx, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L04_001BFAC0;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            vec_fast_normalize(&frame.velocity, ctx, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (math_fast_float_d(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
+        table_clear_entry_flag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(obj, &frame.velocity, &frame.normal);
     }
 }

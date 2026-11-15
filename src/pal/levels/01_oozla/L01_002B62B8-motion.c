@@ -41,24 +41,24 @@ typedef struct PlayerMotionView {
     u8 padA70[0x2294 - 0xA70];
     int state;                           
 } PlayerMotionView;
-extern PlayerMotionView D_00189E20;
+extern PlayerMotionView g_hero_state;
 extern void func_PAL_L00_002D4668(void *, void *, void *);
-extern float func_L00_002D3A58(void *);
-extern float func_L00_002D3B00(void *);
-extern void func_L00_002D3B58(void *, void *, float);
-extern void func_L00_002D3BD8(void *, void *, float);
-extern void func_L00_002D3960(void *, void *);
-extern float func_L00_002B5590(MotionVector *);
-extern void func_L00_002B5A88(void);
+extern float cam_get_view_space_vector_length(void *);
+extern float cam_get_view_space_height(void *);
+extern void cam_set_view_space_height(void *, void *, float);
+extern void cam_set_view_space_vector_length(void *, void *, float);
+extern void cam_project_vector_onto_view_plane(void *, void *);
+extern float hero_get_speed_along_forward(MotionVector *);
+extern void hero_resolve_collision_with_rewind(void);
 extern void func_PAL_L00_002B5178(void);
-extern void func_L01_002B5218(void);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282C88(void *);
-extern float func_00282DF0(void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void UpdateOozlaHeroGroundContacts(void);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_clear_128(void *);
+extern float FastVecLength(void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Apply the hero's velocity, resolve contacts, then measure the movement that resulted. */
 void func_PAL_L01_002B62B8(void)
@@ -70,117 +70,117 @@ void func_PAL_L01_002B62B8(void)
     float amount;
     float zero;
 
-    qcopy(&start, &D_00189E20.position);
-    func_PAL_L00_002D4668(D_00189E20.ledgeMoby, &D_00189E20.platformDelta, &D_00189E20.rotation);
+    qcopy(&start, &g_hero_state.position);
+    func_PAL_L00_002D4668(g_hero_state.ledgeMoby, &g_hero_state.platformDelta, &g_hero_state.rotation);
 
     /* Keep a step within the collision radius, and a fall within the ground distance. */
-    if (D_00189E20.state == 20 || D_00189E20.state == 91 ||
-        D_00189E20.state == 88 || D_00189E20.state == 129) {
-        if (D_00189E20.collisionOffFrames == 0) {
-            amount = func_L00_002D3A58(&D_00189E20.velocity);
-            if (D_00189E20.capsuleRadius - 0.02f < amount)
-                func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, D_00189E20.capsuleRadius - 0.02f);
+    if (g_hero_state.state == 20 || g_hero_state.state == 91 ||
+        g_hero_state.state == 88 || g_hero_state.state == 129) {
+        if (g_hero_state.collisionOffFrames == 0) {
+            amount = cam_get_view_space_vector_length(&g_hero_state.velocity);
+            if (g_hero_state.capsuleRadius - 0.02f < amount)
+                cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, g_hero_state.capsuleRadius - 0.02f);
         }
-        amount = func_L00_002D3B00(&D_00189E20.velocity);
-        if (amount < -D_00189E20.groundDistance) {
-            amount = -D_00189E20.groundDistance - 0.02f;
+        amount = cam_get_view_space_height(&g_hero_state.velocity);
+        if (amount < -g_hero_state.groundDistance) {
+            amount = -g_hero_state.groundDistance - 0.02f;
             if (0.0f < amount)
                 amount = 0.0f;
-            func_L00_002D3B58(&D_00189E20.velocity, &D_00189E20.velocity, amount);
+            cam_set_view_space_height(&g_hero_state.velocity, &g_hero_state.velocity, amount);
         }
-    } else if (D_00189E20.collisionOffFrames == 0) {
-        amount = func_00282DF0(&D_00189E20.velocity);
-        if (D_00189E20.capsuleRadius - 0.02f < amount)
-            func_00282F20(&D_00189E20.velocity, &D_00189E20.velocity, D_00189E20.capsuleRadius - 0.02f);
+    } else if (g_hero_state.collisionOffFrames == 0) {
+        amount = FastVecLength(&g_hero_state.velocity);
+        if (g_hero_state.capsuleRadius - 0.02f < amount)
+            vec_scale_to_length(&g_hero_state.velocity, &g_hero_state.velocity, g_hero_state.capsuleRadius - 0.02f);
     }
 
     /* Move, then resolve the collisions. */
-    func_00282CC0(&D_00189E20.position, &D_00189E20.position, &D_00189E20.velocity);
-    func_00282CC0(&D_00189E20.position, &D_00189E20.position, &D_00189E20.moveImpulse);
-    func_00282C88(&D_00189E20.moveImpulse);
-    D_00189E20.wallHit = 0;
-    D_00189E20.hitMoby = 0;
-    if (func_00282DF0(&D_00189E20.platformDelta) <= 0.0001f) {
-        func_L00_002B5A88();
-        func_L01_002B5218();
-        func_00282CF0(&D_00189E20.displacement, &D_00189E20.position, &start);
+    FastVecAdd(&g_hero_state.position, &g_hero_state.position, &g_hero_state.velocity);
+    FastVecAdd(&g_hero_state.position, &g_hero_state.position, &g_hero_state.moveImpulse);
+    vec_clear_128(&g_hero_state.moveImpulse);
+    g_hero_state.wallHit = 0;
+    g_hero_state.hitMoby = 0;
+    if (FastVecLength(&g_hero_state.platformDelta) <= 0.0001f) {
+        hero_resolve_collision_with_rewind();
+        UpdateOozlaHeroGroundContacts();
+        FastVecSub(&g_hero_state.displacement, &g_hero_state.position, &start);
         func_PAL_L00_002B5178();
     } else {
-        func_L01_002B5218();
+        UpdateOozlaHeroGroundContacts();
     }
 
     /* The part of the movement along the velocity, in full and split horizontally and vertically. */
-    func_00282CF0(&D_00189E20.resolvedVelocity, &D_00189E20.position, &start);
-    qcopy(&D_00189E20.resolvedHorizontal, &D_00189E20.resolvedVelocity);
-    qcopy(&D_00189E20.resolvedVertical, &D_00189E20.resolvedVelocity);
+    FastVecSub(&g_hero_state.resolvedVelocity, &g_hero_state.position, &start);
+    qcopy(&g_hero_state.resolvedHorizontal, &g_hero_state.resolvedVelocity);
+    qcopy(&g_hero_state.resolvedVertical, &g_hero_state.resolvedVelocity);
     zero = 0.0f;
-    func_00282F20(&D_00189E20.resolvedVelocity, &D_00189E20.resolvedVelocity, 1.0f);
+    vec_scale_to_length(&g_hero_state.resolvedVelocity, &g_hero_state.resolvedVelocity, 1.0f);
     {
-        float projection = func_00282DB0(&D_00189E20.resolvedVelocity, &D_00189E20.velocity);
+        float projection = FastVecDot(&g_hero_state.resolvedVelocity, &g_hero_state.velocity);
         if (projection < zero)
             projection = zero;
-        func_00282F20(&D_00189E20.resolvedVelocity, &D_00189E20.velocity, projection);
+        vec_scale_to_length(&g_hero_state.resolvedVelocity, &g_hero_state.velocity, projection);
     }
-    qcopy(&work, &D_00189E20.velocity);
-    func_L00_002D3960(&work, &work);
-    func_L00_002D3960(&D_00189E20.resolvedHorizontal, &D_00189E20.resolvedHorizontal);
-    func_00282F20(&D_00189E20.resolvedHorizontal, &D_00189E20.resolvedHorizontal, 1.0f);
+    qcopy(&work, &g_hero_state.velocity);
+    cam_project_vector_onto_view_plane(&work, &work);
+    cam_project_vector_onto_view_plane(&g_hero_state.resolvedHorizontal, &g_hero_state.resolvedHorizontal);
+    vec_scale_to_length(&g_hero_state.resolvedHorizontal, &g_hero_state.resolvedHorizontal, 1.0f);
     {
-        float projection = func_00282DB0(&D_00189E20.resolvedHorizontal, &work);
+        float projection = FastVecDot(&g_hero_state.resolvedHorizontal, &work);
         if (projection < zero)
             projection = zero;
-        func_00282F20(&D_00189E20.resolvedHorizontal, &work, projection);
+        vec_scale_to_length(&g_hero_state.resolvedHorizontal, &work, projection);
     }
-    qcopy(&vertical, &D_00189E20.velocity);
-    func_L00_002D3BD8(&vertical, &vertical, zero);
-    func_L00_002D3BD8(&D_00189E20.resolvedVertical, &D_00189E20.resolvedVertical, zero);
-    func_00282F20(&D_00189E20.resolvedVertical, &D_00189E20.resolvedVertical, 1.0f);
+    qcopy(&vertical, &g_hero_state.velocity);
+    cam_set_view_space_vector_length(&vertical, &vertical, zero);
+    cam_set_view_space_vector_length(&g_hero_state.resolvedVertical, &g_hero_state.resolvedVertical, zero);
+    vec_scale_to_length(&g_hero_state.resolvedVertical, &g_hero_state.resolvedVertical, 1.0f);
     {
-        float projection = func_00282DB0(&D_00189E20.resolvedVertical, &vertical);
+        float projection = FastVecDot(&g_hero_state.resolvedVertical, &vertical);
         if (projection < zero)
             projection = zero;
-        func_00282F20(&D_00189E20.resolvedVertical, &vertical, projection);
+        vec_scale_to_length(&g_hero_state.resolvedVertical, &vertical, projection);
     }
-    D_00189E20.speed = func_00282DF0(&D_00189E20.resolvedVelocity);
-    D_00189E20.flatSpeed = func_L00_002D3A58(&D_00189E20.resolvedVelocity);
+    g_hero_state.speed = FastVecLength(&g_hero_state.resolvedVelocity);
+    g_hero_state.flatSpeed = cam_get_view_space_vector_length(&g_hero_state.resolvedVelocity);
     /* A plain value copy here; the other transfers go through qcopy. */
-    *(VectorBits *)&work = *(VectorBits *)&D_00189E20.resolvedVelocity;
-    D_00189E20.forwardSpeed = func_L00_002B5590(&work);
-    D_00189E20.verticalSpeed = func_L00_002D3B00(&D_00189E20.resolvedVelocity);
-    if (D_00189E20.forwardSpeed < zero)
-        D_00189E20.forwardSpeed = zero;
+    *(VectorBits *)&work = *(VectorBits *)&g_hero_state.resolvedVelocity;
+    g_hero_state.forwardSpeed = hero_get_speed_along_forward(&work);
+    g_hero_state.verticalSpeed = cam_get_view_space_height(&g_hero_state.resolvedVelocity);
+    if (g_hero_state.forwardSpeed < zero)
+        g_hero_state.forwardSpeed = zero;
 
     /* Then follow the platform, keeping the w of its delta. */
-    qcopy(&work, &D_00189E20.position);
-    if (0.0001f < func_00282DF0(&D_00189E20.platformDelta)) {
+    qcopy(&work, &g_hero_state.position);
+    if (0.0001f < FastVecLength(&g_hero_state.platformDelta)) {
         float saved;
 
-        func_00282CC0(&D_00189E20.position, &D_00189E20.position, &D_00189E20.platformDelta);
-        saved = D_00189E20.platformDelta.w;
-        func_00282C88(&D_00189E20.platformDelta);
-        D_00189E20.platformDelta.w = saved;
-        func_L00_002B5A88();
-        func_L01_002B5218();
-        func_00282CF0(&D_00189E20.displacement, &D_00189E20.position, &start);
+        FastVecAdd(&g_hero_state.position, &g_hero_state.position, &g_hero_state.platformDelta);
+        saved = g_hero_state.platformDelta.w;
+        vec_clear_128(&g_hero_state.platformDelta);
+        g_hero_state.platformDelta.w = saved;
+        hero_resolve_collision_with_rewind();
+        UpdateOozlaHeroGroundContacts();
+        FastVecSub(&g_hero_state.displacement, &g_hero_state.position, &start);
         func_PAL_L00_002B5178();
     }
-    func_00282CF0(&D_00189E20.platformCarry, &D_00189E20.position, &work);
-    D_00189E20.platformDistance = func_00282DF0(&D_00189E20.platformCarry);
-    D_00189E20.platformCarry.w = D_00189E20.platformDelta.w;
-    D_00189E20.platformDelta.w = zero;
+    FastVecSub(&g_hero_state.platformCarry, &g_hero_state.position, &work);
+    g_hero_state.platformDistance = FastVecLength(&g_hero_state.platformCarry);
+    g_hero_state.platformCarry.w = g_hero_state.platformDelta.w;
+    g_hero_state.platformDelta.w = zero;
 
     /* Total displacement, its slope and a cap on its length. */
-    func_00282CF0(&D_00189E20.displacement, &D_00189E20.position, &start);
-    D_00189E20.slope = zero;
-    if (0.004f < D_00189E20.flatSpeed) {
-        D_00189E20.slope = D_00189E20.displacement.z / D_00189E20.flatSpeed;
-        if (0.5f < D_00189E20.slope)
-            D_00189E20.slope = 0.5f;
-        else if (D_00189E20.slope < -0.5f)
-            D_00189E20.slope = -0.5f;
+    FastVecSub(&g_hero_state.displacement, &g_hero_state.position, &start);
+    g_hero_state.slope = zero;
+    if (0.004f < g_hero_state.flatSpeed) {
+        g_hero_state.slope = g_hero_state.displacement.z / g_hero_state.flatSpeed;
+        if (0.5f < g_hero_state.slope)
+            g_hero_state.slope = 0.5f;
+        else if (g_hero_state.slope < -0.5f)
+            g_hero_state.slope = -0.5f;
     }
-    if (1.0400001f < D_00189E20.speed) {
-        func_00282D30(&D_00189E20.displacement, &D_00189E20.displacement, 1.0400001f / D_00189E20.speed);
-        D_00189E20.speed = 1.0400001f;
+    if (1.0400001f < g_hero_state.speed) {
+        FastVecScale(&g_hero_state.displacement, &g_hero_state.displacement, 1.0400001f / g_hero_state.speed);
+        g_hero_state.speed = 1.0400001f;
     }
 }

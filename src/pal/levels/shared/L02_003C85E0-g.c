@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int a;
@@ -10,9 +11,9 @@ typedef struct {
 extern L02Pair2 D_L02_001AFE20;
 extern L02Pair D_L02_001AFE28;
 extern L02Pair D_L02_001AFE30;
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
 typedef struct {
     char pad0[0x20];
     unsigned char kind;
@@ -40,25 +41,25 @@ void func_PAL_L02_003C8A18(L02Owner *self)
     float t;
 
     for (i = 1; i >= 0; i--) {
-        *angle = func_00283B98(*angle, *step * 0.0003490659f);
+        *angle = FastAddRotations(*angle, *step * 0.0003490659f);
         angle++;
         step++;
     }
     if (self->kind == 5) {
-        t = func_00283198(*(float *)(state + 0x128));
-        t = t + func_00283198(*(float *)(state + 0x12C));
+        t = math_fast_sin_or_cos_b(*(float *)(state + 0x128));
+        t = t + math_fast_sin_or_cos_b(*(float *)(state + 0x12C));
         t = t * 0.25f;
-        self->tint = func_00283D38(high.a, high.b, t + 0.5f);
+        self->tint = FastTweenColor(high.a, high.b, t + 0.5f);
     } else {
-        a = func_00283198(*(float *)(state + 0x128)) * 0.5f + 0.5f;
-        b = func_00283198(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
+        a = math_fast_sin_or_cos_b(*(float *)(state + 0x128)) * 0.5f + 0.5f;
+        b = math_fast_sin_or_cos_b(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
         if (a < b)
             a = b;
         {
             float u = a;
             for (j = 2; j >= 0; j--)
                 u = u * a;
-            self->tint = func_00283D38(low.a, low.b, u);
+            self->tint = FastTweenColor(low.a, low.b, u);
         }
     }
 }

@@ -36,8 +36,8 @@ typedef struct malloc_chunk *mbinptr;
 typedef u32 INTERNAL_SIZE_T;
 typedef void Void_t;
 
-extern void func_00116300(struct _reent *);
-extern void func_00116360(struct _reent *);
+extern void malloc_lock_acquire(struct _reent *);
+extern void malloc_lock_release(struct _reent *);
 extern void func_00116460(struct _reent *, INTERNAL_SIZE_T);
 
 extern u32 D_001341E8[];
@@ -175,7 +175,7 @@ extern u32 D_001341E8[];
 #define RCALL reent_ptr,
 
 /* Finds a free block of heap memory of the requested size and hands it out. */
-void *func_001166C8(struct _reent *reent_ptr, u32 bytes) {
+void *malloc_reentrant(struct _reent *reent_ptr, u32 bytes) {
   mchunkptr victim;                  /* inspected/selected chunk */
   INTERNAL_SIZE_T victim_size;       /* its size */
   int       idx;                     /* index for bin traversal */

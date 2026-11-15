@@ -12,16 +12,16 @@ typedef struct Scene {
     u8 pad54[0x138];
     u8 *objects[0];
 } Scene;
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern Scene D_L10_001BD380;
 extern u8 D_L10_00296E90[];
 extern u8 D_L10_00296EB0[];
 extern u8 D_L10_001A93E0[64] __attribute__((sda));
 extern u8 D_L10_001B9680[];
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
 
 void func_PAL_L10_00318BA0(void) {
     f32 tmp[4] __attribute__((aligned(16)));
@@ -29,7 +29,7 @@ void func_PAL_L10_00318BA0(void) {
     u8 *obj;
     u8 *dst, *src;
 
-    if (D_001A79F0 != 10) {
+    if (g_current_map_index != 10) {
         return;
     }
     low = -1;
@@ -62,11 +62,11 @@ void func_PAL_L10_00318BA0(void) {
             src = D_L10_001A93E0;
             for (j = 0; j < 4; j++) {
                 u8 *out = dst + j * 16;
-                func_00283098(out, src + j * 16, obj + 0xC0);
-                func_00282CC0(out, out, obj + 0x10);
-                func_00282CF0(tmp, D_L10_001B9680, out);
-                func_00282F20(tmp, tmp, 0.15f);
-                func_00282CC0(out, out, tmp);
+                matrix_mul_vec3(out, src + j * 16, obj + 0xC0);
+                FastVecAdd(out, out, obj + 0x10);
+                FastVecSub(tmp, D_L10_001B9680, out);
+                vec_scale_to_length(tmp, tmp, 0.15f);
+                FastVecAdd(out, out, tmp);
             }
         }
         *(u8 **)(D_L10_001BD380.target + 0x68) = D_L10_001BD380.objects[slot];

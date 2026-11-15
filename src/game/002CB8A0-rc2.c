@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -35,11 +36,11 @@ extern s32 D_001AA700 __attribute__((sda));
 extern s32 D_001AA718 __attribute__((sda));
 extern s32 D_001AA730 __attribute__((sda));
 extern s32 D_001AA748 __attribute__((sda));
-extern s8 D_00189E20[];
-extern s32 func_002D5E70(void *, void *);
+extern s8 g_hero_state[];
+extern s32 menu_process_entry_request(void *, void *);
 
 /* Runs one of seven menu actions chosen by number. Each one passes a different settings block to a shared handler. */
-s32 func_002CB8A0(u32 action) {
+s32 menu_run_action_by_index(u32 action) {
     void *target;
     void *result;
     s32 local = 0;
@@ -55,7 +56,7 @@ goto *D_0026CCC0[rc2_selector];
 
         rc2_case_0:
             result = &local;
-            table = gHeroState;
+            table = g_hero_state;
             (*(s32 *)((char *)(table) + (0x22C8))) = (*(s32 *)((char *)(table) + (0x1248)));
             target = &D_001AA6B8;
             goto rc2_switch_end;
@@ -86,7 +87,7 @@ goto *D_0026CCC0[rc2_selector];
         
 rc2_switch_end: ;
 }
-        result = (void *) ProcessEntryRequest(target, result);
+        result = (void *) menu_process_entry_request(target, result);
     }
     return (s32) result;
 }

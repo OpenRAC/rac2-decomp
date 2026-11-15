@@ -10,13 +10,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 /* Sets the object's state to 7, then copies the 16-byte vector at A1 into its state at +0xF0. */
 /* Same body as func_L02_003CADA8, with this function's own callees. */
-void func_L03_0041F048(char *moby, char *vector) {
+void laser_bot_set_state_copy_vector(char *moby, char *vector) {
     char *state = *(char **)(moby + 0x68);
 
-    SetMobyState(moby, 7, 2);
+    moby_set_state(moby, 7, 2);
     *(TI128 *)(state + 0x1B0) = *(TI128 *)vector;
 }

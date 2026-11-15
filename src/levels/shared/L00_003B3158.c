@@ -34,13 +34,13 @@ typedef struct {
     Moby *target;               /* 0x1450: the current target */
 } Hero;
 
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern u32 D_00138320[];        /* controller 1's held buttons (D_00138180 + 0x1A0) */
-extern float *func_002AB1F0(Moby *moby);
-extern int func_002AF580(void *origin, void *direction, int *count, Moby **candidates, int capacity,
+extern float *moby_get_private_value_0(Moby *moby);
+extern int SelectBestTargetInCone(void *origin, void *direction, int *count, Moby **candidates, int capacity,
                          int, int, void *config,
                          float angle0, float angle1, float range, float angle2, float angle3);
-extern float func_00282E80(void *from, void *to);
+extern float vec_distance_xy(void *from, void *to);
 
 typedef struct OBJ {
     char pad0[32];
@@ -120,15 +120,15 @@ extern void func_310440();
 /* func_L00_003B63D8 is defined in L00_003B63D8-counter-g8.c. */
 
 
-extern void func_L00_003B6B70();
-extern void func_L00_003B6F88();
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002833F0(void *, void *);
+extern void UpdatePairedActorMovement();
+extern void pair_game_resolve_collisions();
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
 extern void func_002A0F48(void *);
 extern char D_L00_001B8FF0[];
 
-void func_L00_003B69D8(NODE *object)
+void UpdatePairedObjects(NODE *object)
 {
     void **slots;
     void **p;
@@ -139,7 +139,7 @@ void func_L00_003B69D8(NODE *object)
     slots = object->f68;
     UpdatePairedActorMovement();
     v = (char *)slots;
-    ResolvePairedActorCollisions(object);
+    pair_game_resolve_collisions(object);
     q = v + 0x10;
     p = slots;
     for (i = 1; i >= 0; i--) {
@@ -154,7 +154,7 @@ void func_L00_003B69D8(NODE *object)
 }
 
 /* Removes the two ships and every other object of the same kind when the minigame ends. */
-void func_L00_003B6A90(NODE *object)
+void pair_game_destroy_objects(NODE *object)
 {
     void **b = (void **)object->f68;
     OBJ *p;
@@ -187,7 +187,7 @@ void func_L00_003B6A90(NODE *object)
 
 
 /* Wraps two coordinates around to the opposite side when they go past the edge of the play area. */
-void func_L00_003B7190(float *valueA, float *valueB)
+void pair_game_wrap_coordinates(float *valueA, float *valueB)
 {
     if (func_2EE048(*valueA) > ref_L00_003B7190_00) {
         if (*valueA < -ref_L00_003B7190_00)
@@ -210,7 +210,7 @@ void func_L00_003B7190(float *valueA, float *valueB)
 
 /* shared native body of family 32969de2c02196ef */
 /* Calls the update function of every other live object of the same kind as the main object. */
-void func_L00_003B75C8(void *object)
+void moby_update_same_class(void *object)
 {
     OBJ *p;
     short key = D_L06_001AC000->fAA;
@@ -234,7 +234,7 @@ void func_L00_003B75C8(void *object)
 /* func_L00_003B79A0 is defined in L00_003B3158-collect-g8.c. */
 
 /* Updates the helper object by testing its position, with an extra offset when one is set. */
-void func_L00_003B8158(NODE *object)
+void helper_update_hit_test(NODE *object)
 {
     NODE *vars = object->f68;
 
@@ -255,7 +255,7 @@ void func_L00_003B8158(NODE *object)
 /* Picks a target: the hero's current one while it is live; else, of the class 0xEE1 mobies
    func_002AF580 finds, the preferred one (while controller 1 holds a button of the hero's
    buttonMask) or the first one in range. */
-Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
+Moby *SelectCurrentOrPreferredTarget(void *origin, void *direction, Moby *preferred,
                         float angle0, float angle1, float range, float angle2, float angle3)
 {
     Moby *candidates[20];
@@ -269,18 +269,18 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
     TargetVars *fallbackVars;
     int j;
 
-    current = gHeroState.target;
+    current = g_hero_state.target;
     if (current && current->state != 0xFE && current->state != 0xFD) {
-        info = GetMobyPrivateValue0(current);
+        info = moby_get_private_value_0(current);
         if (info && *info > 0.0f)
-            return gHeroState.target;
+            return g_hero_state.target;
     }
 
     SelectBestTargetInCone(origin, direction, &count, candidates, 20, 0, 0, 0,
                   angle0, angle1, range, angle2, angle3);
 
     /* The preferred moby first. */
-    if (gHeroState.f340 && !gHeroState.f34E && (D_00138320[0] & gHeroState.buttonMask)
+    if (g_hero_state.f340 && !g_hero_state.f34E && (D_00138320[0] & g_hero_state.buttonMask)
         && preferred && preferred->state != 0xFE && preferred->state != 0xFD) {
         for (i = 0; i < count; ++i) {
             candidate = candidates[i];

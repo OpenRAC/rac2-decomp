@@ -11,7 +11,7 @@ typedef struct {
 
 extern Entry_r002F46C8 D_L00_0027D848[];
 
-extern char D_0018C958[];
+extern char g_subtitle_history[];
 
 extern short D_L00_0027D880[];
 
@@ -20,14 +20,14 @@ extern void func_2F4490(int, int);
 extern int r1_func_0011CC38();
 
 /* Does nothing. */
-void func_L00_002F4400(void)
+void level_no_op_hook(void)
 {
 }
 
 
 /* Clears the top bit in the same field of each of 161 entries in a table. */
-void func_L00_002F45B8(void) {
-    char *base = gSubtitleHistory;
+void level_clear_entry_top_bits(void) {
+    char *base = g_subtitle_history;
     int *field = (int *)(base + 8);
     unsigned int mask = 0x7FFFFFFF;
     int i = 0xA0;
@@ -40,17 +40,17 @@ void func_L00_002F45B8(void) {
 
 
 /* Sets the first entry of a level table to zero. */
-void func_L00_002F4720(void) {
+void level_clear_second_table_entry(void) {
     D_L00_0027D880[0] = 0;
 }
 
 /* Does nothing. */
-void func_L00_002F51B0(void)
+void level_no_op_hook_b(void)
 {
 }
 
 /* Only the second mode triggers the spawn. */
-void func_L00_002F5890(int mode) {
+void level_spawn_on_second_mode(int mode) {
     if (mode == 2)
         func_2F4490(0xA01, 0x58);
 }
@@ -66,7 +66,7 @@ extern UpdateRecord_2F7298 D_L00_0027DD00[13];
 
 /* The func_0028B6C8 table search: raises a free record's peak to VALUE; 1 when the key is
    missing or the record busy. */
-int func_L00_002F7298(int key, int value)
+int level_raise_record_peak(int key, int value)
 {
     int i;
     for (i = 0; i < 13; i++) {
@@ -89,16 +89,16 @@ int func_L00_002F7298(int key, int value)
 /* rac1-decomp src/core/00119D88.c: func_0011CCB0 */
 /* Returns its callee's value: retail keeps the frame and calls, and
    2.9-ee would tail-call it (a bare `j`) if it were void. */
-int func_L00_002F7568(void) {
+int level_call_helper_a(void) {
     return r1_func_0011CC38();
 }
 
 /* Always answers zero. */
-int func_L00_002F7588(void) {
+int level_return_zero_a(void) {
     return 0;
 }
 
 /* Always answers zero. */
-int func_L00_002F9858(void) {
+int level_return_zero_b(void) {
     return 0;
 }

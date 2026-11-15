@@ -8,11 +8,11 @@ typedef struct {
 } CollisionResult;
 
 extern CollisionResult D_L08_001BFF40;
-extern int func_00277258(void *, int, void *, float);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_0029F338(void *);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern int coll_test_point(void *, int, void *, float);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void moby_mark_spawned(void *);
+extern int CollLine(void *, void *, int, void *, int);
 
 
 
@@ -28,33 +28,33 @@ typedef struct {
 extern LensFlare D_L08_001B9E00;
 extern u8 D_L08_001B9B00[];
 extern int D_L08_001B0DC0;
-extern ScreenExtent D_001A7340 __attribute__((sda));
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283CE0(int);
-extern void func_00279BD8(f32 *, void *);
-extern long long func_0027C878(int);
-extern f32 func_00282C48(f32);
-extern int func_00283CF0(f32);
-extern void func_002FC560(int, long long);
-extern void func_0027E018(int, int, int, int, int, int, int, int, long long, long long);
+extern ScreenExtent g_screen_width __attribute__((sda));
+extern f32 fast_vec_dist(void *, void *);
+extern f32 IntToFloat(int);
+extern void gfx_project_world_point_to_screen(f32 *, void *);
+extern long long GetEffectTextureDescriptor(int);
+extern f32 math_fabs(f32);
+extern int FloatToInt(f32);
+extern void VU1_addGSregister(int, long long);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, long long, long long);
 
 
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 
 
-extern int func_00283CF0(float);
-extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern int FloatToInt(float);
+extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern int func_001163B0(void);
-extern void func_002A8D70(void *, int, int, int, int, int, float, float, float);
-extern void func_00283658(void *, void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_L03_00339128(void *, void *, int, int, int, int, int, float);
-extern void func_L01_003120A8(void *, void *, void *, int, int, int, int, float, float);
-extern float func_00283B98(float, float);
+extern void coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
+extern void copy_matrix_rotation(void *, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void effect_create_timed(void *, void *, int, int, int, int, int, float);
+extern void coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
+extern float FastAddRotations(float, float);
 extern int D_0018C0BC;
 
 /* the level's object-handle table entry: 0x100 bytes, indexed by the handle */
@@ -155,20 +155,20 @@ extern f32 func_2FA3E0(f32);
 extern void func_2F9DF0(void *, void *, void *);
 extern void func_2F9E20(void *, void *, void *);
 extern void func_2FA0B8(void *, void *, f32);
-extern void func_L08_00422B98(Ent *);
+extern void sandfly_pick_flight_target(Ent *);
 extern f32 D_L08_001BFF68;
 extern f32 D_00189EA8;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern f32 func_L08_00422850(Quad *, f32, f32, f32, f32);
-extern void func_L08_00422900(Ent *);
-extern void func_L08_00422AD8(Ent *);
+extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
+extern void vehicle_compute_height_limits(Ent *);
+extern void sandfly_release_sounds(Ent *);
 
 /* func_L08_003D8348 is defined in L08_003D8348-init.c. */
 
 /* the entry's sound handle and both of the moby's own handles are released */
 /* Stops the sounds this creature is playing and marks it as finished. */
-void func_L08_003D8A28(Ent *moby)
+void crawler_release_sounds(Ent *moby)
 {
     Moby *vars = moby->f68;
     s32 done, secondHandle;
@@ -190,41 +190,41 @@ void func_L08_003D8A28(Ent *moby)
 
 /* func_L08_003D8CA8 is matched in its own unit, src/levels/08_tabora/L08_003D8CA8.c (-g). */
 
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern int func_00282948(void *);
-extern float func_002A7878(float, float);
-extern float func_00282E80(void *, void *);
-extern int func_002B4FF0(u8 *, void *, float);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern int math_fast_float_d(void *);
+extern float math_random_float_range(float, float);
+extern float vec_distance_xy(void *, void *);
+extern int moby_turn_toward_target_and_step(u8 *, void *, float);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
 
 /* Walks the Spitting Dune Crawler toward its goal at the given speed and turn rate, switches its wobble now and then, and sets its animation speed from how fast it moves. */
-int func_L08_003D9038(u8 *object, float accel, float unused1, float damping,
+int crawler_move_toward_goal(u8 *object, float accel, float unused1, float damping,
                      float speed, float unused4, float turn, float friction) {
     u8 *state = *(u8 **)(object + 0x68);
     int result;
     float amount;
 
-    SetControllerSpeedLimits(object, speed * 0.00027777778450399637f,
+    moby_set_controller_speed_limits(object, speed * 0.00027777778450399637f,
                   turn * 0.01666666753590107f,
                   accel * 4.848137450608192e-06f,
                   damping * 0.0002908882452175021f);
     *(float *)(state + 0x154) = friction;
-    if (FastFloatHelperD(state + 0x474) != 0) {
+    if (math_fast_float_d(state + 0x474) != 0) {
         *(float *)(state + 0x46C) = -*(float *)(state + 0x46C);
         *(float *)(state + 0x470) = *(float *)(state + 0x46C) * 0.01745329424738884f;
-        *(int *)(state + 0x474) = RandomFloatRange(30.0f, 90.0f);
+        *(int *)(state + 0x474) = math_random_float_range(30.0f, 90.0f);
     }
     if (*(int *)(state + 0x48C) != 0 ||
         (object[0x20] == 8 && object[0x95] != 0) ||
         vec_distance_xy(object + 0x10, state + 0x3F0) < 5.0f)
         *(float *)(state + 0x470) = 0;
-    result = TurnTowardTargetAndStepMovement(object, state + 0x3F0, *(float *)(state + 0x470));
+    result = moby_turn_toward_target_and_step(object, state + 0x3F0, *(float *)(state + 0x470));
     amount = FastVecLength(state + 0x1C0);
-    amount += FloatAbs(*(float *)(state + 0x1D4));
+    amount += math_fabs(*(float *)(state + 0x1D4));
     if (result & 15) {
-        FastFloatHelperD(state + 0x448);
-        amount = FloatAbs(*(float *)(state + 0x1D4)) + 0.010000000707805157f;
+        math_fast_float_d(state + 0x448);
+        amount = math_fabs(*(float *)(state + 0x1D4)) + 0.010000000707805157f;
     }
     *(float *)(object + 0x48) = amount * 29.999998092651367f;
     if (*(float *)(object + 0x48) > 1.5f)
@@ -236,7 +236,7 @@ int func_L08_003D9038(u8 *object, float accel, float unused1, float damping,
 
 /* the countdown runs while the entry is flagged, then the timer field saturates */
 /* Counts down the crawler's timers and ages it by one frame. */
-void func_L08_003D9208(Ent *moby)
+void crawler_tick_timers(Ent *moby)
 {
     Moby *vars = moby->f68;
     u16 age;
@@ -278,24 +278,24 @@ typedef struct {
     u8 padE0[0x21B0];
     int handle;
 } HeroTarget;
-extern HeroTarget D_00189E20;
+extern HeroTarget g_hero_state;
 extern HeightGate D_L08_001CA080;
 extern char D_L08_001BFF80[];
-extern int func_00278E78(void);
-extern void func_002A93B0(void *);
-extern void func_L08_003D82F0(void *);
-extern void func_00283410(void *, void *);
-extern void func_00283698(void *, void *);
-extern float func_002A89A8(void *, int, float);
-extern float func_00283248(float, float);
+extern int GetCollHitMaterial(void);
+extern void moby_update_ground_check(void *);
+extern void moby_store_ground_height(void *);
+extern void euler_to_matrix(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float mat_fast_helper_a(float, float);
 /* EE ABI interleaving of (f32 *, f32 *, s32, f32, f32, f32, f32): each bank keeps its order. */
-extern float func_002AAA00(void *, void *, float, float, float, float, int);
-extern float func_00283BE0(float, float);
-extern void func_002AEC48(void *, void *, int, float, float);
-extern void func_00283098(void *, void *, void *);
+extern float math_approach_target_with_direction_mode(void *, void *, float, float, float, float, int);
+extern float fast_subtract_rotations(float, float);
+extern void moby_update_eased_node(void *, void *, int, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 /* Handles hits on the Spitting Dune Crawler and turns its body and three joints to face the hero. */
-void func_L08_003D92D8(u8 *object)
+void crawler_update_hits_aim(u8 *object)
 {
     float point[4], angles[4], matrix[16], inverse[16], other[16];
     char *state = *(char **)(object + 0x68);
@@ -313,10 +313,10 @@ void func_L08_003D92D8(u8 *object)
         }
     }
     if (object[0x31] && fast_vec_dist(object + 0x10, D_L08_001B9B00) < 24.0f) {
-        UpdateMobyGroundCheck(object);
+        moby_update_ground_check(object);
         object[0x6F] = 22;
     }
-    StoreGroundHeightBelowMoby(object);
+    moby_store_ground_height(object);
     if (*(float *)(object + 0x18) < *(float *)(state + 0x434) + 0.12f) {
         if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 11) {
             *(int *)(state + 0x20) = 0;
@@ -330,7 +330,7 @@ void func_L08_003D92D8(u8 *object)
     if (hit) {
         if (hit == 5) *(int *)(state + 0xE0) = 0;
         *(int *)(state + 0x48C) = 240;
-        ReleaseCrawlerSounds((Ent *)object);
+        crawler_release_sounds((Ent *)object);
     }
     if (object[0x20] < 9 && object[0x20] != 4) {
         pitchAngle = (float *)(object + 0xF4);
@@ -341,26 +341,26 @@ void func_L08_003D92D8(u8 *object)
         euler_to_matrix(matrix, point);
         matrix_from_basis_rows(inverse, matrix);
         matrix_from_basis_rows(other, object + 0xC0);
-        ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
+        coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         func_2FA0B8(angles, D_L08_001BFF80, 1.0f);
         matrix_mul_vec3(angles, angles, inverse);
-        target = FastMatrixHelperA(angles[2], angles[0]);
-        ApproachTargetWithDirectionMode(pitchAngle, state + 0x460, target, 0.0017453294713050127f,
+        target = mat_fast_helper_a(angles[2], angles[0]);
+        math_approach_target_with_direction_mode(pitchAngle, state + 0x460, target, 0.0017453294713050127f,
                       0.0017453294713050127f, 0.10471977293491364f, 0);
-        target = -FastMatrixHelperA(angles[2], angles[1]);
-        ApproachTargetWithDirectionMode(rollAngle, state + 0x464, target, 0.0017453294713050127f,
+        target = -mat_fast_helper_a(angles[2], angles[1]);
+        math_approach_target_with_direction_mode(rollAngle, state + 0x464, target, 0.0017453294713050127f,
                       0.0017453294713050127f, 0.10471977293491364f, 0);
     }
     if (object[0x20] == 8 && !object[0x95]) {
-        TransformMobyJointToWorld(object, 1, point);
-        if (*(int *)(state + 0x250) == gHeroState.handle) {
-            qcopy(state + 0x210, &gHeroState.position);
-            qcopy(state + 0x230, &gHeroState.other);
+        moby_transform_joint_to_world(object, 1, point);
+        if (*(int *)(state + 0x250) == g_hero_state.handle) {
+            qcopy(state + 0x210, &g_hero_state.position);
+            qcopy(state + 0x230, &g_hero_state.other);
         }
         pointY = point[1];
         pointX = point[0];
-        yaw = FastMatrixHelperA(*(float *)(state + 0x230) - pointX, *(float *)(state + 0x234) - pointY);
-        pitch = FastMatrixHelperA(vec_distance_xy(point, state + 0x230), *(float *)(state + 0x238) - point[2]);
+        yaw = mat_fast_helper_a(*(float *)(state + 0x230) - pointX, *(float *)(state + 0x234) - pointY);
+        pitch = mat_fast_helper_a(vec_distance_xy(point, state + 0x230), *(float *)(state + 0x238) - point[2]);
         yaw = fast_subtract_rotations(yaw, *(float *)(object + 0xF8)) * 0.5f;
         pitch = fast_subtract_rotations(-pitch, *(float *)(object + 0xF4)) * 0.3333333432674408f;
         {
@@ -381,21 +381,21 @@ void func_L08_003D92D8(u8 *object)
     }
     {
         int i;
-        for (i = 0; i < 3; i++) UpdateEasedNode(object, state + 0x260 + i * 0x80, 3, 0.02f, 0.4f);
+        for (i = 0; i < 3; i++) moby_update_eased_node(object, state + 0x260 + i * 0x80, 3, 0.02f, 0.4f);
     }
 }
 
 /* Makes the Spitting Dune Crawler's spit attack: a flash in front of it and two sprays of particles. */
-void func_L08_003D9798(char *object)
+void crawler_spawn_spit_effect(char *object)
 {
     float origin[4], end[4], start[4], step[4], matrix[12], point[4];
     float velocity[4], accel[4], position[4];
     char *state = *(char **)(object + 0x68), *particle;
     float heading, angle;
     int a, b, c;
-    TestHitAtBone(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
+    coll_test_hit_at_bone(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
     copy_matrix_rotation(matrix,object+0xC0);
-    TransformMobyJointToWorld(object,1,point);
+    moby_transform_joint_to_world(object,1,point);
     qcopy_nc(origin,point);
     matrix[2]=0;
     qcopy_nc(start,origin);
@@ -407,62 +407,62 @@ void func_L08_003D9798(char *object)
         else if(end[2]<-1.2f) end[2]=-1.2f;
     }
     FastVecAdd(end,end,start);
-    CreateTimedEffectEntry(end,object,1,0x808080,127,30,255,0.5f);
-    CastObjectCollisionLine(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    effect_create_timed(end,object,1,0x808080,127,30,255,0.5f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
     vec_scale_to_length(step,matrix+4,0.1f);
     FastVecAdd(start,start,step);
     FastVecAdd(end,end,step);
-    end[2]+=RandomFloatRange(-0.2f,0.2f);
-    CastObjectCollisionLine(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    end[2]+=math_random_float_range(-0.2f,0.2f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
     vec_scale_to_length(step,matrix+4,-0.2f);
     FastVecAdd(start,start,step);
     FastVecAdd(end,end,step);
-    end[2]+=RandomFloatRange(-0.2f,0.2f);
-    CastObjectCollisionLine(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    end[2]+=math_random_float_range(-0.2f,0.2f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
     heading=*(float *)(object+0xF8);
     velocity[3]=0.6f; accel[3]=1.5f;
     { int i; for(i=1;i>=0;i--) {
         qcopy_nc(position,origin);
-        position[0]+=RandomFloatRange(-0.065f,0.065f);
-        position[1]+=RandomFloatRange(-0.065f,0.065f);
-        position[2]+=RandomFloatRange(-0.065f,0.065f);
-        velocity[0]=FastSinOrCosA(heading)*0.28333336114883423f;
-        velocity[1]=FastSinOrCosB(heading)*0.28333336114883423f;
+        position[0]+=math_random_float_range(-0.065f,0.065f);
+        position[1]+=math_random_float_range(-0.065f,0.065f);
+        position[2]+=math_random_float_range(-0.065f,0.065f);
+        velocity[0]=math_fast_sin_or_cos_a(heading)*0.28333336114883423f;
+        velocity[1]=math_fast_sin_or_cos_b(heading)*0.28333336114883423f;
         velocity[2]=0;
-        velocity[2]=RandomFloatRange(0,0);
-        angle=RandomFloatRange(-90,90)*0.01745329424738884f;
-        accel[0]=FastSinOrCosA(FastAddRotations(heading,angle))*0.008333333767950535f;
-        accel[1]=FastSinOrCosB(FastAddRotations(heading,angle))*0.008333333767950535f;
+        velocity[2]=math_random_float_range(0,0);
+        angle=math_random_float_range(-90,90)*0.01745329424738884f;
+        accel[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.008333333767950535f;
+        accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.008333333767950535f;
         accel[2]=0;
-        accel[2]=RandomFloatRange(0.015000000596046448f,0.01833333447575569f);
-        a=FloatToInt(RandomFloatRange(2,4));
-        b=FloatToInt(RandomFloatRange(12,14.40000057220459f));
-        c=FloatToInt(RandomFloatRange(200,240.00001525878906f));
-        particle=SpawnTrailParticle_002BAA28(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
-        if(particle && (Rand()&1)) particle[3]=0x48;
+        accel[2]=math_random_float_range(0.015000000596046448f,0.01833333447575569f);
+        a=FloatToInt(math_random_float_range(2,4));
+        b=FloatToInt(math_random_float_range(12,14.40000057220459f));
+        c=FloatToInt(math_random_float_range(200,240.00001525878906f));
+        particle=part_spawn_trail(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }
     velocity[3]=0.05f; accel[3]=0.07f;
     { int i; for(i=1;i>=0;i--) {
         qcopy_nc(position,origin);
-        position[0]+=RandomFloatRange(-0.2f,0.2f);
-        position[1]+=RandomFloatRange(-0.2f,0.2f);
-        position[2]+=RandomFloatRange(-0.2f,0.2f);
-        angle=RandomFloatRange(-10,10)*0.01745329424738884f;
-        velocity[0]=FastSinOrCosA(FastAddRotations(heading,angle))*0.20000001788139343f;
-        velocity[1]=FastSinOrCosB(FastAddRotations(heading,angle))*0.20000001788139343f;
+        position[0]+=math_random_float_range(-0.2f,0.2f);
+        position[1]+=math_random_float_range(-0.2f,0.2f);
+        position[2]+=math_random_float_range(-0.2f,0.2f);
+        angle=math_random_float_range(-10,10)*0.01745329424738884f;
+        velocity[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.20000001788139343f;
+        velocity[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.20000001788139343f;
         velocity[2]=0;
-        velocity[2]=RandomFloatRange(0,0);
-        angle=RandomFloatRange(-90,90)*0.01745329424738884f;
-        accel[0]=FastSinOrCosA(FastAddRotations(heading,angle))*0.008333333767950535f;
-        accel[1]=FastSinOrCosB(FastAddRotations(heading,angle))*0.008333333767950535f;
+        velocity[2]=math_random_float_range(0,0);
+        angle=math_random_float_range(-90,90)*0.01745329424738884f;
+        accel[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.008333333767950535f;
+        accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.008333333767950535f;
         accel[2]=0;
-        accel[2]=RandomFloatRange(0.011666666716337204f,0.02500000223517418f);
-        a=FloatToInt(RandomFloatRange(2,4));
-        b=FloatToInt(RandomFloatRange(20,24));
-        c=FloatToInt(RandomFloatRange(200,240.00001525878906f));
-        particle=SpawnTrailParticle_002BAA28(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
-        if(particle && (Rand()&1)) particle[3]=0x48;
+        accel[2]=math_random_float_range(0.011666666716337204f,0.02500000223517418f);
+        a=FloatToInt(math_random_float_range(2,4));
+        b=FloatToInt(math_random_float_range(20,24));
+        c=FloatToInt(math_random_float_range(200,240.00001525878906f));
+        particle=part_spawn_trail(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }
 }
@@ -488,7 +488,7 @@ typedef int TQ_003F79E0 __attribute__((mode(TI)));
    through the screen centre, faded by distance and by how far off-centre it is
    (RAC1 draw_lens_flare). The base size is read through a pointer: retail
    rematerializes its address inside the loop. */
-void func_L08_003F7A48(u8 *object) {
+void gfx_l08_draw_lens_flare(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     f32 scr[4], ctr[4], d[4], off[4], at[4];
     f32 dist, fade, fx, fy, half;
@@ -503,12 +503,12 @@ void func_L08_003F7A48(u8 *object) {
     if (D_L08_001B9E00.intensity <= 0.0f)
         return;
     dist = fast_vec_dist(D_L08_001B9B00, vars + 0x10);
-    ctr[0] = IntToFloat(gScreenWidth.half_width);
-    ctr[1] = IntToFloat(gScreenWidth.half_height);
+    ctr[0] = IntToFloat(g_screen_width.half_width);
+    ctr[1] = IntToFloat(g_screen_width.half_height);
     base_size = &D_L08_001B0DC0;
-    ProjectWorldPointToScreen(scr, vars + 0x10);
-    scr[0] = (scr[0] - IntToFloat(gScreenWidth.left)) * 0.0625f;
-    scr[1] = (scr[1] - IntToFloat(gScreenWidth.top)) * 0.0625f;
+    gfx_project_world_point_to_screen(scr, vars + 0x10);
+    scr[0] = (scr[0] - IntToFloat(g_screen_width.left)) * 0.0625f;
+    scr[1] = (scr[1] - IntToFloat(g_screen_width.top)) * 0.0625f;
     d[0] = ctr[0] - scr[0];
     d[1] = ctr[1] - scr[1];
     for (i = 0; i < 12; i++) {
@@ -522,12 +522,12 @@ void func_L08_003F7A48(u8 *object) {
             fade = 1.0f;
         else if (fade < 0.0f)
             fade = 0.0f;
-        fx = FloatAbs(d[0]) / ctr[0] * -5.0f + 5.5f;
+        fx = math_fabs(d[0]) / ctr[0] * -5.0f + 5.5f;
         if (fx > 1.0f)
             fx = 1.0f;
         else if (fx < 0.0f)
             fx = 0.0f;
-        fy = FloatAbs(d[1]) / ctr[1] * -5.0f + 5.5f;
+        fy = math_fabs(d[1]) / ctr[1] * -5.0f + 5.5f;
         if (fy > 1.0f)
             fy = 1.0f;
         else if (fy < 0.0f)
@@ -545,47 +545,47 @@ void func_L08_003F7A48(u8 *object) {
 }
 
 
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 extern u8 D_001A7B00[] __attribute__((sda));
 extern u8 D_L08_001BFD00[];
 extern s32 D_L08_001A8F00[] __attribute__((sda));
 extern s32 D_L08_001B2700[] __attribute__((sda));
 extern u8 *D_L08_001B2ACC[] __attribute__((sda));
-extern s32 func_002ACBC8(void *, s32);
-extern s32 func_00288AA0(void *, s32);
-extern s32 func_00288BE8(void *);
-extern void func_L01_003CEB00(u8 *);
-extern s32 func_002F5D10(void);
-extern void func_L00_002B9D60(u8 *, u8 *, s32, s32);
-extern void func_00288308(s32);
-extern void func_002B0A18(s32, s32);
-extern void func_0029B3E0(s32, s32);
+extern s32 IsPointInCuboid(void *, s32);
+extern s32 req_push_queue(void *, s32);
+extern s32 req_launch_queued(void *);
+extern void part_spawn_sparkles_and_glow_rings(u8 *);
+extern s32 game_is_either_mode_two(void);
+extern void hero_reset_position_and_direction(u8 *, u8 *, s32, s32);
+extern void help_unlock_entry(s32);
+extern void value_set_entry_by_index(s32, s32);
+extern void MemcardSave(s32, s32);
 
 /* Updates the Glider moby (class 3675): it rises into place, turns slowly, and when the hero is near it plays a sound and removes itself. */
-void func_L08_0040E9B8(u8 *self) {
+void glider_update(u8 *self) {
     u8 *vars = *(u8 **)(self + 0x68);
     u8 *entry;
 
     switch (self[0x20]) {
     case 0:
         if (D_001A7B00[13] != 0) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             break;
         }
         *(float *)(self + 0x18) = *(float *)(self + 0x18) + 0.75f;
         *(float *)(self + 0x2C) = *(float *)(*(u8 **)(self + 0x24) + 0x24) * 1.5f;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), 0.07853982597589493f);
-        if (IsPointInCuboid(gHeroPosition, *(s32 *)(vars + 4)) != 0) {
-            if (PushRequestQueue(D_L08_001BFD00, 0x5B) != 0) {
-                LaunchQueuedRequest(D_L08_001BFD00);
+        if (IsPointInCuboid(g_hero_position, *(s32 *)(vars + 4)) != 0) {
+            if (req_push_queue(D_L08_001BFD00, 0x5B) != 0) {
+                req_launch_queued(D_L08_001BFD00);
                 self[0x20] = 2;
             }
         }
         if (self[0x31] != 0)
-            SpawnSparklesAndGlowRings(self);
+            part_spawn_sparkles_and_glow_rings(self);
         break;
     case 2:
         D_L08_001B2700[10] = 1;
@@ -593,18 +593,18 @@ void func_L08_0040E9B8(u8 *self) {
             self[0x31] = 0;
             *(u16 *)(self + 0x34) |= 1;
         }
-        if (IsEitherModeTwo() != 0)
+        if (game_is_either_mode_two() != 0)
             break;
         D_L08_001B2700[10] = 0;
         self[0x31] = 1;
         entry = D_L08_001B2ACC[0];
         *(u16 *)(self + 0x34) &= 0xFFFE;
         entry += *(s32 *)(vars + 8) * 0x80;
-        ResetHeroPositionAndDirection(entry + 0x30, entry + 0x70, 0, 1);
-        UnlockHelpEntry(0x15);
-        SetEntryValueByIndex(0x122B, -1);
+        hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
+        help_unlock_entry(0x15);
+        value_set_entry_by_index(0x122B, -1);
         MemcardSave(0, -1);
-        MarkMobySpawned(self);
+        moby_mark_spawned(self);
         break;
     }
 }
@@ -612,7 +612,7 @@ void func_L08_0040E9B8(u8 *self) {
 /* func_L08_0040F9D0 is matched in its own unit, src/levels/shared/L08_0040F9D0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Moves a thrown object by its speed, bounces it off walls, carries its mount along, and removes it when it stops or leaves the level. */
-void func_L08_0040FAE8(char *object)
+void thrown_l08_object_update(char *object)
 {
     float position[4];
     char *state = *(char **)(object + 0x68);
@@ -623,7 +623,7 @@ void func_L08_0040FAE8(char *object)
     hit = CollLine(object + 0x10, position, 0, *(void **)(state + 0x18), 0);
     if (!hit) {
         position[2] += 0.3f;
-        hit = TestPointAgainstCollision(position, 0, *(void **)(state + 0x18), 0.3f);
+        hit = coll_test_point(position, 0, *(void **)(state + 0x18), 0.3f);
         position[2] -= 0.3f;
     } else {
         qcopy(D_L08_001BFF40.adjusted, D_L08_001BFF40.hit);
@@ -632,10 +632,10 @@ void func_L08_0040FAE8(char *object)
     if (hit) {
         qcopy(object + 0x10, D_L08_001BFF40.adjusted);
         *(float *)(object + 0x18) -= 0.3f;
-        FastVectorNormalize(state, state, D_L08_001BFF40.normal);
+        vec_fast_normalize(state, state, D_L08_001BFF40.normal);
         FastVecScale(state, state, 0.75f);
         if (FastVecLength(state) < 0.01f) {
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
     } else {
@@ -649,7 +649,7 @@ void func_L08_0040FAE8(char *object)
         *(float *)(object + 0x10) < 2 || *(float *)(object + 0x10) > 1021 ||
         *(float *)(object + 0x14) < 2 || *(float *)(object + 0x14) > 1021 ||
         *(float *)(object + 0x18) < 2 || *(float *)(object + 0x18) > 1021) {
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
     qcopy_nc(mount + 0x10, object + 0x10);
@@ -657,17 +657,17 @@ void func_L08_0040FAE8(char *object)
 }
 
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00283CF0(float);
-extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int FloatToInt(float);
+extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern int func_001163B0(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Sprays a ring of dust puffs around a point, flying outward and upward. */
-void func_L08_00422190(char *moby, void *position, int count,
+void part_spawn_dust_burst(char *moby, void *position, int count,
                       float speed, float rise, float maxRadius, float minRadius,
                       float size, float endSize)
 {
@@ -679,43 +679,43 @@ void func_L08_00422190(char *moby, void *position, int count,
         int i;
         for (i = 0; i < count; i++) {
             float x, y;
-            x = FastSinOrCosA(RandomFloatRange(-3.1415927410125732f, 3.1415927410125732f));
-            offset[0] = x * RandomFloatRange(minRadius, maxRadius);
-            y = FastSinOrCosB(RandomFloatRange(-3.1415927410125732f, 3.1415927410125732f));
-            y *= RandomFloatRange(minRadius, maxRadius);
+            x = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
+            offset[0] = x * math_random_float_range(minRadius, maxRadius);
+            y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
+            y *= math_random_float_range(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
             matrix_mul_vec3(offset, offset, moby + 0xC0);
             {
                 float range = speed * ((maxRadius - FastVecLength(offset)) * 0.01666666753590107f) / maxRadius;
-                vec_scale_to_length(velocity, offset, RandomFloatRange(range * 0.25f, range));
+                vec_scale_to_length(velocity, offset, math_random_float_range(range * 0.25f, range));
             }
-            velocity[2] += RandomFloatRange(rise * 0.25f, rise) * 0.01666666753590107f;
+            velocity[2] += math_random_float_range(rise * 0.25f, rise) * 0.01666666753590107f;
             qzero_nc(accel);
             FastVecAdd(offset, offset, position);
             velocity[3] = size;
             accel[3] = endSize;
-            fadeIn = FloatToInt(RandomFloatRange(15.0f, 25.0f));
-            hold = FloatToInt(RandomFloatRange(20.0f, 40.0f));
-            fadeOut = FloatToInt(RandomFloatRange(30.0f, 60.0f));
-            particle = SpawnTrailParticle_002BAA28(offset, velocity, accel, 0x50204050, 0x7F7F7F, fadeIn, hold, fadeOut, -1);
-            if (particle && (Rand() & 1))
+            fadeIn = FloatToInt(math_random_float_range(15.0f, 25.0f));
+            hold = FloatToInt(math_random_float_range(20.0f, 40.0f));
+            fadeOut = FloatToInt(math_random_float_range(30.0f, 60.0f));
+            particle = part_spawn_trail(offset, velocity, accel, 0x50204050, 0x7F7F7F, fadeIn, hold, fadeOut, -1);
+            if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
         }
     }
 }
 
 
-extern f32 func_002A7940(void);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L01_0032EF38(void *, int, int, float, float, int);
+extern f32 math_random_angle(void);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_l01_spawn_glow(void *, int, int, float, float, int);
 
 /* five rounds: each picks a direction, two spreads and a life time */
 /* Drops five small sparkles around the creature that float up from the ground. */
-void func_L08_00422428(Ent *moby)
+void part_spawn_ground_sparkles(Ent *moby)
 {
     Moby *vars = moby->f68;
     f32 position[4];
@@ -723,17 +723,17 @@ void func_L08_00422428(Ent *moby)
     int life, i;
 
     for (i = 4; i >= 0; i--) {
-        angle = RandomAngle();
-        radius = RandomFloatRange(0.0f, 0.8f);
-        first = RandomFloatRange(0.0f, 1.5f);
-        second = RandomFloatRange(1.5f, 5.7f);
-        life = RandomIntRange(100, 180);
-        position[0] = FastSinOrCosA(angle) * radius;
-        position[1] = FastSinOrCosB(angle) * radius;
+        angle = math_random_angle();
+        radius = math_random_float_range(0.0f, 0.8f);
+        first = math_random_float_range(0.0f, 1.5f);
+        second = math_random_float_range(1.5f, 5.7f);
+        life = math_random_int_range(100, 180);
+        position[0] = math_fast_sin_or_cos_a(angle) * radius;
+        position[1] = math_fast_sin_or_cos_b(angle) * radius;
         position[2] = 0.0f;
         FastVecAdd(position, position, (char *)moby + 0x10);
         position[2] = vars->f1B0 + 0.025f;
-        SpawnGlowParticle_L01(position, 0x38002028, 0x2020, first, second, life);
+        part_l01_spawn_glow(position, 0x38002028, 0x2020, first, second, life);
     }
 }
 
@@ -742,7 +742,7 @@ void func_L08_00422428(Ent *moby)
 
 /* the entry's own two handles and its sound handle are released */
 /* Stops the sounds this creature is playing and marks it as finished. */
-void func_L08_00422AD8(Ent *moby)
+void sandfly_release_sounds(Ent *moby)
 {
     Moby *vars = moby->f68;
     s32 done, secondHandle;
@@ -762,7 +762,7 @@ void func_L08_00422AD8(Ent *moby)
 
 /* the queued sound of the entry is released and the flag cleared */
 /* Stops the creature's queued sound and clears its flag. */
-void func_L08_00422B60(Ent *moby)
+void snd_stop_queued(Ent *moby)
 {
     Moby *vars = moby->f68;
 
@@ -773,25 +773,25 @@ void func_L08_00422B60(Ent *moby)
 }
 
 extern char D_L08_001BFF60[];
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern char *D_L08_001FE7BC;
 extern char *D_L08_001B29DC[] __attribute__((sda));
-extern void func_L01_00337A60(void *, void *, void *, int);
-extern int func_L01_003165E8(void *, int, int, int, int);
-extern float func_002A89A8(void *, int, float);
+extern void math_closest_point_on_polygon_edge(void *, void *, void *, int);
+extern int coll_test_point_against_shapes(void *, int, int, int, int);
+extern float coll_probe_ground_height_below(void *, int, float);
 
 /* Picks the next point the sandfly flies to: near a friend or the hero, or at random, pushed away from walls. */
-void func_L08_00422B98(Ent *object) {
+void sandfly_pick_flight_target(Ent *object) {
     char *state = object->f68;
 
-    if (!TestPointAgainstShapes(state + 0x160, *(int *)(state + 0x1A8), -1, -1, -1)) {
-        if ((Rand() & 1) || *(int *)(state + 0x144) == 2 || *(short *)(state + 0x1BC)) {
-            if (*(int *)(state + 0x184) == -1 || (Rand() & 1)) {
+    if (!coll_test_point_against_shapes(state + 0x160, *(int *)(state + 0x1A8), -1, -1, -1)) {
+        if ((func_001163B0() & 1) || *(int *)(state + 0x144) == 2 || *(short *)(state + 0x1BC)) {
+            if (*(int *)(state + 0x184) == -1 || (func_001163B0() & 1)) {
                 qcopy(state + 0x160, state + 0x150);
             } else {
-                *(float *)(state + 0x160) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * 3.0f;
+                *(float *)(state + 0x160) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * 3.0f;
                 {
-                    float y = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * 3.0f;
+                    float y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 3.0f;
                     int handle = *(int *)(state + 0x184);
                     char *entry = D_L08_001B29DC[0];
                     *(float *)(state + 0x168) = 0;
@@ -801,37 +801,37 @@ void func_L08_00422B98(Ent *object) {
             }
             *(float *)(state + 0x168) += 1.7f;
         } else {
-            *(float *)(state + 0x160) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * 1.2f;
+            *(float *)(state + 0x160) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * 1.2f;
             {
-                float y = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * 1.2f;
+                float y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 1.2f;
                 *(float *)(state + 0x168) = 0;
                 *(float *)(state + 0x164) = y;
-                FastVecAdd(state + 0x160, state + 0x160, gHeroPosition);
+                FastVecAdd(state + 0x160, state + 0x160, g_hero_position);
             }
             *(float *)(state + 0x168) += 1.7f;
         }
-        if (*(short *)(state + 0x1BC) && vec_distance_xy(state + 0x160, gHeroPosition) < 3.0f) {
-            float offset = RandomFloatRange(3.0f, 5.0f);
+        if (*(short *)(state + 0x1BC) && vec_distance_xy(state + 0x160, g_hero_position) < 3.0f) {
+            float offset = math_random_float_range(3.0f, 5.0f);
             float value = *(float *)(state + 0x160);
-            *(float *)(state + 0x160) = (Rand() & 1) ? value - offset : value + offset;
-            offset = RandomFloatRange(3.0f, 5.0f);
+            *(float *)(state + 0x160) = (func_001163B0() & 1) ? value - offset : value + offset;
+            offset = math_random_float_range(3.0f, 5.0f);
             value = *(float *)(state + 0x164);
-            *(float *)(state + 0x164) = (Rand() & 1) ? value - offset : value + offset;
+            *(float *)(state + 0x164) = (func_001163B0() & 1) ? value - offset : value + offset;
         }
     } else if (*(int *)(state + 0x1A8) == -1) {
-        ClosestPointOnPolygonEdge(state + 0x160, state + 0x160, D_L08_001FE7BC + 0x10, *(int *)D_L08_001FE7BC);
+        math_closest_point_on_polygon_edge(state + 0x160, state + 0x160, D_L08_001FE7BC + 0x10, *(int *)D_L08_001FE7BC);
     }
     if (CollLine((char *)object + 0x10, state + 0x160, 2, object, 0)) {
         FastVecSub(state + 0x160, D_L08_001BFF60, state + 0x160);
         vec_scale_to_length(state + 0x160, state + 0x160, 2.0f);
         FastVecAdd(state + 0x160, state + 0x160, D_L08_001BFF60);
     }
-    *(float *)(state + 0x168) = ProbeGroundHeightBelow(state + 0x160, 0, 4.0f) + 1.7f;
+    *(float *)(state + 0x168) = coll_probe_ground_height_below(state + 0x160, 0, 4.0f) + 1.7f;
 }
 
 /* the swing angle is folded into the moby's frame and the subobject is ticked */
 /* Picks a random spot around the sandfly (kept away from the hero), then picks its final flight point. */
-void func_L08_00422EE0(Ent *moby)
+void sandfly_pick_random_target(Ent *moby)
 {
     Moby *vars = moby->f68;
     Quad local;
@@ -847,12 +847,12 @@ void func_L08_00422EE0(Ent *moby)
     func_2F9DF0((char *)vars + 0x160, (char *)vars + 0x160, (char *)vars + 0x150);
     vars->f168 = vars->f168 + 1.7f;
     if (vars->f1BC != 0) {
-        func_2F9E20(&local, (char *)vars + 0x160, (void *)gHeroPosition);
+        func_2F9E20(&local, (char *)vars + 0x160, (void *)g_hero_position);
         *(s32 *)((char *)&local + 8) = 0;
         func_2FA0B8(&local, &local, 8.0f);
         func_2F9DF0((char *)vars + 0x160, (char *)vars + 0x160, &local);
     }
-    PickSandflyFlightTarget(moby);
+    sandfly_pick_flight_target(moby);
 }
 
 /* func_L08_00423010 is in its own unit. */
@@ -863,7 +863,7 @@ void func_L08_00422EE0(Ent *moby)
 
 /* the driver is primed, the entry follows its mount and then its own update runs */
 /* Checks the sandfly for hits: when it is hurt a timer starts or it begins to die, and its sounds are stopped. */
-void func_L08_004238A0(Ent *moby)
+void sandfly_check_hit(Ent *moby)
 {
     Moby *vars = moby->f68;
     Sub24 *sub;
@@ -871,7 +871,7 @@ void func_L08_004238A0(Ent *moby)
     s32 hitResult;
 
     func_3347E0(moby, vars->f1E0, 2, 1, 2.5f);
-    ComputeVehicleHeightLimits(moby);
+    vehicle_compute_height_limits(moby);
     sub = moby->f24;
     halfSize = sub->f24 * 0.5f;
     moby->f2C = halfSize;
@@ -883,7 +883,7 @@ void func_L08_004238A0(Ent *moby)
         } else {
             vars->f1BE = 330;
         }
-        StopQueuedSound(moby);
-        ReleaseSandflySounds(moby);
+        snd_stop_queued(moby);
+        sandfly_release_sounds(moby);
     }
 }

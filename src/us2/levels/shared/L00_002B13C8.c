@@ -37,28 +37,28 @@ typedef struct {
     u8 diving;
 } HeroState;
 typedef struct { u8 pad00[4]; u8 fancy; u8 pad05[0xF]; int sound; u8 pad18[4]; int skin, pad20, flags; u8 pad28[0xB8]; } ItemClass;
-extern u8 D_00189E20[];
-extern u32 D_00138180[];
-extern u8 D_00139568[];
-extern ItemClass D_L00_00262570[];
+extern u8 g_hero_state[];
+extern u32 g_pad_state[];
+extern u8 g_item_slot_to_record[];
+extern ItemClass g_weapon_l00_table[];
 extern int D_001A7398[] __attribute__((sda));
 extern u8 D_001A7A80[] __attribute__((sda));
 extern u8 D_001A7A00[] __attribute__((sda));
 extern u8 D_001A7B08[] __attribute__((sda));
-extern void func_L00_003ECC90(Vector *, int);
-extern int func_L00_002D3F30(int, int);
-extern void func_L00_003C3A70(int);
-extern int func_L00_0032EF10(u32, int, int *);
-extern int func_L00_002D6418(void);
-extern int func_L00_002ADF80(void);
-extern int func_002829A8(void *);
-extern int func_00294630(int);
-extern void func_00294420(int);
-extern void func_L00_002AB3E0(void);
-extern int func_002A7820(int, int);
-extern void func_L00_002B1308(int);
-extern void func_L00_002AF7D0(void);
-extern void func_002A7470(void *, int, int, int);
+extern void synthenoid_spawn_or_kilonoid(Vector *, int);
+extern int weapon_spend_ammo(int, int);
+extern void CreateTrailOwnerMoby(int);
+extern int PadPressedWithin(u32, int, int *);
+extern int hero_is_action_allowed(void);
+extern int hero_is_in_special_kind_or_mode(void);
+extern int vec_fast_helper_a(void *);
+extern int load_is_class_cached(int);
+extern void LoadClassIntoFreeCacheSlot(int);
+extern void hero_clear_slot_records(void);
+extern int math_random_int_range(int, int);
+extern void hero_start_timed_state_for_mode(int);
+extern void cancel_hero_item_animation(void);
+extern void anim_start_blended(void *, int, int, int);
 
 #define ITEM_ENTRY(id) (*(ItemClass *)(D_00139568[(id)] * sizeof(ItemClass) + (u8 *)D_L00_00262570))
 
@@ -68,55 +68,55 @@ void func_US2_L00_002B13C8(int slot) {
     int changed, keepHelmet, keepSuit, combo, sound, cur, disabled;
     u8 *pose;
     if (slot == 0) {
-        if (((HeroState *)D_00189E20)->locked && ((HeroState *)D_00189E20)->slots[slot].item != 10)
-            ((HeroState *)D_00189E20)->pending = 1;
+        if (((HeroState *)g_hero_state)->locked && ((HeroState *)g_hero_state)->slots[slot].item != 10)
+            ((HeroState *)g_hero_state)->pending = 1;
     }
-    if (slot == 0 && ((HeroState *)D_00189E20)->locked && ((HeroState *)D_00189E20)->slots[slot].item == 10) {
-        if (((HeroState *)D_00189E20)->request[slot] == 0x1F) {
-            qcopy(&point, &((HeroState *)D_00189E20)->position);
+    if (slot == 0 && ((HeroState *)g_hero_state)->locked && ((HeroState *)g_hero_state)->slots[slot].item == 10) {
+        if (((HeroState *)g_hero_state)->request[slot] == 0x1F) {
+            qcopy(&point, &((HeroState *)g_hero_state)->position);
             point.f[2] += 1.5f;
-            if (ITEM_ENTRY(0x1F).fancy) func_L00_003ECC90(&point, 0xB02);
-            else func_L00_003ECC90(&point, 0xCB2);
-            ((HeroState *)D_00189E20)->request[slot] = 0;
+            if (ITEM_ENTRY(0x1F).fancy) synthenoid_spawn_or_kilonoid(&point, 0xB02);
+            else synthenoid_spawn_or_kilonoid(&point, 0xCB2);
+            ((HeroState *)g_hero_state)->request[slot] = 0;
         }
-        if (((HeroState *)D_00189E20)->request[slot] == 9) {
-            if (func_L00_002D3F30(9, 1)) ((HeroState *)D_00189E20)->armed = 1;
-            else ((HeroState *)D_00189E20)->armed = 0;
-            ((HeroState *)D_00189E20)->request[slot] = 0;
+        if (((HeroState *)g_hero_state)->request[slot] == 9) {
+            if (weapon_spend_ammo(9, 1)) ((HeroState *)g_hero_state)->armed = 1;
+            else ((HeroState *)g_hero_state)->armed = 0;
+            ((HeroState *)g_hero_state)->request[slot] = 0;
         }
-        if (((HeroState *)D_00189E20)->request[slot] == 0x2D) {
-            func_L00_003C3A70(ITEM_ENTRY(0x2D).fancy != 0);
-            ((HeroState *)D_00189E20)->request[slot] = 0;
+        if (((HeroState *)g_hero_state)->request[slot] == 0x2D) {
+            CreateTrailOwnerMoby(ITEM_ENTRY(0x2D).fancy != 0);
+            ((HeroState *)g_hero_state)->request[slot] = 0;
         }
     }
-    if (((HeroState *)D_00189E20)->blocked && slot == 0 &&
-        (!((HeroState *)D_00189E20)->pending || ((HeroState *)D_00189E20)->slots[slot].item == 10)) {
-        ((HeroState *)D_00189E20)->pending = 0;
+    if (((HeroState *)g_hero_state)->blocked && slot == 0 &&
+        (!((HeroState *)g_hero_state)->pending || ((HeroState *)g_hero_state)->slots[slot].item == 10)) {
+        ((HeroState *)g_hero_state)->pending = 0;
         return;
     }
     changed = 0;
 
-    if (func_L00_0032EF10(0x80, 3, 0) || ((HeroState *)D_00189E20)->pending) {
-        if (slot == 0 && ((HeroState *)D_00189E20)->slots[slot].item != 10) {
-            if (((HeroState *)D_00189E20)->pending) {
-                if (((HeroState *)D_00189E20)->slots[slot].item != 0 && ((HeroState *)D_00189E20)->slots[slot].item != 0x1F && ((HeroState *)D_00189E20)->slots[slot].item != 0x2D && ((HeroState *)D_00189E20)->slots[slot].item != 9)
-                    ((HeroState *)D_00189E20)->previous[slot] = ((HeroState *)D_00189E20)->slots[slot].item;
+    if (PadPressedWithin(0x80, 3, 0) || ((HeroState *)g_hero_state)->pending) {
+        if (slot == 0 && ((HeroState *)g_hero_state)->slots[slot].item != 10) {
+            if (((HeroState *)g_hero_state)->pending) {
+                if (((HeroState *)g_hero_state)->slots[slot].item != 0 && ((HeroState *)g_hero_state)->slots[slot].item != 0x1F && ((HeroState *)g_hero_state)->slots[slot].item != 0x2D && ((HeroState *)g_hero_state)->slots[slot].item != 9)
+                    ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)g_hero_state)->slots[slot].item;
             }
-            ((HeroState *)D_00189E20)->current[slot] = 10;
+            ((HeroState *)g_hero_state)->current[slot] = 10;
             changed = 1;
         }
     }
     if (slot == 0) {
         combo = 0;
-        if (((HeroState *)D_00189E20)->slots[0].item == 10 && D_001A7398[0] && (D_001A7A80[D_001A7398[0]] & 0x20)) {
-            if ((D_00138180[0x1A0 / 4] & 3) == 3 && (D_00138180[0x1A4 / 4] & 3)) combo = 1;
+        if (((HeroState *)g_hero_state)->slots[0].item == 10 && D_001A7398[0] && (D_001A7A80[D_001A7398[0]] & 0x20)) {
+            if ((g_pad_state[0x1A0 / 4] & 3) == 3 && (g_pad_state[0x1A4 / 4] & 3)) combo = 1;
         }
-        if (((D_00138180[0x1A4 / 4] & 0x20) || ((D_00138180[0x1A4 / 4] & 5) && func_L00_002D6418()) || combo) &&
-            !((HeroState *)D_00189E20)->locked) {
+        if (((g_pad_state[0x1A4 / 4] & 0x20) || ((g_pad_state[0x1A4 / 4] & 5) && hero_is_action_allowed()) || combo) &&
+            !((HeroState *)g_hero_state)->locked) {
             int item = D_001A7398[slot];
-            if (((HeroState *)D_00189E20)->slots[0].item != item && item) {
+            if (((HeroState *)g_hero_state)->slots[0].item != item && item) {
                 changed = 1;
-                ((HeroState *)D_00189E20)->current[slot] = item;
+                ((HeroState *)g_hero_state)->current[slot] = item;
             }
         }
     }
@@ -125,168 +125,168 @@ void func_US2_L00_002B13C8(int slot) {
         || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
         disabled = 1;
     if (slot == 1 && !disabled) {
-        if (((HeroState *)D_00189E20)->state == 0xF && D_001A7B08[4]) {
-            if (D_001A7398[1] != 0x14 || !((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item) {
-                ((HeroState *)D_00189E20)->request[1] = 0x14;
-                if (((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item)
-                    ((HeroState *)D_00189E20)->previous[slot] = ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item;
-                else ((HeroState *)D_00189E20)->previous[slot] = 0x77;
+        if (((HeroState *)g_hero_state)->state == 0xF && D_001A7B08[4]) {
+            if (D_001A7398[1] != 0x14 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item) {
+                ((HeroState *)g_hero_state)->request[1] = 0x14;
+                if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)
+                    ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item;
+                else ((HeroState *)g_hero_state)->previous[slot] = 0x77;
             }
         }
         {
-            if (((HeroState *)D_00189E20)->swimming && D_001A7B08[3] &&
-                (D_001A7398[1] != 0x13 || !((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item)) {
-                ((HeroState *)D_00189E20)->request[1] = 0x13;
-                if (((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item)
-                    ((HeroState *)D_00189E20)->previous[slot] = ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].item;
-                else ((HeroState *)D_00189E20)->previous[slot] = 0x77;
+            if (((HeroState *)g_hero_state)->swimming && D_001A7B08[3] &&
+                (D_001A7398[1] != 0x13 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)) {
+                ((HeroState *)g_hero_state)->request[1] = 0x13;
+                if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)
+                    ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item;
+                else ((HeroState *)g_hero_state)->previous[slot] = 0x77;
             }
         }
     }
-    if (slot == 2 && ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby) {
-        if (((HeroState *)D_00189E20)->state == 0x11 || ((HeroState *)D_00189E20)->move == 0x73 ||
-            ((HeroState *)D_00189E20)->move == 0x67 || ((HeroState *)D_00189E20)->move == 0x7F ||
-            ((HeroState *)D_00189E20)->diving)
-            ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby->visible = 1;
-        else ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby->visible = 0;
+    if (slot == 2 && ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby) {
+        if (((HeroState *)g_hero_state)->state == 0x11 || ((HeroState *)g_hero_state)->move == 0x73 ||
+            ((HeroState *)g_hero_state)->move == 0x67 || ((HeroState *)g_hero_state)->move == 0x7F ||
+            ((HeroState *)g_hero_state)->diving)
+            ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby->visible = 1;
+        else ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby->visible = 0;
     }
     keepHelmet = 0;
     keepSuit = 0;
     if (slot == 3) {
-        if (func_L00_002ADF80() || ((HeroState *)D_00189E20)->move == 0x12) {
-            if (D_001A7398[3] != 4 && ((HeroState *)D_00189E20)->slots[slot].item != 4) {
-                ((HeroState *)D_00189E20)->previous[slot] = ((HeroState *)D_00189E20)->slots[slot].item;
+        if (hero_is_in_special_kind_or_mode() || ((HeroState *)g_hero_state)->move == 0x12) {
+            if (D_001A7398[3] != 4 && ((HeroState *)g_hero_state)->slots[slot].item != 4) {
+                ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)g_hero_state)->slots[slot].item;
                 keepHelmet = 1;
-                ((HeroState *)D_00189E20)->request[slot] = 4;
+                ((HeroState *)g_hero_state)->request[slot] = 4;
             }
-        } else if (((HeroState *)D_00189E20)->slots[slot].item == 4 && ((HeroState *)D_00189E20)->previous[slot]) {
-            ((HeroState *)D_00189E20)->restore[slot] = 1;
+        } else if (((HeroState *)g_hero_state)->slots[slot].item == 4 && ((HeroState *)g_hero_state)->previous[slot]) {
+            ((HeroState *)g_hero_state)->restore[slot] = 1;
         }
-        if (((HeroState *)D_00189E20)->move == 0x82) {
-            if (D_001A7398[slot] != 8 && ((HeroState *)D_00189E20)->slots[slot].item != 8) {
+        if (((HeroState *)g_hero_state)->move == 0x82) {
+            if (D_001A7398[slot] != 8 && ((HeroState *)g_hero_state)->slots[slot].item != 8) {
                 keepSuit = 1;
-                ((HeroState *)D_00189E20)->previous[slot] = ((HeroState *)D_00189E20)->slots[slot].item;
-                ((HeroState *)D_00189E20)->request[slot] = 8;
+                ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)g_hero_state)->slots[slot].item;
+                ((HeroState *)g_hero_state)->request[slot] = 8;
             }
-        } else if (((HeroState *)D_00189E20)->slots[slot].item == 8 && ((HeroState *)D_00189E20)->previous[slot]) {
-            ((HeroState *)D_00189E20)->restore[slot] = 1;
+        } else if (((HeroState *)g_hero_state)->slots[slot].item == 8 && ((HeroState *)g_hero_state)->previous[slot]) {
+            ((HeroState *)g_hero_state)->restore[slot] = 1;
         }
-        if (((HeroState *)D_00189E20)->move == 8 &&
-            (D_001A7398[slot] == 4 || D_001A7398[slot] == ((HeroState *)D_00189E20)->move)) {
-            if (D_001A7A00[9]) ((HeroState *)D_00189E20)->request[slot] = 3;
-            else ((HeroState *)D_00189E20)->request[slot] = 2;
+        if (((HeroState *)g_hero_state)->move == 8 &&
+            (D_001A7398[slot] == 4 || D_001A7398[slot] == ((HeroState *)g_hero_state)->move)) {
+            if (D_001A7A00[9]) ((HeroState *)g_hero_state)->request[slot] = 3;
+            else ((HeroState *)g_hero_state)->request[slot] = 2;
         }
     }
-    if (((HeroState *)D_00189E20)->restore[slot]) {
+    if (((HeroState *)g_hero_state)->restore[slot]) {
         int item;
-        ((HeroState *)D_00189E20)->restore[slot] = 0;
-        item = ((HeroState *)D_00189E20)->previous[slot];
-        if (item && item != ((HeroState *)D_00189E20)->slots[slot].item) {
+        ((HeroState *)g_hero_state)->restore[slot] = 0;
+        item = ((HeroState *)g_hero_state)->previous[slot];
+        if (item && item != ((HeroState *)g_hero_state)->slots[slot].item) {
             { int *tbl = D_001A7398;
             if (item == 0x77) item = 0;
-            ((HeroState *)D_00189E20)->previous[slot] = 0;
-            ((HeroState *)D_00189E20)->current[slot] = item;
+            ((HeroState *)g_hero_state)->previous[slot] = 0;
+            ((HeroState *)g_hero_state)->current[slot] = item;
             tbl[slot] = item; }
-            if (slot == 0) ITEM_ENTRY(((HeroState *)D_00189E20)->current[0]).flags = 0x20;
+            if (slot == 0) ITEM_ENTRY(((HeroState *)g_hero_state)->current[0]).flags = 0x20;
             changed = 1;
         }
     }
-    if (((HeroState *)D_00189E20)->request[slot] == 0x1F || ((HeroState *)D_00189E20)->request[slot] == 0x3D) {
-        qcopy(&point, &((HeroState *)D_00189E20)->position);
+    if (((HeroState *)g_hero_state)->request[slot] == 0x1F || ((HeroState *)g_hero_state)->request[slot] == 0x3D) {
+        qcopy(&point, &((HeroState *)g_hero_state)->position);
         point.f[2] += 1.5f;
-        if (ITEM_ENTRY(0x1F).fancy) func_L00_003ECC90(&point, 0xB02);
-        else func_L00_003ECC90(&point, 0xCB2);
-        ((HeroState *)D_00189E20)->request[slot] = 0;
+        if (ITEM_ENTRY(0x1F).fancy) synthenoid_spawn_or_kilonoid(&point, 0xB02);
+        else synthenoid_spawn_or_kilonoid(&point, 0xCB2);
+        ((HeroState *)g_hero_state)->request[slot] = 0;
     }
-    if (((HeroState *)D_00189E20)->request[slot] == 9) {
-        if (func_L00_002D3F30(9, 1)) ((HeroState *)D_00189E20)->armed = 1;
-        else ((HeroState *)D_00189E20)->armed = 0;
-        ((HeroState *)D_00189E20)->request[slot] = 0;
+    if (((HeroState *)g_hero_state)->request[slot] == 9) {
+        if (weapon_spend_ammo(9, 1)) ((HeroState *)g_hero_state)->armed = 1;
+        else ((HeroState *)g_hero_state)->armed = 0;
+        ((HeroState *)g_hero_state)->request[slot] = 0;
     }
-    if (((HeroState *)D_00189E20)->request[slot] == 0x2D) {
-        func_L00_003C3A70(ITEM_ENTRY(0x2D).fancy != 0);
-        ((HeroState *)D_00189E20)->request[slot] = 0;
+    if (((HeroState *)g_hero_state)->request[slot] == 0x2D) {
+        CreateTrailOwnerMoby(ITEM_ENTRY(0x2D).fancy != 0);
+        ((HeroState *)g_hero_state)->request[slot] = 0;
     }
-    if (((HeroState *)D_00189E20)->request[slot]) {
-        if (((HeroState *)D_00189E20)->request[slot] != ((HeroState *)D_00189E20)->current[slot]) {
-            if (slot == 1 && !((HeroState *)D_00189E20)->previous[slot]) {
-                *(s16 *)&D_001A7A00[0x24] = ((HeroState *)D_00189E20)->request[slot];
+    if (((HeroState *)g_hero_state)->request[slot]) {
+        if (((HeroState *)g_hero_state)->request[slot] != ((HeroState *)g_hero_state)->current[slot]) {
+            if (slot == 1 && !((HeroState *)g_hero_state)->previous[slot]) {
+                *(s16 *)&D_001A7A00[0x24] = ((HeroState *)g_hero_state)->request[slot];
                 if (*(s16 *)&D_001A7A00[0x24] == 0x77) *(s16 *)&D_001A7A00[0x24] = 0;
             }
-            if (((HeroState *)D_00189E20)->request[slot] == 0x77) {
-                ((HeroState *)D_00189E20)->current[slot] = 0;
+            if (((HeroState *)g_hero_state)->request[slot] == 0x77) {
+                ((HeroState *)g_hero_state)->current[slot] = 0;
                 D_001A7398[slot] = 0;
             } else {
                 int item;
                 if (slot == 0) {
                     int item = D_001A7398[0];
-                    if (item != 0x26 && item != 0x33 && item && ((HeroState *)D_00189E20)->request[0] != 0x26 &&
-                        ((HeroState *)D_00189E20)->request[0] != 0x33 && ((HeroState *)D_00189E20)->request[0] != item)
+                    if (item != 0x26 && item != 0x33 && item && ((HeroState *)g_hero_state)->request[0] != 0x26 &&
+                        ((HeroState *)g_hero_state)->request[0] != 0x33 && ((HeroState *)g_hero_state)->request[0] != item)
                         *(int *)&D_001A7A00[4] = item;
                 }
-                item = ((HeroState *)D_00189E20)->request[slot];
-                ((HeroState *)D_00189E20)->current[slot] = item;
+                item = ((HeroState *)g_hero_state)->request[slot];
+                ((HeroState *)g_hero_state)->current[slot] = item;
                 if (!keepHelmet || item != 4) D_001A7398[slot] = item;
-                if (!keepSuit || ((HeroState *)D_00189E20)->current[slot] != 8)
-                    D_001A7398[slot] = ((HeroState *)D_00189E20)->current[slot];
-                if (slot == 0) ITEM_ENTRY(((HeroState *)D_00189E20)->current[0]).flags = 0x20;
+                if (!keepSuit || ((HeroState *)g_hero_state)->current[slot] != 8)
+                    D_001A7398[slot] = ((HeroState *)g_hero_state)->current[slot];
+                if (slot == 0) ITEM_ENTRY(((HeroState *)g_hero_state)->current[0]).flags = 0x20;
             }
             changed = 1;
         } else {
-            ((HeroState *)D_00189E20)->request[slot] = 0;
+            ((HeroState *)g_hero_state)->request[slot] = 0;
         }
     }
-    if (((HeroState *)D_00189E20)->slots[slot].state == 2) changed = 0;
-    if (((HeroState *)D_00189E20)->slots[slot].state == 1 && !((HeroState *)D_00189E20)->slots[slot].pose) ((HeroState *)D_00189E20)->slots[slot].pose = ((HeroState *)D_00189E20)->slots[slot].restPose;
-    pose = &((HeroState *)D_00189E20)->slots[0].pose;
-    if (!func_002829A8(pose + slot * sizeof(Slot))) changed = 0;
+    if (((HeroState *)g_hero_state)->slots[slot].state == 2) changed = 0;
+    if (((HeroState *)g_hero_state)->slots[slot].state == 1 && !((HeroState *)g_hero_state)->slots[slot].pose) ((HeroState *)g_hero_state)->slots[slot].pose = ((HeroState *)g_hero_state)->slots[slot].restPose;
+    pose = &((HeroState *)g_hero_state)->slots[0].pose;
+    if (!vec_fast_helper_a(pose + slot * sizeof(Slot))) changed = 0;
     if (slot == 0) {
         if (changed) {
             changed = 0;
-            ((HeroState *)D_00189E20)->queued = *(int *)(pose + 0x10AB);
+            ((HeroState *)g_hero_state)->queued = *(int *)(pose + 0x10AB);
         }
-        if (((HeroState *)D_00189E20)->queued) {
-            sound = ITEM_ENTRY(((HeroState *)D_00189E20)->queued).sound;
-            if (!func_00294630(sound)) {
-                func_00294420(sound);
+        if (((HeroState *)g_hero_state)->queued) {
+            sound = ITEM_ENTRY(((HeroState *)g_hero_state)->queued).sound;
+            if (!load_is_class_cached(sound)) {
+                LoadClassIntoFreeCacheSlot(sound);
             } else {
                 changed = 1;
-                *(int *)(pose + 0x10AB) = ((HeroState *)D_00189E20)->queued;
-                ((HeroState *)D_00189E20)->queued = 0;
+                *(int *)(pose + 0x10AB) = ((HeroState *)g_hero_state)->queued;
+                ((HeroState *)g_hero_state)->queued = 0;
             }
         }
     }
     if (changed) {
-        ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].anim = 3;
-        func_L00_002AB3E0();
-        ((HeroState *)D_00189E20)->quickTimer = func_002A7820(0x32, 0x5A);
-        func_L00_002B1308(((HeroState *)D_00189E20)->current[slot]);
-        if (((HeroState *)D_00189E20)->refresh) func_L00_002AF7D0();
+        ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].anim = 3;
+        hero_clear_slot_records();
+        ((HeroState *)g_hero_state)->quickTimer = math_random_int_range(0x32, 0x5A);
+        hero_start_timed_state_for_mode(((HeroState *)g_hero_state)->current[slot]);
+        if (((HeroState *)g_hero_state)->refresh) cancel_hero_item_animation();
         if (slot == 0) {
-            if (((HeroState *)D_00189E20)->current[0] == 10) D_001A7A00[8] = 1;
+            if (((HeroState *)g_hero_state)->current[0] == 10) D_001A7A00[8] = 1;
             else D_001A7A00[8] = 0;
         }
         if (slot == 3) {
-            if (((HeroState *)D_00189E20)->slots[3].item == 3) D_001A7A00[9] = 1;
+            if (((HeroState *)g_hero_state)->slots[3].item == 3) D_001A7A00[9] = 1;
             else D_001A7A00[9] = 0;
         }
-        ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].swap = 0;
-        ((HeroState *)D_00189E20)->request[slot] = 0;
-        ((HeroState *)D_00189E20)->pending = 0;
-        cur = ((HeroState *)D_00189E20)->current[slot];
-        if (slot == 0 && ITEM_ENTRY(cur).skin != ((HeroState *)D_00189E20)->skin) {
-            if (((HeroState *)D_00189E20)->panel[0]) ((HeroState *)D_00189E20)->panel[0]->dirty = 1;
-            if (((HeroState *)D_00189E20)->panel[1]) ((HeroState *)D_00189E20)->panel[1]->dirty = 1;
+        ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].swap = 0;
+        ((HeroState *)g_hero_state)->request[slot] = 0;
+        ((HeroState *)g_hero_state)->pending = 0;
+        cur = ((HeroState *)g_hero_state)->current[slot];
+        if (slot == 0 && ITEM_ENTRY(cur).skin != ((HeroState *)g_hero_state)->skin) {
+            if (((HeroState *)g_hero_state)->panel[0]) ((HeroState *)g_hero_state)->panel[0]->dirty = 1;
+            if (((HeroState *)g_hero_state)->panel[1]) ((HeroState *)g_hero_state)->panel[1]->dirty = 1;
         }
-        if (((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby && ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby->cls->rank >= 3)
-            func_002A7470(((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].moby, 2, 0, 2);
-        if (((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].holster && slot != 3 &&
-            ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].holster->cls->rank >= 3)
-            func_002A7470(((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].holster, 2, 0, 2);
-        ((HeroState *)(D_00189E20 + slot * sizeof(Slot)))->slots[0].mode = 3;
+        if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby && ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby->cls->rank >= 3)
+            anim_start_blended(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby, 2, 0, 2);
+        if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster && slot != 3 &&
+            ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster->cls->rank >= 3)
+            anim_start_blended(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster, 2, 0, 2);
+        ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].mode = 3;
     }
-    if (slot == 2 && !D_001A7398[2] && !((HeroState *)D_00189E20)->slots[2].moby)
-        ((HeroState *)D_00189E20)->request[2] = 0x2F;
-    if (slot == 1 && !D_001A7398[1] && !((HeroState *)D_00189E20)->slots[1].moby)
-        ((HeroState *)D_00189E20)->request[1] = 0x34;
+    if (slot == 2 && !D_001A7398[2] && !((HeroState *)g_hero_state)->slots[2].moby)
+        ((HeroState *)g_hero_state)->request[2] = 0x2F;
+    if (slot == 1 && !D_001A7398[1] && !((HeroState *)g_hero_state)->slots[1].moby)
+        ((HeroState *)g_hero_state)->request[1] = 0x34;
 }

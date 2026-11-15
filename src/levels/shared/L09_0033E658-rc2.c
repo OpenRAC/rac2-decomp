@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@
 extern s32 *ref_L09_0033E658_00[];
 
 /* Looks up an entry by index in a table and returns its stored id minus one, or -1 if the index is -1 or the slot is empty. */
-s32 func_L09_0033E658(s32 index) {
+s32 path_get_entry_id(s32 index) {
     s32 *entry;
 
     if (index != -1) {

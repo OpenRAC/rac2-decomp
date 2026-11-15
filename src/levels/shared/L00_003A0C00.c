@@ -7,15 +7,15 @@ extern char *D_001FDA80[];
 extern int D_001A8A44 __attribute__((sda));
 extern char D_L00_003A09F8[];
 
-extern int func_002A8AF0(char *a, char *b, int c);
-extern int func_002ACBC8(char *a, int b);
+extern int point_in_path_xy(char *a, char *b, int c);
+extern int IsPointInCuboid(char *a, int b);
 extern void ref_L00_003A0C00_00(char *a, char *b);
-extern void func_L00_00391310(char *a, char *b);
+extern void tether_release(char *a, char *b);
 
 /* Marks the object not drawable, finds the first object of the global list with id 0xAC and
    counts one more frame in the object's state; checks the sixteen-byte regions of the state
    against the target's position and releases the count as soon as one holds. */
-void func_L00_003A0C00(char *object)
+void visibomb_missile_watcher_update(char *object)
 {
     char *state;
     char *target = 0;
@@ -62,6 +62,6 @@ reset:
         if (D_001A8A44 != 0)
             ref_L00_003A0C00_00(D_L00_003A09F8, object);
         if (*(int *)(state + 0x140) >= 0x5B)
-            ReleaseTether(target, *(char **)(target + 0x68));
+            tether_release(target, *(char **)(target + 0x68));
     }
 }

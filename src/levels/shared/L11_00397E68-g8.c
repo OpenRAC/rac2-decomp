@@ -5,18 +5,18 @@ typedef union { TI128 q; float f[4]; } RibbonVector;
 struct RibbonQuad { RibbonVector position[4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
 extern float D_L11_001BA8C0[4];
 extern float D_L11_001AECFC __attribute__((sda));
-extern long long func_0027C878(int);
+extern long long GetEffectTextureDescriptor(int);
 extern void ref_L11_00397E68_00(char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern float func_00283CE0(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern float IntToFloat(int);
 
 /* Draws a fixed-UV ribbon and a scaled scrolling layer along a point chain. */
-void func_L11_00397E68(RibbonVector *points, int count, int flags, u32 color0, u32 color1, float width, float scale) {
+void ribbon_draw_two_layer(RibbonVector *points, int count, int flags, u32 color0, u32 color1, float width, float scale) {
     RibbonVector basis[4];
     struct RibbonQuad mainQuad, innerQuad;
     RibbonVector template0, template1;

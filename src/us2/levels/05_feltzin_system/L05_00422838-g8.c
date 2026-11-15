@@ -10,20 +10,20 @@ extern int D_L05_001B2048;
 extern char *D_L05_001B251C;
 extern char D_L05_001B1380[] SDATA(D_L05_001B1380);
 extern char D_L05_001B1370[] SDATA(D_L05_001B1370);
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(int);
-extern char **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
-extern void func_L05_0037B280(char *, int);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(int);
+extern char **level_get_object_list(void);
+extern int level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(char *, int);
 extern void func_L05_0037CEE0(char *, void *, float);
 extern void func_L05_0037D608(char *, void *, float);
-extern int func_00282948(void *);
-extern void func_L05_00442828(void *, void *, int);
-extern void func_L05_00445B58(void *, void *);
-extern void func_L00_003294F0(char *, int);
-extern void func_L05_00379F48(int);
-extern void func_002AD7B8(int);
+extern int math_fast_float_d(void *);
+extern void ship_start_transition(void *, void *, int);
+extern void ship_point_camera_at_target(void *, void *);
+extern void moby_set_flag_bit(char *, int);
+extern void hero_set_state_value_c(int);
+extern void moby_mark_flag_and_append_to_list(int);
 extern void func_US2_L05_00422530(char *, int);
 
 /* func_US2_L05_00422838, the v2.00 copy of func_L05_00420A88: the same C, where the timer arm calls
@@ -42,11 +42,11 @@ void func_US2_L05_00422838(char *actor)
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
         D_L05_001B1364 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        item = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        item = level_get_object_list();
+        count = level_get_saved_value();
         a.q = 0;
         a.f[0] = 487.0f;
         a.f[1] = 526.0f;
@@ -58,7 +58,7 @@ void func_US2_L05_00422838(char *actor)
                 case 0x957:
                 case 0x97C:
                 case 0xF76:
-                    func_L05_0037B280(*item, 1);
+                    entry_spawn_list_objects_with_flag(*item, 1);
                     func_L05_0037CEE0(*item, &a, 64.0f);
                     func_L05_0037D608(*item, &a, 64.0f);
                     break;
@@ -70,10 +70,10 @@ void func_US2_L05_00422838(char *actor)
     if (D_L05_00221D10[4] != 0 || D_L05_001B2048 < 6)
         return;
     if (D_L05_00221D10[5] <= 0) {
-        if (func_00282948(state + 0x58) == 0)
+        if (math_fast_float_d(state + 0x58) == 0)
             return;
         *(int *)(state + 0x58) = 120;
-        func_L05_00442828(D_L05_001B1380, D_L05_001B1370, 200);
+        ship_start_transition(D_L05_001B1380, D_L05_001B1370, 200);
         a.q = 0;
         b.q = 0;
         c.q = 0;
@@ -87,9 +87,9 @@ void func_US2_L05_00422838(char *actor)
         c.f[0] = 438.0f;
         c.f[1] = 487.0f;
         c.f[2] = 535.0f;
-        func_L05_00445B58(&a, &c);
-        item = func_L05_00379EB8();
-        count2 = func_L00_004272A0();
+        ship_point_camera_at_target(&a, &c);
+        item = level_get_object_list();
+        count2 = level_get_saved_value();
         if (count2 > 0) {
             int n = count2;
             do {
@@ -97,7 +97,7 @@ void func_US2_L05_00422838(char *actor)
                 case 0x957:
                 case 0x97C:
                 case 0xF76:
-                    func_L05_0037B280(*item, 1);
+                    entry_spawn_list_objects_with_flag(*item, 1);
                     func_L05_0037CEE0(*item, &a, 10.0f);
                     func_L05_0037D608(*item, &b, 20.0f);
                     break;
@@ -106,15 +106,15 @@ void func_US2_L05_00422838(char *actor)
             } while (--n != 0);
         }
     } else if (D_L05_001B13F4 != 0) {
-        if (func_00282948(state + 0x58) != 0) {
+        if (math_fast_float_d(state + 0x58) != 0) {
             *(int *)(state + 0x58) = 25;
-            func_002AD7B8(6);
-            func_L00_003294F0(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
+            moby_mark_flag_and_append_to_list(6);
+            moby_set_flag_bit(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
             D_L05_001B13D8 = 0;
             D_L05_001B13F4 = 0;
-            func_L05_00379F48(1);
+            hero_set_state_value_c(1);
         }
-    } else if (func_00282948(state + 0x58) != 0) {
+    } else if (math_fast_float_d(state + 0x58) != 0) {
         func_US2_L05_00422530(actor, 0);
     }
 }

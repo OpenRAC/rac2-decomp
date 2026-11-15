@@ -2,7 +2,7 @@
 
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
 extern int D_L05_00221D94[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u8 D_0019B2E8[];
 extern char *D_L05_001B251C;
 extern float D_L05_001B1680 __attribute__((sda));
@@ -26,26 +26,26 @@ extern float D_L05_001B16FC __attribute__((sda));
 extern float D_L05_001B1704 __attribute__((sda));
 extern float D_L05_001B170C __attribute__((sda));
 extern void *D_L05_001B1728 __attribute__((sda));
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AB600(void *, void *);
-extern char *func_L05_0042BCE0(void *, void *, float, float);
-extern float func_002702C8(float *, float, float, float, float, float);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void mat_transform_via_copy(void *, void *);
+extern char *stream_spawn_piece(void *, void *, float, float);
+extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 /* The registered entry includes its measured pre-prologue F1 load. */
-extern void func_L05_0042AFE0(void *);
+extern void gfx_draw_scrolling_stream_layers(void *);
 
 typedef union { float f[0x40]; int i[0x40]; u16 uh[0x80]; } Fields;
 
 /* Updates a stream of seven moving pieces that slide along a line and wrap around to the start, and draws them. */
-void func_L05_0042AC30(u8 *actor)
+void scrolling_stream_update(u8 *actor)
 {
     Vector position, step, rotation;
     u8 *state = *(u8 **)(actor + 0x68);
-    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
-        MarkMobySpawned(actor);
+    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+        moby_mark_spawned(actor);
         return;
     }
     if (actor[0x20] == 0) {
@@ -71,12 +71,12 @@ void func_L05_0042AC30(u8 *actor)
         }
         span *= 0.14285715f;
         FastVecScale(&step, actor + 0xC0, -span);
-        TransformMatrixViaCopy(&rotation, actor + 0xC0);
+        mat_transform_via_copy(&rotation, actor + 0xC0);
         {
         char **child = (char **)state;
         int i;
         for (i = 6; i >= 0; i--, child++) {
-            *child = SpawnStreamPiece(&position, &rotation, D_L05_001B1680, phase);
+            *child = stream_spawn_piece(&position, &rotation, D_L05_001B1680, phase);
             phase += span;
             FastVecAdd(&position, &position, &step);
         }
@@ -108,13 +108,13 @@ void func_L05_0042AC30(u8 *actor)
     }
     }
     if (*(int *)(*(char **)(D_L05_001B251C + (((Fields *)state)->i[0x1C / 4] << 8) + 0x68) + 0x34) != 0) {
-        D_L05_001B168C = StepSpringDamperClamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = StepSpringDamperClamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = StepSpringDamperClamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
+        D_L05_001B168C = math_step_spring_damper_clamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = math_step_spring_damper_clamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = math_step_spring_damper_clamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
     } else {
-        D_L05_001B168C = StepSpringDamperClamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = StepSpringDamperClamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = StepSpringDamperClamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
+        D_L05_001B168C = math_step_spring_damper_clamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = math_step_spring_damper_clamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = math_step_spring_damper_clamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
     }
-    AddDrawCallbackToList1(DrawScrollingStreamLayers, actor);
+    gfx_add_draw_callback_first(gfx_draw_scrolling_stream_layers, actor);
 }

@@ -1,6 +1,7 @@
+#include "names.h"
 /* func_PAL_L17_003CB570, the PAL copy of func_L17_003C7498: the same C, where the 60 Hz duration becomes (d * 300 + 2) / 6. */
 #include "common.h"
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char *D_L17_001B2D0C;
 extern float D_L17_001B03B0 __attribute__((sda));
 extern int func_003221C8(void *, int);
@@ -17,8 +18,8 @@ void func_PAL_L17_003CB570(char *self, int *path, float duration) {
     int index;
     float delta[4];
     if (*(int *)(data + 0xCC) != -1 && *(int *)(data + 0xAC) == 1 &&
-        func_003221C8(D_00189EA0, *(int *)(data + 0xCC)) &&
-        *(float *)(D_00189EA0 + 8) <= *(float *)(self + 0x18) + 0.05f &&
+        func_003221C8(g_hero_position, *(int *)(data + 0xCC)) &&
+        *(float *)(g_hero_position + 8) <= *(float *)(self + 0x18) + 0.05f &&
         func_002EF0B0(self + 0x10, D_L17_001B2D0C + *(int *)(data + 0xCC) * 128 + 0x30) <= D_L17_001B03B0) {
         *(float *)(data + 0x9C) -= 1.0f;
         goto done;

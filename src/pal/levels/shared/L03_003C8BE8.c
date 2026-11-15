@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L03_003C8BE8, the PAL copy of func_L03_003C4BD8: the same C, with the timers scaled
    to 50 Hz. */
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern float func_002A78D8(float, float);
+extern float math_random_signed_float_range(float, float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* The level's own copy of the object's tilt routine (func_L03_003C4A10), at another address
    in every level that has it. */
@@ -26,21 +27,21 @@ void func_PAL_L03_003C8BE8(unsigned char *a0) {
     float v;
     int flag;
 
-    if (func_00282948(s0 + 0x384) != 0) {
+    if (math_fast_float_d(s0 + 0x384) != 0) {
         if (a0[0x95] == 2) {
-            *(float *)(s0 + 0x388) = func_002A78D8(5.0f, 60.0f) * 0.017453294f;
-            *(float *)(s0 + 0x38C) = func_002A7878(-20.0f, 0.0f) * 0.017453294f;
-            *(int *)(s0 + 0x384) = (func_002A7820(30, 45) * 5 + 2) / 6;
+            *(float *)(s0 + 0x388) = math_random_signed_float_range(5.0f, 60.0f) * 0.017453294f;
+            *(float *)(s0 + 0x38C) = math_random_float_range(-20.0f, 0.0f) * 0.017453294f;
+            *(int *)(s0 + 0x384) = (math_random_int_range(30, 45) * 5 + 2) / 6;
             *(int *)(s0 + 0x390) = 0;
         } else {
-            *(float *)(s0 + 0x388) = func_002A78D8(5.0f, 20.0f) * 0.017453294f;
-            *(float *)(s0 + 0x38C) = func_002A7878(-15.0f, 5.0f) * 0.017453294f;
-            flag = (func_002A77E0(4) == 0);
+            *(float *)(s0 + 0x388) = math_random_signed_float_range(5.0f, 20.0f) * 0.017453294f;
+            *(float *)(s0 + 0x38C) = math_random_float_range(-15.0f, 5.0f) * 0.017453294f;
+            flag = (math_random_int_below(4) == 0);
             *(int *)(s0 + 0x390) = flag;
             if (flag) {
-                *(int *)(s0 + 0x384) = (func_002A7820(180, 300) * 5 + 2) / 6;
+                *(int *)(s0 + 0x384) = (math_random_int_range(180, 300) * 5 + 2) / 6;
             } else {
-                *(int *)(s0 + 0x384) = (func_002A7820(60, 120) * 5 + 2) / 6;
+                *(int *)(s0 + 0x384) = (math_random_int_range(60, 120) * 5 + 2) / 6;
             }
         }
     }

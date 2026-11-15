@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 /* func_00327848: func_00327848 with the turn state in the record (+0x34 flag, +0x38 slack). */
 #include "common.h"
 
@@ -6,22 +7,22 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char ref_00327848_00[];
 
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, char *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, char *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_002831B0(float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, char *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, char *);
+extern void FastVecCross(void *, void *, void *);
+extern float math_fast_angle_helper(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 /* Steers the object's heading toward the vector stored in its record: builds the aim vector, measures the angle to the current heading and turns the heading by a tenth of the remainder. */
-void func_00327848(char *obj)
+void moby_steer_heading_to_target(char *obj)
 {
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
@@ -57,10 +58,10 @@ void func_00327848(char *obj)
         *(float *)(rec + 0x38) = 1.0f - cosine;
         if (cosine > 0.75f)
             *(s32 *)(rec + 0x34) = 1;
-        cosine = 1.5707964f - FastAngleHelper(cosine);
+        cosine = 1.5707964f - math_fast_angle_helper(cosine);
         cosine = cosine * 0.1f;
-        FastVecScale(e, d, FastSinOrCosB(cosine));
-        e[3] = FastSinOrCosA(cosine);
+        FastVecScale(e, d, math_fast_sin_or_cos_b(cosine));
+        e[3] = math_fast_sin_or_cos_a(cosine);
         quaternion_to_rotation_basis(e, f);
         multiply_matrix3x3(face, f, face);
     }

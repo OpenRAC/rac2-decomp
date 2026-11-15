@@ -6,13 +6,13 @@
 typedef union { u8 b[0x2600]; s32 i[0x980]; u8 *ptr[0x980]; } Hero2E68;
 #define H ((Hero2E68 *)D_00189E20)
 
-extern u8 D_00189E20[];
-extern u8 D_00152C00[];
+extern u8 g_hero_state[];
+extern u8 g_hero_moby_default[];
 /* A level object list: its count and its entry pointers. */
 typedef struct { u8 pad[0x44]; s16 count; u8 pad46[0x18C - 0x46]; u8 *entries[1]; } ObjectTable;
 extern ObjectTable D_L00_001BCAC0;
 extern s32 D_L00_001A8F00;
-extern s32 func_L00_002D6418(void);
+extern s32 hero_is_action_allowed(void);
 
 /* Sets bit 0 of the halfword flags at +0x34 of the hero's main object, of the three objects of
    each of the seven hero slots (slot 0 is skipped when func_L00_002D6418 says so; in mode 2 a
@@ -21,7 +21,7 @@ extern s32 func_L00_002D6418(void);
    object when the word at +0x1248 is 10, the mode is 0 and the object's +0x20 byte is set.
    func_L00_002D3068 clears bit 0 of the same objects. */
 /* Turns on the same flag bit for the hero and all the objects attached to it, with a few exceptions for some modes. */
-void func_L00_002D2E68(void)
+void hero_set_objects_flag_bit(void)
 {
     u8 *base;
     u8 *guard;
@@ -36,10 +36,10 @@ void func_L00_002D2E68(void)
 
     hero = H->ptr[0xC18 / 4];
     *(u16 *)(hero + 0x34) |= 1;
-    guard = gHeroMoby_00152C00;
+    guard = g_hero_moby_default;
     for (i = 0; i < 7; i++) {
-        base = gHeroState;
-        if (i == 0 && IsHeroActionAllowed())
+        base = g_hero_state;
+        if (i == 0 && hero_is_action_allowed())
             continue;
         mode = D_L00_001A8F00;
         if (mode == 2) {

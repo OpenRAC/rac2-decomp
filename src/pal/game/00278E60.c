@@ -40,23 +40,23 @@ typedef struct {
     TocFile278fc0 intro;
     TocFile278fc0 frames[20];
 } Toc278fc0;
-extern Toc278fc0 D_0014B540;
+extern Toc278fc0 g_copy_setup_data;
 
 extern int D_00138324;
 extern short D_001A63AC;
 extern unsigned char D_PAL_001A7C3C MACRO_ADDR;
-extern int D_001A7340 __attribute__((sda));
-extern float D_001B15A0 __attribute__((sda));
+extern int g_screen_width __attribute__((sda));
+extern float g_screen_fade __attribute__((sda));
 /* The level's state word, a per-level external (see func_002799A8 in 00274128.c). */
 extern int ref_L00_002E38F0_00 __attribute__((sda));
-extern void func_002B4B70(int, int);
+extern void request_end_slot(int, int);
 extern void func_PAL_00279B50(int, int, int, int, int, int, int, int, int, int, unsigned);
-extern int func_002B7B18(int, int, int);
-extern int func_00282948(void *);
-extern void func_00279828(void);
-extern int func_002799A8(void);
-extern int func_00279988(void);
-extern void func_002AA2E8(float *p, float a, float b);
+extern int load_start_disc_read(int, int, int);
+extern int math_fast_float_d(void *);
+extern void load_relocate_data_table_offsets(void);
+extern int data_advance_to_next_item_group(void);
+extern int data_query_shared_block(void);
+extern void ApproachValue(float *p, float a, float b);
 extern void func_PAL_002E5898(void);
 
 void func_PAL_00278E60(void)
@@ -68,7 +68,7 @@ void func_PAL_00278E60(void)
             D_001B7F80.row = 1;
             ref_L00_002E38F0_00 = 1;
         }
-        func_002B4B70(0, 0);
+        request_end_slot(0, 0);
     }
     switch (D_001B7F80.state) {
     case 0:
@@ -141,20 +141,20 @@ void func_PAL_00278E60(void)
         D_001B7F80.timer = 75;
         D_001B7F80.step = 8;
         D_001B7F80.base = 258;
-        D_001B7F80.duration = (float)D_001A7340 * 2.64f;
+        D_001B7F80.duration = (float)g_screen_width * 2.64f;
         D_001B7F80.rate = 0.19379845f;
         D_001B7F80.repeats = 5;
         D_001B7F80.speed = 0.03f;
         D_001B7F80.limit = 18;
-        func_002B7B18(D_001B7F80.buffers[2], D_0014B540.intro.offset + D_0014B540.base,
-                      D_0014B540.intro.size);
+        load_start_disc_read(D_001B7F80.buffers[2], g_copy_setup_data.intro.offset + g_copy_setup_data.base,
+                      g_copy_setup_data.intro.size);
         D_001B7F80.state = 1;
         break;
     case 1:
         if (D_001A63AC)
             break;
-        if (func_00282948(&D_001B7F80.timer)) {
-            func_00279828();
+        if (math_fast_float_d(&D_001B7F80.timer)) {
+            load_relocate_data_table_offsets();
             D_001B7F80.state = 2;
         }
         break;
@@ -162,9 +162,9 @@ void func_PAL_00278E60(void)
         SeqState278fc0 *s = &D_001B7F80;
         if (s->frame >= 20)
             s->frame %= 20;
-        func_002B7B18(s->buffers[s->buffer_index],
-                      D_0014B540.frames[s->frame].offset + D_0014B540.base,
-                      D_0014B540.frames[s->frame].size);
+        load_start_disc_read(s->buffers[s->buffer_index],
+                      g_copy_setup_data.frames[s->frame].offset + g_copy_setup_data.base,
+                      g_copy_setup_data.frames[s->frame].size);
         s->state = 3;
         break;
     }
@@ -175,7 +175,7 @@ void func_PAL_00278E60(void)
         s = &D_001B7F80;
         s->ready = 1;
         s->buffer_index ^= 1;
-        if (func_002799A8()) {
+        if (data_advance_to_next_item_group()) {
             s->state = 4;
             switch (D_001B8308.rows[s->row].kind) {
             case 0:
@@ -193,8 +193,8 @@ void func_PAL_00278E60(void)
     }
     case 4: {
         SeqState278fc0 *s;
-        func_002AA2E8(&D_001B15A0, 0.0f, 0.080000006f);
-        if (func_00279988()) {
+        ApproachValue(&g_screen_fade, 0.0f, 0.080000006f);
+        if (data_query_shared_block()) {
             s = &D_001B7F80;
             s->state = 2;
             s->frame = D_001B8308.rows[s->row].frame;
@@ -202,7 +202,7 @@ void func_PAL_00278E60(void)
         break;
     }
     case 5:
-        func_002B4B70(0, 0);
+        request_end_slot(0, 0);
         break;
     }
     func_PAL_002E5898();

@@ -3,8 +3,8 @@
 
 typedef short s16;
 
-extern int D_001A79F0[] __attribute__((sda));
-extern int D_L04_001A8FE4[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
+extern int g_current_lap[] __attribute__((sda));
 
 typedef struct {
     char pad000[0x274];
@@ -23,7 +23,7 @@ typedef struct {
 } HeightState;
 
 /* Computes the target height offset from the base height, scaled by how far height is above or below base. */
-void func_L04_00412C58(void *object, HeightState *state, float height, float base,
+void bike_compute_target_height(void *object, HeightState *state, float height, float base,
                        float factor, float speed, float margin)
 {
     float t, extra;
@@ -34,14 +34,14 @@ void func_L04_00412C58(void *object, HeightState *state, float height, float bas
     }
 
     if (margin + base < height) {
-        if (gCurrentMapIndex[0] == 4 && state->f274 != 0 &&
+        if (g_current_map_index[0] == 4 && state->f274 != 0 &&
             state->f314 == -1 && state->animFrame >= 476) {
             t = state->f27C * 9.999999f;
             if (t > 1.0f)
                 t = 1.0f;
             else if (t < 0.0f)
                 t = 0.0f;
-            if (gCurrentLap[0] >= 2)
+            if (g_current_lap[0] >= 2)
                 extra = t * 7.0f + 3.5f;
             else
                 extra = t * 3.0f + 1.5f;

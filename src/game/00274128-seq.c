@@ -37,59 +37,59 @@ typedef struct {
     TocFile278fc0 intro;
     TocFile278fc0 frames[20];
 } Toc278fc0;
-extern Toc278fc0 D_0014B540;
+extern Toc278fc0 g_copy_setup_data;
 
 extern int D_00138324;
 extern short D_001A63AC;
-extern int D_001A7340 __attribute__((sda));
-extern float D_001B15A0 __attribute__((sda));
+extern int g_screen_width __attribute__((sda));
+extern float g_screen_fade __attribute__((sda));
 /* The level's state word, a per-level external (see func_002799A8 in 00274128.c). */
 extern int ref_L00_002E38F0_00 __attribute__((sda));
-extern void func_002B4B70(int, int);
-extern void func_00279790(int, int, int, int, int, int, int, int, int, int, unsigned);
-extern int func_002B7B18(int, int, int);
-extern int func_00282948(void *);
-extern void func_00279828(void);
-extern int func_002799A8(void);
-extern int func_00279988(void);
-extern void func_002AA2E8(float *p, float a, float b);
-extern void func_002E4AC8(void);
+extern void request_end_slot(int, int);
+extern void table_set_slot_values(int, int, int, int, int, int, int, int, int, int, unsigned);
+extern int load_start_disc_read(int, int, int);
+extern int math_fast_float_d(void *);
+extern void load_relocate_data_table_offsets(void);
+extern int data_advance_to_next_item_group(void);
+extern int data_query_shared_block(void);
+extern void ApproachValue(float *p, float a, float b);
+extern void UpdateSoundVoices(void);
 
 /* Runs the disc-streamed picture sequence: loads rows and frames from disc step by step and times each one. */
-void func_00278FC0(void)
+void seq_update_disc_player(void)
 {
     if (D_00138324 & 2) {
         if (ref_L00_002E38F0_00 == 0) {
             D_001B7F80.row = 1;
             ref_L00_002E38F0_00 = 1;
         }
-        EndSlotRequest(0, 0);
+        request_end_slot(0, 0);
     }
     switch (D_001B7F80.state) {
     case 0:
         if (D_001A63AC)
             break;
-        SetTableSlotValues(0x33C0, 0x33C1, 0x33EA, 1, 40, 120, 1, 9, 32, 100, 0);
-        SetTableSlotValues(0x33C0, 0x33EB, 0x340D, 2, 40, 120, 1, 9, 32, 100, 1);
-        SetTableSlotValues(0x340E, 0x340F, 0x340F, 3, 100, 160, 0, 1, 54, 200, 2);
-        SetTableSlotValues(0x3488, 0x3489, 0x3489, 4, 100, 160, 0, 1, 36, 200, 3);
-        SetTableSlotValues(0x3410, 0x3412, 0x341E, 5, 40, 120, 0, 5, 56, 300, 4);
-        SetTableSlotValues(0x3410, 0x3420, 0x3422, 6, 40, 120, 0, 5, 56, 300, 5);
-        SetTableSlotValues(0x3410, 0x3424, 0x3426, 7, 40, 120, 0, 5, 56, 300, 6);
-        SetTableSlotValues(0x3410, 0x342D, 0x342E, 8, 40, 120, 0, 5, 56, 300, 7);
-        SetTableSlotValues(0x342F, 0x3430, 0x3453, 9, 60, 120, 1, 9, 32, 100, 8);
-        SetTableSlotValues(0x34B9, 0x34B9, 0x34B9, 10, 200, 512, 0, 0, 36, 200, 9);
-        SetTableSlotValues(0x348A, 0x348B, 0x348C, 11, 60, 120, 0, 2, 130, 200, 10);
-        SetTableSlotValues(0x348A, 0x348D, 0x348D, 12, 60, 120, 0, 1, 260, 200, 11);
-        SetTableSlotValues(0x348A, 0x348E, 0x348F, 13, 60, 120, 0, 2, 130, 200, 12);
-        SetTableSlotValues(0x348A, 0x3490, 0x3493, 14, 60, 120, 0, 2, 130, 200, 13);
-        SetTableSlotValues(0x348A, 0x3494, 0x3494, 15, 60, 120, 0, 3, 100, 200, 14);
-        SetTableSlotValues(0x348A, 0x3495, 0x349A, 16, 60, 120, 0, 2, 130, 200, 15);
-        SetTableSlotValues(0x349B, 0x3412, 0x3412, 17, 200, 512, 0, 1, 36, 200, 16);
-        SetTableSlotValues(0x34B7, 0x3412, 0x3412, 0, 80, 512, 0, 1, 36, 550, 17);
-        SetTableSlotValues(0x349D, 0x349E, 0x34B5, 18, 60, 120, 1, 8, 32, 100, 18);
-        SetTableSlotValues(0x349D, 0x34B6, 0x34B6, 19, 60, 120, 0, 1, 128, 350, 19);
-        SetTableSlotValues(0x34D0, 0x34D0, 0x34D0, 0, 200, 512, 0, 1, 128, 350, 20);
+        table_set_slot_values(0x33C0, 0x33C1, 0x33EA, 1, 40, 120, 1, 9, 32, 100, 0);
+        table_set_slot_values(0x33C0, 0x33EB, 0x340D, 2, 40, 120, 1, 9, 32, 100, 1);
+        table_set_slot_values(0x340E, 0x340F, 0x340F, 3, 100, 160, 0, 1, 54, 200, 2);
+        table_set_slot_values(0x3488, 0x3489, 0x3489, 4, 100, 160, 0, 1, 36, 200, 3);
+        table_set_slot_values(0x3410, 0x3412, 0x341E, 5, 40, 120, 0, 5, 56, 300, 4);
+        table_set_slot_values(0x3410, 0x3420, 0x3422, 6, 40, 120, 0, 5, 56, 300, 5);
+        table_set_slot_values(0x3410, 0x3424, 0x3426, 7, 40, 120, 0, 5, 56, 300, 6);
+        table_set_slot_values(0x3410, 0x342D, 0x342E, 8, 40, 120, 0, 5, 56, 300, 7);
+        table_set_slot_values(0x342F, 0x3430, 0x3453, 9, 60, 120, 1, 9, 32, 100, 8);
+        table_set_slot_values(0x34B9, 0x34B9, 0x34B9, 10, 200, 512, 0, 0, 36, 200, 9);
+        table_set_slot_values(0x348A, 0x348B, 0x348C, 11, 60, 120, 0, 2, 130, 200, 10);
+        table_set_slot_values(0x348A, 0x348D, 0x348D, 12, 60, 120, 0, 1, 260, 200, 11);
+        table_set_slot_values(0x348A, 0x348E, 0x348F, 13, 60, 120, 0, 2, 130, 200, 12);
+        table_set_slot_values(0x348A, 0x3490, 0x3493, 14, 60, 120, 0, 2, 130, 200, 13);
+        table_set_slot_values(0x348A, 0x3494, 0x3494, 15, 60, 120, 0, 3, 100, 200, 14);
+        table_set_slot_values(0x348A, 0x3495, 0x349A, 16, 60, 120, 0, 2, 130, 200, 15);
+        table_set_slot_values(0x349B, 0x3412, 0x3412, 17, 200, 512, 0, 1, 36, 200, 16);
+        table_set_slot_values(0x34B7, 0x3412, 0x3412, 0, 80, 512, 0, 1, 36, 550, 17);
+        table_set_slot_values(0x349D, 0x349E, 0x34B5, 18, 60, 120, 1, 8, 32, 100, 18);
+        table_set_slot_values(0x349D, 0x34B6, 0x34B6, 19, 60, 120, 0, 1, 128, 350, 19);
+        table_set_slot_values(0x34D0, 0x34D0, 0x34D0, 0, 200, 512, 0, 1, 128, 350, 20);
         D_001B8308.count = 21;
         D_001B7F80.frame = 0;
         D_001B7F80.buffer_index = 0;
@@ -99,20 +99,20 @@ void func_00278FC0(void)
         D_001B7F80.timer = 90;
         D_001B7F80.step = 10;
         D_001B7F80.base = 310;
-        D_001B7F80.duration = (float)gScreenWidth * 2.2f;
+        D_001B7F80.duration = (float)g_screen_width * 2.2f;
         D_001B7F80.rate = 0.16129032f;
         D_001B7F80.repeats = 5;
         D_001B7F80.speed = 0.03f;
         D_001B7F80.limit = 18;
-        StartDiscRead(D_001B7F80.buffers[2], gCopySetupData.intro.offset + gCopySetupData.base,
-                      gCopySetupData.intro.size);
+        load_start_disc_read(D_001B7F80.buffers[2], g_copy_setup_data.intro.offset + g_copy_setup_data.base,
+                      g_copy_setup_data.intro.size);
         D_001B7F80.state = 1;
         break;
     case 1:
         if (D_001A63AC)
             break;
-        if (FastFloatHelperD(&D_001B7F80.timer)) {
-            RelocateDataTableOffsets();
+        if (math_fast_float_d(&D_001B7F80.timer)) {
+            load_relocate_data_table_offsets();
             D_001B7F80.state = 2;
         }
         break;
@@ -120,9 +120,9 @@ void func_00278FC0(void)
         SeqState278fc0 *s = &D_001B7F80;
         if (s->frame >= 20)
             s->frame %= 20;
-        StartDiscRead(s->buffers[s->buffer_index],
-                      gCopySetupData.frames[s->frame].offset + gCopySetupData.base,
-                      gCopySetupData.frames[s->frame].size);
+        load_start_disc_read(s->buffers[s->buffer_index],
+                      g_copy_setup_data.frames[s->frame].offset + g_copy_setup_data.base,
+                      g_copy_setup_data.frames[s->frame].size);
         s->state = 3;
         break;
     }
@@ -133,7 +133,7 @@ void func_00278FC0(void)
         s = &D_001B7F80;
         s->ready = 1;
         s->buffer_index ^= 1;
-        if (AdvanceToNextItemGroup()) {
+        if (data_advance_to_next_item_group()) {
             s->state = 4;
             switch (D_001B8308.rows[s->row].kind) {
             case 0:
@@ -151,8 +151,8 @@ void func_00278FC0(void)
     }
     case 4: {
         SeqState278fc0 *s;
-        ApproachValue(&gScreenFade, 0.0f, 0.06666667f);
-        if (QuerySharedDataBlock()) {
+        ApproachValue(&g_screen_fade, 0.0f, 0.06666667f);
+        if (data_query_shared_block()) {
             s = &D_001B7F80;
             s->state = 2;
             s->frame = D_001B8308.rows[s->row].frame;
@@ -160,7 +160,7 @@ void func_00278FC0(void)
         break;
     }
     case 5:
-        EndSlotRequest(0, 0);
+        request_end_slot(0, 0);
         break;
     }
     UpdateSoundVoices();

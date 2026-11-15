@@ -27,26 +27,26 @@ typedef struct {
     int f2fc;
 } F003C01C0s;
 
-extern int func_002B0ED8(void *, void *, int);
-extern int func_002B1350(void *, void *, void *, int);
-extern void func_002B3BA8(void *, int, int, int, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_L01_002F14E8(int, int, float);
-extern char *D_L01_001B255C __attribute__((sda));
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern int ApplyObjectReaction(void *, void *, void *, int);
+extern void weapon_select_aim_target(void *, int, int, int, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern void hud_start_overlay(int, int, float);
+extern char *g_moby_l01_table __attribute__((sda));
 extern char *D_L01_001B264C __attribute__((sda));
 extern float D_L01_001AFEE0 __attribute__((sda));
 extern float D_L01_001AFEE4 __attribute__((sda));
 extern float D_L01_001AFEE8 __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 /* Handles damage taken by the Swamp Monster II and moves its linked parts with it. */
-void func_L01_003C01C0(F003C01C0obj *moby)
+void swamp_monster_update_hit_reaction(F003C01C0obj *moby)
 {
     F003C01C0s *vars = *(F003C01C0s **)((char *)moby + 0x68);
     int oldState = moby->f20;
 
-    if (ApplyDamageToObject(moby, (char *)vars + 0x60, 0) || vars->f2e == 2) {
+    if (moby_apply_damage_to_object(moby, (char *)vars + 0x60, 0) || vars->f2e == 2) {
         if (vars->f20 <= 0.0f || vars->f2e == 2) {
             vars->f20 = 0.0f;
             if (vars->f2e == 2 && !(vars->f98 & 1)) {
@@ -61,7 +61,7 @@ void func_L01_003C01C0(F003C01C0obj *moby)
                 moby->f20 = 99;
             }
             if (vars->f2f8 != -1) {
-                gMobyTable_L01[vars->f2f8 * 256 + 0xbc] = 1;
+                g_moby_l01_table[vars->f2f8 * 256 + 0xbc] = 1;
                 if (vars->f2fc != -1) {
                     int index = vars->f2fc;
                     char *base = D_L01_001B264C;
@@ -76,10 +76,10 @@ void func_L01_003C01C0(F003C01C0obj *moby)
     if (moby->f20 == 255) {
         moby->f20 = oldState;
     }
-    SelectAimTarget_002B3BA8(moby, vars->f2f0, 0, 0, 0.0f, 0.0f);
+    weapon_select_aim_target(moby, vars->f2f0, 0, 0, 0.0f, 0.0f);
     if (*(char **)((char *)vars + 0x2e4)) {
         FastVecSub(*(char **)((char *)vars + 0x2e4) + 0x20,
-                     (char *)moby + 0x10, gHeroPosition);
+                     (char *)moby + 0x10, g_hero_position);
         (*(char **)((char *)vars + 0x2e4))[0x1f] = 1;
         *(float *)(*(char **)((char *)vars + 0x2e4) + 0x10) =
             D_L01_001AFEE0 * 0.017453294f;
@@ -91,8 +91,8 @@ void func_L01_003C01C0(F003C01C0obj *moby)
             *(int *)(*(char **)((char *)vars + 0x2e4) + 0x34) = 3;
         }
     }
-    if (*(float *)(gHeroPosition + 8) < moby->f18 + 20.0f &&
+    if (*(float *)(g_hero_position + 8) < moby->f18 + 20.0f &&
         (unsigned)(moby->f95 - 2) < 5) {
-        StartHudOverlay(2, 0, vars->f20 / IntToFloat(vars->f24));
+        hud_start_overlay(2, 0, vars->f20 / IntToFloat(vars->f24));
     }
 }

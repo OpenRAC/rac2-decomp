@@ -15,13 +15,13 @@ extern int D_L01_001B2088 MACRO_ADDR;
    take it for small data. */
 extern unsigned char D_001A7A6F __attribute__((nosda));
 extern int D_L01_001A907C MACRO_ADDR;
-extern int func_002E5E58(int, unsigned int, void *);
-extern void func_002B0A18(int, int);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void value_set_entry_by_index(int, int);
 
 /* Once the level's mode word reaches 6 and the timer at D_L01_001AEC38 has run out, raises the
    one-shot flag and starts the sequence (mode 2 first rearms the timer to 0x42). A fresh
    object (state 0) clears its byte at +0x30. */
-void func_L01_00378A80(char *effectObject) {
+void oozla_intro_sequence_trigger(char *effectObject) {
     if (*(unsigned char *)(effectObject + 0x20) == 0)
         *(unsigned char *)(effectObject + 0x30) = 0xFF;
     if (D_L01_001B2088 == 2)
@@ -33,7 +33,7 @@ void func_L01_00378A80(char *effectObject) {
     if (D_001A7A6F != 0)
         return;
     D_001A7A6F = 1;
-    PlaySoundFromGlobalBank(1, 0, 0);
-    SetEntryValueByIndex(0x1233, -1);
+    snd_play_from_global_bank(1, 0, 0);
+    value_set_entry_by_index(0x1233, -1);
     D_L01_001A907C = 1;
 }

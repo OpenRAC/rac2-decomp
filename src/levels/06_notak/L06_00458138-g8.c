@@ -12,12 +12,12 @@ extern int func_003A0948(int, int, char *);
 
 extern void func_00350388(char *);
 
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A77E0(int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L06_0037E6B0(void *, void *, int, float, float);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_below(int);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_spinning_effect_record(void *, void *, int, float, float);
 extern float D_L06_001B1AC0 __attribute__((sda));
 extern float D_L06_001B1AC4 __attribute__((sda));
 extern float D_L06_001B1AC8 __attribute__((sda));
@@ -31,32 +31,32 @@ extern int D_L06_001B1AE4 __attribute__((sda));
 extern int D_L06_001B1AE8 __attribute__((sda));
 
 extern u8 *D_L06_001B281C MACRO_ADDR;
-extern char D_00188660[];
+extern char g_sound_state[];
 extern void func_003514C8(void *, int, void *);
-extern void func_00282CF0(float *, const float *, const float *);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_L06_004583A8(char *);
-extern int func_002E59B0(char *, int);
-extern void func_002E59F8(int);
+extern void FastVecSub(float *, const float *, const float *);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void chained_segment_spawn(char *);
+extern int snd_is_voice_playing_for_owner(char *, int);
+extern void snd_stop_voice(int);
 
 extern u8 *D_L06_001B290C MACRO_ADDR;
 extern char D_L06_001B1990[];
 extern char D_L06_001B19C8[];
 extern char D_L06_001B1A00[];
 extern char D_L06_001B1A30[];
-extern u8 *D_L06_001FE500[];
+extern u8 *g_path_list[];
 
-extern void func_0026FEB8(char *, ...);
+extern void STUB_printf(char *, ...);
 extern int func_001163B0(void);
-extern void func_L06_00459B18(char *a0);
-extern int func_L06_00459BA8(char *a0, char *a1);
-extern void func_L06_00459C38(unsigned char *a0, u8 *a1);
+extern void path_l06_compute_segment_lengths(char *a0);
+extern int actor_classify_headroom(char *a0, char *a1);
+extern void actor_start_size_anim(unsigned char *a0, u8 *a1);
 
 /* Turns this part to follow the progress value of the object it is linked to, and plays a sound while it moves. */
-void func_L06_00458568(char *moby) {
+void linked_rotation_follower_update(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *other;
     float tmp[4];
@@ -73,7 +73,7 @@ void func_L06_00458568(char *moby) {
             *(float *)(vars + 0x1C) = length;
         }
         if (*(float *)(vars + 0xC) == 0.0f) *(float *)(vars + 0xC) = 1.0f;
-        SpawnChainedSegment(moby);
+        chained_segment_spawn(moby);
         *(float *)(vars + 0x24) = 0;
         moby[0x20] = 1;
         break;
@@ -82,7 +82,7 @@ void func_L06_00458568(char *moby) {
             other = D_L06_001B281C + *(int *)vars * 256;
             if (other) {
                 char *linkVars = *(char **)(other + 0x68);
-                if (FloatAbs(*(float *)(vars + 0xC)) > 0.0f)
+                if (math_fabs(*(float *)(vars + 0xC)) > 0.0f)
                     *(float *)(vars + 0x14) = *(float *)linkVars * (*(float *)(vars + 0xC) * 3.1415927f);
                 else *(float *)(vars + 0x14) = 0;
                 *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(vars + 8), *(float *)(vars + 0x14));
@@ -90,12 +90,12 @@ void func_L06_00458568(char *moby) {
                     *(float *)(moby + 0xF4) = fast_subtract_rotations(*(float *)(vars + 0x18), (*(float *)linkVars - 0.6f) * 0.13089971244335175f);
                 if (*(int *)(vars + 0x10) == 0) {
                     if (*(float *)linkVars != *(float *)(vars + 0x24) && *(float *)linkVars != 1.0f && *(float *)linkVars != 0.0f) {
-                        if (!IsVoicePlayingForOwner(moby, *(int *)(vars + 0x20)))
+                        if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x20)))
                             *(int *)(vars + 0x20) = func_003A0948(0, 4, moby);
-                    } else if (IsVoicePlayingForOwner(moby, *(int *)(vars + 0x20))) {
+                    } else if (snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x20))) {
                         if (*(int *)(vars + 0x20) != -1) {
-                        char *sound = gSoundState + *(int *)(vars + 0x20) * 0x70;
-                        if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74)) StopSoundVoice(*(int *)(vars + 0x20));
+                        char *sound = g_sound_state + *(int *)(vars + 0x20) * 0x70;
+                        if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74)) snd_stop_voice(*(int *)(vars + 0x20));
                         }
                         *(int *)(vars + 0x20) = -1;
                     }
@@ -109,7 +109,7 @@ void func_L06_00458568(char *moby) {
 }
 
 /* Resolves the table entries a spawn record names; returns 1 after reporting a missing one. */
-int func_L06_00459D08(u8 *moby, u8 *vars)
+int spawn_record_resolve_links(u8 *moby, u8 *vars)
 {
     s32 pathIdxA, pathIdxB, anchorIdx, homeIdx;
     u8 *pathA, *pathB;
@@ -119,24 +119,24 @@ int func_L06_00459D08(u8 *moby, u8 *vars)
         STUB_printf(D_L06_001B1990, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    pathA = gPathList[pathIdxA];
+    pathA = g_path_list[pathIdxA];
     *(u8 **)(vars + 0x118) = pathA;
-    ComputePathSegmentLengths_L06((char *)pathA);
+    path_l06_compute_segment_lengths((char *)pathA);
     pathIdxB = *(s32 *)(vars + 0x134);
     if (pathIdxB == -1) {
         STUB_printf(D_L06_001B19C8, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    pathB = gPathList[pathIdxB];
+    pathB = g_path_list[pathIdxB];
     *(u8 **)(vars + 0x138) = pathB;
-    ComputePathSegmentLengths_L06((char *)pathB);
+    path_l06_compute_segment_lengths((char *)pathB);
     anchorIdx = *(s32 *)(vars + 0x108);
     if (anchorIdx == -1) {
         STUB_printf(D_L06_001B1A00, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
     *(u8 **)(vars + 0x11C) = D_L06_001B281C + (anchorIdx << 8) + 0x18;
-    moby[0xBC] = ClassifyHeadroomSize((char *)moby, (char *)vars);
+    moby[0xBC] = actor_classify_headroom((char *)moby, (char *)vars);
     homeIdx = *(s32 *)(vars + 0x104);
     if (homeIdx == -1) {
         STUB_printf(D_L06_001B1A30, (moby - D_L06_001B281C) >> 8);
@@ -144,9 +144,9 @@ int func_L06_00459D08(u8 *moby, u8 *vars)
     }
     qcopy(vars + 0xE0, D_L06_001B290C + 0x30 + (homeIdx << 7));
     qcopy(vars + 0xD0, moby + 0x10);
-    StartAnimationForSizeClass(moby, vars);
-    *(s32 *)(vars + 0x124) = Rand() % 120;
-    if (Rand() & 1)
+    actor_start_size_anim(moby, vars);
+    *(s32 *)(vars + 0x124) = func_001163B0() % 120;
+    if (func_001163B0() & 1)
         *(f32 *)(vars + 0x130) = 0.3490659f;
     else
         *(f32 *)(vars + 0x130) = -0.3490659f;
@@ -156,41 +156,41 @@ int func_L06_00459D08(u8 *moby, u8 *vars)
 }
 
 /* Spits out a few small particles in front of the object, along the direction it is facing. */
-void func_L06_0045C6D0(char *moby) {
+void part_emit_facing(char *moby) {
     float velocity[4], pos[4], offset[4];
     qcopy(pos, moby + 0x10);
-    pos[2] += 3.3f + RandomFloatRange(-0.05f, 0.05f);
-    pos[0] += RandomFloatRange(-0.1f, 0.1f);
-    pos[1] += RandomFloatRange(-0.1f, 0.1f);
-    offset[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * 1.5f;
-    offset[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * 1.5f;
+    pos[2] += 3.3f + math_random_float_range(-0.05f, 0.05f);
+    pos[0] += math_random_float_range(-0.1f, 0.1f);
+    pos[1] += math_random_float_range(-0.1f, 0.1f);
+    offset[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * 1.5f;
+    offset[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * 1.5f;
     offset[2] = 0;
     FastVecAdd(pos, pos, offset);
-    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
-    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = RandomFloatRange(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
-    SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    if (RandomIntBelow(D_L06_001B1AE8) != 1) {
-    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
-    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[2] = math_random_float_range(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
+    part_spawn_spinning_effect_record(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
+    part_spawn_spinning_effect_record(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
+    if (math_random_int_below(D_L06_001B1AE8) != 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.0166666675f, D_L06_001B1AC4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = RandomFloatRange(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
-        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.5f, 50.4f);
+    velocity[2] = math_random_float_range(D_L06_001B1AC8 * 0.0166666675f, D_L06_001B1ACC * 0.0166666675f);
+        part_spawn_spinning_effect_record(pos, velocity, D_L06_001B1AE0, 0.5f, 50.4f);
     }
-    if (RandomIntBelow(D_L06_001B1AE8) != 1) {
-    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
-    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    if (math_random_int_below(D_L06_001B1AE8) != 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = RandomFloatRange(D_L06_001B1AD8 * 0.0166666675f, 0.0300000012f);
-        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = math_random_float_range(D_L06_001B1AD8 * 0.0166666675f, 0.0300000012f);
+        part_spawn_spinning_effect_record(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
     }
-    if (RandomIntBelow(D_L06_001B1AE8) == 1) {
-    velocity[0] = FastSinOrCosA(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
-    velocity[1] = FastSinOrCosB(*(float *)(moby + 0xF8)) * RandomFloatRange(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    if (math_random_int_below(D_L06_001B1AE8) == 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.0166666675f, D_L06_001B1AD4 * 0.0166666675f);
     velocity[2] = 0;
-    velocity[2] = RandomFloatRange(D_L06_001B1AD8 * 0.0166666675f, D_L06_001B1ADC * 0.0166666675f);
-        SpawnSpinningEffectRecord(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = math_random_float_range(D_L06_001B1AD8 * 0.0166666675f, D_L06_001B1ADC * 0.0166666675f);
+        part_spawn_spinning_effect_record(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
     }
 }

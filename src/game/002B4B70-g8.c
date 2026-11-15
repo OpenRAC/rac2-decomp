@@ -20,16 +20,16 @@ extern int D_001AA0F8 __attribute__((sda));
 extern int D_001AA0FC __attribute__((sda));
 extern int D_001AA104 __attribute__((sda));
 extern int D_0018C2EC __attribute__((nosda));
-extern int D_001A8BB8;
+extern int g_requested_game_mode;
 extern int D_001B1D50[2];
 
 /* Finishes the current request and brings back the one that was waiting on the stack, if any. */
-int func_002B4B70(int value, int index)
+int request_end_slot(int value, int index)
 {
     int count = D_001AA100;
     int status;
 
-    if (gRequestedGameMode != -2)
+    if (g_requested_game_mode != -2)
         status = 1;
     else
         status = 0;
@@ -40,7 +40,7 @@ int func_002B4B70(int value, int index)
     if (status == 0) {
         D_001AA0F8 = value;
         D_001AA0FC = index;
-        gRequestedGameMode = D_001B1D50[--D_001AA100];
+        g_requested_game_mode = D_001B1D50[--D_001AA100];
         D_001AA104 = 0;
     }
     return status;

@@ -42,9 +42,9 @@ typedef struct {
     short state;
 } PreviewSubtitleOwner;
 
-extern PreviewState D_001B2310 __attribute__((sda));
-extern PreviewCamera D_001B5200;
-extern PreviewSubtitleOwner D_001A63A8;
+extern PreviewState g_object_preview_state __attribute__((sda));
+extern PreviewCamera g_active_camera;
+extern PreviewSubtitleOwner g_music_state;
 extern int D_001AD7E4 SDATA(D_001AD7E4) __attribute__((sda));
 extern int D_001AD7E8 SDATA(D_001AD7E8) __attribute__((sda));
 extern int D_001AD7F8 SDATA(D_001AD7F8) __attribute__((sda));
@@ -54,140 +54,140 @@ extern int D_001AD804 SDATA(D_001AD804) __attribute__((sda));
 extern float D_001B90F0;
 extern short D_0018A000;
 
-extern int func_00282978(short *);
-extern int func_002B6D28(void);
-extern void func_00283360(float *);
-extern void func_0027AB40(void);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_0027D098(void (*)(void), int);
-extern void func_002FFCF8(void);
-extern void func_002FFFE0(void);
-extern void func_002FF3F8(void);
-extern void func_002FF968(char *);
+extern int FastDecTimer(short *);
+extern int snd_resume_music_stream(void);
+extern void set_identity_rotation_rows(float *);
+extern void UpdateViewContext(void);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void gfx_register_final_draw_callback(void (*)(void), int);
+extern void shop_draw_preview_fade_overlay(void);
+extern void shop_draw_preview_dim_overlay(void);
+extern void shop_setup_preview_object(void);
+extern void PlaceObjectBeforeCamera(char *);
 /* Retail passes the object in $a0; the matched body does not read it. */
-extern void func_002FFD78(char *);
-extern char *func_002FFB68(char *);
-extern void func_00287EB0(int);
-extern void func_00288508(int);
-extern void func_002AD860(int);
-extern int func_002B49E0(int, int, int, int, int);
+extern void EmitParticlesBeforeCamera(char *);
+extern char *part_spawn_mode_effect_object(char *);
+extern void menu_advance_chain_entry(int);
+extern void help_show_message_for_id(int);
+extern void moby_handle_request_slot_state(int);
+extern int request_begin_slot(int, int, int, int, int);
 
 /* Steps the object preview through its eight states: wait for the subtitle
    owner (at most 181 frames), set up the camera and the object, show it,
    fade, release it and hand control back. */
-void func_002FF450(void)
+void UpdateObjectPreviewSequence(void)
 {
     char *object, *current;
     float angle, sine, tangent, zero;
 
-    switch (gObjectPreviewState.state) {
+    switch (g_object_preview_state.state) {
     case 0:
-        if (FastDecTimer(&gObjectPreviewState.frames)
-            && !(D_001AD7E4 && (gMusicState.state != 3 || gMusicState.id >= 6000)
+        if (FastDecTimer(&g_object_preview_state.frames)
+            && !(D_001AD7E4 && (g_music_state.state != 3 || g_music_state.id >= 6000)
                  && D_001AD7E8++ < 181)) {
-            ResumeMusicStream();
-            gActiveCamera.position[0] = 25.0f;
-            gActiveCamera.position[2] = 900.0f;
-            gActiveCamera.position[1] = 25.0f;
+            snd_resume_music_stream();
+            g_active_camera.position[0] = 25.0f;
+            g_active_camera.position[2] = 900.0f;
+            g_active_camera.position[1] = 25.0f;
             D_001AD7E4 = 0;
             D_001AD7E8 = 0;
-            set_identity_rotation_rows(gActiveCamera.forward);
-            object = gObjectPreviewState.object;
+            set_identity_rotation_rows(g_active_camera.forward);
+            object = g_object_preview_state.object;
             zero = 0.0f;
-            gActiveCamera.rotation[2] = zero;
-            gActiveCamera.rotation[1] = zero;
-            gActiveCamera.rotation[0] = zero;
-            gObjectPreviewState.state = 1;
-            gObjectPreviewState.frames = D_001AD7FC;
-            gObjectPreviewState.s0E = 0;
-            qcopy(object + 0xF0, gActiveCamera.rotation);
-            if (gObjectPreviewState.spin)
+            g_active_camera.rotation[2] = zero;
+            g_active_camera.rotation[1] = zero;
+            g_active_camera.rotation[0] = zero;
+            g_object_preview_state.state = 1;
+            g_object_preview_state.frames = D_001AD7FC;
+            g_object_preview_state.s0E = 0;
+            qcopy(object + 0xF0, g_active_camera.rotation);
+            if (g_object_preview_state.spin)
                 *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), -1.5707964897155762f);
             angle = 0.5621705651283264f;
-            sine = FastSinOrCosB(angle);
-            tangent = sine / FastSinOrCosA(angle);
+            sine = math_fast_sin_or_cos_b(angle);
+            tangent = sine / math_fast_sin_or_cos_a(angle);
             D_001B90F0 = tangent;
             UpdateViewContext();
             *(unsigned short *)(object + 0x34) &= ~0x41;
         } else {
-            RegisterFinalDrawCallback(DrawPreviewFadeOverlay, 0);
+            gfx_register_final_draw_callback(shop_draw_preview_fade_overlay, 0);
         }
         break;
     case 1:
-        PlaceObjectBeforeCamera(gObjectPreviewState.object);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.frames = D_001AD800;
-            gObjectPreviewState.rate = 1.0f / IntToFloat(gObjectPreviewState.frames);
-            gObjectPreviewState.state = 2;
-            gObjectPreviewState.phase = 0;
+        PlaceObjectBeforeCamera(g_object_preview_state.object);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.frames = D_001AD800;
+            g_object_preview_state.rate = 1.0f / IntToFloat(g_object_preview_state.frames);
+            g_object_preview_state.state = 2;
+            g_object_preview_state.phase = 0;
         }
         break;
     case 2:
-        current = gObjectPreviewState.object;
+        current = g_object_preview_state.object;
         PlaceObjectBeforeCamera(current);
         EmitParticlesBeforeCamera(current);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.frames = 2;
-            gObjectPreviewState.state = 3;
-            gObjectPreviewState.alpha = 128;
-            RegisterFinalDrawCallback(DrawPreviewDimOverlay, 0);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.frames = 2;
+            g_object_preview_state.state = 3;
+            g_object_preview_state.alpha = 128;
+            gfx_register_final_draw_callback(shop_draw_preview_dim_overlay, 0);
         }
         break;
     case 3:
-        current = gObjectPreviewState.object;
-        RegisterFinalDrawCallback(DrawPreviewDimOverlay, 0);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.frames = 12;
-            gObjectPreviewState.state = 4;
-            gObjectPreviewState.object = SpawnModeEffectObject(current);
+        current = g_object_preview_state.object;
+        gfx_register_final_draw_callback(shop_draw_preview_dim_overlay, 0);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.frames = 12;
+            g_object_preview_state.state = 4;
+            g_object_preview_state.object = part_spawn_mode_effect_object(current);
         }
         break;
     case 4:
-        if (gObjectPreviewState.object)
-            PlaceObjectBeforeCamera(gObjectPreviewState.object);
-        RegisterFinalDrawCallback(DrawPreviewDimOverlay, 0);
-        gObjectPreviewState.alpha = FloatToInt(IntToFloat(gObjectPreviewState.frames) * (1.0f / 12.0f) * 128.0f);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.state = 5;
-            gObjectPreviewState.frames = D_001AD804;
-            gObjectPreviewState.alpha = 0;
+        if (g_object_preview_state.object)
+            PlaceObjectBeforeCamera(g_object_preview_state.object);
+        gfx_register_final_draw_callback(shop_draw_preview_dim_overlay, 0);
+        g_object_preview_state.alpha = FloatToInt(IntToFloat(g_object_preview_state.frames) * (1.0f / 12.0f) * 128.0f);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.state = 5;
+            g_object_preview_state.frames = D_001AD804;
+            g_object_preview_state.alpha = 0;
         }
         break;
     case 5:
-        if (gObjectPreviewState.object)
-            PlaceObjectBeforeCamera(gObjectPreviewState.object);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.frames = 3;
-            gObjectPreviewState.state = 6;
+        if (g_object_preview_state.object)
+            PlaceObjectBeforeCamera(g_object_preview_state.object);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.frames = 3;
+            g_object_preview_state.state = 6;
         }
         break;
     case 6:
-        if (gObjectPreviewState.object)
-            PlaceObjectBeforeCamera(gObjectPreviewState.object);
-        RegisterFinalDrawCallback(DrawPreviewFadeOverlay, 0);
-        if (FastDecTimer(&gObjectPreviewState.frames)) {
-            gObjectPreviewState.frames = 0;
-            gObjectPreviewState.rate = 1.0f / IntToFloat(D_001AD7F8);
-            gObjectPreviewState.b0D = gObjectPreviewState.s0E = 1;
+        if (g_object_preview_state.object)
+            PlaceObjectBeforeCamera(g_object_preview_state.object);
+        gfx_register_final_draw_callback(shop_draw_preview_fade_overlay, 0);
+        if (FastDecTimer(&g_object_preview_state.frames)) {
+            g_object_preview_state.frames = 0;
+            g_object_preview_state.rate = 1.0f / IntToFloat(D_001AD7F8);
+            g_object_preview_state.b0D = g_object_preview_state.s0E = 1;
             D_0018A000 = D_001AD7F8 + 5;
-            SetupPreviewObject();
-            gObjectPreviewState.object = 0;
-            AdvanceChainEntry(gObjectPreviewState.s08);
-            ShowHelpMessageForId(gObjectPreviewState.s08);
-            if (gObjectPreviewState.spin)
-                HandleRequestSlotState(gObjectPreviewState.s08);
-            gObjectPreviewState.state = 7;
+            shop_setup_preview_object();
+            g_object_preview_state.object = 0;
+            menu_advance_chain_entry(g_object_preview_state.s08);
+            help_show_message_for_id(g_object_preview_state.s08);
+            if (g_object_preview_state.spin)
+                moby_handle_request_slot_state(g_object_preview_state.s08);
+            g_object_preview_state.state = 7;
         }
         break;
     case 7:
-        if (gObjectPreviewState.frames++ >= D_001AD7F8)
-            BeginSlotRequest(0, 2, 0, 0, 0);
+        if (g_object_preview_state.frames++ >= D_001AD7F8)
+            request_begin_slot(0, 2, 0, 0, 0);
         else
-            RegisterFinalDrawCallback(DrawPreviewFadeOverlay, 0);
+            gfx_register_final_draw_callback(shop_draw_preview_fade_overlay, 0);
         break;
     }
 }

@@ -7,14 +7,14 @@ extern float D_L20_001AECF0 __attribute__((sda));
 extern float D_L20_001AECF4 __attribute__((sda));
 extern float D_L20_001AECF8 __attribute__((sda));
 extern float D_L20_001AECFC __attribute__((sda));
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_L20_00330A68(void *, int);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void *func_002A9640(void *, u32, s32);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_0029F338(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_change_class_from_tables(void *, int);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void moby_mark_spawned(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
 
 /* The block at state + 0x140 that func_002B0ED8 takes as its second argument. */
 typedef struct {
@@ -76,7 +76,7 @@ typedef struct {
 } Object0039D340;
 
 /* Sets up the trooper stats and hit settings on its first frame, then handles damage and picks where to aim. */
-void func_L20_0039D340(Object0039D340 *object) {
+void trooper_setup_stats_target(Object0039D340 *object) {
     State0039D340 *st = object->state;
     unsigned char *event;
     unsigned char *target;
@@ -112,7 +112,7 @@ void func_L20_0039D340(Object0039D340 *object) {
         st->f80 = 0.52359884977340698f;
         st->f84 = 0.10000000149011612f;
         object->h7C = 15;
-        SetControllerSpeedLimits(object, D_L20_001AECF4 * 0.00027777778f,
+        moby_set_controller_speed_limits(object, D_L20_001AECF4 * 0.00027777778f,
                      D_L20_001AECF0 * 0.016666668f,
                      D_L20_001AECFC * 4.8481375e-06f,
                      D_L20_001AECF8 * 0.00029088825f);
@@ -120,28 +120,28 @@ void func_L20_0039D340(Object0039D340 *object) {
             st->s24 = 10;
             st->f20 = 10.0f;
         }
-        ChangeMobyClassFromTables(object, 0xD0F);
-        SetMobyState(object, 6, 2);
-        if (object->b43) StartAnimationBlended(object, 0, 0, 0);
+        moby_change_class_from_tables(object, 0xD0F);
+        moby_set_state(object, 6, 2);
+        if (object->b43) anim_start_blended(object, 0, 0, 0);
         object->h34 = (object->h34 | 0x4000) & 0xFFFB;
     }
-    event = FindOwnedEffectSlot(object, 0x10000, 0);
+    event = part_find_owned_effect_slot(object, 0x10000, 0);
     if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F /* Megacorp Trooper Legs */)
         object->bA8 = 255;
-    ApplyDamageToObject(object, &st->damage, 0);
+    moby_apply_damage_to_object(object, &st->damage, 0);
     if (st->b2E == 2) {
-        SetMobyState(object, 6, 2);
+        moby_set_state(object, 6, 2);
         object->i98 = 0;
         object->h34 = (object->h34 | 0x41) & 0xEFFF;
         child = st->children;
         for (count = 0; count < 2; count++) {
             if (*child) {
-                MarkMobySpawned(*child);
+                moby_mark_spawned(*child);
                 *child = 0;
             }
             ++child;
         }
-        if (st->p254) MarkMobySpawned(st->p254);
+        if (st->p254) moby_mark_spawned(st->p254);
         st->p254 = 0;
     }
     st->b2E = 1;
@@ -151,6 +151,6 @@ void func_L20_0039D340(Object0039D340 *object) {
         qcopy(&st->f1F0, target + 0x10);
         st->f1F0[2] += 0.5f;
     } else {
-        SelectAimTarget_002B3BA8(object, st->i230, 0, 0, 128.0f, 0.0f);
+        weapon_select_aim_target(object, st->i230, 0, 0, 128.0f, 0.0f);
     }
 }

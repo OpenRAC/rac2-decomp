@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,17 +24,17 @@
  */
 #include "common.h"
 
-extern s32 func_00288F48(s32 a);
+extern s32 Help_FindIndex(s32 a);
 extern s32 D_001A8D18;
 extern s32 D_001A8D28 __attribute__((sda));
-extern s32 D_001B1840;
+extern s32 g_subtitle_entries;
 
-s32 func_00288FB8(s32 stringId) {
+s32 GetLocalizedString(s32 stringId) {
     s32 index;
 
     index = Help_FindIndex(stringId);
     if (index >= 0) {
-        return *(s32 *)(gSubtitleEntries + index * 0x10);
+        return *(s32 *)(g_subtitle_entries + index * 0x10);
     }
     if (stringId == 0x9C40) {
         return D_001A8D18;

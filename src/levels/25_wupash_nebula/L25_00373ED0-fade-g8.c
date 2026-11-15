@@ -19,7 +19,7 @@ extern int D_L25_001B305C __attribute__((sda));
 extern int D_L25_001B3058 __attribute__((sda));
 /* The count shown beside the icon is the fourth word of this block. Read as an element, it stays a
    two-word load, which keeps it out of the timer test's delay slot as in retail. */
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern u8 *D_L25_001A904C;
 extern int D_L25_001B0D00 __attribute__((sda)), D_L25_001B0D08 __attribute__((sda));
 extern int D_L25_001B0D10 __attribute__((sda)), D_L25_001B0D18 __attribute__((sda));
@@ -28,15 +28,15 @@ extern float D_L25_001B2904;
 extern int D_L25_001B2900;
 extern Block D_L25_001B0D60;
 extern char D_L25_001B0D70[] MACRO_ADDR;
-extern void *func_00336D50(void *, s32);
+extern void *table_find_by_id(void *, s32);
 /* (sprite, color, x, y, scale, alpha, angle) */
-extern void func_00300A00(void *, u32, f32, f32, f32, f32, f32);
-extern s32 func_00282948(void *);
-extern f32 func_00283CE0(s32);
-extern void *func_0028E588(s32, s32);
-extern void func_0028EA58(void *, s32, s32, s32, s32, Block *);
-extern s32 func_00115DA8(char *, const char *, ...);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern void gfx_draw_scaled_object_two_axes(void *, u32, f32, f32, f32, f32, f32);
+extern s32 math_fast_float_d(void *);
+extern f32 IntToFloat(s32);
+extern void *GetIconFrame(s32, s32);
+extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
+extern s32 sprintf(char *, const char *, ...);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -72,13 +72,13 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 /* One sprite of a pair at (x, y): its y scaled for the display. */
 #define HUD_SPRITE(id, color, x, y, scale, alpha, angle)                                       \
     {                                                                                          \
-        sprite = FindTableEntryById(D_L25_001A904C + 0x8710, id);                                   \
-        DrawScaledObjectTwoAxes(sprite, color, (f32)(x),                                                 \
+        sprite = func_00336D50(D_L25_001A904C + 0x8710, id);                                   \
+        func_00300A00(sprite, color, (f32)(x),                                                 \
                       (f32)label_y(sprite, (f32)(y), D_L25_001B2904, 0.5f, 1), scale, alpha, angle); \
     }
 
 /* Draws the HUD icon pairs for this level. The middle pair fades in and out while its timer runs and shows a count. */
-void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
+void hud_draw_fading_icon_pairs(s32 first, s32 second, s32 third, s32 fourth)
 {
     u8 *state = *(u8 **)(D_L25_001B0CE0 + 0x68);
     f32 fade;
@@ -87,7 +87,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
     Block color;
 
     if (D_L25_001B305C == 0) {
-        D_L25_001B3058 = gCurrentMapIndex[3];
+        D_L25_001B3058 = g_current_map_index[3];
         D_L25_001B305C = 1;
     }
     if (D_L25_001A904C == 0)
@@ -96,8 +96,8 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
         HUD_SPRITE(0xBD, 0x60442D00, D_L25_001B0D00, D_L25_001B0D04, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, D_L25_001B0D00, D_L25_001B0D04, -1.0f, 1.0f, 0.0f);
     }
-    if (second && D_L25_001B3058 < gCurrentMapIndex[3]) {
-        if (FastFloatHelperD(state + 0x30) == 0) {
+    if (second && D_L25_001B3058 < g_current_map_index[3]) {
+        if (math_fast_float_d(state + 0x30) == 0) {
             if (*(s32 *)(state + 0x30) >= 291) {
                 fade = IntToFloat(300 - *(s32 *)(state + 0x30)) * 0.1f;
                 if (fade > 1.0f)
@@ -120,15 +120,15 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 color = D_L25_001B0D60;
-                DrawHudSpriteGradient(GetIconFrame(0xEAA2, 3), D_L25_001B0D08 - 51,
+                hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), D_L25_001B0D08 - 51,
                               screen_coord(D_L25_001B2900, (f32)(D_L25_001B0D0C - 13), 1.0f), 28, 28, &color);
-                Sprintf(text, D_L25_001B0D70, gCurrentMapIndex[3]);
+                sprintf(text, D_L25_001B0D70, g_current_map_index[3]);
                 textX = D_L25_001B0D08 + 5;
-                DrawTextMediumFont(textX, label_y((void *)textX, (f32)(D_L25_001B0D0C + 2), D_L25_001B2904, 0.5f, 1),
+                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L25_001B0D0C + 2), D_L25_001B2904, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {
-            D_L25_001B3058 = gCurrentMapIndex[3];
+            D_L25_001B3058 = g_current_map_index[3];
             *(s32 *)(state + 0x30) = 300;
         }
     }

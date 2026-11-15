@@ -4,16 +4,16 @@
 #define WINT(p, o) (*(int *)((char *)(p)+(o)))
 #define WPTR(p, o) (*(char **)((char *)(p)+(o)))
 typedef struct { unsigned int unknown; int data_offset, length, extra; } PackedHeaderCountView;
-extern int func_L04_003A1540(const PackedHeaderCountView *);
-extern void func_L04_003A1578(void *, int, int);
-extern void func_0026FEB8(void *, ...);
-extern void func_00282A28(void);
+extern int gfx_get_packed_header_block_count(const PackedHeaderCountView *);
+extern void water_select_table_slot(void *, int, int);
+extern void STUB_printf(void *, ...);
+extern void math_trap_always(void);
 extern char D_L04_001AD968[], D_L04_001AD998[], D_L04_002C9880[];
 extern char D_L04_001AD9B0[], D_L04_002C98D0[], D_L04_001AD9E0[];
-extern void func_L04_003A14B8(void *, int);
+extern void water_set_tag_bits(void *, int);
 typedef struct { int id; int offsets[2]; int size; } WaterHeaderSlot;
 /* Register a model header and initialize both alternating water buffers. */
-int func_L04_003A15C0(char *obj, int *count, int *used, WaterHeaderSlot *slots, int *buffer) {
+int water_register_model_header(char *obj, int *count, int *used, WaterHeaderSlot *slots, int *buffer) {
     char *state = WPTR(obj, 0x68);
     int i = 0, size, twice, n;
     int *src, *dst, *dst2;
@@ -27,23 +27,23 @@ int func_L04_003A15C0(char *obj, int *count, int *used, WaterHeaderSlot *slots, 
     if (!WPTR(obj, 0x98)) {
         STUB_printf(D_L04_001AD968);
         STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
-        TrapAlways();
+        math_trap_always();
     }
     if (*count >= 6) {
         STUB_printf(D_L04_002C9880);
         STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
         STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
-        TrapAlways();
+        math_trap_always();
     }
     i = *count;
     WINT(state, 0x1C) = i;
-    size = GetPackedHeaderBlockCount((PackedHeaderCountView *)WPTR(obj, 0x98));
+    size = gfx_get_packed_header_block_count((PackedHeaderCountView *)WPTR(obj, 0x98));
     twice = size * 2;
     if (*used + twice > 0x2000) {
         STUB_printf(D_L04_002C98D0);
         STUB_printf(D_L04_001AD9E0, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA), size);
         STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
-        TrapAlways();
+        math_trap_always();
     }
     slots[i].id = WSHORT(obj, 0xAA);
     slots[i].offsets[0] = *used;
@@ -59,9 +59,9 @@ int func_L04_003A15C0(char *obj, int *count, int *used, WaterHeaderSlot *slots, 
         *dst2++ = *src++;
     }
     WPTR(obj, 0x98) = (char *)(buffer + slots[i].offsets[0]);
-    SetTagBitsOnWordArray(obj, 0);
+    water_set_tag_bits(obj, 0);
     WPTR(obj, 0x98) = (char *)(buffer + slots[i].offsets[1]);
-    SetTagBitsOnWordArray(obj, 7);
-    SelectWaterTableSlot(obj, (int)slots, (int)buffer);
+    water_set_tag_bits(obj, 7);
+    water_select_table_slot(obj, (int)slots, (int)buffer);
     return i;
 }

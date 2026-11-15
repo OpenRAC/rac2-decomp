@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad00[6];
@@ -8,8 +9,8 @@ typedef struct {
     char pad44[0x9C];
 } ClassRecord;
 extern char *D_001A8CFC __attribute__((sda));
-extern unsigned char D_00139568[];
-extern ClassRecord D_00239BA0[];
+extern unsigned char g_item_slot_to_record[];
+extern ClassRecord g_weapon_table[];
 extern void func_PAL_003435D0(void *, int);
 extern int func_PAL_003455D8(unsigned char *);
 extern char *func_PAL_00345620(char *);
@@ -23,14 +24,14 @@ int func_PAL_002D4530(char *object)
         func_PAL_003435D0(D_001A8CFC + 0x3C210, 1);
         i = func_PAL_003455D8((unsigned char *)D_001A8CFC + 0x3C530);
         {
-            ClassRecord *r = &D_00239BA0[D_00139568[i]];
+            ClassRecord *r = &g_weapon_table[g_item_slot_to_record[i]];
             int v = r->f42;
             char *a = D_001A8CFC + 0x3C530;
             *(int *)(object + 0x34) = v;
             target = func_PAL_00345620(a);
         }
         i = func_PAL_003455D8((unsigned char *)D_001A8CFC + 0x3C530);
-        *(int *)(target + 0x58) = D_00239BA0[D_00139568[i]].f06;
+        *(int *)(target + 0x58) = g_weapon_table[g_item_slot_to_record[i]].f06;
     }
     return 0;
 }

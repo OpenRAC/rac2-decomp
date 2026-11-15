@@ -2,21 +2,21 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282948(void *);
-extern void func_L16_004050D8(u8 *);
-extern void func_0029F978(u8 *, s32, void *);
-extern void func_00283898(void *, s32, float);
-extern float func_00283BE0(float, float);
-extern void func_002A8C00(void *, u8 *, s32, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282C48(float);
-extern void func_002A8E20(s32, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282E80(void *, void *);
+extern void math_fast_float_d(void *);
+extern void snivelak_sync_child(u8 *);
+extern void AttachManipulator(u8 *, s32, void *);
+extern void build_axis_rotation_quaternion(void *, s32, float);
+extern float fast_subtract_rotations(float, float);
+extern void make_hit_descriptor(void *, u8 *, s32, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_fabs(float);
+extern void QueueMobyImpact(s32, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float vec_distance_xy(void *, void *);
 extern u8 D_L16_00189E20[];
 
 /* Updates the boss turret each frame: animates it and shoots at the hero when he is lined up. */
-void func_L16_00404F50(u8 *arg)
+void boss_turret_update(u8 *arg)
 {
     float delta[4];
     float pos[4];
@@ -24,9 +24,9 @@ void func_L16_00404F50(u8 *arg)
     u8 *state;
     u8 *hero;
     state = *(u8 **)(arg + 0x68);
-    FastFloatHelperD(state + 0x258);
+    math_fast_float_d(state + 0x258);
     if (*(u16 *)(arg + 0x96) < 0xFFFF) ++*(u16 *)(arg + 0x96);
-    SyncAttachedChild(arg);
+    snivelak_sync_child(arg);
     if (!state[0x211]) AttachManipulator(arg, 7, state + 0x210);
     build_axis_rotation_quaternion(state + 0x220, 2, *(float *)(state + 0x26C));
     *(float *)(state + 0x26C) = fast_subtract_rotations(*(float *)(state + 0x26C), 0.41597017645835876f);
@@ -38,7 +38,7 @@ void func_L16_00404F50(u8 *arg)
         vec_scale_to_length(delta, arg + 0xC0, -1.3f);
         FastVecAdd(pos, delta, pos);
         hero = D_L16_00189E20;
-        if (FloatAbs(*(float *)(hero + 0x88) - pos[2]) < 0.1f &&
+        if (math_fabs(*(float *)(hero + 0x88) - pos[2]) < 0.1f &&
             vec_distance_xy(pos, hero + 0x80) < 9.1f)
             QueueMobyImpact(*(s32 *)(hero + 0x2290), query);
     }

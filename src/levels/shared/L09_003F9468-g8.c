@@ -13,7 +13,7 @@ extern void func_31F7E0(char *moby, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14)
 
 /* Drives the two angle pairs of the state, in degrees converted to radians. */
 /* Turns the object's parts to follow their target angles. */
-void func_L09_00410B40(char *moby)
+void parts_turn_to_target_angles(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -23,12 +23,12 @@ void func_L09_00410B40(char *moby)
                 D_L09_001B183C * 0.000290888245f, D_L09_001B1840 * 0.000290888245f);
 }
 
-extern int func_002E5CF8(int, int, void *);
-extern float func_00282E80(void *, void *);
-extern float func_002A7940(void);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
+extern int PlayMobySound(int, int, void *);
+extern float vec_distance_xy(void *, void *);
+extern float math_random_angle(void);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
 
 typedef struct {
     char pad0[0x33C];
@@ -36,8 +36,8 @@ typedef struct {
     char pad340[0x34E - 0x340];
     short busy;
 } TriggerPlayer;
-extern TriggerPlayer D_00189E20;
-extern int D_001A79F0 __attribute__((sda));
+extern TriggerPlayer g_hero_state;
+extern int g_current_map_index __attribute__((sda));
 /* Flag bytes indexed by level * 16 + owner; 3-bit counters indexed by level * 1024, two per byte. */
 extern u8 D_0019B2E8[];
 extern u8 D_0019B4A8[];
@@ -64,7 +64,7 @@ typedef struct {
 } TriggerObject;
 
 /* Update for moby class 3836, a glowing floor switch. It pulses in colour and turns off once the hero steps on it. */
-void func_L09_0041A700(TriggerObject *obj)
+void floor_l09_switch_update(TriggerObject *obj)
 {
     TriggerState *s = obj->state;
     int shade, level;
@@ -74,22 +74,22 @@ void func_L09_0041A700(TriggerObject *obj)
 
     switch (obj->status) {
     case 0:
-        s->angle = RandomAngle();
+        s->angle = math_random_angle();
         obj->status = 1;
         obj->position[2] -= 0.35f;
         break;
     case 1:
         /* Pulse the colour: the angle advances 6 degrees per update. */
         s->angle = FastAddRotations(s->angle, 0.10471977f);
-        shade = FloatToInt((FastSinOrCosB(s->angle) * 4.0f - 3.0f) * 128.0f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(s->angle) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         green = (shade << 8) | (int)0x80000000;
         red = shade << 16;
         obj->color = (red | green) | shade;
-        if (gHeroState.standing != (char *)obj || gHeroState.busy) {
+        if (g_hero_state.standing != (char *)obj || g_hero_state.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
-            level = gCurrentMapIndex;
+            level = g_current_map_index;
             if (!(D_0019B2E8[obj->owner + level * 16] & 0x80) || s->enabled) {
                 int id;
                 if (!s->enabled) return;
@@ -112,10 +112,10 @@ activate:
             PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
             } else {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                 if ((*counts & 7) != 7) ++*counts;
             }
         }
@@ -132,10 +132,10 @@ proximity:
             if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
                 } else {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
                 obj->status = 2;

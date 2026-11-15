@@ -11,17 +11,17 @@ typedef char PacketExtent[sizeof(OverlayPacket) == 0x90 ? 1 : -1];
 extern float D_L09_001B9A00[];
 /* This consumer reads four complete rows; the external owner extent stays open. */
 extern float D_L09_001B1240_gp[][4] SDATA(D_L09_001B1240);
-extern u64 func_0027C878(int);
-extern void func_002FC560(unsigned int, u64);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(unsigned int, u64);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws a glowing flat marker on the ground at the object's target spot, plus a flash when it was just hit. */
-void func_L09_003FD7D0(unsigned char *object)
+void target_marker_draw(unsigned char *object)
 {
     float position[4];
     OverlayPacket packet;

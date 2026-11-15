@@ -19,8 +19,8 @@ typedef struct {
     u8 pad120[0x21C];
     u8 *attached;
 } HeroDDA8;
-extern HeroDDA8 D_00189E20;
-extern u8 D_00189EA0[];
+extern HeroDDA8 g_hero_state;
+extern u8 g_hero_position[];
 extern s32 D_L12_001B29C8;
 extern s32 D_L12_001B29C8_gp SDATA(D_L12_001B29C8);
 extern f32 D_L12_001B1DE8 SDATA(D_L12_001B1DE8);
@@ -30,26 +30,26 @@ extern s32 D_L12_001B1DE4 SDATA(D_L12_001B1DE4);
 extern s32 D_L12_001B1DF0 SDATA(D_L12_001B1DF0);
 extern s32 D_L12_001B1DF4;
 /* Integer and FP argument order is preserved independently by the EE ABI. */
-extern void func_L01_0031AB20(void *, void *, f32, f32, f32, s32);
-extern void func_L00_00410D18(void *);
-extern s32 func_002ACBC8(void *, s32);
-extern void func_002A7750(void *, s32, s32);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_00282E80(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_00282C48(f32);
-extern void func_002AAC80(void *, f32, f32, f32, f32);
-extern void func_00282F20(void *, void *, f32);
-extern f32 func_00282E48(void *, void *);
-extern s32 func_00282948(void *);
-extern f32 func_00283CE0(s32);
-extern s32 func_L01_0031BC68(s32, s32, f32);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void pushable_moby_update(void *, void *, f32, f32, f32, s32);
+extern void moby_update_empty_alt(void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern void moby_set_state(void *, s32, s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 vec_distance_xy(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern f32 FastVecDot(void *, void *);
+extern f32 math_fabs(f32);
+extern void math_approach_target_with_braking(void *, f32, f32, f32, f32);
+extern void vec_scale_to_length(void *, void *, f32);
+extern f32 fast_vec_dist(void *, void *);
+extern s32 math_fast_float_d(void *);
+extern f32 IntToFloat(s32);
+extern s32 PulseColor(s32, s32, f32);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves between the two node-relative endpoints and pauses before reversing. */
-void func_L12_0041DDA8(u8 *self)
+void UpdateTodanoShuttlePlatform(u8 *self)
 {
     u8 *vars = *(u8 **)(self + 0x68);
     f32 oldPos[4] __attribute__((aligned(16)));
@@ -78,15 +78,15 @@ void func_L12_0041DDA8(u8 *self)
             /* The compiler retains this short delay and pads its loop. */
             for (delay = 0; delay < 2; delay++) {}
         }
-        UpdatePushableMoby(self, vars + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(vars + 0xEC));
+        pushable_moby_update(self, vars + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(vars + 0xEC));
         nodeIds=(s32 *)(vars + 0xE0);
         for (i = 0; i < 2; i++, nodeIds++) {
             if (*nodeIds != -1)
-                EmptyMobyUpdate(D_L12_001B2E9C_gp + (*nodeIds << 8));
+                moby_update_empty_alt(D_L12_001B2E9C_gp + (*nodeIds << 8));
         }
         if (*(s32 *)(vars + 0xE8)!=-1 && IsPointInCuboid(self + 0x10, *(s32 *)(vars + 0xE8))) {
             *(s32 *)(vars + 0x138)=60;
-            SetMobyState(self, 3,-1);
+            moby_set_state(self, 3,-1);
             *(u16 *)(self + 0x34)&=0xEFFF;
             *(f32 *)(vars + 0x130)=1.0f;
         }
@@ -98,10 +98,10 @@ void func_L12_0041DDA8(u8 *self)
         matrix_mul_vec3(&motion, &motion, &D_L12_001B2F8C[*(s32 *)(vars + 0xE8)]);
         FastVecAdd(&motion, &motion,(u8 *)&D_L12_001B2F8C[*(s32 *)(vars + 0xE8)]+0x30);
         speed=vec_distance_xy(self + 0x10, &motion);
-        if (gHeroState.attached!=self && D_L12_001B29C8%30==0) {
+        if (g_hero_state.attached!=self && D_L12_001B29C8%30==0) {
             FastVecSub(&temp, self + 0x10, &motion);
-            angle=FastVecDot(&temp, gHeroState.direction);
-            if (FloatAbs(angle)<*(f32 *)(vars + 0x134)*0.9f) {
+            angle=FastVecDot(&temp, g_hero_state.direction);
+            if (math_fabs(angle)<*(f32 *)(vars + 0x134)*0.9f) {
                 if (*(f32 *)(vars + 0x13C)>3.0f) *(f32 *)(vars + 0x13C)-=0.5f;
                 if (*(f32 *)(vars + 0x140)<9.0f) *(f32 *)(vars + 0x140)+=0.5f;
             } else {
@@ -110,12 +110,12 @@ void func_L12_0041DDA8(u8 *self)
             }
         }
         oldSpeed=*(f32 *)(vars + 0x134);
-        ApproachTargetWithBraking(vars + 0x134, speed, *(f32 *)(vars + 0x13C)*0.00027777778f, *(f32 *)(vars + 0x140)*0.00027777778f, D_L12_001B1DE8*0.016666668f);
+        math_approach_target_with_braking(vars + 0x134, speed, *(f32 *)(vars + 0x13C)*0.00027777778f, *(f32 *)(vars + 0x140)*0.00027777778f, D_L12_001B1DE8*0.016666668f);
         FastVecSub(delta, &motion, self + 0x10);
         delta[2]=0;
         vec_scale_to_length(delta, delta, *(f32 *)(vars + 0x134));
-        qcopy(&temp, gHeroPosition);
-        if (FloatAbs(temp.f[2]-D_L12_001B2F8C[*(s32 *)(vars + 0xE8)].z)<2.5f)
+        qcopy(&temp, g_hero_position);
+        if (math_fabs(temp.f[2]-D_L12_001B2F8C[*(s32 *)(vars + 0xE8)].z)<2.5f)
             temp.f[2]=D_L12_001B2F8C_gp[*(s32 *)(vars + 0xE8)].z;
         if (IsPointInCuboid(&temp, *(s32 *)(vars + 0xE8))) {
             FastVecSub(work, &temp, self + 0x10);
@@ -137,11 +137,11 @@ void func_L12_0041DDA8(u8 *self)
         if (speed<0.01f) {
             *(s32 *)(vars + 0x138)=60;
             *(f32 *)(vars + 0x130)=-*(f32 *)(vars + 0x130);
-            SetMobyState(self, 3,-1);
+            moby_set_state(self, 3,-1);
         }
         break;
     case 3:
-        if (FastFloatHelperD(vars + 0x138)) SetMobyState(self, 2,-1);
+        if (math_fast_float_d(vars + 0x138)) moby_set_state(self, 2,-1);
         break;
     }
     if (self[0x31]) {
@@ -160,5 +160,5 @@ void func_L12_0041DDA8(u8 *self)
         }
     }
     FastVecSub(delta, self + 0x10, oldPos);
-    CombineTransformsAndStore(vars + 0xA0, delta, oldRot, self + 0xF0);
+    mat_combine_and_store(vars + 0xA0, delta, oldRot, self + 0xF0);
 }

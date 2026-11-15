@@ -1,12 +1,12 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00283658(void *moby, void *a1);
-extern void func_002833F0(void *moby, void *a1);
-extern s32  func_L01_0031BC68(u32 moby, u32 a1, f32 a2);
-extern s32  func_00283D38(s32 moby, s32 a1, f32 a2);
-extern void func_L02_002EF968(void *moby, s32 a1, s32 a2, void *a3, void *a4, s32 a5);
-extern void func_L01_002E1510(void *moby, s32 a1, void *a2, s32 a3, void *a4);
+extern void copy_matrix_rotation(void *moby, void *a1);
+extern void euler_rotation_basis(void *moby, void *a1);
+extern s32  PulseColor(u32 moby, u32 a1, f32 a2);
+extern s32  FastTweenColor(s32 moby, s32 a1, f32 a2);
+extern void FillQuadPacket(void *moby, s32 a1, s32 a2, void *a3, void *a4, s32 a5);
+extern void gfx_transform_and_draw_entries(void *moby, s32 a1, void *a2, s32 a3, void *a4);
 
 extern u32 D_L03_001B0430[] __attribute__((sda));
 extern u8   D_L03_001B0410 __attribute__((sda));
@@ -14,7 +14,7 @@ extern f32  D_L03_0029B9F0[];
 
 /* Builds the actor's effect object: the track the level keeps, the two vectors
    the aim is folded into, and the level's own tables. */
-void func_L03_003CBC40(char *moby)
+void tube_start_draw_effect(char *moby)
 {
     u8 packet[0x1A0];
     s32 vars;
@@ -34,5 +34,5 @@ void func_L03_003CBC40(char *moby)
         color = FastTweenColor(color & 0xFFFFFF, color, fade);
     FillQuadPacket(packet, 5, color, &D_L03_001B0410, D_L03_0029B9F0, 1);
     FillQuadPacket(packet + 0x90, 5, color, &D_L03_001B0410, D_L03_0029B9F0 + 0x10, 1);
-    TransformAndDrawEntries(packet, 2, packet + 0x120, 0x20, packet + 0x150);
+    gfx_transform_and_draw_entries(packet, 2, packet + 0x120, 0x20, packet + 0x150);
 }

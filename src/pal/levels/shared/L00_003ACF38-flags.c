@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef float f32;
-extern s32 func_00277F48(f32, s32, s32, s32, s32);
-extern void func_00282F20(void *, void *, float);
+extern s32 coll_process_hit(f32, s32, s32, s32, s32);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_PAL_0032F0B8(int, int, int);
-extern int D_0018C0B0;
-extern unsigned char D_00139568[];
-extern unsigned char D_L00_00262570[];
-extern unsigned int D_L00_001C3280[];
+extern int g_hero_moby;
+extern unsigned char g_item_slot_to_record[];
+extern unsigned char g_weapon_l00_table[];
+extern unsigned int g_area_hit_targets[];
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct {
     float pos[4];
@@ -37,19 +38,19 @@ void func_PAL_L00_003ACF38(char *a0, char *a1, char *a2)
     s.count = 1;
     s.obj = (unsigned int)a0;
     *(TI128 *)s.pos = *(TI128 *)a1;
-    func_00282F20(&s, &s, 1.0f);
+    vec_scale_to_length(&s, &s, 1.0f);
     s.pos[3] = 5627.9248046875f;
     s.kind = 3;
     s.kind2 = 2;
     s.id = *(unsigned short *)(a0 + 0xAA);
-    count = func_00277F48(6.0f, (int)a2, 1, D_0018C0B0, (int)&s);
-    if (((Entry262570 *)(D_L00_00262570 + D_00139568[0x19] * 224))->flag != 0) {
-        p = D_L00_001C3280;
+    count = coll_process_hit(6.0f, (int)a2, 1, g_hero_moby, (int)&s);
+    if (((Entry262570 *)(g_weapon_l00_table + g_item_slot_to_record[0x19] * 224))->flag != 0) {
+        p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            func_PAL_0032F0B8(D_L00_001C3280[i], 0x46, *(int *)(a0 + 0xB8));
+            func_PAL_0032F0B8(g_area_hit_targets[i], 0x46, *(int *)(a0 + 0xB8));
     } else {
-        p = D_L00_001C3280;
+        p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            func_PAL_0032F0B8(D_L00_001C3280[i], 0x19, *(int *)(a0 + 0xB8));
+            func_PAL_0032F0B8(g_area_hit_targets[i], 0x19, *(int *)(a0 + 0xB8));
     }
 }

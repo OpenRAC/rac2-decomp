@@ -2,9 +2,9 @@
 #include "names.h"
 
 /* Qwen draft (branch qwen/autonomy, 2e797515), checked by tools/check.py */
-void func_0028A180(int, int);
+void hud_queue_hint_message(int, int);
 
-extern void func_0028B650(char *, int);
+extern void hud_load_element_from_table(char *, int);
 
 /* Update the measured fields of the first matching key among13records. */
 typedef struct { unsigned int fields[25]; int key; unsigned int busy; unsigned int tail[9]; } UpdateRecord;
@@ -40,7 +40,7 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 
 /* Does nothing (empty stub). */
-void func_00288D88(void)
+void subtitle_empty_a(void)
 {
 }
 
@@ -52,31 +52,31 @@ typedef struct {
     int pending;
 } SubtitleState;
 
-extern SubtitleState D_00254E78;
+extern SubtitleState g_subtitle_state;
 
 /* Makes the subtitle on screen start closing, depending on how far along it is. */
-void func_00288D90(void)
+void subtitle_begin_close(void)
 {
-    switch (gSubtitleState.active) {
+    switch (g_subtitle_state.active) {
     case 0:
-        gSubtitleState.pending = -1;
+        g_subtitle_state.pending = -1;
         return;
     case 1:
     case 2:
-        gSubtitleState.active = 7;
-        gSubtitleState.timer = 0;
+        g_subtitle_state.active = 7;
+        g_subtitle_state.timer = 0;
         return;
     case 3:
-        gSubtitleState.active = 7;
-        gSubtitleState.timer = 0;
+        g_subtitle_state.active = 7;
+        g_subtitle_state.timer = 0;
         return;
     case 4:
-        gSubtitleState.active = 6;
-        gSubtitleState.timer = 4 - gSubtitleState.timer;
+        g_subtitle_state.active = 6;
+        g_subtitle_state.timer = 4 - g_subtitle_state.timer;
         return;
     case 5:
-        gSubtitleState.active = 6;
-        gSubtitleState.timer = 0;
+        g_subtitle_state.active = 6;
+        g_subtitle_state.timer = 0;
         return;
     case 7:
         return;
@@ -88,14 +88,14 @@ typedef struct { char reserved00[0x24]; int key; char reserved28[0x40]; int acti
                 short soundId; char reserved6E[4]; unsigned short soundState; } SelectorOwner;
 typedef struct { unsigned short key; char reserved02[10]; } SelectorRow;
 extern SelectorState ref_L00_00288E18_00;
-extern SelectorOwner D_001A63A8;
-extern SelectorRow D_0018C958[];
+extern SelectorOwner g_music_state;
+extern SelectorRow g_subtitle_history[];
 /* Queues a spoken line with subtitles, but only if no line is playing or waiting. Returns 1 if it was accepted, otherwise 0. */
-int func_00288E18(int key, int selection)
+int subtitle_request_voice_line(int key, int selection)
 {
     SelectorState *state = &ref_L00_00288E18_00;
-    if (state->active == 0 && state->key == -1 && gMusicState.active == 0 &&
-        gMusicState.key == -1 && gSubtitleHistory[selection].key != 65535) {
+    if (state->active == 0 && state->key == -1 && g_music_state.active == 0 &&
+        g_music_state.key == -1 && g_subtitle_history[selection].key != 65535) {
         state->key = key;
         state->selection = selection;
         state->value40 = 0;
@@ -110,28 +110,28 @@ typedef struct { int unk00; int unk04; int id; int unk0C; } TextEntry;
 
 typedef struct { char pad00[0x2A20]; int voiceFlags[1]; } DiscToc;
 
-extern TextEntry *D_001B1840 __attribute__((sda));
-extern DiscToc D_0014B540;
+extern TextEntry *g_subtitle_entries __attribute__((sda));
+extern DiscToc g_copy_setup_data;
 
 /* Stops the current subtitle and clears its state. Also marks its voice line as finished if it was playing. */
-void func_00288EA0(void)
+void subtitle_clear_state(void)
 {
     int voiceId;
 
-    if (gSubtitleState.active == 0)
+    if (g_subtitle_state.active == 0)
         return;
-    if (gSubtitleState.entryIndex != -1) {
-        voiceId = gSubtitleEntries[gSubtitleState.entryIndex].id;
-        if (voiceId != -1 && gCopySetupData.voiceFlags[voiceId] != 0 &&
-            voiceId == gMusicState.soundId - 6000) {
-            if (gMusicState.soundState != 6 && gMusicState.soundState != 7)
-                gMusicState.soundState = 5;
+    if (g_subtitle_state.entryIndex != -1) {
+        voiceId = g_subtitle_entries[g_subtitle_state.entryIndex].id;
+        if (voiceId != -1 && g_copy_setup_data.voiceFlags[voiceId] != 0 &&
+            voiceId == g_music_state.soundId - 6000) {
+            if (g_music_state.soundState != 6 && g_music_state.soundState != 7)
+                g_music_state.soundState = 5;
         }
     }
-    gSubtitleState.active = 0;
-    gSubtitleState.pending = -1;
-    gSubtitleState.entryIndex = -1;
-    gSubtitleState.timer = 0;
+    g_subtitle_state.active = 0;
+    g_subtitle_state.pending = -1;
+    g_subtitle_state.entryIndex = -1;
+    g_subtitle_state.timer = 0;
 }
 
 
@@ -141,7 +141,7 @@ void func_00288EA0(void)
 /* func_00289178 is in 00289178.c. */
 
 /* Does nothing (empty stub). */
-void func_00289AA0(void)
+void subtitle_empty_b(void)
 {
 }
 
@@ -150,7 +150,7 @@ void func_00289AA0(void)
 extern short D_00254EC8[][2];
 
 /* Looks a number up in the table of 170 pairs and returns its position, or -1 if missing. It can also hand back the other number of the pair. */
-int func_00289FC8(short key, int field, unsigned short *out)
+int text_find_pair_in_table(short key, int field, unsigned short *out)
 {
     int i;
 
@@ -169,9 +169,9 @@ extern int D_001A7C04_sda __attribute__((sda));
 extern int D_001A7C04[] __attribute__((sda));
 
 /* Moves a text entry to the end of the recently-used list, adding it if it was missing. */
-void func_0028A030(short id)
+void text_mark_entry_recent(short id)
 {
-    int tableIndex = FindPairInTextTable(id, 1, 0);
+    int tableIndex = text_find_pair_in_table(id, 1, 0);
     int i;
 
     if (tableIndex == -1)
@@ -193,9 +193,9 @@ void
 func_0028A130(int eventId)
 {
   if (eventId == 0x17)
-    QueueHintMessage(0x9f3, 0x4a);
+    hud_queue_hint_message(0x9f3, 0x4a);
   if (eventId == 0x19)
-    QueueHintMessage(0xa35, 0x8c);
+    hud_queue_hint_message(0xa35, 0x8c);
   return;
 }
 
@@ -210,7 +210,7 @@ extern short D_001B1858[] __attribute__((sda));
 /* Appends key with its value unless the ring is full or already holds key. Every access
  * reads the globals directly: local copies of the count and first slot lose the register
  * copies retail makes around the loop. */
-void func_0028A180(int key, int value)
+void hud_queue_hint_message(int key, int value)
 {
     int i;
 
@@ -243,18 +243,18 @@ typedef struct {
     int active;
     int falling;
 } CounterState;
-extern CounterState D_001B1928 __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
-extern int D_001A79F8[] __attribute__((sda));
-extern int func_0029B780(void);
+extern CounterState g_bolt_counter_state __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
+extern int g_player_bolts[] __attribute__((sda));
+extern int level_has_value_pair(void);
 extern void func_0029CBA8(int);
-extern void func_0028A278(void);
-extern void func_0029B698(int);
+extern void hud_reset_bolt_counter_display(void);
+extern void level_forward_value(int);
 
 /* Moves the shown bolt count (D_001A79F8 is the real one) to the real count: a change opens a
  * transition row, 60 frames without a further change commit it, and the pending amount is then
  * applied over 15 frames. */
-void func_0028A2F8(void)
+void UpdateBoltCounter(void)
 {
     CounterRow *row;
     int index;
@@ -262,58 +262,58 @@ void func_0028A2F8(void)
     int previous;
     int delta;
 
-    if (HasLevelObjectValuePair())
+    if (level_has_value_pair())
         return;
-    func_0029CBA8((int)&gBoltCounterState.shown);
-    if (gCurrentGameMode[0] == 5 && gPlayerBolts[0] < gBoltCounterState.shown) {
-        ResetBoltCounterDisplay();
+    func_0029CBA8((int)&g_bolt_counter_state.shown);
+    if (g_current_game_mode[0] == 5 && g_player_bolts[0] < g_bolt_counter_state.shown) {
+        hud_reset_bolt_counter_display();
     } else {
-        falling = gBoltCounterState.falling;
-        if (!falling && gBoltCounterState.active == -1 && gPlayerBolts[0] < gBoltCounterState.shown) {
-            index = gBoltCounterState.rows[0].state != 0;
-            row = &gBoltCounterState.rows[index];
+        falling = g_bolt_counter_state.falling;
+        if (!falling && g_bolt_counter_state.active == -1 && g_player_bolts[0] < g_bolt_counter_state.shown) {
+            index = g_bolt_counter_state.rows[0].state != 0;
+            row = &g_bolt_counter_state.rows[index];
             falling = 1;
             row->state = falling;
             row->timer = 0;
             row->age = 0;
-            row->value = gBoltCounterState.shown - gPlayerBolts[0];
-            gBoltCounterState.active = index;
-            gBoltCounterState.falling = falling;
-        } else if (!falling && gBoltCounterState.active == -1 && gBoltCounterState.shown + gBoltCounterState.pending < gPlayerBolts[0]) {
-            index = gBoltCounterState.rows[0].state != 0;
-            row = &gBoltCounterState.rows[index];
+            row->value = g_bolt_counter_state.shown - g_player_bolts[0];
+            g_bolt_counter_state.active = index;
+            g_bolt_counter_state.falling = falling;
+        } else if (!falling && g_bolt_counter_state.active == -1 && g_bolt_counter_state.shown + g_bolt_counter_state.pending < g_player_bolts[0]) {
+            index = g_bolt_counter_state.rows[0].state != 0;
+            row = &g_bolt_counter_state.rows[index];
             row->state = 1;
             row->timer = 0;
             row->age = 0;
             row->value = 0;
-            gBoltCounterState.active = index;
-            gBoltCounterState.falling = 0;
+            g_bolt_counter_state.active = index;
+            g_bolt_counter_state.falling = 0;
         }
     }
-    index = gBoltCounterState.active;
+    index = g_bolt_counter_state.active;
     if (index != -1) {
-        row = &gBoltCounterState.rows[index];
+        row = &g_bolt_counter_state.rows[index];
         if (row->state != 3) {
             previous = row->value;
             if (previous >= 0) {
-                row->value = gPlayerBolts[0] - gBoltCounterState.shown + gBoltCounterState.pending;
+                row->value = g_player_bolts[0] - g_bolt_counter_state.shown + g_bolt_counter_state.pending;
                 if (row->value != previous)
                     row->timer = 0;
             }
             row->timer++;
             row->age++;
             if (row->timer > 60) {
-                gBoltCounterState.pending = row->value;
-                gBoltCounterState.base = gBoltCounterState.shown;
+                g_bolt_counter_state.pending = row->value;
+                g_bolt_counter_state.base = g_bolt_counter_state.shown;
                 row->timer = -1;
                 row->state = 3;
             }
         }
     }
-    if (index != -1 || gBoltCounterState.rows[0].state == 3 || gBoltCounterState.rows[1].state == 3)
-        ForwardValueToLevelObject(180);
+    if (index != -1 || g_bolt_counter_state.rows[0].state == 3 || g_bolt_counter_state.rows[1].state == 3)
+        level_forward_value(180);
     for (index = 0; index < 2; index++) {
-        row = &gBoltCounterState.rows[index];
+        row = &g_bolt_counter_state.rows[index];
         switch (row->state) {
         case 1:
             if (row->age >= 15)
@@ -321,18 +321,18 @@ void func_0028A2F8(void)
             break;
         case 3:
             row->timer++;
-            delta = (int)((float)gBoltCounterState.pending * 0.0714285746f);
-            gBoltCounterState.shown += delta;
+            delta = (int)((float)g_bolt_counter_state.pending * 0.0714285746f);
+            g_bolt_counter_state.shown += delta;
             row->value -= delta;
-            if (gBoltCounterState.falling ? row->value > 0 : row->value < 0)
+            if (g_bolt_counter_state.falling ? row->value > 0 : row->value < 0)
                 row->value = 0;
             if (row->timer >= 15) {
-                if (gBoltCounterState.shown != gBoltCounterState.base + gBoltCounterState.pending)
-                    gBoltCounterState.shown = gBoltCounterState.base + gBoltCounterState.pending;
-                gBoltCounterState.pending = 0;
-                gBoltCounterState.active = -1;
+                if (g_bolt_counter_state.shown != g_bolt_counter_state.base + g_bolt_counter_state.pending)
+                    g_bolt_counter_state.shown = g_bolt_counter_state.base + g_bolt_counter_state.pending;
+                g_bolt_counter_state.pending = 0;
+                g_bolt_counter_state.active = -1;
                 row->state = 0;
-                gBoltCounterState.falling = 0;
+                g_bolt_counter_state.falling = 0;
             }
             break;
         }
@@ -351,12 +351,12 @@ extern float D_001A8DE0[];
 extern char D_001A8E00[];
 extern unsigned char *D_001A8CFC __attribute__((sda));
 extern float D_001B23A4 __attribute__((sda));
-extern int func_00283D38(int, int, float);
-extern int func_00115DA8(char *, char *, ...);
+extern int FastTweenColor(int, int, float);
+extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
-extern int func_00336D50(unsigned char *, int);
-extern void func_00300A00(char *, int, float, float, float, float, float);
-extern void func_0027F980(int, int, unsigned long long, unsigned char *, int);
+extern int table_find_by_id(unsigned char *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
+extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
 /* The display mode word beside the HUD scale. */
 extern int D_001B23A0 __attribute__((sda));
@@ -374,7 +374,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 }
 
 /* Draws the bolt gain or loss numbers next to the bolt counter. */
-void func_0028A670(void)
+void DrawBoltCounterDeltas(void)
 {
     char text[16];
     unsigned char active;
@@ -399,7 +399,7 @@ void func_0028A670(void)
     first = 0;
     second = 0;
     for (i = 0; i < 2; i++) {
-        row = &gBoltCounterState.rows[i];
+        row = &g_bolt_counter_state.rows[i];
         firstX = 0;
         one = 1;
         switch (row->state) {
@@ -459,18 +459,18 @@ void func_0028A670(void)
             break;
         }
         if (firstX) {
-            Sprintf(text, D_001A8E00, gBoltCounterState.rows[i].value);
-            len = strlen_001157AC(text);
+            sprintf(text, D_001A8E00, g_bolt_counter_state.rows[i].value);
+            len = func_001157AC(text);
             if (len > 0) {
                 width = widths.value[len - 1];
                 active = one;
-                id = FindTableEntryById(D_001A8CFC + 0x8710, 178);
-                DrawScaledObjectTwoAxes((char *)id, first,
+                id = table_find_by_id(D_001A8CFC + 0x8710, 178);
+                gfx_draw_scaled_object_two_axes((char *)id, first,
                     (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, active), scale, scale, width);
-                id = FindTableEntryById(D_001A8CFC + 0x8710, 179);
-                DrawScaledObjectTwoAxes((char *)id, second,
+                id = table_find_by_id(D_001A8CFC + 0x8710, 179);
+                gfx_draw_scaled_object_two_axes((char *)id, second,
                     (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, active), scale, scale, width);
-                DrawTextRightAlignedSmallFont(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, strlen_001157AC(text));
+                text_draw_right_aligned_small(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }
     }
@@ -531,55 +531,55 @@ struct HudState {
     struct HudTexPage *image_pages;
     struct HudTexPage *palette_pages;
 };
-extern struct HudState D_001B1870 __attribute__((sda));
-extern void func_0028AE88(int, int);
+extern struct HudState g_hud_state __attribute__((sda));
+extern void LinkHudBank(int, int);
 typedef struct { char pad[0x20]; int dest; char gap[0xf0]; int offset; } LoadGroupRoot;
-extern LoadGroupRoot D_001F2840;
+extern LoadGroupRoot g_pause_menu_state;
 extern int D_001B18B0;
 extern int D_001B18B8;
 extern int D_001B18BC;
 extern int D_001B18C0;
-extern int func_002EEED0(int, int, int, int, int);
-extern void func_0029D4D0(int, int);
+extern int gfx_upload_records_to_buffer_slot(int, int, int, int, int);
+extern void fast_decompress(int, int);
 /* Fetches the bank's stashed texture groups (handles at +0x94 on, sizes at +0x54 on) to dest at
  * a running offset and links each one. Groups 3 and 4 depend on mode: 0 takes 3, 1 takes 4, 2
  * takes both. */
-void func_0028ACB0(int mode)
+void LoadStashedHudBanks(int mode)
 {
     int dest, offset;
     {
         int size;
-        dest = gPauseMenuState.dest;
-        size = gHudState.header.bank->has54;
-        offset = gPauseMenuState.offset;
+        dest = g_pause_menu_state.dest;
+        size = g_hud_state.header.bank->has54;
+        offset = g_pause_menu_state.offset;
         if (size) {
-            UploadRecordsToBufferSlot(dest, gHudState.header.bank->unk94, 0, D_001B18B0/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk94, 0, D_001B18B0/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(0, offset);
             offset += size;
         }
     }
     {
-        int size = gHudState.header.bank->has5C;
+        int size = g_hud_state.header.bank->has5C;
         if (size) {
-            UploadRecordsToBufferSlot(dest, gHudState.header.bank->unk9C, 0, D_001B18B8/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk9C, 0, D_001B18B8/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(2, offset);
             offset += size;
         }
     }
     if (mode == 0 || mode == 2) {
-        int size = gHudState.header.bank->has60;
+        int size = g_hud_state.header.bank->has60;
         if (size) {
-            UploadRecordsToBufferSlot(dest, gHudState.header.bank->unkA0, 0, D_001B18BC/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA0, 0, D_001B18BC/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(3, offset);
             offset += size;
         }
     }
     if (mode == 1 || mode == 2) {
-        if (gHudState.header.bank->has64) {
-            UploadRecordsToBufferSlot(dest, gHudState.header.bank->unkA4, 0, D_001B18C0/16, 0);
+        if (g_hud_state.header.bank->has64) {
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA4, 0, D_001B18C0/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(4, offset);
         }
@@ -589,10 +589,10 @@ void func_0028ACB0(int mode)
 
 
 extern int D_001A7308 __attribute__((section(".sdata")));
-extern void func_0028F948(unsigned int, int, int, int, int, int);
+extern void gfx_upload_image_to_vram(unsigned int, int, int, int, int, int);
 
 /* Uploads the texture pages of a HUD bank to video memory, linking the first group if it is not loaded yet. */
-void func_0028B160(int bank, int base, int immediate)
+void Hud_SendResidentBank(int bank, int base, int immediate)
 {
     struct HudTexCounts *counts;
     int address;
@@ -605,27 +605,27 @@ void func_0028B160(int bank, int base, int immediate)
     int height_log2;
     int size;
 
-    if (gHudState.header.counts->loaded[bank] == 0) {
+    if (g_hud_state.header.counts->loaded[bank] == 0) {
         LinkHudBank(0, base);
         address = D_001A7308;
     } else {
         address = D_001A7308;
     }
-    counts = gHudState.header.counts;
+    counts = g_hud_state.header.counts;
     bank_offset = bank << 2;
     first = bank == 0 ? 0 : counts->ends[bank - 1];
     i = first;
-    end = *(int *)((unsigned char *)gHudState.header.counts + bank_offset + 0x34); /* ends[bank] */
+    end = *(int *)((unsigned char *)g_hud_state.header.counts + bank_offset + 0x34); /* ends[bank] */
     do {
         for (; i < end; i++) {
             page = address >> 8;
-            width_log2 = gHudState.image_pages[i].width_log2;
-            height_log2 = gHudState.image_pages[i].height_log2;
+            width_log2 = g_hud_state.image_pages[i].width_log2;
+            height_log2 = g_hud_state.image_pages[i].height_log2;
             size = 1 << (width_log2 + height_log2);
-            UploadImageToVram(gHudState.image_pages[i].source_address, page, 0x1B, width_log2,
+            gfx_upload_image_to_vram(g_hud_state.image_pages[i].source_address, page, 0x1B, width_log2,
                           height_log2, immediate);
             address += size * 4;
-            gHudState.image_pages[i].gs_block_offset = page;
+            g_hud_state.image_pages[i].gs_block_offset = page;
         }
     } while (0);
 }
@@ -635,7 +635,7 @@ extern char * volatile D_001B1880 __attribute__((sda));
 extern char * volatile D_001B1884 __attribute__((sda));
 
 /* Sets up the HUD memory pool as one 400 KB block. */
-void func_0028B288(void)
+void hud_init_mem_pool(void)
 {
     char *poolStart = D_001BAF3C;
     D_001B1880 = poolStart;
@@ -643,13 +643,13 @@ void func_0028B288(void)
 }
 
 /* Hands out a piece of the HUD memory pool, rounded up to 16 bytes. Returns 0 if there is not enough room. */
-char *func_0028B2B8(int size)
+char *hud_alloc_mem(int size)
 {
     char *end;
     char *cursor;
 
     if (D_001B1880 == 0)
-        InitHudMemoryPool();
+        hud_init_mem_pool();
     end = D_001B1884;
     cursor = D_001B1880;
     if (end - cursor < size)
@@ -665,11 +665,11 @@ char *func_0028B2B8(int size)
 
 /* Calls a callee with (this, word at +32), copies six words from +36..+56 down to +4..+24, calls the function pointer at +48 with this when non-zero, then clears +104. */
 /* Finishes setting up a HUD element: copies its settings, runs its setup function and clears its busy flag. */
-void func_0028B4D8(char *element)
+void hud_finish_element_setup(char *element)
 {
     int callback;
 
-    LoadHudElementFromTable(element, *(int *)(element + 32));
+    hud_load_element_from_table(element, *(int *)(element + 32));
     callback = *(int *)(element + 48);
     *(int *)(element + 4) = *(int *)(element + 36);
     *(int *)(element + 20) = *(int *)(element + 52);
@@ -683,36 +683,36 @@ void func_0028B4D8(char *element)
 }
 
 typedef struct { unsigned char pad00[0x64]; int key; unsigned char pad68[0x28]; } SearchRow_28B5D0;
-extern SearchRow_28B5D0 D_00255330[];
-extern void func_0028B3D0(int, int, int, int, int, int, int);
+extern SearchRow_28B5D0 g_hud_elements[];
+extern void hud_set_slot_contents(int, int, int, int, int, int, int);
 
 /* Resets all 13 HUD elements. */
-void func_0028B540(void)
+void hud_reset_elements(void)
 {
-    char *row = (char *)gHudElements;
+    char *row = (char *)g_hud_elements;
     int *field = (int *)(row + 0x6c);
     int i = 0;
     do {
-        SetHudSlotContents(i, 0xffff, 0, 0, 0, 0, 1);
+        hud_set_slot_contents(i, 0xffff, 0, 0, 0, 0, 1);
         i++;
         field[4] = 0;
         field[0] = -6;
-        FinishHudElementSetup(row);
+        hud_finish_element_setup(row);
         row += 0x90;
         field = (int *)((char *)field + 0x90);
     } while (i < 13);
 }
 
 /* Starts closing the HUD element that has this key. Returns 1 if it was found. */
-int func_0028B5D0(int key)
+int hud_close_element_by_key(int key)
 {
     int i;
     for (i = 0; i < 13; i++) {
-        if (gHudElements[i].key == key)
+        if (g_hud_elements[i].key == key)
             break;
     }
     if (i < 13) {
-        SetHudSlotContents(i, 0xffff, 0, 0, 0, 0, 0);
+        hud_set_slot_contents(i, 0xffff, 0, 0, 0, 0, 0);
         return 1;
     }
     return 0;
@@ -722,7 +722,7 @@ int func_0028B5D0(int key)
 
 /* findfirstmatchingkey among13records and writefield24 plusfield04 whenword68clear */
 /* Sets the target value of the HUD element that has this key. */
-void func_0028B6C8(int key, unsigned int value)
+void set_animation_parameter(int key, unsigned int value)
 {
     int i;
     for (i = 0; i < 13; i++) {
@@ -736,7 +736,7 @@ void func_0028B6C8(int key, unsigned int value)
 }
 
 /* Shifts a HUD element's draw position so it is centred or lined up the way its flags say. */
-int func_0028B740(HudElem *rec, int *x, int *y) {
+int hud_screen_position(HudElem *rec, int *x, int *y) {
     int w = rec->w;
     int h = rec->h;
     int flags = rec->flags;
@@ -758,11 +758,11 @@ int func_0028B740(HudElem *rec, int *x, int *y) {
 
 extern float ref_L00_002F6FB8_00[];
 extern float ref_L00_002F6FB8_01[];
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
 /* Slides a HUD element's draw position in or out of view, one animation step at a time. */
-void func_0028B7A8(HudElem *element, int *x, int *y, int index, int delta)
+void hud_offset_element_for_slide(HudElem *element, int *x, int *y, int index, int delta)
 {
     float scale;
     int flags;
@@ -799,7 +799,7 @@ void func_0028B7A8(HudElem *element, int *x, int *y, int index, int delta)
 }
 
 /* Works out the starting number and the size of a HUD number counter. */
-void func_0028B950(u8 *element) {
+void hud_init_counter_values(u8 *element) {
     s32 *value=*(s32 **)(element+0xc);
     s32 digits;
     s32 remaining;
@@ -825,13 +825,13 @@ void func_0028B950(u8 *element) {
 }
 
 /* Sets up a HUD counter element. */
-void func_0028BA50(HudElem *element) { element->visibleTimer = 0xD2; element->unk48 = 0; element->unk4A = 0; InitHudCounterValues((u8 *)element); }
+void hud_init_counter_element(HudElem *element) { element->visibleTimer = 0xD2; element->unk48 = 0; element->unk4A = 0; hud_init_counter_values((u8 *)element); }
 
-extern float func_00282C10(float);
+extern float square_root(float);
 extern void func_0028DF80(void *);
 
 /* Per-frame update of a HUD counter: counts the shown number toward the real value and fades it in and out. */
-void func_0028BA88(HudElem *element)
+void hud_update_counter_element(HudElem *element)
 {
     unsigned char *fadeBytes = element->cnt;
     int delta, limit, step;
@@ -879,10 +879,10 @@ void func_0028BA88(HudElem *element)
 
 
 extern void func_0029CCD8(int, int);
-extern void func_002B0CE0(int, int, int);
+extern void ForceClaimNotice(int, int, int);
 
 /* Calls two sound helpers, the second with sound number 13. */
-void func_0028BCA0(int arg) {
+void hud_play_sound_effect(int arg) {
     func_0029CCD8(arg, 1);
     ForceClaimNotice(13, 0, 1);
 }

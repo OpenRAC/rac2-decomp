@@ -2,17 +2,17 @@
 #include "common.h"
 
 typedef struct { float x,y,z,w; } EffectVector __attribute__((aligned(16)));
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282DD8(void *, const void *, const void *);
-extern void func_002AFFD8(char *, char *, int);
-extern int func_002AD330(char *, char *, char *, char *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_0032CA40(char *, void *, void *, float);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecCross(void *, const void *, const void *);
+extern void cam_compute_view_direction(char *, char *, int);
+extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void EmitExplosionParticles(char *, void *, void *, float);
 /* The camera: its position at 0x140 and the shake fields func_0032DD40 also sets. */
 typedef struct {
     char prefix[0x140];
@@ -25,7 +25,7 @@ typedef struct {
     char gap170[0x200];
     EffectVector forward;
 } EffectCamera;
-extern EffectCamera D_001B5200;
+extern EffectCamera g_active_camera;
 
 #define FLOAT_AT(p,o) (*(float *)((char *)(p)+(o)))
 #define SHORT_AT(p,o) (*(short *)((char *)(p)+(o)))
@@ -40,7 +40,7 @@ typedef struct {
 } EffectState;
 
 /* Spawns an explosion object (CreateMoby) and starts its effect (EmitExplosionParticles). */
-char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
+char *SpawnExplosion(EffectVector *position, int flash, int n0, int n1,
                   int n2, int n3, int n4, int orient, float size, float distance,
                   int mode, int extra, int flags, char *owner)
 {
@@ -57,9 +57,9 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
         state=*(EffectState **)(object+0x68);
         qcopy(object+0x10,position);
         FLOAT_AT(object,0x1C)=1.0f;
-        FastVecSub(&delta,&gActiveCamera.position,object+0x10);
+        FastVecSub(&delta,&g_active_camera.position,object+0x10);
         vec_scale_to_length(&delta,&delta,1.0f);
-        ComputeViewDirection(object+0x10,(char *)&radial,1);
+        cam_compute_view_direction(object+0x10,(char *)&radial,1);
         qcopy(object+0xC0,&delta);
         FastVecCross(object+0xD0,object+0xC0,&radial);
         vec_scale_to_length(object+0xD0,object+0xD0,1.0f);
@@ -80,22 +80,22 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
         state->orient=orient;
         state->owner=owner;
         qzero_nc(&attachment);
-        if (owner) TransformPointByMobyAttachment(object,owner,object+0x10,(char *)&attachment);
+        if (owner) moby_transform_point_by_attachment(object,owner,object+0x10,(char *)&attachment);
         qcopy(&sphere,object+0x10);
         sphere.w=size*3.0f;
-        if (FastMathHelperA(&sphere,128.0f)==1) {
+        if (math_fast_helper_a(&sphere,128.0f)==1) {
             state->visible=10;
             state->fade=0.1f;
-            if (fast_vec_dist(position,&gActiveCamera.position)<48.0f && flash) {
-                camera=&gActiveCamera;
+            if (fast_vec_dist(position,&g_active_camera.position)<48.0f && flash) {
+                camera=&g_active_camera;
                 camera->shake_flag=0;
                 camera->shake_duration=40;
                 camera->shake_amplitude=0.075f;
             }
             if (state->orient) {
-                FastVecSub(&direction,object+0x10,&gActiveCamera.position);
+                FastVecSub(&direction,object+0x10,&g_active_camera.position);
                 vec_scale_to_length(&direction,&direction,1.0f);
-                angle=1.5707963705062866f-FastAngleHelper(FastVecDot(&direction,&gActiveCamera.forward));
+                angle=1.5707963705062866f-math_fast_angle_helper(FastVecDot(&direction,&g_active_camera.forward));
                 if (angle<0.45378565788269043f) state->orient=1;
                 else state->orient=0;
             }

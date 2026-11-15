@@ -43,32 +43,32 @@ typedef struct {
 
 typedef int Quad __attribute__((mode(TI)));
 
-extern Object *D_00214920[];
+extern Object *g_equipment_pieces[];
 extern char D_00214970[], D_00214978[];
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern int D_001A8BB0_gp SDATA(D_001A8BB0);
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern float D_001ABF84 __attribute__((sda)), D_001ABF88 __attribute__((sda)), D_001ABF8C __attribute__((sda));
 extern char D_001ABF18[16] __attribute__((sda)), D_001ABF28[16] __attribute__((sda));
 extern char D_001ABF38[16] __attribute__((sda)), D_001ABF48[16] __attribute__((sda));
 extern char D_001ABF58[16] __attribute__((sda)), D_001ABF68[16] __attribute__((sda));
 extern char D_001ABF78[16] __attribute__((sda));
-extern HeroGlobals D_00189E20;
+extern HeroGlobals g_hero_state;
 
 
-extern void func_002E6178(void *);
-extern float func_002A89A8(void *, int, float);
-extern void func_002B41A8(void *, void *, int, int, void *, void *, void *, void *, void *, void *, void *);
-extern void func_00282D60(void *, void *, float);
-extern int func_00283DB8(void *, float);
-extern float func_00282E80(void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AA548(void *, void *, float, float, float, float);
-extern void func_0029FC20(void *, int, void *), func_0029FCC0(void *, int, void *);
-extern void func_00283098(void *, void *, void *), func_002AB6D8(void *, void *), func_002A10E8(void *);
-extern void func_002AD6F0(void *, void *, void *, void *), func_002B44C0(void *, void *, void *);
+extern void SpawnEquipmentPieces(void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void moby_init_controller_params(void *, void *, int, int, void *, void *, void *, void *, void *, void *, void *);
+extern void scale_vector(void *, void *, float);
+extern int math_fast_helper_a(void *, float);
+extern float vec_distance_xy(void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern void moby_transform_joint_point(void *, int, void *), moby_transform_joint_to_world(void *, int, void *);
+extern void matrix_mul_vec3(void *, void *, void *), mat_get_euler_angles(void *, void *), func_002A10E8(void *);
+extern void mat_combine_and_store(void *, void *, void *, void *), moby_update_sway(void *, void *, void *);
 
 /* Spawns the equipment pieces if needed, then makes each piece follow the base object. */
 void func_US2_002E72D8(Object *object)
@@ -78,63 +78,63 @@ void func_US2_002E72D8(Object *object)
     int i, j;
     unsigned char blocked;
 
-    if (!D_00214920[0]) {
-        func_002E6178(object);
-        if (!D_001A8BB0[0]) {
-            float height = func_002A89A8(object->position, 0, 0.5f);
+    if (!g_equipment_pieces[0]) {
+        SpawnEquipmentPieces(object);
+        if (!g_current_game_mode[0]) {
+            float height = coll_probe_ground_height_below(object->position, 0, 0.5f);
             if (height != 0.0f)
                 object->position[2] = height + D_001ABF84;
             D_001ABF88 = object->position[2];
         }
-        func_002B41A8(object, D_00214970, 0, 0, D_001ABF48, D_001ABF58, D_001ABF18, D_001ABF78,
+        moby_init_controller_params(object, D_00214970, 0, 0, D_001ABF48, D_001ABF58, D_001ABF18, D_001ABF78,
                       D_001ABF68, D_001ABF28, D_001ABF38);
     }
     target = 0;
-    if (!D_001A8BB0[0]) {
-        func_00282D60(p, object, 0.0009765625f);
+    if (!g_current_game_mode[0]) {
+        scale_vector(p, object, 0.0009765625f);
         p[3] += 1.0f;
-        if (func_00283DB8(p, 50.0f) == -1)
+        if (math_fast_helper_a(p, 50.0f) == -1)
             return;
         if (!D_001A8BB0_gp) {
             blocked = 0;
-            if (func_00282E80(object->position, ((char *)&D_00189E20.hero)) < 6.0f) {
+            if (vec_distance_xy(object->position, ((char *)&g_hero_state.hero)) < 6.0f) {
                 if (object->blocked) {
-                    qcopy(p, ((char *)&D_00189E20.hero) + 0x60);
+                    qcopy(p, ((char *)&g_hero_state.hero) + 0x60);
                     p[2] += 2.0f;
-                    if (func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, D_00189E20.collision, 0))
+                    if (CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, g_hero_state.collision, 0))
                         blocked = 1;
                     else {
-                        func_00282CF0(old, object->position, ((char *)&D_00189E20.hero));
+                        FastVecSub(old, object->position, ((char *)&g_hero_state.hero));
                         old[2] = 0;
-                        func_00282F20(old, old, 0.4f);
-                        func_00282CC0(p, p, old);
-                        blocked = func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, D_00189E20.collision, 0) != 0;
+                        vec_scale_to_length(old, old, 0.4f);
+                        FastVecAdd(p, p, old);
+                        blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, g_hero_state.collision, 0) != 0;
                     }
                 } else {
-                    qcopy(p, ((char *)&D_00189E20.hero) + 0x60);
+                    qcopy(p, ((char *)&g_hero_state.hero) + 0x60);
                     p[2] += 2.0f;
-                    blocked = func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, *(int *)(((char *)&D_00189E20.hero) + 0x2210), 0) != 0;
+                    blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, *(int *)(((char *)&g_hero_state.hero) + 0x2210), 0) != 0;
                 }
             }
             object->blocked = blocked;
             if (object->blocked)
-                func_002AA548(D_00214978, &D_001ABF8C, D_001ABF88 + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                math_step_value_toward_target(D_00214978, &D_001ABF8C, D_001ABF88 + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
             else
-                func_002AA548(D_00214978, &D_001ABF8C, D_001ABF88, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                math_step_value_toward_target(D_00214978, &D_001ABF8C, D_001ABF88, 0.00055555557f, 0.00055555557f, 0.0166666675f);
         }
     }
-    func_0029FC20(object, 1, matrix);
-    func_0029FCC0(object, 1, p);
-    for (i = 0; D_00214920[i]; i++) {
+    moby_transform_joint_point(object, 1, matrix);
+    moby_transform_joint_to_world(object, 1, p);
+    for (i = 0; g_equipment_pieces[i]; i++) {
         if (object->flags & 1) {
-            D_00214920[i]->render = 0;
-            D_00214920[i]->flags |= 0x41;
+            g_equipment_pieces[i]->render = 0;
+            g_equipment_pieces[i]->flags |= 0x41;
         } else {
-            D_00214920[i]->flags &= 0xFFBE;
-            D_00214920[i]->render = *(int *)(D_00214920[i]->model + 0x10);
+            g_equipment_pieces[i]->flags &= 0xFFBE;
+            g_equipment_pieces[i]->render = *(int *)(g_equipment_pieces[i]->model + 0x10);
         }
         {
-            Object *part = D_00214920[i];
+            Object *part = g_equipment_pieces[i];
             qcopy(old, part->position);
             qcopy(previous, part->previous);
             {
@@ -143,34 +143,34 @@ void func_US2_002E72D8(Object *object)
             }
         }
         for (j = 0; j < 3; j++) {
-            D_00214920[i]->basis[j][0] = matrix[j * 4];
-            D_00214920[i]->basis[j][1] = matrix[j * 4 + 1];
-            D_00214920[i]->basis[j][2] = matrix[j * 4 + 2];
+            g_equipment_pieces[i]->basis[j][0] = matrix[j * 4];
+            g_equipment_pieces[i]->basis[j][1] = matrix[j * 4 + 1];
+            g_equipment_pieces[i]->basis[j][2] = matrix[j * 4 + 2];
         }
-        if (D_001A8BB0[0] == 2 && D_001A79F0[0] == 5) {
+        if (g_current_game_mode[0] == 2 && g_current_map_index[0] == 5) {
             *(Quad *)offset = 0;
             offset[0] = -0.3372f;
             offset[1] = -0.5364f;
             offset[2] = -1.79489f;
-            func_00283098(offset, offset, D_00214920[i]->basis);
-            func_00282CC0(delta, p, offset);
-            qcopy(D_00214920[i]->position, delta);
+            matrix_mul_vec3(offset, offset, g_equipment_pieces[i]->basis);
+            FastVecAdd(delta, p, offset);
+            qcopy(g_equipment_pieces[i]->position, delta);
         }
-        func_002AB6D8(D_00214920[i]->basis, D_00214920[i]->previous);
-        func_002A10E8(D_00214920[i]);
+        mat_get_euler_angles(g_equipment_pieces[i]->basis, g_equipment_pieces[i]->previous);
+        func_002A10E8(g_equipment_pieces[i]);
         {
-            char *state = D_00214920[i]->state;
-            func_00282CF0(delta, D_00214920[i]->position, old);
-            func_002AD6F0(state + 0x20, delta, previous, D_00214920[i]->previous);
+            char *state = g_equipment_pieces[i]->state;
+            FastVecSub(delta, g_equipment_pieces[i]->position, old);
+            mat_combine_and_store(state + 0x20, delta, previous, g_equipment_pieces[i]->previous);
         }
-        if (D_00189E20.count >= 2 && D_00189E20.selected == D_00214920[i])
-            target = ((char *)&D_00189E20.hero);
-        if (D_001A8BB0[0]) {
-            D_00214920[i]->render = 0;
+        if (g_hero_state.count >= 2 && g_hero_state.selected == g_equipment_pieces[i])
+            target = ((char *)&g_hero_state.hero);
+        if (g_current_game_mode[0]) {
+            g_equipment_pieces[i]->render = 0;
             object->render = 0;
         } else if (object->render)
-            D_00214920[i]->render = *(int *)(D_00214920[i]->model + 0x10);
+            g_equipment_pieces[i]->render = *(int *)(g_equipment_pieces[i]->model + 0x10);
     }
-    if (!D_001A8BB0[0])
-        func_002B44C0(object, D_00214970, target);
+    if (!g_current_game_mode[0])
+        moby_update_sway(object, D_00214970, target);
 }

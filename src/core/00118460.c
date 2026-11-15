@@ -1,6 +1,6 @@
 #include "common.h"
 /* Rounds a string of decimal digits up when the next digit is 5 or more, carrying to the left. */
-int func_00118460(char *buf, int len) {
+int RoundDecimalDigits(char *buf, int len) {
     char *p;
     if (len <= 0) goto done;
     --len;

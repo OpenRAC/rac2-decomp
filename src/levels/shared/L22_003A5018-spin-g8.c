@@ -1,21 +1,21 @@
 #include "common.h"
-extern u8 D_00189E20[];
-extern f32 func_00282E48(void *, void *);
-extern void func_002AFFD8(void *, void *, int);
-extern int func_002B3868(void *);
-extern void func_L00_0035F5A0(int, int, int);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_L00_00325600(void *, void *, int);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283360(void *);
-extern void func_002B9180(void *);
-extern void func_0029F338(void *);
-extern void func_00282F20(void *, void *, f32);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_L22_003A2988(void *, f32);
-extern int func_002A77E0(int);
+extern u8 g_hero_state[];
+extern f32 fast_vec_dist(void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern int flag_set_first_pending(void *);
+extern void snd_start_in_slot(int, int, int);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void vec_negate_and_forward(void *, void *, int);
+extern void FastVecScale(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void set_identity_rotation_rows(void *);
+extern void part_kill(void *);
+extern void moby_mark_spawned(void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern int CollLine(void *, void *, int, int, int);
+extern void arena_push_point_out(void *, f32);
+extern int math_random_int_below(int);
 extern f32 ref_L22_003FC870_00 __attribute__((sda));
 extern f32 ref_L22_003FC870_01 __attribute__((sda));
 extern int ref_L22_003FC870_02 __attribute__((sda));
@@ -26,10 +26,10 @@ extern f32 ref_L22_003FC870_06;
 extern const f32 ref_L22_003FC870_07;
 extern u8 ref_L22_003FC870_08[];
 extern u8 * ref_L22_003FC870_09;
-extern void func_L22_003FCF08(void *, void *, int, int);
+extern void part_emit_spray_burst(void *, void *, int, int);
 
 /* Updates moby class 3643 each frame. It spins and shrinks over about 45 frames following the player or a target, then removes itself. */
-void func_L22_003FC870(u8 *obj) {
+void spin_shrink_update(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
     f32 f;
     int i;
@@ -50,9 +50,9 @@ void func_L22_003FC870(u8 *obj) {
             f32 end[4];
         } collision;
     } scratch __attribute__((aligned(16)));
-    if (SetFirstPendingFlag(obj) && obj[0x20] == 0x10) StartEffectInSlot(0x12, 0, 0);
+    if (flag_set_first_pending(obj) && obj[0x20] == 0x10) snd_start_in_slot(0x12, 0, 0);
     if (obj[0x31]) {
-        f = fast_vec_dist(gHeroState + 0x80, obj + 0x10);
+        f = fast_vec_dist(g_hero_state + 0x80, obj + 0x10);
         *(f32 *)(ctl + 0x44) = f;
     if (ref_L22_003FC870_07 <= f) obj[0x23] = 127;
     } else *(f32 *)(ctl + 0x44) = 2000.0f;
@@ -61,13 +61,13 @@ void func_L22_003FC870(u8 *obj) {
         rot[2] = 0.018907737f;
         euler_rotation_basis(scratch.transform.mat, rot);
         multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
-        ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
-        NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
+        cam_compute_view_direction(obj + 0x10, ctl + 0x10, 0);
+        vec_negate_and_forward(obj + 0xC0, ctl + 0x10, 0);
     } else {
         qzero_nc(rot);
         rot[2] = ((45.0f - (f32)*(u16 *)(obj + 0x96)) * 22.0f + 155.0f) * 0.00029088825f;
         euler_rotation_basis(scratch.transform.mat, rot);
-        if (SetFirstPendingFlag(obj)) { obj[0x23] = 127; *(f32 *)(obj + 0x2C) *= 1.2f; }
+        if (flag_set_first_pending(obj)) { obj[0x23] = 127; *(f32 *)(obj + 0x2C) *= 1.2f; }
         if (obj[0x23] >= 3) obj[0x23]--;
         if (obj[0x23] >= 11 && obj[0x20] == 0x10) {
             switch (*(u16 *)(obj + 0x96) & 3) {
@@ -92,7 +92,7 @@ void func_L22_003FC870(u8 *obj) {
                 FastVecScale(scratch.transform.end, obj + 0xC0, -ref_L22_003FC870_01);
                 break;
             }
-            EmitSprayBurst(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
+            part_emit_spray_burst(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
         }
         set_identity_rotation_rows(scratch.transform.scale);
         scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FC870_03 * 0.022222223f);
@@ -100,19 +100,19 @@ void func_L22_003FC870(u8 *obj) {
         multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         
         if (*(u16 *)(obj + 0x96) >= 46) {
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
             return;
         }
         if (obj[0x20] == 0x10) {
-            qcopy(obj + 0x10, gHeroState + 0x80);
-            ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
-            NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
+            qcopy(obj + 0x10, g_hero_state + 0x80);
+            cam_compute_view_direction(obj + 0x10, ctl + 0x10, 0);
+            vec_negate_and_forward(obj + 0xC0, ctl + 0x10, 0);
             vec_scale_to_length(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
             FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         } else {
             qcopy(obj + 0x10, ref_L22_003FC870_04 + 0x10);
-            ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
-            NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
+            cam_compute_view_direction(obj + 0x10, ctl + 0x10, 0);
+            vec_negate_and_forward(obj + 0xC0, ctl + 0x10, 0);
             vec_scale_to_length(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
             FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         }
@@ -125,12 +125,12 @@ void func_L22_003FC870(u8 *obj) {
         FastVecAdd(rot, rot, obj + 0x10);
         FastVecAdd(scratch.collision.mat, scratch.collision.mat, obj + 0x10);
         if (CollLine(scratch.collision.mat, rot, 0x12, 0, 0) == 0) {
-            PushPointOutOfArena(obj + 0x10, 0.0f);
+            arena_push_point_out(obj + 0x10, 0.0f);
             FastVecScale(scratch.collision.move,
-                obj + 0xC0 + RandomIntBelow(2) * 16,
-                RandomIntBelow(2) ? ref_L22_003FC870_05 : -ref_L22_003FC870_06);
+                obj + 0xC0 + math_random_int_below(2) * 16,
+                math_random_int_below(2) ? ref_L22_003FC870_05 : -ref_L22_003FC870_06);
             FastVecAdd(obj + 0x10, obj + 0x10, scratch.collision.move);
-            PushPointOutOfArena(obj + 0x10, 0.0f);
+            arena_push_point_out(obj + 0x10, 0.0f);
             FastVecScale(scratch.collision.start, ctl + 0x10, 3.0f);
             FastVecScale(scratch.collision.end, ctl + 0x10, -3.0f);
             FastVecAdd(scratch.collision.start, scratch.collision.start, obj + 0x10);

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L11_00461308: a Joba moby's state machine with a companion moby (class 0xCF6).
    State 0 spawns the companion; 1 sets or clears flag bits 0x41 on both from a level flag
    and waits on its linked moby's state and func_002ACBC8; 2 makes three
@@ -10,29 +11,29 @@
 */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(char *, char *);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002A7750(char *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_0029FCC0(char *, int, void *);
-extern void func_002830C0(void *, void *, void *);
-extern u8 *func_L11_003DD068(u8 *, u8 *, u8 *, float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(char *, char *);
+extern void anim_start_blended(char *, int, int, int);
+extern void moby_set_state(char *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void moby_transform_joint_to_world(char *, int, void *);
+extern void transform_vector(void *, void *, void *);
+extern u8 *hoverbike_bomb_spawn(u8 *, u8 *, u8 *, float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_002A05A8(char *);
 extern void func_002A0F48(char *);
-extern void func_L00_0033C0D0(char *, void *, void *, void *, int);
+extern void part_spawn_object_relative_particle(char *, void *, void *, void *, int);
 extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
 typedef struct { int unused; int flags; char pad[56]; } Entry61308;
 extern Entry61308 D_L11_002B6D40[];
-extern char *D_L11_001B359C[] NOT_SDA __attribute__((sda));
+extern char *g_moby_l11_table[] NOT_SDA __attribute__((sda));
 extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 /* The random bounds at 001B2388: lower, upper. Retail reads the lower through $gp and the
    upper as the block's second word, absolutely. */
 extern float D_L11_001B2388 SDATA(D_L11_001B2388);
@@ -45,7 +46,7 @@ extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
 /* Updates a floating enemy (moby class 3718) that carries a companion moby: it spawns the companion, bobs up and down, fires three shots at a time, and drops sparks. */
-void func_L11_00461308(char *moby)
+void companion_carrier_update(char *moby)
 {
     float vec[4], pos[4], dir[4], tmp[4];
     char *vars = P(moby,0x68);
@@ -56,11 +57,11 @@ void func_L11_00461308(char *moby)
         P(vars,0x10)=CreateMoby(0xCF6 /* moby class 3318 */);
         F(vars,0x14)=0; F(vars,0x18)=0;
         if(P(vars,0x10)) {
-            InitChildObjectFromParent(P(vars,0x10),0);
+            moby_init_child_from_parent(P(vars,0x10),0);
             H(P(vars,0x10),0x34)|=6;
-            StartAnimationBlended(P(vars,0x10),0x10,0,0);
+            anim_start_blended(P(vars,0x10),0x10,0,0);
         }
-        SetMobyState(moby,1,-1);
+        moby_set_state(moby,1,-1);
         break;
     case 1:
         if ((D_L11_002B6D40[D_L11_001B089C[0]].flags&0x10) && !I(vars,8)) {
@@ -74,17 +75,17 @@ void func_L11_00461308(char *moby)
         H(P(vars,0x10),0x34)&=0xFFBE;
         I(moby,0x98)=I(P(moby,0x24),0x10);
         ready=1;
-        if(I(vars,0xC)!=-1) { char *linked=gMobyTable_L11[0]+(I(vars,0xC)<<8); ready=0; if((unsigned char)linked[0x20]!=3) ready=active; }
-        if (ready && IsPointInCuboid(gHeroPosition,I(vars,0)))
-            SetMobyState(moby,2,-1);
+        if(I(vars,0xC)!=-1) { char *linked=g_moby_l11_table[0]+(I(vars,0xC)<<8); ready=0; if((unsigned char)linked[0x20]!=3) ready=active; }
+        if (ready && IsPointInCuboid(g_hero_position,I(vars,0)))
+            moby_set_state(moby,2,-1);
         break;
     case 2:
         active=1;
-        spread=RandomFloatRange(0.0f,0.333f);
+        spread=math_random_float_range(0.0f,0.333f);
         for(i=0;i<3;i++) {
-            TransformMobyJointToWorld(moby,i==0?3:i==1?2:4,vec);
+            moby_transform_joint_to_world(moby,i==0?3:i==1?2:4,vec);
             *(TI128 *)tmp = 0;
-            tmp[0]=RandomFloatRange(-1.0f,1.0f);
+            tmp[0]=math_random_float_range(-1.0f,1.0f);
             tmp[3]=1.0f;
             tmp[1]=spread+spread-1.0f;
             spread+=0.333f;
@@ -93,20 +94,20 @@ void func_L11_00461308(char *moby)
             {
                 float high = D_L11_001B2388_block[1];
                 float low = D_L11_001B2388;
-                SpawnHoverbikeRaceBomb(moby,vec,dir,RandomFloatRange(low,high)*0.00027777778f);
+                hoverbike_bomb_spawn(moby,vec,dir,math_random_float_range(low,high)*0.00027777778f);
             }
         }
-        SetMobyState(moby,3,-1);
+        moby_set_state(moby,3,-1);
         break;
     case 3:
         active=1;
-        if(!IsPointInCuboid(gHeroPosition,I(vars,0))) SetMobyState(moby,1,-1);
+        if(!IsPointInCuboid(g_hero_position,I(vars,0))) moby_set_state(moby,1,-1);
         break;
     }
     if(active) {
         F(vars,0x14)=FastAddRotations(F(vars,0x14),0.034906592f);
-        sine=FastSinOrCosA(F(vars,0x14));
-        cosine=FastSinOrCosB(F(vars,0x14));
+        sine=math_fast_sin_or_cos_a(F(vars,0x14));
+        cosine=math_fast_sin_or_cos_b(F(vars,0x14));
         F(moby,0x18)-=F(vars,0x18);
         F(vars,0x18)=cosine*0.1f;
         F(moby,0x18)+=F(vars,0x18);
@@ -120,11 +121,11 @@ void func_L11_00461308(char *moby)
         FastVecScale(vec,moby+0xE0,0.59f);
         FastVecAdd(pos,moby+0x10,vec);
         vec[0]=vec[1]=0.0f;
-        vec[2]=-(RandomFloatRange(2.25f,3.5f)*(1.0f/60.0f));
-        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2378,1);
-        vec[2]=-(RandomFloatRange(3.0f,5.0f)*(1.0f/60.0f));
-        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2368,1);
-        vec[2]=-(RandomFloatRange(4.0f,8.0f)*(1.0f/60.0f));
-        SpawnObjectRelativeParticle(moby,pos,vec,D_L11_001B2358,1);
+        vec[2]=-(math_random_float_range(2.25f,3.5f)*(1.0f/60.0f));
+        part_spawn_object_relative_particle(moby,pos,vec,D_L11_001B2378,1);
+        vec[2]=-(math_random_float_range(3.0f,5.0f)*(1.0f/60.0f));
+        part_spawn_object_relative_particle(moby,pos,vec,D_L11_001B2368,1);
+        vec[2]=-(math_random_float_range(4.0f,8.0f)*(1.0f/60.0f));
+        part_spawn_object_relative_particle(moby,pos,vec,D_L11_001B2358,1);
     }
 }

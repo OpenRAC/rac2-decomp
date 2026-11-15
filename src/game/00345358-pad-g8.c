@@ -4,25 +4,25 @@ typedef struct { char pad[0x48c]; int column, row, selected, state; } SelectionO
 typedef struct { char pad[6]; short material; char tail[216]; } MaterialRecord;
 typedef struct { char pad[0x44]; int selected; } EquipmentState;
 
-extern void func_002E5E58(int, int, int);
-extern unsigned char D_001A7AF8[] __attribute__((section(".sdata")));
-extern unsigned char D_00139568[];
-extern MaterialRecord D_00239BA0[];
-extern int D_001ADB10 __attribute__((sda));
+extern void snd_play_from_global_bank(int, int, int);
+extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
+extern unsigned char g_item_slot_to_record[];
+extern MaterialRecord g_weapon_table[];
+extern int g_selected_item_material __attribute__((sda));
 extern SelectionEntry D_001AA898[];
-extern EquipmentState D_001F2840;
+extern EquipmentState g_pause_menu_state;
 
 #define MATERIAL(id) ((MaterialRecord *)(D_00139568[id]*224 + (char *)D_00239BA0))->material
 
 /* Handles the pad for the column selection screen and lets the player pick an item they own. */
-void func_00345D58(SelectionOwner *owner, int buttons)
+void HandleColumnSelectionInput(SelectionOwner *owner, int buttons)
 {
     int id, column;
 
     if (buttons & 0x1000) {
         int next;
 
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         column = owner->column;
         next = column - 1;
         owner->row = 0;
@@ -31,18 +31,18 @@ void func_00345D58(SelectionOwner *owner, int buttons)
             next = 0;
         owner->column = next;
     } else if (buttons & 0x4000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         owner->row = 0;
         owner->state = 0;
     } else if (buttons & 0x8000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         column = owner->column;
         column--;
         owner->column = column;
         if (column < 0)
             owner->column = 2;
     } else if (buttons & 0x2000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         column = owner->column;
         column++;
         owner->column = column;
@@ -50,21 +50,21 @@ void func_00345D58(SelectionOwner *owner, int buttons)
             owner->column = 0;
     } else if (buttons & 0x40) {
         id = D_001AA898[owner->column].v[3];
-        if (id != 0 && gItemOwnedFlags[id] != 0) {
-            PlaySoundFromGlobalBank(4, 0, 0);
-            gSelectedItemMaterial = MATERIAL(owner->selected);
-            if (gPauseMenuState.selected == id)
-                gPauseMenuState.selected = 0;
+        if (id != 0 && g_item_owned_flags[id] != 0) {
+            snd_play_from_global_bank(4, 0, 0);
+            g_selected_item_material = MATERIAL(owner->selected);
+            if (g_pause_menu_state.selected == id)
+                g_pause_menu_state.selected = 0;
             else
-                gPauseMenuState.selected = id;
+                g_pause_menu_state.selected = id;
         } else {
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         }
     }
     {
         int selected = D_001AA898[owner->column].v[3];
         owner->selected = selected;
-        if (selected != 0 && gItemOwnedFlags[selected] != 0)
-            gSelectedItemMaterial = MATERIAL(selected);
+        if (selected != 0 && g_item_owned_flags[selected] != 0)
+            g_selected_item_material = MATERIAL(selected);
     }
 }

@@ -26,15 +26,15 @@ typedef struct {
 } UpdateCollision;
 
 extern char D_001B2830[] MACRO_ADDR;
-extern UpdateCollision D_001BAF80;
+extern UpdateCollision g_collision_hit;
 extern char D_001BAFC0[];
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char *D_001B5390 __attribute__((nosda));
 extern int D_001A8CFC[] MACRO_ADDR;
 extern int D_0018C0B4 __attribute__((nosda));
 extern int D_00138324 __attribute__((nosda));
-extern int D_001A8BB0 __attribute__((sda));
+extern int g_current_game_mode __attribute__((sda));
 extern float D_001B0958 __attribute__((sda));
 extern char *D_001B0960 __attribute__((sda));
 extern int D_001B0964 __attribute__((sda));
@@ -50,45 +50,45 @@ extern int D_001B2858[] MACRO_ADDR;
 extern int update_handle SDATA(D_001B2858);
 
 extern char *D_001AD7EC[] MACRO_ADDR;
-extern float D_002373F0[][2];
-extern void func_002B00B0(void *, void *, int);
-extern void func_002FE8D8(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern void func_00282F20(void *, void *, float);
-extern void func_002B0CE0(int, int, int);
-extern float func_002A7940(void);
-extern float func_002A78D8(float, float);
-extern void func_0029B758(int, void (*)(void *));
-extern void func_0032F3D0(void *);
-extern void func_00335840(void);
-extern void func_003317E0(void);
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_0026F748(int, int);
-extern void func_00335798(void *, void *, void *);
-extern void func_002A7470(void *, int, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_0032FDD0(void *), func_003309A0(void *), func_0032FEA8(void *);
-extern void func_00330BC0(void *), func_00331718(void);
-extern int func_00282948(void *);
-extern int func_002FE9D0(UpdateQuery *);
-extern int func_00300540(int);
-extern void func_00282C88(void *);
-extern float func_00282DF0(void *);
-extern char *func_0032DA58(void *, void *, void *, float);
-extern void func_00330CA0(void *);
-extern void func_002FEE50(int), func_002FED28(int), func_0029F338(void *);
-extern void func_00283658(void *, void *), func_002AB6D8(void *, void *);
-extern int func_002AD0E0(void *, void *, void *, void *, void *, void *);
-extern void func_002833F0(void *, void *), func_0032F598(void *);
-extern void func_0027D098(void (*)(void *), void *);
-extern void func_00330E48(void *);
-extern void func_002A9288(void *, float);
+extern float g_ring_angle_table[][2];
+extern void gravity_get_dir_at_object(void *, void *, int);
+extern void moby_get_facing_direction(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern void vec_scale_to_length(void *, void *, float);
+extern void ForceClaimNotice(int, int, int);
+extern float math_random_angle(void);
+extern float math_random_signed_float_range(float, float);
+extern void level_store_value_pair(int, void (*)(void *));
+extern void hud_draw_timer_b(void *);
+extern void cam_call_helper(void);
+extern void object_set_root_data_active(void);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void stub_empty_8(int, int);
+extern void part_setup_object_effect_entry(void *, void *, void *);
+extern void anim_start_blended(void *, int, int, int);
+extern int PlayMobySound(int, int, void *);
+extern void pad_read_clamped_stick(void *), moby_steer_heading_to_aim(void *), vehicle_update_speed_and_move(void *);
+extern void moby_push_nearby_away(void *), snd_play_on_threshold_crossing(void);
+extern int math_fast_float_d(void *);
+extern int CollideSweptSphere(UpdateQuery *);
+extern int weapon_get_group(int);
+extern void vec_clear_128(void *);
+extern float FastVecLength(void *);
+extern char *part_spawn_blast_effect_moby(void *, void *, void *, float);
+extern void QueueRadialMobyImpacts(void *);
+extern void table_clear_entry_flag(int), slot_free(int), moby_mark_spawned(void *);
+extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern void euler_rotation_basis(void *, void *), vehicle_update_gun_aiming(void *);
+extern void gfx_register_final_draw_callback(void (*)(void *), void *);
+extern void part_draw_ring_effect_and_trail(void *);
+extern void part_queue_ground_shadow(void *, float);
 
 #define I(p, n) (*(int *)((char *)(p) + (n)))
 #define F(p, n) (*(float *)((char *)(p) + (n)))
@@ -97,7 +97,7 @@ extern void func_002A9288(void *, float);
 
 /* Advances launch, grounded movement, falling and teardown states of a timed actor. */
 /* Runs the player's ridden vehicle: launch, flying, landing, crashing and clean up. It also keeps the vehicle's guns and ground contact working. */
-void func_0032EB28(char *obj)
+void vehicle_update_ridden(char *obj)
 {
     /* The query and attachment transform use the same workspace in separate phases. */
     struct {
@@ -111,9 +111,9 @@ void func_0032EB28(char *obj)
     char *hero;
 
     if (STATE(obj) >= 2)
-    GetGravityDirectionAtObject(obj, D_001B2830, 1);
+    gravity_get_dir_at_object(obj, D_001B2830, 1);
     else
-    GetObjectFacingDirection(obj + 0x10, D_001B2830);
+    moby_get_facing_direction(obj + 0x10, D_001B2830);
     FastVecScale(D_001B2830, D_001B2830, -1.0f);
     FastVecScale(&scratch.ahead, obj + 0xE0, D_001B096C);
     FastVecAdd(&scratch.ahead, obj + 0x10, &scratch.ahead);
@@ -142,24 +142,24 @@ void func_0032EB28(char *obj)
         I(vars, 0x58) = 0;
         F(obj, 0x2C) = 0.00025f;
         I(obj, 0x98) = 0;
-        particles = gRingAngleTable;
+        particles = g_ring_angle_table;
         for (i = 97; i >= 0; i--) {
-            (*particles)[0] = RandomAngle();
-            (*particles)[1] = RandomSignedFloatRange(720.0f, 2160.0f) * 0.00029088825f;
+            (*particles)[0] = math_random_angle();
+            (*particles)[1] = math_random_signed_float_range(720.0f, 2160.0f) * 0.00029088825f;
             particles++;
         }
         update_timer = 1800;
         if (D_001A8CFC[0])
-            StoreLevelObjectValuePair(0, DrawHudTimer_0032F3D0);
+            level_store_value_pair(0, hud_draw_timer_b);
         /* fall through */
     case 1:
-        hero = gHeroState;
+        hero = g_hero_state;
         action = I(hero, 0x2294);
-        if (action == 98 || gCurrentGameMode == 2 || action == 111 || action == 100 ||
+        if (action == 98 || g_current_game_mode == 2 || action == 111 || action == 100 ||
             action == 99 || action == 23 || action == 24 || action == 129 || action == 39) {
-            CallCameraHelper();
+            cam_call_helper();
             STATE(obj) = 7;
-            SetRootDataActive();
+            object_set_root_data_active();
             I(vars, 0x60) = 0;
             break;
         }
@@ -168,40 +168,40 @@ void func_0032EB28(char *obj)
             F(obj, 0x2C) = 0.023f;
         qcopy(&scratch.previous, obj + 0x10);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
-        SteerEffectDirection(D_001B2858[0], vars, 0);
-        TransformVectorOrCopy(obj + 0x10, obj + 0x10);
-        TriggerCurrentStateEffect(vars, vars);
-        AddObjectDirectionScaled(obj + 0x10, vars, 0.0030555557f);
+        part_steer_effect_direction(D_001B2858[0], vars, 0);
+        vec_transform_or_copy(obj + 0x10, obj + 0x10);
+        shop_trigger_current_state_effect(vars, vars);
+        vec_add_object_direction_scaled(obj + 0x10, vars, 0.0030555557f);
         if (CollLine(&scratch.previous, obj + 0x10, 0, obj, 0)) {
-            UpdateCollision *collision = &gCollisionHit;
+            UpdateCollision *collision = &g_collision_hit;
             char *other = collision->hit;
             if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == 0x907 /* Spiderbot Glove */))
                 break;
             qcopy(obj + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);
-            EmptyStubF748(28, 1);
-            SetupObjectEffectEntry(obj + 0x10, obj + 0xF0, obj);
+            stub_empty_8(28, 1);
+            part_setup_object_effect_entry(obj + 0x10, obj + 0xF0, obj);
             STATE(obj) = 2;
-            StartAnimationBlended(obj, 1, 0, 10);
+            anim_start_blended(obj, 1, 0, 10);
             I(obj, 0x48) = 0;
         }
         break;
     case 2:
         STATE(obj) = 3;
         PlayMobySound(2, 0, obj);
-        if (D_0018C0B4 != 28 || gCurrentGameMode == 2) {
-            CallCameraHelper();
+        if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+            cam_call_helper();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
         }
         break;
     case 3:
-        ReadClampedStickInput(obj);
-        SteerHeadingTowardAim(obj);
-        UpdateVehicleSpeedAndMove(obj);
-        PushNearbyMobysAway(obj);
-        PlaySoundsOnThresholdCrossing();
-        if (FastFloatHelperD(D_001B2840)) {
+        pad_read_clamped_stick(obj);
+        moby_steer_heading_to_aim(obj);
+        vehicle_update_speed_and_move(obj);
+        moby_push_nearby_away(obj);
+        snd_play_on_threshold_crossing();
+        if (math_fast_float_d(D_001B2840)) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
@@ -209,8 +209,8 @@ void func_0032EB28(char *obj)
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
-        if (D_0018C0B4 != 28 || gCurrentGameMode == 2) {
-            CallCameraHelper();
+        if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+            cam_call_helper();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
         }
@@ -218,9 +218,9 @@ void func_0032EB28(char *obj)
     case 4:
         qcopy(&scratch.previous, obj + 0x10);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
-        AddObjectDirectionScaled(obj + 0x10, vars, 0.0061111115f);
-        TransformVectorOrCopy(obj + 0x10, obj + 0x10);
-        TriggerCurrentStateEffect(vars, vars);
+        vec_add_object_direction_scaled(obj + 0x10, vars, 0.0061111115f);
+        vec_transform_or_copy(obj + 0x10, obj + 0x10);
+        shop_trigger_current_state_effect(vars, vars);
         qcopy(&scratch.workspace.query.start, &scratch.previous);
         qcopy(&scratch.workspace.query.end, obj + 0x10);
         qcopy(&scratch.workspace.query.velocity, vars);
@@ -238,12 +238,12 @@ void func_0032EB28(char *obj)
         qcopy(obj + 0x10, &scratch.workspace.query.end);
         qcopy(vars, &scratch.workspace.query.velocity);
         if (hit == 2) {
-            if (GetWeaponGroup(scratch.workspace.query.surface) || scratch.workspace.query.surface == 12) {
+            if (weapon_get_group(scratch.workspace.query.surface) || scratch.workspace.query.surface == 12) {
                 STATE(obj) = 9;
                 I(vars, 0x60) = 10;
             } else {
                 STATE(obj) = 2;
-                ClearVector128(vars);
+                vec_clear_128(vars);
             }
         } else if (FastVecLength(vars) > 0.4f) {
             STATE(obj) = 9;
@@ -252,17 +252,17 @@ void func_0032EB28(char *obj)
         break;
     case 9:
         STATE(obj) = 5;
-        SetRootDataActive();
+        object_set_root_data_active();
         /* fall through */
     case 5:
-        if (FastFloatHelperD(vars + 0x60)) {
+        if (math_fast_float_d(vars + 0x60)) {
             PlayMobySound(1, 0, obj);
             vec_scale_to_length(&scratch.rotation, obj + 0xC0, 1.0f);
-            SpawnBlastEffectMoby(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
+            part_spawn_blast_effect_moby(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
-            if (D_0018C0B4 != 28 || gCurrentGameMode == 2) {
-                CallCameraHelper();
+            if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+                cam_call_helper();
                 I(vars, 0x60) = 0;
             } else
                 I(vars, 0x60) = D_001B0964;
@@ -272,37 +272,37 @@ void func_0032EB28(char *obj)
     case 6:
         QueueRadialMobyImpacts(obj);
         F(vars, 0x64) += D_001B0958 * 0.016666668f;
-        if (FastFloatHelperD(vars + 0x60) && !I(vars, 0x68))
+        if (math_fast_float_d(vars + 0x60) && !I(vars, 0x68))
             STATE(obj) = 8;
         break;
     case 7:
-        if (FastFloatHelperD(vars + 0x60))
+        if (math_fast_float_d(vars + 0x60))
             STATE(obj) = 8;
         break;
     case 8:
         if (D_0018C0B4 == 28)
-            EmptyStubF748(0, 1);
+            stub_empty_8(0, 1);
         if (*(short *)(D_001B5390 + 0x86) == 27)
-            CallCameraHelper();
-        ClearEntryFlag(update_handle);
-        FreeSlot(I(vars, 0x6C));
-        FreeSlot(I(vars, 0x70));
-        FreeSlot(I(vars, 0x74));
+            cam_call_helper();
+        table_clear_entry_flag(update_handle);
+        slot_free(I(vars, 0x6C));
+        slot_free(I(vars, 0x70));
+        slot_free(I(vars, 0x74));
         D_001B0960 = 0;
-        StoreLevelObjectValuePair(0, 0);
-        MarkMobySpawned(obj);
+        level_store_value_pair(0, 0);
+        moby_mark_spawned(obj);
         return;
     }
     if (STATE(obj) >= 2 && D_001AD7EC[0]) {
         copy_matrix_rotation(scratch.workspace.attachment.transform, obj + 0xC0);
-        GetEulerAnglesFromMatrix(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
-        TransformPointAndRotationByParent(obj, D_001AD7EC[0], obj + 0x10,
+        mat_get_euler_angles(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
+        moby_transform_point_and_rotation_by_parent(obj, D_001AD7EC[0], obj + 0x10,
                      &scratch.workspace.attachment.angles, obj + 0x10,
                      &scratch.workspace.attachment.adjusted);
         euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
     }
     if ((unsigned int)(STATE(obj) - 2) < 2)
-        UpdateVehicleGunAiming(obj);
-    RegisterFinalDrawCallback(DrawRingEffectAndTrail, obj);
-    QueueGroundShadow(obj, D_001B0970);
+        vehicle_update_gun_aiming(obj);
+    gfx_register_final_draw_callback(part_draw_ring_effect_and_trail, obj);
+    part_queue_ground_shadow(obj, D_001B0970);
 }

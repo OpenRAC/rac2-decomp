@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L04_003FD4F8 is in L04_003FD4F8-shot.c. */
 
@@ -8,9 +9,9 @@
 
 #include "common.h"
 typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
-extern void func_00282F20(char *, char *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 typedef union {
     Q16_B0e5d8f83 q;
     float f[4];
@@ -88,22 +89,22 @@ typedef struct {
     u8 pad00[0x20];
     Moby *ignored;               
 } ProjectileVars;
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00277F48(float, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern int coll_process_hit(float, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
 extern void func_001290E0(void *, void *);
-extern void func_00282CD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
+extern void add_vectors(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
 extern void func_PAL_L04_00410678(void *, void *, int, int);
 extern Collision D_L04_001BFAC0;
 extern CollisionHit D_L04_001BFAE0;
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
 
 /* Sweeps a projectile from *position by direction (a line probe over the whole move and,
    when that is clear, a 0.5 sphere probe every 0.49 units) and works out its response.
@@ -138,36 +139,36 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
     probe.owner = projectile;
     probe.active = 1;
     qcopy(probe.v, direction);
-    func_00282F70(&probe, &probe, 1);
+    vec_fast_normalize_helper(&probe, &probe, 1);
     probe.enabled = 1;
     probe.v[3] = 5627.925f;
     probe.mode = 3;
     probe.oClass = projectile->oClass;
     probe.v[2] = 1;
 
-    func_00282CC0(step, pos, direction);
-    lineHit = func_002761F8(pos, step, 0, vars->ignored, &probe);
+    FastVecAdd(step, pos, direction);
+    lineHit = CollLine(pos, step, 0, vars->ignored, &probe);
     if (lineHit) {
         collided = 1;
         remaining = 0;
     } else {
         stride = 0.49f;
-        remaining = func_00282DF0(direction);
+        remaining = FastVecLength(direction);
         if (remaining > 0)
-            func_00282D30(unit, direction, 1.0f / remaining);
+            FastVecScale(unit, direction, 1.0f / remaining);
         else
             qzero(unit);
     }
     while (remaining > 0 && !collided) {
         if (stride < remaining) {
-            func_00282D30(step, unit, stride);
+            FastVecScale(step, unit, stride);
             remaining -= stride;
         } else {
-            func_00282D30(step, unit, remaining);
+            FastVecScale(step, unit, remaining);
             remaining = 0;
         }
-        func_00282CC0(pos, pos, step);
-        if (func_00277F48(0.5f, pos, 0, vars->ignored, &probe))
+        FastVecAdd(pos, pos, step);
+        if (coll_process_hit(0.5f, pos, 0, vars->ignored, &probe))
             collided = 1;
     }
 
@@ -182,33 +183,33 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
                 qcopy(pos, &projectile->position);
             else
                 qcopy(pos, &hitMoby->position);
-            func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-            func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
+            FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+            vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
             result = projectile;
-            func_00283028(response, direction, &D_L04_001BFAE0.normal);
-            func_00282F20((char *)response, (char *)response, 0.040000003f);
-            func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+            vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+            vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
+            vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
             func_001290E0(forward, forward);
-            dot = func_00282DB0(forward, &collision->hit.normal);
+            dot = FastVecDot(forward, &collision->hit.normal);
             if (dot > 0 && dot < 0.707f) {
-                func_00282D30(&collision->hit.normal, &collision->hit.normal, dot);
-                func_00282CC0(direction, direction, &collision->hit.normal);
-                func_00282CD8(target, pos, direction);
-                projectile->rotation.f[2] = func_00283248(direction[0], direction[1]);
-                projectile->rotation.f[1] = -func_00283248(func_00282E20(direction), direction[2]);
+                FastVecScale(&collision->hit.normal, &collision->hit.normal, dot);
+                FastVecAdd(direction, direction, &collision->hit.normal);
+                add_vectors(target, pos, direction);
+                projectile->rotation.f[2] = mat_fast_helper_a(direction[0], direction[1]);
+                projectile->rotation.f[1] = -mat_fast_helper_a(vec_length_xy(direction), direction[2]);
                 *(Q16_B0e5d8f83 *)hitPoint = collision->hit.point.q;
                 func_PAL_L04_00410678(hitPoint, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
                 qcopy(pos, &D_L04_001BFAE0.point);
-                func_00282CF0(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
-                func_00282F20((char *)hitDelta, (char *)hitDelta, 1);
-                func_00283028(response, direction, &D_L04_001BFAE0.normal);
-                func_00282F20((char *)response, (char *)response, 0.040000003f);
-                func_00282F20((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+                FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+                vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
+                vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+                vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
+                vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
             }
         }
     }
@@ -219,7 +220,7 @@ done:
 
 
 
-extern void *func_0029EFD0(void *a0);
+extern void *CreateMoby(void *a0);
 extern void func_002A0F48(void *a0);
 extern void ref_L04_003FA5A8_00(void *, float, float, float);
 extern unsigned char *ref_L04_003FA5A8_01(void *, void *, void *, float *, float *, float *, float, float);
@@ -230,7 +231,7 @@ unsigned char *func_PAL_L04_003FE7B0(unsigned char *owner, float *pos,
     unsigned char *target, float x, float y, float z, float angle, float tilt)
 {
     float origin[4], matrix[16], position[4];
-    unsigned char *m = func_0029EFD0((void *)0xABD);
+    unsigned char *m = CreateMoby((void *)0xABD);
     unsigned char *state;
 
     if (m != 0) {
@@ -290,7 +291,7 @@ unsigned char *func_PAL_L04_003FE7B0(unsigned char *owner, float *pos,
 
 
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 typedef struct {
     unsigned char pad0[0x74];
     unsigned char active;
@@ -304,15 +305,15 @@ typedef struct {
     int timer;
     float age;
 } L04_C678Vars;
-extern int func_00282948(void *);
-extern int func_00283CF0(float);
-extern void func_0029F338(void *);
-extern float func_002AA800(void *, int, float, float);
-extern void func_002E59F8(int);
-extern void func_L00_002E6DB8(void *, void *);
+extern int math_fast_float_d(void *);
+extern int FloatToInt(float);
+extern void moby_mark_spawned(void *);
+extern float StepAngleTowardTarget(void *, int, float, float);
+extern void snd_stop_voice(int);
+extern void gfx_add_draw_callback_second(void *, void *);
 extern void func_PAL_L04_003FFB98(unsigned char *, L04_C678Vars *);
 extern void func_PAL_L04_00400108(void);
-extern unsigned char D_00188660[];
+extern unsigned char g_sound_state[];
 extern int D_L04_001B0488 __attribute__((sda));
 
 void func_PAL_L04_00400888(unsigned char *m)
@@ -322,25 +323,25 @@ void func_PAL_L04_00400888(unsigned char *m)
     L04_C678Slot *e;
 
     *(L04_C678Quad *)(m + 0x10) = *(L04_C678Quad *)(v->owner + 0x10);
-    func_002AA800(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.031415932f);
+    StepAngleTowardTarget(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.031415932f);
     v->age = v->age + 1.0f;
-    if (v->timer != 0 && func_00282948(&v->timer) != 0) {
+    if (v->timer != 0 && math_fast_float_d(&v->timer) != 0) {
         s = D_L04_001B0488;
         if (s != -1) {
-            e = (L04_C678Slot *)(D_00188660 + s * 0x70);
+            e = (L04_C678Slot *)(g_sound_state + s * 0x70);
             if (e->owner == v->owner && e->active != 0) {
-                func_002E59F8(s);
+                snd_stop_voice(s);
             }
         }
         D_L04_001B0488 = -1;
-        func_0029F338(m);
+        moby_mark_spawned(m);
         return;
     }
     if (25.0f < v->age && v->timer == 0) {
-        v->timer = func_00283CF0(12.833334f);
+        v->timer = FloatToInt(12.833334f);
     } else {
         func_PAL_L04_003FFB98(m, v);
     }
-    func_L00_002E6DB8(func_PAL_L04_00400108, m);
+    gfx_add_draw_callback_second(func_PAL_L04_00400108, m);
 }
 

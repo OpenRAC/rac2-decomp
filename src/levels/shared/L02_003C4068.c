@@ -1,19 +1,19 @@
 #include "common.h"
 
-extern char *D_L02_001B359C;
-extern float func_00282E80(const void *, const void *);
-extern void func_002833F0(void *, void *);
-extern void func_002E5DA0(int, int, void *, int);
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(float *, const float *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern char *g_moby_l02_pool;
+extern float vec_distance_xy(const void *, const void *);
+extern void euler_rotation_basis(void *, void *);
+extern void snd_play_from_class_bank(int, int, void *, int);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(float *, const float *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Moves a gate along its path points toward the next point. Returns 0 while moving, 1 or 2 when it reaches the last point, and 3 when its controller is already finished. */
-int func_L02_003C4068(char *object) {
+int gate_move_along_path(char *object) {
     float delta[4];
     char *state = *(char **)(object + 0x68);
     char *controller = *(char **)(state + 8);
-    char *other = gMobyPool_L02 + (*(int *)state << 8);
+    char *other = g_moby_l02_pool + (*(int *)state << 8);
     if (*(int *)(controller + 4) == 0) {
         if (*(int *)(state + 0x14) == **(int **)(state + 0x18) - 1) {
             if (*(int *)(controller + 0x14)) {
@@ -30,10 +30,10 @@ int func_L02_003C4068(char *object) {
                     char *linked2 = *(char **)(*(char **)(state + 8) + 0x1C);
                     *(unsigned short *)(linked2 + 0x34) &= 0xFFBE;
                 }
-                PlaySoundFromClassBank(3, 0, object, 0x896);
+                snd_play_from_class_bank(3, 0, object, 0x896);
                 return 2;
             }
-            PlaySoundFromClassBank(2, 0, object, 0x896);
+            snd_play_from_class_bank(2, 0, object, 0x896);
             return 1;
         }
         if (*(float *)(state + 0xC) < 480.0f)

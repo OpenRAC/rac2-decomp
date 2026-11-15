@@ -12,26 +12,26 @@ typedef struct {
 } Collision;
 extern int D_L04_001B092C SDATA(D_L04_001B092C);
 extern u8 *D_L04_001B0914 SDATA(D_L04_001B0914);
-extern u8 *D_L04_001B24DC;
+extern u8 *g_moby_l04_pool;
 extern Collision D_L04_001BFAC0;
 extern void func_001290E0(void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E20(void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern int func_00277258(void *, float, int, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern void func_002AC9F8(void *, float);
-extern int func_002E5CF8(int, int, void *);
+extern float FastVecLength(void *);
+extern float vec_length_xy(void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern int coll_test_point(void *, float, int, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern void vec_clamp_length(void *, float);
+extern int PlayMobySound(int, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
 extern void func_PAL_L04_00410678(void *, void *, int, int);
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
@@ -65,20 +65,20 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
     up.f[1] = 0;
     up.f[2] = 1;
     up.f[3] = 0;
-    remaining = func_00282DF0(vel);
+    remaining = FastVecLength(vel);
     segment = radius * 0.6f;
-    func_00282F20(&direction, vel, 1.0f);
+    vec_scale_to_length(&direction, vel, 1.0f);
     while (remaining > 0.0f) {
         if (remaining > segment) {
-            func_00282F20(&step, &direction, segment);
+            vec_scale_to_length(&step, &direction, segment);
             remaining -= segment;
         } else {
-            func_00282F20(&step, &direction, remaining);
+            vec_scale_to_length(&step, &direction, remaining);
             remaining = 0;
         }
-        func_00282CC0(&cur, &cur, &step);
-        if (func_00277258(&cur, radius, 4, object)) {
-            func_00282F20(&normal, &D_L04_001BFAC0.normal, 1.0f);
+        FastVecAdd(&cur, &cur, &step);
+        if (coll_test_point(&cur, radius, 4, object)) {
+            vec_scale_to_length(&normal, &D_L04_001BFAC0.normal, 1.0f);
             if (D_L04_001BFAC0.object) {
                 vertical = cur.f[2];
                 cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
@@ -97,10 +97,10 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                 } else if (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xB2D) {
                     a = P(D_L04_001BFAC0.object, 0x68);
                     I(a, 0x178) = 33;
-                    func_00282D30(a + 0x100, &horizontal, -0.05f);
+                    FastVecScale(a + 0x100, &horizontal, -0.05f);
                     a = P(object, 0x68);
                     I(a, 0x178) = 33;
-                    func_00282D30(a + 0x100, &horizontal, 0.05f);
+                    FastVecScale(a + 0x100, &horizontal, 0.05f);
                 } else if ((mode && S(D_L04_001BFAC0.object, 0xAA) == 0xB2D)
                            || (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xBBC)) {
                     func_PAL_L04_00410678(&D_L04_001BFAC0.point, vel, 2, 0);
@@ -108,20 +108,20 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                         b = P(object, 0x68);
                         other = D_L04_001BFAC0.object;
                         a = P(other, 0x68);
-                        func_00282D30(b + 0x2F0, &horizontal, 0.04f);
-                        func_00282D30(a + 0x100, &horizontal, -0.04f);
+                        FastVecScale(b + 0x2F0, &horizontal, 0.04f);
+                        FastVecScale(a + 0x100, &horizontal, -0.04f);
                     } else {
                         a = P(object, 0x68);
                         other = object;
                         b = P(P(a, 0x164), 0x68);
-                        func_002E5CF8(2, 0, P(a, 0x164));
-                        func_00282D30(b + 0x2F0, &horizontal, -0.04f);
-                        func_00282D30(a + 0x100, &horizontal, 0.04f);
+                        PlayMobySound(2, 0, P(a, 0x164));
+                        FastVecScale(b + 0x2F0, &horizontal, -0.04f);
+                        FastVecScale(a + 0x100, &horizontal, 0.04f);
                         if (I(b, 0x1DC) != -1) {
-                            anim = D_L04_001B24DC + (I(b, 0x1DC) << 8);
-                            angle = func_00283248(D_L04_001BFAC0.point.f[0] - F(object, 0x10),
+                            anim = g_moby_l04_pool + (I(b, 0x1DC) << 8);
+                            angle = mat_fast_helper_a(D_L04_001BFAC0.point.f[0] - F(object, 0x10),
                                                   D_L04_001BFAC0.point.f[1] - F(object, 0x14));
-                            angle = func_00283BE0(F(P(a, 0x164), 0xF8), angle);
+                            angle = fast_subtract_rotations(F(P(a, 0x164), 0xF8), angle);
                             if (angle > 0.52359885f && angle < 2.61799407f) {
                                 animation = 3;
                             } else {
@@ -137,7 +137,7 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                             }
                         }
                     }
-                    dot = func_00282DB0(other + 0xD0, a + 0x100);
+                    dot = FastVecDot(other + 0xD0, a + 0x100);
                     if (dot < 0) {
                         F(a, 0x1F4) = 0.17453295f;
                         F(b, 0x4C8) = -0.261799425f;
@@ -149,19 +149,19 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                     }
                     if (I(a, 0x1C0) > 0) {
                         I(a, 0x1BC)++;
-                        if (I(a, 0x1BC) >= 4) func_00282D30(&step, other + 0xC0, 0.02f);
-                        else func_00282D30(&step, other + 0xC0, 0.005f);
-                        if (dot < 0) func_00282D30(a + 0x100, other + 0xD0, -0.035f);
-                        else func_00282D30(a + 0x100, other + 0xD0, 0.035f);
-                        func_00282CC0(a + 0x100, a + 0x100, &step);
-                        func_00282D30(a + 0x100, a + 0x100, (float)I(a, 0x1BC) * 0.05f + 1.0f);
-                        func_00282D30(b + 0x2F0, b + 0x2F0, 1.15f);
+                        if (I(a, 0x1BC) >= 4) FastVecScale(&step, other + 0xC0, 0.02f);
+                        else FastVecScale(&step, other + 0xC0, 0.005f);
+                        if (dot < 0) FastVecScale(a + 0x100, other + 0xD0, -0.035f);
+                        else FastVecScale(a + 0x100, other + 0xD0, 0.035f);
+                        FastVecAdd(a + 0x100, a + 0x100, &step);
+                        FastVecScale(a + 0x100, a + 0x100, (float)I(a, 0x1BC) * 0.05f + 1.0f);
+                        FastVecScale(b + 0x2F0, b + 0x2F0, 1.15f);
                     } else {
                         dot = 1.0f;
                         if (I(b, 0x4D8)) dot = 1.5f;
-                        func_00282D30(a + 0x100, a + 0x100, dot);
+                        FastVecScale(a + 0x100, a + 0x100, dot);
                     }
-                    if ((S(b, 0x274) || B(a, 0xA5)) && func_00282DB0(&up, &normal) > 0.707f) {
+                    if ((S(b, 0x274) || B(a, 0xA5)) && FastVecDot(&up, &normal) > 0.707f) {
                         F(a, 0x138) *= 0.65f;
                         F(a, 0x13C) *= 0.65f;
                     }
@@ -175,11 +175,11 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                     *flag = 2;
                 } else if (S(D_L04_001BFAC0.object, 0xAA) == 0x8BA || S(D_L04_001BFAC0.object, 0xAA) == 0xA77) {
                     *flag = 3;
-                    func_002A8C00(damage, object, 0x30000, &step, 1.0f);
+                    make_hit_descriptor(damage, object, 0x30000, &step, 1.0f);
                     B(damage, 0x18) = 0;
                     B(damage, 0x19) = 1;
                     S(damage, 0x1A) = S(object, 0xAA);
-                    func_002A8E20(D_L04_001BFAC0.object, damage);
+                    QueueMobyImpact(D_L04_001BFAC0.object, damage);
                     if (friction > 0.3f || S(D_L04_001BFAC0.object, 0xAA) == 0xA77) result = 2;
                 }
             } else {
@@ -189,26 +189,26 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                     hitpos->q = ((Vec *)(&D_L04_001BFAC0.point))->q;
                     savedHit = 1;
                 }
-                dot = func_00282DB0(&direction, &normal);
+                dot = FastVecDot(&direction, &normal);
                 if (dot < -0.2f) *wall = 1;
                 else *wall = 0;
-                if ((slopeLimit < slope && dot < -0.866f) || func_00278E78() == 1 || func_00278E78() == 3) {
+                if ((slopeLimit < slope && dot < -0.866f) || GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) {
                     cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
-                    func_00283028(bounce, vel, &normal);
+                    vec_fast_normalize(bounce, vel, &normal);
                     result = 2;
                     ground = 0;
                     break;
                 }
-                if (func_00278E78() == 2 || func_00278E78() == 4) *flag = 1;
+                if (GetCollHitMaterial() == 2 || GetCollHitMaterial() == 4) *flag = 1;
             }
             if (normal.f[2] > 0.707f && !D_L04_001BFAC0.object) {
                 normalOut->q = normal.q;
-                dot = func_00282DB0(vel, normalOut);
-                func_00282D30(&step, normalOut, -dot);
-                func_00282CC0(vel, vel, &step);
+                dot = FastVecDot(vel, normalOut);
+                FastVecScale(&step, normalOut, -dot);
+                FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
-                func_002AC9F8(vel, friction);
+                vec_clamp_length(vel, friction);
                 if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
                 prev->f[2] = vel->f[2];
                 ground = 0;
@@ -219,39 +219,39 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                     direction.f[2] = 0;
                 }
                 func_001290E0(&normal, &normal);
-                dot = func_00282DB0(vel, &normal);
-                func_00282D30(&step, &normal, -dot);
-                func_00282CC0(vel, vel, &step);
+                dot = FastVecDot(vel, &normal);
+                FastVecScale(&step, &normal, -dot);
+                FastVecAdd(vel, vel, &step);
                 if (mode) {
                     a = P(object, 0x68);
-                    dot = func_00282DF0(vel);
+                    dot = FastVecLength(vel);
                     if (dot < (F(a, 0x30C) + F(a, 0x27C)) * 0.020000001f) {
                         F(a, 0x27C) = 0;
                         if (dot < F(a, 0x30C)) F(a, 0x30C) = dot;
                     }
                 }
             }
-            dot = func_00282DB0(&normal, &direction);
-            func_00282D30(&step, &normal, -dot);
-            func_00282CC0(&direction, &direction, &step);
+            dot = FastVecDot(&normal, &direction);
+            FastVecScale(&step, &normal, -dot);
+            FastVecAdd(&direction, &direction, &step);
         }
     }
     pos->q = cur.q;
     if (ground) {
         pos->f[2] -= height;
-        if (func_00277258(pos, radius, 4, object)) {
-            if (func_00278E78() == 1 || func_00278E78() == 3) result = 2;
+        if (coll_test_point(pos, radius, 4, object)) {
+            if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) result = 2;
             pos->q = ((Vec *)(&D_L04_001BFAC0.position))->q;
-            angle = func_00283248(D_L04_001BFAC0.normal.f[2], func_00282E20(&D_L04_001BFAC0.normal));
+            angle = mat_fast_helper_a(D_L04_001BFAC0.normal.f[2], vec_length_xy(&D_L04_001BFAC0.normal));
             if (angle < 0.785398245f) {
                 oldVertical = vel->f[2];
-                func_00282F20(normalOut, &D_L04_001BFAC0.normal, 1.0f);
-                dot = func_00282DB0(vel, normalOut);
-                func_00282D30(&step, normalOut, -dot);
-                func_00282CC0(vel, vel, &step);
+                vec_scale_to_length(normalOut, &D_L04_001BFAC0.normal, 1.0f);
+                dot = FastVecDot(vel, normalOut);
+                FastVecScale(&step, normalOut, -dot);
+                FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
-                func_002AC9F8(vel, friction);
+                vec_clamp_length(vel, friction);
                 if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
                 if (oldVertical < 0 && vel->f[2] > 0) vel->f[2] = 0;
                 prev->f[2] = vel->f[2];
@@ -260,7 +260,7 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
             }
         }
     }
-    if (func_002761F8(&oldpos, pos, 4, object, 0)) {
+    if (CollLine(&oldpos, pos, 4, object, 0)) {
         result = 2;
         pos->q = oldpos.q;
     }

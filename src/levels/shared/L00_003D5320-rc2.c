@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s32 ref_L00_003D5320_00[];
 
 /* Sets a small table of four words back to zero. */
-void func_L00_003D5320(void) {
+void effect_clear_four_word_table(void) {
     s32 *cursor;
     s32 remaining;
 

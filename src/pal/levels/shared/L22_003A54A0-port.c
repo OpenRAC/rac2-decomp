@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern void ref_L22_003A4FF8_00(void);
-extern int func_L22_003A2DF8(int, float);
+extern int math_get_float_bit(int, float);
 
 typedef struct Rec_003A2D58 {
     int count;
@@ -24,7 +24,7 @@ extern Rec_003A2D58 *D_L22_001FE940[];
 
 /* func_L22_003A1ED8 is defined in L22_003A1ED8.c. */
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 typedef int Quad_2160 __attribute__((mode(TI)));
 typedef union Path_2160 { Quad_2160 q; float f[4]; int count; } Path_2160;
@@ -46,11 +46,11 @@ typedef struct State_2160 {
 } State_2160;
 extern void func_002F3AB0(void *, void *, void *);
 extern float func_002F3C40(void *, void *);
-extern int func_L22_003A2780(char *, Quad_2160 *, Quad_2160 *);
-extern int func_L22_003A1ED8(void *);
-extern void func_L22_003A2988(void *, float);
-extern void func_L22_003A2A28(void *, int);
-extern void func_L22_003A2E50(char *, int, int, float);
+extern int WalkPathIsClear(char *, Quad_2160 *, Quad_2160 *);
+extern int space_ship_trace_safe_point_ahead(void *);
+extern void arena_push_point_out(void *, float);
+extern void lane_store_nearest_point_as_current(void *, int);
+extern void WalkPathPickNext(char *, int, int, float);
 extern void func_00321298(void *, void *, void *, void *);
 extern void func_0032FEB8(void *, void *);
 extern float func_0032A758(void *, void *, int);
@@ -62,18 +62,18 @@ void func_PAL_L22_003A54A0(char *obj) {
     float distance;
     qcopy_nc(target, st->target);
     qcopy_nc(flat, st->target);
-    func_L22_003A2988(flat, 0.0f);
-    if (st->target == D_00189EA0) hit = st->target_hit;
-    else hit = func_L22_003A2780(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->target);
+    arena_push_point_out(flat, 0.0f);
+    if (st->target == g_hero_position) hit = st->target_hit;
+    else hit = WalkPathIsClear(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->target);
     if (!hit && st->state == 0) st->state = 1;
     active = 1;
     if (st->state == 2) {
-        if (func_L22_003A2780(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->waypoint)) {
+        if (WalkPathIsClear(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->waypoint)) {
             st->avoiding = 0; active = 0;
         }
     } else if (st->state == 4) {
         if (hit) { st->avoiding = 0; active = 0; }
-    } else if (st->target == D_00189EA0 && st->target_hit) {
+    } else if (st->target == g_hero_position && st->target_hit) {
         st->avoiding = 0; active = 0;
     } else if (!st->state && hit) {
         st->avoiding = 0; active = 0;
@@ -85,7 +85,7 @@ void func_PAL_L22_003A54A0(char *obj) {
             if (func_002F3C40((obj + 0x10), st->avoidance) < 10.0f) st->avoiding = 0;
             qcopy(target, st->avoidance);
         } else {
-            if (func_L22_003A1ED8(obj)) {
+            if (space_ship_trace_safe_point_ahead(obj)) {
                 qcopy(target, st->avoidance);
                 qcopy(st->previous, (obj + 0x10));
             }
@@ -97,7 +97,7 @@ void func_PAL_L22_003A54A0(char *obj) {
     switch (state) {
     case 1: {
         Path_2160 *rec;
-        func_L22_003A2A28(obj, 1);
+        lane_store_nearest_point_as_current(obj, 1);
         rec = (Path_2160 *)D_L22_001FE940[st->paths[st->path]];
         qcopy_nc(point, rec + (st->point + 1));
         st->state = 2;
@@ -125,7 +125,7 @@ void func_PAL_L22_003A54A0(char *obj) {
             else st->direction = 1;
             func_00321298(st->waypoint, point, rec + (st->direction + 1), (obj + 0x10));
         }
-        func_L22_003A2988(st->waypoint, 0.0f);
+        arena_push_point_out(st->waypoint, 0.0f);
         break;
     }
     case 2:
@@ -142,14 +142,14 @@ void func_PAL_L22_003A54A0(char *obj) {
             if (func_002F3C40((obj + 0x10), st->waypoint) < 2.0f) {
                 next = st->point + st->direction;
                 if (next < 0) {
-                    func_L22_003A2E50(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
+                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
                 } else {
                     PathData_2160 *end = (PathData_2160 *)D_L22_001FE940[st->paths[st->path]];
-                    if (next >= end->count) func_L22_003A2E50(obj, 1, 0, end->points[end->count - 1].f[3]);
+                    if (next >= end->count) WalkPathPickNext(obj, 1, 0, end->points[end->count - 1].f[3]);
                     else st->point = next;
                 }
                 qcopy(st->waypoint, (Path_2160 *)D_L22_001FE940[st->paths[st->path]] + (st->point + 1));
-                func_L22_003A2988(st->waypoint, 0.0f);
+                arena_push_point_out(st->waypoint, 0.0f);
             }
             qcopy(target, st->waypoint);
         }
@@ -167,24 +167,24 @@ finish:
 }
 
 typedef int Quad_003A2780 __attribute__((mode(TI)));
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_L22_003A2988(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern void arena_push_point_out(void *, float);
 
 /* func_L22_003A2988 is defined in L22_003A2988-qcopy-barrier.c. */
 
 /* func_L22_003A2A28 is defined in L22_003A2A28-qcopy-barrier.c. */
 
-extern int func_L22_003A48F8(int);
+extern int list_is_key_missing(int);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern void func_002F3AB0(void *, void *, void *);
 extern float func_002F3C40(void *, void *);
 extern int func_0031FC88(int);
-extern int func_L22_003A6128(float);
+extern int mask_is_single_bit_set_and_valid(float);
 extern float func_002F3B88(void *, void *);
 extern float func_002F39F0(float);
 extern void func_002F3BB0(void *, void *, void *);
@@ -209,12 +209,12 @@ typedef struct PathRec_003A36A0 {
     Quad_003A2780 pts[1];
 } PathRec_003A36A0;
 extern Quad_003A2780 D_L22_001C00E0;
-extern void func_L22_003A3CA0(char *);
-extern int func_002A77E0(int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_L22_003A3B50(void *, int);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, float);
+extern void pickup_reset_tables(char *);
+extern int math_random_int_below(int);
+extern void *memset(void *, int, unsigned int);
+extern void SpawnRandomKindAt(void *, int);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, float);
 
 /* func_L22_003A3B50 is defined in L22_0039D708-g8.c. */
 
@@ -238,10 +238,10 @@ extern void func_0039CDC0(void *, void *, int, int, int);
 /* func_L22_003A4938 is defined in L22_0039D708-scan.c. */
 
 extern float D_L22_001B2AA4 __attribute__((sda));
-extern char *D_0018C0B0;
+extern char *g_hero_moby;
 extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3D60(void *, void *, float);
 extern void func_002F3AF0(void *, void *, float);
 extern void func_002F3A80(void *, void *, void *);
-extern void func_L22_003A2B90(void *, void *, void *, int);
-extern void func_L22_003A2988(void *, float);
+extern void lane_find_nearest_point(void *, void *, void *, int);
+extern void arena_push_point_out(void *, float);

@@ -7,15 +7,15 @@
 
 extern s32 D_L08_001B1FA8 __attribute__((sda));
 
-extern s32 func_L08_003289D0(s32);
+extern s32 moby_count_of_class(s32);
 
 /* Counts how many of three kinds of enemy are in the level and saves the total. */
 /* Totals three table lookups into one $-gp word and returns it. */
-s32 func_L08_00435938(void)
+s32 level_get_saved_count(void)
 {
-    s32 first = CountMobysOfClass(0x96A /* Desert Crystal Shell */);
-    s32 second = CountMobysOfClass(0x1002 /* Desert Dune Monster */);
-    s32 sum = first + second + CountMobysOfClass(0x8C4 /* moby class 2244 */);
+    s32 first = moby_count_of_class(0x96A /* Desert Crystal Shell */);
+    s32 second = moby_count_of_class(0x1002 /* Desert Dune Monster */);
+    s32 sum = first + second + moby_count_of_class(0x8C4 /* moby class 2244 */);
 
     D_L08_001B1FA8 = sum;
     return sum;
@@ -58,7 +58,7 @@ typedef struct {
     s32 mode;
 } L08Player;
 
-extern L08Player D_00189E20;
+extern L08Player g_hero_state;
 extern L08Marker *D_L08_001B0318 __attribute__((sda));
 extern s32 D_L08_001B02FC __attribute__((sda));
 extern float D_L08_001B0300 __attribute__((sda));
@@ -69,13 +69,13 @@ extern float D_L08_001B0314 __attribute__((sda));
 extern TI128 D_L08_001B9B00;
 extern s32 D_L08_001B258C MACRO_ADDR;
 
-extern void *func_00115484(void *, int, unsigned int);
-extern int func_002ACBC8(void *, int);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern L08Marker *func_L00_002D70A0(int);
-extern void func_L00_002D7140(void *);
+extern void *memset(void *, int, unsigned int);
+extern int IsPointInCuboid(void *, int);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern L08Marker *cam_alloc_override_slot(int);
+extern void cam_end_override(void *);
 
 static __inline__ void CopyTarget(L08Target *dst, L08Target *src)
 {
@@ -92,7 +92,7 @@ static __inline__ void CopyTarget(L08Target *dst, L08Target *src)
 /* Per-frame target tracker: a vehicle mode places a marker ahead of the vehicle; on foot
    record [1] replaces record [0] once it has been nearest for long enough, a marker
    follows record [0]'s owner, and [1] is shifted into [2] and cleared for the next frame. */
-void func_L08_003D39F0(u8 *moby)
+void lock_on_target_tracker_update(u8 *moby)
 {
     float offset[4] __attribute__((aligned(16)));
     u8 *vehicle;
@@ -120,15 +120,15 @@ void func_L08_003D39F0(u8 *moby)
     }
     if (*vars != -1 && IsPointInCuboid(&D_L08_001B9B00, *vars))
         D_L08_001B258C = 2;
-    if (gHeroState.mode == 0x31 && (vehicle = gHeroState.vehicle) != 0) {
-        BuildSphericalOffset(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
-        FastVecAdd(&D_L08_001B3490[0].pos, offset, gHeroState.vehicle + 0x10);
+    if (g_hero_state.mode == 0x31 && (vehicle = g_hero_state.vehicle) != 0) {
+        vec_build_spherical_offset(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
+        FastVecAdd(&D_L08_001B3490[0].pos, offset, g_hero_state.vehicle + 0x10);
         if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = AllocCameraOverrideSlot(5);
+            D_L08_001B0318 = cam_alloc_override_slot(5);
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
-        if (*(s16 *)(gHeroState.vehicle + 0xAA) == 0x905 /* Glider */) {
+        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == 0x905 /* Glider */) {
             D_L08_001B0318->x0 = D_L08_001B0304;
             D_L08_001B0318->xC = -1.0f;
             D_L08_001B0318->x8 = -1.0f;
@@ -158,7 +158,7 @@ void func_L08_003D39F0(u8 *moby)
     }
     if (D_L08_001B3490[0].owner != 0) {
         if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = AllocCameraOverrideSlot(5);
+            D_L08_001B0318 = cam_alloc_override_slot(5);
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
@@ -166,7 +166,7 @@ void func_L08_003D39F0(u8 *moby)
         D_L08_001B0318->x1F = 1;
         FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
     } else if (D_L08_001B0318 != 0) {
-        EndCameraOverride(D_L08_001B0318);
+        cam_end_override(D_L08_001B0318);
         D_L08_001B0318 = 0;
     }
 shift:

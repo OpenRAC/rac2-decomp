@@ -9,12 +9,12 @@ typedef struct { int count; int reserved[3]; float point[0][4]; } CameraPath;
 extern char *D_L13_001B22C4;
 extern char *D_L13_001B2140;
 extern CameraPath *D_L13_001FE580[];
-extern void func_00282C88(Quad *);
-extern int func_L00_00341FA8(void *, void *, void *, int *, float *, int, float, float, float);
-extern int func_00283CF0(float);
+extern void vec_clear_128(Quad *);
+extern int find_nearest_path_point(void *, void *, void *, int *, float *, int, float, float, float);
+extern int FloatToInt(float);
 
 /* Sets up the path camera: spring and speed settings, and for the two-route mode, works out where each marker sits along its route. */
-void func_L13_004388C8(char *camera) {
+void cam_path_init(char *camera) {
     float projected[4];
     int segment;
     float fraction;
@@ -55,7 +55,7 @@ void func_L13_004388C8(char *camera) {
         spring->active = 0;
         spring->state = 0;
         spring->flags = 0;
-        ClearVector128((Quad *)spring);
+        vec_clear_128((Quad *)spring);
     }
     {
         char *private = *(char **)(camera + 0x70);
@@ -64,13 +64,13 @@ void func_L13_004388C8(char *camera) {
         spring->epsilon = 0.01f;
         *(float *)((char *)spring + 0x28) = 0.2f;
         *(short *)((char *)spring + 0x2C) = 0;
-        ClearVector128((Quad *)spring);
+        vec_clear_128((Quad *)spring);
     }
     {
         char *private = *(char **)(camera + 0x70);
         PathSpring *spring = (PathSpring *)(private + 0x100);
-        ClearVector128((Quad *)spring);
-        ClearVector128((Quad *)(private + 0x120));
+        vec_clear_128((Quad *)spring);
+        vec_clear_128((Quad *)(private + 0x120));
         *(float *)((char *)spring + 0x40) = 3.0f;
         *(float *)((char *)spring + 0x30) = 0.003f;
         *(float *)((char *)spring + 0x34) = 0.1f;

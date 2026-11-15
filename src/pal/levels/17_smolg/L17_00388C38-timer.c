@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 extern u32 D_L04_001B2E84_1 MACRO_ADDR;
 extern int D_L04_001B2E70 MACRO_ADDR;
 extern int D_L04_001B2E7C MACRO_ADDR;
@@ -23,7 +23,7 @@ void func_PAL_L17_003A7CCC(u8 *a0)
         D_L04_001B2E70 = v;
         ref_L04_003C6FE8_00 = v;
         {
-            float duration = func_00283CE0(v);
+            float duration = IntToFloat(v);
             ref_L04_003C6FE8_01 = 1.0f / duration;
         }
         D_L04_001B2E7C = v;

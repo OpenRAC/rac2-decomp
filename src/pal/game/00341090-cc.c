@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_00341090, the PAL copy of func_0033F0A0: the same C, where swap locals *a *f. */
 
 typedef unsigned char u8;
@@ -19,33 +20,33 @@ typedef struct {
     char reserved3E[0xA2];
 } ItemDefinition;
 
-extern ItemDefinition D_00239BA0[];
-extern RecentSlot **D_001B18D4[] __attribute__((sda));
+extern ItemDefinition g_weapon_table[];
+extern RecentSlot **g_radial_menu_pages[] __attribute__((sda));
 
 /* Forwards one object pointer, eight pointer-plus-constant arguments and a null to ten calls in a fixed order. */
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);
 char *func_PAL_00341090(char *object)
 {
     char *cursor;
     int i;
     char *f, *b, *c, *d, *e, *g, *a;
-    func_003361A8(object);
-    func_003361A8(object + 0x4C);
-    func_003361A8(object + 0x98);
-    func_003361A8(object + 0xE4);
-    func_003361A8(object + 0x130);
-    func_003361A8(object + 0x17C);
-    func_003361A8(object + 0x1C8);
-    func_003361A8(object + 0x214);
-    func_003363D0(object + 0x260);
-    func_003361A8(object + 0x2A8);
-    func_003361A8(object + 0x2F4);
+    object_construct_derived_a(object);
+    object_construct_derived_a(object + 0x4C);
+    object_construct_derived_a(object + 0x98);
+    object_construct_derived_a(object + 0xE4);
+    object_construct_derived_a(object + 0x130);
+    object_construct_derived_a(object + 0x17C);
+    object_construct_derived_a(object + 0x1C8);
+    object_construct_derived_a(object + 0x214);
+    object_construct_derived_b(object + 0x260);
+    object_construct_derived_a(object + 0x2A8);
+    object_construct_derived_a(object + 0x2F4);
     cursor = object + 0x340;
-    for (i = 7; i != -1; i--, cursor += 0x4C) func_003361A8(cursor);
-    func_003361A8(object + 0x5A0);
+    for (i = 7; i != -1; i--, cursor += 0x4C) object_construct_derived_a(cursor);
+    object_construct_derived_a(object + 0x5A0);
     cursor = object + 0x5EC;
     i = 7;
     f = object + 0x988;
@@ -55,14 +56,14 @@ char *func_PAL_00341090(char *object)
     c = object + 0x880;
     d = object + 0x8d8;
     e = object + 0x930;
-    for (; i != -1; i--, cursor += 0x3C) func_003366D0(cursor);
-    func_003366D0(a);
-    func_00336968(b);
-    func_00336968(c);
-    func_00336968(d);
-    func_00336968(e);
-    func_00336968(f);
-    func_00336968(g);
+    for (; i != -1; i--, cursor += 0x3C) object_construct_derived_c(cursor);
+    object_construct_derived_c(a);
+    hud_construct_widget_base(b);
+    hud_construct_widget_base(c);
+    hud_construct_widget_base(d);
+    hud_construct_widget_base(e);
+    hud_construct_widget_base(f);
+    hud_construct_widget_base(g);
     return object;
 }
 
@@ -96,22 +97,22 @@ typedef struct {
 /* the table, in the memory a program replaces from 0x1A7C80 on: every program has
    its own copy of it at that address */
 extern MenuEntry D_001FCE0[];
-extern void func_003407F8(MenuState *, MenuEntry *, int);
+extern void AddMenuItemToRing(MenuState *, MenuEntry *, int);
 /* Puts the selected entry's item in the next slot of a ring of eight, first clearing a slot
    that already holds it, and calls func_002E5E58 with 4. An item that is 0, has no flag in
    D_001A7AF8 or whose definition's label is 0xEA7E only calls it with 5. Either way the ring
    index at 0x7CC moves on, wrapping after 7. The global's first read falls in a branch slot,
    where the assembler makes it $gp-relative; its other reads are absolute macro loads. */
-void func_003407F8(MenuState *self, MenuEntry *table, int columns);
+void AddMenuItemToRing(MenuState *self, MenuEntry *table, int columns);
 
 /* Moves the selection of a menu's table: the buttons 0x1000 and 0x4000 move the page,
    0x8000 and 0x2000 the column and 0x40 asks for the entry's value, which is then kept
    in the state. The page moves compare against a variable, so that the compiler keeps
    the -1 in a register, as the retail code does. */
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);
 /* func_00340D68 is in 0033F030-grid-g8.c. */
 
 /* Moves the selection of a menu grid and keeps the selected entry's value at

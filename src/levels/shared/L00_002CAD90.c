@@ -3,15 +3,15 @@
 
 extern int func_L00_002D1DA0_1(int, void *, void *);
 
-extern void func_002A7470(void *, int, int, int);
+extern void anim_start_blended(void *, int, int, int);
 
 extern char D_00189E20_36[];
 
 extern unsigned char D_001A7A80[] __attribute__((sda));
 extern unsigned int D_00138320;
-extern unsigned char D_00138180[];
+extern unsigned char g_pad_state[];
 extern unsigned int D_001A7390 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_L00_001B8C80[];
 
 typedef struct {
@@ -20,18 +20,18 @@ typedef struct {
     unsigned int best;
     unsigned int levels;
 } Statistics;
-extern Statistics D_0018C750[];
+extern Statistics g_progress_statistics[];
 
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 /* Typed call shape: the EE assigns the GPR and FP banks independently of this order. */
-extern char *func_L00_002AE888(void *, float, float, float, float, int, int);
+extern char *SelectBestEligibleTarget(void *, float, float, float, float, int, int);
 
 
 
 
 /* keeps the hero's held target (0x1450) while both low pad bits are set: clears it on an ineligible screen, beyond 30 units or on release, records a statistic when the target stops being eligible; with no target and both bits set plus either in the next pad word, picks one from the camera's view and then from the hero's */
 /* Handles the lock-on target for the hero: keeps it while the buttons are held and it is close, drops it otherwise, and looks for a new one. */
-void func_L00_002CB038(void)
+void UpdateHeroHeldTarget(void)
 {
     char *hero = D_00189E20_36;
     int screen = *(int *)(hero + 0x1248);
@@ -50,15 +50,15 @@ void func_L00_002CB038(void)
         if (!*(char **)(hero + 0x1450) || (*(unsigned short *)(*(char **)(hero + 0x1450) + 0x34) & 0x1000))
             return;
         *(int *)(hero + 0x1450) = 0;
-        if (gProgressStatistics[36].count < 0xFFFF)
-            gProgressStatistics[36].count++;
-        if (D_001A7390 > gProgressStatistics[36].best)
-            gProgressStatistics[36].best = D_001A7390;
-        gProgressStatistics[36].levels = (gProgressStatistics[36].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+        if (g_progress_statistics[36].count < 0xFFFF)
+            g_progress_statistics[36].count++;
+        if (D_001A7390 > g_progress_statistics[36].best)
+            g_progress_statistics[36].best = D_001A7390;
+        g_progress_statistics[36].levels = (g_progress_statistics[36].levels | (1u << g_current_map_index)) | 0x80000000u;
         return;
     }
     {
-        unsigned char *pad = gPadState;
+        unsigned char *pad = g_pad_state;
         if ((*(unsigned int *)(pad + 0x1A0) & 3) == 3 && (*(unsigned int *)(pad + 0x1A4) & 3) != 0) {
             float radius = 25.0f;
             unsigned char *camera = D_L00_001B8C80;
@@ -78,7 +78,7 @@ void func_L00_002CB038(void)
 
 /* loads two object pointers from fixed data, bails out when either is null or when the first object's byte 67 differs from 1, fills two stack ints through a helper, then applies a four-argument operation to each object with those ints */
 /* Switches the hero's two linked objects to the animation chosen for the current move. */
-void func_L00_002D1AE8(void)
+void hero_set_linked_objects_anim(void)
 {
     char *hero = D_00189E20_36;
     void *firstObj;
@@ -99,8 +99,8 @@ void func_L00_002D1AE8(void)
     if (func_L00_002D1DA0_1(0, animIds, animIds + 1) == 0)
         return;
 
-    StartAnimationBlended(firstObj, animIds[0], 0, 7);
-    StartAnimationBlended(secondObj, animIds[1], 0, 7);
+    anim_start_blended(firstObj, animIds[0], 0, 7);
+    anim_start_blended(secondObj, animIds[1], 0, 7);
 }
 
 /* func_L00_002D1B70 is in the sibling file L00_002CAD90-g8.c (-G8). */

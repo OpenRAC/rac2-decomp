@@ -32,11 +32,11 @@ extern s32 r1_func_00119868_tty(int) __asm__("func_0011BAC8");
 
 extern s32 r1_func_00119718();
 
-extern void func_0011BB38();
+extern void tty_handle_deci2_event();
 
 /* rac1-decomp src/core/00119868.c: func_00119CC8 */
 /* Opens the TTY DECI2 endpoint and initializes its uncached packet headers. */
-s32 func_0011BE20(void) {
+s32 tty_open_channel(void) {
     struct TtyInitState *state = &r1_D_00154B50;
     struct TtyMmio *txBlock;
     struct TtyMmio *rxBlock;
@@ -45,7 +45,7 @@ s32 func_0011BE20(void) {
     s32 cmd;
 
     r1_func_00118D80(0);
-    *(volatile s32 *)&state->unk0 = r1_func_00119718(0x210, state, &HandleTtyDeci2Event);
+    *(volatile s32 *)&state->unk0 = r1_func_00119718(0x210, state, &tty_handle_deci2_event);
     if (state->unk0 < 0) {
         return 0;
     }

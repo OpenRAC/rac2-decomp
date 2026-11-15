@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 extern u32 D_L04_001B2E84_1 MACRO_ADDR;
 extern int D_L04_001B2E70 MACRO_ADDR;
 extern int D_L04_001B2E7C MACRO_ADDR;
@@ -10,7 +10,7 @@ extern float ref_L04_003C6FE8_01 SDATA(ref_L04_003C6FE8_01);
 extern float ref_L04_003C6FE8_02 SDATA(ref_L04_003C6FE8_02);
 
 /* Update for a water timer object: starts a 60-frame countdown, then keeps scrolling the water texture. */
-void func_L04_003C6FE8(u8 *moby)
+void water_timer_update(u8 *moby)
 {
     int frames;
 

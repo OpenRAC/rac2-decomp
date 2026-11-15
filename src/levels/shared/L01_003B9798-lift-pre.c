@@ -19,32 +19,32 @@ typedef struct {
     float speed;
     int contact;
 } Lift;
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 typedef struct { char pad[0x74]; unsigned char active; char pad75[0x13]; void *owner; char pad8c[0x70-0x8c+0x70]; } SoundSlot;
-extern struct { char pad[0x70]; } D_00188660[];
+extern struct { char pad[0x70]; } g_sound_state[];
 extern unsigned char D_0019B2E8[], D_0019B4A8[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 typedef struct { char pad[0x464]; unsigned char locked[1]; } Entry;
 extern Entry D_L01_0021E4B0;
-extern int func_L00_00324120(void *);
-extern float func_00282C48(float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_002A7750(void *, int, int);
-extern float func_002AA548(float *, float *, float, float, float, float);
-extern int func_002ACBC8(void *, int);
-extern void func_002AD6F0(void *, void *, void *, void *);
-extern void func_002B3868(void *);
-extern int func_002E59B0(void *, int);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
+extern int hero_is_current_selected_id(void *);
+extern float math_fabs(float);
+extern void FastVecSub(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void moby_set_state(void *, int, int);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern int IsPointInCuboid(void *, int);
+extern void mat_combine_and_store(void *, void *, void *, void *);
+extern void flag_set_first_pending(void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
 
 #define Z(o) (*(float *)((o) + 0x18))
 #define W(o) (*(unsigned short *)((o) + 0xB2))
 #define SLOT(id) ((SoundSlot *)&D_00188660[id])
 
 /* Updates a lift platform: waits for the player, then rides up or down between two heights with sound. */
-void func_L01_003B9798(unsigned char *obj)
+void lift_platform_update(unsigned char *obj)
 {
     Vec old, oldRot, delta;
     Lift *lift = *(Lift **)(obj + 0x68);
@@ -77,39 +77,39 @@ void func_L01_003B9798(unsigned char *obj)
         lift->sound = -1;
         break;
     case 1:
-        if (IsCurrentSelectedId(obj)) {
+        if (hero_is_current_selected_id(obj)) {
             lift->active = 1;
             w = W(obj);
             if (w & 1) {
-                p = &D_0019B4A8[((short)w >> 1) + (gCurrentMapIndex << 10)];
+                p = &D_0019B4A8[((short)w >> 1) + (g_current_map_index << 10)];
                 u = *p;
                 if (((u >> 4) & 7) != 7) {
                     *p = u + 0x10;
                 }
             } else {
-                p = &D_0019B4A8[((short)w >> 1) + (gCurrentMapIndex << 10)];
+                p = &D_0019B4A8[((short)w >> 1) + (g_current_map_index << 10)];
                 u = *p;
                 if ((u & 7) != 7) {
                     *p = u + 1;
                 }
             }
             if (lift->down == 0) {
-                SetMobyState(obj, 3, -1);
-                if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                moby_set_state(obj, 3, -1);
+                if (!snd_is_voice_playing_for_owner(obj, lift->sound)) {
                     lift->sound = PlayMobySound(0, 4, obj);
                 }
             } else {
-                SetMobyState(obj, 2, -1);
-                if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                moby_set_state(obj, 2, -1);
+                if (!snd_is_voice_playing_for_owner(obj, lift->sound)) {
                     lift->sound = PlayMobySound(0, 4, obj);
                 }
             }
         }
-        if (FloatAbs(Z(obj) - gHeroState.position[2]) > 3.0f && lift->down == 0 && Z(obj) > gHeroState.position[2]) {
-            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+        if (math_fabs(Z(obj) - g_hero_state.position[2]) > 3.0f && lift->down == 0 && Z(obj) > g_hero_state.position[2]) {
+            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
                 w2 = W(obj);
                 if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v = D_0019B4A8[((short)w2 >> 1) + (gCurrentMapIndex << 10)];
+                    v = D_0019B4A8[((short)w2 >> 1) + (g_current_map_index << 10)];
                     if (w2 & 1) {
                         if (((v >> 4) & 7) != 0) goto play;
                         goto second;
@@ -118,18 +118,18 @@ void func_L01_003B9798(unsigned char *obj)
                 }
             }
 play:
-            if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+            if (!snd_is_voice_playing_for_owner(obj, lift->sound)) {
                 lift->sound = PlayMobySound(0, 4, obj);
             }
-            SetMobyState(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
             break;
         }
 second:
-        if (FloatAbs(Z(obj) - gHeroState.position[2]) > 3.0f && lift->down == 1 && gHeroState.position[2] > Z(obj)) {
-            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+        if (math_fabs(Z(obj) - g_hero_state.position[2]) > 3.0f && lift->down == 1 && g_hero_state.position[2] > Z(obj)) {
+            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
                 w2 = W(obj);
                 if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v2 = D_0019B4A8[((short)w2 >> 1) + (gCurrentMapIndex << 10)];
+                    v2 = D_0019B4A8[((short)w2 >> 1) + (g_current_map_index << 10)];
                     if (w2 & 1) {
                         if (((v2 >> 4) & 7) != 0) goto play2;
                         break;
@@ -138,66 +138,66 @@ second:
                 }
             }
 play2:
-            if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+            if (!snd_is_voice_playing_for_owner(obj, lift->sound)) {
                 lift->sound = PlayMobySound(0, 4, obj);
             }
-            SetMobyState(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
         }
         break;
     case 2:
         qcopy(delta, obj + 0x10);
         delta[2] = lift->upperZ;
         if (fast_vec_dist(obj + 0x10, delta) > 0.04f) {
-            StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, delta[2], 0.00194444449f, 0.00166666671f, 0.100000009f);
+            math_step_value_toward_target((float *)(obj + 0x18), (float *)&lift->speed, delta[2], 0.00194444449f, 0.00166666671f, 0.100000009f);
             lift->timer++;
-        } else if (!IsCurrentSelectedId(obj)) {
+        } else if (!hero_is_current_selected_id(obj)) {
             id = lift->sound;
             lift->down = 0;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                StopSoundVoice(id);
+                snd_stop_voice(id);
             }
             lift->sound = -1;
-            SetMobyState(obj, 1, -1);
+            moby_set_state(obj, 1, -1);
             qcopy(obj + 0x10, delta);
             lift->timer = 0;
         } else {
             id = lift->sound;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                StopSoundVoice(id);
+                snd_stop_voice(id);
             }
             lift->sound = -1;
         }
         break;
     case 3:
-        SetFirstPendingFlag(obj);
+        flag_set_first_pending(obj);
         if (lift->lowerZ < Z(obj)) {
-            if (Z(obj) - gHeroState.position[2] < 2.8f && Z(obj) > gHeroState.position[2]) {
-                if (IsPointInCuboid((char *)&gHeroState + 0x80, lift->contact) == 0) {
-                    StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
+            if (Z(obj) - g_hero_state.position[2] < 2.8f && Z(obj) > g_hero_state.position[2]) {
+                if (IsPointInCuboid((char *)&g_hero_state + 0x80, lift->contact) == 0) {
+                    math_step_value_toward_target((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
                     lift->timer++;
                 }
             } else {
-                StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
+                math_step_value_toward_target((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
                 lift->timer++;
             }
-        } else if (!IsCurrentSelectedId(obj) && Z(obj) <= lift->lowerZ) {
+        } else if (!hero_is_current_selected_id(obj) && Z(obj) <= lift->lowerZ) {
             id = lift->sound;
             lift->down = 1;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                StopSoundVoice(id);
+                snd_stop_voice(id);
             }
             lift->sound = -1;
-            SetMobyState(obj, 1, -1);
+            moby_set_state(obj, 1, -1);
             lift->timer = 0;
         } else {
             id = lift->sound;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                StopSoundVoice(id);
+                snd_stop_voice(id);
             }
             lift->sound = -1;
         }
         break;
     }
     FastVecSub(delta, obj + 0x10, old);
-    CombineTransformsAndStore(lift->body, delta, oldRot, obj + 0xF0);
+    mat_combine_and_store(lift->body, delta, oldRot, obj + 0xF0);
 }

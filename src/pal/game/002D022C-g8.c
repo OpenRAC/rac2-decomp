@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int active;
@@ -21,11 +22,11 @@ extern char *D_001A8CFC;
 extern int D_001AA430 __attribute__((sda));
 extern int D_001AA434 __attribute__((sda));
 extern int D_001AA438 __attribute__((sda));
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001A7A0A;
-extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char D_001A7A80[] __attribute__((sda));
-extern unsigned char D_00239BA0[];
+extern unsigned char g_weapon_table[];
 extern Menu D_00261750;
 extern char D_002615F8[], D_00261698[];
 extern char D_0025C450[], D_0025C5E8[], D_0025CCF8[];
@@ -41,8 +42,8 @@ int func_PAL_002D0290(void)
         D_001AA434 = 1;
         D_001AA438 = 1;
         for (i = 0; i < 56; i++) {
-            if (((ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0))->active && i != 9 && i != 10) {
-                if (!D_001A7AF8[i]) {
+            if (((ClassRecord *)(g_item_slot_to_record[i] * 0xE0 + (int)g_weapon_table))->active && i != 9 && i != 10) {
+                if (!g_item_owned_flags[i]) {
                     D_001AA430 = 0;
                     D_001AA434 = 0;
                     D_001AA438 = 0;
@@ -52,15 +53,15 @@ int func_PAL_002D0290(void)
                         ClassRecord *record;
                         switch (j) {
                         case 0:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(g_item_slot_to_record[i] * 0xE0 + (int)g_weapon_table);
                             value = record->requirement[0];
                             break;
                         case 1:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(g_item_slot_to_record[i] * 0xE0 + (int)g_weapon_table);
                             value = record->requirement[1];
                             break;
                         case 2:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(g_item_slot_to_record[i] * 0xE0 + (int)g_weapon_table);
                             value = record->requirement[2];
                             break;
                         default:

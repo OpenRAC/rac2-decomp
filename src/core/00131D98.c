@@ -2,22 +2,22 @@
 
 typedef void (*OverlayEntry)(void);
 
-extern void func_0011FC48(void);
-extern OverlayEntry func_00131CB8(void);
-extern void func_0011AEA0(int);
+extern void shutdown_run_callbacks_once(void);
+extern OverlayEntry load_boot_bin_chunks(void);
+extern void FlushCache(int);
 extern void ref_00131D98_00(void);
 
 /* Run each overlay entry, install the next binary, and synchronize its caches. */
 /* Runs each boot program in turn, loading the next one after each, forever. */
-void func_00131D98(void)
+void run_boot_binaries(void)
 {
     OverlayEntry entry;
 
-    RunShutdownCallbacksOnce();
+    shutdown_run_callbacks_once();
     entry = ref_00131D98_00;
     do {
         entry();
-        entry = LoadBootBinChunks();
+        entry = load_boot_bin_chunks();
         FlushCache(0);
         FlushCache(2);
     } while (1);

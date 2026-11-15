@@ -23,7 +23,7 @@ extern s32_1B4C8 r1_func_00118C70();
 
 extern int r1_D_0012FD9C;
 
-extern void func_0011DD48(void);
+extern void iop_file_init_lock_sema(void);
 
 extern int r1_D_0012FD9C NOT_SDA;
 
@@ -33,9 +33,9 @@ extern int r1_D_0012FD9C NOT_SDA;
    (bnez). The in-range-first if/else that matched under 2.95.3 is laid
    out the other way round by 2.9-ee. */
 /* Returns the file table entry for a file number, or 0 if the number is out of range. */
-void *func_0011D950(unsigned int index) {
+void *iop_file_get_slot(unsigned int index) {
     void *slot;
-    InitFileSemaphores();
+    iop_file_init_semaphores();
     r1_func_00118CB0(r1_D_0012FDA0);
     if (index >= 0x20) {
         r1_func_00118C90(r1_D_0012FDA0);
@@ -86,7 +86,7 @@ extern void *r1_func_00115248(void *, const void *, u32);
 
 /* rac1-decomp src/core/00119D88.c: func_0011D9C0 */
 /* Handles the reply to a file request from the IOP: copies the returned data to its destination and wakes the waiting thread. */
-void func_0011D9C0(s32 *message) {
+void iop_file_handle_reply(s32 *message) {
     FsRcvHead head;
     FsRcvHead *headSrc;
     FsRcvBuf *bufSrc;
@@ -174,7 +174,7 @@ void func_0011D9C0(s32 *message) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011BBF0 */
 /* Creates the file system lock the first time it is called. */
-void func_0011DD48(void) {
+void iop_file_init_lock_sema(void) {
     int buf[8];
     if (r1_D_0012FD9C == -1) {
         buf[5] = 0;

@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_002A89A8(void *, int, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_002A7750(void *, int, int);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern float D_L09_001B13BC __attribute__((sda));
 extern char *D_L09_001FE6C0[];
@@ -93,15 +93,15 @@ void func_PAL_L09_00407C08(char *obj) {
     DobboInitData *data = *(DobboInitData **)(obj + 0x68);
     float value;
     int one;
-    data->field_288 = func_002A89A8(obj + 0x10, 0, 0.5f);
+    data->field_288 = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
     value = data->field_288 + D_L09_001B13BC;
     data->field_294 = value;
     if (value < data->field_264) data->field_294 = data->field_264;
     data->field_274 = -1;
-    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * func_002A78D8(25.0f, 100.0f);
+    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * math_random_signed_float_range(25.0f, 100.0f);
     else data->field_260 *= 0.0174532942f;
-    data->field_48 = func_00283CF0(15.0f);
-    data->field_4A = func_00283CF0(2.4f);
+    data->field_48 = FloatToInt(15.0f);
+    data->field_4A = FloatToInt(2.4f);
     data->field_60 = 9;
     data->field_61 = 0;
     data->field_62 = 0;
@@ -130,7 +130,7 @@ void func_PAL_L09_00407C08(char *obj) {
     data->field_138 |= 0x10;
     data->field_1DC = data->field_260 * 0.017453294f;
     data->field_1E2 = 100;
-    func_002B60B0(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
+    moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
     qcopy((char *)data+0x1F0, obj+0x10);
     data->field_200 = 1.0f;
     data->field_20C = 5.0f;
@@ -140,8 +140,8 @@ void func_PAL_L09_00407C08(char *obj) {
     data->field_30 = 0;
     if (data->field_250 != -1) {
         qcopy(obj+0x10, D_L09_001FE6C0[data->field_250] + 0x10);
-        func_002A7750(obj, 1, 0);
-    } else func_002A7750(obj, 2, 2);
+        moby_set_state(obj, 1, 0);
+    } else moby_set_state(obj, 2, 2);
     if (*(unsigned char *)(obj+0x43)) func_PAL_002A7E68(obj, 0, 0, 1);
 }
 
@@ -150,7 +150,7 @@ void func_PAL_L09_00407C08(char *obj) {
  * 0.016666668f becomes 0.020000001f, and D_L09_001B11C8 and D_L09_001B11CC are read as words and
  * scaled to 50 Hz.
  */
-extern void func_00282F20(float, void *, void *);
+extern void vec_scale_to_length(float, void *, void *);
 extern float D_L09_001B11C0 __attribute__((sda));
 extern float D_L09_001B11D0 __attribute__((sda));
 extern s32 D_L09_001B1280 __attribute__((sda));
@@ -158,12 +158,12 @@ extern s32 D_L09_001B11B8 __attribute__((sda));
 extern s32 D_L09_001B11C8 __attribute__((sda));
 extern s32 D_L09_001B11C4 __attribute__((sda));
 extern s32 D_L09_001B11CC __attribute__((sda));
-extern float func_00282E80(char *a0, char *a1);
-extern void func_0029FC20(char *a0, s32 a1, void *a2);
-extern void func_00282CF0(float *a0, char *a1, float *a2);
-extern char *func_L09_003AE8C8(float *a0, char *a1, float *a2, s32 a3, s32 t0, float f12, float f13, float f14, float f15);
-extern s32 func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern s32 func_002829A8(char *a0);
+extern float vec_distance_xy(char *a0, char *a1);
+extern void moby_transform_joint_point(char *a0, s32 a1, void *a2);
+extern void FastVecSub(float *a0, char *a1, float *a2);
+extern char *projectile_l09_spawn(float *a0, char *a1, float *a2, s32 a3, s32 t0, float f12, float f13, float f14, float f15);
+extern s32 PlayMobySound(s32 a0, s32 a1, char *a2);
+extern s32 vec_fast_helper_a(char *a0);
 
 void func_PAL_L09_00403698(char *a0) {
     char *s2 = *(char **)(a0 + 0x68);
@@ -171,19 +171,19 @@ void func_PAL_L09_00403698(char *a0) {
     float va[4];
 
     {
-        if (*(u8 *)(s2 + 0x42B) != 0 && func_00282E80(s2 + 0x390, *(char **)(s2 + 0x150) + 0x10) < 3.0f) {
+        if (*(u8 *)(s2 + 0x42B) != 0 && vec_distance_xy(s2 + 0x390, *(char **)(s2 + 0x150) + 0x10) < 3.0f) {
             *(s16 *)(s2 + 0x412) = 500;
             if (*(s16 *)(s2 + 0x426) == 0 && *(u8 *)(s2 + 0x428) == 0) {
-                func_0029FC20(a0, *(u8 *)(s2 + 0x429) + 4, matrix);
-                if (*(u8 *)(s2 + 0x441) && func_00282E80(s2 + 0x140, s2 + 0x390) < 3.0f) {
-                    func_00282CF0(va, s2 + 0x140, matrix + 12);
+                moby_transform_joint_point(a0, *(u8 *)(s2 + 0x429) + 4, matrix);
+                if (*(u8 *)(s2 + 0x441) && vec_distance_xy(s2 + 0x140, s2 + 0x390) < 3.0f) {
+                    FastVecSub(va, s2 + 0x140, matrix + 12);
                 } else {
-                    func_00282CF0(va, s2 + 0x390, matrix + 12);
+                    FastVecSub(va, s2 + 0x390, matrix + 12);
                 }
-                func_00282F20(D_L09_001B11C0 * 0.020000001f, va, va);
-                func_L09_003AE8C8(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
+                vec_scale_to_length(D_L09_001B11C0 * 0.020000001f, va, va);
+                projectile_l09_spawn(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
                 if (*(u8 *)(s2 + 0x42A) % D_L09_001B1280 == 0)
-                    func_002E5CF8(D_L09_001B11B8, 0, a0);
+                    PlayMobySound(D_L09_001B11B8, 0, a0);
                 *(u8 *)(s2 + 0x429) ^= 1;
                 *(u8 *)(s2 + 0x42A) += 1;
                 *(u8 *)(s2 + 0x428) = (D_L09_001B11C8 * 5 + 2) / 6;
@@ -193,7 +193,7 @@ void func_PAL_L09_00403698(char *a0) {
                 }
             }
         } else if (*(u8 *)(s2 + 0x428) == 0) {
-            if (func_002829A8(s2 + 0x42A) == 0)
+            if (vec_fast_helper_a(s2 + 0x42A) == 0)
                 *(u8 *)(s2 + 0x428) = (D_L09_001B11C8 * 5 + 2) / 6;
         }
     }

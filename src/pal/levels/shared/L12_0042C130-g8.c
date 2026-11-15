@@ -13,20 +13,20 @@ extern char *D_L12_001B2B00[3] __attribute__((sda));
 extern char D_L12_001B2B10[16] __attribute__((sda));
 extern char D_L12_001B9E00[];
 extern float D_L12_001B21C0 __attribute__((sda));
-extern int func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_002B0178(void *, void *, void *);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(void *, int, int);
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void coll_get_ground_distance_below(void *, void *, void *);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_002A93B0(void *);
+extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern void func_L12_00427D50(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern void func_002AFFD8(void *, void *, int);
+extern void hopping_enemy_alert_group(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern void cam_compute_view_direction(void *, void *, int);
 struct L12Private277 {
     char pad0[0x28];
     unsigned char f28;
@@ -90,25 +90,25 @@ void func_PAL_L12_0042CD98(char *obj) {
     if (!B(obj,0x20)) {
         if (D_L12_001A79F0[0] == 2 && F(obj,0x18) > 400.0f) {
             if (!D_L12_001A8FF0) return;
-            func_002B0178(obj+0x10,obj,obj+0x10);
+            coll_get_ground_distance_below(obj+0x10,obj,obj+0x10);
             s->f358=1;
             W(obj,0x9C)=3;
             U(obj,0x34)|=0x100;
-            s->f90=func_00282E48(obj+0x10,D_L12_001B2B10)-1.5f;
+            s->f90=fast_vec_dist(obj+0x10,D_L12_001B2B10)-1.5f;
         } else {
             W(obj,0x9C)=12;
             s->f90=F(obj,0x18)-1.0f;
         }
-        if (s->f230==-1) { func_0029F338(obj); return; }
+        if (s->f230==-1) { moby_mark_spawned(obj); return; }
         { char *v=D_L12_001B2B00[0]+s->f230*0x30;
         if (H(v,0x30)) {
             s->f238=W(P(v,0x3C),0);
             s->f13C=s->f238;
         } else s->f238=-1; }
-        s->f344=func_002A7878(1.0f,1.3329999446868896f);
+        s->f344=math_random_float_range(1.0f,1.3329999446868896f);
         F(obj,0x2C)=F(P(obj,0x24),0x24)*s->f344;
-        s->f48=func_00283CF0(15.0f);
-        s->f4A=func_00283CF0(6.4f);
+        s->f48=FloatToInt(15.0f);
+        s->f4A=FloatToInt(6.4f);
         s->f60=11; s->f98=3;
         s->f80=0.2f; s->f84=0.2f; s->f8C=0.4f;
         if(s->f230!=-1) {
@@ -124,30 +124,30 @@ void func_PAL_L12_0042CD98(char *obj) {
         s->f110=1.5707964897155762f;
         s->f130=0.523598849773407f;
         s->f138|=0x280;
-        { float angle=func_002A78D8(18.0f,22.0f);
+        { float angle=math_random_signed_float_range(18.0f,22.0f);
         s->f1E8=7; s->f1E9=6; s->f1E2=100; s->f1E4=150;
         s->f1DC=angle*0.01745329424738884f;
         s->f1D4=3.0f; s->f1D0=D_L12_001B21C0*0.020000001f; }
-        s->f348=func_002A7940();
+        s->f348=math_random_angle();
         if(s->f234) {
             W(obj,0x98)=0; U(obj,0x34)=(U(obj,0x34)|0x41)&0xEFFF;
-            func_002A7750(obj,13,4);
+            moby_set_state(obj,13,4);
             if(B(obj,0x43)!=10) func_PAL_002A7E68(obj,10,0,0);
         } else {
-            func_002A7750(obj,1,0);
+            moby_set_state(obj,1,0);
             if(B(obj,0x43)) func_PAL_002A7E68(obj,0,0,0);
         }
         qcopy((char *)s+0x300,obj+0x10);
     }
-    if(B(obj,0x31) && func_00282E48(obj+0x10,D_L12_001B9E00)<24.0f) {
-        func_002A93B0(obj); B(obj,0x6F)=22;
+    if(B(obj,0x31) && fast_vec_dist(obj+0x10,D_L12_001B9E00)<24.0f) {
+        moby_update_ground_check(obj); B(obj,0x6F)=22;
     }
     result=func_PAL_002B1A50(obj,(char *)s+0x50,0);
     if(result) {
-        func_L12_00427D50(obj);
-        if(result>=4) func_002A7750(obj,12,-1);
+        hopping_enemy_alert_group(obj);
+        if(result>=4) moby_set_state(obj,12,-1);
     }
     if((unsigned)(B(obj,0x95)-3)>=2)
-        s->f334=func_002B3BA8(obj,s->f230,0,0,16.0f,0.0f);
-    if(s->f358) func_002AFFD8(obj+0x10,(char *)s+0x320,0);
+        s->f334=weapon_select_aim_target(obj,s->f230,0,0,16.0f,0.0f);
+    if(s->f358) cam_compute_view_direction(obj+0x10,(char *)s+0x320,0);
 }

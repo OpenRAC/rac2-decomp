@@ -4,21 +4,21 @@
 extern int func_00115544(const char *, const char *);
 
 /* Returns the given value if two strings match, otherwise zero. */
-void *func_00120390(const char *first, const char *second, void *value) {
-    return strcmp_00115544(first, second) ? 0 : value;
+void *str_select_if_equal(const char *first, const char *second, void *value) {
+    return func_00115544(first, second) ? 0 : value;
 }
 /* Does nothing. */
-void func_001203C0(void) {
+void empty_function(void) {
 }
 
-extern void *func_00115F28(unsigned int);
-extern int func_00115484(unsigned char *, int, int);
-extern void func_00120368(void);
+extern void *malloc(unsigned int);
+extern int memset(unsigned char *, int, int);
+extern void call_terminate_handler(void);
 
 /* Allocates and clears a new 24-byte record for exception handling. */
-char *func_001203C8(void) {
-    char *record = Malloc(24);
-    if (record == 0) CallTerminateHandler();
+char *eh_alloc_context(void) {
+    char *record = malloc(24);
+    if (record == 0) call_terminate_handler();
     memset((unsigned char *)record, 0, 24);
     *(char **)(record + 4) = record + 16;
     return record;
@@ -27,7 +27,7 @@ char *func_001203C8(void) {
 extern char *(*D_00135D38)(void);
 
 /* Returns the current exception state record. */
-char *func_00120420(void) {
+char *eh_get_context(void) {
     return D_00135D38();
 }
 
@@ -36,11 +36,11 @@ char *func_00120448(void) {
     return D_00135D38() + 8;
 }
 
-extern char *func_00120498(void);
+extern char *eh_get_static_context(void);
 
 /* Switches to the fallback exception state getter and returns the state. */
-char *func_00120470(void) {
-    D_00135D38 = GetStaticExceptionContext;
+char *eh_set_default_context_getter(void) {
+    D_00135D38 = eh_get_static_context;
     return D_00135D38();
 }
 
@@ -49,7 +49,7 @@ extern char D_001417F0[];
 extern char D_00141808[];
 
 /* Returns the single shared exception state record, setting it up on first use. */
-char *func_00120498(void) {
+char *eh_get_static_context(void) {
     if (D_00141800 == 0) {
         D_00141800 = 1;
         memset((unsigned char *)D_001417F0, 0, 16);
@@ -59,35 +59,35 @@ char *func_00120498(void) {
 }
 
 /* Returns the handler-chain part of the current exception state. */
-char *func_00120500(void) {
+char *eh_get_handler_chain(void) {
     return D_00135D38() + 4;
 }
 
 /* Reads one small field from an exception record. */
-int func_00120800(short *record) {
+int eh_get_record_field3(short *record) {
     return record[3];
 }
 
 /* Reads another small field from an exception record. */
-int func_00120808(short *record) {
+int eh_get_record_field2(short *record) {
     return record[2];
 }
 
 
 
-extern void *func_00120A30(int, void *, int);
+extern void *eh_get_saved_register_addr(int, void *, int);
 extern void *func_001153D4(void *, const void *, unsigned int);
 
 /* Copies one saved register slot from one stack frame record to another. */
-void *func_00120AB8(int index, void *source, void *destination) {
-    void *from = GetSavedRegisterAddress(index, source, 0);
-    void *to = GetSavedRegisterAddress(index, destination, 0);
+void *eh_copy_saved_register(int index, void *source, void *destination) {
+    void *from = eh_get_saved_register_addr(index, source, 0);
+    void *to = eh_get_saved_register_addr(index, destination, 0);
     unsigned int size = index < 31 ? 16 : index <= 63 ? 4 : 8;
-    return memcpy_001153D4(to, from, size);
+    return func_001153D4(to, from, size);
 }
 
 /* Does nothing; a hook that runs when only cleanup handlers are left. */
-void func_00120BC8(void)
+void eh_unwinding_cleanup(void)
 {
 }
 
@@ -142,14 +142,14 @@ typedef struct exception_descriptor
 
 #define REG_SAVED_REG 2
 
-extern void func_00120368(void);
-extern void func_00120BC8(void);
-extern void *func_001208E8(void *, void *, void *, int, int *);
-extern void *func_00120810(void *, void *);
-extern frame_state *func_00120B38(void *, frame_state *, frame_state *);
+extern void call_terminate_handler(void);
+extern void eh_unwinding_cleanup(void);
+extern void *eh_find_handler(void *, void *, void *, int, int *);
+extern void *eh_find_old_handler(void *, void *);
+extern frame_state *eh_next_stack_level(void *, frame_state *, frame_state *);
 
 /* Walks up the call stack looking for the code that handles a thrown exception and prepares to jump to it. */
-void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
+void *eh_throw_helper(struct eh_context *eh, void *pc, frame_state *my_udata,
 		    frame_state **udata_p)
 {
   frame_state *udata = *udata_p;
@@ -175,7 +175,7 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
   for (;;)
     {
       frame_state *p = udata;
-      udata = NextStackLevel (pc, udata, sub_udata);
+      udata = eh_next_stack_level (pc, udata, sub_udata);
       sub_udata = p;
 
       /* If we couldn't find the next frame, we lose.  */
@@ -191,16 +191,16 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
       if (rethrow)
         {
           rethrow = 0;
-          handler = FindExceptionHandler (eh->table_index, udata->eh_ptr,
+          handler = eh_find_handler (eh->table_index, udata->eh_ptr,
                                    eh_info, 1, &cleanup);
           eh->table_index = (void *)0;
         }
       else
         if (new_eh_model)
-          handler = FindExceptionHandler (pc, udata->eh_ptr, eh_info,
+          handler = eh_find_handler (pc, udata->eh_ptr, eh_info,
                                    0, &cleanup);
         else
-          handler = FindOldExceptionHandler (pc, udata->eh_ptr);
+          handler = eh_find_old_handler (pc, udata->eh_ptr);
 
       /* If we found one, we can stop searching, if its not a cleanup.
          for cleanups, we save the state, and keep looking. This allows
@@ -226,7 +226,7 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
       /* Otherwise, we continue searching.  We subtract 1 from PC to avoid
 	 hitting the beginning of the next region.  */
       {
-        s64 value = *(s64 *)GetSavedRegisterAddress (udata->retaddr_column, udata,
+        s64 value = *(s64 *)eh_get_saved_register_addr (udata->retaddr_column, udata,
 					    (int)sub_udata);
         pc = (void *)((int)value - 1);
       }
@@ -238,13 +238,13 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
       handler = handler_p;
       pc = pc_p;
       if (only_cleanup)
-        UnwindingCleanup ();
+        eh_unwinding_cleanup ();
     }
 
   /* If we haven't found a handler by now, this is an unhandled
      exception.  */
   if (! handler)
-    CallTerminateHandler ();
+    call_terminate_handler ();
 
   eh->handler_label = handler;
 
@@ -268,15 +268,15 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
       while (pc != handler_pc)
 	{
 	  frame_state *p = udata;
-	  udata = NextStackLevel (pc, udata, sub_udata);
+	  udata = eh_next_stack_level (pc, udata, sub_udata);
 	  sub_udata = p;
 
 	  for (i = 0; i < FIRST_PSEUDO_REGISTER; ++i)
 	    if (i != udata->retaddr_column && udata->saved[i])
-	      CopySavedRegister (i, udata, my_udata);
+	      eh_copy_saved_register (i, udata, my_udata);
 
 	  {
-	    s64 value = *(s64 *)GetSavedRegisterAddress (udata->retaddr_column, udata,
+	    s64 value = *(s64 *)eh_get_saved_register_addr (udata->retaddr_column, udata,
 						(int)sub_udata);
 	    pc = (void *)((int)value - 1);
 	  }

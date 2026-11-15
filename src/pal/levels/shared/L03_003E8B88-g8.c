@@ -9,7 +9,7 @@ extern u32 D_L03_001B0C58 NOT_SDA;
 extern u32 D_L03_001B0C5C NOT_SDA;
 extern f32 D_L03_001B0C60 __attribute__((sda));
 extern f32 D_L03_001B0C64 NOT_SDA;
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 extern int ref_L01_0031BC68_00(int, int, f32);
 
 /* Eases the record's own rate by the shared factor and hands the state the
@@ -33,7 +33,7 @@ void func_PAL_L03_003E8B88(u8 *a0) {
         c[1] = D_L03_001B0C5C;
         f13 = D_L03_001B0C64 * 0.0003490659f;
     }
-    r = func_00283B98(*(f32 *)(rec + 0x78), f13);
+    r = FastAddRotations(*(f32 *)(rec + 0x78), f13);
     *(f32 *)(rec + 0x78) = r;
     *(u32 *)(a0 + 0x78) = ref_L01_0031BC68_00(c[0], c[1], r);
 }

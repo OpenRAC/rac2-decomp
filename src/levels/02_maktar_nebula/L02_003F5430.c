@@ -19,62 +19,62 @@ extern int D_L02_002A5520[];
 
 extern int D_L02_002A5560[];
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern void func_L00_002E6EF8(char *, char *);
+extern void gfx_add_draw_callback_third(char *, char *);
 
-extern void func_L00_0030CF60(void);
+extern void module_l00_call_handler_2(void);
 
 extern char D_L02_004004D8[];
 
-extern void func_002A7750(char *, s32, s32);
+extern void moby_set_state(char *, s32, s32);
 
-extern int func_L02_003D77B8(char *);
+extern int moby_has_free_child_slot_state2(char *);
 
-extern void func_L02_003D7868(char *, char *);
+extern void moby_attach_child_first_free_slot(char *, char *);
 
 extern s32 func_003D77F8(char *);
 
 extern void func_003D78A8(char *);
 
-extern s32 func_L02_003D7830(char *);
+extern s32 moby_is_state_two_no_children(char *);
 
-extern char *D_L02_001B359C __attribute__((sda));
+extern char *g_moby_l02_pool __attribute__((sda));
 
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 
-extern void func_L02_003D2390(char *);
+extern void enemy_release_effect_record(char *);
 
-extern void func_L02_003D4900(char *);
+extern void chainblade_reset_to_idle(char *);
 
-extern void func_L02_003DB6D8(char *);
+extern void brawler_switch_off_actor(char *);
 
-extern void func_L02_003F18E8(char *);
+extern void actor_tear_down(char *);
 
-extern void func_L02_0040B980(char *);
+extern void flamethrower_robot_knock_out(char *);
 
-extern void func_L02_0040D180(char *);
+extern void blade_ball_explode(char *);
 
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 
 extern char D_L02_001BA3C0[];
 
 extern char *D_L02_001B368C __attribute__((sda));
 
-extern void func_0029FCC0(char *, s32, char *);
+extern void moby_transform_joint_to_world(char *, s32, char *);
 
-extern float func_00282E80(char *, char *);
+extern float vec_distance_xy(char *, char *);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 extern int D_L02_002A5600[];
 
-extern char D_001A63A8[];
+extern char g_music_state[];
 
 extern int D_0017A80;
 
 /* Checks each entity in the object's list and records, as bits in a mask, which ones passed the check. */
-void func_L02_003F5430(char *actor) {
+void sway_update_piece_mask(char *actor) {
     char *state = *(char **)(actor + 0x68);
     s32 i;
     s16 *idCursor;
@@ -90,14 +90,14 @@ void func_L02_003F5430(char *actor) {
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L02_001B30C8 __attribute__((sda));
+extern int g_frame_l02_counter __attribute__((sda));
 extern float D_L02_001B1040[2] __attribute__((sda));
 extern char *D_L02_001B3B00 __attribute__((sda));
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002AA2E8(float *, float, float);
-extern void func_002833F0(float *, float *);
-extern void func_L02_002F2B88(char *, char *, float *);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float ApproachValue(float *, float, float);
+extern void euler_rotation_basis(float *, float *);
+extern void mat_multiply_rotation(char *, char *, float *);
 
 /* Runs func_L02_003F5430 first when bit 0 of D_L02_001B30C8 is set. The angle at +0x88 is stepped
    (func_002AA2E8, 0.05 degree) towards the target at +0x8C when func_00282948 reports the timer at
@@ -107,7 +107,7 @@ extern void func_L02_002F2B88(char *, char *, float *);
    which multiplies the 64-byte records of D_L02_001B3B00 that the entries of the list at +0x40 name,
    for each bit set in the mask at +0x84. */
 /* Makes a group of pieces sway back and forth by a small random angle each time a timer runs out. */
-void func_L02_003F54D8(char *actor) {
+void sway_update_pieces(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float matrix[12];
     float rotation[4];
@@ -115,19 +115,19 @@ void func_L02_003F54D8(char *actor) {
     s32 i;
     s16 *idCursor;
 
-    if (gFrameCounter_L02 & 1)
-        UpdateSwayPieceMask(actor);
-    if (FastFloatHelperD(state + 0x90) != 0) {
+    if (g_frame_l02_counter & 1)
+        sway_update_piece_mask(actor);
+    if (math_fast_float_d(state + 0x90) != 0) {
         ApproachValue((float *)(state + 0x88), *(float *)(state + 0x8C), 8.726647356525064e-4f);
         if ((*(float *)(state + 0x88) >= *(float *)(state + 0x8C) && *(float *)(state + 0x8C) >= 0.0f) ||
             (*(float *)(state + 0x88) <= *(float *)(state + 0x8C) && *(float *)(state + 0x8C) <= 0.0f)) {
-            *(s32 *)(state + 0x90) = RandomIntRange(0x1E, 0x5A);
+            *(s32 *)(state + 0x90) = math_random_int_range(0x1E, 0x5A);
             if (0.0f < *(float *)(state + 0x8C))
                 *(float *)(state + 0x8C) =
-                    -(RandomFloatRange(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f);
+                    -(math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f);
             else
                 *(float *)(state + 0x8C) =
-                    RandomFloatRange(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f;
+                    math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f;
         }
     } else {
         ApproachValue((float *)(state + 0x88), 0.0f, 8.726647356525064e-4f);
@@ -145,7 +145,7 @@ void func_L02_003F54D8(char *actor) {
         if (skip)
             continue;
         piece = D_L02_001B3B00 + *idCursor * 64;
-        MultiplyRotationMatrices(piece, piece, matrix);
+        mat_multiply_rotation(piece, piece, matrix);
     }
 }
 
@@ -155,7 +155,7 @@ void func_L02_003F54D8(char *actor) {
    value to -1. The dispatch reads the level's own jump table (fourteen words in the level's data
    at 0x2A5520, one per value); `cases` only keeps the labels alive, and each label is named after
    the value that reaches it. */
-s32 func_L02_003F9AF0(u32 challenge) {
+s32 arena_get_challenge_progress_index(u32 challenge) {
     static void *cases[14] = {&&c0, &&c1, &&dflt, &&c3, &&dflt, &&c5, &&c6, &&c7, &&c8, &&dflt,
                               &&c10, &&c11, &&dflt, &&c13};
     if (challenge < 14)
@@ -190,7 +190,7 @@ dflt:
    data at 0x2A5560, one per value); `cases` only keeps the labels alive, and each label is named
    after the value that reaches it. */
 /* Turns a challenge number (0 to 13) into the id of its entry in the save table. */
-s32 func_L02_003F9B70(s32 challenge) {
+s32 arena_get_challenge_save_index(s32 challenge) {
     static void *cases[14] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7, &&c8, &&c9, &&c10,
                               &&c11, &&c12, &&c13};
     if ((u32)challenge < 14)
@@ -229,21 +229,21 @@ dflt:
 }
 
 /* Counts the arena controller's timer up by one each frame and runs the usual per-frame upkeep. */
-void func_L02_003FAF28(char *actor) {
+void arena_tick_controller(char *actor) {
     char *actorAlias = actor;
     char *state = *(char **)(actorAlias + 0x68);
     u16 timer = *(u16 *)(actorAlias + 0x96);
 
     if (timer <= 0xFFFE)
         *(u16 *)(actorAlias + 0x96) = timer + 1;
-    FastFloatHelperD(state + 0xE4);
+    math_fast_float_d(state + 0xE4);
     if (*(u8 *)(actorAlias + 0x20) > 1)
-        AddDrawCallbackToList3(D_L02_004004D8, actorAlias);
-    CallLoadedModuleHandler_L00443E18();
+        gfx_add_draw_callback_third(D_L02_004004D8, actorAlias);
+    module_l00_call_handler_2();
 }
 
 /* Sets the arena controller back to its starting values and puts it in the waiting state. */
-void func_L02_003FAF90(char *actor) {
+void arena_reset_controller(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u32 *cursor;
     s32 i;
@@ -257,7 +257,7 @@ void func_L02_003FAF90(char *actor) {
     }
     *(u32 *)(state + 0xD8) = 0;
     *(u32 *)(state + 0xD0) = 0;
-    SetMobyState(actor, 1, -1);
+    moby_set_state(actor, 1, -1);
     *(u32 *)(state + 0xC0) = 0;
 }
 
@@ -265,13 +265,13 @@ void func_L02_003FAF90(char *actor) {
 
 /* func_L02_003FB120 is matched in L02_003FB120-g8.c (built with -g). */
 
-extern s32 func_L02_003FB6C0(char *, char *);
+extern s32 arena_register_spawned_enemy(char *, char *);
 
 /* Looks through the entity list the object's state names for one of kind A1 whose byte at +0x20
    is 1; records A0 as that entity's owner and returns func_L02_003FB6C0's result for it.
    The walk is func_L02_003FB5A0's `do { ... } while ((s16)*p++ >= 0);`: a `for (;;)` with the
    test and the increment in the body makes this cc1 annul the loop-bottom slot (`bgezl`). */
-s32 func_L02_003FB4D8(char *actor, s32 classId, char *unused) {
+s32 arena_claim_enemy(char *actor, s32 classId, char *unused) {
     char *state = *(char **)(actor + 0x68);
     u32 index = *(u32 *)(state + 0x40);
     u32 listAddr;
@@ -280,30 +280,30 @@ s32 func_L02_003FB4D8(char *actor, s32 classId, char *unused) {
 
     if (index == 0xFF)
         return 0;
-    listAddr = gEntityGroupLists[index];
+    listAddr = g_entity_group_lists[index];
     if (listAddr == 0)
         return 0;
     idCursor = (u16 *)listAddr;
     do {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity != 0 && *(u8 *)(entity + 0x20) != 0xFE && *(u8 *)(entity + 0x20) != 0xFD
             && *(s16 *)(entity + 0xAA) == classId && *(u8 *)(entity + 0x20) == 1) {
             *(char **)(entity + 0xB8) = actor;
-            return RegisterSpawnedEnemy(actor, entity);
+            return arena_register_spawned_enemy(actor, entity);
         }
     } while ((s16)*idCursor++ >= 0);
     return 0;
 }
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern void func_L02_003D47B0(char *, s32);
-extern void func_L02_003DB310(char *, s32);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern void chainblade_reset_to_start(char *, s32);
+extern void ReinitializeActorAndChild(char *, s32);
 
 /* Looks through the entity list the object's state names for one of kind A1 whose byte at +0x20
    is 1; for the kinds 0x9F8 and 0xA44 it records A0 as that entity's owner, runs the kind's start
    function, counts it in the state and returns it. */
-char *func_L02_003FB5A0(char *actor, s32 classId, s32 variant) {
+char *arena_claim_boss(char *actor, s32 classId, s32 variant) {
     char *state = *(char **)(actor + 0x68);
     u32 index = *(u32 *)(state + 0x40);
     u32 listAddr;
@@ -312,18 +312,18 @@ char *func_L02_003FB5A0(char *actor, s32 classId, s32 variant) {
 
     if (index == 0xFF)
         return 0;
-    listAddr = gEntityGroupLists[index];
+    listAddr = g_entity_group_lists[index];
     if (listAddr == 0)
         return 0;
     idCursor = (u16 *)listAddr;
     do {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity != 0 && *(u8 *)(entity + 0x20) != 0xFE && *(u8 *)(entity + 0x20) != 0xFD
             && *(s16 *)(entity + 0xAA) == classId && *(u8 *)(entity + 0x20) == 1) {
             *(char **)(entity + 0xB8) = actor;
             switch (classId) {
             case 0x9F8 /* Chainblade */:
-                ResetChainbladeToStart(entity, *(s16 *)(state + 0x120) == 0xC);
+                chainblade_reset_to_start(entity, *(s16 *)(state + 0x120) == 0xC);
                 *(s32 *)(state + 0xA0) += 1;
                 return entity;
             case 0xA44 /* B2 Brawler Legs */:
@@ -337,17 +337,17 @@ char *func_L02_003FB5A0(char *actor, s32 classId, s32 variant) {
 }
 
 /* Counts the kind of A1 in the state and sets its scale to one. */
-s32 func_L02_003FB6C0(char *actor, char *enemy) {
+s32 arena_register_spawned_enemy(char *actor, char *enemy) {
     char *state = *(char **)(actor + 0x68);
     char **slotList = (char **)(state + 0xA8);
     char **slotPtr = slotList + *(s32 *)(state + 0xD8);
     char *slotEntry = *slotPtr;
 
     if (slotEntry != 0) {
-        if (HasFreeChildSlotInState2(slotEntry) != 0) {
+        if (moby_has_free_child_slot_state2(slotEntry) != 0) {
             char **curSlot = slotList + *(s32 *)(state + 0xD8);
 
-            AttachChildToFirstFreeSlot(*curSlot, enemy);
+            moby_attach_child_first_free_slot(*curSlot, enemy);
             switch (*(s16 *)(enemy + 0xAA)) {
             case 0x9CA /* moby class 2506 */:
                 *(s32 *)(state + 0x90) += 1;
@@ -377,7 +377,7 @@ s32 func_L02_003FB6C0(char *actor, char *enemy) {
 /* func_L02_003FB7E0 is defined in L02_003F5430-g8.c ($gp accesses). */
 
 /* Goes through the arena's spawn slots and starts every enemy that is ready. */
-void func_L02_003FBA58(char *actor) {
+void arena_activate_spawn_slots(char *actor) {
     char **slotPtr;
     char *state = *(char **)(actor + 0x68);
     s32 i;
@@ -391,7 +391,7 @@ void func_L02_003FBA58(char *actor) {
 }
 
 /* True when every occupied slot of the list at +0xA8 has content; then the list is cleared. */
-void func_L02_003FBAD0(char *actor) {
+void arena_clear_spawn_slots(char *actor) {
     char *state = *(char **)(actor + 0x68);
     char **slotPtr = (char **)(state + 0xA8);
     s32 i;
@@ -400,7 +400,7 @@ void func_L02_003FBAD0(char *actor) {
 
     for (i = 0; i <= *(s32 *)(state + 0xD8); i++) {
         if (*slotPtr != 0) {
-            if (IsStateTwoWithNoChildren(*slotPtr) == 0) {
+            if (moby_is_state_two_no_children(*slotPtr) == 0) {
                 ok = 0;
                 break;
             }
@@ -414,18 +414,18 @@ void func_L02_003FBAD0(char *actor) {
     }
 }
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern void func_L02_003D2390(char *);
-extern void func_L02_003D4900(char *);
-extern void func_L02_003DB6D8(char *);
-extern void func_L02_003F18E8(char *);
-extern void func_L02_0040B980(char *);
-extern void func_L02_0040D180(char *);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern void enemy_release_effect_record(char *);
+extern void chainblade_reset_to_idle(char *);
+extern void brawler_switch_off_actor(char *);
+extern void actor_tear_down(char *);
+extern void flamethrower_robot_knock_out(char *);
+extern void blade_ball_explode(char *);
 
 /* Walks the 16-bit stream the object's table entry points at and calls the handler of the
    entity type each word names; a negative word ends the stream. */
-void func_L02_003FBB90(char *actor) {
+void arena_reset_group_enemies(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u32 index = *(u32 *)(state + 0x40);
     u32 listAddr;
@@ -435,38 +435,38 @@ void func_L02_003FBB90(char *actor) {
 
     if (index == 0xFF)
         return;
-    listAddr = gEntityGroupLists[index];
+    listAddr = g_entity_group_lists[index];
     if (listAddr == 0)
         return;
     idCursor = (short *)listAddr;
     do {
-        entity = gMobyPool_L02 + ((*(u16 *)idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*(u16 *)idCursor & 0x7FFF) << 8);
         classId = *(s16 *)(entity + 0xAA);
         switch (classId) {
         case 0x9CA /* moby class 2506 */:
-            ReleaseEnemyEffectRecord(entity);
+            enemy_release_effect_record(entity);
             break;
         case 0xB22 /* moby class 2850 */:
-            TearDownActor(entity);
+            actor_tear_down(entity);
             break;
         case 0xC3B /* Megacorp Security Robot - Flamethrower */:
-            KnockOutFlamethrowerRobot(entity);
+            flamethrower_robot_knock_out(entity);
             break;
         case 0xC3E /* PX6 BladeBall */:
-            ExplodeBladeBall(entity);
+            blade_ball_explode(entity);
             break;
         case 0x9F8 /* Chainblade */:
-            ResetChainbladeToIdle(entity);
+            chainblade_reset_to_idle(entity);
             break;
         case 0xA44 /* B2 Brawler Legs */:
-            SwitchOffActorAndChild(entity);
+            brawler_switch_off_actor(entity);
             break;
         }
     } while (*idCursor++ >= 0);
 }
 
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern void func_L02_003FC1B0(char *, s32);
+extern void IncrementMaktarTypeCounter(char *, s32);
 
 /* The test of the entity walks below: the group word at +0x40 is read again for every condition,
    as the handlers may change it. */
@@ -479,7 +479,7 @@ extern void func_L02_003FC1B0(char *, s32);
    among the group's entities of those two kinds that are not 0xFE/0xFD, have a state byte (+0x20)
    of 4 or more and the flag not set, the one nearest to D_00189EA0, sets its flag and takes one
    off its kind's count (+0x50, +0x54). */
-void func_L02_003FBCF8(char *actor) {
+void arena_pick_nearest_attackers(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u16 *idCursor;
     char *entity;
@@ -490,8 +490,8 @@ void func_L02_003FBCF8(char *actor) {
     u16 kind;
     s16 flag;
 
-    for (idCursor = (u16 *)gEntityGroupLists[*(s32 *)(state + 0x40)]; GROUP_LEFT(idCursor); idCursor++) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+    for (idCursor = (u16 *)g_entity_group_lists[*(s32 *)(state + 0x40)]; GROUP_LEFT(idCursor); idCursor++) {
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
         switch (*(s16 *)(entity + 0xAA)) {
@@ -518,8 +518,8 @@ void func_L02_003FBCF8(char *actor) {
     for (i = 0; i < 2; i++) {
         best = 0;
         bestDistance = 10000.0f;
-        for (idCursor = (u16 *)gEntityGroupLists[*(s32 *)(state + 0x40)]; GROUP_LEFT(idCursor); idCursor++) {
-            entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        for (idCursor = (u16 *)g_entity_group_lists[*(s32 *)(state + 0x40)]; GROUP_LEFT(idCursor); idCursor++) {
+            entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             flag = -1;
@@ -537,9 +537,9 @@ void func_L02_003FBCF8(char *actor) {
                 *(u8 *)(entity + 0x20) >= 4) {
                 if (best == 0) {
                     best = entity;
-                    bestDistance = vec_distance_xy(best + 0x10, gHeroPosition);
+                    bestDistance = vec_distance_xy(best + 0x10, g_hero_position);
                 } else {
-                    distance = vec_distance_xy(entity + 0x10, gHeroPosition);
+                    distance = vec_distance_xy(entity + 0x10, g_hero_position);
                     if (distance < bestDistance) {
                         best = entity;
                         bestDistance = distance;
@@ -563,7 +563,7 @@ void func_L02_003FBCF8(char *actor) {
 }
 
 /* Makes the given boss the arena's current boss and plays its announcer line. */
-void func_L02_003FC020(char *actor, char *boss) {
+void arena_set_current_boss(char *actor, char *boss) {
     char *state = *(char **)(actor + 0x68);
     char *shared = D_L02_001BA3C0;
     s16 classId;
@@ -576,26 +576,26 @@ void func_L02_003FC020(char *actor, char *boss) {
     *(u32 *)(state + 0xD0) = (u32)boss;
     classId = *(s16 *)(boss + 0xAA);
     if (classId == 0x9F8 /* Chainblade */)
-        StartAnnouncerMessage(actor, 0xF);
+        arena_start_announcer_message(actor, 0xF);
     else if (classId == 0xA44 /* B2 Brawler Legs */)
-        StartAnnouncerMessage(actor, 0x15);
+        arena_start_announcer_message(actor, 0x15);
 }
 
 /* Returns the position of the arena's current camera point. */
-char *func_L02_003FC098(char *actor) {
+char *arena_get_camera_point(char *actor) {
     char *state = *(char **)(actor + 0x68);
     return D_L02_001B368C + *(u32 *)(state + 0x88) * 128 + 0x30;
 }
 
 /* Returns one stored number from the arena controller's data. */
-s32 func_L02_003FC0B8(char *actor) {
+s32 arena_get_state_word(char *actor) {
     char *state = *(char **)(actor + 0x68);
     return *(s32 *)(state + 0x84);
 }
 
 /* Counts down one of the four timers named by a1; true when it was still running. */
 /* Uses up one of the stored enemy counts for this enemy type. Returns 1 if there was one left. */
-s32 func_L02_003FC0D0(char *actor, s32 classId) {
+s32 arena_take_enemy_quota(char *actor, s32 classId) {
     char *state = *(char **)(actor + 0x68);
 
     switch (classId) {
@@ -633,7 +633,7 @@ s32 func_L02_003FC0D0(char *actor, s32 classId) {
 }
 
 /* Adds one back to the stored enemy count for this enemy type. */
-void func_L02_003FC1B0(char *actor, s32 classId) {
+void IncrementMaktarTypeCounter(char *actor, s32 classId) {
     s32 *counts = *(s32 **)(actor + 0x68);
     s32 result = 0xA44 /* B2 Brawler Legs */;
     if (classId == result)
@@ -674,11 +674,11 @@ inc5c:
     return;
 }
 
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern s16 func_L02_004024A0(char *);
-extern void func_L02_004024B0(char *);
-extern void func_L02_004024C0(char *);
+extern s16 moby_get_vars_counter(char *);
+extern void moby_set_vars_counter_to_1(char *);
+extern void moby_clear_vars_counter(char *);
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 #define FOR_EACH_ID(p, off) \
@@ -689,26 +689,26 @@ extern void func_L02_004024C0(char *);
 
 /* Counts the entities of the object's group (state word 0x48) for which func_L02_004024A0 holds, then
    sets (func_L02_004024B0) or clears (func_L02_004024C0) entities until the count equals A1. */
-void func_L02_003FC268(char *actor, s32 wantedCount) {
+void arena_match_active_count_a(char *actor, s32 wantedCount) {
     char *state = *(char **)(actor + 0x68);
     u16 *idCursor;
     char *entity;
     s32 count = 0;
 
     FOR_EACH_ID(idCursor, 0x48) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (GetMobyVarsCounter(entity))
+        if (moby_get_vars_counter(entity))
             count++;
     }
     if (count < wantedCount) {
         FOR_EACH_ID(idCursor, 0x48) {
-            entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+            entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
             if (entity == 0)
                 break;
-            if (!GetMobyVarsCounter(entity)) {
-                SetMobyVarsCounterTo1(entity);
+            if (!moby_get_vars_counter(entity)) {
+                moby_set_vars_counter_to_1(entity);
                 count++;
                 if (count >= wantedCount)
                     break;
@@ -716,11 +716,11 @@ void func_L02_003FC268(char *actor, s32 wantedCount) {
         }
     } else if (count > wantedCount) {
         FOR_EACH_ID(idCursor, 0x48) {
-            entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+            entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
             if (entity == 0)
                 break;
-            if (GetMobyVarsCounter(entity)) {
-                ClearMobyVarsCounter(entity);
+            if (moby_get_vars_counter(entity)) {
+                moby_clear_vars_counter(entity);
                 count--;
                 if (count <= wantedCount)
                     break;
@@ -729,32 +729,32 @@ void func_L02_003FC268(char *actor, s32 wantedCount) {
     }
 }
 
-extern s32 func_L02_003D7300(char *);
-extern void func_L02_003D7310(char *);
-extern void func_L02_003D7320(char *);
+extern s32 moby_get_busy_flag(char *);
+extern void moby_set_busy_flag(char *);
+extern void moby_clear_busy_flag(char *);
 
 /* Counts the entities of the object's group (state word 0x4C) for which func_L02_003D7300 holds, then
    sets (func_L02_003D7310) or clears (func_L02_003D7320) entities until the count equals A1. */
-void func_L02_003FC518(char *actor, s32 wantedCount) {
+void arena_match_active_count_b(char *actor, s32 wantedCount) {
     char *state = *(char **)(actor + 0x68);
     u16 *idCursor;
     char *entity;
     s32 count = 0;
 
     FOR_EACH_ID(idCursor, 0x4C) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (GetMobyBusyFlag(entity))
+        if (moby_get_busy_flag(entity))
             count++;
     }
     if (count < wantedCount) {
         FOR_EACH_ID(idCursor, 0x4C) {
-            entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+            entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
             if (entity == 0)
                 break;
-            if (!GetMobyBusyFlag(entity)) {
-                SetMobyBusyFlag(entity);
+            if (!moby_get_busy_flag(entity)) {
+                moby_set_busy_flag(entity);
                 count++;
                 if (count >= wantedCount)
                     break;
@@ -762,11 +762,11 @@ void func_L02_003FC518(char *actor, s32 wantedCount) {
         }
     } else if (count > wantedCount) {
         FOR_EACH_ID(idCursor, 0x4C) {
-            entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+            entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
             if (entity == 0)
                 break;
-            if (GetMobyBusyFlag(entity)) {
-                ClearMobyBusyFlag(entity);
+            if (moby_get_busy_flag(entity)) {
+                moby_clear_busy_flag(entity);
                 count--;
                 if (count <= wantedCount)
                     break;
@@ -775,24 +775,24 @@ void func_L02_003FC518(char *actor, s32 wantedCount) {
     }
 }
 
-extern void func_L02_003D2488(char *, int, int);
-extern void func_L02_003FC248(char *, int, int);
-extern int func_L00_003206B8(void *, int);
-extern void func_L00_002B30E8(void);
+extern void armed_enemy_drop_held_and_reset(char *, int, int);
+extern void moby_set_anim_type_three(char *, int, int);
+extern int coll_point_inside_record_volume(void *, int);
+extern void hero_record_play_counters(void);
 
 /* Walks the entities of the group the object names (the group word is re-read for every
    test: the handlers may change it).  Each live, unflagged one that passes the screen
    against the two bounds is handed to the handler of its type.  Afterwards the follow-up is
    called unless the resident record passes the screen. */
 /* Updates each enemy of the arena group that is near enough to the hero. */
-void func_L02_003FC7C8(char *actor) {
+void arena_update_group_enemies(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u16 *idCursor;
     char *entity;
     u8 entityState;
 
     FOR_EACH_ID(idCursor, 0x40) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
         entityState = *(u8 *)(entity + 0x20);
@@ -804,41 +804,41 @@ void func_L02_003FC7C8(char *actor) {
             continue;
         if (*(u16 *)(entity + 0x34) & 2)
             continue;
-        if (IsPointInsideRecordVolume(entity + 0x10, *(s32 *)(state + 0x80)) == 0 &&
-            IsPointInsideRecordVolume(entity + 0x10, *(s32 *)(state + 0x7C)) != 0)
+        if (coll_point_inside_record_volume(entity + 0x10, *(s32 *)(state + 0x80)) == 0 &&
+            coll_point_inside_record_volume(entity + 0x10, *(s32 *)(state + 0x7C)) != 0)
             continue;
         switch (*(s16 *)(entity + 0xAA)) {
         case 0x9CA /* moby class 2506 */:
-            DropHeldObjectAndReset(entity, 0, 0);
+            armed_enemy_drop_held_and_reset(entity, 0, 0);
             break;
         case 0xB22 /* moby class 2850 */:
-            SetMobyAnimTypeThree(entity, 0, -1);
-            TearDownActor(entity);
+            moby_set_anim_type_three(entity, 0, -1);
+            actor_tear_down(entity);
             break;
         case 0xC3B /* Megacorp Security Robot - Flamethrower */:
-            SetMobyAnimTypeThree(entity, 0, -1);
-            KnockOutFlamethrowerRobot(entity);
+            moby_set_anim_type_three(entity, 0, -1);
+            flamethrower_robot_knock_out(entity);
             break;
         case 0xC3E /* PX6 BladeBall */:
-            SetMobyAnimTypeThree(entity, 0, -1);
-            ExplodeBladeBall(entity);
+            moby_set_anim_type_three(entity, 0, -1);
+            blade_ball_explode(entity);
             break;
         }
     }
-    if (IsPointInsideRecordVolume(gHeroPosition, *(s32 *)(state + 0x7C)) == 0)
-        RecordHeroPlayCounters();
+    if (coll_point_inside_record_volume(g_hero_position, *(s32 *)(state + 0x7C)) == 0)
+        hero_record_play_counters();
 }
 
 /* func_L02_003FC9C0 is matched in L02_003F5430-g8.c. */
 
-extern int func_002A77E0(int);
-extern void func_L00_002D7140(char *);
-extern void func_L00_00303530(int, int);
-extern void func_00282C88(void *);
-extern int func_L02_003F9B70(int);
-extern void func_L00_002B9D60(char *, float *, int, int);
-extern void func_002DF3F8(void *, void *);
-extern void func_L01_00323310(int, int);
+extern int math_random_int_below(int);
+extern void cam_end_override(char *);
+extern void load_scene_chunk(int, int);
+extern void vec_clear_128(void *);
+extern int arena_get_challenge_save_index(int);
+extern void hero_reset_position_and_direction(char *, float *, int, int);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void script_queue_keyed_request(int, int);
 extern int D_L02_001CAA80;
 extern u8 D_001395B8[];
 extern char *D_L02_001B369C __attribute__((sda));
@@ -849,31 +849,31 @@ extern int D_L02_001AA1B0 __attribute__((sda));
    is -1.59 or 2.16, with the matching 128-byte record, to func_L00_002B9D60; ends by setting
    D_L02_001AA1B0 to -1. */
 /* Cancels the challenge menu: puts the hero back at the arena entrance and returns to the waiting state. */
-void func_L02_003FCA80(char *actor) {
+void arena_cancel_challenge_menu(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float heroPos[4];
 
-    StartAnnouncerMessage(actor, RandomIntBelow(2) + 0x25);
-    SetMobyState(actor, 1, -1);
+    arena_start_announcer_message(actor, math_random_int_below(2) + 0x25);
+    moby_set_state(actor, 1, -1);
     if (*(char **)(state + 0xC0) != 0) {
-        EndCameraOverride(*(char **)(state + 0xC0));
+        cam_end_override(*(char **)(state + 0xC0));
         *(s32 *)(state + 0xC0) = 0;
     }
     if (D_L02_001CAA80 != 0)
-        LoadSceneChunk(0, *(s32 *)(state + 0x224));
-    ClearVector128(heroPos);
-    if (D_001395B8[GetChallengeSaveIndex(0)] != 0) {
+        load_scene_chunk(0, *(s32 *)(state + 0x224));
+    vec_clear_128(heroPos);
+    if (D_001395B8[arena_get_challenge_save_index(0)] != 0) {
         heroPos[2] = -1.59f;
-        ResetHeroPositionAndDirection(D_L02_001B369C + *(s32 *)(state + 0x74) * 128 + 0x30, heroPos, 0, 1);
+        hero_reset_position_and_direction(D_L02_001B369C + *(s32 *)(state + 0x74) * 128 + 0x30, heroPos, 0, 1);
     } else {
         heroPos[2] = 2.16f;
-        ResetHeroPositionAndDirection(D_L02_001B368C + *(s32 *)(state + 0x78) * 128 + 0x30, heroPos, 0, 1);
+        hero_reset_position_and_direction(D_L02_001B368C + *(s32 *)(state + 0x78) * 128 + 0x30, heroPos, 0, 1);
     }
-    CaptureCheckpointState(gHeroPosition, gHeroPosition + 0x10);
-    ResetGroupEnemies(actor);
-    MatchActiveCountGroupA(actor, 0);
-    MatchActiveCountGroupB(actor, 0);
-    QueueKeyedRequest(*(s32 *)(state + 0x224), *(s32 *)(state + 0x22C));
+    level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
+    arena_reset_group_enemies(actor);
+    arena_match_active_count_a(actor, 0);
+    arena_match_active_count_b(actor, 0);
+    script_queue_keyed_request(*(s32 *)(state + 0x224), *(s32 *)(state + 0x22C));
     D_L02_001AA1B0 = -1;
 }
 
@@ -882,23 +882,23 @@ void func_L02_003FCA80(char *actor) {
 /* func_L02_003FCCA0 is defined in L02_003F5430-g8.c (D_001A79F8 is a $gp access in a delay slot). */
 
 /* Returns 1 when the entity's marker is on and it is more than 25 units away from the hero. */
-s32 func_L02_003FD000(char *entity) {
+s32 arena_is_entity_far_from_hero(char *entity) {
     char pos[16];
     s32 result = 0;
-    TransformMobyJointToWorld(entity, 0, pos);
+    moby_transform_joint_to_world(entity, 0, pos);
     if (*(u8 *)(entity + 0x31) != 0) {
-        if (vec_distance_xy(pos, gHeroPosition) > 25.0f)
+        if (vec_distance_xy(pos, g_hero_position) > 25.0f)
             result = 1;
     }
     return result;
 }
 
-extern void func_L02_003A6F78(char *);
+extern void moby_finish_release_child(char *);
 
 /* Runs func_L02_003A6F78 on every entity of the object's two groups (state words 0xC8 and
    0xC4); an empty group, or a group word of 0xFF, ends the function. */
 /* Runs the setup function on every entity of the arena's two scenery groups. */
-void func_L02_003FD070(char *actor) {
+void arena_run_scenery_setup(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u16 *idCursor;
     u16 *listStart;
@@ -906,29 +906,29 @@ void func_L02_003FD070(char *actor) {
 
     if (GROUP(0xC8) == 0xFF)
         return;
-    listStart = (u16 *)gEntityGroupLists[GROUP(0xC8)];
+    listStart = (u16 *)g_entity_group_lists[GROUP(0xC8)];
     if (listStart == 0)
         return;
     for (idCursor = listStart; (GROUP(0xC8) & 0xFF) != 0xFF && GROUP(0xC8) <= D_L02_001B35B8[0] && idCursor != 0 &&
-                ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)gEntityGroupLists[GROUP(0xC8)]);
+                ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)g_entity_group_lists[GROUP(0xC8)]);
          idCursor++) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        FinishObjectAndReleaseChild(entity);
+        moby_finish_release_child(entity);
     }
     if (GROUP(0xC4) == 0xFF)
         return;
-    listStart = (u16 *)gEntityGroupLists[GROUP(0xC4)];
+    listStart = (u16 *)g_entity_group_lists[GROUP(0xC4)];
     if (listStart == 0)
         return;
     for (idCursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L02_001B35B8[0] && idCursor != 0 &&
-                ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)gEntityGroupLists[GROUP(0xC4)]);
+                ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)g_entity_group_lists[GROUP(0xC4)]);
          idCursor++) {
-        entity = gMobyPool_L02 + ((*idCursor & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        FinishObjectAndReleaseChild(entity);
+        moby_finish_release_child(entity);
     }
 }
 
@@ -944,7 +944,7 @@ void func_L02_003FD070(char *actor) {
    words in the level's data at 0x2A5600, one per value); `cases` only keeps the labels alive, and
    each label is named after the value that reaches it. */
 /* Returns the text id for a challenge's name. */
-s32 func_L02_003FE1B0(u32 challenge) {
+s32 arena_get_challenge_name_text(u32 challenge) {
     static void *cases[14] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7, &&c8, &&c9, &&c10,
                               &&c11, &&c12, &&c13};
     if (challenge < 14)
@@ -996,7 +996,7 @@ dflt:
 /* func_L02_004004D0 is matched in its own unit, src/levels/shared/L02_004004D0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Timer for one of the thirty-nine messages, refused while one is running. */
-s32 func_L02_00400650(char *actor, s32 messageId) {
+s32 arena_start_announcer_message(char *actor, s32 messageId) {
     char *state = *(char **)(actor + 0x68);
     s32 messageTime;
 
@@ -1012,7 +1012,7 @@ s32 func_L02_00400650(char *actor, s32 messageId) {
         messageTime = *(s32 *)(table + index * 4);
     }
     {
-        char *hudState = gMusicState;
+        char *hudState = g_music_state;
 
         if (*(s32 *)(hudState + 0x68) != 0)
             goto fail;
@@ -1035,48 +1035,48 @@ fail:
 /* func_L02_00400948 is defined in L02_003F5430-g8.c ($gp accesses). */
 
 extern char *D_L02_001B35A8 __attribute__((sda));
-extern void func_003320F0(char *);
-extern void func_00333048(char *);
-extern void func_L02_00414D48(char *);
-extern void func_L02_003F0628(char *);
-extern void func_L02_00392C70(char *);
-extern void func_L02_003948D0(char *);
-extern void func_L02_003AA650(char *);
-extern void func_L02_003DED08(char *);
-extern void func_0029F338(char *);
+extern void explosion_effect_update(char *);
+extern void moby_explode_and_hurt_nearby(char *);
+extern void moby_copy_sub_byte_40_to_25(char *);
+extern void moby_copy_vars_byte_40_to_25(char *);
+extern void moby_raise_state_to_eight(char *);
+extern void moby_raise_state_to_eight_copy(char *);
+extern void moby_release_slots_retire(char *);
+extern void moby_call_helper_10000(char *);
+extern void moby_mark_spawned(char *);
 
 /* Walks the list of objects at D_L02_001B35A8 (linked through +0x28) and hands each one to the
    handler of its kind, the half-word at +0xAA. */
 /* Gives each object in the world a start-of-challenge call, depending on what kind of object it is. */
-void func_L02_00400B10(void) {
+void arena_notify_mobys_challenge_start(void) {
     char *moby;
 
     for (moby = D_L02_001B35A8; moby != 0; moby = *(char **)(moby + 0x28)) {
         switch (*(s16 *)(moby + 0xAA)) {
         case 0xE7D /* Sheep */:
-            UpdateExplosionEffectMoby(moby);
+            explosion_effect_update(moby);
             break;
         case 0xEB0 /* Dark Sheep */:
-            ExplodeAndHurtNearbyMobys(moby);
+            moby_explode_and_hurt_nearby(moby);
             break;
         case 0xCB2 /* Synthenoid */:
-            CopyVarsByte40To25_L02_2(moby);
+            moby_copy_sub_byte_40_to_25(moby);
             break;
         case 0xB02 /* Kilonoid */:
-            CopyVarsByte40To25_L02(moby);
+            moby_copy_vars_byte_40_to_25(moby);
             break;
         case 0x1366 /* Miniturret */:
-            RaiseStateToEight(moby);
+            moby_raise_state_to_eight(moby);
             break;
         case 0x1367 /* Megaturret */:
-            RaiseStateToEightCopy(moby);
+            moby_raise_state_to_eight_copy(moby);
             break;
         case 0x326 /* moby class 806 */:
-            ReleaseSlotsAndRetireObject(moby);
+            moby_release_slots_retire(moby);
             break;
         case 0xA5C /* Shield Charger */:
         case 0x1192 /* Tesla Barrier */:
-            CallHelperWith10000(moby);
+            moby_call_helper_10000(moby);
             break;
         case 0xAE0:
         case 0xAE1:
@@ -1095,7 +1095,7 @@ void func_L02_00400B10(void) {
         case 0xCC8:
         case 0xCC9:
         case 0xCDB /* Ammo */:
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             break;
         }
     }
@@ -1104,7 +1104,7 @@ void func_L02_00400B10(void) {
 /* True when the field at +0xAA is 0xB59, the global at D_0017A80 is 1 and bit 3 of the
    byte at +0x20 is clear. */
 /* Returns 1 when this object is the arena controller and it is running a challenge (state 8). */
-s32 func_L02_00400CC8(char *moby) {
+s32 arena_is_challenge_running(char *moby) {
     s32 result = 0;
     if (*(s16 *)(moby + 0xAA) == 0xB59 /* moby class 2905 */ && D_0017A80 == 1)
         result = (*(u8 *)(moby + 0x20) ^ 8) ? 0 : D_0017A80;

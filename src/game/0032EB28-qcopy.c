@@ -15,13 +15,13 @@ typedef struct {
 
 extern Obj_3353C8 *D_001B5390;
 
-extern Obj_3353C8 *func_00270280(int id);
+extern Obj_3353C8 *moby_find_record_by_handle_id(int id);
 
 /* Copies the caller's position into the current object's position slot. */
-void func_003353C8(TI128 *position)
+void cam_set_state_rotation(TI128 *position)
 {
     Obj_3353C8 *obj = D_001B5390;
-    Obj_3353C8 *target = (obj->f86_353C8 == 5) ? obj : FindRecordByHandleId(5);
+    Obj_3353C8 *target = (obj->f86_353C8 == 5) ? obj : moby_find_record_by_handle_id(5);
     TI128 *dst = (TI128 *)(target->f70_353C8 + 0x90);
 
     *dst = *position;

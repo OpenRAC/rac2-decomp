@@ -13,29 +13,29 @@ struct Sub_003D15E8 {
       char *target;
 };
 extern char *D_L05_001B251C MACRO_ADDR;
-extern char D_00188660[];
-extern int func_L00_00367720(char *);
-extern struct Sub_003D15E8 *func_002ED688(char *);
+extern char g_sound_state[];
+extern int state_get_stored_pointer_value(char *);
+extern struct Sub_003D15E8 *moby_get_motion_data(char *);
 extern void func_PAL_L05_003D5628(char *);
-extern void func_00282C88(void *);
-extern void func_L05_00379E60(char *, void *, int, int);
-extern void func_L00_003CD158(void);
-extern void func_0029F978(char *, int, void *);
+extern void vec_clear_128(void *);
+extern void level_append_object(char *, void *, int, int);
+extern void moby_l00_update_empty_3(void);
+extern void AttachManipulator(char *, int, void *);
 extern void func_PAL_L05_0037E8E0(char *);
-extern void func_L05_0037B538(char *, int, int, int);
-extern void func_L05_0037B948(char *, int, float);
-extern float func_00282E48(void *, void *);
-extern int func_002A77E0(int);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002EE6A8(char *);
-extern float func_00283198(float);
-extern float func_00283180(float);
+extern void moby_process_collision_hit(char *, int, int, int);
+extern void moby_check_player_in_view_and_range(char *, int, float);
+extern float fast_vec_dist(void *, void *);
+extern int math_random_int_below(int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int follower_get_state(char *);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
 extern void func_PAL_L05_003D5738(char *);
-extern int func_L05_0037B888(char *);
-extern int func_L05_0037CE08(char *, int);
-extern void func_L05_0037CDD8(char *, int);
+extern int moby_can_take_next_step(char *);
+extern int list_count_objects_matching_value(char *, int);
+extern void moby_l05_set_state_value(char *, int);
 extern void func_PAL_L05_0037DE20(char *);
-extern void func_00282948(void *);
+extern void math_fast_float_d(void *);
 extern void func_PAL_L05_003D5800(char *);
 
 /* The object's update: on its first frame it sets itself up; afterwards, while its record is
@@ -50,43 +50,43 @@ void func_PAL_L05_003D5330(char *obj)
 
     if (!*(unsigned char *)(obj + 0x20)) {
         *(unsigned char *)(obj + 0x30) = 0xff;
-        if (!func_L00_00367720(obj))
+        if (!state_get_stored_pointer_value(obj))
             return;
         func_PAL_L05_003D5628(obj);
-        func_00282C88(tmp);
+        vec_clear_128(tmp);
         if (*(int *)(state + 0x264))
-            func_L05_00379E60(obj, func_L00_003CD158, 0, 0);
-        func_0029F978(obj, 2, state + 0x270);
-        func_0029F978(obj, 3, state + 0x2b0);
+            level_append_object(obj, moby_l00_update_empty_3, 0, 0);
+        AttachManipulator(obj, 2, state + 0x270);
+        AttachManipulator(obj, 3, state + 0x2b0);
         return;
     }
-    sub = func_002ED688(obj);
+    sub = moby_get_motion_data(obj);
     if (!sub->mode)
         return;
     one = 1;
     func_PAL_L05_0037E8E0(obj);
-    func_L05_0037B538(obj, 0, 0, 0);
-    func_L05_0037B948(obj, 1, 32.0f);
+    moby_process_collision_hit(obj, 0, 0, 0);
+    moby_check_player_in_view_and_range(obj, 1, 32.0f);
     mode = sub->mode;
     if (mode == one) {
         if (*(int *)(state + 0x260) != -1) {
             sub->targetMode = mode;
             sub->target = D_L05_001B251C + (*(int *)(state + 0x260) << 8);
-            if (func_00282E48(sub->target + 0x10, obj + 0x10) < 10.0f) {
-                char *sound1 = D_00188660 + *(int *)(state + 0x2f4) * 0x70;
+            if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
+                char *sound1 = g_sound_state + *(int *)(state + 0x2f4) * 0x70;
 
                 if ((*(char **)(sound1 + 0x88) != obj || !*(unsigned char *)(sound1 + 0x74))
-                    && !func_002A77E0(750))
-                    *(int *)(state + 0x2f4) = func_002E5DA0(14, 0, obj, 0xfbf);
+                    && !math_random_int_below(750))
+                    *(int *)(state + 0x2f4) = snd_play_from_class_bank(14, 0, obj, 0xfbf);
             }
         }
-        func_00282C88(state + 0x280);
-        func_00282C88(state + 0x2c0);
-        if (func_002EE6A8(obj) == 8) {
-            *(float *)(state + 0x284) = func_00283198(0.78539824f);
-            *(float *)(state + 0x28c) = func_00283180(0.78539824f);
-            *(float *)(state + 0x2c4) = func_00283198(0.78539824f);
-            *(float *)(state + 0x2cc) = func_00283180(0.78539824f);
+        vec_clear_128(state + 0x280);
+        vec_clear_128(state + 0x2c0);
+        if (follower_get_state(obj) == 8) {
+            *(float *)(state + 0x284) = math_fast_sin_or_cos_b(0.78539824f);
+            *(float *)(state + 0x28c) = math_fast_sin_or_cos_a(0.78539824f);
+            *(float *)(state + 0x2c4) = math_fast_sin_or_cos_b(0.78539824f);
+            *(float *)(state + 0x2cc) = math_fast_sin_or_cos_a(0.78539824f);
             if (sub->f108)
                 func_PAL_L05_003D5738(obj);
         } else {
@@ -94,21 +94,21 @@ void func_PAL_L05_003D5330(char *obj)
             if (sub->f108 && sub->f104)
                 func_PAL_L05_003D5738(obj);
         }
-        if (func_L05_0037B888(obj)) {
-            if (func_L05_0037CE08(obj, 5) <= 0)
-                func_L05_0037CDD8(obj, 5);
+        if (moby_can_take_next_step(obj)) {
+            if (list_count_objects_matching_value(obj, 5) <= 0)
+                moby_l05_set_state_value(obj, 5);
             else
-                func_L05_0037CDD8(obj, 1);
+                moby_l05_set_state_value(obj, 1);
             func_PAL_L05_0037DE20(obj);
         }
-        func_00282948(state + 0x268);
+        math_fast_float_d(state + 0x268);
         func_PAL_L05_003D5800(obj);
     }
     {
-        char *sound2 = D_00188660 + *(int *)(state + 0x2f0) * 0x70;
+        char *sound2 = g_sound_state + *(int *)(state + 0x2f0) * 0x70;
 
         if (*(char **)(sound2 + 0x88) != obj || !*(unsigned char *)(sound2 + 0x74))
-            *(int *)(state + 0x2f0) = func_002E5DA0(1, 6, obj, 0x97c);
+            *(int *)(state + 0x2f0) = snd_play_from_class_bank(1, 6, obj, 0x97c);
     }
 }
 

@@ -9,20 +9,20 @@ typedef int s32;
 typedef signed char s8;
 typedef unsigned char u8;
 
-extern void func_00282A60(void *, int, int);
+extern void mem_clear(void *, int, int);
 extern char ref_L00_002EA630_00[];
 extern int ref_L00_002EA630_01;
-extern f32 func_00283CE0(s32);
-extern s32 func_00283CF0(f32);
+extern f32 IntToFloat(s32);
+extern s32 FloatToInt(f32);
 
 /* Clears a data buffer and resets a related counter. */
-void func_00280630(void) {
-    ClearMemory(ref_L00_002EA630_00, 0, 0x600);
+void text_clear_font_queue_buffer(void) {
+    mem_clear(ref_L00_002EA630_00, 0, 0x600);
     ref_L00_002EA630_01 = 0;
 }
 
 /* Sum the scaled per-character widths. */
-int func_0027F1D8(u8 *text, int length, u8 *table, float scale) {
+int text_measure_width_scaled(u8 *text, int length, u8 *table, float scale) {
     int i = 0;
     f32 total = 0.0f;
     u8 *p;
@@ -41,15 +41,15 @@ int func_0027F1D8(u8 *text, int length, u8 *table, float scale) {
     return FloatToInt(total);
 }
 
-extern s32 D_001A7BB8;
-extern s32 D_001A7B90;
+extern s32 g_widescreen_flag;
+extern s32 g_is_pal_video;
 extern s32 func_00124418(void);
-extern s32 func_001257D0(s32,s32,s32,s32);
+extern s32 sceGsResetGraph(s32,s32,s32,s32);
 
 /* Updates the display mode when the screen type changes. */
-void func_00284000(void) {
+void gfx_update_display_mode_from_screen_type(void) {
     func_00124418();
-    if (gIsPalVideo != 0) gWidescreenFlag = 0;
-    if (gWidescreenFlag != 0) ResetGsGraph(0,0,0x50,1);
-    else ResetGsGraph(0,1,gIsPalVideo != 0 ? 3 : 2,0);
+    if (g_is_pal_video != 0) g_widescreen_flag = 0;
+    if (g_widescreen_flag != 0) sceGsResetGraph(0,0,0x50,1);
+    else sceGsResetGraph(0,1,g_is_pal_video != 0 ? 3 : 2,0);
 }

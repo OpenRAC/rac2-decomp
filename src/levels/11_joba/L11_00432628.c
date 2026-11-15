@@ -1,5 +1,5 @@
 #include "common.h"
-extern void func_00283098(float *, float *, float *);
+extern void matrix_mul_vec3(float *, float *, float *);
 extern void func_338398(char *, char *, float, int, int);
 extern void func_32E480(char *, char *, int, float, float, float, int, int, int);
 /* A path stores its point count in a 16-byte header, followed by vectors. */
@@ -63,16 +63,16 @@ struct RotorObject {
 };
 
 extern struct RotorPath *D_L11_001FF580[];
-extern char D_00188660[];
+extern char g_sound_state[];
 extern void func_3739C0(int);
-extern int func_002E5CF8(int, int, char *);
-extern float func_00283CE0(int);
-extern float func_002AA140(float, float, float);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E48(void *, void *);
+extern int PlayMobySound(int, int, char *);
+extern float IntToFloat(int);
+extern float math_lerp_float(float, float, float);
+extern void ApproachValue(float *, float, float);
+extern float FastVecDot(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
-extern int D_L11_001B359C __attribute__((sda));
+extern int g_moby_l11_table __attribute__((sda));
 
 extern void func_32C700();
 
@@ -82,11 +82,11 @@ extern void func_32C700();
 
 /* func_L11_00434580 is defined in L11_00432628-g8.c. */
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 /* Spawns a class 0xD1B moby: its position is the first vector of its own state, which then
    takes the vectors at a (at +0x00) and b (at +0x20) and the float f (at +0x3C). */
-char *func_L11_004349F8(char *obj, void *firstVector, void *secondVector, float value)
+char *SpawnStateVectorMoby(char *obj, void *firstVector, void *secondVector, float value)
 {
     typedef int Quadword __attribute__((mode(TI)));
     Quadword vectors[2];
@@ -117,34 +117,34 @@ char *func_L11_004349F8(char *obj, void *firstVector, void *secondVector, float 
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_L11_00434AF8(char *p, void *q);
+extern void joba_draw_beam_first_stage(char *p, void *q);
 
-extern void func_L11_00434D00(char *p, void *q);
+extern void joba_draw_beam_second_stage(char *p, void *q);
 
 /* Hands two reads of the state's quadword to the two measured stage helpers. */
 /* Each frame, runs the two follow-up effect steps for a thrown projectile. */
-void func_L11_00434AA8(char *moby)
+void projectile_run_trail_steps(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
     TI128 v = *(TI128 *)state;
 
-    DrawBeamFirstStageQuad(moby, &v);
+    joba_draw_beam_first_stage(moby, &v);
     v = *(TI128 *)state;
-    DrawBeamSecondStageQuad(moby, &v);
+    joba_draw_beam_second_stage(moby, &v);
 }
 
 extern char D_L11_001BA8C0[];
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern float func_002A78D8(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
-extern int func_00283CF0(float);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern float math_random_signed_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern int FloatToInt(float);
 /* Throws out a burst of puffy particles from a point, each flying off at a random angle and speed. */
-void func_L11_00434F48(float *pos, int count) {
+void part_l11_spawn_impact_burst(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
@@ -158,29 +158,29 @@ void func_L11_00434F48(float *pos, int count) {
     axis[2] = 1.0f;
     axis[3] = 1.0f;
     for (i = 0; i < count; i++) {
-        size = RandomFloatRange(0.5f, 2.0f);
-        sign = RandomIntBelow(2);
+        size = math_random_float_range(0.5f, 2.0f);
+        sign = math_random_int_below(2);
         if (!sign) sign--;
-        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
-        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
-        vec_scale_to_length((char *)velocity, (char *)velocity, RandomFloatRange(0.05f, 3.0f) * 0.0166666675f);
-        velocity[2] = RandomFloatRange(1.0f, 5.0f) * 0.0166666675f;
+        angle = math_random_float_range(-1.0471977f, 1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
+        vec_scale_to_length((char *)velocity, (char *)velocity, math_random_float_range(0.05f, 3.0f) * 0.0166666675f);
+        velocity[2] = math_random_float_range(1.0f, 5.0f) * 0.0166666675f;
         FastVecAdd((char *)origin, (char *)pos, (char *)offset);
-        pos[0] += RandomSignedFloatRange(0, 0.15f);
-        pos[1] += RandomSignedFloatRange(0, 0.15f);
-        pos[2] += RandomSignedFloatRange(0, 0.15f);
-        particle = SpawnGroundEffectParticle(origin, 60, size * 0.1f, size, 0x8020FF20, 0, sign, velocity, 0, 0.002f);
+        pos[0] += math_random_signed_float_range(0, 0.15f);
+        pos[1] += math_random_signed_float_range(0, 0.15f);
+        pos[2] += math_random_signed_float_range(0, 0.15f);
+        particle = part_spawn_ground_effect(origin, 60, size * 0.1f, size, 0x8020FF20, 0, sign, velocity, 0, 0.002f);
         if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
-        particle = SpawnGroundEffectParticle(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
+        particle = part_spawn_ground_effect(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
 
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00282E80(void *, void *);
-extern char D_00189EA0[];
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float vec_distance_xy(void *, void *);
+extern char g_hero_position[];
 
 /* Stops the object's sound if its slot still belongs to it, then forgets the slot. */
 static inline void stop_owned_sound(char *state, char *moby)
@@ -188,7 +188,7 @@ static inline void stop_owned_sound(char *state, char *moby)
     int slot = *(int *)(state + 0x14);
 
     if (slot != -1) {
-        char *e = gSoundState + slot * 0x70;
+        char *e = g_sound_state + slot * 0x70;
 
         if (*(char **)(e + 0x88) == moby && *(unsigned char *)(e + 0x74))
             func_3739C0(slot);
@@ -201,10 +201,10 @@ static inline void stop_owned_sound(char *state, char *moby)
    parent leaves 2 it does the same back, only while D_00189EA0 is more than 6 away, and at a
    full turn returns to its saved position and waits again. */
 /* Slides a part out and back along its own direction when the parent object changes state, with a sound while it moves. */
-void func_L11_00435228(char *moby)
+void sliding_part_update(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
-    char *parent = (char *)(gMobyTable_L11 + (*(int *)(state + 8) << 8));
+    char *parent = (char *)(g_moby_l11_table + (*(int *)(state + 8) << 8));
     float offset[4];
 
     switch (*(unsigned char *)(moby + 0x20)) {
@@ -216,7 +216,7 @@ void func_L11_00435228(char *moby)
         *(unsigned short *)(moby + 0x34) |= 0x800;
     case 1:
         if (*(unsigned char *)(parent + 0x20) == 2) {
-            char *e = gSoundState + *(int *)(state + 0x14) * 0x70;
+            char *e = g_sound_state + *(int *)(state + 0x14) * 0x70;
 
             if (*(char **)(e + 0x88) != moby || !*(unsigned char *)(e + 0x74))
                 *(int *)(state + 0x14) = PlayMobySound(0, 4, moby);
@@ -234,13 +234,13 @@ void func_L11_00435228(char *moby)
             stop_owned_sound(state, moby);
             *(unsigned char *)(moby + 0x20) = 3;
         } else {
-            vec_scale_to_length((char *)offset, moby + 0xE0, (FastSinOrCosA(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
+            vec_scale_to_length((char *)offset, moby + 0xE0, (math_fast_sin_or_cos_a(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
             FastVecAdd(moby + 0x10, (char *)offset, state + 0x20);
         }
         break;
     case 3:
         if (*(unsigned char *)(parent + 0x20) != 2) {
-            char *e = gSoundState + *(int *)(state + 0x14) * 0x70;
+            char *e = g_sound_state + *(int *)(state + 0x14) * 0x70;
 
             if (*(char **)(e + 0x88) != moby || !*(unsigned char *)(e + 0x74))
                 *(int *)(state + 0x14) = PlayMobySound(0, 4, moby);
@@ -250,7 +250,7 @@ void func_L11_00435228(char *moby)
         }
         break;
     case 4:
-        if (vec_distance_xy(moby + 0x10, gHeroPosition) > 6.0f) {
+        if (vec_distance_xy(moby + 0x10, g_hero_position) > 6.0f) {
             *(float *)(state + 0x10) += 0.026179943f;
             *(float *)(state + 0xC) = FastAddRotations(*(float *)(state + 0xC), 0.026179943f);
             if (*(float *)(state + 0x10) >= 6.2831855f) {
@@ -260,7 +260,7 @@ void func_L11_00435228(char *moby)
                 *(float *)(state + 0x10) = 0;
                 qcopy(moby + 0x10, state + 0x20);
             } else {
-                vec_scale_to_length((char *)offset, moby + 0xE0, (FastSinOrCosA(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
+                vec_scale_to_length((char *)offset, moby + 0xE0, (math_fast_sin_or_cos_a(*(float *)(state + 0xC)) + 1.0f) * 5.0f);
                 FastVecAdd(moby + 0x10, (char *)offset, state + 0x20);
             }
         }
@@ -273,7 +273,7 @@ void func_L11_00435228(char *moby)
 /* func_L11_00436350 is defined in L11_00436350-g8.c. */
 
 /* Counts how many frames the object has lived and draws its glow effects. */
-void func_L11_00436768(char *obj)
+void enemy_count_frames_draw_glow(char *obj)
 {
     float tmp[3];
     TI128 tmp2[2];
@@ -300,7 +300,7 @@ extern int func_002B3BA8_6850(char *, int, float, float, int, int);
 
 /* Same body as func_L02_003F16F0, with this function's own callees. */
 /* Keeps the enemy locked onto its target while it is awake, and drops the lock when it is not. */
-void func_L11_00436850(char *moby) {
+void enemy_update_target_lock(char *moby) {
     char *state = *(char **)(moby + 0x68);
 
     if (*(unsigned char *)(moby + 0x20) < 4) {
@@ -313,7 +313,7 @@ void func_L11_00436850(char *moby) {
             func_002B3BA8_6850(moby, *(int *)(state + 0x27C), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x270) = *(int *)(state + 0x200);
     } else {
-        if (ConsumeWaitingFighterOfClass(*(int *)(moby + 0xB8), *(short *)(moby + 0xAA)) == 0)
+        if (arena_consume_waiting_fighter(*(int *)(moby + 0xB8), *(short *)(moby + 0xAA)) == 0)
             goto done;
         *(short *)(state + 0x282) = 1;
         *(short *)(state + 0x280) =
@@ -326,15 +326,15 @@ done:
     *(short *)(state + 0x282) = 0;
 }
 
-extern void func_002B60B0(char *, float, float, float, float);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
 extern void func_002A05A8(char *);
-extern void func_002A0488(char *, int, int, int);
-extern void func_L11_003973F8(char *, int, float, float);
+extern void set_moby_color(char *, int, int, int);
+extern void moby_spawn_linked(char *, int, float, float);
 
 /* Sets up an enemy when it appears: clears its lock, picks its look (active or resting) and starts its animation. */
-void func_L11_00436910(char *object, int mode, int active) {
+void enemy_init_state(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     unsigned short flags;
     char *definition;
@@ -344,7 +344,7 @@ void func_L11_00436910(char *object, int mode, int active) {
     *(short *)(state + 0x88) = 0;
     *(float *)(state + 0x20) = *(short *)(state + 0x24);
     *(short *)(state + 0x286) = active;
-    SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f,
+    moby_set_controller_speed_limits(object, 0.004444444552063942f, 0.13333334028720856f,
                   0.006981317885220051f, 0.20943954586982727f);
     flags = *(unsigned short *)(object + 0x34);
     definition = *(char **)(object + 0x24);
@@ -353,13 +353,13 @@ void func_L11_00436910(char *object, int mode, int active) {
     *(int *)(object + 0x98) = cache;
     *(unsigned char *)(object + 0x7F) = 0;
     if (*(short *)(state + 0x286) != 0) {
-        SetMobyState(object, 7, 3);
+        moby_set_state(object, 7, 3);
         *(unsigned short *)(object + 0x34) |= 0x100;
-        StartAnimationBlended(object, 1, 0, 0);
+        anim_start_blended(object, 1, 0, 0);
         func_002A05A8(object);
-        SpawnLinkedMoby(object, 0, 2.0f, 2.0f);
+        moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {
-        SetMobyState(object, 3, 0);
+        moby_set_state(object, 3, 0);
         *(unsigned char *)(object + 0x31) = 1;
         *(unsigned short *)(object + 0x34) &= 0xFEFE;
     }
@@ -374,26 +374,26 @@ void func_L11_00436910(char *object, int mode, int active) {
     }
 }
 
-extern void func_L11_00441978(unsigned char *object, int class_id);
+extern void arena_add_waiting_fighter(unsigned char *object, int class_id);
 
-extern void func_0032C700(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
-extern void func_002E5DA0(int, int, void *, int);
+extern void snd_play_from_class_bank(int, int, void *, int);
 
-extern void func_002A7470(void *, int, int, int);
+extern void anim_start_blended(void *, int, int, int);
 
 extern void func_002A05A8(char *);
 
-extern void func_002A7750(void *, int, int);
+extern void moby_set_state(void *, int, int);
 
 /* Retires the measured stage-46 record: clears the guard, drops the effect and re-tags the object. */
 /* Puts the enemy back to rest: drops its target, plays a small puff and sound if it was visible, and resets its flags. */
-void func_L11_00436A78(char *obj)
+void enemy_reset_to_idle(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
 
     if (*(short *)(state + 0x282) == 1) {
-        AddWaitingFighterOfClass(*(unsigned char **)(obj + 0xB8), 0xD37 /* moby class 3383 */);
+        arena_add_waiting_fighter(*(unsigned char **)(obj + 0xB8), 0xD37 /* moby class 3383 */);
         *(int *)(state + 0x270) = 0;
     } else {
         *(int *)(state + 0x270) = 0;
@@ -401,11 +401,11 @@ void func_L11_00436A78(char *obj)
     *(short *)(state + 0x282) = 0;
     if (*(unsigned char *)(obj + 0x31)) {
         SpawnExplosion(obj + 0x10, 0, 0, 0x1E, 5, 0, 0x32, 1, 0.3f, 0.0f, 0, 0, 0, 0);
-        PlaySoundFromClassBank(0, 0, obj, 0xDF7);
+        snd_play_from_class_bank(0, 0, obj, 0xDF7);
     }
-    StartAnimationBlended(obj, 0, 0, 3);
+    anim_start_blended(obj, 0, 0, 3);
     func_002A05A8(obj);
-    SetMobyState(obj, 1, 0);
+    moby_set_state(obj, 1, 0);
     *(unsigned char *)(obj + 0x31) = 0;
     *(int *)(obj + 0x98) = 0;
     *(unsigned short *)(obj + 0x34) = (*(unsigned short *)(obj + 0x34) & 0xEFFF) | 0x47;
@@ -422,15 +422,15 @@ extern unsigned char D_L11_00438880[];
 
 extern void func_802F8AD0(void *a0, void *a1);
 extern void func_80338398(void *a0, void *a1, int a2, int a3, float f12);
-extern void func_L11_004395C8(char *p);
-extern void func_L11_00437EA8(void *obj);
-extern void func_L11_00437FD0(char *p);
-extern void func_L11_00438460(void *obj);
-extern void func_L11_004386B8(void *obj);
+extern void rotor_tick_timers(char *p);
+extern void IntegrateVerletChain(void *obj);
+extern void chain_creature_solve_length(char *p);
+extern void chain_creature_update_segments(void *obj);
+extern void chain_creature_update_linked(void *obj);
 
 /* Runs the ten rotors' update, one frame each, and restarts the entry timer. */
 /* Runs one frame of the chain creature body: moves the chain points and updates every body segment. */
-void func_L11_00437CF0(char *moby)
+void chain_creature_update_body(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     int i;
@@ -441,11 +441,11 @@ void func_L11_00437CF0(char *moby)
         ;
 
     if (*(unsigned char *)(moby + 0x20) >= 2) {
-        TickRotationTimers(moby);
+        rotor_tick_timers(moby);
         IntegrateVerletChain(moby);
-        SolveChainLengthConstraints(moby);
-        UpdateSegmentRecordsFromPoints(moby);
-        UpdateLinkedRecordFromPoints(moby);
+        chain_creature_solve_length(moby);
+        chain_creature_update_segments(moby);
+        chain_creature_update_linked(moby);
     }
     if (*(unsigned short *)(moby + 0x96) <= 0xFFFE) {
         (*(unsigned short *)(moby + 0x96))++;
@@ -455,14 +455,14 @@ void func_L11_00437CF0(char *moby)
 
 /* Walks the ten measured indices, clearing each record selected through 0x330. */
 /* Switches all ten body segments to a given animation unless they already play it. */
-void func_L11_00437DC0(char *moby, int animation, int mode, int blend)
+void chain_creature_set_segments_anim(char *moby, int animation, int mode, int blend)
 {
     int i;
 
     for (i = 0; i < 10; i++) {
         int offset = i * 4;
         int index = *(int *)(*(char **)(moby + 0x68) + offset + 0x330);
-        char *record = (char *)(gMobyTable_L11 + (index << 8));
+        char *record = (char *)(g_moby_l11_table + (index << 8));
 
         if (*(unsigned char *)(record + 0x43) != animation)
             func_32C700(record, animation, mode, blend);
@@ -471,16 +471,16 @@ void func_L11_00437DC0(char *moby, int animation, int mode, int blend)
 
 /* Invalidates the measured slot at 0x43 of the 256-byte record indexed by 0x358. */
 /* Switches the linked end segment to a given animation unless it already plays it. */
-void func_L11_00437E68(char *moby, int animation, int mode, int blend)
+void chain_creature_set_linked_anim(char *moby, int animation, int mode, int blend)
 {
-    int record = (*(int *)(*(char **)(moby + 0x68) + 0x358) << 8) + gMobyTable_L11;
+    int record = (*(int *)(*(char **)(moby + 0x68) + 0x358) << 8) + g_moby_l11_table;
 
     if (*(unsigned char *)(record + 0x43) != animation)
-        StartAnimationBlended((char *)record, animation, mode, blend);
+        anim_start_blended((char *)record, animation, mode, blend);
 }
 
-extern void func_00282C88(void *);
-extern void func_00282D30(void *, void *, float);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *, void *, float);
 
 /* A 16-byte aligned vector, copied as one quadword. */
 typedef union Quad {
@@ -491,7 +491,7 @@ typedef union Quad {
 /* Advances the thirteen chain points one Verlet step: each moves by its damped displacement
    from its old position plus a small downward pull, and the old position takes the point's
    previous value. The damping blends 0.97 to 0.98 with the count at 0x378. */
-void func_L11_00437EA8(void *object)
+void IntegrateVerletChain(void *object)
 {
     struct RotorObject *obj = object;
     struct RotorState *state = obj->state;
@@ -504,13 +504,13 @@ void func_L11_00437EA8(void *object)
     float damping;
     int i;
 
-    ClearVector128(&gravity);
+    vec_clear_128(&gravity);
     pos = state->points;
     old = state->oldPoints;
     gravity.f[2] = -1.0f / 720.0f;
 
     t = IntToFloat(state->ropeCount);
-    damping = LerpFloat_002AA140(0.97f, 0.98f, (t -= 2.0f) / IntToFloat(8));
+    damping = math_lerp_float(0.97f, 0.98f, (t -= 2.0f) / IntToFloat(8));
 
     for (i = 12; i >= 0; i--, pos++, old++) {
         qcopy(&saved, pos);
@@ -524,12 +524,12 @@ void func_L11_00437EA8(void *object)
 
 /* func_L11_00437FD0 lives in L11_00437FD0.c. */
 
-extern void func_002833F0(char *, char *);
+extern void euler_rotation_basis(char *, char *);
 
 /* Lays the thirteen chain points out from the object's position: the step starts as the
    reversed first basis axis, each segment takes its length from the twelve floats at 0x2F0,
    and each old point takes the new point's value. */
-void func_L11_00438248(void *object)
+void LayOutVerletChain(void *object)
 {
     struct RotorObject *obj = object;
     struct RotorState *state = obj->state;
@@ -557,31 +557,31 @@ void func_L11_00438248(void *object)
     }
 }
 
-extern void func_00282DD8(void *a, void *b, void *c);
+extern void FastVecCross(void *a, void *b, void *c);
 
-extern void func_002AB6D8(char *a, char *b);
+extern void mat_get_euler_angles(char *a, char *b);
 
-extern void func_002AAA00(char *a, char *b, int c, float d, float e, float f, float g);
+extern void math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f, float g);
 
 /* Builds the measured three-axis basis of the object and hands it to the three slots. */
 /* Turns the object smoothly so it faces a given direction. */
-void func_L11_00438320(char *obj, char *direction, float rate1, float rate2, float rate3)
+void chain_creature_turn_to_face(char *obj, char *direction, float rate1, float rate2, float rate3)
 {
     char *state = *(char **)(obj + 0x68);
     float m[4][4];
     float out[4];
 
     vec_scale_to_length((char *)m[0], direction, 1.0f);
-    ClearVector128((TI128 *)m[2]);
+    vec_clear_128((TI128 *)m[2]);
     m[2][2] = 1.0f;
     FastVecCross((char *)m[1], (char *)m[0], (char *)m[2]);
     vec_scale_to_length((char *)m[1], (char *)m[1], 1.0f);
     FastVecCross((char *)m[2], (char *)m[1], (char *)m[0]);
     vec_scale_to_length((char *)m[2], (char *)m[2], 1.0f);
-    GetEulerAnglesFromMatrix((char *)m[0], (char *)out);
-    ApproachTargetWithDirectionMode(obj + 0xF0, state + 0x2A0, 0, out[0], rate1, rate2, rate3);
-    ApproachTargetWithDirectionMode(obj + 0xF4, state + 0x2A4, 0, out[1], rate1, rate2, rate3);
-    ApproachTargetWithDirectionMode(obj + 0xF8, state + 0x2A8, 0, out[2], rate1, rate2, rate3);
+    mat_get_euler_angles((char *)m[0], (char *)out);
+    math_approach_target_with_direction_mode(obj + 0xF0, state + 0x2A0, 0, out[0], rate1, rate2, rate3);
+    math_approach_target_with_direction_mode(obj + 0xF4, state + 0x2A4, 0, out[1], rate1, rate2, rate3);
+    math_approach_target_with_direction_mode(obj + 0xF8, state + 0x2A8, 0, out[2], rate1, rate2, rate3);
 }
 
 /* Record `index` of the level's 256-byte record table. */
@@ -596,7 +596,7 @@ void func_L11_00438320(char *obj, char *direction, float rate1, float rate2, flo
 #define LINKED_STORE(obj) STORED_RECORD((obj)->state->linked)
 
 /* Updates the positions and orthonormal bases of the ten enabled records. */
-void func_L11_00438460(void *object)
+void chain_creature_update_segments(void *object)
 {
     struct RotorObject *obj = object;
     struct RotorState *state = obj->state;
@@ -610,7 +610,7 @@ void func_L11_00438460(void *object)
         FastVecSub(&LISTED_RECORD(obj, i)->basis[0], state->points[i], state->points[i + 1]);
         LISTED_STORE(obj, i)->basis[0].w = 0;
         vec_scale_to_length(&LISTED_RECORD(obj, i)->basis[0], &LISTED_RECORD(obj, i)->basis[0], 1.0f);
-        ClearVector128(&LISTED_RECORD(obj, i)->basis[2]);
+        vec_clear_128(&LISTED_RECORD(obj, i)->basis[2]);
         LISTED_STORE(obj, i)->basis[2].z = 1.0f;
         FastVecCross(&LISTED_RECORD(obj, i)->basis[1], &LISTED_RECORD(obj, i)->basis[0],
                       &LISTED_RECORD(obj, i)->basis[2]);
@@ -625,7 +625,7 @@ void func_L11_00438460(void *object)
 }
 
 /* Updates the single record selected by the state index at 0x358. */
-void func_L11_004386B8(void *object)
+void chain_creature_update_linked(void *object)
 {
     struct RotorObject *obj = object;
     struct RotorState *state = obj->state;
@@ -634,7 +634,7 @@ void func_L11_004386B8(void *object)
     FastVecSub(&LINKED_RECORD(obj)->basis[0], state->points[10], state->points[11]);
     LINKED_STORE(obj)->basis[0].w = 0;
     vec_scale_to_length(&LINKED_RECORD(obj)->basis[0], &LINKED_RECORD(obj)->basis[0], 1.0f);
-    ClearVector128(&LINKED_RECORD(obj)->basis[2]);
+    vec_clear_128(&LINKED_RECORD(obj)->basis[2]);
     LINKED_STORE(obj)->basis[2].z = 1.0f;
     FastVecCross(&LINKED_RECORD(obj)->basis[1], &LINKED_RECORD(obj)->basis[0],
                   &LINKED_RECORD(obj)->basis[2]);
@@ -650,22 +650,22 @@ void func_L11_004386B8(void *object)
 /* func_L11_00438880 lives in L11_00438880-g-g8.c. */
 
 /* Clears the two 16-bit flags at 0x374/0x376 of the object held at 0x68. */
-void func_L11_00438CD8(char *moby)
+void chain_creature_reset_projectile_seq(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     *(short *)(vars + 0x374) = 0;
     *(short *)(vars + 0x376) = 0;
 }
 
-extern int func_00282978(short *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_0029FC20(void *, int, void *);
-extern char *func_L07_003F6B88(int);
-extern void func_L11_00458A98(char *, void *, int, int, void *, void *, int, float, float);
-extern void func_002A7A00(float *, float, float);
+extern int FastDecTimer(short *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern char *moby_find_active_in_group(int);
+extern void joba_shot_init(char *, void *, int, int, void *, void *, int, float, float);
+extern void vec_random_direction(float *, float, float);
 
 /* Emits a projectile from the next enabled record, with a fifteen-frame delay. */
-void func_L11_00438CE8(struct RotorObject *obj)
+void chain_creature_fire_projectile(struct RotorObject *obj)
 {
     float pos[4];
     float matrix[4][4];
@@ -688,28 +688,28 @@ void func_L11_00438CE8(struct RotorObject *obj)
     if (!FastDecTimer(&state->projectileDelay))
         return;
 
-    TransformMobyJointToWorld(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
-    TransformMobyJointPoint(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
+    moby_transform_joint_to_world(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
+    moby_transform_joint_point(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
     vec_scale_to_length(offset, matrix[2], -0.3f);
     FastVecAdd(pos, pos, offset);
 
-    RandomDirectionVector(jitter, 0.0166666675f, 0.0500000045f);
+    vec_random_direction(jitter, 0.0166666675f, 0.0500000045f);
     jitter[2] = -0.0833333358f;
     qcopy_nc(velocity, jitter);
     FastVecSub(toTarget, state->aim, pos);
     vec_scale_to_length(toTarget, toTarget, 0.333333343f);
     FastVecAdd(velocity, velocity, toTarget);
 
-    projectile = FindActiveMobyInGroup(state->projectileClass);
+    projectile = moby_find_active_in_group(state->projectileClass);
     if (projectile)
-        InitJobaShot(projectile, LISTED_RECORD(obj, state->projectileIndex), obj->fB8,
+        joba_shot_init(projectile, LISTED_RECORD(obj, state->projectileIndex), obj->fB8,
                           state->f60, pos, velocity, 120, 0.00277777785f, state->f35);
     ++state->projectileIndex;
     state->projectileDelay = 15;
 }
 
 /* Chooses the state-dependent path, then finds its nearest point. */
-void func_L11_00438F18(struct RotorObject *obj)
+void chain_creature_choose_path(struct RotorObject *obj)
 {
     struct RotorState *state = obj->state;
     struct RotorPath *path;
@@ -727,16 +727,16 @@ void func_L11_00438F18(struct RotorObject *obj)
         break;
     case 3:
         if (toggled != 0)
-            path = D_L11_001FF580[state->choices[0][RandomIntBelow(4)]];
+            path = D_L11_001FF580[state->choices[0][math_random_int_below(4)]];
         else
-            path = D_L11_001FF580[state->choices[1][RandomIntBelow(4)]];
+            path = D_L11_001FF580[state->choices[1][math_random_int_below(4)]];
         state->path = path;
         break;
     case 4:
         if (toggled != 0)
-            path = D_L11_001FF580[state->choices[2][RandomIntBelow(4)]];
+            path = D_L11_001FF580[state->choices[2][math_random_int_below(4)]];
         else
-            path = D_L11_001FF580[state->choices[3][RandomIntBelow(4)]];
+            path = D_L11_001FF580[state->choices[3][math_random_int_below(4)]];
         state->path = path;
         break;
     }
@@ -753,7 +753,7 @@ void func_L11_00438F18(struct RotorObject *obj)
 }
 
 /* Follows the current path, steers toward its next point and releases the sound at the end. */
-int func_L11_004390D0(char *object)
+int chain_creature_follow_path(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float target[4], direction[4], aim[4], old[4];
@@ -761,7 +761,7 @@ int func_L11_004390D0(char *object)
 
     if (!*(int *)(state + 0x324)) {
         if (*(int *)(state + 0x38C) != -1) {
-            char *entry = gSoundState + *(int *)(state + 0x38C) * 0x70;
+            char *entry = g_sound_state + *(int *)(state + 0x38C) * 0x70;
             if (*(char **)(entry + 0x88) == object && *(unsigned char *)(entry + 0x74))
                 func_3739C0(*(int *)(state + 0x38C));
         }
@@ -769,14 +769,14 @@ int func_L11_004390D0(char *object)
         return 1;
     }
     {
-        char *entry = gSoundState + *(int *)(state + 0x38C) * 0x70;
+        char *entry = g_sound_state + *(int *)(state + 0x38C) * 0x70;
         if (*(char **)(entry + 0x88) != object || !*(unsigned char *)(entry + 0x74))
             *(int *)(state + 0x38C) = PlayMobySound(0, 4, object);
     }
     qcopy(target, *(char **)(state + 0x324) + *(short *)(state + 0x370) * 16 + 16);
     speed = IntToFloat(*(short *)(state + 0x378));
     duration = IntToFloat(8);
-    speed = LerpFloat_002AA140(15.0f, 20.0f, (speed - 2.0f) / duration);
+    speed = math_lerp_float(15.0f, 20.0f, (speed - 2.0f) / duration);
     ApproachValue((float *)(state + 0x32C), speed * (1.0f / 60.0f), 1.0f / 180.0f);
     FastVecSub(direction, target, (float *)(object + 0x10));
     vec_scale_to_length((char *)direction, (char *)direction, *(float *)(state + 0x32C));
@@ -786,11 +786,11 @@ int func_L11_004390D0(char *object)
     vec_scale_to_length((char *)direction, (char *)direction, 1.0f);
     if (FastVecDot(direction, old) > 0.707f) {
         qcopy(aim, old);
-        TurnToFaceDirection(object, (char *)aim, 0.006981317885220051f,
+        chain_creature_turn_to_face(object, (char *)aim, 0.006981317885220051f,
                          0.006981317885220051f, 0.41887909173965454f);
     } else {
         qcopy(aim, direction);
-        TurnToFaceDirection(object, (char *)aim, 0.006981317885220051f,
+        chain_creature_turn_to_face(object, (char *)aim, 0.006981317885220051f,
                          0.006981317885220051f, 0.41887909173965454f);
     }
     if (fast_vec_dist(object + 0x10, target) < 4.0f)
@@ -799,7 +799,7 @@ int func_L11_004390D0(char *object)
         return 0;
     *(int *)(state + 0x324) = 0;
     if (*(int *)(state + 0x38C) != -1) {
-        char *entry = gSoundState + *(int *)(state + 0x38C) * 0x70;
+        char *entry = g_sound_state + *(int *)(state + 0x38C) * 0x70;
         if (*(char **)(entry + 0x88) == object && *(unsigned char *)(entry + 0x74))
             func_3739C0(*(int *)(state + 0x38C));
     }
@@ -822,44 +822,44 @@ extern int func_373978(char *obj, int a);
 extern void func_3739C0(int a);
 
 extern struct RotorPath *D_L11_001FF580[];
-extern char D_00188660[];
+extern char g_sound_state[];
 
 #define REC_L11_359C(o, t) ((*(int *)(*(char **)((o) + 0x68) + 0x358) << 8) + (int)(t))
 
 /* Releases the object's measured slot and clears the six flags of its record. */
-void func_L11_00439BF0(char *obj)
+void chain_creature_clear_sound_flags(char *obj)
 {
     char *state;
     char *records;
 
-    SetMobyState(obj, 1, 0);
+    moby_set_state(obj, 1, 0);
     state = *(char **)(obj + 0x68);
     *(unsigned short *)(obj + 0x34) = (*(unsigned short *)(obj + 0x34) & 0xEFFF) | 0x47;
     *(unsigned char *)(obj + 0x31) = 0;
     *(int *)(obj + 0x98) = 0;
     if (func_373978(obj, *(int *)(state + 0x38C)) != 0) {
         if (*(int *)(state + 0x38C) != -1) {
-            char *entry = gSoundState + *(int *)(state + 0x38C) * 0x70;
+            char *entry = g_sound_state + *(int *)(state + 0x38C) * 0x70;
 
             if (*(char **)(entry + 0x88) == obj && *(unsigned char *)(entry + 0x74) != 0)
                 func_3739C0(*(int *)(state + 0x38C));
         }
         *(int *)(state + 0x38C) = -1;
     }
-    records = (char *)gMobyTable_L11;
+    records = (char *)g_moby_l11_table;
     *(unsigned short *)(REC_L11_359C(obj, records) + 0x34) |= 0x2;
     *(unsigned short *)(REC_L11_359C(obj, records) + 0x34) |= 0x4;
     *(unsigned short *)(REC_L11_359C(obj, records) + 0x34) |= 0x40;
     *(unsigned short *)(REC_L11_359C(obj, records) + 0x34) &= 0xEFFF;
     *(unsigned short *)(REC_L11_359C(obj, records) + 0x34) |= 0x1;
     *(unsigned char *)(REC_L11_359C(obj, records) + 0x31) = 0;
-    *(int *)(REC_L11_359C(obj, (char *)gMobyTable_L11) + 0x98) = 0;
+    *(int *)(REC_L11_359C(obj, (char *)g_moby_l11_table) + 0x98) = 0;
 }
 
 
 /* Picks the measured 3/4 code from the counter at 0x364 of the object at 0x68. */
 /* Returns the next movement state: 3 when the object has a parent holding it, otherwise 4. */
-int func_L11_00439D60(char *moby)
+int chain_creature_pick_move_state(char *moby)
 {
         if (*(int *)(*(char **)(moby + 0x68) + 0x364))
         return 3;
@@ -868,16 +868,16 @@ int func_L11_00439D60(char *moby)
 
 /* func_L11_00439DD0 is defined in L11_00439DD0-g8.c. */
 
-extern int func_00283CF0(float);
-extern void func_L11_0043AB28(char *);
-extern void func_002B0ED8(char *, char *, int);
-extern int func_002B3BA8(char *, int, int, int, float, float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
+extern int FloatToInt(float);
+extern void drone_kill_with_effects(char *);
+extern void moby_apply_damage_to_object(char *, char *, int);
+extern int weapon_select_aim_target(char *, int, int, int, float, float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
 extern char D_L11_001BA8C0[];
 
 /* Sets up the flying drone on its first frame, then each frame handles hits and checks whether the hero is very close. */
-void func_L11_0043A3F8(char *object) {
+void drone_setup_and_hits(char *object) {
     char *state = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -896,27 +896,27 @@ void func_L11_0043A3F8(char *object) {
         *(float *)(state + 0xB4) = 2.0f;
         *(float *)(state + 0xAC) = 0.0027777778450399637f;
         *(int *)(state + 0x1A4) = 0;
-        SetControllerSpeedLimits(object, 0.2777777910232544f, 0.3333333432674408f,
+        moby_set_controller_speed_limits(object, 0.2777777910232544f, 0.3333333432674408f,
                       0.0017453294713050127f, 0.05235988646745682f);
         if (*(short *)(state + 0x24) == 0) {
             *(short *)(state + 0x24) = 10;
             *(float *)(state + 0x20) = 10;
         }
         if (*(unsigned char *)(object + 0x43) != 1)
-            StartAnimationBlended(object, 1, 0, 0);
-        SetMobyState(object, 1, -1);
-        KillDroneWithEffects(object);
+            anim_start_blended(object, 1, 0, 0);
+        moby_set_state(object, 1, -1);
+        drone_kill_with_effects(object);
     }
     if (*(unsigned char *)(object + 0x20) >= 4)
-        ApplyDamageToObject(object, state + 0x170, 0);
+        moby_apply_damage_to_object(object, state + 0x170, 0);
     if (*(unsigned char *)(object + 0x20) >= 3 &&
         *(unsigned char *)(state + 0x2E) == 2)
-        KillDroneWithEffects(object);
-    *(int *)(state + 0x2D8) = SelectAimTarget_002B3BA8(object, *(int *)(state + 0x2E8),
+        drone_kill_with_effects(object);
+    *(int *)(state + 0x2D8) = weapon_select_aim_target(object, *(int *)(state + 0x2E8),
                                          0, 0, 255.0f, 255.0f);
     if (*(unsigned char *)(object + 0x31) != 0) {
         if (fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 48.0f) {
-            UpdateMobyGroundCheck(object);
+            moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 45;
         }
     }
@@ -925,7 +925,7 @@ void func_L11_0043A3F8(char *object) {
 extern void func_32E480(char *p, char *q, int a, float b, float c, float d, int e, int f, int g);
 
 /* Bumps the 16-bit counter at 0x96 while it is under the measured ceiling, then re-arms. */
-void func_L11_0043A620(char *moby)
+void drone_count_frames_draw_glow(char *moby)
 {
     unsigned short count = *(unsigned short *)(moby + 0x96);
 
@@ -937,21 +937,21 @@ void func_L11_0043A620(char *moby)
 /* func_L11_0043A680 is defined in L11_0043A680-g8.c. */
 
 /* True when the byte at 0x20 is above the measured small-id range. */
-int func_L11_0043A800(char *moby)
+int drone_is_state_at_least_four(char *moby)
 {
     return *(unsigned char *)(moby + 0x20) >= 4;
 }
 
 
-extern void func_002A7A00(float *out, float a, float b);
-extern float func_002A7878(float a, float b);
-extern void func_002B0A68(char *self, int mask, float *arg2, unsigned char arg3,
+extern void vec_random_direction(float *out, float a, float b);
+extern float math_random_float_range(float a, float b);
+extern void part_spawn_masked_debris(char *self, int mask, float *arg2, unsigned char arg3,
                            float f0, float f1, float f2, float f3);
-extern int func_002E5CF8(int index, int a1, char *a2);
-extern void func_0029F9F0(char *list, char *node);
+extern int PlayMobySound(int index, int a1, char *a2);
+extern void moby_detach_manipulator(char *list, char *node);
 
 /* Spawns the object's jitter effect while its flag byte is set, then retires the state. */
-void func_L11_0043AB28(char *obj)
+void drone_kill_with_effects(char *obj)
 {
     char *state;
     unsigned short flags;
@@ -963,16 +963,16 @@ void func_L11_0043AB28(char *obj)
     if (*(unsigned char *)(obj + 0x31) != 0) {
         float s = 1.0f / 6.0f;
 
-        RandomDirectionVector(v, s, 1.0f / 3.0f);
-        v[2] = RandomFloatRange(1.0f / 12.0f, s);
-        SpawnDebrisForMaskedParts(obj, 3, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        vec_random_direction(v, s, 1.0f / 3.0f);
+        v[2] = math_random_float_range(1.0f / 12.0f, s);
+        part_spawn_masked_debris(obj, 3, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         PlayMobySound(1, 0, obj);
         SpawnExplosion(obj + 0x10, 1, 0x19, 0xA, 0xA, 5, 0, 1, 1.0f, 20.0f, 0, 0, 0, 0);
-        PlaySoundFromClassBank(0, 0, obj, 0xDF7);
+        snd_play_from_class_bank(0, 0, obj, 0xDF7);
     }
 
-    SetMobyState(obj, 1, 0);
-    StartAnimationBlended(obj, 0, 0, 3);
+    moby_set_state(obj, 1, 0);
+    anim_start_blended(obj, 0, 0, 3);
     func_002A05A8(obj);
 
     state = *(char **)(obj + 0x68);
@@ -982,29 +982,29 @@ void func_L11_0043AB28(char *obj)
     *(unsigned short *)(obj + 0x34) = (flags & 0xEFFF) | 0x47;
 
     if (*(unsigned char *)(state + 0x221))
-        DetachManipulator(obj, state + 0x220);
+        moby_detach_manipulator(obj, state + 0x220);
     if (*(unsigned char *)(state + 0x261))
-        DetachManipulator(obj, state + 0x260);
+        moby_detach_manipulator(obj, state + 0x260);
 }
 
-extern float func_00283248(float, float);
-extern float func_00283198(float);
+extern float mat_fast_helper_a(float, float);
+extern float math_fast_sin_or_cos_b(float);
 
 /* Places out at src plus dist along the heading from src to out's old position, the heading
    and the distance each jittered at random; z comes from src. */
-void func_L11_0043ACB0(float *out, TI128 *src, float distance, float angleJitter, float distJitter) {
+void PlacePointWithPolarJitterFlat(float *out, TI128 *src, float distance, float angleJitter, float distJitter) {
     TI128 vec = *src;
     TI128 *p = &vec;
     float *v = (float *)&vec;
     float angle;
 
-    angle = FastMatrixHelperA(out[0] - v[0], out[1] - v[1]);
+    angle = mat_fast_helper_a(out[0] - v[0], out[1] - v[1]);
     angleJitter *= 0.017453294f;
-    angle += RandomFloatRange(-angleJitter, angleJitter);
-    distance += RandomFloatRange(-distJitter, distJitter);
+    angle += math_random_float_range(-angleJitter, angleJitter);
+    distance += math_random_float_range(-distJitter, distJitter);
     qcopy(out, p);
-    out[0] += distance * FastSinOrCosA(angle);
-    out[1] += distance * FastSinOrCosB(angle);
+    out[0] += distance * math_fast_sin_or_cos_a(angle);
+    out[1] += distance * math_fast_sin_or_cos_b(angle);
     out[2] = v[2];
 }
 

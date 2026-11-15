@@ -8,17 +8,17 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
-extern void func_002A0488(char *, int, int, int);
+extern void set_moby_color(char *, int, int, int);
 
-extern void func_L02_003D4AF0(char *, int);
+extern void chainblade_pick_idle_anim(char *, int);
 
-extern void func_L02_003D5570(char *);
+extern void chainblade_spawn_chain_links(char *);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
 typedef struct {
     char pad0[0x80];
@@ -26,26 +26,26 @@ typedef struct {
     float y;
 } L02_003D7900_Hero;
 
-extern L02_003D7900_Hero D_00189E20;
+extern L02_003D7900_Hero g_hero_state;
 
 extern int D_L02_001B01C0 __attribute__((sda));
 
 /* Puts the Chainblade back at its start spot facing the hero and resets its timers and phase. */
-void func_L02_003D47B0(char *self, int hitCooldown) {
+void chainblade_reset_to_start(char *self, int hitCooldown) {
     char *state = *(char **)(self + 0x68);
     float randomAngle;
     L02_003D7900_Hero *hero;
 
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
-    randomAngle = RandomFloatRange(0.0f, 1.5707965f);
+    randomAngle = math_random_float_range(0.0f, 1.5707965f);
     *(float *)(state + 0x304) = 0.0f;
     *(short *)(state + 0x32C) = 0;
     *(int *)(state + 0x300) = 0;
     *(short *)(state + 0x32A) = 0;
     *(short *)(state + 0x98) = 0;
     *(float *)(state + 0x2F4) = randomAngle;
-    SetMobyState(self, 2, 1);
-    PickChainbladeIdleAnimation(self, 1);
+    moby_set_state(self, 2, 1);
+    chainblade_pick_idle_anim(self, 1);
     *(unsigned char *)(state + 0x7A) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
     *(unsigned char *)(self + 0x31) = 1;
@@ -61,13 +61,13 @@ void func_L02_003D47B0(char *self, int hitCooldown) {
 
         *dst = *(TI128 *)&D_L02_001B01C0;
     }
-    hero = &gHeroState;
-    *(float *)(self + 0xF8) = FastMatrixHelperA(hero->x - *(float *)(self + 0x10),
+    hero = &g_hero_state;
+    *(float *)(self + 0xF8) = mat_fast_helper_a(hero->x - *(float *)(self + 0x10),
                                             hero->y - *(float *)(self + 0x14));
     *(int *)(state + 0x310) = 0;
     *(short *)(state + 0x318) = 0;
     *(short *)(state + 0x31A) = 0;
-    SpawnChainLinks(self);
+    chainblade_spawn_chain_links(self);
     if (*(short *)(state + 0x60) != 0) {
         *(short *)(state + 0x60) = 0;
         set_moby_color(self, *(unsigned char *)(state + 0x64),

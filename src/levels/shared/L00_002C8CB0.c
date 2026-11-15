@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_002C8CB0 (348 bytes, 22 places), in its own unit for the approved qcopy helper.
  * The two final transitions are an if/else that joins at one `return 1`: flow puts a
  * `(use (const_int 0))` after the else arm's call, which ends its block, so jump2 cross-jumps
@@ -7,28 +8,28 @@
 
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float v[4]; } Vector;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_00138320;
 extern int D_L00_001B9080;
-extern void func_L00_002C42E0(int mode, int flag);
-extern int func_002761F8(void *start, void *end, int flags, void *object, int mode);
+extern void hero_l00_set_action(int mode, int flag);
+extern int CollLine(void *start, void *end, int flags, void *object, int mode);
 /* Decides which ledge-grab or climb move the hero starts when close to a ledge, if any. */
-int func_L00_002C8CB0(void)
+int hero_try_start_ledge_move(void)
 {
-    char *pre = gHeroState;
+    char *pre = g_hero_state;
     char *base;
     char *object;
     Vector start, end;
     if (*(int *)(pre + 0x229c) == 0x11) {
         if (*(float *)(pre + 0x330) + 0.4f < *(float *)(pre + 0x88)) {
             D_L00_001B9080 = 0;
-            SetHeroAction_L00(6, 1);
+            hero_l00_set_action(6, 1);
             return 1;
         }
     } else if (*(int *)(pre + 0x2294) != 0x67 && *(int *)(pre + 0x2294) != 0x73) {
         *(int *)(pre + 0x24c0) = 10000;
     }
-    base = gHeroState;
+    base = g_hero_state;
     if (*(short *)(base + 0x1fe) != 0)
         goto fail;
     object = *(char **)(base + 0x2290);
@@ -43,9 +44,9 @@ int func_L00_002C8CB0(void)
     if (CollLine(&start, &end, 2, object, 0) == 0)
         goto fail;
     if (*(short *)(base + 0x24fc) == 0 && (D_00138320 & 10) != 0)
-        SetHeroAction_L00(0x34, 1);
+        hero_l00_set_action(0x34, 1);
     else
-        SetHeroAction_L00(0x32, 1);
+        hero_l00_set_action(0x32, 1);
     return 1;
 fail:
     return 0;

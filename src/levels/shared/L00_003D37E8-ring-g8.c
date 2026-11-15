@@ -15,19 +15,19 @@ typedef struct {
     long long tag[4];
 } RenderPacket;
 
-extern long long func_0027C878(int);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282DD8(void *, const void *, const void *);
-extern void func_00282D30(void *, const void *, float);
-extern void func_002830C0(void *, const void *, const void *);
-extern void func_0027C768(void *, float *, float *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_002A7798(float);
-extern float func_00283B98(float, float);
-extern void func_00280B90(void *, void *, int);
-extern char D_L00_001B8DC0[];
+extern long long GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecCross(void *, const void *, const void *);
+extern void FastVecScale(void *, const void *, float);
+extern void transform_vector(void *, const void *, const void *);
+extern void gfx_world_to_screen_unit(void *, float *, float *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_ease_out_quad(float);
+extern float FastAddRotations(float, float);
+extern void draw_world_quad(void *, void *, int);
+extern char g_camera_l00_position[];
 extern int D_L00_001B04F4 __attribute__((sda));
 extern int D_L00_001B04F8 __attribute__((sda));
 extern int D_L00_001B04FC __attribute__((sda));
@@ -41,7 +41,7 @@ extern RenderVec D_L00_002961A0[];
 extern float D_L00_002474F0[][2];
 
 /* Draws a wobbling 3D ball made of 48 textured faces around the object, facing the camera. The wobble shrinks as the object grows. */
-void func_L00_003DF338(char *object)
+void gfx_draw_wobbling_ball(char *object)
 {
     RenderPacket packet;
     RenderVec matrix[4];
@@ -64,7 +64,7 @@ void func_L00_003DF338(char *object)
     flags |= (long long)D_L00_001B0504 << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
-    FastVecSub(&matrix[0], gCameraPosition_L00, object + 0x10);
+    FastVecSub(&matrix[0], g_camera_l00_position, object + 0x10);
     vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
     FastVecCross(&matrix[1], &matrix[0], &up);
     vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
@@ -86,12 +86,12 @@ void func_L00_003DF338(char *object)
             index = D_L00_002967A0[face][corner][1];
             FastVecScale(&packet.vertex[corner], &D_L00_002961A0[vtx], *(float *)(vars + 0x24) * 2.0f);
             transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
-            ProjectWorldToScreen(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
-            cosValue = FastSinOrCosA(D_L00_002474F0[index][0]);
-            delta = cosValue * EaseOutQuad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
+            cosValue = math_fast_sin_or_cos_a(D_L00_002474F0[index][0]);
+            delta = cosValue * math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
             *texU += delta;
-            sinValue = FastSinOrCosB(D_L00_002474F0[index][0]);
-            scale = EaseOutQuad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            sinValue = math_fast_sin_or_cos_b(D_L00_002474F0[index][0]);
+            scale = math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
             delta = -sinValue;
             delta *= scale;
             *texV += delta;

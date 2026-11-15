@@ -1,13 +1,13 @@
 #include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F70(void *, const void *, float);
-extern float func_00282DB0(const void *, const void *);
-extern float func_00282E80(const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_fast_normalize_helper(void *, const void *, float);
+extern float FastVecDot(const void *, const void *);
+extern float vec_distance_xy(const void *, const void *);
 
 /* Finds the closest point to a given point on a flat line segment, and returns how far away that point is. */
-float func_L00_00341B18(float *out, const float *point, const float *start, const float *end) {
+float math_closest_point_on_segment_2d(float *out, const float *point, const float *start, const float *end) {
     Vector delta;
     Vector normal;
     Vector base;
@@ -22,7 +22,7 @@ float func_L00_00341B18(float *out, const float *point, const float *start, cons
     normal.f[2] = 0.0f;
     base.q = *(const Quadword *)start;
     base.f[2] = 0.0f;
-    FastVectorNormalizeHelper(&normal, &normal, 1.0f);
+    vec_fast_normalize_helper(&normal, &normal, 1.0f);
     distance = FastVecDot(&normal, &base);
     distance = normal.f[0] * point[0] + normal.f[1] * point[1] - distance;
     out[0] = point[0] - distance * normal.f[0];

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L15_00437B68: draws the 100-quad grid in up to four height layers, the
  * u coordinates scrolling with the float at state+4.
  * Source forms the compiler's loop heuristics depend on:
@@ -18,11 +19,11 @@ extern float D_L15_002B7E40[][2];
 extern unsigned int D_L15_002B8688[];
 extern int D_L15_001B1870 __attribute__((sda));
 extern int D_L15_001B1878 __attribute__((sda));
-extern long long func_0027C878(int);
-extern void func_00282D30(void *,const void *,float);
-extern void func_00280B90(void *,void *,int);
+extern long long GetEffectTextureDescriptor(int);
+extern void FastVecScale(void *,const void *,float);
+extern void draw_world_quad(void *,void *,int);
 /* Draws the scrolling grid of layered quads that forms the backdrop, and scrolls its texture a little each frame. */
-void func_L15_00437B68(char *object,int preview)
+void DrawScrollingGridLayers(char *object,int preview)
 {
     GornPacket packet;
     char *state;

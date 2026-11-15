@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_004276D8, the PAL copy of func_L00_00422268: the same C, where D_L00_001B1514
    is read as a word and takes the 50 Hz scale, and the aim values are read and stored in the
    order +0x44, +0x3C, +0x40. */
@@ -92,8 +93,8 @@ extern float D_L00_001B14DC __attribute__((sda)), D_L00_001B14D4 __attribute__((
 extern float D_L00_001B14D8 __attribute__((sda));
 extern int D_L00_001B1854 __attribute__((section(".sdata")));
 extern float D_L00_001B1510 __attribute__((sda));
-extern float func_002702C8(float *, float, float, float, float, float);
-extern float func_002AA548(float *, float *, float, float, float, float);
+extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
 /* Resets the state of object +0x70: eases the motion and view values toward their
    targets (or the defaults in the record at D_L00_001BB040), settles the recoil spring,
@@ -121,21 +122,21 @@ void func_PAL_L00_004276D8(StateOwner *object)
     defaults = &D_L00_001BB040->motion;
     defaultView = &D_L00_001BB040->view;
     if (motion->h3C)
-        motion->f2C = func_002702C8(motion->v44, motion->f2C, motion->f40, motion->f48,
+        motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, motion->f40, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     else
-        motion->f2C = func_002702C8(motion->v44, motion->f2C, defaults->f2C, motion->f48,
+        motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, defaults->f2C, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     if (motion->h3E)
-        motion->f30 = func_002702C8(motion->v50, motion->f30, motion->f4C, motion->f54,
+        motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, motion->f4C, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     else
-        motion->f30 = func_002702C8(motion->v50, motion->f30, defaults->f30, motion->f54,
+        motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, defaults->f30, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     if (view->hDA)
-        view->fB0 = func_002702C8(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
+        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
     else
-        view->fB0 = func_002702C8(view->vBC, view->fB0, defaultView->fB0, view->fB8,
+        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, defaultView->fB0, view->fB8,
                                   0.2f, 0.0f);
     motion->h3C = 0;
     motion->h3E = 0;
@@ -151,10 +152,10 @@ void func_PAL_L00_004276D8(StateOwner *object)
     recoil->f20 = 0.2f;
     recoil->h2 = 0;
     if (recoil->f2C != 0.0f)
-        func_002AA548(&recoil->f28, &recoil->f30, recoil->f2C,
+        math_step_value_toward_target(&recoil->f28, &recoil->f30, recoil->f2C,
                       recoil->f34, recoil->f38, 1.0f);
     else if (recoil->f28 != 0.0f)
-        func_002AA548(&recoil->f28, &recoil->f30, 0.0f,
+        math_step_value_toward_target(&recoil->f28, &recoil->f30, 0.0f,
                       recoil->f34, recoil->f38, 1.0f);
     recoil->f2C = 0.0f;
 

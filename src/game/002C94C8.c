@@ -12,15 +12,15 @@ typedef struct {
     float points[1][4];
 } SegmentPath_2C94C8;
 
-extern SegmentPath_2C94C8 *D_001F1700[];
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00282DF0(float *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282C88(float *);
-extern void func_00283098(float *, float *, float *);
-extern void func_00282D08(float *, float *, float *, float);
+extern SegmentPath_2C94C8 *g_path_table[];
+extern void FastVecSub(float *, float *, float *);
+extern float FastVecLength(float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void vec_clear_128(float *);
+extern void matrix_mul_vec3(float *, float *, float *);
+extern void lerp_vector(float *, float *, float *, float);
 
-int func_002C94C8(int pathIndex, float *start, float *end, float *hitPoint)
+int SegmentCrossPolyline(int pathIndex, float *start, float *end, float *hitPoint)
 {
     float direction[4], sideways[4], upAxis[4], startLocal[4], endLocal[4];
     float best;
@@ -34,21 +34,21 @@ int func_002C94C8(int pathIndex, float *start, float *end, float *hitPoint)
     FastVecSub(direction, end, start);
     direction[2] = 0;
     vec_scale_to_length(direction, direction, 1.0f / FastVecLength(direction));
-    ClearVector128(sideways);
+    vec_clear_128(sideways);
     sideways[0] = direction[1];
     sideways[1] = -direction[0];
-    ClearVector128(upAxis);
+    vec_clear_128(upAxis);
     upAxis[2] = 1.0f;
     best = 1.0f;
-    FastVecSub(startLocal, (float *)((char *)gPathTable_001F1700[pathIndex] + 0x10), start);
+    FastVecSub(startLocal, (float *)((char *)g_path_table[pathIndex] + 0x10), start);
     matrix_mul_vec3(startLocal, startLocal, direction);
     older = startLocal;
     newer = endLocal;
-    if (i < gPathTable_001F1700[pathIndex]->count) {
+    if (i < g_path_table[pathIndex]->count) {
         offset = 0x20;
         zero = 0.0f;
         do {
-            FastVecSub(newer, (float *)((char *)gPathTable_001F1700[pathIndex] + offset), start);
+            FastVecSub(newer, (float *)((char *)g_path_table[pathIndex] + offset), start);
             matrix_mul_vec3(newer, newer, direction);
             if (startLocal[3] != zero || endLocal[3] != zero) {
                 if (endLocal[1] * startLocal[1] < 0.0f) {
@@ -66,7 +66,7 @@ int func_002C94C8(int pathIndex, float *start, float *end, float *hitPoint)
         next:
             i++;
             offset += 0x10;
-        } while (i < gPathTable_001F1700[pathIndex]->count);
+        } while (i < g_path_table[pathIndex]->count);
     }
     lerp_vector(hitPoint, start, end, best);
     return found;

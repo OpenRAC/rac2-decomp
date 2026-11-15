@@ -59,41 +59,41 @@ typedef struct {
     char pad24ac[0x20];
     int active;
 } PickupHero;
-extern unsigned char D_00139568[];
-extern char D_00239BA0[];
-extern int D_00139688[];
-extern int D_001B1688;
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_table[];
+extern int g_item_ammo_counts[];
+extern int g_game_time;
 extern int D_001B275C;
 extern int D_001A8CA0;
-extern char D_00189E20[];
-extern PickupObject *D_0018C0B0 NOT_SDA;
+extern char g_hero_state[];
+extern PickupObject *g_hero_moby NOT_SDA;
 #define WEAPON(i) ((PickupWeapon *)(D_00239BA0 + D_00139568[i] * sizeof(PickupWeapon)))
 #define HERO ((PickupHero *)D_00189E20)
-extern void func_00282C90(void *);
-extern void func_00282C88(void *);
+extern void vec_store_helper(void *);
+extern void vec_clear_128(void *);
 extern int func_PAL_00273A10(void *);
-extern float func_00282E48(void *, void *);
-extern int func_00282948(void *);
-extern float func_00282C48(float);
-extern float func_00282E80(void *, void *);
-extern float func_002B0360(void *);
-extern unsigned int func_0026F748(int, int);
+extern float fast_vec_dist(void *, void *);
+extern int math_fast_float_d(void *);
+extern float math_fabs(float);
+extern float vec_distance_xy(void *, void *);
+extern float gravity_get_center_distance(void *);
+extern unsigned int stub_empty_8(int, int);
 extern void func_PAL_002B15B8(int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_00282C30(int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002AA2E8(void *, float, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_0029F338(void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACE78(void *, void *, float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern int func_00282ED8(void *, void *);
+extern void moby_set_state(void *, int, int);
+extern int subtract_integer_with_clamp(int);
+extern int PlayMobySound(int, int, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void ApproachValue(void *, float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void moby_mark_spawned(void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_set_direction_with_complement(void *, void *, float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern int vec_fast_helper_d(void *, void *);
 typedef int PickupVectorBits __attribute__((mode(TI)));
 
 /* Award ammo on collection, then move and rotate the pickup into the hero. */
@@ -117,34 +117,34 @@ void func_PAL_00321298(PickupObject *object)
         }
         break;
     case 1:
-        if (data->f5C == 3 && (D_001B1688 & 15) == (((int)object >> 8) & 15)) {
+        if (data->f5C == 3 && (g_game_time & 15) == (((int)object >> 8) & 15)) {
             qzero(data);
-            func_00282C90(data->f10);
+            vec_store_helper(data->f10);
             data->f5C = 0;
         }
 
         qcopy(old, data);
         func_PAL_00273A10(object);
         changed = 0;
-        if (func_00282E48(old, data) > data->speedLimit * 2.0f)
+        if (fast_vec_dist(old, data) > data->speedLimit * 2.0f)
             changed = 1;
         allow = 1;
         if (data->f5C || changed) {
-            if (func_00282948(&data->f7C)) {
-                if (func_00282C48(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
-                    func_00282E80(object->pos, HERO->pos) > HERO->pickupRadius)
+            if (math_fast_float_d(&data->f7C)) {
+                if (math_fabs(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
+                    vec_distance_xy(object->pos, HERO->pos) > HERO->pickupRadius)
                     allow = 0;
             }
         } else {
             allow = 0;
-            if (func_00282C48(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
-                func_00282E80(object->pos, HERO->pos) < HERO->pickupRadius)
+            if (math_fabs(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
+                vec_distance_xy(object->pos, HERO->pos) < HERO->pickupRadius)
                 data->f7C = 3;
         }
-        if (D_00139688[data->weapon] >= WEAPON(data->weapon)->capacity)
+        if (g_item_ammo_counts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
         if (D_001A8CA0) {
-            if (func_002B0360(object->pos) < data->groundZ - 2.0f)
+            if (gravity_get_center_distance(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
             goto permit;
@@ -157,62 +157,62 @@ void func_PAL_00321298(PickupObject *object)
             allow = 0;
         if (allow) {
             item = data->weapon;
-            previous = D_00139688[item];
-            func_0026F748(item, data->amount);
-            if (D_00139688[item] > previous) {
-                count = D_00139688[item] - previous;
+            previous = g_item_ammo_counts[item];
+            stub_empty_8(item, data->amount);
+            if (g_item_ammo_counts[item] > previous) {
+                count = g_item_ammo_counts[item] - previous;
                 func_PAL_002B15B8(count == 1 ?
                     WEAPON(item)->messageOne :
                     WEAPON(item)->messageMany,
                     count, -1);
             }
-            func_002A7750(object, 2, -1);
+            moby_set_state(object, 2, -1);
             data->pull = 0.16000001f;
-            func_00282C88(data);
-            if (func_00282C30(D_001B1688 - D_001B275C) >= 9) {
-                func_002E5CF8(0, 0, object);
-                D_001B275C = D_001B1688;
+            vec_clear_128(data);
+            if (subtract_integer_with_clamp(g_game_time - D_001B275C) >= 9) {
+                PlayMobySound(0, 0, object);
+                D_001B275C = g_game_time;
             }
         }
         break;
     case 2:
         /* The hero's basis vectors lie at fixed offsets around its position. */
-        heroPos = D_00189E20 + 0x80;
-        func_00282CF0(old, object->pos, heroPos);
-        func_00283098(old, old, heroPos - 0x40);
+        heroPos = g_hero_state + 0x80;
+        FastVecSub(old, object->pos, heroPos);
+        matrix_mul_vec3(old, old, heroPos - 0x40);
         target = 8.0f;
         if (old[2] > 0.0f)
             target = 0.0f;
-        func_002AA2E8(&data->pull, target, 0.0096f);
-        func_00282F20(move, heroPos - 0x60, data->pull);
-        func_00282CC0(object->pos, object->pos, move);
-        func_00282CC0(object->pos, object->pos, heroPos + 0xD0);
-        speed = func_00282DF0(data);
-        func_002AA2E8(&speed, 1.2800001f, 0.0096f);
-        func_00282CF0(delta, heroPos + 0x60, object->pos);
-        time = func_00282DF0(delta) / speed;
+        ApproachValue(&data->pull, target, 0.0096f);
+        vec_scale_to_length(move, heroPos - 0x60, data->pull);
+        FastVecAdd(object->pos, object->pos, move);
+        FastVecAdd(object->pos, object->pos, heroPos + 0xD0);
+        speed = FastVecLength(data);
+        ApproachValue(&speed, 1.2800001f, 0.0096f);
+        FastVecSub(delta, heroPos + 0x60, object->pos);
+        time = FastVecLength(delta) / speed;
         if (time < 25.0f)
-            func_002AA2E8(&object->lifetime, 0.0f, object->def->fadeRate * (0.04f));
+            ApproachValue(&object->lifetime, 0.0f, object->def->fadeRate * (0.04f));
         if (object->lifetime == 0.0f || time <= 1.0f) {
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return;
         }
-        func_00282F20(data, delta, speed);
-        func_00282CC0(object->pos, object->pos, data);
-        func_00282DD8(angle, heroPos - 0x60, data);
-        func_002ACE78(angle, angle, 0.10471977f);
+        vec_scale_to_length(data, delta, speed);
+        FastVecAdd(object->pos, object->pos, data);
+        FastVecCross(angle, heroPos - 0x60, data);
+        vec_set_direction_with_complement(angle, angle, 0.10471977f);
         *(PickupVectorBits *)pivot = 0;
         pivot[2] = 0.3f;
-        func_00283098(before, pivot, object->basis);
-        func_00283958(angle, rotation);
-        func_00283738(object->basis, rotation, object->basis);
-        func_00283098(after, pivot, object->basis);
-        func_00282CF0(offset, after, before);
-        func_00282CF0(object->pos, object->pos, offset);
+        matrix_mul_vec3(before, pivot, object->basis);
+        quaternion_to_rotation_basis(angle, rotation);
+        multiply_matrix3x3(object->basis, rotation, object->basis);
+        matrix_mul_vec3(after, pivot, object->basis);
+        FastVecSub(offset, after, before);
+        FastVecSub(object->pos, object->pos, offset);
         break;
     }
 
-    if (object->state == 1 && func_00282ED8(object, D_0018C0B0)) {
+    if (object->state == 1 && vec_fast_helper_d(object, g_hero_moby)) {
         if (object->alpha > 36)
             object->alpha -= 4;
         else

@@ -5,7 +5,7 @@ extern int D_L01_001AEC38 __attribute__((sda));
 extern int D_L01_001B2088 MACRO_ADDR;
 extern unsigned char D_001A7A6F __attribute__((nosda));
 extern int D_L01_001A907C MACRO_ADDR;
-extern int func_002E5E58(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void func_PAL_002B1588(int, int);
 
 /* Once the level's mode word reaches 6 and the timer at D_L01_001AEC38 has run out, raises the
@@ -23,7 +23,7 @@ void func_PAL_L01_0037B680(char *arg0) {
     if (D_001A7A6F != 0)
         return;
     D_001A7A6F = 1;
-    func_002E5E58(1, 0, 0);
+    snd_play_from_global_bank(1, 0, 0);
     func_PAL_002B1588(0x1233, -1);
     D_L01_001A907C = 1;
 }

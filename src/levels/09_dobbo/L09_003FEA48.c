@@ -1,19 +1,19 @@
 #include "common.h"
 
 typedef int Quad_Dobbo __attribute__((mode(TI)));
-extern float func_002A7878(float, float);
-extern void func_0029FCC0(char *, int, void *);
-extern float func_00283CE0(int);
-extern char *func_002BAE50(void *, void *, int, int, int, int, int, int);
+extern float math_random_float_range(float, float);
+extern void moby_transform_joint_to_world(char *, int, void *);
+extern float IntToFloat(int);
+extern char *part_spawn_scaling(void *, void *, int, int, int, int, int, int);
 
 typedef int Quadword __attribute__((mode(TI)));
 typedef union EffectVector { Quadword bits; float value[4]; } EffectVector;
 
-extern void func_L08_00328BB0();
+extern void moby_set_group_flags();
 
-extern int func_L01_00321178(char *, char *);
+extern int moby_l01_turn_toward_target(char *, char *);
 
-extern int func_002B4FF0(char *, float *, float);
+extern int moby_turn_toward_target_and_step(char *, float *, float);
 
 extern char *D_L09_001B285C __attribute__((sda));
 
@@ -25,9 +25,9 @@ extern void func_31F500(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
 
 extern void func_322578(char *a0, char *a1, s32 a2, s32 a3, f32 f12);
 
-extern void func_L09_004081F0(char *a0, s32 a1, char *a2, s32 a3);
+extern void dobbo_apply_setting_by_index(char *a0, s32 a1, char *a2, s32 a3);
 
-extern void func_L09_00408138(char *a0, char *a1, s32 a2, s32 a3, s32 a4);
+extern void dobbo_apply_setting_linked(char *a0, char *a1, s32 a2, s32 a3, s32 a4);
 
 extern s32 func_325E78(char *a0, s32 a1);
 
@@ -36,7 +36,7 @@ extern void func_318450(char *a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
 
 extern char D_L09_00189EA0[];
 
-extern void func_L09_00406BA0(s32 a0, u8 a1);
+extern void dobbo_set_linked_state(s32 a0, u8 a1);
 
 extern char D_L09_001B9C30[];
 
@@ -46,7 +46,7 @@ extern f32 func_2EA3E0(f32 x);
 
 extern void func_2EACD0(char *a0, char *a1);
 
-extern void func_L09_00408058(char *a0, s32 a1, s32 a2, s32 a3);
+extern void dobbo_set_mode_flags(char *a0, s32 a1, s32 a2, s32 a3);
 
 extern float func_2EB5C0(int a0);
 extern int func_2EB698(float *a0, float f12);
@@ -73,7 +73,7 @@ extern void func_2E8450(char *a0, float *a1, float *a2, int a3, int a4, float f1
 /* func_L09_003FEAE8 is defined in L09_003FEAE8-g8.c. */
 
 /* Spawns red and white sparkle particles that float up from two joints of the object. */
-void func_L09_003FECF0(char *obj) {
+void part_spawn_joint_sparkles(char *obj) {
     EffectVector origin;
     EffectVector jointPos;
     EffectVector velocity;
@@ -112,7 +112,7 @@ void func_L09_003FECF0(char *obj) {
 
 /* Level 09 helpers. */
 /* Tells every moby of class 3415 in the object's group to raise its alert flag. */
-void func_L09_00403080(char *obj) {
+void dobbo_alert_path_enemies(char *obj) {
     s16 *list;
     s32 listPtr;
     char *member;
@@ -136,10 +136,10 @@ void func_L09_00403080(char *obj) {
     } while (*(s16 *)list++ >= 0);
 }
 
-extern s32 func_002A8508(s32 a0, s32 a1);
+extern s32 moby_count_group_not_in_state(s32 a0, s32 a1);
 
 /* Alerts the group, and for modes 4 and 5 also makes the first idle group member start its next action. */
-void func_L09_00403100(char *obj, s32 mode) {
+void dobbo_alert_group_wake_first(char *obj, s32 mode) {
     char *self = obj;
     char *mobyTable;
     u16 *list;
@@ -149,14 +149,14 @@ void func_L09_00403100(char *obj, s32 mode) {
     if (mode == 0) {
         return;
     }
-    AlertGroupMobyClass3415(obj);
+    dobbo_alert_path_enemies(obj);
     if ((u32)(mode - 4) >= 2) {
         return;
     }
     if (*(u8 *)(self + 0x21) == 0xFF) {
         return;
     }
-    if (CountMobysInGroupNotInState(*(u8 *)(self + 0x21), -1) < 2) {
+    if (moby_count_group_not_in_state(*(u8 *)(self + 0x21), -1) < 2) {
         return;
     }
     mobyTable = D_L09_001B285C;
@@ -174,7 +174,7 @@ void func_L09_00403100(char *obj, s32 mode) {
 }
 
 /* Puts the object back at its saved height unless it is in state 9. */
-void func_L09_00403378(char *obj) {
+void dobbo_restore_saved_height(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     if (*(u8 *)(obj + 0x20) == 9) {
         return;
@@ -195,17 +195,17 @@ void func_L09_00403378(char *obj) {
 /* func_L09_00404C50 is in L09_00404C50-g8.c. */
 
 /* Moves the object toward a point, using one of two movement helpers depending on the mode. */
-void func_L09_00404F90(char *obj, char *dest, s32 mode) {
+void dobbo_move_toward_point(char *obj, char *dest, s32 mode) {
     char *vars = *(char **)(obj + 0x68);
     if (mode == 0) {
-        TurnMobyTowardTarget(obj, dest);
+        moby_l01_turn_toward_target(obj, dest);
     } else {
-        TurnTowardTargetAndStepMovement(obj, (float *)dest, *(f32 *)(vars + 0x33C));
+        moby_turn_toward_target_and_step(obj, (float *)dest, *(f32 *)(vars + 0x33C));
     }
 }
 
 /* Counts down the object's two timers, bumps its frame counter and updates its two effects. */
-void func_L09_00404FC8(char *obj) {
+void dobbo_tick_timers_effects(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     u16 frames;
     func_2EA110(vars + 0x330);
@@ -219,7 +219,7 @@ void func_L09_00404FC8(char *obj) {
 }
 
 /* Tells every moby of class 3472 in the object's group to raise its alert flag. */
-void func_L09_00405060(char *obj) {
+void dobbo_alert_wandering_group(char *obj) {
     s16 *list;
     s32 listPtr;
     char *member;
@@ -252,7 +252,7 @@ void func_L09_00405060(char *obj) {
 /* func_L09_00405610 is defined in L09_00405610-g8.c (small data through $gp, and its own .rodata). */
 
 /* Sets the state byte of the linked object (a switch or door) with the given index. */
-void func_L09_00406BA0(s32 mobyIndex, u8 newState) {
+void dobbo_set_linked_state(s32 mobyIndex, u8 newState) {
     char *moby;
     if (mobyIndex == -1) {
         return;
@@ -274,18 +274,18 @@ void func_L09_00406BA0(s32 mobyIndex, u8 newState) {
 }
 
 /* Calls the linked-object helper unless the index is empty. */
-void func_L09_00406C68(s32 mobyIndex) {
+void dobbo_activate_linked_if_valid(s32 mobyIndex) {
     if (mobyIndex == -1) {
         return;
     }
-    SetMobyGroupFlags(mobyIndex);
+    moby_set_group_flags(mobyIndex);
 }
 
 /* func_L09_00406BF8: 112 bytes against retail's 108, one saved register too many.
    Deposited in nonmatching/levels/func_L09_00406BF8.c. */
 
 /* Marks the linked object as finished and clears the link. */
-void func_L09_00406C90(char *obj) {
+void dobbo_release_linked(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     s32 linkIndex = *(s32 *)(vars + 0x5C);
     if (linkIndex == -1) {
@@ -302,7 +302,7 @@ void func_L09_00406C90(char *obj) {
 /* func_L09_00406FC8 is in L09_00406FC8-g8.c. */
 
 /* Sets an entity's colour key, or hands an off-kind entity to the shared body. */
-void func_L09_00408138(char *controller, char *target, s32 enable, s32 activeMode, s32 modelMode)
+void dobbo_apply_setting_linked(char *controller, char *target, s32 enable, s32 activeMode, s32 modelMode)
 {
     u8 byteValue;
     s16 cls;
@@ -332,19 +332,19 @@ void func_L09_00408138(char *controller, char *target, s32 enable, s32 activeMod
         return;
     }
     if (cls == 0xD09 /* moby class 3337 */ || cls == 0xCEA /* moby class 3306 */) {
-        SetMobyModeFlags(target, 0, activeMode, modelMode);
+        dobbo_set_mode_flags(target, 0, activeMode, modelMode);
         return;
     }
     if (cls == 0xDE0 /* moby class 3552 */) {
         *(u8 *)(target + 0x95) = *(u8 *)(controller + 0x95);
         return;
     }
-    SetMobyModeFlags(target, enable, activeMode, modelMode);
+    dobbo_set_mode_flags(target, enable, activeMode, modelMode);
 }
 
 /* Hands the record's colour key to every entry the index names, negating the
    three offsets when the caller asks for it. */
-void func_L09_004081F0(char *controller, s32 index, char *settings, s32 enable) {
+void dobbo_apply_setting_by_index(char *controller, s32 index, char *settings, s32 enable) {
     char *vars = settings;
     char *target = D_L09_001B285C + (index << 8);
 
@@ -352,23 +352,23 @@ void func_L09_004081F0(char *controller, s32 index, char *settings, s32 enable) 
         return;
     }
     if (enable != 0) {
-        ApplySettingToLinkedMoby(controller, target, *(s8 *)(vars + 0xBC), *(s8 *)(vars + 0xBD),
+        dobbo_apply_setting_linked(controller, target, *(s8 *)(vars + 0xBC), *(s8 *)(vars + 0xBD),
                           *(s8 *)(vars + 0xBF));
     } else {
-        ApplySettingToLinkedMoby(controller, target, -*(s8 *)(vars + 0xBC), -*(s8 *)(vars + 0xBD),
+        dobbo_apply_setting_linked(controller, target, -*(s8 *)(vars + 0xBC), -*(s8 *)(vars + 0xBD),
                           -*(s8 *)(vars + 0xBF));
     }
 }
 
 /* Sends the on/off setting to every moby in the given group. */
-void func_L09_00408250(char *controller, char *settings, s32 group, s32 enable) {
+void dobbo_apply_setting_group(char *controller, char *settings, s32 group, s32 enable) {
     s16 *list;
     list = (s16 *)D_L09_001FFFB560[group];
     if (list == 0) {
         return;
     }
     do {
-        ApplySettingToMobyByIndex(controller, *(u16 *)list & 0x7FFF, settings, enable);
+        dobbo_apply_setting_by_index(controller, *(u16 *)list & 0x7FFF, settings, enable);
     } while (*(s16 *)list++ >= 0);
 }
 
@@ -376,44 +376,44 @@ void func_L09_00408250(char *controller, char *settings, s32 group, s32 enable) 
 
 /* func_L09_00408478 reads D_001A7AF8[k] and stores D_L09_001B25A0[2] as elements of sda arrays:
  * (mem (const (plus sym k))) is a two-word move, so these stay out of delay slots. */
-extern u8 D_001A7AF8[] __attribute__((sda));
+extern u8 g_item_owned_flags[] __attribute__((sda));
 extern u8 D_001395D7[];
 extern u8 D_001395D8[];
 typedef struct { char pad[0x5c]; int state; int flags; } DobboPlayerFlags;
 extern DobboPlayerFlags D_00139768;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern u8 D_0019B2E8[];
 extern int D_00138324;
 extern char D_L09_001B1458[], D_L09_001B1480[], D_L09_001B1498[], D_L09_001B14C0[], D_L09_001B14E8[], D_L09_001B14F8[], D_L09_001B1518[], D_L09_001B1540[];
 extern char D_L09_001BFC00[], D_L09_0021DDE0[];
-extern int D_001A79F8 SDATA(D_001A79F8);
-extern int D_001A79F0 SDATA(D_001A79F0);
+extern int g_player_bolts SDATA(D_001A79F8);
+extern int g_current_map_index SDATA(D_001A79F0);
 extern char *D_L09_001B294C SDATA(D_L09_001B294C);
 extern int D_L09_001A8F00[] __attribute__((sda));
 extern int D_L09_001B25A0[] __attribute__((sda));
 extern int D_L09_0028E350[];
 extern int D_L09_0028E360, D_L09_0028E364;
-extern void func_0026FEB8(char *, ...);
-extern void func_002A7750(char *, int, int);
-extern void func_L01_003128C0(char *);
-extern int func_002ACBC8(char *, int);
-extern int func_00288AA0(char *, int);
-extern void func_L01_003246D0(char *);
-extern void func_00288BE8(char *);
-extern int func_002F5D10(void);
-extern void func_L00_002B9D60(char *, char *, int, int);
-extern int func_002B38B8(char *);
-extern void func_002F5CC8(void);
-extern int func_L01_003245E0(char *, int, float);
-extern void func_L01_00324550(int, int, int);
-extern void func_002AD7B8(int);
-extern void func_002AF0A8(int);
-extern void func_L06_0039A2F0(char *, int, char *, int, char *);
-extern void func_002A0430(int);
-extern void func_002DF3F8(char *, char *);
-extern void func_0029B3E0(int, int);
+extern void STUB_printf(char *, ...);
+extern void moby_set_state(char *, int, int);
+extern void moby_reset_vars_defaults(char *);
+extern int IsPointInCuboid(char *, int);
+extern int req_push_queue(char *, int);
+extern void level_apply_index_for_key(char *);
+extern void req_launch_queued(char *);
+extern int game_is_either_mode_two(void);
+extern void hero_reset_position_and_direction(char *, char *, int, int);
+extern int flag_is_third_pending_set(char *);
+extern void game_set_slowdown_factor(void);
+extern int hero_is_reachable_for_count(char *, int, float);
+extern void text_print_localized_formatted(int, int, int);
+extern void moby_mark_flag_and_append_to_list(int);
+extern void snd_play_indexed(int);
+extern void record_add_or_update_entry(char *, int, char *, int, char *);
+extern void moby_mark_table_entry_flagged(int);
+extern void level_capture_checkpoint_state(char *, char *);
+extern void MemcardSave(int, int);
 /* Per-frame update of the bolt-trading character (moby class 3600): it talks to the hero, offers a deal for bolts, and takes the payment when he accepts. */
-void func_L09_00408478(u8 *obj)
+void UpdateDobboPaidOfferNpc(u8 *obj)
 {
     char *vars = *(char **)(obj + 0x68);
     char *entry;
@@ -425,49 +425,49 @@ void func_L09_00408478(u8 *obj)
 
     switch (obj[0x20]) {
     case 0:
-        if (gItemOwnedFlags[0xDA]) {
-            SetMobyState(obj, 9, -1);
+        if (g_item_owned_flags[0xDA]) {
+            moby_set_state(obj, 9, -1);
             break;
         }
         if (D_00139768.flags & 1) {
             STUB_printf(D_L09_001B1458);
-            startCurrency = gPlayerBolts;
-            if (gItemOwnedFlags[0x197]) {
+            startCurrency = g_player_bolts;
+            if (g_item_owned_flags[0x197]) {
                 if (startCurrency < D_L09_0028E364)
                     goto start_six;
                 else
-                    SetMobyState(obj, 7, 1);
+                    moby_set_state(obj, 7, 1);
             } else {
                 if (startCurrency < D_L09_0028E360) {
                 start_six:
-                    SetMobyState(obj, 6, 1);
+                    moby_set_state(obj, 6, 1);
                 } else
-                    SetMobyState(obj, 7, 1);
+                    moby_set_state(obj, 7, 1);
             }
         } else if (D_00139768.state < 0) {
             STUB_printf(D_L09_001B1480);
             if (D_001395D7[0]) {
                 obj[0x30] = 0xff;
                 STUB_printf(D_L09_001B1498);
-                SetMobyState(obj, 4, 1);
+                moby_set_state(obj, 4, 1);
             } else {
                 obj[0x30] = 0xff;
                 STUB_printf(D_L09_001B14C0);
-                SetMobyState(obj, 3, 0);
+                moby_set_state(obj, 3, 0);
             }
         } else {
             STUB_printf(D_L09_001B14E8);
-            SetMobyState(obj, 1, 0);
+            moby_set_state(obj, 1, 0);
         }
-        ResetMobyVarsDefaults(obj);
+        moby_reset_vars_defaults(obj);
         break;
     case 1:
-        if (IsPointInCuboid(gHeroPosition, *(int *)vars)) {
+        if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
             STUB_printf(D_L09_001B14F8);
-            if (PushRequestQueue(D_L09_001BFC00, 0x5f)) {
-                ApplyIndexForKey(obj);
-                LaunchQueuedRequest(D_L09_001BFC00);
-                SetMobyState(obj, 2, -1);
+            if (req_push_queue(D_L09_001BFC00, 0x5f)) {
+                level_apply_index_for_key(obj);
+                req_launch_queued(D_L09_001BFC00);
+                moby_set_state(obj, 2, -1);
             }
         }
         break;
@@ -477,33 +477,33 @@ void func_L09_00408478(u8 *obj)
             obj[0x31] = 0;
             *(u16 *)(obj + 0x34) |= 1;
         }
-        if (IsEitherModeTwo())
+        if (game_is_either_mode_two())
             break;
         D_L09_001B25A0[2] = 0;
         if (*(int *)(vars + 8) != -1) {
             entry = D_L09_001B294C;
             entry += *(int *)(vars + 8) << 7;
-            ResetHeroPositionAndDirection(entry + 0x30, entry + 0x70, 0, 1);
+            hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
         }
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
-        SetMobyState(obj, 3, -1);
+        moby_set_state(obj, 3, -1);
         break;
     case 3:
         obj[0x30] = 0xff;
-        if (IsThirdPendingFlagSet(obj)) {
+        if (flag_is_third_pending_set(obj)) {
             D_001395D7[0] = 1;
-            SetMobyState(obj, 4, 1);
+            moby_set_state(obj, 4, 1);
         }
         break;
     case 4:
         obj[0x30] = 0xff;
-        if (IsPointInCuboid(gHeroPosition, *(int *)vars)) {
+        if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
             STUB_printf(D_L09_001B1518);
-            if (PushRequestQueue(D_L09_001BFC00, 0x60)) {
-                LaunchQueuedRequest(D_L09_001BFC00);
-                SetSlowdownFactorAndLowFpsFade();
-                SetMobyState(obj, 5, -1);
+            if (req_push_queue(D_L09_001BFC00, 0x60)) {
+                req_launch_queued(D_L09_001BFC00);
+                game_set_slowdown_factor();
+                moby_set_state(obj, 5, -1);
             }
         }
         break;
@@ -514,75 +514,75 @@ void func_L09_00408478(u8 *obj)
             *(u16 *)(obj + 0x34) |= 1;
         }
         D_L09_001B25A0[2] = 1;
-        if (IsEitherModeTwo())
+        if (game_is_either_mode_two())
             break;
         D_L09_001B25A0[2] = 0;
         if (*(int *)(vars + 8) != -1) {
             entry = D_L09_001B294C;
             entry += *(int *)(vars + 8) << 7;
-            ResetHeroPositionAndDirection(entry + 0x30, entry + 0x70, 0, 1);
+            hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
         }
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
         D_001395D8[0] = 1;
-        offerCurrency = gPlayerBolts;
-        if (gItemOwnedFlags[0x197]) {
+        offerCurrency = g_player_bolts;
+        if (g_item_owned_flags[0x197]) {
             if (offerCurrency < D_L09_0028E364)
                 goto offer_six;
             else
-                SetMobyState(obj, 7, -1);
+                moby_set_state(obj, 7, -1);
         } else {
             if (offerCurrency < D_L09_0028E360) {
             offer_six:
-                SetMobyState(obj, 6, -1);
+                moby_set_state(obj, 6, -1);
             } else
-                SetMobyState(obj, 7, -1);
+                moby_set_state(obj, 7, -1);
         }
         break;
     case 6:
-        currency = gPlayerBolts;
-        if (gItemOwnedFlags[0x197]) {
+        currency = g_player_bolts;
+        if (g_item_owned_flags[0x197]) {
             if (D_L09_0028E350[5] < currency)
                 goto change_seven;
         } else {
             if (D_L09_0028E350[4] < currency) {
             change_seven:
-                SetMobyState(obj, 7, -1);
+                moby_set_state(obj, 7, -1);
                 break;
             }
         }
-        if (IsHeroReachableForCount(obj, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27d1, gItemOwnedFlags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
-            ApplyIndexForKey(obj);
+        if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
+            text_print_localized_formatted(0x27d1, g_item_owned_flags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
+            level_apply_index_for_key(obj);
         }
         break;
     case 7:
-        currency = gPlayerBolts;
-        if (gItemOwnedFlags[0x197]) {
+        currency = g_player_bolts;
+        if (g_item_owned_flags[0x197]) {
             if (currency < D_L09_0028E350[5])
                 goto change_six;
         } else {
             if (currency < D_L09_0028E350[4]) {
             change_six:
-                SetMobyState(obj, 6, -1);
+                moby_set_state(obj, 6, -1);
                 break;
             }
         }
-        if (IsHeroReachableForCount(obj, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27d2, gItemOwnedFlags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
-            ApplyIndexForKey(obj);
-            if ((D_00138324 & 0x10) && PushRequestQueue(D_L09_001BFC00, 10)) {
+        if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
+            text_print_localized_formatted(0x27d2, g_item_owned_flags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
+            level_apply_index_for_key(obj);
+            if ((D_00138324 & 0x10) && req_push_queue(D_L09_001BFC00, 10)) {
                 STUB_printf(D_L09_001B1540);
-                balance = gPlayerBolts;
-                if (gItemOwnedFlags[0x197])
+                balance = g_player_bolts;
+                if (g_item_owned_flags[0x197])
                     remaining = balance - D_L09_0028E350[5];
                 else
                     remaining = balance - D_L09_0028E350[4];
-                gPlayerBolts = remaining;
-                PushRequestQueue(D_L09_001BFC00, 0x61);
-                PushRequestQueue(D_L09_001BFC00, 0x62);
-                LaunchQueuedRequest(D_L09_001BFC00);
-                SetMobyState(obj, 8, -1);
+                g_player_bolts = remaining;
+                req_push_queue(D_L09_001BFC00, 0x61);
+                req_push_queue(D_L09_001BFC00, 0x62);
+                req_launch_queued(D_L09_001BFC00);
+                moby_set_state(obj, 8, -1);
             }
         }
         break;
@@ -592,19 +592,19 @@ void func_L09_00408478(u8 *obj)
             obj[0x31] = 0;
             *(u16 *)(obj + 0x34) |= 1;
         }
-        if (IsEitherModeTwo())
+        if (game_is_either_mode_two())
             break;
         D_L09_001B25A0[2] = 0;
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
-        MarkFlagAndAppendToList(10);
-        PlayIndexedSound(10);
-        SetMobyState(obj, 9, -1);
-        AddOrUpdateRecordEntry(obj + 0x20, 1, obj, 1, D_L09_0021DDE0);
+        moby_mark_flag_and_append_to_list(10);
+        snd_play_indexed(10);
+        moby_set_state(obj, 9, -1);
+        record_add_or_update_entry(obj + 0x20, 1, obj, 1, D_L09_0021DDE0);
         if (obj[0xb0] != 0xff) {
-            if (!(D_0019B2E8[obj[0xb0] + (gCurrentMapIndex << 4)] & 0x80))
-                MarkTableEntryFlagged(obj[0xb0]);
-            CaptureCheckpointState(gHeroPosition, gHeroPosition + 0x10);
+            if (!(D_0019B2E8[obj[0xb0] + (g_current_map_index << 4)] & 0x80))
+                moby_mark_table_entry_flagged(obj[0xb0]);
+            level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         } else
             MemcardSave(0, -1);
         break;
@@ -612,23 +612,23 @@ void func_L09_00408478(u8 *obj)
 }
 
 /* Throws red and white sparks out of the object as it dies. */
-void func_L09_004091C8(char *obj)
+void part_spawn_death_sparks(char *obj)
 {
     float pos[4];
     float vel[4];
     float initial[4];
     int i;
     *(Quad_Dobbo *)initial = 0;
-    initial[2] = -(RandomFloatRange(3.5f, 4.5f) * 0.0166666675f);
+    initial[2] = -(math_random_float_range(3.5f, 4.5f) * 0.0166666675f);
     *(Quad_Dobbo *)vel = *(Quad_Dobbo *)initial;
     for (i = 0; i < 2; i++) {
-        TransformMobyJointToWorld(obj, 2, pos);
+        moby_transform_joint_to_world(obj, 2, pos);
         pos[2] += IntToFloat(i) * 0.015f;
         if (i & 1)
-            SpawnScalingParticle(pos, vel, 0x77FF0000, 0xFF0060, 17, 150, -100, 1);
+            part_spawn_scaling(pos, vel, 0x77FF0000, 0xFF0060, 17, 150, -100, 1);
         else
-            SpawnScalingParticle(pos, vel, 0x77FF0060, 0xFF0000, 19, 220, -100, 1);
-        SpawnScalingParticle(pos, vel, 0x77FFFFFF, 0xFF0000, 10, 80, -80, 1);
+            part_spawn_scaling(pos, vel, 0x77FF0060, 0xFF0000, 19, 220, -100, 1);
+        part_spawn_scaling(pos, vel, 0x77FFFFFF, 0xFF0000, 10, 80, -80, 1);
     }
 }
 
@@ -637,7 +637,7 @@ void func_L09_004091C8(char *obj)
 /* func_L09_0040A2E8 is in L09_0040A2E8-g8.c. */
 
 /* Gets a door ready to open: sets its starting slide values and picks which of its two halves moves first. */
-void func_L09_0040B008(char *obj) {
+void door_init_slide_motion(char *obj) {
     char *self = obj;
     char *rotation = self + 0xC0;
     char *vars = *(char **)(self + 0x68);
@@ -657,7 +657,7 @@ void func_L09_0040B008(char *obj) {
 }
 
 /* Every so often puffs out a burst of particles, using a random timer between bursts. */
-void func_L09_00421D60(char *obj) {
+void part_update_periodic_emitter(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     switch (*(u8 *)(obj + 0x20)) {
     case 0:

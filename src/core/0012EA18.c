@@ -22,7 +22,7 @@ typedef struct {
    _sysbitFlush. Clearing acc and bits before the total update is the
    one statement order that matches. */
 /* Skips forward in the bit stream by a number of bytes and refills it. */
-void func_0012EA18(void *stream, int byteCount) {
+void mpeg_skip_bit_stream_bytes(void *stream, int byteCount) {
     BitStream *bs = stream;
     bs->acc = 0;
     bs->bits = 0;

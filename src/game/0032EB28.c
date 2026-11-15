@@ -48,26 +48,26 @@ typedef struct {
     void *table;
 } Constructor_3361A8;
 
-extern Glob_199E20 D_00189E20;
+extern Glob_199E20 g_hero_state;
 
-extern float D_001B284C __attribute__((sda));
+extern float g_stick_length __attribute__((sda));
 
-extern float D_00189EA0[];
+extern float g_hero_position[];
 
 extern void F7242f0a4_FUN_00282D30(char *out, void *source, float value);
 
 extern void F7242f0a4_FUN_00334730(char *buffer, int mode);
 
-extern f32 func_002A78D8(f32 low, f32 high);
+extern f32 math_random_signed_float_range(f32 low, f32 high);
 extern f32 D_001A8BD0[] __attribute__((sda));
 
 typedef union { TI128 quad; float v[4]; } EffectVector;
 
 extern unsigned char *D_001F2540[];                     /* the texture table */
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern unsigned char *func_002C65A0(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern unsigned char *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 
 typedef struct {
     TI128 position;
@@ -80,11 +80,11 @@ typedef struct {
 
 /* The EE assigns the integer and FP banks independently: this is func_002FED90(obj, src, x, y, z)
    with its FP arguments set up first, as retail does. */
-extern int func_002FED90(void *obj, f32 x, f32 y, f32 z, void *src);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_002AFFD8(void *, void *, int);
-extern char *func_0029EFD0(int);
+extern int part_alloc_effect_slot(void *obj, f32 x, f32 y, f32 z, void *src);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void cam_compute_view_direction(void *, void *, int);
+extern char *CreateMoby(int);
 
 extern void F7242f0a4_FUN_00334710(int value, char *buffer);
 
@@ -94,11 +94,11 @@ extern float F7242f0a4_FUN_00282DB0(void *owner, char *buffer);
 
 extern int F7242f0a4_D_001B53A0[];
 
-extern s32 func_00283D38(s32, s32, f32);
+extern s32 FastTweenColor(s32, s32, f32);
 
-extern int func_00335E20(unsigned char *field);
+extern int object_get_fourth_field(unsigned char *field);
 
-extern void func_00336ED0(int a, int b);
+extern void pool_free_cell(int a, int b);
 
 extern int *F7b2f1854_FUN_00336E40(int n);
 
@@ -122,33 +122,33 @@ extern int D_001B2860[] __attribute__((sda));
 
 extern char D_001B0A88[];
 
-extern void func_0026FEB8(void *);
+extern void STUB_printf(void *);
 
 extern unsigned short *D_001EE5A0[];
 
 extern char *D_001B1B5C __attribute__((sda));
 
-extern void func_002FDBD8(void *, void *, int, float);
+extern void part_draw_spinning_billboard_pair(void *, void *, int, float);
 
-extern char D_001B5200[];
+extern char g_active_camera[];
 
-extern void func_002704D0(void);
+extern void moby_clear_visible_flags(void);
 
-extern void func_00283410(void *, void *);
+extern void euler_to_matrix(void *, void *);
 
-extern void func_00283678(void *, void *);
+extern void copy_matrix3x4(void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_002704D0(void);
+extern void moby_clear_visible_flags(void);
 
 extern char D_001AD9C8[] __attribute__((sda));
 
-extern void func_00336DA0(void *);
+extern void ui_nop_a(void *);
 
-extern void func_00115E38(char *, int, char *);
+extern void assert_fail_abort(char *, int, char *);
 
 extern char D_001AD8B0[];
 
@@ -156,7 +156,7 @@ extern char D_001AD8C8[];
 
 extern char D_001AD9A8[] __attribute__((sda));
 
-extern void func_00335870(void *, int);
+extern void object_reset_type_and_free(void *, int);
 
 extern int D_001B23A0 __attribute__((sda));
 
@@ -164,13 +164,13 @@ extern char D_001ADA78[] __attribute__((sda));
 
 extern char D_001ADA78[] __attribute__((sda));
 
-extern void func_00336DA0(void *);
+extern void ui_nop_a(void *);
 
-extern void *func_00335FB0(void *);
+extern void *object_init_base(void *);
 
 extern char D_001ADA58[] __attribute__((sda));
 
-extern int func_00336D50(int, int);
+extern int table_find_by_id(int, int);
 
 extern char D_001AD9F8[] __attribute__((sda));
 
@@ -213,7 +213,7 @@ extern char D_001ADA38[] __attribute__((sda));
 
 
 /* Sprays a burst of small flashing sparks around a point, pushed along a direction. */
-void func_003313E0(TI128 *a0, void *dir)
+void part_spawn_spark_burst_2(TI128 *a0, void *dir)
 {
     EffectVector base;
     float vel[4];
@@ -229,36 +229,36 @@ void func_003313E0(TI128 *a0, void *dir)
     i = 8;
     do {
         i--;
-        pos[0] = base.v[0] + RandomSignedFloatRange(0.0f, 0.1f);
-        pos[1] = base.v[1] + RandomSignedFloatRange(0.0f, 0.1f);
-        pos[2] = base.v[2] + RandomSignedFloatRange(0.0f, 0.1f);
-        rnd = RandomIntBelow(0xFF);
-        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 10, 0x407FFF, rnd, 0x7F, 0, size, size, 0.0f, 1);
+        pos[0] = base.v[0] + math_random_signed_float_range(0.0f, 0.1f);
+        pos[1] = base.v[1] + math_random_signed_float_range(0.0f, 0.1f);
+        pos[2] = base.v[2] + math_random_signed_float_range(0.0f, 0.1f);
+        rnd = math_random_int_below(0xFF);
+        p = part_spawn_gravity_fade(pos, D_001A8BD0, 10, 0x407FFF, rnd, 0x7F, 0, size, size, 0.0f, 1);
         if (p != 0)
             p[2] = D_001F2540[92][5];
-        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 10, 0x406080, rnd, 0x7F, 0, size, size, 0.0f, 1);
+        p = part_spawn_gravity_fade(pos, D_001A8BD0, 10, 0x406080, rnd, 0x7F, 0, size, size, 0.0f, 1);
         if (p != 0)
             p[2] = D_001F2540[53][0];
     } while (i >= 0);
 }
 
-extern s32 func_00283CF0(f32 value);
-extern u8 *func_002C16C0(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
+extern s32 FloatToInt(f32 value);
+extern u8 *part_spawn_burst(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
 extern u8 *D_001F26B0;
 /* Spawns a couple of puffs and one bright flash near a position. */
-void func_00331580(f32 *pos, f32 scale)
+void part_spawn_flash_puffs(f32 *pos, f32 scale)
 {
     f32 v[3];
     f32 size = scale * 6300.0f;
     u8 *effect;
     s32 i;
     for (i = 1; i >= 0; i--) {
-    v[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.04f);
-    v[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.04f);
-    v[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.04f);
-    SpawnBurstParticle_002C16C0(v, D_001A8BD0, 15, 0x5F, 0x7F7F7F, FloatToInt(RandomSignedFloatRange(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
+    v[0] = pos[0] + math_random_signed_float_range(0.0f, 0.04f);
+    v[1] = pos[1] + math_random_signed_float_range(0.0f, 0.04f);
+    v[2] = pos[2] + math_random_signed_float_range(0.0f, 0.04f);
+    part_spawn_burst(v, D_001A8BD0, 15, 0x5F, 0x7F7F7F, FloatToInt(math_random_signed_float_range(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
     }
-    effect = SpawnBurstParticle_002C16C0(v, D_001A8BD0, 15, 0x7F, 0x407FFF, FloatToInt(RandomSignedFloatRange(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
+    effect = part_spawn_burst(v, D_001A8BD0, 15, 0x7F, 0x407FFF, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
     if (effect != 0) {
         effect[2] = D_001F26B0[5];
     }
@@ -269,7 +269,7 @@ void func_00331580(f32 *pos, f32 scale)
 
 
 /* Removes an id from the list of 16 slots, or reports a problem if it is not there. */
-void func_003323F0(int slotId) {
+void moby_release_slot_by_id(int slotId) {
     int i;
 
     for (i = 0; i < 16; i++) {
@@ -282,7 +282,7 @@ void func_003323F0(int slotId) {
 }
 
 /* Creates a new game object at a position and sets up its direction and starting values. */
-char *func_00332440(void *a0, void *a1, void *a2)
+char *moby_spawn_directed(void *a0, void *a1, void *a2)
 {
     TI128 localA;
     TI128 localB;
@@ -290,7 +290,7 @@ char *func_00332440(void *a0, void *a1, void *a2)
     State_332440 *state;
     int result;
 
-    ComputeViewDirection(a1, &localA, 1);
+    cam_compute_view_direction(a1, &localA, 1);
     object = CreateMoby(0xEAA /* moby class 3754 */);
     if (object != 0) {
         state = *(State_332440 **)(object + 0x68);
@@ -308,7 +308,7 @@ char *func_00332440(void *a0, void *a1, void *a2)
         vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
         FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
         *(float *)(object + 0xCC) = *(float *)(object + 0xDC) = *(float *)(object + 0xEC) = 0.0f;
-        result = AllocEffectSlot_002FED90(object, 1.0f, 1.0f, 1.0f, 0);
+        result = part_alloc_effect_slot(object, 1.0f, 1.0f, 1.0f, 0);
         state->f1C = result;
         state->f20 = (int)a0;
     }
@@ -324,7 +324,7 @@ char *func_00332440(void *a0, void *a1, void *a2)
 
 
 /* Sets one byte of private data on every object in a list. */
-void func_00334050(int index, int value)
+void moby_set_entry_list_flag_byte(int index, int value)
 {
     unsigned short *list = D_001EE5A0[index];
     if (list != 0) {
@@ -339,12 +339,12 @@ void func_00334050(int index, int value)
 }
 
 /* Calls a helper on an object when it is in state 2 or 3 and has its extra data set. */
-void func_003340A8(char *object)
+void moby_update_attached_effect_by_state(char *object)
 {
     char *data = *(char **)(object + 0x68);
     unsigned int mode = *(unsigned char *)(object + 0x20);
     if (mode - 2 < 2 && *(int *)(data + 0x40) != 0)
-        DrawSpinningBillboardPair(data + 0x10, data + 0x20, 0, 1.0f);
+        part_draw_spinning_billboard_pair(data + 0x10, data + 0x20, 0, 1.0f);
 }
 
 
@@ -359,7 +359,7 @@ typedef struct {
 extern Entry_34100 ref_L00_00334100_00[30];
 
 /* Finds the table entry with a given id, or returns -1 if none matches. */
-s32 func_00334100(s32 id)
+s32 moby_find_entry_index_by_id(s32 id)
 {
     s32 i;
     s32 found;
@@ -382,29 +382,29 @@ s32 func_00334100(s32 id)
 
 typedef int L_34730TI __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; short h[0x1300]; int i[0x980]; float f[0x980]; } L_34730Hero;
-extern L_34730TI func_00334710(int, L_34730TI *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern L_34730TI hero_copy_vector_to_out(int, L_34730TI *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 extern char D_001B53A0[];
 extern float D_001BAFA0[];
 
 /* Works out the camera spot to use, checking whether something blocks the view. */
-int func_00334730(float *out, int flag)
+int cam_resolve_position(float *out, int flag)
 {
     float base[4] __attribute__((aligned(16)));
     float near[4] __attribute__((aligned(16)));
     float far[4] __attribute__((aligned(16)));
     float ofs[4] __attribute__((aligned(16)));
-    L_34730Hero *hero = (L_34730Hero *)&gHeroState;
+    L_34730Hero *hero = (L_34730Hero *)&g_hero_state;
     float f;
     char *cam = D_001B53A0;
 
     if (hero->h[0x34C / 2] == 0) {
-        CopyHeroVectorToOut(((int *)cam)[-4], (L_34730TI *)out);
+        hero_copy_vector_to_out(((int *)cam)[-4], (L_34730TI *)out);
         return 1;
     }
-    CopyHeroVectorToOut(((int *)cam)[-4], (L_34730TI *)base);
+    hero_copy_vector_to_out(((int *)cam)[-4], (L_34730TI *)base);
     f = hero->f[0x31C / 4];
     if (f >= 30.0f || flag == 0) {
         FastVecScale(ofs, cam + 0x30, 0.2f);
@@ -426,7 +426,7 @@ int func_00334730(float *out, int flag)
 
 
 /* Computes a camera offset and stores it in the owner. */
-void func_003349E8(void *owner, int flag, float value)
+void cam_compute_offset(void *owner, int flag, float value)
 {
     char buffer[32];
     int *root = F7242f0a4_D_001B53A0;
@@ -443,11 +443,11 @@ void func_003349E8(void *owner, int flag, float value)
 
 typedef int TI __attribute__((mode(TI)));
 extern void *D_0026E810[7];
-extern TI func_00334710(int, TI *);
-extern void func_00282CC0(void *, void *, void *);
+extern TI hero_copy_vector_to_out(int, TI *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Adds an offset vector to a point, choosing the offset by mode. */
-int func_003351B0(char *self, void *src, void *dst, int mode)
+int cam_add_offset_by_mode(char *self, void *src, void *dst, int mode)
 {
     static void *arms[7] = {&&transformed, &&direct, &&zero, &&zero, &&zero, &&zero, &&zero};
     TI local;
@@ -460,7 +460,7 @@ zero:
     ret = 0;
     goto done;
 transformed:
-    CopyHeroVectorToOut((int)self, &local);
+    hero_copy_vector_to_out((int)self, &local);
     FastVecAdd(dst, src, &local);
     goto done;
 direct:
@@ -480,19 +480,19 @@ done:
 /* func_00335438 is defined in its own sibling unit. */
 
 /* Sets up the camera for the chosen mode (reset, hold or follow). */
-void func_003355A8(int mode)
+void cam_set_mode_state(int mode)
 {
     struct { float scaled[4]; float negative[4]; float matrix[16]; } work;
-    char *state = gActiveCamera;
+    char *state = g_active_camera;
     char *camera = *(char **)(state + 0x190);
-    ClearObjectVisibleFlags();
+    moby_clear_visible_flags();
     if (mode == 0) {
         char *position = camera + 0x30;
-        euler_to_matrix(work.matrix, gHeroPosition + 4);
+        euler_to_matrix(work.matrix, g_hero_position + 4);
         copy_matrix3x4(camera, work.matrix);
         vec_scale_to_length(work.negative, work.matrix, -1.0f);
         vec_scale_to_length(work.scaled, work.matrix + 8, 1.2f);
-        FastVecAdd(position, gHeroPosition, work.scaled);
+        FastVecAdd(position, g_hero_position, work.scaled);
         FastVecAdd(position, position, work.negative);
         *(short *)(*(char **)(state + 0x190) + 0x8A) = 1;
     } else if (mode == 2) {
@@ -511,22 +511,22 @@ void func_003355A8(int mode)
 }
 
 /* Calls the camera helper with no extra work. */
-void func_00335840(void) {
-    ClearObjectVisibleFlags();
+void cam_call_helper(void) {
+    moby_clear_visible_flags();
 }
 
 
 /* Resets an object and frees it when the flag asks for it. */
-void func_00335870(void *object, int flags) {
+void object_reset_type_and_free(void *object, int flags) {
     *(void **)((char *)object + 4) = D_001AD9C8;
     if (flags & 1)
-        DoNothing00336DA0(object);
+        ui_nop_a(object);
 }
 
 /* Fills four numbers from a blend factor and its opposite. */
-void func_003358A0(void *unused, char *out, float factor) {
+void math_fill_blend_weights(void *unused, char *out, float factor) {
     if (out == 0)
-        ReportAssertAndAbort(D_001AD8B0, 61, D_001AD8C8);
+        assert_fail_abort(D_001AD8B0, 61, D_001AD8C8);
     *(float *)(out + 0x0) = factor;
     *(float *)(out + 0x4) = factor * 0.5f;
     *(float *)(out + 0x8) = 1.0f - factor;
@@ -537,20 +537,20 @@ void func_003358A0(void *unused, char *out, float factor) {
 /* func_00335960 is defined in its own sibling unit. */
 
 /* Sets the type pointer of an object and returns it. */
-void *func_00335AC8(void *object) {
+void *object_init_type_pointer(void *object) {
     *(void **)object = D_001AD9A8;
     return object;
 }
 
 /* Resets an object type pointer and frees it when the flag asks for it. */
-void func_00335AE0(void *object, int flags) {
+void object_destroy_with_type(void *object, int flags) {
     *(void **)object = D_001AD9A8;
     if (flags & 1)
-        DoNothing00336DA0(object);
+        ui_nop_a(object);
 }
 
 /* Interpolate four scalar float components from separate input arrays using (1.0f - factor) * first + factor * second, writing each component to the destination. */
-void func_00335B10(float factor, void *context,
+void math_lerp_float4(float factor, void *context,
                                    float *destination,
                                    const float *first, const float *second)
 {
@@ -562,7 +562,7 @@ void func_00335B10(float factor, void *context,
 }
 
 /* calls one four-argument helper four times, left[i] and right[i] with the float scale, storing each result into dst[i]; the first pointer parameter is unused. */
-void func_00335B80(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
+void math_blend_four(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
     dst[0] = FastTweenColor(left[0], right[0], scale);
     dst[1] = FastTweenColor(left[1], right[1], scale);
     dst[2] = FastTweenColor(left[2], right[2], scale);
@@ -572,7 +572,7 @@ void func_00335B80(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
 
 
 /* Interpolate four scalar float components from interleaved endpoint pairs at source offsets 0x08 through 0x24 using (1.0f - factor) * first + factor * second, writing each component to the destination. */
-void func_00335CC0(float factor,
+void math_lerp_interleaved_float4(float factor,
                                      const Rac2Native_81be3b52930eb806_FallbackInterleavedFloat4Layout *source,
                                      float *destination)
 {
@@ -585,50 +585,50 @@ void func_00335CC0(float factor,
 
 
 /* Passes the call on to the base cleanup. */
-void func_00335D60(void *object, int flags) {
-    ResetObjectTypeAndFree(object, flags);
+void object_destroy_wrapper(void *object, int flags) {
+    object_reset_type_and_free(object, flags);
 }
 
 /* func_00335DC0 uses small data in 0032EB28-g8.c. */
 
 /* Returns a stored number. */
-int func_00335E08(void) {
+int object_get_stored_counter(void) {
     return D_001B23A0;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00335E10(u8 *a0) { return *(s32 *)(a0 + 0x0); }
+s32 object_get_first_field(u8 *a0) { return *(s32 *)(a0 + 0x0); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00335E18(u8 *a0) { return *(s32 *)(a0 + 0x4); }
+s32 object_get_second_field(u8 *a0) { return *(s32 *)(a0 + 0x4); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00335E20(u8 *a0) { return *(s32 *)(a0 + 0xc); }
+s32 object_get_fourth_field(u8 *a0) { return *(s32 *)(a0 + 0xc); }
 
 /* Stores four numbers in the first array of an object. */
-void func_00335E38(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
+void object_set_first_float4(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
  (*(f32 **)a0)[0]=f0;(*(f32 **)a0)[1]=f1;
  (*(f32 **)a0)[2]=f2;(*(f32 **)a0)[3]=f3;
 }
 
 
 /* Turns a stored on/off value to 1 or 0. */
-void func_00335E68(u8 *object, s32 enable) {
+void object_set_flag_value(u8 *object, s32 enable) {
  f32 *value=*(f32 **)(object+0x10);
  *value=(enable!=0)?1.0f:0.0f;
 }
 
 /* Tells whether the stored value is above zero. */
-s32 func_00335E88(u8 *object) {
+s32 object_is_flag_positive(u8 *object) {
  return 0.0f<**(f32 **)(object+0x10);
 }
 
 /* Compares the second argument with the word at offset 4 of the object; when they differ, and when the word at offset 44 is non-zero while the word at offset 24 is zero, it calls a two-argument helper with those two words, marks offset 24 with 1, and finally writes the second argument into offset 4. */
-void func_00335EB0(char *object, int newValue)
+void object_change_first_value(char *object, int newValue)
 {
     if (newValue != *(int *)(object + 4)) {
         if (*(int *)(object + 44) != 0 && *(int *)(object + 24) == 0) {
-            FreePoolCell(*(int *)(object + 44), *(int *)(object + 4));
+            pool_free_cell(*(int *)(object + 44), *(int *)(object + 4));
             *(int *)(object + 24) = 1;
         }
         *(int *)(object + 4) = newValue;
@@ -637,10 +637,10 @@ void func_00335EB0(char *object, int newValue)
 
 
 /* Changes a value and releases the old one if needed. */
-void func_00335F20(char *object, int value) {
+void object_change_second_value(char *object, int value) {
     if (value != *(int *)(object + 0x10)) {
         if (*(int *)(object + 0x2C) != 0 && *(int *)(object + 0x24) == 0) {
-            FreePoolCell(*(int *)(object + 0x2C), *(int *)(object + 0x10));
+            pool_free_cell(*(int *)(object + 0x2C), *(int *)(object + 0x10));
             *(int *)(object + 0x24) = 1;
         }
         *(int *)(object + 0x10) = value;
@@ -648,19 +648,19 @@ void func_00335F20(char *object, int value) {
 }
 
 /* Stores four numbers in the second array of an object. */
-void func_00335F88(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
+void object_set_second_float4(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
  (*(f32 **)(a0+4))[0]=f0;(*(f32 **)(a0+4))[1]=f1;
  (*(f32 **)(a0+4))[2]=f2;(*(f32 **)(a0+4))[3]=f3;
 }
 
 /* Sets the type pointer of an object and returns it. */
-void *func_00335FB0(void *object) {
+void *object_init_base(void *object) {
     *(void **)((char *)object + 0x30) = D_001ADA78;
     return object;
 }
 
 /* Sets up an object by allocating five small arrays of zeros. */
-void func_00335FC8(Obj_F7b2f1854 *o, int a1, int count)
+void object_alloc_float4_arrays(Obj_F7b2f1854 *o, int a1, int count)
 {
     int *p;
     int n;
@@ -717,32 +717,32 @@ void func_00335FC8(Obj_F7b2f1854 *o, int a1, int count)
 
 
 /* Cleans up an object and frees its arrays. */
-void func_003360F8(char *object, int flags)
+void object_destroy_array(char *object, int flags)
 {
     *(char **)(object + 0x30) = D_001ADA78;
     if (*(int *)(object + 0x2C)) {
         if (*(int *)(object + 0x14) == 0)
-            FreePoolCell(*(int *)(object + 0x2C), *(int *)object);
+            pool_free_cell(*(int *)(object + 0x2C), *(int *)object);
         if (*(int *)(object + 0x1C) == 0)
-            FreePoolCell(*(int *)(object + 0x2C), *(int *)(object + 8));
+            pool_free_cell(*(int *)(object + 0x2C), *(int *)(object + 8));
         if (*(int *)(object + 0x18) == 0)
-            FreePoolCell(*(int *)(object + 0x2C), *(int *)(object + 4));
+            pool_free_cell(*(int *)(object + 0x2C), *(int *)(object + 4));
         if (*(int *)(object + 0x20) == 0)
-            FreePoolCell(*(int *)(object + 0x2C), *(int *)(object + 12));
+            pool_free_cell(*(int *)(object + 0x2C), *(int *)(object + 12));
     }
     if (flags & 1)
-        DoNothing00336DA0(object);
+        ui_nop_a(object);
 }
 
 /* Builds an object and sets its table pointer. */
-Constructor_3361A8 *func_003361A8(Constructor_3361A8 *object) {
-    InitBaseObject(object);
+Constructor_3361A8 *object_construct_derived_a(Constructor_3361A8 *object) {
+    object_init_base(object);
     object->table = D_001ADA58;
     return object;
 }
 
 /* Sets up an object with two more arrays and default values. */
-void func_003361E0(char *obj)
+void object_init_derived_arrays(char *obj)
 {
     int *p;
     int x;
@@ -772,26 +772,26 @@ void func_003361E0(char *obj)
 
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_00336318(u8 *a0) { return *(s32 *)(a0 + 0x38); }
+s32 object_get_field_a(u8 *a0) { return *(s32 *)(a0 + 0x38); }
 
 /* Stores the result of a helper call in the object. */
-void func_00336390(char *object, int first, int second) {
-    *(int *)(object + 0x40) = FindTableEntryById(first, second);
+void object_set_helper_result(char *object, int first, int second) {
+    *(int *)(object + 0x40) = table_find_by_id(first, second);
 }
 
 /* Writes a number to the object value. */
-void func_003363C0(u8 *object, f32 value) { f32 *target = *(f32 **)(object + 0x38); *target = value; }
+void object_set_value_float(u8 *object, f32 value) { f32 *target = *(f32 **)(object + 0x38); *target = value; }
 
 /* Builds an object and sets its table pointer. */
-Constructor_3361A8 *func_003363D0(Constructor_3361A8 *object) {
-    InitBaseObject(object);
+Constructor_3361A8 *object_construct_derived_b(Constructor_3361A8 *object) {
+    object_init_base(object);
     object->table = D_001AD9F8;
     return object;
 }
 
 /* Sets up an object and fills in its starting values. */
-void func_00336408(char *object, int a1, int a2, int a3, int a4) {
-    AllocateFloat4Arrays((Obj_F7b2f1854 *)object, a3, a4);
+void object_init_derived_b(char *object, int a1, int a2, int a3, int a4) {
+    object_alloc_float4_arrays((Obj_F7b2f1854 *)object, a3, a4);
     *(int *)(object + 0x3C) = a1;
     *(int *)(object + 0x34) = a2;
     *(int *)(object + 0x40) = 100;
@@ -801,26 +801,26 @@ void func_00336408(char *object, int a1, int a2, int a3, int a4) {
 
 /* lot12 -- measured bodies with sizes recorded in the catalogue. */
 /* Stores two numbers in the first slots of the array. */
-void func_00336498(u8 *object, s32 first, s32 second) {
+void object_set_first_pair(u8 *object, s32 first, s32 second) {
     *(s32 *)*(u8 **)(object + 0xc) = first;
     *(s32 *)(*(u8 **)(object + 0xc) + 0x4) = second;
 }
 
 /* Stores two numbers in the third and fourth slots of the array. */
-void func_003364B0(u8 *object, s32 first, s32 second) {
+void object_set_second_pair(u8 *object, s32 first, s32 second) {
     *(s32 *)(*(u8 **)(object + 0xc) + 0x8) = first;
     *(s32 *)(*(u8 **)(object + 0xc) + 0xc) = second;
 }
 
 /* Sets the top byte of the first two numbers in the array. */
-void func_003364C8(u8 *a0, s32 a1, s32 a2) {
+void object_set_first_pair_top_bytes(u8 *a0, s32 a1, s32 a2) {
     u8 *o = a0;
     *(u32 *)*(u8 **)(o + 0xC) = (*(u32 *)*(u8 **)(o + 0xC) & 0x00FFFFFF) | (u32)(a1 << 24);
     *((u32 *)*(u8 **)(o + 0xC) + 1) = (*((u32 *)*(u8 **)(o + 0xC) + 1) & 0x00FFFFFF) | (u32)(a2 << 24);
 }
 
 /* Sets the top byte of the third and fourth numbers in the array. */
-void func_00336508(u8 *a0, s32 a1, s32 a2) {
+void object_set_second_pair_top_bytes(u8 *a0, s32 a1, s32 a2) {
     u8 *o = a0;
     *((u32 *)*(u8 **)(o + 0xC) + 2) = (*((u32 *)*(u8 **)(o + 0xC) + 2) & 0x00FFFFFF) | (u32)(a1 << 24);
     *((u32 *)*(u8 **)(o + 0xC) + 3) = (*((u32 *)*(u8 **)(o + 0xC) + 3) & 0x00FFFFFF) | (u32)(a2 << 24);
@@ -829,15 +829,15 @@ void func_00336508(u8 *a0, s32 a1, s32 a2) {
 /* func_00336548 is defined in 0032EB28-math-g8.c. */
 
 /* Builds an object and sets its table pointer. */
-Constructor_3361A8 *func_003366D0(Constructor_3361A8 *object) {
-    InitBaseObject(object);
+Constructor_3361A8 *object_construct_derived_c(Constructor_3361A8 *object) {
+    object_init_base(object);
     object->table = D_001ADA38;
     return object;
 }
 
 
 /* Sets up an object and fills in its default sizes. */
-void func_00336710(char *s1, int a1, char *a2)
+void object_init_derived_c(char *s1, int a1, char *a2)
 {
     F081de6c9_FUN_00335FC8(s1, a1, a2);
     if (a2 != 0) {
@@ -859,4 +859,4 @@ void func_00336710(char *s1, int a1, char *a2)
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_003367B8(u8 *a0) { return *(s32 *)(a0 + 0x34); }
+s32 object_get_field_b(u8 *a0) { return *(s32 *)(a0 + 0x34); }

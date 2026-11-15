@@ -1,42 +1,42 @@
 #include "common.h"
-extern float func_00282E20(void *);
-extern void func_002AA2E8(float *,float,float);
-extern void func_00282F70(void *,void *,float);
-extern void func_00282C88(void *);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282F20(void *,void *,float);
-extern float func_00282DB0(void *,void *);
-extern float func_00282DF0(void *);
-extern float func_002A89A8(void *,float,int);
-extern int func_00278E78(void);
-extern float func_002A8A20(void *);
-extern float func_00282C48(float);
-extern float func_0029F530(void *);
-extern void func_002A7470(void *,int,int,int);
-extern int func_002A88A0(float *,float *,float,float,float);
-extern int func_002761F8(void *,void *,int,void *,int);
-extern float func_002AAA00(void *,void *,int,float,float,float,float);
-extern int func_002A8C28(void *,float,void *,int,float,float,int,int,int);
-extern int func_00277258(void *,float,int,void *);
-extern char *func_002AB1F0(void *);
-extern void func_002A90C8(void *,int,int,void *,float);
-extern void func_002C9218(int,void *,void *,float);
-extern void func_002833F0(void *,void *);
-extern void func_00283738(void *,void *,void *);
-extern float func_00283B98(float,float);
+extern float vec_length_xy(void *);
+extern void ApproachValue(float *,float,float);
+extern void vec_fast_normalize_helper(void *,void *,float);
+extern void vec_clear_128(void *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern float FastVecDot(void *,void *);
+extern float FastVecLength(void *);
+extern float coll_probe_ground_height_below(void *,float,int);
+extern int GetCollHitMaterial(void);
+extern float coll_get_ground_height_under_object(void *);
+extern float math_fabs(float);
+extern float moby_get_anim_value(void *);
+extern void anim_start_blended(void *,int,int,int);
+extern int math_solve_quadratic(float *,float *,float,float,float);
+extern int CollLine(void *,void *,int,void *,int);
+extern float math_approach_target_with_direction_mode(void *,void *,int,float,float,float,float);
+extern int coll_sweep_from_object(void *,float,void *,int,float,float,int,int,int);
+extern int coll_test_point(void *,float,int,void *);
+extern char *moby_get_private_value_0(void *);
+extern void part_start_effect_default_table(void *,int,int,void *,float);
+extern void path_push_point_away(int,void *,void *,float);
+extern void euler_rotation_basis(void *,void *);
+extern void multiply_matrix3x3(void *,void *,void *);
+extern float FastAddRotations(float,float);
 typedef int MotionQuad __attribute__((mode(TI)));
 struct ImpactQueueState { char pad[20]; int index; int hit; int flags; MotionQuad point, offset, normal; };
-extern struct ImpactQueueState D_001BAF80;
+extern struct ImpactQueueState g_collision_hit;
 #define BF(p,n) (*(float *)((p)+(n)))
 #define BU(p,n) (*(unsigned char *)((p)+(n)))
 #define BH(p,n) (*(unsigned short *)((p)+(n)))
 #define BI(p,n) (*(int *)((p)+(n)))
 /* Steps motion, animation speed and collision response; returns motion flags. */
 /* Moves an object with gravity, ground checks and bounces, and answers collisions; returns motion flags. */
-int func_002B1F30(char *object,char *state)
+int moby_update_ground_motion(char *object,char *state)
 {
     float destination[4], original[4], offset[4], start[4];
     /* Collision vectors and the later 3x4 rotation matrix share stack storage. */
@@ -60,15 +60,15 @@ int func_002B1F30(char *object,char *state)
       ApproachValue(&speed,target,BF(state,0x2c));
     }
 
-    FastVectorNormalizeHelper((state+0x80),(state+0x80),speed);
-    ClearVector128(offset);
+    vec_fast_normalize_helper((state+0x80),(state+0x80),speed);
+    vec_clear_128(offset);
     offset[2]=BF(state,0x34);
     matrix_mul_vec3(offset,offset,(object+0xc0));
     FastVecAdd(original,offset,(object+0x10));
-    groundHeight=ProbeGroundHeightBelow(original,0.5f,0);
+    groundHeight=coll_probe_ground_height_below(original,0.5f,0);
     if (!GetCollHitMaterial()) {
         if (!BU(state,0x1b) && groundHeight<=original[2] && original[2]+BF(state,0x88)<groundHeight) BU(state,0x1b)=1;
-        groundHeight=GetGroundHeightUnderObject((object+0x10));
+        groundHeight=coll_get_ground_height_under_object((object+0x10));
     }
     if (BU(state,0x1b)) {
         if (BU(state,0x1b)<4) FastVecScale((state+0x80),(state+0x80),0.7f);
@@ -80,9 +80,9 @@ int func_002B1F30(char *object,char *state)
         switch (BU(state,0x1a)) {
         case 0: {
             float flightTime, numerator;
-            flightTime=FloatAbs(BF(state,0x88)/BF(state,0x4c));
+            flightTime=math_fabs(BF(state,0x88)/BF(state,0x4c));
             if (2.0f<flightTime) {
-                distance=GetMobyAnimationValue(object);
+                distance=moby_get_anim_value(object);
                 numerator=BF(state,0x54)-distance;
                 numerator=numerator+numerator;
                 animSpeedTarget=numerator/flightTime;
@@ -91,9 +91,9 @@ int func_002B1F30(char *object,char *state)
             break;
         }
         case 1:
-            if (BF(state,0x60)<=GetMobyAnimationValue(object)) { BF(object,0x48)=0; break; }
+            if (BF(state,0x60)<=moby_get_anim_value(object)) { BF(object,0x48)=0; break; }
             else if (BU(state,0x15)!=255 && (groundHeight==0.0f || groundHeight<BF(state,0x40) || 10.0f<BF(object,0x18)-groundHeight)) {
-                if (BU(object,0x43)!=BU(state,0x15)) StartAnimationBlended(object,BU(state,0x15),0,5);
+                if (BU(object,0x43)!=BU(state,0x15)) anim_start_blended(object,BU(state,0x15),0,5);
                 if (0.004166666883975267f<BF(state,0x50)) BF(state,0x50)=0.004166666883975267f;
                 break;
             }
@@ -101,9 +101,9 @@ int func_002B1F30(char *object,char *state)
                 float numerator;
                 float halfGravity=BF(state,0x50)*-0.5f;
                 fallTime=60.0f;
-                if (SolveQuadratic(&root1,&root2,halfGravity,BF(state,0x88)-halfGravity,BF(object,0x18)-groundHeight)>0 && 0.0f<root1 && root1<fallTime) fallTime=root1;
+                if (math_solve_quadratic(&root1,&root2,halfGravity,BF(state,0x88)-halfGravity,BF(object,0x18)-groundHeight)>0 && 0.0f<root1 && root1<fallTime) fallTime=root1;
                 if (fallTime<0.0001f) fallTime=0.0001f;
-                distance=GetMobyAnimationValue(object);
+                distance=moby_get_anim_value(object);
                 numerator=BF(state,0x60)-distance;
                 numerator=numerator+numerator;
                 animSpeedTarget=numerator/fallTime;
@@ -120,39 +120,39 @@ int func_002B1F30(char *object,char *state)
             break;
         }
     }
-    ApproachTargetWithDirectionMode(object+0xf8,state+0x68,0,BF(state,0x64),0.013962635770440102f,0.0034906589426100254f,3.140000104904175f);
+    math_approach_target_with_direction_mode(object+0xf8,state+0x68,0,BF(state,0x64),0.013962635770440102f,0.0034906589426100254f,3.140000104904175f);
     FastVecAdd((object+0x10),(object+0x10),(state+0x80));
     FastVecAdd(destination,original,(state+0x80));
     FastVecScale(start,(state+0x80),3.0f);
     FastVecAdd(start,start,destination);
-    SweepCollisionFromObject(object,BF(state,0x30),start,0x4000000,1.0f,1.0f,0,1,0);
+    coll_sweep_from_object(object,BF(state,0x30),start,0x4000000,1.0f,1.0f,0,1,0);
     if (BF(state,0x30)<FastVecLength((state+0x80))) {
-        if (CollLine(original,destination,0x24,object,0)) qcopy(destination,&gCollisionHit.point);
+        if (CollLine(original,destination,0x24,object,0)) qcopy(destination,&g_collision_hit.point);
     }
     fallback=0;
-    if (!TestPointAgainstCollision(destination,BF(state,0x30),0x24,object)) {
+    if (!coll_test_point(destination,BF(state,0x30),0x24,object)) {
         int hit=CollLine(destination,(object+0x10),0x24,object,0);
         fallback=1;
         if (!hit) goto finish;
     }
     flags|=4;
-    if (fallback) qcopy((object+0x10),&gCollisionHit.point);
-    else FastVecSub((object+0x10),&gCollisionHit.offset,offset);
+    if (fallback) qcopy((object+0x10),&g_collision_hit.point);
+    else FastVecSub((object+0x10),&g_collision_hit.offset,offset);
     bounceScale=1.0f;
-    vec_scale_to_length(scratch.collision.normal,&gCollisionHit.normal,bounceScale);
+    vec_scale_to_length(scratch.collision.normal,&g_collision_hit.normal,bounceScale);
     if (0.7070000171661377f<=scratch.collision.normal[2]) {
         float projection=FastVecDot((state+0x80),scratch.collision.normal);
         if (projection<0.0f) {
-            if (!gCollisionHit.hit || gCollisionHit.flags>0) {
+            if (!g_collision_hit.hit || g_collision_hit.flags>0) {
                 qcopy(scratch.collision.rayStart,(object+0x10)); scratch.collision.rayStart[2]+=0.2f;
                 qcopy(rayEnd,(object+0x10)); rayEnd[2]-=2.0f;
                 if (CollLine(scratch.collision.rayStart,rayEnd,2,object,0)) {
                     BU(state,0x1a)=2;
                     if (GetCollHitMaterial()==1) {
-                        record=GetMobyPrivateValue0(object);
+                        record=moby_get_private_value_0(object);
                         if (record) {
                             FastVecAdd(impact,(object+0xc0),(object+0x10));
-                            StartEffectWithDefaultTable(object,0,0x110000,impact,(float)*(short *)(record+4));
+                            part_start_effect_default_table(object,0,0x110000,impact,(float)*(short *)(record+4));
                         }
                     }
                 }
@@ -160,7 +160,7 @@ int func_002B1F30(char *object,char *state)
             vec_scale_to_length(scratch.collision.work,scratch.collision.normal,projection);
             FastVecSub((state+0x80),(state+0x80),scratch.collision.work);
             if (BU(state,0x1a)==2) {
-                if (gCollisionHit.hit && gCollisionHit.flags<0) flags|=BH(state,0x38)&1;
+                if (g_collision_hit.hit && g_collision_hit.flags<0) flags|=BH(state,0x38)&1;
                 length=FastVecLength((state+0x80));
                 ApproachValue(&length,0.0f,BF(state,0x50));
                 vec_scale_to_length((state+0x80),(state+0x80),length);
@@ -175,7 +175,7 @@ int func_002B1F30(char *object,char *state)
         }
     }
 finish:
-    if (BI(state,0x7c)!=-1) PushPointAwayFromPath(BI(state,0x7c),(object+0x10),(object+0x10),BF(state,0x30));
+    if (BI(state,0x7c)!=-1) path_push_point_away(BI(state,0x7c),(object+0x10),(object+0x10),BF(state,0x30));
     if (!BU(state,0x1a) && BF(state,0x88)<0.0f) BU(state,0x1a)=1;
     else if (BH(state,0x38)&2) {
         if (flags&4) { if (BF(state,0x88)<=0.0f) flags|=1; }
@@ -188,7 +188,7 @@ finish:
             BF(object,0xf8)=FastAddRotations(BF(object,0xf8),BF(state,0x98));
             euler_rotation_basis((object+0xc0),object+0xf0);
         }
-        ClearVector128(scratch.collision.normal); scratch.collision.normal[2]=BF(state,0x34);
+        vec_clear_128(scratch.collision.normal); scratch.collision.normal[2]=BF(state,0x34);
         matrix_mul_vec3(scratch.collision.normal,scratch.collision.normal,(object+0xc0));
         FastVecSub(scratch.collision.work,offset,scratch.collision.normal);
         FastVecAdd((object+0x10),(object+0x10),scratch.collision.work);

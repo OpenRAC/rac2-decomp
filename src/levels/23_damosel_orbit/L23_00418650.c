@@ -10,12 +10,12 @@ typedef int V4_L23_418650 __attribute__((mode(TI)));
 
 extern char D_00189ED0[];
 extern float D_L23_001B36A4 __attribute__((sda));
-extern void func_00282CF0(char *dst, char *src, char *arg);
-extern void func_00282F20(char *dst, char *src, float arg);
-extern void func_00282CC0(char *dst, char *src, char *arg);
+extern void FastVecSub(char *dst, char *src, char *arg);
+extern void vec_scale_to_length(char *dst, char *src, float arg);
+extern void FastVecAdd(char *dst, char *src, char *arg);
 
 /* Moves a point onto the round planet surface, at the given height above it. */
-void func_L23_00418650(char *pos, float heightOffset) {
+void mothership_project_point_onto_surface(char *pos, float heightOffset) {
     char local[16];
 
     FastVecSub(local, pos, D_00189ED0);

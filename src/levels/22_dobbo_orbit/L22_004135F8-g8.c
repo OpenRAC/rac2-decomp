@@ -2,9 +2,9 @@
 
 typedef int TI16 __attribute__((mode(TI)));
 
-extern int func_002E5CF8(int, int, u8 *);
+extern int PlayMobySound(int, int, u8 *);
 
-extern void func_0029F338(u8 *object);
+extern void moby_mark_spawned(u8 *object);
 
 /* the steering constants of the homing shot */
 extern float D_L22_001B1524 __attribute__((sda));
@@ -46,52 +46,52 @@ typedef struct {
     s32 f20;
 } L22Rec;
 
-extern void func_002AFFD8(void *, void *, s32);
+extern void cam_compute_view_direction(void *, void *, s32);
 
-extern float func_002AA2E8(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00282DD8(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern float func_00282DF0(void *);
+extern float FastVecLength(void *);
 
-extern float func_00282C10(float);
+extern float square_root(float);
 
-extern void func_00283958(void *, void *);
+extern void quaternion_to_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern float func_00282DB0(void *, void *);
+extern float FastVecDot(void *, void *);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern s32 func_002A77E0(s32);
+extern s32 math_random_int_below(s32);
 
-extern void func_002A7A00(void *, float, float);
+extern void vec_random_direction(void *, float, float);
 
-extern s32 func_002761F8(void *, void *, s32, s32, void *);
+extern s32 CollLine(void *, void *, s32, s32, void *);
 
-extern s32 func_00282948(void *);
+extern s32 math_fast_float_d(void *);
 
-extern void func_002ABBB8(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+extern void SpawnExplosionEffects(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                           float, float, float, float, float, float, float);
 
-extern void func_00277F48(void *, s32, s32, void *, float);
+extern void coll_process_hit(void *, s32, s32, void *, float);
 
-extern void func_L00_00320B70(void *, void *, void *, void *, void *, void *, float, float, float, float);
+extern void vec_turn_toward_target(void *, void *, void *, void *, void *, void *, float, float, float, float);
 
 /* EE ABI: retain integer and float argument order within their register banks. */
-extern void func_002C65A0(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
+extern void part_spawn_gravity_fade(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
 
 /* Updates a homing shot: steers it toward its target, leaves a trail, and destroys it with an impact when it hits something or leaves the map. */
-void func_L22_004135F8(u8 *obj) {
+void homing_l22_shot_update(u8 *obj) {
     float up[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
     float mtx[12] __attribute__((aligned(16)));
@@ -112,7 +112,7 @@ void func_L22_004135F8(u8 *obj) {
 
     *(u16 *)(obj + 0x34) &= 0xFFBE;
     vars = *(u8 **)(obj + 0x68);
-    ComputeViewDirection(obj + 0x10, up, 0);
+    cam_compute_view_direction(obj + 0x10, up, 0);
     ApproachValue((float *)(vars + 0x1C), 2.3333335f, 0.055555556f);
     vec_scale_to_length(vel, obj + 0xC0, *(float *)(vars + 0x1C));
     vec_scale_to_length(axis, up, 1.0f);
@@ -126,7 +126,7 @@ void func_L22_004135F8(u8 *obj) {
         if (vars[0x28] != 0) {
             FastVecScale(c, *(u8 **)(vars + 0x18) + 0xE0, D_L22_001B1540);
             FastVecAdd(b, *(u8 **)(vars + 0x18) + 0x10, c);
-            TurnVectorTowardTarget(obj + 0x10, obj + 0xC0, b, vars + 0x20, up, a,
+            vec_turn_toward_target(obj + 0x10, obj + 0xC0, b, vars + 0x20, up, a,
                               D_L22_001B1524, D_L22_001B1528, 0.0f, D_L22_001B1530);
             vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
             FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
@@ -134,7 +134,7 @@ void func_L22_004135F8(u8 *obj) {
             if (*(s32 *)(vars + 0x14) < 0x91) {
                 FastVecSub(a, obj + 0x10, *(u8 **)(vars + 0x2C));
                 if (FastVecDot(a, vel) < 0.0f) {
-                    TurnVectorTowardTarget(obj + 0x10, obj + 0xC0, *(u8 **)(vars + 0x2C), vars + 0x20, up, b,
+                    vec_turn_toward_target(obj + 0x10, obj + 0xC0, *(u8 **)(vars + 0x2C), vars + 0x20, up, b,
                                       D_L22_001B1524, D_L22_001B1528, 0.0f, D_L22_001B152C);
                     vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
                     FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
@@ -148,16 +148,16 @@ void func_L22_004135F8(u8 *obj) {
     }
     qcopy(b, obj + 0x10);
     FastVecScale(c, vel, 0.7f);
-    r = RandomFloatRange(0.1f, 0.3f);
-    n = RandomIntBelow(0xFF);
-    RandomDirectionVector(a, 0.0f, 0.1f);
+    r = math_random_float_range(0.1f, 0.3f);
+    n = math_random_int_below(0xFF);
+    vec_random_direction(a, 0.0f, 0.1f);
     FastVecAdd(a, a, b);
-    SpawnGravityFadeParticle(a, D_L22_001A8F20, 0xF, 0x808080, n, 0x20, 0, r * 210000.0f, r * 42000.0f, 0.0f, 0);
+    part_spawn_gravity_fade(a, D_L22_001A8F20, 0xF, 0x808080, n, 0x20, 0, r * 210000.0f, r * 42000.0f, 0.0f, 0);
     FastVecAdd(b, b, c);
     qcopy(a, obj + 0x10);
     FastVecAdd(obj + 0x10, obj + 0x10, vel);
     if (*(float *)(obj + 0x10) < 0.0f || *(float *)(obj + 0x14) < 0.0f || *(float *)(obj + 0x18) < 0.0f) {
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
         return;
     }
     rec.obj = obj;
@@ -190,14 +190,14 @@ void func_L22_004135F8(u8 *obj) {
         if (flag == 0) {
             PlayMobySound(0, 0, obj);
         }
-    } else if (FastFloatHelperD(vars + 0x14) != 0) {
-        MarkMobySpawned(obj);
+    } else if (math_fast_float_d(vars + 0x14) != 0) {
+        moby_mark_spawned(obj);
         return;
     }
     if (obj[0xBC] != 0) {
         SpawnExplosionEffects(obj, D_L22_001A8F20, 0, 2, 1, 4, -1, 0, 0, -1, 0, 0x810001,
                       0.0f, 0.0f, 1.5f, 1.0f, 9.0f, 1.0f, 15.0f);
-        ProcessCollisionHit(obj + 0x10, 0, *(s32 *)(vars + 0x10), &rec, 2.0f);
-        MarkMobySpawned(obj);
+        coll_process_hit(obj + 0x10, 0, *(s32 *)(vars + 0x10), &rec, 2.0f);
+        moby_mark_spawned(obj);
     }
 }

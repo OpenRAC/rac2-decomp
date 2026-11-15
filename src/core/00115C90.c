@@ -5,14 +5,14 @@
    body below runs when the call returns it */
 extern int D_00133E78;
 
-extern u32 func_0011B270(int arg0);
+extern u32 kernel_process_request_a(int arg0);
 
 /* Asks the system for more heap memory. If that fails, it hands back the error code. */
-u32 func_00115C90(int *errnoOut, u32 increment) {
+u32 sbrk_reentrant(int *errnoOut, u32 increment) {
     u32 result;
 
     D_00133E78 = 0;
-    result = ProcessKernelRequestA(increment);
+    result = kernel_process_request_a(increment);
     if (result == 0xFFFFFFFF) {
         if (D_00133E78 != 0)
             *errnoOut = D_00133E78;

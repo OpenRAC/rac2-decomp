@@ -15,30 +15,30 @@ extern int D_001AA43C SDATA(D_001AA43C) __attribute__((sda));
 extern PromptCornerColors D_001B1E00[] SDATA(D_001B1E00) __attribute__((sda));
 extern PromptBounds D_001ABB80[] MACRO_ADDR;
 extern PromptBounds D_001ABB80_gp[] SDATA(D_001ABB80) __attribute__((sda));
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C540(int);
-extern int func_00288FB8(int);
-extern void func_00280200(unsigned short *, unsigned long, unsigned char *, int);
-extern void func_0027EAE8(int, int, int, int, int, void *);
-extern void func_0027C660(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void SetupGifPaging(int);
+extern int GetLocalizedString(int);
+extern void text_draw_window_medium(unsigned short *, unsigned long, unsigned char *, int);
+extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
+extern void DoGifPaging(void);
 
 int func_US2_002DC940(PromptMenuPrefix *menu)
 {
     unsigned char *text;
     int kind;
-    func_002FC560(0x42, 0x44ULL);
-    func_002FC560(0x47, 0x2004BULL);
-    func_0027C540(0);
+    VU1_addGSregister(0x42, 0x44ULL);
+    VU1_addGSregister(0x47, 0x2004BULL);
+    SetupGifPaging(0);
     text = D_001ABB78;
     kind = D_001F2924;
     switch (kind) {
     case 0:
     case 1:
     case 2:
-        text = (unsigned char *)func_00288FB8(0x2C8F);
+        text = (unsigned char *)GetLocalizedString(0x2C8F);
         break;
     case 3:
-        text = (unsigned char *)func_00288FB8(0x2C92);
+        text = (unsigned char *)GetLocalizedString(0x2C92);
         break;
     }
     {
@@ -50,15 +50,15 @@ int func_US2_002DC940(PromptMenuPrefix *menu)
             D_001B1E10 = 1;
             D_001B1E00[0] = (PromptCornerColors){{D_001AA43C, D_001AA43C, D_001AA43C, D_001AA43C}};
         }
-        func_00280200((unsigned short *)&box, 0x80000000UL, text, -1);
+        text_draw_window_medium((unsigned short *)&box, 0x80000000UL, text, -1);
         box.s[5] = (menu->height - box.s[7]) >> 1;
         box.s[9] ^= 4;
-        func_00280200((unsigned short *)&box, 0x80000000UL, text, -1);
+        text_draw_window_medium((unsigned short *)&box, 0x80000000UL, text, -1);
         {
             int top = D_001ABB80[0].top;
             int bottom = D_001ABB80[0].bottom;
             int right = D_001ABB80[0].right;
-            func_0027EAE8(D_001ABB80_gp[0].left, top, right, bottom, 0, &D_001B1E00[0]);
+            gfx_draw_screen_rectangle(D_001ABB80_gp[0].left, top, right, bottom, 0, &D_001B1E00[0]);
         }
         box.s[0]--;
         box.s[1]--;
@@ -66,9 +66,9 @@ int func_US2_002DC940(PromptMenuPrefix *menu)
         box.s[3]--;
         box.s[4]--;
         box.s[5]--;
-        func_00280200((unsigned short *)&box, 0x80F0F0F0UL, text, -1);
+        text_draw_window_medium((unsigned short *)&box, 0x80F0F0F0UL, text, -1);
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }
 

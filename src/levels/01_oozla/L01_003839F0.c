@@ -1,32 +1,32 @@
 #include "common.h"
 
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_0038E880(void *, void *, void *);
-extern void func_L00_0038F3D8(void *);
+extern void FastVecScale(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
+extern void part_spawn_spark_puff(void *);
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern int D_L01_001AC810 __attribute__((sda));
 extern Collision D_L01_001BF900;
 extern Material D_L01_002637A0[];
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
 /* Moves a bouncing piece of debris through the air. It bounces off surfaces and counts its bounces, then breaks up in a bigger way after 20. */
-void func_L01_003839F0(char *object) {
+void bouncing_l01_debris_update(char *object) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -50,9 +50,9 @@ void func_L01_003839F0(char *object) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, position, vars);
-    ComputeViewDirection(position, &frame.surface, 0);
+    cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
-    SpawnSparkPuff(object);
+    part_spawn_spark_puff(object);
     frame.packet.moby = object;
     frame.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
@@ -60,7 +60,7 @@ void func_L01_003839F0(char *object) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L01_002637A0)->material;
     qcopy(&frame.packet.vector, vars);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(object + 0xAA);
@@ -73,7 +73,7 @@ void func_L01_003839F0(char *object) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L01_001BF900;
             model = reread->hit;
@@ -85,7 +85,7 @@ void func_L01_003839F0(char *object) {
                 void *dest = object + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+            vec_fast_normalize(&frame.velocity, vars, &reread->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
@@ -94,20 +94,20 @@ void func_L01_003839F0(char *object) {
                 goto finish;
             object[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+            vec_fast_normalize(&frame.velocity, vars, &collision->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         object[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
     if (*(unsigned char *)(object + 0xBC)) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
         if (*(int *)(vars + 0x14) < 20)
-            SpawnBigExplosionEffect(object, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(object, &frame.velocity, &frame.normal);
         else
-            SpawnImpactBurst(object, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(object, &frame.velocity, &frame.normal);
     }
 }

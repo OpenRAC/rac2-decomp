@@ -1,18 +1,18 @@
 #include "common.h"
 
-extern void func_00282CF0(char *, char *, char *);
-extern float func_00282DF0(char *);
-extern void func_00282DD8(char *, char *, char *);
-extern float func_00282DB0(char *, char *);
-extern float func_002831B0(float);
-extern float func_002703B0(int, float, float, float, float, float);
-extern float func_00283198(float);
-extern void func_00282F20(char *, char *, float);
-extern float func_00283180(float);
-extern void func_002ACDE8(char *, char *, char *);
+extern void FastVecSub(char *, char *, char *);
+extern float FastVecLength(char *);
+extern void FastVecCross(char *, char *, char *);
+extern float FastVecDot(char *, char *);
+extern float math_fast_angle_helper(float);
+extern float math_step_spring_damper_stored(int, float, float, float, float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_scale_to_length(char *, char *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern void vec_rotate_by_quaternion(char *, char *, char *);
 
 /* Turns a facing vector part of the way toward a target, easing the turn, and can give back the rotation used. */
-void func_L00_00320B70(char *origin, char *forward, char *target, int mode, float turnParamA, float turnParamB, float turnParamC, char *sideVec, float closeRange,
+void vec_turn_toward_target(char *origin, char *forward, char *target, int mode, float turnParamA, float turnParamB, float turnParamC, char *sideVec, float closeRange,
                        char *outQuat)
 {
     char toTarget[16];
@@ -34,7 +34,7 @@ void func_L00_00320B70(char *origin, char *forward, char *target, int mode, floa
     lengthProduct *= FastVecLength(toTarget);
     if (lengthProduct == 0.0f)
         return;
-    angle = 1.5707964f - FastAngleHelper(dotProduct / lengthProduct);
+    angle = 1.5707964f - math_fast_angle_helper(dotProduct / lengthProduct);
     if (angle > 2.8797936f) {
         FastVecCross(quat, forward, sideVec);
         FastVecCross(axis, quat, forward);
@@ -46,10 +46,10 @@ void func_L00_00320B70(char *origin, char *forward, char *target, int mode, floa
             turnParamA = 0.5f;
         }
     }
-    halfAngle = StepSpringDamperStored(mode, 0.0f, angle, turnParamA, turnParamB, turnParamC) * 0.5f;
-    vec_scale_to_length(sideVec, axis, FastSinOrCosB(halfAngle));
-    *(float *)(quat + 12) = FastSinOrCosA(halfAngle);
-    RotateVectorByQuaternion(forward, forward, sideVec);
+    halfAngle = math_step_spring_damper_stored(mode, 0.0f, angle, turnParamA, turnParamB, turnParamC) * 0.5f;
+    vec_scale_to_length(sideVec, axis, math_fast_sin_or_cos_b(halfAngle));
+    *(float *)(quat + 12) = math_fast_sin_or_cos_a(halfAngle);
+    vec_rotate_by_quaternion(forward, forward, sideVec);
     if (outQuat != 0)
         qcopy(outQuat, sideVec);
 }

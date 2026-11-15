@@ -14,21 +14,21 @@ typedef struct {
 } Menu_002D99E8;
 extern int D_001AB910 __attribute__((sda));
 extern int D_001ABB28 __attribute__((sda));
-extern int D_001C4FA0[];
-extern void func_0027C540(int);
-extern int func_0029DB28(int *, int *, int *, int);
-extern void func_002FC560(unsigned int, unsigned long);
-extern int func_00288FB8(int);
-extern void func_0027F538(int, int, long, signed char *, int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_0027EB88(int, int, int, int, int, int);
-extern void func_0027F120(void);
-extern void func_0027F110(void);
-extern void func_0027C660(void);
-extern void func_00280200(TextBox_002D99E8 *, int, signed char *, int);
-extern void func_002D9CF8(int, int, int);
+extern int g_map_overlay_state[];
+extern void SetupGifPaging(int);
+extern int menu_list_active_entries(int *, int *, int *, int);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern int GetLocalizedString(int);
+extern void text_draw_small(int, int, long, signed char *, int);
+extern void *memset(void *, int, unsigned int);
+extern void gfx_draw_rounded_box(int, int, int, int, int, int);
+extern void gfx_disable_screen_flag(void);
+extern void gfx_enable_screen_flag(void);
+extern void DoGifPaging(void);
+extern void text_draw_window_medium(TextBox_002D99E8 *, int, signed char *, int);
+extern void DrawMenuCheckBox(int, int, int);
 
-int func_002D99E8(Menu_002D99E8 *menu)
+int DrawMenuCheckList(Menu_002D99E8 *menu)
 {
     TextBox_002D99E8 draw, initial;
     int mask;
@@ -42,14 +42,14 @@ int func_002D99E8(Menu_002D99E8 *menu)
     x = 4;
     SetupGifPaging(0);
     list = (int *)0x70000000;
-    count = ListActiveMenuEntries(list, &mask, 0, 0);
+    count = menu_list_active_entries(list, &mask, 0, 0);
     VU1_addGSregister(0x42, 0x44);
     VU1_addGSregister(0x47, 0x10B);
     if (!D_001AB910) {
         x = menu->x;
         y = menu->y;
     }
-    DrawTextSmallFont(x, y, 0x80FFA888, (signed char *)GetLocalizedString(0x2DC5), -1);
+    text_draw_small(x, y, 0x80FFA888, (signed char *)GetLocalizedString(0x2DC5), -1);
     y += 20;
     memset(&initial, 0, 24);
     initial.bottom = menu->height;
@@ -59,25 +59,25 @@ int func_002D99E8(Menu_002D99E8 *menu)
     initial.left = x;
     draw = initial;
     if (D_001ABB28)
-        DrawRoundedBox(y, menu->height, x, menu->width, 64, 0x202020);
+        gfx_draw_rounded_box(y, menu->height, x, menu->width, 64, 0x202020);
     for (i = 0; i < count; i++) {
         iconX = x + 4;
         iconY = y + 10;
-        base = gMapOverlayState;
+        base = g_map_overlay_state;
         selected = menu->selected[base[0x230 / 4]] == i;
         color = selected ? 0x8020FFFF : 0x80FFA888;
         if (selected)
-            DisableScreenFlag();
+            gfx_disable_screen_flag();
         limit = x + 16;
         draw.x = limit;
         draw.y = y - menu->scroll;
-        DrawTextWindowMediumFont(&draw, color, (signed char *)GetLocalizedString(list[i]), -1);
+        text_draw_window_medium(&draw, color, (signed char *)GetLocalizedString(list[i]), -1);
         if (selected) {
             if ((s16)draw.y < (limit = (s16)draw.top + 4))
                 menu->scroll -= 4;
             if ((s16)draw.bottom - (s16)draw.height - 4 < (s16)draw.y)
                 menu->scroll += 4;
-            EnableScreenFlag();
+            gfx_enable_screen_flag();
         }
         rows = (s16)draw.height / (s16)draw.line;
         if (rows == 2)

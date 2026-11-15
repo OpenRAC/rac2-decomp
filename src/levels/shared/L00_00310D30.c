@@ -35,11 +35,11 @@ typedef struct AnimationState310D30 {
     char pad30[8];
     unsigned char *currentData, *nextData;
 } AnimationState310D30;
-extern void func_L00_003110E8(AnimationState310D30 *, int, int, unsigned char *);
+extern void level_build_data_block(AnimationState310D30 *, int, int, unsigned char *);
 extern void func_002A1130(unsigned char *, unsigned int, unsigned char *, int);
-extern int func_0011AEA0(int);
+extern int FlushCache(int);
 extern void func_L00_00314D40(AnimationState310D30 *);
-void func_L00_00310D30(void *unused, AnimationState310D30 *state)
+void AdvanceAndDecodeAnimationFrames(void *unused, AnimationState310D30 *state)
 {
     unsigned int data;
     short duration;
@@ -80,7 +80,7 @@ void func_L00_00310D30(void *unused, AnimationState310D30 *state)
         }
     }
     if (state->currentPacked) {
-        BuildDataBlockFromTables(state, state->currentTrack, state->currentFrame, state->currentData);
+        level_build_data_block(state, state->currentTrack, state->currentFrame, state->currentData);
     } else {
         Track310D30 *track = state->model->tracks[state->currentTrack];
         if (track->extra == 0xff) {
@@ -93,7 +93,7 @@ void func_L00_00310D30(void *unused, AnimationState310D30 *state)
         }
     }
     if (state->nextPacked) {
-        BuildDataBlockFromTables(state, state->nextTrack, state->nextFrame, state->nextData);
+        level_build_data_block(state, state->nextTrack, state->nextFrame, state->nextData);
     } else {
         Track310D30 *track = state->model->tracks[state->nextTrack];
         if (track->extra == 0xff) {

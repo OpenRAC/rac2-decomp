@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void func_002A7750(unsigned char *, int, int);
-extern float func_00283B98(float, float);
-extern float func_00282DF0(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_0036AE00(int, int);
+extern void moby_set_state(unsigned char *, int, int);
+extern float FastAddRotations(float, float);
+extern float FastVecLength(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void gfx_setup_scale_record(int, int);
 
 extern int D_L07_001C9780 __attribute__((nosda));
 extern unsigned short **D_L07_001A9014;
@@ -18,7 +18,7 @@ typedef struct {
 } RotState;
 
 /* Slowly spins the linked groups of level pieces around their own centers. */
-void func_L07_00378898(unsigned char *moby)
+void UpdateRotatingTransformGroups(unsigned char *moby)
 {
     RotState *groupState = *(RotState **)(moby + 0x68);
     int i;
@@ -35,7 +35,7 @@ void func_L07_00378898(unsigned char *moby)
     switch (moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (D_L07_001C9780 != 0)
@@ -64,7 +64,7 @@ void func_L07_00378898(unsigned char *moby)
                 vec_scale_to_length(matrixEntry + 0x10, matrixEntry + 0x10, scale);
                 for (axisIndex2 = 0; axisIndex2 < 3; axisIndex2++)
                     *(float *)(matrixEntry + 0xC + axisIndex2 * 16) = savedPos[axisIndex2];
-                SetupScaleRecord(*matrixIndexPtr & 0x7FFF, 1);
+                gfx_setup_scale_record(*matrixIndexPtr & 0x7FFF, 1);
             }
         }
         break;

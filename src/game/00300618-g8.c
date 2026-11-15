@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern volatile unsigned int * volatile D_001B22A8;
+extern volatile unsigned int * volatile g_dma_packet_cursor;
 extern void *F00300910_D_001B22A8 __attribute__((sda));
 extern unsigned char D_001AD840 __attribute__((sda));
 
 /* Starts a new graphics packet chain and remembers where it begins. */
-void func_00300910(void)
+void gfx_begin_packet_chain(void)
 {
-    gDmaPacketCursor[0] = 0x30000003;
-    gDmaPacketCursor[1] = (unsigned int)&D_001AD840;
-    gDmaPacketCursor[2] = 0;
-    gDmaPacketCursor[3] = 0x50000003;
-    F00300910_D_001B22A8 = (void *)(gDmaPacketCursor + 4);
+    g_dma_packet_cursor[0] = 0x30000003;
+    g_dma_packet_cursor[1] = (unsigned int)&D_001AD840;
+    g_dma_packet_cursor[2] = 0;
+    g_dma_packet_cursor[3] = 0x50000003;
+    F00300910_D_001B22A8 = (void *)(g_dma_packet_cursor + 4);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -30,20 +30,20 @@ extern float D_001AE8E8_blk[] __asm__("D_001AE8E8") MACRO_ADDR;
 extern float D_001AE8F0_blk[] __asm__("D_001AE8F0") MACRO_ADDR;
 extern char D_001A8BD0[16] __attribute__((sda));
 extern u8 *D_001F0000[];
-extern s32 D_001B1688[4] __attribute__((sda));
+extern s32 g_game_time[4] __attribute__((sda));
 
-extern s32 func_002A77E0(s32);
-extern void *func_002C2210(char *, float, float, s32, s32, float, s32, s32, char *, s32);
-extern char *func_002C2FD8(char *, s32, s32, s32, s32, s32, s32, float);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, char *);
-extern float func_002A7878(float, float);
-extern s32 func_002A7820(s32, s32);
-extern s32 func_00283D38(s32, s32, float);
-extern void *func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
+extern s32 math_random_int_below(s32);
+extern void *part_spawn_ground_effect(char *, float, float, s32, s32, float, s32, s32, char *, s32);
+extern char *part_spawn_fading(char *, s32, s32, s32, s32, s32, s32, float);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, char *);
+extern float math_random_float_range(float, float);
+extern s32 math_random_int_range(s32, s32);
+extern s32 FastTweenColor(s32, s32, float);
+extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 
 /* Spawns the object's trail puff; when not suppressed and flag one of the resident word is set it also emits the tinted streak. */
-void func_00302848(char *obj, s32 quiet)
+void part_spawn_trail_puff(char *obj, s32 quiet)
 {
     V4_F302848 zero;
     V4_F302848 vec;
@@ -53,18 +53,18 @@ void func_00302848(char *obj, s32 quiet)
     s32 tint, color;
 
     qzero(&zero);
-    if (RandomIntBelow(D_001AE930) == 0)
-        SpawnGroundEffectParticle(obj + 0x10, D_001AE920[0], D_001AE920_blk[1], D_001AE92C, D_001AE900_blk[1], 0.0f, 2, RandomIntBelow(1) ? -D_001AE928 : D_001AE928, D_001A8BD0, 0);
+    if (math_random_int_below(D_001AE930) == 0)
+        part_spawn_ground_effect(obj + 0x10, D_001AE920[0], D_001AE920_blk[1], D_001AE92C, D_001AE900_blk[1], 0.0f, 2, math_random_int_below(1) ? -D_001AE928 : D_001AE928, D_001A8BD0, 0);
     pos = obj + 0x10;
-    puff = SpawnFadingParticle_002C2FD8(pos, D_001AE900, *(u8 *)(rec + 0x41), 0, 0, 2, 0, D_001AE8F0);
+    puff = part_spawn_fading(pos, D_001AE900, *(u8 *)(rec + 0x41), 0, 0, 2, 0, D_001AE8F0);
     if (puff != 0)
         puff[2] = *D_001F0000[0x98E];
-    if (quiet == 0 && (gGameTime[0] & 1)) {
-        RandomDirectionVector(&vec, 0.0f, 0.05f);
+    if (quiet == 0 && (g_game_time[0] & 1)) {
+        vec_random_direction(&vec, 0.0f, 0.05f);
         FastVecAdd(&vec, &vec, pos);
-        zero.f[2] = -(RandomFloatRange(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
-        tint = RandomIntRange(D_001AE900_blk[5], D_001AE900_blk[6]);
-        color = FastTweenColor(D_001AE900_blk[2], D_001AE900_blk[3], RandomFloatRange(0.0f, 1.0f));
-        SpawnHeroRelativeParticle(&vec, &zero, color, tint, RandomIntBelow(0xFF), 0, D_001AE8F0_blk[2]);
+        zero.f[2] = -(math_random_float_range(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
+        tint = math_random_int_range(D_001AE900_blk[5], D_001AE900_blk[6]);
+        color = FastTweenColor(D_001AE900_blk[2], D_001AE900_blk[3], math_random_float_range(0.0f, 1.0f));
+        part_spawn_hero_relative(&vec, &zero, color, tint, math_random_int_below(0xFF), 0, D_001AE8F0_blk[2]);
     }
 }

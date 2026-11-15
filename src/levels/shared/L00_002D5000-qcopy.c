@@ -6,13 +6,13 @@
 typedef int V4_F6a70b950 __attribute__((mode(TI)));
 #endif
 
-extern void func_0029FC20(char *, int, char *);
+extern void moby_transform_joint_point(char *, int, char *);
 
-extern void func_00283678(void *, void *);
+extern void copy_matrix3x4(void *, void *);
 
 extern void func_002A10E8(void *);
 
-extern void func_L00_002AA200(void *, void *, int, int, void *);
+extern void PackPose(void *, void *, int, int, void *);
 
 extern char ref_L00_002D5000_00[];
 
@@ -22,13 +22,13 @@ extern char ref_L00_002D5000_01[];
    record at +0x10, hands the record's +0xC0 and then the record itself to two more
    setters, queues one five-argument request and stamps four resident words. */
 /* Sets up a record from an object: copies its position, queues a level request and clears two fields. */
-void func_L00_002D5000(char *object, char *record)
+void level_init_record_from_object(char *object, char *record)
 {
     char block[0x40];
     V4_F6a70b950 *dst;
     V4_F6a70b950 *src;
 
-    TransformMobyJointPoint(object, 4, block);
+    moby_transform_joint_point(object, 4, block);
     dst = (V4_F6a70b950 *)(record + 0x10);
     src = (V4_F6a70b950 *)(block + 0x30);
     *dst = *src;

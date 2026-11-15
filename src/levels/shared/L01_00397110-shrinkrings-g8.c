@@ -1,5 +1,5 @@
 #include "common.h"
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
@@ -18,17 +18,17 @@ extern float D_L01_001AF620 __attribute__((sda));
 extern float D_L01_001AF5FC[] MACRO_ADDR;
 extern char D_00189F20[];
 extern float D_L01_001B1FA4;
-extern void func_00283658(void *,void *);
-extern long func_0027C878(int);
-extern void func_002AC9F8(void *,float);
-extern unsigned func_00283D38(unsigned,unsigned,float);
-extern void func_00282C90(void *);
-extern void func_002833F0(void *,void *);
-extern void func_L01_002E1510(void *,int,void *,int,void *);
+extern void copy_matrix_rotation(void *,void *);
+extern long GetEffectTextureDescriptor(int);
+extern void vec_clamp_length(void *,float);
+extern unsigned FastTweenColor(unsigned,unsigned,float);
+extern void vec_store_helper(void *);
+extern void euler_rotation_basis(void *,void *);
+extern void gfx_transform_and_draw_entries(void *,int,void *,int,void *);
 /* Draws the moby's fading ring: four quads, one per row, repeated 32 times around it by the
  * batched draw, fading and growing as the radius in its vars shrinks. Row 0 takes the first
  * colour and the others the second. Adapted from RAC1 draw_moby_radius_ring (GPL-3.0). */
-void func_L01_00398B50(char *moby)
+void DrawShrinkingMobyRings(char *moby)
 {
     RingQuad q[4];
     float mat[12];
@@ -58,7 +58,7 @@ void func_L01_00398B50(char *moby)
         FastVecSub(D_00189F20,moby+0x10,D_00189F20-0x80);
         g=D_00189F20-0x100;
         I(g,0x108)=0;
-        ClampVectorLength(D_00189F20,0.01666666753590107f);
+        vec_clamp_length(D_00189F20,0.01666666753590107f);
         shrink=F(vars,0x34);
         t=1.15f-shrink; if(t<0)t=0;
         {float fade=(0.2f-shrink)*5; if(fade<0)fade=0; D_L01_001B1FA4=fade;}
@@ -83,7 +83,7 @@ void func_L01_00398B50(char *moby)
             c=D_L01_001AF5F0[i!=0];
             q[i].c[k]=c;
             q[i].c[k]=FastTweenColor(c&0xffffff,c,alpha);
-            StoreVectorHelper(q[i].v[k]);
+            vec_store_helper(q[i].v[k]);
             row=(RingQuad *)q[0].v[k];
             {float radius=F(vars,0x34); if(i)radius+=0.01f; q[i].v[k][0]=radius;}
             if(k&1) {
@@ -106,5 +106,5 @@ void func_L01_00398B50(char *moby)
     }
     *(TI *)rot=0;rot[2]=0.19634954631328583f;
     euler_rotation_basis(transform,rot);
-    TransformAndDrawEntries(q,4,transform,32,mat);
+    gfx_transform_and_draw_entries(q,4,transform,32,mat);
 }

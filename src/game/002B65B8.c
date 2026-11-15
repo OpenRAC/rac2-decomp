@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
 
@@ -19,7 +20,7 @@ extern int D_001B1B40 MACRO_ADDR;
 extern int D_001B1B44 MACRO_ADDR;
 
 /* Looks up a moby class in the dispatch table and queues its update function in one of two lists. */
-void func_002B65B8(int classId, int noHeader)
+void moby_queue_class_update(int classId, int noHeader)
 {
     int i = 0;
 

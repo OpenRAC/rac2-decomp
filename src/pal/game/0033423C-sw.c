@@ -12,24 +12,24 @@ extern struct {
 extern int D_00138320;
 extern int ref_L24_003EFA38_00[] __attribute__((sda));
 extern int ref_L24_003EFA38_01[] __attribute__((sda));
-extern void func_0029FCC0(void *, int, void *);
-extern float func_003004B0(float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float game_get_override_value(float);
 extern void func_PAL_002FEF98(void *, void *, char *, float, float, float, float, char *);
 extern int func_PAL_002FF5F8(float *, float *, float *, float *, void *, void *, int *, float);
-extern void func_00334050(int, int);
-extern float func_00283CE0(int);
-extern void func_0026F760(void);
-extern void func_0026F768(void);
+extern void moby_set_entry_list_flag_byte(int, int);
+extern float IntToFloat(int);
+extern void stub_empty_11(void);
+extern void stub_empty_12(void);
 extern char *func_PAL_0032B4A8(int, void *, void *);
 extern char *func_PAL_00329D88(int, void *, void *);
-extern int func_00282948(void *);
-extern float func_00282DF0(void *);
-extern float func_002A7878(float, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002B0910(int, int, int, int);
-extern void func_00290010(int, int, int, float);
-extern void func_0027CFD0(void *, void *);
+extern int math_fast_float_d(void *);
+extern float FastVecLength(void *);
+extern float math_random_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int gfx_blend_colors_by_cycle(int, int, int, int);
+extern void gauge_popup_show(int, int, int, float);
+extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_PAL_00335D10(char *);
 typedef struct TargetClass {
     char pad0[0x46];
@@ -79,9 +79,9 @@ void func_PAL_00335758(Target *obj)
     int a, b;
 
     pos = v->position;
-    func_0029FCC0(obj, 0, pos);
-    distance = func_003004B0(4.5f);
-    if (D_00189E20.planet == 29) {
+    moby_transform_joint_to_world(obj, 0, pos);
+    distance = game_get_override_value(4.5f);
+    if (g_hero_state.planet == 29) {
         distance += 6.5f;
     }
     v->hit = 0;
@@ -94,10 +94,10 @@ void func_PAL_00335758(Target *obj)
             TargetVars *target = hit->vars;
             target->maximum = 25;
             if (v->hit->slot != 255) {
-                func_00334050(v->hit->slot, 25);
+                moby_set_entry_list_flag_byte(v->hit->slot, 25);
             }
-            ratio = func_00283CE0(v->hit->progress);
-            ratio /= func_00283CE0(target->maximum);
+            ratio = IntToFloat(v->hit->progress);
+            ratio /= IntToFloat(target->maximum);
             v->fraction = ratio;
             if (target->reverse) {
                 v->fraction = 1.0f - ratio;
@@ -121,15 +121,15 @@ void func_PAL_00335758(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & D_00189E20.input) && v->hit && v->valid && !v->disabled) {
-            func_0026F760();
+        if ((D_00138320 & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+            stub_empty_11();
             obj->state = 3;
             if (!v->reverse) {
                 func_PAL_0032B4A8((int)obj, v->position, dir);
             } else {
                 func_PAL_00329D88((int)obj, v->position, dir);
             }
-            func_002E5DA0(1, 0, (char *)obj, 0xFB0);
+            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 12;
             } else {
@@ -138,22 +138,22 @@ void func_PAL_00335758(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & D_00189E20.input) || !v->hit || !v->valid || v->disabled) {
-            func_0026F768();
+        if (!(D_00138320 & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+            stub_empty_12();
             obj->state = 2;
-        } else if (func_00282948(&v->countdown)) {
+        } else if (math_fast_float_d(&v->countdown)) {
             qcopy(spread, dir);
-            length = func_00282DF0(spread);
-            spread[0] += func_002A7878(-0.005f, 0.005f);
-            spread[1] += func_002A7878(-0.005f, 0.005f);
-            spread[2] += func_002A7878(-0.005f, 0.005f);
-            func_00282F20(spread, spread, length);
+            length = FastVecLength(spread);
+            spread[0] += math_random_float_range(-0.005f, 0.005f);
+            spread[1] += math_random_float_range(-0.005f, 0.005f);
+            spread[2] += math_random_float_range(-0.005f, 0.005f);
+            vec_scale_to_length(spread, spread, length);
             if (!v->reverse) {
                 func_PAL_0032B4A8((int)obj, v->position, spread);
             } else {
                 func_PAL_00329D88((int)obj, v->position, spread);
             }
-            func_002E5DA0(1, 0, (char *)obj, 0xFB0);
+            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 12;
             } else {
@@ -165,7 +165,7 @@ void func_PAL_00335758(Target *obj)
         break;
     }
 
-    if (D_00189E20.mode == 3) {
+    if (g_hero_state.mode == 3) {
         obj->state = 4;
         v->fade -= 0.02f;
     } else {
@@ -191,10 +191,10 @@ void func_PAL_00335758(Target *obj)
         v->smoothed = v->fraction;
     }
 
-    a = func_002B0910(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
-    b = func_002B0910(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
+    a = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
+    b = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
     if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
-        func_00290010(0, a, b, v->smoothed);
+        gauge_popup_show(0, a, b, v->smoothed);
     }
-    func_0027CFD0(func_PAL_00335D10, obj);
+    gfx_register_overlay_draw_callback(func_PAL_00335D10, obj);
 }

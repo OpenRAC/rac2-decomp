@@ -1,8 +1,9 @@
+#include "names.h"
 /* func_US2_L00_0043A4B8, the USA v2.00 copy of func_L00_00438EB0: the same C. */
 
-void* func_L00_00433AA0(void* param_1);
+void* menu_init_two_sub_objects(void* param_1);
 
-extern void func_00343058(unsigned char *owner);
+extern void menu_list_clear_state(unsigned char *owner);
 
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
@@ -10,7 +11,7 @@ extern void func_00343058(unsigned char *owner);
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
 /* Initialize the owner subviews at 8 and 0x 2B 0, then return the supplied owner pointer. */
-void* func_L00_00433AA0(void* param_1);
+void* menu_init_two_sub_objects(void* param_1);
 
 /* Visits both sub-objects, then hands back the same pointer. */
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */
@@ -23,7 +24,7 @@ void* func_L00_00433AA0(void* param_1);
 /* Invoke the measured cleanup helper on the owner subview at 0x 298. */
 void func_US2_L00_0043A4B8(unsigned char *owner)
 {
-    func_00343058(owner + 0x2c8);
+    menu_list_clear_state(owner + 0x2c8);
 }
 
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */

@@ -54,9 +54,9 @@ extern u8 D_0018A0E0[];
 
 extern void func_00282F20_6(u8 *buffer, u8 *table, f32 parameter);
 
-extern void func_L00_002D3BD8(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void cam_set_view_space_vector_length(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
 
-extern void func_L00_002D3B58(FamilyC94396F4Vector_Fc94396f4 *destination,
+extern void cam_set_view_space_height(FamilyC94396F4Vector_Fc94396f4 *destination,
                     FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
 
 extern void func_00282CC0_16(FamilyC94396F4Vector_Fc94396f4 *destination,
@@ -76,7 +76,7 @@ extern char D_00189E20_6[];
 typedef float Rac2Native_5fc519c90e0e763a_f32;
 
 /* resident mode predicate: returns 0, 1 or 2 from the resident state words */
-s32 func_L00_002D3400(void) {
+s32 hero_get_movement_mode(void) {
     s32 result = D_00189E20_8.field348;
     if (D_L00_001A8FF0 != 0 && D_L00_001A8FF4_1 == 0) result = 2;
     if (D_L00_001A8FF4_1 != 0 || D_00189E20_8.field2294 == 59 ||
@@ -89,7 +89,7 @@ s32 func_L00_002D3400(void) {
 }
 
 /* Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence. */
-void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
+void hero_apply_mode_transform(FamilyC94396F4Vector_Fc94396f4 *destination,
                                       FamilyC94396F4Vector_Fc94396f4 *source,
                                       f32 parameter)
 {
@@ -102,8 +102,8 @@ void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
         return;
     case 1:
         func_00282F20_6(first, (u8 *)&D_00189E20_15 + 672, -parameter);
-        SetViewSpaceVectorLength(second, source, 0.0f);
-        SetViewSpaceHeight(destination, destination, 0.0f);
+        cam_set_view_space_vector_length(second, source, 0.0f);
+        cam_set_view_space_height(destination, destination, 0.0f);
         func_00282CC0_16(destination, destination, second);
         func_00282CC0_16(destination, destination, first);
         return;
@@ -113,8 +113,8 @@ void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
         } else {
             func_00282F20_6(first, D_0018A0E0, parameter);
         }
-        SetViewSpaceVectorLength(second, source, 0.0f);
-        SetViewSpaceHeight(destination, destination, 0.0f);
+        cam_set_view_space_vector_length(second, source, 0.0f);
+        cam_set_view_space_height(destination, destination, 0.0f);
         func_00282CC0_16(destination, destination, second);
         func_00282CC0_16(destination, destination, first);
         return;
@@ -124,7 +124,7 @@ void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
 }
 
 /* Fills a three-float record from two helper results scaled by a factor and a third float argument, then runs a setup routine on the record with a bound data root and, when the flag argument is non-zero, a second routine with that root plus 128. */
-void func_L00_002D3638(float *p, int flag, float scale, float value, float height)
+void hero_build_relative_offset(float *p, int flag, float scale, float value, float height)
 {
     p[0] = func_00283180_1(value) * scale;
     p[1] = func_00283198_1(value) * scale;
@@ -141,7 +141,7 @@ extern void func_2EE5D8(void *p, void *q, char *data);
 extern void func_2EE108(void *p, void *q, char *data);
 
 /* Runs the record setup on the three-float destination, fills it from the three float arguments, then binds it to the resident root and, when the flag argument is non-zero, to that root plus 128. */
-void func_L00_002D36E0(float *p, int flag, float x, float y, float z)
+void hero_build_relative_point(float *p, int flag, float x, float y, float z)
 {
     func_2EE0D0(p);
     p[0] = x;
@@ -153,8 +153,8 @@ void func_L00_002D36E0(float *p, int flag, float x, float y, float z)
 }
 
 /* Applies the shared destination/source transform with the opposite amount. */
-void func_L00_002D3778(FamilyC94396F4Vector_Fc94396f4 *destination,
+void hero_apply_mode_transform_reversed(FamilyC94396F4Vector_Fc94396f4 *destination,
                       FamilyC94396F4Vector_Fc94396f4 *source,
                       f32 amount) {
-    ApplyHeroModeTransform(destination, source, -amount);
+    hero_apply_mode_transform(destination, source, -amount);
 }

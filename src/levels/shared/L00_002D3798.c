@@ -43,26 +43,26 @@ typedef struct {
     unsigned char f22b5;
 } Hero4140;
 extern Hero4140 D_00189E20_4140;
-extern void func_00283CE0(int);
+extern void IntToFloat(int);
 typedef struct {
     unsigned char pad0[60];
     int flags;
 } PlatformObject;
-extern PlatformObject *func_002AD0B0(int);
-extern float func_00282DF0(void *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002AD0E0(int, int, void *, void *, void *, void *);
-extern int func_002AD5F8(int, int, void *, void *, void *, void *);
-extern int func_002AD470(int, int, void *, void *, void *, void *);
-extern void func_00282C88(void *);
-extern float func_00282E20(void *);
-extern void func_002AA2E8(float *, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
+extern PlatformObject *moby_get_private_value_2(int);
+extern float FastVecLength(void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int moby_transform_point_and_rotation_by_parent(int, int, void *, void *, void *, void *);
+extern int moby_get_attachment_rotation_angles(int, int, void *, void *, void *, void *);
+extern int coll_apply_push_to_object(int, int, void *, void *, void *, void *);
+extern void vec_clear_128(void *);
+extern float vec_length_xy(void *);
+extern void ApproachValue(float *, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
 
 #ifndef RAC2_T_V4_F6A70B950
 #define RAC2_T_V4_F6A70B950
@@ -125,7 +125,7 @@ extern void func_002830C0_1(char *dst, char *src, char *extra);
 
 extern unsigned char D_00189E20_18[];
 
-extern void func_00282F70(char *a, int b, float f);
+extern void vec_fast_normalize_helper(char *a, int b, float f);
 
 extern void func_002830C0_5(char *a, char *b, char *c);
 
@@ -174,11 +174,11 @@ extern float func_00283198_3(float);
 
 extern int func_00283D38_1(int, int, float);
 
-extern void func_L00_00326048(int, float *, int, int, float);
+extern void math_store_angle_update_result(int, float *, int, int, float);
 
 /* Dispatches on one byte of a fixed global table: when it is zero it copies a 16-byte block from the second argument to the first and then accumulates two table-derived floats, each scaled by the third argument, into the first two words of that block; when it is 1 or 2 it builds a 16-byte vector from two table-derived values and a zero, fills two 64-byte matrices through helper routines, composes them into a vector and passes that vector with the two pointers to a closing routine. */
 /* Moves a point sideways, by the distance given, relative to the current camera or view mode. */
-void func_L00_002D3798(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
+void cam_offset_point_by_side_direction(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
 {
     char *heroBase = D_00189E20_19;
     unsigned char viewMode;
@@ -211,7 +211,7 @@ void func_L00_002D3798(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
 
 /* Reads a byte state from a global root; when zero it copies a 16-byte vector and adds a float to its third element, otherwise (state 1 or 2) it builds a 4x4 matrix from a global object and transforms a vector by it. */
 /* Offsets a point by the given amount along the view height direction, turned by the current view mode. */
-void func_L00_002D38A0(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float amount)
+void cam_offset_point_in_view_space(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float amount)
 {
     char *heroBase = D_00189E20_33;
     unsigned char modeByte = heroBase[8899];
@@ -237,7 +237,7 @@ void func_L00_002D38A0(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float amount)
 
 /* switches on a state byte in a shared table: copies 16 bytes and clears the third word, or computes a dot product that scales a vector and subtracts it into the destination */
 /* Flattens a vector against the current view mode, removing the part that points along the view direction. */
-void func_L00_002D3960(char *dst, char *src)
+void cam_project_vector_onto_view_plane(char *dst, char *src)
 {
     char projected[16];
     char *heroBase;
@@ -265,7 +265,7 @@ void func_L00_002D3960(char *dst, char *src)
 
 /* Reads one byte and one pointer from a shared global; returns a callee float when the byte is zero, returns 0.0f when the byte is outside 0..2, otherwise fills three stack locals through three callees and returns the last callee float. */
 /* Returns the length of a vector after turning it into the current view mode space. */
-float func_L00_002D3A58(char *vec)
+float cam_get_view_space_vector_length(char *vec)
 {
     char matrix[64];
     char inverse[64];
@@ -285,10 +285,10 @@ float func_L00_002D3A58(char *vec)
     return func_00282E20_1(result);
 }
 
-extern void func_00283098(void *a, void *b, void *c);
+extern void matrix_mul_vec3(void *a, void *b, void *c);
 
 /* Returns the height part of a vector after turning it into the current view mode space. */
-float func_L00_002D3B00(char *in)
+float cam_get_view_space_height(char *in)
 {
     char *heroBase = (char *)&D_00189E20_11;
     int viewMode = *(unsigned char *)(heroBase + 8899);
@@ -304,10 +304,10 @@ float func_L00_002D3B00(char *in)
     return rotated[2];
 }
 
-extern void func_002830C0(void *a, void *b, void *c);
+extern void transform_vector(void *a, void *b, void *c);
 
 /* Copies a vector into view space, sets its height to the given value, and turns it back. */
-void func_L00_002D3B58(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
+void cam_set_view_space_height(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
 {
     char *heroBase = (char *)&D_00189E20_11;
     int viewMode = *(unsigned char *)(heroBase + 8899);
@@ -328,7 +328,7 @@ void func_L00_002D3B58(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
 
 /* reads a mode byte from a global block; when zero it forwards the arguments to one helper, otherwise it range-checks the byte and drives two helpers with the object and block pointers */
 /* Sets a vector to a given length in view space, then turns it back to world space. */
-void func_L00_002D3BD8(char *vec, int source, float length)
+void cam_set_view_space_vector_length(char *vec, int source, float length)
 {
     unsigned char *heroBase = D_00189E20_18;
     float savedLength;
@@ -337,7 +337,7 @@ void func_L00_002D3BD8(char *vec, int source, float length)
     savedLength = length;
     viewMode = heroBase[8899];
     if (viewMode == 0) {
-        FastVectorNormalizeHelper(vec, source, length);
+        vec_fast_normalize_helper(vec, source, length);
         return;
     }
     if (viewMode < 0)
@@ -345,13 +345,13 @@ void func_L00_002D3BD8(char *vec, int source, float length)
     if (viewMode >= 3)
         return;
     func_002830C0_5(vec, source, (char *)heroBase + 64);
-    FastVectorNormalizeHelper(vec, vec, savedLength);
+    vec_fast_normalize_helper(vec, vec, savedLength);
     func_002830C0_5(vec, vec, (char *)heroBase);
 }
 
 /* Flag-gated record update: copies 16 bytes src->dst and scales dst+8 by k when a byte flag is zero, otherwise runs two helper calls with DATA0+64 and DATA0 offsets and scales the same field between them. */
 /* Scales the height part of a vector in view space, then turns it back to world space. */
-void func_L00_002D3C68(char *dst, char *src, float k)
+void cam_scale_view_space_height(char *dst, char *src, float k)
 {
     char *heroBase = D_00189E20_31;
     int viewMode = *(unsigned char *)(heroBase + 8899);
@@ -372,7 +372,7 @@ void func_L00_002D3C68(char *dst, char *src, float k)
 
 /* dispatches on one byte of a global table with a three-case switch: case 0 scales two floats of the destination by the incoming scale, cases 1 and 2 first run a helper over the destination with a table at +64, scale the same two floats and then run a second helper with the destination as both source and destination */
 /* Scales the sideways parts of a vector in view space, then turns it back to world space. */
-void func_L00_002D3CF8(float *dst, void *src, float scale)
+void cam_scale_view_space_sideways(float *dst, void *src, float scale)
 {
     char *heroBase = D_00189E20_32;
     int viewMode = *(unsigned char *)(heroBase + 8899);
@@ -407,14 +407,14 @@ typedef struct {
 
 extern unsigned char D_L00_00139568[];
 
-extern Entry_262570 D_L00_00262570[];
+extern Entry_262570 g_weapon_l00_table[];
 
 extern int D_L00_00139688[];
 
 extern int D_0018B068;
 
 /* Spends the given amount of ammo for a weapon slot if there is enough. Returns 1 on success and 0 if there is not enough. */
-int func_L00_002D3F30(int slotIndex, int cost)
+int weapon_spend_ammo(int slotIndex, int cost)
 {
     int slot = slotIndex;
     unsigned char typeIndex;
@@ -425,7 +425,7 @@ int func_L00_002D3F30(int slotIndex, int cost)
         slot = D_0018B068;
     typeIndex = D_L00_00139568[slot];
 
-    entry = &gWeaponTable_L00[typeIndex];
+    entry = &g_weapon_l00_table[typeIndex];
     if (entry->f8E == 0)
         return 1;
     current = D_L00_00139688[slot];
@@ -441,7 +441,7 @@ int func_L00_002D3F30(int slotIndex, int cost)
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
 /* Returns its argument unchanged. */
-unsigned long func_L00_002D3FB0(unsigned long param_1)
+unsigned long math_l00_return_argument_2(unsigned long param_1)
 {
   return param_1;
 }
@@ -458,14 +458,14 @@ typedef struct {
 } Entry_262570;
 #endif
 
-extern Entry_262570 D_L00_00262570[];
+extern Entry_262570 g_weapon_l00_table[];
 
 extern int D_L00_00139688[];
 
 extern int D_0018B068;
 
 /* Returns how much ammo a weapon slot has, or 1 if that weapon has no ammo limit. */
-int func_L00_002D4040(int slotIndex)
+int get_ammo(int slotIndex)
 {
     int slot = slotIndex;
     unsigned char typeIndex;
@@ -475,16 +475,16 @@ int func_L00_002D4040(int slotIndex)
         slot = D_0018B068;
     typeIndex = D_L00_00139568[slot];
 
-    entry = &gWeaponTable_L00[typeIndex];
+    entry = &g_weapon_l00_table[typeIndex];
     if (entry->f8E == 0)
         return 1;
     return D_L00_00139688[slot];
 }
 
-extern void func_L00_002C42E0(int, int);
+extern void hero_l00_set_action(int, int);
 
 /* Stores a target, a mode and a time on the hero, and starts hero state 98 unless the hero is already in states 98 to 100. */
-void func_L00_002D40A0(V4_F6a70b950 *vec, int mode, float time)
+void hero_start_target_state(V4_F6a70b950 *vec, int mode, float time)
 {
     char *heroBase = (char *)&D_00189E20_11 + 0x18A0;
     int heroState;
@@ -496,13 +496,13 @@ void func_L00_002D40A0(V4_F6a70b950 *vec, int mode, float time)
     *(int *)(heroBase + 0x18B0) = mode;
     *(float *)(heroBase + 0x18AC) = time;
     if ((unsigned)(heroState - 98) >= 3)
-        SetHeroAction_L00(98, 2);
+        hero_l00_set_action(98, 2);
 }
 
 extern int D_0018C0B4;
 
 /* Returns 1 or 2 depending on which of hero states 98 to 100 is running, otherwise 0. */
-int func_L00_002D40F0(void)
+int hero_get_target_state_kind(void)
 {
     switch (D_0018C0B4) {
     case 98:
@@ -519,7 +519,7 @@ int func_L00_002D40F0(void)
  * rotation and the displacement retained while the hero leaves the platform.
  * Counterpart: RAC1 update_hero_attachment in hero_mapped_animations.c.
  */
-void func_L00_002D4140(void)
+void UpdateHeroAttachment(void)
 {
     float local_pos[4], local_rot[4], delta[4], next[4];
     float hero_pos[4], hero_rot[4], anchor_pos[4], anchor_rot[4], anchor2_pos[4], anchor2_rot[4];
@@ -559,7 +559,7 @@ void func_L00_002D4140(void)
 
     if (!mode)
         return;
-    object = GetMobyPrivateValue2(D_00189E20_4140.platform);
+    object = moby_get_private_value_2(D_00189E20_4140.platform);
     if (!object)
         return;
 
@@ -570,27 +570,27 @@ void func_L00_002D4140(void)
         if (((D_00189E20_4140.platform_flags ^ 1) & 1)) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
                 qcopy(delta, &D_00189E20_4140.ledge_offset);
-                delta[0] += FastSinOrCosA(FastAddRotations(D_00189E20_4140.ledge_angle,
+                delta[0] += math_fast_sin_or_cos_a(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
-                delta[1] += FastSinOrCosB(FastAddRotations(D_00189E20_4140.ledge_angle,
+                delta[1] += math_fast_sin_or_cos_b(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
                 delta[2] -= -1.43f;
-                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, next, hero_pos);
-                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, delta, hero_pos);
-                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, &D_00189E20_4140.f350,
                         hero_pos);
-                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, &D_00189E20_4140.f370, hero_pos);
             } else if (object->flags & 4) {
-                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, &D_00189E20_4140.f350, delta);
             } else {
-                TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, next, hero_pos);
-                GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
                         &D_00189E20_4140.f350, delta);
             }
             D_00189E20_4140.platform_flags |= 1;
@@ -601,7 +601,7 @@ void func_L00_002D4140(void)
     if ((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) && D_00189E20_4140.f1a4 == 0.0f &&
         D_00189E20_4140.platform_timer == 0) {
         if (!(D_00189E20_4140.platform_flags & 2)) {
-            GetAttachmentRotationAngles(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, delta, &D_00189E20_4140.f360);
             D_00189E20_4140.platform_flags |= 2;
         }
@@ -610,8 +610,8 @@ void func_L00_002D4140(void)
 
     if (D_00189E20_4140.platform_flags & 3)
         mode = 2;
-    ClearVector128(delta);
-    ClearVector128(next);
+    vec_clear_128(delta);
+    vec_clear_128(next);
 
     if (blend != 0.0f) {
         int flags;
@@ -628,10 +628,10 @@ void func_L00_002D4140(void)
             rate *= 0.00027777778f;
             ApproachValue(&height, 0.0f, blend * 0.0069444445f);
             ApproachValue(&length, 0.0f, rate * blend);
-            FastVectorNormalizeHelper((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
+            vec_fast_normalize_helper((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
             delta[2] = height;
         } else if (D_00189E20_4140.platform) {
-            TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, local_pos, local_rot);
             if (D_00189E20_4140.f226 == 0)
                 D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
@@ -641,18 +641,18 @@ void func_L00_002D4140(void)
             qcopy(delta, &D_00189E20_4140.platform_delta);
         qcopy(next, delta);
     } else if (mode == 1) {
-        TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, local_pos, local_rot);
         if (D_00189E20_4140.f226 == 0)
             D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
         FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
         qcopy(&D_00189E20_4140.platform_delta, delta);
     } else if (mode == 2) {
-        TransformPointAndRotationByParent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, hero_pos, hero_rot);
-        ApplyCollisionPushToObject(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
+        coll_apply_push_to_object(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
                 &D_00189E20_4140.f360, anchor_pos, anchor_rot);
-        ApplyCollisionPushToObject(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
+        coll_apply_push_to_object(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
                 &D_00189E20_4140.f360, anchor2_pos, anchor2_rot);
         if (D_00189E20_4140.f226 == 0) {
             if ((D_00189E20_4140.state == 1 || D_00189E20_4140.state == 29) &&
@@ -664,14 +664,14 @@ void func_L00_002D4140(void)
         }
         if (D_00189E20_4140.platform_flags & 1) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
-                offset[0] = FastSinOrCosA(D_00189E20_4140.ledge_angle) * 0.45f;
-                offset[1] = FastSinOrCosB(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[0] = math_fast_sin_or_cos_a(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[1] = math_fast_sin_or_cos_b(D_00189E20_4140.ledge_angle) * 0.45f;
                 offset[2] = 0;
                 FastVecAdd(offset, offset, anchor2_pos);
                 offset[2] += -1.43f;
                 FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
                 qcopy(&D_00189E20_4140.ledge_offset, offset);
-                D_00189E20_4140.ledge_angle = FastMatrixHelperA(anchor_pos[0] - anchor2_pos[0],
+                D_00189E20_4140.ledge_angle = mat_fast_helper_a(anchor_pos[0] - anchor2_pos[0],
                         anchor_pos[1] - anchor2_pos[1]);
             } else {
                 float distance;
@@ -679,10 +679,10 @@ void func_L00_002D4140(void)
                 FastVecSub(delta, anchor_pos, &D_00189E20_4140.pos);
                 distance = FastVecLength(delta);
                 if (distance < 0.0001f) {
-                    ClearVector128(delta);
+                    vec_clear_128(delta);
                     qcopy(&D_00189E20_4140.pos, anchor_pos);
                 } else if (distance > 2.0f) {
-                    ClearVector128(delta);
+                    vec_clear_128(delta);
                     D_00189E20_4140.platform_flags &= ~2;
                     D_00189E20_4140.platform_flags &= ~1;
                 }
@@ -706,7 +706,7 @@ void func_L00_002D4140(void)
 extern int func_003425F8(int, float, char *, char *);
 
 /* Runs a check on the hero and, if it succeeds, sets a hero field to 4. */
-void func_L00_002D49F0(void)
+void hero_check_timed_condition(void)
 {
     char *heroBase = (char *)&D_00189E20_11;
 
@@ -718,7 +718,7 @@ void func_L00_002D49F0(void)
 extern int ref_L00_002D4A38_00 __attribute__((sda));
 
 /* Fades the colors of the level glow objects back and forth over time. */
-void func_L00_002D4A38(void)
+void level_fade_glow_colors(void)
 {
     Node_F882f1178 *node;
 
@@ -752,10 +752,10 @@ void func_L00_002D4A38(void)
     }
     if (D_00189E20_11.p1368 != 0) {
         if (D_L00_001A8F00 == 2)
-            StoreAngleUpdateResult((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
+            math_store_angle_update_result((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.026179943233728409f);
         else
-            StoreAngleUpdateResult((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
+            math_store_angle_update_result((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.040724355727434158f);
     }
 }
@@ -764,15 +764,15 @@ void func_L00_002D4A38(void)
 
 
 extern char D_00189E20_4D98[];
-extern char *func_0029EFD0(int);
-extern void func_L00_002AA178(char *);
-extern void func_L00_002B0968(char *);
+extern char *CreateMoby(int);
+extern void part_spawn_effect_from_record(char *);
+extern void update_hero_item_mobys(char *);
 
 /* One-shot spawn: arms the state word, and when the slot is free asks the allocator for a
    0x50A object, writes its flags, the packed constant at +0x38 and the level's tag, then runs
    the two level entry points on the argument. */
 /* Creates the glow object for the level effect if it does not exist yet, then runs the two level update steps. */
-void func_L00_002D4D98(char *object) {
+void level_spawn_glow_object(char *object) {
     char *heroBase = D_00189E20_4D98;
     char *glowObject;
 
@@ -794,7 +794,7 @@ void func_L00_002D4D98(char *object) {
             *(int *)(heroBase + 0x12E4) = 2;
         }
     }
-    SpawnEffectFromRecord(object);
+    part_spawn_effect_from_record(object);
     update_hero_item_mobys(object);
 }
 
@@ -819,7 +819,7 @@ extern int D_001A7A0C __attribute__((sda));
    live at the exit, which keeps the load of D_001A7A0C out of the exit branch's delay slot
    (a void function gives that slot to the load, as a $gp access). */
 /* Adds up table entries until the running total passes a limit. Reports the totals through the three pointers. */
-int func_L00_002D5E30(int *lastSumOut, int *totalOut, int *bonusOut) {
+int math_sum_table_entries_under_limit(int *lastSumOut, int *totalOut, int *bonusOut) {
     int sum = 0;
     int i = 0;
     short *second = &D_L00_00262260[1];
@@ -834,11 +834,11 @@ int func_L00_002D5E30(int *lastSumOut, int *totalOut, int *bonusOut) {
 }
 
 extern int D_001A7908 __attribute__((sda));
-extern char *D_L00_001B8E10;
-extern unsigned char D_00189E20[];
+extern char *g_follow_camera_object;
+extern unsigned char g_hero_state[];
 
 /* Returns 1 when a hero action is allowed right now. Returns 0 in several special modes and hero states. */
-int func_L00_002D6418(void)
+int hero_is_action_allowed(void)
 {
     int value;
 
@@ -847,12 +847,12 @@ int func_L00_002D6418(void)
     value = D_L00_001A8F00;
     if (value == 2 || value == 6)
         return 0;
-    if (gFollowCameraObject != 0 && *(short *)(gFollowCameraObject + 0x86) == 5)
+    if (g_follow_camera_object != 0 && *(short *)(g_follow_camera_object + 0x86) == 5)
         return 0;
-    if (gHeroState[0x22B4] != 0 || *(int *)(gHeroState + 0x229C) == 0x14 ||
-        *(int *)(gHeroState + 0x24CC) == 0)
+    if (g_hero_state[0x22B4] != 0 || *(int *)(g_hero_state + 0x229C) == 0x14 ||
+        *(int *)(g_hero_state + 0x24CC) == 0)
         return 0;
-    value = *(int *)(gHeroState + 0x2294);
+    value = *(int *)(g_hero_state + 0x2294);
     if (value == 0x6F || value == 0x31 || value == 0x1C || value == 0x8C)
         return 0;
     return 1;

@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
-extern void func_00282CC0(void *, const void *, const void *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_L00_002EBE88(void *, int, int, int, unsigned int, unsigned int, float, float, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void DrawTwoLayerPolylineRibbon(void *, int, int, int, unsigned int, unsigned int, float, float, float);
 extern short D_L00_001B2990[5] MACRO_ADDR;
 extern short D_L00_001B29A0[5] MACRO_ADDR;
 extern short D_L00_001B29B0[5] MACRO_ADDR;
@@ -17,7 +17,7 @@ extern unsigned int D_L00_001AFF20 __attribute__((sda));
 extern unsigned int D_L00_001AFF24 __attribute__((sda));
 
 /* Moves five electric ribbons to follow their owner and fades them out over time, then draws them. */
-void func_L00_003C48D0(unsigned char *object) {
+void electric_ribbons_update(unsigned char *object) {
     Vector origin;
     Vector differences[10];
     int i, j, k, alphaValue;

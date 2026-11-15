@@ -3,9 +3,9 @@
 /* A cleared velocity vector is adjusted and copied before the three emissions. */
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float v[4]; } Vector;
-extern float func_002A7878(float low, float high);
-extern void func_0029FCC0(char *object, int joint, void *out);
-extern void func_L00_0033C0D0(char *object, void *position, void *velocity, void *parameters, int mode);
+extern float math_random_float_range(float low, float high);
+extern void moby_transform_joint_to_world(char *object, int joint, void *out);
+extern void part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
 extern char D_L00_001B02E8 __attribute__((sda));
 extern char D_L00_001B02F8 __attribute__((sda));
 extern char D_L00_001B0308 __attribute__((sda));
@@ -14,16 +14,16 @@ extern char ref_L00_003EC078_00 __attribute__((sda));
 extern char ref_L00_003EC078_01 __attribute__((sda));
 extern char ref_L00_003EC078_02 __attribute__((sda));
 /* Shoots out three small downward puffs from the object when it is visible. */
-void func_L00_003EC078(char *object)
+void synthenoid_emit_exhaust(char *object)
 {
     Vector position, velocity, temporary;
     if (*(unsigned char *)(object + 0x31) != 0) {
         temporary.q = 0;
-        temporary.v[2] = -(RandomFloatRange(1.0f, 2.0f) * 0.016666668f);
+        temporary.v[2] = -(math_random_float_range(1.0f, 2.0f) * 0.016666668f);
         velocity.q = temporary.q;
-        TransformMobyJointToWorld(object, 0, &position);
-        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_00, 1);
-        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_01, 1);
-        SpawnObjectRelativeParticle(object, &position, &velocity, &ref_L00_003EC078_02, 1);
+        moby_transform_joint_to_world(object, 0, &position);
+        part_spawn_object_relative_particle(object, &position, &velocity, &ref_L00_003EC078_00, 1);
+        part_spawn_object_relative_particle(object, &position, &velocity, &ref_L00_003EC078_01, 1);
+        part_spawn_object_relative_particle(object, &position, &velocity, &ref_L00_003EC078_02, 1);
     }
 }

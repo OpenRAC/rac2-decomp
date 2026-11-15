@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002AFFD8(char *a0, void *a1, int a2);
-extern void func_00282D30(void *a0, void *a1, float f12);
+extern void cam_compute_view_direction(char *a0, void *a1, int a2);
+extern void FastVecScale(void *a0, void *a1, float f12);
 extern void func_PAL_L00_00416DC8(char *a0);
 extern char ref_L00_004117B8_00[];
 
@@ -23,9 +23,9 @@ void func_PAL_L00_00416638(char *a0)
     for (i = 0x1D; i >= 0; i--) {
         if (*(char **)(s0 + 0x18) != 0) {
             p = *(char **)(s0 + 0x18);
-            func_002AFFD8(p + 0x10, buf, 1);
+            cam_compute_view_direction(p + 0x10, buf, 1);
             p = *(char **)(s0 + 0x18);
-            func_00282D30(buf, buf, *(float *)(p + 0xC) * 0.0008300250046886504f);
+            FastVecScale(buf, buf, *(float *)(p + 0xC) * 0.0008300250046886504f);
             p = *(char **)(s0 + 0x18);
             buf[0] += *(float *)(p + 0) * 0.0009764999849721789f;
             buf[1] += *(float *)(p + 4) * 0.0009764999849721789f;

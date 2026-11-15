@@ -41,9 +41,9 @@ typedef struct {
     Moby49B8 *f68;          /* 0x68 */
 } Ent49B8;
 
-extern int func_L02_002EF388(void *, void *, void *, void *, int);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, void *, int);
+extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, void *, int);
 
 extern s32 *D_L12_001FEAC0[];
 
@@ -51,14 +51,14 @@ extern f32 func_002F2950(f32, f32);
 
 extern void func_002A0F48(void *);
 
-extern void func_00282F20(f32 *, void *, f32);
+extern void vec_scale_to_length(f32 *, void *, f32);
 
 
-extern void func_L12_0041BED8(u8 *);
+extern void helper_push_objects(u8 *);
 
 extern void func_326F10(void *, void *, s32, s32);
 
-extern void func_L09_003F7788(void *, void *);
+extern void moby_copy_color(void *, void *);
 
 /* A pointer table of level-12 data, reached absolutely (out of the $gp window). */
 
@@ -66,7 +66,7 @@ extern void func_L09_003F7788(void *, void *);
 
 
 /* Returns 1 as soon as one of the two bound sub-objects carries a live state word. */
-s32 func_L12_0041BE60(u8 *moby)
+s32 helper_has_live_object(u8 *moby)
 {
     u8 *mobyCopy = moby;
     u8 *vars;
@@ -78,7 +78,7 @@ s32 func_L12_0041BE60(u8 *moby)
     if (*(s16 *)(mobyCopy + 0xAA) != 0xFAE /* moby class 4014 */)
         return 0;
     vars = *(u8 **)(mobyCopy + 0x68);
-    PushHelperObjects(mobyCopy);
+    helper_push_objects(mobyCopy);
     slot = (u8 **)(vars + 8);
     for (i = 0; i < 2; i++, slot++) {
         if (*slot != 0) {
@@ -92,7 +92,7 @@ s32 func_L12_0041BE60(u8 *moby)
 /* --- func_L12_0041A698 (52 B) ------------------------------------------------------ */
 
 /* Tells whether the object has reached the last point of its path. */
-s32 func_L12_0041A698(u8 *self)
+s32 path_is_at_last_point(u8 *self)
 {
     Tab698 *vars = *(Tab698 **)(self + 0x68);
 
@@ -102,7 +102,7 @@ s32 func_L12_0041A698(u8 *self)
 /* --- func_L12_00416390 (88 B) ------------------------------------------------------ */
 
 /* Turns the object a little more each frame so it spins slowly. */
-f32 func_L12_00416390(Obj390 *self)
+f32 slow_spinning_update(Obj390 *self)
 {
     if (self->f20 == 0) {
         self->f20 = 1;
@@ -115,7 +115,7 @@ f32 func_L12_00416390(Obj390 *self)
 /* --- func_L12_0041BDA8 (68 B) ------------------------------------------------------ */
 
 /* Clears the state word of the object's two helper objects. */
-void func_L12_0041BDA8(u8 *moby)
+void helper_clear_states(u8 *moby)
 {
     s32 i;
     u8 **slot;
@@ -141,7 +141,7 @@ void func_L12_0041BDA8(u8 *moby)
 /* the two bound sub-objects of the moby this driver walks */
 
 /* Walks the moby's two sub-objects, re-arms each one's parent link and releases it. */
-void func_L12_004149B8(Ent49B8 *guard)
+void guard_reattach_helpers(Ent49B8 *guard)
 {
     Moby49B8 *moby = guard->f68;
     Sub114B *head = moby->f2F8;
@@ -165,7 +165,7 @@ void func_L12_004149B8(Ent49B8 *guard)
                 moby->f2F0[i]->f34 = moby->f2F0[i]->f34 | 1;
                 moby->f2F0[i]->f31 = 0;
             }
-            CopyMobyColor(guard, moby->f2F0[i]);
+            moby_copy_color(guard, moby->f2F0[i]);
         }
     }
 }
@@ -190,7 +190,7 @@ void func_L12_004149B8(Ent49B8 *guard)
 /* func_L12_00419D68 is matched in its own unit, L12_00419D68.c. */
 
 /* Puts the object back at its saved spot, switches it to state 2 and starts animation 8. */
-void func_L12_0041A5F8(u8 *self)
+void moby_reset_to_saved_position(u8 *self)
 {
     u8 *dst = self + 0x10;
     u8 *vars = *(u8 **)(self + 0x68);
@@ -202,10 +202,10 @@ void func_L12_0041A5F8(u8 *self)
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & 0xFFBE) | 0x1000;
     classDef = *(void **)(self + 0x24);
     *(u32 *)(self + 0x98) = *(u32 *)((u8 *)classDef + 0x10);
-    FuseObjectWithLinkedObjects(self, dst, self + 0xF0, 0, 0);
-    SetMobyState(self, 2, -1);
+    moby_fuse_linked_objects(self, dst, self + 0xF0, 0, 0);
+    moby_set_state(self, 2, -1);
     if (*(u8 *)(self + 0x43) != 8)
-        StartAnimationBlended(self, 8, 0, 1);
+        anim_start_blended(self, 8, 0, 1);
 }
 
 /* func_L12_0041A790 is matched in L12_0041A790-g8.c. */
@@ -218,7 +218,7 @@ void func_L12_0041A5F8(u8 *self)
 
 /* Pushes each of the object's two helper objects along a little and updates their size every
    frame. */
-void func_L12_0041BED8(u8 *self)
+void helper_push_objects(u8 *self)
 {
     u8 *vars = *(u8 **)(self + 0x68);
     u8 **slot = (u8 **)(vars + 8);

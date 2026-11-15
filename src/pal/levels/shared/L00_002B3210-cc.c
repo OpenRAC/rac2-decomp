@@ -36,51 +36,51 @@ typedef struct {
     int field22b0;
     unsigned char vehicle_mode;
 } HeroCapsuleState;
-extern HeroCapsuleState D_00189E20;
-extern float func_002AA2E8(float *, float, float);
-extern float func_00282E80(char *, char *);
-extern float func_002AA3A8(float *, float *, float, float, float, float);
+extern HeroCapsuleState g_hero_state;
+extern float ApproachValue(float *, float, float);
+extern float vec_distance_xy(char *, char *);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 /* Selects and eases the hero collision capsule dimensions for the movement mode. */
 void func_PAL_L00_002B3210(void)
 {
-    switch (D_00189E20.vehicle_mode) {
+    switch (g_hero_state.vehicle_mode) {
     case 0:
-        D_00189E20.top_target = 0.8f;
-        D_00189E20.bottom_target = 0.7f;
-        D_00189E20.radius_target = 0.44999998807907104f;
+        g_hero_state.top_target = 0.8f;
+        g_hero_state.bottom_target = 0.7f;
+        g_hero_state.radius_target = 0.44999998807907104f;
         break;
     case 1:
-        D_00189E20.top_target = 0.5999999642372131f;
-        D_00189E20.bottom_target = 0.45000001788139343f;
-        D_00189E20.radius_target = 0.3f;
+        g_hero_state.top_target = 0.5999999642372131f;
+        g_hero_state.bottom_target = 0.45000001788139343f;
+        g_hero_state.radius_target = 0.3f;
         break;
     }
-    if (D_00189E20.control_mode == 4) {
-        if (D_00189E20.takeoff_frame < D_00189E20.state_timer && !D_00189E20.past_jump_apex)
-            D_00189E20.bottom_target = D_00189E20.field4b8;
-    } else if (D_00189E20.move_state == 6) {
-        D_00189E20.bottom_target = 0.5f;
-    } else if (D_00189E20.move_state == 4) {
-        D_00189E20.top_target = 0.3500000238418579f;
-    } else if ((unsigned)(D_00189E20.control_mode - 17) < 2) {
-        D_00189E20.top_target = 0.0f;
-        D_00189E20.bottom_target = 0.0f;
-    } else if (D_00189E20.field1492 && D_00189E20.field340) {
-        D_00189E20.top_target = 0.8f;
-        D_00189E20.bottom_target = 0.9f;
-    } else if (D_00189E20.move_state == 124) {
-        D_00189E20.radius_target = 0.8f;
+    if (g_hero_state.control_mode == 4) {
+        if (g_hero_state.takeoff_frame < g_hero_state.state_timer && !g_hero_state.past_jump_apex)
+            g_hero_state.bottom_target = g_hero_state.field4b8;
+    } else if (g_hero_state.move_state == 6) {
+        g_hero_state.bottom_target = 0.5f;
+    } else if (g_hero_state.move_state == 4) {
+        g_hero_state.top_target = 0.3500000238418579f;
+    } else if ((unsigned)(g_hero_state.control_mode - 17) < 2) {
+        g_hero_state.top_target = 0.0f;
+        g_hero_state.bottom_target = 0.0f;
+    } else if (g_hero_state.field1492 && g_hero_state.field340) {
+        g_hero_state.top_target = 0.8f;
+        g_hero_state.bottom_target = 0.9f;
+    } else if (g_hero_state.move_state == 124) {
+        g_hero_state.radius_target = 0.8f;
     }
-    if (!D_00189E20.wall_hit || D_00189E20.previous_control_mode == 18 ||
-        D_00189E20.field22b0 == 18 ||
-        (D_00189E20.vehicle_mode == 0 && D_00189E20.capsule_bottom < 0.53f) ||
-        D_00189E20.control_mode == 17 || D_00189E20.base_condition ||
-        func_00282E80((char *)&D_00189E20 + 0x240, (char *)&D_00189E20 + 0x80) >
-            D_00189E20.radius * 0.5f) {
-        func_002AA2E8(&D_00189E20.capsule_top, D_00189E20.top_target, 0.024f);
-        func_002AA2E8(&D_00189E20.capsule_bottom, D_00189E20.bottom_target, 0.024f);
-        func_002AA3A8(&D_00189E20.radius, &D_00189E20.radius_velocity,
-                     D_00189E20.radius_target, 0.028800001f, 0.43200004f, 0.080000006f);
+    if (!g_hero_state.wall_hit || g_hero_state.previous_control_mode == 18 ||
+        g_hero_state.field22b0 == 18 ||
+        (g_hero_state.vehicle_mode == 0 && g_hero_state.capsule_bottom < 0.53f) ||
+        g_hero_state.control_mode == 17 || g_hero_state.base_condition ||
+        vec_distance_xy((char *)&g_hero_state + 0x240, (char *)&g_hero_state + 0x80) >
+            g_hero_state.radius * 0.5f) {
+        ApproachValue(&g_hero_state.capsule_top, g_hero_state.top_target, 0.024f);
+        ApproachValue(&g_hero_state.capsule_bottom, g_hero_state.bottom_target, 0.024f);
+        math_spring_float_to_goal(&g_hero_state.radius, &g_hero_state.radius_velocity,
+                     g_hero_state.radius_target, 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }

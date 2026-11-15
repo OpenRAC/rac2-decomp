@@ -41,15 +41,15 @@ typedef struct {
     s32 prevLinks[4];
 } L04_RouteState;
 
-extern L04_Route *D_L04_001FE340[];
-extern void func_00282CF0(void *, void *, void *);
+extern L04_Route *g_route_path_table[];
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
-extern float func_L04_0040F8F0(void *, void *, int, int, int, int);
+extern float ProjectLinkedRouteDistance(void *, void *, int, int, int, int);
 
-extern u8 D_L04_00254E10[];
+extern u8 g_racer_trail_pool[];
 
 /* Finds the nearest point on the current route or one of its four links. */
-void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link, int *point,
+void FindNearestRoutePoint(L04_RouteObject *object, L04_RouteState *state, int *link, int *point,
                        float *result, int mode)
 {
     float delta[4] __attribute__((aligned(16)));
@@ -62,7 +62,7 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
     *point = 0;
     *result = 0;
 
-    route = gRoutePathTable[state->route];
+    route = g_route_path_table[state->route];
     for (i = 0; i < route->count - 1; i++) {
         FastVecSub(delta, object->pos, route->points[i]);
         distance = func_L00_002EE290(delta);
@@ -74,7 +74,7 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
 
     for (i = 0; i < 4; i++) {
         if (state->links[i] != -1) {
-            route = gRoutePathTable[state->links[i]];
+            route = g_route_path_table[state->links[i]];
             for (j = 0; j < route->count - 1; j++) {
                 FastVecSub(delta, object->pos, route->points[j]);
                 distance = func_L00_002EE290(delta);
@@ -87,7 +87,7 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
         }
     }
 
-    route = gRoutePathTable[state->route];
+    route = g_route_path_table[state->route];
     i = (int)((float)route->count * 0.5f);
     if (oldLink == -1 && oldPoint == 0 && *link == oldLink && *point > i)
         *point = 0;
@@ -95,18 +95,18 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
     *result = ProjectLinkedRouteDistance(object, state, *link, *point, mode, object->modelId == 0xBBC /* moby class 3004 */);
 }
 
-extern s32 func_00283CF0(f32);
+extern s32 FloatToInt(f32);
 
 /* Finds the nearest point around the last known position: on the current link and its
    neighbours, or on the base route and the links that leave it near that position. */
-float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *link, s32 *point,
+float UpdateNearestRoutePoint(L04_RouteObject *object, L04_RouteState *state, s32 *link, s32 *point,
                         s32 wrap, s32 mode)
 {
     f32 delta[4] __attribute__((aligned(16)));
     f32 best = 9999.0f, dist;
     s32 oldLink = *link;
     L04_Route *path;
-    L04_Route *base = gRoutePathTable[state->route];
+    L04_Route *base = g_route_path_table[state->route];
     L04_Route *other;
     s32 start, boundary;
     s32 i, j, k, index, n;
@@ -123,7 +123,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             entry = links + i;
             if (*entry == -1)
                 continue;
-            path = gRoutePathTable[*entry];
+            path = g_route_path_table[*entry];
 
             end = start + 10;
             boundary = FloatToInt(path->points[1][3]);
@@ -186,7 +186,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
         s32 offset = oldLink * 4;
         s32 *links = state->links, *entry, *oldEntry = (s32 *)((u8 *)links + offset);
 
-        path = gRoutePathTable[*oldEntry];
+        path = g_route_path_table[*oldEntry];
         start = *point - 5;
         if (start < 0) {
             start = 0;
@@ -221,7 +221,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
                     entry = branches + l;
                     if (*entry == -1 || l == oldLink)
                         continue;
-                    other = gRoutePathTable[*entry];
+                    other = g_route_path_table[*entry];
                     if (FloatToInt(other->points[1][3]) != j)
                         continue;
                     for (k = 0; k < 5; k++) {
@@ -246,7 +246,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
             if (l != -1) {
                 s32 *nextEntry = links + l;
 
-                other = gRoutePathTable[*nextEntry];
+                other = g_route_path_table[*nextEntry];
             } else {
                 other = base;
             }
@@ -297,7 +297,7 @@ float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *lin
 
 /* Scans the 0x20 slots at +0x110 of the state block for the first whose stored id the
    matcher accepts, and records its index in +0x270. */
-void func_L04_00410F10(u8 *moby) {
+void racer_find_zone_slot(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     s32 *slot = (s32 *)(vars + 0x110);
     s32 i;
@@ -335,7 +335,7 @@ typedef struct RankObject {
     RankState *state;
     u8 pad6c[0x100 - 0x6c];
 } RankObject;
-extern RankObject *D_L04_001B24DC __attribute__((sda));
+extern RankObject *g_moby_l04_pool __attribute__((sda));
 
 /* Restarts EE timer 0 (T0_MODE = 0x81, T0_COUNT = 0), recomputes the route progress of every
    racer listed in the 21 slots at +0x1E4 of the object's state, bubble-sorts the active ones
@@ -343,7 +343,7 @@ extern RankObject *D_L04_001B24DC __attribute__((sda));
    stores each racer's 1-based rank and the racer count. The table base is reread after the call
    ($gp form in the branch delay slot, absolute in ordinary flow), and the progress store is a
    struct field, which lets the scheduler issue that reload ahead of the slot reload. */
-void func_L04_00412130(RankObject *object) {
+void UpdateRacerRanks(RankObject *object) {
     RankObject *list[21], **out = list;
     RankState *state, *p;
     RankObject *obj;
@@ -357,10 +357,10 @@ void func_L04_00412130(RankObject *object) {
     slot = state->slots;
     for (k = 0; k < 21; k++, slot++) {
         if (*slot != -1) {
-            obj = &gMobyPool_L04[*slot];
+            obj = &g_moby_l04_pool[*slot];
             p = obj->state;
             p->progress = UpdateNearestRoutePoint(obj, state, &p->f120, &p->f124, p->lap, p->f244);
-            if (gMobyPool_L04[*slot].active == 2) {
+            if (g_moby_l04_pool[*slot].active == 2) {
                 *out++ = obj;
                 count++;
             }
@@ -386,20 +386,20 @@ void func_L04_00412130(RankObject *object) {
 
 
 
-float func_00283180(float);
-float func_00283198(float);
-float func_00283B98(float, float);
+float math_fast_sin_or_cos_a(float);
+float math_fast_sin_or_cos_b(float);
+float FastAddRotations(float, float);
 
 /* Turns a stored angle by a step and moves the object sideways by a short distance in that direction. */
-void func_L04_00412E38(void *moby, void *vars, float angleStep, float radius) {
+void math_step_angle_offset(void *moby, void *vars, float angleStep, float radius) {
     float angle;
     float newY;
     float stepX;
 
     angle = FastAddRotations((*(float *)((unsigned char *)vars + 0x38C)), angleStep);
     *(float *)((unsigned char *)vars + 0x38C) = angle;
-    stepX = FastSinOrCosA(angle) * radius;
-    newY = (*(float *)((unsigned char *)moby + 0xF4)) + (FastSinOrCosB((*(float *)((unsigned char *)vars + 0x38C))) * radius);
+    stepX = math_fast_sin_or_cos_a(angle) * radius;
+    newY = (*(float *)((unsigned char *)moby + 0xF4)) + (math_fast_sin_or_cos_b((*(float *)((unsigned char *)vars + 0x38C))) * radius);
     *(float *)((unsigned char *)moby + 0xF0) = (float) ((*(float *)((unsigned char *)moby + 0xF0)) + stepX);
     *(float *)((unsigned char *)moby + 0xF4) = newY;
 }
@@ -438,12 +438,12 @@ typedef struct {
     u8 pad14C[0x150 - 0x14C];
 } L04_5EE8Bolt;
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00283698(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
 
 /* Starts a new trail in the first free one of the 140 trail slots and ties it to the owner. */
-void func_L04_00415EE8(u8 *owner, f32 *pos, f32 *to, f32 *from)
+void racer_start_trail(u8 *owner, f32 *pos, f32 *to, f32 *from)
 {
     f32 d[4] __attribute__((aligned(16)));
     f32 m[16] __attribute__((aligned(16)));
@@ -451,7 +451,7 @@ void func_L04_00415EE8(u8 *owner, f32 *pos, f32 *to, f32 *from)
     s32 i;
 
     for (i = 0; i < 140; i++) {
-        trail = &((L04_5EE8Bolt *)gRacerTrailPool)[i];
+        trail = &((L04_5EE8Bolt *)g_racer_trail_pool)[i];
         if (trail->active == 0) {
             trail->active = 1;
             FastVecAdd(d, from, pos);

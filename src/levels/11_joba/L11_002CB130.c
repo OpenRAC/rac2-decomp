@@ -59,92 +59,92 @@ typedef struct {
     u8 pad3c[4];
 } ContactEntry;
 
-extern PlayerInputView D_00189E20;
+extern PlayerInputView g_hero_state;
 extern ContactEntry D_L11_001C4F80[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_L11_001A9010 __attribute__((sda));
 extern int D_L11_001A8F00 __attribute__((sda));
 extern u8 D_001A7B0B __attribute__((sda));
-extern u8 D_001A7A32 __attribute__((sda));
+extern u8 g_bolt_multiplier __attribute__((sda));
 extern u8 D_001A7A33 __attribute__((sda));
-extern void func_00282A88(void *, int);
-extern float func_00282C48(float);
-extern int func_L11_002D8EF8(int, int);
-extern float func_L00_0037E668(void);
-extern float func_L00_0037E5F0(float);
-extern void func_L00_002A6708(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_002D36E0(float *, int, float, float, float);
-extern void *func_002A9640(void *, unsigned int, int);
-extern int func_00283CF0(float);
-extern void func_L00_002A4EF8(long);
-extern int func_L00_002B9B88(int, int);
-extern void func_L00_002B2C58(int, int, float, float);
-extern void func_L00_002D3C68(char *, char *, float);
+extern void mem_fast_helper_b(void *, int);
+extern float math_fabs(float);
+extern int hero_l11_enter_state(int, int);
+extern float fade_get_value(void);
+extern float fade_reduce_value(float);
+extern void hero_clear_tracked_slots(void);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void hero_build_relative_point(float *, int, float, float, float);
+extern void *part_find_owned_effect_slot(void *, unsigned int, int);
+extern int FloatToInt(float);
+extern void AdjustPlayerHealth(long);
+extern int hero_play_sound(int, int);
+extern void hero_flatten_push_vector(int, int, float, float);
+extern void cam_scale_view_space_height(char *, char *, float);
 
 /* Checks whether the hero is being hit or pushed by something. If asked to apply it, it changes the hero state and knocks the hero away. */
-int func_L11_002CB130(long apply)
+int hero_handle_contact_hit(long apply)
 {
     Vector direction;
     ContactEntry *entry;
     u8 *object, *contact;
     int special;
-    if (gHeroState.movement == 20 || gHeroState.movement == 7) return 0;
-    if (gHeroState.state == 0x31) return 0;
-    if (gHeroState.timer) return 0;
+    if (g_hero_state.movement == 20 || g_hero_state.movement == 7) return 0;
+    if (g_hero_state.state == 0x31) return 0;
+    if (g_hero_state.timer) return 0;
     if (D_L11_001A8F00) return 0;
-    gHeroState.contact = 0;
-    object = gHeroState.object;
+    g_hero_state.contact = 0;
+    object = g_hero_state.object;
     if (object[0xa8] == 0xff) return 0;
     entry = &D_L11_001C4F80[object[0xa8]];
     if (entry->owner != object) return 0;
     if (!(entry->flags & 9)) return 0;
     if (entry->strength != 0.0f) {
-        D_001A7A33 = 0; gBoltMultiplier = 1;
+        D_001A7A33 = 0; g_bolt_multiplier = 1;
     }
-    if (GetFadeValue() != 0.0f && !gHeroState.mode) {
-        entry->strength = ReduceFadeValue(entry->strength);
+    if (fade_get_value() != 0.0f && !g_hero_state.mode) {
+        entry->strength = fade_reduce_value(entry->strength);
         if (entry->strength == 0.0f) return 0;
     }
-    gHeroState.contact = entry->object;
+    g_hero_state.contact = entry->object;
     if (!apply) return 1;
     special = 0;
-    ClearTrackedSlots();
+    hero_clear_tracked_slots();
     if (entry->directionFlags & 1) {
         direction.word = entry->direction.word;
         if (entry->direction.f[3] == 5627.9248046875f) special = 1;
     } else if (entry->object) {
-        FastVecSub(&direction, &gHeroState.position, entry->object+0x10);
-    } else BuildHeroRelativePoint((float *)&direction, 0, -1.0f, 0.0f, 0.0f);
-    switch (gHeroState.mode) {
+        FastVecSub(&direction, &g_hero_state.position, entry->object+0x10);
+    } else hero_build_relative_point((float *)&direction, 0, -1.0f, 0.0f, 0.0f);
+    switch (g_hero_state.mode) {
     case 0:
-        contact = gHeroState.contact;
+        contact = g_hero_state.contact;
         if (contact && (*(short *)(contact+0xaa) == 0x4eb /* moby class 1259 */ || *(short *)(contact+0xaa) == 0x558 /* moby class 1368 */)) {
-            EnterHeroState_L11(0x7d, 1); return 1;
+            hero_l11_enter_state(0x7d, 1); return 1;
         }
-        if ((gHeroState.state == 1 || gHeroState.state == 0x1d || gHeroState.interrupted) && !(entry->flags & 8)) {
-            u8 *hit = FindOwnedEffectSlot(gHeroState.object, 1, 0);
+        if ((g_hero_state.state == 1 || g_hero_state.state == 0x1d || g_hero_state.interrupted) && !(entry->flags & 8)) {
+            u8 *hit = part_find_owned_effect_slot(g_hero_state.object, 1, 0);
             if (hit) AdjustPlayerHealth(FloatToInt(*(float *)(hit+0x2c)));
-            if (!gHeroState.health) EnterHeroState_L11(0x16, 1);
-            gHeroState.timer = 0x4d;
-            if (!gHeroState.soundTimer) gHeroState.soundTimer = 0x12;
-            PlayHeroSound(0x14, 0); return 0;
+            if (!g_hero_state.health) hero_l11_enter_state(0x16, 1);
+            g_hero_state.timer = 0x4d;
+            if (!g_hero_state.soundTimer) g_hero_state.soundTimer = 0x12;
+            hero_play_sound(0x14, 0); return 0;
         }
-        if (entry->flags & 8) EnterHeroState_L11(0x8c, 1);
-        else EnterHeroState_L11(0x16, 1);
-        if (gHeroState.state == 0x8c) qzero(&direction);
+        if (entry->flags & 8) hero_l11_enter_state(0x8c, 1);
+        else hero_l11_enter_state(0x16, 1);
+        if (g_hero_state.state == 0x8c) qzero(&direction);
         else {
-            FlattenPushVectorAndSetStrength((int)&direction, special, gHeroState.jumpPressed ? 0.0f : 0.055000003f, 0.028333336f);
-            if (special && entry->kind == 4) ScaleViewSpaceHeight((char *)&direction, (char *)&direction, 2.0f);
+            hero_flatten_push_vector((int)&direction, special, g_hero_state.jumpPressed ? 0.0f : 0.055000003f, 0.028333336f);
+            if (special && entry->kind == 4) cam_scale_view_space_height((char *)&direction, (char *)&direction, 2.0f);
         }
         break;
     case 1:
-        EnterHeroState_L11(0x42, 1);
-        FlattenPushVectorAndSetStrength((int)&direction, special, 0.083333336f, 0.050000004f);
+        hero_l11_enter_state(0x42, 1);
+        hero_flatten_push_vector((int)&direction, special, 0.083333336f, 0.050000004f);
         break;
     }
-    FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &direction);
-    FastVecAdd(&gHeroState.motion, &gHeroState.motion, &direction);
+    FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &direction);
+    FastVecAdd(&g_hero_state.motion, &g_hero_state.motion, &direction);
     return 1;
 }

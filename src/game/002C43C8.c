@@ -24,17 +24,17 @@ typedef struct {
     Attach2C43C8 at;
 } Effect2C43C8;
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283CE0(int);
-extern void func_0029FC20(void *, int, void *);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_002A7878(float, float);
-extern void func_002B9180(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float IntToFloat(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float math_random_float_range(float, float);
+extern void part_kill(void *);
 
 /* Updates an effect attached to a joint of another object, with a random sideways spread.
    It disappears when that object is gone or dying. */
-void func_002C43C8(Effect2C43C8 *e) {
+void part_update_moby_joint_effect(Effect2C43C8 *e) {
     float mtx[16] __attribute__((aligned(16)));
     float off[4] __attribute__((aligned(16)));
     Attach2C43C8 *at = &e->at;
@@ -45,15 +45,15 @@ void func_002C43C8(Effect2C43C8 *e) {
     float offsetAmount;
 
     if (target == 0 || target->uid != at->uid || target->state == 0xFE || target->state == 0xFD) {
-        KillParticle(e);
+        part_kill(e);
         return;
     }
-    size = at->scale * RandomFloatRange(0.05f, 1.0f);
+    size = at->scale * math_random_float_range(0.05f, 1.0f);
     keep = e->dir[3];
-    TransformMobyJointToWorld(e->at.moby, at->joint, e->pos);
-    TransformMobyJointPoint(e->at.moby, at->joint, mtx);
+    moby_transform_joint_to_world(e->at.moby, at->joint, e->pos);
+    moby_transform_joint_point(e->at.moby, at->joint, mtx);
     spreadRange = IntToFloat(at->spread);
-    offsetAmount = RandomFloatRange(-spreadRange, spreadRange);
+    offsetAmount = math_random_float_range(-spreadRange, spreadRange);
     vec_scale_to_length(off, mtx, (offsetAmount * 0.01f - 1.0f) * at->dist);
     FastVecAdd(e->dir, e->pos, off);
     e->pos[3] = size;

@@ -22,18 +22,18 @@ typedef struct {
 } HeroTargetState;
 
 extern HeroTargetState D_00189E20_target;
-extern void func_L00_002B39F0(int, float);
-extern char *func_L00_002AE888(float, float, float, float, float *, int, int);
-extern float func_00283248(float, float);
-extern void func_00282CF0(float *, char *, float *);
-extern void func_L00_002D3B58(float *, float *, float);
+extern void hero_resolve_stick_direction(int, float);
+extern char *SelectBestEligibleTarget(float, float, float, float, float *, int, int);
+extern float mat_fast_helper_a(float, float);
+extern void FastVecSub(float *, char *, float *);
+extern void cam_set_view_space_height(float *, float *, float);
 
 /* Unless the hero state is 0x20 or a target is already active, selects the best eligible target from the
  * hero position and yaw (or, when the value at 0x24B8 exceeds 0.5, from the alternate position and yaw after
  * clearing the target and marking it active), then aims: the angle and offset to the chosen target, else the
  * saved yaw and vector. Finally passes the aim vector to a helper. */
 /* Picks the best thing in front of the hero to aim at and turns the aim toward it. */
-void func_L00_002B75A0(float a, float b, float c)
+void hero_l00_select_aim_target(float a, float b, float c)
 {
     HeroTargetState *hero = &D_00189E20_target;
     char *bestTarget;
@@ -45,7 +45,7 @@ void func_L00_002B75A0(float a, float b, float c)
     yaw = hero->yaw;
     qcopy(vector, hero->pos);
     if (0.5f < hero->f24B8) {
-        ResolveStickInputToDirection(0, 1.0f);
+        hero_resolve_stick_direction(0, 1.0f);
         yaw = hero->altYaw;
         qcopy(vector, hero->altPos);
         hero->target = 0;
@@ -53,7 +53,7 @@ void func_L00_002B75A0(float a, float b, float c)
     }
     bestTarget = SelectBestEligibleTarget(a, yaw, b, c, vector, -1, 0);
     if (bestTarget != 0 && (hero->target == 0 || hero->active != 0)) {
-        hero->aimAngle = FastMatrixHelperA(*(float *)(bestTarget + 0x10) - hero->origin[0],
+        hero->aimAngle = mat_fast_helper_a(*(float *)(bestTarget + 0x10) - hero->origin[0],
                                     *(float *)(bestTarget + 0x14) - hero->origin[1]);
         FastVecSub(hero->aim, bestTarget + 0x10, hero->origin);
         hero->target = bestTarget;
@@ -61,5 +61,5 @@ void func_L00_002B75A0(float a, float b, float c)
         D_00189E20_target.aimAngle = yaw;
         qcopy(D_00189E20_target.aim, vector);
     }
-    SetViewSpaceHeight(D_00189E20_target.aim, D_00189E20_target.aim, 0.0f);
+    cam_set_view_space_height(D_00189E20_target.aim, D_00189E20_target.aim, 0.0f);
 }

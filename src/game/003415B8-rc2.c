@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,7 +25,7 @@
 #include "common.h"
 
 /* Returns the address of the selected entry in the table of the current tab. */
-s32 func_003415B8(s32 self) {
+s32 tab_menu_get_selected_entry(s32 self) {
     s32 tab;
     s32 table;
     s32 index;

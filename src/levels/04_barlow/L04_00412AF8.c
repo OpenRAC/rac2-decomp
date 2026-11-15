@@ -4,16 +4,16 @@
  */
 typedef unsigned int Word128 __attribute__((mode(TI)));
 typedef union { Word128 word; float f[4]; } Vector;
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern float func_00282DB0(void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern float FastVecDot(void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
 
 /* Place the output on the selected side of the fixed horizontal axis. */
 /* Finds a point 6.5 units to one side of the object, across a fixed line on the ground, depending on which side the object is on. */
-void func_L04_00412AF8(unsigned char *object,Vector *output)
+void find_point_across_line(unsigned char *object,Vector *output)
 {
     Vector origin,axis,difference,direction;
     origin.word=0;axis.word=0;

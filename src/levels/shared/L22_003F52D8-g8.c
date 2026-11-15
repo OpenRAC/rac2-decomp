@@ -10,16 +10,16 @@ extern u8 D_L22_001B9C80[];
 extern s32 D_L22_001B2040;
 extern f32 D_L22_001B0A0C __attribute__((sda));
 extern f32 D_L22_001B0A10 __attribute__((sda));
-extern f32 func_00282E48(void *a0, void *a1);
-extern f32 func_00283CE0(s32 a0);
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7940(void);
-extern void func_00283098(void *a0, void *a1, void *a2);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
-extern void func_L16_003C3A10(void *a0, void *a1, void *a2);
+extern f32 fast_vec_dist(void *a0, void *a1);
+extern f32 IntToFloat(s32 a0);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_angle(void);
+extern void matrix_mul_vec3(void *a0, void *a1, void *a2);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
+extern void bouncing_debris_create(void *a0, void *a1, void *a2);
 
 /* Sprinkles particles along the object's height, scattered around it with random speeds. */
-void func_L22_003F52D8(u8 *moby)
+void part_spray_height(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     f32 distanceScale = 60.0f / fast_vec_dist(D_L22_001B9C80, moby + 0x10);
@@ -43,17 +43,17 @@ void func_L22_003F52D8(u8 *moby)
         f32 spread = distanceScale + progress * 0.1f;
 
         scratch.q = 0;
-        scratch.f[0] = RandomSignedFloatRange(0.0f, spread);
-        scratch.f[1] = RandomSignedFloatRange(0.0f, spread);
+        scratch.f[0] = math_random_signed_float_range(0.0f, spread);
+        scratch.f[1] = math_random_signed_float_range(0.0f, spread);
         scratch.f[2] = progress;
         position.q = scratch.q;
         matrix_mul_vec3(&position, &position, moby + 0xC0);
         FastVecAdd(&position, &position, moby + 0x10);
         randomVec.q = 0;
-        randomVec.f[0] = RandomAngle();
-        randomVec.f[1] = RandomAngle();
-        randomVec.f[2] = RandomAngle();
+        randomVec.f[0] = math_random_angle();
+        randomVec.f[1] = math_random_angle();
+        randomVec.f[2] = math_random_angle();
         scratch.q = randomVec.q;
-        CreateBouncingDebrisMoby(moby, &position, &scratch);
+        bouncing_debris_create(moby, &position, &scratch);
     }
 }

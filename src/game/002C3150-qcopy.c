@@ -24,21 +24,21 @@ typedef struct {
     } motion;
 } Particle_002C3150;
 
-extern Particle_002C3150 *func_002B9030(int);
-extern int func_00283CF0(float);
+extern Particle_002C3150 *part_alloc(int);
+extern int FloatToInt(float);
 typedef struct {
     char pad00[0x80];
     float position[3];
 } HeroView_002C3150;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern unsigned char *D_001F2614;
 
 /* Creates a particle with a starting speed. In mode 1 it keeps its distance from the hero. */
-Particle_002C3150 *func_002C3150(TI128 *position, TI128 *velocity, int colour,
+Particle_002C3150 *part_spawn_hero_relative(TI128 *position, TI128 *velocity, int colour,
                                  unsigned char life, unsigned char seed, int mode, float scale)
 {
-    Particle_002C3150 *p = AllocParticle(0x3C);
+    Particle_002C3150 *p = part_alloc(0x3C);
     typeof(p->motion) *m;
 
     if (p != 0) {
@@ -47,9 +47,9 @@ Particle_002C3150 *func_002C3150(TI128 *position, TI128 *velocity, int colour,
         m->velocity = *velocity;
         m->mode = mode;
         if (mode == 1) {
-            m->offset[0] = ((float *)&p->position)[0] - ((HeroView_002C3150 *)gHeroState)->position[0];
-            m->offset[1] = ((float *)&p->position)[1] - ((HeroView_002C3150 *)gHeroState)->position[1];
-            m->offset[2] = ((float *)&p->position)[2] - ((HeroView_002C3150 *)gHeroState)->position[2];
+            m->offset[0] = ((float *)&p->position)[0] - ((HeroView_002C3150 *)g_hero_state)->position[0];
+            m->offset[1] = ((float *)&p->position)[1] - ((HeroView_002C3150 *)g_hero_state)->position[1];
+            m->offset[2] = ((float *)&p->position)[2] - ((HeroView_002C3150 *)g_hero_state)->position[2];
         }
         p->unk04 = colour;
         p->unk09 = FloatToInt(1.0f) + 0x20;

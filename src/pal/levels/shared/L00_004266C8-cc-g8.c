@@ -1,8 +1,9 @@
+#include "names.h"
 /* func_PAL_L00_004266C8, the PAL copy of func_L00_004212B8: the same C, where the 15 and 16 frame limits
    become 12 and 13 and the timers are scaled by (D * 5 + 2) / 6. */
 #include "common.h"
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; float f[0x980]; } Hero;
-extern char D_00189E20[];
+extern char g_hero_state[];
 typedef struct {
     float base[4];
     float a10[4];
@@ -27,19 +28,19 @@ typedef struct {
     s16 hEC;
     s16 hEE;
 } Ctl;
-extern int func_00277258(void *, int, void *, float);
-extern int func_00282978(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00282DF0(void *);
-extern void func_00334710(void *, void *);
-extern int func_00334730(void *, int);
-extern float func_003348A8(void *, float);
-extern void func_003349E8(void *, int, float);
+extern int coll_test_point(void *, int, void *, float);
+extern int FastDecTimer(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float FastVecLength(void *);
+extern void hero_copy_vector_to_out(void *, void *);
+extern int cam_resolve_position(void *, int);
+extern float cam_compute_signed_angle_to_point(void *, float);
+extern void cam_compute_offset(void *, int, float);
 extern int D_L00_001A8FF0 MACRO_ADDR;
 extern float D_L00_001B1500 __attribute__((sda));
 extern float D_L00_001B1504 __attribute__((sda));
@@ -60,32 +61,32 @@ void func_PAL_L00_004266C8(char *moby, void *out)
     char *v;
     int use;
     float d;
-    if (((Hero *)D_00189E20)->h[0x348 / 2] != 0 || D_L00_001A8FF0 != 0 || (s->hEE != 0 && ((Hero *)D_00189E20)->h[0x34E / 2] != 0)) {
+    if (((Hero *)g_hero_state)->h[0x348 / 2] != 0 || D_L00_001A8FF0 != 0 || (s->hEE != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] != 0)) {
         s->hEC = 0xC;
         s->fD6 = 1;
         s->hEE = 1;
-        func_00282D30(s->a10, cam + 0x30, func_00282DB0(s, cam + 0x30));
+        FastVecScale(s->a10, cam + 0x30, FastVecDot(s, cam + 0x30));
         qcopy(s->a20, s->a10);
         if ((u32)(s->st - 5) < 3 || s->st == 3)
-            func_003349E8(s->a30, 1, D_L00_001B154C * 0.5f);
+            cam_compute_offset(s->a30, 1, D_L00_001B154C * 0.5f);
     } else {
         short st = s->hEE;
         if (st == 1) {
             float r;
-            func_00282D30(s->a10, cam + 0x30, func_00282DB0(s, cam + 0x30));
+            FastVecScale(s->a10, cam + 0x30, FastVecDot(s, cam + 0x30));
             qcopy(s->a20, s->a10);
             if ((u32)(s->st - 5) < 3 || s->st == 3)
-                func_003349E8(s->a30, 1, D_L00_001B154C * 0.5f);
-            r = func_00283CE0(s->hD8);
-            r = r / func_00283CE0(0xC);
-            s->hD8 = func_00283CF0(func_00283CE0(s->hEC) * r);
+                cam_compute_offset(s->a30, 1, D_L00_001B154C * 0.5f);
+            r = IntToFloat(s->hD8);
+            r = r / IntToFloat(0xC);
+            s->hD8 = FloatToInt(IntToFloat(s->hEC) * r);
             s->hEE = 2;
         } else {
             if (st >= 2) {
-                func_00282D30(s->a10, cam + 0x30, func_00282DB0(s, cam + 0x30));
+                FastVecScale(s->a10, cam + 0x30, FastVecDot(s, cam + 0x30));
                 qcopy(s->a20, s->a10);
                 if ((u32)(s->st - 5) < 3 || s->st == 3)
-                    func_003349E8(s->a30, 1, D_L00_001B154C * 0.5f);
+                    cam_compute_offset(s->a30, 1, D_L00_001B154C * 0.5f);
                 s->hEE = s->hEE + 1;
                 if (s->hEE >= 0xD)
                     s->hEE = 0;
@@ -93,11 +94,11 @@ void func_PAL_L00_004266C8(char *moby, void *out)
         }
     }
     c = cam + 0x30;
-    func_00334710(moby, sp);
-    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x74) {
-        func_00282D30(out, c, func_00282DB0(s, c));
-        func_00282CF0(s, s, out);
-        func_00282D30(out, c, func_00282DB0(c, s->a60));
+    hero_copy_vector_to_out(moby, sp);
+    if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x74) {
+        FastVecScale(out, c, FastVecDot(s, c));
+        FastVecSub(s, s, out);
+        FastVecScale(out, c, FastVecDot(c, s->a60));
         qcopy(s->a10, out);
         if (s->st != 0xB) {
             s->st = 0xB;
@@ -109,44 +110,44 @@ void func_PAL_L00_004266C8(char *moby, void *out)
                 t = (D_L00_001B1518 * 5 + 2) / 6;
                 { char *m = o + 0x20;
                 *(s16 *)m = t;
-                *(float *)(m + 0x24) = 1.0f / func_00283CE0((s16)t); }
+                *(float *)(m + 0x24) = 1.0f / IntToFloat((s16)t); }
             }
         }
     } else {
         switch (s->st) {
         case 2:
-            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x11
-                || (((Hero *)D_00189E20)->b[0x49E] != 0 && ((Hero *)D_00189E20)->f[0x31C / 4] > 0.2f)) {
+            if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x11
+                || (((Hero *)g_hero_state)->b[0x49E] != 0 && ((Hero *)g_hero_state)->f[0x31C / 4] > 0.2f)) {
                 u16 t;
-                if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x11) {
-                    d = func_003348A8(moby, s->rB0);
+                if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x11) {
+                    d = cam_compute_signed_angle_to_point(moby, s->rB0);
                     if (!(d < D_L00_001B1504) && !(D_L00_001B1500 < d))
                         goto next;
                 }
                 s->st = 1;
                 t = D_L00_001B1530;
                 s->tC6 = t;
-                s->invC8 = 1.0f / func_00283CE0((s16)t);
+                s->invC8 = 1.0f / IntToFloat((s16)t);
             }
         next:
             use = 0;
-            if (((Hero *)D_00189E20)->h[0x34C / 2] != 0 && (((Hero *)D_00189E20)->b[0x49E] == 0 || ((Hero *)D_00189E20)->h[0x4AE / 2] >= 0x10)) {
+            if (((Hero *)g_hero_state)->h[0x34C / 2] != 0 && (((Hero *)g_hero_state)->b[0x49E] == 0 || ((Hero *)g_hero_state)->h[0x4AE / 2] >= 0x10)) {
                 use = 1;
             } else {
-                if (func_00334730(tmp, 1) != 1)
+                if (cam_resolve_position(tmp, 1) != 1)
                     use = 1;
-                else if (func_00282DB0(tmp, c) < func_00282DF0(s->a10))
+                else if (FastVecDot(tmp, c) < FastVecLength(s->a10))
                     use = 1;
             }
             v = (char *)tmp;
             if (use) {
                 qcopy(out, s->a10);
-                func_00282D30(v, c, func_00282DB0(sp, c));
-                func_00282CF0(s, sp, v);
+                FastVecScale(v, c, FastVecDot(sp, c));
+                FastVecSub(s, sp, v);
             } else {
-                func_00334730(v, 1);
-                func_00282D30(out, c, func_00282DB0(v, c));
-                func_00282CF0(s, v, out);
+                cam_resolve_position(v, 1);
+                FastVecScale(out, c, FastVecDot(v, c));
+                FastVecSub(s, v, out);
             }
             break;
         case 3:
@@ -154,23 +155,23 @@ void func_PAL_L00_004266C8(char *moby, void *out)
         case 6:
         case 7:
             {
-                func_00282D08(s->a10, s->a30, s->a20, (float)s->tD4 * s->rCC);
-                if (s->fD7 == 0 && func_00277258(moby + 0x30, 0x12, 0, 0.2f) != 0) {
+                lerp_vector(s->a10, s->a30, s->a20, (float)s->tD4 * s->rCC);
+                if (s->fD7 == 0 && coll_test_point(moby + 0x30, 0x12, 0, 0.2f) != 0) {
                     qcopy(s->a30, s->a10);
                     s->fD7 = 1;
                 }
                 qcopy(out, s->a10);
-                d = func_00282DB0(sp, c);
+                d = FastVecDot(sp, c);
                 v = (char *)tmp;
-                func_00282D30(v, c, d);
-                func_00282CF0(s, sp, v);
-                if (func_00282978(&s->tD4) != 0) {
+                FastVecScale(v, c, d);
+                FastVecSub(s, sp, v);
+                if (FastDecTimer(&s->tD4) != 0) {
                     if (s->st == 9) {
                         s->st = 0xA;
                         s->tD4 = (D_L00_001B1560 * 5 + 2) / 6;
                         qcopy(s->a20, s->a10);
-                        func_00282D30(v, c, s->rD0);
-                        func_00282CF0(s->a30, s->a20, v);
+                        FastVecScale(v, c, s->rD0);
+                        FastVecSub(s->a30, s->a20, v);
                     } else if (s->st == 6) {
                         s->st = 7;
                         s->tD4 = (D_L00_001B1534 * 5 + 2) / 6;
@@ -181,27 +182,27 @@ void func_PAL_L00_004266C8(char *moby, void *out)
                         s->st = 4;
                         t = D_L00_001B1548;
                         s->tC6 = t;
-                        s->invC8 = 1.0f / func_00283CE0((s16)t);
+                        s->invC8 = 1.0f / IntToFloat((s16)t);
                     }
                 }
             }
             break;
         case 8:
             qcopy(out, s->a10);
-            d = func_00282DB0(sp, c);
+            d = FastVecDot(sp, c);
             v = (char *)tmp;
-            func_00282D30(v, c, d);
-            func_00282CF0(s, sp, v);
+            FastVecScale(v, c, d);
+            FastVecSub(s, sp, v);
             break;
         case 9:
         case 10:
-            func_00282D30(out, c, func_00282DB0(sp, c));
-            func_00282CF0(s, sp, out);
-            func_00282D08(out, out, s->a20, D_L00_001B1574);
+            FastVecScale(out, c, FastVecDot(sp, c));
+            FastVecSub(s, sp, out);
+            lerp_vector(out, out, s->a20, D_L00_001B1574);
             break;
         default:
-            func_00282D30(out, c, func_00282DB0(sp, c));
-            func_00282CF0(s, sp, out);
+            FastVecScale(out, c, FastVecDot(sp, c));
+            FastVecSub(s, sp, out);
             break;
         }
     }

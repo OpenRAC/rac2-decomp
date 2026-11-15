@@ -11,43 +11,43 @@ typedef struct {
     char pad124c[0x1048]; int field2294;
     char pad2298[0x1C]; u8 field22b4;
 } MotionResident;
-extern MotionResident D_00189E20;
+extern MotionResident g_hero_state;
 #define R ((char *)&D_00189E20)
 
 typedef struct { char pad[0x168]; u16 sentinel; } HudResident;
-extern HudResident D_0018C958;
+extern HudResident g_subtitle_history;
 
 
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern u8 D_L16_0027F078[];
 extern int D_L16_001A8FF0;
 extern u8 *D_L16_001B2B1C;
 extern float D_L16_001AF430 __attribute__((sda));
 extern float D_L16_001AF434 __attribute__((sda));
 extern float D_L16_001AF438 __attribute__((sda));
-extern void func_002AFFD8(char *,char *,int);
-extern void func_L00_00325600(void *,void *,void *);
-extern void func_002AB6D8(float *,float *);
-extern void func_002A7750(u8 *,s32,s32);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_00282948(int *);
-extern float func_00282E48(void *,void *);
-extern int func_00288E18(int,int);
-extern int func_L00_0032EF10(int,int,int);
-extern int func_L16_003960F8(char *);
-extern void func_002AFDD8(char *,char *,char *,char *);
-extern void func_00282CF0(void *,void *,void *);
-extern float func_00282DB0(void *,void *);
-extern void func_L16_002C0BC8(int,int);
-extern void func_L16_00395D30(char *);
-extern float func_00282C48(float);
-extern void func_003355A8(int);
-extern void func_L16_00395858(char *);
-extern void func_L16_003959B8(char *);
-extern void func_L16_00395C00(char *);
-extern void func_L16_00395ED0(char *);
-extern s32 func_002B3868(u8 *);
+extern void cam_compute_view_direction(char *,char *,int);
+extern void vec_negate_and_forward(void *,void *,void *);
+extern void mat_get_euler_angles(float *,float *);
+extern void moby_set_state(u8 *,s32,s32);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int math_fast_float_d(int *);
+extern float fast_vec_dist(void *,void *);
+extern int subtitle_request_voice_line(int,int);
+extern int PadPressedWithin(int,int,int);
+extern int moby_is_spot_free_of_blockers(char *);
+extern void vec_transform_by_object_or_given(char *,char *,char *,char *);
+extern void FastVecSub(void *,void *,void *);
+extern float FastVecDot(void *,void *);
+extern void hero_l16_enter_state(int,int);
+extern void cam_start_blend_to_target(char *);
+extern float math_fabs(float);
+extern void cam_set_mode_state(int);
+extern void hero_switch_push_anim_state(char *);
+extern void spinning_object_move_along_ground(char *);
+extern void moby_tilt_to_ground_slope(char *);
+extern void BlendCameraPose(char *);
+extern s32 flag_set_first_pending(u8 *);
 void func_PAL_L16_003984D8(u8 *object)
 {
     struct { float position[4],direction[4],forward[4]; } vectors;
@@ -62,40 +62,40 @@ void func_PAL_L16_003984D8(u8 *object)
     case 0:
         if (!D_L16_001A8FF0) return;
         F(object,0x2C)=F(*(u8 **)(object+0x24),0x24);
-        func_002AFFD8((char *)object+0x10,(char *)position,0);
+        cam_compute_view_direction((char *)object+0x10,(char *)position,0);
         *(u16 *)(object+0x34)|=0x100;
-        func_L00_00325600(object+0xC0,position,0);
-        func_L00_00325600(object+0xC0,position,0);
+        vec_negate_and_forward(object+0xC0,position,0);
+        vec_negate_and_forward(object+0xC0,position,0);
         qcopy(state+0x10,object+0x10);
-        func_002AB6D8((float *)(object+0xC0),(float *)(state+0x20));
+        mat_get_euler_angles((float *)(object+0xC0),(float *)(state+0x20));
         target=D_L16_001B2B1C+(I(state,4)<<8);
         I(state,0x58)=0;
-        if (!target || target[0x20]==254 || target[0x20]==253) { F(state,0x34)=1.0f; func_002A7750(object,4,-1); }
+        if (!target || target[0x20]==254 || target[0x20]==253) { F(state,0x34)=1.0f; moby_set_state(object,4,-1); }
         else { F(state,0x34)=0.0f; goto mode1; }
         return;
     case 1:
-        func_00282F20(position,object+0xE0,D_L16_001AF430);
-        func_00282CC0(object+0x10,position,state+0x10);
-        if (func_00282948((int *)(state+0x3C)) && func_00282E48(object+0x10,R+0x80)<1.75f) {
-            if (D_00189E20.field123a || D_00189E20.field22b4) goto decay;
-            if (D_0018C958.sentinel<65535 && I(D_L16_0027F078,0)==0 && I(D_L16_0027F078,0x24)==-1) {
-                func_00288E18(0x9C7,30);
-                D_0018C958.sentinel=-1;
+        vec_scale_to_length(position,object+0xE0,D_L16_001AF430);
+        FastVecAdd(object+0x10,position,state+0x10);
+        if (math_fast_float_d((int *)(state+0x3C)) && fast_vec_dist(object+0x10,R+0x80)<1.75f) {
+            if (g_hero_state.field123a || g_hero_state.field22b4) goto decay;
+            if (g_subtitle_history.sentinel<65535 && I(D_L16_0027F078,0)==0 && I(D_L16_0027F078,0x24)==-1) {
+                subtitle_request_voice_line(0x9C7,30);
+                g_subtitle_history.sentinel=-1;
             }
-            if (D_00189E20.field1248!=10) goto decay;
-            if (D_00189E20.field1220) {
-                if (!func_L00_0032EF10(0x80,6,0) || !(D_00189E20.field31c<0.2f) || !func_L16_003960F8((char *)object)) goto decay;
+            if (g_hero_state.field1248!=10) goto decay;
+            if (g_hero_state.field1220) {
+                if (!PadPressedWithin(0x80,6,0) || !(g_hero_state.field31c<0.2f) || !moby_is_spot_free_of_blockers((char *)object)) goto decay;
                 if (F(state,0x34)<1.0f) {
-                    func_002AFDD8((char *)object,(char *)forward,R,0);
-                    func_00282CF0(direction,R+0x80,object+0x10);
-                    func_002AFDD8((char *)object,(char *)direction,(char *)direction,0);
+                    vec_transform_by_object_or_given((char *)object,(char *)forward,R,0);
+                    FastVecSub(direction,R+0x80,object+0x10);
+                    vec_transform_by_object_or_given((char *)object,(char *)direction,(char *)direction,0);
                     zero=0.0f;
                     forward[2]=zero;
                     direction[2]=zero;
-                    func_00282F20(direction,direction,1.0f);
-                    func_00282F20(forward,forward,1.0f);
-                    if (func_00282DB0(direction,forward)<0.2f) { func_L16_002C0BC8(0x37,1); func_L16_00395D30((char *)object); }
-                    func_002A7750(object,2,-1);
+                    vec_scale_to_length(direction,direction,1.0f);
+                    vec_scale_to_length(forward,forward,1.0f);
+                    if (FastVecDot(direction,forward)<0.2f) { hero_l16_enter_state(0x37,1); cam_start_blend_to_target((char *)object); }
+                    moby_set_state(object,2,-1);
                 }
             }
         }
@@ -106,38 +106,38 @@ decay:
     value=F(state,0x34);
     if (!(value<=0.0f)) return;
     F(state,0x34)=0.0f;
-    if (func_00282C48(F(state,0x40))>0.002f) { F(state,0x40)*=-0.333f; F(state,0x34)=F(state,0x40); }
+    if (math_fabs(F(state,0x40))>0.002f) { F(state,0x40)*=-0.333f; F(state,0x34)=F(state,0x40); }
     else F(state,0x40)=0.0f;
         return;
     case 2:
-        if (func_L00_0032EF10(0x80,6,0) && D_00189E20.field1b8>=18) goto leaveActive;
+        if (PadPressedWithin(0x80,6,0) && g_hero_state.field1b8>=18) goto leaveActive;
         if (F(state,0x34)>=1.0f) goto leaveActive;
-        if (D_00189E20.field2294==0x37) goto active;
+        if (g_hero_state.field2294==0x37) goto active;
 leaveActive:
-        if (D_00189E20.field2294==0x37) func_L16_002C0BC8(0,1);
-        func_003355A8(1);
+        if (g_hero_state.field2294==0x37) hero_l16_enter_state(0,1);
+        cam_set_mode_state(1);
         I(state,0x3C)=20;
         I(state,0x58)++;
-        if (I(state,0x58)==3 || I(state,0x58)==6) func_00288E18(0x9C7,30);
+        if (I(state,0x58)==3 || I(state,0x58)==6) subtitle_request_voice_line(0x9C7,30);
         if (F(state,0x34)>=1.0f) {
-            if (D_001A79F0==26) D_0018C958.sentinel=-1;
+            if (g_current_map_index==26) g_subtitle_history.sentinel=-1;
             F(state,0x34)=1.0f;
-            func_002A7750(object,4,-1);
+            moby_set_state(object,4,-1);
         } else {
 mode1:
-            func_002A7750(object,1,-1);
+            moby_set_state(object,1,-1);
         }
         return;
 active:
-            func_00282F20(position,object+0xE0,D_L16_001AF434);
-            func_00282CC0(object+0x10,position,state+0x10);
-            func_L16_00395858((char *)object);
-            func_L16_003959B8((char *)object);
-            func_L16_00395C00((char *)object);
-            func_L16_00395ED0((char *)object);
+            vec_scale_to_length(position,object+0xE0,D_L16_001AF434);
+            FastVecAdd(object+0x10,position,state+0x10);
+            hero_switch_push_anim_state((char *)object);
+            spinning_object_move_along_ground((char *)object);
+            moby_tilt_to_ground_slope((char *)object);
+            BlendCameraPose((char *)object);
         return;
     case 4:
-        if (func_002B3868(object)) F(state,0x44)=D_L16_001AF430;
+        if (flag_set_first_pending(object)) F(state,0x44)=D_L16_001AF430;
         velocity=F(state,0x48)-0.004f;
         value=F(state,0x44)+velocity;
         ground=D_L16_001AF438;
@@ -145,11 +145,11 @@ active:
         F(state,0x44)=value;
         if (value<=ground) {
             F(state,0x44)=ground;
-            if (func_00282C48(F(state,0x48))>0.002f) F(state,0x48)*=-0.333f;
+            if (math_fabs(F(state,0x48))>0.002f) F(state,0x48)*=-0.333f;
             else *(u16 *)(object+0x34)|=2;
         }
-        func_00282F20(position,object+0xE0,F(state,0x44));
-        func_00282CC0(object+0x10,position,state+0x10);
+        vec_scale_to_length(position,object+0xE0,F(state,0x44));
+        FastVecAdd(object+0x10,position,state+0x10);
         return;
     default:
         return;

@@ -9,20 +9,20 @@
 typedef unsigned char u8;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern void func_L02_004224C8(u8 *);
-extern int func_002E5CF8(int, int, void *);
+extern void *CreateMoby(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern void moby_rebuild_frame_from_transform(u8 *);
+extern int PlayMobySound(int, int, void *);
 extern char D_0018A0E0[];
 extern float D_L02_001B1F98 __attribute__((sda));
 extern float D_L02_001B1FA0 __attribute__((sda));
 extern float D_L02_001B1FA4 __attribute__((sda));
 
 /* Creates a new moving object (moby class 3336) at the given position, aimed along the given direction, and starts it. Returns the new object, or 0 if none could be made. */
-u8 *func_L02_004216F0(u8 *position, int owner, u8 *direction, float speed) {
+u8 *projectile_l02_spawn(u8 *position, int owner, u8 *direction, float speed) {
     u8 *spawned = CreateMoby(0xD08 /* moby class 3336 */);
     u8 *vars;
     int steps;
@@ -47,7 +47,7 @@ u8 *func_L02_004216F0(u8 *position, int owner, u8 *direction, float speed) {
         *(int *)(vars + 0x50) = owner;
         *(u8 *)(spawned + 0x20) = 0;
         *(float *)(vars + 0x60) = D_L02_001B1F98;
-        RebuildFrameFromTransform(spawned);
+        moby_rebuild_frame_from_transform(spawned);
         PlayMobySound(1, 0, spawned);
     }
     return spawned;

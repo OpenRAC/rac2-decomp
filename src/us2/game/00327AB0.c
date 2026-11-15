@@ -7,7 +7,7 @@
 extern char D_00189E20_9[];
 extern unsigned char D_US2_001A7A4C MACRO_ADDR;
 extern float func_00282C88_1(float *buf);
-extern float func_00282DF0(float *buf);
+extern float FastVecLength(float *buf);
 
 void func_US2_00327AB0(char *obj)
 {
@@ -44,5 +44,5 @@ void func_US2_00327AB0(char *obj)
     func_00282C88_1(buf);
     buf[0] = *(float *)(e + 16);
     buf[1] = *(float *)(e + 20);
-    *(float *)(e + 48) = func_00282DF0(buf);
+    *(float *)(e + 48) = FastVecLength(buf);
 }

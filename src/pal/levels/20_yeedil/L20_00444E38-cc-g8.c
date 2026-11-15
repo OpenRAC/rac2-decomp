@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_00444E38, the PAL copy of func_L20_0043F460: the same C, where rename func_002BDBC0 becomes func_PAL_002BE880; scale func_002A7820(0x14, 0x50). */
 
 /* func_L20_00444088 is defined in L20_00444088-g8.c (it needs its own flags). */
@@ -18,9 +19,9 @@ extern int D_L20_001B1FCC __attribute__((nosda));
 
 extern char D_L20_001A8F20[];
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
 extern void func_PAL_002BE880(char *, char *, int, int, int, float);
 
@@ -30,8 +31,8 @@ void func_PAL_L20_00444E38(char *arg0) {
     int r;
     int v[2];
 
-    f20 = func_002A7878(D_L20_001B1FD0, D_L20_001B1FD4) * 210000.0f;
-    r = (((int)(func_002A7820(0x14, 0x50)) * 5 + 2) / 6);
+    f20 = math_random_float_range(D_L20_001B1FD0, D_L20_001B1FD4) * 210000.0f;
+    r = (((int)(math_random_int_range(0x14, 0x50)) * 5 + 2) / 6);
     if (*(short *)(s0 + 0xAA) == 0xB5A) {
         v[0] = D_L20_001B1FC0;
         v[1] = D_001B1FC4;

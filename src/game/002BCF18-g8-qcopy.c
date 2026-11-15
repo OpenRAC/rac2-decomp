@@ -8,25 +8,25 @@ extern float D_001B168C;
 /* Read through lui/lw with a separate address register: not small data, so an
    incomplete array indexed [0]. */
 extern unsigned char *D_001F2580[];
-extern int func_002A77E0(int);
-extern char *func_002B9030(int);
-extern int func_00283CF0(float);
+extern int math_random_int_below(int);
+extern char *part_alloc(int);
+extern int FloatToInt(float);
 extern char func_001163B0(void);
 
 /* Creates a falling drop particle at a point with a velocity. It does nothing if there is no life or the screen is too busy. */
-char *func_002BCF18(char *position, char *velocity, int color, int endColor, int life, int type, float size)
+char *part_spawn_falling_drop(char *position, char *velocity, int color, int endColor, int life, int type, float size)
 {
     char *particle;
 
     if (life == 0)
         return 0;
-    if (D_001B168C > 0.9f && RandomIntBelow(3) == 0)
+    if (D_001B168C > 0.9f && math_random_int_below(3) == 0)
         return 0;
-    if (D_001B168C > 0.95f && RandomIntBelow(2) == 0)
+    if (D_001B168C > 0.95f && math_random_int_below(2) == 0)
         return 0;
-    if (D_001B168C > 1.0f && RandomIntBelow(1) == 0)
+    if (D_001B168C > 1.0f && math_random_int_below(1) == 0)
         return 0;
-    particle = AllocParticle(0x10);
+    particle = part_alloc(0x10);
     if (particle != 0) {
         char *motion;
         unsigned char *textureTable;
@@ -39,7 +39,7 @@ char *func_002BCF18(char *position, char *velocity, int color, int endColor, int
         *(float *)(particle + 0xC) = size;
         particle[3] = 0x44;
         particle[9] = alphaRand;
-        particle[8] = Rand();
+        particle[8] = func_001163B0();
         motion = particle + 0x20;
         textureTable = D_001F2580[0];
         particle[2] = *((type != 3) ? textureTable + type : textureTable);

@@ -20,37 +20,37 @@ typedef struct {
     unsigned int mask;
 } Stats_2CB2D8;
 
-extern Hero_2CB2D8 D_00189E20;
-extern Stats_2CB2D8 D_0018C750;
+extern Hero_2CB2D8 g_hero_state;
+extern Stats_2CB2D8 g_progress_statistics;
 extern int D_001A7A04 __attribute__((section(".sdata")));
 extern int D_001A7398 __attribute__((section(".sdata")));
 extern unsigned int D_001A7390 __attribute__((section(".sdata")));
-extern int D_001A79F0 __attribute__((section(".sdata")));
-extern int func_L00_002D3FB0(int);
+extern int g_current_map_index __attribute__((section(".sdata")));
+extern int math_l00_return_argument_2(int);
 
 /* Applies a pending hero change request: counts it in the statistics and switches the hero to the new value. */
-void func_L00_002CB2D8(void)
+void hero_apply_pending_change(void)
 {
     int newValue;
     int altValue;
 
-    if (gHeroState.f2538 == 0)
+    if (g_hero_state.f2538 == 0)
         return;
     altValue = D_001A7398;
     newValue = D_001A7A04;
-    if (gHeroState.f1248 == 10)
+    if (g_hero_state.f1248 == 10)
         newValue = altValue;
-    gHeroState.f2538 = 0;
+    g_hero_state.f2538 = 0;
     if (newValue == 0)
         return;
-    if (gHeroState.f1248 == D_001A7A04)
+    if (g_hero_state.f1248 == D_001A7A04)
         return;
-    if (gProgressStatistics.count <= 0xFFFE)
-        gProgressStatistics.count++;
-    if (D_001A7390 > gProgressStatistics.best)
-        gProgressStatistics.best = D_001A7390;
-    gProgressStatistics.mask = gProgressStatistics.mask | (1 << gCurrentMapIndex) | 0x80000000;
-    gHeroState.f22C8 = ReturnArgument_L00_2(newValue);
-    gHeroState.h24F8 = 0;
-    gHeroState.h24FA = 0;
+    if (g_progress_statistics.count <= 0xFFFE)
+        g_progress_statistics.count++;
+    if (D_001A7390 > g_progress_statistics.best)
+        g_progress_statistics.best = D_001A7390;
+    g_progress_statistics.mask = g_progress_statistics.mask | (1 << g_current_map_index) | 0x80000000;
+    g_hero_state.f22C8 = math_l00_return_argument_2(newValue);
+    g_hero_state.h24F8 = 0;
+    g_hero_state.h24FA = 0;
 }

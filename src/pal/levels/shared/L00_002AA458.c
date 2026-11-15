@@ -13,13 +13,13 @@ typedef struct {
     unsigned short counter;
 } ParticleResidentFields;
 extern ParticleResidentFields D_00189E20_20;
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void *func_L00_00338AE0(float, float, float *, float *, float *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void *part_spawn_random_tinted_effect(float, float, float *, float *, float *);
 
 void func_PAL_L00_002AA458(char *self, int arg1)
 {
@@ -36,20 +36,20 @@ void func_PAL_L00_002AA458(char *self, int arg1)
     if (arg1 < (short)n) {
         for (i = 0; i < 2; i++) {
             if (i == 0)
-                f = func_00283B98(D_00189E20_20.angle, 0.785398006f);
+                f = FastAddRotations(D_00189E20_20.angle, 0.785398006f);
             else
-                f = func_00283BE0(D_00189E20_20.angle, 0.785398006f);
-            v[0] = func_00283180(f) * 0.012000001f;
-            v[1] = func_00283198(f) * 0.012000001f;
+                f = fast_subtract_rotations(D_00189E20_20.angle, 0.785398006f);
+            v[0] = math_fast_sin_or_cos_a(f) * 0.012000001f;
+            v[1] = math_fast_sin_or_cos_b(f) * 0.012000001f;
             w[0] = D_00189E20_20.x + v[0] * 18.0f;
             w[1] = D_00189E20_20.y + v[1] * 18.0f;
             w[2] = D_00189E20_20.z;
             v[2] = 0.0f;
-            v[0] = v[0] - func_00283180(D_00189E20_20.angle) * 0.030000001f;
-            v[1] = v[1] - func_00283198(D_00189E20_20.angle) * 0.030000001f;
-            r = func_002A7878(0.4f, 0.5f);
-            func_L00_00338AE0(r, i == 0 ? 2.0f : -2.0f, w, v, &D_00189E20_20.z);
-            D_00189E20_20.counter = self == 0 ? 0 : func_002A77E0((int)self);
+            v[0] = v[0] - math_fast_sin_or_cos_a(D_00189E20_20.angle) * 0.030000001f;
+            v[1] = v[1] - math_fast_sin_or_cos_b(D_00189E20_20.angle) * 0.030000001f;
+            r = math_random_float_range(0.4f, 0.5f);
+            part_spawn_random_tinted_effect(r, i == 0 ? 2.0f : -2.0f, w, v, &D_00189E20_20.z);
+            D_00189E20_20.counter = self == 0 ? 0 : math_random_int_below((int)self);
         }
     }
 }
@@ -75,14 +75,14 @@ typedef struct {
     char gapA48[0x24C4 - 0xA48];
     float amount;
 } EmissionStateView;
-extern char D_00189E20[];
-extern float func_002A7940(void);
-extern int func_002A7820(int, int);
+extern char g_hero_state[];
+extern float math_random_angle(void);
+extern int math_random_int_range(int, int);
 extern Effect2BFB38 *func_PAL_002C0838(void *, void *, int, int);
 
 void func_PAL_L00_002AA638(int period, int threshold)
 {
-    EmissionStateView *state = (EmissionStateView *)D_00189E20;
+    EmissionStateView *state = (EmissionStateView *)g_hero_state;
     float position[4];
     float velocity[4];
     float angle;
@@ -90,20 +90,20 @@ void func_PAL_L00_002AA638(int period, int threshold)
     int lifetime;
     state->counter++;
     if (threshold < state->counter) {
-        position[0] = state->x + func_002A7878(-0.15f, 0.15f) + state->vx * 8.0f;
-        position[1] = state->y + func_002A7878(-0.15f, 0.15f) + state->vy * 8.0f;
+        position[0] = state->x + math_random_float_range(-0.15f, 0.15f) + state->vx * 8.0f;
+        position[1] = state->y + math_random_float_range(-0.15f, 0.15f) + state->vy * 8.0f;
         position[2] = state->z + 0.1f;
-        angle = func_002A7940();
-        radius = func_002A7878(0.0f, 0.060000002f);
-        velocity[0] = func_00283180(angle) * radius + state->vx * 0.75f;
-        velocity[1] = func_00283198(angle) * radius + state->vy * 0.75f;
-        velocity[2] = func_002A7878(0.060000002f, 0.13000001f);
-        lifetime = func_002A7820(90, 120);
+        angle = math_random_angle();
+        radius = math_random_float_range(0.0f, 0.060000002f);
+        velocity[0] = math_fast_sin_or_cos_a(angle) * radius + state->vx * 0.75f;
+        velocity[1] = math_fast_sin_or_cos_b(angle) * radius + state->vy * 0.75f;
+        velocity[2] = math_random_float_range(0.060000002f, 0.13000001f);
+        lifetime = math_random_int_range(90, 120);
         if (state->amount < 0.25f)
             func_PAL_002C0838(position, velocity, 3, lifetime);
         else
             func_PAL_002C0838(position, velocity, 1, lifetime);
-        ((EmissionStateView *)D_00189E20)->counter = func_002A77E0(period);
+        ((EmissionStateView *)g_hero_state)->counter = math_random_int_below(period);
     }
 }
 

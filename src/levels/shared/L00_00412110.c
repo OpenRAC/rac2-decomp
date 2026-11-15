@@ -2,7 +2,7 @@
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
 /* Works out a smooth in-between point on a curve from a start point to an end point, given how far along it is. */
-void func_L00_00412110(float *out, float *startPoint, float *endPoint, float *before, float *after, float amount)
+void math_l00_interpolate_cubic_vector_2(float *out, float *startPoint, float *endPoint, float *before, float *after, float amount)
 {
     float t2, t3, cubicTerm, squareTerm, linearTerm;
 

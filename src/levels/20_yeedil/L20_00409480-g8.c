@@ -11,14 +11,14 @@ extern int D_L20_001B2FB8;
 
 extern char *D_L20_001B2F9C;
 
-extern void func_L09_003F73E8(char *);
+extern void shared_counter_release(char *);
 
-extern void func_L09_003F77D0(char *);
+extern void moby_destroy_linked(char *);
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 /* Destroys every Megacorp Trooper Legs object in the given group. */
-void func_L20_00409480(s32 group) {
+void trooper_legs_destroy_group(s32 group) {
     char *idList = D_L20_001FBB20[group];
     s32 groupByte = group & 0xFF;
     char *member;
@@ -42,9 +42,9 @@ void func_L20_00409480(s32 group) {
             if (*(u8 *)(member + 0x20) != 0xFE) {
                 if (*(u8 *)(member + 0x20) != 0xFD) {
                     *(int *)(*(char **)(member + 0x68) + 0x20) = 0;
-                    ReleaseSharedCounter(member);
-                    DestroyLinkedMobys(member);
-                    MarkMobySpawned(member);
+                    shared_counter_release(member);
+                    moby_destroy_linked(member);
+                    moby_mark_spawned(member);
                 }
             }
         }

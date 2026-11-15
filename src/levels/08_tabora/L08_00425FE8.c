@@ -1,18 +1,18 @@
 #include "common.h"
 typedef unsigned int u128 __attribute__((mode(TI)));
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282FB8(void *,void *,float);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
-extern float func_002A7798(float);
-extern float func_L01_00310BC0(float,float,float,void *,float,float);
-extern void func_002A8240(void *,void *,int,float,float,float);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern void vec_fast_divide_helper(void *,void *,float);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
+extern float math_ease_out_quad(float);
+extern float math_turn_angle_toward_target(float,float,float,void *,float,float);
+extern void moby_move_and_collide(void *,void *,int,float,float,float);
 /* Moves the object toward its target point, speeding up and then slowing down to stop there.
    Returns 1 while it is braking. */
-int func_L08_00425FE8(char *moby,float accel,float speed,float turn,float blend,float angle) {
+int moby_move_to_target_braking(char *moby,float accel,float speed,float turn,float blend,float angle) {
     float old[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
     char *vars=*(char **)(moby+0x68);
@@ -25,7 +25,7 @@ int func_L08_00425FE8(char *moby,float accel,float speed,float turn,float blend,
     distance=FastVecLength(dir);
     velocity=FastVecLength(vars+0x190);
     if (distance < velocity*(velocity/accel)) {velocity-=accel; braking=1;}
-    else velocity += accel*EaseOutQuad((speed-velocity)/speed);
+    else velocity += accel*math_ease_out_quad((speed-velocity)/speed);
     vec_scale_to_length(dir,dir,velocity);
     FastVecScale(vars+0x190,vars+0x190,blend);
     FastVecScale(dir,dir,1.0f-blend);
@@ -35,14 +35,14 @@ int func_L08_00425FE8(char *moby,float accel,float speed,float turn,float blend,
     timer=IntToFloat(*(s16 *)(vars+0x1BE));
     { float divisor=IntToFloat(120); timer *= 6.0f; limit=timer/divisor; }
     if(limit>6.0f)limit=6.0f;
-    MoveAndCollideObject(moby,vars+0x190,0,0.0f,limit,0.0f);
+    moby_move_and_collide(moby,vars+0x190,0,0.0f,limit,0.0f);
     *(float *)(moby+0x18)-=2.0f;
     FastVecSub(vars+0x190,vars+0x190,vars+0x1A0);
-    *(float *)(vars+0x208)=TurnAngleTowardTarget(*(float *)(vars+0x208),turn,0.0005817764904350042f,vars+0x1C0,0.0017453294713050127f,0.03490659222006798f);
-    *(float *)(moby+0xF4)=TurnAngleTowardTarget(*(float *)(moby+0xF4),angle,0.0004848137323278934f,vars+0x220,0.0017453294713050127f,0.03490659222006798f);
+    *(float *)(vars+0x208)=math_turn_angle_toward_target(*(float *)(vars+0x208),turn,0.0005817764904350042f,vars+0x1C0,0.0017453294713050127f,0.03490659222006798f);
+    *(float *)(moby+0xF4)=math_turn_angle_toward_target(*(float *)(moby+0xF4),angle,0.0004848137323278934f,vars+0x220,0.0017453294713050127f,0.03490659222006798f);
     FastVecScale(vars+0x1A0,vars+0x1A0,0.95f);
     FastVecSub(dir,moby+0x10,old);
-    FastVectorDivideHelper(dir,dir,0.13333334f);
+    vec_fast_divide_helper(dir,dir,0.13333334f);
     FastVecAdd(moby+0x10,old,dir);
     return braking;
 }

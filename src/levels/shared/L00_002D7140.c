@@ -7,26 +7,26 @@ typedef int s32;
 
 typedef float f32;
 
-extern void func_0026FF08(f32, f32, f32, f32, s32, s32);
+extern void cam_set_value_target(f32, f32, f32, f32, s32, s32);
 
 /* clears object byte then calls the measured four-float helper when the field is nonnegative */
 /* Ends a camera override: clears its active flag and eases the camera blend back to normal. */
-void func_L00_002D7140(u8 *object) {
+void cam_end_override(u8 *object) {
  object[0x1d]=0;
  if (*(f32 *)(object+0x10)>=0.0f)
-  SetCameraValueTarget(1.1243411302566528f,0.005f,0.2f,0.0f,0,3);
+  cam_set_value_target(1.1243411302566528f,0.005f,0.2f,0.0f,0,3);
 }
 
 
 extern char D_L00_001B8C80[];
 extern float D_L00_001BD370;
-extern float func_00283198(f32);
-extern float func_00283180(f32);
-extern void func_0027AB40(void);
+extern float math_fast_sin_or_cos_b(f32);
+extern float math_fast_sin_or_cos_a(f32);
+extern void UpdateViewContext(void);
 
 /* Initialize the shared blend fields and the quotient of the two helper results. */
 /* Sets up the starting camera blend values when a level begins. */
-void func_L00_002D75F0(void) {
+void cam_l00_init_blend_values(void) {
     u8 *camState = (u8 *)D_L00_001B8C80;
     float blendValue = 1.1243411f;
     float angle = 0.56217057f;
@@ -35,8 +35,8 @@ void func_L00_002D75F0(void) {
     camState[0x3E9] = 0;
     *(float *)(camState + 0x3D4) = blendValue;
     *(float *)(camState + 0x3D8) = blendValue;
-    first = FastSinOrCosB(angle);
-    second = FastSinOrCosA(angle);
+    first = math_fast_sin_or_cos_b(angle);
+    second = math_fast_sin_or_cos_a(angle);
     D_L00_001BD370 = first / second;
     UpdateViewContext();
     *(float *)(camState + 0x3DC) = 0.005f;

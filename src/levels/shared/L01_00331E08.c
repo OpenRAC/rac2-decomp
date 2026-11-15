@@ -1,14 +1,14 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern void func_00282CC0(void *out, void *a, void *b);
-extern float func_002B0520(void *position);
-extern void func_002B9180(void *object);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern float coll_get_heightmap_height(void *position);
+extern void part_kill(void *object);
 extern float D_L01_001B27A0[];
 extern float D_L01_001B27B0 MACRO_ADDR;
 extern float D_L01_001B27A8 MACRO_ADDR;
 
 /* Moves a falling particle each frame and removes it when it leaves the map or sinks below the ground. */
-void func_L01_00331E08(char *object)
+void part_l01_update_falling(char *object)
 {
     float offset[4] __attribute__((aligned(16)));
     float test1[4] __attribute__((aligned(16)));
@@ -20,7 +20,7 @@ void func_L01_00331E08(char *object)
     int x;
     int y;
     if (*(float *)(object + 0x10) < 0.0f || *(float *)(object + 0x14) < 0.0f || *(float *)(object + 0x10) > 512.0f || *(float *)(object + 0x14) > 512.0f || *(float *)(object + 0x18) < height) {
-        KillParticle(object);
+        part_kill(object);
         return;
     }
     position = (float *)(object + 0x10);
@@ -32,15 +32,15 @@ void func_L01_00331E08(char *object)
     FastVecAdd(position, position, D_L01_001B27A0);
     if (x != (int)*(float *)(object + 0x10) || y != (int)*(float *)(object + 0x14)) {
         *(Quad *)test1 = *(Quad *)position;
-        measured = GetHeightmapHeightAtPosition(test1);
+        measured = coll_get_heightmap_height(test1);
         if (D_L01_001B27B0 <= measured) {
             *(Quad *)test2 = *(Quad *)position;
-            height = GetHeightmapHeightAtPosition(test2);
+            height = coll_get_heightmap_height(test2);
         } else {
             height = D_L01_001B27B0;
         }
         if (*(float *)(object + 0x18) < height) {
-            KillParticle(object);
+            part_kill(object);
             return;
         }
     }

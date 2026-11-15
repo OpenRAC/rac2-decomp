@@ -1,11 +1,12 @@
+#include "names.h"
 /* Applies trigger and timer commands to the object, its parent and its two linked parts. */
 #include "common.h"
-extern int func_L00_00329520(void *, int);
-extern int func_L09_003F71C8(void *, int);
-extern int func_00282978(void *);
-extern void func_0026FEB8(const char *, ...);
-extern int func_L02_002EF388(void *, void *, void *, char **, int);
-extern char D_00189EA0[];
+extern int coll_point_inside_region(void *, int);
+extern int trooper_legs_count_with_value(void *, int);
+extern int FastDecTimer(void *);
+extern void STUB_printf(const char *, ...);
+extern int moby_fuse_linked_objects(void *, void *, void *, char **, int);
+extern char g_hero_position[];
 extern char D_L09_001B10E0[];
 extern int D_L09_001B2388[] __attribute__((sda));
 typedef struct ActivationState ActivationState;
@@ -51,18 +52,18 @@ struct ActivationState {
     int threshold;
 };
 /* Turns the enemy and its linked parts on or off when a trigger or timer says so. */
-int func_L09_003F9D08(ActivationObject *obj)
+int enemy_process_activation(ActivationObject *obj)
 {
     ActivationState *s = obj->state;
     if (s->group && obj->group == 255) obj->group = s->group;
     if (s->trigger != -1 && !obj->command) {
-        if (!IsPointInsideRegion(gHeroPosition, s->trigger)) {
+        if (!coll_point_inside_region(g_hero_position, s->trigger)) {
             if (!s->disabled) s->command = -2;
             else if (s->command == -2) s->command = 0;
         } else if ((!s->mode || ((s->flags^1) & 1)) && !s->command) s->command = 1;
     }
     if (s->flags & 2) {
-        if (CountGroupLegsWithValue(obj, s->threshold_arg) < s->threshold) { s->command = 0; return 1; }
+        if (trooper_legs_count_with_value(obj, s->threshold_arg) < s->threshold) { s->command = 0; return 1; }
         if (FastDecTimer(&s->timer)) s->command = 1;
         else s->command = 0;
     }
@@ -115,7 +116,7 @@ int func_L09_003F9D08(ActivationObject *obj)
                     s->parts[i]->enabled = 1;
                 }
             }
-            FuseObjectWithLinkedObjects(obj, (char *)obj + 0x10, (char *)obj + 0xF0, (char **)s->parts, 3);
+            moby_fuse_linked_objects(obj, (char *)obj + 0x10, (char *)obj + 0xF0, (char **)s->parts, 3);
         }
     } else if (s->disabled) {
         if (s->command == -2) s->command = 0;

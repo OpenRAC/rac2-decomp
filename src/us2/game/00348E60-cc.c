@@ -1,6 +1,7 @@
+#include "names.h"
 /* func_US2_00348E60, the USA v2.00 copy of func_00348128: the same C. */
 
-extern unsigned long long func_00347EA0(unsigned long long);
+extern unsigned long long menu_pass_through_handle(unsigned long long);
 
 typedef int s32;
 
@@ -8,7 +9,7 @@ typedef unsigned char u8;
 
 typedef float f32;
 
-extern void func_00348068(unsigned char *owner, float *records);
+extern void menu_set_entry_table(unsigned char *owner, float *records);
 
 extern int func_US2_00348E60(unsigned char *);
 
@@ -18,7 +19,7 @@ extern int func_US2_00348E60(unsigned char *);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 /* func_0034CA68: owner ABI/declaration review retained. */
-extern int func_002A9588(int, int, int, int, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
 /* func_00345490 is built from 00345358-init.c. */
 
 /* func_00345F70 is built from 00345358-layout-g8.c. */
@@ -33,15 +34,15 @@ typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
 extern MenuGridEntry D_00259F58[];
 extern MenuLabelOffset ref_003472B8_00;
-extern void func_00335E68(void *, int);
+extern void object_set_flag_value(void *, int);
 
 /* func_00347468 is built from 00345358-selection-g8.c. */
 
-unsigned long long func_00347EA0(unsigned long long value);
+unsigned long long menu_pass_through_handle(unsigned long long value);
 
 /* func_00347F80 is built from 00345358-wrap.c. */
 
-void func_00348068(u8 *a0,f32 *a1);
+void menu_set_entry_table(u8 *a0,f32 *a1);
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Measured target: byte-identical across all 27 levels. */
@@ -83,7 +84,7 @@ extern const StageIntTable D_001AE648, D_001AE658;
 /* func_0034AA30 is built from 0034AA30.c. */
 
 /* Stores an argument at +1012; if the word at +1024 is zero it returns, else it clears +1024, sets +12 to 1 and calls one callee four times on this+468/604/740/876 with argument 1. */
-extern int func_002A9588(int, int, int, int, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
 
-extern void func_00335E68(void *, int);
+extern void object_set_flag_value(void *, int);
 /* Measured target: byte-identical across all 27 levels. */

@@ -9,9 +9,9 @@ typedef struct { char reserved00[0x10]; int flags; } FlagTarget;
 typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int f54; int f58; } MenuFields;
 typedef struct { short f0; short text; short f4; } TextEntry;
 
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
-extern int func_002E5E58(int, unsigned int, void *);
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int D_001AB9FC __attribute__((sda));
 extern short D_001A63AC[];
 extern unsigned char D_001A7A60[] MACRO_ADDR;
@@ -21,20 +21,20 @@ extern int D_0025C094[];
 extern TextEntry D_0026CF18[];
 
 /* Handles input on the skill points list: moves the cursor through the 30 entries and shows the earned entry text. */
-int func_002CFBE8(void)
+int menu_handle_skill_points_list_input(void)
 {
     int result = 0;
-    int flags = gPadState.flags;
+    int flags = g_pad_state.flags;
     int oldCursor = D_001AB9FC;
 
     if (flags & 0x10) {
         int value;
         int returnCode;
         D_001AB9FC = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             returnCode = -1;
             goto finish;
         }
@@ -46,11 +46,11 @@ finish:
         D_001AB9FC = 0;
         result = 1;
     } else if (flags & 0x1000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         if (--D_001AB9FC < 0)
             D_001AB9FC = 29;
     } else if (flags & 0x4000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         if (++D_001AB9FC >= 30)
             D_001AB9FC = 0;
     }

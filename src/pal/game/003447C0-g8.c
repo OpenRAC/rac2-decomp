@@ -1,15 +1,16 @@
 #include "include_asm.h"
-extern void func_00336320(int *);
-extern void func_003425B8(int *);
-extern void func_00342648(int);
+#include "names.h"
+extern void gfx_draw_screen_element_stored(int *);
+extern void list_menu_draw_cursor(int *);
+extern void list_menu_draw_scroller(int);
 
 void func_PAL_003447C0(int *p)
 {
     if (p[92] != 0) {
-        func_00336320(p);
-        func_00336320(p + 19);
-        func_003425B8(p);
-        func_00342648((int)p);
-        func_00342668(p);
+        gfx_draw_screen_element_stored(p);
+        gfx_draw_screen_element_stored(p + 19);
+        list_menu_draw_cursor(p);
+        list_menu_draw_scroller((int)p);
+        menu_list_draw_rows(p);
     }
 }

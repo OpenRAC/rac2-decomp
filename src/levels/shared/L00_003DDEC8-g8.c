@@ -1,15 +1,15 @@
 #include "common.h"
-extern int D_L00_001B043C __attribute__((sda));
+extern int g_spider_bot_moby __attribute__((sda));
 extern int D_001A904C[] __attribute__((sda));
 extern float D_L00_001B2704[] __attribute__((sda));
 extern int D_L00_001B2B40[] __attribute__((sda));
 extern char D_L00_001B0450[];
-extern int func_00336D50(int, int);
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern void func_002ED578(int, int *, int *, int *);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_00283CF0(float);
-extern void func_0027F5B8(int, int, unsigned long, char *, int);
+extern int table_find_by_id(int, int);
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern void math_split_time_into_parts(int, int *, int *, int *);
+extern int sprintf(char *, char *, ...);
+extern int FloatToInt(float);
+extern void text_draw_medium(int, int, unsigned long, char *, int);
 
 /* The display mode word beside the HUD scale. */
 extern int D_L00_001B2700[] __attribute__((sda));
@@ -29,7 +29,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 
 /* Draws the HUD timer: two labels from the text table, then the time split into three
    fields, formatted and drawn centred, scaled by the HUD scale. */
-int func_L00_003DDEC8(void)
+int hud_draw_timer(void)
 {
     char text[64];
     int a, b, c;
@@ -37,23 +37,23 @@ int func_L00_003DDEC8(void)
     float half;
     float ox, sc, z, w;
 
-    if (gSpiderBotMoby == 0)
+    if (g_spider_bot_moby == 0)
         return 1;
     w = 380.0f;
     half = 0.5f;
     one = 1;
     entry = 0x8710;
-    id = FindTableEntryById(D_001A904C[0] + entry, 0xC1);
+    id = table_find_by_id(D_001A904C[0] + entry, 0xC1);
     y = hud_coord(w, D_L00_001B2704[0], half, one);
     ox = -0.5f;
     sc = 1.0f;
-    DrawScaledObjectTwoAxes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
-    id = FindTableEntryById(D_001A904C[0] + entry, 0xC2);
+    gfx_draw_scaled_object_two_axes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
+    id = table_find_by_id(D_001A904C[0] + entry, 0xC2);
     y = hud_coord(w, D_L00_001B2704[0], half, one);
-    DrawScaledObjectTwoAxes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
-    SplitTimeIntoParts(D_L00_001B2B40[0], &a, &b, &c);
-    Sprintf(text, D_L00_001B0450, a, b, c);
-    DrawTextMediumFont(FloatToInt(405.0f), hud_coord(372.0f, D_L00_001B2704[0], half, one),
+    gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
+    math_split_time_into_parts(D_L00_001B2B40[0], &a, &b, &c);
+    sprintf(text, D_L00_001B0450, a, b, c);
+    text_draw_medium(FloatToInt(405.0f), hud_coord(372.0f, D_L00_001B2704[0], half, one),
                   0x80808080UL, text, 128);
     return 1;
 }

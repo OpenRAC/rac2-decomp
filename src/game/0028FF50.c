@@ -1,3 +1,4 @@
+#include "names.h"
 /* Clamps the object's current value to its limit, then either raises the first of two
    byte counters below 8 (when the 0x7C level is 5 or more) or lowers the second, then the
    first, setting the 0x6C state to 1, or to -6 once both are 0. Its entry is eight bytes
@@ -15,7 +16,7 @@ typedef struct {
 } Gauge;
 
 /* Updates the fade counters of a HUD gauge: they grow while the level is full and shrink back otherwise. */
-void func_0028FF50(Gauge *gauge)
+void gauge_update_fade_counters(Gauge *gauge)
 {
     unsigned char *fades = gauge->counter;
     int limitValue = *gauge->limit;

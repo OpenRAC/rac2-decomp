@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,10 +24,10 @@
  */
 #include "common.h"
 
-extern s8 D_0021F240[];
+extern s8 g_vendor_menu_state[];
 
 /* Marks every entry for the given item in the shop list as owned. */
-void func_002FAD68(s32 itemId) {
+void shop_mark_item_owned(s32 itemId) {
     s32 i;
     s32 count;
     s32 ownedValue;
@@ -34,7 +35,7 @@ void func_002FAD68(s32 itemId) {
     s8 *shopBase;
     s8 *row;
 
-    shop = gVendorMenuState;
+    shop = g_vendor_menu_state;
     if ((*(s32 *)((s8 *)(shop) + (0x740))) > 0) {
         i = 0;
         shopBase = shop;

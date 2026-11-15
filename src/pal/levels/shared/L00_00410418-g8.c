@@ -35,13 +35,13 @@ typedef struct {
 extern s32 D_L00_001B0FE4 __attribute__((sda));
 extern s16 D_L00_001B2D40[3];
 extern s16 D_L00_001B2D50[3];
-extern Moby40B838 *func_0029EFD0(int);
-extern Link40B838 *func_002AB1F0(void *);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_00283CE0(int);
-extern f32 func_002A7940(void);
+extern Moby40B838 *CreateMoby(int);
+extern Link40B838 *moby_get_private_value_0(void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 IntToFloat(int);
+extern f32 math_random_angle(void);
 extern void func_002A0F48(void *);
 
 Moby40B838 *func_PAL_L00_00410418(f32 *pos, int arg1, f32 *parent, int arg3)
@@ -53,7 +53,7 @@ Moby40B838 *func_PAL_L00_00410418(f32 *pos, int arg1, f32 *parent, int arg3)
     Link40B838 *link;
     int i;
 
-    m = func_0029EFD0(0xED8);
+    m = CreateMoby(0xED8);
     if (m != 0) {
         vars = m->vars;
         m->alpha = 0xFF;
@@ -63,35 +63,35 @@ Moby40B838 *func_PAL_L00_00410418(f32 *pos, int arg1, f32 *parent, int arg3)
         m->fB8 = arg1;
         m->state = 0;
         qcopy(vars->vec, parent + 4);
-        vars->vec[2] += func_002AB1F0(parent)->f10;
+        vars->vec[2] += moby_get_private_value_0(parent)->f10;
         if (parent != 0) {
             qcopy(tmp, parent + 4);
-            link = func_002AB1F0(parent);
+            link = moby_get_private_value_0(parent);
             if (link != 0) {
-                func_002AFFD8(parent + 4, vec, 1);
-                func_00282D30(vec, vec, link->f10);
-                func_00282CC0(tmp, tmp, vec);
+                cam_compute_view_direction(parent + 4, vec, 1);
+                FastVecScale(vec, vec, link->f10);
+                FastVecAdd(tmp, tmp, vec);
             }
         }
         qcopy(m->pos, pos);
         {
             int scaled = ((s32)(D_L00_001B0FE4) * 5 + 2) / 6;
             vars->f10 = scaled;
-            vars->f14 = 1.0f / func_00283CE0(scaled);
+            vars->f14 = 1.0f / IntToFloat(scaled);
         }
         vars->f1C = arg3;
         *(f32 **)((char *)vars + 0xC) = parent;
         if (parent != 0) {
-            link = func_002AB1F0(parent);
+            link = moby_get_private_value_0(parent);
             if (link != 0)
                 link->flags |= 0x80;
         }
-        m->rot[0] = func_002A7940();
-        m->rot[1] = func_002A7940();
-        m->rot[2] = func_002A7940();
-        vars->dir[0] = func_002A7940();
-        vars->dir[1] = func_002A7940();
-        vars->dir[2] = func_002A7940();
+        m->rot[0] = math_random_angle();
+        m->rot[1] = math_random_angle();
+        m->rot[2] = math_random_angle();
+        vars->dir[0] = math_random_angle();
+        vars->dir[1] = math_random_angle();
+        vars->dir[2] = math_random_angle();
         for (i = 0; i < 3; i++) {
             D_L00_001B2D40[i] = -1;
             D_L00_001B2D50[i] = 0x18;

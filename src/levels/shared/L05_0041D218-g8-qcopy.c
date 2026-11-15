@@ -10,20 +10,20 @@ typedef struct {
     unsigned long tag, tex, alpha, test;
 } Beam;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
-extern void func_L05_0041D1B0(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
+extern void quad_record_init_default(void *);
 extern Vector4 D_L05_001B96C0;
 
 /* The func_L05_0037D7D8 strip with this level's own setup helper: one strip from start
    to end, one colour, a caller texture and each end's basis taken from that end. */
 /* Draws a flat coloured strip between two points, facing the camera. */
-void func_L05_0041D218(Vector4 *start, Vector4 *end, unsigned int color, int texture, float width)
+void gfx_l05_draw_beam_strip_2(Vector4 *start, Vector4 *end, unsigned int color, int texture, float width)
 {
     Beam strip;
     Vector4 basis[4], size;
@@ -36,7 +36,7 @@ void func_L05_0041D218(Vector4 *start, Vector4 *end, unsigned int color, int tex
     size.f[2] = width;
     strip.tag = 0;
     size.f[3] = 1;
-    InitDefaultQuadRecord(&strip);
+    quad_record_init_default(&strip);
     strip.uv[0] = 0; strip.uv[1] = 0; strip.uv[2] = 0; strip.uv[3] = 1;
     strip.uv[4] = 1; strip.uv[5] = 0; strip.uv[6] = 1; strip.uv[7] = 1;
     FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);

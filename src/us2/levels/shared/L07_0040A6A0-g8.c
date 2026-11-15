@@ -4,7 +4,7 @@
  * test first in case 1. */
 
 extern s32 ref_L07_00409300_00 __attribute__((sda));
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 
 extern void ref_L07_00409300_01(s8 *, s32, s32);
 extern void ref_L07_00409300_02(s8 *, s8 *, s32, s32, f32);
@@ -20,7 +20,7 @@ void func_US2_L07_0040A6A0(s8 *arg0) {
         ref_L07_00409300_01(arg0, 1, -1);
         return;
     case 1:
-        if (D_001A79F0 == 0x33) {
+        if (g_current_map_index == 0x33) {
             return;
         }
         if (s != 0) {

@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
 typedef struct { float x, y, z, w; } V4_F213135aa;
-extern s32 func_00282A18(s32 value);
+extern s32 log2dim(s32 value);
 typedef struct {
     u8 pad00[0x80]; float position[4];
     u8 pad90[0x288]; float previousHeight;
@@ -11,21 +12,21 @@ typedef struct {
     u8 pad1834[0xA5C]; char *field2290; int state;
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
-extern SurfacePlayer D_00189E20;
+extern SurfacePlayer g_hero_state;
 extern char D_001A8BD0[] __attribute__((sda));
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
 } SurfaceCamera;
-extern SurfaceCamera D_001B5200;
+extern SurfaceCamera g_active_camera;
 extern V4_F213135aa ref_00302DA0_04[];
 extern void ref_00302DA0_00(int, int, float);
 extern int ref_00302DA0_01(int, int);
 extern void ref_00302DA0_02(void);
 extern int ref_00302DA0_03(void);
-extern int func_00303E20(char *, void *, int *, int *);
-extern void func_002A7750(u8 *, u8, s32);
-extern float func_002AA140(float, float, float);
+extern int FindSurfaceGridCell(char *, void *, int *, int *);
+extern void moby_set_state(u8 *, u8, s32);
+extern float math_lerp_float(float, float, float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
     float, float, float, float, int, float, int, int, int, int, int);
 
@@ -42,17 +43,17 @@ void func_PAL_00303F38(char *object)
     float center, ceiling, blend;
     int index;
     if (*(int *)(state+0x98)==-1) {
-        if (func_00303E20(object,D_00189E20.position,(int *)(state+0x90),(int *)(state+0x94))) {
+        if (FindSurfaceGridCell(object,g_hero_state.position,(int *)(state+0x90),(int *)(state+0x94))) {
             *(int *)(state+0x98)=0;
-            func_002A7750((u8 *)object,5,-1);
+            moby_set_state((u8 *)object,5,-1);
         }
     }
     if (*(int *)(state+0x98)>=0) {
         center=*(float *)(state+0x70)+*(float *)(state+4);
         ceiling=center+*(float *)(state+0x34)+1.0f;
-        if (D_001B5200.position[2]<=ceiling && center-*(float *)(state+0x34)-1.0f<=D_001B5200.position[2])
-            D_001B5200.heightOffset=ceiling-D_001B5200.position[2];
-        { SurfacePlayer *player = &D_00189E20;
+        if (g_active_camera.position[2]<=ceiling && center-*(float *)(state+0x34)-1.0f<=g_active_camera.position[2])
+            g_active_camera.heightOffset=ceiling-g_active_camera.position[2];
+        { SurfacePlayer *player = &g_hero_state;
         if (player->state!=0x38 && player->state!=0x79 &&
             (player->state!=0x39 || *(int *)(*(char **)(player->field2290+0x24)+0x1f0)) &&
             player->state!=0x7a) {
@@ -72,12 +73,12 @@ void func_PAL_00303F38(char *object)
             else ref_00302DA0_01(0x39,1);
         }
         }
-        if (D_00189E20.state==0x31 && *(int *)(state+0x98)>5)
+        if (g_hero_state.state==0x31 && *(int *)(state+0x98)>5)
             ref_00302DA0_03();
         blend=(float)*(int *)(state+0x98)*0.05f;
         if (blend>1.0f) blend=1.0f;
         index=*(int *)(state+0x40)*64+*(int *)(state+0x94)*8+*(int *)(state+0x90);
-        D_00189E20.position[2]=func_002AA140(D_00189E20.position[2],
+        g_hero_state.position[2]=math_lerp_float(g_hero_state.position[2],
             ref_00302DA0_04[index].z-(float)*(int *)(state+0x98)*0.020000001f,blend);
         ++*(int *)(state+0x98);
     }

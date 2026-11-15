@@ -7,26 +7,26 @@ extern u8 D_L10_00188660[];
 extern s32 D_L10_001A8F00;
 extern s32 D_L10_001A904C __attribute__((sda));
 extern s32 D_L10_001B1440 __attribute__((sda));
-extern s32 D_L10_001B1390[] __attribute__((sda));
+extern s32 g_mission_completion_counts[] __attribute__((sda));
 extern s32 D_L10_001B1390_gp[] SDATA(D_L10_001B1390);
 extern s32 D_L10_001B1448_gp[][3] SDATA(D_L10_001B1448);
 extern s32 D_L10_001B355C;
 extern s32 D_L10_001B13EC __attribute__((sda));
 extern s32 D_L10_001B13E8 __attribute__((sda));
-extern s32 D_001A79F8;
+extern s32 g_player_bolts;
 extern u8 D_001A7A0A;
 extern u32 D_00138324;
-extern s32 D_L10_001B143C __attribute__((sda));
-extern void func_002E59F8(s32);
-extern s32 func_00282948(void *);
-extern void func_0027D330(s32);
+extern s32 g_selected_mission_index __attribute__((sda));
+extern void snd_stop_voice(s32);
+extern s32 math_fast_float_d(void *);
+extern void FadeToBlack(s32);
 extern void func_PAL_0029C0F0(s32, void *);
 extern void func_PAL_L10_00429070(void);
-extern void func_L10_00425888(void);
-extern void func_0029B3E0(s32, s32);
-extern void func_L05_00379F48(s32);
-extern void func_L10_00423500(u8 *);
-extern void func_002B49E0(s32, s32, s32, s32, s32);
+extern void mission_store_completion_counts(void);
+extern void MemcardSave(s32, s32);
+extern void hero_set_state_value_c(s32);
+extern void hrugis_reset_mission_state(u8 *);
+extern void request_begin_slot(s32, s32, s32, s32, s32);
 
 /* Stops the owner's effect. Unless state D_L10_001A8F00 is 2, once func_00282948(s + 0x58)
    reports done, the first pass with D_L10_001A904C set adds the kind's reward (times 10
@@ -46,16 +46,16 @@ void func_PAL_L10_00429620(u8 *obj, s32 kind) {
     if (id != -1) {
         u8 *p = D_L10_00188660 + id * 0x70;
         if (*(u8 **)(p + 0x88) == other && p[0x74])
-            func_002E59F8(id);
+            snd_stop_voice(id);
     }
     os->effect = -1;
     tmp = D_L10_001A8F00;
     if (tmp == 2)
         return;
-    if (!func_00282948(s + 0x58))
+    if (!math_fast_float_d(s + 0x58))
         return;
     if (D_L10_001A904C && !D_L10_001B1440) {
-        func_0027D330(25);
+        FadeToBlack(25);
         func_PAL_0029C0F0(0, func_PAL_L10_00429070);
         n = D_L10_001B1390_gp[kind];
         capped = n < 3 ? n : 2;
@@ -68,29 +68,29 @@ void func_PAL_L10_00429620(u8 *obj, s32 kind) {
         if (multiplier)
             reward *= 10;
         D_L10_001B1390_gp[kind] = n + 1;
-        D_001A79F8 = D_001A79F8 + reward;
-        func_L10_00425888();
-        func_0029B3E0(0, -1);
+        g_player_bolts = g_player_bolts + reward;
+        mission_store_completion_counts();
+        MemcardSave(0, -1);
     }
-    func_L05_00379F48(1);
-    if (!func_00282948(s + 0x40)) {
+    hero_set_state_value_c(1);
+    if (!math_fast_float_d(s + 0x40)) {
         tmp = D_00138324 & 0x40;
         if (tmp) {
             D_L10_001B1440 = 0;
             *(s32 *)(s + 0x40) = 0x20F58;
-            func_0027D330(25);
-            func_L05_00379F48(0);
+            FadeToBlack(25);
+            hero_set_state_value_c(0);
             *(s32 *)(s + 0x58) = 100;
             *(s32 *)(s + 0x48) = 0x2328;
-            if (D_L10_001B1390_gp[0] && D_L10_001B1390[1] && D_L10_001B1390[2])
-                D_L10_001B143C = 3;
-            else if (D_L10_001B1390_gp[0] && D_L10_001B1390[1])
-                D_L10_001B143C = 2;
+            if (D_L10_001B1390_gp[0] && g_mission_completion_counts[1] && g_mission_completion_counts[2])
+                g_selected_mission_index = 3;
+            else if (D_L10_001B1390_gp[0] && g_mission_completion_counts[1])
+                g_selected_mission_index = 2;
             else if (D_L10_001B1390_gp[0])
-                D_L10_001B143C = 1;
-            func_L10_00423500(obj);
+                g_selected_mission_index = 1;
+            hrugis_reset_mission_state(obj);
         } else if (D_00138324 & 0x10)
-            func_002B49E0(3, 1, 4, 0, 0);
+            request_begin_slot(3, 1, 4, 0, 0);
     } else
         *(s32 *)(s + 0x40) = 0x20F58;
 }

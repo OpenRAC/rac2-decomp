@@ -1,24 +1,24 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002A7750(char *, int, int);
-extern void func_002A7750();
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L02_0031E9E8(float *, float);
-extern void func_L01_0031A278(char *, float *, float, float, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_L00_00321878(char *, int, int, int, int, int, float);
-extern int func_002A68A8(char *, int *);
-extern char *func_003202E8(float *, int, int, int);
-extern void func_00282D30(char *, char *, float);
-extern void func_L02_003A8770(float *, int);
-extern void func_0026FEB8(const char *, ...);
-extern int func_002E5E58(int, unsigned int, void *);
-extern void func_002B0A18(int, int);
+extern void moby_set_state(char *, int, int);
+extern void moby_set_state();
+extern void FastVecAdd(void *, void *, void *);
+extern void math_random_planar_offset(float *, float);
+extern void moby_compute_local_point(char *, float *, float, float, float);
+extern int PlayMobySound(int, int, void *);
+extern void part_spawn_bolt_pickups(char *, int, int, int, int, int, float);
+extern int PickAmmoDropItem(char *, int *);
+extern char *SpawnWeaponAmmoPickup(float *, int, int, int);
+extern void FastVecScale(char *, char *, float);
+extern void moby_create_effect_at_position(float *, int);
+extern void STUB_printf(const char *, ...);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void value_set_entry_by_index(int, int);
 extern char D_L02_001B09C8[];
-extern int D_L02_001AEC78 __attribute__((sda));
+extern int g_hovering_object_count __attribute__((sda));
 extern int D_L02_001A903C __attribute__((sda));
-extern int D_001A79F8 __attribute__((sda));
+extern int g_player_bolts __attribute__((sda));
 extern void *D_L02_002A52D0[5];
 typedef struct {
     char pad0[0xA4];
@@ -49,46 +49,46 @@ void func_US2_L02_003E8D50(char *arg0) {
     char *p;
     unsigned int sel;
 
-    func_002A7750(arg0, 1, -1);
-    func_L02_0031E9E8(b, 1.0f);
-    func_L01_0031A278(arg0, a, 3.0f, 0.0f, 2.0f);
-    func_00282CC0(a, b, a);
+    moby_set_state(arg0, 1, -1);
+    math_random_planar_offset(b, 1.0f);
+    moby_compute_local_point(arg0, a, 3.0f, 0.0f, 2.0f);
+    FastVecAdd(a, b, a);
     sel = *(int *)(state + 0x5C) - 1;
     if (sel < 5)
         goto *D_L02_002A52D0[sel];
     goto other;
 c1:
-    func_002E5CF8(2, 0x20, arg0);
-    func_L00_00321878(arg0, 0xF, 0x41, 3, -1, 4, 0.0f);
+    PlayMobySound(2, 0x20, arg0);
+    part_spawn_bolt_pickups(arg0, 0xF, 0x41, 3, -1, 4, 0.0f);
     goto done;
 c2:
     ((State003E77E0 *)state)->flag = 1;
-    D_L02_001AEC78--;
-    func_002A7750(arg0, 5, -1);
+    g_hovering_object_count--;
+    moby_set_state(arg0, 5, -1);
     goto done;
 c3:
-    func_002E5CF8(2, 0x20, arg0);
-    func_002A68A8(arg0, &out);
-    p = *(char **)(func_003202E8(a, out, -1, 0) + 0x68);
-    func_00282D30(p, p, 0.35f);
+    PlayMobySound(2, 0x20, arg0);
+    PickAmmoDropItem(arg0, &out);
+    p = *(char **)(SpawnWeaponAmmoPickup(a, out, -1, 0) + 0x68);
+    FastVecScale(p, p, 0.35f);
     goto done;
 c4:
-    func_002E5CF8(2, 0x20, arg0);
-    func_L02_003A8770(a, 0);
-    func_0026FEB8(D_L02_001B09C8);
+    PlayMobySound(2, 0x20, arg0);
+    moby_create_effect_at_position(a, 0);
+    STUB_printf(D_L02_001B09C8);
     goto done;
 c5:
-    func_002E5CF8(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, arg0);
     if (D_001A7A00.once == 0) {
         D_001A7A00.once = 1;
-        func_002E5E58(1, 0, 0);
-        func_002B0A18(0x1233, -1);
+        snd_play_from_global_bank(1, 0, 0);
+        value_set_entry_by_index(0x1233, -1);
         D_L02_001A903C = 1;
     }
-    D_001A79F8 += 300;
+    g_player_bolts += 300;
     goto done;
 other:
-    func_002E5CF8(3, 0x20, arg0);
+    PlayMobySound(3, 0x20, arg0);
 done:
     return;
 }

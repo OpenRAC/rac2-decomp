@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,20 +24,20 @@
  */
 #include "common.h"
 
-extern void func_00115484(s8 *, s32, s32);
-extern s32 func_00288FB8(s32);
-extern s32 *func_00335E20(s8 *);
-extern void func_00335F88(s8 *, f32, f32, f32, f32);
-extern void func_003361E0(s8 *, s8 *, s8 *);
-extern void func_00336390(s8 *, s32, s32);
-extern void func_003363C0(s8 *, f32);
-extern void func_00336710(s8 *, s8 *, s8 *);
-extern void func_00336920(s8 *, s32, s32);
-extern void func_003369A8(s8 *, s8 *, s8 *);
-extern void func_00336A38(s8 *, s32);
-extern s8 *func_00336DA8(s32, s32);
-extern s32 func_00336E40(s8 *);
-extern void func_00347EC8(s8 *, s8 *);
+extern void memset(s8 *, s32, s32);
+extern s32 GetLocalizedString(s32);
+extern s32 *object_get_fourth_field(s8 *);
+extern void object_set_second_float4(s8 *, f32, f32, f32, f32);
+extern void object_init_derived_arrays(s8 *, s8 *, s8 *);
+extern void object_set_helper_result(s8 *, s32, s32);
+extern void object_set_value_float(s8 *, f32);
+extern void object_init_derived_c(s8 *, s8 *, s8 *);
+extern void hud_set_widget_value_pair(s8 *, s32, s32);
+extern void hud_init_widget_defaults(s8 *, s8 *, s8 *);
+extern void hud_set_widget_field_b(s8 *, s32);
+extern s8 *ui_return_second_arg(s32, s32);
+extern s32 pool_alloc_cell(s8 *);
+extern void list_menu_reset_attach_items(s8 *, s8 *);
 extern s32 D_001A8CFC;
 extern s8 D_001ADC10[];
 extern s8 D_001ADC18[];
@@ -47,7 +48,7 @@ extern s8 D_001ADFC0[];
 extern s8 D_001AE0C0[];
 
 /* Sets up the parts of a tabbed menu: panels, frame, cursor, label and icon. */
-void func_00341220(s8 *self, s8 *parent) {
+void tab_menu_init(s8 *self, s8 *parent) {
     s8 *allocation;
     s8 *cursor;
     s8 *panelOne;
@@ -58,7 +59,7 @@ void func_00341220(s8 *self, s8 *parent) {
 
     (*(s8 **)((s8 *)(self) + (0x21C))) = parent;
     if (parent != 0) {
-        allocation = ReturnSecondArgument(0x10, AllocPoolCell(parent));
+        allocation = ui_return_second_arg(0x10, pool_alloc_cell(parent));
         (*(s8 **)((s8 *)(self) + (0x218))) = allocation;
         (*(s32 *)((s8 *)(allocation) + (4))) = 0;
         (*(s32 *)((s8 *)(allocation) + (8))) = 0;
@@ -72,34 +73,34 @@ void func_00341220(s8 *self, s8 *parent) {
     panelTwo = self + 0xE4;
     (*(f32 *)((s8 *)((*(s8 **)((s8 *)(self) + (0x218)))) + (4))) = 170.0f;
     frame = self + 0x130;
-    InitDerivedArrays(self, D_001ADC10, parent);
+    object_init_derived_arrays(self, D_001ADC10, parent);
     icon = self + 0x17C;
     label = self + 0x1D0;
-    InitDerivedArrays(cursor, D_001ADC18, parent);
-    InitDerivedArrays(panelOne, D_001ADC20, parent);
-    InitDerivedArrays(panelTwo, D_001ADC28, parent);
-    InitDerivedArrays(frame, D_001ADFC0, parent);
-    InitWidgetDefaults(label, D_001ADC30, parent);
-    InitDerivedObjectC(icon, D_001AE0C0, parent);
-    InitListMenu_00347EC8(self + 0x228, parent);
-    *GetFieldC(self) = 0x60442D00;
-    *GetFieldC(cursor) = 0x80FFDE8D;
-    *GetFieldC(panelOne) = 0x55F0C070;
-    *GetFieldC(panelTwo) = 0x55F0C070;
-    *GetFieldC(frame) = 0x70FFFEED;
-    *GetFieldC(label) = 0x80F0F0F0;
-    *GetFieldC(icon) = 0x60F0F0B0;
-    SetFloatAt38(self, 1.0f);
-    SetFloatAt38(panelOne, 1.0f);
-    SetFloatAt38(panelTwo, 1.0f);
-    SetFieldAt40(self, D_001A8CFC + 0x8710, 0x91);
-    SetFieldAt40(cursor, D_001A8CFC + 0x8710, 0x94);
-    SetFieldAt40(panelOne, D_001A8CFC + 0x8710, 0x92);
-    SetFieldAt40(panelTwo, D_001A8CFC + 0x8710, 0x93);
-    SetFieldAt40(frame, D_001A8CFC + 0x8710, 0x95);
-    SetSecondFloat4(frame, 1.0f, 1.05f, 0.0f, 0.0f);
-    SetWidgetField40(label, GetLocalizedString(0x2D55));
-    SetWidgetValuePair(icon, 0xEA9D, 0);
+    object_init_derived_arrays(cursor, D_001ADC18, parent);
+    object_init_derived_arrays(panelOne, D_001ADC20, parent);
+    object_init_derived_arrays(panelTwo, D_001ADC28, parent);
+    object_init_derived_arrays(frame, D_001ADFC0, parent);
+    hud_init_widget_defaults(label, D_001ADC30, parent);
+    object_init_derived_c(icon, D_001AE0C0, parent);
+    list_menu_reset_attach_items(self + 0x228, parent);
+    *object_get_fourth_field(self) = 0x60442D00;
+    *object_get_fourth_field(cursor) = 0x80FFDE8D;
+    *object_get_fourth_field(panelOne) = 0x55F0C070;
+    *object_get_fourth_field(panelTwo) = 0x55F0C070;
+    *object_get_fourth_field(frame) = 0x70FFFEED;
+    *object_get_fourth_field(label) = 0x80F0F0F0;
+    *object_get_fourth_field(icon) = 0x60F0F0B0;
+    object_set_value_float(self, 1.0f);
+    object_set_value_float(panelOne, 1.0f);
+    object_set_value_float(panelTwo, 1.0f);
+    object_set_helper_result(self, D_001A8CFC + 0x8710, 0x91);
+    object_set_helper_result(cursor, D_001A8CFC + 0x8710, 0x94);
+    object_set_helper_result(panelOne, D_001A8CFC + 0x8710, 0x92);
+    object_set_helper_result(panelTwo, D_001A8CFC + 0x8710, 0x93);
+    object_set_helper_result(frame, D_001A8CFC + 0x8710, 0x95);
+    object_set_second_float4(frame, 1.0f, 1.05f, 0.0f, 0.0f);
+    hud_set_widget_field_b(label, GetLocalizedString(0x2D55));
+    hud_set_widget_value_pair(icon, 0xEA9D, 0);
     memset(self + 0x1B8, 0, 12);
-    SetSecondFloat4(icon, 32.0f, 32.0f, 0.0f, 0.0f);
+    object_set_second_float4(icon, 32.0f, 32.0f, 0.0f, 0.0f);
 }

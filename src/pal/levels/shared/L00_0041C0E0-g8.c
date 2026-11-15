@@ -3,16 +3,16 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern void func_002AFFD8(void *, void *, int);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282F20(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void vec_scale_to_length(void *, void *, float);
 extern void *func_PAL_L00_00340CA0(float, void *, void *, int, int, int, int, float, int, int, int);
-extern void *func_L00_0033C0D0(void *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 extern char D_L00_001B1418 __attribute__((sda));
 extern char D_L00_001B13F8 __attribute__((sda));
 extern char D_L00_001B1408 __attribute__((sda));
@@ -26,35 +26,35 @@ void func_PAL_L00_0041C528(char *object)
     int i;
     float angle, random, life, speed, spread, frame;
 
-    func_002AFFD8(object + 0x10, &up, 1);
+    cam_compute_view_direction(object + 0x10, &up, 1);
     if (*(int *)(state + 4) != 0)
         return;
     frame = 0.020000001f;
     for (i = 0; i < 3; i++) {
-        angle = func_002A7878(-0.9599311948f, -1.3962635994f);
-        random = func_002A7940();
-        speed = func_002A7878(0.0f, 0.5f);
+        angle = math_random_float_range(-0.9599311948f, -1.3962635994f);
+        random = math_random_angle();
+        speed = math_random_float_range(0.0f, 0.5f);
         spread = 0.3f;
         frame = 0.020000001f;
         speed *= frame;
-        func_002AF000(&velocity, speed, random, angle);
-        life = func_002A7878(0.65f, 0.85f) * 210000.0f;
-        pos.f[0] = *(float *)(object + 0x10) + func_002A78D8(0.0f, spread);
-        pos.f[1] = *(float *)(object + 0x14) + func_002A78D8(0.0f, spread);
-        pos.f[2] = *(float *)(object + 0x18) + func_002A78D8(0.0f, spread);
-        func_PAL_L00_00340CA0(life, &pos, &velocity, 0x4F808080, 0x08101010, func_002A7820(29, 42), 1, 0.5f, 1, -1, 1);
+        vec_build_spherical_offset(&velocity, speed, random, angle);
+        life = math_random_float_range(0.65f, 0.85f) * 210000.0f;
+        pos.f[0] = *(float *)(object + 0x10) + math_random_signed_float_range(0.0f, spread);
+        pos.f[1] = *(float *)(object + 0x14) + math_random_signed_float_range(0.0f, spread);
+        pos.f[2] = *(float *)(object + 0x18) + math_random_signed_float_range(0.0f, spread);
+        func_PAL_L00_00340CA0(life, &pos, &velocity, 0x4F808080, 0x08101010, math_random_int_range(29, 42), 1, 0.5f, 1, -1, 1);
     }
-    func_002AFFD8(object + 0x10, &velocity, 1);
-    func_00282F20(&velocity, &velocity, 0.2f);
+    cam_compute_view_direction(object + 0x10, &velocity, 1);
+    vec_scale_to_length(&velocity, &velocity, 0.2f);
     qcopy_nc(&pos, object + 0x10);
-    pos.f[2] += func_002A7878(0.1f, 0.4f);
-    func_L00_0033C0D0(object, &pos, &velocity, &D_L00_001B1418, func_002A77E0(2));
+    pos.f[2] += math_random_float_range(0.1f, 0.4f);
+    part_spawn_object_relative_particle(object, &pos, &velocity, &D_L00_001B1418, math_random_int_below(2));
     qcopy_nc(&pos2, object + 0x10);
-    pos2.f[2] += func_002A7878(0.9f, 1.2f);
-    func_L00_0033C0D0(object, &pos2, &velocity, &D_L00_001B13F8, func_002A77E0(2));
+    pos2.f[2] += math_random_float_range(0.9f, 1.2f);
+    part_spawn_object_relative_particle(object, &pos2, &velocity, &D_L00_001B13F8, math_random_int_below(2));
     qcopy_nc(&pos3, object + 0x10);
-    pos3.f[2] += func_002A7878(0.8f, 1.5f);
-    func_L00_0033C0D0(object, &pos3, &velocity, &D_L00_001B1408, func_002A77E0(2));
+    pos3.f[2] += math_random_float_range(0.8f, 1.5f);
+    part_spawn_object_relative_particle(object, &pos3, &velocity, &D_L00_001B1408, math_random_int_below(2));
     qcopy_nc(&pos4, object + 0x10);
-    func_L00_0033C0D0(object, &pos4, &velocity, &D_L00_001B1428, func_002A77E0(2));
+    part_spawn_object_relative_particle(object, &pos4, &velocity, &D_L00_001B1428, math_random_int_below(2));
 }

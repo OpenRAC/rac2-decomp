@@ -1,9 +1,10 @@
 #include "include_asm.h"
-extern int D_001A79F0;
-extern void *func_L01_002F1FD0(float, float, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+#include "names.h"
+extern int g_current_map_index;
+extern void *tv_screen_find_nearest(float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern char D_L12_0027F710[];
 extern int D_L12_001A9410 __attribute__((sda));
 typedef struct {
@@ -27,13 +28,13 @@ void func_PAL_L12_00301950(void)
     int i;
     int off;
 
-    if (D_001A79F0 != 12)
+    if (g_current_map_index != 12)
         return;
 
     obj = 0;
     index = -1;
     if (D_L12_001BDB00.mode < 2) {
-        obj = func_L01_002F1FD0(0.0f, 0.0f, 0.0f);
+        obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
         index = 2;
     }
     if (index != -1 && obj != 0) {
@@ -46,10 +47,10 @@ void func_PAL_L12_00301950(void)
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
-                func_00283098((char *)(D_L12_001BDB00.mesh + off), q, c);
-                func_00282D30((char *)(D_L12_001BDB00.mesh + off),
+                matrix_mul_vec3((char *)(D_L12_001BDB00.mesh + off), q, c);
+                FastVecScale((char *)(D_L12_001BDB00.mesh + off),
                               (char *)(D_L12_001BDB00.mesh + off), scale);
-                func_00282CC0((char *)(D_L12_001BDB00.mesh + off),
+                FastVecAdd((char *)(D_L12_001BDB00.mesh + off),
                               (char *)(D_L12_001BDB00.mesh + off), d);
                 off += 0x10;
                 q += 0x10;

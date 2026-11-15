@@ -6,7 +6,7 @@ typedef struct {
     u8 gap[0x2294 - 0x1834];
     int state;
 } ResidentWaterView;
-extern ResidentWaterView D_00189E20;
+extern ResidentWaterView g_hero_state;
 
 /* Counts and masks have unknown owning extents; these GP address views do not
  * give them invented small array bounds. The initializer consumes six masks. */
@@ -20,14 +20,14 @@ extern u8 D_L20_0025DD00[];
 extern int D_L20_0025DD60[];
 typedef struct { int id, offsets[2], size; } WaterHeaderSlot;
 extern WaterHeaderSlot D_L20_002B22E0[];
-extern void func_L20_00447908(void);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L04_003A1A78(u8 *);
-extern void func_L04_003A5C08(u32, float);
-extern void func_L04_003A1C98(char *);
-extern void func_L04_003A1FA0(u8 *);
-extern void func_L04_003A1FE0(u8 *);
-extern void func_L00_003294F0(void *, int);
+extern void level_start_fixed_effect(void);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void water_init_object(u8 *);
+extern void water_add_splash_entry(u32, float);
+extern void water_update_controller(char *);
+extern void water_advance_controller_state(u8 *);
+extern void water_update_ripple_patches(u8 *);
+extern void moby_set_flag_bit(void *, int);
 
 typedef struct {
     int count, activeCount;
@@ -44,11 +44,11 @@ typedef struct {
 } WaterContext;
 
 /* Runs a patch of water (moby class 4685). It builds and draws the water tiles and turns on the objects linked to it. */
-void func_L20_00447748(u8 *object)
+void water_patch_update(u8 *object)
 {
     WaterContext context;
     u8 *state;
-    u8 *controller = gHeroState.controller;
+    u8 *controller = g_hero_state.controller;
     int count;
     int remaining;
     int *child;
@@ -56,7 +56,7 @@ void func_L20_00447748(u8 *object)
 
     if (controller != 0 && *(s16 *)(controller + 0xAA) == 0x45 /* moby class 69 */ &&
         controller[0x20] != 0xFE && controller[0x20] != 0xFD &&
-        gHeroState.state == 0x31)
+        g_hero_state.state == 0x31)
         return;
     state = *(u8 **)(object + 0x68);
     if (state == 0)
@@ -76,24 +76,24 @@ void func_L20_00447748(u8 *object)
     context.buffer = D_L20_0025DD60;
     context.slots = D_L20_002B22E0;
     context.owner = object;
-    context.draw = StartLevelEffectSix;
-    context.enqueue = AddDrawCallbackToList3;
+    context.draw = level_start_fixed_effect;
+    context.enqueue = gfx_add_draw_callback_third;
     switch (object[0x20]) {
     case 0:
-        InitWaterObject((u8 *)&context);
-        AddWaterSplashEntry((u32)object, *(float *)(state + 0x28));
+        water_init_object((u8 *)&context);
+        water_add_splash_entry((u32)object, *(float *)(state + 0x28));
     case 1:
-        UpdateWaterController((char *)&context);
+        water_update_controller((char *)&context);
         break;
     case 2:
         absent = -1;
-        AdvanceWaterControllerState((u8 *)&context);
+        water_advance_controller_state((u8 *)&context);
         child = (int *)(state + 0x30);
         for (remaining = 3; remaining >= 0; --remaining, ++child) {
             if (*child != absent)
-                SetObjectFlagBit(D_L20_001B2F9C + (*child << 8), state[0x14]);
+                moby_set_flag_bit(D_L20_001B2F9C + (*child << 8), state[0x14]);
         }
         break;
     }
-    UpdateWaterRipplePatches_L04((u8 *)&context);
+    water_update_ripple_patches((u8 *)&context);
 }

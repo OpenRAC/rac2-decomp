@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -38,7 +39,7 @@ extern void func_002F2990(void *, void *, s32, u32, s32, s32, float, float, floa
 
 /* scrolls the effect's phase, spawns three particles around it, and once the phase passes the
    limit emits three more through the shared emitter with the local direction {0, 0, 0, 1} */
-void func_L22_0040E098(u8 *obj) {
+void part_update_scrolling_effect(u8 *obj) {
     float direction[4];
     u8 *vars = *(u8 **)(obj + 0x68);
     float phase;

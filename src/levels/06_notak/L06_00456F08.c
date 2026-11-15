@@ -2,20 +2,20 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 quad; float f[4]; } TriggerVector;
-extern u8 D_00188660[];
-extern void func_002A7750(u8 *, u8, s32);
-extern s32 func_002E5CF8(s32, s32, char *);
-extern float func_00283B98(float, float);
-extern void *func_002A9640(void *, u32, s32);
-extern void func_002E59F8(s32);
-extern s32 func_002A8508(s32, s32);
-extern void func_L00_00326110(void *, s32, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_002B0A68(char *, s32, void *, u8, float, float, float, float);
-extern void func_0029F338(void *);
+extern u8 g_sound_state[];
+extern void moby_set_state(u8 *, u8, s32);
+extern s32 PlayMobySound(s32, s32, char *);
+extern float FastAddRotations(float, float);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern void snd_stop_voice(s32);
+extern s32 moby_count_group_not_in_state(s32, s32);
+extern void part_spawn_scaled_bolts(void *, s32, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void part_spawn_masked_debris(char *, s32, void *, u8, float, float, float, float);
+extern void moby_mark_spawned(void *);
 
 /* Keep the trigger slot alive until touched, then release it and emit the final burst. */
-void func_L06_00456F08(u8 *object)
+void trigger_slot_burst_update(u8 *object)
 {
     TriggerVector offset;
     u8 *state = *(u8 **)(object + 0x68);
@@ -24,36 +24,36 @@ void func_L06_00456F08(u8 *object)
 
     switch (object[0x20]) {
     case 0:
-        SetMobyState(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
         {
-            u8 *active = gSoundState + *(s32 *)(state + 0xC) * 0x70;
+            u8 *active = g_sound_state + *(s32 *)(state + 0xC) * 0x70;
             if (*(u8 **)(active + 0x88) != object || !active[0x74])
                 *(s32 *)(state + 0xC) = PlayMobySound(1, 4, (char *)object);
         }
         *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 4) * 0.00029088825f);
-        if (FindOwnedEffectSlot(object, 0x4010000, 0) && *(s32 *)state == 0) {
+        if (part_find_owned_effect_slot(object, 0x4010000, 0) && *(s32 *)state == 0) {
             PlayMobySound(0, 0, (char *)object);
-            SetMobyState(object, 2, -1);
+            moby_set_state(object, 2, -1);
             slot = *(s32 *)(state + 0xC);
             if (slot != -1) {
-                record = gSoundState + slot * 0x70;
+                record = g_sound_state + slot * 0x70;
                 if (*(u8 **)(record + 0x88) == object && record[0x74])
-                    StopSoundVoice(slot);
+                    snd_stop_voice(slot);
             }
             *(s32 *)(state + 0xC) = -1;
         }
         object[0xA8] = 0xFF;
         break;
     case 2:
-        if (CountMobysInGroupNotInState(*(s32 *)(state + 8), -1) == 1)
-            SpawnScaledBolts(object, 15, 0.0f);
+        if (moby_count_group_not_in_state(*(s32 *)(state + 8), -1) == 1)
+            part_spawn_scaled_bolts(object, 15, 0.0f);
         offset.quad = 0;
         offset.f[0] = -0.116666675f;
         matrix_mul_vec3(&offset, &offset, object + 0xC0);
-        SpawnDebrisForMaskedParts((char *)object, 31, &offset, 255, 3.0f, 6.0f, 3.0f, 6.0f);
-        MarkMobySpawned(object);
+        part_spawn_masked_debris((char *)object, 31, &offset, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+        moby_mark_spawned(object);
         break;
     }
 }

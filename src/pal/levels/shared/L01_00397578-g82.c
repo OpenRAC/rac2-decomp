@@ -1,18 +1,18 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00282D30(void *, void *, float);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_0029F530(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
-extern int func_00283CF0(float);
-extern unsigned char *func_002C2FD8(void *, int, unsigned char, int, int, int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float moby_get_anim_value(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
+extern int FloatToInt(float);
+extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
 extern char D_L01_001B94C0[];
 extern int ref_L01_00397A28_00 __attribute__((sda));
 extern int ref_L01_00397A28_01 __attribute__((sda));
@@ -29,16 +29,16 @@ void func_PAL_L01_0039AE48(char *m) {
     float *phase, *speed, *size;
     int *timer;
     if (*(unsigned char *)(m + 0x20) == 1)
-        func_00282D30(b, m, 0.0009765625f);
+        FastVecScale(b, m, 0.0009765625f);
     else {
-        func_0029FCC0(m, 0, b);
-        scale = (160.0f - func_0029F530(m)) * 0.1f;
+        moby_transform_joint_to_world(m, 0, b);
+        scale = (160.0f - moby_get_anim_value(m)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
-    func_00282CF0(a, D_L01_001B94C0, b);
-    func_00282F20(a, a, -0.3f);
-    func_00282F20(c, a, 0.1f);
-    func_00282CC0(a, a, b);
+    FastVecSub(a, D_L01_001B94C0, b);
+    vec_scale_to_length(a, a, -0.3f);
+    vec_scale_to_length(c, a, 0.1f);
+    FastVecAdd(a, a, b);
     phase = (float *)(d + 0x20);
     speed = (float *)(d + 0x30);
     timer = (int *)(d + 0x40);
@@ -50,12 +50,12 @@ void func_PAL_L01_0039AE48(char *m) {
         phase[i] = value;
         if (255.0f <= value) phase[i] = value - 255.0f;
         else if (value <= 0.0f) phase[i] = value + 255.0f;
-        if (func_00282948((int *)(d + 0x40) + i)) timer[i] = 212;
-        t = func_00283CE0(212 - timer[i]) * 0.004716981f;
-        color = func_00283D38(ref_L01_00397A28_00, ref_L01_00397A28_01,
-            func_00282C48(0.5f - t));
-        func_002C2FD8(a, color, (unsigned char)func_00283CF0(phase[i]), ref_L01_00397A28_03,
+        if (math_fast_float_d((int *)(d + 0x40) + i)) timer[i] = 212;
+        t = IntToFloat(212 - timer[i]) * 0.004716981f;
+        color = FastTweenColor(ref_L01_00397A28_00, ref_L01_00397A28_01,
+            math_fabs(0.5f - t));
+        part_spawn_fading(a, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00397A28_03,
             ref_L01_00397A28_02, 2, 0, size[i] * scale);
-        func_00282CC0(a, a, c);
+        FastVecAdd(a, a, c);
     }
 }

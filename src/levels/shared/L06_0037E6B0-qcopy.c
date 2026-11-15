@@ -30,10 +30,10 @@ typedef struct {
     f32 field1C;
 } L06RecordTail;
 
-extern void *func_002B9030(s32 kind);
-extern s32 func_00283CF0(f32 value);
-extern f32 func_00283CE0(s32 value);
-extern s32 func_002A77E0(s32 limit);
+extern void *part_alloc(s32 kind);
+extern s32 FloatToInt(f32 value);
+extern f32 IntToFloat(s32 value);
+extern s32 math_random_int_below(s32 limit);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u8 *D_L06_001FF50C;
@@ -41,8 +41,8 @@ extern u8 *D_L06_001FF50C;
 /* The func_L04_00362768 spawner with a colour word, a second size and a random
    spin halfword. */
 /* Spawns a spinning effect record at a position, with a colour, a size and a random spin speed. */
-void func_L06_0037E6B0(void *position, void *direction, u32 angle, f32 size, f32 secondSize) {
-    L06Record *record = (L06Record *)(u32)AllocParticle(0x53);
+void part_spawn_spinning_effect_record(void *position, void *direction, u32 angle, f32 size, f32 secondSize) {
+    L06Record *record = (L06Record *)(u32)part_alloc(0x53);
     L06RecordTail *tail;
     L06Quad temp;
 
@@ -55,7 +55,7 @@ void func_L06_0037E6B0(void *position, void *direction, u32 angle, f32 size, f32
         record->field01 = 0;
         record->field02 = *D_L06_001FF50C;
         record->field0C = size * 105000.0f;
-        record->field08 = (u8)RandomIntBelow(0xFF);
+        record->field08 = (u8)math_random_int_below(0xFF);
         record->field0A = (u16)angle;
         temp = *(L06Quad *)direction;
         record->field20 = temp;
@@ -64,6 +64,6 @@ void func_L06_0037E6B0(void *position, void *direction, u32 angle, f32 size, f32
         tail->field14 = size;
         tail->field18 = 0;
         tail->field1C = secondSize;
-        tail->field1A = (s16)(RandomIntBelow(6) - 3);
+        tail->field1A = (s16)(math_random_int_below(6) - 3);
     }
 }

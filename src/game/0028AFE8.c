@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac3-decomp (src/levels/shared/L01_0041C4A0.c, func_L01_0041C4A0): the
    same instructions. Undoes func_0028AE88 for group N: its entries in both lists move
    down by the group's size and get their top bit back, and the size is cleared. Group 0
@@ -16,7 +17,7 @@ extern int D_001B1888[];
 extern int D_001B1894[];
 extern int D_001B1898[];
 
-void func_0028AFE8(int group) {
+void hud_unlink_bank_group(int group) {
     int groupSize = ((GroupTable *)D_001B1888[0])->c[group];
     int i;
     int end;

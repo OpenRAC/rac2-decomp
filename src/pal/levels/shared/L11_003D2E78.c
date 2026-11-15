@@ -1,17 +1,17 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern unsigned char D_001A7A40[] __attribute__((sda));
-extern int func_00283CF0(float);
-extern float func_00283198(float);
-extern void func_002A7750(char *, int, int);
-extern int func_002ACBC8(void *, int);
-extern int func_002B3868(char *);
-extern void func_L00_00429020(int);
-extern int func_002B0CE0(int, int, int);
+extern int FloatToInt(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void moby_set_state(char *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern int flag_set_first_pending(char *);
+extern void cam_lock_entry(int);
+extern int ForceClaimNotice(int, int, int);
 extern int func_PAL_L11_002D9038(int, int);
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
@@ -25,39 +25,39 @@ void func_PAL_L11_003D2E78(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         *(unsigned short *)(obj + 0x34) |= 0x10;
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             word = *(int *)rig;
             if (word != -1) {
-                func_L00_00429020(word);
+                cam_lock_entry(word);
                 *(int *)rig = -1;
             }
         }
-        hero = D_00189E20;
+        hero = g_hero_state;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
             if (D_001A7A40[0xC0] != 0) {
-                func_002B0CE0(0xC, 0x1349, 1);
+                ForceClaimNotice(0xC, 0x1349, 1);
                 *(short *)(hero + 0x1F2) = 0x8;
                 turn = *(float *)(rig + 0xC);
                 if (turn != 0.0f)
                     *(float *)(hero + 0x5B8) = turn;
             }
         } else {
-            other = D_00189E20;
+            other = g_hero_state;
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
-                if (level >= 0 && func_002ACBC8(other + 0x80, level) != 0)
+                if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
                     func_PAL_L11_002D9038(6, 1);
             }
         }
         break;
     }
     if (*(unsigned char *)(obj + 0x31) != 0) {
-        pulse = func_00283B98(*(float *)(rig + 4), 0.12566373f);
+        pulse = FastAddRotations(*(float *)(rig + 4), 0.12566373f);
         *(float *)(rig + 4) = pulse;
-        glow = func_00283CF0(func_00283198(pulse) * 128.0f);
+        glow = FloatToInt(math_fast_sin_or_cos_b(pulse) * 128.0f);
         if (glow > 0x80)
             glow = 0x80;
         else if (glow < 0x20)

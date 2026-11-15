@@ -10,23 +10,23 @@ typedef int s32;
 typedef short s16;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282CF0(float *, const float *, const float *);
+extern void FastVecSub(float *, const float *, const float *);
 
-extern void func_00282F20(char *, char *, float);
+extern void vec_scale_to_length(char *, char *, float);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
-extern float func_00282E48(char *, char *);
+extern float fast_vec_dist(char *, char *);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern int *D_L23_001FF300[];
+extern int *g_path_lists[];
 
-extern s32 func_L23_00419CA0(s32 arg0);
+extern s32 mothership_is_value_not_in_slots(s32 arg0);
 
 /* Picks the nearest entry of the object each measured slot names, and stores the index found. */
-void func_L23_00418DC0(char *moby, s32 onlyAllowed) {
-    extern void func_L23_00419088();
+void mothership_pick_nearest_path_point(char *moby, s32 onlyAllowed) {
+    extern void mothership_push_path_history();
     struct {
         TI128 a;
         float b[4];
@@ -39,7 +39,7 @@ void func_L23_00418DC0(char *moby, s32 onlyAllowed) {
 
     state = *(char **)(moby + 0x68);
     loc.a = *(TI128 *)src;
-    FastVecSub(loc.b, (float *)src, (float *)gHeroPosition);
+    FastVecSub(loc.b, (float *)src, (float *)g_hero_position);
     slots = state + 0x230;
     best = 30000.0f;
     vec_scale_to_length((char *)loc.b, (char *)loc.b, 4.0f);
@@ -48,15 +48,15 @@ void func_L23_00418DC0(char *moby, s32 onlyAllowed) {
         int *obj;
         s32 k;
 
-        if (onlyAllowed != 0 && IsValueNotInSlotTable(i) == 0)
+        if (onlyAllowed != 0 && mothership_is_value_not_in_slots(i) == 0)
             continue;
-        obj = gPathLists[*(int *)(slots + (i << 2))];
+        obj = g_path_lists[*(int *)(slots + (i << 2))];
         for (k = 0; k < *obj; k++) {
             float d = fast_vec_dist((char *)obj + 0x10 + k * 0x10, (char *)&loc.a);
 
             if (d < best) {
                 best = d;
-                PushPathHistory(moby, i);
+                mothership_push_path_history(moby, i);
                 *(s16 *)(state + 0x396) = k;
             }
         }

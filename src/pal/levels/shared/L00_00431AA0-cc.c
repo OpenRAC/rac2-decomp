@@ -11,9 +11,9 @@ extern PathCamera D_L00_001B8C80;
  * entries; it does not add a bounds check to the path scan. */
 /* Measured child block reached at owner->sub + 0x40. */
 /* Measured partial layouts; original type and game roles are unknown. */
-extern void func_L00_004276E8(char *);
+extern void UpdateCameraTransition(char *);
 
-extern void func_L00_00426680(char *);
+extern void cam_reset_mode_state(char *);
 
 #define SDA_OBJ __attribute__((section(".sdata")))
 
@@ -43,7 +43,7 @@ extern Rac2Native_6af85cabb56d3b41_SmallConditional52Global D_00189E20_20;
 
 /* clears the seven words of the sub-object at +0x70 (the last after a refresh call), then
    clears the flag word and the identity word-16 of the table entry and the owner's +0x7E. */
-void func_L00_00426680(char *self);
+void cam_reset_mode_state(char *self);
 
 /* when the mode halfword at +0x86 is 4 or 0x51, raises the flag halfword of the table entry
    selected by the owner's index halfword at +0x84. */
@@ -53,7 +53,7 @@ void func_L00_00426680(char *self);
    resets the entry's two small floats and the owner's state; the two tests jump to it,
    and it needs its own copy of the entry's address. */
 /* Blends the saved camera position and orientation, then rebuilds its matrix. */
-void func_L00_004276E8(char *object);
+void UpdateCameraTransition(char *object);
 
 /* When the sub-object at +0x70 gains its flag word at +0x40, clears the byte at +0x89 and
    fades the block at +0x30 to a half-turn target. */
@@ -85,9 +85,9 @@ extern char *r1_D_L10_0015F050 MACRO_ADDR;
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a50. */
 /* rac1-decomp src/overlays/shared/rocket_and_path_camera.c: func_L00_004290C0 */
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a78. */
-int func_L00_004290C0(char *moby, char *unused);
+int cam_is_hero_in_trigger(char *moby, char *unused);
 
-extern int func_L00_004290C0(char *, char *);
+extern int cam_is_hero_in_trigger(char *, char *);
 
 /* func_L00_00429CE8 is defined in L00_00429CE8.c. */
 

@@ -1,13 +1,13 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L00_001B8E10;
-extern char *D_L00_001B8E10;
+extern char *g_follow_camera_object;
+extern char *g_follow_camera_object;
 
 /* Stores one float and two scaled by an arcsecond-sized constant into the block at +32. */
 void func_PAL_L00_00429FC8(float a, float b, float c)
 {
-    char *p = D_L00_001B8E10;
+    char *p = g_follow_camera_object;
 
     if (*(short *)(p + 134) == 0) {
         char *q = *(char **)(p + 112);

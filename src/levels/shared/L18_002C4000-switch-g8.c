@@ -18,20 +18,20 @@ extern const float D_L18_001B0444 __attribute__((sda));
 extern const float D_L18_001B0448 __attribute__((sda));
 extern const float D_L18_001B044C __attribute__((sda));
 extern const float D_L18_001B0450 __attribute__((sda));
-extern void *func_L00_002D70A0(s32);
-extern void func_L00_002D7140(void *);
+extern void *cam_alloc_override_slot(s32);
+extern void cam_end_override(void *);
 
 /* While D_L18_001C9D40 is clear: allocates the vector at +0x80 of the object's state block
    (func_L00_002D70A0(5)) when it has none, else sets it to the constant triple of MODE (1, 2 or
    any other). Once D_L18_001C9D40 is set: frees the vector and clears the pointer. */
 /* Turns a colour effect on the object on or off, and picks one of three colours for it. */
-void func_L18_003F9DA0(char *object, s32 mode)
+void moby_set_color_effect(char *object, s32 mode)
 {
     char *state = *(char **)(object + 0x68);
 
     if (D_L18_001C9D40 == 0) {
         if (*(float **)(state + 0x80) == 0) {
-            *(void **)(state + 0x80) = AllocCameraOverrideSlot(5);
+            *(void **)(state + 0x80) = cam_alloc_override_slot(5);
         } else {
             switch (mode) {
             case 1:
@@ -52,7 +52,7 @@ void func_L18_003F9DA0(char *object, s32 mode)
             }
         }
     } else {
-        EndCameraOverride(*(void **)(state + 0x80));
+        cam_end_override(*(void **)(state + 0x80));
         *(int *)(state + 0x80) = 0;
     }
 }

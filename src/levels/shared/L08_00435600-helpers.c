@@ -22,13 +22,13 @@ struct SpawnObject {
     u8 unknown6C[0x84];
     SpawnVector orientation;
 };
-extern SpawnObject *func_0029EFD0(s32);
+extern SpawnObject *CreateMoby(s32);
 extern void func_002A0F48(void *);
 
 extern float D_L08_001B1F94 __attribute__((sda));
 /* Creates the effect object for the owner and starts it at the given position. */
 /* Installs the same aligned input vector in the owner and its attached state. */
-SpawnObject *func_L08_00435600(u8 *owner, SpawnVector *position)
+SpawnObject *part_spawn_attached_effect(u8 *owner, SpawnVector *position)
 {
     SpawnObject *object = CreateMoby(0x998 /* moby class 2456 */);
     if (object != 0) {

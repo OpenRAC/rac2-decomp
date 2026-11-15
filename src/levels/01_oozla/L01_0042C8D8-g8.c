@@ -5,26 +5,26 @@ typedef struct { char pad0[0x20]; int path; int look; int target; float offset[3
 typedef struct { int segment; float distance; float length; float scale; float travelled; short started; short stop; } PathMotion;
 extern unsigned char *D_L01_001B1F04;
 extern unsigned char *D_L01_001FE180[];
-extern unsigned char *D_L01_001B255C;
+extern unsigned char *g_moby_l01_table;
 extern unsigned char D_L01_001B96F0[];
 extern unsigned char D_0018A0E0[];
 extern int D_L01_001B1FA8;
 extern int D_L01_001B1FA8_gp SDATA(D_L01_001B1FA8);
-extern int func_L00_00341820(void *, void *, void *, void *, int, float);
-extern int func_00282978(void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_0026FF08(int, int, float, float, float, float);
-extern void func_00272198(float);
-extern float func_002A7C00(float, float, float);
-extern void func_L01_002BEB90(int, int);
+extern int Spline_AdvanceByDistance(void *, void *, void *, void *, int, float);
+extern int FastDecTimer(void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void cam_set_value_target(int, int, float, float, float, float);
+extern void cam_set_transition_frames(float);
+extern float math_cosine_blend(float, float, float);
+extern void SetHeroMoveState(int, int);
 
-void func_L01_0042C8D8(unsigned char *camera)
+void UpdateSplinePathCamera(unsigned char *camera)
 {
     RouteVector old, up, direction, target;
     unsigned char *v = *(unsigned char **)(camera + 0x70);
@@ -43,7 +43,7 @@ void func_L01_0042C8D8(unsigned char *camera)
         target_index = c->target;
         if (target_index >= 0) {
             float *src = c->offset;
-            unsigned char *entity = gMobyTable_L01 + target_index * 256;
+            unsigned char *entity = g_moby_l01_table + target_index * 256;
             up[0] = src[0]; up[1] = src[1]; up[2] = src[2];
             *(int *)&up[3] = 0;
             matrix_mul_vec3(up, up, D_L01_001B96F0);
@@ -64,8 +64,8 @@ void func_L01_0042C8D8(unsigned char *camera)
     if (c->finished) done = 1;
     if (done) {
         c->finished = 1;
-        SetCameraValueTarget(0, 3, keys->roll, 0.005f, 0.2f, 0.0f);
-        SetCameraTransitionFrames(4.0f);
+        cam_set_value_target(0, 3, keys->roll, 0.005f, 0.2f, 0.0f);
+        cam_set_transition_frames(4.0f);
         *(short *)(camera + 0x7e) = 4;
         if (c->lock) D_L01_001B1FA8_gp = 0;
         SetHeroMoveState(0, 1);
@@ -78,7 +78,7 @@ void func_L01_0042C8D8(unsigned char *camera)
             total = along;
             along += motion->distance;
             for (k = motion->segment; k < keys->idx[i + 1]; ++k) total += *(float *)(path + k * 16 + 0x1c);
-            SetCameraValueTarget(0, 3, CosineBlend(keys->angle[i],
+            cam_set_value_target(0, 3, math_cosine_blend(keys->angle[i],
                 keys->angle[i + 1], along / total) * 0.017453294f, 0.005f, 0.2f, 0);
         }
     }
@@ -86,7 +86,7 @@ void func_L01_0042C8D8(unsigned char *camera)
     target_index = c->target;
     if (target_index >= 0) {
         float *src = c->offset;
-        unsigned char *entity = gMobyTable_L01 + target_index * 256;
+        unsigned char *entity = g_moby_l01_table + target_index * 256;
         direction[0] = src[0]; direction[1] = src[1]; direction[2] = src[2];
         *(int *)&direction[3] = 0;
         matrix_mul_vec3(direction, direction, D_L01_001B96F0);

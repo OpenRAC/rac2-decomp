@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,33 +24,33 @@
  */
 #include "common.h"
 
-extern void func_00282CF0(f32 *a, s32 b, s8 *c);
-extern void func_00282D30(f32 *a, f32 *b, f32 c);
-extern void func_002830C0(f32 *a, f32 *b, s8 *c);
-extern s8 D_001B5340[];
+extern void FastVecSub(f32 *a, s32 b, s8 *c);
+extern void FastVecScale(f32 *a, f32 *b, f32 c);
+extern void transform_vector(f32 *a, f32 *b, s8 *c);
+extern s8 g_camera_eye_state[];
 extern s8 D_001B9250[];
-extern s32 D_001A7340;
-extern s32 D_001A7344;
+extern s32 g_screen_width;
+extern s32 g_screen_height;
 
 /* Turns a point in the world into a screen position between 0 and 1. */
-void func_0027C768(s32 worldPos, f32 *screenX, f32 *screenY) {
+void gfx_world_to_screen_unit(s32 worldPos, f32 *screenX, f32 *screenY) {
     f32 point[4];
     s8 *matrices;
     f32 w;
     f32 pixelX;
     f32 pixelY;
 
-    matrices = gCameraState_001B5340;
+    matrices = g_camera_eye_state;
     FastVecSub(point, worldPos, matrices);
     FastVecScale(point, point, 1024.0f);
     point[3] = 1.0f;
     transform_vector(point, point, matrices - 0x100);
     w = point[3];
     FastVecScale(point, point, *(f32 *)D_001B9250 / w);
-    pixelX = point[0] + (f32)(gScreenWidth >> 1);
+    pixelX = point[0] + (f32)(g_screen_width >> 1);
     *screenX = pixelX;
-    *screenX = pixelX / (f32)gScreenWidth;
-    pixelY = point[1] + (f32)(gScreenHeight >> 1);
+    *screenX = pixelX / (f32)g_screen_width;
+    pixelY = point[1] + (f32)(g_screen_height >> 1);
     *screenY = pixelY;
-    *screenY = pixelY / (f32)gScreenHeight;
+    *screenY = pixelY / (f32)g_screen_height;
 }

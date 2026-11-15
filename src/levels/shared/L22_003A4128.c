@@ -5,11 +5,11 @@ extern int D_L22_001B2AA8[] MACRO_ADDR;
 extern Ctl_003A47E8 *D_L22_001B2AB4[] MACRO_ADDR;
 extern char *D_L22_0023B530[3][60];
 extern float D_L22_001B2AA4 __attribute__((sda));
-extern float func_00282E48(void *, void *);
-extern float func_002B0360(void *);
+extern float fast_vec_dist(void *, void *);
+extern float gravity_get_center_distance(void *);
 
 /* Looks for the nearest spawned pickup that the ship needs and is close enough. Copies its position to the output and returns 1 if found. */
-int func_L22_003A4128(char *obj, Quad0792 *out) {
+int pickup_find_nearest_needed(char *obj, Quad0792 *out) {
     int count = D_L22_001B2AA8[0];
     Ctl_003A47E8 *ctl = D_L22_001B2AB4[0];
     int flags = 0, found = 0, i, bit;
@@ -26,7 +26,7 @@ int func_L22_003A4128(char *obj, Quad0792 *out) {
             for (n = 49; n >= 0; n--, slot++) {
                 if (*slot) {
                     float dist = fast_vec_dist(*slot + 0x10, obj + 0x10);
-                    if (dist < best && GetDistanceFromGravityCenter(*slot + 0x10) - D_L22_001B2AA4 < 3.0f) {
+                    if (dist < best && gravity_get_center_distance(*slot + 0x10) - D_L22_001B2AA4 < 3.0f) {
                         qcopy_nc(out, *slot + 0x10);
                         best = dist;
                         found = 1;

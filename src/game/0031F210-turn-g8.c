@@ -31,39 +31,39 @@ typedef struct {
     char f5B0[1];
 } TurnData;
 
-extern void func_002AB8C0(void *, void *);
-extern int func_00282978(void *);
-extern void func_002AEC48(void *, void *, int, float, float);
-extern void func_002B0990(void *, void *, int, int, float);
-extern float func_00283B98(float, float);
-extern void func_00325C50(void *, float, void *, int, void *);
+extern void gfx_update_color_fade(void *, void *);
+extern int FastDecTimer(void *);
+extern void moby_update_eased_node(void *, void *, int, float, float);
+extern void value_set_and_smooth(void *, void *, int, int, float);
+extern float FastAddRotations(float, float);
+extern void enemy_attach_turn_child_parts(void *, float, void *, int, void *);
 /* The incomplete sda array retains the retail absolute address macro. */
 extern char D_001A8BD0[] __attribute__((sda));
-extern void func_00325430(void);
-extern void func_0027CFD0(void (*)(void), void *);
-extern void func_00325DA0(void *, void *);
+extern void gfx_draw_beam_quad_between_points_2(void);
+extern void gfx_register_overlay_draw_callback(void (*)(void), void *);
+extern void group_sync_counter(void *, void *);
 
 /* Steer the object toward its turn target and update its joint chains. */
-void func_00325158(TurnObject *object)
+void group_enemy_update_turn_joints(TurnObject *object)
 {
     TurnData *data = (TurnData *)object->data;
 
     if (object->f95 != 0 && object->state != 3 && object->f95 != 5 && data->f2C4 == 0) {
         data->turnAngle = FastAddRotations(data->turnAngle, data->turnRate * 0.017453294f);
-        AttachAndTurnChildParts(object, data->turnAngle, data->f2A0, 1, D_001A8BD0);
+        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 1, D_001A8BD0);
     } else {
-        AttachAndTurnChildParts(object, data->turnAngle, data->f2A0, 0, D_001A8BD0);
+        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 0, D_001A8BD0);
     }
-    UpdateColorFade(object, data->f50);
+    gfx_update_color_fade(object, data->f50);
     FastDecTimer(data->f270);
     FastDecTimer(data->f272);
     FastDecTimer(data->f26);
-    UpdateEasedNode(object, data->f530, 7, 0.03f, 0.3f);
-    UpdateEasedNode(object, data->f5B0, 8, 0.03f, 0.3f);
+    moby_update_eased_node(object, data->f530, 7, 0.03f, 0.3f);
+    moby_update_eased_node(object, data->f5B0, 8, 0.03f, 0.3f);
     if (object->timer < 65535)
         object->timer++;
     if (object->state == 4 || object->state == 5 || object->f95 == 2 || object->state == 10)
-        RegisterOverlayDrawCallback(DrawBeamQuadBetweenPoints_00325430, object);
-    SyncGroupCounter(object, data->f2FC);
-    SetValueAndStartSmoothChange(object, data->f530, 7, 1, 2.5f);
+        gfx_register_overlay_draw_callback(gfx_draw_beam_quad_between_points_2, object);
+    group_sync_counter(object, data->f2FC);
+    value_set_and_smooth(object, data->f530, 7, 1, 2.5f);
 }

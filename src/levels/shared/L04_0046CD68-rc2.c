@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -50,7 +51,7 @@ extern f32 ref_L04_0046CD68_05 __attribute__((sda));
 extern s32 ref_L04_0046CD68_06 __attribute__((sda));
 
 /* Sets up the follow-camera offset in its record, mirrored and slightly higher when asked to. */
-void func_L04_0046CD68(Outer *camera, s32 mirrored) {
+void cam_init_follow_offset(Outer *camera, s32 mirrored) {
     Entity *record = camera->entity;
     f32 *base = &record->f70;
     Entity *recordAgain ;

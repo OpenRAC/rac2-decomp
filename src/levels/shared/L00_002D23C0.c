@@ -13,15 +13,15 @@ typedef struct {
     int w58;
     int w5C;
 } Obj_2D23C0;
-extern Obj_2D23C0 *D_0018C0B0;
-extern void func_0029F390(void *);
-extern int func_L00_002A4DB0(void *a0, int a1, int a2, char *a3);
+extern Obj_2D23C0 *g_hero_moby;
+extern void update_moby_animation_state(void *);
+extern int anim_copy_entry_data(void *a0, int a1, int a2, char *a3);
 extern char D_001B4400[];
 
 /* Starts the object's animation at the given sequence and frame, ending one frame later or at the last frame. */
-void func_L00_002D23C0(int seq, int frame)
+void anim_start_object_at_frame(int seq, int frame)
 {
-    Obj_2D23C0 *obj = gHeroMoby_0018C0B0;
+    Obj_2D23C0 *obj = g_hero_moby;
     int lastFrame;
     obj->b41 = frame + 1;
     obj->b40 = frame;
@@ -32,6 +32,6 @@ void func_L00_002D23C0(int seq, int frame)
     obj->b42 = seq;
     obj->b43 = seq;
     update_moby_animation_state(obj);
-    obj->w58 = CopyAnimationEntryData(obj, obj->b42, obj->b40, D_001B4400);
-    obj->w5C = CopyAnimationEntryData(obj, obj->b43, obj->b41, D_001B4400 + 0x600);
+    obj->w58 = anim_copy_entry_data(obj, obj->b42, obj->b40, D_001B4400);
+    obj->w5C = anim_copy_entry_data(obj, obj->b43, obj->b41, D_001B4400 + 0x600);
 }

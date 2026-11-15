@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac1-decomp (src/overlays/shared/hero_mapped_animations.c,
    sync_hero_mapped_moby_animation_frames, func_L00_00232B78): the same instructions with
    rac2's offsets. Syncs the hero's second animation (+0x2494) to its main one (+0x2290):
@@ -29,10 +30,10 @@ typedef struct {
     int id[2];
 } AnimState;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
-void func_L00_002D20D0(void) {
-    char *base = gHeroState;
+void anim_sync_second_to_main(void) {
+    char *base = g_hero_state;
     AnimState *obj = *(AnimState **)(base + 0x2494);
 
     if (obj == 0) {

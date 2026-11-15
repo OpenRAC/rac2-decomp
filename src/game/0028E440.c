@@ -4,7 +4,7 @@
 extern unsigned int ref_L00_002F9D30_00 __attribute__((sda));
 
 /* Counts a timer down by one until it reaches zero. */
-void func_0028E440(void)
+void hud_tick_countdown(void)
 {
     if (ref_L00_002F9D30_00 != 0)
         --ref_L00_002F9D30_00;
@@ -22,11 +22,11 @@ extern s32 D_001B187C[] __attribute__((sda));
 extern s32 D_001B17B0[] __attribute__((sda));
 extern s32 D_001B17B4[] __attribute__((sda));
 extern s32 D_001B17B8[] __attribute__((sda));
-extern s32 D_001A8BB0[] __attribute__((sda));
-extern Task28E458 D_00255330[];
+extern s32 g_current_game_mode[] __attribute__((sda));
+extern Task28E458 g_hud_elements[];
 
 /* Runs the update function of each of the thirteen HUD records, then fades the HUD overlay in or out. */
-void func_0028E458(void) {
+void hud_update_record_handlers(void) {
     Task28E458 *record;
     s32 i;
 
@@ -34,7 +34,7 @@ void func_0028E458(void) {
         D_001B18A4[1] = 0;
         return;
     }
-    record = gHudElements;
+    record = g_hud_elements;
     D_001B187C[0] = 0xFFFFF0;
     for (i = 12; i >= 0; i--) {
         if (record->update != 0) {
@@ -42,7 +42,7 @@ void func_0028E458(void) {
         }
         record++;
     }
-    if ((D_001B17B0[0] != 0 || D_001B17B4[0] != 0) && gCurrentGameMode[0] == 0) {
+    if ((D_001B17B0[0] != 0 || D_001B17B4[0] != 0) && g_current_game_mode[0] == 0) {
         if (D_001B17B0[0] != 0) {
             D_001B17B4[0] += 0x10;
             if (D_001B17B4[0] > 0x80) {
@@ -65,16 +65,16 @@ void func_0028E458(void) {
     }
 }
 
-extern int func_0028AB20(int);
+extern int hud_find_entry_index(int);
 extern unsigned short *D_001B188C;
 extern short *D_001B1890;
 extern unsigned int *D_001B1898;
 extern unsigned int *D_001B1894;
 
 /* Looks up the picture number for an icon and frame, or gives zero when it is missing. */
-int func_0028E588(int key, int index)
+int GetIconFrame(int key, int index)
 {
-    int number = FindHudEntryIndex(key);
+    int number = hud_find_entry_index(key);
     unsigned short *row = (unsigned short *)(number * 8 + (unsigned int)D_001B188C);
     if (row[0] == 65535)
         goto fail;
@@ -95,12 +95,12 @@ fail:
 
 extern int *ref_L00_001B2608_00;
 extern int ref_L00_001B1BBC_01;
-extern int D_001A7350;
-extern int D_001A7354;
-extern int func_0028E640(int);
+extern int g_screen_offset_x;
+extern int g_screen_offset_y;
+extern int GetFrameTexture(int);
 
 /* Draws a flat picture on the screen at a pixel position and size, with a see-through amount. */
-void func_0028E868(int texture, int x, int y, int width, int height, int alpha)
+void hud_draw_sprite(int texture, int x, int y, int width, int height, int alpha)
 {
     short *row = (short *)((texture << 2) + (unsigned int)D_001B1890);
     unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
@@ -124,16 +124,16 @@ void func_0028E868(int texture, int x, int y, int width, int height, int alpha)
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
-    *(long long *)(packet + 48) = ((x << 4) + gScreenOffsetX - 8) | ((long long)((y << 4) + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 48) = ((x << 4) + g_screen_offset_x - 8) | ((long long)((y << 4) + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 56) = (mask7 << 20) + (mask6 << 4);
-    *(long long *)(packet + 64) = (((x + width) << 4) + gScreenOffsetX - 8) | ((long long)(((y + height) << 4) + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 64) = (((x + width) << 4) + g_screen_offset_x - 8) | ((long long)(((y + height) << 4) + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
 
 
 /* Draws a picture on the screen like the one above, but the picture size is the size given. */
-void func_0028ECD8(int texture, int x, int y, int width, int height, int alpha)
+void hud_draw_sprite_sized_texture(int texture, int x, int y, int width, int height, int alpha)
 {
     int *oldCursor;
     char *packet;
@@ -153,16 +153,16 @@ void func_0028ECD8(int texture, int x, int y, int width, int height, int alpha)
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
-    *(long long *)(packet + 48) = ((x << 4) + gScreenOffsetX - 8) | ((long long)((y << 4) + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 48) = ((x << 4) + g_screen_offset_x - 8) | ((long long)((y << 4) + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 56) = (height << 20) + (width << 4);
-    *(long long *)(packet + 64) = (((x + width) << 4) + gScreenOffsetX - 8) | ((long long)(((y + height) << 4) + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 64) = (((x + width) << 4) + g_screen_offset_x - 8) | ((long long)(((y + height) << 4) + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
 
 
 /* Draws a picture on the screen at a finer-than-pixel position and size, with a see-through amount. */
-void func_0028EE98(int texture, int x, int y, int width, int height, int alpha)
+void hud_draw_sprite_subpixel_no_color(int texture, int x, int y, int width, int height, int alpha)
 {
     short *row = (short *)((texture << 2) + (unsigned int)D_001B1890);
     unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
@@ -186,15 +186,15 @@ void func_0028EE98(int texture, int x, int y, int width, int height, int alpha)
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
-    *(long long *)(packet + 48) = (x + gScreenOffsetX - 8) | ((long long)(y + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 48) = (x + g_screen_offset_x - 8) | ((long long)(y + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 56) = (mask7 << 20) + (mask6 << 4);
-    *(long long *)(packet + 64) = (x + width + gScreenOffsetX - 8) | ((long long)(y + height + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 64) = (x + width + g_screen_offset_x - 8) | ((long long)(y + height + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
 
 /* Draws a picture on the screen at a finer-than-pixel position with a chosen colour and see-through amount. */
-void func_0028F078(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int color)
+void DrawHudSpriteSubpixel(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int color)
 {
     short *row = (short *)((a0 << 2) + (unsigned int)D_001B1890);
     unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
@@ -223,9 +223,9 @@ void func_0028F078(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int 
     rgba |= (long long)a5 << 24;
     *(long long *)(q + 32) = rgba;
     *(long long *)(q + 40) = 0;
-    *(long long *)(q + 48) = (a1 + gScreenOffsetX - 8) | ((long long)(a2 + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(q + 48) = (a1 + g_screen_offset_x - 8) | ((long long)(a2 + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(q + 56) = (mask7 << 20) + (mask6 << 4);
-    *(long long *)(q + 64) = (a1 + a3 + gScreenOffsetX - 8) | ((long long)(a2 + a4 + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(q + 64) = (a1 + a3 + g_screen_offset_x - 8) | ((long long)(a2 + a4 + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(q + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
@@ -235,7 +235,7 @@ void func_0028F078(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int 
    With a9 used only there, combine folds the load into the extension behind the
    header stores, and the colour loses $v1 to the cursor reloads. */
 /* Draws part of a picture on the screen, choosing which piece of the picture to show. */
-void func_0028F278(long long textureWord, int x, int y, int uWidthLog2, int vHeightLog2, int width, int height, int u, int v, int a9)
+void hud_draw_sprite_region(long long textureWord, int x, int y, int uWidthLog2, int vHeightLog2, int width, int height, int u, int v, int a9)
 {
     int *oldCursor;
     char *packet;
@@ -255,9 +255,9 @@ void func_0028F278(long long textureWord, int x, int y, int uWidthLog2, int vHei
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = u | ((long long)v << 16);
-    *(long long *)(packet + 48) = (x + gScreenOffsetX - 8) | ((long long)(y + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 48) = (x + g_screen_offset_x - 8) | ((long long)(y + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 56) = (u + (1 << (uWidthLog2 + 4))) | ((long long)(v + a9) << 16);
-    *(long long *)(packet + 64) = (x + width + gScreenOffsetX - 8) | ((long long)(y + height + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 64) = (x + width + g_screen_offset_x - 8) | ((long long)(y + height + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
@@ -271,12 +271,12 @@ void func_0028F278(long long textureWord, int x, int y, int uWidthLog2, int vHei
    $gp-relative. */
 extern int *ref_L00_001B2608_00;
 extern int ref_L00_001B1BBC_01;
-extern int D_001A7350;
-extern int D_001A7354;
-extern int func_0028E640(int);
+extern int g_screen_offset_x;
+extern int g_screen_offset_y;
+extern int GetFrameTexture(int);
 
 /* Draws a picture between two screen corners, using a chosen part of the picture. */
-void func_0028F788(int texture, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int alpha)
+void hud_draw_quad_uv(int texture, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int alpha)
 {
     int *oldCursor;
     char *packet;
@@ -296,9 +296,9 @@ void func_0028F788(int texture, int x0, int y0, int x1, int y1, int u0, int v0, 
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = u0 | ((long long)v0 << 16);
-    *(long long *)(packet + 48) = (x0 + gScreenOffsetX - 8) | ((long long)(y0 + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 48) = (x0 + g_screen_offset_x - 8) | ((long long)(y0 + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 56) = u1 | ((long long)v1 << 16);
-    *(long long *)(packet + 64) = (x1 + gScreenOffsetX - 8) | ((long long)(y1 + gScreenOffsetY - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
+    *(long long *)(packet + 64) = (x1 + g_screen_offset_x - 8) | ((long long)(y1 + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }

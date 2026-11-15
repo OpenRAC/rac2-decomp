@@ -1,16 +1,17 @@
+#include "names.h"
 /* func_PAL_L02_003D8D80, the PAL copy of func_L02_003D4D00: the same C, where scale 0x1F4 - *(short *)(state + 0x32A). */
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern void func_L02_003D5C20(char *);
+extern void chainblade_free_chain_links(char *);
 
-extern void func_L02_003D5DF8(char *);
+extern void chainblade_free_effect_trail(char *);
 
-extern void func_L02_003D62F0(char *);
+extern void chainblade_draw_glows(char *);
 
-extern void func_L02_003D6348(char *);
+extern void chainblade_draw_arm_glows(char *);
 
-extern void func_L02_003D6538(char *);
+extern void chainblade_draw_blade_flares(char *);
 
 /* func_L02_003D26B0 is defined in L02_003D26B0-aim-g8.c. */
 
@@ -33,7 +34,7 @@ int func_PAL_L02_003D8D80(char *arg0) {
     if (timer < 0x1F5) {
         delta = (((int)(0x1F4 - *(short *)(state + 0x32A)) * 5 + 2) / 6);
         if (delta > 0) {
-            if (func_002A77E0(delta) != 0) {
+            if (math_random_int_below(delta) != 0) {
                 return 0;
             }
         }
@@ -51,23 +52,23 @@ int func_PAL_L02_003D8D80(char *arg0) {
 
 /* func_L02_003D5748 is defined in L02_003D5748-g8-dbg.c. */
 
-void func_L02_003D5C20(char *arg0);
+void chainblade_free_chain_links(char *arg0);
 
 /* func_L02_003D5CF0 is matched in L02_003D5CF0.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_L02_003D5DF8(char *arg0);
+void chainblade_free_effect_trail(char *arg0);
 
 /* func_L02_003D5E40 is matched in L02_003D5E40-g8.c. */
 
 /* func_L02_003D5F50 is defined in L02_003D26B0-g8.c. */
 
-void func_L02_003D62F0(char *arg0);
+void chainblade_draw_glows(char *arg0);
 
-void func_L02_003D6348(char *arg0);
+void chainblade_draw_arm_glows(char *arg0);
 
 /* func_L02_003D6388 is matched in L02_003D6388-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_L02_003D6538(char *arg0);
+void chainblade_draw_blade_flares(char *arg0);
 
 /* func_L02_003D6570 is matched in L02_003D6570-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
@@ -84,7 +85,7 @@ typedef struct {
     float y;
 } L02_003D7900_Hero;
 
-extern L02_003D7900_Hero D_00189E20;
+extern L02_003D7900_Hero g_hero_state;
 
 /* Builds a four-float vector and hands it to the two vector helpers, tints the three colour
    records of the actor's state from it, then walks the three actors the state points at:

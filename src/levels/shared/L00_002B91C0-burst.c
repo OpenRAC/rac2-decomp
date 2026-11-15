@@ -9,20 +9,20 @@ typedef struct {
 } ResidentState_A220;
 
 extern void func_002AF000_1(char *, float, float, float);
-extern char D_00189EA0[];
-extern int D_001A79F0 __attribute__((sda));
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern int func_00283CF0(float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_002BAE50(void *, void *, unsigned, int, int, int, int, int);
+extern char g_hero_position[];
+extern int g_current_map_index __attribute__((sda));
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern int FloatToInt(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void part_spawn_scaling(void *, void *, unsigned, int, int, int, int, int);
 
 /* Emit ten particles radially around the hero, using the saved height outside level 6. */
-void func_L00_002BA220(void)
+void part_emit_hero_radial_particles(void)
 {
     float pos[4], vec[4];
-    char *origin = gHeroPosition;
+    char *origin = g_hero_position;
     ResidentState_A220 *state = (ResidentState_A220 *)(origin - 0x80);
     int i;
     int life, fade;
@@ -30,19 +30,19 @@ void func_L00_002BA220(void)
 
     i = 9;
     do {
-        life = FloatToInt(RandomFloatRange(4200.0f, 7350.0f) * 0.001f);
-        fade = FloatToInt(RandomFloatRange(21000.0f, 31500.001953125f) * 0.001f);
-        speed = RandomFloatRange(0.002500000176951289f, 0.011666666716337204f);
+        life = FloatToInt(math_random_float_range(4200.0f, 7350.0f) * 0.001f);
+        fade = FloatToInt(math_random_float_range(21000.0f, 31500.001953125f) * 0.001f);
+        speed = math_random_float_range(0.002500000176951289f, 0.011666666716337204f);
         qcopy(pos, origin);
-        if (gCurrentMapIndex != 6)
+        if (g_current_map_index != 6)
             pos[2] = state->f334;
         i--;
-        angle = RandomAngle();
-        elevation = RandomFloatRange(0.349065899848938f, 1.396263599395752f);
-        radius = RandomFloatRange(0.05f, state->f264 + 0.2f);
+        angle = math_random_angle();
+        elevation = math_random_float_range(0.349065899848938f, 1.396263599395752f);
+        radius = math_random_float_range(0.05f, state->f264 + 0.2f);
         func_002AF000_1((char *)vec, speed, angle, elevation);
-        pos[0] += FastSinOrCosA(angle) * radius;
-        pos[1] += FastSinOrCosB(angle) * radius;
-        SpawnScalingParticle(pos, vec, 0x7000c0f0, 0x70f0, 40, life, fade, 1);
+        pos[0] += math_fast_sin_or_cos_a(angle) * radius;
+        pos[1] += math_fast_sin_or_cos_b(angle) * radius;
+        part_spawn_scaling(pos, vec, 0x7000c0f0, 0x70f0, 40, life, fade, 1);
     } while (i >= 0);
 }

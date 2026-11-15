@@ -13,27 +13,27 @@ typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { float x, y, z, w; } Position;
 typedef struct { char pad[0x10]; Position position; } ActorPosition;
 typedef struct { char pad[0x80]; Vector position; } PlayerPosition;
-extern char D_00189E20[] NOT_SDA;
+extern char g_hero_state[] NOT_SDA;
 extern int D_L02_001B0148 __attribute__((sda));
-extern void func_L02_003D10F0(char *), func_L02_003D14F8(char *), func_L02_003D1588(char *), func_L02_003D1610(char *), func_L02_003D1430(char *), func_L02_003D1C38(char *);
-extern void func_L02_003D25C8(char *, float *), func_L02_003D1ED0(char *, Quad *), func_L02_003D2390(char *), func_L02_003FC248(void *, int, int);
-extern int func_L02_003D26B0(char *), func_L02_003D1698(char *), func_002B3868(u8 *), func_002B3890(u8 *), func_002A77E0(int), func_L02_003FC0B8(char *), func_L00_003206B8(void *, int), func_L00_0042AB40(char *);
-extern char *func_L02_003FC098(char *);
-extern float func_00283248(float, float), func_00282E80(void *, void *), func_00283C80(float, float), func_0029F530(char *);
+extern void armed_enemy_update(char *), armed_enemy_return_to_idle(char *), moby_start_anim_fast(char *), moby_start_anim_slow(char *), armed_enemy_finish_frame(char *), armed_enemy_update_attack_variant(char *);
+extern void armed_enemy_pick_point_near_target(char *, float *), armed_enemy_release_held_object(char *, Quad *), enemy_release_effect_record(char *), moby_set_anim_type_three(void *, int, int);
+extern int AimAtGroupEntityInConeL02(char *), armed_enemy_try_close_attack(char *), flag_set_first_pending(u8 *), flag_set_second_pending(u8 *), math_random_int_below(int), arena_get_state_word(char *), coll_point_inside_record_volume(void *, int), cam_hook_return_minus_one(char *);
+extern char *arena_get_camera_point(char *);
+extern float mat_fast_helper_a(float, float), vec_distance_xy(void *, void *), FastDiffRots(float, float), moby_get_anim_value(char *);
 /* Retail forwards the final dot product in F0. */
-extern float func_L02_003D1820(char *, char *);
-extern void func_002A7750(u8 *, int, int), func_002A7470(char *, int, int, int);
-extern int func_L01_00321178(char *, char *);
-extern int func_002B50E0(void *, void *, float);
-extern int func_002B4FF0(char *, float *, float);
-extern void func_002B5258(char *), func_002B5278(u8 *, float), func_0029F978(u8 *, u32, u8 *), func_00282A60(char *, int, int), func_002A7A00(float *, float, float);
-extern unsigned long func_002B1C20(void *, void *);
+extern float vec_normalized_direction_dot(char *, char *);
+extern void moby_set_state(u8 *, int, int), anim_start_blended(char *, int, int, int);
+extern int moby_l01_turn_toward_target(char *, char *);
+extern int moby_step_controller(void *, void *, float);
+extern int moby_turn_toward_target_and_step(char *, float *, float);
+extern void moby_step_at_own_position(char *), moby_step_at_own_position_factor(u8 *, float), AttachManipulator(u8 *, u32, u8 *), mem_clear(char *, int, int), vec_random_direction(float *, float, float);
+extern unsigned long moby_dispatch_action_by_kind(void *, void *);
 /* This interleaving preserves the four integer and four FP argument banks. */
-extern void func_002B0A68(char *, int, float *, float, float, float, float, u8);
-extern void func_L01_003E9CF8(char *, int, void (*)(char *));
-extern void func_002B60B0(u8 *, float, float, float, float);
+extern void part_spawn_masked_debris(char *, int, float *, float, float, float, float, u8);
+extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 /* Runs the armed enemy's target selection and combat animation state machines. */
-void func_L02_003D0408(char *self) {
+void armed_enemy_update_combat(char *self) {
     Vector target, scratch;
     char *state, *owner, *point;
     char *targetObject;
@@ -44,13 +44,13 @@ void func_L02_003D0408(char *self) {
     int stateByte = (u8)self[0x20];
     if (stateByte == 1 || !self || stateByte == 0xFE || stateByte == 0xFD) return;
     state = *(char **)(self + 0x68);
-    InitAndUpdateArmedEnemy(self);
+    armed_enemy_update(self);
     flags = 0;
     stateByte = (u8)self[0x20];
     if (stateByte == 1 || stateByte == 0xFE || stateByte == 0xFD) return;
     if (!*(short *)(state + 0x2F6)) {
         *(char **)(state + 0x2E0) = 0;
-        if ((u8)self[0x95] != 2 && (u8)self[0x95] != 7 && (u8)self[0x95] != 1) ReturnToIdleState(self);
+        if ((u8)self[0x95] != 2 && (u8)self[0x95] != 7 && (u8)self[0x95] != 1) armed_enemy_return_to_idle(self);
     }
     targetObject = *(char **)(state + 0x2E0);
     if (targetObject) {
@@ -61,144 +61,144 @@ void func_L02_003D0408(char *self) {
         targetY = ((ActorPosition *)*(char **)(state + 0x2E0))->position.y;
         targetX -= selfX;
         targetY -= selfY;
-        heading = FastMatrixHelperA(targetX, targetY);
+        heading = mat_fast_helper_a(targetX, targetY);
     } else {
-        target.quad = *(Quad *)(gHeroState + 0x80);
+        target.quad = *(Quad *)(g_hero_state + 0x80);
         selfX = ((ActorPosition *)self)->position.x;
         selfY = ((ActorPosition *)self)->position.y;
-        targetX = ((PlayerPosition *)gHeroState)->position.f[0];
-        targetY = ((PlayerPosition *)gHeroState)->position.f[1];
+        targetX = ((PlayerPosition *)g_hero_state)->position.f[0];
+        targetY = ((PlayerPosition *)g_hero_state)->position.f[1];
         targetX -= selfX;
         targetY -= selfY;
-        heading = FastMatrixHelperA(targetX, targetY);
+        heading = mat_fast_helper_a(targetX, targetY);
     }
     distance = vec_distance_xy(self + 0x10, &target);
     switch ((u8)self[0x95]) {
     case 2:
-        if (SetSecondPendingFlag((u8 *)self)) {
-            owner = *(char **)(self + 0xB8); point = GetArenaCameraPoint(owner);
-            if ((u8)self[0x43] != 3) StartAnimationBlended(self, 3, 0, 10);
-            self[0xBC] = 0; PickRandomPointNearTarget(self, (float *)point); *(u16 *)(self + 0x96) = 10000;
+        if (flag_set_second_pending((u8 *)self)) {
+            owner = *(char **)(self + 0xB8); point = arena_get_camera_point(owner);
+            if ((u8)self[0x43] != 3) anim_start_blended(self, 3, 0, 10);
+            self[0xBC] = 0; armed_enemy_pick_point_near_target(self, (float *)point); *(u16 *)(self + 0x96) = 10000;
         }
         if ((u8)self[0xBC] == 1 && *(u16 *)(self + 0x96) > 300) {
-            switch (RandomIntBelow(2)) {
-            case 0: if ((u8)self[0x43] != 1) StartAnimationBlended(self, 1, 0, 10); break;
-            case 1: if (*(u8 *)(self + 0x43)) StartAnimationBlended(self, 0, 0, 10); break;
+            switch (math_random_int_below(2)) {
+            case 0: if ((u8)self[0x43] != 1) anim_start_blended(self, 1, 0, 10); break;
+            case 1: if (*(u8 *)(self + 0x43)) anim_start_blended(self, 0, 0, 10); break;
             }
-            *(u16 *)(self + 0x96) = RandomIntBelow(100);
+            *(u16 *)(self + 0x96) = math_random_int_below(100);
         }
-        if (*(short *)(state + 0x2F6)) StartMobyAnimationFast(self);
+        if (*(short *)(state + 0x2F6)) moby_start_anim_fast(self);
         point = state + 0x2D0;
         if (!*(u8 *)(self + 0xBC)) {
             if (vec_distance_xy(self + 0x10, point) < 0.5f) { self[0xBC] = 1; break; }
         }
-        StepMovementController(self, point, heading);
+        moby_step_controller(self, point, heading);
         break;
     case 5:
-        if (((ActorAnimationFlags *)self)->animation_flags & 2) StartMobyAnimationSlow(self);
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) moby_start_anim_slow(self);
         break;
     case 3:
         if (!AimAtGroupEntityInConeL02(self)) {
             switch ((u8)self[0x42]) {
-            case 2: TurnMobyTowardTarget(self, (char *)&target); break;
-            case 3: TurnTowardTargetAndStepMovement(self, target.f, *(float *)(state + 0x2E8)); break;
+            case 2: moby_l01_turn_toward_target(self, (char *)&target); break;
+            case 3: moby_turn_toward_target_and_step(self, target.f, *(float *)(state + 0x2E8)); break;
             }
         }
         break;
     case 4:
-        if (distance > 14) StartMobyAnimationFast(self);
-        else if (!TryStartCloseRangeAttack(self)) {
+        if (distance > 14) moby_start_anim_fast(self);
+        else if (!armed_enemy_try_close_attack(self)) {
             if (distance < 4) {
                 turn = FastDiffRots(*(float *)(self + 0xF8), heading);
-                if (turn < 0.26179942f) { SetMobyState((u8 *)self, 11, -1); break; }
+                if (turn < 0.26179942f) { moby_set_state((u8 *)self, 11, -1); break; }
             }
-            if ((u8)self[0x20] == 11 && distance > 5) SetMobyState((u8 *)self, 10, -1);
+            if ((u8)self[0x20] == 11 && distance > 5) moby_set_state((u8 *)self, 10, -1);
         }
         break;
-    case 6: StepMovementAtOwnPositionWithFactor((u8 *)self, heading); break;
+    case 6: moby_step_at_own_position_factor((u8 *)self, heading); break;
     case 7:
-        flags = DispatchActionByKind(self, state + 0x50);
+        flags = moby_dispatch_action_by_kind(self, state + 0x50);
         if (*(float *)(state + 0x20) <= 1 && *(char **)(state + 0x2E4)) {
-            scratch.quad = *(Quad *)(*(char **)(state + 0x2E4) + 0x10); ReleaseHeldObject(self, &scratch.quad);
+            scratch.quad = *(Quad *)(*(char **)(state + 0x2E4) + 0x10); armed_enemy_release_held_object(self, &scratch.quad);
         }
         if (*(float *)(state + 0x20) <= 0 && !*(u8 *)(state + 0x291)) {
-            ClearMemory(state + 0x290, 0, 64); AttachManipulator((u8 *)self, 3, (u8 *)(state + 0x290));
+            mem_clear(state + 0x290, 0, 64); AttachManipulator((u8 *)self, 3, (u8 *)(state + 0x290));
             *(float *)(state + 0x2B8) = 0.0001f; *(float *)(state + 0x2B4) = 0.0001f; *(float *)(state + 0x2B0) = 0.0001f; state[0x292] = 1;
-            RandomDirectionVector(scratch.f, 0.016666668f, 0.050000004f);
-            SpawnDebrisForMaskedParts(self, 0x20, scratch.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            vec_random_direction(scratch.f, 0.016666668f, 0.050000004f);
+            part_spawn_masked_debris(self, 0x20, scratch.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         }
         if (!(flags & 1UL)) {
             if (!(*(float *)(state + 0x20) <= 0 && *(u16 *)(self + 0x96) > 60)) break;
         }
-        *(int *)(self + 0x98) = 0; SetMobyAnimTypeThree(self, 0, -1); QueueMobyForGlowEffect(self, 0, ReleaseEnemyEffectRecord);
+        *(int *)(self + 0x98) = 0; moby_set_anim_type_three(self, 0, -1); part_queue_moby_for_glow(self, 0, enemy_release_effect_record);
         break;
     }
     switch ((u8)self[0x20]) {
     case 3:
-        if (SetFirstPendingFlag((u8 *)self)) {
-            self[0xBC] = 0; if (*(u8 *)(self + 0x43)) StartAnimationBlended(self, 0, 0, 0); *(int *)(state + 0x13C) = -1;
+        if (flag_set_first_pending((u8 *)self)) {
+            self[0xBC] = 0; if (*(u8 *)(self + 0x43)) anim_start_blended(self, 0, 0, 0); *(int *)(state + 0x13C) = -1;
         }
         if (!*(u8 *)(self + 0xBC) && (int)*(u16 *)(self + 0x96) > (int)*(short *)(state + 0x2FC)) {
-            if ((u8)self[0x43] != 3) StartAnimationBlended(self, 3, 0, 10); self[0xBC] = 1;
+            if ((u8)self[0x43] != 3) anim_start_blended(self, 3, 0, 10); self[0xBC] = 1;
         } else if ((u8)self[0xBC] == 1) {
             owner = *(char **)(self + 0xB8);
-            if (IsPointInsideRecordVolume(self + 0x10, GetArenaStateWord84(owner))) {
-                SetMobyState((u8 *)self, 4, 2); *(int *)(state + 0x13C) = CameraHookReturnMinusOne(*(char **)(self + 0xB8));
+            if (coll_point_inside_record_volume(self + 0x10, arena_get_state_word(owner))) {
+                moby_set_state((u8 *)self, 4, 2); *(int *)(state + 0x13C) = cam_hook_return_minus_one(*(char **)(self + 0xB8));
             }
-            point = GetArenaCameraPoint(*(char **)(self + 0xB8)); TurnMobyTowardTarget(self, point);
+            point = arena_get_camera_point(*(char **)(self + 0xB8)); moby_l01_turn_toward_target(self, point);
         }
         break;
     case 7:
-        if (distance < 4 || *(u16 *)(self + 0x96) > 450 || *(int *)(state + 0x180) > 30) StartMobyAnimationFast(self);
+        if (distance < 4 || *(u16 *)(self + 0x96) > 450 || *(int *)(state + 0x180) > 30) moby_start_anim_fast(self);
         break;
     case 6:
         if (distance > 14) {
-            SetControllerSpeedLimits((u8 *)self, 0.0055555556900799274f, 0.10333333909511566f, 0.0034906589426100254f, 0.41887909173965454f);
-            SetMobyState((u8 *)self, 7, 3); if ((u8)self[0x43] != 3) StartAnimationBlended(self, 3, 0, 10);
-        } else if (distance < 4 || *(int *)(state + 0x180) > 30) StartMobyAnimationSlow(self);
+            moby_set_controller_speed_limits((u8 *)self, 0.0055555556900799274f, 0.10333333909511566f, 0.0034906589426100254f, 0.41887909173965454f);
+            moby_set_state((u8 *)self, 7, 3); if ((u8)self[0x43] != 3) anim_start_blended(self, 3, 0, 10);
+        } else if (distance < 4 || *(int *)(state + 0x180) > 30) moby_start_anim_slow(self);
         break;
     case 10:
-        time = GetMobyAnimationValue(self); turn = ComputeNormalizedDirectionDot(self, (char *)&target);
-        if (turn > 0.01f) { SetMobyState((u8 *)self, 9, -1); if ((u8)self[0x43] != 5) StartAnimationBlended(self, 5, 0, 10); }
-        else if (turn < -0.01f) { SetMobyState((u8 *)self, 8, -1); if ((u8)self[0x43] != 4) StartAnimationBlended(self, 4, 0, 10); StepMovementAtOwnPositionWithFactor((u8 *)self, heading); break; }
-        else if (distance < 4) SetMobyState((u8 *)self, 11, -1);
+        time = moby_get_anim_value(self); turn = vec_normalized_direction_dot(self, (char *)&target);
+        if (turn > 0.01f) { moby_set_state((u8 *)self, 9, -1); if ((u8)self[0x43] != 5) anim_start_blended(self, 5, 0, 10); }
+        else if (turn < -0.01f) { moby_set_state((u8 *)self, 8, -1); if ((u8)self[0x43] != 4) anim_start_blended(self, 4, 0, 10); moby_step_at_own_position_factor((u8 *)self, heading); break; }
+        else if (distance < 4) moby_set_state((u8 *)self, 11, -1);
         else {
-            if (time < 2) SetControllerSpeedLimits((u8 *)self, 0.0055555556900799274f, 0.033333335f, 0.0034906589426100254f, 0.41887909173965454f);
-            else if ((time > 10 && GetMobyAnimationValue(self) < 17) || !(time < 20)) goto face_target;
-            TurnMobyTowardTarget(self, (char *)&target); break;
+            if (time < 2) moby_set_controller_speed_limits((u8 *)self, 0.0055555556900799274f, 0.033333335f, 0.0034906589426100254f, 0.41887909173965454f);
+            else if ((time > 10 && moby_get_anim_value(self) < 17) || !(time < 20)) goto face_target;
+            moby_l01_turn_toward_target(self, (char *)&target); break;
         }
 face_target:
-        StepMovementAtOwnPositionWithFactor((u8 *)self, heading); break;
+        moby_step_at_own_position_factor((u8 *)self, heading); break;
     case 8:
-        if (ComputeNormalizedDirectionDot(self, (char *)&target) > -0.01f) {
-            SetMobyState((u8 *)self, 10, -1); if ((u8)self[0x43] != 6) StartAnimationBlended(self, 6, 0, 10); StepMovementAtOwnPosition(self);
-        } else if (GetMobyAnimationValue(self) > 5) {
+        if (vec_normalized_direction_dot(self, (char *)&target) > -0.01f) {
+            moby_set_state((u8 *)self, 10, -1); if ((u8)self[0x43] != 6) anim_start_blended(self, 6, 0, 10); moby_step_at_own_position(self);
+        } else if (moby_get_anim_value(self) > 5) {
             saved = *(float *)(state + 0x130); *(float *)(state + 0x130) = 0.01745329424738884f;
-            StepMovementAtOwnPositionWithFactor((u8 *)self, heading); *(float *)(state + 0x130) = saved;
+            moby_step_at_own_position_factor((u8 *)self, heading); *(float *)(state + 0x130) = saved;
         }
         break;
     case 9:
-        if (ComputeNormalizedDirectionDot(self, (char *)&target) < 0.01f) {
-            SetMobyState((u8 *)self, 10, -1); if ((u8)self[0x43] != 6) StartAnimationBlended(self, 6, 0, 10); StepMovementAtOwnPosition(self);
-        } else if (GetMobyAnimationValue(self) > 5) {
+        if (vec_normalized_direction_dot(self, (char *)&target) < 0.01f) {
+            moby_set_state((u8 *)self, 10, -1); if ((u8)self[0x43] != 6) anim_start_blended(self, 6, 0, 10); moby_step_at_own_position(self);
+        } else if (moby_get_anim_value(self) > 5) {
             saved = *(float *)(state + 0x130); *(float *)(state + 0x130) = 0.01745329424738884f;
-            StepMovementAtOwnPositionWithFactor((u8 *)self, heading); *(float *)(state + 0x130) = saved;
+            moby_step_at_own_position_factor((u8 *)self, heading); *(float *)(state + 0x130) = saved;
         }
         break;
     case 11:
-        if (SetFirstPendingFlag((u8 *)self) && (u8)self[0x43] != 1) StartAnimationBlended(self, 1, 0, 10);
-        StepMovementAtOwnPositionWithFactor((u8 *)self, heading);
+        if (flag_set_first_pending((u8 *)self) && (u8)self[0x43] != 1) anim_start_blended(self, 1, 0, 10);
+        moby_step_at_own_position_factor((u8 *)self, heading);
         /* fall through */
     case 19: case 20:
-        if (flags & 2UL) ReturnToIdleState(self);
+        if (flags & 2UL) armed_enemy_return_to_idle(self);
         break;
     case 13:
-        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; SetMobyState((u8 *)self, 14, -1); if ((u8)self[0x43] != 9) StartAnimationBlended(self, 9, 0, 10); }
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; moby_set_state((u8 *)self, 14, -1); if ((u8)self[0x43] != 9) anim_start_blended(self, 9, 0, 10); }
         break;
     case 14:
         if (distance < 4) {
-            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; SetMobyState((u8 *)self, 15, -1);
-            if ((u8)self[0x43] != 10) StartAnimationBlended(self, 10, 10, 10);
+            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 15, -1);
+            if ((u8)self[0x43] != 10) anim_start_blended(self, 10, 10, 10);
         } else {
             animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
             if (distance > 4) goto abandon_attack;
@@ -206,35 +206,35 @@ face_target:
             previous = D_L02_001B0148++;
             if (previous < 3) break;
             D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1;
-            ReturnToIdleState(self);
+            armed_enemy_return_to_idle(self);
         }
         break;
     case 15: case 18:
         if (((ActorAnimationFlags *)self)->animation_flags & 2) {
             *(short *)(state + 0x2F8) = 0;
-            if (*(char **)(gHeroState + 0x249C) == self) {
-                SetMobyState((u8 *)self, 12, 5); if ((u8)self[0x43] != 7) StartAnimationBlended(self, 7, 0, 10);
-            } else ReturnToIdleState(self);
+            if (*(char **)(g_hero_state + 0x249C) == self) {
+                moby_set_state((u8 *)self, 12, 5); if ((u8)self[0x43] != 7) anim_start_blended(self, 7, 0, 10);
+            } else armed_enemy_return_to_idle(self);
         }
-        UpdateAttackHitEffect(self); break;
+        armed_enemy_update_attack_variant(self); break;
     case 16:
-        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; SetMobyState((u8 *)self, 17, -1); if ((u8)self[0x43] != 12) StartAnimationBlended(self, 12, 0, 10); }
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; moby_set_state((u8 *)self, 17, -1); if ((u8)self[0x43] != 12) anim_start_blended(self, 12, 0, 10); }
         break;
     case 17:
         if (distance < 4) {
-            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; SetMobyState((u8 *)self, 18, -1);
-            if ((u8)self[0x43] != 13) StartAnimationBlended(self, 13, 10, 10);
+            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 18, -1);
+            if ((u8)self[0x43] != 13) anim_start_blended(self, 13, 10, 10);
         } else {
             animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
             if (distance > 4) {
 abandon_attack:
-                *(float *)(self + 0x48) = 1; ReturnToIdleState(self);
+                *(float *)(self + 0x48) = 1; armed_enemy_return_to_idle(self);
             } else if (previous & 2) {
                 previous = D_L02_001B0148++;
-                if (previous > 2) { D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; ReturnToIdleState(self); }
+                if (previous > 2) { D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; armed_enemy_return_to_idle(self); }
             }
         }
         break;
     }
-    FinishEnemyFrame(self);
+    armed_enemy_finish_frame(self);
 }

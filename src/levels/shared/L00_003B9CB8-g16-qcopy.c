@@ -34,7 +34,7 @@ typedef struct State_L00_003C27A0 {
 } State_L00_003C27A0;
 
 extern s32 D_L00_001C9340 __attribute__((nosda));
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 g_current_map_index[] __attribute__((sda));
 extern u16 **D_L00_001A9014;
 extern u16 *D_L00_001FA920[];
 extern u8 *D_L00_001B1E9C;
@@ -46,32 +46,32 @@ extern Vec_L00_003C27A0 D_L00_001AFEA0 __attribute__((sda));
 extern s32 D_L00_001AFE98[2] __attribute__((sda));
 extern s32 D_L00_001AFE90[2] __attribute__((sda));
 
-extern u8 *func_0029EFD0(s32);
-extern void func_002B37E8(void *, void *);
-extern void func_L00_00323448(void *, void *, s32, s32, s32, s32, s32, s32);
-extern void func_L00_00323E48(void *, int, int, void *);
-extern void func_00282C88(void *);
-extern float func_00283248(float, float);
-extern void *func_002A9640(void *, s32, s32);
-extern void func_002833F0(void *, void *);
-extern float func_00282C48(float);
-extern void func_L00_0032A530(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
-extern s32 func_002A7820(s32, s32);
-extern void func_L00_00321878(void *, s32, s32, s32, s32, s32, float);
-extern s32 func_002E5DA0(s32, s32, void *, s32);
-extern void func_L00_003C2DE8(char *, char *, float, float);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_0029F338(void *);
-extern s32 func_00283DB8(void *, float);
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_002AEF28(void *, void *, void *, float, float, float);
-extern float func_00283B98(float, float);
-extern void func_L00_00323958(void *, void *);
+extern u8 *CreateMoby(s32);
+extern void moby_init_child_from_parent(void *, void *);
+extern void BuildObjectAttachmentTransforms(void *, void *, s32, s32, s32, s32, s32, s32);
+extern void level_set_record_payload_by_key(void *, int, int, void *);
+extern void vec_clear_128(void *);
+extern float mat_fast_helper_a(float, float);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
+extern void euler_rotation_basis(void *, void *);
+extern float math_fabs(float);
+extern void ScatterObjectPieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern s32 math_random_int_range(s32, s32);
+extern void part_spawn_bolt_pickups(void *, s32, s32, s32, s32, s32, float);
+extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
+extern void part_spawn_random_spark_rays(char *, char *, float, float);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void moby_mark_spawned(void *);
+extern s32 math_fast_helper_a(void *, float);
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
+extern float FastAddRotations(float, float);
+extern void moby_update_attached_transforms(void *, void *);
 
 /* Per-frame update of the moby class 2503 object: it waits for its group, spawns a helper moby,
    then follows the target and blows up when hit. */
-void func_L00_003C27A0(u8 *self)
+void target_l00_follower_update(u8 *self)
 {
     State_L00_003C27A0 *st = *(State_L00_003C27A0 **)(self + 0x68);
     Vec_L00_003C27A0 cols[2];
@@ -102,21 +102,21 @@ void func_L00_003C27A0(u8 *self)
             moby = CreateMoby(0xE9B /* moby class 3739 */);
             st->moby = moby;
             if (moby != 0) {
-                InitChildObjectFromParent(moby, self);
+                moby_init_child_from_parent(moby, self);
                 *(u16 *)(st->moby + 0x34) |= 0x41;
                 *(u16 *)(st->moby + 0x34) |= 0x5000;
             }
         }
         BuildObjectAttachmentTransforms(self, st->track, 100, st->group_b, st->group, st->x18, 8, 0);
-        if (gCurrentMapIndex[0] == 2 && st->group_b != -1) {
+        if (g_current_map_index[0] == 2 && st->group_b != -1) {
             mobyIds = D_L00_001FA920[st->group_b];
             do {
                 mobyId = *mobyIds & 0x7FFF;
-                SetRecordPayloadBySelectorKey(st->track, 0, mobyId, *(u8 **)(D_L00_001B1E9C + (mobyId << 8) + 0x68) + 0x50);
+                level_set_record_payload_by_key(st->track, 0, mobyId, *(u8 **)(D_L00_001B1E9C + (mobyId << 8) + 0x68) + 0x50);
             } while ((s16)*mobyIds++ >= 0);
         }
         if (st->moby != 0) {
-            ClearVector128(st->moby + 0xF0);
+            vec_clear_128(st->moby + 0xF0);
             st->target = 0;
             for (scanId = D_L00_001A9014[st->group];
                  scanId != 0 && ((s16)scanId[-1] >= 0 || scanId == D_L00_001A9014[st->group]); scanId++) {
@@ -137,11 +137,11 @@ void func_L00_003C27A0(u8 *self)
     case 1:
         if (st->moby != 0 && (entry = st->target) != 0) {
             qcopy_nc(st->moby + 0x10, entry + 0x30);
-            *(f32 *)(st->moby + 0xF8) = FastMatrixHelperA(*(f32 *)entry, *(f32 *)(entry + 4));
-            if (FindOwnedEffectSlot(st->moby, 0x10000, 0) != 0) {
+            *(f32 *)(st->moby + 0xF8) = mat_fast_helper_a(*(f32 *)entry, *(f32 *)(entry + 4));
+            if (part_find_owned_effect_slot(st->moby, 0x10000, 0) != 0) {
                 *(f32 *)(st->moby + 0x2C) = *(f32 *)(*(u8 **)(st->moby + 0x24) + 0x24) * 1.35f;
                 euler_rotation_basis(st->moby + 0xC0, st->moby + 0xF0);
-                if (FloatAbs(*(f32 *)(st->moby + 0xF8)) > 1.6f) {
+                if (math_fabs(*(f32 *)(st->moby + 0xF8)) > 1.6f) {
                     qcopy_nc(&cols[0], D_L00_001AFEB0);
                     qcopy_nc(&cols[1], &D_L00_001AFEA0);
                 } else {
@@ -149,10 +149,10 @@ void func_L00_003C27A0(u8 *self)
                     qcopy_nc(&cols[1], D_L00_001AFEB0);
                 }
                 ScatterObjectPieces(st->moby, cols, D_L00_001AFE98, D_L00_001AFE90, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
-                SpawnBoltPickups_L00(st->moby, 30, 50, 2, -1, RandomIntRange(3, 5), 0.0f);
-                PlaySoundFromClassBank(0, 0, st->moby, 0xE9B /* moby class 3739 */);
+                part_spawn_bolt_pickups(st->moby, 30, 50, 2, -1, math_random_int_range(3, 5), 0.0f);
+                snd_play_from_class_bank(0, 0, st->moby, 0xE9B /* moby class 3739 */);
                 here = *(Vec_L00_003C27A0 *)(self + 0x10);
-                SpawnRandomSparkRays((char *)st->moby, (char *)&here, 1.5f, 0.116666675f);
+                part_spawn_random_spark_rays((char *)st->moby, (char *)&here, 1.5f, 0.116666675f);
                 SpawnExplosion(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
                 for (clearIds = D_L00_001A9014[st->group];
                      clearIds != 0 && ((s16)clearIds[-1] >= 0 || clearIds == D_L00_001A9014[st->group]); clearIds++) {
@@ -172,21 +172,21 @@ void func_L00_003C27A0(u8 *self)
                     }
                 }
                 PlayMobySound(0, 0, st->moby);
-                MarkMobySpawned(st->moby);
-                MarkMobySpawned(self);
+                moby_mark_spawned(st->moby);
+                moby_mark_spawned(self);
                 return;
             }
         }
-        if (FastMathHelperA(st, 500.0f) == -1)
+        if (math_fast_helper_a(st, 500.0f) == -1)
             return;
         if (st->x34 > 0.0f)
-            UpdateWrappedAngleOffset(self, &st->x20, &st->x24, st->x30, st->x34 * 0.000290888245f, -1.0f);
+            math_update_wrapped_angle_offset(self, &st->x20, &st->x24, st->x30, st->x34 * 0.000290888245f, -1.0f);
         if (st->x3C > 0.0f)
-            ScaleOwnerWordsByAngles(self, &st->x28, &st->x2C, st->x38 * 0.017453294f, st->x3C * 0.000290888245f,
+            moby_scale_owner_words_by_angles(self, &st->x28, &st->x2C, st->x38 * 0.017453294f, st->x3C * 0.000290888245f,
                           0.0058177654f);
         *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), st->spin * 0.000290888245f);
         st->angle = FastAddRotations(st->angle, st->spin * 0.000290888245f);
-        UpdateAttachedObjectTransforms(self, st->track);
+        moby_update_attached_transforms(self, st->track);
         break;
     }
 }

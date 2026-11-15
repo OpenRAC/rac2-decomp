@@ -1,3 +1,4 @@
+#include "names.h"
 /* libgcc frame.o: end_fde_sort (with frame_heapsort inlined), from GCC's frame.c,
    carried from rac3-decomp's src/boot_elf/core/libgcc/frame.c (func_00129BF0), the
    same instructions there. abort is func_00115E28, free func_00115F78, fde_split
@@ -6,13 +7,13 @@
    exception below. No proprietary SDK source is used. */
 /* More subroutines needed by GCC output code on some machines.  */
 /* Compile this one with gcc.  */
-/* Copyright (C) 1989, 92-98, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1989, 92-98, 1999 free Software Foundation, Inc.
 
 This file is part of GNU CC.
 
 GNU CC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
+the free Software Foundation; either version 2, or (at your option)
 any later version.
 
 GNU CC is distributed in the hope that it will be useful,
@@ -22,7 +23,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -149,7 +150,7 @@ frame_heapsort (fde_vector *erratic)
 
 /* end_fde_sort */
 /* Sorts all frame records by address and gives back the sorted list. */
-fde ** func_001236C8 (fde_accumulator *accu, size_t count)
+fde ** eh_sort_fde_vector (fde_accumulator *accu, size_t count)
 {
   if (accu->linear.count != count)
     abort ();

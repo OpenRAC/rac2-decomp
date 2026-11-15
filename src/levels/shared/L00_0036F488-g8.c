@@ -23,178 +23,178 @@ typedef struct Hero {
 typedef struct PadState { char pad000[0x1A4]; unsigned int pressed; } PadState;
 typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
 
-extern char D_00189E20[];
-extern char D_00138180[];
+extern char g_hero_state[];
+extern char g_pad_state[];
 
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern int D_L00_001A8FB8 MACRO_ADDR;
 extern int D_L00_001A8FF0 MACRO_ADDR;
 extern int D_001A7428 MACRO_ADDR;
 extern int D_L00_001B19C4 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u32 D_001A7390 MACRO_ADDR;
 extern int D_L00_001B1AE0 MACRO_ADDR;
-extern Statistics D_0018C750[];
+extern Statistics g_progress_statistics[];
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern int D_001A7424 __attribute__((sda));
+extern int g_save_menu_flags __attribute__((sda));
 extern int D_L00_001A8FB4 __attribute__((sda));
 extern int D_L00_001A8FF4 __attribute__((sda));
 extern float D_L00_001B18E0 __attribute__((sda));
 
-extern int func_L00_002F43F8(void);
-extern int func_002B49E0(int, int, int, int, int);
+extern int level_get_flag_b(void);
+extern int request_begin_slot(int, int, int, int, int);
 /* The neighbouring stub in most programs; another function in six of them. */
 extern unsigned int ref_L00_0036F488_00(void);
-extern int func_L00_002D6728(void);
-extern int func_L00_002D6768(void);
-extern int func_L00_002D67A8(int);
-extern int func_L00_002D6880(void);
-extern void func_L00_002FC058(void);
-extern int func_L00_0032EF10(int, int, int *);
-extern void func_00290730(void);
-extern int func_00290748(void);
-extern void func_L00_002CB218(void);
-extern int func_L00_0032B270(void);
-extern int func_L00_002A3B80(void);
-extern void func_L00_0032B2A8(int);
-extern int func_002E5E58(int, unsigned int, void *);
-extern void func_L00_003266D8(void);
-extern void func_L00_0030C7F8(int);
+extern int level_is_mode_in_set(void);
+extern int level_run_mode_update_zero(void);
+extern int level_is_tracked_object_of_selected_class(int);
+extern int level_is_special_mode_active(void);
+extern void level_update_countdown_state_machine(void);
+extern int PadPressedWithin(int, int, int *);
+extern void hud_request_open(void);
+extern int hud_is_open_done(void);
+extern void hero_update_button_hold_timers(void);
+extern int level_is_counter_positive(void);
+extern int level_get_setting_value(void);
+extern void level_set_global_setting_value(int);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void hero_update_hit_streak_effect(void);
+extern void module_l00_call_handler_with_arg_4(int);
 extern void func_L00_0030C710(int);
-extern void func_002F5220(void);
-extern void func_L00_0037E5C0(void);
-extern void func_L00_00310048(void);
-extern void func_002B6658(void);
-extern void func_002E5F60(void);
-extern void func_L00_002A6DD0(void);
-extern void func_002B9390(void);
-extern void func_L00_002ED808(void);
-extern void func_00272368(void);
-extern void func_002E4AC8(void);
-extern void func_002914B8(void);
-extern void func_0029FFB8(void);
-extern void func_0028E138(int);
-extern void func_0029BCD8(void);
-extern void func_00289178(void);
-extern void func_002F52B8(void);
+extern void game_reset_frame_counters(void);
+extern void level_run_per_frame_passes(void);
+extern void level_count_active_records(void);
+extern void moby_update_visible_objects(void);
+extern void snd_run_callbacks(void);
+extern void hero_l00_update_frame_2(void);
+extern void part_update_all(void);
+extern void part_l00_update_effect_slots(void);
+extern void cam_update_state(void);
+extern void UpdateSoundVoices(void);
+extern void UpdateLightingEnvironment(void);
+extern void gfx_compute_light_direction(void);
+extern void hud_update_record_timers(int);
+extern void level_run_callbacks(void);
+extern void subtitle_update_state_machine(void);
+extern void game_update_idle_frame_counters(void);
 
 /* Runs one frame of the game: checks button presses for death or pause menus and then runs the normal update steps. */
-void func_L00_0036F488(void)
+void level_update_game_frame_input(void)
 {
     int blocked;
     int special;
 
-    if (GetLevelFlagB() && !BeginSlotRequest(4, 1, 1, 0, 0))
+    if (level_get_flag_b() && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (!D_L00_001A8F00 && (gSaveMenuFlags & 1) && !BeginSlotRequest(4, 1, 1, 0, 0))
+    if (!D_L00_001A8F00 && (g_save_menu_flags & 1) && !request_begin_slot(4, 1, 1, 0, 0))
         return;
     if (ref_L00_0036F488_00())
         return;
 
     special = 0;
-    blocked = ((Hero *)gHeroState)->state != 0x31;
-    if (((Hero *)gHeroState)->object) {
-        int id = ((Hero *)gHeroState)->object->id;
+    blocked = ((Hero *)g_hero_state)->state != 0x31;
+    if (((Hero *)g_hero_state)->object) {
+        int id = ((Hero *)g_hero_state)->object->id;
         if (id == 0x905 /* Glider */ || id == 0x85C /* moby class 2140 */ || id == 0xEEF /* Mining Vehicle */ || id == 0x10EE)
             special = 1;
     }
     blocked |= special;
     blocked = (blocked != 0);
-    blocked |= IsLevelModeInSet() != 0;
-    blocked |= IsTrackedObjectOfSelectedClass(3) != 0;
-    blocked |= IsSpecificGameModeActive() != 0;
-    UpdateCountdownStateMachine();
+    blocked |= level_is_mode_in_set() != 0;
+    blocked |= level_is_tracked_object_of_selected_class(3) != 0;
+    blocked |= level_is_special_mode_active() != 0;
+    level_update_countdown_state_machine();
 
     if (PadPressedWithin(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
-        if (((Hero *)gHeroState)->state != 0x6F && ((Hero *)gHeroState)->mode != 2 && ((Hero *)gHeroState)->state != 0x31 && blocked
-            && ((Hero *)gHeroState)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
-            && ((Hero *)gHeroState)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
-            RequestHudOpen();
-            if (IsHudOpenDone()) {
-                if (((Hero *)gHeroState)->f22B4 != 1)
-                    UpdateHeroButtonHoldTimers();
-                if (!BeginSlotRequest(4, 1, 7, 0, 0))
+        if (((Hero *)g_hero_state)->state != 0x6F && ((Hero *)g_hero_state)->mode != 2 && ((Hero *)g_hero_state)->state != 0x31 && blocked
+            && ((Hero *)g_hero_state)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
+            && ((Hero *)g_hero_state)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
+            hud_request_open();
+            if (hud_is_open_done()) {
+                if (((Hero *)g_hero_state)->f22B4 != 1)
+                    hero_update_button_hold_timers();
+                if (!request_begin_slot(4, 1, 7, 0, 0))
                     return;
             }
         }
     }
 
-    if (!IsCounterPositive()) {
-        if ((((PadState *)gPadState)->pressed & 0x800) || D_001A7428) {
+    if (!level_is_counter_positive()) {
+        if ((((PadState *)g_pad_state)->pressed & 0x800) || D_001A7428) {
             if (D_L00_001B19C4 < 8)
                 goto normal;
-            if (((Hero *)gHeroState)->state != 0x6F && (((Hero *)gHeroState)->mode != 2 || ((Hero *)gHeroState)->submode == 10)) {
+            if (((Hero *)g_hero_state)->state != 0x6F && (((Hero *)g_hero_state)->mode != 2 || ((Hero *)g_hero_state)->submode == 10)) {
                 if (!blocked || D_L00_001A8F00)
                     goto second;
-                if (!BeginSlotRequest(3, 1, 1, 0, 0)) {
-                    SetGlobalSettingValue(GetLevelSettingValue() != 0);
-                    PlaySoundFromGlobalBank(18, 0, 0);
+                if (!request_begin_slot(3, 1, 1, 0, 0)) {
+                    level_set_global_setting_value(level_get_setting_value() != 0);
+                    snd_play_from_global_bank(18, 0, 0);
                     return;
                 }
             }
         }
     }
 second:
-    if (D_L00_001B19C4 >= 8 && (((PadState *)gPadState)->pressed & 0x500)) {
-        if (((Hero *)gHeroState)->f229C != 22 && ((Hero *)gHeroState)->state != 0x6F && blocked && ((Hero *)gHeroState)->state != 0x1C
+    if (D_L00_001B19C4 >= 8 && (((PadState *)g_pad_state)->pressed & 0x500)) {
+        if (((Hero *)g_hero_state)->f229C != 22 && ((Hero *)g_hero_state)->state != 0x6F && blocked && ((Hero *)g_hero_state)->state != 0x1C
             && !D_L00_001A8F00) {
-            if (IsLevelModeInSet()) {
-                if (RunModeUpdateZero())
+            if (level_is_mode_in_set()) {
+                if (level_run_mode_update_zero())
                     goto normal;
             }
             if (D_L00_001A8FF0 && !D_L00_001A8FF4) {
-                if ((gCurrentMapIndex == 26 || (((Hero *)gHeroState)->state != 0x5B && ((Hero *)gHeroState)->state != 0x58))
-                    && BeginSlotRequest(4, 1, 6, 0, 0)) {
-                    if (gProgressStatistics[35].count < 0xFFFF)
-                        gProgressStatistics[35].count++;
+                if ((g_current_map_index == 26 || (((Hero *)g_hero_state)->state != 0x5B && ((Hero *)g_hero_state)->state != 0x58))
+                    && request_begin_slot(4, 1, 6, 0, 0)) {
+                    if (g_progress_statistics[35].count < 0xFFFF)
+                        g_progress_statistics[35].count++;
                 }
-                if (gProgressStatistics[35].maximum < D_001A7390)
-                    gProgressStatistics[35].maximum = D_001A7390;
-                gProgressStatistics[35].levels = (gProgressStatistics[35].levels | (1 << gCurrentMapIndex)) | 0x80000000;
+                if (g_progress_statistics[35].maximum < D_001A7390)
+                    g_progress_statistics[35].maximum = D_001A7390;
+                g_progress_statistics[35].levels = (g_progress_statistics[35].levels | (1 << g_current_map_index)) | 0x80000000;
                 return;
             }
-            if (!BeginSlotRequest(3, 1, 2, 0, 0)) {
-                SetGlobalSettingValue(GetLevelSettingValue() != 0);
-                if (gProgressStatistics[9].count < 0xFFFF)
-                    gProgressStatistics[9].count++;
+            if (!request_begin_slot(3, 1, 2, 0, 0)) {
+                level_set_global_setting_value(level_get_setting_value() != 0);
+                if (g_progress_statistics[9].count < 0xFFFF)
+                    g_progress_statistics[9].count++;
                 {
                     u32 tick = D_001A7390;
-                    if (gProgressStatistics[9].maximum < tick)
-                        gProgressStatistics[9].maximum = tick;
+                    if (g_progress_statistics[9].maximum < tick)
+                        g_progress_statistics[9].maximum = tick;
                 }
-                gProgressStatistics[9].levels = (gProgressStatistics[9].levels | (1 << gCurrentMapIndex)) | 0x80000000;
+                g_progress_statistics[9].levels = (g_progress_statistics[9].levels | (1 << g_current_map_index)) | 0x80000000;
             }
             return;
         }
     }
 normal:
-    if (((Hero *)gHeroState)->state != 0x1C)
-        UpdateHitStreakEffect();
-    if (((PadState *)gPadState)->pressed & 0x200) {
-        if (((Hero *)gHeroState)->state != 0x1C && ((Hero *)gHeroState)->state != 0x31) {
-            CallLoadedModuleHandlerWithArg_0034B000(360);
+    if (((Hero *)g_hero_state)->state != 0x1C)
+        hero_update_hit_streak_effect();
+    if (((PadState *)g_pad_state)->pressed & 0x200) {
+        if (((Hero *)g_hero_state)->state != 0x1C && ((Hero *)g_hero_state)->state != 0x31) {
+            module_l00_call_handler_with_arg_4(360);
             func_L00_0030C710(180);
         }
     }
-    if (D_L00_001B1AE0 && !BeginSlotRequest(6, 1, 0, 0, 0)) {
-        SetGlobalSettingValue(GetLevelSettingValue() != 0);
+    if (D_L00_001B1AE0 && !request_begin_slot(6, 1, 0, 0, 0)) {
+        level_set_global_setting_value(level_get_setting_value() != 0);
         D_L00_001B1AE0 = 0;
     } else {
-        ResetFrameCounters();
-        RunPerFramePasses();
-        CountActiveRecords();
-        UpdateVisibleObjects();
-        RunSoundCallbacks();
-        UpdateHeroFrame_L00_2();
-        UpdateParticles();
-        UpdateEffectSlots_L00();
-        UpdateCameraState();
+        game_reset_frame_counters();
+        level_run_per_frame_passes();
+        level_count_active_records();
+        moby_update_visible_objects();
+        snd_run_callbacks();
+        hero_l00_update_frame_2();
+        part_update_all();
+        part_l00_update_effect_slots();
+        cam_update_state();
         UpdateSoundVoices();
         UpdateLightingEnvironment();
-        ComputeLightDirection();
-        UpdateHudRecordTimers(1);
-        RunLevelCallbacks();
-        UpdateSubtitleStateMachine();
-        UpdateIdleFrameCounters();
+        gfx_compute_light_direction();
+        hud_update_record_timers(1);
+        level_run_callbacks();
+        subtitle_update_state_machine();
+        game_update_idle_frame_counters();
     }
 }

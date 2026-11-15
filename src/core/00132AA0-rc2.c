@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,9 +25,9 @@
  */
 #include "common.h"
 
-extern s32 func_00132DF0();
+extern s32 snd_queue_command();
 
 /* Sends sound command 24, which has no data. */
-s32 func_00132AA0(void) {
-    return QueueSoundCommand(24, 0, 0, 0, 0);
+s32 snd_send_cmd18(void) {
+    return snd_queue_command(24, 0, 0, 0, 0);
 }

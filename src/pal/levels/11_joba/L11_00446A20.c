@@ -1,34 +1,34 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 func_002A8AF0(f32 *point, f32 *vertices, s32 count);
+extern s32 point_in_path_xy(f32 *point, f32 *vertices, s32 count);
 extern u8 D_L11_004465F8[];
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
-extern s32 func_L02_003D77B8(u8 *);
-extern s32 func_L02_003D77F8(u8 *);
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
+extern s32 moby_has_free_child_slot_state2(u8 *);
+extern s32 moby_has_any_child_slot_used(u8 *);
 extern s32 func_417238(s32);
 extern s32 func_417270(s32);
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C;
-extern void func_L11_00449878(u8 *);
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table;
+extern void security_robot_deactivate(u8 *);
 extern void func_PAL_L11_00451FD0(u8 *);
 extern void func_PAL_L11_004589C8(u8 *);
 extern void func_PAL_L11_0045A9A8(u8 *);
-extern void func_L11_00456540(u8 *);
+extern void fighter_reset_to_idle(u8 *);
 extern void func_PAL_L11_0043BFF8(u8 *);
-extern void func_L11_00439BF0(u8 *);
+extern void chain_creature_clear_sound_flags(u8 *);
 extern void func_PAL_L11_004400D0(u8 *);
-extern void func_L11_003F3098(u8 *);
+extern void joba_enemy_reset(u8 *);
 extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
 extern u8 *D_L11_001B368C __attribute__((sda));
 extern s32 D_L11_001B35B8[] __attribute__((sda));
-extern s16 func_L02_004024A0(u8 *);
-extern s32 func_L02_003D7300(u8 *);
-extern s32 func_L11_00441FB8(u8 *, u8 *, s32);
-extern s32 func_L11_0043A800(u8 *);
-extern u8 D_00189E20[];
-extern u8 D_001A63A8[];
+extern s16 moby_get_vars_counter(u8 *);
+extern s32 moby_get_busy_flag(u8 *);
+extern s32 arena_is_target_outside(u8 *, u8 *, s32);
+extern s32 drone_is_state_at_least_four(u8 *);
+extern u8 g_hero_state[];
+extern u8 g_music_state[];
 
 void func_PAL_L11_00446A20(u8 *obj)
 {
@@ -39,7 +39,7 @@ void func_PAL_L11_00446A20(u8 *obj)
 
     if (index == 0xFF)
         return;
-    list = D_L11_001FC420[index];
+    list = g_group_id_lists[index];
     if (list == 0)
         return;
     p = (u16 *)list;
@@ -47,7 +47,7 @@ void func_PAL_L11_00446A20(u8 *obj)
         entry = D_L11_001B359C_base[0] + ((*p & 0x7FFF) << 8);
         switch (*(s16 *)(entry + 0xAA)) {
         case 0xD98:
-            func_L11_00449878(entry);
+            security_robot_deactivate(entry);
             break;
         case 0xDCF:
             func_PAL_L11_00451FD0(entry);
@@ -59,19 +59,19 @@ void func_PAL_L11_00446A20(u8 *obj)
             func_PAL_L11_0045A9A8(entry);
             break;
         case 0xDF9:
-            func_L11_00456540(entry);
+            fighter_reset_to_idle(entry);
             break;
         case 0xD37:
             func_PAL_L11_0043BFF8(entry);
             break;
         case 0xD4A:
-            func_L11_00439BF0(entry);
+            chain_creature_clear_sound_flags(entry);
             break;
         case 0xD4B:
             func_PAL_L11_004400D0(entry);
             break;
         case 0xB3A:
-            func_L11_003F3098(entry);
+            joba_enemy_reset(entry);
             break;
         }
     } while (*(s16 *)p++ >= 0);

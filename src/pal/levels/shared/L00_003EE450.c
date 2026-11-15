@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A8F00 __attribute__((sda));
-extern void func_L00_002E54E0(float value);
-extern float func_00282C48(float value);
+extern void gfx_set_clamped_view_distance(float value);
+extern float math_fabs(float value);
 
 void func_PAL_L00_003EE6E0(char *p)
 {
@@ -17,7 +18,7 @@ void func_PAL_L00_003EE6E0(char *p)
         *(unsigned short *)(p + 0x32) = 0xAF0;
         *(unsigned char *)(p + 0x30) = 0xFF;
         *(unsigned char *)(p + 0x20) = 1;
-        func_L00_002E54E0(3000.0f);
+        gfx_set_clamped_view_distance(3000.0f);
     }
     if (*(unsigned char *)(p + 0x20) != 1)
         return;
@@ -27,7 +28,7 @@ void func_PAL_L00_003EE6E0(char *p)
     v = *(float *)(p + 0x14);
     v = v - 2.0000002f;
     *(float *)(p + 0x14) = v;
-    x = func_00282C48(v);
+    x = math_fabs(v);
 
     a = 3000.0f - x;
     b = 750.0f - a;

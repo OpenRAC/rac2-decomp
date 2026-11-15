@@ -15,23 +15,23 @@ typedef struct {
     char pad2294[0x22B4 - 0x2294];
     unsigned char mode;
 } L00_004240D8_Player;
-extern L00_004240D8_Player D_00189E20;
+extern L00_004240D8_Player g_hero_state;
 extern const float D_L00_001B14D0 __attribute__((sda));
 extern float D_L00_001B14B4 __attribute__((sda));
 extern const float D_L00_001B14C8 __attribute__((sda));
 extern float D_00138280 NOT_SDA;
 extern void *D_L00_001B1850[] __attribute__((sda));
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282C48(float);
-extern int func_00283CF0(float);
-extern int func_L00_004204A0(void *);
-extern int func_00277258(void *, void *, void *, float);
-extern int func_L00_00424070(void *, int, void *, float);
-extern int func_L00_00423CA8(void *, void *, int, float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fabs(float);
+extern int FloatToInt(float);
+extern int coll_is_point_in_grid(void *);
+extern int coll_test_point(void *, void *, void *, float);
+extern int cam_is_step_behind_plane(void *, int, void *, float);
+extern int cam_push_point_out_of_walls(void *, void *, int, float, float);
 #define F(p,n) (*(float *)((char *)(p)+(n)))
 #define S(p,n) (*(short *)((char *)(p)+(n)))
 #define P(p,n) (*(char **)((char *)(p)+(n)))
@@ -51,37 +51,37 @@ int func_PAL_L00_004295B8(char *obj)
     total=0;
     qcopy(point,base+176);
     step=D_L00_001B14D0;
-    func_00282F20(direction,original,1.0f);
-    for(i=0;i<func_00283CF0(F(state,64)-1.0f);i++) {
-        if(i>0 && !func_L00_004204A0(point) &&
-           func_00277258(point,D_L00_001B1850[0],D_00189E20.owner,step) &&
-           !func_L00_00424070(obj,i,point,step)) {
+    vec_scale_to_length(direction,original,1.0f);
+    for(i=0;i<FloatToInt(F(state,64)-1.0f);i++) {
+        if(i>0 && !coll_is_point_in_grid(point) &&
+           coll_test_point(point,D_L00_001B1850[0],g_hero_state.owner,step) &&
+           !cam_is_step_behind_plane(obj,i,point,step)) {
             qcopy(saved,D_L00_001BF220_1);
             qcopy(previous,point);
-            if(func_L00_00423CA8(obj,point,i,total,step)) {
+            if(cam_push_point_out_of_walls(obj,point,i,total,step)) {
                 result=1;
-                if (D_00189E20.mode!=2 && func_00282C48(D_00138280)>0.05f) {
-                    func_00282CF0(difference,saved,previous);
-                    func_00282F20(difference,difference,1.0f);
-                    if(func_00282C48(func_00282DB0(D_L00_001B8E50,difference))<0.75f) {
+                if (g_hero_state.mode!=2 && math_fabs(D_00138280)>0.05f) {
+                    FastVecSub(difference,saved,previous);
+                    vec_scale_to_length(difference,difference,1.0f);
+                    if(math_fabs(FastVecDot(D_L00_001B8E50,difference))<0.75f) {
                         F(state,48) += ((D_L00_001B14B4) * 1.2f);
                         S(state,52)=1817;
                         if(F(movement,44)-F(state,48)<D_L00_001B14C8)
                             F(state,48)=F(movement,44)-D_L00_001B14C8;
                     }
                 }
-                func_00282CF0(difference,point,camera+80);
-                func_00282F20(movement,difference,F(movement,44)-F(state,48));
-                func_00282F20(direction,movement,1.0f);
+                FastVecSub(difference,point,camera+80);
+                vec_scale_to_length(movement,difference,F(movement,44)-F(state,48));
+                vec_scale_to_length(direction,movement,1.0f);
             }
         }
         {
             float ratio=(F(movement,44)-F(state,48))/F(movement,44);
             step += F(state,68)*F(state,60);
             total += step;
-            func_00282D30(saved,direction,step*ratio);
+            FastVecScale(saved,direction,step*ratio);
         }
-        func_00282CC0(point,point,saved);
+        FastVecAdd(point,point,saved);
     }
     return result;
 }

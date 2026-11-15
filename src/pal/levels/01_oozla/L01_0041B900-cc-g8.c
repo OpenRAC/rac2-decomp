@@ -59,7 +59,7 @@ typedef struct {
     s32 hp;
 } GoldBoltHero;
 
-extern GoldBoltHero D_00189E20;
+extern GoldBoltHero g_hero_state;
 extern u8 D_001A7B2A MACRO_ADDR;
 extern u8 D_001A7A45 MACRO_ADDR;
 extern f32 D_L01_001B1A58 __attribute__((sda));
@@ -77,36 +77,36 @@ extern struct {
 } D_L01_001B22A0 MACRO_ADDR;
 extern s32 D_L01_001B1FA8 MACRO_ADDR;
 extern s32 D_L01_001B1FA8_gp SDATA(D_L01_001B1FA8);
-extern f32 func_002A7940(void);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00282C48(f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern s32 func_002A77E0(s32);
-extern s32 func_00282948(void *);
+extern f32 math_random_angle(void);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
+extern f32 vec_distance_xy(void *, void *);
+extern f32 math_fabs(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern s32 math_random_int_below(s32);
+extern s32 math_fast_float_d(void *);
 extern void func_PAL_L01_0041BFF0(void *);
 extern void func_PAL_L01_0041C0D8(void *);
 extern void func_PAL_L01_0041C560(void *);
-extern void func_L01_00416E78(void *);
+extern void gold_bolt_cam_update(void *);
 extern void func_PAL_L01_0041BF10(void *);
 extern void func_PAL_002B1588(s32, s32);
-extern void func_00288308(s32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_0029F338(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282C88(void *);
-extern void func_0027D330(s32);
-extern void func_L01_002B35E8(s32);
+extern void help_unlock_entry(s32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void moby_mark_spawned(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void FadeToBlack(s32);
+extern void hero_reset_for_area_start(s32);
 extern void func_PAL_L00_002B9CD8(void *, void *, s32, s32);
-extern void func_00335438(void *, void *, s32, s32, s32);
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern void func_003355A8(s32);
+extern void SetCamera5Pose(void *, void *, s32, s32, s32);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern void cam_set_mode_state(s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern void func_PAL_L00_002D2668(s32, s32, f32);
-extern s32 func_0029B3E0(s32, s32);
+extern s32 MemcardSave(s32, s32);
 
 #define SPIN 0.0003490659f
 
@@ -125,10 +125,10 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         }
         qcopy(&vars->home, &moby->pos);
         vars->home.w = moby->rot.z;
-        moby->rot.x = func_002A7940();
-        moby->rot.y = func_002A7940();
-        moby->rot.z = func_002A7940();
-        moby->rot.w = func_002A7940();
+        moby->rot.x = math_random_angle();
+        moby->rot.y = math_random_angle();
+        moby->rot.z = math_random_angle();
+        moby->rot.w = math_random_angle();
         vars->unk68 = D_L01_001B1A68 * SPIN;
         vars->unk64 = D_L01_001B1A6C * SPIN;
         vars->unk60 = D_L01_001B1A70 * SPIN;
@@ -140,61 +140,61 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         break;
     case 1:
         moby->scale = moby->pclass->scale * D_L01_001B1A58;
-        moby->rot.x = func_00283B98(moby->rot.x, D_L01_001B1A68 * SPIN);
-        moby->rot.y = func_00283B98(moby->rot.y, D_L01_001B1A6C * SPIN);
-        moby->rot.z = func_00283B98(moby->rot.z, D_L01_001B1A70 * SPIN);
-        moby->rot.w = func_00283B98(moby->rot.w, D_L01_001B1A74 * SPIN);
+        moby->rot.x = FastAddRotations(moby->rot.x, D_L01_001B1A68 * SPIN);
+        moby->rot.y = FastAddRotations(moby->rot.y, D_L01_001B1A6C * SPIN);
+        moby->rot.z = FastAddRotations(moby->rot.z, D_L01_001B1A70 * SPIN);
+        moby->rot.w = FastAddRotations(moby->rot.w, D_L01_001B1A74 * SPIN);
         func_PAL_L01_0041C0D8(moby);
-        if (!func_002A77E0(D_L01_001B1A98)) {
+        if (!math_random_int_below(D_L01_001B1A98)) {
             func_PAL_L01_0041C560(moby);
         }
-        if (!(func_00282E80(&moby->pos, &D_00189E20.pos) < 3.0f)) {
+        if (!(vec_distance_xy(&moby->pos, &g_hero_state.pos) < 3.0f)) {
             break;
         }
-        if (!(func_00282C48(moby->pos.z - D_00189E20.pos.z) < 2.0f)) {
+        if (!(math_fabs(moby->pos.z - g_hero_state.pos.z) < 2.0f)) {
             break;
         }
-        if (D_00189E20.hp == 0) {
+        if (g_hero_state.hp == 0) {
             break;
         }
-        if (D_00189E20.vehicle_mode != 3 && D_00189E20.vehicle_mode != 0) {
+        if (g_hero_state.vehicle_mode != 3 && g_hero_state.vehicle_mode != 0) {
             break;
         }
         if (vars->unkC != 0) {
             D_L01_001B21B0 = 150;
             func_PAL_002B1588(0xAAA, -1);
-            func_00288308(50);
-            func_002E5CF8(1, 0, moby);
+            help_unlock_entry(50);
+            PlayMobySound(1, 0, moby);
         remove:
-            func_0029F338(moby);
+            moby_mark_spawned(moby);
             break;
         }
-        at.x = func_00283180(vars->home.w) * 2.5f;
-        at.y = func_00283198(vars->home.w) * 2.5f;
+        at.x = math_fast_sin_or_cos_a(vars->home.w) * 2.5f;
+        at.y = math_fast_sin_or_cos_b(vars->home.w) * 2.5f;
         at.z = 0.0f;
-        func_00282CC0(&at, &at, &vars->home);
-        func_00282C88(&look);
-        look.z = func_00283B98(vars->home.w, 3.141593f);
-        func_0027D330(8);
-        if (D_00189E20.vehicle_mode == 3) {
-            func_L01_002B35E8(0);
+        FastVecAdd(&at, &at, &vars->home);
+        vec_clear_128(&look);
+        look.z = FastAddRotations(vars->home.w, 3.141593f);
+        FadeToBlack(8);
+        if (g_hero_state.vehicle_mode == 3) {
+            hero_reset_for_area_start(0);
         }
         func_PAL_L00_002B9CD8(&at, &look, 0x6F, 0);
-        func_002E5CF8(0, 0, moby);
-        at2.x = func_00283180(vars->home.w) * 1.25f;
-        at2.y = func_00283198(vars->home.w) * 1.25f;
+        PlayMobySound(0, 0, moby);
+        at2.x = math_fast_sin_or_cos_a(vars->home.w) * 1.25f;
+        at2.y = math_fast_sin_or_cos_b(vars->home.w) * 1.25f;
         at2.z = 0.0f;
-        at2.x += func_00283180(func_00283B98(vars->home.w, 1.5707965f)) * 4.0f;
-        at2.y += func_00283198(func_00283B98(vars->home.w, 1.5707965f)) * 4.0f;
-        func_00282CC0(&at2, &at2, &vars->home);
+        at2.x += math_fast_sin_or_cos_a(FastAddRotations(vars->home.w, 1.5707965f)) * 4.0f;
+        at2.y += math_fast_sin_or_cos_b(FastAddRotations(vars->home.w, 1.5707965f)) * 4.0f;
+        FastVecAdd(&at2, &at2, &vars->home);
         at2.z += 1.0f;
-        func_00282C88(&look2);
-        look2.z = func_00283BE0(vars->home.w, 1.5707965f);
-        func_00335438(&at2, &look2, 1, 0, 0);
-        func_00335370(&at2);
-        func_003353C8(&look2);
-        qcopy(&moby->pos, &D_00189E20.pos);
-        qcopy(&moby->rot, &D_00189E20.rot);
+        vec_clear_128(&look2);
+        look2.z = fast_subtract_rotations(vars->home.w, 1.5707965f);
+        SetCamera5Pose(&at2, &look2, 1, 0, 0);
+        object_copy_vector_to_selected(&at2);
+        cam_set_state_rotation(&look2);
+        qcopy(&moby->pos, &g_hero_state.pos);
+        qcopy(&moby->rot, &g_hero_state.rot);
         if (moby->prev_seq != 1) {
             func_PAL_002A7E68(moby, 1, 0, 0);
         }
@@ -202,19 +202,19 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         if (D_001A7A45) {
             moby->flags |= 0x8000;
         }
-        D_00189E20.unk22BF = 1;
+        g_hero_state.unk22BF = 1;
         D_L01_001B1FA8 = 1;
         moby->state = 2;
         vars->timer = 50;
         break;
     case 2:
         D_L01_001B22A0.busy = 1;
-        func_L01_00416E78(moby);
-        qcopy(&moby->pos, &D_00189E20.pos);
-        qcopy(&moby->rot, &D_00189E20.rot);
+        gold_bolt_cam_update(moby);
+        qcopy(&moby->pos, &g_hero_state.pos);
+        qcopy(&moby->rot, &g_hero_state.rot);
         if (moby->seq == 1) {
             func_PAL_L01_0041BF10(moby);
-            if (!func_002A77E0(10)) {
+            if (!math_random_int_below(10)) {
                 func_PAL_L01_0041C560(moby);
             }
             if (moby->anim_flags & 2) {
@@ -228,21 +228,21 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
                 }
             }
         }
-        h = &D_00189E20;
+        h = &g_hero_state;
         if (h->anim_flags & 2) {
             func_PAL_L00_002D2668(0, 0, 25.0f);
         }
-        if (moby->seq != 0 || !func_00282948(&vars->timer)) {
+        if (moby->seq != 0 || !math_fast_float_d(&vars->timer)) {
             break;
         }
         D_L01_001B21B0 = 150;
         func_PAL_002B1588(0x129A, -1);
-        func_00288308(50);
+        help_unlock_entry(50);
         D_L01_001B1FA8_gp = 0;
         func_PAL_L00_002B9CD8(&h->pos, &h->rot, 0, 0);
-        func_003355A8(0);
-        func_0029B3E0(0, -1);
-        func_0029F338(moby);
+        cam_set_mode_state(0);
+        MemcardSave(0, -1);
+        moby_mark_spawned(moby);
         break;
     }
 }

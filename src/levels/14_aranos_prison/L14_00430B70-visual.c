@@ -1,21 +1,21 @@
 #include "common.h"
 typedef struct { char pad[0x20]; float rate[4]; unsigned int start[4]; unsigned int end[4]; int timer[4]; float angle[4]; } PrisonVisualState;
-extern void func_L14_004308D0(void *, int, int, int, float, float, float);
-extern float func_L14_00430898(float);
-extern void func_L14_00430E08(void *);
-extern int func_00282948(void *);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern float func_00283B98(float, float);
+extern void gfx_draw_rotated_billboard(void *, int, int, int, float, float, float);
+extern float math_wrap_angle_full_turn(float);
+extern void part_draw_spark_quads(void *);
+extern int math_fast_float_d(void *);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern float FastAddRotations(float, float);
 
 extern char D_L14_001B9500[];
 extern char D_0018A0E0[];
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 typedef struct {
     float pos[4][4];
     int color[4];
@@ -24,20 +24,20 @@ typedef struct {
     char pad[24];
 } PrisonQuad;
 extern float D_L14_002602F0[32], D_L14_00260270[32];
-extern float func_002A7878(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 
 /* Draws the pulse effect: a glowing center quad, two fading rotating quads and the sparks. */
-void func_L14_00430B70(char *self)
+void DrawAnimatedPrisonQuads(char *self)
 {
     char *state = *(char **)(self + 0x68);
     int i;
     unsigned int color;
     float t, scale, angle;
-    DrawRotatedBillboardQuad(self + 0x10, *(int *)(state+0xb8), *(int *)(state+0xc0), 1,
+    gfx_draw_rotated_billboard(self + 0x10, *(int *)(state+0xb8), *(int *)(state+0xc0), 1,
         *(float *)(state+0xbc) * *(float *)(state+0x80), *(float *)(state+0x80)*0.5f, 0.0f);
     for (i=0; i<2; i++) {
-        if (FastFloatHelperD(state+0x50+i*4))
+        if (math_fast_float_d(state+0x50+i*4))
             ((PrisonVisualState *)state)->timer[i] = (int)((float)*(int *)(state+0x10) / ((PrisonVisualState *)state)->rate[i]);
         t = 1.0f - (float)((PrisonVisualState *)state)->timer[i] /
             (float)(int)((float)*(int *)(state+0x10) / ((PrisonVisualState *)state)->rate[i]);
@@ -49,17 +49,17 @@ void func_L14_00430B70(char *self)
             color = (color & 0xffffff) + (((int)(t / *(float *)(state+0x14)*80.0f)+48)<<24);
         }
         scale = *(float *)(state+0x80) * *(float *)(state+0x18);
-        angle = WrapAngleFullTurn(t * (((PrisonVisualState *)state)->angle[i] * 6.2831855f));
-        DrawRotatedBillboardQuad(self+0x10, *(int *)(state+0x1c), color, 1, scale, *(float *)(state+0x80)*0.5f, angle + -3.1415927f);
+        angle = math_wrap_angle_full_turn(t * (((PrisonVisualState *)state)->angle[i] * 6.2831855f));
+        gfx_draw_rotated_billboard(self+0x10, *(int *)(state+0x1c), color, 1, scale, *(float *)(state+0x80)*0.5f, angle + -3.1415927f);
     }
     *(float *)state = FastAddRotations(*(float *)state, 0.007f);
-    DrawRotatedBillboardQuad(self+0x10, *(int *)(state+4), *(int *)(state+12), 1,
+    gfx_draw_rotated_billboard(self+0x10, *(int *)(state+4), *(int *)(state+12), 1,
         *(float *)(state+8)* *(float *)(state+0x80), *(float *)(state+0x80)*0.5f, *(float *)state);
-    DrawPrisonSparkQuads(self);
+    part_draw_spark_quads(self);
 }
 
 /* Draws 32 small spark quads that drift away from the object and fade out. */
-void func_L14_00430E08(void *owner)
+void part_draw_spark_quads(void *owner)
 {
     char *object = owner;
     PrisonQuad q;
@@ -70,9 +70,9 @@ void func_L14_00430E08(void *owner)
     float scale;
     for (i = 0; i < 32; i++) {
         D_L14_002602F0[i]+=1.0f/ *(int *)(state+0xa8);
-        if (D_L14_002602F0[i]>1.0f) { D_L14_002602F0[i]=0; D_L14_00260270[i]=RandomFloatRange(-1.57079637f,1.57079637f); }
+        if (D_L14_002602F0[i]>1.0f) { D_L14_002602F0[i]=0; D_L14_00260270[i]=math_random_float_range(-1.57079637f,1.57079637f); }
     }
-    InitQuadPacketState(&q,*(int *)(state+0xb0),1,alpha);
+    gfx_init_quad_packet_state(&q,*(int *)(state+0xb0),1,alpha);
     q.mode=mode;
     q.uv[0][0]=0; q.uv[0][1]=0; q.uv[1][0]=0; q.uv[1][1]=1;
     q.uv[2][0]=1; q.uv[2][1]=0; q.uv[3][0]=1; q.uv[3][1]=1;
@@ -83,7 +83,7 @@ void func_L14_00430E08(void *owner)
         if (*(float *)(state+0xac)<D_L14_002602F0[i]) color=*(int *)(state+0x98);
         else color=FastTweenColor(*(int *)(state+0x94),*(int *)(state+0x98),D_L14_002602F0[i]/ *(float *)(state+0xac));
         q.color[0]=q.color[1]=q.color[2]=q.color[3]=color;
-        ApplyAxisRotationToQuaternion(rotated,axis,right,D_L14_00260270[i]);
+        math_apply_axis_rotation_to_quat(rotated,axis,right,D_L14_00260270[i]);
         FastVecCross(delta,right,rotated);
         vec_scale_to_length(delta,delta,*(float *)(state+0xb4)*(1.0f-D_L14_002602F0[i]));
         scale=*(float *)(state+0xa4)+D_L14_002602F0[i]*(*(float *)(state+0xa0)-*(float *)(state+0xa4));

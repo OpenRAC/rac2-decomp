@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad_000[0x18];
@@ -11,17 +12,17 @@ typedef struct {
     float value_70;
     unsigned char pad_074[0x6C];
 } L00AimEntry;
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern float func_00282E48(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *,void *,int,void *,void *);
+extern float fast_vec_dist(void *, void *);
 extern char *func_PAL_L00_004012A0(char *, char *, char *, int);
-extern void func_002A8E20(int, void *);
+extern void QueueMobyImpact(int, void *);
 extern void func_PAL_0032F0B8(int, int, char *);
-extern int D_0018C0B0;
+extern int g_hero_moby;
 extern unsigned char D_00139582;
-extern L00AimState D_L00_001BF200;
-extern L00AimEntry D_L00_00262570[];
+extern L00AimState g_collision_result;
+extern L00AimEntry g_weapon_l00_table[];
 
 int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
 {
@@ -30,17 +31,17 @@ int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
     float saved;
     int ret;
 
-    func_00282CF0(a3, a2, a1);
-    func_00282F20(a3, a3, 1.5f);
+    FastVecSub(a3, a2, a1);
+    vec_scale_to_length(a3, a3, 1.5f);
     *(float *)(a3 + 0xC) = 5627.9248046875f;
-    if (func_002761F8(a1, a2, 0x10, D_0018C0B0, 0) != 0) {
-        func_00282CF0(local, a2, a1);
-        func_00282F20(local, local, 1.0f);
-        func_00282CF0(local, (char *)D_L00_001BF200.vector_20, a1);
-        func_PAL_L00_004012A0(a1, local, (char *)D_L00_001BF200.vector_20, 1);
-        if (D_L00_001BF200.object_18 != 0) {
-            saved = (D_L00_00262570 + D_00139582)->value_70;
-            distance = func_00282E48((char *)D_L00_001BF200.vector_20, a1);
+    if (CollLine(a1, a2, 0x10, g_hero_moby, 0) != 0) {
+        FastVecSub(local, a2, a1);
+        vec_scale_to_length(local, local, 1.0f);
+        FastVecSub(local, (char *)g_collision_result.vector_20, a1);
+        func_PAL_L00_004012A0(a1, local, (char *)g_collision_result.vector_20, 1);
+        if (g_collision_result.object_18 != 0) {
+            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            distance = fast_vec_dist((char *)g_collision_result.vector_20, a1);
             if (distance < 10.0f) {
                 *(float *)(a3 + 0x1C) = saved;
             } else if (distance < 14.0f) {
@@ -50,12 +51,12 @@ int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
             } else {
                 *(float *)(a3 + 0x1C) = saved * 0.125f;
             }
-            func_002A8E20(D_L00_001BF200.object_18, a3);
-            func_PAL_0032F0B8(D_L00_001BF200.object_18, 0x44, a0);
+            QueueMobyImpact(g_collision_result.object_18, a3);
+            func_PAL_0032F0B8(g_collision_result.object_18, 0x44, a0);
         }
-        ret = D_L00_001BF200.object_18;
+        ret = g_collision_result.object_18;
     } else {
-    func_00282CF0(local, a2, a1);
+    FastVecSub(local, a2, a1);
     func_PAL_L00_004012A0(a1, local, a2, 0);
     ret = 0;
     }

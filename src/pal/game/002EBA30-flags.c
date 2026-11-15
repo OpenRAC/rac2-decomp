@@ -55,36 +55,36 @@ typedef struct {
     unsigned char pad0C[0x08];
     int x14;
 } Global001A7A00;
-extern Scene2EB1E0 D_001B8840;
+extern Scene2EB1E0 g_scene_playback_state;
 extern Game2EB1E0 D_00189E20_9;
-extern char D_00138180[];
+extern char g_pad_state[];
 #define INPUT ((Input2EB1E0 *)D_00138180)
 extern char D_001A63A8_3[];
 extern SceneActor *D_001B2148;
 extern Global001A7A00 D_001A7A00 MACRO_ADDR;
 extern int D_001A7478 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
-extern int D_001A7B90 MACRO_ADDR;
-extern int D_001A8BB8 MACRO_ADDR;
-extern float D_001B15A0 MACRO_ADDR;
-extern void func_002F5220(void);
-extern void func_002ED0A0(void);
-extern int func_002B6D28(void);
+extern int g_current_map_index MACRO_ADDR;
+extern int g_is_pal_video MACRO_ADDR;
+extern int g_requested_game_mode MACRO_ADDR;
+extern float g_screen_fade MACRO_ADDR;
+extern void game_reset_frame_counters(void);
+extern void scene_update_backdrop_quads(void);
+extern int snd_resume_music_stream(void);
 extern void func_PAL_002B8898(int);
-extern void func_002EB598(void);
+extern void moby_spawn_model_parts(void);
 extern int func_PAL_002EC070(int);
 extern int func_PAL_002F6A48(void);
-extern void func_0029F390(void *);
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void update_moby_animation_state(void *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002E7270(void *);
 extern void func_PAL_002EDA88(void);
-extern void func_0027CFD0(void *, void *);
+extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
-extern void func_0026F790(void *, int);
+extern void stub_empty_17(void *, int);
 extern void func_PAL_002E5898(void);
-extern void func_002914B8(void);
+extern void UpdateLightingEnvironment(void);
 extern void func_PAL_002F6208(void);
 
 /* Advances the scripted scene one frame: fades in, lets the player skip once the fade is
@@ -97,28 +97,28 @@ int func_PAL_002EC0F8(void)
     float fade;
     int skip, done, camera, i;
 
-    if (D_001B8840.done)
+    if (g_scene_playback_state.done)
         return 0;
-    if (D_001B8840.frame + 1 >= D_001B8840.end) {
-        D_001A8BB8 = 0;
-        D_001B8840.done = 1;
+    if (g_scene_playback_state.frame + 1 >= g_scene_playback_state.end) {
+        g_requested_game_mode = 0;
+        g_scene_playback_state.done = 1;
         return 0;
     }
-    func_002F5220();
-    func_002ED0A0();
-    fade = D_001B15A0 - 0.34f;
-    D_001B8840.tick++;
-    D_001B8840.frame++;
-    D_001B15A0 = fade;
+    game_reset_frame_counters();
+    scene_update_backdrop_quads();
+    fade = g_screen_fade - 0.34f;
+    g_scene_playback_state.tick++;
+    g_scene_playback_state.frame++;
+    g_screen_fade = fade;
     if (fade < 0.0f)
-        D_001B15A0 = 0.0f;
-    if (D_001B8840.frame >= D_001B8840.wait)
-        func_002B6D28();
+        g_screen_fade = 0.0f;
+    if (g_scene_playback_state.frame >= g_scene_playback_state.wait)
+        snd_resume_music_stream();
 
     skip = 0;
-    done = D_001B8840.frame >= D_001B8840.end;
-    if (D_001B8840.frame >= 15 && D_001B15A0 == 0.0f) {
-        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || D_001A79F0 <= 0)
+    done = g_scene_playback_state.frame >= g_scene_playback_state.end;
+    if (g_scene_playback_state.frame >= 15 && g_screen_fade == 0.0f) {
+        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || g_current_map_index <= 0)
             && (INPUT->buttons.words[1] & 0x800))
             skip = 1;
         else if ((INPUT->buttons.held & 0x8000000000FULL) == 0x8000000000FULL)
@@ -126,51 +126,51 @@ int func_PAL_002EC0F8(void)
     }
 
     if (skip || done) {
-        D_001B8840.done = 1;
-        D_001A8BB8 = 0;
+        g_scene_playback_state.done = 1;
+        g_requested_game_mode = 0;
     } else {
-        int ticks = D_001A7B90 ? 80 : 96;
-        if (D_001B8840.tick >= ticks) {
-            D_001B8840.chunk++;
+        int ticks = g_is_pal_video ? 80 : 96;
+        if (g_scene_playback_state.tick >= ticks) {
+            g_scene_playback_state.chunk++;
             if (*(short *)(D_001A63A8_3 + 4))
                 func_PAL_002B8898(1);
-            func_002EB598();
-            func_PAL_002EC070(D_001B8840.chunk + 1);
+            moby_spawn_model_parts();
+            func_PAL_002EC070(g_scene_playback_state.chunk + 1);
         }
         camera = func_PAL_002F6A48();
-        for (i = 0; i < D_001B8840.count; i++) {
+        for (i = 0; i < g_scene_playback_state.count; i++) {
             char *keys;
             int key, type;
 
-            actor = D_001B8840.actors[i];
-            key = D_001B8840.tick >> 1;
+            actor = g_scene_playback_state.actors[i];
+            key = g_scene_playback_state.tick >> 1;
             actor->next_key = key + 1;
             actor->key = key;
-            func_0029F390(actor);
-            actor->blend = func_00283CE0(D_001B8840.tick & 1) * 0.5f;
-            if (camera && (D_001B8840.tick & 1))
+            update_moby_animation_state(actor);
+            actor->blend = IntToFloat(g_scene_playback_state.tick & 1) * 0.5f;
+            if (camera && (g_scene_playback_state.tick & 1))
                 actor->blend = 1.0f;
             keys = actor->keys;
-            func_00282D30(first, keys + actor->key * 16, 1.0f - actor->blend);
-            func_00282D30(last, keys + actor->next_key * 16, actor->blend);
-            func_00282CC0(actor->pos, first, last);
+            FastVecScale(first, keys + actor->key * 16, 1.0f - actor->blend);
+            FastVecScale(last, keys + actor->next_key * 16, actor->blend);
+            FastVecAdd(actor->pos, first, last);
             type = actor->type;
             if (type == 0xD54) {
                 actor->flags = 8;
                 func_PAL_002E7270(actor);
                 if (!D_001B2148 || D_001B2148->type == type)
-                    func_0027CFD0(func_PAL_002EDA88, actor);
+                    gfx_register_overlay_draw_callback(func_PAL_002EDA88, actor);
             }
             actor->alpha = 255;
             func_002A0F48(actor);
             if (actor->type == 0) {
                 D_00189E20_9.focus = actor;
-                func_0026F790(actor, 1);
+                stub_empty_17(actor, 1);
             }
         }
     }
     func_PAL_002E5898();
-    func_002914B8();
+    UpdateLightingEnvironment();
     func_PAL_002F6208();
     return skip;
 }

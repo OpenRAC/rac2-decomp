@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,19 +28,19 @@
 #endif
 
 extern s8 D_002359E0[];
-extern s8 D_00189E20[];
+extern s8 g_hero_state[];
 extern f32 D_001B0594 __attribute__((sda));
 extern f32 D_001B0598 __attribute__((sda));
-extern void func_00282C88(void *);
-extern s32 func_002A7820(s32, s32);
-extern void *func_002C2210(void *, s32, s32, s32, s32, void *, s32, f32, f32, f32);
-extern s32 func_00283CF0(f32);
-extern void func_002FE8D8(s32, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern s32 math_random_int_range(s32, s32);
+extern void *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, s32, f32, f32, f32);
+extern s32 FloatToInt(f32);
+extern void moby_get_facing_direction(s32, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Sets up 50 pairs of glowing sprites (one reddish, one red) along a trail that drifts toward the player's aim point. */
-void func_0032AA30(void) {
+void part_init_trail_sparkle_pairs(void) {
     s8 zeroVec[16];
     s8 drift[16];
     s32 index;
@@ -50,22 +51,22 @@ void func_0032AA30(void) {
     f32 redSize;
 
     index = 0;
-    ClearVector128(zeroVec);
+    vec_clear_128(zeroVec);
     do {
-        alpha = RandomIntRange(0, 0x6F) << 24;
+        alpha = math_random_int_range(0, 0x6F) << 24;
         point = D_002359E0 + index * 16;
-        sprite = SpawnGroundEffectParticle(point, 0xC, alpha | 0x7F2020, 0, 1, zeroVec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
+        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0x7F2020, 0, 1, zeroVec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
         redSize = D_001B0598;
-        sprite = SpawnGroundEffectParticle(point, 0xC, alpha | 0xFF4040, 1, 1, zeroVec, 0, redSize * 0.5f, redSize, 0.0f);
+        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0xFF4040, 1, 1, zeroVec, 0, redSize * 0.5f, redSize, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
         index += 1;
-        hero = gHeroState;
-        GetObjectFacingDirection(*(s32 *)(hero + 0x2290) + 0x10, drift);
+        hero = g_hero_state;
+        moby_get_facing_direction(*(s32 *)(hero + 0x2290) + 0x10, drift);
         vec_scale_to_length(drift, drift, -0.00277777785f);
         FastVecAdd(point, point, drift);
     } while (index < 0x32);

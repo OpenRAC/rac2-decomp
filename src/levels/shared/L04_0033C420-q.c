@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern int func_002761F8(void *a, void *b, int mode, void *self, int flag);
+extern int CollLine(void *a, void *b, int mode, void *self, int flag);
 typedef struct { int pad[6]; int f18; int f1C; } L04Flags;
 extern L04Flags ref_L04_0033C420_00;
 
 /* Checks for ground just below a point, and returns 0 if the ground is not allowed. */
-int func_L04_0033C420(void *probePos, void *selfMoby, int rejectFlagged, float upOffset, float downOffset)
+int coll_check_ground_below_point(void *probePos, void *selfMoby, int rejectFlagged, float upOffset, float downOffset)
 {
     float top[4];
     float bottom[4];

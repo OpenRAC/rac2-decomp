@@ -87,52 +87,52 @@ extern int D_L00_001A8F00 __attribute__((sda));
 extern int D_L00_001B0768 __attribute__((sda));
 extern int D_L00_001B075C __attribute__((sda));
 extern unsigned char D_00139587[];
-extern Material D_L00_00262570[];
-extern Runtime D_00189E20;
-extern char D_00188660[];
-extern void *D_0018C0B0 NOT_SDA;
-extern int D_001A79F0 __attribute__((sda));
+extern Material g_weapon_l00_table[];
+extern Runtime g_hero_state;
+extern char g_sound_state[];
+extern void *g_hero_moby NOT_SDA;
+extern int g_current_map_index __attribute__((sda));
 extern int D_L00_001A8FF0[] MACRO_ADDR;
 extern int D_L00_001ADB2C __attribute__((sda));
-extern int D_L00_001B0798[4] __attribute__((sda));
+extern int g_synthenoid_slots[4] __attribute__((sda));
 extern int D_L00_001B076C __attribute__((sda)), D_L00_001B0770 __attribute__((sda));
 extern float D_L00_001B0774 __attribute__((sda)), D_L00_001B0778 __attribute__((sda));
 extern float D_L00_001B077C __attribute__((sda)), D_L00_001B0784 __attribute__((sda));
 extern int D_L00_001B0780 __attribute__((sda));
-extern int func_L00_003D3DE0(void *, void *);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002A7470(void *, int, int,int);
-extern float func_002A7940(void);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_00282EB0(void *, void *);
-extern void func_00282CF0(void *, void *,void *);
-extern void func_00282CC0(void *, void *,void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_003EB7C0(void *, void *);
-extern void func_L00_003EBC68(void *, void *);
-extern void func_L00_003EB8E8(void *, void *);
-extern void func_L00_003EC078(void *, void *);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
-extern void func_00300190(void *, void *);
-extern void func_002A9288(void *, float);
-extern void func_L00_0031AC60(void *, void *,void *, float);
-extern void func_00282D08(void *, void *,void *, float);
-extern float func_00283B98(float, float);
-extern float func_00282C48(float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *,void *);
+extern int kilonoid_spawn(void *, void *);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
+extern void anim_start_blended(void *, int, int,int);
+extern float math_random_angle(void);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float vec_fast_helper_c(void *, void *);
+extern void FastVecSub(void *, void *,void *);
+extern void FastVecAdd(void *, void *,void *);
+extern void FastVecScale(void *, void *, float);
+extern void synthenoid_compute_orbit_point(void *, void *);
+extern void synthenoid_update_movement(void *, void *);
+extern void UpdateAutoTargetFire(void *, void *);
+extern void synthenoid_emit_exhaust(void *, void *);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void part_queue_ground_shadow(void *, float);
+extern void math_blend_vector_sine_ease(void *, void *,void *, float);
+extern void lerp_vector(void *, void *,void *, float);
+extern float FastAddRotations(float, float);
+extern float math_fabs(float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *,void *);
 
 extern int func_001163B0(void);
-extern void func_002ACB48(void *, float);
-extern void func_002C2210(void *, int, int,int, int, void *, int,float, float,float);
+extern void vec_add_random_offset(void *, float);
+extern void part_spawn_ground_effect(void *, int, int,int, int, void *, int,float, float,float);
 
 /* Update the three object states, emit fading particles, and orient the object
  * from the camera basis and its three stored angles. */
 /* Updates the Synthenoid flying robot: it follows the player, shoots at targets and fades away when done. */
-void func_L00_003EC140(Object *object)
+void synthenoid_update(Object *object)
 {
     Vec vector, matrix;
     State *state;
@@ -152,14 +152,14 @@ void func_L00_003EC140(Object *object)
     }
     if (state->disabled == 1)
         object->flags &= 0xFFBE;
-    if (((Material *)(D_00139587[0] * 224 + (char *)gWeaponTable_L00))->active &&
-        object->mode != 2 && SpawnKilonoidMoby(gHeroMoby_0018C0B0, &object->position)) {
+    if (((Material *)(D_00139587[0] * 224 + (char *)g_weapon_l00_table))->active &&
+        object->mode != 2 && kilonoid_spawn(g_hero_moby, &object->position)) {
         qzero(&state->velocity);
         state->timer = D_L00_001B0768;
         if (state->slot != -1) {
-            entry = (Slot *)(gSoundState + state->slot * 112);
+            entry = (Slot *)(g_sound_state + state->slot * 112);
             if (entry->owner == object && entry->active)
-                StopSoundVoice(state->slot);
+                snd_stop_voice(state->slot);
         }
         state->slot = -1;
         PlayMobySound(2, 0, object);
@@ -177,24 +177,24 @@ void func_L00_003EC140(Object *object)
         state->flag = 0;
         state->timer = 0;
         if (object->anim_id)
-            StartAnimationBlended(object, 0, 0, 10);
+            anim_start_blended(object, 0, 0, 10);
         object->color = 255;
         object->color2 = 255;
         state->count = 0;
         state->value30 = 0;
         state->value2c = D_L00_001B075C;
-        qcopy(&state->last_position, &gHeroState.player);
-        entry = (Slot *)(gSoundState + state->slot * 112);
+        qcopy(&state->last_position, &g_hero_state.player);
+        entry = (Slot *)(g_sound_state + state->slot * 112);
         if (entry->owner != object || !entry->active) {
             state->slot = -1;
-            if (((Slot *)(gSoundState - 0x70))->owner != object ||
-                !((Slot *)(gSoundState - 0x70))->active)
+            if (((Slot *)(g_sound_state - 0x70))->owner != object ||
+                !((Slot *)(g_sound_state - 0x70))->active)
                 state->slot = PlayMobySound(1, 4, object);
         }
         qzero(&state->velocity);
-        state->random0 = RandomAngle();
-        state->random1 = RandomAngle();
-        state->random2 = RandomAngle();
+        state->random0 = math_random_angle();
+        state->random1 = math_random_angle();
+        state->random2 = math_random_angle();
         state->value50 = 0;
         object->mode = 1;
         break;
@@ -203,25 +203,25 @@ void func_L00_003EC140(Object *object)
         Slot *entry;
 
         if ((object->status & 2) && object->anim_id != 1)
-            StartAnimationBlended(object, 1, 0, 10);
-        entry = (Slot *)(gSoundState + state->slot * 112);
+            anim_start_blended(object, 1, 0, 10);
+        entry = (Slot *)(g_sound_state + state->slot * 112);
         if (entry->owner != object || !entry->active) {
             state->slot = -1;
-            if (((Slot *)(gSoundState - 0x70))->owner != object ||
-                !((Slot *)(gSoundState - 0x70))->active)
+            if (((Slot *)(g_sound_state - 0x70))->owner != object ||
+                !((Slot *)(g_sound_state - 0x70))->active)
                 state->slot = PlayMobySound(1, 4, object);
         }
-        if (gHeroState.mode != 129 &&
-            FastVectorHelperC(&state->last_position, &gHeroState.player) > 400.0f) {
-            if (gCurrentMapIndex == 7 && gHeroState.object &&
-                gHeroState.object->class_id == 0x11D9 /* moby class 4569 */) {
-                FastVecSub(&vector, &gHeroState.player, &state->last_position);
+        if (g_hero_state.mode != 129 &&
+            vec_fast_helper_c(&state->last_position, &g_hero_state.player) > 400.0f) {
+            if (g_current_map_index == 7 && g_hero_state.object &&
+                g_hero_state.object->class_id == 0x11D9 /* moby class 4569 */) {
+                FastVecSub(&vector, &g_hero_state.player, &state->last_position);
                 FastVecAdd(&object->position, &object->position, &vector);
             } else {
                 if (state->slot != -1) {
-                    Slot *entry = (Slot *)(gSoundState + state->slot * 112);
+                    Slot *entry = (Slot *)(g_sound_state + state->slot * 112);
                     if (entry->owner == object && entry->active)
-                        StopSoundVoice(state->slot);
+                        snd_stop_voice(state->slot);
                 }
                 state->slot = -1;
                 object->alpha = 128;
@@ -229,28 +229,28 @@ void func_L00_003EC140(Object *object)
                 qzero_nc(&state->velocity);
                 object->flags &= 0xFDFF;
                 if (state->index != -1)
-                    gSynthenoidSlots[state->index] = 0;
-                MarkMobySpawned(object);
+                    g_synthenoid_slots[state->index] = 0;
+                moby_mark_spawned(object);
                 return;
             }
         }
-        qcopy(&state->last_position, &gHeroState.player);
+        qcopy(&state->last_position, &g_hero_state.player);
         if (state->timer >= 21 && (object->status & 2)) {
             if (object->anim_id != 1)
-                StartAnimationBlended(object, 1, 0, RandomIntRange(7, 12));
-            object->anim_speed = RandomFloatRange(0.95f, 1.05f);
+                anim_start_blended(object, 1, 0, math_random_int_range(7, 12));
+            object->anim_speed = math_random_float_range(0.95f, 1.05f);
         }
-        if (state->count < state->limit && gHeroState.phase != 22 &&
-            gHeroState.phase != 20 && !gHeroState.flag) {
-            ComputeSynthenoidOrbitPoint(object, state);
-            UpdateSynthenoidMovement(object, state);
+        if (state->count < state->limit && g_hero_state.phase != 22 &&
+            g_hero_state.phase != 20 && !g_hero_state.flag) {
+            synthenoid_compute_orbit_point(object, state);
+            synthenoid_update_movement(object, state);
         } else {
             qzero(&state->velocity);
             state->timer = D_L00_001B0768;
             if (state->slot != -1) {
-                Slot *entry = (Slot *)(gSoundState + state->slot * 112);
+                Slot *entry = (Slot *)(g_sound_state + state->slot * 112);
                 if (entry->owner == object && entry->active)
-                    StopSoundVoice(state->slot);
+                    snd_stop_voice(state->slot);
             }
             state->slot = -1;
             PlayMobySound(2, 0, object);
@@ -261,33 +261,33 @@ void func_L00_003EC140(Object *object)
     }
     case 2:
         if (state->slot != -1) {
-            Slot *entry = (Slot *)(gSoundState + state->slot * 112);
+            Slot *entry = (Slot *)(g_sound_state + state->slot * 112);
             if (entry->owner == object && entry->active)
-                StopSoundVoice(state->slot);
+                snd_stop_voice(state->slot);
         }
         state->slot = -1;
-        if (FastFloatHelperD(&state->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             if (state->slot != -1) {
-                Slot *entry = (Slot *)(gSoundState + state->slot * 112);
+                Slot *entry = (Slot *)(g_sound_state + state->slot * 112);
                 if (entry->owner == object && entry->active)
-                    StopSoundVoice(state->slot);
+                    snd_stop_voice(state->slot);
             }
             state->slot = -1;
             object->alpha = 128;
             qzero(&state->velocity);
             object->flags &= 0xFDFF;
             if (state->index != -1)
-                gSynthenoidSlots[state->index] = 0;
-            MarkMobySpawned(object);
+                g_synthenoid_slots[state->index] = 0;
+            moby_mark_spawned(object);
             return;
         }
         matrix.q = 0;
         qcopy(&vector, &object->position);
-        AddRandomOffsetToVector(&vector, D_L00_001B0774);
+        vec_add_random_offset(&vector, D_L00_001B0774);
         {
-            int red = (Rand() + 0x30) & 0x3F;
-            int green = (Rand() + 0x20) & 0x3F;
-            int blue = Rand() & 0x2F;
+            int red = (func_001163B0() + 0x30) & 0x3F;
+            int green = (func_001163B0() + 0x20) & 0x3F;
+            int blue = func_001163B0() & 0x2F;
             int color;
             int direction;
             int id;
@@ -296,12 +296,12 @@ void func_L00_003EC140(Object *object)
             red |= green << 8;
             red |= blue << 16;
             color = red | (D_L00_001B0780 << 24);
-            direction = Rand() % 2;
+            direction = func_001163B0() % 2;
             if (state->timer & 1)
                 direction = -direction;
-            id = RandomIntRange(D_L00_001B076C, D_L00_001B0770);
-            scale = RandomFloatRange(D_L00_001B0778, D_L00_001B077C);
-            SpawnGroundEffectParticle(&vector, id, color, 2, direction, &matrix, 0,
+            id = math_random_int_range(D_L00_001B076C, D_L00_001B0770);
+            scale = math_random_float_range(D_L00_001B0778, D_L00_001B077C);
+            part_spawn_ground_effect(&vector, id, color, 2, direction, &matrix, 0,
                           scale, 0.001f, D_L00_001B0784 * 0.0002777777845f);
         }
         object->flags |= 0x200;
@@ -311,44 +311,44 @@ void func_L00_003EC140(Object *object)
     }
     if (object->mode) {
         if (!D_L00_001ADB2C) {
-            if (gHeroState.mode == 39) {
-                FastVecAdd(&object->position, &object->position, &gHeroState.movement);
+            if (g_hero_state.mode == 39) {
+                FastVecAdd(&object->position, &object->position, &g_hero_state.movement);
             } else {
-                FastVecAdd(&vector, &object->position, &gHeroState.drift);
-                BlendVectorSineEase(&object->position, &object->position, &vector, 0.4f);
+                FastVecAdd(&vector, &object->position, &g_hero_state.drift);
+                math_blend_vector_sine_ease(&object->position, &object->position, &vector, 0.4f);
                 lerp_vector(&object->position, &object->position, &vector, 0.625f);
             }
         }
-        TransformVectorOrCopy(&object->position, &object->position);
+        vec_transform_or_copy(&object->position, &object->position);
         if (!D_L00_001A8FF0[0])
-            QueueGroundShadow(object, 0.3f);
-        EmitSynthenoidExhaust(object, state);
+            part_queue_ground_shadow(object, 0.3f);
+        synthenoid_emit_exhaust(object, state);
     }
-    camera = gHeroState.camera;
+    camera = g_hero_state.camera;
     qcopy(&object->axis_x, &camera->axis_x);
     qcopy(&object->axis_y, &camera->axis_y);
     qcopy(&object->axis_z, &camera->axis_z);
-    if (gHeroState.phase == 15) {
+    if (g_hero_state.phase == 15) {
         qcopy(&object->axis_x, &camera->axis_y);
         FastVecScale(&object->axis_y, &camera->axis_x, -1.0f);
     }
     angle = object->angle_z;
-    if (FloatAbs(angle) > 0.00001f) {
-        BuildAxisAngleQuaternion(&vector, &object->axis_z, angle);
-        RotateVectorByQuaternion(&object->axis_x, &object->axis_x, &vector);
-        RotateVectorByQuaternion(&object->axis_y, &object->axis_y, &vector);
+    if (math_fabs(angle) > 0.00001f) {
+        math_build_axis_angle_quat(&vector, &object->axis_z, angle);
+        vec_rotate_by_quaternion(&object->axis_x, &object->axis_x, &vector);
+        vec_rotate_by_quaternion(&object->axis_y, &object->axis_y, &vector);
     }
     angle = object->angle_y;
-    if (FloatAbs(angle) > 0.00001f) {
-        BuildAxisAngleQuaternion(&vector, &object->axis_y, angle);
-        RotateVectorByQuaternion(&object->axis_x, &object->axis_x, &vector);
-        RotateVectorByQuaternion(&object->axis_z, &object->axis_z, &vector);
+    if (math_fabs(angle) > 0.00001f) {
+        math_build_axis_angle_quat(&vector, &object->axis_y, angle);
+        vec_rotate_by_quaternion(&object->axis_x, &object->axis_x, &vector);
+        vec_rotate_by_quaternion(&object->axis_z, &object->axis_z, &vector);
     }
     angle = object->angle_x;
-    if (FloatAbs(angle) > 0.00001f) {
-        BuildAxisAngleQuaternion(&vector, &object->axis_x, angle);
-        RotateVectorByQuaternion(&object->axis_y, &object->axis_y, &vector);
-        RotateVectorByQuaternion(&object->axis_z, &object->axis_z, &vector);
+    if (math_fabs(angle) > 0.00001f) {
+        math_build_axis_angle_quat(&vector, &object->axis_x, angle);
+        vec_rotate_by_quaternion(&object->axis_y, &object->axis_y, &vector);
+        vec_rotate_by_quaternion(&object->axis_z, &object->axis_z, &vector);
     }
     object->axis_x.f[3] = object->axis_y.f[3] = object->axis_z.f[3] = 0.0f;
 }

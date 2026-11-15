@@ -13,102 +13,102 @@ extern void func_00307C68(char *a0, int a1, int a2, int a3, f32 f12, f32 f13, f3
 /* Three func_00307C68(p + 0x10, 11, colour, 1, ...) calls, each colour with a random
    alpha byte; the first alpha also sets +0x1C of this level's D_L10_001C7800 record. */
 extern int D_L10_00221CFC __attribute__((section(".data")));
-extern int D_L10_001B13A4 __attribute__((sda));
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(int);
-extern void *func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
-extern void func_L10_00425798(void);
-extern void func_L10_00425410(int, int);
-extern void func_L05_00379F48(int);
+extern int g_mission_initialized __attribute__((sda));
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(int);
+extern void *level_get_object_list(void);
+extern int level_get_saved_value(void);
+extern void cloud_destroy_leftover_objects(void);
+extern void cloud_spawn_objects(int, int);
+extern void hero_set_state_value_c(int);
 extern int D_L10_001B13F8 __attribute__((sda));
 extern int D_L10_001B13FC __attribute__((sda));
 extern int D_L10_001B1444 __attribute__((sda));
-extern int D_L10_001B1390 __attribute__((sda));
+extern int g_mission_completion_counts __attribute__((sda));
 extern int D_L10_001B1424 __attribute__((sda));
 extern char *D_L10_001B251C;
-extern void func_L10_0039D5E0(void *, void *, int, int, int, int, int, int, float, float, float, float);
-extern int func_00282948(void *);
-extern void func_L10_00425888(void);
-extern int func_0029B3E0(int, int);
-extern void func_L00_003294F0(void *, int);
-extern void func_002AD7B8(int);
+extern void CreateEnergyStrip(void *, void *, int, int, int, int, int, int, float, float, float, float);
+extern int math_fast_float_d(void *);
+extern void mission_store_completion_counts(void);
+extern int MemcardSave(int, int);
+extern void moby_set_flag_bit(void *, int);
+extern void moby_mark_flag_and_append_to_list(int);
 
 typedef struct { int idx; u8 pad[0x28]; int f2C; } G221CD0;
 extern G221CD0 D_L10_00221CD0;
 extern u8 *D_001B2614;
-extern void func_L05_0037B280(void *, int);
+extern void entry_spawn_list_objects_with_flag(void *, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
-extern void func_L10_00419188(void *);
-extern void *func_L05_00379ED0(int);
-extern int func_L10_0037D200(void *);
-extern void func_L10_00423DC8(void *, int);
-extern int func_L05_0037B3A0(void *);
-extern void func_0027D330(int);
-extern void func_L10_00423500(void *);
+extern void hrugis_set_group_states(void *);
+extern void *level_find_object_by_class_id(int);
+extern int group_count_alive(void *);
+extern void hrugis_finish_mission_reward(void *, int);
+extern int list_count_ready_objects(void *);
+extern void FadeToBlack(int);
+extern void hrugis_reset_mission_state(void *);
 
-extern int func_002A7820(int low, int high);
-extern f32 func_002A7878(f32 low, f32 high);
-extern f32 func_002A7940(void);
-extern void func_00281EB8(void *at, int kind, unsigned int colour, int count, f32 size,
+extern int math_random_int_range(int low, int high);
+extern f32 math_random_float_range(f32 low, f32 high);
+extern f32 math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *at, int kind, unsigned int colour, int count, f32 size,
                           f32 rate, f32 spin);
-extern f32 func_00283CE0(int);
+extern f32 IntToFloat(int);
 extern u8 D_L10_001C7800[];
 
 /* First call: resets the D_L10_001B13A4 block, marks every class-0xF85 moby, spawns 75
    objects and the effect box. Then, until the 0xF85 moby reports done, each timer expiry
    either closes the D_L10_001B1444 sequence (with D_L10_001B1390 raised around the
    func_0029B3E0 call, which returns an int) or restarts state 0 through func_L10_00423DC8. */
-void func_L10_00424028(char *object)
+void mission_first_update(char *object)
 {
     char **mobyList;
     int result;
     char *vars = *(char **)(object + 0x68);
     char *targetMoby;
     int i;
-    if (!gMissionInitialized) {
+    if (!g_mission_initialized) {
         typedef int Quad __attribute__((mode(TI)));
         union { Quad q; float f[4]; } av, bv;
         D_L10_00221CFC = 0;
-        gMissionInitialized = 1;
+        g_mission_initialized = 1;
         D_L10_001B13F8 = 0;
         D_L10_001B13FC = 0;
         music_Unpause();
-        InitAllRegisteredEntries();
-        SetPlayerStateField13(0);
-        mobyList = GetLevelObjectList();
-        result = GetLevelSavedValue();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        mobyList = level_get_object_list();
+        result = level_get_saved_value();
         for (i = 0; i < result; i++) {
-            if (*(short *)(mobyList[i] + 0xAA) == 0xF85 /* moby class 3973 */) SpawnEntryListObjectsWithFlag(mobyList[i], 1);
+            if (*(short *)(mobyList[i] + 0xAA) == 0xF85 /* moby class 3973 */) entry_spawn_list_objects_with_flag(mobyList[i], 1);
         }
-        DestroyLeftoverCloudObjects();
-        SpawnCloudObjects(75,16);
+        cloud_destroy_leftover_objects();
+        cloud_spawn_objects(75,16);
         av.q = 0; bv.q = 0;
         av.f[0] = 469.63f; av.f[1] = 407.93f; av.f[2] = 502.79f;
         bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
         CreateEnergyStrip(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
     }
-    targetMoby = FindLevelObjectByClassId(0xF85 /* moby class 3973 */);
-    result = targetMoby ? CountAliveGroupMobys(targetMoby) : 0;
+    targetMoby = level_find_object_by_class_id(0xF85 /* moby class 3973 */);
+    result = targetMoby ? group_count_alive(targetMoby) : 0;
     if (!result) {
-        InitAllRegisteredEntries();
+        entry_init_all_registered();
         if (D_L10_001B1444) {
-            if (FastFloatHelperD(vars + 0x58)) {
+            if (math_fast_float_d(vars + 0x58)) {
                 *(int *)(vars + 0x58) = 10;
-                gMissionCompletionCounts++;
-                ClampAndStoreCompletionCounts();
+                g_mission_completion_counts++;
+                mission_store_completion_counts();
                 MemcardSave(0,-1);
-                gMissionCompletionCounts--;
-                SetObjectFlagBit(D_L10_001B251C + *(int *)(vars + 0x2C) * 256,1);
+                g_mission_completion_counts--;
+                moby_set_flag_bit(D_L10_001B251C + *(int *)(vars + 0x2C) * 256,1);
                 D_L10_001B1424 = 0;
                 D_L10_001B1444 = 0;
-                SetPlayerStateField18(1);
-                MarkFlagAndAppendToList(12);
+                hero_set_state_value_c(1);
+                moby_mark_flag_and_append_to_list(12);
             }
-        } else if (FastFloatHelperD(vars + 0x58)) {
-            FinishMissionAndGrantReward(object,0);
+        } else if (math_fast_float_d(vars + 0x58)) {
+            hrugis_finish_mission_reward(object,0);
             D_L10_001B13F8 = 0;
             D_L10_001B13FC = 0;
         }
@@ -117,7 +117,7 @@ void func_L10_00424028(char *object)
 
 /* Mission controller for the second challenge: sets it up on the first frame, then ends the
    round when the first target group is gone or the second group is cleared. */
-void func_L10_00424290(u8 *moby) {
+void mission_second_update(u8 *moby) {
     u8 **mobyList;
     int mobyCount;
     int i;
@@ -125,47 +125,47 @@ void func_L10_00424290(u8 *moby) {
     void *targetMoby;
     int targetsLeft;
 
-    if (gMissionInitialized == 0) {
-        gMissionInitialized = 1;
+    if (g_mission_initialized == 0) {
+        g_mission_initialized = 1;
         D_L10_00221CD0.f2C = 0;
         music_Unpause();
-        InitAllRegisteredEntries();
-        SetPlayerStateField13(0);
-        mobyList = GetLevelObjectList();
-        mobyCount = GetLevelSavedValue();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        mobyList = level_get_object_list();
+        mobyCount = level_get_saved_value();
         for (i = 0; i < mobyCount; i++) {
             current = mobyList[i];
             switch (*(short *)(current + 0xAA)) {
             case 0xCBE /* moby class 3262 */:
-                SpawnEntryListObjectsWithFlag(current, 1);
+                entry_spawn_list_objects_with_flag(current, 1);
                 break;
             case 0xF93 /* moby class 3987 */:
-                SpawnEntryListObjectsWithFlag(current, 1);
+                entry_spawn_list_objects_with_flag(current, 1);
                 func_L05_0037CEE0(mobyList[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
                 func_L05_0037D608(mobyList[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
-                SetGroupMobyStates(mobyList[i]);
+                hrugis_set_group_states(mobyList[i]);
                 break;
             }
         }
-        DestroyLeftoverCloudObjects();
-        SpawnCloudObjects(0x2D, 12);
+        cloud_destroy_leftover_objects();
+        cloud_spawn_objects(0x2D, 12);
     }
-    targetMoby = FindLevelObjectByClassId(0xF93 /* moby class 3987 */);
-    targetsLeft = targetMoby ? CountAliveGroupMobys(targetMoby) : 0;
+    targetMoby = level_find_object_by_class_id(0xF93 /* moby class 3987 */);
+    targetsLeft = targetMoby ? group_count_alive(targetMoby) : 0;
     if (targetsLeft == 0) {
-        FinishMissionAndGrantReward(moby, 1);
+        hrugis_finish_mission_reward(moby, 1);
     }
-    if (CountReadyListObjects(FindLevelObjectByClassId(0xCBE /* moby class 3262 */)) == 0) {
+    if (list_count_ready_objects(level_find_object_by_class_id(0xCBE /* moby class 3262 */)) == 0) {
         FadeToBlack(0x1E);
-        SetPlayerStateField18(0);
-        ResetHrugisMissionState(moby);
+        hero_set_state_value_c(0);
+        hrugis_reset_mission_state(moby);
     }
 }
 
 /* Two-state start-up for a cloud puff: state 0 lays the record at +0x10 out (position
    reset, colour limits, the builder call, its handle in the $gp variable), and states 0
    and 1 both fade the +0xF8 value down; anything else goes straight to the update. */
-void func_L10_0042BE20(u8 *moby) {
+void cloud_puff_startup_update(u8 *moby) {
     u8 *puff = moby;
     u8 state = *(u8 *)(puff + 0x20);
     f32 zero;
@@ -194,19 +194,19 @@ void func_L10_0042BE20(u8 *moby) {
 /* The cloud puff's burst: three layers of particles at the object's position, coloured
    0x800000, 0x808080 and 0x804040 under random alphas, then the entry of D_L10_001C7800
    named by D_L10_001B1648 takes half of a value for the first alpha at +0x1C. */
-void func_L10_0042BEE0(u8 *object)
+void part_spawn_cloud_puff_burst(u8 *object)
 {
     int alpha;
     u8 *entry;
 
-    alpha = RandomIntRange(1, 0x80) << 24;
+    alpha = math_random_int_range(1, 0x80) << 24;
     object += 0x10;
-    DrawBillboardQuad_00281EB8(object, 0xB, (RandomIntRange(0x20, 0x80) << 24) | 0x800000, 1,
-                  RandomFloatRange(8.0f, 15.0f), 0.01f, RandomAngle());
-    DrawBillboardQuad_00281EB8(object, 0xB, alpha | 0x808080, 1, RandomFloatRange(4.0f, 12.0f), 0.025f,
-                  RandomAngle());
-    DrawBillboardQuad_00281EB8(object, 0xB, (RandomIntRange(0, 0x80) << 24) | 0x804040, 1,
-                  RandomFloatRange(8.0f, 17.0f), 0.05f, RandomAngle());
+    gfx_draw_billboard_quad(object, 0xB, (math_random_int_range(0x20, 0x80) << 24) | 0x800000, 1,
+                  math_random_float_range(8.0f, 15.0f), 0.01f, math_random_angle());
+    gfx_draw_billboard_quad(object, 0xB, alpha | 0x808080, 1, math_random_float_range(4.0f, 12.0f), 0.025f,
+                  math_random_angle());
+    gfx_draw_billboard_quad(object, 0xB, (math_random_int_range(0, 0x80) << 24) | 0x804040, 1,
+                  math_random_float_range(8.0f, 17.0f), 0.05f, math_random_angle());
     entry = D_L10_001C7800 + (D_L10_001B1648 << 5);
     *(f32 *)(entry + 0x1C) = IntToFloat(alpha >> 24) * 0.5f;
 }

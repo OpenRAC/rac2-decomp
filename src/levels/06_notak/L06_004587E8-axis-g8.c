@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L06_004587E8 (1,572 bytes, Notak). Own unit: -O2 -G8 -ffunction-sections
  * -frac2-mult-add-no-flatten -frac2-pre-call-test -frac2-cse-noskip-store
  * -frac2-sched-retstore -frac2-sched-stackaddr (config/cflags.txt; docs/build/compiler-notes.md).
@@ -9,21 +10,21 @@
 extern short D_L06_001B3790[] __attribute__((sda));
 extern short D_L06_001B37A0[] __attribute__((sda));
 extern char D_L06_0025FFC0[];
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 typedef unsigned int NotakQuad __attribute__((mode(TI)));
-extern char D_00188660[];
+extern char g_sound_state[];
 extern char D_L06_001A8F20[] __attribute__((sda));
-extern void func_002E59F8(int);
-extern int func_00282948(void *);
+extern void snd_stop_voice(int);
+extern int math_fast_float_d(void *);
 extern char D_L06_001B9840[];
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(char *, char *, float);
-extern int func_002A77E0(int);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, float, int);
-extern void func_002A7750(char *, int, int);
-extern float func_002A7878(float, float);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(char *, char *, float);
+extern int math_random_int_below(int);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, float, int);
+extern void moby_set_state(char *, int, int);
+extern float math_random_float_range(float, float);
 extern void func_00350388(char *);
 typedef struct {
     char prefix[0x18];
@@ -35,21 +36,21 @@ extern NotakCollision D_L06_001BFC80;
 extern char D_L06_001C79C0[];
 extern int D_L06_001B3778[] __attribute__((sda));
 extern int D_L06_001B3760[];
-extern void func_002A8C00(void *, char *, int, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void make_hit_descriptor(void *, char *, int, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
 extern int func_0031EBF8(float, void *, int, void *);
-extern int func_002A8C28(void *, void *, int, int, int, int, float, float, float);
-extern void func_L06_00459828(float *, int);
-extern void func_00291450(int);
-extern void func_002A7988(void *, float, float);
-extern float func_00282DF0(void *);
-extern int func_002E59B0(void *, int);
-extern int func_002E5DA0(int, int, void *, int);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L06_00458F30(char *);
+extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
+extern void part_emit_paired_spin(float *, int);
+extern void gfx_free_point_light(int);
+extern void part_spawn_random_direction_effect(void *, float, float);
+extern float FastVecLength(void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void projectile_draw_trails(char *);
 
 /* Updates a flying projectile: it moves, leaves a twisting trail and bursts when it hits something. */
-void func_L06_004587E8(char *moby) {
+void trail_l06_projectile_update(char *moby) {
     float pos[4];
     typedef union { NotakQuad q; float f[4]; } Vec;
     char *vars = *(char **)(moby + 0x68);
@@ -77,24 +78,24 @@ void func_L06_004587E8(char *moby) {
         make_hit_descriptor(collision, moby, 1, vars, *(float *)(vars + 0x40));
         *(unsigned short *)(collision + 0x1A) = *(unsigned short *)(moby + 0xAA);
         if (CollLine(moby + 0x10, pos, 0, moby, collision) ||
-            func_0031EBF8(0.3f, moby + 0x10, 0, moby) || FastFloatHelperD(vars + 0x38)) {
+            func_0031EBF8(0.3f, moby + 0x10, 0, moby) || math_fast_float_d(vars + 0x38)) {
             hit = D_L06_001BFC80.hit;
             if (hit) {
                 if (hit == *(char **)(vars + 0x3C)) goto update_position;
                 if (*(short *)(hit + 0xAA) != 0x4E /* moby class 78 */)
-                    SweepCollisionFromObject(moby, moby + 0x10, 0x10001, 0, 1, 0, 0.5f, *(float *)(vars + 0x40), 1.0f);
+                    coll_sweep_from_object(moby, moby + 0x10, 0x10001, 0, 1, 0, 0.5f, *(float *)(vars + 0x40), 1.0f);
                 impact = (float *)(moby + 0x10);
             } else {
                 impact = D_L06_001BFC80.point;
             }
-            EmitPairedSpinParticles(impact, 20);
+            part_emit_paired_spin(impact, 20);
             snd = *(int *)(vars + 0x4C);
             if (snd != -1) {
-                soundRecord = gSoundState + snd * 0x70;
-                if (*(char **)(soundRecord + 0x88) == moby && *(unsigned char *)(soundRecord + 0x74)) StopSoundVoice(snd);
+                soundRecord = g_sound_state + snd * 0x70;
+                if (*(char **)(soundRecord + 0x88) == moby && *(unsigned char *)(soundRecord + 0x74)) snd_stop_voice(snd);
             }
             *(int *)(vars + 0x4C) = -1;
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
             return;
         }
     update_position:
@@ -107,7 +108,7 @@ void func_L06_004587E8(char *moby) {
             slot = D_L06_001C79C0 + index * 32;
             *(float *)(slot + 0x1C) -= 0.166666672f;
             if (!(*(float *)(slot + 0x1C) <= 0)) return;
-            FreePointLight(D_L06_001B3778[*(int *)(vars + 0x48)]);
+            gfx_free_point_light(D_L06_001B3778[*(int *)(vars + 0x48)]);
             D_L06_001B3778[*(int *)(vars + 0x48)] = -1;
             D_L06_001B3760[*(int *)(vars + 0x48)] = 0;
             for (row = 0; row < 6; row++) {
@@ -141,26 +142,26 @@ def:
         if (--*timer < 0) *timer = 0;
         *timer = 2;
         D_L06_001B37A0[i] = 64;
-        SpawnRandomDirectionEffect(velocity.f, 0.2f, 0.2f);
+        part_spawn_random_direction_effect(velocity.f, 0.2f, 0.2f);
         if (FastVecLength(velocity.f) > 0.2f) vec_scale_to_length((char *)velocity.f, (char *)velocity.f, 0.2f);
         qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][0], pos);
         direction = 1.0f;
         for (j = 1; j < 4; j++) {
             float *prev = (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j - 1]);
             FastVecSub(axis.f, prev, (float *)D_L06_001B9840);
-            ApplyAxisRotationToQuaternion(velocity.f, velocity.f, axis.f, RandomFloatRange(0.17453295f, 0.7853982448577881f) * direction);
+            math_apply_axis_rotation_to_quat(velocity.f, velocity.f, axis.f, math_random_float_range(0.17453295f, 0.7853982448577881f) * direction);
             direction = -direction;
             FastVecAdd(&((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(vars + 0x48)][i][j - 1], velocity.f);
         }
     }
-    if (!RandomIntBelow(2)) {
-        size = RandomFloatRange(0.2f, 0.9f);
-        sign = RandomIntBelow(2);
+    if (!math_random_int_below(2)) {
+        size = math_random_float_range(0.2f, 0.9f);
+        sign = math_random_int_below(2);
         if (!sign) sign--;
-        SpawnGroundEffectParticle(moby + 0x10, 2, size * 0.1f, size, 0x7F7F2020, 0, sign, D_L06_001A8F20, 0, 0);
-        SpawnGroundEffectParticle(moby + 0x10, 2, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, D_L06_001A8F20, 0, 0);
+        part_spawn_ground_effect(moby + 0x10, 2, size * 0.1f, size, 0x7F7F2020, 0, sign, D_L06_001A8F20, 0, 0);
+        part_spawn_ground_effect(moby + 0x10, 2, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, D_L06_001A8F20, 0, 0);
     }
-    if (!IsVoicePlayingForOwner(moby, *(int *)(vars + 0x4C)))
-        *(int *)(vars + 0x4C) = PlaySoundFromClassBank(7, 4, moby, *(short *)(*(char **)(vars + 0x3C) + 0xAA));
-    AddDrawCallbackToList3(DrawProjectileTrails, moby);
+    if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x4C)))
+        *(int *)(vars + 0x4C) = snd_play_from_class_bank(7, 4, moby, *(short *)(*(char **)(vars + 0x3C) + 0xAA));
+    gfx_add_draw_callback_third(projectile_draw_trails, moby);
 }

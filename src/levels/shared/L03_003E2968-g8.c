@@ -2,7 +2,7 @@
 
 extern int D_0024A7B0[14][6];
 extern int D_L03_001B0B50 __attribute__((sda));
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 typedef struct {
     u8 pad[0x20];
@@ -10,12 +10,12 @@ typedef struct {
 } PuzzleState29;
 
 /* Builds a random route through the puzzle nodes, adding one node at a time until it is as long as the puzzle needs. */
-void func_L03_003E2968(u8 *moby) {
+void path_puzzle_generate_route(u8 *moby) {
     PuzzleState29 *state = *(PuzzleState29 **)(moby + 0x68);
     int count = 3, start, old, inserted, i, a, b, j, k, n, found, scan, shift;
 
     state->path[0] = 0;
-    switch (RandomIntBelow(4)) {
+    switch (math_random_int_below(4)) {
     case 0:
         state->path[1] = 1;
         state->path[2] = 2;
@@ -35,7 +35,7 @@ void func_L03_003E2968(u8 *moby) {
     }
 
     while (count < D_L03_001B0B50) {
-        start = RandomIntBelow(count);
+        start = math_random_int_below(count);
         old = count;
         inserted = 0;
         for (i = 0; i < count; i++) {

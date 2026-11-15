@@ -11,12 +11,12 @@ extern f32 D_001B1A18 MACRO_ADDR;
 extern s32 D_001A91C0 MACRO_ADDR;
 extern s32 D_001C4F40;
 
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
 /* Looks up the terrain height under a position from a height map, giving a large default when the position is off the map. */
-float func_002B0520(TI *position) {
+float coll_get_heightmap_height(TI *position) {
     float worldPos[4] __attribute__((aligned(16)));
     float rel[4] __attribute__((aligned(16)));
     s32 cellIndex;

@@ -32,24 +32,24 @@ typedef struct {
     int audio[0];
 } SubtitleDiscToc;
 
-extern SubtitleStateUpdate D_00254E78;
-extern SubtitleEntryUpdate *D_001B1840[] __attribute__((sda));
-extern SubtitleHistory D_0018C958[];
-extern SubtitleOwnerUpdate D_001A63A8;
-extern SubtitleDiscToc D_0014B540;
+extern SubtitleStateUpdate g_subtitle_state;
+extern SubtitleEntryUpdate *g_subtitle_entries[] __attribute__((sda));
+extern SubtitleHistory g_subtitle_history[];
+extern SubtitleOwnerUpdate g_music_state;
+extern SubtitleDiscToc g_copy_setup_data;
 extern unsigned short D_001A7B94 MACRO_ADDR;
-extern int D_001A79F0[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern unsigned int D_00138320;
 extern unsigned int D_00138324;
 extern unsigned int D_001A7390[] __attribute__((sda));
 
-extern int func_00282948(int *);
-extern void func_00289020(void);
-extern void func_0028A030(int);
-extern void func_002B0CE0(int, int, int);
-extern void func_002B6D28(void);
-extern int func_00288F48(int);
+extern int math_fast_float_d(int *);
+extern void subtitle_init_state(void);
+extern void text_mark_entry_recent(int);
+extern void ForceClaimNotice(int, int, int);
+extern void snd_resume_music_stream(void);
+extern int Help_FindIndex(int);
 
 #define SUBTITLES_OPTION (*(unsigned char *)&D_001A7B94)
 #define SUBTITLE_VOICE_ID (D_001B1840[0][D_00254E78.entry].id)
@@ -65,102 +65,102 @@ extern int func_00288F48(int);
         (D_0018C958[D_00254E78.selection].levels | (1u << D_001A79F0[0])) | 0x80000000u)
 
 /* Per-frame update of the subtitle box. It steps through waiting, fading in, showing and fading out, and records which lines the player has seen. */
-void func_00289178(void)
+void subtitle_update_state_machine(void)
 {
-    if (!gSubtitleState.enabled) {
-        if (gCurrentMapIndex[0] >= 0) {
-            gSubtitleState.enabled = 1;
-            gSubtitleState.wait = 120;
+    if (!g_subtitle_state.enabled) {
+        if (g_current_map_index[0] >= 0) {
+            g_subtitle_state.enabled = 1;
+            g_subtitle_state.wait = 120;
         } else {
-            if (!gSubtitleState.wait && (D_00138320 & 0xF000))
-                gSubtitleState.wait = 1;
-            if (gSubtitleState.wait) {
-                gSubtitleState.wait++;
-                if (gSubtitleState.wait >= 120)
-                    gSubtitleState.enabled = 1;
+            if (!g_subtitle_state.wait && (D_00138320 & 0xF000))
+                g_subtitle_state.wait = 1;
+            if (g_subtitle_state.wait) {
+                g_subtitle_state.wait++;
+                if (g_subtitle_state.wait >= 120)
+                    g_subtitle_state.enabled = 1;
             }
         }
     }
-    if ((gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 7) || !gSubtitleState.enabled) {
-        gSubtitleState.pending = -1;
-        gSubtitleState.state = 0;
-        gSubtitleState.timer = 0;
+    if ((g_current_game_mode[0] != 0 && g_current_game_mode[0] != 7) || !g_subtitle_state.enabled) {
+        g_subtitle_state.pending = -1;
+        g_subtitle_state.state = 0;
+        g_subtitle_state.timer = 0;
         return;
     }
-    gSubtitleState.timer++;
+    g_subtitle_state.timer++;
     if (!SUBTITLES_OPTION) {
-        if (SUBTITLE_VOICE_ID == gMusicState.id - 6000 &&
-            (unsigned short)(gMusicState.state - 6) > 1)
-            gMusicState.state = 5;
+        if (SUBTITLE_VOICE_ID == g_music_state.id - 6000 &&
+            (unsigned short)(g_music_state.state - 6) > 1)
+            g_music_state.state = 5;
     }
-    switch (gSubtitleState.state) {
+    switch (g_subtitle_state.state) {
     case 8:
-        if (gSubtitleState.flag38)
+        if (g_subtitle_state.flag38)
             return;
-        if (gSubtitleState.entry >= 0) {
-            if (!gSubtitleState.flag3A) {
-                if (!FastFloatHelperD(&gSubtitleState.countdown))
+        if (g_subtitle_state.entry >= 0) {
+            if (!g_subtitle_state.flag3A) {
+                if (!math_fast_float_d(&g_subtitle_state.countdown))
                     return;
-                InitSubtitleBoxState();
-                gSubtitleState.flag3A++;
+                subtitle_init_state();
+                g_subtitle_state.flag3A++;
                 return;
             }
-            if (gSubtitleHistory[gSubtitleState.selection].count < 65535)
-                gSubtitleHistory[gSubtitleState.selection].count++;
+            if (g_subtitle_history[g_subtitle_state.selection].count < 65535)
+                g_subtitle_history[g_subtitle_state.selection].count++;
         }
-        if (gSubtitleHistory[gSubtitleState.selection].time < D_001A7390[0])
-            gSubtitleHistory[gSubtitleState.selection].time = D_001A7390[0];
-        gSubtitleState.entry = -1;
-        gSubtitleState.state = 0;
-        gSubtitleState.flag3A = 0;
+        if (g_subtitle_history[g_subtitle_state.selection].time < D_001A7390[0])
+            g_subtitle_history[g_subtitle_state.selection].time = D_001A7390[0];
+        g_subtitle_state.entry = -1;
+        g_subtitle_state.state = 0;
+        g_subtitle_state.flag3A = 0;
         RECORD_SUBTITLE_LEVEL();
         break;
     case 0:
-        if (gSubtitleState.pending < 0)
+        if (g_subtitle_state.pending < 0)
             return;
-        gSubtitleState.entry = Help_FindIndex(gSubtitleState.pending);
-        MarkTextEntryRecent(gSubtitleState.pending);
-        gSubtitleState.pending = -1;
-        if (gSubtitleState.entry >= 0)
-            InitSubtitleBoxState();
+        g_subtitle_state.entry = Help_FindIndex(g_subtitle_state.pending);
+        text_mark_entry_recent(g_subtitle_state.pending);
+        g_subtitle_state.pending = -1;
+        if (g_subtitle_state.entry >= 0)
+            subtitle_init_state();
         break;
     case 1:
     case 2:
         if (SUBTITLES_OPTION) {
             if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-                !gMusicState.active && gMusicState.key == -1) {
-                gMusicState.selection = 0;
-                gMusicState.key = gSubtitleState.selection + 6000;
+                !g_music_state.active && g_music_state.key == -1) {
+                g_music_state.selection = 0;
+                g_music_state.key = g_subtitle_state.selection + 6000;
             }
         }
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
-            gSubtitleState.state = 7;
-            gSubtitleState.timer = 0;
+            g_subtitle_state.state = 7;
+            g_subtitle_state.timer = 0;
             RECORD_SUBTITLE_LEVEL();
             return;
         }
-        if (gSubtitleState.timer <= 0)
+        if (g_subtitle_state.timer <= 0)
             return;
-        if ((gMusicState.state == 3 && gMusicState.id >= 6000) ||
+        if ((g_music_state.state == 3 && g_music_state.id >= 6000) ||
             SUBTITLE_VOICE_ID == -1 || !HAS_AUDIO(SUBTITLE_VOICE_ID) ||
-            SUBTITLE_VOICE_ID != gMusicState.id - 6000) {
-            gSubtitleState.state = 3;
-            gSubtitleState.timer = 0;
+            SUBTITLE_VOICE_ID != g_music_state.id - 6000) {
+            g_subtitle_state.state = 3;
+            g_subtitle_state.timer = 0;
         }
         break;
     case 3:
         ForceClaimNotice(5, 0, 1);
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
-            gSubtitleState.state = 7;
-            gSubtitleState.timer = 0;
+            g_subtitle_state.state = 7;
+            g_subtitle_state.timer = 0;
             RECORD_SUBTITLE_LEVEL();
             return;
         }
-        if (gSubtitleState.timer >= 8) {
-            gSubtitleState.timer = 0;
-            gSubtitleState.state = 4;
+        if (g_subtitle_state.timer >= 8) {
+            g_subtitle_state.timer = 0;
+            g_subtitle_state.state = 4;
         }
         break;
     case 4: {
@@ -169,32 +169,32 @@ void func_00289178(void)
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
             RECORD_SUBTITLE_LEVEL();
-            gSubtitleState.state = 6;
-            gSubtitleState.timer = 4 - gSubtitleState.timer;
+            g_subtitle_state.state = 6;
+            g_subtitle_state.timer = 4 - g_subtitle_state.timer;
             return;
         }
-        if (gSubtitleState.timer < 4)
+        if (g_subtitle_state.timer < 4)
             return;
         subtitles = SUBTITLES_OPTION;
         if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-            SUBTITLE_VOICE_ID != gMusicState.id - 6000 && subtitles)
+            SUBTITLE_VOICE_ID != g_music_state.id - 6000 && subtitles)
             goto next_phase;
         if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-            (gMusicState.state != 3 || gMusicState.id < 6000) && subtitles)
+            (g_music_state.state != 3 || g_music_state.id < 6000) && subtitles)
             return;
-        if (subtitles && SUBTITLE_VOICE_ID == gMusicState.id - 6000)
-            ResumeMusicStream();
-        gSubtitleState.state = 5;
-        gSubtitleState.timer = 0;
+        if (subtitles && SUBTITLE_VOICE_ID == g_music_state.id - 6000)
+            snd_resume_music_stream();
+        g_subtitle_state.state = 5;
+        g_subtitle_state.timer = 0;
         break;
     next_phase:
-        gSubtitleState.timer = 0;
-        gSubtitleState.state = 5;
+        g_subtitle_state.timer = 0;
+        g_subtitle_state.state = 5;
         break;
     }
     case 5:
         ForceClaimNotice(5, 0, 1);
-        if (gSubtitleState.timer >= gSubtitleState.duration) {
+        if (g_subtitle_state.timer >= g_subtitle_state.duration) {
             /* Retail reloads this option again below, without an intervening store. */
             if (SUBTITLE_VOICE_ID == -1 || !HAS_AUDIO(SUBTITLE_VOICE_ID) ||
                 !*(volatile unsigned char *)&D_001A7B94)
@@ -202,37 +202,37 @@ void func_00289178(void)
         }
         if (*(volatile unsigned char *)&D_001A7B94) {
             if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-                SUBTITLE_VOICE_ID != gMusicState.id - 6000)
+                SUBTITLE_VOICE_ID != g_music_state.id - 6000)
                 goto close;
         }
         if (!(D_00138324 & 16))
             return;
     close:
         RECORD_SUBTITLE_TIME();
-        gSubtitleState.state = 6;
-        gSubtitleState.timer = 0;
+        g_subtitle_state.state = 6;
+        g_subtitle_state.timer = 0;
         RECORD_SUBTITLE_LEVEL();
         break;
     case 6:
-        if (D_001A7B94 && gSubtitleState.timer < 4 && !(D_00138324 & 16))
+        if (D_001A7B94 && g_subtitle_state.timer < 4 && !(D_00138324 & 16))
             return;
-        gSubtitleState.state = 7;
-        gSubtitleState.timer = 0;
+        g_subtitle_state.state = 7;
+        g_subtitle_state.timer = 0;
         break;
     case 7:
         ForceClaimNotice(5, 0, 1);
-        if (SUBTITLE_VOICE_ID == gMusicState.id - 6000 &&
-            (unsigned short)(gMusicState.state - 6) > 1)
-            gMusicState.state = 5;
-        if (gSubtitleState.timer < 8)
+        if (SUBTITLE_VOICE_ID == g_music_state.id - 6000 &&
+            (unsigned short)(g_music_state.state - 6) > 1)
+            g_music_state.state = 5;
+        if (g_subtitle_state.timer < 8)
             return;
-        if (gSubtitleState.flag38) {
-            gSubtitleState.state = 8;
+        if (g_subtitle_state.flag38) {
+            g_subtitle_state.state = 8;
         } else {
-            gSubtitleState.state = 0;
-            gSubtitleState.entry = -1;
+            g_subtitle_state.state = 0;
+            g_subtitle_state.entry = -1;
         }
-        gSubtitleState.timer = 0;
+        g_subtitle_state.timer = 0;
         break;
     }
 }

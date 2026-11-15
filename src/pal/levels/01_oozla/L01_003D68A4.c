@@ -12,19 +12,19 @@ typedef struct {
     unsigned char pad32[16];
     short f48, f50; int f52, f56, f60;
 } PoolRecord64;
-extern void func_0026FEB8(const char *, ...);
-extern void func_002A7750(unsigned char *, int, int);
-extern void func_002A8598(int, int);
-extern int func_002ACBC8(void *, int);
-extern int func_00282948(int *);
-extern PoolRecord64 *func_L00_002D70A0(int);
-extern void func_L00_002D7140(unsigned char *);
-extern unsigned char *func_L01_003D25B8(unsigned char *, LaunchVector *, LaunchVector *, int, int);
-extern unsigned char *D_L01_001B255C __attribute__((sda));
+extern void STUB_printf(const char *, ...);
+extern void moby_set_state(unsigned char *, int, int);
+extern void moby_set_byte_on_group(int, int);
+extern int IsPointInCuboid(void *, int);
+extern int math_fast_float_d(int *);
+extern PoolRecord64 *cam_alloc_override_slot(int);
+extern void cam_end_override(unsigned char *);
+extern unsigned char *moby_l01_spawn_child(unsigned char *, LaunchVector *, LaunchVector *, int, int);
+extern unsigned char *g_moby_l01_table __attribute__((sda));
 extern unsigned char *D_L01_001B264C __attribute__((sda));
 extern char D_L01_001B0548[], D_L01_001B0580[];
 extern int D_L01_00297BF0[];
-extern unsigned char D_00189EA0[];
+extern unsigned char g_hero_position[];
 typedef struct { int delay, startId, endId, unused; int first[2], second[2]; int p20, p24, timer, duration; short selection, mode; PoolRecord64 *pool; int event, command; } LaunchState;
 #define FIELD(o) (*(int *)(data + (o)))
 #define HALF(o) (*(short *)(data + (o)))
@@ -41,28 +41,28 @@ void func_PAL_L01_003D6A78(unsigned char *self)
         POOL = 0;
         for (i = 0; i < 2; i++) {
             if (state->first[i] == -1) {
-                func_0026FEB8(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                func_002A7750(self, 4, -1);
+                STUB_printf(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                moby_set_state(self, 4, -1);
             }
             if (state->second[i] == -1) {
-                func_0026FEB8(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                func_002A7750(self, 4, -1);
+                STUB_printf(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                moby_set_state(self, 4, -1);
             }
         }
-        if (self[0x20] == 0) func_002A7750(self, 1, -1);
+        if (self[0x20] == 0) moby_set_state(self, 1, -1);
         break;
     case 1:
         if (self[0xbc]) {
-            D_L01_001B255C[FIELD(4) * 256 + 0xbc] = 1;
+            g_moby_l01_table[FIELD(4) * 256 + 0xbc] = 1;
             FIELD(0x28) = 0;
             self[0xbc] = 0;
             FIELD(0x3c) = 0;
             FIELD(0x2c) = (FIELD(0x24) * 5 + 2) / 6;
-            func_002A7750(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
         break;
     case 2:
-        if (func_00282948((int *)(data + 0x28))) {
+        if (math_fast_float_d((int *)(data + 0x28))) {
             command = D_L01_00297BF0[FIELD(0x3c)];
             switch (command) {
             case 0: HALF(0x30) = 0; HALF(0x32) = 0; break;
@@ -77,28 +77,28 @@ void func_PAL_L01_003D6A78(unsigned char *self)
                 index = state->second[selection];
                 qcopy_nc(&point, base + index * 128 + 0x30);
                 qcopy_nc(&target, base + index * 128 + 0x70);
-                func_L01_003D25B8(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
+                moby_l01_spawn_child(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
             }
             {
                 int duration = (FIELD(0) * 5 + 2) / 6;
                 int triggerIndex = FIELD(8);
                 state->timer = duration;
-                D_L01_001B255C[triggerIndex * 256 + 0xbc] = 1;
+                g_moby_l01_table[triggerIndex * 256 + 0xbc] = 1;
             }
         }
         if (FIELD(0x28) < (FIELD(0) * 5 + 2) / 6 - 33)
-            D_L01_001B255C[FIELD(8) * 256 + 0xbc] = 0;
-        if (func_00282948((int *)(data + 0x2c))) func_002A7750(self, 3, -1);
+            g_moby_l01_table[FIELD(8) * 256 + 0xbc] = 0;
+        if (math_fast_float_d((int *)(data + 0x2c))) moby_set_state(self, 3, -1);
         break;
     case 3:
-        D_L01_001B255C[FIELD(4) * 256 + 0xbc] = 0;
-        func_002A8598(self[0x21], 0);
-        func_002A7750(self, 1, -1);
+        g_moby_l01_table[FIELD(4) * 256 + 0xbc] = 0;
+        moby_set_byte_on_group(self[0x21], 0);
+        moby_set_state(self, 1, -1);
         break;
     }
-    if (self[0x20] == 2 && FIELD(0x38) != -1 && func_002ACBC8(D_00189EA0, FIELD(0x38))) {
+    if (self[0x20] == 2 && FIELD(0x38) != -1 && IsPointInCuboid(g_hero_position, FIELD(0x38))) {
         if (POOL == 0) {
-            POOL = func_L00_002D70A0(5);
+            POOL = cam_alloc_override_slot(5);
             qzero((unsigned char *)POOL + 0x20);
             *(float *)((unsigned char *)POOL + 0x20) = -1.0f;
             POOL->f24 = 1;
@@ -107,7 +107,7 @@ void func_PAL_L01_003D6A78(unsigned char *self)
             POOL->f30 = 1;
         }
     } else if (POOL) {
-        func_L00_002D7140((unsigned char *)POOL);
+        cam_end_override((unsigned char *)POOL);
         POOL = 0;
     }
 }

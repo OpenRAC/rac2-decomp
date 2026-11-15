@@ -1,8 +1,9 @@
+#include "names.h"
 extern unsigned char D_001AD030[27] __attribute__((sda));
 extern unsigned char D_001AD04B[] __attribute__((sda));
 
 /* Turns a cutscene number into a compact index by skipping the unused numbers in between. Numbers outside the normal range are shifted down. */
-unsigned long func_002EF010(int cutsceneId)
+unsigned long cutscene_map_id_to_index(int cutsceneId)
 {
     int i;
     int firstGapEnd;

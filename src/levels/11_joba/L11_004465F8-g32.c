@@ -2,13 +2,13 @@
 
 typedef float Vec[4] __attribute__((aligned(16)));
 typedef struct { Vec pos[4]; u32 color[4]; float uv[4][2]; u64 gs[4]; } Quad;
-extern u64 func_0027C878(int);
-extern float func_00283C28(float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern u32 func_00283D38(u32, u32, float);
-extern void func_00280B90(Quad *, int, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern float math_fast_float_g(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern u32 FastTweenColor(u32, u32, float);
+extern void draw_world_quad(Quad *, int, int);
 extern char *D_L11_001FF580[] NOT_SDA;
 extern s32 D_L11_001B18D4[] __attribute__((sda));
 extern s32 D_L11_001B18D8[] __attribute__((sda));
@@ -35,7 +35,7 @@ extern float D_L11_001B18F8 __attribute__((sda));
 extern s32 D_L11_001B18A8[2] __attribute__((sda));
 extern float D_L11_001B18B0[4][2] __attribute__((sda));
 /* Draws the ribbon along the stored points, with two scrolling texture layers. */
-void func_L11_004465F8(char *moby) {
+void DrawPointLoopRibbon(char *moby) {
     Quad quad;
     u32 mask;
     int i, j;
@@ -71,10 +71,10 @@ void func_L11_004465F8(char *moby) {
         qcopy(pos1, points + (i * 16 + 0x10));
         quad.pos[1][2] -= depth;
         qcopy(pos2, points + (i * 16 + 0x20));
-        quad.pos[2][2] += height + D_L11_001B18F8 * FastSinOrCosA(FastFloatHelperG(quad.pos[0][1]));
+        quad.pos[2][2] += height + D_L11_001B18F8 * math_fast_sin_or_cos_a(math_fast_float_g(quad.pos[0][1]));
         qcopy(pos3, points + (i * 16 + 0x10));
         next_i = i + 1;
-        quad.pos[3][2] += height + D_L11_001B18F8 * FastSinOrCosA(FastFloatHelperG(quad.pos[1][1]));
+        quad.pos[3][2] += height + D_L11_001B18F8 * math_fast_sin_or_cos_a(math_fast_float_g(quad.pos[1][1]));
         quad.uv[0][1] = D_L11_001B18B4[0];
         quad.uv[1][1] = D_L11_001B18BC[0];
         quad.uv[2][1] = D_L11_001B18C4[0];
@@ -84,7 +84,7 @@ void func_L11_004465F8(char *moby) {
             float alpha;
             u32 texColor;
             quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
-            alpha = FastSinOrCosB(*(float *)(state + 0xD0) * 3.1415927410125732f);
+            alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD0) * 3.1415927410125732f);
             texColor = D_L11_001B18A8[index];
             quad.color[j] = FastTweenColor(texColor & mask, texColor, alpha);
         }
@@ -94,7 +94,7 @@ void func_L11_004465F8(char *moby) {
             float alpha;
             u32 texColor;
             quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
-            alpha = FastSinOrCosB(*(float *)(state + 0xD4) * 3.1415927410125732f);
+            alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD4) * 3.1415927410125732f);
             texColor = D_L11_001B18A8[index];
             quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
         }
@@ -106,9 +106,9 @@ void func_L11_004465F8(char *moby) {
     qcopy(pos1, points + (*(int *)points * 16));
     quad.pos[1][2] -= depth;
     qcopy(pos2, points + 0x10);
-    quad.pos[2][2] += height + D_L11_001B18F8 * FastSinOrCosA(FastFloatHelperG(quad.pos[0][1]));
+    quad.pos[2][2] += height + D_L11_001B18F8 * math_fast_sin_or_cos_a(math_fast_float_g(quad.pos[0][1]));
     qcopy(pos3, points + (*(int *)points * 16));
-    quad.pos[3][2] += height + D_L11_001B18F8 * FastSinOrCosA(FastFloatHelperG(quad.pos[1][1]));
+    quad.pos[3][2] += height + D_L11_001B18F8 * math_fast_sin_or_cos_a(math_fast_float_g(quad.pos[1][1]));
     quad.uv[0][1] = D_L11_001B18B4[0];
     quad.uv[1][1] = D_L11_001B18BC[0];
     quad.uv[2][1] = D_L11_001B18C4[0];
@@ -118,7 +118,7 @@ void func_L11_004465F8(char *moby) {
         float alpha;
         u32 texColor;
         quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
-        alpha = FastSinOrCosB(*(float *)(state + 0xD0) * 3.1415927410125732f);
+        alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD0) * 3.1415927410125732f);
         texColor = D_L11_001B18A8[index];
         quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
     }
@@ -128,7 +128,7 @@ void func_L11_004465F8(char *moby) {
         float alpha;
         u32 texColor;
         quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
-        alpha = FastSinOrCosB(*(float *)(state + 0xD4) * 3.1415927410125732f);
+        alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD4) * 3.1415927410125732f);
         texColor = D_L11_001B18A8[index];
         quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
     }

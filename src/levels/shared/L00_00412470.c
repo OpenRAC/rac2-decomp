@@ -13,20 +13,20 @@ typedef struct {
     float x, y, z, w;
 } Vec16_Fc936841d;
 
-extern u64 func_0027C878(int);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
-extern float D_L00_001B8DC0[4];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
+extern float g_camera_l00_position[4];
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 extern void ref_L00_00412470_00(Vec16_Fc936841d *, int);
 extern void ref_L00_00412470_01(char *);
 
 /* Draw a two-layer ribbon along a sequence of sampled beam points. */
-void func_L00_00412470(void *owner, unsigned int opacity, float points[][4], int count)
+void gfx_draw_beam_ribbon_through_points(void *owner, unsigned int opacity, float points[][4], int count)
 {
     BeamQuad outer, inner __attribute__((aligned(16)));
     Vector frame[4];
@@ -65,7 +65,7 @@ void func_L00_00412470(void *owner, unsigned int opacity, float points[][4], int
     inner.uv[3][0] = 0.33f; inner.uv[3][1] = 1.0f;
     FastVecSub(frame[0], initial, points[0]);
     vec_scale_to_length(frame[0], frame[0], 1.0f);
-    FastVecSub(frame[1], gCameraPosition_L00, points[0]);
+    FastVecSub(frame[1], g_camera_l00_position, points[0]);
     FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1.0f);
     FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);
@@ -85,7 +85,7 @@ void func_L00_00412470(void *owner, unsigned int opacity, float points[][4], int
         FastVecScale(inner.vertices[3], inner.vertices[2], -1.0f);
         FastVecSub(frame[0], points[index + 1], points[index]);
         vec_scale_to_length(frame[0], frame[0], 1.0f);
-        FastVecSub(frame[1], gCameraPosition_L00, points[index]);
+        FastVecSub(frame[1], g_camera_l00_position, points[index]);
         FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
         vec_scale_to_length(frame[2], frame[2], 1.0f);
         FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);

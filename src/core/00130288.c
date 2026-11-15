@@ -1,20 +1,20 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_00130288(void *, void *);
+extern void mpeg_report_error(void *, void *);
 
-extern void func_00130240(void *);
+extern void mpeg_print_error(void *);
 
-extern void func_0012FB70(void *);
-extern unsigned int func_0012FB80(void *, void *, unsigned int, unsigned int);
+extern void mpeg_restore_counter(void *);
+extern unsigned int mpeg_alloc_aligned(void *, void *, unsigned int, unsigned int);
 /* Fills in nine DMA addresses that point at the three picture buffers and their halves. */
-extern void func_001306D0(unsigned int *, unsigned int *, unsigned int *, unsigned int *,
+extern void mpeg_fill_buffer_addresses(unsigned int *, unsigned int *, unsigned int *, unsigned int *,
                           unsigned int *, unsigned int *, unsigned int *, unsigned int *,
                           unsigned int *, int, int, int, int, int);
 
 /* rac1-decomp src/core/0012AC80.bufferC: func_0012C468 */
 /* Reports bufferA video error through the registered callback, or prints it if there is none. */
-void func_00130288(void *mpeg, void *message) {
+void mpeg_report_error(void *mpeg, void *message) {
     char *bytes = (char *)mpeg;
     void *callbackOwner = *(void **)(bytes + 0x858);
     /* the mpeg null test is retail's, after it has already dereferenced
@@ -23,9 +23,9 @@ void func_00130288(void *mpeg, void *message) {
         int event[4];
         event[0] = 0;
         event[1] = (int)message;
-        DispatchMpegCallback(callbackOwner, event);
+        mpeg_dispatch_callback(callbackOwner, event);
     } else {
-        PrintMpegError(message);
+        mpeg_print_error(message);
     }
 }
 
@@ -34,7 +34,7 @@ void func_00130288(void *mpeg, void *message) {
    here recorded 4/32 with the 0x4/0x8 stores swapped; the function is
    exact under both compilers now.) */
 /* Stores a picture width and height and the same sizes counted in 16-pixel blocks. */
-int func_001302E0(void *sizeInfo, int width, int height) {
+int mpeg_set_picture_size(void *sizeInfo, int width, int height) {
     char *bytes = (char *)sizeInfo;
     *(int *)(bytes + 0x4) = width;
     *(int *)(bytes + 0x8) = height;
@@ -87,7 +87,7 @@ extern char r1_D_00133100[];
  * (r1_func_0012C608) with the object read back from +0x858.
  */
 /* Reads the video sequence header: picture size, bit rate and quantizer tables. */
-void func_00130300(void *decoder) {
+void mpeg_read_sequence_header(void *decoder) {
     char *bytes = (char *)decoder;
     unsigned int bits;
     int height;
@@ -133,7 +133,7 @@ void func_00130300(void *decoder) {
 
 /* rac1-decomp src/core/0012AC80.c: mpeg_init_seq (func_0012C608) */
 /* Works out the picture size in blocks and sets up the picture buffers when the size changes. */
-void func_00130428(void *sizeInfo) {
+void mpeg_init_seq(void *sizeInfo) {
     int *sizes = (int *)sizeInfo;
     char *decoder = *(char **)((char *)sizeInfo + 0x40);
     int started = *(int *)(decoder + 0x848);
@@ -181,30 +181,30 @@ void func_00130428(void *sizeInfo) {
     desc6 = (unsigned int *)(decoder + 0x458);
     desc7 = (unsigned int *)(decoder + 0x4C0);
     bufferSize = (widthPixels * rowSize) >> 8;
-    RestoreMpegCounter(decoder + 0x108);
-    *(unsigned int *)(decoder + 0xFC) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
-    *(unsigned int *)(decoder + 0x100) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
-    *(unsigned int *)(decoder + 0x104) = AllocMpegAligned(decoder, decoder + 0x108, bufferSize, 0x40);
-    FillMpegBufferAddresses(desc0, desc1, desc2,
+    mpeg_restore_counter(decoder + 0x108);
+    *(unsigned int *)(decoder + 0xFC) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    *(unsigned int *)(decoder + 0x100) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    *(unsigned int *)(decoder + 0x104) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    mpeg_fill_buffer_addresses(desc0, desc1, desc2,
                   desc3, desc4, desc5,
                   desc6, desc7, desc8,
                   *(int *)(decoder + 0xFC), *(int *)(decoder + 0x100), *(int *)(decoder + 0x104), widthPixels, heightPixels);
-    SetMpegPictureSize(desc0, widthPixels, heightPixels);
-    SetMpegPictureSize(desc1, widthPixels, heightPixels);
-    SetMpegPictureSize(desc2, widthPixels, heightPixels);
-    SetMpegPictureSize(desc3, widthPixels, heightPixels >> 1);
-    SetMpegPictureSize(desc4, widthPixels, heightPixels >> 1);
-    SetMpegPictureSize(desc5, widthPixels, heightPixels >> 1);
-    SetMpegPictureSize(desc6, widthPixels, heightPixels >> 1);
-    SetMpegPictureSize(desc7, widthPixels, heightPixels >> 1);
-    SetMpegPictureSize(desc8, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc0, widthPixels, heightPixels);
+    mpeg_set_picture_size(desc1, widthPixels, heightPixels);
+    mpeg_set_picture_size(desc2, widthPixels, heightPixels);
+    mpeg_set_picture_size(desc3, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc4, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc5, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc6, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc7, widthPixels, heightPixels >> 1);
+    mpeg_set_picture_size(desc8, widthPixels, heightPixels >> 1);
     }
 }
 
 
 
 /* rac1-decomp src/core/0012AC80.c: func_001306D0 */
-void func_001306D0(unsigned int *o0, unsigned int *o1, unsigned int *o2, unsigned int *o3,
+void mpeg_fill_buffer_addresses(unsigned int *o0, unsigned int *o1, unsigned int *o2, unsigned int *o3,
                    unsigned int *o4, unsigned int *o5, unsigned int *o6, unsigned int *o7,
                    unsigned int *o8, int a, int b, int c, int w, int h) {
     unsigned int x = (a & 0xFFFFFFF) | 0x20000000;
@@ -225,7 +225,7 @@ extern int r1_func_0011D960(void);
 extern void r1_func_0011D9A8(void);
 extern void r1_func_00128590(void *);
 extern void r1_func_00128560(void *, unsigned int);
-extern void func_001307B0(void *, int, int);
+extern void mpeg_load_default_quant_matrix(void *, int, int);
 
 /* rac1-decomp src/core/0012AC80.c: func_001307B0 */
 /* _setDefaultQM: tell the callback (type 2) that the default quantiser
@@ -233,7 +233,7 @@ extern void func_001307B0(void *, int, int);
    at addr to IPU_TO (tag 4 qwords, chcr 0x101) with interrupts held
    off, send command cmd and wait, and report type 3. Adapted from
    Lombyte's project (GPL-3.0) for PAL. */
-void func_001307B0(void *decoder, int cmd, int addr) {
+void mpeg_load_default_quant_matrix(void *decoder, int cmd, int addr) {
     char *bytes = decoder;
     int event[8];
     int interruptsWereOn;

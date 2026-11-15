@@ -3,6 +3,7 @@
  * The list-pointer word is reloaded on every search step, as in retail.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *payload; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -15,7 +16,7 @@ extern int * volatile D_L24_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L24_001C8CA0;
 
 /* Fills the menu rows from the level list and selects the entry that matches the current owner. */
-int func_L24_0034C450(char *menu) {
+int menu_build_owner_rows(char *menu) {
     int i, currentEntry;
     int *ownerList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

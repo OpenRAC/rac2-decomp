@@ -19,14 +19,14 @@ extern f32 ref_L04_0039FEF0_01 __attribute__((sda));
 extern s32 ref_L04_0039FEF0_02 __attribute__((sda));
 extern s32 ref_L04_0039FEF0_03 __attribute__((sda));
 
-extern void func_L04_0032F1D8(u32 patches, void *count);
-extern void func_L04_0032F62C(u32 patches, s32 count, s32 a2, void *a3);
+extern void ripple_heights_to_scratchpad(u32 patches, void *count);
+extern void water_submit_patches_range(u32 patches, s32 count, s32 a2, void *a3);
 
 /* Walks the level's ripple patches, hands the marked ones to the two helpers and then
    swaps the two row indexes and rewinds the clock.  The flag value and the row stride
    are named so that the compiler keeps them in registers, as the retail does. */
 /* Updates every active water ripple patch for this frame and swaps the row buffers. */
-void func_L04_0039FEF0(void *patches, s32 count) {
+void water_update_active_patches(void *patches, s32 count) {
     s32 i = 0;
     s32 prevRow;
 
@@ -47,7 +47,7 @@ void func_L04_0039FEF0(void *patches, s32 count) {
                     ref_L04_0039FEF0_01 = low;
                 }
                 ripple_heights_to_scratchpad(0x70000000, patch + (ref_L04_0039FEF0_02 * stride + 0x50));
-                SubmitWaterPatchesRange(0x70000000, i, ref_L04_0039FEF0_03, patches);
+                water_submit_patches_range(0x70000000, i, ref_L04_0039FEF0_03, patches);
             }
             i++;
             patch += 0x1190;

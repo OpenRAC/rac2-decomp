@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 extern float D_L20_001B23F8 __attribute__((sda));
-extern void *func_0029EFD0(int);
-extern void func_002B37E8(u8 *, u8 *);
-extern float func_002A7940(void);
-extern void func_002833F0(void *, void *);
-extern float func_002A7878(float a, float b);
+extern void *CreateMoby(int);
+extern void moby_init_child_from_parent(u8 *, u8 *);
+extern float math_random_angle(void);
+extern void euler_rotation_basis(void *, void *);
+extern float math_random_float_range(float a, float b);
 /* func_L20_0044A838 is defined in L20_0044A838-g8.c. */
 
 /* func_L20_00449BB0 is defined in L20_00449BB0-g8.c. */
@@ -34,13 +35,13 @@ char *func_PAL_L20_0044FC48(char *arg0, char *arg1, char *arg2, float arg3, int 
     char *obj;
     char *state;
 
-    obj = func_0029EFD0(0x12EE);
+    obj = CreateMoby(0x12EE);
     if (obj != 0) {
-        func_002B37E8((u8 *)obj, (u8 *)arg0);
+        moby_init_child_from_parent((u8 *)obj, (u8 *)arg0);
         qcopy(obj + 0x10, arg1);
-        *(float *)(obj + 0xF0) = func_002A7940();
-        *(float *)(obj + 0xF4) = func_002A7940();
-        func_002833F0(obj + 0xC0, obj + 0xF0);
+        *(float *)(obj + 0xF0) = math_random_angle();
+        *(float *)(obj + 0xF4) = math_random_angle();
+        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         ((Moby449FD0 *)obj)->state = 1;
         ((Moby449FD0 *)obj)->flags |= 0x100;
         ((Moby449FD0 *)obj)->scale =
@@ -51,17 +52,17 @@ char *func_PAL_L20_0044FC48(char *arg0, char *arg1, char *arg2, float arg3, int 
         *(int *)(state + 0x18) = arg4;
         *(float *)(state + 0x1C) = arg5;
         *(int *)(state + 0x20) = 0x32;
-        *(float *)(state + 0x10) = func_002A7878(10.0f, 20.0f) * 0.00040000002f;
+        *(float *)(state + 0x10) = math_random_float_range(10.0f, 20.0f) * 0.00040000002f;
     }
     return obj;
 }
 
 extern float D_L20_001B2450 __attribute__((sda));
 extern float D_L20_001B2454 __attribute__((sda));
-extern float func_00283248(float, float);
-extern float func_002AAA00(char *a, char *b, int c, float d, float e, float f,
+extern float mat_fast_helper_a(float, float);
+extern float math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f,
                             float g);
-extern float func_002AA2E8(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
 void func_PAL_L20_00450700(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
@@ -72,11 +73,11 @@ void func_PAL_L20_00450700(char *arg0) {
     float d = D_L20_001B2454 * 0.0003490659f;
     float r;
 
-    r = func_00283248(a, b);
-    func_002AAA00(p, state + 0x1A4, 0, r, c, c, d);
+    r = mat_fast_helper_a(a, b);
+    math_approach_target_with_direction_mode(p, state + 0x1A4, 0, r, c, c, d);
     d = d * 4.0f;
-    func_002AA2E8(arg0 + 0xF0, *(float *)(state + 0x1A8), d);
+    ApproachValue(arg0 + 0xF0, *(float *)(state + 0x1A8), d);
     *(float *)(state + 0x1A8) = 0.0f;
-    func_002AA2E8(arg0 + 0x0F4, *(float *)(state + 0x1AC), d);
+    ApproachValue(arg0 + 0x0F4, *(float *)(state + 0x1AC), d);
     *(float *)(state + 0x1AC) = 0.0f;
 }

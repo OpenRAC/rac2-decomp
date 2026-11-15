@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
@@ -7,7 +8,7 @@ typedef int s32;
 extern u32 func_31CFF8(void *a, void *b, u32 c);
 extern u8 *D_L03_001B2A1C __attribute__((sda));
 extern u8 *D_L03_001FB5A0[];
-extern s32 func_002AD860(s32);
+extern s32 moby_handle_request_slot_state(s32);
 extern u8 D_001A7B08[0x40] __attribute__((sda));
 extern s32 D_L03_001B2A38[] __attribute__((sda));
 typedef struct {
@@ -17,12 +18,12 @@ typedef struct {
     u8 pad2C[0x3C];
     s32 active;
 } L03VoiceState;
-extern L03VoiceState D_001A63A8;
+extern L03VoiceState g_music_state;
 
 /* Picks the free voice slot the entity asks for, unless the engine is busy
    or already holds that slot. */
 void func_PAL_L03_003FBA58(u8 *a0, s32 a1) {
-    L03VoiceState *st = &D_001A63A8;
+    L03VoiceState *st = &g_music_state;
     s32 sel = a1;
     u8 *a3 = *(u8 **)(a0 + 0x68);
     u8 *slot;

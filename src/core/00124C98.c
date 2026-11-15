@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs.h"
 
-extern int func_00124B88(int);
+extern int sceCdSyncS(int);
 
 extern int r1_D_001313E8;
 
@@ -80,7 +80,7 @@ extern char r1_D_00137DC8[];
    answers. The two wait loops are written out separately, as retail keeps
    both copies. */
 /* Checks that a CD read command can start. Takes the lock and connects to the CD server, retrying until it answers. */
-int func_00124C98(int cmdId) {
+int cd_ncmd_check_ready(int cmdId) {
     int spin;
     volatile int *sem = &r1_D_001363AC;
 
@@ -171,7 +171,7 @@ extern char r1_D_0013B288[];
    Making any one other init store volatile instead (e.g. 63C8) gives the
    same bytes. */
 /* Starts up the CD system. Connects to the CD server, sends the start mode and reads back the drive version. */
-int func_00124E08(int initMode) {
+int sceCdInit(int initMode) {
     int result;
     int rpcResult;
     int spin;
@@ -319,7 +319,7 @@ extern int r1_func_00120FD0();
 /* libcdvd disk-ready query (the sceCdDiskReady pattern): take the S-command semaphore, bind the 0x8000059A server once, send mode and return the server's status word. Mode 8 reports -1 on failure, every other mode 6.
    Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/textbin/fun_00121190.c, FUN_00121190. */
 /* Asks the CD drive if the disc is ready for the given mode and returns the status. */
-s32 func_001250E8(s32 mode) {
+s32 sce_cd_disk_ready(s32 mode) {
     s32 response;
     s32 spin;
 
@@ -401,7 +401,7 @@ extern char r1_D_00132E08[];
 /* rac1-decomp src/core/001208E8.c: func_00121688 */
 /* sceCdMmode */
 /* Sets the CD media mode and returns the drive reply. */
-int func_001252E0(int mediaMode) {
+int sceCdMmode(int mediaMode) {
     int *modeBuf = &r1_D_00132A00;
     int result;
 

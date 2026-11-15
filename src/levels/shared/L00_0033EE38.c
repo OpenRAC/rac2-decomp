@@ -1,19 +1,19 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern int func_00282978(void *);
+extern int FastDecTimer(void *);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
-extern int func_00283CF0(float value);
+extern int FloatToInt(float value);
 
-extern void func_00282CC0(void *dst, void *left, void *right);
+extern void FastVecAdd(void *dst, void *left, void *right);
 
-extern void func_00300190(void *dst, void *src);
+extern void vec_transform_or_copy(void *dst, void *src);
 
-extern void func_002B9180(void *object);
+extern void part_kill(void *object);
 
 /* vcopy: copies an xyz vector and clears the w word (RAC1's vcopy_273090). */
 static __inline__ void vcopy_L00_0033EE38(float *d, float *s)
@@ -28,7 +28,7 @@ static __inline__ void vcopy_L00_0033EE38(float *d, float *s)
    +0x0C and the alpha byte of +0x04 over the particle's life, moves it by its velocity and
    kills it when it leaves the 2..1021 world box or its timer runs out. The division sits on
    its own source line: this -g unit's line label gives the two nops retail has before div.s. */
-void func_L00_0033EE38(char *m)
+void UpdateMovingSizeAlphaTweenParticle(char *m)
 {
     char *v = m + 0x20;
     float f4;
@@ -36,7 +36,7 @@ void func_L00_0033EE38(char *m)
     int al;
 
     m[8] += v[0xA];
-    if (FastFloatHelperD(m + 0x38)) {
+    if (math_fast_float_d(m + 0x38)) {
         if (*(short *)(v + 8) - *(short *)(m + 0xA) < *(short *)(v + 0x1E)) {
             int c;
             int c2;
@@ -58,13 +58,13 @@ void func_L00_0033EE38(char *m)
             *(float *)(m + 0x14) < 2.0f || *(float *)(m + 0x14) > 1021.0f ||
             *(float *)(m + 0x18) < 2.0f || *(float *)(m + 0x18) > 1021.0f ||
             FastDecTimer(m + 0xA)) {
-            KillParticle(m);
+            part_kill(m);
             return;
         }
     }
     if (*(float *)(m + 0x1C) != 0.0f) {
         if (*(float *)(m + 0x1C) == 2.0f)
-            TransformVectorOrCopy(m + 0x10, m + 0x10);
+            vec_transform_or_copy(m + 0x10, m + 0x10);
         *(float *)(m + 0x1C) = 2.0f;
     }
 }

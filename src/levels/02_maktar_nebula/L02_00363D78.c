@@ -40,20 +40,20 @@ typedef struct {
 extern SkyEffectData *D_L02_001B3B20[] __attribute__((sda));
 extern float D_L02_001B3B50[] MACRO_ADDR;
 
-extern void func_00283388(float *);
-extern void func_002E3478(int);
-extern void func_002E3940(int);
+extern void set_identity_matrix(float *);
+extern void cam_update_view_rotation(int);
+extern void gfx_process_view_entry(int);
 extern int func_001163B0(void);
-extern int func_002A77E0(int);
-extern float func_002A7940(void);
-extern float func_00283CE0(int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282C48(float);
-extern void func_L02_00364A18(void);
-extern void func_002FC560(unsigned int, unsigned long long);
+extern int math_random_int_below(int);
+extern float math_random_angle(void);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fabs(float);
+extern void gfx_draw_sky_effects(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
 
-void func_L02_00363D78(void)
+void sky_update_effects(void)
 {
     float trig_product;
     float elevation;
@@ -72,10 +72,10 @@ void func_L02_00363D78(void)
 
     D_L02_001B3B20[0]->relocation_state = 0;
     set_identity_matrix(D_L02_001B3B50);
-    UpdateViewRotation(0);
-    ProcessViewEntry(0);
-    UpdateViewRotation(1);
-    ProcessViewEntry(1);
+    cam_update_view_rotation(0);
+    gfx_process_view_entry(0);
+    cam_update_view_rotation(1);
+    gfx_process_view_entry(1);
     if (D_L02_001B3B20[0]->effect_count == 0) {
         D_L02_001B3B20[0]->effect_count = 0x100;
         i = 0;
@@ -87,36 +87,36 @@ void func_L02_00363D78(void)
             if (i >= 0xF6) {
                 effect->randomize_color = 0;
                 angles = &effect->state.angles.azimuth;
-                effect->state.angles.azimuth = (short)(Rand() >> 16);
-                angles[1] = (short)(Rand() >> 16);
+                effect->state.angles.azimuth = (short)(func_001163B0() >> 16);
+                angles[1] = (short)(func_001163B0() >> 16);
                 effect->size = 0.16f;
                 effect->texture_index = 1;
                 effect->flags = effect_flags;
             } else {
                 effect->randomize_color = 3;
-                effect->state.angles.azimuth = RandomIntBelow(0x100);
-                effect->texture_index = (Rand() >> 16) & 1;
+                effect->state.angles.azimuth = math_random_int_below(0x100);
+                effect->texture_index = (func_001163B0() >> 16) & 1;
                 effect->flags = effect_flags;
-                effect->angle = RandomAngle();
-                effect->size = IntToFloat(RandomIntBelow(0x30) + 0x20) * 0.00390625f;
-                azimuth = RandomAngle();
-                elevation = RandomAngle();
-                trig_product = FastSinOrCosA(azimuth);
-                trig_product = trig_product * FastSinOrCosB(elevation);
+                effect->angle = math_random_angle();
+                effect->size = IntToFloat(math_random_int_below(0x30) + 0x20) * 0.00390625f;
+                azimuth = math_random_angle();
+                elevation = math_random_angle();
+                trig_product = math_fast_sin_or_cos_a(azimuth);
+                trig_product = trig_product * math_fast_sin_or_cos_b(elevation);
                 trig_product = trig_product * radius;
                 effect->position_x = trig_product;
-                trig_product = FastSinOrCosB(azimuth);
-                trig_product = trig_product * FastSinOrCosB(elevation);
+                trig_product = math_fast_sin_or_cos_b(azimuth);
+                trig_product = trig_product * math_fast_sin_or_cos_b(elevation);
                 trig_product = trig_product * radius;
                 effect->position_y = trig_product;
-                trig_product = FastSinOrCosA(elevation);
-                trig_product = trig_product * FastSinOrCosA(elevation);
+                trig_product = math_fast_sin_or_cos_a(elevation);
+                trig_product = trig_product * math_fast_sin_or_cos_a(elevation);
                 trig_product = trig_product * 36.0f;
                 trig_product = trig_product + 16.0f;
                 effect->position_z = trig_product;
-                color_delta = RandomIntBelow(0x18);
-                alpha_delta = RandomIntBelow(0x20) << 24;
-                if ((Rand() >> 16) & 1)
+                color_delta = math_random_int_below(0x18);
+                alpha_delta = math_random_int_below(0x20) << 24;
+                if ((func_001163B0() >> 16) & 1)
                     effect->state.base_color = alpha_delta + ((color_delta << 16) + base_color);
                 else
                     effect->state.base_color = (alpha_delta + ((color_delta << 8) + base_color)) | color_delta;
@@ -132,15 +132,15 @@ void func_L02_00363D78(void)
             angles[1] = (u16)(angles[1] + 1);
             azimuth = IntToFloat((orbit->azimuth & 0xFFF) - 0x800) * 0.0015339808f;
             elevation = IntToFloat((angles[1] & 0xFFF) - 0x800) * 0.0015339808f;
-            trig_product = FastSinOrCosA(azimuth);
-            trig_product = trig_product * FastSinOrCosB(elevation);
+            trig_product = math_fast_sin_or_cos_a(azimuth);
+            trig_product = trig_product * math_fast_sin_or_cos_b(elevation);
             trig_product = trig_product * 50.0f;
             effect->position_x = trig_product;
-            trig_product = FastSinOrCosB(azimuth);
-            trig_product = trig_product * FastSinOrCosB(elevation);
+            trig_product = math_fast_sin_or_cos_b(azimuth);
+            trig_product = trig_product * math_fast_sin_or_cos_b(elevation);
             trig_product = trig_product * 50.0f;
             effect->position_y = trig_product;
-            effect->position_z = FloatAbs(FastSinOrCosA(elevation)) * 50.0f;
+            effect->position_z = math_fabs(math_fast_sin_or_cos_a(elevation)) * 50.0f;
             if ((u32)(orbit->azimuth & 0x3F) < 8U)
                 effect->color = 0x702020F0;
             else
@@ -149,7 +149,7 @@ void func_L02_00363D78(void)
             u32 color_value;
             u32 color_offset;
 
-            random_bits = Rand() >> 16;
+            random_bits = func_001163B0() >> 16;
             color_offset = ((random_bits & 0x1F00) << 10) + 0xFFDFDFE0;
             color_value = effect->state.base_color + color_offset;
             color_value += (random_bits & 0x1F0) << 6;
@@ -157,10 +157,10 @@ void func_L02_00363D78(void)
             effect->color = color_value;
         }
     }
-    DrawSkyEffects();
+    gfx_draw_sky_effects();
     VU1_addGSregister(0x42, (0x8000ULL << 24) | 0x44);
-    UpdateViewRotation(2);
-    ProcessViewEntry(2);
-    UpdateViewRotation(3);
-    ProcessViewEntry(3);
+    cam_update_view_rotation(2);
+    gfx_process_view_entry(2);
+    cam_update_view_rotation(3);
+    gfx_process_view_entry(3);
 }

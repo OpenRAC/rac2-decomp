@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
-extern void func_L00_00443E18(int);
+extern void sub_object_get_value_second(int);
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
 void func_PAL_L00_0030F000(void)
@@ -9,10 +10,10 @@ void func_PAL_L00_0030F000(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_L00_00443E18(value + 0x36F28);
+        sub_object_get_value_second(value + 0x36F28);
 }
 
-extern void func_0034E4F8(int);
+extern void hud_item_bolt_draw(int);
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
 void func_PAL_L00_0030F030(void)
@@ -20,7 +21,7 @@ void func_PAL_L00_0030F030(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0034E4F8(value + 0x36F28);
+        hud_item_bolt_draw(value + 0x36F28);
 }
 
 extern void func_PAL_0034B088(int);

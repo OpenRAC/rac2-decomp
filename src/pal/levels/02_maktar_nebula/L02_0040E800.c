@@ -1,35 +1,36 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed short s16;
-extern float func_002A7878(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002B3BA8(void *, u32, float, float, int, int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_0029FC20(void *, int, void *);
-extern void func_00282C88(void *);
-extern void func_002830C0(void *, void *, void *);
-extern void *func_002A9640(void *, int, int);
+extern float math_random_float_range(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int weapon_select_aim_target(void *, u32, float, float, int, int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void vec_clear_128(void *);
+extern void transform_vector(void *, void *, void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern char D_L02_001BA500[];
+extern char g_camera_l02_position[];
 extern void func_PAL_L02_00410598(u8 *);
-extern void func_002B60B0(void *, float, float, float, float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern u8 D_001A7BCB __attribute__((sda));
 extern u8 D_L02_001395B8[];
 extern u8 D_L02_001C0700[];
 extern u8 D_0019B2E8[];
 extern u16 D_0018CFDC;
-extern int func_002A77E0(int);
-extern float func_00282E48(void *, void *);
-extern void *func_002A9640(void *, int, int);
-extern int func_002A77E0(int);
-extern void func_00282C88(void *);
+extern int math_random_int_below(int);
+extern float fast_vec_dist(void *, void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern int math_random_int_below(int);
+extern void vec_clear_128(void *);
 extern u8 D_0019B4A8[];
 
 /* Sets up the actor and refreshes its three effect tracks. In state 0 it points the sub-object's
@@ -53,13 +54,13 @@ void func_PAL_L02_0040FD10(u8 *a0) {
 
     if (a0[0x20] == 0) {
         *(u8 **)(s1 + 0x18) = s1 + 0x100;
-        s1[0x48] = func_00283CF0(15.0f);
-        s1[0x4A] = func_00283CF0(12.0f);
-        f = func_002A7878(15.0f, 40.0f) * 0.01745329424738884f;
-        if (func_002A77E0(2) != 0)
+        s1[0x48] = FloatToInt(15.0f);
+        s1[0x4A] = FloatToInt(12.0f);
+        f = math_random_float_range(15.0f, 40.0f) * 0.01745329424738884f;
+        if (math_random_int_below(2) != 0)
             f = -f;
         *(float *)(s1 + 0x2D8) = f;
-        if (func_002A77E0(2) == 1)
+        if (math_random_int_below(2) == 1)
             *(u16 *)(a0 + 0x34) = *(u16 *)(a0 + 0x34) | 0x8000;
         s1[0x60] = 8;
         *(float *)(s1 + 0x80) = 0.5f;
@@ -73,28 +74,28 @@ void func_PAL_L02_0040FD10(u8 *a0) {
         *(float *)(s1 + 0x110) = 1.5707965f;
         *(float *)(s1 + 0x130) = 0.52359885f;
         *(float *)(s1 + 0x12C) = 0.008f;
-        func_002B60B0(a0, 0.0064000003f, 0.16000001f,
+        moby_set_controller_speed_limits(a0, 0.0064000003f, 0.16000001f,
                         0.0016755164f, 0.12566373f);
         s1[0x28] = 3;
         func_PAL_L02_00410598(a0);
     }
     if (a0[0x31] != 0) {
-        if (func_00282E48(a0 + 0x10, D_L02_001BA500) < 24.0f) {
-            func_002A93B0(a0);
+        if (fast_vec_dist(a0 + 0x10, g_camera_l02_position) < 24.0f) {
+            moby_update_ground_check(a0);
             a0[0x6F] = 0x16;
         }
     }
-    func_0029FCC0(a0, 1, s1 + 0x290);
+    moby_transform_joint_to_world(a0, 1, s1 + 0x290);
     p = s1 + 0x2B0;
-    func_0029FCC0(a0, 2, s1 + 0x2A0);
-    func_0029FC20(a0, 3, m);
-    func_00282C88(p);
+    moby_transform_joint_to_world(a0, 2, s1 + 0x2A0);
+    moby_transform_joint_point(a0, 3, m);
+    vec_clear_128(p);
     *(float *)(s1 + 0x2B0) = 0.25f;
     *(int *)(s1 + 0x2B8) = 0;
-    func_002830C0(p, p, m);
-    func_00282CC0(p, p, m + 12);
+    transform_vector(p, p, m);
+    FastVecAdd(p, p, m + 12);
     if (a0[0x31] != 0 && a0[0x20] >= 3) {
-        rec = func_002A9640(a0, 0x10000, 1);
+        rec = part_find_owned_effect_slot(a0, 0x10000, 1);
         if (rec != 0) {
             other = *(u8 **)(rec + 0x20);
             if (other != 0 && a0[0x31] == 0) {
@@ -109,7 +110,7 @@ void func_PAL_L02_0040FD10(u8 *a0) {
         }
         if (a0[0x20] >= 2 && s1[0x2E] == 2)
             func_PAL_L02_00410598(a0);
-        *(s16 *)(s1 + 0x2E0) = func_002B3BA8(a0, *(u32 *)(s1 + 0x2DC), 100.0f, 100.0f, 0, 0);
+        *(s16 *)(s1 + 0x2E0) = weapon_select_aim_target(a0, *(u32 *)(s1 + 0x2DC), 100.0f, 100.0f, 0, 0);
         *(int *)(s1 + 0x2D4) = *(int *)(s1 + 0x200);
     }
 }

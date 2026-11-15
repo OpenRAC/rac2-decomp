@@ -4,14 +4,14 @@ extern char *D_L05_001B1EC4 MACRO_ADDR;
 extern char *D_L05_001B251C MACRO_ADDR;
 extern char D_L05_001B3620[] MACRO_ADDR;
 extern TI128 D_L05_001BFB30;
-extern void func_00282D30(char *, char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern int func_00277F48(char *, int, char *, int, float);
+extern void FastVecScale(char *, char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern int coll_process_hit(char *, int, char *, int, float);
 
 /* Builds the object's 0x30 block from a bound record and, when the lookup succeeds,
    its colour constant. */
 /* Moves the ship's saved position back by a given amount and sets the ship's color if the model lookup works. */
-void func_L05_004424B8(char *object, float strength)
+void ship_update_record_transform(char *object, float strength)
 {
     float local[4];
     char *entry = (char *)((*(short *)(object + 0x84) << 5) + (int)D_L05_001B1EC4);
@@ -20,6 +20,6 @@ void func_L05_004424B8(char *object, float strength)
 
     FastVecScale((char *)local, object, entry, -strength);
     FastVecAdd(D_L05_001B3620, D_L05_001B3620, (char *)local);
-    if (ProcessCollisionHit(object + 0x30, 0x10, record, 0, 0.25f) != 0)
+    if (coll_process_hit(object + 0x30, 0x10, record, 0, 0.25f) != 0)
         *(TI128 *)(object + 0x30) = *(TI128 *)&D_L05_001BFB30;
 }

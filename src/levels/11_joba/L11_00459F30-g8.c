@@ -12,21 +12,21 @@ extern unsigned int ref_L11_00459F30_0 __attribute__((sda));
 extern unsigned int ref_L11_00459F30_1 __attribute__((sda));
 extern unsigned int ref_L11_00459F30_2 __attribute__((sda));
 extern Vector ref_L11_00459F30_4;
-extern u64 func_0027C878(int);
+extern u64 GetEffectTextureDescriptor(int);
 extern int func_001163B0(void);
-extern float func_002A7878(float,float);
+extern float math_random_float_range(float,float);
 /* The packet initialiser: a different copy of the same body in each level. */
 extern void ref_L11_00459F30_3(void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00280B90(void *,int,int);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
+extern void draw_world_quad(void *,int,int);
 
 /* Build the three textured strips around the effect's two endpoints. */
 /* Draws the crackling energy strips between the two ends of a beam effect. */
-void func_L11_00459F30(u8 *object)
+void gfx_l11_draw_beam_strips(u8 *object)
 {
     EffectPacket a,b,c;
     u64 texture;
@@ -38,7 +38,7 @@ void func_L11_00459F30(u8 *object)
     a.texture=GetEffectTextureDescriptor(16);
     a.setup=setup;
     a.reserved=0;
-    a.state=0x8000000040ULL | ((u64)(Rand()%2+1)<<2);
+    a.state=0x8000000040ULL | ((u64)(func_001163B0()%2+1)<<2);
     a.color[1]=ref_L11_00459F30_0; a.color[0]=ref_L11_00459F30_0; a.color[3]=ref_L11_00459F30_0; a.color[2]=ref_L11_00459F30_0;
     b.texture=GetEffectTextureDescriptor(16);
     b.setup=setup; b.state=state; b.reserved=0;
@@ -48,8 +48,8 @@ void func_L11_00459F30(u8 *object)
     c.reserved=0; c.color[1]=ref_L11_00459F30_2; c.color[0]=ref_L11_00459F30_2; c.color[3]=ref_L11_00459F30_2; c.color[2]=ref_L11_00459F30_2;
     small.q=0; wide.q=0; tall.q=0;
     small.f[3]=1.0f; wide.f[3]=1.0f; tall.f[3]=1.0f;
-    tall.f[2]=RandomFloatRange(0.2f,0.25f);
-    small.f[2]=RandomFloatRange(0.3f,0.4f);
+    tall.f[2]=math_random_float_range(0.2f,0.25f);
+    small.f[2]=math_random_float_range(0.3f,0.4f);
     wide.f[2]=small.f[2]+small.f[2];
     tall.f[2]*=*(float *)(effect+0x60);
     wide.f[2]*=*(float *)(effect+0x60);

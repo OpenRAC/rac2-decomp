@@ -3,13 +3,13 @@
 #include "common.h"
 extern int D_L10_001B1648 __attribute__((sda));
 extern u8 D_L10_0042BEE0[];
-extern int func_L00_002FCF18(void *a0, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
-extern f32 func_00283B98(f32 f12, f32 f13);
-extern void func_L00_002E6EF8(void *a0, void *a1);
+extern int part_l00_alloc_effect_slot_2(void *a0, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
+extern f32 FastAddRotations(f32 f12, f32 f13);
+extern void gfx_add_draw_callback_third(void *a0, void *a1);
 extern u8 *D_001B2614;
-extern f32 func_002A7878(f32 low, f32 high);
-extern f32 func_002A7940(void);
-extern f32 func_00283CE0(int);
+extern f32 math_random_float_range(f32 low, f32 high);
+extern f32 math_random_angle(void);
+extern f32 IntToFloat(int);
 extern u8 D_L10_001C7800[];
 
 /* Two-state start-up for a cloud puff: state 0 lays the record at +0x10 out (position
@@ -30,13 +30,13 @@ void func_PAL_L10_00431BD0(u8 *a0) {
         *(f32 *)(s0 + 0x10) = 512.0f;
         *(f32 *)(s0 + 0x14) = 512.0f;
         *(f32 *)(s0 + 0x18) = 512.0f;
-        D_L10_001B1648 = func_L00_002FCF18(s0 + 0x10, 40.0f, v, v, v, 1.0f);
+        D_L10_001B1648 = part_l00_alloc_effect_slot_2(s0 + 0x10, 40.0f, v, v, v, 1.0f);
     case 1:
         *(f32 *)(s0 + 0xF8) =
-            func_00283B98(*(f32 *)(s0 + 0xF8), 0.011780974f);
+            FastAddRotations(*(f32 *)(s0 + 0xF8), 0.011780974f);
         break;
     default:
         break;
     }
-    func_L00_002E6EF8(D_L10_0042BEE0, s0);
+    gfx_add_draw_callback_third(D_L10_0042BEE0, s0);
 }

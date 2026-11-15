@@ -1,14 +1,14 @@
 #include "common.h"
 struct ImpactQueueState { char pad[20]; int index; };
-extern struct ImpactQueueState D_001BAF80;
+extern struct ImpactQueueState g_collision_hit;
 struct ImpactQueueEntry { int __attribute__((mode(TI))) a, b; int kind, flags; unsigned char c,d; unsigned short e; float strength; int f; float g; char * owner; int h; };
 extern struct ImpactQueueEntry D_001BF200[];
-extern void func_00282C88(void *);
-extern float func_00282DF0(void *);
+extern void vec_clear_128(void *);
+extern float FastVecLength(void *);
 
 /* Adds a hit effect to the impact queue for an object, merging with its earlier one if that is stronger. */
-void func_002A8F70(char *object, int kind, int bits, void *position, void *vector, float strength) {
-    int index=gCollisionHit.index;
+void part_queue_impact_effect(char *object, int kind, int bits, void *position, void *vector, float strength) {
+    int index=g_collision_hit.index;
     int flags=0;
     struct ImpactQueueEntry *entry;
     if ((unsigned char)object[0xA8]!=255) {
@@ -33,6 +33,6 @@ void func_002A8F70(char *object, int kind, int bits, void *position, void *vecto
     qcopy(&D_001BF200[index].a,position);
     qcopy(&D_001BF200[index].b,vector);
     object[0xA8]=index;
-    gCollisionHit.index=(index+1)&63;
+    g_collision_hit.index=(index+1)&63;
 }
 

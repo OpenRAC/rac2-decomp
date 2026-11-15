@@ -50,26 +50,26 @@ typedef struct Mtx_L04_00454BF8 {
     f32 pos[4];         /* 0x30 */
 } Mtx_L04_00454BF8;
 
-extern void func_0029F338(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A7750(void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_L02_002F1FB8(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283CC8(float *, float);
-extern f32 func_L04_00455418(void *, f32);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_00283098(void *, void *, void *);
-extern float func_002831B0(float);
-extern f32 func_L04_004554F8(f32);
+extern void moby_mark_spawned(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_set_state(void *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void vec_subtract_vec4(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float FastVecDot(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float SplitFloatFraction(float *, float);
+extern f32 ComputePeriodicLightBlend(void *, f32);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_angle_helper(float);
+extern f32 math_smooth_step(f32);
 extern void func_L00_0036EF68(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void *func_L04_00363CA0(void *, int, float);
-extern int func_00283D38(int, int, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void *part_spawn_effect_record(void *, int, float);
+extern int FastTweenColor(int, int, float);
 
 extern s32 D_L04_001A9018 __attribute__((sda));
 extern u16 **D_L04_001A9014 __attribute__((sda));
@@ -88,7 +88,7 @@ extern char D_L04_001B9680[];
    It is a -g unit: the line label on the case 1 division is what makes the assembler pad it with
    the retail's nop. The sweep's thresholds are locals set at the head of their case, which is what
    puts them in saved registers before the calls. */
-void func_L04_00454BF8(u8 *self)
+void light_controller_update(u8 *self)
 {
     State_L04_00454BF8 *st = *(State_L04_00454BF8 **)(self + 0x68);
     f32 to_cam[4];
@@ -130,7 +130,7 @@ void func_L04_00454BF8(u8 *self)
     case 0:
         group = st->group;
         if (group >= D_L04_001A9018 || group == -1 || D_L04_001A9014[group] == 0) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         st->time = 0.0f;
@@ -169,7 +169,7 @@ void func_L04_00454BF8(u8 *self)
         st->off2[1] = st->off2_in[1];
         st->off2[2] = st->off2_in[2];
         st->off2[3] = 0.0f;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
     case 1:
         st->time += st->step;
         if (st->trigger != -1 && IsPointInCuboid(D_L04_001B9680, st->trigger) == 0)
@@ -179,7 +179,7 @@ void func_L04_00454BF8(u8 *self)
             e = &D_L04_001B2B5C[*p & 0x7FFF];
             if (e == 0)
                 break;
-            SubtractVec4(to_cam, D_L04_001B9680, e->pos);
+            vec_subtract_vec4(to_cam, D_L04_001B9680, e->pos);
             blend = 0.0f;
             light = D_L04_001B2B54 + ((*p & 0x7FFF) << 5);
             if (FastVecLength(to_cam) > 32.0f)
@@ -206,21 +206,21 @@ void func_L04_00454BF8(u8 *self)
                 time = st->time;
                 theta = time * half * 3.1415927f;
                 phi = time * quarter;
-                sin_theta = FastSinOrCosB(theta);
-                axis[0] = sin_theta * FastSinOrCosA(phi);
-                axis[1] = sin_theta * FastSinOrCosB(phi);
-                axis[2] = FastSinOrCosA(theta);
+                sin_theta = math_fast_sin_or_cos_b(theta);
+                axis[0] = sin_theta * math_fast_sin_or_cos_a(phi);
+                axis[1] = sin_theta * math_fast_sin_or_cos_b(phi);
+                axis[2] = math_fast_sin_or_cos_a(theta);
                 matrix_mul_vec3(axis, axis, self + 0xC0);
-                SubtractVec4(probe, e->pos, self + 0x10);
+                vec_subtract_vec4(probe, e->pos, self + 0x10);
                 vec_scale_to_length(probe, probe, 1.0f);
-                elev = 1.5707964f - FastAngleHelper(FastVecDot(probe, axis));
+                elev = 1.5707964f - math_fast_angle_helper(FastVecDot(probe, axis));
                 if (elev > rise) {
                     if (elev <= full)
-                        blend = SmoothStep((elev - rise) / (full - rise));
+                        blend = math_smooth_step((elev - rise) / (full - rise));
                     else if (elev <= fall)
                         blend = 1.0f;
                     else if (elev <= gone)
-                        blend = 1.0f - SmoothStep((elev - fall) / (gone - fall));
+                        blend = 1.0f - math_smooth_step((elev - fall) / (gone - fall));
                 }
                 break;
             }
@@ -235,11 +235,11 @@ void func_L04_00454BF8(u8 *self)
                 fade = 1.0f;
                 vec_scale_to_length(axis, to_cam, 1.0f);
                 matrix_mul_vec3(probe, st->off, e);
-                angle = 1.5707964f - FastAngleHelper(FastVecDot(probe, axis));
+                angle = 1.5707964f - math_fast_angle_helper(FastVecDot(probe, axis));
                 if (angle >= st->fade_end)
                     fade = 0.0f;
                 else if (angle > st->fade_start)
-                    fade = SmoothStep((angle - st->fade_end) / (st->fade_start - st->fade_end));
+                    fade = math_smooth_step((angle - st->fade_end) / (st->fade_start - st->fade_end));
                 alpha = (u32)color >> 24;
                 if (alpha == 0)
                     continue;
@@ -254,7 +254,7 @@ void func_L04_00454BF8(u8 *self)
                 FastVecSub(pull, D_L04_001B9680, spot);
                 vec_scale_to_length(pull, pull, st->reach * size);
                 FastVecAdd(spot, spot, pull);
-                SpawnEffectRecord(spot, glow, st->radius * size * 210000.0f);
+                part_spawn_effect_record(spot, glow, st->radius * size * 210000.0f);
             }
         }
         break;

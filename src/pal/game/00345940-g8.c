@@ -1,12 +1,13 @@
 #include "include_asm.h"
-extern void func_00336320(void *a0);
-extern void func_00336A78(void *a0);
-extern void func_00342BE8(void *a0);
-extern int func_00342BC0(void *a0);
-extern int func_00288FB8(int);
-extern void func_00336A38(void *a0, int a1);
-extern unsigned char D_00139568[];
-extern char D_00239BA0[];
+#include "names.h"
+extern void gfx_draw_screen_element_stored(void *a0);
+extern void text_label_draw(void *a0);
+extern void menu_list_draw_entries(void *a0);
+extern int menu_list_get_selected_id(void *a0);
+extern int GetLocalizedString(int);
+extern void hud_set_widget_field_b(void *a0, int a1);
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_table[];
 
 void func_PAL_00345940(char *self)
 {
@@ -14,15 +15,15 @@ void func_PAL_00345940(char *self)
     char *rec;
 
     if (*(int *)(self + 0x2C0) != 0) {
-        func_00336320(self);
-        func_00336320(self + 0x4C);
-        func_00336320(self + 0x98);
-        func_00336A78(self + 0x1B0);
-        func_00342BE8(self + 0x2C8);
-        r = func_00342BC0(self + 0x2C8);
-        rec = D_00239BA0 + D_00139568[r] * 224;
-        func_00336A38(self + 0x208, func_00288FB8(*(int *)(rec + 8)));
-        func_00336A78(self + 0x208);
-        func_00336A78(self + 0x260);
+        gfx_draw_screen_element_stored(self);
+        gfx_draw_screen_element_stored(self + 0x4C);
+        gfx_draw_screen_element_stored(self + 0x98);
+        text_label_draw(self + 0x1B0);
+        menu_list_draw_entries(self + 0x2C8);
+        r = menu_list_get_selected_id(self + 0x2C8);
+        rec = g_weapon_table + g_item_slot_to_record[r] * 224;
+        hud_set_widget_field_b(self + 0x208, GetLocalizedString(*(int *)(rec + 8)));
+        text_label_draw(self + 0x208);
+        text_label_draw(self + 0x260);
     }
 }

@@ -23,38 +23,38 @@ typedef struct {
 
 extern void func_00282D30_2(char *dst, char *src, float scale);
 
-extern void func_L02_00333480(char *a, char *b, char *c);
+extern void coll_update_controller(char *a, char *b, char *c);
 
-extern float func_00282C10(float a);
+extern float square_root(float a);
 
-extern void func_00283CF0(float a);
+extern void FloatToInt(float a);
 
-extern int func_002A7820(int lo, int hi);
+extern int math_random_int_range(int lo, int hi);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_L11_004507B0(void *a0, unsigned int color, float f, int rand, float a, int a3,
+extern void part_draw_glow_sprite_flares(void *a0, unsigned int color, float f, int rand, float a, int a3,
                               int a4, float one, void *a5);
 
 extern void ref_L11_00458DF0_00(char *p);
 
 extern void ref_L11_00458DF0_01(char *p, float scale);
 
-extern long long func_0027C878(int id);
+extern long long GetEffectTextureDescriptor(int id);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_00282E80(char *a0, float *a1);
+extern float vec_distance_xy(char *a0, float *a1);
 
-extern void func_00283410(void *dst, void *src);
+extern void euler_to_matrix(void *dst, void *src);
 
-extern void func_00280B90(void *dst, void *src, int flag);
+extern void draw_world_quad(void *dst, void *src, int flag);
 
 extern float D_L11_001BA780[];
 
-extern int func_002ACBC8(void *a, int b);
+extern int IsPointInCuboid(void *a, int b);
 
-extern void func_002829D8(void *a);
+extern void vec_fast_helper_b(void *a);
 
 extern unsigned char D_L11_00189EA0[];
 
@@ -63,9 +63,9 @@ extern unsigned char D_L11_00189EA0[];
 /* func_L11_002CDE10 lives in L11_002CDE10-motion.c. */
 
 /* Passes the object and two data blocks inside it (at +0x10 and +0xC0) to a shared helper. */
-void func_L11_003404E0(char *moby)
+void moby_call_helper_with_blocks(char *moby)
 {
-    UpdateObjectController(moby, moby + 0x10, moby + 0xC0);
+    coll_update_controller(moby, moby + 0x10, moby + 0xC0);
 }
 
 /* func_L11_00397C08 lives in L11_00397C08-helpers.c. */
@@ -77,7 +77,7 @@ void func_L11_003404E0(char *moby)
 /* func_L11_003F4198 lives in L11_003F4198-helpers.c. */
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
-void func_L11_00414660(float *out, float *b, float *c, float *a, float *d, float t)
+void vec_l11_interpolate_cubic(float *out, float *b, float *c, float *a, float *d, float t)
 {
     float t2, t3, p, q, r;
 
@@ -110,7 +110,7 @@ void func_L11_00414660(float *out, float *b, float *c, float *a, float *d, float
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L11_0041E460(char *vectors, float scale)
+void vec_l11_scale_four_3(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -119,7 +119,7 @@ void func_L11_0041E460(char *vectors, float scale)
 }
 
 /* Works out how long a thrown object takes to land, from the height gap, its launch speed and gravity. */
-void func_L11_00439D78(float startHeight, float endHeight, float launchSpeed, float gravity)
+void projectile_compute_flight_time(float startHeight, float endHeight, float launchSpeed, float gravity)
 {
     float heightTerm = (gravity + gravity) * (startHeight - endHeight);
 
@@ -130,26 +130,26 @@ void func_L11_00439D78(float startHeight, float endHeight, float launchSpeed, fl
 
 /* Draws the record's two markers, the scaled radius and the two colours, for each of the
    two record kinds the byte at 0x20 selects. */
-void func_L11_00450508(unsigned char *moby)
+void part_draw_shot_glow_sprites(unsigned char *moby)
 {
     switch (moby[0x20]) {
     case 0:
-        DrawGlowSpriteWithFlares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
-                         RandomIntRange(95, 111), RandomAngle(), 11, 2, 1.0f, moby);
-        DrawGlowSpriteWithFlares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
-                         RandomIntRange(111, 127), RandomAngle(), 11, 2, 1.0f, moby);
+        part_draw_glow_sprite_flares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
+                         math_random_int_range(95, 111), math_random_angle(), 11, 2, 1.0f, moby);
+        part_draw_glow_sprite_flares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
+                         math_random_int_range(111, 127), math_random_angle(), 11, 2, 1.0f, moby);
         break;
     case 1:
-        DrawGlowSpriteWithFlares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
-                         RandomIntRange(95, 111), RandomAngle(), 11, 2, 1.0f, moby);
-        DrawGlowSpriteWithFlares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
-                         RandomIntRange(111, 127), RandomAngle(), 11, 2, 1.0f, moby);
+        part_draw_glow_sprite_flares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
+                         math_random_int_range(95, 111), math_random_angle(), 11, 2, 1.0f, moby);
+        part_draw_glow_sprite_flares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
+                         math_random_int_range(111, 127), math_random_angle(), 11, 2, 1.0f, moby);
         break;
     }
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_004506C0(char *record)
+void part_reset_quad_record(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -182,7 +182,7 @@ void func_L11_004506C0(char *record)
 /* func_L11_004507B0 lives in L11_004507B0-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00458D00(char *record)
+void part_reset_quad_record_b(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -221,7 +221,7 @@ void func_L11_00458D00(char *record)
 
 /* Fills a local record: the level's handle, the four blocks it scales, and the
  * two vectors the level's own table gives against the object's position. */
-void func_L11_00458DF0(char *position, void *color, void *alpha, int textureId, int flags, float scale, float roll)
+void part_draw_billboard_sprite(char *position, void *color, void *alpha, int textureId, int flags, float scale, float roll)
 {
     LOC_L11_458DF0 local;
     float pitch;
@@ -236,9 +236,9 @@ void func_L11_00458DF0(char *position, void *color, void *alpha, int textureId, 
     local.k0 = (int)color + ((int)alpha << 24);
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = FastMatrixHelperA(D_L11_001BA780[0x50] - *(float *)position,
+    local.f216 = mat_fast_helper_a(D_L11_001BA780[0x50] - *(float *)position,
                                 D_L11_001BA780[0x51] - *(float *)(position + 4));
-    pitch = FastMatrixHelperA(vec_distance_xy(position, D_L11_001BA780 + 0x50),
+    pitch = mat_fast_helper_a(vec_distance_xy(position, D_L11_001BA780 + 0x50),
                       D_L11_001BA780[0x52] - *(float *)(position + 8));
     local.f212 = -pitch;
     local.v208 = roll;
@@ -253,30 +253,30 @@ void func_L11_00458DF0(char *position, void *color, void *alpha, int textureId, 
 
 /* Emits two effects at the object's position with independently sampled
  * intensities and the two colour/scale presets. */
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_L11_004600A0(void *, int, int, int, int, float, float, float);
+extern void gfx_draw_aimed_packet(void *, int, int, int, int, float, float, float);
 
-void func_L11_0045FEF8(void *moby)
+void part_spawn_two_glow_effects(void *moby)
 {
   float new_var;
   char *position = ((char *) moby) + 0x10;
-  int amount = RandomIntRange(0x2F, 0x3F);
+  int amount = math_random_int_range(0x2F, 0x3F);
   int new_var2;
   float random;
-  DrawAimedPacket(position, (float) 0x103080, amount, 0xB, 2, 2.0f, RandomAngle(), 1.0f);
+  gfx_draw_aimed_packet(position, (float) 0x103080, amount, 0xB, 2, 2.0f, math_random_angle(), 1.0f);
   new_var = 1.0f;
-  new_var2 = RandomIntRange(0x1F, 0x3F);
+  new_var2 = math_random_int_range(0x1F, 0x3F);
   amount = new_var2;
-  random = RandomAngle();
-  DrawAimedPacket(position, 0x606060, amount, 0xB, 2, new_var, random, new_var);
+  random = math_random_angle();
+  gfx_draw_aimed_packet(position, 0x606060, amount, 0xB, 2, new_var, random, new_var);
 }
 
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_0045FFB0(char *record)
+void part_reset_quad_record_c(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -317,7 +317,7 @@ void func_L11_0045FFB0(char *record)
 /* func_L11_0046C1E0 lives in L11_002C5E80-trail-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00472008(char *record)
+void part_reset_quad_record_d(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -350,23 +350,23 @@ void func_L11_00472008(char *record)
 /* func_L11_00472090 is defined in L11_00472090-curve.c. */
 
 /* Checks that the hero is in state 0x82 on this object, then repeats one hero helper call nine times. */
-void func_L11_00474888(char *moby)
+void hero_check_state_repeat_helper(char *moby)
 {
     if (IsPointInCuboid(D_L11_00189EA0, *(int *)(*(char **)(moby + 0x68))) == 0) return;
     if (*(int *)(D_L11_00189EA0 + 0x2214) != 0x82) return;
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
-    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00478EF0(char *record)
+void part_reset_quad_record_e(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;

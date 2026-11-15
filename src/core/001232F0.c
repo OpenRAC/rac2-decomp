@@ -35,15 +35,15 @@
 /* This is a software floating point library which can be used instead of
    the floating point routines in libgcc1.c for targets without hardware
    floating point.
- Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+ Copyright (C) 1994, 1995, 1996, 1997, 1998 free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+free Software Foundation; either version 2, or (at your option) any
 later version.
 
 In addition to the permissions in the GNU General Public License, the
-Free Software Foundation gives you unlimited permission to link the
+free Software Foundation gives you unlimited permission to link the
 compiled version of this file with other programs, and to distribute
 those programs without any restriction coming from the use of this
 file.  (The General Public License restrictions do apply in other
@@ -57,7 +57,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -279,7 +279,7 @@ typedef union
 }
 FLO_union_type;
 
-extern void func_00123400  (FLO_union_type *, fp_number_type *);
+extern void math_unpack_float  (FLO_union_type *, fp_number_type *);
 
 static __inline__ int fp_pack_isnan(fp_number_type *number) {
     return number->class == CLASS_SNAN || number->class == CLASS_QNAN;
@@ -293,7 +293,7 @@ static __inline__ int fp_pack_iszero(fp_number_type *number) {
 
 /* Single-precision packing from the GNU fp-bit.c implementation above. */
 /* Packs the parts of a float back into a real float, with rounding. */
-FLO_type func_001232F0(fp_number_type *src) {
+FLO_type fp_pack_float(fp_number_type *src) {
     FLO_union_type dst;
     fractype fraction = src->fraction.ll;
     int sign = src->sign;
@@ -430,26 +430,26 @@ func_00123400  (FLO_union_type * src, fp_number_type * dst)
     }
 }
 
-extern FLO_type func_001232F0(fp_number_type *);
+extern FLO_type fp_pack_float(fp_number_type *);
 
 /* Builds a float from a kind, sign, exponent and fraction. */
-FLO_type func_001234C0(fp_class_type classification, unsigned int sign, int exponent, fractype fraction) {
+FLO_type fp_build_float_from_parts(fp_class_type classification, unsigned int sign, int exponent, fractype fraction) {
     fp_number_type number;
     number.class = classification;
     number.sign = sign;
     number.normal_exp = exponent;
     number.fraction.ll = fraction;
-    return PackFloat(&number);
+    return fp_pack_float(&number);
 }
 
-extern double func_00123268(fp_class_type, unsigned int, int, unsigned long);
+extern double fp_build_double_from_parts(fp_class_type, unsigned int, int, unsigned long);
 
 /* Converts a float to a double using software math. */
-double func_001234F0(FLO_type value) {
+double __extendsfdf2(FLO_type value) {
     fp_number_type number;
     FLO_type input = value;
-    UnpackFloat((FLO_union_type *)&input, &number);
-    return BuildDoubleFromParts(number.class, number.sign, number.normal_exp,
+    math_unpack_float((FLO_union_type *)&input, &number);
+    return fp_build_double_from_parts(number.class, number.sign, number.normal_exp,
                          (unsigned long)number.fraction.ll << 30);
 }
 
@@ -465,7 +465,7 @@ double func_001234F0(FLO_type value) {
  * Returns: updated pointer to the next byte after the last decoded byte
  */
 /* Reads a variable-length unsigned number from the exception data stream. */
-unsigned char *func_00123530(unsigned char *stream, unsigned int *output)
+unsigned char *eh_read_uleb128(unsigned char *stream, unsigned int *output)
 {
   unsigned char b;
   unsigned int result;
@@ -486,7 +486,7 @@ unsigned char *func_00123530(unsigned char *stream, unsigned int *output)
 }
 
 /* Reads a variable-length signed number from the exception data stream. */
-unsigned char *func_00123578(unsigned char *input, int *output) {
+unsigned char *eh_read_sleb128(unsigned char *input, int *output) {
     unsigned int shift = 0;
     int value = 0;
     unsigned int byte;
@@ -508,7 +508,7 @@ typedef struct {
 } RecordOutput;
 
 /* Collects the usable records of one chain into a list and tracks the lowest and highest address they cover. */
-void func_00123978(int *record, RecordOutput *output, unsigned int *minimum, unsigned int *maximum) {
+void eh_collect_fde_records(int *record, RecordOutput *output, unsigned int *minimum, unsigned int *maximum) {
     unsigned int low = *minimum;
     unsigned int high = *maximum;
     RecordOutput *destination = output;
@@ -571,19 +571,19 @@ static __inline__ int __gthread_mutex_unlock(__gthread_mutex_t *mutex __attribut
 
 static __gthread_mutex_t object_mutex = 0;
 
-extern struct object *D_00141838;
-extern void func_00123A00(struct object *);
+extern struct object *g_registered_frame_objects;
+extern void eh_init_object(struct object *);
 
 /* Finds the exception frame record that covers a given code address. */
-fde *func_00123B40(void *pc) {
+fde *find_fde(void *pc) {
     struct object *ob;
     unsigned int lo, hi;
 
     __gthread_mutex_lock(&object_mutex);
 
-    for (ob = gRegisteredFrameObjects; ob; ob = ob->next) {
+    for (ob = g_registered_frame_objects; ob; ob = ob->next) {
         if (ob->pc_begin == 0)
-            InitFdeObject(ob);
+            eh_init_object(ob);
         if (pc >= ob->pc_begin && pc < ob->pc_end)
             break;
     }
@@ -701,7 +701,7 @@ struct frame_state_internal
 #define DW_CFA_GNU_window_save	0x2d
 #define DW_CFA_GNU_args_size	0x2e
 
-extern void *func_00115F28(unsigned int);
+extern void *malloc(unsigned int);
 extern void func_00115F78(void *);
 extern void func_00115E28(void);
 
@@ -719,7 +719,7 @@ func_00123D30 (void *p, struct frame_state_internal *state,
   else if (insn & DW_CFA_offset)
     {
       reg = (insn & 0x3f);
-      p = ReadUnsignedLeb128 (p, (unsigned int *)&offset);
+      p = eh_read_uleb128 (p, (unsigned int *)&offset);
       offset *= info->data_align;
       state->s.saved[reg] = REG_SAVED_OFFSET;
       state->s.reg_or_offset[reg] = offset;
@@ -749,14 +749,14 @@ func_00123D30 (void *p, struct frame_state_internal *state,
       break;
 
     case DW_CFA_offset_extended:
-      p = ReadUnsignedLeb128 (p, &reg);
-      p = ReadUnsignedLeb128 (p, (unsigned int *)&offset);
+      p = eh_read_uleb128 (p, &reg);
+      p = eh_read_uleb128 (p, (unsigned int *)&offset);
       offset *= info->data_align;
       state->s.saved[reg] = REG_SAVED_OFFSET;
       state->s.reg_or_offset[reg] = offset;
       break;
     case DW_CFA_restore_extended:
-      p = ReadUnsignedLeb128 (p, &reg);
+      p = eh_read_uleb128 (p, &reg);
       state->s.saved[reg] = REG_UNSAVED;
       break;
 
@@ -768,25 +768,25 @@ func_00123D30 (void *p, struct frame_state_internal *state,
     case DW_CFA_register:
       {
 	unsigned reg2;
-	p = ReadUnsignedLeb128 (p, &reg);
-	p = ReadUnsignedLeb128 (p, &reg2);
+	p = eh_read_uleb128 (p, &reg);
+	p = eh_read_uleb128 (p, &reg2);
 	state->s.saved[reg] = REG_SAVED_REG;
 	state->s.reg_or_offset[reg] = reg2;
       }
       break;
 
     case DW_CFA_def_cfa:
-      p = ReadUnsignedLeb128 (p, &reg);
-      p = ReadUnsignedLeb128 (p, (unsigned int *)&offset);
+      p = eh_read_uleb128 (p, &reg);
+      p = eh_read_uleb128 (p, (unsigned int *)&offset);
       state->s.cfa_reg = reg;
       state->s.cfa_offset = offset;
       break;
     case DW_CFA_def_cfa_register:
-      p = ReadUnsignedLeb128 (p, &reg);
+      p = eh_read_uleb128 (p, &reg);
       state->s.cfa_reg = reg;
       break;
     case DW_CFA_def_cfa_offset:
-      p = ReadUnsignedLeb128 (p, (unsigned int *)&offset);
+      p = eh_read_uleb128 (p, (unsigned int *)&offset);
       state->s.cfa_offset = offset;
       break;
 
@@ -794,7 +794,7 @@ func_00123D30 (void *p, struct frame_state_internal *state,
       {
 	struct frame_state_internal *save =
 	  (struct frame_state_internal *)
-	  Malloc (sizeof (struct frame_state_internal));
+	  malloc (sizeof (struct frame_state_internal));
 	memcpy (save, state, sizeof (struct frame_state_internal));
 	state->saved_state = save;
       }
@@ -803,7 +803,7 @@ func_00123D30 (void *p, struct frame_state_internal *state,
       {
 	struct frame_state_internal *save = state->saved_state;
 	memcpy (state, save, sizeof (struct frame_state_internal));
-	Free (save);
+	func_00115F78 (save);
       }
       break;
 
@@ -817,24 +817,24 @@ func_00123D30 (void *p, struct frame_state_internal *state,
       break;
 
     case DW_CFA_GNU_args_size:
-      p = ReadUnsignedLeb128 (p, (unsigned int *)&offset);
+      p = eh_read_uleb128 (p, (unsigned int *)&offset);
       state->s.args_size = offset;
       break;
 
     default:
-      abort_00115E28 ();
+      func_00115E28 ();
     }
   return p;
 }
 
 
-extern fde *func_00123B40(void *);
-extern void *func_00123C28(fde *, struct cie_info *);
-extern void *func_00115484(void *, int, unsigned int);
+extern fde *find_fde(void *);
+extern void *eh_extract_cie_info(fde *, struct cie_info *);
+extern void *memset(void *, int, unsigned int);
 
 /* Reconstruct the DWARF frame state for the instruction at pc. */
 /* Works out how the stack frame is laid out at a given code address, for exception handling. */
-frame_state *func_001240C8(void *pc, frame_state *state) {
+frame_state *__frame_state_for(void *pc, frame_state *state) {
     fde *f;
     struct cie_info info;
     struct frame_state_internal state_in;
@@ -842,23 +842,23 @@ frame_state *func_001240C8(void *pc, frame_state *state) {
     unsigned int i;
     f = find_fde(pc);
     if (f == 0) return 0;
-    insn = ExtractCieInfo(f, &info);
+    insn = eh_extract_cie_info(f, &info);
     if (insn == 0) return 0;
     memset(&state_in, 0, sizeof(state_in));
     state_in.s.retaddr_column = info.ra_regno;
     state_in.s.eh_ptr = info.eh_ptr;
     end = (void *)get_cie(f) + get_cie(f)->length + 4;
     while (insn < end)
-        insn = ExecuteCfaInstruction(insn, &state_in, &info, 0);
+        insn = unwind_execute_cfa_instruction(insn, &state_in, &info, 0);
     insn = f + 1;
     if (info.augmentation[0] == 'z') {
-        insn = ReadUnsignedLeb128(insn, &i);
+        insn = eh_read_uleb128(insn, &i);
         insn += i;
     }
     end = (void *)f + f->length + 4;
     pc_tmp = f->pc_begin;
     while (insn < end && pc_tmp <= pc)
-        insn = ExecuteCfaInstruction(insn, &state_in, &info, &pc_tmp);
+        insn = unwind_execute_cfa_instruction(insn, &state_in, &info, &pc_tmp);
     *state = state_in.s;
     return state;
 }

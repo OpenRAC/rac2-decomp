@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
@@ -7,7 +8,7 @@ int func_US2_L00_0030E5B0(int argument)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_00339320(value + 0x3B418, argument);
+        return mission_screen_place_parts(value + 0x3B418, argument);
     return 0;
 }
 

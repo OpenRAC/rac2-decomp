@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern int D_L30_001B1820[] SDATA(D_L30_001B1820);
 extern int D_L30_001B1824[] SDATA(D_L30_001B1824);
 extern int D_L30_001B18B8[] SDATA(D_L30_001B18B8);
@@ -15,17 +15,17 @@ extern float D_L30_001B1830[] SDATA(D_L30_001B1830);
 extern float D_L30_001B1834[] SDATA(D_L30_001B1834);
 extern float D_L30_001B1838[] SDATA(D_L30_001B1838);
 extern float D_L30_001B183C[] SDATA(D_L30_001B183C);
-extern int func_00278E78(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282DF0(void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283CF0(float);
+extern int GetCollHitMaterial(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastVecLength(void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* rac1-decomp's clobber-free quadword clear: cse forgets the vector addresses at it, so
    the spawn call builds its velocity and acceleration pointers again (addiu from $sp). */
@@ -48,14 +48,14 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
     char *particle;
     char *vars = *(char **)(m + 0x68);
 
-    if (D_001A79F0 == 21 || D_001A79F0 == 30) {
+    if (g_current_map_index == 21 || g_current_map_index == 30) {
         start = 0x30301010;
         end = D_L30_001B1824[0];
     } else {
         start = D_L30_001B1820[0];
         end = D_L30_001B1824[0];
     }
-    if (!func_00278E78()) {
+    if (!GetCollHitMaterial()) {
         start = D_L30_001B18B8[0];
         end = D_L30_001B18BC[0];
     }
@@ -63,30 +63,30 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
         int i;
         for (i = 0; i < count; i++) {
             float x, y;
-            x = func_00283180(func_002A7878(-3.1415927410125732f, 3.1415927410125732f));
-            offset[0] = x * func_002A7878(minRadius, maxRadius);
-            y = func_00283198(func_002A7878(-3.1415927410125732f, 3.1415927410125732f));
-            y *= func_002A7878(minRadius, maxRadius);
+            x = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
+            offset[0] = x * math_random_float_range(minRadius, maxRadius);
+            y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
+            y *= math_random_float_range(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
-            func_00283098(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, m + 0xC0);
             {
-                float range = speed * ((maxRadius - func_00282DF0(offset)) * 0.020000001f) / maxRadius;
-                func_00282F20(velocity, offset, func_002A7878(range / D_L30_001B1858[0], range));
+                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.020000001f) / maxRadius;
+                vec_scale_to_length(velocity, offset, math_random_float_range(range / D_L30_001B1858[0], range));
             }
             qcopy(motion, vars);
             motion[2] *= D_L30_001B18AC[0];
-            func_00282CC0(velocity, velocity, motion);
-            velocity[2] += func_002A7878(rise / D_L30_001B185C[0], rise) * 0.020000001f;
+            FastVecAdd(velocity, velocity, motion);
+            velocity[2] += math_random_float_range(rise / D_L30_001B185C[0], rise) * 0.020000001f;
             vzero(accel);
-            func_00282CC0(offset, offset, position);
+            FastVecAdd(offset, offset, position);
             offset[2] += D_L30_001B18B0[0];
             velocity[3] = size;
             accel[3] = endSize;
-            a = func_00283CF0((func_002A7878(D_L30_001B1828[0], D_L30_001B182C[0]) * 5.0f + 2.0f) * 0.16666667f);
-            b = func_00283CF0((func_002A7878(D_L30_001B1830[0], D_L30_001B1834[0]) * 5.0f + 2.0f) * 0.16666667f);
-            c = func_00283CF0((func_002A7878(D_L30_001B1838[0], D_L30_001B183C[0]) * 5.0f + 2.0f) * 0.16666667f);
-            particle = func_002BAA28(offset, velocity, accel, start, end, a, b, c, -1);
+            a = FloatToInt((math_random_float_range(D_L30_001B1828[0], D_L30_001B182C[0]) * 5.0f + 2.0f) * 0.16666667f);
+            b = FloatToInt((math_random_float_range(D_L30_001B1830[0], D_L30_001B1834[0]) * 5.0f + 2.0f) * 0.16666667f);
+            c = FloatToInt((math_random_float_range(D_L30_001B1838[0], D_L30_001B183C[0]) * 5.0f + 2.0f) * 0.16666667f);
+            particle = part_spawn_trail(offset, velocity, accel, start, end, a, b, c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
         }

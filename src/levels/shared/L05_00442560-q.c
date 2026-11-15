@@ -5,16 +5,16 @@ extern char *D_L05_001B251C MACRO_ADDR;
 extern char *D_L05_001B260C MACRO_ADDR;
 extern char D_L05_001B3600[] MACRO_ADDR;
 
-extern float func_00282E48(char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern s32 func_002A77E0(s32);
-extern void func_L05_00443740(char *);
-extern void func_L05_004427A8(void);
+extern float fast_vec_dist(char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern s32 math_random_int_below(s32);
+extern void UpdateDrivenMobyTransform(char *);
+extern void ship_restore_settings(void);
 
 /* Picks the best-scoring of the entity's nine slots (or the runner-up on a random draw), copies
    its transform to the object and to the entity, and resets the object. */
 /* Puts the ship back at the best of nine saved spots, or sometimes the second best, and clears its state. */
-void func_L05_00442560(char *obj)
+void ship_respawn_at_best_saved_slot(char *obj)
 {
     char *entry = *(char **)(D_L05_001B1EC4 + *(short *)(obj + 0x84) * 32 + 0x1C);
     char *self = D_L05_001B251C + (*(s32 *)(entry + 0x20) << 8);
@@ -43,7 +43,7 @@ void func_L05_00442560(char *obj)
         }
     }
     pick = best;
-    if (RandomIntBelow(2) != 0)
+    if (math_random_int_below(2) != 0)
         pick = second >= 0 ? second : pick;
     rec = D_L05_001B260C + (pick << 7);
     qcopy(obj + 0x30, rec + 0x30);
@@ -54,5 +54,5 @@ void func_L05_00442560(char *obj)
     vec_scale_to_length(obj + 0x20, rec + 0x20, 1.0f);
     qzero(*(char **)(obj + 0x70) + 0xB0);
     UpdateDrivenMobyTransform(obj);
-    RestoreShipSettings();
+    ship_restore_settings();
 }

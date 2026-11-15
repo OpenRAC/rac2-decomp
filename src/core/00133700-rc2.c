@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,10 +25,10 @@
  */
 #include "common.h"
 
-extern void func_00132DF0(s32 a, s32 b, s32 *c, s32 d, s32 e);
+extern void snd_queue_command(s32 a, s32 b, s32 *c, s32 d, s32 e);
 
 /* Sends sound command 0x50 with five values. */
-void func_00133700(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4) {
+void snd_send_cmd50_five_values(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4) {
     s32 payload[5];
 
     payload[0] = p0;
@@ -35,5 +36,5 @@ void func_00133700(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4) {
     payload[2] = p2;
     payload[3] = p3;
     payload[4] = p4;
-    QueueSoundCommand(0x50, 0x14, payload, 0, 0);
+    snd_queue_command(0x50, 0x14, payload, 0, 0);
 }

@@ -8,15 +8,15 @@ typedef int Quad_3f9368 __attribute__((mode(TI)));
 typedef union { Quad_3f9368 q; float f[4]; } Vec_3f9368;
 #endif
 
-extern void func_002A7750(void *, int, int);
-extern float func_00283B98(float, float);
+extern void moby_set_state(void *, int, int);
+extern float FastAddRotations(float, float);
 
 /* The bodies the retail calls reach, at 0x2D5940 and 0x33E220 in level 00. */
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_0033E220(void *, void *, int, int, int, float, float, int, int, int);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
 
 /* Grows the object with its parent and spawns two glowing trails each frame. */
-void func_L00_003F9368(char *self)
+void twin_trail_effect_update(char *self)
 {
     Vec_3f9368 leftDir;
     Vec_3f9368 rightDir;
@@ -28,7 +28,7 @@ void func_L00_003F9368(char *self)
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         *(int *)(self + 0x78) = 0x150000FF;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
     }
     if (*(unsigned char *)(self + 0x20) != 1) {
         return;
@@ -44,11 +44,11 @@ void func_L00_003F9368(char *self)
     leftDir.f[1] = 0.5378739833831787f;
     leftDir.f[2] = -0.3785569965839386f;
     FastVecScale(&leftDir, &leftDir, scaleRatio);
-    SpawnObjectFollowingEffect(&leftDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
+    part_spawn_object_following_effect(&leftDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
 
     rightDir.q = 0;
     rightDir.f[1] = 0.5123069882392883f;
     rightDir.f[2] = 0.37711501121520996f;
     FastVecScale(&rightDir, &rightDir, scaleRatio);
-    SpawnObjectFollowingEffect(&rightDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
+    part_spawn_object_following_effect(&rightDir, self, 0x150000FF, -1, 1, trailLength, trailFade, 2, 1, -1);
 }

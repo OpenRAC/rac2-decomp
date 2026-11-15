@@ -65,121 +65,121 @@ typedef struct {
     Object *target;     /* 0x249C */
 } HeroView;
 
-extern HeroView D_00189E20;
+extern HeroView g_hero_state;
 extern char D_001AFAE0[];
 
-extern void func_0026FEB8(const char *, ...);
-extern void func_0027CDC8(void (*)(Object *), Object *);
-extern void func_0027CFD0(void (*)(Object *), Object *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern void func_002833F0(void *, void *);
-extern float func_00283C80(float, float);
-extern void func_0029F338(void *);
-extern float func_0029F530(Object *);
-extern void func_002A7470(Object *, int, int, int);
-extern void func_002A7750(Object *, int, int);
-extern int func_002A7820(int, int);
-extern float func_002A7E08(Object *, void *, void *, float, float, float);
-extern float func_002A89A8(void *, int, float);
-extern int func_002A8D70(Object *, int, float, float, int, float, int, int, int);
-extern float func_002AA3A8(s32, float, s32, float, float, float);
-extern float func_002AA458(s32, s32, s32, float, float, float);
-extern float func_002AA548(float *, void *, float, float, float, float);
-extern void func_002AEF28(Object *, void *, void *, float, float, float);
-extern int func_002B1C20(Object *, void *);
-extern s32 func_002B3890(Object *);
-extern int func_002B4FF0(Object *, float *, float);
-extern int func_002B50E0(Object *, void *, float);
-extern void func_002B60B0(Object *, float, float, float, float);
-extern void func_0031BCC8(Object *);
-extern void func_0031C498(Object *);
-extern void func_0031C7A0(Object *);
-extern void func_0031D268(Object *);
-extern void func_0031D308(Object *);
+extern void STUB_printf(const char *, ...);
+extern void gfx_register_world_draw_callback(void (*)(Object *), Object *);
+extern void gfx_register_overlay_draw_callback(void (*)(Object *), Object *);
+extern void FastVecSub(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern float FastDiffRots(float, float);
+extern void moby_mark_spawned(void *);
+extern float moby_get_anim_value(Object *);
+extern void anim_start_blended(Object *, int, int, int);
+extern void moby_set_state(Object *, int, int);
+extern int math_random_int_range(int, int);
+extern float moby_turn_toward_position(Object *, void *, void *, float, float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int coll_test_hit_at_bone(Object *, int, float, float, int, float, int, int, int);
+extern float math_spring_float_to_goal(s32, float, s32, float, float, float);
+extern float vec_spring_to_target(s32, s32, s32, float, float, float);
+extern float math_step_value_toward_target(float *, void *, float, float, float, float);
+extern void moby_scale_owner_words_by_angles(Object *, void *, void *, float, float, float);
+extern int moby_dispatch_action_by_kind(Object *, void *);
+extern s32 flag_set_second_pending(Object *);
+extern int moby_turn_toward_target_and_step(Object *, float *, float);
+extern int moby_step_controller(Object *, void *, float);
+extern void moby_set_controller_speed_limits(Object *, float, float, float, float);
+extern void three_part_turret_init_update(Object *);
+extern void three_part_turret_update_parts(Object *);
+extern void three_part_turret_draw_effects(Object *);
+extern void gfx_record_trail_point(Object *);
+extern void gfx_draw_trail_ribbon(Object *);
 
 /* Updates the hovering enemy each frame: waits, flies to the hero, attacks with its beam and drops back when hurt. */
-void func_0031ABE0(Object *self)
+void three_part_turret_update(Object *self)
 {
     Vars *vars = self->vars;
     Vector target, delta;
     float ground, frame, drop;
     int result;
 
-    InitAndUpdateThreePartTurret(self);
+    three_part_turret_init_update(self);
     switch (self->mode) {
     case 0:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            SetMobyState(self, 11, 4);
-            if (self->animNext != 1) StartAnimationBlended(self, 1, 0, 4);
+            moby_set_state(self, 11, 4);
+            if (self->animNext != 1) anim_start_blended(self, 1, 0, 4);
             if (vars->path != -1) {
-                SetMobyState(self, 10, 1);
-                if (self->animNext != 26) StartAnimationBlended(self, 26, 0, 4);
+                moby_set_state(self, 10, 1);
+                if (self->animNext != 26) anim_start_blended(self, 26, 0, 4);
             }
         } else if (vars->alerted) {
-            SetMobyState(self, 9, 3);
+            moby_set_state(self, 9, 3);
             vars->alerted = 0;
-            if (vars->timer < 300) vars->timer = RandomIntRange(480, 600);
+            if (vars->timer < 300) vars->timer = math_random_int_range(480, 600);
         }
         break;
     case 2:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            SetMobyState(self, 5, 4);
-            if (self->animNext != 25) StartAnimationBlended(self, 25, 0, 4);
+            moby_set_state(self, 5, 4);
+            if (self->animNext != 25) anim_start_blended(self, 25, 0, 4);
         } else if (vars->alerted && vars->active) {
             vars->alerted = 0;
-            SetMobyState(self, 5, 4);
-            if (self->animNext != 25) StartAnimationBlended(self, 25, 0, 4);
+            moby_set_state(self, 5, 4);
+            if (self->animNext != 25) anim_start_blended(self, 25, 0, 4);
         }
         break;
     case 3:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            SetMobyState(self, 11, 4);
-            if (self->animNext != 1) StartAnimationBlended(self, 1, 0, 4);
+            moby_set_state(self, 11, 4);
+            if (self->animNext != 1) anim_start_blended(self, 1, 0, 4);
         } else if (vars->timer == 0) {
-            SetMobyState(self, 2, 0);
-            if (self->animNext != 4) StartAnimationBlended(self, 4, 0, 10);
+            moby_set_state(self, 2, 0);
+            if (self->animNext != 4) anim_start_blended(self, 4, 0, 10);
         }
         break;
     case 4:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         if (vars->mode != 1 && vars->mode != 2) {
             if (self->state != 5) {
                 if (self->state != 4) {
-                    SetMobyState(self, 9, 3);
-                    if (self->animNext != 7) StartAnimationBlended(self, 7, 0, 10);
-                    vars->timer = RandomIntRange(580, 600);
+                    moby_set_state(self, 9, 3);
+                    if (self->animNext != 7) anim_start_blended(self, 7, 0, 10);
+                    vars->timer = math_random_int_range(580, 600);
                 }
             }
         }
         break;
     case 5:
-        result = DispatchActionByKind(self, vars->dispatch);
+        result = moby_dispatch_action_by_kind(self, vars->dispatch);
         if (result & 1) {
-            MarkMobySpawned(vars->parts[0]);
-            MarkMobySpawned(vars->parts[1]);
-            MarkMobySpawned(vars->parts[2]);
-            MarkMobySpawned(self);
+            moby_mark_spawned(vars->parts[0]);
+            moby_mark_spawned(vars->parts[1]);
+            moby_mark_spawned(vars->parts[2]);
+            moby_mark_spawned(self);
             return;
         }
         if (result & 2) {
             if (vars->mode == 1 || vars->mode == 2) {
-                SetMobyState(self, 12, 4);
-                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
+                moby_set_state(self, 12, 4);
+                if (self->animNext != 11) anim_start_blended(self, 11, 0, 10);
             } else {
-                SetMobyState(self, 9, 3);
-                if (self->animNext != 7) StartAnimationBlended(self, 7, 0, 10);
-                vars->timer = RandomIntRange(580, 600);
+                moby_set_state(self, 9, 3);
+                if (self->animNext != 7) anim_start_blended(self, 7, 0, 10);
+                vars->timer = math_random_int_range(580, 600);
             }
             if (vars->active != 1) vars->active = 1;
         }
@@ -190,147 +190,147 @@ void func_0031ABE0(Object *self)
     case 2:
         break;
     case 3:
-        ScaleOwnerWordsByAngles(self, vars->sway, vars->tilt, 0.06981318f, 0.052359886f, 0.013089972f);
+        moby_scale_owner_words_by_angles(self, vars->sway, vars->tilt, 0.06981318f, 0.052359886f, 0.013089972f);
         break;
     case 5:
         vars->ticks++;
-        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        SpringFloatToGoal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
         {
-        float level = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
+        float level = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         if (self->pos[2] - level > 0.05f) {
             self->pos[2] = self->pos[2] - level * 0.00025f;
         } else {
-            SetMobyState(self, 8, -1);
-            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
+            moby_set_state(self, 8, -1);
+            if (self->animNext != 15) anim_start_blended(self, 15, 0, 3);
         }
         }
         if (self->flags & 2) {
-            SetMobyState(self, 4, -1);
-            if (self->animNext != 26) StartAnimationBlended(self, 26, 0, 15);
+            moby_set_state(self, 4, -1);
+            if (self->animNext != 26) anim_start_blended(self, 26, 0, 15);
         }
         break;
     case 4:
         vars->ticks++;
-        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        SpringFloatToGoal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        ground = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        ground = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            StepValueTowardTarget(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
+            math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
             STUB_printf(D_001AFAE0, vars->ticks);
-            SetMobyState(self, 8, -1);
-            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
+            moby_set_state(self, 8, -1);
+            if (self->animNext != 15) anim_start_blended(self, 15, 0, 3);
         }
         break;
     case 6:
         if (self->flags & 2) {
-            SetMobyState(self, 7, -1);
-            if (self->animNext != 14) StartAnimationBlended(self, 14, 0, 15);
+            moby_set_state(self, 7, -1);
+            if (self->animNext != 14) anim_start_blended(self, 14, 0, 15);
         }
         break;
     case 7:
-        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
         euler_rotation_basis(self->basis, self->rot);
-        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        ground = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        ground = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            StepValueTowardTarget(&self->pos[2], vars->height, drop, 0.025000002f, 0.16333334f, 0.25f);
+            math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.025000002f, 0.16333334f, 0.25f);
         } else {
-            SetMobyState(self, 8, -1);
-            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
+            moby_set_state(self, 8, -1);
+            if (self->animNext != 15) anim_start_blended(self, 15, 0, 3);
         }
         break;
     case 8:
         if (self->flags & 2) {
-            SetMobyState(self, 12, 4);
-            if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 15);
-            self->pos[2] = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
+            moby_set_state(self, 12, 4);
+            if (self->animNext != 8) anim_start_blended(self, 8, 0, 15);
+            self->pos[2] = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         }
         break;
     case 10:
         target.q = vars->home.q;
         target.v[2] -= 3.0f;
         FastVecSub(&delta, &target, self->pos);
-        self->rot[2] = FastMatrixHelperA(delta.v[0], delta.v[1]);
-        self->rot[1] = FastMatrixHelperA(vec_length_xy(&delta), delta.v[2]);
+        self->rot[2] = mat_fast_helper_a(delta.v[0], delta.v[1]);
+        self->rot[1] = mat_fast_helper_a(vec_length_xy(&delta), delta.v[2]);
         euler_rotation_basis(self->basis, self->rot);
-        SpringVectorToTarget((s32)self->pos, (s32)&target, (s32)vars->height, 0.016666668f, 0.0f, 0.33333334f);
+        vec_spring_to_target((s32)self->pos, (s32)&target, (s32)vars->height, 0.016666668f, 0.0f, 0.33333334f);
         if (fast_vec_dist(self->pos, &target) < 0.4f) {
-            if (self->animNext != 14) StartAnimationBlended(self, 14, 0, 10);
-            SetMobyState(self, 7, -1);
+            if (self->animNext != 14) anim_start_blended(self, 14, 0, 10);
+            moby_set_state(self, 7, -1);
         }
         break;
     case 11:
         if (self->flags & 2) {
-            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-            SetMobyState(self, 12, -1);
-            if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 15);
+            moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+            moby_set_state(self, 12, -1);
+            if (self->animNext != 11) anim_start_blended(self, 11, 0, 15);
         }
         break;
     case 12:
-        if (vec_distance_xy(self->pos, gHeroState.pos) < 2.8f
-            && FastDiffRots(self->rot[2], FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1])) < 0.38397247f) {
-            SetMobyState(self, 13, -1);
-            if (self->animNext != 16) StartAnimationBlended(self, 16, 4, 3);
+        if (vec_distance_xy(self->pos, g_hero_state.pos) < 2.8f
+            && FastDiffRots(self->rot[2], mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1])) < 0.38397247f) {
+            moby_set_state(self, 13, -1);
+            if (self->animNext != 16) anim_start_blended(self, 16, 4, 3);
             vars->hold = 0;
-        } else if (vec_distance_xy(self->pos, gHeroState.pos) > 2.8f) {
-            TurnTowardTargetAndStepMovement(self, gHeroState.pos, vars->range);
+        } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 2.8f) {
+            moby_turn_toward_target_and_step(self, g_hero_state.pos, vars->range);
         } else {
-            StepMovementController(self, self->pos, FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1]));
+            moby_step_controller(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         }
-        if (vec_distance_xy(self->pos, gHeroState.pos) > 5.0f && self->anim == 8) {
-            if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 4);
-            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+        if (vec_distance_xy(self->pos, g_hero_state.pos) > 5.0f && self->anim == 8) {
+            if (self->animNext != 11) anim_start_blended(self, 11, 0, 4);
+            moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         }
         break;
     case 13:
         if (self->flags & 2) {
-            if (gHeroState.target == self) {
-                SetMobyState(self, 14, -1);
-                if (self->animNext != 17) StartAnimationBlended(self, 17, 0, 7);
-            } else if (vec_distance_xy(self->pos, gHeroState.pos) > 4.0f) {
-                SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 12, -1);
-                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
+            if (g_hero_state.target == self) {
+                moby_set_state(self, 14, -1);
+                if (self->animNext != 17) anim_start_blended(self, 17, 0, 7);
+            } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
+                moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 12, -1);
+                if (self->animNext != 11) anim_start_blended(self, 11, 0, 10);
             } else {
-                SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 12, -1);
-                if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 10);
+                moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 12, -1);
+                if (self->animNext != 8) anim_start_blended(self, 8, 0, 10);
             }
         }
-        frame = GetMobyAnimationValue(self);
+        frame = moby_get_anim_value(self);
         if (self->anim == 16) {
             if (frame >= 19.0f && frame <= 25.0f) {
-                TestHitAtBone(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
-                TestHitAtBone(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
-                TestHitAtBone(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
             }
             if (self->anim == 16 && frame >= 17.0f && frame <= 25.0f) {
-                RegisterWorldDrawCallback(DrawTrailRibbon_0031D308, self);
-                RecordTrailPoint(self);
+                gfx_register_world_draw_callback(gfx_draw_trail_ribbon, self);
+                gfx_record_trail_point(self);
             }
         }
-        StepMovementController(self, self->pos, FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1]));
+        moby_step_controller(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         break;
     case 14:
         if (self->flags & 2) {
-            if (vec_distance_xy(self->pos, gHeroState.pos) > 4.0f) {
-                SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 12, -1);
-                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
+            if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
+                moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 12, -1);
+                if (self->animNext != 11) anim_start_blended(self, 11, 0, 10);
             } else {
-                SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 12, -1);
-                if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 10);
+                moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 12, -1);
+                if (self->animNext != 8) anim_start_blended(self, 8, 0, 10);
             }
         }
         {
-            float at = GetMobyAnimationValue(self);
+            float at = moby_get_anim_value(self);
             if (self->anim == 17 && (at <= 5.0f || (at >= 12.0f && at <= 15.0f)))
                 vars->open = 1;
             else
@@ -338,6 +338,6 @@ void func_0031ABE0(Object *self)
         }
         break;
     }
-    UpdateTurretPartsAndSparks(self);
-    RegisterOverlayDrawCallback(DrawClass2485Effects, self);
+    three_part_turret_update_parts(self);
+    gfx_register_overlay_draw_callback(three_part_turret_draw_effects, self);
 }

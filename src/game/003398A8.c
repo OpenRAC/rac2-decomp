@@ -9,18 +9,18 @@ extern int D_L04_001ADF10 __attribute__((sda));
 
 extern int D_L04_001ADF18 __attribute__((sda));
 
-extern void func_L00_00430948(char *, float, float);
+extern void mem_store_two_floats_through_cell(char *, float, float);
 
-extern void func_0033AE28(char *);
+extern void prompt_bar_update(char *);
 
 extern int func_002A9588_1(int, int, int, int, int);
 
-extern void *func_00335E20(char *);
+extern void *object_get_fourth_field(char *);
 
 extern void func_00335E38_3(char *, float, float, float, float);
 
 /* Moves the pop-up's box and label to follow its position and row, and updates the label colour. */
-int func_003398A8(char *popup)
+int popup_update_position(char *popup)
 {
     char *box = popup + 8;
     char *label;
@@ -28,12 +28,12 @@ int func_003398A8(char *popup)
     float labelX;
     float labelY;
 
-    StoreTwoFloatsThroughCell(box, ((float *)(*(int *)(popup + 756)))[0], ((float *)(*(int *)(popup + 756)))[1]);
-    UpdateButtonPromptBar(box);
+    mem_store_two_floats_through_cell(box, ((float *)(*(int *)(popup + 756)))[0], ((float *)(*(int *)(popup + 756)))[1]);
+    prompt_bar_update(box);
     if (D_00138344[0] & 0x5000)
         func_002A9588_1(0, 0, 1, 0, 1);
     label = popup + 680;
-    colorSlot = GetFieldC(label);
+    colorSlot = object_get_fourth_field(label);
     *(int *)colorSlot = func_002A9588_1(0x60442D00, 0x70FFFEED, 20, 0, 0);
     labelX = ((float *)(*(int *)(popup + 756)))[0] + (float)D_L04_001ADF10;
     labelY = ((float *)(*(int *)(popup + 756)))[1]

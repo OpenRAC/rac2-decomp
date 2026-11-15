@@ -12,7 +12,7 @@ extern short D_L00_001B267E;
 extern void func_002E5C40(void);
 
 /* Clears the screen effects and sets the screen overlay colour from a flag, then applies it. */
-void func_L00_0037F790(void)
+void gfx_reset_screen_overlay(void)
 {
     func_002F0538(0);
     func_002E7D48(0, 0, 0, 0x80);
@@ -26,29 +26,29 @@ void func_L00_0037F790(void)
 typedef int Quad __attribute__((mode(TI)));
 extern int func_001163B0(void);
 extern void func_001163A0(int);
-extern float func_002A78D8(float,float);
-extern float func_002A7878(float,float);
-extern int func_00283D38(int,int,float);
-extern int func_002A77E0(int);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void *func_002C3150(void *,void *,int,int,float,int,int);
+extern float math_random_signed_float_range(float,float);
+extern float math_random_float_range(float,float);
+extern int FastTweenColor(int,int,float);
+extern int math_random_int_below(int);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void *part_spawn_hero_relative(void *,void *,int,int,float,int,int);
 extern int D_L00_001AEE48 __attribute__((sda));
 extern int D_L00_001AEE50[2];
 extern float D_L00_001AEE58 __attribute__((sda));
 extern float D_L00_001AEE5C;
 extern float D_L00_001AEE60[2];
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
 
 /* Throws a burst of randomly aimed, randomly coloured particles from the controller's position. */
-void func_L00_00385040(char *object)
+void part_l00_spawn_random_burst(char *object)
 {
     union { Quad q; float f[4]; } vectors[2];
     char *state=*(char **)(object+0x68);
-    int saved=Rand();
+    int saved=func_001163B0();
     int i=0;
-    Srand(*(int *)(state+0x68));
+    func_001163A0(*(int *)(state+0x68));
     while(i<D_L00_001AEE48) {
         float speed,blend;
         int color;
@@ -56,23 +56,23 @@ void func_L00_00385040(char *object)
         vectors[1].q=0;
         vectors[1].f[0]=20.0f;
         i++;
-        vectors[1].f[1]=RandomSignedFloatRange(0.0f,D_L00_001AEE58);
-        vectors[1].f[2]=RandomSignedFloatRange(0.0f,D_L00_001AEE5C);
+        vectors[1].f[1]=math_random_signed_float_range(0.0f,D_L00_001AEE58);
+        vectors[1].f[2]=math_random_signed_float_range(0.0f,D_L00_001AEE5C);
         vectors[0].q=vectors[1].q;
-        matrix_mul_vec3(&vectors[0],&vectors[0],gCameraPosition_L00 + 0x230);
-        FastVecAdd(&vectors[0],&vectors[0],gCameraPosition_L00);
-        speed=RandomFloatRange(D_L00_001AEE60[0],D_L00_001AEE60[1]);
-        blend=RandomFloatRange(0.0f,1.0f);
+        matrix_mul_vec3(&vectors[0],&vectors[0],g_camera_l00_position + 0x230);
+        FastVecAdd(&vectors[0],&vectors[0],g_camera_l00_position);
+        speed=math_random_float_range(D_L00_001AEE60[0],D_L00_001AEE60[1]);
+        blend=math_random_float_range(0.0f,1.0f);
         color=FastTweenColor(D_L00_001AEE50[0],D_L00_001AEE50[1],blend);
-        random=RandomIntBelow(255);
-        SpawnHeroRelativeParticle(&vectors[0],D_L00_001A8F20,color,2,speed,random,0);
+        random=math_random_int_below(255);
+        part_spawn_hero_relative(&vectors[0],D_L00_001A8F20,color,2,speed,random,0);
     }
-    Srand(saved);
+    func_001163A0(saved);
 }
 
-extern int func_00115DA8(char *buffer, char *format, ...);
+extern int sprintf(char *buffer, char *format, ...);
 
-extern void func_L00_002E95C0(int x, int y, unsigned long colour, char *text, int length);
+extern void text_draw_coloured(int x, int y, unsigned long colour, char *text, int length);
 
 extern char D_L00_001AEEC0[];
 
@@ -93,17 +93,17 @@ extern int D_L00_001AEEB0_gp SDATA(D_L00_001AEEB0);
 /* Draws "Score: %d" (data+0x60), "Level: %d" (data+0x70 plus one) and "Score: %d"
  * (data+0x64) from the object's data (object+0x68), each at its own position and
  * colour. */
-void func_L00_003852A0(void *object)
+void DrawThreeObjectCounters(void *object)
 {
     char buffer[0x100];
     char *state = *(char **)((char *)object + 0x68);
 
-    Sprintf(buffer, D_L00_001AEEC0, *(int *)(state + 0x60));
-    DrawColouredText(D_L00_001AEE98_gp, D_L00_001AEE98[1], D_L00_001AEEB0[2], buffer, -1);
-    Sprintf(buffer, D_L00_001AEED0, *(int *)(state + 0x70) + 1);
-    DrawColouredText(D_L00_001AEE98[2], D_L00_001AEE98[3], D_L00_001AEEB0[1], buffer, -1);
-    Sprintf(buffer, D_L00_001AEEC0, *(int *)(state + 0x64));
-    DrawColouredText(D_L00_001AEE98[4], D_L00_001AEE98[5], D_L00_001AEEB0_gp, buffer, -1);
+    sprintf(buffer, D_L00_001AEEC0, *(int *)(state + 0x60));
+    text_draw_coloured(D_L00_001AEE98_gp, D_L00_001AEE98[1], D_L00_001AEEB0[2], buffer, -1);
+    sprintf(buffer, D_L00_001AEED0, *(int *)(state + 0x70) + 1);
+    text_draw_coloured(D_L00_001AEE98[2], D_L00_001AEE98[3], D_L00_001AEEB0[1], buffer, -1);
+    sprintf(buffer, D_L00_001AEEC0, *(int *)(state + 0x64));
+    text_draw_coloured(D_L00_001AEE98[4], D_L00_001AEE98[5], D_L00_001AEEB0_gp, buffer, -1);
 }
 
 
@@ -112,14 +112,14 @@ typedef int FlareQuad __attribute__((mode(TI)));
 typedef union { FlareQuad bits; float f[4]; } FlareVec;
 typedef struct { char pad[0x20]; unsigned char flags; } FlareTarget;
 
-extern float func_00282E48(void *, void *);
-extern float func_00283CE0(int);
-extern void func_00279BD8(void *, void *);
-extern unsigned long func_0027C878(int);
-extern float func_00282C48(float);
-extern int func_00283CF0(float);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027E018(int, int, int, int, int, int, int, int,
+extern float fast_vec_dist(void *, void *);
+extern float IntToFloat(int);
+extern void gfx_project_world_point_to_screen(void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern float math_fabs(float);
+extern int FloatToInt(float);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int,
                          unsigned long, unsigned long);
 
 typedef struct {
@@ -144,7 +144,7 @@ extern int D_L00_001AED00[];
    through the screen centre, faded by distance and by how far off-centre it is
    (RAC1 draw_lens_flare; func_L08_003F7A48 draws 12). Both table bases are read
    through pointers set before the loop: reload rematerializes them inside it. */
-void func_L00_00382F28(char *object)
+void DrawLevelLensFlare(char *object)
 {
     char *work = *(char **)(object + 0x68);
     FlareVec screen;
@@ -162,11 +162,11 @@ void func_L00_00382F28(char *object)
     }
     if (D_L00_001B90C0.intensity <= 0.0f)
         return;
-    distance = fast_vec_dist(gCameraPosition_L00, work);
+    distance = fast_vec_dist(g_camera_l00_position, work);
     baseSize = D_L00_001AED00;
     center[0] = IntToFloat(D_001A7348[0]);
     center[1] = IntToFloat(D_001A7348[1]);
-    ProjectWorldPointToScreen(&screen, work);
+    gfx_project_world_point_to_screen(&screen, work);
     screen.f[0] = (screen.f[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
     screen.f[1] = (screen.f[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
     delta[0] = center[0] - screen.f[0];
@@ -182,12 +182,12 @@ void func_L00_00382F28(char *object)
             fade = 1.0f;
         else if (fade < 0.0f)
             fade = 0.0f;
-        horizontal = FloatAbs(delta[0]) / center[0] * -5.0f + 5.5f;
+        horizontal = math_fabs(delta[0]) / center[0] * -5.0f + 5.5f;
         if (horizontal > 1.0f)
             horizontal = 1.0f;
         else if (horizontal < 0.0f)
             horizontal = 0.0f;
-        vertical = FloatAbs(delta[1]) / center[1] * -5.0f + 5.5f;
+        vertical = math_fabs(delta[1]) / center[1] * -5.0f + 5.5f;
         if (vertical > 1.0f)
             vertical = 1.0f;
         else if (vertical < 0.0f)

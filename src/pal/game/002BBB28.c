@@ -35,23 +35,23 @@ void func_PAL_002BBB28(char *a0)
 }
 
 
-extern void func_002B9180(char *);
-extern s32 func_00282948(void *);
-extern void func_00300190(char *, char *);
+extern void part_kill(char *);
+extern s32 math_fast_float_d(void *);
+extern void vec_transform_or_copy(char *, char *);
 
 void func_PAL_002BBC10(u8 *a0)
 {
     u8 *s0 = a0;
     u8 *s1 = a0 + 0x20;
 
-    if (func_00282948((char *)s1) != 0) {
-        func_002B9180((char *)s0);
+    if (math_fast_float_d((char *)s1) != 0) {
+        part_kill((char *)s0);
         return;
     }
     {
         u8 *p = s0 + 0x10;
 
-        func_00300190((char *)p, (char *)p);
+        vec_transform_or_copy((char *)p, (char *)p);
     }
     *(f32 *)(s0 + 0xC) = *(f32 *)(s0 + 0xC) + *(f32 *)(s1 + 4);
     if (*(s32 *)(s1) < 5) {

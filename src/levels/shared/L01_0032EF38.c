@@ -25,19 +25,19 @@ typedef struct {
     L01_EF38Payload payload;
 } L01_EF38Particle;
 
-extern L01_EF38Particle *func_002B9030(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
+extern L01_EF38Particle *part_alloc(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
 extern unsigned char *D_L01_001FF110;
 
 /* Creates a short-lived glowing particle at a position with a color, size and lifetime, and returns it. */
-L01_EF38Particle *func_L01_0032EF38(L01_EF38Quad *position, int color, int kind, float scale, float second, int life)
+L01_EF38Particle *part_l01_spawn_glow(L01_EF38Quad *position, int color, int kind, float scale, float second, int life)
 {
     L01_EF38Particle *particle;
     L01_EF38Payload *outPayload;
 
-    particle = AllocParticle(0x34);
+    particle = part_alloc(0x34);
     if (particle) {
         outPayload = &particle->payload;
         qcopy(&particle->position, position);
@@ -49,7 +49,7 @@ L01_EF38Particle *func_L01_0032EF38(L01_EF38Quad *position, int color, int kind,
         particle->b2 = *D_L01_001FF110;
         particle->size = life;
         particle->life = scale * 210000.0f;
-        particle->seed = RandomIntBelow(255);
+        particle->seed = math_random_int_below(255);
         outPayload->color = color;
         outPayload->kind = kind;
         particle->payload.scale = scale;

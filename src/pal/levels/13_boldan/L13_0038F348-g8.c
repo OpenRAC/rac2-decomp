@@ -7,12 +7,12 @@ extern f32 D_L13_001AEBC8 __attribute__((sda));
 extern f32 D_L13_001AEBC0 __attribute__((sda));
 extern f32 D_L13_001AEBF4 __attribute__((nosda));
 extern f32 D_L13_001AEBF8 __attribute__((nosda));
-extern s32 func_002A9640(u8 *, s32, s32);
-extern s32 func_002A7750(u8 *, s32, s32);
-extern s32 func_0029F338(u8 *);
-extern void func_L00_0033E220(float, float, void *, u8 *, s32, s32, s32, s32, s32, s32);
+extern s32 part_find_owned_effect_slot(u8 *, s32, s32);
+extern s32 moby_set_state(u8 *, s32, s32);
+extern s32 moby_mark_spawned(u8 *);
+extern void part_spawn_object_following_effect(float, float, void *, u8 *, s32, s32, s32, s32, s32, s32);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
-extern void func_L01_0031A278(u8 *, f32 *, f32, f32, f32);
+extern void moby_compute_local_point(u8 *, f32 *, f32, f32, f32);
 extern void func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                         float, float);
 
@@ -21,12 +21,12 @@ void func_PAL_L13_0038F348(u8 *a0) {
 
     switch (a0[0x20]) {
     case 0:
-        func_L00_0033E220(210000.0f, 0.75f, &D_L13_001AEBF0, a0, 0x50204040, -1, 1, -1, 0, -1);
-        func_002A7750(a0, 1, -1);
+        part_spawn_object_following_effect(210000.0f, 0.75f, &D_L13_001AEBF0, a0, 0x50204040, -1, 1, -1, 0, -1);
+        moby_set_state(a0, 1, -1);
         break;
     case 1:
-        if (func_002A9640(a0, 0x4010000, 0) != 0 && *s1 == 0)
-            func_002A7750(a0, 2, -1);
+        if (part_find_owned_effect_slot(a0, 0x4010000, 0) != 0 && *s1 == 0)
+            moby_set_state(a0, 2, -1);
         a0[0xA8] = 0xFF;
         break;
     case 2: {
@@ -37,10 +37,10 @@ void func_PAL_L13_0038F348(u8 *a0) {
             f32 first = D_L13_001AEBF8;
             f32 x = D_L13_001AEBF0;
             f32 second = D_L13_001AEBF4;
-            func_L01_0031A278(a0, buf, x, second, first);
+            moby_compute_local_point(a0, buf, x, second, first);
         }
         func_PAL_L00_003FB330(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0, 0.3f, 20.0f);
-        func_0029F338(a0);
+        moby_mark_spawned(a0);
         break;
     }
     }

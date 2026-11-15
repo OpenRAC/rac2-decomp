@@ -6,13 +6,13 @@ typedef int s32;
 
 typedef unsigned char u8;
 
-extern s32 func_001253A8(s32, s32, u8 *, u8 *);
+extern s32 sceCdRead(s32, s32, u8 *, u8 *);
 
-extern s32 func_00124B88(s32);
+extern s32 sceCdSyncS(s32);
 
 typedef unsigned int u32;
 
-extern s32 func_0011F5E0(void);
+extern s32 DIntr(void);
 
 extern s32 func_0011F628(void);
 
@@ -21,42 +21,42 @@ extern void F0b028b34_FUN_00350878(char *a, unsigned int b, int c, int d);
 extern void F0b028b34_FUN_00350808(int a);
 
 /* func_003512B8 : rounds a field to a multiple of 2048 under a semaphore */
-extern s32 func_0011AC60(s32);
+extern s32 WaitSema(s32);
 
-extern s32 func_0011AC40(s32);
+extern s32 SignalSema(s32);
 
 /* func_00351268 : waits, then combines two fields shifted by 11 */
-extern s32 func_0011AC60(s32 a0);
+extern s32 WaitSema(s32 a0);
 
-extern s32 func_0011AC40(s32 a0);
+extern s32 SignalSema(s32 a0);
 
-extern void func_00350A78(int *owner, int *first_address, int *first_count,
+extern void mpeg_vibuf_get_free_regions(int *owner, int *first_address, int *first_count,
                          int *second_address, int *second_count);
 
 /* Reads disc sectors into a buffer and moves the read position forward when it succeeds. */
-s32 func_003506B0(u8 *reader, u8 *dest, s32 byteCount, s32 failFlag) {
+s32 mpeg_read_disc_sectors(u8 *reader, u8 *dest, s32 byteCount, s32 failFlag) {
     u8 readMode[3];
     s32 sectors = byteCount >> 11;
     s32 result = 0;
     readMode[0] = 100; readMode[1] = 1; readMode[2] = 0;
-    StartCdSectorRead(*(s32 *)(reader+4), sectors, dest, readMode);
+    sceCdRead(*(s32 *)(reader+4), sectors, dest, readMode);
     if (failFlag == 0) {
         *(s32 *)(reader+4) += sectors;
-        WaitSCommandDone(0);
+        sceCdSyncS(0);
         result = byteCount;
     }
     return result;
 }
 
 /* Turns a memory address inside the video buffer into a slot number. */
-s32 func_00350750(u8 *buf, s32 addr) {
+s32 mpeg_vibuf_addr_to_slot(u8 *buf, s32 addr) {
     u32 endAddress = ((*(u32 *)(buf + 8) << 4) + *(u32 *)(buf + 4) + 0x10) & 0x0FFFFFFF;
     if (addr == endAddress) return 0;
     return (u32)(addr - *(u32 *)buf) >> 11;
 }
 
 /* Starts DMA channel 3 with the given control value. */
-void func_00350798(u32 control) {
+void mpeg_start_dma3(u32 control) {
     DIntr();
     D_ENABLEW = D_ENABLER | 0x10000;
     D3_CHCR = control;
@@ -65,7 +65,7 @@ void func_00350798(u32 control) {
 }
 
 /* Starts DMA channel 4 with the given control value. */
-void func_00350808(u32 control) {
+void mpeg_start_dma4(u32 control) {
     DIntr();
     D_ENABLEW = D_ENABLER | 0x10000;
     D4_CHCR = control;
@@ -74,15 +74,15 @@ void func_00350808(u32 control) {
 }
 
 /* Builds a DMA tag from an address, flags and size. */
-void func_00350878(unsigned long *tag,unsigned long a1,unsigned long flags,unsigned long quadCount) {
+void scTag2(unsigned long *tag,unsigned long a1,unsigned long flags,unsigned long quadCount) {
  *tag=(a1<<32)|((flags<<32)>>4)|((quadCount<<32)>>32);
 }
 
-extern int func_0011AC20(int *);
-extern int func_00350918(int *);
+extern int CreateSema(int *);
+extern int mpeg_vibuf_reset(int *);
 
 /* Sets up the video input buffer and then resets it. */
-int func_003508A0(int *object, int address, unsigned int buffer, int count, int *records, int capacity)
+int mpeg_vibuf_init(int *object, int address, unsigned int buffer, int count, int *records, int capacity)
 {
     int semaphore[5];
     object[0] = address;
@@ -94,13 +94,13 @@ int func_003508A0(int *object, int address, unsigned int buffer, int count, int 
     semaphore[2] = 1;
     semaphore[1] = 1;
     object[16] = CreateSema(semaphore);
-    ViBufReset(object);
+    mpeg_vibuf_reset(object);
     *(long long *)(object + 18) = 0;
     return 1;
 }
 
 /* Clears the video input buffer, builds its DMA tag chain and starts DMA channel 4. */
-int func_00350918(int *buf)
+int mpeg_vibuf_reset(int *buf)
 {
     int i;
 
@@ -128,7 +128,7 @@ int func_00350918(int *buf)
 }
 
 /* Works out the free space in the video buffer as one or two memory ranges. */
-void func_00350A78(s32 *buf, s32 *firstAddress, s32 *firstCount, s32 *secondAddress, s32 *secondCount) {
+void mpeg_vibuf_get_free_regions(s32 *buf, s32 *firstAddress, s32 *firstCount, s32 *secondAddress, s32 *secondCount) {
     s32 writePos, freeBytes;
     WaitSema(buf[16]);
     freeBytes = (s32)((long)buf[2] - (long)(buf[4]+2)) * 2048 - buf[5];

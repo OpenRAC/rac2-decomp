@@ -12,26 +12,26 @@ typedef struct Scene {
     u8 *objects[0];
 } Scene;
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern Scene D_L10_001BD380;
 extern u8 D_L10_00296E90[];
 extern u8 D_L10_00296EB0[];
 extern u8 D_L10_001A93E0[64] __attribute__((sda));
 extern u8 D_L10_001B9680[];
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
 
 /* In the level 10 story scenes, finds the scene object and moves four marker points to
    sit around it. The scene ends when its frame runs out. */
-void func_L10_003170D0(void) {
+void hrugis_update_scene_markers(void) {
     f32 tmp[4] __attribute__((aligned(16)));
     s32 low, high, slot, i, j;
     u8 *target;
     u8 *dst, *src;
 
-    if (gCurrentMapIndex != 10) {
+    if (g_current_map_index != 10) {
         return;
     }
     low = -1;

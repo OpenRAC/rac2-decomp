@@ -12,20 +12,20 @@ typedef struct {
     unsigned long long tag, texture, control, blend;
 } BeamPacket;
 
-extern long long func_0027C878(int);
+extern long long GetEffectTextureDescriptor(int);
 extern int func_001163B0(void);
-extern float func_002A7878(float, float);
-extern void func_L00_003C1D30(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282DD8(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(char *, char *, int);
+extern float math_random_float_range(float, float);
+extern void sprite_reset_large_record(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecCross(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(char *, char *, int);
 extern char D_L09_001B9A00[];
 
 /* Draws three textured strips between the two stored endpoints, facing the camera. */
-void func_L09_003AF060(char *object)
+void DrawLayeredBeamQuads(char *object)
 {
     BeamPacket beam, glow, core;
     BeamVector matrix[4];
@@ -35,7 +35,7 @@ void func_L09_003AF060(char *object)
     beam.texture = GetEffectTextureDescriptor(16);
     beam.control = 0x0000FF9000000260ULL;
     beam.tag = 0;
-    beam.blend = 0x8000000040ULL | ((unsigned long long)(Rand() % 2 + 1) << 2);
+    beam.blend = 0x8000000040ULL | ((unsigned long long)(func_001163B0() % 2 + 1) << 2);
     beam.colors[1] = 0x7F081840;
     beam.colors[0] = 0x7F081840;
     beam.colors[3] = 0x7F081840;
@@ -65,16 +65,16 @@ void func_L09_003AF060(char *object)
     beamWidth.w = 1.0f;
     glowWidth.w = 1.0f;
     coreWidth.w = 1.0f;
-    coreWidth.z = RandomFloatRange(0.2f, 0.25f);
-    beamWidth.z = RandomFloatRange(0.3f, 0.4f);
+    coreWidth.z = math_random_float_range(0.2f, 0.25f);
+    beamWidth.z = math_random_float_range(0.3f, 0.4f);
     glowWidth.z = beamWidth.z + beamWidth.z;
     coreWidth.z *= *(float *)(state + 0x50);
     glowWidth.z *= *(float *)(state + 0x50);
     beamWidth.z *= *(float *)(state + 0x50);
 
-    ResetLargeSpriteRecord(&beam);
-    ResetLargeSpriteRecord(&glow);
-    ResetLargeSpriteRecord(&core);
+    sprite_reset_large_record(&beam);
+    sprite_reset_large_record(&glow);
+    sprite_reset_large_record(&core);
     beam.uv[0] = 0;
     beam.uv[1] = 0;
     beam.uv[2] = 0;

@@ -2,10 +2,10 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vec4;
-extern void func_00283098(float *, const float *, const float *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(float *, const float *, const float *);
-extern int func_00277258(void *position, int flags, char *self, float radius);
+extern void matrix_mul_vec3(float *, const float *, const float *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(float *, const float *, const float *);
+extern int coll_test_point(void *position, int flags, char *self, float radius);
 typedef struct {
     char pad[0x18];
     char *hit;
@@ -17,7 +17,7 @@ typedef struct {
 extern Collision D_L13_001BFD00;
 
 /* Tests whether a creature would hit something and, if so, moves it to the contact point. */
-int func_L13_0040A2C8(char *object, char *record) {
+int creature_push_out_of_coll(char *object, char *record) {
     int result;
     Vec4 position;
     Vec4 offset;
@@ -28,7 +28,7 @@ int func_L13_0040A2C8(char *object, char *record) {
     offset.q = initial.q;
     matrix_mul_vec3((float *)&offset, (float *)&offset, (float *)(object + 0xC0));
     FastVecAdd(&position, origin, &offset);
-    if (!TestPointAgainstCollision(&position, *(int *)(record + 0x38) & 2, object, *(float *)record)) {
+    if (!coll_test_point(&position, *(int *)(record + 0x38) & 2, object, *(float *)record)) {
         result = 0;
         goto done;
     }

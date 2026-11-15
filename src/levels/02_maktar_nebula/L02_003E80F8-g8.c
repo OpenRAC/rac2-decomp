@@ -2,9 +2,9 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { float vertex[4][4]; unsigned int color[4]; float uv[4][2]; unsigned long long state[4]; } Packet __attribute__((aligned(16)));
-extern int D_L02_001B30C8;
-extern char *D_L02_001B359C;
-extern unsigned short *D_L02_001FC060[];
+extern int g_frame_l02_counter;
+extern char *g_moby_l02_pool;
+extern unsigned short *g_entity_group_lists[];
 extern int D_L02_001B0A68[] __attribute__((sda)), D_L02_001B0A98[] __attribute__((sda));
 extern int D_L02_001B0A68_gp SDATA(D_L02_001B0A68), D_L02_001B0A98_gp SDATA(D_L02_001B0A98);
 extern float D_L02_001B0A78[][2] SDATA(D_L02_001B0A78);
@@ -16,26 +16,26 @@ extern unsigned int D_L02_001B0B38[] SDATA(D_L02_001B0B38);
 extern float D_L02_001B0B40 __attribute__((sda));
 extern float D_L02_001B0B48[][2] MACRO_ADDR;
 extern float D_L02_001B0B48_gp[][2] SDATA(D_L02_001B0B48);
-extern char D_L02_001BA500[];
-extern float func_00283CE0(int);
-extern void func_00283410(void *, void *), func_0029FC20(void *, int, void *), func_002830C0(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern void func_00283788(void *, void *, void *);
-extern void func_L02_002EF968(void *, int, int, void *, void *, int);
-extern void func_00282C88(void *), func_002833F0(void *, void *), func_00283098(void *, void *, void *);
-extern void func_00283738(void *, void *, void *), func_00280B90(void *, void *, int);
-extern unsigned long long func_0027C878(int);
-extern void func_00283388(void *), func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float), func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float), func_002A7940(void);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_00281EB8(void *, int, unsigned int, int, float, float, float);
+extern char g_camera_l02_position[];
+extern float IntToFloat(int);
+extern void euler_to_matrix(void *, void *), moby_transform_joint_point(void *, int, void *), transform_vector(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern void multiply_matrix(void *, void *, void *);
+extern void FillQuadPacket(void *, int, int, void *, void *, int);
+extern void vec_clear_128(void *), euler_rotation_basis(void *, void *), matrix_mul_vec3(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *), draw_world_quad(void *, void *, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void set_identity_matrix(void *), FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float), FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float), math_random_angle(void);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float, float);
 
 /* Draws the actor's object group as rotating quads, then a mirrored quad and three effects per
  * visible object. Each bound of the first vertex loop is built in two steps beside its test:
  * loop.c moves such a pair out of the loop after the copy of offsetAddress, while a single load
  * would stay ahead of that copy. */
-void func_L02_003E80F8(char *actor) {
+void DrawRotatingObjectGroupEffects(char *actor) {
     float matrices[32][16] __attribute__((aligned(16)));
     float rotation[16] __attribute__((aligned(16)));
     unsigned int visible[32];
@@ -57,20 +57,20 @@ void func_L02_003E80F8(char *actor) {
     probe[0] = 30.0f;
     probe[3] = 1.0f;
     *(Quad *)point = 0;
-    frame = IntToFloat(gFrameCounter_L02 % 600);
+    frame = IntToFloat(g_frame_l02_counter % 600);
     point[0] = (frame * 0.0016666667f + frame * 0.0016666667f) * 3.1415927f - 3.1415927f;
     *(Quad *)angles = *(Quad *)point;
     euler_to_matrix(rotation, angles);
-    entry = gEntityGroupLists[*(unsigned char *)(actor + 0x21)];
+    entry = g_entity_group_lists[*(unsigned char *)(actor + 0x21)];
     while (count < 32) {
         char *object;
         id = *entry;
-        object = gMobyPool_L02 + (id & 0x7FFF) * 0x100;
+        object = g_moby_l02_pool + (id & 0x7FFF) * 0x100;
         visible[count] = (*(unsigned short *)(object + 0x7C) >> 15) ^ 1;
-        TransformMobyJointPoint(object, 0, matrices[count]);
+        moby_transform_joint_point(object, 0, matrices[count]);
         transform_vector(point, probe, matrices[count]);
         point[3] = 30.0f;
-        if (FastMathHelperA(point, 512.0f) != -1) {
+        if (math_fast_helper_a(point, 512.0f) != -1) {
             multiply_matrix(matrices[count], matrices[count], rotation);
             count++;
         }
@@ -80,7 +80,7 @@ void func_L02_003E80F8(char *actor) {
     FillQuadPacket(packet + 1, D_L02_001B0A68[1], D_L02_001B0A98[2], D_L02_001B0A78, D_L02_001B0AF0_gp, 1);
     packet[0].color[1] = packet[0].color[3] = D_L02_001B0A98[1];
     packet[1].color[1] = packet[1].color[3] = D_L02_001B0A98[3];
-    ClearVector128(angles);
+    vec_clear_128(angles);
     angles[0] = 0.3926991f;
     euler_rotation_basis(tilt, angles);
     for (i = 0; i < 2; i++) {
@@ -113,7 +113,7 @@ void func_L02_003E80F8(char *actor) {
         int vertex;
         float *geometry;
         if (!visible[objectIndex]) continue;
-        FastVecSub(point, gCameraPosition_L02, matrices[objectIndex] + 12);
+        FastVecSub(point, g_camera_l02_position, matrices[objectIndex] + 12);
         FastVecCross(normal, matrices[objectIndex], point);
         normal[3] = 1.0f;
         qcopy(identity + 12, matrices[objectIndex] + 12);
@@ -151,16 +151,16 @@ void func_L02_003E80F8(char *actor) {
         offset[0] = 2.666f;
         offset[3] = 1.0f;
         transform_vector(offset, offsetAddress, matrices[objectIndex]);
-        frame = RandomFloatRange(0.0f, 1.0f);
+        frame = math_random_float_range(0.0f, 1.0f);
         color = FastTweenColor(D_L02_001B0A98_gp, D_L02_001B0A98[1], frame);
-        frame = RandomAngle();
-        DrawBillboardQuad_00281EB8(offset, 11, color, 1, 2.0f, 0.0f, frame);
-        frame = RandomFloatRange(0.0f, 1.0f);
+        frame = math_random_angle();
+        gfx_draw_billboard_quad(offset, 11, color, 1, 2.0f, 0.0f, frame);
+        frame = math_random_float_range(0.0f, 1.0f);
         color = FastTweenColor(D_L02_001B0A98[2], D_L02_001B0A98[3], frame);
-        frame = RandomAngle();
-        DrawBillboardQuad_00281EB8(offset, 11, color, 1, 2.75f, 0.0f, frame);
-        frame = RandomAngle();
-        DrawBillboardQuad_00281EB8(offset, 49, color, 1, 2.75f, 0.0f, frame);
+        frame = math_random_angle();
+        gfx_draw_billboard_quad(offset, 11, color, 1, 2.75f, 0.0f, frame);
+        frame = math_random_angle();
+        gfx_draw_billboard_quad(offset, 49, color, 1, 2.75f, 0.0f, frame);
     }
     }
 }

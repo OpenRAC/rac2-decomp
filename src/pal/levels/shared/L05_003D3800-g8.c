@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_L05_003CFC28(int);
+extern int moby_class_id_to_table_index(int);
 extern float D_L05_001AFB68 __attribute__((sda));
-extern void func_002E5DA0(int, int, char *, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 extern void func_L05_003CFB90(char *, char *);
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 typedef struct {
     char pad000[0x140];
     float f140[4];
@@ -22,11 +23,11 @@ extern ShakeCamera_003CFAB8 D_L05_001B9580;
  * shares them after scheduling. */
 void func_PAL_L05_003D3800(char *obj)
 {
-    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * func_L05_003CFC28(*(short *)(obj + 0xAA)));
+    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * moby_class_id_to_table_index(*(short *)(obj + 0xAA)));
 
-    if (func_00282E48(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
+    if (fast_vec_dist(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
         func_L05_003CFB90(obj, (char *)D_L05_001B9580.f140);
-        func_002E5DA0(7, 0, obj, 0xFBF);
+        snd_play_from_class_bank(7, 0, obj, 0xFBF);
         if (*(short *)(obj + 0xAA) == 0x955) {
             D_L05_001B9580.f160 = 0.05f;
             D_L05_001B9580.f168 = 0x19;

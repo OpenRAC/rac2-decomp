@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char reserved00[0x14];
@@ -7,7 +8,7 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 extern void func_0029C8B0(int);
 
@@ -15,10 +16,10 @@ int func_PAL_002D4180(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -33,20 +34,20 @@ return_value:
     return result;
 }
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
 extern void func_0029C8F0(void);
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 /* Implementation matching decompiled output */
 long func_PAL_002D4208(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C8F0();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
@@ -55,9 +56,9 @@ extern void func_0029C960(void);
 /* Candidate function: FUN_002d3390 */
 unsigned long long func_PAL_002D4308(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C960();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -79,18 +80,18 @@ typedef struct {
     int message;
     int flags;
 } MenuGameState;
-extern MenuGameState D_00138180;
+extern MenuGameState g_pad_state;
 extern void func_0029C5D0(int);
 
 int func_PAL_002D4378(void)
 {
-    int flags = D_00138180.flags;
+    int flags = g_pad_state.flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -101,16 +102,16 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_0029C5D0(D_00138180.message);
+        func_0029C5D0(g_pad_state.message);
     return result;
 }
 
 extern void func_0029C5A0(void);
 
 int func_PAL_002D4400(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C5A0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 

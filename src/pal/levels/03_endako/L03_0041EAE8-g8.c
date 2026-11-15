@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef signed int s32;
 extern u8 *D_L03_001B2A1C __attribute__((sda));
 extern s32 D_L03_001B108C __attribute__((sda));
-extern u8 *func_002BDCE8(void *p, float f0, float f1, float f2, int z, void *local,
+extern u8 *SpawnSpinningSparkParticle(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
-extern s32 func_002B38B8();
+extern s32 flag_is_third_pending_set();
 extern u8 *D_L03_001FB5A0[];
 typedef struct {
     u8 pad00[0x30];
@@ -19,9 +20,9 @@ typedef struct {
 } L03Block;
 extern L03Block D_L03_001BD680;
 extern s32 D_L03_001A8F00 __attribute__((sda));
-extern void func_002A0488(u8 *a0, s32 a1, s32 a2, s32 a3);
-extern s32 func_L02_003272D8(u8 *a0);
-extern void func_002AEC18(u8 *a0, s32 a1);
+extern void set_moby_color(u8 *a0, s32 a1, s32 a2, s32 a3);
+extern s32 moby_pack_handle(u8 *a0);
+extern void moby_set_light_color(u8 *a0, s32 a1);
 
 void func_PAL_L03_0041EAE8(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -61,13 +62,13 @@ void func_PAL_L03_0041EAE8(u8 *entity) {
                     arg2 = 0xB0;
                     arg3 = 0xF0;
                 }
-                func_002A0488(obj, arg1, arg2, arg3);
+                set_moby_color(obj, arg1, arg2, arg3);
                 return;
             other:
                 if (D_L03_001BD680.field34 < 0x395) {
-                    *(s32 *)(state + 4) = func_L02_003272D8(obj);
+                    *(s32 *)(state + 4) = moby_pack_handle(obj);
                 } else {
-                    func_002AEC18(obj, *(s32 *)(state + 4));
+                    moby_set_light_color(obj, *(s32 *)(state + 4));
                 }
             }
         }

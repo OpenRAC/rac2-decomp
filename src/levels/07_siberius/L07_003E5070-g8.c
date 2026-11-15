@@ -10,16 +10,16 @@ extern int D_L07_001B0A80[] __attribute__((sda));
 extern int D_L07_001B0A80_gp[] SDATA(D_L07_001B0A80);
 extern float D_L07_001B0A60[][2] SDATA(D_L07_001B0A60);
 extern float D_L07_0029F5B0[][4];
-extern void func_00283658(void *, void *);
-extern void func_002833F0(void *, void *);
-extern int func_L01_0031BC68(float, int, int);
-extern int func_00283D38(float, int, int);
-extern void func_L02_002EF968(DrawPacket5070 *, int, int, void *, void *, int);
-extern void func_L01_002E1510(DrawPacket5070 *, int, void *, int, void *);
+extern void copy_matrix_rotation(void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern int PulseColor(float, int, int);
+extern int FastTweenColor(float, int, int);
+extern void FillQuadPacket(DrawPacket5070 *, int, int, void *, void *, int);
+extern void gfx_transform_and_draw_entries(DrawPacket5070 *, int, void *, int, void *);
 /* Build two packets and submit them. The frame has room for a third: retail reserves 0x1B0 bytes,
    exactly 3 * sizeof(DrawPacket5070), contiguous from $sp + 0, and uses only the first two. */
 /* Draws a glowing disc at the object's position, with colours that change with its state. */
-void func_L07_003E5070(char *actor)
+void entity_draw_glow_disc(char *actor)
 {
     DrawPacket5070 packets[3];
     float rotation[12] __attribute__((aligned(16)));
@@ -37,5 +37,5 @@ void func_L07_003E5070(char *actor)
     colour = FastTweenColor(*(float *)(state + 0x18), colour & 0xffffff, colour);
     FillQuadPacket(&packets[0], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[0], 1);
     FillQuadPacket(&packets[1], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[4], 1);
-    TransformAndDrawEntries(packets, 2, rotation, 32, world);
+    gfx_transform_and_draw_entries(packets, 2, rotation, 32, world);
 }

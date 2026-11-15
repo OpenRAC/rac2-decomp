@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,11 +24,11 @@
  */
 #include "common.h"
 
-extern f32 func_00283CE0();
-extern s32 func_00283CF0(f32);
+extern f32 IntToFloat();
+extern s32 FloatToInt(f32);
 
 /* Fades a sound volume from loud to quiet as the distance grows from the near limit to the far limit. */
-s32 func_002E45C8(s32 curve, f32 distance, f32 nearDistance, f32 farDistance) {
+s32 snd_compute_falloff(s32 curve, f32 distance, f32 nearDistance, f32 farDistance) {
     f32 remaining;
     f32 span;
     f32 volumeRange;

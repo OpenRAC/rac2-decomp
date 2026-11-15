@@ -1,21 +1,21 @@
 #include "common.h"
 typedef struct { int active; unsigned char kind; char pad05[0xDB]; } WeaponRecord;
 typedef struct { short count; short index[31]; } ProjectileList;
-extern char *D_0018C0B0;
-extern unsigned char D_00139568[];
-extern WeaponRecord D_L00_00262570[];
+extern char *g_hero_moby;
+extern unsigned char g_item_slot_to_record[];
+extern WeaponRecord g_weapon_l00_table[];
 extern ProjectileList D_L00_001B1FF0 MACRO_ADDR;
 extern s32 D_L00_001B1E9C_base __asm__("D_L00_001B1E9C") MACRO_ADDR;
 extern s16 D_L00_001B1FF0_list[] __asm__("D_L00_001B1FF0") MACRO_ADDR;
-extern char *func_0029EFD0(int);
-extern int func_002FED90(void *, int, float, float, float);
-extern void func_002AB650(u8 *);
+extern char *CreateMoby(int);
+extern int part_alloc_effect_slot(void *, int, float, float, float);
+extern void hero_copy_field_to_moby(u8 *);
 extern void func_002A0F48(char *);
-extern void func_002ACAD0(int, unsigned short *), func_002ACA50(int, short *, short);
+extern void RemoveMobyFromIndexList(int, unsigned short *), AddMobyToIndexList(int, short *, short);
 /* Separate predicates match the weapon pool's two active families. */
 static __inline__ int projectile_standard_weapon(void) {
-    unsigned char *game = gItemSlotToRecord;
-    WeaponRecord *entry = gWeaponTable_L00 + game[0x11];
+    unsigned char *game = g_item_slot_to_record;
+    WeaponRecord *entry = g_weapon_l00_table + game[0x11];
     int result;
     if (!entry->active) goto no;
     if (entry->kind == 2) goto yes;
@@ -29,14 +29,14 @@ done:
     return result;
 }
 static __inline__ int projectile_upgraded_weapon(void) {
-    unsigned char *game = gItemSlotToRecord;
-    WeaponRecord *entry = gWeaponTable_L00 + game[0x11];
+    unsigned char *game = g_item_slot_to_record;
+    WeaponRecord *entry = g_weapon_l00_table + game[0x11];
     int result = 0;
     if (entry->active) result = entry->kind == 3;
     return result;
 }
 /* Creates a projectile and retires the oldest live entries when the shared list is full. */
-char *func_L00_00398810(char *position, char *direction) {
+char *decoy_create_projectile(char *position, char *direction) {
     char *actor = CreateMoby(0xCB /* Decoy */);
     char *state, *hero, *oldest;
     int i, count, age, oldestAge;
@@ -48,15 +48,15 @@ char *func_L00_00398810(char *position, char *direction) {
         qcopy(actor + 0x10, position);
         qcopy(state + 0x10, direction);
         *(unsigned char *)(actor + 0x20) = 0;
-        hero = gHeroMoby_0018C0B0;
+        hero = g_hero_moby;
         qcopy(actor + 0xC0, hero + 0xC0);
         qcopy(actor + 0xD0, hero + 0xD0);
         qcopy(actor + 0xE0, hero + 0xE0);
         *(int *)(state + 0x30) = 0;
         *(int *)(state + 0x2C) = 0;
         *(int *)(state + 0x28) = 0;
-        *(int *)(state + 0x20) = AllocEffectSlot_002FED90(actor, 0, 1.0f, 1.0f, 1.0f);
-        CopyHeroField38ToMoby((u8 *)actor);
+        *(int *)(state + 0x20) = part_alloc_effect_slot(actor, 0, 1.0f, 1.0f, 1.0f);
+        hero_copy_field_to_moby((u8 *)actor);
         *(unsigned char *)(state + 7) = 250;
         *(short *)(state + 0xC) = 4;
         *(short *)(state + 0xE) = 15;

@@ -9,48 +9,48 @@ extern int D_001B27C8;
 
 extern float D_001B00F8 __attribute__((sda)), D_001B0108 __attribute__((sda)), D_001B010C __attribute__((sda));
 extern int D_001B00FC __attribute__((sda)), D_001B0100 __attribute__((sda));
-extern int D_001A8BB0 __attribute__((sda));
+extern int g_current_game_mode __attribute__((sda));
 extern int D_001A8CFC[] MACRO_ADDR;
 extern int D_0018C0B4[], D_00138324[];
 extern char *D_001AD7EC[] MACRO_ADDR;
 extern char *D_001B5390[];
-extern char D_001BAFC0[], D_001BAF80[];
+extern char D_001BAFC0[], g_collision_hit[];
 typedef struct { char pad[0x2290]; char *target; int state; } PlayerState;
 extern PlayerState D_00189E20_9;
 extern float D_0022AC90[][2];
-extern void func_002B00B0(char *, char *, int);
-extern void func_002FE8D8(char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern int func_002761F8(char *, char *, int, char *, int);
-extern int func_00278E78(void);
-extern int func_002B0CE0(int, int, int);
-extern float func_002A7940(void), func_002A78D8(float, float);
-extern void func_0029B758(int, void (*)(void));
-extern void func_00326A10(void), func_00335840(void), func_00317390(void);
-extern void func_002FEE70(char *, char *, int);
-extern void func_00300190(char *, char *), func_00300248(char *, char *);
-extern void func_002FE880(char *, char *, float);
-extern void func_00282C88(char *);
-extern void func_0026F748(int, int);
-extern void func_00335798(char *, char *, char *);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002E5CF8(int, int, char *);
-extern void func_00326CB8(char *), func_00327848(char *), func_00326D90(char *), func_00327A60(char *);
-extern void func_00326BD8(void);
-extern int func_00282948(char *), func_002FE9D0(char *), func_00300540(int);
-extern float func_00282DF0(char *);
-extern void func_0032DA58(char *, char *, char *, float);
-extern void func_00327B40(char *), func_002FEE50(int), func_0029F338(char *);
-extern void func_0027D098(void (*)(char *), char *), func_00327D08(char *);
-extern void func_00283658(char *, char *);
-extern void func_002AB6D8(char *, char *);
-extern int func_002AD0E0(char *, char *, char *, char *, char *, char *);
-extern void func_002833F0(char *, char *), func_002A9288(char *, float);
+extern void gravity_get_dir_at_object(char *, char *, int);
+extern void moby_get_facing_direction(char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern int CollLine(char *, char *, int, char *, int);
+extern int GetCollHitMaterial(void);
+extern int ForceClaimNotice(int, int, int);
+extern float math_random_angle(void), math_random_signed_float_range(float, float);
+extern void level_store_value_pair(int, void (*)(void));
+extern void hud_draw_timer_a(void), cam_call_helper(void), moby_set_linked_flag(void);
+extern void part_steer_effect_direction(char *, char *, int);
+extern void vec_transform_or_copy(char *, char *), shop_trigger_current_state_effect(char *, char *);
+extern void vec_add_object_direction_scaled(char *, char *, float);
+extern void vec_clear_128(char *);
+extern void stub_empty_8(int, int);
+extern void part_setup_object_effect_entry(char *, char *, char *);
+extern void anim_start_blended(char *, int, int, int);
+extern void PlayMobySound(int, int, char *);
+extern void pad_clamp_stick_to_vars(char *), moby_steer_heading_to_target(char *), moby_move_with_friction(char *), moby_notify_nearby_of_kind(char *);
+extern void snd_play_on_threshold_cross(void);
+extern int math_fast_float_d(char *), CollideSweptSphere(char *), weapon_get_group(int);
+extern float FastVecLength(char *);
+extern void part_spawn_blast_effect_moby(char *, char *, char *, float);
+extern void DamageNearbyMobys(char *), table_clear_entry_flag(int), moby_mark_spawned(char *);
+extern void gfx_register_final_draw_callback(void (*)(char *), char *), ring_update_if_below_threshold(char *);
+extern void copy_matrix_rotation(char *, char *);
+extern void mat_get_euler_angles(char *, char *);
+extern int moby_transform_point_and_rotation_by_parent(char *, char *, char *, char *, char *, char *);
+extern void euler_rotation_basis(char *, char *), part_queue_ground_shadow(char *, float);
 
 /* Updates a thrown object through its states: flying, hitting something, bouncing, spinning and finally going away. */
-void func_00326198(char *object)
+void thrown_object_update(char *object)
 {
     char oldpos[16], ahead[16], behind[16];
     char *data = *(char **)(object + 0x68);
@@ -58,10 +58,10 @@ void func_00326198(char *object)
     int i, result;
     float (*randoms)[2];
     if ((unsigned char)object[0x20] >= 2) {
-        GetGravityDirectionAtObject(object, D_001B27B0, 1);
+        gravity_get_dir_at_object(object, D_001B27B0, 1);
     } else {
         char *p = object + 0x10;
-        GetObjectFacingDirection(p, D_001B27B0);
+        moby_get_facing_direction(p, D_001B27B0);
     }
     FastVecScale(D_001B27B0, D_001B27B0, -1.0f);
     FastVecScale(ahead, object + 0xE0, D_001B0108);
@@ -95,20 +95,20 @@ void func_00326198(char *object)
         i = 97;
         do {
             i--;
-            (*randoms)[0] = RandomAngle();
-            (*randoms)[1] = RandomSignedFloatRange(720.0f, 2160.0f) * 0.0002908882452175021f;
+            (*randoms)[0] = math_random_angle();
+            (*randoms)[1] = math_random_signed_float_range(720.0f, 2160.0f) * 0.0002908882452175021f;
             randoms++;
         } while (i >= 0);
-        if (D_001A8CFC[0]) StoreLevelObjectValuePair(0, DrawHudTimer_00326A10);
+        if (D_001A8CFC[0]) level_store_value_pair(0, hud_draw_timer_a);
     }
         /* fall through */
     case 1: {
         player = &D_00189E20_9;
-        if (player->state == 98 || gCurrentGameMode == 2 || player->state == 111 || player->state == 100 || player->state == 99 ||
+        if (player->state == 98 || g_current_game_mode == 2 || player->state == 111 || player->state == 100 || player->state == 99 ||
             player->state == 23 || player->state == 24 || player->state == 129 || player->state == 39) {
-            CallCameraHelper();
+            cam_call_helper();
             object[0x20] = 7;
-            SetLinkedMobyFlag();
+            moby_set_linked_flag();
             *(int *)(data + 0x20) = 0;
             break;
         }
@@ -117,21 +117,21 @@ void func_00326198(char *object)
             *(float *)(object + 0x2C) = 0.0181099995970726f;
         qcopy(oldpos, object + 0x10);
         FastVecAdd(object + 0x10, object + 0x10, data);
-        SteerEffectDirection(D_001B27CC[0], data, 0);
-        TransformVectorOrCopy(object + 0x10, object + 0x10);
-        TriggerCurrentStateEffect(data, data);
-        AddObjectDirectionScaled(object + 0x10, data, 0.003055555745959282f);
+        part_steer_effect_direction(D_001B27CC[0], data, 0);
+        vec_transform_or_copy(object + 0x10, object + 0x10);
+        shop_trigger_current_state_effect(data, data);
+        vec_add_object_direction_scaled(object + 0x10, data, 0.003055555745959282f);
         if (CollLine(oldpos, object + 0x10, 2, object, 0)) {
-            char *hitinfo = gCollisionHit;
+            char *hitinfo = g_collision_hit;
             char *hit = *(char **)(hitinfo + 0x18);
             if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907 /* Spiderbot Glove */)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
-            ClearVector128(data);
+            vec_clear_128(data);
             ForceClaimNotice(6, 0, 1);
-            EmptyStubF748(28, 1);
-            SetupObjectEffectEntry(object + 0x10, object + 0xF0, object);
+            stub_empty_8(28, 1);
+            part_setup_object_effect_entry(object + 0x10, object + 0xF0, object);
             object[0x20] = 2;
-            StartAnimationBlended(object, 1, 0, 10);
+            anim_start_blended(object, 1, 0, 10);
             *(int *)(object + 0x48) = 0;
             return;
         }
@@ -140,20 +140,20 @@ void func_00326198(char *object)
     case 2: {
         object[0x20] = 3;
         PlayMobySound(2, 0, object);
-        if (D_0018C0B4[0] != 28 || gCurrentGameMode == 2) {
-            CallCameraHelper();
+        if (D_0018C0B4[0] != 28 || g_current_game_mode == 2) {
+            cam_call_helper();
             object[0x20] = 9;
             *(int *)(data + 0x20) = 0;
         }
         break;
     }
     case 3: {
-        ClampStickInputToVars(object);
-        SteerObjectHeadingTowardTarget(object);
-        MoveObjectWithFriction(object);
-        NotifyNearbyObjectsOfKind(object);
-        PlaySoundOnThresholdCross();
-        if (FastFloatHelperD((char *)&D_001B27C0)) {
+        pad_clamp_stick_to_vars(object);
+        moby_steer_heading_to_target(object);
+        moby_move_with_friction(object);
+        moby_notify_nearby_of_kind(object);
+        snd_play_on_threshold_cross();
+        if (math_fast_float_d((char *)&D_001B27C0)) {
             object[0x20] = 9;
             *(int *)(data + 0x20) = 10;
         }
@@ -161,8 +161,8 @@ void func_00326198(char *object)
             object[0x20] = 9;
             *(int *)(data + 0x20) = 10;
         }
-        if (D_0018C0B4[0] != 28 || gCurrentGameMode == 2) {
-            CallCameraHelper();
+        if (D_0018C0B4[0] != 28 || g_current_game_mode == 2) {
+            cam_call_helper();
             object[0x20] = 9;
             *(int *)(data + 0x20) = 0;
         }
@@ -178,9 +178,9 @@ void func_00326198(char *object)
         } collision;
         qcopy(oldpos, object + 0x10);
         FastVecAdd(object + 0x10, object + 0x10, data);
-        AddObjectDirectionScaled(object + 0x10, data, 0.006111111491918564f);
-        TransformVectorOrCopy(object + 0x10, object + 0x10);
-        TriggerCurrentStateEffect(data, data);
+        vec_add_object_direction_scaled(object + 0x10, data, 0.006111111491918564f);
+        vec_transform_or_copy(object + 0x10, object + 0x10);
+        shop_trigger_current_state_effect(data, data);
         qcopy(collision.start, oldpos);
         qcopy(collision.end, object + 0x10);
         qcopy(collision.velocity, data);
@@ -198,12 +198,12 @@ void func_00326198(char *object)
         qcopy(object + 0x10, collision.end);
         qcopy(data, collision.velocity);
         if (result == 2) {
-            if (GetWeaponGroup(collision.surface) || collision.surface == 12) {
+            if (weapon_get_group(collision.surface) || collision.surface == 12) {
                 object[0x20] = 9;
                 *(int *)(data + 0x20) = 10;
             } else {
                 object[0x20] = result;
-                ClearVector128(data);
+                vec_clear_128(data);
             }
         } else if (FastVecLength(data) > 0.4f) {
             object[0x20] = 9;
@@ -213,19 +213,19 @@ void func_00326198(char *object)
     }
     case 9: {
         object[0x20] = 5;
-        SetLinkedMobyFlag();
+        moby_set_linked_flag();
     }
         /* fall through */
     case 5: {
         char direction[16];
-        if (FastFloatHelperD(data + 0x20)) {
+        if (math_fast_float_d(data + 0x20)) {
             vec_scale_to_length(direction, object + 0xC0, 1.0f);
-            SpawnBlastEffectMoby(object, object + 0x10, direction, *(float *)(object + 0x18));
+            part_spawn_blast_effect_moby(object, object + 0x10, direction, *(float *)(object + 0x18));
             PlayMobySound(1, 0, object);
             object[0x20] = 6;
             *(unsigned short *)(object + 0x34) |= 0x41;
-            if (D_0018C0B4[0] != 28 || gCurrentGameMode == 2) {
-                CallCameraHelper();
+            if (D_0018C0B4[0] != 28 || g_current_game_mode == 2) {
+                cam_call_helper();
                 *(int *)(data + 0x20) = 0;
             } else *(int *)(data + 0x20) = D_001B0100;
             *(int *)(data + 0x24) = 0;
@@ -235,30 +235,30 @@ void func_00326198(char *object)
     case 6: {
         DamageNearbyMobys(object);
         *(float *)(data + 0x24) += D_001B00F8 * (1.0f / 60.0f);
-        if (FastFloatHelperD(data + 0x20) && !*(int *)(data + 0x28)) object[0x20] = 8;
+        if (math_fast_float_d(data + 0x20) && !*(int *)(data + 0x28)) object[0x20] = 8;
         break;
     }
     case 7: {
-        if (FastFloatHelperD(data + 0x20)) object[0x20] = 8;
+        if (math_fast_float_d(data + 0x20)) object[0x20] = 8;
         break;
     }
     case 8: {
-        if (D_0018C0B4[0] == 28) EmptyStubF748(0, 1);
-        if (*(short *)(D_001B5390[0] + 0x86) == 27) CallCameraHelper();
+        if (D_0018C0B4[0] == 28) stub_empty_8(0, 1);
+        if (*(short *)(D_001B5390[0] + 0x86) == 27) cam_call_helper();
         D_001B00FC = 0;
-        StoreLevelObjectValuePair(0, 0);
-        ClearEntryFlag((int)D_001B27CC_gp);
-        MarkMobySpawned(object);
+        level_store_value_pair(0, 0);
+        table_clear_entry_flag((int)D_001B27CC_gp);
+        moby_mark_spawned(object);
         return;
     }
     }
-    RegisterFinalDrawCallback(UpdateRingIfBelowThreshold, object);
+    gfx_register_final_draw_callback(ring_update_if_below_threshold, object);
     if ((unsigned char)object[0x20] >= 2 && D_001AD7EC[0]) {
         char angles[16], adjusted[16], matrix[64];
         copy_matrix_rotation(matrix, object + 0xC0);
-        GetEulerAnglesFromMatrix(matrix, angles);
-        TransformPointAndRotationByParent(object, D_001AD7EC[0], object + 0x10, angles, object + 0x10, adjusted);
+        mat_get_euler_angles(matrix, angles);
+        moby_transform_point_and_rotation_by_parent(object, D_001AD7EC[0], object + 0x10, angles, object + 0x10, adjusted);
         euler_rotation_basis(object + 0xC0, adjusted);
     }
-    QueueGroundShadow(object, D_001B010C);
+    part_queue_ground_shadow(object, D_001B010C);
 }

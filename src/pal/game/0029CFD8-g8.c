@@ -1,144 +1,145 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_001A8CFC;
-extern int func_0033E5C0(void *, int);
+extern int simple_page_update(void *, int);
 
 int func_PAL_0029CFD8(int value) {
     if (D_001A8CFC != 0)
-        return func_0033E5C0(D_001A8CFC + 0x3C898, value);
+        return simple_page_update(D_001A8CFC + 0x3C898, value);
     return 0;
 }
 
-extern void func_0033D970(void *);
+extern void two_toggle_b_draw(void *);
 
 void func_PAL_0029D018(void) {
     if (D_001A8CFC != 0)
-        func_0033D970(D_001A8CFC + 0x3D288);
+        two_toggle_b_draw(D_001A8CFC + 0x3D288);
 }
 
-extern int func_0033D868(void *, int);
+extern int two_toggle_b_update(void *, int);
 
 int func_PAL_0029D048(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D868(D_001A8CFC + 0x3D288, value);
+        return two_toggle_b_update(D_001A8CFC + 0x3D288, value);
     return 0;
 }
 
-extern int func_0033C590(void *, int);
+extern int UpdateFourOptionMenuInput(void *, int);
 
 int func_PAL_0029D088(int value) {
     if (D_001A8CFC != 0)
-        return func_0033C590(D_001A8CFC + 0x3D568, value);
+        return UpdateFourOptionMenuInput(D_001A8CFC + 0x3D568, value);
     return 0;
 }
 
-extern void func_0033C738(void *);
+extern void four_option_menu_draw(void *);
 
 void func_PAL_0029D0C8(void) {
     if (D_001A8CFC != 0)
-        func_0033C738(D_001A8CFC + 0x3D568);
+        four_option_menu_draw(D_001A8CFC + 0x3D568);
 }
 
-extern int func_0033CB18(void *, int);
+extern int two_toggle_a_update(void *, int);
 
 int func_PAL_0029D0F8(int value) {
     if (D_001A8CFC != 0)
-        return func_0033CB18(D_001A8CFC + 0x3D848, value);
+        return two_toggle_a_update(D_001A8CFC + 0x3D848, value);
     return 0;
 }
 
-extern void func_0033CC20(void *);
+extern void two_toggle_a_draw(void *);
 
 void func_PAL_0029D138(void) {
     if (D_001A8CFC != 0)
-        func_0033CC20(D_001A8CFC + 0x3D848);
+        two_toggle_a_draw(D_001A8CFC + 0x3D848);
 }
 
-extern int func_0033D5A0(void *, int);
+extern int single_toggle_a_update(void *, int);
 
 int func_PAL_0029D168(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D5A0(D_001A8CFC + 0x3DE98, value);
+        return single_toggle_a_update(D_001A8CFC + 0x3DE98, value);
     return 0;
 }
 
-extern void func_0033D638(void *);
+extern void single_toggle_a_draw(void *);
 
 void func_PAL_0029D1A8(void) {
     if (D_001A8CFC != 0)
-        func_0033D638(D_001A8CFC + 0x3DE98);
+        single_toggle_a_draw(D_001A8CFC + 0x3DE98);
 }
 
-extern int func_0033BE98(void *, int);
+extern int screen_adjust_menu_update(void *, int);
 
 int func_PAL_0029D1D8(int value) {
     if (D_001A8CFC != 0)
-        return func_0033BE98(D_001A8CFC + 0x3E178, value);
+        return screen_adjust_menu_update(D_001A8CFC + 0x3E178, value);
     return 0;
 }
 
-extern void func_0033C028(void *);
+extern void onoff_menu_draw_with_help(void *);
 
 void func_PAL_0029D218(void) {
     if (D_001A8CFC != 0)
-        func_0033C028(D_001A8CFC + 0x3E178);
+        onoff_menu_draw_with_help(D_001A8CFC + 0x3E178);
 }
 
-extern int func_0033C2D8(void *, int);
+extern int onoff_menu_update(void *, int);
 
 int func_PAL_0029D248(int value) {
     if (D_001A8CFC != 0)
-        return func_0033C2D8(D_001A8CFC + 0x3E458, value);
+        return onoff_menu_update(D_001A8CFC + 0x3E458, value);
     return 0;
 }
 
-extern void func_0033C378(void *);
+extern void onoff_menu_draw(void *);
 
 void func_PAL_0029D288(void) {
     if (D_001A8CFC != 0)
-        func_0033C378(D_001A8CFC + 0x3E458);
+        onoff_menu_draw(D_001A8CFC + 0x3E458);
 }
 
-extern int func_0033E3A0(void *, int);
+extern int list_page_update(void *, int);
 
 int func_PAL_0029D2B8(int value) {
     if (D_001A8CFC != 0)
-        return func_0033E3A0(D_001A8CFC + 0x3F4A0, value);
+        return list_page_update(D_001A8CFC + 0x3F4A0, value);
     return 0;
 }
 
-extern void func_0033E428(void *);
+extern void list_page_draw(void *);
 
 void func_PAL_0029D2F8(void) {
     if (D_001A8CFC != 0)
-        func_0033E428(D_001A8CFC + 0x3F4A0);
+        list_page_draw(D_001A8CFC + 0x3F4A0);
 }
 
-extern int func_0033D028(void *, int);
+extern int audio_menu_update(void *, int);
 
 int func_PAL_0029D328(int value) {
     if (D_001A8CFC != 0)
-        return func_0033D028(D_001A8CFC + 0x3DB28, value);
+        return audio_menu_update(D_001A8CFC + 0x3DB28, value);
     return 0;
 }
 
-extern void func_0033D2C0(void *);
+extern void audio_menu_draw(void *);
 
 void func_PAL_0029D368(void) {
     if (D_001A8CFC != 0)
-        func_0033D2C0(D_001A8CFC + 0x3DB28);
+        audio_menu_draw(D_001A8CFC + 0x3DB28);
 }
 
-extern int func_0033DC30(void *, int);
+extern int single_toggle_c_update(void *, int);
 
 int func_PAL_0029D398(int value) {
     if (D_001A8CFC != 0)
-        return func_0033DC30(D_001A8CFC + 0x3EC00, value);
+        return single_toggle_c_update(D_001A8CFC + 0x3EC00, value);
     return 0;
 }
 
-extern void func_0033DCC8(void *);
+extern void single_toggle_c_draw(void *);
 
 void func_PAL_0029D3D8(void) {
     if (D_001A8CFC != 0)
-        func_0033DCC8(D_001A8CFC + 0x3EC00);
+        single_toggle_c_draw(D_001A8CFC + 0x3EC00);
 }

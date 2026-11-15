@@ -2,7 +2,7 @@
 
 /* func_PAL_L18_0042D330, the PAL copy of func_L18_004286D0: the same C, with the halfword control
    scaled to 50 Hz. */
-extern void func_0026FEB8(void *);
+extern void STUB_printf(void *);
 
 extern int D_L18_001B1240 __attribute__((sda));
 
@@ -19,7 +19,7 @@ void func_PAL_L18_0042D330(u8 *a0) {
         case 0xEE1:
             break;
         default:
-            func_0026FEB8(D_L18_001B1360);
+            STUB_printf(D_L18_001B1360);
             break;
     }
 }

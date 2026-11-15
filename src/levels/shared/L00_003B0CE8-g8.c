@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003B0CE8 (184 bytes, 27 levels): frees slot idx and, in every used slot from
    the cursor up to the first free one, replaces references to it with that slot's own
    number; rebuilds the list when the freed slot was the cursor. */
@@ -8,9 +9,9 @@ extern Slot D_L00_0023BB78[];
 extern u8 D_L00_001AF810 __attribute__((sda));
 extern u8 D_L00_001AF811 __attribute__((sda));
 
-extern void func_L00_003B0A28();
+extern void AdvanceNodeRingCursor();
 
-void func_L00_003B0CE8(int idx)
+void node_free_slot(int idx)
 {
     u8 c = idx;
     u8 cur;

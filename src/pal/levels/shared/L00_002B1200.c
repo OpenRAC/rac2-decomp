@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef float f32;
@@ -27,7 +28,7 @@ typedef struct {
     u8 pad6[0x24F4 - 0x22C4];
     short b;
 } D00189E20_Overlay;
-extern D00189E20_Overlay D_00189E20;
+extern D00189E20_Overlay g_hero_state;
 extern void *D_L00_002A00A0[31];
 
 /* Dispatches on the argument through the level's table: the five listed cases write
@@ -49,15 +50,15 @@ void func_PAL_L00_002B1200(int a0)
         goto ret;
     }
 arm:
-    D_00189E20.b = 3;
-    D_00189E20.a = 0x3A;
+    g_hero_state.b = 3;
+    g_hero_state.a = 0x3A;
 ret:
     return;
 }
 
-extern void func_L00_002B1F90(void);
+extern void UpdateHeroSlotCallbacks(void);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int D_L00_001B18D8[] __attribute__((sda)), D_L00_001B19C8[] __attribute__((sda));
+extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 extern void func_PAL_L00_002B1248(int);
 extern int D_L00_001B18D8[] __attribute__((sda));
 
@@ -89,7 +90,7 @@ void func_PAL_L00_002B1E88(void)
             case 3:
                 ++slot[0x123B];
                 if ((entry[0x60] & 2) || i == 1 || i == 0)
-                    func_L00_002B1230(i, D_L00_001B18D8[0] + 2);
+                    hero_release_item_slot(i, D_L00_001B18D8[0] + 2);
                 break;
             }
             {
@@ -112,16 +113,16 @@ void func_PAL_L00_002B1E88(void)
 
 extern void func_PAL_L00_002AF6C0(void);
 extern void func_PAL_L00_002B1E88(void);
-extern void func_0028B3D0(int, int, char *, char *, char *, int, int);
-extern void func_L00_00322EC8(char *);
-extern void func_L00_002D2E68(void);
-extern void func_L00_002A6708(void);
-extern void func_L00_002A53B8(void);
+extern void hud_set_slot_contents(int, int, char *, char *, char *, int, int);
+extern void level_release_slot_list(char *);
+extern void hero_set_objects_flag_bit(void);
+extern void hero_clear_tracked_slots(void);
+extern void attachment_reset_all(void);
 extern void func_PAL_L00_002B3210(void);
-extern void func_L00_002D24B8(void);
+extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
 extern void func_PAL_L00_002C4480(int, int);
-extern void func_L00_002F6B90(int);
+extern void level_run_slot_callback(int);
 extern int D_00138320[];
 extern char D_L00_002F8588[];
 extern char D_L00_002F85D0[];
@@ -140,14 +141,14 @@ void func_PAL_L00_002B2958(int mode, int value, char *object)
     p[0x22B6] = 1;
     func_PAL_L00_002B1E88();
     *(int *)(p + 0x2290) = *(int *)(p + 0xC18);
-    func_L00_00322EC8(p + 0x18E0);
-    func_L00_00322EC8(p + 0x1A30);
+    level_release_slot_list(p + 0x18E0);
+    level_release_slot_list(p + 0x1A30);
     current = *(char **)(p + 0x2290);
     *(int *)(current + 0x9C) = -1;
     if (mode != 4 || (unsigned char)p[0x22B4] != mode)
-        func_L00_002D2E68();
-    func_L00_002A6708();
-    func_L00_002A53B8();
+        hero_set_objects_flag_bit();
+    hero_clear_tracked_slots();
+    attachment_reset_all();
     {
         char *q = (char *)D_00189E20_1;
 
@@ -155,9 +156,9 @@ void func_PAL_L00_002B2958(int mode, int value, char *object)
         *(int *)(q + 0xC14) = (int)object;
         *(int *)(q + 0x2290) = (int)object;
         if ((unsigned char)mode == 1 && (D_00138320[0] & 0x10) != 0) {
-            func_0028B3D0(0x23, 0, D_L00_002F8588,
+            hud_set_slot_contents(0x23, 0, D_L00_002F8588,
                              D_L00_002F85D0, D_L00_002F8AD8, 0, 0);
-            func_L00_002F6B90(3);
+            level_run_slot_callback(3);
         }
         {
             char *r = (char *)D_00189E20_1;
@@ -167,7 +168,7 @@ void func_PAL_L00_002B2958(int mode, int value, char *object)
             *(float *)(r + 0x254) = *(float *)(r + 0x25C);
             *(unsigned short *)(*(char **)(r + 0x2290) + 0x34) |= 6;
             *(float *)(r + 0xC24) = *(float *)(r + 0xC20) = 1.0f;
-            func_L00_002D24B8();
+            hero_clear_queued_anim();
             func_002A677C(*(char **)(r + 0x2290));
             *(short *)(r + 0x24F2) = (short)value;
             if (mode == 1) {

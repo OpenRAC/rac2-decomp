@@ -18,16 +18,16 @@ extern int D_L04_001AE488 __attribute__((sda));
 
 extern int D_L04_001AE48C;
 
-extern int D_001A7340;
+extern int g_screen_width;
 
-extern int D_001A7344;
+extern int g_screen_height;
 
-extern int func_002A9588(int a, int b, int c, int d, int e);
+extern int math_ping_pong_blend_values(int a, int b, int c, int d, int e);
 
-extern int func_00285548(int a, int b, int c, int d, int e, int f, int g);
+extern int DrawFramebufferRect(int a, int b, int c, int d, int e, int f, int g);
 
 /* Draws the coloured frame around a menu panel at its current position. */
-void func_00343068(VEC_F6bf9ce42 **positionPtr)
+void menu_panel_draw_frame(VEC_F6bf9ce42 **positionPtr)
 {
     int left, top, bottom, right;
     int colour;
@@ -40,12 +40,12 @@ void func_00343068(VEC_F6bf9ce42 **positionPtr)
     right = (int)((float)D_L04_001AE480 + position->x + (float)D_L04_001AE488);
     bottom = (int)((float)D_L04_001AE484 + position->y + (float)D_L04_001AE48C);
 
-    colour = PingPongBlendValues(0x60241700, 0x55F0C070, 20, 0, 0);
-    DrawFramebufferRect(left, top, right, bottom, gScreenWidth, gScreenHeight, colour);
+    colour = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 20, 0, 0);
+    DrawFramebufferRect(left, top, right, bottom, g_screen_width, g_screen_height, colour);
 
     position = *positionPtr;
     DrawFramebufferRect((int)((float)D_L04_001AE478 + position->x), (int)((float)D_L04_001AE47C + position->y),
             (int)((float)D_L04_001AE480 + position->x), (int)((float)D_L04_001AE484 + position->y),
-            gScreenWidth, gScreenHeight, 0x60241700);
+            g_screen_width, g_screen_height, 0x60241700);
 
 }

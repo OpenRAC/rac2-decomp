@@ -1,20 +1,20 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283B98(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(void *, int, char *, float);
-extern void func_002A7750(char *, int, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282C88(void *);
-extern float func_002A7878(float, float);
-extern void func_002C65A0(void *, void *, int, int, int, int, int, float, float, float, int);
-extern char *func_002A9640(char *, int, int);
-extern void func_002A8C28(void *, void *, float, int, float, float, int, int, int);
+extern float FastAddRotations(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(void *, int, char *, float);
+extern void moby_set_state(char *, int, int);
+extern void FastVecScale(void *, void *, float);
+extern void vec_clear_128(void *);
+extern float math_random_float_range(float, float);
+extern void part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
+extern char *part_find_owned_effect_slot(char *, int, int);
+extern void coll_sweep_from_object(void *, void *, float, int, float, float, int, int, int);
 extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_0029F338(char *);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L11_0045FEF8(void);
+extern void moby_mark_spawned(char *);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void part_spawn_two_glow_effects(void);
 extern float D_L11_001B22C8 __attribute__((sda));
 extern int D_L11_001B22C0 __attribute__((sda));
 extern char *D_L11_001C0D18 NOT_SDA;
@@ -28,47 +28,47 @@ void func_PAL_L11_004657E0(char *p)
     float a, b;
     switch (*(unsigned char *)(p + 0x20)) {
     case 0:
-        *(float *)(p + 0xF0) = func_00283B98(*(float *)(p + 0xF0), *(float *)(q + 0x20) * 0.7f);
-        *(float *)(p + 0xF4) = func_00283B98(*(float *)(p + 0xF4), *(float *)(q + 0x20) * 0.5f);
-        *(float *)(p + 0xF8) = func_00283B98(*(float *)(p + 0xF8), *(float *)(q + 0x20));
-        func_00282CC0(next, p + 0x10, q);
-        if (func_00277258(next, 0, p, D_L11_001B22C8) &&
+        *(float *)(p + 0xF0) = FastAddRotations(*(float *)(p + 0xF0), *(float *)(q + 0x20) * 0.7f);
+        *(float *)(p + 0xF4) = FastAddRotations(*(float *)(p + 0xF4), *(float *)(q + 0x20) * 0.5f);
+        *(float *)(p + 0xF8) = FastAddRotations(*(float *)(p + 0xF8), *(float *)(q + 0x20));
+        FastVecAdd(next, p + 0x10, q);
+        if (coll_test_point(next, 0, p, D_L11_001B22C8) &&
             D_L11_001C0D18 && D_L11_001C0D18 != *(char **)(q + 0x10)) {
-            func_002A7750(p, 1, -1);
+            moby_set_state(p, 1, -1);
             return;
         }
         qcopy(p + 0x10, next);
-        func_00282D30(velocity, q, -0.5f);
-        func_00282C88(zero);
-        a = func_002A7878(2.5f, 3.0f) * 210000.0f;
-        b = func_002A7878(0.2f, 0.4f) * 210000.0f;
-        func_002C65A0(p + 0x10, velocity, 15, D_L11_001B22C0, 3, 80, 0, a, b, 0.0f, 0);
+        FastVecScale(velocity, q, -0.5f);
+        vec_clear_128(zero);
+        a = math_random_float_range(2.5f, 3.0f) * 210000.0f;
+        b = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+        part_spawn_gravity_fade(p + 0x10, velocity, 15, D_L11_001B22C0, 3, 80, 0, a, b, 0.0f, 0);
         if (*(float *)(q + 0x24) < *(float *)(p + 0x18) && *(float *)(q + 0x24) > 0.0f)
-            func_002A7750(p, 2, -1);
-        hit = func_002A9640(p, 0x10000, 0);
+            moby_set_state(p, 2, -1);
+        hit = part_find_owned_effect_slot(p, 0x10000, 0);
         if (hit) {
             *(float *)(q + 0x14) -= *(float *)(hit + 0x2C);
-            if (*(float *)(q + 0x14) <= 0.0f) func_002A7750(p, 1, -1);
+            if (*(float *)(q + 0x14) <= 0.0f) moby_set_state(p, 1, -1);
         }
-        if (D_0018C0B4 == 111) func_002A7750(p, 2, -1);
+        if (D_0018C0B4 == 111) moby_set_state(p, 2, -1);
         break;
     case 1:
-        func_002A8C28(p, p + 0x10, 3.0f, 0x10001, *(float *)(q + 0x18), 1.0f, 0, 1, 0);
+        coll_sweep_from_object(p, p + 0x10, 3.0f, 0x10001, *(float *)(q + 0x18), 1.0f, 0, 1, 0);
         func_PAL_L00_003FB330(p + 0x10, 1, 2, 2, 5, 10, 2, 1, 3.0f, 0.0f, 0, 1, 0, 0);
-        func_0029F338(p);
+        moby_mark_spawned(p);
         return;
     case 2:
         func_PAL_L00_003FB330(p + 0x10, 0, 10, 2, 10, 5, 2, 1, 2.0f, 0.0f, 0, 1, 0, 0);
-        func_0029F338(p);
+        moby_mark_spawned(p);
         return;
     }
-    func_L00_002E6EF8(func_L11_0045FEF8, p);
+    gfx_add_draw_callback_third(part_spawn_two_glow_effects, p);
 }
 
-extern char *func_0029EFD0(int);
-extern float func_002A7940(void);
+extern char *CreateMoby(int);
+extern float math_random_angle(void);
 extern void func_PAL_L11_00465FD0(void *, int);
-extern void func_002E5DA0(int, int, char *, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 extern float D_L11_001B22C4 __attribute__((sda));
 extern int D_L11_001B22CC __attribute__((sda));
 typedef struct {
@@ -103,7 +103,7 @@ typedef struct {
 char *func_PAL_L11_00465B28(char *owner, void *velocity, void *position, float paramA, float paramB,
                         float scale, float paramD)
 {
-    SpawnObject *obj = (SpawnObject *)func_0029EFD0(0xE7B);
+    SpawnObject *obj = (SpawnObject *)CreateMoby(0xE7B);
 
     if (obj) {
         SpawnState *state;
@@ -121,8 +121,8 @@ char *func_PAL_L11_00465B28(char *owner, void *velocity, void *position, float p
         state->owner = owner;
         state->parameterA = paramA;
         state->parameterB = paramB;
-        state->heading = func_002A7940();
-        state->turn = func_002A7878(0.062831864f, 0.12566373f);
+        state->heading = math_random_angle();
+        state->turn = math_random_float_range(0.062831864f, 0.12566373f);
         state->parameterD = paramD;
 
         obj->kind = 255;
@@ -131,7 +131,7 @@ char *func_PAL_L11_00465B28(char *owner, void *velocity, void *position, float p
         obj->scale = D_L11_001B22C4 * scale;
         obj->flags = 0x1008;
         func_PAL_L11_00465FD0(obj->position, arg);
-        func_002E5DA0(0, 0, (char *)obj, 0xE7B);
+        snd_play_from_class_bank(0, 0, (char *)obj, 0xE7B);
     }
     return (char *)obj;
 }

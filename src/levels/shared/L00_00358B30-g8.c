@@ -10,13 +10,13 @@ typedef struct {
     unsigned char pad2294[0x32];
     unsigned char state;
 } Hero;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 typedef struct {
     unsigned char pad00[0x64];
     int field64;
     unsigned char field68, field69, field6A, field6B;
 } GameState;
-extern GameState D_00188660;
+extern GameState g_sound_state;
 extern unsigned short D_001A63F0[];
 typedef struct {
     int active, reserved04[3];
@@ -42,39 +42,39 @@ extern float D_L00_001B198C[] __attribute__((sda));
 extern float D_L00_001B1990;
 extern unsigned char *D_L00_001B1E9C[] __attribute__((sda));
 extern unsigned char *D_L00_001B1EA0[] __attribute__((sda));
-extern void *func_00282A60(void *, int, unsigned int);
-extern void *func_00282AB0(void *, const void *, unsigned int);
-extern void func_L00_00303530(int, int);
-extern void func_00282A28(void);
-extern void func_L00_002B2A40(int, int, void *);
+extern void *mem_clear(void *, int, unsigned int);
+extern void *mem_copy_aligned(void *, const void *, unsigned int);
+extern void load_scene_chunk(int, int);
+extern void math_trap_always(void);
+extern void SetHeroMode(int, int, void *);
 extern void func_002A0F48(void *);
-extern void func_002833F0(void *, const void *);
-extern void func_L00_002D9D98(void);
-extern void func_L00_00358E50(void);
+extern void euler_rotation_basis(void *, const void *);
+extern void cam_reset_default(void);
+extern void level_apply_data_blocks(void);
 
 /* Puts Ratchet back to the saved position, view and settings when a level is reloaded. */
-void func_L00_00358B30(void) {
+void RestoreSavedHeroState(void) {
     unsigned char *entity;
     int kind;
     int i;
-    gHeroState.state = 15;
+    g_hero_state.state = 15;
     if (D_L00_0021DDB0.active == 0) {
-        ClearMemory(D_L00_0021D140, 0, 0xC70);
+        mem_clear(D_L00_0021D140, 0, 0xC70);
         return;
     }
-    CopyMemoryAligned(D_L00_0021D140, &D_L00_0021DDB0, 0xC70);
-    qcopy(&gHeroState.position, &D_L00_0021DDB0.position);
-    qcopy(&gHeroState.rotation, &D_L00_0021DDB0.rotation);
-    *(int *)(gHeroState.moby + 0x38) = D_L00_0021DDB0.field30;
-    *(int *)(gHeroState.moby + 0x3C) = D_L00_0021DDB0.field34;
-    gSoundState.field64 = D_L00_0021DDB0.field38;
-    gSoundState.field68 = D_L00_0021DDB0.field3C;
-    gSoundState.field69 = D_L00_0021DDB0.field3D;
-    gSoundState.field6A = D_L00_0021DDB0.field3E;
-    gSoundState.field6B |= 7;
+    mem_copy_aligned(D_L00_0021D140, &D_L00_0021DDB0, 0xC70);
+    qcopy(&g_hero_state.position, &D_L00_0021DDB0.position);
+    qcopy(&g_hero_state.rotation, &D_L00_0021DDB0.rotation);
+    *(int *)(g_hero_state.moby + 0x38) = D_L00_0021DDB0.field30;
+    *(int *)(g_hero_state.moby + 0x3C) = D_L00_0021DDB0.field34;
+    g_sound_state.field64 = D_L00_0021DDB0.field38;
+    g_sound_state.field68 = D_L00_0021DDB0.field3C;
+    g_sound_state.field69 = D_L00_0021DDB0.field3D;
+    g_sound_state.field6A = D_L00_0021DDB0.field3E;
+    g_sound_state.field6B |= 7;
     D_001A63F0[0] = D_L00_0021DDB0.fieldC64;
     if (D_L00_001C9340[0] != D_L00_0021DDB0.fieldC68)
-        LoadSceneChunk(D_L00_0021DDB0.fieldC68, *(int *)&D_L00_0021DDB0.fieldC64);
+        load_scene_chunk(D_L00_0021DDB0.fieldC68, *(int *)&D_L00_0021DDB0.fieldC64);
     D_L00_001B1980[0] = D_L00_0021DDB0.field3F;
     D_L00_001B1981[0] = D_L00_0021DDB0.field40;
     D_L00_001B1982[0] = D_L00_0021DDB0.field41;
@@ -92,7 +92,7 @@ void func_L00_00358B30(void) {
             kind = 0x1A3;
             break;
         default:
-            TrapAlways();
+            math_trap_always();
         }
         for (i = 0; (entity = D_L00_001B1E9C[0] + (i << 8)) < D_L00_001B1EA0[0]; i++) {
             if (*(short *)(entity + 0xAA) == kind) {
@@ -102,8 +102,8 @@ void func_L00_00358B30(void) {
         }
     }
 done:
-    func_002A0F48(gHeroState.moby);
-    euler_rotation_basis(gHeroState.moby + 0xC0, &gHeroState.rotation);
-    ResetDefaultCamera();
-    ApplyLevelDataBlocks();
+    func_002A0F48(g_hero_state.moby);
+    euler_rotation_basis(g_hero_state.moby + 0xC0, &g_hero_state.rotation);
+    cam_reset_default();
+    level_apply_data_blocks();
 }

@@ -17,12 +17,12 @@
    tests have no effect on the result; each do-while(0) group holds real statements. The unit
    builds with -malign-loops=2. */
 
-extern s32 D_001A7340 MACRO_ADDR;
+extern s32 g_screen_width MACRO_ADDR;
 extern s32 D_001A8F00 MACRO_ADDR;
 extern u8 D_001A7A0A MACRO_ADDR;
 extern u8 D_001A7BB0[] __attribute__((sda)); /* the language byte is [4] */
 extern unsigned char D_PAL_001A7C3C;
-extern s32 D_00138180[];
+extern s32 g_pad_state[];
 extern u8 *D_L10_001A904C MACRO_ADDR;
 extern f32 D_L10_001B2D84;
 extern s32 D_L10_001B2D80 MACRO_ADDR;
@@ -30,27 +30,27 @@ extern f32 D_L10_001B2D84_gp SDATA(D_L10_001B2D84);
 extern s32 D_L10_001B2D80_gp SDATA(D_L10_001B2D80);
 extern s32 D_L10_001B2048 MACRO_ADDR;
 extern s32 D_L10_001B1F64 __attribute__((sda));
-extern s32 D_L10_001B143C __attribute__((sda));
-extern s32 D_L10_001B1390[] MACRO_ADDR;
+extern s32 g_selected_mission_index __attribute__((sda));
+extern s32 g_mission_completion_counts[] MACRO_ADDR;
 extern s32 D_L10_001B1448[][3] MACRO_ADDR;
 extern s32 D_L10_001B1390_gp[] SDATA(D_L10_001B1390);
 extern s32 D_L10_001B1448_gp[][3] SDATA(D_L10_001B1448);
 
-extern f32 func_00283CE0(s32);
-extern s32 func_00283CF0(f32);
-extern u32 func_00283D38(u32, u32, f32);
-extern void *func_00336D50(void *, s32);
-extern void func_00300968(void *, f32, f32, s32, f32, f32);
-extern void func_00300A00(void *, s32, f32, f32, f32, f32, f32);
-extern char *func_00288FB8(s32);
-extern s32 func_00115DA8(char *, char *, ...);
+extern f32 IntToFloat(s32);
+extern s32 FloatToInt(f32);
+extern u32 FastTweenColor(u32, u32, f32);
+extern void *table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object(void *, f32, f32, s32, f32, f32);
+extern void gfx_draw_scaled_object_two_axes(void *, s32, f32, f32, f32, f32, f32);
+extern char *GetLocalizedString(s32);
+extern s32 sprintf(char *, char *, ...);
 extern s32 func_001157AC(char *);
-extern s32 func_0027FBD8(s32, s32, u64, char *, s32);
-extern s32 func_0027FAA8(s32, s32, u64, char *, s32);
-extern s32 func_0027FB40(s32, s32, u64, char *, s32);
-extern void func_L08_002F5CB8(s32, s32, u64, void *, s32, f32);
-extern s32 func_L05_00303000(s32, s32, s32, s32, u64, u8 *, s32);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_large(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_small(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_medium(s32, s32, u64, char *, s32);
+extern void DrawCenteredScaledText(s32, s32, u64, void *, s32, f32);
+extern s32 text_print_wrapped_default(s32, s32, s32, s32, u64, u8 *, s32);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
@@ -131,45 +131,45 @@ s32 func_PAL_L10_00427628(void) {
     
     u32 blend, color;
 
-    center = func_00283CE0(D_001A7340) * 0.5f;
+    center = IntToFloat(g_screen_width) * 0.5f;
     if (D_001A8F00 != 0)
         return 1;
     if (D_L10_001A904C != 0) {
         D_L10_001B1F64 = 0;
-        sprite = func_00336D50(D_L10_001A904C + 0x8710, 0x45);
-        func_00300968(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
-        sprite = func_00336D50(D_L10_001A904C + 0x8710, 0x44);
-        func_00300968(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x45);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x44);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
         t = D_L10_001B2048 % 50;
         if (t >= 25)
             fade = 1.0f - (f32)(t - 25) * 0.04f;
         else
             fade = (f32)t * 0.04f;
-        blend = func_00283D38(0x80FFDE8D, 0x60442D00, fade);
-        color = (D_00138180[0x68] & 0x2000) ? 0x80007FFF : blend;
-        sprite = func_00336D50(D_L10_001A904C + 0x8710, 0x4A);
+        blend = FastTweenColor(0x80FFDE8D, 0x60442D00, fade);
+        color = (g_pad_state[0x68] & 0x2000) ? 0x80007FFF : blend;
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x4A);
         image_y = (f32)sprite_y(sprite, 291.0f, 2.0f);
-        func_00300A00(sprite, color, 259.0f, image_y, 1.0f, 1.0f, 0.0f);
-        color = (D_00138180[0x68] & 0x8000) ? 0x80007FFF : blend;
-        sprite = func_00336D50(D_L10_001A904C + 0x8710, 0x4B);
+        gfx_draw_scaled_object_two_axes(sprite, color, 259.0f, image_y, 1.0f, 1.0f, 0.0f);
+        color = (g_pad_state[0x68] & 0x8000) ? 0x80007FFF : blend;
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x4B);
         image_y = (f32)sprite_y(sprite, 291.0f, 2.0f);
-        func_00300A00(sprite, color, 251.0f, image_y, 1.0f, 1.0f, 0.0f);
-        func_00115DA8(buf, func_00288FB8(0xE97), D_L10_001B143C + 1);
+        gfx_draw_scaled_object_two_axes(sprite, color, 251.0f, image_y, 1.0f, 1.0f, 0.0f);
+        sprintf(buf, GetLocalizedString(0xE97), g_selected_mission_index + 1);
         {
             s32 len;
 
-            hx = func_00283CF0(center);
+            hx = FloatToInt(center);
             len = func_001157AC(buf);
-            func_0027FBD8(hx, 46, 0x80F0F0F0, buf, len);
+            text_draw_centered_large(hx, 46, 0x80F0F0F0, buf, len);
         }
-        x = func_00283CF0(center);
-        switch (D_L10_001B143C) {
+        x = FloatToInt(center);
+        switch (g_selected_mission_index) {
         case 0:
         {
             s32 index;
 
             {
-                char *title = func_00288FB8(0xF06);
+                char *title = GetLocalizedString(0xF06);
 
                 if (D_PAL_001A7C3C == 3 || D_PAL_001A7C3C == 4) {
                     f32 scale = 0.85f;
@@ -177,16 +177,16 @@ s32 func_PAL_L10_00427628(void) {
                     if (D_PAL_001A7C3C == 4)
                         scale = 0.75f;
                     y = screen_coord(D_L10_001B2D80, 101.0f, -1.0f);
-                    func_L08_002F5CB8(x, y, 0x80F0F0F0, title, func_001157AC(title), scale);
+                    DrawCenteredScaledText(x, y, 0x80F0F0F0, title, func_001157AC(title), scale);
                 } else {
                     y = screen_coord(D_L10_001B2D80, 101.0f, -2.0f);
-                    func_0027FB40(x, y, 0x80F0F0F0, title, func_001157AC(title));
+                    text_draw_centered_medium(x, y, 0x80F0F0F0, title, func_001157AC(title));
                 }
             }
-            text = func_00288FB8(0xF0B);
+            text = GetLocalizedString(0xF0B);
             {
                 s32 ty = label_y(text, 131.0f, D_L10_001B2D84, 0.5f, 1);
-                func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
+                text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
             }
             index = D_L10_001B1390_gp[0];
             if (index >= 3)
@@ -197,20 +197,20 @@ s32 func_PAL_L10_00427628(void) {
             if (color != 0) {
                 s32 len, ty;
                 do {
-                    func_00115DA8(buf, func_00288FB8(0xF04), color);
+                    sprintf(buf, GetLocalizedString(0xF04), color);
                     ty = label_y(buf, 242.0f, D_L10_001B2D84, 0.5f, 1);
                 } while (0);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
             }
             if (D_001A7BB0[4] == 5) {
-                func_0027F5B8(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                text_draw_medium(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
             } else if (D_001A7BB0[4] == 4) {
-                func_0027F5B8(164, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                text_draw_medium(164, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
             } else if (D_001A7BB0[4] == 2) {
-                func_0027F5B8(160, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                text_draw_medium(160, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
             } else {
-                func_0027F5B8(181, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                text_draw_medium(181, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
             }
         }
             break;
@@ -218,48 +218,48 @@ s32 func_PAL_L10_00427628(void) {
             if (D_L10_001B1390_gp[0] != 0) {
                 s32 index;
     
-                text = func_00288FB8(0xF07);
+                text = GetLocalizedString(0xF07);
                 y = screen_coord(D_L10_001B2D80, 101.0f, -2.0f);
-                func_0027FAA8(x, y, 0x80F0F0F0, text, func_001157AC(text));
-                text = func_00288FB8(0xF0C);
+                text_draw_centered_small(x, y, 0x80F0F0F0, text, func_001157AC(text));
+                text = GetLocalizedString(0xF0C);
                 {
                     s32 len, ty, len1, ty1;
                     ty1 = label_y(text, 131.0f, D_L10_001B2D84, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        func_L05_00303000(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
-                        index = D_L10_001B1390[1];
+                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        index = g_mission_completion_counts[1];
                         if (index >= 3)
                             index = 2;
                         color = D_L10_001B1448[1][index];
                         if (D_001A7A0A != 0)
                             color *= 10;
-                        func_00115DA8(buf, func_00288FB8(0xF04), color);
+                        sprintf(buf, GetLocalizedString(0xF04), color);
                         ty = label_y3(buf, 242.0f, D_L10_001B2D84, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (D_001A7BB0[4] == 5) {
-                    func_0027F5B8(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 4) {
-                    func_0027F5B8(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 2) {
-                    func_0027F5B8(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else {
-                    func_0027F5B8(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 }
             } else {
-                text = func_00288FB8(0xE98);
-                func_0027FBD8(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text = GetLocalizedString(0xE98);
+                text_draw_centered_large(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         case 2:
-            if (D_L10_001B1390_gp[0] != 0 && D_L10_001B1390[1] != 0) {
+            if (D_L10_001B1390_gp[0] != 0 && g_mission_completion_counts[1] != 0) {
                 s32 index;
     
                 {
-                    char *title = func_00288FB8(0xF09);
+                    char *title = GetLocalizedString(0xF09);
 
                     if (D_PAL_001A7C3C == 3 || D_PAL_001A7C3C == 4) {
                         f32 scale = 0.8f;
@@ -267,100 +267,100 @@ s32 func_PAL_L10_00427628(void) {
                         if (D_PAL_001A7C3C == 4)
                             scale = 0.75f;
                         y = screen_coord(D_L10_001B2D80, 101.0f, -1.0f);
-                        func_L08_002F5CB8(x, y, 0x80F0F0F0, title, func_001157AC(title), scale);
+                        DrawCenteredScaledText(x, y, 0x80F0F0F0, title, func_001157AC(title), scale);
                     } else {
                         y = screen_coord(D_L10_001B2D80, 101.0f, -2.0f);
-                        func_0027FB40(x, y, 0x80F0F0F0, title, func_001157AC(title));
+                        text_draw_centered_medium(x, y, 0x80F0F0F0, title, func_001157AC(title));
                     }
                 }
-                text = func_00288FB8(0xF0D);
+                text = GetLocalizedString(0xF0D);
                 {
                     s32 len, ty, len1, ty1;
                     ty1 = label_y(text, 131.0f, D_L10_001B2D84, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        func_L05_00303000(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
-                        index = D_L10_001B1390[2];
+                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        index = g_mission_completion_counts[2];
                         if (index >= 3)
                             index = 2;
                         color = D_L10_001B1448[2][index];
                         if (D_001A7A0A != 0)
                             color *= 10;
-                        func_00115DA8(buf, func_00288FB8(0xF04), color);
+                        sprintf(buf, GetLocalizedString(0xF04), color);
                         ty = label_y3(buf, 242.0f, D_L10_001B2D84, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (D_001A7BB0[4] == 5) {
-                    func_0027F5B8(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 4) {
-                    func_0027F5B8(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 2) {
-                    func_0027F5B8(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else {
-                    func_0027F5B8(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 }
             } else {
-                text = func_00288FB8(0xE98);
-                func_0027FBD8(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text = GetLocalizedString(0xE98);
+                text_draw_centered_large(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         case 3:
-            if (D_L10_001B1390_gp[0] != 0 && D_L10_001B1390[1] != 0 && D_L10_001B1390[2] != 0) {
+            if (D_L10_001B1390_gp[0] != 0 && g_mission_completion_counts[1] != 0 && g_mission_completion_counts[2] != 0) {
                 s32 index;
     
                 {
-                    char *title = func_00288FB8(0xF0A);
+                    char *title = GetLocalizedString(0xF0A);
 
                     if (D_PAL_001A7C3C == 4) {
                         y = screen_coord(D_L10_001B2D80, 101.0f, -1.0f);
-                        func_L08_002F5CB8(x, y, 0x80F0F0F0, title, func_001157AC(title), 0.75f);
+                        DrawCenteredScaledText(x, y, 0x80F0F0F0, title, func_001157AC(title), 0.75f);
                     } else {
                         y = screen_coord(D_L10_001B2D80, 101.0f, -2.0f);
-                        func_0027FB40(x, y, 0x80F0F0F0, title, func_001157AC(title));
+                        text_draw_centered_medium(x, y, 0x80F0F0F0, title, func_001157AC(title));
                     }
                 }
-                text = func_00288FB8(0xF0F);
+                text = GetLocalizedString(0xF0F);
                 {
                     s32 len, ty, len1, ty1;
                     ty1 = label_y(text, 131.0f, D_L10_001B2D84, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        func_L05_00303000(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
-                        index = D_L10_001B1390[3];
+                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        index = g_mission_completion_counts[3];
                         if (index >= 3)
                             index = 2;
                         color = D_L10_001B1448[3][index];
                         if (D_001A7A0A != 0)
                             color *= 10;
-                        func_00115DA8(buf, func_00288FB8(0xF04), color);
+                        sprintf(buf, GetLocalizedString(0xF04), color);
                         ty = label_y3(buf, 242.0f, D_L10_001B2D84, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    func_L05_00303000(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (D_001A7BB0[4] == 5) {
-                    func_0027F5B8(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(168, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 4) {
-                    func_0027F5B8(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(164, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else if (D_001A7BB0[4] == 2) {
-                    func_0027F5B8(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(160, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 } else {
-                    func_0027F5B8(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE64), -1);
+                    text_draw_medium(181, screen_coord_gp(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
                 }
             } else {
-                text = func_00288FB8(0xE98);
-                func_0027FBD8(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text = GetLocalizedString(0xE98);
+                text_draw_centered_large(x, label_y(text, 170.0f, D_L10_001B2D84, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         }
-        func_0027F5B8(119, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE65), -1);
-        func_0027F5B8(356, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE66), -1);
+        text_draw_medium(119, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE65), -1);
+        text_draw_medium(356, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE66), -1);
         if (D_001A7BB0[4] == 5)
-            func_0027F5B8(285, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE67), -1);
+            text_draw_medium(285, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE67), -1);
         else
-            func_0027F5B8(279, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, func_00288FB8(0xE67), -1);
+            text_draw_medium(279, screen_coord(D_L10_001B2D80, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE67), -1);
     }
     return 1;
 }

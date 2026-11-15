@@ -34,18 +34,18 @@ extern CollisionShape *D_L00_001B1F94 __attribute__((sda));
 extern CollisionShape *D_L00_001B1F9C __attribute__((sda));
 extern CollisionPill *D_L00_001B1F84 __attribute__((sda));
 
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00283098(float *, float *, float *);
-extern float func_00282DF0(float *);
-extern float func_00282E20(float *);
-extern float func_00282E48(float *, float *);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern void matrix_mul_vec3(float *, float *, float *);
+extern float FastVecLength(float *);
+extern float vec_length_xy(float *);
+extern float fast_vec_dist(float *, float *);
 
 /* Is the position inside the primitive's shape, the radius widening a sphere? Each shape is
    tested in its own space: a cuboid against the unit cube, a cylinder against the unit
    cylinder, and a pill against its cylinder and then the sphere at either end. */
 /* Tells whether a point is inside a collision shape. */
-int func_L00_002DB4B8(Quad *position, CollisionPrimitive *primitive, float radius)
+int IsPointInCollisionPrimitive(Quad *position, CollisionPrimitive *primitive, float radius)
 {
     Vec origin, axis, local, transformed;
     float *point = origin.f;

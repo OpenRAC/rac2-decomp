@@ -3,20 +3,20 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } RibbonVector;
 struct RibbonQuad { RibbonVector position[4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
-extern float D_L18_001B97C0[];
+extern float g_camera_l18_position[];
 extern float D_L18_001B1CA0 __attribute__((sda));
-extern long long func_0027C878(int);
+extern long long GetEffectTextureDescriptor(int);
 extern void ref_L18_0043F428_00(char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern float func_00283CE0(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern float IntToFloat(int);
 
 /* Draws a fixed-UV ribbon and a scaled scrolling layer along a point chain. */
-void func_L18_0043F428(RibbonVector *points, int count, int flags, u32 color0, u32 color1, float width, float scale) {
+void ribbon_draw_along_points(RibbonVector *points, int count, int flags, u32 color0, u32 color1, float width, float scale) {
     RibbonVector basis[4];
     struct RibbonQuad mainQuad, innerQuad;
     RibbonVector template0, template1;
@@ -50,7 +50,7 @@ void func_L18_0043F428(RibbonVector *points, int count, int flags, u32 color0, u
     template1.f[2] = width * scale;
     FastVecSub(&basis[0], &points[1], &points[0]);
     vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-    FastVecSub(&basis[1], gCameraPosition_L18, &points[0]);
+    FastVecSub(&basis[1], g_camera_l18_position, &points[0]);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1.0f);
     FastVecCross(&basis[1], &basis[0], &basis[2]);
@@ -70,7 +70,7 @@ void func_L18_0043F428(RibbonVector *points, int count, int flags, u32 color0, u
         FastVecScale(&innerQuad.position[3], &innerQuad.position[2], -1.0f);
         FastVecSub(&basis[0], &points[i + 1], &points[i]);
         vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-        FastVecSub(&basis[1], gCameraPosition_L18, &points[i]);
+        FastVecSub(&basis[1], g_camera_l18_position, &points[i]);
         FastVecCross(&basis[2], &basis[1], &basis[0]);
         vec_scale_to_length(&basis[2], &basis[2], 1.0f);
         FastVecCross(&basis[1], &basis[0], &basis[2]);

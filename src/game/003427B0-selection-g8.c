@@ -14,10 +14,10 @@ typedef struct {
 } MenuList;
 
 extern const int D_001AE1CC __attribute__((sda));
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 
 /* Moves the menu list cursor up or down when the player presses the direction buttons, scrolls smoothly, and works out which entries are on screen. */
-int func_00342978(MenuList *self, int flags)
+int UpdateListSelection(MenuList *self, int flags)
 {
     int row;
     int offset;
@@ -26,11 +26,11 @@ int func_00342978(MenuList *self, int flags)
     switch (self->state) {
     case 0:
         if ((flags & 0x1000) && self->selected > 0) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             self->backward = 1;
             self->state = 1;
         } else if ((flags & 0x4000) && self->selected < self->count - 1) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             self->backward = 0;
             self->state = 1;
         }
@@ -74,23 +74,23 @@ int func_00342978(MenuList *self, int flags)
     return 0;
 }
 
-extern void func_00343068(MenuListPosition **);
-extern int func_003427C0(char *, float, float, float, float, int);
-extern unsigned char D_00139568[], D_00239BA0[];
+extern void menu_panel_draw_frame(MenuListPosition **);
+extern int ComputeListEntryAlpha(char *, float, float, float, float, int);
+extern unsigned char g_item_slot_to_record[], g_weapon_table[];
 extern MenuColourQuad D_001AE1D8, D_001AE1E8;
 extern float D_001AE1D0 __attribute__((sda));
 extern int D_001AE1D4 __attribute__((sda));
 extern int D_001B23C0 __attribute__((sda));
 extern MenuClipRectangle D_001B23B0 MACRO_ADDR;
 extern MenuClipRectangle menuClipGP SDATA(D_001B23B0);
-extern int D_001A7340 MACRO_ADDR, D_001A7344 MACRO_ADDR;
+extern int g_screen_width MACRO_ADDR, g_screen_height MACRO_ADDR;
 extern int screenWidthGP SDATA(D_001A7340);
-extern void func_002FC620(int, int, int, int);
-extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, int *);
+extern void gfx_set_scissor_clamped(int, int, int, int);
+extern int GetIconFrame(int, int);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 
 /* Draws the visible entries of a menu list with their icons, fading them out toward the top and bottom edges. */
-void func_00342BE8(MenuList *object)
+void menu_list_draw_entries(MenuList *object)
 {
     float high, low, current;
     int index, topAlpha, bottomAlpha, texture;
@@ -98,14 +98,14 @@ void func_00342BE8(MenuList *object)
     char *colours;
     MenuClipRectangle clip;
     unsigned char *entry;
-    DrawMenuPanelFrame(&object->position);
+    menu_panel_draw_frame(&object->position);
     low = object->position->y + object->rowHeight * -4.0f;
     high = object->position->y + object->iconSize * 0.5f;
     for (index = object->firstVisible;
             index <= object->lastVisible && object->count; index++) {
         normal = D_001AE1D8;
         alternate = D_001AE1E8;
-        entry = gWeaponTable_00239BA0 + gItemSlotToRecord[object->ids[object->selected + index]] * 224;
+        entry = g_weapon_table + g_item_slot_to_record[object->ids[object->selected + index]] * 224;
         colours = (char *)&normal;
         if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
@@ -127,12 +127,12 @@ void func_00342BE8(MenuList *object)
             D_001B23C0 = 1;
             menuClipGP = clip;
         }
-        SetGsScissorClamped(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
-        entry = gWeaponTable_00239BA0 + gItemSlotToRecord[object->ids[object->selected + index]] * 224;
+        gfx_set_scissor_clamped(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
+        entry = g_weapon_table + g_item_slot_to_record[object->ids[object->selected + index]] * 224;
         texture = GetIconFrame(*(unsigned short *)(entry + 0x3C), 0);
-        DrawHudSpriteGradient(texture, (int)object->position->x,
+        hud_draw_sprite_gradient(texture, (int)object->position->x,
                 (int)(object->position->y + object->rowHeight * current + (float)object->scrollOffset),
                 (int)object->iconSize, (int)object->iconSize, (int *)colours);
-        SetGsScissorClamped(0, gScreenWidth - 1, 0, gScreenHeight - 1);
+        gfx_set_scissor_clamped(0, g_screen_width - 1, 0, g_screen_height - 1);
     }
 }

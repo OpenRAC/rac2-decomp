@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char b[8];
 } CdClock;
-extern int func_001256D8(CdClock *);
-extern void func_00131A98(unsigned char *);
-extern void func_0029ADA0(int);
+extern int sceCdReadClock(CdClock *);
+extern void clock_to_local_time(unsigned char *);
+extern void save_build_packet(int);
 extern unsigned char D_001A7360[8] __attribute__((sda));
-extern unsigned char D_001393E0[];
-extern void func_00298E08(int, int);
+extern unsigned char g_memcard_state[];
+extern void save_load_game_data_reset_menu(int, int);
 
 void func_PAL_002DF6D0(int value, int mode)
 {
     unsigned char *state;
-    func_00298E08(value, mode);
-    func_001256D8((CdClock *)D_001A7360);
-    func_00131A98(D_001A7360);
-    func_0029ADA0(value);
-    state = D_001393E0;
+    save_load_game_data_reset_menu(value, mode);
+    sceCdReadClock((CdClock *)D_001A7360);
+    clock_to_local_time(D_001A7360);
+    save_build_packet(value);
+    state = g_memcard_state;
     *(int *)(state + 0x148) = 0;
     *(short *)(state + 0x18) = mode;
     *(int *)(state + mode * 0x1C + 0x30) = 0;
@@ -38,15 +39,15 @@ typedef struct {
 extern Slot D_0025EBD0[];
 extern int D_001AB29C[4] MACRO_ADDR;
 extern int D_001A7318 MACRO_ADDR;
-extern int func_002B0E90(void);
-extern int func_002B0E28(void);
+extern int save_count_nonzero_flags(void);
+extern int save_count_entries_above_threshold(void);
 
 /* Unlock levels for the counts the player has collected. */
 void func_PAL_002DFE20(void)
 {
-    int a = func_002B0E90() >= 15;
-    int b = func_002B0E90() >= 30;
-    int c = func_002B0E28() >= 10;
+    int a = save_count_nonzero_flags() >= 15;
+    int b = save_count_nonzero_flags() >= 30;
+    int c = save_count_entries_above_threshold() >= 10;
     D_0025EBD0[5].f2 = a ? 3 : 2;
     D_0025EBD0[6].f2 = b ? 3 : 2;
     D_0025EBD0[7].f2 = c ? 10 : 2;

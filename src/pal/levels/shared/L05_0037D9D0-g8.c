@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_L05_001B251C;
 extern int D_L05_00225DD0[];
 extern int D_L05_00225E50[];
 extern int D_L05_001FB220[];
-extern int func_002ED688(char *object);
-extern int func_L00_004272A0(void);
-extern void func_L05_0037AEC0(char *object, int flag);
+extern int moby_get_motion_data(char *object);
+extern int level_get_saved_value(void);
+extern void moby_init_spawned_sub_object(char *object, int flag);
 
 /* Offers the entry to every registered object with the same id, then walks the entry's list
    and offers each object it names to the handler. */
@@ -20,7 +21,7 @@ void func_PAL_L05_0037D9D0(char *object, int handler)
     if (D_L05_001FB220[obj[0x21]] == 0)
         return;
 
-    count = func_L00_004272A0();
+    count = level_get_saved_value();
     for (i = 0; i < count; i++) {
         char *e = (char *)D_L05_00225DD0[i];
 
@@ -38,9 +39,9 @@ void func_PAL_L05_0037D9D0(char *object, int handler)
 
         off = (p[0] & 0x7FFF) << 8;
         base = D_L05_001B251C;
-        if (func_002ED688(base + off) != 0) {
+        if (moby_get_motion_data(base + off) != 0) {
             base = D_L05_001B251C;
-            func_L05_0037AEC0(base + off, handler);
+            moby_init_spawned_sub_object(base + off, handler);
         }
     } while (*(short *)p++ >= 0);
 }

@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_US2_0034BDB0, the USA v2.00 copy of func_0034B070: the same C, where the
  * object's fields sit 0x10 and 0x20 further along. */
 #include "common.h"
 
-extern s32 func_00335AC8();
-extern s32 func_003361A8();
-extern s32 func_003366D0();
-extern s32 func_00336968();
-extern s32 func_00349498();
-extern s32 func_00349918();
-extern s32 func_00349CB8();
+extern s32 object_init_type_pointer();
+extern s32 object_construct_derived_a();
+extern s32 object_construct_derived_c();
+extern s32 hud_construct_widget_base();
+extern s32 menu_clear_sixteen_words();
+extern s32 effect_clear_row_groups();
+extern s32 meter_screen_init_parts();
 
 extern s8 D_001AD928[];
 extern s8 D_001AD908[];
@@ -35,24 +36,24 @@ s32 func_US2_0034BDB0(s32 arg0) {
 
     var_s2 = 7;
     var_s1 = arg0 + 0x378;
-    func_003361A8(arg0);
-    func_003361A8(arg0 + 0x4C);
-    func_003361A8(arg0 + 0x98);
-    func_00336968(arg0 + 0x100);
-    func_003366D0(arg0 + 0x158);
-    func_003361A8(arg0 + 0x194);
-    func_003361A8(arg0 + 0x1E0);
-    func_00336968(arg0 + 0x248);
-    func_003366D0(arg0 + 0x2A0);
-    func_003361A8(arg0 + 0x2E0);
-    func_003361A8(arg0 + 0x32C);
+    object_construct_derived_a(arg0);
+    object_construct_derived_a(arg0 + 0x4C);
+    object_construct_derived_a(arg0 + 0x98);
+    hud_construct_widget_base(arg0 + 0x100);
+    object_construct_derived_c(arg0 + 0x158);
+    object_construct_derived_a(arg0 + 0x194);
+    object_construct_derived_a(arg0 + 0x1E0);
+    hud_construct_widget_base(arg0 + 0x248);
+    object_construct_derived_c(arg0 + 0x2A0);
+    object_construct_derived_a(arg0 + 0x2E0);
+    object_construct_derived_a(arg0 + 0x32C);
     do {
         var_s2 -= 1;
-        func_003361A8(var_s1);
+        object_construct_derived_a(var_s1);
         var_s1 += 0x4C;
     } while (var_s2 != -1);
     var_s1_2 = arg0 + 0x624;
-    func_003361A8(arg0 + 0x5D8);
+    object_construct_derived_a(arg0 + 0x5D8);
     var_s2_2 = 7;
     spC = arg0 + 0xE2C;
     sp20 = arg0 + 0xEB4;
@@ -71,30 +72,30 @@ s32 func_US2_0034BDB0(s32 arg0) {
     sp24 = arg0 + 0x14F4;
     do {
         var_s2_2 -= 1;
-        func_003366D0(var_s1_2);
+        object_construct_derived_c(var_s1_2);
         var_s1_2 += 0x3C;
     } while (var_s2_2 != -1);
-    func_00349CB8(arg0 + 0x808);
-    func_00349498(arg0 + 0xC0C);
-    func_00349498(arg0 + 0xC94);
-    func_00349498(arg0 + 0xD1C);
-    func_00349498(arg0 + 0xDA4);
-    func_00349498(spC);
-    func_00349498(sp20);
-    func_00349918(sp34);
-    func_00349918(sp14);
-    func_00349918(sp38);
-    func_00349498(sp1C);
-    func_00349918(sp28);
-    func_00349918(sp0);
-    func_00349918(sp2C);
-    func_00349918(sp4);
-    func_00349918(sp30);
-    func_00335AC8(sp8);
+    meter_screen_init_parts(arg0 + 0x808);
+    menu_clear_sixteen_words(arg0 + 0xC0C);
+    menu_clear_sixteen_words(arg0 + 0xC94);
+    menu_clear_sixteen_words(arg0 + 0xD1C);
+    menu_clear_sixteen_words(arg0 + 0xDA4);
+    menu_clear_sixteen_words(spC);
+    menu_clear_sixteen_words(sp20);
+    effect_clear_row_groups(sp34);
+    effect_clear_row_groups(sp14);
+    effect_clear_row_groups(sp38);
+    menu_clear_sixteen_words(sp1C);
+    effect_clear_row_groups(sp28);
+    effect_clear_row_groups(sp0);
+    effect_clear_row_groups(sp2C);
+    effect_clear_row_groups(sp4);
+    effect_clear_row_groups(sp30);
+    object_init_type_pointer(sp8);
     (*(s32 *)((s8 *)(arg0) + (0x1464))) = ((s32)D_001AD928);
-    func_00335AC8(sp10);
+    object_init_type_pointer(sp10);
     (*(s32 *)((s8 *)(arg0) + (0x1468))) = ((s32)D_001AD908);
-    func_00349498(sp18);
-    func_00349498(sp24);
+    menu_clear_sixteen_words(sp18);
+    menu_clear_sixteen_words(sp24);
     return arg0;
 }

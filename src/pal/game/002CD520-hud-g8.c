@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_002CD520 (2,420 bytes, PAL): the PAL copy of func_002CC6B0 (src/game/002CC6B0-hud-g8.c).
  * A FAKEMATCH unit (owner rulings of 14 November 2026 for src/pal/ and for this function's order
  * hints; config/fakematch.tsv). Each site is marked below.
@@ -20,11 +21,11 @@ typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
 typedef struct { char pad[0x14]; char *screen; } Screen;
 extern char D_001AB988[], D_001AB990[], D_001AB998[], D_001AB9A0[];
-extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], D_00139568[];
-extern unsigned char D_001A7AF8[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
+extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], g_item_slot_to_record[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
 extern int D_001C51D0 NOT_SDA;
-extern int D_001A7B90[] MACRO_ADDR;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_is_pal_video[] MACRO_ADDR;
+extern int g_current_map_index __attribute__((sda));
 extern int D_001AA440 __attribute__((sda));
 extern int D_001AB984 __attribute__((sda));
 extern int D_001AB9A8 __attribute__((sda));
@@ -33,22 +34,22 @@ extern int D_001AB9AC __attribute__((sda));
 extern int D_00138320[];
 extern char *D_001F2854 NOT_SDA;
 extern char D_0025A498[];
-extern void func_002FC560(int, long);
-extern int func_0029DB28(int *, unsigned int *, int *, int);
-extern int func_00289FC8(short, int, unsigned short *);
+extern void VU1_addGSregister(int, long);
+extern int menu_list_active_entries(int *, unsigned int *, int *, int);
+extern int text_find_pair_in_table(short, int, unsigned short *);
 typedef struct { unsigned char pad[4]; unsigned char available; unsigned char tail[0xDB]; } ItemConfig;
-extern ItemConfig D_00239BA0[];
-extern int func_00115DA8(char *, const char *, ...);
-extern void *func_00115484(void *, int, int);
-extern void func_0027C540(int);
-extern long func_0027C878(int);
-extern void func_0027C660(void), func_0027F120(void), func_0027F110(void);
-extern char *func_00288FB8(int);
+extern ItemConfig g_weapon_table[];
+extern int sprintf(char *, const char *, ...);
+extern void *memset(void *, int, int);
+extern void SetupGifPaging(int);
+extern long GetEffectTextureDescriptor(int);
+extern void DoGifPaging(void), gfx_disable_screen_flag(void), gfx_enable_screen_flag(void);
+extern char *GetLocalizedString(int);
 extern void func_PAL_00280A30(void *, long, char *, long, long, unsigned char *);
 extern void func_PAL_002804A8(void *, long, char *, long, long, unsigned char *, float);
 extern char D_PAL_001F2840[];
 extern char D_PAL_0025BF30[];
-extern void func_0027ECC8(int, int, int, int, int);
+extern void gfx_draw_box_outline(int, int, int, int, int);
 #define ST (*(char **)(D_001F2854 + 0xE8))
 #define TEXT(id) func_00288FB8(id)
 #define DRAW(c,t) func_PAL_00280A30(&win,c,t,-1,tex,glyphs)
@@ -95,12 +96,12 @@ int func_PAL_002CD520(unsigned char *w) {
         font = 2;
         glyphs = D_00263EF0;
     }
-    func_002FC560(0x42, 0x44);
-    ((void (*)(int, long))func_002FC560)(0x47, 0x2004B);
+    VU1_addGSregister(0x42, 0x44);
+    ((void (*)(int, long))VU1_addGSregister)(0x47, 0x2004B);
 
     flags = *(int *)(w + 0x30);
     if (flags & 0x20) {
-        content = D_001A79F0 - 1;
+        content = g_current_map_index - 1;
         if ((unsigned int)content >= 0x12) {
             content = -1;
         }
@@ -116,14 +117,14 @@ int func_PAL_002CD520(unsigned char *w) {
     } else if (flags & 0x80) {
         content = *(int *)(ST + 0x40);
         if (flags & 0x8000) {
-            variant = D_001A7B90[0] != 0;
+            variant = g_is_pal_video[0] != 0;
         }
     } else if (flags & 0x100) {
         char *cell;
         content = *(int *)(ST + 0x3C);
         cell = *(char **)(ST + 0x48) + content * 10;
         if (*(short *)(cell + 4) == 0) {
-            id = D_001A7AF8[*(short *)(cell + 6)];
+            id = g_item_owned_flags[*(short *)(cell + 6)];
         } else {
             id = D_001395B8[*(short *)(cell + 6)];
         }
@@ -136,7 +137,7 @@ int func_PAL_002CD520(unsigned char *w) {
         content = *(int *)(st + 0x40);
         id = *(short *)(*(char **)(st + 0x34) + content * 12);
         *(int *)(w + 0x34) = 0xFFFF;
-        func_00289FC8(id, 0, (unsigned short *)(w + 0x34));
+        text_find_pair_in_table(id, 0, (unsigned short *)(w + 0x34));
     } else {
         char *cell;
         int k;
@@ -144,7 +145,7 @@ int func_PAL_002CD520(unsigned char *w) {
         k = *(short *)(cell + 6);
         variant = 0;
         if (*(short *)(cell + 4) == 0)
-            variant = ((ItemConfig *)(D_00139568[k] * 0xE0 + (int)D_00239BA0))->available != 0;
+            variant = ((ItemConfig *)(g_item_slot_to_record[k] * 0xE0 + (int)g_weapon_table))->available != 0;
         content = k;
     }
 
@@ -196,7 +197,7 @@ int func_PAL_002CD520(unsigned char *w) {
         char *table = *(char **)(w + 0x34);
         text = TEXT(*(int *)(at + (unsigned int)(table + variant * 4)));
     }
-    if ((*(int *)(w + 0x30) & 0x11E4) == 0 && ((unsigned char *)&D_001A7AF8)[content] == 0) {
+    if ((*(int *)(w + 0x30) & 0x11E4) == 0 && ((unsigned char *)&g_item_owned_flags)[content] == 0) {
         text = D_001AB990;
     }
     if (*(int *)(w + 0x30) & 0x200) {
@@ -205,7 +206,7 @@ int func_PAL_002CD520(unsigned char *w) {
         int id = *(int *)(at + (unsigned int)table);
         if (id != 0xB4B && id != 0xB52 && id != 0xB56) {
             do { /* FAKEMATCH: loop group weights the text references (allocation priority) */
-            func_00115DA8(buf, D_001AB998, TEXT(0xB44), text);
+            sprintf(buf, D_001AB998, TEXT(0xB44), text);
             text = buf;
             } while (0);
         }
@@ -214,7 +215,7 @@ int func_PAL_002CD520(unsigned char *w) {
     a23 = *(int *)(w + 0x18) + *(int *)(w + 0x20) / 2;
     a21 = *(int *)(w + 0x1C) + *(int *)(w + 0x24) / 2;
     if ((f & 0x4004) == 0x4004 && *(int *)(w + 0x34) == 0x112D) {
-        func_0029DB28((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
+        menu_list_active_entries((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
         if (helpResult < 0) text = TEXT(0x112C);
         a21 += 8;
     }
@@ -239,10 +240,10 @@ int func_PAL_002CD520(unsigned char *w) {
         a21 = *(int *)(w + 0x24) / 2;
     }
 
-    func_0027C540(0);
-    tex = func_0027C878(font);
+    SetupGifPaging(0);
+    tex = GetEffectTextureDescriptor(font);
     if (SCREEN == D_0025A498 || D_001AB9A8 != 0) { do { originY = a21; do originX = a23 + 1; while (0); } while (0); /* FAKEMATCH: loop groups weight a21/a23 */ } else { originX = 1; originY = D_001AB974; }
-    func_00115484(&tmp, 0, 0x18);
+    memset(&tmp, 0, 0x18);
     tmp.s[0] = originY;
     tmp.s[1] = *(unsigned short *)(w + 0x24) + originY;
     tmp.s[2] = originX;
@@ -253,7 +254,7 @@ int func_PAL_002CD520(unsigned char *w) {
     tmp.s[9] = wflags;
     tmp.s[11] = -(*(unsigned short *)(w + 0x3C) & 0xF);
     win = tmp;
-    if (D_001AB9AC) func_0027ECC8(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
+    if (D_001AB9AC) gfx_draw_box_outline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
     if (*(int *)(w + 0x30) & 0x10000) {
         win.s[1] = *(unsigned short *)(w + 0x24) - 1;
     }
@@ -285,11 +286,11 @@ int func_PAL_002CD520(unsigned char *w) {
     k = 0x20000; /* FAKEMATCH: mask kept in the reused stand-in */
     m &= k;
     if (m) {
-        func_0027F120();
+        gfx_disable_screen_flag();
     }
     DRAW_SCALED(colour, text);
     if (*(int *)(w + 0x30) & 0x20000) {
-        func_0027F110();
+        gfx_enable_screen_flag();
     }
     if (*(int *)(w + 0x30) & 0x400) {
         /* FAKEMATCH: y holds gap*3 and then the s[0] copy */
@@ -303,7 +304,7 @@ int func_PAL_002CD520(unsigned char *w) {
         win.s[5] += m; win.s[0] += k; win.s[0] -= k; win.s[5] -= m;
         /* FAKEMATCH: dead stand-in values: combine cancels the pairs, the four loads stay until
            reload and hold a2..t1 while the scroll address is live, then flow2 deletes them */
-        { int sa = D_001AB9AC, sb = D_001AA440, sc = D_001A79F0, sd = D_001C51D0;
+        { int sa = D_001AB9AC, sb = D_001AA440, sc = g_current_map_index, sd = D_001C51D0;
         win.s[5] += sa + sb; win.s[5] -= sa + sb; win.s[0] += sc + sd; win.s[0] -= sc + sd; }
         DRAW_SCALED(colour, text);
         if (*(int *)(w + 0x30) & 0x400) {
@@ -311,6 +312,6 @@ int func_PAL_002CD520(unsigned char *w) {
             ((LabelSO *)w)->so %= (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
         }
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

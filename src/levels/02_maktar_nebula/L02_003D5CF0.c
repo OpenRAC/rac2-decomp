@@ -7,18 +7,18 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern float func_00282DF0(void *);
+extern float FastVecLength(void *);
 
-extern void func_00282F20(char *, char *, float);
+extern void vec_scale_to_length(char *, char *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern char *func_L02_0033C760(void *, char *, int, float);
+extern char *part_spawn_chain_link(void *, char *, int, float);
 
 /* Lays a line of effect nodes from a start point to an end point, one every step, and returns the first node. */
-char *func_L02_003D5CF0(char *start, char *end, float step) {
+char *chainblade_spawn_effect_trail(char *start, char *end, float step) {
     float v[4];
     float diff[4];
     char *first = 0;
@@ -31,7 +31,7 @@ char *func_L02_003D5CF0(char *start, char *end, float step) {
     vec_scale_to_length((char *)diff, (char *)diff, step);
     *(TI128 *)v = *(TI128 *)start;
     for (t = 0.0f; t < len; t += step) {
-        node = SpawnChainParticle(v, node, 0, step * 1.3f);
+        node = part_spawn_chain_link(v, node, 0, step * 1.3f);
         if (node != 0) {
             if (first == 0) first = node;
         }

@@ -136,7 +136,7 @@ extern void func_00282CC0_32(void *a0, void *a0b, float *local);
 extern float func_00282C48_9(float t);
 
 /* Switches a moby to a new state, remembers the previous state and resets its state timer. */
-void func_002A7750(u8 *moby,s32 newState,s32 subState) {
+void moby_set_state(u8 *moby,s32 newState,s32 subState) {
  u8 prevState=moby[0x20];moby[0x20]=(u8)newState;moby[0x94]=prevState;*(short *)(moby+0x96)=0;
  moby[0xbe]&=~1;
  if(subState!=-1){moby[0x95]=(u8)subState;moby[0xbe]&=~2;}
@@ -144,46 +144,46 @@ void func_002A7750(u8 *moby,s32 newState,s32 subState) {
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Squares a number. */
-f32 func_002A7790(f32 value) { return value * value; }
+f32 math_square(f32 value) { return value * value; }
 
 /* Eases a 0 to 1 value so it starts fast and slows down near 1. */
-f32 func_002A7798(f32 t) {
+f32 math_ease_out_quad(f32 t) {
  return 1.0f-(1.0f-t)*(1.0f-t);
 }
 
 
 /* Returns a random whole number from 0 up to but not including the limit. */
-s32 func_002A77E0(s32 limit) {
-    return (Rand() >> 16 & 0x7fff) % limit;
+s32 math_random_int_below(s32 limit) {
+    return (func_001163B0() >> 16 & 0x7fff) % limit;
 }
 
 /* Returns a random whole number between low and high, both included. */
-s32 func_002A7820(s32 low, s32 high) {
-    return (Rand() >> 16 & 0x7fff) % ((high - low) + 1) + low;
+s32 math_random_int_range(s32 low, s32 high) {
+    return (func_001163B0() >> 16 & 0x7fff) % ((high - low) + 1) + low;
 }
 
 /* Returns a random decimal number between low and high. */
-f32 func_002A7878(f32 low, f32 high) {
-    s32 rand = Rand();
+f32 math_random_float_range(f32 low, f32 high) {
+    s32 rand = func_001163B0();
     return low + (f32)(rand >> 16 & 0x7FFF) * (high - low) * 3.0517578125e-05f;
 }
 
 /* Returns a random decimal number between low and high, randomly made negative half of the time. */
-f32 func_002A78D8(f32 low, f32 high) {
-    s32 rand = Rand();
+f32 math_random_signed_float_range(f32 low, f32 high) {
+    s32 rand = func_001163B0();
     f32 result = low + (f32)(rand >> 16 & 0xFFF) * (high - low) * 0.000244140625f;
     if ((rand >> 16 & 1) != 0) result = -result;
     return result;
 }
 
 /* Returns a random angle in radians, roughly between minus pi/2 and plus pi/2. */
-f32 func_002A7940(void) {
-    return (f32)((Rand() >> 16 & 0xfff) - 0x800) * 0.0015339808f;
+f32 math_random_angle(void) {
+    return (f32)((func_001163B0() >> 16 & 0xfff) - 0x800) * 0.0015339808f;
 }
 
 /* draws two bounded random angles and an interval random value from the two float arguments, then forwards the pointer, the interval draw and both angles to a fourth callee */
 /* Picks two random angles and a random distance, then passes them to another function along with the target. */
-void func_002A7988(s32 target, f32 low, f32 high) {
+void part_spawn_random_direction_effect(s32 target, f32 low, f32 high) {
     f32 x = func_002A7940_5();
     f32 y = func_002A7940_5();
     f32 z = func_002A7878_10(low, high);
@@ -191,9 +191,9 @@ void func_002A7988(s32 target, f32 low, f32 high) {
 }
 
 /* Writes a random direction vector with a random length between low and high. */
-void func_002A7A00(float *out, float low, float high)
+void vec_random_direction(float *out, float low, float high)
 {
-    float length = RandomFloatRange(low, high);
+    float length = math_random_float_range(low, high);
     float yaw = Fc3394786_FUN_002A7940();
     float pitch = Fc3394786_FUN_002A7940();
     float value;
@@ -207,7 +207,7 @@ void func_002A7A00(float *out, float low, float high)
     out[2] = Fc3394786_FUN_00283180(pitch) * length;
 }
 
-float func_002A7AA8(float a, float b, float c, float d, float t) {
+float cubic_hermite_scalar(float a, float b, float c, float d, float t) {
     float p = (d - c) - (a - b);
     float q = (a - b) - p;
     float t2 = t * t;
@@ -221,7 +221,7 @@ static __inline__ void qcopy(void *dst, const void *src) {
 }
 
 /* Computes a point on a smooth curve through four points, using t from 0 to 1. */
-void func_002A7AE0(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d, float t)
+void vec_catmull_rom(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d, float t)
 {
     f32 t2;
     f32 t3;
@@ -254,7 +254,7 @@ void func_002A7AE0(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d, float t)
 
 /* Eased scalar interpolation between a and b: returns a for t==0.0, b for t==1.0, otherwise a + (b-a)*((1-cos(t*pi))*0.5). */
 /* Smoothly blends between two numbers, starting and ending gently. */
-f32 func_002A7C00 (f32 a, f32 b, f32 t)
+f32 math_cosine_blend (f32 a, f32 b, f32 t)
 {
   f32 u;
   if (t == 0.0f)
@@ -267,7 +267,7 @@ f32 func_002A7C00 (f32 a, f32 b, f32 t)
 
 
 /* Turns a heading toward a target angle with spring-like motion and a speed limit. */
-float func_002A7CA0(struct family_27f9_object *object,
+float MobySpringTurn(struct family_27f9_object *object,
                                          float *velocity,
                                          float p1, float p2, float p3, float p4)
 {
@@ -308,12 +308,12 @@ float func_002A7CA0(struct family_27f9_object *object,
     return out;
 }
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 /* Turns an object toward a target position using the spring turning function. */
-float func_002A7E08(struct family_27f9_object *object, float *target, float *value,
+float moby_turn_toward_position(struct family_27f9_object *object, float *target, float *value,
                    float speed, float damping, float limit)
 {
-    float angle = FastMatrixHelperA(target[4] - ((float *)object)[4],
+    float angle = mat_fast_helper_a(target[4] - ((float *)object)[4],
                                target[5] - ((float *)object)[5]);
     return MobySpringTurn(object, value, angle, speed, damping, limit);
 }
@@ -332,7 +332,7 @@ extern char *D_001B1B5C __attribute__((sda));
    byte (0x20) is not value; an entry with the high bit of the id set ends the
    list, and value -1 counts every entry with a class byte below 0x80. */
 /* Counts the moby entries in a group list whose state differs from a given value. */
-int func_002A8508(int index, int value) {
+int moby_count_group_not_in_state(int index, int value) {
     unsigned short *list;
     unsigned short *entry;
     short key;
@@ -365,7 +365,7 @@ extern char *r1_D_L01_00160058 MACRO_ADDR;
 /* rac1-decomp src/overlays/shared/mobyutil_0026E8E0.c: func_L01_0026F040 */
 // Set byte 0xBC of each entry in a negative-terminated index list.
 /* Sets one byte on every moby in a group list. */
-void func_002A8598(int group, int value) {
+void moby_set_byte_on_group(int group, int value) {
     unsigned short *list = r1_D_L01_001ABFC0[group];
     unsigned short *p;
     if (list != 0) {
@@ -381,13 +381,13 @@ extern unsigned char *D_001B1D40 MACRO_ADDR;
 extern unsigned short *D_001B1D38 MACRO_ADDR;
 extern short D_001B1D3C MACRO_ADDR;
 extern int D_001B1B78 MACRO_ADDR;
-extern int func_002A86E8(int *out, unsigned char *m, int includeInactive, int onlyInactive);
+extern int GetNextMobyInGroup(int *out, unsigned char *m, int includeInactive, int onlyInactive);
 
 /* rac1-decomp src/overlays/shared/moby_ground_collision.c: get_first_moby_in_group */
 // Starts the group cursor at the first moby of a group; when the state filter
 // rejects it, advances to the next accepted moby.
 /* Starts looping over the mobys of a group and returns the first one that passes the filter. */
-int func_002A8600(int *out, int group, int includeInactive, int onlyInactive) {
+int GetFirstMobyInGroup(int *out, int group, int includeInactive, int onlyInactive) {
     unsigned short *entry;
     unsigned char *m;
     int index;
@@ -424,7 +424,7 @@ found:
 
 
 /* Subtracts from the top byte of a packed number, stopping at 0, and says whether it reached 0. */
-int func_002A8860(int *packed, int amount) {
+int moby_decrement_top_byte(int *packed, int amount) {
     int word = *packed;
     int count = (word >> 24) - amount;
     if (count < 0) count = 0;
@@ -435,16 +435,16 @@ int func_002A8860(int *packed, int amount) {
 
 
 
-extern float func_002A89A8(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 
 /* Looks up the ground height under an object. */
-void func_002A8A20(void *object) {
-    ProbeGroundHeightBelow(object, 32, 0.5f);
+void coll_get_ground_height_under_object(void *object) {
+    coll_probe_ground_height_below(object, 32, 0.5f);
 }
 
 
 /* Checks a point against a convex shape and returns the number of the first edge it lies outside, or 0 if inside. */
-s32 func_002A8A50(const f32 *point,const MmiPoint *poly,s32 count) {
+s32 coll_find_outside_edge_index(const f32 *point,const MmiPoint *poly,s32 count) {
     s32 i;
     for(i=0;i<count;i++) {
         f32 x=poly[i].x,y=poly[i].y;
@@ -454,7 +454,7 @@ s32 func_002A8A50(const f32 *point,const MmiPoint *poly,s32 count) {
 }
 
 /* Tells whether a point lies inside a flat polygon. */
-int func_002A8AF0(float *point, float *verts, int count) {
+int point_in_path_xy(float *point, float *verts, int count) {
     int inside = 0;
     int next = 0;
     int k;
@@ -473,10 +473,10 @@ int func_002A8AF0(float *point, float *verts, int count) {
 
 
 /* Fills in an effect record with two numbers and a scale, then resets it. */
-void func_002A8BD0(char *record, int valueA, int valueB, float scale) { extern void ClearVector128(void *); *(int *)(record + 0x10) = valueA; *(int *)(record + 0x14) = valueB; *(float *)(record + 0x1C) = scale; *(int *)(record + 0x20) = 0; ClearVector128(record); }
+void part_init_effect_record(char *record, int valueA, int valueB, float scale) { extern void vec_clear_128(void *); *(int *)(record + 0x10) = valueA; *(int *)(record + 0x14) = valueB; *(float *)(record + 0x1C) = scale; *(int *)(record + 0x20) = 0; vec_clear_128(record); }
 
 /* Fills in an effect record with two numbers, a scale and a position copied from a source. */
-void func_002A8C00(char *record, int valueA, int valueB, float scale, Quad16 *source) {
+void make_hit_descriptor(char *record, int valueA, int valueB, float scale, Quad16 *source) {
     *(int *)(record + 0x10) = valueA;
     *(int *)(record + 0x14) = valueB;
     *(float *)(record + 0x1C) = scale;
@@ -485,15 +485,15 @@ void func_002A8C00(char *record, int valueA, int valueB, float scale, Quad16 *so
 }
 
 
-extern void func_0029FCC0(void *, int, float *);
-extern int func_002A8C28(void *, float, float *, int, float, float, int, int, int);
+extern void moby_transform_joint_to_world(void *, int, float *);
+extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 
 /* Reads the position of a bone on an object and uses it to run a hit test. */
-int func_002A8D70(float x, float y, float z, void *object, int bone, int mode, int first, int second, int third)
+int coll_test_hit_at_bone(float x, float y, float z, void *object, int bone, int mode, int first, int second, int third)
 {
     float vector[4];
-    TransformMobyJointToWorld(object, bone, vector);
-    return SweepCollisionFromObject(object, x, vector, mode, y, z, first, second, third);
+    moby_transform_joint_to_world(object, bone, vector);
+    return coll_sweep_from_object(object, x, vector, mode, y, z, first, second, third);
 }
 
 
@@ -524,14 +524,14 @@ typedef struct {
     f32 f24;
 } L_A8E20Req;
 
-extern void func_00282C88(void *);
-extern s32 D_001BAF80[];
+extern void vec_clear_128(void *);
+extern s32 g_collision_hit[];
 extern L_A8E20Entry D_001BF200[];
 
 /* Adds a hit effect to the queue for a moby, merging with its existing one if it is stronger. */
-void func_002A8E20(u8 *moby, L_A8E20Req *request)
+void QueueMobyImpact(u8 *moby, L_A8E20Req *request)
 {
-    s32 idx = gCollisionHit[5];
+    s32 idx = g_collision_hit[5];
     s32 flags = 0;
     L_A8E20Entry *entry;
 
@@ -547,7 +547,7 @@ void func_002A8E20(u8 *moby, L_A8E20Req *request)
         }
     }
     entry = &D_001BF200[idx];
-    ClearVector128(entry);
+    vec_clear_128(entry);
     qcopy(D_001BF200[idx].pos, request->pos);
     entry->flags = request->flags | flags;
     entry->i20 = request->i10;
@@ -560,7 +560,7 @@ void func_002A8E20(u8 *moby, L_A8E20Req *request)
     entry->owner = moby;
     entry->i3C = 0;
     moby[0xA8] = idx;
-    gCollisionHit[5] = (idx + 1) & 0x3F;
+    g_collision_hit[5] = (idx + 1) & 0x3F;
 }
 
 /* func_002A8F70 is in 002A7750-records.c. */
@@ -571,13 +571,13 @@ extern int D_001B22D8 __attribute__((sda));
 extern int D_001B22DC __attribute__((sda));
 typedef struct { float x, y, height, radius; } HeightPlane;
 extern HeightPlane D_001B22E0 __attribute__((sda));
-extern int func_002FD828(float *, float, float, float);
-extern float func_00282C48(float);
-extern float func_00282E80(void *, void *);
-extern void func_00282C98(void *);
+extern int SampleSurfaceHeightMap(float *, float, float, float);
+extern float math_fabs(float);
+extern float vec_distance_xy(void *, void *);
+extern void vec_copy_helper_a(void *);
 
 /* Finds the ground height at a position, using the level floor or a special flat area. */
-float func_002A90F8(float *position, void *direction)
+float coll_get_ground_height_at_position(float *position, void *direction)
 {
     float result;
     if (D_001B22D8 != 0) {
@@ -585,22 +585,22 @@ float func_002A90F8(float *position, void *direction)
         if (SampleSurfaceHeightMap(&result, position[0], position[1], position[2]) != 0)
             return result;
     }
-    if (D_001B22DC != 0 && FloatAbs(position[2] - D_001B22E0.height) < 0.5f &&
+    if (D_001B22DC != 0 && math_fabs(position[2] - D_001B22E0.height) < 0.5f &&
         vec_distance_xy(position, &D_001B22E0) < D_001B22E0.radius) {
         if (direction != 0)
-            VectorCopyHelperA(direction);
+            vec_copy_helper_a(direction);
         return D_001B22E0.height;
     }
     if (direction != 0)
-        VectorCopyHelperA(direction);
+        vec_copy_helper_a(direction);
     return position[2];
 }
 
-extern void func_002837D0(void *, void *, void *);
-extern void func_00283898(void *, int, float);
+extern void multiply_quaternions(void *, void *, void *);
+extern void build_axis_rotation_quaternion(void *, int, float);
 
 /* Builds a rotation from three axis angles and combines them into one. */
-void func_002A91F0(void *out, float *angles) {
+void mat_build_rotation_from_angles(void *out, float *angles) {
     float rotZ[4];
     float rotY[4];
     float rotX[4];
@@ -616,15 +616,15 @@ void func_002A91F0(void *out, float *angles) {
 extern int D_001A8CA0[] __attribute__((sda));
 extern float D_001BAFA0[];
 extern float D_001BAFA8;
-extern void func_00282D60(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void scale_vector(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* Checks the ground below a moby and sets its ground height and slide values. */
-void func_002A93B0(char *moby)
+void moby_update_ground_check(char *moby)
 {
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
@@ -666,14 +666,14 @@ void func_002A93B0(char *moby)
 }
 
 /* Runs the ground check for an object. */
-void func_002A9548(void *object) {
-    UpdateMobyGroundCheck(object);
+void moby_run_ground_check(void *object) {
+    moby_update_ground_check(object);
 }
 
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 
 /* Calls another function with two values and an amount and returns its result. */
-int func_002A9568(int first, int second, float amount) {
+int moby_forward_two_values_and_amount(int first, int second, float amount) {
     return FastTweenColor(first, second, amount);
 }
 
@@ -698,13 +698,13 @@ typedef struct Src_002A96A0 {
     float f2C;
 } Src_002A96A0;
 
-extern Rec_002A96A0 *func_002AB1F0(s32);
-extern u8 *func_002AB220(s32);
-extern u8 func_002AD980(u8 *);
+extern Rec_002A96A0 *moby_get_private_value_0(s32);
+extern u8 *moby_get_private_value_4(s32);
+extern u8 moby_get_kind_slot(u8 *);
 
 /* Tracks which target the player is aiming at and returns an updated strength value, with a short delay before switching. */
-f32 func_002A96A0(s32 id, Src_002A96A0 *src) {
-    Rec_002A96A0 *rec = GetMobyPrivateValue0(id);
+f32 moby_update_aim_target_strength(s32 id, Src_002A96A0 *src) {
+    Rec_002A96A0 *rec = moby_get_private_value_0(id);
     f32 result = 0.0f;
     if (rec != 0) {
         u8 *target = rec->p18;
@@ -736,7 +736,7 @@ f32 func_002A96A0(s32 id, Src_002A96A0 *src) {
             if (newTarget != 0) {
                 if (rec->p18 != newTarget) {
                     rec->p18 = newTarget;
-                    rec->b17 = GetMobyKindSlot(src->p20);
+                    rec->b17 = moby_get_kind_slot(src->p20);
                     rec->s1C = 1;
                 } else {
                     if (src->b28 == 9) {
@@ -750,10 +750,10 @@ f32 func_002A96A0(s32 id, Src_002A96A0 *src) {
             }
             if ((f32)rec->s4 <= 1.0f && result > 0.0f && result < 1.0f) result = 1.0f;
             if (src->f24 & 0x100000) {
-                u8 *slot = GetMobyPrivateValue4(id);
+                u8 *slot = moby_get_private_value_4(id);
                 if (slot != 0) slot[0x18] = 1;
             } else {
-                u8 *slot = GetMobyPrivateValue4(id);
+                u8 *slot = moby_get_private_value_4(id);
                 if (slot != 0) slot[0x18] = 0;
             }
         }
@@ -762,7 +762,7 @@ f32 func_002A96A0(s32 id, Src_002A96A0 *src) {
 }
 
 /* Queues a hit effect for each object in a list, pushing each one away from a point. */
-void func_002A9850(void *owner, Vec16_F5621621c *src, int *nodes, int count,
+void moby_queue_knockback_for_nodes(void *owner, Vec16_F5621621c *src, int *nodes, int count,
                                         int t0, int t1, int t2, int t3,
                                         float f1, float f2, float f3)
 {
@@ -798,17 +798,17 @@ void func_002A9850(void *owner, Vec16_F5621621c *src, int *nodes, int count,
 
 
 /* Blends linearly between two numbers. */
-f32 func_002AA140(f32 a, f32 b, f32 t) { return a + (b - a) * t; }
+f32 math_lerp_float(f32 a, f32 b, f32 t) { return a + (b - a) * t; }
 
 /* Moves an angle part of the way toward a target angle. */
-float func_002AA150(float angle, float target, float factor)
+float math_move_angle_toward_target(float angle, float target, float factor)
 {
     return F27f9be8e_FUN_00283B98(angle,
             F27f9be8e_FUN_00283BE0(target, angle) * factor);
 }
 
 /* Updates a spring speed value, clamping it to limits. */
-void func_002AA198(Obj_Ff454dd77 *spring, float a, float b, float c, float d)
+void math_update_spring_velocity(Obj_Ff454dd77 *spring, float a, float b, float c, float d)
 {
     if (Ff454dd77_FUN_00282C48(a) < spring->f0)
         spring->f0 = Ff454dd77_FUN_00282C48(a);
@@ -830,7 +830,7 @@ void func_002AA198(Obj_Ff454dd77 *spring, float a, float b, float c, float d)
 }
 
 /* Moves a number toward a target by at most one step and returns the remaining distance. */
-f32 func_002AA2E8(f32 *value, f32 target, f32 step) {
+f32 ApproachValue(f32 *value, f32 target, f32 step) {
     f32 diff = target - *value;
     if (step < diff) diff = step;
     else if (diff < -step) diff = -step;
@@ -839,7 +839,7 @@ f32 func_002AA2E8(f32 *value, f32 target, f32 step) {
 }
 
 /* Moves a whole number toward a target by at most one step and returns the remaining distance. */
-f32 func_002AA340(s32 *number, s32 target, s32 maxStep)
+f32 math_step_int_toward_target(s32 *number, s32 target, s32 maxStep)
 {
     s32 value;
     s32 step = target - *number;
@@ -854,7 +854,7 @@ f32 func_002AA340(s32 *number, s32 target, s32 maxStep)
 
 
 /* Moves a value toward a goal with spring motion and snaps to it when close. */
-float func_002AA3A8(float *value, float *velocity, float f1, float f2,
+float math_spring_float_to_goal(float *value, float *velocity, float f1, float f2,
                                          float f3, float f4)
 {
     float goal = f1;
@@ -877,7 +877,7 @@ float func_002AA3A8(float *value, float *velocity, float f1, float f2,
 
 /* shared native family */
 /* Moves a position toward a target with spring motion and snaps to it when close. */
-float func_002AA458(void *pos, void *target, void *speed, float f1, float f2, float f3)
+float vec_spring_to_target(void *pos, void *target, void *speed, float f1, float f2, float f3)
 {
     float delta[4];
     float dist;
@@ -899,11 +899,11 @@ float func_002AA458(void *pos, void *target, void *speed, float f1, float f2, fl
 
 /* func_002AA548 is implemented in 002AA548.c. */
 
-extern float func_00283BE0(float, float);
-extern float func_00282C48(float);
+extern float fast_subtract_rotations(float, float);
+extern float math_fabs(float);
 
 /* Gives the shortest turn between two angles, going a chosen direction when asked. */
-f32 func_002AA738(float from, s32 direction, float to)
+f32 math_shortest_angle_delta(float from, s32 direction, float to)
 {
     f32 base = fast_subtract_rotations(from, to);
 
@@ -912,7 +912,7 @@ f32 func_002AA738(float from, s32 direction, float to)
     {
         f32 zero = 0.0f;
 
-        if (FloatAbs(base) <= 0.001745329471305012702941895f)
+        if (math_fabs(base) <= 0.001745329471305012702941895f)
             return zero;
         if (base > zero)
             return base - 6.2831859588623046875f;

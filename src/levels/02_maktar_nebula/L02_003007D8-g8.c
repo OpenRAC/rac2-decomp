@@ -10,15 +10,15 @@ typedef struct {
     s32 time;
 } L02_Clock;
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
-extern void func_L01_002E2608(void *, int, int, unsigned int, int);
+extern void DrawQuadWithRotatedUVs(void *, int, int, unsigned int, int);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
 extern L02_Table10 D_L02_001A9460;
 
@@ -44,12 +44,12 @@ extern char D_L02_001A9420[8] __attribute__((sda));
    next line's `li` above it) makes the assembler pad it with the two nops retail has, and the second
    div.s, which has no label in front of it, stays unpadded. */
 /* During the intro cutscene, shows the timed picture overlays and fades them into each other. */
-void func_L02_003007D8(void *unused) {
+void cutscene_draw_intro_overlays(void *unused) {
     L02_Table10 frameTable;
     int tableIndex, fadeFrame, alpha, overlayId, fadeOutId, extra;
     float fadeFraction;
 
-    if (gCurrentMapIndex == 2) {
+    if (g_current_map_index == 2) {
         int first_end = 0x136, second_end = 0x17C, third_end = 0x190;
 
         frameTable = D_L02_001A9460;
@@ -77,7 +77,7 @@ void func_L02_003007D8(void *unused) {
         } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
             overlayId = 0x47;
         } else if (D_L02_001BE200.time > second_end && D_L02_001BE200.time < third_end) {
-            extra = RandomIntRange(0, 3);
+            extra = math_random_int_range(0, 3);
             overlayId = 0x49;
         } else if (D_L02_001BE200.time > third_end && D_L02_001BE200.time < 0x1B5) {
             fadeFrame = D_L02_001BE200.time - 0x1A1;

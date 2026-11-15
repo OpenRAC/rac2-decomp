@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -35,7 +36,7 @@ extern struct Obj27 ref_L00_002F46C8_00;
 extern void ref_L00_002F46C8_01(void *arg0);
 
 /* Starts a timed object the first time it is called: sets a 60 frame timer and a default mode of 8 if none was set. */
-void func_L00_002F46C8(void) {
+void level_start_timed_object_once(void) {
     struct Obj27 *p  = &ref_L00_002F46C8_00;
 
     if (p->f38 == 0) {

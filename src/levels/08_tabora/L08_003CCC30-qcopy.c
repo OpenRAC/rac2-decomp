@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void *func_0029EFD0(int id);
-extern float func_00283CE0(int value);
+extern void *CreateMoby(int id);
+extern float IntToFloat(int value);
 extern void func_002A0F48(void *moby);
 
 /* Creates one waterfall piece of the given class at the parent waterfall's position and copies the parent's settings into it. */
-void *func_L08_003CCC30(void *parent, int classId, short rotationSpeed, int isOpen, int linkIndex, unsigned char minAlpha,
+void *waterfall_spawn_piece(void *parent, int classId, short rotationSpeed, int isOpen, int linkIndex, unsigned char minAlpha,
                         unsigned char rotates) {
     unsigned char *parentBytes = (unsigned char *)parent;
     unsigned char *child = (unsigned char *)CreateMoby(classId);

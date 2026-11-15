@@ -34,7 +34,7 @@ typedef struct {
     MenuPage *current;
 } MenuSystem;
 
-extern MenuSystem D_001F2840;
+extern MenuSystem g_pause_menu_state;
 extern MenuPage D_00258EE8, D_00259018;
 extern MenuDescriptor D_00259148, D_00259198, D_002591E8, D_00259238, D_00259288, D_002592D8;
 extern unsigned char D_00263B50[], D_00263EF0[], D_00264290[];
@@ -42,18 +42,18 @@ extern unsigned char D_00263B50[], D_00263EF0[], D_00264290[];
 extern int D_00258D70[];
 extern char D_00210C40[], D_001ABAC8[];
 extern int D_001AA444 __attribute__((sda)), D_001AA448 __attribute__((sda));
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_0027C540(int);
-extern void func_0027F120(void);
-extern void func_0027F110(void);
-extern void func_0027C660(void);
-extern void func_00282A60(void *, int, int);
-extern unsigned long func_0027C878(int);
-extern int func_0027F128(char *, int, unsigned char *);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void SetupGifPaging(int);
+extern void gfx_disable_screen_flag(void);
+extern void gfx_enable_screen_flag(void);
+extern void DoGifPaging(void);
+extern void mem_clear(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern int measure_text_width(char *, int, unsigned char *);
 extern int func_PAL_002D74D8(int, int, int);
-extern int func_00115DA8(char *, char *, ...);
-extern char *func_00288FB8(int);
-extern void func_0027F2A8(int, int, unsigned long, char *, int, unsigned long, unsigned char *);
+extern int sprintf(char *, char *, ...);
+extern char *GetLocalizedString(int);
+extern void text_draw_line(int, int, unsigned long, char *, int, unsigned long, unsigned char *);
 
 /* RAC1 pause.c render_localized_ui_entry_list, with RaC2's formatted-text rows. */
 int func_PAL_002D6E30(MenuDescriptor *menu) {
@@ -85,7 +85,7 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
     font_height = 12;
     font_texture_index = 1;
     glyphs = D_00263B50;
-    focused = D_001F2840.current->focus == menu;
+    focused = g_pause_menu_state.current->focus == menu;
     if (menu->flags & 4) {
         font_height = 14;
         font_texture_index = 3;
@@ -96,9 +96,9 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
         font_texture_index = 2;
         glyphs = D_00263EF0;
     }
-    func_002FC560(0x42, 0x44);
-    func_002FC560(0x47, 0x2004B);
-    func_0027C540(0);
+    VU1_addGSregister(0x42, 0x44);
+    VU1_addGSregister(0x47, 0x2004B);
+    SetupGifPaging(0);
     entry_count = 0;
     entry = menu->items;
     while (entry->text_id != 0) {
@@ -119,8 +119,8 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
         if (scan_entry[0].text_id != 0) {
             entry_index = 0;
             do {
-                text_width = func_0027F128(
-                    func_00288FB8(scan_entry[entry_index].text_id), -1, glyphs);
+                text_width = measure_text_width(
+                    GetLocalizedString(scan_entry[entry_index].text_id), -1, glyphs);
                 entry_index++;
                 maximum_text_width =
                     (maximum_text_width < text_width) ? (text_width) : (maximum_text_width);
@@ -162,8 +162,8 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
             } else {
                 color = 0x80303030;
             }
-            text_id = func_00288FB8(menu->items[selection_index].text_id);
-            if ((D_001F2840.current == &D_00258EE8 || D_001F2840.current == &D_00259018) &&
+            text_id = GetLocalizedString(menu->items[selection_index].text_id);
+            if ((g_pause_menu_state.current == &D_00258EE8 || g_pause_menu_state.current == &D_00259018) &&
                 (menu == &D_00259148 || menu == &D_00259198 || menu == &D_002591E8 ||
                  menu == &D_00259238 || menu == &D_00259288 || menu == &D_002592D8)) {
                 int j, found = -1;
@@ -176,52 +176,52 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
                     j += 2;
                 }
                 if (found >= 0) {
-                    func_00282A60(D_00210C40, 0, 256);
-                    text_id = func_00288FB8(menu->items[selection_index].text_id);
-                    func_00115DA8(D_00210C40, D_001ABAC8,
-                                 func_00288FB8(D_00258D70[found]), text_id);
+                    mem_clear(D_00210C40, 0, 256);
+                    text_id = GetLocalizedString(menu->items[selection_index].text_id);
+                    sprintf(D_00210C40, D_001ABAC8,
+                                 GetLocalizedString(D_00258D70[found]), text_id);
                     text_id = D_00210C40;
                 }
             }
             if (menu->items[selection_index].enabled == 2) {
-                text_id = func_00288FB8(0xbd1);
+                text_id = GetLocalizedString(0xbd1);
             }
-            x = half_width - (func_0027F128(text_id, -1, glyphs) >> 1);
+            x = half_width - (measure_text_width(text_id, -1, glyphs) >> 1);
             if (menu->flags & 0x40) {
                 x = 4;
             } else if (menu->flags & 0x4000) {
                 x = half_width - (maximum_text_width >> 1);
             }
-            func_0027F120();
-            func_0027F2A8(x + D_001AA444, y + D_001AA448, 0x80000000L, text_id, -1,
-                       func_0027C878(font_texture_index), glyphs);
-            func_0027F110();
+            gfx_disable_screen_flag();
+            text_draw_line(x + D_001AA444, y + D_001AA448, 0x80000000L, text_id, -1,
+                       GetEffectTextureDescriptor(font_texture_index), glyphs);
+            gfx_enable_screen_flag();
             if (menu->flags & 0x80) {
-                func_0027F120();
+                gfx_disable_screen_flag();
             }
-            func_0027F2A8(x, y, color, text_id, -1, func_0027C878(font_texture_index), glyphs);
+            text_draw_line(x, y, color, text_id, -1, GetEffectTextureDescriptor(font_texture_index), glyphs);
             y += row_height;
             if (menu->items[selection_index].secondary_text_id != 0) {
-                func_0027F120();
+                gfx_disable_screen_flag();
                 shadow_x = x + D_001AA444;
                 shadow_y = y + D_001AA448;
-                secondary_text = func_00288FB8(menu->items[selection_index].secondary_text_id);
-                func_0027F2A8(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
-                           func_0027C878(font_texture_index), glyphs);
+                secondary_text = GetLocalizedString(menu->items[selection_index].secondary_text_id);
+                text_draw_line(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
+                           GetEffectTextureDescriptor(font_texture_index), glyphs);
                 if (!(menu->flags & 0x80)) {
-                    func_0027F110();
+                    gfx_enable_screen_flag();
                 }
-                func_0027F2A8(x, y, color,
-                           func_00288FB8(menu->items[selection_index].secondary_text_id), -1,
-                           func_0027C878(font_texture_index), glyphs);
+                text_draw_line(x, y, color,
+                           GetLocalizedString(menu->items[selection_index].secondary_text_id), -1,
+                           GetEffectTextureDescriptor(font_texture_index), glyphs);
                 y += row_height;
             }
             if (menu->flags & 0x80) {
-                func_0027F110();
+                gfx_enable_screen_flag();
             }
             selection_index++;
         } while (menu->items[selection_index].text_id != 0);
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

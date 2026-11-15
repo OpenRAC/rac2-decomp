@@ -3,21 +3,21 @@
 
 extern void r1_func_0012C278();
 
-extern int func_00130020(void *);
+extern int mpeg_stop_decoding(void *);
 
 extern void r1_func_0012C278(void *);
 
 extern void r1_func_00127378(int arg0);
 
-extern void func_00130088(void *arg0);
+extern void mpeg_restart_hardware(void *arg0);
 
-extern void func_00130118(void *);
+extern void mpeg_set_scratchpad_buffers(void *);
 
 extern int r1_func_0011D960(void);
 
 extern void r1_func_0011D9A8(void);
 
-extern void func_00130178(void *arg0);
+extern void mpeg_reset_hardware(void *arg0);
 
 extern void r1_func_0012CF98(int, int);
 
@@ -27,20 +27,20 @@ extern char r1_D_00153BD8[];
    but calling one is fine -- only defining one needs stdarg.h. */
 extern void r1_func_0011A6C8();
 
-extern void func_00130240(void *);
+extern void mpeg_print_error(void *);
 
-extern void func_00130288(void *, void *);
+extern void mpeg_report_error(void *, void *);
 
 /* _errMessage (func_00130250) sprintf's its format and passes the
    format's arguments on untouched in $a1-$a3, so it is called here
    without a prototype, with the value the "%08x" reports. */
-extern void func_00130250();
+extern void mpeg_format_error();
 
 extern void r1_func_00116248(void *);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C200 */
 /* Stops the current video decoding. Returns 1 if it was running. */
-int func_00130020(void *mpeg) {
+int mpeg_stop_decoding(void *mpeg) {
     Wrapper *wrapper = (Wrapper *)mpeg;
     Obj40 *decoder = wrapper->obj;
     int result = 0;
@@ -58,25 +58,25 @@ int func_00130020(void *mpeg) {
 /* Tail call: the constant argument setup lands in the jump's delay slot,
    so the field store precedes it. r1_func_00127378 is defined above. */
 /* Marks the decoder as not started and restarts the picture hardware. */
-void func_00130088(void *decoder) {
+void mpeg_restart_hardware(void *decoder) {
     *(int *)((char *)decoder + 0x848) = 0;
     r1_func_00127378(1);
 }
 
 extern char D_0013BDC8[];
-extern void func_00130288(void *, void *);
-extern void func_0012DC50(void *, int, int);
-extern void func_0012DD60(void *, int, int, int);
+extern void mpeg_report_error(void *, void *);
+extern void mpeg_output_picture(void *, int, int);
+extern void mpeg_output_field_pair(void *, int, int, int);
 
 /* Finishes the last decoded picture, or reports an error if a decode was still in progress. */
-void func_00130098(char *decoder) {
+void mpeg_finish_picture(char *decoder) {
     int frameNumber = *(int *)(decoder + 0x118);
     if (*(int *)(decoder + 0x120) != 0)
-        ReportMpegError(decoder, D_0013BDC8);
+        mpeg_report_error(decoder, D_0013BDC8);
     else if (*(int *)(decoder + 0x174) == 3)
-        OutputMpegPicture(decoder, *(int *)(decoder + 0x1BC), frameNumber - 1);
+        mpeg_output_picture(decoder, *(int *)(decoder + 0x1BC), frameNumber - 1);
     else
-        OutputMpegFieldPair(decoder, *(int *)(decoder + 0x1CC), *(int *)(decoder + 0x1DC), frameNumber - 1);
+        mpeg_output_field_pair(decoder, *(int *)(decoder + 0x1CC), *(int *)(decoder + 0x1DC), frameNumber - 1);
     *(int *)(decoder + 0x120) = 0;
 }
 
@@ -105,7 +105,7 @@ void func_00130098(char *decoder) {
  * register at all, the source defined it before the call.
  */
 /* Points the decoder buffers at fast scratchpad memory and clears a flag. */
-void func_00130118(void *decoder) {
+void mpeg_set_scratchpad_buffers(void *decoder) {
     char *bytes = (char *)decoder;
     int scratchpadBase = 0x70000000;
 
@@ -129,7 +129,7 @@ void func_00130118(void *decoder) {
  * and a tail call into r1_func_0012CF98(0, 0).
  */
 /* Resets the picture decoding hardware: its DMA channels and the picture unit. */
-void func_00130178(void *decoder) {
+void mpeg_reset_hardware(void *decoder) {
     char *bytes = (char *)decoder;
     int interruptsWereOn;
 
@@ -158,14 +158,14 @@ void func_00130178(void *decoder) {
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C420 */
 /* Prints a video error message with one value. */
-void func_00130240(void *value) {
+void mpeg_print_error(void *value) {
     r1_func_0011A6C8(r1_D_00153BD8, value);
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C430 */
 /* Builds a video error message and reports it. */
-void func_00130250(void *mpeg) {
+void mpeg_format_error(void *mpeg) {
     char message[0x100];
     r1_func_00116248(message);
-    ReportMpegError(mpeg, message);
+    mpeg_report_error(mpeg, message);
 }

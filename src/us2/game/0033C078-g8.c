@@ -1,17 +1,18 @@
 #include "include_asm.h"
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
-extern void func_003369A8(void *, void *, void *);
-extern void func_00336710(void *, void *, void *);
-extern void func_00336A30(void *, int);
-extern void func_00336A38(void *, int);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern void func_00335F88(void *, float, float, float, float);
-extern void func_00336920(void *, int, int);
-extern int func_00288FB8(int);
-extern int func_0033B540(char *, int);
+#include "names.h"
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
+extern void object_init_derived_c(void *, void *, void *);
+extern void hud_set_widget_field_a(void *, int);
+extern void hud_set_widget_field_b(void *, int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern void object_set_second_float4(void *, float, float, float, float);
+extern void hud_set_widget_value_pair(void *, int, int);
+extern int GetLocalizedString(int);
+extern int map_screen_update_layout(char *, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[];
 extern char D_001ADD58[], D_001ADD60[], D_001ADD68[], D_001ADD70[], D_001ADD78[];
 extern char *D_001A8CFC;
@@ -28,7 +29,7 @@ void func_US2_0033C1B8(char *self, char *owner)
 
     *(char **)(self + 0x1CC) = owner;
     if (owner) {
-        int *allocation = func_00336DA8(16, func_00336E40(owner));
+        int *allocation = ui_return_second_arg(16, pool_alloc_cell(owner));
         *(int **)(self + 0x1C8) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -38,39 +39,39 @@ void func_US2_0033C1B8(char *self, char *owner)
     *(int *)(self + 0x358) = 1;
     (*(float **)(self + 0x1C8))[0] = 255.0f;
     (*(float **)(self + 0x1C8))[1] = 207.0f;
-    func_003361E0(self, D_001ADC10, owner);
-    func_003361E0(self + 0x4C, D_001ADC18, owner);
-    func_003361E0(self + 0x98, D_001ADC20, owner);
+    object_init_derived_arrays(self, D_001ADC10, owner);
+    object_init_derived_arrays(self + 0x4C, D_001ADC18, owner);
+    object_init_derived_arrays(self + 0x98, D_001ADC20, owner);
     for (i = 0; i < 3; i++)
-        func_003361E0(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
-    func_003369A8(self + 0x1D8, D_001ADD58, owner);
-    func_003369A8(self + 0x288, D_001ADD60, owner);
-    func_003369A8(self + 0x230, D_001ADD68, owner);
-    func_00336A30(self + 0x288, 0);
-    func_00336A30(self + 0x230, 0);
-    func_00336710(self + 0x2E0, D_001ADD70, owner);
-    func_00336710(self + 0x31C, D_001ADD78, owner);
-    *func_00335E20(self) = 0x60442D00;
-    *func_00335E20(self + 0x4C) = 0x60241700;
-    *func_00335E20(self + 0x98) = 0x55F0C070;
+        object_init_derived_arrays(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
+    hud_init_widget_defaults(self + 0x1D8, D_001ADD58, owner);
+    hud_init_widget_defaults(self + 0x288, D_001ADD60, owner);
+    hud_init_widget_defaults(self + 0x230, D_001ADD68, owner);
+    hud_set_widget_field_a(self + 0x288, 0);
+    hud_set_widget_field_a(self + 0x230, 0);
+    object_init_derived_c(self + 0x2E0, D_001ADD70, owner);
+    object_init_derived_c(self + 0x31C, D_001ADD78, owner);
+    *object_get_fourth_field(self) = 0x60442D00;
+    *object_get_fourth_field(self + 0x4C) = 0x60241700;
+    *object_get_fourth_field(self + 0x98) = 0x55F0C070;
     for (j = 0; j < 3; j++)
-        *func_00335E20(self + 0xE4 + j * 0x4C) = 0x80FFDE8D;
-    *func_00335E20(self + 0x2E0) = 0x70A0C0C0;
-    *func_00335E20(self + 0x1D8) = 0x80F0F0F0;
-    *func_00335E20(self + 0x288) = 0x80F0F0F0;
-    *func_00335E20(self + 0x230) = 0x80F0F0F0;
-    func_00336390(self, D_001A8CFC + 0x8710, 0x87);
-    func_00336390(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
-    func_00336390(self + 0x98, D_001A8CFC + 0x8710, 0x89);
+        *object_get_fourth_field(self + 0xE4 + j * 0x4C) = 0x80FFDE8D;
+    *object_get_fourth_field(self + 0x2E0) = 0x70A0C0C0;
+    *object_get_fourth_field(self + 0x1D8) = 0x80F0F0F0;
+    *object_get_fourth_field(self + 0x288) = 0x80F0F0F0;
+    *object_get_fourth_field(self + 0x230) = 0x80F0F0F0;
+    object_set_helper_result(self, D_001A8CFC + 0x8710, 0x87);
+    object_set_helper_result(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
+    object_set_helper_result(self + 0x98, D_001A8CFC + 0x8710, 0x89);
     for (k = 0; k < 3; k++)
-        func_00336390(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
-    func_00335F88(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
-    func_00336920(self + 0x2E0, 0xE99A, 10);
-    func_00335F88(self + 0x2E0, 240.0f, 194.0f, 0.0f, 0.0f);
-    func_00335F88(self + 0x31C, 32.0f, 32.0f, 0.0f, 0.0f);
+        object_set_helper_result(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
+    object_set_second_float4(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
+    hud_set_widget_value_pair(self + 0x2E0, 0xE99A, 10);
+    object_set_second_float4(self + 0x2E0, 240.0f, 194.0f, 0.0f, 0.0f);
+    object_set_second_float4(self + 0x31C, 32.0f, 32.0f, 0.0f, 0.0f);
     *(int *)(self + 0x1D0) = 0;
-    func_00336A38(self + 0x1D8, func_00288FB8(0x2BF6));
-    func_00336A38(self + 0x288, func_00288FB8(0x2BE5));
-    func_00336A38(self + 0x230, func_00288FB8(0x2C0B));
-    func_0033B540(self, 0);
+    hud_set_widget_field_b(self + 0x1D8, GetLocalizedString(0x2BF6));
+    hud_set_widget_field_b(self + 0x288, GetLocalizedString(0x2BE5));
+    hud_set_widget_field_b(self + 0x230, GetLocalizedString(0x2C0B));
+    map_screen_update_layout(self, 0);
 }

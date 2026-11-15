@@ -25,7 +25,7 @@ typedef union {
 /* rac1-decomp src/core/00116070.c: func_001161B0 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/math/classify_float_bits.c, ClassifyDoubleNaN. */
 /* Tells whether a number is a valid, finite number (returns 1) or infinity / not-a-number (returns 0). */
-s32 func_001313C8(f64 x) {
+s32 math_is_finite_double(f64 x) {
     s32 hx;
     s32 lx;
     ieee_double_shape_type ew_u;

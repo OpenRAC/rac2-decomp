@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L01_002A8B30, the PAL copy of func_L01_002A8C48: the same C, where func_L01_002A84D8
    becomes func_PAL_L01_002A8368; func_L00_002B36E0 becomes func_PAL_L00_002B3608;
    func_L01_002AE128 becomes func_PAL_L01_002AE010; func_L01_002C37C8 becomes
@@ -14,18 +15,18 @@
 
 #include "common.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_L01_001A8F40 MACRO_ADDR;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 extern void func_PAL_L01_002A8368(void);
 extern void func_2C7CA8(void);
 extern void func_PAL_L00_002B3608(void);
-extern void func_L01_002ADDC8(void);
+extern void hero_read_input_command_flags(void);
 extern void func_PAL_L01_002AE010(char *a0, char *a1, char *a2);
 extern void func_PAL_L01_002C3A10(void);
 extern void func_2C8628(void);
-extern void func_L00_002D3068(void);
+extern void hero_clear_objects_flag_bit(void);
 extern void func_2AEB80(void);
 extern void func_2B9878(void);
 extern void func_PAL_L00_002AC088(void);
@@ -38,28 +39,28 @@ extern void func_PAL_L00_002A56D0(void);
 extern void func_PAL_L00_002B7688(void);
 extern void func_2A7740(void);
 extern void func_2AB028(void);
-extern void func_L00_002AA178(int a0);
+extern void part_spawn_effect_from_record(int a0);
 extern void func_PAL_L00_002B2018(void);
 extern void func_PAL_L00_002B2230(void);
 extern void func_PAL_L00_002B20F8(void);
-extern void func_L00_002AFBC0(void);
-extern int func_L00_002D6418(void);
+extern void hero_update_items_frame(void);
+extern int hero_is_action_allowed(void);
 extern void func_2A9520(void);
 extern void func_2A9310(void);
 extern void func_PAL_L00_002A6688(void);
 extern void func_PAL_L00_002D6408(void);
 extern void func_PAL_L00_002A62B0(void);
 extern void func_PAL_L00_002D5680(void);
-extern int func_L00_002A7000(void);
-extern void func_L00_003080D0(void *a0);
+extern int hero_is_in_swing_or_grind_mode(void);
+extern void coll_clear_map_bits_around_pos(void *a0);
 extern void func_30F444(int a0);
-extern void func_L01_002A9298(void);
+extern void weapon_update_equipped_effect(void);
 extern void func_2AB328(void);
 
 void func_PAL_L01_002A8B30(void) {
     char *p;
 
-    p = D_00189E20;
+    p = g_hero_state;
     *(short *)(p + 0x2162) = 0;
     *(short *)(p + 0x2160) = 0;
     if (*(unsigned char *)(p + 0x22B4) != 0) {
@@ -68,14 +69,14 @@ void func_PAL_L01_002A8B30(void) {
     }
     func_2C7CA8();
     func_PAL_L00_002B3608();
-    func_L01_002ADDC8();
+    hero_read_input_command_flags();
     func_PAL_L01_002AE010(p + 0x80, p + 0x90, p + 0x550);
     func_PAL_L01_002C3A10();
     if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
             func_2C8628();
         else
-            func_L00_002D3068();
+            hero_clear_objects_flag_bit();
         return;
     }
     func_2AEB80();
@@ -92,15 +93,15 @@ void func_PAL_L01_002A8B30(void) {
     func_PAL_L00_002B7688();
     func_2A7740();
     func_2AB028();
-    func_L00_002AA178(0);
+    part_spawn_effect_from_record(0);
     func_PAL_L00_002B2018();
     func_PAL_L00_002B2230();
     func_PAL_L00_002B20F8();
-    func_L00_002AFBC0();
-    if (*(unsigned char *)(p + 0x22B5) != 0 || func_L00_002D6418() != 0)
+    hero_update_items_frame();
+    if (*(unsigned char *)(p + 0x22B5) != 0 || hero_is_action_allowed() != 0)
         func_2C8628();
     else
-        func_L00_002D3068();
+        hero_clear_objects_flag_bit();
     func_2A9520();
     func_2A9310();
     func_PAL_L00_002A6688();
@@ -108,15 +109,15 @@ void func_PAL_L01_002A8B30(void) {
     func_PAL_L00_002A62B0();
     func_PAL_L00_002D5680();
     {
-        char *q = D_00189E20;
+        char *q = g_hero_state;
         if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F
-             && *(int *)(q + 0x2294) != 0x31) || func_L00_002A7000() != 0)
-            func_L00_003080D0(D_00189EA0);
+             && *(int *)(q + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
+            coll_clear_map_bits_around_pos(g_hero_position);
     }
     {
-        char *q = D_00189E20;
+        char *q = g_hero_state;
         func_30F444(*(int *)(q + 0x2290));
     }
-    func_L01_002A9298();
+    weapon_update_equipped_effect();
     func_2AB328();
 }

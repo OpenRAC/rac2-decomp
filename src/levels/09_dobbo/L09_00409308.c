@@ -12,15 +12,15 @@ typedef struct DobboPlayer {
     char pad1834[0xa60];
     int mode;
 } DobboPlayer;
-extern DobboPlayer D_00189E20;
+extern DobboPlayer g_hero_state;
 typedef struct DobboAnimation {
     char pad[0x43];
     unsigned char animation;
 } DobboAnimation;
-extern float func_002A7878(float, float);
-extern void func_002A7750(char *, int, int);
-extern int func_00282948(void *);
-extern void func_L09_004091C8(char *);
+extern float math_random_float_range(float, float);
+extern void moby_set_state(char *, int, int);
+extern int math_fast_float_d(void *);
+extern void part_spawn_death_sparks(char *);
 
 typedef struct DobboPath {
     int count;
@@ -34,27 +34,27 @@ typedef struct DobboPathEffect {
     float position[4];
 } DobboPathEffect;
 extern DobboPathEffect D_L09_001C7B80[];
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283C80(float, float);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
+extern float FastDiffRots(float, float);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002C9828(void *, int, void *, void *, int, float);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00291450(int);
-extern void func_0029F338(void *);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
+extern void anim_start_blended(void *, int, int, int);
+extern void path_sample_position(void *, int, void *, void *, int, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void gfx_free_point_light(int);
+extern void moby_mark_spawned(void *);
 #define F(p,o) (*(float *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 /* Per-frame update of a guide creature (moby class 3610): it rides along a path once the hero gets on a glider, looks at the hero and watches where he aims. */
-void func_L09_00409308(char *obj)
+void path_guide_update(char *obj)
 {
     char *vars = *(char **)(obj+0x68);
     char *glider;
@@ -69,42 +69,42 @@ void func_L09_00409308(char *obj)
         distance = fast_vec_dist(path->points[0],path->points[1]);
         inverse = 1.0f / distance;
         F(vars,0x29c)=(inverse*0.0166666675f)*F(vars,0x264);
-        I(vars,0x274)=AllocateEffectSlot_L00_2(obj+0x10,F(vars,0x278),F(vars,0x288),F(vars,0x27c),F(vars,0x280),F(vars,0x284));
-        SetMobyState(obj,2,-1);
+        I(vars,0x274)=part_l00_alloc_effect_slot_2(obj+0x10,F(vars,0x278),F(vars,0x288),F(vars,0x27c),F(vars,0x280),F(vars,0x284));
+        moby_set_state(obj,2,-1);
         break;
     }
     case 2:
-        if (gHeroState.mode==0x31) {
-            glider=gHeroState.target;
+        if (g_hero_state.mode==0x31) {
+            glider=g_hero_state.target;
             if(glider && *(short *)(glider+0xaa)==0x905 /* Glider */ && B(glider,0x20)!=0xfe && B(glider,0x20)!=0xfd) {
                 B(obj,0x30)=0xff; *(short *)(obj+0x32)=0x3ff; I(vars,0x268)=0;
-                if(((DobboAnimation *)obj)->animation!=4) StartAnimationBlended(obj,4,0,10);
-                SetMobyState(obj,1,-1);
+                if(((DobboAnimation *)obj)->animation!=4) anim_start_blended(obj,4,0,10);
+                moby_set_state(obj,1,-1);
             }
         }
     case 3:
-        if(((DobboAnimation *)obj)->animation==0 && FastFloatHelperD(vars+0x298)) {
-                I(vars,0x298)=FloatToInt(RandomFloatRange(1200.0f,2400.0f));
-                { int state=(Rand()&1)+1;
-                  if(((DobboAnimation *)obj)->animation!=state) StartAnimationBlended(obj,state,0,10); }
+        if(((DobboAnimation *)obj)->animation==0 && math_fast_float_d(vars+0x298)) {
+                I(vars,0x298)=FloatToInt(math_random_float_range(1200.0f,2400.0f));
+                { int state=(func_001163B0()&1)+1;
+                  if(((DobboAnimation *)obj)->animation!=state) anim_start_blended(obj,state,0,10); }
         } else if(B(obj,0x60)&2) {
-            if(((DobboAnimation *)obj)->animation!=0) StartAnimationBlended(obj,0,0,10);
+            if(((DobboAnimation *)obj)->animation!=0) anim_start_blended(obj,0,0,10);
         }
-        angle=FastMatrixHelperA(gHeroState.position[0]-F(obj,0x10),gHeroState.position[1]-F(obj,0x14));
+        angle=mat_fast_helper_a(g_hero_state.position[0]-F(obj,0x10),g_hero_state.position[1]-F(obj,0x14));
         F(obj,0xf8)=FastAddRotations(F(obj,0xf8),fast_subtract_rotations(angle,F(obj,0xf8))*0.01f);
         break;
     case 1: {
         DobboPath *path;
         DobboPathEffect *effect;
-        if(((DobboAnimation *)obj)->animation==4 && FastFloatHelperD(vars+0x298)) {
-                I(vars,0x298)=FloatToInt(RandomFloatRange(1200.0f,2400.0f));
-                if(((DobboAnimation *)obj)->animation!=2) StartAnimationBlended(obj,2,0,10);
+        if(((DobboAnimation *)obj)->animation==4 && math_fast_float_d(vars+0x298)) {
+                I(vars,0x298)=FloatToInt(math_random_float_range(1200.0f,2400.0f));
+                if(((DobboAnimation *)obj)->animation!=2) anim_start_blended(obj,2,0,10);
         } else if(B(obj,0x60)&2) {
-            if(((DobboAnimation *)obj)->animation!=4) StartAnimationBlended(obj,4,0,10);
+            if(((DobboAnimation *)obj)->animation!=4) anim_start_blended(obj,4,0,10);
         }
         path=*(DobboPath **)(vars+0x26c);
-        SamplePathPosition(path,1,obj+0x10,obj+0xf0,0,F(vars,0x268));
-        distance=fast_vec_dist(obj+0x10,gHeroState.position);
+        path_sample_position(path,1,obj+0x10,obj+0xf0,0,F(vars,0x268));
+        distance=fast_vec_dist(obj+0x10,g_hero_state.position);
         if(distance<10.0f) F(vars,0x29c)*=1.01f;
         else if(distance>30.0f) F(vars,0x29c)*=0.99f;
         else {
@@ -126,25 +126,25 @@ void func_L09_00409308(char *obj)
     }
     }
     if(((DobboAnimation *)obj)->animation==0) {
-        if(vec_distance_xy(obj+0x10,gHeroState.position)<8.0f &&
-           FastDiffRots(F(obj,0xf8),FastMatrixHelperA(gHeroState.aim[0]-F(obj,0x10),gHeroState.aim[1]-F(obj,0x14)))<1.5707965f) {
-            if(FastVecLength(gHeroState.velocity)>0.01f) I(vars,0x290)=120;
-            else FastFloatHelperD(vars+0x290);
-        } else if(I(vars,0x290)) { I(vars,0x290)=0; qcopy(vars+0x250,gHeroState.aim); }
-        if(FastFloatHelperD(vars+0x294)) {
-            I(vars,0x294)=FloatToInt(RandomFloatRange(180.0f,300.0f));
-            angle=FastAddRotations(F(obj,0xf8),RandomFloatRange(-90.0f,90.0f)*0.017453294f);
-            distance=RandomFloatRange(0.0f,30.0f)*0.017453294f;
-            BuildSphericalOffset(vars+0x250,6.0f,angle,distance);
+        if(vec_distance_xy(obj+0x10,g_hero_state.position)<8.0f &&
+           FastDiffRots(F(obj,0xf8),mat_fast_helper_a(g_hero_state.aim[0]-F(obj,0x10),g_hero_state.aim[1]-F(obj,0x14)))<1.5707965f) {
+            if(FastVecLength(g_hero_state.velocity)>0.01f) I(vars,0x290)=120;
+            else math_fast_float_d(vars+0x290);
+        } else if(I(vars,0x290)) { I(vars,0x290)=0; qcopy(vars+0x250,g_hero_state.aim); }
+        if(math_fast_float_d(vars+0x294)) {
+            I(vars,0x294)=FloatToInt(math_random_float_range(180.0f,300.0f));
+            angle=FastAddRotations(F(obj,0xf8),math_random_float_range(-90.0f,90.0f)*0.017453294f);
+            distance=math_random_float_range(0.0f,30.0f)*0.017453294f;
+            vec_build_spherical_offset(vars+0x250,6.0f,angle,distance);
             FastVecAdd(vars+0x250,vars+0x250,obj+0x10);
         }
         if (I(vars,0x290))
-            qcopy(&target,gHeroState.aim);
+            qcopy(&target,g_hero_state.aim);
         else
             qcopy(&target,vars+0x250);
     }
-    if(B(obj,0xbc)) { FreePointLight(I(vars,0x274)); MarkMobySpawned(obj); }
-    else SpawnDeathSparkParticles(obj);
+    if(B(obj,0xbc)) { gfx_free_point_light(I(vars,0x274)); moby_mark_spawned(obj); }
+    else part_spawn_death_sparks(obj);
 }
 #undef F
 #undef I

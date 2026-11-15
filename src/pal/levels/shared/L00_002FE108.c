@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_0027BA48(void);
+void gfx_call_sync_helper(void);
 
 void func_PAL_L00_002FE108(void)
 {
-  func_00278EB0();
+  cam_init_scene_state();
   return;
 }
 
 
 void func_PAL_L00_002FE128(void)
 {
-  func_00278F80();
+  gfx_restore_draw_position();
   return;
 }
 
@@ -25,7 +26,7 @@ void func_PAL_L00_002FE148(void)
 
 void func_PAL_L00_002FE168(void)
 {
-  func_L00_002E2958();
+  text_draw_screen_wipe();
   return;
 }
 

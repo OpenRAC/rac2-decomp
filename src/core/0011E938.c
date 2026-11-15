@@ -33,7 +33,7 @@ struct SifLoadCmd {
 
 #define SIFCMD ((struct SifLoadCmd *) r1_D_00158300)
 
-extern int func_0011EB00(int arg0, int arg1, int arg2, void *arg3);
+extern int sceSifLoadModuleBuffer(int arg0, int arg1, int arg2, void *arg3);
 
 /* rac1-decomp src/core/0011CCE0.c: func_0011CCE0 */
 /* _lf_bind (libkernl.a eeloadfile.o): unless already bound (r1_D_0012FDB0
@@ -47,7 +47,7 @@ extern int func_0011EB00(int arg0, int arg1, int arg2, void *arg3);
  * ahead of the inlined memcpy, which moves the copy's registers up by
  * one as in retail. The already-bound test jumps to the shared one. */
 /* Connects to the IOP file loader server once and reads its start-up reply. */
-int func_0011E938(void) {
+int iop_loadfile_bind_server(void) {
     int i;
 
     if (r1_D_0012FDB0 >= 0)
@@ -74,14 +74,14 @@ int func_0011E938(void) {
 done:
     return 0;
 }
-extern int func_0011EA38(void);
+extern int iop_loadfile_buffers_equal(void);
 extern char D_00134684[];
 extern char D_00140528[];
 extern char *D_0013474C;
-extern int func_00115340(void *, void *, int);
+extern int memcmp(void *, void *, int);
 
 /* Compares three small buffers to see whether they all agree. Returns 1 only if they do. */
-int func_0011EA38(void) {
+int iop_loadfile_buffers_equal(void) {
     char *reference = D_00134684;
     char *state = D_00140528;
     int result = 0;
@@ -95,10 +95,10 @@ int func_0011EA38(void) {
 
 extern int D_00134748;
 extern char D_00140528[];
-extern void func_00115484(void *, int, int);
+extern void memset(void *, int, int);
 
 /* Marks the module loader as not ready and clears its saved buffer. */
-int func_0011EAC8(void) {
+int iop_loadfile_reset_state(void) {
     D_00134748 = -1;
     memset(D_00140528, 0, 4);
     return 0;
@@ -107,13 +107,13 @@ int func_0011EAC8(void) {
 /* rac1-decomp src/core/0011CCE0.c: func_0011CE70 */
 /* _sceSifLoadModuleBuffer. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Asks the IOP to load a module from a buffer and returns the module result. */
-int func_0011EB00(int moduleAddr, int argLen, int args, void *outArg) {
+int sceSifLoadModuleBuffer(int moduleAddr, int argLen, int args, void *outArg) {
     int *resultOut = outArg;
     int errorCode;
     int moduleResult;
 
     errorCode = 0xFFFF0000;
-    if (BindLoadFileServer() < 0) {
+    if (iop_loadfile_bind_server() < 0) {
         return errorCode;
     }
     if (r1_func_0011CDE0() != 0) {

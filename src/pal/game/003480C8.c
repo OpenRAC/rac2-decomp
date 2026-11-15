@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -66,17 +67,17 @@ void *func_PAL_003487C8(char *p)
 }
 
 
-extern float *func_00335E10(char *);
+extern float *object_get_first_field(char *);
 typedef unsigned char u8;
-extern void func_00335E38(char *, float, float, float, float);
+extern void object_set_first_float4(char *, float, float, float, float);
 typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
 extern MenuGridEntry D_00259F58[];
-extern u8 D_001A7AF8[] __attribute__((section(".sdata")));
+extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
 extern u8 D_001A7A80[] __attribute__((section(".sdata")));
 extern MenuLabelOffset ref_003472B8_00;
-extern void func_00335E68(void *, int);
-extern void func_00335E68(void *, int);
+extern void object_set_flag_value(void *, int);
+extern void object_set_flag_value(void *, int);
 
 void func_PAL_00349450(char *obj)
 {
@@ -88,24 +89,24 @@ void func_PAL_00349450(char *obj)
     int bits;
     int index = D_00259F58[*(int *)(obj + 0x574) + *(int *)(obj + 0x578) * 4].id;
 
-    if (D_001A7AF8[index] == 0)
+    if (g_item_owned_flags[index] == 0)
         return;
     a = obj + 0x318;
     pad = ref_003472B8_00;
     flags = &D_001A7A80[index];
     b = obj + 0x370;
     bits = flags[0] & 4;
-    func_00335E68(a, (flags[0] & 1) | (bits != 0));
+    object_set_flag_value(a, (flags[0] & 1) | (bits != 0));
     {
         int b2 = flags[0] & 0x10;
-        func_00335E68(b, b2 != 0);
+        object_set_flag_value(b, b2 != 0);
     }
-    x = (*(float **)(obj + 0x4E8))[0] + func_00335E10(a)[0] + (float)pad.x;
-    y = (*(float **)(obj + 0x4E8))[1] + func_00335E10(a)[1] + (float)pad.y;
-    func_00335E38(a, x, y, 0.0f, 0.0f);
-    x2 = (*(float **)(obj + 0x4E8))[0] + func_00335E10(b)[0] + (float)pad.x;
-    y2 = (*(float **)(obj + 0x4E8))[1] + func_00335E10(b)[1] + (float)pad.y;
-    func_00335E38(b, x2, y2, 0.0f, 0.0f);
+    x = (*(float **)(obj + 0x4E8))[0] + object_get_first_field(a)[0] + (float)pad.x;
+    y = (*(float **)(obj + 0x4E8))[1] + object_get_first_field(a)[1] + (float)pad.y;
+    object_set_first_float4(a, x, y, 0.0f, 0.0f);
+    x2 = (*(float **)(obj + 0x4E8))[0] + object_get_first_field(b)[0] + (float)pad.x;
+    y2 = (*(float **)(obj + 0x4E8))[1] + object_get_first_field(b)[1] + (float)pad.y;
+    object_set_first_float4(b, x2, y2, 0.0f, 0.0f);
 }
 
 

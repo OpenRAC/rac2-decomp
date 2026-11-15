@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,14 +27,14 @@
 struct V4 { f32 x; f32 y; f32 z; s32 w; };
 typedef int TI __attribute__((mode(TI)));
 extern TI D_001BAFA0;
-extern s32 func_002761F8(s8 *a0, s8 *a1, s32 a2, s32 a3, s32 a4);
-extern s32 func_00282978(s8 *p);
-extern void func_00282CC0(s8 *a0, s8 *a1, struct V4 *saved);
-extern void func_002B9180(s8 *p);
+extern s32 CollLine(s8 *a0, s8 *a1, s32 a2, s32 a3, s32 a4);
+extern s32 FastDecTimer(s8 *p);
+extern void FastVecAdd(s8 *a0, s8 *a1, struct V4 *saved);
+extern void part_kill(s8 *p);
 
 /* Updates a particle that moves along a line. It is removed when its timer ends,
    and it is reset if it hits something. */
-void func_002C1EF0(s8 *particle) {
+void part_update_streak_collision(s8 *particle) {
     struct V4 step;
     s8 *trail;
     s8 *motion;
@@ -49,7 +50,7 @@ void func_002C1EF0(s8 *particle) {
     FastVecAdd(position, position, &step);
     FastVecAdd(trail, trail, &step);
     if (FastDecTimer(particle + 0xA) != 0) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     if (CollLine(trail, position, 0x10, *(s32 *)(motion + 0xC), 0) != 0) {

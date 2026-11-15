@@ -16,11 +16,11 @@ typedef struct {
     int ringCount;
 } Resident;
 
-extern Resident D_00189E20;
+extern Resident g_hero_state;
 extern V4_F6b9e759f D_00189EA0_1[];
 
 /* Keeps trying to fix the hero collision, stepping the hero back along its recent positions each time, up to 16 tries. */
-void func_L00_002B5A88(void)
+void hero_resolve_collision_with_rewind(void)
 {
     V4_F6b9e759f *historyTable = D_00189EA0_1;
     V4_F6b9e759f *ring = historyTable + 465;
@@ -30,11 +30,11 @@ void func_L00_002B5A88(void)
     do {
         if (func_L00_002B55F0_1(i) == 1)
             break;
-        if (gHeroState.ringCount >= 2) {
-            gHeroState.ringCount = gHeroState.ringCount - 1;
-            gHeroState.ringIndex = (gHeroState.ringIndex + 31) % 32;
+        if (g_hero_state.ringCount >= 2) {
+            g_hero_state.ringCount = g_hero_state.ringCount - 1;
+            g_hero_state.ringIndex = (g_hero_state.ringIndex + 31) % 32;
         }
-        *(V4_Fa012328c *)historyTable = *(V4_Fa012328c *)&ring[gHeroState.ringIndex];
+        *(V4_Fa012328c *)historyTable = *(V4_Fa012328c *)&ring[g_hero_state.ringIndex];
         i++;
     } while (i < 16);
 }

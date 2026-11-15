@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Measures a path of 2D points: for each segment it stores the length, the direction and where the segment starts, and it gives the total length. */
-void func_L04_0040A090(int n, int (*pts)[2], float (*dirs)[4], float *lens, float *starts, float *total)
+void path_measure_segments(int n, int (*pts)[2], float (*dirs)[4], float *lens, float *starts, float *total)
 {
     float delta[4] __attribute__((aligned(16)));
     float from[4] __attribute__((aligned(16)));

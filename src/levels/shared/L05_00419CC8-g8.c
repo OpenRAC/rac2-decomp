@@ -1,13 +1,13 @@
 #include "common.h"
 
 
-extern char *func_0029EFD0(int);
-extern int func_00283CF0(float);
-extern float func_002A7940(void);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_L00_002E6EF8(void (*)(char *), char *);
-extern void func_L05_0041A228(char *);
+extern char *CreateMoby(int);
+extern int FloatToInt(float);
+extern float math_random_angle(void);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void gfx_add_draw_callback_third(void (*)(char *), char *);
+extern void gfx_draw_energy_blast(char *);
 extern float D_L05_001B1030 __attribute__((sda));
 extern float D_L05_001B1034 __attribute__((sda));
 extern float D_L05_001B1038 __attribute__((sda));
@@ -16,7 +16,7 @@ extern float D_L05_001B1058 __attribute__((sda));
 typedef int EffectVector __attribute__((mode(TI)));
 
 /* Creates a shot-like effect object that starts at a position and flies along a direction. It copies the owner's turn or builds its own, and gets its draw function set up. */
-char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color2, int orient, int kind, int value, float scale)
+char *moby_spawn_shot_effect(char *owner, void *pos, void *dir, int color1, int color2, int orient, int kind, int value, float scale)
 {
     char *effect = CreateMoby(0xFFA /* moby class 4090 */);
     float up[4];
@@ -41,7 +41,7 @@ char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color
         *(int *)vars = life;
         *(float *)(vars+0x3c) = start;
         *(float *)(vars+0x40) = (end-start)/(float)life;
-        *(float *)(vars+8) = RandomAngle();
+        *(float *)(vars+8) = math_random_angle();
         *(float *)(vars+0xc) = scale;
         *(int *)(vars+0x38) = value;
         if (*(int *)(vars+0x30)) {
@@ -65,7 +65,7 @@ char *func_L05_00419CC8(char *owner, void *pos, void *dir, int color1, int color
             qcopy(vars+0x10,dir);
         }
         qcopy(effect+0x10,pos);
-        AddDrawCallbackToList3(DrawEnergyBlastEffect,effect);
+        gfx_add_draw_callback_third(gfx_draw_energy_blast,effect);
     }
     return effect;
 }

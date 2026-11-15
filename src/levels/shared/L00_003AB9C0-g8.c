@@ -57,31 +57,31 @@ typedef struct {
 
 typedef int Quad __attribute__((mode(TI)));
 
-extern SpawnObject *func_0029EFD0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_L00_0037FA90(void *, void *, float, float, float);
-extern float func_002A7878(float, float), func_002A78D8(float, float), func_002A7940(void);
-extern void func_002AFFD8(void *, void *, int);
-extern TargetState *func_002AB1F0(void *);
-extern int func_00283CF0(float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_L00_003ACC88(void *, void *);
-extern void func_002A0F48(void *), func_002ACA50(void *, void *, int);
-extern int func_002FED90(void *, int, float, float, float);
+extern SpawnObject *CreateMoby(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void math_compute_aim_direction(void *, void *, float, float, float);
+extern float math_random_float_range(float, float), math_random_signed_float_range(float, float), math_random_angle(void);
+extern void cam_compute_view_direction(void *, void *, int);
+extern TargetState *moby_get_private_value_0(void *);
+extern int FloatToInt(float);
+extern int CollLine(void *, void *, int, void *, int);
+extern void moby_transform_offset_to_world(void *, void *);
+extern void func_002A0F48(void *), AddMobyToIndexList(void *, void *, int);
+extern int part_alloc_effect_slot(void *, int, float, float, float);
 
-extern Material D_L00_00262570[];
+extern Material g_weapon_l00_table[];
 extern int D_L00_001AF7A0 __attribute__((sda));
 extern unsigned char D_00139583 NOT_SDA;
 extern int D_L00_001A8FF0[] __attribute__((sda));
 extern char D_L00_001BF220[], D_L00_0023B710[], D_L00_001B1FB0[] __attribute__((sda));
-extern HeroState D_00189E20;
+extern HeroState g_hero_state;
 
-SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *target, char *arg,
+SpawnObject *projectile_spawn_targeted(SpawnObject *owner, char *pos, SpawnObject *target, char *arg,
                                float scale, float lo, float hi, float unused)
 {
     float v[4] __attribute__((aligned(16)));
@@ -109,7 +109,7 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             D_L00_001AF7A0 = (index + 1) % 8;
         }
 
-        speed = ((Material *)(D_00139583 * 0xE0 + (char *)gWeaponTable_L00))->speed * (1.0f / 60.0f);
+        speed = ((Material *)(D_00139583 * 0xE0 + (char *)g_weapon_l00_table))->speed * (1.0f / 60.0f);
         qcopy(obj->position, pos);
 
         if (target) {
@@ -121,7 +121,7 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             *(Quad *)v = 0;
         }
 
-        if (gHeroState.mode == 1) {
+        if (g_hero_state.mode == 1) {
             vec_scale_to_length(obj->forward, owner->right, -1.0f);
             FastVecScale(obj->right, owner->forward, -1.0f);
             qcopy(obj->up, owner->up);
@@ -130,28 +130,28 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
             float *direction = obj->forward;
             FastVecSub(direction, v, obj->position);
             vec_scale_to_length(direction, direction, 1.0f);
-            FastVecCross(obj->right, direction, gHeroState.target->up);
+            FastVecCross(obj->right, direction, g_hero_state.target->up);
             vec_scale_to_length(obj->right, obj->right, 1.0f);
             FastVecCross(obj->up, obj->right, direction);
             basis = direction;
         } else {
-            qcopy(obj->forward, gHeroState.forward);
+            qcopy(obj->forward, g_hero_state.forward);
             basis = obj->forward;
-            if (gHeroState.aiming)
-                ComputeAimDirection(basis, pos, 1.0f, 75.0f, 0.52359885f);
-            FastVecCross(obj->right, basis, gHeroState.up);
+            if (g_hero_state.aiming)
+                math_compute_aim_direction(basis, pos, 1.0f, 75.0f, 0.52359885f);
+            FastVecCross(obj->right, basis, g_hero_state.up);
             vec_scale_to_length(obj->right, obj->right, 1.0f);
             FastVecCross(obj->up, obj->right, basis);
         }
 
         obj->forward[3] = obj->right[3] = obj->up[3] = 0.0f;
         data->owner = owner;
-        data->spread = RandomFloatRange(lo, hi);
+        data->spread = math_random_float_range(lo, hi);
         if (target)
             data->spread = 0;
-        data->turn = RandomSignedFloatRange(6.0f, 10.0f);
+        data->turn = math_random_signed_float_range(6.0f, 10.0f);
         data->speed = speed;
-        data->phase = RandomAngle();
+        data->phase = math_random_angle();
         data->enabled = on;
         data->target = target;
         data->active = on;
@@ -160,14 +160,14 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
 
         if (D_L00_001A8FF0[0]) {
             float projection;
-            ComputeViewDirection(obj->position, w, 1);
+            cam_compute_view_direction(obj->position, w, 1);
             projection = FastVecDot(w, data->basis);
             FastVecScale(tmp, w, projection);
             FastVecSub(data->basis, data->basis, tmp);
         }
 
         if (target) {
-            TargetState *state = GetMobyPrivateValue0(target);
+            TargetState *state = moby_get_private_value_0(target);
             if (state) {
                 state->flags |= 0x80;
                 if (state->kind)
@@ -189,16 +189,16 @@ SpawnObject *func_L00_003AB9C0(SpawnObject *owner, char *pos, SpawnObject *targe
         *(Quad *)w = *(Quad *)(owner->position);
         w[2] = ((float *)pos)[2];
 
-        if (CollLine(w, pos, 0, gHeroState.target, 0)) {
+        if (CollLine(w, pos, 0, g_hero_state.target, 0)) {
             obj->blocked = on;
             qcopy(obj->position, D_L00_001BF220);
         }
 
-        TransformOffsetToWorld(obj, D_L00_0023B710 + (data->material << 6));
+        moby_transform_offset_to_world(obj, D_L00_0023B710 + (data->material << 6));
         func_002A0F48(obj);
         AddMobyToIndexList(obj, D_L00_001B1FB0, 31);
         obj->radius *= 2.5f;
-        data->sound = AllocEffectSlot_002FED90(obj, 0, 1.0f, 1.0f, 1.0f);
+        data->sound = part_alloc_effect_slot(obj, 0, 1.0f, 1.0f, 1.0f);
     }
     return obj;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern s8 *ref_L12_00413EA8_00[];
 extern s8 *ref_L12_00413EA8_01;
 
 /* Marks every guard in the given group as having been alerted. */
-void func_L12_00413EA8(void *arg0, s32 group) {
+void guard_alert_group(void *arg0, s32 group) {
     s8 *table ;
     s8 *entry ;
     s8 *record;

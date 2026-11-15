@@ -34,21 +34,21 @@ typedef struct {
 } Moby_2A75E0;
 
 extern f32 D_001CD540[][4];
-extern void func_002A7398(Moby_2A75E0 *, int, int);
-extern int func_0029FA88(void *);
+extern void anim_start_immediate(Moby_2A75E0 *, int, int);
+extern int moby_alloc_object_slot(void *);
 extern void func_002A2450(Moby_2A75E0 *, int);
-extern void func_0029F390(void *);
-extern float func_00283CE0(int);
+extern void update_moby_animation_state(void *);
+extern float IntToFloat(int);
 
 /* Start an animation blended over a number of frames (or at once when there are none). */
-void func_002A75E0(Moby_2A75E0 *m, int anim, int f41, int frames, int flags)
+void anim_start_blended_with_flags(Moby_2A75E0 *m, int anim, int f41, int frames, int flags)
 {
     if (frames <= 0) {
-        StartAnimationImmediate(m, anim, f41);
+        anim_start_immediate(m, anim, f41);
         return;
     }
     if (m->f44 > 0.025f || m->f50 != 0 || m->f54 != 0 || (flags & 4)) {
-        int slot = AllocObjectSlot(m);
+        int slot = moby_alloc_object_slot(m);
         if (slot >= 0) {
             int slotFlags = slot;
             if (flags & 1) slotFlags |= 0x100;

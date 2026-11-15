@@ -2,12 +2,12 @@
 
 #include "common.h"
 extern u8 D_L08_001B9B00[];
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283CE0(int);
-extern f32 func_00282C48(f32);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 IntToFloat(int);
+extern f32 math_fabs(f32);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 typedef struct {
     f32 f0;
     f32 f4;
@@ -19,22 +19,22 @@ extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
 extern f32 D_L08_001BFF68;
 extern f32 D_00189EA8;
-extern f32 func_L08_00422850(Quad *, f32, f32, f32, f32);
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern int func_00282948(void *);
-extern float func_002A7878(float, float);
-extern float func_00282E80(void *, void *);
+extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern int math_fast_float_d(void *);
+extern float math_random_float_range(float, float);
+extern float vec_distance_xy(void *, void *);
 extern int func_PAL_002B5BA8(u8 *, void *, float);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
 extern u8 D_001A7B00[] __attribute__((sda));
 extern u8 D_L08_001BFD00[];
 extern u8 *D_L08_001B2ACC[] __attribute__((sda));
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern f32 func_002A7940(void);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern f32 math_random_angle(void);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
 
 int func_PAL_L08_003DD170(u8 *object, float accel, float unused1, float damping,
                      float speed, float unused4, float turn, float friction) {
@@ -42,26 +42,26 @@ int func_PAL_L08_003DD170(u8 *object, float accel, float unused1, float damping,
     int result;
     float amount;
 
-    func_002B60B0(object, speed * 0.00040000002f,
+    moby_set_controller_speed_limits(object, speed * 0.00040000002f,
                   turn * 0.020000001f,
                   accel * 6.981318e-06f,
                   damping * 0.0003490659f);
     *(float *)(state + 0x154) = friction;
-    if (func_00282948(state + 0x474) != 0) {
+    if (math_fast_float_d(state + 0x474) != 0) {
         *(float *)(state + 0x46C) = -*(float *)(state + 0x46C);
         *(float *)(state + 0x470) = *(float *)(state + 0x46C) * 0.01745329424738884f;
-        *(int *)(state + 0x474) = ((s32)(func_002A7878(30.0f, 90.0f)) * 5 + 2) / 6;
+        *(int *)(state + 0x474) = ((s32)(math_random_float_range(30.0f, 90.0f)) * 5 + 2) / 6;
     }
     if (*(int *)(state + 0x48C) != 0 ||
         (object[0x20] == 8 && object[0x95] != 0) ||
-        func_00282E80(object + 0x10, state + 0x3F0) < 5.0f)
+        vec_distance_xy(object + 0x10, state + 0x3F0) < 5.0f)
         *(float *)(state + 0x470) = 0;
     result = func_PAL_002B5BA8(object, state + 0x3F0, *(float *)(state + 0x470));
-    amount = func_00282DF0(state + 0x1C0);
-    amount += func_00282C48(*(float *)(state + 0x1D4));
+    amount = FastVecLength(state + 0x1C0);
+    amount += math_fabs(*(float *)(state + 0x1D4));
     if (result & 15) {
-        func_00282948(state + 0x448);
-        amount = func_00282C48(*(float *)(state + 0x1D4)) + 0.012000001f;
+        math_fast_float_d(state + 0x448);
+        amount = math_fabs(*(float *)(state + 0x1D4)) + 0.012000001f;
     }
     *(float *)(object + 0x48) = amount * 24.999998f;
     if (*(float *)(object + 0x48) > 1.5f)
@@ -136,17 +136,17 @@ typedef struct {
     s32 f488;
     u8  f48C[8];
 } Moby;
-extern s32 func_00282948();
-extern s32 func_002A7820(s32, s32);
+extern s32 math_fast_float_d();
+extern s32 math_random_int_range(s32, s32);
 extern s32 func_2EA300(void *, void *, s32, s32, s32);
 extern s32 func_3357E8(Ent *, void *, s32);
 extern s32 D_L08_001A8F00[] __attribute__((sda));
 extern s32 D_L08_001B2700[] __attribute__((sda));
-extern s32 func_002ACBC8(void *, s32);
-extern s32 func_00288AA0(void *, s32);
-extern s32 func_00288BE8(void *);
-extern s32 func_002F5D10(void);
-extern s32 func_002A7820(s32, s32);
+extern s32 IsPointInCuboid(void *, s32);
+extern s32 req_push_queue(void *, s32);
+extern s32 req_launch_queued(void *);
+extern s32 game_is_either_mode_two(void);
+extern s32 math_random_int_range(s32, s32);
 
 /* the countdown runs while the entry is flagged, then the timer field saturates */
 void func_PAL_L08_003DD368(Ent *a0)
@@ -157,36 +157,36 @@ void func_PAL_L08_003DD368(Ent *a0)
     if (a0->fBC != 0) {
         a0->fBC = 0;
         if (s0->f448 < 167) {
-            s0->f448 = ((s32)(func_002A7820(300, 360)) * 5 + 2) / 6;
+            s0->f448 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
             s0->f40E = 12;
         }
     }
     v1 = a0->f96;
     if (s0->f254 == 2) {
-        if (func_00282948(&s0->f448)) s0->f40E = 3;
+        if (math_fast_float_d(&s0->f448)) s0->f40E = 3;
     }
     v1 = a0->f96;
     if (v1 <= 0xFFFDu) a0->f96 = v1 + 1;
     if (a0->f20 == 8) {
-        if (a0->f95 == 0) func_00282948(&s0->f48C);
+        if (a0->f95 == 0) math_fast_float_d(&s0->f48C);
     }
-    func_00282948(&s0->f440);
-    func_00282948(&s0->f44C);
+    math_fast_float_d(&s0->f440);
+    math_fast_float_d(&s0->f44C);
 }
 
 
 
-extern void func_002A8D70(void *, int, int, int, int, int, float, float, float);
-extern void func_00283658(void *, void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282F20(void *, void *, float);
+extern void coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
+extern void copy_matrix_rotation(void *, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_scale_to_length(void *, void *, float);
 extern int D_0018C0BC;
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L03_00339128(void *, void *, int, int, int, int, int, float);
-extern void func_L01_003120A8(void *, void *, void *, int, int, int, int, float, float);
-extern float func_00283B98(float, float);
-extern int func_00283CF0(float);
-extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void effect_create_timed(void *, void *, int, int, int, int, int, float);
+extern void coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
+extern float FastAddRotations(float, float);
+extern int FloatToInt(float);
+extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern int func_001163B0(void);
 
 /* func_PAL_L08_003DD918, the PAL copy of func_L08_003D9798: the same C, with speeds and
@@ -198,75 +198,75 @@ void func_PAL_L08_003DD918(char *object)
     char *state = *(char **)(object + 0x68), *particle;
     float heading, angle;
     int a, b, c;
-    func_002A8D70(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
-    func_00283658(matrix,object+0xC0);
-    func_0029FCC0(object,1,point);
+    coll_test_hit_at_bone(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
+    copy_matrix_rotation(matrix,object+0xC0);
+    moby_transform_joint_to_world(object,1,point);
     qcopy_nc(origin,point);
     matrix[2]=0;
     qcopy_nc(start,origin);
-    func_00282F20(end,matrix,3.0f);
+    vec_scale_to_length(end,matrix,3.0f);
     if (*(int *)(state+0x250)) {
         if ((unsigned)(D_0018C0BC-17)<2) end[2]=*(float *)(state+0x218)-start[2];
         else end[2]=*(float *)(state+0x248)-start[2];
         if (end[2]>1.2f) end[2]=1.2f;
         else if(end[2]<-1.2f) end[2]=-1.2f;
     }
-    func_00282CC0(end,end,start);
-    func_L03_00339128(end,object,1,0x808080,127,30,255,0.5f);
-    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
-    func_00282F20(step,matrix+4,0.1f);
-    func_00282CC0(start,start,step);
-    func_00282CC0(end,end,step);
-    end[2]+=func_002A7878(-0.2f,0.2f);
-    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
-    func_00282F20(step,matrix+4,-0.2f);
-    func_00282CC0(start,start,step);
-    func_00282CC0(end,end,step);
-    end[2]+=func_002A7878(-0.2f,0.2f);
-    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    FastVecAdd(end,end,start);
+    effect_create_timed(end,object,1,0x808080,127,30,255,0.5f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    vec_scale_to_length(step,matrix+4,0.1f);
+    FastVecAdd(start,start,step);
+    FastVecAdd(end,end,step);
+    end[2]+=math_random_float_range(-0.2f,0.2f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    vec_scale_to_length(step,matrix+4,-0.2f);
+    FastVecAdd(start,start,step);
+    FastVecAdd(end,end,step);
+    end[2]+=math_random_float_range(-0.2f,0.2f);
+    coll_cast_object_line(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
     heading=*(float *)(object+0xF8);
     velocity[3]=0.6f; accel[3]=1.5f;
     { int i; for(i=1;i>=0;i--) {
         qcopy_nc(position,origin);
-        position[0]+=func_002A7878(-0.065f,0.065f);
-        position[1]+=func_002A7878(-0.065f,0.065f);
-        position[2]+=func_002A7878(-0.065f,0.065f);
-        velocity[0]=func_00283180(heading)*0.34000003f;
-        velocity[1]=func_00283198(heading)*0.34000003f;
+        position[0]+=math_random_float_range(-0.065f,0.065f);
+        position[1]+=math_random_float_range(-0.065f,0.065f);
+        position[2]+=math_random_float_range(-0.065f,0.065f);
+        velocity[0]=math_fast_sin_or_cos_a(heading)*0.34000003f;
+        velocity[1]=math_fast_sin_or_cos_b(heading)*0.34000003f;
         velocity[2]=0;
-        velocity[2]=func_002A7878(0,0);
-        angle=func_002A7878(-90,90)*0.01745329424738884f;
-        accel[0]=func_00283180(func_00283B98(heading,angle))*0.010000001f;
-        accel[1]=func_00283198(func_00283B98(heading,angle))*0.010000001f;
+        velocity[2]=math_random_float_range(0,0);
+        angle=math_random_float_range(-90,90)*0.01745329424738884f;
+        accel[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.010000001f;
+        accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.010000001f;
         accel[2]=0;
-        accel[2]=func_002A7878(0.018000001f,0.022000002f);
-        a=func_00283CF0((func_002A7878(2,4)*5.0f+2.0f)*0.16666667f);
-        b=func_00283CF0((func_002A7878(12,14.40000057220459f)*5.0f+2.0f)*0.16666667f);
-        c=func_00283CF0((func_002A7878(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
-        particle=func_002BAA28(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
+        accel[2]=math_random_float_range(0.018000001f,0.022000002f);
+        a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
+        b=FloatToInt((math_random_float_range(12,14.40000057220459f)*5.0f+2.0f)*0.16666667f);
+        c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
         if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }
     velocity[3]=0.05f; accel[3]=0.07f;
     { int i; for(i=1;i>=0;i--) {
         qcopy_nc(position,origin);
-        position[0]+=func_002A7878(-0.2f,0.2f);
-        position[1]+=func_002A7878(-0.2f,0.2f);
-        position[2]+=func_002A7878(-0.2f,0.2f);
-        angle=func_002A7878(-10,10)*0.01745329424738884f;
-        velocity[0]=func_00283180(func_00283B98(heading,angle))*0.24000001f;
-        velocity[1]=func_00283198(func_00283B98(heading,angle))*0.24000001f;
+        position[0]+=math_random_float_range(-0.2f,0.2f);
+        position[1]+=math_random_float_range(-0.2f,0.2f);
+        position[2]+=math_random_float_range(-0.2f,0.2f);
+        angle=math_random_float_range(-10,10)*0.01745329424738884f;
+        velocity[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.24000001f;
+        velocity[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.24000001f;
         velocity[2]=0;
-        velocity[2]=func_002A7878(0,0);
-        angle=func_002A7878(-90,90)*0.01745329424738884f;
-        accel[0]=func_00283180(func_00283B98(heading,angle))*0.010000001f;
-        accel[1]=func_00283198(func_00283B98(heading,angle))*0.010000001f;
+        velocity[2]=math_random_float_range(0,0);
+        angle=math_random_float_range(-90,90)*0.01745329424738884f;
+        accel[0]=math_fast_sin_or_cos_a(FastAddRotations(heading,angle))*0.010000001f;
+        accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.010000001f;
         accel[2]=0;
-        accel[2]=func_002A7878(0.014f,0.030000001f);
-        a=func_00283CF0((func_002A7878(2,4)*5.0f+2.0f)*0.16666667f);
-        b=func_00283CF0((func_002A7878(20,24)*5.0f+2.0f)*0.16666667f);
-        c=func_00283CF0((func_002A7878(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
-        particle=func_002BAA28(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
+        accel[2]=math_random_float_range(0.014f,0.030000001f);
+        a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
+        b=FloatToInt((math_random_float_range(20,24)*5.0f+2.0f)*0.16666667f);
+        c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
         if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }

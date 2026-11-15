@@ -11,21 +11,21 @@ typedef struct {
 
 extern Ent330 r1_D_0015B640[];
 
-extern int func_00128D58(int);
+extern int scePad2LinkDriver(int);
 
-extern int func_00128578(int);
+extern int sceDbcGetDepNumber(int);
 
 extern void r1_func_00119288(void *, void *);
 
-extern void *func_00128DB0(int);
+extern void *pad_select_newer_buffer(int);
 
 extern void r1_func_00119288(void *a, void *b);
 
-extern int func_00128E18(int);
+extern int scePad2CheckDma(int);
 
 extern int r1_D_00132ED8[];
 
-extern int func_00128E98(unsigned char *, int *);
+extern int pad_expand_button_mask(unsigned char *, int *);
 
 /* rac1-decomp src/core/001236F0.c: func_00125020 */
 /* scePad2LinkDriver(port): opens the link driver for `port` and, on
@@ -33,8 +33,8 @@ extern int func_00128E98(unsigned char *, int *);
    its own early return: with one shared `return t` the compiler moves the
    result copy to the end of the function. */
 /* Links the driver to a controller port and remembers the handle. */
-int func_00128D58(int port) {
-    int handle = SceDbcGetDepNumber(port);
+int scePad2LinkDriver(int port) {
+    int handle = sceDbcGetDepNumber(port);
     if (handle < 0) {
         return handle;
     }
@@ -61,7 +61,7 @@ int func_00128D58(int port) {
  * give the table a real element type and index it. See Ent330 above.
  */
 /* Returns whichever of the two controller data buffers was written most recently. */
-void *func_00128DB0(int port) {
+void *pad_select_newer_buffer(int port) {
     char *padBuf = r1_D_0015B640[port].dmaBuffer;
     char *slot[2];
 
@@ -80,7 +80,7 @@ void *func_00128DB0(int port) {
    2.9-ee; under 2.95.3 it was a word long. */
 /* The old note's decode, exact since 001236F0.c builds with 2.9-ee. */
 /* Returns 1 if the controller data has changed since the last check, otherwise 0. */
-int func_00128E18(int port) {
+int scePad2CheckDma(int port) {
     char *padBuf = r1_D_0015B640[port].dmaBuffer;
     char *slot[2];
 
@@ -105,7 +105,7 @@ int func_00128E18(int port) {
    sets i gives i the shorter live range, so this file's compiler
    (2.9-ee) allocates it first, as retail. */
 /* Turns a bit mask of buttons into a list of button slots. */
-int func_00128E98(unsigned char *src, int *out) {
+int pad_expand_button_mask(unsigned char *src, int *out) {
     int bit;
     int a;
     int i;
@@ -160,7 +160,7 @@ extern int r1_func_00124A70(int, Mode128F48, int *, int);
    and the struct is passed by value. `if (r >= 0) return out;` keeps
    retail's two returns; an `r = out` spelling becomes slt/movz. */
 /* Sends a command to a controller port and returns the result value. */
-int func_00128F48(int port, int dst) {
+int pad_send_command(int port, int dst) {
     Mode128F48 m;
     int out;
     int status;
@@ -182,14 +182,14 @@ extern void *func_001153D4(void *, const void *, unsigned int);
    func_00128F48's: retail moves the whole 64-bit register into $a1
    (daddu), where an int view of it would be truncated (dsll32/dsra32,
    as libpad2's func_00128B28 shows). */
-extern int func_001286C8(int, Mode128F48, int *, unsigned char *);
+extern int dbc_send_vibration_command(int, Mode128F48, int *, unsigned char *);
 
 /* The libvib sibling of func_00128F48: build command {0xB, 1, 3, 1}, pack
    both sizes and the two blocks (first, then second) into one packet and
    send it through func_001286C8 with a 0x28-byte size word. Initialising
    `result` before the bitfields gives retail's insert schedule; adding the
    packet's address to first_size gives retail's second destination. */
-int func_00128FD0(int port, int second_size, void *second, int first_size, void *first) {
+int sceVibSetActParam(int port, int second_size, void *second, int first_size, void *first) {
     Mode128F48 m;
     struct {
         int sizes[2];
@@ -203,11 +203,11 @@ int func_00128FD0(int port, int second_size, void *second, int first_size, void 
     m.c = 3;
     m.d = 1;
     packet.sizes[1] = first_size;
-    memcpy_001153D4(packet.buffer, first, first_size);
+    func_001153D4(packet.buffer, first, first_size);
     packet.sizes[0] = second_size;
     first_size += (int)&packet;
-    memcpy_001153D4((void *)(first_size + 8), second, second_size);
-    return SendVibrationCommand(port, m, &result, (unsigned char *)&packet);
+    func_001153D4((void *)(first_size + 8), second, second_size);
+    return dbc_send_vibration_command(port, m, &result, (unsigned char *)&packet);
 }
 
 ASM_FUNC("asm/core", func_001290BC);

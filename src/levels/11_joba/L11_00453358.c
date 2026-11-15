@@ -86,79 +86,79 @@ typedef struct {
     JobaObject *player;
 } PlayerBlock;
 
-extern int func_00277F48(int, int, void *, int, float);
-extern void func_002A8F70(void *, void *, int, float, float *, float *);
-extern PlayerBlock D_00189E20;
+extern int coll_process_hit(int, int, void *, int, float);
+extern void part_queue_impact_effect(void *, void *, int, float, float *, float *);
+extern PlayerBlock g_hero_state;
 extern JobaObject *D_L11_001C4D80[];
-extern int func_00283CF0(float);
-extern HitRecord *func_002A9640(void *, int, int);
-extern int func_002B0ED8(void *, void *, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
+extern int FloatToInt(float);
+extern HitRecord *part_find_owned_effect_slot(void *, int, int);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
 extern char D_L11_001BA8C0[];
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283BE0(float, float);
-extern float func_002A78D8(float, float);
-extern void func_L00_002E6EF8(void *, char *);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void gfx_add_draw_callback_third(void *, char *);
 
 typedef int TI128 __attribute__((mode(TI)));
 
 
 extern void func_00282D30_2(char *dst, char *src, float scale);
-extern void func_002A7750(void *a0, int a1, int a2);
-extern void func_002AB8C0(void *a0, void *a1);
-extern void func_002A0488(void *a0, int a1, int a2, int a3);
-extern void func_002A8C28(void *a0, void *a1, int a2, float f12, float f13, float f14,
+extern void moby_set_state(void *a0, int a1, int a2);
+extern void gfx_update_color_fade(void *a0, void *a1);
+extern void set_moby_color(void *a0, int a1, int a2, int a3);
+extern void coll_sweep_from_object(void *a0, void *a1, int a2, float f12, float f13, float f14,
                           int a3, int t0, int t1);
-extern void func_L11_00459F30();
-extern void func_L11_0045A3C8();
-extern void func_L11_0045A578();
-extern float func_00283248(float a, float b);
-extern float func_002A7878(float a, float b);
-extern float func_00283180(float x);
-extern float func_00283198(float x);
+extern void gfx_l11_draw_beam_strips();
+extern void gfx_l11_draw_billboard_flare();
+extern void joba_effect_spawn_quad();
+extern float mat_fast_helper_a(float a, float b);
+extern float math_random_float_range(float a, float b);
+extern float math_fast_sin_or_cos_a(float x);
+extern float math_fast_sin_or_cos_b(float x);
 
-extern void func_002A7470(void *a0, int a1, int a2, int a3);
+extern void anim_start_blended(void *a0, int a1, int a2, int a3);
 
 extern void func_002A05A8(void *a0);
 
-extern void func_L11_00441978(char *p, int id);
+extern void arena_add_waiting_fighter(char *p, int id);
 
-extern int func_L11_00441868(char *p, int id);
+extern int arena_consume_waiting_fighter(char *p, int id);
 
-extern int func_002B3BA8(void *a0, int a1, int a2, int a3, float f12, float f13);
+extern int weapon_select_aim_target(void *a0, int a1, int a2, int a3, float f12, float f13);
 
-extern void func_002B60B0(void *a0, float f12, float f13, float f14, float f15);
+extern void moby_set_controller_speed_limits(void *a0, float f12, float f13, float f14, float f15);
 
-extern float func_002A7820(int a0, int a1);
+extern float math_random_int_range(int a0, int a1);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_00281EB8(void *a0, void *a1, void *a2, float f12, float f13,
+extern void gfx_draw_billboard_quad(void *a0, void *a1, void *a2, float f12, float f13,
                           float f14, int a3);
 
-extern void func_002B3380(void *a0, void *a1, void *a2, int a3);
+extern void part_spawn_damage_debris(void *a0, void *a1, void *a2, int a3);
 
 extern void func_002A0F48(void *a0);
 
-extern void func_L00_002E6CF0(void *a0, void *a1);
+extern void gfx_add_draw_callback_first(void *a0, void *a1);
 
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(char *, char *);
-extern int func_002ACBC8(void *, int);
-extern void func_0029FCC0(char *, int, void *);
-extern void func_002830C0(void *, void *, void *);
-extern u8 *func_L11_003DD068(u8 *, u8 *, u8 *, float);
-extern float func_00283B98(float, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_0033C0D0(char *, void *, void *, void *, int);
-extern char D_00189EA0[];
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(char *, char *);
+extern int IsPointInCuboid(void *, int);
+extern void moby_transform_joint_to_world(char *, int, void *);
+extern void transform_vector(void *, void *, void *);
+extern u8 *hoverbike_bomb_spawn(u8 *, u8 *, u8 *, float);
+extern float FastAddRotations(float, float);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_object_relative_particle(char *, void *, void *, void *, int);
+extern char g_hero_position[];
 extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
 /* 64-byte records indexed by D_L11_001B089C[0]. */
 typedef struct { int unused; int flags; char pad[56]; } Entry61308;
 extern Entry61308 D_L11_002B6D40[];
-extern char *D_L11_001B359C[] NOT_SDA __attribute__((sda));
+extern char *g_moby_l11_table[] NOT_SDA __attribute__((sda));
 extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
 /* Lower and upper bound of a random value. */
 extern float D_L11_001B2388[] NOT_SDA __attribute__((sda));
@@ -166,7 +166,7 @@ extern char D_L11_001B2378[] NOT_SDA __attribute__((sda));
 extern char D_L11_001B2368[] NOT_SDA __attribute__((sda));
 extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
 
-extern void func_L11_0045B6C8(char *p);
+extern void gfx_draw_spinning_glow_sprites(char *p);
 
 extern int D_L11_001CAE40;
 
@@ -174,7 +174,7 @@ extern int D_L11_001B46D4;
 
 extern int D_L11_001B30C8;
 
-extern void func_L11_00458DF0(char *a0, void *a1, void *a2, int a3, int t0, float f12,
+extern void part_draw_billboard_sprite(char *a0, void *a1, void *a2, int a3, int t0, float f12,
                               float f13);
 
 /* The vector the aim helpers read, at 0x001BA780 in joba. */
@@ -187,47 +187,47 @@ typedef struct {
 
 extern L11AimVector D_L11_001BA780;
 
-extern void func_L11_0045FFB0(char *pkt);
+extern void part_reset_quad_record_c(char *pkt);
 
-extern long long func_0027C878(char *p);
+extern long long GetEffectTextureDescriptor(char *p);
 
-extern float func_00282E80(void *p, float *v);
+extern float vec_distance_xy(void *p, float *v);
 
-extern void func_00283410(float *matrix, float *quat);
+extern void euler_to_matrix(float *matrix, float *quat);
 
-extern void func_00282CF0(float *out, float *a, float *b);
+extern void FastVecSub(float *out, float *a, float *b);
 
-extern void func_00282F20(float *dst, float *src, float scale);
+extern void vec_scale_to_length(float *dst, float *src, float scale);
 
-extern void func_00280B90(char *pkt, float *matrix, int mode);
-extern void func_002E59F8(int index);
+extern void draw_world_quad(char *pkt, float *matrix, int mode);
+extern void snd_stop_voice(int index);
 
-extern void func_002E5DA0(int index, int value, char *object, int kind);
+extern void snd_play_from_class_bank(int index, int value, char *object, int kind);
 
-extern void func_0032C700(char *, int, int, int, int, int, int, int, float, float, int,
+extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
                          int, int, int);
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
-extern void func_L11_003973F8(char *, int, float, float);
+extern void moby_spawn_linked(char *, int, float, float);
 
-extern char D_00188660[];
+extern char g_sound_state[];
 
-extern void func_L11_00456540(char *);
-extern void func_L11_00456378(char *);
-extern void func_L11_00456EA0(void);
+extern void fighter_reset_to_idle(char *);
+extern void fighter_update_lock_on(char *);
+extern void joba_ring_effect_draw_sprites(void);
 
 /* func_L11_00453358 lives in L11_00453358-state-g8.c. */
 
 /* func_L11_00454508 lives in the sibling small-data unit (L11_00453358-g8.c). */
 
 /* Keeps the actor's timer going: re-arms its effect once a timer reaches zero, and counts the frames it has lived. */
-void func_L11_00454AE0(char *moby)
+void drone_update_timer(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     unsigned short frameCount;
 
-    UpdateColorFade(moby, vars + 0x50);
+    gfx_update_color_fade(moby, vars + 0x50);
     if (*(short *)(vars + 0x50) == 0) {
         if (*(short *)(vars + 0x1FE) == 0) {
             set_moby_color(moby, *(int *)(vars + 0x1F0), *(int *)(vars + 0x1F4), *(int *)(vars + 0x1F8));
@@ -246,7 +246,7 @@ extern int func_002B3BA8_4b60(void *, u32, float, float, int, int);
 
 /* Same body as func_L02_0040CF68, with this function's own callees. */
 /* Checks whether the actor still has a target to lock on to, and sends it back to patrolling when it loses it. */
-void func_L11_00454B60(u8 *moby) {
+void drone_update_lock_on(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     if (moby[0x20] < 4) {
@@ -257,7 +257,7 @@ void func_L11_00454B60(u8 *moby) {
             *(s16 *)(vars + 0x1EA) = func_002B3BA8_4b60(moby, *(u32 *)(vars + 0x1E4), 100.0f, 100.0f, 0, 0);
             *(s32 *)(vars + 0x1C4) = *(s32 *)(vars + 0x160);
         } else {
-            if (moby[0x31] != 0 && ConsumeWaitingFighterOfClass(*(void **)(moby + 0xB8), *(s16 *)(moby + 0xAA)) != 0) {
+            if (moby[0x31] != 0 && arena_consume_waiting_fighter(*(void **)(moby + 0xB8), *(s16 *)(moby + 0xAA)) != 0) {
                 *(u16 *)(vars + 0x1EC) = 1;
                 *(s16 *)(vars + 0x1EA) = func_002B3BA8_4b60(moby, *(u32 *)(vars + 0x1E4), 100.0f, 100.0f, 0, 0);
                 *(s32 *)(vars + 0x1C4) = *(s32 *)(vars + 0x160);
@@ -276,7 +276,7 @@ void func_L11_00454B60(u8 *moby) {
 
 
 /* Aims the object's stage, re-arms its effect and stores the new heading. */
-void func_L11_00454C78(char *moby, int delay, int mode)
+void drone_init_state(char *moby, int delay, int mode)
 {
     char *vars = *(char **)(moby + 0x68);
     char *definition;
@@ -290,7 +290,7 @@ void func_L11_00454C78(char *moby, int delay, int mode)
     *(unsigned char *)(vars + 0x2E) = 1;
     *(float *)(vars + 0x20) = value;
     if (*(unsigned char *)(moby + 0x43) != 0)
-        StartAnimationBlended(moby, 0, 0, 10);
+        anim_start_blended(moby, 0, 0, 10);
     flags = *(unsigned short *)(moby + 0x34);
     *(unsigned char *)(moby + 0x7F) = 0;
     *(unsigned short *)(moby + 0x34) = (flags | 0x1000) & 0xFFB9;
@@ -298,16 +298,16 @@ void func_L11_00454C78(char *moby, int delay, int mode)
     cache = *(int *)(definition + 0x10);
     *(int *)(moby + 0x98) = cache;
     if (*(short *)(vars + 0x1FC) != 0) {
-        SetMobyState(moby, 7, 3);
+        moby_set_state(moby, 7, 3);
         *(unsigned short *)(moby + 0x34) |= 0x100;
-        SpawnLinkedMoby(moby, 0, 2.0f, 2.0f);
+        moby_spawn_linked(moby, 0, 2.0f, 2.0f);
     } else {
-        SetMobyState(moby, 3, 1);
+        moby_set_state(moby, 3, 1);
         *(unsigned char *)(moby + 0x31) = 1;
         *(unsigned short *)(moby + 0x34) &= 0xFEFE;
     }
-    ClearVector128(vars + 0x1B0);
-    value = RandomFloatRange(20.0f, 30.0f) * 0.017453294f;
+    vec_clear_128(vars + 0x1B0);
+    value = math_random_float_range(20.0f, 30.0f) * 0.017453294f;
     *(short *)(vars + 0x1EE) = delay;
     *(float *)(vars + 0x1CC) = value;
     if (*(short *)(vars + 0x50) != 0) {
@@ -318,29 +318,29 @@ void func_L11_00454C78(char *moby, int delay, int mode)
 }
 
 /* Releases the object's slot in the shared table and drops it to the idle flag block. */
-void func_L11_00454DD8(char *moby)
+void drone_reset_to_idle(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     int slot = *(int *)(vars + 0x1DC);
     char *entry;
 
     if (slot != -1) {
-        entry = gSoundState + slot * 0x70;
+        entry = g_sound_state + slot * 0x70;
         if (*(char **)(entry + 0x88) == moby && *(unsigned char *)(entry + 0x74) != 0)
-            StopSoundVoice(slot);
+            snd_stop_voice(slot);
     }
     *(int *)(vars + 0x1DC) = -1;
     if (*(short *)(vars + 0x1EC) == 1) {
         *(short *)(vars + 0x1EC) = 0;
-        AddWaitingFighterOfClass(*(char **)(moby + 0xB8), *(short *)(moby + 0xAA));
+        arena_add_waiting_fighter(*(char **)(moby + 0xB8), *(short *)(moby + 0xAA));
     }
     if (*(unsigned char *)(moby + 0x31) != 0) {
         SpawnExplosion(moby + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
-        PlaySoundFromClassBank(0, 0, moby, 0xDF7);
+        snd_play_from_class_bank(0, 0, moby, 0xDF7);
     }
-    StartAnimationBlended(moby, 0, 0, 3);
+    anim_start_blended(moby, 0, 0, 3);
     func_002A05A8(moby);
-    SetMobyState(moby, 1, 0);
+    moby_set_state(moby, 1, 0);
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xEFFF) | 0x47;
     *(int *)(moby + 0x98) = 0;
     *(unsigned char *)(moby + 0x31) = 0;
@@ -352,7 +352,7 @@ void func_L11_00454DD8(char *moby)
 
 /* Sets up the actor's tuning on its first stage, handles contacts while active, and runs the
    attack-state update. */
-void func_L11_00455DF8(JobaObject *obj)
+void fighter_update_contacts(JobaObject *obj)
 {
     JobaActorState *state = obj->state;
     HitRecord *hit;
@@ -378,47 +378,47 @@ void func_L11_00455DF8(JobaObject *obj)
         state->f28 = 3;
         state->f30 = 0.75f;
         state->f29 = 1;
-        ResetJobaFighterToIdle((char *)obj);
+        fighter_reset_to_idle((char *)obj);
     }
 
     if (obj->active) {
         if (obj->stage >= 3) {
-            hit = FindOwnedEffectSlot(obj, 0x10000, 1);
+            hit = part_find_owned_effect_slot(obj, 0x10000, 1);
             if (hit && (other = hit->object) && !obj->active) {
                 if (other->id == 0xDF9 /* moby class 3577 */ || other->id == 0xB89 /* moby class 2953 */)
                     hit->f2C = 0;
             }
-            if (ApplyDamageToObject(obj, state->contact, 0) == 5) {
+            if (moby_apply_damage_to_object(obj, state->contact, 0) == 5) {
                 state->fE0 = 0;
                 state->fE4 = 0.837758183f;
             }
         }
         if (obj->active && fast_vec_dist(obj->position, D_L11_001BA8C0) < 24.0f) {
-            UpdateMobyGroundCheck(obj);
+            moby_update_ground_check(obj);
             obj->f6F = 22;
         }
     }
 
     if (obj->stage >= 2 && state->f2E == 2)
-        ResetJobaFighterToIdle((char *)obj);
-    UpdateJobaFighterLockOn((char *)obj);
+        fighter_reset_to_idle((char *)obj);
+    fighter_update_lock_on((char *)obj);
 }
 
 /* Counts one more frame for the object and checks what it touches. */
-void func_L11_00456010(char *moby)
+void fighter_count_frame_check_contact(char *moby)
 {
     unsigned short frameCount = *(unsigned short *)(moby + 0x96);
 
     if (frameCount < 0xFFFF)
         *(unsigned short *)(moby + 0x96) = frameCount + 1;
-    SweepCollisionFromObject(moby, moby + 0x10, 0x4000000, 1.6f, 1.0f, 1.0f, 0, 1, 0);
+    coll_sweep_from_object(moby, moby + 0x10, 0x4000000, 1.6f, 1.0f, 1.0f, 0, 1, 0);
 }
 
 extern int func_002B3BA8_6378(char *, int, float, float, int, int);
 
 /* Same body as func_L02_003F16F0, with this function's own callees. */
 /* Starts or stops the lock-on on the target depending on the object's state. */
-void func_L11_00456378(char *moby) {
+void fighter_update_lock_on(char *moby) {
     char *state = *(char **)(moby + 0x68);
 
     if (*(unsigned char *)(moby + 0x20) < 4) {
@@ -431,7 +431,7 @@ void func_L11_00456378(char *moby) {
             func_002B3BA8_6378(moby, *(int *)(state + 0x24C), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x240) = *(int *)(state + 0x220);
     } else {
-        if (ConsumeWaitingFighterOfClass(*(int *)(moby + 0xB8), *(short *)(moby + 0xAA)) == 0)
+        if (arena_consume_waiting_fighter(*(int *)(moby + 0xB8), *(short *)(moby + 0xAA)) == 0)
             goto done;
         *(short *)(state + 0x256) = 1;
         *(short *)(state + 0x254) =
@@ -446,18 +446,18 @@ done:
 
 
 /* Retires the state's counter and drops the object to its idle flag block. */
-void func_L11_00456540(char *moby)
+void fighter_reset_to_idle(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(short *)(vars + 0x256) == 1) {
-        AddWaitingFighterOfClass(*(char **)(moby + 0xB8), 0xDF9 /* moby class 3577 */);
+        arena_add_waiting_fighter(*(char **)(moby + 0xB8), 0xDF9 /* moby class 3577 */);
     }
     *(short *)(vars + 0x256) = 0;
     *(int *)(vars + 0x240) = 0;
-    StartAnimationBlended(moby, 0, 0, 3);
+    anim_start_blended(moby, 0, 0, 3);
     func_002A05A8(moby);
-    SetMobyState(moby, 1, 0);
+    moby_set_state(moby, 1, 0);
     *(int *)(moby + 0x98) = 0;
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xEFFF) | 0x47;
     *(char *)(moby + 0x31) = 0;
@@ -465,19 +465,19 @@ void func_L11_00456540(char *moby)
 
 /* Same body as func_L02_003F1A88, with this function's own callees. */
 /* Picks a random goal spot about eight units from the target and stores it. */
-void func_L11_004565D8(char *moby, char *targetPos) {
+void fighter_pick_goal_near_target(char *moby, char *targetPos) {
     char *state;
     float angle;
     float radius;
 
-    angle = FastMatrixHelperA(*(float *)(moby + 0x10) - *(float *)targetPos,
+    angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)targetPos,
                           *(float *)(moby + 0x14) - *(float *)(targetPos + 4));
-    angle += RandomFloatRange(-0.78539824f, 0.78539824f);
-    radius = RandomFloatRange(-2.0f, 2.0f) + 8.0f;
+    angle += math_random_float_range(-0.78539824f, 0.78539824f);
+    radius = math_random_float_range(-2.0f, 2.0f) + 8.0f;
     state = *(char **)(moby + 0x68);
     qcopy(state + 0x230, targetPos);
-    *(float *)(state + 0x230) += radius * FastSinOrCosA(angle);
-    *(float *)(state + 0x234) += radius * FastSinOrCosB(angle);
+    *(float *)(state + 0x230) += radius * math_fast_sin_or_cos_a(angle);
+    *(float *)(state + 0x234) += radius * math_fast_sin_or_cos_b(angle);
 }
 
 /* func_L11_004566C0 lives in L11_00453358-aim-g8.c. */
@@ -486,14 +486,14 @@ void func_L11_004565D8(char *moby, char *targetPos) {
 
 /* Damages and knocks back every object within radius of the source, with separate damage,
    scale and lift for the player and for everything else. */
-void func_L11_00456A48(JobaObject *source, int kind, float radius, float playerDamage,
+void joba_damage_objects_in_radius(JobaObject *source, int kind, float radius, float playerDamage,
                        float otherDamage, float playerScale, float otherScale, float playerZ,
                        float otherZ)
 {
     float pos[4];           /* receives a copy of the target position that is not read again */
     float impulseStorage[4];
     float *impulse;
-    int count = ProcessCollisionHit(kind, 0, source, 0, radius);
+    int count = coll_process_hit(kind, 0, source, 0, radius);
     JobaObject **entry;
     PlayerBlock *resident;
     int remaining;
@@ -504,7 +504,7 @@ void func_L11_00456A48(JobaObject *source, int kind, float radius, float playerD
     if (count != 0) {
         if (count > 0) {
             impulse = impulseStorage;
-            resident = &gHeroState;
+            resident = &g_hero_state;
             entry = D_L11_001C4D80;
             remaining = count;
             do {
@@ -531,7 +531,7 @@ void func_L11_00456A48(JobaObject *source, int kind, float radius, float playerD
                 vec_scale_to_length(impulse, impulse, scale);
                 impulseStorage[2] = z;
                 impulseStorage[3] = 5627.925f;
-                QueueImpactEffect(target, source, 0x10001, damage, point, impulse);
+                part_queue_impact_effect(target, source, 0x10001, damage, point, impulse);
             next:
                 remaining--;
                 entry++;
@@ -541,7 +541,7 @@ void func_L11_00456A48(JobaObject *source, int kind, float radius, float playerD
 }
 
 /* Keeps the ring's points inside the configured radial and angular limits. */
-void func_L11_00456C20(JobaObject *obj)
+void joba_ring_effect_update(JobaObject *obj)
 {
     JobaRingState *state = obj->state;
     float *point;
@@ -556,38 +556,38 @@ void func_L11_00456C20(JobaObject *obj)
         for (i = 0; i < state->count; i++) {
             float newRadius, newAzimuth;
 
-            newRadius = RandomFloatRange(state->minRadius, state->maxRadius);
-            newAzimuth = RandomAngle();
-            BuildSphericalOffset(state->points[i], newRadius, newAzimuth, RandomAngle());
+            newRadius = math_random_float_range(state->minRadius, state->maxRadius);
+            newAzimuth = math_random_angle();
+            vec_build_spherical_offset(state->points[i], newRadius, newAzimuth, math_random_angle());
             FastVecAdd(state->points[i], obj->position, state->points[i]);
         }
     }
 
     if (obj->stage == 1) {
-        AddDrawCallbackToList3(DrawJobaRingEffectSprites, (char *)obj);
+        gfx_add_draw_callback_third(joba_ring_effect_draw_sprites, (char *)obj);
         for (j = 0; j < state->count; j++) {
             point = state->points[j];
             FastVecSub(scratch, obj->position, point);
-            azimuth = FastMatrixHelperA(point[0] - obj->position[0], point[1] - obj->position[1]);
-            elevation = FastMatrixHelperA(vec_distance_xy(obj->position, point),
+            azimuth = mat_fast_helper_a(point[0] - obj->position[0], point[1] - obj->position[1]);
+            elevation = mat_fast_helper_a(vec_distance_xy(obj->position, point),
                                       point[2] - obj->position[2]);
             azimuth = fast_subtract_rotations(azimuth, state->f9C * 0.017453294f);
             elevation = fast_subtract_rotations(elevation,
-                                      RandomSignedFloatRange(state->fA4, state->fA0) * 0.017453294f);
+                                      math_random_signed_float_range(state->fA4, state->fA0) * 0.017453294f);
             if (state->maxElevation < elevation)
                 elevation = state->maxElevation;
             if (elevation < state->minElevation)
                 elevation = state->minElevation;
 
             radius = fast_vec_dist(obj->position, point);
-            step = RandomSignedFloatRange(state->f98 * 0.0166666675f, state->f94 * 0.0166666675f);
+            step = math_random_signed_float_range(state->f98 * 0.0166666675f, state->f94 * 0.0166666675f);
             radius += step;
             if (state->maxRadius < radius)
                 radius = state->maxRadius;
             if (radius < state->minRadius)
                 radius = state->minRadius;
 
-            BuildSphericalOffset(point, radius, azimuth, elevation);
+            vec_build_spherical_offset(point, radius, azimuth, elevation);
             FastVecAdd(point, obj->position, point);
         }
     }
@@ -595,7 +595,7 @@ void func_L11_00456C20(JobaObject *obj)
 
 /* func_L11_00456EA0 lives in L11_00456EA0-g8.c. */
 
-extern void func_L04_0040A090(int, void *, void *, void *, void *, void *);
+extern void path_measure_segments(int, void *, void *, void *, void *, void *);
 extern char D_L11_001B1E50[] __attribute__((sda));
 extern char D_L11_001B1E70[] __attribute__((sda));
 extern char D_L11_001B1E80[] __attribute__((sda));
@@ -648,20 +648,20 @@ extern char D_L11_002626B0[];
 extern char D_L11_00262710[];
 
 /* Registers the ten groups of effect tables for this level with one shared helper. */
-void func_L11_00457600(void) {
-    MeasurePathSegments(4, D_L11_001B1E50, D_L11_001B43F0, D_L11_001B4570, D_L11_001B4608, D_L11_001B46A0);
-    MeasurePathSegments(2, D_L11_001B1E70, D_L11_001B4430, D_L11_001B4580, D_L11_001B4618, D_L11_001B46A4);
-    MeasurePathSegments(4, D_L11_001B1E80, D_L11_001B4450, D_L11_001B4588, D_L11_001B4620, D_L11_001B46A8);
+void joba_register_effect_tables(void) {
+    path_measure_segments(4, D_L11_001B1E50, D_L11_001B43F0, D_L11_001B4570, D_L11_001B4608, D_L11_001B46A0);
+    path_measure_segments(2, D_L11_001B1E70, D_L11_001B4430, D_L11_001B4580, D_L11_001B4618, D_L11_001B46A4);
+    path_measure_segments(4, D_L11_001B1E80, D_L11_001B4450, D_L11_001B4588, D_L11_001B4620, D_L11_001B46A8);
     {
         char *data = D_L11_001B4490;
-        MeasurePathSegments(2, D_L11_001B1EA0, data, D_L11_001B4598, D_L11_001B4630, D_L11_001B46AC);
+        path_measure_segments(2, D_L11_001B1EA0, data, D_L11_001B4598, D_L11_001B4630, D_L11_001B46AC);
     }
-    MeasurePathSegments(6, D_L11_001B1EB0, D_L11_002626B0, D_L11_001B45A0, D_L11_001B4638, D_L11_001B46B0);
-    MeasurePathSegments(8, D_L11_001B1EE0, D_L11_00262710, D_L11_001B45B8, D_L11_001B4650, D_L11_001B46B4);
-    MeasurePathSegments(2, D_L11_001B1F20, D_L11_001B44B0, D_L11_001B45D8, D_L11_001B4670, D_L11_001B46B8);
-    MeasurePathSegments(4, D_L11_001B1F30, D_L11_001B44D0, D_L11_001B45E0, D_L11_001B4678, D_L11_001B46BC);
-    MeasurePathSegments(4, D_L11_001B1F50, D_L11_001B4510, D_L11_001B45F0, D_L11_001B4688, D_L11_001B46C0);
-    MeasurePathSegments(2, D_L11_001B1F70, D_L11_001B4550, D_L11_001B4600, D_L11_001B4698, D_L11_001B46C4);
+    path_measure_segments(6, D_L11_001B1EB0, D_L11_002626B0, D_L11_001B45A0, D_L11_001B4638, D_L11_001B46B0);
+    path_measure_segments(8, D_L11_001B1EE0, D_L11_00262710, D_L11_001B45B8, D_L11_001B4650, D_L11_001B46B4);
+    path_measure_segments(2, D_L11_001B1F20, D_L11_001B44B0, D_L11_001B45D8, D_L11_001B4670, D_L11_001B46B8);
+    path_measure_segments(4, D_L11_001B1F30, D_L11_001B44D0, D_L11_001B45E0, D_L11_001B4678, D_L11_001B46BC);
+    path_measure_segments(4, D_L11_001B1F50, D_L11_001B4510, D_L11_001B45F0, D_L11_001B4688, D_L11_001B46C0);
+    path_measure_segments(2, D_L11_001B1F70, D_L11_001B4550, D_L11_001B4600, D_L11_001B4698, D_L11_001B46C4);
 }
 
 
@@ -674,7 +674,7 @@ void func_L11_00457600(void) {
 /* func_L11_00458C38 lives in L11_00458C38-g8.c. */
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L11_00458D88(char *vectors, float scale)
+void vec_l11_scale_four_2(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -683,11 +683,11 @@ void func_L11_00458D88(char *vectors, float scale)
 }
 
 /* Switches the object off: clears its flags and puts it in the idle state. */
-void func_L11_00458F58(char *moby)
+void moby_disable_to_idle(char *moby)
 {
     *(int *)(moby + 0x98) = 0;
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
-    SetMobyState(moby, 1, -1);
+    moby_set_state(moby, 1, -1);
 }
 
 /* func_L11_00458F90 is defined in L11_00458F90-qcopy-barrier-g8.c. */
@@ -696,19 +696,19 @@ void func_L11_00458F58(char *moby)
 /* func_L11_00459640 and func_L11_00459D48 live in the sibling small-data unit (L11_00453358-g8.c). */
 
 /* Runs the effect's two update steps, then spawns five more particle quads. */
-void func_L11_00459E48(char *moby)
+void joba_effect_update_particles(char *moby)
 {
     int i;
 
-    DrawBeamStrips_L11(moby);
-    DrawBillboardFlare_L11(moby);
+    gfx_l11_draw_beam_strips(moby);
+    gfx_l11_draw_billboard_flare(moby);
     for (i = 4; i >= 0; i--)
-        SpawnJobaEffectQuad(moby);
+        joba_effect_spawn_quad(moby);
 }
 
 /* shared native body of family a04928c6 */
 /* Fills a draw packet with a plain square that is four units wide. */
-void func_L11_00459EA0(char *packet)
+void gfx_init_square_packet(char *packet)
 {
     *(long long *)(packet + 112) = 0LL;
     *(int *)(packet + 80) = 0;
@@ -754,7 +754,7 @@ void func_L11_00459EA0(char *packet)
 /* func_L11_0045FDB0 is defined in L11_00453358-spawn-g8.c. */
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L11_00460038(char *vectors, float scale)
+void vec_scale_four_alt(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -765,7 +765,7 @@ void func_L11_00460038(char *vectors, float scale)
 /* Builds a 144-byte packet, aims a quaternion at the level's vector from pos through three
    float helpers, derives an offset basis by a fourth, writes the last matrix row from pos
    plus that offset, then dispatches the packet. */
-void func_L11_004600A0(char *pos, int colorBase, int alpha, char *texture, int blendFlags,
+void gfx_draw_aimed_packet(char *pos, int colorBase, int alpha, char *texture, int blendFlags,
                        float scale, float roll, float offsetScale)
 {
     char pkt[144];
@@ -774,7 +774,7 @@ void func_L11_004600A0(char *pos, int colorBase, int alpha, char *texture, int b
     float off[4];
     long long r;
 
-    ResetEffectQuadRecordC(pkt);
+    part_reset_quad_record_c(pkt);
     r = GetEffectTextureDescriptor(texture);
 
     *(long long *)(pkt + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
@@ -787,9 +787,9 @@ void func_L11_004600A0(char *pos, int colorBase, int alpha, char *texture, int b
     *(long long *)(pkt + 120) = r;
 
     quat[3] = 0.0f;
-    quat[2] = FastMatrixHelperA(D_L11_001BA780.x_140 - *(float *)(pos + 0),
+    quat[2] = mat_fast_helper_a(D_L11_001BA780.x_140 - *(float *)(pos + 0),
                            D_L11_001BA780.y_144 - *(float *)(pos + 4));
-    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &D_L11_001BA780.x_140),
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L11_001BA780.x_140),
                              D_L11_001BA780.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
@@ -802,7 +802,7 @@ void func_L11_004600A0(char *pos, int colorBase, int alpha, char *texture, int b
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    ScaleFourVectorsAlt(pkt, scale);
+    vec_scale_four_alt(pkt, scale);
     draw_world_quad(pkt, m, 0);
 }
 

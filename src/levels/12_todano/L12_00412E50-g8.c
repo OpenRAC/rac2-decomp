@@ -8,8 +8,8 @@ extern f32 D_L12_001B1800 __attribute__((sda));
 extern f32 D_L12_001B1804 __attribute__((sda));
 extern f32 D_L12_001B1808 __attribute__((sda));
 
-extern void func_002B60B0(u8 *, f32, f32, f32, f32);
-extern void func_002A7470(void *, s32, s32, s32);
+extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
+extern void anim_start_blended(void *, s32, s32, s32);
 
 typedef struct StateData {
     u8 pad_0[97];
@@ -41,7 +41,7 @@ typedef struct StateData {
 
 /* Fires the object's emitter for the new state, doubles the object's rate, arms the two
    animation tables the state selects and hands the state to both owners. */
-void func_L12_00412E50(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
+void guard_switch_animation(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
     StateData *vars = *(StateData **)(moby + 0x68);
     f32 rate0, rate1, rate2, rate3;
     u8 *owner;
@@ -51,7 +51,7 @@ void func_L12_00412E50(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
         rate1 = D_L12_001B17F8;
         rate2 = D_L12_001B1804;
         rate3 = D_L12_001B1808;
-        SetControllerSpeedLimits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
+        moby_set_controller_speed_limits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
             rate2 * 4.8481375e-06f,
             rate3 * 0.00029088824f);
         vars->field_118 = vars->field_118 * 2.0f;
@@ -60,7 +60,7 @@ void func_L12_00412E50(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
         rate1 = D_L12_001B1800;
         rate2 = D_L12_001B1804;
         rate3 = D_L12_001B1808;
-        SetControllerSpeedLimits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
+        moby_set_controller_speed_limits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
             rate2 * 4.8481375e-06f,
             rate3 * 0.00029088824f);
         vars->field_118 = vars->field_118 * 2.0f;
@@ -99,8 +99,8 @@ void func_L12_00412E50(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
         vars->field_C3 = 0x11;
     }
     if (*(u8 *)(moby + 0x43) != animId)
-        StartAnimationBlended(moby, animId, animFlags, blendFrames);
+        anim_start_blended(moby, animId, animFlags, blendFrames);
     owner = vars->field_2F8;
     if (owner != 0 && owner[0x43] != animId)
-        StartAnimationBlended(owner, animId, animFlags, blendFrames);
+        anim_start_blended(owner, animId, animFlags, blendFrames);
 }

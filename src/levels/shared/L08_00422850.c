@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern s32 func_002761F8(void *first, void *second, s32 mode, void *object, s32 flags);
+extern s32 CollLine(void *first, void *second, s32 mode, void *object, s32 flags);
 extern float D_L08_001BFF68;
 
 /* func_L01_003BD560 with a zero floor meaning the probe's own height. */
 /* Looks for solid ground below a point and returns its height, or the floor value if nothing is hit. */
-float func_L08_00422850(void *position, float first, float second, float floor, float limit)
+float coll_find_ground_height(void *position, float first, float second, float floor, float limit)
 {
     float endpoints[2][4] __attribute__((aligned(16)));
     qcopy(endpoints[0], position);

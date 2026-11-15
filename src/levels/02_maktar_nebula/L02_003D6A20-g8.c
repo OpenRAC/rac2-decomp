@@ -28,7 +28,7 @@ typedef struct {
     char pad70[0x20];
 } L02_003D6A20_Seg;
 
-extern int D_L02_001B0344 __attribute__((sda));
+extern int g_blade_trail_count __attribute__((sda));
 
 extern int D_L02_001B0370 __attribute__((sda));
 
@@ -38,16 +38,16 @@ extern TI128 D_L02_002412A0[];
 
 extern TI128 D_L02_002415C0[];
 
-extern void func_00281DE8(void *, int, int, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 
-extern void func_00280B90(void *, int, int);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws a curved path as a chain of short segments, using the saved point and tangent tables. */
-void func_L02_003D6A20(void) {
+void gfx_draw_curved_path_segments(void) {
     L02_003D6A20_Seg segment;
     int i;
     int previousValue;
@@ -57,8 +57,8 @@ void func_L02_003D6A20(void) {
     TI128 *pointRows;
     TI128 *tangentRows;
 
-    if (gBladeTrailCount >= 2) {
-        InitQuadPacketState(&segment, 0x2B, 1, 0x80);
+    if (g_blade_trail_count >= 2) {
+        gfx_init_quad_packet_state(&segment, 0x2B, 1, 0x80);
         segment.z50 = 0;
         segment.z54 = 0;
         segment.z58 = 0;
@@ -68,8 +68,8 @@ void func_L02_003D6A20(void) {
         segment.f68 = 1.0f;
         segment.f6c = 1.0f;
         previousValue = 0;
-        step = 1.0f / IntToFloat(gBladeTrailCount - 1);
-        for (i = 0; i < gBladeTrailCount - 1; i++) {
+        step = 1.0f / IntToFloat(g_blade_trail_count - 1);
+        for (i = 0; i < g_blade_trail_count - 1; i++) {
             pointRows = D_L02_002415C0;
             tangentRows = D_L02_002412A0;
             segment.p0 = pointRows[i];

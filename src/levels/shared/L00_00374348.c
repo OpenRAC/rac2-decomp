@@ -14,7 +14,7 @@ typedef struct {
     char pad72C[0x14];
     int limit;
 } PurchaseState;
-extern PurchaseState D_L00_0022F7C0;
+extern PurchaseState g_purchase_menu_model;
 typedef struct { int words[10]; } ResetRow;
 extern ResetRow D_L00_0028B380[15];
 
@@ -26,43 +26,43 @@ typedef struct {
     char pad08[0xF0];
     int last_item;
 } PlayerProgress;
-extern PlayerProgress D_001A79F8 __attribute__((sda));
-extern int D_00138180[];
+extern PlayerProgress g_player_bolts __attribute__((sda));
+extern int g_pad_state[];
 extern int D_L00_001B25A4 __attribute__((sda));
-extern void func_002E5CF8(int, int, int);
-extern void func_002F7738(void);
-extern void func_002FB1A0(void);
+extern void PlayMobySound(int, int, int);
+extern void shop_build_vendor_list_by_flags(void);
+extern void PrepareVendorSelectionPreview(void);
 
 /* The purchase confirmation's state machine: warn about the price, wait for a button, then buy. */
-void func_L00_00374348(int *result, int *unused)
+void UpdatePurchaseConfirmationDialog(int *result, int *unused)
 {
-    PurchaseState *model = &gPurchaseMenuModel;
+    PurchaseState *model = &g_purchase_menu_model;
     int index = model->selected;
     int cost = model->rows[index].cost;
     if (model->state == 1) {
         *result = 0;
-        if (gPlayerBolts.balance < cost) PlayMobySound(2, 17, model->owner);
+        if (g_player_bolts.balance < cost) PlayMobySound(2, 17, model->owner);
         model->state = 2;
     } else if (model->state == 2) {
-        if ((gPadState[0x1C4 / 4] & 16) && !(D_L00_001B25A4 & 16)) {
+        if ((g_pad_state[0x1C4 / 4] & 16) && !(D_L00_001B25A4 & 16)) {
             *result = 0;
-            gPurchaseMenuModel.state = 3;
-        } else if ((gPadState[0x1C4 / 4] & 64) && !(D_L00_001B25A4 & 64)) {
+            g_purchase_menu_model.state = 3;
+        } else if ((g_pad_state[0x1C4 / 4] & 64) && !(D_L00_001B25A4 & 64)) {
             *result = 1;
-            gPurchaseMenuModel.state = 3;
+            g_purchase_menu_model.state = 3;
         }
     } else if (model->state == 3) {
         if (*result) {
-            if (gPlayerBolts.balance >= cost) {
-                gPlayerBolts.balance -= cost;
-                gPlayerBolts.last_item = model->item_id;
-                D_L00_0028B380[gPurchaseMenuModel.rows[index].item].words[6] = 1;
-                BuildFlagGatedVendorList();
+            if (g_player_bolts.balance >= cost) {
+                g_player_bolts.balance -= cost;
+                g_player_bolts.last_item = model->item_id;
+                D_L00_0028B380[g_purchase_menu_model.rows[index].item].words[6] = 1;
+                shop_build_vendor_list_by_flags();
                 if (model->limit < model->selected) model->selected = model->limit;
                 PlayMobySound(7, 17, model->owner);
             } else PlayMobySound(0, 17, model->owner);
         } else PlayMobySound(0, 17, model->owner);
-        gPurchaseMenuModel.state = 0;
+        g_purchase_menu_model.state = 0;
         PrepareVendorSelectionPreview();
     }
 }

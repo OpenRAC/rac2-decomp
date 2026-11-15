@@ -1,21 +1,22 @@
 #include "include_asm.h"
-extern int func_002DE3A0(int);
-extern int func_002DE550(int);
-extern int func_002C9A60(void);
-extern void func_00287E80(void);
-extern void func_00339760(void *);
+#include "names.h"
+extern int menu_stream_chunk_table_init(int);
+extern int menu_stream_chunk_claim_free(int);
+extern int menu_clear_block_fields(void);
+extern void menu_clear_counter(void);
+extern void popup_set_flag_on(void *);
 extern volatile int D_001A8C88;
 extern char *D_001A8CFC __attribute__((sda));
 
 int func_PAL_002DD7B0(char *object)
 {
-    func_002DE3A0(1);
-    *(int *)(object + 0x48) = func_002DE550(0);
+    menu_stream_chunk_table_init(1);
+    *(int *)(object + 0x48) = menu_stream_chunk_claim_free(0);
     *(int *)(object + 0x4C) = 0;
-    func_002C9A60();
-    func_00287E80();
+    menu_clear_block_fields();
+    menu_clear_counter();
     if (D_001A8C88 != 0 && D_001A8CFC != 0)
-        func_00339760(D_001A8CFC + 0x3CF50);
+        popup_set_flag_on(D_001A8CFC + 0x3CF50);
     return 0;
 }
 
@@ -34,42 +35,42 @@ typedef struct {
     int pad160;
     int selected;
 } Slots_002DC900;
-extern Slots_002DC900 D_001393E0;
-extern char D_001F2840[];
+extern Slots_002DC900 g_memcard_state;
+extern char g_pause_menu_state[];
 extern int D_00258D70[];
 extern int D_001ABBEC __attribute__((sda));
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-extern char *func_00288FB8(int);
-extern char *func_002DF1F8(char *, int);
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+extern char *GetLocalizedString(int);
+extern char *text_format_location_name(char *, int);
+extern void text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Menu line for the current slot: prints its name (and the follow-up line)
    while the menu is in its listing state. */
 int func_PAL_002DD5F8(int *box)
 {
     char buf[64];
-    char *g = D_001F2840;
-    Slots_002DC900 *s = &D_001393E0;
+    char *g = g_pause_menu_state;
+    Slots_002DC900 *s = &g_memcard_state;
     int idx;
     int next;
     int y;
 
     idx = s->entries[*(int *)(*(char **)(*(char **)(g + 0x14) + 0xE8) + 0x40)].first % 0x1C;
-    func_0027C540(0);
+    SetupGifPaging(0);
     if (s->mode < 3 && s->selected < 0 && *(int *)(g + 0x164) >= 11 && s->state == 2) {
         if (idx == -1) {
-            func_0027FAA8(box[6], box[7] + D_001ABBEC / 2, 0x80F0F0F0, func_00288FB8(0xE39), -1);
+            text_draw_centered_small(box[6], box[7] + D_001ABBEC / 2, 0x80F0F0F0, GetLocalizedString(0xE39), -1);
         } else {
             next = D_00258D70[idx * 2 + 1];
             y = 0;
             if (next < 0) y = D_001ABBEC >> 1;
-            func_0027FAA8(box[6], box[7] + y, 0x80F0F0F0, func_002DF1F8(buf, idx), -1);
+            text_draw_centered_small(box[6], box[7] + y, 0x80F0F0F0, text_format_location_name(buf, idx), -1);
             if (next >= 0) {
-                func_0027FAA8(box[6], box[7] + D_001ABBEC, 0x80F0F0F0, func_00288FB8(D_00258D70[idx * 2 + 1]), -1);
+                text_draw_centered_small(box[6], box[7] + D_001ABBEC, 0x80F0F0F0, GetLocalizedString(D_00258D70[idx * 2 + 1]), -1);
             }
         }
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

@@ -22,17 +22,17 @@ typedef struct {
     PairVars *vars;             /* 0x68 */
 } Moby;
 
-extern void func_00282CF0(float *out, float *a, float *b);
-extern void func_00282CC0(float *out, float *a, float *b);
-extern void func_00282F20(float *out, float *vector, float scale);
-extern int func_00282978(short *timer);
-extern float func_00283CE0(int value);
-extern float func_00282C48(float value);
-extern int func_00283CF0(float value);
-extern int func_00283D38(unsigned int from, unsigned int to, float amount);
-extern unsigned char *func_002C2FD8(float *position, int color, int angle, int, int, int, int,
+extern void FastVecSub(float *out, float *a, float *b);
+extern void FastVecAdd(float *out, float *a, float *b);
+extern void vec_scale_to_length(float *out, float *vector, float scale);
+extern int FastDecTimer(short *timer);
+extern float IntToFloat(int value);
+extern float math_fabs(float value);
+extern int FloatToInt(float value);
+extern int FastTweenColor(unsigned int from, unsigned int to, float amount);
+extern unsigned char *part_spawn_fading(float *position, int color, int angle, int, int, int, int,
                                     float size);
-extern float D_001B5340[];                              /* the camera position */
+extern float g_camera_eye_state[];                              /* the camera position */
 extern int D_001AF174 __attribute__((sda));             /* the pairs' lifetime */
 extern unsigned int D_001AF1C4 __attribute__((sda));    /* the colour pairs */
 extern unsigned int D_001AF1C8 __attribute__((sda));
@@ -88,14 +88,14 @@ int func_PAL_00314678(Moby *self)
     int alpha;
     unsigned char *particle;
 
-    func_00282CF0(position, D_001B5340, self->position);
-    func_00282F20(position, position, -0.3f);
-    func_00282F20(step, position, 0.1f);
+    FastVecSub(position, g_camera_eye_state, self->position);
+    vec_scale_to_length(position, position, -0.3f);
+    vec_scale_to_length(step, position, 0.1f);
     count = 3;
-    func_00282CC0(position, position, self->position);
+    FastVecAdd(position, position, self->position);
     baseZ = position[2];
     do {
-        if (func_00282978(timer) == 0) {
+        if (FastDecTimer(timer) == 0) {
             if (TIMER(timerOffset) >= 41)
                 active = 1;
             ANGLE(floatOffset) += ENTRY(D_001AF1E0, floatOffset);
@@ -104,30 +104,30 @@ int func_PAL_00314678(Moby *self)
             else if (ANGLE(floatOffset) <= 0.0f)
                 ANGLE(floatOffset) += 255.0f;
 
-            mix = func_00282C48(0.5f - func_00283CE0(span - TIMER(timerOffset)) * 0.004716981f);
+            mix = math_fabs(0.5f - IntToFloat(span - TIMER(timerOffset)) * 0.004716981f);
             if (vars->altColors)
-                color = func_00283D38(D_001AF1CC, D_001AF1D0, mix);
+                color = FastTweenColor(D_001AF1CC, D_001AF1D0, mix);
             else
-                color = func_00283D38(D_001AF1C4, D_001AF1C8, mix);
+                color = FastTweenColor(D_001AF1C4, D_001AF1C8, mix);
             oldAlpha = color >> 24;
-            duration = func_00283CE0(((s32)(D_001AF174) * 5 + 2) / 6);
+            duration = IntToFloat(((s32)(D_001AF174) * 5 + 2) / 6);
             remaining = 1.0f - (float)TIMER(timerOffset) / duration;
-            alpha = func_00283CF0(func_00283CE0(oldAlpha) * (1.0f - remaining)) << 24;
+            alpha = FloatToInt(IntToFloat(oldAlpha) * (1.0f - remaining)) << 24;
             color = alpha | (color & 0xFFFFFF);
 
             position[2] = baseZ + ENTRY(D_001AF200, floatOffset);
-            particle = func_002C2FD8(position, color, func_00283CF0(ANGLE(floatOffset)) & 255,
+            particle = part_spawn_fading(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
                                      D_001AF1D8, 0, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * remaining);
             if (particle != 0)
                 particle[2] = D_001F2540[62][0];
-            particle = func_002C2FD8(position, alpha | 0xFFFFFF,
-                                     func_00283CF0(ANGLE(floatOffset)) & 255, D_001AF1D8,
+            particle = part_spawn_fading(position, alpha | 0xFFFFFF,
+                                     FloatToInt(ANGLE(floatOffset)) & 255, D_001AF1D8,
                                      D_001AF1D4, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * 0.7f * remaining);
             if (particle != 0)
                 particle[2] = D_001F2540[62][0];
-            func_00282CC0(position, position, step);
+            FastVecAdd(position, position, step);
         }
         floatOffset += 4;
         timerOffset += 2;

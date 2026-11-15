@@ -1,24 +1,25 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0027C540(int a);
-extern void func_0027C660(void);
-extern void func_L00_0030DB88(void);
+extern void SetupGifPaging(int a);
+extern void DoGifPaging(void);
+extern void level_l00_call_module_handler_6(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_US2_L00_0034FD48(void)
 {
-    func_0027C540(0);
-    func_L00_0030DB88();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_6();
+    DoGifPaging();
     return 0;
 }
 
 extern int D_00138344;
-extern void func_L00_0030D478(int a);
+extern void module_l00_call_handler_with_arg_9(int a);
 
 int func_US2_L00_0034FDD0(void)
 {
-    func_L00_0030D478(D_00138344);
+    module_l00_call_handler_with_arg_9(D_00138344);
     return 0;
 }
 

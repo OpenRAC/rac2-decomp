@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,13 +24,13 @@
  */
 #include "common.h"
 
-extern void func_00282D60(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283130(void *, unsigned long long);
-extern void func_00282D30(void *, void *, float);
+extern void scale_vector(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_fast_helper_e(void *, unsigned long long);
+extern void FastVecScale(void *, void *, float);
 /* Builds a joint's position matrix and optional point list from the moby's animation data. Returns how many points it wrote. */
-int func_0029F840(char *obj, char *m, char *out, int index) {
+int moby_get_joint_matrix(char *obj, char *m, char *out, int index) {
     char *classData = *(char **)(obj + 0x24);
     int cnt = *(short *)(classData + 0x2E);
     int tab;
@@ -73,7 +74,7 @@ fail:
         dst = out;
         for (i = n; i != 0;) {
             i--;
-            FastVectorHelperE(dst, *(unsigned long long *)rec);
+            vec_fast_helper_e(dst, *(unsigned long long *)rec);
             rec += 8;
             FastVecScale(dst, dst, *(float *)(obj + 0x2C) * unitScale);
             *(float *)(dst + 0xC) = 1.0f;

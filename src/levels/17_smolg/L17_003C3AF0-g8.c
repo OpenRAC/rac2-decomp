@@ -2,21 +2,21 @@
 
 extern float D_L17_001B0240 __attribute__((sda));
 
-extern void func_00282CF0(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
 
-extern void func_00282CC0(float *, float *, float *);
+extern void FastVecAdd(float *, float *, float *);
 
-extern void func_00282D30(float *, float *, float);
+extern void FastVecScale(float *, float *, float);
 
-extern float func_00283180(float);
+extern float math_fast_sin_or_cos_a(float);
 
-extern float func_00283CE0(s32);
+extern float IntToFloat(s32);
 
-extern s32 func_00283CF0(float);
+extern s32 FloatToInt(float);
 
 /* Scales the sub-object's angle by pi, takes the frame it names and measures the object's
    own height against the frame's, writing the difference into the sub-object. */
-void func_L17_003C3AF0(char *objectIn, char *pathIn, char *oldPositionIn)
+void platform_place_on_path_by_timer(char *objectIn, char *pathIn, char *oldPositionIn)
 {
     f32 delta[4];
     f32 wave;
@@ -34,7 +34,7 @@ void func_L17_003C3AF0(char *objectIn, char *pathIn, char *oldPositionIn)
     value = *(f32 *)(vars + 0xA8);
     value = value * 3.1415929f;
     value = value / (D_L17_001B0240 * 60.0f);
-    wave = FastSinOrCosA(value);
+    wave = math_fast_sin_or_cos_a(value);
     ease = 1.0f - wave;
     ease = ease * 0.5f;
     wave = IntToFloat(*(s32 *)path - 1);

@@ -12,7 +12,7 @@ extern void func_00323370(void *, void *, void *, void *);
 typedef unsigned int StateQuad __attribute__((mode(TI)));
 /* Updates an object that falls to the ground. When it is hit it turns into its next form and
    later disappears. */
-void func_L17_003C5C28(char *moby) {
+void falling_breakable_update(char *moby) {
     union { StateQuad q; float f[4]; } oldPosition, delta;
     char *vars = *(char **)(moby + 0x68);
     float ground;

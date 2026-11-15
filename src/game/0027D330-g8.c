@@ -3,36 +3,36 @@
 /* Fade sequence follows rac1-decomp src/game/draw.c (GPL-3.0). */
 typedef union { int *words; char *bytes; int address; } PacketCursor;
 
-extern void func_002FC3C0(int);
-extern void func_002FC1D8(void);
-extern void func_002FC280(void);
-extern void func_002FC220(void);
-extern int func_001261F0(int);
-extern void func_00284EA8(void);
-extern void func_00284F40(int);
-extern void func_00284FC0(void);
-extern void func_002FC560(unsigned int, unsigned long);
+extern void gfx_wait_for_dma_status_bits(int);
+extern void gfx_reset_packet_buffer(void);
+extern void SubmitBufferedDmaChain(void);
+extern void gfx_swap_packet_buffer(void);
+extern int sceGsSyncV(int);
+extern void gfx_append_draw_list_header(void);
+extern void gfx_append_draw_list_buffer_tag(int);
+extern void PutDrawBufferSmall(void);
+extern void VU1_addGSregister(unsigned int, unsigned long);
 extern int D_001B1598;
 extern int D_001B1598_GP SDATA(D_001B1598);
 extern PacketCursor ref_0027D330_00;
 extern char D_00138990[];
 
 /* Fades the screen to black over the given number of frames. */
-void func_0027D330(int frames)
+void FadeToBlack(int frames)
 {
     int i;
 
-    WaitForDmaStatusBits(1);
-    GetGsCurrentField(0);
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598_GP = D_001B1598 + 1;
-    ResetPacketBuffer();
+    gfx_reset_packet_buffer();
     i = frames - 1;
     if (i >= 0) {
         do {
             int q;
 
-            AppendDrawListHeader();
-            AppendDrawListBufferTag(1);
+            gfx_append_draw_list_header();
+            gfx_append_draw_list_buffer_tag(1);
             PutDrawBufferSmall();
             VU1_addGSregister(0x42, 0x8000000044UL);
             q = (i << 7) / (i + 1);
@@ -43,17 +43,17 @@ void func_0027D330(int frames)
             ref_0027D330_00.words[2] = 0;
             ref_0027D330_00.words[3] = 0x50000014;
             ref_0027D330_00.words += 4;
-            WaitForDmaStatusBits(1);
-            GetGsCurrentField(0);
+            gfx_wait_for_dma_status_bits(1);
+            sceGsSyncV(0);
             D_001B1598_GP = D_001B1598 + 1;
             SubmitBufferedDmaChain();
-            SwapPacketBuffer();
+            gfx_swap_packet_buffer();
         } while (i >= 0);
     }
-    WaitForDmaStatusBits(1);
-    GetGsCurrentField(0);
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598_GP = D_001B1598 + 1;
-    ResetPacketBuffer();
-    AppendDrawListHeader();
-    AppendDrawListBufferTag(1);
+    gfx_reset_packet_buffer();
+    gfx_append_draw_list_header();
+    gfx_append_draw_list_buffer_tag(1);
 }

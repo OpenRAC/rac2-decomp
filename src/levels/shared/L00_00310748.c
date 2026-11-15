@@ -25,13 +25,13 @@ typedef struct {
     float mC0[4];
 } Obj_310748;
 
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Transforms a point into the object's space and stores it, scaled, in the given table entry. */
-void func_L00_00310748(Obj_310748 *self, int idx, void *p, float x, float y)
+void vec_store_transformed_entry(Obj_310748 *self, int idx, void *p, float x, float y)
 {
     float matrix[16];
     float vec[4];

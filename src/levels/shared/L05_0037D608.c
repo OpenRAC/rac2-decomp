@@ -4,11 +4,11 @@
    an sda word so each use is the assembler macro form (lui + lw), never hoisted. */
 typedef unsigned char u8;
 
-extern int func_002ED688(unsigned char *);
-extern float func_002A7940(void);
-extern void func_002AF000(float *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002EE920(void *, float *);
+extern int moby_get_motion_data(unsigned char *);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void follower_set_push_vector(void *, float *);
 
 extern short *D_L05_001FB220[];
 extern u8 *D_L05_001B251C __attribute__((sda));
@@ -26,13 +26,13 @@ void func_L05_0037D608(void *object, void *argument, float value)
         do {
             int offset = (*p & 0x7FFF) << 8;
 
-            if (GetMobyMotionData(D_L05_001B251C + offset) != 0) {
-                float a = RandomAngle();
-                float b = RandomAngle();
+            if (moby_get_motion_data(D_L05_001B251C + offset) != 0) {
+                float a = math_random_angle();
+                float b = math_random_angle();
 
-                BuildSphericalOffset(vector, value, a, b);
+                vec_build_spherical_offset(vector, value, a, b);
                 FastVecAdd(vector, vector, argument);
-                SetFollowerPushVector(D_L05_001B251C + offset, vector);
+                follower_set_push_vector(D_L05_001B251C + offset, vector);
             }
         } while ((short)*p++ >= 0);
     }

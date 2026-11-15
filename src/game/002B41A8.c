@@ -7,16 +7,16 @@
    store to obj+0x34, which retail schedules after the argument spills. The pointers are set
    before they are tested, and in another order: both orders reach the register allocator. */
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 typedef int TI16_2B41A8 __attribute__((mode(TI)));
 typedef struct { float x, y, z; } Vec3_2B41A8;
 extern const Vec3_2B41A8 D_001AA060, D_001AA070, D_001AA080, D_001AA090, D_001AA0A0, D_001AA0B0;
-extern float func_002A7940(void);
-extern void func_00283098(void *, void *, void *);
+extern float math_random_angle(void);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 /* Fills in a movement controller block, using the given values or built-in defaults for each setting. */
-void func_002B41A8(char *obj, char *dst, char *origin, char *rotation, float *p4, float *p5, float *p6, float *p7,
+void moby_init_controller_params(char *obj, char *dst, char *origin, char *rotation, float *p4, float *p5, float *p6, float *p7,
                    float *p8, float *p9, float *p10)
 {
     Vec3_2B41A8 v0, v1, v2, v3, v4, v5, v6;
@@ -71,7 +71,7 @@ void func_002B41A8(char *obj, char *dst, char *origin, char *rotation, float *p4
         *o2++ = *e++;
         *o3++ = *b++;
         *o4++ = *c++;
-        *o5++ = RandomAngle();
+        *o5++ = math_random_angle();
         *o6++ = *f++;
         *o7++ = *g++ * 0.00029088825f;
     }

@@ -24,7 +24,7 @@ typedef struct {
     u64 state[4];
 } SurfacePacket;
 typedef struct { char prefix[0x2294]; int state; } WaterHero;
-extern WaterHero D_00189E20;
+extern WaterHero g_hero_state;
 extern int D_L01_001A8A48 __attribute__((section(".sdata")));
 typedef struct { unsigned char prefix[0x228]; float scale0, scale1; } RenderScales;
 extern RenderScales D_L01_001BD9C0;
@@ -39,22 +39,22 @@ typedef struct { float x, y, z; } WaterPos;
 extern WaterPos D_L01_00240260[], D_L01_00240660[];
 extern u32 D_L01_00240560[], D_L01_00240960[];
 extern WaterUV D_L01_00240A60[], D_L01_00240C60[];
-extern void func_002FC560(u32, u64);
-extern unsigned long func_0027C878(int);
-extern void func_00280328(void);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
-extern void func_00281810(int, void *, void *, void *, int);
-extern void func_00280B90(void *, int, int);
-extern float func_00282E20(void *);
-extern void func_00282A28(void);
+extern void VU1_addGSregister(u32, u64);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void font_queue_vu_state(void);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
+extern void part_draw_glint_effect(int, void *, void *, void *, int);
+extern void draw_world_quad(void *, int, int);
+extern float vec_length_xy(void *);
+extern void math_trap_always(void);
 /* Draws the ocean: a fading strip at the shore, a far-away sheet of water, and two moving layers of water tiles around the camera. */
-void func_L01_003BAFB8(char *object)
+void DrawWaterSheet(char *object)
 {
     Vector point, scratch, right, up;
     Vector corners[4], along_left, along_right;
@@ -67,7 +67,7 @@ void func_L01_003BAFB8(char *object)
     int color, lower_color, upper_color;
     saved0 = D_L01_001BD9C0.scale0;
     saved1 = D_L01_001BD9C0.scale1;
-    if (gHeroState.state != 28 && D_L01_001A8A48 == 0) {
+    if (g_hero_state.state != 28 && D_L01_001A8A48 == 0) {
         D_L01_001BD9C0.scale0 = 255.0f;
         D_L01_001BD9C0.scale1 = 249.9f;
     }
@@ -124,13 +124,13 @@ void func_L01_003BAFB8(char *object)
         D_L01_00240260[i+1].y = point.v[1];
         D_L01_00240260[i+1].z = point.v[2];
     }
-    DrawGlintEffect(12, D_L01_00240260, D_L01_00240560, D_L01_00240A60, 1);
+    part_draw_glint_effect(12, D_L01_00240260, D_L01_00240560, D_L01_00240A60, 1);
     packet.state[1] = GetEffectTextureDescriptor(0x16);
     packet.state[2] = 0xFF9000000260ULL;
     packet.state[3] = 0x8000000044ULL;
     packet.state[0] = 0;
     if (settings->threshold < D_L01_001B9380.pos[2] - settings->altitude &&
-        gHeroState.state != 28 && D_L01_001A8A48 == 0) {
+        g_hero_state.state != 28 && D_L01_001A8A48 == 0) {
         packet.zero[0] = 0;
         packet.zero[1] = 0;
         packet.zero[2] = 0;
@@ -203,9 +203,9 @@ void func_L01_003BAFB8(char *object)
                     D_L01_00240960[i] = FastTweenColor(lower_color, upper_color, t);
                 }
                 count += 4;
-                if (count >= 64) TrapAlways();
+                if (count >= 64) math_trap_always();
             }
-            DrawGlintEffect(count, D_L01_00240660, D_L01_00240960, D_L01_00240C60, 1);
+            part_draw_glint_effect(count, D_L01_00240660, D_L01_00240960, D_L01_00240C60, 1);
         }
     }
     D_L01_001BD9C0.scale0 = saved0; D_L01_001BD9C0.scale1 = saved1;

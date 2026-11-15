@@ -4,8 +4,8 @@
 extern void func_37BB30(int, unsigned long long);
 extern void func_302298(int, int, int, int, int, int);
 extern void func_2F0670(int, int, unsigned long long, char *, int);
-extern int func_00115DA8(char *, char *, ...);
-extern char *func_00288FB8(int);
+extern int sprintf(char *, char *, ...);
+extern char *GetLocalizedString(int);
 extern int D_L30_001B1B50 __attribute__((sda));
 extern int D_L30_001B1B60 __attribute__((sda));
 extern int D_L30_001B1B68 __attribute__((sda));
@@ -21,23 +21,23 @@ extern char D_L30_001B1BC8[];
 extern void *D_L30_00260E30[];
 extern char *D_L30_00260EB0[];
 extern unsigned char D_L30_001B3D30[] __attribute__((sda)) NOT_SDA;
-extern void func_002A7750(void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern int func_002B0CE0(int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern int ForceClaimNotice(int, int, int);
 extern long D_00138320 __attribute__((nosda));
-extern char D_00189EA0[];
-extern int func_002B3868(void *);
-extern char *func_L30_00413490(void *);
-extern void func_L30_00413528(void *, void *, char *, int, int, int);
+extern char g_hero_position[];
+extern int flag_set_first_pending(void *);
+extern char *museum_tweak_menu_spawn(void *);
+extern void MuseumTweakMenuAddItem(void *, void *, char *, int, int, int);
 extern unsigned int D_L30_001B1F28;
 extern float D_L30_001B1F04;
 extern int func_US2_002AF9C8(void *, float);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_L30_00416D88(void *, void *, void *, int, float);
-extern void func_0029F338(void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void museum_projectile_spawn(void *, void *, void *, int, float);
+extern void moby_mark_spawned(void *);
 extern char D_L30_001B1C38[];
 extern char D_L30_001B1C48[];
 extern char D_L30_001B1C58[];
@@ -108,33 +108,33 @@ void func_US2_L30_00413C18(char *obj) {
     int *st = *(int **)(obj + 0x68);
     func_37BB30(0x42, 0x8000000044ULL);
     func_302298(D_L30_001B1B50, D_L30_001B1B54, D_L30_001B1B58, D_L30_001B1B54 + D_L30_001B1B60 * (st[1] < 17 ? st[1] : 16), D_L30_001B1B7C, 0);
-    func_2F0670(2, 8, D_L30_001B1B74, func_00288FB8(0x2BE5), -1);
+    func_2F0670(2, 8, D_L30_001B1B74, GetLocalizedString(0x2BE5), -1);
     for (; i < 32 - st[2] && count < st[1] && count < 16; i++) {
         if (!D_L30_00260E30[i + st[2]]) continue;
         count++;
         if (D_L30_00260EB0[i]) {
-            func_00115DA8(text, D_L30_001B1BB0, D_L30_00260EB0[i + st[2]]);
+            sprintf(text, D_L30_001B1BB0, D_L30_00260EB0[i + st[2]]);
             func_2F0670(D_L30_001B1B68, D_L30_001B1B6C + i * D_L30_001B1B60, D_L30_001B1B74, text, -1);
         }
         if (st[0] == i + st[2]) {
-            func_00115DA8(text, D_L30_001B1BB8);
+            sprintf(text, D_L30_001B1BB8);
             func_2F0670(D_L30_001B1B68 - 16, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008000ULL, text, -1);
         }
         switch (D_L30_001B3D30[i + st[2]]) {
         case 0:
-            func_00115DA8(text, D_L30_001B1BC0, *(int *)D_L30_00260E30[i + st[2]]);
+            sprintf(text, D_L30_001B1BC0, *(int *)D_L30_00260E30[i + st[2]]);
             func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
             break;
         case 1:
-            func_00115DA8(text, D_L30_001B1BC8, (double)*(float *)D_L30_00260E30[i + st[2]]);
+            sprintf(text, D_L30_001B1BC8, (double)*(float *)D_L30_00260E30[i + st[2]]);
             func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
             break;
         case 2:
-            func_00115DA8(text, D_L30_001B1BC0, *(unsigned char *)D_L30_00260E30[i + st[2]]);
+            sprintf(text, D_L30_001B1BC0, *(unsigned char *)D_L30_00260E30[i + st[2]]);
             func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
             break;
         case 3:
-            func_00115DA8(text, D_L30_001B1BC0, *(short *)D_L30_00260E30[i + st[2]]);
+            sprintf(text, D_L30_001B1BC0, *(short *)D_L30_00260E30[i + st[2]]);
             func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
             break;
         }
@@ -154,68 +154,68 @@ void func_US2_L30_00414F70(char *obj) {
         *(int *)(st+0x18) = (color >> 16) & 0xff;
         *(int *)(st+0x1c) = (unsigned int)color >> 24;
         D_L30_001B1F04 = 5.0f;
-        func_002A7750(obj,1,-1);
+        moby_set_state(obj,1,-1);
         break;
     case 1:
-        if (*(int *)(st+4) != -1 && func_002ACBC8(D_00189EA0,*(int *)(st+4))) {
-            func_002B0CE0(1,0x1338,1);
+        if (*(int *)(st+4) != -1 && IsPointInCuboid(g_hero_position,*(int *)(st+4))) {
+            ForceClaimNotice(1,0x1338,1);
             { long buttons = D_00138320;
-              if ((buttons & 3) == 3) func_002A7750(obj,2,-1); }
+              if ((buttons & 3) == 3) moby_set_state(obj,2,-1); }
         }
-        if (*(int *)(st+8) != -1 && func_002ACBC8(D_00189EA0,*(int *)(st+8))) {
-            func_002B0CE0(1,0x1343,1);
+        if (*(int *)(st+8) != -1 && IsPointInCuboid(g_hero_position,*(int *)(st+8))) {
+            ForceClaimNotice(1,0x1343,1);
             { long buttons = D_00138320;
-              if ((buttons & 3) == 3) func_002A7750(obj,3,-1); }
+              if ((buttons & 3) == 3) moby_set_state(obj,3,-1); }
         }
         break;
     case 2:
-        if (func_002B3868(obj)) {
-            *(char **)(st+0xc) = func_L30_00413490(obj);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F10, D_L30_001B1C38, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F14, D_L30_001B1C48, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F18, D_L30_001B1C58, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F1C, D_L30_001B1C68, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F24, D_L30_001B1C78, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F38, D_L30_001B1C88, 1, -1000, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F3C, D_L30_001B1C98, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F40, D_L30_001B1CA8, 1, 0, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F20, D_L30_001B1CB8, 0, 0, 60);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F44, D_L30_001B1CC8, 0, 0, 60);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F48, D_L30_001B1CD8, 0, 0, 60);
+        if (flag_set_first_pending(obj)) {
+            *(char **)(st+0xc) = museum_tweak_menu_spawn(obj);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F10, D_L30_001B1C38, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F14, D_L30_001B1C48, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F18, D_L30_001B1C58, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F1C, D_L30_001B1C68, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F24, D_L30_001B1C78, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F38, D_L30_001B1C88, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F3C, D_L30_001B1C98, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F40, D_L30_001B1CA8, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F20, D_L30_001B1CB8, 0, 0, 60);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F44, D_L30_001B1CC8, 0, 0, 60);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F48, D_L30_001B1CD8, 0, 0, 60);
         }
-        func_002B0CE0(1,0,1);
+        ForceClaimNotice(1,0,1);
         if (!*(char **)(st+0xc) || *(short *)(*(char **)(st+0xc)+0xaa) != 0x118a || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfd)
-            func_002A7750(obj,1,-1);
+            moby_set_state(obj,1,-1);
         break;
     case 3:
-        if (func_002B3868(obj)) {
-            *(char **)(st+0xc) = func_L30_00413490(obj);
-            func_L30_00413528(*(char **)(st+0xc), st+0x10, D_L30_001B1CE8, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), st+0x14, D_L30_001B1CF0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), st+0x18, D_L30_001B1D00, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), st+0x1c, D_L30_001B1D10, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F30, D_L30_001B1D20, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F2C, D_L30_001B1D30, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F34, D_L30_001B1D40, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F54, D_L30_001B1D50, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F64, D_L30_001B1D60, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F58, D_L30_001B1D70, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F68, D_L30_001B1D80, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F5C, D_L30_001B1D90, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F6C, D_L30_001B1DA0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F74, D_L30_001B1DB0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F84, D_L30_001B1DC0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F78, D_L30_001B1DD0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F88, D_L30_001B1DE0, 0, -1000, 1000);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F7C, D_L30_001B1DF0, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F8C, D_L30_001B1E00, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F94, D_L30_001B1E10, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F98, D_L30_001B1E18, 0, 0, 255);
-            func_L30_00413528(*(char **)(st+0xc), D_L30_001B1F9C, D_L30_001B1E20, 0, 0, 255);
+        if (flag_set_first_pending(obj)) {
+            *(char **)(st+0xc) = museum_tweak_menu_spawn(obj);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x10, D_L30_001B1CE8, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x14, D_L30_001B1CF0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x18, D_L30_001B1D00, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x1c, D_L30_001B1D10, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F30, D_L30_001B1D20, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F2C, D_L30_001B1D30, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F34, D_L30_001B1D40, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F54, D_L30_001B1D50, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F64, D_L30_001B1D60, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F58, D_L30_001B1D70, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F68, D_L30_001B1D80, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F5C, D_L30_001B1D90, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F6C, D_L30_001B1DA0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F74, D_L30_001B1DB0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F84, D_L30_001B1DC0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F78, D_L30_001B1DD0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F88, D_L30_001B1DE0, 0, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F7C, D_L30_001B1DF0, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F8C, D_L30_001B1E00, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F94, D_L30_001B1E10, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F98, D_L30_001B1E18, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F9C, D_L30_001B1E20, 0, 0, 255);
         }
-        func_002B0CE0(1,0,1);
+        ForceClaimNotice(1,0,1);
         if (!*(char **)(st+0xc) || *(short *)(*(char **)(st+0xc)+0xaa) != 0x118a || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfd)
-            func_002A7750(obj,1,-1);
+            moby_set_state(obj,1,-1);
         break;
     }
     {
@@ -227,14 +227,14 @@ void func_US2_L30_00414F70(char *obj) {
         D_L30_001B1F28 = packed;
     }
     if (func_US2_002AF9C8(obj,1.0f)) {
-        func_0029FC20(obj,0,matrix);
-        velocity[0] = func_00283180(*(float *)(obj+0xf8));
-        velocity[1] = func_00283198(*(float *)(obj+0xf8));
+        moby_transform_joint_point(obj,0,matrix);
+        velocity[0] = math_fast_sin_or_cos_a(*(float *)(obj+0xf8));
+        velocity[1] = math_fast_sin_or_cos_b(*(float *)(obj+0xf8));
         velocity[2] = 0;
-        func_00282F20(velocity,velocity,0.583333373f);
+        vec_scale_to_length(velocity,velocity,0.583333373f);
         if (*(int *)st) {
-            func_L30_00416D88(obj,velocity,matrix+12,1,0.0f);
-            func_0029F338(obj);
-        } else func_L30_00416D88(obj,velocity,matrix+12,0,0.0f);
+            museum_projectile_spawn(obj,velocity,matrix+12,1,0.0f);
+            moby_mark_spawned(obj);
+        } else museum_projectile_spawn(obj,velocity,matrix+12,0,0.0f);
     }
 }

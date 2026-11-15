@@ -19,19 +19,19 @@ extern float D_001B0970 __attribute__((sda));
 extern float D_001B2830[4] __attribute__((sda));
 extern int D_001B2848;
 extern float D_001BAFB0[4];
-extern SweepHit D_001BAF80;
-extern float func_00282C48(float);
-extern void func_00282C88(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282D90(void *, void *, float);
-extern float func_00283CE0(int);
-extern float func_00283198(float), func_00283180(float);
-extern void func_002837D0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278870(void *, float);
+extern SweepHit g_collision_hit;
+extern float math_fabs(float);
+extern void vec_clear_128(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void divide_vector_xyz(void *, void *, float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void multiply_quaternions(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int coll_process_triangles(void *, float);
 
 /* Casts 32 rays over a quarter turn about the row at +0xE0, in the direction
    of the sign of the state's +0x58. Each hit adds its correction to a sum,
@@ -47,7 +47,7 @@ extern int func_00278870(void *, float);
    in use beyond the block, and the copies must not be adjacent, or cse
    collapses them. moby's number follows the declarations before it, so the
    function's named scalars are what bring it to that pseudo. */
-void func_00330150(char *object)
+void SweepMobyArcProbe(char *object)
 {
     SweepRecord settings;
     float base[4], sum[4], axis[4], first[4], rotated[4], temporary[4], inverse[4];
@@ -60,7 +60,7 @@ void func_00330150(char *object)
     float down, unit, one, total;
     char *other, *info;
 
-    speed = FloatAbs(*(float *)(state + 0x58));
+    speed = math_fabs(*(float *)(state + 0x58));
     threshold = 0.0001f;
     if (speed < threshold) return;
     {
@@ -73,13 +73,13 @@ void func_00330150(char *object)
         radius = *(float *)(state + 0x58);
         zero = 0.0f;
         if (!(radius <= zero)) negative = 0;
-        ClearVector128(sum);
+        vec_clear_128(sum);
         hits = 0;
         lift = D_001B096C;
         drop = -lift;
         vec_scale_to_length(base, D_001B2830, drop);
         FastVecAdd(base, base, self + 0x10);
-        if (!D_001B2848 && ProcessCollisionTriangles(base, D_001B0970)) {
+        if (!D_001B2848 && coll_process_triangles(base, D_001B0970)) {
             FastVecSub(axis, D_001BAFB0, base);
             FastVecAdd(self + 0x10, axis, self + 0x10);
         }
@@ -91,10 +91,10 @@ void func_00330150(char *object)
             vec_scale_to_length(axis, self + 0xD0, D_001B0970);
             quarter = 1.57079637f;
             angle *= quarter;
-            sine = FastSinOrCosB(angle);
+            sine = math_fast_sin_or_cos_b(angle);
             if (!negative) sine = -sine;
             FastVecScale(rotated, self + 0xE0, sine);
-            cosine = FastSinOrCosA(angle);
+            cosine = math_fast_sin_or_cos_a(angle);
             rotated[3] = cosine;
             x = rotated[0];
             nx = -x;
@@ -115,12 +115,12 @@ void func_00330150(char *object)
                 down = -1.0f;
                 FastVecScale(opposite, D_001B2830, down);
                 unit = 0.0009765625f;
-                FastVecScale(normal, gCollisionHit.normal, unit);
+                FastVecScale(normal, g_collision_hit.normal, unit);
                 one = 1.0f;
                 vec_scale_to_length(normal, normal, one);
-                FastVecSub(correction, gCollisionHit.position, endpoint);
+                FastVecSub(correction, g_collision_hit.position, endpoint);
                 FastVecAdd(sum, sum, correction);
-                other = gCollisionHit.object;
+                other = g_collision_hit.object;
                 if (other) {
                     info = *(char **)(other + 0x24);
                     if (*(short *)(info + 0x46) == 5) {

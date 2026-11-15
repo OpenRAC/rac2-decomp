@@ -34,7 +34,7 @@ typedef struct {
     MenuPage *current;
 } MenuSystem;
 
-extern MenuSystem D_001F2840;
+extern MenuSystem g_pause_menu_state;
 extern MenuPage D_00258EE8, D_00259018;
 extern MenuDescriptor D_00259148, D_00259198, D_002591E8, D_00259238, D_00259288, D_002592D8;
 extern unsigned char D_00263B50[], D_00263EF0[], D_00264290[];
@@ -42,22 +42,22 @@ extern unsigned char D_00263B50[], D_00263EF0[], D_00264290[];
 extern int D_00258D70[];
 extern char D_00210C40[], D_001ABAC8[];
 extern int D_001AA444 __attribute__((sda)), D_001AA448 __attribute__((sda));
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_0027C540(int);
-extern void func_0027F120(void);
-extern void func_0027F110(void);
-extern void func_0027C660(void);
-extern void func_00282A60(void *, int, int);
-extern unsigned long func_0027C878(int);
-extern int func_0027F128(char *, int, unsigned char *);
-extern int func_002D68D8(int, int, int);
-extern int func_00115DA8(char *, char *, ...);
-extern char *func_00288FB8(int);
-extern void func_0027F2A8(int, int, unsigned long, char *, int, unsigned long, unsigned char *);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void SetupGifPaging(int);
+extern void gfx_disable_screen_flag(void);
+extern void gfx_enable_screen_flag(void);
+extern void DoGifPaging(void);
+extern void mem_clear(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern int measure_text_width(char *, int, unsigned char *);
+extern int menu_blend_highlight_color(int, int, int);
+extern int sprintf(char *, char *, ...);
+extern char *GetLocalizedString(int);
+extern void text_draw_line(int, int, unsigned long, char *, int, unsigned long, unsigned char *);
 
 /* RAC1 pause.c render_localized_ui_entry_list, with RaC2's formatted-text rows. */
 /* Draws a menu list with centered text rows and a shadow, using the highlight color for the chosen row. */
-int func_002D6230(MenuDescriptor *menu) {
+int RenderLocalizedUiEntryList(MenuDescriptor *menu) {
     int selection_index;
     int entry_index;
     int focused;
@@ -86,7 +86,7 @@ int func_002D6230(MenuDescriptor *menu) {
     font_height = 12;
     font_texture_index = 1;
     glyphs = D_00263B50;
-    focused = gPauseMenuState.current->focus == menu;
+    focused = g_pause_menu_state.current->focus == menu;
     if (menu->flags & 4) {
         font_height = 14;
         font_texture_index = 3;
@@ -158,13 +158,13 @@ int func_002D6230(MenuDescriptor *menu) {
                 color = 0x80006060;
             } else if (enabled) {
             fade_timer:
-                color = BlendHighlightColor(selected_item->fade_timer, -1, -1);
+                color = menu_blend_highlight_color(selected_item->fade_timer, -1, -1);
 
             } else {
                 color = 0x80303030;
             }
             text_id = GetLocalizedString(menu->items[selection_index].text_id);
-            if ((gPauseMenuState.current == &D_00258EE8 || gPauseMenuState.current == &D_00259018) &&
+            if ((g_pause_menu_state.current == &D_00258EE8 || g_pause_menu_state.current == &D_00259018) &&
                 (menu == &D_00259148 || menu == &D_00259198 || menu == &D_002591E8 ||
                  menu == &D_00259238 || menu == &D_00259288 || menu == &D_002592D8)) {
                 int j, found = -1;
@@ -177,9 +177,9 @@ int func_002D6230(MenuDescriptor *menu) {
                     j += 2;
                 }
                 if (found >= 0) {
-                    ClearMemory(D_00210C40, 0, 256);
+                    mem_clear(D_00210C40, 0, 256);
                     text_id = GetLocalizedString(menu->items[selection_index].text_id);
-                    Sprintf(D_00210C40, D_001ABAC8,
+                    sprintf(D_00210C40, D_001ABAC8,
                                  GetLocalizedString(D_00258D70[found]), text_id);
                     text_id = D_00210C40;
                 }
@@ -193,32 +193,32 @@ int func_002D6230(MenuDescriptor *menu) {
             } else if (menu->flags & 0x4000) {
                 x = half_width - (maximum_text_width >> 1);
             }
-            DisableScreenFlag();
-            DrawTextLine(x + D_001AA444, y + D_001AA448, 0x80000000L, text_id, -1,
+            gfx_disable_screen_flag();
+            text_draw_line(x + D_001AA444, y + D_001AA448, 0x80000000L, text_id, -1,
                        GetEffectTextureDescriptor(font_texture_index), glyphs);
-            EnableScreenFlag();
+            gfx_enable_screen_flag();
             if (menu->flags & 0x80) {
-                DisableScreenFlag();
+                gfx_disable_screen_flag();
             }
-            DrawTextLine(x, y, color, text_id, -1, GetEffectTextureDescriptor(font_texture_index), glyphs);
+            text_draw_line(x, y, color, text_id, -1, GetEffectTextureDescriptor(font_texture_index), glyphs);
             y += row_height;
             if (menu->items[selection_index].secondary_text_id != 0) {
-                DisableScreenFlag();
+                gfx_disable_screen_flag();
                 shadow_x = x + D_001AA444;
                 shadow_y = y + D_001AA448;
                 secondary_text = GetLocalizedString(menu->items[selection_index].secondary_text_id);
-                DrawTextLine(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
+                text_draw_line(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
                            GetEffectTextureDescriptor(font_texture_index), glyphs);
                 if (!(menu->flags & 0x80)) {
-                    EnableScreenFlag();
+                    gfx_enable_screen_flag();
                 }
-                DrawTextLine(x, y, color,
+                text_draw_line(x, y, color,
                            GetLocalizedString(menu->items[selection_index].secondary_text_id), -1,
                            GetEffectTextureDescriptor(font_texture_index), glyphs);
                 y += row_height;
             }
             if (menu->flags & 0x80) {
-                EnableScreenFlag();
+                gfx_enable_screen_flag();
             }
             selection_index++;
         } while (menu->items[selection_index].text_id != 0);

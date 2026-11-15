@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_2EF398(void *, void *, void *);
 
@@ -9,7 +10,7 @@ extern void func_2EEEB8(void *, void *, void *);
 /* transforms a point given in three floats through the sub-object's matrix, rescales it and
    writes it back through the descriptor */
 /* Turns a point given as three numbers into world space using the object's matrix and size, and adds it to the output. */
-void func_L17_00326F38(char *object, char *output, float x, float y, float z)
+void vec_local_to_world(char *object, char *output, float x, float y, float z)
 {
     float point[3];
 

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad00[0x80];
@@ -7,16 +8,16 @@ typedef struct {
     char pad88[0xBC];
     struct { int first; int limit; int third; int fourth; } cells[0];  
 } LimitModel;
-extern LimitModel D_L00_0022F7C0;
+extern LimitModel g_purchase_menu_model;
 extern int D_L00_001AD7A0 __attribute__((sda));
 extern int D_L00_001AD7A4;
-extern int func_002B0D70(void);
-extern unsigned char *func_00288FB8(int);
-extern int func_0027FB40(int, int, long, unsigned char *, int);
+extern int save_count_items_above_baseline(void);
+extern unsigned char *GetLocalizedString(int);
+extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
 void func_US2_L00_0037A218(void)
 {
-    LimitModel *base = &D_L00_0022F7C0;
+    LimitModel *base = &g_purchase_menu_model;
     int index;
     int limit;
     int r;
@@ -25,9 +26,9 @@ void func_US2_L00_0037A218(void)
         return;
     index = base->index;
     limit = base->cells[index].limit;
-    r = func_002B0D70();
+    r = save_count_items_above_baseline();
     if (r >= limit)
-        func_0027FB40(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, func_00288FB8(0x31B5), -1);
+        text_draw_centered_medium(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x31B5), -1);
     else
-        func_0027FB40(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, func_00288FB8(0x31B4), -1);
+        text_draw_centered_medium(D_L00_001AD7A0, D_L00_001AD7A4, 0x80F0F0F0, GetLocalizedString(0x31B4), -1);
 }

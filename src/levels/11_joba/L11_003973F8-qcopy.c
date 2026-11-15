@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern char *func_3224B0(int);
@@ -5,7 +6,7 @@ extern void func_300D78(char *);
 
 /* Creates a linked object that follows a parent and a target. It returns 1 if the object
    was made. */
-int func_L11_003973F8(char *parentArg, char *targetArg, float valueA, float valueB)
+int moby_spawn_linked(char *parentArg, char *targetArg, float valueA, float valueB)
 {
     char *parent = parentArg;
     char *target = targetArg;

@@ -12,8 +12,8 @@ extern s32 D_001B187C[] __attribute__((sda));
 extern s32 D_001B17B0[] __attribute__((sda));
 extern s32 D_001B17B4[] __attribute__((sda));
 extern s32 D_001B17B8[] __attribute__((sda));
-extern s32 D_001A8BB0[] __attribute__((sda));
-extern Task28E458 D_00255330[];
+extern s32 g_current_game_mode[] __attribute__((sda));
+extern Task28E458 g_hud_elements[];
 
 void func_PAL_0028ECD8(void) {
     Task28E458 *t;
@@ -23,7 +23,7 @@ void func_PAL_0028ECD8(void) {
         D_001B18A4[1] = 0;
         return;
     }
-    t = D_00255330;
+    t = g_hud_elements;
     D_001B187C[0] = 0xFFFFF0;
     for (i = 12; i >= 0; i--) {
         if (t->update != 0) {
@@ -31,7 +31,7 @@ void func_PAL_0028ECD8(void) {
         }
         t++;
     }
-    if ((D_001B17B0[0] != 0 || D_001B17B4[0] != 0) && D_001A8BB0[0] == 0) {
+    if ((D_001B17B0[0] != 0 || D_001B17B4[0] != 0) && g_current_game_mode[0] == 0) {
         if (D_001B17B0[0] != 0) {
             D_001B17B4[0] += 0x12;
             if (D_001B17B4[0] > 0x80) {

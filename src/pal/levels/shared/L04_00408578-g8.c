@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     unsigned char pad0[0x84];
     int f84;
@@ -17,10 +18,10 @@ typedef struct {
     unsigned char pad4[0x2D0 - 0x1BC];
     float f2d0;
 } L04_004044B8_Record;
-extern int func_002ACBC8(void *, int);
-extern void func_002A7470(char *, int, int, int);
-extern int D_001A7B90 __attribute__((sda));
-extern int D_L04_001A8FE8;
+extern int IsPointInCuboid(void *, int);
+extern void anim_start_blended(char *, int, int, int);
+extern int g_is_pal_video __attribute__((sda));
+extern int g_race_time_ticks;
 
 /* Updates the record's flag from the two point tests, prints the message when the
    record has one and its counter runs, then advances the counter and the value. */
@@ -29,10 +30,10 @@ void func_PAL_L04_00408930(void *a0, L04_004044B8_Record *s0)
     char *s1 = (char *)a0 + 0x10;
     int v;
 
-    if (func_002ACBC8(s1, s0->f88)) {
+    if (IsPointInCuboid(s1, s0->f88)) {
         s0->f15c = 1;
     }
-    if (!func_002ACBC8(s1, s0->f84)) {
+    if (!IsPointInCuboid(s1, s0->f84)) {
         return;
     }
     if (s0->f15c == 0) {
@@ -40,7 +41,7 @@ void func_PAL_L04_00408930(void *a0, L04_004044B8_Record *s0)
     }
     v = s0->f160;
     if (s0->f8c && v > 0) {
-        func_002A7470(s0->f8c, 9, 0, 0xA);
+        anim_start_blended(s0->f8c, 9, 0, 0xA);
         v = s0->f160;
     }
     if (v < 4) {
@@ -48,7 +49,7 @@ void func_PAL_L04_00408930(void *a0, L04_004044B8_Record *s0)
         float f2;
         float f0;
 
-        if (D_001A7B90 != 0) {
+        if (g_is_pal_video != 0) {
             f2 = f1 * 0.02f;
         } else {
             f2 = f1 * 0.016666667f;
@@ -65,7 +66,7 @@ void func_PAL_L04_00408930(void *a0, L04_004044B8_Record *s0)
             return;
         }
         if (*(unsigned char *)(s0->f164 + 0x20) == 2) {
-            s0->f1a0 = D_L04_001A8FE8;
+            s0->f1a0 = g_race_time_ticks;
         }
     }
 }

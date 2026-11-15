@@ -18,12 +18,12 @@ extern int D_L00_001B2AC0[] MACRO_ADDR;
 extern Q128 D_L00_001B2A50[] MACRO_ADDR;
 extern Q128 D_L00_002403C0[];
 extern Q128 D_L00_002403B0[];
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Resets the beam chain and its pulse timers the first time it is needed. Each chain point is moved back along the beam direction. */
-void func_L00_003C6A88(char *owner)
+void ResetBeamChainAndPulseState(char *owner)
 {
     char shift[16] __attribute__((aligned(16)));
     char *vars;

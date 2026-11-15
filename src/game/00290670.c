@@ -3,52 +3,52 @@
 
    /* current buffer */
 extern short r1_D_0015EDC4;
-extern void func_00290670(void);
-extern int D_001A9018 __attribute__((sda));
+extern void hud_request_letterbox_bars(void);
+extern int g_letterbox_grow_flag __attribute__((sda));
 
 /* Asks for the screen bars at the top to grow. */
-void func_00290670(void) {
-    gLetterboxGrowFlag = 1;
+void hud_request_letterbox_bars(void) {
+    g_letterbox_grow_flag = 1;
 }
 
 
-extern int D_001A9014 __attribute__((sda));
-extern int D_001A9018 __attribute__((sda));
-extern void func_0027DDC0(int, int, int, int);
+extern int g_letterbox_level __attribute__((sda));
+extern int g_letterbox_grow_flag __attribute__((sda));
+extern void gfx_set_clear_color_packet(int, int, int, int);
 
 /* Moves the screen bar level up or down by one step and draws the bar at its current height. */
-void func_00290680(void)
+void hud_update_letterbox_bars(void)
 {
     int level;
     int barHeight;
 
-    if (gLetterboxGrowFlag != 0) {
-        gLetterboxGrowFlag = 0;
-        level = gLetterboxLevel + 1;
-        gLetterboxLevel = level;
+    if (g_letterbox_grow_flag != 0) {
+        g_letterbox_grow_flag = 0;
+        level = g_letterbox_level + 1;
+        g_letterbox_level = level;
         if (level >= 11)
-            gLetterboxLevel = 10;
+            g_letterbox_level = 10;
     } else {
-        level = gLetterboxLevel - 1;
-        gLetterboxLevel = level;
+        level = g_letterbox_level - 1;
+        g_letterbox_level = level;
         if (level < 0)
-            gLetterboxLevel = 0;
+            g_letterbox_level = 0;
     }
-    barHeight = (int)((float)gLetterboxLevel * 0.1f * 48.0f);
+    barHeight = (int)((float)g_letterbox_level * 0.1f * 48.0f);
     if (barHeight != 0)
-        SetClearColorPacket(0, 0, 0, barHeight);
+        gfx_set_clear_color_packet(0, 0, 0, barHeight);
 }
 
 extern int D_001A901C __attribute__((sda));
 
 /* Clears a HUD flag. */
-void func_00290720(void) {
+void hud_clear_flag_a(void) {
     D_001A901C = 0;
 }
 
 extern int D_001A9020 __attribute__((sda));
 
 /* Clears a second HUD flag. */
-void func_00290728(void) {
+void hud_clear_flag_b(void) {
     D_001A9020 = 0;
 }

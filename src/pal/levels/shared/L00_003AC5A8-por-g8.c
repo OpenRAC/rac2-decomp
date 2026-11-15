@@ -32,12 +32,12 @@ typedef struct {
 extern int D_0018C0B4 __attribute__((nosda));
 extern int D_L00_001A8FF0 MACRO_ADDR;
 extern int D_L00_001AF770 __attribute__((sda));
-extern char *func_L00_0032A088(int, int);
-extern int *func_L00_0032A0B8(int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern char *level_get_slot_body(int, int);
+extern int *level_get_slot_header(int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 void func_PAL_L00_003AC5A8(Actor *self)
 {
@@ -48,19 +48,19 @@ void func_PAL_L00_003AC5A8(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = func_L00_0032A088(0x5CB, source->id);
-    slots = (Slot *)(base + *func_L00_0032A0B8(0x5CB, source->id));
-    func_00282F20(&m, source, 1.0f);
+    base = level_get_slot_body(0x5CB, source->id);
+    slots = (Slot *)(base + *level_get_slot_header(0x5CB, source->id));
+    vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) func_002AFFD8(&self->pos, &dir, 1);
-    func_00282DD8(&tmp, &m, &dir);
-    func_00282F20(&tmp, &tmp, 1.0f);
-    func_00282DD8(&slots[source->index].d, &tmp, &m);
+    if (D_L00_001A8FF0) cam_compute_view_direction(&self->pos, &dir, 1);
+    FastVecCross(&tmp, &m, &dir);
+    vec_scale_to_length(&tmp, &tmp, 1.0f);
+    FastVecCross(&slots[source->index].d, &tmp, &m);
     qcopy_nc(&slots[source->index].c, &m);
     qcopy_nc(&slots[source->index].pos, &self->pos);
-    func_00282CC0(&slots[source->index].a, &self->pos, source);
+    FastVecAdd(&slots[source->index].a, &self->pos, source);
     qcopy_nc(&slots[source->index].b, &slots[source->index].a);
     slots[source->index].count = (D_L00_001AF770 * 5 + 2) / 6;
     slots[source->index].rate = 1.0f / slots[source->index].count;

@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_US2_002CAFD8, v2.00's own: resets the view's field of view and fog, updates the
    view context, then resets the active camera. */
-extern void func_0027AB40(void);
-extern void func_002C9C90(void);
-extern void func_00279D18(void);
+extern void UpdateViewContext(void);
+extern void cam_reset_active_position(void);
+extern void gfx_build_view_matrices(void);
 
 /* Partial view of the shared screen/render state. */
 typedef struct {
@@ -25,8 +26,8 @@ void func_US2_002CAFD8(void) {
     view->f228 = 255.0f;
     view->f22C = 0.0f;
     view->fB0 = 0.62f;
-    func_0027AB40();
-    func_002C9C90();
-    func_00279D18();
+    UpdateViewContext();
+    cam_reset_active_position();
+    gfx_build_view_matrices();
 }
 

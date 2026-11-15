@@ -33,25 +33,25 @@ extern RPoint D_L04_002AB6E0[],D_L04_002AB7A0[];
 extern int D_L04_002AB860[][4];
 extern float D_L04_002AB8C0[],D_L04_002AB8C4[],D_L04_002AB920[];
 extern float ref_L04_003C4050_00;
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *,int,int);
-extern u32 func_00282978(s16 *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_002FC560(int,u64);
-extern void func_L04_003C4858(void *,int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,int,int);
+extern u32 FastDecTimer(s16 *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void VU1_addGSregister(int,u64);
+extern void part_init_from_ranges(void *,int);
 
 static inline void TransformVertex(RPoint *v, EVec *m)
 {
     transform_vector(v, v, m);
 }
-void func_L04_003C4050(char *self) {
+void DrawEmitterParticles(char *self) {
     EVec position,up,basis[4],other[4];
     struct {
         RPoint vertices[4];
@@ -118,8 +118,8 @@ void func_L04_003C4050(char *self) {
                 opacity=FloatToInt((1.0f-IntToFloat(D_L04_0023D860[i])*D_L04_001B2E78)*D_L04_001AF334);
             } else if(D_L04_0023D9F0[i]) {
                 if(FastDecTimer(&D_L04_0023D9F0[i])) {
-                    InitParticleFromRanges(self,i); opacity=0;
-                    D_L04_0023D090[i]=RandomIntBelow(2);
+                    part_init_from_ranges(self,i); opacity=0;
+                    D_L04_0023D090[i]=math_random_int_below(2);
                 } else opacity=FloatToInt(IntToFloat(D_L04_0023D9F0[i])*D_L04_001B2E80*D_L04_001AF334);
             } else {
                 if(FastDecTimer(&D_L04_0023DB80[i])) D_L04_0023D9F0[i]=D_L04_001B2E7C;

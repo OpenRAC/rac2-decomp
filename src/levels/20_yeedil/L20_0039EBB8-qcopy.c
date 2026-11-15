@@ -10,15 +10,15 @@ typedef union {
     float f[4];
 } Vector;
 
-extern int func_002B3868(unsigned char *);
+extern int flag_set_first_pending(unsigned char *);
 
-extern void func_002A7750(unsigned char *, int, int);
+extern void moby_set_state(unsigned char *, int, int);
 
-extern int func_00282948(int *);
+extern int math_fast_float_d(int *);
 
-extern void func_00282CF0(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
 
-extern void func_002AD6F0(void *, const void *, const void *, const void *);
+extern void mat_combine_and_store(void *, const void *, const void *, const void *);
 
 /* Two-state mover. State 0 records the start position (object + 0x10) in state + 0x60 when
    func_002B3868 returns nonzero, and switches to state 1. State 1 steps the timer at
@@ -28,7 +28,7 @@ extern void func_002AD6F0(void *, const void *, const void *, const void *);
    then pass the position change, the old rotation and the rotation at object + 0xF0 to
    func_002AD6F0. */
 /* Moves a platform up and down in a repeating wave and passes its movement on to what rides on it. */
-void func_L20_0039EBB8(unsigned char *object) {
+void bobbing_l20_platform_update(unsigned char *object) {
     Vector oldPosition, oldRotation, delta;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float phase, low, high, z;
@@ -37,12 +37,12 @@ void func_L20_0039EBB8(unsigned char *object) {
     oldRotation.q = *(TI128 *)(object + 0xF0);
     switch (object[0x20]) {
     case 0:
-        if (SetFirstPendingFlag(object)) *(TI128 *)(state + 0x60) = *(TI128 *)(object + 0x10);
-        SetMobyState(object, 1, -1);
+        if (flag_set_first_pending(object)) *(TI128 *)(state + 0x60) = *(TI128 *)(object + 0x10);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (SetFirstPendingFlag(object)) *(int *)(state + 0x7C) = *(int *)(state + 0x78);
-        if (FastFloatHelperD((int *)(state + 0x7C))) SetMobyState(object, 1, -1);
+        if (flag_set_first_pending(object)) *(int *)(state + 0x7C) = *(int *)(state + 0x78);
+        if (math_fast_float_d((int *)(state + 0x7C))) moby_set_state(object, 1, -1);
         *(TI128 *)(object + 0x10) = *(TI128 *)(state + 0x60);
         phase = (float)*(int *)(state + 0x7C) / (float)*(int *)(state + 0x78) + *(float *)(state + 0x80);
         high = *(float *)(state + 0x70);
@@ -53,5 +53,5 @@ void func_L20_0039EBB8(unsigned char *object) {
         break;
     }
     FastVecSub(&delta, object + 0x10, &oldPosition);
-    CombineTransformsAndStore(state + 0x20, &delta, &oldRotation, object + 0xF0);
+    mat_combine_and_store(state + 0x20, &delta, &oldRotation, object + 0xF0);
 }

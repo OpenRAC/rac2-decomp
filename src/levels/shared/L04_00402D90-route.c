@@ -1,24 +1,25 @@
+#include "names.h"
 /* func_L04_00402D90 in a unit of its own: it needs -frac2-gcse-unsplit-edges (config/cflags.txt),
    so gcse leaves the reload of the main route index at the label of the rejoin test. */
 
 #include "common.h"
 
-extern u8 *D_L04_001FE340[];
-extern struct { s32 pad; s32 flags; u8 rest[56]; } D_L04_002C63C0[];
-extern int D_L04_001B090C MACRO_ADDR;
-extern u8 *D_L04_001B24DC MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
+extern u8 *g_route_path_table[];
+extern struct { s32 pad; s32 flags; u8 rest[56]; } g_race_challenge_table[];
+extern int g_current_race_index MACRO_ADDR;
+extern u8 *g_moby_l04_pool MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern char ref_L04_00402D90_00[];     /* an absolute symbol: 4 in level 04 */
-extern int func_002829A8(u8 *);
-extern void func_00282CF0(void *, void *, void *);
+extern int vec_fast_helper_a(u8 *);
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern int func_002ACBC8(void *, int);
-extern void func_002C96F8(float, float, void *, void *, void *, void *);
-extern int func_L04_00400AB0(void *, void *, int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern int IsPointInCuboid(void *, int);
+extern void anim_sample_key_track(float, float, void *, void *, void *, void *);
+extern int FindNearestRoutePointIndex(void *, void *, int);
 
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
@@ -27,13 +28,13 @@ extern int func_L04_00400AB0(void *, void *, int);
 /* Starts the route at index slot from its first point at the given speed. */
 #define START_ROUTE(slot, speed)                                                            \
     {                                                                                      \
-        u8 *route_ = gRoutePathTable[I(s, slot)];                                            \
+        u8 *route_ = D_L04_001FE340[I(s, slot)];                                            \
                                                                                             \
         I(s, 0x114) = 0;                                                                    \
         P(s, 0x110) = route_;                                                               \
         F(s, 0x16C) = 0.0f;                                                                 \
         F(s, 0xA8) = speed;                                                                 \
-        SampleKeyTrack(speed, F(route_, 0x1C), route_, s + 0x114, s + 0x118, s + 0xF0);      \
+        func_002C96F8(speed, F(route_, 0x1C), route_, s + 0x114, s + 0x118, s + 0xF0);      \
         I(s, 0x174) = -1000;                                                                \
     }
 
@@ -49,14 +50,14 @@ extern int func_L04_00400AB0(void *, void *, int);
             ahead_ = base_ + 5.0f;                                                          \
         }                                                                                   \
         F(s, 0xA8) = ahead_;                                                                \
-        SampleKeyTrack(ahead_, F(P(s, 0x110), 0x1C), P(s, 0x110), s + 0x114, s + 0x118,    \
+        func_002C96F8(ahead_, F(P(s, 0x110), 0x1C), P(s, 0x110), s + 0x114, s + 0x118,    \
                       s + 0xF0);                                                            \
     }
 
 /* Picks a new sideways wobble and the time until the next one. */
 #define SWAY()                                                                              \
     {                                                                                      \
-        F(s, 0x16C) += RandomFloatRange(-0.25f, 0.25f);                                        \
+        F(s, 0x16C) += func_002A7878(-0.25f, 0.25f);                                        \
         if (F(s, 0x16C) > 1.5f) {                                                           \
             F(s, 0x16C) = 1.5f;                                                             \
         }                                                                                   \
@@ -70,7 +71,7 @@ extern int func_L04_00400AB0(void *, void *, int);
 /* A racer's route choice in Barlow and Joba: takes the shortcuts at the scripted points,
    turns onto a nearby branch route at random, and rejoins its main route at the end of a
    branch. */
-void func_L04_00402D90(u8 *self)
+void UpdateRacerRouteChoice(u8 *self)
 {
     float delta[4];
     u8 *s;
@@ -84,17 +85,17 @@ void func_L04_00402D90(u8 *self)
     if (I(s, 0x54) == -1) {
         return;
     }
-    if (gCurrentMapIndex == 11) {
-        if (P(s, 0x110) == gRoutePathTable[I(s, 0x54)] && I(s, 0x124) >= 0xBA && I(s, 0x124) < 0xCD
+    if (g_current_map_index == 11) {
+        if (P(s, 0x110) == g_route_path_table[I(s, 0x54)] && I(s, 0x124) >= 0xBA && I(s, 0x124) < 0xCD
             && I(s, 0x1AC) >= 5) {
             START_ROUTE(0x7C, 4.0f);
         }
         if (I(s, 0x240) == 0 && I(s, 0x120) == -1 && I(s, 0x124) >= 0x2C && I(s, 0x124) < 0x33) {
-            u8 *rival = P(gMobyPool_L04 + (I(leaderVars, 0x1A4) << 8), 0x68);
+            u8 *rival = P(g_moby_l04_pool + (I(leaderVars, 0x1A4) << 8), 0x68);
 
             if (I(rival, 0x14) == 0) {
-                if (RandomFloatRange(0.0f, 1.0f) < 0.9f - (float)(10 - I(s, 0x1A8)) * 0.03f) {
-                    u8 *route = gRoutePathTable[I(s, 0x5C)];
+                if (math_random_float_range(0.0f, 1.0f) < 0.9f - (float)(10 - I(s, 0x1A8)) * 0.03f) {
+                    u8 *route = g_route_path_table[I(s, 0x5C)];
 
                     P(s, 0x110) = route;
                     JOIN_ROUTE(route);
@@ -107,7 +108,7 @@ void func_L04_00402D90(u8 *self)
                     i = 0;
                 }
             } else {
-                if (RandomFloatRange(0.0f, 1.0f) < 0.9f) {
+                if (math_random_float_range(0.0f, 1.0f) < 0.9f) {
                     I(s, 0x240) = 1;
                     s[0xA1] = 180;
                 }
@@ -115,30 +116,30 @@ void func_L04_00402D90(u8 *self)
             }
         }
     }
-    if ((int)ref_L04_00402D90_00 == 40 || gCurrentMapIndex == 4) {
-        if (P(s, 0x110) == gRoutePathTable[I(s, 0x54)] && I(s, 0x124) >= 0x1AA && I(s, 0x124) < 0x1B3
+    if ((int)ref_L04_00402D90_00 == 40 || g_current_map_index == 4) {
+        if (P(s, 0x110) == g_route_path_table[I(s, 0x54)] && I(s, 0x124) >= 0x1AA && I(s, 0x124) < 0x1B3
             && I(s, 0x1AC) >= 2 && IsPointInCuboid(self + 0x10, I(leaderVars, 0x1A0)) != 0) {
             START_ROUTE(0x7C, 2.0f);
         }
-        if (P(s, 0x110) == gRoutePathTable[I(s, 0x6C)] && I(s, 0x124) >= 0xAB && I(s, 0x124) < 0xAF
+        if (P(s, 0x110) == g_route_path_table[I(s, 0x6C)] && I(s, 0x124) >= 0xAB && I(s, 0x124) < 0xAF
             && I(s, 0x1AC) >= 4) {
-            u8 *route = gRoutePathTable[I(s, 0x54)];
+            u8 *route = g_route_path_table[I(s, 0x54)];
 
             P(s, 0x110) = route;
             JOIN_ROUTE(route);
         }
     }
-    if (FastVectorHelperA(s + 0xA1) != 0 && I(s, 0x240) == 0 && P(s, 0x110) == gRoutePathTable[I(s, 0x54)]
+    if (vec_fast_helper_a(s + 0xA1) != 0 && I(s, 0x240) == 0 && P(s, 0x110) == g_route_path_table[I(s, 0x54)]
         && i) {
         for (i = 0; i < 5; i++) {
             int id = ((int *)(s + 0x58))[i];
 
             if (id != -1) {
-                u8 *branch = gRoutePathTable[id];
+                u8 *branch = g_route_path_table[id];
 
                 FastVecSub(delta, branch + 0x10, s + 0xF0);
                 if (func_L00_002EE290(delta) < 25.0f) {
-                    if (RandomIntBelow(2) == 0) {
+                    if (math_random_int_below(2) == 0) {
                         P(s, 0x110) = branch;
                     } else {
                         s[0xA1] = 120;
@@ -146,16 +147,16 @@ void func_L04_00402D90(u8 *self)
                 }
             }
         }
-        if (gRaceChallengeTable[gCurrentRaceIndex].flags & 4) {
+        if (g_race_challenge_table[g_current_race_index].flags & 4) {
             for (i = 0; i < 4; i++) {
                 int id = ((int *)(s + 0x6C))[i];
 
                 if (id != -1) {
-                    u8 *branch = gRoutePathTable[id];
+                    u8 *branch = g_route_path_table[id];
 
                     FastVecSub(delta, branch + 0x10, s + 0xF0);
                     if (func_L00_002EE290(delta) < 25.0f) {
-                        if (RandomIntBelow(2) == 0) {
+                        if (math_random_int_below(2) == 0) {
                             P(s, 0x110) = branch;
                         } else {
                             s[0xA1] = 120;
@@ -164,12 +165,12 @@ void func_L04_00402D90(u8 *self)
                 }
             }
         }
-        if (P(s, 0x110) != gRoutePathTable[I(s, 0x54)]) {
+        if (P(s, 0x110) != g_route_path_table[I(s, 0x54)]) {
             JOIN_ROUTE(P(s, 0x110));
             WOBBLE();
         }
-    } else if (P(s, 0x110) != gRoutePathTable[I(s, 0x54)] && I(s, 0x114) == I(P(s, 0x110), 0) - 1) {
-        u8 *route = gRoutePathTable[I(s, 0x54)];
+    } else if (P(s, 0x110) != g_route_path_table[I(s, 0x54)] && I(s, 0x114) == I(P(s, 0x110), 0) - 1) {
+        u8 *route = g_route_path_table[I(s, 0x54)];
 
         P(s, 0x110) = route;
         JOIN_ROUTE(route);

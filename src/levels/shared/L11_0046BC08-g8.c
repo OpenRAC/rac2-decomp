@@ -23,13 +23,13 @@ extern float D_L11_001B25C0 __attribute__((sda));
 extern float D_L11_001B25C8 __attribute__((sda));
 extern float D_L11_001B25DC __attribute__((sda));
 extern BoltBuffer D_L11_00264760[];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* When the bolt's reset flag is set: lays the row's core points on the straight line
  * from start towards end, one step apart, and clears the jitter and wave phases. */
-void func_L11_0046BC08(char *object)
+void ResetBoltPointsToLine(char *object)
 {
     Vector delta, step;
     BoltState *state = *(BoltState **)(object + 0x68);

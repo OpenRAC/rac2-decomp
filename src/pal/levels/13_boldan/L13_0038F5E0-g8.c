@@ -4,16 +4,16 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F38c810;
 extern float D_L13_001A8F20;
-extern void func_002A7750(char *, s32, s32);
-extern s32 func_002A9640(char *, s32, s32);
-extern void func_L00_0033E220(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
-extern void func_002E5CF8(s32, s32, char *);
+extern void moby_set_state(char *, s32, s32);
+extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern void part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
+extern void PlayMobySound(s32, s32, char *);
 extern void func_PAL_L00_003281C0(char *, s32, float);
 extern void func_PAL_L00_003FB330(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
-extern float func_00283B98(float, float);
-extern void func_002833F0(void *, void *);
+extern float FastAddRotations(float, float);
+extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_002B15D8(char *, s32, float *, float, float, float, float, s32);
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 
 /* Three-state effect object: arms its emitter, waits for the trigger, then spins a burst of four sprites and retires. */
 void func_PAL_L13_0038F5E0(char *obj)
@@ -27,16 +27,16 @@ void func_PAL_L13_0038F5E0(char *obj)
     case 0:
         v.q = 0;
         v.f[2] = 2.0f;
-        func_L00_0033E220(&v, obj, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
-        func_002A7750(obj, 1, -1);
+        part_spawn_object_following_effect(&v, obj, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
+        moby_set_state(obj, 1, -1);
         return;
     case 1:
-        if (func_002A9640(obj, 0x04010000, 0) != 0 && *rec == 0)
-            func_002A7750(obj, 2, -1);
+        if (part_find_owned_effect_slot(obj, 0x04010000, 0) != 0 && *rec == 0)
+            moby_set_state(obj, 2, -1);
         *(u8 *)(obj + 0xA8) = 0xFF;
         return;
     case 2:
-        func_002E5CF8(0, 0, obj);
+        PlayMobySound(0, 0, obj);
         func_PAL_L00_003281C0(obj, 4, 0.0f);
         pos = obj + 0xC0;
         rot = obj + 0xF0;
@@ -44,12 +44,12 @@ void func_PAL_L13_0038F5E0(char *obj)
         i = 3;
         do {
             i--;
-            *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), 1.5707964f);
-            func_002833F0(pos, rot);
+            *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 1.5707964f);
+            euler_rotation_basis(pos, rot);
             func_PAL_002B15D8(obj, 0xF, &D_L13_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             *(short *)(obj + 0x7C) = 0;
         } while (i >= 0);
-        func_0029F338(obj);
+        moby_mark_spawned(obj);
         return;
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef signed short s16;
@@ -9,7 +10,7 @@ extern s32 func_00342228(u8 *a0, s32 a1);
 extern f32 func_0030FE40(f32 x, f32 y);
 extern f32 func_0030F3A0(f32 x);
 extern f32 func_0030F3B8(f32 x);
-extern u8 D_L04_00254E10[];
+extern u8 g_racer_trail_pool[];
 typedef struct RankState {
     u8 pad0[0xA2];
     u8 rank;
@@ -32,8 +33,8 @@ typedef struct RankObject {
     RankState *state;
     u8 pad6c[0x100 - 0x6c];
 } RankObject;
-extern RankObject *D_L04_001B24DC __attribute__((sda));
-extern f32 func_L04_00410788(RankObject *, RankState *, s32 *, s32 *, s32, s32);
+extern RankObject *g_moby_l04_pool __attribute__((sda));
+extern f32 UpdateNearestRoutePoint(RankObject *, RankState *, s32 *, s32 *, s32, s32);
 /* func_L04_00415E28 is a near miss: nonmatching/levels/func_L04_00415E28.c */
 
 /* func_L04_00415EA8 is a near miss: nonmatching/levels/func_L04_00415EA8.c */
@@ -61,9 +62,9 @@ typedef struct {
     u8 *owner;
     u8 pad14C[0x150 - 0x14C];
 } L04_5EE8Bolt;
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00283698(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
 
 void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
 {
@@ -73,13 +74,13 @@ void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
     s32 i;
 
     for (i = 0; i < 140; i++) {
-        b = &((L04_5EE8Bolt *)D_L04_00254E10)[i];
+        b = &((L04_5EE8Bolt *)g_racer_trail_pool)[i];
         if (b->active == 0) {
             b->active = 1;
-            func_00282CC0(d, from, pos);
-            func_00282CC0(b->start, d, to);
-            func_00283698(m, owner + 0xC0);
-            func_002830C0(b->dir, pos, m);
+            FastVecAdd(d, from, pos);
+            FastVecAdd(b->start, d, to);
+            matrix_from_basis_rows(m, owner + 0xC0);
+            transform_vector(b->dir, pos, m);
             qcopy(b->origin, pos);
             b->to = to;
             b->i138 = 1;

@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 /* func_US2_00287108: v2.00's own exit helper of the menu overlay: refresh, set D_0018A000 to 10, pop the state. */
 extern short D_0018A000;
-extern void func_002B8518(void);
-extern int func_002B4B70(int, int);
+extern void pad_clear_port_state(void);
+extern int request_end_slot(int, int);
 
 void func_US2_00287108(void)
 {
-    func_002B8518();
+    pad_clear_port_state();
     D_0018A000 = 10;
-    func_002B4B70(0, 0);
+    request_end_slot(0, 0);
 }

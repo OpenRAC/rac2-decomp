@@ -62,29 +62,29 @@ extern float D_L17_001B024C __attribute__((sda));
 extern float D_L17_001B0250 __attribute__((sda));
 extern float D_L17_001B0254 __attribute__((sda));
 extern float D_L17_001B0258 __attribute__((sda));
-extern char D_00189EA0[];          /* the hero's position */
-extern SoundRecord D_00188660[];
+extern char g_hero_position[];          /* the hero's position */
+extern SoundRecord g_sound_state[];
 extern char D_L17_001A8F20[] MACRO_ADDR;
 
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283B98(float, float);
-extern float func_00282E80(void *, void *);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern int func_00283CF0(float);
-extern int func_00282948(int *);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002A9640(void *, int, int);
-extern float func_00283CE0(int);
-extern void func_002AEE70(void *, float *, float *, float, float, float);
-extern void func_002AEF28(void *, float *, float *, float, float, float);
-extern void func_002E59F8(int);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, int,
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float FastAddRotations(float, float);
+extern float vec_distance_xy(void *, void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern int FloatToInt(float);
+extern int math_fast_float_d(int *);
+extern int PlayMobySound(int, int, void *);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern float IntToFloat(int);
+extern void math_update_wrapped_angle_offset(void *, float *, float *, float, float, float);
+extern void moby_scale_owner_words_by_angles(void *, float *, float *, float, float, float);
+extern void snd_stop_voice(int);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int,
                           int, int, int, float, float);
-extern void func_002B0A68(void *, int, void *, int, float, float, float, float);
-extern void func_L00_00326110(void *, int, float);
-extern void func_0029F338(void *);
+extern void part_spawn_masked_debris(void *, int, void *, int, float, float, float, float);
+extern void part_spawn_scaled_bolts(void *, int, float);
+extern void moby_mark_spawned(void *);
 
 /* Rests at a low and a high height in turn, easing each move along a cosine,
    while bobbing, swaying and spinning; plays its sound while the hero is near
@@ -108,27 +108,27 @@ void func_PAL_L17_003C7F18(Moby *moby)
     case 0:
         /* First update: pick the rise, the spin and a random point in the cycle. */
         vars->baseZ = moby->position[2];
-        vars->rise = func_002A7878(vars->minRise, vars->maxRise);
-        spin = func_002A7878(0.0052359886f, 0.015707966f);
-        if (func_002A77E0(2))
+        vars->rise = math_random_float_range(vars->minRise, vars->maxRise);
+        spin = math_random_float_range(0.0052359886f, 0.015707966f);
+        if (math_random_int_below(2))
             spin = -spin;
         vars->spinSpeed = spin;
         vars->sound = -1;
-        if (func_002A77E0(2)) {
+        if (math_random_int_below(2)) {
             moby->position[2] += vars->rise;
             vars->state = 3;
         } else {
             vars->state = 1;
         }
-        vars->timer = func_002A7820(func_00283CF0((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                    func_00283CF0((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
-        vars->timer = func_002A7820(0, vars->timer);
+        vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
+                                    FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+        vars->timer = math_random_int_range(0, vars->timer);
         break;
 
     case 1:
         /* Resting low. */
-        if (func_00282948(&vars->timer)) {
-            vars->timer = func_00283CF0((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
+        if (math_fast_float_d(&vars->timer)) {
+            vars->timer = FloatToInt((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
             vars->state = 2;
         }
         moby->position[2] = vars->baseZ;
@@ -136,23 +136,23 @@ void func_PAL_L17_003C7F18(Moby *moby)
 
     case 2:
         /* Rising. */
-        if (func_00282948(&vars->timer)) {
+        if (math_fast_float_d(&vars->timer)) {
             moby->position[2] = vars->baseZ + vars->rise;
             vars->state = 3;
-            vars->timer = func_002A7820(func_00283CF0((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                        func_00283CF0((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+            vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
+                                        FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
         } else {
-            ratio = func_00283CE0(vars->timer) / ((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
+            ratio = IntToFloat(vars->timer) / ((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
             moby->position[2] = vars->baseZ +
-                vars->rise * (func_00283180(ratio * 3.141593f) * 0.5f) +
+                vars->rise * (math_fast_sin_or_cos_a(ratio * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
         break;
 
     case 3:
         /* Resting high. */
-        if (func_00282948(&vars->timer)) {
-            vars->timer = func_00283CF0((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
+        if (math_fast_float_d(&vars->timer)) {
+            vars->timer = FloatToInt((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
             vars->state = 4;
         }
         moby->position[2] = vars->baseZ + vars->rise;
@@ -160,47 +160,47 @@ void func_PAL_L17_003C7F18(Moby *moby)
 
     case 4:
         /* Falling. */
-        if (func_00282948(&vars->timer)) {
+        if (math_fast_float_d(&vars->timer)) {
             moby->position[2] = vars->baseZ;
             vars->state = 1;
-            vars->timer = func_002A7820(func_00283CF0((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                        func_00283CF0((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+            vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
+                                        FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
         } else {
-            ratio = func_00283CE0(vars->timer) / ((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
+            ratio = IntToFloat(vars->timer) / ((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
             moby->position[2] = vars->baseZ +
-                vars->rise * (func_00283180((1.0f - ratio) * 3.141593f) * 0.5f) +
+                vars->rise * (math_fast_sin_or_cos_a((1.0f - ratio) * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
         break;
     }
 
     /* The periods are in seconds: 0.0003490659 is one degree per second, in radians per 50 Hz frame. */
-    func_002AEE70(moby, &vars->bobPhase, &vars->bobOffset, D_L17_001B024C,
+    math_update_wrapped_angle_offset(moby, &vars->bobPhase, &vars->bobOffset, D_L17_001B024C,
                   360.0f / D_L17_001B0248 * 0.0003490659f, moby->position[2]);
-    func_002AEF28(moby, &vars->swayPhase, &vars->tiltPhase, D_L17_001B0250,
+    moby_scale_owner_words_by_angles(moby, &vars->swayPhase, &vars->tiltPhase, D_L17_001B0250,
                   360.0f / D_L17_001B0254 * 0.0003490659f,
                   360.0f / D_L17_001B0258 * 0.0003490659f);
-    moby->rotation[2] = func_00283B98(moby->rotation[2], vars->spinSpeed);
+    moby->rotation[2] = FastAddRotations(moby->rotation[2], vars->spinSpeed);
 
-    if (func_00282E80(moby->position, D_00189EA0) < 80.0f) {
-        SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+    if (vec_distance_xy(moby->position, g_hero_position) < 80.0f) {
+        SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
         if (voice->owner != moby || !voice->active)
-            vars->sound = func_002E5CF8(0, 4, moby);
+            vars->sound = PlayMobySound(0, 4, moby);
     } else {
         int sound = vars->sound;
         if (sound != -1) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
             if (voice->owner == moby && voice->active)
-                func_002E59F8(sound);
+                snd_stop_voice(sound);
         }
         vars->sound = -1;
     }
 
-    if (func_002A9640(moby, 0x4010000, 0)) {
-        func_0032C700(moby->position, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 10.0f, 20.0f);
-        func_002B0A68(moby, 127, D_L17_001A8F20, 255, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_L00_00326110(moby, 9, 0);
-        func_0029F338(moby);
+    if (part_find_owned_effect_slot(moby, 0x4010000, 0)) {
+        SpawnExplosion(moby->position, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 10.0f, 20.0f);
+        part_spawn_masked_debris(moby, 127, D_L17_001A8F20, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_scaled_bolts(moby, 9, 0);
+        moby_mark_spawned(moby);
     } else {
         moby->impactSlot = 255;
     }

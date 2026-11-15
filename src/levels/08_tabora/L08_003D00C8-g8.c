@@ -1,20 +1,20 @@
 #include "include_asm.h"
 #include "names.h"
 typedef struct { char pad0[0x80]; char position[0x2BC]; char *active; int enabled; char pad1[0x244]; char *other; char pad2[0x1D10]; int mode; } Globals;
-extern Globals D_00189E20;
+extern Globals g_hero_state;
 extern char *D_L08_001B29DC;
 extern float D_L08_001B01E0 __attribute__((sda)), D_L08_001B01E4 __attribute__((sda)), D_L08_001B01E8 __attribute__((sda));
 extern float D_L08_001B01EC __attribute__((sda)), D_L08_001B01F0 __attribute__((sda)), D_L08_001B01F4 __attribute__((sda)), D_L08_001B01F8 __attribute__((sda));
-extern int func_L08_003D0098(int);
-extern float func_00283180(float);
-extern float func_00282E80(void *, void *);
-extern float func_00283B98(float, float);
-extern float func_00282C48(float);
-extern void func_002E5CF8(int, int, void *);
-extern void func_L08_003D0040(void *);
+extern int seesaw_is_linked_switched_on(int);
+extern float math_fast_sin_or_cos_a(float);
+extern float vec_distance_xy(void *, void *);
+extern float FastAddRotations(float, float);
+extern float math_fabs(float);
+extern void PlayMobySound(int, int, void *);
+extern void moby_attach_parts(void *);
 
 /* Seesaw beam: tilts when the hero stands on either end and rocks back toward level, playing a creak sound as it moves. */
-void func_L08_003D00C8(char *moby) {
+void UpdateLinkedObjectTilt(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     float tiltAccel, previousTilt, tiltScale;
     float dampFactor;
@@ -38,35 +38,35 @@ void func_L08_003D00C8(char *moby) {
             *(char **)(vars + 4) = beamEnd;
         }
     second_done:
-        *(int *)(vars + 0x10) = IsLinkedMobySwitchedOnSeesaw(*(int *)(vars + 0xC));
+        *(int *)(vars + 0x10) = seesaw_is_linked_switched_on(*(int *)(vars + 0xC));
         moby[0x20] = 1;
         break;
     case 1:
         tiltAccel = 0;
-        if (gHeroState.enabled) {
-            if (gHeroState.active == *(char **)vars) {
-                float tiltRate = FastSinOrCosA(*(float *)(moby + 0xF4));
-                float heroDistance = vec_distance_xy(gHeroState.position, moby + 0x10);
+        if (g_hero_state.enabled) {
+            if (g_hero_state.active == *(char **)vars) {
+                float tiltRate = math_fast_sin_or_cos_a(*(float *)(moby + 0xF4));
+                float heroDistance = vec_distance_xy(g_hero_state.position, moby + 0x10);
                 float weightFactor = D_L08_001B01E0;
                 tiltRate *= 0.000004848137450608192f;
                 tiltAccel = weightFactor * tiltRate * heroDistance / D_L08_001B01F0;
             }
-            if (gHeroState.active == *(char **)(vars + 4)) {
-                tiltScale = FastSinOrCosA(*(float *)(moby + 0xF4));
-                tiltAccel = -(D_L08_001B01E0 * 0.000004848137450608192f) * tiltScale * vec_distance_xy(gHeroState.position, moby + 0x10) / D_L08_001B01F0;
+            if (g_hero_state.active == *(char **)(vars + 4)) {
+                tiltScale = math_fast_sin_or_cos_a(*(float *)(moby + 0xF4));
+                tiltAccel = -(D_L08_001B01E0 * 0.000004848137450608192f) * tiltScale * vec_distance_xy(g_hero_state.position, moby + 0x10) / D_L08_001B01F0;
             }
         }
-        if (gHeroState.mode == 3) {
-            if (gHeroState.other == *(char **)vars) {
-                float tiltRate = FastSinOrCosA(*(float *)(moby + 0xF4));
-                float heroDistance = vec_distance_xy(gHeroState.position, moby + 0x10);
+        if (g_hero_state.mode == 3) {
+            if (g_hero_state.other == *(char **)vars) {
+                float tiltRate = math_fast_sin_or_cos_a(*(float *)(moby + 0xF4));
+                float heroDistance = vec_distance_xy(g_hero_state.position, moby + 0x10);
                 float weightFactor = D_L08_001B01E0;
                 tiltRate *= 0.000004848137450608192f;
                 tiltAccel = weightFactor * tiltRate * heroDistance / D_L08_001B01F0;
             }
-            if (gHeroState.other == *(char **)(vars + 4)) {
-                tiltScale = FastSinOrCosA(*(float *)(moby + 0xF4));
-                tiltAccel = -(D_L08_001B01E0 * 0.000004848137450608192f) * tiltScale * vec_distance_xy(gHeroState.position, moby + 0x10) / D_L08_001B01F0;
+            if (g_hero_state.other == *(char **)(vars + 4)) {
+                tiltScale = math_fast_sin_or_cos_a(*(float *)(moby + 0xF4));
+                tiltAccel = -(D_L08_001B01E0 * 0.000004848137450608192f) * tiltScale * vec_distance_xy(g_hero_state.position, moby + 0x10) / D_L08_001B01F0;
             }
         }
         if (*(float *)(moby + 0xF4) > D_L08_001B01E4 * 0.01745329424738884f)
@@ -86,22 +86,22 @@ void func_L08_003D00C8(char *moby) {
         previousTilt = *(float *)(vars + 8);
         *(float *)(vars + 8) += tiltAccel;
         *(float *)(moby + 0xF4) = FastAddRotations(*(float *)(moby + 0xF4), *(float *)(vars + 8));
-        if ((FloatAbs(previousTilt) < 0.0002908882452175021f && FloatAbs(*(float *)(vars + 8)) > 0.0002908882452175021f) ||
-            (FloatAbs(previousTilt) < 0.0014544413425028324f && FloatAbs(*(float *)(vars + 8)) > 0.0014544413425028324f) ||
-            (FloatAbs(previousTilt) < 0.002908882685005665f && FloatAbs(*(float *)(vars + 8)) > 0.002908882685005665f))
+        if ((math_fabs(previousTilt) < 0.0002908882452175021f && math_fabs(*(float *)(vars + 8)) > 0.0002908882452175021f) ||
+            (math_fabs(previousTilt) < 0.0014544413425028324f && math_fabs(*(float *)(vars + 8)) > 0.0014544413425028324f) ||
+            (math_fabs(previousTilt) < 0.002908882685005665f && math_fabs(*(float *)(vars + 8)) > 0.002908882685005665f))
             PlayMobySound(0, 0, moby);
-        linkedOn = IsLinkedMobySwitchedOnSeesaw(*(int *)(vars + 0xC));
-        if (FloatAbs(*(float *)(moby + 0xF4)) > D_L08_001B01F4 * 0.01745329424738884f && linkedOn) {
+        linkedOn = seesaw_is_linked_switched_on(*(int *)(vars + 0xC));
+        if (math_fabs(*(float *)(moby + 0xF4)) > D_L08_001B01F4 * 0.01745329424738884f && linkedOn) {
             *(float *)(vars + 8) = 0;
             moby[0x20] = 2;
         }
         dampFactor = D_L08_001B01F8;
         *(int *)(vars + 0x10) = linkedOn;
         *(float *)(vars + 8) *= dampFactor;
-        AttachPartsToMoby(moby);
+        moby_attach_parts(moby);
         break;
     case 2:
-        if (!IsLinkedMobySwitchedOnSeesaw(*(int *)(vars + 0xC))) moby[0x20] = 1;
+        if (!seesaw_is_linked_switched_on(*(int *)(vars + 0xC))) moby[0x20] = 1;
         break;
     }
 }

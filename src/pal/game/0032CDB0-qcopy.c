@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Rac2TI128 __attribute__((mode(TI)));
 typedef struct Rec_0032B598 {
@@ -28,17 +29,17 @@ typedef struct Rec_0032B598 {
     int w_A8;
     unsigned char tail_AC[4];
 } Rec_0032B598;
-extern Rec_0032B598 D_002351A0[];
+extern Rec_0032B598 g_ring_pieces[];
 extern char D_00189F00[];
-extern float func_002A7878(float low, float high);
-extern float func_002A78D8(float low, float high);
-extern void func_00282C88(void *p);
+extern float math_random_float_range(float low, float high);
+extern float math_random_signed_float_range(float low, float high);
+extern void vec_clear_128(void *p);
 
 /* Claims the first free record of the twelve 0xB0-byte records at D_002351A0, keeps the owner's
    pointer in it, copies two quadwords in and fills the drawn values. */
 void func_PAL_0032CDB0(char *owner, char *src, int arg)
 {
-    Rec_0032B598 *base = D_002351A0;
+    Rec_0032B598 *base = g_ring_pieces;
     Rec_0032B598 *slot;
     int i;
 
@@ -49,26 +50,26 @@ void func_PAL_0032CDB0(char *owner, char *src, int arg)
         slot->w_9C = (int)owner;
         *(Rac2TI128 *)((char *)slot + 0x20) = *(Rac2TI128 *)D_00189F00;
         *(Rac2TI128 *)((char *)slot + 0x40) = *(Rac2TI128 *)src;
-        slot->f_50 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_54 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_58 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_74 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_78 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_7C = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_5C = func_002A78D8(0.001f, 0.005f);
-        slot->f_60 = func_002A78D8(0.001f, 0.005f);
-        slot->f_64 = func_002A78D8(0.001f, 0.005f);
-        slot->f_80 = func_002A78D8(0.001f, 0.005f);
-        slot->f_84 = func_002A78D8(0.001f, 0.005f);
-        slot->f_88 = func_002A78D8(0.001f, 0.005f);
-        slot->f_68 = func_002A7878(3.25f, 4.75f);
-        slot->f_6C = func_002A7878(3.25f, 4.75f);
-        slot->f_70 = func_002A7878(3.25f, 4.75f);
-        slot->f_8C = func_002A7878(3.25f, 4.75f);
-        slot->f_90 = func_002A7878(3.25f, 4.75f);
-        slot->f_94 = func_002A7878(3.25f, 4.75f);
-        func_00282C88(slot);
-        func_00282C88((char *)slot + 0x10);
+        slot->f_50 = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_54 = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_58 = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_74 = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_78 = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_7C = math_random_float_range(-3.14159274f, 3.14159274f);
+        slot->f_5C = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_60 = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_64 = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_80 = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_84 = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_88 = math_random_signed_float_range(0.001f, 0.005f);
+        slot->f_68 = math_random_float_range(3.25f, 4.75f);
+        slot->f_6C = math_random_float_range(3.25f, 4.75f);
+        slot->f_70 = math_random_float_range(3.25f, 4.75f);
+        slot->f_8C = math_random_float_range(3.25f, 4.75f);
+        slot->f_90 = math_random_float_range(3.25f, 4.75f);
+        slot->f_94 = math_random_float_range(3.25f, 4.75f);
+        vec_clear_128(slot);
+        vec_clear_128((char *)slot + 0x10);
         slot->w_A8 = 0;
         slot->w_A0 = arg;
         slot->w_98 = 17;

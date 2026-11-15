@@ -24,18 +24,18 @@ extern int D_L01_001AEC38 MACRO_ADDR;
 extern float D_L01_001B2090, D_L01_001B208C;
 extern int D_L01_001B3468 MACRO_ADDR;
 extern int D_L01_001B15E0 MACRO_ADDR;
-extern void *func_002A9640(void *, int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003D6B00(void *, int, float, float, float, float);
-extern void func_002E5CF8(int, int, void *);
-extern void func_L00_00326110(void *, int, float);
-extern void func_L00_00326620(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern void moby_set_state(void *, int, int);
+extern void part_l01_spawn_ring_of_sparks(void *, int, float, float, float, float);
+extern void PlayMobySound(int, int, void *);
+extern void part_spawn_scaled_bolts(void *, int, float);
+extern void moby_l00_spawn_child(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
 
 /* Breakable object. When something hits it, it breaks into pieces, hides, and removes itself after a short wait. */
-void func_L01_003D68C0(OozlaStateMoby *moby)
+void breakable_l01_object_update(OozlaStateMoby *moby)
 {
     OozlaCountdown *vars = moby->vars;
 
@@ -43,38 +43,38 @@ void func_L01_003D68C0(OozlaStateMoby *moby)
     case 0: {
         D_L01_001AEC38++;
         moby->flags |= 0x800;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
-        if (FindOwnedEffectSlot(moby, 0x4010000, 0) && !vars->active) {
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !vars->active) {
             D_L01_001AEC38 = D_L01_001AEC38 - 1;
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         moby->hitSlot = 255;
         break;
     case 2:
         if (moby->visible && D_L01_001B2090 < 0.9f && D_L01_001B208C < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0)
-            SpawnRingOfSparks_L01(moby, 15, 1.5f, 6.5f, 1.5f, 0.06666667f);
+            part_l01_spawn_ring_of_sparks(moby, 15, 1.5f, 6.5f, 1.5f, 0.06666667f);
         else
-            SpawnRingOfSparks_L01(moby, 6, 1.5f, 6.5f, 1.5f, 0.06666667f);
+            part_l01_spawn_ring_of_sparks(moby, 6, 1.5f, 6.5f, 1.5f, 0.06666667f);
         PlayMobySound(0, 0, moby);
-        SpawnScaledBolts(moby, 1, 0.0f);
-        SpawnChildMoby_L00(moby, 0xF94, 0);
-        SetMobyState(moby, 3, -1);
+        part_spawn_scaled_bolts(moby, 1, 0.0f);
+        moby_l00_spawn_child(moby, 0xF94, 0);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
-        if (SetFirstPendingFlag(moby)) {
+        if (flag_set_first_pending(moby)) {
             moby->flags |= 1;
             moby->visible = 0;
             moby->collisionDisable = 0;
             vars->timer = 120;
             D_L01_001B3468++;
         }
-        if (FastFloatHelperD(&vars->timer)) {
+        if (math_fast_float_d(&vars->timer)) {
             D_L01_001B3468--;
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
         }
         break;
     }

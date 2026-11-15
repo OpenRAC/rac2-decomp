@@ -5,51 +5,51 @@ extern int D_L19_001A8F00 __attribute__((sda));
 extern u8 D_001A7BDC[] __attribute__((sda));
 extern int D_L19_001B2724[4] __attribute__((sda));
 extern char *D_L19_001B2B0C[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern u8 D_0019B2E8[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L19_001BFC40[];
-extern void func_L04_00423178(char *a0);
-extern void func_0029F338(char *a0);
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern void func_L01_003128C0(char *a0);
-extern s32 func_002ACBC8(char *a0, s32 a1);
-extern s32 func_00288AA0(char *a0, s32 a1);
-extern void func_L01_003246D0(char *a0);
-extern void func_00288BE8(char *a0);
-extern s32 func_002F5D10(void);
-extern void func_002AD7B8(s32 a0);
+extern void moby_reset_matching_effects(char *a0);
+extern void moby_mark_spawned(char *a0);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern void moby_reset_vars_defaults(char *a0);
+extern s32 IsPointInCuboid(char *a0, s32 a1);
+extern s32 req_push_queue(char *a0, s32 a1);
+extern void level_apply_index_for_key(char *a0);
+extern void req_launch_queued(char *a0);
+extern s32 game_is_either_mode_two(void);
+extern void moby_mark_flag_and_append_to_list(s32 a0);
 extern void func_US2_002AFF10(s32 a0);
-extern void func_L00_002B9D60(char *a0, char *a1, s32 a2, s32 a3);
-extern void func_002A0430(s32 a0);
-extern void func_002DF3F8(char *a0, char *a1);
-extern void func_0029B3E0(s32 a0, s32 a1);
+extern void hero_reset_position_and_direction(char *a0, char *a1, s32 a2, s32 a3);
+extern void moby_mark_table_entry_flagged(s32 a0);
+extern void level_capture_checkpoint_state(char *a0, char *a1);
+extern void MemcardSave(s32 a0, s32 a1);
 
 void func_US2_L19_00424DC8(char *a0)
 {
     char *s1 = *(char **)(a0 + 0x68);
     u8 id;
 
-    func_L04_00423178(a0);
+    moby_reset_matching_effects(a0);
     switch (*(u8 *)(a0 + 0x20)) {
     case 0:
         *(s32 *)(a0 + 0x98) = 0;
         *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
         if (D_001A7BDC[0] != 0) {
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
         } else {
-            func_002A7750(a0, 1, -1);
-            func_L01_003128C0(a0);
+            moby_set_state(a0, 1, -1);
+            moby_reset_vars_defaults(a0);
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(s1 + 0x120)) != 0) {
-            if (func_00288AA0(D_L19_001BFC40, 0x96) != 0) {
-                func_00288AA0(D_L19_001BFC40, 0x14);
-                func_00288AA0(D_L19_001BFC40, 0x97);
-                func_L01_003246D0(a0);
-                func_00288BE8(D_L19_001BFC40);
-                func_002A7750(a0, 2, -1);
+        if (IsPointInCuboid(g_hero_position, *(s32 *)(s1 + 0x120)) != 0) {
+            if (req_push_queue(D_L19_001BFC40, 0x96) != 0) {
+                req_push_queue(D_L19_001BFC40, 0x14);
+                req_push_queue(D_L19_001BFC40, 0x97);
+                level_apply_index_for_key(a0);
+                req_launch_queued(D_L19_001BFC40);
+                moby_set_state(a0, 2, -1);
             }
         }
         break;
@@ -59,24 +59,24 @@ void func_US2_L19_00424DC8(char *a0)
             *(u8 *)(a0 + 0x31) = 0;
             *(u16 *)(a0 + 0x34) |= 1;
         }
-        if (func_002F5D10() == 0) {
+        if (game_is_either_mode_two() == 0) {
             D_L19_001B2724[1] = 0;
-            func_002AD7B8(0x14);
+            moby_mark_flag_and_append_to_list(0x14);
             func_US2_002AFF10(0x14);
-            func_L00_002B9D60(D_L19_001B2B0C[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x30,
+            hero_reset_position_and_direction(D_L19_001B2B0C[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x30,
                         D_L19_001B2B0C[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x70, 0, 1);
             *(u16 *)(a0 + 0x34) &= 0xFFFE;
             *(u8 *)(a0 + 0x31) = 1;
             if (*(u8 *)(a0 + 0xB0) != 0xFF) {
                 id = *(u8 *)(a0 + 0xB0);
-                if ((D_0019B2E8[id + (D_001A79F0[0] << 4)] & 0x80) == 0)
-                    func_002A0430(id);
-                func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
-                func_0029B3E0(0, -1);
+                if ((D_0019B2E8[id + (g_current_map_index[0] << 4)] & 0x80) == 0)
+                    moby_mark_table_entry_flagged(id);
+                level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
+                MemcardSave(0, -1);
             } else {
-                func_0029B3E0(0, -1);
+                MemcardSave(0, -1);
             }
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
         }
         break;
     }

@@ -3,21 +3,21 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { int count; int reserved[3]; Vector points[0]; } Path;
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
 /* The EE keeps integer and FP argument order in independent register banks. */
 extern void scale_vector_radius(float, void *, const void *) __asm__("func_00282F20");
-extern void func_00282CC0(void *, const void *, const void *);
+extern void FastVecAdd(void *, const void *, const void *);
 extern const Vector D_0018A0E0;
 extern const Path *D_L00_001FDA80[];
-extern float func_00282DB0(const void *, const void *);
-extern void func_00282DD8(void *, const void *, const void *);
-extern float func_00282C48(float);
-extern float func_00282DF0(const void *);
+extern float FastVecDot(const void *, const void *);
+extern void FastVecCross(void *, const void *, const void *);
+extern float math_fabs(float);
+extern float FastVecLength(const void *);
 
 /* Push the point away from the active edges while retaining its plane height. */
 /* Pushes a point away from the edges of a path so it stays a set distance from them. Returns 1 if the point was moved. */
-int func_L00_003425F8(int pathIndex, const Vector *point, Vector *out, float radius) {
+int path_push_point_out_of_edges(int pathIndex, const Vector *point, Vector *out, float radius) {
     Vector relative, displacement, position, segment, unit, cross, planePart;
     int hit = 0;
     const Path *path;
@@ -40,7 +40,7 @@ int func_L00_003425F8(int pathIndex, const Vector *point, Vector *out, float rad
         FastVecSub(&segment, &segment, &planePart);
         vec_scale_to_length(&unit, &segment, 1.0f);
         FastVecCross(&cross, &relative, &unit);
-        side = FloatAbs(FastVecDot(&cross, &D_0018A0E0));
+        side = math_fabs(FastVecDot(&cross, &D_0018A0E0));
         if (!(side > radius)) {
             length = FastVecLength(&segment);
             along = FastVecDot(&relative, &unit);

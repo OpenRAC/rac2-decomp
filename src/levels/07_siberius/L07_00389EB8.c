@@ -13,11 +13,11 @@
 /* func_L07_003E56B8 is in L07_003E56B8-g8.c. */
 
 
-extern void func_00282978(char *);
+extern void FastDecTimer(char *);
 
 /* Clear the two resource slots and step the state counter while it has room. */
 /* Ticks two countdown timers and advances the object's frame counter. */
-void func_L07_003E5A70(char *moby)
+void entity_tick_timers(char *moby)
 {
     char *vars = *(char **)(moby + 104);
     unsigned short counter;
@@ -29,26 +29,26 @@ void func_L07_003E5A70(char *moby)
         *(unsigned short *)(moby + 0x96) = counter + 1;
 }
 
-extern unsigned short *D_L07_001FAD60[];
+extern unsigned short *g_moby_l07_group_lists[];
 
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
-extern unsigned char *D_L07_001B22DC[] __attribute__((sda));
+extern unsigned char *g_moby_l07_array[] __attribute__((sda));
 extern int D_L07_001B22F8[] __attribute__((sda));
 
 /* Sets the +0x244 word of every entity of the object's group state to 1. */
 /* Raises an alert flag on every object in this object's group. */
-void func_L07_003E5AC8(unsigned char *moby)
+void entity_set_group_alert_a(unsigned char *moby)
 {
     unsigned short *memberList;
     unsigned char *member;
 
     if (moby[0x21] == 0xFF)
         return;
-    memberList = gMobyGroupLists_L07[moby[0x21]];
+    memberList = g_moby_l07_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && memberList != 0 &&
-           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == gMobyGroupLists_L07[moby[0x21]])) {
-        member = gMobyArray_L07[0] + ((*memberList & 0x7FFF) << 8);
+           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == g_moby_l07_group_lists[moby[0x21]])) {
+        member = g_moby_l07_array[0] + ((*memberList & 0x7FFF) << 8);
         if (member == 0)
             break;
         *(int *)(*(char **)(member + 0x68) + 0x244) = 1;
@@ -59,7 +59,7 @@ void func_L07_003E5AC8(unsigned char *moby)
 /* Counts the entities of the group whose class is 0xD1D and whose state byte is neither 0xFE nor
    0xFD into *count; returns the last entity of the group in state 8, or 0. */
 /* Counts the live group members of moby class 3357 and returns the last one that is idle. */
-unsigned char *func_L07_003E5B70(int group, int *count)
+unsigned char *entity_find_last_idle_member(int group, int *count)
 {
     unsigned short *memberList;
     unsigned char *member;
@@ -69,11 +69,11 @@ unsigned char *func_L07_003E5B70(int group, int *count)
     if (group == -1)
         return 0;
     result = 0;
-    for (memberList = gMobyGroupLists_L07[group];
+    for (memberList = g_moby_l07_group_lists[group];
          (unsigned char)group != 0xFF && group <= D_L07_001B22F8[0] && memberList != 0 &&
-         ((short)memberList[-1] >= 0 || memberList == gMobyGroupLists_L07[group]);
+         ((short)memberList[-1] >= 0 || memberList == g_moby_l07_group_lists[group]);
          memberList++) {
-        member = gMobyArray_L07[0] + ((*memberList & 0x7FFF) << 8);
+        member = g_moby_l07_array[0] + ((*memberList & 0x7FFF) << 8);
         if (member == 0)
             break;
         if (*(short *)(member + 0xAA) == 0xD1D /* moby class 3357 */ && member[0x20] != 0xFE && member[0x20] != 0xFD)
@@ -88,19 +88,19 @@ unsigned char *func_L07_003E5B70(int group, int *count)
 
 /* func_L07_003E5FA8 is in L07_003E5FA8-g8.c. */
 
-extern void func_002AD0E0(char *, int, char *, char *, char *, char *);
+extern void moby_transform_point_and_rotation_by_parent(char *, int, char *, char *, char *, char *);
 
 /* Run the shared pass on both halves of the object, then again on the
    secondary half with a stack buffer when the state byte reads nine. */
 /* Moves the object along with the platform it stands on. */
-void func_L07_003E6148(char *moby)
+void entity_follow_platform(char *moby)
 {
     char *vars = *(char **)(moby + 104);
     char scratch[16];
 
-    TransformPointAndRotationByParent(moby, *(int *)(vars + 0x260), moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
+    moby_transform_point_and_rotation_by_parent(moby, *(int *)(vars + 0x260), moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
     if (*(unsigned char *)(moby + 0x20) == 9)
-        TransformPointAndRotationByParent(moby, *(int *)(vars + 0x260), vars + 0x230, scratch, vars + 0x230, scratch);
+        moby_transform_point_and_rotation_by_parent(moby, *(int *)(vars + 0x260), vars + 0x230, scratch, vars + 0x230, scratch);
 }
 
 /* func_L07_003E61B8 is in the sibling file L07_00389EB8-g8.c: its body
@@ -115,17 +115,17 @@ void func_L07_003E6148(char *moby)
 
 /* Sets the +0x2D0 word of every entity of the object's group state to 1. */
 /* Raises an alert flag on every object in this object's group. */
-void func_L07_003E6F40(unsigned char *moby)
+void entity_set_group_alert_b(unsigned char *moby)
 {
     unsigned short *memberList;
     unsigned char *member;
 
     if (moby[0x21] == 0xFF)
         return;
-    memberList = gMobyGroupLists_L07[moby[0x21]];
+    memberList = g_moby_l07_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && memberList != 0 &&
-           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == gMobyGroupLists_L07[moby[0x21]])) {
-        member = gMobyArray_L07[0] + ((*memberList & 0x7FFF) << 8);
+           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == g_moby_l07_group_lists[moby[0x21]])) {
+        member = g_moby_l07_array[0] + ((*memberList & 0x7FFF) << 8);
         if (member == 0)
             break;
         *(int *)(*(char **)(member + 0x68) + 0x2D0) = 1;
@@ -133,25 +133,25 @@ void func_L07_003E6F40(unsigned char *moby)
     }
 }
 
-extern int func_002761F8(void *,void *,int,void *,int);
-extern char *func_002AD0B0(char *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AFDD8(void *,void *,void *,int);
-extern int func_002AD5F8(void *,void *,void *,void *,void *,void *);
-extern int func_002AD470(void *,void *,void *,void *,void *,void *);
-extern void func_002833F0(void *,void *);
-extern void func_002B0408(void *,void *,int);
-extern void func_002AB6D8(void *,void *);
-extern void func_00282D30(void *,void *,float);
+extern int CollLine(void *,void *,int,void *,int);
+extern char *moby_get_private_value_2(char *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_transform_by_object_or_given(void *,void *,void *,int);
+extern int moby_get_attachment_rotation_angles(void *,void *,void *,void *,void *,void *);
+extern int coll_apply_push_to_object(void *,void *,void *,void *,void *,void *);
+extern void euler_rotation_basis(void *,void *);
+extern void mat_align_to_dir(void *,void *,int);
+extern void mat_get_euler_angles(void *,void *);
+extern void FastVecScale(void *,void *,float);
 typedef int Quad128 __attribute__((mode(TI)));
-extern void func_00283098(Quad128 *, Quad128 *, char *);
+extern void matrix_mul_vec3(Quad128 *, Quad128 *, char *);
 typedef struct { char pad[24]; char *object; } Collision;
 extern Collision D_L07_001BF640;
 
 /* With no platform attached, probe below the object and attach to the object hit when it is
    a platform (flag 2), recording the relative offset; otherwise carry the object along with
    the attached platform and rebuild its orientation. */
-void func_L07_003E6FE8(char *moby)
+void RideMobyBelow(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
     float rayStart[4] __attribute__((aligned(16)));
@@ -167,30 +167,30 @@ void func_L07_003E6FE8(char *moby)
         rayStart[2] += 2.0f;
         rayEnd[2] -= 3.0f;
         if (CollLine(rayStart, rayEnd, 0, moby, 0) && D_L07_001BF640.object != 0) {
-            if (*(int *)(GetMobyPrivateValue2(D_L07_001BF640.object) + 0x3C) & 2) {
+            if (*(int *)(moby_get_private_value_2(D_L07_001BF640.object) + 0x3C) & 2) {
                 *(char **)(state + 0x338) = D_L07_001BF640.object;
                 FastVecSub(localOffset, pos, *(char **)(state + 0x338) + 0x10);
-                TransformVectorByObjectOrGiven(*(char **)(state + 0x338), localOffset, localOffset, 0);
+                vec_transform_by_object_or_given(*(char **)(state + 0x338), localOffset, localOffset, 0);
                 *(float *)(state + 0x33C) = localOffset[2] - 1.0f;
-                GetAttachmentRotationAngles(moby, *(char **)(state + 0x338), pos, moby + 0xF0,
+                moby_get_attachment_rotation_angles(moby, *(char **)(state + 0x338), pos, moby + 0xF0,
                              state + 0x310, state + 0x320);
             }
             *(int *)(state + 0x88) |= 0x100;
         }
     } else {
         if (*(unsigned char *)(moby + 0x20) == 9 || *(unsigned char *)(moby + 0x20) == 11) {
-            ApplyCollisionPushToObject(moby, platform, state + 0x310, state + 0x320, moby + 0x10, moby + 0xF0);
+            coll_apply_push_to_object(moby, platform, state + 0x310, state + 0x320, moby + 0x10, moby + 0xF0);
         } else {
-            TransformPointAndRotationByParent(moby, (int)platform, moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
+            moby_transform_point_and_rotation_by_parent(moby, (int)platform, moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
         }
         euler_rotation_basis(moby + 0xC0, moby + 0xF0);
-        AlignRotationToDirection(moby + 0xC0, *(char **)(state + 0x338) + 0xE0, 0);
-        GetEulerAnglesFromMatrix(moby + 0xC0, moby + 0xF0);
+        mat_align_to_dir(moby + 0xC0, *(char **)(state + 0x338) + 0xE0, 0);
+        mat_get_euler_angles(moby + 0xC0, moby + 0xF0);
         if (*(unsigned short *)(moby + 0x34) & 0x8000)
             FastVecScale(moby + 0xD0, moby + 0xD0, -1.0f);
         if (*(unsigned char *)(moby + 0x95) == 3) {
             FastVecSub(rayStart, moby + 0x10, *(char **)(state + 0x338) + 0x10);
-            TransformVectorByObjectOrGiven(*(char **)(state + 0x338), rayStart, rayStart, 0);
+            vec_transform_by_object_or_given(*(char **)(state + 0x338), rayStart, rayStart, 0);
             rayStart[2] = *(float *)(state + 0x33C);
             matrix_mul_vec3((Quad128 *)rayStart, (Quad128 *)rayStart, *(char **)(state + 0x338) + 0xC0);
             *(float *)(state + 0x180) = rayStart[2] + *(float *)(*(char **)(state + 0x338) + 0x18);
@@ -201,29 +201,29 @@ void func_L07_003E6FE8(char *moby)
 /* The 16-byte vector the object keeps. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00325D30(char *, char *);
+extern void group_destroy_attached_parts(char *, char *);
 
-extern void func_002A6C58(char *, int, int);
+extern void SetDeathBits(char *, int, int);
 
-extern void func_00283098(TI128 *, TI128 *, char *);
+extern void matrix_mul_vec3(TI128 *, TI128 *, char *);
 
-extern void func_00282CC0(TI128 *, TI128 *, char *);
+extern void FastVecAdd(TI128 *, TI128 *, char *);
 
-extern void func_0032C700(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
+extern void SpawnExplosion(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
                           int);
 
-extern void func_002E5CF8(int, int, char *);
+extern void PlayMobySound(int, int, char *);
 
-extern void func_00282F20(TI128 *, TI128 *, float);
+extern void vec_scale_to_length(TI128 *, TI128 *, float);
 
-extern void func_002B0A68(char *, int, TI128 *, float, float, float, float, int);
+extern void part_spawn_masked_debris(char *, int, TI128 *, float, float, float, float, int);
 
 /* Arm the object's mode, then set up its position and hand it to the launcher.
    func_002B0A68's integer mask is its last parameter, and this compiler sets the
    arguments up in parameter order: the mask's store then comes after the four
    float copies, in the call's delay slot, as the retail has it. */
 /* Plays the entity's death effects: an explosion, a sound and a burst of flying pickups. */
-void func_L07_003E7240(char *moby)
+void entity_spawn_death_effects(char *moby)
 {
     char *vars;
     TI128 burstPos[1];
@@ -232,7 +232,7 @@ void func_L07_003E7240(char *moby)
     vars = *(char **)(moby + 0x68);
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
     *(int *)(moby + 0x98) = 0;
-    DestroyAttachedParts(moby, vars + 0x330);
+    group_destroy_attached_parts(moby, vars + 0x330);
     SetDeathBits(moby, 0, 3);
     burstPos[0] = 0;
     ((float *)burstPos)[2] = 0.75f;
@@ -241,68 +241,68 @@ void func_L07_003E7240(char *moby)
     SpawnExplosion(burstPos, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, *(int *)(vars + 0x338));
     PlayMobySound(6, 0, moby);
     vec_scale_to_length(&impulse, vars + 0x1C0, 0.05000000447034836f);
-    SpawnDebrisForMaskedParts(moby, 1016, &impulse, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+    part_spawn_masked_debris(moby, 1016, &impulse, 3.0f, 6.0f, 3.0f, 6.0f, 255);
 }
 
-extern void func_002A7750(int, int, int);
+extern void moby_set_state(int, int, int);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
-extern void func_L07_002E2090(char *, int, int, char *, int, int, int);
+extern void part_spawn_between_points_depth_push(char *, int, int, char *, int, int, int);
 
 /* Arm the object's mode ten and hand it to the shared launcher. */
 /* Throws a group member at a target and switches it to its launched state. */
-void func_L07_003E7380(char *moby, int fromPos, int toPos, int owner, int flag)
+void entity_launch_member_a(char *moby, int fromPos, int toPos, int owner, int flag)
 {
     int randomValue;
 
-    SetMobyState(moby, 10, -1);
+    moby_set_state(moby, 10, -1);
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
     *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
-    randomValue = RandomIntRange(0x2D, 0x4B);
-    SpawnEffectBetweenPointsWithDepthPush(moby, fromPos, toPos, moby + 0xF0, randomValue, owner, flag);
+    randomValue = math_random_int_range(0x2D, 0x4B);
+    part_spawn_between_points_depth_push(moby, fromPos, toPos, moby + 0xF0, randomValue, owner, flag);
 }
 
 /* func_L07_003EA900 is in L07_003EA900-g8.c. */
 
 /* func_L07_003EB2C0 is in L07_003EB2C0-g8.c. */
 
-extern void func_00282948(char *);
+extern void math_fast_float_d(char *);
 
-extern void func_002B0990(char *, char *, int, int, float);
+extern void value_set_and_smooth(char *, char *, int, int, float);
 
 extern int D_L07_001C9780;
 
 /* Ticks two countdown timers, advances the frame counter and carries the object on its
    platform. */
-void func_L07_003EB700(char *moby)
+void entity_tick_timers_ride_platform(char *moby)
 {
     char *vars = *(char **)(moby + 104);
     unsigned short counter;
 
-    FastFloatHelperD(vars + 0x2D4);
-    FastFloatHelperD(vars + 0x2D8);
+    math_fast_float_d(vars + 0x2D4);
+    math_fast_float_d(vars + 0x2D8);
     counter = *(unsigned short *)(moby + 0x96);
     if (counter <= 0xFFFE)
         *(unsigned short *)(moby + 0x96) = counter + 1;
     if (D_L07_001C9780 != 0)
-        RidePlatformBelowAndSnapHeight(moby);
-    SetValueAndStartSmoothChange(moby, vars + 0x230, 5, 1, 2.5f);
+        entity_ride_platform_snap_height(moby);
+    value_set_and_smooth(moby, vars + 0x230, 5, 1, 2.5f);
 }
 
 /* Twin of func_L07_003E6F40. */
 /* Raises an alert flag on every object in this object's group. */
-void func_L07_003EB790(unsigned char *moby)
+void entity_set_group_alert_c(unsigned char *moby)
 {
     unsigned short *memberList;
     unsigned char *member;
 
     if (moby[0x21] == 0xFF)
         return;
-    memberList = gMobyGroupLists_L07[moby[0x21]];
+    memberList = g_moby_l07_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && memberList != 0 &&
-           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == gMobyGroupLists_L07[moby[0x21]])) {
-        member = gMobyArray_L07[0] + ((*memberList & 0x7FFF) << 8);
+           ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == g_moby_l07_group_lists[moby[0x21]])) {
+        member = g_moby_l07_array[0] + ((*memberList & 0x7FFF) << 8);
         if (member == 0)
             break;
         *(int *)(*(char **)(member + 0x68) + 0x2D0) = 1;
@@ -313,7 +313,7 @@ void func_L07_003EB790(unsigned char *moby)
 /* func_L07_003EB838 is in L07_003EB838.c. */
 
 /* Plays the entity's death effects: an explosion, a sound and a burst of flying pickups. */
-void func_L07_003EBAB8(char *moby)
+void entity_spawn_death_effects_b(char *moby)
 {
     float position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -329,36 +329,36 @@ void func_L07_003EBAB8(char *moby)
                  1, 0, 0, *(int *)(state + 0x314));
     PlayMobySound(9, 0, moby);
     vec_scale_to_length((TI128 *)direction, (TI128 *)(state + 0x1c0), 0.0500000045f);
-    SpawnDebrisForMaskedParts(moby, 0x7f8, (TI128 *)direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xff);
+    part_spawn_masked_debris(moby, 0x7f8, (TI128 *)direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xff);
 }
 
 
 /* Twin of func_L07_003E7380 with the mode eight instead of ten. */
 /* Throws a group member at a target and switches it to its launched state. */
-void func_L07_003EBBE8(char *moby, int fromPos, int toPos, int owner, int flag)
+void entity_launch_member_b(char *moby, int fromPos, int toPos, int owner, int flag)
 {
     int randomValue;
 
-    SetMobyState(moby, 8, -1);
+    moby_set_state(moby, 8, -1);
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
     *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
-    randomValue = RandomIntRange(0x2D, 0x4B);
-    SpawnEffectBetweenPointsWithDepthPush(moby, fromPos, toPos, moby + 0xF0, randomValue, owner, flag);
+    randomValue = math_random_int_range(0x2D, 0x4B);
+    part_spawn_between_points_depth_push(moby, fromPos, toPos, moby + 0xF0, randomValue, owner, flag);
 }
 
 /* func_L07_003EE3B0 is in L07_003EE3B0-g8.c. */
 
-extern void func_002A7750(int, int, int);
+extern void moby_set_state(int, int, int);
 
-extern int func_002ACBC8(int, int);
+extern int IsPointInCuboid(int, int);
 
-extern void func_L02_0031F858(int, int);
+extern void moby_set_group_enabled(int, int);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 /* Per-frame update for moby class 3388: when each of up to eight conditions is met, it
    triggers the linked object once. */
-void func_L07_003EE640(char *moby)
+void timed_trigger_slots_update(char *moby)
 {
     int *vars = *(int **)(moby + 104);
     int *targetIds;
@@ -367,15 +367,15 @@ void func_L07_003EE640(char *moby)
 
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         conditionIds = vars;
         targetIds = vars + 8;
         for (i = 0; i < 8; i++) {
             if (targetIds[i] != -1) {
-                if (IsPointInCuboid((int)gHeroPosition, *conditionIds) != 0) {
-                    SetGroupObjectsEnabled(targetIds[i], 1);
+                if (IsPointInCuboid((int)g_hero_position, *conditionIds) != 0) {
+                    moby_set_group_enabled(targetIds[i], 1);
                     targetIds[i] = -1;
                 }
             }
@@ -389,7 +389,7 @@ void func_L07_003EE640(char *moby)
 
 /* Attaches this object to a parent object at a given offset and stores its starting position
    and facing. */
-void func_L07_003EEBF8(char *moby, char *parent, TI128 *offsetPos, TI128 *secondVec)
+void moby_attach_to_parent(char *moby, char *parent, TI128 *offsetPos, TI128 *secondVec)
 {
     TI128 offsets[2];
     TI128 *second = &offsets[1];
@@ -404,7 +404,7 @@ void func_L07_003EEBF8(char *moby, char *parent, TI128 *offsetPos, TI128 *second
 
     vars = *(char **)(moby + 0x68);
     *(int *)(moby + 0x98) = *(int *)(*(int *)(moby + 0x24) + 0x10);
-    SetMobyState((unsigned char *)moby, 2, -1);
+    moby_set_state((unsigned char *)moby, 2, -1);
 
     *(unsigned char *)(moby + 0x30) = 0xFF;
     *(short *)(moby + 0x32) = 0xFF;
@@ -426,9 +426,9 @@ void func_L07_003EEBF8(char *moby, char *parent, TI128 *offsetPos, TI128 *second
 /* func_L07_003EECE0 is in L07_003EECE0.c. */
 
 /* Play the fixed mode/value pair for this object. */
-void func_L07_003EEE08(char *moby)
+void entity_set_state_five(char *moby)
 {
-    SetMobyState(moby, 5, -1);
+    moby_set_state(moby, 5, -1);
 }
 
 /* func_L07_003EEE28 is defined in L07_003EEE28-g8.c. */

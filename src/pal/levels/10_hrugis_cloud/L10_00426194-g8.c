@@ -67,7 +67,7 @@ typedef struct {
 
 extern MissionState D_L10_00221CD0;
 extern SaveGame D_001395B8;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern Moby *D_L10_001B251C;            /* the moby table */
 extern s32 D_L10_001B3554;
 extern s32 D_L10_001B3558;
@@ -85,7 +85,7 @@ extern s32 D_L10_001B13A0 __attribute__((sda));  /* the selected kind, -2 for no
 extern Moby *D_L10_001B13F0 __attribute__((sda));
 extern s32 D_L10_001B1438 __attribute__((sda));  /* set while a kind is being chosen */
 extern s32 D_L10_001B1428 __attribute__((sda));  /* index of a mission record */
-extern s32 D_L10_001B13A4 __attribute__((sda));
+extern s32 g_mission_initialized __attribute__((sda));
 extern s32 D_L10_001B1408 __attribute__((sda));
 extern s32 D_L10_001B13D0 __attribute__((sda));
 extern s32 D_L10_001B13D4 __attribute__((sda));
@@ -94,7 +94,7 @@ extern s32 D_L10_001B13E8 __attribute__((sda));
 extern s32 D_L10_001B13EC __attribute__((sda));
 extern s32 D_L10_001B1424 __attribute__((sda));  /* frames in state 1 */
 extern s32 D_L10_001B1430 __attribute__((sda));  /* subtitle 0xA18 queued */
-extern s32 D_L10_001B1390 __attribute__((sda));
+extern s32 g_mission_completion_counts __attribute__((sda));
 extern s32 D_L10_001B1444 __attribute__((sda));  /* no kind 0 completion yet */
 extern s32 D_L10_001B1420 __attribute__((sda));  /* vars->moby enabled */
 extern s32 D_L10_001B142C __attribute__((sda));  /* subtitle 0xA17 queued */
@@ -102,24 +102,24 @@ extern s32 D_L10_001B2048 __attribute__((sda));
 extern s32 D_L10_001A904C MACRO_ADDR;
 extern s32 D_L10_001B1440 __attribute__((sda));
 
-extern void func_L05_00379F18(s32 value);
-extern void func_L05_00379F28(s32 value);
-extern void func_L05_00379B60(void);
-extern void func_L05_0030C930(s32 a0, s32 a1);
-extern void func_L00_003294F0(Moby *moby, s32 enabled);
-extern s32 func_L00_002C42E0(s32 action, s32 animate);
-extern void func_L05_00379F48(s32 value);
-extern s32 func_L05_0041ED18(void);
-extern void func_L05_00445A98(void);
-extern s32 func_00288E18(s32 key, s32 selection);
-extern s32 func_L10_0037F510(void);
-extern s32 func_00282948(s32 *timer);
+extern void hero_set_state_value_a(s32 value);
+extern void hero_set_state_value_b(s32 value);
+extern void level_select_random_object(void);
+extern void level_store_pair_with_increment(s32 a0, s32 a1);
+extern void moby_set_flag_bit(Moby *moby, s32 enabled);
+extern s32 hero_l00_set_action(s32 action, s32 animate);
+extern void hero_set_state_value_c(s32 value);
+extern s32 LockedEntryMenuInput(void);
+extern void ship_save_transform_state(void);
+extern s32 subtitle_request_voice_line(s32 key, s32 selection);
+extern s32 status_any_record_nonzero(void);
+extern s32 math_fast_float_d(s32 *timer);
 extern void func_PAL_L10_00429880(Moby *moby);
 extern void func_PAL_L10_00429B20(Moby *moby);
 extern void func_PAL_L10_00429D08(Moby *moby);
 extern void func_PAL_L10_00429E20(Moby *moby);
-extern void func_0029B758(s32 a0, void (*callback)(void));
-extern s32 func_L05_00442860(void);
+extern void level_store_value_pair(s32 a0, void (*callback)(void));
+extern s32 cam_is_mode_active(void);
 extern void func_PAL_L10_00426618(void);
 extern void func_PAL_L10_00428C8C(void);
 extern void func_PAL_L10_00428D58(void);
@@ -154,7 +154,7 @@ void func_PAL_L10_00426194(Moby *moby)
         D_L10_00221CD0.f24 = 1;
         D_L10_001B13F0 = moby;
         D_L10_001B1428 = 1;
-        D_L10_001B13A4 = 0;
+        g_mission_initialized = 0;
         D_L10_001B1408 = 0;
         D_L10_001B13D0 = 0;
         D_L10_001B13D4 = 0;
@@ -181,8 +181,8 @@ void func_PAL_L10_00426194(Moby *moby)
         D_L10_00221CD0.resetAll = func_PAL_L10_00428D58;
         D_L10_00221CD0.onHit = func_PAL_L10_00428E38;
         D_L10_00221CD0.controller = moby;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
+        hero_set_state_value_a(1);
+        hero_set_state_value_b(0);
         completed0 = D_001395B8.completions[0];
         completed1 = D_001395B8.completions[1];
         completed2 = D_001395B8.completions[2];
@@ -192,54 +192,54 @@ void func_PAL_L10_00426194(Moby *moby)
         D_L10_001B1394 = completed1;
         D_L10_001B1398 = completed2;
         D_L10_001B139C = completed3;
-        D_L10_001B1390 = completed0;
-        if (!D_L10_001B1390)
+        g_mission_completion_counts = completed0;
+        if (!g_mission_completion_counts)
             D_L10_001B1444 = 1;
         else
             D_L10_001B1444 = 0;
-        if (D_00189E20.moby != 0)
-            D_00189E20.moby->flags |= 0x41;
+        if (g_hero_state.moby != 0)
+            g_hero_state.moby->flags |= 0x41;
         /* fall through */
     case 1: {
         /* One 1 for the stores and the test below: literal 1s compile differently. */
         s32 on = 1;
 
-        func_L05_00379B60();
-        func_L05_0030C930((s32)(D_L10_001B2D84 * -230.0f + 0.5f), 2);
+        level_select_random_object();
+        level_store_pair_with_increment((s32)(D_L10_001B2D84 * -230.0f + 0.5f), 2);
         if (D_L10_00221CD0.selection != D_L10_001B13A0) {
             D_L10_00221CD0.selection = D_L10_001B13A0;
             D_L10_00221CD0.f88 = 0;
         }
         if (!D_L10_001B1420) {
-            func_L00_003294F0(&D_L10_001B251C[vars->moby], 1);
+            moby_set_flag_bit(&D_L10_001B251C[vars->moby], 1);
             D_L10_001B1420 = on;
             D_L10_001B1424 = 0;
         }
         if (D_L10_001B1424++ < 5 || D_L10_001A8F00 == 2)
             break;
 
-        func_L00_002C42E0(0x31, 0);
+        hero_l00_set_action(0x31, 0);
         if (D_L10_001B1438) {
-            func_L05_00379F48(on);
-            D_L10_001B13A0 = func_L05_0041ED18();
+            hero_set_state_value_c(on);
+            D_L10_001B13A0 = LockedEntryMenuInput();
             if (D_L10_001B13A0 != -2)
-                func_L05_00445A98();
+                ship_save_transform_state();
             break;
         }
         if (!D_L10_001B142C) {
-            func_00288E18(0xA17, 0x6E);
+            subtitle_request_voice_line(0xA17, 0x6E);
             D_L10_001B142C = on;
         }
         if ((D_0013A170[0] == on || D_0013A170[0] == 5 || D_0013A170[0] == 10)
-            && !func_L10_0037F510() && !D_L10_001B1430) {
-            func_00288E18(0xA18, 0x6F);
+            && !status_any_record_nonzero() && !D_L10_001B1430) {
+            subtitle_request_voice_line(0xA18, 0x6F);
             D_L10_001B1430 = 1;
         }
-        if (func_00282948(&vars->timer))
+        if (math_fast_float_d(&vars->timer))
             D_L10_00221CD0.waiting = 0;
         else
             D_L10_00221CD0.waiting = 1;
-        func_L05_00379F48(0);
+        hero_set_state_value_c(0);
         if (D_L10_001B13A0 != -2 && D_L10_001B2048 >= 3) {
             switch (D_L10_001B13A0) {
             case 0:
@@ -257,7 +257,7 @@ void func_PAL_L10_00426194(Moby *moby)
             }
         }
         if (D_L10_001A904C && !D_L10_001B13E8 && !D_L10_001B1440) {
-            func_0029B758(0, func_PAL_L10_00426618);
+            level_store_value_pair(0, func_PAL_L10_00426618);
             D_L10_001B13EC = 0;
             D_L10_001B13E8 = 1;
         }
@@ -266,7 +266,7 @@ void func_PAL_L10_00426194(Moby *moby)
     case 2:
         break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!cam_is_mode_active()) {
             D_L10_00221CD0.waiting = 0;
             D_L10_00221CD0.rounds++;
             moby->state = 1;

@@ -18,15 +18,15 @@ struct DriftParticle {
     float position[4];
     struct DriftParameters parameters;
 };
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern void func_00300190(char *, char *);
-extern float func_002A7790(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282978(char *);
-extern void func_002B9180(char *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern void vec_transform_or_copy(char *, char *);
+extern float math_square(float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastDecTimer(char *);
+extern void part_kill(char *);
 
 /* Default game profile matches US and US2 in all 28 placements (612 bytes).
  * This particle view covers the complete 0x40-byte direct-access prefix.
@@ -41,46 +41,46 @@ void func_PAL_002C9830(struct DriftParticle *particle)
     velocity[1] = parameters->velocity[1];
     velocity[2] = parameters->velocity[2];
     velocity[3] = 0.0f;
-    speed = func_00283CE0(parameters->speed_start) * 0.0078125f;
-    end_speed = func_00283CE0(parameters->speed_end) * 0.0078125f;
-    distance_limit = func_00283CE0(parameters->distance_limit) * 0.0078125f;
-    distance = func_00283CE0(parameters->distance) * 0.0078125f;
-    func_00300190((char *)particle->position, (char *)particle->position);
-    life = func_00283CE0(particle->remaining);
-    life /= func_00283CE0(parameters->lifetime);
+    speed = IntToFloat(parameters->speed_start) * 0.0078125f;
+    end_speed = IntToFloat(parameters->speed_end) * 0.0078125f;
+    distance_limit = IntToFloat(parameters->distance_limit) * 0.0078125f;
+    distance = IntToFloat(parameters->distance) * 0.0078125f;
+    vec_transform_or_copy((char *)particle->position, (char *)particle->position);
+    life = IntToFloat(particle->remaining);
+    life /= IntToFloat(parameters->lifetime);
     progress = 1.0f - life;
     if (!(parameters->flags & 1)) {
-        particle->color = func_00283D38(0x103080, (int)parameters->color, progress) | ((u32)parameters->alpha << 24);
+        particle->color = FastTweenColor(0x103080, (int)parameters->color, progress) | ((u32)parameters->alpha << 24);
         speed += (end_speed - speed) * progress;
         particle->size = parameters->size_start + (parameters->size_end - parameters->size_start) * progress;
     } else {
         float initial_alpha, fade;
         int alpha;
         speed = end_speed;
-        initial_alpha = func_00283CE0(parameters->alpha);
-        fade = func_00283CE0(parameters->alpha);
-        fade *= func_002A7790(progress);
-        alpha = func_00283CF0(initial_alpha - fade);
+        initial_alpha = IntToFloat(parameters->alpha);
+        fade = IntToFloat(parameters->alpha);
+        fade *= math_square(progress);
+        alpha = FloatToInt(initial_alpha - fade);
         particle->color = parameters->color | ((unsigned int)alpha << 24);
     }
     if (!(parameters->flags & 2)) {
-        func_00282D30(change, velocity, speed);
+        FastVecScale(change, velocity, speed);
         distance += speed;
-        func_00282CC0(particle->position, particle->position, change);
-        if (distance <= distance_limit) parameters->distance = func_00283CF0(distance * 128.0f);
+        FastVecAdd(particle->position, particle->position, change);
+        if (distance <= distance_limit) parameters->distance = FloatToInt(distance * 128.0f);
         else {
             parameters->flags |= 2;
-            func_00282D30(change, velocity, distance_limit - distance);
-            func_00282CC0(particle->position, change, particle->position);
+            FastVecScale(change, velocity, distance_limit - distance);
+            FastVecAdd(particle->position, change, particle->position);
         }
     }
     particle->frame += parameters->frame_step;
-    if (func_00282978((char *)&particle->remaining)) {
+    if (FastDecTimer((char *)&particle->remaining)) {
         if (!(parameters->flags & 1)) {
             parameters->flags |= 1;
             parameters->lifetime = 17;
             particle->remaining = 17;
-        } else func_002B9180((char *)particle);
+        } else part_kill((char *)particle);
     }
 }
 

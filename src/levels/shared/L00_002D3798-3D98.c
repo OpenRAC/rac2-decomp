@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 extern char D_00189E20_11[];
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern float func_L00_002D3B00(char *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern float cam_get_view_space_height(char *);
 
 /* Returns the height reached by an object moving with the given velocity for the current
  * movement mode and optionally stores the quantized number of steps. */
-float func_L00_002D3D98(float *position, float *velocity, int *out_steps, float step)
+float EvaluateQuantizedHeight(float *position, float *velocity, int *out_steps, float step)
 {
     int mode = *(unsigned char *)(D_00189E20_11 + 8899);
 
@@ -26,7 +26,7 @@ float func_L00_002D3D98(float *position, float *velocity, int *out_steps, float 
     }
     case 1:
     case 2: {
-        int steps = FloatToInt(GetViewSpaceHeight((char *)velocity) / step);
+        int steps = FloatToInt(cam_get_view_space_height((char *)velocity) / step);
 
         if (out_steps)
             *out_steps = steps;

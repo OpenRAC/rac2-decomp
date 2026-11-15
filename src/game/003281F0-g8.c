@@ -4,27 +4,27 @@
 typedef int Quad __attribute__((mode(TI)));
 extern int D_001B01E8 __attribute__((sda));
 typedef struct { char pad[0x34]; int owner; char tail[8]; } ParticleRecord;
-extern ParticleRecord D_0022B0A0[100];
+extern ParticleRecord g_spark_records[100];
 typedef struct { char pad[0x24]; int kind; char *owner; char tail[0x3C]; int active; } OwnerContext;
-extern OwnerContext D_001A63A8;
+extern OwnerContext g_music_state;
 extern char D_001BAFA0[0x30];
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282C88(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283B98(float, float), func_00282E48(void *, void *);
-extern void func_00328848(void *), func_003290D0(void *, void *, float);
-extern int func_003286D0(void *, void *);
-extern void func_00328758(void *), func_002E5CF8(int, int, void *);
-extern float func_002A7940(void), func_002A7878(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern void func_002BE278(void *, void *, int, float);
-extern int func_00282948(int *);
-extern void func_0029F338(void *), func_00328918(void *), func_00329328(void *);
-extern void func_0027CFD0(void *, void *);
-extern void func_00328A20(void);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastAddRotations(float, float), fast_vec_dist(void *, void *);
+extern void part_claim_spark_record(void *), SpawnObjectParticle(void *, void *, float);
+extern int moby_place_at_collision_point(void *, void *);
+extern void hero_check_hit_by_object(void *), PlayMobySound(int, int, void *);
+extern float math_random_angle(void), math_random_float_range(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void part_spawn_white_flash(void *, void *, int, float);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *), part_update_orbiting_sparks(void *), part_update_object_particles(void *);
+extern void gfx_register_overlay_draw_callback(void *, void *);
+extern void DrawObjectSpriteEffects(void);
 /* Updates a thrown ball-like object: it flies and falls, bursts into sparks when it hits something, then fades away and is deleted. */
-void func_003281F0(char *self)
+void thrown_burst_update(char *self)
 {
     float previous[4], velocity[4];
     char *state = *(char **)(self + 0x68);
@@ -39,12 +39,12 @@ void func_003281F0(char *self)
             *(int *)(state + 0x50) = 0;
             if (!initialized) {
                 int i;
-                for (i = 99; i >= 0; i--) gSparkRecords_0022B0A0[i].owner = 0;
+                for (i = 99; i >= 0; i--) g_spark_records[i].owner = 0;
                 D_001B01E8 = 1;
             }
         }
         {
-            OwnerContext *context = &gMusicState;
+            OwnerContext *context = &g_music_state;
             if (!context->active && context->kind == -1) {
                 context->owner = self;
                 context->kind = 0xDB9;
@@ -58,15 +58,15 @@ void func_003281F0(char *self)
         *(float *)(state + 8) -= 0.00305555575f;
         *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        ClaimSparkRecord_00328848(self);
+        part_claim_spark_record(self);
         SpawnObjectParticle(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
-        if (PlaceObjectAtCollisionPoint(self, previous)) {
+        if (moby_place_at_collision_point(self, previous)) {
             *(unsigned char *)(self + 0x20) = 2;
             *(int *)(state + 0x44) = 20;
             *(int *)(state + 0x58) = 128;
             *(unsigned short *)(self + 0x34) |= 8;
-            ClearVector128(state);
-            CheckPlayerHitByObject(self);
+            vec_clear_128(state);
+            hero_check_hit_by_object(self);
             PlayMobySound(0, 0, self);
             FastVecScale(state + 0x20, D_001BAFA0 + 0x20, 0.0009765625f);
             vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
@@ -75,10 +75,10 @@ void func_003281F0(char *self)
                 float *v = velocity;
                 int i;
                 for (i = 7; i >= 0; i--) {
-                    angle = RandomAngle();
-                    elevation = RandomFloatRange(0.392699093f, 3.14159274f);
-                    BuildSphericalOffset(v, 0.13333334f, angle, elevation);
-                    SpawnWhiteFlashParticle(self + 0x10, v, 0, -1.0f);
+                    angle = math_random_angle();
+                    elevation = math_random_float_range(0.392699093f, 3.14159274f);
+                    vec_build_spherical_offset(v, 0.13333334f, angle, elevation);
+                    part_spawn_white_flash(self + 0x10, v, 0, -1.0f);
                 }
             }
         }
@@ -88,7 +88,7 @@ void func_003281F0(char *self)
         FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.00152777787f;
         *(unsigned char *)(self + 0x23) -= 4;
-        FastFloatHelperD((int *)(state + 0x44));
+        math_fast_float_d((int *)(state + 0x44));
         if (*(unsigned char *)(self + 0x23) > 4) *(unsigned char *)(self + 0x23) -= 4;
         if (!*(int *)(state + 0x44) && *(unsigned char *)(self + 0x23) < 4) *(unsigned char *)(self + 0x20) = 3;
         break;
@@ -103,13 +103,13 @@ void func_003281F0(char *self)
         }
         break;
     case 4:
-        if (FastFloatHelperD((int *)(state + 0x5C))) {
-            MarkMobySpawned(self);
+        if (math_fast_float_d((int *)(state + 0x5C))) {
+            moby_mark_spawned(self);
             return;
         }
         break;
     }
-    UpdateOrbitingSparks(self);
-    UpdateObjectParticles(self);
-    RegisterOverlayDrawCallback(DrawObjectSpriteEffects, self);
+    part_update_orbiting_sparks(self);
+    part_update_object_particles(self);
+    gfx_register_overlay_draw_callback(DrawObjectSpriteEffects, self);
 }

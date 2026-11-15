@@ -7,6 +7,6 @@ extern void r1_func_0011D4A0(void);
 /* Tail call: retail is `j r1_func_0011D4A0` + nop, with no frame at all.
    2.9-ee emits it natively for a void function that ends in a call. */
 /* Calls the system reset step used when the program exits. */
-void func_0011FA18(void) {
+void boot_reset_tlb_on_exit(void) {
     r1_func_0011D4A0();
 }

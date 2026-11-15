@@ -11,11 +11,11 @@ typedef struct {
     Slot_002B5EF8 *right;               /* 0x4C */
 } Rec_002B5EF8;
 
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
 
 /* Tilts the left and right foot parts of an object to match how much it is turning. */
-void func_002B5EF8(char *self, Rec_002B5EF8 *ctl, float x)
+void anim_update_foot_tilt_angles(char *self, Rec_002B5EF8 *ctl, float x)
 {
     float limit, leftWeight, rightWeight, inv, d;
 

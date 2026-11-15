@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0029F338(void *moby);
+extern void moby_mark_spawned(void *moby);
 extern void func_PAL_002A7E68(void *, int, int, int);
 typedef struct {
     char pad0[6];
@@ -49,11 +50,11 @@ typedef struct {
     short packDisabled;          
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001A7A00[] __attribute__((sda));
 extern int D_001A7398[] __attribute__((sda));
-extern int D_00139688[];
-extern int D_L00_001B18D8[] __attribute__((sda)), D_L00_001B19C8[] __attribute__((sda));
+extern int g_item_ammo_counts[];
+extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
@@ -69,11 +70,11 @@ typedef struct {
     unsigned short ammo;
     char pad2[0x50];
 } HeroItemDefinition;
-extern HeroItemDefinition D_L00_00262570[];
+extern HeroItemDefinition g_weapon_l00_table[];
 extern void func_PAL_00295298(int);
-extern HeroItemMoby *func_0029EFD0(int);
-extern void func_00282A60(void *, int, int);
-extern void func_L00_00390938(int);
+extern HeroItemMoby *CreateMoby(int);
+extern void mem_clear(void *, int, int);
+extern void tether_create_holder(int);
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
 #define HERO_ITEMS (&D_00189E20_items)
 extern int D_L00_001B18D8[] __attribute__((sda));
@@ -97,11 +98,11 @@ void func_PAL_L00_002AFAE8(void)
         }
         func_PAL_00295298(ITEM_DEF(id)->object);
         for (i = 0; i < 3; i++) {
-            func_00282A60(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
+            mem_clear(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
             D_0018B9A0[i].joint = -1;
         }
         HERO_ITEMS->slots[0].id = id;
-        moby = func_0029EFD0(ITEM_DEF(id)->object);
+        moby = CreateMoby(ITEM_DEF(id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -111,7 +112,7 @@ void func_PAL_L00_002AFAE8(void)
             HERO_ITEMS->slots[0].state = 2;
             HERO_ITEMS->slots[0].moby = moby;
             HERO_ITEMS->slots[0].ammoFlag = 0;
-            if (ITEM_DEF(id)->ammo && !D_00139688[id])
+            if (ITEM_DEF(id)->ammo && !g_item_ammo_counts[id])
                 HERO_ITEMS->slots[0].ammoFlag = 255;
             if (id == 10) {
                 HERO_ITEMS->slots[0].buttonMask = 128;
@@ -136,7 +137,7 @@ void func_PAL_L00_002AFAE8(void)
             }
         }
         HERO_ITEMS->slots[3].id = id;
-        moby = func_0029EFD0(ITEM_DEF(id)->object);
+        moby = CreateMoby(ITEM_DEF(id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -148,14 +149,14 @@ void func_PAL_L00_002AFAE8(void)
             if (HERO_ITEMS->packDisabled)
                 moby->flags |= 0x41;
             if (!HERO_ITEMS->packDisabled && (HERO_ITEMS->slots[3].id == 3 || HERO_ITEMS->slots[3].id == 8)) {
-                func_L00_00390938(0);
-                func_L00_00390938(1);
+                tether_create_holder(0);
+                tether_create_holder(1);
             }
         }
     }
 
     if (!HERO_ITEMS->slots[3].other) {
-        moby = func_0029EFD0(ITEM_DEF(1)->object);
+        moby = CreateMoby(ITEM_DEF(1)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -174,7 +175,7 @@ void func_PAL_L00_002AFAE8(void)
         || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
         disabled = 1;
     if (HERO_ITEMS->slots[2].moby && disabled) {
-        func_0029F338(HERO_ITEMS->slots[2].moby);
+        moby_mark_spawned(HERO_ITEMS->slots[2].moby);
         HERO_ITEMS->slots[2].moby = 0;
     }
     if (!HERO_ITEMS->slots[2].moby && !disabled) {
@@ -184,7 +185,7 @@ void func_PAL_L00_002AFAE8(void)
         if (!id)
             id = 47;
         HERO_ITEMS->slots[2].id = id;
-        slotMoby = func_0029EFD0(ITEM_DEF(id)->object);
+        slotMoby = CreateMoby(ITEM_DEF(id)->object);
         if (slotMoby) {
             slotMoby->drawDistance = 32;
             slotMoby->visible = 1;
@@ -205,22 +206,22 @@ void func_PAL_L00_002AFAE8(void)
         disabled = 1;
     if (disabled) {
         if (HERO_ITEMS->slots[1].moby) {
-            func_0029F338(HERO_ITEMS->slots[1].moby);
+            moby_mark_spawned(HERO_ITEMS->slots[1].moby);
             HERO_ITEMS->slots[1].moby = 0;
         }
         if (HERO_ITEMS->slots[1].other) {
-            func_0029F338(HERO_ITEMS->slots[1].other);
+            moby_mark_spawned(HERO_ITEMS->slots[1].other);
             HERO_ITEMS->slots[1].other = 0;
         }
     }
     if (!HERO_ITEMS->slots[1].moby && !disabled) {
-        if (D_L00_001B19C8[0] < 3)
+        if (g_frame_l00_counter[0] < 3)
             HERO_ITEMS->slots[1].id = D_001A7398[1] = (*(short *)(D_001A7A00 + 0x24));
         else
             HERO_ITEMS->slots[1].id = D_001A7398[1];
         if (!HERO_ITEMS->slots[1].id)
             HERO_ITEMS->slots[1].id = 52;
-        moby = func_0029EFD0(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
+        moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -231,7 +232,7 @@ void func_PAL_L00_002AFAE8(void)
             HERO_ITEMS->slots[1].moby = moby;
             HERO_ITEMS->slots[1].state = 2;
         }
-        moby = func_0029EFD0(ITEM_DEF(HERO_ITEMS->slots[1].id)->other);
+        moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->other);
         if (moby) {
             moby->drawDistance = 32;
             moby->visible = 1;
@@ -247,7 +248,7 @@ void func_PAL_L00_002AFAE8(void)
     if (!HERO_ITEMS->slots[4].moby && D_001A7A00[0xFD]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(5)->object);
+        slotMoby = CreateMoby(ITEM_DEF(5)->object);
         HERO_ITEMS->slots[4].id = 5;
         if (slotMoby) {
             slotMoby->drawDistance = 32;
@@ -262,7 +263,7 @@ void func_PAL_L00_002AFAE8(void)
     if (!HERO_ITEMS->slots[4].other && D_001A7A00[0x12A]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(50)->object);
+        slotMoby = CreateMoby(ITEM_DEF(50)->object);
         HERO_ITEMS->slots[4].id = 50;
         if (slotMoby) {
             slotMoby->drawDistance = 32;
@@ -275,7 +276,7 @@ void func_PAL_L00_002AFAE8(void)
     if (!HERO_ITEMS->slots[4].extra && D_001A7A00[0xFF]) {
         HeroItemMoby *slotMoby;
 
-        slotMoby = func_0029EFD0(ITEM_DEF(7)->object);
+        slotMoby = CreateMoby(ITEM_DEF(7)->object);
         HERO_ITEMS->slots[4].id = 7;
         if (slotMoby) {
             slotMoby->drawDistance = 32;

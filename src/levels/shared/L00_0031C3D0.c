@@ -1,16 +1,16 @@
 #include "names.h"
-extern float func_00283CE0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, void *, void *, void *);
+extern float IntToFloat(int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, void *, void *, void *);
 
 typedef struct {
     float x, y, z, w;
 } V4;
 
 /* Moves two points along two paths in small steps and checks each pair of positions for a hit. Returns 1 as soon as one is found. */
-int func_L00_0031C3D0(char *startA, char *startB, char *endA, char *endB, void *hitInfoA, void *hitInfoB, int stepCount)
+int coll_sweep_segment_for_hit(char *startA, char *startB, char *endA, char *endB, void *hitInfoA, void *hitInfoB, int stepCount)
 {
     V4 deltaA, deltaB, pointA, pointB;
     float ratio;

@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 extern char D_0025E328[];
 extern int D_001AE304 __attribute__((sda));
 extern int D_001AE308 __attribute__((sda));
@@ -39,7 +40,7 @@ void func_PAL_00347078(char *o)
     f[6] = (int)&D_001AE318;
     f[5] = (int)&D_001AE310;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern char D_001AA810[];
@@ -80,10 +81,10 @@ void func_PAL_00347348(char *o)
     f[6] = (int)&D_001AE3A8;
     f[5] = (int)&D_001AE3A0;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
-extern void func_00335E38(char *p, float x, float y, float zero, float zero2);
+extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
 extern float D_L04_001AE1E0 __attribute__((sda));
 extern float D_L04_001AE1E8 __attribute__((sda));
 extern float D_L04_001AE1F0 __attribute__((sda));
@@ -110,13 +111,13 @@ void func_PAL_003468F8(char *self)
 {
     float zero = 0.0f;
 
-    func_00335E38(self + 872, D_PAL_001AE330 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 872, D_PAL_001AE330 + (*(struct pos **)(self + 1184))->x,
             D_PAL_001AE334 + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 960, D_PAL_001AE338 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 960, D_PAL_001AE338 + (*(struct pos **)(self + 1184))->x,
             D_PAL_001AE33C + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 1048, D_PAL_001AE340 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 1048, D_PAL_001AE340 + (*(struct pos **)(self + 1184))->x,
             D_PAL_001AE344 + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 784, D_PAL_001AE348 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 784, D_PAL_001AE348 + (*(struct pos **)(self + 1184))->x,
             D_PAL_001AE34C + (*(struct pos **)(self + 1184))->y, zero, zero);
 }
 
@@ -158,7 +159,7 @@ void func_PAL_00347168(char *o)
     f[6] = (int)&D_PAL_001AE3B8;
     f[5] = (int)&D_PAL_001AE3B0;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern char D_PAL_001AA910[];
@@ -199,5 +200,5 @@ void func_PAL_00347258(char *o)
     f[6] = (int)&D_PAL_001AE3E8;
     f[5] = (int)&D_PAL_001AE3E0;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }

@@ -4,11 +4,11 @@
 extern float D_L12_001B1C74 __attribute__((sda));
 extern float D_L12_001B1C70 __attribute__((sda));
 extern u8 D_L12_001B9E00[];
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
-extern void func_002B60B0(char *, float, float, float, float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
 
 void func_PAL_L12_0041F568(char *self) {
     char *state = *(char **)(self + 0x68);
@@ -21,7 +21,7 @@ void func_PAL_L12_0041F568(char *self) {
         *(float *)(state + 0x21C) = *(float *)(self + 0xF8);
         *(int *)(self + 0x98) = 0;
         *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(self, 1, 0);
+        moby_set_state(self, 1, 0);
         if (*(u8 *)(self + 0x43) != 0) {
             func_PAL_002A7E68(self, 0, 0, 0);
         }
@@ -41,14 +41,14 @@ void func_PAL_L12_0041F568(char *self) {
             *(int *)(state + 0x15C) = -1;
             *(float *)(state + 0x130) = pi;
         }
-        func_002B60B0(self, 0.012800001f, rate, 0.005026549f, 0.25132746f);
+        moby_set_controller_speed_limits(self, 0.012800001f, rate, 0.005026549f, 0.25132746f);
         *(int *)(state + 0x11C) = 0;
         *(int *)(state + 0x258) = 0;
     }
     *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * D_L12_001B1C70;
     if (*(u8 *)(self + 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L12_001B9E00) < 24.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, D_L12_001B9E00) < 24.0f) {
+            moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x16;
         }
     }

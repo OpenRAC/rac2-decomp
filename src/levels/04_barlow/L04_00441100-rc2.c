@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_00189EA0[];
+extern s8 g_hero_position[];
 extern s8 ref_L04_00441100_00[];
 extern s8 D_001395C8;
 extern s32 ref_L04_00441100_01(s8 *, s32);
@@ -31,14 +32,14 @@ extern void ref_L04_00441100_02(s8 *);
 extern void ref_L04_00441100_03(s8 *, s32, s32);
 
 /* On its first update waits until the hero is at the linked spot, then sets a level flag and moves to the next state. */
-void func_L04_00441100(s8 *object) {
+void barlow_proximity_trigger_update(s8 *object) {
     s32 *links;
     s32 linkedId;
 
     if (*(u8 *)(object + 0x20) == 0) {
         links = *(s32 **)(object + 0x68);
         linkedId = *links;
-        if (linkedId != -1 && ref_L04_00441100_01(gHeroPosition, linkedId) != 0) {
+        if (linkedId != -1 && ref_L04_00441100_01(g_hero_position, linkedId) != 0) {
             ref_L04_00441100_02(ref_L04_00441100_00);
             D_001395C8 = 1;
             ref_L04_00441100_03(object, 1, -1);

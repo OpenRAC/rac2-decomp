@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Places the electric orb at a position and sets its mode. */
-void func_L20_0039F210(char *moby, char *position, int mode) {
+void electric_orb_set_position_mode(char *moby, char *position, int mode) {
     char *dst = moby + 0x10;
     char *state;
 

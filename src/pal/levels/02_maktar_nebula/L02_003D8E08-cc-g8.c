@@ -1,9 +1,10 @@
+#include "names.h"
 /* func_PAL_L02_003D8E08, the PAL copy of func_L02_003D4D68: the same C, where scale 0x384 - *(short *)(state + 0x32A). */
 #include "common.h"
 
-extern float func_00282E80(char *, void *);
+extern float vec_distance_xy(char *, void *);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 extern float D_L02_001B02C0[4] SDATA(D_L02_001B02C0);
 extern float D_L02_001B0200[4] SDATA(D_L02_001B0200);
@@ -17,7 +18,7 @@ int func_PAL_L02_003D8E08(char *arg0) {
     short timer;
     int delta;
 
-    if (func_00282E80(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
+    if (vec_distance_xy(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
         return 0;
     }
     timer = *(short *)(state + 0x32E);
@@ -27,7 +28,7 @@ int func_PAL_L02_003D8E08(char *arg0) {
     if (timer < 0x385) {
         delta = (((int)(0x384 - *(short *)(state + 0x32A)) * 5 + 2) / 6);
         if (delta > 0) {
-            if (func_002A77E0(delta) != 0) {
+            if (math_random_int_below(delta) != 0) {
                 return 0;
             }
         }

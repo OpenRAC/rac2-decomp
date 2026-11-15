@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003D54B0 (levels 00 and 07; 4,424 bytes): family F28, the same body as func_00320550 (boot),
  * written from func_00322CC0 (src/game/00322CC0.c).
  * D_L00_001A8F00 (the mode word) is reached through the address macro (MACRO_ADDR): lui/lw in flow,
@@ -10,59 +11,59 @@
 typedef int Quad003D54B0 __attribute__((mode(TI)));
 
 extern int D_L00_001A8F00 MACRO_ADDR;
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern char D_L00_001A8F20[] __attribute__((sda));
 extern char D_L00_001B0318[];
 
-extern int func_003216E8(char *);
-extern void func_0029F338(void *);
-extern int func_002B3890(char *);
-extern void func_002B60B0(void *, float, float, float, float);
-extern float func_00282C48(float);
-extern void func_002A7750(char *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern int func_002A7820(int, int);
-extern float func_00282E80(void *, void *);
-extern void *func_002A9640(void *, u32, s32);
-extern int func_002B1C20(char *, char *);
-extern int func_002E5CF8(int, int, char *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_00322A30(void *);
-extern void func_002A6C58(char *, int, int);
-extern int func_002B5258(char *);
-extern void func_002AEF28(char *, char *, char *, float, float, float);
-extern float func_002A7E08(char *, char *, char *, float, float, float);
-extern float func_002AA3A8(void *, float, void *, float, float, float);
-extern float func_002A89A8(void *, int, float);
-extern void func_002E59F8(s32);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern void func_0026FEB8(const char *, ...);
-extern void func_002833F0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00282E20(void *);
-extern float func_002AA458(void *, void *, void *, float, float, float);
-extern float func_00282E48(void *, void *);
-extern float func_00283C80(float, float);
-extern int func_002B4FF0(char *, void *, float);
-extern int func_002B50E0(char *, void *, float);
-extern void func_00322690(float, char *, void *, int);
-extern void func_0027CFD0(void (*)(char *), char *);
-extern void func_003225C0(char *);
-extern void func_00321E80(char *);
-extern void func_00321FE0(char *);
+extern int robot_init_check_health(char *);
+extern void moby_mark_spawned(void *);
+extern int flag_set_second_pending(char *);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern float math_fabs(float);
+extern void moby_set_state(char *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern int math_random_int_range(int, int);
+extern float vec_distance_xy(void *, void *);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern int moby_dispatch_action_by_kind(char *, char *);
+extern int PlayMobySound(int, int, char *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void robot_spawn_death_debris(void *);
+extern void SetDeathBits(char *, int, int);
+extern int moby_step_at_own_position(char *);
+extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, float, float);
+extern float moby_turn_toward_position(char *, char *, char *, float, float, float);
+extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void snd_stop_voice(s32);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern void STUB_printf(const char *, ...);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float vec_length_xy(void *);
+extern float vec_spring_to_target(void *, void *, void *, float, float, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastDiffRots(float, float);
+extern int moby_turn_toward_target_and_step(char *, void *, float);
+extern int moby_step_controller(char *, void *, float);
+extern void part_spawn_joint_hit_effects(float, char *, void *, int);
+extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
+extern void robot_draw_joint_flash(char *);
+extern void robot_update_timers_limbs(char *);
+extern void robot_draw_glow_effects(char *);
 
 /* Per-frame update of a flying enemy. It idles, hovers and chases the player, takes hits, and crashes and explodes when its health runs out. */
-void func_L00_003D54B0(char *self)
+void flying_l00_enemy_update(char *self)
 {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
     char *vars = *(char **)(self + 0x68);
 
-    if (InitAndUpdateRobotEnemyHealth(self) != 0) {
-        MarkMobySpawned(self);
+    if (robot_init_check_health(self) != 0) {
+        moby_mark_spawned(self);
         return;
     }
 
@@ -79,90 +80,90 @@ void func_L00_003D54B0(char *self)
 
     switch (*(u8 *)(self + 0x95)) {
     case 0:
-        if (SetSecondPendingFlag(self) != 0)
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self) != 0)
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (*(int *)(vars + 0x258) == 1 && *(int *)(vars + 0x294) != 0
-            && FloatAbs(*(float *)(self + 0x18) - *(float *)(vars + 0x238)) < 2.0f && D_L00_001A8F00 != 2) {
-            SetMobyState(self, 0xB, 4);
+            && math_fabs(*(float *)(self + 0x18) - *(float *)(vars + 0x238)) < 2.0f && D_L00_001A8F00 != 2) {
+            moby_set_state(self, 0xB, 4);
             if (*(u8 *)(self + 0x43) != 1)
-                StartAnimationBlended(self, 1, 0, 4);
+                anim_start_blended(self, 1, 0, 4);
             if (*(int *)(vars + 0x288) != -1) {
-                SetMobyState(self, 0xA, 1);
+                moby_set_state(self, 0xA, 1);
                 if (*(u8 *)(self + 0x43) != 0x1A)
-                    StartAnimationBlended(self, 0x1A, 0, 4);
+                    anim_start_blended(self, 0x1A, 0, 4);
             }
         } else if (*(s16 *)(vars + 0x276) != 0) {
-            SetMobyState(self, 9, 3);
+            moby_set_state(self, 9, 3);
             *(s16 *)(vars + 0x276) = 0;
             if (*(s16 *)(vars + 0x270) < 300)
-                *(s16 *)(vars + 0x270) = RandomIntRange(480, 600);
+                *(s16 *)(vars + 0x270) = math_random_int_range(480, 600);
         }
         break;
     case 2: {
         char *hit;
-        if (SetSecondPendingFlag(self) != 0)
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self) != 0)
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (*(int *)(vars + 0x258) == 1 && *(int *)(vars + 0x294) != 0 && *(int *)(vars + 0x2B0) == 0) {
-            SetMobyState(self, 5, -1);
+            moby_set_state(self, 5, -1);
             if (*(u8 *)(self + 0x43) != 0x19)
-                StartAnimationBlended(self, 0x19, 0, 4);
+                anim_start_blended(self, 0x19, 0, 4);
             *(int *)(vars + 0x2B0) = 1;
         } else if (*(s16 *)(vars + 0x276) != 0 && *(int *)(vars + 0x294) != 0 && *(int *)(vars + 0x2B0) == 0) {
             *(s16 *)(vars + 0x276) = 0;
-            SetMobyState(self, 5, -1);
+            moby_set_state(self, 5, -1);
             if (*(u8 *)(self + 0x43) != 0x19)
-                StartAnimationBlended(self, 0x19, 0, 4);
+                anim_start_blended(self, 0x19, 0, 4);
             *(int *)(vars + 0x2B0) = 1;
         }
-        hit = FindOwnedEffectSlot(*(char **)(vars + 0x2AC), 0x10000, 0);
+        hit = part_find_owned_effect_slot(*(char **)(vars + 0x2AC), 0x10000, 0);
         if (hit != 0 && *(s16 *)(vars + 0x26) <= 0) {
             *(float *)(vars + 0x20) -= *(float *)(hit + 0x2C);
             *(u8 *)(*(char **)(vars + 0x2AC) + 0xA8) = 0xFF;
             *(s16 *)(vars + 0x26) = 0xF;
             if (*(int *)(vars + 0x2B0) == 0) {
-                SetMobyState(self, 5, -1);
+                moby_set_state(self, 5, -1);
                 if (*(u8 *)(self + 0x43) != 0x19)
-                    StartAnimationBlended(self, 0x19, 0, 4);
+                    anim_start_blended(self, 0x19, 0, 4);
                 *(int *)(vars + 0x2B0) = 1;
             }
             if (*(float *)(vars + 0x20) <= 0.0f)
-                SetMobyState(self, 0xF, 5);
+                moby_set_state(self, 0xF, 5);
         }
         qcopy(*(char **)(vars + 0x2AC) + 0x10, self + 0x10);
         break;
     }
     case 3:
-        if (SetSecondPendingFlag(self) != 0)
-            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self) != 0)
+            moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if ((*(int *)(vars + 0x258) == 1 || *(int *)(vars + 0x25C) == 1) && *(int *)(vars + 0x294) != 0) {
-            SetMobyState(self, 0xB, 4);
+            moby_set_state(self, 0xB, 4);
             if (*(u8 *)(self + 0x43) != 1)
-                StartAnimationBlended(self, 1, 0, 4);
+                anim_start_blended(self, 1, 0, 4);
         } else if (*(s16 *)(vars + 0x270) == 0) {
-            SetMobyState(self, 2, 0);
+            moby_set_state(self, 2, 0);
             if (*(u8 *)(self + 0x43) != 3)
-                StartAnimationBlended(self, 3, 0, 0xA);
+                anim_start_blended(self, 3, 0, 0xA);
         }
         break;
     case 4:
-        if (SetSecondPendingFlag(self) != 0)
-            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(self) != 0)
+            moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         if (*(int *)(vars + 0x258) != 1 && *(int *)(vars + 0x25C) != 1) {
             if (*(u8 *)(self + 0x20) != 5) if (*(u8 *)(self + 0x20) != 4) {
-                SetMobyState(self, 9, 3);
+                moby_set_state(self, 9, 3);
                 if (*(u8 *)(self + 0x43) != 6)
-                    StartAnimationBlended(self, 6, 0, 0xA);
-                *(s16 *)(vars + 0x270) = RandomIntRange(580, 600);
+                    anim_start_blended(self, 6, 0, 0xA);
+                *(s16 *)(vars + 0x270) = math_random_int_range(580, 600);
             }
         }
         break;
     case 5: {
-        int flags = DispatchActionByKind(self, vars + 0x60);
+        int flags = moby_dispatch_action_by_kind(self, vars + 0x60);
         int index = *(int *)(vars + 0x2C0);
         if (index != -1) {
-            u8 *slot = gSoundState + index * 0x70;
+            u8 *slot = g_sound_state + index * 0x70;
             if (*(char **)(slot + 0x88) == self && slot[0x74] != 0)
-                StopSoundVoice(index);
+                snd_stop_voice(index);
         }
         *(int *)(vars + 0x2C0) = -1;
         if ((flags & 1) || *(float *)(vars + 0x20) <= 0.0f) {
@@ -170,7 +171,7 @@ void func_L00_003D54B0(char *self)
             PlayMobySound(0xC, 0, self);
             child = *(char **)(vars + 0x2AC);
             if (child != 0 && *(s16 *)(child + 0xAA) == 0xAB7 /* moby class 2743 */)
-                MarkMobySpawned(child);
+                moby_mark_spawned(child);
             *(Quad003D54B0 *)v = 0;
             v[2] = 0.75f;
             *(u16 *)(self + 0x34) |= 0x41;
@@ -179,21 +180,21 @@ void func_L00_003D54B0(char *self)
             matrix_mul_vec3(v, v, self + 0xC0);
             FastVecAdd(v, v, self + 0x10);
             SpawnExplosion(v, 0, 5, 5, 5, 0, 0, 0, 0.5f, 20.0f, 1, 0, 0, 0);
-            SpawnRobotDeathDebris(self);
+            robot_spawn_death_debris(self);
             SetDeathBits(self, 0, 3);
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         if (flags & 2) {
             if (*(int *)(vars + 0x258) == 1 || *(int *)(vars + 0x25C) == 1) {
-                SetMobyState(self, 0xC, 4);
+                moby_set_state(self, 0xC, 4);
                 if (*(u8 *)(self + 0x43) != 0x1C)
-                    StartAnimationBlended(self, 0x1C, 0, 0xA);
+                    anim_start_blended(self, 0x1C, 0, 0xA);
             } else {
-                SetMobyState(self, 9, 3);
+                moby_set_state(self, 9, 3);
                 if (*(u8 *)(self + 0x43) != 6)
-                    StartAnimationBlended(self, 6, 0, 0xA);
-                *(s16 *)(vars + 0x270) = RandomIntRange(580, 600);
+                    anim_start_blended(self, 6, 0, 0xA);
+                *(s16 *)(vars + 0x270) = math_random_int_range(580, 600);
             }
         }
         break;
@@ -203,41 +204,41 @@ void func_L00_003D54B0(char *self)
     switch (*(u8 *)(self + 0x20)) {
     case 1:
         if (*(int *)(vars + 0x2BC) == 0)
-            StepMovementAtOwnPosition(self);
+            moby_step_at_own_position(self);
         break;
     case 3:
-        ScaleOwnerWordsByAngles(self, vars + 0x2A4, vars + 0x2A8, 0.06981318f, 0.052359886f, 0.013089972f);
+        moby_scale_owner_words_by_angles(self, vars + 0x2A4, vars + 0x2A8, 0.06981318f, 0.052359886f, 0.013089972f);
         break;
     case 5: {
-        u8 *slot = gSoundState + *(int *)(vars + 0x2C0) * 0x70;
+        u8 *slot = g_sound_state + *(int *)(vars + 0x2C0) * 0x70;
         float height;
         float y;
         *(int *)(vars + 0x2A0) += 1;
         if (*(char **)(slot + 0x88) != self || slot[0x74] == 0)
             *(int *)(vars + 0x2C0) = PlayMobySound(0xD, 4, self);
-        TurnTowardPosition(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
-        SpringFloatToGoal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
-        SpringFloatToGoal(self + 0xF0, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
-        height = ProbeGroundHeightBelow(self + 0x10, 0, 0.5f);
+        moby_turn_toward_position(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal(self + 0xF0, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
+        height = coll_probe_ground_height_below(self + 0x10, 0, 0.5f);
         y = *(float *)(self + 0x18);
         if (y - height > 0.05f) {
             *(float *)(self + 0x18) = y - height * 0.00025f;
         } else {
             int index = *(int *)(vars + 0x2C0);
             if (index != -1) {
-                u8 *other = gSoundState + index * 0x70;
+                u8 *other = g_sound_state + index * 0x70;
                 if (*(char **)(other + 0x88) == self && other[0x74] != 0)
-                    StopSoundVoice(index);
+                    snd_stop_voice(index);
             }
             *(int *)(vars + 0x2C0) = -1;
-            SetMobyState(self, 8, -1);
+            moby_set_state(self, 8, -1);
             if (*(u8 *)(self + 0x43) != 0xE)
-                StartAnimationBlended(self, 0xE, 0, 3);
+                anim_start_blended(self, 0xE, 0, 3);
         }
         if (*(u8 *)(self + 0x60) & 2) {
-            SetMobyState(self, 4, -1);
+            moby_set_state(self, 4, -1);
             if (*(u8 *)(self + 0x43) != 0x1A)
-                StartAnimationBlended(self, 0x1A, 0, 0xF);
+                anim_start_blended(self, 0x1A, 0, 0xF);
         }
         break;
     }
@@ -245,32 +246,32 @@ void func_L00_003D54B0(char *self)
         float height;
         float above;
         *(int *)(vars + 0x2A0) += 1;
-        TurnTowardPosition(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
-        SpringFloatToGoal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
-        SpringFloatToGoal(self + 0xF0, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
-        height = ProbeGroundHeightBelow(self + 0x10, 0, 0.5f);
+        moby_turn_toward_position(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal(self + 0xF0, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
+        height = coll_probe_ground_height_below(self + 0x10, 0, 0.5f);
         above = *(float *)(self + 0x18) - height;
         height -= 3.0f;
         if (above > 0.05f) {
-            StepValueTowardTarget(self + 0x18, vars + 0x280, height, 0.016666668f, 0.16333334f, 0.16666667f);
+            math_step_value_toward_target(self + 0x18, vars + 0x280, height, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
             int index;
             char *child;
             STUB_printf(D_L00_001B0318, *(int *)(vars + 0x2A0));
             index = *(int *)(vars + 0x2C0);
             if (index != -1) {
-                u8 *slot = gSoundState + index * 0x70;
+                u8 *slot = g_sound_state + index * 0x70;
                 if (*(char **)(slot + 0x88) == self && slot[0x74] != 0)
-                    StopSoundVoice(index);
+                    snd_stop_voice(index);
             }
             *(int *)(vars + 0x2C0) = -1;
-            SetMobyState(self, 8, -1);
+            moby_set_state(self, 8, -1);
             if (*(u8 *)(self + 0x43) != 0xE)
-                StartAnimationBlended(self, 0xE, 0, 3);
+                anim_start_blended(self, 0xE, 0, 3);
             *(int *)(self + 0x98) = *(int *)(*(char **)(self + 0x24) + 0x10);
             child = *(char **)(vars + 0x2AC);
             if (*(s16 *)(child + 0xAA) == 0xAB7 /* moby class 2743 */)
-                MarkMobySpawned(child);
+                moby_mark_spawned(child);
             *(float *)(vars + 0x30) = 0.5f;
             *(u16 *)(self + 0x34) |= 0x1000;
         }
@@ -278,103 +279,103 @@ void func_L00_003D54B0(char *self)
     }
     case 6:
         if (*(u8 *)(self + 0x60) & 2) {
-            SetMobyState(self, 7, -1);
+            moby_set_state(self, 7, -1);
             if (*(u8 *)(self + 0x43) != 0xD)
-                StartAnimationBlended(self, 0xD, 0, 0xF);
+                anim_start_blended(self, 0xD, 0, 0xF);
         }
         break;
     case 7: {
         float height;
         float above;
-        SpringFloatToGoal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
+        math_spring_float_to_goal(self + 0xF4, 0.0f, vars + 0x290, 0.016666668f, 0.0f, 0.06666667f);
         euler_rotation_basis(self + 0xC0, self + 0xF0);
-        TurnTowardPosition(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
-        height = ProbeGroundHeightBelow(self + 0x10, 0, 0.5f);
+        moby_turn_toward_position(self, *(char **)(vars + 0x240), vars + 0x28C, 0.001f, 0.01f, 0.1f);
+        height = coll_probe_ground_height_below(self + 0x10, 0, 0.5f);
         above = *(float *)(self + 0x18) - height;
         height -= 3.0f;
         if (above > 0.05f) {
-            StepValueTowardTarget(self + 0x18, vars + 0x280, height, 0.025000002f, 0.16333334f, 0.25f);
+            math_step_value_toward_target(self + 0x18, vars + 0x280, height, 0.025000002f, 0.16333334f, 0.25f);
         } else {
-            SetMobyState(self, 8, -1);
+            moby_set_state(self, 8, -1);
             if (*(u8 *)(self + 0x43) != 0xE)
-                StartAnimationBlended(self, 0xE, 0, 3);
+                anim_start_blended(self, 0xE, 0, 3);
         }
         break;
     }
     case 8:
         if (*(u8 *)(self + 0x60) & 2) {
-            SetMobyState(self, 0xC, 4);
+            moby_set_state(self, 0xC, 4);
             if (*(u8 *)(self + 0x43) != 0x1C)
-                StartAnimationBlended(self, 0x1C, 0, 0xF);
-            *(float *)(self + 0x18) = ProbeGroundHeightBelow(self + 0x10, 0, 0.5f);
+                anim_start_blended(self, 0x1C, 0, 0xF);
+            *(float *)(self + 0x18) = coll_probe_ground_height_below(self + 0x10, 0, 0.5f);
         }
         break;
     case 10:
         qcopy(v, vars + 0x380);
         v[2] -= 3.0f;
         FastVecSub(w, v, self + 0x10);
-        *(float *)(self + 0xF8) = FastMatrixHelperA(w[0], w[1]);
-        *(float *)(self + 0xF4) = FastMatrixHelperA(vec_length_xy(w), w[2]);
+        *(float *)(self + 0xF8) = mat_fast_helper_a(w[0], w[1]);
+        *(float *)(self + 0xF4) = mat_fast_helper_a(vec_length_xy(w), w[2]);
         euler_rotation_basis(self + 0xC0, self + 0xF0);
-        SpringVectorToTarget(self + 0x10, v, vars + 0x280, 0.016666668f, 0.0f, 0.33333334f);
+        vec_spring_to_target(self + 0x10, v, vars + 0x280, 0.016666668f, 0.0f, 0.33333334f);
         if (fast_vec_dist(self + 0x10, v) < 0.4f) {
             if (*(u8 *)(self + 0x43) != 0xD)
-                StartAnimationBlended(self, 0xD, 0, 0xA);
-            SetMobyState(self, 7, -1);
+                anim_start_blended(self, 0xD, 0, 0xA);
+            moby_set_state(self, 7, -1);
         }
         break;
     case 11:
-        StepMovementAtOwnPosition(self);
+        moby_step_at_own_position(self);
         if (*(u8 *)(self + 0x60) & 2) {
-            SetControllerSpeedLimits(self, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
-            SetMobyState(self, 0xC, -1);
+            moby_set_controller_speed_limits(self, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
+            moby_set_state(self, 0xC, -1);
             if (*(u8 *)(self + 0x43) != 0x1C)
-                StartAnimationBlended(self, 0x1C, 0, 0xF);
+                anim_start_blended(self, 0x1C, 0, 0xF);
         }
         break;
     case 12:
-        SetControllerSpeedLimits(self, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
+        moby_set_controller_speed_limits(self, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
         if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) < 2.8f
             && FastDiffRots(*(float *)(self + 0xF8),
-                             FastMatrixHelperA(*(float *)(vars + 0x230) - *(float *)(self + 0x10),
+                             mat_fast_helper_a(*(float *)(vars + 0x230) - *(float *)(self + 0x10),
                                            *(float *)(vars + 0x234) - *(float *)(self + 0x14))) < 0.38397247f) {
         } else if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 2.8f) {
-            TurnTowardTargetAndStepMovement(self, vars + 0x230, *(float *)(vars + 0x284));
+            moby_turn_toward_target_and_step(self, vars + 0x230, *(float *)(vars + 0x284));
         } else {
             char *target = *(char **)(vars + 0x240);
-            StepMovementController(self, self + 0x10,
-                          FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(self + 0x10),
+            moby_step_controller(self, self + 0x10,
+                          mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(self + 0x10),
                                         *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         }
         if (*(u8 *)(self + 0x42) == 0x1C)
-            SpawnJointHitEffects(*(float *)(vars + 0x298), self, D_L00_001A8F20, 4);
+            part_spawn_joint_hit_effects(*(float *)(vars + 0x298), self, D_L00_001A8F20, 4);
         break;
     case 13: {
         char *target;
         if (*(u8 *)(self + 0x42) == 0xF)
-            RegisterOverlayDrawCallback(DrawRobotJointFlash, self);
+            gfx_register_overlay_draw_callback(robot_draw_joint_flash, self);
         target = *(char **)(vars + 0x240);
-        StepMovementController(self, self + 0x10,
-                      FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(self + 0x10),
+        moby_step_controller(self, self + 0x10,
+                      mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(self + 0x10),
                                     *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         break;
     }
     case 14:
         if (*(u8 *)(self + 0x60) & 2) {
             if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 4.0f) {
-                SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 0xC, -1);
+                moby_set_controller_speed_limits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 0xC, -1);
                 if (*(u8 *)(self + 0x43) != 0x1C)
-                    StartAnimationBlended(self, 0x1C, 0, 0xA);
+                    anim_start_blended(self, 0x1C, 0, 0xA);
             } else {
-                SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                SetMobyState(self, 0xC, -1);
+                moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                moby_set_state(self, 0xC, -1);
                 if (*(u8 *)(self + 0x43) != 7)
-                    StartAnimationBlended(self, 7, 0, 0xA);
+                    anim_start_blended(self, 7, 0, 0xA);
             }
         }
         break;
     }
-    UpdateEnemyTimersAndLimbs(self);
-    RegisterOverlayDrawCallback(DrawObjectGlowEffects, self);
+    robot_update_timers_limbs(self);
+    gfx_register_overlay_draw_callback(robot_draw_glow_effects, self);
 }

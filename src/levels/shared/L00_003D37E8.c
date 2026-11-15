@@ -45,7 +45,7 @@ extern void ref_L00_003E2E80_05(void *, void *, float);
 extern float ref_L00_003E2E80_06(int);
 extern int ref_L00_003E2E80_07(float);
 extern void ref_L00_003E2E80_08(void *, int, int);
-extern float D_L00_001B8DC0[];
+extern float g_camera_l00_position[];
 
 
 
@@ -126,7 +126,7 @@ extern L00AimVector D_L00_001B8C80;
 
 /* shared native body of family a04928c6 */
 /* Sets up a large square sprite packet with default corners, colors and texture coordinates. */
-void func_L00_003D6FB8(char *p)
+void gfx_init_large_sprite_packet(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -157,7 +157,7 @@ void func_L00_003D6FB8(char *p)
 }
 
 /* Draws a two-layer glow sprite at a point, turned to face the camera. */
-void func_L00_003D7250(int unused, char *pos, int color, int first, int second, float scale)
+void gfx_draw_two_layer_glow_sprite(int unused, char *pos, int color, int first, int second, float scale)
 {
     char pkt[144];
     float m[16];
@@ -216,7 +216,7 @@ void func_L00_003D7250(int unused, char *pos, int color, int first, int second, 
 
 /* shared native body of family a04928c6 */
 /* Sets up a large square sprite packet with default corners, colors and texture coordinates. */
-void func_L00_003DA2B0(char *p)
+void gfx_init_large_sprite_packet_b(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -254,7 +254,7 @@ void func_L00_003DA2B0(char *p)
 
 
 /* Starts a burst of particles and sparks in a direction from a point. */
-void func_L00_003DC3E0(char *object, int unused, char *pos, char *direction)
+void EmitRingAndDirectionalParticles(char *object, int unused, char *pos, char *direction)
 {
     float a[4], b[4], c[4], d[4];
     struct C3PairGlobal colors;
@@ -293,14 +293,14 @@ void func_L00_003DC3E0(char *object, int unused, char *pos, char *direction)
 
 typedef int Quad640 __attribute__((mode(TI)));
 
-extern void func_L00_003DCC48(float f12, float f13, float f14, void *pos, char *a1, int a2, int a3);
+extern void gfx_draw_tapered_ribbon(float f12, float f13, float f14, void *pos, char *a1, int a2, int a3);
 extern int func_0031A768_1(int lo, int hi);
-extern void func_L00_003DC910(char *pos, int a1, float fA, int a2, float fB, char *a3, int t0, float fC);
-extern void func_L00_003DCAC8(char *pos, int a1, int a2, float f12, float f13, char *a3, int t0,
+extern void gfx_draw_camera_facing_sprite(char *pos, int a1, float fA, int a2, float fB, char *a3, int t0, float fC);
+extern void gfx_draw_directional_sprite(char *pos, int a1, int a2, float f12, float f13, char *a3, int t0,
                               char *src);
 
 /* Effect update by state: 1 starts the burst (one random-angle puff), 2 counts the timer down and draws the two fade rings. */
-void func_L00_003DC640(char *obj)
+void part_l00_update_burst_effect(char *obj)
 {
     char *vars = *(char **)(obj + 0x68);
     Quad640 pos;
@@ -310,21 +310,21 @@ void func_L00_003DC640(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 1:
         pos = *(Quad640 *)(obj + 0x10);
-        DrawTaperedRibbon(0.0f, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
+        gfx_draw_tapered_ribbon(0.0f, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
         scale = *(float *)(obj + 0x2C) * 95.0f;
         n = func_0031A768_1(0x5F, 0x6F) >> 2;
-        DrawCameraFacingSprite_L00(obj + 0x10, 0x103080, scale, n, func_0031A888_1(), (char *)0xB, 2, -1.0f);
+        gfx_draw_camera_facing_sprite(obj + 0x10, 0x103080, scale, n, func_0031A888_1(), (char *)0xB, 2, -1.0f);
         break;
     case 2:
         if (--*(int *)(vars + 0x6C) <= 0)
             *(int *)(vars + 0x6C) = 0;
         zero = 0.0f;
         pos = *(Quad640 *)(obj + 0x10);
-        DrawTaperedRibbon(zero, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
+        gfx_draw_tapered_ribbon(zero, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
         if (*(int *)(vars + 0x7C) == 0) {
-            DrawDirectionalSprite(obj + 0x10, 0x103080, *(int *)(vars + 0x6C),
+            gfx_draw_directional_sprite(obj + 0x10, 0x103080, *(int *)(vars + 0x6C),
                               *(float *)(obj + 0x2C) * 45.0f, zero, (char *)0xB, 2, vars + 0x50);
-            DrawDirectionalSprite(obj + 0x10, 0x3F3F3F, *(int *)(vars + 0x6C),
+            gfx_draw_directional_sprite(obj + 0x10, 0x3F3F3F, *(int *)(vars + 0x6C),
                               *(float *)(obj + 0x2C) * 33.75f, zero, (char *)0xB, 2, vars + 0x50);
         }
         break;
@@ -332,7 +332,7 @@ void func_L00_003DC640(char *obj)
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003DC820(char *p)
+void gfx_init_small_sprite_packet(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -363,7 +363,7 @@ void func_L00_003DC820(char *p)
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003DC8A8(char *p, float scale)
+void gfx_scale_sprite_packet_corners(char *p, float scale)
 {
     func_00282D30_2(p, p, scale);
     func_00282D30_2(p + 16, p + 16, scale);
@@ -372,7 +372,7 @@ void func_L00_003DC8A8(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003DC910(char *pos, int colorRgb, float scale, int alpha, float roll, char *textureId, int blendFlags, float offsetScale)
+void gfx_draw_camera_facing_sprite(char *pos, int colorRgb, float scale, int alpha, float roll, char *textureId, int blendFlags, float offsetScale)
 {
     char packet[144];
     float m[16];
@@ -413,7 +413,7 @@ void func_L00_003DC910(char *pos, int colorRgb, float scale, int alpha, float ro
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void func_L00_003DCAC8(char *pos, int colorRgb, int alpha, float scale, float roll, char *textureId, int blendFlags,
+void gfx_draw_directional_sprite(char *pos, int colorRgb, int alpha, float scale, float roll, char *textureId, int blendFlags,
                        char *direction)
 {
     char packet[144];
@@ -479,7 +479,7 @@ typedef struct BounceState {
 } BounceState;
 
 /* Per-frame update of a bouncing object: runs its timed phases, then moves and bounces it. */
-void func_L00_003DD2B8(BounceObject *object)
+void UpdateRotatingBouncingEffect(BounceObject *object)
 {
     float point[4];
     float rotation[12];
@@ -548,7 +548,7 @@ void func_L00_003DD2B8(BounceObject *object)
 }
 
 /* Switches a moby on the first time it runs. */
-void func_L00_003DD680(char *p)
+void moby_activate_once(char *p)
 {
     if (*(unsigned char *)(p + 0x20) == 0) {
         *(unsigned short *)(p + 0x34) |= 0x800;
@@ -571,7 +571,7 @@ void func_L00_003DD680(char *p)
 
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003DFF98(char *p)
+void gfx_init_small_sprite_packet_b(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -602,7 +602,7 @@ void func_L00_003DFF98(char *p)
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003E0020(char *p, float scale)
+void gfx_scale_sprite_packet_corners_b(char *p, float scale)
 {
     func_00282D30_2(p, p, scale);
     func_00282D30_2(p + 16, p + 16, scale);
@@ -611,7 +611,7 @@ void func_L00_003E0020(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003E0088(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+void gfx_draw_camera_facing_sprite_b(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
                        float scale, float roll, float offsetScale)
 {
     char packet[144];
@@ -653,7 +653,7 @@ void func_L00_003E0088(char *pos, int colorRgb, int alpha, char *textureId, int 
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003E0CE8(char *p)
+void gfx_init_small_sprite_packet_c(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -684,7 +684,7 @@ void func_L00_003E0CE8(char *p)
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003E0D70(char *p, float scale)
+void gfx_scale_sprite_packet_corners_c(char *p, float scale)
 {
     func_00282D30_2(p, p, scale);
     func_00282D30_2(p + 16, p + 16, scale);
@@ -693,7 +693,7 @@ void func_L00_003E0D70(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void func_L00_003E0DD8(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+void gfx_draw_directional_sprite_b(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
                                         char *direction, float scale, float roll)
 {
     char packet[144];
@@ -732,7 +732,7 @@ void func_L00_003E0DD8(char *pos, int colorRgb, int alpha, char *textureId, int 
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003E0F58(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+void gfx_draw_camera_facing_sprite_c(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
                        float scale, float roll, float offsetScale)
 {
     char packet[144];
@@ -789,7 +789,7 @@ typedef struct {
 } __attribute__((aligned(16))) TrailPacket;
 
 /* Draws a two-layer trail along a chain of points, fading its alpha toward the end. */
-void func_L00_003E2E80(float *points, int tex1, int tex2, int count,
+void DrawFadingTwoPassRibbon(float *points, int tex1, int tex2, int count,
                        unsigned int color1, unsigned int color2,
                        float unused, float scale, float scroll)
 {
@@ -833,7 +833,7 @@ void func_L00_003E2E80(float *points, int tex1, int tex2, int count,
     outer.uv[0] = scroll;
     outer.uv[4] = scroll + 1;
 
-    ref_L00_003E2E80_01(ray, points, gCameraPosition_L00);
+    ref_L00_003E2E80_01(ray, points, g_camera_l00_position);
     ref_L00_003E2E80_01(tangent, next, points);
     ref_L00_003E2E80_02(cross, tangent, ray);
     ref_L00_003E2E80_03(offset, cross, points[3]);
@@ -846,7 +846,7 @@ void func_L00_003E2E80(float *points, int tex1, int tex2, int count,
     for (i = 1; i < count; i++) {
         float *point = points + i * 4;
 
-        ref_L00_003E2E80_01(ray, point, gCameraPosition_L00);
+        ref_L00_003E2E80_01(ray, point, g_camera_l00_position);
         ref_L00_003E2E80_01(tangent, point, points + (i - 1) * 4);
         ref_L00_003E2E80_02(cross, tangent, ray);
         ref_L00_003E2E80_03(offset, cross, point[3]);

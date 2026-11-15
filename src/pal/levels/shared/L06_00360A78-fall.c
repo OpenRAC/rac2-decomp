@@ -3,29 +3,29 @@
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vec4;
 extern void func_PAL_002ABCB8(void *, void *, void *);
-extern float func_00282E20(void *);
-extern void func_002AA2E8(float *, float, float);
-extern void func_00282F70(void *, void *, float);
-extern float func_002A89A8(void *, int, float);
-extern int func_00278E78(void);
-extern void *func_00312D58(void *, float);
-extern float func_002A8A20(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282C48(float);
-extern float func_0029F530(void *);
-extern int func_002A88A0(float *, float *, float, float, float);
-extern void func_002A7CA0(void *, void *, float, float, float, float);
-extern int func_00277F48(float, void *, int, void *, void *);
-extern float func_00283CE0(int);
-extern int func_002ABB78(void *);
-extern void func_002A8F70(void *, float, int, int, void *, void *);
-extern float func_00282DF0(void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00277258(void *, float, int, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern void ApproachValue(float *, float, float);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int GetCollHitMaterial(void);
+extern void *moby_spawn_scaled_effect(void *, float);
+extern float coll_get_ground_height_under_object(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fabs(float);
+extern float moby_get_anim_value(void *);
+extern int math_solve_quadratic(float *, float *, float, float, float);
+extern void MobySpringTurn(void *, void *, float, float, float, float);
+extern int coll_process_hit(float, void *, int, void *, void *);
+extern float IntToFloat(int);
+extern int moby_is_in_special_class_range(void *);
+extern void part_queue_impact_effect(void *, float, int, int, void *, void *);
+extern float FastVecLength(void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int coll_test_point(void *, float, int, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern int *D_L06_001C3D00[];
 extern Vec4 D_L06_001BFCA0, D_L06_001BFCB0;
 
@@ -54,36 +54,36 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
         }
     }
 
-    f60 = func_00282E20(st);
+    f60 = vec_length_xy(st);
     t = (*(short *)(st + 0x3E) == 2) ? 0.0f : *(float *)(st + 0x4C);
-    func_002AA2E8(&f60, t, *(float *)(st + 0x14));
-    func_00282F70((float *)st, (float *)st, f60);
+    ApproachValue(&f60, t, *(float *)(st + 0x14));
+    vec_fast_normalize_helper((float *)st, (float *)st, f60);
     if (*(float *)(st + 0x1C) < *(float *)(st + 0x8)) {
         *(float *)(st + 0x8) = *(float *)(st + 0x1C);
     }
 
     qcopy(v10, moby + 0x10);
     v10[2] = v10[2] + *(float *)(st + 0x28);
-    f21 = func_002A89A8(v10, 0, 0.5f);
-    if (func_00278E78() == 0) {
+    f21 = coll_probe_ground_height_below(v10, 0, 0.5f);
+    if (GetCollHitMaterial() == 0) {
         if (*(float *)(st + 0x5C) == 0.0f && f21 <= v10[2] && v10[2] + *(float *)(st + 0x8) < f21) {
             *(float *)(st + 0x5C) = 1.0f;
             v10[2] = f21;
-            func_00312D58(v10, 3.0f);
+            moby_spawn_scaled_effect(v10, 3.0f);
         }
-        f21 = func_002A8A20((moby + 0x10));
+        f21 = coll_get_ground_height_under_object((moby + 0x10));
     } else {
         if ((*(int *)(st + 0x24) & 0x10) || *(short *)(st + 0x3E) == 2) {
-            func_00282CC0(v20, (moby + 0x10), st);
-            if (func_002A8A20(v20) < f21 - 0.25f) {
-                func_00282F70((float *)st, (float *)st, 0.0f);
+            FastVecAdd(v20, (moby + 0x10), st);
+            if (coll_get_ground_height_under_object(v20) < f21 - 0.25f) {
+                vec_fast_normalize_helper((float *)st, (float *)st, 0.0f);
             }
         }
     }
 
     if (*(float *)(st + 0x5C) != 0.0f) {
         if (*(float *)(st + 0x5C) < 4.0f) {
-            func_00282D30(st, st, 0.7f);
+            FastVecScale(st, st, 0.7f);
         }
         if (*(float *)(st + 0x5C) < 7.0f) {
             *(float *)(st + 0x5C) = *(float *)(st + 0x5C) + 1.0f;
@@ -101,33 +101,33 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
         case 0: {
             float s0;
             float numerator0;
-            s0 = func_00282C48(*(float *)(st + 0x8) / *(float *)(st + 0x10));
+            s0 = math_fabs(*(float *)(st + 0x8) / *(float *)(st + 0x10));
             if (2.0f < s0) {
-                t = func_0029F530(moby);
+                t = moby_get_anim_value(moby);
                 numerator0 = *(float *)(st + 0x50) - t;
                 rr = numerator0 / s0;
                 if (0.0f < rr) {
-                    func_002AA2E8((float *)(moby + 0x48), rr, 0.120000005f);
+                    ApproachValue((float *)(moby + 0x48), rr, 0.120000005f);
                 }
             }
             break;
         }
         case 1:
-            t = func_0029F530(moby);
+            t = moby_get_anim_value(moby);
             if (*(float *)(st + 0x54) <= t) {
                 *(int *)(moby + 0x48) = 0;
             } else {
                 float numerator1;
                 float h = *(float *)(st + 0x10) * -0.5f;
                 f20 = 60.0f;
-                n = func_002A88A0(&f64, &f68, h, *(float *)(st + 0x8) - h, *(float *)(moby + 0x18) - f21);
+                n = math_solve_quadratic(&f64, &f68, h, *(float *)(st + 0x8) - h, *(float *)(moby + 0x18) - f21);
                 if (n > 0 && 0.0f < f64 && f64 < f20) {
                     f20 = f64;
                 }
                 if (f20 < 0.0001f) {
                     f20 = 0.0001f;
                 }
-                t = func_0029F530(moby);
+                t = moby_get_anim_value(moby);
                 numerator1 = *(float *)(st + 0x54) - t;
                 rr = numerator1 / f20;
                 if (2.0f < rr) {
@@ -135,7 +135,7 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
                 } else if (rr < 0.0f) {
                     rr = 0.0f;
                 }
-                func_002AA2E8((float *)(moby + 0x48), rr, 0.120000005f);
+                ApproachValue((float *)(moby + 0x48), rr, 0.120000005f);
             }
             break;
         case 2:
@@ -148,63 +148,63 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
         flags |= 0x40;
     }
     if (!(*(int *)(st + 0x24) & 4)) {
-        func_002A7CA0(moby, (float *)(st + 0x44), *(float *)(st + 0x40), 0.02f, 0.3f, *(float *)(st + 0x48));
+        MobySpringTurn(moby, (float *)(st + 0x44), *(float *)(st + 0x40), 0.02f, 0.3f, *(float *)(st + 0x48));
     }
 
     i = 0;
     qcopy(v0, (moby + 0x10));
     v0[2] = v0[2] + *(float *)(st + 0x28);
-    func_00282CC0((moby + 0x10), (moby + 0x10), st);
+    FastVecAdd((moby + 0x10), (moby + 0x10), st);
     qcopy(v20, (moby + 0x10));
     v20[2] = v20[2] + *(float *)(st + 0x28);
-    func_00282CC0(v30, v20, st);
-    n = func_00277F48(func_00283CE0(*(int *)(st + 0x20)) * 0.0010742187732830644f, v30, 16, moby, 0);
+    FastVecAdd(v30, v20, st);
+    n = coll_process_hit(IntToFloat(*(int *)(st + 0x20)) * 0.0010742187732830644f, v30, 16, moby, 0);
     if (i < n) {
         int **pp = D_L06_001C3D00;
         int k = n;
         do {
-            if (func_002ABB78(*pp) != 0) {
-                func_002A8F70((char *)*pp, 1.0f, (int)moby, 0x10000, (moby + 0x10), st);
+            if (moby_is_in_special_class_range(*pp) != 0) {
+                part_queue_impact_effect((char *)*pp, 1.0f, (int)moby, 0x10000, (moby + 0x10), st);
             }
             pp++;
         } while (--k != 0);
     }
 
     sc = 0.0009765625f;
-    t = func_00282DF0(st);
+    t = FastVecLength(st);
     if ((float)*(int *)(st + 0x20) * sc < t) {
-        func_002761F8(v0, v20, 36, moby, 0);
+        CollLine(v0, v20, 36, moby, 0);
         qcopy(v20, &D_L06_001BFCA0);
     }
-    if (func_00277258(v20, func_00283CE0(*(int *)(st + 0x20)) * sc, 36, moby) != 0) {
+    if (coll_test_point(v20, IntToFloat(*(int *)(st + 0x20)) * sc, 36, moby) != 0) {
         flags |= 2;
         g = &D_L06_001BFCB0;
         qcopy((moby + 0x10), g);
         one = 1.0f;
         *(float *)(moby + 0x18) = *(float *)(moby + 0x18) - *(float *)(st + 0x28);
-        func_00282F20(v40, (char *)g + 0x10, one);
+        vec_scale_to_length(v40, (char *)g + 0x10, one);
         if (0.7070000171661377f <= v40[2]) {
-            float e = func_00282DB0(st, v40);
+            float e = FastVecDot(st, v40);
             if (e < 0.0f) {
                 q = (char *)g - 0x30;
                 if (*(int *)(q + 0x18) == 0 || *(int *)(q + 0x1C) > 0) {
                     flags |= 1;
                     *(short *)(st + 0x3E) = 2;
                 }
-                func_00282F20(v50, v40, e);
-                func_00282CF0(st, st, v50);
+                vec_scale_to_length(v50, v40, e);
+                FastVecSub(st, st, v50);
                 if (*(short *)(st + 0x3E) == 2) {
-                    f6c = func_00282DF0(st);
-                    func_002AA2E8(&f6c, 0.0f, *(float *)(st + 0x10));
-                    func_00282F20(st, st, f6c);
+                    f6c = FastVecLength(st);
+                    ApproachValue(&f6c, 0.0f, *(float *)(st + 0x10));
+                    vec_scale_to_length(st, st, f6c);
                 }
             }
         } else {
-            float d = func_00282DB0(st, v40);
+            float d = FastVecDot(st, v40);
             if (d < 0.0f) {
                 d = d * -(*(float *)(st + 0x30) + one);
-                func_00282F20(v50, v40, d);
-                func_00282CC0(st, st, v50);
+                vec_scale_to_length(v50, v40, d);
+                FastVecAdd(st, st, v50);
             }
         }
     }

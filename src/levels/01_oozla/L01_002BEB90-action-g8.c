@@ -69,7 +69,7 @@ typedef struct ActionView {
     unsigned char gap22E8[0x1D0];
     float blend;
 } ActionView;
-extern ActionView D_00189E20;
+extern ActionView g_hero_state;
 typedef union ButtonPair {
     struct { unsigned int buffered; unsigned int pressed; } word;
     unsigned long both;
@@ -78,8 +78,8 @@ typedef struct InputView {
     unsigned char prefix[0x1A0];
     ButtonPair buttons;
 } InputView;
-extern InputView D_00138180;
-extern unsigned char D_00139568[];
+extern InputView g_pad_state;
+extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001A7B2E;
 /* Four per-slot item ids (also read in src/game/002C7748-g8.c); 0x001A739C is element 1. */
 extern int D_001A7398[] __attribute__((sda));
@@ -91,20 +91,20 @@ typedef struct ActionTableEntry {
     unsigned char suffix[0xC8];
 } ActionTableEntry;
 extern ActionTableEntry D_L01_002637A0[];
-extern unsigned int func_L00_0032EF10(unsigned int, int, int *);
-extern int func_L00_002B3248(unsigned char *);
-extern void func_L00_002BA508(void);
-extern int func_L01_002BEB90(long, int);
-extern int func_L00_002D4040(int);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002E5CF8(int, int, char *);
-extern char *func_L00_002AE888(char *, int, int, float, float, float, float);
-extern int func_002761F8(void *, void *, int, char *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern int func_00283CF0(float);
-extern int func_00282948(int *);
-extern void func_L00_002AF568(void);
+extern unsigned int PadPressedWithin(unsigned int, int, int *);
+extern int moby_is_class_71(unsigned char *);
+extern void hero_setup_attached_object_transform(void);
+extern int SetHeroMoveState(long, int);
+extern int get_ammo(int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int PlayMobySound(int, int, char *);
+extern char *SelectBestEligibleTarget(char *, int, int, float, float, float, float);
+extern int CollLine(void *, void *, int, char *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern int FloatToInt(float);
+extern int math_fast_float_d(int *);
+extern void start_equipped_item_animation(void);
 
 /* Field views retain the measured resident layout without asserting its extent. */
 #define ACTION D_00189E20.action
@@ -113,7 +113,7 @@ extern void func_L00_002AF568(void);
 /* Equipped-item input for the current hero state, as in RAC1's
  * process_hero_item_action_input: starts the matching move and returns 1 when
  * the state timer was reset. */
-int func_L01_002C1A70(void)
+int ProcessHeroItemActionInput(void)
 {
     int request;
     int previousTimer;
@@ -129,28 +129,28 @@ int func_L01_002C1A70(void)
     int window;
     float angle;
 
-    if (gHeroState.override && (gHeroState.request != 10 || gHeroState.stance != 1)) return 0;
-    if (gHeroState.mode) return 0;
-    if (!gHeroState.actionObject) return 0;
-    if (gHeroState.actionLock) return 0;
-    if (gHeroState.actionMode != 2) return 0;
-    request = gHeroState.request;
-    mask = gHeroState.actionMask;
-    previousTimer = gHeroState.transitionTimer;
+    if (g_hero_state.override && (g_hero_state.request != 10 || g_hero_state.stance != 1)) return 0;
+    if (g_hero_state.mode) return 0;
+    if (!g_hero_state.actionObject) return 0;
+    if (g_hero_state.actionLock) return 0;
+    if (g_hero_state.actionMode != 2) return 0;
+    request = g_hero_state.request;
+    mask = g_hero_state.actionMask;
+    previousTimer = g_hero_state.transitionTimer;
 
     switch (request) {
     case 10:
-        if (gHeroState.attackDisabled) break;
-        if (MOTION < 2 || (MOTION == 4 && gHeroState.canAttack)) {
+        if (g_hero_state.attackDisabled) break;
+        if (MOTION < 2 || (MOTION == 4 && g_hero_state.canAttack)) {
             if (PadPressedWithin(mask, 10, &scratch.attackBuffered)) {
-                object = gHeroState.actionObject;
+                object = g_hero_state.actionObject;
                 if (!object) goto clearPending;
-                if (!IsMobyClass71((unsigned char *)object) || *(unsigned char *)(object + 0x20))
+                if (!moby_is_class_71((unsigned char *)object) || *(unsigned char *)(object + 0x20))
                     goto clearPending;
-                if ((gPadState.buttons.word.buffered & 8) ||
-                    ((ACTION == 1 || ACTION == 0x1D) && gHeroState.transitionTimer > 20)) {
-                    if ((ACTION == 1 || ACTION == 0x1D) && gHeroState.transitionTimer > 20) {
-                        SetupHeroAttachedObjectTransform();
+                if ((g_pad_state.buttons.word.buffered & 8) ||
+                    ((ACTION == 1 || ACTION == 0x1D) && g_hero_state.transitionTimer > 20)) {
+                    if ((ACTION == 1 || ACTION == 0x1D) && g_hero_state.transitionTimer > 20) {
+                        hero_setup_attached_object_transform();
                         goto clearPending;
                     }
                     SetHeroMoveState(0x15, 1);
@@ -160,18 +160,18 @@ int func_L01_002C1A70(void)
             }
         } else {
             if (ACTION == 7 || ACTION == 9 || ACTION == 0x89 || ACTION == 8 || ACTION == 6 ||
-                (ACTION == 0xE && gHeroState.animationFrame > 32.0f) ||
-                (ACTION == 0xB && gHeroState.airStyle != 3 && gHeroState.animationFrame > 18.0f) ||
-                (ACTION == 0xB && gHeroState.airStyle == 3 && gHeroState.animationFrame > 20.0f) ||
+                (ACTION == 0xE && g_hero_state.animationFrame > 32.0f) ||
+                (ACTION == 0xB && g_hero_state.airStyle != 3 && g_hero_state.animationFrame > 18.0f) ||
+                (ACTION == 0xB && g_hero_state.airStyle == 3 && g_hero_state.animationFrame > 20.0f) ||
                 ACTION == 0x2C || ACTION == 0x11) {
-                if (gHeroState.transitionTimer > 10) {
+                if (g_hero_state.transitionTimer > 10) {
                     int airWindow = 0xE;
                     if (ACTION == 0xB || ACTION == 0xE) airWindow = 0x12;
                     if (!PadPressedWithin(mask, airWindow, 0)) goto clearPending;
-                    if ((!gHeroState.highAttack && gHeroState.height > 0.1f) ||
-                        (gHeroState.highAttack && gHeroState.height > 0.57f) ||
-                        (ACTION == 8 && gHeroState.height > 0.57f)) {
-                        if (!gHeroState.attackBlock && !gHeroState.pendingAttack)
+                    if ((!g_hero_state.highAttack && g_hero_state.height > 0.1f) ||
+                        (g_hero_state.highAttack && g_hero_state.height > 0.57f) ||
+                        (ACTION == 8 && g_hero_state.height > 0.57f)) {
+                        if (!g_hero_state.attackBlock && !g_hero_state.pendingAttack)
                             SetHeroMoveState(0x14, 1);
                     } else {
                         SetHeroMoveState(0x13, 1);
@@ -180,25 +180,25 @@ int func_L01_002C1A70(void)
                 }
             }
             if (MOTION == 6) {
-                timing = D_L01_0025EC90[gHeroState.animationIndex];
-                if (ACTION == 0x15 && gHeroState.transitionTimer > 30) {
-                    if (gHeroState.actionLock) goto checkAnimationLock;
-                    if (gHeroState.animationLock) goto clearPending;
-                    if ((float)*(int *)(timing + 0x10) <= gHeroState.animationFrame &&
-                        (gPadState.buttons.word.buffered & 8) && PadPressedWithin(mask, 15, 0)) {
+                timing = D_L01_0025EC90[g_hero_state.animationIndex];
+                if (ACTION == 0x15 && g_hero_state.transitionTimer > 30) {
+                    if (g_hero_state.actionLock) goto checkAnimationLock;
+                    if (g_hero_state.animationLock) goto clearPending;
+                    if ((float)*(int *)(timing + 0x10) <= g_hero_state.animationFrame &&
+                        (g_pad_state.buttons.word.buffered & 8) && PadPressedWithin(mask, 15, 0)) {
                         SetHeroMoveState(0x15, 1);
                         goto complete;
                     }
                 }
 checkAnimationLock:
-                if (!gHeroState.animationLock) {
-                    if (!gHeroState.actionLock) {
-                        float frame = gHeroState.animationFrame;
+                if (!g_hero_state.animationLock) {
+                    if (!g_hero_state.actionLock) {
+                        float frame = g_hero_state.animationFrame;
                         if ((float)*(int *)(timing + 0x10) <= frame) {
                             window = (FloatToInt(frame) - *(int *)(timing + 0xC)) * 2;
                             window = window > 0 ? window : 1;
                             if (PadPressedWithin(mask, window < 16 ? window : 15, 0)) {
-                                if (gPadState.buttons.word.buffered & 8)
+                                if (g_pad_state.buttons.word.buffered & 8)
                                     SetHeroMoveState(0x15, 1);
                                 else
                                     SetHeroMoveState(0x13, 1);
@@ -211,43 +211,43 @@ checkAnimationLock:
             }
         }
 clearPending:
-        gHeroState.pendingAttack = 0;
+        g_hero_state.pendingAttack = 0;
         break;
 
     case 22: case 65:
         if (ACTION == 1 || ACTION == 0x1D ||
-            (MOTION > 1 && MOTION != 12 && (MOTION != 4 || !gHeroState.canAttack)) ||
-            (gHeroState.queuedAction && gHeroState.queuedAction != 22 && gHeroState.queuedAction != 65)) break;
-        if (!(gPadState.buttons.word.buffered & 0x20) || gHeroState.actionAge < 23) break;
+            (MOTION > 1 && MOTION != 12 && (MOTION != 4 || !g_hero_state.canAttack)) ||
+            (g_hero_state.queuedAction && g_hero_state.queuedAction != 22 && g_hero_state.queuedAction != 65)) break;
+        if (!(g_pad_state.buttons.word.buffered & 0x20) || g_hero_state.actionAge < 23) break;
         if (get_ammo(request)) {
             SetHeroMoveState(0x83, 1);
             goto complete;
         }
-        if (gPadState.buttons.word.pressed & 0x20)
-            PlaySoundFromClassBank(0, 0, gHeroState.object,
-                         (D_L01_002637A0 + gItemSlotToRecord[request])->id);
+        if (g_pad_state.buttons.word.pressed & 0x20)
+            snd_play_from_class_bank(0, 0, g_hero_state.object,
+                         (D_L01_002637A0 + g_item_slot_to_record[request])->id);
         break;
 
     case 46: {
         char *target;
-        if (gPadState.buttons.word.pressed & mask) {
-            if (gHeroState.target) {
-                gHeroState.target = 0;
+        if (g_pad_state.buttons.word.pressed & mask) {
+            if (g_hero_state.target) {
+                g_hero_state.target = 0;
                 break;
             }
-            target = SelectBestEligibleTarget((char *)&gHeroState, 21, 0, 20.0f, gHeroState.facing,
+            target = SelectBestEligibleTarget((char *)&g_hero_state, 21, 0, 20.0f, g_hero_state.facing,
                                       0.52359885f, 0.6981318f);
-            gHeroState.target = target;
+            g_hero_state.target = target;
             if (target) {
                 qcopy(&scratch.position, target + 0x10);
                 ((float *)&scratch.position)[2] += 0.5f;
-                if (CollLine(&scratch.position, gHeroState.origin, 2, target, 0)) {
-                    gHeroState.target = 0;
+                if (CollLine(&scratch.position, g_hero_state.origin, 2, target, 0)) {
+                    g_hero_state.target = 0;
                 } else {
-                    char *aimTarget = gHeroState.target;
-                    angle = FastMatrixHelperA(gHeroState.position[0] - *(float *)(aimTarget + 0x10),
-                                          gHeroState.position[1] - *(float *)(aimTarget + 0x14));
-                    gHeroState.targetAngle = fast_subtract_rotations(*(float *)(gHeroState.target + 0xF8), angle);
+                    char *aimTarget = g_hero_state.target;
+                    angle = mat_fast_helper_a(g_hero_state.position[0] - *(float *)(aimTarget + 0x10),
+                                          g_hero_state.position[1] - *(float *)(aimTarget + 0x14));
+                    g_hero_state.targetAngle = fast_subtract_rotations(*(float *)(g_hero_state.target + 0xF8), angle);
                 }
             }
         }
@@ -258,22 +258,22 @@ clearPending:
         int actionAge;
         int actionWindow;
         if (((MOTION != 0 || ACTION == 0x1D) && MOTION != 1 && MOTION != 12 &&
-             MOTION != 5 && MOTION != 15 && (MOTION != 4 || !gHeroState.allowAction) &&
-             (ACTION != 0x22 || !(gHeroState.animationFrame > 55.0f))) || gHeroState.busy) break;
-        actionAge = gHeroState.actionAge;
+             MOTION != 5 && MOTION != 15 && (MOTION != 4 || !g_hero_state.allowAction) &&
+             (ACTION != 0x22 || !(g_hero_state.animationFrame > 55.0f))) || g_hero_state.busy) break;
+        actionAge = g_hero_state.actionAge;
         actionWindow = actionAge;
         if (actionAge >= 7) actionWindow = 7;
-        if (!PadPressedWithin(mask, actionWindow, &scratch.actionBuffered) && !(gPadState.buttons.word.buffered & 0x20)) break;
+        if (!PadPressedWithin(mask, actionWindow, &scratch.actionBuffered) && !(g_pad_state.buttons.word.buffered & 0x20)) break;
         if (actionAge < 23) break;
         if (get_ammo(-1)) {
             if (MOTION == 12 || MOTION == 0 || ACTION == 3 ||
-                (MOTION == 1 && gHeroState.blend < 0.7f)) {
+                (MOTION == 1 && g_hero_state.blend < 0.7f)) {
                 SetHeroMoveState(0x22, 1);
                 goto complete;
             }
             start_equipped_item_animation();
-        } else if (gHeroState.actionObject && (gPadState.buttons.word.pressed & 0x20)) {
-            PlayMobySound(0, 0, gHeroState.actionObject);
+        } else if (g_hero_state.actionObject && (g_pad_state.buttons.word.pressed & 0x20)) {
+            PlayMobySound(0, 0, g_hero_state.actionObject);
         }
         break;
     }
@@ -281,14 +281,14 @@ clearPending:
     case 53: {
         int wrenchAge;
         int wrenchWindow;
-        if (MOTION > 1 && (MOTION != 4 || !gHeroState.canAttack)) break;
+        if (MOTION > 1 && (MOTION != 4 || !g_hero_state.canAttack)) break;
         if (ACTION != 1) {
-            wrenchAge = gHeroState.actionAge;
+            wrenchAge = g_hero_state.actionAge;
             wrenchWindow = 10;
             if (wrenchAge < 10) wrenchWindow = wrenchAge;
-            if (PadPressedWithin(mask, wrenchWindow, &scratch.wrenchBuffered) && gHeroState.actionObject) {
+            if (PadPressedWithin(mask, wrenchWindow, &scratch.wrenchBuffered) && g_hero_state.actionObject) {
                 SetHeroMoveState(31, 1);
-                if (gHeroState.actionObject) PlayMobySound(0, 0, gHeroState.actionObject);
+                if (g_hero_state.actionObject) PlayMobySound(0, 0, g_hero_state.actionObject);
             }
         }
         break;
@@ -296,17 +296,17 @@ clearPending:
     }
 
 complete:
-    if (gHeroState.transitionTimer == previousTimer) {
+    if (g_hero_state.transitionTimer == previousTimer) {
         if (D_001A7B2E && D_001A7398[1] == 0x36 &&
             ACTION != 0x1D && ACTION != 1 &&
-            !(gHeroState.flags & 0xFFFFFFFF00000000UL)) {
-            FastFloatHelperD(&D_L01_001A7CC4);
+            !(g_hero_state.flags & 0xFFFFFFFF00000000UL)) {
+            math_fast_float_d(&D_L01_001A7CC4);
             if (D_L01_001A7CC4 &&
-                (MOTION < 2 || MOTION == 12 || ((MOTION == 2 || MOTION == 4) && gHeroState.platformMode)) &&
-                (gPadState.buttons.both & 0x800000008UL) == 0x800000008UL)
+                (MOTION < 2 || MOTION == 12 || ((MOTION == 2 || MOTION == 4) && g_hero_state.platformMode)) &&
+                (g_pad_state.buttons.both & 0x800000008UL) == 0x800000008UL)
                 SetHeroMoveState(0x7B, 1);
-            if (gPadState.buttons.word.pressed & 8) D_L01_001A7CC4 = 30;
+            if (g_pad_state.buttons.word.pressed & 8) D_L01_001A7CC4 = 30;
         }
     }
-    return gHeroState.transitionTimer < previousTimer;
+    return g_hero_state.transitionTimer < previousTimer;
 }

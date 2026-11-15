@@ -23,29 +23,29 @@ typedef struct {
     char pad6C[0x3E];
     unsigned short kind;
 } ShotMoby;
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00277258(void *, int, float, void *);
-extern int func_002E5CF8(void *, int, void *);
-extern int func_00283CF0(float);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int,
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int coll_test_point(void *, int, float, void *);
+extern int PlayMobySound(void *, int, void *);
+extern int FloatToInt(float);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern int func_00277F48(void *, int, void *, void *, float);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
-extern void func_L09_003AEE80(void *);
+extern int coll_process_hit(void *, int, void *, void *, float);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
+extern void projectile_update_orientation(void *);
 
 /* Moves a shot, tests it against the level and its targets, and explodes it on contact or timeout. */
 /* This is the update of the shot moby of class 1502. */
-void func_L16_003A8D58(ShotMoby *m)
+void shot_l16_update(ShotMoby *m)
 {
     float start[4], scratch[4], old[4];
     ShotProbe probe;
     ShotState *v = m->vars;
     qcopy(start, m->position);
-    ComputeViewDirection(m->position, scratch, 1);
+    cam_compute_view_direction(m->position, scratch, 1);
     qcopy(old, m->position);
     if (m->state == 0) {
         FastVecAdd(m->position, m->position, v->velocity);
@@ -60,28 +60,28 @@ void func_L16_003A8D58(ShotMoby *m)
         probe.enabled = v->enabled;
         probe.kind = m->kind;
         if (CollLine(old, m->position, 0, v->owner, &probe) ||
-            TestPointAgainstCollision(m->position, 0, 0.2f, v->owner)) {
+            coll_test_point(m->position, 0, 0.2f, v->owner)) {
             PlayMobySound(0, 0, m);
             SpawnExplosionEffects(m, v->velocity, 0, 0.0f, 0.0f, FloatToInt(v->size * 5.0f),
                          FloatToInt(v->size * 4.0f), FloatToInt(v->size * 10.0f),
                          0.0f, 0.0f, 9.0f, v->size, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            ProcessCollisionHit(m->position, 0x10, v->owner, &probe, 1.0f);
-            MarkMobySpawned(m);
+            coll_process_hit(m->position, 0x10, v->owner, &probe, 1.0f);
+            moby_mark_spawned(m);
             return;
         }
     }
-    if (FastFloatHelperD(&v->timer)) {
+    if (math_fast_float_d(&v->timer)) {
         SpawnExplosionEffects(m, v->velocity, 0, 2.0f, v->radius, FloatToInt(v->size * 5.0f),
                      FloatToInt(v->size * 4.0f), FloatToInt(v->size * 10.0f),
                      0.0f, 0.0f, 9.0f, v->size, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-        MarkMobySpawned(m);
+        moby_mark_spawned(m);
         return;
     }
     if (m->position[0] < 2.0f || m->position[0] > 1021.0f ||
         m->position[1] < 2.0f || m->position[1] > 1021.0f ||
         m->position[2] < 2.0f || m->position[2] > 1021.0f) {
-        MarkMobySpawned(m);
+        moby_mark_spawned(m);
         return;
     }
-    UpdateProjectileOrientation(m);
+    projectile_update_orientation(m);
 }

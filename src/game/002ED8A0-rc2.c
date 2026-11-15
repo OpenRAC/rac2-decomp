@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 D_00262958[];
 
 /* Follows a chain of 0x28-byte table entries starting at the given index and returns the last used entry, or -1 if there is none. */
-s32 func_002ED8A0(s32 index) {
+s32 table_find_last_used_entry(s32 index) {
     s32 table;
     s32 offset;
     s8 *nextBase;

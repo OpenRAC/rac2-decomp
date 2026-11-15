@@ -24,9 +24,9 @@ typedef struct {
     Puff2BDBC0 p;
 } Effect2BDBC0;
 extern u8 *D_001F2598[];
-extern Effect2BDBC0 *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
+extern Effect2BDBC0 *part_alloc(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
 extern int func_001163B0(void);
 
 void func_PAL_002BE880(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
@@ -35,11 +35,11 @@ void func_PAL_002BE880(void *pos, void *dir, u32 color, s32 flags, s32 frames, f
     f32 len;
     f32 d;
 
-    e = func_002B9030(0x16);
+    e = part_alloc(0x16);
     if (e != 0) {
         p = &e->p;
         e->color = color;
-        e->f9 = func_00283CF0(4.0f) + 0x70;
+        e->f9 = FloatToInt(4.0f) + 0x70;
         e->f1 = 0;
         e->f3 = 0x44;
         e->size = size * 0.2f;
@@ -47,7 +47,7 @@ void func_PAL_002BE880(void *pos, void *dir, u32 color, s32 flags, s32 frames, f
         e->f2 = *D_001F2598[0];
         e->frames = frames;
         p->frames = frames;
-        len = func_00283CE0(frames);
+        len = IntToFloat(frames);
         d = size - e->size;
         p->color = color;
         p->flags = flags;

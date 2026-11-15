@@ -1,32 +1,33 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { int f0; unsigned char *toggle; int pad8[2]; int flags; } ListEntry;
 typedef struct { char pad0[0x34]; ListEntry *list; int cursor; int timer; } ListMenu;
-extern char D_001F2840[];
-extern int D_00138180[];
-extern float D_001B15A0 __attribute__((sda));
+extern char g_pause_menu_state[];
+extern int g_pad_state[];
+extern float g_screen_fade __attribute__((sda));
 extern unsigned char D_001B1F10_sda __attribute__((sda));
 extern unsigned char D_001B1F10;
-extern void func_002DF190(int, int);
-extern void func_002B49E0(int, int, int, int, int);
-extern void func_0027D330(int);
+extern void snd_play_menu_sound_if_enabled(int, int);
+extern void request_begin_slot(int, int, int, int, int);
+extern void FadeToBlack(int);
 
 int func_PAL_002DBEA8(ListMenu *object)
 {
-    char *root = D_001F2840;
+    char *root = g_pause_menu_state;
     int active = *(ListMenu **)(*(char **)(root + 0x14) + 0xE8) == object;
     int flags;
     int old;
 
     if (object->timer != 0) {
         int t = --object->timer;
-        D_001B15A0 = (float)(t < 5 ? t : 4) * 0.25f;
+        g_screen_fade = (float)(t < 5 ? t : 4) * 0.25f;
         return 0;
     }
     if (!active)
         return 0;
     {
-        int *state = D_00138180;
+        int *state = g_pad_state;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
         if (*(int *)(root + 0x134) == 0)
@@ -34,11 +35,11 @@ int func_PAL_002DBEA8(ListMenu *object)
     }
 proceed:
     {
-        int *state = D_00138180;
+        int *state = g_pad_state;
         flags = state[0x1C4 / 4];
     }
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = g_pause_menu_state;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -61,20 +62,20 @@ finish:
         if (old != 0)
             object->cursor = old - 1;
     }
-    if (D_00138180[0x1C4 / 4] & 0x4000) {
+    if (g_pad_state[0x1C4 / 4] & 0x4000) {
         int cur = object->cursor;
         if (object->list[cur + 1].f0 != 0)
             object->cursor = cur + 1;
     }
-    if (D_00138180[0x1C4 / 4] & 0x40) {
-        func_002DF190(0, 0x11);
+    if (g_pad_state[0x1C4 / 4] & 0x40) {
+        snd_play_menu_sound_if_enabled(0, 0x11);
 
         if (object->list[object->cursor].flags & 1) {
             if (D_001B1F10_sda) {
-                char *root = D_001F2840;
-                func_002B49E0(4, 1, 3, *(int *)(root + 0x14), 0);
+                char *root = g_pause_menu_state;
+                request_begin_slot(4, 1, 3, *(int *)(root + 0x14), 0);
             } else {
-                func_0027D330(4);
+                FadeToBlack(4);
                 object->timer = 0xD;
                 D_001B1F10_sda = !D_001B1F10;
             }
@@ -83,6 +84,6 @@ finish:
         }
     }
     if (object->cursor != old)
-        func_002DF190(1, 0x11);
+        snd_play_menu_sound_if_enabled(1, 0x11);
     return 0;
 }

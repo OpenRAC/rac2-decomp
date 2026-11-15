@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_001A79F0;
-extern float func_00282E48(void *, void *);
-extern float func_002AA458(void *, void *, void *, float, float, float);
-extern float func_00283B98(float, float);
+extern int g_current_map_index;
+extern float fast_vec_dist(void *, void *);
+extern float vec_spring_to_target(void *, void *, void *, float, float, float);
+extern float FastAddRotations(float, float);
 extern int func_L05_0037AAC8(int);
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 extern int func_0030CBA8(int);
-extern void func_00326198(int, int);
+extern void thrown_object_update(int, int);
 typedef struct L05Slot40 {
     int state;
     int next;
@@ -19,8 +19,8 @@ typedef struct L05Slot40 {
 } L05Slot40;
 extern L05Slot40 D_002A1800[];
 extern void func_0029CC50(int, int, int);
-extern int func_002E5DA0(int, int, char *, int);
-extern void func_0029F338(void *);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern void moby_mark_spawned(void *);
 extern int D_L05_001AFAA0 __attribute__((sda));
 
 extern void func_L05_003CD598(char *);
@@ -35,8 +35,8 @@ void func_L05_003CD280(char *object)
     if (D_L05_001AFAA0 != 0) {
         scale = fast_vec_dist((void *)(D_L05_001AFAA0 + 0x10), object + 0x10);
 
-        if (gCurrentMapIndex == 0x14) {
-            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+        if (g_current_map_index == 0x14) {
+            vec_spring_to_target(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -51,7 +51,7 @@ void func_L05_003CD280(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
     check_scale:
@@ -59,17 +59,17 @@ void func_L05_003CD280(char *object)
             int slot = func_L05_0037AAC8(6);
             int add = D_002A1800[slot].limit;
 
-            if (RandomIntBelow(4) != 0) {
-                UpdateThrownObject(func_0030CBA8(0x1283), -1);
+            if (math_random_int_below(4) != 0) {
+                thrown_object_update(func_0030CBA8(0x1283), -1);
                 add = 0x21;
             } else {
-                UpdateThrownObject(func_0030CBA8(0x1284), -1);
+                thrown_object_update(func_0030CBA8(0x1284), -1);
             }
-            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
+            snd_play_from_class_bank(0xC, 0, object, 0xFBF);
             D_002A1800[slot].value += add;
             if (D_002A1800[slot].limit < D_002A1800[slot].value)
                 D_002A1800[slot].value = D_002A1800[slot].limit;
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
     }

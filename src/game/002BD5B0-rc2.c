@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -57,21 +58,21 @@ typedef struct Fr {
     TI pad;
 } Fr;
 
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern void func_002830C0(f32 *, f32 *, s8 *);
-extern void func_00282CF0(f32 *, f32 *, f32 *);
-extern void func_0029FCC0(s8 *, s32, f32 *);
-extern void func_00282F20(f32 *, f32 *, f32);
-extern void func_00282CC0(f32 *, f32 *, f32 *);
-extern f32 func_00283B98(f32, f32);
-extern s32 func_00283CF0(f32);
-extern f32 func_002AB0E8(f32 *, s8 *, f32 *, s32);
-extern s32 func_00282978(s8 *);
-extern void func_002B9180(Obj *);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void transform_vector(f32 *, f32 *, s8 *);
+extern void FastVecSub(f32 *, f32 *, f32 *);
+extern void moby_transform_joint_to_world(s8 *, s32, f32 *);
+extern void vec_scale_to_length(f32 *, f32 *, f32);
+extern void FastVecAdd(f32 *, f32 *, f32 *);
+extern f32 FastAddRotations(f32, f32);
+extern s32 FloatToInt(f32);
+extern f32 mat_get_product_element(f32 *, s8 *, f32 *, s32);
+extern s32 FastDecTimer(s8 *);
+extern void part_kill(Obj *);
 
 /* Updates a small drifting particle that hops off the ground and slowly fades out. It disappears when it has faded away or its timer runs out. */
-void func_002BD5B0(Obj *particle)
+void part_update_bouncing_fade(Obj *particle)
 {
     Sub *state = &particle->sub;
     Fr work;
@@ -82,38 +83,38 @@ void func_002BD5B0(Obj *particle)
         work.m0 = *(TI *)matrix;
         work.m1 = *(TI *)(matrix + 0x10);
         work.m2 = *(TI *)(matrix + 0x20);
-        work.a[1] = FastSinOrCosB(state->f14) * state->f10;
-        work.a[2] = FastSinOrCosA(state->f14) * state->f10;
+        work.a[1] = math_fast_sin_or_cos_b(state->f14) * state->f10;
+        work.a[2] = math_fast_sin_or_cos_a(state->f14) * state->f10;
         work.a[0] = 0.0f;
         work.a[3] = 0.0f;
         transform_vector(work.b, work.a, (s8 *)&work.m0);
         FastVecSub(vec, vec, work.b);
         state->f1C = state->f1C + 0.0600100006f;
-        TransformMobyJointToWorld(state->p18, 0, work.c);
+        moby_transform_joint_to_world(state->p18, 0, work.c);
         FastVecSub(work.a, work.c, vec);
         vec_scale_to_length(work.a, work.a, state->f1C);
         FastVecAdd(vec, vec, work.a);
         state->f14 = FastAddRotations(state->f14, 0.5235988f);
         state->f10 = state->f10 * 0.9f;
-        work.a[1] = FastSinOrCosB(state->f14) * state->f10;
-        work.a[2] = FastSinOrCosA(state->f14) * state->f10;
+        work.a[1] = math_fast_sin_or_cos_b(state->f14) * state->f10;
+        work.a[2] = math_fast_sin_or_cos_a(state->f14) * state->f10;
         work.a[0] = 0.0f;
         work.a[3] = 0.0f;
         transform_vector(work.b, work.a, (s8 *)&work.m0);
         FastVecAdd(vec, vec, work.b);
-        if (GetMatrixProductElement(work.c, state->p18 + 0xC0, vec, 1) > 0.0f) {
-            KillParticle(particle);
+        if (mat_get_product_element(work.c, state->p18 + 0xC0, vec, 1) > 0.0f) {
+            part_kill(particle);
             return;
         }
     }
 
     state->f04 = state->f04 + state->f0C * 0.011f;
     if (state->f04 <= 0.0f) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     if (FastDecTimer((s8 *)particle + 0xA) != 0) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     if (1.0f <= state->f04) {

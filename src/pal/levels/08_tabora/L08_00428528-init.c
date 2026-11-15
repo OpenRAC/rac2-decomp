@@ -66,39 +66,39 @@ typedef struct {
     short f1BE;
     float f1C0;
 } InitState1348;
-extern int func_00283CF0(f32);
-extern f32 func_002A7878(f32, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L08_00422900(Ent *);
+extern int FloatToInt(f32);
+extern f32 math_random_float_range(f32, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void vehicle_compute_height_limits(Ent *);
 extern int D_L08_001B2508[] __attribute__((sda));
 extern void *D_L08_001FE7C0[];
-extern float func_L08_0032EF80(void *, int, int, int, int);
-extern void func_L01_003377C8(void *);
+extern float coll_point_depth_in_volumes(void *, int, int, int, int);
+extern void path_l01_compute_segment_lengths(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_L08_00422EE0(Ent *);
+extern void moby_set_state(void *, int, int);
+extern void sandfly_pick_random_target(Ent *);
 
 void func_PAL_L08_00428900(u8 *object)
 {
     InitState1348 *state = *(InitState1348 **)(object + 0x68);
     float position[4], radius;
-    state->f48 = func_00283CF0(15.0f);
-    state->f4A = func_00283CF0(3.2f);
+    state->f48 = FloatToInt(15.0f);
+    state->f4A = FloatToInt(3.2f);
     state->f29 = 1;
     if (!D_L08_001B2508[0]) **(int **)((char *)state+0x1CC)=0;
     qcopy((char *)state+0x150,object+0x10);
-    func_L08_00422900((Ent *)object);
+    vehicle_compute_height_limits((Ent *)object);
     *(float *)(object+0x18)=state->f1B0;
     qcopy((char *)state+0x150,object+0x10);
     state->f188=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
-    radius=func_L08_0032EF80(position,state->f190,state->f198,state->f194,-1);
-    if(radius>0) object[0x30]=func_00283CF0(radius+2.0f);
+    radius=coll_point_depth_in_volumes(position,state->f190,state->f198,state->f194,-1);
+    if(radius>0) object[0x30]=FloatToInt(radius+2.0f);
     state->f188=state->f189=object[0x30];
     *(V4 *)position=*(V4 *)(object+0x10);
-    radius=func_L08_0032EF80(position,state->f19C,state->f1A4,state->f1A0,-1);
-    if(radius>0) state->f188=func_00283CF0(radius+2.0f);
-    if(state->f1A8!=-1) func_L01_003377C8(D_L08_001FE7C0[state->f1A8]);
+    radius=coll_point_depth_in_volumes(position,state->f19C,state->f1A4,state->f1A0,-1);
+    if(radius>0) state->f188=FloatToInt(radius+2.0f);
+    if(state->f1A8!=-1) path_l01_compute_segment_lengths(D_L08_001FE7C0[state->f1A8]);
     *(void **)((char *)state+0x10)=(char *)state+0x50;
     state->f60=9; state->f98=-1;
     state->f88=0; state->f6A=0;
@@ -119,22 +119,22 @@ void func_PAL_L08_00428900(u8 *object)
         *(unsigned short *)(object+0x34)&=0xEFFF;
         if((unsigned char)object[0x43]!=1) func_PAL_002A7E68(object,1,0,3);
         object[0x31]=0; *(unsigned short *)(object+0x34)|=1;
-        func_002A7750(object,1,-1); break;
+        moby_set_state(object,1,-1); break;
     case 1:
         *(float *)(object+0x18)=state->f1B0+2.7f;
         qcopy((char *)state+0x150,object+0x10); qzero_nc((char *)state+0x170);
-        func_L08_00422EE0((Ent *)object);
+        sandfly_pick_random_target((Ent *)object);
         *(unsigned short *)(object+0x34)|=0x1000;
         if((unsigned char)object[0x43]!=1) func_PAL_002A7E68(object,1,0,3);
-        func_002A7750(object,6,0); break;
+        moby_set_state(object,6,0); break;
     case 2:
         qcopy((char *)state+0x170,(char *)state+0xD0);
-        func_00282CC0(object+0x10,object+0x10,(char *)state+0x170);
+        FastVecAdd(object+0x10,object+0x10,(char *)state+0x170);
         qcopy((char *)state+0x150,object+0x10);
         if((unsigned char)object[0x43]!=5) func_PAL_002A7E68(object,5,0,3);
         object[0x31]=1;
         *(unsigned short *)(object+0x34)=(*(unsigned short *)(object+0x34)|0x1000)&0xFFFE;
-        func_002A7750(object,4,-1); break;
+        moby_set_state(object,4,-1); break;
     }
-    state->f15C=func_002A7878(0,1);
+    state->f15C=math_random_float_range(0,1);
 }

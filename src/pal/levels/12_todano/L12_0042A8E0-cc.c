@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L12_0042A8E0, the PAL copy of func_L12_00425448: the same C, where scale func_002A7820(D_L12_001B20C0, (s32)D_L12_001B20C4). */
 #include "common.h"
 
@@ -7,9 +8,9 @@
    high-part register of its own; the flag would change the other bodies of the old unit. */
 
 extern u8 *D_L12_001B20C4;
-extern int func_00282948(void *);
-extern s32 func_002A7820(s32, s32);
-extern s32 func_002E5CF8(s32, s32, void *);
+extern int math_fast_float_d(void *);
+extern s32 math_random_int_range(s32, s32);
+extern s32 PlayMobySound(s32, s32, void *);
 extern s32 D_L12_001B20C0 __attribute__((sda));
 
 /* Starts the sub-object's timer when it has finished, then tells the engine to
@@ -17,8 +18,8 @@ extern s32 D_L12_001B20C0 __attribute__((sda));
 void func_PAL_L12_0042A8E0(u8 *a0) {
     u8 *s0 = *(u8 **)(a0 + 0x68);
 
-    if (func_00282948(s0 + 0x2C0) != 0) {
-        *(s32 *)(s0 + 0x2C0) = (((int)(func_002A7820(D_L12_001B20C0, (s32)D_L12_001B20C4)) * 5 + 2) / 6);
-        func_002E5CF8(1, 0, a0);
+    if (math_fast_float_d(s0 + 0x2C0) != 0) {
+        *(s32 *)(s0 + 0x2C0) = (((int)(math_random_int_range(D_L12_001B20C0, (s32)D_L12_001B20C4)) * 5 + 2) / 6);
+        PlayMobySound(1, 0, a0);
     }
 }

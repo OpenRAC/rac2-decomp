@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,14 +25,14 @@
  */
 #include "common.h"
 
-extern f32 func_00282C10(f32);
+extern f32 square_root(f32);
 struct Ord3 {
     s32 w[3];
 };
 extern struct Ord3 D_001A9EA0;
 
 /* Turns a rotation matrix into a quaternion. */
-void func_002AB378(f32 *quat, f32 *matrix) {
+void mat_to_quaternion(f32 *quat, f32 *matrix) {
     struct Ord3 nextAxis = D_001A9EA0;
     f32 m[3][3];
     f32 trace;

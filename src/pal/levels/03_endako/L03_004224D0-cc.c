@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L03_004224D0, the PAL copy of func_L03_0041D128: the same C, where scale func_31BA30(0x28, 0x32); lit 0x6 becomes 0x5; rename func_31BA30 becomes func_002A7820. */
 
 typedef unsigned char u8;
@@ -6,10 +7,10 @@ typedef unsigned int u32;
 typedef signed short s16;
 typedef int s32;
 
-extern int func_002A7820(int a, int b);
+extern int math_random_int_range(int a, int b);
 /* The entity's per-frame sub-states; several are still INCLUDE_ASM markers
  * further down this file, hence the prototypes that repeat their definition. */
-extern void func_L03_003F6610(u8 *entity);
+extern void endako_boss_blend_parts(u8 *entity);
 /* `lui $v0,%hi ; lw $v0,%lo($v0)` in the retail: one register, no HIGH/LO_SUM
  * split, which is what the sda attribute (SYMBOL_REF_FLAG) gives in -G0. */
 extern u8 *D_L03_001B2A1C __attribute__((sda));
@@ -55,7 +56,7 @@ extern Entry41D1D8 *D_L03_001FE700[];
 /* func_L03_003F64E8 lives in L03_003F64E8-g8.c */
 
 /* steps the entity's two blend channels and its rate */
-void func_L03_003F6610(u8 *entity);
+void endako_boss_blend_parts(u8 *entity);
 
 /* hands every record of the stream at slot 0xAC to func_3A2F48 */
 /* func_L03_003F6748 is defined in L03_003F6748-g8.c. */
@@ -75,7 +76,7 @@ typedef struct {
     s32 active;
 } L03VoiceState;
 
-extern L03VoiceState D_001A63A8;
+extern L03VoiceState g_music_state;
 
 /* Picks the free voice slot the entity asks for, unless the engine is busy
    or already holds that slot. */
@@ -116,7 +117,7 @@ void func_PAL_L03_004224D0(u8 *entity) {
             if (*(short *)(record + 0xAA) == 0xff3) {
                 u8 *owner = *(u8 **)(record + 0x68);
 
-                *(int *)(owner + 0x2D8) = (((int)(func_002A7820(0x28, 0x32)) * 5 + 2) / 6);
+                *(int *)(owner + 0x2D8) = (((int)(math_random_int_range(0x28, 0x32)) * 5 + 2) / 6);
             }
         }
         if ((s16)p->raw < 0) break;

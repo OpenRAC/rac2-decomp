@@ -1,15 +1,16 @@
+#include "names.h"
 /* Shares the typed hero-motion layout with L04_002CC748-movement.c.
  * The dedicated -g profile retains retail padding before the slope division.
  */
 #include "common.h"
 
-extern unsigned char D_00189E20[];
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern unsigned char g_hero_state[];
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecSub(float *, float *, float *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 typedef int MovementQuadword __attribute__((mode(TI)));
 typedef struct {
@@ -54,21 +55,21 @@ typedef struct {
     int control_mode;
 } MovementHero;
 #define MOVE_HERO (*(MovementHero *)&D_00189E20)
-extern void func_L00_002D4140(int, void *, void *);
-extern float func_L00_002D3A58(void *);
-extern float func_L00_002D3B00(void *);
-extern void func_L00_002D3BD8(void *, void *, float);
-extern void func_L00_002D3B58(void *, void *, float);
-extern void func_L00_002D3960(void *, void *);
-extern void func_00282C88(void *);
-extern float func_00282E20(void *);
-extern void func_00282F70(void *, void *, float);
-extern void func_L00_002B5A88(void);
-extern void func_L00_002B4900(void);
-extern void func_L00_002B5250(void);
-extern float func_L00_002B5590(void *);
+extern void UpdateHeroAttachment(int, void *, void *);
+extern float cam_get_view_space_vector_length(void *);
+extern float cam_get_view_space_height(void *);
+extern void cam_set_view_space_vector_length(void *, void *, float);
+extern void cam_set_view_space_height(void *, void *, float);
+extern void cam_project_vector_onto_view_plane(void *, void *);
+extern void vec_clear_128(void *);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern void hero_resolve_collision_with_rewind(void);
+extern void hero_l00_update_ground_contact(void);
+extern void EaseHeroPositionToGoal(void);
+extern float hero_get_speed_along_forward(void *);
 /* Apply the hero's velocity and surface motion, then measure resolved displacement. */
-void func_L00_002B5B60(void) {
+void ApplyHeroMotionAndResolveCollisions(void) {
     float old[4], horizontal[4], flat[4];
 
     qcopy(old, &MOVE_HERO.position);
@@ -77,20 +78,20 @@ void func_L00_002B5B60(void) {
     if (MOVE_HERO.state == 0x14 || MOVE_HERO.state == 0x5B ||
         MOVE_HERO.state == 0x58 || MOVE_HERO.state == 0x81) {
         if (MOVE_HERO.air_frames == 0) {
-            if (GetViewSpaceVectorLength(&MOVE_HERO.velocity) > MOVE_HERO.speed_limit - 0.02f) {
-                SetViewSpaceVectorLength(&MOVE_HERO.velocity, &MOVE_HERO.velocity,
+            if (cam_get_view_space_vector_length(&MOVE_HERO.velocity) > MOVE_HERO.speed_limit - 0.02f) {
+                cam_set_view_space_vector_length(&MOVE_HERO.velocity, &MOVE_HERO.velocity,
                                   MOVE_HERO.speed_limit - 0.02f);
             }
         }
-        if (GetViewSpaceHeight(&MOVE_HERO.velocity) < -MOVE_HERO.fall_speed_limit) {
+        if (cam_get_view_space_height(&MOVE_HERO.velocity) < -MOVE_HERO.fall_speed_limit) {
             float x = -MOVE_HERO.fall_speed_limit - 0.02f;
             if (x > 0.0f) x = 0.0f;
-            SetViewSpaceHeight(&MOVE_HERO.velocity, &MOVE_HERO.velocity, x);
+            cam_set_view_space_height(&MOVE_HERO.velocity, &MOVE_HERO.velocity, x);
         }
     } else if (MOVE_HERO.control_mode == 15) {
         if (MOVE_HERO.air_frames == 0) {
             if (vec_length_xy(&MOVE_HERO.velocity) > MOVE_HERO.speed_limit - 0.02f) {
-                FastVectorNormalizeHelper(&MOVE_HERO.velocity, &MOVE_HERO.velocity,
+                vec_fast_normalize_helper(&MOVE_HERO.velocity, &MOVE_HERO.velocity,
                              MOVE_HERO.speed_limit - 0.02f);
             }
         }
@@ -107,16 +108,16 @@ void func_L00_002B5B60(void) {
 integrate:
     FastVecAdd(&MOVE_HERO.position, &MOVE_HERO.position, &MOVE_HERO.velocity);
     FastVecAdd(&MOVE_HERO.position, &MOVE_HERO.position, &MOVE_HERO.move_impulse);
-    ClearVector128(&MOVE_HERO.move_impulse);
+    vec_clear_128(&MOVE_HERO.move_impulse);
     MOVE_HERO.collision_flag = 0;
     MOVE_HERO.collision_count = 0;
     if (FastVecLength(&MOVE_HERO.surface_motion) <= 0.0001f) {
-        ResolveHeroCollisionWithRewind();
-        UpdateHeroGroundContact_L00();
+        hero_resolve_collision_with_rewind();
+        hero_l00_update_ground_contact();
         FastVecSub((float *)&MOVE_HERO.displacement, (float *)&MOVE_HERO.position, old);
         EaseHeroPositionToGoal();
     } else {
-        UpdateHeroGroundContact_L00();
+        hero_l00_update_ground_contact();
     }
     FastVecSub((float *)&MOVE_HERO.resolved_velocity, (float *)&MOVE_HERO.position, old);
     qcopy(&MOVE_HERO.resolved_velocity_planar, &MOVE_HERO.resolved_velocity);
@@ -129,8 +130,8 @@ integrate:
         vec_scale_to_length((float *)&MOVE_HERO.resolved_velocity, (float *)&MOVE_HERO.velocity, x);
     }
     qcopy(horizontal, &MOVE_HERO.velocity);
-    ProjectVectorOntoViewPlane(horizontal, horizontal);
-    ProjectVectorOntoViewPlane(&MOVE_HERO.resolved_velocity_planar, &MOVE_HERO.resolved_velocity_planar);
+    cam_project_vector_onto_view_plane(horizontal, horizontal);
+    cam_project_vector_onto_view_plane(&MOVE_HERO.resolved_velocity_planar, &MOVE_HERO.resolved_velocity_planar);
     vec_scale_to_length((float *)&MOVE_HERO.resolved_velocity_planar,
                   (float *)&MOVE_HERO.resolved_velocity_planar, 1.0f);
     {
@@ -139,8 +140,8 @@ integrate:
         vec_scale_to_length((float *)&MOVE_HERO.resolved_velocity_planar, horizontal, x);
     }
     qcopy(flat, &MOVE_HERO.velocity);
-    SetViewSpaceVectorLength(flat, flat, 0.0f);
-    SetViewSpaceVectorLength(&MOVE_HERO.resolved_velocity_xy, &MOVE_HERO.resolved_velocity_xy, 0.0f);
+    cam_set_view_space_vector_length(flat, flat, 0.0f);
+    cam_set_view_space_vector_length(&MOVE_HERO.resolved_velocity_xy, &MOVE_HERO.resolved_velocity_xy, 0.0f);
     vec_scale_to_length((float *)&MOVE_HERO.resolved_velocity_xy,
                   (float *)&MOVE_HERO.resolved_velocity_xy, 1.0f);
     {
@@ -149,20 +150,20 @@ integrate:
         vec_scale_to_length((float *)&MOVE_HERO.resolved_velocity_xy, flat, x);
     }
     MOVE_HERO.speed = FastVecLength(&MOVE_HERO.resolved_velocity);
-    MOVE_HERO.planar_speed = GetViewSpaceVectorLength(&MOVE_HERO.resolved_velocity);
+    MOVE_HERO.planar_speed = cam_get_view_space_vector_length(&MOVE_HERO.resolved_velocity);
     *(MovementQuadword *)horizontal = *(MovementQuadword *)&MOVE_HERO.resolved_velocity;
-    MOVE_HERO.forward_speed = GetSpeedAlongHeroForward(horizontal);
-    MOVE_HERO.vertical_speed = GetViewSpaceHeight(&MOVE_HERO.resolved_velocity);
+    MOVE_HERO.forward_speed = hero_get_speed_along_forward(horizontal);
+    MOVE_HERO.vertical_speed = cam_get_view_space_height(&MOVE_HERO.resolved_velocity);
     if (MOVE_HERO.forward_speed < 0.0f) MOVE_HERO.forward_speed = 0.0f;
     qcopy(horizontal, &MOVE_HERO.position);
     if (FastVecLength(&MOVE_HERO.surface_motion) > 0.0001f) {
         float x;
         FastVecAdd(&MOVE_HERO.position, &MOVE_HERO.position, &MOVE_HERO.surface_motion);
         x = MOVE_HERO.surface_motion.w;
-        ClearVector128(&MOVE_HERO.surface_motion);
+        vec_clear_128(&MOVE_HERO.surface_motion);
         MOVE_HERO.surface_motion.w = x;
-        ResolveHeroCollisionWithRewind();
-        UpdateHeroGroundContact_L00();
+        hero_resolve_collision_with_rewind();
+        hero_l00_update_ground_contact();
         FastVecSub((float *)&MOVE_HERO.displacement, (float *)&MOVE_HERO.position, old);
         EaseHeroPositionToGoal();
     }

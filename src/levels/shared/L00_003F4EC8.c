@@ -3,33 +3,33 @@
 
 typedef int MovingEffectWord128 __attribute__((mode(TI)));
 typedef union { MovingEffectWord128 word; float values[4]; } MovingEffectVector;
-extern int func_002B4038(int, int);
-extern void func_0029F338(void *);
-extern void func_00300190(void *, void *);
-extern void func_L00_003F5660(char *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_L00_003F5750(char *, void *);
-extern void func_L00_003F6900(char *, void *);
-extern int func_L00_003F5238(char *, void *);
-extern int func_00282948(void *);
+extern int save_is_record_value(int, int);
+extern void moby_mark_spawned(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void vaporizer_update_passes(char *);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern void lerp_vector(void *, void *, void *, float);
+extern void vaporizer_add_chain_joint(char *, void *);
+extern void vaporizer_bolt_spawn_spark(char *, void *);
+extern int vaporizer_bolt_test_hit(char *, void *);
+extern int math_fast_float_d(void *);
 
 /* Updates a Vaporizer bolt moby (class 3319). It moves each frame, leaves a trail and sparks
    behind it, and ends when it hits something, leaves the map, or runs out of time. */
-void func_L00_003F4EC8(unsigned char *object) {
+void vaporizer_bolt_update(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     MovingEffectVector previous, point;
     int i;
     float *position;
-    if (!IsSavedRecordValue(0xC04 /* Vaporizer */, *(short *)(state + 0x1A))) {
-        MarkMobySpawned(object);
+    if (!save_is_record_value(0xC04 /* Vaporizer */, *(short *)(state + 0x1A))) {
+        moby_mark_spawned(object);
         return;
     }
     switch ((unsigned char)object[0x20]) {
     case 2:
-        TransformVectorOrCopy(object + 0x10, object + 0x10);
-        UpdateVaporizerMoby_L00_2(object);
+        vec_transform_or_copy(object + 0x10, object + 0x10);
+        vaporizer_update_passes(object);
         break;
     default:
     if (*(int *)(state + 0x28) == 1)
@@ -44,11 +44,11 @@ void func_L00_003F4EC8(unsigned char *object) {
         object[0x20] = 1;
     for (i = 0; i < 4; i++) {
         lerp_vector(&point, &previous, position, IntToFloat(i) * 0.25f);
-        AddVaporizerChainJoint(object, &point);
+        vaporizer_add_chain_joint(object, &point);
     }
-    SpawnBoltSpark(object, position);
+    vaporizer_bolt_spawn_spark(object, position);
     lerp_vector(&point, &previous, position, 0.5f);
-    SpawnBoltSpark(object, &point);
+    vaporizer_bolt_spawn_spark(object, &point);
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f ||
         *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f ||
         *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
@@ -62,10 +62,10 @@ void func_L00_003F4EC8(unsigned char *object) {
             if (*(float *)(object + 0x18) > hi) *(float *)(object + 0x18) = hi;
         }
         object[0x20] = 2;
-    } else if (TestBoltHit(object, &previous) || FastFloatHelperD(state + 0x10)) {
+    } else if (vaporizer_bolt_test_hit(object, &previous) || math_fast_float_d(state + 0x10)) {
         object[0x20] = 2;
     } else {
-        UpdateVaporizerMoby_L00_2(object);
+        vaporizer_update_passes(object);
     }
     break;
     }

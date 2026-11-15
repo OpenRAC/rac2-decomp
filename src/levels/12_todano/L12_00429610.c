@@ -1,8 +1,8 @@
 #include "common.h"
-extern int func_002A77E0(int);
-extern int func_00283CF0(float);
+extern int math_random_int_below(int);
+extern int FloatToInt(float);
 /* The qualified Notak particle family preserves these five GPR/four FP banks. */
-extern unsigned char *func_002BDCE8(void *,float,float,float,int,void *,float,unsigned int,int);
+extern unsigned char *SpawnSpinningSparkParticle(void *,float,float,float,int,void *,float,unsigned int,int);
 
 /* Measured prefix of the spark payload; no owning allocation size is asserted. */
 struct SparkPayloadPrefix {
@@ -14,7 +14,7 @@ struct SparkPayloadPrefix {
 };
 
 /* Spawns a small spray of sparks below the object, going up or down. */
-void func_L12_00429610(unsigned char *object,int positive)
+void part_l12_spawn_spark_spray(unsigned char *object,int positive)
 {
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -24,8 +24,8 @@ void func_L12_00429610(unsigned char *object,int positive)
     velocity[2]=positive?0.5f:-0.5f;
     velocity[1]=0.0f;
     velocity[3]=1.0f;
-    rotation=RandomIntBelow(16);
-    if(RandomIntBelow(2))
+    rotation=math_random_int_below(16);
+    if(math_random_int_below(2))
         rotation=-rotation;
     qcopy(position,object+0x10);
     position[2]-=0.25f;
@@ -57,7 +57,7 @@ void func_L12_00429610(unsigned char *object,int positive)
         int brightness=FloatToInt(4.0f);
         *(unsigned short *)(particle+0xA)=5;
         particle[9]=brightness+0x70;
-        particle[8]=RandomIntBelow(255);
+        particle[8]=math_random_int_below(255);
         state->mode=2;
         state->alpha=0xDF;
         state->lifetime=first[0xA];

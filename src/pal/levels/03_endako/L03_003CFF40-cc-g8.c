@@ -1,9 +1,10 @@
+#include "names.h"
 /* func_PAL_L03_003CFF40, the PAL copy of func_L03_003CBE58: the same C, where scale D_L03_001B0438; wrap D_L03_001B0438 (((int)({e}) * 5 + 2) / 6); lit 1.6964601f becomes 2.035752f. */
 
 #include "common.h"
 
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 /* case 0 makes the object opaque and moves it to state 1; case 1 scrolls the three
    offsets in its vars by the table's rates per frame (wrapping below -1) and queues
    its draw callback with the object as argument (AddDrawCallback in rac1-decomp) */
@@ -35,16 +36,16 @@ typedef struct {
    ordinary flow, not only in a delay slot), the state word is not: the retail
    reads it with an absolute lui/%lo pair and clears it from a delay slot. */
 extern L03_003D21F8_Obj *D_L03_001B0670 __attribute__((sda));
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(char *a0, char *a1, char *a2);
-extern void func_00283698(char *a0, char *a1);
-extern s32  func_002B38B8(char *a0);
-extern s32  func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern void func_002E59F8(s32 a0);
-extern void func_L01_003115E8(int a0, int a1);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(char *a0, char *a1, char *a2);
+extern void matrix_from_basis_rows(char *a0, char *a1);
+extern s32  flag_is_third_pending_set(char *a0);
+extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
+extern void snd_stop_voice(s32 a0);
+extern void moby_set_state_in_list(int a0, int a1);
 extern u8  *D_L03_001B2A1C;
-extern u8   D_00188660[];
+extern u8   g_sound_state[];
 extern s32  D_L03_001B0438 __attribute__((sda));
 extern f32  D_L03_001B043C __attribute__((sda));
 
@@ -61,29 +62,29 @@ void func_PAL_L03_003CFF40(char *a0)
     switch (*(u8 *)(s2 + 0x20)) {
     case 0:
         if (*(s32 *)(s1 + 0x70) != -1) {
-            func_002A7750(s2, 2, -1);
+            moby_set_state(s2, 2, -1);
             s0 = s1 + 0x60;
-            func_00282CF0(s0, D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
+            FastVecSub(s0, D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
             *(s32 *)(s1 + 0x7C) = -1;
             *(s32 *)(s1 + 0x78) = 0;
-            func_00283698(buf, s2 + 0xC0);
-            func_00283098(s0, s0, buf);
+            matrix_from_basis_rows(buf, s2 + 0xC0);
+            matrix_mul_vec3(s0, s0, buf);
         } else {
-            func_002A7750(s2, 1, -1);
+            moby_set_state(s2, 1, -1);
         }
         break;
     case 2: {
         char *p;
 
-        if (func_002B38B8(D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100) == 0) {
+        if (flag_is_third_pending_set(D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100) == 0) {
             break;
         }
-        p = D_00188660 + *(s32 *)(s1 + 0x7C) * 0x70;
+        p = g_sound_state + *(s32 *)(s1 + 0x7C) * 0x70;
         if (*(char **)(p + 0x88) != s2 || *(u8 *)(p + 0x74) == 0) {
-            *(s32 *)(s1 + 0x7C) = func_002E5CF8(0, 4, s2);
+            *(s32 *)(s1 + 0x7C) = PlayMobySound(0, 4, s2);
         }
-        func_L01_003115E8(*(u8 *)(s2 + 0x21), 4);
-        func_002A7750(s2, 3, -1);
+        moby_set_state_in_list(*(u8 *)(s2 + 0x21), 4);
+        moby_set_state(s2, 3, -1);
         break;
     }
     case 3: {
@@ -99,13 +100,13 @@ void func_PAL_L03_003CFF40(char *a0)
         if (1.69646013f < t) {
             if (*(s32 *)(s1 + 0x78) < 5) {
                 if (*(s32 *)(s1 + 0x7C) != -1) {
-                    p = D_00188660 + *(s32 *)(s1 + 0x7C) * 0x70;
+                    p = g_sound_state + *(s32 *)(s1 + 0x7C) * 0x70;
                     if (*(char **)(p + 0x88) == s2 && *(u8 *)(p + 0x74) != 0) {
-                        func_002E59F8(*(s32 *)(s1 + 0x7C));
+                        snd_stop_voice(*(s32 *)(s1 + 0x7C));
                     }
                 }
                 *(s32 *)(s1 + 0x7C) = -1;
-                func_002E5CF8(1, 0, s2);
+                PlayMobySound(1, 0, s2);
                 (*(s32 *)(s1 + 0x78))++;
             }
             *(f32 *)(s2 + 0xF4) = 1.69646013f;
@@ -114,12 +115,12 @@ void func_PAL_L03_003CFF40(char *a0)
                 *(f32 *)(s1 + 0x74) = v * -0.5f;
             } else {
                 *(s32 *)(s1 + 0x74) = 0;    /* the retail stores the word, not the float */
-                func_002A7750(s2, 5, -1);
+                moby_set_state(s2, 5, -1);
             }
         }
         q = D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10;
-        func_00283098(q, s1 + 0x60, s2 + 0xC0);
-        func_00282CC0(q, q, s2 + 0x10);
+        matrix_mul_vec3(q, s1 + 0x60, s2 + 0xC0);
+        FastVecAdd(q, q, s2 + 0x10);
         break;
     }
     case 4: {
@@ -139,7 +140,7 @@ void func_PAL_L03_003CFF40(char *a0)
                 *(f32 *)(s1 + 0x74) = v * -0.5f;
             } else {
                 *(s32 *)(s1 + 0x74) = 0;    /* the retail stores the word, not the float */
-                func_002A7750(s2, 5, -1);
+                moby_set_state(s2, 5, -1);
             }
         }
         break;
@@ -155,6 +156,6 @@ typedef struct {
 } L03_22C8Entry;
 
 extern L03_22C8Entry *D_L03_001FE700[];
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);

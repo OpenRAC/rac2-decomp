@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int count0;
@@ -21,10 +22,10 @@ typedef struct {
     char padBC[0xC0 - 0xBC];
     float mtx[4];
 } Obj_410508;
-extern int func_L00_002D4040(int);
-extern void func_L00_002D3F30(int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern int get_ammo(int);
+extern void weapon_spend_ammo(int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern int func_PAL_L00_003AF190(int a, void *b, int c, char *d, float e, float f, float g, float h);
 extern float D_L00_001B12C0[4][4] __attribute__((sda));
 extern int D_L00_001B2D58 __attribute__((nosda));
@@ -38,7 +39,7 @@ void func_PAL_L00_00415310(Obj_410508 *self)
     int n;
     Obj_410508 *r;
 
-    if (func_L00_002D4040(-1) == 0) {
+    if (get_ammo(-1) == 0) {
         st->n = -1;
         return;
     }
@@ -47,8 +48,8 @@ void func_PAL_L00_00415310(Obj_410508 *self)
     if (sign == 0.0f)
         sign = -1.0f;
     st->n = n - 1;
-    func_00283098(v, D_L00_001B12C0[n], self->mtx);
-    func_00282CC0(w, self->pos, v);
+    matrix_mul_vec3(v, D_L00_001B12C0[n], self->mtx);
+    FastVecAdd(w, self->pos, v);
     if (st->n == -1) {
         if (st->count0 != 0) {
             v[2] = 0.0f;
@@ -58,7 +59,7 @@ void func_PAL_L00_00415310(Obj_410508 *self)
     r = (Obj_410508 *)func_PAL_L00_003AF190((int)self, w, st->count0, (char *)v, st->f8, 4.0f, 8.0f, 0.5f);
     if (r != 0) {
         Sub_410508 *p;
-        func_L00_002D3F30(-1, 1);
+        weapon_spend_ammo(-1, 1);
         D_L00_001B2D58 = 1;
         r->owner = self;
         p = r->node;

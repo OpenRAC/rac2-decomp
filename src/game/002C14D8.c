@@ -21,21 +21,21 @@ typedef struct {
     f32 position[4];
     SmokeMotion motion;
 } SmokeParticle;
-extern void func_002B9180(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00282CC0(void *, void *, void *);
+extern void part_kill(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Age a smoke particle: fade its colour towards grey and its alpha in and out. */
 /* Updates a smoke puff: it ages, changes colour a little, fades in and out, and rises. */
-void func_002C14D8(SmokeParticle *p)
+void part_update_smoke(SmokeParticle *p)
 {
     SmokeMotion *m = &p->motion;
     float t;
     int r, g, b, a;
     u32 color;
     if (m->life < ++p->age) {
-        KillParticle(p);
+        part_kill(p);
         return;
     }
     t = IntToFloat(p->age) / IntToFloat(m->life);

@@ -27,7 +27,7 @@ ASM_FUNC("asm/levels", func_L22_002F3B38);
 /* Early-outs when the third float argument is positive; otherwise bends the first angle
    through one helper, feeds the second angle and the angle at the fourth pointer through
    the two placement calls, scales it by the first float argument and stores it back. */
-void func_L22_00328220(u8 *position, u8 *angleRef, u8 *speedRef, u8 *directionRef, f32 factor, f32 unusedFactor, f32 limit)
+void math_steer_along_direction(u8 *position, u8 *angleRef, u8 *speedRef, u8 *directionRef, f32 factor, f32 unusedFactor, f32 limit)
 {
     u8 *posPtr = position;
     u8 *angle = angleRef;
@@ -59,7 +59,7 @@ void func_L22_00328220(u8 *position, u8 *angleRef, u8 *speedRef, u8 *directionRe
    the second float, the first byte at D_001FF814 and the handle, then the first float
    divided by a helper's value for the handle. Does nothing without a handle or when the
    allocation fails. */
-void func_L22_00334F78(TI128 *source, u8 red, u8 green, u8 blue, s32 handle, f32 scale, f32 value)
+void part_spawn_glow_record(TI128 *source, u8 red, u8 green, u8 blue, s32 handle, f32 scale, f32 value)
 {
     u8 *record;
     u8 *pair;
@@ -86,7 +86,7 @@ void func_L22_00334F78(TI128 *source, u8 red, u8 green, u8 blue, s32 handle, f32
 
 /* Defined in L22_00334F78.c. */
 
-void func_L22_00335078(u8 *object)
+void part_update_fade_record(u8 *object)
 {
     u8 *rec = object;
     u8 *extra = object + 0x20;

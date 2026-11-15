@@ -13,9 +13,9 @@ struct CC7Hero {
     char pad274[0xc8]; int portal; int active;
     char pad344[0x1f4c]; int target;
 };
-extern struct CC7Hero D_00189E20;
-extern char D_L02_001BA500[];
-extern int D_L02_001B30C8 MACRO_ADDR;
+extern struct CC7Hero g_hero_state;
+extern char g_camera_l02_position[];
+extern int g_frame_l02_counter MACRO_ADDR;
 extern int ref_L02_003CC7B0_00 __attribute__((sda));
 extern int ref_L02_003CC7B0_01(float);
 extern char *ref_L02_003CC7B0_02(int);
@@ -142,7 +142,7 @@ int func_PAL_L02_003D06F0(unsigned char *obj) {
             else ref_L02_003CC7B0_06(obj,1,0);
         }
     }
-    if (obj[0x31] && ref_L02_003CC7B0_07(obj+0x10,D_L02_001BA500)<24.0f) {
+    if (obj[0x31] && ref_L02_003CC7B0_07(obj+0x10,g_camera_l02_position)<24.0f) {
         ref_L02_003CC7B0_08(obj); obj[0x6f]=22;
     }
     ref_L02_003CC7B0_09(obj,0,mat);
@@ -157,17 +157,17 @@ int func_PAL_L02_003D06F0(unsigned char *obj) {
         if (value<data->h37a) data->h386=250;
         data->h37a=value;
     }
-    if (((unsigned char)obj[0x95]!=3 && (unsigned char)obj[0x20]!=23) || !(D_L02_001B30C8&15))
+    if (((unsigned char)obj[0x95]!=3 && (unsigned char)obj[0x20]!=23) || !(g_frame_l02_counter&15))
         ref_L02_003CC7B0_16(obj,data->w31c,0,0,16.0f,0.0f);
     if (data->w204==1) {
         if (data->w33c) {
             allowed=0;
-            if (D_00189E20.obj26c==obj || D_00189E20.obj270==obj || (D_00189E20.active && !D_00189E20.portal)) allowed=1;
+            if (g_hero_state.obj26c==obj || g_hero_state.obj270==obj || (g_hero_state.active && !g_hero_state.portal)) allowed=1;
             else if (ref_L02_003CC7B0_18(F(obj,0xf8),ref_L02_003CC7B0_17(F(data,0x1f0)-F(obj,0x10),F(data,0x1f4)-F(obj,0x14)))<1.5707964897155762f) allowed=1;
             if (!allowed) data->w204=0; else data->h386=250;
         } else data->h386=250;
     } else if (data->h386) {
-        data->w200=D_00189E20.target; qcopy((char *)data+0x1f0,D_00189E20.direction); data->w204=1;
+        data->w200=g_hero_state.target; qcopy((char *)data+0x1f0,g_hero_state.direction); data->w204=1;
     }
     return 0;
 }

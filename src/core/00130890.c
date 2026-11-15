@@ -3,7 +3,7 @@
 
 extern void r1_func_00127378(int arg0);
 
-extern void func_00130288(void *, void *);
+extern void mpeg_report_error(void *, void *);
 
 extern int r1_func_00128A58(void *, int);
 
@@ -33,7 +33,7 @@ extern void r1_func_00114438(void *, void *);
  * `horizontal_size = (horizontal_size_extension<<12) | (horizontal_size&0xfff)`
  * et al.
  */
-void func_00130890(void *decoder) {
+void mpeg_read_sequence_extension(void *decoder) {
     char *bytes = (char *)decoder;
     unsigned int bits1, bits2;
     unsigned int chroma_format, h_ext, v_ext, bitrate_ext;
@@ -50,7 +50,7 @@ void func_00130890(void *decoder) {
 
     *(unsigned int *)(bytes + 0x140) = chroma_format;
     if (chroma_format != 1) {
-        ReportMpegError(bytes, r1_D_00153C00);
+        mpeg_report_error(bytes, r1_D_00153C00);
     }
 
     progressive = (bits1 >> 19) & 1;
@@ -61,7 +61,7 @@ void func_00130890(void *decoder) {
     vbv_ext = bits2 >> 8;
 
     if (profile != 0x48 && profile != 0x58 && profile != 0x44) {
-        ReportMpegError(bytes, r1_D_00153C28);
+        mpeg_report_error(bytes, r1_D_00153C28);
     }
 
     *(int *)(bytes + 0x124) = (h_ext << 12) | (*(int *)(bytes + 0x124) & 0xFFF);
@@ -83,7 +83,7 @@ void func_00130890(void *decoder) {
  * value call it reset $v0's readers and the +0x148 store lost the
  * scheduler tie to the next call's argument setup, 8/140.)
  */
-void func_001309C0(void *decoder) {
+void mpeg_read_sequence_display_ext(void *decoder) {
     char *bytes = (char *)decoder;
 
     r1_func_00128A58(bytes, 3);
@@ -101,38 +101,38 @@ void func_001309C0(void *decoder) {
 /* Retail is a bare tail jump: Sony's 2.9-ee, which builds this SDK object,
    emits it for a void function that ends in a call. */
 /* Hands the object on to a handler together with a fixed callback. */
-void func_00130A50(void *mpeg) {
+void mpeg_call_handler_with_callback(void *mpeg) {
     r1_func_00114438(mpeg, r1_func_00113968);
 }
-extern void func_00130A60(void *arg0);
+extern void mpeg_report_error_fixed_a(void *arg0);
 extern char D_0013BE88[];
 
 /* Reports a fixed video error message. */
-void func_00130A60(void *decoder) {
-    ReportMpegError(decoder, D_0013BE88);
+void mpeg_report_error_fixed_a(void *decoder) {
+    mpeg_report_error(decoder, D_0013BE88);
 }
 
-extern void func_00130A70(void *arg0);
+extern void mpeg_report_error_fixed_b(void *arg0);
 extern char D_0013BEA0[];
 
 /* Reports a fixed video error message. */
-void func_00130A70(void *decoder) {
-    ReportMpegError(decoder, D_0013BEA0);
+void mpeg_report_error_fixed_b(void *decoder) {
+    mpeg_report_error(decoder, D_0013BEA0);
 }
 
-extern void func_00130A80(void *arg0);
+extern void mpeg_report_error_fixed_c(void *arg0);
 extern char D_0013BED8[];
 
 /* Reports a fixed video error message. */
-void func_00130A80(void *decoder) {
-    ReportMpegError(decoder, D_0013BED8);
+void mpeg_report_error_fixed_c(void *decoder) {
+    mpeg_report_error(decoder, D_0013BED8);
 }
 
 
 /* Its entry is four bytes into the catalogued row, after one word of 0xCDCDCDCD fill. */
-extern void func_00130B80(void *arg0);
+extern void sceIpuStopDMA(void *arg0);
 
 /* Stops the picture DMA for this decoder and saves its state. */
-void func_00130A8C(void *mpeg) {
-    StopIpuDma(*(char **)((char *)mpeg + 0x40) + 0x4C);
+void mpeg_stop_dma(void *mpeg) {
+    sceIpuStopDMA(*(char **)((char *)mpeg + 0x40) + 0x4C);
 }

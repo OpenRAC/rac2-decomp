@@ -6,28 +6,28 @@
 typedef unsigned char u8;
 typedef int s32;
 
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern u8 D_0019B2E8[];
 extern u8 D_0019B4A8[];
-extern int D_001A79F0 MACRO_ADDR;
-extern u8 *D_L19_001B2A1C __attribute__((sda));
+extern int g_current_map_index MACRO_ADDR;
+extern u8 *g_moby_l19_array __attribute__((sda));
 extern u8 D_L19_001B2860[] MACRO_ADDR;
 typedef struct { u8 pad[0x464]; u8 slot[1]; } SlotTable;
 extern SlotTable D_L19_0021DDC0;
 extern SlotTable D_L19_0021EA30;
-extern void func_00282F20(void *, void *, float);
-extern unsigned long long func_002A0488(void *, int, int, int);
-extern void func_002A7750(u8 *, u8, s32);
-extern int func_002E5CF8(int, int, char *);
-extern void func_002E59F8(s32);
-extern s32 func_002B38B8(u8 *);
-extern s32 func_00283CF0(float);
-extern void func_00291450(s32);
-extern void func_0029F338(void *);
-extern void func_L00_00310838(unsigned char *, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern unsigned long long set_moby_color(void *, int, int, int);
+extern void moby_set_state(u8 *, u8, s32);
+extern int PlayMobySound(int, int, char *);
+extern void snd_stop_voice(s32);
+extern s32 flag_is_third_pending_set(u8 *);
+extern s32 FloatToInt(float);
+extern void gfx_free_point_light(s32);
+extern void moby_mark_spawned(void *);
+extern void offset_moby_class_point_pairs(unsigned char *, int, int);
 
 /* Shows a glowing level marker that fades out when its linked object is activated, then removes itself. */
-void func_L19_00422420(u8 *actor)
+void level_marker_update_fading(u8 *actor)
 {
     u8 *state = *(u8 **)(actor + 0x68);
     float scale = 9.77f;
@@ -47,19 +47,19 @@ void func_L19_00422420(u8 *actor)
         *(short *)(state + 0xa) = -1;
         *(float *)(state + 4) = 1.0f;
         set_moby_color(actor, 0x80, 0x80, 0x80);
-        if (actor[0xb0] != 0xff && (D_0019B2E8[actor[0xb0] + gCurrentMapIndex * 16] & 0x80))
-            SetMobyState(actor, 3, -1);
+        if (actor[0xb0] != 0xff && (D_0019B2E8[actor[0xb0] + g_current_map_index * 16] & 0x80))
+            moby_set_state(actor, 3, -1);
         break;
     case 1: {
-        u8 *link = gSoundState + *(int *)(state + 0x14) * 0x70;
+        u8 *link = g_sound_state + *(int *)(state + 0x14) * 0x70;
         int index;
         if (*(u8 **)(link + 0x88) != actor || link[0x74] == 0)
             *(int *)(state + 0x14) = PlayMobySound(0, 4, (char *)actor);
         index = *(int *)state;
         if (index != -1) {
-            u8 *entry = gMobyArray_L19 + index * 0x100;
+            u8 *entry = g_moby_l19_array + index * 0x100;
             if (entry && entry[0x20] != 0xfe && entry[0x20] != 0xfd) {
-                flags = D_0019B4A8[((int)(*(unsigned short *)(entry + 0xb2) << 16) >> 17) + gCurrentMapIndex * 0x400];
+                flags = D_0019B4A8[((int)(*(unsigned short *)(entry + 0xb2) << 16) >> 17) + g_current_map_index * 0x400];
                 if (*(unsigned short *)(entry + 0xb2) & 1) {
                     if ((flags >> 4) & 7)
                         goto active;
@@ -70,7 +70,7 @@ void func_L19_00422420(u8 *actor)
                 }
             }
         } else {
-            flags = IsThirdPendingFlagSet(actor);
+            flags = flag_is_third_pending_set(actor);
         test_active:
             if (!flags)
                 break;
@@ -82,9 +82,9 @@ void func_L19_00422420(u8 *actor)
     case 2: {
         int index = *(int *)(state + 0x14);
         if (index != -1) {
-            u8 *entry = gSoundState + index * 0x70;
+            u8 *entry = g_sound_state + index * 0x70;
             if (*(u8 **)(entry + 0x88) == actor && entry[0x74])
-                StopSoundVoice(index);
+                snd_stop_voice(index);
         }
         *(float *)(state + 4) -= 0.05f;
         *(int *)(state + 0x14) = -1;
@@ -95,14 +95,14 @@ void func_L19_00422420(u8 *actor)
         break; }
     case 3:
         if (*(short *)(state + 0xa) != -1) {
-            FreePointLight(*(short *)(state + 0xa));
+            gfx_free_point_light(*(short *)(state + 0xa));
             *(short *)(state + 0xa) = -1;
         }
         D_L19_0021DDC0.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
         if (actor[0xb0] == 0xff || (!(*(D_L19_001B2860 + actor[0xb0]) & 0x80) &&
-                (D_0019B2E8[actor[0xb0] + gCurrentMapIndex * 16] & 0x80)))
+                (D_0019B2E8[actor[0xb0] + g_current_map_index * 16] & 0x80)))
             D_L19_0021EA30.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
-        MarkMobySpawned(actor);
+        moby_mark_spawned(actor);
         return;
     }
     step = 0x10;

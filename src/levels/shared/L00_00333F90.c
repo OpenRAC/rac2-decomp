@@ -5,12 +5,12 @@
 typedef int TI128_33F90 __attribute__((mode(TI)));
 #endif
 
-extern void *func_002B9030(int);
+extern void *part_alloc(int);
 
-extern int func_002A77E0(int);
-extern int func_00283CF0(float);
+extern int math_random_int_below(int);
+extern int FloatToInt(float);
 
-extern void func_00282CF0(char *dst, char *first, char *second);
+extern void FastVecSub(char *dst, char *first, char *second);
 
 extern unsigned char *D_L00_001FE98C;
 
@@ -28,14 +28,14 @@ typedef struct {
 } EffectPrefix;
 
 /* Spawns a short streak effect running between two points. */
-void *func_L00_00333F90(EffectVector *position, EffectVector *a1)
+void *part_spawn_streak_effect(EffectVector *position, EffectVector *a1)
 {
-    EffectPrefix *record = AllocParticle(0x13);
+    EffectPrefix *record = part_alloc(0x13);
     EffectVector *endpoint;
     EffectVector *difference;
     int packed;
     if (record) {
-        packed = (RandomIntBelow(6) * 6 + 0x40) | 0x78404000;
+        packed = (math_random_int_below(6) * 6 + 0x40) | 0x78404000;
         record->word4 = packed;
         record->wordC = packed;
         record->b9 = FloatToInt(2.0f) + 0x20;

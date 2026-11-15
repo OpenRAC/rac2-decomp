@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s32 ref_L04_0040ACC8_02 __attribute__((sda));
 extern s32 ref_L04_0040ACC8_03 __attribute__((sda));
 
 /* Counts how often a player event happens in a row. Three times in a row sets a flag, and a long gap resets the count. */
-void func_L04_0040ACC8(void) {
+void racer_update_event_streak(void) {
     s8 *vars;
     s32 newCount;
     s32 eventFlag;

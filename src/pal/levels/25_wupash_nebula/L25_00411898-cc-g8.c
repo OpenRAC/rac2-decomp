@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L25_00411898, the PAL copy of func_L25_0040CDA0: the same C, where rename func_00288E18 becomes func_PAL_00289730; rename func_0029B758 becomes func_PAL_0029C0F0; rename func_L05_00442828 becomes func_PAL_L05_00448A58; rename func_L25_003752D8 becomes func_PAL_L25_00377A28. */
 /* func_PAL_L25_00411898, the level's mission update (setup, timer, completion).
    The function lives in its own small-data unit; its callees func_PAL_L25_00377A28, 00376FE0 and
@@ -33,13 +34,13 @@ typedef struct InventoryView {
     unsigned int completed;
 } InventoryView;
 extern MissionContext D_L25_00221850;
-extern InventoryView D_0018C958;
+extern InventoryView g_subtitle_history;
 extern char *D_L25_001B0CE0 __attribute__((sda));
 extern int D_L25_001B0CD0 __attribute__((sda)), D_L25_001B0CD4 __attribute__((sda));
 extern int D_L25_001B0CD8 __attribute__((sda)), D_L25_001B0CDC __attribute__((sda));
 extern int D_L25_001B0CC0 __attribute__((sda)), D_L25_001B0CB0 __attribute__((sda));
 extern int D_L25_001B0CF8 __attribute__((sda));
-extern char *D_0018C0B0 __attribute__((nosda));
+extern char *g_hero_moby __attribute__((nosda));
 
 extern int D_L25_001B3060 MACRO_ADDR, D_L25_001B1BC8 MACRO_ADDR;
 extern int D_L25_001B209C MACRO_ADDR;
@@ -47,28 +48,28 @@ extern int D_00138324 __attribute__((nosda));
 extern char *D_L25_001A904C MACRO_ADDR;
 extern float D_L25_001B2904 MACRO_ADDR;
 extern unsigned char D_001A7C01 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
-extern int func_L25_0040DCD0(char *,int);
+extern int g_current_map_index MACRO_ADDR;
+extern int moby_tick_death_timer(char *,int);
 extern int func_PAL_00289730(int,int);
-extern int func_00282948(void *);
-extern void func_L05_00379B60(void);
-extern void func_L05_0030C930(int,int);
-extern int func_002E5DA0(int,int,char *,int);
-extern int func_L25_0040D208(void);
+extern int math_fast_float_d(void *);
+extern void level_select_random_object(void);
+extern void level_store_pair_with_increment(int,int);
+extern int snd_play_from_class_bank(int,int,char *,int);
+extern int DrawWupashCombatHud(void);
 extern void func_PAL_0029C0F0(int,void *);
 extern void func_PAL_L05_00448A58(void *,void *,int);
-extern void func_L05_00445B58(void *,void *);
-extern void func_L05_0037B210(void);
-extern void func_00288CB0(int,int);
-extern void func_L05_0037B108(void);
-extern int func_L05_00442860(void);
+extern void ship_point_camera_at_target(void *,void *);
+extern void entry_init_all_registered(void);
+extern void data_set_small_value_and_refresh(int,int);
+extern void effect_remove_family_mobys(void);
+extern int cam_is_mode_active(void);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
 
 extern void func_PAL_L25_00377A28(u8 *);
-extern void func_L25_00376FE0(u8 *, f32);
-extern void func_L25_00377608(u8 *, f32);
+extern void level_offer_entries_float(u8 *, f32);
+extern void level_offer_entries_float_alt(u8 *, f32);
 
 extern int D_L25_001B2900;
 
@@ -107,7 +108,7 @@ void func_PAL_L25_00411898(char *obj)
         ctx = &D_L25_00221850;
         
         ctx->scale=8.0f;
-        ctx->deathCallback=func_L25_0040DCD0;
+        ctx->deathCallback=moby_tick_death_timer;
         D_L25_001B0CE0=obj;
         D_L25_001B0CD0=0; D_L25_001B0CD4=0;
         D_L25_001B0CD8=0; D_L25_001B0CDC=0;
@@ -118,20 +119,20 @@ void func_PAL_L25_00411898(char *obj)
         ctx->enabled=1;
         D_L25_001B3060=450;
         ctx->owner=obj;
-        if (D_0018C0B0) H(D_0018C0B0,0x34)|=0x41;
+        if (g_hero_moby) H(g_hero_moby,0x34)|=0x41;
     case 1:
         
-        if (!D_0018C958.dialogue) func_PAL_00289730(0xa16,0x6d);
+        if (!g_subtitle_history.dialogue) func_PAL_00289730(0xa16,0x6d);
         
-        if (func_00282948(state+0x34)) D_L25_00221850.timerVisible=0;
+        if (math_fast_float_d(state+0x34)) D_L25_00221850.timerVisible=0;
         else D_L25_00221850.timerVisible=1;
         active = 1;
-        func_L05_00379B60();
-        func_L05_0030C930(label_y(obj, -224.0f, D_L25_001B2904, 0.5f, 1),2);
+        level_select_random_object();
+        level_store_pair_with_increment(label_y(obj, -224.0f, D_L25_001B2904, 0.5f, 1),2);
         qcopy(obj+0x10,(void *)((I(state,0x20)<<8) + D_L25_001B209C + 0x10));
-        if (D_00138324&0x10) func_002E5DA0(0,0,obj,0xeee);
+        if (D_00138324&0x10) snd_play_from_class_bank(0,0,obj,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
-            func_PAL_0029C0F0(0,func_L25_0040D208);
+            func_PAL_0029C0F0(0,DrawWupashCombatHud);
             D_L25_001B0CDC=active;
         }
         /* Retail executes this counted wait before reading the mission state:
@@ -140,7 +141,7 @@ void func_PAL_L25_00411898(char *obj)
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
-            if (!func_00282948(state+0x2c)) break;
+            if (!math_fast_float_d(state+0x2c)) break;
             I(state,0x2c)=450;
             func_PAL_L05_00448A58(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
             *(Quad *)a=0; *(Quad *)b=0;
@@ -148,20 +149,20 @@ void func_PAL_L25_00411898(char *obj)
             a[0]=359.0f; a[1]=440.0f; a[2]=524.0f;
             b[0]=403.0f; b[1]=456.0f; b[2]=524.0f;
             func_PAL_L25_00377A28((u8 *)1);
-            func_L25_00376FE0((u8 *)a,10.0f); func_L25_00377608((u8 *)b,10.0f);
+            level_offer_entries_float((u8 *)a,10.0f); level_offer_entries_float_alt((u8 *)b,10.0f);
             *(Quad *)d = *(Quad *)c = 0;
             c[0]=417.18f; c[1]=454.03f; c[2]=532.6f;
             d[0]=420.93f; d[1]=413.79f; d[2]=534.54f;
-            func_L05_00445B58(c,d);
+            ship_point_camera_at_target(c,d);
         } else {
-            if (func_00282948(state+0x2c)) {
-                func_L05_0037B210(); func_PAL_0029C0F0(0,0);
-                D_001A7C01=1; func_00288CB0(2,1);
+            if (math_fast_float_d(state+0x2c)) {
+                entry_init_all_registered(); func_PAL_0029C0F0(0,0);
+                D_001A7C01=1; data_set_small_value_and_refresh(2,1);
             } else {
                 if (!D_L25_001B0CF8) {
-                    func_L05_0037B108(); D_L25_001B0CF8=1;
+                    effect_remove_family_mobys(); D_L25_001B0CF8=1;
                 }
-                { u32 seen = D_0018C958.completed & (1u << D_001A79F0);
+                { u32 seen = g_subtitle_history.completed & (1u << g_current_map_index);
                 if (!seen) func_PAL_00289730(0xa36,0x8d); }
             }
         }
@@ -170,7 +171,7 @@ void func_PAL_L25_00411898(char *obj)
         break;
     case 3:
         
-        if (!func_L05_00442860()) {
+        if (!cam_is_mode_active()) {
             D_L25_00221850.timerVisible=0;
             D_L25_00221850.completed++;
             B(obj,0x20)=active;

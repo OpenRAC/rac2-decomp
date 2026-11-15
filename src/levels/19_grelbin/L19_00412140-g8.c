@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L19_00412140 (DrawGrelbinStatusHud) - 3308 bytes, level 19 @0x00412148
 
    Draws the status bar and its two texture labels, the warning and counter texts, the pickup
@@ -9,11 +10,11 @@
    sets alias analysis has no base for it, so the palette stores stay behind the hero load. */
 #include "common.h"
 
-extern unsigned char D_00189E20[];
-extern int D_001A7340, D_001A7344;
+extern unsigned char g_hero_state[];
+extern int g_screen_width, g_screen_height;
 extern int D_00138320 __attribute__((section(".data")));
-extern int D_001A79F0;
-extern int D_L19_001B2508;
+extern int g_current_map_index;
+extern int g_frame_l19_counter;
 extern unsigned char *D_L19_001A904C;
 extern int D_L19_001B3280;
 extern float D_L19_001B3284;
@@ -53,32 +54,32 @@ extern unsigned int D_L19_001B1AF4 __attribute__((sda));
 extern unsigned int D_L19_001B1AF8 __attribute__((sda));
 extern float D_L19_001B19BC __attribute__((sda));
 extern float D_L19_001B0120 __attribute__((sda));
-extern void func_L08_00389B68(int,int,unsigned long,int,unsigned long);
-extern int func_00282978(void *);
-extern void func_L08_00300090(void);
-extern void func_L08_00300100(void);
-extern void func_L08_003000C0(void);
-extern char *func_00336D50(void *,int);
-extern void func_00300A00(char *,int,float,float,float,float,float);
-extern float func_00282C48(float);
-extern unsigned int func_00283D38(unsigned int,unsigned int,float);
-extern void func_0027EAE8(int,int,int,int,int,void *);
-extern void func_002E5DA0(int,int,void *,int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_002A7798(float);
-extern float func_002A7790(float);
-extern float func_L08_003277C0(int,float);
-extern unsigned char *func_00288FB8(int);
-extern void func_L08_002F5CB8(int,int,u64,void *,int,float);
-extern void func_L08_0033CD18(void *,void *,int);
+extern void gfx_append_vectors_to_packet(int,int,unsigned long,int,unsigned long);
+extern int FastDecTimer(void *);
+extern void hero_begin_saved_float_hold(void);
+extern void hero_set_saved_float_and_update(void);
+extern void hero_end_saved_float_hold(void);
+extern char *table_find_by_id(void *,int);
+extern void gfx_draw_scaled_object_two_axes(char *,int,float,float,float,float,float);
+extern float math_fabs(float);
+extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
+extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
+extern void snd_play_from_class_bank(int,int,void *,int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_ease_out_quad(float);
+extern float math_square(float);
+extern float IntegerPower(int,float);
+extern unsigned char *GetLocalizedString(int);
+extern void DrawCenteredScaledText(int,int,u64,void *,int,float);
+extern void thread_call_var_args_worker(void *,void *,int);
 extern int func_001157AC(void *);
-extern void func_0027F5B8(int,int,u64,void *,int);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern int func_0028E588(int,int);
-extern int func_0028EA58(int,int,int,int,int,void *);
-extern void func_L08_004207D0(void *);
+extern void text_draw_medium(int,int,u64,void *,int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int GetIconFrame(int,int);
+extern int hud_draw_sprite_gradient(int,int,int,int,int,void *);
+extern void radar_draw(void *);
 typedef struct { unsigned char pad[0xA4]; float level; } HudState;
 static __inline__ unsigned long PackGaugeFlag(unsigned long flags, unsigned char value, int shift)
 {
@@ -145,14 +146,14 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 /* Draws one centred texture label. */
 static __inline__ void sprite(char *id, int col, float x, int y, float a, float b, float c)
 {
-    DrawScaledObjectTwoAxes(id, col, x, (float)y, a, b, c);
+    gfx_draw_scaled_object_two_axes(id, col, x, (float)y, a, b, c);
 }
 
 /* The status bar's bottom edge. */
 static __inline__ int hud_bar_bottom(void)
 {
     int mode = D_L19_001B3280;
-    int h = gScreenHeight;
+    int h = g_screen_height;
     float scaled = D_L19_001B1AE8 * D_L19_001B3284 + 0.5f;
     float scale = D_L19_001B3284;
     int y;
@@ -165,18 +166,18 @@ static __inline__ int hud_bar_bottom(void)
 }
 
 /* Draws the status HUD for the hero: the bar with its labels, the warning and counter texts, and the pickup icon. */
-int func_L19_00412140(void)
+int DrawGrelbinStatusHud(void)
 {
     unsigned int colors[4];
     struct Palette { unsigned int a,b; } palette;
     char text[64];
-    int hero = (int)gHeroState;
+    int hero = (int)g_hero_state;
     unsigned char *heroMoby = *(unsigned char **)(hero + 0x1830);
     unsigned char *vars = *(unsigned char **)(heroMoby + 0x68);
     int mask = -1;
 
     if (*(float *)(hero + 0x183C) < *(float *)(hero + 0x1840) * 0.25f)
-        if ((gFrameCounter_L19 / 90) & 1) mask = 0xFF0F0FFF;
+        if ((g_frame_l19_counter / 90) & 1) mask = 0xFF0F0FFF;
     {
         unsigned long test, alpha;
         test = D_L19_001B1A59;
@@ -190,7 +191,7 @@ int func_L19_00412140(void)
         test = PackGaugeFlag(test, D_L19_001B1A5F, 16);
         alpha = PackGaugeFlag(alpha, D_L19_001B1A56, 4);
         alpha = PackGaugeFlag(alpha, D_L19_001B1A57, 6);
-        AppendVectorsToPacket(2, 0x47, test | ((unsigned long)D_L19_001B1A60 << 17),
+        gfx_append_vectors_to_packet(2, 0x47, test | ((unsigned long)D_L19_001B1A60 << 17),
             0x42, alpha | ((unsigned long)D_L19_001B1A58 << 32));
     }
     FastDecTimer(vars + 0x8E);
@@ -203,24 +204,24 @@ int func_L19_00412140(void)
         int one, entry;
         float half, fade, z;
         entry = 0x8710;
-        BeginSavedFloatHold();
+        hero_begin_saved_float_hold();
         one = 1;
-        SetSavedFloatAndUpdate();
+        hero_set_saved_float_and_update();
         half = 0.5f;
-        str = (unsigned char *)FindTableEntryById(D_L19_001A904C + entry,0xA8);
-        x = (float)(gScreenWidth / 2);
+        str = (unsigned char *)table_find_by_id(D_L19_001A904C + entry,0xA8);
+        x = (float)(g_screen_width / 2);
         y = label_y(str, D_L19_001B19BC, D_L19_001B3284, half, 1);
         fade = 1.0f;
         z = 0.0f;
-        sprite((char *)str, mask & 0x60442D00, x, gScreenHeight / 2 + y, fade, fade, z);
-        str = (unsigned char *)FindTableEntryById(D_L19_001A904C + entry,0xA9);
-        x = (float)(gScreenWidth / 2);
+        sprite((char *)str, mask & 0x60442D00, x, g_screen_height / 2 + y, fade, fade, z);
+        str = (unsigned char *)table_find_by_id(D_L19_001A904C + entry,0xA9);
+        x = (float)(g_screen_width / 2);
         y = label_y(str, D_L19_001B19BC, D_L19_001B3284, half, 1);
-        sprite((char *)str, mask & 0x55F0C070, x, gScreenHeight / 2 + y, fade, fade, z);
+        sprite((char *)str, mask & 0x55F0C070, x, g_screen_height / 2 + y, fade, fade, z);
         delta = *(float *)(hero + 0x183C) - ((HudState *)vars)->level;
         delta *= 0.2f;
         {
-            float magnitude = FloatAbs(delta);
+            float magnitude = math_fabs(delta);
             if (magnitude > fade) delta /= magnitude;
         }
         c0 = D_L19_001B1AF4;
@@ -231,55 +232,55 @@ int func_L19_00412140(void)
         palette.b = c1;
         *(struct Palette *)colors = palette;
         colors[1] = FastTweenColor(c0,c1,ratio);
-        DrawScreenRectangle((int)D_L19_001B1AE4,
-            gScreenHeight - hud_coord(D_L19_001B3280, D_L19_001B1AE8, half, one, -4.0f),
+        gfx_draw_screen_rectangle((int)D_L19_001B1AE4,
+            g_screen_height - hud_coord(D_L19_001B3280, D_L19_001B1AE8, half, one, -4.0f),
             (int)(D_L19_001B1AE4 + D_L19_001B1AEC * ratio),
             hud_bar_bottom(),
             0xFFFFF1, colors);
-        EndSavedFloatHold();
+        hero_end_saved_float_hold();
     }
-    if (gCurrentMapIndex == 8 || gCurrentMapIndex == 19) {
+    if (g_current_map_index == 8 || g_current_map_index == 19) {
         unsigned char *str;
         if (*(short *)(vars + 0x8E)) {
             float ratio, scale, alpha;
             int color;
-            if (*(short *)(vars + 0x8E) == 1) PlaySoundFromClassBank(3,0,heroMoby,0x85C);
+            if (*(short *)(vars + 0x8E) == 1) snd_play_from_class_bank(3,0,heroMoby,0x85C);
             ratio = IntToFloat(180-*(short *)(vars + 0x8E)) / IntToFloat(180);
-            scale = D_L19_001B1ADC + (D_L19_001B1AE0-D_L19_001B1ACC)*EaseOutQuad(ratio);
+            scale = D_L19_001B1ADC + (D_L19_001B1AE0-D_L19_001B1ACC)*math_ease_out_quad(ratio);
             alpha = IntegerPower(3,1.0f-ratio)*127.0f;
             color = FloatToInt(alpha*0.5f) << 24;
             str = GetLocalizedString(0x2F59);
-            DrawCenteredScaledText(gScreenWidth-D_L19_001B1AB4,gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x80)&mask,str,0x11,scale*0.96f);
             color = FloatToInt(alpha*0.75f) << 24;
-            DrawCenteredScaledText(gScreenWidth-D_L19_001B1AB4,gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x800000)&mask,str,0x11,scale*0.98f);
             color = FloatToInt(alpha) << 24;
-            DrawCenteredScaledText(gScreenWidth-D_L19_001B1AB4,gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                 (color|0x808080)&mask,str,0x11,scale);
         } else if (*(int *)(vars + 0x6C)) {
             if (*(float *)(vars + 0x68) > D_L19_001B0120) {
                 int x, y;
                 char *line;
                 str = GetLocalizedString(0x31E0);
-                CallVarArgsWorker(text,str,FloatToInt(*(float *)(vars + 0x68)));
+                thread_call_var_args_worker(text,str,FloatToInt(*(float *)(vars + 0x68)));
                 line = text;
-                x = gScreenWidth-D_L19_001B1AB0;
-                y = gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f);
+                x = g_screen_width-D_L19_001B1AB0;
+                y = g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f);
                 hero = 0x80FFDE8D; /* From here on `hero` is the counter's colour. */
                 hero = mask & hero;
-                DrawTextMediumFont(x,y,(unsigned int)hero,line,strlen_001157AC(line));
+                text_draw_medium(x,y,(unsigned int)hero,line,func_001157AC(line));
             } else if (D_00138320 & 0x80) {
                 str = GetLocalizedString(0x2F57);
-                DrawCenteredScaledText(gScreenWidth-D_L19_001B1AB4,gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+                DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                     (unsigned int)(mask&0x80F0F0F0),str,0xD,D_L19_001B1AD0);
             } else {
                 float scale;
-                scale = WrapAngleToPi(IntToFloat(gFrameCounter_L19)*0.1f);
-                scale = FastSinOrCosB(scale);
+                scale = math_wrap_angle_to_pi(IntToFloat(g_frame_l19_counter)*0.1f);
+                scale = math_fast_sin_or_cos_b(scale);
                 scale = D_L19_001B1AD4 + D_L19_001B1AD8*scale;
                 str = GetLocalizedString(0x2F58);
-                DrawCenteredScaledText(gScreenWidth-D_L19_001B1AB4,gScreenHeight-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+                DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
                     (unsigned int)(mask&0x80F0F0F0),str,0x11,scale);
             }
         }
@@ -287,26 +288,26 @@ int func_L19_00412140(void)
             float ratio, width, height, dx, dy, top;
             int color, tex, x, y, a, b, alpha;
             ratio = IntToFloat(*(short *)(vars + 0x88))/IntToFloat(D_L19_001B1A98);
-            width = Square(ratio)*32.0f;
-            height = Square(ratio)*24.0f;
-            dx = D_L19_001B1AA0*EaseOutQuad(ratio);
-            dy = D_L19_001B1AA4*EaseOutQuad(ratio);
+            width = math_square(ratio)*32.0f;
+            height = math_square(ratio)*24.0f;
+            dx = D_L19_001B1AA0*math_ease_out_quad(ratio);
+            dy = D_L19_001B1AA4*math_ease_out_quad(ratio);
             color = FloatToInt(ratio*128.0f)<<24;
             top = 16.0f-width*0.5f;
             if (D_L19_001A904C) {
-                BeginSavedFloatHold();
-                SetSavedFloatAndUpdate();
+                hero_begin_saved_float_hold();
+                hero_set_saved_float_and_update();
                 alpha = FloatToInt(IntToFloat(96)*ratio)<<24;
-                str = (unsigned char *)FindTableEntryById(D_L19_001A904C+0x8710,0xAA);
-                DrawScaledObjectTwoAxes((char *)str,
+                str = (unsigned char *)table_find_by_id(D_L19_001A904C+0x8710,0xAA);
+                gfx_draw_scaled_object_two_axes((char *)str,
                     (alpha|0x442D00)&mask,
-                    (float)(gScreenWidth/2+32)-dx,(float)(gScreenHeight/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
+                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
                 alpha = FloatToInt(IntToFloat(85)*ratio)<<24;
-                str = (unsigned char *)FindTableEntryById(D_L19_001A904C+0x8710,0xAB);
-                DrawScaledObjectTwoAxes((char *)str,
+                str = (unsigned char *)table_find_by_id(D_L19_001A904C+0x8710,0xAB);
+                gfx_draw_scaled_object_two_axes((char *)str,
                     (alpha|0xF0C070)&mask,
-                    (float)(gScreenWidth/2+32)-dx,(float)(gScreenHeight/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
-                EndSavedFloatHold();
+                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
+                hero_end_saved_float_hold();
             }
             if (vars[0x8A] < 3) {
                 int c=color|0xF0F0B0;
@@ -315,17 +316,17 @@ int func_L19_00412140(void)
                 colors[2]=c;
                 colors[3]=c;
                 tex=GetIconFrame(0xEAA2,3);
-                x=FloatToInt((float)gScreenWidth-D_L19_001B1AAC-dy);
+                x=FloatToInt((float)g_screen_width-D_L19_001B1AAC-dy);
                 y=FloatToInt(D_L19_001B1AA8+(float)D_L19_001B1A94+(float)*(short *)(vars + 0x8C)+top);
                 y=scaled_coord(y,D_L19_001B3284,0.5f,1);
                 a=FloatToInt(height);
                 b=FloatToInt(height);
-                DrawHudSpriteGradient(tex,x,y,a,b,colors);
+                hud_draw_sprite_gradient(tex,x,y,a,b,colors);
             }
         }
-        DrawRadar(heroMoby);
+        radar_draw(heroMoby);
     }
-    AppendVectorsToPacket(2,0x47,0x5340B,0x42,0x8000000044ULL);
+    gfx_append_vectors_to_packet(2,0x47,0x5340B,0x42,0x8000000044ULL);
     *(float *)(vars + 0x68)=1000000.0f;
     *(int *)(vars + 0x6C)=0;
     return 1;

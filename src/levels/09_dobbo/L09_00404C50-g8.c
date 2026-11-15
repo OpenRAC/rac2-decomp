@@ -1,12 +1,12 @@
 #include "common.h"
 
 extern float D_L09_001B13F4 __attribute__((sda));
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(char *, int, int);
-extern void func_002A7470(char *, int, int, int);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(char *, int, int);
+extern void anim_start_blended(char *, int, int, int);
 
 typedef struct DobboEmitter {
     u8 pad_0[0x28];
@@ -59,14 +59,14 @@ typedef struct DobboEmitter {
 
 /* Runs on the object's first update: copies its position into the record, rolls its size and
    timings and fills in the record's defaults. */
-void func_L09_00404C50(char *obj)
+void dobbo_wandering_init_vars(char *obj)
 {
     DobboEmitter *rec = *(DobboEmitter **)(obj + 0x68);
     float size, spin;
     int count;
 
     qcopy((char *)rec + 0x300, obj + 0x10);
-    size = RandomFloatRange(1.0f, 1.333f);
+    size = math_random_float_range(1.0f, 1.333f);
     rec->f_344 = size;
     *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * size;
     rec->f_48 = FloatToInt(15.0f);
@@ -86,7 +86,7 @@ void func_L09_00404C50(char *obj)
     rec->f_100 = rec->f_344 * 0.3f;
     rec->f_10C = rec->f_108 = 0.1f;
     rec->f_138 |= 0x80;
-    spin = RandomSignedFloatRange(18.0f, 22.0f);
+    spin = math_random_signed_float_range(18.0f, 22.0f);
     rec->f_1E8 = 7;
     rec->f_1E9 = 6;
     rec->f_1DC = spin * 0.017453294f;
@@ -95,10 +95,10 @@ void func_L09_00404C50(char *obj)
     rec->f_13C = rec->f_234;
     rec->f_1D4 = 1.75f;
     rec->f_1D0 = D_L09_001B13F4 * 0.016666668f;
-    rec->f_348 = RandomAngle();
-    SetMobyState(obj, 1, 0);
+    rec->f_348 = math_random_angle();
+    moby_set_state(obj, 1, 0);
     if (*(u8 *)(obj + 0x43) != 0)
-        StartAnimationBlended(obj, 0, 0, 0);
+        anim_start_blended(obj, 0, 0, 0);
     *(s32 *)(obj + 0x9C) = 0xC;
     *(unsigned short *)(obj + 0x34) |= 0x1000;
 }

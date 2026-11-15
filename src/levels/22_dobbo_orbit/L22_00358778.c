@@ -1,55 +1,55 @@
 #include "include_asm.h"
 #include "common.h"
-extern void *func_002A9640(void *a0, s32 a1, s32 a2);
-extern s32 func_002A77E0(s32 a0);
-extern s32 func_002E5DA0(s32 a0, s32 a1, char *a2, s32 a3);
-extern void func_002AC728(u8 *a0, void *a1, s32 a2, f32 f12, f32 f13);
-extern s32 func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern void func_002B0A68(char *a0, s32 a1, f32 *a2, u8 a3, f32 f12, f32 f13, f32 f14,
+extern void *part_find_owned_effect_slot(void *a0, s32 a1, s32 a2);
+extern s32 math_random_int_below(s32 a0);
+extern s32 snd_play_from_class_bank(s32 a0, s32 a1, char *a2, s32 a3);
+extern void part_spawn_explosion_with_sparks(u8 *a0, void *a1, s32 a2, f32 f12, f32 f13);
+extern s32 PlayMobySound(s32 a0, s32 a1, char *a2);
+extern void part_spawn_masked_debris(char *a0, s32 a1, f32 *a2, u8 a3, f32 f12, f32 f13, f32 f14,
                         f32 f15);
-extern void func_0029F338(char *a0);
+extern void moby_mark_spawned(char *a0);
 
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_0038F3D8(void *);
-extern void func_L00_0038E880(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_spark_puff(void *);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern int D_L22_001AC790 __attribute__((sda));
 extern int D_L22_001B28B0 __attribute__((sda)), D_L22_001B28B8 __attribute__((sda));
 extern char D_L22_002645F0[];
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_L00_0038F178(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_00278E78(void);
-extern void func_002FD1B8(int, int, int, float, float, float, float);
-extern void func_00282C88(void *);
-extern char *func_00312D58(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002BFB38(void *, void *, int, int);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void part_emit_sparkle(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int GetCollHitMaterial(void);
+extern void RippleDisturb(int, int, int, float, float, float, float);
+extern void vec_clear_128(void *);
+extern char *moby_spawn_scaled_effect(void *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void part_spawn_spark_2(void *, void *, int, int);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
 extern struct { char pad[0x18]; char *target; } D_L22_001C00C0;
-extern u8 *D_0018C0B0;
-extern void func_002A8E20(void *, void *);
+extern u8 *g_hero_moby;
+extern void QueueMobyImpact(void *, void *);
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -75,15 +75,15 @@ extern void func_3167E8(s32, s32, s32);
 extern void func_362E98(s32, s32, s32);
 extern void func_32AE80(s32, s32);
 
-extern void func_L22_003E87B8(s32, s32, s32);
-extern void func_L22_003FA1D0(s32, s32, s32);
+extern void text_show_message_at_moby(s32, s32, s32);
+extern void text_show_message_with_sound(s32, s32, s32);
 
 
 
 /* func_L22_00385F40 is in L22_00385F40.c. */
 
 /* Moves a thrown projectile one step. It bounces off what it hits and sprays sparks when it lands in the water or hits the ground. */
-void func_L22_0038FBE0(unsigned char *moby) {
+void projectile_l22_update_bouncing(unsigned char *moby) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -107,20 +107,20 @@ void func_L22_0038FBE0(unsigned char *moby) {
     work.normal.f[2] = 1.0f;
     qcopy(&work.old, position);
     FastVecAdd(position, vars, position);
-    SteerEffectDirection(*(int *)(vars + 0x1C), vars, 0);
-    TransformVectorOrCopy(position, position);
-    TriggerCurrentStateEffect(vars, vars);
-    AddObjectDirectionScaled(position, vars, 0.0030555557f);
-    EmitSparkleParticles(moby);
+    part_steer_effect_direction(*(int *)(vars + 0x1C), vars, 0);
+    vec_transform_or_copy(position, position);
+    shop_trigger_current_state_effect(vars, vars);
+    vec_add_object_direction_scaled(position, vars, 0.0030555557f);
+    part_emit_sparkle(moby);
     work.packet.moby = moby;
     work.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
         work.packet.flags = 0x830001;
     work.packet.enabled = 1;
     work.packet.material =
-        ((Material *)((u32)D_L22_002645F0 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+        ((Material *)((u32)D_L22_002645F0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&work.packet.vector, vars);
-    FastVectorNormalizeHelper(&work.packet.vector, &work.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&work.packet.vector, &work.packet.vector, 1.0f);
     work.packet.vector.f[2] = 1.0f;
     work.packet.vector.f[3] = 5627.925f;
     work.packet.kind = 2;
@@ -133,25 +133,25 @@ void func_L22_0038FBE0(unsigned char *moby) {
             RippleDisturb(D_L22_001B28B0, D_L22_001B28B8, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
-            ClearVector128(vars);
+            vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             work.position.f[0] = *(float *)(moby + 0x10);
             work.position.f[1] = *(float *)(moby + 0x14);
             work.position.f[2] = ((Collision *)&D_L22_001C00C0)->point.f[2];
-            splash = SpawnScaledEffectMoby(&work.position, 2.0f);
+            splash = moby_spawn_scaled_effect(&work.position, 2.0f);
             if (splash)
                 splash[0x23] = 0x70;
             spread = &work.spread;
             sparkCount = 15;
             do {
                 --sparkCount;
-                angle = RandomAngle();
-                speed = RandomFloatRange(0.0f, 0.050000004f);
-                work.spread.f[0] = FastSinOrCosA(angle) * speed;
-                work.spread.f[1] = FastSinOrCosB(angle) * speed;
-                work.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
-                sparkLife = RandomIntRange(90, 120);
-                SpawnSparkParticle_002BFB38(&work.position, spread, RandomIntBelow(2), sparkLife);
+                angle = math_random_angle();
+                speed = math_random_float_range(0.0f, 0.050000004f);
+                work.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
+                work.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
+                work.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
+                sparkLife = math_random_int_range(90, 120);
+                part_spawn_spark_2(&work.position, spread, math_random_int_below(2), sparkLife);
             } while (sparkCount >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -162,7 +162,7 @@ void func_L22_0038FBE0(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = ((Collision *)&D_L22_001C00C0);
                 model = reread->hit;
@@ -170,7 +170,7 @@ void func_L22_0038FBE0(unsigned char *moby) {
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
-                FastVectorNormalize(&work.velocity, vars, &reread->normal);
+                vec_fast_normalize(&work.velocity, vars, &reread->normal);
                 vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
                 vec_scale_to_length(&work.normal, &reread->normal, 1.0f);
             } else {
@@ -178,25 +178,25 @@ void func_L22_0038FBE0(unsigned char *moby) {
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &collision->point);
-                FastVectorNormalize(&work.velocity, vars, &collision->normal);
+                vec_fast_normalize(&work.velocity, vars, &collision->normal);
                 vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
                 vec_scale_to_length(&work.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         moby[0xBC] = 1;
         FastVecAdd((char *)&work.velocity, (char *)&work.velocity, vars);
     }
 finish:
     if (moby[0xBC]) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
-        SpawnBigExplosionEffect(moby, &work.velocity, &work.normal);
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
+        part_spawn_big_explosion(moby, &work.velocity, &work.normal);
     }
 }
 
 
 /* Moves a projectile one step along its velocity and bounces it off walls and objects it hits. */
-void func_L22_0038FFF8(char *moby) {
+void projectile_update_motion(char *moby) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -220,9 +220,9 @@ void func_L22_0038FFF8(char *moby) {
     work.normal.f[2] = 1.0f;
     qcopy(&work.old, position);
     FastVecAdd(position, position, vars);
-    ComputeViewDirection(position, &work.surface, 0);
+    cam_compute_view_direction(position, &work.surface, 0);
     FastVecScale(&work.surface, &work.surface, 0.0003055556f);
-    SpawnSparkPuff(moby);
+    part_spawn_spark_puff(moby);
     work.packet.moby = moby;
     work.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
@@ -230,7 +230,7 @@ void func_L22_0038FFF8(char *moby) {
     work.packet.enabled = 1;
     work.packet.material = ((Material *)D_L22_002645F0 + D_00139574)->material;
     qcopy(&work.packet.vector, vars);
-    FastVectorNormalizeHelper(&work.packet.vector, &work.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&work.packet.vector, &work.packet.vector, 1.0f);
     work.packet.kind = 2;
     work.packet.vector.f[3] = 5627.925f;
     work.packet.class_id = *(unsigned short *)(moby + 0xAA);
@@ -243,7 +243,7 @@ void func_L22_0038FFF8(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = ((Collision *)&D_L22_001C00C0);
             model = reread->hit;
@@ -255,7 +255,7 @@ void func_L22_0038FFF8(char *moby) {
                 void *dest = moby + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&work.velocity, vars, &reread->normal);
+            vec_fast_normalize(&work.velocity, vars, &reread->normal);
             vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
             vec_scale_to_length(&work.normal, &reread->normal, 1.0f);
         } else {
@@ -264,21 +264,21 @@ void func_L22_0038FFF8(char *moby) {
                 goto finish;
             moby[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&work.velocity, vars, &collision->normal);
+            vec_fast_normalize(&work.velocity, vars, &collision->normal);
             vec_scale_to_length(&work.velocity, &work.velocity, 0.033333335f);
             vec_scale_to_length(&work.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         moby[0xBC] = 1;
         FastVecAdd((char *)&work.velocity, (char *)&work.velocity, vars);
     }
 finish:
     if (*(unsigned char *)(moby + 0xBC)) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
         if (*(int *)(vars + 0x14) < 20)
-            SpawnBigExplosionEffect(moby, &work.velocity, &work.normal);
+            part_spawn_big_explosion(moby, &work.velocity, &work.normal);
         else
-            SpawnImpactBurst(moby, &work.velocity, &work.normal);
+            part_l00_spawn_impact_burst(moby, &work.velocity, &work.normal);
     }
 }
 
@@ -293,36 +293,36 @@ finish:
 /* func_L22_003E87B8 is in L22_003E87B8.c. */
 
 /* Shows the message effect for this object and clears one of its flags. */
-void func_L22_003E8830(s32 moby) {
+void text_show_message_clear_flag(s32 moby) {
     s32 varsPtr = *(u32 *)(moby + 0x68);
 
-    ShowTextMessageAtMoby(moby, varsPtr, varsPtr);
+    text_show_message_at_moby(moby, varsPtr, varsPtr);
     *(u8 *)(moby + 0x30) = 0xFF;
 }
 
 /* Shows a text message with a sound at the object and starts its effect. Does nothing if the object has no target. */
-void func_L22_003FA1D0(s32 mobyAddr, s32 unused1, s32 unused2)
+void text_show_message_with_sound(s32 mobyAddr, s32 unused1, s32 unused2)
 {
     char *moby = (char *)mobyAddr;
-    char *target = FindOwnedEffectSlot(moby, -1, 0);
+    char *target = part_find_owned_effect_slot(moby, -1, 0);
     char offset[0x10];
 
     if (target == 0)
         return;
-    PlaySoundFromClassBank(RandomIntBelow(3) + 0xC, 0, moby, 0xE0B);
-    SpawnExplosionWithSparks((u8 *)moby, moby + 0x10, -1, 2.0f, 13.0f);
+    snd_play_from_class_bank(math_random_int_below(3) + 0xC, 0, moby, 0xE0B);
+    part_spawn_explosion_with_sparks((u8 *)moby, moby + 0x10, -1, 2.0f, 13.0f);
     PlayMobySound(0, 0, moby);
     func_2F3D60(offset, target + 0x10, 0.25f);
-    SpawnDebrisForMaskedParts(moby, 3, (f32 *)offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    MarkMobySpawned(moby);
+    part_spawn_masked_debris(moby, 3, (f32 *)offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    moby_mark_spawned(moby);
 }
 
 
 /* Shows the message effect with sound for this object and clears one of its flags. */
-void func_L22_003FA2A8(s32 moby) {
+void text_show_message_sound_clear_flag(s32 moby) {
     s32 varsPtr = *(u32 *)(moby + 0x68);
 
-    ShowMessageWithSoundEffect(moby, varsPtr, varsPtr);
+    text_show_message_with_sound(moby, varsPtr, varsPtr);
     *(u8 *)(moby + 0x30) = 0xFF;
 }
 
@@ -332,7 +332,7 @@ void func_L22_003FA2A8(s32 moby) {
 /* func_L22_0040D638 lives in L22_00358778-state-g8.c. */
 
 /* Updates the timers and animation of an object each frame, and ages it by one tick. */
-void func_L22_0040DA80(s32 moby) {
+void flyer_update_timers_anim(s32 moby) {
     s32 mobyCopy = moby;
     s32 vars = *(u32 *)(mobyCopy + 0x68);
 
@@ -348,7 +348,7 @@ void func_L22_0040DA80(s32 moby) {
 
 
 /* Steers an object toward a target position, scaled by speed and the frame time. */
-void func_L22_0040DC40(s32 moby, s32 target, s32 useOffset, f32 speed) {
+void moby_l22_steer_toward_target(s32 moby, s32 target, s32 useOffset, f32 speed) {
     u8 steer[0x10];
     u8 adjusted[0x10];
     f32 step = speed;
@@ -393,20 +393,20 @@ typedef struct {
     float p1[4];
     float p2[4];
 } TrailMoby0040DE00;
-extern void func_002AFFD8(void *, void *, int);
-extern TrailMoby0040DE00 *func_0029EFD0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern TrailMoby0040DE00 *CreateMoby(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 
 /* Creates a trail effect object at a position moving along a velocity, and fills in its size, lifetime and three trail points. */
-TrailMoby0040DE00 *func_L22_0040DE00(float *pos, float *vel, float *scale)
+TrailMoby0040DE00 *part_spawn_trail_effect(float *pos, float *vel, float *scale)
 {
     float ref[4];
     float scaled[4];
     TrailMoby0040DE00 *moby;
     TrailVars0040DE00 *vars;
 
-    ComputeViewDirection(pos, ref, 1);
+    cam_compute_view_direction(pos, ref, 1);
     moby = CreateMoby(0xF5D /* moby class 3933 */);
     if (moby != 0) {
         vars = moby->vars;
@@ -431,12 +431,12 @@ TrailMoby0040DE00 *func_L22_0040DE00(float *pos, float *vel, float *scale)
 
 extern u8 *D_L22_001AF314[] __attribute__((sda));
 extern f32 D_L22_001B2A98 __attribute__((sda));
-extern void func_0029FCC0(void *, s32, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
+extern void moby_transform_joint_to_world(void *, s32, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
 
 /* Spawns two trail effects at the object's joints, flying away from an origin point. */
-void func_L22_0040DB20(u8 *moby, f32 *origin, f32 sizeArg) {
+void part_spawn_joint_trails(u8 *moby, f32 *origin, f32 sizeArg) {
     f32 jointPos[4] __attribute__((aligned(16)));
     f32 velocity[4] __attribute__((aligned(16)));
     f32 size = sizeArg;
@@ -444,30 +444,30 @@ void func_L22_0040DB20(u8 *moby, f32 *origin, f32 sizeArg) {
     if (D_L22_001AF314[0] != 0 && *(f32 *)(*(u8 **)(D_L22_001AF314[0] + 0x68) + 0x20) <= 0.0f) {
         return;
     }
-    TransformMobyJointToWorld(moby, 2, jointPos);
+    moby_transform_joint_to_world(moby, 2, jointPos);
     if (size == 0.0f) {
         size = D_L22_001B2A98;
     }
     FastVecSub(velocity, origin, jointPos);
     vec_scale_to_length(velocity, velocity, 0.6666667f);
-    SpawnTrailEffectMoby_L22(jointPos, velocity, &size);
-    TransformMobyJointToWorld(moby, 3, jointPos);
+    part_spawn_trail_effect(jointPos, velocity, &size);
+    moby_transform_joint_to_world(moby, 3, jointPos);
     FastVecSub(velocity, origin, jointPos);
     vec_scale_to_length(velocity, velocity, 0.6666667f);
-    SpawnTrailEffectMoby_L22(jointPos, velocity, &size);
+    part_spawn_trail_effect(jointPos, velocity, &size);
 }
 
 typedef struct { u8 pad[0x18]; u8 *target; } G1C00C0;
 extern G1C00C0 D_001C00C0;
-extern u8 *D_0018C0B0;
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282F20(void *, void *, f32);
-extern void func_002A8C00(void *, void *, int, void *, f32);
-extern void func_002A8E20(void *, void *);
-extern void func_L22_0040E2B0(void *, s32, s32);
+extern u8 *g_hero_moby;
+extern int CollLine(void *, void *, int, void *, int);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void make_hit_descriptor(void *, void *, int, void *, f32);
+extern void QueueMobyImpact(void *, void *);
+extern void part_start_random_scale_effect(void *, s32, s32);
 
 /* Checks whether the object hit something since its last position. If so it hurts the target, spawns the impact effect and goes to state 2. */
-void func_L22_0040DF28(u8 *moby, u8 *oldPos) {
+void projectile_check_hit_explode(u8 *moby, u8 *oldPos) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 hitDir[16] __attribute__((aligned(16)));
     u8 hitEvent[0x30] __attribute__((aligned(16)));
@@ -484,7 +484,7 @@ void func_L22_0040DF28(u8 *moby, u8 *oldPos) {
     if (*(s16 *)(target + 0xAA) == 0xEDD /* moby class 3805 */ || *(s16 *)(target + 0xAA) == 0xE0B /* moby class 3595 */) {
         return;
     }
-    if (target == gHeroMoby_0018C0B0 && !(*(f32 *)(vars + 0x1C) < 50.0f)) {
+    if (target == g_hero_moby && !(*(f32 *)(vars + 0x1C) < 50.0f)) {
         return;
     }
     if (*(f32 *)(vars + 0x1C) >= 50.0f) {
@@ -496,10 +496,10 @@ void func_L22_0040DF28(u8 *moby, u8 *oldPos) {
     hitEvent[0x19] = 3;
     *(u16 *)(hitEvent + 0x1A) = *(u16 *)(moby + 0xAA);
     QueueMobyImpact(D_001C00C0.target, hitEvent);
-    StartRandomScaleEffect(moby + 0x10, 10, 1);
+    part_start_random_scale_effect(moby + 0x10, 10, 1);
     if (D_001C00C0.target == 0) {
         qcopy(impactPos, moby + 0x10);
-        StartRandomScaleEffect(impactPos, 15, 0);
+        part_start_random_scale_effect(impactPos, 15, 0);
     }
     moby[0x20] = 2;
 }

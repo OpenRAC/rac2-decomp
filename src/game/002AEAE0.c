@@ -3,9 +3,9 @@
 
 /* Round x to a decimal place count: scale = 10^a0, then round(x * scale) / scale.
    -g for the nop pair before div.s. */
-extern int func_00283CF0(float x);
+extern int FloatToInt(float x);
 
-float func_002AEAE0(int places, float x)
+float math_round_to_decimal_places(int places, float x)
 {
     int scaleInt = 1;
     float scale;

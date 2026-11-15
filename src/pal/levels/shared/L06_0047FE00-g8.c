@@ -11,8 +11,8 @@ typedef struct {
     char pad1[0x24A0 - 0x34E];
     s32 field24A0;
 } L06State;
-extern L06State D_00189E20 __attribute__((nosda));
-extern int D_001A79F0;
+extern L06State g_hero_state __attribute__((nosda));
+extern int g_current_map_index;
 
 s32 func_PAL_L06_00480660(s32 a0)
 {
@@ -36,10 +36,10 @@ s32 func_PAL_L06_00480660(s32 a0)
     case 10:
         if (*(s16 *)(state + 0x2E) != 0)
             goto clear;
-        if (D_00189E20.field34C != 0) {
-            if (D_001A79F0 != 14)
+        if (g_hero_state.field34C != 0) {
+            if (g_current_map_index != 14)
                 return 0;
-            if (D_00189E20.field24A0 != 13)
+            if (g_hero_state.field24A0 != 13)
                 return 0;
         }
     }

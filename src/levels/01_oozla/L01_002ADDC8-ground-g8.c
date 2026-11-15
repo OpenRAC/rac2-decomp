@@ -59,7 +59,7 @@ typedef struct {
     u8 pad22A0[0x22C3 - 0x22A0];
     u8 gravityMode;                 /* 0x22C3 */
 } HeroGround;
-extern HeroGround D_00189E20;
+extern HeroGround g_hero_state;
 
 /* The result of the last collision query. */
 typedef struct {
@@ -72,38 +72,38 @@ typedef struct {
 } CollisionHit;
 extern CollisionHit D_L01_001BF900;
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern int D_L01_001A9030 MACRO_ADDR;
 extern int D_L01_001A9034;
 
-extern int func_L00_002ADF80(void);
-extern void func_00282C88(void *);
-extern void func_L00_002B47A8(void *, void *, int, float, float);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern int hero_is_in_special_kind_or_mode(void);
+extern void vec_clear_128(void *);
+extern void BuildOffsetVectorPair(void *, void *, int, float, float);
+extern int CollLine(void *, void *, int, void *, int);
 extern int func_L00_002E2048(void);
-extern int func_00278E78(void);
-extern float func_002A90F8(void *, void *);
-extern int func_002ABB78(void *);
-extern u8 *func_002AB1F0(void *);
-extern u8 *func_002AD0B0(void *);
-extern float func_002B0360(void *);
-extern void func_002AFF60(void *, void *, int);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00282E48(void *, void *);
+extern int GetCollHitMaterial(void);
+extern float coll_get_ground_height_at_position(void *, void *);
+extern int moby_is_in_special_class_range(void *);
+extern u8 *moby_get_private_value_0(void *);
+extern u8 *moby_get_private_value_2(void *);
+extern float gravity_get_center_distance(void *);
+extern void vec_compute_flat_direction_from_point(void *, void *, int);
+extern void ApproachValue(float *, float, float);
+extern float fast_vec_dist(void *, void *);
 extern void func_001290E0(void *, void *);
-extern float func_L00_002D3EA8(void *);
-extern float func_00283248(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_002B8E48(void *, void *);
+extern float cam_get_view_space_angle(void *);
+extern float mat_fast_helper_a(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void hero_compute_angles_to_local_dir(void *, void *);
 /* The EE integer and FP argument banks keep their own order. */
-extern void func_L00_002D3638(void *, float, float, float, int);
-extern float func_00282C48(float);
+extern void hero_build_relative_offset(void *, float, float, float, int);
+extern float math_fabs(float);
 
 /* Probe the ground under the hero: surface type and height, slope, gravity direction and side tilts. */
-void func_L01_002B5218(void)
+void UpdateOozlaHeroGroundContacts(void)
 {
     Vec4 rayEnd;
     Vec4 rayStart;
@@ -119,169 +119,169 @@ void func_L01_002B5218(void)
     s32 alongGravity;
     f32 height;
 
-    gHeroState.groundNormal.f[2] = 1.0f;
-    gHeroState.airFrames.u++;
-    gHeroState.framesOffGround.u++;
-    gHeroState.groundNormal.i[0] = 0;
-    gHeroState.groundNormal.i[1] = 0;
-    gHeroState.groundSlope.i = 0;
-    gHeroState.groundZ.i = 0;
-    ClearVector128(&gHeroState.groundPoint);
-    gHeroState.onFlaggedGroundMoby = 0;
-    gHeroState.groundDistance = 32.0f;
-    gHeroState.groundMoby = 0;
-    if (gHeroState.inWaterFrames != 0)
-        gHeroState.inWaterFrames++;
+    g_hero_state.groundNormal.f[2] = 1.0f;
+    g_hero_state.airFrames.u++;
+    g_hero_state.framesOffGround.u++;
+    g_hero_state.groundNormal.i[0] = 0;
+    g_hero_state.groundNormal.i[1] = 0;
+    g_hero_state.groundSlope.i = 0;
+    g_hero_state.groundZ.i = 0;
+    vec_clear_128(&g_hero_state.groundPoint);
+    g_hero_state.onFlaggedGroundMoby = 0;
+    g_hero_state.groundDistance = 32.0f;
+    g_hero_state.groundMoby = 0;
+    if (g_hero_state.inWaterFrames != 0)
+        g_hero_state.inWaterFrames++;
 
     /* Cast a ray down from above the hero. */
     alongGravity = 1;
-    height = gHeroState.capsuleRadius * 2.2f;
-    if (gHeroState.controlMode == 2)
-        height = gHeroState.capsuleRadius * 2.9f;
-    if (IsHeroInSpecialKindOrMode())
+    height = g_hero_state.capsuleRadius * 2.2f;
+    if (g_hero_state.controlMode == 2)
+        height = g_hero_state.capsuleRadius * 2.9f;
+    if (hero_is_in_special_kind_or_mode())
         height = 0.0f;
     BuildOffsetVectorPair(&rayStart, &rayEnd, alongGravity, height, -48.0f);
-    if (CollLine(&rayStart, &rayEnd, 2, gHeroState.moby, 0) == 0)
+    if (CollLine(&rayStart, &rayEnd, 2, g_hero_state.moby, 0) == 0)
         goto probed;
-    gHeroState.groundSoundClass = func_L00_002E2048();
+    g_hero_state.groundSoundClass = func_L00_002E2048();
     if (D_L01_001BF900.moby != 0)
-        gHeroState.groundSoundClass = 0;
-    if (gCurrentMapIndex == 7 && D_L01_001BF900.moby != 0)
-        gHeroState.groundSoundClass = 1;
-    gHeroState.groundType = GetCollHitMaterial();
-    if (gHeroState.groundType == 0) {
+        g_hero_state.groundSoundClass = 0;
+    if (g_current_map_index == 7 && D_L01_001BF900.moby != 0)
+        g_hero_state.groundSoundClass = 1;
+    g_hero_state.groundType = GetCollHitMaterial();
+    if (g_hero_state.groundType == 0) {
         /* Water: note the surface, then look for the floor below it. */
-        gHeroState.waterSurfaceZ = GetGroundHeightAtPosition(&D_L01_001BF900.point, &gHeroState.waterNormal);
-        if (gHeroState.position.f[2] < gHeroState.waterSurfaceZ && gHeroState.inWaterFrames <= 0)
-            gHeroState.inWaterFrames = 1;
-        if (CollLine(&rayStart, &rayEnd, 0x24, gHeroState.moby, 0) == 0)
+        g_hero_state.waterSurfaceZ = coll_get_ground_height_at_position(&D_L01_001BF900.point, &g_hero_state.waterNormal);
+        if (g_hero_state.position.f[2] < g_hero_state.waterSurfaceZ && g_hero_state.inWaterFrames <= 0)
+            g_hero_state.inWaterFrames = 1;
+        if (CollLine(&rayStart, &rayEnd, 0x24, g_hero_state.moby, 0) == 0)
             goto probed;
-        gHeroState.groundSoundClass = func_L00_002E2048();
+        g_hero_state.groundSoundClass = func_L00_002E2048();
     }
-    if (gHeroState.groundType == 3) {
-        gHeroState.sinkSurfaceZ = D_L01_001BF900.point.f[2];
+    if (g_hero_state.groundType == 3) {
+        g_hero_state.sinkSurfaceZ = D_L01_001BF900.point.f[2];
         rayStart.f[2] = D_L01_001BF900.point.f[2] - 0.01f;
-        if (CollLine(&rayStart, &rayEnd, 4, gHeroState.moby, 0) == 0)
+        if (CollLine(&rayStart, &rayEnd, 4, g_hero_state.moby, 0) == 0)
             goto probed;
     }
-    if (gHeroState.groundType == 0xB) {
-        gHeroState.sinkSurfaceZ = D_L01_001BF900.point.f[2];
+    if (g_hero_state.groundType == 0xB) {
+        g_hero_state.sinkSurfaceZ = D_L01_001BF900.point.f[2];
         goto probed;
     }
     if (D_L01_001BF900.moby != 0) {
-        if (IsMobyInSpecialClassRange(D_L01_001BF900.moby))
-            gHeroState.onFlaggedGroundMoby = 1;
-        info = GetMobyPrivateValue0(D_L01_001BF900.moby);
+        if (moby_is_in_special_class_range(D_L01_001BF900.moby))
+            g_hero_state.onFlaggedGroundMoby = 1;
+        info = moby_get_private_value_0(D_L01_001BF900.moby);
         if (info != 0 && (*(u16 *)(info + 0x1E) & 8))
-            gHeroState.onFlaggedGroundMoby = 1;
-        info = GetMobyPrivateValue2(D_L01_001BF900.moby);
+            g_hero_state.onFlaggedGroundMoby = 1;
+        info = moby_get_private_value_2(D_L01_001BF900.moby);
         if (info != 0 && (*(int *)(info + 0x3C) & 8))
-            gHeroState.onFlaggedGroundMoby = 1;
+            g_hero_state.onFlaggedGroundMoby = 1;
     }
     if (D_L01_001BF900.count > 0) {
-        qcopy(&gHeroState.groundPoint, &D_L01_001BF900.point);
-        gHeroState.groundZ.f = D_L01_001BF900.point.f[2];
+        qcopy(&g_hero_state.groundPoint, &D_L01_001BF900.point);
+        g_hero_state.groundZ.f = D_L01_001BF900.point.f[2];
         if (D_L01_001A9030)
-            gHeroState.groundZ.f = GetDistanceFromGravityCenter(&D_L01_001BF900.point);
-        gHeroState.groundDistance = fast_vec_dist(&gHeroState.position, &gHeroState.groundPoint);
-        gHeroState.groundMoby = D_L01_001BF900.moby;
-        func_001290E0(&gHeroState.groundNormal, &D_L01_001BF900.normal);
-        gHeroState.groundSlope.f = GetViewSpaceAngle(&D_L01_001BF900.normal);
-        gHeroState.downhillYaw = FastMatrixHelperA(D_L01_001BF900.normal.f[0], D_L01_001BF900.normal.f[1]);
-        FastVecSub(&work, &gHeroState.groundPoint, &gHeroState.position);
-        if (0.0f < FastVecDot(&work, &gHeroState.groundNormal))
-            gHeroState.groundDistance = -gHeroState.groundDistance;
-        if (gHeroState.groundDistance < 0.02f) {
-            gHeroState.framesOffGround.s = 0;
-            if (gHeroState.groundSlope.f <= 0.87266469f || gHeroState.gravityMode != 0) {
-                gHeroState.airFrames.s = 0;
-                gHeroState.lastLandedMoby = D_L01_001BF900.moby;
+            g_hero_state.groundZ.f = gravity_get_center_distance(&D_L01_001BF900.point);
+        g_hero_state.groundDistance = fast_vec_dist(&g_hero_state.position, &g_hero_state.groundPoint);
+        g_hero_state.groundMoby = D_L01_001BF900.moby;
+        func_001290E0(&g_hero_state.groundNormal, &D_L01_001BF900.normal);
+        g_hero_state.groundSlope.f = cam_get_view_space_angle(&D_L01_001BF900.normal);
+        g_hero_state.downhillYaw = mat_fast_helper_a(D_L01_001BF900.normal.f[0], D_L01_001BF900.normal.f[1]);
+        FastVecSub(&work, &g_hero_state.groundPoint, &g_hero_state.position);
+        if (0.0f < FastVecDot(&work, &g_hero_state.groundNormal))
+            g_hero_state.groundDistance = -g_hero_state.groundDistance;
+        if (g_hero_state.groundDistance < 0.02f) {
+            g_hero_state.framesOffGround.s = 0;
+            if (g_hero_state.groundSlope.f <= 0.87266469f || g_hero_state.gravityMode != 0) {
+                g_hero_state.airFrames.s = 0;
+                g_hero_state.lastLandedMoby = D_L01_001BF900.moby;
             }
         }
     }
 probed:
-    if (gHeroState.position.f[2] > gHeroState.waterSurfaceZ)
-        gHeroState.inWaterFrames = 0;
-    if (gHeroState.airFrames.s != 0) {
-        gHeroState.groundedFrames = 0;
+    if (g_hero_state.position.f[2] > g_hero_state.waterSurfaceZ)
+        g_hero_state.inWaterFrames = 0;
+    if (g_hero_state.airFrames.s != 0) {
+        g_hero_state.groundedFrames = 0;
     } else {
-        gHeroState.groundedFrames++;
-        qcopy(&gHeroState.lastGroundPoint, &gHeroState.groundPoint);
-        if (gHeroState.state != 0x38)
-            gHeroState.f18C0 = 0;
+        g_hero_state.groundedFrames++;
+        qcopy(&g_hero_state.lastGroundPoint, &g_hero_state.groundPoint);
+        if (g_hero_state.state != 0x38)
+            g_hero_state.f18C0 = 0;
     }
 
     /* Gravity direction. */
-    ClearVector128(&gHeroState.gravityDir);
-    switch (gHeroState.gravityMode) {
+    vec_clear_128(&g_hero_state.gravityDir);
+    switch (g_hero_state.gravityMode) {
     case 0:
-        gHeroState.gravityDir.f[2] = -1.0f;
+        g_hero_state.gravityDir.f[2] = -1.0f;
         break;
     case 1:
         if (D_L01_001A9034) {
-            ComputeFlatDirectionFromPoint(&gHeroState.position, &gHeroState.gravityDir, 0);
-        } else if (gHeroState.gravityOverride.f[3] != 0.0f) {
-            ApproachValue(&gHeroState.gravityOverride.f[3], 0.0f, 1.0f);
-            qcopy(&gHeroState.gravityDir, &gHeroState.gravityOverride);
+            vec_compute_flat_direction_from_point(&g_hero_state.position, &g_hero_state.gravityDir, 0);
+        } else if (g_hero_state.gravityOverride.f[3] != 0.0f) {
+            ApproachValue(&g_hero_state.gravityOverride.f[3], 0.0f, 1.0f);
+            qcopy(&g_hero_state.gravityDir, &g_hero_state.gravityOverride);
         } else {
-            qcopy(&gHeroState.gravityDir, &gHeroState.groundNormal);
-            FastVecScale(&gHeroState.gravityDir, &gHeroState.gravityDir, -1.0f);
+            qcopy(&g_hero_state.gravityDir, &g_hero_state.groundNormal);
+            FastVecScale(&g_hero_state.gravityDir, &g_hero_state.gravityDir, -1.0f);
         }
         break;
     case 2:
         sign = -1.0f;
-        if (gHeroState.gravityPoint.f[3] > 0.0f)
+        if (g_hero_state.gravityPoint.f[3] > 0.0f)
             sign = 1.0f;
-        FastVecSub(&gHeroState.gravityDir, &gHeroState.gravityPoint, &gHeroState.position);
-        vec_scale_to_length(&gHeroState.gravityDir, &gHeroState.gravityDir, sign);
+        FastVecSub(&g_hero_state.gravityDir, &g_hero_state.gravityPoint, &g_hero_state.position);
+        vec_scale_to_length(&g_hero_state.gravityDir, &g_hero_state.gravityDir, sign);
         break;
     }
 
     /* Ground and side tilts, only close to the ground in the listed control modes. */
-    gHeroState.groundTiltY.i = 0;
-    gHeroState.groundTiltX.i = 0;
-    gHeroState.sideTiltX.i[0] = 0;
-    gHeroState.sideTiltX.i[1] = 0;
-    gHeroState.sideTiltY.i[0] = 0;
-    gHeroState.sideTiltY.i[1] = 0;
-    gHeroState.sideHeight.i[0] = 0;
-    gHeroState.sideHeight.i[1] = 0;
-    if (!(gHeroState.groundDistance < 0.25f))
+    g_hero_state.groundTiltY.i = 0;
+    g_hero_state.groundTiltX.i = 0;
+    g_hero_state.sideTiltX.i[0] = 0;
+    g_hero_state.sideTiltX.i[1] = 0;
+    g_hero_state.sideTiltY.i[0] = 0;
+    g_hero_state.sideTiltY.i[1] = 0;
+    g_hero_state.sideHeight.i[0] = 0;
+    g_hero_state.sideHeight.i[1] = 0;
+    if (!(g_hero_state.groundDistance < 0.25f))
         return;
-    if (!(gHeroState.controlMode == 0 || gHeroState.controlMode == 12 ||
-          gHeroState.controlMode == 9 || gHeroState.controlMode == 7 ||
-          (gHeroState.controlMode == 4 && gHeroState.f49C) ||
-          gHeroState.controlMode == 1))
+    if (!(g_hero_state.controlMode == 0 || g_hero_state.controlMode == 12 ||
+          g_hero_state.controlMode == 9 || g_hero_state.controlMode == 7 ||
+          (g_hero_state.controlMode == 4 && g_hero_state.f49C) ||
+          g_hero_state.controlMode == 1))
         return;
-    ComputeAnglesToHeroLocalDirection(&gHeroState.groundNormal, &work);
+    hero_compute_angles_to_local_dir(&g_hero_state.groundNormal, &work);
     if (-0.785398244f < work.f[1] && work.f[1] < 0.785398244f)
-        gHeroState.groundTiltY.f = work.f[1];
+        g_hero_state.groundTiltY.f = work.f[1];
     if (-0.785398244f < work.f[0] && work.f[0] < 0.785398244f)
-        gHeroState.groundTiltX.f = work.f[0];
+        g_hero_state.groundTiltX.f = work.f[0];
     for (side = 0; side < 2; side++) {
         angle = 1.57079649f;
         if (side == 1)
             angle = -angle;
-        BuildHeroRelativeOffset(&sideStart, 0.2f, angle, 0.45f, 1);
-        BuildHeroRelativeOffset(&sideEnd, 0.2f, angle, -0.45f, 1);
-        if (CollLine(&sideStart, &sideEnd, 0x22, gHeroState.moby, 0)) {
+        hero_build_relative_offset(&sideStart, 0.2f, angle, 0.45f, 1);
+        hero_build_relative_offset(&sideEnd, 0.2f, angle, -0.45f, 1);
+        if (CollLine(&sideStart, &sideEnd, 0x22, g_hero_state.moby, 0)) {
             if (D_L01_001A9030)
-                gHeroState.sideHeight.f[side] = GetDistanceFromGravityCenter(&D_L01_001BF900.point) -
-                                                GetDistanceFromGravityCenter(&gHeroState.groundPoint);
+                g_hero_state.sideHeight.f[side] = gravity_get_center_distance(&D_L01_001BF900.point) -
+                                                gravity_get_center_distance(&g_hero_state.groundPoint);
             else
-                gHeroState.sideHeight.f[side] = D_L01_001BF900.point.f[2] - gHeroState.groundZ.f;
-            if (0.4f < FloatAbs(gHeroState.sideHeight.f[side]))
-                gHeroState.sideHeight.f[side] = 0.0f;
+                g_hero_state.sideHeight.f[side] = D_L01_001BF900.point.f[2] - g_hero_state.groundZ.f;
+            if (0.4f < math_fabs(g_hero_state.sideHeight.f[side]))
+                g_hero_state.sideHeight.f[side] = 0.0f;
             func_001290E0(&sideNormal, &D_L01_001BF900.normal);
-            ComputeAnglesToHeroLocalDirection(&sideNormal, &sideAngles);
+            hero_compute_angles_to_local_dir(&sideNormal, &sideAngles);
             if (-0.785398244f < sideAngles.f[1] && sideAngles.f[1] < 0.785398244f)
-                gHeroState.sideTiltY.f[side] = sideAngles.f[1];
+                g_hero_state.sideTiltY.f[side] = sideAngles.f[1];
             if (-0.785398244f < sideAngles.f[0] && sideAngles.f[0] < 0.785398244f)
-                gHeroState.sideTiltX.f[side] = sideAngles.f[0];
+                g_hero_state.sideTiltX.f[side] = sideAngles.f[0];
         } else {
-            gHeroState.sideHeight.i[side] = 0;
-            gHeroState.sideTiltY.f[side] = gHeroState.groundTiltY.f;
-            gHeroState.sideTiltX.f[side] = gHeroState.groundTiltX.f;
+            g_hero_state.sideHeight.i[side] = 0;
+            g_hero_state.sideTiltY.f[side] = g_hero_state.groundTiltY.f;
+            g_hero_state.sideTiltX.f[side] = g_hero_state.groundTiltX.f;
         }
     }
 }

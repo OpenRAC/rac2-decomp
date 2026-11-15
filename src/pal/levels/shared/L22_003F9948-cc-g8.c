@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L22_003F9948, the PAL copy of func_L22_003F54B8: the same C. */
 
 typedef unsigned char u8;
@@ -30,11 +31,11 @@ typedef float f32;
  * second turned into radians per frame (pi / 180 / 60), and the amplitude is a level
  * value. The point and both values take per-program names.
  */
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AFDD8(void *, void *, void *, int);
-extern int func_002A77E0(int);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283B98(f32, f32);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_transform_by_object_or_given(void *, void *, void *, int);
+extern int math_random_int_below(int);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 
 typedef struct {
     u8 pad[0xB0];
@@ -53,10 +54,10 @@ void func_PAL_L22_003F9948(u8 *obj) {
     SwayVars *vars = *(SwayVars **)(obj + 0x68);
     f32 delta[4];
 
-    func_00282CF0(delta, ref_L22_003F54B8_00, obj + 0x10);
-    func_002AFDD8(obj, delta, delta, 0);
-    vars->heading = func_002A77E0(2) ? 1.5707964f : -1.5707964f;
-    vars->heading = func_00283B98(vars->heading, func_00283248(delta[0], delta[1]));
+    FastVecSub(delta, ref_L22_003F54B8_00, obj + 0x10);
+    vec_transform_by_object_or_given(obj, delta, delta, 0);
+    vars->heading = math_random_int_below(2) ? 1.5707964f : -1.5707964f;
+    vars->heading = FastAddRotations(vars->heading, mat_fast_helper_a(delta[0], delta[1]));
     vars->phase_step = ref_L22_003F54B8_01 * 0.0003490659f;
     vars->amplitude = ref_L22_003F54B8_02;
     vars->phase = 0.0f;
@@ -66,7 +67,7 @@ void func_PAL_L22_003F9948(u8 *obj) {
  * $gp; the scale factor it multiplies is at a different address in the other program that
  * carries the function, so it takes a per-program name.
  */
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 /* Scales the controller of the object: when the controller is idle its position is copied to
  * the object, otherwise the controller's values are scaled and written back.
  */
@@ -89,4 +90,4 @@ typedef unsigned short u16;
  * from the ring's index table, the outer two corners pushed out by a factor. */
 typedef struct { f32 x, y, z; } RingVertex;
 extern RingVertex D_L22_00255920[];
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);

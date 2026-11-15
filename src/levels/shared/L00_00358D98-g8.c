@@ -4,25 +4,25 @@
 /* -G8 unit: the two registry words this body passes by address are small data (the retail reaches
  * them with `addiu $a0,$gp,0x35A0`), so the function lives here; see config/cflags.txt. */
 
-extern int D_L00_0022F7C0[];
+extern int g_purchase_menu_model[];
 
 extern int D_001B2590 __attribute__((sda));
 
 extern int D_001B2594 __attribute__((sda));
 
-extern void func_002F8918(int *a, int *b);
+extern void VendorPurchaseDialogUpdate(int *a, int *b);
 
-extern void func_L00_00373F48(int *a, int *b);
+extern void UpdateItemPurchaseConfirmation(int *a, int *b);
 
-extern void func_L00_00374348(int *a, int *b);
+extern void UpdatePurchaseConfirmationDialog(int *a, int *b);
 
-extern void func_L00_00373D40(int *a, int *b);
+extern void UpdateSelectedItemPurchaseDialog(int *a, int *b);
 
 /* Dispatch on a mode word held in the level's own data, once the module's registry word is set. */
 /* Runs the purchase confirmation step that matches the current menu mode. */
-void func_L00_00374708(void)
+void shop_dispatch_purchase_confirm(void)
 {
-    int *menu = gPurchaseMenuModel;
+    int *menu = g_purchase_menu_model;
     int mode;
 
     if (menu[0x84 / 4] == 0)
@@ -41,7 +41,7 @@ void func_L00_00374708(void)
 extern int D_L00_001AD410 __attribute__((sda));
 extern void ref_L00_0036ADB0_00(void *, float);
 /* Resets all 64 entries of a table to the same starting value. */
-void func_L00_0036ADB0(void)
+void table_reset_entries(void)
 {
     int i = 0;
     do {
@@ -66,7 +66,7 @@ extern int D_L00_001AC598 __attribute__((sda));
 extern int D_L00_001AC59C __attribute__((sda));
 
 /* Sets the saved menu state back to its start values and clears the 128 menu slots. */
-void func_L00_00367308(void) {
+void menu_reset_state(void) {
     int i;
 
     D_L00_00221410.words[7] = 2;

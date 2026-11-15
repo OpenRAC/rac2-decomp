@@ -33,22 +33,22 @@ typedef struct {
     u8 pad6[0x24B0 - 0x2498];
     s32 mode;
 } HeroAnimation2168;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 #define HA ((HeroAnimation2168 *)D_00189E20)
 extern u8 D_001A7A45[] __attribute__((sda));
 extern u8 D_L00_001B4400[];
 extern u8 D_L00_001B4A00[];
 extern u8 D_L00_001D98C0[];
 extern s32 D_L00_001A7DF8[2] __attribute__((sda));
-extern s32 func_0029FA88(void *);
+extern s32 moby_alloc_object_slot(void *);
 extern s32 func_PAL_002A2E30(void *, s32);
-extern void func_0011AEA0(s32);
-extern void func_0029F390(void *);
-extern s32 func_L00_002A4DB0(char *, s32, s32, s32);
-extern s32 func_00283CF0(float);
-extern void func_L00_002D24B8(void);
+extern void FlushCache(s32);
+extern void update_moby_animation_state(void *);
+extern s32 anim_copy_entry_data(char *, s32, s32, s32);
+extern s32 FloatToInt(float);
+extern void hero_clear_queued_anim(void);
 extern void func_PAL_L00_002D2140(s32, s32, float);
-extern void func_L00_002D1F60(void);
+extern void hero_clear_anim_flags(void);
 extern void func_PAL_L00_002D24D8(s32, s32, float);
 
 /* Starts hero animation sequence seq at frame: a positive speed plays it at rate 1/speed,
@@ -69,10 +69,10 @@ void func_PAL_L00_002D2668(s32 seq, s32 frame, float speed)
             seq = 0x31;
     }
 
-    id = func_0029FA88(obj);
+    id = moby_alloc_object_slot(obj);
     if (id >= 0) {
         func_PAL_002A2E30(obj, id | 0x300);
-        func_0011AEA0(0);
+        FlushCache(0);
         qcopy(D_L00_001D98C0 + id * 16, obj);
         if (obj->seq != 0xFF)
             obj->prevSeq = obj->seq;
@@ -82,11 +82,11 @@ void func_PAL_L00_002D2668(s32 seq, s32 frame, float speed)
     }
     obj->nextFrame = frame;
     obj->nextSeq = seq;
-    func_0029F390(obj);
+    update_moby_animation_state(obj);
 
     if (obj->seq != 0xFF)
-        obj->current = func_L00_002A4DB0((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
-    obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+        obj->current = anim_copy_entry_data((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
+    obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
 
     HA->speed = 1.0f;
     if (speed > 0.0f) {
@@ -95,12 +95,12 @@ void func_PAL_L00_002D2668(s32 seq, s32 frame, float speed)
         HA->curve = -1;
     } else {
         HA->rate = 1.0f;
-        HA->curve = func_00283CF0(-speed) - 1;
+        HA->curve = FloatToInt(-speed) - 1;
         HA->step = 0;
         obj->time = 0.0f;
     }
 
-    func_L00_002D24B8();
+    hero_clear_queued_anim();
 
     obj->sound = obj->model->seqs[seq]->sound;
     HA->changing = 1;
@@ -111,7 +111,7 @@ void func_PAL_L00_002D2668(s32 seq, s32 frame, float speed)
         func_PAL_L00_002D2140(seq, frame, speed);
     if (HA->flag22b4 == 0 && HA->flag22ba == 0 && seq != HA->mode)
         HA->flag22b8 = 0;
-    func_L00_002D1F60();
+    hero_clear_anim_flags();
     if (HA->slot != 0)
         func_PAL_L00_002D24D8(seq, frame, speed);
 }

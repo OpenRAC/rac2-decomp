@@ -68,7 +68,7 @@ typedef struct {
     float current_path_dist;
 } HeroTimerState;
 
-extern HeroTimerState D_00189E20;
+extern HeroTimerState g_hero_state;
 extern int D_L20_001B2AC8;
 
 #define BS(p, o) (*(short *)((p)+(o)))
@@ -83,24 +83,24 @@ typedef struct {
     int no_direction;
 } TimerPadState;
 
-extern TimerPadState D_00138180;
+extern TimerPadState g_pad_state;
 extern unsigned char *D_L20_001FBEE0[];
 extern unsigned char D_L20_00267060[];
 extern int D_L20_001A8F00_abs __asm__("D_L20_001A8F00");
 extern float D_L20_001B29E0, D_L20_001B29E4;
 /* The equipment flag at 0x1A7AFF: a small-data object at a nonzero offset, length 2 for reorg. */
 extern unsigned char D_001A7A70[] __attribute__((sda));
-extern void func_L00_002B9380(void), func_L00_002A7A10(void), func_L00_002C3838(void), func_L00_002B30E8(void);
-extern void func_L20_002D7730(int, int);
-extern int func_00282978(void *), func_00282948(void *);
-extern void func_00282C88(void *);
-extern int func_002ABB78(void *), func_002A77E0(int);
-extern void func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float);
-extern int func_002A8F70(void *, int, int, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_L00_002D3B00(void *), func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D3778(void *, void *, float);
+extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
+extern void hero_l20_set_state(int, int);
+extern int FastDecTimer(void *), math_fast_float_d(void *);
+extern void vec_clear_128(void *);
+extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
+extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float cam_get_view_space_height(void *), FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void hero_build_relative_point(void *, int, float, float, float), hero_apply_mode_transform_reversed(void *, void *, float);
 
 /* Modes 1 and 4 have equal arms on purpose: retail keeps them apart until jump2 cross-jumps them.
    Written as `case 1: case 4:`, the dispatch inverts in jump1, cse carries the base into the default
@@ -108,171 +108,171 @@ extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D37
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
 /* Counts up the hero frame timers each frame, ticks down cooldowns and updates the hero reach distance. */
-void func_L20_002D6488(void) {
+void hero_l20_update_timers(void) {
     unsigned char *m, *pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!gHeroState.tilt_disabled) EaseHeroLeanToUpright();
+    if (!g_hero_state.tilt_disabled) hero_ease_lean_to_upright();
     {
-        int state = gHeroState.state_frames+1;
-        int control = gHeroState.control_mode_frames+1;
-        int step = gHeroState.step_frames+1;
-        int animation = gHeroState.animation_frames+1;
-        gHeroState.state_frames = state;
-        gHeroState.control_mode_frames = control;
-        gHeroState.step_frames = step;
-        gHeroState.animation_frames = animation;
+        int state = g_hero_state.state_frames+1;
+        int control = g_hero_state.control_mode_frames+1;
+        int step = g_hero_state.step_frames+1;
+        int animation = g_hero_state.animation_frames+1;
+        g_hero_state.state_frames = state;
+        g_hero_state.control_mode_frames = control;
+        g_hero_state.step_frames = step;
+        g_hero_state.animation_frames = animation;
     }
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1E0);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1DC);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1D2);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1E4);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1F8);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1FE);
-    FastFloatHelperD(((unsigned char *)&gHeroState)+0x1D4);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x210);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1D0);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1F4);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1F6);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x204);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x206);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1F0);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1EC);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1EE);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x208);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x200);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x20E);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x20A);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x214);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x212);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1FC);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x216);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1FA);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x218);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1F2);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x21A);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x21C);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1DE);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x1E6);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x222);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x224);
-    FastDecTimer(((unsigned char *)&gHeroState)+0x226);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1DC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1D2);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F8);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FE);
+    math_fast_float_d(((unsigned char *)&g_hero_state)+0x1D4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x210);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1D0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F6);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x204);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x206);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1EC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1EE);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x208);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x200);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x20E);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x20A);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x214);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x212);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x216);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FA);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x218);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F2);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x21A);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x21C);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1DE);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E6);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x222);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x224);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x226);
 
-    if (!(gPadState.held&4)) gHeroState.field_20C = 0;
-    if (gHeroState.field_21C) QueueHeroGlowDrawRoutine();
-    if (gHeroState.item_animation_active) gHeroState.item_animation_frames++;
-    else gHeroState.item_animation_frames = 0;
-    if (gPadState.no_direction) {
-        gHeroState.stick_held_frames = 0;
-        gHeroState.stick_idle_frames++;
+    if (!(g_pad_state.held&4)) g_hero_state.field_20C = 0;
+    if (g_hero_state.field_21C) hero_queue_glow_draw_routine();
+    if (g_hero_state.item_animation_active) g_hero_state.item_animation_frames++;
+    else g_hero_state.item_animation_frames = 0;
+    if (g_pad_state.no_direction) {
+        g_hero_state.stick_held_frames = 0;
+        g_hero_state.stick_idle_frames++;
     }
     else {
-        gHeroState.stick_idle_frames = 0;
-        gHeroState.stick_held_frames++;
+        g_hero_state.stick_idle_frames = 0;
+        g_hero_state.stick_held_frames++;
     }
-    if (gHeroState.field_22C3 && !gHeroState.field_229C && gHeroState.field_340 && gHeroState.field_170<0.0016666668f && gHeroState.field_184<0.0016666668f) qcopy(((unsigned char *)&gHeroState)+0x80, ((unsigned char *)&gHeroState)+0x2030);
-    if (gHeroState.field_1454) gHeroState.field_1E8 = 0;
-    else gHeroState.field_1E8++;
-    if (gHeroState.field_24CC && !D_L20_001A8F00_abs && gHeroState.mode == 4 && gHeroState.field_2294 != 0x6F && (gPadState.pressed&0x10)) {
-        gHeroState.field_1E0 = 0;
-        gHeroState.field_24CC = 0;
-        YeedilEnterHeroAction(0x91, 1);
+    if (g_hero_state.field_22C3 && !g_hero_state.field_229C && g_hero_state.field_340 && g_hero_state.field_170<0.0016666668f && g_hero_state.field_184<0.0016666668f) qcopy(((unsigned char *)&g_hero_state)+0x80, ((unsigned char *)&g_hero_state)+0x2030);
+    if (g_hero_state.field_1454) g_hero_state.field_1E8 = 0;
+    else g_hero_state.field_1E8++;
+    if (g_hero_state.field_24CC && !D_L20_001A8F00_abs && g_hero_state.mode == 4 && g_hero_state.field_2294 != 0x6F && (g_pad_state.pressed&0x10)) {
+        g_hero_state.field_1E0 = 0;
+        g_hero_state.field_24CC = 0;
+        hero_l20_set_state(0x91, 1);
     }
     if (!D_L20_001A8F00_abs) {
-        if (D_L20_001B29E0>0) gHeroState.field_22A++;
-        else gHeroState.field_22A = 0;
-        if (gHeroState.field_22A>120) {
+        if (D_L20_001B29E0>0) g_hero_state.field_22A++;
+        else g_hero_state.field_22A = 0;
+        if (g_hero_state.field_22A>120) {
             D_L20_001B29E0 = 0;
-            gHeroState.field_22A = 0;
+            g_hero_state.field_22A = 0;
         }
-        if (D_L20_001B29E4>0) gHeroState.field_228++;
-        else gHeroState.field_228 = 0;
-        if (gHeroState.field_228>120) {
-            gHeroState.field_228 = 0;
+        if (D_L20_001B29E4>0) g_hero_state.field_228++;
+        else g_hero_state.field_228 = 0;
+        if (g_hero_state.field_228>120) {
+            g_hero_state.field_228 = 0;
             D_L20_001B29E4 = 0;
         }
     }
-    if (gHeroState.field_224) {
+    if (g_hero_state.field_224) {
         for (i = 0;(m = D_L20_001FBEE0[i]) != 0;i++) {
-            if (IsMobyInSpecialClassRange(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_L20_001B2AC8&7) == (((int)m>>8)&7) || !RandomIntBelow(4)) {
-                    hero = (unsigned char *)&gHeroState+0x80;
+            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
+                if ((D_L20_001B2AC8&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
+                    hero = (unsigned char *)&g_hero_state+0x80;
                     pos = m+0x10;
                     if (fast_vec_dist(hero, pos)<15.37f) {
                         FastVecSub(sum, pos, hero);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        QueueImpactEffect(m, gHeroState.field_2290, 0x4000000, hero, sum, 1.0f);
+                        part_queue_impact_effect(m, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) FastFloatHelperD(D_L20_00267060+i*0x70);
-    gHeroState.current_path_dist = 9999.0f;
-    if (gHeroState.field_34E && GetViewSpaceHeight(((unsigned char *)&gHeroState)+0xF0)<0) {
-        if (gHeroState.pos_history_count != 32) goto history_done;
-        ClearVector128(sum);
+    for (i = 0;i<4;i++) math_fast_float_d(D_L20_00267060+i*0x70);
+    g_hero_state.current_path_dist = 9999.0f;
+    if (g_hero_state.field_34E && cam_get_view_space_height(((unsigned char *)&g_hero_state)+0xF0)<0) {
+        if (g_hero_state.pos_history_count != 32) goto history_done;
+        vec_clear_128(sum);
         count = 8;
         for (i = 0;i<count;) {
-            history_index = gHeroState.pos_history_index-i;
+            history_index = g_hero_state.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            FastVecSub(delta, ((unsigned char *)&gHeroState)+0x1D90+first_index*16, ((unsigned char *)&gHeroState)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&g_hero_state)+0x1D90+first_index*16, ((unsigned char *)&g_hero_state)+0x1D90+second_index*16);
             i++;
             FastVecAdd(sum, sum, delta);
         }
         FastVecScale(sum, sum, 1.0f/(float)count);
         if (FastVecLength(sum)<0.016666668f) {
-            gHeroState.still_frames++;
+            g_hero_state.still_frames++;
             goto history_done;
         }
     }
-    gHeroState.still_frames = 0;
+    g_hero_state.still_frames = 0;
 history_done:
-    UpdateHeroLandingSlide();
-    switch (gHeroState.mode) {
+    hero_update_landing_slide();
+    switch (g_hero_state.mode) {
     case 1:
-        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.4f);
+        hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.4f);
         break;
     case 4:
-        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.4f);
+        hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.4f);
         break;
     default:
-        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.7f);
+        hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.7f);
         break;
     }
     if (!(D_L20_001B2AC8&3)) {
-        switch (gHeroState.mode) {
+        switch (g_hero_state.mode) {
         case 1:
-            gHeroState.reach_distance = 2.125f;
-            gHeroState.reach_height = 1.25f;
+            g_hero_state.reach_distance = 2.125f;
+            g_hero_state.reach_height = 1.25f;
             break;
         case 4:
-            gHeroState.reach_distance = 2.125f;
-            gHeroState.reach_height = 1.25f;
+            g_hero_state.reach_distance = 2.125f;
+            g_hero_state.reach_height = 1.25f;
             break;
         default:
             if (D_001A7A70[0x8F]) {
-                gHeroState.reach_distance = 14;
-                gHeroState.reach_height = 4.5f;
+                g_hero_state.reach_distance = 14;
+                g_hero_state.reach_height = 4.5f;
             }
             else {
-                gHeroState.reach_distance = 4.25f;
-                gHeroState.reach_height = 2.25f;
+                g_hero_state.reach_distance = 4.25f;
+                g_hero_state.reach_height = 2.25f;
             }
         }
     }
-    if (gHeroState.field_31C<4) {
-        qcopy(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0x2D0);
-        ApplyHeroModeTransformReversed(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0xD0, 0.5f);
+    if (g_hero_state.field_31C<4) {
+        qcopy(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0x2D0);
+        hero_apply_mode_transform_reversed(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0xD0, 0.5f);
     }
-    else qcopy(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0xE0);
+    else qcopy(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0xE0);
     {
-        unsigned char *heldMoby = gHeroState.field_5C0;
+        unsigned char *heldMoby = g_hero_state.field_5C0;
         if (heldMoby) {
-            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == gHeroState.field_33C) gHeroState.field_5C0 = 0;
-            if (gHeroState.field_5C0 && gHeroState.field_1248 != 46) gHeroState.field_5C0 = 0;
+            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == g_hero_state.field_33C) g_hero_state.field_5C0 = 0;
+            if (g_hero_state.field_5C0 && g_hero_state.field_1248 != 46) g_hero_state.field_5C0 = 0;
         }
     }
-    if (gHeroState.field_88<1) RecordHeroPlayCounters();
+    if (g_hero_state.field_88<1) hero_record_play_counters();
 }

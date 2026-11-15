@@ -1,27 +1,28 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_L02_001B359C;
+extern int g_moby_l02_pool;
 extern int D_L02_001B03F0 __attribute__((sda));
 typedef struct { char pad[0x160]; float amount; int pad2; int time; int phase; } Shake;
 extern Shake D_L02_001BA3C0;
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_0029F530(char *);
-extern void func_002B60B0(char *, float, float, float, float);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float moby_get_anim_value(char *);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern void func_PAL_002B5E30(char *, float);
-extern float func_L02_00321C30(void *, void *, float);
-extern void *func_L02_003FC0B8(void *);
-extern float *func_L02_003FC098(void *);
-extern int func_L00_003206B8(void *, void *);
+extern float vec_step_toward_target_limited(void *, void *, float);
+extern void *arena_get_state_word(void *);
+extern float *arena_get_camera_point(void *);
+extern int coll_point_inside_record_volume(void *, void *);
 extern void func_PAL_L01_00323068(char *, void *);
-extern void *func_0029FCC0(char *, int, void *);
-extern void func_002833F0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L01_00322288(char *, float);
-extern float func_00283C28(float);
-extern void func_L02_003DAB68(char *);
-extern float func_002AA2E8(float *, float, float);
+extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_start_effect_from_entry(char *, float);
+extern float math_fast_float_g(float);
+extern void turret_spawn_beam_hits(char *);
+extern float ApproachValue(float *, float, float);
 
 void func_PAL_L02_003DD890(char *self) {
     float before[4];
@@ -29,28 +30,28 @@ void func_PAL_L02_003DD890(char *self) {
     float delta[4];
     char *state = *(char **)(self + 0x68);
     float *target = (float *)(state + 0x230);
-    float distance = func_00282E80(self + 0x10, target);
-    float heading = func_00283248(target[0] - *(float *)(self + 0x10), target[1] - *(float *)(self + 0x14));
-    float frame = func_0029F530(self);
-    char *part = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C);
+    float distance = vec_distance_xy(self + 0x10, target);
+    float heading = mat_fast_helper_a(target[0] - *(float *)(self + 0x10), target[1] - *(float *)(self + 0x14));
+    float frame = moby_get_anim_value(self);
+    char *part = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + g_moby_l02_pool);
     int saved = *(int *)(part + 0x98);
     unsigned int mode;
     float speed;
     *(int *)(part + 0x98) = 0;
-    func_002B60B0(self, 0.0024f, 0.062000003f, 0.005026549f, 0.12566373f);
+    moby_set_controller_speed_limits(self, 0.0024f, 0.062000003f, 0.005026549f, 0.12566373f);
     mode = *(unsigned char *)(self + 0x42);
     switch (mode) {
     case 0:
     if (*(unsigned char *)(self + 0x20) != 4)
         func_PAL_002B5E30(self, *(float *)(self + 0xF8));
     else
-        func_L02_00321C30(self + 0x10, &D_L02_001B03F0, 0.20000002f);
+        vec_step_toward_target_limited(self + 0x10, &D_L02_001B03F0, 0.20000002f);
     break;
     case 1:
-    if (func_L00_003206B8(self + 0x10, func_L02_003FC0B8(*(void **)(self + 0xB8))))
+    if (coll_point_inside_record_volume(self + 0x10, arena_get_state_word(*(void **)(self + 0xB8))))
         func_PAL_L01_00323068(self, target);
     else
-        func_PAL_L01_00323068(self, func_L02_003FC098(*(void **)(self + 0xB8)));
+        func_PAL_L01_00323068(self, arena_get_camera_point(*(void **)(self + 0xB8)));
     if ((frame > 0.0f && frame < 2.0f) || (frame > 15.0f && frame < 17.0f) ||
         (frame > 30.0f && frame < 32.0f) || (frame > 45.0f && frame < 47.0f)) {
         D_L02_001BA3C0.amount = 0.05f;
@@ -60,19 +61,19 @@ void func_PAL_L02_003DD890(char *self) {
     break;
     case 2:
     if (frame > 12.0f && frame < 25.0f) {
-        func_0029FCC0(self, 4, before);
+        moby_transform_joint_to_world(self, 4, before);
         func_PAL_002B5E30(self, heading);
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_0029FCC0(self, 4, after);
-        func_00282CF0(delta, before, after);
-        func_00282CC0(self + 0x10, self + 0x10, delta);
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
+        moby_transform_joint_to_world(self, 4, after);
+        FastVecSub(delta, before, after);
+        FastVecAdd(self + 0x10, self + 0x10, delta);
     } else if (frame > 42.0f && frame < 55.0f) {
-        func_0029FCC0(self, 8, before);
+        moby_transform_joint_to_world(self, 8, before);
         func_PAL_002B5E30(self, heading);
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_0029FCC0(self, 8, after);
-        func_00282CF0(delta, before, after);
-        func_00282CC0(self + 0x10, self + 0x10, delta);
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
+        moby_transform_joint_to_world(self, 8, after);
+        FastVecSub(delta, before, after);
+        FastVecAdd(self + 0x10, self + 0x10, delta);
     }
     if ((frame > 0.0f && frame < 2.0f) || (frame > 29.0f && frame < 31.0f)) {
         D_L02_001BA3C0.amount = 0.1f;
@@ -84,9 +85,9 @@ void func_PAL_L02_003DD890(char *self) {
         if (frame < 23.0f)
             break;
     case 4:
-    func_L01_00322288(self, func_00283248(*(float *)(state + 0xF0), *(float *)(state + 0xF4)));
+    moby_start_effect_from_entry(self, mat_fast_helper_a(*(float *)(state + 0xF0), *(float *)(state + 0xF4)));
     *(float *)(state + 0xF8) -= *(float *)(state + 0x7C);
-    func_00282CC0(self + 0x10, self + 0x10, state + 0xF0);
+    FastVecAdd(self + 0x10, self + 0x10, state + 0xF0);
     break;
     case 5:
     if (frame > 3.0f && frame < 5.0f) {
@@ -105,17 +106,17 @@ void func_PAL_L02_003DD890(char *self) {
     case 7:
     if ((unsigned int)(*(unsigned char *)(self + 0x20) - 10) >= 2) {
         *(float *)(self + 0xF8) += ((*(float *)(state + 0x20) / (float)*(short *)(state + 0x24)) * -90.0f + 160.0f) * 0.0003490659f;
-        *(float *)(self + 0xF8) = func_00283C28(*(float *)(self + 0xF8));
-        func_002833F0(self + 0xC0, self + 0xF0);
-        func_L02_003DAB68(self);
+        *(float *)(self + 0xF8) = math_fast_float_g(*(float *)(self + 0xF8));
+        euler_rotation_basis(self + 0xC0, self + 0xF0);
+        turret_spawn_beam_hits(self);
         if (distance > 12.0f && *(unsigned char *)(self + 0x20) != 10) {
-            if (func_L00_003206B8(self + 0x10, func_L02_003FC0B8(*(void **)(self + 0xB8)))) {
+            if (coll_point_inside_record_volume(self + 0x10, arena_get_state_word(*(void **)(self + 0xB8)))) {
                 speed = ((*(float *)(state + 0x20) / (float)*(short *)(state + 0x24)) * -2.2f + 3.0f) * 0.020000001f;
-                func_002AA2E8((float *)(self + 0x10), target[0], speed);
-                func_002AA2E8((float *)(self + 0x14), target[1], speed);
+                ApproachValue((float *)(self + 0x10), target[0], speed);
+                ApproachValue((float *)(self + 0x14), target[1], speed);
             } else {
-                func_002AA2E8((float *)(self + 0x10), func_L02_003FC098(*(void **)(self + 0xB8))[0], 0.40000004f);
-                func_002AA2E8((float *)(self + 0x14), func_L02_003FC098(*(void **)(self + 0xB8))[1], 0.40000004f);
+                ApproachValue((float *)(self + 0x10), arena_get_camera_point(*(void **)(self + 0xB8))[0], 0.40000004f);
+                ApproachValue((float *)(self + 0x14), arena_get_camera_point(*(void **)(self + 0xB8))[1], 0.40000004f);
             }
         }
     }
@@ -129,7 +130,7 @@ void func_PAL_L02_003DD890(char *self) {
     case 9:
         break;
     }
-    if (*(float *)(self + 0x18) < func_L02_003FC098(*(void **)(self + 0xB8))[2])
-        *(float *)(self + 0x18) = func_L02_003FC098(*(void **)(self + 0xB8))[2];
-    *(int *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C + 0x98) = saved;
+    if (*(float *)(self + 0x18) < arena_get_camera_point(*(void **)(self + 0xB8))[2])
+        *(float *)(self + 0x18) = arena_get_camera_point(*(void **)(self + 0xB8))[2];
+    *(int *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + g_moby_l02_pool + 0x98) = saved;
 }

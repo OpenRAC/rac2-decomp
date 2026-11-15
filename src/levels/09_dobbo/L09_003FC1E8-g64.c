@@ -22,23 +22,23 @@ extern float D_L09_001B1194 __attribute__((sda)), D_L09_001B1198 __attribute__((
 extern float D_L09_001B119C __attribute__((sda));
 extern SparkBank D_L09_001FF580;
 extern void *D_L09_00255E90[16][2];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern unsigned long long func_0027C878(int);
-extern float func_002A7878(float, float);
-extern int func_L02_002F1658(void);
-extern void func_00280B90(void *, int, int);
-extern void func_00283098(void *, void *, void *), func_00282FB8(void *, void *, float);
-extern float func_00283198(float), func_00283CE0(int), func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern float math_random_float_range(float, float);
+extern int level_is_resident_flag_clear(void);
+extern void draw_world_quad(void *, int, int);
+extern void matrix_mul_vec3(void *, void *, void *), vec_fast_divide_helper(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float), IntToFloat(int), math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
 extern int func_001163B0(void);
-extern char *func_L08_0034A078(void *, void *, int, void *);
+extern char *part_spawn_short_lived(void *, void *, int, void *);
 
 /* Draws one glowing beam link between two points, with a bright core and a soft glow, and sometimes throws sparks. */
-void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, int alpha, int slot, int spark)
+void DrawBeamLinkStrip(int tex0, int tex1, void *points, int inner, int outer, int alpha, int slot, int spark)
 {
     Packet packets[2];
     V width, glowWidth, mat[4], axis[3], origin, delta, nextPoint, prevPoint, velocity;
@@ -153,15 +153,15 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
             qcopy(&packets[0].vertex[1], &packets[0].vertex[3]);
             qcopy(&packets[1].vertex[0], &packets[1].vertex[2]);
             qcopy(&packets[1].vertex[1], &packets[1].vertex[3]);
-            if (i == spark && IsResidentFlagClear()) {
-                r0 = RandomFloatRange(.01f, .08f);
+            if (i == spark && level_is_resident_flag_clear()) {
+                r0 = math_random_float_range(.01f, .08f);
                 vel = &velocity;
-                r1 = RandomAngle();
-                r2 = RandomAngle();
-                BuildSphericalOffset(vel, r0, r1, r2 * .25f);
+                r1 = math_random_angle();
+                r2 = math_random_angle();
+                vec_build_spherical_offset(vel, r0, r1, r2 * .25f);
                 matrix_mul_vec3(vel, vel, &D_L09_00255F10[slot][0]);
-                FastVectorDivideHelper(vel, vel, 1.0f / 30.0f);
-                particle = SpawnShortLivedParticle(&packets[0].vertex[Rand() & 3], vel, alpha * 64 / 100,
+                vec_fast_divide_helper(vel, vel, 1.0f / 30.0f);
+                particle = part_spawn_short_lived(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 64 / 100,
                                              D_L09_00255E90[slot][0]);
                 if (particle) {
                     particle[2] = *D_L09_001FF580.bank;
@@ -169,7 +169,7 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
                     output->inverse = 1.0f / IntToFloat(*(short *)(particle + 0xA));
                     output->color = 0x7F3F20;
                     *(float *)(particle + 0xC) = 150000.0f;
-                    particle = SpawnShortLivedParticle(&packets[0].vertex[Rand() & 3], vel, alpha * 127 / 100,
+                    particle = part_spawn_short_lived(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 127 / 100,
                                                  D_L09_00255E90[slot][0]);
                     if (particle) {
                         particle[2] = *D_L09_001FF580.bank;
@@ -183,7 +183,7 @@ void func_L09_003FC1E8(int tex0, int tex1, void *points, int inner, int outer, i
             fraction = IntToFloat(i);
             i++;
             fraction /= IntToFloat(6);
-            size = initialSize + (D_L09_001B1194 - initialSize) * FastSinOrCosB(fraction * 3.1415927f);
+            size = initialSize + (D_L09_001B1194 - initialSize) * math_fast_sin_or_cos_b(fraction * 3.1415927f);
             packets[0].uv[1][0] = packets[0].uv[0][0] = D_L09_001B37E0[slot];
             packets[0].uv[3][0] = packets[0].uv[2][0] = D_L09_001B37E0[slot] + 1;
             packets[0].uv[0][1] = 0;

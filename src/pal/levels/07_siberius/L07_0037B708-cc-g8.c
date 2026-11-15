@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L07_0037B708, the PAL copy of func_L07_00378AE0: the same C, where rename func_L07_00379020 becomes func_PAL_L07_0037BC50; rename func_L07_00336860 becomes func_PAL_L07_00338B98; expr 0.055555556f becomes 0.020000001f; expr 0.027777778f becomes 0.010000001f; expr 0.13888888f becomes 0.050000004f; lit 4.0f becomes 4.8f. */
 
 #include "common.h"
@@ -8,10 +9,10 @@ typedef struct {
 
 /* Mixed address forms are deliberate: retail loads these with lui+lw (MACRO_ADDR),
  * a split %hi/%lo pair (nosda) or $gp (sda/SDATA). */
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern int D_L07_001B1E08 MACRO_ADDR;
 extern int D_L07_001C9780 __attribute__((nosda));
-extern char *D_L07_001AEC08 __attribute__((sda));
+extern char *g_snowfall_moby __attribute__((sda));
 extern char *D_L07_001ADAAC MACRO_ADDR;
 extern float D_L07_001AEC10[] SDATA(D_L07_001AEC10);
 extern float D_L07_001AEC14[] MACRO_ADDR;
@@ -20,16 +21,16 @@ extern float D_L07_001B90C0[]; /* hero */
 extern V D_L07_001B2550 MACRO_ADDR;
 
 extern void func_PAL_L07_0037BC50(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_L02_0031E9E8(void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002B3868(void *);
-extern int func_L00_00329520(void *, int);
+extern void moby_set_state(void *, int, int);
+extern void math_random_planar_offset(void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int flag_set_first_pending(void *);
+extern int coll_point_inside_region(void *, int);
 extern char *func_PAL_L07_00338B98(void *, void *, int, int);
 
 typedef struct {
@@ -67,47 +68,47 @@ void func_PAL_L07_0037B708(Object *obj) {
     case 0:
         obj->alpha = 255;
         obj->flags |= 0x100;
-        if (D_001A79F0 == 7 && D_L07_001B1E08) {
+        if (g_current_map_index == 7 && D_L07_001B1E08) {
             func_PAL_L07_0037BC50(obj);
-            func_002A7750(obj, 1, -1);
+            moby_set_state(obj, 1, -1);
         }
         data->speed = 1.5f;
         data->fall = 2.5f;
         data->enabled = 1;
-        D_L07_001AEC08 = (char *)obj;
+        g_snowfall_moby = (char *)obj;
         break;
     case 1:
-        if (D_001A79F0 == 7 && D_L07_001C9780 == 1) {
-            func_002A7750(obj, 2, -1);
+        if (g_current_map_index == 7 && D_L07_001C9780 == 1) {
+            moby_set_state(obj, 2, -1);
             break;
         }
-        for (i = 0; i < func_002A77E0(2); i++) {
-            func_L02_0031E9E8(&pos, 15.0f);
+        for (i = 0; i < math_random_int_below(2); i++) {
+            math_random_planar_offset(&pos, 15.0f);
             pos.z += 7.0f;
-            func_00282CC0(&pos, &pos, &D_L07_001B9200);
-            func_00282D30(&tmp, &D_L07_001B9200[35], 4.0f);
-            func_00282CC0(&pos, &tmp, &pos);
-            func_L02_0031E9E8(&vel, data->speed * (0.020000001f));
-            vel.z = -(data->fall * (0.020000001f)) * func_002A7878(0.8f, 1.2f);
-            if (!func_L00_00329520(&pos, data->group))
+            FastVecAdd(&pos, &pos, &D_L07_001B9200);
+            FastVecScale(&tmp, &D_L07_001B9200[35], 4.0f);
+            FastVecAdd(&pos, &tmp, &pos);
+            math_random_planar_offset(&vel, data->speed * (0.020000001f));
+            vel.z = -(data->fall * (0.020000001f)) * math_random_float_range(0.8f, 1.2f);
+            if (!coll_point_inside_region(&pos, data->group))
                 func_PAL_L07_00338B98(&pos, &vel, 0, 0);
         }
-        func_00282D30(&point, &D_L07_001B9200[35], 4.0f);
-        func_00282CC0(&tmp, &point, &D_L07_001B9200);
-        func_00282CF0(&D_L07_001B2550, &tmp, &data->previous);
-        data->scale = func_00282DF0(&D_L07_001B2550) * 3.3333333f;
+        FastVecScale(&point, &D_L07_001B9200[35], 4.0f);
+        FastVecAdd(&tmp, &point, &D_L07_001B9200);
+        FastVecSub(&D_L07_001B2550, &tmp, &data->previous);
+        data->scale = FastVecLength(&D_L07_001B2550) * 3.3333333f;
         if (data->scale > 1.0f)
             data->scale = 1.0f;
         else if (data->scale < 0.0f)
             data->scale = 0.0f;
-        func_00282D30(&D_L07_001B2550, &D_L07_001B2550, data->scale);
+        FastVecScale(&D_L07_001B2550, &D_L07_001B2550, data->scale);
         qcopy_nc(&data->previous, &tmp);
         break;
     case 2:
-        if (func_002B3868(obj))
+        if (flag_set_first_pending(obj))
             D_L07_001B2550.z -= 60.0f;
-        if (D_001A79F0 == 7 && D_L07_001C9780 != 1) {
-            func_002A7750(obj, 1, -1);
+        if (g_current_map_index == 7 && D_L07_001C9780 != 1) {
+            moby_set_state(obj, 1, -1);
             break;
         }
         if (!D_L07_001ADAAC)
@@ -117,20 +118,20 @@ void func_PAL_L07_0037B708(Object *obj) {
         lo = D_L07_001AEC10[j * 2];
         hi = D_L07_001AEC14[j * 2];
         for (k = 0; k < 6; k++) {
-            func_00282D30(&tmp, &data->axisA, func_002A7878(-25.0f, 25.0f));
-            func_00282CC0(&pos, &tmp, &data->origin);
-            func_00282D30(&tmp, &data->axisB, func_002A7878(lo, hi));
-            func_00282CC0(&pos, &tmp, &pos);
-            func_00282CC0(&pos, &pos, hero_pos);
-            func_00282CF0(&pos, &pos, D_L07_001ADAAC + 0x10);
+            FastVecScale(&tmp, &data->axisA, math_random_float_range(-25.0f, 25.0f));
+            FastVecAdd(&pos, &tmp, &data->origin);
+            FastVecScale(&tmp, &data->axisB, math_random_float_range(lo, hi));
+            FastVecAdd(&pos, &tmp, &pos);
+            FastVecAdd(&pos, &pos, hero_pos);
+            FastVecSub(&pos, &pos, D_L07_001ADAAC + 0x10);
             pos.z -= D_L07_001B90C0[0x148 / 4] - *(float *)(D_L07_001ADAAC + 0x18);
-            func_L02_0031E9E8(&vel, 0.050000004f);
-            vel.z = data->fall * (func_002A7878(0.8f, 1.2f) * (-0.010000001f));
+            math_random_planar_offset(&vel, 0.050000004f);
+            vel.z = data->fall * (math_random_float_range(0.8f, 1.2f) * (-0.010000001f));
             func_PAL_L07_00338B98(&pos, &vel, 1, 0);
         }
-        func_00282CF0(&D_L07_001B2550, hero_pos, &data->previous);
-        func_00282D30(&tmp, D_L07_001ADAAC + 0xC0, 1.2f);
-        func_00282CC0(&D_L07_001B2550, &tmp, &D_L07_001B2550);
+        FastVecSub(&D_L07_001B2550, hero_pos, &data->previous);
+        FastVecScale(&tmp, D_L07_001ADAAC + 0xC0, 1.2f);
+        FastVecAdd(&D_L07_001B2550, &tmp, &D_L07_001B2550);
         qcopy_nc(&data->previous, hero_pos);
         break;
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Manual retail reconstruction, 2026-10-24. */
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -19,7 +20,7 @@ typedef union { DmaTag *tag; int *words; u8 *bytes; int address; } PacketCursor;
 extern PacketCursor ref_0027EA28_00;
 extern QuadWord ref_0027EA28_01;
 /* Adds a plain colour quad with four corners to the draw list. */
-void func_0027EA28(const s64 *vertices, const int *registers)
+void gfx_append_flat_quad_packet(const s64 *vertices, const int *registers)
 {
     int *tag;
     u64 *packet;

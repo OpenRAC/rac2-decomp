@@ -23,17 +23,17 @@ extern float D_L01_001B1624 NOT_SDA;
 extern float D_L01_001B1628 NOT_SDA;
 extern char D_L01_001A8F60[] NOT_SDA;
 
-extern s32 func_00282948(char *);
-extern void func_0029F338(char *);
-extern void func_002A7750(char *, s32, s32);
-extern s32 func_002A9640(char *, s32, s32);
-extern float func_002A7878(float, float);
+extern s32 math_fast_float_d(char *);
+extern void moby_mark_spawned(char *);
+extern void moby_set_state(char *, s32, s32);
+extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern float math_random_float_range(float, float);
 extern void *func_PAL_002735D0(char *, s32, s32, s32, char *, char *, void *, s32, float, float);
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_PAL_002B15D8(char *, s32, char *, s32, float, float, float, float);
-extern s32 func_002B3868(char *);
-extern void func_002E5CF8(s32, s32, char *);
-extern void func_L00_00324F18(char *, void *, float, float, float);
+extern s32 flag_set_first_pending(char *);
+extern void PlayMobySound(s32, s32, char *);
+extern void vec_local_offset_to_world(char *, void *, float, float, float);
 extern void func_PAL_L00_003281C0(char *, s32, float);
 extern void func_PAL_L00_0032C328(char *, void *, void *, void *, s32, s32, s32, s32, s32, u8, void *);
 extern void func_PAL_L01_002E2968(float, float, float, void *, void *, s32, u32, s32);
@@ -47,12 +47,12 @@ void func_PAL_L01_00414828(char *obj)
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
         D_L01_001AEC38 = D_L01_001AEC38_1 + 1;
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (func_002A9640(obj, 0x04010000, 0) != 0 && *(s32 *)rec == 0) {
+        if (part_find_owned_effect_slot(obj, 0x04010000, 0) != 0 && *(s32 *)rec == 0) {
             D_L01_001AEC38 = D_L01_001AEC38_1 - 1;
-            func_002A7750(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
         }
         *(u8 *)(obj + 0xA8) = 0xFF;
         break;
@@ -62,27 +62,27 @@ void func_PAL_L01_00414828(char *obj)
             func_PAL_L00_0032C328(obj, D_L01_001B1600, D_L01_001B15F8, D_L01_001B15F0,
                 65535, 0, 0, 6, 65535, 255, 0);
             jitter.q = 0;
-            jitter.f[0] = func_002A7878(-1.0f, 1.0f) * 0.020000001f;
-            jitter.f[1] = func_002A7878(-1.0f, 1.0f) * 0.020000001f;
+            jitter.f[0] = math_random_float_range(-1.0f, 1.0f) * 0.020000001f;
+            jitter.f[1] = math_random_float_range(-1.0f, 1.0f) * 0.020000001f;
             jitter.f[2] = 0.10000001f;
             velocity.q = jitter.q;
             func_PAL_002735D0(obj, 2, *(s16 *)(obj + 0xaa), 0, obj + 0x10, obj + 0xf0,
-                &velocity, 255, func_002A7878(180.0f, 360.0f), 15.0f);
+                &velocity, 255, math_random_float_range(180.0f, 360.0f), 15.0f);
             jitter.q = 0;
             jitter.f[1] = -0.018000001f;
-            func_L00_00324F18(obj, &position, D_L01_001B1620, D_L01_001B1624, D_L01_001B1628);
-            func_00283098(&jitter, &jitter, obj + 0xc0);
+            vec_local_offset_to_world(obj, &position, D_L01_001B1620, D_L01_001B1624, D_L01_001B1628);
+            matrix_mul_vec3(&jitter, &jitter, obj + 0xc0);
             func_PAL_L01_002E2968(0.008f, 1.0f, 1.0299999713897705f, &position, &jitter, 10, 0x80808080, 0);
-            func_002A7750(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
         } else {
             func_PAL_002B15D8(obj, 17, D_L01_001A8F60, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             func_PAL_L00_003281C0(obj, 1, 0.0f);
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         }
-        func_002A7750(obj, 3, -1);
+        moby_set_state(obj, 3, -1);
         break;
     case 3:
-        if (func_002B3868(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             RetiringObject *retiring = (RetiringObject *)obj;
             unsigned int flags = retiring->flags;
             int count;
@@ -93,9 +93,9 @@ void func_PAL_L01_00414828(char *obj)
             *(int *)(rec + 8) = 0x64;
             D_L01_001B3468_1 = count + 1;
         }
-        if (func_00282948(rec + 8) != 0) {
+        if (math_fast_float_d(rec + 8) != 0) {
             D_L01_001B3468 = D_L01_001B3468 - 1;
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
         }
         break;
     }

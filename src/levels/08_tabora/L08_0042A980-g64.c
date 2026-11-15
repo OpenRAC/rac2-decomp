@@ -8,20 +8,20 @@ extern f32 D_0018A0E0[];
 extern f32 D_L08_001B3A70[][4] __attribute__((sda));
 extern f32 D_L08_001B1CE0[4][4] __attribute__((sda));
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282D30(void *, void *, f32);
-extern void func_002830C0(void *, void *, void *);
-extern s64 func_0027C878(s32);
-extern void func_00280B90(void *, s32, s32);
-extern f32 func_002A7878(f32, f32);
-extern f32 func_002A78D8(f32, f32);
-extern s32 func_L02_002F1658(void);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecScale(void *, void *, f32);
+extern void transform_vector(void *, void *, void *);
+extern s64 GetEffectTextureDescriptor(s32);
+extern void draw_world_quad(void *, s32, s32);
+extern f32 math_random_float_range(f32, f32);
+extern f32 math_random_signed_float_range(f32, f32);
+extern s32 level_is_resident_flag_clear(void);
 
 /* Draws a glowing sparkle at each end of a beam slot. */
-void func_L08_0042A980(s32 unused, s32 index)
+void DrawGlowBillboardPair(s32 unused, s32 index)
 {
     struct {
         f32 vertices[4][4];
@@ -54,12 +54,12 @@ void func_L08_0042A980(s32 unused, s32 index)
     packet.uv[6] = 1;
     packet.uv[7] = 1;
 
-    size = RandomFloatRange(0.3f, 0.325f);
-    if (!IsResidentFlagClear()) size = 0.3125f;
-    jitter[0] = RandomSignedFloatRange(0, 0.05f);
-    jitter[1] = RandomSignedFloatRange(0, 0.05f);
-    jitter[2] = RandomSignedFloatRange(0, 0.05f);
-    if (!IsResidentFlagClear()) jitter[2] = jitter[1] = jitter[0] = 0.025f;
+    size = math_random_float_range(0.3f, 0.325f);
+    if (!level_is_resident_flag_clear()) size = 0.3125f;
+    jitter[0] = math_random_signed_float_range(0, 0.05f);
+    jitter[1] = math_random_signed_float_range(0, 0.05f);
+    jitter[2] = math_random_signed_float_range(0, 0.05f);
+    if (!level_is_resident_flag_clear()) jitter[2] = jitter[1] = jitter[0] = 0.025f;
 
     {
         s32 corner;
@@ -97,8 +97,8 @@ void func_L08_0042A980(s32 unused, s32 index)
     vec_scale_to_length(basis[1], basis[1], -1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
 
-    size = RandomFloatRange(0.2f, 0.225f);
-    if (!IsResidentFlagClear()) size = 0.2225f;
+    size = math_random_float_range(0.2f, 0.225f);
+    if (!level_is_resident_flag_clear()) size = 0.2225f;
     packet.tag = 0xFF00000044LL;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = -1;
     {

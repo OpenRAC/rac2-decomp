@@ -6,26 +6,26 @@ extern u8 D_L12_001B9E00[];
 extern u8 D_L12_00188660[];
 extern s32 func_315148();
 extern s32 func_32D988();
-extern s32 func_00282978(void *arg0);
+extern s32 FastDecTimer(void *arg0);
 extern void func_PAL_002AC3C0(void *arg0, void *arg1);
-extern void func_002AEC48(void *arg0, void *arg1, s32 arg2, f32 x, f32 y);
+extern void moby_update_eased_node(void *arg0, void *arg1, s32 arg2, f32 x, f32 y);
 extern s32 func_3205F8(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_364DF8(s32 arg0, s32 arg1, void *arg2);
 extern f32 func_2F2950(f32 x, f32 y);
 extern s32 D_L12_001B2E9C __attribute__((sda));
 extern s32 D_L12_001B2E9C_2;
 extern u16 *D_L12_001FB960[];
-extern s32 D_001A79F0 __attribute__((sda));
-extern s32 func_002A8600(u8 **out, s32 kind, s32 arg2, s32 arg3);
-extern s32 func_002A86E8(u8 **out, u32 value, s32 arg2, s32 arg3);
-extern u8 D_001A7AF8[] __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
+extern s32 GetFirstMobyInGroup(u8 **out, s32 kind, s32 arg2, s32 arg3);
+extern s32 GetNextMobyInGroup(u8 **out, u32 value, s32 arg2, s32 arg3);
+extern u8 g_item_owned_flags[] __attribute__((sda));
 extern u8 D_001A7A40 MACRO_ADDR;
 extern u32 D_001397DC, D_00138324;
 extern u8 D_L12_001C0000[];
-extern u8 *func_0029EFD0(int);
-extern u8 *func_00288FB8(int);
+extern u8 *CreateMoby(int);
+extern u8 *GetLocalizedString(int);
 extern s32 *D_L12_001FEAC0[];
-extern s32 func_002A8AF0(void *, void *, s32);
+extern s32 point_in_path_xy(void *, void *, s32);
 
 /* Resets the measured slot state and re-arms the primitive. */
 void func_PAL_L12_003E5CA0(u8 *object) {
@@ -33,12 +33,12 @@ void func_PAL_L12_003E5CA0(u8 *object) {
     u16 counter;
 
     func_PAL_002AC3C0(object, state + 0x50);
-    func_00282978(state + 0x360);
-    func_00282978(state + 0x362);
+    FastDecTimer(state + 0x360);
+    FastDecTimer(state + 0x362);
     counter = *(u16 *)(object + 0x96);
     if (counter <= 0xFFFE)
         *(u16 *)(object + 0x96) = counter + 1;
-    func_002AEC48(object, state + 0x240, 1, 0.0432f, 0.43200004f);
-    func_002AEC48(object, state + 0x2C0, 0, 0.0432f, 0.43200004f);
+    moby_update_eased_node(object, state + 0x240, 1, 0.0432f, 0.43200004f);
+    moby_update_eased_node(object, state + 0x2C0, 0, 0.0432f, 0.43200004f);
 }
 

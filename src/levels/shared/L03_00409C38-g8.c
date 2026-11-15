@@ -26,27 +26,27 @@ typedef struct {
 extern f32 D_L03_001B1654 __attribute__((sda));
 extern f32 D_L03_001B1658 __attribute__((sda));
 
-extern void func_002A7750(void *, int, int);
-extern void func_002A93B0(void *);
-extern float func_002AA548(void *, void *, float, float, float, float);
+extern void moby_set_state(void *, int, int);
+extern void moby_update_ground_check(void *);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 
 /* Starts the object falling; when not quiet it first lifts the object a little and gives it a downward push. */
-void func_L03_00409C38(L03Moby9C38 *self, s32 quiet) {
+void moby_start_drop(L03Moby9C38 *self, s32 quiet) {
     L03Vars9C38 *vars = self->vars;
 
     if (self->state != 2) {
         self->flags = (self->flags & 0xFFBE) | 0x1000;
         self->f98 = self->cls[4];
-        SetMobyState(self, 2, -1);
+        moby_set_state(self, 2, -1);
         qcopy(self->pos, vars);
         vars->drop = 0;
         if (quiet == 0) {
             self->pos[2] = self->pos[2] + 10.0f;
-            StepValueTowardTarget(&self->pos[2], &vars->drop, vars->height, 1.0f,
+            math_step_value_toward_target(&self->pos[2], &vars->drop, vars->height, 1.0f,
                           D_L03_001B1654 * 0.00027777778f, D_L03_001B1658 * 0.016666668f);
         }
     }
     self->flags |= 0x400;
-    UpdateMobyGroundCheck(self);
+    moby_update_ground_check(self);
     vars->state = 4;
 }

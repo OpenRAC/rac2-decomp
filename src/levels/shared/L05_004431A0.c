@@ -3,7 +3,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 
 extern int D_001A79F0_alt MACRO_ADDR;
 
@@ -20,7 +20,7 @@ extern void ref_L05_004431A0_01(void *, void *, float);
 extern void ref_L05_004431A0_02(void *, void *, void *);
 
 /* Rotates the ship's three direction vectors by the turn amounts from the steering, then saves them. */
-void func_L05_004431A0(void *obj, float *yawRate, float *pitchRate)
+void ship_apply_steering_rotation(void *obj, float *yawRate, float *pitchRate)
 {
     void *ship = obj;
     float *yawPtr = yawRate;
@@ -28,7 +28,7 @@ void func_L05_004431A0(void *obj, float *yawRate, float *pitchRate)
     TI128 scratch;
     float epsilon;
 
-    if (gCurrentMapIndex == 20)
+    if (g_current_map_index == 20)
         goto done;
     epsilon = 1e-5f;
     if (epsilon < ref_L05_004431A0_00(*yawPtr)) {

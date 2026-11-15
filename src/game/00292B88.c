@@ -6,7 +6,7 @@ typedef struct {
     int pixels;
     short width, height, storage, base, first, second;
 } Texture_292B88;
-extern int func_00282A18(int value);
+extern int log2dim(int value);
 extern int D_001A72F4 MACRO_ADDR;
 extern int D_001A7304 MACRO_ADDR;
 extern long D_001B19B0[];
@@ -18,7 +18,7 @@ extern long D_001B19C8_1[];
    fixed word and 0. In the direct-storage arm the filter bits are computed
    first and the tex_address constant is ORed in its own statement: that order
    gives the filter its live range and the words their retail registers. */
-void func_00292B88(long *out, Texture_292B88 *texture,
+void build_indexed_resident_render_packet(long *out, Texture_292B88 *texture,
                     int k, int filter, int address, int clamp, int mode)
 {
     int width = texture->width >> 6;

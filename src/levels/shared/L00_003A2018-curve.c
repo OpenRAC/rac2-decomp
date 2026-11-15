@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
-void func_L00_003A2018(float *out, float *from, float *to, float *before, float *after, float t)
+void vec_l00_interpolate_cubic(float *out, float *from, float *to, float *before, float *after, float t)
 {
     float tSquared, tCubed, cubicTerm, squareTerm, linearTerm;
 

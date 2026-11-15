@@ -1,6 +1,6 @@
 #include "common.h"
 extern char *D_L15_001B261C;
-extern char D_00188660[];
+extern char g_sound_state[];
 
 typedef struct { char pad[0x270]; int id; } GornData;
 extern int D_L15_001A8F00 MACRO_ADDR;
@@ -10,44 +10,44 @@ extern int D_L15_001B1520[4] __attribute__((sda));
 extern int D_L15_001B15D8[4][3] __attribute__((sda));
 extern int D_L15_001B157C __attribute__((sda)), D_L15_001B1578 __attribute__((sda));
 extern int D_L15_001B15C8 __attribute__((sda)), D_L15_001B15BC __attribute__((sda));
-extern int D_L15_001B36A4, D_001A79F8;
+extern int D_L15_001B36A4, g_player_bolts;
 extern unsigned char D_001A7A0A;
 extern int D_00138324 NOT_SDA;
 /* Absolute suffix view shared with func_L15_00432008. */
 extern int D_L15_001B1520_4[] MACRO_ADDR;
-extern void func_002E59F8(int);
-extern int func_00282948(void *);
-extern void func_0027D330(int);
-extern void func_0029B758(int, void *);
-extern void func_L15_00430168(void);
-extern void func_L15_00432008(void);
-extern void func_0029B3E0(int,int);
-extern void func_L05_00379F48(int);
-extern void func_L15_0042FD40(void *);
-extern void func_002B49E0(int,int,int,int,int);
+extern void snd_stop_voice(int);
+extern int math_fast_float_d(void *);
+extern void FadeToBlack(int);
+extern void level_store_value_pair(int, void *);
+extern void gorn_reward_panel_draw(void);
+extern void snd_clamp_copy_volumes(void);
+extern void MemcardSave(int,int);
+extern void hero_set_state_value_c(int);
+extern void ResetGornStageCounters(void *);
+extern void request_begin_slot(int,int,int,int,int);
 /* Ends a Gorn challenge stage: stops its sound, pays the reward, shows the reward panel and then picks the next menu entry. */
-void func_L15_00430590(char *moby, int stageNum)
+void gorn_finish_challenge_stage(char *moby, int stageNum)
 {
     char *vars = *(char **)(moby + 0x68);
     char *targetMoby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
     GornData *data = *(GornData **)(targetMoby + 0x68);
     int soundId = data->id;
     if (soundId != -1) {
-        char *entry = gSoundState + soundId * 0x70;
+        char *entry = g_sound_state + soundId * 0x70;
         if (*(char **)(entry + 0x88) == targetMoby && *(unsigned char *)(entry + 0x74))
-            StopSoundVoice(soundId);
+            snd_stop_voice(soundId);
     }
     data->id = -1;
     if (D_L15_001A8F00 == 2) {
         return;
     }
-    if (!FastFloatHelperD(vars + 0x6C)) {
+    if (!math_fast_float_d(vars + 0x6C)) {
         return;
     }
     if (D_L15_001A904C && !D_L15_001B15CC) {
         int timesDone, reward;
         FadeToBlack(30);
-        StoreLevelObjectValuePair(0, DrawGornRewardPanel);
+        level_store_value_pair(0, gorn_reward_panel_draw);
         timesDone = D_L15_001B1520[stageNum];
         reward = D_L15_001B15D8[stageNum][timesDone < 3 ? timesDone : 2];
         D_L15_001B15CC = 1;
@@ -56,17 +56,17 @@ void func_L15_00430590(char *moby, int stageNum)
         D_L15_001B1578 = 0;
         if (D_001A7A0A) reward *= 10;
         D_L15_001B1520[stageNum] = timesDone + 1;
-        gPlayerBolts = gPlayerBolts + reward;
-        ClampAndCopyVolumeSettings();
+        g_player_bolts = g_player_bolts + reward;
+        snd_clamp_copy_volumes();
         MemcardSave(0, -1);
     }
-    SetPlayerStateField18(1);
-    if (!FastFloatHelperD(vars + 0x50)) {
+    hero_set_state_value_c(1);
+    if (!math_fast_float_d(vars + 0x50)) {
         if (D_00138324 & 0x40) {
             D_L15_001B15CC = 0;
             *(int *)(vars + 0x50) = 5400;
             FadeToBlack(30);
-            SetPlayerStateField18(0);
+            hero_set_state_value_c(0);
             *(int *)(vars + 0x6C) = 120;
             if (D_L15_001B1520[0]) {
                 if (D_L15_001B1520_4[1] && D_L15_001B1520_4[2]) {
@@ -82,7 +82,7 @@ void func_L15_00430590(char *moby, int stageNum)
             D_L15_001B15BC = 0;
             ResetGornStageCounters(moby);
         } else if (D_00138324 & 0x10) {
-            BeginSlotRequest(3, 1, 4, 0, 0);
+            request_begin_slot(3, 1, 4, 0, 0);
         }
     } else {
         *(int *)(vars + 0x50) = 5400;

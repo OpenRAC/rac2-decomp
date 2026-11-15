@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L02_00405040, the PAL copy of func_L02_00400720: the same C, where scale D_L02_001B1530 + func_002A77E0(D_L02_001B1530). */
 
 /* Four bytes: cc1 then emits the address as a single `la`, which gas expands to an adjacent
@@ -12,7 +13,7 @@ typedef struct {
     unsigned char b24F0;
 } L02_003F5710_Hero;
 
-extern L02_003F5710_Hero D_00189E20;
+extern L02_003F5710_Hero g_hero_state;
 
 /* Watches the hero block's height (+0x88) against 420.0 and the copy of it the actor kept at
    +0x98. Crossing it downwards clears the byte at +0x24F0 and the global flag; crossing it upwards
@@ -36,7 +37,7 @@ typedef int s32;
 typedef float f32;
 
 extern char *D_L02_001B1190[2] __attribute__((sda));
-extern s32 func_002A77E0(s32);
+extern s32 math_random_int_below(s32);
 /* Leaves the function when the group is 0xFF or empty; the braces it opens close in END_IDS. */
 /* One half: collect the entities of group OFF for which func_00312B58 holds (counting the
    others in m), then, up to 1000 passes over group 0xCC while m is below the record's limit,
@@ -52,9 +53,9 @@ extern unsigned char D_001395B8[0x100];
 /* D_001A7A0C, written as the second word of an 8-byte object: cc1 then counts the store as two
    instructions and keeps it out of func_L02_003FCDF8's delay slot, and the assembler gives the
    absolute `lui $at ; sw`. */
-extern int func_L02_003F9B70(int);
+extern int arena_get_challenge_save_index(int);
 
-extern int func_L02_00400650(char *, int);
+extern int arena_start_announcer_message(char *, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the
@@ -67,7 +68,7 @@ extern int func_L02_00400650(char *, int);
    as a vector whose z is -func_002A7878(D_L02_001B1750, D_L02_001B1754) / 60, combines it with
    A1, and hands v0 and v1 twice to func_002BAE50 with colour words and a pick of func_002A7820:
    first with one of two sets chosen by bit 0 of D_L02_001B30C8, then with a third set. */
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 
 /* Picks the message to ask for after the entity the object is attending to (state word 0xD0),
    for its kinds 0x9F8 and 0xA44: while D_0018C2EC is not positive, one of two at random (0x10 or
@@ -84,7 +85,7 @@ typedef struct {
 
 extern L02_003FF9A0_Rec D_L02_00264A70[];
 
-extern s32 func_L02_003F9B70(s32);
+extern s32 arena_get_challenge_save_index(s32);
 /* Calls func_L00_002C42E0(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test
    func_L00_0032EF10(0x40, 0x3C, 0) holds, the object changes state to 7 and its selection (state
    half-word 0x118) moves to the next entry of the table at D_L02_001B1190 that is usable: the flag
@@ -99,8 +100,8 @@ extern float D_L02_001B1528 __attribute__((sda));
 extern float D_L02_001B152C __attribute__((sda));
 extern s32 D_L02_001B1530 __attribute__((sda));
 extern s32 D_001A7A00;
-extern char D_001A63A8[];
-extern s32 func_00282948(void *);
+extern char g_music_state[];
+extern s32 math_fast_float_d(void *);
 
 /* Picks an idle message for the object. Nothing happens while the message system at D_001A63A8
    is busy (+0x68 set, +0x24 not -1) or while the countdown at +0xE4 of the state runs. A float
@@ -122,7 +123,7 @@ extern s32 func_00282948(void *);
    high half and loads each id next to its store. */
 void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
     char *state = *(char **)(a0 + 0x68);
-    char *g = D_001A63A8;
+    char *g = g_music_state;
     char *hero;
     char *hero2;
     s32 id23;
@@ -160,7 +161,7 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
         *(s32 *)(state + 0xEC) = 0;
         *(s32 *)(state + 0xE8) = 0;
     }
-    if (func_00282948(state + 0x100) != 0) {
+    if (math_fast_float_d(state + 0x100) != 0) {
         *(s32 *)(state + 0xEC) = 0;
         *(s32 *)(state + 0x100) = 250;
         *(s32 *)(state + 0xE8) = 0;
@@ -174,21 +175,21 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
                 lp[n++] = id;
         }
     }
-    hero = (char *)&D_00189E20;
+    hero = (char *)&g_hero_state;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * D_L02_001B152C) {
         id23 = 0x23;
         if (*(s16 *)(state + 0x216) == 0)
             list[n++] = id23;
     }
-    hero2 = (char *)&D_00189E20;
+    hero2 = (char *)&g_hero_state;
     if (*(s32 *)(hero2 + 0x24CC) <= 0) {
         id24 = 0x24;
         if (*(s16 *)(state + 0x218) == 0)
             list[n++] = id24;
     }
     if (n != 0) {
-        func_L02_00400650(a0, list[func_002A77E0(n)]);
-        *(s32 *)(state + 0xE4) = (((int)(D_L02_001B1530 + func_002A77E0(D_L02_001B1530)) * 5 + 2) / 6);
+        arena_start_announcer_message(a0, list[math_random_int_below(n)]);
+        *(s32 *)(state + 0xE4) = (((int)(D_L02_001B1530 + math_random_int_below(D_L02_001B1530)) * 5 + 2) / 6);
     }
 }
 

@@ -4,14 +4,14 @@
    entries 3, 1, 2 or 0. +0x14C is the selection, +0x150 keeps it while the stick is released and
    +0x154 is a 10-frame repeat delay. Reading the table field at each use gives retail's copy of
    the first table pointer. Its own unit: the nops before the divisions need -g. */
-extern char D_00138180[];
+extern char g_pad_state[];
 extern float D_001AE5F4 __attribute__((sda));
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
 
 #define RANGES (*(float (**)[2])(object + 0x144))
 
-int func_00349190(char *object)
+int UpdateDirectionSelection(char *object)
 {
     float x, y, magnitude, angle;
     char *pad;
@@ -21,7 +21,7 @@ int func_00349190(char *object)
     if (--*(int *)(object + 0x154) < 0)
         *(int *)(object + 0x154) = 0;
     if (*(int *)(object + 0x154) == 0) {
-        pad = gPadState;
+        pad = g_pad_state;
         x = *(float *)(pad + 0x148);
         y = *(float *)(pad + 0x14C);
         magnitude = square_root(x*x + y*y);
@@ -29,7 +29,7 @@ int func_00349190(char *object)
             x /= magnitude;
             y /= magnitude;
         }
-        angle = FastMatrixHelperA(x, y);
+        angle = mat_fast_helper_a(x, y);
         i = 0;
         if (*(int *)(object + 0x150) == 0)
             *(int *)(object + 0x14C) = -1;

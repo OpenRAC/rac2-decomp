@@ -107,9 +107,9 @@ typedef struct {
 } Particle;
 
 /* Particle emitter inputs; the two register banks retain their EE argument order. */
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern Particle *func_002BDCE8(void *, float, float, float, int, void *, float, unsigned int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, unsigned int, int);
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
 
@@ -123,9 +123,9 @@ extern TI128 D_001A8F20;
 
 /* func_L03_002ADC00 is in its dedicated zero-vector profile unit. */
 
-extern float func_002AA2E8(float *, float, float);
-extern void func_002AA3A8(float *, float *, float, float, float, float);
-extern float func_00282E80(void *, void *);
+extern float ApproachValue(float *, float, float);
+extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float vec_distance_xy(void *, void *);
 
 void func_PAL_L03_002B8C28(void) {
     switch (D_L03_00189E20[0x22B4]) {
@@ -157,12 +157,12 @@ void func_PAL_L03_002B8C28(void) {
         *(int *)(D_L03_00189E20 + 0x22B0) == 0x12 ||
         (!D_L03_00189E20[0x22B4] && *(float *)(D_L03_00189E20 + 0x254) < 0.53f) ||
         *(int *)(D_L03_00189E20 + 0x229C) == 0x11 || D_L03_00189E20[0x1494] ||
-        func_00282E80(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
+        vec_distance_xy(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
         float *p = (float *)(D_L03_00189E20 + 0x250);
         unsigned char *g = D_L03_00189E20;
-        func_002AA2E8(p, *(float *)(g + 0x258), 0.024f);
-        func_002AA2E8(p + 1, *(float *)(g + 0x25C), 0.024f);
-        func_002AA3A8(p + 5, p + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
+        ApproachValue(p, *(float *)(g + 0x258), 0.024f);
+        ApproachValue(p + 1, *(float *)(g + 0x25C), 0.024f);
+        math_spring_float_to_goal(p + 5, p + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }
 
@@ -181,12 +181,12 @@ void func_PAL_L03_002B8C28(void) {
 
 /* func_L03_0038B238 is defined in L03_002AB5C8-g8.c (this unit has no $gp access for it). */
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern float (*D_L03_001FE700[])[4];
 
 /* Effect state hung off an object: four vertex-table indices, a vertex count and an offset. */
 /* Adjusts each vertex of the object's groups relative to a computed centre, then offsets it by the state vector. */
-float func_L03_003C5AB8(unsigned char *);
+float bot_compute_speed_from_turn(unsigned char *);
 
 /* func_L03_003C4240 is defined in L03_002AB5C8-g8.c (it reads two $gp constants). */
 
@@ -198,7 +198,7 @@ float func_L03_003C5AB8(unsigned char *);
 
 /* func_L03_003C4A10 is defined in L03_002AB5C8-g8.c (it reads $gp data). */
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* The level's own copy of the object's tilt routine (func_L03_003C4A10), at another address
    in every level that has it. */
@@ -207,7 +207,7 @@ extern int func_002A77E0(int);
    resident image: the list of group g ends after its first entry with bit 15 set). */
 /* The part of the object's private state (at +0x68) that these walks read: eight group ids at
    +0x200 and the id of an entity at +0x220. */
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 /* Returns the entity nearest to the object, within 15.0, among its eight groups, that has bit 12
    of its flags at 0x34 set, a value of 5 at 0x46 of the record at 0x24, a height (at 0x18)
@@ -227,4 +227,4 @@ extern float func_00282E80(void *, void *);
    what leaves 0xFE out of loop.c's budget for hoisting the walk's constants, as in retail. */
 /* func_L03_003C58F0 is defined in L03_002AB5C8-g8.c (it reads the group count through $gp). */
 
-float func_L03_003C5AB8(unsigned char *a0);
+float bot_compute_speed_from_turn(unsigned char *a0);

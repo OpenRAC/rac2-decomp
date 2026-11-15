@@ -19,11 +19,12 @@ sys.path.insert(0, str(ROOT / "tools"))
 import build  # noqa: E402
 import elf  # noqa: E402
 import levels  # noqa: E402
+import srcnames  # noqa: E402
 
 
 def source_of(name: str) -> Path | None:
     for f in sorted((ROOT / "src").rglob("*.c")):
-        for line in f.read_text(errors="replace").splitlines():
+        for line in srcnames.canon(f.read_text(errors="replace")).splitlines():
             if build.re.match(rf"^(?:[A-Za-z_][^;=#]*?\b)?{name}\s*\(", line) and not line.rstrip().endswith(";") \
                     and not line.startswith(("extern", "typedef")):
                 return f

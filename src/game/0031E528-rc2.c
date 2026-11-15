@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -27,7 +28,7 @@
 extern s32  D_001B2754[] __attribute__((sda));
 
 /* Frees every glow ring entry that belongs to the given object. */
-void func_0031E528(s32 owner) {
+void glow_ring_free_entries(s32 owner) {
     s32 entry;
     s32 remaining;
 

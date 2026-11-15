@@ -1,15 +1,16 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_00283D38(int a, int b, float c);
-extern int D_L14_001B259C __attribute__((sda));
-extern int func_L00_00324120(char *self);
-extern void func_L00_003294F0(int table, int mode);
-extern void func_002A7750(char *self, int state, int mode);
-extern int func_002B3868(char *self);
-extern void func_002E5CF8(int a, int b, char *self);
-extern float func_00283B98(float a, float b);
-extern float func_00283198(float a);
-extern int func_00283D38(int a, int b, float c);
+extern int FastTweenColor(int a, int b, float c);
+extern int g_moby_l14_pool __attribute__((sda));
+extern int hero_is_current_selected_id(char *self);
+extern void moby_set_flag_bit(int table, int mode);
+extern void moby_set_state(char *self, int state, int mode);
+extern int flag_set_first_pending(char *self);
+extern void PlayMobySound(int a, int b, char *self);
+extern float FastAddRotations(float a, float b);
+extern float math_fast_sin_or_cos_b(float a);
+extern int FastTweenColor(int a, int b, float c);
 
 /* Steps the owner's state block, then blends the two colours its state asks for. */
 void func_PAL_L14_0040E8C8(char *self)
@@ -23,24 +24,24 @@ void func_PAL_L14_0040E8C8(char *self)
 
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
-        if (func_L00_00324120(self) != 0) {
+        if (hero_is_current_selected_id(self) != 0) {
             idx = *(int *)(v + 0);
             if (idx != -1) {
-                func_L00_003294F0(D_L14_001B259C + (idx << 8), 1);
+                moby_set_flag_bit(g_moby_l14_pool + (idx << 8), 1);
             }
-            func_002A7750(self, 1, -1);
+            moby_set_state(self, 1, -1);
         }
         break;
     case 1:
-        if (func_002B3868(self) != 0) {
-            func_002E5CF8(0, 0, self);
+        if (flag_set_first_pending(self) != 0) {
+            PlayMobySound(0, 0, self);
         }
         c1 = 0x80468CDC;
         c2 = 0x801E78AA;
         break;
     }
-    f = func_00283B98(*(float *)(v + 4), 0.12915438f);
+    f = FastAddRotations(*(float *)(v + 4), 0.12915438f);
     *(float *)(v + 4) = f;
-    r = func_00283D38(c1, c2, func_00283198(f) * 0.5f + 0.5f);
-    *(int *)(self + 0x78) = func_00283D38(*(int *)(self + 0x78), r, 0.18f);
+    r = FastTweenColor(c1, c2, math_fast_sin_or_cos_b(f) * 0.5f + 0.5f);
+    *(int *)(self + 0x78) = FastTweenColor(*(int *)(self + 0x78), r, 0.18f);
 }

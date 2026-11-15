@@ -9,11 +9,11 @@ extern char r1_D_00132590[];
 
 extern int r1_func_0011B4C8();
 
-extern int func_00124980(int);
+extern int cd_scmd_check_ready(int);
 
 extern int r1_D_00131440;
 
-extern int func_00124B88(int);
+extern int sceCdSyncS(int);
 
 extern int r1_D_001313F0;
 
@@ -47,10 +47,10 @@ extern char r1_D_00132E08[];
  * this matches, is 2.9-ee's.
  */
 /* Asks the CD drive if the disc is ready and returns the reply. */
-int func_00124AF0(void) {
+int sceCdDiskReady(void) {
     int result;
 
-    if (CheckSCommandReady(2) == 0) {
+    if (cd_scmd_check_ready(2) == 0) {
         return 0;
     }
     if (r1_func_0011B4C8(r1_D_00132590, 0xE, 0, 0, 0, &r1_D_00131440, 4, 0, 0) < 0) {
@@ -65,13 +65,13 @@ int func_00124AF0(void) {
 /* rac1-decomp src/core/001208E8.c: func_00120F30 */
 /* sceCdSyncS */
 /* Waits for the last CD system command to finish, or only checks if it is still running. */
-int func_00124B88(int pollOnly) {
+int sceCdSyncS(int pollOnly) {
     if (pollOnly == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00152FF0);
         }
         while (r1_D_001313F0 != 0 || r1_func_0011B6B8(r1_D_00132590) != 0) {
-            SleepWithAlarm(0x3C);
+            cd_sleep_with_alarm(0x3C);
         }
         return 0;
     }
@@ -84,13 +84,13 @@ int func_00124B88(int pollOnly) {
 /* rac1-decomp src/core/001208E8.c: func_00120FD0 */
 /* sceCdSync */
 /* Waits for the last CD read command to finish, or only checks if it is still running. */
-int func_00124C28(int pollOnly) {
+int sceCdSync(int pollOnly) {
     if (pollOnly == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00153000);
         }
         while (r1_func_0011B6B8(r1_D_00132E08) != 0) {
-            SleepWithAlarm(0x3C);
+            cd_sleep_with_alarm(0x3C);
         }
         return 0;
     }

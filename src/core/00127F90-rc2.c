@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -29,12 +30,12 @@ extern s8 D_00141B80[];
 extern s8 D_001430C0[];
 extern s32 D_00137E6C;
 extern s32 D_00137E68;
-extern s32 func_0011AC40(s32);
-extern s32 func_0011AC70(s32);
-extern s32 func_0011D620(s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern s32 SignalSema(s32);
+extern s32 PollSema(s32);
+extern s32 sceSifCallRpc(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 /* Sends a memory card command that takes a port and a slot (probably the format command). */
-s32 func_00127F90(s32 port, s32 slot) {
+s32 sceMcFormat(s32 port, s32 slot) {
     s8 *client = D_00141B00;
     s8 *request;
     s32 slotCopy = slot;
@@ -51,7 +52,7 @@ s32 func_00127F90(s32 port, s32 slot) {
     request = D_00141B80;
     *(s32 *)(request + 4) = portCopy;
     *(s32 *)(request + 8) = slotCopy;
-    result = CallRpcServer((s32)client, 0x10, 1, (s32)request, 0x30, (s32)D_001430C0, 4, 0, 0);
+    result = sceSifCallRpc((s32)client, 0x10, 1, (s32)request, 0x30, (s32)D_001430C0, 4, 0, 0);
     if (result == 0) {
         D_00137E68 = 0x10;
     } else {

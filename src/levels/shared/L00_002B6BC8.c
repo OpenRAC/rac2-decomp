@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
 extern char D_L04_001B9680[];
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
-extern void func_00282CF0(f32 *,f32 *,f32 *);
+extern void FastVecSub(f32 *,f32 *,f32 *);
 #define AB(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define AH(p,o) (*(short *)((char *)(p)+(o)))
 #define AI(p,o) (*(int *)((char *)(p)+(o)))
@@ -27,42 +27,42 @@ typedef struct {
     u32 field2290, field2294, field2298, field229C;
 } RippleHero;
 #define RIPPLE_HERO (*(RippleHero *)&D_00189E20)
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
 #define WBYTE(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define WSHORT(p,o) (*(short *)((char *)(p)+(o)))
 #define WINT(p,o) (*(int *)((char *)(p)+(o)))
 #define WFLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define WPTR(p,o) (*(char **)((char *)(p)+(o)))
 
-extern u32 func_00282978(u8 *);
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern u32 FastDecTimer(u8 *);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
-extern void func_00282F20(float *, float *, float);
-extern float func_00282DB0(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_L00_002D3A58(void *);
-extern void func_L00_002D3BD8(void *, void *, float);
-extern void func_L00_002D3B58(void *, void *, float);
-extern void func_L00_002B54F8(float, float);
-extern float func_002AA2E8(float *, float, float);
-extern void func_L00_002B41B8(float, float);
-extern void func_L00_002D3798(void *, void *, float);
-extern void func_L00_002B3EF8(int, float, float, float);
-extern void func_L00_002B6198(float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283C80(float, float);
-extern float func_00283BE0(float, float);
-extern void func_L00_002AA0F0(float, float, float);
-extern void func_L00_002B47A8(void *, void *, int, float, float);
-extern int func_00278E78(void);
-extern void func_L00_002B39F0(int, float);
+extern void vec_scale_to_length(float *, float *, float);
+extern float FastVecDot(void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float cam_get_view_space_vector_length(void *);
+extern void cam_set_view_space_vector_length(void *, void *, float);
+extern void cam_set_view_space_height(void *, void *, float);
+extern void hero_build_move_impulse(float, float);
+extern float ApproachValue(float *, float, float);
+extern void hero_approach_speed(float, float);
+extern void cam_offset_point_by_side_direction(void *, void *, float);
+extern void hero_steer_heading(int, float, float, float);
+extern void ApproachHeroVelocity(float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastDiffRots(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void hero_start_pose_offset(float, float, float);
+extern void BuildOffsetVectorPair(void *, void *, int, float, float);
+extern int GetCollHitMaterial(void);
+extern void hero_resolve_stick_direction(int, float);
 extern int D_001A8FF0 MACRO_ADDR;
 extern float D_001A7DC0 MACRO_ADDR;
 extern unsigned char D_L00_001B8C80[];
@@ -155,7 +155,7 @@ typedef struct {
 #define HOP_SAVED (*(HopSavedState *)D_L00_001B8C80)
 #define HOP_PLAYER (*(HopPlayer *)&D_00189E20)
 
-extern f32 func_002AA898(f32 *position, f32 target, f32 *velocity,
+extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 
 typedef struct {
@@ -175,7 +175,7 @@ typedef struct {
     u32 field2290;
     u32 field2294;
 } D00189E20;
-extern D00189E20 D_00189E20;
+extern D00189E20 g_hero_state;
 
 /* Check the hero's surface contact and optionally apply its movement impulse. */
 
@@ -185,11 +185,11 @@ extern D00189E20 D_00189E20;
 
 /* Per-state airborne steering; shares the hop-velocity state cases with
    rac1-decomp's hero_update_hop_velocity. */
-void func_L00_002B6BC8(void) {
+void hero_update_airborne_steering(void) {
     float probe_start[4], probe_end[4], yaw, speed, rate;
 
     if (HOP_PLAYER.state == 10) {
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
     } else if (HOP_PLAYER.state == 16) {
@@ -201,12 +201,12 @@ void func_L00_002B6BC8(void) {
         } else {
             HOP_PLAYER.target_speed = 0.05833333730697632f;
         }
-        ApproachHeroSpeed(0.012222222983837128f, 0.0125f);
-        SetViewSpaceVectorLength(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-        OffsetPointBySideDirection(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, HOP_PLAYER.ground_speed);
+        hero_approach_speed(0.012222222983837128f, 0.0125f);
+        cam_set_view_space_vector_length(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
+        cam_offset_point_by_side_direction(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, HOP_PLAYER.ground_speed);
     } else if (HOP_PLAYER.state == 27) {
         if (HOP_PLAYER.state_timer >= 41) {
-            SteerHeroHeading(0, 0.04f, 0.2f, 0.2501639127731323f);
+            hero_steer_heading(0, 0.04f, 0.2f, 0.2501639127731323f);
             ApproachHeroVelocity(0.0055555556900799274f);
         }
         if (HOP_PLAYER.anim_frame >= 13.0f && HOP_PLAYER.anim_frame <= 30.0f) {
@@ -235,7 +235,7 @@ void func_L00_002B6BC8(void) {
     } else if (HOP_PLAYER.state == 11) {
         HOP_PLAYER.move_yaw = HOP_PLAYER.takeoff_yaw;
         qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field480.f);
-        SteerHeroHeading(0, 0.04f, 0.2f, 0.116355299949646f);
+        hero_steer_heading(0, 0.04f, 0.2f, 0.116355299949646f);
         if (HOP_PLAYER.field4D4 != 3) {
             HOP_PLAYER.ground_speed = HOP_PLAYER.air_target_speed;
         } else {
@@ -253,51 +253,51 @@ void func_L00_002B6BC8(void) {
             ApproachValue(&HOP_PLAYER.high_jump_drift_speed, 0.07f, 0.002222222276031971f);
         }
         if (!HOP_PLAYER.field22C3) {
-            HOP_PLAYER.velocity.f[0] = FastSinOrCosA(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
-            HOP_PLAYER.velocity.f[1] = FastSinOrCosB(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
+            HOP_PLAYER.velocity.f[0] = math_fast_sin_or_cos_a(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
+            HOP_PLAYER.velocity.f[1] = math_fast_sin_or_cos_b(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
         } else {
-            SetViewSpaceVectorLength(probe_start, HOP_PLAYER.field470.f, HOP_PLAYER.high_jump_drift_speed);
-            SetViewSpaceHeight(probe_start, probe_start, 0.0f);
-            SetViewSpaceVectorLength(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
+            cam_set_view_space_vector_length(probe_start, HOP_PLAYER.field470.f, HOP_PLAYER.high_jump_drift_speed);
+            cam_set_view_space_height(probe_start, probe_start, 0.0f);
+            cam_set_view_space_vector_length(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
             FastVecAdd(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
         }
         if (!HOP_PLAYER.field22C3 && !HOP_PLAYER.field52D) {
-            float drift = HOP_PLAYER.air_target_speed * FastSinOrCosB(FastDiffRots(HOP_PLAYER.takeoff_yaw, HOP_PLAYER.high_jump_drift_yaw));
+            float drift = HOP_PLAYER.air_target_speed * math_fast_sin_or_cos_b(FastDiffRots(HOP_PLAYER.takeoff_yaw, HOP_PLAYER.high_jump_drift_yaw));
 
-            HOP_PLAYER.velocity.f[0] += FastSinOrCosA(HOP_PLAYER.takeoff_yaw) * drift;
-            HOP_PLAYER.velocity.f[1] += FastSinOrCosB(HOP_PLAYER.takeoff_yaw) * drift;
+            HOP_PLAYER.velocity.f[0] += math_fast_sin_or_cos_a(HOP_PLAYER.takeoff_yaw) * drift;
+            HOP_PLAYER.velocity.f[1] += math_fast_sin_or_cos_b(HOP_PLAYER.takeoff_yaw) * drift;
         }
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
     } else if (HOP_PLAYER.state == 17) {
         HOP_PLAYER.move_yaw = HOP_PLAYER.field4F0.f[3];
         qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field4F0.f);
         if (HOP_PLAYER.state_timer >= 10) {
-            SteerHeroHeading(-1, 0.041999999433755875f, 0.2f, 0.1978040188550949f);
+            hero_steer_heading(-1, 0.041999999433755875f, 0.2f, 0.1978040188550949f);
         }
         if (HOP_PLAYER.state_timer >= 9) {
             if (!HOP_PLAYER.field348) {
-                HOP_PLAYER.velocity.f[0] = FastSinOrCosA(HOP_PLAYER.move_yaw) * 0.08166667073965073f;
-                HOP_PLAYER.velocity.f[1] = FastSinOrCosB(HOP_PLAYER.move_yaw) * 0.08166667073965073f;
+                HOP_PLAYER.velocity.f[0] = math_fast_sin_or_cos_a(HOP_PLAYER.move_yaw) * 0.08166667073965073f;
+                HOP_PLAYER.velocity.f[1] = math_fast_sin_or_cos_b(HOP_PLAYER.move_yaw) * 0.08166667073965073f;
             } else {
-                SetViewSpaceVectorLength(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
+                cam_set_view_space_vector_length(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
                 vec_scale_to_length(probe_start, HOP_PLAYER.move_dir.f, 0.08166667073965073f);
                 FastVecAdd(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
             }
         }
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
     } else if (HOP_PLAYER.state == 0x81 && !D_001A8FF0) {
-        SteerHeroHeading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
+        hero_steer_heading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
         HOP_PLAYER.ground_speed = 0.0f;
     } else {
         if (HOP_PLAYER.state == 44) {
             yaw = HOP_PLAYER.yaw;
-            HOP_PLAYER.yaw_error = ApproachWithVelocity(&yaw, HOP_PLAYER.move_yaw, &HOP_PLAYER.yaw_rate,
+            HOP_PLAYER.yaw_error = math_approach_with_velocity(&yaw, HOP_PLAYER.move_yaw, &HOP_PLAYER.yaw_rate,
                                       0.018f, 0.2f, 0.12217307090759277f, 0);
             {
                 float delta = fast_subtract_rotations(yaw, HOP_PLAYER.yaw);
 
-                StartHeroPoseOffset(0.0f, 0.0f, delta);
+                hero_start_pose_offset(0.0f, 0.0f, delta);
             }
         } else {
             float saved = HOP_PLAYER.move_yaw;
@@ -307,7 +307,7 @@ void func_L00_002B6BC8(void) {
                 HOP_PLAYER.move_yaw = HOP_SAVED.yaw;
                 qcopy(HOP_PLAYER.move_dir.f, HOP_SAVED.direction.f);
             }
-            SteerHeroHeading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
+            hero_steer_heading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
             if (HOP_PLAYER.field1454) {
                 HOP_PLAYER.field1458 = saved;
                 qcopy(HOP_PLAYER.field1440.f, probe_start);
@@ -315,7 +315,7 @@ void func_L00_002B6BC8(void) {
                 qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field1440.f);
             }
         }
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
         rate = 0.0055555556900799274f;
         if (HOP_PLAYER.target_speed < D_001A7DC0 * 0.0033333336468786f) {
@@ -323,9 +323,9 @@ void func_L00_002B6BC8(void) {
                 float decel = HOP_PLAYER.fieldA84;
 
                 if (HOP_PLAYER.field1492) decel = 0.000047222223947152495f;
-                speed = GetViewSpaceVectorLength(HOP_PLAYER.velocity.f);
+                speed = cam_get_view_space_vector_length(HOP_PLAYER.velocity.f);
                 ApproachValue(&speed, 0.0f, decel);
-                SetViewSpaceVectorLength(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, speed);
+                cam_set_view_space_vector_length(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, speed);
                 return;
             }
             if (HOP_PLAYER.field34A) {
@@ -340,17 +340,17 @@ void func_L00_002B6BC8(void) {
             rate = 0.00013888889225199819f;
             if (HOP_PLAYER.stick_magnitude > 0.9f) {
                 BuildOffsetVectorPair(probe_start, probe_end, 0, 0.5f, -1.5f);
-                probe_start[0] += FastSinOrCosA(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_start[1] += FastSinOrCosB(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_end[0] += FastSinOrCosA(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_end[1] += FastSinOrCosB(HOP_PLAYER.move_yaw) * 0.7f;
+                probe_start[0] += math_fast_sin_or_cos_a(HOP_PLAYER.move_yaw) * 0.7f;
+                probe_start[1] += math_fast_sin_or_cos_b(HOP_PLAYER.move_yaw) * 0.7f;
+                probe_end[0] += math_fast_sin_or_cos_a(HOP_PLAYER.move_yaw) * 0.7f;
+                probe_end[1] += math_fast_sin_or_cos_b(HOP_PLAYER.move_yaw) * 0.7f;
                 if (CollLine(probe_start, probe_end, 2, 0, 0) && GetCollHitMaterial() != 7) {
                     HOP_PLAYER.target_speed = 0.0833333358168602f;
                     rate = 0.0027777778450399637f;
                 }
             }
             if (HOP_PLAYER.state == 15) {
-                ResolveStickInputToDirection(0, 0.0416666679084301f);
+                hero_resolve_stick_direction(0, 0.0416666679084301f);
                 rate = 0.0008333333535119891f;
             }
             if (HOP_PLAYER.field320 > 0.2617994248867035f) {
@@ -422,10 +422,10 @@ typedef struct {
     L04Quad v;
 } L04Vector;
 
-extern s32 func_00283CF0(f32 value);
-extern s32 func_002A77E0(s32 limit);
-extern void func_00282F20(f32 *dst, f32 *a, f32 len);
-extern void func_00282CF0(f32 *dst, f32 *a, f32 *b);
+extern s32 FloatToInt(f32 value);
+extern s32 math_random_int_below(s32 limit);
+extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
+extern void FastVecSub(f32 *dst, f32 *a, f32 *b);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u32 ref_L04_00362768_00;
@@ -453,8 +453,8 @@ typedef struct {
 extern MobListStruct ref_L04_0031D630_00;
 
 /* shared callee, named by its catalogue row (04:0031D3C8) */
-extern void func_002E64A0(void *mob);
-extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
+extern void UpdateEquipmentPieces(void *mob);
+extern void math_store_angle_update_result(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 /* Walks the list of mobs: the ones of type 0xE29 get the 0x800 flag, the ones of type
    0xD54 are handed to func_002E64A0, and the ones of type 0xFA0 with a 0x68 pointer
@@ -468,8 +468,8 @@ extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 /* func_L04_00344568 is in L04_002CC748-axis.c. */
 
-extern f32 func_00282DB0(void *a, void *b);
-extern void func_002830C0(void *a, void *b, void *c);
+extern f32 FastVecDot(void *a, void *b);
+extern void transform_vector(void *a, void *b, void *c);
 
 /* Copies the caller's matrix into a local one, takes the two aim angles off
    the target vector, springs one of them, and turns the copy by the three
@@ -483,7 +483,7 @@ typedef struct {
     f32 history[30];
 } PadHistory;
 
-extern PadHistory D_00138180;
+extern PadHistory g_pad_state;
 
 /* Returns the float steps entries back from the head of a 30-entry history ring (steps capped
    at the ring's count); RAC1's read_pad_float_history. */
@@ -518,17 +518,17 @@ typedef struct {
    and its alpha byte: it starts at the target, or at its joint JOINT moved 0.4 toward
    D_L04_001B9680 when JOINT is not -1. */
 
-extern s32 func_00283CF0(f32);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_002A77E0(s32);
+extern s32 FloatToInt(f32);
+extern f32 math_random_float_range(f32, f32);
+extern s32 math_random_int_below(s32);
 /* func_L04_0035F3E0 is defined in L04_0035F3E0-qcopy.c. */
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 word; float values[4]; } Vec4;
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
 
 /* Same body as func_002C7620, with this function's own callees. */
 
@@ -575,7 +575,7 @@ typedef struct {
     f32 field40;
 } D002A00E8Self;
 
-extern void func_002FD1B8(u32 a0, u32 a1, void *a2);
+extern void RippleDisturb(u32 a0, u32 a1, void *a2);
 
 /* Cull a water grid tile against the near and far clip volumes, then submit it.
  * Adapted from RAC1 cull_and_submit_water_grid_tile (GPL-3.0), itself adapted
@@ -593,7 +593,7 @@ extern void func_002FD1B8(u32 a0, u32 a1, void *a2);
 
 /* Toggle the water controller, animate its height, and disturb its ripple tiles. */
 
-extern u32 func_00282978(u8 *ptr);
+extern u32 FastDecTimer(u8 *ptr);
 
 /* func_L04_003A1FE0 is matched in L04_002CC748-g8.c (built with -G8). */
 
@@ -609,14 +609,14 @@ typedef struct {
 extern Tbl D_L04_00231E00;
 
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 typedef unsigned int B352Quad __attribute__((mode(TI)));
 typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern int D_L04_001AC790 __attribute__((sda));
 extern Collision D_L04_001BFAC0;
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* func_L04_003C3BA0 is matched in L04-particle-emitter-g8.c. */
 
@@ -655,8 +655,8 @@ extern u16 D_L04_0023DB80[];
 #endif
 extern s32 D_L04_001B2E70 MACRO_ADDR;
 extern u16 D_L04_001B2E74 MACRO_ADDR;
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 
 /* A sixteen-byte record per spawn slot (L04SpawnRecord, above). */
 
@@ -672,8 +672,8 @@ extern u16 D_L04_0023DB80[];
 extern s32 D_L04_001B2E70;
 extern u16 D_L04_001B2E74;
 
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 
 extern u32 D_L04_001B2E84 __attribute__((sda));
 

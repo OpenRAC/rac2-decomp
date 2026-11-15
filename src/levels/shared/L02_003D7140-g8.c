@@ -2,16 +2,16 @@
 
 extern float D_L02_001B038C __attribute__((sda));
 extern float D_L02_001B0388 __attribute__((sda));
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern u8 *D_001C49C0[];
 
-extern int func_00277F48(float, void *, int, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8F70(void *, void *, int, void *, void *, float);
+extern int coll_process_hit(float, void *, int, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void part_queue_impact_effect(void *, void *, int, void *, void *, float);
 
 /* Pushes every nearby object (and the player) sideways around this object, like a whirl. Some objects are skipped. */
-void func_L02_003D7140(u8 *self)
+void moby_push_nearby_sideways(u8 *self)
 {
     f32 seen[4] __attribute__((aligned(16)));
     f32 diff[4] __attribute__((aligned(16)));
@@ -23,11 +23,11 @@ void func_L02_003D7140(u8 *self)
     int i;
     char *game;
 
-    n = ProcessCollisionHit(D_L02_001B038C, self + 0x10, 0, self, 0);
+    n = coll_process_hit(D_L02_001B038C, self + 0x10, 0, self, 0);
     if (n == 0)
         return;
     for (i = 0; i < n; i++) {
-        game = gHeroState;
+        game = g_hero_state;
         obj = D_001C49C0[i];
         if (obj == *(u8 **)(game + 0x2290)) {
             qcopy(seen, game + 0x80);
@@ -59,6 +59,6 @@ void func_L02_003D7140(u8 *self)
         vec_scale_to_length(push, push, D_L02_001B0388);
         push[2] = 1.0f;
         push[3] = 5627.9248046875f;
-        QueueImpactEffect(obj, self, 0x10001, pos, push, (float)state[0x14]);
+        part_queue_impact_effect(obj, self, 0x10001, pos, push, (float)state[0x14]);
     }
 }

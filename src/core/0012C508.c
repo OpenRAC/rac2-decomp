@@ -2,7 +2,7 @@
 #include "structs.h"
 
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
-extern short func_0012C508(int, int);
+extern short mpeg_read_ipu_vlc_code(int, int);
 
 extern int r1_D_00132F70[];
 
@@ -20,16 +20,16 @@ typedef struct {
     void *cbData;
 } MpegVdec;
 
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *, int);
 
-extern void func_0012C788(void *, int);
+extern void mpeg_skip_bits(void *, int);
 
-extern int func_0012C878(void *, int);
+extern int mpeg_read_bits(void *, int);
 
 /* rac1-decomp src/core/00125630.c: func_001286E8 */
 /* _ipuVdec (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Reads one code from the video stream using one of the chip lookup tables, and sets the error flag if nothing matched. */
-short func_0012C508(int decoderAddr, int tbl) {
+short mpeg_read_ipu_vlc_code(int decoderAddr, int tbl) {
     MpegVdec *d = (MpegVdec *)decoderAddr;
     int i;
     int j;
@@ -68,8 +68,8 @@ short func_0012C508(int decoderAddr, int tbl) {
     d->errorFlag = (int)r == 0;
     return (short)r;
 }
-extern int func_0012C680(void *arg, int count);
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *arg, int count);
+extern int mpeg_peek_bits(void *, int);
 extern int r1_D_00132F70[];
 extern void r1_func_0012BCC8(int);
 extern long r1_func_00128638(void *arg0);
@@ -79,7 +79,7 @@ extern long r1_func_00128638(void *arg0);
    consuming them, refilling the 32-bit window from the IPU (FDEC) when
    it runs short and nudging the callback while the IPU stays busy.
    Adapted from Lombyte's project (GPL-3.0) for PAL. */
-int func_0012C680(void *decoderPtr, int count) {
+int mpeg_peek_bits(void *decoderPtr, int count) {
     char *ctx = decoderPtr;
     int counter;
 
@@ -103,7 +103,7 @@ done:
     return (unsigned int)*(int *)(ctx + 0x838) >> (0x20 - count);
 }
 
-extern void func_0012C788(void *arg0, int arg1);
+extern void mpeg_skip_bits(void *arg0, int arg1);
 extern long r1_func_00128638();
 
 
@@ -123,7 +123,7 @@ extern long r1_func_00128638();
  * The stores go in source order 0x838 then 0x83C.
  */
 /* Skips a given number of bits in the video stream. */
-void func_0012C788(void *decoderPtr, int bitCount) {
+void mpeg_skip_bits(void *decoderPtr, int bitCount) {
     int counter = 0;
     unsigned int cmd;
 
@@ -140,7 +140,7 @@ void func_0012C788(void *decoderPtr, int bitCount) {
     *(int *)((char *)decoderPtr + 0x83C) = 0x20;
 }
 
-extern int func_0012C878(void *arg0, int n);
+extern int mpeg_read_bits(void *arg0, int n);
 
 
 
@@ -152,7 +152,7 @@ extern int func_0012C878(void *arg0, int n);
  * computed before the command store, or the allocator swaps $v1 and $a0.
  */
 /* Reads the given number of bits from the video stream and moves past them. */
-int func_0012C878(void *decoderPtr, int n) {
+int mpeg_read_bits(void *decoderPtr, int n) {
     char *s = (char *)decoderPtr;
     int counter = 0;
     unsigned int cmd;

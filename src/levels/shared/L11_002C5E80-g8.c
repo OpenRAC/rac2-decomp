@@ -19,11 +19,11 @@ extern float D_L11_001B262C __attribute__((sda));
 /* The level's table of entries: addressed absolutely, never $gp-relative. */
 extern char D_L11_00264760[] __attribute__((nosda));
 
-extern void func_L11_0046C1E0(int moby, int a1, int a2, int a3, float f12, float f13, float f14);
+extern void DrawScrollingRibbonWithHaloAlpha(int moby, int a1, int a2, int a3, float f12, float f13, float f14);
 
 /* Clamps the level's timer and hands two table entries to the level's helper:
  * the first at the table's head, the second one record further on. */
-void func_L11_0046C118(char *moby)
+void DrawObjectRibbonPair(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     float scroll;

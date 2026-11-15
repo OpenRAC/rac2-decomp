@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_002D5540 (1,228 bytes): the USA v2.00 copy of func_002D4948
  * (src/game/002D4948-options-g8.c), which builds the options menu from the settings word
  * D_001A7AF0 and finds the matching preset; v2.00 first resets the view with its own
@@ -16,7 +17,7 @@ typedef struct {
     int timer;
 } CallbackState;
 
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 
 /* A 256-byte menu line. */
 typedef struct {
@@ -54,7 +55,7 @@ typedef struct {
     int w3C;
 } Layout_002D4948;
 
-extern unsigned int D_001A7AF0;
+extern unsigned int g_equipment_bits;
 /* Text ids per setting value. */
 extern short D_001A8C28[4];
 extern short D_001A8C30[4];
@@ -67,9 +68,9 @@ extern short D_001A8C58[4];
 extern const OptionPreset_002D4948 D_0026CFD0[21];
 extern Layout_002D4948 D_0025D478;
 extern int D_001ABA74 __attribute__((sda));
-extern char *func_002DE550(int);
-extern void func_0029F0C8(MenuLine_002D4948 *, int);
-extern void func_002A0468(MenuLine_002D4948 *, int, int, int, int);
+extern char *menu_stream_chunk_claim_free(int);
+extern void moby_init_instance(MenuLine_002D4948 *, int);
+extern void gfx_pack_render_command_fields(MenuLine_002D4948 *, int, int, int, int);
 extern void func_002A0F48(MenuLine_002D4948 *);
 
 /* Builds the options menu from the settings word D_001A7AF0, then finds the preset
@@ -87,7 +88,7 @@ int func_US2_002D5540(void)
     int i;
 
     func_US2_002CAFD8();
-    settings = D_001A7AF0;
+    settings = g_equipment_bits;
     a = (settings >> 2) & 3;
     b = (settings >> 4) & 1;
     c = (settings >> 6) & 1;
@@ -95,67 +96,67 @@ int func_US2_002D5540(void)
     e = (settings >> 9) & 1;
     f = (settings >> 10) & 3;
     g = (settings >> 14) & 3;
-    D_001F2840.items = func_002DE550(1);
-    line = (MenuLine_002D4948 *)D_001F2840.items;
-    func_0029F0C8(line, 0xD54);
+    g_pause_menu_state.items = menu_stream_chunk_claim_free(1);
+    line = (MenuLine_002D4948 *)g_pause_menu_state.items;
+    moby_init_instance(line, 0xD54);
     line->kind = 9;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x100);
-    func_0029F0C8(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x100);
+    moby_init_instance(line, D_001A8C28[a]);
     line->kind = 8;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x200);
-    func_0029F0C8(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x200);
+    moby_init_instance(line, D_001A8C28[a]);
     line->kind = 8;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x300);
-    func_0029F0C8(line, D_001A8C30[b]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x300);
+    moby_init_instance(line, D_001A8C30[b]);
     line->kind = 0;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x400);
-    func_0029F0C8(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x400);
+    moby_init_instance(line, D_001A8C38[c]);
     line->kind = 1;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x500);
-    func_0029F0C8(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x500);
+    moby_init_instance(line, D_001A8C38[c]);
     line->kind = 1;
     line->style |= 0x8000;
     n = 6;
     if (D_001A8C40[d] != 0) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + 0x600);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x600);
         n = 7;
-        func_0029F0C8(line, D_001A8C40[d]);
+        moby_init_instance(line, D_001A8C40[d]);
         line->kind = 2;
     }
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+    moby_init_instance(line, D_001A8C48[e]);
     line->kind = kind3;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+    moby_init_instance(line, D_001A8C48[e]);
     line->kind = kind3;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+    moby_init_instance(line, D_001A8C50[f]);
     line->kind = kind4;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+    moby_init_instance(line, D_001A8C50[f]);
     line->kind = kind4;
     line->style |= 0x8000;
-    if ((D_001A7AF0 >> 12) & 1) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, 0x10E2);
+    if ((g_equipment_bits >> 12) & 1) {
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+        moby_init_instance(line, 0x10E2);
         line->kind = 5;
     }
-    if ((D_001A7AF0 >> 13) & 1) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, 0x10E4);
+    if ((g_equipment_bits >> 13) & 1) {
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+        moby_init_instance(line, 0x10E4);
         line->kind = 6;
     }
     if (g != 0) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, D_001A8C58[g]);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
+        moby_init_instance(line, D_001A8C58[g]);
         line->kind = 7;
     }
     for (i = 0; i < n; i++) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + i * 0x100);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + i * 0x100);
         line->width = 0x1FF;
-        func_002A0468(line, 0x202020, 14, 14, 0);
+        gfx_pack_render_command_fields(line, 0x202020, 14, 14, 0);
         line->width = 0xFF;
         line->b31 = 1;
         line->b30 = 0xFF;
@@ -170,10 +171,10 @@ int func_US2_002D5540(void)
         line->colour[2] = -2.782353f;
         func_002A0F48(line);
     }
-    D_001F2840.count = n;
-    D_001F2840.timer = 300;
+    g_pause_menu_state.count = n;
+    g_pause_menu_state.timer = 300;
     for (D_001ABA74 = 0; D_001ABA74 < 21; D_001ABA74++) {
-        if ((D_001A7AF0 & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
+        if ((g_equipment_bits & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
             break;
         }
     }

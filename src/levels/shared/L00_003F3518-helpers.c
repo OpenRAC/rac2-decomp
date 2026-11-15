@@ -16,15 +16,15 @@ typedef struct {
 
 extern Aimvec_F0b10 D_L00_001B8C80;
 
-extern int func_00283DB8(char *local, float value);
-extern void func_00283098(char *, char *, char *);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282CF0(char *off, char *v, char *pos);
-extern void func_00282F20(char *dst, char *src, float angle);
-extern float func_00282DB0(char *, char *);
-extern int func_L00_0031C998(int, int, float);
-extern void func_L00_003F34D8(char *, int *, char *, int *, int *);
-extern void func_L00_00325CC0(int, void *, void *, float, float);
+extern int math_fast_helper_a(char *local, float value);
+extern void matrix_mul_vec3(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecSub(char *off, char *v, char *pos);
+extern void vec_scale_to_length(char *dst, char *src, float angle);
+extern float FastVecDot(char *, char *);
+extern int math_lerp_int_fraction(int, int, float);
+extern void gfx_append_point_and_color(char *, int *, char *, int *, int *);
+extern void DrawOffsetBillboardBatch(int, void *, void *, float, float);
 
 extern unsigned short **D_L00_001A9014 __attribute__((sda));
 extern unsigned char *D_L00_001B2514 __attribute__((sda));
@@ -32,7 +32,7 @@ extern unsigned char *D_L00_001B251C __attribute__((sda));
 
 /* Goes through a list of lit points near the object, keeps the ones in view, and works out
    each colour from how much the point faces the camera. Then it sends them all to be drawn. */
-void func_L00_003F3518(char *obj)
+void gfx_draw_lit_group_points(char *obj)
 {
     unsigned char *vars = *(unsigned char **)(obj + 0x68);
     char buf0[0x460] __attribute__((aligned(16)));
@@ -58,7 +58,7 @@ void func_L00_003F3518(char *obj)
          indexList++) {
         qcopy(pos, D_L00_001B2514 + ((*indexList & 0x7FFF) << 5));
         *(float *)(pos + 12) += *(float *)(vars + 0x4C);
-        if (FastMathHelperA(pos, *(float *)(vars + 0x60)) < 0)
+        if (math_fast_helper_a(pos, *(float *)(vars + 0x60)) < 0)
             continue;
         qcopy(groupPoint, entry + 0x30);
         *(TI128 *)scratch = 0;
@@ -69,7 +69,7 @@ void func_L00_003F3518(char *obj)
         matrix_mul_vec3(offset, offset, (char *)entry);
         FastVecAdd(groupPoint, groupPoint, offset);
         if (*(int *)(vars + 0x6C) != 0) {
-            AppendPointAndColorToList(groupPoint, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
+            gfx_append_point_and_color(groupPoint, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
             continue;
         }
         FastVecSub(scratch, (char *)&D_L00_001B8C80.x_140, groupPoint);
@@ -86,8 +86,8 @@ void func_L00_003F3518(char *obj)
             dot = dot * 0.5f + 0.5f;
             if (*(int *)(vars + 0x38) != 0)
                 dot = dot * dot;
-            color = LerpIntegerFraction(*(int *)(vars + 0x34), *(int *)(vars + 0x30), dot);
-            AppendPointAndColorToList(groupPoint, &color, buf0, (int *)buf1, &count);
+            color = math_lerp_int_fraction(*(int *)(vars + 0x34), *(int *)(vars + 0x30), dot);
+            gfx_append_point_and_color(groupPoint, &color, buf0, (int *)buf1, &count);
         }
     }
     DrawOffsetBillboardBatch(count, buf0, buf1, *(float *)(vars + 0x4C), *(float *)(vars + 0x5C));

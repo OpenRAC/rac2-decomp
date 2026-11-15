@@ -4,29 +4,29 @@ extern u8 D_001395B8[];
 extern u8 *D_L16_001B2B1C[] __attribute__((sda));
 extern u8 *D_L16_001B16C0 __attribute__((sda));
 extern int D_L16_001B16C4 __attribute__((sda));
-extern u8 D_00188660[];
-extern void func_L16_00411F80(u8 *, int);
-extern void func_0029F338(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern u8 *func_0029EFD0(int);
-extern void func_002B37E8(u8 *, u8 *);
-extern void func_00282A60(void *, int, int);
-extern void func_L16_00410C80(u8 *);
-extern void func_002A7750(u8 *, u8, int);
-extern void func_L16_004116C8(u8 *, int, int, float);
-extern void func_L16_004117A8(u8 *);
-extern void *func_002A9640(void *, unsigned int, int);
-extern float func_L07_003F90E8(int, int, float, float);
-extern void func_002AB800(int, char *);
-extern float func_002A96A0(u8 *, void *);
-extern float func_002AA2E8(float *, float, float);
-extern void func_002E59F8(int);
-extern void func_L16_00412AF0(u8 *);
-extern void func_002B3BA8(u8 *, int, void *, void *, float, float);
+extern u8 g_sound_state[];
+extern void SetMobyAndGroupsEnabled(u8 *, int);
+extern void moby_mark_spawned(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern u8 *CreateMoby(int);
+extern void moby_init_child_from_parent(u8 *, u8 *);
+extern void mem_clear(void *, int, int);
+extern void snivelak_copy_position_pair_after_setup(u8 *);
+extern void moby_set_state(u8 *, u8, int);
+extern void anim_play_on_self_or_child(u8 *, int, int, float);
+extern void snivelak_clean_up_arena_mobys(u8 *);
+extern void *part_find_owned_effect_slot(void *, unsigned int, int);
+extern float math_interpolate_between_limits(int, int, float, float);
+extern void gfx_start_color_fade(int, char *);
+extern float moby_update_aim_target_strength(u8 *, void *);
+extern float ApproachValue(float *, float, float);
+extern void snd_stop_voice(int);
+extern void snivelak_play_voice_cues(u8 *);
+extern void weapon_select_aim_target(u8 *, int, void *, void *, float, float);
 
 /* Initializes the boss hierarchy and applies damage, phase changes and speech. */
-void func_L16_00410618(u8 *moby)
+void UpdateSnivelakBossDamage(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *child, *attacker, *damage;
@@ -37,8 +37,8 @@ void func_L16_00410618(u8 *moby)
     if (!moby[0x20]) {
         if (D_001395B8[0x83] == 2) {
             SetMobyAndGroupsEnabled(moby, 0);
-            MarkMobySpawned(D_L16_001B2B1C[0] + *(int *)(state + 0x174) * 256);
-            MarkMobySpawned(moby);
+            moby_mark_spawned(D_L16_001B2B1C[0] + *(int *)(state + 0x174) * 256);
+            moby_mark_spawned(moby);
             return;
         }
         if (!*(short *)(state + 0x24)) {
@@ -56,7 +56,7 @@ void func_L16_00410618(u8 *moby)
         for (i = 1; i >= 0; i--, arms++) {
             child = CreateMoby(0x7e8);
             if (child) {
-                InitChildObjectFromParent(child, moby);
+                moby_init_child_from_parent(child, moby);
                 *(unsigned short *)(child + 0x34) |= 0x4100;
                 *arms = child;
             }
@@ -74,32 +74,32 @@ void func_L16_00410618(u8 *moby)
         *(unsigned short *)(moby + 0x32) = 500;
         *(unsigned short *)(*(u8 **)(state + 0x1f0) + 0x32) = 500;
         *(unsigned short *)(moby + 0x34) |= 0x400;
-        ClearMemory(speech, 0, 48);
+        mem_clear(speech, 0, 48);
         *(int *)(state + 0x350) = 0;
         *(int *)(state + 0x354) = -1;
-        CopyPositionPairAfterSetup(moby);
-        SetMobyState(moby, 1, 0);
-        PlayAnimationOnSelfOrChild(moby, 0, 0, 0.0f);
+        snivelak_copy_position_pair_after_setup(moby);
+        moby_set_state(moby, 1, 0);
+        anim_play_on_self_or_child(moby, 0, 0, 0.0f);
         if (D_001395B8[0x83] == 1) {
-            CleanUpArenaMobys(moby);
+            snivelak_clean_up_arena_mobys(moby);
             SetMobyAndGroupsEnabled(moby, 1);
         } else SetMobyAndGroupsEnabled(moby, 0);
     }
     if (!moby[0x95] || moby[0x95] == 5) return;
-    damage = FindOwnedEffectSlot(moby, 0x10000, 0);
-    if (!damage) damage = FindOwnedEffectSlot(*(u8 **)(state + 0x1f0), 0x10000, 0);
-    if (!damage) damage = FindOwnedEffectSlot(*(u8 **)(state + 0x238), 0x10000, 0);
-    if (!damage) damage = FindOwnedEffectSlot(*(u8 **)(state + 0x23c), 0x10000, 0);
+    damage = part_find_owned_effect_slot(moby, 0x10000, 0);
+    if (!damage) damage = part_find_owned_effect_slot(*(u8 **)(state + 0x1f0), 0x10000, 0);
+    if (!damage) damage = part_find_owned_effect_slot(*(u8 **)(state + 0x238), 0x10000, 0);
+    if (!damage) damage = part_find_owned_effect_slot(*(u8 **)(state + 0x23c), 0x10000, 0);
     if (damage) {
-        *(float *)(damage + 0x2c) *= InterpolateBetweenLimits(0, 20, 0.5f, 1.5f);
+        *(float *)(damage + 0x2c) *= math_interpolate_between_limits(0, 20, 0.5f, 1.5f);
         if (moby[0x95] == 3) *(float *)(damage + 0x2c) *= 0.333f;
         attacker = *(u8 **)(damage + 0x20);
         if (attacker && *(short *)(attacker + 0xaa) != 0xea7) {
             *(float *)(damage + 0x2c) *= 0.2f;
             if (*(short *)(attacker + 0xaa) == 0x5c9) *(float *)(damage + 0x2c) *= 0.05f;
         }
-        else StartColorFade((int)moby, (char *)(state + 0x50));
-        amount = UpdateAimTargetStrength(moby, damage);
+        else gfx_start_color_fade((int)moby, (char *)(state + 0x50));
+        amount = moby_update_aim_target_strength(moby, damage);
         ApproachValue((float *)(state + 0x20), 0.0f, amount);
         if (D_L16_001B16C0 && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
             divisor = IntToFloat(D_L16_001B16C4);
@@ -108,11 +108,11 @@ void func_L16_00410618(u8 *moby)
             threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
             (*(int *)(state + 0x260))++;
             *(float *)(state + 0x248) = (float)threshold * quantum;
-            SetMobyState(moby, 9, 3);
+            moby_set_state(moby, 9, 3);
             sound = *(int *)(state + 0x368);
             if (sound != -1) {
-                u8 *soundRecord = gSoundState + sound * 112;
-                if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) StopSoundVoice(sound);
+                u8 *soundRecord = g_sound_state + sound * 112;
+                if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) snd_stop_voice(sound);
             }
             {
                 u8 *target = D_L16_001B16C0;
@@ -122,17 +122,17 @@ void func_L16_00410618(u8 *moby)
         } else if (*(float *)(state + 0x20) == 0.0f || state[0x2e] == 2) {
             sound = *(int *)(state + 0x368);
             if (sound != -1) {
-                u8 *soundRecord = gSoundState + sound * 112;
-                if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) StopSoundVoice(sound);
+                u8 *soundRecord = g_sound_state + sound * 112;
+                if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) snd_stop_voice(sound);
             }
             *(int *)(state + 0x368) = -1;
-            SetMobyState(moby, 17, 5);
+            moby_set_state(moby, 17, 5);
         }
     }
-    PlayBossVoiceCues(moby);
+    snivelak_play_voice_cues(moby);
     moby[0xa8] = 255;
     (*(u8 **)(state + 0x1f0))[0xa8] = 255;
     (*(u8 **)(state + 0x238))[0xa8] = 255;
     (*(u8 **)(state + 0x23c))[0xa8] = 255;
-    SelectAimTarget_002B3BA8(moby, -1, 0, 0, 128.0f, 0.0f);
+    weapon_select_aim_target(moby, -1, 0, 0, 128.0f, 0.0f);
 }

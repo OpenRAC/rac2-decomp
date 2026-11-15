@@ -19,18 +19,18 @@ typedef struct Moby_L05_0041C118 {
 } Moby_L05_0041C118;
 
 /* The moby of class 0xFBF, found once. */
-extern Moby_L05_0041C118 *D_L05_001B1300 __attribute__((sda));
+extern Moby_L05_0041C118 *g_homing_pickup_target __attribute__((sda));
 /* The head of the moby list. */
 extern Moby_L05_0041C118 *D_L05_001B2528;
 
-extern Moby_L05_0041C118 *func_0029EFD0(int);
-extern void func_00282C88(float *);
-extern float func_002A7940(void);
-extern void func_L05_0041C410(Moby_L05_0041C118 *);
+extern Moby_L05_0041C118 *CreateMoby(int);
+extern void vec_clear_128(float *);
+extern float math_random_angle(void);
+extern void glow_l05_ring_init_state(Moby_L05_0041C118 *);
 
 /* Spawns a moby of class 0x10CF at the caller's position with a random turn, remembers the
    last moby of class 0xFBF in the list the first time, and sets up the new moby's state. */
-Moby_L05_0041C118 *func_L05_0041C118(Moby_L05_0041C118 *caller)
+Moby_L05_0041C118 *pickup_spawn_homing(Moby_L05_0041C118 *caller)
 {
     Moby_L05_0041C118 *moby;
     Moby_L05_0041C118 *other;
@@ -41,15 +41,15 @@ Moby_L05_0041C118 *func_L05_0041C118(Moby_L05_0041C118 *caller)
         moby->drawDist = 0xFF;
         moby->drawn = 1;
         qcopy(moby->position, caller->position);
-        ClearVector128(moby->rot);
-        moby->rot[2] = RandomAngle();
-        if (gHomingPickupTarget == 0) {
+        vec_clear_128(moby->rot);
+        moby->rot[2] = math_random_angle();
+        if (g_homing_pickup_target == 0) {
             for (other = D_L05_001B2528; other != 0; other = other->pChain) {
                 if (other->oClass == 0xFBF /* moby class 4031 */)
-                    gHomingPickupTarget = other;
+                    g_homing_pickup_target = other;
             }
         }
-        InitGlowRingState_L05(moby);
+        glow_l05_ring_init_state(moby);
         moby->scale = *(float *)(moby->pClass + 0x24);
         return moby;
     }

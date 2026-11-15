@@ -97,18 +97,18 @@ typedef struct FighterState {
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define U(p,o) (*(u8 *)((char *)(p)+(o)))
-extern char *D_L17_001B2C1C;
+extern char *g_moby_l17_pool;
 extern float D_L17_001B0E40 __attribute__((sda)),D_L17_001B0F38 __attribute__((sda)),D_L17_001B0E48 __attribute__((sda));
 extern char D_L17_001B9BC0[];
-extern int func_00283CF0(float);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *,int,int);
-extern int func_L02_0032E508(void *,int,void *,int);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *);
-extern char *func_002A9640(void *,u32,int);
-extern int func_002B0ED8(void *,void *,int);
-extern int func_002B3BA8(void *,int,void *,int,float,float);
+extern int FloatToInt(float);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *,int,int);
+extern int path_build_route_nodes(void *,int,void *,int);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *);
+extern char *part_find_owned_effect_slot(void *,u32,int);
+extern int moby_apply_damage_to_object(void *,void *,int);
+extern int weapon_select_aim_target(void *,int,void *,int,float,float);
 /* Initializes the fighter's complete parameter groups, then handles proximity and damage. */
 void func_PAL_L17_003ED568(char *object)
 {
@@ -135,11 +135,11 @@ void func_PAL_L17_003ED568(char *object)
     if(!U(object,0x20)) {register float t;float o1, o2, o3, o4, o5, o6; /* FAKEMATCH: `register` keeps t live to the end of its scope (-frac2-register-scope, retail's $f20); no-code copy chain of the 1.0 for state->f30 (tied in local-alloc, deleted by reload); its quantity holds $f2 over the init window like retail */int c1,c7,cE,cD,c8,c9,c3,c20,c12,c4,c6,c60;
         F(object,0x2c)=F(P(object,0x24),0x24)*0.85f;
         index=state->f6B8;
-        if((unsigned)(index+1)>=2) F(object,0x18)=F(D_L17_001B2C1C+index*256,0x18)+1.4f;
+        if((unsigned)(index+1)>=2) F(object,0x18)=F(g_moby_l17_pool+index*256,0x18)+1.4f;
         state->f6C0.q=*(Q *)(object+0x10);
         state->f110=D_L17_001B0E40;
         state->f6C0.f[3]=F(object,0xf8);state->f6E8=0;state->f6EC=0;
-t=15.0f;state->f48=func_00283CF0(t);state->f4A=func_00283CF0(12.8f);
+t=15.0f;state->f48=FloatToInt(t);state->f4A=FloatToInt(12.8f);
 /*BEGIN*/
 o1=1.0f; /* FAKEMATCH: see o1..o6 */
 c1=1;
@@ -201,21 +201,21 @@ state->f30=o6; /* FAKEMATCH: end of the 1.0 chain */
 state->f118=e48;
 state->f98=0;
 /*END*/
-        if(state->f680==-1 || state->f684==-1) {func_0029F338(object);return;}
+        if(state->f680==-1 || state->f684==-1) {moby_mark_spawned(object);return;}
         
-        if((unsigned)(state->f6B8+1)<2) func_002A7750(object,3,0);else func_002A7750(object,1,5);
+        if((unsigned)(state->f6B8+1)<2) moby_set_state(object,3,0);else moby_set_state(object,1,5);
         state->f730=1;state->f720=state->f744;
         if(state->f744) I(state->f744,0)=-1;
-        state->f750=func_L02_0032E508(object,state->f684,(char *)state+0x280,32);
+        state->f750=path_build_route_nodes(object,state->f684,(char *)state+0x280,32);
     }
-    if(U(object,0x31) && func_00282E48(object+16,D_L17_001B9BC0)<24.0f) {func_002A93B0(object);U(object,0x6f)=22;}
-    hit=func_002A9640(object,0x10000,1);
+    if(U(object,0x31) && fast_vec_dist(object+16,D_L17_001B9BC0)<24.0f) {moby_update_ground_check(object);U(object,0x6f)=22;}
+    hit=part_find_owned_effect_slot(object,0x10000,1);
     if(hit && P(hit,0x20) && (H(P(hit,0x20),0xaa)==0x31a || H(P(hit,0x20),0xaa)==0x1256 || H(P(hit,0x20),0xaa)==0x1305)) goto impact;
-    if(U(object,0x20)!=1) func_002B0ED8(object,(char *)state+0x60,0);
+    if(U(object,0x20)!=1) moby_apply_damage_to_object(object,(char *)state+0x60,0);
     goto damage;
 impact:
     if(hit) U(object,0xa8)=255;
 damage:;
-    state->f69E=func_002B3BA8(object,state->f680,0,0,0.0f,0.0f);
+    state->f69E=weapon_select_aim_target(object,state->f680,0,0,0.0f,0.0f);
     state->f6A4=state->f250;
 }

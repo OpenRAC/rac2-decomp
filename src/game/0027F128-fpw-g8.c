@@ -5,14 +5,14 @@ typedef unsigned char u8;
 typedef unsigned long u64;
 extern int D_001B1668 __attribute__((nosda));
 extern int D_001A89B0[8] __attribute__((sda));
-extern int func_0027F128(u8 *, int, u8 *);
-extern void func_0027F640(u64, u8 *, int, u64, u8 *, float, float, float);
-extern void func_0027F2A8(int, int, u64, u8 *, int, u64, u8 *);
-extern int D_001A8BB0 __attribute__((section(".sdata")));
+extern int measure_text_width(u8 *, int, u8 *);
+extern void FontPrintScaled(u64, u8 *, int, u64, u8 *, float, float, float);
+extern void text_draw_line(int, int, u64, u8 *, int, u64, u8 *);
+extern int g_current_game_mode __attribute__((section(".sdata")));
 extern int D_001B166C __attribute__((sda));
-extern int D_001A7340 __attribute__((nosda));
-extern int D_001A7344 __attribute__((nosda));
-extern void func_002FC620(int, int, int, int);
+extern int g_screen_width __attribute__((nosda));
+extern int g_screen_height __attribute__((nosda));
+extern void gfx_set_scissor_clamped(int, int, int, int);
 
 struct FontWindow {
     short y_min, y_max, x_min, x_max, x_anchor, y_start;
@@ -23,7 +23,7 @@ struct FontWindow {
 
 /* FontPrintWindow; adapted from RAC1 draw.c FontPrintWindow (GPL-3.0). */
 /* Draws text inside a box. It splits the text into lines, then centers or aligns each line. */
-void func_0027FC70(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u8 *glyphs)
+void FontPrintWindow(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u8 *glyphs)
 {
     struct FontWindow *win = (struct FontWindow *)win_p;
     unsigned char *text = (unsigned char *)text_p;
@@ -33,8 +33,8 @@ void func_0027FC70(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u
     int W, Wsave, line, i, brk, width, colr, n0, last, balanced;
     int k, y, adv;
 
-    if (gCurrentGameMode != 1)
-        SetGsScissorClamped(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
+    if (g_current_game_mode != 1)
+        gfx_set_scissor_clamped(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
     D_001B166C = 1;
     if ((win->flags ^ 1) & 1) {
         W = win->x_max - win->x_anchor;
@@ -131,10 +131,10 @@ void func_0027FC70(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u
                     FontPrintScaled((long)D_001A89B0[colr_arr[k]], text + start[k], cnt, a4, glyphs,
                                   fx, y + dw->y_sub * 0.0625f, 1.0f);
                 } else if (dw->flags & 1) {
-                    DrawTextLine(dw->x_anchor - (w >> 1), y, (long)D_001A89B0[colr_arr[k]],
+                    text_draw_line(dw->x_anchor - (w >> 1), y, (long)D_001A89B0[colr_arr[k]],
                                   text + start[k], cnt, a4, glyphs);
                 } else {
-                    DrawTextLine(dw->x_anchor, y, (long)D_001A89B0[colr_arr[k]],
+                    text_draw_line(dw->x_anchor, y, (long)D_001A89B0[colr_arr[k]],
                                   text + start[k], cnt, a4, glyphs);
                 }
             }
@@ -146,6 +146,6 @@ void func_0027FC70(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u
         }
     }
     D_001B166C = 0;
-    if (gCurrentGameMode != 1)
-        SetGsScissorClamped(0, gScreenWidth - 1, 0, gScreenHeight - 1);
+    if (g_current_game_mode != 1)
+        gfx_set_scissor_clamped(0, g_screen_width - 1, 0, g_screen_height - 1);
 }

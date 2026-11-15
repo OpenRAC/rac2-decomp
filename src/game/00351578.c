@@ -27,15 +27,15 @@ typedef struct VideoBuffer_351578 {
 } VideoBuffer_351578;
 
 
-extern int func_0011AC60(int);
-extern int func_0011AC40(int);
+extern int WaitSema(int);
+extern int SignalSema(int);
 static inline int ts_dist(int a, int size) {
     return a % size;
 }
 
 /* func_00351578(VideoBuffer_351578 *, Timestamp_351578 *) */
 /* Finds the timestamp that belongs to the data the decoder is reading now and hands it back. */
-int func_00351578(VideoBuffer_351578 *buf, Timestamp_351578 *timestamp) {
+int VideoBufferTakeTimestamp(VideoBuffer_351578 *buf, Timestamp_351578 *timestamp) {
     unsigned int madr = D4_MADR;
     unsigned int top = IPU_BP;
     int bp = *(unsigned int *)((char *)buf + 0x38) & 0x7F;

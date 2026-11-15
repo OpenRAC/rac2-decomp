@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "common.h"
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Spawns a small burst effect just above the object. */
-void func_L09_003F7370(char *moby, float heightOffset)
+void part_spawn_small_burst(char *moby, float heightOffset)
 {
     float position[4];
     qcopy(position, moby + 0x10);

@@ -24,23 +24,23 @@ typedef struct {
 
 #define SKY_VERTEX_RECORDS 0x70002000   /* scratchpad: the transformed vertex records */
 
-extern unsigned char *D_001B22A8;           /* the DMA packet cursor */
+extern unsigned char *g_dma_packet_cursor;           /* the DMA packet cursor */
 extern char D_00139300[];
 extern char D_00139370[];
 extern int D_001ABDD8[2] __attribute__((sda));  /* the two scratchpad buffers */
 extern int D_001ABDE0 __attribute__((sda));     /* which buffer receives the next upload */
 extern int D_001A72E0;
 
-extern void func_002E4388(void *, int, void *);
-extern int func_002E3E54(int, int, int);
-extern void func_002E3FA0(int, int, int, int);
-extern void func_002E40C8(int, int, int, int);
-extern void func_0029CF58(int, int, int);
-extern void func_0029CF78(void);
-extern void func_002FC560(int, long);
+extern void vec_transform_vectors_vu0_alt(void *, int, void *);
+extern int gfx_process_render_entry_a(int, int, int);
+extern void gfx_process_render_entry_b(int, int, int, int);
+extern void gfx_process_render_entry_c(int, int, int, int);
+extern void DmaToSpr(int, int, int);
+extern void DmaToSprSync(void);
+extern void VU1_addGSregister(int, long);
 
 /* Draws the textured pieces of the sky, loading each piece into fast memory while the previous one is drawn. */
-void func_002E3998(Sky *sky)
+void gfx_sky_textured_pieces_draw(Sky *sky)
 {
     int count = sky->count;
     u8 visible[count];
@@ -48,12 +48,12 @@ void func_002E3998(Sky *sky)
 
     if (count == 0)
         return;
-    TransformVectorsVu0Alt((char *)sky + 0x10, count, visible);
-    *(int *)(gDmaPacketCursor + 0) = 0x30000007;
-    *(int *)(gDmaPacketCursor + 4) = (int)D_00139370;
-    *(int *)(gDmaPacketCursor + 8) = 0;
-    *(int *)(gDmaPacketCursor + 0xC) = 0x50000007;
-    gDmaPacketCursor = gDmaPacketCursor + 16;
+    vec_transform_vectors_vu0_alt((char *)sky + 0x10, count, visible);
+    *(int *)(g_dma_packet_cursor + 0) = 0x30000007;
+    *(int *)(g_dma_packet_cursor + 4) = (int)D_00139370;
+    *(int *)(g_dma_packet_cursor + 8) = 0;
+    *(int *)(g_dma_packet_cursor + 0xC) = 0x50000007;
+    g_dma_packet_cursor = g_dma_packet_cursor + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
         DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
@@ -73,14 +73,14 @@ void func_002E3998(Sky *sky)
             st = PIECE(sky, i)->face_data;
             face_list = base + faces;
             st_list = base + st;
-            if (ProcessRenderEntryA(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
-                ProcessRenderEntryC(PIECE(sky, i)->face_count, face_list, st_list, SKY_VERTEX_RECORDS);
+            if (gfx_process_render_entry_a(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
+                gfx_process_render_entry_c(PIECE(sky, i)->face_count, face_list, st_list, SKY_VERTEX_RECORDS);
         }
     }
 }
 
 /* Draws the colour-shaded pieces of the sky, loading each piece into fast memory while the previous one is drawn. */
-void func_002E3BD8(Sky *sky)
+void gfx_sky_gouraud_pieces_draw(Sky *sky)
 {
     int count = sky->count;
     u8 visible[count];
@@ -88,12 +88,12 @@ void func_002E3BD8(Sky *sky)
 
     if (count == 0)
         return;
-    TransformVectorsVu0Alt((char *)sky + 0x10, count, visible);
-    *(int *)(gDmaPacketCursor + 0) = 0x30000007;
-    *(int *)(gDmaPacketCursor + 4) = (int)D_00139300;
-    *(int *)(gDmaPacketCursor + 8) = 0;
-    *(int *)(gDmaPacketCursor + 0xC) = 0x50000007;
-    gDmaPacketCursor = gDmaPacketCursor + 16;
+    vec_transform_vectors_vu0_alt((char *)sky + 0x10, count, visible);
+    *(int *)(g_dma_packet_cursor + 0) = 0x30000007;
+    *(int *)(g_dma_packet_cursor + 4) = (int)D_00139300;
+    *(int *)(g_dma_packet_cursor + 8) = 0;
+    *(int *)(g_dma_packet_cursor + 0xC) = 0x50000007;
+    g_dma_packet_cursor = g_dma_packet_cursor + 16;
     D_001ABDE0 = 1 - D_001ABDE0;
     if (visible[0] == 1)
         DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
@@ -113,8 +113,8 @@ void func_002E3BD8(Sky *sky)
             colours = PIECE(sky, i)->face_data;
             face_list = base + faces;
             colour_list = base + colours;
-            if (ProcessRenderEntryA(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
-                ProcessRenderEntryB(PIECE(sky, i)->face_count, face_list, colour_list, SKY_VERTEX_RECORDS);
+            if (gfx_process_render_entry_a(base + vertices, SKY_VERTEX_RECORDS, PIECE(sky, i)->vertex_count) == 0)
+                gfx_process_render_entry_b(PIECE(sky, i)->face_count, face_list, colour_list, SKY_VERTEX_RECORDS);
         }
     }
     VU1_addGSregister(0x47, 0x3180B);

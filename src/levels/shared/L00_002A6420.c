@@ -3,13 +3,13 @@
 
 typedef unsigned char u8;
 
-extern void func_L00_002A61C8(int arg0, int arg1, int arg2, int arg3);
+extern void hero_play_footstep_sound_dust(int arg0, int arg1, int arg2, int arg3);
 
 extern void func_002E6CF0(void *routine, void *state);
 
 extern void func_00323270(void *a0, void *a1, void *a2, float f12, float f13, float f14);
 
-extern void func_L00_002A7A50();
+extern void DrawHeroGlowQuads();
 
 extern int func_L00_002B3998_1(float value);
 
@@ -46,13 +46,13 @@ extern int func_L00_002D67A8_1(int);
 
 extern char D_00189E20_2[];
 
-extern float func_002AA2E8(float *p, float a, float b);
+extern float ApproachValue(float *p, float a, float b);
 
 extern char D_00189E20_24[];
 
 extern int func_00283CF0_6(float value);
 
-extern float func_00283CC8(float *buffer, float value);
+extern float SplitFloatFraction(float *buffer, float value);
 
 #ifndef RAC2_T_V4_FBFDC087A
 #define RAC2_T_V4_FBFDC087A
@@ -96,21 +96,21 @@ extern char D_00189E20_20[];
 
 extern float func_002A7878_6(float a0, float a1);
 
-extern void func_002C19D8(float *a0, float *a1, int a2, float a3, float a4);
+extern void part_spawn_drifting(float *a0, float *a1, int a2, float a3, float a4);
 
 extern int func_002A77E0_2(char *a0);
 
-extern void func_L00_002D3638(char *target, int mode, float value, float zero, float scale);
+extern void hero_build_relative_offset(char *target, int mode, float value, float zero, float scale);
 
 extern int func_002761F8_2(char *first, char *second, int mode, int flag, int extra);
 
 extern float func_00282E48_4(char *source, short *table);
 
-extern float func_00282E48(void *source, void *table);
+extern float fast_vec_dist(void *source, void *table);
 
-extern int func_002ABB78(void *object);
+extern int moby_is_in_special_class_range(void *object);
 
-extern int func_L00_002ADEA0(int index);
+extern int hero_slot_item_id(int index);
 
 extern void *D_L00_001BF218;
 
@@ -122,7 +122,7 @@ typedef struct {
 } HeroBlock_2ab1d8;
 #endif
 
-extern HeroBlock_2ab1d8 D_00189EA0;
+extern HeroBlock_2ab1d8 g_hero_position;
 
 extern short D_L00_001BF220_2[];
 
@@ -133,7 +133,7 @@ typedef int s32;
 
 typedef float f32;
 
-extern void func_L00_002D36E0(f32, f32, f32, f32 *, s32);
+extern void hero_build_relative_point(f32, f32, f32, f32 *, s32);
 
 typedef unsigned int u32;
 
@@ -154,7 +154,7 @@ typedef struct {
 } ResidentFlags2294;
 
 /* Reads a resident mode word and the kind byte of a pointer field, then for kind 3, 4 or 20 tests two float thresholds through a predicate and triggers a four-argument action with selector zero or one. */
-void func_L00_002A6420(void)
+void hero_check_targeting_triggers(void)
 {
     int selector;
 
@@ -167,7 +167,7 @@ void func_L00_002A6420(void)
 
     if (D_00189E20_16.f2294 == 2) {
         if (D_00189E20_16.f1B8 == 22)
-            PlayFootstepSoundAndDust(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
     }
 
     switch (D_00189E20_16.p2290[67]) {
@@ -175,25 +175,25 @@ void func_L00_002A6420(void)
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(49.5f) != 0)
-            PlayFootstepSoundAndDust(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(17.0f) != 0)
-            PlayFootstepSoundAndDust(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     case 4:
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(12.5f) != 0)
-            PlayFootstepSoundAndDust(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(1.0f) != 0)
-            PlayFootstepSoundAndDust(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     case 20:
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(8.0f) != 0)
-            PlayFootstepSoundAndDust(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(21.0f) != 0)
-            PlayFootstepSoundAndDust(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     }
 }
@@ -202,7 +202,7 @@ void func_L00_002A6420(void)
 
 
 /* reads a global mode value; for 8, 9 or 19 probes two engine queries and returns 1 if either reports true, else 0 */
-int func_L00_002A7000(void)
+int hero_is_in_swing_or_grind_mode(void)
 {
     int v = D_001A79F0_3;
     int r = 0;
@@ -217,7 +217,7 @@ int func_L00_002A7000(void)
 
 /* shared native body of family 0be97c76a107 */
 /* Gives each of the seven weapon slot objects the same 8 bytes from the hero object. */
-void func_L00_002A7070(void)
+void hero_copy_color_to_slot_objects(void)
 {
     char *hero = D_00189E20_2;
     int slot, part;
@@ -237,7 +237,7 @@ void func_L00_002A7070(void)
 }
 
 /* Does nothing. */
-void func_L00_002A70F0(void)
+void hero_empty_hook(void)
 {
 }
 
@@ -248,7 +248,7 @@ void func_L00_002A70F0(void)
 
 /* runs a three-float setup over two resident blocks when the mode is 124, then publishes a
    height once two resident flags are clear */
-void func_L00_002A76B8(void)
+void hero_update_model_wobble(void)
 {
     char *hero = D_00189E20_2;
 
@@ -267,7 +267,7 @@ void func_L00_002A76B8(void)
 /* func_L00_002A7958 is matched in its own unit, src/levels/shared/L00_002A7958-g8.c (-O2 -G8 -ffunction-sections). */
 
 /* raises the pending flag once: registers an update routine with the resident pointer */
-void func_L00_002A7A10(void)
+void hero_queue_glow_draw_routine(void)
 {
     char *hero = D_00189E20_2;
 
@@ -286,7 +286,7 @@ void func_L00_002A7A10(void)
 /* func_L00_002A9760 is defined in L00_002A9760-g8.c. */
 
 /* Clamps two float fields of one object into [-1,1] through a repeated helper call and copies the clamped values into a second object. */
-void func_L00_002A9D38(float *outValues, float *stick, float rate)
+void pad_clamp_stick_to_unit_range(float *outValues, float *stick, float rate)
 {
     char *base = D_00189E20_2;
     float target[2];
@@ -306,7 +306,7 @@ void func_L00_002A9D38(float *outValues, float *stick, float rate)
 /* func_L00_002A9E30 is defined in L00_002A9E30-retime.c. */
 
 /* blends two table entries by the fractional part of a clock value: the integer part is the index, one step back is wrapped over a count unless a flag selects the last slot, and the result is frac*table[index] + (scale-frac)*table[previous] */
-float func_L00_002A9F30(float *table, int count)
+float math_blend_table_entries_by_clock(float *table, int count)
 {
     char *hero = D_00189E20_24;
     float scratch[4];
@@ -324,7 +324,7 @@ float func_L00_002A9F30(float *table, int count)
 }
 
 /* Copies a 16-byte block pointed to by the first argument into a stack buffer, stores the three float arguments into a 16-byte stack vector, fills two 64-byte matrices through helper routines, applies copies of the buffer through them into two more 16-byte stack vectors, and finishes by passing the destination, the source and a composed vector to a closing routine. */
-void func_L00_002A9FE8(V4_Fbfdc087a *src, float x, float y, float z)
+void hero_offset_pose_by_vector(V4_Fbfdc087a *src, float x, float y, float z)
 {
     char *p = D_00189EB0;
     float q[4];
@@ -350,7 +350,7 @@ void func_L00_002A9FE8(V4_Fbfdc087a *src, float x, float y, float z)
 }
 
 /* runs a setup routine on a 16-byte stack buffer, selects 0.35f or 0.6f into buffer slot 2 from a flag byte in fixed data, then forwards the buffer with three float arguments */
-void func_L00_002AA0F0(float a, float b, float c)
+void hero_start_pose_offset(float a, float b, float c)
 {
     float buf[4];
 
@@ -365,7 +365,7 @@ void func_L00_002AA0F0(float a, float b, float c)
 }
 
 /* Copies a 36-byte global record onto the stack, substitutes a default id when the argument is zero, and calls one helper with the id, the count 9 and two fixed global addresses. */
-void func_L00_002AA178(int id)
+void part_spawn_effect_from_record(int id)
 {
     S36_F39e097fb buf;
 
@@ -378,7 +378,7 @@ void func_L00_002AA178(int id)
 /* func_L00_002AA200 is defined in L00_002AA200-pose.c. */
 
 /* Bumps a 16-bit counter in a fixed data block and, when the new value exceeds the caller's threshold, builds a three-float jittered position from two globals plus three random calls, hands it to a spawn helper and stores the helper's return value back into the counter. */
-void func_L00_002AA478(char *owner, int threshold)
+void part_spawn_jittered_after_delay(char *owner, int threshold)
 {
     float position[3];
     int count;
@@ -393,7 +393,7 @@ void func_L00_002AA478(char *owner, int threshold)
         position[1] = *(float *)(hero + 132) + func_002A7878_6(-0.05f, 0.05f);
         position[2] = *(float *)(hero + 816);
         speed = func_002A7878_6(0.4f, 0.6f);
-        SpawnDriftingParticle_002C19D8(position, (float *)(hero + 816), -1, speed, 5250.0f);
+        part_spawn_drifting(position, (float *)(hero + 816), -1, speed, 5250.0f);
         *(unsigned short *)(hero + 2628) = func_002A77E0_2(owner);
     }
 }
@@ -439,36 +439,36 @@ typedef struct {
 extern FloatBlock_2ab1d8 D_L00_0025BE10_1;
 
 /* Stores two values in the first entry of a small table. */
-void func_L00_002AB0A8(float first, float second) {
+void cam_set_limits_first(float first, float second) {
     D_L00_0025BE10[0].first = first;
     D_L00_0025BE10[0].second = second;
 }
 
 /* Stores two values in the second entry of a small table. */
-void func_L00_002AB0C0(float first, float second) {
+void cam_set_limits_second(float first, float second) {
     D_L00_0025BE10[1].first = first;
     D_L00_0025BE10[1].second = second;
 }
 
 /* Stores two values in the third entry of a small table. */
-void func_L00_002AB0D8(float first, float second) {
+void cam_set_limits_third(float first, float second) {
     D_L00_0025BE10[2].first = first;
     D_L00_0025BE10[2].second = second;
 }
 
 /* Stores two values in the fourth entry of a small table. */
-void func_L00_002AB0F0(float first, float second) {
+void cam_set_limits_fourth(float first, float second) {
     D_L00_0025BE10[3].first = first;
     D_L00_0025BE10[3].second = second;
 }
 
 /* scales and blends two 16-byte samples through a helper, and on a successful comparison writes a table-derived value to the caller's output */
-int func_L00_002AB108(float *out, float scale, float amount)
+int hero_test_reach_blend(float *out, float scale, float amount)
 {
     char buffer[32];
 
-    BuildHeroRelativeOffset(buffer, 1, D_0018A084 - 0.02f, 0.0f, scale);
-    BuildHeroRelativeOffset(buffer + 16, 1, amount, 0.0f, scale);
+    hero_build_relative_offset(buffer, 1, D_0018A084 - 0.02f, 0.0f, scale);
+    hero_build_relative_offset(buffer + 16, 1, amount, 0.0f, scale);
     if (func_002761F8_2(buffer, buffer + 16, 2, 0, 0)) {
         if (out)
             *out = func_00282E48_4(buffer, D_L00_001BF220_2);
@@ -482,7 +482,7 @@ int func_L00_002AB108(float *out, float scale, float amount)
    blend helper for the frame scale, and writes the clamped angle pair into the level's
    float block at 0x25BE10. */
 
-void func_L00_002AB1D8(void)
+void cam_update_blend_angles(void)
 {
     float blendValue;
     float range, pitchAngle, yawAngle, scale;
@@ -499,19 +499,19 @@ void func_L00_002AB1D8(void)
     if (D_00189E20_16.b22BF != 0)
         return;
 
-    if (TestHeroReachBlend(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
+    if (hero_test_reach_blend(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
         return;
 
     if (D_00189E20_16.b22B8 != 0 && D_L00_001BF218 != 0) {
-        if (IsMobyInSpecialClassRange(D_L00_001BF218) != 0)
+        if (moby_is_in_special_class_range(D_L00_001BF218) != 0)
             return;
     }
 
     D_L00_0025BE10_1.f6D4 = 0.05f;
     D_L00_0025BE10_1.f6D8 = 0.3f;
 
-    blendValue = fast_vec_dist(&gHeroPosition, D_L00_001BF220_2);
-    range = 1.3f - (blendValue - gHeroPosition.f1E4);
+    blendValue = fast_vec_dist(&g_hero_position, D_L00_001BF220_2);
+    range = 1.3f - (blendValue - g_hero_position.f1E4);
     scale = range * 0.9615385f;
     pitchAngle = scale * (-70.0f * 0.017453294f);
     if (-30.0f * 0.017453294f < pitchAngle)
@@ -543,7 +543,7 @@ void func_L00_002AB1D8(void)
 }
 
 /* Clears the hero's saved values for the first slot and four more small records. */
-void func_L00_002AB3E0(void)
+void hero_clear_slot_records(void)
 {
     char *hero = D_00189E20_2;
     int i;
@@ -579,40 +579,40 @@ void func_L00_002AB3E0(void)
 /* func_L00_002ADB40 is defined in L00_002ADB40.c. */
 
 /* forwards an output pointer, three pinned floating constants and selector one to the typed helper */
-void func_L00_002ADCF8(f32 *output) {
- BuildHeroRelativePoint(0.3f,0.0f,1.34f,output,1);
+void hero_get_offset_vector(f32 *output) {
+ hero_build_relative_point(0.3f,0.0f,1.34f,output,1);
 }
 
 /* func_L00_002ADD30 is matched in its own unit, L00_002ADD30.c. */
 
 /* returns indexed resident word 0x1220 when field 0x1244 equals two, otherwise zero */
-u32 func_L00_002ADE68(s32 index) {
+u32 hero_get_slot_object(s32 index) {
  NativeIndexedFieldsView *p=(NativeIndexedFieldsView *)((u8 *)&D_00189E20_1+index*0x50);
  if(p->field1244==2) return p->field1220;
  return 0;
 }
 
 /* returns indexed resident word 0x1248 when field 0x1244 equals two, otherwise minus one */
-s32 func_L00_002ADEA0(s32 index) {
+s32 hero_slot_item_id(s32 index) {
  NativeIndexedFieldsView *p=(NativeIndexedFieldsView *)((u8 *)&D_00189E20_1+index*0x50);
  if(p->field1244==2) return p->field1248;
  return -1;
 }
 
 /* tests whether the indexed resident status equals 12 or 17 */
-s32 func_L00_002ADED8(s32 index) {
+s32 hero_is_slot_item_wrench(s32 index) {
  s32 value=hero_slot_item_id(index);
  if(value==12 || value==17) return 1;
  return 0;
 }
 
 /* tests whether the indexed resident status equals 47 */
-s32 func_L00_002ADF10(s32 index) {
+s32 hero_is_slot_item_special(s32 index) {
  return hero_slot_item_id(index)==47;
 }
 
 /* the indexed resident status is one of four measured values */
-s32 func_L00_002ADF38(s32 index)
+s32 hero_is_slot_item_one_of_four(s32 index)
 {
     s32 value = hero_slot_item_id(index);
 
@@ -623,7 +623,7 @@ s32 func_L00_002ADF38(s32 index)
 
 
 /* tests the measured unsigned resident kind and mode alternatives */
-s32 func_L00_002ADF80(void)
+s32 hero_is_in_special_kind_or_mode(void)
 {
     ResidentFlags2294 *root = (ResidentFlags2294 *)D_00189E20_1;
 
@@ -636,7 +636,7 @@ s32 func_L00_002ADF80(void)
 }
 
 /* returns the provided value, or object byte 0xa9 when the value is 255 */
-u32 func_L00_002ADFD0(u8 *object,u32 value) {
+u32 hero_get_value_or_default(u8 *object,u32 value) {
     if(value==255) value=object[0xa9];
     return value;
 }
@@ -644,7 +644,7 @@ u32 func_L00_002ADFD0(u8 *object,u32 value) {
 
 
 /* Returns a saved value from a ring of the last 32 float values, going back by the given number of steps. */
-float func_L00_002AE070(int count)
+float hero_get_recent_float(int count)
 {
     char *hero = D_00189E20_2;
     char *ring;

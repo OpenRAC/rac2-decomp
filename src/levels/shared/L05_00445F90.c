@@ -5,29 +5,29 @@ typedef struct {
     char *row;
 } TableEntry;
 
-extern void func_L00_002C42E0(int, int);
-extern void func_L00_002D2E68(void);
+extern void hero_l00_set_action(int, int);
+extern void hero_set_objects_flag_bit(void);
 extern int D_00221D94;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern TableEntry *D_001B1EC4 MACRO_ADDR;
-extern char D_00189E20[] MACRO_ADDR;
+extern char g_hero_state[] MACRO_ADDR;
 extern char D_0019B2E8[];
 
 /* While the level is idle, checks the object's table bit before starting the encounter. */
 /* Starts the ship fight the first time the player reaches it, unless it was already done. Returns 1 if it started. */
-int func_L05_00445F90(char *object)
+int ship_try_start_encounter(char *object)
 {
     char *row;
     char *base;
 
     row = D_001B1EC4[*(short *)(object + 0x84)].row;
     if (D_00221D94 != 0 ||
-        (*(unsigned char *)(*(char **)(row + 0x5C) + (gCurrentMapIndex << 4) + (int)D_0019B2E8) & 0x80) != 0)
+        (*(unsigned char *)(*(char **)(row + 0x5C) + (g_current_map_index << 4) + (int)D_0019B2E8) & 0x80) != 0)
         return 0;
-    SetHeroAction_L00(0x31, 1);
-    base = gHeroState;
+    hero_l00_set_action(0x31, 1);
+    base = g_hero_state;
     *(int *)(*(char **)(base + 0x2290) + 0x98) = 0;
-    SetHeroObjectsFlagBit();
+    hero_set_objects_flag_bit();
     *(unsigned char *)(base + 0x22B5) = 1;
     return 1;
 }

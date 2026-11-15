@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
-extern void func_00283698(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
 
-extern void func_00283678(void *, void *);
+extern void copy_matrix3x4(void *, void *);
 
 typedef int V4TI_F36d8a248 __attribute__((mode(TI)));
 
 /* Finds the joint record closest to the given point and returns its index, also giving back its inverse matrix and position. */
-int func_L00_00323338(void *attachment, void *records, int count, void *src0, void *src1,
+int coll_find_closest_joint_record(void *attachment, void *records, int count, void *src0, void *src1,
                       void *dst, void *ctx)
 {
     struct {

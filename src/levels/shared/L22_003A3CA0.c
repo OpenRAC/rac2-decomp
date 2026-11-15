@@ -8,7 +8,7 @@ extern s32 D_L22_001B1920[4];
 extern s32 *D_L22_001B2AB4 __attribute__((sda));
 
 /* Clears the counts and rows of spawned pickups and sets the starting limits from the ship. */
-void func_L22_003A3CA0(char *obj) {
+void pickup_reset_tables(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     s32 i, j;
     s32 *q;

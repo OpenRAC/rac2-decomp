@@ -28,23 +28,23 @@ extern u32 D_L00_001B09A8 __attribute__((sda));
 extern u32 D_L00_001B09A4 __attribute__((sda));
 extern u32 D_L00_001B09B8 __attribute__((sda));
 extern BeamVector D_L00_0029F0D0[];
-extern BeamVector D_L00_001B8DC0;
-extern char *func_L00_0032A088(int, int);
-extern int *func_L00_0032A0B8(int, int);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283CF0(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern BeamVector g_camera_l00_position;
+extern char *level_get_slot_body(int, int);
+extern int *level_get_slot_header(int, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecCross(void *, void *, void *);
+extern int FloatToInt(float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 
 /* Draws the bolt's three glowing rings and the flat streaks between them, fading them out over
    time. */
-void func_L00_003F6308(unsigned char *object)
+void vaporizer_bolt_draw_beam_rings(unsigned char *object)
 {
     int ring;
     BeamQuad quad;
@@ -52,13 +52,13 @@ void func_L00_003F6308(unsigned char *object)
     BeamVector vertices[3][20];
     BeamVector temp, side;
     unsigned char *vars = *(unsigned char **)(object + 0x68);
-    char *base = GetSlotBody(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a));
-    BeamRing *rings = (BeamRing *)(base + *GetSlotHeader(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a)));
+    char *base = level_get_slot_body(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a));
+    BeamRing *rings = (BeamRing *)(base + *level_get_slot_header(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a)));
     int row, j;
     u32 primary, col, alpha;
     float side_u, fade, phase, u, next, phase2;
 
-    InitQuadPacketState(&quad, 21, 0, 128);
+    gfx_init_quad_packet_state(&quad, 21, 0, 128);
     for (ring = 0; ring < 3; ring++) {
         if (rings[ring].enabled == 0) continue;
         qcopy(matrix[0], rings[ring].basis[0]);
@@ -101,7 +101,7 @@ void func_L00_003F6308(unsigned char *object)
             }
             col = primary;
         }
-        InitQuadPacketState(&quad, 14, 1, 128);
+        gfx_init_quad_packet_state(&quad, 14, 1, 128);
         alpha = FloatToInt(fade * (float)D_L00_001B09AC) << 24;
         col = D_L00_001B09A8;
         quad.uv[0][0] = 0;
@@ -115,7 +115,7 @@ void func_L00_003F6308(unsigned char *object)
         quad.uv[3][0] = 0.5f;
         quad.uv[2][0] = 0.5f;
         col = D_L00_001B09A4;
-        FastVecSub(temp, &gCameraPosition_L00, rings[ring].origin[0]);
+        FastVecSub(temp, &g_camera_l00_position, rings[ring].origin[0]);
         FastVecCross(matrix[1], matrix[0], temp);
         vec_scale_to_length(side, matrix[1], D_L00_001B09A0);
         for (j = 0; j < 2; j++) {
@@ -129,7 +129,7 @@ void func_L00_003F6308(unsigned char *object)
             quad.uv[0][0] = quad.uv[1][0] = quad.uv[2][0];
             quad.uv[2][0] = quad.uv[3][0] = 3.0f;
         }
-        InitQuadPacketState(&quad, 23, 1, 128);
+        gfx_init_quad_packet_state(&quad, 23, 1, 128);
         alpha = FloatToInt(fade * (float)D_L00_001B09BC) << 24;
         col = D_L00_001B09B8;
         primary = alpha | col;

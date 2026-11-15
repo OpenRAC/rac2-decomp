@@ -13,13 +13,13 @@ extern void func_3152C0(void *,void *);
 extern void func_317618(void *,void *,void *,void *);
 extern void func_313DD8(void *,f32,f32);
 extern void func_355188(s32);
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 typedef struct { f32 v[4]; } Vec;
 extern Vec D_L07_001B1790[2] __attribute__((sda));
 extern Vec D_L07_001B17B0[2] __attribute__((sda));
 typedef struct {u8 pad[0x108];u8 *children[2];f32 angles[2];} State;
 /* Creates the two side parts and the top attachment of a Siberius ship and keeps them attached to its body every frame. */
-void func_L07_0040F0D0(u8 *moby)
+void ship_update_attached_parts(u8 *moby)
 {
  f32 mat[16],oldpos[4],oldrot[4],delta[4],rot[4];
  u8 *vars=*(u8 **)(moby+0x68),*child,*partVars,*sound;
@@ -74,7 +74,7 @@ void func_L07_0040F0D0(u8 *moby)
    if(*(f32 *)(vars+0x16c4)>=*(f32 *)(vars+0x16c8)) {
     soundId=*(s32 *)(vars+0x16cc);
     if(soundId!=-1) {
-     sound=gSoundState+soundId*0x70;
+     sound=g_sound_state+soundId*0x70;
      if(*(u8 **)(sound+0x88)==moby && sound[0x74]) func_355188(soundId);
     }
     *(s32 *)(vars+0x16cc)=-1;

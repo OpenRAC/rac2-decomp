@@ -33,6 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import levels  # noqa: E402
+import srcnames  # noqa: E402
 
 REPORT = ROOT / "progress/report.json"
 TAG_PATTERN = "|".join(re.escape(v["tag"]) for v in levels.VERSIONS.values() if v["tag"])
@@ -58,7 +59,7 @@ def source_functions(version: str = "us") -> dict[str, list[tuple[str, bool]]]:
     out = {}
     for path in source_files(version):
         found = []
-        for line in path.read_text(errors="replace").splitlines():
+        for line in srcnames.canon(path.read_text(errors="replace")).splitlines():
             m = MARKER.match(line)
             if m:
                 found.append((m.group(1), False))
@@ -76,7 +77,7 @@ HANDWRITTEN = re.compile(rf'^ASM_FUNC\("[^"]*",\s*({NAME})\);', re.M)
 def handwritten(version: str = "us") -> set[str]:
     """Functions marked ASM_FUNC: assembly in the original too (VU0 and other routines no C
     compiles to), kept as assembly and counted as finished, as rac1-decomp counts them."""
-    return {n for path in source_files(version) for n in HANDWRITTEN.findall(path.read_text(errors="replace"))}
+    return {n for path in source_files(version) for n in HANDWRITTEN.findall(srcnames.canon(path.read_text(errors="replace")))}
 
 
 def measures(fns: list[dict]) -> dict:

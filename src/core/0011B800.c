@@ -34,7 +34,7 @@ extern int r1_func_00118BE0(void);
 
 extern int r1_func_00118BA0(int, int);
 
-extern void func_0011B728(void *);
+extern void kernel_service_thread_run(void *);
 
 extern int r1_D_0012FCF8;
 
@@ -78,7 +78,7 @@ extern void r1_func_00118E90(int arg0, void *arg1);
 
 /* rac1-decomp src/core/00119328.c: func_001195A0 */
 /* Starts the background service thread once, with its own semaphore. Returns -1 if it is already running or fails. */
-int func_0011B800(void) {
+int kernel_service_thread_start(void) {
     ThreadParam_1195A0 tp;
     SemaParam_1195A0 sp;
     int tid;
@@ -92,7 +92,7 @@ int func_0011B800(void) {
     if (r1_D_00154600 < 0) {
         return -1;
     }
-    tp.entry = RunKernelServiceThread;
+    tp.entry = kernel_service_thread_run;
     tp.stack = r1_D_00154200;
     tp.stackSize = 0x400;
     tp.gpReg = r1_D_00166D00;
@@ -122,7 +122,7 @@ ASM_FUNC("asm/core", func_0011B8D8);
    Deci2Call, declared void in this file, so it is reached through an
    alias). */
 /* Opens a debug-network (DECI2) channel and returns its handle. */
-int func_0011B978(unsigned short protocol, void *option, void *handler) {
+int deci2_open_channel(unsigned short protocol, void *option, void *handler) {
     unsigned int buf[4];
 
     buf[0] = protocol;
@@ -135,7 +135,7 @@ int func_0011B978(unsigned short protocol, void *option, void *handler) {
 
 /* rac1-decomp src/core/00119328.c: func_00119768 */
 /* Asks the debug network to send data on a channel. */
-void func_0011B9C8(int sock, signed char dest) {
+void deci2_send_data(int sock, signed char dest) {
     int buf[4];
     buf[0] = sock;
     buf[1] = dest;
@@ -144,14 +144,14 @@ void func_0011B9C8(int sock, signed char dest) {
 
 /* rac1-decomp src/core/00119328.c: func_00119798 */
 /* Polls a debug-network channel so its pending events get handled. */
-void func_0011B9F8(int sock) {
+void deci2_poll_channel(int sock) {
     int local = sock;
     r1_func_00118E90(0x4, &local);
 }
 
 /* rac1-decomp src/core/00119328.c: func_001197C0 */
 /* Reads bytes from a debug-network channel into a buffer. */
-void func_0011BA20(int sock, int buffer, unsigned short length) {
+void deci2_read_data(int sock, int buffer, unsigned short length) {
     int buf[4];
     buf[0] = sock;
     buf[1] = buffer;
@@ -161,7 +161,7 @@ void func_0011BA20(int sock, int buffer, unsigned short length) {
 
 /* rac1-decomp src/core/00119328.c: func_001197F8 */
 /* Writes bytes to a debug-network channel from a buffer. */
-void func_0011BA58(int sock, int buffer, unsigned short length) {
+void deci2_write_data(int sock, int buffer, unsigned short length) {
     int buf[4];
     buf[0] = sock;
     buf[1] = buffer;
@@ -172,7 +172,7 @@ void func_0011BA58(int sock, int buffer, unsigned short length) {
 
 /* rac1-decomp src/core/00119328.c: func_00119840 */
 /* Closes a debug-network channel. */
-void func_0011BAA0(int sock) {
+void deci2_close_channel(int sock) {
     int local = sock;
     r1_func_00118E90(0x10, &local);
 }

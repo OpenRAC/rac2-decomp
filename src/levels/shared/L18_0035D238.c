@@ -1,14 +1,14 @@
 #include "common.h"
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282C10(float);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float square_root(float);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
 /* Chooses a point on the segment near the sphere, breaking ties by reference distance. */
-float func_L18_0035D238(float radius, float *out, float *reference, float *point, float *start, float *end)
+float FindSegmentSpherePoint(float radius, float *out, float *reference, float *point, float *start, float *end)
 {
     struct {
         float offset[4], segment[4], closest[4], first[4], second[4];
@@ -35,13 +35,13 @@ float func_L18_0035D238(float radius, float *out, float *reference, float *point
         else if (secondT > 1.0f) secondT = 1.0f;
         FastVecScale(vectors.first, vectors.segment, firstT);
         FastVecAdd(vectors.first, vectors.first, start);
-        firstError = FloatAbs(fast_vec_dist(vectors.first, point) - radius);
+        firstError = math_fabs(fast_vec_dist(vectors.first, point) - radius);
         threshold = radius * 0.01f;
         if (firstError < threshold) firstError = 0.0f;
         second = vectors.second;
         FastVecScale(second, vectors.segment, secondT);
         FastVecAdd(second, second, start);
-        secondError = FloatAbs(fast_vec_dist(second, point) - radius);
+        secondError = math_fabs(fast_vec_dist(second, point) - radius);
         if (secondError < threshold) secondError = 0.0f;
         if (firstError < secondError || (firstError == secondError && fast_vec_dist(vectors.first, reference) < fast_vec_dist(second, reference))) {
             qcopy(out, vectors.first);
@@ -53,10 +53,10 @@ float func_L18_0035D238(float radius, float *out, float *reference, float *point
     } else {
         if (along < 0.0f) {
             qcopy(out, start);
-            distance = FloatAbs(fast_vec_dist(out, point) - radius);
+            distance = math_fabs(fast_vec_dist(out, point) - radius);
         } else if (along > 1.0f) {
             qcopy(out, end);
-            distance = FloatAbs(fast_vec_dist(out, point) - radius);
+            distance = math_fabs(fast_vec_dist(out, point) - radius);
         } else {
             qcopy(out, vectors.closest);
         }

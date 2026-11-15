@@ -23,27 +23,27 @@ extern float D_L16_001B1848_GP SDATA(D_L16_001B1848);
 extern float D_L16_001B9B00[4], D_L16_001BFF60[4];
 extern BeamDamageData D_L16_001A8F20 MACRO_ADDR;
 extern int D_L16_001B2648;
-extern void func_0029FC20(void *, int, void *), func_002830C0(void *, void *, void *);
-extern float func_L16_00416EB8(char *);
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F70(void *, void *, float), func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *), func_00282D30(void *, void *, float);
-extern void func_002A8C00(char *, int, int, float, BeamDamageData *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern u32 func_00283D38(u32, u32, float);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, int, int);
-extern int func_002A7820(int, int), func_00283CF0(float);
-extern float func_002A78D8(float, float), func_002A7878(float, float);
-extern void func_00282D08(void *, void *, void *, float);
+extern void moby_transform_joint_point(void *, int, void *), transform_vector(void *, void *, void *);
+extern float turret_get_horizontal_speed(char *);
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float), vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
+extern void make_hit_descriptor(char *, int, int, float, BeamDamageData *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern u32 FastTweenColor(u32, u32, float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, int, int);
+extern int math_random_int_range(int, int), FloatToInt(float);
+extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
+extern void lerp_vector(void *, void *, void *, float);
 /* Particle calls consume six/three GPR inputs and five/one FP inputs.
  * Both return their allocated pointer or null; this caller ignores those results. */
-extern void *func_002C16C0(void *, void *, int, int, int, int, float, float, float, float, float);
-extern void *func_002C6DD8(void *, void *, int, float);
-extern void func_002A7A00(void *, float, float);
+extern void *part_spawn_burst(void *, void *, int, int, int, int, float, float, float, float, float);
+extern void *part_spawn_trail_2(void *, void *, int, float);
+extern void vec_random_direction(void *, float, float);
 
 /* Draws the boss's laser beam from its body to its target, hurts whatever it hits and sprays sparks along the beam. */
-void func_L16_00412560(u8 *moby)
+void snivelak_draw_laser_beam(u8 *moby)
 {
     BeamBatch batch[2];
     float bone[16] __attribute__((aligned(16)));
@@ -81,18 +81,18 @@ void func_L16_00412560(u8 *moby)
     float length;
 
     body = *(void **)(state + 0x1f0);
-    TransformMobyJointPoint(body, joint, bone);
+    moby_transform_joint_point(body, joint, bone);
     muzzle = D_L16_001B16D0;
     transform_vector(start, muzzle, bone);
     object = *(u8 **)(state + 0x24c);
     if (object) {
         qcopy(target, (object + 0x10));
-        target[2] = GetTurretHorizontalSpeed((char *)object);
+        target[2] = turret_get_horizontal_speed((char *)object);
     } else qcopy(target, (state + 0x210));
     FastVecSub(end, moby + 0x10, target);
     end[2] = drop;
     length = *(float *)(state + 0x250);
-    FastVectorNormalizeHelper(end, end, length);
+    vec_fast_normalize_helper(end, end, length);
     FastVecAdd(end, end, target);
     damage = &D_L16_001A8F20;
     make_hit_descriptor(effect, (int)moby, layers, (float)state[0x36], damage);
@@ -131,21 +131,21 @@ void func_L16_00412560(u8 *moby)
         *(int *)(state + 0x258) = D_L16_001B2648;
         FastVecSub(delta, end, start);
         for (k = 0; k < D_L16_001B1828; k++) {
-            texture = RandomIntRange(D_L16_001B1840_GP, D_L16_001B1840[1]);
-            seed = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-            size = RandomFloatRange(D_L16_001B1848_GP, D_L16_001B1848[1]) * 210000.0f;
-            speed = RandomFloatRange(D_L16_001B1830[2], D_L16_001B1830[3]);
+            texture = math_random_int_range(D_L16_001B1840_GP, D_L16_001B1840[1]);
+            seed = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+            size = math_random_float_range(D_L16_001B1848_GP, D_L16_001B1848[1]) * 210000.0f;
+            speed = math_random_float_range(D_L16_001B1830[2], D_L16_001B1830[3]);
             vec_scale_to_length(velocity, delta, speed * 0.016666668f);
-            lerp_vector(sample, end, start, RandomFloatRange(0.0f, 1.0f));
-            SpawnBurstParticle_002C16C0(sample, velocity, texture, (int)D_L16_001B182C >> shift,
+            lerp_vector(sample, end, start, math_random_float_range(0.0f, 1.0f));
+            part_spawn_burst(sample, velocity, texture, (int)D_L16_001B182C >> shift,
                 D_L16_001B182C & 0xffffff, seed, size,
                 500.0f, 1.0f, 0.0f, 1.0f);
-            size = RandomFloatRange(10.0f, 20.0f);
-            SpawnTrailParticle_002C6DD8(sample, velocity, texture, size * 0.00027777778f);
-            RandomDirectionVector(velocity, D_L16_001B1830_GP * 0.016666668f,
+            size = math_random_float_range(10.0f, 20.0f);
+            part_spawn_trail_2(sample, velocity, texture, size * 0.00027777778f);
+            vec_random_direction(velocity, D_L16_001B1830_GP * 0.016666668f,
                 D_L16_001B1830[1] * 0.016666668f);
-            velocity[2] += RandomFloatRange(D_L16_001B1830[2], D_L16_001B1830[3]) * 0.016666668f;
-            SpawnTrailParticle_002C6DD8(end, velocity, texture, 0.0040555559f);
+            velocity[2] += math_random_float_range(D_L16_001B1830[2], D_L16_001B1830[3]) * 0.016666668f;
+            part_spawn_trail_2(end, velocity, texture, 0.0040555559f);
         }
     }
 }

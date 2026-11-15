@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned long TextureBits;
 typedef struct {
@@ -29,7 +30,7 @@ extern char ref_0027C878_07[];
  * Resolve a cached texture descriptor, allocating VRAM and queuing its upload
  * when necessary. Negative identifiers select the render-target descriptors. */
 /* Finds the texture settings for a picture, and loads the picture into video memory first if needed. */
-TextureBits func_0027C878(int id)
+TextureBits GetEffectTextureDescriptor(int id)
 {
     if (id < 0) {
         if (id == -5)

@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
 extern char *g_pHeroMoby[];
-extern s32 func_002A8508(u32, s32);
-extern int func_00288D58(void);
-extern int func_002E5CF8(int, int, char *);
+extern s32 moby_count_group_not_in_state(u32, s32);
+extern int flag_is_byte_set(void);
+extern int PlayMobySound(int, int, char *);
 
 /* A pickup's states: 0 takes the hero's flags, 1 waits until none of its four
    links is alive (or the zone byte says go), 2 fades it out, 4 is done. */
-void func_L04_004389C0(u8 *obj)
+void barlow_linked_fade_out_update(u8 *obj)
 {
     u8 *links = *(u8 **)(obj + 0x68);
     s32 i;
@@ -23,16 +23,16 @@ void func_L04_004389C0(u8 *obj)
     if (obj[0x20] == 1) {
         s32 found = 0;
         for (i = 0; i < 4; i++) {
-            if (CountMobysInGroupNotInState(*(u32 *)(links + 4 * i), -1))
+            if (moby_count_group_not_in_state(*(u32 *)(links + 4 * i), -1))
                 found = 1;
         }
         if (*(u32 *)(links + 0x10) != 0) {
-            if (IsFlagByteSet() != 0) {
-                if (CountMobysInGroupNotInState(*(u32 *)links, -1) == 0)
+            if (flag_is_byte_set() != 0) {
+                if (moby_count_group_not_in_state(*(u32 *)links, -1) == 0)
                     found = 0;
             }
         }
-        if (found == 0 || (D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+        if (found == 0 || (D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             PlayMobySound(0, 0, (char *)obj);
             obj[0x20] = 2;
         }

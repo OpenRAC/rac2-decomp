@@ -47,27 +47,27 @@ typedef struct {
     char gap[0x246];
     short mode;
 } TransitionGlobals;
-extern TransitionContext D_00152C00;
-extern TransitionScene D_001B8840;
+extern TransitionContext g_hero_moby_default;
+extern TransitionScene g_scene_playback_state;
 extern TransitionArchive D_001BAEC0;
-extern TransitionState D_001A63A8;
-extern TransitionGlobals D_00189E20;
+extern TransitionState g_music_state;
+extern TransitionGlobals g_hero_state;
 extern char D_001B1390[] MACRO_ADDR;
 extern char D_001B2980[];
 extern char D_001B13D0[] MACRO_ADDR;
 extern int D_001B22B0;
-extern float D_001B15A0;
+extern float g_screen_fade;
 extern int D_001B15A4 __attribute__((sda));
 extern TransitionMoby *D_001B1B60;
-extern void func_00282A60(void *, int, int);
-extern void func_002FC138(void);
+extern void mem_clear(void *, int, int);
+extern void gfx_select_packet_buffer_setup(void);
 extern unsigned int func_US2_0026F750(int, int);
-extern void func_0026F728(void);
-extern void func_00293F98(int, int);
-extern void func_00294070(int);
-extern int func_002E4AC8(void);
-extern int func_001261F0(int);
-extern int func_002B6D28(void);
+extern void stub_empty_4(void);
+extern void load_parts_set_from_disc(int, int);
+extern void load_select_segment_update_world(int);
+extern int UpdateSoundVoices(void);
+extern int sceGsSyncV(int);
+extern int snd_resume_music_stream(void);
 
 void func_US2_002E7BE0(int mode)
 {
@@ -78,28 +78,28 @@ void func_US2_002E7BE0(int mode)
     int music;
     int channel;
 
-    D_00152C00.field6C = 0;
-    D_00152C00.mode = mode;
-    D_00152C00.field8 = 0;
-    D_00152C00.slot = -1;
-    func_00282A60(&D_001B8840, 0, 0x1D0);
-    func_00282A60(&D_001B1390, 0, 0x40);
-    func_00282A60(D_001B2980, 0, 0x40);
-    func_00282A60(D_001B2980 + 0x40, 0, 0x40);
-    func_00282A60(&D_001B13D0, 0, 0x40);
-    func_002FC138();
+    g_hero_moby_default.field6C = 0;
+    g_hero_moby_default.mode = mode;
+    g_hero_moby_default.field8 = 0;
+    g_hero_moby_default.slot = -1;
+    mem_clear(&g_scene_playback_state, 0, 0x1D0);
+    mem_clear(&D_001B1390, 0, 0x40);
+    mem_clear(D_001B2980, 0, 0x40);
+    mem_clear(D_001B2980 + 0x40, 0, 0x40);
+    mem_clear(&D_001B13D0, 0, 0x40);
+    gfx_select_packet_buffer_setup();
 
     offset = D_001B22B0 - 0x60000;
-    D_001B8840.start = D_001BAEC0.start + offset;
-    D_001B8840.end = D_001BAEC0.end + offset;
-    D_001B15A0 = 1.0f;
+    g_scene_playback_state.start = D_001BAEC0.start + offset;
+    g_scene_playback_state.end = D_001BAEC0.end + offset;
+    g_screen_fade = 1.0f;
     D_001B22B0 = offset;
     D_001B15A4 = 0;
     func_US2_0026F750(0x61, 2);
-    D_00189E20.flag = 1;
-    func_0026F728();
+    g_hero_state.flag = 1;
+    stub_empty_4();
 
-    object = D_00152C00.object;
+    object = g_hero_moby_default.object;
     p = D_001B1B60;
     object->flags |= 1;
     for (; p->status != 255; p++) {
@@ -108,24 +108,24 @@ void func_US2_002E7BE0(int mode)
     }
 
     if (mode == 0) {
-        state = D_00189E20.mode ? 5 : 2;
-        music = D_00189E20.mode ? 3 : 1;
-        func_00293F98(music, 6);
+        state = g_hero_state.mode ? 5 : 2;
+        music = g_hero_state.mode ? 3 : 1;
+        load_parts_set_from_disc(music, 6);
     } else {
-        state = D_00189E20.mode ? 3 : 0;
-        music = D_00189E20.mode ? 2 : 0;
-        if (!D_00152C00.active)
+        state = g_hero_state.mode ? 3 : 0;
+        music = g_hero_state.mode ? 2 : 0;
+        if (!g_hero_moby_default.active)
             state++;
-        channel = D_00152C00.active ? 0 : 2;
-        func_00293F98(music, channel);
+        channel = g_hero_moby_default.active ? 0 : 2;
+        load_parts_set_from_disc(music, channel);
     }
 
-    D_001A63A8.state = state + 5000;
-    D_001A63A8.next = 0;
-    func_00294070(0);
-    while (D_001A63A8.phase != 3 || D_001A63A8.limit >= 6000) {
-        func_002E4AC8();
-        func_001261F0(0);
+    g_music_state.state = state + 5000;
+    g_music_state.next = 0;
+    load_select_segment_update_world(0);
+    while (g_music_state.phase != 3 || g_music_state.limit >= 6000) {
+        UpdateSoundVoices();
+        sceGsSyncV(0);
     }
-    func_002B6D28();
+    snd_resume_music_stream();
 }

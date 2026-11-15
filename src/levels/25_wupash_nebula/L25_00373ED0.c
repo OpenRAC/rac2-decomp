@@ -9,28 +9,28 @@
 
 /* func_L25_0040D208 is in L25_00373ED0-hud-g8.c. */
 
-extern char *func_002A9640(char *a0, int a1, int a2);
+extern char *part_find_owned_effect_slot(char *a0, int a1, int a2);
 
-extern void func_002AB8C0(char *a0, char *a1);
+extern void gfx_update_color_fade(char *a0, char *a1);
 
-extern void func_002AB800(char *a0, char *a1);
+extern void gfx_start_color_fade(char *a0, char *a1);
 
-extern int func_002E5DA0(int index, int value, char *object, int kind);
+extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
 
-extern void func_L05_00424990(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern void part_spawn_shockwave_burst(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
                               int a8, int a9, int a10, float f12);
 
 extern void func_L05_00421908(char *a0, int a1, int a2);
 
-extern int func_L05_0037BBB8(char *a0);
+extern int moby_is_in_use(char *a0);
 
-extern void func_L05_0037BE98(char *a0);
+extern void moby_release_from_group(char *a0);
 
-extern void func_L05_0037AE40(char *a0);
+extern void moby_reset_action_state(char *a0);
 
 /* The moby's death timer: it ticks the stored time down and, once it reaches zero,
    fires the object's effect and takes the moby down, which it reports. */
-int func_L25_0040DCD0(char *objectMoby, int flag)
+int moby_tick_death_timer(char *objectMoby, int flag)
 {
     char *effectLink;
     float *timerPtr;
@@ -38,32 +38,32 @@ int func_L25_0040DCD0(char *objectMoby, int flag)
     char *vars;
     int ret = 0;
 
-    frameInfo = FindOwnedEffectSlot(objectMoby, 0x230000, 0);
+    frameInfo = part_find_owned_effect_slot(objectMoby, 0x230000, 0);
     *(unsigned char *)(objectMoby + 0xA8) = 0xFF;
     vars = *(char **)(objectMoby + 0x68);
     effectLink = *(char **)(vars + 0x10);
     timerPtr = *(float **)(vars + 0x0);
     if (effectLink != 0) {
-        UpdateColorFade(objectMoby, effectLink);
+        gfx_update_color_fade(objectMoby, effectLink);
     }
     if (frameInfo != 0) {
         if (effectLink != 0) {
             *(unsigned char *)(effectLink + 7) = 0xFF;
-            StartColorFade(objectMoby, effectLink);
+            gfx_start_color_fade(objectMoby, effectLink);
         }
         *timerPtr = *timerPtr - *(float *)(frameInfo + 0x2C);
         if (*(short *)(objectMoby + 0xAA) != 0xB73 /* moby class 2931 */) {
-            PlaySoundFromClassBank(2, 0, objectMoby, 0x957);
+            snd_play_from_class_bank(2, 0, objectMoby, 0x957);
         }
         if (*timerPtr <= 0.0f) {
             *timerPtr = 0.0f;
-            SpawnShockwaveBurst(objectMoby + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
+            part_spawn_shockwave_burst(objectMoby + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
             func_L05_00421908(objectMoby, 1, 0x19);
-            if (IsObjectInUse(objectMoby)) {
-                ReleaseObjectFromGroup(objectMoby);
+            if (moby_is_in_use(objectMoby)) {
+                moby_release_from_group(objectMoby);
             }
             if (flag == 0) {
-                ResetObjectActionState(objectMoby);
+                moby_reset_action_state(objectMoby);
             }
             ret = 1;
         }

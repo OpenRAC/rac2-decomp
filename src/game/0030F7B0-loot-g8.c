@@ -1,14 +1,14 @@
 #include "common.h"
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 extern int D_001AF0FC __attribute__((sda));
-extern void func_002A6C58(void *, int, int);
-extern int func_002A68A8(void *, int *);
-extern void func_003202E8(void *, int, int, int);
+extern void SetDeathBits(void *, int, int);
+extern int PickAmmoDropItem(void *, int *);
+extern void SpawnWeaponAmmoPickup(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
  * halfword at +0xB4 before handing it to the state helper. */
-void func_00311F70(unsigned char *self)
+void crate_drop_loot(unsigned char *self)
 {
     unsigned char *data = *(unsigned char **)(self + 0x68);
     int item = *(short *)(data + 0xC6) == 0;
@@ -23,7 +23,7 @@ void func_00311F70(unsigned char *self)
             i = 1;
         else
             i = 2;
-        SetDeathBits(self, 256, RandomIntBelow(2) + i);
+        SetDeathBits(self, 256, math_random_int_below(2) + i);
     } else {
         if (*(short *)(self + 0xAA) != 0x1F5 /* Nanotech Crate */ && *(short *)(self + 0xAA) != 0x200 /* Purple Nanotech Crate */) {
             {

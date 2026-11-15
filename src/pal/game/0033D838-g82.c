@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8_Ff4eb83c9;
 typedef int s32_Ff4eb83c9;
-extern int func_0033C590(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
+extern int UpdateFourOptionMenuInput(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
 extern void func_PAL_0033CD50(void *);
-extern void func_0033B018(void *, float, float);
-extern int func_002E5E58(int, int, void *);
-extern void func_0027AB40(void);
+extern void menu_set_anchor_pos(void *, float, float);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void UpdateViewContext(void);
 
 int func_PAL_0033E460(u8_Ff4eb83c9 *a0, int a1)
 {
@@ -20,17 +21,17 @@ int func_PAL_0033E460(u8_Ff4eb83c9 *a0, int a1)
 
     func_PAL_0033CD50(p);
     q = *(float **)(a0 + 0x2DC);
-    func_0033B018(p, q[0], q[1]);
+    menu_set_anchor_pos(p, q[0], q[1]);
     if (a1 & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         v = *(int *)(a0 + 0x2D8);
         *(int *)(a0 + 0x2D8) = (v + 3) % 4;
     } else if (a1 & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         v = *(int *)(a0 + 0x2D8);
         *(int *)(a0 + 0x2D8) = (v + 1) % 4;
     } else if (a1 & 0x40) {
-        func_002E5E58(4, 0, 0);
+        snd_play_from_global_bank(4, 0, 0);
         switch (*(int *)(a0 + 0x2D8)) {
         case 0:
             *sfx = *sfx < 1;
@@ -43,7 +44,7 @@ int func_PAL_0033E460(u8_Ff4eb83c9 *a0, int a1)
             break;
         case 3:
             *toggle = *toggle < 1;
-            func_0027AB40();
+            UpdateViewContext();
             break;
         }
     }
@@ -67,9 +68,9 @@ extern int D_001ADE1C[] __attribute__((sda));
 extern int D_001A7BA4, D_001A7BA8, D_001A7BAC;
 extern unsigned char D_001A7BB1;
 extern void func_PAL_0033CE70(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 
 void func_PAL_0033E608(char *object)
 {
@@ -86,26 +87,26 @@ void func_PAL_0033E608(char *object)
     toggle = D_001ADDD0;
     format = D_001ADDD8;
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    first = func_00288FB8(0xBF3);
-    second = func_00288FB8(onoff.ids[D_001A7BA4 != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FB40(D_001ADE00, D_001ADE04[0], color, buffer, -1);
+    first = GetLocalizedString(0xBF3);
+    second = GetLocalizedString(onoff.ids[D_001A7BA4 != 0]);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_medium(D_001ADE00, D_001ADE04[0], color, buffer, -1);
     color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    label2 = func_00288FB8(0xBF2);
-    second = func_00288FB8(onoff.ids[D_001A7BA8 != 0]);
-    func_00115DA8(buffer, format, label2, second);
-    func_0027FB40(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
+    label2 = GetLocalizedString(0xBF2);
+    second = GetLocalizedString(onoff.ids[D_001A7BA8 != 0]);
+    sprintf(buffer, format, label2, second);
+    text_draw_centered_medium(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
     color = *(int *)(object + 0x2D8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     {
         int mode = D_001A7BAC;
-        label3 = func_00288FB8(0xE3D);
-        second = func_00288FB8(modes.ids[mode]);
+        label3 = GetLocalizedString(0xE3D);
+        second = GetLocalizedString(modes.ids[mode]);
     }
-    func_00115DA8(buffer, format, label3, second);
-    func_0027FB40(D_001ADE10, D_001ADE14[0], color, buffer, -1);
+    sprintf(buffer, format, label3, second);
+    text_draw_centered_medium(D_001ADE10, D_001ADE14[0], color, buffer, -1);
     color = *(int *)(object + 0x2D8) == 3 ? (int)0x80D0D0D0 : 0x70808080;
-    label4 = func_00288FB8(0x10FC);
-    second = func_00288FB8(toggle.ids[D_001A7BB1 != 0]);
-    func_00115DA8(buffer, format, label4, second);
-    func_0027FB40(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
+    label4 = GetLocalizedString(0x10FC);
+    second = GetLocalizedString(toggle.ids[D_001A7BB1 != 0]);
+    sprintf(buffer, format, label4, second);
+    text_draw_centered_medium(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
 }

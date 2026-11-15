@@ -10,10 +10,10 @@ extern TableEntry D_L00_001A7D60[] SDATA(D_L00_001A7D60);
 extern TableEntry D_L00_001A7D48[] SDATA(D_L00_001A7D48);
 extern TableEntry D_L00_001A7D78[] SDATA(D_L00_001A7D78);
 
-extern int func_L00_002ADEA0(int);
+extern int hero_slot_item_id(int);
 
 /* picks the table for the item in hero slot 3 and, for the entry whose byte a equals id, writes its key to out and returns 1; otherwise writes 0 and returns 0 */
-int func_L00_002D1B70(int id, int *out)
+int FindSlotTableKey(int id, int *out)
 {
     TableEntry *table = 0;
     int index;

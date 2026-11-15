@@ -23,17 +23,17 @@ typedef struct { int count; int reserved[3]; PathPoint point[0]; } CameraPath;
 extern char *D_L13_001B22C4[] __attribute__((sda));
 extern char *D_L13_001B9914;
 extern CameraPath *D_L13_001FE580[];
-extern float D_00189EA0[4];
-extern float func_00282E48(void *, void *);
-extern int func_L00_00341FA8(void *, void *, void *, int *, float *, int, float, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_L13_004388C8(char *);
+extern float g_hero_position[4];
+extern float fast_vec_dist(void *, void *);
+extern int find_nearest_path_point(void *, void *, void *, int *, float *, int, float, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void cam_path_init(char *);
 
 /* Starts the path camera: copies the current camera view, measures the path segments and checks which way the player faces along the path. */
-void func_L13_00439820(char *camera) {
+void cam_path_start(char *camera) {
     float projected[4] __attribute__((aligned(16)));
     float tangent[4] __attribute__((aligned(16)));
     float difference[4] __attribute__((aligned(16)));
@@ -59,18 +59,18 @@ void func_L13_00439820(char *camera) {
         CameraPath *path = D_L13_001FE580[*(int *)(settings + 0x20)];
         segment = 0;
         fraction = 0.0f;
-        if (find_nearest_path_point(path, gHeroPosition, projected, &segment, &fraction, 0, 20.0f, 1.0f, 0.0f)) {
+        if (find_nearest_path_point(path, g_hero_position, projected, &segment, &fraction, 0, 20.0f, 1.0f, 0.0f)) {
             int count = path->count;
             int next = segment + 1;
             if (next >= count) next = count - 1;
             FastVecSub(tangent, &path->point[next], &path->point[segment]);
             if (FastVecLength(tangent) != 0.0f && next != segment) {
                 vec_scale_to_length(tangent, tangent, 1.0f);
-                FastVecSub(difference, camera + 0x30, gHeroPosition);
+                FastVecSub(difference, camera + 0x30, g_hero_position);
                 if (FastVecDot(difference, tangent) > 0.0f)
                     *(short *)(settings + 0x36) = 1;
             }
         }
     }
-    InitPathCamera(camera);
+    cam_path_init(camera);
 }

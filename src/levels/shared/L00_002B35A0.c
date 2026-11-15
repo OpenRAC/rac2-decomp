@@ -1,12 +1,12 @@
 #include "common.h"
 extern u8 D_00189E20_1[];
-extern void func_00282978(char *);
+extern void FastDecTimer(char *);
 typedef int AnimQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0x158]; float value; u8 gap[0x370-0x15c]; AnimQuad vector; } AnimBase;
 extern AnimBase D_L00_001B8C80;
-extern void func_L00_002B3EF8(int, float, float, float);
+extern void hero_steer_heading(int, float, float, float);
 /* Copies the hero turning values from the animation data and slows the turn depending on which way the hero is leaning. */
-void func_L00_002B35A0(void)
+void hero_update_turn_from_anim(void)
 {
     u8 *hero=D_00189E20_1;
     float factor;
@@ -32,7 +32,7 @@ void func_L00_002B35A0(void)
         *(float *)(heroBlock+0x1b4)*=factor;
         qcopy_nc(heroBlock+0x190,&anim->vector);
         *(float *)(heroBlock+0x1a4)=*(float *)(heroBlock+0x145c);
-        SteerHeroHeading(0,0.037f,0.25f,0.2036217749118805f);
+        hero_steer_heading(0,0.037f,0.25f,0.2036217749118805f);
         {
             float saved=*(float *)(heroBlock+0x1a4);
             *(float *)(heroBlock+0x1a8)=0.0f;

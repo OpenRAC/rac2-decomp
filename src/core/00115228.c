@@ -8,6 +8,6 @@ extern void *D_00133E74;
 extern void func_00115210(void *arg0) __asm__("func_00115210");
 
 /* Runs the library step that gets its shared data ready before text is printed. */
-void func_00115228(void) {
-    GetLibraryDataBlock(D_00133E74);
+void libc_init_stdio_state(void) {
+    libc_get_data_block(D_00133E74);
 }

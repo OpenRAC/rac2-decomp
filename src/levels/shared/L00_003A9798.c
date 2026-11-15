@@ -2,19 +2,19 @@
 #include "names.h"
 typedef int s32;
 typedef float f32;
-extern s32 func_00277F48(f32, s32, s32, s32, s32);
+extern s32 coll_process_hit(f32, s32, s32, s32, s32);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_0032D758(int, int, int);
+extern void StartAttachedEffect(int, int, int);
 
-extern int D_0018C0B0;
+extern int g_hero_moby;
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 
-extern unsigned char D_L00_00262570[];
+extern unsigned char g_weapon_l00_table[];
 
-extern unsigned int D_L00_001C3280[];
+extern unsigned int g_area_hit_targets[];
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -41,7 +41,7 @@ typedef struct {
 #endif
 
 /* Hurts everything near a projectile when it blows up, and plays the hit sound for each thing hit. */
-void func_L00_003A9798(char *moby, char *vars, char *position)
+void projectile_damage_nearby_on_hit(char *moby, char *vars, char *position)
 {
     Trail_3A9798 s;
     int count;
@@ -58,14 +58,14 @@ void func_L00_003A9798(char *moby, char *vars, char *position)
     s.kind = 3;
     s.kind2 = 2;
     s.id = *(unsigned short *)(moby + 0xAA);
-    count = ProcessCollisionHit(6.0f, (int)position, 1, gHeroMoby_0018C0B0, (int)&s);
-    if (((Entry262570 *)(gWeaponTable_L00 + gItemSlotToRecord[0x19] * 224))->flag != 0) {
-        p = gAreaHitTargets;
+    count = coll_process_hit(6.0f, (int)position, 1, g_hero_moby, (int)&s);
+    if (((Entry262570 *)(g_weapon_l00_table + g_item_slot_to_record[0x19] * 224))->flag != 0) {
+        p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            StartAttachedEffect(gAreaHitTargets[i], 0x46, *(int *)(moby + 0xB8));
+            StartAttachedEffect(g_area_hit_targets[i], 0x46, *(int *)(moby + 0xB8));
     } else {
-        p = gAreaHitTargets;
+        p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            StartAttachedEffect(gAreaHitTargets[i], 0x19, *(int *)(moby + 0xB8));
+            StartAttachedEffect(g_area_hit_targets[i], 0x19, *(int *)(moby + 0xB8));
     }
 }

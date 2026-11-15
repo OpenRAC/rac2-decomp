@@ -3,6 +3,7 @@
  * 16-byte tail (FUNCTION_ENTRY_OFFSETS); the word at 14:0028D180 points there.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -15,7 +16,7 @@ extern int * volatile D_L14_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L14_001C9AE0;
 
 /* Fills the menu entry list from the table of unlocked ids, then finds which entry is currently selected and stores its index. */
-int func_L14_0035F510(char *menu) {
+int menu_fill_selection_entries(char *menu) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

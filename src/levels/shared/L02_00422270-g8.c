@@ -18,21 +18,21 @@ extern u8 ref_L02_00422270_05[] MACRO_ADDR;
 extern u8 ref_L02_00422270_06[] MACRO_ADDR;
 extern u8 ref_L02_00422270_07[] MACRO_ADDR;
 
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern char *func_002BBCB0(void *, void *, int, int, float, int, int, int, int, float);
-extern char *func_00308408(char *, char *, char *, int, float, u8, u8, u8, u8);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring(char *, char *, char *, int, float, u8, u8, u8, u8);
 
 /* Called with a constant radius: each ring loads it afresh instead of sharing one register. */
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)
 {
-    SpawnShockwaveRing(obj, pos, velocity, type, radius, r, g, b, a);
+    part_spawn_shockwave_ring(obj, pos, velocity, type, radius, r, g, b, a);
 }
 
 /* Bursts at pos: six sparks, three coloured rings, then a damage ring for an owner. */
-void func_L02_00422270(char *obj, char *pos)
+void SpawnSparkRingBurst(char *obj, char *pos)
 {
     float velocity[4];
     float scale, damage;
@@ -45,13 +45,13 @@ void func_L02_00422270(char *obj, char *pos)
     damage = 2.0f;
     scale = 1.0f;
     for (i = 0; i < 6; i++) {
-        speed = RandomFloatRange(8.0f, 10.0f) * (1.0f / 60.0f);
-        index = RandomIntBelow(6);
+        speed = math_random_float_range(8.0f, 10.0f) * (1.0f / 60.0f);
+        index = math_random_int_below(6);
         first = ref_L02_00422270_00[index];
         last = ref_L02_00422270_01[index];
-        life = RandomIntRange(15, 20);
-        spark = SpawnFireworkSparkParticle(pos, velocity, first, last, scale * 400000.0f, life,
-                              RandomIntRange(30, 45), 0, 0, speed * scale);
+        life = math_random_int_range(15, 20);
+        spark = part_spawn_firework_spark(pos, velocity, first, last, scale * 400000.0f, life,
+                              math_random_int_range(30, 45), 0, 0, speed * scale);
         if (spark)
             spark[3] = 0x44;
     }

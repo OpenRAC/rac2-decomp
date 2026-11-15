@@ -7,19 +7,19 @@ extern u8 D_001A7A78 __attribute__((nosda));
 
 extern s32 D_L22_001A903C __attribute__((sda));
 
-extern void func_002A7750(u8 *, s32, s32);
+extern void moby_set_state(u8 *, s32, s32);
 
-extern s32 func_002E5E58(s32, s32, void *);
+extern s32 snd_play_from_global_bank(s32, s32, void *);
 
-extern void func_002B0A18(s32, s32);
+extern void value_set_entry_by_index(s32, s32);
 
 /* Starts in the idle state, then waits until no other object of class 3389 is still active before it fires the one-time event. */
-void func_L22_00385F40(s32 moby)
+void moby_wait_no_active_trigger_event(s32 moby)
 {
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
         *(u8 *)(moby + 0x30) = 0xFF;
-        SetMobyState((u8 *)moby, 1, -1);
+        moby_set_state((u8 *)moby, 1, -1);
         break;
     case 1: {
         s32 activeFound = 0;
@@ -36,8 +36,8 @@ void func_L22_00385F40(s32 moby)
             break;
         if (D_001A7A78 == 0) {
             D_001A7A78 = 1;
-            PlaySoundFromGlobalBank(1, 0, 0);
-            SetEntryValueByIndex(0x1233, -1);
+            snd_play_from_global_bank(1, 0, 0);
+            value_set_entry_by_index(0x1233, -1);
             D_L22_001A903C = 1;
         }
         break;

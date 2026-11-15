@@ -8,10 +8,10 @@ extern int D_001341E4;
 
 extern int D_00134DB8;
 
-extern void func_0011AC40(int arg0);
+extern void SignalSema(int arg0);
 
 /* Releases the memory lock, and wakes a waiting thread once the last hold is let go. */
-void func_00116360(void) {
+void malloc_lock_release(void) {
     if (--D_001341E4 == 0) {
         D_001341E0 = -1;
         SignalSema(D_00134DB8);

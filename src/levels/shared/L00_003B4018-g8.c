@@ -12,12 +12,12 @@ extern int D_L00_001B28A4;
 extern int D_L00_001B28A8;
 extern float D_L00_001B28AC;
 
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern int func_00282948(int *);
-extern int func_00282978(void *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern int math_fast_float_d(int *);
+extern int FastDecTimer(void *);
 
-void func_L00_003B4018(void)
+void UpdateTimedEvents(void)
 {
     if(D_L00_001AF8F0) {
         int i;
@@ -27,7 +27,7 @@ void func_L00_003B4018(void)
         D_L00_001B28A8=FloatToInt(D_L00_001AF8F8/(D_L00_001AF934*(1.0f/60.0f)));
         D_L00_001B28AC=1.0f/IntToFloat(D_L00_001B28A8);
     }
-    if(!D_L00_001B28A4 && FastFloatHelperD(&D_L00_001B28A0)) {
+    if(!D_L00_001B28A4 && math_fast_float_d(&D_L00_001B28A0)) {
         int time=D_L00_001AF8F4;
         unsigned short counter=*(unsigned short *)&D_L00_001B28A8;
         unsigned short delay=D_L00_001AF938;

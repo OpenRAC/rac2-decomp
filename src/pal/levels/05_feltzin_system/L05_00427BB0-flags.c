@@ -1,19 +1,20 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-extern s32 func_00282948(u8 *a0);
+extern s32 math_fast_float_d(u8 *a0);
 extern s32 func_0030CBA8(s32 a0);
 extern u8 **func_00379EB8(void);
 extern s32 func_00379EC8(void);
-extern s32 func_L00_00367720(u8 *a0);
-extern void func_L05_00379E60(u8 *a0, s32 a1, s32 a2, s32 a3);
-extern s32 func_L05_0037B538(u8 *a0, s32 a1, s32 a2, s32 a3);
-extern s32 func_L05_0037B3A0(u8 *a0);
-extern s32 func_002A7820(s32 a0, s32 a1);
+extern s32 state_get_stored_pointer_value(u8 *a0);
+extern void level_append_object(u8 *a0, s32 a1, s32 a2, s32 a3);
+extern s32 moby_process_collision_hit(u8 *a0, s32 a1, s32 a2, s32 a3);
+extern s32 list_count_ready_objects(u8 *a0);
+extern s32 math_random_int_range(s32 a0, s32 a1);
 extern u32 *func_00379CA0(u8 *a0);
 extern u8 *func_0037B440(s32 a0);
 extern void func_PAL_L05_00427CF8(u8 *a0);
@@ -45,25 +46,25 @@ void func_PAL_L05_00427BB0(u8 *arg0)
 
     if (arg0[0x20] == 0) {
         arg0[0x30] = 0xFF;
-        if (func_L00_00367720(arg0) == 0)
+        if (state_get_stored_pointer_value(arg0) == 0)
             return;
         func_PAL_L05_00427CF8(arg0);
         if (*(s32 *)(s1 + 0x264) == 0)
             return;
-        func_L05_00379E60(arg0, 0, 0, 0);
+        level_append_object(arg0, 0, 0, 0);
         return;
     }
 
-    func_L05_0037B538(arg0, 0, 1, 1);
+    moby_process_collision_hit(arg0, 0, 1, 1);
     if (*(s32 *)(s1 + 0x264) == 0)
         return;
-    if (func_00282948(s1 + 0x26C) == 0)
+    if (math_fast_float_d(s1 + 0x26C) == 0)
         return;
     target = 0;
-    n = func_L05_0037B3A0(arg0);
+    n = list_count_ready_objects(arg0);
 
     if (n >= 2) {
-        s32 count = func_002A7820(0, n - 1);
+        s32 count = math_random_int_range(0, n - 1);
         u16 *p = (u16 *)D_L05_001FB220[arg0[0x21]];
         u16 v;
         i = 0;

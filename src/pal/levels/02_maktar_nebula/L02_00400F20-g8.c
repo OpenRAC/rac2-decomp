@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -7,31 +8,31 @@ typedef float f32;
 extern s32 D_L02_001B35B8[] __attribute__((sda));
 extern f32 D_L02_001B1258 __attribute__((sda));
 extern f32 D_L02_001B125C __attribute__((sda));
-extern s32 func_00312B58(char *);
-extern s32 func_L02_00416800(char *);
-extern s32 func_002A77E0(s32);
-extern s32 func_L02_003D77B8(char *);
-extern s32 func_L02_003FD000(char *);
-extern f32 func_00282E80(char *, char *);
+extern s32 moby_is_state_six(char *);
+extern s32 moby_is_state_one_cleared_vars(char *);
+extern s32 math_random_int_below(s32);
+extern s32 moby_has_free_child_slot_state2(char *);
+extern s32 arena_is_entity_far_from_hero(char *);
+extern f32 vec_distance_xy(char *, char *);
 extern unsigned char D_001395B8[0x100];
-extern int func_L02_003F9B70(int);
-extern int func_L02_00400650(char *, int);
-extern s32 D_L02_001B30C8;
-extern s32 func_002A7820(s32, s32);
+extern int arena_get_challenge_save_index(int);
+extern int arena_start_announcer_message(char *, int);
+extern s32 g_frame_l02_counter;
+extern s32 math_random_int_range(s32, s32);
 extern s32 D_0018C2EC __attribute__((nosda));
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 extern s32 D_0018C0B4 __attribute__((nosda));
 extern u8 D_001395B8[];
-extern u8 D_00139568[];
-extern s32 func_L00_0032EF10(s32, s32, s32 *);
-extern s32 func_L02_003F9B70(s32);
-extern s32 func_00288D58(void);
+extern u8 g_item_slot_to_record[];
+extern s32 PadPressedWithin(s32, s32, s32 *);
+extern s32 arena_get_challenge_save_index(s32);
+extern s32 flag_is_byte_set(void);
 extern const s32 D_L02_001B1524 __attribute__((sda));
 extern s32 D_L02_001B1530 __attribute__((sda));
 extern s32 D_001A7A00;
-extern s32 func_00282948(void *);
+extern s32 math_fast_float_d(void *);
 extern void *func_PAL_L00_002D7850(s32);
-extern void func_L00_002D7140(void *);
+extern void cam_end_override(void *);
 extern f32 D_L02_001B1234 __attribute__((sda));
 extern f32 D_L02_001B1238 __attribute__((sda));
 extern f32 D_L02_001B123C __attribute__((sda));
@@ -82,7 +83,7 @@ void func_PAL_L02_00401118(u8 *a0) {
             }
         }
     } else {
-        func_L00_002D7140(*(L02_003FC9C0_Vec3 **)(s0 + 0xC0));
+        cam_end_override(*(L02_003FC9C0_Vec3 **)(s0 + 0xC0));
         *(L02_003FC9C0_Vec3 **)(s0 + 0xC0) = 0;
     }
 }

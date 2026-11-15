@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef float f32;
-extern s32 func_00282948(u8 *a0);
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(s32 a0);
-extern u8 **func_L05_00379EB8(void);
-extern s32 func_L00_004272A0(void);
-extern void func_L05_0037B280(u8 *a0, s32 a1);
+extern s32 math_fast_float_d(u8 *a0);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(s32 a0);
+extern u8 **level_get_object_list(void);
+extern s32 level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
 extern void func_US2_L05_00422530(u8 *a0, s32 a1);
@@ -31,17 +32,17 @@ void func_US2_L05_00422BB0(u8 *arg0)
     s32 index;
     s32 found;
 
-    func_00282948(D_L05_001B3550);
+    math_fast_float_d(D_L05_001B3550);
     if (D_L05_001B1364 == 0) {
         ((FeltzinState *)D_L05_00221D10)->reset = 0;
         *(s32 *)D_L05_001B3550 = 0x1C20;
         *(s32 *)(owner + 0x44) = 0x1C20;
         D_L05_001B1364 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        list = func_L05_00379EB8();
-        found = func_L00_004272A0();
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        list = level_get_object_list();
+        found = level_get_saved_value();
         if (found > 0) {
             count = found;
             do {
@@ -50,7 +51,7 @@ void func_US2_L05_00422BB0(u8 *arg0)
                 if (*(s16 *)(entry + 0xAA) == 0x10F5) {
                     f32 scale = 64.0f;
 
-                    func_L05_0037B280(entry, 1);
+                    entry_spawn_list_objects_with_flag(entry, 1);
                     index = ((FeltzinState *)D_L05_00221D10)->count;
                     func_L05_0037CEE0(*list, (u8 *)D_L05_001B2614 + (index << 7) + 0x30, scale);
                     index = ((FeltzinState *)D_L05_00221D10)->count;
@@ -65,6 +66,6 @@ void func_US2_L05_00422BB0(u8 *arg0)
         func_US2_L05_00422530(arg0, 1);
         return;
     }
-    if (func_00282948(owner + 0x44) != 0)
+    if (math_fast_float_d(owner + 0x44) != 0)
         func_US2_L05_00422780(arg0, 1);
 }

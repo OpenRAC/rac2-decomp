@@ -10,7 +10,7 @@ extern float D_L12_001B1F48 __attribute__((sda));
 extern int D_L12_001B363C;
 extern float D_L12_001B3640[4] __attribute__((aligned(16), sda));
 extern int D_L12_001B29C8[] __attribute__((sda));
-extern u8 D_00189EA0[];
+extern u8 g_hero_position[];
 
 /* 294 vertices, in strips of 21. */
 extern float D_L12_002A11B0[][4];
@@ -33,24 +33,24 @@ typedef struct {
     u64 registers[4];
 } L12Buf_420950;
 
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00280B90(void *, void *, int);
-extern int func_L00_00329520(void *point, int index);
-extern void func_L00_002E6CF0(void (*callback)(u8 *), void *object);
-extern void func_L00_002E6EF8(void (*callback)(u8 *), void *object);
-extern float func_00283198(float angle);
-extern float func_002A7878(float low, float high);
-extern float func_00282E80(void *a, void *b);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void draw_world_quad(void *, void *, int);
+extern int coll_point_inside_region(void *point, int index);
+extern void gfx_add_draw_callback_first(void (*callback)(u8 *), void *object);
+extern void gfx_add_draw_callback_third(void (*callback)(u8 *), void *object);
+extern float math_fast_sin_or_cos_b(float angle);
+extern float math_random_float_range(float low, float high);
+extern float vec_distance_xy(void *a, void *b);
 
 /* Draws the water-like mesh twice with scrolling texture. */
-void func_L12_00420950(u8 *object)
+void DrawScrollingTwoPassQuadMesh(u8 *object)
 {
     float *data = *(float **)(object + 0x68);
     L12Buf_420950 buf;
     int i;
     int j;
 
-    InitQuadPacketState(&buf, D_L12_001B1F40, 2, 0x80);
+    gfx_init_quad_packet_state(&buf, D_L12_001B1F40, 2, 0x80);
     buf.i[3] = D_L12_001B1F34;
     buf.i[2] = D_L12_001B1F34;
     buf.i[1] = D_L12_001B1F34;
@@ -66,7 +66,7 @@ void func_L12_00420950(u8 *object)
         }
         draw_world_quad(&buf, 0, 0);
     }
-    InitQuadPacketState(&buf, D_L12_001B1F40 + 1, 0, 0x80);
+    gfx_init_quad_packet_state(&buf, D_L12_001B1F40 + 1, 0, 0x80);
     buf.i[3] = D_L12_001B1F38;
     buf.i[2] = D_L12_001B1F38;
     buf.i[1] = D_L12_001B1F38;
@@ -85,7 +85,7 @@ void func_L12_00420950(u8 *object)
 }
 
 /* Makes the mesh ripple in waves while the hero is close enough to see it. */
-void func_L12_00420B78(u8 *object)
+void UpdateWaveMesh(u8 *object)
 {
     float *data = *(float **)(object + 0x68);
     int i;
@@ -113,26 +113,26 @@ void func_L12_00420B78(u8 *object)
         }
         break;
     case 1:
-        if (IsPointInsideRegion(gHeroPosition, *(int *)(data + 6)))
+        if (coll_point_inside_region(g_hero_position, *(int *)(data + 6)))
             return;
-        AddDrawCallbackToList1(DrawScrollingTwoPassQuadMesh, object);
+        gfx_add_draw_callback_first(DrawScrollingTwoPassQuadMesh, object);
         D_L12_001B363C = 1;
-        qcopy(D_L12_001B3640, gHeroPosition);
+        qcopy(D_L12_001B3640, g_hero_position);
         D_L12_001B3640[3] = 48.0f;
-        *(short *)(gHeroPosition + 0x17e) = 5;
+        *(short *)(g_hero_position + 0x17e) = 5;
         angle = (float)(D_L12_001B29C8[0] % 360) * 0.017444444820284843f - 3.140000104904175f;
-        D_L12_001B3640[2] = FastSinOrCosB(angle) * 0.25f + 59.5f;
+        D_L12_001B3640[2] = math_fast_sin_or_cos_b(angle) * 0.25f + 59.5f;
         data[4] += data[5];
         if (data[4] >= 8.0f)
             data[4] -= 8.0f;
-        wave0 = FastSinOrCosB(data[0] * 3.141590118408203f) * 0.001f;
-        wave1 = FastSinOrCosB(data[1] * 3.141590118408203f) * 0.001f;
-        wave2 = FastSinOrCosB(data[2] * 3.141590118408203f) * 0.001f;
-        wave3 = FastSinOrCosB(data[3] * 3.141590118408203f) * 0.001f;
-        wave4 = FastSinOrCosB(data[0] * 3.141590118408203f) * 0.001f;
-        wave5 = FastSinOrCosB(data[1] * 3.141590118408203f) * 0.001f;
-        wave6 = FastSinOrCosB(data[2] * 3.141590118408203f) * 0.001f;
-        wave7 = FastSinOrCosB(data[3] * 3.141590118408203f) * 0.001f;
+        wave0 = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
+        wave1 = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
+        wave2 = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
+        wave3 = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
+        wave4 = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
+        wave5 = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
+        wave6 = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
+        wave7 = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
         for (i = 0; i < 21; i++) {
             float *p = D_L12_002A11B0[i];
 
@@ -185,11 +185,11 @@ void func_L12_00420B78(u8 *object)
         if (data[1] > 2.0f) data[1] = 0;
         if (data[2] > 2.0f) data[2] = 0;
         if (data[3] > 2.0f) data[3] = 0;
-        data[5] = RandomFloatRange(D_L12_001B1F44, D_L12_001B1F48);
+        data[5] = math_random_float_range(D_L12_001B1F44, D_L12_001B1F48);
         break;
     case 2:
-        if (vec_distance_xy(object + 0x10, gHeroPosition) < 64.0f)
-            AddDrawCallbackToList3(DrawScrollingTwoPassQuadMesh, object);
+        if (vec_distance_xy(object + 0x10, g_hero_position) < 64.0f)
+            gfx_add_draw_callback_third(DrawScrollingTwoPassQuadMesh, object);
         break;
     }
 }

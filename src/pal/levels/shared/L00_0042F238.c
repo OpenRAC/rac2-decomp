@@ -2,13 +2,13 @@
 
 #include "common.h"
 extern char *D_L00_001B1844 __attribute__((section(".sdata")));
-extern char *D_L00_001B8E10;
-extern char D_00189EA0[];
-extern float func_00282C48(float);
-extern float func_00282E80(char *, char *);
-extern int func_002ACBC8(char *, int);
-extern int func_L00_003206B8(char *, int);
-extern int func_002ACCA8(char *, int);
+extern char *g_follow_camera_object;
+extern char g_hero_position[];
+extern float math_fabs(float);
+extern float vec_distance_xy(char *, char *);
+extern int IsPointInCuboid(char *, int);
+extern int coll_point_inside_record_volume(char *, int);
+extern int coll_is_point_inside_unit_sphere(char *, int);
 typedef struct { char pad[0x30]; char pos[16]; char rest[0x40]; } Entry_b0898;
 extern Entry_b0898 *D_L00_001B1F8C __attribute__((section(".sdata")));
 typedef struct {
@@ -19,7 +19,7 @@ extern Global_b0898 D_00189E20_b0898;
 
 int func_PAL_L00_0042F238(char *a)
 {
-    char *owner = D_L00_001B8E10;
+    char *owner = g_follow_camera_object;
     char *sub = *(char **)(owner + 0x70);
     char *move = sub + 0x160;
     char *rot = sub + 0x1C0;
@@ -30,21 +30,21 @@ int func_PAL_L00_0042F238(char *a)
     if (*(short *)(p + 0x4A) && !mode) return 0;
     if (*(short *)(p + 0x48) && mode) return 0;
     if (*(int *)(p + 0x34)) {
-        if (func_00282C48(*(float *)(move + 0x34)) > 0.01f) return 0;
-        if (func_00282C48(*(float *)(rot + 8)) > 0.01f) return 0;
+        if (math_fabs(*(float *)(move + 0x34)) > 0.01f) return 0;
+        if (math_fabs(*(float *)(rot + 8)) > 0.01f) return 0;
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.020000001f) return 0;
     if (*(int *)(p + 0xC) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
-        if (func_002ACBC8(D_00189EA0, *(int *)(p + 0xC))) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
+        if (IsPointInCuboid(g_hero_position, *(int *)(p + 0xC))) return 1;
     }
     if (*(int *)(p + 0x10) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
-        if (func_L00_003206B8(D_00189EA0, *(int *)(p + 0x10))) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
+        if (coll_point_inside_record_volume(g_hero_position, *(int *)(p + 0x10))) return 1;
     }
     if (*(int *)(p + 8) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
-        if (func_002ACCA8(D_00189EA0, *(int *)(p + 8))) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
+        if (coll_is_point_inside_unit_sphere(g_hero_position, *(int *)(p + 8))) return 1;
     }
     *(short *)(p + 0x26) = 1;
     return 0;
@@ -65,22 +65,22 @@ typedef struct Hero_429F68 {
     float axis[4];
 } Hero_429F68;
 extern Hero_429F68 D_00189E20_6;
-extern float func_00283248(float, float), func_00283C80(float, float);
-extern float func_00283BE0(float, float), func_00283198(float), func_00283180(float);
-extern void func_00282CF0(char *, char *, char *);
-extern float func_00282DB0(char *, char *), func_00282DF0(char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern int func_L00_00424978(char *);
-extern void func_L00_00424940(char *);
+extern float mat_fast_helper_a(float, float), FastDiffRots(float, float);
+extern float fast_subtract_rotations(float, float), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void FastVecSub(char *, char *, char *);
+extern float FastVecDot(char *, char *), FastVecLength(char *);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern int cam_claim_request_slot(char *);
+extern void cam_release_request_slot(char *);
 extern int func_PAL_L00_0042F238(char *);
 extern int D_00138320;
-extern void func_L00_00424A08(int, float, float);
-extern void func_L00_00424C00(void);
-extern void func_L00_00424A50(float, float);
-extern void func_L00_00424A88(int, float, float);
-extern void func_L00_00424B20(float);
-extern void func_L00_00424B48(int);
+extern void follow_camera_set_distance(int, float, float);
+extern void cam_set_snap_flag(void);
+extern void follow_camera_set_height(float, float);
+extern void cam_set_aim_offset_target(int, float, float);
+extern void cam_set_tuning_value(float);
+extern void set_follow_camera_orbit_clamp_mode(int);
 extern void func_PAL_L00_00429FC8(float, float, float);
 
 /* Initializes and updates the aim - camera volume, including follow - camera offsets. */
@@ -94,7 +94,7 @@ void func_PAL_L00_0042F4B8(char *camera)
     char *camera_position, *state, *reset, *tail, *follow, *snap, *rig;
     float yaw, height, tangent, pitch;
     if (func_PAL_L00_0042F238(camera)) {
-        if (func_L00_00424978(camera)<=0) {
+        if (cam_claim_request_slot(camera)<=0) {
             if (*(int *)(params + 0x20)) *(short *)(params + 0x26) = 1;
             *(int *)(params + 0x20) = 0;
             return;
@@ -103,7 +103,7 @@ void func_PAL_L00_0042F4B8(char *camera)
     }
     if (*(int *)(params + 0x20)) *(short *)(params + 0x26) = 1;
     *(int *)(params + 0x20) = 0;
-    func_L00_00424940(camera);
+    cam_release_request_slot(camera);
     return;
 run:
     if (*(int *)(params + 0x20)<2) {
@@ -112,29 +112,29 @@ run:
             *(float *)(params + 0x2C) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x14);
             *(float *)(params + 0x30) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x18);
         }
-        yaw = func_00283248(
+        yaw = mat_fast_helper_a(
             D_00189E20_6.position[0] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0],
             D_00189E20_6.position[1] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1]);
-        if (func_00283C80(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
-            *(float *)(params + 0x44) = func_00283BE0(*(float *)(params + 0x30), yaw);
+        if (FastDiffRots(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
+            *(float *)(params + 0x44) = fast_subtract_rotations(*(float *)(params + 0x30), yaw);
         position[0] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0];
         position[1] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1];
         position[2] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[2];
         position[3] = 0.0f;
-        func_00282CF0(to_position, (char *)position, (char *)D_00189E20_6.position);
-        height = func_00282DB0(to_position, (char *)D_00189E20_6.axis);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis, height);
-        func_00282CF0(horizontal, to_position, gravity_offset);
-        *(float *)(params + 0x38) = func_00282DF0(horizontal);
+        FastVecSub(to_position, (char *)position, (char *)D_00189E20_6.position);
+        height = FastVecDot(to_position, (char *)D_00189E20_6.axis);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis, height);
+        FastVecSub(horizontal, to_position, gravity_offset);
+        *(float *)(params + 0x38) = FastVecLength(horizontal);
         *(float *)(params + 0x3C) =  - height;
         pitch = *(float *)(params + 0x2C);
-        if (func_00282C48(pitch)==1.5707964897155762f) *(float *)(params + 0x40) = 0.0f;
+        if (math_fabs(pitch)==1.5707964897155762f) *(float *)(params + 0x40) = 0.0f;
         else {
-            tangent = func_00283198(pitch);
-            tangent/=func_00283180(pitch);
+            tangent = math_fast_sin_or_cos_b(pitch);
+            tangent/=math_fast_sin_or_cos_a(pitch);
             *(float *)(params + 0x40) = *(float *)(params + 0x3C) - *(float *)(params + 0x38)*tangent;
         }
-        camera_position = D_L00_001B8E10;
+        camera_position = g_follow_camera_object;
         rig = *(char **)(camera_position + 0x70);
         camera_position+=0x30;
         follow = rig + 0x60;
@@ -147,12 +147,12 @@ run:
         *(float *)(tail + 0x30) = *(float *)(params + 0x3C);
         *(float *)(reset + 0x28) = *(float *)(params + 0x44);
         *(float *)(follow + 0xB0) = *(float *)(params + 0x40);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail + 0x30));
-        func_00282CC0(state + 0xB0, (char *)D_00189E20_6.position, gravity_offset);
-        func_00282CF0(tail, (char *)position, state + 0xB0);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail + 0x30));
+        FastVecAdd(state + 0xB0, (char *)D_00189E20_6.position, gravity_offset);
+        FastVecSub(tail, (char *)position, state + 0xB0);
         qcopy(state + 0x170, tail);
-        func_00282D30(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow + 0xB0));
-        func_00282CC0(state + 0xA0, (char *)D_00189E20_6.position, gravity_offset);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow + 0xB0));
+        FastVecAdd(state + 0xA0, (char *)D_00189E20_6.position, gravity_offset);
         qcopy(state + 0xF0, state + 0xA0);
         qcopy(follow, (char *)D_00189E20_6.position);
         qcopy(state + 0xC0, follow);
@@ -174,13 +174,13 @@ run:
     ++*(int *)(params + 0x20);
     if (*(int *)(params + 0x20)>167) *(int *)(params + 0x20) = 167;
     if (*(float *)(params + 0x38)!=0.0f) {
-        func_L00_00424A08(0, *(float *)(params + 0x38), 0.003f);
-        func_L00_00424C00();
+        follow_camera_set_distance(0, *(float *)(params + 0x38), 0.003f);
+        cam_set_snap_flag();
     }
-    if (*(float *)(params + 0x3C)!=0.0f) func_L00_00424A50(*(float *)(params + 0x3C), 0.003f);
-    if (*(float *)(params + 0x40)!=0.0f) func_L00_00424A88(0, *(float *)(params + 0x40), 0.005f);
-    if (*(float *)(params + 0x28)!=0.0f) func_L00_00424B20(*(float *)(params + 0x28)*0.01745329424738884f);
-    if (*(short *)(params + 0x24)==0) func_L00_00424B48(0);
+    if (*(float *)(params + 0x3C)!=0.0f) follow_camera_set_height(*(float *)(params + 0x3C), 0.003f);
+    if (*(float *)(params + 0x40)!=0.0f) cam_set_aim_offset_target(0, *(float *)(params + 0x40), 0.005f);
+    if (*(float *)(params + 0x28)!=0.0f) cam_set_tuning_value(*(float *)(params + 0x28)*0.01745329424738884f);
+    if (*(short *)(params + 0x24)==0) set_follow_camera_orbit_clamp_mode(0);
     if (*(float *)(params + 0x44)!=0.0f) func_PAL_L00_00429FC8(*(float *)(params + 0x44), 60.0f, 60.0f);
 }
 

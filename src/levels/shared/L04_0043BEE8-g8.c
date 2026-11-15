@@ -1,11 +1,11 @@
 #include "common.h"
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern float func_002A7878(float, float);
-extern unsigned int func_00283D38(int, float, int);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, unsigned int, int, float, float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern unsigned int FastTweenColor(int, float, int);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float, float);
 extern int D_L04_001B13C0 __attribute__((sda));
 extern int D_L04_001B13C4[] NOT_SDA;
 extern int D_L04_001B13C8[] NOT_SDA;
@@ -16,11 +16,11 @@ extern int D_L04_001B13D8[] NOT_SDA;
 extern int D_L04_001B13DC[] NOT_SDA;
 
 /* Draws four coloured glow sprites at the current point along the curved path of the spark burst. */
-void func_L04_0043BEE8(char *object)
+void spark_burst_draw_glows(char *object)
 {
     float a[4], b[4], position[4];
     char *state = *(char **)(object + 0x68);
-    float factor = FastSinOrCosB(*(float *)(state + 0x4c) * 3.1415927f);
+    float factor = math_fast_sin_or_cos_b(*(float *)(state + 0x4c) * 3.1415927f);
     unsigned int color;
     float angle, fraction;
     FastVecAdd(a, state, state + 0x10);
@@ -28,20 +28,20 @@ void func_L04_0043BEE8(char *object)
     FastVecAdd(b, state + 0x20, state + 0x30);
     lerp_vector(b, state + 0x20, b, factor);
     lerp_vector(position, a, b, *(float *)(state + 0x4c));
-    fraction = RandomFloatRange(0.0f, 1.0f);
+    fraction = math_random_float_range(0.0f, 1.0f);
     color = FastTweenColor(D_L04_001B13C0, fraction, D_L04_001B13C4[0]);
-    angle = RandomAngle();
-    DrawBillboardQuad_00281EB8(position, 0x31, color, 1, 1.0f, 0.0f, angle);
-    fraction = RandomFloatRange(0.0f, 1.0f);
+    angle = math_random_angle();
+    gfx_draw_billboard_quad(position, 0x31, color, 1, 1.0f, 0.0f, angle);
+    fraction = math_random_float_range(0.0f, 1.0f);
     color = FastTweenColor(D_L04_001B13C8[0], fraction, D_L04_001B13CC[0]);
-    angle = RandomAngle();
-    DrawBillboardQuad_00281EB8(position, 0x31, color, 1, 0.6f, 0.0f, angle);
-    fraction = RandomFloatRange(0.0f, 1.0f);
+    angle = math_random_angle();
+    gfx_draw_billboard_quad(position, 0x31, color, 1, 0.6f, 0.0f, angle);
+    fraction = math_random_float_range(0.0f, 1.0f);
     color = FastTweenColor(D_L04_001B13D0[0], fraction, D_L04_001B13D4[0]);
-    angle = RandomAngle();
-    DrawBillboardQuad_00281EB8(position, 0xb, color, 1, 1.4f, 0.0f, angle);
-    fraction = RandomFloatRange(0.0f, 1.0f);
+    angle = math_random_angle();
+    gfx_draw_billboard_quad(position, 0xb, color, 1, 1.4f, 0.0f, angle);
+    fraction = math_random_float_range(0.0f, 1.0f);
     color = FastTweenColor(D_L04_001B13D8[0], fraction, D_L04_001B13DC[0]);
-    angle = RandomAngle();
-    DrawBillboardQuad_00281EB8(position, 0xb, color, 1, 0.9f, 0.0f, angle);
+    angle = math_random_angle();
+    gfx_draw_billboard_quad(position, 0xb, color, 1, 0.9f, 0.0f, angle);
 }

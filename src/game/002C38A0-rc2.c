@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,12 +25,12 @@
  */
 #include "common.h"
 
-extern s32 func_00282978();
-extern s32 func_002B9180();
+extern s32 FastDecTimer();
+extern s32 part_kill();
 
 /* Removes a particle when its timer runs out. */
-void func_002C38A0(s32 particle) {
+void part_update_timer(s32 particle) {
     if (FastDecTimer(particle + 0xA) != 0) {
-        KillParticle(particle);
+        part_kill(particle);
     }
 }

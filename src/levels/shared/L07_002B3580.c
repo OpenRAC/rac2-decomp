@@ -6,40 +6,40 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_0038F3D8(void *);
-extern void func_L00_0038E880(void *, void *, void *);
-extern unsigned char D_00139568[];
-extern char *D_0018C0B0 NOT_SDA;
+extern void FastVecScale(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void part_spawn_spark_puff(void *);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
+extern unsigned char g_item_slot_to_record[];
+extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern int D_L00_001AC850 __attribute__((sda));
 extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
-extern Collision D_L00_001BF200;
-extern Material D_L00_00262570[];
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_L00_0038F178(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00278E78(void);
-extern void func_002FD1B8(int, int, int, float, float, float, float);
-extern void func_00282C88(void *);
-extern char *func_00312D58(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002BFB38(void *, void *, int, int);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
+extern Collision g_collision_result;
+extern Material g_weapon_l00_table[];
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void part_emit_sparkle(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern void RippleDisturb(int, int, int, float, float, float, float);
+extern void vec_clear_128(void *);
+extern char *moby_spawn_scaled_effect(void *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void part_spawn_spark_2(void *, void *, int, int);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
 
 extern char D_L07_001FDEC0[];
 extern void func_338D68();
@@ -76,7 +76,7 @@ typedef struct PlayerDriveView {
     unsigned char pad22A0[0x22C3 - 0x22A0]; unsigned char axisMode;
     unsigned char pad22C4[0x24B8 - 0x22C4]; float animationSpeed;
 } PlayerDriveView;
-extern PlayerDriveView D_00189E20;
+extern PlayerDriveView g_hero_state;
 /* Resident subview at the velocity vector; targetSpeed is 0xC4 bytes later. */
 typedef struct DriveVelocityView {
     DriveVector velocity;
@@ -91,161 +91,161 @@ typedef struct DriveSettings {
     unsigned char pad15C[0x370 - 0x15C]; DriveVector direction;
 } DriveSettings;
 extern DriveSettings D_L07_001B90C0;
-extern void func_L00_002B54F8(float, float);
-extern void func_L00_002B41B8(float, float);
-extern void func_L00_002B3EF8(int, float, float, float);
-extern void func_L01_002B6948(float);
-extern void func_L00_002D3798(DriveVector *, DriveVector *, float);
-extern void func_L00_002D3B58(DriveVector *, DriveVector *, float);
-extern void func_L00_002D3BD8(void *, const void *, float);
-extern float func_L00_002D3A58(char *);
-extern float func_002AA2E8(float *, float, float);
-extern float func_002AA898(float *, float *, int, float, float, float, float);
-extern float func_00283BE0(float, float);
-extern void func_L00_002AA0F0(float, float, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283C80(float, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void hero_build_move_impulse(float, float);
+extern void hero_approach_speed(float, float);
+extern void hero_steer_heading(int, float, float, float);
+extern void hero_approach_velocity(float);
+extern void cam_offset_point_by_side_direction(DriveVector *, DriveVector *, float);
+extern void cam_set_view_space_height(DriveVector *, DriveVector *, float);
+extern void cam_set_view_space_vector_length(void *, const void *, float);
+extern float cam_get_view_space_vector_length(char *);
+extern float ApproachValue(float *, float, float);
+extern float math_approach_with_velocity(float *, float *, int, float, float, float, float);
+extern float fast_subtract_rotations(float, float);
+extern void hero_start_pose_offset(float, float, float);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float FastDiffRots(float, float);
+extern void FastVecAdd(void *, void *, void *);
 
 
 /* Update directional movement, including the state-44 yaw spring.
  * Shares the resident views and locomotion arms with func_L01_002B7360. */
-void func_L07_002B5738(void)
+void UpdateHeroVelocityForStateWithYawSpring(void)
 {
     union { DriveVector q; float f[4]; } local;
     float smoothed;
     float oldHeading;
-    int state = gHeroState.state;
+    int state = g_hero_state.state;
 
     if (state == 10) {
-        BuildHeroMoveImpulse(0.7f, 0.0f);
-        qcopy(&gHeroState.pendingResult, &gHeroState.pending);
-        gHeroState.targetSpeed = gHeroState.planarDistance;
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
+        g_hero_state.targetSpeed = g_hero_state.planarDistance;
     } else if (state == 16) {
         float speed;
-        PlayerDriveView *hero = &gHeroState;
-        if (gHeroState.frame > 54) {
-            ApproachValue((float *)(&gHeroState.recoveryRate), 0.0069444445f, 0.0019444445f);
+        PlayerDriveView *hero = &g_hero_state;
+        if (g_hero_state.frame > 54) {
+            ApproachValue((float *)(&g_hero_state.recoveryRate), 0.0069444445f, 0.0019444445f);
         }
-        if (gHeroState.frame <= 54) speed = gHeroState.recoverySpeed;
+        if (g_hero_state.frame <= 54) speed = g_hero_state.recoverySpeed;
         else speed = 0.058333337f;
         hero->speed = speed;
-        ApproachHeroSpeed(0.012222223f, 0.0125f);
-        SetViewSpaceVectorLength(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
-        OffsetPointBySideDirection((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
+        hero_approach_speed(0.012222223f, 0.0125f);
+        cam_set_view_space_vector_length(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
+        cam_offset_point_by_side_direction((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
     } else if (state == 27) {
-        if (gHeroState.frame > 40) {
-            SteerHeroHeading(0, 0.04f, 0.2f, 0.250163913f);
-            ApproachHeroVelocity_L01(0.0055555557f);
+        if (g_hero_state.frame > 40) {
+            hero_steer_heading(0, 0.04f, 0.2f, 0.250163913f);
+            hero_approach_velocity(0.0055555557f);
         }
-        if (13.0f <= gHeroState.plane && gHeroState.plane <= 30.0f) {
-            if (27.0f < gHeroState.plane)
-                ApproachValue((float *)(&gHeroState.lateralSpeed), 0.0f, 0.0022222223f);
-            else ApproachValue((float *)(&gHeroState.lateralSpeed), 0.033333335f, 0.0022222223f);
+        if (13.0f <= g_hero_state.plane && g_hero_state.plane <= 30.0f) {
+            if (27.0f < g_hero_state.plane)
+                ApproachValue((float *)(&g_hero_state.lateralSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&g_hero_state.lateralSpeed), 0.033333335f, 0.0022222223f);
         }
-        local.f[0] = gHeroState.lateralSpeed;
+        local.f[0] = g_hero_state.lateralSpeed;
         local.f[1] = 0.0f;
-        local.f[2] = FastVecDot(&gHeroState.velocity, &gHeroState.basis);
-        matrix_mul_vec3(&gHeroState.velocity, &local, &gHeroState);
+        local.f[2] = FastVecDot(&g_hero_state.velocity, &g_hero_state.basis);
+        matrix_mul_vec3(&g_hero_state.velocity, &local, &g_hero_state);
     } else if (state == 11) {
-        gHeroState.heading = gHeroState.targetHeading;
-        qcopy(&gHeroState.direction, &gHeroState.targetDirection);
-        SteerHeroHeading(0, 0.04f, 0.2f, 0.11635530f);
-        if (gHeroState.transition != 3) gHeroState.targetSpeed = gHeroState.inputSpeed;
-        else gHeroState.targetSpeed = 0.0f;
-        if (gHeroState.useCurrentSpeed != 0) {
-            float rate = gHeroState.animationSpeed * 0.083333336f;
+        g_hero_state.heading = g_hero_state.targetHeading;
+        qcopy(&g_hero_state.direction, &g_hero_state.targetDirection);
+        hero_steer_heading(0, 0.04f, 0.2f, 0.11635530f);
+        if (g_hero_state.transition != 3) g_hero_state.targetSpeed = g_hero_state.inputSpeed;
+        else g_hero_state.targetSpeed = 0.0f;
+        if (g_hero_state.useCurrentSpeed != 0) {
+            float rate = g_hero_state.animationSpeed * 0.083333336f;
             if (rate < 0.033333335f) rate = 0.033333335f;
-            ApproachValue((float *)(&gHeroState.strafeSpeed), rate, 0.010277778f);
-            gHeroState.targetSpeed = gHeroState.planarDistance;
+            ApproachValue((float *)(&g_hero_state.strafeSpeed), rate, 0.010277778f);
+            g_hero_state.targetSpeed = g_hero_state.planarDistance;
         } else {
-            if (gHeroState.allowAction != 0 && gHeroState.actionFrame <= 11)
-                ApproachValue((float *)(&gHeroState.strafeSpeed), 0.0f, 0.0022222223f);
-            else ApproachValue((float *)(&gHeroState.strafeSpeed), 0.07f, 0.0022222223f);
+            if (g_hero_state.allowAction != 0 && g_hero_state.actionFrame <= 11)
+                ApproachValue((float *)(&g_hero_state.strafeSpeed), 0.0f, 0.0022222223f);
+            else ApproachValue((float *)(&g_hero_state.strafeSpeed), 0.07f, 0.0022222223f);
         }
-        if (gHeroState.axisMode == 0) {
-            ((float *)&gHeroState.velocity)[0] = FastSinOrCosA(gHeroState.inputHeading);
-            ((float *)&gHeroState.velocity)[0] *= gHeroState.strafeSpeed;
-            ((float *)&gHeroState.velocity)[1] = FastSinOrCosB(gHeroState.inputHeading);
-            ((float *)&gHeroState.velocity)[1] *= gHeroState.strafeSpeed;
+        if (g_hero_state.axisMode == 0) {
+            ((float *)&g_hero_state.velocity)[0] = math_fast_sin_or_cos_a(g_hero_state.inputHeading);
+            ((float *)&g_hero_state.velocity)[0] *= g_hero_state.strafeSpeed;
+            ((float *)&g_hero_state.velocity)[1] = math_fast_sin_or_cos_b(g_hero_state.inputHeading);
+            ((float *)&g_hero_state.velocity)[1] *= g_hero_state.strafeSpeed;
         } else {
-            SetViewSpaceVectorLength(&local, &gHeroState.localDirection, gHeroState.strafeSpeed);
-            SetViewSpaceHeight(&local.q, &local.q, 0.0f);
-            SetViewSpaceVectorLength(&gHeroState.velocity, &gHeroState.velocity, 0.0f);
-            FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &local);
+            cam_set_view_space_vector_length(&local, &g_hero_state.localDirection, g_hero_state.strafeSpeed);
+            cam_set_view_space_height(&local.q, &local.q, 0.0f);
+            cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, 0.0f);
+            FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &local);
         }
-        if (gHeroState.axisMode == 0 && gHeroState.useCurrentSpeed == 0) {
-            float angle = FastDiffRots(gHeroState.targetHeading, gHeroState.inputHeading);
-            float cosine = FastSinOrCosB(angle);
-            float amount = gHeroState.inputSpeed * cosine;
-            float component = FastSinOrCosA(gHeroState.targetHeading);
-            ((float *)&gHeroState.velocity)[0] += component * amount;
-            component = FastSinOrCosB(gHeroState.targetHeading);
-            ((float *)&gHeroState.velocity)[1] += component * amount;
+        if (g_hero_state.axisMode == 0 && g_hero_state.useCurrentSpeed == 0) {
+            float angle = FastDiffRots(g_hero_state.targetHeading, g_hero_state.inputHeading);
+            float cosine = math_fast_sin_or_cos_b(angle);
+            float amount = g_hero_state.inputSpeed * cosine;
+            float component = math_fast_sin_or_cos_a(g_hero_state.targetHeading);
+            ((float *)&g_hero_state.velocity)[0] += component * amount;
+            component = math_fast_sin_or_cos_b(g_hero_state.targetHeading);
+            ((float *)&g_hero_state.velocity)[1] += component * amount;
         }
-        BuildHeroMoveImpulse(0.7f, 0.0f);
-        qcopy(&gHeroState.pendingResult, &gHeroState.pending);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
     } else if (state == 17) {
-        gHeroState.heading = ((float *)&gHeroState.jumpDirection)[3];
-        qcopy(&gHeroState.direction, &gHeroState.jumpDirection);
-        if (gHeroState.frame > 9) SteerHeroHeading(-1, 0.042f, 0.2f, 0.19780402f);
-        if (gHeroState.frame > 8) {
-            if (gHeroState.request == 0) {
-                ((float *)&gHeroState.velocity)[0] = FastSinOrCosA(gHeroState.heading);
-                ((float *)&gHeroState.velocity)[0] *= 0.08166667f;
-                ((float *)&gHeroState.velocity)[1] = FastSinOrCosB(gHeroState.heading);
-                ((float *)&gHeroState.velocity)[1] *= 0.08166667f;
+        g_hero_state.heading = ((float *)&g_hero_state.jumpDirection)[3];
+        qcopy(&g_hero_state.direction, &g_hero_state.jumpDirection);
+        if (g_hero_state.frame > 9) hero_steer_heading(-1, 0.042f, 0.2f, 0.19780402f);
+        if (g_hero_state.frame > 8) {
+            if (g_hero_state.request == 0) {
+                ((float *)&g_hero_state.velocity)[0] = math_fast_sin_or_cos_a(g_hero_state.heading);
+                ((float *)&g_hero_state.velocity)[0] *= 0.08166667f;
+                ((float *)&g_hero_state.velocity)[1] = math_fast_sin_or_cos_b(g_hero_state.heading);
+                ((float *)&g_hero_state.velocity)[1] *= 0.08166667f;
             } else {
-                SetViewSpaceVectorLength(&gHeroState.velocity, &gHeroState.velocity, 0.0f);
-                vec_scale_to_length(&local, &gHeroState.direction, 0.08166667f);
-                FastVecAdd(&gHeroState.velocity, &gHeroState.velocity, &local);
+                cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, 0.0f);
+                vec_scale_to_length(&local, &g_hero_state.direction, 0.08166667f);
+                FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &local);
             }
         }
-        gHeroState.targetSpeed = gHeroState.planarDistance;
+        g_hero_state.targetSpeed = g_hero_state.planarDistance;
     } else if (state == 129 && D_L07_001A8FF0 == 0) {
-        SteerHeroHeading(0, 0.04f, 0.2f, gHeroState.acceleration);
-        gHeroState.targetSpeed = 0.0f;
+        hero_steer_heading(0, 0.04f, 0.2f, g_hero_state.acceleration);
+        g_hero_state.targetSpeed = 0.0f;
     } else {
-        if (gHeroState.state == 44) {
-            float angle = gHeroState.rotation;
+        if (g_hero_state.state == 44) {
+            float angle = g_hero_state.rotation;
             float delta;
-            gHeroState.yawError = ApproachWithVelocity(&angle, &gHeroState.yawRate, 0,
-                gHeroState.heading, 0.017999999225139618f, 0.2f, 0.12217307090759277f);
-            delta = fast_subtract_rotations(angle, gHeroState.rotation);
-            StartHeroPoseOffset(0.0f, 0.0f, delta);
+            g_hero_state.yawError = math_approach_with_velocity(&angle, &g_hero_state.yawRate, 0,
+                g_hero_state.heading, 0.017999999225139618f, 0.2f, 0.12217307090759277f);
+            delta = fast_subtract_rotations(angle, g_hero_state.rotation);
+            hero_start_pose_offset(0.0f, 0.0f, delta);
         } else {
-            oldHeading = gHeroState.heading;
-            qcopy(&local, &gHeroState.direction);
-            if (gHeroState.overrideDirection != 0) {
-                gHeroState.heading = D_L07_001B90C0.heading;
-                qcopy(&gHeroState.direction, &D_L07_001B90C0.direction);
+            oldHeading = g_hero_state.heading;
+            qcopy(&local, &g_hero_state.direction);
+            if (g_hero_state.overrideDirection != 0) {
+                g_hero_state.heading = D_L07_001B90C0.heading;
+                qcopy(&g_hero_state.direction, &D_L07_001B90C0.direction);
             }
-            SteerHeroHeading(0, 0.04f, 0.2f, gHeroState.acceleration);
-            if (gHeroState.overrideDirection != 0) {
-                gHeroState.savedHeading = oldHeading;
-                qcopy(&gHeroState.savedDirection, &local);
-                gHeroState.heading = oldHeading;
-                qcopy(&gHeroState.direction, &gHeroState.savedDirection);
+            hero_steer_heading(0, 0.04f, 0.2f, g_hero_state.acceleration);
+            if (g_hero_state.overrideDirection != 0) {
+                g_hero_state.savedHeading = oldHeading;
+                qcopy(&g_hero_state.savedDirection, &local);
+                g_hero_state.heading = oldHeading;
+                qcopy(&g_hero_state.direction, &g_hero_state.savedDirection);
             }
         }
-        BuildHeroMoveImpulse(0.7f, 0.0f);
-        qcopy(&gHeroState.pendingResult, &gHeroState.pending);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
         {
             float damping = 0.0055555557f;
-            if (gHeroState.speed < D_L07_001A7DC0 * 0.00333333365f) {
-                if (gHeroState.mode == 2) {
-                    float rate = gHeroState.pendingDamping;
-                    smoothed = GetViewSpaceVectorLength((char *)&gHeroState.velocity);
+            if (g_hero_state.speed < D_L07_001A7DC0 * 0.00333333365f) {
+                if (g_hero_state.mode == 2) {
+                    float rate = g_hero_state.pendingDamping;
+                    smoothed = cam_get_view_space_vector_length((char *)&g_hero_state.velocity);
                     ApproachValue(&smoothed, 0.0f, rate);
-                    SetViewSpaceVectorLength(&gHeroState.velocity, &gHeroState.velocity, smoothed);
+                    cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, smoothed);
                     return;
                 }
-                if (gHeroState.contact != 0) damping = 0.00305555575f;
-                else if (gHeroState.special != 0) damping = 0.00055555557f;
+                if (g_hero_state.contact != 0) damping = 0.00305555575f;
+                else if (g_hero_state.special != 0) damping = 0.00055555557f;
                 else damping = 0.0022222223f;
             }
-            ApproachHeroVelocity_L01(damping);
+            hero_approach_velocity(damping);
         }
     }
 }
@@ -254,7 +254,7 @@ void func_L07_002B5738(void)
 
 
 /* Looks up an entry by index and runs its handler. Returns -1 when the index is missing. */
-int func_L07_00338D20(int index)
+int table_run_entry_by_index(int index)
 {
     char *entry;
 
@@ -270,7 +270,7 @@ int func_L07_00338D20(int index)
 
 
 /* Moves a bouncing projectile one step. On a hit it splashes or bounces, and when it ends it sets off its explosion. */
-void func_L07_003844C0(unsigned char *obj) {
+void bouncing_l07_projectile_update(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -294,20 +294,20 @@ void func_L07_003844C0(unsigned char *obj) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, ctx, position);
-    SteerEffectDirection(*(int *)(ctx + 0x1C), ctx, 0);
-    TransformVectorOrCopy(position, position);
-    TriggerCurrentStateEffect(ctx, ctx);
-    AddObjectDirectionScaled(position, ctx, 0.0030555557f);
-    EmitSparkleParticles(obj);
+    part_steer_effect_direction(*(int *)(ctx + 0x1C), ctx, 0);
+    vec_transform_or_copy(position, position);
+    shop_trigger_current_state_effect(ctx, ctx);
+    vec_add_object_direction_scaled(position, ctx, 0.0030555557f);
+    part_emit_sparkle(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)gWeaponTable_L00 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_weapon_l00_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
@@ -320,44 +320,44 @@ void func_L07_003844C0(unsigned char *obj) {
             RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
-            ClearVector128(ctx);
+            vec_clear_128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = gCollisionResult.point.f[2];
-            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
+            frame.position.f[2] = g_collision_result.point.f[2];
+            effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = RandomAngle();
-                speed = RandomFloatRange(0.0f, 0.050000004f);
-                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
-                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
-                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
-                lifetime = RandomIntRange(90, 120);
-                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
+                angle = math_random_angle();
+                speed = math_random_float_range(0.0f, 0.050000004f);
+                frame.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
+                frame.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
+                frame.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
+                lifetime = math_random_int_range(90, 120);
+                part_spawn_spark_2(&frame.position, spread, math_random_int_below(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &gCollisionResult;
+            Collision *collision = &g_collision_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &gCollisionResult;
+                reread = &g_collision_result;
                 model = reread->hit;
                 if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
-                FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+                vec_fast_normalize(&frame.velocity, ctx, &reread->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
@@ -365,25 +365,25 @@ void func_L07_003844C0(unsigned char *obj) {
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
-                FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+                vec_fast_normalize(&frame.velocity, ctx, &collision->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (FastFloatHelperD(ctx + 0x18)) {
+    } else if (math_fast_float_d(ctx + 0x18)) {
         obj[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
-        ClearEntryFlag(*(int *)(ctx + 0x1C));
-        SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
+        table_clear_entry_flag(*(int *)(ctx + 0x1C));
+        part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
     }
 }
 
 
 /* Moves a bouncing projectile one step, like the other one, but counts steps and picks between two explosions. */
-void func_L07_003848D8(char *obj) {
+void bouncing_projectile_update_counted(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -407,17 +407,17 @@ void func_L07_003848D8(char *obj) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, position, ctx);
-    ComputeViewDirection(position, &frame.surface, 0);
+    cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
-    SpawnSparkPuff(obj);
+    part_spawn_spark_puff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + gWeaponTable_L00)->material;
+    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
@@ -425,14 +425,14 @@ void func_L07_003848D8(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &gCollisionResult;
+        collision = &g_collision_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &gCollisionResult;
+            reread = &g_collision_result;
             model = reread->hit;
             if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
@@ -442,51 +442,51 @@ void func_L07_003848D8(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+            vec_fast_normalize(&frame.velocity, ctx, &reread->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &gCollisionResult;
+            collision = &g_collision_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+            vec_fast_normalize(&frame.velocity, ctx, &collision->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(ctx + 0x18)) {
+    } else if (math_fast_float_d(ctx + 0x18)) {
         obj[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        ClearEntryFlag(*(int *)(ctx + 0x1C));
+        table_clear_entry_flag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
         else
-            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(obj, &frame.velocity, &frame.normal);
     }
 }
 
 
 
-extern unsigned short *D_L07_001FAD60[];
+extern unsigned short *g_moby_l07_group_lists[];
 
-extern unsigned char *D_L07_001B22DC[] __attribute__((sda));
+extern unsigned char *g_moby_l07_array[] __attribute__((sda));
 
 extern int D_L07_001B22F8[] __attribute__((sda));
 
 /* Returns the first entity of the group's id list whose state byte is 1, or 0. */
-unsigned char *func_L07_003F6B88(int group) {
+unsigned char *moby_find_active_in_group(int group) {
     unsigned short *p;
     unsigned char *e;
 
-    for (p = gMobyGroupLists_L07[group];
+    for (p = g_moby_l07_group_lists[group];
          (unsigned char)group != 0xFF && group <= D_L07_001B22F8[0] && p != 0 &&
-         ((short)p[-1] >= 0 || p == gMobyGroupLists_L07[group]);
+         ((short)p[-1] >= 0 || p == g_moby_l07_group_lists[group]);
          p++) {
-        e = gMobyArray_L07[0] + ((*p & 0x7FFF) << 8);
+        e = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         if (e[0x20] == 1)

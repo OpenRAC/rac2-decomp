@@ -19,19 +19,19 @@ extern float D_L20_001B23E4 __attribute__((sda));
    the reload after the 0xAC store stays absolute, as in retail. */
 extern int D_L20_001B2AC8;
 
-extern void func_L20_00449A78(char *);
+extern void moby_reset_to_idle(char *);
 
-extern void func_L20_00449AE8(char *);
+extern void moby_vanish_with_effect(char *);
 
-extern void func_L20_00449BB0(char *);
+extern void path_follow_pop_on_touch(char *);
 
-extern void func_L01_0031AB20(void *, void *, float, float, float, int);
+extern void pushable_moby_update(void *, void *, float, float, float, int);
 
-extern float func_002A89A8(char *, int, float);
+extern float coll_probe_ground_height_below(char *, int, float);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
-extern int func_00282948(int *);
+extern int math_fast_float_d(int *);
 
 /* The object's state block (only the fields this body touches). */
 typedef struct {
@@ -52,12 +52,12 @@ typedef struct {
 } State;
 
 /* Update handler for moby class 4819: it sets itself up, waits quietly, and pops with an effect when the player targets it or comes close. */
-void func_L20_00449850(char *moby) {
+void pop_target_update(char *moby) {
     State *state = *(State **)(moby + 0x68);
     int mode;
 
     if (D_L20_001A8F00 == 2 && *(u8 *)(moby + 0x20) != 1) {
-        ResetMobyToIdle(moby);
+        moby_reset_to_idle(moby);
     }
     mode = *(u8 *)(moby + 0x20);
     switch (mode) {
@@ -67,23 +67,23 @@ void func_L20_00449850(char *moby) {
         state->x70 |= 6;
         state->x84 = D_L20_001B23E0;
         state->x88 = D_L20_001B23E4;
-        ResetMobyToIdle(moby);
+        moby_reset_to_idle(moby);
         return;
     case 1:
         return;
     case 2:
-        UpdatePushableMoby(moby, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
+        pushable_moby_update(moby, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
         break;
     }
     if (D_0018A3E0 == moby) {
         state->xAC = 1;
     }
     if (((D_L20_001B2AC8 & 0xF) == (((int)moby >> 8) & 0xF)
-         && 5.0f < FloatAbs(*(float *)(moby + 0x18)
-                                 - ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f)))
-        || (state->xAC != 0 && FastFloatHelperD(&state->xA8) != 0)) {
-        VanishMobyWithEffect(moby);
+         && 5.0f < math_fabs(*(float *)(moby + 0x18)
+                                 - coll_probe_ground_height_below(moby + 0x10, 0, 0.5f)))
+        || (state->xAC != 0 && math_fast_float_d(&state->xA8) != 0)) {
+        moby_vanish_with_effect(moby);
     } else {
-        FollowPathAndPopOnTouch(moby);
+        path_follow_pop_on_touch(moby);
     }
 }

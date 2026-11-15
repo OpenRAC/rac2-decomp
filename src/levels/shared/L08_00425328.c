@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern s32 func_002761F8(void *first, void *second, s32 mode, void *object, s32 flags);
+extern s32 CollLine(void *first, void *second, s32 mode, void *object, s32 flags);
 extern float D_L08_001BFF68;
 
 /* func_L08_003D8290 with a floor (-ffast-math for the max.s): the clear result is the floor, a hit is raised to it. */
-float func_L08_00425328(void *position, float first, float second, float floor)
+float coll_find_ground_height_floor(void *position, float first, float second, float floor)
 {
     float endpoints[2][4] __attribute__((aligned(16)));
     qcopy(endpoints[0], position);

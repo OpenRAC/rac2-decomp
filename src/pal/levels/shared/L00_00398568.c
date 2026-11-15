@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_0018B060;
-extern void func_0029F338(char *object);
-extern void func_L00_00310838(char *object, int mode, int delta);
-extern float func_002A7878(float low, float high);
-extern float func_002ABB18(float angle);
-extern float func_00283B98(float value, float amount);
+extern void moby_mark_spawned(char *object);
+extern void offset_moby_class_point_pairs(char *object, int mode, int delta);
+extern float math_random_float_range(float low, float high);
+extern float math_wrap_angle_to_pi(float angle);
+extern float FastAddRotations(float value, float amount);
 extern void func_002A10E8(char *object);
 
 void func_PAL_L00_00398568(char *object)
@@ -15,7 +16,7 @@ void func_PAL_L00_00398568(char *object)
     unsigned char tag = *(unsigned char *)(other + 0x20);
 
     if (tag == 0 || (tag & 0xF0) == 0xF0) {
-        func_0029F338(object);
+        moby_mark_spawned(object);
         return;
     }
     if (other != 0) {
@@ -42,12 +43,12 @@ void func_PAL_L00_00398568(char *object)
             delta = 0xF40;
             *(int *)(s1 + 4) = current + 0xF40;
         }
-        func_L00_00310838(*(char **)(object + 0x24), 0, delta);
+        offset_moby_class_point_pairs(*(char **)(object + 0x24), 0, delta);
     }
     *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24)
-                                * *(float *)(s1 + 0xC) * func_002A7878(0.5f, 1.0f);
-    *(float *)(object + 0xF4) = func_00283B98(*(float *)(object + 0xF4),
-                                             func_002ABB18(*(float *)(s1 + 0xC)));
+                                * *(float *)(s1 + 0xC) * math_random_float_range(0.5f, 1.0f);
+    *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4),
+                                             math_wrap_angle_to_pi(*(float *)(s1 + 0xC)));
     func_002A10E8(object);
 }
 

@@ -9,7 +9,7 @@ typedef int TI128 __attribute__((mode(TI)));
 extern u8 D_L07_001B31AF __attribute__((sda));
 
 /* Clears a block of 16 flag bytes to zero. */
-void func_L07_0040FC50(void)
+void flag_block_clear(void)
 {
     u8 *p;
     s32 i;
@@ -42,10 +42,10 @@ extern f32 func_2E5360(f32 a, f32 b);
 
 extern f32 D_L07_00189E20[];
 
-extern void func_L07_003F68F0(u8 *a0, f32 x);
+extern void swing_update_yaw(u8 *a0, f32 x);
 
 /* Starts the swinging turret: switches to state 2, picks which way to turn toward the player and aims it. */
-void func_L07_003F6528(u8 *moby)
+void turret_start_swinging(u8 *moby)
 {
     u8 *vars;
     f32 side;
@@ -62,24 +62,24 @@ void func_L07_003F6528(u8 *moby)
     } else {
         *(f32 *)(vars + 0x54) = 1.5707964f;
     }
-    UpdateSwingingYaw(moby, 0.0f);
+    swing_update_yaw(moby, 0.0f);
 }
 
-extern u16 *D_L07_001FAD60[];
+extern u16 *g_moby_l07_group_lists[];
 
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
-extern u8 *D_L07_001B22DC[] __attribute__((sda));
+extern u8 *g_moby_l07_array[] __attribute__((sda));
 extern s32 D_L07_001B22F8[] __attribute__((sda));
 
-extern s32 func_002A77E0(s32 n);
+extern s32 math_random_int_below(s32 n);
 
-extern s32 func_00282948(s32 *counter);
+extern s32 math_fast_float_d(s32 *counter);
 
 /* Picks at random one of the group's entities that are in state 1: counts them, draws an index
    below the count, then walks the list again stepping the index down (func_00282948) until it
    runs out. Returns 0 when there is none. */
-u8 *func_L07_003F65E8(s32 group)
+u8 *group_pick_random_active_entity(s32 group)
 {
     u16 *idPtr;
     u16 *idPtrB;
@@ -87,11 +87,11 @@ u8 *func_L07_003F65E8(s32 group)
     s32 activeCount = 0;
     s32 pickIndex;
 
-    for (idPtr = gMobyGroupLists_L07[group];
+    for (idPtr = g_moby_l07_group_lists[group];
          (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && idPtr != 0 &&
-         ((s16)idPtr[-1] >= 0 || idPtr == gMobyGroupLists_L07[group]);
+         ((s16)idPtr[-1] >= 0 || idPtr == g_moby_l07_group_lists[group]);
          idPtr++) {
-        entity = gMobyArray_L07[0] + ((*idPtr & 0x7FFF) << 8);
+        entity = g_moby_l07_array[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (entity[0x20] == 1)
@@ -99,15 +99,15 @@ u8 *func_L07_003F65E8(s32 group)
     }
     if (activeCount == 0)
         return 0;
-    pickIndex = RandomIntBelow(activeCount);
-    for (idPtrB = gMobyGroupLists_L07[group];
+    pickIndex = math_random_int_below(activeCount);
+    for (idPtrB = g_moby_l07_group_lists[group];
          (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && idPtrB != 0 &&
-         ((s16)idPtrB[-1] >= 0 || idPtrB == gMobyGroupLists_L07[group]);
+         ((s16)idPtrB[-1] >= 0 || idPtrB == g_moby_l07_group_lists[group]);
          idPtrB++) {
-        entity = gMobyArray_L07[0] + ((*idPtrB & 0x7FFF) << 8);
+        entity = g_moby_l07_array[0] + ((*idPtrB & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (entity[0x20] == 1 && FastFloatHelperD(&pickIndex) != 0)
+        if (entity[0x20] == 1 && math_fast_float_d(&pickIndex) != 0)
             return entity;
     }
     return 0;
@@ -143,7 +143,7 @@ struct SibNode {
 };
 
 /* Resets the object and its two child objects: sets their flags and clears their counters. */
-void func_L07_003F78F8(SibNode *moby)
+void boss_reset_with_children(SibNode *moby)
 {
     SibNode *vars = moby->f68;
 
@@ -160,20 +160,20 @@ void func_L07_003F78F8(SibNode *moby)
 /* func_L07_003F7968 is defined in L07_003F7968-g32.c. */
 
 /* Returns the boss's current attack mode. */
-u8 *func_L07_003F7BE0(u8 *moby)
+u8 *boss_get_attack_mode(u8 *moby)
 {
     return *(u8 **)(*(u8 **)(moby + 0x68) + 0x420);
 }
 
 /* func_L07_003F7BF0 is defined in L07_003F7BF0-g8.c. */
 
-extern void func_002A93B0(u8 *a);
+extern void moby_update_ground_check(u8 *a);
 
 extern void func_002A0F48(u8 *a);
 
-extern void func_0029FC20(u8 *a, s32 b, void *c);
+extern void moby_transform_joint_point(u8 *a, s32 b, void *c);
 
-extern void func_00283678(u8 *a, void *b);
+extern void copy_matrix3x4(u8 *a, void *b);
 
 /* func_L07_003F8010 is defined in L07_003F8010-copy.c. */
 
@@ -183,27 +183,27 @@ extern void func_00283678(u8 *a, void *b);
 
 /* func_L07_003F8780 is defined in L07_003F4578-g8.c (this unit has no $gp access for it). */
 
-extern void func_00282CF0(u8 *a, u8 *b, u8 *c);
+extern void FastVecSub(u8 *a, u8 *b, u8 *c);
 
-extern void func_002AFDD8(u8 *a, u8 *b, u8 *c, s32 d);
+extern void vec_transform_by_object_or_given(u8 *a, u8 *b, u8 *c, s32 d);
 
 /* func_L07_003F8828 is defined in L07_003F8828-copy.c. */
 
-extern void func_00283098(u8 *a, u8 *b, u8 *c);
+extern void matrix_mul_vec3(u8 *a, u8 *b, u8 *c);
 
-extern void func_00282CC0(u8 *a, u8 *b, u8 *c);
+extern void FastVecAdd(u8 *a, u8 *b, u8 *c);
 
 /* func_L07_003F8898 is defined in L07_003F8898-copy.c. */
 
 
 /* func_L07_003F8AB0 is defined in L07_003F4578-qcopy.c (this unit needs the grouped quadword copy). */
 
-extern void func_L07_003F43E0(u8 *a, u8 *b, void *c, void *d, f32 e);
+extern void SpawnBallisticMoby(u8 *a, u8 *b, void *c, void *d, f32 e);
 
 
-extern u8 *func_L07_003F6B88(u8 *a);
+extern u8 *moby_find_active_in_group(u8 *a);
 
-extern void func_L07_003F6C40(u8 *a, u8 *b, void *c, f32 d);
+extern void homing_bomb_init(u8 *a, u8 *b, void *c, f32 d);
 
 /* One 128-byte record, its float field read by the measured index. */
 typedef struct {
@@ -217,46 +217,46 @@ extern SibRec128 *D_L07_001B23CC;
 
 /* func_L07_003F8D90 is defined in L07_003F8D90.c. */
 
-extern void func_002A7470(u8 *a0, s32 a1, s32 a2, s32 a3);
+extern void anim_start_blended(u8 *a0, s32 a1, s32 a2, s32 a3);
 
 /* Picks the boss's idle animation (one set while no attack mode is active, another while one is) and changes it only if it differs. */
-void func_L07_003F9028(u8 *moby)
+void boss_select_idle_anim(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     if (*(u32 *)(vars + 0x420) == 0) {
         if (*(u8 *)(moby + 0x43) != 2) {
-            StartAnimationBlended(moby, 2, 0, 10);
+            anim_start_blended(moby, 2, 0, 10);
         }
         return;
     }
     if (*(u8 *)(moby + 0x43) != 8) {
-        StartAnimationBlended(moby, 8, 0, 10);
+        anim_start_blended(moby, 8, 0, 10);
     }
 }
 
 /* Picks the boss's attack animation (one set while no attack mode is active, another while one is) and changes it only if it differs. */
-void func_L07_003F9088(u8 *moby)
+void boss_select_attack_anim(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     if (*(u32 *)(vars + 0x420) == 0) {
         if (*(u8 *)(moby + 0x43) != 3) {
-            StartAnimationBlended(moby, 3, 0, 10);
+            anim_start_blended(moby, 3, 0, 10);
         }
         return;
     }
     if (*(u8 *)(moby + 0x43) != 9) {
-        StartAnimationBlended(moby, 9, 0, 10);
+        anim_start_blended(moby, 9, 0, 10);
     }
 }
 
 extern u8 D_001A7BD0 __attribute__((sda));
 
-extern void func_L01_003C91C8(u8 *a0);
+extern void UpdateCuboidTriggeredMoby(u8 *a0);
 
 /* Updates the object with the standard code, unless a global flag is set, in which case it only marks the object. */
-void func_L07_003FF618(u8 *moby)
+void moby_update_unless_paused(u8 *moby)
 {
     if (D_001A7BD0 != 0) {
         *(u16 *)(moby + 0x34) |= 0x2;
@@ -283,7 +283,7 @@ extern f32 D_L07_001B3198 __attribute__((sda));
 /* Runs the object's own 200 steps: each step advances the shared record's third
    float, then the three angles are computed and handed to the shared passes. */
 /* Throws 200 sparks out of the object in random directions. */
-void func_L07_00408338(u8 *moby)
+void part_l07_spawn_spark_burst(u8 *moby)
 {
     f32 sparkVelocity[4];
     f32 sparkPos[4];
@@ -317,7 +317,7 @@ extern void func_338D68(void *a, s32 b, void *c, void *d, s32 e, f32 f);
 extern f32 func_2E4508(void *a, void *b);
 
 /* Works out the heading and tilt of a path at a given distance along it, by looking a little behind and a little ahead. */
-void func_L07_0040EFC8(s32 *path, f32 *angles, f32 distance, f32 span)
+void path_compute_heading_and_tilt(s32 *path, f32 *angles, f32 distance, f32 span)
 {
     f32 aheadPoint[4];
     f32 behindPoint[4];
@@ -348,7 +348,7 @@ typedef struct {
 
 /* Walks the id list of each of the object's three groups, stopping at the first id with no
    entity; the walk itself does nothing. */
-void func_L07_0040F598(u8 *a0)
+void group_walk_entities(u8 *a0)
 {
     GroupState *state = *(GroupState **)(a0 + 0x68);
     s32 i;
@@ -358,11 +358,11 @@ void func_L07_0040F598(u8 *a0)
     for (i = 0; i < 3; i++) {
         if (state->groups[i] == -1)
             continue;
-        for (p = gMobyGroupLists_L07[state->groups[i]];
+        for (p = g_moby_l07_group_lists[state->groups[i]];
              (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= D_L07_001B22F8[0] && p != 0 &&
-             ((s16)p[-1] >= 0 || p == gMobyGroupLists_L07[state->groups[i]]);
+             ((s16)p[-1] >= 0 || p == g_moby_l07_group_lists[state->groups[i]]);
              p++) {
-            e = gMobyArray_L07[0] + ((*p & 0x7FFF) << 8);
+            e = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
                 break;
         }
@@ -381,7 +381,7 @@ extern void func_2E4398(void *a, void *b, f32 c);
 extern f32 func_2E44D0(void *a, void *b);
 
 /* For each of three paths, finds the middle of its points and stores it after the last point, along with the largest distance of any point from it. */
-void func_L07_0040F8F8(void)
+void path_compute_centers_and_radii(void)
 {
     s32 i, pointCount, j, testIndex, sumIndex;
     f32 center[4];
@@ -415,7 +415,7 @@ extern void func_2E4DD8(void *, void *);
 extern void func_2E47F8(void *, void *, void *);
 
 /* Turns the stored path points into world positions using the object's own matrix and position, and saves them for its record. */
-void func_L07_0040FA90(u8 *moby, s32 index)
+void path_upload_points_to_world(u8 *moby, s32 index)
 {
     f32 matrix[16];
     f32 endPoint[4];
@@ -452,17 +452,17 @@ void func_L07_0040FA90(u8 *moby, s32 index)
 
 /* func_L07_00410588 is defined in L07_00410588-snapshot.c. */
 
-extern void func_002833F0(u8 *a, u8 *b);
+extern void euler_rotation_basis(u8 *a, u8 *b);
 
-extern void func_L00_00323958(u8 *a, u8 *b);
+extern void moby_update_attached_transforms(u8 *a, u8 *b);
 
 /* Builds the object's matrix from its angles, then updates its attached record. */
-void func_L07_004106B8(u8 *moby)
+void moby_build_matrix(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     euler_rotation_basis(moby + 0xC0, moby + 0xF0);
-    UpdateAttachedObjectTransforms(moby, vars + 0x1B0);
+    moby_update_attached_transforms(moby, vars + 0x1B0);
 }
 
 /* func_L07_00410700 is defined in L07_00410700-g8.c. */

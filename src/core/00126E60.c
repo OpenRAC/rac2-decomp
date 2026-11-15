@@ -5,13 +5,13 @@ extern void r1_func_0011A6C8();
 
 extern void r1_func_0011A6C8(void *);
 
-extern int func_001272A8(void *);
+extern int sceDmaPause(void *);
 
 extern char r1_D_001534E0[];
 
-extern void func_00126E60(void *);
+extern void dma_wait_channel_done(void *);
 
-extern int func_00126ED8(int);
+extern int dma_convert_scratchpad_address(int);
 
 extern int r1_D_00132E70[];
 
@@ -36,7 +36,7 @@ extern int r1_D_00132E70[];
  */
 extern int r1_D_001534F8[];
 
-extern int func_00127040(void *);
+extern int sceDmaPutEnv(void *);
 
 /* rac1-decomp src/core/00123168.c: func_00123208 */
 /*
@@ -53,13 +53,13 @@ extern int func_00127040(void *);
  * volatile, as the hardware register it is.
  */
 /* Waits for a DMA channel to finish and reports a timeout if it takes too long. */
-void func_00126E60(void *channelReg) {
+void dma_wait_channel_done(void *channelReg) {
     int pollsLeft = 0x1000000;
 
     while ((*(volatile int *)channelReg & 0x100) != 0) {
         if (--pollsLeft < 0) {
             r1_func_0011A6C8(r1_D_001534E0);
-            SceDmaPause(channelReg);
+            sceDmaPause(channelReg);
         }
     }
 }
@@ -67,7 +67,7 @@ void func_00126E60(void *channelReg) {
 
 /* rac1-decomp src/core/00123168.c: func_00123280 */
 /* Turns a scratchpad address into the matching address the DMA unit uses and leaves other addresses alone. */
-int func_00126ED8(int addr) {
+int dma_convert_scratchpad_address(int addr) {
     if ((unsigned int)addr >> 28 == 7) {
         addr &= 0x0FFFFFFF;
         addr |= 0x80000000;
@@ -86,7 +86,7 @@ int func_00126ED8(int addr) {
    elsewhere in core_text. Under 2.95.3 the same C gets the registers
    right but reorg fills the slot (6/52); the old do-while was 2/52. */
 /* Fills a block of memory with zeros. */
-void func_00126F00(char *dst, int n) {
+void mem_zero_fill_bytes(char *dst, int n) {
     while (n-- != 0) {
         *dst++ = 0;
     }
@@ -97,7 +97,7 @@ void func_00126F00(char *dst, int n) {
    channels. The in-range return comes first under 2.9-ee (the
    `>= 0xA` guard-first form matched 2.95.3 and is 21/40 here). */
 /* Returns the register block of a DMA channel, or 0 if the number is too big. */
-int func_00126F38(unsigned int channelId) {
+int sceDmaGetChan(unsigned int channelId) {
     if (channelId < 0xA) {
         return r1_D_00132E70[channelId];
     }
@@ -106,7 +106,7 @@ int func_00126F38(unsigned int channelId) {
 
 /* rac1-decomp src/core/00123168.c: func_00123308 */
 /* Resets all DMA channels and the DMA status, then sets a clean DMA setup. */
-int func_00126F60(int mode) {
+int sceDmaReset(int mode) {
     char envBuf[0x14];
     int dmaEnabled;
     int i;
@@ -128,8 +128,8 @@ int func_00126F60(int mode) {
     *(unsigned int *)0x1000E010 = 0xFF1F;
     *(unsigned int *)0x1000E010 = D_STAT & 0xFF1F0000;
 
-    ZeroFillBytes(envBuf, 0x14);
-    SceDmaPutEnv(envBuf);
+    mem_zero_fill_bytes(envBuf, 0x14);
+    sceDmaPutEnv(envBuf);
 
     if (mode == 1) {
         D_CTRL = D_CTRL | 1;

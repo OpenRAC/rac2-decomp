@@ -36,11 +36,11 @@ typedef struct {
 } T3F9568_Obj;
 
 extern char D_L09_001BFE58[];
-extern s32 func_002761F8(void *, void *, int, void *, int);
-extern s32 func_00277258(void *, int, void *, float);
+extern s32 CollLine(void *, void *, int, void *, int);
+extern s32 coll_test_point(void *, int, void *, float);
 
 /* Checks whether the enemy has a clear line to its target. Returns 1 if something blocks the view. */
-s32 func_L09_003F9568(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoint, s32 lowShot)
+s32 enemy_check_line_of_sight(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoint, s32 lowShot)
 {
     T3F9568_Owned *vars = moby->f68;
     TI128 pos[1];
@@ -64,7 +64,7 @@ s32 func_L09_003F9568(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoint, s32 
         blocked = 1;
     if (checkSolid != 0 && blocked == 0) {
         probe[0] = *(TI128 *)(D_L09_001BFE58 + 8);
-        if (TestPointAgainstCollision(probe, 1, moby, 0.5f) != 0) {
+        if (coll_test_point(probe, 1, moby, 0.5f) != 0) {
             T3F9568_Hit *hit = *(T3F9568_Hit **)D_L09_001BFE58;
             if (hit == 0 || hit->f24 == 0 || *(s16 *)(hit->f24 + 0x46) != 5)
                 blocked = 1;

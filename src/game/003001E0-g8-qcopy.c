@@ -7,20 +7,20 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern int ref_L00_003001E0_00 __attribute__((sda));
 
-extern unsigned char D_0018C0B0[];
+extern unsigned char g_hero_moby[];
 
-extern void func_002AD330(void *, void *, void *, void *);
+extern void moby_transform_point_by_attachment(void *, void *, void *, void *);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Adds a vector to another one, first transforming it when a transform is set, otherwise copies it. */
-void func_003001E0(void *dest, void *source, void *extra)
+void vec_add_transformed_or_copy(void *dest, void *source, void *extra)
 {
     TI128 transformed;
     int *state = ref_L00_003001E0_00;
 
     if (state != 0) {
-        TransformPointByMobyAttachment(*(int *)gHeroMoby_0018C0B0, state, extra, &transformed);
+        moby_transform_point_by_attachment(*(int *)g_hero_moby, state, extra, &transformed);
         FastVecAdd(dest, source, &transformed);
     } else {
         *(TI128 *)dest = *(TI128 *)source;

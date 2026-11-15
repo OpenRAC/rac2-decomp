@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern char *D_L02_001FF1C0[];
-extern void func_002A7750(u8 *, s32, s32);
+extern char *g_route_polygons[];
+extern void moby_set_state(u8 *, s32, s32);
 
 struct TableState {
     s32 index;
@@ -13,7 +13,7 @@ struct TableState {
 
 /* when the object is idle, retargets it at its state's table entry: takes the entry's
    position, restarts the timer and switches to state 1 */
-void func_L02_003DBEC8(char *object)
+void table_positioned_b_update(char *object)
 {
     struct TableState *q = *(struct TableState **)(object + 0x68);
     char *entry;
@@ -22,9 +22,9 @@ void func_L02_003DBEC8(char *object)
         return;
     *(u8 *)(object + 0x30) = 0x80;
     q->phase = -1.0f;
-    entry = gRoutePolygons[q->index];
+    entry = g_route_polygons[q->index];
     q->target = entry;
     q->elapsed = 0;
     qcopy(object + 0x10, entry + 0x10);
-    SetMobyState((u8 *)object, 1, -1);
+    moby_set_state((u8 *)object, 1, -1);
 }

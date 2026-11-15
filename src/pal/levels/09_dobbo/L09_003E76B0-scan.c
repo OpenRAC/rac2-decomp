@@ -8,11 +8,11 @@
 
 extern unsigned char D_001395B8[];
 typedef struct { char pad[0x1bc]; unsigned short flag; char pad2[2]; unsigned int time; } DobboClock;
-extern DobboClock D_0018C750;
+extern DobboClock g_progress_statistics;
 typedef struct { char pad[0x2c0]; int first; char pad2[0x11c]; int second; char pad3[0x20]; int third; char pad4[0x24]; unsigned short flag; } DobboDialogue;
-extern DobboDialogue D_0018C958;
+extern DobboDialogue g_subtitle_history;
 typedef struct { char pad[0x80]; char position[0x10]; char pad2[0x128]; int field1b8; char pad3[0x20d8]; int field2294; } DobboPlayer;
-extern DobboPlayer D_00189E20;
+extern DobboPlayer g_hero_state;
 extern int D_001397C4;
 extern unsigned char D_001A7A60[] __attribute__((sda)), D_001A7B08[] __attribute__((sda));
 extern short D_001A7A10[] __attribute__((sda));
@@ -43,10 +43,10 @@ typedef struct {
     char padac[0x54];
 } ScanMoby;
 extern ScanMoby *D_L09_001B285C MACRO_ADDR, *D_L09_001B2860 MACRO_ADDR;
-extern int func_002ACBC8(void *, int);
+extern int IsPointInCuboid(void *, int);
 extern int func_PAL_00289730(int, int);
 extern void func_PAL_002B1588(int, int);
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 
 void func_PAL_L09_003E76B0(unsigned char *object)
 {
@@ -97,7 +97,7 @@ void func_PAL_L09_003E76B0(unsigned char *object)
             if (&D_L09_001B285C[s->scan] >= D_L09_001B2860) {
                 if (!s->count && !D_001A7A60[12]) {
                     D_001A7A60[12] = 1;
-                    func_002E5E58(1, 0, 0);
+                    snd_play_from_global_bank(1, 0, 0);
                     func_PAL_002B1588(0x1233, -1);
                     D_L09_001A903C[0] = 1;
                 }
@@ -107,38 +107,38 @@ void func_PAL_L09_003E76B0(unsigned char *object)
         }
     }
 
-    if (!D_0018C958.flag && D_001397C4 < 0 && !D_001A7B08[5]) {
-        if (func_002ACBC8(D_00189E20.position, s->region[0]))
+    if (!g_subtitle_history.flag && D_001397C4 < 0 && !D_001A7B08[5]) {
+        if (IsPointInCuboid(g_hero_state.position, s->region[0]))
             func_PAL_00289730(0xa02, 0x59);
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[1]))
+    if (IsPointInCuboid(g_hero_state.position, s->region[1]))
         s->entered = 1;
-    if (D_00189E20.field2294 == 0x39 && !D_00189E20.field1b8 && s->entered)
+    if (g_hero_state.field2294 == 0x39 && !g_hero_state.field1b8 && s->entered)
         D_001395B8[0x7a]++;
-    if (D_001A7A10[4] <= 0 && func_002ACBC8(D_00189E20.position, s->region[1])) {
-        if (D_001395B8[0x7a] % 5 == 4 && !s->hint1c && D_00189E20.field2294 != 0x39) {
-            if (D_0018C958.second >= 0)
+    if (D_001A7A10[4] <= 0 && IsPointInCuboid(g_hero_state.position, s->region[1])) {
+        if (D_001395B8[0x7a] % 5 == 4 && !s->hint1c && g_hero_state.field2294 != 0x39) {
+            if (g_subtitle_history.second >= 0)
                 func_PAL_00289730(0x9fb, 0x52);
             s->hint1c = 1;
             D_001395B8[0x7a]++;
         }
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[2])) {
-        if (D_00189E20.field2294 == 0x39 && !D_00189E20.field1b8)
+    if (IsPointInCuboid(g_hero_state.position, s->region[2])) {
+        if (g_hero_state.field2294 == 0x39 && !g_hero_state.field1b8)
             D_001395B8[0x79]++;
     }
-    if (!D_001A7B08[7] && func_002ACBC8(D_00189E20.position, s->region[2])) {
-        if (D_001395B8[0x79] % 5 == 4 && !s->hint18 && D_00189E20.field2294 != 0x39) {
-            if (D_0018C958.third >= 0)
+    if (!D_001A7B08[7] && IsPointInCuboid(g_hero_state.position, s->region[2])) {
+        if (D_001395B8[0x79] % 5 == 4 && !s->hint18 && g_hero_state.field2294 != 0x39) {
+            if (g_subtitle_history.third >= 0)
                 func_PAL_00289730(0x9fe, 0x55);
             s->hint18 = 1;
             D_001395B8[0x79]++;
         }
     }
-    if (func_002ACBC8(D_00189E20.position, s->region[3])) {
-        if ((!D_0018C750.flag || (((int)(D_001A7390) * 5 + 2) / 6) - D_0018C750.time > 360000) &&
+    if (IsPointInCuboid(g_hero_state.position, s->region[3])) {
+        if ((!g_progress_statistics.flag || (((int)(D_001A7390) * 5 + 2) / 6) - g_progress_statistics.time > 360000) &&
             D_001395B8[0x7d] < 3 && !s->hint14) {
-            if (D_0018C958.first >= 0)
+            if (g_subtitle_history.first >= 0)
                 func_PAL_00289730(0x9e3, 0x3a);
             D_001395B8[0x7d]++;
             s->hint14 = 1;

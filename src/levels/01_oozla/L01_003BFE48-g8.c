@@ -79,12 +79,12 @@ typedef struct {
     float f2ec;
 } L01_003BFE48_STATE;
 
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_L01_003377C8(void *);
-extern void func_L01_003A6280(void *, void *, int, float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003BFDC8(void *, int, int, int);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void path_l01_compute_segment_lengths(void *);
+extern void moby_spawn_linked_helper(void *, void *, int, float, float);
+extern void moby_set_state(void *, int, int);
+extern void moby_set_animation_and_speed(void *, int, int, int);
 extern char *D_L01_001FE180[];
 extern float D_L01_001AFE50 __attribute__((sda));
 extern float D_L01_001AFE5C __attribute__((sda));
@@ -94,7 +94,7 @@ extern float D_L01_001AFE7C __attribute__((sda));
 extern float D_L01_001AFE80 __attribute__((sda));
 
 /* Sets up a Swamp Monster II when it first appears: its speeds, health and sizes, and its starting animation. */
-void func_L01_003BFE48(L01_003BFE48_OBJ *moby)
+void swamp_monster_init(L01_003BFE48_OBJ *moby)
 {
     L01_003BFE48_STATE *vars = *(L01_003BFE48_STATE **)((char *)moby + 0x68);
 
@@ -138,27 +138,27 @@ void func_L01_003BFE48(L01_003BFE48_OBJ *moby)
     vars->f140 = 0.3490659f;
     vars->f160 = 0.52359885f;
     vars->f15c = D_L01_001AFE50 * 0.00027777778f;
-    SetControllerSpeedLimits(moby, D_L01_001AFE74 * 0.00027777778f,
+    moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f,
                  D_L01_001AFE80 * 0.016666668f,
                  D_L01_001AFE78 * 0.0000048481375f,
                  D_L01_001AFE7C * 0.00029088825f);
     vars->f28 = 3;
     moby->fbc = 0;
     if (vars->f2c8 != -1) {
-        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c8]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c8]);
     }
     if (vars->f2c4 != -1) {
-        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c4]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c4]);
     }
     if (vars->f2c0 != -1) {
-        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c0]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c0]);
     }
-    SpawnLinkedHelperMoby(moby, (char *)moby + 0x10, 11, 1.2f, 2.0f);
+    moby_spawn_linked_helper(moby, (char *)moby + 0x10, 11, 1.2f, 2.0f);
     vars->f2e1 = 1;
     vars->f2e0 = 0;
     vars->f2e2 = 0;
     vars->f2e8 = moby->f18;
     vars->f2ec = D_L01_001AFE5C;
-    SetMobyState(moby, 0, 1);
-    SetMobyAnimationAndSpeed(moby, 0, 0, 2);
+    moby_set_state(moby, 0, 1);
+    moby_set_animation_and_speed(moby, 0, 0, 2);
 }

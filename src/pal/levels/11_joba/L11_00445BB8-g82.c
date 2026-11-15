@@ -1,15 +1,16 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef unsigned int u32;
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
-extern u8 *D_L11_001B359C __attribute__((sda));
-extern u8 *D_L11_001FC420[];
-extern u8 D_00189E20[] __attribute__((nosda));
+extern u8 *g_moby_l11_table __attribute__((sda));
+extern u8 *g_group_id_lists[];
+extern u8 g_hero_state[] __attribute__((nosda));
 extern s32 func_PAL_L11_004461C8(u8 *obj, u8 *record);
-extern s32 func_L11_00440C90(u8 *obj, u8 *record);
+extern s32 arena_add_fighter_to_squad(u8 *obj, u8 *record);
 
 /* Finds the class record the identifier names: the first live record of the state's
    class list whose identifier matches, and hands it to the class's handler. */
@@ -24,12 +25,12 @@ s32 func_PAL_L11_00445FE8(u8 *obj, s32 id, s32 flag) {
     if (index == 0xFF) {
         return 0;
     }
-    list = D_L11_001FC420[index];
+    list = g_group_id_lists[index];
     if (list == 0) {
         return 0;
     }
     cursor = (u16 *)list;
-    base = D_L11_001B359C;
+    base = g_moby_l11_table;
     do {
         record = base + ((*cursor & 0x7FFF) << 8);
 
@@ -39,7 +40,7 @@ s32 func_PAL_L11_00445FE8(u8 *obj, s32 id, s32 flag) {
             if (flag != 0) {
                 return func_PAL_L11_004461C8(obj, record);
             }
-            return func_L11_00440C90(obj, record);
+            return arena_add_fighter_to_squad(obj, record);
         }
     } while (*(s16 *)cursor++ >= 0);
     return 0;

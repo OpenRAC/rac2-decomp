@@ -1,55 +1,56 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
-extern float *func_00335E10(void *);
-extern void func_0027F120(void),func_0027F110(void);
-extern int func_00336A40(void *);
+extern float *object_get_first_field(void *);
+extern void gfx_disable_screen_flag(void),gfx_enable_screen_flag(void);
+extern int hud_draw_widget_text(void *);
 extern void func_PAL_00338770(void *);
-extern void func_0027EAE8(int,int,int,int,int,void *);
-extern int func_00335E20(u8 *);
-extern void func_00335F88(void *,float,float,float,float);
-extern void func_00336A38(void *,int);
-extern int func_00288FB8(int);
+extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
+extern int object_get_fourth_field(u8 *);
+extern void object_set_second_float4(void *,float,float,float,float);
+extern void hud_set_widget_field_b(void *,int);
+extern int GetLocalizedString(int);
 typedef struct {unsigned int first,second;} MenuColors;
 
 void func_PAL_0034A300(char *o)
 {
-    float *pos=func_00335E10(o);
+    float *pos=object_get_first_field(o);
     int i=0;
     MenuColors colors, first, second;
-    func_0027F120();
+    gfx_disable_screen_flag();
     pos[0]=(*(float **)(o+0x5C))[0];
     for(i=0;i<*(int *)(o+0xC0);i++) {
         int offset=i*20;
         pos[1]=(float)(*(int *)(o+0xB8)+*(int *)(o+0xBC)*i)+(*(float **)(o+0x5C))[1];
-        func_00335F88(o,*(float *)(offset+*(unsigned int *)(o+0x68)),0.0f,0.0f,0.0f);
+        object_set_second_float4(o,*(float *)(offset+*(unsigned int *)(o+0x68)),0.0f,0.0f,0.0f);
         if(*(int *)(offset+*(unsigned int *)(o+0x68)+4)==0x10FC) pos[1]+=3.0f;
-        if(*(int *)(o+0xC4)) func_00336A38(o,*(int *)(offset+*(unsigned int *)(o+0x68)+4));
-        else func_00336A38(o,func_00288FB8(*(int *)(offset+*(unsigned int *)(o+0x68)+4)));
+        if(*(int *)(o+0xC4)) hud_set_widget_field_b(o,*(int *)(offset+*(unsigned int *)(o+0x68)+4));
+        else hud_set_widget_field_b(o,GetLocalizedString(*(int *)(offset+*(unsigned int *)(o+0x68)+4)));
         { char *entry=o+i*4;
             if(*(int *)(entry+0x6C)) {
                 if(*(int *)(o+0xCC)==i) {
                     int x,y;
                     first.second=first.first=(*(unsigned int *)(o+0xAC)&0xffffff)|0x20000000;
                     colors=first;
-                    x=(int)(pos[0]-(float)(func_00336A40(o)>>1)-2.0f-16.0f);
+                    x=(int)(pos[0]-(float)(hud_draw_widget_text(o)>>1)-2.0f-16.0f);
                     y=(int)(pos[1]+2.0f);
-                    func_0027EAE8(x,y,(int)(pos[0]-(float)(func_00336A40(o)>>1)-2.0f-16.0f+8.0f),(int)(pos[1]-2.0f+16.0f),0,&colors);
+                    gfx_draw_screen_rectangle(x,y,(int)(pos[0]-(float)(hud_draw_widget_text(o)>>1)-2.0f-16.0f+8.0f),(int)(pos[1]-2.0f+16.0f),0,&colors);
                 }
                 if(*(int *)(o+0x60)==i) {
-                    *(int *)func_00335E20((u8 *)o)=*(int *)(o+0xAC);
+                    *(int *)object_get_fourth_field((u8 *)o)=*(int *)(o+0xAC);
                     if(*(int *)(o+0xC8)) {
                         int x,y;
                         second.second=second.first=(*(unsigned int *)(o+0xAC)&0xffffff)|0x20000000;
                         colors=second;
-                        x=(int)(pos[0]-(float)(func_00336A40(o)>>1)-8.0f);
+                        x=(int)(pos[0]-(float)(hud_draw_widget_text(o)>>1)-8.0f);
                         y=(int)(pos[1]-2.0f);
-                        func_0027EAE8(x,y,(int)(pos[0]+(float)(func_00336A40(o)>>1)+9.0f),(int)(pos[1]+2.0f+16.0f),0,&colors);
+                        gfx_draw_screen_rectangle(x,y,(int)(pos[0]+(float)(hud_draw_widget_text(o)>>1)+9.0f),(int)(pos[1]+2.0f+16.0f),0,&colors);
                     }
-                } else *(int *)func_00335E20((u8 *)o)=*(int *)(o+0xB0);
-            } else *(int *)func_00335E20((u8 *)o)=*(int *)(o+0xB4);
+                } else *(int *)object_get_fourth_field((u8 *)o)=*(int *)(o+0xB0);
+            } else *(int *)object_get_fourth_field((u8 *)o)=*(int *)(o+0xB4);
         }
         func_PAL_00338770(o);
     }
-    func_0027F110();
+    gfx_enable_screen_flag();
 }

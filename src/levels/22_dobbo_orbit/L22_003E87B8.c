@@ -1,22 +1,23 @@
+#include "names.h"
 /* func_L22_003E87B8 (120 bytes): spawns into the caller's object, paints a font-mode
    string and arms its animation, like func_L22_003D4320. func_002E5DA0 returns a value;
    declaring it void reorders the argument setup of its call. */
 #include "common.h"
 
-extern void *func_002A9640(void *, int, int);
-extern char *func_002A77E0(int);
-extern int func_002E5DA0(char *, int, void *, int);
-extern void func_002AC728(void *, void *, int, float, float);
-extern void func_0029F338(void *object);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern char *math_random_int_below(int);
+extern int snd_play_from_class_bank(char *, int, void *, int);
+extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
+extern void moby_mark_spawned(void *object);
 
 /* Shows a text message at the object and starts its effect. Does nothing if the object has no target. */
-void func_L22_003E87B8(u8 *moby, int unusedA, int unusedB) {
+void text_show_message_at_moby(u8 *moby, int unusedA, int unusedB) {
     u8 *mobyCopy = moby;
     void *target;
-    target = FindOwnedEffectSlot(moby, -1, 0);
+    target = part_find_owned_effect_slot(moby, -1, 0);
     if (target == 0)
         return;
-    PlaySoundFromClassBank(0xC + RandomIntBelow(3), 0, mobyCopy, 0xE0B);
-    SpawnExplosionWithSparks(mobyCopy, mobyCopy + 0x10, -1, 2.0f, 13.0f);
-    MarkMobySpawned(mobyCopy);
+    snd_play_from_class_bank(0xC + math_random_int_below(3), 0, mobyCopy, 0xE0B);
+    part_spawn_explosion_with_sparks(mobyCopy, mobyCopy + 0x10, -1, 2.0f, 13.0f);
+    moby_mark_spawned(mobyCopy);
 }

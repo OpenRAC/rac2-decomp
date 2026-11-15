@@ -6,7 +6,7 @@ extern unsigned char D_L03_00189E20[] __attribute__((nosda));
 
 extern float D_L03_001AEF64 __attribute__((sda));
 
-extern int D_L03_001B2548;
+extern int g_frame_l03_counter;
 extern int D_L03_001A9028;
 extern int D_L03_001A9024;
 extern int D_L03_001C63A8[] __attribute__((nosda));
@@ -16,7 +16,7 @@ extern void func_2EF020(unsigned char *, unsigned char *, float);
 extern void func_2EEFB0(unsigned char *, unsigned char *, unsigned char *);
 
 /* Finds a point in front of an object: its facing direction scaled by a level constant, added to its position. */
-void func_L03_0038A9D0(unsigned char *object, unsigned char *outPoint) {
+void moby_compute_point_ahead(unsigned char *object, unsigned char *outPoint) {
     unsigned char *point = outPoint;
     unsigned char *self = object;
 
@@ -31,11 +31,11 @@ extern float D_L03_00237F40[] __attribute__((nosda));
 extern float func_31BAE8(float, float);
 
 /* Once per frame, refills a table of 16 random vectors. */
-void func_L03_0038B238(void) {
+void math_refresh_random_vector_table(void) {
     float *vectors;
     int i;
 
-    if (D_L03_001AEF60 >= gFrameCounter_L03)
+    if (D_L03_001AEF60 >= g_frame_l03_counter)
         return;
     vectors = D_L03_00237F40;
     for (i = 15; i >= 0; i--) {
@@ -45,13 +45,13 @@ void func_L03_0038B238(void) {
         vectors[3] = 1.0f;
         vectors += 4;
     }
-    D_L03_001AEF60 = gFrameCounter_L03;
+    D_L03_001AEF60 = g_frame_l03_counter;
 }
 
 /* Remembers an id in a list of up to 32 entries. The list starts over when the frame number changes. */
-void func_L03_0032AD10(int value) {
-    if (gFrameCounter_L03 != D_L03_001A9028) {
-        D_L03_001A9028 = gFrameCounter_L03;
+void moby_add_id_to_frame_list(int value) {
+    if (g_frame_l03_counter != D_L03_001A9028) {
+        D_L03_001A9028 = g_frame_l03_counter;
         D_L03_001A9024 = 0;
     }
     if (D_L03_001A9024 < 0x20) {
@@ -68,11 +68,11 @@ typedef struct {
     float w;
 } Vec4;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00282E20(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float vec_length_xy(void *);
 
 extern float D_L03_001B0040 __attribute__((sda));
 extern float D_L03_001B0044 __attribute__((sda));
@@ -81,7 +81,7 @@ extern float D_L03_001B004C __attribute__((sda));
 
 /* Builds a vector with the engine's VU0 helpers, trims its z by the constant the state at
    0xAA names, and stores the two clamped, halved angles in the moby at 0x68. */
-void func_L03_003C4A10(unsigned char *object, void *target) {
+void moby_aim_body_toward_point(unsigned char *object, void *target) {
     Vec4 toTarget;
     Vec4 inverseFrame[4];
     float pitch;
@@ -114,8 +114,8 @@ void func_L03_003C4A10(unsigned char *object, void *target) {
         break;
     }
 
-    yaw = FastMatrixHelperA(toTarget.x, toTarget.y);
-    pitch = -FastMatrixHelperA(vec_length_xy(&toTarget), toTarget.z);
+    yaw = mat_fast_helper_a(toTarget.x, toTarget.y);
+    pitch = -mat_fast_helper_a(vec_length_xy(&toTarget), toTarget.z);
 
     if (yaw > 1.5707964f)
         yaw = 1.5707964f;
@@ -143,14 +143,14 @@ extern unsigned char *D_L03_001B2A1C[3] __attribute__((sda));
 
 extern unsigned short *D_L03_001FB5A0[];
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
-extern void func_00283410(void *, void *);
+extern void euler_to_matrix(void *, void *);
 
 /* Walks the entities of the object's group (the others of its team at +0x95, not in state 0xFE or
    0xFD), puts each one's offset from the object into the frame that faces the point a1, and
    counts -1 when its y is then positive, +1 otherwise; returns the sum clamped to -5..5. */
-int func_L03_003C58F0(unsigned char *object, float *point) {
+int moby_count_teammates_by_side(unsigned char *object, float *point) {
     float angles[4];
     float offset[4];
     float frame[16];
@@ -160,9 +160,9 @@ int func_L03_003C58F0(unsigned char *object, float *point) {
 
     if (object[0x21] == 0xFF)
         return 0;
-    ClearVector128(angles);
+    vec_clear_128(angles);
     score = 0;
-    angles[2] = FastMatrixHelperA(point[0] - *(float *)(object + 0x10), point[1] - *(float *)(object + 0x14));
+    angles[2] = mat_fast_helper_a(point[0] - *(float *)(object + 0x10), point[1] - *(float *)(object + 0x14));
     euler_to_matrix(frame, angles);
     matrix_from_basis_rows(frame, frame);
     for (entryList = D_L03_001FB5A0[object[0x21]];
@@ -194,11 +194,11 @@ int func_L03_003C58F0(unsigned char *object, float *point) {
     return score;
 }
 
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L03_003C4800(unsigned char *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void part_spawn_at_attachment_points(unsigned char *);
 
 /* This function is in levels 3 and 14, which keep the data it reads at other addresses: none of
    it is named by an address. _00 is the level's jump table for the object kind (nine words), _01
@@ -256,7 +256,7 @@ typedef struct {
    func_L03_003C4800 for the object with func_L00_002E6CF0. The kind selects its arm through the
    level's jump table; `cases` only keeps the labels alive, and the labels are named after the
    kind that reaches them. */
-void func_L03_003C4578(L03Obj *object) {
+void moby_pulse_tint(L03Obj *object) {
     static void *cases[9] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c1, &&c8};
     L03State *vars = object->state;
     int pair[2];
@@ -314,7 +314,7 @@ c0:
 join:
         newPhase = FastAddRotations(vars->phase, scale);
         vars->phase = newPhase;
-        wave = FastSinOrCosB(newPhase);
+        wave = math_fast_sin_or_cos_b(newPhase);
         object->tint = FastTweenColor(pair[0], pair[1], wave * 0.5f + 0.5f);
         if (vars->stamp != ref_L03_003C4578_19) {
             for (entryList = ref_L03_003C4578_20[object->group];
@@ -326,16 +326,16 @@ join:
                     break;
                 other->state->stamp = ref_L03_003C4578_19;
             }
-            AddDrawCallbackToList1(SpawnEffectsAtAttachmentPoints, object);
+            gfx_add_draw_callback_first(part_spawn_at_attachment_points, object);
         }
     }
 }
 
-extern float func_00282DF0(float *);
+extern float FastVecLength(float *);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
 /* The level's own copies of the helpers this function calls, at another address in every level
    that has them. */
@@ -355,7 +355,7 @@ extern float ref_L03_003C4240_05 __attribute__((sda));
 
 /* Turns the object with its state: it stops when the state has no time left, otherwise it
    spreads the turn over the frame and lets the state and the object react to it. */
-void func_L03_003C4240(unsigned char *object) {
+void moby_turn_toward_move_direction(unsigned char *object) {
     unsigned char *vars = *(unsigned char **)(object + 0x68);
     unsigned char *target;
     float turnValue;
@@ -366,7 +366,7 @@ void func_L03_003C4240(unsigned char *object) {
         return;
     turnSize = FastVecLength((float *)(vars + 0x1B0));
     if (turnSize > 0.016666668f) {
-        turnValue = FastMatrixHelperA(*(float *)(vars + 0x1B0), *(float *)(vars + 0x1B4));
+        turnValue = mat_fast_helper_a(*(float *)(vars + 0x1B0), *(float *)(vars + 0x1B4));
         turnValue = FastAddRotations(turnValue, 3.14159274f);
         ref_L03_003C4240_00(object, turnValue);
     }

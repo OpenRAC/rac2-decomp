@@ -26,7 +26,7 @@ extern Ent *D_L08_001B29DC __attribute__((sda));
 
 /* handle is valid and the entry's class byte is a live one */
 /* Tells whether the linked object is running (or when there is no link, says yes). */
-s32 func_L08_003D8918(s32 mobyIndex)
+s32 moby_l08_is_linked_running(s32 mobyIndex)
 {
     Ent *mobyTable;
     s32 byteOffset;
@@ -41,7 +41,7 @@ s32 func_L08_003D8918(s32 mobyIndex)
 
 /* handle is valid and the entry's class byte is a live one */
 /* Tells whether the linked object is running (or when there is no link, says yes). */
-s32 func_L08_004229C8(s32 mobyIndex)
+s32 moby_l08_is_linked_running_2(s32 mobyIndex)
 {
     Ent *mobyTable;
     s32 byteOffset;
@@ -56,7 +56,7 @@ s32 func_L08_004229C8(s32 mobyIndex)
 
 /* the entry's two faces are either unset or already gone */
 /* Tells whether the linked object is gone (or when there is no link, says yes). */
-s32 func_L08_003D8948(s32 mobyIndex)
+s32 moby_l08_is_linked_gone(s32 mobyIndex)
 {
     Ent *linked;
     s32 gone;
@@ -72,7 +72,7 @@ s32 func_L08_003D8948(s32 mobyIndex)
 
 /* the entry's two faces are either unset or already gone */
 /* Tells whether the linked object is gone (or when there is no link, says yes). */
-s32 func_L08_003D8990(s32 mobyIndex)
+s32 moby_l08_is_linked_gone_2(s32 mobyIndex)
 {
     Ent *linked;
     s32 gone;
@@ -88,7 +88,7 @@ s32 func_L08_003D8990(s32 mobyIndex)
 
 /* the entry's two faces are either unset or already gone */
 /* Tells whether the linked object is gone (or when there is no link, says yes). */
-s32 func_L08_004229F8(s32 mobyIndex)
+s32 moby_l08_is_linked_gone_3(s32 mobyIndex)
 {
     Ent *linked;
     s32 gone;
@@ -104,7 +104,7 @@ s32 func_L08_004229F8(s32 mobyIndex)
 
 /* the entry's two faces are either unset or already gone */
 /* Tells whether the linked object is gone (or when there is no link, says yes). */
-s32 func_L08_00422A40(s32 mobyIndex)
+s32 moby_l08_is_linked_gone_4(s32 mobyIndex)
 {
     Ent *linked;
     s32 gone;
@@ -120,7 +120,7 @@ s32 func_L08_00422A40(s32 mobyIndex)
 
 /* the entry is a live class or an unset one */
 /* Tells whether the linked object is running or gone (or when there is no link, says yes). */
-s32 func_L08_003D89D8(s32 mobyIndex)
+s32 moby_l08_is_linked_running_or_gone(s32 mobyIndex)
 {
     Ent *linked;
     u32 stateByte;
@@ -138,7 +138,7 @@ s32 func_L08_003D89D8(s32 mobyIndex)
 
 /* the entry is a live class or an unset one */
 /* Tells whether the linked object is running or gone (or when there is no link, says yes). */
-s32 func_L08_00422A88(s32 mobyIndex)
+s32 moby_l08_is_linked_running_or_gone_2(s32 mobyIndex)
 {
     Ent *linked;
     u32 stateByte;
@@ -155,12 +155,12 @@ s32 func_L08_00422A88(s32 mobyIndex)
 }
 
 
-extern volatile s32 D_001A7344[] __attribute__((sda));
+extern volatile s32 g_screen_height[] __attribute__((sda));
 extern void ref_L08_003F76C0_00(void *dest, s32 *position, void *table);
 extern float ref_L08_003F76C0_01(void *work, void *table);
 extern void ref_L08_003F76C0_02(s32 *position, s32 *x, s32 *y);
 extern s32 ref_L08_003F76C0_03(s32 sentinel, u16 x, u16 y, s32 width, s32 rowBytes, s32 flags, float *out);
-extern s32 D_001A7340;
+extern s32 g_screen_width;
 extern float ref_L08_003F76C0_04 __attribute__((sda));
 extern signed char ref_L08_003F76C0_05[];
 
@@ -172,7 +172,7 @@ typedef struct {
 } QueryWork;
 
 /* Looks up the ground height under the object from the level height map, giving -1 when the spot is off the map. */
-float func_L08_003F76C0(void *moby) {
+float level_get_height_map_ground(void *moby) {
     QueryWork query;
     float groundHeight;
     s32 positionAddr;
@@ -182,9 +182,9 @@ float func_L08_003F76C0(void *moby) {
     groundHeight = ref_L08_003F76C0_01(&query, ref_L08_003F76C0_05 + 0x230);
     ref_L08_003F76C0_02((s32 *)positionAddr, &query.x, &query.y);
     if (query.x < 0 ||
-        query.x >= gScreenWidth - 0x10 ||
+        query.x >= g_screen_width - 0x10 ||
         query.y < 0 ||
-        query.y >= gScreenHeight[0] - 8 ||
+        query.y >= g_screen_height[0] - 8 ||
         !(groundHeight > 0.0f) ||
         ref_L08_003F76C0_03(-1, (u16)query.x, (u16)query.y, 0x10, 8, 0, &ref_L08_003F76C0_04) == -1) {
         ref_L08_003F76C0_04 = -1.0f;

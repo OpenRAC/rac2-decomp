@@ -6,26 +6,26 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char D_00139574;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 /* Keep the model load as one macro instruction, as in retail. */
 extern int D_L13_001AC790 __attribute__((sda));
 extern Collision D_L13_001BFD00;
 extern Material D_L13_0026D270[];
-extern void func_00282CC0(char *, char *, char *);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_0038F3D8(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
-extern void func_L00_0038E880(void *, void *, void *);
+extern void FastVecAdd(char *, char *, char *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_spark_puff(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
 
 /* Moves a bouncing shot, checks what it hits, and on impact starts a bounce or a bigger burst after enough hits. */
-void func_L13_00397A18(char *obj) {
+void bouncing_l13_shot_update(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -49,9 +49,9 @@ void func_L13_00397A18(char *obj) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, position, ctx);
-    ComputeViewDirection(position, &frame.surface, 0);
+    cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
-    SpawnSparkPuff(obj);
+    part_spawn_spark_puff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
@@ -59,7 +59,7 @@ void func_L13_00397A18(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L13_0026D270)->material;
     qcopy(&frame.packet.vector, ctx);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
@@ -72,7 +72,7 @@ void func_L13_00397A18(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L13_001BFD00;
             model = reread->hit;
@@ -84,7 +84,7 @@ void func_L13_00397A18(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+            vec_fast_normalize(&frame.velocity, ctx, &reread->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
@@ -93,20 +93,20 @@ void func_L13_00397A18(char *obj) {
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+            vec_fast_normalize(&frame.velocity, ctx, &collision->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(ctx + 0x18)) {
+    } else if (math_fast_float_d(ctx + 0x18)) {
         obj[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        ClearEntryFlag(*(int *)(ctx + 0x1C));
+        table_clear_entry_flag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
         else
-            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(obj, &frame.velocity, &frame.normal);
     }
 }

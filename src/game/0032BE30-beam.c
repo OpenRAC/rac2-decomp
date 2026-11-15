@@ -4,20 +4,20 @@ typedef union { VectorBits bits; float f[4]; } __attribute__((aligned(16))) Beam
 typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { float vertices[4][4]; unsigned int colors[4]; float uv[4][2]; u64 registers[4]; } __attribute__((aligned(16))) BeamQuad;
 typedef struct { float x, y, z, w; } Vec16_Fc936841d;
-extern u64 func_0027C878(int);
-extern void func_0032BDC8(Vec16_Fc936841d *, int);
-extern void func_0032B2F0(char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282DD8(char *, char *, char *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
-extern char D_001B5340[];
+extern u64 GetEffectTextureDescriptor(int);
+extern void gfx_extend_line_by_one_point(Vec16_Fc936841d *, int);
+extern void gfx_reset_draw_packet_copy(char *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecCross(char *, char *, char *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
+extern char g_camera_eye_state[];
 
 /* Draws a two-layer ribbon along sampled points. */
-void func_0032BE30(void *owner, unsigned int opacity, float points[][4], int count)
+void gfx_draw_beam_ribbon(void *owner, unsigned int opacity, float points[][4], int count)
 {
     BeamQuad outer, inner __attribute__((aligned(16)));
     Vector frame[4];
@@ -43,9 +43,9 @@ void func_0032BE30(void *owner, unsigned int opacity, float points[][4], int cou
     outerWidth.f[3] = 1.0f;
     innerWidth.f[2] = 0.16f;
     innerWidth.f[3] = 1.0f;
-    ExtendLineByOnePoint((Vec16_Fc936841d *)points, count);
-    ResetDrawPacketCopy((char *)&outer);
-    ResetDrawPacketCopy((char *)&inner);
+    gfx_extend_line_by_one_point((Vec16_Fc936841d *)points, count);
+    gfx_reset_draw_packet_copy((char *)&outer);
+    gfx_reset_draw_packet_copy((char *)&inner);
     outer.uv[0][0] = 0.0f; outer.uv[0][1] = 0.0f;
     outer.uv[1][0] = 0.0f; outer.uv[1][1] = 1.0f;
     outer.uv[2][0] = 1.0f; outer.uv[2][1] = 0.0f;
@@ -56,7 +56,7 @@ void func_0032BE30(void *owner, unsigned int opacity, float points[][4], int cou
     inner.uv[3][0] = 0.33f; inner.uv[3][1] = 1.0f;
     FastVecSub(frame[0], initial, points[0]);
     vec_scale_to_length(frame[0], frame[0], 1.0f);
-    FastVecSub(frame[1], gCameraState_001B5340, points[0]);
+    FastVecSub(frame[1], g_camera_eye_state, points[0]);
     FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1.0f);
     FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);
@@ -76,7 +76,7 @@ void func_0032BE30(void *owner, unsigned int opacity, float points[][4], int cou
         FastVecScale(inner.vertices[3], inner.vertices[2], -1.0f);
         FastVecSub(frame[0], points[index + 1], points[index]);
         vec_scale_to_length(frame[0], frame[0], 1.0f);
-        FastVecSub(frame[1], gCameraState_001B5340, points[index]);
+        FastVecSub(frame[1], g_camera_eye_state, points[index]);
         FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
         vec_scale_to_length(frame[2], frame[2], 1.0f);
         FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);

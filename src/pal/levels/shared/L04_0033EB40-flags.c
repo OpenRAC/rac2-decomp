@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern void func_PAL_L04_0033EB40(char *,char *,float *,float *,float);
 
 void func_PAL_L04_0033F000(char *a0, char *a1)
@@ -13,10 +13,10 @@ void func_PAL_L04_0033F000(char *a0, char *a1)
 
     qcopy(v, src);
     {
-        float x = v[0] + func_00283180(*(float *)(a0 + 0xF8)) * 100.0f;
+        float x = v[0] + math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * 100.0f;
         float angle = *(float *)(a0 + 0xF8);
         v[0] = x;
-        v[1] += func_00283198(angle) * 100.0f;
+        v[1] += math_fast_sin_or_cos_b(angle) * 100.0f;
     }
     func_PAL_L04_0033EB40(a0, a1, v, w, 1.0f);
 }

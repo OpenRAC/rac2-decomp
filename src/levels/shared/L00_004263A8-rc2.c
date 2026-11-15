@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -25,6 +26,6 @@
 #include "common.h"
 
 /* Camera hook that does nothing and returns 0. */
-s32 func_L00_004263A8(void) {
+s32 cam_hook_return_zero_d(void) {
     return 0;
 }

@@ -7,16 +7,16 @@ extern float D_L20_001B2090 __attribute__((sda));
 
 extern int D_L20_001B2094 __attribute__((sda));
 
-extern void func_L20_00443B60(char *, char *, char *, float *);
+extern void yeedil_boss_compute_shot_launch(char *, char *, char *, float *);
 
-extern void func_L20_0044B100(char *, char *, char *, char *, int, float, int);
+extern void homing_l20_shot_spawn(char *, char *, char *, char *, int, float, int);
 
-extern void func_00282F20(char *, char *, float);
+extern void vec_scale_to_length(char *, char *, float);
 
-extern void func_L20_0044AC38(char *, int, TI128 *, TI128 *);
+extern void turret_spawn_from_group(char *, int, TI128 *, TI128 *);
 
 /* Launches the group shot from the enemy muzzle toward the hero. */
-void func_L20_00444018(char *moby) {
+void yeedil_boss_launch_group_shot(char *moby) {
     TI128 launchPos;
     TI128 launchVelocity;
     TI128 *pa = &launchPos;
@@ -26,20 +26,20 @@ void func_L20_00444018(char *moby) {
 
     aimAngle = 0.78539824f;
     state = *(char **)(moby + 0x68);
-    ComputeShotLaunch(moby, (char *)pa, (char *)pb, &aimAngle);
-    SpawnTurretFromGroup(moby, *(int *)(state + 0x240), pa, pb);
+    yeedil_boss_compute_shot_launch(moby, (char *)pa, (char *)pb, &aimAngle);
+    turret_spawn_from_group(moby, *(int *)(state + 0x240), pa, pb);
 }
 
 /* Launches a damaging shot from the enemy muzzle, scaled by its speed and damage settings. */
-void func_L20_00444088(char *moby) {
+void yeedil_boss_launch_damage_shot(char *moby) {
     char *state = *(char **)(moby + 0x68);
     TI128 launchPos;
     TI128 launchVelocity;
     float aimAngle;
 
     aimAngle = 0.78539824f;
-    ComputeShotLaunch(moby, (char *)&launchPos, (char *)&launchVelocity, (float *)&aimAngle);
+    yeedil_boss_compute_shot_launch(moby, (char *)&launchPos, (char *)&launchVelocity, (float *)&aimAngle);
     vec_scale_to_length((char *)&launchVelocity, (char *)&launchVelocity, D_L20_001B2090 * 0.0166666675f);
-    SpawnHomingShot_L20(moby, (char *)&launchPos, (char *)&launchVelocity, state + 0x1F0, D_L20_001B2094,
+    homing_l20_shot_spawn(moby, (char *)&launchPos, (char *)&launchVelocity, state + 0x1F0, D_L20_001B2094,
                       (float)*(unsigned char *)(state + 0x35), *(int *)(state + 0x210));
 }

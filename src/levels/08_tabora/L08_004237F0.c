@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
@@ -12,7 +13,7 @@ extern s32 func_327898(s32, s32);
 extern void func_329EC0(Ent *, f32);
 
 /* Counts down the creature's timers and ages it by one frame. */
-void func_L08_004237F0(char *moby) {
+void sandfly_tick_timers(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
 

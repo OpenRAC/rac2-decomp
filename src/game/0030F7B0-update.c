@@ -107,43 +107,43 @@ typedef struct {
     char pad24[0xC];
 } __attribute__((aligned(16))) CrateBurst;
 
-extern int D_001B1688 MACRO_ADDR;   /* the frame counter */
-extern char D_00189E20[];
+extern int g_game_time MACRO_ADDR;   /* the frame counter */
+extern char g_hero_state[];
 extern char D_001BF000[];
 extern int D_0018C0BC;
 
 #define HERO ((CrateHero *)D_00189E20)
 
-extern void func_00312600(CrateMoby *);
-extern CrateHit *func_002A9640(CrateMoby *, int, int);
-extern int func_002ABB78(CrateMoby *);
-extern void func_00282C88(void *);
-extern void func_003116E8(CrateMoby *);
-extern void *func_00312E20(CrateMoby *, int);
-extern int func_002B3868(CrateMoby *);
-extern void func_003120C8(CrateMoby *, int, CrateHit *);
-extern void func_00311F70(CrateMoby *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00277F48(void *, int, CrateMoby *, void *, float);
-extern void func_002A9850(CrateMoby *, void *, void *, int, CrateMoby *, int, int, int, float, float, float);
-extern int func_002A7820(int, int);
-extern void func_0029F338(CrateMoby *);
-extern int func_00283DB8(void *, float);
-extern int func_002829A8(unsigned char *);
-extern void func_002A7750(CrateMoby *, int, int);
-extern int func_002A8600(CrateMoby **, int, int, int);
-extern int func_002A86E8(CrateMoby **, CrateMoby *, int, int);
-extern float func_00282E80(void *, void *);
-extern float func_002A89A8(void *, int, float);
-extern void func_002E5CF8(int, int, CrateMoby *);
-extern void func_002A0488(CrateMoby *, int, int, int);
+extern void UpdateCrateStackMotion(CrateMoby *);
+extern CrateHit *part_find_owned_effect_slot(CrateMoby *, int, int);
+extern int moby_is_in_special_class_range(CrateMoby *);
+extern void vec_clear_128(void *);
+extern void GroundAttachedUpdate(CrateMoby *);
+extern void *moby_spawn_linked_child(CrateMoby *, int);
+extern int flag_set_first_pending(CrateMoby *);
+extern void DestroyCrate(CrateMoby *, int, CrateHit *);
+extern void crate_drop_loot(CrateMoby *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern int coll_process_hit(void *, int, CrateMoby *, void *, float);
+extern void moby_queue_knockback_for_nodes(CrateMoby *, void *, void *, int, CrateMoby *, int, int, int, float, float, float);
+extern int math_random_int_range(int, int);
+extern void moby_mark_spawned(CrateMoby *);
+extern int math_fast_helper_a(void *, float);
+extern int vec_fast_helper_a(unsigned char *);
+extern void moby_set_state(CrateMoby *, int, int);
+extern int GetFirstMobyInGroup(CrateMoby **, int, int, int);
+extern int GetNextMobyInGroup(CrateMoby **, CrateMoby *, int, int);
+extern float vec_distance_xy(void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void PlayMobySound(int, int, CrateMoby *);
+extern void set_moby_color(CrateMoby *, int, int, int);
 
 /* Updates a crate each frame. It handles hits, breaking, detonating, and coming back after a while. */
-void func_00310E98(CrateMoby *moby)
+void CrateUpdate(CrateMoby *moby)
 {
     CrateBurst burst;
     float position[4] __attribute__((aligned(16)));
@@ -154,14 +154,14 @@ void func_00310E98(CrateMoby *moby)
     CrateColl *coll = &vars->coll;
 
     if (vars->flags & 0xC) {
-        if (vars->frame != gGameTime) {
+        if (vars->frame != g_game_time) {
             UpdateCrateStackMotion(moby);
         }
     }
     if (vars->above == 0) {
         coll->flags |= 1;
     }
-    hit = FindOwnedEffectSlot(moby, 0x5830001, 0);
+    hit = part_find_owned_effect_slot(moby, 0x5830001, 0);
     touched = 0;
     if (hit != 0 && hit->flags == 0x1000000) {
         hit = 0;
@@ -169,13 +169,13 @@ void func_00310E98(CrateMoby *moby)
     }
     switch (moby->state) {
     case 0:
-        if (vars->above != 0 && !IsMobyInSpecialClassRange(vars->above)) {
+        if (vars->above != 0 && !moby_is_in_special_class_range(vars->above)) {
             vars->above = 0;
         }
-        if (vars->below != 0 && !IsMobyInSpecialClassRange(vars->below)) {
+        if (vars->below != 0 && !moby_is_in_special_class_range(vars->below)) {
             vars->below = 0;
         }
-        ClearVector128(vars->f90);
+        vec_clear_128(vars->f90);
         moby->state = 1;
         vars->fA8 = 0;
         if (moby->oClass == 0x1FF /* Ammo Crate */) {
@@ -191,13 +191,13 @@ void func_00310E98(CrateMoby *moby)
         if (moby->oClass == 0x1FF /* Ammo Crate */) {
             vars->fC6 = 100;
         } else if (moby->oClass == 0x1F5 /* Nanotech Crate */) {
-            vars->linked = SpawnLinkedChildMoby(moby, 0);
+            vars->linked = moby_spawn_linked_child(moby, 0);
         } else if (moby->oClass == 0x200 /* Purple Nanotech Crate */) {
-            vars->linked = SpawnLinkedChildMoby(moby, 1);
+            vars->linked = moby_spawn_linked_child(moby, 1);
         }
         break;
     case 1:
-        if (SetFirstPendingFlag(moby)) {
+        if (flag_set_first_pending(moby)) {
             vars->f100 = 0;
         }
         if (moby->oClass == 0x1F9 /* Explosive Crate */ &&
@@ -206,7 +206,7 @@ void func_00310E98(CrateMoby *moby)
              HERO->ledgeMoby == moby || touched)) {
             if (HERO->f229C == 15) {
                 DestroyCrate(moby, 1, 0);
-                DropCrateLoot(moby);
+                crate_drop_loot(moby);
                 break;
             }
             moby->command = 0;
@@ -224,14 +224,14 @@ void func_00310E98(CrateMoby *moby)
                 if (hit->flags & 0x20000) {
                     moby->command = 1;
                 } else {
-                    moby->command = FloatToInt(RandomFloatRange(5.0f, 15.0f));
+                    moby->command = FloatToInt(math_random_float_range(5.0f, 15.0f));
                 }
                 vars->savedColor = moby->color;
                 doHit = 0;
             }
             if (doHit) {
                 DestroyCrate(moby, moby->oClass == 0x1F9 /* Explosive Crate */, hit);
-                DropCrateLoot(moby);
+                crate_drop_loot(moby);
             }
             moby->hitSlot = 255;
         }
@@ -255,11 +255,11 @@ void func_00310E98(CrateMoby *moby)
             FastVecAdd(position, position, moby->position);
             radius = IntToFloat(vars->burstFrame) * 0.05f;
             burst.f14 = 1;
-            ProcessCollisionHit(position, 16, moby, &burst, radius + radius);
+            coll_process_hit(position, 16, moby, &burst, radius + radius);
             burst.f14 = 0x30000;
-            target = ProcessCollisionHit(position, 16, HERO->moby, 0, radius * 3.0f);
+            target = coll_process_hit(position, 16, HERO->moby, 0, radius * 3.0f);
             if (target != 0) {
-                QueueKnockbackForNodes(moby, position, D_001BF000, target, HERO->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
+                moby_queue_knockback_for_nodes(moby, position, D_001BF000, target, HERO->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
             }
             vars->burstFrame++;
         } else if (vars->respawns != 0) {
@@ -270,10 +270,10 @@ void func_00310E98(CrateMoby *moby)
             }
             moby->state = 6;
             if (vars->respawnTimer != 255) {
-                vars->respawnTimer = RandomIntRange(30, 60);
+                vars->respawnTimer = math_random_int_range(30, 60);
             }
         } else {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             break;
         }
         moby->hitSlot = 255;
@@ -286,11 +286,11 @@ void func_00310E98(CrateMoby *moby)
         qcopy(&burst, moby->position);
         burst.position[2] += 0.5f;
         burst.position[3] = 1.0f;
-        if (FastMathHelperA(&burst, (float)moby->drawDistance) != -1 || !FastVectorHelperA(&vars->respawnTimer)) {
+        if (math_fast_helper_a(&burst, (float)moby->drawDistance) != -1 || !vec_fast_helper_a(&vars->respawnTimer)) {
             goto done;
         }
         if (moby->group == 255) {
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
             moby->flags = (moby->flags & 0xFFBE) | 0x1000;
             moby->collision = moby->pclass->collision;
             break;
@@ -317,7 +317,7 @@ void func_00310E98(CrateMoby *moby)
             GetNextMobyInGroup(&found, found, 0, 0);
         }
         if (moby->state != 1) {
-            moby->position[2] = ProbeGroundHeightBelow(moby->position, 0, 0.5f);
+            moby->position[2] = coll_probe_ground_height_below(moby->position, 0, 0.5f);
             moby->state = 1;
             vars->above = 0;
             vars->below = 0;
@@ -331,7 +331,7 @@ void func_00310E98(CrateMoby *moby)
             moby->command = 179;
             vars->savedColor = moby->color;
         } else if (moby->command >= 16 && hit != 0) {
-            moby->command = FloatToInt(RandomFloatRange(5.0f, 15.0f));
+            moby->command = FloatToInt(math_random_float_range(5.0f, 15.0f));
         }
         if (moby->command % 60 == 57 || moby->command == 13) {
             PlayMobySound(1, 32, moby);
@@ -344,13 +344,13 @@ void func_00310E98(CrateMoby *moby)
         if (moby->command == 1 || D_0018C0BC == 22) {
             moby->color = vars->savedColor;
             DestroyCrate(moby, 1, 0);
-            DropCrateLoot(moby);
+            crate_drop_loot(moby);
         }
         moby->hitSlot = 255;
         moby->command--;
         break;
     case 4:
-        if (FastVectorHelperA(&moby->command)) {
+        if (vec_fast_helper_a(&moby->command)) {
             moby->state = 1;
             moby->flags &= 0xFFFE;
         }

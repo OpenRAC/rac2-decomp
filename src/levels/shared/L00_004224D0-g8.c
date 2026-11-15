@@ -1,21 +1,21 @@
 #include "include_asm.h"
 #include "common.h"
 extern char D_L00_001B8E20[], D_L00_001BF220[], D_L00_001BF230[];
-extern int D_001A79F0;
-extern char *D_0018C0B0 NOT_SDA;
+extern int g_current_map_index;
+extern char *g_hero_moby NOT_SDA;
 extern float D_L00_001B14E8 __attribute__((sda)), D_L00_001B14EC __attribute__((sda));
 extern float D_L00_001B14F0 __attribute__((sda)), D_L00_001B14F4 __attribute__((sda));
-extern void func_00282CC0(void *,void *,void *), func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float),func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float),func_002ACEC0(void *,void *,void *,float);
-extern float func_00282DF0(void *),func_00282DB0(void *,void *),func_00282C48(float),func_002831B0(float);
-extern float func_002702C8(void *,float,float,float,float,float),func_002703B0(void *,float,float,float,float,float);
-extern int func_00277258(void *,int,int,float);
-extern void func_L00_00425A98(char *,float *,float *);
+extern void FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float),FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float),math_apply_axis_rotation_to_quat(void *,void *,void *,float);
+extern float FastVecLength(void *),FastVecDot(void *,void *),math_fabs(float),math_fast_angle_helper(float);
+extern float math_step_spring_damper_clamped(void *,float,float,float,float,float),math_step_spring_damper_stored(void *,float,float,float,float,float);
+extern int coll_test_point(void *,int,int,float);
+extern void cam_follow_get_ease_speeds(char *,float *,float *);
 #define F(p,n) (*(float *)((char *)(p)+(n)))
 #define P(p,n) (*(char **)((char *)(p)+(n)))
 /* Moves the camera eye toward its wanted spot and pushes it out of walls so it never clips into the level. */
-void func_L00_00425CD0(char *obj)
+void cam_follow_move_eye(char *obj)
 {
     char *base=P(obj,112), *move=base+352, *pos=base+96, *camera=D_L00_001B8E20;
     char a[16],b[16],c[16],d[16],e[16],v[16],g[16],h[16],saved[16],delta[16];
@@ -27,25 +27,25 @@ void func_L00_00425CD0(char *obj)
     len1=FastVecLength(move);
     len2=FastVecLength(move+16);
     angle2=0.0f;
-    GetFollowCameraEaseSpeeds(obj,&out1,&out2);
-    len2=StepSpringDamperClamped(move+40,len2,len1,out1,out2,angle2);
+    cam_follow_get_ease_speeds(obj,&out1,&out2);
+    len2=math_step_spring_damper_clamped(move+40,len2,len1,out1,out2,angle2);
     vert1=FastVecDot(move,camera+32);
-    if(FloatAbs(len1)<0.0001f) angle1=0.0f;
+    if(math_fabs(len1)<0.0001f) angle1=0.0f;
     else {
         ratio=vert1/len1;
         if(ratio>1.0f) ratio=1.0f;
         else if(ratio< -1.0f) ratio= -1.0f;
-        angle1=FastAngleHelper(ratio);
+        angle1=math_fast_angle_helper(ratio);
     }
     len1=FastVecDot(move+16,camera+32);
-    if(FloatAbs(len2)<0.0001f) angle2=0.0f;
+    if(math_fabs(len2)<0.0001f) angle2=0.0f;
     else {
         ratio=len1/len2;
         if(ratio>1.0f) ratio=1.0f;
         else if(ratio< -1.0f) ratio= -1.0f;
-        angle2=FastAngleHelper(ratio);
+        angle2=math_fast_angle_helper(ratio);
     }
-    turn=StepSpringDamperStored(move+36,angle2,angle1,D_L00_001B14F0,D_L00_001B14F4,0.0f);
+    turn=math_step_spring_damper_stored(move+36,angle2,angle1,D_L00_001B14F0,D_L00_001B14F4,0.0f);
     FastVecScale(a,camera+32,vert1);
     FastVecSub(b,move,a);
     FastVecScale(c,camera+32,len1);
@@ -56,26 +56,26 @@ void func_L00_00425CD0(char *obj)
     {
         float raw;
         if(len<0.0001f) raw=0.0f;
-        else raw=1.5707963705062866f-FastAngleHelper(vert1/len);
-        angle=StepSpringDamperStored(move+32,0.0f,raw,D_L00_001B14E8,D_L00_001B14EC,0.0f);
+        else raw=1.5707963705062866f-math_fast_angle_helper(vert1/len);
+        angle=math_step_spring_damper_stored(move+32,0.0f,raw,D_L00_001B14E8,D_L00_001B14EC,0.0f);
     }
     FastVecCross(e,d,camera+32);
     dot2=FastVecDot(e,b);
     sign=-1.0f;
     if(dot2>=0.0f) sign=1.0f;
-    ApplyAxisRotationToQuaternion(v,d,camera+32,angle*sign);
+    math_apply_axis_rotation_to_quat(v,d,camera+32,angle*sign);
     FastVecCross(e,camera+32,v);
-    ApplyAxisRotationToQuaternion(v,v,e,turn);
+    math_apply_axis_rotation_to_quat(v,v,e,turn);
     vec_scale_to_length(move+16,v,len2);
     FastVecScale(g,camera+32,F(move,48));
     FastVecAdd(h,g,pos+96);
     FastVecAdd(obj+48,h,move+16);
     qcopy(saved,obj+48);
     changed=0;
-    if(gCurrentMapIndex==13 && F(gHeroMoby_0018C0B0,24)<120.0f) {
+    if(g_current_map_index==13 && F(g_hero_moby,24)<120.0f) {
         int j=0;
         while(j<3) {
-            if(TestPointAgainstCollision(obj+48,54,0,0.3f)) {
+            if(coll_test_point(obj+48,54,0,0.3f)) {
                 changed=1;
                 qcopy(obj+48,D_L00_001BF230);
                 j++;
@@ -84,10 +84,10 @@ void func_L00_00425CD0(char *obj)
     } else {
         i=0;
         do {
-            if(!TestPointAgainstCollision(obj+48,54,0,0.25f)) break;
+            if(!coll_test_point(obj+48,54,0,0.25f)) break;
             FastVecSub(delta,D_L00_001BF220,obj+48);
             vec_scale_to_length(delta,delta,1.0f);
-            if(FloatAbs(FastVecDot(obj+32,delta))<=0.5f) break;
+            if(math_fabs(FastVecDot(obj+32,delta))<=0.5f) break;
             changed=1;
             qcopy(obj+48,D_L00_001BF230);
         } while(++i<3);

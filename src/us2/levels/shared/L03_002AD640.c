@@ -1,52 +1,53 @@
 #include "include_asm.h"
+#include "names.h"
 /* func_US2_L03_002AD640, the USA v2.00 copy of func_L03_002AD540: the same update, with the pad's
    held and pressed words masked while the player's 0x1E0 timer runs and restored on every exit. */
 
 #include "common.h"
 
-extern char D_00138180[];
-extern char D_00189E20[];
+extern char g_pad_state[];
+extern char g_hero_state[];
 extern int D_L03_001A8F00 MACRO_ADDR;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 extern void ref_L03_002AD540_00(void);
-extern void func_L00_002D24E8(void);
+extern void AdvanceHeroAnimation(void);
 extern void ref_L03_002AD540_01(void);
 extern void ref_L03_002AD540_02(void);
 extern void ref_L03_002AD540_03(char *a0, char *a1, char *a2);
 extern void ref_L03_002AD540_04(void);
 extern void ref_L03_002AD540_05(void);
-extern void func_L00_002D2E68(void);
-extern void func_L00_002D3068(void);
-extern void func_L00_002AE0C8(void);
-extern void func_L00_002B9CA8(void);
-extern void func_L00_002AC1A0(void);
-extern void func_L00_002AB1D8(void);
-extern void func_L00_002AB420(void);
-extern void func_L00_002ABBA0(void);
-extern void func_L00_002AB948(void);
-extern void func_L00_002A5518(void);
-extern void func_L00_002A5840(void);
-extern void func_L00_002B7718(void);
-extern void func_L00_002A5368(void);
-extern void func_L00_002A9460(void);
-extern void func_L00_002AA178(int a0);
-extern void func_L00_002B2120(void);
+extern void hero_set_objects_flag_bit(void);
+extern void hero_clear_objects_flag_bit(void);
+extern void RebuildRegionObjectMembership(void);
+extern void UpdateDelayedSounds(void);
+extern void UpdateHeroEasingTargetsAndPointEffects(void);
+extern void cam_update_blend_angles(void);
+extern void UpdateHeroPitchAndYawEasingTargets(void);
+extern void UpdateHeroAutoAimAngles(void);
+extern void UpdateHeroIdleRandomRotationTargets(void);
+extern void ClampHeroControlAndUpdateEffects(void);
+extern void UpdateHeroGlowAndExtraManipulators(void);
+extern void UpdateHeroTiltPoseTargets(void);
+extern void attachment_update_all(void);
+extern void update_hero_moby(void);
+extern void part_spawn_effect_from_record(int a0);
+extern void hero_update_items_and_flags(void);
 extern void func_US2_L00_002B2408(void);
 extern void func_US2_L00_002B22D0(void);
-extern void func_L00_002AFBC0(void);
-extern int func_L00_002D6418(void);
-extern void func_L00_002A7958(void);
-extern void func_L00_002A7748(void);
+extern void hero_update_items_frame(void);
+extern int hero_is_action_allowed(void);
+extern void gfx_fade_screen_effect(void);
+extern void ApplyHeroAxisScales(void);
 extern void func_US2_L00_002A67F8(void);
 extern void func_US2_L00_002D6258(void);
-extern void func_L00_002A6420(void);
-extern void func_L00_002D5158(void);
-extern int func_L00_002A7000(void);
-extern void func_L00_003080D0(void *a0);
+extern void hero_check_targeting_triggers(void);
+extern void UpdateHeroAimAndTransitions(void);
+extern int hero_is_in_swing_or_grind_mode(void);
+extern void coll_clear_map_bits_around_pos(void *a0);
 extern void func_002A677C(int a0);
 extern void ref_L03_002AD540_06(void);
-extern void func_L00_002A9760(void);
+extern void UpdateHeroMobyProbedHeightBounds(void);
 
 void func_US2_L03_002AD640(void) {
     char *pad;
@@ -58,8 +59,8 @@ void func_US2_L03_002AD640(void) {
     int masked;
     int masked_pressed;
 
-    pad = D_00138180;
-    player = D_00189E20;
+    pad = g_pad_state;
+    player = g_hero_state;
     held = *(int *)(pad + 0x1A0);
     pressed = *(int *)(pad + 0x1A4);
     timer = *(short *)(player + 0x1E0);
@@ -74,7 +75,7 @@ void func_US2_L03_002AD640(void) {
     if (timer == 0)
         masked_pressed = *(int *)(pad + 0x1A4);
     *(int *)(pad + 0x1A4) = masked_pressed;
-    p = D_00189E20;
+    p = g_hero_state;
     *(short *)(p + 0x2162) = 0;
     *(short *)(p + 0x2160) = 0;
     if (*(unsigned char *)(p + 0x22B4) != 0) {
@@ -83,7 +84,7 @@ void func_US2_L03_002AD640(void) {
         *(int *)(pad + 0x1A4) = pressed;
         return;
     }
-    func_L00_002D24E8();
+    AdvanceHeroAnimation();
     ref_L03_002AD540_01();
     ref_L03_002AD540_02();
     ref_L03_002AD540_03(p + 0x80, p + 0x90, p + 0x550);
@@ -91,65 +92,65 @@ void func_US2_L03_002AD640(void) {
     ref_L03_002AD540_05();
     if (D_L03_001A8F00 == 2 || D_L03_001A8F00 == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
-            func_L00_002D2E68();
+            hero_set_objects_flag_bit();
         else
-            func_L00_002D3068();
+            hero_clear_objects_flag_bit();
         {
-            char *q = D_00138180;
+            char *q = g_pad_state;
             *(int *)(q + 0x1A0) = held;
             *(int *)(q + 0x1A4) = pressed;
         }
         return;
     }
-    func_L00_002AE0C8();
+    RebuildRegionObjectMembership();
     if (*(unsigned char *)(p + 0x22B4) != 0) {
         *(int *)(pad + 0x1A0) = held;
         *(int *)(pad + 0x1A4) = pressed;
         return;
     }
-    func_L00_002B9CA8();
-    func_L00_002AC1A0();
-    func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
-    func_L00_002A5368();
-    func_L00_002A9460();
-    func_L00_002AA178(0);
-    func_L00_002B2120();
+    UpdateDelayedSounds();
+    UpdateHeroEasingTargetsAndPointEffects();
+    cam_update_blend_angles();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
+    attachment_update_all();
+    update_hero_moby();
+    part_spawn_effect_from_record(0);
+    hero_update_items_and_flags();
     func_US2_L00_002B2408();
     func_US2_L00_002B22D0();
-    func_L00_002AFBC0();
+    hero_update_items_frame();
     {
-        char *q = D_00189E20;
-        if (*(unsigned char *)(q + 0x22B5) != 0 || func_L00_002D6418() != 0)
-            func_L00_002D2E68();
+        char *q = g_hero_state;
+        if (*(unsigned char *)(q + 0x22B5) != 0 || hero_is_action_allowed() != 0)
+            hero_set_objects_flag_bit();
         else
-            func_L00_002D3068();
+            hero_clear_objects_flag_bit();
     }
-    func_L00_002A7958();
-    func_L00_002A7748();
+    gfx_fade_screen_effect();
+    ApplyHeroAxisScales();
     func_US2_L00_002A67F8();
     func_US2_L00_002D6258();
-    func_L00_002A6420();
-    func_L00_002D5158();
+    hero_check_targeting_triggers();
+    UpdateHeroAimAndTransitions();
     {
-        char *q = D_00189E20;
+        char *q = g_hero_state;
         if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F
-             && *(int *)(q + 0x2294) != 0x31) || func_L00_002A7000() != 0)
-            func_L00_003080D0(D_00189EA0);
+             && *(int *)(q + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
+            coll_clear_map_bits_around_pos(g_hero_position);
     }
     {
-        char *q = D_00189E20;
+        char *q = g_hero_state;
         func_002A677C(*(int *)(q + 0x2290));
     }
     ref_L03_002AD540_06();
-    func_L00_002A9760();
+    UpdateHeroMobyProbedHeightBounds();
     {
-        char *q = D_00138180;
+        char *q = g_pad_state;
         *(int *)(q + 0x1A0) = held;
         *(int *)(q + 0x1A4) = pressed;
     }

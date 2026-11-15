@@ -13,14 +13,14 @@ typedef struct {
 } EffectResident;
 typedef struct { char pad0[0xc]; short light; short timer; } FlashState;
 typedef struct { float color[4]; float position[4]; } LightRecord;
-extern EffectResident D_00189E20;
+extern EffectResident g_hero_state;
 extern LightRecord D_L00_001C6F40[];
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
-extern void func_00291450(int);
-extern int func_00282978(void *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
+extern void gfx_free_point_light(int);
+extern int FastDecTimer(void *);
 
 /* Drives a short light flash from a countdown timer: while the timer is 13 or more the
    intensity ramps up as (15 - timer) / 3, below that it fades as timer / 12 (the three
@@ -38,37 +38,37 @@ void func_PAL_L00_00414F80(char *object, void *origin)
     float scale[4] __attribute__((aligned(16)));
     FlashState *state;
     float *axis;
-    int disabled = D_00189E20.mode == 3;
+    int disabled = g_hero_state.mode == 3;
     float a, b, c;
 
     state = *(FlashState **)(object + 0x68);
     if (!disabled && state->timer > 0) {
         if (state->timer >= 11) {
-            float inverse = 1.0f / func_00283CE0(2);
-            a = func_00283CE0(12 - state->timer) * inverse;
-            b = func_00283CE0(12 - state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(12 - state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(2);
+            a = IntToFloat(12 - state->timer) * inverse;
+            b = IntToFloat(12 - state->timer) * (inverse * 0.8f);
+            c = IntToFloat(12 - state->timer) * (inverse * 0.5f);
         } else {
-            float inverse = 1.0f / func_00283CE0(10);
-            a = func_00283CE0(state->timer) * inverse;
-            b = func_00283CE0(state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(10);
+            a = IntToFloat(state->timer) * inverse;
+            b = IntToFloat(state->timer) * (inverse * 0.8f);
+            c = IntToFloat(state->timer) * (inverse * 0.5f);
         }
-        if (D_00189E20.alternate) {
-            func_00282D30(direction, object + 0xd0, -1.0f);
+        if (g_hero_state.alternate) {
+            FastVecScale(direction, object + 0xd0, -1.0f);
             qcopy(position, origin);
             axis = direction;
         } else {
-            qcopy(direction, D_00189E20.axis);
+            qcopy(direction, g_hero_state.axis);
             qcopy(position, origin);
             axis = direction;
         }
-        func_00282D30(offset, D_00189E20.object + 0xe0, 0.3f);
-        func_00282CC0(position, position, offset);
-        func_00282D30(scale, axis, 1.75f);
-        func_00282CC0(position, position, scale);
+        FastVecScale(offset, g_hero_state.object + 0xe0, 0.3f);
+        FastVecAdd(position, position, offset);
+        FastVecScale(scale, axis, 1.75f);
+        FastVecAdd(position, position, scale);
         if (state->light == -1) {
-            state->light = func_L00_002FCF18(position, 14.0f, 0.0f, a, b, c);
+            state->light = part_l00_alloc_effect_slot_2(position, 14.0f, 0.0f, a, b, c);
         } else {
             LightRecord *light = &D_L00_001C6F40[state->light];
             qcopy(light->position, position);
@@ -77,15 +77,15 @@ void func_PAL_L00_00414F80(char *object, void *origin)
             light->color[1] = b;
             light->color[2] = c;
         }
-        func_00282978(&state->timer);
+        FastDecTimer(&state->timer);
     } else if (state->light != -1) {
-        func_00291450(state->light);
+        gfx_free_point_light(state->light);
         state->light = -1;
         state->timer = 0;
     }
     if (disabled) {
         if (state->light != -1) {
-            func_00291450(state->light);
+            gfx_free_point_light(state->light);
             state->light = -1;
         }
         state->timer = 0;

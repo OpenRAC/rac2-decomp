@@ -15,7 +15,7 @@ extern const float D_L18_001B0448 __attribute__((sda));
 extern const float D_L18_001B044C __attribute__((sda));
 extern const float D_L18_001B0450 __attribute__((sda));
 extern void *func_PAL_L00_002D7850(s32);
-extern void func_L00_002D7140(void *);
+extern void cam_end_override(void *);
 
 /* While D_L18_001C9D40 is clear: allocates the vector at +0x80 of the object's state block
    (func_PAL_L00_002D7850(5)) when it has none, else sets it to the constant triple of MODE (1, 2 or
@@ -47,7 +47,7 @@ void func_PAL_L18_003FDE80(char *a0, s32 mode)
             }
         }
     } else {
-        func_L00_002D7140(*(void **)(state + 0x80));
+        cam_end_override(*(void **)(state + 0x80));
         *(int *)(state + 0x80) = 0;
     }
 }

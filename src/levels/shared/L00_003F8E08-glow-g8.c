@@ -55,31 +55,31 @@ extern f32 D_L00_001B0BA4 __attribute__((sda));
 extern f32 D_L00_001B0BA8 __attribute__((sda));
 extern f32 D_L00_001B0BAC __attribute__((sda));
 extern TI128 D_L00_001AA310[];
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
-extern void func_00279BD8(void *, void *);
-extern void func_0027C768(void *, void *, void *);
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, int, int);
-extern void func_00281DE8(void *, s32, s32, s32);
-extern int func_00282978(void *);
-extern float func_00282C48(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_002A7AA8(float, float, float, float, float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern float func_00282DF0(void *);
-extern void func_002FC560(unsigned int, unsigned long long);
+extern void gfx_project_world_point_to_screen(void *, void *);
+extern void gfx_world_to_screen_unit(void *, void *, void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, int, int);
+extern void gfx_init_quad_packet_state(void *, s32, s32, s32);
+extern int FastDecTimer(void *);
+extern float math_fabs(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float cubic_hermite_scalar(float, float, float, float, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern float FastVecLength(void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
 
 static __inline__ u32 pack_alpha(s32 value)
 {
@@ -104,7 +104,7 @@ static __inline__ void set_edge(f32 *v, s32 i, f32 t, f32 half)
 /* Draws a moby's glow: eight camera-facing quads, the screen-edge flare set, then the pvars 0x34 and 0x40 quads.
  * moby is a late copy of the argument, so it has a high pseudo: moby + 0xC0 hashes after the frame addresses and
  * takes the last spill slot. It has to stay the first assignment in the function, or cprop folds it back. */
-void func_L00_003FA858(u8 *self)
+void draw_moby_glow_sprites(u8 *self)
 {
     Quad quad;
     V4 matrix[4];
@@ -153,7 +153,7 @@ void func_L00_003FA858(u8 *self)
     u8 *moby = self;
 
     vars = *(Pv **)(moby + 0x68);
-    FastVecSub(dir, moby + 0x10, gCameraPosition_L00);
+    FastVecSub(dir, moby + 0x10, g_camera_l00_position);
     distance = FastVecLength(dir);
     if (distance != 0.0f) {
         FastVecScale(dir, dir, 1.0f / distance);
@@ -181,10 +181,10 @@ void func_L00_003FA858(u8 *self)
         alpha = FloatToInt(a * dot) << 24;
     } while (0);
 
-    if (FloatAbs(vars->ang[0]) > 0.00001f) {
-        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[0]);
-        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
-        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
+    if (math_fabs(vars->ang[0]) > 0.00001f) {
+        math_build_axis_angle_quat(rot, (f32 *)(moby + 0xC0), vars->ang[0]);
+        vec_rotate_by_quaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        vec_rotate_by_quaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
         qcopy(matrix[1], (f32 *)(moby + 0xD0));
         qcopy(matrix[2], (f32 *)(moby + 0xE0));
@@ -195,7 +195,7 @@ void func_L00_003FA858(u8 *self)
     FastVecScale(matrix[2], matrix[2], size);
     matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
     matrix[3][3] = 1.0f;
-    InitQuadPacketState(&quad, 0x38, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, 0x38, 1, 0x80);
     color = alpha | D_L00_001B0AA4;
     quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
     quad.uv[0][0] = 0.0f;
@@ -211,10 +211,10 @@ void func_L00_003FA858(u8 *self)
     }
     draw_world_quad(&quad, 0, 0);
 
-    if (FloatAbs(vars->ang[0]) > 0.00001f) {
-        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), -vars->ang[0]);
-        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
-        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
+    if (math_fabs(vars->ang[0]) > 0.00001f) {
+        math_build_axis_angle_quat(rot, (f32 *)(moby + 0xC0), -vars->ang[0]);
+        vec_rotate_by_quaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        vec_rotate_by_quaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
         qcopy(matrix[1], (f32 *)(moby + 0xD0));
         qcopy(matrix[2], (f32 *)(moby + 0xE0));
@@ -243,10 +243,10 @@ void func_L00_003FA858(u8 *self)
     alpha = pack_alpha(alpha);
     b = pack_alpha(FloatToInt(a));
     quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = b | 0xFFFFFF;
-    if (FloatAbs(vars->ang[1]) > 0.00001f) {
-        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[1]);
-        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
-        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
+    if (math_fabs(vars->ang[1]) > 0.00001f) {
+        math_build_axis_angle_quat(rot, (f32 *)(moby + 0xC0), vars->ang[1]);
+        vec_rotate_by_quaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        vec_rotate_by_quaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
         qcopy(matrix[1], (f32 *)(moby + 0xD0));
         qcopy(matrix[2], (f32 *)(moby + 0xE0));
@@ -267,7 +267,7 @@ void func_L00_003FA858(u8 *self)
         if (b >= 0x100) {
             b = 0xFF;
         }
-        InitQuadPacketState(&quad, 0x39, 1, 0x80);
+        gfx_init_quad_packet_state(&quad, 0x39, 1, 0x80);
         quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = pack_alpha(b) | 0xFFFFFF;
     }
     quad.uv[0][0] = 0.0f;
@@ -279,10 +279,10 @@ void func_L00_003FA858(u8 *self)
     quad.uv[3][0] = 1.0f;
     quad.uv[3][1] = 1.0f;
     qcopy(basis[3], (f32 *)(moby + 0x10));
-    if (FloatAbs(vars->ang[2]) > 0.00001f) {
-        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[2]);
-        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
-        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
+    if (math_fabs(vars->ang[2]) > 0.00001f) {
+        math_build_axis_angle_quat(rot, (f32 *)(moby + 0xC0), vars->ang[2]);
+        vec_rotate_by_quaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        vec_rotate_by_quaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
         qcopy(matrix[1], (f32 *)(moby + 0xD0));
         qcopy(matrix[2], (f32 *)(moby + 0xE0));
@@ -298,10 +298,10 @@ void func_L00_003FA858(u8 *self)
     }
     draw_world_quad(&quad, 0, 0);
 
-    if (FloatAbs(vars->ang[3]) > 0.00001f) {
-        BuildAxisAngleQuaternion(rot, (f32 *)(moby + 0xC0), vars->ang[3]);
-        RotateVectorByQuaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
-        RotateVectorByQuaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
+    if (math_fabs(vars->ang[3]) > 0.00001f) {
+        math_build_axis_angle_quat(rot, (f32 *)(moby + 0xC0), vars->ang[3]);
+        vec_rotate_by_quaternion(matrix[1], (f32 *)(moby + 0xD0), rot);
+        vec_rotate_by_quaternion(matrix[2], (f32 *)(moby + 0xE0), rot);
     } else {
         qcopy(matrix[1], (f32 *)(moby + 0xD0));
         qcopy(matrix[2], (f32 *)(moby + 0xE0));
@@ -319,20 +319,20 @@ void func_L00_003FA858(u8 *self)
 
     color = alpha | 0xFFFFFF;
     quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
-    FastVecSub(rot, gCameraPosition_L00, (f32 *)(moby + 0x10));
+    FastVecSub(rot, g_camera_l00_position, (f32 *)(moby + 0x10));
     vec_scale_to_length(rot, rot, 0.25f);
     FastVecAdd(matrix[3], (f32 *)(moby + 0x10), rot);
-    ComputeViewDirection(basis[3], basis[4], 1);
-    FastVecSub(basis[0], gCameraPosition_L00, matrix[3]);
+    cam_compute_view_direction(basis[3], basis[4], 1);
+    FastVecSub(basis[0], g_camera_l00_position, matrix[3]);
     vec_scale_to_length(basis[0], basis[0], 1.0f);
     FastVecCross(basis[1], basis[0], basis[4]);
     vec_scale_to_length(basis[1], basis[1], 1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
 
-    if (FloatAbs(vars->ang[4]) > 0.00001f) {
-        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[4]);
-        RotateVectorByQuaternion(matrix[1], basis[1], v140);
-        RotateVectorByQuaternion(matrix[2], basis[2], v140);
+    if (math_fabs(vars->ang[4]) > 0.00001f) {
+        math_build_axis_angle_quat(v140, basis[0], vars->ang[4]);
+        vec_rotate_by_quaternion(matrix[1], basis[1], v140);
+        vec_rotate_by_quaternion(matrix[2], basis[2], v140);
     } else {
         qcopy(matrix[1], basis[1]);
         qcopy(matrix[2], basis[2]);
@@ -347,10 +347,10 @@ void func_L00_003FA858(u8 *self)
     }
     draw_world_quad(&quad, 0, 0);
 
-    if (FloatAbs(vars->ang[5]) > 0.00001f) {
-        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[5]);
-        RotateVectorByQuaternion(matrix[1], basis[1], v140);
-        RotateVectorByQuaternion(matrix[2], basis[2], v140);
+    if (math_fabs(vars->ang[5]) > 0.00001f) {
+        math_build_axis_angle_quat(v140, basis[0], vars->ang[5]);
+        vec_rotate_by_quaternion(matrix[1], basis[1], v140);
+        vec_rotate_by_quaternion(matrix[2], basis[2], v140);
     } else {
         qcopy(matrix[1], basis[1]);
         qcopy(matrix[2], basis[2]);
@@ -367,13 +367,13 @@ void func_L00_003FA858(u8 *self)
     draw_world_quad(&quad, 0, 0);
 
     t2 = pack_alpha(FloatToInt(IntToFloat((u8)(alpha >> 24)) * 0.2f));
-    InitQuadPacketState(&quad, 0x38, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, 0x38, 1, 0x80);
     color = t2 | 0xFFFFFF;
     quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
-    if (FloatAbs(vars->ang[1]) > 0.00001f) {
-        BuildAxisAngleQuaternion(v140, basis[0], vars->ang[1]);
-        RotateVectorByQuaternion(matrix[1], basis[1], v140);
-        RotateVectorByQuaternion(matrix[2], basis[2], v140);
+    if (math_fabs(vars->ang[1]) > 0.00001f) {
+        math_build_axis_angle_quat(v140, basis[0], vars->ang[1]);
+        vec_rotate_by_quaternion(matrix[1], basis[1], v140);
+        vec_rotate_by_quaternion(matrix[2], basis[2], v140);
     } else {
         qcopy(matrix[1], basis[1]);
         qcopy(matrix[2], basis[2]);
@@ -390,7 +390,7 @@ void func_L00_003FA858(u8 *self)
     draw_world_quad(&quad, 0, 0);
 
     if (FastDecTimer(&vars->t36) == 0) {
-        ProjectWorldPointToScreen(v140, (f32 *)(moby + 0x10));
+        gfx_project_world_point_to_screen(v140, (f32 *)(moby + 0x10));
         if (v140[0] >= 28492.0f && v140[0] <= 37082.0f && v140[1] >= 28492.0f && v140[1] <= 37082.0f) {
             f32 h;
             inv = 0.000116414434f;
@@ -400,8 +400,8 @@ void func_L00_003FA858(u8 *self)
             span = 8590.0f;
             k = (f32)vars->t36 * vars->k38;
             alpha = pack_alpha(FloatToInt(D_L00_001B0BA0 * k));
-            ApplyAxisRotationToQuaternion(v150, basis[4], dir, 0.78539824f);
-            InitQuadPacketState(&quad, D_L00_001B0B88, 1, 0x80);
+            math_apply_axis_rotation_to_quat(v150, basis[4], dir, 0.78539824f);
+            gfx_init_quad_packet_state(&quad, D_L00_001B0B88, 1, 0x80);
             least = v140[1] <= v140[0] ? v140[1] : v140[0];
             t = least * inv;
             color = alpha | D_L00_001B0B98;
@@ -437,7 +437,7 @@ void func_L00_003FA858(u8 *self)
                 vec_scale_to_length(v150, v150, *s);
                 FastVecCross(v180, dir, v150);
                 vec_scale_to_length(v180, v180, D_L00_001B0B90);
-                FastVecAdd(v190, gCameraPosition_L00, v170);
+                FastVecAdd(v190, g_camera_l00_position, v170);
                 FastVecSub(v1A0, v190, (f32 *)(moby + 0x10));
                 FastVecAdd(&quad.corner[0], v190, v180);
                 FastVecSub(&quad.corner[1], v190, v180);
@@ -448,7 +448,7 @@ void func_L00_003FA858(u8 *self)
                 FastVecSub(&quad.corner[3], v190, v180);
                 draw_world_quad(&quad, 0, 0);
                 if (i9 < 3) {
-                    ApplyAxisRotationToQuaternion(v150, v150, dir, 1.5707965f);
+                    math_apply_axis_rotation_to_quat(v150, v150, dir, 1.5707965f);
                 }
                 s++;
             }
@@ -457,7 +457,7 @@ void func_L00_003FA858(u8 *self)
 
     if (vars->t34 != 0) {
         k = IntToFloat(vars->t34) * vars->k3C;
-        InitQuadPacketState(&quad, 0xB, 4, 0x80);
+        gfx_init_quad_packet_state(&quad, 0xB, 4, 0x80);
         color = pack_alpha(FloatToInt(k * 255.0f)) | 0x808080;
         quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
         quad.uv[0][0] = 0.0f;
@@ -468,9 +468,9 @@ void func_L00_003FA858(u8 *self)
         quad.uv[2][1] = 0.0f;
         quad.uv[3][0] = 1.0f;
         quad.uv[3][1] = 1.0f;
-        FastVecSub(v140, (f32 *)(moby + 0x10), gCameraPosition_L00);
+        FastVecSub(v140, (f32 *)(moby + 0x10), g_camera_l00_position);
         vec_scale_to_length(v150, v140, 0.1f);
-        FastVecAdd(v160, gCameraPosition_L00, v150);
+        FastVecAdd(v160, g_camera_l00_position, v150);
         FastVecCross(v170, v140, basis[4]);
         vec_scale_to_length(v170, v170, D_L00_001B0B70);
         FastVecCross(v180, v170, v140);
@@ -488,10 +488,10 @@ void func_L00_003FA858(u8 *self)
         f32 sz;
         k = IntToFloat(vars->t40) * vars->k44;
         sz = D_L00_001B0B80 + (D_L00_001B0B7C - D_L00_001B0B80) * k;
-        FastVecSub(v140, (f32 *)(moby + 0x10), gCameraPosition_L00);
+        FastVecSub(v140, (f32 *)(moby + 0x10), g_camera_l00_position);
         vec_scale_to_length(v140, v140, 0.3f);
-        FastVecAdd(v150, gCameraPosition_L00, v140);
-        InitQuadPacketState(&quad, D_L00_001B0B84, 1, 0x80);
+        FastVecAdd(v150, g_camera_l00_position, v140);
+        gfx_init_quad_packet_state(&quad, D_L00_001B0B84, 1, 0x80);
         quad.d88 = (0x8000LL << 24) | 0x4A;
         color = pack_alpha(FloatToInt(k * 255.0f)) | 0x808080;
         quad.rgba[0] = quad.rgba[1] = quad.rgba[2] = quad.rgba[3] = color;
@@ -526,7 +526,7 @@ void func_L00_003FA858(u8 *self)
             FastVecSub(v1B0, &quad.corner[i11], v1A0);
             FastVecScale(v1B0, v1B0, 0.8f);
             FastVecAdd(v1B0, v1A0, v1B0);
-            ProjectWorldToScreen(&quad.corner[i11], &quad.uv[i11][0], &quad.uv[i11][1]);
+            gfx_world_to_screen_unit(&quad.corner[i11], &quad.uv[i11][0], &quad.uv[i11][1]);
             if (quad.uv[i11][0] > 0.9f) {
                 quad.uv[i11][0] = 0.9f;
             } else if (quad.uv[i11][0] < 0.0f) {

@@ -2,10 +2,10 @@
 
 extern int D_001AEBB8 __attribute__((sda));
 extern int D_001AEBBC __attribute__((sda));
-extern float D_L30_00233A60[];
+extern float g_museum_water_heights[];
 
 /* Advance the interior of the 24-by-24 height field, then exchange its banks. */
-void func_L30_00382FB8(void)
+void StepMuseumHeightField(void)
 {
     int source = D_001AEBB8 * 0x900;
     int destination = D_001AEBBC * 0x900;
@@ -24,15 +24,15 @@ void func_L30_00382FB8(void)
         current += sourceCenter;
         for (column = 1; column < 23; column++) {
             int at = column * 4;
-            float sum = *(float *)(previous+at+(char *)gMuseumWaterHeights)
-                     +*(float *)(next+at+(char *)gMuseumWaterHeights)
-                     +*(float *)(current+at-8+(char *)gMuseumWaterHeights)
-                     +*(float *)(current+at+(char *)gMuseumWaterHeights)
-                     +*(float *)(previous+at-4+(char *)gMuseumWaterHeights)
-                     +*(float *)(previous+at+4+(char *)gMuseumWaterHeights)
-                     +*(float *)(next+at-4+(char *)gMuseumWaterHeights)
-                     +*(float *)(next+at+4+(char *)gMuseumWaterHeights);
-            float *cell = (float *)(out+at+(char *)gMuseumWaterHeights);
+            float sum = *(float *)(previous+at+(char *)g_museum_water_heights)
+                     +*(float *)(next+at+(char *)g_museum_water_heights)
+                     +*(float *)(current+at-8+(char *)g_museum_water_heights)
+                     +*(float *)(current+at+(char *)g_museum_water_heights)
+                     +*(float *)(previous+at-4+(char *)g_museum_water_heights)
+                     +*(float *)(previous+at+4+(char *)g_museum_water_heights)
+                     +*(float *)(next+at-4+(char *)g_museum_water_heights)
+                     +*(float *)(next+at+4+(char *)g_museum_water_heights);
+            float *cell = (float *)(out+at+(char *)g_museum_water_heights);
             float value = sum * 0.25f - *cell;
             *cell = value - value * 0.0625f;
         }

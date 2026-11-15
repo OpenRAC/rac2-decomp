@@ -36,9 +36,9 @@ extern float D_L01_001AF510 __attribute__((sda));
 extern float D_L01_001AF514 __attribute__((sda));
 extern float D_L01_001AF528 __attribute__((sda));
 extern int D_L01_001AF54C __attribute__((sda));
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern int func_002A77E0(int);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern int math_random_int_below(int);
 extern void func_PAL_L01_0041C0D8(Obj_397870 *);
 
 extern float D_PAL_001B1A48 __attribute__((sda));
@@ -55,16 +55,16 @@ void func_PAL_L01_0041BF10(Obj_397870 *a0)
     a0->f2C = a0->cls->f24 * D_PAL_001B1A48;
 
     if (a0->b20 == 1) {
-        f = func_00283198(a0->fFC);
+        f = math_fast_sin_or_cos_b(a0->fFC);
         a0->f18 = s1->f18 + D_PAL_001B1A4C + D_PAL_001B1A50 * f;
-        a0->fF0 = func_00283B98(a0->fF0, s1->f68);
-        a0->fF4 = func_00283B98(a0->fF4, s1->f64);
-        a0->fF8 = func_00283B98(a0->fF8, s1->f60);
-        a0->fFC = func_00283B98(a0->fFC, 0.0003490659f * D_PAL_001B1A64);
+        a0->fF0 = FastAddRotations(a0->fF0, s1->f68);
+        a0->fF4 = FastAddRotations(a0->fF4, s1->f64);
+        a0->fF8 = FastAddRotations(a0->fF8, s1->f60);
+        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * D_PAL_001B1A64);
     }
 
     func_PAL_L01_0041C0D8(a0);
-    if (func_002A77E0(D_PAL_001B1A88) == 0)
+    if (math_random_int_below(D_PAL_001B1A88) == 0)
         func_PAL_L01_0041C560(a0);
 }
 

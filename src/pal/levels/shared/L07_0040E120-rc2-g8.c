@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  * 
@@ -26,7 +27,7 @@
 /* func_PAL_L07_0040E120, the PAL copy of func_L07_00409300: the same C, where both float
  * arguments are scaled by 6/5 and case 1 first leaves when D_001A79F0 (the current area) is 0x33. */
 
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern s32 ref_L07_00409300_00 __attribute__((sda));
 
 extern void ref_L07_00409300_01(s8 *, s32, s32);
@@ -43,7 +44,7 @@ void func_PAL_L07_0040E120(s8 *arg0) {
         ref_L07_00409300_01(arg0, 1, -1);
         return;
     case 1:
-        if (D_001A79F0 == 0x33) {
+        if (g_current_map_index == 0x33) {
             break;
         }
         if (s != 0) {

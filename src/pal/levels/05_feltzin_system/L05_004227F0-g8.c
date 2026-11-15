@@ -15,7 +15,7 @@ typedef struct {
     int warmup, delay, first, second, third, fourth, fifth, timeout;
 } State05;
 extern unsigned char D_001395B8[];
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern unsigned char D_L05_001B2000[] __attribute__((sda)), D_L05_001B2001[] __attribute__((sda)), D_L05_001B2002[] __attribute__((sda));
 extern float D_L05_001B2004[] __attribute__((sda)), D_L05_001B2008[] __attribute__((sda)), D_L05_001B200C[] __attribute__((sda)), D_L05_001B2010[] __attribute__((sda));
 extern int D_L05_001B2014[] __attribute__((sda));
@@ -28,20 +28,20 @@ extern int D_L05_001A8F00[] __attribute__((sda));
 extern int D_L05_001A904C MACRO_ADDR;
 extern float D_L05_001B2D84[] __attribute__((sda));
 extern char *D_L05_001B251C[] __attribute__((sda));
-extern void func_L05_00379F18(int), func_L05_00379F28(int), func_L05_00379B60(void);
-extern void func_L05_0030C930(int, int), func_L00_003294F0(void *, int);
+extern void hero_set_state_value_a(int), hero_set_state_value_b(int), level_select_random_object(void);
+extern void level_store_pair_with_increment(int, int), moby_set_flag_bit(void *, int);
 extern int func_PAL_L00_002C4480(int, int);
-extern void func_L05_00379F48(int);
+extern void hero_set_state_value_c(int);
 extern int func_PAL_L05_00423A68(void);
 extern void func_PAL_L05_0044BEB8(void);
 extern int func_PAL_00289730(int, int);
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 extern void func_PAL_L05_004262B0(void *), func_PAL_L05_00426658(void *);
 extern void func_PAL_L05_004267E0(void *), func_PAL_L05_00426930(void *);
 extern void func_PAL_0029C0F0(int, void *);
-extern int func_L05_00442860(void);
+extern int cam_is_mode_active(void);
 extern void func_PAL_L05_004253C8(void), func_PAL_L05_00425518(void), func_PAL_L05_00422CA8(void);
-extern int func_L05_0041FFF8(char *, int);
+extern int feltzin_target_damage(char *, int);
 extern int D_L05_001B1360 __attribute__((sda));
 extern int D_L05_001B13B0 __attribute__((sda));
 extern int D_L05_001B13E8 __attribute__((sda));
@@ -105,10 +105,10 @@ void func_PAL_L05_004227F0(char *object)
         D_L05_001B3554[0] = 450;
         D_L05_00221D10.callbacks[0] = func_PAL_L05_004253C8;
         D_L05_00221D10.callbacks[1] = func_PAL_L05_00425518;
-        D_L05_00221D10.callbacks[2] = func_L05_0041FFF8;
+        D_L05_00221D10.callbacks[2] = feltzin_target_damage;
         D_L05_00221D10.object = object;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
+        hero_set_state_value_a(1);
+        hero_set_state_value_b(0);
         D_L05_001AA6A0[0] = (int)func_PAL_L05_004253C8;
         D_L05_001AA6A8[0] = (int)func_PAL_L05_00425518;
         D_L05_001B1350 = D_001395B8[0x61];
@@ -117,7 +117,7 @@ void func_PAL_L05_004227F0(char *object)
         D_L05_001B135C[0] = D_001395B8[0x64];
         if (!D_L05_001B1350) D_L05_001B13F4 = 1;
         else D_L05_001B13F4 = 0;
-        hero = D_00189E20;
+        hero = g_hero_state;
         D_L05_001B3558[0] = D_L05_001B2000[0];
         D_L05_001B3559[0] = D_L05_001B2001[0];
         D_L05_001B355A[0] = D_L05_001B2002[0];
@@ -137,17 +137,17 @@ void func_PAL_L05_004227F0(char *object)
         /* fall through */
     case 1:
         one = 1;
-        func_L05_00379B60();
-        func_L05_0030C930((int)(D_L05_001B2D84[0] * -230.0f + 0.5f), 2);
+        level_select_random_object();
+        level_store_pair_with_increment((int)(D_L05_001B2D84[0] * -230.0f + 0.5f), 2);
         if (!D_L05_001B13D4) {
-            func_L00_003294F0(D_L05_001B251C[0] + sub->target*256,1);
+            moby_set_flag_bit(D_L05_001B251C[0] + sub->target*256,1);
             D_L05_001B13D4 = one;
             D_L05_001B13D8 = 0;
         }
         if (D_L05_001B13D8++ < 5 || D_L05_001A8F00[0] == 2) break;
         func_PAL_L00_002C4480(0x31,0);
         if (D_L05_001B13E8) {
-            func_L05_00379F48(1);
+            hero_set_state_value_c(1);
             D_L05_001B1360 = func_PAL_L05_00423A68();
             if (D_L05_001B1360 != -2) func_PAL_L05_0044BEB8();
             break;
@@ -156,9 +156,9 @@ void func_PAL_L05_004227F0(char *object)
             func_PAL_00289730(0xA17,110);
             D_L05_001B13E0 = one;
         }
-        if (func_00282948((char *)sub+0x54)) D_L05_00221D10.pending = 0;
+        if (math_fast_float_d((char *)sub+0x54)) D_L05_00221D10.pending = 0;
         else D_L05_00221D10.pending = one;
-        func_L05_00379F48(0);
+        hero_set_state_value_c(0);
         if (D_L05_001B1360 != -2 && D_L05_001B2048 >= 3) {
             switch (D_L05_001B1360) {
             case 0: func_PAL_L05_004262B0(object); break;
@@ -175,7 +175,7 @@ void func_PAL_L05_004227F0(char *object)
         break;
     case 2: break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!cam_is_mode_active()) {
             D_L05_00221D10.pending = 0;
             D_L05_00221D10.count++;
             object[0x20] = 1;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef struct {
@@ -13,12 +14,12 @@ typedef struct {
     int mode;
 } FlashResidentFields;
 extern FlashResidentFields D_00189E20_2;
-extern unsigned char D_00139568[];
-extern char D_L00_00262570[];
-extern void func_002A04B8(void *owner, int *a1, int *a2, int *a3);
-extern void func_002A0488(void *owner, int a1, int a2, int a3);
-extern void func_L00_002A7070(void);
-extern void func_L00_002A70F0(int first, void *second);
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_l00_table[];
+extern void get_moby_color(void *owner, int *a1, int *a2, int *a3);
+extern void set_moby_color(void *owner, int a1, int a2, int a3);
+extern void hero_copy_color_to_slot_objects(void);
+extern void hero_empty_hook(int first, void *second);
 
 void func_PAL_L00_002A7390(void)
 {
@@ -27,7 +28,7 @@ void func_PAL_L00_002A7390(void)
     if (D_00189E20_2.mode == 125 || D_00189E20_2.mode == 127)
         active = D_00189E20_2.frame < 25;
     if (active) {
-        func_002A04B8(D_00189E20_2.owner, &r, &g, &b);
+        get_moby_color(D_00189E20_2.owner, &r, &g, &b);
 
         if (D_00189E20_2.frame % 4 < 3) {
             r = 0;
@@ -39,19 +40,19 @@ void func_PAL_L00_002A7390(void)
             b = 0xF0;
         }
 
-        func_002A0488(D_00189E20_2.owner, r, g, b);
-        func_L00_002A7070();
+        set_moby_color(D_00189E20_2.owner, r, g, b);
+        hero_copy_color_to_slot_objects();
     }
 
     if (D_00189E20_2.index >= 0) {
-        unsigned char index = D_00139568[D_00189E20_2.index];
-        char *record = D_L00_00262570 + index * 0xE0;
+        unsigned char index = g_item_slot_to_record[D_00189E20_2.index];
+        char *record = g_weapon_l00_table + index * 0xE0;
 
         if (*(u8 *)(record + 4) != 0) {
             int state = D_00189E20_2.state;
 
             if (state != 0)
-                func_L00_002A70F0(state, D_00189E20_2.owner);
+                hero_empty_hook(state, D_00189E20_2.owner);
         }
     }
 }

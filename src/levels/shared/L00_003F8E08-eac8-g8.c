@@ -15,7 +15,7 @@ typedef struct {
 
 /* The boot's resident byte that picks the table row. */
 extern u8 D_00139581[];
-extern TableEntry_L00_003FEAC8 D_L00_00262570[];
+extern TableEntry_L00_003FEAC8 g_weapon_l00_table[];
 extern float D_L00_001B0C14 __attribute__((sda));
 
 /* Call targets that sit at another address in each level (level 00: 0x3FEBA0 is
@@ -27,7 +27,7 @@ extern char *ref_L00_003FEAC8_03(void *pos, void *direction, void *owner, float 
 
 /* Sparks along direction from pos, then spawns an object there, stores it in the owner's
    slot and links it back to the owner. */
-void func_L00_003FEAC8(char *obj, char *pos, void *direction, int slot)
+void part_spawn_linked_effect_with_sparks(char *obj, char *pos, void *direction, int slot)
 {
     SpawnSlots_L00_003FEAC8 *slots = *(SpawnSlots_L00_003FEAC8 **)(obj + 0x68);
     float dir[4] __attribute__((aligned(16)));
@@ -37,7 +37,7 @@ void func_L00_003FEAC8(char *obj, char *pos, void *direction, int slot)
     char *spawned;
 
     qcopy(dir, direction);
-    entry = gWeaponTable_L00 + D_00139581[0];
+    entry = g_weapon_l00_table + D_00139581[0];
     scale = entry->scale;
     ref_L00_003FEAC8_00(obj, pos, direction);
     length = ref_L00_003FEAC8_01(dir);

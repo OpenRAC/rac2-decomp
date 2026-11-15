@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -37,7 +38,7 @@ void ref_L01_0042E0A8_02(void *, void *, void *);
 void ref_L01_0042E0A8_03(s32, s32);
 
 /* Checks if the player is inside a box around the moby and calls one of two actions when the player leaves on a side. */
-void func_L01_0042E0A8(void *moby) {
+void box_exit_trigger_update(void *moby) {
     u8 *self  = (u8 *)moby;
     s32 *state  = (*(s32 *)((s8 *)(moby) + (8)));
     f32 limit  = 1.0f;

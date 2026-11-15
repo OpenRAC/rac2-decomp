@@ -4,14 +4,14 @@ extern float D_L12_001B1C74 __attribute__((sda));
 extern float D_L12_001B1C70 __attribute__((sda));
 extern u8 D_L12_001B9E00[];
 
-extern void func_002A7750(char *, int, int);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002B60B0(char *, float, float, float, float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
+extern void moby_set_state(char *, int, int);
+extern void anim_start_blended(char *, int, int, int);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
 
 /* Sets up the path enemy on its first frame and every frame scales it and hides it if the hero is close. */
-void func_L12_0041A2B8(char *moby) {
+void path_enemy_init_scale(char *moby) {
     char *state = *(char **)(moby + 0x68);
     float rate;
 
@@ -22,9 +22,9 @@ void func_L12_0041A2B8(char *moby) {
         *(float *)(state + 0x21C) = *(float *)(moby + 0xF8);
         *(int *)(moby + 0x98) = 0;
         *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
-        SetMobyState(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         if (*(u8 *)(moby + 0x43) != 0) {
-            StartAnimationBlended(moby, 0, 0, 0);
+            anim_start_blended(moby, 0, 0, 0);
         }
         {
             float half = 0.5f;
@@ -42,14 +42,14 @@ void func_L12_0041A2B8(char *moby) {
             *(int *)(state + 0x15C) = -1;
             *(float *)(state + 0x130) = pi;
         }
-        SetControllerSpeedLimits(moby, 0.0088888891f, rate, 0.00349065894f, 0.209439546f);
+        moby_set_controller_speed_limits(moby, 0.0088888891f, rate, 0.00349065894f, 0.209439546f);
         *(int *)(state + 0x11C) = 0;
         *(int *)(state + 0x258) = 0;
     }
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L12_001B1C70;
     if (*(u8 *)(moby + 0x31) != 0) {
         if (fast_vec_dist(moby + 0x10, D_L12_001B9E00) < 24.0f) {
-            UpdateMobyGroundCheck(moby);
+            moby_update_ground_check(moby);
             *(u8 *)(moby + 0x6F) = 0x16;
         }
     }

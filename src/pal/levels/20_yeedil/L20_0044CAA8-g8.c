@@ -5,7 +5,7 @@ extern u16 *D_L20_001FBB20[];
 extern u8 *D_L20_001B2F9C[] __attribute__((sda));
 extern int D_L20_001B2FB8 __attribute__((sda));
 extern void func_PAL_002A7650(void *, int, int);
-extern void func_L18_003F74B8(u8 *, int);
+extern void protopet_end_action(u8 *, int);
 
 /* For every entity of the object's group (the id list D_L20_001FBB20[self[0x21]], ids masked
    with 0x7FFF, 0x100-byte records at D_L20_001B2F9C) of class 0xB69 whose state byte is neither
@@ -29,7 +29,7 @@ void func_PAL_L20_0044D1C8(u8 *self) {
             break;
         if (*(s16 *)(e + 0xAA) == 0xB69 && e[0x20] != 0xFE && e[0x20] != 0xFD) {
             func_PAL_002A7650(e, 0, 1);
-            func_L18_003F74B8(e, 0);
+            protopet_end_action(e, 0);
         }
     }
 }

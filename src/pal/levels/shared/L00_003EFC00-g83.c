@@ -2,8 +2,8 @@
 
 #include "common.h"
 typedef struct { char pad[0x80]; float x, y; } PositionBase;
-extern PositionBase D_00189E20 __attribute__((nosda));
-extern char D_00189EA0[] __attribute__((nosda));
+extern PositionBase g_hero_state __attribute__((nosda));
+extern char g_hero_position[] __attribute__((nosda));
 extern float D_L00_001B0788 __attribute__((sda));
 extern float D_L00_001B078C __attribute__((sda));
 extern float D_L00_001B0790 __attribute__((sda));
@@ -55,7 +55,7 @@ void func_PAL_L00_003EFF80(char *object, char *state)
     int hit;
     char *target;
     ref_L00_003D4548_00(difference, state, object + 0x10);
-    distance = ref_L00_003D4548_01(object + 0x10, D_00189EA0);
+    distance = ref_L00_003D4548_01(object + 0x10, g_hero_position);
     ref_L00_003D4548_01(object + 0x10, state);
     switch (*(unsigned char *)(object + 0xbc)) {
     case 0:
@@ -97,8 +97,8 @@ void func_PAL_L00_003EFF80(char *object, char *state)
         }
         if (distance < 1.1f) {
             correction = 1.1f - distance;
-            angle = ref_L00_003D4548_08(D_00189E20.x - *(float *)(object + 0x10),
-                                      D_00189E20.y - *(float *)(object + 0x14));
+            angle = ref_L00_003D4548_08(g_hero_state.x - *(float *)(object + 0x10),
+                                      g_hero_state.y - *(float *)(object + 0x14));
             *(float *)(state + 0x10) -= correction * ref_L00_003D4548_09(angle) * 0.14400001f;
             *(float *)(state + 0x14) -= correction * ref_L00_003D4548_10(angle) * 0.14400001f;
         }

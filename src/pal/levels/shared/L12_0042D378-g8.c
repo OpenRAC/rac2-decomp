@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern void func_0029FC20(char *, int, void *);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L12_004281D8(u8 *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern void moby_transform_joint_point(char *, int, void *);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void group_draw_entity_glows(u8 *);
 extern unsigned short *D_L12_001FB960[];
 extern int D_L12_001B2EB8 __attribute__((sda));
 extern u8 *D_L12_001B2E9C[3] __attribute__((sda));
@@ -54,11 +55,11 @@ void func_PAL_L12_0042D5E8(struct L12Kind348Object *a0) {
     struct L12Kind348Entity *e;
     struct L12Kind348 *s0;
 
-    f = func_00283B98(o->f348, 0.25132746f);
+    f = FastAddRotations(o->f348, 0.25132746f);
     o->f348 = f;
-    f = func_00283198(f);
+    f = math_fast_sin_or_cos_b(f);
     o->f34C = f * 0.5f + 0.5f;
-    a0->f78 = func_00283D38(v.a, v.b, o->f34C);
+    a0->f78 = FastTweenColor(v.a, v.b, o->f34C);
     if (o->f350 != D_L12_001B29C8_s) {
         for (q = D_L12_001FB960[a0->group];
              a0->group != 0xFF && a0->group <= D_L12_001B2EB8 && q != 0 &&
@@ -69,10 +70,10 @@ void func_PAL_L12_0042D5E8(struct L12Kind348Object *a0) {
                 break;
             if (e->f31 != 0 && e->type == 0x11EB && e->state != 0xFE && e->state != 0xFD) {
                 s0 = e->obj;
-                func_0029FC20((char *)e, 0, (char *)s0 + 0x240);
+                moby_transform_joint_point((char *)e, 0, (char *)s0 + 0x240);
                 s0->f350 = D_L12_001B29C8[0];
             }
         }
-        func_L00_002E6CF0((void *)func_L12_004281D8, a0);
+        gfx_add_draw_callback_first((void *)group_draw_entity_glows, a0);
     }
 }

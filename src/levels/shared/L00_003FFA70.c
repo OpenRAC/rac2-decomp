@@ -3,21 +3,21 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002A7750(char *arg, int mode, int value);
+extern void moby_set_state(char *arg, int mode, int value);
 
 extern void func_L00_003FF7B8_1(char *arg);
 
-extern void func_L00_003FF890(char *arg);
+extern void glow_ring_effect_update(char *arg);
 
 extern float func_00282E80_3(char *arg, char *table);
 
 extern float func_00282C48_10(float value);
 
-extern void func_002B0A18(int arg, int value);
+extern void value_set_entry_by_index(int arg, int value);
 
-extern void func_00288308(int arg);
+extern void help_unlock_entry(int arg);
 
-extern void func_002AD860(int arg);
+extern void moby_handle_request_slot_state(int arg);
 
 extern void func_0029F338_4(char *arg);
 
@@ -27,7 +27,7 @@ extern unsigned char D_001A7B2E __attribute__((sda));
 
 /* two-state update on a record: state 0 marks a byte with 255 and either runs a shared two-call teardown when a global latch byte is set and a sub-object field is non-zero, or plays a mode/value pair plus a call; state 1 runs a setup call and two float queries against a stored table and, when both are below 2.0, plays three fixed calls and either tears down or writes 120 into a sub-object field */
 /* Updates the Charge Boots pickup (moby class 3696): when Ratchet walks up to it, the pickup sound plays and it is collected. */
-void func_L00_003FFA70(char *arg)
+void charge_boots_pickup_update(char *arg)
 {
     int *object = *(int **)(arg + 104);
     unsigned char state = *(unsigned char *)(arg + 32);
@@ -40,17 +40,17 @@ void func_L00_003FFA70(char *arg)
             func_0029F338_4(arg);
             return;
         } else {
-            SetMobyState(arg, 1, -1);
+            moby_set_state(arg, 1, -1);
             func_L00_003FF7B8_1(arg);
         }
         break;
     case 1:
-        UpdateGlowRingEffect(arg);
+        glow_ring_effect_update(arg);
         if (func_00282E80_3(arg + 16, D_00189EA0_2) < 2.0f) {
             if (func_00282C48_10(*(float *)(arg + 24) - *(float *)(D_00189EA0_2 + 8)) < 2.0f) {
-                SetEntryValueByIndex(4658, -1);
-                UnlockHelpEntry(54);
-                HandleRequestSlotState(54);
+                value_set_entry_by_index(4658, -1);
+                help_unlock_entry(54);
+                moby_handle_request_slot_state(54);
                 if (object[17] != 0) {
                     func_0029F338_4((char *)object[17]);
                     func_0029F338_4(arg);
@@ -81,20 +81,20 @@ void func_L00_003FFA70(char *arg)
 /* func_L00_004029E8 is matched in L00_003FFA70-g8.c. */
 
 
-extern void func_002FDBD8(void *obj, float f, void *p, void *q);
+extern void part_draw_spinning_billboard_pair(void *obj, float f, void *p, void *q);
 typedef struct __attribute__((packed)) { unsigned char b[8]; } Blob8;
 extern Blob8 D_L00_001B0DB8 __attribute__((nosda));
 
 /* Passes the object to a shared effect routine when it has been set up, with an extra value when a second field is set. */
-void func_L00_00402DD8(char *arg)
+void object_run_effect_if_active(char *arg)
 {
     int *o = *(int **)(arg + 104);
     if (o[9] != 0) {
         if (o[11] == 0) {
-            DrawSpinningBillboardPair(o, 1.0f, (char *)o + 16, 0);
+            part_draw_spinning_billboard_pair(o, 1.0f, (char *)o + 16, 0);
         } else {
             Blob8 tmp = D_L00_001B0DB8;
-            DrawSpinningBillboardPair(o, 1.0f, (char *)o + 16, &tmp);
+            part_draw_spinning_billboard_pair(o, 1.0f, (char *)o + 16, &tmp);
         }
     }
 }
@@ -109,7 +109,7 @@ extern int D_L00_001B2C30[] __attribute__((sda));
 
 /* clears the 16 words ending at D_L00_001B2C6C, from the top down */
 /* Empties the list of 16 active sheep. */
-void func_L00_00403BF8(void)
+void sheep_clear_active_list(void)
 {
     int i;
 
@@ -119,7 +119,7 @@ void func_L00_00403BF8(void)
 
 /* true when none of the 16 words is zero */
 /* Tells whether the list of 16 active sheep is full. */
-int func_L00_00403C30(void)
+int sheep_is_active_list_full(void)
 {
     int i;
 
@@ -143,8 +143,8 @@ extern int func_002EDD48(char *a);
 extern void func_002E6EF8(void (*f)(char *), char *arg);
 extern void func_0037E1B8(int a);
 extern void func_00310440(char *arg);
-extern void func_L00_00404168(char *arg);
-extern void func_L00_00403F90(char *arg, void *p);
+extern void smoky_spark_effect_update(char *arg);
+extern void sheep_shot_resolve_hit(char *arg, void *p);
 
 /* func_L00_00403D58 is matched in L00_003FFA70-qcopy.c (built with -frac2-qcopy
    -frac2-qcopy-barrier). */
@@ -153,50 +153,50 @@ extern void func_L00_00403F90(char *arg, void *p);
 
 /* func_L00_00404168 is matched in L00_00404168-por.c (-frac2-zero-ti-por). */
 
-extern void func_L00_00418730(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
+extern void blue_explosion_spawn(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
                               int k, float scale);
-extern float func_002A7878(float lo, float hi);
-extern float func_002A7940(void);
-extern float func_002A78D8(float a, float b);
-extern int func_002A7820(int lo, int hi);
-extern void func_002AF000(void *out, float x, float y, float z);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, float scale);
-extern void func_L00_0033E888(void *pos, void *velocity, float speed, float size,
+extern float math_random_float_range(float lo, float hi);
+extern float math_random_angle(void);
+extern float math_random_signed_float_range(float a, float b);
+extern int math_random_int_range(int lo, int hi);
+extern void vec_build_spherical_offset(void *out, float x, float y, float z);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, float scale);
+extern void part_spawn_spinning_particle(void *pos, void *velocity, float speed, float size,
                               unsigned int colour, unsigned int colour2, int life, int a, int b,
                               int c, int d);
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
 /* one func_L00_00418730 effect at pos, then two func_L00_0033E888 particles with random
    velocities; before each, pos moves 0.3 of the way towards D_L00_001B8DC0 (FastVecSub,
    scale, FastVecAdd) */
 /* Makes a small burst of sparks at a spot, used when a sheep shot hits something. */
-void func_L00_00404368(float *pos, int unused, int mode)
+void sheep_shot_spawn_hit_sparks(float *pos, int unused, int mode)
 {
     float velocity[4], offset[4], point[4];
     float pitch, heading, speed;
     int i;
 
-    SpawnBlueExplosionMoby(pos, 0, 15, 10, 0, 20, 0, 0, 1, 0, 0.1f);
+    blue_explosion_spawn(pos, 0, 15, 10, 0, 20, 0, 0, 1, 0, 0.1f);
     for (i = 0; i < 2; i++) {
-        pitch = RandomFloatRange(-0.9599312f, -1.3962636f);
-        heading = RandomAngle();
-        speed = RandomFloatRange(0.0f, 0.5f);
-        BuildSphericalOffset(velocity, speed * 0.016666668f, heading, pitch);
-        FastVecSub(offset, gCameraPosition_L00, pos);
+        pitch = math_random_float_range(-0.9599312f, -1.3962636f);
+        heading = math_random_angle();
+        speed = math_random_float_range(0.0f, 0.5f);
+        vec_build_spherical_offset(velocity, speed * 0.016666668f, heading, pitch);
+        FastVecSub(offset, g_camera_l00_position, pos);
         vec_scale_to_length(offset, offset, 0.3f);
         FastVecAdd(pos, pos, offset);
-        speed = RandomFloatRange(25000.0f, 50000.0f);
-        point[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.02f);
-        point[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.02f);
-        point[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.02f);
+        speed = math_random_float_range(25000.0f, 50000.0f);
+        point[0] = pos[0] + math_random_signed_float_range(0.0f, 0.02f);
+        point[1] = pos[1] + math_random_signed_float_range(0.0f, 0.02f);
+        point[2] = pos[2] + math_random_signed_float_range(0.0f, 0.02f);
         if (mode)
-            SpawnSpinningParticle_L00(point, velocity, speed, 0.1f, 0x78ffffff, 0x101e1e1e,
-                              RandomIntRange(10, 20), 1, 1, -1, 1);
+            part_spawn_spinning_particle(point, velocity, speed, 0.1f, 0x78ffffff, 0x101e1e1e,
+                              math_random_int_range(10, 20), 1, 1, -1, 1);
         else
-            SpawnSpinningParticle_L00(point, velocity, speed, 0.1f, 0x78ffffff, 0x101e1e1e,
-                              RandomIntRange(25, 60), 1, 1, -1, 1);
+            part_spawn_spinning_particle(point, velocity, speed, 0.1f, 0x78ffffff, 0x101e1e1e,
+                              math_random_int_range(25, 60), 1, 1, -1, 1);
     }
 }
 
@@ -234,7 +234,7 @@ extern void func_0035F450(int a, int b, void *c, int d);
 
 /* shared native body of family af5b3bc3a678ed5c */
 /* Sets the starting values of a new object the first time it runs. */
-void func_L00_00409420(char *object)
+void moby_init_first_frame(char *object)
 {
     char *o = object;
     int *q = *(int **)(o + 104);

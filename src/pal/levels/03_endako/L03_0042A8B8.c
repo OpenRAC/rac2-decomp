@@ -4,11 +4,11 @@
 extern s32 D_L03_001B2A38[] __attribute__((sda));
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));
 extern u16 *D_L03_001FB5A0[];
-extern void func_0029F338(void *);
-extern float func_00283C28(float);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern s32 func_00283D38(s32, s32, float);
+extern void moby_mark_spawned(void *);
+extern float math_fast_float_g(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern s32 FastTweenColor(s32, s32, float);
 #define GROUP (*(s32 *)state)
 
 /* State 0 checks the group word of the state block (a group that is out of range, empty or -1
@@ -30,7 +30,7 @@ void func_PAL_L03_0042A8B8(u8 *a0)
     switch (a0[0x20]) {
     case 0:
         if (GROUP >= D_L03_001B2A38[0] || D_L03_001FB5A0[GROUP] == 0 || GROUP == -1) {
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
         } else {
             *(f32 *)(state + 4) = -0.062831864f;
             *(f32 *)(state + 8) = *(f32 *)(state + 8) * 0.017453294f;
@@ -46,7 +46,7 @@ void func_PAL_L03_0042A8B8(u8 *a0)
                 s0 = *(u8 **)(e + 0x68);
                 *(s32 *)(s0 + 4) = 0x80A0A0A0;
                 *(s32 *)(s0 + 8) = 0x80000000;
-                *(f32 *)(s0 + 0xC) = func_00283C28((f32)(*(s32 *)s0 * 30) * 0.017453294f);
+                *(f32 *)(s0 + 0xC) = math_fast_float_g((f32)(*(s32 *)s0 * 30) * 0.017453294f);
                 *(u16 *)(e + 0x32) = 0x1FF;
                 e[0x30] = 0xFF;
             }
@@ -62,10 +62,10 @@ void func_PAL_L03_0042A8B8(u8 *a0)
             if (e == 0)
                 break;
             s0 = *(u8 **)(e + 0x68);
-            *(f32 *)(s0 + 0xC) = func_00283B98(*(f32 *)(s0 + 0xC), *(f32 *)(state + 4));
+            *(f32 *)(s0 + 0xC) = FastAddRotations(*(f32 *)(s0 + 0xC), *(f32 *)(state + 4));
             *(s32 *)(e + 0x78) =
-                func_00283D38(*(s32 *)(s0 + 4), *(s32 *)(s0 + 8),
-                              func_00283198(*(f32 *)(s0 + 0xC)) * 0.5f + 0.5f);
+                FastTweenColor(*(s32 *)(s0 + 4), *(s32 *)(s0 + 8),
+                              math_fast_sin_or_cos_b(*(f32 *)(s0 + 0xC)) * 0.5f + 0.5f);
         }
         break;
     }

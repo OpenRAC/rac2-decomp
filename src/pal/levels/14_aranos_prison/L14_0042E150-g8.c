@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_00283D38(int a, int b, float c);
-extern float func_00283B98(float a, float b);
-extern float func_00283198(float a);
-extern int func_00283D38(int a, int b, float c);
-extern unsigned short *D_L14_001FB060[];
+extern int FastTweenColor(int a, int b, float c);
+extern float FastAddRotations(float a, float b);
+extern float math_fast_sin_or_cos_b(float a);
+extern int FastTweenColor(int a, int b, float c);
+extern unsigned short *g_group_entity_lists[];
 extern int D_L14_001B25B8;
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
 typedef struct {
@@ -33,11 +34,11 @@ typedef struct {
     int a;
     int b;
 } L14ColorPair;
-extern void func_L14_00428BA0(L14Obj *);
+extern void group_marker_draw(L14Obj *);
 extern L14ColorPair D_L14_001B18C0[];
 extern int D_L14_001B20C8;
-extern void func_0029FC20(void *moby, int joint, void *out);
-extern void func_L00_002E6CF0(void *, void *);
+extern void moby_transform_joint_point(void *moby, int joint, void *out);
+extern void gfx_add_draw_callback_first(void *, void *);
 
 /* Advances the owner's pulse (the angle, then the blend it gives), tints the owner with the
    first colour pair and, when its stamp is not the current one, refreshes every live class-0x112B
@@ -53,15 +54,15 @@ void func_PAL_L14_0042E150(L14Obj *self)
     float angle;
     float blend;
 
-    angle = func_00283B98(state->angle, 0.25132746f);
+    angle = FastAddRotations(state->angle, 0.25132746f);
     state->angle = angle;
-    blend = func_00283198(angle) * 0.5f + 0.5f;
+    blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     state->blend = blend;
-    self->tint = func_00283D38(colors.a, colors.b, blend);
+    self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (state->stamp != D_L14_001B20C8) {
-        for (p = D_L14_001FB060[self->group];
+        for (p = g_group_entity_lists[self->group];
              self->group != 0xFF && self->group <= D_L14_001B25B8 && p != 0 &&
-             ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[self->group]);
+             ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self->group]);
              p++) {
             e = (L14Obj *)(D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8));
             if (e == 0)
@@ -72,13 +73,13 @@ void func_PAL_L14_0042E150(L14Obj *self)
                     if (e->kind != 0xFE) {
                         if (e->kind != 0xFD) {
                             s0 = e->cfg;
-                            func_0029FC20(e, 0, &s0->vec);
+                            moby_transform_joint_point(e, 0, &s0->vec);
                             s0->stamp = D_L14_001B20C8;
                         }
                     }
                 }
             }
         }
-        func_L00_002E6CF0((void *)func_L14_00428BA0, self);
+        gfx_add_draw_callback_first((void *)group_marker_draw, self);
     }
 }

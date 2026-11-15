@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,13 +25,13 @@
  */
 #include "common.h"
 
-extern void func_00288308();
-extern s32 func_002908D0();
-extern s32 func_00290A40(s32);
-extern s32 func_002AD860();
+extern void help_unlock_entry();
+extern s32 level_validate_item_list();
+extern s32 gfx_run_filter_over_all_slots(s32);
+extern s32 moby_handle_request_slot_state();
 extern volatile s32 D_001A7398;
 extern volatile s32 D_001A73A0;
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 extern volatile u8 D_001A7AFE;
 extern volatile u8 D_001A7B16;
 extern volatile u8 D_001A7B22;
@@ -40,26 +41,26 @@ extern volatile s8 D_001A7B68;
 extern volatile s8 D_001A7B69;
 
 /* Gives the starting items when the player does not have them yet, then checks the item list. */
-void func_00290978(void) {
+void level_grant_starting_items(void) {
     if (D_001A7B16 == 0) {
-        UnlockHelpEntry(0x1E);
-        HandleRequestSlotState(0x1E);
+        help_unlock_entry(0x1E);
+        moby_handle_request_slot_state(0x1E);
         D_001A7B68 = 0x5E;
         D_001A7398 = 0x1E;
     }
     if (D_001A7B22 == 0) {
-        UnlockHelpEntry(0x2A);
-        HandleRequestSlotState(0x2A);
+        help_unlock_entry(0x2A);
+        moby_handle_request_slot_state(0x2A);
         D_001A7B69 = 0x6A;
     }
     if (D_001A7B27 == 0) {
-        UnlockHelpEntry(0x2F);
+        help_unlock_entry(0x2F);
         D_001A73A0 = 0x2F;
     }
     if (D_001A7AFE == 0) {
         D_001A7B36 = 1;
         D_001A7AFE = 1;
     }
-    ValidateItemList();
-    RunFilterOverAllSlots(gCurrentMapIndex);
+    level_validate_item_list();
+    gfx_run_filter_over_all_slots(g_current_map_index);
 }

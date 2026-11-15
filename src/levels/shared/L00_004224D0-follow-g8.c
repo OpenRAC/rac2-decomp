@@ -5,21 +5,21 @@ extern char D_00189F00[];
 extern int D_0018A160 NOT_SDA;
 extern float D_L00_001B14C4 __attribute__((sda));
 
-extern void func_00282978(void *timer);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282D08(void *out, void *a, void *b, float t);
-extern void func_00282D30(void *out, void *v, float k);
-extern float func_00282DB0(void *a, void *b);
-extern void func_00282DD8(void *out, void *a, void *b);
-extern float func_00282DF0(void *v);
-extern void func_00282F20(void *out, void *v, float length);
-extern void func_002ACEC0(void *out, void *v, void *axis, float angle);
-extern float func_002702C8(void *state, float current, float goal, float a, float b, float c);
-extern float func_002703B0(void *state, float current, float goal, float a, float b, float c);
-extern float func_002831B0(float x);
-extern float func_00283248(float y, float x);
-extern float func_00283BE0(float a, float b);
-extern float func_00283CE0(int n);
+extern void FastDecTimer(void *timer);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void lerp_vector(void *out, void *a, void *b, float t);
+extern void FastVecScale(void *out, void *v, float k);
+extern float FastVecDot(void *a, void *b);
+extern void FastVecCross(void *out, void *a, void *b);
+extern float FastVecLength(void *v);
+extern void vec_scale_to_length(void *out, void *v, float length);
+extern void math_apply_axis_rotation_to_quat(void *out, void *v, void *axis, float angle);
+extern float math_step_spring_damper_clamped(void *state, float current, float goal, float a, float b, float c);
+extern float math_step_spring_damper_stored(void *state, float current, float goal, float a, float b, float c);
+extern float math_fast_angle_helper(float x);
+extern float mat_fast_helper_a(float y, float x);
+extern float fast_subtract_rotations(float a, float b);
+extern float IntToFloat(int n);
 
 #define F(p, n) (*(float *)((char *)(p) + (n)))
 
@@ -28,7 +28,7 @@ extern float func_00283CE0(int n);
    target-to-eye direction with the view axis at +0x20 projected off, eases the orbit and eye
    heights, pitches by the smoothed look angle clamped to +-70 degrees, blends out the start-up
    timer and re-orthogonalises the right and up rows. */
-void func_L00_00425560(char *cam)
+void follow_camera_build_view(char *cam)
 {
     char *view, *target, *settings, *state, *owner, *motion, *right, *up, *w;
     float g, r0, g2, d, r, e, t, x, h, g3, l;
@@ -55,7 +55,7 @@ void func_L00_00425560(char *cam)
         FastVecSub(v2, cam + 0x30, v0);
         FastVecSub(v3, v1, v2);
         if (F(state, 0x28) != 0.0f) {
-            ApplyAxisRotationToQuaternion(v3, v3, view + 0x20, F(state, 0x28));
+            math_apply_axis_rotation_to_quat(v3, v3, view + 0x20, F(state, 0x28));
         }
         r0 = FastVecLength(v3);
         if (0.05f <= r0) {
@@ -70,9 +70,9 @@ void func_L00_00425560(char *cam)
         vec_scale_to_length(w, w, 1.0f);
         right = w;
         t = 0.0f;
-        F(state, 0x8) = StepSpringDamperClamped(state + 0x10, F(state, 0x8), F(motion, 0x30), 0.004f, 0.2f, 0.0f);
+        F(state, 0x8) = math_step_spring_damper_clamped(state + 0x10, F(state, 0x8), F(motion, 0x30), 0.004f, 0.2f, 0.0f);
         up = cam + 0x20;
-        g2 = StepSpringDamperClamped(state + 0xC, F(state, 0x4), F(settings, 0xB0), 0.004f, 0.2f, 0.0f);
+        g2 = math_step_spring_damper_clamped(state + 0xC, F(state, 0x4), F(settings, 0xB0), 0.004f, 0.2f, 0.0f);
         d = F(state, 0x8) - g2;
         F(state, 0x4) = g2;
         FastVecScale(v0, view + 0x20, -FastVecDot(motion + 0x10, view + 0x20));
@@ -85,7 +85,7 @@ void func_L00_00425560(char *cam)
         r = FastVecLength(v3);
         if (r != 0.0f) {
             e = FastVecDot(cam, v3);
-            e = 1.5707964f - FastAngleHelper(e / r);
+            e = 1.5707964f - math_fast_angle_helper(e / r);
             FastVecCross(up, right, cam);
             if (FastVecDot(up, v3) < 0.0f) {
                 e = -e;
@@ -93,7 +93,7 @@ void func_L00_00425560(char *cam)
             g3 = FastVecDot(motion, view + 0x20);
             l = FastVecLength(motion);
             if (D_0018A160) {
-                x = FastMatrixHelperA(l, g3) / D_L00_001B14C4;
+                x = mat_fast_helper_a(l, g3) / D_L00_001B14C4;
                 if (x < -0.1f) {
                     x = -x;
                     if (0.5f < x) {
@@ -103,7 +103,7 @@ void func_L00_00425560(char *cam)
                     t = x * 0.2617994248867035f;
                 }
             }
-            h = StepSpringDamperStored(state + 0x18, F(state, 0x14), t, F(state, 0x1C), F(state, 0x20), 0.0f);
+            h = math_step_spring_damper_stored(state + 0x18, F(state, 0x14), t, F(state, 0x1C), F(state, 0x20), 0.0f);
             F(state, 0x14) = h;
             e = fast_subtract_rotations(e, h);
             if (1.2217305898666382f < e) {
@@ -111,7 +111,7 @@ void func_L00_00425560(char *cam)
             } else if (e < -1.2217305898666382f) {
                 e = -1.2217305898666382f;
             }
-            ApplyAxisRotationToQuaternion(cam, cam, right, e);
+            math_apply_axis_rotation_to_quat(cam, cam, right, e);
             vec_scale_to_length(cam, cam, 1.0f);
         }
     }

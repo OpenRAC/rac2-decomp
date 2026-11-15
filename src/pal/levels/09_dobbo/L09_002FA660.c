@@ -19,11 +19,11 @@ typedef struct {
 } MobList_PAL_L09_002FAA98;
 
 extern MobList_PAL_L09_002FAA98 ref_L09_002F8FD8_00;
-extern int D_001A79F0 __attribute__((sda));
-extern void func_L00_002FC980(void);
+extern int g_current_map_index __attribute__((sda));
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
-extern void func_L00_00326048(void *, void *, int, int, float);
-extern void func_L00_002E6CF0(void *, void *);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
 extern void func_PAL_L09_002FA660(void *);
 
 /* func_PAL_L09_002FAA98, the PAL copy of func_L09_002F8FD8: the same C, with a game-state
@@ -31,7 +31,7 @@ extern void func_PAL_L09_002FA660(void *);
 void func_PAL_L09_002FAA98(void) {
     int i;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < ref_L09_002F8FD8_00.count; i++) {
         Mob_PAL_L09_002FAA98 *mob = ref_L09_002F8FD8_00.mobs[i];
 
@@ -42,10 +42,10 @@ void func_PAL_L09_002FAA98(void) {
         if (mob != 0) {
             int class_id = 0xFA0;
 
-            if (mob->type == class_id && D_001A79F0 != 0x33 && mob->p68 != 0)
-                func_L00_00326048(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+            if (mob->type == class_id && g_current_map_index != 0x33 && mob->p68 != 0)
+                math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
-    if (D_001A79F0 == 9 && ref_L09_002F8FD8_00.mode == 1)
-        func_L00_002E6CF0(func_PAL_L09_002FA660, *(void **)((char *)&ref_L09_002F8FD8_00 + 0x194));
+    if (g_current_map_index == 9 && ref_L09_002F8FD8_00.mode == 1)
+        gfx_add_draw_callback_first(func_PAL_L09_002FA660, *(void **)((char *)&ref_L09_002F8FD8_00 + 0x194));
 }

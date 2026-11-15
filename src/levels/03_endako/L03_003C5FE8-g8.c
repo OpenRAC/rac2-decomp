@@ -6,17 +6,17 @@ extern f32 D_L03_001B0054 __attribute__((sda));
 extern f32 D_L03_001B0058[2] __attribute__((sda));
 extern char D_L03_00188660[];
 typedef struct { f32 scale; f32 spin; f32 wobble[2]; f32 roll; f32 fade; s32 slot; } SpinState;
-extern void func_002A7750(char *moby, s32 a1, s32 a2);
-extern f32  func_00283B98(f32 moby, f32 a1);
-extern void func_L00_002E6CF0(void *moby, void *a1);
-extern void func_L03_003C6208(void);
-extern s32  func_002B38B8(char *moby);
-extern f32  func_002AA2E8(f32 *moby, f32 a1, f32 a2);
-extern void func_002E59F8(s32 moby);
-extern s32  func_002E5CF8(s32 moby, s32 a1, char *a2);
+extern void moby_set_state(char *moby, s32 a1, s32 a2);
+extern f32  FastAddRotations(f32 moby, f32 a1);
+extern void gfx_add_draw_callback_first(void *moby, void *a1);
+extern void rotor_draw(void);
+extern s32  flag_is_third_pending_set(char *moby);
+extern f32  ApproachValue(f32 *moby, f32 a1, f32 a2);
+extern void snd_stop_voice(s32 moby);
+extern s32  PlayMobySound(s32 moby, s32 a1, char *a2);
 
 /* Updates the spinning, wobbling rotor object. It keeps turning, fades out when its trigger is on, and looks after its looping sound. */
-void func_L03_003C5FE8(char *moby)
+void rotor_update(char *moby)
 {
     char *self = moby;
     SpinState *state = *(SpinState **)(self + 0x68);
@@ -24,7 +24,7 @@ void func_L03_003C5FE8(char *moby)
     switch (*(u8 *)(self + 0x20)) {
     case 0:
         *(f32 *)(self + 0x2C) = *(f32 *)(*(s32 *)(self + 0x24) + 0x24) * state->scale;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         *(u16 *)(self + 0x34) |= 1;
         *(u8 *)(self + 0x31) = 0;
         state->fade = 1.0f;
@@ -42,11 +42,11 @@ void func_L03_003C5FE8(char *moby)
             wobbleAngle++;
             speedTable++;
         }
-        AddDrawCallbackToList1(DrawSpinningRotor, self);
-        if (IsThirdPendingFlagSet(self) != 0) {
+        gfx_add_draw_callback_first(rotor_draw, self);
+        if (flag_is_third_pending_set(self) != 0) {
             ApproachValue(&state->fade, 0.0f, 0.0333333351f);
             if (state->fade <= 0.0f) {
-                SetMobyState(self, 2, -1);
+                moby_set_state(self, 2, -1);
                 *(s32 *)(self + 0x98) = 0;
             }
         }
@@ -65,7 +65,7 @@ void func_L03_003C5FE8(char *moby)
             char *soundSlot = D_L03_00188660 + slotIndex * 0x70;
 
             if (*(char **)(soundSlot + 0x88) == self && *(u8 *)(soundSlot + 0x74) != 0)
-                StopSoundVoice(slotIndex);
+                snd_stop_voice(slotIndex);
         }
         state->slot = -1;
     }

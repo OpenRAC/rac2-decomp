@@ -1,16 +1,17 @@
+#include "names.h"
 /* func_PAL_L00_003F9B90, the PAL copy of func_L00_003F5750: the same C, where 0.016666668f becomes
    0.020000001f. */
 #include "include_asm.h"
 #include "common.h"
 
-extern char *func_L00_0032A088(int a0, int a1);
+extern char *level_get_slot_body(int a0, int a1);
 
-extern void func_L00_003F5870(char *rec, int index);
+extern void vaporizer_set_chain_joint_offset(char *rec, int index);
 
-extern float func_00283CE0(int);
-extern float func_002ABB18(float);
-extern float func_002A7878(float,float);
-extern float func_002A78D8(float,float);
+extern float IntToFloat(int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_random_float_range(float,float);
+extern float math_random_signed_float_range(float,float);
 extern float D_L00_001B0940 __attribute__((sda));
 extern float D_L00_001B0944 __attribute__((sda));
 extern float D_L00_001B0948 __attribute__((sda));
@@ -34,16 +35,16 @@ typedef struct {
 void func_PAL_L00_003F9B90(char *object, char *position)
 {
     char *state = *(char **)(object + 0x68);
-    char **table = (char **)func_L00_0032A088(0xc04, *(short *)(state + 0x1a));
+    char **table = (char **)level_get_slot_body(0xc04, *(short *)(state + 0x1a));
     short index = *(short *)(state + 0x20);
     char **entry;
     int offset = index * 0x30;
     entry = (char **)((*(short *)(state + 0x18) << 2) + (int)table);
     qcopy(((L00Joint *)(offset + (int)*entry))->position, position);
-    ((L00Joint *)(offset + (int)*entry))->angle = func_002ABB18(func_00283CE0(index) * 0.017453294f * D_L00_001B0948);
-    ((L00Joint *)(offset + (int)*entry))->f28 = func_002A7878(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
+    ((L00Joint *)(offset + (int)*entry))->angle = math_wrap_angle_to_pi(IntToFloat(index) * 0.017453294f * D_L00_001B0948);
+    ((L00Joint *)(offset + (int)*entry))->f28 = math_random_float_range(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
     ((L00Joint *)(offset + (int)*entry))->length = D_L00_001B094C;
-    ((L00Joint *)(offset + (int)*entry))->f2c = func_002A78D8(D_L00_001B0950, D_L00_001B0954) * 0.020000001f;
-    func_L00_003F5870(*entry, index);
+    ((L00Joint *)(offset + (int)*entry))->f2c = math_random_signed_float_range(D_L00_001B0950, D_L00_001B0954) * 0.020000001f;
+    vaporizer_set_chain_joint_offset(*entry, index);
     (*(unsigned short *)(state + 0x20))++;
 }

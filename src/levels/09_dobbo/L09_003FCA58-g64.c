@@ -13,19 +13,19 @@ typedef struct {
 } GlowPacket;
 extern GlowVector D_L09_00255F40[][4], D_L09_00256410[], D_L09_001B1150[4] __attribute__((sda));
 extern GlowVector D_L09_001B9A00[], D_0018A0E0[];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern unsigned long long func_0027C878(int);
-extern float func_002A7878(float, float), func_002A78D8(float, float);
-extern int func_L02_002F1658(void);
-extern void func_00280B90(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
+extern int level_is_resident_flag_clear(void);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws the flickering glow at both ends of a beam, each with a bright core and a larger soft halo. */
-void func_L09_003FCA58(void *unused, int slot, int alpha)
+void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
 {
     GlowPacket packet;
     GlowVector basis[3], position, jitter;
@@ -47,13 +47,13 @@ void func_L09_003FCA58(void *unused, int slot, int alpha)
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     packet.uv[0][0] = 0; packet.uv[0][1] = 0; packet.uv[1][0] = 0; packet.uv[1][1] = 1;
     packet.uv[2][0] = 1; packet.uv[2][1] = 0; packet.uv[3][0] = 1; packet.uv[3][1] = 1;
-    scale = RandomFloatRange(0.3f, 0.325f);
-    if (!IsResidentFlagClear())
+    scale = math_random_float_range(0.3f, 0.325f);
+    if (!level_is_resident_flag_clear())
         scale = 0.3125f;
-    jitter.f[0] = RandomSignedFloatRange(0, 0.05f);
-    jitter.f[1] = RandomSignedFloatRange(0, 0.05f);
-    jitter.f[2] = RandomSignedFloatRange(0, 0.05f);
-    if (!IsResidentFlagClear()) {
+    jitter.f[0] = math_random_signed_float_range(0, 0.05f);
+    jitter.f[1] = math_random_signed_float_range(0, 0.05f);
+    jitter.f[2] = math_random_signed_float_range(0, 0.05f);
+    if (!level_is_resident_flag_clear()) {
         jitter.f[0] = 0.025f;
         jitter.f[1] = 0.025f;
         jitter.f[2] = 0.025f;
@@ -84,8 +84,8 @@ void func_L09_003FCA58(void *unused, int slot, int alpha)
     FastVecCross(&basis[1], &basis[0], D_0018A0E0);
     vec_scale_to_length(&basis[1], &basis[1], -1.0f);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
-    scale = RandomFloatRange(0.3f, 0.325f);
-    if (!IsResidentFlagClear())
+    scale = math_random_float_range(0.3f, 0.325f);
+    if (!level_is_resident_flag_clear())
         scale = 0.3125f;
     packet.blend = 0xFF00000044ULL;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;

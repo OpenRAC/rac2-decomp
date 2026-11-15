@@ -29,7 +29,7 @@ typedef struct {
     unsigned char pad2298[0x4];
     int f229C;
 } PointEffectHero;
-extern PointEffectHero D_00189E20;
+extern PointEffectHero g_hero_state;
 typedef struct {
     unsigned char pad0[0x320];
     float f320;
@@ -47,41 +47,41 @@ typedef struct {
     float f530;
 } PointEffectJoints;
 extern PointEffectJoints D_L00_0025BE10;
-extern int func_L00_002ADF80(void);
-extern float func_00282C48(float);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern void func_L00_002D3248(short, unsigned char, unsigned char, unsigned char, float, float);
-extern void func_0029FCC0(char *, int, char *);
-extern float func_002A7878(float, float);
-extern void func_L00_00335558(void *, void *, float);
+extern int hero_is_in_special_kind_or_mode(void);
+extern float math_fabs(float);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void hero_set_level_clock_and_bytes(short, unsigned char, unsigned char, unsigned char, float, float);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern float math_random_float_range(float, float);
+extern void part_spawn_spark_effect(void *, void *, float);
 
 /* Drive articulated offsets and emit the active pair of joint effects. */
 /* Swings the hero arms and body parts as the hero moves, and makes small effects at the hands when needed. */
-void func_L00_002AC1A0(void)
+void UpdateHeroEasingTargetsAndPointEffects(void)
 {
     Quadword position;
     unsigned char *matrix;
     float left, right, draw;
     int index;
 
-    if (gHeroState.f1270) {
+    if (g_hero_state.f1270) {
         D_L00_0025BE10.f36C = 0.01f;
         D_L00_0025BE10.f41C = 0.01f;
     }
-    if (IsHeroInSpecialKindOrMode())
+    if (hero_is_in_special_kind_or_mode())
         return;
-    if ((FloatAbs(gHeroState.f300) > 0.015f ||
-         FloatAbs(gHeroState.f304) > 0.015f ||
-         FloatAbs(gHeroState.f308) > 0.01745329424738884f ||
-         FloatAbs(gHeroState.f30C) > 0.01745329424738884f ||
-         FloatAbs(gHeroState.f310) > 0.01745329424738884f ||
-         FloatAbs(gHeroState.f314) > 0.01745329424738884f) &&
-        gHeroState.f348 != 1) {
-        D_L00_0025BE10.f324 = -gHeroState.f308;
-        D_L00_0025BE10.f3D4 = -gHeroState.f30C;
-        left = FastMatrixHelperA(0.2f, gHeroState.f300) * 1.2f;
-        right = -FastMatrixHelperA(0.2f, gHeroState.f304) * 1.2f;
+    if ((math_fabs(g_hero_state.f300) > 0.015f ||
+         math_fabs(g_hero_state.f304) > 0.015f ||
+         math_fabs(g_hero_state.f308) > 0.01745329424738884f ||
+         math_fabs(g_hero_state.f30C) > 0.01745329424738884f ||
+         math_fabs(g_hero_state.f310) > 0.01745329424738884f ||
+         math_fabs(g_hero_state.f314) > 0.01745329424738884f) &&
+        g_hero_state.f348 != 1) {
+        D_L00_0025BE10.f324 = -g_hero_state.f308;
+        D_L00_0025BE10.f3D4 = -g_hero_state.f30C;
+        left = mat_fast_helper_a(0.2f, g_hero_state.f300) * 1.2f;
+        right = -mat_fast_helper_a(0.2f, g_hero_state.f304) * 1.2f;
         if (left > 0.785398244857788f)
             left = 0.785398244857788f;
         if (left < -0.174532949924469f)
@@ -92,31 +92,31 @@ void func_L00_002AC1A0(void)
             right = -0.785398244857788f;
         D_L00_0025BE10.f480 = left;
         D_L00_0025BE10.f530 = right;
-        D_L00_0025BE10.f320 = -fast_subtract_rotations(gHeroState.f310, -left);
-        D_L00_0025BE10.f3D0 = -fast_subtract_rotations(gHeroState.f314, -right);
+        D_L00_0025BE10.f320 = -fast_subtract_rotations(g_hero_state.f310, -left);
+        D_L00_0025BE10.f3D0 = -fast_subtract_rotations(g_hero_state.f314, -right);
     }
-    if (!(gHeroState.f143E & 0x80)) {
-        if (gHeroState.f2294 == 3)
-            SetHeroLevelClockAndBytes(1, 2, 1, 0, 0.021f, 0.002f);
-        if (gHeroState.f229C == 4 && gHeroState.f49C && gHeroState.f49C < 12)
-            SetHeroLevelClockAndBytes(1, 2, 0, 1, 0.016f, 0.002f);
-        if (gHeroState.f1438 > 0 && gHeroState.f143C) {
+    if (!(g_hero_state.f143E & 0x80)) {
+        if (g_hero_state.f2294 == 3)
+            hero_set_level_clock_and_bytes(1, 2, 1, 0, 0.021f, 0.002f);
+        if (g_hero_state.f229C == 4 && g_hero_state.f49C && g_hero_state.f49C < 12)
+            hero_set_level_clock_and_bytes(1, 2, 0, 1, 0.016f, 0.002f);
+        if (g_hero_state.f1438 > 0 && g_hero_state.f143C) {
             matrix = 0;
-            if (gHeroState.f143E & 1)
-                matrix = gHeroState.f2290 + 0xC0;
-            --gHeroState.f1438;
-            TransformMobyJointToWorld((char *)gHeroState.f2290, 22, (char *)&position);
-            for (index = 0; index < gHeroState.f143C; ++index) {
-                draw = RandomFloatRange(-gHeroState.f1434, gHeroState.f1434);
-                SpawnSparkEffect(&position, matrix, gHeroState.f1430 + draw);
+            if (g_hero_state.f143E & 1)
+                matrix = g_hero_state.f2290 + 0xC0;
+            --g_hero_state.f1438;
+            moby_transform_joint_to_world((char *)g_hero_state.f2290, 22, (char *)&position);
+            for (index = 0; index < g_hero_state.f143C; ++index) {
+                draw = math_random_float_range(-g_hero_state.f1434, g_hero_state.f1434);
+                part_spawn_spark_effect(&position, matrix, g_hero_state.f1430 + draw);
             }
-            TransformMobyJointToWorld((char *)gHeroState.f2290, 23, (char *)&position);
-            for (index = 0; index < gHeroState.f143C; ++index) {
-                draw = RandomFloatRange(-gHeroState.f1434, gHeroState.f1434);
-                SpawnSparkEffect(&position, matrix, gHeroState.f1430 + draw);
+            moby_transform_joint_to_world((char *)g_hero_state.f2290, 23, (char *)&position);
+            for (index = 0; index < g_hero_state.f143C; ++index) {
+                draw = math_random_float_range(-g_hero_state.f1434, g_hero_state.f1434);
+                part_spawn_spark_effect(&position, matrix, g_hero_state.f1430 + draw);
             }
         }
     } else {
-        gHeroState.f1438 = 0;
+        g_hero_state.f1438 = 0;
     }
 }

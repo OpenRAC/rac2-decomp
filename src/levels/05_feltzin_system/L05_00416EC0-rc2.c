@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern s32 ref_L05_00416EC0_03(s8 *, s8 *, s8 *);
 extern s32 ref_L05_00416EC0_04(void *, void *, s8 *);
 
 /* Moves the object by a step based on its speed, turned by its own direction, and adds that step to its position. */
-void func_L05_00416EC0(void *moby, s32 value) {
+void object_step_along_direction(void *moby, s32 value) {
     s8 frame[0x80];
     s8 *base = (s8 *)moby;
     void *vars;

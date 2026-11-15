@@ -1,5 +1,5 @@
 #include "common.h"
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 struct EffectState98 {
     short timer, duration, delay, pad6;
     float scale2, scale4, fade, scale;
@@ -23,7 +23,7 @@ extern int func_307840(void *, float);
 extern float func_3067D8(void *, void *);
 extern float func_306720(void *, void *);
 extern float func_306C38(float);
-extern void func_L05_00399268(void *, void *);
+extern void EmitScaledParticleBurst(void *, void *);
 /* Creates a shockwave effect object at a position, may shake the camera when the player is
    close, and checks if it is on screen. */
 char *func_L05_00398F18(void *position, int shake, int a2, int a3, int a4, int a5, int a6, int a7, float scale)

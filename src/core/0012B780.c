@@ -3,23 +3,23 @@
 
 extern void r1_func_0012C468(void *, void *);
 
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *, int);
 
-extern void func_0012C788(void *, int);
+extern void mpeg_skip_bits(void *, int);
 
 extern void r1_func_0012C430(void *, char *, int);
 
-extern void func_0012C9C8(void *);
+extern void mpeg_skip_to_start_code(void *);
 
-extern int func_0012CA48(void *);
+extern int mpeg_read_slice_header_extra(void *);
 
 extern char r1_D_00153900[];
 
 extern char r1_D_00153928[];
 
-extern int func_0012B780(void *, int, int *, int *, void *);
+extern int mpeg_read_slice_header(void *, int, int *, int *, void *);
 
-extern int func_0012B568(void *);
+extern int mpeg_read_mb_address_increment(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00127960 */
 /* sliceA0 (libmpeg.a:mpc.o): ISO/IEC 13818-2 6.2.4 slice_header(), the
@@ -34,7 +34,7 @@ extern int func_0012B568(void *);
  * +0x1B0, and zero eight fields of the *arg4 output struct.
  */
 /* Reads the header of a slice (a row of macroblocks) and works out the first macroblock to decode. Returns 0 on success, nonzero on a stream error. */
-int func_0012B780(void *decoderPtr, int mbCount, int *startMbAddr, int *mbIncOut, void *blockInfo) {
+int mpeg_read_slice_header(void *decoderPtr, int mbCount, int *startMbAddr, int *mbIncOut, void *blockInfo) {
     char *dec = (char *)decoderPtr;
     char *blockInfoBytes = (char *)blockInfo;
     unsigned int code;
@@ -43,17 +43,17 @@ int func_0012B780(void *decoderPtr, int mbCount, int *startMbAddr, int *mbIncOut
     int row;
 
     *(int *)(dec + 0x11C) = 0;
-    SkipToMpegStartCode(dec);
-    code = PeekMpegBits(dec, 0x20);
+    mpeg_skip_to_start_code(dec);
+    code = mpeg_peek_bits(dec, 0x20);
 
     if ((unsigned int)(code - 0x101) >= 0xAF) {
         r1_func_0012C430(dec, r1_D_00153900, code);
         return 2;
     }
 
-    SkipMpegBits(dec, 0x20);
-    sliceB_result = ReadMpegSliceHeaderExtra(dec);
-    mbInc = ReadMpegMbAddressIncrement(dec);
+    mpeg_skip_bits(dec, 0x20);
+    sliceB_result = mpeg_read_slice_header_extra(dec);
+    mbInc = mpeg_read_mb_address_increment(dec);
     *mbIncOut = mbInc;
 
     if (*(int *)(dec + 0x11C) != 0) {

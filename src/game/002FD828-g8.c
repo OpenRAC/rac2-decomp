@@ -22,18 +22,18 @@ typedef struct {
     f32 cell_width;
     f32 cell_height;
 } SurfaceHeightGrid;
-extern SurfaceHeightTile * D_001B22D0[] __attribute__((sda));
+extern SurfaceHeightTile * g_surface_height_tiles[] __attribute__((sda));
 extern SurfaceHeightGrid ref_L00_002FD828_00 __attribute__((sda));
 extern int ref_L00_002FD828_01 __attribute__((sda));
-extern float func_00283CE0(int);
-extern s32 func_002FCFC8(f32, f32, f32);
-extern s32 func_00283CF0(f32) ;
-extern void func_00282DD8(f32 *, f32 *, f32 *);
-extern void func_00282F20(f32 *, f32 *, f32) ;
+extern float IntToFloat(int);
+extern s32 coll_find_surface_box_at_point(f32, f32, f32);
+extern s32 FloatToInt(f32) ;
+extern void FastVecCross(f32 *, f32 *, f32 *);
+extern void vec_scale_to_length(f32 *, f32 *, f32) ;
 
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/textbin/fun_00239f58.c, func_002FD828. */
 /* Finds the water surface height (and optionally its slope) at a point; returns 0 if no patch is there. */
-s32 func_002FD828(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
+s32 SampleSurfaceHeightMap(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
     f32 x_tangent[4] __attribute__((aligned(16)));
     f32 y_tangent[4] __attribute__((aligned(16)));
     SurfaceHeightTile *tile;
@@ -50,11 +50,11 @@ s32 func_002FD828(f32 *height, f32 *normal, f32 x, f32 y, f32 z) {
     f32 weight_x;
     f32 weight_y;
 
-    tile_index = FindSurfaceBoxAtPoint(x, y, z);
+    tile_index = coll_find_surface_box_at_point(x, y, z);
     if (tile_index < 0) {
         return 0;
     }
-    tile = &gSurfaceHeightTiles[0][tile_index];
+    tile = &g_surface_height_tiles[0][tile_index];
     fraction_x = tile->x;
     fraction_y = tile->y;
     fraction_x += ref_L00_002FD828_00.origin_x;

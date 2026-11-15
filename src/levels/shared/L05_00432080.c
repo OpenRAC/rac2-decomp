@@ -1,12 +1,12 @@
 #include "common.h"
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 extern void func_002A0F48(void *);
 
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Creates an object of class 0x10E3 that copies the position and orientation of the given object. */
-char *func_L05_00432080(char *source, float scaleFactor)
+char *CreateTransformClone(char *source, float scaleFactor)
 {
     char *newObj = CreateMoby(0x10E3);
 

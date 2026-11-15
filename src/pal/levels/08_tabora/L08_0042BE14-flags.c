@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L08_0042BE14, the PAL copy of func_L08_00426730: the same C at 50 Hz. Both func_002A7820
  * results are scaled by ((s32)(x) * 5 + 2) / 6, with their arguments unchanged; 240 becomes 200,
  * 120 becomes 100, 115 becomes 96, 90 becomes 75, 38 becomes 32; floats 0.012f, 0.006f, 0.64000005f,
@@ -5,54 +6,54 @@
 #include "common.h"
 #define FIELD(p, type, off) (*(type *)((p) + (off)))
 extern int D_L08_001B29DC __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_0019B4A8[];
 extern char D_L08_001B9B00[];
 extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } D_L08_001B99C0;
 extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80;
 extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
-extern int func_002ACD38(void *);
-extern void func_0029F338(void *);
-extern float func_00282E80(void *, void *);
+extern int moby_is_in_selected_zone(void *);
+extern void moby_mark_spawned(void *);
+extern float vec_distance_xy(void *, void *);
 extern void func_PAL_L08_0042B190(char *);
 extern void func_PAL_L08_0042B610(char *);
-extern int func_002A77E0(int);
-extern int func_L08_0032F898(char *, char *, float, float, int, int, int, int);
-extern int func_L04_00343498(char *, float);
-extern int func_L08_004254D0(int);
-extern int func_L08_00425518(int);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002A7750(char *, int, int);
-extern int func_002B3868(char *);
-extern void func_002E5CF8(int, int, char *);
-extern float func_002AA548(void *, float, void *, float, float, float);
+extern int math_random_int_below(int);
+extern int SelectNearestListedMoby(char *, char *, float, float, int, int, int, int);
+extern int vec_apply_scaled_value(char *, float);
+extern int moby_handle_is_gone(int);
+extern int moby_handle_is_past_early_state(int);
+extern void anim_start_blended(char *, int, int, int);
+extern void moby_set_state(char *, int, int);
+extern int flag_set_first_pending(char *);
+extern void PlayMobySound(int, int, char *);
+extern float math_step_value_toward_target(void *, float, void *, float, float, float);
 extern void func_PAL_L08_0042A6A0(char *, void *, int, float, float, float, float, float, float);
-extern void func_L08_004257A0(char *);
+extern void creature_pick_random_target(char *);
 extern int func_001163B0(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A7820(int, int);
-extern float func_00283248(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_range(int, int);
+extern float mat_fast_helper_a(float, float);
 extern int func_PAL_L08_0042B6D0(char *, float, float, int, float, float, float);
-extern void func_L08_004258D0(char *);
-extern int func_00282978(void *);
-extern float func_00282DF0(void *);
-extern int func_L08_00429238(char *, int, int);
-extern float func_00283C80(float, float);
-extern float func_00283B98(float, float);
-extern void func_L08_004262C0(char *);
-extern void func_L08_00424ED0(char *);
-extern int func_L08_00429350(char *);
-extern int func_002B1C20(char *, void *);
-extern char *func_0029EFD0(int);
+extern void creature_compute_aim_point(char *);
+extern int FastDecTimer(void *);
+extern float FastVecLength(void *);
+extern int ClaimTaboraSlot(char *, int, int);
+extern float FastDiffRots(float, float);
+extern float FastAddRotations(float, float);
+extern void dune_monster_sweep_attack(char *);
+extern void group_advance_turn(char *);
+extern int slot_release_by_key(char *);
+extern int moby_dispatch_action_by_kind(char *, void *);
+extern char *CreateMoby(int);
 extern void func_002A0F48(char *);
-extern void func_002AB650(char *);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void func_L08_00424F40(char *);
-extern void func_002A6C58(char *, int, int);
+extern void hero_copy_field_to_moby(char *);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void group_remove_member(char *);
+extern void SetDeathBits(char *, int, int);
 extern void func_PAL_L08_0042AC50(char *);
-extern void func_L08_003D3928(char *, void *);
+extern void UpdateNearestTarget(char *, void *);
 
 /* Per-frame state machine of a level-08 moby: wait for its trigger, rise above and sink
    below the height at +0x1C4, patrol and attack, recover
@@ -65,18 +66,18 @@ void func_PAL_L08_0042BE14(char *actor) {
     int ready;
     int flags;
     float angle;
-    if (!func_002ACD38(actor + 0x10)) return;
+    if (!moby_is_in_selected_zone(actor + 0x10)) return;
     p = FIELD(actor, char *, 0x68);
     if (FIELD(actor, u8, 0x20) == 0) {
         u16 id = FIELD(actor, u16, 0xB2);
-        int bits = D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+        int bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
         if ((id & 1) ? (((bits >> 4) & 7) != 0) : ((bits & 7) != 0)) {
-            func_0029F338(actor);
+            moby_mark_spawned(actor);
             return;
         }
         func_PAL_L08_0042B190(actor);
     }
-    if (func_00282E80(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
+    if (vec_distance_xy(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
     func_PAL_L08_0042B610(actor);
     switch (FIELD(actor, u8, 0x20)) {
     case 0: break;
@@ -86,11 +87,11 @@ void func_PAL_L08_0042BE14(char *actor) {
         switch (FIELD(p, u8, 0x20C)) {
         case 0:
         case 1:
-            if (!func_002A77E0(7)) {
-                func_L08_0032F898(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 0.0f,
+            if (!math_random_int_below(7)) {
+                SelectNearestListedMoby(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 0.0f,
                     FIELD(p, int, 0x1D0), -1, FIELD(p, int, 0x1D4), -1);
                 if (FIELD(p, int, 0x164) != 2)
-                    condition = ~func_L04_00343498(actor, (float)FIELD(actor, s16, 0x32));
+                    condition = ~vec_apply_scaled_value(actor, (float)FIELD(actor, s16, 0x32));
                 else break;
                 goto ready_nonzero;
             }
@@ -101,9 +102,9 @@ void func_PAL_L08_0042BE14(char *actor) {
                 ready = 1;
             }
             break;
-        case 3: ready = func_L08_004254D0(FIELD(p, int, 0x1EC)) != 0; break;
+        case 3: ready = moby_handle_is_gone(FIELD(p, int, 0x1EC)) != 0; break;
         case 5:
-            condition = func_L08_00425518(FIELD(p, int, 0x1E8));
+            condition = moby_handle_is_past_early_state(FIELD(p, int, 0x1E8));
 ready_nonzero:
             ready = condition != 0;
             break;
@@ -112,13 +113,13 @@ ready_nonzero:
             FIELD(actor, u8, 0xBC) = 0;
             ready = 1;
         }
-        if (ready && func_L04_00343498(actor, (float)FIELD(actor, s16, 0x32)) != -1) {
+        if (ready && vec_apply_scaled_value(actor, (float)FIELD(actor, s16, 0x32)) != -1) {
             FIELD(actor, u8, 0x30) = FIELD(p, u8, 0x20E);
             qzero(p + 0x190);
-            if (FIELD(actor, u8, 0x43) != 1) func_002A7470(actor, 1, 0, 10);
+            if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 10);
             FIELD(actor, u8, 0x31) = 1;
             FIELD(actor, u16, 0x34) &= 0xFFFE;
-            func_002A7750(actor, 2, -1);
+            moby_set_state(actor, 2, -1);
             D_L08_001B99C0.amount = 0.25f;
             D_L08_001B99C0.timer = 32;
             D_L08_001B99C0.phase = 0;
@@ -131,8 +132,8 @@ ready_nonzero:
     }
     case 2: {
         float height;
-        if (func_002B3868(actor)) func_002E5CF8(0, 0, actor);
-        func_002AA548(actor + 0x18, FIELD(p, float, 0x1C8), p + 0x198,
+        if (flag_set_first_pending(actor)) PlayMobySound(0, 0, actor);
+        math_step_value_toward_target(actor + 0x18, FIELD(p, float, 0x1C8), p + 0x198,
             0.012f, 0.006f, 0.64000005f);
         height = FIELD(p, float, 0x1C4);
         if (FIELD(actor, float, 0x18) < height + 1.5f) {
@@ -143,21 +144,21 @@ ready_nonzero:
         if (FIELD(actor, u8, 0x60) & 2) {
             FIELD(actor, int, 0x98) = FIELD(FIELD(actor, char *, 0x24), int, 0x10);
             FIELD(actor, u16, 0x34) |= 0x1000;
-            func_L08_004257A0(actor);
+            creature_pick_random_target(actor);
             if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 4)
-                func_002A7470(actor, (func_001163B0() & 1) | 4, 0, 10);
-            func_002A7750(actor, 4, 0);
+                anim_start_blended(actor, (func_001163B0() & 1) | 4, 0, 10);
+            moby_set_state(actor, 4, 0);
         }
         break;
     }
     case 3: {
         float height;
-        func_002AA548(actor + 0x18, FIELD(p, float, 0x1C4) - 1.5f, p + 0x198,
+        math_step_value_toward_target(actor + 0x18, FIELD(p, float, 0x1C4) - 1.5f, p + 0x198,
             0.012f, 0.006f, 0.64000005f);
-        func_00282CF0(local, p + 0x170, actor + 0x10);
-        func_00282D30(local, local, 0.025f);
+        FastVecSub(local, p + 0x170, actor + 0x10);
+        FastVecScale(local, local, 0.025f);
         local[2] = 0.0f;
-        func_00282CC0(actor + 0x10, actor + 0x10, local);
+        FastVecAdd(actor + 0x10, actor + 0x10, local);
         height = FIELD(p, float, 0x1C4);
         if (FIELD(actor, float, 0x18) < height + 1.5f) {
             qcopy(local2, actor + 0x10);
@@ -169,140 +170,140 @@ ready_nonzero:
             FIELD(actor, int, 0x98) = 0;
             FIELD(actor, u16, 0x34) &= 0xEFFF;
             FIELD(actor, float, 0x18) = FIELD(p, float, 0x1C4);
-            if (FIELD(actor, u8, 0x43)) func_002A7470(actor, 0, 0, 2);
-            func_002A7750(actor, 1, -1);
+            if (FIELD(actor, u8, 0x43)) anim_start_blended(actor, 0, 0, 2);
+            moby_set_state(actor, 1, -1);
             FIELD(actor, u8, 0x30) = FIELD(p, u8, 0x20F);
         }
         break;
     }
     case 4:
-        if (!func_002A77E0(7))
-            func_L08_0032F898(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 60.0f,
+        if (!math_random_int_below(7))
+            SelectNearestListedMoby(actor, p + 0x120, (float)FIELD(actor, s16, 0x32), 60.0f,
                 FIELD(p, int, 0x1D8), FIELD(p, int, 0x1E0), FIELD(p, int, 0x1DC), -1);
-        if (func_00282E80(actor + 0x10, p + 0x120) < 8.0f) FIELD(p, s16, 0x1B8) = 100;
+        if (vec_distance_xy(actor + 0x10, p + 0x120) < 8.0f) FIELD(p, s16, 0x1B8) = 100;
         switch (FIELD(actor, u8, 0x95)) {
         case 1:
             if (!FIELD(p, s16, 0x1B0)) {
                 u16 timer;
-                FIELD(p, s16, 0x1B0) = ((s32)func_002A7820(240, 480) * 5 + 2) / 6;
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(15, 30));
+                FIELD(p, s16, 0x1B0) = ((s32)math_random_int_range(240, 480) * 5 + 2) / 6;
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 timer = FIELD(actor, u16, 0x96);
-                func_002A7750(actor, 4, 0);
+                moby_set_state(actor, 4, 0);
                 FIELD(actor, u16, 0x96) = timer;
             }
             if (FIELD(p, int, 0x164) != 2 && !FIELD(p, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                func_002A7750(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             break;
         case 0:
             if (func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
-                func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
+                mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) FIELD(p, s16, 0x1B0) = 0;
             if (!FIELD(p, s16, 0x1B0)) {
                 if (FIELD(actor, u16, 0x96) < 60) {
                     u16 timer;
-                    func_L08_004257A0(actor);
-                    FIELD(p, s16, 0x1B0) = ((s32)func_002A7820(90, 180) * 5 + 2) / 6;
+                    creature_pick_random_target(actor);
+                    FIELD(p, s16, 0x1B0) = ((s32)math_random_int_range(90, 180) * 5 + 2) / 6;
                     if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 2)
-                        func_002A7470(actor, (func_001163B0() & 1) | 2, 0, 30);
+                        anim_start_blended(actor, (func_001163B0() & 1) | 2, 0, 30);
                     timer = FIELD(actor, u16, 0x96);
-                    func_002A7750(actor, 4, 1);
+                    moby_set_state(actor, 4, 1);
                     FIELD(actor, u16, 0x96) = timer;
                 } else {
                     FIELD(p, s16, 0x1B0) = 32767;
                     qcopy(p + 0x180, p + 0x170);
                     FIELD(p, float, 0x188) = FIELD(actor, float, 0x18);
-                    func_002A7750(actor, 4, 4);
+                    moby_set_state(actor, 4, 4);
                 }
             }
             /* Same check as case 4; jump2 cross-jumps the two, sharing the call above. */
             if (FIELD(p, int, 0x164) != 2 && !FIELD(p, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                func_002A7750(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             goto patrol_heading;
         case 4:
             if (func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
-                func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
+                mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) {
-                if (FIELD(actor, u8, 0x43)) func_002A7470(actor, 0, 0, 180);
-                func_002A7750(actor, 3, -1);
+                if (FIELD(actor, u8, 0x43)) anim_start_blended(actor, 0, 0, 180);
+                moby_set_state(actor, 3, -1);
             }
             if (FIELD(p, int, 0x164) != 2 && !FIELD(p, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                func_002A7750(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             goto patrol_heading;
         case 2:
-            func_L08_004258D0(actor);
+            creature_compute_aim_point(actor);
             FIELD(p, float, 0x188) = FIELD(p, float, 0x1C8);
-            if (func_00282978(p + 0x1B8)) {
+            if (FastDecTimer(p + 0x1B8)) {
                 func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
-                    func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
+                    mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             } else {
                 func_PAL_L08_0042B6D0(actor, 32.0f, 12.0f, 1,
-                    func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
+                    mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             }
             if (FIELD(actor, u8, 0x60) & 2) {
-                if (func_00282DF0(p + 0x190) < 0.020000001f) {
+                if (FastVecLength(p + 0x190) < 0.020000001f) {
                     if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 4)
-                        func_002A7470(actor, (func_001163B0() & 1) | 4, 0, 10);
-                } else if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, 10);
+                        anim_start_blended(actor, (func_001163B0() & 1) | 4, 0, 10);
+                } else if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, 10);
             }
             if (FIELD(p, int, 0x164) == 2) {
-                if (!func_00282978(p + 0x1B4)) goto patrol_heading;
+                if (!FastDecTimer(p + 0x1B4)) goto patrol_heading;
                 goto resume_patrol;
             }
             if (FIELD(p, s16, 0x1BC) >= 200) {
 resume_patrol:
             if (FIELD(actor, u8, 0x43) != (func_001163B0() & 2) + 2)
-                func_002A7470(actor, (func_001163B0() & 2) + 2, 0, 10);
+                anim_start_blended(actor, (func_001163B0() & 2) + 2, 0, 10);
             FIELD(actor, u8, 0x30) = FIELD(p, u8, 0x20E);
-            func_002A7750(actor, 4, 0);
+            moby_set_state(actor, 4, 0);
                 goto patrol_heading;
             } else {
                 FIELD(p, s16, 0x1B4) = 200;
                 if ((FIELD(actor, u8, 0x21) != 255 &&
                         FIELD(FIELD(p, char *, 0x1F8), int, 0) != FIELD(p, u8, 0x20D)) ||
-                    !func_00282978(p + 0x1B6) || !func_L08_00429238(actor, 1, 0) ||
+                    !FastDecTimer(p + 0x1B6) || !ClaimTaboraSlot(actor, 1, 0) ||
                     FIELD(p, s16, 0x1BC)) goto patrol_heading;
                 FIELD(p, float, 0x1F4) = -0.78539824f;
                 FIELD(p, float, 0x1F0) = 1.0f;
                 FIELD(p, int, 0x204) = 0;
                 FIELD(p, int, 0x21C) = 0;
                 FIELD(p, u8, 0x219) = 0;
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(15, 30));
-                func_002A7750(actor, 4, 3);
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
+                moby_set_state(actor, 4, 3);
                 FIELD(p, u8, 0x218) = 0;
                 FIELD(actor, u8, 0x30) = 255;
                 goto patrol_heading;
             }
             goto patrol_heading;
         case 3:
-            func_L08_004258D0(actor);
-            angle = func_00283248(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
+            creature_compute_aim_point(actor);
+            angle = mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14));
-            if (func_00282978(p + 0x1B8)) {
+            if (FastDecTimer(p + 0x1B8)) {
                 func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1, angle, 0.0f,
-                    -func_00283248(func_00282E80(actor + 0x10, p + 0x140),
+                    -mat_fast_helper_a(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             } else {
                 func_PAL_L08_0042B6D0(actor, 32.0f, 12.0f, 1, angle, 0.0f,
-                    -func_00283248(func_00282E80(actor + 0x10, p + 0x140),
+                    -mat_fast_helper_a(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             }
             switch (FIELD(p, u8, 0x218)) {
             case 0:
-                if (func_00283C80(angle, FIELD(p, float, 0x208)) < 0.6981318f) {
+                if (FastDiffRots(angle, FIELD(p, float, 0x208)) < 0.6981318f) {
                     FIELD(p, float, 0x1F4) = -0.78539824f;
                     FIELD(p, float, 0x1F0) = 1.0f;
-                    if (FIELD(actor, u8, 0x43) != 7) func_002A7470(actor, 7, 0, func_002A7820(8, 15));
+                    if (FIELD(actor, u8, 0x43) != 7) anim_start_blended(actor, 7, 0, math_random_int_range(8, 15));
                     FIELD(p, u8, 0x218) = 1;
                 }
                 goto attack_check_cancel;
@@ -316,7 +317,7 @@ resume_patrol:
                 goto attack_move;
             case 2: {
                 float sweep, direction;
-                FIELD(p, float, 0x1F4) = func_00283B98(FIELD(p, float, 0x1F4), FIELD(p, float, 0x1F0) * 0.024434613f);
+                FIELD(p, float, 0x1F4) = FastAddRotations(FIELD(p, float, 0x1F4), FIELD(p, float, 0x1F0) * 0.024434613f);
                 sweep = FIELD(p, float, 0x1F4);
                 direction = FIELD(p, float, 0x1F0);
                 if (direction > 0.0f) {
@@ -333,7 +334,7 @@ sweep_done:
                 goto attack_move;
             }
             case 3:
-                if (func_00282978(p + 0x21A)) FIELD(p, u8, 0x218) = 2;
+                if (FastDecTimer(p + 0x21A)) FIELD(p, u8, 0x218) = 2;
                 goto attack_move;
             case 4:
                 FIELD(p, float, 0x21C) -= 0.012f;
@@ -342,27 +343,27 @@ sweep_done:
                     FIELD(p, u8, 0x218) = 5;
                 }
 attack_move:
-                func_L08_004262C0(actor);
+                dune_monster_sweep_attack(actor);
                 goto attack_check_cancel;
             case 5:
-                func_L08_00424ED0(actor);
-                func_L08_00429350(actor);
+                group_advance_turn(actor);
+                slot_release_by_key(actor);
                 FIELD(p, int, 0x204) = 0;
                 FIELD(p, s16, 0x1B6) = 75;
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(8, 15));
-                func_002A7750(actor, 4, 0);
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(8, 15));
+                moby_set_state(actor, 4, 0);
                 goto attack_check_cancel;
             default: goto attack_check_cancel;
 
             }
 attack_check_cancel:
             if (FIELD(p, int, 0x164) == 2 || FIELD(p, s16, 0x1BC) >= 200) {
-                func_L08_00424ED0(actor);
-                func_L08_00429350(actor);
+                group_advance_turn(actor);
+                slot_release_by_key(actor);
                 FIELD(p, s16, 0x1B6) = 0;
-                if (FIELD(actor, u8, 0x43) != 6) func_002A7470(actor, 6, 0, func_002A7820(8, 15));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(8, 15));
                 FIELD(actor, u8, 0x30) = FIELD(p, u8, 0x20E);
-                func_002A7750(actor, 4, 0);
+                moby_set_state(actor, 4, 0);
             } else FIELD(p, s16, 0x1B4) = 200;
 patrol_heading:
             FIELD(actor, float, 0xF8) = FIELD(p, float, 0x208);
@@ -372,22 +373,22 @@ patrol_heading:
     case 5:
         FIELD(actor, u8, 0x30) = 255;
         FIELD(actor, s16, 0x32) = 255;
-        func_L08_00429350(actor);
+        slot_release_by_key(actor);
         FIELD(p, u16, 0x1BA)++;
-        flags = func_002B1C20(actor, p + 0x50);
+        flags = moby_dispatch_action_by_kind(actor, p + 0x50);
         FIELD(p, float, 0x208) = FIELD(actor, float, 0xF8);
-        if (flags & 1) func_002A7750(actor, 6, -1);
+        if (flags & 1) moby_set_state(actor, 6, -1);
         else if ((flags & 2) || FIELD(p, s16, 0x1BA) >= 96) {
             if (FIELD(p, float, 0x20) > 0.0f) {
                 qzero(p + 0x1A0);
                 FIELD(p, u8, 0x6A) = 2;
-                if (FIELD(actor, u8, 0x43) != 4) func_002A7470(actor, 4, 0, 40);
+                if (FIELD(actor, u8, 0x43) != 4) anim_start_blended(actor, 4, 0, 40);
                 FIELD(p, s16, 0x1BA) = 0;
                 qzero(p + 0x190);
                 FIELD(actor, u8, 0x30) = FIELD(p, u8, 0x20E);
-                func_002A7750(actor, 4, 2);
-                func_L08_00424ED0(actor);
-            } else func_002A7750(actor, 6, -1);
+                moby_set_state(actor, 4, 2);
+                group_advance_turn(actor);
+            } else moby_set_state(actor, 6, -1);
         }
         if ((flags & 4) || FIELD(actor, float, 0x18) < FIELD(p, float, 0x1C4) + 1.5f) {
             FIELD(p, u16, 0x1BA)++;
@@ -401,8 +402,8 @@ patrol_heading:
         char *child;
         u16 id;
         u8 *bits;
-        func_L08_00429350(actor);
-        child = func_0029EFD0(0x8C4);
+        slot_release_by_key(actor);
+        child = CreateMoby(0x8C4);
         if (!child) break;
         FIELD(child, u8, 0x23) = 80;
         FIELD(child, u16, 0x34) |= 0x800;
@@ -415,16 +416,16 @@ patrol_heading:
         if (FIELD(p, float, 0x1C4) != 0.0f) FIELD(child, float, 0x18) = FIELD(p, float, 0x1C4);
         FIELD(FIELD(child, char *, 0x68), char *, 4) = actor;
         func_002A0F48(child);
-        func_002AB650(child);
+        hero_copy_field_to_moby(child);
         if (FIELD(actor, u8, 0x20) == 7)
-            func_002ABBB8(actor, p + 0x190, 0, 0.0f, 0.0f, 20, 6, 32,
+            SpawnExplosionEffects(actor, p + 0x190, 0, 0.0f, 0.0f, 20, 6, 32,
                 8.0f, 4.0f, 9.0f, 2.0f, -1, 30.0f, 1, 2, -1, 0, 0x810001);
-        func_L08_00424F40(actor);
-        func_002A6C58(actor, 0, 3);
+        group_remove_member(actor);
+        SetDeathBits(actor, 0, 3);
         D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = 0;
         D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = 0;
         id = FIELD(actor, u16, 0xB2);
-        bits = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+        bits = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
         {
             u8 value = *bits;
             u8 low = value & 0xF8;
@@ -432,7 +433,7 @@ patrol_heading:
             value = !(id & 1) ? low : high;
             *bits = value;
         }
-        func_0029F338(actor);
+        moby_mark_spawned(actor);
         return;
     }
     case 8: break;
@@ -443,14 +444,14 @@ patrol_heading:
         if (index != -1 && FIELD(FIELD(p, char *, 0x1FC), int, 0)) {
             char *target = (char *)(D_L08_001B29DC + (index << 8));
             if (!target || FIELD(target, u8, 0x20) == 0xFE || FIELD(target, u8, 0x20) == 0xFD)
-                func_L08_003D3928(actor, actor + 0x10);
-            else func_L08_003D3928(actor, target + 0x10);
-        } else func_L08_003D3928(actor, actor + 0x10);
+                UpdateNearestTarget(actor, actor + 0x10);
+            else UpdateNearestTarget(actor, target + 0x10);
+        } else UpdateNearestTarget(actor, actor + 0x10);
     }
     if (FIELD(actor, float, 0x10) < 30.0f || FIELD(actor, float, 0x10) > 993.0f ||
         FIELD(actor, float, 0x14) < 30.0f || FIELD(actor, float, 0x14) > 993.0f ||
         FIELD(actor, float, 0x18) < 30.0f || FIELD(actor, float, 0x18) > 993.0f) {
-        func_L08_00424F40(actor);
-        func_0029F338(actor);
+        group_remove_member(actor);
+        moby_mark_spawned(actor);
     }
 }

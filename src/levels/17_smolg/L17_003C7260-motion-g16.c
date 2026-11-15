@@ -5,11 +5,11 @@ extern int D_L17_001B2748 MACRO_ADDR;
 extern int D_L17_001C0018 NOT_SDA;
 extern float D_L17_001B0390 __attribute__((sda));
 extern UpdateVec D_L17_001B0380 __attribute__((sda));
-extern char D_00189EA0[];
-extern void *D_0018C0B0 NOT_SDA;
+extern char g_hero_position[];
+extern void *g_hero_moby NOT_SDA;
 extern char D_L17_001A8F20[] __attribute__((sda));
 extern float func_0031CD58(void *, int, float);
-extern int func_L17_003C70E0(void *);
+extern int platform_is_player_inside_footprint(void *);
 extern void func_002EF398(void *, void *, void *);
 extern void func_0031D090(void *, void *, int, void *, float);
 extern void func_0031D2B0(void *, void *);
@@ -20,7 +20,7 @@ extern void func_002EEEE8(void *, void *, void *);
 extern void func_00323370(void *, void *, void *, void *);
 /* Updates the falling object: it drops to the ground, hurts the player if it lands on
    them, and wakes up when the player stays close for a while. */
-void func_L17_003C7260(char *self) {
+void falling_l17_object_update(char *self) {
     UpdateVec oldpos, delta;
     char collision[0x30];
     char *position;
@@ -40,16 +40,16 @@ void func_L17_003C7260(char *self) {
                 *(int *)(data + 0x98) = 0;
                 *(float *)(self + 0x18) = ground;
             }
-            if (IsPlayerInsideObjectFootprint(self)) {
+            if (platform_is_player_inside_footprint(self)) {
                 func_002EF398(&delta, &D_L17_001B0380, self + 0xC0);
                 func_0031D090(collision, self, 0x10001, &delta, 2.0f);
-                func_0031D2B0(gHeroMoby_0018C0B0, collision);
+                func_0031D2B0(g_hero_moby, collision);
             }
         }
     }
     if (D_L17_001B2748 >= 31) {
         if (*(int *)(data + 0xA4) == 0 && *(int *)(data + 0xA8) >= 51 &&
-            func_002EF078(position, gHeroPosition) < 15.0f && *(unsigned char *)(self + 0x20) == 0) {
+            func_002EF078(position, g_hero_position) < 15.0f && *(unsigned char *)(self + 0x20) == 0) {
             func_00327FF8(self, 0x931, 0, 0x931, 4, 6, 0, D_L17_001A8F20);
             func_003629B8(0, 0, self);
             *(unsigned char *)(self + 0x20) = 1;

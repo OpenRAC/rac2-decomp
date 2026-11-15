@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; int fallback; } SelectionCallback;
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern char *D_001A8CFC;
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
 extern int func_PAL_L00_0030F998(int);
 extern char *func_PAL_00344418(void *);
 extern void func_PAL_002D6A70(int);
@@ -13,15 +14,15 @@ extern int ref_PAL_L00_00350F30_00(int);
 int func_PAL_L00_00350F30(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
-    CallbackMenuState *state = &D_00138180;
+    CallbackMenuState *state = &g_pad_state;
     int flags = state->flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         int status;
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }

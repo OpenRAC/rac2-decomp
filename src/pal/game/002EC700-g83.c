@@ -13,7 +13,7 @@ typedef struct {
     char pad58[0x10]; void *tail; unsigned char *source; int destination;
     char pad74[0x118]; SceneObject *objects[17];
 } SceneList;
-extern SceneList D_001B8840;
+extern SceneList g_scene_playback_state;
 typedef struct { char pad0[0x24]; int pending; char pad28[0x40]; int busy; char pad6C[6]; unsigned short state; } SceneContextEnd;
 extern SceneContextEnd D_001A63A8_3;
 typedef struct { char pad[0x12C0]; SceneObject *object; } SceneEndRoot;
@@ -21,18 +21,18 @@ extern SceneEndRoot D_00189E20_9;
 typedef struct { char pad[0xB0]; float fade; } SceneFade;
 extern SceneFade D_001B9040;
 typedef struct { char pad[0xFC]; SceneObject *object; } SceneOwnerEnd;
-extern SceneOwnerEnd D_001F2840;
+extern SceneOwnerEnd g_pause_menu_state;
 typedef struct { int unk0; SceneObject *moby; void *data; } SceneTalkEnd;
 extern SceneTalkEnd D_001B178C MACRO_ADDR;
 extern int D_001B15A8 __attribute__((section(".sdata")));
 extern int D_001B15AC __attribute__((section(".sdata")));
-extern float D_001B15A0 __attribute__((sda));
-extern void func_0027D330(int);
+extern float g_screen_fade __attribute__((sda));
+extern void FadeToBlack(int);
 extern void func_PAL_002E5898(void);
-extern int func_001261F0(int);
-extern int func_00132028(void);
-extern void func_0027AB40(void);
-extern void func_0029F338(SceneObject *);
+extern int sceGsSyncV(int);
+extern int snd_Pump(void);
+extern void UpdateViewContext(void);
+extern void moby_mark_spawned(SceneObject *);
 
 /* Scene teardown: puts the transition word back to 5 unless it is 6 or 7,
    calls func_0027D330(12) and waits until the transition is idle with
@@ -48,29 +48,29 @@ void func_PAL_002EC9C0(void)
     SceneContextEnd *context = &D_001A63A8_3;
     unsigned short state = context->state;
     if ((unsigned int)(state - 6) >= 2) context->state = 5;
-    func_0027D330(12);
+    FadeToBlack(12);
     while (D_001A63A8_3.busy || D_001A63A8_3.pending != -1) {
-        func_PAL_002E5898(); func_001261F0(0);
+        func_PAL_002E5898(); sceGsSyncV(0);
     }
-    while (func_00132028()) {}
+    while (snd_Pump()) {}
     D_001B9040.fade = 0.63f;
     D_001B15A8 = 0;
     D_001B15AC = 0;
-    D_001B15A0 = 0.0f;
-    func_0027AB40();
-    for (i = 0; i < D_001B8840.count; i++) {
-        obj = D_001B8840.objects[i];
+    g_screen_fade = 0.0f;
+    UpdateViewContext();
+    for (i = 0; i < g_scene_playback_state.count; i++) {
+        obj = g_scene_playback_state.objects[i];
         if (obj) {
             obj->model[12]--;
             { unsigned char *model = obj->model;
             model += model[12] * 4;
             *(int *)(model + 0x48) = 0; }
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
         }
     }
     { SceneEndRoot *owner = &D_00189E20_9;
-    if (owner->object) { func_0029F338(owner->object); owner->object = 0; } }
+    if (owner->object) { moby_mark_spawned(owner->object); owner->object = 0; } }
     if (D_001B178C.moby) D_001B178C.moby->flags34 &= ~1;
-    obj = D_001F2840.object;
-    if (obj) { obj->flags34 &= ~1; D_001F2840.object = 0; }
+    obj = g_pause_menu_state.object;
+    if (obj) { obj->flags34 &= ~1; g_pause_menu_state.object = 0; }
 }

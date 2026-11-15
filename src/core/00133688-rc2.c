@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,15 +24,15 @@
  */
 #include "common.h"
 
-extern s32 func_00125588();
+extern s32 sceCdGetError();
 extern s32 D_001A748C __attribute__((sda));
 
 extern s32 D_001A7110 __attribute__((nosda));
 
 /* Returns the error code of the last disc read. */
-s32 func_00133688(void) {
+s32 snd_get_cd_read_error(void) {
     if (D_001A748C == 0) {
-        return GetCdLastError();
+        return sceCdGetError();
     }
     return D_001A7110;
 }

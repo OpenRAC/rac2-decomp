@@ -8,11 +8,11 @@ typedef struct {
     u8 pad00[0x34];
     s32 time;
 } L02_Clock;
-extern int D_001A79F0;
-extern void func_L01_002E2608(void *, int, int, unsigned int, int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A7820(int, int);
+extern int g_current_map_index;
+extern void DrawQuadWithRotatedUVs(void *, int, int, unsigned int, int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_range(int, int);
 extern L02_Table10 D_L02_001A9460;
 extern float D_L02_001B2FE4;
 extern L02_Clock D_L02_001BE200;
@@ -37,7 +37,7 @@ void func_PAL_L02_00302438(void *unused) {
     int k, n, alpha, id, id2, extra;
     float frac;
 
-    if (D_001A79F0 == 2) {
+    if (g_current_map_index == 2) {
         int first_end = 0x102, second_end = 0x13D, third_end = 0x14D;
 
         tab = D_L02_001A9460;
@@ -57,33 +57,33 @@ void func_PAL_L02_00302438(void *unused) {
             id = 0x46;
             if (n > 0) {
                 id = 0x47;
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0x21);
+                frac = IntToFloat(n);
+                frac = frac / IntToFloat(0x21);
                 id2 = 0x46;
-                alpha = func_00283CF0(frac * 127.0f);
+                alpha = FloatToInt(frac * 127.0f);
             }
         } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
             id = 0x47;
         } else if (D_L02_001BE200.time > second_end && D_L02_001BE200.time < third_end) {
-            extra = func_002A7820(0, 3);
+            extra = math_random_int_range(0, 3);
             id = 0x49;
         } else if (D_L02_001BE200.time > third_end && D_L02_001BE200.time < 0x16C) {
             n = D_L02_001BE200.time - 0x15C;
             id = 0x48;
             if (n > 0) {
-                frac = func_00283CE0(n);
-                frac = frac / func_00283CE0(0xC);
-                alpha = 0x7F - func_00283CF0(frac * 127.0f);
+                frac = IntToFloat(n);
+                frac = frac / IntToFloat(0xC);
+                alpha = 0x7F - FloatToInt(frac * 127.0f);
             }
             if (alpha < 0)
                 alpha = 0;
         }
         if (id != -1) {
             if (id2 == -1 || id == id2) {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                func_L01_002E2608(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
-                func_L01_002E2608(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

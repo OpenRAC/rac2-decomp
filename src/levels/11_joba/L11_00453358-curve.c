@@ -51,14 +51,14 @@ extern char D_L11_001B46C4[] __attribute__((sda));
 extern char D_L11_002626B0[];
 extern char D_L11_00262710[];
 extern void func_00282D30_2(char *, char *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 extern char *D_L11_001FF580[];
 extern char D_L11_001B1DD0[], D_L11_001B1E00[], D_L11_001B1E28[];
-extern void func_0026FEB8(char *, ...);
+extern void STUB_printf(char *, ...);
 
 /* Works out where something moving along a path made of curve pieces is at a given frame, and gives back its x and y. */
-void func_L11_004577F8(int *outX, int *outY, int selector, int frame,
+void InterpolateSegmentedPath(int *outX, int *outY, int selector, int frame,
                        int *previousCurve, int *segment, char *object)
 {
     float point[4], delta[4];

@@ -29,24 +29,24 @@ extern int D_00138344[];
 
 extern int D_001ABA68 __attribute__((sda));
 
-extern SelectionCallback D_001F2840;
+extern SelectionCallback g_pause_menu_state;
 
 extern int D_0025CCE8[];
 
-extern int func_002E5E58(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 
-extern CallbackMenuState D_00138180;
+extern CallbackMenuState g_pad_state;
 
 extern int func_0029C560(int);
 
 extern int func_0029C4F0(int);
 
-extern char *func_003415B8(void *);
+extern char *tab_menu_get_selected_entry(void *);
 
-extern void func_002D5E98(int);
+extern void menu_start_action(int);
 
 /* Turns on a few menu setting flags when the panel exists and the matching options are set. */
-int func_002D1CB0(void)
+int menu_apply_setting_flags(void)
 {
     if (D_001A8CFC != 0) {
         if (D_001A7A0A != 0) {
@@ -64,7 +64,7 @@ int func_002D1CB0(void)
 }
 
 /* Handles input for a scrolling list of seven entries: up and down move the choice with a click sound, confirm and back leave. */
-int func_002D23F8(void)
+int menu_handle_scroll_list_input(void)
 {
     int flags = D_00138344[0];
     int result = 0;
@@ -72,10 +72,10 @@ int func_002D23F8(void)
         int value;
         int status;
         D_001ABA68 = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -88,16 +88,16 @@ finish:
         result = 1;
     } else if (flags & 0x8000) {
         if (--D_001ABA68 >= 0)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         if (D_001ABA68 < 0)
             D_001ABA68 = 0;
     } else if (flags & 0x2000) {
         if (++D_001ABA68 < 7)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         if (D_001ABA68 >= 7)
             D_001ABA68 = 6;
     }
@@ -106,18 +106,18 @@ finish:
 }
 
 /* Handles menu input: confirm or back leave, otherwise it passes the buttons on and sends the chosen entry's key and value to the menu. */
-int func_002CD950(void)
+int menu_handle_input_send_selection(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
-    CallbackMenuState *state = &gPadState;
+    CallbackMenuState *state = &g_pad_state;
     int flags = state->flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         int status;
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -130,28 +130,28 @@ int func_002CD950(void)
     } else {
         func_0029C4F0(flags);
         if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = GetSelectedTabEntryAddress(D_001A8CFC + 0x3BE08);
+            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3BE08);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
-            StartMenuAction((int)&message);
+            menu_start_action((int)&message);
         }
     }
     return result;
 }
 
 /* Like the menu input above, but plays a refusal sound when the chosen entry has no value. */
-int func_002CF1D0(void)
+int menu_handle_input_send_selection_or_refuse(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
-    CallbackMenuState *state = &gPadState;
+    CallbackMenuState *state = &g_pad_state;
     int flags = state->flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         int status;
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -164,12 +164,12 @@ finish:
     else {
         func_0029C560(flags);
         if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = GetSelectedTabEntryAddress(D_001A8CFC + 0x3BE08);
+            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3BE08);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
             if (message.value == 0)
-                PlaySoundFromGlobalBank(5, 0, 0);
-            StartMenuAction((int)&message);
+                snd_play_from_global_bank(5, 0, 0);
+            menu_start_action((int)&message);
         }
     }
     return result;
@@ -179,7 +179,7 @@ extern int D_001ABA28 __attribute__((sda));
 extern unsigned char D_001ABA30[8] __attribute__((sda));
 extern int D_001A7904 __attribute__((sda));
 extern short D_001A63AC[];
-extern void func_00288CB0(int, int);
+extern void data_set_small_value_and_refresh(int, int);
 
 typedef struct { char reserved00[0x10]; int flags; } FlagTarget;
 typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int f54; int f58; } MenuFields;
@@ -188,10 +188,10 @@ extern MenuFields D_0025C580;
 extern int D_0026CD20[];
 
 /* Handles input for an eight entry menu: moves the choice, plays sounds, and starts the screen for the chosen entry if it is available. */
-int func_002D0FA0(void)
+int menu_handle_eight_entry_input(void)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
-    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int flags = ((CallbackMenuState *)&g_pad_state)->flags;
     int old = D_001ABA28;
     int result = 0;
 
@@ -199,10 +199,10 @@ int func_002D0FA0(void)
         int value;
         int status;
         D_001ABA28 = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -215,30 +215,30 @@ finish:
         result = 1;
     } else {
         if (flags & 0x1000) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             if (--D_001ABA28 < 0)
                 D_001ABA28 = 7;
         } else if (flags & 0x4000) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             if (++D_001ABA28 >= 8)
                 D_001ABA28 = 0;
         }
-        if (((CallbackMenuState *)&gPadState)->flags & 0x40) {
+        if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
             if (D_001ABA30[D_001ABA28] != 0) {
-                PlaySoundFromGlobalBank(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
                 if ((unsigned)D_001ABA28 < 8)
                     goto *D_0026CD20[D_001ABA28];
                 goto cont;
-c0:            D_001A7904 = 2; SetSmallDataValueAndRefresh(2, 1); goto cont;
-c1:            D_001A7904 = 3; SetSmallDataValueAndRefresh(4, 1); goto cont;
-c2:            D_001A7904 = 3; SetSmallDataValueAndRefresh(11, 1); goto cont;
-c3:            D_001A7904 = 2; SetSmallDataValueAndRefresh(11, 1); goto cont;
-c4:            D_001A7904 = 1; SetSmallDataValueAndRefresh(26, 1); goto cont;
-c5:            D_001A7904 = 1; SetSmallDataValueAndRefresh(22, 1); goto cont;
-c6:            D_001A7904 = 1; SetSmallDataValueAndRefresh(23, 1); goto cont;
-c7:            SetSmallDataValueAndRefresh(21, 1); goto cont;
+c0:            D_001A7904 = 2; data_set_small_value_and_refresh(2, 1); goto cont;
+c1:            D_001A7904 = 3; data_set_small_value_and_refresh(4, 1); goto cont;
+c2:            D_001A7904 = 3; data_set_small_value_and_refresh(11, 1); goto cont;
+c3:            D_001A7904 = 2; data_set_small_value_and_refresh(11, 1); goto cont;
+c4:            D_001A7904 = 1; data_set_small_value_and_refresh(26, 1); goto cont;
+c5:            D_001A7904 = 1; data_set_small_value_and_refresh(22, 1); goto cont;
+c6:            D_001A7904 = 1; data_set_small_value_and_refresh(23, 1); goto cont;
+c7:            data_set_small_value_and_refresh(21, 1); goto cont;
             } else {
-                PlaySoundFromGlobalBank(5, 0, 0);
+                snd_play_from_global_bank(5, 0, 0);
             }
         }
 cont:

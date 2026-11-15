@@ -19,20 +19,20 @@ typedef struct {
     ParticleContext_C65A0 context;
 } Particle_C65A0;
 
-extern void *func_002B9030(int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern int func_00282C30(int);
-extern void func_002C6748(char *);
+extern void *part_alloc(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern int subtract_integer_with_clamp(int);
+extern void part_update_spin_falling(char *);
 extern unsigned char *ref_L00_0033DC48_00[];
 
 /* Creates a particle that flies with a speed and gravity, changing size and fading in see-through amount over its life. */
-Particle_C65A0 *func_002C65A0(const float *position, const float *velocity,
+Particle_C65A0 *part_spawn_gravity_fade(const float *position, const float *velocity,
                             float startSize, float endSize, float gravity,
                             int steps, unsigned int color, int phaseStep,
                             int alphaStart, int alphaEnd, int transformMode) {
-    Particle_C65A0 *particle = AllocParticle(0x55);
+    Particle_C65A0 *particle = part_alloc(0x55);
     if (particle != 0) {
         ParticleContext_C65A0 *context;
         int variation;
@@ -47,7 +47,7 @@ Particle_C65A0 *func_002C65A0(const float *position, const float *velocity,
         particle->size = startSize;
         particle->kind = 0x48;
         particle->variation = variation;
-        particle->phase = RandomIntBelow(0xFF);
+        particle->phase = math_random_int_below(0xFF);
         difference = alphaEnd - alphaStart;
         particle->shade = ref_L00_0033DC48_00[0][0];
         context->velocity[0] = velocity[0];
@@ -61,7 +61,7 @@ Particle_C65A0 *func_002C65A0(const float *position, const float *velocity,
         duration = IntToFloat(steps);
         context->size_delta = (endSize - startSize) / duration;
         particle->timer = subtract_integer_with_clamp(steps);
-        context->update = UpdateSpinFallingParticle;
+        context->update = part_update_spin_falling;
     }
     return particle;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,15 +24,15 @@
  */
 #include "common.h"
 
-extern s8 D_001A63A8[];
+extern s8 g_music_state[];
 
 /* Tries to claim the single attack turn: if nobody has it, records this enemy and starts a delay taken from its table. Returns 1 on success. */
-s32 func_L12_0041A6D0(s8 *moby, u32 slot) {
+s32 enemy_claim_attack_turn(s8 *moby, u32 slot) {
     s8 *turnState;
     s8 *vars;
     s32 delay;
 
-    turnState = gMusicState;
+    turnState = g_music_state;
     if ((*(s32 *)(turnState + 0x68) == 0) && (*(s32 *)(turnState + 0x24) == -1)) {
         vars = *(s8 **)(moby + 0x68);
         if (slot >= 10) {

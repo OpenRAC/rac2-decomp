@@ -1,23 +1,23 @@
 #include "common.h"
 
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern u8 D_L20_001B5600[], D_L20_001B5C00[];
 extern s32 D_L20_001A8F00[] __attribute__((sda));
-extern void func_0029F338(void *);
-extern s32 func_002AB1F0(u8 *);
-extern void func_0029B758(s32, s32);
-extern void func_L00_002B2BD0(void);
-extern void func_L00_002A53B8(void);
-extern void func_0028BDB0(u8 *);
-extern void func_0028BE00(u8 *);
-extern void func_0028C6D0(u8 *);
-extern s32 func_0028B3D0(s32, s32, void (*)(u8 *), void (*)(u8 *), void (*)(u8 *), s32, s32);
-extern s32 func_L00_002F6B90(u32);
-extern void func_L00_002A6708(void);
-extern void func_L00_002D24B8(void);
-extern s32 func_L00_002A4DB0(char *, s32, s32, s32);
-extern void func_L00_002D9D98(void);
-extern void func_L20_002D7730(s32, s32);
+extern void moby_mark_spawned(void *);
+extern s32 moby_get_private_value_0(u8 *);
+extern void level_store_value_pair(s32, s32);
+extern void hero_reset_speeds_and_vectors(void);
+extern void attachment_reset_all(void);
+extern void menu_init_panel_layout(u8 *);
+extern void weapon_wheel_update_select(u8 *);
+extern void weapon_wheel_draw(u8 *);
+extern s32 hud_set_slot_contents(s32, s32, void (*)(u8 *), void (*)(u8 *), void (*)(u8 *), s32, s32);
+extern s32 level_run_slot_callback(u32);
+extern void hero_clear_tracked_slots(void);
+extern void hero_clear_queued_anim(void);
+extern s32 anim_copy_entry_data(char *, s32, s32, s32);
+extern void cam_reset_default(void);
+extern void hero_l20_set_state(s32, s32);
 
 /* Apart from the leading state-1 block this is the same code as func_L18_002CFF48
    (src/levels/shared/L18_002CFD68-qcopy.c), and it needs the same grouped-copy profile.
@@ -25,9 +25,9 @@ extern void func_L20_002D7730(s32, s32);
    rebuilds it from the %hi kept in $s2.  D_L20_001A8F00 is declared as an sda array, as in
    the sibling, which gives retail's lui + lw into the same register. */
 /* Takes the hero out of vehicle or ride mode and puts it back on foot. */
-void func_L20_002C5A48(s32 keep)
+void hero_exit_vehicle_mode(s32 keep)
 {
-    u8 *hero = gHeroState;
+    u8 *hero = g_hero_state;
     u8 *base;
     u8 *object;
     float *record;
@@ -40,60 +40,60 @@ void func_L20_002C5A48(s32 keep)
         *(s32 *)(hero + 0x24D0) = *(s32 *)(hero + 0x24CC);
         *(s32 *)(hero + 0x24CC) = *(s16 *)(hero + 0x24D4);
         if (*(void **)(hero + 0x1860)) {
-            MarkMobySpawned(*(void **)(hero + 0x1860));
+            moby_mark_spawned(*(void **)(hero + 0x1860));
             *(void **)(hero + 0x1860) = 0;
         }
         if (*(void **)(hero + 0x1864)) {
-            MarkMobySpawned(*(void **)(hero + 0x1864));
+            moby_mark_spawned(*(void **)(hero + 0x1864));
             *(void **)(hero + 0x1864) = 0;
         }
     }
-    base = gHeroState;
+    base = g_hero_state;
     if (base[0x22B4] == 4) {
-        record = (float *)GetMobyPrivateValue0(*(u8 **)(base + 0x2290));
+        record = (float *)moby_get_private_value_0(*(u8 **)(base + 0x2290));
         if (record) *record = (float)*(s32 *)(base + 0x24CC);
         object = *(u8 **)(base + 0xC18);
         qcopy((base + 0x80), (object + 0x10));
         qcopy((base + 0x90), (object + 0xF0));
         *(s32 *)(base + 0x24CC) = *(s16 *)(base + 0x24D4);
-        if (!keep) StoreLevelObjectValuePair(0, 0);
-        ResetHeroSpeedsAndVectors();
+        if (!keep) level_store_value_pair(0, 0);
+        hero_reset_speeds_and_vectors();
         *(s16 *)(base + 0x34E) = 1;
         *(s32 *)(base + 0x3A4) &= ~1;
         *(s32 *)(base + 0x3A4) &= ~2;
         *(s32 *)(base + 0x3A0) = 0;
         base[0x22B5] = 0;
     }
-    ResetAllAttachmentRecords();
-    gHeroState[0x22B4] = 0;
-    SetHudSlotContents(35, 0, InitMenuPanelLayout, UpdateRadialWeaponSelect, DrawWeaponWheel, 0, 0);
-    RunSlotCallback(3);
-    attached = *(u8 **)(gHeroState + 0xC14);
+    attachment_reset_all();
+    g_hero_state[0x22B4] = 0;
+    hud_set_slot_contents(35, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
+    level_run_slot_callback(3);
+    attached = *(u8 **)(g_hero_state + 0xC14);
     if (attached) *(u16 *)(attached + 0x34) &= ~6;
-    *(u8 **)(gHeroState + 0xC14) = 0;
-    ClearTrackedSlots();
-    restored = *(u8 **)(gHeroState + 0xC18);
-    *(u8 **)(gHeroState + 0x2290) = restored;
-    qcopy((restored + 0x10), (gHeroState + 0x80));
+    *(u8 **)(g_hero_state + 0xC14) = 0;
+    hero_clear_tracked_slots();
+    restored = *(u8 **)(g_hero_state + 0xC18);
+    *(u8 **)(g_hero_state + 0x2290) = restored;
+    qcopy((restored + 0x10), (g_hero_state + 0x80));
     *(s32 *)(restored + 0x9C) = 0;
-    *(float *)(gHeroState + 0xC24) = 1.0f;
-    ClearHeroQueuedAnimation();
-    current = *(u8 **)(gHeroState + 0x2290);
+    *(float *)(g_hero_state + 0xC24) = 1.0f;
+    hero_clear_queued_anim();
+    current = *(u8 **)(g_hero_state + 0x2290);
     if (current[0x42] != 255) {
-        value = CopyAnimationEntryData((char *)current, current[0x42], current[0x40], (s32)D_L20_001B5600);
-        *(s32 *)(*(u8 **)(gHeroState + 0x2290) + 0x58) = value;
+        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)D_L20_001B5600);
+        *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x58) = value;
     }
-    current = *(u8 **)(gHeroState + 0x2290);
-    value = CopyAnimationEntryData((char *)current, current[0x43], current[0x41], (s32)D_L20_001B5C00);
-    *(s32 *)(*(u8 **)(gHeroState + 0x2290) + 0x5C) = value;
-    if (*(s32 *)(gHeroState + 0x2294) != 0x61) goto reset;
+    current = *(u8 **)(g_hero_state + 0x2290);
+    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)D_L20_001B5C00);
+    *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x5C) = value;
+    if (*(s32 *)(g_hero_state + 0x2294) != 0x61) goto reset;
     switch (D_L20_001A8F00[0]) {
     case 2:
     case 6:
         goto done;
     }
 reset:
-    YeedilEnterHeroAction(0, 1);
+    hero_l20_set_state(0, 1);
 done:
-    if (gHeroState[0x22B4] == 4) ResetDefaultCamera();
+    if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

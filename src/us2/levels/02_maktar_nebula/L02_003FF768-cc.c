@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L02_003FF768, the USA v2.00 copy of func_L02_003FE1B0: the same C. */
 
 typedef unsigned char u8;
@@ -10,23 +11,23 @@ typedef short s16;
 
 typedef int s32;
 
-extern char *D_L02_001B359C __attribute__((sda));
+extern char *g_moby_l02_pool __attribute__((sda));
 
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 
-extern void func_L02_003D2390(char *);
+extern void enemy_release_effect_record(char *);
 
-extern void func_L02_003D4900(char *);
+extern void chainblade_reset_to_idle(char *);
 
-extern void func_L02_003DB6D8(char *);
+extern void brawler_switch_off_actor(char *);
 
-extern void func_L02_003F18E8(char *);
+extern void actor_tear_down(char *);
 
-extern void func_L02_0040B980(char *);
+extern void flamethrower_robot_knock_out(char *);
 
-extern void func_L02_0040D180(char *);
+extern void blade_ball_explode(char *);
 
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 
 extern int D_L02_002A5600[];
 
@@ -47,42 +48,42 @@ extern int D_L02_002A5600[];
    other value to -1. The dispatch reads the level's own jump table (fourteen words in the level's
    data at 0x2A5560, one per value); `cases` only keeps the labels alive, and each label is named
    after the value that reaches it. */
-s32 func_L02_003F9B70(s32 a0);
+s32 arena_get_challenge_save_index(s32 a0);
 
 /* func_L02_003FB000 is defined in L02_003FB000-g8.c. */
 
 /* func_L02_003FB120 is matched in L02_003FB120-g8.c (built with -g). */
 
-extern s32 func_L02_003FB6C0(char *, char *);
+extern s32 arena_register_spawned_enemy(char *, char *);
 
 /* Looks through the entity list the object's state names for one of kind A1 whose byte at +0x20
    is 1; records A0 as that entity's owner and returns func_L02_003FB6C0's result for it.
    The walk is func_L02_003FB5A0's `do { ... } while ((s16)*p++ >= 0);`: a `for (;;)` with the
    test and the increment in the body makes this cc1 annul the loop-bottom slot (`bgezl`). */
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
 /* Looks through the entity list the object's state names for one of kind A1 whose byte at +0x20
    is 1; for the kinds 0x9F8 and 0xA44 it records A0 as that entity's owner, runs the kind's start
    function, counts it in the state and returns it. */
 /* Counts the kind of A1 in the state and sets its scale to one. */
-s32 func_L02_003FB6C0(char *a0, char *a1);
+s32 arena_register_spawned_enemy(char *a0, char *a1);
 
 /* func_L02_003FB7E0 is defined in L02_003F5430-g8.c ($gp accesses). */
 
 /* True when every occupied slot of the list at +0xA8 has content; then the list is cleared. */
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern void func_L02_003D2390(char *);
-extern void func_L02_003D4900(char *);
-extern void func_L02_003DB6D8(char *);
-extern void func_L02_003F18E8(char *);
-extern void func_L02_0040B980(char *);
-extern void func_L02_0040D180(char *);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern void enemy_release_effect_record(char *);
+extern void chainblade_reset_to_idle(char *);
+extern void brawler_switch_off_actor(char *);
+extern void actor_tear_down(char *);
+extern void flamethrower_robot_knock_out(char *);
+extern void blade_ball_explode(char *);
 
 /* Walks the 16-bit stream the object's table entry points at and calls the handler of the
    entity type each word names; a negative word ends the stream. */
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern void func_L02_003FC1B0(char *, s32);
+extern void IncrementMaktarTypeCounter(char *, s32);
 
 /* The test of the entity walks below: the group word at +0x40 is read again for every condition,
    as the handlers may change it. */
@@ -92,9 +93,9 @@ extern void func_L02_003FC1B0(char *, s32);
    of 4 or more and the flag not set, the one nearest to D_00189EA0, sets its flag and takes one
    off its kind's count (+0x50, +0x54). */
 /* Counts down one of the four timers named by a1; true when it was still running. */
-void func_L02_003FC1B0(char *a0, s32 a1);
+void IncrementMaktarTypeCounter(char *a0, s32 a1);
 
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
 extern s32 D_L02_001B35B8[] __attribute__((sda));
 /* Counts the entities of the object's group (state word 0x48) for which func_L02_004024A0 holds, then
    sets (func_L02_004024B0) or clears (func_L02_004024C0) entities until the count equals A1. */
@@ -106,7 +107,7 @@ extern s32 D_L02_001B35B8[] __attribute__((sda));
    called unless the resident record passes the screen. */
 /* func_L02_003FC9C0 is matched in L02_003F5430-g8.c. */
 
-extern int func_L02_003F9B70(int);
+extern int arena_get_challenge_save_index(int);
 /* Starts the actor: calls func_L02_00400650 with 0x25 plus a random pick below 2, sets state 1,
    releases the object held at +0xC0 and, by a per-slot flag, hands a vector whose third float
    is -1.59 or 2.16, with the matching 128-byte record, to func_L00_002B9D60; ends by setting
@@ -172,7 +173,7 @@ dflt:
 /* func_L02_004004D0 is matched in its own unit, src/levels/shared/L02_004004D0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Timer for one of the thirty-nine messages, refused while one is running. */
-s32 func_L02_00400650(char *a0, s32 a1);
+s32 arena_start_announcer_message(char *a0, s32 a1);
 
 /* func_L02_00400720 is defined in L02_003F5430-g8.c ($gp accesses). */
 

@@ -7,6 +7,6 @@
 extern void func_00115E28(void) __attribute__((noreturn));
 
 /* Default action when something goes wrong in exception handling: stops the program. */
-void func_00120354(void) {
-    abort_00115E28();
+void default_terminate(void) {
+    func_00115E28();
 }

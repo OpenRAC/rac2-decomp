@@ -17,18 +17,18 @@ typedef struct {
     int filter_count;
 } Root;
 
-extern Root D_00189E20;
+extern Root g_hero_state;
 extern int ref_L00_002B0528_0 __attribute__((sda));
-extern void func_00283678(void *, void *);
-extern void func_002AB028(void *);
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002AB6D8(void *, void *);
-extern float func_L00_002B0480(Row *, Row *);
+extern void copy_matrix3x4(void *, void *);
+extern void mat_normalize_columns(void *);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void mat_get_euler_angles(void *, void *);
+extern float mat_measure_difference(Row *, Row *);
 
 /* Saves the latest object transform in a history and, when asked, averages the recent ones (leaving out odd ones) to give a smooth result. */
-void func_L00_002B0528(char *object, void *matrix, int filter)
+void FilterTransformHistory(char *object, void *matrix, int filter)
 {
     Row sum[4];
     /* Retail accumulates into this scratch array without clearing it. */
@@ -36,46 +36,46 @@ void func_L00_002B0528(char *object, void *matrix, int filter)
     int i, j, n, rejected, accepted;
     Row *cursor;
     float max;
-    int index = gHeroState.history_index;
+    int index = g_hero_state.history_index;
 
     {
-        Row *history = gHeroState.history[0];
+        Row *history = g_hero_state.history[0];
         copy_matrix3x4(history + index * 3, matrix);
-        NormalizeMatrixColumns(history + gHeroState.history_index * 3);
+        mat_normalize_columns(history + g_hero_state.history_index * 3);
     }
-    gHeroState.history_index = (gHeroState.history_index + 1) % 16;
-    gHeroState.history_count++;
-    if (gHeroState.history_count > 16)
-        gHeroState.history_count = 16;
+    g_hero_state.history_index = (g_hero_state.history_index + 1) % 16;
+    g_hero_state.history_count++;
+    if (g_hero_state.history_count > 16)
+        g_hero_state.history_count = 16;
     if (!filter)
         return;
     for (cursor = sum, j = 2; j >= 0; j--, cursor++)
-        ClearVector128(cursor);
-    if (gHeroState.moveState == 2)
+        vec_clear_128(cursor);
+    if (g_hero_state.moveState == 2)
         ref_L00_002B0528_0 = 5;
     else
         ref_L00_002B0528_0 = 11;
-    if (gHeroState.filter_count < ref_L00_002B0528_0)
-        gHeroState.filter_count++;
-    else if (gHeroState.filter_count > ref_L00_002B0528_0)
-        gHeroState.filter_count--;
-    n = gHeroState.filter_count;
+    if (g_hero_state.filter_count < ref_L00_002B0528_0)
+        g_hero_state.filter_count++;
+    else if (g_hero_state.filter_count > ref_L00_002B0528_0)
+        g_hero_state.filter_count--;
+    n = g_hero_state.filter_count;
     if (n < 2)
         n = 2;
-    if (gHeroState.f22b8 && gHeroState.f1d8 < 10) {
+    if (g_hero_state.f22b8 && g_hero_state.f1d8 < 10) {
         if (n > 3)
             n = 3;
     }
-    if (gHeroState.history_count < n)
+    if (g_hero_state.history_count < n)
         return;
     rejected = 0;
     for (i = 0; i < n; i++) {
-        int a = (gHeroState.history_index + 15 - i) % 16;
+        int a = (g_hero_state.history_index + 15 - i) % 16;
         for (j = 0; j < n; j++) {
             if (i != j) {
-                int b = (gHeroState.history_index + 15 - j) % 16;
-                scores[i] += MeasureTransformDifference(gHeroState.history[0] + a * 3,
-                                              gHeroState.history[0] + b * 3);
+                int b = (g_hero_state.history_index + 15 - j) % 16;
+                scores[i] += mat_measure_difference(g_hero_state.history[0] + a * 3,
+                                              g_hero_state.history[0] + b * 3);
             }
         }
     }
@@ -94,9 +94,9 @@ void func_L00_002B0528(char *object, void *matrix, int filter)
             continue;
         accepted++;
         {
-            int sample = (gHeroState.history_index + 15 - i) % 16;
+            int sample = (g_hero_state.history_index + 15 - i) % 16;
             {
-                Row *p = gHeroState.history[0] + sample * 3;
+                Row *p = g_hero_state.history[0] + sample * 3;
                 Row *out;
                 for (out = sum, j = 2; j >= 0; out++, j--, p++)
                     FastVecAdd(out, out, p);
@@ -105,5 +105,5 @@ void func_L00_002B0528(char *object, void *matrix, int filter)
     }
     for (cursor = sum, j = 2; j >= 0; j--, cursor++)
         FastVecScale(cursor, cursor, 1.0f / (float)accepted);
-    GetEulerAnglesFromMatrix(sum, object + 0xf0);
+    mat_get_euler_angles(sum, object + 0xf0);
 }

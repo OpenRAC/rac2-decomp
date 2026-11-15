@@ -13,15 +13,15 @@ extern unsigned char *D_L09_001B285C_1[3] __attribute__((sda));
 extern int D_L09_00257110[];
 extern char D_L09_001B9A00[];
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 extern unsigned char D_001395B8[];
 typedef struct { char pad[0x1bc]; unsigned short flag; char pad2[2]; unsigned int time; } DobboClock;
-extern DobboClock D_0018C750;
+extern DobboClock g_progress_statistics;
 typedef struct { char pad[0x2c0]; int first; char pad2[0x11c]; int second; char pad3[0x20]; int third; char pad4[0x24]; unsigned short flag; } DobboDialogue;
-extern DobboDialogue D_0018C958;
+extern DobboDialogue g_subtitle_history;
 typedef struct { char pad[0x80]; char position[0x10]; char pad2[0x128]; int field1b8; char pad3[0x20d8]; int field2294; } DobboPlayer;
-extern DobboPlayer D_00189E20;
+extern DobboPlayer g_hero_state;
 extern int D_001397C4;
 extern unsigned char D_001A7A60[] __attribute__((sda)), D_001A7B08[] __attribute__((sda));
 extern short D_001A7A10[] __attribute__((sda));
@@ -52,15 +52,15 @@ typedef struct {
     char padac[0x54];
 } ScanMoby;
 extern ScanMoby *D_L09_001B285C MACRO_ADDR, *D_L09_001B2860 MACRO_ADDR;
-extern int func_002ACBC8(void *, int);
-extern int func_00288E18(int, int);
-extern void func_002B0A18(int, int);
-extern int func_002E5E58(int, int, void *);
+extern int IsPointInCuboid(void *, int);
+extern int subtitle_request_voice_line(int, int);
+extern void value_set_entry_by_index(int, int);
+extern int snd_play_from_global_bank(int, int, void *);
 
 /* Walks the record's track while its signed halfwords stay non-negative and returns the
    entry whose measured value is largest, skipping the entries whose field 0xB2 is in the
    twenty-value screen table. */
-void *func_L09_003FE3B0(int index, int *table)
+void *track_find_farthest_entry(int index, int *table)
 {
     unsigned short *q = D_L09_001FB560[index];
     char *r;
@@ -92,7 +92,7 @@ void *func_L09_003FE3B0(int index, int *table)
 }
 
 /* Scans the nearby objects of this region and reacts to the ones it finds. */
-void func_L09_003E3288(unsigned char *object)
+void region_scan_objects(unsigned char *object)
 {
     RegionState *s = *(RegionState **)(object + 0x68);
     ScanMoby *m;
@@ -141,8 +141,8 @@ void func_L09_003E3288(unsigned char *object)
             if (&D_L09_001B285C[s->scan] >= D_L09_001B2860) {
                 if (!s->count && !D_001A7A60[12]) {
                     D_001A7A60[12] = 1;
-                    PlaySoundFromGlobalBank(1, 0, 0);
-                    SetEntryValueByIndex(0x1233, -1);
+                    snd_play_from_global_bank(1, 0, 0);
+                    value_set_entry_by_index(0x1233, -1);
                     D_L09_001A903C[0] = 1;
                 }
                 s->scan = 0;
@@ -151,39 +151,39 @@ void func_L09_003E3288(unsigned char *object)
         }
     }
 
-    if (!gSubtitleHistory.flag && D_001397C4 < 0 && !D_001A7B08[5]) {
-        if (IsPointInCuboid(gHeroState.position, s->region[0]))
-            RequestSubtitleVoiceLine(0xa02, 0x59);
+    if (!g_subtitle_history.flag && D_001397C4 < 0 && !D_001A7B08[5]) {
+        if (IsPointInCuboid(g_hero_state.position, s->region[0]))
+            subtitle_request_voice_line(0xa02, 0x59);
     }
-    if (IsPointInCuboid(gHeroState.position, s->region[1]))
+    if (IsPointInCuboid(g_hero_state.position, s->region[1]))
         s->entered = 1;
-    if (gHeroState.field2294 == 0x39 && !gHeroState.field1b8 && s->entered)
+    if (g_hero_state.field2294 == 0x39 && !g_hero_state.field1b8 && s->entered)
         D_001395B8[0x7a]++;
-    if (D_001A7A10[4] <= 0 && IsPointInCuboid(gHeroState.position, s->region[1])) {
-        if (D_001395B8[0x7a] % 5 == 4 && !s->hint1c && gHeroState.field2294 != 0x39) {
-            if (gSubtitleHistory.second >= 0)
-                RequestSubtitleVoiceLine(0x9fb, 0x52);
+    if (D_001A7A10[4] <= 0 && IsPointInCuboid(g_hero_state.position, s->region[1])) {
+        if (D_001395B8[0x7a] % 5 == 4 && !s->hint1c && g_hero_state.field2294 != 0x39) {
+            if (g_subtitle_history.second >= 0)
+                subtitle_request_voice_line(0x9fb, 0x52);
             s->hint1c = 1;
             D_001395B8[0x7a]++;
         }
     }
-    if (IsPointInCuboid(gHeroState.position, s->region[2])) {
-        if (gHeroState.field2294 == 0x39 && !gHeroState.field1b8)
+    if (IsPointInCuboid(g_hero_state.position, s->region[2])) {
+        if (g_hero_state.field2294 == 0x39 && !g_hero_state.field1b8)
             D_001395B8[0x79]++;
     }
-    if (!D_001A7B08[7] && IsPointInCuboid(gHeroState.position, s->region[2])) {
-        if (D_001395B8[0x79] % 5 == 4 && !s->hint18 && gHeroState.field2294 != 0x39) {
-            if (gSubtitleHistory.third >= 0)
-                RequestSubtitleVoiceLine(0x9fe, 0x55);
+    if (!D_001A7B08[7] && IsPointInCuboid(g_hero_state.position, s->region[2])) {
+        if (D_001395B8[0x79] % 5 == 4 && !s->hint18 && g_hero_state.field2294 != 0x39) {
+            if (g_subtitle_history.third >= 0)
+                subtitle_request_voice_line(0x9fe, 0x55);
             s->hint18 = 1;
             D_001395B8[0x79]++;
         }
     }
-    if (IsPointInCuboid(gHeroState.position, s->region[3])) {
-        if ((!gProgressStatistics.flag || D_001A7390 - gProgressStatistics.time > 432000) &&
+    if (IsPointInCuboid(g_hero_state.position, s->region[3])) {
+        if ((!g_progress_statistics.flag || D_001A7390 - g_progress_statistics.time > 432000) &&
             D_001395B8[0x7d] < 3 && !s->hint14) {
-            if (gSubtitleHistory.first >= 0)
-                RequestSubtitleVoiceLine(0x9e3, 0x3a);
+            if (g_subtitle_history.first >= 0)
+                subtitle_request_voice_line(0x9e3, 0x3a);
             D_001395B8[0x7d]++;
             s->hint14 = 1;
         }

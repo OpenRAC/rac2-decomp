@@ -12,13 +12,13 @@
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 /*
  * Function: func_002D2EE0
@@ -38,10 +38,10 @@ void func_0027C660(void);
  * - All external function addresses come from the assigned externals list.
  */
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
 /* External functions declared with exact aliases from task.externals */
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 extern void func_0029C960(void);
 
@@ -51,7 +51,7 @@ extern int F7cb419c1_FUN_002DE618(int arg);
 
 /* Candidate function: FUN_002d3390 */
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-unsigned long long func_002D3390(void)
+unsigned long long menu_page_draw_9(void)
 {
     SetupGifPaging(0);
     func_0029C960();
@@ -64,7 +64,7 @@ extern float ref_L00_002D33C0_00[];
 extern void ref_L00_002D33C0_01(unsigned char *, float *);
 
 /* Sets up the model preview helper object for the menu if the menu is open. */
-int func_002D33C0(void)
+int menu_preview_helper_init(void)
 {
     if (D_001A8CFC[0] != 0)
         ref_L00_002D33C0_01((unsigned char *)(D_001A8CFC[0] + 0x3EDB8), ref_L00_002D33C0_00);
@@ -85,20 +85,20 @@ typedef struct {
     int fallback;
 } CallbackState;
 
-extern MenuGameState D_00138180;
-extern CallbackState D_001F2840;
+extern MenuGameState g_pad_state;
+extern CallbackState g_pause_menu_state;
 extern void func_0029C5D0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the current message to the page handler. */
-int func_002D3400(void)
+int menu_page_update_pass_message(void)
 {
-    int flags = gPadState.flags;
+    int flags = g_pad_state.flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -109,14 +109,14 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_0029C5D0(gPadState.message);
+        func_0029C5D0(g_pad_state.message);
     return result;
 }
 
 extern void func_0029C5A0(void);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D3488(void) {
+int menu_page_draw_10(void) {
     SetupGifPaging(0);
     func_0029C5A0();
     DoGifPaging();
@@ -124,21 +124,21 @@ int func_002D3488(void) {
 }
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_003435B0(char *, int);
-extern void func_00343538(char *, char *);
-extern void func_00343580(char *);
-extern void func_003435A0(char *, char *);
+extern void item_menu_set_title_mode(char *, int);
+extern void item_menu_fill_list(char *, char *);
+extern void item_menu_clear_selection_state(char *);
+extern void item_menu_set_extra_value(char *, char *);
 extern char D_00259F58[];
 extern char D_0025D0E0[];
 
 /* Sets up the first model preview object of the menu with its model data. */
-int func_002D34B8(void)
+int menu_preview_object_init_first(void)
 {
     if (D_001A8CFC[0] != 0) {
-        SetMenuTitleMode(D_001A8CFC[0] + 0x3C108, 0);
-        FillMenuItemList(D_001A8CFC[0] + 0x3C108, D_00259F58);
-        ClearMenuListSelectionState(D_001A8CFC[0] + 0x3C108);
-        SetMenuExtraValue(D_001A8CFC[0] + 0x3C108, D_0025D0E0);
+        item_menu_set_title_mode(D_001A8CFC[0] + 0x3C108, 0);
+        item_menu_fill_list(D_001A8CFC[0] + 0x3C108, D_00259F58);
+        item_menu_clear_selection_state(D_001A8CFC[0] + 0x3C108);
+        item_menu_set_extra_value(D_001A8CFC[0] + 0x3C108, D_0025D0E0);
     }
     return 0;
 }
@@ -147,13 +147,13 @@ extern char D_00259CE0[];
 extern char D_0025D288[];
 
 /* Sets up the second model preview object of the menu with its model data. */
-int func_002D3538(void)
+int menu_preview_object_init_second(void)
 {
     if (D_001A8CFC[0] != 0) {
-        SetMenuTitleMode(D_001A8CFC[0] + 0x3C108, 1);
-        FillMenuItemList(D_001A8CFC[0] + 0x3C108, D_00259CE0);
-        ClearMenuListSelectionState(D_001A8CFC[0] + 0x3C108);
-        SetMenuExtraValue(D_001A8CFC[0] + 0x3C108, D_0025D288);
+        item_menu_set_title_mode(D_001A8CFC[0] + 0x3C108, 1);
+        item_menu_fill_list(D_001A8CFC[0] + 0x3C108, D_00259CE0);
+        item_menu_clear_selection_state(D_001A8CFC[0] + 0x3C108);
+        item_menu_set_extra_value(D_001A8CFC[0] + 0x3C108, D_0025D288);
     }
     return 0;
 }
@@ -162,13 +162,13 @@ int func_002D3538(void)
 
 /* func_002D36A0 is in its -G8 sibling. */
 
-extern int func_0028E588(int, int);
-extern double func_001234F0(float);
-extern int func_00123028(double, double);
-extern double func_00122A98(double, double);
-extern double func_00122B00(double, double);
-extern int func_00123130(double);
-extern int func_0028EA58(int, int, int, int, int, int *);
+extern int GetIconFrame(int, int);
+extern double __extendsfdf2(float);
+extern int __cmpdf2(double, double);
+extern double __subdf3(double, double);
+extern double __muldf3(double, double);
+extern int __fixdfsi(double);
+extern int hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
@@ -193,7 +193,7 @@ static __inline__ int scaled_screen_size(int mode, float value, int adjust)
 
 /* Draws the icon of preview choice `index` at column `x`, fading its left and right edges by their
    distance from the middle of the 512-wide screen. */
-int func_002D3D88(int index, int x)
+int DrawPreviewChoiceIcon(int index, int x)
 {
     int colors[4];
     int leftAlpha;
@@ -208,14 +208,14 @@ int func_002D3D88(int index, int x)
     int mode;
 
     texture = GetIconFrame(0xea97, D_0026CFD0[index].icon);
-    distance = FloatToDouble(256.0f - (float)left);
-    if (CompareDoubles(distance, 0.0) < 0)
-        distance = SubtractDoubles(0.0, distance);
-    leftAlpha = 128 - DoubleToInt(MultiplyDoubles(distance, 0.75));
-    distance = FloatToDouble(256.0f - (float)(x + 40));
-    if (CompareDoubles(distance, 0.0) < 0)
-        distance = SubtractDoubles(0.0, distance);
-    rightAlpha = 128 - DoubleToInt(MultiplyDoubles(distance, 0.75));
+    distance = __extendsfdf2(256.0f - (float)left);
+    if (__cmpdf2(distance, 0.0) < 0)
+        distance = __subdf3(0.0, distance);
+    leftAlpha = 128 - __fixdfsi(__muldf3(distance, 0.75));
+    distance = __extendsfdf2(256.0f - (float)(x + 40));
+    if (__cmpdf2(distance, 0.0) < 0)
+        distance = __subdf3(0.0, distance);
+    rightAlpha = 128 - __fixdfsi(__muldf3(distance, 0.75));
     if (leftAlpha < 0)
         leftAlpha = 0;
     if (rightAlpha < 0)
@@ -229,7 +229,7 @@ int func_002D3D88(int index, int x)
     mode = D_001B23A0[0];
     y = scaled_screen_coord(mode, 334.0f, 4.0f);
     height = scaled_screen_size(mode, 40.0f, 0);
-    return DrawHudSpriteGradient(texture, left, y, 40, height, colors);
+    return hud_draw_sprite_gradient(texture, left, y, 40, height, colors);
 }
 
 /* func_002D3FA0 is defined in 002D3FA0-options-g8.c. */
@@ -237,7 +237,7 @@ int func_002D3D88(int index, int x)
 /* func_002D4948 is defined in 002D4948-options-g8.c. */
 
 /* Updates the saved choice number in the menu state using a helper. */
-int func_002D4E10(void)
+int menu_update_choice_number(void)
 {
     char *p = F7cb419c1_D_001F2840;
 
@@ -251,7 +251,7 @@ int func_002D4E10(void)
 extern int D_0025BA80;
 
 /* Clears the menu counter back to zero. */
-int func_002D5038(void) {
+int menu_clear_counter_2(void) {
     D_0025BA80 = 0;
     return 0;
 }
@@ -259,12 +259,12 @@ int func_002D5038(void) {
 
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void *func_00341558(void *);
+extern void *tab_menu_get_selected_value(void *);
 
 /* Stores the preview object of the open menu into the given menu item. */
-int func_002D5290(char *object) {
+int menu_item_set_preview(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = GetSelectedTabEntryValue(D_001A8CFC[0] + 0x3BE08);
+        *(void **)(object + 0x34) = tab_menu_get_selected_value(D_001A8CFC[0] + 0x3BE08);
     return 0;
 }
 
@@ -272,18 +272,18 @@ int func_002D5290(char *object) {
 
 /* func_002D53F0 is defined in 002D53F0.c. */
 
-extern void func_00287E80(void);
-extern void func_00341540(char *, char *, char *, char *);
-extern void func_00341610(char *, int);
+extern void menu_clear_counter(void);
+extern void tab_menu_set_tables(char *, char *, char *, char *);
+extern void tab_menu_switch_tab(char *, int);
 extern char D_002615F8[], D_00261698[], D_00261750[];
 
 /* Sets up the preview object of the open menu with its data tables and turns it on. */
-int func_002D5480(void)
+int menu_preview_data_init(void)
 {
-    ClearMenuCounter_00287E80();
+    menu_clear_counter();
     if (D_001A8CFC[0] != 0) {
-        SetTabbedMenuTables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        SwitchTabbedMenuTab(D_001A8CFC[0] + 0x3BE08, 1);
+        tab_menu_set_tables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
+        tab_menu_switch_tab(D_001A8CFC[0] + 0x3BE08, 1);
     }
     return 0;
 }
@@ -292,7 +292,7 @@ extern int D_00138344;
 extern void func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
-int func_002D54F0(void) {
+int menu_handle_buttons(void) {
     func_0029CF08(D_00138344);
     return 0;
 }
@@ -301,7 +301,7 @@ extern int D_00138344;
 extern void func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
-int func_002D5518(void) {
+int menu_handle_buttons_alt(void) {
     func_0029CF08(D_00138344);
     return 0;
 }

@@ -24,22 +24,22 @@ extern float D_L05_001B1018 __attribute__((sda));
 extern float D_L05_001B101C __attribute__((sda));
 extern int D_L05_001B1020 __attribute__((sda));
 
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
 /* EE ABI: A0-A3 hold position, direction, count, color;
  * F12-F14 hold width, height, extent. */
-extern void func_L05_00418D68(void *, void *, int, float, float, float, int);
-extern void func_L05_00419370(char *);
-extern int func_L05_0037AC00(void);
-extern void func_L05_00418E90(char *);
+extern void part_spawn_sprite_line(void *, void *, int, float, float, float, int);
+extern void UpdateBeamTrailParticles(char *);
+extern int hero_get_shield_value(void);
+extern void gfx_draw_thruster_glow(char *);
 typedef int BeamVec __attribute__((mode(TI)));
 
 /* Draws the bright flame lines behind the object. They are wider and longer when a Spaceship Attachment is fitted, and they grow with a timer. */
-void func_L05_004186D8(char *object)
+void DrawInterpolatedBeamLayers(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *attachment = *(char **)(state + 0x4C);
@@ -77,9 +77,9 @@ void func_L05_004186D8(char *object)
         color = FastTweenColor(D_L05_001B0FC0, D_L05_001B0FF4, factor);
         color2 = FastTweenColor(D_L05_001B0FD8, D_L05_001B100C, factor);
         FastVecScale(direction, object + 0xC0, length);
-        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        part_spawn_sprite_line(pos, direction, count, width, height, extent, color);
         FastVecScale(direction, object + 0xC0, length2);
-        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
+        part_spawn_sprite_line(pos, direction, count2, width2, height2, extent2, color2);
         *(BeamVec *)offset2 = 0;
         offset2[1] = -0.045f;
         offset2[0] = offsetX;
@@ -88,9 +88,9 @@ void func_L05_004186D8(char *object)
         matrix_mul_vec3(pos, offset2, object + 0xC0);
         FastVecAdd(pos, pos, object + 0x10);
         FastVecScale(direction, object + 0xC0, length);
-        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        part_spawn_sprite_line(pos, direction, count, width, height, extent, color);
         FastVecScale(direction, object + 0xC0, length2);
-        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
+        part_spawn_sprite_line(pos, direction, count2, width2, height2, extent2, color2);
         *(BeamVec *)offset3 = 0;
         offset3[2] = 0.07f;
         offset3[0] = offsetX;
@@ -98,9 +98,9 @@ void func_L05_004186D8(char *object)
         matrix_mul_vec3(pos, offset3, object + 0xC0);
         FastVecAdd(pos, pos, object + 0x10);
         FastVecScale(direction, object + 0xC0, length);
-        SpawnSpriteLine(pos, direction, count, width + width, height + height, extent, color);
+        part_spawn_sprite_line(pos, direction, count, width + width, height + height, extent, color);
         FastVecScale(direction, object + 0xC0, length2);
-        SpawnSpriteLine(pos, direction, count2, width2 + width2, height2 + height2, extent2, color2);
+        part_spawn_sprite_line(pos, direction, count2, width2 + width2, height2 + height2, extent2, color2);
     } else {
         float factor, length, length2, width, height, width2, height2, extent, extent2;
         int count, count2, color, color2;
@@ -125,11 +125,11 @@ void func_L05_004186D8(char *object)
         color = FastTweenColor(D_L05_001B0FC0, D_L05_001B0FF4, factor);
         color2 = FastTweenColor(D_L05_001B0FD8, D_L05_001B100C, factor);
         FastVecScale(direction, object + 0xC0, -length);
-        SpawnSpriteLine(pos, direction, count, width, height, extent, color);
+        part_spawn_sprite_line(pos, direction, count, width, height, extent, color);
         FastVecScale(direction, object + 0xC0, -length2);
-        SpawnSpriteLine(pos, direction, count2, width2, height2, extent2, color2);
+        part_spawn_sprite_line(pos, direction, count2, width2, height2, extent2, color2);
     }
     UpdateBeamTrailParticles(object);
-    if (GetShieldSlotValue())
-        DrawThrusterGlow(object);
+    if (hero_get_shield_value())
+        gfx_draw_thruster_glow(object);
 }

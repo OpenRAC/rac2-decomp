@@ -7,24 +7,24 @@ typedef struct {
     u8 pad[0x80]; f32 position[4];
     u8 pad90[0x33c - 0x90]; u8 *standing; s32 flags;
 } LiftPlayer;
-extern LiftPlayer D_00189E20;
+extern LiftPlayer g_hero_state;
 extern int D_00138324 NOT_SDA;
 typedef struct { u8 pad[0x74]; u8 active; u8 pad75[0x13]; u8 *owner; } LiftSound;
-extern u8 D_00188660[];
-extern void func_002A7750(u8 *object, int animation, int frame);
-extern int func_002B38B8(u8 *object);
-extern float func_00282C48(float x);
-extern int func_002B0C28(int channel, int message, int mode);
-extern float func_00282E80(void *a, void *b);
-extern int func_002ACBC8(void *point, int index);
-extern float func_002AA548(float *value, float *velocity, float target, float minimum, float acceleration, float maximum);
-extern void func_002E59F8(int index);
-extern int func_002E5CF8(int index, int kind, char *object);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_002AD6F0(void *matrix, void *offset, void *a, void *b);
+extern u8 g_sound_state[];
+extern void moby_set_state(u8 *object, int animation, int frame);
+extern int flag_is_third_pending_set(u8 *object);
+extern float math_fabs(float x);
+extern int TryClaimNotice(int channel, int message, int mode);
+extern float vec_distance_xy(void *a, void *b);
+extern int IsPointInCuboid(void *point, int index);
+extern float math_step_value_toward_target(float *value, float *velocity, float target, float minimum, float acceleration, float maximum);
+extern void snd_stop_voice(int index);
+extern int PlayMobySound(int index, int kind, char *object);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void mat_combine_and_store(void *matrix, void *offset, void *a, void *b);
 
 /* Moves a lift between two heights and plays a sound while it moves. It carries the hero standing on it. */
-void func_L12_0041EA18(u8 *object)
+void UpdateTodanoLift(u8 *object)
 {
     LiftQuad oldPosition;
     LiftQuad displacement;
@@ -38,55 +38,55 @@ void func_L12_0041EA18(u8 *object)
     switch (object[0x20]) {
     case 0:
         qcopy(data + 0x70, object + 0x10);
-        SetMobyState(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (!IsThirdPendingFlagSet(object)) break;
+        if (!flag_is_third_pending_set(object)) break;
         if (*(int *)(data + 0x68))
             target = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
         else
             target = *(float *)(data + 0x78);
-        if (FloatAbs(target - *(float *)(object + 0x18)) < 2.0f) {
+        if (math_fabs(target - *(float *)(object + 0x18)) < 2.0f) {
             reference = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
-            if (gHeroState.standing == object && gHeroState.flags) {
+            if (g_hero_state.standing == object && g_hero_state.flags) {
                 TryClaimNotice(8, 0x279a, 1);
                 if (D_00138324 & 0x10)
                     *(int *)(data + 0x68) = (*(int *)(data + 0x68) + 1) & 1;
             } else if (*(int *)(data + 0x68)) {
-                if (FloatAbs(gHeroState.position[2] - *(float *)(data + 0x78)) < 4.0f &&
-                    vec_distance_xy(gHeroState.position, object + 0x10) < 24.0f)
+                if (math_fabs(g_hero_state.position[2] - *(float *)(data + 0x78)) < 4.0f &&
+                    vec_distance_xy(g_hero_state.position, object + 0x10) < 24.0f)
                     *(int *)(data + 0x68) = 0;
             } else {
-                if (FloatAbs(gHeroState.position[2] - reference) < 4.0f &&
-                    vec_distance_xy(gHeroState.position, object + 0x10) < 24.0f)
+                if (math_fabs(g_hero_state.position[2] - reference) < 4.0f &&
+                    vec_distance_xy(g_hero_state.position, object + 0x10) < 24.0f)
                     *(int *)(data + 0x68) = 1;
             }
         }
         rate = 0.003888888983055949f;
         if (*(int *)(data + 0x68)) {
-            if (gHeroState.position[2] < *(float *)(object + 0x18) - 1.0f &&
-                IsPointInCuboid(gHeroState.position, *(int *)(data + 0x60))) {
+            if (g_hero_state.position[2] < *(float *)(object + 0x18) - 1.0f &&
+                IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x60))) {
                 target += 3.0f;
                 rate = 0.007777777966111898f;
             } else {
                 target += 0.5f;
             }
         }
-        StepValueTowardTarget((float *)(object + 0x18), (float *)(data + 0x6c), target, 0.0019444444915279746f, rate, 0.5f);
-        if (FloatAbs(target - *(float *)(object + 0x18)) < 0.8f) {
+        math_step_value_toward_target((float *)(object + 0x18), (float *)(data + 0x6c), target, 0.0019444444915279746f, rate, 0.5f);
+        if (math_fabs(target - *(float *)(object + 0x18)) < 0.8f) {
             index = *(int *)(data + 0x80);
             if (index != -1) {
-                LiftSound *sound = (LiftSound *)(index * 112 + (s32)gSoundState);
+                LiftSound *sound = (LiftSound *)(index * 112 + (s32)g_sound_state);
                 if (sound->owner == object && sound->active)
-                    StopSoundVoice(index);
+                    snd_stop_voice(index);
             }
             *(int *)(data + 0x80) = -1;
         } else {
-            LiftSound *sound = (LiftSound *)(*(int *)(data + 0x80) * 112 + (s32)gSoundState);
+            LiftSound *sound = (LiftSound *)(*(int *)(data + 0x80) * 112 + (s32)g_sound_state);
             if (sound->owner != object || sound->active == 0)
                 *(int *)(data + 0x80) = PlayMobySound(0, 4, (char *)object);
         }
     }
     FastVecSub(&displacement, object + 0x10, &oldPosition);
-    CombineTransformsAndStore(data + 0x20, &displacement, object + 0xf0, object + 0xf0);
+    mat_combine_and_store(data + 0x20, &displacement, object + 0xf0, object + 0xf0);
 }

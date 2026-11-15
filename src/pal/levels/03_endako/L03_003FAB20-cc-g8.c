@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L03_003FAB20, the PAL copy of func_L03_003F62C8: the same C, where scale D_L03_001B1058. */
 
 typedef unsigned char u8;
@@ -14,8 +15,8 @@ typedef float f32;
 extern s32 D_L03_001B108C __attribute__((sda));
 extern u32 D_L03_001B1058 __attribute__((sda));
 
-extern void func_002A7750(void *entity, int a, int b);
-extern int func_002A77E0(int id);
+extern void moby_set_state(void *entity, int a, int b);
+extern int math_random_int_below(int id);
 
 /* The engine's particle and light helpers, called with the level's own copies. */
 /* The level's own float, reached through $gp. */
@@ -41,16 +42,16 @@ void func_PAL_L03_003FAB20(u8 *entity) {
         state[0x30B]--;
         sel = 2;
     } else {
-        sel = func_002A77E0(state[0x308] + 1);
+        sel = math_random_int_below(state[0x308] + 1);
     }
 
     switch (sel) {
     case 0:
-        func_002A7750(entity, 7, 3);
+        moby_set_state(entity, 7, 3);
         if (state[0x308] >= 2) {
             *(float *)(state + 0x2F8) = 0.6981318f;
             *(float *)(state + 0x2FC) = -0.6981318f;
-        } else if (func_002A77E0(2) != 0) {
+        } else if (math_random_int_below(2) != 0) {
             *(float *)(state + 0x2F8) = 0.6981318f;
         } else {
             *(float *)(state + 0x2FC) = -0.6981318f;
@@ -59,12 +60,12 @@ void func_PAL_L03_003FAB20(u8 *entity) {
         break;
     case 1:
         *(u32 *)(state + 0x2E4) = 250;
-        func_002A7750(entity, 9, 4);
-        state[0x309] = func_002A77E0(2) + 1;
+        moby_set_state(entity, 9, 4);
+        state[0x309] = math_random_int_below(2) + 1;
         break;
     case 2:
         *(u32 *)(state + 0x2E4) = (((int)(D_L03_001B1058) * 5 + 2) / 6);
-        func_002A7750(entity, 12, 5);
+        moby_set_state(entity, 12, 5);
         state[0x309] = 1;
         break;
     }

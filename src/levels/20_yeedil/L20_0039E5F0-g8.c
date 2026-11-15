@@ -1,18 +1,18 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern void func_L20_00330A68(void *, int);
-extern void func_002A7750(void *, int, int);
-extern s32 func_002B3BA8(void *, s32, s32, float, float, s32);
-extern int func_002A9640(void *, int, int);
-extern float func_002A96A0(void *, int);
+extern void moby_change_class_from_tables(void *, int);
+extern void moby_set_state(void *, int, int);
+extern s32 weapon_select_aim_target(void *, s32, s32, float, float, s32);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern float moby_update_aim_target_strength(void *, int);
 
 extern const float D_L20_001AED00 __attribute__((sda));
 extern int g_pHeroMoby[];
 
 /* A countdown object: set up once, then it drains its timer by the animation's step
    and changes state at the end of the count or on a long step. */
-void func_L20_0039E5F0(char *obj)
+void object_life_timer_update(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     float zero;
@@ -24,25 +24,25 @@ void func_L20_0039E5F0(char *obj)
             *(u16 *)(state + 0x24) = 0x1E;
             *(f32 *)(state + 0x20) = 30.0f;
         }
-        ChangeMobyClassFromTables(obj, 0xCBC);
+        moby_change_class_from_tables(obj, 0xCBC);
         *(u16 *)(obj + 0x32) = 0xFF;
         *(u16 *)(obj + 0x34) &= 0xFFFB;
         *(f32 *)(obj + 0x2C) = *(f32 *)(*(char **)(obj + 0x24) + 0x24) * D_L20_001AED00;
         *(int *)(state + 0x190) = 1;
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
     }
     zero = 0.0f;
-    SelectAimTarget_002B3BA8(obj, *(int *)(state + 0x80), 0, zero, zero, 0);
+    weapon_select_aim_target(obj, *(int *)(state + 0x80), 0, zero, zero, 0);
     if (*(int *)(state + 0x60) == 0)
         *(int *)(state + 0x60) = g_pHeroMoby[0];
-    step = UpdateAimTargetStrength(obj, FindOwnedEffectSlot(obj, 0x10000, 0));
+    step = moby_update_aim_target_strength(obj, part_find_owned_effect_slot(obj, 0x10000, 0));
     left = *(f32 *)(state + 0x20) - step;
     *(f32 *)(state + 0x20) = left;
     if (left <= zero)
-        SetMobyState(obj, 5, -1);
+        moby_set_state(obj, 5, -1);
     if (5.0f <= step)
-        SetMobyState(obj, 4, -1);
+        moby_set_state(obj, 4, -1);
     *(u8 *)(obj + 0xA8) = 0xFF;
 }

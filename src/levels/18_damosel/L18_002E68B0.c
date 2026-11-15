@@ -1,28 +1,28 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern s32 func_00282978(s16 *timer);
-extern s32 func_00288E18(s32 key, s32 selection);
-extern s32 func_002ACBC8(void *point, s32 index);
-extern s32 func_002E5E58(s32 index, s32 value, void *object);
-extern void func_002B0A18(s32 first, s32 second);
+extern s32 FastDecTimer(s16 *timer);
+extern s32 subtitle_request_voice_line(s32 key, s32 selection);
+extern s32 IsPointInCuboid(void *point, s32 index);
+extern s32 snd_play_from_global_bank(s32 index, s32 value, void *object);
+extern void value_set_entry_by_index(s32 first, s32 second);
 
 extern u16 D_0018CF40;
 extern u8 D_001A7AFD[] __attribute__((sda));
 extern u8 D_001A7A60[] MACRO_ADDR;
-extern u8 D_00189EA0[];
-extern u8 D_00189E20[];
+extern u8 g_hero_position[];
+extern u8 g_hero_state[];
 extern u32 D_L18_001A903C[] __attribute__((sda));
 
 typedef int u128 __attribute__((mode(TI)));
 
-extern char *func_002A9640(char *, int, int);
-extern void func_002B0ED8(char *, char *, int);
-extern void func_002A6C58(char *, int, int);
-extern void func_0029F338(char *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A8C28(char *, void *, float, float, float, int, int, int, int);
-extern void func_L00_002E6EF8(void *, char *);
+extern char *part_find_owned_effect_slot(char *, int, int);
+extern void moby_apply_damage_to_object(char *, char *, int);
+extern void SetDeathBits(char *, int, int);
+extern void moby_mark_spawned(char *);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_sweep_from_object(char *, void *, float, float, float, int, int, int, int);
+extern void gfx_add_draw_callback_third(void *, char *);
 extern char D_L18_003F9018[];
 
 extern void func_3F7CD8(s32);
@@ -38,11 +38,11 @@ extern float func_3099E8(float, float);
 extern float func_308860(float);
 extern void func_34B1D0(s32);
 
-extern char *func_002B9030(s32);
+extern char *part_alloc(s32);
 extern s32 func_001163B0(void);
-extern s32 func_00283CF0(float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern s32 FloatToInt(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern u8 *D_L18_001FF4D4;
 
 /* func_L18_002E68B0 is in the sibling file L18_002E68B0-decider.c (its own profile). */
@@ -52,17 +52,17 @@ extern u8 *D_L18_001FF4D4;
 
 /* Fills the record with the requested fields and derived coordinates. */
 /* Creates a short-lived effect that circles a point, at a set distance and angle from it. */
-char *func_L18_0035B6B8(char *center, float radius, float angle, float angleStep, float scaleA, float scaleB, s16 frameStep,
+char *part_create_orbiting_effect(char *center, float radius, float angle, float angleStep, float scaleA, float scaleB, s16 frameStep,
                          char *owner, s32 typeIndex, char *flag)
 {
-    char *record = AllocParticle(0x65);
+    char *record = part_alloc(0x65);
     char *orbit = record + 0x20;
 
     if (record != 0) {
         *(u8 *)(record + 3) = (flag != 0) ? 0x48 : 0x44;
         *(u8 *)(record + 1) = 0;
         *(u8 *)(record + 2) = D_L18_001FF4D4[typeIndex];
-        *(u8 *)(record + 8) = Rand();
+        *(u8 *)(record + 8) = func_001163B0();
         *(u8 *)(record + 9) = FloatToInt(1.0f) + 0x40;
         *(u32 *)(record + 4) = owner;
         *(float *)(record + 0xC) = scaleA * 210000.0f;
@@ -73,16 +73,16 @@ char *func_L18_0035B6B8(char *center, float radius, float angle, float angleStep
         *(u16 *)(orbit + 0x14) = frameStep;
         *(float *)(orbit + 0x10) = scaleB * 210000.0f;
         *(float *)(record + 0x10) = *(float *)(*(char **)(orbit + 0)) +
-                                *(float *)(orbit + 4) * FastSinOrCosA(angle);
+                                *(float *)(orbit + 4) * math_fast_sin_or_cos_a(angle);
         *(float *)(record + 0x18) = *(float *)(*(char **)(orbit + 0) + 8) +
-                                *(float *)(orbit + 4) * FastSinOrCosB(*(float *)(orbit + 8));
+                                *(float *)(orbit + 4) * math_fast_sin_or_cos_b(*(float *)(orbit + 8));
         *(float *)(record + 0x14) = *(float *)(*(char **)(orbit + 0) + 4);
     }
     return record;
 }
 
 /* Turns the circling effect a little each frame, moves it, and removes it when it has turned far enough. */
-void func_L18_0035B838(char *effect)
+void part_update_orbiting_effect(char *effect)
 {
     char *record = effect;
     char *orbit = record + 0x20;
@@ -101,7 +101,7 @@ void func_L18_0035B838(char *effect)
 }
 
 /* Watches the hero in two steps, first for one action and then for another, and then triggers an event with a sound. */
-void func_L18_003A0C28(u8 *moby) {
+void two_step_hero_trigger_update(u8 *moby) {
     u8 *vars;
     u32 step;
     u8 stateByte;
@@ -117,7 +117,7 @@ void func_L18_003A0C28(u8 *moby) {
         goto after;
     if (D_001A7AFD[0] != 0) {
         if (FastDecTimer((s16 *)(vars + 0xE)) != 0)
-            RequestSubtitleVoiceLine(0xA27, 0x7E);
+            subtitle_request_voice_line(0xA27, 0x7E);
     }
 after:
     stateByte = moby[0x20];
@@ -126,7 +126,7 @@ after:
     step = *(u32 *)(vars + 0x8);
     switch (step) {
     case 0: {
-        u8 *hero = gHeroPosition;
+        u8 *hero = g_hero_position;
         if (IsPointInCuboid(hero, *(u32 *)(vars + 0)) != 0) {
             if (*(u32 *)(hero + 0x221C) == 15)
                 *(u32 *)(vars + 8) = stateByte;
@@ -134,14 +134,14 @@ after:
         break;
     }
     case 1: {
-        u8 *hero = gHeroState;
+        u8 *hero = g_hero_state;
         if (*(u32 *)(hero + 0x2294) == 0x3E) {
             *(u32 *)(vars + 8) = 0;
         } else if (IsPointInCuboid(hero + 0x80, *(u32 *)(vars + 4)) != 0) {
             if (D_001A7A60[7] == 0) {
                 D_001A7A60[7] = step;
-                PlaySoundFromGlobalBank(1, 0, 0);
-                SetEntryValueByIndex(0x1233, -1);
+                snd_play_from_global_bank(1, 0, 0);
+                value_set_entry_by_index(0x1233, -1);
                 D_L18_001A903C[0] = step;
             }
         }
@@ -154,7 +154,7 @@ end:
 
 
 /* Per-frame update of a small flying robot enemy: sets it up on the first frame, then runs its movement, attack and hit checks. */
-void func_L18_003F7C70(s32 moby)
+void robot_l18_update(s32 moby)
 {
     u8 stateByte = *(u8 *)(moby + 0x20);
 
@@ -170,15 +170,15 @@ void func_L18_003F7C70(s32 moby)
     func_3F8C08(moby);
 }
 
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_L02_0032E508(u8 *, int, u8 *, int);
-extern void func_L18_003F8FA8(u8 *);
-extern void func_002A7750(u8 *, int, int);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int path_build_route_nodes(u8 *, int, u8 *, int);
+extern void protopet_reset_to_start_anim(u8 *);
+extern void moby_set_state(u8 *, int, int);
 
 /* Sets up the robot enemy: its speeds, turning and bounce values, a random spin direction and its starting behaviour. */
-void func_L18_003F7CD8(u8 *object) {
+void robot_init(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     float turnDegrees, turnSpeed;
 
@@ -199,38 +199,38 @@ void func_L18_003F7CD8(u8 *object) {
     *(float *)(vars + 0x118) = 0.5f;
     *(float *)(vars + 0x11C) = 2.0f;
     *(float *)(vars + 0x120) = 1.5707964897155762f;
-    SetControllerSpeedLimits(object, 0.0033333334140479565f, 0.10000000894069672f,
+    moby_set_controller_speed_limits(object, 0.0033333334140479565f, 0.10000000894069672f,
                   0.0034906589426100254f, 0.20943954586982727f);
     *(u8 **)(vars + 0x158) = vars + 0x680;
     *(u8 **)(vars + 0x15C) = vars + 0x600;
-    turnDegrees = RandomFloatRange(5.0f, 20.0f);
-    if (RandomIntBelow(2) != 0)
+    turnDegrees = math_random_float_range(5.0f, 20.0f);
+    if (math_random_int_below(2) != 0)
         turnSpeed = turnDegrees * -0.01745329424738884f;
     else
         turnSpeed = turnDegrees * 0.01745329424738884f;
     *(float *)(vars + 0x720) = turnSpeed;
     *(int *)(vars + 0x14C) = *(int *)(vars + 0x718);
     if (*(int *)(vars + 0x71C) != -1)
-        *(int *)(vars + 0x730) = BuildRouteNodes(object,
+        *(int *)(vars + 0x730) = path_build_route_nodes(object,
             *(int *)(vars + 0x71C), vars + 0x200, 0x20);
-    *(short *)(vars + 0x76C) = RandomIntBelow(2);
-    *(float *)(vars + 0x72C) = RandomFloatRange(5.0f, 7.0f);
-    *(u16 *)(object + 0x7C) |= 1 << RandomIntBelow(6);
+    *(short *)(vars + 0x76C) = math_random_int_below(2);
+    *(float *)(vars + 0x72C) = math_random_float_range(5.0f, 7.0f);
+    *(u16 *)(object + 0x7C) |= 1 << math_random_int_below(6);
     switch (*(short *)(vars + 0x764)) {
     case 1:
-        ResetToStartAnimation(object);
+        protopet_reset_to_start_anim(object);
         break;
     case 2:
-        SetMobyState(object, 2, 1);
+        moby_set_state(object, 2, 1);
         break;
     }
 }
 
 /* Handles hits on the robot enemy: damages or ignores the thing it touched, destroys it if it falls too low, and draws its shadow. */
-void func_L18_003F7EF8(char *moby)
+void robot_handle_hits(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    char *hitInfo = FindOwnedEffectSlot(moby, 0x10000, 1);
+    char *hitInfo = part_find_owned_effect_slot(moby, 0x10000, 1);
     int oldAnim;
     float worldPos[4] __attribute__((aligned(16)));
     float offsetTemp[4] __attribute__((aligned(16)));
@@ -243,19 +243,19 @@ void func_L18_003F7EF8(char *moby)
         } else if (hitClass == 0xF0A /* Extermibot Legs */ || hitClass == 0xF9E /* moby class 3998 */) *(float *)(hitInfo + 0x2C) = 0;
     }
     oldAnim = *(unsigned char *)(moby + 0x94);
-    ApplyDamageToObject(moby, vars + 0x60, 0);
+    moby_apply_damage_to_object(moby, vars + 0x60, 0);
     if (*(unsigned char *)(moby + 0x20) == 9 &&
         (*(unsigned char *)(moby + 0x94) == 9 || *(unsigned char *)(moby + 0x94) == 4 || *(unsigned char *)(moby + 0x94) == 3))
         *(unsigned char *)(moby + 0x94) = oldAnim;
     if (*(float *)(moby + 0x18) < 90.0f) {
         SetDeathBits(moby, 0, 3);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
     *(u128 *)offset = 0;
     offset[2] = *(float *)(vars + 0x114) + *(float *)(vars + 0x110);
     *(u128 *)offsetTemp = *(u128 *)offset;
     FastVecAdd(worldPos, moby + 0x10, offsetTemp);
-    SweepCollisionFromObject(moby, worldPos, *(float *)(vars + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
-    if (*(unsigned char *)(moby + 0x20) >= 2) AddDrawCallbackToList3(D_L18_003F9018, moby);
+    coll_sweep_from_object(moby, worldPos, *(float *)(vars + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
+    if (*(unsigned char *)(moby + 0x20) >= 2) gfx_add_draw_callback_third(D_L18_003F9018, moby);
 }

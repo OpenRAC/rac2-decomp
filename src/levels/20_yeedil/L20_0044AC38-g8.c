@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: the body reaches a global through $gp. */
 
@@ -14,18 +15,18 @@ extern char *D_L20_001B2F9C[] __attribute__((sda));
 extern char *D_L20_001FBB20[];
 extern int D_L20_001B2440 __attribute__((sda));
 
-extern void func_002A7470(void *, int, int, int);
-extern void func_002AEC18(void *, int);
-extern int func_002A77E0(int);
-extern void func_002A7750(void *, int, int);
-extern float func_002A7878(float, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_002A7940(void);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_set_light_color(void *, int);
+extern int math_random_int_below(int);
+extern void moby_set_state(void *, int, int);
+extern float math_random_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_angle(void);
 
 /* Wakes an idle turret from a group of objects, places it at a position facing a direction, and returns it (or null if none is free). */
-char *func_L20_0044AC38(int parent, int groupIndex, float *position, float *direction) {
+char *turret_spawn_from_group(int parent, int groupIndex, float *position, float *direction) {
     char *idp = D_L20_001FBB20[groupIndex];
     char *found = 0;
 
@@ -73,9 +74,9 @@ end:
 
         *(u16 *)(found + 0x34) = (*(u16 *)(found + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(found + 0x98) = *(int *)(*(char **)(found + 0x24) + 0x10);
-        StartAnimationBlended(found, 0, 0, 0xF);
-        SetMobyLightColor(found, D_L20_001B2440);
-        if (RandomIntBelow(2) != 0) {
+        anim_start_blended(found, 0, 0, 0xF);
+        moby_set_light_color(found, D_L20_001B2440);
+        if (math_random_int_below(2) != 0) {
             *(u16 *)(found + 0x34) |= 0x8000;
         } else {
             *(u16 *)(found + 0x34) &= 0x7FFF;
@@ -86,13 +87,13 @@ end:
         qcopy(state + 0x180, position);
         qcopy(state + 0x170, direction);
         *(int *)(found + 0xB8) = parent;
-        SetMobyState(found, 2, -1);
-        vec_scale_to_length(state + 0x190, direction, RandomFloatRange(20.0f, 30.0f));
+        moby_set_state(found, 2, -1);
+        vec_scale_to_length(state + 0x190, direction, math_random_float_range(20.0f, 30.0f));
         FastVecAdd(state + 0x190, state + 0x190, pos);
         *(float *)(state + 0x198) = position[2];
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
-        *(float *)(found + 0xF8) = FastMatrixHelperA(direction[0], direction[1]);
-        *(float *)(state + 0x1A0) = RandomAngle();
+        *(float *)(found + 0xF8) = mat_fast_helper_a(direction[0], direction[1]);
+        *(float *)(state + 0x1A0) = math_random_angle();
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
     }
     return found;

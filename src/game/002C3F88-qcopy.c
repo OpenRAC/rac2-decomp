@@ -27,19 +27,19 @@ typedef struct {
     } motion;
 } Particle_002C3F88;
 
-extern Particle_002C3F88 *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern int func_002A77E0(int);
+extern Particle_002C3F88 *part_alloc(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern int math_random_int_below(int);
 extern unsigned char *D_001F264C;
 
 /* Spawns a spark particle at position for owner; mode 0 fades it out over its
    life, a velocity is copied when given. */
 /* Creates a spark that belongs to an owner and can fade out over its life. */
-Particle_002C3F88 *func_002C3F88(int owner, TI128 *position, int life, int mode, int alpha,
+Particle_002C3F88 *part_spawn_owned_spark(int owner, TI128 *position, int life, int mode, int alpha,
                                  float *velocity, float extraA, float extraB)
 {
-    Particle_002C3F88 *p = AllocParticle(0x43);
+    Particle_002C3F88 *p = part_alloc(0x43);
     typeof(p->motion) *m = &p->motion;
 
     if (p != 0) {
@@ -52,7 +52,7 @@ Particle_002C3F88 *func_002C3F88(int owner, TI128 *position, int life, int mode,
         p->unk01 = 0;
         p->unk03 = 0x48;
         p->unk0C = 52500.0f;
-        p->unk08 = RandomIntBelow(0xFF);
+        p->unk08 = math_random_int_below(0xFF);
         m->mode = mode;
         m->age = 0;
         if (mode == 0)

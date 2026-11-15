@@ -12,10 +12,10 @@ typedef struct {
 } Obj_35370;
 
 extern Obj_35370 *ref_L00_00335370_00;
-extern char *func_00270280(s32 a0);
+extern char *moby_find_record_by_handle_id(s32 a0);
 
 /* Copies a vector into the data of the selected object. */
-void func_00335370(void *vec)
+void object_copy_vector_to_selected(void *vec)
 {
     Obj_35370 *current;
     Obj_35370 *selected;
@@ -24,7 +24,7 @@ void func_00335370(void *vec)
 
     current = ref_L00_00335370_00;
     if (current->f86_35370 != 5) {
-        selected = (Obj_35370 *)FindRecordByHandleId(5);
+        selected = (Obj_35370 *)moby_find_record_by_handle_id(5);
     } else {
         selected = current;
     }

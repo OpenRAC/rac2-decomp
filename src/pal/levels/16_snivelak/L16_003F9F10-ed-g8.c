@@ -2,6 +2,7 @@
    the 50 Hz scale and 60 becomes 50. */
 
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L16_003F9F10 has a unit of its own: retail reads the particle colours and lifetime bounds
    through bare absolute `lui $r ; lw $r,%lo($r)` pairs that never sit in a delay slot, yet builds
@@ -26,17 +27,17 @@ extern int D_L16_001B1108 __attribute__((sda));
 extern int D_L16_001B110C[] __attribute__((sda));   /* lifetime bounds */
 extern int D_L16_001B1110[] __attribute__((sda));
 
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00282C48(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern void func_00282C88(void *);
-extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float math_fabs(float);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern void vec_clear_128(void *);
+extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Emits randomly positioned particles outside the central rectangle, each with colours blended
    at random between two pairs, a random size from the table and random lifetimes. */
@@ -53,27 +54,27 @@ void func_PAL_L16_003F9F10(char *object)
 
     for (i = 0; (float)i < D_L16_001B10E4; ++i) {
         *(Quadword *)random = 0;
-        random[0] = func_002A78D8(0.0f, 26.0f);
-        random[1] = func_002A78D8(0.0f, 8.0f);
-        random[2] = func_002A7878(0.0f, 30.0f);
+        random[0] = math_random_signed_float_range(0.0f, 26.0f);
+        random[1] = math_random_signed_float_range(0.0f, 8.0f);
+        random[2] = math_random_float_range(0.0f, 30.0f);
         *(Quadword *)position = *(Quadword *)random;
-        if (func_00282C48(position[0]) < 9.0f && func_00282C48(position[2]) < 25.0f)
+        if (math_fabs(position[0]) < 9.0f && math_fabs(position[2]) < 25.0f)
             continue;
         scale = *(float *)(object + 44) / *(float *)(*(char **)(object + 36) + 36);
-        func_00282D30(position, position, scale);
-        func_00283098(position, position, object + 192);
-        func_00282CC0(position, position, object + 16);
-        blend = func_002A7878(0.0f, 1.0f);
-        first = func_00283D38(D_L16_001B10E8, D_L16_001B10EC[0], blend);
-        blend = func_002A7878(0.0f, 1.0f);
-        second = func_00283D38(D_L16_001B10F0[0], D_L16_001B10F4[0], blend);
-        size = D_L16_001B10F8[func_002A77E0(2)];
-        func_00282C88(random);
+        FastVecScale(position, position, scale);
+        matrix_mul_vec3(position, position, object + 192);
+        FastVecAdd(position, position, object + 16);
+        blend = math_random_float_range(0.0f, 1.0f);
+        first = FastTweenColor(D_L16_001B10E8, D_L16_001B10EC[0], blend);
+        blend = math_random_float_range(0.0f, 1.0f);
+        second = FastTweenColor(D_L16_001B10F0[0], D_L16_001B10F4[0], blend);
+        size = D_L16_001B10F8[math_random_int_below(2)];
+        vec_clear_128(random);
         random[3] = size;
-        func_00282C88(direction);
+        vec_clear_128(direction);
         direction[3] = size;
-        third = ((int)func_002A7820(1, D_L16_001B1108) * 5 + 2) / 6;
-        fourth = ((int)func_002A7820(D_L16_001B110C[0], D_L16_001B1110[0]) * 5 + 2) / 6;
-        func_002BAA28(position, random, direction, first, second, third, fourth, 50, D_L16_001B1104);
+        third = ((int)math_random_int_range(1, D_L16_001B1108) * 5 + 2) / 6;
+        fourth = ((int)math_random_int_range(D_L16_001B110C[0], D_L16_001B1110[0]) * 5 + 2) / 6;
+        part_spawn_trail(position, random, direction, first, second, third, fourth, 50, D_L16_001B1104);
     }
 }

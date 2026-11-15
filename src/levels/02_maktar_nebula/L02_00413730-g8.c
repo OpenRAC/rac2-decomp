@@ -1,8 +1,8 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
 extern float D_L02_001B1C74 __attribute__((sda));
 extern float D_L02_001B1C78 __attribute__((sda));
 extern float D_L02_001B1C7C __attribute__((sda));
@@ -11,7 +11,7 @@ extern float D_L02_001B1C84 __attribute__((sda));
 extern float D_L02_001B1C88 __attribute__((sda));
 
 /* Restore the base pose, then advance its three independent oscillations. */
-void func_L02_00413730(u8 *object)
+void lift_apply_wobble(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     float step;
@@ -22,13 +22,13 @@ void func_L02_00413730(u8 *object)
     *(TI128 *)(object + 0xF0) = *(TI128 *)(state + 0xA0);
     step = 0.00029088825f;
     *(float *)(state + 0xB8) = FastAddRotations(*(float *)(state + 0xB8), D_L02_001B1C74 * step);
-    wave = FastSinOrCosB(*(float *)(state + 0xB8));
+    wave = math_fast_sin_or_cos_b(*(float *)(state + 0xB8));
     next = D_L02_001B1C7C * step;
     *(float *)(object + 0xF0) += D_L02_001B1C78 * wave;
     *(float *)(state + 0xB4) = FastAddRotations(*(float *)(state + 0xB4), next);
-    wave = FastSinOrCosB(*(float *)(state + 0xB4));
+    wave = math_fast_sin_or_cos_b(*(float *)(state + 0xB4));
     next = D_L02_001B1C84 * step;
     *(float *)(object + 0xF4) += D_L02_001B1C80 * wave;
     *(float *)(state + 0xB0) = FastAddRotations(*(float *)(state + 0xB0), next);
-    *(float *)(object + 0x18) += D_L02_001B1C88 * FastSinOrCosB(*(float *)(state + 0xB0));
+    *(float *)(object + 0x18) += D_L02_001B1C88 * math_fast_sin_or_cos_b(*(float *)(state + 0xB0));
 }

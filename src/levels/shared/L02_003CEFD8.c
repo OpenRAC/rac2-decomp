@@ -2,8 +2,8 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern char *D_L02_001FC060[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern char *g_entity_group_lists[];
 extern int D_L02_001B35B8 __attribute__((sda));
 
 struct L02PairWordB {
@@ -13,10 +13,10 @@ struct L02PairWordB {
 
 extern struct L02PairWordB D_L02_001B00C8;
 
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 struct L02Vec4 {
     float x, y, z, w;
@@ -49,7 +49,7 @@ struct L02PushObject {
 /* For every live entity of kind 0xA4E in the object's group (not in state 0xFE/0xFD), builds
    a vector from the unit scaled by the entity's block, transforms it by the block's matrix
    and hands it, with the block's random word, to the shared emitter. */
-void func_L02_003CEFD8(struct L02PushObject *a0)
+void chickenbot_emit_sparks(struct L02PushObject *a0)
 {
     struct L02Vec4 vec;
     struct L02PairWordB k;
@@ -62,7 +62,7 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
 
     if (a0->group == 0xFF)
         return;
-    q = (unsigned short *)gEntityGroupLists[a0->group];
+    q = (unsigned short *)g_entity_group_lists[a0->group];
     if (q == 0)
         return;
     *(TI128 *)&vec = 0;
@@ -70,10 +70,10 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
     vec.z = 0.1f;
     vec.w = 1.0f;
     k = D_L02_001B00C8;
-    p = (unsigned short *)gEntityGroupLists[a0->group];
+    p = (unsigned short *)g_entity_group_lists[a0->group];
     while (a0->group != 0xFF && a0->group <= D_L02_001B35B8 && p != 0 &&
-           ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)gEntityGroupLists[a0->group])) {
-        e = (struct L02PushEntity *)(gMobyPool_L02 + ((*p & 0x7FFF) << 8));
+           ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)g_entity_group_lists[a0->group])) {
+        e = (struct L02PushEntity *)(g_moby_l02_pool + ((*p & 0x7FFF) << 8));
         if (e == 0)
             break;
         if (e->f31 != 0 && e->type == 0xA4E /* Megacorp Chickenbot */ && e->state != 0xFE && e->state != 0xFD) {
@@ -81,7 +81,7 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
             FastVecScale(tmp, &vec, o->f324);
             transform_vector(tmp, tmp, (char *)o + 0x220);
             r = FastTweenColor(k.a, k.b, o->f32C);
-            DrawBillboardQuad_L00(tmp, r, o->f324 * 0.2f, 0.08f);
+            gfx_l00_draw_billboard_quad(tmp, r, o->f324 * 0.2f, 0.08f);
         }
         p++;
     }

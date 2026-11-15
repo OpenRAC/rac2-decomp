@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_L00_0037E5F0(float);
+extern void fade_reduce_value(float);
 
 void func_PAL_L02_003E2FB0(void) {
-    func_L00_0037E5F0(10000.0f);
+    fade_reduce_value(10000.0f);
 }
 

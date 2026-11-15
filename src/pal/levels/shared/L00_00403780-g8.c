@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern void func_00300190(void *, void *);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void vec_transform_or_copy(void *, void *);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 typedef struct EffectParticle {
     unsigned char prefix[10];
     short life;
@@ -22,32 +22,32 @@ typedef struct EffectParticleExtension {
     short spin;
     unsigned char alpha, life;
 } EffectParticleExtension;
-extern EffectParticle *func_002BDCE8(void *, float, float, float, int, void *, float, unsigned, int);
+extern EffectParticle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, unsigned, int);
 extern float D_L00_001A8F20[4] MACRO_ADDR;
 
 
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_003252A8(void *, void *, int);
-extern void func_002FEE70(int, void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_L00_0031D670(void *, void *, void *, float);
-extern int func_002FE9D0(void *);
-extern int func_00300540(int);
-extern int func_00277F48(void *, int, void *, void *, float);
-extern void func_0032D758(void *, int, void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_L00_003FF530(void *);
-extern void func_002A9288(void *, float);
-extern float func_00282DB0(void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void moby_forward_position_call(void *, void *, int);
+extern void part_steer_effect_direction(int, void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void LerpVector4(void *, void *, void *, float);
+extern int CollideSweptSphere(void *);
+extern int weapon_get_group(int);
+extern int coll_process_hit(void *, int, void *, void *, float);
+extern void StartAttachedEffect(void *, int, void *);
+extern int PlayMobySound(int, int, void *);
+extern void shot_spawn_fragments(void *);
+extern void part_queue_ground_shadow(void *, float);
+extern float FastVecDot(void *, void *);
 extern unsigned char D_0013958D[];
 typedef struct EffectPlayer {
     unsigned char prefix[0x70];
     float scale;
     unsigned char suffix[0x6C];
 } EffectPlayer;
-extern EffectPlayer D_L00_00262570[];
-extern void *D_0018C0B0[];
-extern void *D_L00_001C3280[];
+extern EffectPlayer g_weapon_l00_table[];
+extern void *g_hero_moby[];
+extern void *g_area_hit_targets[];
 extern int D_L00_001A8FF0[] MACRO_ADDR, D_L00_001A8FF4[] MACRO_ADDR;
 extern float D_L00_001B0C20 __attribute__((sda));
 extern float D_L00_001B0C28 __attribute__((sda));
@@ -107,15 +107,15 @@ void func_PAL_L00_00403780(char *self)
     float fadeRadius;
     int remaining;
     void **targets;
-    func_002AFFD8(self + 0x10, work.normal.f, 1);
-    func_00300190(self + 0x10, self + 0x10);
+    cam_compute_view_direction(self + 0x10, work.normal.f, 1);
+    vec_transform_or_copy(self + 0x10, self + 0x10);
     switch ((unsigned char)self[0x20]) {
     case 0:
         qcopy(work.old.f, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, p);
-        func_002FEE70(p->rotation, p, 0);
-        func_002FE880(self + 0x10, p, 0.00584f);
-        func_00282948(&p->trail);
+        FastVecAdd(self + 0x10, self + 0x10, p);
+        part_steer_effect_direction(p->rotation, p, 0);
+        vec_add_object_direction_scaled(self + 0x10, p, 0.00584f);
+        math_fast_float_d(&p->trail);
         if (p->trail) {
             for (i = 0; i < 3; i++) {
                 int id;
@@ -125,13 +125,13 @@ void func_PAL_L00_00403780(char *self)
                 float third = 0.33329999446868896f;
                 float one = 1.0f;
                 *(EffectQuad *)work.tmp.f = *(EffectQuad *)(self + 0x10);
-                func_L00_0031D670(work.params.point.f, work.old.f, work.tmp.f, func_00283CE0(i) * third);
-                id = func_002A77E0(6);
-                if (func_002A77E0(2)) {
+                LerpVector4(work.params.point.f, work.old.f, work.tmp.f, IntToFloat(i) * third);
+                id = math_random_int_below(6);
+                if (math_random_int_below(2)) {
                     id = -id;
                 }
-                x = (float)p->trail / func_00283CE0(42) * 65000.0f + 10000.0f;
-                r = func_002BDCE8(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
+                x = (float)p->trail / IntToFloat(42) * 65000.0f + 10000.0f;
+                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
                 if (r) {
                     short life = 42;
                     EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
@@ -163,60 +163,60 @@ void func_PAL_L00_00403780(char *self)
         work.query.field48 = 0;
         work.query.field4c = 0;
         work.query.field58 = 0;
-        swept = func_002FE9D0(&work.query);
-        kind = func_00300540(work.query.hit);
+        swept = CollideSweptSphere(&work.query);
+        kind = weapon_get_group(work.query.hit);
         if (swept > 0 && (unsigned)(kind - 1) < 2) {
-            func_L00_003FF530(self);
-            func_0029F338(self);
+            shot_spawn_fragments(self);
+            moby_mark_spawned(self);
             return;
         }
         qcopy(self + 0x10, work.query.end.f);
         qcopy(p, work.query.delta.f);
-        func_002ACDE8(self + 0xC0, self + 0xC0, p->axis.f);
-        func_002ACDE8(self + 0xD0, self + 0xD0, p->axis.f);
-        func_002ACDE8(self + 0xE0, self + 0xE0, p->axis.f);
+        vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, p->axis.f);
+        vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, p->axis.f);
+        vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, p->axis.f);
         work.hit.owner = self;
         work.hit.flags = 0x830000;
-        { EffectPlayer *pl = &D_L00_00262570[D_0013958D[0]]; work.hit.scale = pl->scale; }
+        { EffectPlayer *pl = &g_weapon_l00_table[D_0013958D[0]]; work.hit.scale = pl->scale; }
         work.hit.enabled = 1;
         qcopy(work.hit.pos, p);
-        func_00282F20(work.hit.pos, work.hit.pos, 1.0f);
+        vec_scale_to_length(work.hit.pos, work.hit.pos, 1.0f);
         work.hit.type = 3;
         work.hit.radius = 5627.9248046875f;
         work.hit.classId = *(unsigned short *)(self + 0xAA);
         work.hit.active = 1;
-        result = func_00277F48(self + 0x10, 1, D_0018C0B0[0], &work.hit, radius + 0.1f);
+        result = coll_process_hit(self + 0x10, 1, g_hero_moby[0], &work.hit, radius + 0.1f);
         if (result) {
             if (p->charged) {
                 if (result > 0) {
-                    targets = D_L00_001C3280;
+                    targets = g_area_hit_targets;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x4C, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x4C, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
             } else {
                 if (result > 0) {
-                    targets = D_L00_001C3280;
+                    targets = g_area_hit_targets;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x25, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x25, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
             }
-            func_L00_003FF530(self);
-            func_0029F338(self);
+            shot_spawn_fragments(self);
+            moby_mark_spawned(self);
             return;
         }
         if (swept > 0) {
             qcopy(work.tmp.f, p);
             work.tmp.f[2] = 0;
-            func_00282DD8(work.tmp.f, work.tmp.f, work.normal.f);
-            func_00282F20(work.tmp.f, work.tmp.f, 1.0f);
-            func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.062831864f, 0.12566373f));
-            func_002E5CF8(1, 0, self);
+            FastVecCross(work.tmp.f, work.tmp.f, work.normal.f);
+            vec_scale_to_length(work.tmp.f, work.tmp.f, 1.0f);
+            math_build_axis_angle_quat(p->axis.f, work.tmp.f, math_random_float_range(0.062831864f, 0.12566373f));
+            PlayMobySound(1, 0, self);
             p->bounces += 1;
             if (p->bounces >= 4) {
                 qcopy(self + 0x10, D_L00_001BF230);
@@ -226,28 +226,28 @@ void func_PAL_L00_00403780(char *self)
                 if (p->charged) {
                     speed *= D_L00_001B0C34;
                 }
-                func_L00_003252A8(self, work.offset.f, 1);
-                scale = func_00282DB0(work.offset.f, p);
-                func_00282D30(work.step.f, work.offset.f, scale);
-                func_00282CF0(p, p, work.step.f);
-                func_00282F20(p, p, speed);
+                moby_forward_position_call(self, work.offset.f, 1);
+                scale = FastVecDot(work.offset.f, p);
+                FastVecScale(work.step.f, work.offset.f, scale);
+                FastVecSub(p, p, work.step.f);
+                vec_scale_to_length(p, p, speed);
                 qcopy(p->axis.f, work.tmp.f);
                 p->axis.f[3] = 0.062831864f;
             }
         }
         break;
     case 1:
-        func_00282CC0(self + 0x10, self + 0x10, p);
-        func_002AB668(work.old.f, p->axis.f, p->axis.f[3]);
-        func_002ACDE8(self + 0xC0, self + 0xC0, work.old.f);
-        func_002ACDE8(self + 0xD0, self + 0xD0, work.old.f);
-        func_002ACDE8(self + 0xE0, self + 0xE0, work.old.f);
+        FastVecAdd(self + 0x10, self + 0x10, p);
+        math_build_axis_angle_quat(work.old.f, p->axis.f, p->axis.f[3]);
+        vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, work.old.f);
+        vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, work.old.f);
+        vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, work.old.f);
         scale = (D_L00_001B0C40 - 1.0f) * 1.2f + 1.0f;
         p->axis.f[3] *= scale;
-        func_00282D30(p, p, scale);
-        if (func_00282948(&p->timer)) {
-            func_L00_003FF530(self);
-            func_0029F338(self);
+        FastVecScale(p, p, scale);
+        if (math_fast_float_d(&p->timer)) {
+            shot_spawn_fragments(self);
+            moby_mark_spawned(self);
             return;
         }
         break;
@@ -257,6 +257,6 @@ void func_PAL_L00_00403780(char *self)
         fadeRadius *= D_L00_001B0C34;
     }
     if (D_L00_001A8FF0[0] == 0 && D_L00_001A8FF4[0] == 0) {
-        func_002A9288(self, fadeRadius);
+        part_queue_ground_shadow(self, fadeRadius);
     }
 }

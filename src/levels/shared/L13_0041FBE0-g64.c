@@ -24,21 +24,21 @@ extern float D_L13_001B1BB4 __attribute__((sda));
 extern float D_L13_001B1BB8 __attribute__((sda));
 extern int D_L13_001B1BBC __attribute__((sda));
 extern int D_L13_001B1BC0 __attribute__((sda));
-extern void func_00283658(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AFDD8(char *, char *, char *, char *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283198(float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_L02_002EF968(void *, int, unsigned int, void *, void *, int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_002833F0(void *, void *);
-extern void func_L01_002E1510(void *, int, void *, int, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void copy_matrix_rotation(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void FillQuadPacket(void *, int, unsigned int, void *, void *, int);
+extern void *memset(void *, int, unsigned int);
+extern void euler_rotation_basis(void *, void *);
+extern void gfx_transform_and_draw_entries(void *, int, void *, int, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Draws a pulsing glowing strip made of layered quads whose edges fade out. */
-void func_L13_0041FBE0(char *object) {
+void gfx_draw_pulsing_glow_strip(char *object) {
     float transform[16];
     Vector direction;
     DrawPacket packet[7];
@@ -65,9 +65,9 @@ void func_L13_0041FBE0(char *object) {
     vec_scale_to_length(transform, transform, 4.0f);
     vec_scale_to_length(transform + 4, transform + 4, 10.0f);
     FastVecSub(&direction, D_L13_001B98C0, object + 0x10);
-    TransformVectorByObjectOrGiven(object, (char *)&direction, (char *)&direction, 0);
+    vec_transform_by_object_or_given(object, (char *)&direction, (char *)&direction, 0);
     if (direction.f[0] < 0.0f) FastVecScale(transform, transform, -1.0f);
-    amount = FastSinOrCosB(*(float *)(private + 0x20)) * 0.5f + 0.5f;
+    amount = math_fast_sin_or_cos_b(*(float *)(private + 0x20)) * 0.5f + 0.5f;
     main_color = FastTweenColor(D_L13_001B1A90, D_L13_001B1A90_1[1], amount);
     trim_color = FastTweenColor(D_L13_001B1A90_1[2], D_L13_001B1A90_1[3], amount);
     fade_a = *(float *)(private + 4);
@@ -113,7 +113,7 @@ void func_L13_0041FBE0(char *object) {
     subtract_offsets[0].quad = offsets[0].quad;
     subtract_offsets[1].quad = offsets[1].quad;
     euler_rotation_basis(rotation_matrix, &rotation);
-    TransformAndDrawEntries(packet, D_L13_001B1BBC, rotation_matrix, D_L13_001B1BC0, transform);
+    gfx_transform_and_draw_entries(packet, D_L13_001B1BBC, rotation_matrix, D_L13_001B1BC0, transform);
     for (i = 0; i < 4; i++) {
         FastVecAdd(packet[0].vertex + i, D_L13_001B1AB0 + i, &setup);
         FastVecAdd(packet[1].vertex + i, D_L13_001B1AF0 + i, &setup);
@@ -128,5 +128,5 @@ void func_L13_0041FBE0(char *object) {
         FastVecAdd(packet[6].vertex + i, packet[6].vertex + i, subtract_offsets + 1);
     }
     euler_rotation_basis(rotation_matrix, &rotation);
-    TransformAndDrawEntries(packet, D_L13_001B1BBC, rotation_matrix, D_L13_001B1BC0, transform);
+    gfx_transform_and_draw_entries(packet, D_L13_001B1BBC, rotation_matrix, D_L13_001B1BC0, transform);
 }

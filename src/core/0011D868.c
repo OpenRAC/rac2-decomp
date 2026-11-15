@@ -36,7 +36,7 @@ extern s32 r1_func_00118CB0(s32);
  * exact (8/92 at best), which is what kept this one open.
  */
 /* Creates the two locks used by the file system code, the first time it is called. */
-void func_0011D868(void) {
+void iop_file_init_semaphores(void) {
     int buf[8];
     if (r1_D_0012FDA0 == -1) {
         buf[2] = 1;
@@ -62,10 +62,10 @@ void func_0011D868(void) {
  * 2.95.3 parked the %hi in $4 instead.
  */
 /* Finds an unused slot in the file table and marks it as taken. Returns 0 if all slots are used. */
-void *func_0011D8C8(void) {
+void *iop_file_alloc_slot(void) {
     char *slot;
 
-    InitFileSemaphores();
+    iop_file_init_semaphores();
     r1_func_00118CB0(r1_D_0012FDA0);
     for (slot = r1_D_00157E80; slot < r1_D_00157E80 + 0x200; slot += 0x10) {
         if (*(int *)(slot + 0x4) == 0) {

@@ -3,11 +3,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int id);
+extern void *CreateMoby(int id);
 extern void func_002A0F48(char *object);
 
 /* Finds the object with the fixed id, marks it and gives it the caller's position. */
-int func_00302A20(void *object)
+int moby_place_fixed_id_object(void *object)
 {
     void *found = CreateMoby(0x3EF /* moby class 1007 */);
 
@@ -28,17 +28,17 @@ typedef struct {
     int pad28, pad2C;
 } Slot00305438;
 
-extern void func_0029FCC0(void *a, int b, void *c);
+extern void moby_transform_joint_to_world(void *a, int b, void *c);
 extern Slot00305438 ref_00305438_00[];
 
 /* Takes the first free entry of the table for the object and counts it. */
-void func_00305438(void *obj, void *other)
+void part_add_trail_entry(void *obj, void *other)
 {
     char *vars = *(char **)((char *)obj + 0x68);
     TI128 local;
     int i;
 
-    TransformMobyJointToWorld(obj, 1, &local);
+    moby_transform_joint_to_world(obj, 1, &local);
     for (i = 0; i < 100; i++) {
         if (ref_00305438_00[i].owner == 0) {
             Slot00305438 *e = &ref_00305438_00[i];

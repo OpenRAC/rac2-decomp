@@ -1,3 +1,4 @@
+#include "names.h"
 /* Per-frame update of a Maktar Nebula object. State 0 sets up its timers; state 1 runs a
    series of tests on its state record and two global records, calling func_0028A180,
    func_PAL_00289730 and func_PAL_L01_002EBFB8 with the ids listed below.
@@ -18,7 +19,7 @@
 #include "common.h"
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define B(p,o) (*(u8 *)((char *)(p)+(o)))
-extern char D_00189EA0[], D_L02_0027FD48[];
+extern char g_hero_position[], D_L02_0027FD48[];
 typedef struct HintFlags { u8 pad[0x75]; u8 intro, timers; u8 pad77[5]; u8 hint; } HintFlags;
 extern HintFlags D_001395B8;
 typedef struct HintHistory {
@@ -73,54 +74,54 @@ typedef struct HintState {
     s32 value98;
     s32 value9C;
 } HintState;
-extern HintHistory D_0018C958;
-extern PlayerHistory D_0018C750;
-extern u32 D_001A79F0[] __attribute__((sda));
+extern HintHistory g_subtitle_history;
+extern PlayerHistory g_progress_statistics;
+extern u32 g_current_map_index[] __attribute__((sda));
 extern u32 D_001A7390 MACRO_ADDR;
 extern u32 timer_sda SDATA(D_001A7390);
-extern u8 D_001A7AF8[] MACRO_ADDR;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern int D_L02_001A8FF0 MACRO_ADDR;
 extern int unlock_sda SDATA(D_L02_001A9010);
-extern char *D_L02_001B359C MACRO_ADDR;
+extern char *g_moby_l02_pool MACRO_ADDR;
 extern char *objects_sda SDATA(D_L02_001B359C);
 extern char *D_L02_001B368C MACRO_ADDR;
-extern int D_L02_001B30C8 MACRO_ADDR;
-extern void func_002A7750(void *,int,int);
-extern int func_L01_00305E18(int),func_002ACBC8(void *,int);
-extern void func_0028A180(int,int),func_PAL_00289730(int,int),func_PAL_L01_002EBFB8(int,int,int,int,int);
-extern int func_L02_00400CC8(void *),func_00282948(void *),func_L02_003D6BB0(void *),func_002B38B8(void *);
-extern void func_L00_003672F8(void),func_PAL_L00_002B9CD8(void *,void *,int,int);
+extern int g_frame_l02_counter MACRO_ADDR;
+extern void moby_set_state(void *,int,int);
+extern int level_get_table_entry_short(int),IsPointInCuboid(void *,int);
+extern void hud_queue_hint_message(int,int),func_PAL_00289730(int,int),func_PAL_L01_002EBFB8(int,int,int,int,int);
+extern int arena_is_challenge_running(void *),math_fast_float_d(void *),chainblade_is_state_active(void *),flag_is_third_pending_set(void *);
+extern void state_set_flag_one(void),func_PAL_L00_002B9CD8(void *,void *,int,int);
 void func_PAL_L02_0040E800(char *e) {
     HintState *s=*(HintState **)(e+0x68);
 
     switch(B(e,0x20)) { default: return; case 0: {
         B(e,0x30)=255; s->value60=0;s->value64=0;s->value50=0;s->value90=0;
         s->value94=1000;s->value2C=150;s->value98=500;
-        func_002A7750(e,1,-1);
+        moby_set_state(e,1,-1);
     break; } case 1: {
         HintHistory *base;
-        int mode=func_L01_00305E18(2);
-        if(mode==2 && func_L01_00305E18(0)!=mode) {
+        int mode=level_get_table_entry_short(2);
+        if(mode==2 && level_get_table_entry_short(0)!=mode) {
             base=(HintHistory *)&D_001395B8;
-            if(!(((HintFlags *)base)->intro&4) && func_002ACBC8(D_00189EA0,s->value9C) && ((((int)(timer_sda) * 5 + 2) / 6)-D_0018C750.time1CC>360000 || !D_0018C750.count1C8)) {
-                ((HintFlags *)base)->intro|=4;func_0028A180(0xa3c,0x93);
+            if(!(((HintFlags *)base)->intro&4) && IsPointInCuboid(g_hero_position,s->value9C) && ((((int)(timer_sda) * 5 + 2) / 6)-g_progress_statistics.time1CC>360000 || !g_progress_statistics.count1C8)) {
+                ((HintFlags *)base)->intro|=4;hud_queue_hint_message(0xa3c,0x93);
             }
         }
-        base=&D_0018C958;
+        base=&g_subtitle_history;
         if(base->countF0<65535) {
-            if(D_001A7AF8[0x2E]) base->countF0=65535;
-            else if(func_002ACBC8(D_00189EA0,I(s,0))) {
+            if(g_item_owned_flags[0x2E]) base->countF0=65535;
+            else if(IsPointInCuboid(g_hero_position,I(s,0))) {
                 if(base->countF0) {
                     if((((int)(D_001A7390) * 5 + 2) / 6)-base->timeF4>900 || !base->timeF4)func_PAL_00289730(0x9bd,0x14);
                     else if(base->timeF4<(((int)(D_001A7390) * 5 + 2) / 6))base->timeF4=(((int)(D_001A7390) * 5 + 2) / 6);
                 } else {
                     base->countF0++; if(base->timeF4<(((int)(D_001A7390) * 5 + 2) / 6))base->timeF4=(((int)(D_001A7390) * 5 + 2) / 6);
-                    base->levelsF8=(base->levelsF8|(1<<D_001A79F0[0]))|0x80000000;
+                    base->levelsF8=(base->levelsF8|(1<<g_current_map_index[0]))|0x80000000;
                 }
             }
         }
         if(D_L02_001A8FF0 && !I(D_L02_0027FD48,0) && I(D_L02_0027FD48,0x24)==-1) {
-            base=&D_0018C958;
+            base=&g_subtitle_history;
             if(base->flags158>=0)func_PAL_00289730(0x9c5,0x1c);
             if(base->time154+base->count152>=(((int)(D_001A7390) * 5 + 2) / 6)-2) {
                 int count = base->count152+1;
@@ -129,42 +130,42 @@ void func_PAL_L02_0040E800(char *e) {
             } else {if(base->time154<(((int)(D_001A7390) * 5 + 2) / 6))base->time154=(((int)(D_001A7390) * 5 + 2) / 6);base->count152=0;}
         }
         func_PAL_L01_002EBFB8(0x9bf,0x16,2,s->value10,s->value14);
-        if(D_0018C958.count120<65535) {
-            if(D_0018C750.count54>=3 || func_002ACBC8(D_00189EA0,s->value24))D_0018C958.count120=65535;
-            else if(func_002ACBC8(D_00189EA0,s->value20)) {
-                if((((int)(timer_sda) * 5 + 2) / 6)-D_0018C958.time124>900 || !D_0018C958.time124)func_PAL_00289730(0x9c1,0x18);
-                else if(D_0018C958.time124<(((int)(timer_sda) * 5 + 2) / 6))D_0018C958.time124=(((int)(timer_sda) * 5 + 2) / 6);
+        if(g_subtitle_history.count120<65535) {
+            if(g_progress_statistics.count54>=3 || IsPointInCuboid(g_hero_position,s->value24))g_subtitle_history.count120=65535;
+            else if(IsPointInCuboid(g_hero_position,s->value20)) {
+                if((((int)(timer_sda) * 5 + 2) / 6)-g_subtitle_history.time124>900 || !g_subtitle_history.time124)func_PAL_00289730(0x9c1,0x18);
+                else if(g_subtitle_history.time124<(((int)(timer_sda) * 5 + 2) / 6))g_subtitle_history.time124=(((int)(timer_sda) * 5 + 2) / 6);
             }
         }
         func_PAL_L01_002EBFB8(0x9c2,0x19,1,s->value30,s->value34);
-        if(!D_0018C958.count138) {
+        if(!g_subtitle_history.count138) {
             if(!s->value3C && unlock_sda)s->value3C=1;
-            if(D_001A7AF8[0x26])D_0018C958.count138=65535;
-            if(s->value3C && func_002ACBC8(D_00189EA0,s->value38))func_PAL_00289730(0x9c3,0x1a);
+            if(g_item_owned_flags[0x26])g_subtitle_history.count138=65535;
+            if(s->value3C && IsPointInCuboid(g_hero_position,s->value38))func_PAL_00289730(0x9c3,0x1a);
         }
         func_PAL_L01_002EBFB8(0x9c4,0x1b,0,s->value44,-1);
-        if(func_L02_00400CC8(D_L02_001B359C+(s->value68<<8))) {
-            if(func_00282948(&s->value94) && (((D_001395B8.timers>>D_001A79F0[0])^1)&1)) {
-                if(!D_0018C750.countF0 || (((int)(timer_sda) * 5 + 2) / 6)-D_0018C750.timeF4>35000)func_0028A180(0x9c9,0x20);
-                D_001395B8.timers|=1<<D_001A79F0[0];
+        if(arena_is_challenge_running(g_moby_l02_pool+(s->value68<<8))) {
+            if(math_fast_float_d(&s->value94) && (((D_001395B8.timers>>g_current_map_index[0])^1)&1)) {
+                if(!g_progress_statistics.countF0 || (((int)(timer_sda) * 5 + 2) / 6)-g_progress_statistics.timeF4>35000)hud_queue_hint_message(0x9c9,0x20);
+                D_001395B8.timers|=1<<g_current_map_index[0];
             }
-            if(func_L02_003D6BB0(D_L02_001B359C+(s->value6C<<8)) && (!D_0018C750.count1BC || (((int)(timer_sda) * 5 + 2) / 6)-D_0018C750.time1C0>60000) && func_00282948(&s->value98) && D_0018C958.value2C0>=0)func_PAL_00289730(0x9e3,0x3a);
+            if(chainblade_is_state_active(g_moby_l02_pool+(s->value6C<<8)) && (!g_progress_statistics.count1BC || (((int)(timer_sda) * 5 + 2) / 6)-g_progress_statistics.time1C0>60000) && math_fast_float_d(&s->value98) && g_subtitle_history.value2C0>=0)func_PAL_00289730(0x9e3,0x3a);
         }
         if(D_L02_001A8FF0) {
-            if(func_002ACBC8(D_00189EA0,s->value4C) && !D_0018C958.count15C) {func_0028A180(0x9c6,0x1d);s->value90=180000;}
-            if(func_00282948(&s->value90)){func_0028A180(0x9c6,0x1d);s->value90=180000;}
-            if((((int)(D_001A7390) * 5 + 2) / 6)-D_0018C750.time1A8<60)s->value90=180000;
+            if(IsPointInCuboid(g_hero_position,s->value4C) && !g_subtitle_history.count15C) {hud_queue_hint_message(0x9c6,0x1d);s->value90=180000;}
+            if(math_fast_float_d(&s->value90)){hud_queue_hint_message(0x9c6,0x1d);s->value90=180000;}
+            if((((int)(D_001A7390) * 5 + 2) / 6)-g_progress_statistics.time1A8<60)s->value90=180000;
         }
-        if(func_002ACBC8(D_00189EA0,s->value78) && (!D_0018C750.count1BC || (((int)(timer_sda) * 5 + 2) / 6)-D_0018C750.time1C0>60000) && !D_001395B8.hint && D_0018C958.value2C0>=0)func_PAL_00289730(0x9e3,0x3a);
-        if(func_002ACBC8(D_00189EA0,s->value38))D_001395B8.hint=1;
-        if(D_001A7AF8[0x2E])func_PAL_L01_002EBFB8(0x9f1,0x48,2,s->value7C,-1);
-        if(D_L02_001B30C8<3 && D_001A7AF8[0x26] && !func_002B38B8(objects_sda+(s->value88<<8)) && func_002ACBC8(D_00189EA0,s->value80)) {
+        if(IsPointInCuboid(g_hero_position,s->value78) && (!g_progress_statistics.count1BC || (((int)(timer_sda) * 5 + 2) / 6)-g_progress_statistics.time1C0>60000) && !D_001395B8.hint && g_subtitle_history.value2C0>=0)func_PAL_00289730(0x9e3,0x3a);
+        if(IsPointInCuboid(g_hero_position,s->value38))D_001395B8.hint=1;
+        if(g_item_owned_flags[0x2E])func_PAL_L01_002EBFB8(0x9f1,0x48,2,s->value7C,-1);
+        if(g_frame_l02_counter<3 && g_item_owned_flags[0x26] && !flag_is_third_pending_set(objects_sda+(s->value88<<8)) && IsPointInCuboid(g_hero_position,s->value80)) {
             char *q;
-            func_L00_003672F8();q=D_L02_001B368C+(s->value84<<7);func_PAL_L00_002B9CD8(q+0x30,q+0x70,0,1);
+            state_set_flag_one();q=D_L02_001B368C+(s->value84<<7);func_PAL_L00_002B9CD8(q+0x30,q+0x70,0,1);
         }
-        if(func_002ACBC8(D_00189EA0,s->value28)) {
-            if((((int)(timer_sda) * 5 + 2) / 6)-D_0018C958.time61C>100 || !D_0018C958.time61C)func_PAL_00289730(0xa2b,0x82);
-            else if(D_0018C958.time61C<(((int)(timer_sda) * 5 + 2) / 6))D_0018C958.time61C=(((int)(timer_sda) * 5 + 2) / 6);
+        if(IsPointInCuboid(g_hero_position,s->value28)) {
+            if((((int)(timer_sda) * 5 + 2) / 6)-g_subtitle_history.time61C>100 || !g_subtitle_history.time61C)func_PAL_00289730(0xa2b,0x82);
+            else if(g_subtitle_history.time61C<(((int)(timer_sda) * 5 + 2) / 6))g_subtitle_history.time61C=(((int)(timer_sda) * 5 + 2) / 6);
         }
     }
     }

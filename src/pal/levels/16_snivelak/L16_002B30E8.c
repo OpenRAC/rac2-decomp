@@ -52,19 +52,19 @@ typedef struct {
 extern PlayerView D_00189E20_view __asm__("D_00189E20");
 #define PLAYER (&D_00189E20_view)
 extern int D_L16_001A8FF0 __attribute__((sda));
-extern void func_00282C88(void *);
-extern void func_L00_002D49F0(void);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L00_002D38A0(Quad *, Quad *, float);
-extern void func_L00_002D36E0(float *, int, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(float, void *, int, void *);
+extern void vec_clear_128(void *);
+extern void hero_check_timed_condition(void);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void cam_offset_point_in_view_space(Quad *, Quad *, float);
+extern void hero_build_relative_point(float *, int, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(float, void *, int, void *);
 extern int func_L00_002E0200(float, void *, int, void *, float);
-extern int func_00278870(void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern int coll_process_triangles(void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 int func_PAL_L16_002B5848(int mode)
 {
@@ -75,47 +75,47 @@ int func_PAL_L16_002B5848(int mode)
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
-    func_00282C88(&offset);
+    vec_clear_128(&offset);
     if (PLAYER->path_constrain_pending) {
-        func_L00_002D49F0();
+        hero_check_timed_condition();
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
+    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
     switch (PLAYER->control_mode) {
     case 17:
         break;
     case 15:
-        func_00282C88(&offset);
+        vec_clear_128(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, PLAYER->moby + 0xc0);
+        matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
             if (PLAYER->state == 2) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 5.0f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 0.77f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
             }
         } else {
             offset.z = PLAYER->capsule_bottom;
         }
         break;
     }
-    func_00282CC0(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 15) {
-            if (!func_00277258(0.54f, &PLAYER->position, 0x324, PLAYER->moby)) break;
+            if (!coll_test_point(0.54f, &PLAYER->position, 0x324, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
             if (player->gravity_mode || facingUp) {
-                hit = func_00277258(player->capsule_radius, &player->position, 0x324, player->moby);
+                hit = coll_test_point(player->capsule_radius, &player->position, 0x324, player->moby);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -123,7 +123,7 @@ int func_PAL_L16_002B5848(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x324,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }
@@ -133,9 +133,9 @@ int func_PAL_L16_002B5848(int mode)
         PLAYER->wall_hit = 1;
         PLAYER->coll_hit_moby = HIT->moby;
     }
-    func_00282CF0(&PLAYER->position, &PLAYER->position, &offset);
-    func_00282CF0(&displacement, &PLAYER->position, &previous);
-    if (func_00282DF0(&displacement) > PLAYER->capsule_radius * 1.5f) {
+    FastVecSub(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecSub(&displacement, &PLAYER->position, &previous);
+    if (FastVecLength(&displacement) > PLAYER->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -143,8 +143,8 @@ int func_PAL_L16_002B5848(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, PLAYER->capsule_radius);
-            func_00282CC0(&PLAYER->position, &previous, &displacement);
+            vec_scale_to_length(&displacement, &displacement, PLAYER->capsule_radius);
+            FastVecAdd(&PLAYER->position, &previous, &displacement);
         }
         return -1;
     }

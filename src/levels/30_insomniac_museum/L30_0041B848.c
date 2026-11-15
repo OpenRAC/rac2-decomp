@@ -16,27 +16,27 @@ typedef struct {
 
 extern Vector D_0018A0E0;
 extern Vector ref_L30_0041B848_01[4];
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C768(int, float *, float *);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_world_to_screen_unit(int, float *, float *);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 
 extern Vector ref_L30_0041B848_02;
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282DD8(char *, char *, char *);
-extern void func_00280B90(char *, float *, int);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecCross(char *, char *, char *);
+extern void draw_world_quad(char *, float *, int);
 /* Draws a camera-facing textured quad of the given size at a position, optionally rolled and
    moved along the camera direction, then redraws it with texture -1 and UVs projected to the
    screen (from points pulled 20% towards the quad's centre when mode is set), jittered and
    clamped to [0, 1]. */
-void func_L30_0041B848(Vector *position, float size, float offset, float roll,
+void gfx_draw_screen_quad(Vector *position, float size, float offset, float roll,
                        float unused, float jitter, int texture, int mode)
 {
     RenderPacket packet;
@@ -52,7 +52,7 @@ void func_L30_0041B848(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    InitQuadPacketState(&packet, texture, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -117,10 +117,10 @@ void func_L30_0041B848(Vector *position, float size, float offset, float roll,
             FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
             FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -131,10 +131,10 @@ void func_L30_0041B848(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -142,7 +142,7 @@ void func_L30_0041B848(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    InitQuadPacketState(&packet, -1, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x33001ULL);
     draw_world_quad((char *)&packet, 0, 0);

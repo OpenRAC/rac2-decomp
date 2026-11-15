@@ -4,14 +4,14 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
 extern float D_L14_001AFF0C __attribute__((sda));
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Applies the swing angle to the object: turns its rotation, moves it around its pivot point and carries along anything riding on it. */
-void func_L14_003CB4D8(char *object) {
+void swing_apply_to_object(char *object) {
     Vector rotation, delta, world, initial;
     char *matrix;
     char *vars = *(char **)(object + 0x68);
@@ -28,5 +28,5 @@ void func_L14_003CB4D8(char *object) {
     FastVecAdd(&world, &world, object);
     FastVecSub(&delta, vars + 0x70, &world);
     FastVecAdd(object, object, &delta);
-    CombineTransformsAndStore(vars + 0x20, &delta, &rotation, angles);
+    mat_combine_and_store(vars + 0x20, &delta, &rotation, angles);
 }

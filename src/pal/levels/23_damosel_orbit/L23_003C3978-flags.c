@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 extern int D_L23_001B36F0 __attribute__((sda));
-extern void func_L23_003BFFC0(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
+extern void moby_play_anim_and_link(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
 extern void func_367150(int);
 
 void func_PAL_L23_003C3978(char *arg0) {
@@ -17,7 +18,7 @@ void func_PAL_L23_003C3978(char *arg0) {
     *(int *)(state + 0x25C) = 0;
     *(short *)(state + 0x26) = 2;
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
-    func_L23_003BFFC0(arg0, 1, 0, 0, 3, 1.0f);
+    moby_play_anim_and_link(arg0, 1, 0, 0, 3, 1.0f);
     {
         unsigned short d = D_L23_001B36F0;
         float f = (float)D_L23_001B36F0;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s32 *ref_L12_0041A578_00[];
 
 /* Finds the next point on the route, after the given one, that is marked as a stopping point. Returns the last point if none is marked. */
-s32 func_L12_0041A578(s8 *moby, s32 startIndex) {
+s32 path_find_next_stop_point(s8 *moby, s32 startIndex) {
     s32 i  = startIndex + 1;
     f32 zero  = 0.0f;
     s32 **tables  = (s32 **)ref_L12_0041A578_00;

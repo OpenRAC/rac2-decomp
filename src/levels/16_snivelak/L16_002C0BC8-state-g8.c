@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L16_002C0BC8 (16_snivelak): the hero's state entry, family F3. It changes the action at 0x2294, initialises the
  * movement parameters of the new state and picks its animation: a jump table on the new state id.
  * Ported from func_L19_002C44F8 (src/levels/19_grelbin/L19_002C44F8.c, whose header explains how the parameter
@@ -47,78 +48,78 @@ typedef struct {
     Src_F66766f2b *src;             /* 324 */
     int count;            /* 328 */
 } List_F66766f2b;
-extern f32 func_00282C48(f32);
-extern void func_L00_00341820(s32, f32 *, s32 *, f32 *, s32, f32);
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_00282DF0(void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282A60(unsigned int *, unsigned int, int);
-extern void func_00282C88(TI128 *);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_002A78D8(f32, f32);
-extern void *func_002A9640(void *, u32, s32);
-extern void func_002AC9F8(float *, float);
-extern s32 func_L00_002A4EF0(s32);
-extern void func_L00_002AB3E0(void);
-extern u32 func_L00_002ADE68(s32);
-extern s32 func_L00_002ADF80(void);
-extern f32 func_L00_002AE070(int);
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002B2BD0(void);
-extern s32 func_L00_002B3248(u8 *);
-extern void func_L00_002B6118(f32);
-extern f32 func_L00_002B9B38(void *, int);
-extern int func_L00_002B9B88(int, int);
-extern int func_L00_002C3A78(void);
-extern void func_L00_002D2470(s32, s32);
-extern f32 func_L00_002D3A58(char *);
-extern void func_L00_002D3B58(V4_F6a70b950 *, V4_F6a70b950 *, float);
-extern int func_L00_002D6900(unsigned int);
-extern void func_L00_002D6940(void);
-extern void func_L00_00322A98(void *, char *);
-extern void func_L00_00322AC0(List_F66766f2b *, int, int, float);
-extern void func_L00_00322EC8(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *);
-extern int func_L00_0035F5A0(int, int, int);
-extern void func_L01_002C1988(int);
-extern s32 func_L18_004283F0(u8 *);
-extern void func_L18_004286D0(u8 *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, f32);
-extern f32 func_00282E20(void *);
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283C80(f32, f32);
-extern s32 func_00283CF0(f32);
-extern void func_002A7470(void *, int, int, int);
+extern f32 math_fabs(f32);
+extern void Spline_AdvanceByDistance(s32, f32 *, s32 *, f32 *, s32, f32);
+extern f32 FastVecDot(void *, void *);
+extern f32 FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void mem_clear(unsigned int *, unsigned int, int);
+extern void vec_clear_128(TI128 *);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_random_signed_float_range(f32, f32);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern void vec_clamp_length(float *, float);
+extern s32 math_l00_return_argument(s32);
+extern void hero_clear_slot_records(void);
+extern u32 hero_get_slot_object(s32);
+extern s32 hero_is_in_special_kind_or_mode(void);
+extern f32 hero_get_recent_float(int);
+extern void cancel_hero_item_animation(void);
+extern void hero_reset_speeds_and_vectors(void);
+extern s32 moby_is_class_71(u8 *);
+extern void hero_scale_saved_vectors(f32);
+extern f32 hero_get_direction_angle_delta(void *, int);
+extern int hero_play_sound(int, int);
+extern int hero_classify_input_direction(void);
+extern void hero_select_anim_frame(s32, s32);
+extern f32 cam_get_view_space_vector_length(char *);
+extern void cam_set_view_space_height(V4_F6a70b950 *, V4_F6a70b950 *, float);
+extern int queue_copy_record_by_index(unsigned int);
+extern void slot_clear_active_bytes(void);
+extern void level_init_pending_slot(void *, char *);
+extern void level_append_record_to_table(List_F66766f2b *, int, int, float);
+extern void level_release_slot_list(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *);
+extern int snd_start_in_slot(int, int, int);
+extern void hero_start_move_state_walk_or_run(int);
+extern s32 enemy_get_kind_index(u8 *);
+extern void enemy_reset_timer_by_kind(u8 *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, f32);
+extern f32 vec_length_xy(void *);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern s32 FloatToInt(f32);
+extern void anim_start_blended(void *, int, int, int);
 /* These calls use side effects only; their original scalar return contracts remain unqualified. */
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void func_002FD1B8(void *, s32, u32, f32, f32, f32, f32);
-extern void func_L00_002A4EF8(int);
-extern void func_L00_002A61C8(int, int, int, int);
-extern void func_L00_002A6708(void);
-extern void func_L00_002AABE0(int, int, int);
-extern void func_L00_002AF3D8(int, int);
-extern void func_L00_002B39F0(int, f32);
-extern void func_L00_002B75A0(f32, f32, f32);
-extern void func_L00_002BA508(void);
-extern int func_L00_002CAF20(void);
-extern void func_L00_002D2168(int, int, f32);
-extern void func_L00_0041E958(f32, f32, f32);
-extern s32 func_L01_002A7248(int);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void RippleDisturb(void *, s32, u32, f32, f32, f32, f32);
+extern void AdjustPlayerHealth(int);
+extern void hero_play_footstep_sound_dust(int, int, int, int);
+extern void hero_clear_tracked_slots(void);
+extern void part_emit_hero_dust_and_debris(int, int, int);
+extern void hero_create_item_slot_objects(int, int);
+extern void hero_resolve_stick_direction(int, f32);
+extern void hero_l00_select_aim_target(f32, f32, f32);
+extern void hero_setup_attached_object_transform(void);
+extern int hero_try_start_grab(void);
+extern void set_hero_animation(int, int, f32);
+extern void UpdateHeroAimTarget(f32, f32, f32);
+extern s32 hero_get_weapon_anim_id(int);
 extern u32 D_001A7390;
-extern s32 D_001A7B90;
+extern s32 g_is_pal_video;
 extern u8 D_001A7A40[8];
 extern u8 D_L16_001A7DE0[8] __attribute__((sda));
 extern u8 D_L16_001A7E00[8] __attribute__((sda));
 extern s32 D_L16_0025F290[][11];
-extern u8 D_00189E20[];
-extern u32 D_001A79F0;
+extern u8 g_hero_state[];
+extern u32 g_current_map_index;
 typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
 extern Statistics D_0018C360[];
-extern Statistics D_0018C750[];
+extern Statistics g_progress_statistics[];
 extern s32 D_L16_001A8F00;
 extern s32 D_L16_001A9010;
 extern s32 D_L16_001A8FF4 __attribute__((sda));
@@ -143,7 +144,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u
 #define COPY_VECTOR(dst,src) (*(TI128 *)VEC(dst) = *(TI128 *)VEC(src))
 
 /* Changes the player's action, initializes its movement parameters and selects animation. */
-s32 func_L16_002C0BC8(s32 action, s32 animate) {
+s32 hero_l16_enter_state(s32 action, s32 animate) {
     f32 dir[4];
     u8 *objectSnapshot;
     u8 *hit_10, *hit_29, *hit_44, *hit_45, *hit_52;
@@ -189,10 +190,10 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         BYTE(0x22C2) = 0;
         BYTE(0x22BF) = 0;
         HALF(0x2504) = 0;
-        ReleaseSlotList((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x18E0));
+        level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x18E0));
     }
-    if (SHORT(0x1FA) == 0) ClearSlotActiveBytes();
-    CreateHeldItemSlotObjects(WORD(0x22A0), WORD(0x2294));
+    if (SHORT(0x1FA) == 0) slot_clear_active_bytes();
+    hero_create_item_slot_objects(WORD(0x22A0), WORD(0x2294));
     WORD(0x1188) = 0;
     switch (action) {
     case 0:
@@ -200,24 +201,24 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         BITS(0x24A0) = 0;
         if (WORD(0x1248) == 0x1A) cancel_hero_item_animation();
         BYTE(0x24EF) = 0;
-        WORD(0x11A0) = RandomIntRange(50, 100);
-        ClearHeroSlotRecords();
-        if (BYTE(0x22B4)) { StartHeroMoveStateOneOrTwo(0); return 1; }
+        WORD(0x11A0) = math_random_int_range(50, 100);
+        hero_clear_slot_records();
+        if (BYTE(0x22B4)) { hero_start_move_state_walk_or_run(0); return 1; }
         COPY_VECTOR(0x160, 0x120);
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { EnterPlayerState(0x76, 1); return 0; }
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l16_enter_state(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        if (GetHeroWeaponAnimationId_L01(0) == 0x51) set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 18.0f); else set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, -1.0f);
+        if (hero_get_weapon_anim_id(0) == 0x51) set_hero_animation(hero_get_weapon_anim_id(0), 0, 18.0f); else set_hero_animation(hero_get_weapon_anim_id(0), 0, -1.0f);
         goto finish;
     case 0x64:
         WORD(0x229C) = 0; BITS(0x24A0) = 0;
-        ClearVector128((TI128 *)VEC(0x160)); WORD(0x1188) = 0x68;
+        vec_clear_128((TI128 *)VEC(0x160)); WORD(0x1188) = 0x68;
         if (!animate) goto finish;
-        if (GetHeroWeaponAnimationId_L01(0) == 0x51) set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 18.0f); else set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, -1.0f);
+        if (hero_get_weapon_anim_id(0) == 0x51) set_hero_animation(hero_get_weapon_anim_id(0), 0, 18.0f); else set_hero_animation(hero_get_weapon_anim_id(0), 0, -1.0f);
         goto finish;
     case 0x3D:
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 9.0f);
-        if (PTR(0x1854)) StartAnimationBlended(PTR(0x1854), 0, 0, 9);
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 9.0f);
+        if (PTR(0x1854)) anim_start_blended(PTR(0x1854), 0, 0, 9);
         goto finish;
     case 0x39:
         WORD(0x229C) = 20; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x120);
@@ -228,34 +229,34 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         if (animate) set_hero_animation(0x4F, 0, 5.0f);
         REAL(0x98) = *(f32 *)(PTR(0x1830) + 0xF8);
         *(TI128 *)VEC(0x80) = *(TI128 *)(PTR(0x1830) + 0x10);
-        ClearVector128((TI128 *)VEC(0xF0)); goto finish;
+        vec_clear_128((TI128 *)VEC(0xF0)); goto finish;
     case 1:
         BITS(0x24A0) = 4;
         WORD(0x229C) = 0;
         if (BYTE(0x22BA)) goto finish;
-        animation_16 = GetHeroWeaponAnimationId_L01(1);
+        animation_16 = hero_get_weapon_anim_id(1);
         if (PTR(0x2290)[0x43] == animation_16 || !animate) goto finish;
         set_hero_animation(animation_16, 0, 18.0f); goto finish;
     case 0x2F:
         WORD(0x229C) = 8; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x110);
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 5.0f); HALF(0x1EC) = 7;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 5.0f); HALF(0x1EC) = 7;
         goto finish;
     case 2: case 0x70:
         WORD(0x229C) = 1;
         BITS(0x24A0) = 0;
-        if (WORD(0x22A4) != 4 && WORD(0x22B0) != 4) REAL(0x1B4) = GetViewSpaceVectorLength((char *)VEC(0x120));
+        if (WORD(0x22A4) != 4 && WORD(0x22B0) != 4) REAL(0x1B4) = cam_get_view_space_vector_length((char *)VEC(0x120));
         COPY_VECTOR(0x3F0, 0);
         BITS(0x410) = 0;
         REAL(0x408) = REAL(0x98);
         if (REAL(0x1B4) > 0.11666667461395264f) REAL(0x1B4) = 0.11666667461395264f;
         BYTE(0x40F) = 0;
-        ResolveStickInputToDirection(0, 1.0f);
+        hero_resolve_stick_direction(0, 1.0f);
         value_18 = FastDiffRots(REAL(0x98), REAL(0x1A0));
         if (value_18 > 1.5707964897155762f &&
             (WORD(0x22A4) == 4 || WORD(0x22A0) == 3 || WORD(0x22AC) == 3)) REAL(0x1B4) = 0;
         WORD(0x1188) = 0x68;
         if (BYTE(0x149A)) {
-            if (SHORT(0x34C) == 0 || REAL(0x31C) < 0.3f) { EnterPlayerState(0x76, 1); return 0; }
+            if (SHORT(0x34C) == 0 || REAL(0x31C) < 0.3f) { hero_l16_enter_state(0x76, 1); return 0; }
         }
         WORD(0x2298) = 0;
         BYTE(0x40C) = 0; BYTE(0x40E) = 0;
@@ -285,28 +286,28 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
     case 3:
         WORD(0x229C) = 1; BITS(0x24A0) = 0;
         COPY_VECTOR(0x160, 0x120);
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { EnterPlayerState(0x76, 1); return 0; }
-        if (TryStartHeroGrab()) return 0;
-        if (GetHeroWeaponAnimationId_L01(0) == 0x51) {
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l16_enter_state(0x76, 1); return 0; }
+        if (hero_try_start_grab()) return 0;
+        if (hero_get_weapon_anim_id(0) == 0x51) {
             if (!animate) goto finish;
-            if (EnterPlayerState(0, 0)) set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 18.0f);
+            if (hero_l16_enter_state(0, 0)) set_hero_animation(hero_get_weapon_anim_id(0), 0, 18.0f);
             return 0;
         }
         if (!animate) goto finish;
         animation_21 = objectSnapshot[0x42];
         {
             value_21 = REAL(0xC38); selected_21 = 6;
-            if (ReturnArgument_L00(animation_21) == 4 && value_21 > 3.0f && value_21 < 16.0f) selected_21 = 5;
+            if (math_l00_return_argument(animation_21) == 4 && value_21 > 3.0f && value_21 < 16.0f) selected_21 = 5;
             set_hero_animation(selected_21, 4, 9.0f);
             goto finish;
         }
     case 0x63:
         WORD(0x229C) = 1; BITS(0x24A0) = 0;
-        REAL(0x1B4) = GetViewSpaceVectorLength((char *)VEC(0x120)); COPY_VECTOR(0x160, 0x120);
+        REAL(0x1B4) = cam_get_view_space_vector_length((char *)VEC(0x120)); COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
         animation_22 = objectSnapshot[0x42]; {
             value_22 = REAL(0xC38); selected_22 = 6;
-            if (ReturnArgument_L00(animation_22) == 4 && value_22 > 3.0f && value_22 < 16.0f) selected_22 = 5;
+            if (math_l00_return_argument(animation_22) == 4 && value_22 > 3.0f && value_22 < 16.0f) selected_22 = 5;
             set_hero_animation(selected_22, 4, 9.0f);
             goto finish;
         }
@@ -314,25 +315,25 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         WORD(0x229C) = 12; BITS(0x24A0) = 0;
         REAL(0x1B4) = vec_length_xy(VEC(0x120));
         if (REAL(0x1B4) > 0.11666667461395264f) REAL(0x1B4) = 0.11666667461395264f;
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { EnterPlayerState(0x76, 1); return 0; }
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l16_enter_state(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
         COPY_VECTOR(0x160, 0x120);
-        ClampVectorLength((float *)VEC(0x160), 0.11666667461395264f);
-        if (REAL(0x178) > 0.05833333730697632f) PlayHeroSound(9, 0);
+        vec_clamp_length((float *)VEC(0x160), 0.11666667461395264f);
+        if (REAL(0x178) > 0.05833333730697632f) hero_play_sound(9, 0);
         if (animate) {
-            if (PTR(0x2290)[0x42] == GetHeroWeaponAnimationId_L01(0)) set_hero_animation(13, 2, 9.0f);
+            if (PTR(0x2290)[0x42] == hero_get_weapon_anim_id(0)) set_hero_animation(13, 2, 9.0f);
             else set_hero_animation(13, 2, 14.0f);
-            SelectHeroAnimationFrame(3, 18);
+            hero_select_anim_frame(3, 18);
         }
         goto finish;
     case 0x8A:
         WORD(0x229C) = 33; BITS(0x24A0) = 0;
         if (D_0018C360[13].count < 0xFFFF) D_0018C360[13].count++;
         if (D_001A7390 > D_0018C360[13].maximum) D_0018C360[13].maximum = D_001A7390;
-        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
-        REAL(0x1A0) = FastMatrixHelperA(*(f32 *)(PTR(0xB10) + 0x10) - REAL(0x80),
+        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << g_current_map_index)) | 0x80000000u;
+        REAL(0x1A0) = mat_fast_helper_a(*(f32 *)(PTR(0xB10) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xB10) + 0x14) - REAL(0x84));
-        BITS(0xB1C) = 0; { if (animate) { set_hero_animation(0x2F, 2, 5.0f); SelectHeroAnimationFrame(10, 14); } goto finish; }
+        BITS(0xB1C) = 0; { if (animate) { set_hero_animation(0x2F, 2, 5.0f); hero_select_anim_frame(10, 14); } goto finish; }
     case 0x8B:
         WORD(0x229C) = 33; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
         goto finish;
@@ -340,11 +341,11 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         WORD(0x229C) = 13; BITS(0x24A0) = 7;
         if (D_0018C360[13].count < 0xFFFF) D_0018C360[13].count++;
         if (D_001A7390 > D_0018C360[13].maximum) D_0018C360[13].maximum = D_001A7390;
-        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
-        REAL(0x1A0) = FastMatrixHelperA(*(f32 *)(PTR(0xAA4) + 0x10) - REAL(0x80),
+        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << g_current_map_index)) | 0x80000000u;
+        REAL(0x1A0) = mat_fast_helper_a(*(f32 *)(PTR(0xAA4) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xAA4) + 0x14) - REAL(0x84));
         if (WORD(0x22A0) == 0x28) COPY_VECTOR(0x160, 0xF0);
-        { if (animate) { set_hero_animation(0x2F, 2, 5.0f); SelectHeroAnimationFrame(10, 14); } goto finish; }
+        { if (animate) { set_hero_animation(0x2F, 2, 5.0f); hero_select_anim_frame(10, 14); } goto finish; }
     case 0x24:
         WORD(0x229C) = 13; BITS(0x24A0) = 7; BITS(0xAA0) = 0;
         BITS(0xAB4) = 0; BYTE(0x22BC) = 1;
@@ -360,7 +361,7 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         WORD(0x229C) = 14; BITS(0x24A0) = 7;
         if (D_0018C360[13].count < 0xFFFF) D_0018C360[13].count++;
         if (D_001A7390 > D_0018C360[13].maximum) D_0018C360[13].maximum = D_001A7390;
-        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << gCurrentMapIndex)) | 0x80000000u; HALF(0xAFE) = 1;
+        D_0018C360[13].levels = (D_0018C360[13].levels | (1u << g_current_map_index)) | 0x80000000u; HALF(0xAFE) = 1;
         BITS(0xAE8) = 0; BYTE(0x22BC) = 1; PTR(0xAD4) = PTR(0xAD0);
         HALF(0xADC) = 0; HALF(0xAFC) = 0; BITS(0xAF4) = 0; BITS(0xAF8) = 0;
         hit_29 = *(u8 **)(PTR(0xAD0) + 0x68);
@@ -368,11 +369,11 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         if (*(f32 *)(hit_29 + 0x10) == REAL(0xAE8)) *(f32 *)(hit_29 + 0x14) = *(f32 *)(hit_29 + 0xC);
         else *(f32 *)(hit_29 + 0x14) = *(f32 *)(hit_29 + 0x10);
         REAL(0xB04) = 0.025f; REAL(0xB08) = 0.33f; REAL(0xB0C) = 0.1833333373f;
-        ClearVector128((TI128 *)VEC(0xA0)); HALF(0x206) = 40;
+        vec_clear_128((TI128 *)VEC(0xA0)); HALF(0x206) = 40;
         if (*(f32 *)(hit_29 + 0x24) != 0.0f) REAL(0xB04) = *(f32 *)(hit_29 + 0x24);
         if (*(f32 *)(hit_29 + 0x28) != 0.0f) REAL(0xB08) = *(f32 *)(hit_29 + 0x28);
         if (*(f32 *)(hit_29 + 0x2C) != 0.0f) REAL(0xB0C) = *(f32 *)(hit_29 + 0x2C);
-        REAL(0xAEC) = FastMatrixHelperA(*(f32 *)(PTR(0xAD4) + 0x10) - REAL(0x80),
+        REAL(0xAEC) = mat_fast_helper_a(*(f32 *)(PTR(0xAD4) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xAD4) + 0x14) - REAL(0x84));
         REAL(0xAE4) = fast_vec_dist(VEC(0x80), PTR(0xAD4) + 0x10);
         REAL(0xAF0) = 0.007500000298f;
@@ -382,7 +383,7 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         goto finish;
     case 0x2C:
         WORD(0x229C) = 2; BITS(0x24A0) = 7;
-        ClearVector128((TI128 *)VEC(0xA0)); COPY_VECTOR(0xF0, 0x120);
+        vec_clear_128((TI128 *)VEC(0xA0)); COPY_VECTOR(0xF0, 0x120);
         if (!animate) goto finish;
         set_hero_animation(11, 0, 15.0f); goto finish;
     case 0x27: {
@@ -400,8 +401,8 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             if (WORD(0x22A4) != 15) REAL(0x680) = FastVecDot(VEC(0x110), dir);
         }
         if (PTR(0x6A8)) {
-            f32 toward = FastMatrixHelperA(*(f32 *)(PTR(0x6A8) + 0x10) - REAL(0x80), *(f32 *)(PTR(0x6A8) + 0x14) - REAL(0x84));
-            if (FastDiffRots(toward, FastAddRotations(REAL(0x658), FastMatrixHelperA(dir[0], dir[1]))) > 1.57079649f) {
+            f32 toward = mat_fast_helper_a(*(f32 *)(PTR(0x6A8) + 0x10) - REAL(0x80), *(f32 *)(PTR(0x6A8) + 0x14) - REAL(0x84));
+            if (FastDiffRots(toward, FastAddRotations(REAL(0x658), mat_fast_helper_a(dir[0], dir[1]))) > 1.57079649f) {
                 REAL(0x658) = 1.57079649f; WORD(0x65C) = 1;
             }
         }
@@ -438,16 +439,16 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         if (WORD(0x2294) == 0x74) {
             WORD(0x229C) = 0x14;
             if (BYTE(0x22B4) == 1) {
-                if (gCurrentMapIndex == 3) StartEffectInSlot(17, 0, (s32)PTR(0x2290));
-                else if (gCurrentMapIndex == 14) StartEffectInSlot(21, 0, (s32)PTR(0x2290));
+                if (g_current_map_index == 3) snd_start_in_slot(17, 0, (s32)PTR(0x2290));
+                else if (g_current_map_index == 14) snd_start_in_slot(21, 0, (s32)PTR(0x2290));
             }
         }
         REAL(0xA80) = 0.006111111491918564f;
         REAL(0xA84) = 0.0019444444915279746f;
         if (WORD(0x2294) == 0x74) {
-            if (!BYTE(0x22B4)) HALF(0x24D6) = PlayHeroSound(14, 0x20);
-            REAL(0xA90) = RandomSignedFloatRange(0.05235988646745682f, 0.07272206246852875f);
-            REAL(0xA94) = RandomSignedFloatRange(0.05235988646745682f, 0.07272206246852875f);
+            if (!BYTE(0x22B4)) HALF(0x24D6) = hero_play_sound(14, 0x20);
+            REAL(0xA90) = math_random_signed_float_range(0.05235988646745682f, 0.07272206246852875f);
+            REAL(0xA94) = math_random_signed_float_range(0.05235988646745682f, 0.07272206246852875f);
         }
         WORD(0x1188) = 0x68; WORD(0x2298) = 0;
         COPY_VECTOR(0xF0, 0x120);
@@ -469,7 +470,7 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
     case 8: {
         s32 n = -2;
         WORD(0x229C) = 5; WORD(0x1188) = 0x68; BITS(0x24A0) = 0;
-        if (REAL(0x170) > 0.075f) ScaleHeroSavedVectors(0.075f / REAL(0x170));
+        if (REAL(0x170) > 0.075f) hero_scale_saved_vectors(0.075f / REAL(0x170));
         WORD(0x24C8) = 0; COPY_VECTOR(0xF0, 0x110);
         if (!animate) goto finish;
         set_hero_animation(0x13, 0, n); goto finish; }
@@ -478,13 +479,13 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
     case 0x6E: case 0x81: case 0x89: case 0x92:
         if (WORD(0x2294) != 0x81 && PTR(0x33C) &&
             (*(s16 *)(PTR(0x33C) + 0xAA) == 0x9B9 /* moby class 2489 */ || *(s16 *)(PTR(0x33C) + 0xAA) == 0xF05 /* moby class 3845 */)) {
-            EnterPlayerState(0x81, 1); return 0;
+            hero_l16_enter_state(0x81, 1); return 0;
         }
         if (WORD(0x2294) != 0x6E && SHORT(0x348) == 1 && action != 0xE &&
-            action != 0x38 && !D_L16_001A8FF4) { EnterPlayerState(0x6E, 1); return 0; }
+            action != 0x38 && !D_L16_001A8FF4) { hero_l16_enter_state(0x6E, 1); return 0; }
         if (WORD(0x22A0) == 0x11 && !BYTE(0x24DA)) BYTE(0x24DB)++;
         else BYTE(0x24DB) = 0;
-        if (SHORT(0x1F2)) { EnterPlayerState(0x82, 1); return 0; }
+        if (SHORT(0x1F2)) { hero_l16_enter_state(0x82, 1); return 0; }
         if (SHORT(0x212)) {
             WORD(0x2294) = WORD(0x22A0); WORD(0x2298) = oldStep; WORD(0x1B8) = WORD(0x22A8);
             return 0;
@@ -494,13 +495,13 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         if (WORD(0x2294) == 7 || WORD(0x2294) == 0xF || WORD(0x2294) == 0xD ||
             (WORD(0x2294) == 0xB && WORD(0x22A4) != 4)) {
             oldWeapon = BYTE(0x149D);
-            PlayFootstepSoundAndDust(oldWeapon, 0, 0, 30);
-            PlayFootstepSoundAndDust(oldWeapon, 1, 0, 30);
+            hero_play_footstep_sound_dust(oldWeapon, 0, 0, 30);
+            hero_play_footstep_sound_dust(oldWeapon, 1, 0, 30);
         }
         COPY_VECTOR(0xF0, 0x120);
         if (WORD(0x2294) != 0x12 && BYTE(0x1494) && REAL(0x88) < REAL(0x330) + 0.5f)
-            EmitHeroDustAndDebris(3, 0x10, 0);
-        if (WORD(0x2294) == 0x66) PlayHeroSound(8, 0);
+            part_emit_hero_dust_and_debris(3, 0x10, 0);
+        if (WORD(0x2294) == 0x66) hero_play_sound(8, 0);
         {
         f32 c504, c510, c514, c4A4;
         REAL(0x490) = REAL(0x88);
@@ -528,11 +529,11 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         }
         else if (WORD(0x2294) == 0x81) {
             SHORT(0x4AC) = 5; REAL(0x4B8) = 0.6f; REAL(0x4C8) = 18.0f; REAL(0x4CC) = 30.0f; REAL(0x4D0) = 12.0f; REAL(0x4A8) = D_L16_001A7CD8; REAL(0x50C) = D_L16_001A7CD8 + 0.5f; REAL(0x508) = D_L16_001A7CD8; HALF(0x518) = 15; HALF(0x51A) = 400; REAL(0x510) = 300.0f; REAL(0x520) = D_L16_001A7CDC * 0.0002777777845f; HALF(0x526) = 1200; HALF(0x52A) = 1200; REAL(0x4A4) = 0.11666667461395264f;
-            if (gCurrentMapIndex == 16) REAL(0x4A4) = 0.0f;
-            InitPendingSlot(PTR(0x2290), (char *)VEC(0x18E0));
-            AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 70, 2, 0.0f);
-            AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 35, 4, 0.0f);
-            AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 17, 6, 0.0f);
+            if (g_current_map_index == 16) REAL(0x4A4) = 0.0f;
+            level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
+            level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 70, 2, 0.0f);
+            level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 35, 4, 0.0f);
+            level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 17, 6, 0.0f);
 
         }
         else if (WORD(0x2294) == 0x38) {
@@ -544,9 +545,9 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             if (WORD(0x22A0) == 0x38 || WORD(0x22AC) == 0x38 || WORD(0x24CC) == 0) {
                 WORD(0x18C0)++;
                 if (WORD(0x18C0) > 2 || WORD(0x24CC) == 0) {
-                    if (gCurrentMapIndex == 2 && D_L16_001A9010) EnterPlayerState(0x7D, 1);
-                    else if (*(s32 *)(*(u8 **)(PTR(0x2290) + 0x24) + 0x1F0) != 0) EnterPlayerState(0x79, 1);
-                    else EnterPlayerState(0x39, 1);
+                    if (g_current_map_index == 2 && D_L16_001A9010) hero_l16_enter_state(0x7D, 1);
+                    else if (*(s32 *)(*(u8 **)(PTR(0x2290) + 0x24) + 0x1F0) != 0) hero_l16_enter_state(0x79, 1);
+                    else hero_l16_enter_state(0x39, 1);
                     return 0;
                 }
             } else WORD(0x18C0) = 0;
@@ -594,13 +595,13 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             REAL(0x4C8) = 18.0f; SHORT(0x4AC) = 5; REAL(0x4B8) = 0.8f;
             REAL(0x4CC) = 30.0f; REAL(0x4D0) = 11.0f; REAL(0x4A8) = 1.5f;
             REAL(0x50C) = 1.55f; REAL(0x508) = 1.5f; HALF(0x518) = 1;
-            QueueRecordsByIndex(20);
+            queue_copy_record_by_index(20);
             REAL(0x50C) = 0.9f; REAL(0x4A8) = 0.4f; REAL(0x508) = 0.4f;
             if (REAL(0x184) < 0.3333333433f) {
-                InitPendingSlot(PTR(0x2290), (char *)VEC(0x18E0));
-                AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 40, 2, 0.0f);
-                AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 20, 4, 0.0f);
-                AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 10, 6, 0.0f);
+                level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
+                level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 40, 2, 0.0f);
+                level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 20, 4, 0.0f);
+                level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 10, 6, 0.0f);
             }
             BYTE(0x52E) = 1; REAL(0x454) = 0.19166667759418488f;
             if (REAL(0x31C) > 1.4f) REAL(0x454) = 0.094999998807907104f;
@@ -620,7 +621,7 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             REAL(0x4C8) = 12.0f; REAL(0x4CC) = 20.0f; REAL(0x4D0) = 10.0f; HALF(0x518) = 12;
             if (BYTE(0x24DA)) { REAL(0x498) = 0.081666670739650726f; REAL(0x50C) = 3.35f; REAL(0x508) = 3.3f; }
             else { REAL(0x498) = 0.028333336114883423f; REAL(0x50C) = 1.85f; REAL(0x508) = 1.8f; }
-            BYTE(0x49F) = 1; REAL(0x4A8) = REAL(0x508); QueueRecordsByIndex(27);
+            BYTE(0x49F) = 1; REAL(0x4A8) = REAL(0x508); queue_copy_record_by_index(27);
             HALF(0x52A) = 80; REAL(0x520) = 0.008055555634f;
             COPY_VECTOR(0x4F0, 0x4E0); HALF(0x24D8) = 1; BYTE(0x22B7) = 1; BYTE(0x52C) = 1;
 
@@ -629,12 +630,12 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             REAL(0x4A8) = 4.0f; REAL(0x4C8) = 26.0f; SHORT(0x4AC) = 9;
             REAL(0x4CC) = 38.0f; REAL(0x4D0) = 18.0f; REAL(0x50C) = 4.07f;
             REAL(0x4B8) = 0.6f; REAL(0x508) = 4.0f; HALF(0x518) = 14;
-            QueueRecordsByIndex(20); REAL(0x510) = 4.5f; HALF(0x51A) = 120;
+            queue_copy_record_by_index(20); REAL(0x510) = 4.5f; HALF(0x51A) = 120;
             REAL(0x4A4) = 0.031666666269302368f; HALF(0x526) = 37;
             if (REAL(0x184) < 0.3333333433f) {
-                InitPendingSlot(PTR(0x2290), (char *)VEC(0x18E0));
-                AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 40, 3, 0.0f);
-                AppendRecordToFourEntryTable((List_F66766f2b *)VEC(0x18E0), 20, 5, 0.0f);
+                level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
+                level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 40, 3, 0.0f);
+                level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 20, 5, 0.0f);
             }
             BYTE(0x52E) = 1;
 
@@ -645,7 +646,7 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             REAL(0x4D0) = 28.0f; REAL(0x50C) = 1.7f; REAL(0x508) = 1.65f;
             HALF(0x518) = 5; REAL(0x510) = 4.5f; HALF(0x51A) = 130;
             REAL(0x4A4) = 0.055000003427267075f; HALF(0x526) = 85; HALF(0x1D0) = 70; BYTE(0x49D) = 1;
-            if (gIsPalVideo) WORD(0x430) = 34; else WORD(0x430) = 35;
+            if (g_is_pal_video) WORD(0x430) = 34; else WORD(0x430) = 35;
             WORD(0x434) = WORD(0x430) + 36; REAL(0x438) = 29.0f;
             REAL(0x43C) = 50.0f; BITS(0x440) = 86; PTR(0x444) = (u8 *)D_L16_001A7E00;
             BYTE(0x52E) = 1;
@@ -665,8 +666,8 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             REAL(0x4A8) = 3.2f; REAL(0x4CC) = 31.0f; REAL(0x4D0) = 24.0f;
             REAL(0x50C) = 3.25f; REAL(0x508) = 3.2f; HALF(0x518) = 14;
             REAL(0x510) = 4.5f; HALF(0x52A) = 50; REAL(0x514) = 1.0f; BYTE(0x49F) = 1;
-            REAL(0x4C4) = GetRecentHeroFloat(10); COPY_VECTOR(0x480, 0);
-            WORD(0x4D4) = ClassifyHeroInputDirection(); REAL(0x4C0) = REAL(0x1A0); COPY_VECTOR(0x470, 0x190);
+            REAL(0x4C4) = hero_get_recent_float(10); COPY_VECTOR(0x480, 0);
+            WORD(0x4D4) = hero_classify_input_direction(); REAL(0x4C0) = REAL(0x1A0); COPY_VECTOR(0x470, 0x190);
             if (REAL(0x174) > 0.025000002f) REAL(0x4D8) = REAL(0x174); else REAL(0x4D8) = 0.0f;
             REAL(0x4DC) = 0.0f; BYTE(0x52C) = 1;
             if (SHORT(0x1454) && REAL(0x24B8) > 0.3f) {
@@ -686,12 +687,12 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         else if (WORD(0x2294) == 0x28) { set_hero_animation(0x4D, 4, 5.0f); goto finish; }
         else if (WORD(0x2294) == 0x29) {
             s32 turn = 0x1E;
-            if (FastDiffRots(REAL(0x98), FastMatrixHelperA(REAL(0x5D0) - REAL(0x610), REAL(0x5D4) - REAL(0x614))) > 1.57079649f) turn = 0x1F;
+            if (FastDiffRots(REAL(0x98), mat_fast_helper_a(REAL(0x5D0) - REAL(0x610), REAL(0x5D4) - REAL(0x614))) > 1.57079649f) turn = 0x1F;
             set_hero_animation(turn, 0, 5.0f); goto finish;
         }
         else if (WORD(0x2294) == 9) {
             animation_41 = 8; index = FloatToInt(REAL(0xC38));
-            if (ReturnArgument_L00(objectSnapshot[0x42]) == 4) animation_41 = D_L16_001A7DE0[index];
+            if (math_l00_return_argument(objectSnapshot[0x42]) == 4) animation_41 = D_L16_001A7DE0[index];
             set_hero_animation(animation_41, 0, 5.0f); goto finish;
         }
         else if (WORD(0x2294) == 10) { set_hero_animation(18, 0, 5.0f); goto finish; }
@@ -716,45 +717,45 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
     case 0x13: case 0x14: case 0x15: case 0x1F: case 0x22: case 0x4D: case 0x83: case 0x93:
         WORD(0x229C) = 6;
         if (WORD(0x1500) && (u32)(WORD(0x2294) - 0x13) < 3) {
-            if (gProgressStatistics[1].count < 0xFFFF) gProgressStatistics[1].count++;
-            if (D_001A7390 > gProgressStatistics[1].maximum) gProgressStatistics[1].maximum = D_001A7390;
-            gProgressStatistics[1].levels = (gProgressStatistics[1].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+            if (g_progress_statistics[1].count < 0xFFFF) g_progress_statistics[1].count++;
+            if (D_001A7390 > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = D_001A7390;
+            g_progress_statistics[1].levels = (g_progress_statistics[1].levels | (1u << g_current_map_index)) | 0x80000000u;
             if (D_0018C360[56].count < 0xFFFF) D_0018C360[56].count++;
             if (D_001A7390 > D_0018C360[56].maximum) D_0018C360[56].maximum = D_001A7390;
-            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
-            SetupHeroAttachedObjectTransform(); WORD(0x2294) = WORD(0x22A0); WORD(0x229C) = WORD(0x22A4);
+            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << g_current_map_index)) | 0x80000000u;
+            hero_setup_attached_object_transform(); WORD(0x2294) = WORD(0x22A0); WORD(0x229C) = WORD(0x22A4);
             goto finish;
         }
         if (action != 0x83) BITS(0x24A0) = 0;
         REAL(0xBF4) = 1.0f; WORD(0xBE8) = 0; BITS(0xBE4) = 0; HALF(0xBFE) = 0;
         switch (WORD(0x2294)) {
         case 0x14:
-            if (gProgressStatistics[0].count < 0xFFFF) gProgressStatistics[0].count++;
-            if (D_001A7390 > gProgressStatistics[0].maximum) gProgressStatistics[0].maximum = D_001A7390;
-            gProgressStatistics[0].levels = (gProgressStatistics[0].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+            if (g_progress_statistics[0].count < 0xFFFF) g_progress_statistics[0].count++;
+            if (D_001A7390 > g_progress_statistics[0].maximum) g_progress_statistics[0].maximum = D_001A7390;
+            g_progress_statistics[0].levels = (g_progress_statistics[0].levels | (1u << g_current_map_index)) | 0x80000000u;
             BITS(0x24A0) = 0x50; SHORT(0xBFC) = 4; WORD(0x2300) = 0;
-            SelectHeroAimTarget(8.0f, 1.047197699546814f, -1.0f); BITS(0xC00) = 0;
+            hero_l00_select_aim_target(8.0f, 1.047197699546814f, -1.0f); BITS(0xC00) = 0;
             if (animate) {
                 selected_14 = WORD(0x22A0) == 11 && WORD(0x22A8) < 42 ? 17 : 11;
                 set_hero_animation(0x2B, 4, (f32)selected_14);
-                animation_14 = GetHeroSlotObject(0);
-                if (IsMobyClass71((u8 *)animation_14)) StartAnimationBlended((u8 *)animation_14, 10, 4, selected_14 + 2);
+                animation_14 = hero_get_slot_object(0);
+                if (moby_is_class_71((u8 *)animation_14)) anim_start_blended((u8 *)animation_14, 10, 4, selected_14 + 2);
             }
             goto finish;
         case 0x15:
-            if (gProgressStatistics[1].count < 0xFFFF) gProgressStatistics[1].count++;
-            if (D_001A7390 > gProgressStatistics[1].maximum) gProgressStatistics[1].maximum = D_001A7390;
-            gProgressStatistics[1].levels = (gProgressStatistics[1].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+            if (g_progress_statistics[1].count < 0xFFFF) g_progress_statistics[1].count++;
+            if (D_001A7390 > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = D_001A7390;
+            g_progress_statistics[1].levels = (g_progress_statistics[1].levels | (1u << g_current_map_index)) | 0x80000000u;
             if (D_0018C360[56].count < 0xFFFF) D_0018C360[56].count++;
             if (D_001A7390 > D_0018C360[56].maximum) D_0018C360[56].maximum = D_001A7390;
-            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << g_current_map_index)) | 0x80000000u;
             SHORT(0xBFC) = 3; WORD(0x2300) = 0;
-            SelectHeroAimTarget(14.0f, 0.523598849773407f, -1.0f);
+            hero_l00_select_aim_target(14.0f, 0.523598849773407f, -1.0f);
             BITS(0xC0C) = BITS(0xC0C) == 0;
             if (animate) {
                 selected_15 = PTR(0x2290)[0x43] == 0x1A ? 3 : 10;
                 if (WORD(0x22A0) == 1) selected_15 = 17;
-                set_hero_animation(0x1A, 0, (f32)selected_15); SelectHeroAnimationFrame(6, 21);
+                set_hero_animation(0x1A, 0, (f32)selected_15); hero_select_anim_frame(6, 21);
             }
             goto finish;
         case 0x83:
@@ -768,18 +769,18 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             goto finish;
         case 0x1F:
             if (WORD(0x1220)) {
-                QueueRecordsByIndex(19);
+                queue_copy_record_by_index(19);
                 if (animate) {
                     set_hero_animation(0x60, 4, -1.0f);
-                    StartAnimationBlended(PTR(0x1220), 3, 4, -1);
+                    anim_start_blended(PTR(0x1220), 3, 4, -1);
                 }
-                SelectHeroAimTarget(11.0f, 0.8726646900177002f, -1.0f);
+                hero_l00_select_aim_target(11.0f, 0.8726646900177002f, -1.0f);
             }
             goto finish;
         case 0x13:
         if (D_0018C360[10].count < 0xFFFF) D_0018C360[10].count++;
         if (D_001A7390 > D_0018C360[10].maximum) D_0018C360[10].maximum = D_001A7390;
-        D_0018C360[10].levels = (D_0018C360[10].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+        D_0018C360[10].levels = (D_0018C360[10].levels | (1u << g_current_map_index)) | 0x80000000u;
         {
         s32 *entry = D_L16_0025F290[SHORT(0xBFC)];
         mode = 0; WORD(0x2300) = 0;
@@ -787,28 +788,28 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             (WORD(0x22AC) == 0x13 && WORD(0x1B8) + WORD(0x22A8) < 27)) mode = (entry[1] + 1) % 3;
         }
         SHORT(0xBFC) = mode;
-        SelectHeroAimTarget(5.0f, 0.785398244857788f, 0.785398244857788f);
+        hero_l00_select_aim_target(5.0f, 0.785398244857788f, 0.785398244857788f);
         if (animate) {
             current = 0;
             if (mode == 0) selected_13 = 5;
             else if (mode == 1) { current = 2; selected_13 = 7; }
             else { current = 4; selected_13 = 7; }
             if (WORD(0xBE8) && mode < 2) {
-                if (BYTE(0x22C3)) angle_13 = GetDirectionAngleDelta(VEC(0xBC0), 0);
+                if (BYTE(0x22C3)) angle_13 = hero_get_direction_angle_delta(VEC(0xBC0), 0);
                 else angle_13 = FastDiffRots(REAL(0xBEC), REAL(0x98));
                 selected_13 += FloatToInt(angle_13 * 1.5f);
             }
             current /= 2;
             set_hero_animation(mode + 0x17, current, (f32)selected_13);
-            animation_13 = GetHeroSlotObject(0);
-            if (IsMobyClass71((u8 *)animation_13)) StartAnimationBlended((u8 *)animation_13, mode + 3, current, selected_13);
+            animation_13 = hero_get_slot_object(0);
+            if (moby_is_class_71((u8 *)animation_13)) anim_start_blended((u8 *)animation_13, mode + 3, current, selected_13);
         }
         goto finish;
         case 0x22:
             if (animate) set_hero_animation(0x2C, 7, 9.0f);
             if (WORD(0x1248) == 12 && PTR(0xBE0)) {
                 WORD(0xBE8) = 1;
-                REAL(0xBEC) = FastMatrixHelperA(*(f32 *)(PTR(0xBE0) + 0x10) - REAL(0x80),
+                REAL(0xBEC) = mat_fast_helper_a(*(f32 *)(PTR(0xBE0) + 0x10) - REAL(0x80),
                                             *(f32 *)(PTR(0xBE0) + 0x14) - REAL(0x84));
                 FastVecSub(VEC(0xBC0), PTR(0xBE0) + 0x10, VEC(0x80));
             }
@@ -821,8 +822,8 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         if (!animate) goto finish;
         set_hero_animation(SHORT(0xBFC) + 0x4B, 0, 4.0f);
         {
-            u32 object = GetHeroSlotObject(0);
-            if (IsMobyClass71((u8 *)object)) StartAnimationBlended((u8 *)object, SHORT(0xBFC) + 0xC, 0, 4);
+            u32 object = hero_get_slot_object(0);
+            if (moby_is_class_71((u8 *)object)) anim_start_blended((u8 *)object, SHORT(0xBFC) + 0xC, 0, 4);
         }
         goto finish;
     case 0x77:
@@ -833,9 +834,9 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         frames = 8.0f; animation_43 = 0x29; { set_hero_animation(animation_43, 5, frames); goto finish; }
     case 0x16:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
-        ScaleHeroSavedVectors(0.5f); QueueRecordsByIndex(18); HALF(0x20E) = 45;
-        COPY_VECTOR(0xF0, 0x120); ClampVectorLength((f32 *)VEC(0xF0), 0.1166666746f);
-        hit_44 = FindOwnedEffectSlot(PTR(0x2290), 1, 0);
+        hero_scale_saved_vectors(0.5f); queue_copy_record_by_index(18); HALF(0x20E) = 45;
+        COPY_VECTOR(0xF0, 0x120); vec_clamp_length((f32 *)VEC(0xF0), 0.1166666746f);
+        hit_44 = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
         if (hit_44) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_44 + 0x2C)));
         else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
@@ -844,9 +845,9 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         *(f32 *)(PTR(0x2290) + 0x44) = D_L16_0025F420[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x8C:
-        WORD(0x229C) = 7; BITS(0x24A0) = 0; ScaleHeroSavedVectors(0.5f);
-        BYTE(0x22BC) = 1; QueueRecordsByIndex(18);
-        hit_45 = FindOwnedEffectSlot(PTR(0x2290), 8, 0);
+        WORD(0x229C) = 7; BITS(0x24A0) = 0; hero_scale_saved_vectors(0.5f);
+        BYTE(0x22BC) = 1; queue_copy_record_by_index(18);
+        hit_45 = part_find_owned_effect_slot(PTR(0x2290), 8, 0);
         if (hit_45) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_45 + 0x2C)));
         else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
@@ -856,19 +857,19 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
         goto finish;
     case 0x65:
         WORD(0x229C) = 25; BITS(0x24A0) = 0; WORD(0x18C0)++;
-        PlayHeroSound(7, 0);
+        hero_play_sound(7, 0);
         BITS(0x3A0) = 0; BITS(0x1B0) = 0; BITS(0x1B4) = 0; WORD(0x1188) = 0x68;
         if (!animate) goto finish;
         set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x78:
         WORD(0x229C) = 25; HALF(0x1F0) = 10000; BITS(0x24A0) = 0;
-        PlayHeroSound(7, 0);
+        hero_play_sound(7, 0);
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
         set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x79:
         WORD(0x229C) = 20; REAL(0x334) = REAL(0x318); HALF(0x1F0) = 10000;
-        WORD(0x24CC) = 0; BITS(0x24A0) = 0; PlayHeroSound(7, 0);
+        WORD(0x24CC) = 0; BITS(0x24A0) = 0; hero_play_sound(7, 0);
         if (!animate) goto finish;
         set_hero_animation(0x6A, 0, 8.0f); goto finish;
     case 0x3E:
@@ -877,54 +878,54 @@ s32 func_L16_002C0BC8(s32 action, s32 animate) {
             if (PTR(0x6C4)) { AdjustPlayerHealth(FloatToInt(*(f32 *)(PTR(0x6C4) + 0x2C))); PTR(0x6C4) = 0; }
             else AdjustPlayerHealth(1);
         }
-        PlayHeroSound(20, 0);
+        hero_play_sound(20, 0);
         if (WORD(0x24CC) < 1) {
-            angle_53 = FastAddRotations(FastMatrixHelperA(REAL(0xF0), REAL(0xF4)), 3.14159297943f);
-            angle_53 = FastAddRotations(angle_53, RandomSignedFloatRange(0.523598849774f, 0.610865294933f));
-            REAL(0x120) = FastSinOrCosA(angle_53) * REAL(0x644) * 0.7f;
-            REAL(0x124) = FastSinOrCosB(angle_53) * REAL(0x644) * 0.7f; REAL(0x128) = 0.075f;
+            angle_53 = FastAddRotations(mat_fast_helper_a(REAL(0xF0), REAL(0xF4)), 3.14159297943f);
+            angle_53 = FastAddRotations(angle_53, math_random_signed_float_range(0.523598849774f, 0.610865294933f));
+            REAL(0x120) = math_fast_sin_or_cos_a(angle_53) * REAL(0x644) * 0.7f;
+            REAL(0x124) = math_fast_sin_or_cos_b(angle_53) * REAL(0x644) * 0.7f; REAL(0x128) = 0.075f;
             if (WORD(0x640) > 15 && WORD(0x24CC) < 2) WORD(0x24CC) = 2;
-            PTR(0x2290)[0xA8] = 255; EnterPlayerState(0x16, 1); HALF(0x1F4) = 150; HALF(0x1D0) = 70;
+            PTR(0x2290)[0xA8] = 255; hero_l16_enter_state(0x16, 1); HALF(0x1F4) = 150; HALF(0x1D0) = 70;
             return 0;
         }
         HALF(0x1DC) = 77; REAL(0x69C) = 0.041666667908430099f;
         if (REAL(0x680) > 0.0416666679084f) REAL(0x680) = 0.0416666679084f;
-        BITS(0x674) = 0; ClearVector128((TI128 *)VEC(0xF0)); ClearVector128((TI128 *)VEC(0x110));
+        BITS(0x674) = 0; vec_clear_128((TI128 *)VEC(0xF0)); vec_clear_128((TI128 *)VEC(0x110));
         REAL(0xF8) = 0.1833333373f;
         if (!animate) goto finish;
         frames = -3.0f; animation_53 = 16; { set_hero_animation(animation_53, 2, frames); goto finish; }
     case 0x1C:
         WORD(0x229C) = 9; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 10.0f); goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 10.0f); goto finish;
     case 0x1D:
         BITS(0x24A0) = 0x51; WORD(0x229C) = 0;
-        if (ReturnArgument_L00(PTR(0x2290)[0x42]) == GetHeroWeaponAnimationId_L01(0)) goto finish;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 5.0f); goto finish;
+        if (math_l00_return_argument(PTR(0x2290)[0x42]) == hero_get_weapon_anim_id(0)) goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 5.0f); goto finish;
     case 0x1E:
         WORD(0x229C) = 9; BITS(0x24A0) = 0;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 10.0f); goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 10.0f); goto finish;
     case 0x6F:
         WORD(0x229C) = 9; BYTE(0x22BC) = 1; BITS(0x24A0) = 0;
         cancel_hero_item_animation();
         if (!animate) goto finish;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 10.0f); goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 10.0f); goto finish;
     case 0x26:
         WORD(0x229C) = 8; BITS(0x24A0) = 0;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 10.0f); goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, 10.0f); goto finish;
     case 0x31:
         WORD(0x229C) = 9; BITS(0x24A0) = 0; BYTE(0x22B7) = 1;
-        BYTE(0x22BD) = 1; BYTE(0x22BC) = 1; ReleaseSlotList((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30));
+        BYTE(0x22BD) = 1; BYTE(0x22BC) = 1; level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30));
         if (!animate) goto finish;
-        set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, -1.0f); goto finish;
+        set_hero_animation(hero_get_weapon_anim_id(0), 0, -1.0f); goto finish;
     case 0x75:
         WORD(0x229C) = 9; BITS(0x24A0) = 0; BYTE(0x22B7) = 1; BYTE(0x22BC) = 1;
-        ClearVector128((TI128 *)VEC(0xF0));
+        vec_clear_128((TI128 *)VEC(0xF0));
         if (!animate) goto finish;
         set_hero_animation(11, 0, -1.0f); goto finish;
     case 0x60: case 0x61:
         WORD(0x229C) = 24; BYTE(0x22BC) = 1;
-        ReleaseSlotList((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30)); cancel_hero_item_animation();
-        if (animate) set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, -1.0f);
+        level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x1A30)); cancel_hero_item_animation();
+        if (animate) set_hero_animation(hero_get_weapon_anim_id(0), 0, -1.0f);
         goto finish;
     default:
         goto finish;
@@ -935,9 +936,9 @@ finish:
     if ((u32)(WORD(0x229C) - 13) > 2 && (WORD(0x2294) != 6 || WORD(0x22A0) != 0x24) &&
         WORD(0x1298) == 20 && WORD(0x2304)) BITS(0x2320) = 1;
     if (WORD(0x229C) == 20) { cancel_hero_item_animation(); BYTE(0x22BC) = 1; }
-    if ((!IsHeroInSpecialKindOrMode() || WORD(0x229C) == 18) &&
+    if ((!hero_is_in_special_kind_or_mode() || WORD(0x229C) == 18) &&
         (REAL(0x330) < D_L16_001B99C0.f148 || WORD(0x229C) == 0)) D_L16_001B99C0.i400 = 0;
-    if (WORD(0x229C) != WORD(0x22A4)) ClearTrackedSlots();
+    if (WORD(0x229C) != WORD(0x22A4)) hero_clear_tracked_slots();
     WORD(0x1B8) = 0;
     BITS(0x1C0) = 0;
     if (WORD(0x229C) != WORD(0x22A4)) BITS(0x1BC) = 0;

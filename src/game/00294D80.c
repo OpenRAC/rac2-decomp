@@ -14,7 +14,7 @@ typedef struct {
 extern GsTextureUploadSlot D_001B9340[];
 extern u32 D_001B15FC __attribute__((sda));
 
-u64 func_00294D80(int widthLog2, int heightLog2, u32 pixelData, u32 paletteData, int paletteAddr, int textureAddr)
+u64 register_8bit_texture(int widthLog2, int heightLog2, u32 pixelData, u32 paletteData, int paletteAddr, int textureAddr)
 {
     int shift;
     u64 value;

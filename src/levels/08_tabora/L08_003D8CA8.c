@@ -1,41 +1,41 @@
 #include "common.h"
-extern float func_00282E80(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern char D_00189EA0[];
+extern float vec_distance_xy(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern char g_hero_position[];
 extern char *D_L08_001B29DC[] __attribute__((sda));
-extern int func_002A77E0(int);
-extern int func_002A8600(void *, int, int, int);
-extern int func_002A86E8(void *, void *, int, int);
-extern void func_L08_003D8AB0(char *);
+extern int math_random_int_below(int);
+extern int GetFirstMobyInGroup(void *, int, int, int);
+extern int GetNextMobyInGroup(void *, void *, int, int);
+extern void crawler_pick_walk_target(char *);
 
 /* Picks a new walking goal for the Spitting Dune Crawler, steers it away from nearby creatures and its mount, then refines the goal. */
-void func_L08_003D8CA8(char *object) {
+void crawler_choose_goal(char *object) {
     float delta[4];
     char *other;
     char *state = *(char **)(object + 0x68);
 
-    if (*(int *)(state + 0x44C) && vec_distance_xy(object + 0x10, gHeroPosition) < 8.0f) {
-        FastVecSub(delta, object + 0x10, gHeroPosition);
+    if (*(int *)(state + 0x44C) && vec_distance_xy(object + 0x10, g_hero_position) < 8.0f) {
+        FastVecSub(delta, object + 0x10, g_hero_position);
         delta[2] = 0;
         vec_scale_to_length(delta, delta, 8.0f);
         FastVecAdd(state + 0x3F0, object + 0x10, delta);
-    } else if (*(int *)(state + 0x254) != 2 && !RandomIntBelow(2)) {
-        *(float *)(state + 0x3F0) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * 3.0f;
+    } else if (*(int *)(state + 0x254) != 2 && !math_random_int_below(2)) {
+        *(float *)(state + 0x3F0) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * 3.0f;
         {
-            float y = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * 3.0f;
+            float y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 3.0f;
             *(float *)(state + 0x3F8) = 0;
             *(float *)(state + 0x3F4) = y;
-            FastVecAdd(state + 0x3F0, state + 0x3F0, gHeroPosition);
+            FastVecAdd(state + 0x3F0, state + 0x3F0, g_hero_position);
         }
     } else {
-        *(float *)(state + 0x3F0) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * 8.0f;
+        *(float *)(state + 0x3F0) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * 8.0f;
         {
-            float y = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * 8.0f;
+            float y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 8.0f;
             *(float *)(state + 0x3F8) = 0;
             *(float *)(state + 0x3F4) = y;
             FastVecAdd(state + 0x3F0, state + 0x3F0, object + 0x10);
@@ -64,5 +64,5 @@ void func_L08_003D8CA8(char *object) {
         }
     }
     *(float *)(state + 0x3F8) = *(float *)(object + 0x18);
-    PickCrawlerWalkTarget(object);
+    crawler_pick_walk_target(object);
 }

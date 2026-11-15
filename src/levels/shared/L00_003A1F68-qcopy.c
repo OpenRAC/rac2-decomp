@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 /* Blends between two points by the amount t, giving exactly the first or second point at 0 and 1. */
-void func_L00_003A1F68(TI128 *out, TI128 *first, TI128 *second, float t)
+void vec_lerp_exact(TI128 *out, TI128 *first, TI128 *second, float t)
 {
     TI128 local;
     if (t == 0.0f) {

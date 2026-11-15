@@ -8,13 +8,13 @@ extern int r1_D_0012FCFC;
 
 extern char r1_D_00154E00[];
 
-extern void func_0011BF18();
+extern void tty_putchar_deci2();
 
 extern int r1_func_00119D88();
 
 extern int r1_func_00119D88(int c);
 
-extern void func_0011C7E8(const char *, ...);
+extern void printf_formatted(const char *, ...);
 
 /* The print core: walks fmt with the va_list, writing through the hook
    r1_D_0012FD00, and returns the count. */
@@ -26,7 +26,7 @@ extern int r1_func_0011A0A0(const char *, va_list);
    line buffer) counted by r1_D_0012FCFC, flushing (r1_func_00119840) and
    resetting the count once it reaches 0x7E; on '\n' it also flushes
    immediately (appending the '\n' first) instead of just buffering it. */
-void func_0011BF18(int c) {
+void tty_putchar_deci2(int c) {
     int count = r1_D_0012FCFC;
 
     if (count >= 0x7E) {
@@ -50,7 +50,7 @@ void func_0011BF18(int c) {
 /* serialPutchar (libkernl.a:kprintf.o): the printf hook used when going to
    the serial port. '\n' is expanded to a CR/LF pair (write '\r' then the
    original character); anything else is written as-is via kputchar. */
-void func_0011BFC8(int c) {
+void tty_putchar_serial_crlf(int c) {
     if (c == 0xA) {
         r1_func_00119D88(0xD);
         r1_func_00119D88(0xA);
@@ -61,7 +61,7 @@ void func_0011BFC8(int c) {
 
 /* rac1-decomp src/core/00119D88.c: func_00119EA8 (kprintf float helper). */
 /* Turns the raw bits of a double into a whole number for printing, using only its top digits. */
-int func_0011C000(unsigned long bits) {
+int printf_double_to_digits(unsigned long bits) {
     long exponent = (long)((bits << 1) >> 53);
     exponent -= 1075;
     if (exponent < -53) return 0;
@@ -88,7 +88,7 @@ extern void (*r1_D_0012FD00_A0A0[])(s32) __asm__("r1_D_0012FD00");
 
 /* rac1-decomp src/core/00119D88.c: func_0011C1F8 */
 /* Prints text with %d %u %x %o %c %s %f style codes, one character at a time, through the output hook. */
-int func_0011C1F8(const char *fmt, va_list ap) {
+int printf_format_to_hook(const char *fmt, va_list ap) {
     char buf[32];
     char *padStart;
     char *cursor;
@@ -298,7 +298,7 @@ int func_0011C1F8(const char *fmt, va_list ap) {
  * definition also spills $f12-$f18 (SIZE 72/56), which is why this was
  * once a hand-built `long args[16]` forwarder (13/56).
  */
-void func_0011C7E8(const char *fmt, ...) {
+void printf_formatted(const char *fmt, ...) {
     va_list ap;
 
     va_start(ap, fmt);

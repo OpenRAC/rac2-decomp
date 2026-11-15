@@ -8,7 +8,7 @@ extern float D_L11_001B12C8 __attribute__((sda));
 
 /* Bleeds the ten rotation timers the level keeps beside its state: each armed
    entry loses a sixtieth of the shared rate and clamps at zero, disarming. */
-void func_L11_004395C8(char *obj)
+void rotor_tick_timers(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     int i;
@@ -29,15 +29,15 @@ void func_L11_004395C8(char *obj)
 
 extern float D_L11_001B1338 __attribute__((sda));
 
-extern void func_002A7470(void *, int, int, int);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern void func_00282A60(unsigned int *, unsigned int, int);
-extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
+extern void anim_start_blended(void *, int, int, int);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern void mem_clear(unsigned int *, unsigned int, int);
+extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 
 /* Re-aims the object: resets the measured state, draws a random angle and
    clears the two rotation slots of the state. */
-void func_L11_0043A9D8(char *obj)
+void rotor_reaim_random_spin(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     float spinAngle;
@@ -53,47 +53,47 @@ void func_L11_0043A9D8(char *obj)
     *(unsigned short *)(obj + 0x34) = (*(unsigned short *)(obj + 0x34) | 0x1000) & 0xFFB9;
     *(unsigned char *)(obj + 0x7F) = 0;
     if (*(unsigned char *)(obj + 0x43) != 1)
-        StartAnimationBlended(obj, 1, 0, 0);
-    spinAngle = RandomFloatRange(10.0f, 30.0f) * 0.017453294f;
-    if (RandomIntBelow(2) != 0)
+        anim_start_blended(obj, 1, 0, 0);
+    spinAngle = math_random_float_range(10.0f, 30.0f) * 0.017453294f;
+    if (math_random_int_below(2) != 0)
         spinAngle = -spinAngle;
     *(float *)(state + 0x2D4) = spinAngle;
-    if (RandomIntBelow(2) != 0)
+    if (math_random_int_below(2) != 0)
         spinRate = -D_L11_001B1338;
     else
         spinRate = D_L11_001B1338;
     *(short *)(state + 0x2EE) = 0;
     *(float *)(state + 0x2DC) = spinRate;
-    ClearMemory((unsigned int *)(state + 0x220), 0, 0x40);
+    mem_clear((unsigned int *)(state + 0x220), 0, 0x40);
     AttachManipulator((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
-    ClearMemory((unsigned int *)(state + 0x260), 0, 0x40);
+    mem_clear((unsigned int *)(state + 0x260), 0, 0x40);
     AttachManipulator((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
 }
 
 extern float D_L11_001B12C4 __attribute__((sda));
 
-extern int D_L11_001B359C;
+extern int g_moby_l11_table;
 
-extern void func_00282CF0(void *dst, void *a, void *b);
+extern void FastVecSub(void *dst, void *a, void *b);
 
-extern void func_00282F20(void *dst, void *src, float scale);
+extern void vec_scale_to_length(void *dst, void *src, float scale);
 
-extern void func_002ACB48(float *p, float f);
+extern void vec_add_random_offset(float *p, float f);
 
-extern int func_002A77E0(int n);
+extern int math_random_int_below(int n);
 
-extern char *func_L11_004417E8(char *object);
+extern char *arena_get_center_point(char *object);
 
-extern void func_L11_004417A8(char *object, int value);
+extern void arena_set_boss_owner(char *object, int value);
 
-extern void func_L11_0043A680(void *a0, void *a1, float f0, float f1);
+extern void InitializeRandomizedObjectMotion(void *a0, void *a1, float f0, float f1);
 
 
 /* Aims the object at the entry its state names: crosses the entry with the record,
    jitters the result by a random sixtieth and hands it to the level's own helper.
    The table base is read afresh for each of the three groups, which is how retail
    keeps it in the caller-saved registers. */
-void func_L11_004393D8(char *obj, int index, int flag)
+void rotor_aim_at_entry(char *obj, int index, int flag)
 {
     char *state = *(char **)(obj + 0x68);
     char *base1;
@@ -106,14 +106,14 @@ void func_L11_004393D8(char *obj, int index, int flag)
     int randomValue;
     int record;
 
-    entry = GetArenaCenterPoint(*(char **)(obj + 0xB8));
+    entry = arena_get_center_point(*(char **)(obj + 0xB8));
 
-    base1 = gMobyTable_L11;
+    base1 = g_moby_l11_table;
     FastVecSub(aimVec, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
-    randomValue = RandomIntBelow(10) + 15;
+    randomValue = math_random_int_below(10) + 15;
     vec_scale_to_length(aimVec, aimVec, (float)randomValue * (1.0f / 60.0f));
-    AddRandomOffsetToVector(aimVec, 1.0f / 60.0f);
-    randomValue = RandomIntBelow(5) + 5;
+    vec_add_random_offset(aimVec, 1.0f / 60.0f);
+    randomValue = math_random_int_below(5) + 5;
     aimVec[2] = (float)randomValue * (1.0f / 60.0f);
 
     falloff = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
@@ -122,19 +122,19 @@ void func_L11_004393D8(char *obj, int index, int flag)
     if (falloff < 0.0f)
         falloff = 0.0f;
 
-    base2 = gMobyTable_L11;
+    base2 = g_moby_l11_table;
     InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aimVec, D_L11_001B12C4 * (1.0f / 3600.0f), falloff);
 
-    base3 = gMobyTable_L11;
+    base3 = g_moby_l11_table;
     /* The record's field at 0xB8 takes the object's own handle. */
     *(int *)((char *)((*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8) + (int)base3)
             + 0xB8) = *(int *)(obj + 0xB8);
     record = (int)((char *)(base3 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8)));
     *(int *)(state + 0x364) = record;
     if (flag != 0)
-        SetArenaBossOwner(*(char **)(obj + 0xB8), record);
+        arena_set_boss_owner(*(char **)(obj + 0xB8), record);
     else
-        SetArenaBossOwner(*(char **)(obj + 0xB8), 0);
+        arena_set_boss_owner(*(char **)(obj + 0xB8), 0);
 
     *(unsigned char *)(state + index + 0x380) = 1;
 }
@@ -159,10 +159,10 @@ typedef struct {
     TI128 corner;
 } EffectQuadFrame;
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 extern char D_L11_001BA8C0[];
 extern int D_L11_001B11FC __attribute__((sda));
 extern int D_L11_001B1204 __attribute__((sda));
@@ -173,7 +173,7 @@ extern float D_L11_001B1214[] __attribute__((sda));
 /* Draws the first stage of the beam between the state's two end points: each
    side is pulled a tenth of the way toward the level's anchor, then the four
    corners are crossed out from the span and submitted as one textured quad. */
-void func_L11_00434AF8(char *obj, void *q)
+void joba_draw_beam_first_stage(char *obj, void *q)
 {
     EffectQuadFrame quadFrame;
     char *vars;
@@ -213,7 +213,7 @@ extern int D_L11_001B1208 __attribute__((sda));
 
 /* The second stage: the same quad pulled a twentieth of the way in, drawn
    once with its own texture and then again with the additive overlay. */
-void func_L11_00434D00(char *obj, void *q)
+void joba_draw_beam_second_stage(char *obj, void *q)
 {
     EffectQuadFrame quadFrame;
     char *vars;

@@ -29,19 +29,19 @@ typedef struct {
     float angle[4];
 } DebrisObject_F3FED60;
 
-extern DebrisObject_F3FED60 *func_0029EFD0(int);
-extern float func_002A7940(void);
-extern void func_002833F0(void *, void *);
-extern float func_002A7878(float, float);
-extern void func_002AB668(void *, void *, float);
-extern int func_002FED90(void *, void *, float, float, float);
+extern DebrisObject_F3FED60 *CreateMoby(int);
+extern float math_random_angle(void);
+extern void euler_rotation_basis(void *, void *);
+extern float math_random_float_range(float, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
 extern void func_002A0F48(void *);
 extern float D_L00_001B0C38 __attribute__((sda));
 extern float D_L00_001B0C2C __attribute__((sda));
 
 /* Spawns a piece of debris at the position with the given velocity, a random spin and a
    scale that depends on the flag. */
-DebrisObject_F3FED60 *func_L00_003FED60(SpawnVector_F3FED60 *position, SpawnVector_F3FED60 *velocity, int flag)
+DebrisObject_F3FED60 *bouncer_spawn_debris_object(SpawnVector_F3FED60 *position, SpawnVector_F3FED60 *velocity, int flag)
 {
     DebrisObject_F3FED60 *object = CreateMoby(0xE64 /* moby class 3684 */);
     if (object != 0) {
@@ -57,15 +57,15 @@ DebrisObject_F3FED60 *func_L00_003FED60(SpawnVector_F3FED60 *position, SpawnVect
         state->bounced = flag;
         state->age = 0;
         state->life = 15;
-        object->angle[0] = RandomAngle();
-        object->angle[1] = RandomAngle();
-        object->angle[2] = RandomAngle();
+        object->angle[0] = math_random_angle();
+        object->angle[1] = math_random_angle();
+        object->angle[2] = math_random_angle();
         euler_rotation_basis(object->rotation, object->angle);
-        spin = RandomFloatRange(0.052359886f, 0.10471977f);
-        BuildAxisAngleQuaternion(&state->spin, object->matrix, spin);
+        spin = math_random_float_range(0.052359886f, 0.10471977f);
+        math_build_axis_angle_quat(&state->spin, object->matrix, spin);
         if (flag) object->scale *= D_L00_001B0C38;
         else object->scale *= D_L00_001B0C2C;
-        state->shadow = AllocEffectSlot_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
+        state->shadow = part_alloc_effect_slot(object, 0, 1.0f, 1.0f, 1.0f);
         func_002A0F48(object);
     }
     return object;

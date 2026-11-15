@@ -10,23 +10,23 @@ typedef short s16;
 typedef int TI128 __attribute__((mode(TI)));
 
 extern unsigned int D_L18_001FB320[];
-extern char *D_L18_001B281C;
+extern char *g_moby_l18_table;
 extern char *D_L18_001B281C_sda __attribute__((sda));
 extern int D_L18_001B2838 __attribute__((sda));
 extern const unsigned short D_L18_001B125C __attribute__((sda));
 extern int D_L18_001B2348;
 extern char D_L18_002C0A90[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char *D_001FE480[];
 
-extern void func_0026FEB8(char *fmt, int a1, int a2);
-extern float func_L18_0035D5A8(void *a0, void *a1, void *a2, int a3, float f12);
-extern void func_002A7750(u8 *a0, int a1, int a2);
-extern void func_L18_00427208(u8 *a0);
-extern float func_00282E80(void *a0, void *a1);
+extern void STUB_printf(char *fmt, int a1, int a2);
+extern float path_find_best_point_by_id(void *a0, void *a1, void *a2, int a3, float f12);
+extern void moby_set_state(u8 *a0, int a1, int a2);
+extern void moby_wake_linked_enemy(u8 *a0);
+extern float vec_distance_xy(void *a0, void *a1);
 
 /* Picks the closest idle enemy to this spawner's target point and wakes it up with the spawner's settings. */
-void func_L18_004273F0(u8 *obj)
+void spawner_activate_nearest_enemy(u8 *obj)
 {
     u8 *vars = *(u8 **)(obj + 0x68);
     u8 *bestObject = 0;
@@ -42,7 +42,7 @@ void func_L18_004273F0(u8 *obj)
         if (*(int *)(vars + 0x368) == -1) {
             STUB_printf(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
         } else {
-            FindBestPointOnPathById(targetPoint, obj + 0x10, gHeroPosition, *(int *)(vars + 0x368), 0.0f);
+            path_find_best_point_by_id(targetPoint, obj + 0x10, g_hero_position, *(int *)(vars + 0x368), 0.0f);
             foundPoint = 1;
         }
     } else {
@@ -52,7 +52,7 @@ void func_L18_004273F0(u8 *obj)
     listEntry = (u16 *)D_L18_001FB320[obj[0x21]];
     while (obj[0x21] != 0xFF && obj[0x21] <= D_L18_001B2838 && listEntry != 0 &&
            ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == (u16 *)D_L18_001FB320[obj[0x21]])) {
-        candidate = (u8 *)(gMobyTable_L18 + ((*listEntry & 0x7FFF) << 8));
+        candidate = (u8 *)(g_moby_l18_table + ((*listEntry & 0x7FFF) << 8));
         if (candidate == 0)
             break;
         candidateState = *(u8 **)(candidate + 0x68);
@@ -83,13 +83,13 @@ void func_L18_004273F0(u8 *obj)
         bestState[0x399] = 2;
         *(u16 *)(bestState + 0x392) = vars[0x398];
         if (foundPoint) {
-            SetMobyState(bestObject, 0, 4);
+            moby_set_state(bestObject, 0, 4);
         } else if (bestState[0x3EA] != 0 && *(int *)(bestState + 0x3B4) != -1 &&
                    ((u8 *)((*(int *)(bestState + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
                    ((u8 *)((*(int *)(bestState + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
-            WakeLinkedEnemy(bestObject);
+            moby_wake_linked_enemy(bestObject);
         } else {
-            SetMobyState(bestObject, 0, 3);
+            moby_set_state(bestObject, 0, 3);
         }
     }
 }

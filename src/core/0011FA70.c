@@ -28,7 +28,7 @@ typedef struct { int a; int b; } r1_D_00131358_pair;
  * bytes against 56, which is what kept this a stub.
  */
 /* Copies a block of words from one place to another and returns zero. */
-int func_0011FA70(int *dst, int *src, unsigned int nbytes) {
+int mem_copy_words_block(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
         *dst++ = *src++;
@@ -51,7 +51,7 @@ ASM_FUNC("asm/core", func_0011FAA8);
  * syscall wrappers.
  */
 /* Sets up the system call entries and copies start-up code into memory, unless this was already done. */
-void func_0011FAB8(void) {
+void kernel_install_entries_boot(void) {
     int *t;
     r1_D_00131358_pair *p;
     unsigned int i;
@@ -89,7 +89,7 @@ extern int D_001417EC;
 extern void func_0011FB98(void);
 
 /* Runs the program shutdown code only once. */
-void func_0011FC48(void) {
+void shutdown_run_callbacks_once(void) {
     if (D_001417EC == 0) {
         D_001417EC = 1;
         func_0011FB98();

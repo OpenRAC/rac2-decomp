@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Rac2TI128 __attribute__((mode(TI)));
-extern void *func_0029EFD0(int id);
-extern int func_002FED90(void *a0, void *a1, float f12, float f13, float f14);
-extern int func_L00_002FCF18(void *a0, float f12, float f13, float f14, float f15, float f16);
-extern float func_002A7940(void);
-extern void func_002833F0(void *a0, void *a1);
+extern void *CreateMoby(int id);
+extern int part_alloc_effect_slot(void *a0, void *a1, float f12, float f13, float f14);
+extern int part_l00_alloc_effect_slot_2(void *a0, float f12, float f13, float f14, float f15, float f16);
+extern float math_random_angle(void);
+extern void euler_rotation_basis(void *a0, void *a1);
 extern unsigned int D_L00_001AFDA0 __attribute__((sda));
 
 /* Creates the level's own object, fills the header the object carries, copies the two
@@ -18,7 +19,7 @@ void *func_PAL_L00_003BECF0(char *a0, char *a1, char *a2, char *a3)
     char *p1;
     unsigned short v0;
 
-    node = (char *)func_0029EFD0(0x9A9);
+    node = (char *)CreateMoby(0x9A9);
     if (node != 0) {
         v0 = *(unsigned short *)(node + 0x34);
         *(unsigned char *)(node + 0x30) = 0xFF;
@@ -36,17 +37,17 @@ void *func_PAL_L00_003BECF0(char *a0, char *a1, char *a2, char *a3)
         *(Rac2TI128 *)sub = *(Rac2TI128 *)a3;
         *(Rac2TI128 *)(sub + 0x20) = *(Rac2TI128 *)a3;
 
-        *(int *)(sub + 0x50) = func_002FED90(node, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(sub + 0x50) = part_alloc_effect_slot(node, 0, 1.0f, 1.0f, 1.0f);
         *(int *)(sub + 0x54) = 0;
         *(int *)(sub + 0x58) = 0;
         *(unsigned char *)(node + 0x20) = 0;
         D_L00_001AFDA0 = D_L00_001AFDA0 + 1;
-        *(int *)(sub + 0x5C) = func_L00_002FCF18(p1, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
-        *(float *)(node + 0xF0) = func_002A7940();
-        *(float *)(node + 0xF4) = func_002A7940();
-        *(float *)(node + 0xF8) = func_002A7940();
+        *(int *)(sub + 0x5C) = part_l00_alloc_effect_slot_2(p1, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
+        *(float *)(node + 0xF0) = math_random_angle();
+        *(float *)(node + 0xF4) = math_random_angle();
+        *(float *)(node + 0xF8) = math_random_angle();
         *(float *)(node + 0xFC) = 0.0f;
-        func_002833F0(node + 0xC0, node + 0xF0);
+        euler_rotation_basis(node + 0xC0, node + 0xF0);
     }
     return node;
 }

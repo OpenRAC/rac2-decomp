@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -29,7 +30,7 @@ f32 ref_L00_003DFDC0_01(void);
 void ref_L00_003DFDC0_02(void *, s32, f32, s32, f32, s32, s32, f32);
 
 /* Throws out two bursts of particles from the object, sized by its scale and a stored value. */
-void func_L00_003DFDC0(void *moby) {
+void part_spawn_bursts_at_moby(void *moby) {
     f32 sizeA;
     f32 sizeB;
     f32 sizeC;

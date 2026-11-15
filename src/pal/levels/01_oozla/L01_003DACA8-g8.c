@@ -23,15 +23,15 @@ extern int D_L01_001AEC38 MACRO_ADDR;
 extern float D_L01_001B2090, D_L01_001B208C;
 extern int D_L01_001B3468 MACRO_ADDR;
 extern int D_L01_001B15E0 MACRO_ADDR;
-extern void *func_002A9640(void *, int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003D6B00(void *, int, float, float, float, float);
-extern void func_002E5CF8(int, int, void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern void moby_set_state(void *, int, int);
+extern void part_l01_spawn_ring_of_sparks(void *, int, float, float, float, float);
+extern void PlayMobySound(int, int, void *);
 extern void func_PAL_L00_003281C0(void *, int, float);
-extern void func_L00_00326620(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(void *);
-extern void func_0029F338(void *);
+extern void moby_l00_spawn_child(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(void *);
+extern void moby_mark_spawned(void *);
 
 void func_PAL_L01_003DACA8(OozlaStateMoby *a0)
 {
@@ -41,38 +41,38 @@ void func_PAL_L01_003DACA8(OozlaStateMoby *a0)
     case 0: {
         D_L01_001AEC38++;
         a0->flags |= 0x800;
-        func_002A7750(a0, 1, -1);
+        moby_set_state(a0, 1, -1);
         break;
     }
     case 1:
-        if (func_002A9640(a0, 0x4010000, 0) && !p->active) {
+        if (part_find_owned_effect_slot(a0, 0x4010000, 0) && !p->active) {
             D_L01_001AEC38 = D_L01_001AEC38 - 1;
-            func_002A7750(a0, 2, -1);
+            moby_set_state(a0, 2, -1);
         }
         a0->fielda8 = 255;
         break;
     case 2:
         if (a0->field31 && D_L01_001B2090 < 0.9f && D_L01_001B208C < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0)
-            func_L01_003D6B00(a0, 15, 1.5f, 6.5f, 1.5f, 0.080000006f);
+            part_l01_spawn_ring_of_sparks(a0, 15, 1.5f, 6.5f, 1.5f, 0.080000006f);
         else
-            func_L01_003D6B00(a0, 6, 1.5f, 6.5f, 1.5f, 0.080000006f);
-        func_002E5CF8(0, 0, a0);
+            part_l01_spawn_ring_of_sparks(a0, 6, 1.5f, 6.5f, 1.5f, 0.080000006f);
+        PlayMobySound(0, 0, a0);
         func_PAL_L00_003281C0(a0, 1, 0.0f);
-        func_L00_00326620(a0, 0xF94, 0);
-        func_002A7750(a0, 3, -1);
+        moby_l00_spawn_child(a0, 0xF94, 0);
+        moby_set_state(a0, 3, -1);
         break;
     case 3:
-        if (func_002B3868(a0)) {
+        if (flag_set_first_pending(a0)) {
             a0->flags |= 1;
             a0->field31 = 0;
             a0->field98 = 0;
             p->timer = 100;
             D_L01_001B3468++;
         }
-        if (func_00282948(&p->timer)) {
+        if (math_fast_float_d(&p->timer)) {
             D_L01_001B3468--;
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
         }
         break;
     }

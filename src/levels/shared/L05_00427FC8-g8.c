@@ -7,20 +7,20 @@ extern float D_L05_001B157C __attribute__((sda));
 extern s32 D_L05_001B35B0[5] MACRO_ADDR;
 extern u8 D_L05_001B9580[];
 
-extern void *func_0029EFD0(s32);
-extern float func_002A78D8(float, float);
-extern s32 func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L05_00428AC8(void *);
+extern void *CreateMoby(s32);
+extern float math_random_signed_float_range(float, float);
+extern s32 math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void part_spawn_fire_explosion(void *);
 
 /* spawns object 0x1193 at pos with parent's orientation, when one of the five slots is free:
    fills its vars from the arguments and, if it is in view, grades it against the reference
    point at D_L05_001B9580 + 0x140 */
-void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 a4, s32 a5,
+void *part_spawn_limited_blast(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 a4, s32 a5,
                         s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, s32 a11, s32 a12) {
     TI128 sphere;
     TI128 dir;
@@ -73,10 +73,10 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
         *(s32 *)(vars + 0x1C) = a10;
         *(s32 *)(vars + 0x38) = a11;
         *(s32 *)(vars + 0x18) = a8;
-        *(float *)(vars + 0x44) = RandomSignedFloatRange(65.0f, 80.0f);
+        *(float *)(vars + 0x44) = math_random_signed_float_range(65.0f, 80.0f);
         qcopy(&sphere, obj + 0x10);
         ((float *)&sphere)[3] = scale * 3.0f;
-        if (FastMathHelperA(&sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
             if (fast_vec_dist(pos, D_L05_001B9580 + 0x140) < 48.0f && flag != 0) {
@@ -88,7 +88,7 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
             if (*(s32 *)(vars + 0x18) != 0) {
                 FastVecSub(&dir, obj + 0x10, D_L05_001B9580 + 0x140);
                 vec_scale_to_length(&dir, &dir, 1.0f);
-                angle = FastAngleHelper(FastVecDot(&dir, D_L05_001B9580 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(&dir, D_L05_001B9580 + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {
@@ -99,7 +99,7 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
             *(s16 *)(vars + 4) = 0;
             *(s32 *)(vars + 0x18) = 0;
         }
-        SpawnFireExplosionEffect(obj);
+        part_spawn_fire_explosion(obj);
     }
     return obj;
 }

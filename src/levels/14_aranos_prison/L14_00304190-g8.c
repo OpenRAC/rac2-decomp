@@ -1,13 +1,13 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
 extern int D_001A72E0;
 
 extern int D_L14_001B23D0 __attribute__((sda));
 
-extern char *D_L14_001B259C __attribute__((sda));
+extern char *g_moby_l14_pool __attribute__((sda));
 
 extern char D_L14_00284690[];
 
@@ -19,7 +19,7 @@ extern void func_367778();
 
 extern void func_385CB8(unsigned int reg, unsigned long value);
 
-extern void func_L14_00304190();
+extern void level_init_record_table();
 
 extern void func_2F5CC0(void *dst, void *src, float s);
 
@@ -31,7 +31,7 @@ extern void func_321F58();
 
 extern void func_3DFA10();
 
-extern int func_002B38B8();
+extern int flag_is_third_pending_set();
 
 extern int func_3322A0();
 
@@ -53,23 +53,23 @@ extern void func_317D90();
 
 extern void func_2EE5F0();
 
-extern void func_L14_003DFA60();
+extern void gfx_draw_flipbook_billboard();
 
 extern int D_L14_001B092C __attribute__((sda));
 
-extern float func_002A78D8(float a0, float a1);
+extern float math_random_signed_float_range(float a0, float a1);
 
-extern int func_00283CF0(float f);
+extern int FloatToInt(float f);
 
-extern long long func_0027C878(int a);
+extern long long GetEffectTextureDescriptor(int a);
 
-extern void func_00283410(void *dst, void *src);
+extern void euler_to_matrix(void *dst, void *src);
 
-extern void func_00282D30(void *dst, void *src, float s);
+extern void FastVecScale(void *dst, void *src, float s);
 
-extern void func_00280B90(void *dst, void *src, int c);
+extern void draw_world_quad(void *dst, void *src, int c);
 
-extern void func_L14_003F0E98(char *a);
+extern void coll_reset_box_record(char *a);
 
 extern float D_L14_001B0388 __attribute__((sda));
 
@@ -80,11 +80,11 @@ extern float D_L14_001B0390 __attribute__((sda));
 /* This unit is built with -G8: these two bodies reach a global through $gp. */
 
 /* Sets up the level's scene at load time and starts the sound and graphics registers. */
-void func_L14_00304280(void) {
+void level_init_scene(void) {
     func_367708();
     D_L14_001B23D0 = (int)D_L14_00284690;
-    if (gCurrentMapIndex == 0xE) {
-        InitRecordTable();
+    if (g_current_map_index == 0xE) {
+        level_init_record_table();
     } else {
         func_3674A0();
     }
@@ -93,24 +93,24 @@ void func_L14_00304280(void) {
     func_385CB8(0x4E, 0x1000000 | (D_001A72E0 >> 13));
 }
 
-extern char D_00189EA0[];
-extern unsigned char D_00188660[];
-extern void func_002A7750(void *, int, int);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern float func_00282DF0(void *);
-extern void func_00282DD8(void *dst, void *a, void *b);
-extern int func_L14_003DE2D8(char *);
-extern int func_002B3868(void *);
-extern int func_002ACBC8(void *, int);
-extern void func_L14_003DE488(char *);
-extern int func_00282948(int *);
-extern int func_L00_00324120(void *);
-extern float func_00282E48(void *, void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern void func_L14_003DE360(char *, float);
-extern void func_L14_003DE310(char *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern char g_hero_position[];
+extern unsigned char g_sound_state[];
+extern void moby_set_state(void *, int, int);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern float FastVecLength(void *);
+extern void FastVecCross(void *dst, void *a, void *b);
+extern int moby_count_used_child_slots(char *);
+extern int flag_set_first_pending(void *);
+extern int IsPointInCuboid(void *, int);
+extern void moby_wake_children(char *);
+extern int math_fast_float_d(int *);
+extern int hero_is_current_selected_id(void *);
+extern float fast_vec_dist(void *, void *);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern void moby_place_from_group_matrices(char *, float);
+extern void moby_clear_dead_linked(char *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Updates moby class 2788 (no label yet): a door-like part that swings between two positions. */
 /* A two-position mover. State 0 stores its two end points (which one is the current
@@ -119,7 +119,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
    or the player has moved to the other side of the object, start the turn (states 5 and 6),
    which steps func_L14_003DE360 until the angle at 0x80 reaches 0 or pi/2 and then stops the
    object's sound. */
-void func_L14_003DDD38(char *self)
+void swinging_mover_update(char *self)
 {
     float pos[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
@@ -147,12 +147,12 @@ void func_L14_003DDD38(char *self)
             qcopy(vars + 0x90, self + 0x10);
             qcopy(vars + 0xA0, vars + 0x60);
             *(float *)(vars + 0x80) = 1.5707964f;
-            SetMobyState(self, 4, -1);
+            moby_set_state(self, 4, -1);
         } else {
             qcopy(vars + 0xA0, self + 0x10);
             qcopy(vars + 0x90, vars + 0x60);
             *(float *)(vars + 0x80) = 0.0f;
-            SetMobyState(self, 3, -1);
+            moby_set_state(self, 3, -1);
         }
         qcopy(vars + 0xB0, vars + 0xA0);
         *(float *)(vars + 0xB8) = *(float *)(vars + 0x98);
@@ -167,7 +167,7 @@ void func_L14_003DDD38(char *self)
            st+0xF0, so each one is read eight words back from its distance. */
         for (i = 3; i >= 0; i--) {
             if (*(int *)(dist - 8) > 0) {
-                *ent = gMobyPool_L14 + (*(int *)(dist - 8) << 8);
+                *ent = g_moby_l14_pool + (*(int *)(dist - 8) << 8);
                 FastVecSub(d1, *ent + 0x10, vars + 0xB0);
                 distance = FastVecLength(d1);
                 if ((unsigned char)self[0x20] == 4) {
@@ -183,95 +183,95 @@ void func_L14_003DDD38(char *self)
             ent++;
             dist++;
         }
-        if (CountUsedChildSlots(self) != 0 && *(int *)(vars + 0x74) >= 0) {
-            SetMobyState(self, 1, -1);
+        if (moby_count_used_child_slots(self) != 0 && *(int *)(vars + 0x74) >= 0) {
+            moby_set_state(self, 1, -1);
         }
         break;
     case 1:
-        SetFirstPendingFlag(self);
-        if (IsPointInCuboid(gHeroPosition, *(int *)(vars + 0x74)) != 0) {
-            SetMobyState(self, 2, -1);
+        flag_set_first_pending(self);
+        if (IsPointInCuboid(g_hero_position, *(int *)(vars + 0x74)) != 0) {
+            moby_set_state(self, 2, -1);
         }
         break;
     case 2:
-        SetMobyState(self, 3, -1);
+        moby_set_state(self, 3, -1);
     case 3:
     case 4:
-        if (SetFirstPendingFlag(self) != 0) {
-            WakeChildMobys(self);
+        if (flag_set_first_pending(self) != 0) {
+            moby_wake_children(self);
             *(int *)(vars + 0x8C) = 100;
         }
-        FastFloatHelperD((int *)(vars + 0x8C));
-        if (IsCurrentSelectedId(self) == 0) {
-            if (!(fast_vec_dist(gHeroPosition, self + 0x10) < 30.0f)) {
+        math_fast_float_d((int *)(vars + 0x8C));
+        if (hero_is_current_selected_id(self) == 0) {
+            if (!(fast_vec_dist(g_hero_position, self + 0x10) < 30.0f)) {
                 break;
             }
             /* Which end the player is nearer; the object's own nearer end must differ. */
-            side = fast_vec_dist(gHeroPosition, vars + 0x90) > fast_vec_dist(gHeroPosition, vars + 0xA0);
+            side = fast_vec_dist(g_hero_position, vars + 0x90) > fast_vec_dist(g_hero_position, vars + 0xA0);
             if ((side ^ (fast_vec_dist(self + 0x10, vars + 0x90) > fast_vec_dist(self + 0x10, vars + 0xA0))) == 0) {
                 break;
             }
         }
-        if (CountUsedChildSlots(self) == 0 && *(int *)(vars + 0x8C) <= 0) {
+        if (moby_count_used_child_slots(self) == 0 && *(int *)(vars + 0x8C) <= 0) {
             if ((unsigned char)self[0x20] == 4) {
-                SetMobyState(self, 5, -1);
+                moby_set_state(self, 5, -1);
             } else {
-                SetMobyState(self, 6, -1);
+                moby_set_state(self, 6, -1);
             }
         }
         break;
     case 5:
-        if (SetFirstPendingFlag(self) != 0) {
+        if (flag_set_first_pending(self) != 0) {
             *(int *)(vars + 0x78) = PlayMobySound(0, 4, self);
         }
         if (*(float *)(vars + 0x80) > 0.0f) {
-            PlaceObjectFromGroupMatrices(self, -*(float *)(vars + 0x7C));
+            moby_place_from_group_matrices(self, -*(float *)(vars + 0x7C));
         } else {
             if (*(int *)(vars + 0x78) >= 0) {
                 if (*(int *)(vars + 0x78) != -1) {
-                    sound = gSoundState + *(int *)(vars + 0x78) * 0x70;
+                    sound = g_sound_state + *(int *)(vars + 0x78) * 0x70;
                     if (*(char **)(sound + 0x88) == self && sound[0x74]) {
-                        StopSoundVoice(*(int *)(vars + 0x78));
+                        snd_stop_voice(*(int *)(vars + 0x78));
                     }
                 }
                 *(int *)(vars + 0x78) = -1;
             }
-            if (IsCurrentSelectedId(self) == 0) {
-                SetMobyState(self, 3, -1);
+            if (hero_is_current_selected_id(self) == 0) {
+                moby_set_state(self, 3, -1);
             }
         }
         break;
     case 6:
-        if (SetFirstPendingFlag(self) != 0) {
+        if (flag_set_first_pending(self) != 0) {
             *(int *)(vars + 0x78) = PlayMobySound(0, 4, self);
         }
         if (*(float *)(vars + 0x80) < 1.5707964f) {
-            PlaceObjectFromGroupMatrices(self, *(float *)(vars + 0x7C));
+            moby_place_from_group_matrices(self, *(float *)(vars + 0x7C));
         } else {
             if (*(int *)(vars + 0x78) >= 0) {
                 if (*(int *)(vars + 0x78) != -1) {
-                    sound = gSoundState + *(int *)(vars + 0x78) * 0x70;
+                    sound = g_sound_state + *(int *)(vars + 0x78) * 0x70;
                     if (*(char **)(sound + 0x88) == self && sound[0x74]) {
-                        StopSoundVoice(*(int *)(vars + 0x78));
+                        snd_stop_voice(*(int *)(vars + 0x78));
                     }
                 }
                 *(int *)(vars + 0x78) = -1;
             }
-            if (IsCurrentSelectedId(self) == 0) {
-                SetMobyState(self, 4, -1);
+            if (hero_is_current_selected_id(self) == 0) {
+                moby_set_state(self, 4, -1);
             }
         }
         break;
     }
-    ClearDeadLinkedMobys(self);
+    moby_clear_dead_linked(self);
     FastVecSub(delta, self + 0x10, pos);
-    CombineTransformsAndStore(vars + 0x20, delta, rot, self + 0xF0);
+    mat_combine_and_store(vars + 0x20, delta, rot, self + 0xF0);
 }
 
 /* func_L14_003E5030 is matched in its own unit, src/levels/shared/L14_003E5030-g8.c (-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Draws two lines on either side of the object, along its facing direction. */
-void func_L14_003DF100(char *moby, int isFirst) {
+void gfx_draw_moby_edge_lines(char *moby, int isFirst) {
     float offsetA[4];
     float offsetB[4];
     char *vars;
@@ -295,22 +295,22 @@ void func_L14_003DF100(char *moby, int isFirst) {
    symbol (the second name: `sda` on an array over 8 bytes), while D_L14_001B25B8 is a plain int:
    its `.extern` comes last in the file, so the load in a branch delay slot is a $gp access and
    no other load is. */
-extern unsigned short *D_L14_001FB060[];
+extern unsigned short *g_group_entity_lists[];
 extern int D_L14_001B25B8;
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
-extern void *func_L00_0032C638(char *a0);
+extern void *moby_get_vars_word_18(char *a0);
 
 /* 0 when an entity of the owner's group (state word 0x68), other than the two states 0xFE and
    0xFD, has a linked object whose word at +0x88 is not the owner; else 1. */
-int func_L14_003DF440(char *self) {
+int group_is_linked_to_owner(char *self) {
     char *state = *(char **)(self + 0x68);
     unsigned short *p;
     unsigned char *e;
     char *t;
 
-    for (p = gGroupEntityLists[*(int *)(state + 0x68)];
+    for (p = g_group_entity_lists[*(int *)(state + 0x68)];
          (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
-         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == gGroupEntityLists[*(int *)(state + 0x68)]);
+         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         e = D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
@@ -318,7 +318,7 @@ int func_L14_003DF440(char *self) {
         /* two tests, as retail has them: `!= 0xFE && != 0xFD` is folded into one range test */
         if (e[0x20] != 0xFE) {
             if (e[0x20] != 0xFD) {
-                t = GetObjectVarsWord18(e);
+                t = moby_get_vars_word_18(e);
                 if (t != 0 && *(char **)(t + 0x88) != self)
                     return 0;
             }
@@ -327,25 +327,25 @@ int func_L14_003DF440(char *self) {
     return 1;
 }
 
-extern float func_00282C48(float x);
+extern float math_fabs(float x);
 
 /* 1 when an entity of the owner's group (state word 0x68), other than the two states 0xFE and
    0xFD, is more than 1.5 away from it along the float at +0x18; else 0. */
-int func_L14_003DF540(char *self) {
+int group_is_misaligned(char *self) {
     char *state = *(char **)(self + 0x68);
     unsigned short *p;
     unsigned char *e;
 
-    for (p = gGroupEntityLists[*(int *)(state + 0x68)];
+    for (p = g_group_entity_lists[*(int *)(state + 0x68)];
          (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
-         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == gGroupEntityLists[*(int *)(state + 0x68)]);
+         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         e = D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         if (e[0x20] != 0xFE) {
             if (e[0x20] != 0xFD) {
-                if (FloatAbs(*(float *)(e + 0x18) - *(float *)(self + 0x18)) > 1.5f)
+                if (math_fabs(*(float *)(e + 0x18) - *(float *)(self + 0x18)) > 1.5f)
                     return 1;
             }
         }
@@ -354,7 +354,7 @@ int func_L14_003DF540(char *self) {
 }
 
 /* Moves and spins an object that flies off and is removed once it has gone far enough. */
-void func_L14_003DF7F8(char *moby) {
+void flying_away_update(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     switch (*(unsigned char *)(moby + 0x20)) {
@@ -365,7 +365,7 @@ void func_L14_003DF7F8(char *moby) {
         }
         break;
     case 1:
-        if (IsThirdPendingFlagSet(moby) != 0) {
+        if (flag_is_third_pending_set(moby) != 0) {
             if (*(int *)(vars + 0x0) != -1) {
                 func_3DFA10(moby, 1);
             }
@@ -418,7 +418,7 @@ void func_L14_003DF7F8(char *moby) {
         break;
     }
     if (*(unsigned char *)(moby + 0x31) != 0 && *(int *)(vars + 0x4) != -1) {
-        func_2EE5F0(DrawFlipbookBillboardQuad, moby);
+        func_2EE5F0(gfx_draw_flipbook_billboard, moby);
     }
 }
 
@@ -449,7 +449,7 @@ typedef struct {
 
 /* The caller supplies an unused scale in F12; the body replaces it before use. */
 /* Builds two ribbon-like quads at the object with random fading colours and draws them. */
-void func_L14_003F0F38(char *moby, char *target, float unused_scale, int colorBase, int fadeA, int fadeB) {
+void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int colorBase, int fadeA, int fadeB) {
     L14_003F0F38_frame fr;
     char *vars;
     long long id;
@@ -459,8 +459,8 @@ void func_L14_003F0F38(char *moby, char *target, float unused_scale, int colorBa
 
     vars = *(char **)(moby + 0x68);
 
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 5.0f)) << 24);
-    ResetBoxRecord(&fr.rec);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
+    coll_reset_box_record(&fr.rec);
 
     fr.rec.f[0] = *(float *)vars;
     fr.rec.f[1] = 0.0f;
@@ -478,11 +478,11 @@ void func_L14_003F0F38(char *moby, char *target, float unused_scale, int colorBa
     fr.rec.p[0] = colorBase + fadeA;
     fr.rec.q = 0LL;
 
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = colorBase + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = colorBase + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = colorBase + fadeA;
 
     fr.dir[2] = *(float *)(moby + 0xF8);
@@ -507,13 +507,13 @@ void func_L14_003F0F38(char *moby, char *target, float unused_scale, int colorBa
     fr.rec.f[2] = *(float *)(vars + 8);
     fr.rec.f[3] = 1.0f;
     fr.t = tv;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[0] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = colorBase + fadeB;
     fr.rec.f[4] = *(float *)(vars + 8) + 1.0f;
     fr.rec.f[5] = 0.0f;
@@ -525,11 +525,11 @@ void func_L14_003F0F38(char *moby, char *target, float unused_scale, int colorBa
 extern float D_L14_001B04B0 __attribute__((sda));
 extern float D_L14_001B04B4 __attribute__((sda));
 extern float D_L14_001B04B8 __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern void func_0027C768(void *, float *, float *);
-extern float func_00283198(float);
-extern float func_L14_003E22A8(char *);
-extern float func_L14_003E28E8(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void gfx_world_to_screen_unit(void *, float *, float *);
+extern float math_fast_sin_or_cos_b(float);
+extern float moby_get_state_progress(char *);
+extern float math_wrap_angle_two_pi(float);
 
 /* The caller fills four vertices (indices 0..3), colors at +0x40,
  * and four UV pairs at +0x50 in its quad packet. */
@@ -540,7 +540,7 @@ typedef struct {
 } L14Swing;
 
 /* Works out one corner of a wobbling quad: its position and clamped texture coordinates. */
-void func_L14_003E2688(char *object, L14Swing *base, int index, float *a, float *b, float *c,
+void gfx_calc_wobble_quad_corner(char *object, L14Swing *base, int index, float *a, float *b, float *c,
                        int phase0, int phase1)
 {
     float v[4];
@@ -549,12 +549,12 @@ void func_L14_003E2688(char *object, L14Swing *base, int index, float *a, float 
     FastVecAdd(base->rows[index], a, v);
     FastVecScale(v, c, (float)phase0 * 0.125f);
     FastVecAdd(base->rows[index], base->rows[index], v);
-    ProjectWorldToScreen(base->rows[index], &base->pairs[index][0], &base->pairs[index][1]);
-    base->pairs[index][0] += (1.0f - GetStateProgressFraction(object)) * D_L14_001B04B0
-        * FastSinOrCosB(WrapAngleToTwoPi((D_L14_001B04B4 + D_L14_001B04B4) * (GetStateProgressFraction(object) * 3.1415927f)
+    gfx_world_to_screen_unit(base->rows[index], &base->pairs[index][0], &base->pairs[index][1]);
+    base->pairs[index][0] += (1.0f - moby_get_state_progress(object)) * D_L14_001B04B0
+        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((D_L14_001B04B4 + D_L14_001B04B4) * (moby_get_state_progress(object) * 3.1415927f)
                                           + (float)phase0 * 3.1415927f / D_L14_001B04B8));
-    base->pairs[index][1] += (1.0f - GetStateProgressFraction(object)) * D_L14_001B04B0
-        * FastSinOrCosB(WrapAngleToTwoPi((D_L14_001B04B4 + D_L14_001B04B4) * (GetStateProgressFraction(object) * 3.1415927f)
+    base->pairs[index][1] += (1.0f - moby_get_state_progress(object)) * D_L14_001B04B0
+        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((D_L14_001B04B4 + D_L14_001B04B4) * (moby_get_state_progress(object) * 3.1415927f)
                                           + (float)phase1 * 3.1415927f / D_L14_001B04B8));
     if (1.0f < base->pairs[index][0])
         base->pairs[index][0] = 1.0f;
@@ -578,16 +578,16 @@ extern s32 D_L14_001B04F0 __attribute__((sda));
 extern float D_L14_001B04F4 __attribute__((sda));
 extern char D_L14_001A8F20[] MACRO_ADDR;
 
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern int func_00283D38(int, int, float);
-extern char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int alpha, int endAlpha,
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern int FastTweenColor(int, int, float);
+extern char *part_spawn_size_changing(char *pos, char *vel, int life, int color, int speed, int alpha, int endAlpha,
                            float size, float endSize, float gravity, int kind);
 
 /* Spawns a flash particle: jitters the position at random within the object's scaled radius, blends a
    random opaque colour toward the record's colour (rec+0x84) by the object's fade factor, and spawns it
    with a random life and speed. */
-void func_L14_003E2980(char *obj)
+void part_l14_spawn_flash(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
@@ -595,16 +595,16 @@ void func_L14_003E2980(char *obj)
     int argb, color, life, red, green, blue;
 
     qcopy(pos, obj + 0x10);
-    pos[0] += RandomFloatRange(D_L14_001B04BC * -GetStateProgressFraction(obj), D_L14_001B04BC * GetStateProgressFraction(obj));
-    pos[1] += RandomFloatRange(D_L14_001B04BC * -GetStateProgressFraction(obj), D_L14_001B04BC * GetStateProgressFraction(obj));
-    pos[2] += RandomFloatRange(D_L14_001B04BC * -GetStateProgressFraction(obj), 0.0f);
+    pos[0] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), D_L14_001B04BC * moby_get_state_progress(obj));
+    pos[1] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), D_L14_001B04BC * moby_get_state_progress(obj));
+    pos[2] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), 0.0f);
     qcopy(vel, D_L14_001A8F20);
-    red = RandomIntRange(0, D_L14_001B04EC);
-    green = RandomIntRange(0, D_L14_001B04E8);
-    blue = RandomIntRange(0, D_L14_001B04E4);
+    red = math_random_int_range(0, D_L14_001B04EC);
+    green = math_random_int_range(0, D_L14_001B04E8);
+    blue = math_random_int_range(0, D_L14_001B04E4);
     argb = 0xFF000000 | (green << 8);
-    color = FastTweenColor((red << 16) | argb | blue, *(int *)(rec + 0x84), GetStateProgressFraction(obj));
-    life = RandomIntRange(D_L14_001B04D4 / 2, D_L14_001B04D4);
-    SpawnSizeChangingParticle((char *)pos, (char *)vel, life, color, RandomIntRange(0, D_L14_001B04E0), 0x80, 0,
+    color = FastTweenColor((red << 16) | argb | blue, *(int *)(rec + 0x84), moby_get_state_progress(obj));
+    life = math_random_int_range(D_L14_001B04D4 / 2, D_L14_001B04D4);
+    part_spawn_size_changing((char *)pos, (char *)vel, life, color, math_random_int_range(0, D_L14_001B04E0), 0x80, 0,
                   D_L14_001B04D8, D_L14_001B04DC, D_L14_001B04F4, D_L14_001B04F0);
 }

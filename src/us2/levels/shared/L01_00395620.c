@@ -20,8 +20,8 @@ typedef union { float v[4]; MotionQuad q; } MotionVec;
 typedef struct { MotionVec forward[4]; MotionVec inverse[4]; } MotionPath;
 extern MotionPath *D_L01_001B264C[] __attribute__((sda));
 extern char D_L01_001B94C0[];
-extern char D_00189EA0[];
-extern void func_L01_00394148(void *); /* the parameter is unused */
+extern char g_hero_position[];
+extern void part_flash_matching_things(void *); /* the parameter is unused */
 
 typedef int CamQuad __attribute__((mode(TI)));
 typedef struct {
@@ -35,7 +35,7 @@ typedef struct {
     char padAE[2]; u8 index; char padB1; u16 saveIndex; char padB4[8]; u8 active;
 } CamMoby;
 extern u8 D_0019B2E8[];
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern u8 D_0019B4A8[];
 extern struct { u8 header[0x464]; u8 collected[0]; } D_L01_0021E4B0;
 extern int D_0018A160 NOT_SDA;
@@ -47,33 +47,33 @@ extern struct {
 } D_L01_001B22A0 MACRO_ADDR;
 extern int D_L01_001B9780 NOT_SDA;
 extern char D_L01_002A4370[];
-extern void func_0026FEB8(void *, int, int);
-extern void func_0029F338(void *);
-extern int func_002ACBC8(void *, int);
-extern void func_L00_002B9D60(void *, void *, int, int);
-extern void func_00335438(void *, void *, int, int, int);
-extern int func_002B38B8(void *);
-extern int func_00282948(void *);
-extern void func_003355A8(int);
+extern void STUB_printf(void *, int, int);
+extern void moby_mark_spawned(void *);
+extern int IsPointInCuboid(void *, int);
+extern void hero_reset_position_and_direction(void *, void *, int, int);
+extern void SetCamera5Pose(void *, void *, int, int, int);
+extern int flag_is_third_pending_set(void *);
+extern int math_fast_float_d(void *);
+extern void cam_set_mode_state(int);
 extern void ref_L01_00394240_01(int);
 extern int ref_L01_00394240_02(int, int); /* result unused here */
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern void func_002A0430(int);
-extern void func_002DF3F8(void *, void *);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern void moby_mark_table_entry_flagged(int);
+extern void level_capture_checkpoint_state(void *, void *);
 void func_US2_L01_00395620(CamMoby *m)
 {
     CamVars *v = m->vars;
     CamQuad position, rotation;
     int saved;
-    func_L01_00394148(m);
+    part_flash_matching_things(m);
     switch (m->state) {
     case 0:
         if (v->requireEnabled && (D_0019B2E8[m->index + (ref_L01_00394240_00 << 4)] & 0x80)) {
-            func_0029F338(m);
+            moby_mark_spawned(m);
         } else if (v->camera == -1) {
-            func_0026FEB8(D_L01_002A4370, m->id, m->group);
-            func_0029F338(m);
+            STUB_printf(D_L01_002A4370, m->id, m->group);
+            moby_mark_spawned(m);
         } else {
             m->field30 = m->field32 = 255;
             m->state = 1;
@@ -81,7 +81,7 @@ void func_US2_L01_00395620(CamMoby *m)
         break;
     case 1:
         if (D_L01_0021E4B0.collected[(s16)m->saveIndex]) goto saved_state;
-        saved = D_0019B4A8[((s16)m->saveIndex >> 1) + (D_001A79F0[0] << 10)];
+        saved = D_0019B4A8[((s16)m->saveIndex >> 1) + (g_current_map_index[0] << 10)];
         if (m->saveIndex & 1) {
             if ((saved >> 4) & 7) goto saved_state;
         } else {
@@ -91,15 +91,15 @@ void func_US2_L01_00395620(CamMoby *m)
                 break;
             }
         }
-        if ((func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1) &&
-            (!v->requireHero || *(int *)(D_00189EA0 + 0x2C0))) {
+        if ((IsPointInCuboid(g_hero_position, v->trigger) || m->active == 1) &&
+            (!v->requireHero || *(int *)(g_hero_position + 0x2C0))) {
             qcopy(&position, D_L01_001B94C0);
             qcopy(&rotation, D_L01_001B94C0 + 16);
-            if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
-            else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
+            if (v->source == -1) hero_reset_position_and_direction(g_hero_position, g_hero_position + 0x10, 0x6F, 1);
+            else hero_reset_position_and_direction(&D_L01_001B264C[0][v->source].forward[3],
                                   &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
-            if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            if (v->mode) SetCamera5Pose(&position, &rotation, 2, v->parameter, 0);
+            else SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                               &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             D_L01_001B1FA8[0] = 1;
             m->state = 2;
@@ -109,18 +109,18 @@ void func_US2_L01_00395620(CamMoby *m)
             qcopy(&v->position, &base[camera].forward[3]);
             qcopy(&v->rotation, &base[camera].inverse[3]); }
         }
-        if (D_001A79F0[0] == 19 &&
-            (func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1 || func_002B38B8(m)) &&
+        if (g_current_map_index[0] == 19 &&
+            (IsPointInCuboid(g_hero_position, v->trigger) || m->active == 1 || flag_is_third_pending_set(m)) &&
             (!v->requireHero || D_0018A160)) {
             qcopy(&position, D_L01_001B94C0);
             qcopy(&rotation, D_L01_001B94C0 + 16);
-            if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
-            else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
+            if (v->source == -1) hero_reset_position_and_direction(g_hero_position, g_hero_position + 0x10, 0x6F, 1);
+            else hero_reset_position_and_direction(&D_L01_001B264C[0][v->source].forward[3],
                                   &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
-            if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else if (D_001A79F0[0] == 19) func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            if (v->mode) SetCamera5Pose(&position, &rotation, 2, v->parameter, 0);
+            else if (g_current_map_index[0] == 19) SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                                                  &D_L01_001B264C[0][v->camera].inverse[3], 1, 0, 0);
-            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+            else SetCamera5Pose(&D_L01_001B264C[0][v->camera].forward[3],
                               &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             { unsigned int saveIndex = m->saveIndex;
             u8 *p;
@@ -129,11 +129,11 @@ void func_US2_L01_00395620(CamMoby *m)
             m->active = 1;
             m->state = 2;
             if (saveIndex & 1) {
-                p = &D_0019B4A8[((s16)saveIndex >> 1) + (D_001A79F0[0] << 10)];
+                p = &D_0019B4A8[((s16)saveIndex >> 1) + (g_current_map_index[0] << 10)];
                 b = *p;
                 if (((b >> 4) & 7) != 7) *p = b + 16;
             } else {
-                p = &D_0019B4A8[((s16)saveIndex >> 1) + (D_001A79F0[0] << 10)];
+                p = &D_0019B4A8[((s16)saveIndex >> 1) + (g_current_map_index[0] << 10)];
                 b = *p;
                 if ((b & 7) != 7) *p = b + 1;
             } }
@@ -145,9 +145,9 @@ void func_US2_L01_00395620(CamMoby *m)
         }
         break;
     case 2:
-        if (func_00282948(&v->timer) || m->active != 1) {
-            if (v->mode) func_003355A8(2);
-            else func_003355A8(0);
+        if (math_fast_float_d(&v->timer) || m->active != 1) {
+            if (v->mode) cam_set_mode_state(2);
+            else cam_set_mode_state(0);
             ref_L01_00394240_01(0);
             if (v->lock) D_L01_001B22A0.busy = 0;
             D_L01_001B1FA8[0] = 0;
@@ -157,14 +157,14 @@ void func_US2_L01_00395620(CamMoby *m)
         } else {
             if (v->lock) D_L01_001B22A0.busy = 1;
             ref_L01_00394240_02(0x6F, 1);
-            func_00335370(&v->position);
-            func_003353C8(&v->rotation);
+            object_copy_vector_to_selected(&v->position);
+            cam_set_state_rotation(&v->rotation);
         }
         break;
     case 3:
         if (v->reset && !(D_0019B2E8[m->index + (ref_L01_00394240_00 << 4)] & 0x80)) {
-            func_002A0430(m->index);
-            func_002DF3F8((char *)m + 0x10, (char *)m + 0xF0);
+            moby_mark_table_entry_flagged(m->index);
+            level_capture_checkpoint_state((char *)m + 0x10, (char *)m + 0xF0);
         }
         if (m->active == 1) m->state = 1;
         break;

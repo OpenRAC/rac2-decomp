@@ -4,15 +4,15 @@
 typedef unsigned char u8;
 typedef float f32;
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 extern int D_L22_001B2AA8;
 extern int *D_L22_001B2AB4;
 
 /* Restores one of three stats on the object, picking one at random and topping up the first one that is below its maximum. */
-void func_L22_003A5F90(u8 *obj)
+void stat_restore_random(u8 *obj)
 {
     u8 *vars = *(u8 **)(obj + 0x68);
-    int choice = RandomIntBelow(3);
+    int choice = math_random_int_below(3);
     int limit = D_L22_001B2AA8;
     int *stats;
     int limitCopy;

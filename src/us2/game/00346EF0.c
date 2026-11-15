@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -41,28 +42,28 @@ void func_US2_00347550(char *a0)
 extern void F449e2f67_FUN_003361A8(char *p);
 extern void F449e2f67_FUN_00336968(char *p);
 extern void F449e2f67_FUN_003366D0(char *p);
-extern void func_003363D0(char *p);
-extern void func_00336968(char *p);
-extern void func_003366D0(char *p);
+extern void object_construct_derived_b(char *p);
+extern void hud_construct_widget_base(char *p);
+extern void object_construct_derived_c(char *p);
 
-extern void func_003361A8(char *p);
+extern void object_construct_derived_a(char *p);
 
 char *func_US2_003475F0(char *p)
 {
-    func_003361A8(p);
-    func_003361A8(p + 76);
-    func_003361A8(p + 152);
-    func_003361A8(p + 228);
-    func_003361A8(p + 304);
-    func_003361A8(p + 380);
-    func_003363D0(p + 456);
-    func_00336968(p + 528);
-    func_00336968(p + 616);
-    func_00336968(p + 704);
-    func_003366D0(p + 792);
-    func_003361A8(p + 852);
-    func_003361A8(p + 928);
-    func_003361A8(p + 1004);
+    object_construct_derived_a(p);
+    object_construct_derived_a(p + 76);
+    object_construct_derived_a(p + 152);
+    object_construct_derived_a(p + 228);
+    object_construct_derived_a(p + 304);
+    object_construct_derived_a(p + 380);
+    object_construct_derived_b(p + 456);
+    hud_construct_widget_base(p + 528);
+    hud_construct_widget_base(p + 616);
+    hud_construct_widget_base(p + 704);
+    object_construct_derived_c(p + 792);
+    object_construct_derived_a(p + 852);
+    object_construct_derived_a(p + 928);
+    object_construct_derived_a(p + 1004);
     return p;
 }
 

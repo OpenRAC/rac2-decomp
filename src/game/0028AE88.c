@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac3-decomp (src/frontbin/38DED0.c, func_00392FD0): the same instructions.
    Gives group N of the table at D_001B1888 its size (rounded up to 16) once: the
    entries of the group in both entry lists (D_001B1898, D_001B1894) lose their top bit and
@@ -21,7 +22,7 @@ extern GroupTable *D_001B1888[];
 extern GroupEntry *D_001B1894[];
 extern GroupEntry *D_001B1898[];
 
-void func_0028AE88(s32 group, s32 size) {
+void LinkHudBank(s32 group, s32 size) {
     s32 first;
     s32 index;
     s32 end;

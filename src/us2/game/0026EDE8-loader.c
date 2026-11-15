@@ -32,79 +32,79 @@ typedef struct { char pad[4]; unsigned char mode; char rest[219]; } LoaderOption
 typedef struct { char pad[0x18]; int format; char pad1c[0x14]; int audio; } LoaderSettings;
 
 extern LoaderMemory D_001BAEC0;
-extern LoaderDisc D_0014B540;
-extern BootMemcard D_001393E0[];
-extern LoaderPad D_00138180;
-extern LoaderTables D_00254E78;
-extern LoaderGame D_00189E20;
-extern LoaderSound D_001A63A8;
+extern LoaderDisc g_copy_setup_data;
+extern BootMemcard g_memcard_state[];
+extern LoaderPad g_pad_state;
+extern LoaderTables g_subtitle_state;
+extern LoaderGame g_hero_state;
+extern LoaderSound g_music_state;
 extern LoaderMovie D_001BAD40;
-extern LoaderSelection D_00139568;
-extern LoaderOption D_00239BA0[];
-extern LoaderSettings D_00152C00;
+extern LoaderSelection g_item_slot_to_record;
+extern LoaderOption g_weapon_table[];
+extern LoaderSettings g_hero_moby_default;
 extern char D_00238C80[], D_01806380[], D_0180DA80[];
 extern int D_00138320[];
 extern char *D_001B1604 __attribute__((sda));
-extern LoaderResource *D_001B1840 __attribute__((sda));
+extern LoaderResource *g_subtitle_entries __attribute__((sda));
 extern LoaderArchive *D_001A7280[] __attribute__((sda));
 extern unsigned long long D_001A7200 __attribute__((sda));
 extern int D_001A8C88[] __attribute__((sda));
 extern int D_001B16A8[] __attribute__((sda)), D_001B16AC[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda)), D_001A8BB4[] __attribute__((sda));
-extern int D_001A8BB8[] __attribute__((sda)), D_001A8BBC[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda)), g_previous_game_mode[] __attribute__((sda));
+extern int g_requested_game_mode[] __attribute__((sda)), D_001A8BBC[] __attribute__((sda));
 extern int D_001A8B84[] __attribute__((sda)), D_001B1684[] __attribute__((sda)), D_001B1598[] __attribute__((sda));
 extern unsigned char D_001A7BB0[] __attribute__((sda));
 extern short D_001A7A10[] __attribute__((sda));
 extern int D_001A7290[] __attribute__((sda)), D_001A72C0[] __attribute__((sda));
-extern int D_001A7AF0[] __attribute__((sda)), D_001A7B90[] __attribute__((sda)), D_001A72D0[] __attribute__((sda));
+extern int g_equipment_bits[] __attribute__((sda)), g_is_pal_video[] __attribute__((sda)), D_001A72D0[] __attribute__((sda));
 extern unsigned short D_001A7AF2[] __attribute__((sda));
 extern int D_001A7478 MACRO_ADDR;
 extern float D_001B168C MACRO_ADDR;
 
-extern void func_0011AEA0(int);
-extern int func_001261F0(int);
-extern int func_00132028(void);
-extern void func_00133220(void);
-extern void func_0026EA00(int);
-extern void func_0026EAC8(int);
-extern void func_0026EC58(unsigned short *);
-extern void func_0027B948(void), func_US2_0027CB08(void), func_US2_0027CB80(void);
-extern void func_0027D330(int);
-extern void func_00280710(void);
-extern void func_00282A28(void);
-extern float func_00283CE0(int);
-extern int func_00284E80(void);
-extern void func_00284EA8(void), func_00284FC0(void), func_00285338(void), func_US2_00287140(void);
-extern int func_00288AA0(unsigned char *, int);
-extern int func_00288BE8(void *);
-extern void func_0028AB70(void);
-extern void func_00290758(void), func_00290C60(void);
+extern void FlushCache(int);
+extern int sceGsSyncV(int);
+extern int snd_Pump(void);
+extern void snd_set_current_buffer_flag(void);
+extern void ShowSplashImage(int);
+extern void gfx_draw_splash_screen_frame(int);
+extern void menu_fill_shuffled_tile_table(unsigned short *);
+extern void ResetGsRegistersPr(void), func_US2_0027CB08(void), func_US2_0027CB80(void);
+extern void FadeToBlack(int);
+extern void gfx_process_screen_copy_regions(void);
+extern void math_trap_always(void);
+extern float IntToFloat(int);
+extern int gfx_query_display_buffer(void);
+extern void gfx_append_draw_list_header(void), PutDrawBufferSmall(void), gfx_queue_second_strip_packet(void), func_US2_00287140(void);
+extern int req_push_queue(unsigned char *, int);
+extern int req_launch_queued(void *);
+extern void InitializeHudSlotsAndBuffers(void);
+extern void level_init_systems(void), InitOnce(void);
 extern void func_US2_00292650(int *, int);
-extern void func_US2_00292928(int), func_00292408(int), func_002925F0(int), func_002926B8(int);
+extern void func_US2_00292928(int), LoadPackSingleTexture(int), load_disc_table_entry_for_draw(int), LoadDiscTableTexture(int);
 extern void func_US2_00293138(void);
 extern void func_US2_002957C0(void);
-extern void func_00298178(void), func_US2_00299CF0(void);
+extern void map_update_state_machine(void), func_US2_00299CF0(void);
 extern void func_US2_0029DB80(void);
 extern void func_US2_0029E308(int, int);
-extern int func_002B49E0(int, int, int, int, unsigned char *);
-extern int func_002B4B70(int, int);
+extern int request_begin_slot(int, int, int, int, unsigned char *);
+extern int request_end_slot(int, int);
 extern void func_US2_002B5B38(void);
-extern void func_002B67E0(int, int);
-extern int func_002B7B18(int, int, int);
-extern short func_002B7CE0(int);
-extern void func_002B9000(void);
-extern void func_002C9C20(void);
+extern void snd_start_bank_load(int, int);
+extern int load_start_disc_read(int, int, int);
+extern short snd_pump_music_and_disc_read(int);
+extern void pad_poll_ports(void);
+extern void menu_reset_slots(void);
 extern void func_US2_002CB860(void);
 extern int func_US2_002EA0C0(void);
 extern void func_US2_002EB740(void);
 extern void func_US2_002ED260(void);
-extern void func_002EED08(void);
+extern void gfx_reset_buffer_slot_table(void);
 extern void func_US2_002F6E10(void);
-extern void func_002FC220(void), func_002FC280(void);
-extern void func_002FC3C0(unsigned long long);
-extern long long func_002FCB00(int, int, int, int);
+extern void gfx_swap_packet_buffer(void), SubmitBufferedDmaChain(void);
+extern void gfx_wait_for_dma_status_bits(unsigned long long);
+extern long long tex_upload_blocks_return_setup(int, int, int, int);
 
-static inline BootMemcard *Memcard(void) { BootMemcard *mc = D_001393E0; return mc; }
+static inline BootMemcard *Memcard(void) { BootMemcard *mc = g_memcard_state; return mc; }
 static inline int CardType(BootMemcard *mc) { return mc->card[0].type; }
 static inline int CardFormat(BootMemcard *mc) { return mc->card[0].format; }
 static inline int CardStatus(BootMemcard *mc) { return mc->card[0].status; }
@@ -121,67 +121,67 @@ void func_US2_0026EDE8(void)
     float time;
 
     D_001A8C88[0] = 1;
-    func_00290C60();
+    InitOnce();
     {
         LoaderMemory *memory = &D_001BAEC0;
-        LoaderDisc *disc = &D_0014B540;
-        func_002B7B18((int)memory->archive + 0x400000, disc->offset + disc->base, disc->count);
+        LoaderDisc *disc = &g_copy_setup_data;
+        load_start_disc_read((int)memory->archive + 0x400000, disc->offset + disc->base, disc->count);
     }
-    while (D_001393E0->state == 2 && D_001393E0->next_state < 0) {
+    while (g_memcard_state->state == 2 && g_memcard_state->next_state < 0) {
         func_US2_00299CF0();
-        func_00298178();
-        func_001261F0(0);
+        map_update_state_machine();
+        sceGsSyncV(0);
     }
-    while (D_001393E0->state != 2 || D_001393E0->next_state >= 0) {
+    while (g_memcard_state->state != 2 || g_memcard_state->next_state >= 0) {
         func_US2_00299CF0();
-        func_00298178();
-        func_001261F0(0);
+        map_update_state_machine();
+        sceGsSyncV(0);
     }
     for (;;) {
         if (!(CardType(Memcard()) != 2
               || (CardFormat(Memcard()) != 0 && CardStatus(Memcard()) < -1 && CardFree(Memcard()) < 475)))
             break;
         loaded = 1;
-        if (D_001393E0->state < 3 && D_001393E0->next_state < 0) {
-            if (D_001393E0->card[0].type != 2)
-                func_0026EAC8((int)D_01806380);
-            else if (D_001393E0->card[0].status != -4)
-                func_0026EAC8((int)D_0180DA80);
-            if (D_001393E0->next_state < 0) {
-                D_001393E0->next_state = 7;
-                D_001393E0->next_card = 0;
+        if (g_memcard_state->state < 3 && g_memcard_state->next_state < 0) {
+            if (g_memcard_state->card[0].type != 2)
+                gfx_draw_splash_screen_frame((int)D_01806380);
+            else if (g_memcard_state->card[0].status != -4)
+                gfx_draw_splash_screen_frame((int)D_0180DA80);
+            if (g_memcard_state->next_state < 0) {
+                g_memcard_state->next_state = 7;
+                g_memcard_state->next_card = 0;
             }
         }
-        func_002B9000();
+        pad_poll_ports();
         func_US2_00299CF0();
-        func_00298178();
+        map_update_state_machine();
         if (frames <= 119)
             frames++;
-        func_001261F0(0);
+        sceGsSyncV(0);
         if (frames >= 61) {
-            if (D_00138180.pressed & 0xFFFF0FFF)
+            if (g_pad_state.pressed & 0xFFFF0FFF)
                 break;
         }
     }
-    func_00290758();
+    level_init_systems();
     if (loaded) {
         int i;
-        func_0027D330(5);
+        FadeToBlack(5);
         for (i = 29; i >= 0; i--)
-            func_001261F0(0);
+            sceGsSyncV(0);
     }
     {
         LoaderMemory *memory = &D_001BAEC0;
-        func_002B7CE0(1);
-        func_0011AEA0(0);
+        snd_pump_music_and_disc_read(1);
+        FlushCache(0);
         func_US2_0029E308((int)memory->archive + 0x400000, (int)memory->archive);
-        func_0011AEA0(0);
-        func_002EED08();
+        FlushCache(0);
+        gfx_reset_buffer_slot_table();
         archive = memory->archive;
-        func_0026EA00(archive->offsets[0x50 / 4] + (int)archive);
+        ShowSplashImage(archive->offsets[0x50 / 4] + (int)archive);
         D_001A7280[2] = memory->archive;
         func_US2_00293138();
-        func_002B67E0(archive->offsets[8 / 4] + (int)archive, 0);
+        snd_start_bank_load(archive->offsets[8 / 4] + (int)archive, 0);
         {
             LoaderBank *bank = (LoaderBank *)(archive->offsets[0] + (int)archive);
             D_001B1604 = (char *)bank + bank->code + bank->size;
@@ -205,142 +205,142 @@ void func_US2_0026EDE8(void)
                 tables[i][j].data += (int)tables[i] - 8;
         }
     }
-    D_00254E78.count = counts[D_001A7BB0[4]];
-    D_001B1840 = tables[D_001A7BB0[4]];
+    g_subtitle_state.count = counts[D_001A7BB0[4]];
+    g_subtitle_entries = tables[D_001A7BB0[4]];
     image = (char *)(archive->offsets[0x10 / 4] + (int)archive);
     extra = (char *)(archive->offsets[0x60 / 4] + (int)archive);
     {
         int i;
         for (i = 44; i >= 0; i--)
-            func_001261F0(0);
+            sceGsSyncV(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     {
         int i;
         for (i = 29; i >= 0; i--)
-            func_001261F0(0);
+            sceGsSyncV(0);
     }
-    func_0026EA00(archive->offsets[0x58 / 4] + (int)archive);
+    ShowSplashImage(archive->offsets[0x58 / 4] + (int)archive);
     {
         LoaderSound *sound;
-        D_00189E20.enabled = 1;
-        sound = &D_001A63A8;
+        g_hero_state.enabled = 1;
+        sound = &g_music_state;
         D_001A8BBC[0] = 20;
         D_001B16A8[0] = 20;
         D_001B16AC[0] = (int)D_00238C80;
         sound->flag = 0;
-        D_001A8BB8[0] = -2;
-        D_001A8BB0[0] = 0;
-        D_001A8BB4[0] = 0;
+        g_requested_game_mode[0] = -2;
+        g_current_game_mode[0] = 0;
+        g_previous_game_mode[0] = 0;
         D_001B1684[0] = 0;
     }
     func_US2_002957C0();
-    func_0028AB70();
+    InitializeHudSlotsAndBuffers();
     func_US2_0029DB80();
-    func_002C9C20();
+    menu_reset_slots();
     {
         int i;
         for (i = 24; i >= 0; i--)
-            func_001261F0(0);
+            sceGsSyncV(0);
     }
-    func_0027D330(30);
+    FadeToBlack(30);
     frames = 1800;
     D_001B1598[0] = 0;
-    func_001261F0(0);
-    func_00284E80();
-    func_00133220();
+    sceGsSyncV(0);
+    gfx_query_display_buffer();
+    snd_set_current_buffer_flag();
     D_001A7478 = 3;
-    func_00288AA0((unsigned char *)&D_001BAD40, 0xB2);
-    func_00288BE8(&D_001BAD40);
+    req_push_queue((unsigned char *)&D_001BAD40, 0xB2);
+    req_launch_queued(&D_001BAD40);
     func_US2_002B5B38();
     while (!D_001A8B84[0]) {
-        D_001B1840 = tables[D_001A7BB0[4]];
-        D_00254E78.count = counts[D_001A7BB0[4]];
+        g_subtitle_entries = tables[D_001A7BB0[4]];
+        g_subtitle_state.count = counts[D_001A7BB0[4]];
         /* T1_COUNT, the timer-1 counter register. */
         D_001A7200 += T1_COUNT;
         T1_COUNT = 0;
-        func_00280710();
-        func_002FC280();
-        func_002FC220();
-        func_00284FC0();
-        func_00285338();
-        func_00284EA8();
-        func_00132028();
-        state = D_001A8BB0[0];
+        gfx_process_screen_copy_regions();
+        SubmitBufferedDmaChain();
+        gfx_swap_packet_buffer();
+        PutDrawBufferSmall();
+        gfx_queue_second_strip_packet();
+        gfx_append_draw_list_header();
+        snd_Pump();
+        state = g_current_game_mode[0];
         switch (state) {
         case -1:
         case 0:
-            if (D_001A8BB4[0] == 3 || frames >= 1800) {
+            if (g_previous_game_mode[0] == 3 || frames >= 1800) {
                 frames = 0;
-                func_0026EC58((unsigned short *)sequence);
+                menu_fill_shuffled_tile_table((unsigned short *)sequence);
                 D_001BAD40.active = 1;
                 D_001A7478 = 2;
                 D_001BAD40.sequence = sequence;
-                func_00288AA0((unsigned char *)&D_001BAD40, sequence[1]);
-                func_00288BE8(&D_001BAD40);
+                req_push_queue((unsigned char *)&D_001BAD40, sequence[1]);
+                req_launch_queued(&D_001BAD40);
             } else {
-                func_002FCB00((int)(image + 0x10), D_001A72D0[3], 512, 416);
-                func_002B49E0(3, 1, 6, 0, 0);
+                tex_upload_blocks_return_setup((int)(image + 0x10), D_001A72D0[3], 512, 416);
+                request_begin_slot(3, 1, 6, 0, 0);
             }
             break;
         case 1:
             func_US2_002F6E10();
             if (extra) {
                 int i;
-                func_0026EA00((int)extra);
+                ShowSplashImage((int)extra);
                 for (i = 29; i >= 0; i--)
-                    func_001261F0(0);
-                func_0027D330(30);
+                    sceGsSyncV(0);
+                FadeToBlack(30);
                 extra = 0;
             }
             break;
         case 3:
             frames++;
-            func_002B9000();
+            pad_poll_ports();
             if (D_00138320[0])
                 frames = 0;
             func_US2_002CB860();
             func_US2_0027CB80();
             if (frames >= 1800) {
                 frames = 0;
-                func_002B4B70(0, 0);
+                request_end_slot(0, 0);
             }
             break;
         case 4:
-            func_002B9000();
+            pad_poll_ports();
             func_US2_00287140();
             func_US2_0027CB08();
             break;
         case 6:
-            func_002B9000();
+            pad_poll_ports();
             func_US2_002EA0C0();
             func_US2_002EB740();
             break;
         default:
-            func_00282A28();
+            math_trap_always();
             break;
         }
-        if (D_001A8BB0[0] != state)
+        if (g_current_game_mode[0] != state)
             D_001B1684[0] = 0;
         else
             D_001B1684[0]++;
         func_US2_00299CF0();
-        func_00298178();
-        func_002FC3C0(1);
-        time = func_00283CE0(T1_COUNT);
-        D_001B168C = time * (D_001A7B90[0] ? 0.0000868055578f : 0.000104166669f);
-        func_0027B948();
+        map_update_state_machine();
+        gfx_wait_for_dma_status_bits(1);
+        time = IntToFloat(T1_COUNT);
+        D_001B168C = time * (g_is_pal_video[0] ? 0.0000868055578f : 0.000104166669f);
+        ResetGsRegistersPr();
         func_US2_002B5B38();
         D_001B1598[0]++;
-        func_001261F0(0);
+        sceGsSyncV(0);
     }
     if (D_001A7290[0] != D_001A7A10[4])
         func_US2_00292928(D_001A7A10[4]);
-    if (D_001A72C0[0] != (D_00239BA0 + D_00139568.index)->mode)
-        func_00292408((D_00239BA0 + D_00139568.index)->mode);
-    if (D_00152C00.audio != (D_001A7AF2[0] & 31))
-        func_002926B8(D_001A7AF2[0] & 31);
-    if (D_00152C00.format != (D_001A7AF0[0] & 3))
-        func_002925F0(D_001A7AF0[0] & 3);
+    if (D_001A72C0[0] != (g_weapon_table + g_item_slot_to_record.index)->mode)
+        LoadPackSingleTexture((g_weapon_table + g_item_slot_to_record.index)->mode);
+    if (g_hero_moby_default.audio != (D_001A7AF2[0] & 31))
+        LoadDiscTableTexture(D_001A7AF2[0] & 31);
+    if (g_hero_moby_default.format != (g_equipment_bits[0] & 3))
+        load_disc_table_entry_for_draw(g_equipment_bits[0] & 3);
     func_US2_002ED260();
 }

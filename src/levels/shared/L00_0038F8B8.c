@@ -8,23 +8,23 @@ typedef struct {
     char pad2298[4]; int state; char pad22A0[0x1C]; u8 busy; char pad22BD[0x22F];
     s16 platform; char pad24EE[0x46]; int cooldown; char pad2538[8];
 } TetherLaunchHero;
-extern TetherLaunchHero D_00189E20;
+extern TetherLaunchHero g_hero_state;
 extern LaunchStats D_0018C360;
 extern int D_L00_001A8F00[] __attribute__((sda)), D_L00_001A8F08[] __attribute__((sda));
 typedef struct { char pad00[0x1A4]; u32 buttons; } LaunchInput;
-extern LaunchInput D_00138180;
+extern LaunchInput g_pad_state;
 extern u32 D_001A7390 MACRO_ADDR;
-extern u32 D_001A79F0[] __attribute__((sda));
-extern char *D_L00_001B8E10;
-extern int func_00282948(int *), func_L00_002D3F30(int, int);
-extern float func_00282E20(void *), func_00283248(float, float);
-extern void func_002AF000(float *, float, float, float), func_00282CC0(void *, void *, void *);
-extern void func_002A7470(void *, int, int, int), func_L00_002F46C8(void);
-extern char *func_L00_00390FF8(char *, char *, float, float);
-extern int func_002E5CF8(int, int, char *);
+extern u32 g_current_map_index[] __attribute__((sda));
+extern char *g_follow_camera_object;
+extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
+extern float vec_length_xy(void *), mat_fast_helper_a(float, float);
+extern void vec_build_spherical_offset(float *, float, float, float), FastVecAdd(void *, void *, void *);
+extern void anim_start_blended(void *, int, int, int), level_start_timed_object_once(void);
+extern char *visibomb_create_missile(char *, char *, float, float);
+extern int PlayMobySound(int, int, char *);
 /* Starts the tether when the shared input and movement gates permit it. */
 /* Per-frame update of the Visibomb Gun moby. */
-void func_L00_0038F8B8(char *actor) {
+void visibomb_gun_update(char *actor) {
     int *state;
     int ready;
     float point[4];
@@ -33,37 +33,37 @@ void func_L00_0038F8B8(char *actor) {
     if (!actor) return;
     state = *(int **)(actor + 0x68);
     ready = 1;
-    FastFloatHelperD(state);
-    if (gHeroState.level == 29) { if (!FastFloatHelperD(&gHeroState.cooldown)) ready = 0; }
-    else gHeroState.cooldown = 40;
-    if (D_L00_001A8F00[0] || D_L00_001A8F08[0] != -2 || !(gPadState.buttons & gHeroState.buttons) || state[0] || state[1] || gHeroState.busy) goto finish;
-    if (gHeroState.state == 7 || gHeroState.state == 2 || gHeroState.state == 3 || gHeroState.state == 4 || gHeroState.state == 5 || gHeroState.state == 6 || gHeroState.state == 16 || gHeroState.state == 14 || gHeroState.state == 9 || gHeroState.state == 10 || gHeroState.state == 11 || gHeroState.state >= 13 || gHeroState.level == 111 || gHeroState.level == 98) goto finish;
-    if ((gFollowCameraObject && *(short *)(gFollowCameraObject + 0x86) == 5) || !gHeroState.grounded || gHeroState.resource < 23) goto finish;
-    if (gHeroState.support && (*(short *)(gHeroState.support + 0xAA) == 0x13E /* moby class 318 */ || *(short *)(gHeroState.support + 0xAA) == 0x46F /* Teleporter */) && ready) goto finish;
-    if (!SpendWeaponAmmo(-1, 1)) goto denied;
+    math_fast_float_d(state);
+    if (g_hero_state.level == 29) { if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0; }
+    else g_hero_state.cooldown = 40;
+    if (D_L00_001A8F00[0] || D_L00_001A8F08[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
+    if (g_hero_state.state == 7 || g_hero_state.state == 2 || g_hero_state.state == 3 || g_hero_state.state == 4 || g_hero_state.state == 5 || g_hero_state.state == 6 || g_hero_state.state == 16 || g_hero_state.state == 14 || g_hero_state.state == 9 || g_hero_state.state == 10 || g_hero_state.state == 11 || g_hero_state.state >= 13 || g_hero_state.level == 111 || g_hero_state.level == 98) goto finish;
+    if ((g_follow_camera_object && *(short *)(g_follow_camera_object + 0x86) == 5) || !g_hero_state.grounded || g_hero_state.resource < 23) goto finish;
+    if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E /* moby class 318 */ || *(short *)(g_hero_state.support + 0xAA) == 0x46F /* Teleporter */) && ready) goto finish;
+    if (!weapon_spend_ammo(-1, 1)) goto denied;
     pitch = 0.0f;
-    heading = gHeroState.heading;
-    if (gHeroState.platform == 1 || gHeroState.special) {
-        pitch = FastMatrixHelperA(vec_length_xy(actor + 0xD0), *(float *)(actor + 0xD8));
-        BuildSphericalOffset(point, 0.6f, heading, -pitch);
+    heading = g_hero_state.heading;
+    if (g_hero_state.platform == 1 || g_hero_state.special) {
+        pitch = mat_fast_helper_a(vec_length_xy(actor + 0xD0), *(float *)(actor + 0xD8));
+        vec_build_spherical_offset(point, 0.6f, heading, -pitch);
         FastVecAdd(point, point, actor + 0x10);
     } else {
-        BuildSphericalOffset(point, 0.6f, heading, -pitch);
+        vec_build_spherical_offset(point, 0.6f, heading, -pitch);
         FastVecAdd(point, point, actor + 0x10);
     }
-    if (*(u8 *)(actor + 0x43) != 3) StartAnimationBlended(actor, 3, 0, 0);
-    StartTimedObjectOnce();
-    *(char **)(state + 1) = CreateVisibombMissile(actor, (char *)point, heading, pitch);
+    if (*(u8 *)(actor + 0x43) != 3) anim_start_blended(actor, 3, 0, 0);
+    level_start_timed_object_once();
+    *(char **)(state + 1) = visibomb_create_missile(actor, (char *)point, heading, pitch);
     if (D_0018C360.launches < 0xFFFF) D_0018C360.launches++;
     now = D_001A7390;
     if (D_0018C360.bestTime < now) D_0018C360.bestTime = now;
-    D_0018C360.mask |= 1U << gCurrentMapIndex[0];
+    D_0018C360.mask |= 1U << g_current_map_index[0];
     D_0018C360.mask |= 0x80000000;
     state[0] = 60;
     goto finish;
 denied:
-    if (gPadState.buttons & gHeroState.buttons) PlayMobySound(0, 0, actor);
+    if (g_pad_state.buttons & g_hero_state.buttons) PlayMobySound(0, 0, actor);
 finish:
-    if ((*(u8 *)(actor + 0x60) & 2) && *(u8 *)(actor + 0x43) != 1) StartAnimationBlended(actor, 1, 0, 0);
+    if ((*(u8 *)(actor + 0x60) & 2) && *(u8 *)(actor + 0x43) != 1) anim_start_blended(actor, 1, 0, 0);
     *(u16 *)(actor + 0x34) |= 4;
 }

@@ -33,17 +33,17 @@ typedef struct {
     int flags;
     Vector position, pad30, normal;
 } Collision;
-extern Collision D_L00_001BF200;
+extern Collision g_collision_result;
 extern int D_L00_001A8FF0;
 extern Vector D_L00_001A8F20 __attribute__((sda)) NOT_SDA;
-extern char *D_L00_001C3280[];
+extern char *g_area_hit_targets[];
 extern unsigned char D_00139587 NOT_SDA;
 typedef struct {
     unsigned char pad[0x74];
     float damage;
     unsigned char rest[0x68];
 } DamageTableRow;
-extern DamageTableRow D_L00_00262570[];
+extern DamageTableRow g_weapon_l00_table[];
 extern Color D_L00_001B0920;
 extern float D_L00_001B0900 __attribute__((sda));
 extern int D_L00_001B0904 __attribute__((sda));
@@ -51,37 +51,37 @@ extern float D_L00_001B0908 __attribute__((sda));
 extern float D_L00_001B090C __attribute__((sda));
 extern float D_L00_001B0918 __attribute__((sda));
 extern float D_L00_001B091C __attribute__((sda));
-extern int func_00277258(Vector *, int, char *, float);
-extern int func_00282948(int *);
-extern int func_00282978(short *);
-extern void func_00282CC0(Vector *, const Vector *, const Vector *);
-extern void func_00282CF0(Vector *, const Vector *, const Vector *);
-extern void func_L00_003252A8(void *, void *, int);
-extern void func_00282D30(Vector *, const Vector *, float);
-extern float func_00282DB0(const Vector *, const Vector *);
-extern void func_L00_0031D670(Vector *, const Vector *, const Vector *, float);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern char *func_002BDCE8(Vector *, float, float, float, int, const Vector *, float, int, int);
-extern int func_002761F8(Vector *, Vector *, int, char *, int);
-extern void func_00282F20(Vector *, const Vector *, float);
-extern void func_00283028(Vector *, const Vector *, const Vector *);
-extern int func_002E5CF8(int, int, char *);
-extern void func_00282F70(Vector *, const Vector *, float);
-extern float func_00282E20(const Vector *);
-extern void func_003001E0(Vector *, const Vector *, const Vector *);
-extern int func_00283CF0(float);
-extern void func_00300190(void *, void *);
-extern int func_002E5DA0(int, int, char *, int);
-extern void func_002ABBB8(void *, float, void *, float, void *, int, int, int,
+extern int coll_test_point(Vector *, int, char *, float);
+extern int math_fast_float_d(int *);
+extern int FastDecTimer(short *);
+extern void FastVecAdd(Vector *, const Vector *, const Vector *);
+extern void FastVecSub(Vector *, const Vector *, const Vector *);
+extern void moby_forward_position_call(void *, void *, int);
+extern void FastVecScale(Vector *, const Vector *, float);
+extern float FastVecDot(const Vector *, const Vector *);
+extern void LerpVector4(Vector *, const Vector *, const Vector *, float);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern char *SpawnSpinningSparkParticle(Vector *, float, float, float, int, const Vector *, float, int, int);
+extern int CollLine(Vector *, Vector *, int, char *, int);
+extern void vec_scale_to_length(Vector *, const Vector *, float);
+extern void vec_fast_normalize(Vector *, const Vector *, const Vector *);
+extern int PlayMobySound(int, int, char *);
+extern void vec_fast_normalize_helper(Vector *, const Vector *, float);
+extern float vec_length_xy(const Vector *);
+extern void vec_add_transformed_or_copy(Vector *, const Vector *, const Vector *);
+extern int FloatToInt(float);
+extern void vec_transform_or_copy(void *, void *);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern void SpawnExplosionEffects(void *, float, void *, float, void *, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern void func_002A8BD0(char *, int, int, float);
-extern int func_00277F48(Vector *, int, char *, DamageRequest *, float);
-extern int func_00334160(char *, int, int);
-extern void func_0029F338(void *);
-extern float func_00283B98(float, float);
+extern void part_init_effect_record(char *, int, int, float);
+extern int coll_process_hit(Vector *, int, char *, DamageRequest *, float);
+extern int weapon_start_health_drain(char *, int, int);
+extern void moby_mark_spawned(void *);
+extern float FastAddRotations(float, float);
 
-void func_L00_003F4210(char *object)
+void UpdateBouncingExplosive(char *object)
 {
     union {
         DamageRequest request;
@@ -96,16 +96,16 @@ void func_L00_003F4210(char *object)
     int red, green, blue;
     float speed, fade, damage, dot, minimum;
 
-    if (TestPointAgainstCollision((Vector *)(object + 0x10), 0, object, 0.64999998f) != 0 &&
+    if (coll_test_point((Vector *)(object + 0x10), 0, object, 0.64999998f) != 0 &&
         D_L00_001BF218 != 0 && D_L00_001BF218 != state->owner)
         *(unsigned char *)(object + 0x20) = 3;
-    if (FastFloatHelperD(&state->timer) != 0)
+    if (math_fast_float_d(&state->timer) != 0)
         *(unsigned char *)(object + 0x20) = 3;
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
     case 1:
         FastVecAdd(&scratch.motion.end, (Vector *)(object + 0x10), (&state->velocity));
-        ForwardObjectPositionCall(object, &scratch.motion.normal, 0);
+        moby_forward_position_call(object, &scratch.motion.normal, 0);
         FastVecScale(&scratch.motion.scaled, &scratch.motion.normal, state->velocity.v[3]);
         FastVecAdd((&state->velocity), (&state->velocity), &scratch.motion.scaled);
         if (D_L00_001A8FF0 != 0) {
@@ -126,8 +126,8 @@ void func_L00_003F4210(char *object)
                 QuadWord copy = ((Vector *)(object + 0x10))->word;
                 temporary.word = copy;
                 LerpVector4(&point, &temporary, &scratch.motion.end, (float)i * third);
-                spin = RandomIntBelow(6);
-                if (RandomIntBelow(2) != 0) spin = -spin;
+                spin = math_random_int_below(6);
+                if (math_random_int_below(2) != 0) spin = -spin;
                 fade = IntToFloat(D_L00_001B0904);
                 life = (float)state->particle_timer;
                 life /= fade;
@@ -144,28 +144,28 @@ void func_L00_003F4210(char *object)
             }
         }
         if (CollLine((Vector *)(object + 0x10), &scratch.motion.end, 0, object, 0) != 0 &&
-            (gCollisionResult.owner == 0 || gCollisionResult.owner != state->owner))
-            qcopy((Vector *)(object + 0x10), &gCollisionResult.position);
+            (g_collision_result.owner == 0 || g_collision_result.owner != state->owner))
+            qcopy((Vector *)(object + 0x10), &g_collision_result.position);
         else
             qcopy((Vector *)(object + 0x10), &scratch.motion.end);
         if (D_L00_001A8FF0 != 0) {
-            FastVecSub(&point, (Vector *)(object + 0x10), &gCollisionResult.position);
+            FastVecSub(&point, (Vector *)(object + 0x10), &g_collision_result.position);
             crossed = FastVecDot(&point, &scratch.motion.normal) > 0.0f;
         } else {
-            crossed = ((Vector *)(object + 0x10))->v[2] - gCollisionResult.position.v[2] < 0.0f;
+            crossed = ((Vector *)(object + 0x10))->v[2] - g_collision_result.position.v[2] < 0.0f;
         }
-        if (TestPointAgainstCollision((Vector *)(object + 0x10), 0, object, D_L00_001B0900) == 0) break;
+        if (coll_test_point((Vector *)(object + 0x10), 0, object, D_L00_001B0900) == 0) break;
         if (*(unsigned char *)(object + 0x20) != 0 && !crossed) break;
-        if (gCollisionResult.owner != 0 && gCollisionResult.owner == state->owner) break;
-        vec_scale_to_length(&point, &gCollisionResult.normal, D_L00_001B0900);
-        FastVecAdd((Vector *)(object + 0x10), &gCollisionResult.position, &point);
-        FastVectorNormalize((&state->velocity), (&state->velocity), &gCollisionResult.normal);
+        if (g_collision_result.owner != 0 && g_collision_result.owner == state->owner) break;
+        vec_scale_to_length(&point, &g_collision_result.normal, D_L00_001B0900);
+        FastVecAdd((Vector *)(object + 0x10), &g_collision_result.position, &point);
+        vec_fast_normalize((&state->velocity), (&state->velocity), &g_collision_result.normal);
         PlayMobySound(1, 0, object);
         if (*(unsigned char *)(object + 0x20) == 0) {
             *(unsigned char *)(object + 0x20) = 3;
             ++state->bounces;
             if (state->bounces == 1) {
-                FastVectorNormalizeHelper((&state->velocity), (&state->velocity), D_L00_001B091C * 0.016666668f);
+                vec_fast_normalize_helper((&state->velocity), (&state->velocity), D_L00_001B091C * 0.016666668f);
                 if (D_L00_001A8FF0 != 0) {
                     dot = FastVecDot((&state->velocity), &scratch.motion.normal);
                     FastVecScale(&temporary, &scratch.motion.normal, -dot);
@@ -175,13 +175,13 @@ void func_L00_003F4210(char *object)
                 } else {
                     state->velocity.v[2] *= D_L00_001B0918;
                 }
-                AddTransformedVectorOrCopy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
+                vec_add_transformed_or_copy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
             } else {
                 FastVecScale(&temporary, (&state->velocity), D_L00_001B0918);
                 speed = vec_length_xy(&temporary);
                 minimum = D_L00_001B0908 * 0.016666668f;
                 if (speed < minimum) {
-                    FastVectorNormalizeHelper((&state->velocity), (&state->velocity), minimum);
+                    vec_fast_normalize_helper((&state->velocity), (&state->velocity), minimum);
                     if (D_L00_001A8FF0 != 0) {
                         dot = FastVecDot((&state->velocity), &scratch.motion.normal);
                         FastVecScale(&vertical, &scratch.motion.normal, -dot);
@@ -191,7 +191,7 @@ void func_L00_003F4210(char *object)
                     } else {
                         state->velocity.v[2] *= D_L00_001B0918;
                     }
-                    AddTransformedVectorOrCopy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
+                    vec_add_transformed_or_copy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
                 } else {
                     qcopy((&state->velocity), &temporary);
                 }
@@ -213,7 +213,7 @@ void func_L00_003F4210(char *object)
                     state->velocity.v[3] = min;
             }
             vec_scale_to_length((&state->velocity), (&state->velocity), state->velocity.v[3]);
-            AddTransformedVectorOrCopy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
+            vec_add_transformed_or_copy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
             state->fade_scale = 1.0f / IntToFloat(state->timer);
         }
         break;
@@ -237,28 +237,28 @@ void func_L00_003F4210(char *object)
         }
         vec_scale_to_length((&state->velocity), (&state->velocity), state->velocity.v[3]);
         FastVecAdd((Vector *)(object + 0x10), (Vector *)(object + 0x10), (&state->velocity));
-        TransformVectorOrCopy((Vector *)(object + 0x10), (Vector *)(object + 0x10));
+        vec_transform_or_copy((Vector *)(object + 0x10), (Vector *)(object + 0x10));
         break;
     case 3:
-        damage = ((DamageTableRow *)(D_00139587 * 0xe0 + (int)gWeaponTable_L00))->damage;
-        PlaySoundFromClassBank(5, 0, object, 0xb02);
+        damage = ((DamageTableRow *)(D_00139587 * 0xe0 + (int)g_weapon_l00_table))->damage;
+        snd_play_from_class_bank(5, 0, object, 0xb02);
         SpawnExplosionEffects(object, 0.0f, (&state->velocity), 0.0f, (Vector *)(object + 0x10), 5, 2, 4,
                      6.0f, 2.0f, 9.0f, 1.0f, 0, 15.0f, 1, 1, -1, 0, 0x810001);
-        InitEffectRecord_002A8BD0((char *)&scratch.request, (int)object, 0x810000, damage);
+        part_init_effect_record((char *)&scratch.request, (int)object, 0x810000, damage);
         scratch.request.enabled = 2;
         scratch.request.kind = 1;
         scratch.request.object_class = *(unsigned short *)(object + 0xaa);
-        count = ProcessCollisionHit((Vector *)(object + 0x10), 0x10, object, &scratch.request, 6.0f);
+        count = coll_process_hit((Vector *)(object + 0x10), 0x10, object, &scratch.request, 6.0f);
         if (count > 0) {
         int remaining = count;
-        hit = gAreaHitTargets;
+        hit = g_area_hit_targets;
         do {
-            StartHealthDrainOnTarget(*hit, 61, *(int *)(object + 0xb8));
+            weapon_start_health_drain(*hit, 61, *(int *)(object + 0xb8));
             ++hit;
             --remaining;
         } while (remaining != 0);
         }
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
     if (*(unsigned char *)(object + 0x20) < 2) speed = vec_length_xy(&state->velocity);

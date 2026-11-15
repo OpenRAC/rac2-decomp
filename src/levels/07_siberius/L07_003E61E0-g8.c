@@ -13,154 +13,154 @@ extern float D_L07_001B0AF8 __attribute__((sda));
 extern float D_L07_001B0AFC __attribute__((sda));
 extern float D_L07_001B0B00 __attribute__((sda));
 extern struct Choice61 {int a, b, c, d;} D_L07_001B0B08;
-extern int func_L07_003E69B8(void *);
-extern void func_L07_003E7240(void *);
-extern void func_L07_003E6E00(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002A7820(int, int);
-extern void func_L00_00424A08(int, float, float);
-extern void func_L00_00424A50(float, float);
-extern int func_002B3890(void *);
-extern void func_002B60B0(void *, float, float, float, float);
-extern int func_002B1C20(void *, void *);
-extern void func_0029F338(void *);
-extern int func_002B3868(void *);
-extern void func_002A7470(void *, int, int, int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L01_00321178(void *, void *);
-extern int func_002A77E0(int);
-extern void func_L02_00332630(void *, void *);
-extern float func_00283248(float, float);
-extern int func_L02_00331440(void *, void *, int, float, float, float);
-extern void func_002B4FF0(void *, void *, float);
-extern float func_00282E80(void *, void *);
-extern float func_0029F530(void *);
-extern void func_L01_00322288(void *, float);
-extern int func_002A8C28(void *, void *, int, float, float, int, float, int, int);
-extern float func_00283C80(float, float);
-extern int func_002A8508(int, int);
+extern int shooter_entity_base_update(void *);
+extern void entity_spawn_death_effects(void *);
+extern void entity_finish_update(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_range(int, int);
+extern void follow_camera_set_distance(int, float, float);
+extern void follow_camera_set_height(float, float);
+extern int flag_set_second_pending(void *);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern int moby_dispatch_action_by_kind(void *, void *);
+extern void moby_mark_spawned(void *);
+extern int flag_set_first_pending(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern int moby_l01_turn_toward_target(void *, void *);
+extern int math_random_int_below(int);
+extern void moby_check_target_point_from_offset(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern int moby_move_to_target_temp_limits(void *, void *, int, float, float, float);
+extern void moby_turn_toward_target_and_step(void *, void *, float);
+extern float vec_distance_xy(void *, void *);
+extern float moby_get_anim_value(void *);
+extern void moby_start_effect_from_entry(void *, float);
+extern int coll_sweep_from_object(void *, void *, int, float, float, int, float, int, int);
+extern float FastDiffRots(float, float);
+extern int moby_count_group_not_in_state(int, int);
 
 /* Update the entity's submode, movement target and timed attack actions. */
-void func_L07_003E61E0(char *actor)
+void UpdateSiberiusEntityActions(char *actor)
 {
     char *state = *(char **)(actor + 0x68);
     float time;
     int result;
     int choices[4];
     if (D_L07_001B1E08 >= 2 && D_L07_001C9780 != I(state, 0x350)) return;
-    if (InitAndUpdateShooterEntityBase(actor)) goto cleanup;
+    if (shooter_entity_base_update(actor)) goto cleanup;
     {
         switch (B(actor, 0x95)) {
         case 0:
-            if (I(state, 0x2D4) == 1) {SetMobyState(actor, 6, 2); break;}
+            if (I(state, 0x2D4) == 1) {moby_set_state(actor, 6, 2); break;}
             if (I(state, 0x2D0)) {
-                SetMobyState(actor, 3, 1);
+                moby_set_state(actor, 3, 1);
                 I(state, 0x2D0) = 0;
-                if (I(state, 0x344) < 300) I(state, 0x344) = RandomIntRange(480, 600);
+                if (I(state, 0x344) < 300) I(state, 0x344) = math_random_int_range(480, 600);
             }
             break;
         case 1:
-            if (I(state, 0x2D4) == 1) SetMobyState(actor, 6, 2);
+            if (I(state, 0x2D4) == 1) moby_set_state(actor, 6, 2);
             break;
         case 2:
             follow_camera_set_distance(0, D_L07_001B0AFC, 0.003f);
             follow_camera_set_height(D_L07_001B0B00, 0.003f);
-            if (SetSecondPendingFlag(actor))
-                SetControllerSpeedLimits(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
+            if (flag_set_second_pending(actor))
+                moby_set_controller_speed_limits(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
             if (I(state, 0x2D4) != 1 && B(actor, 0x20) != 7) {
-                if (I(state, 0x338)) SetMobyState(actor, 3, 1);
-                else SetMobyState(actor, 4, 1);
-                I(state, 0x344) = RandomIntRange(580, 600);
+                if (I(state, 0x338)) moby_set_state(actor, 3, 1);
+                else moby_set_state(actor, 4, 1);
+                I(state, 0x344) = math_random_int_range(580, 600);
             }
             break;
         case 3:
-            result = DispatchActionByKind(actor, state + 0x140);
+            result = moby_dispatch_action_by_kind(actor, state + 0x140);
             if (result & 1) {
-                SpawnEntityDeathEffects(actor);
+                entity_spawn_death_effects(actor);
 cleanup:
                 /* The initialization helper also reaches this shared cleanup. */
-                MarkMobySpawned(actor);
+                moby_mark_spawned(actor);
                 return;
             }
-            if (result & 2) {SetMobyState(actor, 7, 2);I(state, 0x344) = RandomIntRange(580, 600);}
+            if (result & 2) {moby_set_state(actor, 7, 2);I(state, 0x344) = math_random_int_range(580, 600);}
             break;
         }
     }
     switch (B(actor, 0x20)) {
     case 1:
-        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 2) StartAnimationBlended(actor, 2, 0, 20);
-        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) SetMobyState(actor, 2, -1);
+        if (flag_set_first_pending(actor) && B(actor, 0x43) != 2) anim_start_blended(actor, 2, 0, 20);
+        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) moby_set_state(actor, 2, -1);
         break;
     case 2: {
         float radius, angle;
-        if (SetFirstPendingFlag(actor)) {
-            if (B(actor, 0x43) != 8) StartAnimationBlended(actor, 8, 0, 20);
-            radius = RandomFloatRange(0, 5);
-            angle = RandomAngle();
-            F(state, 0x300) = FastSinOrCosA(angle)*radius;
-            F(state, 0x304) = FastSinOrCosB(angle)*radius;
+        if (flag_set_first_pending(actor)) {
+            if (B(actor, 0x43) != 8) anim_start_blended(actor, 8, 0, 20);
+            radius = math_random_float_range(0, 5);
+            angle = math_random_angle();
+            F(state, 0x300) = math_fast_sin_or_cos_a(angle)*radius;
+            F(state, 0x304) = math_fast_sin_or_cos_b(angle)*radius;
             F(state, 0x308) = 0;
             FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
-        result = TurnMobyTowardTarget(actor, state + 0x300);
-        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) SetMobyState(actor, 1, -1);
+        result = moby_l01_turn_toward_target(actor, state + 0x300);
+        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) moby_set_state(actor, 1, -1);
         break;
     }
     case 3:
-        if (SetFirstPendingFlag(actor)) {
+        if (flag_set_first_pending(actor)) {
             *(struct Choice61 *)choices = D_L07_001B0B08;
-            if (B(actor, 0x43) != choices[RandomIntBelow(4)]) StartAnimationBlended(actor, choices[RandomIntBelow(4)], 0, 20);
+            if (B(actor, 0x43) != choices[math_random_int_below(4)]) anim_start_blended(actor, choices[math_random_int_below(4)], 0, 20);
         }
-        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) SetMobyState(actor, 4, -1);
+        if ((B(actor, 0x60) & 2) && !I(state, 0x338)) moby_set_state(actor, 4, -1);
         break;
     case 4: {
         float radius, angle;
-        if (SetFirstPendingFlag(actor)) {
-            if (B(actor, 0x43) != 8) StartAnimationBlended(actor, 8, 0, 20);
-            radius = RandomFloatRange(0, 3);
-            angle = RandomAngle();
-            F(state, 0x300) = FastSinOrCosA(angle)*radius;
-            F(state, 0x304) = FastSinOrCosB(angle)*radius;
+        if (flag_set_first_pending(actor)) {
+            if (B(actor, 0x43) != 8) anim_start_blended(actor, 8, 0, 20);
+            radius = math_random_float_range(0, 3);
+            angle = math_random_angle();
+            F(state, 0x300) = math_fast_sin_or_cos_a(angle)*radius;
+            F(state, 0x304) = math_fast_sin_or_cos_b(angle)*radius;
             F(state, 0x308) = 0;
             FastVecAdd(state + 0x300, state + 0x300, state + 0x2F0);
         }
-        CheckTargetPointFromOffset(actor, state + 0x210);
-        angle = FastMatrixHelperA(F(state, 0x300)-F(actor, 0x10), F(state, 0x304)-F(actor, 0x14));
-        result = MoveToTargetWithTempLimits(actor, state + 0x300, 16, angle, -1, -1);
-        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) SetMobyState(actor, 3, -1);
+        moby_check_target_point_from_offset(actor, state + 0x210);
+        angle = mat_fast_helper_a(F(state, 0x300)-F(actor, 0x10), F(state, 0x304)-F(actor, 0x14));
+        result = moby_move_to_target_temp_limits(actor, state + 0x300, 16, angle, -1, -1);
+        if (result == 128 || (I(state, 0xD0) && H(actor, 0x96) > 40) || H(actor, 0x96) > 180) moby_set_state(actor, 3, -1);
         break;
     }
     case 6:
-        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 11) StartAnimationBlended(actor, 11, 0, 20);
-        TurnTowardTargetAndStepMovement(actor, state + 0x210, 0);
-        if (vec_distance_xy(actor + 0x10, state + 0x210) < D_L07_001B0AE8) SetMobyState(actor, 7, -1);
+        if (flag_set_first_pending(actor) && B(actor, 0x43) != 11) anim_start_blended(actor, 11, 0, 20);
+        moby_turn_toward_target_and_step(actor, state + 0x210, 0);
+        if (vec_distance_xy(actor + 0x10, state + 0x210) < D_L07_001B0AE8) moby_set_state(actor, 7, -1);
         break;
     case 7:
-        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 12) StartAnimationBlended(actor, 12, 5, 10);
-        time = GetMobyAnimationValue(actor);
-        if (time < 19) StartMobyEffectFromEntry(actor, FastMatrixHelperA(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14)));
+        if (flag_set_first_pending(actor) && B(actor, 0x43) != 12) anim_start_blended(actor, 12, 5, 10);
+        time = moby_get_anim_value(actor);
+        if (time < 19) moby_start_effect_from_entry(actor, mat_fast_helper_a(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14)));
         else if (time<=22) {
-            SweepCollisionFromObject(actor, *(char **)(state + 0x330)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
-            SweepCollisionFromObject(actor, *(char **)(state + 0x334)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
+            coll_sweep_from_object(actor, *(char **)(state + 0x330)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
+            coll_sweep_from_object(actor, *(char **)(state + 0x334)+0x10, 1, 0.333f, (float)B(state, 0x34), 0, 1.0f, 1, 0);
         }
         if (B(actor, 0x60) & 2) {
             time = vec_distance_xy(actor + 0x10, state + 0x210);
             if (D_L07_001B0AE8+0.5f < time ||
-                FastDiffRots(F(actor, 0xF8), FastMatrixHelperA(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
-                SetMobyState(actor, 6, -1);
+                FastDiffRots(F(actor, 0xF8), mat_fast_helper_a(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
+                moby_set_state(actor, 6, -1);
         }
         break;
     case 9:
-        if (!CountMobysInGroupNotInState(I(state, 0x2B8), -1) || F(state, 0x20) < *(short *)(state + 0x24)) SetMobyState(actor, 10, -1);
+        if (!moby_count_group_not_in_state(I(state, 0x2B8), -1) || F(state, 0x20) < *(short *)(state + 0x24)) moby_set_state(actor, 10, -1);
         break;
     case 10:
-        if (SetFirstPendingFlag(actor) && B(actor, 0x43) != 1) StartAnimationBlended(actor, 1, 0, 2);
-        if (B(actor, 0x60) & 2) SetMobyState(actor, 6, -1);
+        if (flag_set_first_pending(actor) && B(actor, 0x43) != 1) anim_start_blended(actor, 1, 0, 2);
+        if (B(actor, 0x60) & 2) moby_set_state(actor, 6, -1);
         break;
     }
-    FinishEntityUpdate(actor);
+    entity_finish_update(actor);
 }

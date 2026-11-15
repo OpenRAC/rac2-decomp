@@ -18,18 +18,18 @@ typedef struct {
     TI128 axis;
 } Frame;
 
-extern unsigned long func_0027C878(int);
+extern unsigned long GetEffectTextureDescriptor(int);
 extern void ref_0031A158_00(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 extern char ref_0031A158_01[];
 
 /* Fills an effect packet (texture 14, corners from the state block's two reference points) and draws it. */
-void func_0031A158(char *obj)
+void gfx_draw_beam_between_points(char *obj)
 {
     Frame f;
     char *st = *(char **)(obj + 0x68);

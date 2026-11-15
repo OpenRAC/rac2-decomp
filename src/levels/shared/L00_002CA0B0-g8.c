@@ -21,77 +21,77 @@ typedef struct {
     unsigned char pad17[0x24B8 - 0x24A4]; float timer;
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 
 typedef struct { float start, end, reserved0, reserved1; } AnimationRange;
 /* The same table from its first end field; retail reaches these through an absolute address. */
 extern float D_L00_001A7DAC[][4] MACRO_ADDR;
 extern AnimationRange animation_ranges[2] SDATA(D_L00_001A7DA8);
 extern int D_L00_001A7DC8[2][2] SDATA(D_L00_001A7DC8);
-extern void func_L00_002D2168(int, int, float);
+extern void set_hero_animation(int, int, float);
 
 /* Sets the animation scale. Mode 1 scales from field_170. With both 0x1454 flags set it plays
  * animation 20 and clamps a scale from the time. Otherwise it moves frame to the range holding the
  * time, restarts the animation at the matching frame when frame changes (the table gives an
  * offset per old and new frame), and clamps a scale chosen by frame. */
-void func_L00_002CA0B0(void)
+void hero_update_anim_scale(void)
 {
     float limit;
     int old;
-    if (gHeroState.mode_22b4 == 1) {
-        gHeroState.animation_scale = gHeroState.field_170 * 90.0f;
-        if (gHeroState.animation_scale < 0.5f) gHeroState.animation_scale = 0.5f;
+    if (g_hero_state.mode_22b4 == 1) {
+        g_hero_state.animation_scale = g_hero_state.field_170 * 90.0f;
+        if (g_hero_state.animation_scale < 0.5f) g_hero_state.animation_scale = 0.5f;
         return;
     }
-    if (gHeroState.flag_1454 != 0 && gHeroState.flag_1456 != 0) {
-        if (((unsigned char *)gHeroState.object)[0x43] != 20)
+    if (g_hero_state.flag_1454 != 0 && g_hero_state.flag_1456 != 0) {
+        if (((unsigned char *)g_hero_state.object)[0x43] != 20)
             set_hero_animation(20, 0, 11.0f);
-        gHeroState.animation_scale = gHeroState.animation_time * 25.0f;
-        if (gHeroState.animation_scale < 0.7f) gHeroState.animation_scale = 0.7f;
-        if (2.2f < gHeroState.animation_scale) gHeroState.animation_scale = 2.2f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 25.0f;
+        if (g_hero_state.animation_scale < 0.7f) g_hero_state.animation_scale = 0.7f;
+        if (2.2f < g_hero_state.animation_scale) g_hero_state.animation_scale = 2.2f;
         return;
     }
-    if (((unsigned char *)gHeroState.object)[0x43] == 20) {
-        set_hero_animation(gHeroState.frame + 3, 0, 7.0f);
-    } else if (gHeroState.count_1c0 > 4 && gHeroState.flag_40e == 0) {
-        float time = gHeroState.animation_time;
+    if (((unsigned char *)g_hero_state.object)[0x43] == 20) {
+        set_hero_animation(g_hero_state.frame + 3, 0, 7.0f);
+    } else if (g_hero_state.count_1c0 > 4 && g_hero_state.flag_40e == 0) {
+        float time = g_hero_state.animation_time;
         float start;
         int before_range;
-        old = gHeroState.frame;
+        old = g_hero_state.frame;
         start = animation_ranges[old].start * 0.01666666753590107f;
         before_range = time < start;
         if (before_range || D_L00_001A7DAC[old][0] * 0.01666666753590107f < time) {
             if (before_range) {
                 if (time < start) {
                     do {
-                        --gHeroState.frame;
-                    } while (time < animation_ranges[gHeroState.frame].start * 0.01666666753590107f);
+                        --g_hero_state.frame;
+                    } while (time < animation_ranges[g_hero_state.frame].start * 0.01666666753590107f);
                 }
             } else {
-                while (D_L00_001A7DAC[gHeroState.frame][0] * 0.01666666753590107f < time) gHeroState.frame++;
+                while (D_L00_001A7DAC[g_hero_state.frame][0] * 0.01666666753590107f < time) g_hero_state.frame++;
             }
-            if (gHeroState.frame < 0) gHeroState.frame = 0;
-            if (gHeroState.frame > 1) gHeroState.frame = 1;
-            if (old != gHeroState.frame) {
-                char *object = gHeroState.object;
+            if (g_hero_state.frame < 0) g_hero_state.frame = 0;
+            if (g_hero_state.frame > 1) g_hero_state.frame = 1;
+            if (old != g_hero_state.frame) {
+                char *object = g_hero_state.object;
                 struct { char pad[0x48]; unsigned char *entry[1]; } *frames = *(void **)(object + 0x24);
                 int before = frames->entry[old + 3][0x10];
-                int after = frames->entry[gHeroState.frame + 3][0x10];
-                int offset = D_L00_001A7DC8[old][gHeroState.frame];
-                set_hero_animation(gHeroState.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
+                int after = frames->entry[g_hero_state.frame + 3][0x10];
+                int offset = D_L00_001A7DC8[old][g_hero_state.frame];
+                set_hero_animation(g_hero_state.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
             }
         }
     }
-    switch (gHeroState.frame) {
+    switch (g_hero_state.frame) {
     case 0:
-        gHeroState.animation_scale = gHeroState.animation_time * 157.0f;
-        if (gHeroState.animation_scale < 0.6f) gHeroState.animation_scale = 0.6f;
-        if (4.0f < gHeroState.animation_scale) gHeroState.animation_scale = 4.0f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 157.0f;
+        if (g_hero_state.animation_scale < 0.6f) g_hero_state.animation_scale = 0.6f;
+        if (4.0f < g_hero_state.animation_scale) g_hero_state.animation_scale = 4.0f;
         break;
     case 1:
-        gHeroState.animation_scale = gHeroState.animation_time * 14.0f;
-        if (gHeroState.animation_scale < 0.6f) gHeroState.animation_scale = 0.6f;
-        if (2.2f < gHeroState.animation_scale) gHeroState.animation_scale = 2.2f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 14.0f;
+        if (g_hero_state.animation_scale < 0.6f) g_hero_state.animation_scale = 0.6f;
+        if (2.2f < g_hero_state.animation_scale) g_hero_state.animation_scale = 2.2f;
         break;
     }
 }

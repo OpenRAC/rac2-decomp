@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_3066A0(char *, char *, float);
 
 extern void func_306630(char *, char *, char *);
 
 /* Works out where the ship is aiming from its lean and turn, and stores that aim point in the driven moby. */
-void func_L05_00443C18(char *obj, char *moby)
+void ship_update_aim_point(char *obj, char *moby)
 {
     char *state = *(char **)(moby + 0x68);
     char *objAlias = obj;

@@ -12,22 +12,22 @@ typedef struct {
 } CollisionRequest5238;
 extern unsigned char D_0013957F;
 typedef struct { char prefix[0x50]; float speed; char gap[0x1c]; float distance; char rest[0x6c]; } Tuning;
-extern Tuning D_L00_00262570[];
-extern char *D_0018C0B0;
-extern char D_L00_001BF200[];
+extern Tuning g_weapon_l00_table[];
+extern char *g_hero_moby;
+extern char g_collision_result[];
 /* Partial view of the measured result fields, not an assertion of whole-object size. */
 typedef struct { char prefix[0x18]; char *object; char gap[4]; TI128 position; } HitResultView;
-extern void func_00282F20(void *,void *,float);
-extern int func_002761F8(char *,void *,int,char *,void *);
-extern void func_L00_003F5390(char *,char *);
-extern int func_L00_0031BE88(char *);
-extern void func_00334160(char *,int,int);
+extern void vec_scale_to_length(void *,void *,float);
+extern int CollLine(char *,void *,int,char *,void *);
+extern void ApplyAreaHitOrEmitParticles(char *,char *);
+extern int level_has_pending_inner_flag(char *);
+extern void weapon_start_health_drain(char *,int,int);
 /* Checks whether the bolt hit anything during its last step. If so it applies the hit effect
    and damage. Returns 1 when the bolt should stop. */
-int func_L00_003F5238(char *object,char *source)
+int vaporizer_bolt_test_hit(char *object,char *source)
 {
     unsigned int settingsIndex = D_0013957F;
-    Tuning *settings = gWeaponTable_L00 + settingsIndex;
+    Tuning *settings = g_weapon_l00_table + settingsIndex;
     CollisionRequest5238 request;
     TI128 position;
     char *state = *(char **)(object + 0x68);
@@ -43,15 +43,15 @@ int func_L00_003F5238(char *object,char *source)
     request.kind = 1;
     if (*(int *)(state + 0x28) == 1) qcopy(&position,state + 0x40);
     else qcopy(&position,object + 0x10);
-    if (CollLine(source,&position,0,gHeroMoby_0018C0B0,&request) != 0) {
-        char *hitPosition = gCollisionResult + 0x20;
+    if (CollLine(source,&position,0,g_hero_moby,&request) != 0) {
+        char *hitPosition = g_collision_result + 0x20;
         HitResultView *result;
         ApplyAreaHitOrEmitParticles(object,hitPosition);
         result = (HitResultView *)(hitPosition - 0x20);
         if (result->object == 0) return 1;
-        if (HasPendingInnerFlag(result->object) != 0) return 1;
+        if (level_has_pending_inner_flag(result->object) != 0) return 1;
         if (result->object != 0)
-            StartHealthDrainOnTarget(result->object,0x42,*(int *)(object + 0xb8));
+            weapon_start_health_drain(result->object,0x42,*(int *)(object + 0xb8));
     }
     return 0;
 }

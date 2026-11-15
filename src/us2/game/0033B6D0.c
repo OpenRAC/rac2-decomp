@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef float f32;
 typedef unsigned char u8;
@@ -21,7 +22,7 @@ void func_US2_0033BA28(u8 *a0, s32 a1) { if (a1 < *(s32 *)(a0 + 0x208)) *(s32 *)
 /* Measured target: byte-identical across all 27 levels. */
 void func_US2_0033BA40(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x21C) = a1; }
 
-extern int func_0033AB50(int);
+extern int prompt_bar_destroy(int);
 extern void F7d9c8805_FUN_003361A8(int);
 extern void F7d9c8805_FUN_00336968(int);
 
@@ -41,7 +42,7 @@ int func_US2_0033BB98(int a0)
 }
 
 
-extern void func_0033AE18(unsigned char *owner, int value);
+extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
 /* func_0033ABD8 is matched in 003399B0-g8.c (-G8 small data). */
 
@@ -51,8 +52,8 @@ void func_US2_0033BE60(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C0) = a1; }
 /* Measured target: byte-identical across all 27 levels. */
 void func_US2_0033BE68(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C4) = a1; }
 
-extern void func_00335E38(void *, float, float, float, float);
-extern void func_003363C0(void *, float);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern void object_set_value_float(void *, float);
 
 void func_US2_0033BE70(char *object) {
     char *r = object + 12;
@@ -61,16 +62,16 @@ void func_US2_0033BE70(char *object) {
     for (i = 4; i >= 0; i--) {
         if (*(short *)q != 0) {
             float *position = *(float **)object;
-            func_00335E38(r, position[0], position[1], 0.0f, 0.0f);
-            func_003363C0(r, *(float *)(object + 0x2A4));
+            object_set_first_float4(r, position[0], position[1], 0.0f, 0.0f);
+            object_set_value_float(r, *(float *)(object + 0x2A4));
         }
         r += 76;
         q += 2;
     }
     if (*(int *)(object + 0x2C0) != 0) {
-        func_00335E38(object + 0x198, (*(float **)object)[0] + *(float *)(object + 0x2A8), (*(float **)object)[1] + *(float *)(object + 0x2AC), 0.0f, 0.0f);
-        func_00335E38(object + 0x248, (*(float **)object)[0] + *(float *)(object + 0x2B8), (*(float **)object)[1] + *(float *)(object + 0x2BC), 0.0f, 0.0f);
-        func_00335E38(object + 0x1F0, (*(float **)object)[0] + *(float *)(object + 0x2B0), (*(float **)object)[1] + *(float *)(object + 0x2B4), 0.0f, 0.0f);
+        object_set_first_float4(object + 0x198, (*(float **)object)[0] + *(float *)(object + 0x2A8), (*(float **)object)[1] + *(float *)(object + 0x2AC), 0.0f, 0.0f);
+        object_set_first_float4(object + 0x248, (*(float **)object)[0] + *(float *)(object + 0x2B8), (*(float **)object)[1] + *(float *)(object + 0x2BC), 0.0f, 0.0f);
+        object_set_first_float4(object + 0x1F0, (*(float **)object)[0] + *(float *)(object + 0x2B0), (*(float **)object)[1] + *(float *)(object + 0x2B4), 0.0f, 0.0f);
     }
 }
 

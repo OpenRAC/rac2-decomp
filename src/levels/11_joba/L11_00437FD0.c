@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L11_00437FD0: four alternating constraint passes over the object's state
  * (field 0x68): live points at 0x100..0x1CF (16-byte records), previous points at
  * 0x1D0..0x29F, twelve rest lengths at 0x2F0..0x31F. A forward pass walks links
@@ -21,14 +22,14 @@
  *   counter decrement. -g (config/cflags.txt) gives the line-label nop before div.s.
  */
 #include "common.h"
-extern float *func_L11_004417E8(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
+extern float *arena_get_center_point(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Pulls the chain points back to their set spacing in four passes, keeping them above the ground. */
-void func_L11_00437FD0(u8 *object)
+void chain_creature_solve_length(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     float delta[4] __attribute__((aligned(16)));
@@ -46,8 +47,8 @@ void func_L11_00437FD0(u8 *object)
             previous = (float *)(state + 0x1D0);
             for (i = 0; i < 12; i++) {
                 float length;
-                if (object[0x20] >= 3 && current[2] < GetArenaCenterPoint(*(void **)(object + 0xB8))[2]) {
-                    current[2] = GetArenaCenterPoint(*(void **)(object + 0xB8))[2];
+                if (object[0x20] >= 3 && current[2] < arena_get_center_point(*(void **)(object + 0xB8))[2]) {
+                    current[2] = arena_get_center_point(*(void **)(object + 0xB8))[2];
                     previous[2] = current[2];
                 }
                 next = current + 4;
@@ -67,8 +68,8 @@ void func_L11_00437FD0(u8 *object)
             previous = (float *)(state + 0x290);
             for (i = 11; i >= 0; i--) {
                 float length;
-                if (object[0x20] >= 3 && current[2] < GetArenaCenterPoint(*(void **)(object + 0xB8))[2]) {
-                    current[2] = GetArenaCenterPoint(*(void **)(object + 0xB8))[2];
+                if (object[0x20] >= 3 && current[2] < arena_get_center_point(*(void **)(object + 0xB8))[2]) {
+                    current[2] = arena_get_center_point(*(void **)(object + 0xB8))[2];
                     previous[2] = current[2];
                 }
                 next = current - 4;

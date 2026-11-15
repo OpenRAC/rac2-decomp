@@ -4,10 +4,10 @@
    switch arms, so cse does not carry the dispatch's base address into
    the default arm and each block re-adds %lo(D_00189E20), as in retail. */
 
-extern char D_00189E20[];
-extern unsigned char D_00139568[];
+extern char g_hero_state[];
+extern unsigned char g_item_slot_to_record[];
 extern char D_L22_002645F0[];
-extern int func_L00_002ADEA0(int index);
+extern int hero_slot_item_id(int index);
 
 typedef struct {
     char pad_0[0x1492];
@@ -31,7 +31,7 @@ typedef struct {
 #define STATE ((State_002A8CE0 *)D_00189E20)
 
 /* Picks the shop entry the level's table names for the current progress state. */
-int func_L22_002A8CE0(int check)
+int shop_get_entry_for_state(int check)
 {
     switch (STATE->mode) {
     case 1:
@@ -42,7 +42,7 @@ int func_L22_002A8CE0(int check)
         if (check && STATE->field_22BA && !STATE->field_24EC) {
             int index = hero_slot_item_id(0);
 
-            return ((Entry_002A8CE0 *)D_L22_002645F0)[gItemSlotToRecord[index]].value;
+            return ((Entry_002A8CE0 *)D_L22_002645F0)[g_item_slot_to_record[index]].value;
         }
         if (STATE->field_24CC != 1) {
             return STATE->field_1492 ? 0x67 : 0;

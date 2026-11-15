@@ -1,30 +1,30 @@
 #include "common.h"
 
 typedef struct { float pad[32]; float x, y, z; } Target;
-extern Target D_00189E20;
-extern u8 D_00189EA0[];
-extern u8 D_00188660[];
+extern Target g_hero_state;
+extern u8 g_hero_position[];
+extern u8 g_sound_state[];
 extern float D_L12_001AFC70 __attribute__((sda));
 extern float D_L12_001AFC74 __attribute__((sda));
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
-extern float func_00282C48(float);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_L00_00326620(void *, int, int);
-extern void func_002E59F8(int);
-extern void func_0029F338(void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
+extern float math_fabs(float);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_l00_spawn_child(void *, int, int);
+extern void snd_stop_voice(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern int func_002A9640(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern float func_002AAA00(void *, float, void *, int, float, float, float);
-extern void func_002AEC48(void *, void *, int, float, float);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
+extern void moby_update_eased_node(void *, void *, int, float, float);
 
 /* Updates a moby of class 2154. It turns its head to follow the hero while the hero is close,
    plays a looping effect while it turns, and removes itself when hit. */
-void func_L12_003BE7D0(u8 *moby) {
+void hero_tracking_head_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     float yaw = 0, pitch = 0;
     float acceleration, damping;
@@ -33,54 +33,54 @@ void func_L12_003BE7D0(u8 *moby) {
     *(u16 *)(moby + 0x34) |= 4;
     switch (moby[0x20]) {
     case 0:
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         yaw = 0;
-        if (vec_distance_xy(moby + 0x10, gHeroPosition) < 16.0f) {
+        if (vec_distance_xy(moby + 0x10, g_hero_position) < 16.0f) {
             moby[0x20] = 2;
             if (moby[0x43] != 1)
-                StartAnimationBlended(moby, 1, 0, 30);
+                anim_start_blended(moby, 1, 0, 30);
         }
-        if (FindOwnedEffectSlot(moby, 0x4010000, 0) && !*(int *)(vars + 0x110))
-            SetMobyState(moby, 3, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !*(int *)(vars + 0x110))
+            moby_set_state(moby, 3, -1);
         moby[0xA8] = 255;
         break;
     case 2: {
         float *target;
 
-        yaw = FastAddRotations(fast_subtract_rotations(FastMatrixHelperA(gHeroState.x - *(float *)(moby + 0x10), gHeroState.y - *(float *)(moby + 0x14)), *(float *)(moby + 0xF8)), 1.5707964897155762f);
-        target = &gHeroState.x;
-        pitch = FastMatrixHelperA(vec_distance_xy(target, moby + 0x10), *(float *)(moby + 0x18) - gHeroState.z);
+        yaw = FastAddRotations(fast_subtract_rotations(mat_fast_helper_a(g_hero_state.x - *(float *)(moby + 0x10), g_hero_state.y - *(float *)(moby + 0x14)), *(float *)(moby + 0xF8)), 1.5707964897155762f);
+        target = &g_hero_state.x;
+        pitch = mat_fast_helper_a(vec_distance_xy(target, moby + 0x10), *(float *)(moby + 0x18) - g_hero_state.z);
         if (vec_distance_xy(moby + 0x10, target) > 20.0f) {
             moby[0x20] = 1;
             if (moby[0x43] != 0)
-                StartAnimationBlended(moby, 0, 0, 30);
+                anim_start_blended(moby, 0, 0, 30);
         }
-        if (FindOwnedEffectSlot(moby, 0x4010000, 0) && !*(int *)(vars + 0x110))
-            SetMobyState(moby, 3, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !*(int *)(vars + 0x110))
+            moby_set_state(moby, 3, -1);
         moby[0xA8] = 255;
         break;
     }
     case 3:
-        SpawnChildMoby_L00(moby, 0x1132, moby[0x30]);
+        moby_l00_spawn_child(moby, 0x1132, moby[0x30]);
         PlayMobySound(0, 0, moby);
         {
             int effectId = *(int *)(vars + 0x114);
             u8 *effect;
 
             if (effectId != -1) {
-                effect = gSoundState + effectId * 0x70;
+                effect = g_sound_state + effectId * 0x70;
                 if (*(u8 **)(effect + 0x88) == moby && effect[0x74])
-                    StopSoundVoice(effectId);
+                    snd_stop_voice(effectId);
             }
         }
         *(int *)(vars + 0x114) = -1;
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
-    if (FloatAbs(fast_subtract_rotations(yaw, *(float *)(vars + 0x100))) > D_L12_001AFC74 * 0.017453294f) {
-        u8 *effect = gSoundState + *(int *)(vars + 0x114) * 0x70;
+    if (math_fabs(fast_subtract_rotations(yaw, *(float *)(vars + 0x100))) > D_L12_001AFC74 * 0.017453294f) {
+        u8 *effect = g_sound_state + *(int *)(vars + 0x114) * 0x70;
 
         if (*(u8 **)(effect + 0x88) != moby || !effect[0x74])
             *(int *)(vars + 0x114) = PlayMobySound(1, 4, moby);
@@ -89,24 +89,24 @@ void func_L12_003BE7D0(u8 *moby) {
         u8 *effect;
 
         if (effectId != -1) {
-            effect = gSoundState + effectId * 0x70;
+            effect = g_sound_state + effectId * 0x70;
             if (*(u8 **)(effect + 0x88) == moby && effect[0x74])
-                StopSoundVoice(effectId);
+                snd_stop_voice(effectId);
         }
         *(int *)(vars + 0x114) = -1;
     }
     acceleration = 0.03f;
-    ApproachTargetWithDirectionMode(vars + 0x100, yaw, vars + 0x108, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
+    math_approach_target_with_direction_mode(vars + 0x100, yaw, vars + 0x108, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
     damping = 0.3f;
-    ApproachTargetWithDirectionMode(vars + 0x104, pitch, vars + 0x10C, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
+    math_approach_target_with_direction_mode(vars + 0x104, pitch, vars + 0x10C, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
     halfPitch = *(float *)(vars + 0x104) * 0.5f;
     halfYaw = *(float *)(vars + 0x100) * 0.5f;
     *(float *)(vars + 0x68) = halfYaw;
     *(float *)(vars + 0x60) = halfPitch;
     *(float *)(vars + 0xE0) = halfPitch;
     *(float *)(vars + 0xE8) = halfYaw;
-    UpdateEasedNode(moby, vars, 0, acceleration, damping);
-    UpdateEasedNode(moby, vars + 0x80, 1, acceleration, damping);
+    moby_update_eased_node(moby, vars, 0, acceleration, damping);
+    moby_update_eased_node(moby, vars + 0x80, 1, acceleration, damping);
     func_002A0F48(moby);
     *(float *)(moby + 0xC) = D_L12_001AFC70;
 }

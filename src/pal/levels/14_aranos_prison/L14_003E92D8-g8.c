@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L14_003E92D8, the PAL copy of func_L14_003E4EA0: the same C, where both ends of the
    span are key positions scaled to 50 Hz and the current position stays unscaled. A unit of its
    own: it reads four float constants through $gp (hence -g8), and it is built with -g, whose line
@@ -20,7 +21,7 @@ extern float D_L14_001B05C8 __attribute__((sda));
 extern float D_L14_001B05CC __attribute__((sda));
 extern float D_L14_001B05C0 __attribute__((sda));
 extern float D_L14_001B05C4 __attribute__((sda));
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 void func_PAL_L14_003E92D8(char *self)
 {
@@ -66,9 +67,9 @@ void func_PAL_L14_003E92D8(char *self)
     key = (raw * 5 + 2) / 6;
     start = (float)key;
     span = (float)(end - key);
-    r1 = func_00282C48((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)pos - start) / span);
+    r1 = math_fabs((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)pos - start) / span);
     u = D_L14_001B05C8 - r1;
-    r2 = func_00282C48((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - start) / span);
+    r2 = math_fabs((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - start) / span);
     out0 = u * D_L14_001B05C0;
     out1 = (D_L14_001B05CC - r2) * D_L14_001B05C4;
     *(float *)(out + 0x40) = out0;

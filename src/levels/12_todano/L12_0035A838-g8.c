@@ -3,6 +3,7 @@
  * 16-byte tail (FUNCTION_ENTRY_OFFSETS); the word at 12:00288180 points there.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -14,7 +15,7 @@ extern InitEntry12 D_L12_0021DF30[];
 extern int * volatile D_L12_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L12_001CA3E0;
 
-int func_L12_0035A838(char *obj) {
+int menu_init_list_entries(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

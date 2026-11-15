@@ -12,7 +12,7 @@ extern Slot_00329E90 D_L00_00268E20[];
 extern int D_L00_001A902C[] __attribute__((sda));
 
 /* Finds or frees one of the two slots for this entity and returns its number; tells the caller if the slot was already its own. */
-int func_L00_00329E90(char *entity, void (*callback)(Slot_00329E90 *), int *out) {
+int AcquireEntitySlot(char *entity, void (*callback)(Slot_00329E90 *), int *out) {
     int tries, g, id, last;
     Slot_00329E90 *rec;
 

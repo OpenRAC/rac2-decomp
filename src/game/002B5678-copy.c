@@ -29,19 +29,19 @@ typedef struct {
     float speed;                        /* 0xB0 */
 } Ctl_002B5678;
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_00282948(void *);
-extern int func_002B5D38(void *, void *);
-extern int func_002B5E48(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int math_fast_float_d(void *);
+extern int coll_resolve_wall_floor(void *, void *);
+extern int coll_resolve_object(void *, void *);
 
 /* Retail callers also pass a fourth scratch pointer. This body does not read it;
  * keep the slot explicit so its C interface agrees with those callers.
  */
 /* Moves the object by its speed and then pushes it out of walls and objects, trying up to eight times, and updates the speed. */
-void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *unused_output)
+void coll_apply_velocity_and_resolve(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *unused_output)
 {
     Vec4Q_002B5678 saved;
     Quad_002B5678 *position = (Quad_002B5678 *)self->pos;
@@ -54,8 +54,8 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
     qzero(&ctl->q60);
     changed = 0;
     for (i = 0; i < 8; i++) {
-        r = ResolveWallFloorCollision(self, ctl);
-        r |= ResolveObjectCollision(self, ctl);
+        r = coll_resolve_wall_floor(self, ctl);
+        r |= coll_resolve_object(self, ctl);
         changed |= r;
         if (r == 0)
             break;
@@ -64,7 +64,7 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
         FastVecSub(ctl->vel, self->pos, target);
         len = vec_length_xy(ctl->vel);
         if (ctl->speed < len)
-            FastVectorNormalizeHelper(ctl->vel, ctl->vel, ctl->speed);
+            vec_fast_normalize_helper(ctl->vel, ctl->vel, ctl->speed);
         else
             ctl->speed = len;
         if (self->pos[2] <= ctl->f90) {
@@ -76,9 +76,9 @@ void func_002B5678(Self_002B5678 *self, Ctl_002B5678 *ctl, float *target, void *
         if (ctl->speed < ctl->f28 * 0.5f)
             ctl->w80 += 1;
         else
-            FastFloatHelperD(&ctl->w80);
+            math_fast_float_d(&ctl->w80);
     } else {
-        FastFloatHelperD(&ctl->w80);
+        math_fast_float_d(&ctl->w80);
     }
     FastVecSub(ctl->out70, self->pos, &saved);
 }

@@ -17,11 +17,11 @@ extern float D_L00_001B1520 __attribute__((sda));
 extern float D_L00_001B1524 __attribute__((sda));
 extern float D_L00_001B1528 __attribute__((sda));
 
-extern int func_00282978(short *p);
+extern int FastDecTimer(short *p);
 
-extern void func_L00_00421A98(char *obj, char *arg1, float *local, unsigned char index);
+extern void cam_offset_point_by_vector(char *obj, char *arg1, float *local, unsigned char index);
 
-extern void func_L00_004219D8(char *obj, float *a1, float *a2, float f12, float f13, float f14);
+extern void cam_ease_vector_toward(char *obj, float *a1, float *a2, float f12, float f13, float f14);
 
 /* The parts of an object state (object +0x70) that func_L00_00422268 resets. */
 typedef struct {
@@ -113,11 +113,11 @@ extern float D_L00_001B14DC __attribute__((sda)), D_L00_001B14D4 __attribute__((
 extern float D_L00_001B14D8 __attribute__((sda));
 extern int D_L00_001B1854 __attribute__((section(".sdata")));
 extern float D_L00_001B1510 __attribute__((sda));
-extern float func_002702C8(float *, float, float, float, float, float);
-extern float func_002AA548(float *, float *, float, float, float, float);
+extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
 /* Starts a small effect at an entry of the ring. It alternates between two choices each time it is called. */
-void func_L00_0041ACA0(char *object, void *entry)
+void lava_gun_spawn_entry_effect(char *object, void *entry)
 {
     int local[4];
     int sel[2];
@@ -132,7 +132,7 @@ void func_L00_0041ACA0(char *object, void *entry)
 }
 
 /* Updates the type byte and interpolates the two values passed to the helper. */
-void func_L00_00421B50(char *moby, char *context)
+void weapon_update_anim_blend(char *moby, char *context)
 {
     char *mobyVars;
     char *anim;
@@ -151,7 +151,7 @@ void func_L00_00421B50(char *moby, char *context)
     }
     blendTimer = *(short *)(anim + 0xC6);
     scale = (float)blendTimer * *(float *)(anim + 0xC8);
-    OffsetPointByCameraVector(moby, context, local, *(unsigned char *)(anim + 0xC4));
+    cam_offset_point_by_vector(moby, context, local, *(unsigned char *)(anim + 0xC4));
 
     if (*(unsigned char *)(anim + 0xC4) == 3 ||
         *(unsigned char *)(anim + 0xC4) == 5 ||
@@ -165,13 +165,13 @@ void func_L00_00421B50(char *moby, char *context)
         valueB = D_L00_001B1520;
     }
     valueC = 0.0f;
-    EaseCameraVectorToward(moby, (float *)(anim + 0x90), local, valueA, valueB, valueC);
+    cam_ease_vector_toward(moby, (float *)(anim + 0x90), local, valueA, valueB, valueC);
 }
 
 /* Resets the state of object +0x70: eases the motion and view values toward their
    targets (or the defaults in the record at D_L00_001BB040), settles the recoil spring,
    then restores the view, aim and sway defaults from the level tuning values. */
-void func_L00_00422268(StateOwner *object)
+void weapon_reset_view_state(StateOwner *object)
 {
     State *state;
     float viewDefaultX, viewDefaultY, aim0, aim1, aim2;
@@ -194,21 +194,21 @@ void func_L00_00422268(StateOwner *object)
     defaults = &D_L00_001BB040->motion;
     defaultView = &D_L00_001BB040->view;
     if (motion->h3C)
-        motion->f2C = StepSpringDamperClamped(motion->v44, motion->f2C, motion->f40, motion->f48,
+        motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, motion->f40, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     else
-        motion->f2C = StepSpringDamperClamped(motion->v44, motion->f2C, defaults->f2C, motion->f48,
+        motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, defaults->f2C, motion->f48,
                                     D_L00_001B14F8, *(float *)(temporary + 0x1C));
     if (motion->h3E)
-        motion->f30 = StepSpringDamperClamped(motion->v50, motion->f30, motion->f4C, motion->f54,
+        motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, motion->f4C, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     else
-        motion->f30 = StepSpringDamperClamped(motion->v50, motion->f30, defaults->f30, motion->f54,
+        motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, defaults->f30, motion->f54,
                                     D_L00_001B14FC, 0.0f);
     if (view->hDA)
-        view->fB0 = StepSpringDamperClamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
+        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
     else
-        view->fB0 = StepSpringDamperClamped(view->vBC, view->fB0, defaultView->fB0, view->fB8,
+        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, defaultView->fB0, view->fB8,
                                   0.2f, 0.0f);
     motion->h3C = 0;
     motion->h3E = 0;
@@ -224,10 +224,10 @@ void func_L00_00422268(StateOwner *object)
     recoil->f20 = 0.2f;
     recoil->h2 = 0;
     if (recoil->f2C != 0.0f)
-        StepValueTowardTarget(&recoil->f28, &recoil->f30, recoil->f2C,
+        math_step_value_toward_target(&recoil->f28, &recoil->f30, recoil->f2C,
                       recoil->f34, recoil->f38, 1.0f);
     else if (recoil->f28 != 0.0f)
-        StepValueTowardTarget(&recoil->f28, &recoil->f30, 0.0f,
+        math_step_value_toward_target(&recoil->f28, &recoil->f30, 0.0f,
                       recoil->f34, recoil->f38, 1.0f);
     recoil->f2C = 0.0f;
 

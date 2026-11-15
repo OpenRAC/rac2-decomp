@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,24 +24,24 @@
  */
 #include "common.h"
 
-extern void func_00282CC0(void *, void *, s32);
-extern void func_0032B3E0(void *, s32, s32, s32, s32, f32, f32, f32);
-extern s8 D_00189E20[];
-extern s8 D_002329A0[];
+extern void FastVecAdd(void *, void *, s32);
+extern void gfx_draw_facing_sprite_copy(void *, s32, s32, s32, s32, f32, f32, f32);
+extern s8 g_hero_state[];
+extern s8 g_trail_nodes[];
 
 /* Draws every trail node of an owner as two glowing sprites. */
-void func_0032B0A8(s32 owner) {
+void part_draw_trail_nodes(s32 owner) {
     f32 offset[4];
-    s8 *hero = gHeroState;
+    s8 *hero = g_hero_state;
     s32 i;
     for (i = 0; i < 0x80; i++) {
-        s32 node = (s32)gTrailNodes + i * 0x50;
+        s32 node = (s32)g_trail_nodes + i * 0x50;
         if (*(s32 *)(node + 0x44) == owner) {
             f32 secondSize;
             FastVecAdd(offset, (void *)node, *(s32 *)(hero + 0x2290) + 0x10);
-            DrawFacingSpriteCopy(offset, 0x7F7F7F, *(s32 *)(node + 0x34), 0x31, 2, *(f32 *)(node + 0x20), *(f32 *)(node + 0x2C), 0.001f);
+            gfx_draw_facing_sprite_copy(offset, 0x7F7F7F, *(s32 *)(node + 0x34), 0x31, 2, *(f32 *)(node + 0x20), *(f32 *)(node + 0x2C), 0.001f);
             secondSize = *(volatile f32 *)(node + 0x24);
-            DrawFacingSpriteCopy(offset, *(s32 *)(node + 0x38), *(s32 *)(node + 0x34) >> 1, 0x31, 2, secondSize, *(f32 *)(node + 0x2C), 0.001f);
+            gfx_draw_facing_sprite_copy(offset, *(s32 *)(node + 0x38), *(s32 *)(node + 0x34) >> 1, 0x31, 2, secondSize, *(f32 *)(node + 0x2C), 0.001f);
         }
     }
 }

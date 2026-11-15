@@ -31,24 +31,24 @@ typedef struct {
 extern Moby *D_L10_001B251C[] __attribute__((sda));
 extern u8 D_L10_001B9680[];
 
-extern s32 func_002A7820(s32 min, s32 max);
-extern f32 func_002A7878(f32 min, f32 max);
-extern f32 func_002A7940(void);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_0029FC20(Moby *moby, s32 joint, f32 matrix[4][4]);
+extern s32 math_random_int_range(s32 min, s32 max);
+extern f32 math_random_float_range(f32 min, f32 max);
+extern f32 math_random_angle(void);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void moby_transform_joint_point(Moby *moby, s32 joint, f32 matrix[4][4]);
 extern s32 func_001163B0(void);
-extern void func_00281DE8(BeamQuad *quad, s32 texture, s32 kind, s32 a3);
-extern void func_00280B90(BeamQuad *quad, s32 a1, s32 a2);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282DD8(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *in, f32 length);
-extern void func_00281EB8(void *position, s32 texture, u32 color, s32 kind,
+extern void gfx_init_quad_packet_state(BeamQuad *quad, s32 texture, s32 kind, s32 a3);
+extern void draw_world_quad(BeamQuad *quad, s32 a1, s32 a2);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecCross(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *in, f32 length);
+extern void gfx_draw_billboard_quad(void *position, s32 texture, u32 color, s32 kind,
                           f32 scale, f32 offset, f32 angle);
 
 /* Draws the beam from the moby to a joint of its target moby: two scrolling layers (each
    frame one of two textures at random) and a wider glow, each a quad either side of the
    line facing D_L10_001B9680, then two sprites at the far end. */
-void func_L10_003F61C8(Moby *moby)
+void DrawHrugisBeamEffect(Moby *moby)
 {
     BeamQuad q;
     f32 end[4] __attribute__((aligned(16)));
@@ -67,15 +67,15 @@ void func_L10_003F61C8(Moby *moby)
     f32 size1;
     f32 size2;
 
-    TransformMobyJointPoint(&mobies[vars->target], vars->joint, matrix);
+    moby_transform_joint_point(&mobies[vars->target], vars->joint, matrix);
     qcopy(end, matrix[3]);
 
     /* First layer. */
-    if (Rand() & 1)
-        InitQuadPacketState(&q, 0x17, 0, 0x80);
+    if (func_001163B0() & 1)
+        gfx_init_quad_packet_state(&q, 0x17, 0, 0x80);
     else
-        InitQuadPacketState(&q, 0x30, 0, 0x80);
-    layer1Color = ((u32)RandomIntRange(0x20, 0x80) << 24) | 0xFFFFFF;
+        gfx_init_quad_packet_state(&q, 0x30, 0, 0x80);
+    layer1Color = ((u32)math_random_int_range(0x20, 0x80) << 24) | 0xFFFFFF;
     position = moby->position;
     uv = q.uv;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = layer1Color;
@@ -92,7 +92,7 @@ void func_L10_003F61C8(Moby *moby)
         if (uv[i * 2] <= -8.0f)
             uv[i * 2] += 8.0f;
     }
-    vars->scroll[0] += RandomFloatRange(0.1f, 0.25f);
+    vars->scroll[0] += math_random_float_range(0.1f, 0.25f);
     if (vars->scroll[0] >= 8.0f)
         vars->scroll[0] -= 8.0f;
     FastVecSub(view, position, D_L10_001B9680);
@@ -106,11 +106,11 @@ void func_L10_003F61C8(Moby *moby)
     draw_world_quad(&q, 0, 0);
 
     /* Second layer. */
-    if (Rand() & 1)
-        InitQuadPacketState(&q, 0x17, 0, 0x80);
+    if (func_001163B0() & 1)
+        gfx_init_quad_packet_state(&q, 0x17, 0, 0x80);
     else
-        InitQuadPacketState(&q, 0x2F, 0, 0x80);
-    layer2Color = ((u32)RandomIntRange(0x20, 0x80) << 24) | 0xFFFFFF;
+        gfx_init_quad_packet_state(&q, 0x2F, 0, 0x80);
+    layer2Color = ((u32)math_random_int_range(0x20, 0x80) << 24) | 0xFFFFFF;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = layer2Color;
     q.uv[0] = 0;
     q.uv[1] = 0;
@@ -125,7 +125,7 @@ void func_L10_003F61C8(Moby *moby)
         if (uv[i * 2] <= -8.0f)
             uv[i * 2] += 8.0f;
     }
-    vars->scroll[1] += RandomFloatRange(0.08f, 0.1f);
+    vars->scroll[1] += math_random_float_range(0.08f, 0.1f);
     if (vars->scroll[1] >= 8.0f)
         vars->scroll[1] -= 8.0f;
     FastVecSub(view, position, D_L10_001B9680);
@@ -139,7 +139,7 @@ void func_L10_003F61C8(Moby *moby)
     draw_world_quad(&q, 0, 0);
 
     /* The glow: four units either side at the moby, three at the far end. */
-    InitQuadPacketState(&q, 0xE, 1, 0x80);
+    gfx_init_quad_packet_state(&q, 0xE, 1, 0x80);
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x40FF0020;
     q.uv[0] = 0;
     q.uv[1] = 0;
@@ -158,9 +158,9 @@ void func_L10_003F61C8(Moby *moby)
     draw_world_quad(&q, 0, 0);
 
     /* Two sprites of random size and angle at the far end. */
-    size1 = RandomFloatRange(3.5f, 4.5f);
-    DrawBillboardQuad_00281EB8(end, 0x31, 0x40800000, 1, size1, 2.5f, RandomAngle());
-    spriteColor = ((u32)RandomIntRange(0x40, 0x80) << 24) | 0x7F7F7F;
-    size2 = RandomFloatRange(2.5f, 3.5f);
-    DrawBillboardQuad_00281EB8(end, 0x31, spriteColor, 1, size2, 2.5f, RandomAngle());
+    size1 = math_random_float_range(3.5f, 4.5f);
+    gfx_draw_billboard_quad(end, 0x31, 0x40800000, 1, size1, 2.5f, math_random_angle());
+    spriteColor = ((u32)math_random_int_range(0x40, 0x80) << 24) | 0x7F7F7F;
+    size2 = math_random_float_range(2.5f, 3.5f);
+    gfx_draw_billboard_quad(end, 0x31, spriteColor, 1, size2, 2.5f, math_random_angle());
 }

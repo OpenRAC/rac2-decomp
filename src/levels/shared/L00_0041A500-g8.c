@@ -1,13 +1,14 @@
+#include "names.h"
 /* Per-frame step over a ring of 35 entries of 0x40 bytes: now and then hands one entry to a
    helper, and now and then fires a second helper on it. */
 #include "common.h"
 
-extern char *D_L00_001B144C __attribute__((sda));
+extern char *g_lava_gun_ring_entries __attribute__((sda));
 extern int func_001163B0(void);
-extern void func_L00_0041ACA0(char *object, void *entry);
-extern void func_002BE278(void *entry, void *next, int zero, float scale);
+extern void lava_gun_spawn_entry_effect(char *object, void *entry);
+extern void part_spawn_white_flash(void *entry, void *next, int zero, float scale);
 
-void func_L00_0041A500(char *object)
+void lava_gun_update_ring_entries(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int first = *(int *)(state + 0x48);
@@ -20,13 +21,13 @@ void func_L00_0041A500(char *object)
     if (index <= -1)
         index += 0x23;
 
-    random = Rand();
+    random = func_001163B0();
     if (random % 7 == 0)
-        SpawnLavaGunEntryEffect(object, gLavaGunRingEntries + (index << 6));
+        lava_gun_spawn_entry_effect(object, g_lava_gun_ring_entries + (index << 6));
 
-    random = Rand();
+    random = func_001163B0();
     if (random % 0x16 == 0) {
-        char *entry = gLavaGunRingEntries + (index << 6);
-        SpawnWhiteFlashParticle(entry, entry + 0x10, 0, -1.0f);
+        char *entry = g_lava_gun_ring_entries + (index << 6);
+        part_spawn_white_flash(entry, entry + 0x10, 0, -1.0f);
     }
 }

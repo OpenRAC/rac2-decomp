@@ -9,28 +9,28 @@ extern char D_L05_00225DD0[];
 extern char *func_379CA0(char *object);
 extern int func_37CDB0(char *object);
 
-extern int func_L05_003CFC28(int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
+extern int moby_class_id_to_table_index(int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
 
 /* The reach table the object's id indexes, at $gp+0xB78. */
 extern float D_L05_001AFB68 __attribute__((sda));
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
-extern char *func_002ED688(char *object);
+extern char *moby_get_motion_data(char *object);
 
-extern void func_L05_00379FA0(char *, int, int, int, float, float, float, float, int, int, int);
+extern void SpawnSpaceProjectile(char *, int, int, int, float, float, float, float, int, int, int);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern void func_002E5DA0(int, int, char *, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 
 /* Decides whether the object may take its next step: the gate must be open, the looked-up
  * sub-object must exist, its handle must match the one the gate's table names, it must not be
  * already counting, its two counters must be ordered, and its state must be neither 3 nor 0xD.
  * The last test writes 0 rather than branching. */
-int func_L05_0037B888(char *a0)
+int moby_can_take_next_step(char *a0)
 {
     char *object = a0;
     char *sub = func_379CA0(a0);
@@ -56,7 +56,7 @@ int func_L05_0037B888(char *a0)
 
 /* Gives the object a random reach, three random angles and a random cone, and writes the
  * scaled results into its state. */
-void func_L05_003CF9C8(char *obj)
+void moby_randomize_reach_and_angles(char *obj)
 {
     char *s0 = obj;
     char *s1 = *(char **)(obj + 0x68);
@@ -69,23 +69,23 @@ void func_L05_003CF9C8(char *obj)
 
     *(unsigned char *)(s0 + 0x30) = 0xFF;
     *(unsigned short *)(s0 + 0x32) = 0x1FF;
-    idx = ClassIdToTableIndex(*(short *)(s0 + 0xAA));
+    idx = moby_class_id_to_table_index(*(short *)(s0 + 0xAA));
     f21 = 0.0f;
     f20 = 0.01745329424738884f;
     f22 = 1.0f;
     f1 = *(float *)(s0 + 0x2C) * *(float *)((char *)&D_L05_001AFB68 + 4 * idx);
     *(float *)(s0 + 0x2C) = f1;
-    f0 = RandomAngle();
+    f0 = math_random_angle();
     *(float *)(s0 + 0xF0) = f0;
-    f0 = RandomAngle();
+    f0 = math_random_angle();
     *(float *)(s0 + 0xF4) = f0;
-    f0 = RandomAngle();
+    f0 = math_random_angle();
     *(float *)(s0 + 0xF8) = f0;
-    f0 = RandomFloatRange(f21, 0.5f) * f20;
+    f0 = math_random_float_range(f21, 0.5f) * f20;
     *(float *)(s1 + 0x0) = f0;
-    f0 = RandomFloatRange(f21, f22) * f20;
+    f0 = math_random_float_range(f21, f22) * f20;
     *(float *)(s1 + 0x4) = f0;
-    f0 = RandomFloatRange(f21, 2.0f) * f20;
+    f0 = math_random_float_range(f21, 2.0f) * f20;
     *(float *)(s1 + 0x8) = f0;
     *(float *)(s1 + 0xC) = f22;
 }
@@ -93,12 +93,12 @@ void func_L05_003CF9C8(char *obj)
 /* Spawns the object's effect once its guards clear, then runs the timer and marks the run.
  * The two words of the effect's parameters are the same in both calls, so the compiler
  * loads the constant once and copies it into the two argument registers. */
-void func_L05_003D0420(char *obj)
+void moby_spawn_effect_once(char *obj)
 {
     char *s1 = *(char **)(obj + 0x68);
     char *r;
 
-    r = GetMobyMotionData(obj);
+    r = moby_get_motion_data(obj);
     if (r == 0)
         return;
     if (*(int *)(r + 0x120) == 0)
@@ -106,18 +106,18 @@ void func_L05_003D0420(char *obj)
     if (*(int *)(s1 + 0x1B8) != 0)
         return;
     if (*(unsigned char *)(obj + 0x20) == 1) {
-        if (gCurrentMapIndex == 0xF)
+        if (g_current_map_index == 0xF)
             SpawnSpaceProjectile(obj, 0x60008000, 1, 0, 0.6f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
         else
             SpawnSpaceProjectile(obj, 0x60008000, 1, 0, 1.0f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
     }
-    if (RandomIntBelow(3) == 0)
-        PlaySoundFromClassBank(0, 0, obj, 0x957);
+    if (math_random_int_below(3) == 0)
+        snd_play_from_class_bank(0, 0, obj, 0x957);
     *(int *)(s1 + 0x1B8) = 0x14;
 }
 
 extern void func_L05_003CFB90(char *, char *);
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
 typedef struct {
     char pad000[0x140];
@@ -134,13 +134,13 @@ extern ShakeCamera_003CFAB8 D_L05_001B9580;
  * camera position to func_L05_003CFB90, calls func_002E5DA0 and starts a camera shake (weaker
  * and shorter for class 0x955). The shake stores are the same in both arms; cross-jumping
  * shares them after scheduling. */
-void func_L05_003CFAB8(char *obj)
+void cam_shake_if_object_near(char *obj)
 {
-    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * ClassIdToTableIndex(*(short *)(obj + 0xAA)));
+    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * moby_class_id_to_table_index(*(short *)(obj + 0xAA)));
 
     if (fast_vec_dist(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
         func_L05_003CFB90(obj, (char *)D_L05_001B9580.f140);
-        PlaySoundFromClassBank(7, 0, obj, 0xFBF);
+        snd_play_from_class_bank(7, 0, obj, 0xFBF);
         if (*(short *)(obj + 0xAA) == 0x955) {
             D_L05_001B9580.f160 = 0.05f;
             D_L05_001B9580.f168 = 0x1E;
@@ -184,30 +184,30 @@ extern float D_L05_001AEBE4 __attribute__((sda));
 extern float D_L05_001AEBE0 __attribute__((sda));
 extern float D_L05_001AEBDC __attribute__((sda));
 
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283B98(float, float);
-extern int func_00282948(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastAddRotations(float, float);
+extern int math_fast_float_d(void *);
 extern void func_L05_003D1E60(void *, int, int);
-extern void func_0029F338(void *);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern void moby_mark_spawned(void *);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int CollLine(void *, void *, int, void *, int);
 extern void func_L05_00398378(void *, void *, int);
-extern void func_L05_00398618(char *);
-extern void func_L05_00398018(char *);
-extern void func_L00_002E6EF8(void (*)(char *), char *);
-extern int func_00277F48(void *, float, int, char *, void *);
-extern int func_00278E78(void);
-extern int func_00277258(void *, float, int, void *);
-extern void func_L05_00397F48(char *, char *, char *);
-extern void func_L05_00424990(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern void record_animate_owned(char *);
+extern void record_update_owned_effects(char *);
+extern void gfx_add_draw_callback_third(void (*)(char *), char *);
+extern int coll_process_hit(void *, float, int, char *, void *);
+extern int GetCollHitMaterial(void);
+extern int coll_test_point(void *, float, int, void *);
+extern void SubmitFlightStateHitRecord(char *, char *, char *);
+extern void part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
 
 /* Moves the projectile along its velocity, slowing it and spinning its two angles. When its life
    runs out or it leaves the 2..1021 box it releases all twenty-four records, bursts and removes
    itself. Each time its second timer expires it throws a hit record towards a random point 21
    units away. On hitting the world it submits its hit record, bursts and removes itself. */
-void func_L05_00397B30(char *obj)
+void homing_l05_projectile_update(char *obj)
 {
     float old[4];
     float target[4];
@@ -228,11 +228,11 @@ void func_L05_00397B30(char *obj)
     *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.05f);
     *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(obj + 0xF4), 0.03f);
 
-    if (FastFloatHelperD(state + 0x18)) {
+    if (math_fast_float_d(state + 0x18)) {
         for (i = 0; i < 24; i++)
             D_L05_00233560[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
         return;
     }
     if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
@@ -241,18 +241,18 @@ void func_L05_00397B30(char *obj)
         for (i = 0; i < 24; i++)
             D_L05_00233560[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
         return;
     }
 
-    if (FastFloatHelperD(state + 0x28)) {
-        BuildSphericalOffset(target, 21.0f, RandomAngle(), RandomAngle());
+    if (math_fast_float_d(state + 0x28)) {
+        vec_build_spherical_offset(target, 21.0f, math_random_angle(), math_random_angle());
         FastVecAdd(target, target, obj + 0x10);
         if (CollLine(obj + 0x10, target, 0, obj, 0))
             qcopy(target, D_L05_001BFB20);
         func_L05_00398378(obj, target, 1);
-        AnimateOwnedRecords(obj);
-        AddDrawCallbackToList3(UpdateOwnedRecordEffects, obj);
+        record_animate_owned(obj);
+        gfx_add_draw_callback_third(record_update_owned_effects, obj);
 
         hit.owner = obj;
         hit.flags = 0x810000;
@@ -271,12 +271,12 @@ void func_L05_00397B30(char *obj)
             speed = D_L05_001AEBE0;
         else
             speed = D_L05_001AEBDC;
-        ProcessCollisionHit(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
+        coll_process_hit(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
     }
 
     if (GetCollHitMaterial() != 6) {
         collided = 0;
-        if (TestPointAgainstCollision(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
+        if (coll_test_point(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
             collided = 1;
             qcopy(obj + 0x10, D_L05_001BFB30);
         }
@@ -284,9 +284,9 @@ void func_L05_00397B30(char *obj)
             qcopy(obj + 0x10, D_L05_001BFB20);
             SubmitFlightStateHitRecord(obj, state, obj + 0x10);
             if (*(int *)(state + 0x24))
-                SpawnShockwaveBurst(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
+                part_spawn_shockwave_burst(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
             func_L05_003D1E60(obj + 0x10, 0, 0);
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
         }
     }
 }

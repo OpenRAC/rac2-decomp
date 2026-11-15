@@ -14,26 +14,26 @@ extern f32 D_L02_001B0474 __attribute__((sda));
 extern f32 D_L02_001B0478 __attribute__((sda));
 extern s32 D_L02_001B0480 __attribute__((sda));
 
-extern void *func_0029FCC0(char *, int, void *);
-extern void func_0029FC20(char *, int, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_point(char *, int, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 typedef struct { f32 x, y, z, w; } V4;
 typedef struct { f32 v[16]; } M4;
 
 /* Draws a glow at a joint of the boss, moved by a fixed offset in the joint's own direction. */
-void func_L02_003DB158(char *moby, s32 jointIndex) {
+void boss_draw_joint_glow(char *moby, s32 jointIndex) {
     char *vars = *(char **)(*(char **)(moby + 0xB8) + 0x68);
     V4 jointPos, jointPosCopy;
     M4 jointMatrix;
     V4 localOffset;
 
-    TransformMobyJointToWorld(moby, jointIndex, &jointPos);
+    moby_transform_joint_to_world(moby, jointIndex, &jointPos);
     *(TQ *)&jointPosCopy = *(TQ *)&jointPos;
-    TransformMobyJointPoint(moby, jointIndex, &jointMatrix);
+    moby_transform_joint_point(moby, jointIndex, &jointMatrix);
     transform_vector(&localOffset, &D_L02_001B0480, &jointMatrix);
     FastVecAdd(&jointPos, &jointPos, &localOffset);
-    DrawBillboardQuad_L00(&jointPos, *(s32 *)(vars + 0x250), D_L02_001B0478, D_L02_001B0474);
+    gfx_l00_draw_billboard_quad(&jointPos, *(s32 *)(vars + 0x250), D_L02_001B0478, D_L02_001B0474);
 }

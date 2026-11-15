@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern void func_0027C540(int);
+extern void SetupGifPaging(int);
 extern void func_PAL_0029CE58(void);
-extern s32 func_00288FB8(s32);
-extern void func_0027F980(int, int, u64, u8 *, int);
-extern void func_0027C660(void);
+extern s32 GetLocalizedString(s32);
+extern void text_draw_right_aligned_small(int, int, u64, u8 *, int);
+extern void DoGifPaging(void);
 /* PAL's stored panel text position (455, 293). */
 extern int D_PAL_001ABA48 __attribute__((sda));
 extern int D_PAL_001ABA4C[] __attribute__((sda));
@@ -14,9 +14,9 @@ extern int D_PAL_001ABA4C[] __attribute__((sda));
    0x2D4F becomes 0xB60. */
 int func_PAL_002CE9BC(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_PAL_0029CE58();
-    func_0027F980(D_PAL_001ABA48, D_PAL_001ABA4C[0], 0x80F0F0F0ULL, (u8 *)func_00288FB8(0xB60), -1);
-    func_0027C660();
+    text_draw_right_aligned_small(D_PAL_001ABA48, D_PAL_001ABA4C[0], 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0xB60), -1);
+    DoGifPaging();
     return 0;
 }

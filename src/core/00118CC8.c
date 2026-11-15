@@ -1,5 +1,5 @@
 #include "names.h"
-/* VfprintfDispatch (symbol_addrs/usa-v2 0x00118cc8, size 0xCC): the split
+/* vfprintf_dispatch (symbol_addrs/usa-v2 0x00118cc8, size 0xCC): the split
    newlib/SDK printf picks its engine from the format string. It scans for a
    conversion and, when the conversion is one of the floating point set
    (E G L e f g), tail-calls the float-capable engine VfprintfFloat 0x118D98;
@@ -7,12 +7,12 @@
    engine VfprintfInteger 0x119BF8. Both engines get (fp->_data, fp, fmt0, ap).
    The switch over (c - 0x45) is what makes cc1 emit the 35-entry table at
    0x13A4B0. */
-extern int func_00118D98(void *arg0, void *arg1, char *arg2, void *arg3);
+extern int VfprintfFloat(void *arg0, void *arg1, char *arg2, void *arg3);
 
-extern int func_00119BF8(void *arg0, void *arg1, char *arg2, void *arg3);
+extern int VfprintfInteger(void *arg0, void *arg1, char *arg2, void *arg3);
 
 /* Looks at the format string and picks the float-capable or the integer-only print routine. */
-int func_00118CC8(void *fp, char *fmt, void *ap) {
+int vfprintf_dispatch(void *fp, char *fmt, void *ap) {
     char *p;
 
     for (p = fmt; *p != '\0'; p++) {

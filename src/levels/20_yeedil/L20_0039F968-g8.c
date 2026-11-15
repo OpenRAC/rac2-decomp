@@ -1,17 +1,18 @@
+#include "names.h"
 /* func_L20_0039F968 is a unit of its own: the history-copy loop needs -frac2-mult-add-no-flatten
    (docs/build/compiler-notes.md) so its source cursor keeps retail's i*400 + (D - 16) grouping. */
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
-extern void func_00282D30(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
-extern int func_L02_002F1658(void);
-extern void func_002AB668(void *, int, float);
-extern void func_002ACDE8(void *, const void *, const void *);
-extern void func_002ACB48(float *, float);
-extern float func_00282DF0(const void *);
-extern unsigned char *func_002C36D0(void *, int, int, int);
-extern void func_L00_003C5310(void *, int, int, int, unsigned int, unsigned int, unsigned int, unsigned int,
+extern void FastVecScale(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern int level_is_resident_flag_clear(void);
+extern void math_build_axis_angle_quat(void *, int, float);
+extern void vec_rotate_by_quaternion(void *, const void *, const void *);
+extern void vec_add_random_offset(float *, float);
+extern float FastVecLength(const void *);
+extern unsigned char *part_spawn_bluish_fade(void *, int, int, int);
+extern void gfx_draw_ribbon_strip(void *, int, int, int, unsigned int, unsigned int, unsigned int, unsigned int,
                              int, int, int, float, float, float);
 extern Vector D_L20_00234880[][25];
 extern Vector D_L20_00235500[];
@@ -27,7 +28,7 @@ extern float D_L20_001AED54 __attribute__((sda));
 extern unsigned char D_L20_001FFB40[];
 
 /* Updates and draws the eight lightning trails of the electric orb, adding sparks at their tips. */
-void func_L20_0039F968(unsigned char *object) {
+void electric_orb_update_trails(unsigned char *object) {
     Vector points[25];
     Vector origin, offset, rotation;
     int i = 0;
@@ -40,7 +41,7 @@ void func_L20_0039F968(unsigned char *object) {
     FastVecScale(&offset, object + 0xE0, D_L20_001AED3C);
     FastVecAdd(&origin, object + 0x10, &offset);
     for (; i < 8; ++i) {
-        if (IsResidentFlagClear()) {
+        if (level_is_resident_flag_clear()) {
             Vector *head;
             int historyIndex;
             ++counts[i];
@@ -49,9 +50,9 @@ void func_L20_0039F968(unsigned char *object) {
             for (historyIndex = last; historyIndex > 0; --historyIndex)
                 qcopy_nc(&D_L20_00234880[i][historyIndex], &D_L20_00234880[i][historyIndex - 1]);
             head = D_L20_00234880[i];
-            BuildAxisAngleQuaternion(&rotation, (int)&D_L20_00235500[i], D_L20_001AED58 * 0.017453294f);
-            RotateVectorByQuaternion(head, head, &rotation);
-            AddRandomOffsetToVector(head->f, 0.125f);
+            math_build_axis_angle_quat(&rotation, (int)&D_L20_00235500[i], D_L20_001AED58 * 0.017453294f);
+            vec_rotate_by_quaternion(head, head, &rotation);
+            vec_add_random_offset(head->f, 0.125f);
             length = FastVecLength(head);
             limit = D_L20_001AED40 * 1.1f;
             if (limit < length) FastVecScale(head, head, limit / length);
@@ -72,23 +73,23 @@ void func_L20_0039F968(unsigned char *object) {
         }
         FastVecAdd(&points[last], &origin, D_L20_00234880[i]);
         points[last].f[3] = 0.05f;
-        if (IsResidentFlagClear()) {
+        if (level_is_resident_flag_clear()) {
             int top = counts[i] - 1;
             Vector *tip = &points[top];
-            particle = SpawnBluishFadeParticle(tip, 10, 0, 1);
+            particle = part_spawn_bluish_fade(tip, 10, 0, 1);
             if (particle) {
                 float size = D_L20_001AED50 * 210000.0f;
                 *(unsigned int *)(particle + 4) = D_L20_001AED44 | *(unsigned int *)(state + 4);
                 *(float *)(particle + 0xC) = size;
                 particle[2] = (*(unsigned char **)(level + 0xF8))[1];
             }
-            particle = SpawnBluishFadeParticle(tip, 10, 0, 1);
+            particle = part_spawn_bluish_fade(tip, 10, 0, 1);
             if (particle) {
                 *(float *)(particle + 0xC) = D_L20_001AED50 * 63000.00390625f;
                 *(unsigned int *)(particle + 4) = 0x407F7F7F;
             }
         }
-        DrawRibbonStrip(points, 25, 14, 14, D_L20_001AED48, D_L20_001AED48 & 0xFFFFFF,
+        gfx_draw_ribbon_strip(points, 25, 14, 14, D_L20_001AED48, D_L20_001AED48 & 0xFFFFFF,
                           D_L20_001AED4C | *(unsigned int *)(state + 4), D_L20_001AED4C,
                           0, counts[i] - 1, counts[i], 0.1f, 0.2f, D_L20_001AED54);
     }

@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "names.h"
-extern void func_00282A60(unsigned int *, unsigned int, int);
+extern void mem_clear(unsigned int *, unsigned int, int);
 extern char *ref_0029EFD0_00[] __attribute__((sda));
 extern char *ref_0029EFD0_01[] __attribute__((sda));
 extern unsigned int ref_0029EFD0_02[] __attribute__((sda));
 extern char *ref_0029EFD0_03[] __attribute__((sda));
 extern int ref_0029EFD0_04[] __attribute__((sda));
 extern char ref_0029EFD0_05[];
-extern void func_0029F0C8(char *, int);
-extern void func_0026FEB8(const char *, ...);
+extern void moby_init_instance(char *, int);
+extern void STUB_printf(const char *, ...);
 
 /* The pool uses 256-byte slots; only fields needed by allocation are named. */
 typedef struct MobyPoolSlot {
@@ -67,7 +67,7 @@ extern void func_002A3F10_1(char *, int, int *, char *);
 
 extern void func_00282D30_4(char *, char *, float);
 
-extern void func_00283658(char *, char *);
+extern void copy_matrix_rotation(char *, char *);
 
 extern void func_00283788_1(char *, char *, char *);
 
@@ -81,7 +81,7 @@ extern void func_00283098_6(char *a, char *b, char *c);
 
 extern void func_00282CC0_20(char *a, char *b, char *c);
 
-extern void func_002A3DB8(char *);
+extern void get_moby_joint_matrices_batch(char *);
 
 extern void func_00282D30_7(char *, char *, float);
 
@@ -111,10 +111,10 @@ extern ListObjectb52b2850 *D_L03_001DAB80[];
 
 extern Pairb52b2850 D_L03_001DDA00[];
 
-void func_00282A60(unsigned int *dst, unsigned int val, int size);
+void mem_clear(unsigned int *dst, unsigned int val, int size);
 
 /* Return whether both flag bit 0x10000 at data offset 0x90 and flag bit 0x04000000 at offset 0x98 are set, retaining the measured early rejection path. */
-int func_0029DE38(void)
+int menu_are_both_status_flags_set(void)
 {
     if ((D_00139768.flags_90 & 0x10000u) == 0 &&
         (D_00139768.flags_98 & 0x04000000u) != 0)
@@ -128,17 +128,17 @@ int func_0029DE38(void)
 
 
 /* Finds a free moby slot, initialises it for the given class, and returns it (or 0 if the pool is full). */
-char *func_0029EFD0(int classId)
+char *CreateMoby(int classId)
 {
     MobyPoolSlot *slot;
     for (slot = (MobyPoolSlot *)ref_0029EFD0_01[0];
          slot < (MobyPoolSlot *)ref_0029EFD0_00[0]; slot++) {
         if (slot->state >= 254 && ref_0029EFD0_02[0] >= slot->spawn_frame) {
             if (slot->state == 255) slot[1].state = 255;
-            InitMobyInstance((char *)slot, classId);
+            moby_init_instance((char *)slot, classId);
             slot->vars = ref_0029EFD0_03[0] +
                 (slot - (MobyPoolSlot *)ref_0029EFD0_01[0]) * 128;
-            ClearMemory(slot->vars, 0, 128);
+            mem_clear(slot->vars, 0, 128);
             if (ref_0029EFD0_04[0]) --ref_0029EFD0_04[0];
             return (char *)slot;
         }
@@ -150,23 +150,23 @@ char *func_0029EFD0(int classId)
 /* func_0029F0C8 is defined in 0029F0C8.c. */
 
 extern char *D_001B1B60 __attribute__((sda));
-extern int D_001B1688 __attribute__((sda));
+extern int g_game_time __attribute__((sda));
 extern void func_002A0C68(char *, unsigned int);
 
 /* Marks a moby as ready: sets its state byte by pool position and records the spawn frame. */
-void func_0029F338(void *object)
+void moby_mark_spawned(void *object)
 {
     char *moby = (char *)object;
     if ((unsigned int)moby < (unsigned int)D_001B1B60)
         ((unsigned char *)moby)[0x20] = 0xFD;
     else
         ((unsigned char *)moby)[0x20] = 0xFE;
-    *(int *)(moby + 0xA0) = gGameTime + 2;
+    *(int *)(moby + 0xA0) = g_game_time + 2;
     func_002A0C68(moby, 0x80807F7Fu);
 }
 
 /* shared native body of family d1172b6afb7d978b */
-void func_0029F390(u8 *moby)
+void update_moby_animation_state(u8 *moby)
 {
     if (moby[66] != 255) {
         u8 *animTable = (u8 *)(*(volatile int *)(moby + 36) + 72);
@@ -183,24 +183,24 @@ void func_0029F390(u8 *moby)
     *(int *)(moby + 92) = *(int *)(*(int *)(*(volatile int *)(moby + 36) + (moby[67] << 2) + 72) + (moby[65] << 2) + 28);
 }
 
-extern u8 D_00188660[];
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, char *);
+extern u8 g_sound_state[];
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, char *);
 
 /* Starts or stops the sound attached to a moby depending on its flags. */
-void func_0029F450(void *object)
+void moby_update_sound(void *object)
 {
     u8 *moby = (u8 *)object;
 
     if (moby[0x6D] != 0xFF) {
-        u8 *soundSlot = gSoundState + moby[0x6D] * 0x70;
+        u8 *soundSlot = g_sound_state + moby[0x6D] * 0x70;
 
         if (*(int *)(soundSlot + 0x88) != (int)moby) {
             moby[0x6D] = 0xFF;
         } else if (*(short *)(soundSlot + 0x7E) != moby[0x6C] ||
                    (*(unsigned short *)(moby + 0x34) & 0x40) != 0 ||
                    (*(unsigned short *)(moby + 0x7C) & 0x8000) != 0) {
-            StopSoundVoice(moby[0x6D]);
+            snd_stop_voice(moby[0x6D]);
             moby[0x6D] = 0xFF;
         }
     } else if (moby[0x6C] != 0xFF &&
@@ -212,7 +212,7 @@ void func_0029F450(void *object)
 
 
 /* Picks one of two pointers held at +88 and +92 of the receiver, choosing +92 when the byte at +66 equals 255, then returns a value derived from the scale word at +68: either a halved table lookup, or a weighted blend of two table lookups plus the scale, or an interpolation between a lookup at +92 and a lookup at +88 weighted by one minus the scale. */
-float func_0029F530(char *moby)
+float moby_get_anim_value(char *moby)
 {
     char *p;
     char *q;
@@ -237,10 +237,10 @@ float func_0029F530(char *moby)
 }
 
 
-extern int func_00282A18(int);
+extern int log2dim(int);
 
 /* Reads the number of animation entries for a moby and a value built from that count. */
-void func_0029F648(char *object, int *count, int *value)
+void moby_get_anim_entry_count(char *object, int *count, int *value)
 {
     char *p = *(char **)(object + 0x24);
     int index = *(unsigned char *)(p + 0x2C);
@@ -296,7 +296,7 @@ void func_0029F6A0(
 }
 
 /* Attaches a manipulator record to a moby and adds it to the moby's list. */
-void func_0029F978(u8 *moby,u32 jointId,u8 *record) {
+void AttachManipulator(u8 *moby,u32 jointId,u8 *record) {
  u8 *p;
  if(record[1]!=0) return;
  record[0]=jointId; record[1]=1;
@@ -311,7 +311,7 @@ void func_0029F978(u8 *moby,u32 jointId,u8 *record) {
 }
 
 /* unlinks a node from a singly linked list (head case and inner-chain case) and calls a release routine on it; does nothing for a null node */
-void func_0029F9F0 (char *list, char *node)
+void moby_detach_manipulator (char *list, char *node)
 {
   char *cur;
 
@@ -334,7 +334,7 @@ void func_0029F9F0 (char *list, char *node)
 }
 
 /* Reserve or reuse an object slot, reset its associated state and return signed slot index */
-int func_0029FA88(void *object)
+int moby_alloc_object_slot(void *object)
 {
     int index;
     for (index = 0; index < 16; ++index) {
@@ -349,7 +349,7 @@ int func_0029FA88(void *object)
 }
 
 /* Empties all 16 slots of the object slot table. */
-void func_0029FAE0(void)
+void moby_clear_object_slots(void)
 {
     int i;
     for (i = 0; i < 16; i++) {
@@ -360,7 +360,7 @@ void func_0029FAE0(void)
 
 
 /* Copies an int argument into a 64-byte stack local, scales the float at offset 44 of the first pointer by 1/1024, and runs five helpers over the two pointers and that local buffer. */
-void func_0029FC20(char *moby, int jointIndex, char *out)
+void moby_transform_joint_point(char *moby, int jointIndex, char *out)
 {
     int n;
     char buf[64];
@@ -376,7 +376,7 @@ void func_0029FC20(char *moby, int jointIndex, char *out)
 }
 
 /* scales a float field by 1/1024, stores an int argument in a stack record, and drives four helper calls with frame and object-field pointers */
-void func_0029FCC0(char *moby, int jointIndex, char *out)
+void moby_transform_joint_to_world(char *moby, int jointIndex, char *out)
 {
     char buf[80];
     float x;
@@ -391,7 +391,7 @@ void func_0029FCC0(char *moby, int jointIndex, char *out)
 }
 
 /* Loops n times over a 16-byte-strided pointer, scaling the first pointer float at offset 44 by 1/1024 and calling three helpers with that pointer and two offsets of the first argument. */
-void func_0029FD48(char *moby, int n, char *p3, char *points)
+void moby_transform_point_list(char *moby, int n, char *p3, char *points)
 {
     float f = *(float *)(moby + 44) * 0.0009765625f;
 
@@ -410,7 +410,7 @@ void func_0029FD48(char *moby, int n, char *p3, char *points)
 /* func_0029FDF0 is in 0029DE38-textures-g8.c. */
 
 /* shared native body of family b52b2850e37f2b40 */
-void func_0029FEE0(void)
+void PatchMobyGifs(void)
 {
     int *selected;
     ListObjectb52b2850 *object;
@@ -452,61 +452,61 @@ out:
     }
 }
 
-extern int D_0018C0B0;
+extern int g_hero_moby;
 extern float D_001B1B90[];
 extern void func_002A04E8(int, float *);
-extern float func_00283248(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float mat_fast_helper_a(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 
 /* Works out a small direction vector (length 0.14) from a stored angle and saves it, with a fixed -0.99 height. */
-void func_0029FFB8(void)
+void gfx_compute_light_direction(void)
 {
     float v[2];
     float a;
 
-    func_002A04E8(gHeroMoby_0018C0B0, v);
-    a = FastMatrixHelperA(v[0], v[1]);
-    D_001B1B90[0] = FastSinOrCosA(a) * 0.14f;
-    D_001B1B90[1] = FastSinOrCosB(a) * 0.14f;
+    func_002A04E8(g_hero_moby, v);
+    a = mat_fast_helper_a(v[0], v[1]);
+    D_001B1B90[0] = math_fast_sin_or_cos_a(a) * 0.14f;
+    D_001B1B90[1] = math_fast_sin_or_cos_b(a) * 0.14f;
     D_001B1B90[2] = -0.99f;
 }
 
 /* func_002A0048 is in 0029DE38-dma.c. */
 
-extern void func_0011AEA0(int);
+extern void FlushCache(int);
 extern char D_00238F00[];
 extern void *D_001B16B0 __attribute__((sda));
 extern int D_001B16B4 __attribute__((sda));
-extern void func_002A4D88(void *, int);
+extern void MobyAnimProc(void *, int);
 
 /* Copies a block of data to the graphics scratch area and starts the next upload. */
-void func_002A0180(void)
+void tex_upload_scratch_data(void)
 {
     FlushCache(0);
-    FastMemoryHelperC((void *)0x70003800, D_00238F00, 0x800);
+    mem_fast_helper_c((void *)0x70003800, D_00238F00, 0x800);
     MobyAnimProc(D_001B16B0, D_001B16B4);
 }
 
 /* Fills a small scratch area with a fixed pattern. */
-void func_002A01C8(void)
+void mem_fill_scratch_area(void)
 {
-    ClearMemory((unsigned int *)0x70003A00, 0x40000000, 0x3C0);
+    mem_clear((unsigned int *)0x70003A00, 0x40000000, 0x3C0);
 }
 
-extern void func_00282B50(void *, void *, int);
+extern void mem_fast_helper_c(void *, void *, int);
 
 /* Saves the scratch area to a backup buffer. */
-void func_002A01F0(void)
+void mem_save_scratch_area(void)
 {
-    FastMemoryHelperC((void *)((char *)D_L03_001DAB80 - 0x3C0), (void *)0x70003A00, 0x3C0);
+    mem_fast_helper_c((void *)((char *)D_L03_001DAB80 - 0x3C0), (void *)0x70003A00, 0x3C0);
 }
 
 
 /* Restores the scratch area from the backup buffer. */
-void func_002A0220(void)
+void mem_restore_scratch_area(void)
 {
-    FastMemoryHelperC((void *)0x70003A00, (void *)((char *)D_L03_001DAB80 - 0x3C0), 0x3C0);
+    mem_fast_helper_c((void *)0x70003A00, (void *)((char *)D_L03_001DAB80 - 0x3C0), 0x3C0);
 }
 
 
@@ -514,17 +514,17 @@ void func_002A0220(void)
 
 /* func_002A0300 is in 0029DE38-g8.c. */
 
-extern void func_0029FDF0(void);
-extern void func_002A0180(void);
-extern int func_002A0048(void);
+extern void DmaMobyTextures(void);
+extern void tex_upload_scratch_data(void);
+extern int ConfigureGraphicsSetupDmaChain(void);
 extern int D_001B1B80;
 
 /* Runs the texture upload, and then the graphics setup if it is switched on. */
-int func_002A0380(void)
+int tex_run_upload_and_setup(void)
 {
     int result;
     DmaMobyTextures();
-    UploadScratchTextureData();
+    tex_upload_scratch_data();
     result = D_001B1B80;
     if (result != 0)
         result = ConfigureGraphicsSetupDmaChain();

@@ -4,12 +4,12 @@ extern int D_001A8CFC[] __attribute__((sda));
 extern float D_001B23A4[] __attribute__((sda));
 extern int D_001B27C0[] __attribute__((sda));
 extern char D_001B0110[];
-extern int func_00336D50(int, int);
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern void func_002ED578(int, int *, int *, int *);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_00283CF0(float);
-extern void func_0027F5B8(int, int, unsigned long, char *, int);
+extern int table_find_by_id(int, int);
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern void math_split_time_into_parts(int, int *, int *, int *);
+extern int sprintf(char *, char *, ...);
+extern int FloatToInt(float);
+extern void text_draw_medium(int, int, unsigned long, char *, int);
 
 /* The display mode word beside the HUD scale. */
 extern int D_001B23A0[] __attribute__((sda));
@@ -29,7 +29,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 
 /* Draws the HUD timer: two labels from the text table, then the time split into three
    fields, formatted and drawn centred, scaled by the HUD scale. */
-int func_00326A10(void)
+int hud_draw_timer_a(void)
 {
     char text[64];
     int hours, minutes, seconds;
@@ -43,17 +43,17 @@ int func_00326A10(void)
     half = 0.5f;
     one = 1;
     textOffset = 0x8710;
-    id = FindTableEntryById(D_001A8CFC[0] + textOffset, 0xC1);
+    id = table_find_by_id(D_001A8CFC[0] + textOffset, 0xC1);
     y = hud_coord(baseY, D_001B23A4[0], half, one);
     ox = -0.5f;
     sc = 1.0f;
-    DrawScaledObjectTwoAxes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
-    id = FindTableEntryById(D_001A8CFC[0] + textOffset, 0xC2);
+    gfx_draw_scaled_object_two_axes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
+    id = table_find_by_id(D_001A8CFC[0] + textOffset, 0xC2);
     y = hud_coord(baseY, D_001B23A4[0], half, one);
-    DrawScaledObjectTwoAxes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
-    SplitTimeIntoParts(D_001B27C0[0], &hours, &minutes, &seconds);
-    Sprintf(text, D_001B0110, hours, minutes, seconds);
-    DrawTextMediumFont(FloatToInt(405.0f), hud_coord(372.0f, D_001B23A4[0], half, one),
+    gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
+    math_split_time_into_parts(D_001B27C0[0], &hours, &minutes, &seconds);
+    sprintf(text, D_001B0110, hours, minutes, seconds);
+    text_draw_medium(FloatToInt(405.0f), hud_coord(372.0f, D_001B23A4[0], half, one),
                   0x80808080UL, text, 128);
     return 1;
 }

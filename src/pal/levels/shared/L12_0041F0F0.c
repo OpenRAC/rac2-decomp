@@ -4,7 +4,7 @@
 
 #include "common.h"
 extern char D_L12_001FEAC0[];
-extern f32 func_00283248(f32 a, f32 b);
+extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern int func_PAL_002B5C98(char *a, char *b, f32 c);
 
 /* Aim pass over the slot the 0x110 record names: measure the two position differences,
@@ -31,7 +31,7 @@ s32 func_PAL_L12_0041F710(char *a0)
     p = (char *)s0 + off;
     dx = *(f32 *)(p + 0x10) - *(f32 *)(s1 + 0x10);
     dy = *(f32 *)(p + 0x14) - *(f32 *)(s1 + 0x14);
-    r = func_00283248(dx, dy);
+    r = mat_fast_helper_a(dx, dy);
     if ((func_PAL_002B5C98(s1, (char *)s0 + ((*(s32 *)(s2 + 0x224) << 4) + 0x10), r) & 0x8F) != 0) {
         n = *(s32 *)(s2 + 0x224);
         if (n == *(s32 *)(s2 + 0x220))

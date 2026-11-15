@@ -13,15 +13,15 @@ extern int D_L00_001B0074 __attribute__((sda)), D_L00_001B0078 __attribute__((sd
 extern float D_L00_001AFFEC __attribute__((sda)), D_L00_001AFFF0 __attribute__((sda)), D_L00_001AFFF4 __attribute__((sda)), D_L00_001AFFF8 __attribute__((sda));
 extern float D_L00_001AFFFC __attribute__((sda)), D_L00_001B0000 __attribute__((sda)), D_L00_001B0004 __attribute__((sda));
 extern SurfaceVector D_L00_00240480[], D_L00_00240540[], D_L00_00240600[][20], D_L00_002404C0[][20];
-extern char D_L00_001B8DC0[];
-extern void func_L00_003C7DF0(void *, int, int, float, float, float, int, int);
-extern void func_L00_003C83E0(void *), func_L00_003C8608(void *);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern char g_camera_l00_position[];
+extern void DrawScrollingRibbonColored(void *, int, int, float, float, float, int, int);
+extern void DrawLightningArcSparks2(void *), DrawBeamOriginCameraFacingQuads(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void draw_world_quad(void *, void *, int);
 /* Draws the beam effect: two glowing ribbons, the lightning sparks, the beam origin quads and a ring of scrolling surface quads around the beam. */
-void func_L00_003C79F8(void *object)
+void DrawBeamRingAndRailEffects(void *object)
 {
     SurfacePacket packet;
     SurfaceVector edge, side, normal, eye;
@@ -61,7 +61,7 @@ void func_L00_003C79F8(void *object)
                 FastVecSub(&edge, &packet.vertex[0], &packet.vertex[1]);
                 FastVecSub(&side, point2, &packet.vertex[1]);
                 FastVecCross(&normal, &side, &edge);
-                FastVecSub(&eye, &packet.vertex[1], gCameraPosition_L00);
+                FastVecSub(&eye, &packet.vertex[1], g_camera_l00_position);
                 if (FastVecDot(&normal, &eye) >= 0) {
                     texV += D_L00_001AFFF0; texW += D_L00_001AFFF0;
                 } else {

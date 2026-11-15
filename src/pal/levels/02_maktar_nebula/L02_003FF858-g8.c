@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L02_003FF858, the PAL copy of func_L02_003FB120: the same C, where the timer reload is
    read as a word and scaled for 50 Hz at the store, and the callee is func_PAL_L02_00405040. */
 #include "include_asm.h"
@@ -9,11 +10,11 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 
-extern unsigned char *D_L02_001B359C[3] __attribute__((sda));
+extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern f32 D_L02_001B1218 __attribute__((sda));
 
@@ -25,9 +26,9 @@ extern s32 D_L02_001B1214 __attribute__((sda));
 
 extern void func_PAL_L02_00405040(char *, s32, f32, f32);
 
-extern void func_L00_0035F5A0(s32, s32, s32);
+extern void snd_start_in_slot(s32, s32, s32);
 
-extern s32 func_00282978(char *);
+extern s32 FastDecTimer(char *);
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 
@@ -51,7 +52,7 @@ void func_PAL_L02_003FF858(char *a0) {
     u16 *q;
 
     if (GROUP(0x40) != 0xFF) {
-        q = (u16 *)D_L02_001FC060[GROUP(0x40)];
+        q = (u16 *)g_entity_group_lists[GROUP(0x40)];
         if (q != 0) {
             u16 *p = q;
             char *e;
@@ -61,7 +62,7 @@ void func_PAL_L02_003FF858(char *a0) {
             f32 f;
 
             do {
-                e = (char *)D_L02_001B359C[0] + ((*p & 0x7FFF) << 8);
+                e = (char *)g_moby_l02_pool[0] + ((*p & 0x7FFF) << 8);
                 if (e != 0 && *(u8 *)(e + 0x20) != 0xFE && *(u8 *)(e + 0x20) != 0xFD &&
                     *(u8 *)(e + 0x20) != 1) {
                     kind = *(s16 *)(e + 0xAA);
@@ -77,7 +78,7 @@ void func_PAL_L02_003FF858(char *a0) {
                 }
             } while ((s16)*p++ >= 0);
             {
-                char *hero = D_00189E20;
+                char *hero = g_hero_state;
                 s32 k;
                 s32 r;
                 s32 x;
@@ -89,7 +90,7 @@ void func_PAL_L02_003FF858(char *a0) {
                 func_PAL_L02_00405040(a0, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
                                   *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC));
                 if (*(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC) > 0.0f)
-                    func_L00_0035F5A0(0x17, 0, 0);
+                    snd_start_in_slot(0x17, 0, 0);
                 if (count < *(s32 *)(state + 0x60))
                     *(s32 *)(state + ((s16) * (s16 *)(state + 0x11C) << 4)) +=
                         *(s32 *)(state + 0x60) - count;
@@ -127,7 +128,7 @@ void func_PAL_L02_003FF858(char *a0) {
                 {
                     char *timer = state + 0x11E;
 
-                    if (func_00282978(timer)) {
+                    if (FastDecTimer(timer)) {
                         char *b4 = state + 4;
                         char *b8 = state + 8;
                         s32 reload = D_L02_001B1214;

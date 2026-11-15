@@ -3,7 +3,7 @@
 
 /* func_PAL_002D74D8, the PAL copy of func_002D68D8: the same C, with the frame count at 50 Hz. */
 extern int ref_L00_002D68D8_00 __attribute__((sda));
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 
 int func_PAL_002D74D8(int start, int first, int second)
 {
@@ -15,5 +15,5 @@ int func_PAL_002D74D8(int start, int first, int second)
         fraction = 1.0f - (float)(((s32)(ref_L00_002D68D8_00) * 5 + 2) / 6 - start) / (float)(((s32)(ref_L00_002D68D8_00) * 5 + 2) / 6);
     else
         fraction = 1.0f;
-    return func_00283D38(first, second, fraction);
+    return FastTweenColor(first, second, fraction);
 }

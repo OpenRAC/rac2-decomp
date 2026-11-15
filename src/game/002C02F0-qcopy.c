@@ -28,43 +28,43 @@ typedef struct {
     } motion;
 } Particle_002C02F0;
 
-extern Particle_002C02F0 *func_002B9030(int);
-extern int func_002AAE98(float, float, float, float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
+extern Particle_002C02F0 *part_alloc(int);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
 extern int func_001163B0(void);
 extern unsigned char *D_001F2570;
 
 /* Spawns a grey smoke particle like func_002C0CC0, sized by scale; kinds below 5
    get a random size and a shorter random life. */
 /* Creates a grey smoke puff whose size depends on the given scale. */
-Particle_002C02F0 *func_002C02F0(TI128 *position, TI128 *velocity, unsigned char kind, int extra,
+Particle_002C02F0 *part_spawn_scaled_smoke(TI128 *position, TI128 *velocity, unsigned char kind, int extra,
                                  unsigned char scale, int shade)
 {
-    Particle_002C02F0 *p = AllocParticle(0x28);
+    Particle_002C02F0 *p = part_alloc(0x28);
     typeof(p->motion) *m = &p->motion;
     float turn;
 
     if (p != 0) {
         p->position = *position;
         m->velocity = *velocity;
-        p->colour = PackColorFloatsToWord(0.7f, 0.7f, 0.7f, 0.08f);
+        p->colour = gfx_pack_color_floats(0.7f, 0.7f, 0.7f, 0.08f);
         p->unk09 = (shade >> 5 << 4) + FloatToInt(4.0f);
         p->unk01 = 0;
         p->unk03 = 0x44;
-        turn = RandomAngle();
+        turn = math_random_angle();
         m->unk10 = turn;
         p->unk08 = (int)(turn * 256.0f);
-        p->unk02 = D_001F2570[Rand() & 7];
+        p->unk02 = D_001F2570[func_001163B0() & 7];
         m->scale = scale;
         m->kind = kind;
         m->unk14 = 0;
         m->unk16 = 0;
         if (kind < 5) {
-            p->unk0C = RandomFloatRange(IntToFloat(m->scale) * 656.25f, IntToFloat(m->scale) * 937.5f);
-            p->life = 0x12 - Rand() % 15;
+            p->unk0C = math_random_float_range(IntToFloat(m->scale) * 656.25f, IntToFloat(m->scale) * 937.5f);
+            p->life = 0x12 - func_001163B0() % 15;
         } else {
             p->unk0C = IntToFloat(m->scale) * 937.5f;
             p->life = 0x12;

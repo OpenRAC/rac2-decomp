@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_002E91C0, the USA v2.00 copy of func_002E8368: the same C, where rename func_002EC1C0 becomes func_US2_002ED018; rename func_002E64A0 becomes func_US2_002E72D8; rename func_00132A10 becomes func_001329F0; rename func_00132AC8 becomes func_00132AA0; rename func_00132828 becomes func_00132818. */
 #include "common.h"
 #define W(p, o)  (*(int *)((char *)(p) + (o)))
@@ -5,32 +6,32 @@
 #define B(p, o)  (*(unsigned char *)((char *)(p) + (o)))
 #define F(p, o)  (*(float *)((char *)(p) + (o)))
 
-extern void func_002F5220(void);
-extern void func_002F52B8(void);
-extern void func_00133220(void);
-extern void func_00133230(void);
-extern int func_00132028(void);
-extern void func_001329F0(int, int, int, int, int, int, int, int);
-extern void func_0029F338(void *);
-extern void func_0029F390(void *);
-extern void func_0029FC20(void *, int, void *);
+extern void game_reset_frame_counters(void);
+extern void game_update_idle_frame_counters(void);
+extern void snd_set_current_buffer_flag(void);
+extern void snd_clear_flag_and_update(void);
+extern int snd_Pump(void);
+extern void snd_send_cmd11_six_values_callback(int, int, int, int, int, int, int, int);
+extern void moby_mark_spawned(void *);
+extern void update_moby_animation_state(void *);
+extern void moby_transform_joint_point(void *, int, void *);
 extern void func_002A0F48(void *);
 extern void func_002A10E8(void *);
 extern void func_US2_002ED018(void);
 extern char D_00240450[];
-extern void func_002ED260(void *);
-extern void func_00132AA0(void);
+extern void part_init_effect_table(void *);
+extern void snd_send_cmd18(void);
 extern int func_001163B0(void);
-extern void func_00132858(int);
-extern void func_00132818(void);
-extern void func_002E80B0(void);
-extern void func_00282A60(void *, int, int);
-extern void func_00294070(int);
-extern void func_002E6A60(void);
-extern void func_0027AB40(void);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
+extern void snd_send_cmd6(int);
+extern void snd_send_cmd8(void);
+extern void scene_load_texture_block(void);
+extern void mem_clear(void *, int, int);
+extern void load_select_segment_update_world(int);
+extern void cam_set_from_selected_record(void);
+extern void UpdateViewContext(void);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
 extern void func_US2_002E72D8(int);
 
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
  char pad48[0x19]; unsigned char alpha, cached_frame, flags; char pad64[4];
  char *keys; char pad6c[0x29]; unsigned char opacity; char pad96[0x14]; short type;
 } TransitionActor;
-extern float D_001B15A0 MACRO_ADDR;
+extern float g_screen_fade MACRO_ADDR;
 typedef struct {
  char pad[0xc]; unsigned char count; char gap[0x3b]; void *animations[1];
 } AnimationClass;
@@ -50,11 +51,11 @@ typedef struct {
  char pad46[0xe]; int id; char pad58[0x14]; int start, end;
  int entries[70]; char *objects[17];
 } TransitionScene;
-extern TransitionScene D_001B8840;        /* controller state */
+extern TransitionScene g_scene_playback_state;        /* controller state */
 typedef struct {
  char pad[0x2c]; short flag; char pad2e[0x36]; int index, phase;
 } TransitionMenu;
-extern TransitionMenu D_00152C00;        /* mode block: +0x64 index, +0x68 phase */
+extern TransitionMenu g_hero_moby_default;        /* mode block: +0x64 index, +0x68 phase */
 extern int D_001B2130_first SDATA(D_001B2130);
 
 extern int D_001B2130[] MACRO_ADDR __attribute__((sda));         /* [0] +0, [1] +4, [3] +0xC */
@@ -62,7 +63,7 @@ extern int D_001B2148[] __attribute__((sda));
 extern int D_001B2148_first[] __asm__("D_001B2148") __attribute__((sda));         /* null-terminated entity list */
 typedef struct { char pad[0x24]; float scale; } ScaleClass;
 typedef struct { char pad[0x24]; ScaleClass *definition; int pad28; float scale; } ScaleEntity;
-extern ScaleEntity *D_00214920[];         /* null-terminated entity list */
+extern ScaleEntity *g_equipment_pieces[];         /* null-terminated entity list */
 extern int D_001ABEB0 __attribute__((sda));
 extern int D_001A7280;
 extern int D_001A7280_block[] __asm__("D_001A7280") MACRO_ADDR __attribute__((sda));
@@ -92,85 +93,85 @@ int func_US2_002E91C0(void)
     float f20;
     int i, fp;
 
-    func_002F5220();
+    game_reset_frame_counters();
     {
-        float v = D_001B15A0 - 0.25f;
-        D_001B8840.tick = D_001B8840.tick + 1;
-        D_001B8840.frame = D_001B8840.frame + 1;
-        D_001B15A0 = v;
+        float v = g_screen_fade - 0.25f;
+        g_scene_playback_state.tick = g_scene_playback_state.tick + 1;
+        g_scene_playback_state.frame = g_scene_playback_state.frame + 1;
+        g_screen_fade = v;
         if (v < 0.0f)
-            D_001B15A0 = 0.0f;
+            g_screen_fade = 0.0f;
     }
-    if (D_001B8840.frame == 1) {
+    if (g_scene_playback_state.frame == 1) {
         int n;
-        func_00133220();
-        n = D_00152C00.index;
-        func_001329F0(D_001B2130[n], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + n * 0x70);
-        func_00133230();
-        func_00132028();
+        snd_set_current_buffer_flag();
+        n = g_hero_moby_default.index;
+        snd_send_cmd11_six_values_callback(D_001B2130[n], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + n * 0x70);
+        snd_clear_flag_and_update();
+        snd_Pump();
     }
-    if (D_001B8840.frame < D_001B8840.duration) {
+    if (g_scene_playback_state.frame < g_scene_playback_state.duration) {
         goto running;
     }
     /* the phase has ended */
-    for (i = 0; i < D_001B8840.count; i++) {
-        AnimationObject *p = (AnimationObject *)D_001B8840.objects[i];
+    for (i = 0; i < g_scene_playback_state.count; i++) {
+        AnimationObject *p = (AnimationObject *)g_scene_playback_state.objects[i];
         if (p != 0) {
             p->definition->count--;
             p->definition->animations[p->definition->count] = 0;
-            func_0029F338(p);
+            moby_mark_spawned(p);
         }
     }
     if (D_001ABEB0 != 0) {
         func_US2_002ED018();
         D_001ABEB0 = 0;
     }
-    func_002ED260(D_00240450);
+    part_init_effect_table(D_00240450);
     if (D_001A7280 < 2)
-        D_00152C00.phase = 0;
-    if (D_00152C00.phase < 2) {
-        if (D_00152C00.index != 2) {
-            func_00132AA0();
-            while (func_00132028() != 0)
+        g_hero_moby_default.phase = 0;
+    if (g_hero_moby_default.phase < 2) {
+        if (g_hero_moby_default.index != 2) {
+            snd_send_cmd18();
+            while (snd_Pump() != 0)
                 ;
         }
-        if (D_00152C00.phase == 0) {
+        if (g_hero_moby_default.phase == 0) {
             int r = ((func_001163B0() >> 16) % 3) + 1;
-            D_00152C00.index = (D_00152C00.index + r) & 3;
+            g_hero_moby_default.index = (g_hero_moby_default.index + r) & 3;
         } else {
-            D_00152C00.index = 4;
-            func_00133220();
-            func_00132858(D_001B2130_first);
-            func_00132858(D_001B2130[1]);
-            func_00132858(D_001B2130[3]);
-            func_00133230();
-            while (func_00132028() != 0)
+            g_hero_moby_default.index = 4;
+            snd_set_current_buffer_flag();
+            snd_send_cmd6(D_001B2130_first);
+            snd_send_cmd6(D_001B2130[1]);
+            snd_send_cmd6(D_001B2130[3]);
+            snd_clear_flag_and_update();
+            while (snd_Pump() != 0)
                 ;
-            func_00132818();
+            snd_send_cmd8();
             D_001A7280_block[1] = 0;
-            func_002E80B0();
+            scene_load_texture_block();
         }
-        D_00152C00.phase = D_00152C00.phase + 1;
+        g_hero_moby_default.phase = g_hero_moby_default.phase + 1;
         qcopy(D_001AC0D0, D_001AC0C0);
-        func_00282A60(&D_001B8840, 0, 0x1D0);
+        mem_clear(&g_scene_playback_state, 0, 0x1D0);
         {
             int workspace_offset = D_001B22B0;
             TransitionHeader *header;
             TransitionChunk *chunk;
             int data_base;
             int k;
-            D_001B8840.start = D_001BAEC0.start + workspace_offset;
-            D_001B8840.end = D_001BAEC0.end + workspace_offset;
+            g_scene_playback_state.start = D_001BAEC0.start + workspace_offset;
+            g_scene_playback_state.end = D_001BAEC0.end + workspace_offset;
             header = D_001BAEC0.data;
             data_base = (int)header + header->data_offset;
-            chunk = (TransitionChunk *)(data_base + header->scenes[D_00152C00.index]);
+            chunk = (TransitionChunk *)(data_base + header->scenes[g_hero_moby_default.index]);
             for (k = 0; k < 70 && chunk->size != 0; k++) {
                 int offset = chunk->offset + 0x800;
-                D_001B8840.entries[k] = data_base + header->scenes[D_00152C00.index] + offset;
+                g_scene_playback_state.entries[k] = data_base + header->scenes[g_hero_moby_default.index] + offset;
                 chunk++;
             }
         }
-        func_00294070(0);
+        load_select_segment_update_world(0);
         goto after;
     } else {
         if (D_001A7280_block[1] == 0)
@@ -180,42 +181,42 @@ int func_US2_002E91C0(void)
     }
 
 running:
-    if (!(D_001B8840.tick < 0x60)) {
-        D_001B8840.page = D_001B8840.page + 1;
-        func_00294070(D_001B8840.page);
+    if (!(g_scene_playback_state.tick < 0x60)) {
+        g_scene_playback_state.page = g_scene_playback_state.page + 1;
+        load_select_segment_update_world(g_scene_playback_state.page);
     }
 after:
-    func_002E6A60();
+    cam_set_from_selected_record();
     {
         float current = D_001B9040.fov;
-        float t = D_001AC168[D_00152C00.index];
+        float t = D_001AC168[g_hero_moby_default.index];
         if (current < t)
             D_001B9040.fov = t;
     }
-    func_0027AB40();
+    UpdateViewContext();
     f20 = 1.0f;
-    if (D_00152C00.index == 4) {
-        f20 = (float)(D_001B8840.duration - D_001B8840.frame) / (float)D_001B8840.duration;
-        func_00282D30(sp0, D_001AC120, f20);
-        func_00282CC0(D_001AC0D0, D_001AC0D0, sp0);
+    if (g_hero_moby_default.index == 4) {
+        f20 = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
+        FastVecScale(sp0, D_001AC120, f20);
+        FastVecAdd(D_001AC0D0, D_001AC0D0, sp0);
     }
-    func_00282D30(&D_001B20D0, D_00261F30 + D_00152C00.index * 16, (float)(D_001B8840.frame - 0x78) * (f20 * 20.0f));
-    D_001ABDD4 = D_001AC150[D_00152C00.index];
-    for (i = 0; i < D_001B8840.count; i = fp) {
+    FastVecScale(&D_001B20D0, D_00261F30 + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (f20 * 20.0f));
+    D_001ABDD4 = D_001AC150[g_hero_moby_default.index];
+    for (i = 0; i < g_scene_playback_state.count; i = fp) {
         TransitionActor *o;
         int s1, s2;
         float r;
         char *s0m;
-        s1 = D_001B8840.tick >> 1;
-        o = (TransitionActor *)D_001B8840.objects[i];
+        s1 = g_scene_playback_state.tick >> 1;
+        o = (TransitionActor *)g_scene_playback_state.objects[i];
         fp = i + 1;
-        r = func_00283CE0(D_001B8840.tick & 1);
+        r = IntToFloat(g_scene_playback_state.tick & 1);
         s2 = s1 + 1;
         o->blend = r * 0.5f;
         s0m = (char *)o->keys;
-        func_00282D30(sp0, s0m + s1 * 16, 1.0f - o->blend);
-        func_00282D30(sp10, s0m + s2 * 16, o->blend);
-        func_00282CC0(o->position, sp0, sp10);
+        FastVecScale(sp0, s0m + s1 * 16, 1.0f - o->blend);
+        FastVecScale(sp10, s0m + s2 * 16, o->blend);
+        FastVecAdd(o->position, sp0, sp10);
         {
             char *d = (char *)o->definition;
             o->current_anim = B(d, 0xC) - 1;
@@ -223,11 +224,11 @@ after:
             o->key = s1;
             o->next_key = s2;
         }
-        func_0029F390(o);
+        update_moby_animation_state(o);
         o->draw_flags = 0x1FF;
         if (o->type == 0xD54) {
             if (D_001B2148_first[0] != 0) {
-                func_0029FC20(o, 0, sp20);
+                moby_transform_joint_point(o, 0, sp20);
                 {
                     int a3 = 0;
                     o->flags = 0;
@@ -249,7 +250,7 @@ after:
                     }
                 }
             } else {
-                func_US2_002E72D8(D_001B8840.id);
+                func_US2_002E72D8(g_scene_playback_state.id);
             }
             o->opacity = 0xE8;
         }
@@ -264,9 +265,9 @@ after:
             char *d = (char *)o->definition;
             o->current_anim = B(d, 0xC) - 1;
             o->next_anim = B(d, 0xC) - 1;
-            if (D_00152C00.index == 4) {
-                int a0 = D_001B8840.duration;
-                int v1 = D_001B8840.frame;
+            if (g_hero_moby_default.index == 4) {
+                int a0 = g_scene_playback_state.duration;
+                int v1 = g_scene_playback_state.frame;
                 if (a0 - 0x28 < v1) {
                     float f1 = (float)(a0 - v1 - 4) * 0.027777778f;
                     if (f1 < 0.0f)
@@ -281,14 +282,14 @@ after:
                     if (o->type == 0xD54) {
                         if (D_001B2148_first[0] == 0) {
                             int j;
-                            D_00152C00.flag = 1;
-                            if (D_00214920[0] != 0) {
+                            g_hero_moby_default.flag = 1;
+                            if (g_equipment_pieces[0] != 0) {
                                 j = 0;
                                 do {
-                                    ScaleEntity *e = D_00214920[j];
+                                    ScaleEntity *e = g_equipment_pieces[j];
                                     j++;
                                     e->scale = e->definition->scale * f1;
-                                } while (D_00214920[j] != 0);
+                                } while (g_equipment_pieces[j] != 0);
                             }
                         }
                     }
@@ -296,6 +297,6 @@ after:
             }
         }
     }
-    func_002F52B8();
+    game_update_idle_frame_counters();
     return 0;
 }

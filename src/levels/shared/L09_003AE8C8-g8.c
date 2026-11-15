@@ -18,22 +18,22 @@ typedef struct {
     int a, b;
 } ProjectileState;
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 extern char D_0018A0E0[];
 extern float D_L09_001AF89C __attribute__((sda));
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern void func_L09_003AEE10(char *);
-extern void func_002E5CF8(int, int, char *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern void projectile_init_direction(char *);
+extern void PlayMobySound(int, int, char *);
 extern void func_002A0F48(char *);
 
 /* Integer arguments stay pos, owner, dir, a, b ($a0-$t0) and float arguments f, range, c, d
    ($f12-$f15); only the interleaving of the two banks is chosen. */
 /* Spawns a projectile at a position flying along a direction, works out how many frames it lives and returns it. */
-char *func_L09_003AE8C8(void *pos, char *owner, float f, float range, float c, void *dir, int a,
+char *projectile_l09_spawn(void *pos, char *owner, float f, float range, float c, void *dir, int a,
                         int b, float d)
 {
     char *obj = CreateMoby(0x5DE /* moby class 1502 */);
@@ -66,7 +66,7 @@ char *func_L09_003AE8C8(void *pos, char *owner, float f, float range, float c, v
         *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * factor;
         *(unsigned char *)(obj + 0x20) = 0;
         st->d = d;
-        InitProjectileDirection(obj);
+        projectile_init_direction(obj);
         PlayMobySound(0, 0, obj);
         func_002A0F48(obj);
     }

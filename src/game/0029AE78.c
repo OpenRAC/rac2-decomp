@@ -12,7 +12,7 @@ typedef struct {
     SaveInfoEntry entries[4];
 } SaveInfoSlot;
 
-extern SaveInfoSlot D_001393E0[];
+extern SaveInfoSlot g_memcard_state[];
 extern void *memcpy(void *, const void *, unsigned int);
 
 typedef int s32;
@@ -29,10 +29,10 @@ extern BatchA_A08_s32 D_L00_001A904C[] __attribute__((sda));
 
 extern int D_L00_001A904C_6 __attribute__((sda));
 
-extern void func_003380B0(int *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
+extern void text_draw_framed_box(int *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
 
 /* Works out how many bytes the save data needs by walking a list of records, with each one padded to 4 bytes. */
-s32 func_0029AE78(s32 *records) {
+s32 memcard_GetDataSize(s32 *records) {
  s32 size=8;
  while(records[0]!=0) {
   size+=8; size+=records[1]; size=(size+3)&-4;
@@ -44,7 +44,7 @@ s32 func_0029AE78(s32 *records) {
 extern int D_00256138[];
 
 /* Makes a 16-bit checksum of a block of save data. Returns 0 if the block is too long. */
-int func_0029AEB0(char *data, int length)
+int save_compute_checksum(char *data, int length)
 {
     char *end;
     unsigned int crc;
@@ -68,19 +68,19 @@ int func_0029AEB0(char *data, int length)
 }
 
 /* Checks that a save block matches the checksum stored in its header. */
-int func_0029AF58(char *block)
+int save_verify_block_checksum(char *block)
 {
-    extern int func_0029AEB0(char *, int);
+    extern int save_compute_checksum(char *, int);
     int storedChecksum = *(int *)(block + 4);
     int length = *(int *)block;
     int result = 0;
     if (storedChecksum != 0)
-        result = ComputeSaveChecksum(block + 8, length) == storedChecksum;
+        result = save_compute_checksum(block + 8, length) == storedChecksum;
     return result;
 }
 
 /* Packs all the save records into one buffer and adds the end marker and checksum. Returns the total size. */
-int func_0029AF98(char *saveBuf, int slotIndex, int *records)
+int save_pack_records(char *saveBuf, int slotIndex, int *records)
 {
     int size = 0;
     char *dst = saveBuf + 8;
@@ -119,17 +119,17 @@ int func_0029AF98(char *saveBuf, int slotIndex, int *records)
 
 /* Reads one save-slot header from memory-card data into the slot info table and marks it bad if the checksum fails. */
 /* Slot indexing follows RAC1 memcard_RestoreInfo (src/game/memcard.c). */
-void func_0029B0B0(char *src, int slot, int entry)
+void FillSaveSlotInfo(char *src, int slot, int entry)
 {
-    gMemcardState[slot].entries[entry].invalid = VerifySaveBlockChecksum(src) == 0;
+    g_memcard_state[slot].entries[entry].invalid = save_verify_block_checksum(src) == 0;
     src += 0x10;
-    gMemcardState[slot].entries[entry].first = *(int *)src;
+    g_memcard_state[slot].entries[entry].first = *(int *)src;
     src += 0xC;
-    gMemcardState[slot].entries[entry].second = *(int *)src;
-    gMemcardState[slot].entries[entry].third = *(unsigned char *)(src + 0x12);
+    g_memcard_state[slot].entries[entry].second = *(int *)src;
+    g_memcard_state[slot].entries[entry].third = *(unsigned char *)(src + 0x12);
     src += 0x48;
-    gMemcardState[slot].entries[entry].fourth = *(int *)src;
-    memcpy(gMemcardState[slot].entries[entry].stamp, src + 0xC, 8);
+    g_memcard_state[slot].entries[entry].fourth = *(int *)src;
+    memcpy(g_memcard_state[slot].entries[entry].stamp, src + 0xC, 8);
 }
 
 
@@ -140,34 +140,34 @@ void func_0029B0B0(char *src, int slot, int entry)
 /* The existing implementation is in 0029B658-rc2.c. */
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_0034CE28(void *, int);
+extern void menu_set_screen_value_restart_four_fades(void *, int);
 
 /* Passes a value on to the level object, if one is loaded. */
-void func_0029B698(int value) {
+void level_forward_value(int value) {
     if (D_001A8CFC[0] != 0)
-        SetScreenValueAndRestartFourFades(D_001A8CFC[0] + 0x376C8, value);
+        menu_set_screen_value_restart_four_fades(D_001A8CFC[0] + 0x376C8, value);
 }
 
-extern void func_0034CAE8(void *, int, int);
+extern void menu_set_screen_value_restart_fades(void *, int, int);
 
 /* Passes two values on to the level object, if one is loaded. */
-void func_0029B6D0(int first, int second) {
+void level_forward_pair(int first, int second) {
     if (D_001A8CFC[0] != 0)
-        SetScreenValueAndRestartFades(D_001A8CFC[0] + 0x376C8, first, second);
+        menu_set_screen_value_restart_fades(D_001A8CFC[0] + 0x376C8, first, second);
 }
 
 
-extern void func_0034B000(void *, int);
+extern void menu_set_flag_restart_fades(void *, int);
 
 /* Passes a value on to another part of the level object, if one is loaded. */
-void func_0029B720(int value) {
+void level_forward_value_b(int value) {
     if (D_001A8CFC[0] != 0)
-        SetMenuFlagAndRestartFades(D_001A8CFC[0] + 0x37EB0, value);
+        menu_set_flag_restart_fades(D_001A8CFC[0] + 0x37EB0, value);
 }
 
 /* A08-sda-offset-40 freshly exact-verified under family reservation */
 /* Stores two values in the level object, if one is loaded. */
-void func_0029B758(BatchA_A08_s32 first, BatchA_A08_s32 second) {
+void level_store_value_pair(BatchA_A08_s32 first, BatchA_A08_s32 second) {
     BatchA_A08_s32 base = D_L00_001A904C[0];
     BatchA_A08_s32 *values;
     if (base == 0) return;
@@ -177,7 +177,7 @@ void func_0029B758(BatchA_A08_s32 first, BatchA_A08_s32 second) {
 }
 
 /* Returns 1 if either of the two stored level values is non-zero. */
-int func_0029B780(void) {
+int level_has_value_pair(void) {
     int base = D_L00_001A904C[0];
     if (base != 0) {
         int *state = (int *)(base + 0x38000);
@@ -189,20 +189,20 @@ int func_0029B780(void) {
 
 
 
-extern void func_0034E4B8(void *);
+extern void hud_update_subobject_primary(void *);
 
 /* Runs the level object update routine, if a level object is loaded. */
-void func_0029B858(void) {
+void level_run_update(void) {
     if (D_001A8CFC[0] != 0)
-        UpdateHudSubobjectAt1D6C(D_001A8CFC[0] + 0x36F28);
+        hud_update_subobject_primary(D_001A8CFC[0] + 0x36F28);
 }
 
 /* Loads a 32-bit global pointer from a fixed data address; if non-null, tail-forwards it (offset by 0x36F28) plus ten incoming arguments to an overlay-local callee. */
-void func_0029B888(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
+void level_forward_draw_args(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
 {
     int value = D_L00_001A904C_6;
 
     if (value != 0)
-        DrawTextInFramedBox((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+        text_draw_framed_box((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
 }
 

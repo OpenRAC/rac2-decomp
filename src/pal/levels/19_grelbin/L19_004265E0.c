@@ -1,21 +1,21 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
-extern u8 *D_L19_001B2A1C[] __attribute__((sda));
+extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern int D_L19_001C9FC0[];
-extern void func_L00_00323448(char *, char *, int, int, int, int, int, int);
-extern void func_L00_00323958(char *, char *);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void BuildObjectAttachmentTransforms(char *, char *, int, int, int, int, int, int);
+extern void moby_update_attached_transforms(char *, char *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 extern u16 *D_L19_001FB5A0[];
-extern u8 *D_L19_001B2A1C[] __attribute__((sda));
+extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern s32 D_L19_001B2A38[] __attribute__((sda));
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
-extern s32 func_002B38B8(u8 *);
-extern void func_0029F338(u8 *);
+extern s32 flag_is_third_pending_set(u8 *);
+extern void moby_mark_spawned(u8 *);
 extern float D_L19_001B1ECC[] SDATA(D_L19_001B1ECC);
 extern float D_L19_001B1ED0[] SDATA(D_L19_001B1ED0);
 extern float D_L19_001B1ED4[] SDATA(D_L19_001B1ED4);
@@ -43,13 +43,13 @@ void func_PAL_L19_004265E0(char *obj)
     case 0:
         if (*(long *)rig != -1) {
             { u8 a = 0xFF; *(u8 *)(obj + 0x30) = a; }
-            func_L00_00323448(obj, rig + 0x30, 0x32, *(s32 *)(rig + 4), *(s32 *)rig, *(s32 *)(rig + 8), 7, 0);
+            BuildObjectAttachmentTransforms(obj, rig + 0x30, 0x32, *(s32 *)(rig + 4), *(s32 *)rig, *(s32 *)(rig + 8), 7, 0);
             if (*(u8 *)(rig + 0x7A) == 0) {
-                func_0029F338((u8 *)obj);
+                moby_mark_spawned((u8 *)obj);
             } else {
                 *(u8 *)(rig + 0x7D) = 1;
                 *(u16 *)(obj + 0x34) |= 0x104;
-                func_002833F0(obj + 0xC0, obj + 0xF0);
+                euler_rotation_basis(obj + 0xC0, obj + 0xF0);
                 *(u8 *)(obj + 0x20) = 1;
             }
         }
@@ -59,19 +59,19 @@ void func_PAL_L19_004265E0(char *obj)
             turn[0] = *(float *)(rig + 0x10) * 0.0003490659f;
             turn[1] = *(float *)(rig + 0x14) * 0.0003490659f;
             turn[2] = *(float *)(rig + 0x18) * 0.0003490659f;
-            func_002833F0(mat, turn);
-            func_00283738(obj + 0xC0, obj + 0xC0, mat);
+            euler_rotation_basis(mat, turn);
+            multiply_matrix3x3(obj + 0xC0, obj + 0xC0, mat);
             joint = rig + 0x30;
             do {
                 turn[0] = *(float *)(rig + 0x1C) * 0.0003490659f;
                 turn[1] = *(float *)(rig + 0x20) * 0.0003490659f;
                 turn[2] = *(float *)(rig + 0x24) * 0.0003490659f;
-                func_002833F0(mat, turn);
-                func_00283738(joint, joint, mat);
+                euler_rotation_basis(mat, turn);
+                multiply_matrix3x3(joint, joint, mat);
                 tag = *(u8 *)(joint + 0x4A);
                 joint += 0x50;
             } while (tag != 1);
-            func_L00_00323958(obj, rig + 0x30);
+            moby_update_attached_transforms(obj, rig + 0x30);
         }
         break;
     }

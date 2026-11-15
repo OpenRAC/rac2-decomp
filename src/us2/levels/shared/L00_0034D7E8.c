@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_00138344;
 typedef struct {
@@ -9,7 +10,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void func_L00_0030DAD8(int);
+extern void level_l00_call_module_handler_with_arg_4(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_US2_L00_0034D7E8(void)
@@ -31,20 +32,20 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030DAD8(flags);
+        level_l00_call_module_handler_with_arg_4(flags);
     return result;
 }
 
-extern void func_0027C540(int a);
-extern void func_0027C660(void);
-extern void func_L00_0030DB18(void);
+extern void SetupGifPaging(int a);
+extern void DoGifPaging(void);
+extern void level_l00_call_module_handler_5(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_US2_L00_0034D870(void)
 {
-    func_0027C540(0);
-    func_L00_0030DB18();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_5();
+    DoGifPaging();
     return 0;
 }
 

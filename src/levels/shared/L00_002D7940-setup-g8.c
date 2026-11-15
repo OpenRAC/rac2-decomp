@@ -45,12 +45,12 @@ typedef struct {
 extern CameraState9E D_L00_001B8C80;
 extern CameraSlot9E D_L00_001B91D0[];
 extern int D_L00_001BB930[];
-extern CameraHero9E D_00189E20;
+extern CameraHero9E g_hero_state;
 extern float D_001A8900 __attribute__((sda));
 extern int D_L00_001B1840 MACRO_ADDR, D_L00_001B1848 MACRO_ADDR;
 extern CameraDef9E *D_L00_001B1844 MACRO_ADDR;
-extern void func_L00_002D7068(void),func_L00_002D75F0(void),func_L00_002D9D98(void);
-extern int func_L00_002D9D48(int);
+extern void cam_clear_override_slots(void),cam_l00_init_blend_values(void),cam_reset_default(void);
+extern int cam_find_entry_index(int);
 extern void func_L00_002EE3D0(void *,void *,float);
 extern void func_L00_002EE0D0(void *);
 
@@ -60,7 +60,7 @@ extern void func_L00_002EE0D0(void *);
    fresh state pointer (g1). The descriptor address is summed as an integer, offset
    first, which is the operand order retail's addu has without RAC1's -fno-force-mem. */
 /* Resets all level cameras when a level starts. */
-void func_L00_002D9E80(void) {
+void SetupLevelCameras(void) {
     CameraState9E *camState = &D_L00_001B8C80;
     CameraState9E *camState2;
     CameraFollow9E *follow;
@@ -75,14 +75,14 @@ void func_L00_002D9E80(void) {
         D_L00_001B91D0[slotIndex].hard_cut=0;
         D_L00_001BB930[slotIndex]=0;
     }
-    ClearCameraOverrideSlots();
-    InitCameraBlendValues_L00();
+    cam_clear_override_slots();
+    cam_l00_init_blend_values();
     camState2=&D_L00_001B8C80;
     camState2->previous=0;
     camState2->blend.phase=0;
     qzero_nc(&camState2->clear);
     follow=&D_L00_001B8C80.follow;
-    hero=&gHeroState;
+    hero=&g_hero_state;
     up=&follow->up;
     func_L00_002EE3D0(up,hero->object+0xe0,1.0f);
     qcopy(&follow->target,up);
@@ -124,10 +124,10 @@ void func_L00_002D9E80(void) {
         id=source->id;
         D_L00_001BB930[i]=1;
         entry->id=id;
-        entry->type=FindCameraEntryIndex((short)id);
+        entry->type=cam_find_entry_index((short)id);
         i++;
     } while(i<D_L00_001B1848);
-    ResetDefaultCamera();
+    cam_reset_default();
     {
         CameraBlend9E *b=&D_L00_001B8C80.blend;
         int *u=b->unknown;

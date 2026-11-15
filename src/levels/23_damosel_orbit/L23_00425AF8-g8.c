@@ -2,17 +2,17 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { Vector vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } RibbonPacket;
-extern char D_L23_001BA640[];
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, void *, int), func_002FC560(int, u64);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
+extern char g_camera_l23_position[];
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
 extern int D_L23_001B19DC __attribute__((sda));
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI orders the integer and FP banks independently: count is a3,
  * and coreWidth, width and extend are f12, f13 and f14. */
-void func_L23_00425AF8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth, float width, float extend, int count, u32 baseColor, u32 outerColor) {
+void DrawColoredRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth, float width, float extend, int count, u32 baseColor, u32 outerColor) {
     RibbonPacket core, halo;
     Vector normal, widthVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
     float length, initialLength, haloLength, firstLength, lastLength;
@@ -36,7 +36,7 @@ void func_L23_00425AF8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     halo.uv[4] = 1; halo.uv[5] = zero; halo.uv[6] = 1; halo.uv[7] = 1;
     core.uv[0] = zero; core.uv[1] = zero; core.uv[2] = zero; core.uv[3] = 1;
     core.uv[4] = 1; core.uv[5] = zero; core.uv[6] = 1; core.uv[7] = 1;
-    FastVecSub(&eye, points, gCameraPosition_L23);
+    FastVecSub(&eye, points, g_camera_l23_position);
     FastVecSub(&tangent, points + 1, points);
     FastVecCross(&normal, &tangent, &eye);
     initialLength = FastVecLength(&normal);
@@ -46,7 +46,7 @@ void func_L23_00425AF8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     FastVecSub(&core.vertex[1], points, &normal);
     for (i = 1; i < count - 1; i++) {
         float coreZero = 0.0f;
-        FastVecSub(&eye, points + i, gCameraPosition_L23);
+        FastVecSub(&eye, points + i, g_camera_l23_position);
         FastVecSub(&tangent, points + i + 1, points + i);
         FastVecCross(&normal, &tangent, &eye);
         length = FastVecLength(&normal);
@@ -62,8 +62,8 @@ void func_L23_00425AF8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     }
     for (i = 0; i < count - 1; i++) {
         float haloZero = 0.0f;
-        FastVecSub(&firstRay, points + i, gCameraPosition_L23);
-        FastVecSub(&lastRay, points + i + 1, gCameraPosition_L23);
+        FastVecSub(&firstRay, points + i, g_camera_l23_position);
+        FastVecSub(&lastRay, points + i + 1, g_camera_l23_position);
         firstLength = FastVecLength(&firstRay);
         lastLength = FastVecLength(&lastRay);
         if (lastLength < firstLength) {
@@ -71,13 +71,13 @@ void func_L23_00425AF8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
             else FastVecScale(&lastRay, &lastRay, firstLength / lastLength);
         } else if (firstLength == haloZero) { qcopy(&firstRay, &lastRay); }
         else FastVecScale(&firstRay, &firstRay, lastLength / firstLength);
-        FastVecAdd(&first, gCameraPosition_L23, &firstRay);
-        FastVecAdd(&last, gCameraPosition_L23, &lastRay);
+        FastVecAdd(&first, g_camera_l23_position, &firstRay);
+        FastVecAdd(&last, g_camera_l23_position, &lastRay);
         FastVecSub(&tangent, &last, &first);
         FastVecScale(&extension, &tangent, extend);
         FastVecSub(&first, &first, &extension);
         FastVecAdd(&last, &last, &extension);
-        FastVecSub(&toEye, gCameraPosition_L23, &first);
+        FastVecSub(&toEye, g_camera_l23_position, &first);
         FastVecCross(&normal, &toEye, &tangent);
         haloLength = FastVecLength(&normal);
         if (haloLength != haloZero) haloLength = 1.0f / haloLength;

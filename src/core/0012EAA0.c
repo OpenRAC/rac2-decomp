@@ -22,7 +22,7 @@ extern int r1_func_0012AB60(void *arg0, int arg1);
 
 extern void r1_func_0012ABB0(void *arg0);
 
-extern int func_0012F070();
+extern int mpeg_skip_system_header();
 
 struct TypeEntry_12AC80 {
     u64 id;
@@ -35,7 +35,7 @@ extern struct TypeEntry_12AC80 r1_D_00132FD8_12AC80[] __asm__("r1_D_00132FD8");
    r1_D_00132FD8[type].id with value shifted into the field its mask selects
    (0, 24 or 32 bits up); 0 for any other type.
    Adapted from Lombyte's project (GPL-3.0): src/sdk/library/type2id.c, _type2id. */
-long func_0012EAA0(int id, int value) {
+long mpeg_make_stream_id(int id, int value) {
     u64 result = 0;
     s32 shift = 0;
 
@@ -112,7 +112,7 @@ extern s32 r1_func_0012B2C0_2AD10(MpegSys *sys, SysBit *bs, PesHdr *pes) __asm__
 /* rac1-decomp src/core/0012AC80.c: func_0012EB28 */
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/dma/sce_mpeg_demux_pss_ring.c, sceMpegDemuxPssRing. */
 /* Walks through a PSS movie stream in a ring buffer and calls the registered handler for each packet. Returns how many bytes it used. */
-int func_0012EB28(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufsize) {
+int sceMpegDemuxPssRing(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufsize) {
     SysBit bs;
     PssHdr hdr;
     SysBit *b;
@@ -205,7 +205,7 @@ int func_0012EB28(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufsize) {
  * the previous callback.
  */
 /* Registers a handler for one kind of movie stream and returns the previous handler. */
-int func_0012EE28(void *mpeg, int streamType, int streamIndex, int callback, int userData) {
+int sceMpegAddStrCallback(void *mpeg, int streamType, int streamIndex, int callback, int userData) {
     int old = 0;
     char *sys = *(char **)((char *)mpeg + 0x40);
     StrCbEnt *handlers = *(StrCbEnt **)(sys + 0x44);
@@ -246,7 +246,7 @@ int func_0012EE28(void *mpeg, int streamType, int streamIndex, int callback, int
  * elsewhere in this file), otherwise clears +0xC. Always returns 1.
  */
 /* Reads a movie stream pack header and stores the timing values. Returns 1. */
-int func_0012EF20(void *stream, void *header) {
+int mpeg_read_pack_header(void *stream, void *header) {
     char *hdr = (char *)header;
     unsigned int timeHigh, timeMid, timeLow, stuffing;
     unsigned int i;
@@ -271,7 +271,7 @@ int func_0012EF20(void *stream, void *header) {
 
     if (r1_func_0012AAA8(stream, 0x20) == 0x1BB) {
         *(int *)(hdr + 0xC) = 1;
-        SkipMpegSystemHeader(stream, hdr);
+        mpeg_skip_system_header(stream, hdr);
     } else {
         *(int *)(hdr + 0xC) = 0;
     }

@@ -18,15 +18,15 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* func_L16_003959B8 is in L16_003959B8.c. */
 
-extern char D_00189E20[];
-extern void func_002AFDD8(char *object, void *out, void *table, int a3);
-extern float func_00283248(float a, float b);
-extern float func_00282C48(float a);
-extern void func_00282F20(char *dst, char *src, float x);
-extern float func_00283198(float a);
-extern float func_00283180(float a);
-extern void func_00283958(char *a, char *b);
-extern void func_00283738(char *a, char *b, char *c);
+extern char g_hero_state[];
+extern void vec_transform_by_object_or_given(char *object, void *out, void *table, int a3);
+extern float mat_fast_helper_a(float a, float b);
+extern float math_fabs(float a);
+extern void vec_scale_to_length(char *dst, char *src, float x);
+extern float math_fast_sin_or_cos_b(float a);
+extern float math_fast_sin_or_cos_a(float a);
+extern void quaternion_to_rotation_basis(char *a, char *b);
+extern void multiply_matrix3x3(char *a, char *b, char *c);
 
 /* steers the object along the ground normal the terrain query returns */
 /* func_L16_00395C00 uses its dedicated compiler profile. */
@@ -36,7 +36,7 @@ extern void func_00283738(char *a, char *b, char *c);
 /* func_L16_00395ED0 is in L16_00395ED0-blend-g8.c. */
 
 /* Read and return the float at linked offset 0x 34 through the pointer stored at owner+0x 68. */
-float func_L16_003960E8(const unsigned char *owner)
+float moby_get_linked_float(const unsigned char *owner)
 {
     const unsigned char *linked = *(const unsigned char * const *)(owner + 0x68);
     return *(const float *)(linked + 0x34);
@@ -81,7 +81,7 @@ extern char *D_L16_001B2B1C __attribute__((sda));
 extern char *D_L16_001B9B50;
 
 /* pushes the two axis values onto the linked node, unless the node is inert or a value is zero */
-void func_L16_0042FB10(float x, float y)
+void moby_push_axis_to_linked_node(float x, float y)
 {
     char *st = D_L16_001B9B50;
     char *p;
@@ -95,11 +95,11 @@ void func_L16_0042FB10(float x, float y)
         *(float *)(p + 0x20) = y;
 }
 
-extern void func_L16_00435CE8(void);
+extern void cam_update_zone_control(void);
 
 /* runs the level's one-shot start-up; the caller uses this only for its side effects */
-int func_L16_004364B0(void)
+int level_run_startup(void)
 {
-    UpdateCameraZoneControl();
+    cam_update_zone_control();
     return 0;
 }

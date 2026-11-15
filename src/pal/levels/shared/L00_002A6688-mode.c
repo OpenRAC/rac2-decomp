@@ -1,9 +1,9 @@
 #include "common.h"
-extern int D_001A79F8[] __attribute__((sda));
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_player_bolts[] __attribute__((sda));
+extern int g_current_map_index MACRO_ADDR;
 extern int D_L00_001A903C MACRO_ADDR;
 extern unsigned char D_001A7A70[] __attribute__((sda));
-extern unsigned int D_001A7AF0 MACRO_ADDR;
+extern unsigned int g_equipment_bits MACRO_ADDR;
 typedef struct {
  char pad0[0x18c];
  unsigned short f18c;
@@ -18,7 +18,7 @@ typedef struct {
  char pad5ba[0xb2];
  unsigned short f66c;
 } State_flags;
-extern State_flags D_0018C958;
+extern State_flags g_subtitle_history;
 typedef struct {
  char pad0[0xfc]; unsigned short ffc; char padfe[0xbe];
  unsigned short f1bc;
@@ -33,7 +33,7 @@ typedef struct {
  unsigned int f1e4;
  unsigned int f1e8;
 } State_stats;
-extern State_stats D_0018C750;
+extern State_stats g_progress_statistics;
 extern unsigned short D_0018C84C[];
 typedef struct {
  char pad0[0xfc]; unsigned short ffc; char padfe[0xbe];
@@ -59,43 +59,43 @@ typedef struct {
  char pad22a0[0x25c];
  short f24fc;
 } State_b;
-extern State_b D_00189E20;
+extern State_b g_hero_state;
 
 extern unsigned char D_001A7A80[] __attribute__((sda));
-extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char g_item_owned_flags[] __attribute__((sda));
 
 
 extern unsigned int D_001A7390 MACRO_ADDR;
 extern int D_001B19C8 MACRO_ADDR;
 typedef struct { char pad[0x100]; float x,y; } InputState;
-extern InputState D_00138180;
-extern unsigned char D_00139568[];
+extern InputState g_pad_state;
+extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[12]; int kind; char rest[0xd0]; } CountedEntry;
-extern CountedEntry D_L00_00262570[];
-extern int func_002E5E58(int,int,void *);
-extern void func_002B0A18(int,int);
-extern float func_00282C48(float);
-extern int func_00288E18(int,int);
-extern int func_0029D830(void);
-extern void func_L00_002F59A8(void);
+extern CountedEntry g_weapon_l00_table[];
+extern int snd_play_from_global_bank(int,int,void *);
+extern void value_set_entry_by_index(int,int);
+extern float math_fabs(float);
+extern int subtitle_request_voice_line(int,int);
+extern int menu_update_entry_states(void);
+extern void level_advance_checked_cursor(void);
 void func_PAL_L00_002A6688(void)
 {
     float v[4], mag;
     int sign,i,count;
     State_b *state;
-    if((D_001A7AF0&0xbb50)==0xbb50 && !D_001A7A70[0xD]) {
+    if((g_equipment_bits&0xbb50)==0xbb50 && !D_001A7A70[0xD]) {
         D_001A7A70[0xD]=1;
-        (void)func_002E5E58(1,0,0);
-        func_002B0A18(0x1233,-1);
+        (void)snd_play_from_global_bank(1,0,0);
+        value_set_entry_by_index(0x1233,-1);
         D_L00_001A903C=1;
     }
-    if(!D_0018C958.f18c && D_001A79F0<5 && !D_0018C750.f1d4 && D_00189E20.f2294!=1 && D_00189E20.f2294!=29) {
+    if(!g_subtitle_history.f18c && g_current_map_index<5 && !g_progress_statistics.f1d4 && g_hero_state.f2294!=1 && g_hero_state.f2294!=29) {
         qzero_nc(v);
-        v[0]=D_00138180.x;
-        v[1]=D_00138180.y;
-        mag=func_00282C48(v[0]);
+        v[0]=g_pad_state.x;
+        v[1]=g_pad_state.y;
+        mag=math_fabs(v[0]);
         sign=v[0]<0.0f;
-        state=&D_00189E20;
+        state=&g_hero_state;
         switch(state->f780) {
         case 0:
             if(mag>0.8f) {
@@ -121,54 +121,54 @@ void func_PAL_L00_002A6688(void)
                 state->f78c=0; state->f780=3;
                 break;
             }
-            if(D_00189E20.f78c>100) D_00189E20.f780=0;
+            if(g_hero_state.f78c>100) g_hero_state.f780=0;
             break;
         case 3:
             ++state->f78c;
             if(state->f78c>33 && state->f78c>state->f788+17) {
-                if(D_0018C750.f1e0<65535) ++D_0018C750.f1e0;
-                if((unsigned int)(((int)D_001A7390 * 5 + 2) / 6)>D_0018C750.f1e4) D_0018C750.f1e4=((int)D_001A7390 * 5 + 2) / 6;
-                { unsigned int bit = 1u << D_001A79F0; D_0018C750.f1e8=(D_0018C750.f1e8|bit)|0x80000000u; }
-                if(D_0018C750.f1e0>=2) func_00288E18(0x9ca,0x21);
+                if(g_progress_statistics.f1e0<65535) ++g_progress_statistics.f1e0;
+                if((unsigned int)(((int)D_001A7390 * 5 + 2) / 6)>g_progress_statistics.f1e4) g_progress_statistics.f1e4=((int)D_001A7390 * 5 + 2) / 6;
+                { unsigned int bit = 1u << g_current_map_index; g_progress_statistics.f1e8=(g_progress_statistics.f1e8|bit)|0x80000000u; }
+                if(g_progress_statistics.f1e0>=2) subtitle_request_voice_line(0x9ca,0x21);
                 state->f780=0;
-            } else if(mag<0.2f || sign==D_00189E20.f784) D_00189E20.f780=0;
+            } else if(mag<0.2f || sign==g_hero_state.f784) g_hero_state.f780=0;
             break;
         }
     }
     if(D_001B19C8>0 && (D_001B19C8&127)==0) {
-        if(!D_0018C958.f2dc && !D_0018C84C[0]) {
-            unsigned char *map=D_00139568;
-            CountedEntry *entries=D_L00_00262570;
+        if(!g_subtitle_history.f2dc && !D_0018C84C[0]) {
+            unsigned char *map=g_item_slot_to_record;
+            CountedEntry *entries=g_weapon_l00_table;
             count=0;
             for(i=0;i<56;i++) {
-                if(!entries[*(unsigned char *)(i+(unsigned int)map)].kind && i!=10 && D_001A7AF8[i]) count++;
+                if(!entries[*(unsigned char *)(i+(unsigned int)map)].kind && i!=10 && g_item_owned_flags[i]) count++;
             }
-            if(count>=9) func_00288E18(0x9e6,0x3d);
+            if(count>=9) subtitle_request_voice_line(0x9e6,0x3d);
         }
-        if(D_00189E20.f229c==17 && D_00189E20.f1bc>250 && !D_00189E20.f24fc && !D_0018C958.f5b8 && !D_00189E20.f1fe && *(int *)(*(char **)(D_00189E20.f2290+0x24)+0x134)) func_00288E18(0xa23,0x7a);
-        if(D_001A79F8[2]==80 && !D_0018C958.f66c) {
+        if(g_hero_state.f229c==17 && g_hero_state.f1bc>250 && !g_hero_state.f24fc && !g_subtitle_history.f5b8 && !g_hero_state.f1fe && *(int *)(*(char **)(g_hero_state.f2290+0x24)+0x134)) subtitle_request_voice_line(0xa23,0x7a);
+        if(g_player_bolts[2]==80 && !g_subtitle_history.f66c) {
             if(!D_001A7A70[7]) {
                 D_001A7A70[7]=1;
-                (void)func_002E5E58(1,0,0);
-                func_002B0A18(0x1233,-1);
+                (void)snd_play_from_global_bank(1,0,0);
+                value_set_entry_by_index(0x1233,-1);
                 D_L00_001A903C=1;
             }
-            func_00288E18(0xa32,0x89);
+            subtitle_request_voice_line(0xa32,0x89);
         }
-        if(!D_0018C958.f420) {
-            State_b *hero=&D_00189E20;
+        if(!g_subtitle_history.f420) {
+            State_b *hero=&g_hero_state;
             unsigned char *items=D_001A7A80;
-            if(items[hero->f1248]&32) func_00288E18(0xa01,0x58);
+            if(items[hero->f1248]&32) subtitle_request_voice_line(0xa01,0x58);
         }
-        if(D_001A79F0==5) D_0018C958.f444=65535;
+        if(g_current_map_index==5) g_subtitle_history.f444=65535;
     }
-    if(!D_00189E20.f1454) D_00189E20.f220=0;
-    else if(D_00189E20.f2294) ++D_00189E20.f220;
-    if(D_00189E20.f220>75) {
-        if(D_0018C750.f1bc<65535) ++D_0018C750.f1bc;
-        if((unsigned int)(((int)D_001A7390 * 5 + 2) / 6)>D_0018C750.f1c0) D_0018C750.f1c0=((int)D_001A7390 * 5 + 2) / 6;
-        { unsigned int bit = 1u << D_001A79F0; D_0018C750.f1c4=(D_0018C750.f1c4|bit)|0x80000000u; }
+    if(!g_hero_state.f1454) g_hero_state.f220=0;
+    else if(g_hero_state.f2294) ++g_hero_state.f220;
+    if(g_hero_state.f220>75) {
+        if(g_progress_statistics.f1bc<65535) ++g_progress_statistics.f1bc;
+        if((unsigned int)(((int)D_001A7390 * 5 + 2) / 6)>g_progress_statistics.f1c0) g_progress_statistics.f1c0=((int)D_001A7390 * 5 + 2) / 6;
+        { unsigned int bit = 1u << g_current_map_index; g_progress_statistics.f1c4=(g_progress_statistics.f1c4|bit)|0x80000000u; }
     }
-    if(D_001B19C8<5 || (D_001B19C8&511)==21) func_0029D830();
-    func_L00_002F59A8();
+    if(D_001B19C8<5 || (D_001B19C8&511)==21) menu_update_entry_states();
+    level_advance_checked_cursor();
 }

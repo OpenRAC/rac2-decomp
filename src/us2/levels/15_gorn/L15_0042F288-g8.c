@@ -62,7 +62,7 @@ typedef struct {
 
 extern MissionState D_L15_00221E10;
 extern SaveGame D_001395B8;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern Moby *D_L15_001B261C;
 extern s32 D_L15_001B369C;
 extern s32 D_L15_001B36A0;
@@ -95,28 +95,28 @@ extern s32 D_L15_001B2148 __attribute__((sda));
 extern s32 D_L15_001A904C MACRO_ADDR;
 extern s32 D_L15_001B15CC __attribute__((sda));
 
-extern void func_L05_00379F18(s32 value);
-extern void func_L05_00379F28(s32 value);
-extern void func_L05_00379B60(void);
-extern void func_L05_0030C930(s32 a0, s32 a1);
-extern void func_L00_003294F0(Moby *moby, s32 enabled);
+extern void hero_set_state_value_a(s32 value);
+extern void hero_set_state_value_b(s32 value);
+extern void level_select_random_object(void);
+extern void level_store_pair_with_increment(s32 a0, s32 a1);
+extern void moby_set_flag_bit(Moby *moby, s32 enabled);
 extern s32 func_US2_L00_002C4560(s32 action, s32 animate);
-extern void func_L05_00379F48(s32 value);
+extern void hero_set_state_value_c(s32 value);
 extern s32 func_US2_L05_00420238(void);
-extern void func_L05_00445A98(void);
+extern void ship_save_transform_state(void);
 extern s32 func_US2_00289840(s32 key, s32 selection);
-extern s32 func_L10_0037F510(void);
-extern s32 func_00282948(s32 *timer);
+extern s32 status_any_record_nonzero(void);
+extern s32 math_fast_float_d(s32 *timer);
 extern void func_US2_L15_00432488(Moby *moby);
 extern void func_US2_L15_00432858(Moby *moby);
 extern void func_US2_L15_004329F0(Moby *moby);
 extern void func_US2_L15_00432BA8(Moby *moby);
 extern void func_US2_0029C548(s32 a0, void (*callback)(void));
-extern s32 func_L05_00442860(void);
+extern s32 cam_is_mode_active(void);
 extern void func_US2_L15_0042F6D0(void);
 extern void func_US2_L10_00425104(void);
 extern void func_US2_L10_004251D0(void);
-extern s32 func_L15_0042FFB8(Moby *moby, s32 keep);
+extern s32 moby_l15_apply_hit_damage(Moby *moby, s32 keep);
 
 /* Update of the Gorn mission controller. State 0 sets up the mission state, its callbacks and
    the controller's timers and loads the saved completion counts. State 1 runs the shared update
@@ -164,10 +164,10 @@ void func_US2_L15_0042F288(Moby *moby)
         D_L15_00221E10.reset = func_US2_L10_00425104;
         D_L15_00221E10.resetAll = func_US2_L10_004251D0;
         D_L15_001B15B8 = 0;
-        D_L15_00221E10.onHit = func_L15_0042FFB8;
+        D_L15_00221E10.onHit = moby_l15_apply_hit_damage;
         D_L15_00221E10.controller = moby;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
+        hero_set_state_value_a(1);
+        hero_set_state_value_b(0);
         completed0 = D_001395B8.completions[0];
         completed1 = D_001395B8.completions[1];
         completed2 = D_001395B8.completions[2];
@@ -182,17 +182,17 @@ void func_US2_L15_0042F288(Moby *moby)
             D_L15_001B15D0 = 1;
         else
             D_L15_001B15D0 = 0;
-        if (D_00189E20.moby != 0)
-            D_00189E20.moby->flags |= 0x41;
+        if (g_hero_state.moby != 0)
+            g_hero_state.moby->flags |= 0x41;
         /* fall through */
     case 1: {
         /* One 1 for the stores and the test below: literal 1s compile differently. */
         s32 on = 1;
 
-        func_L05_00379B60();
-        func_L05_0030C930((s32)(D_L15_001B2E84 * -230.0f + 0.5f), 2);
+        level_select_random_object();
+        level_store_pair_with_increment((s32)(D_L15_001B2E84 * -230.0f + 0.5f), 2);
         if (!D_L15_001B15A8) {
-            func_L00_003294F0(&D_L15_001B261C[vars->moby], 1);
+            moby_set_flag_bit(&D_L15_001B261C[vars->moby], 1);
             D_L15_001B15A8 = on;
             D_L15_001B15AC = 0;
         }
@@ -201,10 +201,10 @@ void func_US2_L15_0042F288(Moby *moby)
 
         func_US2_L00_002C4560(0x31, 0);
         if (D_L15_001B15C4) {
-            func_L05_00379F48(on);
+            hero_set_state_value_c(on);
             D_L15_001B1530 = func_US2_L05_00420238();
             if (D_L15_001B1530 != -2)
-                func_L05_00445A98();
+                ship_save_transform_state();
             break;
         }
         if (!D_L15_001B15B4) {
@@ -212,15 +212,15 @@ void func_US2_L15_0042F288(Moby *moby)
             D_L15_001B15B4 = on;
         }
         if ((D_0013A170[5] == on || D_0013A170[5] == 5 || D_0013A170[5] == 10)
-            && !func_L10_0037F510() && !D_L15_001B15B8) {
+            && !status_any_record_nonzero() && !D_L15_001B15B8) {
             func_US2_00289840(0xA18, 0x6F);
             D_L15_001B15B8 = 1;
         }
-        if (func_00282948(&vars->timer))
+        if (math_fast_float_d(&vars->timer))
             D_L15_00221E10.waiting = 0;
         else
             D_L15_00221E10.waiting = 1;
-        func_L05_00379F48(0);
+        hero_set_state_value_c(0);
         if (D_L15_001B1530 != -2 && D_L15_001B2148 >= 3) {
             switch (D_L15_001B1530) {
             case 0:
@@ -247,7 +247,7 @@ void func_US2_L15_0042F288(Moby *moby)
     case 2:
         break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!cam_is_mode_active()) {
             D_L15_00221E10.waiting = 0;
             D_L15_00221E10.rounds++;
             moby->state = 1;

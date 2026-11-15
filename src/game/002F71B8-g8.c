@@ -24,25 +24,25 @@ extern int D_001AD1C0 __attribute__((sda));
 extern int D_001AD1B8 __attribute__((sda));
 extern Func002F71B8Table D_001AD268;
 extern unsigned char D_001395B8[];
-extern Func002F71B8List D_0021F240;
-extern int func_00288D58(void);
+extern Func002F71B8List g_vendor_menu_state;
+extern int flag_is_byte_set(void);
 
-void func_002F71B8(void)
+void shop_rebuild_unlocked_slot_list(void)
 {
     Func002F71B8Table values = D_001AD268;
     int i;
 
-    gVendorMenuState.count = 0;
+    g_vendor_menu_state.count = 0;
     D_001AD1B8 = 0;
     for (i = D_001AD1C0 != 0 ? D_001AD1C0 + 1 : 1; i < 5; i++) {
         if ((unsigned int)i >= 8 ||
             ((D_001395B8[0x8D] >> i) & 1) == 0) {
-            if (IsFlagByteSet() == 0)
+            if (flag_is_byte_set() == 0)
                 continue;
         }
-        gVendorMenuState.entry[gVendorMenuState.count].slot = i;
-        gVendorMenuState.entry[gVendorMenuState.count].value = values.value[i];
-        gVendorMenuState.entry[gVendorMenuState.count].id = i + 0xEA92;
-        gVendorMenuState.count = gVendorMenuState.count + 1;
+        g_vendor_menu_state.entry[g_vendor_menu_state.count].slot = i;
+        g_vendor_menu_state.entry[g_vendor_menu_state.count].value = values.value[i];
+        g_vendor_menu_state.entry[g_vendor_menu_state.count].id = i + 0xEA92;
+        g_vendor_menu_state.count = g_vendor_menu_state.count + 1;
     }
 }

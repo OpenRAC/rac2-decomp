@@ -44,28 +44,28 @@ typedef struct {
     unsigned char f22b5;
 } Hero4140;
 extern Hero4140 D_00189E20_4140;
-extern void func_00283CE0(int);
+extern void IntToFloat(int);
 typedef struct {
     unsigned char pad0[60];
     int flags;
 } PlatformObject;
-extern PlatformObject *func_002AD0B0(int);
-extern float func_00282DF0(void *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002AD0E0(int, int, void *, void *, void *, void *);
-extern int func_002AD5F8(int, int, void *, void *, void *, void *);
-extern int func_002AD470(int, int, void *, void *, void *, void *);
-extern void func_00282C88(void *);
-extern float func_00282E20(void *);
-extern void func_002AA2E8(float *, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
+extern PlatformObject *moby_get_private_value_2(int);
+extern float FastVecLength(void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int moby_transform_point_and_rotation_by_parent(int, int, void *, void *, void *, void *);
+extern int moby_get_attachment_rotation_angles(int, int, void *, void *, void *, void *);
+extern int coll_apply_push_to_object(int, int, void *, void *, void *, void *);
+extern void vec_clear_128(void *);
+extern float vec_length_xy(void *);
+extern void ApproachValue(float *, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
 typedef int V4_F6a70b950 __attribute__((mode(TI)));
-extern void func_00282F70(char *a, int b, float f);
+extern void vec_fast_normalize_helper(char *a, int b, float f);
 
 /* Carry the hero with the supporting platform, including ledge anchors,
  * rotation and the displacement retained while the hero leaves the platform.
@@ -101,7 +101,7 @@ void func_PAL_L00_002D4668(void)
         mode = 1;
     } else if (D_00189E20_4140.platform) {
         mode = 1;
-        func_00283CE0(100 - D_00189E20_4140.platform_timer);
+        IntToFloat(100 - D_00189E20_4140.platform_timer);
         blend = D_00189E20_4140.platform_timer;
     } else {
         D_00189E20_4140.platform = 0;
@@ -111,38 +111,38 @@ void func_PAL_L00_002D4668(void)
 
     if (!mode)
         return;
-    object = func_002AD0B0(D_00189E20_4140.platform);
+    object = moby_get_private_value_2(D_00189E20_4140.platform);
     if (!object)
         return;
 
     if (((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) &&
-         func_00282DF0(&D_00189E20_4140.f160) == 0.0f &&
+         FastVecLength(&D_00189E20_4140.f160) == 0.0f &&
          D_00189E20_4140.platform_timer == 0 && D_00189E20_4140.f216 == 0) ||
         (unsigned)(D_00189E20_4140.state - 23) < 2) {
         if (((D_00189E20_4140.platform_flags ^ 1) & 1)) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
                 qcopy(delta, &D_00189E20_4140.ledge_offset);
-                delta[0] += func_00283180(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[0] += math_fast_sin_or_cos_a(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
-                delta[1] += func_00283198(func_00283B98(D_00189E20_4140.ledge_angle,
+                delta[1] += math_fast_sin_or_cos_b(FastAddRotations(D_00189E20_4140.ledge_angle,
                         3.1415925f)) * 0.45f;
                 delta[2] -= -1.43f;
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, next, hero_pos);
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, delta, hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.ledge_offset, &D_00189E20_4140.rot, &D_00189E20_4140.f350,
                         hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, delta,
                         &D_00189E20_4140.rot, &D_00189E20_4140.f370, hero_pos);
             } else if (object->flags & 4) {
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, &D_00189E20_4140.f350, delta);
             } else {
-                func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform,
+                moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform,
                         &D_00189E20_4140.pos, &D_00189E20_4140.rot, next, hero_pos);
-                func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
+                moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, next, hero_pos,
                         &D_00189E20_4140.f350, delta);
             }
             D_00189E20_4140.platform_flags |= 1;
@@ -153,7 +153,7 @@ void func_PAL_L00_002D4668(void)
     if ((D_00189E20_4140.state2 == 0 || D_00189E20_4140.state2 == 12) && D_00189E20_4140.f1a4 == 0.0f &&
         D_00189E20_4140.platform_timer == 0) {
         if (!(D_00189E20_4140.platform_flags & 2)) {
-            func_002AD5F8(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            moby_get_attachment_rotation_angles(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, delta, &D_00189E20_4140.f360);
             D_00189E20_4140.platform_flags |= 2;
         }
@@ -162,12 +162,12 @@ void func_PAL_L00_002D4668(void)
 
     if (D_00189E20_4140.platform_flags & 3)
         mode = 2;
-    func_00282C88(delta);
-    func_00282C88(next);
+    vec_clear_128(delta);
+    vec_clear_128(next);
 
     if (blend != 0.0f) {
         int flags;
-        float planar = func_00282E20(&D_00189E20_4140.platform_delta);
+        float planar = vec_length_xy(&D_00189E20_4140.platform_delta);
 
         flags = object->flags;
         height = D_00189E20_4140.platform_delta.f[2];
@@ -178,33 +178,33 @@ void func_PAL_L00_002D4668(void)
             if (flags & 16)
                 rate = 20.0f;
             rate *= 0.00040000002f;
-            func_002AA2E8(&height, 0.0f, blend * 0.010000001f);
-            func_002AA2E8(&length, 0.0f, rate * blend);
-            func_00282F70((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
+            ApproachValue(&height, 0.0f, blend * 0.010000001f);
+            ApproachValue(&length, 0.0f, rate * blend);
+            vec_fast_normalize_helper((char *)delta, (int)&D_00189E20_4140.platform_delta, length);
             delta[2] = height;
         } else if (D_00189E20_4140.platform) {
-            func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+            moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                     &D_00189E20_4140.rot, local_pos, local_rot);
             if (D_00189E20_4140.f226 == 0)
                 D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-            func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
             qcopy(&D_00189E20_4140.platform_delta, delta);
         } else
             qcopy(delta, &D_00189E20_4140.platform_delta);
         qcopy(next, delta);
     } else if (mode == 1) {
-        func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, local_pos, local_rot);
         if (D_00189E20_4140.f226 == 0)
             D_00189E20_4140.rot.q = *(V4_F6a70b950 *)local_rot;
-        func_00282CF0(delta, local_pos, &D_00189E20_4140.pos);
+        FastVecSub(delta, local_pos, &D_00189E20_4140.pos);
         qcopy(&D_00189E20_4140.platform_delta, delta);
     } else if (mode == 2) {
-        func_002AD0E0(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
+        moby_transform_point_and_rotation_by_parent(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.pos,
                 &D_00189E20_4140.rot, hero_pos, hero_rot);
-        func_002AD470(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
+        coll_apply_push_to_object(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f350,
                 &D_00189E20_4140.f360, anchor_pos, anchor_rot);
-        func_002AD470(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
+        coll_apply_push_to_object(D_00189E20_4140.f2290, D_00189E20_4140.platform, &D_00189E20_4140.f370,
                 &D_00189E20_4140.f360, anchor2_pos, anchor2_rot);
         if (D_00189E20_4140.f226 == 0) {
             if ((D_00189E20_4140.state == 1 || D_00189E20_4140.state == 29) &&
@@ -216,41 +216,41 @@ void func_PAL_L00_002D4668(void)
         }
         if (D_00189E20_4140.platform_flags & 1) {
             if ((unsigned)(D_00189E20_4140.state - 23) < 2) {
-                offset[0] = func_00283180(D_00189E20_4140.ledge_angle) * 0.45f;
-                offset[1] = func_00283198(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[0] = math_fast_sin_or_cos_a(D_00189E20_4140.ledge_angle) * 0.45f;
+                offset[1] = math_fast_sin_or_cos_b(D_00189E20_4140.ledge_angle) * 0.45f;
                 offset[2] = 0;
-                func_00282CC0(offset, offset, anchor2_pos);
+                FastVecAdd(offset, offset, anchor2_pos);
                 offset[2] += -1.43f;
-                func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+                FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
                 qcopy(&D_00189E20_4140.ledge_offset, offset);
-                D_00189E20_4140.ledge_angle = func_00283248(anchor_pos[0] - anchor2_pos[0],
+                D_00189E20_4140.ledge_angle = mat_fast_helper_a(anchor_pos[0] - anchor2_pos[0],
                         anchor_pos[1] - anchor2_pos[1]);
             } else {
                 float distance;
 
-                func_00282CF0(delta, anchor_pos, &D_00189E20_4140.pos);
-                distance = func_00282DF0(delta);
+                FastVecSub(delta, anchor_pos, &D_00189E20_4140.pos);
+                distance = FastVecLength(delta);
                 if (distance < 0.0001f) {
-                    func_00282C88(delta);
+                    vec_clear_128(delta);
                     qcopy(&D_00189E20_4140.pos, anchor_pos);
                 } else if (distance > 2.0f) {
-                    func_00282C88(delta);
+                    vec_clear_128(delta);
                     D_00189E20_4140.platform_flags &= ~2;
                     D_00189E20_4140.platform_flags &= ~1;
                 }
-                func_00282CC0(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
-                func_00282CF0(offset, delta, &D_00189E20_4140.f150);
-                if (func_00282DF0(offset) > 0.1f)
+                FastVecAdd(&D_00189E20_4140.ledge_offset, &D_00189E20_4140.ledge_offset, delta);
+                FastVecSub(offset, delta, &D_00189E20_4140.f150);
+                if (FastVecLength(offset) > 0.1f)
                     D_00189E20_4140.platform_flags &= ~1;
             }
         } else {
-            func_00282CF0(delta, hero_pos, &D_00189E20_4140.pos);
+            FastVecSub(delta, hero_pos, &D_00189E20_4140.pos);
             qcopy(next, delta);
         }
         qcopy(&D_00189E20_4140.platform_delta, delta);
     }
 
-    func_00282CC0(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
-    D_00189E20_4140.f100.f[3] = func_00283BE0(D_00189E20_4140.rot.f[2], old_yaw);
+    FastVecAdd(&D_00189E20_4140.f100, &D_00189E20_4140.f100, delta);
+    D_00189E20_4140.f100.f[3] = fast_subtract_rotations(D_00189E20_4140.rot.f[2], old_yaw);
 }
 

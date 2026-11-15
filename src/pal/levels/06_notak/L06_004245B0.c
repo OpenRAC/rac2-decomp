@@ -5,8 +5,8 @@
 
 
 #include "common.h"
-extern void func_002A8598(int, int);
-extern int func_00282948(char *);
+extern void moby_set_byte_on_group(int, int);
+extern int math_fast_float_d(char *);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void *D_L06_002E1F00[];
 
@@ -54,7 +54,7 @@ c2:
     func_PAL_002A7E68(s0, 2, 0, 0);
     goto done;
 c3:
-    if (func_00282948(s1) == 0)
+    if (math_fast_float_d(s1) == 0)
         goto done;
     *(unsigned char *)(s0 + 0x20) = 4;
     if (*(unsigned char *)(s0 + 0x43) == 3)
@@ -71,7 +71,7 @@ c4:
 tail:
     *(int *)(s0 + 0x98) = *(int *)(*(int *)(s0 + 0x24) + 0x10);
     *(int *)s1 = 0x4E2;
-    func_002A8598(*(unsigned char *)(s0 + 0x21), 0);
+    moby_set_byte_on_group(*(unsigned char *)(s0 + 0x21), 0);
     goto done;
 done:
     return;

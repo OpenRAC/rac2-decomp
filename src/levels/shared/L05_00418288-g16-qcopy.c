@@ -9,19 +9,19 @@ extern int D_L05_001B0FA4 __attribute__((sda));
 extern char D_L05_001C7840[];
 extern Rotation D_L05_001B34E0;
 extern Rotation D_L05_001B34E0_gp SDATA(D_L05_001B34E0);
-extern Vector D_L05_001B34F0;
-extern float D_L05_001B3500;
-extern float func_00283B98(float, float);
-extern void func_00282C88(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D90(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern Vector g_light_spot_sum;
+extern float g_light_spot_count;
+extern float FastAddRotations(float, float);
+extern void vec_clear_128(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void divide_vector_xyz(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Moves a small light next to the object with a wobble. When other objects have added to the shared light spot it also places a brighter, larger light there. */
-void func_L05_00418288(char *object)
+void wobbling_light_update(char *object)
 {
     Vector value;
     Matrix rotation;
@@ -32,23 +32,23 @@ void func_L05_00418288(char *object)
     D_L05_001B34E0_gp.x = FastAddRotations(D_L05_001B34E0_gp.x, 0.1f);
     D_L05_001B34E0.y = FastAddRotations(D_L05_001B34E0.y, 0.09f);
     D_L05_001B34E0.z = FastAddRotations(D_L05_001B34E0.z, 0.11f);
-    ClearVector128(&value);
+    vec_clear_128(&value);
     value.x = 0.4f;
     euler_rotation_basis(&rotation, &D_L05_001B34E0_gp);
     matrix_mul_vec3(&value, &value, &rotation);
     FastVecAdd(&value, &value, position);
     qcopy(output, &value);
     *(float *)(entry + 0x1C) = 3.0f;
-    if (gLightSpotCount > 0.0f) {
-        divide_vector_xyz(&gLightSpotSum, &gLightSpotSum, gLightSpotCount);
-        FastVecSub(&gLightSpotSum, &gLightSpotSum, position);
-        vec_scale_to_length(&gLightSpotSum, &gLightSpotSum, 5.0f);
-        FastVecAdd(&gLightSpotSum, &gLightSpotSum, position);
-        qcopy(output, &gLightSpotSum);
+    if (g_light_spot_count > 0.0f) {
+        divide_vector_xyz(&g_light_spot_sum, &g_light_spot_sum, g_light_spot_count);
+        FastVecSub(&g_light_spot_sum, &g_light_spot_sum, position);
+        vec_scale_to_length(&g_light_spot_sum, &g_light_spot_sum, 5.0f);
+        FastVecAdd(&g_light_spot_sum, &g_light_spot_sum, position);
+        qcopy(output, &g_light_spot_sum);
         *(float *)(entry + 0x1C) = 10.0f;
     } else {
         *(float *)(entry + 0x1C) = 0.0f;
     }
-    ClearVector128(&gLightSpotSum);
-    gLightSpotCount = 0.0f;
+    vec_clear_128(&g_light_spot_sum);
+    g_light_spot_count = 0.0f;
 }

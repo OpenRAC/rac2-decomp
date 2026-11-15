@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,11 +25,11 @@
  */
 #include "common.h"
 
-extern s32 func_00132DF0();
+extern s32 snd_queue_command();
 
 /* Sends sound command 0x2D with one value. */
-void func_001333C0(s32 value) {
+void snd_send_cmd2d(s32 value) {
     s32 payload[1];
     payload[0] = value;
-    QueueSoundCommand(0x2D, 4, payload, 0, 0);
+    snd_queue_command(0x2D, 4, payload, 0, 0);
 }

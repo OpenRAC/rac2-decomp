@@ -2,23 +2,23 @@
 
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) RibbonVector;
 typedef struct { RibbonVector vertices[4]; int colors[4]; float uv[8]; unsigned long long flags; unsigned long long texture, alpha, test; } RibbonQuad;
-extern void func_L03_0038B390(unsigned char *, int, int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
-extern int func_00283D38(float, int, int);
-extern float func_002AA140(float, float, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, int, int);
-extern void func_002FC560(int, unsigned long long);
+extern void part_l03_init_effect_record(unsigned char *, int, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
+extern int FastTweenColor(float, int, int);
+extern float math_lerp_float(float, float, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, int, int);
+extern void VU1_addGSregister(int, unsigned long long);
 extern RibbonVector D_L03_00237F50;
 extern RibbonVector D_L03_001B9980;
 
 /* Draws a glowing ribbon through a list of points: a bright inner strip with a wider glow, brighter where a pulse passes. */
-void func_L03_0038AB30(unsigned char *object, RibbonVector *points, int count,
+void gfx_draw_glow_ribbon(unsigned char *object, RibbonVector *points, int count,
                       int colorA, int colorB, int glowA, int glowB,
                       float innerA, float innerB, float outerA, float outerB, float extension) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
@@ -31,11 +31,11 @@ void func_L03_0038AB30(unsigned char *object, RibbonVector *points, int count,
     int startColor, endColor, startGlow, endGlow;
     int i, j;
     float *uv;
-    InitEffectRecord_L03((unsigned char *)&inner, *(int *)(state + 0x9C), 1, colorA);
+    part_l03_init_effect_record((unsigned char *)&inner, *(int *)(state + 0x9C), 1, colorA);
     inner.flags = 0;
     for (uv = inner.uv, j = 3; j >= 0; j--, uv += 2)
         *uv += *(float *)(state + 0x84);
-    InitEffectRecord_L03((unsigned char *)&outer, *(int *)(state + 0x80), 1, glowA);
+    part_l03_init_effect_record((unsigned char *)&outer, *(int *)(state + 0x80), 1, glowA);
     outer.flags = 0;
     qcopy(&origin, object + 0x10);
     origin.z += 1.1f;
@@ -54,13 +54,13 @@ void func_L03_0038AB30(unsigned char *object, RibbonVector *points, int count,
             FastVecSub(&offset, &origin, &points[i]);
             distance = FastVecLength(&offset) * 0.9090909f;
             delta = phase - distance;
-            if (FloatAbs(delta) < *(float *)(state + 0xCC))
-                startBlend = 1.0f - FloatAbs(delta) / *(float *)(state + 0xCC);
+            if (math_fabs(delta) < *(float *)(state + 0xCC))
+                startBlend = 1.0f - math_fabs(delta) / *(float *)(state + 0xCC);
             FastVecSub(&offset, &origin, &points[i + 1]);
             distance = FastVecLength(&offset) * 0.9090909f;
             delta = phase - distance;
-            if (FloatAbs(delta) < *(float *)(state + 0xCC))
-                endBlend = 1.0f - FloatAbs(delta) / *(float *)(state + 0xCC);
+            if (math_fabs(delta) < *(float *)(state + 0xCC))
+                endBlend = 1.0f - math_fabs(delta) / *(float *)(state + 0xCC);
         } else if (object[0x20] == 2) {
             FastVecSub(&offset, &origin, &points[i]);
             distance = FastVecLength(&offset) * 0.9090909f;
@@ -75,12 +75,12 @@ void func_L03_0038AB30(unsigned char *object, RibbonVector *points, int count,
         width = 1.0f;
         startColor = FastTweenColor(startBlend, colorA, colorB);
         startGlow = FastTweenColor(startBlend, glowA, glowB);
-        startInner = LerpFloat_002AA140(innerA, innerB, startBlend);
-        startOuter = LerpFloat_002AA140(outerA, outerB, startBlend);
+        startInner = math_lerp_float(innerA, innerB, startBlend);
+        startOuter = math_lerp_float(outerA, outerB, startBlend);
         endColor = FastTweenColor(endBlend, colorA, colorB);
         endGlow = FastTweenColor(endBlend, glowA, glowB);
-        endInner = LerpFloat_002AA140(innerA, innerB, endBlend);
-        endOuter = LerpFloat_002AA140(outerA, outerB, endBlend);
+        endInner = math_lerp_float(innerA, innerB, endBlend);
+        endOuter = math_lerp_float(outerA, outerB, endBlend);
         if (*(int *)(state + 0x3C) & 4) {
             float reach;
             FastVecSub(&direction, &points[i], &origin);

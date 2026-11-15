@@ -1,16 +1,16 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_00283CF0(f32);
-extern s32 func_L17_00340DD0(f32, s32, s32, s32);
+extern int FloatToInt(f32);
+extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
 extern f32 D_L17_001B04B8 __attribute__((sda));
-extern void func_002A7750(void *, s32, s32);
-extern s32 func_002A9640(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
+extern s32 part_find_owned_effect_slot(void *, s32, s32);
 extern s32 D_L17_001B1E00 __attribute__((sda));
 extern s32 D_L17_001B1DE0 __attribute__((sda));
 extern s32 D_L17_001B1DD8 __attribute__((sda));
 extern s32 D_L17_001B1DD0 __attribute__((sda));
-extern char *D_L17_001B2C1C __attribute__((sda));
+extern char *g_moby_l17_pool __attribute__((sda));
 typedef int Quad __attribute__((mode(TI)));
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define H(p,o) (*(short *)((u8 *)(p)+(o)))
@@ -102,28 +102,28 @@ extern float D_L17_001B0CA8 __attribute__((sda));
 extern u8 D_L17_001B0CB8[4] __attribute__((sda));
 extern u8 D_L17_001B9BC0[];
 extern char D_L17_001B0CC8[];
-extern u8 *D_0018C0B0 NOT_SDA;
-extern float func_002A89A8(void *, int, float);
-extern void func_L04_0033CB88(void *);
-extern int func_002A7820(int, int);
-extern void func_002AB650(void *);
+extern u8 *g_hero_moby NOT_SDA;
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void MoveCtl_Init(void *);
+extern int math_random_int_range(int, int);
+extern void hero_copy_field_to_moby(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern void func_L17_003E4860(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern void func_0026FEB8(void *, ...);
-extern s32 D_001A79F0 MACRO_ADDR;
+extern void moby_l17_set_group_alert_flag(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern void STUB_printf(void *, ...);
+extern s32 g_current_map_index MACRO_ADDR;
 extern u8 D_0019B4A8[];
 extern u8 D_0019B2E8[];
-extern u8 *D_L17_001FE880[];
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern f32 func_002A7940(void);
-extern s32 func_002B3868(void *);
-extern s32 func_002ACBC8(void *, s32);
-extern s32 func_002E5CF8(s32, s32, void *);
+extern u8 *g_path_l17_table[];
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_random_angle(void);
+extern s32 flag_set_first_pending(void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern s32 PlayMobySound(s32, s32, void *);
 
 /* Sets the state record up on the first update (the tuning block in field order), then
    handles damage and keeps a target, falling back to D_0018C0B0 when the record has none. */
@@ -136,21 +136,21 @@ void func_PAL_L17_003E89B0(u8 *obj)
 
     obj[0x23] = 128;
     if (obj[0x20] == 0) {
-        float ground = func_002A89A8(obj + 0x10, 0, 0.5f);
+        float ground = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
         float radius = F(*(u8 **)(obj + 0x24), 0x24);
 
         F(obj, 0x18) = ground;
         F(obj, 0x2C) = radius;
         qzero_nc(obj + 0xF0);
         if (p->i428 != -1) {
-            F(obj, 0x18) = F((u8 *)D_L17_001B2C1C + p->i428 * 256, 0x18) + 1.4f;
+            F(obj, 0x18) = F((u8 *)g_moby_l17_pool + p->i428 * 256, 0x18) + 1.4f;
             H(obj, 0x34) |= 0x41;
             I(obj, 0x98) = 0;
         }
         p->i420 = 0;
         p->i424 = 0;
-        p->b48 = func_00283CF0(15.0f);
-        p->b4A = func_00283CF0(4.0f);
+        p->b48 = FloatToInt(15.0f);
+        p->b4A = FloatToInt(4.0f);
         p->b29 = 1;
         p->b70 = 7;
         p->iA8 = 3;
@@ -171,10 +171,10 @@ void func_PAL_L17_003E89B0(u8 *obj)
         p->bCF = 11;
         p->bD2 = 6;
         p->bD3 = 11;
-        func_L04_0033CB88(&p->t140);
+        MoveCtl_Init(&p->t140);
         p->t140.f0C = 2.5f;
         p->t140.f08 = 2.0f;
-        p->t140.i00 = func_00283CF0(D_L17_001B0CA8 * 1024.0f);
+        p->t140.i00 = FloatToInt(D_L17_001B0CA8 * 1024.0f);
         p->t140.f04 = D_L17_001B0CA8;
         p->t140.f24 = p->f40C * (0.020000001f);
         if (p->v3D0.f[3] != 12439.4f) {
@@ -183,25 +183,25 @@ void func_PAL_L17_003E89B0(u8 *obj)
         }
         qcopy_nc(&p->v110, &p->v3D0);
         p->f120 = 0.5f;
-        p->h400 = func_002A7820(100, 583);
+        p->h400 = math_random_int_range(100, 583);
         p->i41C = 0;
-        func_002AB650(obj);
+        hero_copy_field_to_moby(obj);
         p->f340 = F(obj, 0x2C);
         p->f330 = p->f30;
         p->b28 = 0;
         p->i418 = 0;
         p->p310 = D_L17_001B0CB8;
         p->f430 = (float)p->b34;
-        func_002A7750(obj, 1, 0);
+        moby_set_state(obj, 1, 0);
         if (obj[0x43])
             func_PAL_002A7E68(obj, 0, 0, 0);
         p->i450 = p->i428;
     }
-    if (obj[0x31] && func_00282E48(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
-        func_002A93B0(obj);
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
+        moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }
-    hit = (u8 *)func_002A9640(obj, 0x230000, 0);
+    hit = (u8 *)part_find_owned_effect_slot(obj, 0x230000, 0);
     if (hit && hit[0x28] == 8) {
         obj[0x20] = 9;
         obj[0xBC] = 4;
@@ -212,13 +212,13 @@ void func_PAL_L17_003E89B0(u8 *obj)
             p->iF0 = 0;
             p->fF4 = 1.0053098f;
         }
-        func_L17_003E4860(obj);
+        moby_l17_set_group_alert_flag(obj);
     }
-    p->h404 = func_002B3BA8(obj, -1, 0, 0, 15.0f, 3.0f);
+    p->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
     target = p->target;
     if (!target) {
-        func_0026FEB8(D_L17_001B0CC8);
-        target = D_0018C0B0;
+        STUB_printf(D_L17_001B0CC8);
+        target = g_hero_moby;
     }
     p->p408 = target;
 }

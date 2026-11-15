@@ -5,14 +5,14 @@ extern float D_L20_001AECF0 __attribute__((sda));
 extern float D_L20_001AECF4 __attribute__((sda));
 extern float D_L20_001AECF8 __attribute__((sda));
 extern float D_L20_001AECFC __attribute__((sda));
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_L20_00330A68(void *, int);
-extern void func_002A7750(void *, int, int);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_change_class_from_tables(void *, int);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void *func_002A9640(void *, u32, s32);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern void func_0029F338(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
+extern void moby_mark_spawned(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
 typedef struct {
     char pad0[0x10];
     unsigned char b10, b11, b12;
@@ -105,7 +105,7 @@ void func_PAL_L20_003A0288(Object0039D340 *object) {
         st->f80 = 0.52359884977340698f;
         st->f84 = 0.10000000149011612f;
         object->h7C = 15;
-        func_002B60B0(object, D_L20_001AECF4 * 0.00040000002f,
+        moby_set_controller_speed_limits(object, D_L20_001AECF4 * 0.00040000002f,
                      D_L20_001AECF0 * 0.020000001f,
                      D_L20_001AECFC * 6.981318e-06f,
                      D_L20_001AECF8 * 0.0003490659f);
@@ -113,28 +113,28 @@ void func_PAL_L20_003A0288(Object0039D340 *object) {
             st->s24 = 10;
             st->f20 = 10.0f;
         }
-        func_L20_00330A68(object, 0xD0F);
-        func_002A7750(object, 6, 2);
+        moby_change_class_from_tables(object, 0xD0F);
+        moby_set_state(object, 6, 2);
         if (object->b43) func_PAL_002A7E68(object, 0, 0, 0);
         object->h34 = (object->h34 | 0x4000) & 0xFFFB;
     }
-    event = func_002A9640(object, 0x10000, 0);
+    event = part_find_owned_effect_slot(object, 0x10000, 0);
     if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F)
         object->bA8 = 255;
     func_PAL_002B1A50(object, &st->damage, 0);
     if (st->b2E == 2) {
-        func_002A7750(object, 6, 2);
+        moby_set_state(object, 6, 2);
         object->i98 = 0;
         object->h34 = (object->h34 | 0x41) & 0xEFFF;
         child = st->children;
         for (count = 0; count < 2; count++) {
             if (*child) {
-                func_0029F338(*child);
+                moby_mark_spawned(*child);
                 *child = 0;
             }
             ++child;
         }
-        if (st->p254) func_0029F338(st->p254);
+        if (st->p254) moby_mark_spawned(st->p254);
         st->p254 = 0;
     }
     st->b2E = 1;
@@ -144,6 +144,6 @@ void func_PAL_L20_003A0288(Object0039D340 *object) {
         qcopy(&st->f1F0, target + 0x10);
         st->f1F0[2] += 0.5f;
     } else {
-        func_002B3BA8(object, st->i230, 0, 0, 128.0f, 0.0f);
+        weapon_select_aim_target(object, st->i230, 0, 0, 128.0f, 0.0f);
     }
 }

@@ -8,7 +8,7 @@ extern SurfaceSample ref_00303738_01[];
 
 /* Fill one vertex, color and a pair of perturbed repeating surface coordinates. */
 /* Fills in one corner of a surface square with its position, colour and wobbling texture coordinates. */
-void func_00303738(char *object, SurfacePacketView *packet, int column, int row, int vertex)
+void surface_grid_fill_vertex(char *object, SurfacePacketView *packet, int column, int row, int vertex)
 {
     char *state = *(char **)(object + 0x68);
     int cell = row * 8 + column;

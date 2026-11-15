@@ -27,19 +27,19 @@ typedef struct {
     u8 pad2C[0xE0 - 0x2C];
 } Entry_2CAF20;
 
-extern Hero_2CAF20 D_00189E20;
-extern u8 D_00139568[];
-extern Entry_2CAF20 D_L00_00262570[];
-extern s32 func_L00_002ADEA0(s32);
-extern void func_L00_002AF7D0(void);
-extern int func_L00_002C42E0(int a0, int a1);
-extern void func_L00_002D2168(void *, int, f32);
-extern void func_002AC9F8(float *, float);
+extern Hero_2CAF20 g_hero_state;
+extern u8 g_item_slot_to_record[];
+extern Entry_2CAF20 g_weapon_l00_table[];
+extern s32 hero_slot_item_id(s32);
+extern void cancel_hero_item_animation(void);
+extern int hero_l00_set_action(int a0, int a1);
+extern void set_hero_animation(void *, int, f32);
+extern void vec_clamp_length(float *, float);
 
 /* Tries to start the hero's grab onto the nearby object, and returns 1 when it started. */
-int func_L00_002CAF20(void)
+int hero_try_start_grab(void)
 {
-    Hero_2CAF20 *h = &gHeroState;
+    Hero_2CAF20 *h = &g_hero_state;
     int idx;
     void *moby;
 
@@ -49,10 +49,10 @@ int func_L00_002CAF20(void)
         cancel_hero_item_animation();
         return 0;
     }
-    moby = (gWeaponTable_L00 + gItemSlotToRecord[idx])->moby;
-    if (SetHeroAction_L00(0, 0) == 0)
+    moby = (g_weapon_l00_table + g_item_slot_to_record[idx])->moby;
+    if (hero_l00_set_action(0, 0) == 0)
         return 0;
-    ClampVectorLength(h->v160, 0.0250000015f);
+    vec_clamp_length(h->v160, 0.0250000015f);
     if (0.0250000015f < h->f1B4)
         h->f1B4 = 0.0250000015f;
     set_hero_animation(moby, 0, 11.0f);

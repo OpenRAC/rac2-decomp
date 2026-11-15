@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_00336E40(void *);
-extern void *func_00336DA8(int, int);
+extern int pool_alloc_cell(void *);
+extern void *ui_return_second_arg(int, int);
 extern void *func_US2_003377B0(void *, void *, void *);
 extern char D_001AE5A8[];
 
@@ -14,7 +15,7 @@ void func_US2_00348BF8(char *object, void *data)
     *(int *)(object + 0xC0) = 0;
     *(void **)(object + 0x58) = data;
     if (data) {
-        position = func_00336DA8(16, func_00336E40(data));
+        position = ui_return_second_arg(16, pool_alloc_cell(data));
         *(int **)(object + 0x5C) = position;
         position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
     }
@@ -34,8 +35,8 @@ void func_US2_00348BF8(char *object, void *data)
 typedef int s32;
 typedef unsigned char u8;
 typedef float f32;
-extern void func_00348068(unsigned char *owner, float *records);
-extern u8 D_001A7AF8[] __attribute__((section(".sdata")));
+extern void menu_set_entry_table(unsigned char *owner, float *records);
+extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
 extern u8 D_001A7A80[] __attribute__((section(".sdata")));
 
 /* func_00347F80 is built from 00345358-wrap.c. */

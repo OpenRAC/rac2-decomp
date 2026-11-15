@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -28,7 +29,7 @@ extern s32 ref_L18_00428338_01(s8 *, s8 *, s8 *, s32, s32, s32, s32, f32, f32);
 extern f32 ref_L18_00428338_02 __attribute__((sda));
 
 /* Lets the enemy aim at a target using two attachment points while in one state. Returns 0 in other states. */
-s32 func_L18_00428338(s8 *moby) {
+s32 enemy_aim_at_target(s8 *moby) {
     s8 attachPointA[0x10];
     s8 attachPointB[0x10];
     s8 *vars;

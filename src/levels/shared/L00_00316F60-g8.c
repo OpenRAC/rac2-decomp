@@ -7,7 +7,7 @@ extern int D_L00_001B1B48;
 extern int D_L00_001A9038 __attribute__((sda));
 
 /* Clears a list of five counters and a related value. */
-void func_L00_0032A138(void) {
+void level_l00_clear_counter_list(void) {
     int count = 4;
     int *cursor = &D_L00_001B1B30;
 
@@ -20,7 +20,7 @@ void func_L00_0032A138(void) {
 }
 
 /* Clears a second list of five counters and a related value. */
-void func_L00_0032A170(void) {
+void level_l00_clear_counter_list_2(void) {
     int count = 4;
     int *cursor = &D_L00_001B1B48;
 
@@ -37,11 +37,11 @@ extern int D_L00_001A8FB4_1 __attribute__((sda));
 extern int D_L00_001A8FB0;
 extern int D_L00_001B2084;
 extern int D_L00_001B2084_1 __attribute__((sda));
-extern void func_L00_0030DDF0(void);
-extern void func_0028B5D0(int);
+extern void level_l00_call_module_handler_9(void);
+extern void hud_close_element_by_key(int);
 
 /* If the value matches the current one, resets that state and releases the resource, returning 1. */
-int func_L00_003268E8(int value) {
+int level_release_matching_resource(int value) {
     if (D_L00_001A8FB4 != value)
         return 0;
     if (D_L00_001B2084 == -1)
@@ -49,8 +49,8 @@ int func_L00_003268E8(int value) {
 
     D_L00_001A8FB0 = 0;
     D_L00_001A8FB4_1 = 0;
-    CallLoadedModuleHandler_L0042D9D0();
-    CloseHudElementByKey(D_L00_001B2084_1);
+    level_l00_call_module_handler_9();
+    hud_close_element_by_key(D_L00_001B2084_1);
     D_L00_001B2084 = -1;
     return 1;
 }
@@ -64,7 +64,7 @@ extern float func_2EE268(void *);
 /* Screens the 128-byte record the index picks out of the resident object table: runs the
    caller's transform through the record's two matrices and accepts only when the remaining
    length is under 1 and the record's own z direction stays inside [-1, 1]. */
-int func_L00_003206B8(void *transform, int index)
+int coll_point_inside_record_volume(void *transform, int index)
 {
     unsigned char *entry;
     float b1[4];
@@ -85,10 +85,10 @@ int func_L00_003206B8(void *transform, int index)
     return 0;
 }
 
-extern void func_0029FC20(void *, int, void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283678(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void copy_matrix3x4(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 extern char *D_L00_001B1E9C;
 extern char *D_L00_001B251C;
 extern char *D_L00_001B2400;
@@ -100,22 +100,22 @@ typedef struct {
     short index;
     unsigned char end, joint, type, copy_matrix, period, phase;
 } B1320Entry;
-extern void func_00282B50(void *, void *, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CA8(void *, void *, void *);
-extern void func_00283658(void *, void *);
-extern void func_002AB6D8(void *, void *);
+extern void mem_fast_helper_c(void *, void *, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_copy_helper_b(void *, void *, void *);
+extern void copy_matrix_rotation(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
 extern void func_002A0F48(void *);
-extern void func_L00_0036AE00(int, int);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern void func_00282D60(void *, void *, float);
-extern int D_L00_001B19C8 __attribute__((sda));
+extern void gfx_setup_scale_record(int, int);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern void scale_vector(void *, void *, float);
+extern int g_frame_l00_counter __attribute__((sda));
 extern char *D_L00_001B23F8;
 extern char *D_L00_0021EA20[];
 /* Moves linked objects, lights and similar items to follow an object using a list of attachment entries. */
-void func_L00_00323958(char *object, B1320Entry *entries)
+void moby_update_attached_transforms(char *object, B1320Entry *entries)
 {
     char matrix[64] __attribute__((aligned(16)));
     char temp[64] __attribute__((aligned(16)));
@@ -124,14 +124,14 @@ void func_L00_00323958(char *object, B1320Entry *entries)
     float x, y;
     int sx, sy, active;
     if (!entries->end) return;
-    if (entries->copy_matrix) FastMemoryHelperC(matrix, object + 0xC0, 48);
+    if (entries->copy_matrix) mem_fast_helper_c(matrix, object + 0xC0, 48);
     else euler_rotation_basis(matrix, object + 0xF0);
     qcopy_nc(matrix + 48, object + 0x10);
     *(int *)(matrix + 60) = 0;
     i = 0;
     do {
         if (entries[i].attachment) {
-            TransformMobyJointPoint(entries[i].attachment, entries[i].joint, temp);
+            moby_transform_joint_point(entries[i].attachment, entries[i].joint, temp);
             copy_matrix3x4(matrix, temp);
         }
         switch (entries[i].type) {
@@ -142,11 +142,11 @@ void func_L00_00323958(char *object, B1320Entry *entries)
             break;
         case 1:
             matrix_mul_vec3(temp, entries[i].position, matrix);
-            VectorCopyHelperB(D_L00_001B251C + entries[i].index * 64 + 0x30, matrix + 48, temp);
+            vec_copy_helper_b(D_L00_001B251C + entries[i].index * 64 + 0x30, matrix + 48, temp);
             break;
         case 2:
             matrix_mul_vec3(temp, entries[i].position, matrix);
-            VectorCopyHelperB(D_L00_001B2400 + entries[i].index * 64 + 0x30, matrix + 48, temp);
+            vec_copy_helper_b(D_L00_001B2400 + entries[i].index * 64 + 0x30, matrix + 48, temp);
             break;
         }
         switch (entries[i].type) {
@@ -161,7 +161,7 @@ void func_L00_00323958(char *object, B1320Entry *entries)
             }
             if (!*(int *)(item + 0x24)) {
                 copy_matrix_rotation(rotation, item + 0xC0);
-                GetEulerAnglesFromMatrix(rotation, item + 0xF0);
+                mat_get_euler_angles(rotation, item + 0xF0);
             }
             break;
         }
@@ -189,9 +189,9 @@ void func_L00_00323958(char *object, B1320Entry *entries)
             active = 0;
             if (entries[i].period == 0) active = 1;
             else if (entries[i].period != 255) {
-                if (gFrameCounter_L00 % entries[i].period == entries[i].phase) active = 1;
+                if (g_frame_l00_counter % entries[i].period == entries[i].phase) active = 1;
             }
-            SetupScaleRecord(entries[i].index, active);
+            gfx_setup_scale_record(entries[i].index, active);
             break;
         case 2: {
             char *item, *data;

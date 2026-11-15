@@ -9,21 +9,21 @@ extern int D_L23_001AFA54 __attribute__((sda));
 extern TI128 D_L23_001C0AA0[];
 extern char D_00189ED0[];
 
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
 extern void func_L22_002F3B38(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
+extern int CollLine(void *, void *, int, int, int);
 
 #define F(i, k) (((float *)&loc[i])[k])
 
 /* Fires a ray ahead of the enemy; on a hit it picks a new point to move toward next to the wall and returns 1. */
-int func_L23_003C1420(char *moby) {
+int enemy_probe_ahead_point(char *moby) {
     TI128 loc[8];
     char *vars = *(char **)(moby + 0x68);
     int value;
@@ -37,7 +37,7 @@ int func_L23_003C1420(char *moby) {
     loc[2] = 0;
     F(2, 0) = 4.0f;
     loc[0] = loc[1];
-    value = RandomIntBelow(8);
+    value = math_random_int_below(8);
     F(2, 1) = (float)value * 0.4285714626f + -1.5f;
     F(2, 2) = *(float *)(vars + 0x54) + *(float *)(vars + 0x50);
     loc[1] = loc[2];
@@ -70,7 +70,7 @@ int func_L23_003C1420(char *moby) {
     qcopy(followPoint, clampedPoint);
     value = D_L23_001AFA54;
     *(short *)(vars + 0x26C) = 1;
-    *(unsigned short *)(vars + 0x26E) = (unsigned short)D_L23_001AFA54 + RandomIntRange(-value / 2, value / 2);
+    *(unsigned short *)(vars + 0x26E) = (unsigned short)D_L23_001AFA54 + math_random_int_range(-value / 2, value / 2);
     vec_scale_to_length(hitNormal, hitNormal, 10.0f);
     FastVecAdd(hitNormal, hitNormal, hitInfo);
     return 1;

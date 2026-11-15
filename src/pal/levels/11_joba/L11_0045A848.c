@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002A7750(void *a0, int a1, int a2);
-extern void func_002A0488(void *a0, int a1, int a2, int a3);
-extern float func_002A7878(float a, float b);
-extern void func_002A7470(void *a0, int a1, int a2, int a3);
-extern void func_00282C88(void *);
-extern void func_L11_003973F8(char *, int, float, float);
+extern void moby_set_state(void *a0, int a1, int a2);
+extern void set_moby_color(void *a0, int a1, int a2, int a3);
+extern float math_random_float_range(float a, float b);
+extern void anim_start_blended(void *a0, int a1, int a2, int a3);
+extern void vec_clear_128(void *);
+extern void moby_spawn_linked(char *, int, float, float);
 
 /* Aims the object's stage, re-arms its effect and stores the new heading. */
 void func_PAL_L11_0045A848(char *p, int a1, int a2)
@@ -23,7 +23,7 @@ void func_PAL_L11_0045A848(char *p, int a1, int a2)
     *(unsigned char *)(q + 0x2E) = 1;
     *(float *)(q + 0x20) = f;
     if (*(unsigned char *)(p + 0x43) != 0)
-        func_002A7470(p, 0, 0, 8);
+        anim_start_blended(p, 0, 0, 8);
     flags = *(unsigned short *)(p + 0x34);
     *(unsigned char *)(p + 0x7F) = 0;
     *(unsigned short *)(p + 0x34) = (flags | 0x1000) & 0xFFB9;
@@ -31,32 +31,32 @@ void func_PAL_L11_0045A848(char *p, int a1, int a2)
     cache = *(int *)(definition + 0x10);
     *(int *)(p + 0x98) = cache;
     if (*(short *)(q + 0x1FC) != 0) {
-        func_002A7750(p, 7, 3);
+        moby_set_state(p, 7, 3);
         *(unsigned short *)(p + 0x34) |= 0x100;
-        func_L11_003973F8(p, 0, 2.0f, 2.0f);
+        moby_spawn_linked(p, 0, 2.0f, 2.0f);
     } else {
-        func_002A7750(p, 3, 1);
+        moby_set_state(p, 3, 1);
         *(unsigned char *)(p + 0x31) = 1;
         *(unsigned short *)(p + 0x34) &= 0xFEFE;
     }
-    func_00282C88(q + 0x1B0);
-    f = func_002A7878(20.0f, 30.0f) * 0.017453294f;
+    vec_clear_128(q + 0x1B0);
+    f = math_random_float_range(20.0f, 30.0f) * 0.017453294f;
     *(short *)(q + 0x1EE) = a1;
     *(float *)(q + 0x1CC) = f;
     if (*(short *)(q + 0x50) != 0) {
         *(short *)(q + 0x50) = 0;
-        func_002A0488(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
+        set_moby_color(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
         *(short *)(q + 0x52) = 1;
     }
 }
 
 extern void func_002A05A8(void *a0);
-extern void func_L11_00441978(char *p, int id);
-extern void func_002E59F8(int index);
-extern void func_002E5DA0(int index, int value, char *object, int kind);
-extern void func_0032C700(char *, int, int, int, int, int, int, int, float, float, int,
+extern void arena_add_waiting_fighter(char *p, int id);
+extern void snd_stop_voice(int index);
+extern void snd_play_from_class_bank(int index, int value, char *object, int kind);
+extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
                          int, int, int);
-extern char D_00188660[];
+extern char g_sound_state[];
 
 /* Releases the object's slot in the shared table and drops it to the idle flag block. */
 void func_PAL_L11_0045A9A8(char *p)
@@ -66,22 +66,22 @@ void func_PAL_L11_0045A9A8(char *p)
     char *entry;
 
     if (i != -1) {
-        entry = D_00188660 + i * 0x70;
+        entry = g_sound_state + i * 0x70;
         if (*(char **)(entry + 0x88) == p && *(unsigned char *)(entry + 0x74) != 0)
-            func_002E59F8(i);
+            snd_stop_voice(i);
     }
     *(int *)(q + 0x1DC) = -1;
     if (*(short *)(q + 0x1EC) == 1) {
         *(short *)(q + 0x1EC) = 0;
-        func_L11_00441978(*(char **)(p + 0xB8), *(short *)(p + 0xAA));
+        arena_add_waiting_fighter(*(char **)(p + 0xB8), *(short *)(p + 0xAA));
     }
     if (*(unsigned char *)(p + 0x31) != 0) {
-        func_0032C700(p + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
-        func_002E5DA0(0, 0, p, 0xDF7);
+        SpawnExplosion(p + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
+        snd_play_from_class_bank(0, 0, p, 0xDF7);
     }
-    func_002A7470(p, 0, 0, 3);
+    anim_start_blended(p, 0, 0, 3);
     func_002A05A8(p);
-    func_002A7750(p, 1, 0);
+    moby_set_state(p, 1, 0);
     *(unsigned short *)(p + 0x34) = (*(unsigned short *)(p + 0x34) & 0xEFFF) | 0x47;
     *(int *)(p + 0x98) = 0;
     *(unsigned char *)(p + 0x31) = 0;
@@ -148,14 +148,14 @@ typedef struct {
     s16 f256;
 } JobaActorState;
 extern JobaObject *D_L11_001C4D80[];
-extern int func_00283CF0(float);
-extern HitRecord *func_002A9640(void *, int, int);
+extern int FloatToInt(float);
+extern HitRecord *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
 extern char D_L11_001BA8C0[];
-extern void func_L11_00456540(char *);
-extern void func_L11_00456378(char *);
+extern void fighter_reset_to_idle(char *);
+extern void fighter_update_lock_on(char *);
 
 /* func_L11_00454F18 lives in L11_00454F18-g8.c. */
 
@@ -168,8 +168,8 @@ void func_PAL_L11_0045B9E8(JobaObject *obj)
     JobaObject *other;
 
     if (obj->stage == 0) {
-        state->f48 = func_00283CF0(15.0f);
-        state->f4A = func_00283CF0(12.0f);
+        state->f48 = FloatToInt(15.0f);
+        state->f4A = FloatToInt(12.0f);
         state->f80 = 0.5f;
         state->f84 = 0.5f;
         state->f108 = 0.5f;
@@ -187,12 +187,12 @@ void func_PAL_L11_0045B9E8(JobaObject *obj)
         state->f28 = 3;
         state->f30 = 0.75f;
         state->f29 = 1;
-        func_L11_00456540((char *)obj);
+        fighter_reset_to_idle((char *)obj);
     }
 
     if (obj->active) {
         if (obj->stage >= 3) {
-            hit = func_002A9640(obj, 0x10000, 1);
+            hit = part_find_owned_effect_slot(obj, 0x10000, 1);
             if (hit && (other = hit->object) && !obj->active) {
                 if (other->id == 0xDF9 || other->id == 0xB89)
                     hit->f2C = 0;
@@ -202,14 +202,14 @@ void func_PAL_L11_0045B9E8(JobaObject *obj)
                 state->fE4 = 1.0053098f;
             }
         }
-        if (obj->active && func_00282E48(obj->position, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(obj);
+        if (obj->active && fast_vec_dist(obj->position, D_L11_001BA8C0) < 24.0f) {
+            moby_update_ground_check(obj);
             obj->f6F = 22;
         }
     }
 
     if (obj->stage >= 2 && state->f2E == 2)
-        func_L11_00456540((char *)obj);
-    func_L11_00456378((char *)obj);
+        fighter_reset_to_idle((char *)obj);
+    fighter_update_lock_on((char *)obj);
 }
 

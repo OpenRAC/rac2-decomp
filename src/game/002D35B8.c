@@ -11,30 +11,30 @@ typedef struct {
 } ClassRecord;
 
 extern char *D_001A8CFC __attribute__((sda));
-extern unsigned char D_00139568[];
-extern ClassRecord D_00239BA0[];
+extern unsigned char g_item_slot_to_record[];
+extern ClassRecord g_weapon_table[];
 
-extern void func_00341550(void *, int);
-extern int func_00343560(unsigned char *);
-extern char *func_003435A8(char *);
+extern void tab_menu_set_enabled(void *, int);
+extern int item_menu_get_selected_id(unsigned char *);
+extern char *item_menu_get_extra_value(char *);
 
-int func_002D35B8(char *object)
+int menu_preview_copy_class_fields(char *object)
 {
     char *target;
     int i;
 
     if (D_001A8CFC != 0) {
-        SetTabbedMenuEnabled(D_001A8CFC + 0x3BE08, 1);
-        i = GetMenuSelectedId((unsigned char *)D_001A8CFC + 0x3C108);
+        tab_menu_set_enabled(D_001A8CFC + 0x3BE08, 1);
+        i = item_menu_get_selected_id((unsigned char *)D_001A8CFC + 0x3C108);
         {
-            ClassRecord *r = &gWeaponTable_00239BA0[gItemSlotToRecord[i]];
+            ClassRecord *r = &g_weapon_table[g_item_slot_to_record[i]];
             int v = r->f42;
             char *a = D_001A8CFC + 0x3C108;
             *(int *)(object + 0x34) = v;
-            target = GetMenuExtraValue(a);
+            target = item_menu_get_extra_value(a);
         }
-        i = GetMenuSelectedId((unsigned char *)D_001A8CFC + 0x3C108);
-        *(int *)(target + 0x58) = gWeaponTable_00239BA0[gItemSlotToRecord[i]].f06;
+        i = item_menu_get_selected_id((unsigned char *)D_001A8CFC + 0x3C108);
+        *(int *)(target + 0x58) = g_weapon_table[g_item_slot_to_record[i]].f06;
     }
     return 0;
 }

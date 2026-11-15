@@ -10,7 +10,7 @@ extern void func_003068F8(u8 *a0, u8 *a1, f32 f12);
 extern void func_0037D210(u8 *a0);
 
 /* Spawns a target object at a random point of the given object and gives it a facing. */
-void func_L05_00422540(u8 *moby) {
+void feltzin_target_spawn_random(u8 *moby) {
     TI128 v[6];
     u8 *pw;
     u8 *px;

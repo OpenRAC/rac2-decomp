@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
-extern u8 *D_L04_001B24DC;
-extern u8 *D_L04_001FE340[];
-extern int D_L04_001A8FE4[] __attribute__((sda));
-extern int D_L04_001A8FE8[] __attribute__((sda));
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
+extern u8 *g_moby_l04_pool;
+extern u8 *g_route_path_table[];
+extern int g_current_lap[] __attribute__((sda));
+extern int g_race_time_ticks[] __attribute__((sda));
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
 
 /* Collects the racers, sorts their recorded times, and records each rank and
    the next racer in the ordered list. */
@@ -23,23 +24,23 @@ void func_PAL_L04_004155D8(u8 *object) {
     list[0] = object;
     for (k = 19; k >= 0; k--, slot++) {
         if (*slot != -1) {
-            obj = D_L04_001B24DC + (*slot << 8);
+            obj = g_moby_l04_pool + (*slot << 8);
             p = *(u8 **)(obj + 0x68);
             *out++ = obj;
             n++;
             if (*(int *)(p + 0x1A0) == 0) {
-                route = D_L04_001FE340[*(int *)(state + 0x1A8)];
+                route = g_route_path_table[*(int *)(state + 0x1A8)];
                 length = (float)*(int *)route * *(float *)(route + 0x1C);
                 distance = length - *(float *)(p + 0x11C) +
-                           length * (float)(D_L04_001A8FE4[0] - *(int *)(p + 0x160));
+                           length * (float)(g_current_lap[0] - *(int *)(p + 0x160));
                 if (distance <= 0.0f) {
-                    distance = func_002A7878(10.0f, 20.0f);
+                    distance = math_random_float_range(10.0f, 20.0f);
                 }
-                *(int *)(p + 0x1A0) = func_00283CF0(distance * 2.4999998f);
+                *(int *)(p + 0x1A0) = FloatToInt(distance * 2.4999998f);
                 if (*(int *)(p + 0x1A0) < 5) {
                     *(int *)(p + 0x1A0) = 5;
                 }
-                *(int *)(p + 0x1A0) += D_L04_001A8FE8[0];
+                *(int *)(p + 0x1A0) += g_race_time_ticks[0];
             }
         }
     }
@@ -52,7 +53,7 @@ void func_PAL_L04_004155D8(u8 *object) {
                 {
                     u8 *obj = list[j];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC) {
-                        a = D_L04_001A8FE8[0];
+                        a = g_race_time_ticks[0];
                     } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
                         a = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
@@ -60,7 +61,7 @@ void func_PAL_L04_004155D8(u8 *object) {
                 {
                     u8 *obj = list[j + 1];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC) {
-                        b = D_L04_001A8FE8[0];
+                        b = g_race_time_ticks[0];
                     } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
                         b = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }

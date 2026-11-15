@@ -21,12 +21,12 @@ void func_PAL_L15_0043BD80(char *a0) {
 
 
 
-extern void func_L06_00382608(char *, int, int, int, float, int);
-extern int func_002EEB00(char *);
-extern void func_002EE920(char *, char *);
-extern void func_002EE678(char *, int);
+extern void DrawPath(char *, int, int, int, float, int);
+extern int follower_has_reached_target(char *);
+extern void follower_set_push_vector(char *, char *);
+extern void follower_set_state(char *, int);
 extern void func_PAL_L05_0037E8E0(char *);
-extern void func_L05_0037B538(char *, int, int, int);
+extern void moby_process_collision_hit(char *, int, int, int);
 typedef struct GornPathPoint {
     float position[3];
     float action;
@@ -39,24 +39,24 @@ typedef struct GornPath {
 extern char *D_L15_001FE480[];
 extern void func_PAL_L15_0043C8B8(char *);
 extern void func_PAL_L15_0043C978(void);
-extern int func_002ED688(unsigned char *owner);
-extern int func_00282948(void *);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern int func_L00_00367720(void);
-extern void func_L05_00379E60(void *, void *, int, int);
-extern int func_002A77E0(int);
+extern int moby_get_motion_data(unsigned char *owner);
+extern int math_fast_float_d(void *);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern int state_get_stored_pointer_value(void);
+extern void level_append_object(void *, void *, int, int);
+extern int math_random_int_below(int);
 extern s32 D_L15_001AEE20[] __attribute__((sda));
 extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
 extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
-extern s32 func_002E5CF8(s32 a, s32 b, void *c);
-extern s32 func_002A77E0(s32 a);
-extern f32 func_002A7878(f32 a, f32 b);
-extern s32 func_00283CF0(f32 a);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002A77E0(int);
+extern s32 PlayMobySound(s32 a, s32 b, void *c);
+extern s32 math_random_int_below(s32 a);
+extern f32 math_random_float_range(f32 a, f32 b);
+extern s32 FloatToInt(f32 a);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern int PlayMobySound(int, int, void *);
+extern int math_random_int_below(int);
 
 /* func_L15_004363C8 is in L15_004363C8-g8.c. */
 
@@ -69,24 +69,24 @@ void func_PAL_L15_0043C6A0(char *object) {
     switch (*(unsigned char *)(mover + 0x20)) {
     case 0:
         *(unsigned char *)(mover + 0x30) = 0xFF;
-        if (func_L00_00367720() == 0) {
+        if (state_get_stored_pointer_value() == 0) {
             return;
         }
         func_PAL_L15_0043C8B8(mover);
         if (*(int *)(state + 0x264) != 0) {
-            func_L05_00379E60(mover, (void *)func_PAL_L15_0043C978, 0, 0);
+            level_append_object(mover, (void *)func_PAL_L15_0043C978, 0, 0);
         }
-        func_L06_00382608(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
+        DrawPath(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
         break;
     case 1: {
         GornPath *path;
         char *owner;
         int index;
 
-        func_L06_00382608(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
-        owner = (char *)func_002ED688(mover);
+        DrawPath(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
+        owner = (char *)moby_get_motion_data(mover);
         path = (GornPath *)D_L15_001FE480[*(int *)(state + 0x268)];
-        if (func_002EEB00(mover) != 0) {
+        if (follower_has_reached_target(mover) != 0) {
             index = *(int *)(state + 0x26C);
             *(int *)(state + 0x26C) = index + 1;
             if (index + 1 == path->count - 1) {
@@ -95,22 +95,22 @@ void func_PAL_L15_0043C6A0(char *object) {
                 float action = path->points[index].action;
 
                 if (action != -1.0f) {
-                    if ((func_00283CF0(action) & 1) != 0) {
-                        *(int *)(state + 0x274) = (func_00283CF0(action) >> 1) * 0x32;
+                    if ((FloatToInt(action) & 1) != 0) {
+                        *(int *)(state + 0x274) = (FloatToInt(action) >> 1) * 0x32;
                         *(unsigned char *)(mover + 0x20) = 2;
                     }
                 }
-                func_002EE920(mover, (char *)&path->points[*(int *)(state + 0x26C)]);
+                follower_set_push_vector(mover, (char *)&path->points[*(int *)(state + 0x26C)]);
                 *(int *)(owner + 0x130) = 0x196E6B;
             }
         }
-        func_002EE678(mover, 0xC);
+        follower_set_state(mover, 0xC);
         func_PAL_L05_0037E8E0(mover);
-        func_L05_0037B538(mover, 0, 1, 1);
+        moby_process_collision_hit(mover, 0, 1, 1);
         break;
     }
     case 2:
-        if (func_00282948((int *)(state + 0x274)) != 0) {
+        if (math_fast_float_d((int *)(state + 0x274)) != 0) {
             *(unsigned char *)(mover + 0x20) = 1;
         }
         break;
@@ -118,14 +118,14 @@ void func_PAL_L15_0043C6A0(char *object) {
 }
 
 
-extern void func_L15_00436BA8(char *);
+extern void gorn_path_mover_init(char *);
 extern void func_PAL_L05_0037D610(char *object, int flag);
-extern void func_L05_00379C68(int arg0, int value);
+extern void level_set_object_state_field(int arg0, int value);
 
 void func_PAL_L15_0043C8B8(char *a0) {
     char *s0 = a0;
     char *s1 = *(char **)(s0 + 0x68);
-    char *s2 = (char *)func_002ED688((unsigned char *)a0);
+    char *s2 = (char *)moby_get_motion_data((unsigned char *)a0);
 
     *(int *)(s2 + 0x148) = 100;
     func_PAL_L05_0037D610(s0, 1);
@@ -140,7 +140,7 @@ void func_PAL_L15_0043C8B8(char *a0) {
     *(int *)(s1 + 0x270) = 0;
     *(int *)(s1 + 0x274) = 0;
     *(int *)(s2 + 0x154) = (int)(s1 + 0x278);
-    func_L05_00379C68((int)s0, 0xFFFF);
+    level_set_object_state_field((int)s0, 0xFFFF);
 }
 
 

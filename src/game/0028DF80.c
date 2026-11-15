@@ -26,8 +26,8 @@ typedef struct Anim28DF80_State {
 } Anim28DF80_State;
 
 extern Anim28DF80_Frame *D_001B188C __attribute__((sda));
-extern s32 D_001B1688 __attribute__((sda));
-extern s32 func_002A77E0(s32);
+extern s32 g_game_time __attribute__((sda));
+extern s32 math_random_int_below(s32);
 
 /* Picks the frame of an animation record: clamp, loop, ping-pong or one-shot. */
 s32 func_0028DF80(Anim28DF80_State *a0) {
@@ -40,10 +40,10 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
             r = t->f4;
             break;
         case 1:
-            r = t->f4 + (gGameTime - a0->fC) / t->f7 % t->f2;
+            r = t->f4 + (g_game_time - a0->fC) / t->f7 % t->f2;
             break;
         case 2:
-            r = (gGameTime - a0->fC) / t->f7 % (t->f2 * 2 - 2);
+            r = (g_game_time - a0->fC) / t->f7 % (t->f2 * 2 - 2);
             if (r >= t->f2) {
                 s32 k = r + 2;
                 r = t->f2 * 2 - k;
@@ -51,8 +51,8 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
             r += t->f4;
             break;
         case 3:
-            if (a0->fC < gGameTime) {
-                r = (gGameTime - a0->fC) / t->f7;
+            if (a0->fC < g_game_time) {
+                r = (g_game_time - a0->fC) / t->f7;
                 if (r < t->f2 * 2 - 2) {
                     if (r >= t->f2) {
                         s32 k = r + 2;
@@ -62,7 +62,7 @@ s32 func_0028DF80(Anim28DF80_State *a0) {
                 } else {
                     r = t->f4;
                     {
-                        s32 k = RandomIntBelow(30) + 10;
+                        s32 k = math_random_int_below(30) + 10;
                         a0->fC = t->f2 * 2 + k;
                     }
                 }

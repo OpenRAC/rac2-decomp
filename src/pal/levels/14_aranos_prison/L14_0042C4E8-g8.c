@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float D_L14_001B17B8 __attribute__((sda));
 extern float D_L14_001B17BC __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern void *func_PAL_L00_002D7850(int size);
-extern void func_L00_002D7140(void *block);
-extern int func_002ACBC8(void *, int);
+extern void cam_end_override(void *block);
+extern int IsPointInCuboid(void *, int);
 typedef struct {
     float x;
     float y;
@@ -21,7 +22,7 @@ void func_PAL_L14_0042C4E8(char *a0)
     int i;
 
     for (i = 0; i < 4; i++, slot++) {
-        if (*slot != -1 && func_002ACBC8(D_00189EA0, *slot) != 0) {
+        if (*slot != -1 && IsPointInCuboid(g_hero_position, *slot) != 0) {
             if (*(EffectPair **)(state + 0x14) == 0) {
                 *(EffectPair **)(state + 0x14) = func_PAL_L00_002D7850(5);
             }
@@ -32,7 +33,7 @@ void func_PAL_L14_0042C4E8(char *a0)
     }
 
     if (*(EffectPair **)(state + 0x14) != 0) {
-        func_L00_002D7140(*(EffectPair **)(state + 0x14));
+        cam_end_override(*(EffectPair **)(state + 0x14));
         *(EffectPair **)(state + 0x14) = 0;
     }
 }

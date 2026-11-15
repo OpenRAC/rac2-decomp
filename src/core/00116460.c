@@ -55,9 +55,9 @@ extern unsigned long long max_total_mem;
 
 extern struct mallinfo_116460 current_mallinfo;
 
-extern char *func_00115C90(void *, unsigned int);
+extern char *sbrk_reentrant(void *, unsigned int);
 
-extern void func_00116E10(void *, void *);
+extern void FreeReentrant(void *, void *);
 
 #define MORECORE(reent, size) func_00115C90(reent, (size))
 

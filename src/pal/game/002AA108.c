@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
@@ -7,7 +8,7 @@ extern s32 func_001163B0(void);
 extern f32 func_002A7940_5(void);
 extern f32 func_002A7878_10(f32, f32);
 extern f32 func_00283180_3 (f32);
-extern s32 D_001BAF80[];
+extern s32 g_collision_hit[];
 typedef struct Rec_002A96A0 {
     char pad0[4];
     short s4;
@@ -23,12 +24,12 @@ typedef struct Src_002A96A0 {
     u8 b28;
     float f2C;
 } Src_002A96A0;
-extern Rec_002A96A0 *func_002AB1F0(s32);
-extern u8 *func_002AB220(s32);
-extern u8 func_002AD980(u8 *);
+extern Rec_002A96A0 *moby_get_private_value_0(s32);
+extern u8 *moby_get_private_value_4(s32);
+extern u8 moby_get_kind_slot(u8 *);
 
 f32 func_PAL_002AA108(s32 a0, Src_002A96A0 *a1) {
-    Rec_002A96A0 *p = func_002AB1F0(a0);
+    Rec_002A96A0 *p = moby_get_private_value_0(a0);
     f32 f = 0.0f;
     if (p != 0) {
         u8 *q = p->p18;
@@ -60,7 +61,7 @@ f32 func_PAL_002AA108(s32 a0, Src_002A96A0 *a1) {
             if (x != 0) {
                 if (p->p18 != x) {
                     p->p18 = x;
-                    p->b17 = func_002AD980(a1->p20);
+                    p->b17 = moby_get_kind_slot(a1->p20);
                     p->s1C = 1;
                 } else {
                     if (a1->b28 == 9) {
@@ -74,10 +75,10 @@ f32 func_PAL_002AA108(s32 a0, Src_002A96A0 *a1) {
             }
             if ((f32)p->s4 <= 1.0f && f > 0.0f && f < 1.0f) f = 1.0f;
             if (a1->f24 & 0x100000) {
-                u8 *o = func_002AB220(a0);
+                u8 *o = moby_get_private_value_4(a0);
                 if (o != 0) o[0x18] = 1;
             } else {
-                u8 *o = func_002AB220(a0);
+                u8 *o = moby_get_private_value_4(a0);
                 if (o != 0) o[0x18] = 0;
             }
         }

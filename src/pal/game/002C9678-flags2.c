@@ -1,16 +1,16 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00300190(void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(float, int, int);
-extern float func_002A7798(float);
-extern float func_002A7790(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(float, int, int);
+extern float math_ease_out_quad(float);
+extern float math_square(float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
 
 void func_PAL_002C9678(char *self) {
     float a[4];
@@ -23,30 +23,30 @@ void func_PAL_002C9678(char *self) {
     b[1] = *(float *)(p + 4);
     b[2] = *(float *)(p + 8);
     b[3] = 0;
-    func_00300190(self + 0x10, self + 0x10);
-    t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(p + 0x11));
+    vec_transform_or_copy(self + 0x10, self + 0x10);
+    t = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(p + 0x11));
     f22 = 1.0f - t;
     if (*(unsigned char *)(p + 0x13) == 0) {
-        color = func_00283D38(f22, 0x103080, *(int *)(p + 0xC));
+        color = FastTweenColor(f22, 0x103080, *(int *)(p + 0xC));
         *(int *)(self + 4) = color | (*(unsigned char *)(p + 0x12) << 24);
         *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * f22;
-        func_00282D30(a, b, *(float *)(p + 0x1C) * func_002A7798(f22));
+        FastVecScale(a, b, *(float *)(p + 0x1C) * math_ease_out_quad(f22));
     } else {
-        f21 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = func_00283CE0(*(unsigned char *)(p + 0x12));
-        f20 = f20 * func_002A7790(f22);
-        *(int *)(self + 4) = *(int *)(p + 0xC) | (func_00283CF0(f21 - f20) << 24);
-        func_00282D30(a, b, *(float *)(p + 0x1C));
+        f21 = IntToFloat(*(unsigned char *)(p + 0x12));
+        f20 = IntToFloat(*(unsigned char *)(p + 0x12));
+        f20 = f20 * math_square(f22);
+        *(int *)(self + 4) = *(int *)(p + 0xC) | (FloatToInt(f21 - f20) << 24);
+        FastVecScale(a, b, *(float *)(p + 0x1C));
     }
-    func_00282CC0(self + 0x10, a, self + 0x10);
+    FastVecAdd(self + 0x10, a, self + 0x10);
     *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(p + 0x10);
-    if (func_00282978(self + 0xA) != 0) {
+    if (FastDecTimer(self + 0xA) != 0) {
         if (*(unsigned char *)(p + 0x13) == 0) {
             *(unsigned char *)(p + 0x13) = 1;
             *(unsigned char *)(p + 0x11) = 0x11;
             *(short *)(self + 0xA) = 0x11;
         } else {
-            func_002B9180(self);
+            part_kill(self);
         }
     }
 }

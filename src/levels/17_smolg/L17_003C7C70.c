@@ -1,7 +1,7 @@
 #include "common.h"
 
 
-extern s32 D_L17_001FE880[];
+extern s32 g_path_l17_table[];
 
 extern void func_2EEAF8(s32);
 extern void func_2EEB28(s32);
@@ -12,9 +12,9 @@ extern f32 func_2EF0B0(s32, s32);
 
 extern s32 D_L17_001B2748 __attribute__((sda));
 extern s32 func_2F0108(u32, u32, f32);
-extern f32 func_00283198(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
 
-extern s32 D_L17_001B2C1C __attribute__((sda));
+extern s32 g_moby_l17_pool __attribute__((sda));
 
 extern s32 D_L17_001C0018;
 extern s32 func_2DF570(s32, s32, s32, s32, s32);
@@ -22,7 +22,7 @@ extern s32 func_2DF570(s32, s32, s32, s32, s32);
 /* func_L17_003C7C70 is defined in L17_003C7C70-tilt-g8.c. */
 
 /* Slowly pulses the object between two colours (moby class 2363). */
-void func_L17_003C8248(s32 moby)
+void color_pulse_update(s32 moby)
 {
     f32 t = (f32)(D_L17_001B2748 % 150) * (1.0f / 150.0f);
     f32 ang = (t + t) * 3.1415927f;
@@ -30,7 +30,7 @@ void func_L17_003C8248(s32 moby)
     if (ang > 3.1415927f)
         ang = ang - 6.2831855f;
     *(s32 *)(moby + 0x78) = func_2F0108(0x80464646u, 0x80828282u,
-                                      (FastSinOrCosB(ang) + 1.0f) * 0.5f);
+                                      (math_fast_sin_or_cos_b(ang) + 1.0f) * 0.5f);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -47,15 +47,15 @@ typedef union {
     } f;
 } Vec4;
 
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern f32 func_00282C48(f32);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern f32 math_fabs(f32);
 
 /* Turns the vector at a1 into the object's frame, then into the world with the matrix at
    a0 + 0xC0, and reports whether both of the first two coordinates stay below the two
    bounds. */
-s32 func_L17_003CC798(u8 *a0, TI128 *a1, f32 limitY, f32 limitX) {
+s32 coll_is_point_inside_bounds(u8 *a0, TI128 *a1, f32 limitY, f32 limitX) {
     Vec4 localPoint[1];
     Vec4 mat[4];
     Vec4 worldPoint[1];
@@ -66,8 +66,8 @@ s32 func_L17_003CC798(u8 *a0, TI128 *a1, f32 limitY, f32 limitX) {
     FastVecSub(&out[0].q, &localPoint[0].q, a0 + 0x10);
     worldPoint[0].q = out[0].q;
     transform_vector(&worldPoint[0].q, &worldPoint[0].q, mat);
-    if (FloatAbs(worldPoint[0].f.x) < limitX) {
-        if (FloatAbs(worldPoint[0].f.y) < limitY)
+    if (math_fabs(worldPoint[0].f.x) < limitX) {
+        if (math_fabs(worldPoint[0].f.y) < limitY)
             return 1;
     }
     return 0;
@@ -82,17 +82,17 @@ typedef struct {
     s32 w340;
 } L17Player;
 
-extern L17Player D_00189E20;
+extern L17Player g_hero_state;
 extern f32 D_L17_001B04BC SDATA(D_L17_001B04BC);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283C80(f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_002AA2E8(void *, f32, f32);
-extern void func_00282CD8(void *, void *, void *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 ApproachValue(void *, f32, f32);
+extern void add_vectors(void *, void *, void *);
 
 /* Blows the player along the direction it faces, like a fan, while the player stands in
    front of it (moby class 2478). */
-void func_L17_003CC850(u8 *moby)
+void fan_l17_update(u8 *moby)
 {
     f32 *vars = *(f32 **)(moby + 0x68);
     TI128 here __attribute__((aligned(16)));
@@ -108,41 +108,41 @@ void func_L17_003CC850(u8 *moby)
     case 1:
         break;
     case 2:
-        if (!(gHeroState.z < *(f32 *)(moby + 0x18))) {
+        if (!(g_hero_state.z < *(f32 *)(moby + 0x18))) {
             break;
         }
         if (!(FastDiffRots(*(f32 *)(moby + 0xF8),
-                          FastMatrixHelperA(gHeroState.x - *(f32 *)(moby + 0x10),
-                                      gHeroState.y - *(f32 *)(moby + 0x14))) < 1.5707965f)) {
+                          mat_fast_helper_a(g_hero_state.x - *(f32 *)(moby + 0x10),
+                                      g_hero_state.y - *(f32 *)(moby + 0x14))) < 1.5707965f)) {
             break;
         }
-        if (gHeroState.w340 != 0) {
+        if (g_hero_state.w340 != 0) {
             break;
         }
         moby[0x20] = 3;
         vars[3] = 0;
         /* fall through */
     case 3:
-        if (gHeroState.w340 != 0) {
+        if (g_hero_state.w340 != 0) {
             moby[0x20] = 1;
             break;
         }
-        here = *(TI128 *)&gHeroState.x;
-        if (IsPointInsideObjectBounds(moby, &here, 60.0f, 2.5f)) {
+        here = *(TI128 *)&g_hero_state.x;
+        if (coll_is_point_inside_bounds(moby, &here, 60.0f, 2.5f)) {
             ApproachValue(vars + 3, vars[2] * (1.0f / 60.0f), vars[2] * 0.0011111112544313073f);
         } else {
             ApproachValue(vars + 3, 0.0f, vars[2] * 0.0005555556272156537f);
         }
-        dir[0] = FastSinOrCosA(*(f32 *)(moby + 0xF8)) * vars[3];
-        dir[1] = FastSinOrCosB(*(f32 *)(moby + 0xF8)) * vars[3];
+        dir[0] = math_fast_sin_or_cos_a(*(f32 *)(moby + 0xF8)) * vars[3];
+        dir[1] = math_fast_sin_or_cos_b(*(f32 *)(moby + 0xF8)) * vars[3];
         dir[2] = 0;
-        add_vectors(&here, (u8 *)&gHeroState + 0x100, dir);
+        add_vectors(&here, (u8 *)&g_hero_state + 0x100, dir);
         break;
     }
     if (moby[0x20] != 3) {
-        if (*(f32 *)(moby + 0x18) <= gHeroState.z) {
-            *(TI128 *)dir = *(TI128 *)&gHeroState.x;
-            if (IsPointInsideObjectBounds(moby, (TI128 *)dir, vars[0], vars[1])) {
+        if (*(f32 *)(moby + 0x18) <= g_hero_state.z) {
+            *(TI128 *)dir = *(TI128 *)&g_hero_state.x;
+            if (coll_is_point_inside_bounds(moby, (TI128 *)dir, vars[0], vars[1])) {
                 moby[0x20] = 2;
                 return;
             }
@@ -174,7 +174,7 @@ typedef struct {
 
 /* Walks the id list of the state's group and sets the state's mode word to 0x57 for every id
    that has an entity, stopping at the first that has none. */
-void func_L17_003E3148(u8 *moby)
+void grulch_activate_group_members(u8 *moby)
 {
     L17GroupState *state = *(L17GroupState **)(moby + 0x68);
     u16 *groupIds;
@@ -196,7 +196,7 @@ void func_L17_003E3148(u8 *moby)
 
 
 /* Updates the creature's animation and counts up a frame counter. */
-void func_L17_003E47E8(s32 moby) {
+void grulch_update_animation(s32 moby) {
     s32 vars = *(s32 *)(moby + 0x68);
 
     func_320B58(moby, vars + 0x50);
@@ -215,11 +215,11 @@ void func_L17_003E47E8(s32 moby) {
    taken when free or when its holder is in state 0xFE/0xFD, then in mode 1 handed to the
    nearest candidate; returns 1 once this object holds it in mode 2. func_L17_003E6F20
    releases it. */
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
-int func_L17_003E6DE8(char *object)
+int ClaimNearestObjectSlot(char *object)
 {
-    char *base = (char *)gMobyPool_L17;
+    char *base = (char *)g_moby_l17_pool;
     int index = (object - base) >> 8;
     char *state = *(char **)(object + 0x68);
     int other;
@@ -258,21 +258,21 @@ int func_L17_003E6DE8(char *object)
 }
 
 /* Gives up the shared slot if this object is the one holding it. */
-void func_L17_003E6F20(s32 moby)
+void grulch_release_slot(s32 moby)
 {
     s32 vars = *(s32 *)(moby + 0x68);
     s32 *slot = *(s32 **)(vars + 0x720);
 
-    if (*slot == (moby - gMobyPool_L17) >> 8) {
+    if (*slot == (moby - g_moby_l17_pool) >> 8) {
         *slot = -1;
         *(s32 *)(*(s32 *)(vars + 0x748)) = 0;
     }
 }
 
 /* Picks a random point on the object's path that is more than 3 units away from it. */
-s32 func_L17_003E6F58(s32 moby) {
+s32 grulch_pick_random_path_point(s32 moby) {
     s32 pointIndex;
-    s32 path = gPathTable_L17[*(s32 *)(*(s32 *)(moby + 0x68) + 0x684)];
+    s32 path = g_path_l17_table[*(s32 *)(*(s32 *)(moby + 0x68) + 0x684)];
     s32 pointCount = *(s32 *)path;
     s32 attempts = 0;
 
@@ -289,7 +289,7 @@ s32 func_L17_003E6F58(s32 moby) {
 }
 
 /* Tells whether the way to the target is clear (1 if nothing blocks it). */
-s32 func_L17_003E7010(s32 moby) {
+s32 grulch_is_target_reachable(s32 moby) {
     s32 vars = *(s32 *)(moby + 0x68);
 
     if (func_2DF570(moby + 0x10, vars + 0x240, 0, moby, 0) == 0)
@@ -310,22 +310,22 @@ s32 func_L17_003E7010(s32 moby) {
 typedef struct { unsigned char pad[0x464]; unsigned char flags[0]; } PickupFlags;
 extern PickupFlags D_L17_0021EBB0;
 extern unsigned char D_0019B4A8[], D_0013963C, D_001395B8[];
-extern int D_001A79F0 SDATA(D_001A79F0);
+extern int g_current_map_index SDATA(D_001A79F0);
 typedef struct { unsigned char pad[0x20]; unsigned char state; unsigned char rest[0xDF]; } Entity;
 extern Entity *entity_base_ptr __asm__("D_L17_001B2C1C") __attribute__((sda));
 extern Entity *entity_base_gp SDATA(D_L17_001B2C1C);
-extern char D_00189EA0[];
-extern float func_00283B98(float,float), func_002A7878(float,float), func_002A7940(void), func_002A78D8(float,float);
-extern int func_002A77E0(int);
-extern void func_002AF000(void *,float,float,float);
-extern void *func_002C2210(void *,int,unsigned,int,int,void *,float,float,float,int);
-extern float func_00282E80(void *,void *);
-extern void func_L00_003294F0(void *,int),func_002A7750(void *,int,int),func_0029F338(void *),func_002B0A18(int,int);
-extern int func_00288E18(int,int);
+extern char g_hero_position[];
+extern float FastAddRotations(float,float), math_random_float_range(float,float), math_random_angle(void), math_random_signed_float_range(float,float);
+extern int math_random_int_below(int);
+extern void vec_build_spherical_offset(void *,float,float,float);
+extern void *part_spawn_ground_effect(void *,int,unsigned,int,int,void *,float,float,float,int);
+extern float vec_distance_xy(void *,void *);
+extern void moby_set_flag_bit(void *,int),moby_set_state(void *,int,int),moby_mark_spawned(void *),value_set_entry_by_index(int,int);
+extern int subtitle_request_voice_line(int,int);
 /* Spins and sparkles an uncollected pickup; when the player comes within 1.5 units it bumps the
    pickup's saved count and triggers its linked entity, and when inactive it removes itself once
    that entity dies. */
-void func_L17_0041ED58(unsigned char *moby)
+void UpdateProximityPickup(unsigned char *moby)
 {
     int *vars=*(int **)(moby+0x68);
     unsigned short id;
@@ -339,7 +339,7 @@ void func_L17_0041ED58(unsigned char *moby)
     id=*(unsigned short *)(moby+0xb2);
     if(D_L17_0021EBB0.flags[(short)id]!=0) goto remove_self;
     {
-        bits=D_0019B4A8[((short)id>>1)+(gCurrentMapIndex<<10)];
+        bits=D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)];
         if(id&1) bits=(bits>>4)&7; else bits=bits&7;
         if(bits) goto remove_self;
         position=moby+0x10;
@@ -347,43 +347,43 @@ void func_L17_0041ED58(unsigned char *moby)
             *(float *)(moby+0xf8)=FastAddRotations(*(float *)(moby+0xf8),0.087266474f);
             pass=1;
             do {
-                size=RandomFloatRange(2.0f,5.0f);
-                sign=RandomIntBelow(2); if(sign==0)--sign;
-                ang=RandomAngle();
-                speed=RandomFloatRange(0.3490659f,1.5358899f);
-                scale=RandomFloatRange(0.05f,0.1f);
-                BuildSphericalOffset(vel,scale,ang,speed);
+                size=math_random_float_range(2.0f,5.0f);
+                sign=math_random_int_below(2); if(sign==0)--sign;
+                ang=math_random_angle();
+                speed=math_random_float_range(0.3490659f,1.5358899f);
+                scale=math_random_float_range(0.05f,0.1f);
+                vec_build_spherical_offset(vel,scale,ang,speed);
                 qcopy(pos,position);
-                pos[0]+=RandomSignedFloatRange(0.0f,0.15f);
-                pos[1]+=RandomSignedFloatRange(0.0f,0.15f);
-                pos[2]+=RandomSignedFloatRange(0.0f,0.15f);
-                SpawnGroundEffectParticle(pos,3,0x208020ff,0,sign,vel,size*0.1f,size,0.006f,0);
-                SpawnGroundEffectParticle(pos,3,0x20ffffff,1,-sign,vel,size*0.03f,size*0.3f,0.006f,0);
+                pos[0]+=math_random_signed_float_range(0.0f,0.15f);
+                pos[1]+=math_random_signed_float_range(0.0f,0.15f);
+                pos[2]+=math_random_signed_float_range(0.0f,0.15f);
+                part_spawn_ground_effect(pos,3,0x208020ff,0,sign,vel,size*0.1f,size,0.006f,0);
+                part_spawn_ground_effect(pos,3,0x20ffffff,1,-sign,vel,size*0.03f,size*0.3f,0.006f,0);
             } while(--pass>=0);
-            if(vec_distance_xy(position,gHeroPosition)<1.5f) {
+            if(vec_distance_xy(position,g_hero_position)<1.5f) {
                 unsigned short pickupId;
                 unsigned char *counter;
                 D_0013963C=1;
                 pickupId=*(unsigned short *)(moby+0xb2);
                 if(pickupId&1) {
-                    counter=(((short)pickupId>>1)+(gCurrentMapIndex<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
                     if(((*counter>>4)&7)!=7)*counter+=16;
                 } else {
-                    counter=(((short)pickupId>>1)+(gCurrentMapIndex<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
                     if((*counter&7)!=7)++*counter;
                 }
                 if(*(int *)vars!=-1) {
                     ((unsigned short *)moby)[0x1a]|=1;
                     moby[0x31]=0;
-                    SetObjectFlagBit(&entity_base_ptr[*vars],1);
-                    SetMobyState(moby,1,-1);
+                    moby_set_flag_bit(&entity_base_ptr[*vars],1);
+                    moby_set_state(moby,1,-1);
                 } else goto remove_self;
             }
             return;
         }
     }
 remove_self:
-    MarkMobySpawned(moby);
+    moby_mark_spawned(moby);
     return;
 inactive:
     if(*(int *)vars!=-1) {
@@ -394,11 +394,11 @@ inactive:
     }
 dead:
     {
-        SetEntryValueByIndex(0x1292,0x78);
+        value_set_entry_by_index(0x1292,0x78);
         count=D_001395B8[0x86]?1:2;
         if(D_001395B8[0x89])--count;
-        if(count>0)RequestSubtitleVoiceLine(0xa0f,0x66);else RequestSubtitleVoiceLine(0xa10,0x67);
-        MarkMobySpawned(moby);
+        if(count>0)subtitle_request_voice_line(0xa0f,0x66);else subtitle_request_voice_line(0xa10,0x67);
+        moby_mark_spawned(moby);
     }
 done:;
 }

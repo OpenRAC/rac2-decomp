@@ -22,16 +22,16 @@ typedef struct {
     int direction;
 } MotionState;
 
-extern MotionAnchor *D_L17_001FE880[];
+extern MotionAnchor *g_path_l17_table[];
 /* One macro pointer: a GP load in case 1's delay slots, absolute in case 4. */
-extern char *D_L17_001B2C1C MACRO_ADDR;
+extern char *g_moby_l17_pool MACRO_ADDR;
 extern float D_L17_001B0240 __attribute__((sda)), D_L17_001B0244 __attribute__((sda));
-extern MotionQuad D_00189EA0[];
-extern int func_00282948(void *);
+extern MotionQuad g_hero_position[];
+extern int math_fast_float_d(void *);
 extern void func_PAL_L17_003C7908(void *, void *, void *);
-extern int func_L17_003C3A00(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern int platform_is_point_below(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves the object between two anchors when their source mobys are cleared, waiting at
    the far anchor, and stops while a forward or backward probe is blocked. */
@@ -43,7 +43,7 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
     MotionAnchor *anchor;
 
     frame.old.q = *(MotionQuad *)(obj + 0x10);
-    func_00282948(&s->cooldown);
+    math_fast_float_d(&s->cooldown);
     switch (obj[0x20]) {
     case 0:
         s->speed = 0;
@@ -52,13 +52,13 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
         obj[0x20] = 1;
         s->flags |= 9;
         if (s->destination0 != -1)
-            *(MotionQuad *)(obj + 0x10) = D_L17_001FE880[s->destination0]->position.q;
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[s->destination0]->position.q;
         else if (s->destination1 != -1)
-            *(MotionQuad *)(obj + 0x10) = D_L17_001FE880[s->destination1]->position.q;
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[s->destination1]->position.q;
         break;
     case 1:
         if (s->source0 != -1 && s->destination0 != -1) {
-            target = D_L17_001B2C1C + (s->source0 << 8);
+            target = g_moby_l17_pool + (s->source0 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
                 || (unsigned char)target[0x20] == s->activeState) {
                 s->timer = 0;
@@ -68,7 +68,7 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
             }
         }
         if (s->destination0 == -1 && s->source1 != -1 && s->destination1 != -1) {
-            target = D_L17_001B2C1C + (s->source1 << 8);
+            target = g_moby_l17_pool + (s->source1 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
                 || (unsigned char)target[0x20] == s->activeState) {
                 s->timer = 0;
@@ -83,9 +83,9 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
         if (s->timer >= (D_L17_001B0240 * 300.0f + 2.0f) * 0.16666667f)
             s->timer = (D_L17_001B0240 * 300.0f + 2.0f) * 0.16666667f;
         if (s->direction == 0)
-            anchor = D_L17_001FE880[s->destination0];
+            anchor = g_path_l17_table[s->destination0];
         else
-            anchor = D_L17_001FE880[s->destination1];
+            anchor = g_path_l17_table[s->destination1];
         func_PAL_L17_003C7908(obj, anchor, &frame.old);
         if (s->timer >= (D_L17_001B0240 * 300.0f + 2.0f) * 0.16666667f) {
             if (s->once0 && !s->direction) {
@@ -106,9 +106,9 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
         if (s->timer <= 0.0f)
             s->timer = 0.0f;
         if (s->direction == 0)
-            anchor = D_L17_001FE880[s->destination0];
+            anchor = g_path_l17_table[s->destination0];
         else
-            anchor = D_L17_001FE880[s->destination1];
+            anchor = g_path_l17_table[s->destination1];
         func_PAL_L17_003C7908(obj, anchor, &frame.old);
         if (s->timer <= 0.0f)
             obj[0x20] = 1;
@@ -119,9 +119,9 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
             MotionMoby *m;
             obj[0x20] = 3;
             if (s->direction == 0)
-                m = (MotionMoby *)((s->source0 << 8) + (unsigned int)D_L17_001B2C1C);
+                m = (MotionMoby *)((s->source0 << 8) + (unsigned int)g_moby_l17_pool);
             else if (s->direction == 1)
-                m = (MotionMoby *)((s->source1 << 8) + (unsigned int)D_L17_001B2C1C);
+                m = (MotionMoby *)((s->source1 << 8) + (unsigned int)g_moby_l17_pool);
             else
                 break;
             m->marked = 0;
@@ -131,8 +131,8 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
     if (s->cooldown) {
         s->blocked = 1;
     } else if (s->speed < 0.0f) {
-        frame.probe1.q = D_00189EA0[0];
-        if (func_L17_003C3A00(obj, &frame.probe1)) {
+        frame.probe1.q = g_hero_position[0];
+        if (platform_is_point_below(obj, &frame.probe1)) {
             if (!s->cooldown)
                 s->cooldown = 25;
             s->blocked = 1;
@@ -140,10 +140,10 @@ void func_PAL_L17_003C7A80(unsigned char *obj)
             goto check_clear;
     } else {
 check_clear:
-        frame.probe2.q = D_00189EA0[0];
-        if (!func_L17_003C3A00(obj, &frame.probe2))
+        frame.probe2.q = g_hero_position[0];
+        if (!platform_is_point_below(obj, &frame.probe2))
             s->blocked = 0;
     }
-    func_00282CF0(&frame.delta, obj + 0x10, &frame.old);
-    func_002AD6F0((char *)s + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
+    FastVecSub(&frame.delta, obj + 0x10, &frame.old);
+    mat_combine_and_store((char *)s + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
 }

@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_002B72E8();
-extern int func_002B49C8();
-extern void func_002B6E78();
-extern void func_L00_00303418();
-extern void func_L00_0032D208();
-extern void func_L00_003032F0();
-extern void func_002F0FA0();
+extern void music_Pause();
+extern int request_is_current_slot();
+extern void snd_start_music_stream_no_loop();
+extern void level_update_object_visibility();
+extern void ReloadSoundBank();
+extern void tutorial_reset_record_values();
+extern void gfx_reset_record_list();
 extern void func_002F0468();
-extern void func_L00_00300378();
-extern void func_L00_00300090();
+extern void level_relocate_header_blocks();
+extern void initialize_tfrag_render_data();
 extern void func_PAL_0029DE68();
-extern void func_0011AEA0();
+extern void FlushCache();
 extern int func_PAL_002B8838(char *, int, int);
-extern void func_L00_002FD400();
-extern void func_002FC3C0();
-extern void func_002B7170();
-extern void func_002E5FE0();
-extern void func_L00_0035F8D0();
+extern void level_flush_table_entry_offsets();
+extern void gfx_wait_for_dma_status_bits();
+extern void snd_wait_for_music_idle();
+extern void snd_clear_all_voices();
+extern void gfx_configure_screen_effect();
 extern int D_L00_001C9340[];
 extern int D_L00_001B2600[];
 extern int D_L00_001B2614 __attribute__((section(".sdata")));
@@ -28,7 +29,7 @@ typedef struct {
     unsigned char pad52A0[0x28];
     struct { int sector, size; } entries[0];
 } ChunkDiscTable;
-extern ChunkDiscTable D_0014B540;
+extern ChunkDiscTable g_copy_setup_data;
 extern int D_L00_001B2608 __attribute__((section(".sdata")));
 extern unsigned char *D_L00_001B24D0 __attribute__((section(".sdata")));
 
@@ -40,23 +41,23 @@ void func_PAL_L00_00305110(int index, int argument)
     int i;
     if (root[0] == index)
         return;
-    func_L00_0035F8D0(0, 0, 0, 0, 0);
-    func_002E5FE0();
-    func_002B7170();
-    func_002FC3C0(1);
+    gfx_configure_screen_effect(0, 0, 0, 0, 0);
+    snd_clear_all_voices();
+    snd_wait_for_music_idle();
+    gfx_wait_for_dma_status_bits(1);
     root[0] = index;
     block = (int *)D_L00_001B2600[0];
     D_L00_001B2608 = D_L00_001B2600[D_L00_001B2614];
-    func_L00_002FD400();
-    func_PAL_002B8838((char *)block, D_0014B540.entries[index].sector + D_0014B540.base, D_0014B540.entries[index].size);
+    level_flush_table_entry_offsets();
+    func_PAL_002B8838((char *)block, g_copy_setup_data.entries[index].sector + g_copy_setup_data.base, g_copy_setup_data.entries[index].size);
     first = (int *)((char *)block + block[0]);
     second = (int *)((char *)block + block[1]);
-    func_0011AEA0(0);
+    FlushCache(0);
     func_PAL_0029DE68(first, root[2]);
     func_PAL_0029DE68(second, root[1]);
-    func_0011AEA0(0);
-    func_L00_00300090(root[2], root[4]);
-    func_L00_00300378(root[1]);
+    FlushCache(0);
+    initialize_tfrag_render_data(root[2], root[4]);
+    level_relocate_header_blocks(root[1]);
     {
         int count = D_L00_001B24D4;
         if (count > 0) {
@@ -79,11 +80,11 @@ void func_PAL_L00_00305110(int index, int argument)
         *p = 0xffff;
         func_002F0468((void *)0x70003000);
     }
-    func_002F0FA0();
-    func_L00_003032F0();
-    func_L00_0032D208(index);
-    func_L00_00303418(index);
-    func_002B6E78(argument, 1, 1024);
-    if (func_002B49C8(2))
-        func_002B72E8(0);
+    gfx_reset_record_list();
+    tutorial_reset_record_values();
+    ReloadSoundBank(index);
+    level_update_object_visibility(index);
+    snd_start_music_stream_no_loop(argument, 1, 1024);
+    if (request_is_current_slot(2))
+        music_Pause(0);
 }

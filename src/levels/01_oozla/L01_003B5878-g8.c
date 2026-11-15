@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L01_003B5878: a creature's per-frame state machine on object[0x95] (idle, waiting, airborne
  * leap, pursuit, attack, dispatch, removal), followed by the head-tracking ease of the angles at
  * +0xF4/+0xF0, each clamped to 40 degrees; same template as func_L01_003DAE58.
@@ -17,54 +18,54 @@ typedef struct {
 typedef struct DispatchContext DispatchContext;
 typedef unsigned long DispatchFlags;
 
-extern void func_L01_003B53C8(u8 *);
-extern void func_L01_003B4C58(u8 *);
-extern float func_002AA2E8(float *,float,float);
-extern int func_00282948(int *);
-extern int func_002A7820(int,int);
-extern int func_002A77E0(int);
-extern void func_002A7470(u8 *,int,int,int);
-extern void func_002A7750(u8 *,int,int);
-extern void func_L01_003B49D8(u8 *,void *);
-extern int func_L01_003B4AD0(u8 *,void *,float *);
-extern void func_L01_003B57A8(u8 *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *,void *,float);
-extern float func_L00_0031CDD0(void *,void *,float *,float,float);
-extern int func_002E5CF8(int,int,char *);
-extern float func_0029F530(char *);
-extern float func_00283248(float,float);
-extern void func_002A7CA0(void *,float,float,float,float,void *);
-extern float func_00282C48(float);
-extern int func_002B6318(unsigned char *);
+extern void swamp_beast_update_awareness(u8 *);
+extern void swamp_beast_init_state(u8 *);
+extern float ApproachValue(float *,float,float);
+extern int math_fast_float_d(int *);
+extern int math_random_int_range(int,int);
+extern int math_random_int_below(int);
+extern void anim_start_blended(u8 *,int,int,int);
+extern void moby_set_state(u8 *,int,int);
+extern void swamp_beast_move(u8 *,void *);
+extern int swamp_beast_move_with_speed(u8 *,void *,float *);
+extern void swamp_beast_find_best_patrol_position(u8 *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern float weapon_compute_shot_launch_speed(void *,void *,float *,float,float);
+extern int PlayMobySound(int,int,char *);
+extern float moby_get_anim_value(char *);
+extern float mat_fast_helper_a(float,float);
+extern void MobySpringTurn(void *,float,float,float,float,void *);
+extern float math_fabs(float);
+extern int coll_check_object_inside_polygon(unsigned char *);
 extern int func_001163B0(void);
-extern void func_L01_003B50C8(char *,int,float);
-extern void func_002B5258(char *);
-extern void func_002B5278(u8 *,float);
-extern float func_00283CE0(int);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_00282E80(void *,void *);
-extern float func_00283C80(float,float);
-extern int func_L01_003B4C20(u8 *);
-extern void func_L01_003B4BD8(u8 *);
-extern float func_002AAA00(void *,float,float,float,float,void *,int);
-extern int func_002A8D70(float,float,float,void *,int,int,int,int,int);
-extern DispatchFlags func_002B1C20(void *,DispatchContext *);
-extern void func_0029F338(void *);
-extern void func_L01_003B4480(u8 *);
-extern int func_00278E78(void);
-extern void func_L01_003B5290(u8 *);
-extern void func_002A6C58(u8 *,int,int);
+extern void part_spawn_surface_particles(char *,int,float);
+extern void moby_step_at_own_position(char *);
+extern void moby_step_at_own_position_factor(u8 *,float);
+extern float IntToFloat(int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float vec_distance_xy(void *,void *);
+extern float FastDiffRots(float,float);
+extern int swamp_beast_claim_group_slot(u8 *);
+extern void swamp_beast_release_group_slot(u8 *);
+extern float math_approach_target_with_direction_mode(void *,float,float,float,float,void *,int);
+extern int coll_test_hit_at_bone(float,float,float,void *,int,int,int,int,int);
+extern DispatchFlags moby_dispatch_action_by_kind(void *,DispatchContext *);
+extern void moby_mark_spawned(void *);
+extern void swamp_beast_spawn_bubbles(u8 *);
+extern int GetCollHitMaterial(void);
+extern void swamp_beast_alert_group(u8 *);
+extern void SetDeathBits(u8 *,int,int);
 /* Called with a null callback; a callback would receive the object. */
-extern void func_L01_003E9CF8(u8 *,int,void (*)(u8 *));
-extern void func_00283410(void *,void *);
-extern void func_00283698(void *,void *);
-extern int func_L00_0031BE88(char *);
-extern void func_00283098(void *,void *,void *);
-extern void func_L01_003B5310(u8 *);
+extern void part_queue_moby_for_glow(u8 *,int,void (*)(u8 *));
+extern void euler_to_matrix(void *,void *);
+extern void matrix_from_basis_rows(void *,void *);
+extern int level_has_pending_inner_flag(char *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void swamp_beast_update_timers(u8 *);
 /* Prefix views of the hero record (position, object) and of the collision query's hit object. */
 typedef struct {
     u8 prefix[0x80];
@@ -73,12 +74,12 @@ typedef struct {
     u8 *object;
 } HeroTargetPrefix;
 typedef struct { u8 prefix[0x18]; u8 *object; } CollisionQueryPrefix;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 #define HERO_TARGET ((HeroTargetPrefix *)D_00189E20)
 /* Mixed absolute/GP reads of the same mutable frame counter. */
 extern int D_L01_001B2088 MACRO_ADDR;
 extern int D_L01_001AFDB0 __attribute__((sda));
-extern u8 *D_L01_001B255C __attribute__((sda));
+extern u8 *g_moby_l01_table __attribute__((sda));
 /* 128-byte destination records with a 16-byte position at +0x30. */
 typedef struct { u8 prefix[0x30]; float position[4]; u8 rest[0x40]; } DestinationRecord;
 extern DestinationRecord *D_L01_001B264C MACRO_ADDR;
@@ -92,7 +93,7 @@ extern u8 D_L01_001AC5A0[] MACRO_ADDR;
 #define STATE_POINTER(o) (((u8 **)state)[(o)/4])
 
 /* Updates this creature's idle, pursuit, airborne, attack and recovery phases. */
-void func_L01_003B5878(u8 *object)
+void mutant_swamp_beast_update(u8 *object)
 {
     /* Label tables for the phase and pursuit-action dispatches. */
     static void *const phases[8]={&&phase_idle,&&phase_wait,&&phase_airborne,&&phase_pursuit,
@@ -110,13 +111,13 @@ void func_L01_003B5878(u8 *object)
 
     qcopy(&local.previous_position, object+0x10);
     state=*(u8 **)(object+0x68);
-    if (object[0x95]) UpdateSwampBeastAwareness(object);
+    if (object[0x95]) swamp_beast_update_awareness(object);
     phase=object[0x95];
     if (phase<8) goto *phases[phase];
     goto phase_done;
 
 phase_idle:
-    InitSwampBeastState(object);
+    swamp_beast_init_state(object);
     goto phase_done;
 
 phase_wait:
@@ -125,38 +126,38 @@ phase_wait:
         if (STATE_INT(0x32C)>=21)
             ApproachValue((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
         else ApproachValue((float *)(state+0x214),0.0f,0.0011111111380159855f);
-        if (FastFloatHelperD((int *)(state+0x32C))) {
-            if (object[0x43]!=4) StartAnimationBlended(object,4,0,RandomIntRange(18,24));
-            SetMobyState(object,1,-1);
+        if (math_fast_float_d((int *)(state+0x32C))) {
+            if (object[0x43]!=4) anim_start_blended(object,4,0,math_random_int_range(18,24));
+            moby_set_state(object,1,-1);
         }
-        if (STATE_INT(0x308)!=-1) MoveSwampBeast(object,state+0x200);
+        if (STATE_INT(0x308)!=-1) swamp_beast_move(object,state+0x200);
         break;
     case 1:
         if (object[0x60]&2) {
-            STATE_INT(0x32C)=RandomIntRange(120,400);
-            if (object[0x43]!=4) StartAnimationBlended(object,4,0,RandomIntRange(20,30));
-            SetMobyState(object,0,-1);
+            STATE_INT(0x32C)=math_random_int_range(120,400);
+            if (object[0x43]!=4) anim_start_blended(object,4,0,math_random_int_range(20,30));
+            moby_set_state(object,0,-1);
         }
         break;
     case 2:
         qcopy(state+0x2E0, state+0x2D0);
         break;
     case 3:
-        if (FastFloatHelperD((int *)(state+0x360))) {
-            FindBestPatrolPosition(object,&local.target);
+        if (math_fast_float_d((int *)(state+0x360))) {
+            swamp_beast_find_best_patrol_position(object,&local.target);
             FastVecSub(&local.delta,&local.target,object+0x10);
             if (FastVecLength(&local.delta)*0.03333333507180214f < 0.13333334028720856f)
                 speed=FastVecLength(&local.delta)*0.03333333507180214f;
             else speed=0.13333334028720856f;
             vec_scale_to_length(&local.delta,&local.delta,speed);
             duration=0.0f;
-            ((float *)&local.delta)[2]=ComputeShotLaunchSpeed(object+0x10,&local.target,&duration,speed,-0.004999999888241291f);
+            ((float *)&local.delta)[2]=weapon_compute_shot_launch_speed(object+0x10,&local.target,&duration,speed,-0.004999999888241291f);
             qcopy(state+0x2F0, &local.delta);
             qcopy(state+0x2E0, &local.target);
             PlayMobySound(5,0,(char *)object);
-            if (object[0x43]!=3) StartAnimationBlended(object,3,0,10);
+            if (object[0x43]!=3) anim_start_blended(object,3,0,10);
             if (duration>0.0f) *(float *)(object+0x48)=38.0f/duration;
-            SetMobyState(object,1,2);
+            moby_set_state(object,1,2);
         }
         break;
     }
@@ -167,29 +168,29 @@ phase_wait:
             *(float *)(object+0x18)=STATE_FLOAT(0x34C);
             STATE_INT(0x39C)=0;
             STATE_UINT(0x398)=STATE_UINT(0x390);
-            SetMobyState(object,3,1);
+            moby_set_state(object,3,1);
         }
     }
     goto phase_done;
 
 phase_airborne:
     if (object[0x42]!=3) goto phase_done;
-    frame=GetMobyAnimationValue((char *)object);
+    frame=moby_get_anim_value((char *)object);
     if (!(frame>5.0f)) goto phase_done;
     FastVecAdd(object+0x10,object+0x10,state+0x2F0);
-    angle=FastMatrixHelperA(STATE_FLOAT(0x2E0)-*(float *)(object+0x10),STATE_FLOAT(0x2E4)-*(float *)(object+0x14));
+    angle=mat_fast_helper_a(STATE_FLOAT(0x2E0)-*(float *)(object+0x10),STATE_FLOAT(0x2E4)-*(float *)(object+0x14));
     MobySpringTurn(object,angle,STATE_FLOAT(0x124)*10.0f,STATE_FLOAT(0x134)*10.0f,STATE_FLOAT(0x12C)*10.0f,
                   state+0x1C4);
     STATE_FLOAT(0x2F8)-=0.004999999888241291f;
     if (!(STATE_FLOAT(0x2F8)<0.0f)) goto phase_done;
-    if (!(FloatAbs(*(float *)(object+0x18)-STATE_FLOAT(0x2E8)) < -STATE_FLOAT(0x2F8))) goto phase_done;
+    if (!(math_fabs(*(float *)(object+0x18)-STATE_FLOAT(0x2E8)) < -STATE_FLOAT(0x2F8))) goto phase_done;
     *(int *)(object+0x98)=*(int *)(*(u8 **)(object+0x24)+0x10);
     STATE_UINT(0x14C)=STATE_UINT(0x30C);
     qcopy(state+0x200, object+0x10);
     object[0xBC]=1;
     STATE_INT(0x330)=240;
-    CheckObjectInsidePolygon(object);
-    if (object[0x43]!=8) StartAnimationBlended(object,8,0,10);
+    coll_check_object_inside_polygon(object);
+    if (object[0x43]!=8) anim_start_blended(object,8,0,10);
     goto finish_attack;
 
 phase_pursuit:
@@ -200,49 +201,49 @@ pursuit_idle:
     if (STATE_INT(0x32C)>=21)
         ApproachValue((float *)(state+0x214),0.03333333507180214f,0.0011111111380159855f);
     else ApproachValue((float *)(state+0x214),0.0f,0.0011111111380159855f);
-    if (FastFloatHelperD((int *)(state+0x32C))) {
+    if (math_fast_float_d((int *)(state+0x32C))) {
         if (!object[0xBC]) {
             STATE_INT(0x32C)=180;
             animation=object[0x43];
-            if (animation!=(Rand()&1)) {
-                animation=Rand()&1;
-                first=RandomIntRange(30,40);
-                StartAnimationBlended(object,animation,0,first);
+            if (animation!=(func_001163B0()&1)) {
+                animation=func_001163B0()&1;
+                first=math_random_int_range(30,40);
+                anim_start_blended(object,animation,0,first);
             }
         } else {
             STATE_INT(0x32C)=120;
             animation=object[0x43];
-            if (animation!=(Rand()&1)+6)
-                StartAnimationBlended(object,(Rand()&1)+6,0,RandomIntRange(30,40));
+            if (animation!=(func_001163B0()&1)+6)
+                anim_start_blended(object,(func_001163B0()&1)+6,0,math_random_int_range(30,40));
         }
-        SetMobyState(object,1,-1);
+        moby_set_state(object,1,-1);
     }
-    MoveSwampBeast(object,state+0x200);
-    SpawnSurfaceParticles((char *)object,1,-1.0f);
+    swamp_beast_move(object,state+0x200);
+    part_spawn_surface_particles((char *)object,1,-1.0f);
     goto pursuit_done;
 pursuit_wait:
-    if (!RandomIntBelow(7)) StepMovementAtOwnPosition((char *)object);
-    if (FastFloatHelperD((int *)(state+0x32C)) && (object[0x60]&2)) {
-        STATE_INT(0x32C)=RandomIntRange(120,400);
+    if (!math_random_int_below(7)) moby_step_at_own_position((char *)object);
+    if (math_fast_float_d((int *)(state+0x32C)) && (object[0x60]&2)) {
+        STATE_INT(0x32C)=math_random_int_range(120,400);
         animation=19;
         if (*(u16 *)(object+0xB2)&1) animation=8;
-        StartAnimationBlended(object,animation,0,RandomIntRange(25,35));
-        SetMobyState(object,0,-1);
+        anim_start_blended(object,animation,0,math_random_int_range(25,35));
+        moby_set_state(object,0,-1);
     }
     goto pursuit_done;
 pursuit_weave:
-    weave=FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
+    weave=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
     if (vec_distance_xy(object+0x10,state+0x230)<4.75f) weave=0.0f;
-    MoveSwampBeastWithSpeed(object,state+0x2E0,&weave);
-    SpawnSurfaceParticles((char *)object,1,-1.0f);
+    swamp_beast_move_with_speed(object,state+0x2E0,&weave);
+    part_spawn_surface_particles((char *)object,1,-1.0f);
     if (vec_distance_xy(object+0x10,STATE_POINTER(0x240)+0x10)<3.75f) {
-        if (FloatAbs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
-            angle=FastMatrixHelperA(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
+        if (math_fabs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
+            angle=mat_fast_helper_a(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
             if (FastDiffRots(*(float *)(object+0xF8),angle)<0.174532949924469f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
-                if (object[0x43]!=10) StartAnimationBlended(object,10,D_L01_001AFDB0,RandomIntRange(16,22));
-                SetMobyState(object,1,4);
+                if (object[0x43]!=10) anim_start_blended(object,10,D_L01_001AFDB0,math_random_int_range(16,22));
+                moby_set_state(object,1,4);
             }
         }
     }
@@ -251,35 +252,35 @@ pursuit_straight:
     {
         int destination=STATE_INT(0x310);
         straight=0.0f;
-        if (destination==-1) MoveSwampBeastWithSpeed(object,state+0x2D0,&straight);
-        else MoveSwampBeastWithSpeed(object,D_L01_001B264C[destination].position,&straight);
+        if (destination==-1) swamp_beast_move_with_speed(object,state+0x2D0,&straight);
+        else swamp_beast_move_with_speed(object,D_L01_001B264C[destination].position,&straight);
     }
-    SpawnSurfaceParticles((char *)object,1,-1.0f);
+    part_spawn_surface_particles((char *)object,1,-1.0f);
     if ((object[0x60]&2) && (*(u64 *)(state+0x1A0)&0x18000000000ULL)!=0x10000000000ULL) {
         animation=object[0x43];
-        if (animation!=(Rand()&1)) {
-            animation=Rand()&1;
-            first=RandomIntRange(30,40);
-            StartAnimationBlended(object,animation,0,first);
+        if (animation!=(func_001163B0()&1)) {
+            animation=func_001163B0()&1;
+            first=math_random_int_range(30,40);
+            anim_start_blended(object,animation,0,first);
         }
-        SetMobyState(object,1,-1);
+        moby_set_state(object,1,-1);
     }
     goto pursuit_done;
 pursuit_group:
     STATE_UINT(0x398)=STATE_UINT(0x390);
     STATE_FLOAT(0x39C)=STATE_FLOAT(0x388);
-    MoveSwampBeast(object,state+0x200);
-    SpawnSurfaceParticles((char *)object,1,-1.0f);
+    swamp_beast_move(object,state+0x200);
+    part_spawn_surface_particles((char *)object,1,-1.0f);
     if (STATE_INT(0x244)==1 && (STATE_INT(0x38C)==-1 ||
-        gMobyTable_L01[STATE_INT(0x38C)*256+0xBC])) SetMobyState(object,7,-1);
+        g_moby_l01_table[STATE_INT(0x38C)*256+0xBC])) moby_set_state(object,7,-1);
     goto pursuit_done;
 pursuit_leave:
-    pursuit=FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
+    pursuit=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
     qcopy(state+0x2E0, D_L01_001B264C[STATE_INT(0x380)].position);
-    MoveSwampBeastWithSpeed(object,state+0x2E0,&pursuit);
-    SpawnSurfaceParticles((char *)object,1,-1.0f);
+    swamp_beast_move_with_speed(object,state+0x2E0,&pursuit);
+    part_spawn_surface_particles((char *)object,1,-1.0f);
     if ((STATE_UINT(0x1A4)&0x80) && !object[0x31]) {
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
 
@@ -294,7 +295,7 @@ pursuit_done:
     {
         if (object[0x21]!=255 && **(int **)(state+0x36C)!=*(short *)(object+0xB2) &&
             **(int **)(state+0x370)!=*(short *)(object+0xB2)) goto cancel_pursuit;
-        if (!(FloatAbs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<1.0f)) goto cancel_pursuit;
+        if (!(math_fabs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<1.0f)) goto cancel_pursuit;
         STATE_INT(0x330)=240;
         object[0xBC]=1;
         STATE_UINT(0x14C)=STATE_UINT(0x30C);
@@ -305,9 +306,9 @@ pursuit_done:
         qcopy(state+0x2E0, STATE_POINTER(0x240)+0x10);
         animation=19;
         if (*(u16 *)(object+0xB2)&1) animation=8;
-        StartAnimationBlended(object,animation,0,RandomIntRange(20,30));
-        ClaimGroupSlot(object);
-        SetMobyState(object,2,-1);
+        anim_start_blended(object,animation,0,math_random_int_range(20,30));
+        swamp_beast_claim_group_slot(object);
+        moby_set_state(object,2,-1);
         goto pursuit_distance;
     }
 copy_pursuit_target:
@@ -315,15 +316,15 @@ copy_pursuit_target:
     goto pursuit_distance;
 cancel_pursuit:
     if (object[0x20]==2) {
-        ReleaseGroupSlot(object);
+        swamp_beast_release_group_slot(object);
         object[0xBC]=0;
         animation=object[0x43];
-        if (animation!=(Rand()&1)) {
-            animation=Rand()&1;
-            first=RandomIntRange(30,40);
-            StartAnimationBlended(object,animation,0,first);
+        if (animation!=(func_001163B0()&1)) {
+            animation=func_001163B0()&1;
+            first=math_random_int_range(30,40);
+            anim_start_blended(object,animation,0,first);
         }
-        SetMobyState(object,1,-1);
+        moby_set_state(object,1,-1);
     }
     goto pursuit_distance;
 mirror_hero:
@@ -331,17 +332,17 @@ mirror_hero:
         qcopy(state+0x2E0, HERO_TARGET->position);
 pursuit_distance:
     if (vec_distance_xy(object+0x10,STATE_POINTER(0x240)+0x10)<3.5f) {
-        if (FloatAbs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
-            angle=FastMatrixHelperA(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
+        if (math_fabs(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
+            angle=mat_fast_helper_a(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
             if (FastDiffRots(*(float *)(object+0xF8),angle)<0.523598849773407f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
-                if (object[0x43]!=10) StartAnimationBlended(object,10,D_L01_001AFDB0,RandomIntRange(8,12));
-                SetMobyState(object,1,4);
+                if (object[0x43]!=10) anim_start_blended(object,10,D_L01_001AFDB0,math_random_int_range(8,12));
+                moby_set_state(object,1,4);
             } else {
                 float *heading=(float *)(object+0xF8);
-                angle=FastMatrixHelperA(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
-                ApproachTargetWithDirectionMode(heading,angle,STATE_FLOAT(0x124),STATE_FLOAT(0x128),STATE_FLOAT(0x12C),state+0x1C4,0);
+                angle=mat_fast_helper_a(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
+                math_approach_target_with_direction_mode(heading,angle,STATE_FLOAT(0x124),STATE_FLOAT(0x128),STATE_FLOAT(0x12C),state+0x1C4,0);
             }
         }
     }
@@ -349,68 +350,68 @@ pursuit_distance:
 
 phase_attack:
     if (STATE_POINTER(0x240)) {
-        if (!RandomIntBelow(7)) {
-            angle=FastMatrixHelperA(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
-            StepMovementAtOwnPositionWithFactor(object,angle);
+        if (!math_random_int_below(7)) {
+            angle=mat_fast_helper_a(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
+            moby_step_at_own_position_factor(object,angle);
         } else {
             float *heading=(float *)(object+0xF8);
-            angle=FastMatrixHelperA(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
-            ApproachTargetWithDirectionMode(heading,angle,STATE_FLOAT(0x124),STATE_FLOAT(0x128),STATE_FLOAT(0x12C),state+0x1C4,0);
+            angle=mat_fast_helper_a(*(float *)(STATE_POINTER(0x240)+0x10)-*(float *)(object+0x10),*(float *)(STATE_POINTER(0x240)+0x14)-*(float *)(object+0x14));
+            math_approach_target_with_direction_mode(heading,angle,STATE_FLOAT(0x124),STATE_FLOAT(0x128),STATE_FLOAT(0x12C),state+0x1C4,0);
         }
-    } else if (!RandomIntBelow(7)) StepMovementAtOwnPosition((char *)object);
-    frame=GetMobyAnimationValue((char *)object);
+    } else if (!math_random_int_below(7)) moby_step_at_own_position((char *)object);
+    frame=moby_get_anim_value((char *)object);
     if (object[0x42]==10 && frame>=18.0f && frame<=25.0f) {
         for (i=0;i<5;i++) {
-            if (TestHitAtBone(0.5f,(float)state[0x34],1.0f,object,i,0x4000001,0,1,0) &&
+            if (coll_test_hit_at_bone(0.5f,(float)state[0x34],1.0f,object,i,0x4000001,0,1,0) &&
                 COLLISION_QUERY->object==HERO_TARGET->object) state[0x35C]=1;
         }
     }
     if (!(frame>30.0f) && (object[0x42]==10 || object[0x43]==10)) goto phase_done;
     if (state[0x35C]) {
         STATE_INT(0x334)=100;
-        if (object[0x43]!=11) StartAnimationBlended(object,11,0,RandomIntRange(25,30));
+        if (object[0x43]!=11) anim_start_blended(object,11,0,math_random_int_range(25,30));
     } else {
         STATE_INT(0x334)=40;
-        if (object[0x43]!=8) StartAnimationBlended(object,8,0,RandomIntRange(25,30));
+        if (object[0x43]!=8) anim_start_blended(object,8,0,math_random_int_range(25,30));
     }
     state[0x35C]=0;
-    ReleaseGroupSlot(object);
+    swamp_beast_release_group_slot(object);
 finish_attack:
     STATE_UINT(0x398)=STATE_UINT(0x394);
     STATE_FLOAT(0x39C)=STATE_FLOAT(0x388);
-    SetMobyState(object,1,3);
+    moby_set_state(object,1,3);
     goto phase_done;
 
 phase_dispatch:
-    flags=DispatchActionByKind(object,(DispatchContext *)(state+0x60));
-    if ((flags&1UL)==1UL) SetMobyState(object,0,7);
+    flags=moby_dispatch_action_by_kind(object,(DispatchContext *)(state+0x60));
+    if ((flags&1UL)==1UL) moby_set_state(object,0,7);
     else if ((flags&2UL)==2UL) {
         *(int *)(object+0x98)=*(int *)(*(u8 **)(object+0x24)+0x10);
-        SpawnSwampBeastBubbles(object);
-        ReleaseGroupSlot(object);
+        swamp_beast_spawn_bubbles(object);
+        swamp_beast_release_group_slot(object);
         if (GetCollHitMaterial()==3) {
-            if (object[0x43]!=4) StartAnimationBlended(object,4,0,110);
-            SetMobyState(object,0,6);
+            if (object[0x43]!=4) anim_start_blended(object,4,0,110);
+            moby_set_state(object,0,6);
         } else {
             STATE_INT(0x384)=-1;
             STATE_UINT(0x398)=STATE_UINT(0x394);
             STATE_FLOAT(0x39C)=STATE_FLOAT(0x388);
             animation=19;
             if (*(u16 *)(object+0xB2)&1) animation=8;
-            StartAnimationBlended(object,animation,0,RandomIntRange(18,24));
-            if (!CheckObjectInsidePolygon(object)) SetMobyState(object,4,3);
-            else SetMobyState(object,1,3);
+            anim_start_blended(object,animation,0,math_random_int_range(18,24));
+            if (!coll_check_object_inside_polygon(object)) moby_set_state(object,4,3);
+            else moby_set_state(object,1,3);
         }
     }
     goto phase_done;
 
 phase_removed:
-    AlertSwampBeastGroup(object);
+    swamp_beast_alert_group(object);
     SetDeathBits(object,0,3);
-    SpawnSwampBeastBubbles(object);
-    SpawnSurfaceParticles((char *)object,5,-1.0f);
-    ReleaseGroupSlot(object);
-    QueueMobyForGlowEffect(object,0,0);
+    swamp_beast_spawn_bubbles(object);
+    part_spawn_surface_particles((char *)object,5,-1.0f);
+    swamp_beast_release_group_slot(object);
+    part_queue_moby_for_glow(object,0,0);
 
 phase_done:
     if ((unsigned int)(object[0x95]-3)<2) {
@@ -424,7 +425,7 @@ phase_done:
             Quadword *v;
             u8 *target = STATE_POINTER(0x198);
 
-            if (target && !HasPendingInnerFlag((char *)target)) {
+            if (target && !level_has_pending_inner_flag((char *)target)) {
                 v = &local.target;
                 qcopy(v, D_L01_001AC5A0);
             } else
@@ -432,14 +433,14 @@ phase_done:
             v = &local.target;
             matrix_mul_vec3(v,v,local.inverse);
         }
-        yaw=FastMatrixHelperA(((float *)&local.target)[2],((float *)&local.target)[0]);
-        pitch=-FastMatrixHelperA(((float *)&local.target)[2],((float *)&local.target)[1]);
+        yaw=mat_fast_helper_a(((float *)&local.target)[2],((float *)&local.target)[0]);
+        pitch=-mat_fast_helper_a(((float *)&local.target)[2],((float *)&local.target)[1]);
         if (yaw>0.698131799697876f) yaw=0.698131799697876f;
         else if (yaw<-0.698131799697876f) yaw=-0.698131799697876f;
         if (pitch>0.698131799697876f) pitch=0.698131799697876f;
         else if (pitch<-0.698131799697876f) pitch=-0.698131799697876f;
-        ApproachTargetWithDirectionMode(object+0xF4,yaw,0.0017453294713050127f,0.0017453294713050127f,0.10471977293491364f,state+0x358,0);
-        ApproachTargetWithDirectionMode(object+0xF0,pitch,0.0017453294713050127f,0.0017453294713050127f,0.10471977293491364f,state+0x354,0);
+        math_approach_target_with_direction_mode(object+0xF4,yaw,0.0017453294713050127f,0.0017453294713050127f,0.10471977293491364f,state+0x358,0);
+        math_approach_target_with_direction_mode(object+0xF0,pitch,0.0017453294713050127f,0.0017453294713050127f,0.10471977293491364f,state+0x354,0);
     }
-    UpdateSwampBeastTimers(object);
+    swamp_beast_update_timers(object);
 }

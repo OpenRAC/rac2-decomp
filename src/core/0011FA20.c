@@ -12,7 +12,7 @@ extern void r1_func_00118A60(int);
 
 /* rac1-decomp src/core/0011DD68.c: func_0011DDA0 */
 /* Shuts the system down and exits the program with the given status. */
-void func_0011FA20(int status) {
-    ResetTlbOnExit();
+void exit_program(int status) {
+    boot_reset_tlb_on_exit();
     r1_func_00118A60(status);
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L18_002C4000 (496 bytes, 3 places: levels 18, 19 and 20), in its own unit for the hero
  * union view: the hero's fixed-address fields are read through one based register. The last
  * beqz (the % 6 test) reaches the epilogue's ld $s0 through the division-guard barrier on
@@ -6,14 +7,14 @@
 #include "common.h"
 typedef unsigned int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern u32 D_00138320;
 extern s32 D_L18_001AFBB0 MACRO_ADDR;
-extern void func_L00_002D2168(s32, s32, float);
-extern void func_L18_00428428(u8 *, s32);
+extern void set_hero_animation(s32, s32, float);
+extern void shooter_fire_shot(u8 *, s32);
 #define H ((Hero *)D_00189E20)
 /* Handles the player grabbing and letting go of a held object, and triggers its pickup effect. */
-void func_L18_002C4000(void)
+void hero_update_held_grab(void)
 {
     u8 *object;
     object = H->ptr[0x2290 / 4];
@@ -37,11 +38,11 @@ void func_L18_002C4000(void)
         H->f[0xC20 / 4] = 3.0f;
         if (*(s16 *)(object + 0xAA) == 0xEE1) {
             if (H->i[0x1D8 / 4] > 3) {
-                if (H->i[0x1D8 / 4] % 6 == 0) FireShooterShot(object, 0);
-                if ((H->i[0x1D8 / 4] + 3) % 6 == 0) FireShooterShot(H->ptr[0x2290 / 4], 1);
+                if (H->i[0x1D8 / 4] % 6 == 0) shooter_fire_shot(object, 0);
+                if ((H->i[0x1D8 / 4] + 3) % 6 == 0) shooter_fire_shot(H->ptr[0x2290 / 4], 1);
             }
         } else if (*(s16 *)(object + 0xAA) == 0xED4 && H->i[0x1D8 / 4] % 6 != 0) {
-            FireShooterShot(object, 0);
+            shooter_fire_shot(object, 0);
         }
     }
 }

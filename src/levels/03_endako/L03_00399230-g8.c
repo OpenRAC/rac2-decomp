@@ -3,13 +3,13 @@
 #include "common.h"
 
 extern f32  D_L03_001B0340 __attribute__((sda));
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern s32  func_31BA30(s32 a0, s32 a1);
 extern s32  func_31B9F0(s32 a0);
 extern f32  func_2F0000(f32 a0, f32 a1);
 
 /* Gives a spinning object a random turn speed and direction when it starts, then keeps turning it at that rate. */
-void func_L03_003CA938(char *moby)
+void fan_l03_update(char *moby)
 {
     if (*(u8 *)(moby + 0x31) == 0) {
         return;
@@ -20,7 +20,7 @@ void func_L03_003CA938(char *moby)
         if (func_31B9F0(2) != 0) {
             *(u8 *)(moby + 0xBC) += 15;
         }
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         *(f32 *)(moby + 0xF8) = func_2F0000(*(f32 *)(moby + 0xF8),
@@ -31,8 +31,8 @@ void func_L03_003CA938(char *moby)
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_L03_003CAD78(char *a0);
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_build_effect_packet(char *a0);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void func_31B920(char *a0, s32 a1, s32 a2);
 extern void func_2E77F0(void *fn, void *entity);
 extern char *func_3113F0(s32 a0);
@@ -47,7 +47,7 @@ extern f32 D_L03_001B0648 __attribute__((sda));
    offsets in its vars by the table's rates per frame (wrapping below -1) and queues
    its draw callback with the object as argument (AddDrawCallback in rac1-decomp) */
 /* Slowly scrolls the texture of an object so it looks like moving water or energy. */
-void func_L03_003CACA8(char *moby)
+void UpdateThreeScrollOffsets(char *moby)
 {
     s32 state = *(u8 *)(moby + 0x20);
     char *vars = *(char **)(moby + 0x68);
@@ -72,7 +72,7 @@ void func_L03_003CACA8(char *moby)
             src++;
             dst++;
         }
-        func_2E77F0(BuildMobyEffectPacket, moby);
+        func_2E77F0(moby_build_effect_packet, moby);
         break;
     }
     }
@@ -107,18 +107,18 @@ typedef struct {
    reads it with an absolute lui/%lo pair and clears it from a delay slot. */
 extern L03_003D21F8_Obj *D_L03_001B0670 __attribute__((sda));
 extern u32 D_L03_001B3458;
-extern void *func_L00_002D70A0(s32 size);
+extern void *cam_alloc_override_slot(s32 size);
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(char *a0, char *a1, char *a2);
-extern void func_00283698(char *a0, char *a1);
-extern s32  func_002B38B8(char *a0);
-extern s32  func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern void func_002E59F8(s32 a0);
-extern void func_L01_003115E8(int a0, int a1);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(char *a0, char *a1, char *a2);
+extern void matrix_from_basis_rows(char *a0, char *a1);
+extern s32  flag_is_third_pending_set(char *a0);
+extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
+extern void snd_stop_voice(s32 a0);
+extern void moby_set_state_in_list(int a0, int a1);
 extern u8  *D_L03_001B2A1C;
-extern u8   D_00188660[];
+extern u8   g_sound_state[];
 extern s32  D_L03_001B0438 __attribute__((sda));
 extern f32  D_L03_001B043C __attribute__((sda));
 
@@ -126,7 +126,7 @@ extern f32  D_L03_001B043C __attribute__((sda));
    target up, states 3 and 4 turn it by a rate that decays; every other state
    does nothing.  The actor's angle is at 0xF4, its rate at 0x74 of the state. */
 /* Swings an object around a pivot until it reaches an end stop, bounces back with less force each time, and plays a sound on each hit. */
-void func_L03_003CBE58(char *moby)
+void ant_bridge_update(char *moby)
 {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
@@ -136,7 +136,7 @@ void func_L03_003CBE58(char *moby)
     switch (*(u8 *)(self + 0x20)) {
     case 0:
         if (*(s32 *)(vars + 0x70) != -1) {
-            SetMobyState(self, 2, -1);
+            moby_set_state(self, 2, -1);
             offset = vars + 0x60;
             FastVecSub(offset, D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10, self + 0x10);
             *(s32 *)(vars + 0x7C) = -1;
@@ -144,21 +144,21 @@ void func_L03_003CBE58(char *moby)
             matrix_from_basis_rows(buf, self + 0xC0);
             matrix_mul_vec3(offset, offset, buf);
         } else {
-            SetMobyState(self, 1, -1);
+            moby_set_state(self, 1, -1);
         }
         break;
     case 2: {
         char *soundSlot;
 
-        if (IsThirdPendingFlagSet(D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100) == 0) {
+        if (flag_is_third_pending_set(D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100) == 0) {
             break;
         }
-        soundSlot = gSoundState + *(s32 *)(vars + 0x7C) * 0x70;
+        soundSlot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
         if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0) {
             *(s32 *)(vars + 0x7C) = PlayMobySound(0, 4, self);
         }
-        SetMobyStateInList(*(u8 *)(self + 0x21), 4);
-        SetMobyState(self, 3, -1);
+        moby_set_state_in_list(*(u8 *)(self + 0x21), 4);
+        moby_set_state(self, 3, -1);
         break;
     }
     case 3: {
@@ -174,9 +174,9 @@ void func_L03_003CBE58(char *moby)
         if (1.69646013f < angle) {
             if (*(s32 *)(vars + 0x78) < 5) {
                 if (*(s32 *)(vars + 0x7C) != -1) {
-                    soundSlot = gSoundState + *(s32 *)(vars + 0x7C) * 0x70;
+                    soundSlot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
                     if (*(char **)(soundSlot + 0x88) == self && *(u8 *)(soundSlot + 0x74) != 0) {
-                        StopSoundVoice(*(s32 *)(vars + 0x7C));
+                        snd_stop_voice(*(s32 *)(vars + 0x7C));
                     }
                 }
                 *(s32 *)(vars + 0x7C) = -1;
@@ -189,7 +189,7 @@ void func_L03_003CBE58(char *moby)
                 *(f32 *)(vars + 0x74) = rate * -0.5f;
             } else {
                 *(s32 *)(vars + 0x74) = 0;    /* the retail stores the word, not the float */
-                SetMobyState(self, 5, -1);
+                moby_set_state(self, 5, -1);
             }
         }
         anchorPos = D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
@@ -214,7 +214,7 @@ void func_L03_003CBE58(char *moby)
                 *(f32 *)(vars + 0x74) = rate * -0.5f;
             } else {
                 *(s32 *)(vars + 0x74) = 0;    /* the retail stores the word, not the float */
-                SetMobyState(self, 5, -1);
+                moby_set_state(self, 5, -1);
             }
         }
         break;
@@ -225,14 +225,14 @@ void func_L03_003CBE58(char *moby)
 /* case 0 spawns the object and points the actor at it; case 1 clears the
    object while the state word still reads zero, and clears the word otherwise */
 /* Sets up the level's shared record when it starts and later resets all its values to unused. */
-void func_L03_003D21F8(char *moby)
+void shared_record_reset_update(char *moby)
 {
     char *self = moby;
 
     switch (*(u8 *)(self + 0x20)) {
     case 0:
-        D_L03_001B0670 = AllocCameraOverrideSlot(4);
-        SetMobyState(self, 1, -1);
+        D_L03_001B0670 = cam_alloc_override_slot(4);
+        moby_set_state(self, 1, -1);
         *(u8 *)(self + 0x30) = 0xFF;
         break;
     case 1: {
@@ -262,7 +262,7 @@ void func_L03_003D21F8(char *moby)
 }
 
 extern s32  D_L03_001B0674 __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L03_001B9980[];
 
 typedef struct {
@@ -279,23 +279,23 @@ typedef struct {
 } L03_22C8Entry;
 
 extern L03_22C8Entry *D_L03_001FE700[];
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern void func_0029F338(char *a0);
-extern s32  func_002A8AF0(char *a0, void *a1, u32 a2);
-extern void func_00335438(char *a0, char *a1, s32 a2, s32 a3, s32 a4);
-extern void func_L03_003D2518(char *a0, f32 *a1, f32 *a2);
-extern void func_00282CF0(void *, void *, void *);
-extern f32  func_00282DF0(f32 *a0);
-extern void func_002AAC80(f32 *a0, f32 a1, f32 a2, f32 a3, f32 a4);
-extern void func_00282F20(f32 *a0, f32 *a1, f32 a2);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00335370(char *a0);
-extern f32 func_002AAA00(char *a0, f32 *a1, f32 a3, f32 a4, f32 a5, f32 a6, s32 a2);
-extern void func_003353C8(char *a0);
-extern void func_003355A8(s32 a0);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern void moby_mark_spawned(char *a0);
+extern s32  point_in_path_xy(char *a0, void *a1, u32 a2);
+extern void SetCamera5Pose(char *a0, char *a1, s32 a2, s32 a3, s32 a4);
+extern void cam_compute_aim_and_angles(char *a0, f32 *a1, f32 *a2);
+extern void FastVecSub(void *, void *, void *);
+extern f32  FastVecLength(f32 *a0);
+extern void math_approach_target_with_braking(f32 *a0, f32 a1, f32 a2, f32 a3, f32 a4);
+extern void vec_scale_to_length(f32 *a0, f32 *a1, f32 a2);
+extern void FastVecAdd(void *, void *, void *);
+extern void object_copy_vector_to_selected(char *a0);
+extern f32 math_approach_target_with_direction_mode(char *a0, f32 *a1, f32 a3, f32 a4, f32 a5, f32 a6, s32 a2);
+extern void cam_set_state_rotation(char *a0);
+extern void cam_set_mode_state(s32 a0);
 
 /* Takes over the camera while the hero is inside a trigger area, easing it toward a set view, and gives it back when the hero leaves. */
-void func_L03_003D22C8(char *moby)
+void camera_trigger_area_update(char *moby)
 {
     L03_22C8State *vars = *(L03_22C8State **)(moby + 0x68);
     f32 targetPos[4] __attribute__((aligned(16)));
@@ -311,34 +311,34 @@ void func_L03_003D22C8(char *moby)
     }
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         if (vars->index == -1) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
         }
         break;
     case 1:
-        if (point_in_path_xy(gHeroPosition, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) != 0) {
+        if (point_in_path_xy(g_hero_position, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) != 0) {
             SetCamera5Pose(D_L03_001B9980, D_L03_001B9980 + 0x10, 1, 0, 0);
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
         followRate = 0.0027777778450399637f;
-        ComputeCameraAimAndAngles(moby, targetPos, targetAngles);
+        cam_compute_aim_and_angles(moby, targetPos, targetAngles);
         one = 1.0f;
         FastVecSub(offset, targetPos, D_L03_001B9980);
         turnRate = 0.0008726647356525064f;
         len = FastVecLength(offset);
-        ApproachTargetWithBraking(&vars->f18, len, followRate, followRate, one);
+        math_approach_target_with_braking(&vars->f18, len, followRate, followRate, one);
         vec_scale_to_length(offset, offset, vars->f18);
         FastVecAdd(D_L03_001B9980, offset, D_L03_001B9980);
-        CopyVectorToSelectedObject(D_L03_001B9980);
-        ApproachTargetWithDirectionMode(D_L03_001B9980 + 0x14, &vars->f1C, targetAngles[1], turnRate, turnRate, one, 0);
-        ApproachTargetWithDirectionMode(D_L03_001B9980 + 0x18, &vars->f20, targetAngles[2], turnRate, turnRate, one, 0);
-        SetCameraStateRotation(D_L03_001B9980 + 0x10);
-        if (point_in_path_xy(gHeroPosition, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) == 0) {
-            SetCameraModeState(1);
-            SetMobyState(moby, 1, -1);
+        object_copy_vector_to_selected(D_L03_001B9980);
+        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x14, &vars->f1C, targetAngles[1], turnRate, turnRate, one, 0);
+        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x18, &vars->f20, targetAngles[2], turnRate, turnRate, one, 0);
+        cam_set_state_rotation(D_L03_001B9980 + 0x10);
+        if (point_in_path_xy(g_hero_position, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) == 0) {
+            cam_set_mode_state(1);
+            moby_set_state(moby, 1, -1);
         }
         break;
     }

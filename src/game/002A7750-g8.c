@@ -2,10 +2,10 @@
 #include "names.h"
 extern int D_L00_001AA1D4 __attribute__((sda));
 extern int D_L00_001AA1D8 __attribute__((sda));
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 
 /* Blends between two values, ping-ponging back and forth over a span of steps with a shared counter. */
-int func_002A9588(int first, int second, int span, int mode, int reset)
+int math_ping_pong_blend_values(int first, int second, int span, int mode, int reset)
 {
     int *counter = &D_L00_001AA1D8;
     int phase;

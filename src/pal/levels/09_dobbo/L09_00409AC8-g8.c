@@ -6,23 +6,23 @@ extern s32 D_L09_001A79F0 __attribute__((sda));
 extern s32 D_L09_001A9040 __attribute__((sda));
 extern char *D_L09_001B285C __attribute__((sda));
 extern s32 func_323340(char *a0, char *a1, s32 a2);
-extern char *func_L09_00326E90(char *a0);
-extern s32 D_001A79F0;
-extern void func_L09_00404C50(void);
-extern float func_00282E48(char *a0, char *a1);
-extern void func_002A93B0(void *a0);
-extern s32 func_002B0ED8(char *a0, char *a1, s32 a2);
-extern void func_L09_00405060(char *a0);
-extern void func_L09_004050E0(char *a0);
-extern s32 func_002B3BA8(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
+extern char *moby_is_hero_or_special(char *a0);
+extern s32 g_current_map_index;
+extern void dobbo_wandering_init_vars(void);
+extern float fast_vec_dist(char *a0, char *a1);
+extern void moby_update_ground_check(void *a0);
+extern s32 moby_apply_damage_to_object(char *a0, char *a1, s32 a2);
+extern void dobbo_alert_wandering_group(char *a0);
+extern void dobbo_destroy_with_debris(char *a0);
+extern s32 weapon_select_aim_target(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 extern char D_L09_001B9A00[];
 extern s32 D_L09_001B2878;
 extern u8 *D_L09_001B285C_1;
 extern s32 D_L09_001B1420[2];
-extern s32 func_00283D38(s32, s32, f32);
+extern s32 FastTweenColor(s32, s32, f32);
 extern s32 D_L09_001B2388;
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
 
 /* Releases the record the sub-object holds once the resident mode word says 9, then
    rebuilds the sub-object's effect. */
@@ -33,41 +33,41 @@ void func_PAL_L09_00409DC8(char *a0) {
     s16 idx;
 
     if (*(u8 *)(s0 + 0x20) == 0) {
-        func_L09_00404C50();
+        dobbo_wandering_init_vars();
     }
     if (*(u8 *)(s0 + 0x31) != 0) {
-        if (func_00282E48(s0 + 0x10, D_L09_001B9A00) < 24.0f) {
-            func_002A93B0(s0);
+        if (fast_vec_dist(s0 + 0x10, D_L09_001B9A00) < 24.0f) {
+            moby_update_ground_check(s0);
             *(u8 *)(s0 + 0x6F) = 0x16;
         }
     }
-    s2 = func_002B0ED8(s0, s1 + 0x50, 0);
-    if (D_001A79F0 == 9) {
+    s2 = moby_apply_damage_to_object(s0, s1 + 0x50, 0);
+    if (g_current_map_index == 9) {
         idx = *(s16 *)(s1 + 0xC0);
         if (idx != -1) {
-            if (func_L09_00326E90(D_L09_001B285C + (idx << 8)) == 0) {
+            if (moby_is_hero_or_special(D_L09_001B285C + (idx << 8)) == 0) {
                 D_L09_001A9040 = 0;
             }
             *(s16 *)(s1 + 0xC0) = -1;
         }
     }
     if (s2 != 0) {
-        func_L09_00405060(s0);
+        dobbo_alert_wandering_group(s0);
         if (s2 >= 4) {
-            func_L09_004050E0(s0);
+            dobbo_destroy_with_debris(s0);
         }
     }
     if (*(u8 *)(s0 + 0x95) != 3 && *(u8 *)(s0 + 0x95) != 4) {
-        *(s16 *)(s1 + 0x334) = func_002B3BA8(s0, *(s32 *)(s1 + 0x230), 0, 0, 16.0f, 0.0f);
+        *(s16 *)(s1 + 0x334) = weapon_select_aim_target(s0, *(s32 *)(s1 + 0x230), 0, 0, 16.0f, 0.0f);
     }
 }
 
 extern float D_L09_001B13F4 __attribute__((sda));
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(char *, int, int);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 typedef struct DobboEmitter {
     u8 pad_0[0x28];
@@ -127,11 +127,11 @@ void func_PAL_L09_00409BC0(char *obj)
     int count;
 
     qcopy((char *)rec + 0x300, obj + 0x10);
-    size = func_002A7878(1.0f, 1.333f);
+    size = math_random_float_range(1.0f, 1.333f);
     rec->f_344 = size;
     *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * size;
-    rec->f_48 = func_00283CF0(15.0f);
-    rec->f_4A = func_00283CF0(4.0f);
+    rec->f_48 = FloatToInt(15.0f);
+    rec->f_4A = FloatToInt(4.0f);
     count = 3;
     rec->f_98 = count;
     rec->f_8C = 0.4f;
@@ -147,7 +147,7 @@ void func_PAL_L09_00409BC0(char *obj)
     rec->f_100 = rec->f_344 * 0.3f;
     rec->f_10C = rec->f_108 = 0.1f;
     rec->f_138 |= 0x80;
-    spin = func_002A78D8(18.0f, 22.0f);
+    spin = math_random_signed_float_range(18.0f, 22.0f);
     rec->f_1E8 = 7;
     rec->f_1E9 = 6;
     rec->f_1DC = spin * 0.017453294f;
@@ -156,8 +156,8 @@ void func_PAL_L09_00409BC0(char *obj)
     rec->f_13C = rec->f_234;
     rec->f_1D4 = 1.75f;
     rec->f_1D0 = D_L09_001B13F4 * 0.020000001f;
-    rec->f_348 = func_002A7940();
-    func_002A7750(obj, 1, 0);
+    rec->f_348 = math_random_angle();
+    moby_set_state(obj, 1, 0);
     if (*(u8 *)(obj + 0x43) != 0)
         func_PAL_002A7E68(obj, 0, 0, 0);
     *(s32 *)(obj + 0x9C) = 0xC;

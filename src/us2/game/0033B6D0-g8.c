@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 extern float ref_L00_0033A688_00 __attribute__((sda));
 extern float D_001ADD0C;
-extern void func_00335E38(char *, float, float, float, float);
+extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
    shared spawn helper with no rotation. */
@@ -10,23 +11,23 @@ void func_US2_0033B6D0(char *a0)
     if (*(int *)(a0 + 0x21C) != 0) {
         float *position = *(float **)(a0 + 0x20C);
 
-        func_00335E38(a0 + 0x170, position[0] + ref_L00_0033A688_00,
+        object_set_first_float4(a0 + 0x170, position[0] + ref_L00_0033A688_00,
                       position[1] + D_001ADD0C, 0.0f, 0.0f);
     }
 }
 
-extern int *func_00335E20(void *);
-extern int func_00288FB8(int);
-extern void func_00336A38(void *, int);
-extern void func_00335E68(char *, int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00335F88(char *, float, float, float, float);
-extern int *func_00335E20(void *);
-extern void func_00336828(char *);
-extern void func_00336920(char *, int, int);
-extern int func_00288FB8(int);
-extern void func_00336A78(char *);
+extern int *object_get_fourth_field(void *);
+extern int GetLocalizedString(int);
+extern void hud_set_widget_field_b(void *, int);
+extern void object_set_flag_value(char *, int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void object_set_second_float4(char *, float, float, float, float);
+extern int *object_get_fourth_field(void *);
+extern void hud_draw_colored_quad_widget(char *);
+extern void hud_set_widget_value_pair(char *, int, int);
+extern int GetLocalizedString(int);
+extern void text_label_draw(char *);
 extern float D_001ADD20 __attribute__((sda));
 extern float D_001ADD24;
 extern int D_001ADD10 __attribute__((sda));
@@ -37,7 +38,7 @@ extern float D_001ADD2C;
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
 typedef struct { char pad[8]; short n; void (*fn)(char *); } Vtable_0033A6D8;
 #define ENTRY_0033A6D8 (*(Entry_0033A6D8 **)self)[i]
-extern int *func_00335E20(void *);
+extern int *object_get_fourth_field(void *);
 
 /* Draws the selection list: two fixed sprites, then one sprite per entry placed around the stored
    position (the radius at +0x204 scales the cosine and the sine of the entry's angle), and for the
@@ -57,12 +58,12 @@ void func_US2_0033B720(char *self)
         float *position = *(float **)(self + 0x20C);
         int i;
 
-        func_00335E38(rec0, position[0], position[1], 0.0f, 0.0f);
-        func_00335F88(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_first_float4(rec0, position[0], position[1], 0.0f, 0.0f);
+        object_set_second_float4(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0x80))->fn(rec0 + (*(Vtable_0033A6D8 **)(self + 0x80))->n);
         position = *(float **)(self + 0x20C);
-        func_00335E38(rec1, position[0], position[1], 0.0f, 0.0f);
-        func_00335F88(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_first_float4(rec1, position[0], position[1], 0.0f, 0.0f);
+        object_set_second_float4(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0xCC))->fn(rec1 + (*(Vtable_0033A6D8 **)(self + 0xCC))->n);
         for (i = 0; i < *(int *)(self + 0x208); i++) {
             char *rec = self + 0x134;
@@ -70,34 +71,34 @@ void func_US2_0033B720(char *self)
             int one = 1;
             float cs, sn;
 
-            cs = *(float *)(self + 0x214) * func_00283180(ENTRY_0033A6D8.angle);
-            sn = *(float *)(self + 0x214) * func_00283198(ENTRY_0033A6D8.angle);
-            func_00336920(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
+            cs = *(float *)(self + 0x214) * math_fast_sin_or_cos_a(ENTRY_0033A6D8.angle);
+            sn = *(float *)(self + 0x214) * math_fast_sin_or_cos_b(ENTRY_0033A6D8.angle);
+            hud_set_widget_value_pair(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
             position = *(float **)(self + 0x20C);
-            func_00335E38(rec, position[0] + (float)D_001ADD10 + cs,
+            object_set_first_float4(rec, position[0] + (float)D_001ADD10 + cs,
                           position[1] + (float)D_001ADD14 + D_001ADD18 * sn, 0.0f, 0.0f);
             mode = (int *)(self + 0x1C8) + i;
-            *func_00335E20(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
-            func_00335E68(rec, *mode != 2);
-            func_00336828(rec);
+            *object_get_fourth_field(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
+            object_set_flag_value(rec, *mode != 2);
+            hud_draw_colored_quad_widget(rec);
             if (i == *(int *)(self + 0x218)) {
                 char *cursor;
 
-                func_00335F88(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+                object_set_second_float4(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
                 if (*mode != 2) {
                     position = *(float **)(self + 0x20C);
-                    func_00335E38(self + 4, position[0] + D_001ADD28 + cs,
+                    object_set_first_float4(self + 4, position[0] + D_001ADD28 + cs,
                                   position[1] + D_001ADD2C + D_001ADD18 * sn, 0.0f, 0.0f);
                     {
                         int text = ENTRY_0033A6D8.text;
 
                         if (text != 0) {
-                            func_00336A38(self + 0x170, text);
+                            hud_set_widget_field_b(self + 0x170, text);
                         } else {
-                            text = func_00288FB8(ENTRY_0033A6D8.id);
-                            func_00336A38(self + 0x170, text);
+                            text = GetLocalizedString(ENTRY_0033A6D8.id);
+                            hud_set_widget_field_b(self + 0x170, text);
                         }
-                        func_00336A78(self + 0x170);
+                        text_label_draw(self + 0x170);
                     }
                 }
                 cursor = self + 4;
@@ -107,14 +108,14 @@ void func_US2_0033B720(char *self)
     }
 }
 
-extern void func_003361E0(void *, void *, void *);
-extern void func_00336390(void *, void *, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void object_set_helper_result(void *, void *, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC88[];
 extern int D_001ADD30 __attribute__((sda));
-extern void func_003361E0(void *, void *, void *);
-extern void func_00336390(void *, void *, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void object_set_helper_result(void *, void *, int);
 extern char D_001ADC80[], D_001ADC88[];
 
 void func_US2_0033BA48(char *obj, int *arr, char *third)
@@ -128,12 +129,12 @@ void func_US2_0033BA48(char *obj, int *arr, char *third)
 
     for (i = 3; i >= 0; i--) {
         if (*arr != 0) {
-            func_003361E0(p, D_001ADC88, *(int *)(obj + 0x210));
-            *(int *)func_00335E20(p) = *q;
-            func_00336390(p, D_001A8CFC[0] + 0x8710, *arr);
+            object_init_derived_arrays(p, D_001ADC88, *(int *)(obj + 0x210));
+            *(int *)object_get_fourth_field(p) = *q;
+            object_set_helper_result(p, D_001A8CFC[0] + 0x8710, *arr);
         } else {
-            func_00336390(p, D_001A8CFC[0] + 0x8710, 0);
-            func_00335E68(p, 0);
+            object_set_helper_result(p, D_001A8CFC[0] + 0x8710, 0);
+            object_set_flag_value(p, 0);
         }
         p += 76;
         q += 1;

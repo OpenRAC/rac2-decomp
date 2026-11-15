@@ -65,7 +65,7 @@ typedef struct {
 
 /* Fills the record func_0031A340 builds: the four template blocks with their second
    and third components doubled, then the fixed fields. */
-void func_0031A098(Loc_0031a340 *p)
+void gfx_fill_quad_from_template(Loc_0031a340 *p)
 {
     QuadA098 local[4];
     Block_0031a340 *src = (Block_0031a340 *)local;

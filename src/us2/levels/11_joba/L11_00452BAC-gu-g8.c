@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L11_00452BAC, the v2.00 copy of func_L11_00451178: the Joba sentry's patrol, alert,
  * attack and launch states. The same C, except case 9: func_002AEB60 is gone from this release,
  * so the func_003280C8 branch runs once through a latch at state+0x2DA, cleared when the state
@@ -25,7 +26,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 quad; float f[4]; } ActorVector;
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; TI128 q[0x260]; } Hero;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 typedef struct { u8 pad00[0x5C]; u8 *ids; } L11_Palette;
 extern L11_Palette D_L11_00200440;
 extern s32 D_L11_001A8FF4 __attribute__((sda));
@@ -39,69 +40,69 @@ extern float D_L11_001B1D1C __attribute__((sda));
 extern float D_L11_001B1D20 __attribute__((sda));
 extern float D_L11_001B1D24 __attribute__((sda));
 extern u8 *D_L11_001C0D18[];
-extern u8 *D_0018C0B0 __attribute__((nosda));
-extern u8 *D_0018C2BC __attribute__((nosda));
+extern u8 *g_hero_moby __attribute__((nosda));
+extern u8 *g_active_attacker_robot __attribute__((nosda));
 extern char D_L11_001A8F20[] MACRO_ADDR;
 
-extern void func_L11_00452450(u8 *);
-extern void func_002A7750(u8 *, s32, s32);
-extern s32 func_002A77E0(s32);
-extern void func_002A7470(u8 *, s32, s32, s32);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_002B04E0(u8 *, void *, u8 *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern s32 func_002B3890(u8 *);
-extern s32 func_002B3868(u8 *);
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern u8 *func_L11_004417E8(u8 *);
-extern void func_L11_00452F30(u8 *, u8 *);
-extern void func_L11_004530C0(u8 *);
-extern void func_L02_00333438(u8 *, void *);
-extern int func_L01_00321178(u8 *, void *);
-extern s32 func_L11_00441808(u8 *, u8 *);
-extern void func_002B5278(u8 *, float);
-extern s32 func_00282978(void *);
-extern s32 func_002761F8(void *, void *, s32, void *, void *);
-extern s32 func_L11_004530E0(u8 *);
-extern s32 func_002B4FF0(u8 *, float *, float);
-extern int func_L02_00333480(u8 *, void *, void *);
-extern s32 func_002B50E0(u8 *, void *, float);
-extern s32 func_00283DB8(void *, float);
-extern void func_0029FC20(u8 *, s32, void *);
-extern void func_0029FCC0(u8 *, s32, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACB48(float *, float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern void *func_002C65A0(void *, void *, s32, u32, s32, s32, s32, float, float, float, s32);
-extern s32 func_002A8C28(void *, void *, float, u32, float, float, s32, s32, s32);
-extern void *func_002C16C0(void *, void *, s32, s32, u32, s32, float, float, float, float, float);
-extern s32 func_002A7820(s32, s32);
-extern int func_L11_00340500(u8 *, void *);
-extern float func_0029F530(u8 *);
-extern void func_00283098(void *, void *, void *);
-extern void *func_003280C8(float, u8 *, void *, void *, s32, s32);
-extern unsigned long func_002B1C20(u8 *, void *);
-extern void func_L02_003FC248(u8 *, s32, s32);
-extern void func_L11_00452DF8(u8 *);
-extern void func_002AB6D8(void *, void *);
-extern int func_L07_00321D68(u8 *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002A3F10(u8 *, s32, s32 *, void *);
-extern void func_002B4090(float, float, float, u8 *, void *);
-extern void func_002833F0(void *, void *);
-extern void func_L11_00452810(u8 *);
-extern void func_L11_004528A0(u8 *);
-extern void func_L00_002E6EF8(void (*)(u8 *), void *);
+extern void turret_enemy_update_b(u8 *);
+extern void moby_set_state(u8 *, s32, s32);
+extern s32 math_random_int_below(s32);
+extern void anim_start_blended(u8 *, s32, s32, s32);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern float vec_get_heading_angle(u8 *, void *, u8 *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern s32 flag_set_second_pending(u8 *);
+extern s32 flag_set_first_pending(u8 *);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern u8 *arena_get_center_point(u8 *);
+extern void flamethrower_robot_pick_wander_point(u8 *, u8 *);
+extern void flamethrower_robot_start_turn_around(u8 *);
+extern void moby_aim_at_target_offset(u8 *, void *);
+extern int moby_l01_turn_toward_target(u8 *, void *);
+extern s32 arena_is_point_in_polygon(u8 *, u8 *);
+extern void moby_step_at_own_position_factor(u8 *, float);
+extern s32 FastDecTimer(void *);
+extern s32 CollLine(void *, void *, s32, void *, void *);
+extern s32 enemy_aim_at_group_entity_in_cone_c(u8 *);
+extern s32 moby_turn_toward_target_and_step(u8 *, float *, float);
+extern int coll_update_controller(u8 *, void *, void *);
+extern s32 moby_step_controller(u8 *, void *, float);
+extern s32 math_fast_helper_a(void *, float);
+extern void moby_transform_joint_point(u8 *, s32, void *);
+extern void moby_transform_joint_to_world(u8 *, s32, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_add_random_offset(float *, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void *part_spawn_gravity_fade(void *, void *, s32, u32, s32, s32, s32, float, float, float, s32);
+extern s32 coll_sweep_from_object(void *, void *, float, u32, float, float, s32, s32, s32);
+extern void *part_spawn_burst(void *, void *, s32, s32, u32, s32, float, float, float, float, float);
+extern s32 math_random_int_range(s32, s32);
+extern int coll_check_move_to_point(u8 *, void *);
+extern float moby_get_anim_value(u8 *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void *part_spawn_spinning_effect_moby(float, u8 *, void *, void *, s32, s32);
+extern unsigned long moby_dispatch_action_by_kind(u8 *, void *);
+extern void moby_set_anim_type_three(u8 *, s32, s32);
+extern void flamethrower_robot_deactivate(u8 *);
+extern void mat_get_euler_angles(void *, void *);
+extern int hero_set_control_motion_and_step(u8 *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void get_moby_joint_matrices(u8 *, s32, s32 *, void *);
+extern void moby_rotate_about_point(float, float, float, u8 *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void flamethrower_robot_finish_frame(u8 *);
+extern void flamethrower_robot_add_lights(u8 *);
+extern void gfx_add_draw_callback_third(void (*)(u8 *), void *);
 
 /* Movement tuning with the sentry's usual turn limits. */
 static __inline__ void turn(u8 *object, float rate, float speed)
 {
-    func_002B60B0(object, rate, speed, 0.0005817765f, 0.052359886f);
+    moby_set_controller_speed_limits(object, rate, speed, 0.0005817765f, 0.052359886f);
 }
 
 /* Update the Joba sentry's patrol, alert, attack and launch states. */
@@ -125,99 +126,99 @@ void func_US2_L11_00452BAC(u8 *object)
     state = *(u8 **)(object + 0x68);
     if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !D_L11_001A8FF4 && object[0x20] != 12 && object[0x20] != 11))
         return;
-    func_L11_00452450(object);
+    turret_enemy_update_b(object);
     if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !D_L11_001A8FF4))
         return;
     if (*(s16 *)(state + 0x2D2) == 0 && object[0x95] == 3) {
-        func_002A7750(object, 4, 2);
-        if (func_002A77E0(2)) {
+        moby_set_state(object, 4, 2);
+        if (math_random_int_below(2)) {
             if (object[0x43] != 2)
-                func_002A7470(object, 2, 0, 10);
+                anim_start_blended(object, 2, 0, 10);
         } else if (object[0x43] != 3)
-            func_002A7470(object, 3, 0, 10);
+            anim_start_blended(object, 3, 0, 10);
     }
     if (*(u8 **)(state + 0x2C4))
         target.quad = *(TI128 *)(*(u8 **)(state + 0x2C4) + 0x10);
     else
-        target.quad = *(TI128 *)(D_00189E20 + 0x80);
+        target.quad = *(TI128 *)(g_hero_state + 0x80);
     if (*(s16 *)(state + 0x2D8)) {
-        func_00282CF0(&work[0], &target, object + 0x10);
+        FastVecSub(&work[0], &target, object + 0x10);
         pos = object + 0x10;
         heading = 0.0f;
-        angle = func_002B04E0(object, &work[0], state + 0x230);
+        angle = vec_get_heading_angle(object, &work[0], state + 0x230);
     } else {
         pos = object + 0x10;
-        heading = func_00283248(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
-        angle = func_00283C80(heading, *(float *)(object + 0xF8));
+        heading = mat_fast_helper_a(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
+        angle = FastDiffRots(heading, *(float *)(object + 0xF8));
     }
-    range = func_00282E48(pos, &target);
+    range = fast_vec_dist(pos, &target);
     if (object[0x95] == 2) {
         u8 *goal;
-        if (func_002B3890(object)) {
+        if (flag_set_second_pending(object)) {
             if (object[0x43] != 9)
-                func_002A7470(object, 9, 0, 10);
+                anim_start_blended(object, 9, 0, 10);
             object[0xBC] = 0;
             turn(object, 0.0044444446f, 0.13333334f);
-            func_L11_00452F30(object, func_L11_004417E8(*(u8 **)(object + 0xB8)));
+            flamethrower_robot_pick_wander_point(object, arena_get_center_point(*(u8 **)(object + 0xB8)));
             *(u16 *)(object + 0x96) = 10000;
         }
         if (object[0xBC] == 1 && *(u16 *)(object + 0x96) >= 301) {
-            switch (func_002A77E0(5)) {
-            case 0: if (object[0x43] != 2) func_002A7470(object, 2, 0, 10); break;
-            case 1: if (object[0x43] != 3) func_002A7470(object, 3, 0, 10); break;
-            case 2: if (object[0x43] != 5) func_002A7470(object, 5, 0, 10); break;
-            case 3: if (object[0x43] != 6) func_002A7470(object, 6, 0, 10); break;
+            switch (math_random_int_below(5)) {
+            case 0: if (object[0x43] != 2) anim_start_blended(object, 2, 0, 10); break;
+            case 1: if (object[0x43] != 3) anim_start_blended(object, 3, 0, 10); break;
+            case 2: if (object[0x43] != 5) anim_start_blended(object, 5, 0, 10); break;
+            case 3: if (object[0x43] != 6) anim_start_blended(object, 6, 0, 10); break;
             }
-            *(u16 *)(object + 0x96) = func_002A77E0(100);
+            *(u16 *)(object + 0x96) = math_random_int_below(100);
         }
         if (*(s16 *)(state + 0x2D2)) {
-            func_002A7750(object, 5, 3);
-            if (func_002A77E0(2)) {
-                if (object[0x43] != 1) func_002A7470(object, 1, 0, 10);
-            } else if (object[0x43] != 4) func_002A7470(object, 4, 0, 10);
+            moby_set_state(object, 5, 3);
+            if (math_random_int_below(2)) {
+                if (object[0x43] != 1) anim_start_blended(object, 1, 0, 10);
+            } else if (object[0x43] != 4) anim_start_blended(object, 4, 0, 10);
         }
         if (angle > 2.7925272f)
-            func_L11_004530C0(object);
+            flamethrower_robot_start_turn_around(object);
         goal = state + 0x2A0;
-        if (!object[0xBC] && func_00282E80(pos, goal) < 0.5f)
+        if (!object[0xBC] && vec_distance_xy(pos, goal) < 0.5f)
             object[0xBC] = 1;
         else if (*(s16 *)(state + 0x2D8))
-            func_L02_00333438(object, goal);
+            moby_aim_at_target_offset(object, goal);
         else
-            func_L01_00321178(object, goal);
+            moby_l01_turn_toward_target(object, goal);
     }
     switch (object[0x20]) {
     case 3:
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             object[0xBC] = 0;
-            if (object[0x43] != 2) func_002A7470(object, 2, 0, 0);
+            if (object[0x43] != 2) anim_start_blended(object, 2, 0, 0);
             *(u16 *)(object + 0x96) = 0;
         }
         if (object[0xBC] == 0 && *(s16 *)(state + 0x2D4) < (s32)*(u16 *)(object + 0x96)) {
-            if (object[0x43] != 9) func_002A7470(object, 9, 0, 10);
+            if (object[0x43] != 9) anim_start_blended(object, 9, 0, 10);
             object[0xBC] = 1;
         } else if (object[0xBC] == 1) {
-            if (func_L11_00441808(*(u8 **)(object + 0xB8), pos))
-                func_002A7750(object, 4, 2);
-            func_L01_00321178(object, func_L11_004417E8(*(u8 **)(object + 0xB8)));
+            if (arena_is_point_in_polygon(*(u8 **)(object + 0xB8), pos))
+                moby_set_state(object, 4, 2);
+            moby_l01_turn_toward_target(object, arena_get_center_point(*(u8 **)(object + 0xB8)));
         }
         break;
     case 5:
         if (object[0x60] & 2)
-            func_002A7750(object, 7, -1);
+            moby_set_state(object, 7, -1);
         break;
     case 6:
-        if (func_002B3868(object)) {
-            if (object[0x43] != 8) func_002A7470(object, 8, 0, 10);
-            func_002B60B0(object, 0.0044444446f, 0.13333334f, 0.003490659f, 0.4188791f);
+        if (flag_set_first_pending(object)) {
+            if (object[0x43] != 8) anim_start_blended(object, 8, 0, 10);
+            moby_set_controller_speed_limits(object, 0.0044444446f, 0.13333334f, 0.003490659f, 0.4188791f);
         }
-        func_002B5278(object, heading);
+        moby_step_at_own_position_factor(object, heading);
         if (object[0x60] & 2)
-            func_002A7750(object, 7, -1);
+            moby_set_state(object, 7, -1);
         break;
     case 7:
-        if (func_002B3868(object)) {
-            if (object[0x43] != 9) func_002A7470(object, 9, 0, 15);
+        if (flag_set_first_pending(object)) {
+            if (object[0x43] != 9) anim_start_blended(object, 9, 0, 15);
             *(u16 *)(state + 0x2D6) = 0;
         }
         if (D_L11_001B1D24 < range)
@@ -225,32 +226,32 @@ void func_US2_L11_00452BAC(u8 *object)
         else if (range < D_L11_001B1D20)
             turn(object, 0.0011111111f, 0.033333335f);
         if (object[0x42] != 12 && range < D_L11_001B1D18 && angle < 1.5707965f) {
-            if (object[0x43] != 12) func_002A7470(object, 12, 0, 10);
+            if (object[0x43] != 12) anim_start_blended(object, 12, 0, 10);
         } else if (object[0x42] == 12 && D_L11_001B1D1C < range) {
-            if (object[0x43] != 9) func_002A7470(object, 9, 0, 15);
-        } else if (object[0x42] != 12 && D_L11_001B1D04 < range && range < D_L11_001B1D08 && !func_002A77E0(D_L11_001B1D0C)) {
-            if (func_00282978(state + 0x2D6) && object[0x31]) {
+            if (object[0x43] != 9) anim_start_blended(object, 9, 0, 15);
+        } else if (object[0x42] != 12 && D_L11_001B1D04 < range && range < D_L11_001B1D08 && !math_random_int_below(D_L11_001B1D0C)) {
+            if (FastDecTimer(state + 0x2D6) && object[0x31]) {
                 u8 *other;
                 s16 id;
-                if (!func_002761F8(pos, &target, 1, object, 0) ||
+                if (!CollLine(pos, &target, 1, object, 0) ||
                     ((other = D_L11_001C0D18[0]) != 0 && (id = *(s16 *)(other + 0xAA)) != 0xD98 && id != 0xDCF &&
                      id != 0xDF4 && id != 0xDF7 && id != 0xDF9 && id != 0xD37)) {
-                    func_002A7750(object, 9, -1);
+                    moby_set_state(object, 9, -1);
                     *(u16 *)(state + 0x2D6) = D_L11_001B1D10;
                 }
             }
         } else if (range > 2.8f) {
             if (*(s16 *)(state + 0x2D8))
-                func_L02_00333438(object, &target);
-            else if (!func_L11_004530E0(object))
-                func_002B4FF0(object, target.f, *(float *)(state + 0x2C8));
+                moby_aim_at_target_offset(object, &target);
+            else if (!enemy_aim_at_group_entity_in_cone_c(object))
+                moby_turn_toward_target_and_step(object, target.f, *(float *)(state + 0x2C8));
         } else if (*(s16 *)(state + 0x2D8)) {
-            func_00282CF0(&work[0], &target, pos);
-            func_L02_00333480(object, pos, &work[0]);
+            FastVecSub(&work[0], &target, pos);
+            coll_update_controller(object, pos, &work[0]);
         } else
-            func_002B50E0(object, pos, heading);
+            moby_step_controller(object, pos, heading);
         if (angle > 2.7925272f)
-            func_L11_004530C0(object);
+            flamethrower_robot_start_turn_around(object);
         if (object[0x42] == 12) {
             work[1].quad = 0;
             work[1].f[0] = *(float *)(object + 0x10);
@@ -258,18 +259,18 @@ void func_US2_L11_00452BAC(u8 *object)
             work[1].f[2] = *(float *)(object + 0x18);
             work[1].f[3] = 2.0f;
             work[0].quad = work[1].quad;
-            if (object[0x31] || func_00283DB8(work, 128.0f) > 0) {
+            if (object[0x31] || math_fast_helper_a(work, 128.0f) > 0) {
                 s32 i;
                 s32 j;
-                func_0029FC20(object, 4, &work[2]);
+                moby_transform_joint_point(object, 4, &work[2]);
                 qcopy(&work[1], &work[3]);
-                func_0029FCC0(object, 4, &effect);
-                func_00282F20(&near_point, work + 1, 0.85f);
-                func_00282F20(&far_point, work + 1, 1.6f);
-                func_00282F20(&velocity, work + 3, 0.25f);
-                func_00282F20(work + 1, work + 1, 3.0f);
-                func_00282CC0(&near_point, &near_point, &effect);
-                func_00282CC0(&far_point, &far_point, &effect);
+                moby_transform_joint_to_world(object, 4, &effect);
+                vec_scale_to_length(&near_point, work + 1, 0.85f);
+                vec_scale_to_length(&far_point, work + 1, 1.6f);
+                vec_scale_to_length(&velocity, work + 3, 0.25f);
+                vec_scale_to_length(work + 1, work + 1, 3.0f);
+                FastVecAdd(&near_point, &near_point, &effect);
+                FastVecAdd(&far_point, &far_point, &effect);
                 near_point.f[2] -= 0.1f;
                 far_point.f[2] -= 0.1f;
                 i = 2;
@@ -277,15 +278,15 @@ void func_US2_L11_00452BAC(u8 *object)
                     float first;
                     float second;
                     float third;
-                    func_002ACB48(effect.f, 0.1f);
-                    first = func_002A7878(0.2f, 0.4f) * 210000.0f;
-                    second = func_002A7878(1.0f, 1.5f) * 210000.0f;
-                    third = func_002A78D8(0.0f, 0.01f);
-                    func_002C65A0(&effect, &velocity, 9, 0x808080, 30, 127, 32, first, second, third, 0);
+                    vec_add_random_offset(effect.f, 0.1f);
+                    first = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+                    second = math_random_float_range(1.0f, 1.5f) * 210000.0f;
+                    third = math_random_signed_float_range(0.0f, 0.01f);
+                    part_spawn_gravity_fade(&effect, &velocity, 9, 0x808080, 30, 127, 32, first, second, third, 0);
                     if (range < 3.0f) {
-                        func_002A8C28(object, &effect, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
-                        func_002A8C28(object, &near_point, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
-                        func_002A8C28(object, &far_point, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
+                        coll_sweep_from_object(object, &effect, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
+                        coll_sweep_from_object(object, &near_point, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
+                        coll_sweep_from_object(object, &far_point, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
                     }
                 } while (--i >= 0);
                 tmpl = &particle;
@@ -294,12 +295,12 @@ void func_US2_L11_00452BAC(u8 *object)
                 particle.f[2] = 0.1f;
                 particle.f[3] = 1.0f;
                 for (j = 0; j < 2; j++) {
-                    u8 *part = func_002C16C0(&near_point, tmpl, 15, 60, 0x606060, 3,
+                    u8 *part = part_spawn_burst(&near_point, tmpl, 15, 60, 0x606060, 3,
                         105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
                     if (part) {
                         part[2] = *D_L11_00200440.ids;
                         part[3] = 0x44;
-                        if (func_002A7820(0, 1)) {
+                        if (math_random_int_range(0, 1)) {
                             u8 *tail;
                             u16 alpha;
                             part[3] = 0x48;
@@ -317,108 +318,108 @@ void func_US2_L11_00452BAC(u8 *object)
         }
         break;
     case 9:
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             object[0xBC] = 0;
-            if (object[0x43] != 7) func_002A7470(object, 7, 0, 10);
+            if (object[0x43] != 7) anim_start_blended(object, 7, 0, 10);
             *(s16 *)(state + 0x2DA) = 0;
         }
         if (!object[0xBC] && angle < D_L11_001B1D14 * 0.017453294f) {
             object[0xBC] = 1;
-            if (object[0x43] != 17) func_002A7470(object, 17, 0, 10);
+            if (object[0x43] != 17) anim_start_blended(object, 17, 0, 10);
         } else if (*(s16 *)(state + 0x2D8))
-            func_L11_00340500(object, &target);
+            coll_check_move_to_point(object, &target);
         else
-            func_002B5278(object, heading);
+            moby_step_at_own_position_factor(object, heading);
         if (object[0xBC] == 1) {
-            float dist = func_0029F530(object);
+            float dist = moby_get_anim_value(object);
             if (*(s16 *)(state + 0x2DA) == 0 && dist > 17.0f) {
                 *(s16 *)(state + 0x2DA) = 1;
                 work[2].quad = 0;
                 work[2].f[2] = 1.0f;
-                func_0029FCC0(object, 4, &work[0]);
+                moby_transform_joint_to_world(object, 4, &work[0]);
                 if (*(u8 **)(state + 0x2C4))
-                    func_00283098(&work[2], &work[2], *(u8 **)(state + 0x2C4) + 0xC0);
+                    matrix_mul_vec3(&work[2], &work[2], *(u8 **)(state + 0x2C4) + 0xC0);
                 else
-                    func_00283098(&work[2], &work[2], D_0018C0B0 + 0xC0);
-                func_00282CC0(&work[2], &work[2], &target);
-                func_00282CF0(&work[1], &work[2], &work[0]);
-                func_00282F20(&work[1], &work[1], 0.33333334f);
-                func_003280C8((float)state[0x35], object, &work[1], &work[0], 0, 0);
+                    matrix_mul_vec3(&work[2], &work[2], g_hero_moby + 0xC0);
+                FastVecAdd(&work[2], &work[2], &target);
+                FastVecSub(&work[1], &work[2], &work[0]);
+                vec_scale_to_length(&work[1], &work[1], 0.33333334f);
+                part_spawn_spinning_effect_moby((float)state[0x35], object, &work[1], &work[0], 0, 0);
             } else if (dist < 17.0f && object[0x43] == 17) {
                 float first;
                 float second;
-                func_0029FCC0(object, 4, &work[0]);
-                first = func_002A7878(1.0f, 1.5f) * 210000.0f;
-                second = func_002A7878(0.2f, 0.4f) * 210000.0f;
-                func_002C65A0(&work[0], D_L11_001A8F20, 4, 0x808080, 9, 0x4F, 0, first, second, func_002A78D8(0.0f, 0.1f), 0);
+                moby_transform_joint_to_world(object, 4, &work[0]);
+                first = math_random_float_range(1.0f, 1.5f) * 210000.0f;
+                second = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+                part_spawn_gravity_fade(&work[0], D_L11_001A8F20, 4, 0x808080, 9, 0x4F, 0, first, second, math_random_signed_float_range(0.0f, 0.1f), 0);
             }
             if (object[0x60] & 2) {
-                if (D_0018C2BC == object || !func_002A77E0(6))
-                    func_002A7750(object, 10, -1);
+                if (g_active_attacker_robot == object || !math_random_int_below(6))
+                    moby_set_state(object, 10, -1);
                 else
-                    func_002A7750(object, 7, -1);
+                    moby_set_state(object, 7, -1);
             }
         }
         break;
     case 10:
-        if (func_002B3868(object) && object[0x43] != 11)
-            func_002A7470(object, 11, 0, 7);
+        if (flag_set_first_pending(object) && object[0x43] != 11)
+            anim_start_blended(object, 11, 0, 7);
         if (object[0x60] & 2)
-            func_002A7750(object, 7, -1);
+            moby_set_state(object, 7, -1);
         break;
     case 11: {
-        unsigned long flags = func_002B1C20(object, state + 0x50);
+        unsigned long flags = moby_dispatch_action_by_kind(object, state + 0x50);
         if (object[0x42] == 15) {
-            if (func_002A77E0(30) && (flags & 1UL) == 0)
+            if (math_random_int_below(30) && (flags & 1UL) == 0)
                 break;
-            if (func_0029F530(object) < 15.0f && *(s16 *)(state + 0x2D8) && !func_002A77E0(2))
-                func_002A7750(object, 12, -1);
+            if (moby_get_anim_value(object) < 15.0f && *(s16 *)(state + 0x2D8) && !math_random_int_below(2))
+                moby_set_state(object, 12, -1);
             else {
-                func_L02_003FC248(object, 0, -1);
-                func_L11_00452DF8(object);
+                moby_set_anim_type_three(object, 0, -1);
+                flamethrower_robot_deactivate(object);
             }
         } else if ((flags & 2UL) != 0)
-            func_002A7750(object, 7, 3);
+            moby_set_state(object, 7, 3);
         break;
     }
     case 12: {
         u8 *launch = state + 0x1A0;
-        s32 started = func_002B3868(object);
+        s32 started = flag_set_first_pending(object);
         if (started) {
             s32 k;
             float *spin;
-            func_00282CF0(launch, func_L11_004417E8(*(u8 **)(object + 0xB8)), pos);
+            FastVecSub(launch, arena_get_center_point(*(u8 **)(object + 0xB8)), pos);
             *(float *)(state + 0x1A8) = 0.0f;
-            func_00282F20(launch, launch, func_002A7878(3.0f, 5.0f) * 0.016666668f);
+            vec_scale_to_length(launch, launch, math_random_float_range(3.0f, 5.0f) * 0.016666668f);
             *(s16 *)(state + 0x2D8) = 0;
             spin = (float *)(state + 0x2B0);
             for (k = 0; k < 3; k++) {
-                spin[k] = func_002A7878(240.0f, 720.0f) * 0.00029088825f;
+                spin[k] = math_random_float_range(240.0f, 720.0f) * 0.00029088825f;
                 qcopy(&work[k], &((ActorVector *)(object + 0xC0))[k]);
             }
-            func_002AB6D8(work, object + 0xF0);
-            if (object[0x43] != 18) func_002A7470(object, 18, 0, 30);
+            mat_get_euler_angles(work, object + 0xF0);
+            if (object[0x43] != 18) anim_start_blended(object, 18, 0, 30);
             *(u16 *)(object + 0x34) &= 0xEFFF;
         }
         *(float *)(state + 0x1A8) -= *(float *)(state + 0x12C);
-        func_L07_00321D68(object, launch);
-        func_00282D30(state + 0x2B0, state + 0x2B0, 0.98f);
+        hero_set_control_motion_and_step(object, launch);
+        FastVecScale(state + 0x2B0, state + 0x2B0, 0.98f);
         {
             float f = *(float *)(object + 0x2C) * 0.0009765625f;
             count = 3;
-            func_002A3F10(object, 1, &count, &work[1]);
-            func_00282D30(&work[0], &work[4], f);
+            get_moby_joint_matrices(object, 1, &count, &work[1]);
+            FastVecScale(&work[0], &work[4], f);
         }
-        func_002B4090(*(float *)(state + 0x2B0), *(float *)(state + 0x2B4), *(float *)(state + 0x2B8), object, work);
-        func_002833F0(object + 0xC0, object + 0xF0);
-        if (*(float *)(object + 0x18) < ((float *)func_L11_004417E8(*(u8 **)(object + 0xB8)))[2] + 5.0f ||
-            !func_002A77E0(450) || *(u16 *)(object + 0x96) >= 301) {
-            func_L02_003FC248(object, 0, -1);
-            func_L11_00452DF8(object);
+        moby_rotate_about_point(*(float *)(state + 0x2B0), *(float *)(state + 0x2B4), *(float *)(state + 0x2B8), object, work);
+        euler_rotation_basis(object + 0xC0, object + 0xF0);
+        if (*(float *)(object + 0x18) < ((float *)arena_get_center_point(*(u8 **)(object + 0xB8)))[2] + 5.0f ||
+            !math_random_int_below(450) || *(u16 *)(object + 0x96) >= 301) {
+            moby_set_anim_type_three(object, 0, -1);
+            flamethrower_robot_deactivate(object);
         }
         break;
     }
     }
-    func_L11_00452810(object);
-    func_L00_002E6EF8(func_L11_004528A0, object);
+    flamethrower_robot_finish_frame(object);
+    gfx_add_draw_callback_third(flamethrower_robot_add_lights, object);
 }

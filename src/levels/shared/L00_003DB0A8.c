@@ -1,8 +1,8 @@
 #include "names.h"
-extern float func_00283CE0(int value);
-extern int func_00283CF0(float value);
+extern float IntToFloat(int value);
+extern int FloatToInt(float value);
 /* Rounds a number up to the next multiple of 16. */
-int func_L00_003DB0A8(int value)
+int mem_round_up_16(int value)
 {
     int alignment = 16;
     if (value % alignment != 0)

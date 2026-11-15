@@ -1,13 +1,14 @@
+#include "names.h"
 /* Allocate a flock member and initialize its complete vectors and orientation. */
 #include "common.h"
 
-extern char *func_0029EFD0(int);
-extern float func_002A7878(float, float);
+extern char *CreateMoby(int);
+extern float math_random_float_range(float, float);
 extern void func_002A0F48(char *);
 
 typedef int TI128 __attribute__((mode(TI)));
 
-char *func_L06_003F3EF0(char *owner, TI128 *position, TI128 *motion, int field1a, int field1c)
+char *flock_create_member(char *owner, TI128 *position, TI128 *motion, int field1a, int field1c)
 {
     char *vars;
     char *member;
@@ -22,9 +23,9 @@ char *func_L06_003F3EF0(char *owner, TI128 *position, TI128 *motion, int field1a
         qcopy(member + 0x10, position);
         qcopy(vars, motion);
         {
-            angle = RandomFloatRange(-3.1415927f, 3.1415927f);
+            angle = math_random_float_range(-3.1415927f, 3.1415927f);
             *(float *)(member + 0xF0) = angle;
-            angle = RandomFloatRange(-3.1415927f, 3.1415927f);
+            angle = math_random_float_range(-3.1415927f, 3.1415927f);
             *(float *)(member + 0xF4) = angle;
         }
         *(unsigned short *)(vars + 0x18) = 0x1F4;

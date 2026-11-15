@@ -1,28 +1,28 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern char *func_00270280(int);
-extern void func_00270598(void *);
-extern void func_00272550(void *, void *, void *);
-extern char D_001B5340[];
-extern float D_00189EA0[];
+extern char *moby_find_record_by_handle_id(int);
+extern void cam_switch_active(void *);
+extern void cam_compute_direction_angles(void *, void *, void *);
+extern char g_camera_eye_state[];
+extern float g_hero_position[];
 
 /* Moves the camera to a new place and turning, then starts a blend or hold that lasts the given time. */
-void func_00335438(TI128 *position, TI128 *rotation, int mode, int duration, int flags) {
+void SetCamera5Pose(TI128 *position, TI128 *rotation, int mode, int duration, int flags) {
     TI128 pos, rot, oldpos, oldrot;
-    char *camera = FindRecordByHandleId(5);
+    char *camera = moby_find_record_by_handle_id(5);
     char *state, *transition, *statepos, *staterot;
     qcopy(&pos, position);
     qcopy(&rot, rotation);
-    qcopy(&oldpos, gCameraState_001B5340);
-    qcopy(&oldrot, gCameraState_001B5340 + 0x10);
-    SwitchActiveCamera(camera);
+    qcopy(&oldpos, g_camera_eye_state);
+    qcopy(&oldrot, g_camera_eye_state + 0x10);
+    cam_switch_active(camera);
     state = *(char **)(camera + 0x70);
     camera[0x7D] = 1;
     transition = state + 0xE0;
     statepos = state + 0x80;
     qcopy(camera + 0x30, &pos);
-    qcopy(gCameraState_001B5340, &pos);
+    qcopy(g_camera_eye_state, &pos);
     qcopy(camera + 0x40, &rot);
     qcopy(statepos, &pos);
     staterot = state + 0x90;
@@ -35,8 +35,8 @@ void func_00335438(TI128 *position, TI128 *rotation, int mode, int duration, int
         *(int *)(transition + 0x48) = 0;
         qcopy(camera + 0x30, &oldpos);
         qcopy(camera + 0x40, &oldrot);
-        qcopy(state + 0x110, gHeroPosition);
-        ComputeDirectionAngles(state + 0xFC, &oldpos, gHeroPosition);
+        qcopy(state + 0x110, g_hero_position);
+        cam_compute_direction_angles(state + 0xFC, &oldpos, g_hero_position);
         /* fall through */
     case 2:
         *(int *)(transition + 4) = duration;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,7 +25,7 @@
 #include "common.h"
 
 /* Switches parts of an object on or off by setting its flag bits and model: each of the three modes turns something on if positive, off if negative. */
-void func_L09_00408058(void *obj, s32 modeA, s32 modeB, s32 modeC) {
+void dobbo_set_mode_flags(void *obj, s32 modeA, s32 modeB, s32 modeC) {
     u16 flags;
     u16 newFlags;
     u16 newFlags2 ;

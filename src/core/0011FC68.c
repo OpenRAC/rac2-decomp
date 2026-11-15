@@ -1,3 +1,4 @@
+#include "names.h"
 /* GCC libgcc2.c and longlong.h, public GCC revision 31cf01446d (1999-09-09).
  * __mips__ umul_ppmm is the original runtime-library target primitive,
  * unchanged from public longlong.h:629-636. Other arithmetic is the active
@@ -7,11 +8,11 @@
  * No proprietary SDK source is used.
  */
 /* longlong.h -- definitions for mixed size 32/64 bit arithmetic.
-   Copyright (C) 1991, 92, 94, 95, 96, 1997, 1998 Free Software Foundation, Inc.
+   Copyright (C) 1991, 92, 94, 95, 96, 1997, 1998 free Software Foundation, Inc.
 
    This definition file is free software; you can redistribute it
    and/or modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
+   License as published by the free Software Foundation; either
    version 2, or (at your option) any later version.
 
    This definition file is distributed in the hope that it will be
@@ -20,20 +21,20 @@
    See the GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   along with this program; if not, write to the free Software
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
 
 /* More subroutines needed by GCC output code on some machines.  */
 /* Compile this one with gcc.  */
-/* Copyright (C) 1989, 92-98, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1989, 92-98, 1999 free Software Foundation, Inc.
 
 This file is part of GNU CC.
 
 GNU CC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
+the free Software Foundation; either version 2, or (at your option)
 any later version.
 
 GNU CC is distributed in the hope that it will be useful,
@@ -43,7 +44,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -331,7 +332,7 @@ static inline UDItype __udivmoddi4 (UDItype n, UDItype d, UDItype *rp) {
 }
 
 /* Divides one big signed number by another and returns the result. */
-DItype func_0011FC68 (DItype u, DItype v) {
+DItype __divdi3 (DItype u, DItype v) {
     word_type c = 0;
     DIunion uu, vv;
     DItype w;

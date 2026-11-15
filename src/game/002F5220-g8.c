@@ -4,19 +4,19 @@ extern char D_001BAD40[];
 extern int D_001A7478 __attribute__((sda));
 extern short D_00152C28[];
 extern int D_0013955C[];
-extern void func_00288AA0(char *, int);
-extern void func_00288BE8(char *);
-extern void func_002F5CB8(void (*)(void), int);
-extern void func_002F6458(void);
+extern void req_push_queue(char *, int);
+extern void req_launch_queued(char *);
+extern void game_set_stored_value_pair(void (*)(void), int);
+extern void menu_flag_current_entry(void);
 
 /* Loads a data file into the shared buffer and sets up a callback and two flags for the next screen. */
-void func_002F64A8(void)
+void load_data_and_setup_callback(void)
 {
     char *buffer = D_001BAD40;
     D_001A7478 = 1;
-    PushRequestQueue(buffer, 21);
-    LaunchQueuedRequest(buffer);
-    SetStoredValuePair(FlagCurrentMenuEntry, 0);
+    req_push_queue(buffer, 21);
+    req_launch_queued(buffer);
+    game_set_stored_value_pair(menu_flag_current_entry, 0);
     D_00152C28[0] = 1;
     D_0013955C[0] = 0;
 }
@@ -68,145 +68,145 @@ typedef struct { char pad[0xFC]; char *moby; } CutsceneMenu;
 typedef struct { int unk0; char *moby; void *data; } CutsceneTalk;
 typedef struct { char pad[0xC]; int baseC, base10; } CutsceneResources;
 
-extern CutsceneState D_001B8840;
+extern CutsceneState g_scene_playback_state;
 extern CutsceneCamVars D_001B9040;
-extern CutsceneHelp D_001A63A8;
-extern CutsceneHero D_00189E20;
-extern CutsceneMenu D_001F2840;
+extern CutsceneHelp g_music_state;
+extern CutsceneHero g_hero_state;
+extern CutsceneMenu g_pause_menu_state;
 extern CutsceneTalk D_001B178C MACRO_ADDR;
 extern CutsceneResources D_001BAEC0;
-extern float D_001A8C74, D_001A8C78, D_001A8C7C, D_001B15A0;
-extern int D_001A79F0, D_001A8BB0, D_001B15A4, D_001B15A8, D_001B15AC;
+extern float D_001A8C74, D_001A8C78, D_001A8C7C, g_screen_fade;
+extern int g_current_map_index, g_current_game_mode, D_001B15A4, D_001B15A8, D_001B15AC;
 extern int D_001B22B0[] __attribute__((sda));
 extern char *D_001B1B60;
 extern int D_00139768[];
 extern char D_001B1450[] MACRO_ADDR, D_001B1390[] MACRO_ADDR, D_001B13D0[] MACRO_ADDR, D_001B1410[] MACRO_ADDR;
 extern char D_001B2980[], D_0021F080[];
 extern void (*D_001A8C80)(int);
-extern int D_001A8C84, D_001A8BB8;
+extern int D_001A8C84, g_requested_game_mode;
 extern int D_001BAD78[];
-extern void func_00288B38(void *);
-extern int func_002EF010(int);
-extern void func_002B72E8(int);
-extern void func_002B7CE0(int);
-extern void func_00282A60(void *, int, int);
-extern void func_00288EA0(void);
-extern unsigned int func_0026F748(int, int);
-extern void func_0026F720(void);
-extern int func_00293CA8(int);
-extern void func_00293D30(void);
-extern void func_002912F0(void);
-extern void func_002E4AC8(void);
-extern int func_001261F0(int);
-extern int func_002B6D28(void);
-extern void func_002FC138(void);
-extern void func_0027D330(int);
-extern void func_00272198(float);
-extern void func_002F5220(void);
-extern void func_0027AB40(void);
-extern void func_0029F338(void *);
-extern void func_0026F750(int);
-extern float func_002A89A8(void *, int, float);
-extern float func_00282C48(float);
-extern void func_0026F728(void);
-extern void func_0026F778(void *, void *, int, int);
-extern void func_002B8108(void *, void *, int);
-extern void func_002B7340(int);
-extern void func_002E6120(void);
+extern void req_mark_queued_in_flag_table(void *);
+extern int cutscene_map_id_to_index(int);
+extern void music_Pause(int);
+extern void snd_pump_music_and_disc_read(int);
+extern void mem_clear(void *, int, int);
+extern void subtitle_clear_state(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_3(void);
+extern int load_chunk_part_from_disc(int);
+extern void load_relocate_world_object_parts(void);
+extern void gfx_empty_stub(void);
+extern void UpdateSoundVoices(void);
+extern int sceGsSyncV(int);
+extern int snd_resume_music_stream(void);
+extern void gfx_select_packet_buffer_setup(void);
+extern void FadeToBlack(int);
+extern void cam_set_transition_frames(float);
+extern void game_reset_frame_counters(void);
+extern void UpdateViewContext(void);
+extern void moby_mark_spawned(void *);
+extern void stub_empty_9(int);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float math_fabs(float);
+extern void stub_empty_4(void);
+extern void stub_empty_14(void *, void *, int, int);
+extern void cutscene_run_dialogue_node(void *, void *, int);
+extern void music_set_active_track_value(int);
+extern void hero_destroy_equipment_pieces(void);
 
 /* Starts cutscene n: marks it seen, clears the cutscene state and buffers, sets
    up the resource bases and hero, then waits for the dialog stream and three
    frames. */
 /* Starts a cutscene by its number. */
-void func_002F53C8(int cutsceneId)
+void cutscene_start(int cutsceneId)
 {
     int index, i, memTop;
     char *bufferPtr, *moby;
 
     if ((unsigned)cutsceneId < 0xB1)
         *(D_00139768 + ((unsigned)cutsceneId >> 2)) |= 1 << (cutsceneId & 31);
-    MarkQueuedRequestsInFlagTable(D_001BAD40);
-    index = MapCutsceneIdToIndex(cutsceneId);
+    req_mark_queued_in_flag_table(D_001BAD40);
+    index = cutscene_map_id_to_index(cutsceneId);
     if (index < 0)
         return;
     music_Pause(0);
-    PumpMusicAndDiscRead(0);
-    ClearMemory(&gScenePlaybackState, 0, 0x1D0);
-    ClearMemory(D_001B1450, 0, 0x40);
-    ClearMemory(D_001B1390, 0, 0x40);
-    ClearMemory(D_001B2980, 0, 0x40);
-    ClearMemory(D_001B2980 + 0x40, 0, 0x40);
-    ClearMemory(D_001B13D0, 0, 0x40);
-    ClearMemory(D_001B1410, 0, 0x40);
+    snd_pump_music_and_disc_read(0);
+    mem_clear(&g_scene_playback_state, 0, 0x1D0);
+    mem_clear(D_001B1450, 0, 0x40);
+    mem_clear(D_001B1390, 0, 0x40);
+    mem_clear(D_001B2980, 0, 0x40);
+    mem_clear(D_001B2980 + 0x40, 0, 0x40);
+    mem_clear(D_001B13D0, 0, 0x40);
+    mem_clear(D_001B1410, 0, 0x40);
     bufferPtr = D_0021F080;
     for (i = 0; i < 7; i++) {
         char *entry = bufferPtr;
         bufferPtr += 0x40;
-        ClearMemory(entry, 0, 0x40);
+        mem_clear(entry, 0, 0x40);
     }
     D_001A8C74 = 1.0f;
-    gScenePlaybackState.id = index;
+    g_scene_playback_state.id = index;
     D_001A8C78 = 0;
-    gScenePlaybackState.unk34 = 0;
-    gScenePlaybackState.unk3C = 0;
-    if (gCurrentMapIndex == 20)
+    g_scene_playback_state.unk34 = 0;
+    g_scene_playback_state.unk3C = 0;
+    if (g_current_map_index == 20)
         memTop = D_001B22B0[0] - 0x60000;
     else
         memTop = D_001B22B0[0] - 0x40000;
     D_001B22B0[0] = memTop;
-    gScenePlaybackState.base6C = D_001BAEC0.baseC + memTop;
-    gScenePlaybackState.base70 = D_001BAEC0.base10 + memTop;
-    ClearSubtitleState();
-    gScreenFade = 1.0f;
-    gCurrentGameMode = 2;
+    g_scene_playback_state.base6C = D_001BAEC0.baseC + memTop;
+    g_scene_playback_state.base70 = D_001BAEC0.base10 + memTop;
+    subtitle_clear_state();
+    g_screen_fade = 1.0f;
+    g_current_game_mode = 2;
     D_001B15A4 = 0;
     D_001A8C7C = 0;
-    if (gHeroState.active) {
-        EmptyStubF748(0x61, 2);
-        gHeroState.flag = 1;
-        EmptyStubF720();
+    if (g_hero_state.active) {
+        stub_empty_8(0x61, 2);
+        g_hero_state.flag = 1;
+        stub_empty_3();
     }
     if (D_001B178C.moby)
         *(unsigned short *)(D_001B178C.moby + 0x34) |= 1;
-    if (gPauseMenuState.moby)
-        *(unsigned short *)(gPauseMenuState.moby + 0x34) |= 1;
+    if (g_pause_menu_state.moby)
+        *(unsigned short *)(g_pause_menu_state.moby + 0x34) |= 1;
     D_001B15A8 = 1;
     D_001B15AC = 52;
-    if (gMusicState.active) {
-        PumpMusicAndDiscRead(1);
-        LoadChunkPartFromDisc(0);
+    if (g_music_state.active) {
+        snd_pump_music_and_disc_read(1);
+        load_chunk_part_from_disc(0);
     } else
-        LoadChunkPartFromDisc(0);
-    if (gMusicState.active)
-        PumpMusicAndDiscRead(1);
-    RelocateWorldObjectParts();
-    EmptyStub_002912F0();
+        load_chunk_part_from_disc(0);
+    if (g_music_state.active)
+        snd_pump_music_and_disc_read(1);
+    load_relocate_world_object_parts();
+    gfx_empty_stub();
     for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
         if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
             *(unsigned short *)(moby + 0x34) |= 0x80;
     }
-    gMusicState.id = gScenePlaybackState.id;
-    gMusicState.flag = 0;
-    while (gMusicState.state != 3 || gMusicState.timer >= 6000) {
+    g_music_state.id = g_scene_playback_state.id;
+    g_music_state.flag = 0;
+    while (g_music_state.state != 3 || g_music_state.timer >= 6000) {
         UpdateSoundVoices();
-        GetGsCurrentField(0);
+        sceGsSyncV(0);
     }
     {
         int ticks = 0;
-        CutsceneState *state = &gScenePlaybackState;
+        CutsceneState *state = &g_scene_playback_state;
 
         state->wait = -3;
-        ResumeMusicStream();
-        LoadChunkPartFromDisc(1);
+        snd_resume_music_stream();
+        load_chunk_part_from_disc(1);
         for (; state->wait < ticks; ticks--)
-            GetGsCurrentField(0);
+            sceGsSyncV(0);
     }
 }
 
 /* Ends the cutscene: restores the frame rate, camera field of view and the
    cutscene mobys, drops the hero and camera back to the ground, clears the
    talk and menu mobys and runs the pending end callback. */
-void func_002F57A8(void)
+void cutscene_end(void)
 {
     char *moby;
     CutsceneHero *hero;
@@ -214,66 +214,66 @@ void func_002F57A8(void)
     float heroGroundZ, cutsceneGroundZ;
     int i;
 
-    if ((unsigned short)(gMusicState.state - 6) >= 2)
-        gMusicState.state = 5;
-    SelectPacketBufferSetup();
+    if ((unsigned short)(g_music_state.state - 6) >= 2)
+        g_music_state.state = 5;
+    gfx_select_packet_buffer_setup();
     FadeToBlack(6);
     D_001B15A8 = 0;
     D_001B15AC = 0;
     D_001B15A4 = 0;
     D_001A8C7C = 0;
-    SetCameraTransitionFrames(6.0f);
-    ResetFrameCounters();
+    cam_set_transition_frames(6.0f);
+    game_reset_frame_counters();
     D_001B9040.fov = 0.62f;
     UpdateViewContext();
-    for (i = 0; i < gScenePlaybackState.count; i++) {
-        CutsceneMoby *m = gScenePlaybackState.mobys[i];
+    for (i = 0; i < g_scene_playback_state.count; i++) {
+        CutsceneMoby *m = g_scene_playback_state.mobys[i];
         if (m) {
             m->parts->n--;
             m->parts->slots[m->parts->n] = 0;
-            MarkMobySpawned(m);
+            moby_mark_spawned(m);
         }
     }
     for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
         if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
             *(unsigned short *)(moby + 0x34) &= 0xFF7F;
     }
-    hero = &gHeroState;
+    hero = &g_hero_state;
     if (hero->active) {
-        EmptyStubF750(1);
-        heroGroundZ = ProbeGroundHeightBelow(hero->pos, 0, 0.5f);
+        stub_empty_9(1);
+        heroGroundZ = coll_probe_ground_height_below(hero->pos, 0, 0.5f);
         if (2.0f < heroGroundZ) {
-            if (FloatAbs(hero->pos[2] - heroGroundZ) < 4.5f)
+            if (math_fabs(hero->pos[2] - heroGroundZ) < 4.5f)
                 hero->pos[2] = heroGroundZ;
         }
-        gHeroState.flag = 0;
-        EmptyStubF728();
-        cutscene = &gScenePlaybackState;
+        g_hero_state.flag = 0;
+        stub_empty_4();
+        cutscene = &g_scene_playback_state;
         if (cutscene->restore) {
-            cutsceneGroundZ = ProbeGroundHeightBelow(cutscene->pos, 0, 0.5f);
-            if (2.0f < cutsceneGroundZ && FloatAbs(cutscene->pos[2] - cutsceneGroundZ) < 2.0f)
+            cutsceneGroundZ = coll_probe_ground_height_below(cutscene->pos, 0, 0.5f);
+            if (2.0f < cutsceneGroundZ && math_fabs(cutscene->pos[2] - cutsceneGroundZ) < 2.0f)
                 cutscene->pos[2] = cutsceneGroundZ;
-            EmptyStubF778(gScenePlaybackState.pos, gScenePlaybackState.rot, 0, 1);
+            stub_empty_14(g_scene_playback_state.pos, g_scene_playback_state.rot, 0, 1);
         }
     }
     if (D_001B178C.moby)
         *(unsigned short *)(D_001B178C.moby + 0x34) &= 0xFFFE;
-    if (gPauseMenuState.moby) {
-        *(unsigned short *)(gPauseMenuState.moby + 0x34) &= 0xFFFE;
-        gPauseMenuState.moby = 0;
+    if (g_pause_menu_state.moby) {
+        *(unsigned short *)(g_pause_menu_state.moby + 0x34) &= 0xFFFE;
+        g_pause_menu_state.moby = 0;
     }
     if (D_001B178C.moby) {
         char *moby = D_001B178C.moby;
         void *data = D_001B178C.data;
         D_001B178C.moby = 0;
         D_001B178C.data = 0;
-        RunDialogueNode(moby, data, 1);
+        cutscene_run_dialogue_node(moby, data, 1);
     }
     music_set_active_track_value(30);
-    if (D_001A8C80 && !D_001BAD78[0] && gRequestedGameMode != 2 && gRequestedGameMode != 1) {
+    if (D_001A8C80 && !D_001BAD78[0] && g_requested_game_mode != 2 && g_requested_game_mode != 1) {
         D_001A8C80(D_001A8C84);
         D_001A8C80 = 0;
         D_001A8C84 = 0;
     }
-    DestroyEquipmentPieces();
+    hero_destroy_equipment_pieces();
 }

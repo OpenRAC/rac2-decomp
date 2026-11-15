@@ -37,13 +37,13 @@ typedef struct {
 
 extern char D_L12_001B1860[];
 extern char D_L12_001C0258[];
-extern s32 func_002761F8(void *, void *, int, void *, int);
-extern s32 func_00277258(void *, int, void *, float);
-extern void func_0026FEB8(void *);
+extern s32 CollLine(void *, void *, int, void *, int);
+extern s32 coll_test_point(void *, int, void *, float);
+extern void STUB_printf(void *);
 
 /* Checks whether the guard's line of sight to its target is blocked. Returns 1 when something
    is in the way. */
-s32 func_L12_00414AB8(Todano_Obj *moby, s32 checkHitKind, s32 useAnchor, s32 crouched)
+s32 guard_is_line_of_sight_blocked(Todano_Obj *moby, s32 checkHitKind, s32 useAnchor, s32 crouched)
 {
     Todano_Owned *vars = moby->f68;
     TI128 pos[1];
@@ -68,7 +68,7 @@ s32 func_L12_00414AB8(Todano_Obj *moby, s32 checkHitKind, s32 useAnchor, s32 cro
     STUB_printf(D_L12_001B1860);
     if (checkHitKind != 0 && blocked == 0) {
         probe[0] = *(TI128 *)(D_L12_001C0258 + 8);
-        if (TestPointAgainstCollision(probe, 1, moby, 0.5f) != 0) {
+        if (coll_test_point(probe, 1, moby, 0.5f) != 0) {
             Todano_Hit *h = *(Todano_Hit **)D_L12_001C0258;
             if (h == 0 || h->f24 == 0 || *(s16 *)(h->f24 + 0x46) != 5)
                 blocked = 1;

@@ -46,17 +46,17 @@ typedef struct {
 } SceneCamera;
 
 extern Scene18 D_L18_001BD4C0;
-extern int D_001A79F0 __attribute__((sda));
-extern SceneMoby *D_L18_001B281C MACRO_ADDR;
+extern int g_current_map_index __attribute__((sda));
+extern SceneMoby *g_moby_l18_table MACRO_ADDR;
 extern SceneMoby *D_L18_001B2820 MACRO_ADDR;
 extern SceneCamera D_L18_001B9680;
 extern ExplosionSpot D_L18_00287D10[];
 
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
-extern void func_L00_00326048(void *, void *, unsigned int, unsigned int, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 void func_PAL_L18_00318BE0(void)
@@ -68,7 +68,7 @@ void func_PAL_L18_00318BE0(void)
     ExplosionSpot *spot, *table;
     Scene18 *scene;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < D_L18_001BD4C0.count; i++) {
         object = D_L18_001BD4C0.objects[i];
         if (object && *(short *)(object + 0xAA) == 0xE29) {
@@ -80,20 +80,20 @@ void func_PAL_L18_00318BE0(void)
         if (object) {
             int type = 0xFA0;
 
-            if (*(short *)(object + 0xAA) == type && D_001A79F0 != 51) {
+            if (*(short *)(object + 0xAA) == type && g_current_map_index != 51) {
                 state = *(unsigned char **)(object + 0x68);
                 if (state) {
-                    func_L00_00326048(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+                    math_store_angle_update_result(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
                 }
             }
         }
     }
-    if (D_001A79F0 != 18 || D_L18_001BD4C0.mode != 4) {
+    if (g_current_map_index != 18 || D_L18_001BD4C0.mode != 4) {
         return;
     }
     if (D_L18_001BD4C0.timer == 1) {
-        for (k = 0; &D_L18_001B281C[k] < D_L18_001B2820; k++) {
-            moby = &D_L18_001B281C[k];
+        for (k = 0; &g_moby_l18_table[k] < D_L18_001B2820; k++) {
+            moby = &g_moby_l18_table[k];
             moby->flags |= 0x41;
         }
     }
@@ -104,8 +104,8 @@ void func_PAL_L18_00318BE0(void)
         if (scene->timer == (((int)(spot->time) * 5 + 2) / 6)) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                func_00283098(position, position, D_L18_001B9680.matrix);
-                func_00282CC0(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
+                FastVecAdd(position, position, D_L18_001B9680.position);
             }
             func_PAL_L00_003FB330(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {

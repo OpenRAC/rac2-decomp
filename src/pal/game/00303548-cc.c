@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_00303548, the PAL copy of func_00302440: the same C, where rename func_003022A0 becomes func_PAL_003033A8. */
 
 #define RAC2_T_V4_F213135AA
@@ -26,29 +27,29 @@ typedef struct {
 
 typedef struct { float x, y, z, w; } V4_F213135aa;
 
-    extern void func_0029FCC0(void *, int, void *);
+    extern void moby_transform_joint_to_world(void *, int, void *);
 
-    extern int func_00277258(void *, int, void *, float);
+    extern int coll_test_point(void *, int, void *, float);
 
     extern int D_001BAF9C;
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 extern V4_F213135aa ref_00303210_00[];
-extern void func_00300330(void *);
+extern void moby_sort_entries_by_distance(void *);
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern void func_00305798(void *);
+extern void projectile_move_owner_entries(void *);
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
-extern int func_00277258(void *, int, void *, float);
+extern int coll_test_point(void *, int, void *, float);
 
 extern int D_001BAF9C;
 
-extern void func_00300330(void *);
+extern void moby_sort_entries_by_distance(void *);
 
-extern int func_00282948(void *p);
+extern int math_fast_float_d(void *p);
 
 typedef struct {
     u8 pad00[0x80]; float position[4];
@@ -57,12 +58,12 @@ typedef struct {
     u8 pad1834[0xA5C]; char *field2290; int state;
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
-extern SurfacePlayer D_00189E20;
+extern SurfacePlayer g_hero_state;
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
 } SurfaceCamera;
-extern SurfaceCamera D_001B5200;
+extern SurfaceCamera g_active_camera;
 extern V4_F213135aa ref_00302DA0_04[];
 /* Relocates serialized header offsets and compacts each row in its original storage. */
 
@@ -101,8 +102,8 @@ int func_PAL_00303548(char *obj, char *obj2)
 /* Resolve the player onto the surface grid and blend their height into it. */
 typedef unsigned long long u64;
 
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 
 /* Regenerate the 8 by 8 mesh from four surface control points. */
 /* func_00303568 is defined in 00303568.c. */
@@ -125,13 +126,13 @@ extern void func_00280B90(void *, void *, int);
    address in every program, so they have no address of their own. */
 
 /* Walks the table of objects and lets every entry the owner owns move it. */
-void func_00305798(void *owner);
+void projectile_move_owner_entries(void *owner);
 
 typedef struct { float x, y, z, w; } EffectVector __attribute__((aligned(16)));
 typedef struct { u8 prefix[0x140]; EffectVector position; } EffectCameraView;
-extern unsigned long func_0027C878(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 extern EffectCameraView ref_00305910_00;
 

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 ref_L05_0037AA88_00[];
 
 /* Follows the chain of slots from the given one and returns the first active slot, or -1. */
-s32 func_L05_0037AA88(s32 index) {
+s32 slot_find_active_in_chain(s32 index) {
     s32 stride ;
     s32 active ;
     s8 *nextField;

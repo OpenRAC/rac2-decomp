@@ -1,5 +1,6 @@
 #include "include_asm.h"
-extern int D_L00_001B19C8[] __attribute__((sda));
+#include "names.h"
+extern int g_frame_l00_counter[] __attribute__((sda));
 extern char *D_L00_001B1EA8[] __attribute__((sda));
 extern float D_L00_001B0430 __attribute__((sda));
 extern float func_002EE2B0(char *a, char *b);
@@ -11,7 +12,7 @@ void func_PAL_L00_003E3248(char *arg)
 {
     char *o;
 
-    if ((D_L00_001B19C8[0] & 1) == 0)
+    if ((g_frame_l00_counter[0] & 1) == 0)
         return;
 
     for (o = D_L00_001B1EA8[0]; o != 0; o = *(char **)(o + 40)) {

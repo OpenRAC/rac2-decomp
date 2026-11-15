@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L20_0039EEC8 makes an object of class 0x1316 at `position` for `owner`, resets its
    rotation matrix and fills D_L20_00234880 and D_L20_00235500 from the matrix axes.
    - The object's position is copied with the qcopy helper; its volatile asm keeps the
@@ -12,12 +13,12 @@
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
-extern unsigned char *func_0029EFD0(int);
-extern void func_00283360(void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282DD8(void *, const void *, const void *);
+extern unsigned char *CreateMoby(int);
+extern void set_identity_rotation_rows(void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void FastVecCross(void *, const void *, const void *);
 extern unsigned int D_L20_001AEDA0[] __attribute__((sda));
 extern float D_L20_001AED40 __attribute__((sda));
 extern int D_L20_001B3870[] __attribute__((sda));
@@ -28,7 +29,7 @@ extern Vector D_L20_00234880[8][25];
 extern Vector D_L20_00235500[8];
 
 /* Creates the electric orb at a position and sets up the directions of its eight arms. */
-unsigned char *func_L20_0039EEC8(unsigned char *owner, const Vector *position) {
+unsigned char *electric_orb_spawn(unsigned char *owner, const Vector *position) {
     unsigned char *object = CreateMoby(0x1316 /* moby class 4886 */);
     unsigned char *state;
     Vector *x, *y, *z;

@@ -2,22 +2,22 @@
 
 /* Prefix view of the effect-position field; not a complete global layout. */
 typedef struct { char pad[0xB0]; float effect_position[4]; } EffectPositionView;
-extern EffectPositionView D_00189E20;
+extern EffectPositionView g_hero_state;
 /* Keep the destination address as the assembler's absolute-address macro. */
 extern char D_L02_001B3210[] __attribute__((sda));
 extern char *D_L02_001AD410 __attribute__((sda));
-extern void func_L02_003F5390(char *);
-extern void func_L02_003F54D8(char *);
-extern void func_L02_003F56C0(char *);
-extern void func_L02_003F5710(char *);
-extern void func_002833B8(char *, float);
-extern void func_002A7750(u8 *, s32, s32);
+extern void actor_collect_matching_indices(char *);
+extern void sway_update_pieces(char *);
+extern void actor_advance_cycle_timer(char *);
+extern void hero_update_height_zone_flags(char *);
+extern void set_scale_matrix(char *, float);
+extern void moby_set_state(u8 *, s32, s32);
 
 /* Updates this actor: sets up a fixed point and its camera on the first frame, then runs its per-frame checks. */
-void func_L02_003F52B0(char *moby) {
+void camera_point_actor_update(char *moby) {
     switch (*(u8 *)(moby + 0x20)) {
     case 0: {
-        EffectPositionView *heroBlock = &gHeroState;
+        EffectPositionView *heroBlock = &g_hero_state;
 
         float *source;
         char *dest;
@@ -29,15 +29,15 @@ void func_L02_003F52B0(char *moby) {
         dest = D_L02_001B3210;
         qcopy(dest, source);
         *(u8 *)(moby + 0x30) = 0xFF;
-        CollectMatchingRecordIndices(moby);
+        actor_collect_matching_indices(moby);
         set_scale_matrix(D_L02_001AD410 + 0x40, 1.0f);
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
-        UpdateSwayingPieces(moby);
-        AdvanceActorCycleTimer(moby);
-        UpdateHeroHeightZoneFlags(moby);
+        sway_update_pieces(moby);
+        actor_advance_cycle_timer(moby);
+        hero_update_height_zone_flags(moby);
         break;
     }
 }

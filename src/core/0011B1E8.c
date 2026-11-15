@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs.h"
 
-extern int func_0011B1E8();
+extern int tty_write_via_deci2();
 
 extern int r1_D_0012FCF0 NOT_SDA;
 
@@ -20,7 +20,7 @@ extern int r1_func_00119CC8(int);
    the write's argument, stolen from the branch target. */
 /* r1_func_00119CC8 takes no argument; passing one puts a redundant move in
    the jal slot and swaps $s0/$s1. */
-int func_0011B1E8(int fd, int buf, int len) {
+int tty_write_via_deci2(int fd, int buf, int len) {
     if (fd == 1 || fd == 2) {
         if (r1_D_0012FCF0 == 0) {
             if (r1_func_00119CC8_v() == 0) {

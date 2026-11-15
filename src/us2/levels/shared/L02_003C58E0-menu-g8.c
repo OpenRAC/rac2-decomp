@@ -5,11 +5,11 @@
    func_L02_003C43F0. It uses v2.00's text ids, and its two header labels move up one pixel
    when the display mode is 1. */
 
-extern char *func_00336D50(char *, int);
-extern void func_00300A00(char *, int, float, float, float, float, float);
-extern void func_002FC560(int, unsigned long);
-extern char *func_00288FB8(int);
-extern void func_0027FBD8(int, int, u64, char *, int);
+extern char *table_find_by_id(char *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
+extern void VU1_addGSregister(int, unsigned long);
+extern char *GetLocalizedString(int);
+extern void text_draw_centered_large(int, int, u64, char *, int);
 extern char *D_L02_001A904C;
 extern float D_L02_001B3E04;
 extern int D_L02_001B3E00;
@@ -61,29 +61,29 @@ void func_US2_L02_003C58E0(char *obj) {
     k = 203.0f;
     half = 0.5f;
     on = 1;
-    id = func_00336D50(D_L02_001A904C + entry, 0x70);
+    id = table_find_by_id(D_L02_001A904C + entry, 0x70);
     y = menu_coord(D_L02_001B3E04, k, half, on);
     one = 1.0f;
     zero = 0.0f;
     s = (float)y;
-    func_00300A00(id, 0x60442D00, 258.0f, s, one, one, zero);
-    func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
+    gfx_draw_scaled_object_two_axes(id, 0x60442D00, 258.0f, s, one, one, zero);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
+    gfx_draw_scaled_object_two_axes(table_find_by_id(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    id = func_00336D50(D_L02_001A904C + entry, 0x72);
+    id = table_find_by_id(D_L02_001A904C + entry, 0x72);
     y = menu_coord(D_L02_001B3E04, k, half, on);
     s = one;
-    func_00300A00(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
-    func_002FC560(0x47, 0x5360BUL);
+    gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
+    VU1_addGSregister(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
-        text = func_00288FB8(0x2DF2);
-        func_0027FBD8(254, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
+        text = GetLocalizedString(0x2DF2);
+        text_draw_centered_large(254, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
-        text = func_00288FB8(0x2DF1);
-        func_0027FBD8(262, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
+        text = GetLocalizedString(0x2DF1);
+        text_draw_centered_large(262, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
     }
-    text = func_00288FB8(0x2DF0);
-    func_0027FBD8(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
+    text = GetLocalizedString(0x2DF0);
+    text_draw_centered_large(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

@@ -9,15 +9,15 @@ extern int D_L01_001A90CC[] SDATA(D_L01_001A90CC);
 extern float D_L01_001A90C4[] SDATA(D_L01_001A90C4);
 extern float D_L01_001B2DC4[] __attribute__((sda));
 extern unsigned char D_L01_001BD9C0[];
-extern void func_0027AB40(void);
-extern int func_00336D50(void *, int);
-extern void func_00300A00(void *, int, float, float, float, float, float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_0027EAE8(int, int, int, int, int, const void *);
-extern int func_0028E588(int, int);
-extern void func_0028E868(int, int, int, int, int, int);
+extern void UpdateViewContext(void);
+extern int table_find_by_id(void *, int);
+extern void gfx_draw_scaled_object_two_axes(void *, int, float, float, float, float, float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void gfx_draw_screen_rectangle(int, int, int, int, int, const void *);
+extern int GetIconFrame(int, int);
+extern void hud_draw_sprite(int, int, int, int, int, int);
 
 extern int D_L01_001B2DC0[] __attribute__((sda));
 
@@ -69,7 +69,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Draws the HUD overlay: three label sprites, a fading bar and an icon, then puts the camera back as it was. */
-int func_L01_002F1588(void)
+int hud_draw_overlay(void)
 {
     OverlayColorPair colors, source;
     float oldProjection, span, rounding, unit, zero, height;
@@ -85,22 +85,22 @@ int func_L01_002F1588(void)
     rounding = 0.5f;
     one = 1;
     nodeOffset = 0x8710;
-    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 142);
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 142);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = 1.0f;
     unit = height;
     height = 0.0f;
     zero = height;
     height = (float)labelY;
-    DrawScaledObjectTwoAxes(node, 0x60442D00, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 143);
+    gfx_draw_scaled_object_two_axes(node, 0x60442D00, 250.0f, height, unit, unit, zero);
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 143);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = (float)labelY;
-    DrawScaledObjectTwoAxes(node, 0x60241700, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)FindTableEntryById(D_L01_001A908C + nodeOffset, 144);
+    gfx_draw_scaled_object_two_axes(node, 0x60241700, 250.0f, height, unit, unit, zero);
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 144);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = (float)labelY;
-    DrawScaledObjectTwoAxes(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
+    gfx_draw_scaled_object_two_axes(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
     source.second = FastTweenColor(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
@@ -108,14 +108,14 @@ int func_L01_002F1588(void)
     height = D_L01_001B2DC4[0];
     top = hud_round(374.0f, height, rounding, one);
     bottom = hud_round(388.0f, height, rounding, one);
-    DrawScreenRectangle(190, top, barRight, bottom, 0, &colors);
+    gfx_draw_screen_rectangle(190, top, barRight, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
         int icon = GetIconFrame(0xEAA7, D_L01_001A90CC[0] - 1);
         height = D_L01_001B2DC4[0];
         /* This caller passes `one`, a local holding 1, as `active` (allowed by owner ruling). */
         top = label_y((void *)icon, 352.0f, height, rounding, one);
         bottom = label_y((void *)icon, 43.0f, height, rounding, one);
-        DrawHudSprite(icon, 139, top, 43, bottom, 128);
+        hud_draw_sprite(icon, 139, top, 43, bottom, 128);
     }
     *(float *)(hud_camera() + 0xB0) = oldProjection;
     UpdateViewContext();

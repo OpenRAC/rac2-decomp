@@ -3,11 +3,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002B3BA8(char *, int, float, float, int, int);
-extern char *func_L20_004448A8(char *, char *);
+extern void weapon_select_aim_target(char *, int, float, float, int, int);
+extern char *FindLastGroupMemberInRange(char *, char *);
 
 /* Chooses what the trooper aims at: the nearest valid target, or its owner if there is none. */
-void func_L20_0039E158(char *mobyIn) {
+void trooper_choose_target(char *mobyIn) {
     char *moby = mobyIn;
     char *vars = *(char **)(moby + 0x68);
     char *found;
@@ -15,7 +15,7 @@ void func_L20_0039E158(char *mobyIn) {
 
     if (*(int *)(vars + 0x27C) != 0) {
         *(int *)(vars + 0x280) = 0;
-        SelectAimTarget_002B3BA8(mobyIn, *(int *)(vars + 0x230), 0.0f, 0.0f, 0, 0);
+        weapon_select_aim_target(mobyIn, *(int *)(vars + 0x230), 0.0f, 0.0f, 0, 0);
     } else {
         found = FindLastGroupMemberInRange(*(char **)(moby + 0xB8), moby);
         *(int *)(vars + 0x280) = (int)found;

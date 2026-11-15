@@ -2,12 +2,12 @@
 #include "names.h"
 
 extern int D_L00_001A8F00 __attribute__((sda));
-extern void func_L00_002E54E0(float value);
-extern float func_00282C48(float value);
+extern void gfx_set_clamped_view_distance(float value);
+extern float math_fabs(float value);
 extern char D_L00_001D9F00[];
 extern char D_L00_001DA860[];
-int func_L00_003D3DE0(char *a, char *b);
-int func_L00_003EB610(char *a, char *b);
+int kilonoid_spawn(char *a, char *b);
+int SpawnCB2Moby(char *a, char *b);
 void func_L00_0035F180(char *a, int b, int c, char *d, int e);
 
 typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner {
@@ -22,9 +22,9 @@ typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext {
     unsigned int active_24;
 } Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext;
 
-extern int D_L00_001B0798[] __attribute__((sda));
+extern int g_synthenoid_slots[] __attribute__((sda));
 
-extern void func_002A3F10(char *p, int one, int *w, char *out);
+extern void get_moby_joint_matrices(char *p, int one, int *w, char *out);
 
 extern void func_00282D30_3(char *a, char *out, float f);
 
@@ -35,17 +35,17 @@ extern void func_00283098_2(char *a, char *b, char *c);
 extern void func_002FDBD8_4(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
                                     float *vector, int mode);
 
-extern int func_002ACBC8(void *, int);
+extern int IsPointInCuboid(void *, int);
 
-extern int func_L00_002E3B38(int);
+extern int level_get_difficulty_scaled(int);
 
-extern void func_0026FEB8(void *, ...);
+extern void STUB_printf(void *, ...);
 
-extern unsigned char D_00189EA0[];
+extern unsigned char g_hero_position[];
 
 extern unsigned char D_0019B2E8[];
 
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 
 extern int D_001A7A10 __attribute__((sda));
 
@@ -57,30 +57,30 @@ extern int D_L00_001C5540[][3];
 
 extern char D_L00_001B0700[];
 
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
-extern void func_00282CF0(char *, char *, char *);
+extern void FastVecSub(char *, char *, char *);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern float func_002A78D8(float, float);
+extern float math_random_signed_float_range(float, float);
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern void func_002AF000(float *, float, float, float);
+extern void vec_build_spherical_offset(float *, float, float, float);
 
-extern void func_002C16C0(float *, float *, int, int, unsigned int, int,
+extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 
 /* scales a float field by 1/1024, passes a caller word and two 16/48-byte scratch buffers to a four-argument helper, then forwards the second buffer with the scaled float to one helper and two sub-objects of the same parameter to three more helpers */
 /* Finds where a point on a moving part of an object is in the world. */
-void func_L00_003EA0E0(char *moby, int jointIndex, char *outPoint, char *localPoint)
+void moby_get_attachment_point(char *moby, int jointIndex, char *outPoint, char *localPoint)
 {
     char jointMatrices[48];
     char tempBuffer[16];
@@ -97,7 +97,7 @@ void func_L00_003EA0E0(char *moby, int jointIndex, char *outPoint, char *localPo
 }
 
 /* Slides an object back and forth along one axis and shrinks it near both ends. */
-void func_L00_003EA408(char *moby)
+void sweeping_scale_update(char *moby)
 {
     float posY;
     float absPosY;
@@ -110,7 +110,7 @@ void func_L00_003EA408(char *moby)
         *(unsigned short *)(moby + 0x32) = 0xAF0;
         *(unsigned char *)(moby + 0x30) = 0xFF;
         *(unsigned char *)(moby + 0x20) = 1;
-        SetClampedViewDistance(3000.0f);
+        gfx_set_clamped_view_distance(3000.0f);
     }
     if (*(unsigned char *)(moby + 0x20) != 1)
         return;
@@ -120,7 +120,7 @@ void func_L00_003EA408(char *moby)
     posY = *(float *)(moby + 0x14);
     posY = posY - 1.6666667f;
     *(float *)(moby + 0x14) = posY;
-    absPosY = FloatAbs(posY);
+    absPosY = math_fabs(posY);
 
     distFromEnd = 3000.0f - absPosY;
     nearEnd = 750.0f - distFromEnd;
@@ -141,7 +141,7 @@ void func_L00_003EA408(char *moby)
 
 /* shared native body of family 5a97ab89858c */
 /* Sets a flat picture packet to its starting values. */
-void func_L00_003EA860(char *quadPacket)
+void gfx_init_quad_packet(char *quadPacket)
 {
     *(long long *)(quadPacket + 112) = 0;
     *(float *)(quadPacket + 8) = -1.0f;
@@ -183,7 +183,7 @@ extern void func_2EAC30(char *, char *, int);
 /* Builds one aim/render packet: resets the work record, fills the colour and the blend words,
    takes the two aim angles from the level's aim vector, turns them into the packet's orientation
    and scales the packet's four basis vectors by the caller's alpha. */
-void func_L00_003EA8C8(char *unused, char *position, int color, float alpha)
+void gfx_draw_aimed_glow_sprite(char *unused, char *position, int color, float alpha)
 {
     unsigned char work[0xE0];
     float yaw;
@@ -233,7 +233,7 @@ void func_L00_003EA8C8(char *unused, char *position, int color, float alpha)
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
 /* Draws the effect for the Miniturret Glove when its flag is on. */
-void func_L00_003EAC88(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void miniturret_glove_draw(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -242,22 +242,22 @@ void func_L00_003EAC88(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 }
 
 /* Updates a collectible pickup: when the player touches it, it is marked as collected and the counters go up. */
-void func_L00_003EAEF8(char *object) {
+void collectible_pickup_update(char *object) {
     int *state = *(int **)(object + 0x68);
     int result, index, shift;
     unsigned char *entry;
 
-    if (!IsPointInCuboid(gHeroPosition, state[1]))
+    if (!IsPointInCuboid(g_hero_position, state[1]))
         return;
-    gHeroPosition[0x2246] = *(unsigned char *)(object + 0xB0);
+    g_hero_position[0x2246] = *(unsigned char *)(object + 0xB0);
     if (state[2])
         return;
-    if ((D_0019B2E8[*(unsigned char *)(object + 0xB0) + gCurrentMapIndex * 16] >>
+    if ((D_0019B2E8[*(unsigned char *)(object + 0xB0) + g_current_map_index * 16] >>
          (*(unsigned char *)(object + 0xB1) * 2)) & 3)
         return;
     state[2] = 1;
-    result = GetDifficultyScaledLevel(*(unsigned char *)(object + 0xB0));
-    index = (*(unsigned char *)(object + 0xB0) & 15) + gCurrentMapIndex * 16;
+    result = level_get_difficulty_scaled(*(unsigned char *)(object + 0xB0));
+    index = (*(unsigned char *)(object + 0xB0) & 15) + g_current_map_index * 16;
     shift = (*(unsigned char *)(object + 0xB1) & 3) * 2;
     entry = D_0019B2E8 + index;
     if (!((*entry >> shift) & 3)) {
@@ -274,23 +274,23 @@ void func_L00_003EAEF8(char *object) {
 
 extern int D_L00_001C9340;
 
-extern void func_L00_00323448(char *, void *, int, int, int, int, int, int);
+extern void BuildObjectAttachmentTransforms(char *, void *, int, int, int, int, int, int);
 
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern void func_002AEE70(char *, void *, void *, float, float, float);
+extern void math_update_wrapped_angle_offset(char *, void *, void *, float, float, float);
 
-extern void func_002AEF28(char *, float, void *, float, void *, float);
+extern void moby_scale_owner_words_by_angles(char *, float, void *, float, void *, float);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_002AB6D8(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
 
-extern void func_L00_00323958(char *, void *);
+extern void moby_update_attached_transforms(char *, void *);
 
 typedef struct {
     long long id;
@@ -313,7 +313,7 @@ typedef struct {
 } L00_003EB0C0_State;
 
 /* Updates an object made of several parts that spin, and keeps its parts turning. */
-void func_L00_003EB0C0(char *self)
+void rotating_parts_update(char *self)
 {
     float angles[4];
     char rotation[48];
@@ -332,7 +332,7 @@ void func_L00_003EB0C0(char *self)
         }
         BuildObjectAttachmentTransforms(self, st->entries, 0x50, *((int *)&st->id + 1), *(int *)&st->id, st->flags, 7, 0);
         if (!st->present) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             break;
         }
         if (!st->mode) {
@@ -342,17 +342,17 @@ void func_L00_003EB0C0(char *self)
         }
         if (st->firstAngle != 0.0f)
             st->firstAngle *= 0.01745329424738884f;
-        st->firstVelocity = FastSinOrCosB(st->firstAngle) * st->firstSpeed;
+        st->firstVelocity = math_fast_sin_or_cos_b(st->firstAngle) * st->firstSpeed;
         self[0x20] = 1;
         break;
     case 1:
         if (D_L00_001C9340 != st->level)
             break;
         if (st->firstStep > 0.0f)
-            UpdateWrappedAngleOffset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,
+            math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,
                           st->firstStep * 0.0002908882452175021f, -1.0f);
         if (st->secondStep > 0.0f) {
-            ScaleOwnerWordsByAngles(self, st->secondSpeed * 0.01745329424738884f, &st->secondAngle,
+            moby_scale_owner_words_by_angles(self, st->secondSpeed * 0.01745329424738884f, &st->secondAngle,
                           st->secondStep * 0.0002908882452175021f, &st->secondVelocity, 0.00581776537001133f);
             if (st->update)
                 euler_rotation_basis(self + 0xC0, self + 0xF0);
@@ -364,7 +364,7 @@ void func_L00_003EB0C0(char *self)
             euler_rotation_basis(rotation, angles);
             multiply_matrix3x3(self + 0xC0, self + 0xC0, rotation);
             if (st->secondStep > 0.0f)
-                GetEulerAnglesFromMatrix(self + 0xC0, self + 0xF0);
+                mat_get_euler_angles(self + 0xC0, self + 0xF0);
         } else {
             i = 0;
             do {
@@ -377,12 +377,12 @@ void func_L00_003EB0C0(char *self)
                 i++;
             } while (isLast != 1);
         }
-        UpdateAttachedObjectTransforms(self, st->entries);
+        moby_update_attached_transforms(self, st->entries);
         break;
     }
 }
 
-extern int func_002A8508(int, int);
+extern int moby_count_group_not_in_state(int, int);
 
 extern unsigned char *D_L00_001B1E9C __attribute__((sda));
 
@@ -396,13 +396,13 @@ extern int D_L00_001B0738[];
    list of each of the four ids names and arm D_L00_001B0720; wait again, clear those bits
    and arm D_L00_001B0738. */
 /* Switches a group of objects on and off in two steps, waiting for the level data each time. */
-void func_L00_003EB400(char *self)
+void object_group_toggle_update(char *self)
 {
     int i;
     char *state = *(char **)(self + 0x68);
 
     if (*(unsigned char *)(self + 0x20) == 0) {
-        if (IsPointInCuboid(gHeroPosition, *(int *)(state + 0x10)))
+        if (IsPointInCuboid(g_hero_position, *(int *)(state + 0x10)))
             *(unsigned char *)(self + 0x20) = 1;
     }
     if (*(unsigned char *)(self + 0x20) == 1) {
@@ -418,7 +418,7 @@ void func_L00_003EB400(char *self)
             groupId = *(int *)row;
             if (D_L00_001FA920[groupId] == 0)
                 continue;
-            if (CountMobysInGroupNotInState(groupId, -1) < 2)
+            if (moby_count_group_not_in_state(groupId, -1) < 2)
                 continue;
             records = D_L00_001B1E9C;
             idList = (unsigned short *)D_L00_001FA920[*(int *)(state + i * 4)];
@@ -431,7 +431,7 @@ void func_L00_003EB400(char *self)
         *(unsigned char *)(self + 0x20) = 2;
     }
     if (*(unsigned char *)(self + 0x20) == 2) {
-        if (IsPointInCuboid(gHeroPosition, *(int *)(state + 0x10)) == 0)
+        if (IsPointInCuboid(g_hero_position, *(int *)(state + 0x10)) == 0)
             *(unsigned char *)(self + 0x20) = 3;
     }
     if (*(unsigned char *)(self + 0x20) == 3) {
@@ -447,7 +447,7 @@ void func_L00_003EB400(char *self)
             groupId = *(int *)row;
             if (D_L00_001FA920[groupId] == 0)
                 continue;
-            if (CountMobysInGroupNotInState(groupId, -1) < 2)
+            if (moby_count_group_not_in_state(groupId, -1) < 2)
                 continue;
             records = D_L00_001B1E9C;
             idList = (unsigned short *)D_L00_001FA920[*(int *)(state + i * 4)];
@@ -471,12 +471,12 @@ void func_L00_003EB400(char *self)
 
 
 /* Clears the four Synthenoid slots. */
-void func_L00_003ECB00(void)
+void synthenoid_clear_slots(void)
 {
     int i;
 
     for (i = 3; i >= 0; i--)
-        gSynthenoidSlots[i] = 0;
+        g_synthenoid_slots[i] = 0;
 }
 
 typedef struct { char pad[0x2290]; char *tbl; } Rac2Native_003ECB38_ConstBlock;
@@ -486,7 +486,7 @@ typedef struct { char pad[0x2290]; char *tbl; } Rac2Native_003ECB38_ConstBlock;
    pi/2 - fn(angle / probe) and hands obj+0xF8, the third parameter and the
    three incoming floats to the renderer helper; original game role is unknown. */
 /* Works out the angle toward a target and turns a part of the object to it. */
-void func_L00_003ECB38(char *obj, void *rec, char *mob, float fa, float fb, float fc)
+void moby_aim_part_at_target(char *obj, void *rec, char *mob, float fa, float fb, float fc)
 {
     extern void func_2EE138(void *, void *, void *);
     extern float func_2EE1F8(char *, char *);
@@ -494,7 +494,7 @@ void func_L00_003ECB38(char *obj, void *rec, char *mob, float fa, float fb, floa
     extern float func_2EE238(char *);
     extern float func_2EE710(float);
     extern void func_31DE50(char *, float, char *, float, float, float, int);
-    extern Rac2Native_003ECB38_ConstBlock D_00189E20;
+    extern Rac2Native_003ECB38_ConstBlock g_hero_state;
 
     char delta[0x10];
     char upPart[0x10];
@@ -507,25 +507,25 @@ void func_L00_003ECB38(char *obj, void *rec, char *mob, float fa, float fb, floa
 
     func_2EE138(delta, rec, obj + 0x10);
 
-    upDot = func_2EE1F8(delta, gHeroState.tbl + 0xE0);
-    func_2EE178(upPart, gHeroState.tbl + 0xE0, upDot);
+    upDot = func_2EE1F8(delta, g_hero_state.tbl + 0xE0);
+    func_2EE178(upPart, g_hero_state.tbl + 0xE0, upDot);
     func_2EE138(delta, delta, upPart);
 
-    angle = func_2EE1F8(delta, gHeroState.tbl + 0xC0);
+    angle = func_2EE1F8(delta, g_hero_state.tbl + 0xC0);
     length = func_2EE238(delta);
     if (length == zero)
         return;
     angle = 1.57079637050628662f - func_2EE710(angle / length);
-    if (func_2EE1F8(delta, gHeroState.tbl + 0xD0) < zero)
+    if (func_2EE1F8(delta, g_hero_state.tbl + 0xD0) < zero)
         angle = -angle;
 
     func_31DE50(obj + 0xF8, angle, mob, fa, fb, fc, 0);
 }
 
-extern Rac2Native_003ECB38_ConstBlock D_00189E20;
+extern Rac2Native_003ECB38_ConstBlock g_hero_state;
 
 /* Tries to create a Kilonoid or Synthenoid at a place, and starts a fallback effect if it cannot. */
-void func_L00_003ECC90(char *spawnPos, int classId)
+void synthenoid_spawn_or_kilonoid(char *spawnPos, int classId)
 {
     int spawned = 0;
     int i;
@@ -537,17 +537,17 @@ void func_L00_003ECC90(char *spawnPos, int classId)
     cls = classId;
     do {
         if (cls == 0xB02 /* Kilonoid */) {
-            if (SpawnKilonoidMoby(gHeroState.tbl, pos) != 0)
+            if (kilonoid_spawn(g_hero_state.tbl, pos) != 0)
                 spawned = 1;
         } else {
-            if (SpawnCB2Moby(gHeroState.tbl, pos) != 0)
+            if (SpawnCB2Moby(g_hero_state.tbl, pos) != 0)
                 spawned = 1;
         }
     } while (++i < 4);
     if (spawned != 0)
         return;
     func_L00_0035F180((char *)(*(int *)(*(int *)(D_L00_001D9F00 + *(unsigned char *)(D_L00_001DA860 + cls) * 4) + 0x28) + 0xC0),
-                      0, 0, (char *)gHeroPosition, 0x400);
+                      0, 0, (char *)g_hero_position, 0x400);
 }
 
 
@@ -555,31 +555,31 @@ void func_L00_003ECC90(char *spawnPos, int classId)
 /* func_L00_003ED198 is defined in L00_003EA0E0-seeker.c. */
 
 
-extern void func_00282CF0(char *local, char *first, char *second);
+extern void FastVecSub(char *local, char *first, char *second);
 
-extern float func_00283248(float a, float b);
+extern float mat_fast_helper_a(float a, float b);
 
-extern void func_00282D30(char *dst, char *src, float scale);
+extern void FastVecScale(char *dst, char *src, float scale);
 
-extern float func_002A7878(float a, float b);
+extern float math_random_float_range(float a, float b);
 
-extern float func_002A78D8(float a, float b);
+extern float math_random_signed_float_range(float a, float b);
 
-extern int func_00283CF0(float f);
+extern int FloatToInt(float f);
 
-extern float func_00283CE0(int v);
+extern float IntToFloat(int v);
 
-extern float func_00283B98(float a, float b);
+extern float FastAddRotations(float a, float b);
 
-extern void func_002AF000(float *p, float a, float b, float c);
+extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 
-extern char *func_002BDCE8(char *p, float fa, float fb, float fc, float fd, int v, char *local,
+extern char *SpawnSpinningSparkParticle(char *p, float fa, float fb, float fc, float fd, int v, char *local,
                             unsigned int color, int flag);
 
-extern void func_002C16C0(float *out, float *dir, int a, int b, unsigned int color, int id,
+extern void part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
 
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
 extern char D_0018A0E0[];
 
@@ -589,7 +589,7 @@ extern char D_0018A0E0[];
    second particle along a random direction with a random magnitude; the original game role
    is unknown. */
 /* Throws out a burst of sparks and puffs from a point. */
-void func_L00_003EDB98(float *origin)
+void part_l00_spawn_impact_spark_burst(float *origin)
 {
     float toCamera[4];
     float direction[4];
@@ -604,17 +604,17 @@ void func_L00_003EDB98(float *origin)
     char *particle;
     char *extra;
 
-    FastVecSub((char *)toCamera, gCameraPosition_L00, (char *)origin);
-    ang = FastMatrixHelperA(toCamera[0], toCamera[1]);
+    FastVecSub((char *)toCamera, g_camera_l00_position, (char *)origin);
+    ang = mat_fast_helper_a(toCamera[0], toCamera[1]);
 
     for (i = 19; i >= 0; i--) {
-        randomValue = RandomFloatRange(0.2f, 3.0f);
+        randomValue = math_random_float_range(0.2f, 3.0f);
         FastVecScale((char *)direction, D_0018A0E0, -(randomValue * 0.01666666753590107f));
-        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        randomValue = RandomFloatRange(0.3f, 0.75f) * 210000.0f;
-        spawnPos[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.2f);
-        spawnPos[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.2f);
-        spawnPos[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.2f);
+        id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        randomValue = math_random_float_range(0.3f, 0.75f) * 210000.0f;
+        spawnPos[0] = origin[0] + math_random_signed_float_range(0.0f, 0.2f);
+        spawnPos[1] = origin[1] + math_random_signed_float_range(0.0f, 0.2f);
+        spawnPos[2] = origin[2] + math_random_signed_float_range(0.0f, 0.2f);
         particle = SpawnSpinningSparkParticle((char *)spawnPos, 0.0f, 1.0f, 1.01f, randomValue, id, (char *)direction, 0x7F202020, 1);
         if (particle != 0) {
             extra = particle + 32;
@@ -626,15 +626,15 @@ void func_L00_003EDB98(float *origin)
             *(unsigned char *)(extra + 0xA) = 0x30;
             *(unsigned char *)(extra + 0xB) = *(unsigned char *)(particle + 10);
         }
-        scale = RandomFloatRange(1.0f, 2.0f);
-        mag = RandomFloatRange(0.0f, 1.396263599395752f);
-        angle = FastAddRotations(ang, RandomSignedFloatRange(0.0f, 1.396263599395752f));
-        BuildSphericalOffset(direction, scale * 0.01666666753590107f, angle, mag);
-        spawnPos[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.1f);
-        spawnPos[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.1f);
-        spawnPos[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.1f);
-        SpawnBurstParticle_002C16C0(spawnPos, direction, 30, 127, 0x007F7F7F, id,
-                      RandomFloatRange(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
+        scale = math_random_float_range(1.0f, 2.0f);
+        mag = math_random_float_range(0.0f, 1.396263599395752f);
+        angle = FastAddRotations(ang, math_random_signed_float_range(0.0f, 1.396263599395752f));
+        vec_build_spherical_offset(direction, scale * 0.01666666753590107f, angle, mag);
+        spawnPos[0] = origin[0] + math_random_signed_float_range(0.0f, 0.1f);
+        spawnPos[1] = origin[1] + math_random_signed_float_range(0.0f, 0.1f);
+        spawnPos[2] = origin[2] + math_random_signed_float_range(0.0f, 0.1f);
+        part_spawn_burst(spawnPos, direction, 30, 127, 0x007F7F7F, id,
+                      math_random_float_range(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     }
 }
 
@@ -643,7 +643,7 @@ void func_L00_003EDB98(float *origin)
    random small amount on each axis and hand the result to the spawn helper with
    210000.0f, 500.0f, 1.0f, 0.0f and 1.0f; the original game role is unknown. */
 /* Throws out a burst of small sparks from a point. */
-void func_L00_003EDEE0(float *origin)
+void part_spawn_small_spark_burst(float *origin)
 {
     float toCamera[4];
     float direction[4];
@@ -656,21 +656,21 @@ void func_L00_003EDEE0(float *origin)
     int id;
     int i;
 
-    FastVecSub((char *)toCamera, gCameraPosition_L00, (char *)origin);
-    ang = FastMatrixHelperA(toCamera[0], toCamera[1]);
+    FastVecSub((char *)toCamera, g_camera_l00_position, (char *)origin);
+    ang = mat_fast_helper_a(toCamera[0], toCamera[1]);
 
     for (i = 19; i >= 0; i--) {
-        scale = RandomFloatRange(0.5f, 1.0f);
-        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        RandomFloatRange(0.05f, 0.2f);
+        scale = math_random_float_range(0.5f, 1.0f);
+        id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        math_random_float_range(0.05f, 0.2f);
         speed = 210000.0f;
-        mag = RandomFloatRange(0.0f, 1.396263599395752f);
-        angle = FastAddRotations(ang, RandomSignedFloatRange(0.0f, 1.396263599395752f));
-        BuildSphericalOffset(direction, scale * 0.01666666753590107f, angle, mag);
-        spawnPos[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.1f);
-        spawnPos[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.1f);
-        spawnPos[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.1f);
-        SpawnBurstParticle_002C16C0(spawnPos, direction, 30, 127, 0x007F7F7F, id,
-                      RandomFloatRange(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 1.0f);
+        mag = math_random_float_range(0.0f, 1.396263599395752f);
+        angle = FastAddRotations(ang, math_random_signed_float_range(0.0f, 1.396263599395752f));
+        vec_build_spherical_offset(direction, scale * 0.01666666753590107f, angle, mag);
+        spawnPos[0] = origin[0] + math_random_signed_float_range(0.0f, 0.1f);
+        spawnPos[1] = origin[1] + math_random_signed_float_range(0.0f, 0.1f);
+        spawnPos[2] = origin[2] + math_random_signed_float_range(0.0f, 0.1f);
+        part_spawn_burst(spawnPos, direction, 30, 127, 0x007F7F7F, id,
+                      math_random_float_range(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 1.0f);
     }
 }

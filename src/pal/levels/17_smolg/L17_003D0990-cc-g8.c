@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_PAL_L17_003D0990, the PAL copy of func_L17_003CC6A8: the same C, where the measured
    60.0f frame count becomes the 50 Hz (x * 300.0f + 2.0f) * 0.16666667f. */
 #include "common.h"
 
 /* This unit is built with -G8: every body here reaches a global through $gp. */
 
-extern int func_00283CF0(f32);
+extern int FloatToInt(f32);
 
-extern s32 func_L17_00340DD0(f32, s32, s32, s32);
+extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
 
 extern f32 D_L17_001B04B8 __attribute__((sda));
 
@@ -39,9 +40,9 @@ void func_PAL_L17_003D0990(s32 a0)
     packed |= p[1] << 8;
     packed |= p[0];
     f20 = *(f32 *)&p[4] * 210000.0f;
-    r = func_00283CF0((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
-    if (func_L17_00340DD0(f20, obj, packed, r) != 0)
-        *(u16 *)(obj + 0x96) = func_00283CF0((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
+    r = FloatToInt((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
+    if (part_l17_spawn_fading(f20, obj, packed, r) != 0)
+        *(u16 *)(obj + 0x96) = FloatToInt((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
     else
         *(u16 *)(obj + 0x96) = 1;
 }

@@ -17,30 +17,30 @@ extern volatile float D_L26_001B045C MACRO_ADDR;
 extern int D_L26_001B0468[2] __attribute__((sda));
 extern int D_L26_001B0470[2] __attribute__((sda));
 extern int D_L26_001B1748;
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(unsigned char *, int, int);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B0408(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_L26_00324DE8(unsigned char *, int);
-extern int func_00282948(int *);
-extern void func_L26_003D4930(unsigned char *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(unsigned char *, int, int);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void mat_align_to_dir(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void vec_scale_triangle_vertices(unsigned char *, int);
+extern int math_fast_float_d(int *);
+extern void trail_advance_samples(unsigned char *);
 
 /* Per-frame update for the moby of class 3072: it moves around a circle centred on a fixed point,
    turning to face along its path and switching between two animation modes now and then. It is
    hidden while the level is not active. */
-void func_L26_003D4590(unsigned char *object) {
+void orbiting_moby_update(unsigned char *object) {
     Vector position;
     union {
         float init_matrix[12];
@@ -84,38 +84,38 @@ void func_L26_003D4590(unsigned char *object) {
         FastVecCross(private + 0x60, private + 0x50, private + 0x70);
         vec_scale_to_length(private + 0x60, private + 0x60, radius);
         upper = D_L26_001B0464;
-        *(float *)(private + 0x188) = RandomSignedFloatRange(D_L26_001B0460, upper) * 0.00029088825f;
+        *(float *)(private + 0x188) = math_random_signed_float_range(D_L26_001B0460, upper) * 0.00029088825f;
         upper = D_L26_001B045C;
-        *(float *)(private + 0x180) = RandomFloatRange(D_L26_001B0458, upper) * 0.00029088825f;
-        *(float *)(private + 0x184) = RandomAngle();
-        SetMobyState(object, 1, -1);
+        *(float *)(private + 0x180) = math_random_float_range(D_L26_001B0458, upper) * 0.00029088825f;
+        *(float *)(private + 0x184) = math_random_angle();
+        moby_set_state(object, 1, -1);
         break;
     case 1:
         *(float *)(private + 0x184) = FastAddRotations(*(float *)(private + 0x184), *(float *)(private + 0x180));
-        position.f[0] = FastSinOrCosA(*(float *)(private + 0x184));
-        position.f[1] = FastSinOrCosB(*(float *)(private + 0x184));
+        position.f[0] = math_fast_sin_or_cos_a(*(float *)(private + 0x184));
+        position.f[1] = math_fast_sin_or_cos_b(*(float *)(private + 0x184));
         position.f[2] = 0.0f;
         matrix_mul_vec3(object + 0x10, &position, private + 0x50);
         FastVecAdd(object + 0x10, object + 0x10, &D_L26_001B1890);
         angle = FastAddRotations(*(float *)(private + 0x184), 1.5707965f);
-        workspace.motion.tangent.f[0] = FastSinOrCosA(angle);
-        workspace.motion.tangent.f[1] = FastSinOrCosB(angle);
+        workspace.motion.tangent.f[0] = math_fast_sin_or_cos_a(angle);
+        workspace.motion.tangent.f[1] = math_fast_sin_or_cos_b(angle);
         workspace.motion.tangent.f[2] = 0.0f;
         matrix_mul_vec3(&workspace.motion.tangent, &workspace.motion.tangent, private + 0x50);
-        AlignRotationToDirection(object + 0xC0, &workspace.motion.tangent, 0);
+        mat_align_to_dir(object + 0xC0, &workspace.motion.tangent, 0);
         workspace.motion.rotation_seed.q = 0;
         workspace.motion.rotation_seed.f[2] = *(float *)(private + 0x188);
         workspace.motion.rotation.q = workspace.motion.rotation_seed.q;
         euler_rotation_basis(matrix, &workspace.motion.rotation);
         multiply_matrix3x3(object + 0xC0, object + 0xC0, matrix);
-        if ((D_L26_001B1748 & 0xFF) == 0) ScaleTriangleVertices(object + 0xC0, 0);
-        if (FastFloatHelperD((int *)(private + 0x18C))) {
+        if ((D_L26_001B1748 & 0xFF) == 0) vec_scale_triangle_vertices(object + 0xC0, 0);
+        if (math_fast_float_d((int *)(private + 0x18C))) {
             selection = (object[0xBC] + 1) & 1;
             object[0xBC] = selection;
             *(int *)(object + 0x78) = D_L26_001B0468[object[0xBC]];
             *(int *)(private + 0x18C) = D_L26_001B0470[object[0xBC]];
         }
-        AdvanceTrailSamples(object);
+        trail_advance_samples(object);
         break;
     }
 }

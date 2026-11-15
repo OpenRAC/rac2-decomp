@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
 typedef float f32;
-extern void func_00348068(unsigned char *owner, float *records);
-extern u8 D_001A7AF8[] __attribute__((section(".sdata")));
+extern void menu_set_entry_table(unsigned char *owner, float *records);
+extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
 extern u8 D_001A7A80[] __attribute__((section(".sdata")));
 
 /* func_00347F80 is built from 00345358-wrap.c. */

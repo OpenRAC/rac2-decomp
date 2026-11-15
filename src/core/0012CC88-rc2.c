@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -26,28 +27,28 @@
 
 struct T44 { s32 f[11]; };
 extern s8 D_0013BBC8[];
-extern s32 func_0012C680(s64,s32);
-extern void func_0012C788(s64,s32);
-extern u32 func_0012C878(s64,s32);
+extern s32 mpeg_peek_bits(s64,s32);
+extern void mpeg_skip_bits(s64,s32);
+extern u32 mpeg_read_bits(s64,s32);
  
-extern void func_0012C9C8(s64);
+extern void mpeg_skip_to_start_code(s64);
 /* Reads the extension and user data blocks that follow a header, running a handler for each extension type. */
-void func_0012CC88(s64 decoderAddr) {
+void mpeg_read_extension_data(s64 decoderAddr) {
     struct T44 tab;
     s32 startCode;
     u32 idx;
     tab=*(struct T44 *)D_0013BBC8;
-    SkipToMpegStartCode(decoderAddr);
-    while ((startCode=PeekMpegBits(decoderAddr,0x20))==0x1B5 || startCode==0x1B2) {
+    mpeg_skip_to_start_code(decoderAddr);
+    while ((startCode=mpeg_peek_bits(decoderAddr,0x20))==0x1B5 || startCode==0x1B2) {
         if (startCode==0x1B5) {
-            SkipMpegBits(decoderAddr,0x20);
-            idx=ReadMpegBits(decoderAddr,4);
+            mpeg_skip_bits(decoderAddr,0x20);
+            idx=mpeg_read_bits(decoderAddr,4);
             idx=(idx>10)?0:idx;
             ((void (*)(s64))tab.f[idx])(decoderAddr);
-            SkipToMpegStartCode(decoderAddr);
+            mpeg_skip_to_start_code(decoderAddr);
         } else {
-            SkipMpegBits(decoderAddr,0x20);
-            SkipToMpegStartCode(decoderAddr);
+            mpeg_skip_bits(decoderAddr,0x20);
+            mpeg_skip_to_start_code(decoderAddr);
         }
     }
 }

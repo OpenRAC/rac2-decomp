@@ -21,16 +21,16 @@ typedef struct {
 } ParticleConfig;
 
 extern const ParticleConfig D_L01_002A4E78;
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern int func_001163B0(void);
-extern int func_00283CF0(float);
-extern u8 *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern int FloatToInt(float);
+extern u8 *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 typedef struct {
     u8 pad[0x10];
@@ -53,22 +53,22 @@ void func_PAL_L01_003DCCC8(ParticleOwner *a0)
 
     count = D_L01_002A4E78.count;
     for (i = 0; i < count; i++) {
-        trig = func_00283180(func_002A7878(-3.1415927f, 3.1415927f));
-        trig *= func_002A7878(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f));
+        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
         pos[0] = trig;
-        trig = func_00283198(func_002A7878(-3.1415927f, 3.1415927f));
-        trig *= func_002A7878(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f));
+        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
         pos[1] = trig;
         pos[2] = 0;
-        func_00283098(pos, pos, owner->rotation);
-        radialSpeed = func_00282DF0(pos);
+        matrix_mul_vec3(pos, pos, owner->rotation);
+        radialSpeed = FastVecLength(pos);
         w = D_L01_002A4E78.outer;
         radialSpeed = D_L01_002A4E78.radialSpeed * ((w - radialSpeed) * 0.020000001f) / w;
-        func_00282F20(vel, pos, func_002A7878(radialSpeed / D_L01_002A4E78.radialDiv, radialSpeed));
+        vec_scale_to_length(vel, pos, math_random_float_range(radialSpeed / D_L01_002A4E78.radialDiv, radialSpeed));
         verticalSpeed = D_L01_002A4E78.verticalSpeed;
-        vel[2] += func_002A7878(verticalSpeed / D_L01_002A4E78.verticalDiv, verticalSpeed) * 0.020000001f;
+        vel[2] += math_random_float_range(verticalSpeed / D_L01_002A4E78.verticalDiv, verticalSpeed) * 0.020000001f;
         qzero(acc);
-        func_00282CC0(pos, pos, owner->position);
+        FastVecAdd(pos, pos, owner->position);
         pos[2] += D_L01_002A4E78.height;
         vel[3] = D_L01_002A4E78.velW;
         acc[3] = D_L01_002A4E78.accW;
@@ -77,10 +77,10 @@ void func_PAL_L01_003DCCC8(ParticleOwner *a0)
             color = D_L01_002A4E78.altColor;
             color2 = D_L01_002A4E78.altColor2;
         }
-        x = func_00283CF0((func_002A7878(D_L01_002A4E78.x[0], D_L01_002A4E78.x[1]) * 5.0f + 2.0f) * 0.16666667f);
-        y = func_00283CF0((func_002A7878(D_L01_002A4E78.y[0], D_L01_002A4E78.y[1]) * 5.0f + 2.0f) * 0.16666667f);
-        z = func_00283CF0((func_002A7878(D_L01_002A4E78.z[0], D_L01_002A4E78.z[1]) * 5.0f + 2.0f) * 0.16666667f);
-        r = func_002BAA28(pos, vel, acc, color, color2, x, y, z, -1);
+        x = FloatToInt((math_random_float_range(D_L01_002A4E78.x[0], D_L01_002A4E78.x[1]) * 5.0f + 2.0f) * 0.16666667f);
+        y = FloatToInt((math_random_float_range(D_L01_002A4E78.y[0], D_L01_002A4E78.y[1]) * 5.0f + 2.0f) * 0.16666667f);
+        z = FloatToInt((math_random_float_range(D_L01_002A4E78.z[0], D_L01_002A4E78.z[1]) * 5.0f + 2.0f) * 0.16666667f);
+        r = part_spawn_trail(pos, vel, acc, color, color2, x, y, z, -1);
         if (r && flag)
             r[3] = 0x48;
     }

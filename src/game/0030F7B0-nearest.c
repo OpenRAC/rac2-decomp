@@ -29,19 +29,19 @@ typedef struct {
 
 extern Moby *D_001B1B68 __attribute__((sda));   /* the first moby of the moby list */
 extern float D_001AF54C;                        /* the search range */
-extern char D_001B5340[];                       /* the camera position */
-extern Collision D_001BAF80;
-extern Hero D_00189E20;
+extern char g_camera_eye_state[];                       /* the camera position */
+extern Collision g_collision_hit;
+extern Hero g_hero_state;
 
-extern int func_00283DB8(void *sphere, float);
-extern int func_002761F8(void *start, void *end, int, void *moby, int);
-extern float func_00282E80(void *a, void *b);
-extern float func_00282E48(void *a, void *b);
+extern int math_fast_helper_a(void *sphere, float);
+extern int CollLine(void *start, void *end, int, void *moby, int);
+extern float vec_distance_xy(void *a, void *b);
+extern float fast_vec_dist(void *a, void *b);
 
 /* Returns the moby of class 0xCB5 or 0x12EA nearest the hero, not in state 2, that the camera
  * can see: func_00283DB8 passes and the line from the camera hits nothing, or only the hero
  * or a 0xCB5 moby (or ends within 1.0 of a 0x12EA moby). */
-Moby *func_00315C78(Moby *self)
+Moby *FindNearestEligibleTarget(Moby *self)
 {
     Moby *best = 0;
     Moby *moby = D_001B1B68;
@@ -55,19 +55,19 @@ Moby *func_00315C78(Moby *self)
 
             qcopy(sphere, moby->position);
             sphere[3] = 0.5f;
-            if (FastMathHelperA(sphere, *(float *)(moby->vars + 8)) != -1) {
+            if (math_fast_helper_a(sphere, *(float *)(moby->vars + 8)) != -1) {
                 accept = 1;
-                if (CollLine(gCameraState_001B5340, moby->position, 6, moby, 0)) {
-                    Moby *hit = gCollisionHit.moby;
+                if (CollLine(g_camera_eye_state, moby->position, 6, moby, 0)) {
+                    Moby *hit = g_collision_hit.moby;
 
-                    if (hit == 0 || (hit->oClass != 0xCB5 && gHeroState.moby != hit))
+                    if (hit == 0 || (hit->oClass != 0xCB5 && g_hero_state.moby != hit))
                         accept = 0;
                     if (moby->oClass == 0x12EA &&
-                        vec_distance_xy(gCollisionHit.point, moby->position) < 1.0f)
+                        vec_distance_xy(g_collision_hit.point, moby->position) < 1.0f)
                         accept = 1;
                 }
                 if (accept) {
-                    float distance = fast_vec_dist(moby->position, gHeroState.moby->position);
+                    float distance = fast_vec_dist(moby->position, g_hero_state.moby->position);
 
                     if (distance < nearest) {
                         nearest = distance;

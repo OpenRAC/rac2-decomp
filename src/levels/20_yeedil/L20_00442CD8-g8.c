@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L20_001B20CC __attribute__((sda));
 /* The five-entry state table is reached through $gp. */
@@ -6,7 +7,7 @@ extern int D_L20_001B20D8[5] __attribute__((sda));
 extern int func_0032F680(int);
 
 /* Picks which attack the enemy does next. It avoids repeating the same attack until all of them have been used. */
-void func_L20_00442CD8(char *moby) {
+void yeedil_boss_choose_attack(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     int mask, i, startIndex, forcedChoice;
 

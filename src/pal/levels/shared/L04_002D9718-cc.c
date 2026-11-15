@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L04_002D9718, the PAL copy of func_L04_002D9780: the same C, where lit 0.024f becomes 0.0288f. */
 
 /* SPDX-License-Identifier: MIT
@@ -25,7 +26,7 @@
  */
 #include "common.h"
 
-extern s8 D_00189E20[];
+extern s8 g_hero_state[];
 extern s8 D_0018A070[];
 extern f32 ref_L04_002D9780_00(void *, void *, void *, s32);
 extern void ref_L04_002D9780_01(void *, f32, f32);
@@ -42,7 +43,7 @@ void func_PAL_L04_002D9718(void) {
     s8 *bb;
     f32 r;
 
-    b = D_00189E20;
+    b = g_hero_state;
     if ((*(u8 *)((char *)(b) + (0x22B4))) == 0) {
         (*(f32 *)((char *)(b) + (0x258))) = 0.8f;
         (*(f32 *)((char *)(b) + (0x25C))) = 0.7f;
@@ -50,7 +51,7 @@ void func_PAL_L04_002D9718(void) {
     }
     a3 = (*(s32 *)((char *)(b) + (0x229C)));
     if (a3 == 4) {
-        c = D_00189E20;
+        c = g_hero_state;
         if ((*(s16 *)((char *)(c) + (0x4AC))) < (*(s32 *)((char *)(c) + (0x1B8))) && (*(u8 *)((char *)(c) + (0x49E))) == 0) {
             (*(f32 *)((char *)(c) + (0x25C))) = (*(f32 *)((char *)(c) + (0x4B8)));
         }
@@ -68,14 +69,14 @@ void func_PAL_L04_002D9718(void) {
                 (*(f32 *)((char *)(b) + (0x258))) = 0.8f;
                 (*(f32 *)((char *)(b) + (0x25C))) = 0.9f;
             } else {
-                b = D_00189E20;
+                b = g_hero_state;
                 if ((*(s32 *)((char *)(b) + (0x2294))) == 0x7C) {
                     (*(f32 *)((char *)(b) + (0x260))) = 0.8f;
                 }
             }
         }
     }
-    p = D_00189E20;
+    p = g_hero_state;
     if ((*(u8 *)((char *)(p) + (0x287))) == 0 || (*(s32 *)((char *)(p) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(p) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(p) + (0x22B4))) == 0 && (*(f32 *)((char *)(p) + (0x254))) < 0.53f) || (*(s32 *)((char *)(p) + (0x229C))) == 0x11 || (*(u8 *)((char *)(p) + (0x1494))) != 0 || ((r = ref_L04_002D9780_00(p + 0x240, p + 0x80, b, a3)), ((*(f32 *)((char *)(p) + (0x264))) * 0.5f) < r)) {
         d = D_0018A070;
         bb = d - 0x250;

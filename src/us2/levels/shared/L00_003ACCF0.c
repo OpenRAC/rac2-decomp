@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_US2_L00_003ACCF0, the USA v2.00 copy of func_L00_003AB8B8: the same C, where the last call
  * becomes func_US2_L00_003AB8F8 and gains a fifth argument, 5. */
@@ -20,11 +21,11 @@ typedef struct {
 } Res_189E20;
 
 extern unsigned char D_00139580[];
-extern AngleRecord_262570 D_L00_00262570[];
-extern Res_189E20 D_00189E20;
+extern AngleRecord_262570 g_weapon_l00_table[];
+extern Res_189E20 g_hero_state;
 extern char D_L00_001B8FF0[];
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_0032A1A8(void *, void *, void *, int, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void vec_compute_object_to_target(void *, void *, void *, int, float);
 extern void func_US2_L00_003AB8F8(void *, void *, void *, void *, int);
 
 void func_US2_L00_003ACCF0(char *a0, char *a1) {
@@ -34,19 +35,19 @@ void func_US2_L00_003ACCF0(char *a0, char *a1) {
     Res_189E20 *g;
     void *p;
 
-    e = &D_L00_00262570[D_00139580[0]];
+    e = &g_weapon_l00_table[D_00139580[0]];
     angle = e->angle * 0.01666666753590107f;
-    if (D_00189E20.i2294 == 0x1D) {
-        func_00282F20(buf, D_L00_001B8FF0, angle);
-    } else if (D_00189E20.h24EC == 1) {
-        func_00282F20(buf, a1 + 0xD0, -angle);
+    if (g_hero_state.i2294 == 0x1D) {
+        vec_scale_to_length(buf, D_L00_001B8FF0, angle);
+    } else if (g_hero_state.h24EC == 1) {
+        vec_scale_to_length(buf, a1 + 0xD0, -angle);
     } else {
-        func_00282F20(buf, (char *)&D_00189E20 + 0x760, angle);
+        vec_scale_to_length(buf, (char *)&g_hero_state + 0x760, angle);
     }
-    g = &D_00189E20;
+    g = &g_hero_state;
     p = 0;
     if (g->pBF8 != 0) {
-        func_L00_0032A1A8(g->pBF8, a0, buf, 0, angle);
+        vec_compute_object_to_target(g->pBF8, a0, buf, 0, angle);
         p = g->pBF8;
     }
     func_US2_L00_003AB8F8(a0, buf, a1, p, 5);

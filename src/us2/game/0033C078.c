@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef float f32;
@@ -14,9 +15,9 @@ void func_US2_0033C078(u8 *a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6) {
 
 void func_US2_0033C098(int object, unsigned int a1, unsigned int a2, unsigned int a3)
 {
-    func_00336A38(object + 0x198, a1);
-    func_00336A38(object + 0x248, a2);
-    func_00336A38(object + 0x1F0, a3);
+    hud_set_widget_field_b(object + 0x198, a1);
+    hud_set_widget_field_b(object + 0x248, a2);
+    hud_set_widget_field_b(object + 0x1F0, a3);
 }
 
 /* Measured target: byte-identical across all 27 levels. */

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad0[0x160]; float velocity[4];
@@ -22,57 +23,57 @@ typedef struct {
     unsigned char pad17[0x24B8 - 0x24A4]; float timer;
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 extern unsigned int D_00138320[];
 extern int ref_L00_002CA898_00(int, int);
-extern void func_L00_002B39F0(int, float);
+extern void hero_resolve_stick_direction(int, float);
 extern void func_PAL_L00_002D2668(int, int, float);
-extern void func_L00_002D2470(int, int);
+extern void hero_select_anim_frame(int, int);
 extern int ref_L00_002CA898_01(int);
-extern void func_002AC9F8(void *, float);
+extern void vec_clamp_length(void *, float);
 extern int D_L00_001A7DDC __attribute__((sda));
 
 void func_PAL_L00_002CAC40(void)
 {
-    D_00189E20.reset_24a0 = 0;
-    if (D_00189E20.flag_1492 != 0 && 0.010000001f < D_00189E20.elapsed_174) {
+    g_hero_state.reset_24a0 = 0;
+    if (g_hero_state.flag_1492 != 0 && 0.010000001f < g_hero_state.elapsed_174) {
         ref_L00_002CA898_00(0x2E, 1);
         return;
     }
-    func_L00_002B39F0(0, 1.0f);
+    hero_resolve_stick_direction(0, 1.0f);
     if (D_00138320[0] & 8) {
         ref_L00_002CA898_00(4, 0);
         func_PAL_L00_002D2668(0xD, 2, -2.0f);
-        func_L00_002D2470(3, 0x12);
+        hero_select_anim_frame(3, 0x12);
         return;
     }
-    if (0.3f < D_00189E20.timer && D_00189E20.flag_1e0 == 0) {
-        if (D_00189E20.flag_1492 != 0 || D_00189E20.flag_22b9 != 0) {
+    if (0.3f < g_hero_state.timer && g_hero_state.flag_1e0 == 0) {
+        if (g_hero_state.flag_1492 != 0 || g_hero_state.flag_22b9 != 0) {
             ref_L00_002CA898_00(2, 1);
         } else {
             int amount;
             if (!ref_L00_002CA898_00(2, 0)) return;
             amount = 7;
-            if (D_00189E20.level_49c > 4) amount = 12;
-            D_00189E20.frame = 1;
+            if (g_hero_state.level_49c > 4) amount = 12;
+            g_hero_state.frame = 1;
             func_PAL_L00_002D2668(4, D_L00_001A7DDC, (float)amount);
-            D_00189E20.flag_40e = 1;
+            g_hero_state.flag_40e = 1;
         }
         return;
     }
-    if ((0.060000002f < D_00189E20.speed_178 && D_00189E20.level_49c > 2) ||
-        D_00189E20.mode == 0x10) {
+    if ((0.060000002f < g_hero_state.speed_178 && g_hero_state.level_49c > 2) ||
+        g_hero_state.mode == 0x10) {
         if (ref_L00_002CA898_00(3, 0)) {
             func_PAL_L00_002D2668(5, 0, -1.0f);
-            func_002AC9F8(D_00189E20.velocity, 0.10000001f);
+            vec_clamp_length(g_hero_state.velocity, 0.10000001f);
         }
         return;
     }
-    if (D_00189E20.level_49c < 11 && (D_00189E20.flags_c28 & 2) == 0) return;
+    if (g_hero_state.level_49c < 11 && (g_hero_state.flags_c28 & 2) == 0) return;
     if (!ref_L00_002CA898_00(0, 0)) return;
     if (ref_L00_002CA898_01(0) == 0x51) {
         func_PAL_L00_002D2668(ref_L00_002CA898_01(0), 0, 12.0f);
-    } else if (D_00189E20.flags_c28 & 2) {
+    } else if (g_hero_state.flags_c28 & 2) {
         func_PAL_L00_002D2668(ref_L00_002CA898_01(0), 0, -2.0f);
     }
 }

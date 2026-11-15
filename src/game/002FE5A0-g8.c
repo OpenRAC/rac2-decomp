@@ -3,22 +3,22 @@ extern int D_0018C0B4 NOT_SDA;
 extern int ref_L00_002FE5A0_00[] __attribute__((sda));
 typedef struct { char pad[0x1C]; int count; float point[4]; char rest[0x20]; } CollisionE5;
 extern CollisionE5 ref_L00_002FE5A0_01;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern float *ref_L00_002FE5A0_02;
 extern float ref_L00_002FE5A0_03[];
-extern int func_002FED90(void *, void *, float, float, float);
-extern void func_002FEE70(int, float *, int);
-extern void func_002FE880(void *, float *, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern int func_00282948(int *);
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00282D30(float *, float *, float);
-extern void func_00282F20(float *, float *, float);
-extern void func_002FEE50(int);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
+extern void part_steer_effect_direction(int, float *, int);
+extern void vec_add_object_direction_scaled(void *, float *, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern int math_fast_float_d(int *);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern void FastVecScale(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
+extern void table_clear_entry_flag(int);
 /* Flies a small test effect from the start point along the motion direction until it hits something, then reports the hit spot, surface direction and what was hit. */
-int func_002FE5A0(float *start, float *motion, float *destination, float *normal,
+int coll_trace_projectile_to_impact(float *start, float *motion, float *destination, float *normal,
                  void *owner, int *object_out, int *type_out, float scale)
 {
     float current[4] __attribute__((aligned(16)));
@@ -31,25 +31,25 @@ int func_002FE5A0(float *start, float *motion, float *destination, float *normal
     int slot, i, type;
     if (D_0018C0B4 == 111 || ref_L00_002FE5A0_00[0]) return 0;
     qcopy(effect.last, start);
-    slot = AllocEffectSlot_002FED90(&effect, 0, 1.0f, 1.0f, 1.0f);
+    slot = part_alloc_effect_slot(&effect, 0, 1.0f, 1.0f, 1.0f);
     qcopy(previous, start);
     qcopy(current, start);
     qcopy(step, motion);
     count = 300;
-    while (!FastFloatHelperD(&count)) {
+    while (!math_fast_float_d(&count)) {
         qcopy(previous, current);
         for (i = 9; i >= 0; i--) {
-            SteerEffectDirection(slot, step, 0);
+            part_steer_effect_direction(slot, step, 0);
             FastVecAdd(current, current, step);
             qcopy(effect.last, current);
-            AddObjectDirectionScaled(current, step, scale);
+            vec_add_object_direction_scaled(current, step, scale);
         }
         if (CollLine(previous, current, 18, owner, 0)) {
             type = GetCollHitMaterial();
             if (ref_L00_002FE5A0_01.count > 0 || type != -1) {
                 if (type_out) *type_out = type;
                 qcopy(destination, ref_L00_002FE5A0_01.point);
-                if (gCurrentMapIndex == 1 && type == 3 && ref_L00_002FE5A0_02) {
+                if (g_current_map_index == 1 && type == 3 && ref_L00_002FE5A0_02) {
                     destination[2] = *ref_L00_002FE5A0_02;
                     qcopy(adjustment, step);
                     adjustment[2] = 0;
@@ -69,6 +69,6 @@ int func_002FE5A0(float *start, float *motion, float *destination, float *normal
         FastVecScale(previous, previous, 0.94f);
         FastVecAdd(destination, previous, ref_L00_002FE5A0_03);
     }
-    ClearEntryFlag(slot);
+    table_clear_entry_flag(slot);
     return result;
 }

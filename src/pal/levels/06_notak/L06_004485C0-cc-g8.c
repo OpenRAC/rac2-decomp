@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_PAL_L06_004485C0, the PAL copy of func_L06_00443A38: the same C, where rename func_002A7470 becomes func_PAL_002A7E68; rename func_002B0ED8 becomes func_PAL_002B1A50; rename func_L06_00443F30 becomes func_PAL_L06_00448AB8; rename func_002A6C58 becomes func_PAL_002A7650; rename func_002AC728 becomes func_PAL_002AD288. */
 #include "common.h"
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern int func_PAL_002B1A50(char *, char *, int);
 typedef struct {
     char pad00[0x1830]; unsigned char *player;
     char pad1834[0xA60]; int mode;
 } ControllerGlobals;
-extern ControllerGlobals D_00189E20;
+extern ControllerGlobals g_hero_state;
 extern char D_L06_00188660[], D_L06_001B9840[];
 extern int D_L06_001B1858[] SDATA(D_L06_001B1858);
 extern int D_L06_001B187C SDATA(D_L06_001B187C);
@@ -18,19 +19,19 @@ extern char *D_L06_001B2480;
 extern float D_L06_001B1090 __attribute__((sda));
 extern char D_L06_002E20C8[];
 extern char D_L06_002E2128[];
-extern void func_0026FEB8(const char *, ...);
-extern void func_00282A28(void);
-extern int func_00283CF0(float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_L06_00443E88(u8 *);
+extern void STUB_printf(const char *, ...);
+extern void math_trap_always(void);
+extern int FloatToInt(float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void actor_alert_group_and_markers(u8 *);
 extern void func_PAL_L06_00448AB8(char *);
 extern void func_PAL_002A7650(void *, int, int);
 extern void func_PAL_002AD288(void *, void *, int, float, float);
-extern void func_0029F338(void *);
-extern s32 func_002B3BA8(void *, s32, float, float, s32, s32);
+extern void moby_mark_spawned(void *);
+extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 
 /* A Notak enemy's update (spawn-time setup, then the shared distance, target and ground
    checks). The fields are indexed through typed pointers so their MEMs are in-struct: the
@@ -50,15 +51,15 @@ void func_PAL_L06_004485C0(u8 *m)
         char *rec;
 
         if (D_L06_001B2838 < m[0x21]) {
-            func_0026FEB8(D_L06_002E20C8);
-            func_0026FEB8(D_L06_002E2128);
-            func_00282A28();
+            STUB_printf(D_L06_002E20C8);
+            STUB_printf(D_L06_002E2128);
+            math_trap_always();
         }
         m[0x30] = 0x40;
         qcopy(v + 0x2E0, m + 0x10);
         F(0x324) = 1.0f;
-        B(0x48) = func_00283CF0(15.0f);
-        B(0x4A) = func_00283CF0(4.8f);
+        B(0x48) = FloatToInt(15.0f);
+        B(0x4A) = FloatToInt(4.8f);
         H(0x88) = 0;
         B(0x60) = 8;
         I(0x98) = 3;
@@ -75,7 +76,7 @@ void func_PAL_L06_004485C0(u8 *m)
         I(0x138) |= 0x80;
         F(0x110) = 1.57079649f;
         F(0x130) = 0.52359885f;
-        F(0x1DC) = func_002A78D8(18.0f, 22.0f) * 0.0174532942f;
+        F(0x1DC) = math_random_signed_float_range(18.0f, 22.0f) * 0.0174532942f;
         B(0x1E8) = 7;
         B(0x1E9) = 6;
         H(0x1E2) = 100;
@@ -85,35 +86,35 @@ void func_PAL_L06_004485C0(u8 *m)
         rec = D_L06_001B2480 + I(0x210) * 0x30;
         if (*(short *)(rec + 0x30) != 0)
             I(0x13C) = **(int **)(rec + 0x3C);
-        F(0x328) = func_002A7940();
+        F(0x328) = math_random_angle();
         if (I(0x214) != 0) {
             *(int *)(m + 0x98) = 0;
             *(unsigned short *)(m + 0x34) = (*(unsigned short *)(m + 0x34) | 0x41) & 0xEFFF;
-            func_002A7750((char *)m, 9, 4);
+            moby_set_state((char *)m, 9, 4);
             if (m[0x43] != 10)
                 func_PAL_002A7E68((char *)m, 10, 0, 0);
         } else {
-            func_002A7750((char *)m, 1, 0);
+            moby_set_state((char *)m, 1, 0);
             if (m[0x43] != 0)
                 func_PAL_002A7E68((char *)m, 0, 0, 0);
         }
     }
-    if (m[0x31] != 0 && func_00282E48(m + 0x10, D_L06_001B9840) < 24.0f) {
-        func_002A93B0(m);
+    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, D_L06_001B9840) < 24.0f) {
+        moby_update_ground_check(m);
         m[0x6F] = 0x16;
     }
     hit = func_PAL_002B1A50((char *)m, (char *)(v + 0x50), 0);
     if (hit != 0) {
-        func_L06_00443E88(m);
+        actor_alert_group_and_markers(m);
         if (hit >= 4)
             func_PAL_L06_00448AB8((char *)m);
     }
     if (*(float *)(m + 0x18) < 48.0f) {
         func_PAL_002A7650(m, 0, 3);
         func_PAL_002AD288(m, m + 0x10, -1, 1.0f, 13.0f);
-        func_0029F338(m);
+        moby_mark_spawned(m);
     } else if (m[0x95] != 3 && m[0x95] != 4) {
-        H(0x314) = func_002B3BA8(m, I(0x210), 16.0f, 0.0f, 0, 0);
+        H(0x314) = weapon_select_aim_target(m, I(0x210), 16.0f, 0.0f, 0, 0);
     }
 }
 
@@ -122,7 +123,7 @@ void func_PAL_L06_004485C0(u8 *m)
 #undef I
 #undef F
 
-void func_L06_00443E88(u8 *arg0);
+void actor_alert_group_and_markers(u8 *arg0);
 
 /* The id-list walks below read D_L06_001B281C as a bare symbol (a second name for the 4-byte
    `sda` pointer above, declared as a 12-byte array so the assembler keeps its loads absolute),
@@ -160,7 +161,7 @@ typedef struct {
     int b;
 } L06ColorPair;
 
-extern void func_L06_00444300(L06Obj *);
+extern void marker_draw_group(L06Obj *);
 extern L06ColorPair D_L06_001B1098[];
 /* Advances the owner's pulse (the angle, then the blend it gives), tints the owner with the
    colour pair and, when its stamp is not the current one, refreshes every live class-0xDB0
@@ -172,7 +173,7 @@ extern L06ColorPair D_L06_001B1098[];
 /* For every live class-0xDB0 entity in the owner's group, builds the marker's vector from the
    entity's size and stored position and hands it to func_L00_00325AE8 with the colour pair
    blended by the entity's pulse. */
-void func_L06_00444300(L06Obj *self);
+void marker_draw_group(L06Obj *self);
 
 /* The level's three turn angles, in degrees (37, 41 and 70); the step below turns them into
    radians per frame. The first one is read through $gp, the other two absolutely. */

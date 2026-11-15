@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002CC528: stores &D_001AB628 at object+0x34 when D_001A7318 is nonzero,
  * otherwise &D_001AB658, and returns 0. Retail reaches it through data pointers.
  *
@@ -14,7 +15,7 @@ extern int D_001A7318 __attribute__((nosda));
 extern char D_001AB658 __attribute__((sda));
 extern char D_001AB628 __attribute__((sda));
 
-int func_002CC528(void *object)
+int menu_select_object_data_pointer(void *object)
 {
     void *selected = &D_001AB658;
     if (D_001A7318)

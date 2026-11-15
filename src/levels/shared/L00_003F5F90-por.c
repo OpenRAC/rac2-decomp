@@ -32,16 +32,16 @@ typedef struct {
 extern int D_0018C0B4 __attribute__((nosda));
 extern int D_L00_001A8FF0 MACRO_ADDR;
 extern short D_L00_001B0998 __attribute__((sda));
-extern char *func_L00_0032A088(int, int);
-extern int *func_L00_0032A0B8(int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern char *level_get_slot_body(int, int);
+extern int *level_get_slot_header(int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Writes a fresh trail record for a bolt, with its position, side directions and fade timer,
    so its trail starts here. */
-void func_L00_003F5F90(Actor *self)
+void vaporizer_bolt_start_trail_sample(Actor *self)
 {
     Slot *slots;
     Source *source;
@@ -50,13 +50,13 @@ void func_L00_003F5F90(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = GetSlotBody(0xC04 /* Vaporizer */, source->id);
-    slots = (Slot *)(base + *GetSlotHeader(0xC04 /* Vaporizer */, source->id));
+    base = level_get_slot_body(0xC04 /* Vaporizer */, source->id);
+    slots = (Slot *)(base + *level_get_slot_header(0xC04 /* Vaporizer */, source->id));
     vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) ComputeViewDirection(&self->pos, &dir, 1);
+    if (D_L00_001A8FF0) cam_compute_view_direction(&self->pos, &dir, 1);
     FastVecCross(&tmp, &m, &dir);
     vec_scale_to_length(&tmp, &tmp, 1.0f);
     FastVecCross(&slots[source->index].d, &tmp, &m);

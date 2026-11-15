@@ -2,19 +2,19 @@
 #include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_002AB6D8(void *, void *);
-extern void func_002A6C58(void *, int, int);
-extern void func_002E5CF8(int, int, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AC728(void *, void *, int, float, float);
-extern char D_00189EA0[];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AFEB8(void *, void *, void *, int, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002A77E0(int);
-extern void func_002B0A68(void *, int, void *, int, float, float, float, float);
-extern void func_0029F338(void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void SetDeathBits(void *, int, int);
+extern void PlayMobySound(int, int, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
+extern char g_hero_position[];
+extern void FastVecSub(void *, void *, void *);
+extern void vec_transform_and_set_height(void *, void *, void *, int, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_random_int_below(int);
+extern void part_spawn_masked_debris(void *, int, void *, int, float, float, float, float);
+extern void moby_mark_spawned(void *);
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -41,18 +41,18 @@ extern void func_32F848();
 extern void func_32F978(f32);
 
 extern void func_L12_00322AF8(s32, s32);
-extern void func_L12_00400900();
+extern void trigger_apply_settings_to_object();
 extern void func_L12_0031E1D0(s32, s32, s32);
 extern void func_L12_002F15C8(s32);
 extern void func_L12_00326948(s32, s32, s32, f32, f32);
 extern void func_L12_003296A8(s32, s32, s32, s32, f32);
 
-extern float func_00282E80(void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern float func_L02_002F21C0(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern float vec_distance_squared_xy(void *, void *);
 
 /* Picks which path point the enemy should walk to next: the one it is on, the nearest one, or the nearest one it can see. */
-void func_L12_003E1CB0(s32 moby) {
+void enemy_choose_nearest_visible_path_point(s32 moby) {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *path = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(state + 0x158) << 2));
     s32 i;
@@ -74,7 +74,7 @@ void func_L12_003E1CB0(s32 moby) {
     bestIdx = -1;
     best = 1000.0f;
     for (i = 0; i < *(s32 *)path; i++) {
-        dist = DistanceSquaredXY(moby + 0x10, path + 0x10 + i * 16);
+        dist = vec_distance_squared_xy(moby + 0x10, path + 0x10 + i * 16);
         if (dist < best) {
             best = dist;
             bestIdx = i;
@@ -95,7 +95,7 @@ void func_L12_003E1CB0(s32 moby) {
     for (i = 0; i < *(s32 *)path; i++) {
         if (CollLine(moby + 0x10, path + 0x10 + i * 16, 2, 0, 0) != 0)
             continue;
-        dist = DistanceSquaredXY(moby + 0x10, path + 0x10 + i * 16);
+        dist = vec_distance_squared_xy(moby + 0x10, path + 0x10 + i * 16);
         if (dist < best) {
             best = dist;
             bestIdx = i;
@@ -115,7 +115,7 @@ void func_L12_003E1CB0(s32 moby) {
 /* func_L12_003E20F0 is defined in L12_003E20F0-g8.c. */
 
 /* Tries to take the shared attack slot for this group so only one member attacks at a time. */
-void func_L12_003E2370(s32 moby) {
+void group_try_claim_attack_slot(s32 moby) {
     s32 mobyAlias = moby;
     s32 vars = *(u32 *)(mobyAlias + 0x68);
     s32 ownerIndex = *(s32 *)(*(u32 *)(vars + 0x294));
@@ -145,7 +145,7 @@ void func_L12_003E2370(s32 moby) {
 }
 
 /* Gives the shared group attack slot back if this enemy is holding it. */
-void func_L12_003E2418(s32 moby) {
+void group_release_attack_slot(s32 moby) {
     s32 *slot = *(s32 **)(*(u32 *)(moby + 0x68) + 0x294);
 
     if (*slot == ((moby - D_L12_001B2E9C) >> 8))
@@ -157,7 +157,7 @@ void func_L12_003E2418(s32 moby) {
 /* func_L12_003E3A88 is defined in L12_003E3A88-g8.c. */
 
 /* Turns two of the object's flags on or off, and sets its colour/direction bytes, from the settings given by a trigger. */
-void func_L12_00400900(int index, struct L12Settings *settings, int enable) {
+void trigger_apply_settings_to_object(int index, struct L12Settings *settings, int enable) {
     u8 *obj = (u8 *)(D_L12_001B2E9C + (index << 8));
 
     if (!obj)
@@ -204,12 +204,12 @@ void func_L12_00400900(int index, struct L12Settings *settings, int enable) {
 }
 
 /* Applies a trigger's settings to every object in one group list. */
-void func_L12_00400B28(s32 a0, s32 settings, s32 groupId, s32 enable) {
+void trigger_apply_settings_to_group(s32 a0, s32 settings, s32 groupId, s32 enable) {
     s16 *ids = D_L12_001FB960[groupId];
 
     if (ids != 0) {
         do {
-            ApplyTriggerSettingsToObject(*(u16 *)ids & 0x7FFF, settings, enable);
+            trigger_apply_settings_to_object(*(u16 *)ids & 0x7FFF, settings, enable);
         } while (*ids++ >= 0);
     }
 }
@@ -227,7 +227,7 @@ void func_L12_00400B28(s32 a0, s32 settings, s32 groupId, s32 enable) {
 /* func_L12_0041A460 is defined in L12_0041A460.c. */
 
 /* Updates the enemy's timers and counts up its age, stopping at the maximum. */
-void func_L12_0041A530(s32 moby) {
+void enemy_tick_timers_age(s32 moby) {
     func_L12_00322AF8(moby, *(u32 *)(moby + 0x68) + 0x50);
     if (*(u16 *)(moby + 0x96) <= 0xFFFE)
         *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
@@ -239,7 +239,7 @@ void func_L12_0041A530(s32 moby) {
 
 
 /* Adds one to a counter on every Space Tourist in the group. */
-void func_L12_0041A730(s32 groupId) {
+void tourist_increment_counters(s32 groupId) {
     s16 *ids = D_L12_001FB960[groupId];
     s32 mobyBase;
 
@@ -265,7 +265,7 @@ void func_L12_0041A730(s32 groupId) {
 
 
 /* Counts down the enemy's timers, ages it, and updates its glow effects. */
-void func_L12_00427CB0(s32 moby) {
+void hopping_enemy_tick_timers(s32 moby) {
     s32 mobyAlias = moby;
     s32 vars = *(u32 *)(mobyAlias + 0x68);
 
@@ -279,7 +279,7 @@ void func_L12_00427CB0(s32 moby) {
 }
 
 /* Wakes up every hopping enemy in the object's group by setting its alert flag. */
-void func_L12_00427D50(s32 moby) {
+void hopping_enemy_alert_group(s32 moby) {
     s32 mobyBase;
     s16 *ids;
     s16 *idList;
@@ -302,26 +302,26 @@ void func_L12_00427D50(s32 moby) {
 }
 
 /* Plays the death blast of the hopping enemy: sound, sparks and a puff of smoke, then removes it. */
-void func_L12_00427DD0(char *obj) {
+void hopping_enemy_play_death_blast(char *obj) {
     char pos[16];
     union { TI128 q; float f[4]; } offset;
     char dir[16];
     int color;
     if (*(short *)(*(char **)(obj + 0x68) + 0x358))
-        GetEulerAnglesFromMatrix(obj + 0xC0, obj + 0xF0);
+        mat_get_euler_angles(obj + 0xC0, obj + 0xF0);
     SetDeathBits(obj, 0, 3);
     PlayMobySound(1, 0, obj);
     offset.q = 0;
     offset.f[2] = 0.75f;
     matrix_mul_vec3(pos, &offset, obj + 0xC0);
     FastVecAdd(pos, pos, obj + 0x10);
-    SpawnExplosionWithSparks(obj, pos, -1, 0.3330000042915344f, 0.0f);
-    FastVecSub(dir, obj + 0x10, gHeroPosition);
-    TransformAndSetHeight(obj, dir, dir, 0, 0.0f);
+    part_spawn_explosion_with_sparks(obj, pos, -1, 0.3330000042915344f, 0.0f);
+    FastVecSub(dir, obj + 0x10, g_hero_position);
+    vec_transform_and_set_height(obj, dir, dir, 0, 0.0f);
     vec_scale_to_length(dir, dir, 0.10000000894069672f);
-    color = D_L12_001A8FF0 ? RandomIntBelow(0xFF) : 0xFF;
-    SpawnDebrisForMaskedParts(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    MarkMobySpawned(obj);
+    color = D_L12_001A8FF0 ? math_random_int_below(0xFF) : 0xFF;
+    part_spawn_masked_debris(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    moby_mark_spawned(obj);
 }
 
 /* func_L12_00428040 is defined in L12_003E1CB0-g8.c (it reads the group count through $gp). */

@@ -9,19 +9,19 @@ extern s32 D_L02_001A9018;
 extern u16 **D_L02_001A9014;
 extern char *D_L02_001B3C1C;
 extern char D_L02_001B1510[8] __attribute__((sda));
-extern char D_L02_001BA500[];
+extern char g_camera_l02_position[];
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern int func_L00_0031C998(int, int, float);
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern int math_lerp_int_fraction(int, int, float);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 /* Draws glowing markers at nearby records that face the player. The closer they face, the brighter they get. */
-void func_L02_004004D0(char *moby) {
+void gfx_draw_record_glow_markers(char *moby) {
     char *state = *(char **)(moby + 0x68);
     s32 listIndex = *(s32 *)(state + 0x104);
     u16 *listStart;
@@ -46,14 +46,14 @@ void func_L02_004004D0(char *moby) {
         *(TI128 *)v0 = *(TI128 *)(record + 0x30);
         matrix_mul_vec3(v1, D_L02_001B1510, record);
         FastVecAdd(v0, v0, v1);
-        FastVecSub(v2, gCameraPosition_L02, v0);
+        FastVecSub(v2, g_camera_l02_position, v0);
         vec_scale_to_length(v2, v2, 1.0f);
         FastVecScale(v3, record + 0x20, -1.0f);
         dot = FastVecDot(v2, v3);
         if (dot > 0.5f) {
             dot = dot - 0.5f;
             dot = dot + dot;
-            DrawBillboardQuad_L00(v0, LerpIntegerFraction(0xFF8020, 0x88FF8020, dot * dot), 3.0f, 1.0f);
+            gfx_l00_draw_billboard_quad(v0, math_lerp_int_fraction(0xFF8020, 0x88FF8020, dot * dot), 3.0f, 1.0f);
         }
     } while ((s16)*entry++ >= 0);
 }

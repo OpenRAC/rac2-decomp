@@ -3,30 +3,30 @@ typedef struct { float x, y, z, w; } EffectVector;
 extern short D_L00_001B2AF0[] MACRO_ADDR;
 extern char D_L00_00247310[], D_L00_00247450[];
 extern short D_L00_001B2AF8, D_L00_001B2AFA;
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_0018A580[];
-extern short D_001A6480[];
+extern short g_screen_adjust_offsets[];
 extern float D_L00_001B01BC __attribute__((sda)), D_L00_001B01C0 __attribute__((sda)), D_L00_001B01C4 __attribute__((sda)), D_L00_001B01C8 __attribute__((sda));
 extern int D_L00_001B021C __attribute__((sda)), D_L00_001B020C __attribute__((sda));
 extern float D_L00_001B0208 __attribute__((sda)), D_L00_001B0210 __attribute__((sda));
-extern void func_L00_003D37E8(void *, int, int, int, float, float, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282CF0(void *, void *,void *);
-extern void func_00282CC0(void *, void *,void *);
-extern void func_00282DD8(void *, void *,void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *,void *);
-extern void func_002ACB48(void *, float);
-extern void func_00281DE8(void *, int, int,int);
-extern void func_00280B90(void *, void *, int);
-extern void func_002FC560(int, int);
-extern void func_0027DE50(int, int,int, int, unsigned int);
+extern void DrawScrollingRibbonWithFadedEnds(void *, int, int, int, float, float, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecSub(void *, void *,void *);
+extern void FastVecAdd(void *, void *,void *);
+extern void FastVecCross(void *, void *,void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *,void *);
+extern void vec_add_random_offset(void *, float);
+extern void gfx_init_quad_packet_state(void *, int, int,int);
+extern void draw_world_quad(void *, void *, int);
+extern void VU1_addGSregister(int, int);
+extern void gfx_draw_colored_rectangle(int, int,int, int, unsigned int);
 /* Update four effect strips, then draw the active radial ring and fading quad. */
-void func_L00_003D2ED0(char *object)
+void RenderRadialRingAndQuad(char *object)
 {
     char render[0x90];
     EffectVector position, axis, direction;
@@ -43,8 +43,8 @@ void func_L00_003D2ED0(char *object)
     DrawScrollingRibbonWithFadedEnds(D_L00_00247450, D_L00_001B2AF8, D_L00_001B2AF8, 5, D_L00_001B01C4, D_L00_001B01C8, 0.2f);
     DrawScrollingRibbonWithFadedEnds(D_L00_00247450 + 0x50, D_L00_001B2AFA, D_L00_001B2AFA, 5, D_L00_001B01C4, D_L00_001B01C8, 0.2f);
     qcopy(&position, context + 0x10);
-    ComputeViewDirection(&position, &axis, 1);
-    FastVecSub(&direction, gCameraPosition_L00, &position);
+    cam_compute_view_direction(&position, &axis, 1);
+    FastVecSub(&direction, g_camera_l00_position, &position);
     fade = 1.0f;
     vec_scale_to_length(&direction, &direction, fade);
     if (*(int *)(context + 0x44)) {
@@ -56,10 +56,10 @@ void func_L00_003D2ED0(char *object)
         FastVecScale(&effect.offset, D_0018A580, (1.0f - fade)* 32.0f);
         FastVecAdd(&effect.center, &position, &effect.offset);
         for (pointIndex = 0; pointIndex < 20; pointIndex++) {
-            BuildAxisAngleQuaternion(&effect.rotated, &direction, IntToFloat(pointIndex)* 0.3141593f);
-            RotateVectorByQuaternion(&effect.radial, &axis, &effect.rotated);
+            math_build_axis_angle_quat(&effect.rotated, &direction, IntToFloat(pointIndex)* 0.3141593f);
+            vec_rotate_by_quaternion(&effect.radial, &axis, &effect.rotated);
             FastVecScale(&effect.radial, &effect.radial, radius);
-            AddRandomOffsetToVector(&effect.radial, spread);
+            vec_add_random_offset(&effect.radial, spread);
             FastVecAdd(&effect.points[pointIndex], &effect.center, &effect.radial);
         }
         DrawScrollingRibbonWithFadedEnds(effect.points, effect.color, effect.color, 20, 0.3f, 1.2f, 0.2f);
@@ -68,7 +68,7 @@ void func_L00_003D2ED0(char *object)
         if (*(int *)(context + 0x28) < D_L00_001B020C)
             fade = IntToFloat(*(int *)(context + 0x28)) * *(float *)(context + 0x2C);
         else fade = 1.0f;
-        InitQuadPacketState(render, 11, 1, 128);
+        gfx_init_quad_packet_state(render, 11, 1, 128);
         color = (FloatToInt(fade * 255.0f) << 24) | 0x808080;
         *(int *)(render+0x4C)=color;
         *(int *)(render+0x48)=color;
@@ -83,7 +83,7 @@ void func_L00_003D2ED0(char *object)
         *(float *)(render+0x68)=1.0f;
         *(float *)(render+0x6C)=1.0f;
         FastVecScale(&effect.points[0], &direction, -0.1f);
-        FastVecAdd(&effect.points[1], gCameraPosition_L00, &effect.points[0]);
+        FastVecAdd(&effect.points[1], g_camera_l00_position, &effect.points[0]);
         FastVecCross(&effect.points[2], &direction, &axis);
         vec_scale_to_length(&effect.points[2], &effect.points[2], D_L00_001B0208);
         FastVecCross(&effect.points[3], &effect.points[2], &direction);
@@ -101,6 +101,6 @@ void func_L00_003D2ED0(char *object)
         *(int *)(render+0x44)=color;
         *(int *)(render+0x40)=color;
         VU1_addGSregister(66, 72);
-        DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9],0,gScreenAdjustOffsets[0xA8],*(unsigned int *)(render+0x40));
+        gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9],0,g_screen_adjust_offsets[0xA8],*(unsigned int *)(render+0x40));
     }
 }

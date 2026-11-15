@@ -2,10 +2,10 @@
 
 #include "common.h"
 typedef int Quad_3fca40 __attribute__((mode(TI)));
-extern void *func_0029EFD0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
+extern void *CreateMoby(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
 extern int D_L00_001B0BB4 __attribute__((sda));
 extern void ref_L00_003FCA40_00(void *);
 extern void ref_L00_003FCA40_01(void *, void *);
@@ -25,7 +25,7 @@ char *func_PAL_L00_004012A0(char *a0, char *a1, Quad_3fca40 *a2, int a3)
     int g;
     float f;
 
-    obj = (char *)func_0029EFD0(0xD9C);
+    obj = (char *)CreateMoby(0xD9C);
     if (obj != 0) {
         *(unsigned char *)(obj + 0x30) = 0xFF;
         p = *(int **)(obj + 0x68);
@@ -35,13 +35,13 @@ char *func_PAL_L00_004012A0(char *a0, char *a1, Quad_3fca40 *a2, int a3)
         *(unsigned char *)(obj + 0x20) = 0;
         q = (char *)p + 0x20;
         obj10 = obj + 0x10;
-        func_00282F20(q, a1, 0.40000004f);
+        vec_scale_to_length(q, a1, 0.40000004f);
         *(Quad_3fca40 *)obj10 = *a2;
-        func_00282F20(&local, q, -0.25f);
-        func_00282CC0((char *)p + 0x50, a0, &local);
+        vec_scale_to_length(&local, q, -0.25f);
+        FastVecAdd((char *)p + 0x50, a0, &local);
         g = (int)((s32)(D_L00_001B0BB4) * 5 + 2) / 6;
         *(int *)((char *)p + 0x38) = g;
-        f = func_00283CE0(g);
+        f = IntToFloat(g);
         *(int *)((char *)p + 0x34) = a3;
         *(float *)((char *)p + 0x3C) = 1.0f / f;
         ref_L00_003FCA40_00(obj10);

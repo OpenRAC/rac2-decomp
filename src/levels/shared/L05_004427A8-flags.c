@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned char D_L05_001B2000;
 extern unsigned char D_L05_001B2001;
@@ -19,7 +20,7 @@ extern int D_L05_001B3644;
 
 /* The reverse copy of func_L05_00442720. */
 /* Puts the ship's saved settings back as the current settings. */
-void func_L05_004427A8(void)
+void ship_restore_settings(void)
 {
     unsigned int byte0 = D_L05_001B3630;
     unsigned int byte1 = D_L05_001B3631;

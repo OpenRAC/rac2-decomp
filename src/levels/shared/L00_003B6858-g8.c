@@ -7,12 +7,12 @@ extern Quad D_L00_001AFA50[2] SDATA(D_L00_001AFA50);
 extern float D_L00_001AFAA0[2] __attribute__((sda));
 extern float D_L00_001AFA90[2] SDATA(D_L00_001AFA90);
 extern int D_L00_001AFA98[2] SDATA(D_L00_001AFA98);
-extern int func_002A77E0(int);
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(char *,int);
-extern void func_002AEC18(char *,int);
+extern int math_random_int_below(int);
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(char *,int);
+extern void moby_set_light_color(char *,int);
 
-int func_L00_003B6858(char *object)
+int InitializePairedObjects(char *object)
 {
     int i=0;
     Quad *source,*position;
@@ -24,7 +24,7 @@ int func_L00_003B6858(char *object)
     Quad *out,*velocity;
     slot=state->objects;
     velocity=state->velocity;
-    state->seed=RandomIntBelow(255);
+    state->seed=math_random_int_below(255);
     material=D_L00_001AFA98;
     scale=D_L00_001AFA90;
     rate=D_L00_001AFAA0;
@@ -33,7 +33,7 @@ int func_L00_003B6858(char *object)
     out=state->positions;
     do {
         *slot=CreateMoby(i?0xe7d /* Sheep */:0xeb0 /* Dark Sheep */);
-        InitChildObjectFromParent(*slot,0);
+        moby_init_child_from_parent(*slot,0);
         *(unsigned short *)(*slot+0x34)|=0x4100;
         (*slot)[0xbc]=i;
         *(Quad *)(*slot+0xf0)=*source;
@@ -41,7 +41,7 @@ int func_L00_003B6858(char *object)
         *velocity=0;
         ((float *)velocity)[1]=*rate*(1.0f/60.0f);
         *(float *)(*slot+0x2c)=*(float *)(*(char **)(*slot+0x24)+0x24)* *scale;
-        SetMobyLightColor(*slot,*material);
+        moby_set_light_color(*slot,*material);
         slot++;rate++;position++;out++;source++;velocity++;scale++;material++;i++;
     }while(i<2);
     if(state->objects[0]) {

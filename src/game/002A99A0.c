@@ -1,20 +1,20 @@
 #include "common.h"
 
 typedef struct { float x, y, z, w; } MmiPoint;
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern void func_002A3110(void *, int, int);
-extern void func_00282D60(void *, void *, float);
-extern void func_00282D90(void *, void *, float);
+extern void scale_vector(void *, void *, float);
+extern void divide_vector_xyz(void *, void *, float);
 extern void func_00129148(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282C10(float);
-extern void func_00283098(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float square_root(float);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 /* Choose collision shapes by volume and scatter points inside them.
  * Source structure follows RAC1's func_L00_0025BCF8_r in
@@ -22,7 +22,7 @@ extern void func_00283098(void *, void *, void *);
  * The float argument precedes the integer arguments in source, as in RAC1;
  * each register bank retains its own argument order in the EE ABI.
  */
-int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int mask)
+int coll_scatter_points_in_shapes(float density, char *object, int limit, MmiPoint *output, int mask)
 {
     float volumes[20];
     char *shapes[20];
@@ -104,7 +104,7 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
     n = (int)(density * total + 0.5f);
     if (limit < n) n = limit;
     for (i = 0; i < n; i++) {
-        value = RandomFloatRange(0.0f, total);
+        value = math_random_float_range(0.0f, total);
         {
             int selected;
             for (selected = 0; selected < count; selected++) {
@@ -132,9 +132,9 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             divide_vector_xyz(&center, &center, 1024.0f);
             negative = -radius;
             for (;;) {
-                random.x = RandomFloatRange(negative, radius);
-                random.y = RandomFloatRange(negative, radius);
-                random.z = RandomFloatRange(negative, radius);
+                random.x = math_random_float_range(negative, radius);
+                random.y = math_random_float_range(negative, radius);
+                random.z = math_random_float_range(negative, radius);
                 if (FastVecLength(&random) <= radius) {
                     FastVecAdd(&random, &random, &center);
                     matrix_mul_vec3(&random, &random, object + 0xC0);
@@ -153,11 +153,11 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             divide_vector_xyz(&center, &center, 1024.0f);
             radius *= 1.0f / 1024.0f;
             height *= 1.0f / 1024.0f;
-            a = square_root(RandomFloatRange(0.0f, radius * radius));
-            b = RandomFloatRange(0.0f, height);
-            angle = RandomAngle();
-            random.x = FastSinOrCosA(angle) * a;
-            random.y = FastSinOrCosB(angle) * a;
+            a = square_root(math_random_float_range(0.0f, radius * radius));
+            b = math_random_float_range(0.0f, height);
+            angle = math_random_angle();
+            random.x = math_fast_sin_or_cos_a(angle) * a;
+            random.y = math_fast_sin_or_cos_b(angle) * a;
             random.z = b;
             FastVecAdd(&random, &random, object + 0x10);
             FastVecAdd(&output[i], &center, &random);
@@ -169,7 +169,7 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             func_00129148(&center, (void *)(0x70000000 + (*(short *)(data) << 4)), *(float *)(object + 0x2C));
             func_00129148(&random, (void *)(0x70000000 + (*(short *)(data + 2) << 4)), *(float *)(object + 0x2C));
             FastVecSub(&delta, &random, &center);
-            value = RandomFloatRange(0.0f, 1.0f);
+            value = math_random_float_range(0.0f, 1.0f);
             FastVecScale(&delta, &delta, value);
             FastVecAdd(&point, &delta, &center);
             divide_vector_xyz(&point, &point, 1024.0f);
@@ -177,9 +177,9 @@ int func_002A99A0(float density, char *object, int limit, MmiPoint *output, int 
             radius *= 1.0f / 1024.0f;
             negative = -radius;
             do {
-                jitter.x = RandomFloatRange(negative, radius);
-                jitter.y = RandomFloatRange(negative, radius);
-                jitter.z = RandomFloatRange(negative, radius);
+                jitter.x = math_random_float_range(negative, radius);
+                jitter.y = math_random_float_range(negative, radius);
+                jitter.z = math_random_float_range(negative, radius);
             } while (!(FastVecLength(&jitter) <= radius));
             FastVecAdd(&jitter, &jitter, &point);
             matrix_mul_vec3(&jitter, &jitter, object + 0xC0);

@@ -1,16 +1,16 @@
 #include "common.h"
-extern void func_002833F0(void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_00283678(void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void copy_matrix3x4(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 extern int D_L02_001A9018 MACRO_ADDR;
 extern unsigned short **D_L02_001A9014 MACRO_ADDR;
 extern char *D_L02_001B3C1C[] __attribute__((sda));
 /* Looks through the nearby records for one very close to the object and, if found, remembers it and its position relative to the object. */
-void func_L02_003D6EE0(char *object)
+void moby_find_nearby_record(char *object)
 {
     struct {
         float inverse[12];

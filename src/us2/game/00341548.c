@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_US2_00341548, the USA v2.00 copy of func_00340638: the same C, where the fields at
    0x870 and 0xA18 move to 0x880 and 0xA78. */
@@ -11,8 +12,8 @@ extern const Word2_340498 D_001AE0A8;
 extern const Word2_340498 D_001AE0B0;
 extern char D_00259CE0[];
 extern char *D_001A8CFC __attribute__((sda));
-extern void func_00336390(void *, void *, int);
-extern void func_00337210(int *);
+extern void object_set_helper_result(void *, void *, int);
+extern void DrawItemGrid(int *);
 
 static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
 
@@ -40,7 +41,7 @@ void func_US2_00341548(char *o)
     f[2] = 2;
     f[0] = (int)D_00259CE0;
     f[17] = (int)(o + 0x880);
-    func_00336390(child, D_001A8CFC + 0x8710, 0x5D);
+    object_set_helper_result(child, D_001A8CFC + 0x8710, 0x5D);
     f[10] = (int)child;
     f[12] = (int)(o + 0x214);
     f[15] = (int)(o + 0x7D0);
@@ -52,5 +53,5 @@ void func_US2_00341548(char *o)
     f[5] = (int)&q0;
     f[20] = (int)&q5;
     f[22] = 0;
-    func_00337210(f);
+    DrawItemGrid(f);
 }

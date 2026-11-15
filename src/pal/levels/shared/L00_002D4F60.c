@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_L00_001A8F00 __attribute__((sda));
 extern void func_PAL_L00_002AFAE8(void);
 extern void func_PAL_L00_002B0860(char *);
@@ -36,7 +37,7 @@ void func_PAL_L00_002D5150(char *arg0)
     if (D_L00_001A8F00 != 2 && D_L00_001A8F00 != 6)
         return;
 
-    if (((Base_2A *)D_00189E20)->f12C0 == 0)
+    if (((Base_2A *)g_hero_state)->f12C0 == 0)
         func_PAL_L00_002AFAE8();
 
     for (i = 0; i < D_L00_001BCAC0.count; i++) {
@@ -48,13 +49,13 @@ void func_PAL_L00_002D5150(char *arg0)
         }
     }
 
-    func_L00_002AA178(arg0);
+    part_spawn_effect_from_record(arg0);
     func_PAL_L00_002B0860(arg0);
     func_PAL_L00_002D4F60();
 
     {
         void *node;
-        Base_2A *state = (Base_2A *)D_00189E20;
+        Base_2A *state = (Base_2A *)g_hero_state;
 
         node = state->f12C0;
         if (node != 0) {
@@ -91,9 +92,9 @@ void func_PAL_L00_002D5150(char *arg0)
 
 
 extern char D_00189E20_4D98[];
-extern char *func_0029EFD0(int);
-extern void func_L00_002AA178(char *);
-extern void func_L00_002B0968(char *);
+extern char *CreateMoby(int);
+extern void part_spawn_effect_from_record(char *);
+extern void update_hero_item_mobys(char *);
 
 /* One-shot spawn: arms the state word, and when the slot is free asks the allocator for a
    0x50A object, writes its flags, the packed constant at +0x38 and the level's tag, then runs
@@ -104,7 +105,7 @@ void func_PAL_L00_002D52C0(char *arg0) {
 
     *(int *)(base + 0x12E8) = 0x2F;
     if (*(int *)(base + 0x12C0) == 0) {
-        node = func_0029EFD0(0x50A);
+        node = CreateMoby(0x50A);
         if (node != 0) {
             *(unsigned short *)(node + 0x32) = 0x20;
             *(unsigned short *)(node + 0x34) =
@@ -120,7 +121,7 @@ void func_PAL_L00_002D52C0(char *arg0) {
             *(int *)(base + 0x12E4) = 2;
         }
     }
-    func_L00_002AA178(arg0);
-    func_L00_002B0968(arg0);
+    part_spawn_effect_from_record(arg0);
+    update_hero_item_mobys(arg0);
 }
 

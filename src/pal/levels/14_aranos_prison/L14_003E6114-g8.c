@@ -36,20 +36,20 @@ typedef struct {
     int animation;
 } FieldMob;
 
-extern void func_002A04B8(void *, int *, int *, int *);
-extern void func_002A0488(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern int func_00283D38(int, int, float);
-extern void func_L00_002E6EF8(void (*)(char *), char *);
-extern int func_L00_00324120(void *);
-extern void func_L14_00328E70(void *, void *, void *);
-extern void func_L14_00328E90(void *, void *, void *);
-extern void func_L14_003E2238(void *);
+extern void get_moby_color(void *, int *, int *, int *);
+extern void set_moby_color(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern int FastTweenColor(int, int, float);
+extern void gfx_add_draw_callback_third(void (*)(char *), char *);
+extern int hero_is_current_selected_id(void *);
+extern void moby_copy_pos_rot(void *, void *, void *);
+extern void moby_pass_pos_rot_to_helper(void *, void *, void *);
+extern void moby_rebuild_matrix_scaled(void *);
 extern float func_PAL_L14_003E6618(void *);
-extern void func_L14_003E2328(char *self);
-extern void func_L14_003E2980(void *);
+extern void DrawFadingField(char *self);
+extern void part_l14_spawn_flash(void *);
 
 /* The level's entity array, read as a bare symbol (lui/lw) as in the level's other units. */
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
@@ -75,7 +75,7 @@ void func_PAL_L14_003E6114(FieldMob *self) {
 
     switch (self->state) {
     case 0:
-        func_002A04B8(self, &r, &g, &bl);
+        get_moby_color(self, &r, &g, &bl);
         s->color = (long long)(int)(0x80000000 + (bl << 16) + (g << 8)) + r;
         if (s->mobIndex != -1) {
             s->linked = D_L14_001B259C_base[0] + (s->mobIndex << 8);
@@ -86,13 +86,13 @@ void func_PAL_L14_003E6114(FieldMob *self) {
         self->color = 0x80008000;
         self->flags |= 0x10;
         if (s->proximity) {
-            func_002A7750(self, 3, -1);
+            moby_set_state(self, 3, -1);
         } else {
-            func_002A7750(self, 1, -1);
+            moby_set_state(self, 1, -1);
         }
         break;
     case 4:
-        if (func_002B3868(self)) {
+        if (flag_set_first_pending(self)) {
             self->flags |= 0x100;
             s->flags = 0;
             s->requested = 0;
@@ -101,56 +101,56 @@ void func_PAL_L14_003E6114(FieldMob *self) {
             s->requested = 0;
             s->emitTimer = ((s32)(D_L14_001B04D0) * 5 + 2) / 6;
         }
-        if (func_00282948(&s->timer)) {
-            func_002A7750(self, 1, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 1, -1);
         }
-        if (func_00282948(&s->emitTimer)) {
-            func_L14_003E2980(self);
+        if (math_fast_float_d(&s->emitTimer)) {
+            part_l14_spawn_flash(self);
             s->emitTimer = ((s32)(D_L14_001B04D0) * 5 + 2) / 6;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = func_00283D38(c, s->color, func_PAL_L14_003E6618(self));
-        func_002A0488(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
-        func_L14_00328E70(self, a, b);
-        func_L14_003E2238(self);
-        func_L14_00328E90(self, a, b);
-        func_L00_002E6EF8(func_L14_003E2328, (char *)self);
+        c = FastTweenColor(c, s->color, func_PAL_L14_003E6618(self));
+        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        moby_copy_pos_rot(self, a, b);
+        moby_rebuild_matrix_scaled(self);
+        moby_pass_pos_rot_to_helper(self, a, b);
+        gfx_add_draw_callback_third(DrawFadingField, (char *)self);
         break;
     case 1:
-        if (func_002B3868(self)) {
+        if (flag_set_first_pending(self)) {
             self->active = 0;
             self->animation = 0;
             self->flags |= 1;
         }
         if (s->requested || (s->proximity && self->position[2] > D_00189EA8)) {
-            func_002A7750(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
         break;
     case 2:
-        if (func_002B3868(self)) {
+        if (flag_set_first_pending(self)) {
             self->active = 1;
             self->flags = (self->flags | 0x100) & 0xFFFE;
             self->animation = *(int *)(self->model + 0x10);
             s->timer = ((s32)(s->openTime) * 5 + 2) / 6;
             s->emitTimer = ((s32)(D_L14_001B04D0) * 5 + 2) / 6;
         }
-        if (func_00282948(&s->timer)) {
-            func_002A7750(self, 3, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 3, -1);
         }
-        if (func_00282948(&s->emitTimer)) {
-            func_L14_003E2980(self);
+        if (math_fast_float_d(&s->emitTimer)) {
+            part_l14_spawn_flash(self);
             s->emitTimer = ((s32)(D_L14_001B04D0) * 5 + 2) / 6;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = func_00283D38(c, s->color, func_PAL_L14_003E6618(self));
-        func_002A0488(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
-        func_L14_00328E70(self, a, b);
-        func_L14_003E2238(self);
-        func_L14_00328E90(self, a, b);
-        func_L00_002E6EF8(func_L14_003E2328, (char *)self);
+        c = FastTweenColor(c, s->color, func_PAL_L14_003E6618(self));
+        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        moby_copy_pos_rot(self, a, b);
+        moby_rebuild_matrix_scaled(self);
+        moby_pass_pos_rot_to_helper(self, a, b);
+        gfx_add_draw_callback_third(DrawFadingField, (char *)self);
         break;
     case 3:
-        if (func_002B3868(self)) {
+        if (flag_set_first_pending(self)) {
             self->flags &= 0xFEFF;
             if (s->contact) {
                 s->flags |= 0x20;
@@ -160,7 +160,7 @@ void func_PAL_L14_003E6114(FieldMob *self) {
             s->timer = ((s32)(s->activeTime) * 5 + 2) / 6;
             self->color = 0x80008000;
         }
-        if ((func_L00_00324120(self) && !s->contact) || (D_0018A0B4 == self && s->contact)) {
+        if ((hero_is_current_selected_id(self) && !s->contact) || (D_0018A0B4 == self && s->contact)) {
             e = s->linked;
             if (e != 0 && *(short *)(e + 0xAA) == 0xAFE) {
                 *(int *)(*(char **)(e + 0x68) + 0x80) = 1;
@@ -169,8 +169,8 @@ void func_PAL_L14_003E6114(FieldMob *self) {
         if (s->proximity && self->position[2] > D_00189EA8) {
             s->timer = ((s32)(s->activeTime) * 5 + 2) / 6;
         }
-        if (func_00282948(&s->timer)) {
-            func_002A7750(self, 4, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 4, -1);
         }
         break;
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,15 +24,15 @@
  */
 #include "common.h"
 
-extern s32 func_0028AB20(s32);
+extern s32 hud_find_entry_index(s32);
 extern s8 *D_001B188C;
 
 /* Fills a HUD element from the table entry that matches the given id. */
-void func_0028B650(s8 *dest, s32 key) {
+void hud_load_element_from_table(s8 *dest, s32 key) {
     s32 index;
     u16 firstWord;
 
-    index = FindHudEntryIndex(key);
+    index = hud_find_entry_index(key);
     firstWord = *(u16 *)(D_001B188C + index * 8);
     (*(s16 *)((s8 *)(dest) + (0x40))) = index;
     (*(s32 *)((s8 *)(dest) + (0))) = firstWord;

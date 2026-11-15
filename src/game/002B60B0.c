@@ -1,11 +1,11 @@
 #include "names.h"
 typedef unsigned char u8;
-extern void *func_002B5D28(u8 *);
+extern void *moby_get_controller(u8 *);
 
 /* Sets the speed and turning limits in an object's movement controller. */
-void func_002B60B0(u8 *object, float x, float y, float z, float w)
+void moby_set_controller_speed_limits(u8 *object, float x, float y, float z, float w)
 {
-    char *ctl = GetMovementController(object);
+    char *ctl = moby_get_controller(object);
     if (ctl != 0) {
         *(float *)(ctl + 0x20) = x;
         *(float *)(ctl + 0x24) = x;

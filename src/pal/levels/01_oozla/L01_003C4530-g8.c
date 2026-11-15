@@ -1,9 +1,9 @@
 #include "common.h"
 
 extern int func_001163B0(void);
-extern int func_002A7820(int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003BFDC8(void *, int, int, int);
+extern int math_random_int_range(int, int);
+extern void moby_set_state(void *, int, int);
+extern void moby_set_animation_and_speed(void *, int, int, int);
 
 /* Small data reached through $gp: this is only one instruction at -G8. */
 extern int D_L01_001AFED4 __attribute__((sda));
@@ -25,9 +25,9 @@ void func_PAL_L01_003C4530(L01_003C06E8_OBJ *a0)
     L01_003C06E8_OBJ *p = a0;
     L01_003C06E8_OWNED *q = p->f68;
     int v = (func_001163B0() & 1) + 6;
-    int r = func_002A7820(10, 15);
+    int r = math_random_int_range(10, 15);
 
-    func_L01_003BFDC8(p, v, 0, r);
-    func_002A7750(p, 1, 3);
+    moby_set_animation_and_speed(p, v, 0, r);
+    moby_set_state(p, 1, 3);
     q->f2DC = (D_L01_001AFED4 * 5 + 2) / 6;
 }

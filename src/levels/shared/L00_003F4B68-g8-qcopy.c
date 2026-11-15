@@ -1,17 +1,18 @@
+#include "names.h"
 /* Reconstructed from retail; standalone all-placement checks pass in all three releases.
  * The lead must still verify strict linked builds. */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_003001E0(char *,char *,char *);
-extern float func_00283248(float,float);
+extern char *CreateMoby(int);
+extern void vec_add_transformed_or_copy(char *,char *,char *);
+extern float mat_fast_helper_a(float,float);
 extern void func_002A0F48(char *);
 extern unsigned short D_L00_001B0904 __attribute__((sda));
 extern float D_L00_001B0910 __attribute__((sda));
 
 /* Creates a bouncing explosive moby (class 3315) at the given position, with its throw
    velocity, owner and timer. */
-char *func_L00_003F4B68(int owner, char *position, char *velocity, int value, float scale)
+char *bouncing_explosive_spawn(int owner, char *position, char *velocity, int value, float scale)
 {
     char *object = CreateMoby(0xcf3 /* moby class 3315 */);
     char *state;
@@ -26,7 +27,7 @@ char *func_L00_003F4B68(int owner, char *position, char *velocity, int value, fl
         *(int *)(state + 0x24) = owner;
         *(TI128 *)(object + 0x10) = *(TI128 *)position;
         *(TI128 *)(state + 0x10) = *(TI128 *)velocity;
-        AddTransformedVectorOrCopy(state + 0x10, state + 0x10, position);
+        vec_add_transformed_or_copy(state + 0x10, state + 0x10, position);
         timer = D_L00_001B0904;
         *(float *)(state + 0x1c) = scale;
         *(int *)(state + 0x20) = value;
@@ -34,7 +35,7 @@ char *func_L00_003F4B68(int owner, char *position, char *velocity, int value, fl
         *(short *)(state + 0x2a) = 0;
         *(int *)(object + 0xf0) = 0;
         *(int *)(object + 0xf4) = 0;
-        angle = FastMatrixHelperA(*(float *)velocity, *(float *)(velocity+4));
+        angle = mat_fast_helper_a(*(float *)velocity, *(float *)(velocity+4));
         *(float *)(object + 0x2c) *= D_L00_001B0910;
         *(float *)(object + 0xf8) = angle;
         func_002A0F48(object);

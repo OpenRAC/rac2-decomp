@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,12 +24,12 @@
  */
 #include "common.h"
 
-extern s32 func_00288768(s32 a0);
+extern s32 help_is_id_in_mapping_table(s32 a0);
 extern s8 D_001A7B68[];
 extern s8 D_001A7B88[];
 
 /* Walks the item list, clears every entry that is not allowed, and tells whether all were fine. */
-s32 func_002908D0(void) {
+s32 level_validate_item_list(void) {
     s32 entry;
     s32 listEnd;
     s32 allValid;
@@ -50,7 +51,7 @@ s32 func_002908D0(void) {
             entry++;
             continue;
         }
-        if (IsHelpIdInMappingTable(itemId) == 0 || itemId == 0) {
+        if (help_is_id_in_mapping_table(itemId) == 0 || itemId == 0) {
             *(u8 *)entry = 0xFF;
             allValid = 0;
         }

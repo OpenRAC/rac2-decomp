@@ -2,17 +2,17 @@
 #include "names.h"
 #include "include_asm.h"
 
-extern void func_0011AC60(int value);
+extern void WaitSema(int value);
 
 extern void func_00350808_1(int value);
 
-extern void func_00350798(int value);
+extern void mpeg_start_dma3(int value);
 
-extern void func_0011AC40(int value);
+extern void SignalSema(int value);
 
 /* snapshots five hardware registers into a structure, spins while one register's nibble stays set, snapshots five more and returns 1 */
 /* Saves the video decoder and DMA channel registers into the buffer, waiting for the decoder to finish first. */
-int func_00350DC8(int *buf)
+int mpeg_save_ipu_dma_state(int *buf)
 {
     WaitSema(buf[16]);
     buf[17] = 0;
@@ -24,7 +24,7 @@ int func_00350DC8(int *buf)
     if (((int)IPU_CTRL) & 0xF0)
         while (((int)IPU_CTRL) & 0xF0)
             ;
-    StartDmaChannel3(0);
+    mpeg_start_dma3(0);
     buf[11] = ((int)D3_MADR);
     buf[12] = ((int)D3_QWC);
     buf[13] = ((int)D3_CHCR);
@@ -34,7 +34,7 @@ int func_00350DC8(int *buf)
     return 1;
 }
 
-extern int func_00350750(void *, int);
+extern int mpeg_vibuf_addr_to_slot(void *, int);
 
 struct ipu_fifo {
     unsigned base;
@@ -62,7 +62,7 @@ struct ipu_fifo {
    two ring-index tests is written with its % twice because retail keeps one divide but a zero check
    per use */
 /* Puts back the saved video decoder and DMA state after a pause. */
-int func_00350ED8(struct ipu_fifo *p)
+int mpeg_restore_ipu_dma_state(struct ipu_fifo *p)
 {
     unsigned bp = p->ipu_bp;
     unsigned ifc = (bp >> 8) & 0xF;
@@ -91,8 +91,8 @@ int func_00350ED8(struct ipu_fifo *p)
             p->count++;
         }
     } else {
-        int r1 = ViBufAddressToSlot(p, p->madr);
-        int r2 = ViBufAddressToSlot(p, madr);
+        int r1 = mpeg_vibuf_addr_to_slot(p, p->madr);
+        int r2 = mpeg_vibuf_addr_to_slot(p, madr);
 
         if (r1 != r2) {
             int units = p->units;
@@ -117,7 +117,7 @@ int func_00350ED8(struct ipu_fifo *p)
         if (p->d3_qwc != 0) {
             D3_MADR = p->d3_madr;
             D3_QWC = p->d3_qwc;
-            StartDmaChannel3(p->d3_chcr | 0x100);
+            mpeg_start_dma3(p->d3_chcr | 0x100);
         }
     }
     if (p->count != 0) {
@@ -140,9 +140,9 @@ int func_00350ED8(struct ipu_fifo *p)
     return 1;
 }
 
-extern void func_0011AC30(int value);
+extern void DeleteSema(int value);
 /* Stops DMA channel 4, clears its addresses and releases the buffer's semaphore. */
-int func_00351210(int *buf)
+int mpeg_vibuf_stop_dma(int *buf)
 {
     func_00350808_1(5);
     D4_QWC = 0;

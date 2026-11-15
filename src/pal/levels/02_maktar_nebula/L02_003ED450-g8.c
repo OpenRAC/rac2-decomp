@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L02_003ED450, the PAL copy of func_L02_003E9040: the same C, where the timer takes
    PAL's 50 Hz scale and is stored after the two zero stores. It is a unit of its own: it needs
@@ -36,13 +37,13 @@ extern int D_L02_001B0C30 __attribute__((sda));
 
 extern int D_L02_001B0C44 __attribute__((sda));
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
 void func_PAL_L02_003ED450(char *arg0) {
     char *state;
@@ -57,13 +58,13 @@ void func_PAL_L02_003ED450(char *arg0) {
         D_L02_001B0BA4 = 0;
         D_L02_001B420C = 0;
         D_L02_001B4208 = (D_L02_001B0CA8 * 5 + 2) / 6;
-        func_00282CF0(v0, state + 0x30, state + 0x20);
-        func_00282F20(v1, v0, D_L02_001B0BA8 * 0.05f);
+        FastVecSub(v0, state + 0x30, state + 0x20);
+        vec_scale_to_length(v1, v0, D_L02_001B0BA8 * 0.05f);
         *(TI128 *)D_L02_00249090[0] = *(TI128 *)(state + 0x20);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(D_L02_00249090[i], D_L02_00249090[i - 1], v1);
+            FastVecAdd(D_L02_00249090[i], D_L02_00249090[i - 1], v1);
             D_L02_00249310[i] = 0;
-            func_00282C88(D_L02_00249360[i]);
+            vec_clear_128(D_L02_00249360[i]);
             D_L02_002494A0[i] = 0;
         }
         m1 = -1;

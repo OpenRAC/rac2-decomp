@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-extern void func_L07_003F8430(u8 *);
+extern void flyer_steer(u8 *);
 extern void func_2E47D0(void *,void *,void *);
 extern void func_2E4310(void *,void *,void *);
 extern u8 *func_316FD8(void *);
@@ -18,7 +18,7 @@ extern f32 func_2E4418(void *,void *);
 /* Level-07 copy of func_002AA548, which returns float (result unused here). */
 extern f32 func_314038(f32 *,f32 *,f32,f32,f32,f32);
 typedef struct {u8 pad[0x80];f32 pos[4];} Player;
-extern Player D_00189E20;
+extern Player g_hero_state;
 extern f32 D_L07_001B1070 __attribute__((sda));
 extern f32 D_L07_001B1074 __attribute__((sda));
 extern f32 D_L07_001B1078 __attribute__((sda));
@@ -28,14 +28,14 @@ extern f32 D_L07_001B1084 __attribute__((sda));
 extern f32 D_L07_001B1088 __attribute__((sda));
 extern f32 D_L07_001B108C __attribute__((sda));
 /* Moves the boss toward its target point, either riding its platform or facing the player, with limited speed. It also tilts the boss as it moves. */
-void func_L07_003F80B8(u8 *obj,f32 limit)
+void boss_move_toward_target(u8 *obj,f32 limit)
 {
  f32 target[4],delta[4],move[4],accel[4];
  u8 *vars=*(u8 **)(obj+0x68);
  u8 *platformRoot;
  f32 rate,speed,distance,stepLength,angle,bank,turnRate,turnSpeed;
  f32 *yaw;
- SteerFlyingEnemy(obj);
+ flyer_steer(obj);
  if(!obj[0x95]) {
   func_2E47D0(target,vars+0x3e0,*(u8 **)(vars+0x418)+0xc0);
   func_2E4310(target,target,*(u8 **)(vars+0x418)+0x10);
@@ -49,7 +49,7 @@ void func_L07_003F80B8(u8 *obj,f32 limit)
  } else {
   qcopy(target,vars+0x3e0);
   yaw=(f32 *)(obj+0xf8);
-  angle=func_2E49C8(gHeroState.pos[0]-*(f32 *)(obj+0x10),gHeroState.pos[1]-*(f32 *)(obj+0x14));
+  angle=func_2E49C8(g_hero_state.pos[0]-*(f32 *)(obj+0x10),g_hero_state.pos[1]-*(f32 *)(obj+0x14));
   func_3144F0(yaw,vars+0x424,angle,0.0034906589426100254f,0.0034906589426100254f,0.20943955f,0);
  }
  func_2E4340(delta,target,obj+0x10);

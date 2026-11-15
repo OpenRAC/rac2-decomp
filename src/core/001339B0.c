@@ -10,7 +10,7 @@ extern long D_001A7208 NOT_SDA;
 extern long D_001A7210 MACRO_ADDR;
 
 /* Runs every vertical sync and updates the timer counters. */
-int func_001339B0(void) {
+int timer_update_vsync_counters(void) {
     D_001A7208++;
     D_001A7210 = D_001A7200 + (unsigned int)((int)T1_COUNT);
     return 0;

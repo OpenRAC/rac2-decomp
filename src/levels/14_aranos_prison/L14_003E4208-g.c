@@ -4,21 +4,21 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 
-extern float func_002A7878(float, float);
-extern int func_00282948(int *counter);
-extern void func_00283098(void *dst, void *a, void *mtx);
-extern void func_00282CC0(void *dst, void *a, void *b);
-extern void func_002A7750(char *object, int state, int arg);
-extern int func_002B3868(char *self);
-extern void func_002E59F8(int index);
-extern int func_002E5CF8(int index, int a1, char *a2);
-extern int func_00283D38(int a, int b, float t);
-extern float func_002AA140(float a, float b, float t);
+extern float math_random_float_range(float, float);
+extern int math_fast_float_d(int *counter);
+extern void matrix_mul_vec3(void *dst, void *a, void *mtx);
+extern void FastVecAdd(void *dst, void *a, void *b);
+extern void moby_set_state(char *object, int state, int arg);
+extern int flag_set_first_pending(char *self);
+extern void snd_stop_voice(int index);
+extern int PlayMobySound(int index, int a1, char *a2);
+extern int FastTweenColor(int a, int b, float t);
+extern float math_lerp_float(float a, float b, float t);
 /* The particle spawner (src/levels/shared/L00_0033E888-qcopy.c), declared with the life and
    rotation floats among the integer arguments: the EE ABI keeps each register bank's order. */
-extern void *func_L00_0033E888(void *position, void *velocity, int color, int value, float life, int size,
+extern void *part_spawn_spinning_particle(void *position, void *velocity, int color, int value, float life, int size,
                                int extra, float rotation, int texture, int flags, int weight);
-extern char D_00188660[];
+extern char g_sound_state[];
 extern char D_L14_001A8F20[] __attribute__((sda));
 
 /* The state block of a particle emitter. */
@@ -45,7 +45,7 @@ typedef struct {
    and color ramped over that count; once the count is done it moves to state 3. State 3 claims a
    sound slot if self does not own one and keeps spawning at the end rate until triggered. */
 /* Updates the moby of class 2829: a smoke-like particle emitter that builds up, bursts, then trickles. */
-void func_L14_003E4208(char *self)
+void smoke_emitter_update(char *self)
 {
     Emitter *st = *(Emitter **)(self + 0x68);
     Vec pos;
@@ -74,12 +74,12 @@ void func_L14_003E4208(char *self)
         st->color[1] = 0x70700050;
         st->color[3] = 0x80800070;
         st->entry = -1;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
         if (st->trigger == 1.0f) {
             st->trigger = 0.0f;
-            SetMobyState(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
         break;
     case 2: {
@@ -91,20 +91,20 @@ void func_L14_003E4208(char *self)
 
         if (st->trigger == 1.0f) {
             st->trigger = 0.0f;
-            SetMobyState(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
-        if (SetFirstPendingFlag(self)) {
+        if (flag_set_first_pending(self)) {
             st->accum = 0.0f;
             st->remaining = st->total;
         }
         if (st->entry != -1) {
-            char *e = gSoundState + st->entry * 0x70;
+            char *e = g_sound_state + st->entry * 0x70;
             if (*(int *)(e + 0x88) == (int)self && *(unsigned char *)(e + 0x74) != 0) {
-                StopSoundVoice(st->entry);
+                snd_stop_voice(st->entry);
             }
         }
         st->entry = -1;
-        if (FastFloatHelperD(&st->remaining) == 0) {
+        if (math_fast_float_d(&st->remaining) == 0) {
             rate = (st->rate_end - st->rate_start) / (float)st->total;
             rate = st->rate_start + rate * (((float)st->total - (float)st->remaining) - 0.008333334f);
             rate *= 0.016666668f;
@@ -118,38 +118,38 @@ void func_L14_003E4208(char *self)
                 tmp.f[0] += 1.1f;
                 matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
                 FastVecAdd(&pos, &pos, &tmp);
-                a = FastTweenColor(st->color[0], st->color[2], RandomFloatRange(0.0f, 1.0f));
-                color = FastTweenColor(FastTweenColor(st->color[1], st->color[3], RandomFloatRange(0.0f, 1.0f)), a,
+                a = FastTweenColor(st->color[0], st->color[2], math_random_float_range(0.0f, 1.0f));
+                color = FastTweenColor(FastTweenColor(st->color[1], st->color[3], math_random_float_range(0.0f, 1.0f)), a,
                                       (float)st->remaining / (float)st->total);
                 value = color & 0xFFFFFF;
-                life = RandomFloatRange(LerpFloat_002AA140(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
-                                     LerpFloat_002AA140(st->life_max[1], st->life_min[1], (float)st->remaining / (float)st->total));
+                life = math_random_float_range(math_lerp_float(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
+                                     math_lerp_float(st->life_max[1], st->life_min[1], (float)st->remaining / (float)st->total));
                 if (st->remaining < st->total / 3) {
-                    vel.f[0] += RandomFloatRange(0.0f, st->spread[0] * 2.0f);
-                    vel.f[1] += RandomFloatRange(0.0f, st->spread[1] * 2.0f);
-                    vel.f[2] += RandomFloatRange(-st->spread[2], 0.0f);
+                    vel.f[0] += math_random_float_range(0.0f, st->spread[0] * 2.0f);
+                    vel.f[1] += math_random_float_range(0.0f, st->spread[1] * 2.0f);
+                    vel.f[2] += math_random_float_range(-st->spread[2], 0.0f);
                     life *= 1.5f;
                     rotation = 0.0f;
                 } else {
-                    vel.f[0] += RandomFloatRange(0.0f, st->spread[0]);
-                    vel.f[1] += RandomFloatRange(0.0f, st->spread[1]);
-                    vel.f[2] += RandomFloatRange(-st->spread[2], 0.0f);
+                    vel.f[0] += math_random_float_range(0.0f, st->spread[0]);
+                    vel.f[1] += math_random_float_range(0.0f, st->spread[1]);
+                    vel.f[2] += math_random_float_range(-st->spread[2], 0.0f);
                     rotation = st->rotation;
                 }
                 matrix_mul_vec3(&vel, &vel, self + 0xC0);
-                SpawnSpinningParticle_L00(&pos, &vel, color, value, life, st->size, 0, rotation, 2, -1, 0);
+                part_spawn_spinning_particle(&pos, &vel, color, value, life, st->size, 0, rotation, 2, -1, 0);
                 st->accum -= 1.0f;
             }
         } else {
-            SetMobyState(self, 3, -1);
+            moby_set_state(self, 3, -1);
         }
         break;
     }
     case 3: {
         char *e;
 
-        SetFirstPendingFlag(self);
-        e = gSoundState + st->entry * 0x70;
+        flag_set_first_pending(self);
+        e = g_sound_state + st->entry * 0x70;
         if (*(int *)(e + 0x88) != (int)self || *(unsigned char *)(e + 0x74) == 0) {
             st->entry = PlayMobySound(0, 4, self);
         }
@@ -169,21 +169,21 @@ void func_L14_003E4208(char *self)
                 tmp.f[0] += 1.1f;
                 matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
                 FastVecAdd(&pos, &pos, &tmp);
-                color = FastTweenColor(st->color[1], st->color[3], RandomFloatRange(0.0f, 1.0f));
+                color = FastTweenColor(st->color[1], st->color[3], math_random_float_range(0.0f, 1.0f));
                 value = color & 0xFFFFFF;
-                life = RandomFloatRange(LerpFloat_002AA140(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
-                                     LerpFloat_002AA140(st->life_max[1], st->life_min[1], (float)st->remaining / (float)st->total));
-                vel.f[0] += RandomFloatRange(0.0f, st->spread[0] * 2.0f);
-                vel.f[1] += RandomFloatRange(0.0f, st->spread[1] * 2.0f);
-                vel.f[2] += RandomFloatRange(-st->spread[2], 0.0f);
+                life = math_random_float_range(math_lerp_float(st->life_max[0], st->life_min[0], (float)st->remaining / (float)st->total),
+                                     math_lerp_float(st->life_max[1], st->life_min[1], (float)st->remaining / (float)st->total));
+                vel.f[0] += math_random_float_range(0.0f, st->spread[0] * 2.0f);
+                vel.f[1] += math_random_float_range(0.0f, st->spread[1] * 2.0f);
+                vel.f[2] += math_random_float_range(-st->spread[2], 0.0f);
                 life *= 1.5f;
                 matrix_mul_vec3(&vel, &vel, self + 0xC0);
-                SpawnSpinningParticle_L00(&pos, &vel, color, value, life, st->size, 0, 0.0f, 2, -1, 0);
+                part_spawn_spinning_particle(&pos, &vel, color, value, life, st->size, 0, 0.0f, 2, -1, 0);
                 st->accum -= 1.0f;
             }
         } else {
             st->trigger = 0.0f;
-            SetMobyState(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
         break;
     }

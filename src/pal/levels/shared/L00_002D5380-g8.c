@@ -16,7 +16,7 @@ extern float D_L00_001A7CF8 __attribute__((sda));
 extern Manipulator4E58 D_L00_001B16D0 __attribute__((sda));
 extern Manipulator4E58 D_L00_001B2D80[];
 extern int D_0018B090[];
-extern void func_0029F978(char *, int, Manipulator4E58 *);
+extern void AttachManipulator(char *, int, Manipulator4E58 *);
 extern void func_PAL_L00_002D52C0(char *);
 extern void func_PAL_L00_002D5150(char *);
 
@@ -38,7 +38,7 @@ void func_PAL_L00_002D5380(char *object, int spawn)
     else
         D_L00_001A7CF8 = 1.0f;
     if (D_L00_001B16D0.initialized == 0) {
-        func_0029F978(object, 24, &D_L00_001B16D0);
+        AttachManipulator(object, 24, &D_L00_001B16D0);
         if (*(short *)(object + 0xAA) == 0xF6B) {
             D_L00_001B16D0.scale[0] = 0.92f;
             D_L00_001B16D0.scale[1] = 0.92f;
@@ -59,7 +59,7 @@ void func_PAL_L00_002D5380(char *object, int spawn)
         record = D_L00_001B2D80;
         for (i = 0; i < 2; i++, record++) {
             if (record->initialized == 0) {
-                func_0029F978(object, i + 22, record);
+                AttachManipulator(object, i + 22, record);
                 record->scale[0] = 0.01f;
                 record->scale[1] = 0.01f;
                 record->scale[2] = 0.01f;

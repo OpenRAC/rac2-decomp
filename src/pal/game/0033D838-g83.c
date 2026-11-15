@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_PAL_0033CFD0(void *, float);
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
 extern void func_PAL_0033CB00(void *, void *, void *);
-extern int func_00288FB8(int);
+extern int GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CF58(void *, float, float, float, float, float, float);
 extern void func_PAL_0033EEF8(void *, int);
 extern int D_001ADE48[2] __attribute__((sda));
 extern char D_001ADC88[];
-extern void func_00336408(void *, int, int, void *, void *);
-extern void func_00336CC8(void *, int);
+extern void object_init_derived_b(void *, int, int, void *, void *);
+extern void widget_set_pos_y(void *, int);
 extern void func_PAL_003388E8(void *, int);
-extern void func_00336B98(void *, int);
-extern void func_00336498(void *, int, int);
-extern void func_003364B0(void *, int, int);
-extern void func_00336CE0(void *, int);
-extern void func_00336CC0(void *, int);
+extern void meter_set_value(void *, int);
+extern void object_set_first_pair(void *, int, int);
+extern void object_set_second_pair(void *, int, int);
+extern void text_set_alignment(void *, int);
+extern void widget_store_field(void *, int);
 
 void func_PAL_0033EC98(char *object, void *argument)
 {
@@ -27,7 +28,7 @@ void func_PAL_0033EC98(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x36C) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -40,28 +41,28 @@ void func_PAL_0033EC98(char *object, void *argument)
     widget = object + 0x2DC;
     secondWidget = object + 0x324;
     func_PAL_0033CB00(child, argument, D_001ADE48);
-    text = func_00288FB8(0xBA8);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xBA8);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CF58(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_PAL_0033CFD0(child, 0.67f);
     table = D_001ADC88;
-    func_00336408(widget, 150, 1, table, argument);
-    func_00336CC8(widget, 16);
+    object_init_derived_b(widget, 150, 1, table, argument);
+    widget_set_pos_y(widget, 16);
     func_PAL_003388E8(widget, 0x400);
-    func_00336B98(widget, 0);
-    func_00336498(widget, 0x55F0C070, 0x55F0C070);
-    func_003364B0(widget, 0x60442D00, 0x60442D00);
-    func_00336CE0(widget, 0x20FFFFFF);
-    func_00336CC0(widget, 0);
-    func_00336408(secondWidget, 150, 1, table, argument);
-    func_00336CC8(secondWidget, 16);
+    meter_set_value(widget, 0);
+    object_set_first_pair(widget, 0x55F0C070, 0x55F0C070);
+    object_set_second_pair(widget, 0x60442D00, 0x60442D00);
+    text_set_alignment(widget, 0x20FFFFFF);
+    widget_store_field(widget, 0);
+    object_init_derived_b(secondWidget, 150, 1, table, argument);
+    widget_set_pos_y(secondWidget, 16);
     func_PAL_003388E8(secondWidget, 0x400);
-    func_00336B98(secondWidget, 0);
-    func_00336498(secondWidget, 0x55F0C070, 0x55F0C070);
-    func_003364B0(secondWidget, 0x60442D00, 0x60442D00);
-    func_00336CE0(secondWidget, 0x20FFFFFF);
-    func_00336CC0(secondWidget, 0);
+    meter_set_value(secondWidget, 0);
+    object_set_first_pair(secondWidget, 0x55F0C070, 0x55F0C070);
+    object_set_second_pair(secondWidget, 0x60442D00, 0x60442D00);
+    text_set_alignment(secondWidget, 0x20FFFFFF);
+    widget_store_field(secondWidget, 0);
     *(int *)(object + 0x2D8) = 0;
     func_PAL_0033EEF8(object, 0);
 }
@@ -79,7 +80,7 @@ void func_PAL_00340158(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x3BC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -91,9 +92,9 @@ void func_PAL_00340158(char *object, void *argument)
     child = object + 8;
     widget = object + 0x2E0;
     func_PAL_0033CB00(child, argument, D_001ADEC8);
-    text = func_00288FB8(0xBB1);
-    second = func_00288FB8(0xB86);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xBB1);
+    second = GetLocalizedString(0xB86);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CF58(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_PAL_0033CFD0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -128,7 +129,7 @@ void func_PAL_003404B0(char *object, void *argument)
     int text;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2D8) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -139,13 +140,13 @@ void func_PAL_003404B0(char *object, void *argument)
     (*(float **)(object + 0x2D8))[1] = 208.0f;
     child = object + 8;
     func_PAL_0033CB00(child, argument, D_001ADEF0);
-    text = func_00288FB8(0xC31);
-    func_PAL_0033CF78(child, text, 0, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xC31);
+    func_PAL_0033CF78(child, text, 0, GetLocalizedString(0xB60));
     func_PAL_0033CF58(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
     func_PAL_003405B0(object, 0);
 }
 
-extern void func_00335E38(char *p, float x, float y, float zero, float zero2);
+extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
 extern float D_L04_001AE1E0 __attribute__((sda));
 extern float D_L04_001AE1E8 __attribute__((sda));
 extern float D_L04_001AE1F0 __attribute__((sda));
@@ -163,12 +164,12 @@ void func_PAL_00340C88(char *self)
 {
     float zero = 0.0f;
 
-    func_00335E38(self + 1400, D_L04_001AE1F8 + (*(struct pos **)(self + 728))->x,
+    object_set_first_float4(self + 1400, D_L04_001AE1F8 + (*(struct pos **)(self + 728))->x,
             D_L04_001AE1FC + (*(struct pos **)(self + 728))->y, zero, zero);
-    func_00335E38(self + 1136, D_L04_001AE1E0 + (*(struct pos **)(self + 728))->x,
+    object_set_first_float4(self + 1136, D_L04_001AE1E0 + (*(struct pos **)(self + 728))->x,
             D_L04_001AE1E4 + (*(struct pos **)(self + 728))->y, zero, zero);
-    func_00335E38(self + 1224, D_L04_001AE1E8 + (*(struct pos **)(self + 728))->x,
+    object_set_first_float4(self + 1224, D_L04_001AE1E8 + (*(struct pos **)(self + 728))->x,
             D_L04_001AE1EC + (*(struct pos **)(self + 728))->y, zero, zero);
-    func_00335E38(self + 1312, D_L04_001AE1F0 + (*(struct pos **)(self + 728))->x,
+    object_set_first_float4(self + 1312, D_L04_001AE1F0 + (*(struct pos **)(self + 728))->x,
             D_L04_001AE1F4 + (*(struct pos **)(self + 728))->y, zero, zero);
 }

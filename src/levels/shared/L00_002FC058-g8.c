@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_002FC058 (184 bytes, 27 levels): a small state machine. State 1 arms the
    counter from the saved word; state 2 counts it down, runs the two hooks when
    func_L00_002FC018 says so, and otherwise advances or resets on the 0x10 pad flag.
@@ -9,11 +10,11 @@ extern int ref_L00_002FC058_01 __attribute__((sda));
 extern int ref_L00_002FC058_02 __attribute__((sda));
 extern char D_00138320[];
 
-extern int func_L00_002FC018(void);
-extern void func_L00_002FC020(void);
-extern void func_L00_002FC028(void);
+extern int level_get_flag_d(void);
+extern void level_clear_flag_e(void);
+extern void level_clear_flag_f(void);
 
-void func_L00_002FC058(void)
+void level_update_countdown_state_machine(void)
 {
     switch (ref_L00_002FC058_00) {
     case 0:
@@ -24,9 +25,9 @@ void func_L00_002FC058(void)
         break;
     case 2:
         ref_L00_002FC058_02 = ref_L00_002FC058_02 - 1;
-        if (GetLevelFlagD() != 0) {
-            ClearLevelFlagE();
-            ClearLevelFlagF();
+        if (level_get_flag_d() != 0) {
+            level_clear_flag_e();
+            level_clear_flag_f();
         } else if (ref_L00_002FC058_02 == 0) {
             if (*(int *)D_00138320 & 0x10)
                 ref_L00_002FC058_00++;

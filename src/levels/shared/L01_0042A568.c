@@ -2,11 +2,11 @@
 #include "common.h"
 
 extern char *ref_L01_0042A568_00[];
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
 /* The ship's docking state: 1 when it has come to rest on the pad, 4 when it is
    still too far out, plus 2 while the pad's beacon is lit and the ship can see it. */
-int func_L01_0042A568(void)
+int ship_get_docking_state(void)
 {
     char *ship = ref_L01_0042A568_00[0];
     char *motion = *(char **)(ship + 0x70);

@@ -11,7 +11,7 @@ extern int func_00282978_11();
 
 extern void func_002B9180_17();
 
-extern float func_00283CE0(int a);
+extern float IntToFloat(int a);
 
 extern int func_00283CF0_2(float f);
 
@@ -25,7 +25,7 @@ extern void func_00282D30_13(char *a, char *b, float f);
 
 extern void func_00300190_1(char *a, char *b);
 
-extern void func_00300248(char *a, char *b);
+extern void shop_trigger_current_state_effect(char *a, char *b);
 
 extern int func_00282978_3(char *p);
 
@@ -38,9 +38,9 @@ typedef int V4_F61e33ad9 __attribute__((mode(TI)));
 
 extern float func_00282C48_4(float f);
 
-extern float func_00282E80(void *a, void *b);
+extern float vec_distance_xy(void *a, void *b);
 
-extern float func_00282E48(void *a, void *b);
+extern float fast_vec_dist(void *a, void *b);
 
 /*
  * Disassembled at 0x002cd220
@@ -55,15 +55,15 @@ extern float func_00282E48(void *a, void *b);
  */
 extern void func_0027C540_2(long);
 
-extern void func_L00_0030D210(void);
+extern void module_l00_call_handler_4(void);
 
 extern void func_0027C660_2(void);
 
-unsigned long long func_L00_00346A80(void);
+unsigned long long level_l00_run_setup_return_zero_long(void);
 
 extern void func_0027C540_9(long);
 
-extern void func_L00_0030D2B0(void);
+extern void module_l00_call_handler_6(void);
 
 extern void func_0027C660_9(void);
 
@@ -85,17 +85,17 @@ extern void func_0027C660_9(void);
 /* External function declarations (exact addresses from task metadata) */
 extern void func_0027C540_7(long);
 
-extern void func_L00_0030D528(void);
+extern void module_l00_call_handler_11(void);
 
 extern void func_0027C660_7(void);
 
 extern int D_L00_001A904C_3 __attribute__((sda));
 
-extern int func_00341558(int x);
+extern int tab_menu_get_selected_value(int x);
 
 extern void func_0027C540_6(long);
 
-extern void func_L00_0030D758(void);
+extern void module_l00_call_handler_16(void);
 
 extern void func_0027C660_6(void);
 
@@ -103,7 +103,7 @@ void func_0027C540_3(long);
 
 void func_0027C660_3(void);
 
-void func_L00_0030D808(void);
+void module_l00_call_handler_17(void);
 
 /* 
  * Function: FUN_002D2EE0
@@ -125,7 +125,7 @@ void func_L00_0030D808(void);
 
 extern void func_0027C540_4(long arg0);
 
-extern void func_L00_0030D878(void);
+extern void module_l00_call_handler_18(void);
 
 extern void func_0027C660_4(void);
 
@@ -134,14 +134,14 @@ extern void func_0027C540_5(long);
 
 extern void func_0027C660_5(void);
 
-extern void func_L00_0030D9C8(void);
+extern void level_l00_call_module_handler_2(void);
 
 /* External functions declared with exact aliases from task.externals */
 extern void func_0027C540_8(long param_1);
 
 extern void func_0027C660_8(void);
 
-extern void func_L00_0030DA38(void);
+extern void level_l00_call_module_handler_3(void);
 
 /* Target: FUN_002d5540 on MIPS (SCUS_972.68, -O2 -G0 -ffunction-sections)
  * Calls three externals: FUN_0027C540(int), FUN_0029CED8(void), FUN_0027C660(void)
@@ -164,7 +164,7 @@ extern BatchA_A03_s32 D_001A7B90_1[] __attribute__((sda));
 
 /* Guarded child-descriptor update: when the guard call returns non-zero the child is released, otherwise a packed colour byte is folded into a parent word and a four-float vector is assembled and handed to a spawn helper before three counters are advanced. */
 /* Updates one small visual effect each frame: it fades and moves the effect, or removes it when its time is up. */
-void func_L00_0033F678(char *effect)
+void part_l00_update_fading_effect_2(char *effect)
 {
     char delta[16];
     char *effectBase = effect;
@@ -196,7 +196,7 @@ void func_L00_0033F678(char *effect)
 
 /* Calls a routine on pointer-plus-10 and, when it returns non-zero, calls a second routine with the pointer itself. */
 /* Removes the effect once its timer check says it is finished. */
-void func_L00_003402B8(char *effect)
+void part_remove_finished_effect(char *effect)
 {
     if (func_00282978_11(effect + 10)) {
         func_002B9180_17(effect);
@@ -205,7 +205,7 @@ void func_L00_003402B8(char *effect)
 
 /* Guarded child-descriptor update: when the guard call returns non-zero the child is released, otherwise a packed colour byte is folded into a parent word and a four-float vector is assembled and handed to a spawn helper before three counters are advanced. */
 /* Updates one small visual effect each frame: it fades and moves the effect, or removes it when its time is up. */
-void func_L00_00340490(char *effect)
+void part_l00_update_fading_effect_3(char *effect)
 {
     char delta[16];
     char *effectBase = effect;
@@ -245,7 +245,7 @@ void func_L00_00340490(char *effect)
 
 /* divides one helper result by a second, multiplies a third by the quotient, quantises that product to a byte lane and the half quotient through two more helpers, bumps a byte counter, adds a scaled helper result to a float field, forwards two 16-byte sub-objects to three helpers, stores the merged byte lanes over a low halfword and calls a trailing helper when a probe on the parameter returns non-zero */
 /* Updates a fading, shrinking effect that drifts and is removed when its time runs out. */
-void func_L00_00341658(char *effect)
+void part_update_shrinking_effect(char *effect)
 {
     char *params = effect + 32;
     char *effectPos = effect + 16;
@@ -264,7 +264,7 @@ void func_L00_00341658(char *effect)
     func_00282CC0_13(effectPos, effectPos, params);
     func_00282D30_13(params, params, 0.99f);
     func_00300190_1(effectPos, effectPos);
-    TriggerCurrentStateEffect(params, params);
+    shop_trigger_current_state_effect(params, params);
     *(int *)(effect + 4) = colorByte | (alphaByte << 24);
     if (func_00282978_3(effect + 10) != 0) {
         func_002B9180_6(effect);
@@ -275,7 +275,7 @@ void func_L00_00341658(char *effect)
 /* advances an index with signed delta and either wraps by count or clamps the applicable endpoint */
 /* Advances a signed index, wrapping or clamping to the measured count. */
 /* Moves a list index forward or back and either wraps around or stops at the ends. */
-s32 func_L00_003417B8(const s32 *count, s32 index, s32 delta, s32 wrap) {
+s32 path_advance_index(const s32 *count, s32 index, s32 delta, s32 wrap) {
     if (wrap != 0) {
         index = (index + delta + *count) % *count;
     } else {
@@ -293,7 +293,7 @@ s32 func_L00_003417B8(const s32 *count, s32 index, s32 delta, s32 wrap) {
 
 /* copies two 16-byte records into locals; when the float threshold is positive it passes the difference of their third components through a float leaf returning the absolute value and, if that is below the threshold, calls one leaf with both records, otherwise the shared alternative leaf */
 /* Measures how far apart two points are, using a quicker check when they are close in height. */
-float func_L00_00341A88(void *vecA, void *vecB, float scale)
+float vec_measure_distance_with_height(void *vecA, void *vecB, float scale)
 {
     V4_F61e33ad9 copyA;
     V4_F61e33ad9 copyB;
@@ -323,14 +323,14 @@ float func_L00_00341A88(void *vecA, void *vecB, float scale)
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { int count; int reserved[3]; Vector points[0]; } Path;
-extern int func_L00_00341820(const Path *, Vector *, int *, float *, float, int);
-extern float func_L00_00341D08(Vector *, const Vector *, const Vector *, const Vector *, float);
-extern void func_00282C88(Quadword *);
+extern int Spline_AdvanceByDistance(const Path *, Vector *, int *, float *, float, int);
+extern float ProjectPointOntoSegment(Vector *, const Vector *, const Vector *, const Vector *, float);
+extern void vec_clear_128(Quadword *);
 
 /* Find the nearby path segment and the projected position on that segment.
  * Counterpart of rac1-decomp's find_nearest_path_point (moby_ground_collision.c). */
 /* Finds the closest spot along a path to a given point. */
-int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
+int find_nearest_path_point(const Path *path, const Vector *point, Vector *out,
                      int *index, float *offset, int wrap,
                      float range, float step, float height) {
     Vector current, a, b, candidate;
@@ -345,16 +345,16 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
     a.q = point->q;
     nearestIndex = 0;
     nearestOffset = 0.0f;
-    nearestDistance = MeasureDistanceWithHeightCheck(&current, &a, height);
+    nearestDistance = vec_measure_distance_with_height(&current, &a, height);
     if (path->count == 0) {
-        ClearVector128(&out->q);
+        vec_clear_128(&out->q);
         return 0;
     }
     searchRange = step + range;
     do {
         finished = Spline_AdvanceByDistance(path, &current, &scanIndex, &scanOffset, step, wrap);
         a.q = point->q;
-        distance = MeasureDistanceWithHeightCheck(&current, &a, height);
+        distance = vec_measure_distance_with_height(&current, &a, height);
         if (distance < nearestDistance) {
             nearestIndex = scanIndex;
             nearestDistance = distance;
@@ -368,13 +368,13 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
     right = nearestIndex;
     scanOffset = nearestOffset;
     Spline_AdvanceByDistance(path, &current, &right, &scanOffset, step, wrap);
-    right = AdvancePathIndex(&path->count, right, 1, wrap);
+    right = path_advance_index(&path->count, right, 1, wrap);
     scanIndex = left;
     nearestDistance = 1000000000.0f;
     for (;;) {
         a.q = ((const Vector *)path)[scanIndex + 1].q;
         b.q = point->q;
-        distance = MeasureDistanceWithHeightCheck(&a, &b, height);
+        distance = vec_measure_distance_with_height(&a, &b, height);
         if (distance < nearestDistance) {
             nearestIndex = scanIndex;
             nearestDistance = distance;
@@ -393,7 +393,7 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
         *index = previous;
         a.q = ((const Vector *)path)[previous + 1].q;
         b.q = out->q;
-        *offset = MeasureDistanceWithHeightCheck(&a, &b, 0.0f);
+        *offset = vec_measure_distance_with_height(&a, &b, 0.0f);
         nearestDistance = projected;
     }
     if (nearestIndex < path->count - 1 || wrap) {
@@ -404,7 +404,7 @@ int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
             *index = nearestIndex;
             b.q = ((const Vector *)path)[nearestIndex + 1].q;
             candidate.q = out->q;
-            *offset = MeasureDistanceWithHeightCheck(&b, &candidate, 0.0f);
+            *offset = vec_measure_distance_with_height(&b, &candidate, 0.0f);
         }
     }
     return 1;
@@ -419,146 +419,146 @@ extern void *r1_D_0012F86C NOT_SDA;
 
 /* rac1-decomp src/core/001138A8.c: func_001138A8 */
 /* Returns a stored global pointer. */
-int func_L00_00342EB0(void) {
+int level_get_stored_global_pointer(void) {
     return (int)r1_D_0012F86C;
 }
 
 /* Does nothing and returns zero. */
-unsigned int func_L00_00345AF0(void)
+unsigned int return_l00_zero(void)
 {
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00345AF8(void) {
+int return_l00_zero_2(void) {
     return 0;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_00346680(void)
+int level_l00_run_setup_return_zero(void)
 {
   func_0027C540_2(0);
-  CallLoadedModuleHandler_00348EC0();
+  module_l00_call_handler_4();
   func_0027C660_2();
   return 0;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-unsigned long long func_L00_00346A80(void)
+unsigned long long level_l00_run_setup_return_zero_long(void)
 {
   func_0027C540_9(0);
-  CallLoadedModuleHandler_003465D0();
+  module_l00_call_handler_6();
   func_0027C660_9();
   return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00346AB0(void) {
+int return_l00_zero_3(void) {
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00346AB8(void) {
+int return_l00_zero_4(void) {
     return 0;
 }
 
 /* Runs a short setup routine and returns zero. */
-int func_L00_00346B50(void)
+int level_l00_run_setup_return_zero_2(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_00340250();
+    level_l00_call_module_handler_8();
     DoGifPaging();
     return 0;
 }
 
-extern int func_00344378(int x);
+extern int grid_menu_get_selected_text_id(int x);
 
 /* When the global is set, derives a pointer from it plus a fixed offset, runs it through a callee and stores the result into a field of the argument. */
 /* Looks up a data entry from a global table and stores it in the object. */
-int func_L00_00346CD8(int *effect)
+int level_l00_store_table_entry_in_object(int *effect)
 {
     if (D_L00_001A904C_3 != 0)
-        effect[13] = GetGridMenuSelectedTextId(D_L00_001A904C_3 + 0x39F38);
+        effect[13] = grid_menu_get_selected_text_id(D_L00_001A904C_3 + 0x39F38);
     return 0;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-long long func_L00_00346D20(void)
+long long level_l00_run_setup_return_zero_long_2(void)
 {
     func_0027C540_7(0LL);
-    CallLoadedModuleHandler_00345358();
+    module_l00_call_handler_11();
     func_0027C660_7();
     return 0LL;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00347A28(void) {
+int return_l00_zero_5(void) {
     return 0;
 }
 
 /* When a global flag is set, derives a pointer from that global plus a fixed offset, runs it through one callee and stores the callee result into a field of the argument. */
 /* Looks up a data entry from a global table and stores it in the object. */
-int func_L00_003485E8(int *obj)
+int level_l00_store_table_entry_in_object_2(int *obj)
 {
     if (D_L00_001A904C_3 != 0)
-        obj[13] = GetSelectedTabEntryValue(D_L00_001A904C_3 + 0x3BE08);
+        obj[13] = tab_menu_get_selected_value(D_L00_001A904C_3 + 0x3BE08);
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00349040(void) {
+int return_l00_zero_6(void) {
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_00349628(void) {
+int return_l00_zero_7(void) {
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_0034B470(void) {
+int return_l00_zero_8(void) {
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_0034BC90(void) {
+int return_l00_zero_9(void) {
     return 0;
 }
 
 extern int D_00138344;
 
-extern void func_L00_0030D718(int a);
+extern void module_l00_call_handler_with_arg_15(int a);
 
-extern void func_L00_0030E010(int a);
+extern void level_l00_call_module_handler_with_arg_11(int a);
 
-extern void func_0027C540(int a);
+extern void SetupGifPaging(int a);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
-extern void func_L00_0030DCF8(void);
+extern void level_l00_call_module_handler_8(void);
 
-extern void func_L00_0030D6E8(void);
+extern void module_l00_call_handler_15(void);
 
-extern void func_L00_0030D8E8(void);
+extern void module_l00_call_handler_19(void);
 
 
-extern void func_L00_0030D478(int a);
+extern void module_l00_call_handler_with_arg_9(int a);
 
 /* Runs an update step using the saved input state and returns zero. */
-int func_L00_0034C038(void)
+int pad_run_input_update_return_zero(void)
 {
-    CallLoadedModuleHandlerWithArg_0033E5C0(D_00138344);
+    module_l00_call_handler_with_arg_15(D_00138344);
     return 0;
 }
 
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C060(void)
+int level_l00_run_setup_return_zero_3(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_L00433F50();
+    module_l00_call_handler_15();
     DoGifPaging();
     return 0;
 }
@@ -575,11 +575,11 @@ typedef struct {
 
 extern CallbackStateL001FEC40 D_L00_001FEC40;
 
-extern void func_L00_0030D788(int);
+extern void module_l00_call_handler_with_arg_16(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C090(void)
+int pad_l00_update_input_callback(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -598,7 +598,7 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_L00433198(flags);
+        module_l00_call_handler_with_arg_16(flags);
     return result;
 }
 
@@ -606,20 +606,20 @@ return_value:
    and report it (or the fallback's -1); with a busy bit set report 1; otherwise run the setup
    call and service the pending request. Three copies differ only in their callees. */
 
-extern int D_00138180[];
-extern int func_L00_0030D5C8(int);
-extern int func_L00_0030D9F8(int);
-extern int func_L00_0030DB48(int);
-extern int func_003415B8(int);
-extern int func_0033E310(int);
-extern int func_003423B0(int);
-extern void func_002D5E98(int);
+extern int g_pad_state[];
+extern int module_l00_call_handler_with_arg_12(int);
+extern int level_l00_call_module_handler_with_arg_2(int);
+extern int level_l00_call_module_handler_with_arg_5(int);
+extern int tab_menu_get_selected_entry(int);
+extern int list_page_get_selected_record(int);
+extern int list_menu_get_selected_record(int);
+extern void menu_start_action(int);
 
 /* Checks the saved input state, runs an update step and may send out a pending request. */
-int func_L00_00346DB0(void)
+int pad_update_input_callback_with_request(void)
 {
     int result = 0;
-    int *state = gPadState;
+    int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
@@ -638,14 +638,14 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else {
-        CallLoadedModuleHandlerWithArg_003418C0_L00(flags);
+        module_l00_call_handler_with_arg_12(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_L00_001A904C_3) {
-            char *entry = (char *)GetSelectedTabEntryAddress(D_L00_001A904C_3 + 0x3BE08);
+            char *entry = (char *)tab_menu_get_selected_entry(D_L00_001A904C_3 + 0x3BE08);
             struct { short unused; unsigned short id; int value; } request;
 
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            StartMenuAction((int)&request);
+            menu_start_action((int)&request);
         }
     }
     return result;
@@ -653,29 +653,29 @@ return_value:
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C118(void)
+int level_l00_run_setup_return_zero_4(void)
 {
     func_0027C540_6(0);
-    CallLoadedModuleHandler_0033D970();
+    module_l00_call_handler_16();
     func_0027C660_6();
     return 0;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-unsigned long long func_L00_0034C288(void)
+unsigned long long level_l00_run_setup_return_zero_long_3(void)
 {
     func_0027C540_3(0);
-    CallLoadedModuleHandler_0033C738();
+    module_l00_call_handler_17();
     func_0027C660_3();
     return 0;
 }
 
-extern void func_L00_0030D838(int);
+extern void module_l00_call_handler_with_arg_18(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C2B8(void)
+int pad_l00_update_input_callback_2(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -694,25 +694,25 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_L00432448(flags);
+        module_l00_call_handler_with_arg_18(flags);
     return result;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-unsigned long long func_L00_0034C340(void)
+unsigned long long level_l00_run_setup_return_zero_long_4(void)
 {
     func_0027C540_4(0);
-    CallLoadedModuleHandler_0033CC20();
+    module_l00_call_handler_18();
     func_0027C660_4();
     return 0;
 }
 
-extern void func_L00_0030D8A8(int);
+extern void module_l00_call_handler_with_arg_19(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C370(void)
+int pad_l00_update_input_callback_3(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -731,23 +731,23 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_L00432ED0(flags);
+        module_l00_call_handler_with_arg_19(flags);
     return result;
 }
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C3F8(void)
+int level_l00_run_setup_return_zero_5(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033D638();
+    module_l00_call_handler_19();
     DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030DAD8(int);
+extern void level_l00_call_module_handler_with_arg_4(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C428(void)
+int pad_l00_update_input_callback_4(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -766,26 +766,26 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_L00433560(flags);
+        level_l00_call_module_handler_with_arg_4(flags);
     return result;
 }
-extern void func_L00_0030DB18(void);
+extern void level_l00_call_module_handler_5(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C4B0(void)
+int level_l00_run_setup_return_zero_6(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033DCC8();
+    level_l00_call_module_handler_5();
     DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030DA68(int);
+extern void level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C4E0(void)
+int pad_l00_update_input_callback_5(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -804,38 +804,38 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_0033D028(flags);
+        level_l00_call_module_handler_with_arg_3(flags);
     return result;
 }
-extern void func_L00_0030DAA8(void);
+extern void level_l00_call_module_handler_4(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C568(void)
+int level_l00_run_setup_return_zero_7(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033D2C0();
+    level_l00_call_module_handler_4();
     DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030D958(void);
+extern void level_l00_call_module_handler(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C638(void)
+int level_l00_run_setup_return_zero_8(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033C028();
+    level_l00_call_module_handler();
     DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030D988(int);
+extern void level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
-int func_L00_0034C668(void)
+int pad_l00_update_input_callback_6(void)
 {
     int result = 0;
     int flags = D_00138344;
@@ -854,26 +854,26 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        CallLoadedModuleHandlerWithArg_0033C2D8(flags);
+        level_l00_call_module_handler_with_arg(flags);
     return result;
 }
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Implementation matching decompiled output */
 /* Runs a short setup routine and returns zero. */
-long func_L00_0034C6F0(void)
+long setup_l00_run_three_return_zero(void)
 {
   func_0027C540_5(0);
-  CallLoadedModuleHandler_0033C378();
+  level_l00_call_module_handler_2();
   func_0027C660_5();
   return 0;
 }
 
 /* The same guarded callback update with its own setup call and pending-request reader. */
 /* Checks the saved input state, runs an update step and may send out a pending request. */
-int func_L00_0034C720(void)
+int input_l00_callback_send_request(void)
 {
     int result = 0;
-    int *state = gPadState;
+    int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
@@ -892,14 +892,14 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else {
-        CallLoadedModuleHandlerWithArg_0033E3A0(flags);
+        level_l00_call_module_handler_with_arg_2(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_L00_001A904C_3) {
-            char *entry = (char *)GetSelectedListRecord(D_L00_001A904C_3 + 0x3EDB8);
+            char *entry = (char *)list_page_get_selected_record(D_L00_001A904C_3 + 0x3EDB8);
             struct { short unused; unsigned short id; int value; } request;
 
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            StartMenuAction((int)&request);
+            menu_start_action((int)&request);
         }
     }
     return result;
@@ -908,52 +908,52 @@ return_value:
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Candidate function: FUN_002d3390 */
 /* Runs a short setup routine and returns zero. */
-unsigned long long func_L00_0034C7F0(void)
+unsigned long long setup_l00_run_three_return_zero_2(void)
 {
     func_0027C540_8(0);
-    CallLoadedModuleHandler_0033E428();
+    level_l00_call_module_handler_3();
     func_0027C660_8();
     return 0;
 }
 
-extern void func_L00_0030D678(void);
+extern void module_l00_call_handler_14(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034C8E8(void)
+int setup_l00_run_three_return_zero_3(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_003438E8();
+    module_l00_call_handler_14();
     DoGifPaging();
     return 0;
 }
 
 /* When a global flag is set, derives a pointer from that global plus a fixed offset, runs it through one callee and stores the callee result into a field of the argument. */
 /* Looks up a data entry from a global table and stores it in the object. */
-int func_L00_0034E6F0(int *obj)
+int table_store_entry_in_object(int *obj)
 {
     if (D_L00_001A904C_3 != 0)
-        obj[13] = GetSelectedTabEntryValue(D_L00_001A904C_3 + 0x3BE08);
+        obj[13] = tab_menu_get_selected_value(D_L00_001A904C_3 + 0x3BE08);
     return 0;
 }
 
 /* Runs an update step using the saved input state and returns zero. */
-int func_L00_0034E950(void)
+int input_l00_update_return_zero(void)
 {
-    CallLoadedModuleHandlerWithArg_003398A8(D_00138344);
+    level_l00_call_module_handler_with_arg_11(D_00138344);
     return 0;
 }
 
 /* Runs an update step using the saved input state and returns zero. */
-int func_L00_0034E978(void)
+int input_l00_update_return_zero_2(void)
 {
-    CallLoadedModuleHandlerWithArg_003398A8(D_00138344);
+    level_l00_call_module_handler_with_arg_11(D_00138344);
     return 0;
 }
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-long long func_L00_0034E9A0(void)
+long long setup_l00_run_three_return_zero_4(void)
 {
     func_0027C540_1(0);
     func_L00_0030DFE0();
@@ -962,28 +962,28 @@ long long func_L00_0034E9A0(void)
 }
 
 /* Does nothing and returns zero. */
-int func_L00_0034EA38(void) {
+int stub_l00_return_zero(void) {
     return 0;
 }
 
-extern void func_L00_0030DBF8(void);
+extern void level_l00_call_module_handler_7(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034EB78(void)
+int setup_l00_run_three_return_zero_5(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_00341F38();
+    level_l00_call_module_handler_7();
     DoGifPaging();
     return 0;
 }
 
 /* The same guarded callback update with its own setup call and pending-request reader. */
 /* Checks the saved input state, runs an update step and may send out a pending request. */
-int func_L00_0034EC00(void)
+int input_l00_callback_send_request_2(void)
 {
     int result = 0;
-    int *state = gPadState;
+    int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
@@ -1002,46 +1002,46 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else {
-        CallLoadedModuleHandlerWithArg_003424C0(flags);
+        level_l00_call_module_handler_with_arg_5(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_L00_001A904C_3) {
-            char *entry = (char *)GetSelectedListRecordAddress(D_L00_001A904C_3 + 0x3E1D8);
+            char *entry = (char *)list_menu_get_selected_record(D_L00_001A904C_3 + 0x3E1D8);
             struct { short unused; unsigned short id; int value; } request;
 
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            StartMenuAction((int)&request);
+            menu_start_action((int)&request);
         }
     }
     return result;
 }
 
-extern void func_L00_0030DB88(void);
+extern void level_l00_call_module_handler_6(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034ECD0(void)
+int setup_l00_run_three_return_zero_6(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_00342758();
+    level_l00_call_module_handler_6();
     DoGifPaging();
     return 0;
 }
 
 /* Runs an update step using the saved input state and returns zero. */
-int func_L00_0034ED58(void)
+int input_l00_update_return_zero_3(void)
 {
-    CallLoadedModuleHandlerWithArg_0033B540(D_00138344);
+    module_l00_call_handler_with_arg_9(D_00138344);
     return 0;
 }
 
-extern void func_L00_0030D448(void);
+extern void module_l00_call_handler_9(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034ED80(void)
+int setup_l00_run_three_return_zero_7(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033B910();
+    module_l00_call_handler_9();
     DoGifPaging();
     return 0;
 }
@@ -1049,24 +1049,24 @@ int func_L00_0034ED80(void)
 extern int D_L00_001C95D4;
 
 /* Resets a global value to minus one. */
-int func_L00_0034EDB0(void) {
+int state_l00_reset_to_minus_one(void) {
     D_L00_001C95D4 = -1;
     return 0;
 }
 
 /* Does nothing and returns zero. */
-int func_L00_0034EDC8(void) {
+int stub_l00_return_zero_2(void) {
     return 0;
 }
 
-extern void func_L00_0030D4B8(void);
+extern void module_l00_call_handler_10(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Runs a short setup routine and returns zero. */
-int func_L00_0034EF68(void)
+int setup_l00_run_three_return_zero_8(void)
 {
     SetupGifPaging(0);
-    CallLoadedModuleHandler_0033F030();
+    module_l00_call_handler_10();
     DoGifPaging();
     return 0;
 }
@@ -1075,13 +1075,13 @@ int func_L00_0034EF68(void)
 extern int D_L00_001C95D4;
 
 /* Resets a global value to minus one. */
-int func_L00_00350F28(void) {
+int state_l00_reset_to_minus_one_2(void) {
     D_L00_001C95D4 = -1;
     return 0;
 }
 
 /* Does nothing and returns zero. */
-unsigned int func_L00_00351608(void)
+unsigned int stub_l00_return_zero_3(void)
 {
     return 0;
 }
@@ -1089,7 +1089,7 @@ unsigned int func_L00_00351608(void)
 
 /* A03-counter-mod50-80 freshly exact-verified under family reservation */
 /* Counts calls and gives the counter a small bump every 50th call. */
-void func_L00_003584B0(void)
+void counter_count_calls_bump(void)
 {
     if (D_L00_001A8FE0[0] == 0) {
         BatchA_A03_s32 counter = D_001A7BC0[0] + 1;
@@ -1105,13 +1105,13 @@ void func_L00_003584B0(void)
 /* Return the constant signed integer one. */
 /* Returns the constant integer 1. Matches FUN_0012F940 disassembly and decompilation. */
 /* Always returns 1. */
-int func_L00_00358668(void) {
+int stub_l00_return_one(void) {
     return 1;
 }
 
 
 
-extern void func_00282A60(unsigned int *dst, unsigned int val, int size);
+extern void mem_clear(unsigned int *dst, unsigned int val, int size);
 
 extern char D_L00_0021D140[];
 extern char D_L00_0021DDB0[];
@@ -1119,11 +1119,11 @@ extern char D_L00_001B2370[] __attribute__((sda));
 
 /* Zeroes the three measured work areas, the two 0xC70-byte ones and a 0x40-byte one. */
 /* Clears three work memory areas to zero. */
-void func_L00_003588A8(void)
+void mem_clear_work_areas(void)
 {
-    ClearMemory((unsigned int *)D_L00_0021D140, 0, 0xC70);
-    ClearMemory((unsigned int *)D_L00_0021DDB0, 0, 0xC70);
-    ClearMemory((unsigned int *)D_L00_001B2370, 0, 0x40);
+    mem_clear((unsigned int *)D_L00_0021D140, 0, 0xC70);
+    mem_clear((unsigned int *)D_L00_0021DDB0, 0, 0xC70);
+    mem_clear((unsigned int *)D_L00_001B2370, 0, 0x40);
 }
 
 
@@ -1132,7 +1132,7 @@ extern char *D_L00_001B1EA0 __attribute__((sda));
 
 /* Walks the 0x100-byte records between the two list bounds and returns the first whose 16-bit key at 0xB2 matches, or null. */
 /* Searches the record list for the entry with a matching id and returns it, or null. */
-char *func_L00_00358D50(int a0, int key)
+char *record_find_by_id(int a0, int key)
 {
     char *cur;
     for (cur = D_L00_001B1E9C; cur != D_L00_001B1EA0; cur += 0x100) {

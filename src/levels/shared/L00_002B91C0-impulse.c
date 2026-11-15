@@ -23,8 +23,8 @@ typedef struct {
 
 extern char D_00189F10[];
 extern ResidentState_9F00 D_00189E20_2;
-extern char D_00189EA0[];
-extern struct { char pad[0x1C]; int count; char pad20[0x20]; float v[4]; } D_L00_001BF200;
+extern char g_hero_position[];
+extern struct { char pad[0x1C]; int count; char pad20[0x20]; float v[4]; } g_collision_result;
 
 extern float func_L00_002D3A58_1(void *);
 extern void func_L00_002D3BD8_2(void *, void *, float);
@@ -32,13 +32,13 @@ extern void func_L00_002D3B58_1(void *, void *, float);
 extern void func_00282CC0_3(void *, void *, void *);
 extern int func_002761F8_1(void *, void *, int, int, int);
 extern void func_00282D30_9f(void *, void *, float);
-extern void func_L00_002D3798(void *, void *, float);
-extern void func_L00_002D38A0(void *, void *, float);
-extern float func_L00_002D3EA8(void *);
-extern void func_L00_002B6118(float);
+extern void cam_offset_point_by_side_direction(void *, void *, float);
+extern void cam_offset_point_in_view_space(void *, void *, float);
+extern float cam_get_view_space_angle(void *);
+extern void hero_scale_saved_vectors(float);
 
 /* Scale the hero's velocity into a push (at least minimum long), probe for a surface along it, and trigger the response unless the surface is too steep. */
-void func_L00_002B9F00(float amount, float minimum)
+void hero_try_surface_push_response(float amount, float minimum)
 {
     /* The resident block is viewed from three symbols (velocity, block, hero). */
     char *vel = D_00189F10;
@@ -63,23 +63,23 @@ void func_L00_002B9F00(float amount, float minimum)
     func_00282D30_9f(push, base->velocity, amount);
     if (minimum > 0.0f && func_L00_002D3A58_1(push) < minimum) {
         func_L00_002D3BD8_2(push, push, 0.0f);
-        OffsetPointBySideDirection(push, push, minimum);
+        cam_offset_point_by_side_direction(push, push, minimum);
     }
     func_L00_002D3B58_1(push, push, 0.0f);
 
-    origin = gHeroPosition;
+    origin = g_hero_position;
     func_00282CC0_3(push, push, origin);
     qcopy(probe, push);
-    OffsetPointInViewSpace(push, push, 0.3f);
+    cam_offset_point_in_view_space(push, push, 0.3f);
     hero = (ResidentState_9F00 *)(origin - 0x80);
-    OffsetPointInViewSpace(probe, probe, hero->b22B4 == 2 ? -0.7f : -0.35f);
+    cam_offset_point_in_view_space(probe, probe, hero->b22B4 == 2 ? -0.7f : -0.35f);
 
     enabled = 1.0f;
     if (func_002761F8_1(push, probe, 4, hero->i2290, 0)) {
-        if (gCollisionResult.count > 0 &&
-            GetViewSpaceAngle(gCollisionResult.v) <= 0.8726646900177002f)
+        if (g_collision_result.count > 0 &&
+            cam_get_view_space_angle(g_collision_result.v) <= 0.8726646900177002f)
             enabled = 0.0f;
     }
     if (enabled != 0.0f)
-        ScaleHeroSavedVectors(0.0f);
+        hero_scale_saved_vectors(0.0f);
 }

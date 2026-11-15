@@ -7,10 +7,10 @@ extern float D_001BD364[];
 extern int D_001B1EB4[] __attribute__((sda));
 extern int D_001B255C[] __attribute__((sda));
 extern float ref_L00_002E54E0_00 __attribute__((sda));
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 /* Limits the value to a safe range, stores it in several engine settings, then refreshes the view. */
-void func_L00_002E54E0(float value)
+void gfx_set_clamped_view_distance(float value)
 {
     int quantized;
 

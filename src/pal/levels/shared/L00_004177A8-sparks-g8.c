@@ -9,17 +9,17 @@ extern float D_L00_001B1350 __attribute__((sda));
 extern float D_L00_001B1354 __attribute__((sda));
 extern float D_L00_001B1358 __attribute__((sda));
 extern float D_L00_001B135C __attribute__((sda));
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282D30(void *,void *,float);
-extern float func_00282DB0(void *,void *);
-extern float func_002A7878(float,float),func_002A78D8(float,float);
-extern int func_002A77E0(int);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecScale(void *,void *,float);
+extern float FastVecDot(void *,void *);
+extern float math_random_float_range(float,float),math_random_signed_float_range(float,float);
+extern int math_random_int_below(int);
 extern int func_001163B0(void);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern unsigned char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
-extern int func_00283CF0(float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern int FloatToInt(float);
 /* Emit paired particles, either outward or toward the camera. */
 void func_PAL_L00_004177A8(char *pos, int count, int mode) {
     float velocity[4] __attribute__((aligned(16)));
@@ -31,64 +31,64 @@ void func_PAL_L00_004177A8(char *pos, int count, int mode) {
     float size, angle, speed;
     u8 *particle;
 
-    func_00282CF0(direction, D_L00_001B8C80+0x140, (float *)pos);
+    FastVecSub(direction, D_L00_001B8C80+0x140, (float *)pos);
     if (D_L00_001A8FF0 == 0) {
         direction[2] = 0.0f;
         axis[0] = 0.0f; axis[1] = 0.0f; axis[2] = 1.0f; axis[3] = 1.0f;
     } else {
-        func_00282CF0(extra, pos, D_00189ED0);
-        func_00282F20(axis, extra, 1.0f);
-        func_00282D30(extra, axis, func_00282DB0(axis, direction));
-        func_00282CF0(direction, direction, extra);
+        FastVecSub(extra, pos, D_00189ED0);
+        vec_scale_to_length(axis, extra, 1.0f);
+        FastVecScale(extra, axis, FastVecDot(axis, direction));
+        FastVecSub(direction, direction, extra);
     }
     for (i = 0; i < count; i++) {
-        size = func_002A7878(D_L00_001B1358, D_L00_001B135C);
-        sign = func_002A77E0(2);
+        size = math_random_float_range(D_L00_001B1358, D_L00_001B135C);
+        sign = math_random_int_below(2);
         if (sign == 0)
             sign--;
-        angle = func_002A7878(-1.0471977f, 1.0471977f);
-        func_002ACEC0(velocity, direction, axis, angle);
-        speed = func_002A7878(D_L00_001B1344, D_L00_001B1348) * 0.020000001f;
-        func_00282F20((char *)velocity, (char *)velocity, speed);
-        velocity[2] = func_002A7878(D_L00_001B134C, D_L00_001B1350) * 0.020000001f;
+        angle = math_random_float_range(-1.0471977f, 1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
+        speed = math_random_float_range(D_L00_001B1344, D_L00_001B1348) * 0.020000001f;
+        vec_scale_to_length((char *)velocity, (char *)velocity, speed);
+        velocity[2] = math_random_float_range(D_L00_001B134C, D_L00_001B1350) * 0.020000001f;
         qcopy(point, pos);
-        point[0] += func_002A78D8(0.0f, 0.15f);
-        point[1] += func_002A78D8(0.0f, 0.15f);
-        point[2] += func_002A78D8(0.0f, 0.15f);
+        point[0] += math_random_signed_float_range(0.0f, 0.15f);
+        point[1] += math_random_signed_float_range(0.0f, 0.15f);
+        point[2] += math_random_signed_float_range(0.0f, 0.15f);
         if (mode == 0) {
             if (!(func_001163B0() & 1)) {
-                func_00282D30(velocity, velocity, 1.5f);
-                particle = func_002C2210(point, 50, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                FastVecScale(velocity, velocity, 1.5f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
                 if (particle)
-                    particle[9] = func_00283CF0(4.0f) + 0x70;
-                particle = func_002C2210(point, 50, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                    particle[9] = FloatToInt(4.0f) + 0x70;
+                particle = part_spawn_ground_effect(point, 50, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
             } else {
-                func_00282CF0(extra, D_L00_001B8C80+0x140, point);
-                func_00282F20((char *)extra, (char *)extra, speed);
-                func_00282CC0((char *)velocity, (char *)velocity, (char *)extra);
-                particle = func_002C2210(point, 33, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                FastVecSub(extra, D_L00_001B8C80+0x140, point);
+                vec_scale_to_length((char *)extra, (char *)extra, speed);
+                FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
+                particle = part_spawn_ground_effect(point, 33, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
                 if (particle)
-                    particle[9] = func_00283CF0(4.0f) + 0x70;
-                particle = func_002C2210(point, 33, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                    particle[9] = FloatToInt(4.0f) + 0x70;
+                particle = part_spawn_ground_effect(point, 33, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
             }
         } else {
             if (!(func_001163B0() & 1)) {
-                func_00282D30(velocity, velocity, 1.5f);
-                particle = func_002C2210(point, 50, size * 0.3f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                FastVecScale(velocity, velocity, 1.5f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.3f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
                 if (particle)
-                    particle[9] = func_00283CF0(4.0f) + 0x70;
-                particle = func_002C2210(point, 50, size * 0.21000000834465027f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                    particle[9] = FloatToInt(4.0f) + 0x70;
+                particle = part_spawn_ground_effect(point, 50, size * 0.21000000834465027f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
             } else {
-                func_00282CF0(extra, D_L00_001B8C80+0x140, point);
-                func_00282F20((char *)extra, (char *)extra, speed);
-                func_00282CC0((char *)velocity, (char *)velocity, (char *)extra);
-                particle = func_002C2210(point, 33, size * 0.25f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                FastVecSub(extra, D_L00_001B8C80+0x140, point);
+                vec_scale_to_length((char *)extra, (char *)extra, speed);
+                FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
+                particle = part_spawn_ground_effect(point, 33, size * 0.25f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
                 if (particle)
-                    particle[9] = func_00283CF0(4.0f) + 0x70;
-                particle = func_002C2210(point, 33, size * 0.175f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                    particle[9] = FloatToInt(4.0f) + 0x70;
+                particle = part_spawn_ground_effect(point, 33, size * 0.175f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
             }
         }
         if (particle)
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }

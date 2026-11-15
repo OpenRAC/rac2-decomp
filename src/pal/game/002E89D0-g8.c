@@ -1,25 +1,25 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00283130(void *, unsigned long long);
-extern void func_00282D60(void *, void *, float);
-extern void func_00282CA8(void *, void *, void *);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
-extern void func_00282C88(void *);
-extern void func_002ED368(void *);
-extern void func_002ED2B8(void *, void *);
-extern void func_00281EB8(void *, unsigned int, unsigned int, int, float, float, float);
+extern void vec_fast_helper_e(void *, unsigned long long);
+extern void scale_vector(void *, void *, float);
+extern void vec_copy_helper_b(void *, void *, void *);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern void vec_clear_128(void *);
+extern void part_update_effect_records(void *);
+extern void part_add_effect_record(void *, void *);
+extern void gfx_draw_billboard_quad(void *, unsigned int, unsigned int, int, float, float, float);
 extern float D_001AC130 __attribute__((sda));
 extern float D_001AC140 __attribute__((sda));
 typedef struct { char pad[0x34]; int frame; } Frame7B;
-extern Frame7B D_001B8840;
+extern Frame7B g_scene_playback_state;
 typedef struct {
  float pos[4], velocity[4];
  float angle, rotation, size; unsigned int color;
@@ -42,65 +42,65 @@ void func_PAL_002E89D0(void *object)
  spark.unknown2 = 0x001C0000;
 #endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
- func_00283130(second, next);
- func_00282D60(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- func_00282D60(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
- func_00282CA8(combined, first, second);
- func_00283958(combined, matrix);
- func_00283738(matrix, o + 0xc0, matrix);
- func_00283098(pos, &D_001AC130, matrix);
- func_00283098(other, &D_001AC140, matrix);
- func_00282CC0(pos, pos, o + 0x10);
- func_00282CC0(other, other, o + 0x10);
- func_002ED368(object);
- effect.life = func_002A7820(95, 127);
+ vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ vec_fast_helper_e(second, next);
+ scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ vec_copy_helper_b(combined, first, second);
+ quaternion_to_rotation_basis(combined, matrix);
+ multiply_matrix3x3(matrix, o + 0xc0, matrix);
+ matrix_mul_vec3(pos, &D_001AC130, matrix);
+ matrix_mul_vec3(other, &D_001AC140, matrix);
+ FastVecAdd(pos, pos, o + 0x10);
+ FastVecAdd(other, other, o + 0x10);
+ part_update_effect_records(object);
+ effect.life = math_random_int_range(95, 127);
  if (*(short *)(o + 0xaa) == 0x128c)
-  effect.color = func_00283D38(0xff0f0f, 0xff3f3f, func_002A7878(0.0f, 1.0f));
+  effect.color = FastTweenColor(0xff0f0f, 0xff3f3f, math_random_float_range(0.0f, 1.0f));
  else if (*(short *)(o + 0xaa) == 0x128d)
-  effect.color = func_00283D38(0xf6fcf, 0x3fcfef, func_002A7878(0.0f, 1.0f));
+  effect.color = FastTweenColor(0xf6fcf, 0x3fcfef, math_random_float_range(0.0f, 1.0f));
  else
-  effect.color = func_00283D38(0xf4fdf, 0x1f8fff, func_002A7878(0.0f, 1.0f));
- effect.size = func_002A7878(1.0f, 2.0f);
+  effect.color = FastTweenColor(0xf4fdf, 0x1f8fff, math_random_float_range(0.0f, 1.0f));
+ effect.size = math_random_float_range(1.0f, 2.0f);
  if (*(short *)(o + 0xaa) == 0x128c) qcopy(effect.pos, pos);
  else qcopy(effect.pos, o + 0x10);
  if (*(short *)(o + 0xaa) != 0x128c) {
-  effect.pos[0] += func_002A7878(-0.25f, 0.25f);
-  effect.pos[1] += func_002A7878(-0.25f, 0.25f);
-  effect.pos[2] += func_002A7878(-0.25f, 0.25f);
+  effect.pos[0] += math_random_float_range(-0.25f, 0.25f);
+  effect.pos[1] += math_random_float_range(-0.25f, 0.25f);
+  effect.pos[2] += math_random_float_range(-0.25f, 0.25f);
  }
- func_00282C88(effect.velocity);
- effect.rotation = func_002A7940();
- effect.angle = func_002A7878(90.0f, 180.0f) * 0.0003490659f;
- effect.first = effect.last = ((s32)(func_002A7820(70, 90)) * 5 + 2) / 6;
+ vec_clear_128(effect.velocity);
+ effect.rotation = math_random_angle();
+ effect.angle = math_random_float_range(90.0f, 180.0f) * 0.0003490659f;
+ effect.first = effect.last = ((s32)(math_random_int_range(70, 90)) * 5 + 2) / 6;
  effect.type = 5;
- effect.flags = ((D_001B8840.frame % 2 + 1) << 1) | 1;
- func_002ED2B8(object, &effect);
+ effect.flags = ((g_scene_playback_state.frame % 2 + 1) << 1) | 1;
+ part_add_effect_record(object, &effect);
  if (*(short *)(o + 0xaa) == 0x128c) {
   qcopy(effect.pos, other);
-  func_002ED2B8(object, &effect);
+  part_add_effect_record(object, &effect);
   if (*(short *)(o + 0xaa) == 0x128c) {
-   if (!(D_001B8840.frame & 1)) {
-   spark.life = func_002A7820(127, 255);
+   if (!(g_scene_playback_state.frame & 1)) {
+   spark.life = math_random_int_range(127, 255);
    spark.color = 0x3fff;
-   spark.size = func_002A7878(0.0625f, 0.125f);
+   spark.size = math_random_float_range(0.0625f, 0.125f);
    qcopy(spark.pos, o + 0x10);
-   spark.pos[0] += func_002A7878(-1.5f, 1.5f);
-   spark.pos[1] += func_002A7878(-1.5f, 1.5f);
-   spark.pos[2] += func_002A7878(-1.5f, 1.5f);
-   func_00282C88(spark.velocity);
-   spark.rotation = func_002A7940();
-   spark.angle = func_002A7878(90.0f, 180.0f) * 0.0003490659f;
-   spark.first = spark.last = ((s32)(func_002A7820(135, 160)) * 5 + 2) / 6;
+   spark.pos[0] += math_random_float_range(-1.5f, 1.5f);
+   spark.pos[1] += math_random_float_range(-1.5f, 1.5f);
+   spark.pos[2] += math_random_float_range(-1.5f, 1.5f);
+   vec_clear_128(spark.velocity);
+   spark.rotation = math_random_angle();
+   spark.angle = math_random_float_range(90.0f, 180.0f) * 0.0003490659f;
+   spark.first = spark.last = ((s32)(math_random_int_range(135, 160)) * 5 + 2) / 6;
    spark.type = 0;
    spark.flags = 0;
-   func_002ED2B8(object, &spark);
+   part_add_effect_record(object, &spark);
    spark.color = 0xffffff;
    spark.size *= 0.8f;
-   func_002ED2B8(object, &spark);
+   part_add_effect_record(object, &spark);
    }
-   color = (func_002A7820(32, 80) << 24) | 0xff1f1f;
-   func_00281EB8(o + 0x10, 5, color, 1, 5.0f, 1.0f, func_002A7940());
+   color = (math_random_int_range(32, 80) << 24) | 0xff1f1f;
+   gfx_draw_billboard_quad(o + 0x10, 5, color, 1, 5.0f, 1.0f, math_random_angle());
   }
  }
 }

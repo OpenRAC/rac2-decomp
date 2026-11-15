@@ -30,28 +30,28 @@ void func_PAL_L00_002B9C20(void)
             if (id == 0x16)
                 func_PAL_L00_002A6058(D_00189E20_9CA8.b149D, 1, 1, 0x32);
             else
-                func_L00_002B9B88(id, D_00189E20_9CA8.slots[i].arg);
+                hero_play_sound(id, D_00189E20_9CA8.slots[i].arg);
         }
     }
 }
 
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern int D_L00_001B9080;
-extern void func_00283410(void *a, void *b);
-extern void func_002833F0(void *a, void *b);
-extern void func_L00_002B2BD0(void);
-extern void func_L00_00322EC8(void *p);
+extern void euler_to_matrix(void *a, void *b);
+extern void euler_rotation_basis(void *a, void *b);
+extern void hero_reset_speeds_and_vectors(void);
+extern void level_release_slot_list(void *p);
 extern void func_PAL_L00_002AF6C0(void);
-extern void func_L00_002A53B8(void);
+extern void attachment_reset_all(void);
 extern void func_PAL_L00_002C4480(int a0, int a1);
-extern void func_L00_002D23C0(int a0, int a1);
-extern void func_L00_002B4900(void);
-extern float func_00282E48(void *a, void *b);
+extern void anim_start_object_at_frame(int a0, int a1);
+extern void hero_l00_update_ground_contact(void);
+extern float fast_vec_dist(void *a, void *b);
 extern void func_PAL_L00_003E38E8(int a0, int a1);
 extern void func_PAL_L00_004071F0(void *a, int b);
-extern void func_L00_002D9D98(void);
-extern void func_L00_00311DC0(void *p);
+extern void cam_reset_default(void);
+extern void level_apply_nearest_env_preset(void *p);
 typedef struct {
     u8 pad000[0x34E];
     short h34E;
@@ -70,18 +70,18 @@ typedef struct {
 void func_PAL_L00_002B9CD8(void *position, void *direction, int sound, int refresh)
 {
     ResidentState_9D60 *res;
-    char *hero = D_00189EA0;
+    char *hero = g_hero_position;
 
     qcopy(hero, position);
     res = (ResidentState_9D60 *)(hero - 0x80);
     qcopy(res->object + 0x10, position);
     qcopy(hero + 0x10, direction);
 
-    func_00283410(res, hero + 0x10);
-    func_002833F0(res->object + 0xC0, hero + 0x10);
-    func_L00_002B2BD0();
-    func_L00_00322EC8(hero + 0x1860);
-    func_L00_00322EC8(hero + 0x19B0);
+    euler_to_matrix(res, hero + 0x10);
+    euler_rotation_basis(res->object + 0xC0, hero + 0x10);
+    hero_reset_speeds_and_vectors();
+    level_release_slot_list(hero + 0x1860);
+    level_release_slot_list(hero + 0x19B0);
 
     res->flags3A4 &= ~1;
     res->flags3A4 &= ~2;
@@ -90,29 +90,29 @@ void func_PAL_L00_002B9CD8(void *position, void *direction, int sound, int refre
     res->b24EF = 0;
 
     func_PAL_L00_002AF6C0();
-    func_L00_002A53B8();
+    attachment_reset_all();
 
     if (sound != -1)
         func_PAL_L00_002C4480(sound, 2);
 
-    func_L00_002D23C0(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
+    anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
     if (res->i229C == 0x11)
         D_L00_001B9080 = 1;
     else
         D_L00_001B9080 = 0;
 
-    func_L00_002B4900();
+    hero_l00_update_ground_contact();
 
-    if (func_00282E48(D_00189EA0, D_00189EA0 + 0x250) < 1.0f)
-        qcopy(D_00189EA0, D_00189EA0 + 0x250);
+    if (fast_vec_dist(g_hero_position, g_hero_position + 0x250) < 1.0f)
+        qcopy(g_hero_position, g_hero_position + 0x250);
 
     func_PAL_L00_003E38E8(0, 0);
     func_PAL_L00_004071F0(0, 0);
 
     if (refresh != 0)
-        func_L00_002D9D98();
+        cam_reset_default();
 
-    func_L00_00311DC0(*(void **)(D_00189EA0 + 0x2210));
+    level_apply_nearest_env_preset(*(void **)(g_hero_position + 0x2210));
 }
 

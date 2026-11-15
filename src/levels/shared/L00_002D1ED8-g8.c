@@ -37,7 +37,7 @@ typedef struct {
 } HeroAnimation2168;
 
 /* The resident hero state; the fields are those AdvanceHeroAnimation (func_L00_002D24E8) uses. */
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 #define HA ((HeroAnimation2168 *)D_00189E20)
 
 /* Mirror flag: swaps the two facing animations. Incomplete with sda: retail reads it through an
@@ -50,20 +50,20 @@ extern u8 D_L00_001D98C0[];
 /* Frame counts per animation curve (two entries, the next symbol is 8 bytes on). */
 extern s32 D_L00_001A7DF8[2] __attribute__((sda));
 
-extern s32 func_0029FA88(void *);
+extern s32 moby_alloc_object_slot(void *);
 extern s32 func_002A2450(void *, s32);
-extern void func_0011AEA0(s32);
-extern void func_0029F390(void *);
-extern s32 func_L00_002A4DB0(char *, s32, s32, s32);
-extern s32 func_00283CF0(float);
-extern void func_L00_002D24B8(void);
-extern void func_L00_002D1C40(s32, s32, float);
-extern void func_L00_002D1F60(void);
-extern void func_L00_002D1FD8(s32, s32, float);
+extern void FlushCache(s32);
+extern void update_moby_animation_state(void *);
+extern s32 anim_copy_entry_data(char *, s32, s32, s32);
+extern s32 FloatToInt(float);
+extern void hero_clear_queued_anim(void);
+extern void hero_sync_linked_object_anims(s32, s32, float);
+extern void hero_clear_anim_flags(void);
+extern void hero_start_linked_object_anim(s32, s32, float);
 
 /* Starts hero animation sequence seq at frame: a positive speed plays it at rate 1/speed,
    otherwise -speed names a 1-based curve whose frame count is handed to the followers. */
-void func_L00_002D2168(s32 seq, s32 frame, float speed)
+void set_hero_animation(s32 seq, s32 frame, float speed)
 {
     AnimObject *obj;
     s32 id;
@@ -79,7 +79,7 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
             seq = 0x31;
     }
 
-    id = AllocObjectSlot(obj);
+    id = moby_alloc_object_slot(obj);
     if (id >= 0) {
         func_002A2450(obj, id | 0x300);
         FlushCache(0);
@@ -95,8 +95,8 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
     update_moby_animation_state(obj);
 
     if (obj->seq != 0xFF)
-        obj->current = CopyAnimationEntryData((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
-    obj->next = CopyAnimationEntryData((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+        obj->current = anim_copy_entry_data((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
+    obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
 
     HA->speed = 1.0f;
     if (speed > 0.0f) {
@@ -110,7 +110,7 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
         obj->time = 0.0f;
     }
 
-    ClearHeroQueuedAnimation();
+    hero_clear_queued_anim();
 
     obj->sound = obj->model->seqs[seq]->sound;
     HA->changing = 1;
@@ -118,10 +118,10 @@ void func_L00_002D2168(s32 seq, s32 frame, float speed)
         speed = D_L00_001A7DF8[HA->curve];
 
     if (HA->flag22b4 == 0)
-        SyncLinkedObjectAnimations(seq, frame, speed);
+        hero_sync_linked_object_anims(seq, frame, speed);
     if (HA->flag22b4 == 0 && HA->flag22ba == 0 && seq != HA->mode)
         HA->flag22b8 = 0;
-    ClearHeroAnimFlags();
+    hero_clear_anim_flags();
     if (HA->slot != 0)
-        StartLinkedObjectAnimation(seq, frame, speed);
+        hero_start_linked_object_anim(seq, frame, speed);
 }

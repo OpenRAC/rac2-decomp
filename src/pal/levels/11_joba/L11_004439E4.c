@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -6,13 +7,13 @@ extern u8 D_L11_004465F8[];
 extern void func_300150(void *);
 extern void func_2F8AD0(void *, void *);
 extern void func_31F338(void);
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C;
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table;
 extern u8 *D_L11_001B368C __attribute__((sda));
-extern u8 D_00189E20[];
-extern u8 D_001A63A8[];
+extern u8 g_hero_state[];
+extern u8 g_music_state[];
 
 void func_PAL_L11_004459B8(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);

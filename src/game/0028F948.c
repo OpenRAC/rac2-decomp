@@ -23,9 +23,9 @@ extern int *D_L03_001B3188 __attribute__((sda));
 
 extern void D_00126288(void *, short, short, int, int, int, short, short);
 
-extern void func_0011AEA0(int);
+extern void FlushCache(int);
 
-extern void func_001265B0(void *, int);
+extern void sceGsExecLoadImage(void *, int);
 
 /* Paired-strip packet emitter, 396 bytes, placed in levels/10_hrugis_cloud and
    levels/5_feltzin_system.  The body writes a 16-byte GIF header into the
@@ -47,9 +47,9 @@ extern int D_001A7354_1 __attribute__((sda));
    compiled under the qualified small-data profile (-O2 -G8). */
 extern int *D_L03_001B3188_1 __attribute__((sda));
 
-extern int D_001A7350 __attribute__((sda));
+extern int g_screen_offset_x __attribute__((sda));
 
-extern int D_001A7354 __attribute__((sda));
+extern int g_screen_offset_y __attribute__((sda));
 
 /* Family 9b94f3cd1f5fac83 (372 B, 2 placements).
    Retail builds a 64-byte packet from the resident cursor global D_L02_001B3D08 and
@@ -62,7 +62,7 @@ extern int *D_L02_001B3D08 __attribute__((sda));
 
 /* shared native body of family 435a49e62f53b8db (default profile) */
 /* Copies an image into video memory, either straight into the draw list or through a temporary buffer. */
-void func_0028F948(int source, int vramBase, int format, int widthLog2, int heightLog2, int immediate)
+void gfx_upload_image_to_vram(int source, int vramBase, int format, int widthLog2, int heightLog2, int immediate)
 {
     char buf[96];
     void *work;
@@ -96,13 +96,13 @@ void func_0028F948(int source, int vramBase, int format, int widthLog2, int heig
         D_L03_001B3188 = (int *)((char *)D_L03_001B3188 + 16);
     } else {
         FlushCache(0);
-        ExecGsLoadImage(work, source);
+        sceGsExecLoadImage(work, source);
     }
 }
 
 /* shared native body of family a6a1a427e2388f5f */
 /* Draws a plain coloured line on the screen between two points. */
-void func_0028FAB8(int x0, int y0, int x1, int y1, int color, int isSubpixel)
+void gfx_draw_screen_line(int x0, int y0, int x1, int y1, int color, int isSubpixel)
 {
     long long *q;
 
@@ -139,7 +139,7 @@ void func_0028FAB8(int x0, int y0, int x1, int y1, int color, int isSubpixel)
 
 /* shared native body of family 5e27257c03e3aebd */
 /* Draws a plain coloured rectangle on the screen between two corners. */
-void func_0028FC48(int x0, int y0, int x1, int y1, unsigned long color, int isSubpixel)
+void AppendScreenRectPacket(int x0, int y0, int x1, int y1, unsigned long color, int isSubpixel)
 {
     long long *q;
 
@@ -176,7 +176,7 @@ void func_0028FC48(int x0, int y0, int x1, int y1, unsigned long color, int isSu
 
 /* shared native body of family 9b94f3cd1f5fac83 */
 /* Draws a plain coloured rectangle on the screen between two corners, at a chosen depth. */
-void func_0028FDD8(int x0, int y0, int x1, int y1, long long color, int depth, int isSubpixel)
+void gfx_draw_screen_rect_with_depth(int x0, int y0, int x1, int y1, long long color, int depth, int isSubpixel)
 {
     int *packet;
 
@@ -191,18 +191,18 @@ void func_0028FDD8(int x0, int y0, int x1, int y1, long long color, int depth, i
     *(long long *)(packet + 8) = 70;
     *(long long *)(packet + 10) = color;
     if (isSubpixel) {
-        *(long long *)(packet + 12) = (x0 + gScreenOffsetX - 8)
-                               | ((long long)(y0 + gScreenOffsetY - 8) << 16)
+        *(long long *)(packet + 12) = (x0 + g_screen_offset_x - 8)
+                               | ((long long)(y0 + g_screen_offset_y - 8) << 16)
                                | ((long long)depth << 32);
-        *(long long *)(packet + 14) = (x1 + gScreenOffsetX - 8)
-                               | ((long long)(y1 + gScreenOffsetY - 8) << 16)
+        *(long long *)(packet + 14) = (x1 + g_screen_offset_x - 8)
+                               | ((long long)(y1 + g_screen_offset_y - 8) << 16)
                                | ((long long)depth << 32);
     } else {
-        *(long long *)(packet + 12) = ((x0 << 4) + gScreenOffsetX - 16)
-                               | ((long long)((y0 << 4) + gScreenOffsetY - 16) << 16)
+        *(long long *)(packet + 12) = ((x0 << 4) + g_screen_offset_x - 16)
+                               | ((long long)((y0 << 4) + g_screen_offset_y - 16) << 16)
                                | ((long long)depth << 32);
-        *(long long *)(packet + 14) = ((x1 << 4) + gScreenOffsetX - 16)
-                               | ((long long)((y1 << 4) + gScreenOffsetY - 16) << 16)
+        *(long long *)(packet + 14) = ((x1 << 4) + g_screen_offset_x - 16)
+                               | ((long long)((y1 << 4) + g_screen_offset_y - 16) << 16)
                                | ((long long)depth << 32);
     }
     D_L02_001B3D08 = (int *)((char *)D_L02_001B3D08 + 48);

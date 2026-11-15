@@ -2,23 +2,23 @@
 
 typedef struct { float v[4][4]; int color[4]; float uv[4][2]; unsigned long gs[4]; } QuadD2618;
 typedef struct { int index; float scale; int mode; } StateD2618;
-extern unsigned long func_0027C878(int);
-extern void func_002FC560(u32, u64);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern int func_00282948(int *);
-extern void func_00283410(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_00282C48(float);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_0029F338(void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(u32, u64);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern int math_fast_float_d(int *);
+extern void euler_to_matrix(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void add_vectors(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fabs(float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void moby_mark_spawned(void *);
 extern int D_L05_001AFCAC __attribute__((sda));
 extern int D_L05_001AFCA0 __attribute__((sda));
 extern int D_L05_001AFCA4 __attribute__((sda));
@@ -76,15 +76,15 @@ static inline void FaceCameraD2618(float *rotation, char *object)
     rotation[1] = RotationAxisD2618(object, 1);
     rotation[2] = RotationAxisD2618(object, 2);
     rotation[3] = 0;
-    rotation[2] = FastMatrixHelperA(x, y);
+    rotation[2] = mat_fast_helper_a(x, y);
     x = vec_distance_xy(object + 0x10, D_L05_001B9580.pos);
-    rotation[1] = -FastMatrixHelperA(x, D_L05_001B9580.pos[2] - PositionAxisD2618(object, 2));
+    rotation[1] = -mat_fast_helper_a(x, D_L05_001B9580.pos[2] - PositionAxisD2618(object, 2));
 }
 
 /* Faces the camera, then draws four layers of a 128-quad mesh, a growing flash quad and, in mode 0,
    two spinning glow quads. Once func_00282948 reports on D_L05_001B2FE8 and the alpha at
    D_L05_001B2FA0 falls below zero, calls func_0029F338 and returns; otherwise calls func_002FC560. */
-void func_L05_003D2618(char *object)
+void DrawAnimatedMeshAndGlowEffect(char *object)
 {
     QuadD2618 q;
     float matrix[16];
@@ -103,7 +103,7 @@ void func_L05_003D2618(char *object)
         int group;
         for (group = 0; group < 4; group++) {
             inactive = 0;
-            if (FastFloatHelperD(&D_L05_0024CFD0[state->index][group]) ||
+            if (math_fast_float_d(&D_L05_0024CFD0[state->index][group]) ||
                 !D_L05_0024CFD0[state->index][group]) {
                 inactive = 1;
                 D_L05_0024CFD0[state->index][group] = 0;
@@ -214,9 +214,9 @@ void func_L05_003D2618(char *object)
         FastVecScale(q.v[1], q.v[1], size[state->index] * state->scale);
         FastVecScale(q.v[2], q.v[2], size[state->index] * state->scale);
         FastVecScale(q.v[3], q.v[3], size[state->index] * state->scale);
-        matrix[12 + 2] = FastSinOrCosB(-rotation[1]);
-        matrix[12 + 0] = FastSinOrCosA(-rotation[2]) * (1.0f - FloatAbs(matrix[12 + 2]));
-        matrix[12 + 1] = -FastSinOrCosB(-rotation[2]) * (1.0f - FloatAbs(matrix[12 + 2]));
+        matrix[12 + 2] = math_fast_sin_or_cos_b(-rotation[1]);
+        matrix[12 + 0] = math_fast_sin_or_cos_a(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
+        matrix[12 + 1] = -math_fast_sin_or_cos_b(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
         matrix[12 + 2] *= state->scale;
         matrix[12 + 0] *= state->scale;
         matrix[12 + 1] *= state->scale;
@@ -237,9 +237,9 @@ void func_L05_003D2618(char *object)
         FastVecScale(q.v[1], q.v[1], size[state->index] * state->scale);
         FastVecScale(q.v[2], q.v[2], size[state->index] * state->scale);
         FastVecScale(q.v[3], q.v[3], size[state->index] * state->scale);
-        matrix[12 + 2] = FastSinOrCosB(-rotation[1]);
-        matrix[12 + 0] = FastSinOrCosA(-rotation[2]) * (1.0f - FloatAbs(matrix[12 + 2]));
-        matrix[12 + 1] = -FastSinOrCosB(-rotation[2]) * (1.0f - FloatAbs(matrix[12 + 2]));
+        matrix[12 + 2] = math_fast_sin_or_cos_b(-rotation[1]);
+        matrix[12 + 0] = math_fast_sin_or_cos_a(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
+        matrix[12 + 1] = -math_fast_sin_or_cos_b(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
         matrix[12 + 2] *= state->scale * 2;
         matrix[12 + 0] *= state->scale * 2;
         matrix[12 + 1] *= state->scale * 2;
@@ -252,13 +252,13 @@ void func_L05_003D2618(char *object)
         angle_b[state->index] = fast_subtract_rotations(angle_b[state->index], 0.04654212296009064f);
         size[state->index] += 0.02f;
     }
-    if (FastFloatHelperD(D_L05_001B2FE8 + state->index)) {
+    if (math_fast_float_d(D_L05_001B2FE8 + state->index)) {
         D_L05_001B2FA0[state->index] -= 2;
         if (D_L05_001B2FA0[state->index] < 0) {
             D_L05_001B2FA0[state->index] = 0;
             D_L05_001B3018[state->index] = 0;
             D_L05_001AFCB8 -= 1.0f;
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
     }

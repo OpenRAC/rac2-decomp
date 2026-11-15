@@ -1,18 +1,19 @@
+#include "names.h"
 /* func_PAL_L12_0041B520, the PAL copy of func_L12_004163E8: the same C, where rename func_0032C700 becomes func_PAL_L00_003FB330; rename func_L12_0041E8F8 becomes func_PAL_L12_00423C50; rename func_002B0A68 becomes func_PAL_002B15D8; scale D_L12_001B18F0; scale D_L12_001B18F0 / 2. */
 #include "common.h"
 
-extern s32 func_L12_0041E8E8(u8 *);
+extern s32 linked_moby_is_finished(u8 *);
 extern void func_PAL_L12_00423C50(u8 *);
-extern s32 func_00282948(s32 *);
-extern void func_002A7750(u8 *, u8, s32);
-extern void func_0029F338(void *);
+extern s32 math_fast_float_d(s32 *);
+extern void moby_set_state(u8 *, u8, s32);
+extern void moby_mark_spawned(void *);
 extern u8 *func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32,
                           f32, f32, s32, s32, s32, void *);
-extern void func_00282F20(f32 *, void *, f32);
+extern void vec_scale_to_length(f32 *, void *, f32);
 extern void func_PAL_002B15D8(f32, f32, f32, f32, char *, s32, f32 *, u8);
 
 /* level 12 data reached through $gp (small-data) */
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern u8 *D_L12_001B2E9C;
 extern int D_L12_001B18F0 __attribute__((sda));
@@ -60,7 +61,7 @@ void func_PAL_L12_0041B520(Actor *self)
         if (D_L12_0021EDF0.flags[(s16)f] != 0)
             goto Destroy;
         {
-            s32 bits = D_0019B4A8[((s16)f >> 1) + (D_001A79F0 << 10)];
+            s32 bits = D_0019B4A8[((s16)f >> 1) + (g_current_map_index << 10)];
             if (f & 1) {
                 if (((bits >> 4) & 7) != 0)
                     goto Destroy;
@@ -75,7 +76,7 @@ void func_PAL_L12_0041B520(Actor *self)
     }
     case 1:
         if (s1->f0 != -1) {
-            if (func_L12_0041E8E8(D_L12_001B2E9C + (s1->f0 << 8)) == 0)
+            if (linked_moby_is_finished(D_L12_001B2E9C + (s1->f0 << 8)) == 0)
                 return;
         }
         self->f20 = 2;
@@ -97,16 +98,16 @@ void func_PAL_L12_0041B520(Actor *self)
 
     }
     case 2:
-        if (func_00282948(&s1->fC) != 0)
+        if (math_fast_float_d(&s1->fC) != 0)
             return;
-        func_002A7750((u8 *)self, 3, -1);
+        moby_set_state((u8 *)self, 3, -1);
         s1->fC = (((int)(D_L12_001B18F0) * 5 + 2) / 6);
         return;
 
     case 3: {
         u16 f;
 
-        if (func_00282948(&s1->fC) != 0) {
+        if (math_fast_float_d(&s1->fC) != 0) {
             u8 *t = (u8 *)D_L12_001B2E9C + (s1->f0 << 8);
             f32 local[4];
 
@@ -115,24 +116,24 @@ void func_PAL_L12_0041B520(Actor *self)
             self->f98 = 0;
             self->f34 = (self->f34 | 0x41) & 0xEFFF;
             func_PAL_L12_00423C50(t);
-            func_00282F20(local, self->fC0, -0.120000005f);
+            vec_scale_to_length(local, self->fC0, -0.120000005f);
             func_PAL_002B15D8(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, local, 0xFF);
             if (s1->f0 != -1) {
                 ((Actor *)D_L12_001B2E9C)[s1->f0].f34 &= 0xEFFF;
-                func_0029F338(D_L12_001B2E9C + (s1->f0 << 8));
+                moby_mark_spawned(D_L12_001B2E9C + (s1->f0 << 8));
             }
         f = self->fB2;
         if (f & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
 Destroy:
-        func_0029F338(self);
+        moby_mark_spawned(self);
         } else if (s1->fC == (((int)(D_L12_001B18F0 / 2) * 5 + 2) / 6)) {
             if (s1->f0 != -1)
                 ((Actor *)D_L12_001B2E9C)[s1->f0].f20 = 4;
@@ -145,15 +146,15 @@ Destroy:
 
         f = self->fB2;
         if (f & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
-        func_0029F338(self);
+        moby_mark_spawned(self);
         return;
     }
     }

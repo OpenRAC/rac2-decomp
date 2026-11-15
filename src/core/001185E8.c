@@ -9,16 +9,16 @@ extern char D_0013A498[];
 extern char D_0013A4A0[];
 extern char D_0013A4A8[];
 
-extern int func_00118460(char *buf, int len);
+extern int RoundDecimalDigits(char *buf, int len);
 
-extern char *func_00118548(int value, char *buf, unsigned int base);
+extern char *IntegerToAscii(int value, char *buf, unsigned int base);
 
-extern double func_00117650(double);
+extern double floor(double);
 
-extern double func_00117848(double, double);
+extern double __ieee754_fmod(double, double);
 
 /* Turns a decimal number into a string of digits for printing. */
-char *func_001185E8(double value, int ndigits, char ch, int dot) {
+char *str_format_float_digits(double value, int ndigits, char ch, int dot) {
     union {
         double d;
         int i[2];

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_002CCAA0: v2.00's copy of func_002CBAE0 (src/game/002C7748-g8.c), the
  * menu-source dispatcher. The code is v1.01's with every address moved; it is the
  * release's own function because three of its callees changed in v2.00.
@@ -12,8 +13,8 @@ typedef struct {
     int state;
 } MenuState_US2_2CCAA0;
 typedef struct { char pad[0x1C4]; int flags; } InputState_US2_2CCAA0;
-extern MenuState_US2_2CCAA0 D_001F2840;
-extern InputState_US2_2CCAA0 D_00138180;
+extern MenuState_US2_2CCAA0 g_pause_menu_state;
+extern InputState_US2_2CCAA0 g_pad_state;
 extern char D_00259018[];
 extern char D_0025A738[];
 extern char D_0025A498[];
@@ -31,24 +32,24 @@ int func_US2_002CCAA0(void)
 {
     int result = 0;
 
-    if (D_001F2840.source == D_00259018) {
-        if (D_00138180.flags & 0x910) {
-            D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
+    if (g_pause_menu_state.source == D_00259018) {
+        if (g_pad_state.flags & 0x910) {
+            g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
             result = 1;
-        } else if (D_00210ACC[0](D_00138180.flags) >= 0) {
+        } else if (D_00210ACC[0](g_pad_state.flags) >= 0) {
             result = 1;
         }
-    } else if (D_001F2840.source == D_0025A738) {
+    } else if (g_pause_menu_state.source == D_0025A738) {
         func_0029CE38();
-    } else if (D_001F2840.source == D_0025A498 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == D_0025A498 && !D_001AB910) {
         func_US2_0029D0C8(0);
-    } else if (D_001F2840.source == D_0025A190 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == D_0025A190 && !D_001AB910) {
         if (func_US2_002D7BA0(0))
-            D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
-        func_US2_0029D138(D_00138180.flags);
-        result = D_001F2840.destination != D_0025A498;
-    } else if ((D_001F2840.source == D_0025A058 && !D_001AB910)
-               || (D_001F2840.source == D_00259B48 && !D_001AB910)) {
+            g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
+        func_US2_0029D138(g_pad_state.flags);
+        result = g_pause_menu_state.destination != D_0025A498;
+    } else if ((g_pause_menu_state.source == D_0025A058 && !D_001AB910)
+               || (g_pause_menu_state.source == D_00259B48 && !D_001AB910)) {
         /* nothing: only the tests remain */
     }
     return result;

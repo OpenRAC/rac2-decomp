@@ -33,20 +33,20 @@ typedef struct {
     int state;
 } Player_2B44C0;
 
-extern Player_2B44C0 D_00189E20;
-extern void func_00115484(void *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AFDD8(char *, void *, void *, void *);
-extern int func_00282948(void *);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002B0158(char *, void *, void *, float);
-extern char *func_002AD0B0(char *);
-extern void func_002AD6F0(char *, void *, void *, void *);
+extern Player_2B44C0 g_hero_state;
+extern void memset(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_transform_by_object_or_given(char *, void *, void *, void *);
+extern int math_fast_float_d(void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void gravity_offset_object_position(char *, void *, void *, float);
+extern char *moby_get_private_value_2(char *);
+extern void mat_combine_and_store(char *, void *, void *, void *);
 
 void func_PAL_002B5050(char *self, Sway_2B44C0 *sway, float *target)
 {
@@ -67,20 +67,20 @@ void func_PAL_002B5050(char *self, Sway_2B44C0 *sway, float *target)
 
     qcopy_nc(old_position, self + 0x10);
     qcopy(old_rotation, self + 0xF0);
-    func_00115484(push, 0, 16);
+    memset(push, 0, 16);
     if (target != 0)
         goto target_delta;
-    if (D_00189E20.target == self && D_00189E20.state >= 2)
+    if (g_hero_state.target == self && g_hero_state.state >= 2)
         goto player_delta;
     goto decay;
 target_delta:
-    func_00282CF0(delta, target, self + 0x10);
+    FastVecSub(delta, target, self + 0x10);
     goto active;
 player_delta:
-    func_00282CF0(delta, &D_00189E20.position, self + 0x10);
+    FastVecSub(delta, &g_hero_state.position, self + 0x10);
 active:
-    func_002AFDD8(self, delta, delta, 0);
-    func_00282CF0(delta, delta, &sway->offset);
+    vec_transform_by_object_or_given(self, delta, delta, 0);
+    FastVecSub(delta, delta, &sway->offset);
     push[0] = -delta[1] * sway->scale[0];
     push[1] = delta[0] * sway->scale[1];
     push[2] = -sway->scale[2];
@@ -91,14 +91,14 @@ active:
     }
     goto update;
 decay:
-    func_00282948(&sway->timer);
+    math_fast_float_d(&sway->timer);
 update:
     for (i = 0; i < 3; i++) {
         sway->velocity[i] += sway->spring[i] * (push[i] - sway->position[i]);
         sway->velocity[i] -= sway->damping[i] * sway->velocity[i];
         sway->position[i] += sway->velocity[i];
-        sway->phase[i] = func_00283B98(sway->phase[i], sway->speed[i]);
-        delta[i] = sway->amplitude[i] * func_00283198(sway->phase[i]);
+        sway->phase[i] = FastAddRotations(sway->phase[i], sway->speed[i]);
+        delta[i] = sway->amplitude[i] * math_fast_sin_or_cos_b(sway->phase[i]);
     }
     *(Vec128_2B44C0 *)work = 0;
     work[0] = sway->position[0] + delta[0];
@@ -112,24 +112,24 @@ update:
         angles[1] = sway->limit[1];
     else if (angles[1] < -sway->limit[1])
         angles[1] = -sway->limit[1];
-    func_002833F0(matrix, angles);
-    func_002833F0(self + 0xC0, &sway->rotation);
-    func_00283738(self + 0xC0, self + 0xC0, matrix);
+    euler_rotation_basis(matrix, angles);
+    euler_rotation_basis(self + 0xC0, &sway->rotation);
+    multiply_matrix3x3(self + 0xC0, self + 0xC0, matrix);
     qcopy_nc(work, &sway->offset);
     work[2] += delta[2];
-    func_00283098(moved, work, self + 0xC0);
-    func_00282CC0(moved, moved, self + 0x10);
-    func_00282CF0(shift, &sway->anchor, moved);
-    func_00282CC0(self + 0x10, self + 0x10, shift);
+    matrix_mul_vec3(moved, work, self + 0xC0);
+    FastVecAdd(moved, moved, self + 0x10);
+    FastVecSub(shift, &sway->anchor, moved);
+    FastVecAdd(self + 0x10, self + 0x10, shift);
     roll = -sway->position[2];
     if (sway->limit[2] < roll)
         roll = sway->limit[2];
     else if (roll < -sway->limit[2])
         roll = -sway->limit[2];
-    func_002B0158(self, self + 0x10, self + 0x10, roll);
-    body = func_002AD0B0(self);
+    gravity_offset_object_position(self, self + 0x10, self + 0x10, roll);
+    body = moby_get_private_value_2(self);
     if (body != 0) {
-        func_00282CF0(step, self + 0x10, old_position);
-        func_002AD6F0(body, step, old_rotation, self + 0xF0);
+        FastVecSub(step, self + 0x10, old_position);
+        mat_combine_and_store(body, step, old_rotation, self + 0xF0);
     }
 }

@@ -14,7 +14,7 @@ extern short Fe524d931_D_001A6480[];
 extern void Ffb202470_FUN_0033AB50(char *p);
 
 /* Updates the screen-adjust menu: moves the screen offset with the d-pad (within limits) and plays a sound when it changes. */
-int func_0033BE98(char *object, int mask)
+int screen_adjust_menu_update(char *object, int mask)
 {
     char *prompt = object + 8;
     short oldX;
@@ -66,7 +66,7 @@ int func_0033BE98(char *object, int mask)
 /* func_0033C028 is matched in its own unit, src/game/0033C028-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Cleans up the button prompt bar inside the screen-adjust menu and gives the menu back. */
-char *func_0033C178(char *object)
+char *screen_adjust_menu_destroy(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -78,30 +78,30 @@ typedef struct { int ids[2]; } SolTextPair;
 extern SolTextPair D_L00_001AE110;
 extern char D_L00_001AE118[];
 /* Resident byte at 0x001A7BB1 is shared by all programs. */
-extern void func_0033AF48(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern void prompt_bar_draw(void *);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
+extern void text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Draws the on/off option menu: its prompt bar and one line of text showing the current setting. */
-void func_0033C378(char *object)
+void onoff_menu_draw(char *object)
 {
     char buffer[128];
     SolTextPair pair;
     char *first;
     char *second;
     char *format;
-    DrawButtonPromptBar(object + 8);
+    prompt_bar_draw(object + 8);
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
     first = GetLocalizedString(0x31E4);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7BB1 != 0]);
-    Sprintf(buffer, format, first, second);
-    DrawTextCenteredSmallFont(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_small(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
 }
 
 /* Cleans up the button prompt bar inside the on/off option menu and gives the menu back. */
-char *func_0033C430(char *object)
+char *onoff_menu_destroy(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;

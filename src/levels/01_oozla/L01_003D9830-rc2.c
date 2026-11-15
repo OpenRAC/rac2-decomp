@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -31,7 +32,7 @@ extern void ref_L01_003D9830_01(void *, s32, s32);
 extern s32 ref_L01_003D9830_02 __attribute__((sda));
 
 /* Checks whether a swamp monster has touched the platform, and if so starts the platform sinking. */
-void func_L01_003D9830(void *moby) {
+void platform_sink_when_hit(void *moby) {
     s16 classId;
     u8 attachedState;
     void *vars;

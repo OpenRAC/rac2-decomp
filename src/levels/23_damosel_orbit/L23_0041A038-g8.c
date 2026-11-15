@@ -21,36 +21,36 @@ extern float D_L23_001B3728;
 extern int D_L23_001B3784;
 extern char D_L23_001B3860[] MACRO_ADDR;
 extern char D_L23_001B36C0[] MACRO_ADDR;
-extern char *D_0018C0B0 __attribute__((nosda));
-extern void func_00282C88(Quad *);
-extern void func_0029FC20(char *, int, char *);
-extern void func_0029FCC0(char *, int, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern float func_00282DB0(char *, char *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282DD8(char *, char *, char *);
-extern float func_002831B0(float);
-extern float func_00283C28(float);
-extern float func_00283B98(float, float);
-extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
-extern void func_00283898(void *, int, float);
-extern float func_00283BE0(float, float);
-extern void func_L23_0041BF18(char *, float, float);
+extern char *g_hero_moby __attribute__((nosda));
+extern void vec_clear_128(Quad *);
+extern void moby_transform_joint_point(char *, int, char *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern float FastVecDot(char *, char *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void FastVecCross(char *, char *, char *);
+extern float math_fast_angle_helper(float);
+extern float math_fast_float_g(float);
+extern float FastAddRotations(float, float);
+extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
+extern void build_axis_rotation_quaternion(void *, int, float);
+extern float fast_subtract_rotations(float, float);
+extern void mothership_turn_joints(char *, float, float);
 
 /* Update the aiming direction and its signed turn rate. */
-int func_L23_0041A038(char *object, char *target) {
+int UpdateAimTurn(char *object, char *target) {
     struct { Quad zero, matrix[4], axis, direction, cross; } local;
     char *state = *(char **)(object + 0x68);
     char *direction;
     float speed, dot, angle;
     unsigned int mode;
-    ClearVector128(&local.zero);
+    vec_clear_128(&local.zero);
     ((float *)&local.zero)[3] = 1.0f;
     ((unsigned char *)state)[0x473] = 1;
     *(Quad *)(state + 0x480) = local.zero;
-    TransformMobyJointPoint(object, 39, (char *)local.matrix);
+    moby_transform_joint_point(object, 39, (char *)local.matrix);
     qcopy(&D_L23_001B3850, &local.matrix[3]);
     qcopy(&D_L23_001B3870, &local.matrix[0]);
     if (D_L23_001B1438) return 0;
@@ -59,11 +59,11 @@ int func_L23_0041A038(char *object, char *target) {
     ((float *)&local.axis)[3] = 1.0f;
     FastVecScale(state + 0x4A0, (char *)&local.axis,
         (float)D_L23_001B1440 * D_L23_001B1448 * D_L23_001B144C);
-    TransformMobyJointToWorld(object, 42, (char *)&local.axis);
+    moby_transform_joint_to_world(object, 42, (char *)&local.axis);
     FastVecSub((char *)&local.direction, target, (char *)&local.axis);
     vec_scale_to_length((char *)&local.direction, (char *)&local.direction, 1.0f);
     D_L23_001B3728 = FastVecDot((char *)&local.direction, (char *)&D_L23_001B3870);
-    D_L23_001B3784 = CollLine(D_L23_001B3860, D_L23_001B36C0, 16, gHeroMoby_0018C0B0, 0) == 0;
+    D_L23_001B3784 = CollLine(D_L23_001B3860, D_L23_001B36C0, 16, g_hero_moby, 0) == 0;
     direction = (char *)&local.direction;
     speed = D_L23_001B1580 * 0.00029088825f;
     if (((unsigned char *)state)[0x404] && ((unsigned char *)state)[0x405]) {
@@ -74,15 +74,15 @@ int func_L23_0041A038(char *object, char *target) {
         }
         FastVecCross((char *)&local.cross, direction, (char *)&D_L23_001B3870);
         dot = FastVecDot((char *)&local.cross, object + 0xD0);
-        angle = FastAngleHelper(dot);
-        FastFloatHelperG(angle + 1.5707964f);
+        angle = math_fast_angle_helper(dot);
+        math_fast_float_g(angle + 1.5707964f);
         if (dot < 0.0f) *(float *)(state + 0x57C) = -speed;
         else *(float *)(state + 0x57C) = speed;
         *(float *)(state + 0x578) = FastAddRotations(*(float *)(state + 0x578), *(float *)(state + 0x57C));
         if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
         build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
         *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
-        TurnBossJoints(object, 1.0f, 1.0f);
+        mothership_turn_joints(object, 1.0f, 1.0f);
         return 1;
     }
     if ((unsigned)((unsigned char)object[0x20] - 13) < 2) D_L23_001B140C = 1;
@@ -93,7 +93,7 @@ int func_L23_0041A038(char *object, char *target) {
             if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);
             build_axis_rotation_quaternion(state + 0x4C0, 1, *(float *)(state + 0x578));
             *(float *)(state + 0x578) = fast_subtract_rotations(*(float *)(state + 0x578), *(float *)(state + 0x57C) * 0.00029088825f);
-            TurnBossJoints(object, -1.0f, -1.0f);
+            mothership_turn_joints(object, -1.0f, -1.0f);
         }
     }
     return 0;

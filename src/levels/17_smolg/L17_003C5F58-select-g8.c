@@ -1,6 +1,6 @@
 #include "common.h"
-extern char D_00189EA0[];
-extern char *D_L17_001FE880[];
+extern char g_hero_position[];
+extern char *g_path_l17_table[];
 extern float D_L17_001B0344 __attribute__((sda));
 extern int func_003221C8(void *, int);
 extern float func_002EF0B0(void *, void *);
@@ -31,24 +31,24 @@ typedef struct {
 } SelectMoby;
 /* Checks the five entry slots of a ride platform. When one is selected, the platform moves to
    that slot's start point, turns to face along it and switches to its moving state. */
-void func_L17_003C5F58(char *self) {
+void ride_platform_select_entry(char *self) {
     SelectMoby *moby = (SelectMoby *)self;
     SelectData *data = moby->data;
     char *target;
     int i;
     for (i = 0; i < 5; i++) {
         if ((data->triggers[i] != -1 || data->current == i) &&
-            (func_003221C8(gHeroPosition, data->triggers[i]) || data->current == i)) {
+            (func_003221C8(g_hero_position, data->triggers[i]) || data->current == i)) {
             moby->animation = *(int *)(moby->model + 0x10);
             moby->flags = (moby->flags & 0xFFBE) | 0x1000;
             moby->animation = *(int *)(moby->model + 0x10);
             if (data->targets[i] != -1) {
-                target = gPathTable_L17[data->targets[i]];
+                target = g_path_l17_table[data->targets[i]];
                 qcopy(self + 0x10, target + 0x10);
                 *(float *)(self + 0xF8) = func_002EF590(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
             } else if (data->fallback[i] != -1) {
-                if (func_002EF0B0(self + 0x10, gPathTable_L17[data->fallback[i]] + 0x10) > 2.0f) {
-                    target = gPathTable_L17[data->fallback[i]];
+                if (func_002EF0B0(self + 0x10, g_path_l17_table[data->fallback[i]] + 0x10) > 2.0f) {
+                    target = g_path_l17_table[data->fallback[i]];
                     qcopy(self + 0x10, target + 0x10);
                     *(float *)(self + 0xF8) = func_002EF590(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
                 }

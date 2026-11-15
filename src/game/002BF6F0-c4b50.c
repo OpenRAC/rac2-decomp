@@ -4,14 +4,14 @@ typedef unsigned int TI128 __attribute__((mode(TI)));
  * stores the floor threshold; it is not a separate adjacent object. */
 typedef union { float lane[4]; TI128 quad; } ParticlePayload_C4B50;
 typedef struct { unsigned char header[16]; ParticlePayload_C4B50 position, velocity_floor; } FallingParticle_C4B50;
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B9180(void *);
-extern float func_002B0520(float *);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_kill(void *);
+extern float coll_get_heightmap_height(float *);
 extern float D_001B1DC0[];
 extern float D_001B1DC8;
 extern float D_001B1DD0;
 /* Moves a falling particle over the ground grid and removes it when it leaves the area or sinks below the ground. */
-void func_002C4B50(FallingParticle_C4B50 *self) {
+void part_update_falling_ground(FallingParticle_C4B50 *self) {
     ParticlePayload_C4B50 motion, sample, sampleAgain;
     float *velocity = self->velocity_floor.lane;
     float floor = velocity[3];
@@ -27,15 +27,15 @@ void func_002C4B50(FallingParticle_C4B50 *self) {
     FastVecAdd(self->position.lane, self->position.lane, D_001B1DC0);
     if (oldX != (int)self->position.lane[0] || oldY != (int)self->position.lane[1]) {
         sample.quad = self->position.quad;
-        if (GetHeightmapHeightAtPosition(sample.lane) >= D_001B1DD0) {
+        if (coll_get_heightmap_height(sample.lane) >= D_001B1DD0) {
             sampleAgain.quad = self->position.quad;
-            floor = GetHeightmapHeightAtPosition(sampleAgain.lane);
+            floor = coll_get_heightmap_height(sampleAgain.lane);
         } else floor = D_001B1DD0;
         if (self->position.lane[2] < floor) goto expired;
     }
     goto update;
 expired:
-    KillParticle(self);
+    part_kill(self);
     return;
 update:
     motion.lane[0] = 0.0f;
@@ -50,7 +50,7 @@ update:
 /* func_002C4D18 shares this unit's -mno-split-addresses: retail reads the
    scalar flag D_001A8BB0 with one lui/lw macro. Its scalar MEM and the
    struct-field stores of the velocity let the flag load go between them. */
-extern int D_001A8BB0;
+extern int g_current_game_mode;
 /* The motion block of an attached spark, at 0x20 in the particle. */
 typedef struct {
     float vx, vy, vz;   /* velocity */
@@ -58,16 +58,16 @@ typedef struct {
     float ox, oy, oz;   /* offset from the owner, in the owner's frame */
     int *rec;           /* colour ramp and lifetime */
 } SparkMotion_C4D18;
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern int func_002A9568(int, int, float);
-extern int func_00282978(short *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern int moby_forward_two_values_and_amount(int, int, float);
+extern int FastDecTimer(short *);
 
 /* The velocity decays by 0.98 per frame. While D_001A8BB0 is clear the spark
    follows its owner (its offset moved by the velocity, then rotated by the
    owner's matrix at 0xC0) and dies with it; otherwise it drifts. */
-void func_002C4D18(char *self)
+void UpdateOwnerFollowingSpark(char *self)
 {
     float velocity[4], offset[4], rotated[4];
     SparkMotion_C4D18 *spark = (SparkMotion_C4D18 *)(self + 0x20);
@@ -84,7 +84,7 @@ void func_002C4D18(char *self)
     spark->vx = velocity[0];
     spark->vy = velocity[1];
     spark->vz = velocity[2];
-    if (gCurrentGameMode == 0) {
+    if (g_current_game_mode == 0) {
         owner = spark->owner;
         if (owner != 0 && *(unsigned char *)(owner + 0x20) != 0xFE && *(unsigned char *)(owner + 0x20) != 0xFD) {
             offset[0] = spark->ox;
@@ -97,14 +97,14 @@ void func_002C4D18(char *self)
             matrix_mul_vec3(rotated, offset, spark->owner + 0xC0);
             FastVecAdd(self + 0x10, spark->owner + 0x10, rotated);
         } else {
-            KillParticle(self);
+            part_kill(self);
             return;
         }
     } else {
         FastVecAdd(self + 0x10, self + 0x10, velocity);
     }
     *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + 1;
-    *(int *)(self + 4) = ForwardTwoValuesAndAmount(rec[1], rec[0], (float)*(short *)(self + 0xA) / IntToFloat(rec[3]));
+    *(int *)(self + 4) = moby_forward_two_values_and_amount(rec[1], rec[0], (float)*(short *)(self + 0xA) / IntToFloat(rec[3]));
     if (FastDecTimer((short *)(self + 0xA)) != 0)
-        KillParticle(self);
+        part_kill(self);
 }

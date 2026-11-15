@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char D_001B5340[];
-extern int func_002A77E0(int);
+extern char g_camera_eye_state[];
+extern int math_random_int_below(int);
 extern float D_001AF1A4 __attribute__((sda));
 extern float D_001AF1A8 __attribute__((sda));
 extern unsigned char D_001AF1AC __attribute__((sda));
@@ -11,12 +12,12 @@ extern void *D_001AF1B8 __attribute__((sda));
 extern float D_001AF1BC __attribute__((sda));
 extern float D_001AF1C0 __attribute__((sda));
 extern char D_0018A0E0[];
-extern void func_00282CF0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7940(void);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_002C3150(void *, void *, void *, int, int, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_angle(void);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void part_spawn_hero_relative(void *, void *, void *, int, int, int, float);
 
 void func_PAL_00314558(unsigned char *object)
 {
@@ -30,19 +31,19 @@ void func_PAL_00314558(unsigned char *object)
     unsigned char random;
 
     state = *(unsigned char **)(object + 0x68);
-    func_00282CF0(first, D_001B5340, object + 0x10);
+    FastVecSub(first, g_camera_eye_state, object + 0x10);
     basis = D_0018A0E0;
-    func_00282D30(second, basis,
-                  func_002A7878(D_001AF1A4 * 0.020000001f,
+    FastVecScale(second, basis,
+                  math_random_float_range(D_001AF1A4 * 0.020000001f,
                                D_001AF1A8 * 0.020000001f));
-    func_002ACEC0(third, second, first, func_002A7940());
+    math_apply_axis_rotation_to_quat(third, second, first, math_random_angle());
 
     effect = state[0x57] != 0 ? D_001AF1B8 : D_001AF1B0;
     kind = D_001AF1AC;
-    random = (unsigned char)func_002A77E0(255);
-    func_002C3150(object + 0x10, third, effect, kind, random, 1, D_001AF1BC);
+    random = (unsigned char)math_random_int_below(255);
+    part_spawn_hero_relative(object + 0x10, third, effect, kind, random, 1, D_001AF1BC);
 
     kind = D_001AF1AC;
-    random = (unsigned char)func_002A77E0(255);
-    func_002C3150(object + 0x10, third, D_001AF1B4, kind, random, 1, D_001AF1C0);
+    random = (unsigned char)math_random_int_below(255);
+    part_spawn_hero_relative(object + 0x10, third, D_001AF1B4, kind, random, 1, D_001AF1C0);
 }

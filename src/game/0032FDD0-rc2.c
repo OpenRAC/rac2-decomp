@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,19 +24,19 @@
  */
 #include "common.h"
 
-extern void func_00282C88(f32 *v);
-extern f32 func_00282DF0(f32 *v);
-extern s8 D_00189E20[];
-extern f32 D_001B284C;
+extern void vec_clear_128(f32 *v);
+extern f32 FastVecLength(f32 *v);
+extern s8 g_hero_state[];
+extern f32 g_stick_length;
 
 /* Reads the stick input stored in the hero data, limits each axis to the range -1 to 1, saves it in the object and stores the stick length. */
-void func_0032FDD0(s8 *moby) {
+void pad_read_clamped_stick(s8 *moby) {
     s8 *heroData;
     s8 *vars;
     f32 stickVec[2];
 
     vars = *(s8 **)(moby + 0x68);
-    heroData = gHeroState;
+    heroData = g_hero_state;
     (*(f32 *)((s8 *)(vars) + (0x54))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB0)));
     (*(f32 *)((s8 *)(vars) + (0x50))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB4)));
     if ((*(f32 *)((s8 *)(vars) + (0x54))) > 1.0f) {
@@ -48,8 +49,8 @@ void func_0032FDD0(s8 *moby) {
     } else if ((*(f32 *)((s8 *)(vars) + (0x50))) < -1.0f) {
         (*(f32 *)((s8 *)(vars) + (0x50))) = -1.0f;
     }
-    ClearVector128(stickVec);
+    vec_clear_128(stickVec);
     stickVec[0] = (*(f32 *)((s8 *)(vars) + (0x50)));
     stickVec[1] = (*(f32 *)((s8 *)(vars) + (0x54)));
-    gStickLength = FastVecLength(stickVec);
+    g_stick_length = FastVecLength(stickVec);
 }

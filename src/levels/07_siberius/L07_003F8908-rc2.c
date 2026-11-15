@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -35,7 +36,7 @@ extern s32 ref_L07_003F8908_08 __attribute__((sda));
 extern s32 ref_L07_003F8908_09 __attribute__((sda));
 
 /* Picks the enemy's next action from its current phase and a random roll, and sets up the timer and handlers for it. Returns the chosen action number. */
-s32 func_L07_003F8908(void *moby) {
+s32 enemy_choose_action(void *moby) {
     s32 one  = 1;
     u8 *vars ;
     s32 action ;

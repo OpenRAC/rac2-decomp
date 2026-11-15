@@ -7,21 +7,21 @@ extern float D_L16_001B1780 __attribute__((sda));
 extern float D_L16_001B1784 __attribute__((sda));
 extern float D_L16_001B1788 __attribute__((sda));
 extern float D_L16_001B1790[4] __attribute__((sda));
-extern void func_0029FC20(void *, s32, void *);
-extern void func_002A7470(void *, s32, s32, s32);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern void func_L16_0040DAE0(void *, void *, s32);
-extern s32 func_002761F8(void *, void *, s32, void *, s32);
+extern void moby_transform_joint_point(void *, s32, void *);
+extern void anim_start_blended(void *, s32, s32, s32);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void snivelak_spawn_shot_from_matrix(void *, void *, s32);
+extern s32 CollLine(void *, void *, s32, void *, s32);
 
 /* Fires a shot from the boss's current arm toward the player with a small random spread, then switches to the other arm. */
-void func_L16_00411900(u8 *moby)
+void snivelak_fire_arm_shot(u8 *moby)
 {
     float matrix[16];
     float origin[4];
@@ -40,9 +40,9 @@ void func_L16_00411900(u8 *moby)
     if (D_L16_001B16C0) {
         state = *(u8 **)(moby + 0x68);
         children = (u8 **)(state + 0x238);
-        TransformMobyJointPoint(*(u8 **)((u32)children + (*(s32 *)(state + 0x240) << 2)), 0, matrix);
+        moby_transform_joint_point(*(u8 **)((u32)children + (*(s32 *)(state + 0x240) << 2)), 0, matrix);
         children = (u8 **)((u32)children + (*(s32 *)(state + 0x240) << 2));
-        StartAnimationBlended(*children, 1, 0, 3);
+        anim_start_blended(*children, 1, 0, 3);
         *(TI128 *)origin = *(TI128 *)(matrix + 12);
         vec_scale_to_length(forward, matrix, 20.0f);
         FastVecAdd(forward, forward, origin);
@@ -50,13 +50,13 @@ void func_L16_00411900(u8 *moby)
         hero[2] += 2.0f;
         zero = 0.0f;
         degree = 0.017453294f;
-        angle = FastMatrixHelperA(*(float *)(moby + 0x10) - *(float *)(D_L16_001B16C0 + 0x10), *(float *)(moby + 0x14) - *(float *)(D_L16_001B16C0 + 0x14));
-        spread = RandomSignedFloatRange(zero, D_L16_001B1780);
+        angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)(D_L16_001B16C0 + 0x10), *(float *)(moby + 0x14) - *(float *)(D_L16_001B16C0 + 0x14));
+        spread = math_random_signed_float_range(zero, D_L16_001B1780);
         angle = FastAddRotations(angle, spread * degree);
-        spread = RandomFloatRange(zero, D_L16_001B1784);
-        BuildSphericalOffset(random, D_L16_001B1788, angle, spread * degree);
+        spread = math_random_float_range(zero, D_L16_001B1784);
+        vec_build_spherical_offset(random, D_L16_001B1788, angle, spread * degree);
         FastVecAdd(random, random, hero);
-        SpawnSnivelakShotFromMatrix(moby, origin, 180);
+        snivelak_spawn_shot_from_matrix(moby, origin, 180);
         index = (*(s32 *)(state + 0x240) + 1) & 1;
         *(s32 *)(state + 0x240) = index;
         *(TI128 *)child = *(TI128 *)D_L16_001B1790;

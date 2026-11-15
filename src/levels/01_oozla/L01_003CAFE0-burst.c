@@ -21,16 +21,16 @@ typedef struct {
 } ParticleConfig;
 
 extern const ParticleConfig D_L01_002A4E78;
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern int func_001163B0(void);
-extern int func_00283CF0(float);
-extern u8 *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern int FloatToInt(float);
+extern u8 *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 typedef struct {
     u8 pad[0x10];
@@ -40,7 +40,7 @@ typedef struct {
 } ParticleOwner;
 
 /* Shoots out a burst of coloured particles from the moby. */
-void func_L01_003D8830(ParticleOwner *source)
+void part_l01_spawn_burst(ParticleOwner *source)
 {
     float pos[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
@@ -53,34 +53,34 @@ void func_L01_003D8830(ParticleOwner *source)
 
     count = D_L01_002A4E78.count;
     for (i = 0; i < count; i++) {
-        trig = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f));
-        trig *= RandomFloatRange(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f));
+        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
         pos[0] = trig;
-        trig = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f));
-        trig *= RandomFloatRange(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f));
+        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
         pos[1] = trig;
         pos[2] = 0;
         matrix_mul_vec3(pos, pos, owner->rotation);
         radialSpeed = FastVecLength(pos);
         w = D_L01_002A4E78.outer;
         radialSpeed = D_L01_002A4E78.radialSpeed * ((w - radialSpeed) * 0.016666668f) / w;
-        vec_scale_to_length(vel, pos, RandomFloatRange(radialSpeed / D_L01_002A4E78.radialDiv, radialSpeed));
+        vec_scale_to_length(vel, pos, math_random_float_range(radialSpeed / D_L01_002A4E78.radialDiv, radialSpeed));
         verticalSpeed = D_L01_002A4E78.verticalSpeed;
-        vel[2] += RandomFloatRange(verticalSpeed / D_L01_002A4E78.verticalDiv, verticalSpeed) * 0.016666668f;
+        vel[2] += math_random_float_range(verticalSpeed / D_L01_002A4E78.verticalDiv, verticalSpeed) * 0.016666668f;
         qzero(acc);
         FastVecAdd(pos, pos, owner->position);
         pos[2] += D_L01_002A4E78.height;
         vel[3] = D_L01_002A4E78.velW;
         acc[3] = D_L01_002A4E78.accW;
-        flag = Rand() & 1;
-        if (!flag && (Rand() & 1)) {
+        flag = func_001163B0() & 1;
+        if (!flag && (func_001163B0() & 1)) {
             color = D_L01_002A4E78.altColor;
             color2 = D_L01_002A4E78.altColor2;
         }
-        x = FloatToInt(RandomFloatRange(D_L01_002A4E78.x[0], D_L01_002A4E78.x[1]));
-        y = FloatToInt(RandomFloatRange(D_L01_002A4E78.y[0], D_L01_002A4E78.y[1]));
-        z = FloatToInt(RandomFloatRange(D_L01_002A4E78.z[0], D_L01_002A4E78.z[1]));
-        particle = SpawnTrailParticle_002BAA28(pos, vel, acc, color, color2, x, y, z, -1);
+        x = FloatToInt(math_random_float_range(D_L01_002A4E78.x[0], D_L01_002A4E78.x[1]));
+        y = FloatToInt(math_random_float_range(D_L01_002A4E78.y[0], D_L01_002A4E78.y[1]));
+        z = FloatToInt(math_random_float_range(D_L01_002A4E78.z[0], D_L01_002A4E78.z[1]));
+        particle = part_spawn_trail(pos, vel, acc, color, color2, x, y, z, -1);
         if (particle && flag)
             particle[3] = 0x48;
     }

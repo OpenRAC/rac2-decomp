@@ -27,12 +27,12 @@ typedef struct Actor {
     char padac[0x44];
     float rx, ry, rz;
 } Actor;
-extern int func_002A77E0(int);
-extern Actor *func_0029EFD0(int);
-extern void func_002A0488(Actor *, int, int, int);
+extern int math_random_int_below(int);
+extern Actor *CreateMoby(int);
+extern void set_moby_color(Actor *, int, int, int);
 extern char D_L10_002BABF0[];
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
 extern Actor *D_L10_001B1780 __attribute__((sda));
 extern Actor *D_L10_001B2528;
 
@@ -45,28 +45,28 @@ Actor *func_PAL_L10_00433CD0(int arg)
     Actor *p;
     CloudWork *st;
     int index;
-    int kind = func_002A77E0(5);
+    int kind = math_random_int_below(5);
 
-    if (kind == 0) p = func_0029EFD0(0x1315);
-    else if (kind == 1) p = func_0029EFD0(0x1328);
-    else p = func_0029EFD0(0x1327);
+    if (kind == 0) p = CreateMoby(0x1315);
+    else if (kind == 1) p = CreateMoby(0x1328);
+    else p = CreateMoby(0x1327);
     if (p) {
         p->state = 0;
         p->alpha = 255;
         p->flags = 255;
         p->active = 1;
         st = p->work;
-        func_002A0488(p, 20, 20, 20);
-        index = func_002A77E0(5);
+        set_moby_color(p, 20, 20, 20);
+        index = math_random_int_below(5);
         st->index = index;
         qcopy(&p->pos, D_L10_002BABF0 + index * 16);
-        p->pos[0] += func_002A7878(5.0f, -5.0f);
-        p->pos[1] += func_002A7878(5.0f, -5.0f);
-        p->pos[2] += func_002A7878(5.0f, -5.0f);
-        p->rx = func_002A7940();
-        p->ry = func_002A7940();
-        p->rz = func_002A7940();
-        st->timer = ((s32)(func_002A77E0(3600)) * 5 + 2) / 6;
+        p->pos[0] += math_random_float_range(5.0f, -5.0f);
+        p->pos[1] += math_random_float_range(5.0f, -5.0f);
+        p->pos[2] += math_random_float_range(5.0f, -5.0f);
+        p->rx = math_random_angle();
+        p->ry = math_random_angle();
+        p->rz = math_random_angle();
+        st->timer = ((s32)(math_random_int_below(3600)) * 5 + 2) / 6;
         st->arg = arg;
         if (!D_L10_001B1780) {
             Actor *cur = D_L10_001B2528;

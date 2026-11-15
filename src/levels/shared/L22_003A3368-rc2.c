@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ extern void *ref_L22_003A3368_00[];
 f32 ref_L22_003A3368_01(void *, void *);
 
 /* Works out which lanes touch each other at their ends and stores the result as bit masks on each lane. */
-void func_L22_003A3368(void *obj) {
+void lane_build_connection_masks(void *obj) {
     s32 i;
     s32 j;
     s32 k;

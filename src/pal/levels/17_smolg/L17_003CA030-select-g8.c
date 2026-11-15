@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_00189EA0[];
-extern char *D_L17_001FE880[];
+extern char g_hero_position[];
+extern char *g_path_l17_table[];
 extern float D_L17_001B0344 __attribute__((sda));
-extern int func_002ACBC8(void *, int);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
+extern int IsPointInCuboid(void *, int);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
 typedef struct {
     char pad[0x90];
     float cooldown;
@@ -39,19 +39,19 @@ void func_PAL_L17_003CA030(char *self) {
     int i;
     for (i = 0; i < 5; i++) {
         if ((data->triggers[i] != -1 || data->current == i) &&
-            (func_002ACBC8(D_00189EA0, data->triggers[i]) || data->current == i)) {
+            (IsPointInCuboid(g_hero_position, data->triggers[i]) || data->current == i)) {
             moby->animation = *(int *)(moby->model + 0x10);
             moby->flags = (moby->flags & 0xFFBE) | 0x1000;
             moby->animation = *(int *)(moby->model + 0x10);
             if (data->targets[i] != -1) {
-                target = D_L17_001FE880[data->targets[i]];
+                target = g_path_l17_table[data->targets[i]];
                 qcopy(self + 0x10, target + 0x10);
-                *(float *)(self + 0xF8) = func_00283248(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
+                *(float *)(self + 0xF8) = mat_fast_helper_a(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
             } else if (data->fallback[i] != -1) {
-                if (func_00282E80(self + 0x10, D_L17_001FE880[data->fallback[i]] + 0x10) > 2.0f) {
-                    target = D_L17_001FE880[data->fallback[i]];
+                if (vec_distance_xy(self + 0x10, g_path_l17_table[data->fallback[i]] + 0x10) > 2.0f) {
+                    target = g_path_l17_table[data->fallback[i]];
                     qcopy(self + 0x10, target + 0x10);
-                    *(float *)(self + 0xF8) = func_00283248(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
+                    *(float *)(self + 0xF8) = mat_fast_helper_a(*(float *)(target + 0x20) - *(float *)(self + 0x10), *(float *)(target + 0x24) - *(float *)(self + 0x14));
                 }
             }
             moby->choice = i;

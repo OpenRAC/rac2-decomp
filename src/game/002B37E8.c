@@ -4,7 +4,7 @@
 extern void func_002A0F48(char *);
 
 /* Sets up an object as a child of another: copies its position and rotation and links the two. */
-void func_002B37E8(char *child, char *parent)
+void moby_init_child_from_parent(char *child, char *parent)
 {
     *(unsigned char *)(child + 0x30) = 0xFF;
     *(short *)(child + 0x32) = 0xFF;

@@ -32,10 +32,10 @@ extern int D_L00_001B1EB4 __attribute__((section(".sdata")));
 extern int D_L00_001B20C0 __attribute__((section(".sdata")));
 extern int D_L00_001B255C __attribute__((section(".sdata")));
 extern Cfg_390F28 D_L00_001BD2C0;
-extern void func_00284E18(int, int, int);
+extern void SetBackgroundColor(int, int, int);
 
 /* Restores the lighting and fog settings saved by func_L00_00390E10; when full is set it also resets the view range. */
-void func_L00_00390F28(char *object, int full)
+void level_restore_lighting(char *object, int full)
 {
     State_390F28 *st = *(State_390F28 **)(object + 0x68);
 

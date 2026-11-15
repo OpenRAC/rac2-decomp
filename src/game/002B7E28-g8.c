@@ -11,7 +11,7 @@
    same file holds the clear of the fixed-address word at 0x10000000, which the
    retail reaches through its own `lui`/`sw` pair. */
 
-extern int D_001B1688;
+extern int g_game_time;
 
 /* The fixed-address word the particle update clears.  Its address is the same in
    every program, so it is named after the address; the incomplete array keeps it
@@ -19,38 +19,38 @@ extern int D_001B1688;
    into the retail's `lui`/`sw` pair. */
 extern int D_10000000[];
 
-extern void func_002AE838(char *dst, char *src);
+extern void vec_decode_byte_color(char *dst, char *src);
 
-extern void func_00282CC0(char *dst, char *a, char *b);
+extern void FastVecAdd(char *dst, char *a, char *b);
 
-extern float func_00283CE0(int a);
+extern float IntToFloat(int a);
 
-extern int func_00283D38(int a, int b, float f);
+extern int FastTweenColor(int a, int b, float f);
 
-extern int func_00282978(short *p);
+extern int FastDecTimer(short *p);
 
-extern void func_00282D08(float *out, char *a, char *b, float f);
+extern void lerp_vector(float *out, char *a, char *b, float f);
 
-extern void func_002B9180(void *p);
+extern void part_kill(void *p);
 
 typedef struct {
     float v[4];
 } Vec4_002BABE8;
 
 /* Updates one animated effect each frame: moves it, and blends its color and size through its fade-in, hold and fade-out phases. */
-void func_002BABE8(char *self)
+void part_update_fading_effect(char *self)
 {
     char *effect = self;
     char *anim = self + 0x20;
     Vec4_002BABE8 step, fromStep, toStep;
     float progress;
 
-    if (gGameTime & 1) {
+    if (g_game_time & 1) {
         *(unsigned char *)(effect + 8) = *(unsigned char *)(effect + 8) + 1;
     }
     if (*(short *)(anim + 0x10) != 0) {
         D_10000000[0] = 0;
-        DecodeByteColorVector((char *)&step, anim);
+        vec_decode_byte_color((char *)&step, anim);
         FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
         progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x10));
         *(int *)(effect + 4) = FastTweenColor(*(int *)(anim + 8) & 0xFFFFFF, *(int *)(anim + 8), 1.0f - progress);
@@ -60,8 +60,8 @@ void func_002BABE8(char *self)
             *(short *)(effect + 0xA) = *(unsigned short *)(anim + 0x12);
         }
     } else if (*(short *)(anim + 0x12) != 0) {
-        DecodeByteColorVector((char *)&fromStep, anim);
-        DecodeByteColorVector((char *)&toStep, effect + 0x24);
+        vec_decode_byte_color((char *)&fromStep, anim);
+        vec_decode_byte_color((char *)&toStep, effect + 0x24);
         progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x12));
         lerp_vector((float *)&step, (char *)&toStep, (char *)&fromStep, progress);
         FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
@@ -73,14 +73,14 @@ void func_002BABE8(char *self)
             *(short *)(effect + 0xA) = *(unsigned short *)(anim + 0x14);
         }
     } else {
-        DecodeByteColorVector((char *)&step, effect + 0x24);
+        vec_decode_byte_color((char *)&step, effect + 0x24);
         FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
         *(int *)(effect + 4) = FastTweenColor(*(int *)(anim + 0xC) & 0xFFFFFF, *(int *)(anim + 0xC),
                                          IntToFloat(*(short *)(effect + 0xA))
                                              / IntToFloat(*(short *)(anim + 0x14)));
         *(float *)(effect + 0xC) = (float)(*(short *)(anim + 0x18) * 1000);
         if (FastDecTimer((short *)(effect + 0xA)) != 0) {
-            KillParticle(effect);
+            part_kill(effect);
         }
     }
 }
@@ -131,28 +131,28 @@ extern int D_001AA2B8 __attribute__((sda));
 extern Separators_002B8108 D_001AA250;
 extern char D_001AA278[];
 extern char D_001AA288[];
-extern int D_001A79F8;
+extern int g_player_bolts;
 extern short D_001A7A1A;
 extern unsigned char D_001A7BB4;
-extern unsigned char D_00139568[];
-extern ClassRecord_002B8108 D_00239BA0[];
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_slot_to_record[];
+extern ClassRecord_002B8108 g_weapon_table[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern unsigned char D_001A7B30[] MACRO_ADDR;
 
-extern int func_002B49E0(int, int, int, int, int);
-extern int func_002B0D70(void);
-extern void func_0028BCA0(char *);
-extern int func_0028B5D0(int);
-extern char *func_00288FB8(int);
-extern char *func_00115690(char *, const char *);
-extern char *func_001163E0(const char *, const char *);
-extern int func_00115DA8(char *, const char *, ...);
+extern int request_begin_slot(int, int, int, int, int);
+extern int save_count_items_above_baseline(void);
+extern void hud_play_sound_effect(char *);
+extern int hud_close_element_by_key(int);
+extern char *GetLocalizedString(int);
+extern char *strcpy(char *, const char *);
+extern char *strstr(const char *, const char *);
+extern int sprintf(char *, const char *, ...);
 
 /* The class-record lookups are written index-first, i[D_00139568] and
    (j)[D_00239BA0]: retail adds each index to its base in that operand order
    (blocker 28), which is also what orders the loads in the switch cases. */
 /* Runs one step of a dialogue script: shows the current line, checks its condition and moves on to the next line. */
-void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
+void cutscene_run_dialogue_node(char *owner, DialogState_002B8108 *st, int enter)
 {
     DialogNode_002B8108 *node = &st->nodes[st->cur];
     char text[0x100];
@@ -167,7 +167,7 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     if (enter) {
         st->prev = st->cur;
-        st->startTime = gGameTime;
+        st->startTime = g_game_time;
         if (st->cur != node->next) {
             unsigned short flags = node->flags;
             st->cur = node->next;
@@ -179,9 +179,9 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
                 D_001B178C.data = st;
                 sound = node->sound;
                 if (sound & 0x4000) {
-                    BeginSlotRequest(1, 1, 0, (short)(sound ^ 0x4000), 0);
+                    request_begin_slot(1, 1, 0, (short)(sound ^ 0x4000), 0);
                 } else {
-                    BeginSlotRequest(2, 1, (short)sound, 0, 0);
+                    request_begin_slot(2, 1, (short)sound, 0, 0);
                 }
             }
         }
@@ -195,23 +195,23 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
         seps = D_001AA250;
         strcpy((char *)0x70000000, GetLocalizedString(node->message));
         {
-            char *p = Strstr((char *)0x70000000, D_001AA288);
+            char *p = strstr((char *)0x70000000, D_001AA288);
             if (p != 0) {
                 p[1] = 's';
             }
         }
         {
-            int price = (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].price;
-            Sprintf(number, D_001AA278, price / 1000, seps.s[D_001A7BB4 % 6], price % 1000);
+            int price = (node->arg[g_item_slot_to_record])[g_weapon_table].price;
+            sprintf(number, D_001AA278, price / 1000, seps.s[D_001A7BB4 % 6], price % 1000);
         }
-        Sprintf(text, (char *)0x70000000, number);
+        sprintf(text, (char *)0x70000000, number);
     } else {
-        Sprintf(text, GetLocalizedString(node->message));
+        sprintf(text, GetLocalizedString(node->message));
     }
     if (D_001B178C.message != 0) {
-        PlayHudSoundEffect(text);
+        hud_play_sound_effect(text);
     } else if (D_001AA2B8 != -1) {
-        CloseHudElementByKey(D_001AA2B8);
+        hud_close_element_by_key(D_001AA2B8);
         D_001AA2B8 = -1;
     }
     if (node->kind == 0) {
@@ -219,19 +219,19 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     switch (node->kind) {
     case 1:
-        cond = gPlayerBolts >= (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].cost;
+        cond = g_player_bolts >= (node->arg[g_item_slot_to_record])[g_weapon_table].cost;
         break;
     case 2:
-        cond = gItemOwnedFlags[node->arg] != 0;
+        cond = g_item_owned_flags[node->arg] != 0;
         break;
     case 3:
-        cond = gItemOwnedFlags[node->arg] != 0 && D_001A7B30[node->arg] == 0;
+        cond = g_item_owned_flags[node->arg] != 0 && D_001A7B30[node->arg] == 0;
         break;
     case 5:
-        cond = CountItemsAboveBaseline() >= node->arg;
+        cond = save_count_items_above_baseline() >= node->arg;
         break;
     case 6:
-        cond = gPlayerBolts >= (node->arg[gItemSlotToRecord])[gWeaponTable_00239BA0].price && CountItemsAboveBaseline() >= 4;
+        cond = g_player_bolts >= (node->arg[g_item_slot_to_record])[g_weapon_table].price && save_count_items_above_baseline() >= 4;
         break;
     case 7:
         cond = D_001A7A1A >= node->arg;
@@ -247,10 +247,10 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
     }
     if (next != st->cur) {
         st->cur = next;
-        st->startTime = gGameTime;
+        st->startTime = g_game_time;
         node = &st->nodes[next];
         st->skippable = node->flags & 1;
-        RunDialogueNode(owner, st, 0);
+        cutscene_run_dialogue_node(owner, st, 0);
     }
 }
 
@@ -260,13 +260,13 @@ void func_002B8108(char *owner, DialogState_002B8108 *st, int enter)
    "pad 0 disconnected" flag is a bare -G8 symbol reference, which the assembler
    expands into retail's lui/sw pair through $at. */
 
-extern int func_00128C18(int socket);
-extern int func_00128B28(int socket, void *profile);
+extern int scePad2GetState(int socket);
+extern int pad_read_button_mask(int socket, void *profile);
 extern int func_00128F50(int socket, void *profile);
 extern int func_00128A50(int socket, void *data);
-extern void func_00128FD0(int socket, int profile_size, void *profile, int data_size, void *data);
-extern void func_002B8888(void *pad);
-extern void func_002B88F0(void *pad, void *data, int size);
+extern void sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
+extern void ClearPadInput(void *pad);
+extern void pad_decode_reading(void *pad, void *data, int size);
 extern int D_001A7428;
 
 typedef struct {
@@ -287,10 +287,10 @@ typedef struct {
     int latched_held;
 } PadPollState;
 
-extern PadPollState D_00138180;
+extern PadPollState g_pad_state;
 
 /* Reads the state of one controller each frame, fetching its button and vibration profile when it connects, and sends the vibration levels. */
-void func_002B85F8(void *padArg)
+void poll_pad_device_state(void *padArg)
 {
     PadPollState *p = padArg;
     unsigned char buf[64];
@@ -301,14 +301,14 @@ void func_002B85F8(void *padArg)
     p->prev_held = p->latched_held;
     p->prev_raw_held = p->raw_held;
     p->raw_held = 0;
-    status = ScePad2GetState(p->socket);
+    status = scePad2GetState(p->socket);
     p->device_state = status;
     if (status == 1) {
         switch (p->profile_state) {
         case 0: {
             int n;
 
-            n = ReadPad2ButtonMask(p->socket, buf);
+            n = pad_read_button_mask(p->socket, buf);
             if (*(unsigned int *)buf == 0xFFFFFFFF)
                 p->profile_mask = 0x79;
             else
@@ -346,7 +346,7 @@ void func_002B85F8(void *padArg)
                 vibration = shifted | (p->vibration0 & 1);
             }
             sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
-            DecodePadReading(p, buf, n);
+            pad_decode_reading(p, buf, n);
             break;
         case 2:
             ClearPadInput(p);
@@ -358,5 +358,5 @@ void func_002B85F8(void *padArg)
     }
     p->vibration0 = 0;
     p->vibration1 = 0;
-    D_001A7428 = gPadState.device_state == 0;
+    D_001A7428 = g_pad_state.device_state == 0;
 }

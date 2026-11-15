@@ -2,7 +2,7 @@
 /* Build the menu descriptor, retaining its default initialization before overrides. */
 typedef struct { unsigned int lo; unsigned int hi; } Word2_462A8;
 
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 
 extern char D_00259CE0[];
 
@@ -24,7 +24,7 @@ extern int D_001AE468 __attribute__((sda));
 
 static __inline__ void initDescriptor_462A8(int *f) { f[20] = 0; f[21] = 1; }
 
-void func_003462A8(char *menu)
+void item_grid_draw_page(char *menu)
 {
     struct { Word2_462A8 q; int f[23] __attribute__((aligned(16))); } local;
 

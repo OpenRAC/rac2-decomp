@@ -10,7 +10,7 @@ typedef struct { char pad[12]; Key_335960 *first; unsigned int count; int mode; 
 typedef struct { char pad[8]; Track_335960 *track; } Owner_335960;
 
 /* Reads a value from a list of timed keys. It blends between the two keys around the given time. */
-void func_00335960(Owner_335960 *owner, float *out, float time) {
+void InterpolateTrackVector(Owner_335960 *owner, float *out, float time) {
     Key_335960 *key, *previous;
     unsigned int i;
     float t;

@@ -11,8 +11,8 @@ extern int D_L09_001B37A0[] MACRO_ADDR;
 extern float D_L09_001B37E0[16] MACRO_ADDR;
 extern int D_L09_001B35E0[16] MACRO_ADDR;
 extern unsigned char *D_L09_00255E90[16][2];
-extern void func_L08_002F2D10(void *, void *);
-extern void func_L09_003FB860(int);
+extern void gfx_queue_draw_callback(void *, void *);
+extern void beam_slot_clear_by_index(int);
 extern void func_PAL_L09_004005A8(void *, int);
 extern void func_PAL_L09_00400B48(char *);
 typedef struct DobboMoby DobboMoby;
@@ -96,7 +96,7 @@ void func_PAL_L09_00400080(DobboMoby *moby)
                     D_L09_00255E90[i][1] = 0;
                 }
             } else if (D_L09_001B35E0[i] == 4) {
-                func_L09_003FB860(i);
+                beam_slot_clear_by_index(i);
             } else if (D_L09_001B35E0[i]) {
                 count++;
                 func_PAL_L09_004005A8(D_L09_00255E90[i][0], i);
@@ -104,7 +104,7 @@ void func_PAL_L09_00400080(DobboMoby *moby)
             }
         }
         if (count)
-            func_L08_002F2D10(func_PAL_L09_00400B48, moby);
+            gfx_queue_draw_callback(func_PAL_L09_00400B48, moby);
         break;
     }
 }

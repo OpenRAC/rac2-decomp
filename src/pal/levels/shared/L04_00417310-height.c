@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef short s16;
-extern int D_001A79F0[] __attribute__((sda));
-extern int D_L04_001A8FE4[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
+extern int g_current_lap[] __attribute__((sda));
 typedef struct {
     char pad000[0x274];
     s16 f274;
@@ -31,14 +32,14 @@ void func_PAL_L04_00417310(void *object, HeightState *state, float height, float
     }
 
     if (margin + base < height) {
-        if (D_001A79F0[0] == 4 && state->f274 != 0 &&
+        if (g_current_map_index[0] == 4 && state->f274 != 0 &&
             state->f314 == -1 && state->animFrame >= 476) {
             t = state->f27C * 8.333333f;
             if (t > 1.0f)
                 t = 1.0f;
             else if (t < 0.0f)
                 t = 0.0f;
-            if (D_L04_001A8FE4[0] >= 2)
+            if (g_current_lap[0] >= 2)
                 extra = t * 7.0f + 3.5f;
             else
                 extra = t * 3.0f + 1.5f;

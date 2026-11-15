@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -35,7 +36,7 @@ extern f32 ref_L16_0041EBE8_08;
 extern f32 g_001B3AAC __attribute__((sda));
 
 /* Swings an object to a set angle with a bounce, then stops once it has settled. */
-void func_L16_0041EBE8(s8 *moby) {
+void swing_to_angle_update(s8 *moby) {
     f32 angle;
     f32 finalSpeed;
     f32 targetAngle;

@@ -10,11 +10,11 @@ extern PathView D_L00_001BD2C0;
 extern u8 *D_L00_001FDA80[];
 typedef struct { u8 pad[0x194]; InitQuad *transform; } PathCamera;
 extern PathCamera D_L00_001B8C80;
-extern float func_00283248(float x, float y);
-extern void func_00282C88(InitQuad *v);
-extern int func_L00_002C42E0(int event, int value);
-extern float func_00282E48(char *a, char *b);
-extern float func_00283CE0(int);
+extern float mat_fast_helper_a(float x, float y);
+extern void vec_clear_128(InitQuad *v);
+extern int hero_l00_set_action(int event, int value);
+extern float fast_vec_dist(char *a, char *b);
+extern float IntToFloat(int);
 #define SDA_OBJ __attribute__((section(".sdata")))
 extern char *D_L00_001B1844 SDA_OBJ;
 
@@ -73,7 +73,7 @@ void func_PAL_L00_0042E68C(u8 *object)
     }
     accepted = 0;
     position = object + 0x30;
-    *(float *)(pathState + 0x30) = func_00283248(1.0f, D_L00_001BD2C0.scale) * 2.0f;
+    *(float *)(pathState + 0x30) = mat_fast_helper_a(1.0f, D_L00_001BD2C0.scale) * 2.0f;
     if (data->initialized == 0 && data->pathIndex >= 0) {
         int i;
         u8 *path = D_L00_001FDA80[data->pathIndex];
@@ -86,20 +86,20 @@ void func_PAL_L00_0042E68C(u8 *object)
                 data->indices[accepted] = i;
                 accepted++;
             }
-            distance = func_00282E48((char *)(path + (i * 16 + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
+            distance = fast_vec_dist((char *)(path + (i * 16 + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
             *(float *)(path + (i << 4) + 0x1C) = distance;
             if (i < *(int *)path - 1)
                 motion->distance += distance;
         }
     }
     if (data->duration > 0)
-        data->speed = (motion->distance / func_00283CE0(((s32)data->duration * 5 + 2) / 6)) * 60.0f;
+        data->speed = (motion->distance / IntToFloat(((s32)data->duration * 5 + 2) / 6)) * 60.0f;
     if (data->secondPathIndex >= 0) {
         int i;
         u8 *path = D_L00_001FDA80[data->secondPathIndex];
         for (i = 0; i < *(int *)path; i++) {
             int byteOffset = i * 16;
-            distance = func_00282E48((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
+            distance = fast_vec_dist((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
             *(float *)(path + byteOffset + 0x1C) = distance;
             if (i < *(int *)path - 1)
                 motion->secondDistance += distance;
@@ -108,12 +108,12 @@ void func_PAL_L00_0042E68C(u8 *object)
     { u8 *saved = *(u8 **)(object + 0x70);
     *(float *)saved = 0.03f;
     *(float *)(saved + 4) = 0.2f;
-    func_00282C88((InitQuad *)(saved + 0x10));
+    vec_clear_128((InitQuad *)(saved + 0x10));
     }
     { u8 *saved = *(u8 **)(object + 0x70);
     *(float *)(saved + 0x20) = 0.03f;
     *(float *)(saved + 0x24) = 0.2f;
-    func_00282C88((InitQuad *)(saved + 0x30));
+    vec_clear_128((InitQuad *)(saved + 0x30));
     }
     transform = D_L00_001B8C80.transform;
     qcopy(position, transform + 3);
@@ -121,6 +121,6 @@ void func_PAL_L00_0042E68C(u8 *object)
     qcopy(object + 0x10, transform + 1);
     qcopy(object + 0x20, transform + 2);
     if (data->eventGate == 0)
-        func_L00_002C42E0(0x6f, 1);
+        hero_l00_set_action(0x6f, 1);
     data->initialized = 1;
 }

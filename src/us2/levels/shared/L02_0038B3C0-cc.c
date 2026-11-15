@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L02_0038B3C0, the USA v2.00 copy of func_L02_00389F70: the same C, where rename func_002B0A18 becomes func_US2_002B1880. */
 
 /* One-shot trigger: on the first update it marks the object initialised; once the level's
@@ -8,11 +9,11 @@
    first branch's delay slot is gp-relative while the fall-through load stays absolute. */
 
 extern int D_L02_001A9048 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_001A7A6B __attribute__((nosda));
 extern int D_L02_001A903C __attribute__((sda));
 
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 extern void func_US2_002B1880(int, int);
 
 struct TriggerState {
@@ -29,12 +30,12 @@ void func_US2_L02_0038B3C0(struct TriggerState *self) {
     }
     if (D_L02_001A9048 < 14)
         return;
-    if (D_001A79F0 != 16)
+    if (g_current_map_index != 16)
         return;
     if (D_001A7A6B != 0)
         return;
     D_001A7A6B = 1;
-    func_002E5E58(1, 0, 0);
+    snd_play_from_global_bank(1, 0, 0);
     func_US2_002B1880(0x1233, -1);
     D_L02_001A903C = 1;
 }

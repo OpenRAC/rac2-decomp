@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L18_00317D10, the USA v2.00 copy of func_L18_003170F8: the same scene update, where
  * class 0xFA0's effect is skipped while D_001A79F0 is 0x33.  That test adds a constant to the
  * object scan, and the wording below follows from loop.c's movable threshold (61, less 3 per
@@ -53,18 +54,18 @@ typedef struct {
 } SceneCamera;
 
 extern Scene18 D_L18_001BD4C0;
-extern int D_001A79F0 __attribute__((sda));
-extern SceneMoby *D_L18_001B281C MACRO_ADDR;
+extern int g_current_map_index __attribute__((sda));
+extern SceneMoby *g_moby_l18_table MACRO_ADDR;
 extern SceneMoby *D_L18_001B2820 MACRO_ADDR;
 extern SceneCamera D_L18_001B9680;
 extern ExplosionSpot D_L18_00287D10[];
 
-extern void func_L00_002FC980(void);
-extern void func_002E64A0(void *);
-extern void func_L00_00326048(void *, void *, unsigned int, unsigned int, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void anim_start_startup_animations(void);
+extern void UpdateEquipmentPieces(void *);
+extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 void func_US2_L18_00317D10(void)
 {
@@ -76,7 +77,7 @@ void func_US2_L18_00317D10(void)
     Scene18 *scene, *timing;
     int shakeTime, secondaryShakeTime;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     i = 0;
     if (i < D_L18_001BD4C0.count) do {
         scene = &D_L18_001BD4C0;
@@ -85,22 +86,22 @@ void func_US2_L18_00317D10(void)
             *(unsigned short *)(object + 0x34) |= 0x800;
         }
         if (*(short *)(object + 0xAA) == 0xD54) {
-            func_002E64A0(object);
+            UpdateEquipmentPieces(object);
         }
-        if (object && *(short *)(object + 0xAA) == 0xFA0 && D_001A79F0 != 0x33) {
+        if (object && *(short *)(object + 0xAA) == 0xFA0 && g_current_map_index != 0x33) {
             state = *(unsigned char **)(object + 0x68);
             if (state) {
-                func_L00_00326048(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
+                math_store_angle_update_result(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
             }
         }
         i++;
     } while (i < scene->count);
-    if (D_001A79F0 != 18 || D_L18_001BD4C0.mode != 4) {
+    if (g_current_map_index != 18 || D_L18_001BD4C0.mode != 4) {
         return;
     }
     if (D_L18_001BD4C0.timer == 1) {
-        for (k = 0; &D_L18_001B281C[k] < D_L18_001B2820; k++) {
-            moby = &D_L18_001B281C[k];
+        for (k = 0; &g_moby_l18_table[k] < D_L18_001B2820; k++) {
+            moby = &g_moby_l18_table[k];
             moby->flags |= 0x41;
         }
     }
@@ -112,10 +113,10 @@ void func_US2_L18_00317D10(void)
         if (timer == spot->time) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                func_00283098(position, position, D_L18_001B9680.matrix);
-                func_00282CC0(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
+                FastVecAdd(position, position, D_L18_001B9680.position);
             }
-            func_0032C700(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
+            SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
                 shakeTime = 55;
                 secondaryShakeTime = 70;

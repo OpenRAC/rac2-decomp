@@ -1,5 +1,6 @@
+#include "names.h"
 /* Turns a hue angle into a fully bright packed colour with the given alpha. */
-unsigned int func_L04_00432530(float angle, int alpha)
+unsigned int gfx_hue_to_packed_color(float angle, int alpha)
 {
     float sector = angle * 0.1591549367f * 6.0f;
     int index = (int)sector;

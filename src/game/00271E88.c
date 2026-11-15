@@ -10,35 +10,35 @@ typedef struct {
     s32 grounded;
 } Cam_271E88;
 
-extern Cam_271E88 D_001B5200;
-extern s32 D_001A8BB0 __attribute__((sda));
+extern Cam_271E88 g_active_camera;
+extern s32 g_current_game_mode __attribute__((sda));
 extern f32 D_001BAFA0[4];
-extern s32 func_002761F8(void *, void *, s32, void *, s32);
-extern int func_00278E78(void);
-extern float func_002A90F8(float *, void *);
+extern s32 CollLine(void *, void *, s32, void *, s32);
+extern int GetCollHitMaterial(void);
+extern float coll_get_ground_height_at_position(float *, void *);
 
 /* Probe down from the camera target for up to six hits; grounded when a floor is within reach. */
-void func_00271E88(void)
+void cam_update_grounded(void)
 {
     f32 top[4] __attribute__((aligned(16)));
     f32 bottom[4] __attribute__((aligned(16)));
     int i;
 
-    if (gActiveCamera.moby->state == 6 || gCurrentGameMode != 0) {
-        gActiveCamera.grounded = 0;
+    if (g_active_camera.moby->state == 6 || g_current_game_mode != 0) {
+        g_active_camera.grounded = 0;
         return;
     }
-    qcopy(top, gActiveCamera.pos);
-    qcopy(bottom, gActiveCamera.pos);
+    qcopy(top, g_active_camera.pos);
+    qcopy(bottom, g_active_camera.pos);
     top[2] += 0.75f;
     bottom[2] -= 0.75f;
     for (i = 0; i < 6 && CollLine(top, bottom, 0x12, 0, 0); i++) {
         if (GetCollHitMaterial() == 0) {
-            f32 floorHeight = GetGroundHeightAtPosition(D_001BAFA0, 0) + 0.04f;
-            if (gActiveCamera.pos[2] < floorHeight) {
-                gActiveCamera.grounded = 1;
+            f32 floorHeight = coll_get_ground_height_at_position(D_001BAFA0, 0) + 0.04f;
+            if (g_active_camera.pos[2] < floorHeight) {
+                g_active_camera.grounded = 1;
             } else {
-                gActiveCamera.grounded = 0;
+                g_active_camera.grounded = 0;
             }
             return;
         }

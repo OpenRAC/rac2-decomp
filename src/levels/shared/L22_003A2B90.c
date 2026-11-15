@@ -3,18 +3,18 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_00282E48(char *, char *);
+extern float fast_vec_dist(char *, char *);
 extern int *D_L22_001FE940[];
-extern int func_L22_003A48F8(int);
+extern int list_is_key_missing(int);
 
 /* Finds the lane point closest to a position and copies it to the output. */
-void func_L22_003A2B90(char *obj, char *out, char *pos, int flag) {
+void lane_find_nearest_point(char *obj, char *out, char *pos, int flag) {
     char *slots = *(char **)(obj + 0x68) + 0x2A0;
     float best = 30000.0f;
     int i;
 
     for (i = 0; i < 0x20; i++) {
-        if (flag == 0 || IsKeyMissingFromList(i) != 0) {
+        if (flag == 0 || list_is_key_missing(i) != 0) {
             int *list = D_L22_001FE940[*(int *)(slots + (i << 2))];
             int j;
 

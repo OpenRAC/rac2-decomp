@@ -12,19 +12,19 @@
 
 typedef int L00_0037FA90_TI128 __attribute__((mode(TI)));
 
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00283180(float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282D30(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern void FastVecCross(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
 extern L00_0037FA90_TI128 D_L00_001BF220;
 /* The input at +0x230 and the lower vector share this measured data block. */
-extern char D_L00_001B8DC0[0x240];
+extern char g_camera_l00_position[0x240];
 
 /* The level's own data: the vector block the reach is measured against and the
    pointer the shared test takes. */
@@ -34,12 +34,12 @@ typedef struct {
     void *f2290;
 } L00_0037FA90_Data;
 
-extern L00_0037FA90_Data D_00189E20;
+extern L00_0037FA90_Data g_hero_state;
 
 /* Works out a smooth aim direction from the level's stored vectors, bending it toward a fixed direction when it is close, or straight to it otherwise. */
-void func_L00_0037FA90(char *result, char *target, float blend, float lookAhead, float maxAngle)
+void math_compute_aim_direction(char *result, char *target, float blend, float lookAhead, float maxAngle)
 {
-    char *origin = gCameraPosition_L00 + 0x230;
+    char *origin = g_camera_l00_position + 0x230;
     char probe[16];
     char axis[16];
     float alignment;
@@ -47,14 +47,14 @@ void func_L00_0037FA90(char *result, char *target, float blend, float lookAhead,
     vec_scale_to_length(probe, origin, lookAhead);
     origin -= 0x230;
     FastVecAdd(probe, probe, origin);
-    if (CollLine(origin, probe, 0, gHeroState.f2290, 0) != 0)
+    if (CollLine(origin, probe, 0, g_hero_state.f2290, 0) != 0)
         *(L00_0037FA90_TI128 *)probe = D_L00_001BF220;
     FastVecSub(result, probe, target);
     vec_scale_to_length(result, result, 1.0f);
-    alignment = FastVecDot(result, gHeroState.f760);
-    if (alignment < FastSinOrCosA(maxAngle)) {
-        FastVecCross(axis, result, gHeroState.f760);
-        ApplyAxisRotationToQuaternion(result, gHeroState.f760, axis, maxAngle);
+    alignment = FastVecDot(result, g_hero_state.f760);
+    if (alignment < math_fast_sin_or_cos_a(maxAngle)) {
+        FastVecCross(axis, result, g_hero_state.f760);
+        math_apply_axis_rotation_to_quat(result, g_hero_state.f760, axis, maxAngle);
         vec_scale_to_length(result, result, blend);
     } else {
         FastVecScale(result, result, blend);

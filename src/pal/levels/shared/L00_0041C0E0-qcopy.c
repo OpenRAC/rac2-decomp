@@ -1,19 +1,20 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int V4_L00_004170A8 __attribute__((mode(TI)));
-extern char D_L00_0025A920[];
+extern char g_spark_l00_records[];
 extern V4_L00_004170A8 D_L00_001BF220;
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 extern void func_PAL_L00_0041C528(char *);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
 extern void func_PAL_L00_0041CBB8(char *, void *, int);
-extern void func_L00_00417D70(char *);
+extern void spark_records_update(char *);
 extern void func_PAL_L00_0041C390(char *);
 extern void func_PAL_L00_0041C878(char *);
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
 void func_PAL_L00_0041C220(char *object)
@@ -23,41 +24,41 @@ void func_PAL_L00_0041C220(char *object)
     float a, b;
     int i;
     char *p;
-    if (func_00282948(state) == 0) {
+    if (math_fast_float_d(state) == 0) {
         if (*(int *)(state + 4) == 0)
             func_PAL_L00_0041C528(object);
         if (*(int *)(state + 4) == 0) {
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&local, 7.0f, a, b);
+            a = math_random_angle();
+            b = math_random_angle();
+            vec_build_spherical_offset(&local, 7.0f, a, b);
         } else {
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&local, 5.0f, a, b);
+            a = math_random_angle();
+            b = math_random_angle();
+            vec_build_spherical_offset(&local, 5.0f, a, b);
         }
-        func_00282CC0(&local, &local, object + 0x10);
-        if (func_002761F8(object + 0x10, &local, 0, object, 0) != 0)
+        FastVecAdd(&local, &local, object + 0x10);
+        if (CollLine(object + 0x10, &local, 0, object, 0) != 0)
             local = D_L00_001BF220;
         func_PAL_L00_0041CBB8(object, &local, 17);
-        func_L00_00417D70(object);
+        spark_records_update(object);
         ref_L00_004170A8_00(func_PAL_L00_0041C878, object);
     } else {
-        p = D_L00_0025A920;
+        p = g_spark_l00_records;
         p += 0x106C;
         for (i = 23; i >= 0; --i, p -= 0xB0)
             *(int *)p = 0;
         if (*(int *)(state + 4) == 0)
             func_PAL_L00_0041C390(object);
-        func_0029F338(object);
+        moby_mark_spawned(object);
     }
 }
 
 typedef int CurveWord128 __attribute__((mode(TI)));
 typedef union { CurveWord128 word; float values[4]; } CurveVector;
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002A7820(int, int);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_random_int_range(int, int);
 extern void ref_L00_00417868_00(void *, void *, void *, void *, void *, float);
 extern void ref_L00_00417868_01(void *, int, void *, int);
 
@@ -67,21 +68,21 @@ void func_PAL_L00_0041C9E0(char *object, char *state) {
     int i;
     float t;
     for (i = 0; i < 24; i++) {
-        t = func_00283CE0(i) / func_00283CE0(23);
+        t = IntToFloat(i) / IntToFloat(23);
         start.word = *(CurveWord128 *)state;
         end.word = *(CurveWord128 *)(state + 0x10);
-        func_00282CC0(&start, &start, state + 0x20);
-        func_00282CC0(&end, &end, state + 0x30);
+        FastVecAdd(&start, &start, state + 0x20);
+        FastVecAdd(&end, &end, state + 0x30);
         ref_L00_00417868_00(&points[i], state + 0x20, state + 0x30, &start, &end, t);
         jitter.values[3] = 0;
-        jitter.values[0] = func_002A7878(-1.0f, 1.0f);
-        jitter.values[1] = func_002A7878(-1.0f, 1.0f);
-        jitter.values[2] = func_002A7878(-1.0f, 1.0f);
-        func_00282F20(&jitter, &jitter, 0.075f);
-        func_00282CC0(&points[i], &points[i], &jitter);
+        jitter.values[0] = math_random_float_range(-1.0f, 1.0f);
+        jitter.values[1] = math_random_float_range(-1.0f, 1.0f);
+        jitter.values[2] = math_random_float_range(-1.0f, 1.0f);
+        vec_scale_to_length(&jitter, &jitter, 0.075f);
+        FastVecAdd(&points[i], &points[i], &jitter);
     }
     if (*(int *)(state + 0x98) >= 8)
-        ref_L00_00417868_01(object, func_002A7820(0x40, 0x80), points, 25);
+        ref_L00_00417868_01(object, math_random_int_range(0x40, 0x80), points, 25);
     else
-        ref_L00_00417868_01(object, func_002A7820(0, 0x40), points, 25);
+        ref_L00_00417868_01(object, math_random_int_range(0, 0x40), points, 25);
 }

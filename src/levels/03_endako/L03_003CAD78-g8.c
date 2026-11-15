@@ -17,15 +17,15 @@ extern TI128 D_L03_001B0390[] SDATA(D_L03_001B0390);
 extern s32 D_L03_001B03D0[] SDATA(D_L03_001B03D0);
 extern f32 D_L03_001B9840[];
 
-extern void func_00282C88(TI128 *moby);
-extern f32  func_00283248(f32 moby, f32 a1);
-extern void func_00283410(void *moby, void *a1);
-extern s32  func_0027C878(s32 moby);
-extern void func_00280B90(void *moby, void *a1, s32 a2);
+extern void vec_clear_128(TI128 *moby);
+extern f32  mat_fast_helper_a(f32 moby, f32 a1);
+extern void euler_to_matrix(void *moby, void *a1);
+extern s32  GetEffectTextureDescriptor(s32 moby);
+extern void draw_world_quad(void *moby, void *a1, s32 a2);
 
 /* Builds the actor's effect track: the aim, the four corners of the level's
    tables, and the two packed words the level keeps. */
-void func_L03_003CAD78(char *moby)
+void moby_build_effect_packet(char *moby)
 {
     u8 packet[0xE0];
     f32 *vars;
@@ -39,8 +39,8 @@ void func_L03_003CAD78(char *moby)
     int i;
 
     vars = *(f32 **)(moby + 0x68);
-    ClearVector128((TI128 *)(packet + 0xD0));
-    *(f32 *)(packet + 0xD8) = FastMatrixHelperA(D_L03_001B9840[0x140 / 4] - *(f32 *)(moby + 0x10),
+    vec_clear_128((TI128 *)(packet + 0xD0));
+    *(f32 *)(packet + 0xD8) = mat_fast_helper_a(D_L03_001B9840[0x140 / 4] - *(f32 *)(moby + 0x10),
                                           D_L03_001B9840[0x144 / 4] - *(f32 *)(moby + 0x14));
     euler_to_matrix(packet + 0x90, packet + 0xD0);
     qcopy(packet + 0xC0, moby + 0x10);

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,16 +25,16 @@
  */
 #include "common.h"
 
-extern f32 func_00282C10(f32);
-extern f32 func_00282C48(f32);
-extern f32 func_00283B98(f32, f32);
-extern void func_002AA2E8(f32 *, f32, f32);
-extern f32 func_002AA738(s32, f32, f32);
-extern void func_002AA800(f32 *, s32, f32, f32);
+extern f32 square_root(f32);
+extern f32 math_fabs(f32);
+extern f32 FastAddRotations(f32, f32);
+extern void ApproachValue(f32 *, f32, f32);
+extern f32 math_shortest_angle_delta(s32, f32, f32);
+extern void StepAngleTowardTarget(f32 *, s32, f32, f32);
 
 /* Moves a value toward a target using a speed that builds up and then brakes in time to
    stop on the target. Mode 2 lets it pick the shorter way around. */
-f32 func_002AAA00(f32 *value, f32 *velocity, s32 mode, f32 target, f32 accel, f32 brake, f32 maxSpeed)
+f32 math_approach_target_with_direction_mode(f32 *value, f32 *velocity, s32 mode, f32 target, f32 accel, f32 brake, f32 maxSpeed)
 {
     s32 direction;
     f32 delta;
@@ -60,7 +61,7 @@ aa0:
         direction = -1;
     }
 abc:
-    delta = GetShortestAngleDelta(direction, target, *value);
+    delta = math_shortest_angle_delta(direction, target, *value);
     if (*velocity == 0.0f && delta == 0.0f) {
         return 0.0f;
     }
@@ -70,9 +71,9 @@ abc:
 
         if (0.0f <= oldVelocity * delta) {
             stopDistance = ((oldVelocity * oldVelocity) / brake) * 0.5f;
-            if (FloatAbs(delta) < stopDistance) {
-                absDeltaTmp = FloatAbs(delta);
-                if (stopDistance < absDeltaTmp + FloatAbs(*velocity)) {
+            if (math_fabs(delta) < stopDistance) {
+                absDeltaTmp = math_fabs(delta);
+                if (stopDistance < absDeltaTmp + math_fabs(*velocity)) {
                     ApproachValue(velocity, 0.0f, brake);
                 } else {
                     ApproachValue(velocity, 0.0f, brake * 1.1f);
@@ -88,8 +89,8 @@ abc:
                     StepAngleTowardTarget(velocity, 0, desiredSpeed, accel);
                 }
             }
-            absDelta = FloatAbs(delta);
-            if (FloatAbs(*velocity) < absDelta) {
+            absDelta = math_fabs(delta);
+            if (math_fabs(*velocity) < absDelta) {
                 newVelocity = *velocity;
             } else {
                 *value = target;

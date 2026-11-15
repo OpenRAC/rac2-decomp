@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 extern int D_001AF0FC __attribute__((sda));
 extern void func_US2_002A7AA8(void *, int, int);
-extern int func_002A68A8(void *, int *);
+extern int PickAmmoDropItem(void *, int *);
 extern void func_US2_003210E0(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
@@ -24,7 +24,7 @@ void func_US2_00312D68(unsigned char *self)
             i = 1;
         else
             i = 2;
-        func_US2_002A7AA8(self, 256, func_002A77E0(2) + i);
+        func_US2_002A7AA8(self, 256, math_random_int_below(2) + i);
     } else {
         if (*(short *)(self + 0xAA) != 0x1F5 && *(short *)(self + 0xAA) != 0x200) {
             {
@@ -52,7 +52,7 @@ void func_US2_00312D68(unsigned char *self)
             selected:
                 ;
             }
-            n = func_002A68A8(self, &item);
+            n = PickAmmoDropItem(self, &item);
             if (n > 0) {
                 i = n;
                 do {

@@ -22,7 +22,7 @@ extern void func_003140C0(char *, f32, f32);
 extern char D_001B9B00[];
 
 /* lays the object's ten measurement points out along a ring and asks the engine to arm them */
-void func_L16_00416D08(char *moby) {
+void turret_explode_into_debris(char *moby) {
     char buf0[0x10];
     char buf1[0x10];
     f32 speed;
@@ -45,7 +45,7 @@ void func_L16_00416D08(char *moby) {
 }
 
 /* the horizontal speed the object carries in its data block */
-f32 func_L16_00416EB8(char *moby) {
+f32 turret_get_horizontal_speed(char *moby) {
     return *(f32 *)(*(char **)(moby + 0x68) + 0x78);
 }
 
@@ -56,7 +56,7 @@ f32 func_L16_00416EB8(char *moby) {
 /* func_L16_00417210 is defined in L16_00417210-g8.c. */
 
 /* the model index the object's data block points at */
-s32 func_L16_00417788(char *moby) {
+s32 turret_get_model_index(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     return *(s32 *)(vars + 0x60);
 }
@@ -76,18 +76,18 @@ s32 func_L16_00417788(char *moby) {
 /* func_L16_00419140 is defined in L16_00419140-g8.c. */
 
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern void func_00315728(char *, char *, s32, char *, f32);
 extern void func_00315948(char *, char *);
 
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
-extern s32 func_002829D8(char *);
-extern void func_L16_0041C948(char *);
-extern void func_002A7750(char *, s32, s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
+extern s32 vec_fast_helper_b(char *);
+extern void gfx_submit_subobject_angle_scale(char *);
+extern void moby_set_state(char *, s32, s32);
 
 /* Controls the timed rotation cycle and restores the original settings. */
-void func_L16_0041C7A0(char *self) {
+void rotation_cycle_update(char *self) {
     char *vars = *(char **)(self + 0x68);
     f32 firstTime, secondTime, savedAngle;
     switch (*(u8 *)(self + 0x20)) {
@@ -104,24 +104,24 @@ void func_L16_0041C7A0(char *self) {
         *(s32 *)(vars + 36) = *(u8 *)(self + 0xBC);
         *(f32 *)(vars + 32) = secondTime;
         *(f32 *)(vars + 28) = firstTime;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
         if (*(u8 *)(self + 0xBC))
-            SetMobyState(self, 4, -1);
+            moby_set_state(self, 4, -1);
         break;
     case 4:
         if (*(s32 *)(vars + 16) < 180) {
             *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), 0.0872664749622345f);
             *(s32 *)(vars + 16) += 5;
-        } else SetMobyState(self, 2, -1);
+        } else moby_set_state(self, 2, -1);
         break;
     case 2:
-        if (FastVectorHelperB(vars + 20)) SetMobyState(self, 3, -1);
+        if (vec_fast_helper_b(vars + 20)) moby_set_state(self, 3, -1);
         break;
     case 3:
-        if (FastVectorHelperB(vars + 24)) SetMobyState(self, 5, -1);
-        SubmitSubobjectWithAngleScale(self);
+        if (vec_fast_helper_b(vars + 24)) moby_set_state(self, 5, -1);
+        gfx_submit_subobject_angle_scale(self);
         break;
     case 5:
         if (*(s32 *)(vars + 16) > 0) {
@@ -133,7 +133,7 @@ void func_L16_0041C7A0(char *self) {
             *(f32 *)(vars + 24) = *(f32 *)(vars + 32);
             firstTime = *(f32 *)(vars + 40);
             *(f32 *)(self + 0xF0) = firstTime;
-            SetMobyState(self, 1, -1);
+            moby_set_state(self, 1, -1);
         }
         break;
     }
@@ -159,7 +159,7 @@ extern s32 func_003320E0(char *, char *, u32, u32, f32, u32, u32);
 extern s32 func_002E8648(f32);
 
 /* spawns the level's score pickup effect for this object */
-void func_L16_0041F150(char *moby) {
+void part_spawn_score_particle(char *moby) {
     char buf[0x10];
     char *vars = *(char **)(moby + 0x68);
     char *particle;

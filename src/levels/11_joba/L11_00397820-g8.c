@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern void func_00282CF0(void *,void *,void *),func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float),func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *),func_002830C0(void *,void *,void *);
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *,int,int);
+extern void FastVecSub(void *,void *,void *),FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *),transform_vector(void *,void *,void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,int,int);
 extern float D_L11_001AEC88 __attribute__((sda)),D_L11_001AEC70 __attribute__((sda));
 extern float D_L11_001AEC8C MACRO_ADDR,D_L11_001AEC90 MACRO_ADDR;
 extern char D_L11_001BA8C0[],D_L11_001AA2D0[] __attribute__((sda));
 typedef struct { float v[4][4]; u32 color[4]; float uv[7]; float param; u64 prim,texture,reg,tag; } QuadDrawPacket11;
 /* Builds an oriented quad and submits it with texture IDs 11 and 6. */
 /* Draws a flat glowing square that faces the player, using two textures. */
-void func_L11_00397820(u8 *moby) {
+void gfx_draw_facing_quad(u8 *moby) {
  struct { float forward[4],side[4],up[4],position[4],direction[4],offset[4]; QuadDrawPacket11 draw; } frame;
  u8 *vars=*(u8 **)(moby+0x68); int i; float *out,*corners; QuadDrawPacket11 *draw;
  qcopy(frame.direction,moby+0xe0);qcopy(frame.position,moby+0x10);

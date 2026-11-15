@@ -13,22 +13,22 @@ extern float ref_00302470_09 SDATA(ref_00302470_09);
 extern int ref_00302470_01 SDATA(ref_00302470_01);
 extern ParticleVector ref_00302470_02 __attribute__((nosda));
 extern int D_001A7A10[] MACRO_ADDR;
-extern char *D_0018C0B0 __attribute__((nosda));
-extern float func_00282E48(void *, void *);
-extern char *func_0029EFD0(int);
-extern void func_002833F0(void *, void *);
-extern void func_002AEC18(void *, int);
-extern void func_002A04B8(void *, u32 *, u32 *, u32 *);
-extern void func_002A0468(unsigned long long *, unsigned long long,
+extern char *g_hero_moby __attribute__((nosda));
+extern float fast_vec_dist(void *, void *);
+extern char *CreateMoby(int);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_set_light_color(void *, int);
+extern void get_moby_color(void *, u32 *, u32 *, u32 *);
+extern void gfx_pack_render_command_fields(unsigned long long *, unsigned long long,
     unsigned long long, unsigned long long, unsigned long long);
-extern void func_002A0488(void *, u32, u32, u32);
-extern int func_002A77E0(int);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AB668(void *, int, float);
+extern void set_moby_color(void *, u32, u32, u32);
+extern int math_random_int_below(int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_build_axis_angle_quat(void *, int, float);
 extern int func_PAL_003033A8(char *, char *, float, float);
 extern void func_002A0F48(void *);
 
@@ -75,19 +75,19 @@ BoltSpawnObject *func_PAL_00303578(BoltSpawnObject *source, void *position, void
     ParticleVector crossed, difference;
     u32 red, green, blue;
     float scale, spin, angle;
-    if (func_00282E48(position,&ref_00302470_02)>=64.0f) {
+    if (fast_vec_dist(position,&ref_00302470_02)>=64.0f) {
         D_001A7A10[1]+=value;
         return 0;
     }
     switch (value) {
     default:
-    case 1: object=(BoltSpawnObject *)func_0029EFD0(13); scale=ref_00302470_03; break;
-    case 5: object=(BoltSpawnObject *)func_0029EFD0(14); scale=ref_00302470_04; break;
-    case 20: object=(BoltSpawnObject *)func_0029EFD0(15); scale=ref_00302470_05; break;
-    case 50: object=(BoltSpawnObject *)func_0029EFD0(16); scale=ref_00302470_06; break;
-    case 100: object=(BoltSpawnObject *)func_0029EFD0(17); scale=ref_00302470_07; break;
-    case 500: object=(BoltSpawnObject *)func_0029EFD0(18); scale=ref_00302470_08; break;
-    case 1000: object=(BoltSpawnObject *)func_0029EFD0(19); scale=ref_00302470_09; break;
+    case 1: object=(BoltSpawnObject *)CreateMoby(13); scale=ref_00302470_03; break;
+    case 5: object=(BoltSpawnObject *)CreateMoby(14); scale=ref_00302470_04; break;
+    case 20: object=(BoltSpawnObject *)CreateMoby(15); scale=ref_00302470_05; break;
+    case 50: object=(BoltSpawnObject *)CreateMoby(16); scale=ref_00302470_06; break;
+    case 100: object=(BoltSpawnObject *)CreateMoby(17); scale=ref_00302470_07; break;
+    case 500: object=(BoltSpawnObject *)CreateMoby(18); scale=ref_00302470_08; break;
+    case 1000: object=(BoltSpawnObject *)CreateMoby(19); scale=ref_00302470_09; break;
     }
     if (object) {
     state=object->vars;
@@ -103,26 +103,26 @@ BoltSpawnObject *func_PAL_00303578(BoltSpawnObject *source, void *position, void
     object->visible=1;
     object->state=1;
     object->scale=object->objectClass->scale*scale;
-    func_002833F0(orientation,&object->rotation);
-    func_002AEC18(object,ref_00302470_01);
-    func_002A04B8(object,&red,&green,&blue);
-    func_002A0468((unsigned long long *)object,0,13,0,0);
-    func_002A0488(object,red,green,blue);
+    euler_rotation_basis(orientation,&object->rotation);
+    moby_set_light_color(object,ref_00302470_01);
+    get_moby_color(object,&red,&green,&blue);
+    gfx_pack_render_command_fields((unsigned long long *)object,0,13,0,0);
+    set_moby_color(object,red,green,blue);
     qcopy(&object->position,position);
     qcopy(&state->velocity,velocity);
-    if (func_002A77E0(2)) state->flags|=1;
-    state->angle=func_002A7940();
-    state->phase=func_002A7940();
+    if (math_random_int_below(2)) state->flags|=1;
+    state->angle=math_random_angle();
+    state->phase=math_random_angle();
     state->startZ=object->position.f[2];
-    spin=func_002A7878(0.0f,720.0f)*0.0003490659f;
-    func_00282CF0(&difference,&source->position,&object->position);
-    func_00282DD8(&crossed,&state->velocity,&difference);
-    func_00282F20(&state->spin,&crossed,1.0f);
-    func_002AB668(&state->spin,(int)(&state->spin),spin);
+    spin=math_random_float_range(0.0f,720.0f)*0.0003490659f;
+    FastVecSub(&difference,&source->position,&object->position);
+    FastVecCross(&crossed,&state->velocity,&difference);
+    vec_scale_to_length(&state->spin,&crossed,1.0f);
+    math_build_axis_angle_quat(&state->spin,(int)(&state->spin),spin);
     if (flags&2) {
         angle=0.0f;
-        if (flags&0x10) angle=func_002A7878(-30.0f,30.0f)*0.017453294f;
-        func_PAL_003033A8((char *)object,D_0018C0B0,angle,0.0f);
+        if (flags&0x10) angle=math_random_float_range(-30.0f,30.0f)*0.017453294f;
+        func_PAL_003033A8((char *)object,g_hero_moby,angle,0.0f);
     }
     func_002A0F48(object);
     }

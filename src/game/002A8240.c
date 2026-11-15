@@ -1,19 +1,19 @@
 #include "common.h"
 
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(float, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern int func_00277258(void *, float, int, void *);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(float, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern int coll_test_point(void *, float, int, void *);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
 extern float D_001BAFA0[];
 extern float D_001BAFB0[];
-extern char D_001BAF80[];
+extern char g_collision_hit[];
 
 /* Moves an object by a step, pushing it out of walls and down onto the floor, and reports what it touched. */
-int func_002A8240(char *object, float *movement, int flags,
+int moby_move_and_collide(char *object, float *movement, int flags,
                   float height, float radius, float offset)
 {
     float previous[4] __attribute__((aligned(16)));
@@ -47,7 +47,7 @@ int func_002A8240(char *object, float *movement, int flags,
     for (;;) {
         qcopy(from, position);
         from[2] += height;
-        if (!TestPointAgainstCollision(from, radius, mask | 4, object))
+        if (!coll_test_point(from, radius, mask | 4, object))
             break;
         qcopy(position, D_001BAFB0);
         ++retries;
@@ -62,12 +62,12 @@ int func_002A8240(char *object, float *movement, int flags,
     from[2] += height;
     to[2] = base - 0.05f;
     if (CollLine(from, to, mask | 2, object, 0)) {
-        hit = gCollisionHit;
+        hit = g_collision_hit;
         if (*(int *)(hit + 0x1C) > 0) {
             float normal;
             result |= 2;
             normal = vec_length_xy(hit + 0x40);
-            if (FastMatrixHelperA(*(float *)(hit + 0x48), normal) > 0.5f)
+            if (mat_fast_helper_a(*(float *)(hit + 0x48), normal) > 0.5f)
                 result |= 4;
             if (base < *(float *)(hit + 0x28))
                 *(float *)(object + 0x18) += (*(float *)(hit + 0x28) - base) * 0.3f;

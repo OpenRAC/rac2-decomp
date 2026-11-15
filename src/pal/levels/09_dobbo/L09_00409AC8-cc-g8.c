@@ -65,7 +65,7 @@ typedef struct {
    scalar global D_L09_001B2388 (a plain cast store it must keep in front of that load). */
 extern ColorPair D_L09_001B1400[2];
 
-void func_L09_00405490(u8 *a0);
+void dobbo_draw_pulsing_glows(u8 *a0);
 
 /* Steps the object's pulse: the angle at +0x348 advances by 2*pi/30 through the resident angle
    blend, its sine is mapped to 0..1 and kept at +0x34C, and the colour pair D_L09_001B1400 is
@@ -77,7 +77,7 @@ void func_L09_00405490(u8 *a0);
    hidden (byte 0x31) or in state 0xFE or 0xFD: scales the sub-object's vector by its float at
    +0x344, transforms it by the matrix at +0x240, blends the colour pair by the float at +0x34C
    and hands the result to func_L00_00325AE8 with the +0x344 float scaled by 0.2. */
-void func_L09_00405490(u8 *a0);
+void dobbo_draw_pulsing_glows(u8 *a0);
 
 typedef struct { u8 pad[0x464]; u8 spent[1]; } L09_CellFlags;
 extern L09_CellFlags D_L09_0021E9F0;

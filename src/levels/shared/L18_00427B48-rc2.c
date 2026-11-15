@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ extern s32 ref_L18_00427B48_00;
 extern u16 *ref_L18_00427B48_01[];
 
 /* Marks every live shooter in the given group so it will start firing (sets a flag in its state). */
-void func_L18_00427B48(s32 unusedArg, s32 group) {
+void shooter_flag_group(s32 unusedArg, s32 group) {
     u16 *entry;
     u16 *list;
     s8 *target;

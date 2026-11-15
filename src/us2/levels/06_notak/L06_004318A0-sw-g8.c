@@ -7,27 +7,27 @@
 #define F(p,o) (*(float *)((p)+(o)))
 extern char D_00189F00[], D_L06_001BFA40[], D_L06_001B0B80[];
 typedef struct { char pad0[0x80]; float position[4]; char pad90[0x50]; float vector_e0[4]; } PlayerView;
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 #define PLAYER_POSITION ((char *)&D_00189E20.position)
 extern unsigned char D_001A7BCF, D_001A7C8F, D_001A7A40;
 extern unsigned char D_001395CD NOT_SDA;
 extern int D_001397B0 NOT_SDA, D_00138324 NOT_SDA, D_L06_001A8F00;
-extern int D_001A79F8 MACRO_ADDR;
+extern int g_player_bolts MACRO_ADDR;
 extern struct { int pad; int flag; } D_L06_001B2564 MACRO_ADDR;
 extern struct { int normal, challenge; } D_L06_002958D0 NOT_SDA;
 extern char *D_L06_001B281C;
-extern int func_002ACBC8(char *,int);
-extern void func_L01_003128C0(char *), func_L01_003246D0(char *), func_00288AA0(char *,int), func_00288BE8(char *);
-extern void func_002A7750(char *,int,int), func_L00_0030C710(int), func_L01_00324550(int,int,int);
-extern int func_002F5D10(void), func_L01_003245E0(char *,int,float);
-extern void func_L00_002B9D60(void *,void *,int,int), func_002A8598(int,int), func_0026FEB8(char *);
-extern void func_002AD7B8(int), func_US2_002AFF10(int), func_0029B3E0(int,int), func_0029F338(char *);
-extern int func_00282978(char *),func_00282948(char *),func_002A7820(int,int),func_00283CF0(float);
-extern float func_002A7878(float,float),func_00282E80(char *,char *),func_00283248(float,float),func_00283C80(float,float),func_00282DF0(char *),func_00283B98(float,float),func_00283BE0(float,float),func_00282E20(char *);
-extern void func_002A7470(char *,int,int,int),func_002AF000(char *,float,float,float),func_00282CC0(char *,char *,char *),func_00282CF0(char *,char *,char *),func_002AEC48(char *,char *,int,float,float);
+extern int IsPointInCuboid(char *,int);
+extern void moby_reset_vars_defaults(char *), level_apply_index_for_key(char *), req_push_queue(char *,int), req_launch_queued(char *);
+extern void moby_set_state(char *,int,int), func_L00_0030C710(int), text_print_localized_formatted(int,int,int);
+extern int game_is_either_mode_two(void), hero_is_reachable_for_count(char *,int,float);
+extern void hero_reset_position_and_direction(void *,void *,int,int), moby_set_byte_on_group(int,int), STUB_printf(char *);
+extern void moby_mark_flag_and_append_to_list(int), func_US2_002AFF10(int), MemcardSave(int,int), moby_mark_spawned(char *);
+extern int FastDecTimer(char *),math_fast_float_d(char *),math_random_int_range(int,int),FloatToInt(float);
+extern float math_random_float_range(float,float),vec_distance_xy(char *,char *),mat_fast_helper_a(float,float),FastDiffRots(float,float),FastVecLength(char *),FastAddRotations(float,float),fast_subtract_rotations(float,float),vec_length_xy(char *);
+extern void anim_start_blended(char *,int,int,int),vec_build_spherical_offset(char *,float,float,float),FastVecAdd(char *,char *,char *),FastVecSub(char *,char *,char *),moby_update_eased_node(char *,char *,int,float,float);
 static __inline__ void joint_step(char *obj,char *joint,int index,float speed,float limit)
 {
-    func_002AEC48(obj,joint,index,speed,limit);
+    moby_update_eased_node(obj,joint,index,speed,limit);
 }
 
 void func_US2_L06_004318A0(char *obj)
@@ -39,65 +39,65 @@ void func_US2_L06_004318A0(char *obj)
     switch(B(obj,0x20)) {
     case 0:
         if(D_001A7BCF) goto destroy;
-        func_L01_003128C0(obj);
-        if(I(s,0x124)) func_002A7750(obj,6,-1);
-        else if(D_001397B0&0x400) func_002A7750(obj,2,-1);
-        else func_002A7750(obj,1,-1);
+        moby_reset_vars_defaults(obj);
+        if(I(s,0x124)) moby_set_state(obj,6,-1);
+        else if(D_001397B0&0x400) moby_set_state(obj,2,-1);
+        else moby_set_state(obj,1,-1);
         break;
     case 1:
-        if(func_002ACBC8(PLAYER_POSITION,I(s,0x128))) {
-            func_L01_003246D0(obj);
-            func_00288AA0(D_L06_001BFA40,0x4a);
-            func_00288BE8(D_L06_001BFA40);
-            func_002A7750(obj,2,-1);
+        if(IsPointInCuboid(PLAYER_POSITION,I(s,0x128))) {
+            level_apply_index_for_key(obj);
+            req_push_queue(D_L06_001BFA40,0x4a);
+            req_launch_queued(D_L06_001BFA40);
+            moby_set_state(obj,2,-1);
         }
         break;
     case 2: {
         D_L06_001B2564.flag=1;
         if(D_L06_001A8F00==2) {B(obj,0x31)=0;H(obj,0x34)|=1;}
-        if(func_002F5D10()) break;
+        if(game_is_either_mode_two()) break;
         D_L06_001B2564.flag=0;
         H(obj,0x34)&=0xfffe; B(obj,0x31)=1;
         target[0]=456.0800f;target[1]=251.2400f;target[2]=68.9200f;
         origin[2]=-2.094395399093628f;
-        func_L00_002B9D60(target,origin,0,1);
+        hero_reset_position_and_direction(target,origin,0,1);
         {
             int challenge = D_001A7C8F;
-            int coins = D_001A79F8;
+            int coins = g_player_bolts;
             if(challenge) {
-                if(coins>=D_L06_002958D0.challenge) {func_002A7750(obj,4,-1);break;}
+                if(coins>=D_L06_002958D0.challenge) {moby_set_state(obj,4,-1);break;}
             } else if(coins>=D_L06_002958D0.normal) goto state4;
-            func_002A7750(obj,3,-1);
+            moby_set_state(obj,3,-1);
             break;
         state4:
-            func_002A7750(obj,4,-1);break;
+            moby_set_state(obj,4,-1);break;
         }
     }
     case 3: {
         int challenge = D_001A7C8F;
-        int coins = D_001A79F8;
+        int coins = g_player_bolts;
         if(challenge ? D_L06_002958D0.challenge<coins : D_L06_002958D0.normal<coins) {
-            func_002A7750(obj,4,-1); break;
+            moby_set_state(obj,4,-1); break;
         }
-        if(func_L01_003245E0(obj,10,2.5f)) {
+        if(hero_is_reachable_for_count(obj,10,2.5f)) {
             func_L00_0030C710(180);
-            func_L01_00324550(0x1320,D_001A7C8F ? D_L06_002958D0.challenge : D_L06_002958D0.normal,-1);
-            func_L01_003246D0(obj);
+            text_print_localized_formatted(0x1320,D_001A7C8F ? D_L06_002958D0.challenge : D_L06_002958D0.normal,-1);
+            level_apply_index_for_key(obj);
         }
         break;
     }
     case 4: {
         int challenge = D_001A7C8F;
-        int coins = D_001A79F8;
+        int coins = g_player_bolts;
         if(challenge ? coins<D_L06_002958D0.challenge : coins<D_L06_002958D0.normal) {
-            func_L00_0030C710(180);func_002A7750(obj,3,-1);break;
+            func_L00_0030C710(180);moby_set_state(obj,3,-1);break;
         }
-        if(func_L01_003245E0(obj,10,2.5f)) {
+        if(hero_is_reachable_for_count(obj,10,2.5f)) {
             func_L00_0030C710(180);
-            func_L01_00324550(0x1321,D_001A7C8F ? D_L06_002958D0.challenge : D_L06_002958D0.normal,-1);
-            func_L01_003246D0(obj);
+            text_print_localized_formatted(0x1321,D_001A7C8F ? D_L06_002958D0.challenge : D_L06_002958D0.normal,-1);
+            level_apply_index_for_key(obj);
             if(D_00138324&0x10) {
-                func_00288AA0(D_L06_001BFA40,0x4b);func_00288AA0(D_L06_001BFA40,7);func_00288AA0(D_L06_001BFA40,0x4c);func_00288BE8(D_L06_001BFA40);func_002A7750(obj,5,-1);
+                req_push_queue(D_L06_001BFA40,0x4b);req_push_queue(D_L06_001BFA40,7);req_push_queue(D_L06_001BFA40,0x4c);req_launch_queued(D_L06_001BFA40);moby_set_state(obj,5,-1);
             }
         }
         break;
@@ -105,63 +105,63 @@ void func_US2_L06_004318A0(char *obj)
     case 5:
         D_L06_001B2564.flag=1;
         if(D_L06_001A8F00==2) {B(obj,0x31)=0;H(obj,0x34)|=1;}
-        if(func_002F5D10()) break;
+        if(game_is_either_mode_two()) break;
         D_L06_001B2564.flag=0;B(obj,0x31)=1;H(obj,0x34)&=0xfffe;
-        if(B(obj,0x21)!=255) func_002A8598(B(obj,0x21),1);
-        func_0026FEB8(D_L06_001B0B80);
+        if(B(obj,0x21)!=255) moby_set_byte_on_group(B(obj,0x21),1);
+        STUB_printf(D_L06_001B0B80);
         D_001395CD=1;
         if(!D_001A7BCF) {
-            func_002AD7B8(7);func_US2_002AFF10(7);
+            moby_mark_flag_and_append_to_list(7);func_US2_002AFF10(7);
             {
                 int challenge = D_001A7C8F;
-                int coins = D_001A79F8;
+                int coins = g_player_bolts;
                 int left;
                 if(challenge) left=coins-D_L06_002958D0.challenge;
                 else left=coins-D_L06_002958D0.normal;
-                D_001A79F8=left;
+                g_player_bolts=left;
             }
             func_L00_0030C710(180);
         }
         if(I(s,0x120)!=-1) B(D_L06_001B281C,(I(s,0x120)<<8)+0xbc)=1;
-        func_0029B3E0(0,-1);
+        MemcardSave(0,-1);
         goto destroy;
     case 6:
         if(D_L06_001A8F00==2) {B(obj,0x31)=0;H(obj,0x34)|=1;}
         else {B(obj,0x31)=1;H(obj,0x34)&=0xfffe;}
-        if(D_001A7BCF) {destroy:func_0029F338(obj);return;}
+        if(D_001A7BCF) {destroy:moby_mark_spawned(obj);return;}
         break;
     }
     if(B(obj,0x20)) {
-        if(B(obj,0x43)==2 && func_00282978(s+0x11e)) {
-            H(s,0x11e)=func_00283CF0(func_002A7878(1200,2400));
-            if(B(obj,0x43)!=3) func_002A7470(obj,3,0,func_002A7820(10,20));
+        if(B(obj,0x43)==2 && FastDecTimer(s+0x11e)) {
+            H(s,0x11e)=FloatToInt(math_random_float_range(1200,2400));
+            if(B(obj,0x43)!=3) anim_start_blended(obj,3,0,math_random_int_range(10,20));
         } else if(B(obj,0x60)&2) {
-            if(B(obj,0x43)!=2) func_002A7470(obj,2,0,func_002A7820(10,20));
-            F(obj,0x48)=func_002A7878(0.9f,1.1f);
+            if(B(obj,0x43)!=2) anim_start_blended(obj,2,0,math_random_int_range(10,20));
+            F(obj,0x48)=math_random_float_range(0.9f,1.1f);
         }
     }
     speed=0.02f;
     active=0;
     if(B(obj,0x43)==2) {
         active=1;
-        if(func_00282E80(obj+0x10,PLAYER_POSITION)<8.0f && func_00283C80(F(obj,0xf8),func_00283248(D_00189E20.vector_e0[0]-F(obj,0x10),D_00189E20.vector_e0[1]-F(obj,0x14)))<1.5707964897155762f) {
-            if(func_00282DF0(PLAYER_POSITION+0x90)>0.01f) I(s,0x114)=120;
-            else func_00282948(s+0x114);
+        if(vec_distance_xy(obj+0x10,PLAYER_POSITION)<8.0f && FastDiffRots(F(obj,0xf8),mat_fast_helper_a(g_hero_state.vector_e0[0]-F(obj,0x10),g_hero_state.vector_e0[1]-F(obj,0x14)))<1.5707964897155762f) {
+            if(FastVecLength(PLAYER_POSITION+0x90)>0.01f) I(s,0x114)=120;
+            else math_fast_float_d(s+0x114);
         } else if(I(s,0x114)) {I(s,0x114)=0;qcopy(s+0x100,D_00189F00);}
-        if(func_00282948(s+0x118)) {
-            I(s,0x118)=func_00283CF0(func_002A7878(180,300));
-            angle=func_00283B98(F(obj,0xf8),func_002A7878(-90,90)*0.01745329424738884f);
-            func_002AF000(s+0x100,6,angle,func_002A7878(0,30)*0.01745329424738884f);
-            func_00282CC0(s+0x100,s+0x100,obj+0x10);
+        if(math_fast_float_d(s+0x118)) {
+            I(s,0x118)=FloatToInt(math_random_float_range(180,300));
+            angle=FastAddRotations(F(obj,0xf8),math_random_float_range(-90,90)*0.01745329424738884f);
+            vec_build_spherical_offset(s+0x100,6,angle,math_random_float_range(0,30)*0.01745329424738884f);
+            FastVecAdd(s+0x100,s+0x100,obj+0x10);
         }
         if(I(s,0x114)) {qcopy(target,D_00189F00);speed=0.04f;}
         else qcopy(target,s+0x100);
     }
     if(active) {
         qcopy(origin,obj+0x10);origin[2]+=2;
-        func_00282CF0((char *)delta,(char *)target,(char *)origin);
-        yaw=func_00283BE0(func_00283248(delta[0],delta[1]),F(obj,0xf8));
-        pitch=-func_00283248(func_00282E20((char *)delta),delta[2]);
+        FastVecSub((char *)delta,(char *)target,(char *)origin);
+        yaw=fast_subtract_rotations(mat_fast_helper_a(delta[0],delta[1]),F(obj,0xf8));
+        pitch=-mat_fast_helper_a(vec_length_xy((char *)delta),delta[2]);
         if(yaw>1.5707964897155762f) yaw=1.5707964897155762f;
         else if(yaw< -1.5707964897155762f) yaw= -1.5707964897155762f;
         if(pitch>0.523598849773407f) pitch=0.523598849773407f;

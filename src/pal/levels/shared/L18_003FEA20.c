@@ -1,13 +1,13 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void *func_00115484(void *, int, unsigned int);
-extern float D_00189EA0[4];
-extern float func_L02_002F21C0(void *, void *);
-extern int func_L02_004127F8(unsigned char *);
+extern void *memset(void *, int, unsigned int);
+extern float g_hero_position[4];
+extern float vec_distance_squared_xy(void *, void *);
+extern int moby_is_state_two(unsigned char *);
 extern int func_PAL_L18_003FF648(unsigned char *, int);
 extern unsigned short *D_L18_001FB320[];
-extern char *D_L18_001B281C[] __attribute__((sda));
+extern char *g_moby_l18_table[] __attribute__((sda));
 extern int D_L18_001B2838[] __attribute__((sda));
 /* Each scan reads the current slot id again when advancing its group iterator. */
 static __inline__ int L18_SelectionGroupId(char *p, int i, int base) {
@@ -26,7 +26,7 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
     char *entity;
     int i;
 
-    func_00115484(secondary, 0, 8);
+    memset(secondary, 0, 8);
     {
         unsigned short *entry;
         for (entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)];
@@ -34,7 +34,7 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
              L18_SelectionGroupId(state, slot, 0) <= D_L18_001B2838[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
               entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)]); entry++) {
-            entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+            entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (entity != 0 && *(unsigned char *)(entity + 0x20) != 0xfe &&
                 *(unsigned char *)(entity + 0x20) != 0xfd &&
@@ -53,7 +53,7 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
                  L18_SelectionGroupId(state, slot, 0x20) <= D_L18_001B2838[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
                   entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x20)]); entry++) {
-                entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+                entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
                 if (entity != secondary[0] && entity != 0 &&
                     *(unsigned char *)(entity + 0x20) != 0xfe &&
@@ -73,11 +73,11 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
              L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
               entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
-            entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+            entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (*(unsigned char *)(entity + 0x31) != 0 &&
-                func_L02_002F21C0(D_00189EA0, entity + 0x10) > 16.0f &&
-                func_L02_004127F8((unsigned char *)entity) == 0) {
+                vec_distance_squared_xy(g_hero_position, entity + 0x10) > 16.0f &&
+                moby_is_state_two((unsigned char *)entity) == 0) {
                 selected = entity;
                 break;
             }
@@ -91,9 +91,9 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
                  L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
                   entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
-                entity = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100;
+                entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
-                if (func_L02_004127F8((unsigned char *)entity) == 0) {
+                if (moby_is_state_two((unsigned char *)entity) == 0) {
                     selected = entity;
                     break;
                 }
@@ -101,8 +101,8 @@ int func_PAL_L18_003FEA20(char *owner, int slot) {
         }
         if (selected == 0) goto fail;
     }
-    func_L18_003F8D28(source, entity, (void *)L18_SelectionGroupId(state, slot, 0x10));
-    func_L18_003F7818((unsigned char *)secondary[0], (unsigned char *)source, 0);
+    protopet_setup_target_transforms(source, entity, (void *)L18_SelectionGroupId(state, slot, 0x10));
+    protopet_attach_to_target((unsigned char *)secondary[0], (unsigned char *)source, 0);
     func_PAL_L18_003FF648((unsigned char *)selected, 1);
     return 1;
 fail:

@@ -8,19 +8,19 @@ typedef struct {
     union { float f[4][2]; unsigned int bits[4][2]; } uv;
     unsigned long long tag[4];
 } TrailPacket;
-extern unsigned long long func_0027C878(int);
-extern void func_00316DA0(void *, int);
-extern void func_00316B40(void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282D30(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00280B90(void *,int,int);
-extern float func_00283CE0(int);
-extern TrailVector D_001B5340;
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void gfx_extrapolate_curve_end(void *, int);
+extern void gfx_init_draw_packet_defaults(void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecScale(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
+extern void draw_world_quad(void *,int,int);
+extern float IntToFloat(int);
+extern TrailVector g_camera_eye_state;
 /* Draws a lightning ribbon along the given points, facing the camera, as a thin bright band over a wider dim one. */
-void func_00316E08(int unused, int color, TrailVector *points, int count)
+void gfx_draw_lightning_ribbon(int unused, int color, TrailVector *points, int count)
 {
     /* Retail leaves b.color[1] untouched. The assembly renderer transfers the
        packet representation, including that indeterminate word; do not invent
@@ -45,16 +45,16 @@ void func_00316E08(int unused, int color, TrailVector *points, int count)
     thick.q=0;
     a.color[1]=green; b.color[0]=green;
     thin.v.z=0.05f; thick.v.z=0.2f; thin.v.w=1; thick.v.w=1;
-    ExtrapolateCurveEndPoint(points,count);
-    InitDrawPacketDefaults(&a);
-    InitDrawPacketDefaults(&b);
+    gfx_extrapolate_curve_end(points,count);
+    gfx_init_draw_packet_defaults(&a);
+    gfx_init_draw_packet_defaults(&b);
     a.uv.bits[0][0]=0; a.uv.bits[0][1]=0; a.uv.bits[1][0]=0; a.uv.f[1][1]=1;
     a.uv.f[2][0]=1; a.uv.bits[2][1]=0; a.uv.f[3][0]=1; a.uv.f[3][1]=1;
     b.uv.bits[0][0]=0; b.uv.bits[0][1]=0; b.uv.bits[1][0]=0; b.uv.f[1][1]=1;
     b.uv.f[2][0]=0.33f; b.uv.bits[2][1]=0; b.uv.f[3][0]=0.33f; b.uv.f[3][1]=1;
     FastVecSub(&basis[0],next,points);
     vec_scale_to_length(&basis[0],&basis[0],1);
-    FastVecSub(&basis[1],&gCameraState_001B5340,points);
+    FastVecSub(&basis[1],&g_camera_eye_state,points);
     FastVecCross(&basis[2],&basis[1],&basis[0]);
     vec_scale_to_length(&basis[2],&basis[2],1);
     FastVecCross(&basis[1],&basis[0],&basis[2]);
@@ -75,7 +75,7 @@ void func_00316E08(int unused, int color, TrailVector *points, int count)
         FastVecScale(&b.vertices[3],&b.vertices[2],-1);
         FastVecSub(&basis[0],&points[i+1],&points[i]);
         vec_scale_to_length(&basis[0],&basis[0],1);
-        FastVecSub(&basis[1],&gCameraState_001B5340,points+i);
+        FastVecSub(&basis[1],&g_camera_eye_state,points+i);
         FastVecCross(&basis[2],&basis[1],&basis[0]);
         vec_scale_to_length(&basis[2],&basis[2],1);
         FastVecCross(&basis[1],&basis[0],&basis[2]);

@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_002B9180(char *);
-extern int func_00283CF0(float);
-extern int func_00282948(char *);
-extern float func_00283B98(float, float);
+extern void part_kill(char *);
+extern int FloatToInt(float);
+extern int math_fast_float_d(char *);
+extern float FastAddRotations(float, float);
 extern int D_001AA304 __attribute__((sda));
 
 /* func_PAL_002BC6A0, the PAL copy of func_002BBA38: the same C, with the frame count scaled to 50 Hz. */
@@ -13,11 +14,11 @@ void func_PAL_002BC6A0(char *particle)
     int alpha;
     unsigned int shifted;
     int color;
-    if (func_00282948(state)) {
-        func_002B9180(particle);
+    if (math_fast_float_d(state)) {
+        part_kill(particle);
     } else {
-        *(float *)(state + 12) = func_00283B98(*(float *)(state + 12), *(float *)(state + 8));
-        particle[8] = func_00283CF0(*(float *)(state + 12) * 40.7436637878418f) - 128;
+        *(float *)(state + 12) = FastAddRotations(*(float *)(state + 12), *(float *)(state + 8));
+        particle[8] = FloatToInt(*(float *)(state + 12) * 40.7436637878418f) - 128;
         if (*(int *)(particle + 32) > ((D_001AA304 * 5 + 2) / 6) * 3 / 4)
             alpha = *(int *)(state + 16) * (((D_001AA304 * 5 + 2) / 6) - *(int *)(particle + 32)) / (((D_001AA304 * 5 + 2) / 6) / 4);
         else if (*(int *)(particle + 32) < ((D_001AA304 * 5 + 2) / 6) / 4)

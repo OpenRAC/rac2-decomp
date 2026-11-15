@@ -77,19 +77,19 @@ extern f32 D_L02_001B141C __attribute__((sda));
 extern s32 D_L02_001B1420 __attribute__((sda));
 extern s32 D_L02_001B1424 __attribute__((sda));
 
-extern void func_0027AB40(void);
-extern void func_00280190(Rect *, u64, char *, s32);
-extern void func_00280270(Rect *, u64, char *, s32);
-extern void func_002802E0(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
-extern f32 func_00283CE0(s32);
-extern char *func_00288FB8(s32);
-extern void func_002FC560(u32, u64);
-extern void func_L00_0037B7B0(void);
-extern void func_00300A00(char *, f32, s32, f32, f32, f32, f32);
-extern void func_L02_003FE768(f32);
-extern char *func_00336D50(s32, s32);
+extern void UpdateViewContext(void);
+extern void text_draw_window_small(Rect *, u64, char *, s32);
+extern void text_draw_window_large(Rect *, u64, char *, s32);
+extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
+extern f32 IntToFloat(s32);
+extern char *GetLocalizedString(s32);
+extern void VU1_addGSregister(u32, u64);
+extern void gfx_append_draw_list_packet_c(void);
+extern void gfx_draw_scaled_object_two_axes(char *, f32, s32, f32, f32, f32, f32);
+extern void hud_draw_boss_health_bar(f32);
+extern char *table_find_by_id(s32, s32);
 extern s32 func_001157AC(char *);
-extern s32 func_00115DA8(char *, char *, ...);
+extern s32 sprintf(char *, char *, ...);
 
 
 #define LBL0(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
@@ -111,7 +111,7 @@ extern s32 func_00115DA8(char *, char *, ...);
             str = (s); \
             fn((r), D_L02_001B1358, str, func_001157AC(str))
 #define DRAWBUF(fn, r) \
-            { s32 c = D_L02_001B1358; s32 n = strlen_001157AC(buf); fn((r), c, buf, n); }
+            { s32 c = D_L02_001B1358; s32 n = func_001157AC(buf); fn((r), c, buf, n); }
 #define sprintf_n func_00115DA8
 
 extern int D_L02_001B3E00;
@@ -165,7 +165,7 @@ static __inline__ int hud_coord(float value, float scale, float half)
 }
 
 /* Draws the heads-up display during a challenge: the time left or the score, the wave number and the boss health bar. */
-void func_L02_003FE8B8(u8 *moby)
+void DrawMaktarChallengeHud(u8 *moby)
 {
     char buf[0x40];
     Rect r50;
@@ -195,7 +195,7 @@ void func_L02_003FE8B8(u8 *moby)
     if (D_L02_001A904C[0] == 0) {
         return;
     }
-    AppendDrawListPacketC();
+    gfx_append_draw_list_packet_c();
     one = 1;
     half = 0.5f;
     data = *(u8 **)(moby + 0x68);
@@ -233,35 +233,35 @@ void func_L02_003FE8B8(u8 *moby)
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(DrawTextWindowLargeFont, &r90);
-        DRAW(DrawTextWindowSmallFont, &rB0, GetLocalizedString(0x2F63));
+        DRAWBUF(text_draw_window_large, &r90);
+        DRAW(text_draw_window_small, &rB0, GetLocalizedString(0x2F63));
         LABEL(k2, one);
         SUM();
-        Sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
-        DRAWBUF(DrawTextWindowLargeFont, &r50);
-        DRAW(DrawTextWindowSmallFont, &r70, GetLocalizedString(0x2F61));
+        sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
+        DRAWBUF(text_draw_window_large, &r50);
+        DRAW(text_draw_window_small, &r70, GetLocalizedString(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 5) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(DrawTextWindowLargeFont, &r90);
-        DRAW(DrawTextWindowSmallFont, &rB0, GetLocalizedString(0x2F63));
+        DRAWBUF(text_draw_window_large, &r90);
+        DRAW(text_draw_window_small, &rB0, GetLocalizedString(0x2F63));
         LABEL(k2, one);
         SUM();
-        Sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
-        DRAWBUF(DrawTextWindowLargeFont, &r50);
-        DRAW(DrawTextWindowSmallFont, &r70, GetLocalizedString(0x2F61));
+        sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
+        DRAWBUF(text_draw_window_large, &r50);
+        DRAW(text_draw_window_small, &r70, GetLocalizedString(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 0xC) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         n = 120 - *(s32 *)(data + 0xD4) / 60;
-        Sprintf(buf, D_L02_001B1428, n);
+        sprintf(buf, D_L02_001B1428, n);
         if (n >= 100) {
-            DRAWBUF(DrawTextWindowSmallFont, &r90);
+            DRAWBUF(text_draw_window_small, &r90);
         } else {
-            do { DRAWBUF(DrawTextWindowLargeFont, &r90); } while (0);
+            do { DRAWBUF(text_draw_window_large, &r90); } while (0);
         }
-        DRAW(DrawTextWindowSmallFont, &rB0, GetLocalizedString(0x2F63));
+        DRAW(text_draw_window_small, &rB0, GetLocalizedString(0x2F63));
     } else {
         if (*(u8 **)(data + 0xD0) != 0) {
             s32 ofs = 0x8710;
@@ -271,12 +271,12 @@ void func_L02_003FE8B8(u8 *moby)
             switch (*(s16 *)(obj + 0xAA)) {
             case 0x9F8 /* Chainblade */:
                 pv = *(u8 **)(obj + 0x68);
-                DrawBossHealthBar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
+                hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
                 LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
                 break;
             case 0xA44 /* B2 Brawler Legs */:
                 pv = *(u8 **)(obj + 0x68);
-                DrawBossHealthBar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
+                hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
                 LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k2);
                 break;
             }
@@ -286,9 +286,9 @@ void func_L02_003FE8B8(u8 *moby)
         LBL0(0x4E, D_L02_001B1424, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f, 0.5f, 1);
         LBL0(0x4F, D_L02_001B1420, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f, 0.5f, 1);
         }
-        Sprintf(buf, D_L02_001B1430, *(s16 *)(data + 0x122) + 1, *D_L02_001B1190[*(s16 *)(data + 0x120)]);
-        DRAWBUF(DrawTextWindowLargeFont, &rF0);
-        DRAW(DrawTextWindowSmallFont, &rD0, GetLocalizedString(0x2F60));
+        sprintf(buf, D_L02_001B1430, *(s16 *)(data + 0x122) + 1, *D_L02_001B1190[*(s16 *)(data + 0x120)]);
+        DRAWBUF(text_draw_window_large, &rF0);
+        DRAW(text_draw_window_small, &rD0, GetLocalizedString(0x2F60));
     }
     VU1_addGSregister(0x47, 0x5360B);
     ((HudRenderState *)D_L02_001BEA00)->text_scale = save;

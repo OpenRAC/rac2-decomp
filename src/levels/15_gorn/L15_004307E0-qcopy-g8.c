@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L15_004307E0: Gorn's cutscene controller. On the first frame it starts the scene and
    wakes every 0x1211 object, then, once the timer runs out, it builds the camera from the
    object D_L15_001B261C points at (a ray towards it, the distance halved or pulled to -32, a
@@ -33,32 +34,32 @@ extern int D_L15_001B2148;
 extern u8 *D_L15_001B261C;
 extern Hit D_L15_001BFC00;
 
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(s32 a0);
-extern u8 **func_L05_00379EB8(void);
-extern s32 func_L00_004272A0(void);
-extern void func_L05_0037B280(u8 *a0, s32 a1);
-extern void *func_L05_00379ED0(int);
-extern int func_L10_0037D200(void *);
-extern int func_00282948(void *);
-extern void func_L05_0037B108(void);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern void func_L05_00442828(void *, void *, int);
-extern void func_L15_00432008(void);
-extern int func_0029B3E0(int, int);
-extern void func_L00_003294F0(void *, int);
-extern void func_L05_00379F48(int);
-extern void func_002AD7B8(int);
-extern void func_L15_00430590(void *, int);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(s32 a0);
+extern u8 **level_get_object_list(void);
+extern s32 level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(u8 *a0, s32 a1);
+extern void *level_find_object_by_class_id(int);
+extern int group_count_alive(void *);
+extern int math_fast_float_d(void *);
+extern void effect_remove_family_mobys(void);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void ship_start_transition(void *, void *, int);
+extern void snd_clamp_copy_volumes(void);
+extern int MemcardSave(int, int);
+extern void moby_set_flag_bit(void *, int);
+extern void hero_set_state_value_c(int);
+extern void moby_mark_flag_and_append_to_list(int);
+extern void gorn_finish_challenge_stage(void *, int);
 
 /* Runs the Gorn cutscene stage: starts the scene, aims the camera at the target, then hands control back. */
-void func_L15_004307E0(u8 *moby)
+void gorn_cutscene_update(u8 *moby)
 {
     Vector step;
     Vector ahead;
@@ -73,17 +74,17 @@ void func_L15_004307E0(u8 *moby)
         D_L15_00221E3C = 0;
         D_L15_001B1534 = 1;
         music_Unpause();
-        InitAllRegisteredEntries();
-        SetPlayerStateField13(0);
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
         *(int *)(vars + 0x6C) = 30;
-        list = GetLevelObjectList();
-        count = GetLevelSavedValue();
+        list = level_get_object_list();
+        count = level_get_saved_value();
         for (i = 0; i < count; i++) {
             if (*(short *)(list[i] + 0xAA) == 0x1211 /* moby class 4625 */)
-                SpawnEntryListObjectsWithFlag(list[i], 1);
+                entry_spawn_list_objects_with_flag(list[i], 1);
         }
     }
-    if (CountAliveGroupMobys(FindLevelObjectByClassId(0x1211 /* moby class 4625 */)) != 0)
+    if (group_count_alive(level_find_object_by_class_id(0x1211 /* moby class 4625 */)) != 0)
         return;
     if (D_L15_001B2148 < 6)
         return;
@@ -92,10 +93,10 @@ void func_L15_004307E0(u8 *moby)
         u8 *targetPos;
         float distance;
 
-        if (FastFloatHelperD(vars + 0x6C) == 0)
+        if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 60;
-        RemoveEffectFamilyMobys();
+        effect_remove_family_mobys();
         targetMoby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
         targetPos = targetMoby + 0x10;
         qcopy(camera_pos, targetPos);
@@ -121,25 +122,25 @@ void func_L15_004307E0(u8 *moby)
         qcopy(basis[2], up.f);
         FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
-        GetEulerAnglesFromMatrix(basis, D_L15_001B1540);
-        StartShipTransition(camera_pos, D_L15_001B1540, 300);
+        mat_get_euler_angles(basis, D_L15_001B1540);
+        ship_start_transition(camera_pos, D_L15_001B1540, 300);
         moby[0x20] = 3;
         D_L15_001B15BC = 1;
     } else if (D_L15_001B15D0 != 0) {
-        if (FastFloatHelperD(vars + 0x6C) == 0)
+        if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 10;
         D_L15_001B1520++;
-        ClampAndCopyVolumeSettings();
+        snd_clamp_copy_volumes();
         MemcardSave(0, -1);
         D_L15_001B1520--;
-        SetObjectFlagBit(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
+        moby_set_flag_bit(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
         D_L15_001B15AC = 0;
         D_L15_001B15D0 = 0;
-        SetPlayerStateField18(1);
-        MarkFlagAndAppendToList(0x10);
-    } else if (FastFloatHelperD(vars + 0x6C) != 0) {
-        InitAllRegisteredEntries();
-        FinishGornChallengeStage(moby, 0);
+        hero_set_state_value_c(1);
+        moby_mark_flag_and_append_to_list(0x10);
+    } else if (math_fast_float_d(vars + 0x6C) != 0) {
+        entry_init_all_registered();
+        gorn_finish_challenge_stage(moby, 0);
     }
 }

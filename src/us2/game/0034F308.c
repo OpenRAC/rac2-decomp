@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00336DB0(void *);
-extern void func_00336CE8(void *);
-extern void func_00336DB8(void *, int, void *, int);
-extern void func_002B7C80(void *, void *, int);
-extern void func_00115484(void *, int, int);
+extern void ui_return_self(void *);
+extern void table_relocate_entries(void *);
+extern void pool_init_cells(void *, int, void *, int);
+extern void load_read_disc_with_pause(void *, void *, int);
+extern void memset(void *, int, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x1348]; char *data; int size; } InitData;
-extern InitData D_0014B540;
+extern InitData g_copy_setup_data;
 extern void func_US2_00349200(void *);
 extern void func_US2_003475F0(void *);
 extern void func_US2_00346368(void *);
@@ -30,15 +31,15 @@ extern void func_US2_0033DDC8(void *);
 extern void func_US2_0033E488(void *);
 extern void func_US2_0033CD80(void *);
 extern void func_US2_0033D1C0(void *);
-extern void func_00347EA0(void *);
-extern void func_003420C8(void *);
+extern void menu_pass_through_handle(void *);
+extern void list_menu_construct_parts(void *);
 extern void func_US2_00342BA0(void *);
 extern void func_US2_0033EB20(void *);
 extern void func_US2_0033EDD0(void *);
 extern void func_US2_0033EFC8(void *);
 extern void func_US2_0033F1C0(void *);
-extern void func_0033A4A0(void *);
-extern void func_0034E070(void *, void *, void *);
+extern void title_screen_destroy(void *);
+extern void records_screen_init(void *, void *, void *);
 extern void func_US2_003493E0(void *, void *);
 extern void func_US2_00347680(void *, void *);
 extern void func_US2_003463F8(void *, void *);
@@ -52,8 +53,8 @@ extern void func_US2_00344170(void *, void *);
 extern void func_US2_0033C1B8(void *, void *);
 extern void func_US2_0033F720(void *, void *);
 extern void func_US2_0033F510(void *, void *);
-extern void func_00349150(void *);
-extern void func_0033A520(void *, void *);
+extern void menu_clear_entries(void *);
+extern void title_screen_init_labels(void *, void *);
 extern void func_US2_0033E788(void *, void *);
 extern void func_US2_0033D4B0(void *, void *);
 extern void func_US2_0033A678(void *, void *);
@@ -64,7 +65,7 @@ extern void func_US2_0033CDB8(void *, void *);
 extern void func_US2_0033D1F8(void *, void *);
 extern void func_US2_00348BF8(void *, void *);
 extern void func_US2_00342BF0(void *, void *);
-extern void func_00342118(void *, void *);
+extern void list_menu_init(void *, void *);
 extern void func_US2_0033EB58(void *, void *);
 extern void func_US2_0033EE08(void *, void *);
 extern void func_US2_0033F000(void *, void *);
@@ -113,7 +114,7 @@ char *func_US2_0034F308(char *object)
         clear += 4;
     }
     root = object + 0x36F10;
-    func_00336DB0(root);
+    ui_return_self(root);
     part0 = object + 0x36F28;
     func_US2_0034ED28(part0);
     part1 = object + 0x39160;
@@ -161,9 +162,9 @@ char *func_US2_0034F308(char *object)
     part22 = object + 0x3E3A8;
     func_US2_0033D1C0(part22);
     part23 = object + 0x3E688;
-    func_00347EA0(part23);
+    menu_pass_through_handle(part23);
     part24 = object + 0x3E760;
-    func_003420C8(part24);
+    list_menu_construct_parts(part24);
     part25 = object + 0x3E9C8;
     func_US2_00342BA0(part25);
     part26 = object + 0x3EB50;
@@ -175,16 +176,16 @@ char *func_US2_0034F308(char *object)
     part29 = object + 0x3F3F0;
     func_US2_0033F1C0(part29);
     part30 = object + 0x3F7B0;
-    func_0033A4A0(part30);
+    title_screen_destroy(part30);
     size = 0x3FB20;
     end = object + size;
     D_001A8CFC[0] = object;
     *(char **)object = (char *)(((int)end + 3) & -4);
     *(int *)(object + 0x3F9D0) = size;
-    func_002B7C80(object + 0x8710, D_0014B540.data + D_0014B540.offset, D_0014B540.size);
-    func_00336CE8(object + 0x8710);
-    func_00336DB8(root, 16, object + 4, 0x8700);
-    func_0034E070(part0, object, root);
+    load_read_disc_with_pause(object + 0x8710, g_copy_setup_data.data + g_copy_setup_data.offset, g_copy_setup_data.size);
+    table_relocate_entries(object + 0x8710);
+    pool_init_cells(root, 16, object + 4, 0x8700);
+    records_screen_init(part0, object, root);
     *(int *)(object + 0x3F9D4) = 0;
     *(int *)(object + 0x3F9D8) = 0;
     *(int *)(object + 0x3F9DC) = 0;
@@ -202,8 +203,8 @@ char *func_US2_0034F308(char *object)
     func_US2_0033C1B8(part8, root);
     func_US2_0033F720(part9, root);
     func_US2_0033F510(part12, root);
-    func_00349150(part14);
-    func_0033A520(part30, root);
+    menu_clear_entries(part14);
+    title_screen_init_labels(part30, root);
     func_US2_0033E788(part16, root);
     func_US2_0033D4B0(part17, root);
     func_US2_0033A678(part15, root);
@@ -216,7 +217,7 @@ char *func_US2_0034F308(char *object)
     func_US2_0033D1F8(part22, root);
     func_US2_00348BF8(part23, root);
     func_US2_00342BF0(part25, root);
-    func_00342118(part24, root);
+    list_menu_init(part24, root);
     func_US2_0033EB58(part26, root);
     func_US2_0033EE08(part27, root);
     func_US2_0033F000(part28, root);
@@ -224,8 +225,8 @@ char *func_US2_0034F308(char *object)
     *(int *)(object + 0x3F9EC) = 0;
     *(int *)(object + 0x3F9F0) = 0;
     *(int *)(object + 0x3F9F4) = 0;
-    func_00115484(object + 0x3F9F8, 0, 32);
-    func_00115484(object + 0x3FA18, 0, 256);
+    memset(object + 0x3F9F8, 0, 32);
+    memset(object + 0x3FA18, 0, 256);
     return object;
 }
 

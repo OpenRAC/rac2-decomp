@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -6,7 +7,7 @@
 
 
 typedef unsigned char u8;
-extern void func_L00_002A61C8(int arg0, int arg1, int arg2, int arg3);
+extern void hero_play_footstep_sound_dust(int arg0, int arg1, int arg2, int arg3);
 extern int func_L00_002B3998_1(float value);
 typedef struct {
     u8 pad000[0x1b8];
@@ -46,7 +47,7 @@ void func_PAL_L00_002A62B0(void)
 
     if (D_00189E20_16.f2294 == 2) {
         if (D_00189E20_16.f1B8 == 18)
-            func_L00_002A61C8(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
     }
 
     switch (D_00189E20_16.p2290[67]) {
@@ -54,25 +55,25 @@ void func_PAL_L00_002A62B0(void)
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(49.5f) != 0)
-            func_L00_002A61C8(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(17.0f) != 0)
-            func_L00_002A61C8(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     case 4:
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(12.5f) != 0)
-            func_L00_002A61C8(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(1.0f) != 0)
-            func_L00_002A61C8(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     case 20:
         if (D_00189E20_16.fC2C != 0)
             return;
         if (func_L00_002B3998_1(8.0f) != 0)
-            func_L00_002A61C8(selector, 0, 1, 30);
+            hero_play_footstep_sound_dust(selector, 0, 1, 30);
         if (func_L00_002B3998_1(21.0f) != 0)
-            func_L00_002A61C8(selector, 1, 1, 30);
+            hero_play_footstep_sound_dust(selector, 1, 1, 30);
         return;
     }
 }

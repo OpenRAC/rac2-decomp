@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,9 +25,9 @@
  */
 #include "common.h"
 
-extern s32 func_00335870();
+extern s32 object_reset_type_and_free();
 
 /* Runs the shared base cleanup. */
-void func_00335D30(void) {
-    ResetObjectTypeAndFree();
+void object_call_base_cleanup(void) {
+    object_reset_type_and_free();
 }

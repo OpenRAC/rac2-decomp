@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,14 +24,14 @@
  */
 #include "common.h"
 
-extern void func_00282A60(void *p, s32 c, s32 n);
+extern void mem_clear(void *p, s32 c, s32 n);
 extern u8 *D_001C4FAC;
 extern s32 D_001A9720[];
 
 typedef struct { s32 w[16]; } Tab32;
 
 /* Shrinks a 4-bit map image into a 1-bit occlusion map. Each output bit is set when the sum of four samples is high enough. */
-void func_00297BB0(u8 *occlusionOut)
+void map_build_occlusion_from_image(u8 *occlusionOut)
 {
     s32 rowSums[128];
     s32 nibbleWeights[16];
@@ -46,7 +47,7 @@ void func_00297BB0(u8 *occlusionOut)
     *(Tab32 *)nibbleWeights = *(Tab32 *)D_001A9720;
     for (row = 0; row < 0x200; row++) {
         if (row % 4 == 0) {
-            ClearMemory(rowSums, 0, 0x200);
+            mem_clear(rowSums, 0, 0x200);
         }
         for (col = 0; col < 128; col += 2) {
             u8 packed = *src++;

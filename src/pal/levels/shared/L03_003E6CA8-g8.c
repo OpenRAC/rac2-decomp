@@ -35,15 +35,15 @@ extern PuzzleNode D_L03_0029BBF0[14];
 extern int D_0024A7B0[14][6];
 extern int D_L03_001B0B5C __attribute__((sda));
 extern f32 D_L03_001B36B0[4] __attribute__((sda));
-extern void func_00282F20(void *, void *, f32);
-extern f32 func_00282DB0(void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern void func_002A91F0(void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern f32 FastVecDot(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void mat_build_rotation_from_angles(void *, void *);
 extern void func_001163A0(unsigned int);
-extern void func_L03_003E2968(u8 *);
-extern void func_L03_003E2C08(u8 *);
-extern void func_L03_003E3308(u8 *);
-extern void func_L03_003E3430(u8 *);
+extern void path_puzzle_generate_route(u8 *);
+extern void SelectPathStepNodes(u8 *);
+extern void choice_list_build(u8 *);
+extern void path_puzzle_choose_next_node(u8 *);
 
 /* Sets the fourteen node vectors to unit length and lists in each node's row of the shared
    six-entry neighbour table the nodes whose direction is close to its own (dot product above
@@ -59,7 +59,7 @@ void func_PAL_L03_003E6CA8(u8 *p) {
     f32 d, t;
 
     for (k = 0; k < 14; k++) {
-        func_00282F20(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
+        vec_scale_to_length(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
         q->facing[k] = 255;
     }
     q->facing[14] = 255;
@@ -75,7 +75,7 @@ void func_PAL_L03_003E6CA8(u8 *p) {
         for (j = 0; j < 14; j++) {
             if (i != j) {
                 node = &D_L03_0029BBF0[i];
-                d = func_00282DB0(node, &D_L03_0029BBF0[j]);
+                d = FastVecDot(node, &D_L03_0029BBF0[j]);
                 t = 0.5f;
                 if (node->x != 0.0f && node->y != 0.0f && node->z != 0.0f)
                     t = -0.1f;
@@ -85,13 +85,13 @@ void func_PAL_L03_003E6CA8(u8 *p) {
         }
     }
 
-    func_002AB6D8(rotation, position);
-    func_002A91F0(D_L03_001B36B0, position);
+    mat_get_euler_angles(rotation, position);
+    mat_build_rotation_from_angles(D_L03_001B36B0, position);
     func_001163A0(q->sound);
-    func_L03_003E2968(p);
-    func_L03_003E2C08(p);
-    func_L03_003E3308(p);
-    func_L03_003E3430(p);
+    path_puzzle_generate_route(p);
+    SelectPathStepNodes(p);
+    choice_list_build(p);
+    path_puzzle_choose_next_node(p);
 
     for (m = 0; m < 16; m++) {
         q->order[m] = 255;

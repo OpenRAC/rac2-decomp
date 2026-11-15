@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,44 +24,44 @@
  */
 #include "common.h"
 
-extern s8 *D_001B22A8;
+extern s8 *g_dma_packet_cursor;
 extern s8 *D_001B15F4;
 extern s8 *D_001B15F8;
 extern void func_0029D0E0(s8 *p);
-extern void func_002FC748(void);
+extern void gfx_append_vu1_preset_a(void);
 
 /* Wraps the draw list in end markers so the graphics chip can finish the queued work. */
-void func_0027C660(void) {
+void DoGifPaging(void) {
     s8 *cursor;
     s8 *packet;
     s8 *packetCopy;
     s32 tagWord;
-    cursor = gDmaPacketCursor;
+    cursor = g_dma_packet_cursor;
     D_001B15F8 = cursor;
     tagWord = 0x20000000;
     packet = D_001B15F4;
-    gDmaPacketCursor = cursor + 0x10;
+    g_dma_packet_cursor = cursor + 0x10;
     *(s32 *)packet = tagWord;
     packetCopy = D_001B15F4;
-    *(s32 *)(packetCopy + 4) = (s32)gDmaPacketCursor;
+    *(s32 *)(packetCopy + 4) = (s32)g_dma_packet_cursor;
     *(s32 *)(D_001B15F4 + 8) = 0;
     *(s32 *)(D_001B15F4 + 0xC) = 0;
     func_0029D0E0(packetCopy);
-    AppendVu1DmaChainTable1();
-    packet = gDmaPacketCursor;
+    gfx_append_vu1_preset_a();
+    packet = g_dma_packet_cursor;
     *(s32 *)packet = tagWord;
     cursor = D_001B15F4;
-    packetCopy = gDmaPacketCursor;
+    packetCopy = g_dma_packet_cursor;
     *(s32 *)(packetCopy + 4) = (s32)(cursor + 0x10);
-    packet = gDmaPacketCursor;
+    packet = g_dma_packet_cursor;
     *(s32 *)(packet + 8) = 0;
-    packetCopy = gDmaPacketCursor;
+    packetCopy = g_dma_packet_cursor;
     *(s32 *)(packetCopy + 0xC) = 0;
-    cursor = gDmaPacketCursor;
+    cursor = g_dma_packet_cursor;
     packet = D_001B15F8;
-    gDmaPacketCursor = cursor + 0x10;
+    g_dma_packet_cursor = cursor + 0x10;
     *(s32 *)packet = tagWord;
-    cursor = gDmaPacketCursor;
+    cursor = g_dma_packet_cursor;
     packetCopy = D_001B15F8;
     *(s32 *)(packetCopy + 4) = (s32)cursor;
     packet = D_001B15F8;

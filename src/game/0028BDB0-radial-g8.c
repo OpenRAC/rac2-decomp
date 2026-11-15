@@ -1,20 +1,20 @@
 #include "common.h"
 
-extern void func_00287E60(void);
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
-extern int func_002A9588(int, int, int, int, int);
-extern int func_002E5E58(int, int, void *);
-extern void func_00287E18(void);
-extern int func_0028B5D0(int);
+extern void menu_set_state_word_three(void);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void menu_advance_state_in_mode_seven(void);
+extern int hud_close_element_by_key(int);
 typedef struct { char pad0[0x148]; float x, y; char pad150[0x70]; int held, pressed, released, mode; } RadialInput;
-extern RadialInput D_00138180;
+extern RadialInput g_pad_state;
 typedef struct { char pad0[0x24E4]; int choice; } RadialState;
-extern RadialState D_00189E20;
+extern RadialState g_hero_state;
 extern short D_001B189C, D_001B18A0, D_001B18A2, D_001B18A4;
-extern int D_001B18D0 __attribute__((sda));
-extern int D_001A8D48;
-extern int **D_001B18D4;
+extern int g_radial_slot_count __attribute__((sda));
+extern int g_radial_menu_page_index;
+extern int **g_radial_menu_pages;
 extern int D_001A8DB0[] __attribute__((sda));
 extern unsigned char D_001A7BB3;
 extern int D_001B18FC, D_001B18F8, D_001B1598;
@@ -22,25 +22,25 @@ extern int D_001B1900 __attribute__((sda));
 typedef struct { char pad[0x64]; int handle; char pad68[4]; int timer; unsigned char fade[4]; int selected, state, timeout; } Selector;
 
 /* Reads the stick and buttons for the radial weapon menu and updates which slot is selected. Closes the menu when the button is let go. */
-void func_0028CCE0(Selector *object)
+void UpdateRadialMenuSelection(Selector *object)
 {
     float x, y, magnitude, angle;
     int old, choice;
     unsigned char *fade = object->fade;
-    SetStateWordToThree();
+    menu_set_state_word_three();
     object->timeout = 180;
     object->timer = 24;
-    gPadState.mode = 2;
-    x = gPadState.x;
-    y = gPadState.y;
+    g_pad_state.mode = 2;
+    x = g_pad_state.x;
+    y = g_pad_state.y;
     magnitude = square_root(x * x + y * y);
     if (magnitude != 0.0f) {
         x /= magnitude;
         y /= magnitude;
     }
-    angle = FastMatrixHelperA(x, y);
+    angle = mat_fast_helper_a(x, y);
     if ((object->state >> 24) == 0 && D_001B189C) {
-        if (gPadState.pressed & 0xF000) goto reset_selection;
+        if (g_pad_state.pressed & 0xF000) goto reset_selection;
         if (magnitude < 0.5f) goto reset_selection;
         --object->state;
         if (object->state == -1) {
@@ -54,51 +54,51 @@ reset_selection:
         if (magnitude > 0.0f) {
             if (magnitude > 0.9f) {
                 float a;
-                a = angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)gRadialSlotCount;
-                a = a * 0.15915494f * (float)gRadialSlotCount;
-                object->selected = (int)a % gRadialSlotCount;
+                a = angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
+                a = a * 0.15915494f * (float)g_radial_slot_count;
+                object->selected = (int)a % g_radial_slot_count;
             }
-        } else if (gPadState.pressed & 0xF000) {
+        } else if (g_pad_state.pressed & 0xF000) {
             choice = old;
-            if (gPadState.pressed & 0x1000) {
-                choice = choice == -1 ? D_001A8DB0[4] : gRadialMenuPages[gRadialMenuPageIndex][choice * 7 + 4];
+            if (g_pad_state.pressed & 0x1000) {
+                choice = choice == -1 ? D_001A8DB0[4] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 4];
             }
-            if (gPadState.pressed & 0x4000) {
-                choice = choice == -1 ? D_001A8DB0[5] : gRadialMenuPages[gRadialMenuPageIndex][choice * 7 + 5];
+            if (g_pad_state.pressed & 0x4000) {
+                choice = choice == -1 ? D_001A8DB0[5] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 5];
             }
-            if (gPadState.pressed & 0x8000) {
-                choice = choice == -1 ? D_001A8DB0[2] : gRadialMenuPages[gRadialMenuPageIndex][choice * 7 + 2];
+            if (g_pad_state.pressed & 0x8000) {
+                choice = choice == -1 ? D_001A8DB0[2] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 2];
             }
-            if (gPadState.pressed & 0x2000) {
-                choice = choice == -1 ? D_001A8DB0[3] : gRadialMenuPages[gRadialMenuPageIndex][choice * 7 + 3];
+            if (g_pad_state.pressed & 0x2000) {
+                choice = choice == -1 ? D_001A8DB0[3] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 3];
             }
             object->selected = choice;
         }
     }
     if (object->selected != old) {
-        PingPongBlendValues(0, 0, 1, 0, 1);
+        math_ping_pong_blend_values(0, 0, 1, 0, 1);
         fade[1] = 0;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
     } else if (fade[1] < 8) ++fade[1];
-    if (!(gPadState.held & 0x10)) {
-        if (gPadState.released & 0x10) {
+    if (!(g_pad_state.held & 0x10)) {
+        if (g_pad_state.released & 0x10) {
             int current = object->selected;
-            if (current == -1) gHeroState.choice = 0;
-            else gHeroState.choice = gRadialMenuPages[gRadialMenuPageIndex][current * 7 + 6];
+            if (current == -1) g_hero_state.choice = 0;
+            else g_hero_state.choice = g_radial_menu_pages[g_radial_menu_page_index][current * 7 + 6];
         }
-        if (D_001A7BB3) AdvanceMenuStateOnMode7();
+        if (D_001A7BB3) menu_advance_state_in_mode_seven();
         if (*fade) --*fade;
     } else if (*fade < 8) ++*fade;
-    if (gHeroState.choice == 6 && !D_001B18A0)
-        gHeroState.choice = 0;
-    if (gHeroState.choice == 7 && !D_001B18A4)
-        gHeroState.choice = 0;
-    if (gHeroState.choice == 5 && !D_001B18A2)
-        gHeroState.choice = 0;
+    if (g_hero_state.choice == 6 && !D_001B18A0)
+        g_hero_state.choice = 0;
+    if (g_hero_state.choice == 7 && !D_001B18A4)
+        g_hero_state.choice = 0;
+    if (g_hero_state.choice == 5 && !D_001B18A2)
+        g_hero_state.choice = 0;
     if (!*fade) {
         D_001B1900 = object->selected;
         D_001B18FC = object->state;
-        CloseHudElementByKey(object->handle);
+        hud_close_element_by_key(object->handle);
         object->timer = -6;
         D_001B18F8 = D_001B1598;
     }

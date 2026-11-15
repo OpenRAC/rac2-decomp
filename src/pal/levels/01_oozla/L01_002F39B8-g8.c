@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 extern int D_L01_001A79F0;
-extern void *func_L01_002F1FD0(float, float, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void *tv_screen_find_nearest(float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern char D_L01_0027F810[];
 extern int D_001A9420 __attribute__((sda));
 typedef struct {
@@ -31,7 +32,7 @@ void func_PAL_L01_002F39B8(void)
         return;
 
     index = -1;
-    obj = func_L01_002F1FD0(0.0f, 0.0f, 0.0f);
+    obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
     if (D_L01_001BD1C0.mode == 3)
         index = 1;
     if (index != -1 && obj != 0) {
@@ -44,9 +45,9 @@ void func_PAL_L01_002F39B8(void)
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
-                func_00283098(p, q, c);
-                func_00282D30(p, p, scale);
-                func_00282CC0(p, p, d);
+                matrix_mul_vec3(p, q, c);
+                FastVecScale(p, p, scale);
+                FastVecAdd(p, p, d);
                 p += 0x10;
                 q += 0x10;
             }

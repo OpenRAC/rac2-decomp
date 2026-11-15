@@ -3,18 +3,18 @@
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 vertices[4]; unsigned int colors[4]; float uv[4][2]; unsigned long long header[4]; } BeamPacket;
 typedef struct { BeamPacket packet; Vector128 firstSide,secondSide,direction,end,scratch; } BeamWorkspace;
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern unsigned long long func_0027C878(int);
-extern void func_00280B90(void *,void *,int);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,void *,int);
 extern char D_L19_001B9A40[];
 extern float D_L19_001B1DE8[] __attribute__((sda));
 extern float D_L19_001B1DEC[] __attribute__((sda));
 
 /* Draws the object's 25-unit beam along its heading: a wide tinted quad, then a narrow white core. */
-void func_L19_00420B48(char *moby)
+void gfx_draw_beam_along_heading(char *moby)
 {
     BeamWorkspace beam;
     int i, j;

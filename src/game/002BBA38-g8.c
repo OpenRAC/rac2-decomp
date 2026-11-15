@@ -1,21 +1,21 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_00282948(void *);
-extern void func_002B9180(void *);
-extern float func_00283B98(float, float);
-extern int func_00283CF0(float);
+extern int math_fast_float_d(void *);
+extern void part_kill(void *);
+extern float FastAddRotations(float, float);
+extern int FloatToInt(float);
 extern int D_001AA304 __attribute__((sda));
 
 /* Fades a particle in at the start and out at the end of its life and tints it. Removes it when the time is up. */
-void func_002BBA38(char *particle)
+void part_update_fade_in_out(char *particle)
 {
     char *motion = particle + 32;
     int alpha;
     unsigned int alphaShifted;
     int tint;
-    if (FastFloatHelperD(motion)) {
-        KillParticle(particle);
+    if (math_fast_float_d(motion)) {
+        part_kill(particle);
     } else {
         *(float *)(motion + 12) = FastAddRotations(*(float *)(motion + 12), *(float *)(motion + 8));
         particle[8] = FloatToInt(*(float *)(motion + 12) * 40.7436637878418f) - 128;

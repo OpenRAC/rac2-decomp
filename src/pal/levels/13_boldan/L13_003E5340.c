@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef float f32;
 typedef unsigned char u8;
@@ -6,55 +7,55 @@ typedef short s16;
 typedef int s32;
 typedef unsigned short u16;
 typedef unsigned int u32;
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 extern f32 D_L13_001B2568 __attribute__((sda));
 extern u8 D_L13_001B1E60[];
 extern u8 D_0019B2E8[];
 extern u8 *D_L13_001B2A0C __attribute__((sda));
 extern u8 *D_L13_001B291C_2;
-extern u8 D_00189E20[];
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00282E48(void *, void *);
-extern u8 D_00189EA0[];
-extern u8 D_00188660[];
+extern u8 g_hero_state[];
+extern f32 vec_distance_xy(void *, void *);
+extern f32 fast_vec_dist(void *, void *);
+extern u8 g_hero_position[];
+extern u8 g_sound_state[];
 extern u8 D_L13_001B1C20[];
 extern u8 D_L13_001B1C48[];
 extern u8 D_001395B8[];
 extern u8 D_L13_001B1E60[];
 
 void func_PAL_L13_003E5340(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
 }
 
 
 void func_PAL_L13_003E5378(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
 }
 
 
 void func_PAL_L13_003E53B0(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.03490659f);
+    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.03490659f);
 }
 
 
 void func_PAL_L13_003E53E8(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
 }
 
 
 void func_PAL_L13_003E5420(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
 }
 
 
-extern u8 D_00189EA0[];
-extern u8 D_0018C750[];
+extern u8 g_hero_position[];
+extern u8 g_progress_statistics[];
 extern u32 D_001A7390[] __attribute__((sda));
 extern u8 D_001A7A60[] __attribute__((sda));
 extern s32 D_001A903C[] __attribute__((sda));
 extern s32 D_0018CC18;
-extern s32 func_002ACBC8(void *a0, s32 a1);
-extern void func_002E5E58(s32 a0, s32 a1, s32 a2);
+extern s32 IsPointInCuboid(void *a0, s32 a1);
+extern void snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
 extern void func_PAL_002B1588(s32 a0, s32 a1);
 extern void func_PAL_00289730(s32 a0, s32 a1);
 
@@ -77,24 +78,24 @@ void func_PAL_L13_003EC9C0(u8 *self)
     h = *(s16 *)(state + 0xE);
     switch (h) {
     case 0:
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 4)) != 0 && *(s32 *)(D_00189EA0 + 0x221C) == 0xF)
+        if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 4)) != 0 && *(s32 *)(g_hero_position + 0x221C) == 0xF)
             *(s16 *)(state + 0xE) = 1;
         break;
     case 1:
-        hero = D_00189E20;
+        hero = g_hero_state;
         if (*(s32 *)(hero + 0x2294) == 0x3E) {
             *(s16 *)(state + 0xE) = 0;
-        } else if (func_002ACBC8(hero + 0x80, *(s32 *)(state + 8)) != 0 && D_001A7A60[4] == 0) {
+        } else if (IsPointInCuboid(hero + 0x80, *(s32 *)(state + 8)) != 0 && D_001A7A60[4] == 0) {
             D_001A7A60[4] = 1;
-            func_002E5E58(1, 0, 0);
+            snd_play_from_global_bank(1, 0, 0);
             func_PAL_002B1588(0x1233, -1);
             D_001A903C[0] = 1;
         }
         break;
     }
-    if (func_002ACBC8(D_00189EA0, *(s32 *)state) == 0)
+    if (IsPointInCuboid(g_hero_position, *(s32 *)state) == 0)
         return;
-    timers = D_0018C750;
+    timers = g_progress_statistics;
     if (*(u16 *)(timers + 0x1BC) != 0 && !((((int)(D_001A7390[0]) * 5 + 2) / 6) - *(u32 *)(timers + 0x1C0) > 0x57E40))
         return;
     counters = D_001395B8;

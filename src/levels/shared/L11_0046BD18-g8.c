@@ -35,25 +35,25 @@ extern float D_L11_001B25E4 __attribute__((sda));
 extern float D_L11_001B25F8 __attribute__((sda));
 extern float D_L11_001B25FC __attribute__((sda));
 extern char D_L11_001A8F20[] __attribute__((sda));
-extern float func_002A7940(void);
-extern float func_00283B98(float, float);
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A78D8(float, float);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_00283248(float, float);
-extern void func_002A8C00(void *, void *, int, float, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern float math_random_angle(void);
+extern float FastAddRotations(float, float);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float mat_fast_helper_a(float, float);
+extern void make_hit_descriptor(void *, void *, int, float, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* Rebuilds a lightning bolt along its path: each point gets a random jitter
  * (core), a copy of it is displaced by a travelling wave (wave), and every
  * second segment spawns a spark effect. */
-void func_L11_0046BD18(char *object)
+void lightning_rebuild_bolt_points(char *object)
 {
     Vector position;
     Vector direction;
@@ -69,10 +69,10 @@ void func_L11_0046BD18(char *object)
     int i;
 
     state = *(BoltState **)(object + 0x68);
-    D_L11_001B25C0 = RandomAngle();
-    D_L11_001B25C8 = RandomAngle();
+    D_L11_001B25C0 = math_random_angle();
+    D_L11_001B25C8 = math_random_angle();
     D_L11_001B25DC = FastAddRotations(D_L11_001B25DC, D_L11_001B25E0);
-    ClearVector128(&position);
+    vec_clear_128(&position);
     state->count = D_L11_001B25A0;
     FastVecSub(&direction, &state->end, &state->start);
     vec_scale_to_length(&direction, &direction, 1.0f);
@@ -81,9 +81,9 @@ void func_L11_0046BD18(char *object)
     qcopy_nc(&D_L11_00264760[state->row].core[0], &path->points[0]);
     qcopy_nc(&D_L11_00264760[state->row].wave[0], &path->points[0]);
     for (i = 1; i < D_L11_001B25A0; i++) {
-        nz = RandomSignedFloatRange(D_L11_001B25F8, D_L11_001B25FC);
-        nx = RandomSignedFloatRange(D_L11_001B25F8, D_L11_001B25FC);
-        ny = RandomSignedFloatRange(D_L11_001B25F8, D_L11_001B25FC);
+        nz = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
+        nx = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
+        ny = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
         qcopy_nc(&D_L11_00264760[state->row].core[i], &path->points[i]);
         f = (float)i;
         D_L11_00264760[state->row].core[i].z += nz;
@@ -92,18 +92,18 @@ void func_L11_0046BD18(char *object)
         /* Previous point: the row's points from index -1. */
         prev = &D_L11_00264760[state->row].core[-1];
         FastVecSub(&delta, &D_L11_00264760[state->row].core[i], &prev[i]);
-        phase = WrapAngleToPi(D_L11_001B25C8 + f * D_L11_001B25D0);
-        angle = WrapAngleToPi(D_L11_001B25DC + f * D_L11_001B25E4);
-        amplitude = D_L11_001B25D4 * FastSinOrCosB(angle);
+        phase = math_wrap_angle_to_pi(D_L11_001B25C8 + f * D_L11_001B25D0);
+        angle = math_wrap_angle_to_pi(D_L11_001B25DC + f * D_L11_001B25E4);
+        amplitude = D_L11_001B25D4 * math_fast_sin_or_cos_b(angle);
         /* Column i of the wave points, then this bolt's row. */
         qcopy_nc(&D_L11_00264760[0].wave[i] + state->row * 40,
                  &D_L11_00264760[state->row].core[i]);
-        nz = amplitude * FastSinOrCosB(phase) + RandomSignedFloatRange(0.0f, 0.1f);
+        nz = amplitude * math_fast_sin_or_cos_b(phase) + math_random_signed_float_range(0.0f, 0.1f);
         D_L11_00264760[state->row].wave[i].z += nz;
-        angle = FastAddRotations(FastMatrixHelperA(delta.x, delta.y), 1.5707964897155762f);
-        horizontalAmplitude = D_L11_001B25D8 * FastSinOrCosA(phase);
-        perpendicular.x = FastSinOrCosA(angle) * horizontalAmplitude;
-        perpendicular.y = FastSinOrCosB(angle) * horizontalAmplitude;
+        angle = FastAddRotations(mat_fast_helper_a(delta.x, delta.y), 1.5707964897155762f);
+        horizontalAmplitude = D_L11_001B25D8 * math_fast_sin_or_cos_a(phase);
+        perpendicular.x = math_fast_sin_or_cos_a(angle) * horizontalAmplitude;
+        perpendicular.y = math_fast_sin_or_cos_b(angle) * horizontalAmplitude;
         perpendicular.z = 0.0f;
         wave = D_L11_00264760[state->row].wave;
         FastVecAdd(&wave[i], &wave[i], &perpendicular);

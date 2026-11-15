@@ -17,11 +17,11 @@ typedef struct OBJ3 {
 
 extern OBJ3 *D_L00_0023DBA0[];
 
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002A7A00(float *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void *func_002C3150(void *, void *, int, int, float, int, int);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void vec_random_direction(float *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void *part_spawn_hero_relative(void *, void *, int, int, float, int, int);
 extern int D_L00_001AFB68 __attribute__((sda));
 extern float D_L00_001AFAE8 __attribute__((sda));
 extern float D_L00_001AFAEC;
@@ -36,13 +36,13 @@ void func_PAL_L00_003BB200(char *object, float *position)
     for (i = 0; i < D_L00_001AFB68; i++) {
         unsigned char kind, random;
         int *color;
-        func_002A7A00(point, 0.0f, 0.333f);
-        func_00282CC0(point, point, position);
-        func_002A7A00(velocity, D_L00_001AFAE8 * (0.020000001f), D_L00_001AFAEC * (0.020000001f));
-        kind = (((int)(func_002A7820(D_L00_001AFB0C[1], D_L00_001AFB0C[2])) * 5 + 2) / 6);
+        vec_random_direction(point, 0.0f, 0.333f);
+        FastVecAdd(point, point, position);
+        vec_random_direction(velocity, D_L00_001AFAE8 * (0.020000001f), D_L00_001AFAEC * (0.020000001f));
+        kind = (((int)(math_random_int_range(D_L00_001AFB0C[1], D_L00_001AFB0C[2])) * 5 + 2) / 6);
         color = &D_L00_001AFB70[(unsigned char)object[0xbc]];
-        random = func_002A77E0(255);
-        func_002C3150(point, velocity, *color, kind, D_L00_001AFAFC, random, 0);
+        random = math_random_int_below(255);
+        part_spawn_hero_relative(point, velocity, *color, kind, D_L00_001AFAFC, random, 0);
     }
 }
 

@@ -8,7 +8,7 @@ typedef struct {
     char reserved1834[0xA60];
     int mode;
 } L04DispatchGlobals;
-extern L04DispatchGlobals D_00189E20;
+extern L04DispatchGlobals g_hero_state;
 
 /* Eight group counts and ten signed slot indices, addressed through $gp. */
 extern int D_L04_001AFFA0[8] __attribute__((sda));
@@ -16,19 +16,19 @@ extern short D_L04_001AFFC0[10] __attribute__((sda));
 extern int D_L04_001AFFD4 __attribute__((sda));
 extern int D_L04_001AFFD8 __attribute__((sda));
 extern char D_L04_002AF6C0[], D_L04_002405C0[], D_L04_00240660[], D_L04_002BA660[];
-extern void func_L04_003E7FE8(void);
-extern void func_L00_002E6EF8(void);
-extern void func_L04_003A1A78(void *);
-extern void func_L04_003A1C98(void *);
-extern void func_L04_003A1FA0(void *);
-extern void func_L04_003A1FE0(void *);
-extern void func_L04_003A5C08(void *, float);
+extern void group_run_shared_routine(void);
+extern void gfx_add_draw_callback_third(void);
+extern void water_init_object(void *);
+extern void water_update_controller(void *);
+extern void water_advance_controller_state(void *);
+extern void water_update_ripple_patches(void *);
+extern void water_add_splash_entry(void *, float);
 
 /* Runs the shared per-frame code for an object that belongs to a group, calling a different routine for each of its states. */
-void func_L04_003E7E68(char *moby)
+void grouped_object_update_by_state(char *moby)
 {
     char *vars;
-    L04DispatchGlobals *globals = &gHeroState;
+    L04DispatchGlobals *globals = &g_hero_state;
     char *player = globals->player;
     if (player && *(short *)(player + 0xAA) == 0x45 &&
         (unsigned char)player[0x20] != 0xFE && (unsigned char)player[0x20] != 0xFD &&
@@ -51,22 +51,22 @@ void func_L04_003E7E68(char *moby)
             callArgs[5] = (int)D_L04_001AFFA0;
             callArgs[6] = (int)D_L04_00240660;
             callArgs[7] = (int)D_L04_002BA660;
-            callArgs[11] = (int)RunSharedGroupRoutine;
-            callArgs[12] = (int)AddDrawCallbackToList3;
+            callArgs[11] = (int)group_run_shared_routine;
+            callArgs[12] = (int)gfx_add_draw_callback_third;
             callArgs[10] = (int)moby;
             switch ((unsigned char)moby[0x20]) {
             case 0:
-                InitWaterObject(callArgs);
-                AddWaterSplashEntry(moby, *(float *)(vars + 0x28));
+                water_init_object(callArgs);
+                water_add_splash_entry(moby, *(float *)(vars + 0x28));
                 /* Fall through. */
             case 1:
-                UpdateWaterController(callArgs);
+                water_update_controller(callArgs);
                 break;
             case 2:
-                AdvanceWaterControllerState(callArgs);
+                water_advance_controller_state(callArgs);
                 break;
             }
-            UpdateWaterRipplePatches_L04(callArgs);
+            water_update_ripple_patches(callArgs);
         }
     }
 }

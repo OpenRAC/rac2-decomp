@@ -7,18 +7,18 @@ typedef union { TI128 q; float f[4]; s32 w[4]; } V4_F428000;
 extern float D_L00_001B1630[];
 typedef struct { u8 pad[0x80]; V4_F428000 pos; u8 pad90[0x1220 - 0x90]; char *partner; } HeroView_F428000;
 typedef struct { u8 pad[0x140]; V4_F428000 pos; u8 pad150[8]; float yaw; } CamView_F428000;
-extern HeroView_F428000 D_00189E20;
+extern HeroView_F428000 g_hero_state;
 extern CamView_F428000 D_L00_001B8C80;
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_002D7958(void *, void *, float);
-extern void func_L00_00427BE8(char *, void *, float, void *);
-extern float func_00283B98(float, float);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00282E80(void *, void *);
-extern void func_00300190(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_copy5_blend_first(void *, void *, float);
+extern void cam_set_target_and_weight(char *, void *, float, void *);
+extern float FastAddRotations(float, float);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float vec_distance_xy(void *, void *);
+extern void vec_transform_or_copy(void *, void *);
 
 /* func_US2_L00_00429510, the USA v2.00 copy of func_L00_00428000: the same C, where the smaller of
    the hero's and the partner's distances to the camera becomes the hero's distance alone. */
@@ -39,22 +39,22 @@ int func_US2_L00_00429510(char *self, char *target)
         offset.f[0] = D_L00_001B1630[0];
         offset.f[2] = 0.12f;
         info = *(char **)(target + 0x68);
-        func_00283098(&offset, &offset, target + 0xC0);
-        func_00282CC0(&pos, target + 0x10, &offset);
+        matrix_mul_vec3(&offset, &offset, target + 0xC0);
+        FastVecAdd(&pos, target + 0x10, &offset);
         if (*(int *)(info + 0x10) == -1) {
-            func_L00_002D7958(orbit, self + 0x50, 0.0f);
+            vec_copy5_blend_first(orbit, self + 0x50, 0.0f);
             orbit[2] = 6.0f;
             orbit[1] = orbit[3];
             orbit[3] = 0.0f;
-            func_L00_00427BE8(self, orbit, 0.0f, &pos);
+            cam_set_target_and_weight(self, orbit, 0.0f, &pos);
         }
         if (*(int *)(info + 0x10) <= 0) {
-            *(float *)(cam + 0xAC) = func_00283B98(*(float *)(cam + 0xAC), *(float *)(info + 0x18));
+            *(float *)(cam + 0xAC) = FastAddRotations(*(float *)(cam + 0xAC), *(float *)(info + 0x18));
             *(float *)(info + 0x18) *= 0.97f;
-            angle = func_00283C80(func_00283248(D_L00_001B8C80.pos.f[0] - D_00189E20.pos.f[0],
-                                                D_L00_001B8C80.pos.f[1] - D_00189E20.pos.f[1]),
+            angle = FastDiffRots(mat_fast_helper_a(D_L00_001B8C80.pos.f[0] - g_hero_state.pos.f[0],
+                                                D_L00_001B8C80.pos.f[1] - g_hero_state.pos.f[1]),
                                   D_L00_001B8C80.yaw);
-            d = func_00282E80(&D_00189E20.pos, &D_L00_001B8C80.pos);
+            d = vec_distance_xy(&g_hero_state.pos, &D_L00_001B8C80.pos);
             if (d < 0.77f) {
                 if (angle < 1.5707965f) {
                     *(float *)(cam + 0x1C) -= 0.7f - d;
@@ -67,7 +67,7 @@ int func_US2_L00_00429510(char *self, char *target)
                 *(float *)(info + 4) *= 0.97f;
             }
             qcopy(cam + 0x80, &pos);
-            func_00300190(cam + 0x80, cam + 0x80);
+            vec_transform_or_copy(cam + 0x80, cam + 0x80);
             return 0;
         }
         *(float *)(cam + 0xAC) = *(float *)(target + 0xF0) * 0.5f;

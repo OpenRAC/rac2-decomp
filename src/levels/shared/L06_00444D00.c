@@ -9,7 +9,7 @@ extern void ref_L06_00444D00_03(void *, void *, s32, s32);
 extern void ref_L06_00444D00_04(s32, void *, s32);
 
 /* Updates a switch moby (class 3546): works out if it is on, and when that changes it tells the linked objects. */
-void func_L06_00444D00(char *object)
+void switch_l06_update(char *object)
 {
     char *state;
     s128 testPoint;

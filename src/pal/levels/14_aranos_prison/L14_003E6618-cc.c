@@ -8,8 +8,8 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern Collision D_L14_001BF940;
 extern Material D_L14_002686F0[];
-extern float func_002A7878(float, float);
-extern void func_00282CC0(void *dst, void *a, void *b);
+extern float math_random_float_range(float, float);
+extern void FastVecAdd(void *dst, void *a, void *b);
 /* func_L14_00304190 is defined in L14_00304190-zp.c (it clears a stack vector with por, which needs -frac2-zero-ti-por). */
 
 /* func_L14_00304280 lives in the -g8 sibling file (it reaches a global through $gp). */
@@ -47,23 +47,23 @@ extern MobList_L14_00304588 ref_L14_00304588_00;
 
 /* func_L14_003CB4D8 is defined in L14_003CB4D8-g8.c. */
 
-extern void func_00283698(void *dst, void *src);
+extern void matrix_from_basis_rows(void *dst, void *src);
 
-extern void func_00282CF0(void *dst, void *a, void *b);
+extern void FastVecSub(void *dst, void *a, void *b);
 
-extern void func_002AFDD8(void *a, void *b, void *c, void *d);
+extern void vec_transform_by_object_or_given(void *a, void *b, void *c, void *d);
 
-extern float func_00282C48(float a);
+extern float math_fabs(float a);
 
-extern void func_00283098(void *dst, void *a, void *mtx);
+extern void matrix_mul_vec3(void *dst, void *a, void *mtx);
 
-extern void func_00282CC0(void *dst, void *a, void *b);
+extern void FastVecAdd(void *dst, void *a, void *b);
 
-extern void func_L14_003C9658(char *e, void *v);
+extern void entity_apply_corrected_pos(char *e, void *v);
 
-extern unsigned short *D_L14_001FB060[];
+extern unsigned short *g_group_entity_lists[];
 
-extern unsigned char *D_L14_001B259C __attribute__((sda));
+extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
 extern int D_L14_001B25B8 __attribute__((sda));
 
@@ -89,9 +89,9 @@ typedef struct {
     char pad0090[0x22B4 - 0x90];
     unsigned char mode;         /* 0x22B4 */
 } PrisonLiftHero;
-extern PrisonLiftHero D_00189E20;
-extern char D_00188660[];
-extern int func_002B3868(char *self);
+extern PrisonLiftHero g_hero_state;
+extern char g_sound_state[];
+extern int flag_set_first_pending(char *self);
 /* A lift that travels between its start height (0x68) and its target (0x64): state 0 sets it
    up, state 1 waits for the hero (or a trigger) and starts it with its travel sound, states 2
    and 3 ease it up and down and stop the sound on arrival. Riders follow its movement. */
@@ -101,23 +101,23 @@ extern int func_002B3868(char *self);
 
 /* func_L14_003DF100 lives in the -g8 sibling file (its calls pass floats, so it needs real prototypes). */
 
-extern float func_00282C48(float a);
+extern float math_fabs(float a);
 
-extern void func_00283698(void *dst, void *src);
+extern void matrix_from_basis_rows(void *dst, void *src);
 
-extern void func_00282CF0(void *dst, void *a, void *b);
+extern void FastVecSub(void *dst, void *a, void *b);
 
-extern void func_002AFDD8(void *a, void *b, void *c, void *d);
+extern void vec_transform_by_object_or_given(void *a, void *b, void *c, void *d);
 
-extern void func_00283098(void *dst, void *a, void *mtx);
+extern void matrix_mul_vec3(void *dst, void *a, void *mtx);
 
-extern void func_00282CC0(void *dst, void *a, void *b);
+extern void FastVecAdd(void *dst, void *a, void *b);
 
-extern void func_L14_003C9658(char *e, void *v);
+extern void entity_apply_corrected_pos(char *e, void *v);
 
-extern unsigned short *D_L14_001FB060[];
+extern unsigned short *g_group_entity_lists[];
 
-extern unsigned char *D_L14_001B259C __attribute__((sda));
+extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
 extern int D_L14_001B25B8 __attribute__((sda));
 
@@ -159,18 +159,18 @@ float func_PAL_L14_003E6618(char *arg0) {
 
 /* func_L14_003E4208 is defined in L14_003E4208-g.c (it needs -g for retail's line-note nops). */
 
-extern char D_00188660[];
+extern char g_sound_state[];
 /* The object steers a group of entities: by its state byte it either leaves the group
    (state 0), asks whether the group is free and hands itself over if it is (state 1) or
    turns (state 2).  In the turning state it takes an entry from the ring of the group's own
    entries (D_00188660, 0x70 bytes each) - a new one when the entry it holds is not its
    own or is free - and turns half a degree; at the end it releases the entry it holds
    when the entry is its own and in use, and forgets it either way. */
-extern int func_002B3868(char *self);
-extern void func_L14_003E50B8(char *self);
-extern void func_L14_003E5190(char *self);
-extern void func_L14_003E51B0(char *self);
-extern void func_L14_003E5218(char *self);
+extern int flag_set_first_pending(char *self);
+extern void AdvanceRingState(char *self);
+extern void moby_clear_linked_flag(char *self);
+extern void moby_send_colors_to_linked(char *self);
+extern void moby_set_child_fade_colors(char *self);
 
 /* The key state of an object that steers a group (+0x14 the current key, +0x16 the key index,
    +0x34 the key word). The last walk stores through this struct: cc1 then knows the store does
@@ -191,14 +191,14 @@ extern void func_L14_003E5218(char *self);
 
 /* func_L14_003E5030 lives in the -g8 sibling file (it reaches a global through $gp). */
 
-void func_L14_003E50B8(char *object);
+void AdvanceRingState(char *object);
 
-void func_L14_003E5190(char *arg0);
+void moby_clear_linked_flag(char *arg0);
 
-void func_L14_003E51B0(char *arg0);
+void moby_send_colors_to_linked(char *arg0);
 
-void func_L14_003E5218(char *self);
+void moby_set_child_fade_colors(char *self);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 /* Resets the record: the four axis pairs, the flags and the packed word. */
 /* func_L14_003F0F38 lives in the -g8 sibling file (it reaches a global through $gp). */

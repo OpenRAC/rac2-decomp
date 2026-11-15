@@ -3,25 +3,25 @@
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 vertices[4]; unsigned int colors[4]; float uv[4][2]; unsigned long long header[4]; } BeamPacket;
 typedef struct { BeamPacket packet; Vector128 firstSide,secondSide,direction,end,scratch; } BeamWorkspace;
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern unsigned long long func_0027C878(int);
-extern void func_00280B90(void *,void *,int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,void *,int);
 extern char D_L16_001B9B00[];
 extern float D_L16_001B1EA8[] __attribute__((sda));
 extern float D_L16_001B1EAC[] __attribute__((sda));
 
 /* Draws the object's 25-unit beam along its heading: a wide tinted quad, then a narrow white core. */
-void func_L16_0041CF80(char *object)
+void DrawBeamQuads(char *object)
 {
     BeamWorkspace local;
     int i, j;
-    ((float *)&local.direction)[0]=FastSinOrCosA(*(float *)(object+0xf8))*25.0f;
-    ((float *)&local.direction)[1]=FastSinOrCosB(*(float *)(object+0xf8))*25.0f;
+    ((float *)&local.direction)[0]=math_fast_sin_or_cos_a(*(float *)(object+0xf8))*25.0f;
+    ((float *)&local.direction)[1]=math_fast_sin_or_cos_b(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.direction)[2]=0.0f;
     FastVecAdd(&local.end,object+0x10,&local.direction);
     FastVecSub(&local.firstSide,object+0x10,D_L16_001B9B00);

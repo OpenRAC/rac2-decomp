@@ -3,9 +3,9 @@
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 struct LiftHero { char pad0[0x80]; float pos[4]; char pad1[0x28c]; float f31c; char pad2[0x1c]; char *standing; int active; };
-extern char D_00189E20[];
+extern char g_hero_state[];
 #define HERO ((struct LiftHero *)D_00189E20)
-extern char D_00188660[], D_L02_001BA500[];
+extern char g_sound_state[], g_camera_l02_position[];
 extern void ref_L02_003EB8F8_02(void *);
 extern void ref_L02_003EB8F8_03(void *, int, int);
 extern float ref_L02_003EB8F8_04(float);
@@ -38,7 +38,7 @@ struct LiftMoby {
 extern struct LiftPoint *ref_L02_003EB8F8_00 __attribute__((sda));
 extern struct LiftPoint *ref_L02_003EB8F8_01 MACRO_ADDR;
 /* Runs an elevator. It moves between its stops, changes direction when the player stands on it or calls it, and plays a sound while moving. */
-void func_L02_003EB8F8(struct LiftMoby *obj) {
+void elevator_l02_update(struct LiftMoby *obj) {
     struct LiftData *data = obj->data;
     int oldpos[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -73,8 +73,8 @@ void func_L02_003EB8F8(struct LiftMoby *obj) {
         speed=0.003888889f;
         d=delta;
         if (data->direction) {
-            if (HERO->pos[2]<obj->pos[2]-1.0f || F(gCameraPosition_L02,8)<obj->pos[2]) {
-                ref_L02_003EB8F8_06(d,gCameraPosition_L02,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
+            if (HERO->pos[2]<obj->pos[2]-1.0f || F(g_camera_l02_position,8)<obj->pos[2]) {
+                ref_L02_003EB8F8_06(d,g_camera_l02_position,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
                 ref_L02_003EB8F8_07(d,d,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x40);
                 if (ref_L02_003EB8F8_08(HERO->pos,data->waypoint) || (ref_L02_003EB8F8_04(delta[0])<1.0f && ref_L02_003EB8F8_04(delta[1])<1.0f)) {
                     if (obj->kind==0xbf5 /* moby class 3061 */ ) target+=5.0f; else target+=3.0f;
@@ -90,11 +90,11 @@ void func_L02_003EB8F8(struct LiftMoby *obj) {
         break;
     }
     if (ref_L02_003EB8F8_04(data->velocity)>0.01f) {
-        char *e=gSoundState+data->sound*0x70;
+        char *e=g_sound_state+data->sound*0x70;
         if (P(e,0x88)!=obj || !*(unsigned char *)(e+0x74)) data->sound=ref_L02_003EB8F8_10(0,4,obj);
     } else {
         if (data->sound!=-1) {
-            char *e=gSoundState+data->sound*0x70;
+            char *e=g_sound_state+data->sound*0x70;
             if (P(e,0x88)==obj && *(unsigned char *)(e+0x74)) ref_L02_003EB8F8_11(data->sound);
         }
         data->sound=-1;

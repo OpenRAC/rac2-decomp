@@ -27,13 +27,13 @@ extern s32 D_L23_0025E8B0[];
 typedef struct { s16 a; s16 b; s32 c; } Edge; /* 8 bytes; the array is walked through an s16 cast */
 extern Edge D_L23_002A7A74[];
 extern s32 D_L23_0025E9D0[];
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 
 /* arms the object once: clears the list, builds the 500/500/575 start position and the 16 slots
    (the count, spread over the list of used edges, scaled by sixteenths) */
 /* Sets up the controller object the first time it runs. It places it, counts which links
    between points are in use, and fills a table of 16 steps. */
-void func_L23_00429DC8(u8 *obj) {
+void effect_controller_init_link_table(u8 *obj) {
     s32 *payload = *(s32 **)(obj + 0x68);
     s32 i, j, k, m, n, found;
     V4 v;
@@ -54,7 +54,7 @@ void func_L23_00429DC8(u8 *obj) {
         v.f[1] = 500.0f;
         v.f[2] = 575.0f;
         *(TI128 *)(obj + 0x10) = v.q;
-        SetMobyState(obj, 1, 0);
+        moby_set_state(obj, 1, 0);
         for (i = 0; i < 0x48; i++) {
             float *p = D_L23_002A7170[i];
 

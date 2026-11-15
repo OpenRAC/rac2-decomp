@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -27,10 +28,10 @@
 extern s32 D_001A7288 __attribute__((sda));
 extern s32  D_001B1888[] __attribute__((sda));
 
-extern s32 func_0029D4D0();
+extern s32 fast_decompress();
 
 /* Unpacks the packed data of one HUD bank into the given memory address and clears that bank's flag. */
-void func_00292B20(s32 bankIndex, s32 target) {
+void hud_unpack_bank_data(s32 bankIndex, s32 target) {
     s32 root;
     s32 alignedTarget;
     s32 bankBase;

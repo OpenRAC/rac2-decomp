@@ -1,27 +1,28 @@
+#include "names.h"
 /* func_00304F28: the motion pointer is a byte pointer (its scale is at +0x10), the child's
  * entity is read once for the copy and the +0xE0 argument, and the copy is
  * qcopy(), so the buffer address is set up before the motion is saved. */
 #include "common.h"
 
-extern char *func_002AB1F0(char *);
-extern void func_002FE8D8(void *object, float *out);
-extern void func_00282D30(char *local, void *value, float scale);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_0029FCC0(void *entity, int a, void *out);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282F20(char *out, char *in, float length);
-extern void func_002836E8(float *out, float *in);
-extern void func_00283098(void *out, void *a, void *b);
+extern char *moby_get_private_value_0(char *);
+extern void moby_get_facing_direction(void *object, float *out);
+extern void FastVecScale(char *local, void *value, float scale);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void moby_transform_joint_to_world(void *entity, int a, void *out);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void vec_scale_to_length(char *out, char *in, float length);
+extern void mat_fast_helper_c(float *out, float *in);
+extern void matrix_mul_vec3(void *out, void *a, void *b);
 
 /* Aims the Miniturret at its locked target. Drops the target and goes idle when the target is gone. */
-void func_00304F28(char *object)
+void miniturret_aim_at_target(char *object)
 {
     float vec[28];
     char *vars = *(char **)(object + 0x68);
-    char *targetInfo = GetMobyPrivateValue0(*(char **)(vars + 0x68));
+    char *targetInfo = moby_get_private_value_0(*(char **)(vars + 0x68));
     char *target;
 
-    GetObjectFacingDirection(object + 0x10, &vec[4]);
+    moby_get_facing_direction(object + 0x10, &vec[4]);
     target = *(char **)(vars + 0x68);
     qcopy(&vec[0], target + 0x10);
     if (targetInfo != 0) {
@@ -36,9 +37,9 @@ void func_00304F28(char *object)
         *(char **)(vars + 0x68) = 0;
         return;
     }
-    TransformMobyJointToWorld(object, 0, &vec[8]);
+    moby_transform_joint_to_world(object, 0, &vec[8]);
     FastVecSub(&vec[12], &vec[0], &vec[8]);
     vec_scale_to_length(vars + 0x20, (char *)&vec[12], 1.0f);
-    FastMatrixHelperC(&vec[16], (float *)(object + 0xC0));
+    mat_fast_helper_c(&vec[16], (float *)(object + 0xC0));
     matrix_mul_vec3(vars + 0x20, vars + 0x20, &vec[16]);
 }

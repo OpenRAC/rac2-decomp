@@ -4,14 +4,14 @@ extern f32 D_L11_001B0544 __attribute__((sda));
 extern f32 D_L11_001B0550 __attribute__((sda));
 extern f32 D_L11_001B0554 __attribute__((sda));
 extern f32 D_L11_001B0558 __attribute__((sda));
-extern f32 func_00283B98(f32,f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 *func_L11_004417E8(s32);
-extern void func_002833F0(void *,void *);
+extern f32 FastAddRotations(f32,f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 *arena_get_center_point(s32);
+extern void euler_rotation_basis(void *,void *);
 /* Spins the enemy around its anchor point, speeding up in one direction, and turns it to
    face along its orbit. */
-void func_L11_003F2A30(u8 *mobyArg) {
+void joba_enemy_update_orbit(u8 *mobyArg) {
     u8 *moby = mobyArg;
     u8 *vars = *(u8 **)(moby + 0x68);
     f32 limit, speed, trig;
@@ -36,10 +36,10 @@ void func_L11_003F2A30(u8 *mobyArg) {
     }
     if (*(u8 *)(moby + 0x20) == 5 || *(u8 *)(moby + 0x20) == 9) return;
     if (*(s32 *)(moby + 0xB8)) {
-        trig = FastSinOrCosA(*(f32 *)(vars + 0x250));
-        *(f32 *)(moby + 0x10) = D_L11_001B0558 * trig + GetArenaCenterPoint(*(s32 *)(moby + 0xB8))[0];
-        trig = FastSinOrCosB(*(f32 *)(vars + 0x250));
-        *(f32 *)(moby + 0x14) = D_L11_001B0558 * trig + GetArenaCenterPoint(*(s32 *)(moby + 0xB8))[1];
+        trig = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x250));
+        *(f32 *)(moby + 0x10) = D_L11_001B0558 * trig + arena_get_center_point(*(s32 *)(moby + 0xB8))[0];
+        trig = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x250));
+        *(f32 *)(moby + 0x14) = D_L11_001B0558 * trig + arena_get_center_point(*(s32 *)(moby + 0xB8))[1];
     }
     if (*(u8 *)(moby + 0x95) == 2) {
         *(f32 *)(moby + 0x18) = D_L11_001B0540;

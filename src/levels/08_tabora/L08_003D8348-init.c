@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern int func_00283CF0(float);
-extern void func_L08_003D82F0(void *);
-extern void func_0029F338(void *);
-extern float func_L08_0032EF80(void *, int, int, int, int);
-extern void func_L01_003377C8(void *);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
+extern int FloatToInt(float);
+extern void moby_store_ground_height(void *);
+extern void moby_mark_spawned(void *);
+extern float coll_point_depth_in_volumes(void *, int, int, int, int);
+extern void path_l01_compute_segment_lengths(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
 extern int func_001163B0(void);
-extern void func_00282CC0(void *, void *, void *);
-extern int D_001A79F0 __attribute__((sda));
+extern void FastVecAdd(void *, void *, void *);
+extern int g_current_map_index __attribute__((sda));
 extern char D_0019B4A8[];
 
 typedef int InitVector __attribute__((mode(TI)));
@@ -137,7 +137,7 @@ typedef struct {
 } InitObject;
 
 /* Sets up a sheep or herd animal when it loads: picks its starting pose and speeds, and removes it if its save flags say it has already been dealt with. */
-void func_L08_003D8348(InitObject *object)
+void herd_animal_init(InitObject *object)
 {
     InitState *vars = object->f68;
     float position[4], depth;
@@ -166,31 +166,31 @@ void func_L08_003D8348(InitObject *object)
         if (((InitEntry *)linkedEntry)->fB0 != 255) {
             linkedFlag = ((InitEntry *)linkedEntry)->fB2;
             if (D_L08_0021EAF0.flags[(short)linkedFlag] ||
-                ((flagBits = (u8)D_0019B4A8[((short)linkedFlag >> 1) + (gCurrentMapIndex << 10)]),
+                ((flagBits = (u8)D_0019B4A8[((short)linkedFlag >> 1) + (g_current_map_index << 10)]),
                  (linkedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7)) {
                 unsigned short savedFlag = object->fB2;
-                flagBits = (u8)D_0019B4A8[((short)savedFlag >> 1) + (gCurrentMapIndex << 10)];
+                flagBits = (u8)D_0019B4A8[((short)savedFlag >> 1) + (g_current_map_index << 10)];
                 if ((savedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7) {
-                    MarkMobySpawned(object);
+                    moby_mark_spawned(object);
                     return;
                 }
             }
         }
     }
     qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
-    StoreGroundHeightBelowMoby(object);
+    moby_store_ground_height(object);
     vars->f408 = object->f30;
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
-    depth = ComputePointDepthInVolumes(position, vars->f410, vars->f418, vars->f414, -1);
+    depth = coll_point_depth_in_volumes(position, vars->f410, vars->f418, vars->f414, -1);
     if (depth > 0)
         object->f30 = FloatToInt(depth + 2.0f);
     vars->f408 = vars->f40A = object->f30;
     *(InitVector *)position = *(InitVector *)((char *)object + 0x10);
-    depth = ComputePointDepthInVolumes(position, vars->f41C, vars->f424, vars->f420, -1);
+    depth = coll_point_depth_in_volumes(position, vars->f41C, vars->f424, vars->f420, -1);
     if (depth > 0)
         vars->f408 = FloatToInt(depth + 2.0f);
     if (vars->f428 == -1)
-        ComputePathSegmentLengths_L01(D_L08_001FE7BC);
+        path_l01_compute_segment_lengths(D_L08_001FE7BC);
     vars->f88 = 0;
     vars->f6A = 0;
     vars->f98 = -1;
@@ -232,8 +232,8 @@ void func_L08_003D8348(InitObject *object)
         qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
         qzero_nc((char *)vars + 0x1C0);
         if (object->f43 != 11)
-            StartAnimationBlended(object, 11, 0, 2);
-        SetMobyState(object, 1, -1);
+            anim_start_blended(object, 11, 0, 2);
+        moby_set_state(object, 1, -1);
         object->f31 = 0;
         object->f98 = 0;
         object->f34 = (object->f34 & 0xEFFF) | 1;
@@ -243,9 +243,9 @@ void func_L08_003D8348(InitObject *object)
         object->f18 = vars->f434;
         qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
         qzero_nc((char *)vars + 0x1C0);
-        if (object->f43 != (Rand() & 1))
-            StartAnimationBlended(object, Rand() & 1, 0, 2);
-        SetMobyState(object, 6, -1);
+        if (object->f43 != (func_001163B0() & 1))
+            anim_start_blended(object, func_001163B0() & 1, 0, 2);
+        moby_set_state(object, 6, -1);
         object->f31 = 1;
         object->f34 = (object->f34 | 0x1000) & 0xFFFE;
         break;
@@ -254,11 +254,11 @@ void func_L08_003D8348(InitObject *object)
         FastVecAdd((char *)object + 0x10, (char *)object + 0x10, (char *)vars + 0xD0);
         qcopy_nc((char *)vars + 0x3E0, (char *)object + 0x10);
         if (object->f43 != 14)
-            StartAnimationBlended(object, 14, 0, 2);
+            anim_start_blended(object, 14, 0, 2);
         object->f2C = *(float *)(object->f24 + 0x24) * 0.5f;
         object->f31 = 1;
         object->f34 = (object->f34 | 0x1000) & 0xFFFE;
-        SetMobyState(object, 4, -1);
+        moby_set_state(object, 4, -1);
         break;
     }
 }

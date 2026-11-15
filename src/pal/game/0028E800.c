@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -18,8 +19,8 @@ typedef struct Anim28DF80_State {
     s32 fC;
 } Anim28DF80_State;
 extern Anim28DF80_Frame *D_001B188C __attribute__((sda));
-extern s32 D_001B1688 __attribute__((sda));
-extern s32 func_002A77E0(s32);
+extern s32 g_game_time __attribute__((sda));
+extern s32 math_random_int_below(s32);
 
 /* Picks the frame of an animation record: clamp, loop, ping-pong or one-shot. */
 s32 func_PAL_0028E800(Anim28DF80_State *a0) {
@@ -32,10 +33,10 @@ s32 func_PAL_0028E800(Anim28DF80_State *a0) {
             r = t->f4;
             break;
         case 1:
-            r = t->f4 + (D_001B1688 - a0->fC) / t->f7 % t->f2;
+            r = t->f4 + (g_game_time - a0->fC) / t->f7 % t->f2;
             break;
         case 2:
-            r = (D_001B1688 - a0->fC) / t->f7 % (t->f2 * 2 - 2);
+            r = (g_game_time - a0->fC) / t->f7 % (t->f2 * 2 - 2);
             if (r >= t->f2) {
                 s32 k = r + 2;
                 r = t->f2 * 2 - k;
@@ -43,8 +44,8 @@ s32 func_PAL_0028E800(Anim28DF80_State *a0) {
             r += t->f4;
             break;
         case 3:
-            if (a0->fC < D_001B1688) {
-                r = (D_001B1688 - a0->fC) / t->f7;
+            if (a0->fC < g_game_time) {
+                r = (g_game_time - a0->fC) / t->f7;
                 if (r < t->f2 * 2 - 2) {
                     if (r >= t->f2) {
                         s32 k = r + 2;
@@ -54,7 +55,7 @@ s32 func_PAL_0028E800(Anim28DF80_State *a0) {
                 } else {
                     r = t->f4;
                     {
-                        s32 k = func_002A77E0(25) + 8;
+                        s32 k = math_random_int_below(25) + 8;
                         a0->fC = t->f2 * 2 + k;
                     }
                 }
@@ -69,10 +70,10 @@ s32 func_PAL_0028E800(Anim28DF80_State *a0) {
 }
 
 
-extern char D_00255330[];
+extern char g_hud_elements[];
 extern int D_001B1874 __attribute__((sda));
-extern void func_0028B4D8(char *);
-extern void func_0028E2A8(void);
+extern void hud_finish_element_setup(char *);
+extern void weapon_menu_update_entry(void);
 
 /* Walks the records, caps their timers, moves their positions on, and lets a
    record run its own handler. */
@@ -82,9 +83,9 @@ int func_PAL_0028E9B8(int arg)
     char *end;
     int count = 0;
 
-    func_0028E2A8();
-    rec = (char *)D_00255330;
-    end = (char *)D_00255330 + 0x750;
+    weapon_menu_update_entry();
+    rec = (char *)g_hud_elements;
+    end = (char *)g_hud_elements + 0x750;
     do {
         int v;
 
@@ -115,7 +116,7 @@ int func_PAL_0028E9B8(int arg)
 
         if (*(int *)(rec + 0x68) != 0) {
             if (*(int *)(rec + 0x6C) == -6) {
-                func_0028B4D8(rec);
+                hud_finish_element_setup(rec);
             }
         }
 

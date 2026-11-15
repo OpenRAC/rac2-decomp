@@ -21,14 +21,14 @@ extern s32 D_L12_001B1D1C SDATA(D_L12_001B1D1C);
 extern s32 D_L12_001B1D4C SDATA(D_L12_001B1D4C);
 extern s32 D_L12_001B1D50 SDATA(D_L12_001B1D50);
 extern s32 D_L12_001B1D54 SDATA(D_L12_001B1D54);
-extern void func_00283410(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern u64 func_0027C878(int);
-extern u32 func_00283D38(u32, u32, float);
+extern void euler_to_matrix(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern u32 FastTweenColor(u32, u32, float);
 
 /* Draws the beam volume as a stack of glowing panels with side walls. */
-void func_L12_0041BF88(u8 *self)
+void gfx_draw_beam_volume_panels(u8 *self)
 {
     BF88Packet packet;
     BF88Vector matrix[4], rotation[4], angle, offset;

@@ -24,8 +24,8 @@ typedef struct {
     V4_L00_0033BA68 v10;
 } Obj_L00_0033BA68;
 
-extern void *func_002B9030(s32 kind);
-extern s32 func_00283CF0(f32 value);
+extern void *part_alloc(s32 kind);
+extern s32 FloatToInt(f32 value);
 
 /* The level's pointer to the byte array the record's second flag byte indexes:
    its address differs per level, so it is a per-level symbol. */
@@ -34,9 +34,9 @@ extern int *ref_L00_0033BA68_00;
 /* Allocates the 0x46 record, copies the caller's sixteen-byte block into it and
    fills its flag bytes, its tag word and its two level-derived fields. */
 /* Creates a short glow effect at a position, with brightness scaled by the given value. */
-Obj_L00_0033BA68 *func_L00_0033BA68(char *src1, int index, f32 value)
+Obj_L00_0033BA68 *part_spawn_glow_effect(char *src1, int index, f32 value)
 {
-    Obj_L00_0033BA68 *o = (Obj_L00_0033BA68 *)AllocParticle(0x46);
+    Obj_L00_0033BA68 *o = (Obj_L00_0033BA68 *)part_alloc(0x46);
 
     if (o != 0) {
         o->v10 = *(V4_L00_0033BA68 *)src1;

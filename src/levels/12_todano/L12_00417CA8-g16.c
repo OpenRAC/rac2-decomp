@@ -36,43 +36,43 @@ typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
 extern Transform *D_L12_001B2F8C[] __attribute__((sda));
 extern Transform *D_L12_001B2F8C_gp SDATA(D_L12_001B2F8C) __attribute__((sda));
 extern u8 *D_L12_001B090C[] __attribute__((sda));
-extern V D_00189EA0 NOT_SDA;
+extern V g_hero_position NOT_SDA;
 extern LevelSaveState D_L12_0021EDF0;
 extern Collision D_L12_001C0240;
 extern u8 D_0019B4A8[];
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 g_current_map_index[] __attribute__((sda));
 extern s32 D_001A79F0_gp SDATA(D_001A79F0) __attribute__((sda));
 extern s32 D_001A7A00[] __attribute__((sda));
-extern void *D_0018C0B0 NOT_SDA;
+extern void *g_hero_moby NOT_SDA;
 extern f32 D_L12_001B1BB0 __attribute__((sda));
 extern f32 D_L12_001B1BB4 __attribute__((sda));
 extern f32 D_L12_001B1BC0 __attribute__((sda));
 extern f32 D_L12_001B1BC4 __attribute__((sda));
 extern V D_L12_001B1BD0 __attribute__((sda));
 
-extern void func_002A7750(void *, s32, s32);
-extern void func_00283098(void *, void *, void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern f32 func_00282DF0(void *);
-extern f32 func_00282C48(f32);
-extern s32 func_002761F8(void *, void *, s32, void *, void *);
-extern s32 func_002ACBC8(void *, s32);
-extern void func_002AD0E0(void *, void *, void *, void *, void *, void *);
-extern void func_00282D30(void *, void *, f32);
-extern void func_002A8C00(void *, void *, s32, void *, f32);
-extern void func_002A8E20(void *, void *);
-extern s32 func_L12_003DE4B0(void);
-extern s32 func_L00_003DE260(void);
-extern void func_L00_003DF6B0(s32, s32);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L12_00418418(void);
+extern void moby_set_state(void *, s32, s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern f32 FastVecLength(void *);
+extern f32 math_fabs(f32);
+extern s32 CollLine(void *, void *, s32, void *, void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern void FastVecScale(void *, void *, f32);
+extern void make_hit_descriptor(void *, void *, s32, void *, f32);
+extern void QueueMobyImpact(void *, void *);
+extern s32 tracked_object_is_open(void);
+extern s32 tracked_moby_is_active(void);
+extern void tracked_moby_set_state(s32, s32);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_draw_barrier_field_strips(void);
 
 /* Updates a barrier field. It checks how deep the hero has pushed into it, knocks the hero back, and counts progress when the end is reached. */
-void func_L12_00417CA8(Moby7CA8 *self)
+void barrier_field_update(Moby7CA8 *self)
 {
     V offset, direction, rotation[3], matrix[4], hit, rayStart, rayEnd, pushDir, point, normal, tmp;
     u8 impulse[0x30] __attribute__((aligned(16)));
@@ -89,17 +89,17 @@ void func_L12_00417CA8(Moby7CA8 *self)
             goto active;
         {
             /* One 3-bit count per nibble; the low bit of the id picks the nibble. */
-            s32 bits = D_0019B4A8[(index >> 1) + (gCurrentMapIndex[0] << 10)];
+            s32 bits = D_0019B4A8[(index >> 1) + (g_current_map_index[0] << 10)];
             if (rawIndex & 1) {
                 if ((bits >> 4) & 7)
                     goto active;
-                SetMobyState(self, 1, -1);
+                moby_set_state(self, 1, -1);
             } else {
                 if (bits & 7) {
 active:
-                    SetMobyState(self, 2, -1);
+                    moby_set_state(self, 2, -1);
                 } else {
-                    SetMobyState(self, 1, -1);
+                    moby_set_state(self, 1, -1);
                 }
             }
         }
@@ -143,7 +143,7 @@ active:
                 vars->depth = numerator / denominator;
             }
             if (*(s16 *)(D_L12_001C0240.hit + 0xAA) == 0xFC4 /* moby class 4036 */) {
-                TransformPointAndRotationByParent(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
+                moby_transform_point_and_rotation_by_parent(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
                 point.f.z = 0;
                 FastVecSub(&tmp, &point, &self->position);
                 point.q = tmp.q;
@@ -152,10 +152,10 @@ active:
                 FastVecScale(&pushDir, &pushDir, D_L12_001B1BC4);
             }
         }
-        qcopy(&point, &gHeroPosition);
+        qcopy(&point, &g_hero_position);
         point.f.z += D_L12_001B1BC0;
         if (IsPointInCuboid(&point, vars->transform)) {
-            FastVecSub(&offset, &gHeroPosition, &D_L12_001B2F8C[0][vars->transform].rows[3]);
+            FastVecSub(&offset, &g_hero_position, &D_L12_001B2F8C[0][vars->transform].rows[3]);
             transform_vector(&offset, &offset, matrix);
             offset.f.z = -offset.f.z / -length;
             if (offset.f.z < vars->depth - (D_L12_001B1BB0 / length) * 1.5f ||
@@ -165,7 +165,7 @@ active:
                 normal.f.z = -3;
                 FastVecSub(&normal, &normal, &pushDir);
                 make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
-                QueueMobyImpact(gHeroMoby_0018C0B0, &impulse);
+                QueueMobyImpact(g_hero_moby, &impulse);
             }
         }
         point.f.z = D_L12_001B2F8C[0][vars->transform].rows[3].f.z;
@@ -177,7 +177,7 @@ active:
                 f32 denominator = -length;
                 offset.f.z = numerator / denominator;
             }
-            if (FloatAbs(offset.f.z + 1) < 0.01f && !vars->done) {
+            if (math_fabs(offset.f.z + 1) < 0.01f && !vars->done) {
                 u16 uid;
                 vars->done = 1;
                 uid = self->uid;
@@ -206,15 +206,15 @@ active:
                     ++D_0019B4A8[tableIndex];
             }
         }
-        if (IsTrackedObjectOpen() && !IsTrackedObjectActive()) {
+        if (tracked_object_is_open() && !tracked_moby_is_active()) {
             u8 *player = D_L12_001B090C[0];
             qcopy_nc(&normal, player + 0x10);
-            if (FloatAbs(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][vars->transform].rows[3].f.z) < 2)
+            if (math_fabs(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][vars->transform].rows[3].f.z) < 2)
                 normal.f.z = D_L12_001B2F8C_gp[vars->transform].rows[3].f.z;
             if (IsPointInCuboid(&normal, vars->transform))
-                SetTrackedObjectState(1, -1);
+                tracked_moby_set_state(1, -1);
         }
-        AddDrawCallbackToList1(DrawBarrierFieldStrips, self);
+        gfx_add_draw_callback_first(gfx_draw_barrier_field_strips, self);
         break;
     }
 }

@@ -3,20 +3,20 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 
-extern int func_L02_002F1658(void);
-extern void func_00282CF0(float *, const float *, const float *);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_002ABB18(float);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern void func_002ACB48(void *, float);
-extern char *func_L08_0034A078(void *, void *, int, void *);
+extern int level_is_resident_flag_clear(void);
+extern void FastVecSub(float *, const float *, const float *);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_wrap_angle_to_pi(float);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern void vec_add_random_offset(void *, float);
+extern char *part_spawn_short_lived(void *, void *, int, void *);
 
 extern int D_L09_001B35E0[16] MACRO_ADDR;
 extern float D_L09_001B3620[16] MACRO_ADDR;
@@ -33,13 +33,13 @@ extern Vec D_L09_00256510[][6];
 extern char D_L09_001A8F20[] MACRO_ADDR;
 
 /* Updates one beam link slot: moves its two end points, draws its glow effect and fades it in and out. */
-void func_L09_003FB9F8(void *object, int slot)
+void UpdateBeamLinkStrips(void *object, int slot)
 {
     Vec delta, origin, direction, pos;
     float length, step;
     int i, alpha, first, second;
     char *effect, *payload;
-    if (!IsResidentFlagClear()) return;
+    if (!level_is_resident_flag_clear()) return;
     alpha = D_L09_00255E90[slot][0][0x23];
     FastVecSub(delta.f, D_L09_00256310[slot].f, D_L09_00255F40[slot][0].f);
     first = slot * 2;
@@ -66,8 +66,8 @@ void func_L09_003FB9F8(void *object, int slot)
         float angleStep = (360.0f / (IntToFloat(6) * 0.5f)) * 0.017453294f;
         for (i = 0; i < 6; i++) {
             float t = IntToFloat(i);
-            float y = FastSinOrCosB(t / IntToFloat(5) * 3.1415927f) * -0.09f + 0.1f;
-            y *= FastSinOrCosB(WrapAngleToPi(D_L09_001B3620[slot] + t * angleStep));
+            float y = math_fast_sin_or_cos_b(t / IntToFloat(5) * 3.1415927f) * -0.09f + 0.1f;
+            y *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L09_001B3620[slot] + t * angleStep));
             D_L09_00256510[first][i].f[1] = 0;
             D_L09_00256510[first][i].f[3] = 1;
             D_L09_00256510[first][i].f[2] = y;
@@ -77,24 +77,24 @@ void func_L09_003FB9F8(void *object, int slot)
     qcopy(&D_L09_00256410[slot], D_L09_00255E90[slot][1] + 0x10);
     for (i = 0; i < 6; i++) {
         float t = IntToFloat(i);
-        float x = WrapAngleToPi(D_L09_001B3660[slot] + t * 0.99483776f);
-        float z = WrapAngleToPi(D_L09_001B36A0[slot] + t * 0.20943999f);
-        float y = FastSinOrCosB(z) * 0.2f;
-        z = FastSinOrCosB(x);
+        float x = math_wrap_angle_to_pi(D_L09_001B3660[slot] + t * 0.99483776f);
+        float z = math_wrap_angle_to_pi(D_L09_001B36A0[slot] + t * 0.20943999f);
+        float y = math_fast_sin_or_cos_b(z) * 0.2f;
+        z = math_fast_sin_or_cos_b(x);
         {
-            float noise = RandomSignedFloatRange(0, 0.2f);
+            float noise = math_random_signed_float_range(0, 0.2f);
             (D_L09_00256510[second] + i)->f[2] = (D_L09_00256510[first][i].f[2] + y * z) + noise;
         }
-        (D_L09_00256510[second] + i)->f[1] = FastSinOrCosA(x) * 0.1f;
+        (D_L09_00256510[second] + i)->f[1] = math_fast_sin_or_cos_a(x) * 0.1f;
         (D_L09_00256510[second] + i)->f[3] = 1;
         (D_L09_00256510[second] + i)->f[0] = step * t;
     }
     /* first is reused here as the endpoint index (retail keeps both in s5). */
     for (first = 0; first < 2; first++) {
-        if (RandomIntBelow(3)) continue;
+        if (math_random_int_below(3)) continue;
         qcopy(&pos, D_L09_00255E90[slot][first] + 0x10);
-        AddRandomOffsetToVector(&pos, 0.1f);
-        effect = SpawnShortLivedParticle(&pos, D_L09_001A8F20, alpha * 127 / 100, D_L09_00255E90[slot][first]);
+        vec_add_random_offset(&pos, 0.1f);
+        effect = part_spawn_short_lived(&pos, D_L09_001A8F20, alpha * 127 / 100, D_L09_00255E90[slot][first]);
         if (effect) {
             payload = effect + 0x20;
             *(float *)(effect + 0xC) = 120000;

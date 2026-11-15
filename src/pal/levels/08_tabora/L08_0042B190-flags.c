@@ -2,14 +2,14 @@
 
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
-extern int func_00283CF0(float);
-extern void func_L08_00425398(char *);
-extern float func_L08_0032EF80(void *, int, int, int, int);
-extern void func_L01_003377C8(void *);
-extern float func_L08_00425328(void *, float, float, float);
-extern int func_L08_003D3D80(void *);
-extern void func_0026FEB8(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
+extern int FloatToInt(float);
+extern void moby_update_ground_probe(char *);
+extern float coll_point_depth_in_volumes(void *, int, int, int, int);
+extern void path_l01_compute_segment_lengths(void *);
+extern float coll_find_ground_height_floor(void *, float, float, float);
+extern int puff_spawn_linked_child(void *);
+extern void STUB_printf(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int *D_L08_001FE7C0[];
 extern char D_L08_001B1BD0[];
@@ -20,12 +20,12 @@ void func_PAL_L08_0042B190(char *a) {
     float v[4];
     char *p = *(char **)(a + 0x68);
     float f;
-    *(u8 *)(p + 0x48) = func_00283CF0(40.0f);
-    *(u8 *)(p + 0x4A) = func_00283CF0(64.0f);
+    *(u8 *)(p + 0x48) = FloatToInt(40.0f);
+    *(u8 *)(p + 0x4A) = FloatToInt(64.0f);
     *(u8 *)(p + 0x29) = 1;
     qcopy(p + 0x170, a + 0x10);
     *(float *)(p + 0x208) = *(float *)(a + 0xF8);
-    func_L08_00425398(a);
+    moby_update_ground_probe(a);
     if (*(u8 *)(a + 0x21) != 255 && **(int **)(p + 0x200) != 0x4CB2F) {
         **(int **)(p + 0x1FC) = 0;
         **(int **)(p + 0x1F8) = 0;
@@ -33,13 +33,13 @@ void func_PAL_L08_0042B190(char *a) {
     }
     *(u8 *)(p + 0x20E) = *(u8 *)(a + 0x30);
     *(Quad *)v = *(Quad *)(a + 0x10);
-    f = func_L08_0032EF80(v, *(int *)(p + 0x1D0), -1, *(int *)(p + 0x1D4), -1);
-    if (f > 0.0f) *(u8 *)(a + 0x30) = func_00283CF0(f + 2.0f);
+    f = coll_point_depth_in_volumes(v, *(int *)(p + 0x1D0), -1, *(int *)(p + 0x1D4), -1);
+    if (f > 0.0f) *(u8 *)(a + 0x30) = FloatToInt(f + 2.0f);
     *(u8 *)(p + 0x20E) = *(u8 *)(p + 0x20F) = *(u8 *)(a + 0x30);
     *(Quad *)v = *(Quad *)(a + 0x10);
-    f = func_L08_0032EF80(v, *(int *)(p + 0x1D8), *(int *)(p + 0x1E0), *(int *)(p + 0x1DC), -1);
-    if (f > 0.0f) *(u8 *)(p + 0x20E) = func_00283CF0(f + 2.0f);
-    if (*(int *)(p + 0x1E4) != -1) func_L01_003377C8(D_L08_001FE7C0[*(int *)(p + 0x1E4)]);
+    f = coll_point_depth_in_volumes(v, *(int *)(p + 0x1D8), *(int *)(p + 0x1E0), *(int *)(p + 0x1DC), -1);
+    if (f > 0.0f) *(u8 *)(p + 0x20E) = FloatToInt(f + 2.0f);
+    if (*(int *)(p + 0x1E4) != -1) path_l01_compute_segment_lengths(D_L08_001FE7C0[*(int *)(p + 0x1E4)]);
     *(u8 *)(p + 0x60) = 5;
     *(int *)(p + 0x98) = -1;
     *(u8 *)(p + 0x61) = 8;
@@ -73,20 +73,20 @@ void func_PAL_L08_0042B190(char *a) {
     qcopy(p + 0x180, a + 0x10);
     qzero_nc(p + 0x1A0);
     if (*(float *)(p + 0x1C4) == 0.0f) {
-        float height = func_L08_00425328(a + 0x10, *(float *)(a + 0x18) + 20.0f, *(float *)(p + 0x90), *(float *)(p + 0x90));
+        float height = coll_find_ground_height_floor(a + 0x10, *(float *)(a + 0x18) + 20.0f, *(float *)(p + 0x90), *(float *)(p + 0x90));
         *(float *)(p + 0x1C4) = height;
         *(float *)(p + 0x1C8) = height <= *(float *)(p + 0x178) ? height : *(float *)(p + 0x178);
     }
     if (*(float *)(p + 0x1C4) > 0.0f) *(float *)(a + 0x18) = *(float *)(p + 0x1C4) - 0.5f;
-    *(int *)(p + 0x22C) = func_L08_003D3D80(a);
+    *(int *)(p + 0x22C) = puff_spawn_linked_child(a);
     *(s16 *)(p + 0x1BE) = 0;
     if (*(u8 *)(p + 0x20C) == 1 || *(u8 *)(p + 0x20C) == 4) {
-        func_0026FEB8(D_L08_001B1BD0, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
+        STUB_printf(D_L08_001B1BD0, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
         *(u8 *)(p + 0x20C) += 1;
     }
     qcopy(p + 0x170, a + 0x10);
     *(u16 *)(a + 0x34) &= 0xEFFF;
-    func_002A7750(a, 1, -1);
+    moby_set_state(a, 1, -1);
     if (*(u8 *)(a + 0x43)) func_PAL_002A7E68(a, 0, 0, 2);
     *(int *)(a + 0x98) = 0;
     *(u8 *)(a + 0x31) = 0;

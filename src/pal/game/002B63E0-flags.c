@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad_002B5828 __attribute__((mode(TI)));
-extern void func_002B5BC0(void *, void *, float);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern int func_002B6318(void *);
-extern void func_002A7470(void *, int, int, int);
-extern int func_002B63C0(void *, void *);
-extern void func_002A90C8(void *, int, int, void *, float);
+extern void coll_find_ground_below_object(void *, void *, float);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern int coll_check_object_inside_polygon(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern int coll_is_object_well_above_ground(void *, void *);
+extern void part_start_effect_default_table(void *, int, int, void *, float);
 typedef struct {
     char pad0[0x10];
     float pos[3];                  
@@ -52,7 +53,7 @@ void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, voi
     float angle, dist, div, ratio;
     unsigned char b;
 
-    func_002B5BC0(self, ctl, 0.0f);
+    coll_find_ground_below_object(self, ctl, 0.0f);
     changed = 0;
     if (self->pos[2] < ctl->f90 - ctl->f08) {
         changed = 1;
@@ -65,7 +66,7 @@ void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, voi
         }
     }
     if (ctl->hC0 != 0) {
-        angle = func_00283248(ctl->v50[2], func_00282E20(ctl->v50));
+        angle = mat_fast_helper_a(ctl->v50[2], vec_length_xy(ctl->v50));
         if (ctl->f10 < angle) {
             changed = 1;
             ctl->flags94 |= 4;
@@ -74,7 +75,7 @@ void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, voi
     position = self->pos;
     if (changed) {
         *(Quad_002B5828 *)position = *(Quad_002B5828 *)newpos;
-        func_002B5BC0(self, ctl, 0.0f);
+        coll_find_ground_below_object(self, ctl, 0.0f);
     }
     if (self->pos[2] <= ctl->f90) {
         if (ctl->f90 <= self->pos[2] - ctl->fA8)
@@ -85,12 +86,12 @@ void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, voi
         ctl->hC0 = 0;
         ctl->hC2++;
     }
-    dist = func_00282E80(position, target);
+    dist = vec_distance_xy(position, target);
     ctl->fCC = dist;
     if (dist <= ctl->f34)
         ctl->flags94 |= 0x80;
     if (ctl->flags9C & 1) {
-        if (func_002B6318(self))
+        if (coll_check_object_inside_polygon(self))
             ctl->flags9C &= ~1;
         else
             ctl->flags94 |= 0x100;
@@ -110,17 +111,17 @@ void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, voi
         if ((ctl->flags9C & 2) && ctl->fB4 != 0.0f) {
             if (self->b43 == ctl->bE8 || self->b43 == ctl->bE9) {
                 ctl->bEA = self->b43;
-                func_002A7470(self, 0.0f < ctl->fB4 ? ctl->bE6 : ctl->bE7, 0, 8);
+                anim_start_blended(self, 0.0f < ctl->fB4 ? ctl->bE6 : ctl->bE7, 0, 8);
             }
         } else {
             if (self->b43 == ctl->bE6 || self->b43 == ctl->bE7) {
                 if (ctl->bEA != 0xFF)
-                    func_002A7470(self, ctl->bEA, 0, 8);
+                    anim_start_blended(self, ctl->bEA, 0, 8);
             }
         }
     }
     if (ctl->flags38 & 0x200) {
-        if (func_002B63C0(self, ctl))
-            func_002A90C8(self, 0, 0x10000, position, 255.0f);
+        if (coll_is_object_well_above_ground(self, ctl))
+            part_start_effect_default_table(self, 0, 0x10000, position, 255.0f);
     }
 }

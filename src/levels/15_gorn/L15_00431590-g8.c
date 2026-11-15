@@ -24,7 +24,7 @@ typedef struct {
 extern u8 *D_L15_001B1580 __attribute__((sda));
 extern s32 D_L15_001B3694 __attribute__((sda));
 extern s32 D_L15_001B3690 __attribute__((sda));
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 g_current_map_index[] __attribute__((sda));
 extern u8 *D_L15_001A904C;
 extern s32 D_L15_001B1620 __attribute__((sda)), D_L15_001B1628 __attribute__((sda));
 extern s32 D_L15_001B1630 __attribute__((sda)), D_L15_001B1638 __attribute__((sda));
@@ -34,14 +34,14 @@ extern s32 D_L15_001B2E80;
 extern Block D_L15_001B1698;
 extern char D_L15_001B16A8[] MACRO_ADDR;
 
-extern void *func_00336D50(void *, s32);
-extern void func_00300A00(void *, s32, f32, f32, f32, f32, f32);
-extern s32 func_00282948(s32 *);
-extern f32 func_00283CE0(s32);
-extern s32 func_0028E588(s32, s32);
-extern void func_0028EA58(s32, s32, s32, s32, s32, Block *);
-extern s32 func_00115DA8(char *, char *, ...);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern void *table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object_two_axes(void *, s32, f32, f32, f32, f32, f32);
+extern s32 math_fast_float_d(s32 *);
+extern f32 IntToFloat(s32);
+extern s32 GetIconFrame(s32, s32);
+extern void hud_draw_sprite_gradient(s32, s32, s32, s32, s32, Block *);
+extern s32 sprintf(char *, char *, ...);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -78,14 +78,14 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 #define HUD_SPRITE(id, color, X, Y, a, b, c)                                                        \
     {                                                                                               \
         f32 x;                                                                                      \
-        sprite = FindTableEntryById(D_L15_001A904C + 0x8710, id);                                       \
+        sprite = func_00336D50(D_L15_001A904C + 0x8710, id);                                       \
         x = (f32)(X);                                                                               \
-        DrawScaledObjectTwoAxes(sprite, color, x, (f32)label_y(sprite, (f32)(Y), D_L15_001B2E84, 0.5f, 1), a, \
+        func_00300A00(sprite, color, x, (f32)label_y(sprite, (f32)(Y), D_L15_001B2E84, 0.5f, 1), a, \
                       b, c);                                                                        \
     }
 
 /* Draws the Gorn HUD sprite pairs, including the timed pair with its countdown and fade. */
-void func_L15_00431590(s32 first, s32 timed, s32 third, s32 fourth)
+void gorn_hud_draw_sprites(s32 first, s32 timed, s32 third, s32 fourth)
 {
     HudTimerVars *vars = *(HudTimerVars **)(D_L15_001B1580 + 0x68);
     f32 fade;
@@ -94,7 +94,7 @@ void func_L15_00431590(s32 first, s32 timed, s32 third, s32 fourth)
     Block color;
 
     if (!D_L15_001B3694) {
-        D_L15_001B3690 = gCurrentMapIndex[3];
+        D_L15_001B3690 = g_current_map_index[3];
         D_L15_001B3694 = 1;
     }
     if (!D_L15_001A904C)
@@ -103,8 +103,8 @@ void func_L15_00431590(s32 first, s32 timed, s32 third, s32 fourth)
         HUD_SPRITE(0xBD, 0x60442D00, D_L15_001B1620, D_L15_001B1624, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, D_L15_001B1620, D_L15_001B1624, -1.0f, 1.0f, 0.0f);
     }
-    if (timed && D_L15_001B3690 < gCurrentMapIndex[3]) {
-        if (!FastFloatHelperD(&vars->timer)) {
+    if (timed && D_L15_001B3690 < g_current_map_index[3]) {
+        if (!math_fast_float_d(&vars->timer)) {
             if (vars->timer >= 291) {
                 fade = IntToFloat(300 - vars->timer) * 0.1f;
                 if (fade > 1.0f)
@@ -131,20 +131,20 @@ void func_L15_00431590(s32 first, s32 timed, s32 third, s32 fourth)
                 s32 x = D_L15_001B1628 - 51;
                 s32 y = screen_coord(D_L15_001B2E80, (f32)(D_L15_001B162C - 13), 1.0f);
 
-                DrawHudSpriteGradient(icon, x, y, 28, 28, &color);
+                hud_draw_sprite_gradient(icon, x, y, 28, 28, &color);
             }
-            Sprintf(text, D_L15_001B16A8, gCurrentMapIndex[3]);
+            sprintf(text, D_L15_001B16A8, g_current_map_index[3]);
             {
                 s32 textX = D_L15_001B1628 + 5;
 
-                DrawTextMediumFont(textX, label_y((void *)textX, (f32)(D_L15_001B162C + 2), D_L15_001B2E84, 0.5f, 1),
+                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L15_001B162C + 2), D_L15_001B2E84, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;
         } else {
             s32 reset = 300;
 
-            D_L15_001B3690 = gCurrentMapIndex[3];
+            D_L15_001B3690 = g_current_map_index[3];
             vars->timer = reset;
         }
     }

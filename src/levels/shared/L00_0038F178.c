@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_002A77E0(int mode);
+extern int math_random_int_below(int mode);
 
-extern float func_002A90F8(char *object, char *local);
+extern float coll_get_ground_height_at_position(char *object, char *local);
 
 extern void func_00282D30_7(char *local, int value, float scale);
 
 extern float func_002A7878_1(float low, float high);
 
-extern void func_002BF728(char *object, char *local, float amount, float base);
+extern void part_spawn_bubble(char *object, char *local, float amount, float base);
 
 extern char *func_0029EFD0_1(int);
 
@@ -26,7 +26,7 @@ typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext {
     unsigned int active_24;
 } Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext;
 
-extern void func_002FDBD8(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
+extern void part_draw_spinning_billboard_pair(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
                                     float *vector, int mode);
 
 extern void func_002FDBD8_1(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
@@ -40,23 +40,23 @@ extern int D_18C0B4;
 
 extern int D_L00_001B9080;
 
-extern void func_002A7470(char *object, int mode, int a2, int a3);
+extern void anim_start_blended(char *object, int mode, int a2, int a3);
 
-extern void func_002FEE50(int value);
+extern void table_clear_entry_flag(int value);
 
-extern void func_00282C88(char *quad);
+extern void vec_clear_128(char *quad);
 
 extern void func_002A10E8(char *object);
 
 extern void func_002A0F48(char *object);
 
-extern void func_L00_004283C8(int value);
+extern void cam_pick_state_from_hero_turn(int value);
 
-extern void func_L00_002C42E0(int a, int b);
+extern void hero_l00_set_action(int a, int b);
 
-extern void func_L00_002F4720(void);
+extern void level_clear_second_table_entry(void);
 
-extern void func_L00_00390F28(char *object, int mode);
+extern void level_restore_lighting(char *object, int mode);
 
 /* Level state saved by func_L00_00390E10 and restored by func_L00_00390F28. */
 typedef struct {
@@ -83,7 +83,7 @@ extern float D_L00_001B2408 __attribute__((section(".sdata")));
 extern int D_L00_001B1EB4 __attribute__((section(".sdata")));
 extern int D_L00_001B20C0 __attribute__((section(".sdata")));
 extern int D_L00_001B255C __attribute__((section(".sdata")));
-extern void func_00284E18(int, int, int);
+extern void SetBackgroundColor(int, int, int);
 
 typedef unsigned char u8;
 
@@ -98,7 +98,7 @@ typedef struct {
     f32 field2C;
 } NativeUpdate775View;
 
-extern void func_0029F338(NativeUpdate775View *object);
+extern void moby_mark_spawned(NativeUpdate775View *object);
 
 typedef struct {
     char prefix[0x760];
@@ -114,95 +114,95 @@ typedef struct {
     char pad22BD[0x277];
     int cooldown;
 } LaunchHero;
-extern LaunchHero D_00189E20;
+extern LaunchHero g_hero_state;
 extern unsigned int D_00138320;
-extern void func_0029FCC0(char *, int, char *);
+extern void moby_transform_joint_to_world(char *, int, char *);
 /* Interleaved declarations preserve the EE ABI's independent GPR and FP argument order. */
-extern void func_002FDF40(void *, void *, void *, float, float, float, float, void *);
-extern int func_002FE5A0(void *, void *, void *, void *, void *, int, int, float);
-extern int func_00282948(int *), func_L00_002D3F30(int, int);
-extern void func_L00_002AF7D0(void), func_L00_002AF568(void);
-extern int func_002E5CF8(int, int, char *);
-extern char *func_L00_00398810(char *, char *);
+extern void CalculateAimedLaunchVelocity(void *, void *, void *, float, float, float, float, void *);
+extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void *, int, int, float);
+extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
+extern void cancel_hero_item_animation(void), start_equipped_item_animation(void);
+extern int PlayMobySound(int, int, char *);
+extern char *decoy_create_projectile(char *, char *);
 extern void ref_L00_0039D110_00(void *, void *);
-extern void func_L00_0039D340(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *);
+extern void decoy_glove_draw_projectile(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *);
 
 typedef struct { float value[3]; } QuerySettings;
 extern QuerySettings D_L00_001AF410;
 typedef struct { char prefix[0x1A0]; unsigned int held, pressed; } LaunchInput;
-extern LaunchInput D_00138180;
-extern char *func_002AF580(void *, void *, int *, void *, int, int, float, float, float, float, float, int, void *);
-extern char *func_L00_0038D530(char *, char *);
+extern LaunchInput g_pad_state;
+extern char *SelectBestTargetInCone(void *, void *, int *, void *, int, int, float, float, float, float, float, int, void *);
+extern char *part_l00_spawn_spinning_debris(char *, char *);
 extern void ref_L00_00397E60_00(void *, void *);
-extern void func_L00_00398118(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *);
+extern void bomb_glove_draw_projectile(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *);
 
 /* func_L00_0038F178 is defined in L00_0038F178-effects.c. */
 
 /* Family 6eb4f363e5305bed: seed body at func_L00_00387408. */
 /* Spawns a small puff of sparks at the object, unless the random check says to skip it. */
-void func_L00_0038F3D8(char *object)
+void part_spawn_spark_puff(char *object)
 {
     char local[16];
     float base;
     int value = *(int *)(object + 104);
 
-    if (RandomIntBelow(5))
+    if (math_random_int_below(5))
         return;
-    base = GetGroundHeightAtPosition(object + 16, local);
+    base = coll_get_ground_height_at_position(object + 16, local);
     func_00282D30_7(local, value, 0.25f);
-    SpawnBubbleParticle(object + 16, local, func_002A7878_1(0.05f, 0.1f) * 210000.0f, base);
+    part_spawn_bubble(object + 16, local, func_002A7878_1(0.05f, 0.1f) * 210000.0f, base);
 }
 
 typedef union { TI128 quad; float f[4]; } ParticleUpdateVector;
 typedef struct { int color[4]; } ParticleUpdateColors;
 extern ParticleUpdateColors D_L00_001AF010;
-extern float func_002A7878(float, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002AAFA0(int, int);
-extern void func_002BAE50(void *, void *, int, int, int, int, int, int);
-extern float func_00283B98(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_003253A0(void *, void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00282978(short *);
+extern float math_random_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int gfx_swap_packed_color_channels(int, int);
+extern void part_spawn_scaling(void *, void *, int, int, int, int, int, int);
+extern float FastAddRotations(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_mix_on_inner_data(void *, void *, void *, float);
+extern float IntToFloat(int);
+extern int FastDecTimer(short *);
 
 /* Per-frame update of a drifting spark particle: sheds colored sparks, slows down, and removes itself when it fades or leaves the map. */
-void func_L00_0038F5F0(char *object)
+void spark_particle_update(char *object)
 {
     ParticleUpdateColors colors;
     ParticleUpdateVector direction, random;
     char *state = *(char **)(object + 0x68);
     int enabled = 1;
     if (*(int *)(state + 0x20) != 0)
-        if (RandomIntBelow(2))
+        if (math_random_int_below(2))
             enabled = 0;
     if ((*(unsigned char *)(object + 0xBC) & 1) && enabled) {
         int color;
         colors = D_L00_001AF010;
         random.quad = 0;
-        random.f[0] = RandomFloatRange(-1.0f, 1.0f);
-        random.f[1] = RandomFloatRange(-1.0f, 1.0f);
-        random.f[2] = RandomFloatRange(-1.0f, 1.0f);
+        random.f[0] = math_random_float_range(-1.0f, 1.0f);
+        random.f[1] = math_random_float_range(-1.0f, 1.0f);
+        random.f[2] = math_random_float_range(-1.0f, 1.0f);
         direction.quad = random.quad;
         vec_scale_to_length(&direction, &direction, 1.0f / 60.0f);
         if (*(unsigned char *)(object + 0xBC) & 0xFE) {
-            color = SwapPackedColorChannels(colors.color[RandomIntBelow(4)],
+            color = gfx_swap_packed_color_channels(colors.color[math_random_int_below(4)],
                                 *(unsigned char *)(object + 0xBC) >> 1);
-            SpawnScalingParticle(object + 0x10, &direction, color,
-                         SwapPackedColorChannels(0x4FFF, *(unsigned char *)(object + 0xBC) >> 1),
+            part_spawn_scaling(object + 0x10, &direction, color,
+                         gfx_swap_packed_color_channels(0x4FFF, *(unsigned char *)(object + 0xBC) >> 1),
                          45, 50, 120, 1);
         } else {
-            SpawnScalingParticle(object + 0x10, &direction, colors.color[RandomIntBelow(4)],
+            part_spawn_scaling(object + 0x10, &direction, colors.color[math_random_int_below(4)],
                          0x4FFF, 45, 50, 120, 1);
         }
     }
     *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), *(float *)(state + 0x10));
     *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), *(float *)(state + 0x14));
     FastVecAdd(object + 0x10, object + 0x10, state);
-    MixOnInnerData(object, state, state, 0.0040555559f);
+    moby_mix_on_inner_data(object, state, state, 0.0040555559f);
     if (*(float *)(object + 0x10) < 0.0f || *(float *)(object + 0x14) < 0.0f ||
         *(float *)(object + 0x18) < 0.0f) {
-        MarkMobySpawned((NativeUpdate775View *)object);
+        moby_mark_spawned((NativeUpdate775View *)object);
         return;
     }
     if (*(short *)(state + 0x18) < *(short *)(state + 0x1A) / 4) {
@@ -211,7 +211,7 @@ void func_L00_0038F5F0(char *object)
                                   IntToFloat(*(short *)(state + 0x1A) / 4);
     }
     if (FastDecTimer((short *)(state + 0x18)))
-        MarkMobySpawned((NativeUpdate775View *)object);
+        moby_mark_spawned((NativeUpdate775View *)object);
 }
 
 /* func_L00_0038F8B8 is defined in L00_0038F8B8.c. */
@@ -220,7 +220,7 @@ void func_L00_0038F5F0(char *object)
 
 
 /* Calls a callee with the constant 167 and, when it returns a non-zero object, stores the argument pointer at +4 of the object held at +104, clears the words at +0, +8 and +12 of that object, sets byte +48 to 255, the halfword at +50 to 126 and bytes +49 and +32 to 0, then returns the object. */
-char *func_L00_00390938(char *owner)
+char *tether_create_holder(char *owner)
 {
     char *object = func_0029EFD0_1(167 /* moby class 167 */);
     int *vars;
@@ -240,7 +240,7 @@ char *func_L00_00390938(char *owner)
 }
 
 /* Saves the current lighting and fog settings into the object, then switches the level to a dim, close-range look. */
-void func_L00_00390E10(char *object)
+void level_save_and_dim_lighting(char *object)
 {
     LevelSavedState_390E10 *st = *(LevelSavedState_390E10 **)(object + 0x68);
     float f30 = D_L00_001B1984;
@@ -276,7 +276,7 @@ void func_L00_00390E10(char *object)
 /* Releases the second argument's object: clears a word of the sub-object at +0x68, clears
  * two globals, hands its +0x14 word over before clearing it, then runs five helpers and the
  * first argument through one more. */
-void func_L00_00391310(char *actor, char *tether)
+void tether_release(char *actor, char *tether)
 {
     char *tetherRef = tether;
     char *actorRef = actor;
@@ -286,13 +286,13 @@ void func_L00_00391310(char *actor, char *tether)
     if (vars != 0)
         vars[1] = 0;
     D_18C0A0 = 0;
-    PickCameraStateFromHeroTurn(*(int *)(tetherRef + 0x14));
+    cam_pick_state_from_hero_turn(*(int *)(tetherRef + 0x14));
     *(int *)(tetherRef + 0x14) = 0;
-    SetHeroAction_L00(0, 1);
-    RestoreLevelLighting(actorRef, 1);
-    ClearSecondLevelTableEntry();
-    ClearEntryFlag(*(int *)(tetherRef + 0x4C));
-    MarkMobySpawned((NativeUpdate775View *)actorRef);
+    hero_l00_set_action(0, 1);
+    level_restore_lighting(actorRef, 1);
+    level_clear_second_table_entry();
+    table_clear_entry_flag(*(int *)(tetherRef + 0x4C));
+    moby_mark_spawned((NativeUpdate775View *)actorRef);
     D_L00_001B9080 = 0;
 }
 
@@ -317,7 +317,7 @@ extern float func_2EF0F8(float value, float amount);
 
 extern void func_312D18(char *object);
 
-void func_L00_003952E0(char *object)
+void tether_fin_piece_update(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     char *other = *(char **)(vars + 8);
@@ -363,7 +363,7 @@ void func_L00_003952E0(char *object)
 /* Builds the object for type 0xB3 and, when the constructor returns one, fills its fields,
  * clears a quad at +0xF0, records the argument in the sub-object at +0x68 and copies three
  * quads from the argument before running two helpers. Returns the object. */
-char *func_L00_00395240(char *source)
+char *tether_create_fin_piece(char *source)
 {
     char *p = source;
     char *object = func_0029EFD0_1(0xB3 /* moby class 179 */);
@@ -377,7 +377,7 @@ char *func_L00_00395240(char *source)
         *(unsigned char *)(object + 0x23) = 0x50;
         *(char *)(object + 0x20) = 0;
         vars[2] = (int)p;
-        ClearVector128(object + 0xF0);
+        vec_clear_128(object + 0xF0);
         *(TI128 *)(object + 0xC0) = *(TI128 *)(p + 0xC0);
         *(TI128 *)(object + 0xD0) = *(TI128 *)(p + 0xD0);
         *(TI128 *)(object + 0xE0) = *(TI128 *)(p + 0xE0);
@@ -398,7 +398,7 @@ char *func_L00_00395240(char *source)
 
 /* Selects an aim target before advancing the projectile launcher state. */
 /* Per-frame update of the Bomb Glove moby. */
-void func_L00_00397E60(char *actor)
+void UpdateAimedProjectileLauncher(char *actor)
 {
     char *state = *(char **)(actor + 0x68);
     char position[16];
@@ -407,52 +407,52 @@ void func_L00_00397E60(char *actor)
     int foundCount;
     char *target;
     int ready;
-    TransformMobyJointToWorld(actor, 0, position);
+    moby_transform_joint_to_world(actor, 0, position);
     settings = D_L00_001AF410;
-    target = SelectBestTargetInCone(actor + 0x10, gHeroState.aimAxis, &foundCount, 0, 0, 0,
+    target = SelectBestTargetInCone(actor + 0x10, g_hero_state.aimAxis, &foundCount, 0, 0, 0,
                           0.3926991f, 0.7853982f, 11.1f, 0.0f, 0.0f, 0, &settings);
-    CalculateAimedLaunchVelocity(direction, position, target, 1.5f, gHeroState.level == 29 ? 11.0f : 10.0f, 0.16666667f, 0.003055555745959282f, 0);
+    CalculateAimedLaunchVelocity(direction, position, target, 1.5f, g_hero_state.level == 29 ? 11.0f : 10.0f, 0.16666667f, 0.003055555745959282f, 0);
     ready = 1;
-    *(int *)(state + 0x24) = TraceProjectileToImpact(position, direction, state, state + 0x10, actor, 0, 0, 0.003055555745959282f);
-    if (gHeroState.level == 29) {
-        if (!FastFloatHelperD(&gHeroState.cooldown)) ready = 0;
+    *(int *)(state + 0x24) = coll_trace_projectile_to_impact(position, direction, state, state + 0x10, actor, 0, 0, 0.003055555745959282f);
+    if (g_hero_state.level == 29) {
+        if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0;
     }
-    else gHeroState.cooldown = 40;
+    else g_hero_state.cooldown = 40;
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
         *(unsigned char *)(actor + 0x20) = 1;
         *(int *)(state + 0x24) = 0;
     case 1:
-        if ((gPadState.held & gHeroState.buttons) == 0 || gHeroState.busy || gHeroState.resource < 23 || !ready) break;
-        if (SpendWeaponAmmo(-1, 1)) {
+        if ((g_pad_state.held & g_hero_state.buttons) == 0 || g_hero_state.busy || g_hero_state.resource < 23 || !ready) break;
+        if (weapon_spend_ammo(-1, 1)) {
             start_equipped_item_animation();
             *(unsigned char *)(actor + 0x20) = 2;
             *(int *)(state + 0x20) = 20;
             break;
         }
-        if (gPadState.pressed & gHeroState.buttons) PlayMobySound(2, 0, actor);
+        if (g_pad_state.pressed & g_hero_state.buttons) PlayMobySound(2, 0, actor);
         break;
     case 2:
-        if (!FastFloatHelperD((int *)(state + 0x20))) break;
-        *(char **)(SpawnSpinningDebris(position, direction) + 0xB8) = actor;
+        if (!math_fast_float_d((int *)(state + 0x20))) break;
+        *(char **)(part_l00_spawn_spinning_debris(position, direction) + 0xB8) = actor;
         cancel_hero_item_animation();
         *(unsigned char *)(actor + 0x20) = 3;
         *(int *)(state + 0x20) = 10;
         break;
     case 3:
-        if (FastFloatHelperD((int *)(state + 0x20))) *(unsigned char *)(actor + 0x20) = 1;
+        if (math_fast_float_d((int *)(state + 0x20))) *(unsigned char *)(actor + 0x20) = 1;
         break;
     }
-    ref_L00_00397E60_00(DrawBombGloveProjectile, actor);
+    ref_L00_00397E60_00(bomb_glove_draw_projectile, actor);
 }
 
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_L00_00398118(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void bomb_glove_draw_projectile(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
-        DrawSpinningBillboardPair(1.0f, context, context->vector_10, 0);
+        part_draw_spinning_billboard_pair(1.0f, context, context->vector_10, 0);
     }
 }
 
@@ -464,26 +464,26 @@ void func_L00_00398118(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 /* Aims and launches the actor's projectile in response to the shared input gate. */
 /* Per-frame update of the Decoy Glove moby. */
-void func_L00_0039D110(char *actor)
+void UpdateProjectileLauncher(char *actor)
 {
     char *state = *(char **)(actor + 0x68);
     char position[16], direction[16];
     int ready;
-    TransformMobyJointToWorld(actor, 0, position);
-    CalculateAimedLaunchVelocity(direction, position, 0, 1.5f, gHeroState.level == 29 ? 11.0f : 5.0f, 0.16666667f, 0.003055555745959282f, 0);
+    moby_transform_joint_to_world(actor, 0, position);
+    CalculateAimedLaunchVelocity(direction, position, 0, 1.5f, g_hero_state.level == 29 ? 11.0f : 5.0f, 0.16666667f, 0.003055555745959282f, 0);
     ready = 1;
-    *(int *)(state + 0x24) = TraceProjectileToImpact(position, direction, state, state + 0x10, actor, 0, 0, 0.003055555745959282f);
-    if (gHeroState.level == 29) {
-        if (!FastFloatHelperD(&gHeroState.cooldown)) ready = 0;
+    *(int *)(state + 0x24) = coll_trace_projectile_to_impact(position, direction, state, state + 0x10, actor, 0, 0, 0.003055555745959282f);
+    if (g_hero_state.level == 29) {
+        if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0;
     }
-    else gHeroState.cooldown = 40;
+    else g_hero_state.cooldown = 40;
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
         *(unsigned char *)(actor + 0x20) = 1;
         *(int *)(state + 0x24) = 0;
     case 1:
-        if ((D_00138320 & gHeroState.buttons) == 0 || gHeroState.busy || gHeroState.resource < 9 || !ready) break;
-        if (SpendWeaponAmmo(-1, 1)) {
+        if ((D_00138320 & g_hero_state.buttons) == 0 || g_hero_state.busy || g_hero_state.resource < 9 || !ready) break;
+        if (weapon_spend_ammo(-1, 1)) {
             start_equipped_item_animation();
             *(unsigned char *)(actor + 0x20) = 2;
             *(int *)(state + 0x20) = 20;
@@ -492,21 +492,21 @@ void func_L00_0039D110(char *actor)
         PlayMobySound(2, 0, actor);
         break;
     case 2:
-        if (!FastFloatHelperD((int *)(state + 0x20))) break;
-        *(char **)(CreateDecoyProjectile(position, direction) + 0xB8) = actor;
+        if (!math_fast_float_d((int *)(state + 0x20))) break;
+        *(char **)(decoy_create_projectile(position, direction) + 0xB8) = actor;
         cancel_hero_item_animation();
         *(unsigned char *)(actor + 0x20) = 3;
         *(int *)(state + 0x20) = 10;
         break;
     case 3:
-        if (FastFloatHelperD((int *)(state + 0x20))) *(unsigned char *)(actor + 0x20) = 1;
+        if (math_fast_float_d((int *)(state + 0x20))) *(unsigned char *)(actor + 0x20) = 1;
         break;
     }
-    ref_L00_0039D110_00(DrawDecoyGloveProjectile, actor);
+    ref_L00_0039D110_00(decoy_glove_draw_projectile, actor);
 }
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_L00_0039D340(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void decoy_glove_draw_projectile(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -517,23 +517,23 @@ void func_L00_0039D340(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 /* The mode word at 0x18C0B4 must be 8 and the object's byte 0x43 must not be 6; the
  * helper then takes the object with mode 6, zero and ten. */
 /* Per-frame update of the Helipack moby: keeps the hero in the flying pose. */
-void func_L00_0039D378(char *object)
+void helipack_update(char *object)
 {
     if (D_18C0B4 == 8) {
         if (*(unsigned char *)(object + 0x43) != 6)
-            StartAnimationBlended(object, 6, 0, 10);
+            anim_start_blended(object, 6, 0, 10);
     }
 }
 
 /* func_L00_0039E158 is defined in L00_0038F178-rail.c. */
 
 /* multiply binary32 field2C by exact1.025f then subtract3 modulo256 from byte23; call original pointer helper if updated byte below4; no original semantic field names recovered */
-void func_L00_0039E5B0(NativeUpdate775View *object)
+void part_update_fading_shrinking(NativeUpdate775View *object)
 {
     object->field2C *= 1.025f;
     object->field23 -= 3;
     if (object->field23 < 4)
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
 }
 
 /* func_L00_0039E600 is defined in L00_0039E600.c. */

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct {
@@ -21,7 +22,7 @@ extern Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags ref_L00_00327858_01(vo
 extern Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags ref_L00_00327858_00(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context);
 
 /* Runs the stored action for an object depending on its kind, and switches the action off when it reports it is done. */
-Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags func_002B1C20(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context)
+Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags moby_dispatch_action_by_kind(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context)
 {
     Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags result = 0;
     if (context->enabled == 1 && context->count != 0)

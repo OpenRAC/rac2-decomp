@@ -11,21 +11,21 @@ extern unsigned int *D_001A7480 __attribute__((sda));
 extern unsigned int D_001A7484 __attribute__((sda));
 extern unsigned int D_001A74F8 __attribute__((sda));
 
-extern void func_0011AEA0(int);
-extern int func_0011D810(void *);
-extern void func_00115D48(char *);
+extern void FlushCache(int);
+extern int sif_rpc_is_handle_valid(void *);
+extern void printf(char *);
 
 extern char D_0013BFA0[];
 extern char D_001A7040[] __attribute__((sda));
 
 /* Checks whether the sound server has finished the last request. Returns 1 when it is done and 0 when it is still busy. */
-int func_00132220(void) {
+int snd_poll_rpc_done(void) {
     unsigned int *p;
 
     FlushCache(0);
     if (D_001A7480 == 0)
         return 1;
-    if (IsRpcHandleValid(D_001A7040) != 0)
+    if (sif_rpc_is_handle_valid(D_001A7040) != 0)
         return 0;
     p = D_001A7480;
     if (p[0] == 0xFFFFFFFFu && p[1 + D_001A7484] == p[0]) {
@@ -33,6 +33,6 @@ int func_00132220(void) {
         return 1;
     }
     if (D_001A74F8 == 0)
-        Printf(D_0013BFA0);
+        printf(D_0013BFA0);
     return 0;
 }

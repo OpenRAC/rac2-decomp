@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -45,7 +46,7 @@ extern void ref_L11_0043A810_13(void *, void *);
 extern void ref_L11_0043A810_14(s32, void *, f32);
 
 /* Turns the drone's head to aim at the hero, with a small left-right sway while it fires. */
-void func_L11_0043A810(void *moby) {
+void drone_aim_head_at_hero(void *moby) {
     Fr fr;
     s8 *vars;
     s8 *aimTarget;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned char u8;
@@ -12,7 +13,7 @@ typedef struct {
 
 /* caches the table slot the moby's vars selects, then clears the flag at the head of its
    sub-moby */
-void func_L04_003A1578(u8 *moby, Entry *entries, s32 *table)
+void water_select_table_slot(u8 *moby, Entry *entries, s32 *table)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 

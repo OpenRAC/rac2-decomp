@@ -2,25 +2,25 @@
 /* A unit of its own for -frac2-keep-block-order (config/cflags.txt): retail keeps the
    frame-15 joint call behind the frame-5 one, reached by a jump. */
 
-extern int func_L01_00321178(char *, float *);
-extern float func_0029F530(char *);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
+extern int moby_l01_turn_toward_target(char *, float *);
+extern float moby_get_anim_value(char *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
 extern float D_L11_002B6B60[];
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283248(float, float);
-extern int func_002B5278(char *, float);
-extern void func_0029FCC0(char *, int, float *);
-extern void func_002A7A00(float *, float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern char *func_002BDCE8(float *, float, float, float, int, float *, float, int, int);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern float mat_fast_helper_a(float, float);
+extern int moby_step_at_own_position_factor(char *, float);
+extern void moby_transform_joint_to_world(char *, int, float *);
+extern void vec_random_direction(float *, float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern char *SpawnSpinningSparkParticle(float *, float, float, float, int, float *, float, int, int);
 
 /* Steps along the vector at +0xC0, weighted by the walk table at the animation frame, and
    turns toward the target; on frames 5 and 15 it scatters ten dust particles at a joint
    (3, then 2). A state change hands over to the shared handler instead. */
-void func_L11_00432628(char *obj, float *target)
+void joba_walk_and_scatter_dust(char *obj, float *target)
 {
     float offset[4], origin[4], half[4], velocity[4], pos[4];
     float frame, frameStart, scale;
@@ -29,33 +29,33 @@ void func_L11_00432628(char *obj, float *target)
     char *particle, *data;
 
     if (*(unsigned char *)(obj + 0x42) != *(unsigned char *)(obj + 0x43)) {
-        TurnMobyTowardTarget(obj, target);
+        moby_l01_turn_toward_target(obj, target);
         return;
     }
-    frame = GetMobyAnimationValue(obj);
+    frame = moby_get_anim_value(obj);
     index = FloatToInt(frame);
     next = index + 1;
     frameStart = IntToFloat(index);
     FastVecScale((char *)offset, obj + 0xC0, D_L11_002B6B60[index] + (D_L11_002B6B60[next] - D_L11_002B6B60[index]) * (frame - frameStart));
     FastVecAdd(obj + 0x10, (char *)offset, obj + 0x10);
-    StepMovementAtOwnPositionWithFactor(obj, FastMatrixHelperA(target[0] - *(float *)(obj + 0x10), target[1] - *(float *)(obj + 0x14)));
+    moby_step_at_own_position_factor(obj, mat_fast_helper_a(target[0] - *(float *)(obj + 0x10), target[1] - *(float *)(obj + 0x14)));
     if (index == 5 || index == 15) {
         if (index == 5) {
-            TransformMobyJointToWorld(obj, 3, origin);
+            moby_transform_joint_to_world(obj, 3, origin);
         } else {
-            TransformMobyJointToWorld(obj, 2, origin);
+            moby_transform_joint_to_world(obj, 2, origin);
         }
         FastVecScale((char *)half, obj + 0xC0, 0.5f);
         FastVecAdd((char *)origin, (char *)origin, (char *)half);
         origin[2] -= 0.2f;
         lifetime = 60;
         for (i = 9; i >= 0; i--) {
-            RandomDirectionVector(velocity, 0.005000000353902578f, 0.050000004f);
-            type = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
-            scale = RandomFloatRange(0.3f, 1.0f) * 210000.0f;
-            pos[0] = origin[0] + RandomSignedFloatRange(0, 0.3f);
-            pos[1] = origin[1] + RandomSignedFloatRange(0, 0.3f);
-            pos[2] = origin[2] + RandomSignedFloatRange(0, 0.3f);
+            vec_random_direction(velocity, 0.005000000353902578f, 0.050000004f);
+            type = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
+            scale = math_random_float_range(0.3f, 1.0f) * 210000.0f;
+            pos[0] = origin[0] + math_random_signed_float_range(0, 0.3f);
+            pos[1] = origin[1] + math_random_signed_float_range(0, 0.3f);
+            pos[2] = origin[2] + math_random_signed_float_range(0, 0.3f);
             particle = SpawnSpinningSparkParticle(pos, 0, 1.0f, 1.01f, type, velocity, scale, 0x406080, 0);
             if (particle != 0) {
                 *(short *)(particle + 0xA) = lifetime;

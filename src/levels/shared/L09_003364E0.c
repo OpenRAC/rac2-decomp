@@ -22,17 +22,17 @@ typedef struct {
 } __attribute__((aligned(16))) ParticleSlot;
 
 extern u8 *D_L09_001FF65C;
-extern void *func_002B9030(int);
-extern int func_00283CF0(float);
-extern void func_0029FCC0(char *, int, char *);
+extern void *part_alloc(int);
+extern int FloatToInt(float);
+extern void moby_transform_joint_to_world(char *, int, char *);
 
 /* Integer arguments stay object, index, value, parameter ($a0-$a3) and float arguments
    first_scale, second_scale ($f12-$f13); only the interleaving of the two banks is chosen. */
 /* Creates one particle slot at the object (or at one of its points) with a size and fade, and returns it. */
-char *func_L09_003364E0(char *object, int index, float first_scale, u32 value,
+char *part_spawn_sized(char *object, int index, float first_scale, u32 value,
                         float second_scale, int parameter)
 {
-    ParticleSlot *slot = AllocParticle(0x37);
+    ParticleSlot *slot = part_alloc(0x37);
     float *position;
 
     if (slot != 0) {
@@ -44,7 +44,7 @@ char *func_L09_003364E0(char *object, int index, float first_scale, u32 value,
         slot->header.bytes[2] = D_L09_001FF65C[0];
         if (index > 0) {
             position = slot->position;
-            TransformMobyJointToWorld(object, index, (char *)position);
+            moby_transform_joint_to_world(object, index, (char *)position);
         } else {
             qcopy(slot->position, object + 0x10);
         }

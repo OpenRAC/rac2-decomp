@@ -4,12 +4,12 @@
 /* A body whose retail bytes address its global through $gp in ordinary flow: the assembler
    only selects that form when the back end emits the .extern size directive, which the
    pinned profile does at -G8 (see docs/build/compiler-notes.md). */
-extern unsigned char *func_0029EFD0(int size);
+extern unsigned char *CreateMoby(int size);
 
 extern unsigned char *D_L00_001B0A20 __attribute__((sda));
 
 /* Creates the health drain slots object and remembers it in a level global. */
-unsigned char *func_L00_003F8DC8(int unused)
+unsigned char *health_drain_slots_create(int unused)
 {
     unsigned char *moby = CreateMoby(0xD04 /* moby class 3332 */);
 
@@ -32,16 +32,16 @@ extern float D_L00_001B096C __attribute__((sda));
 
 extern float D_L00_001B0970 __attribute__((sda));
 
-extern char *func_L00_0032A088(int a0, int a1);
+extern char *level_get_slot_body(int a0, int a1);
 
-extern float func_00283B98(float a0, float a1);
+extern float FastAddRotations(float a0, float a1);
 
-extern void func_L00_003F5870(char *rec, int index);
+extern void vaporizer_set_chain_joint_offset(char *rec, int index);
 
-extern int func_00282978(char *a0);
+extern int FastDecTimer(char *a0);
 
 /* Updates the Vaporizer joint chain each frame: it fires each joint, eases a shared offset back toward zero, and returns 1 when the chain timer has run out. */
-int func_L00_003F59F0(char *moby)
+int vaporizer_update_joint_chain(char *moby)
 {
     char *state;
     char *table;
@@ -53,7 +53,7 @@ int func_L00_003F59F0(char *moby)
     float value;
 
     state = *(char **)(moby + 0x68);
-    table = GetSlotBody(0xC04 /* Vaporizer */, *(short *)(state + 0x1A));
+    table = level_get_slot_body(0xC04 /* Vaporizer */, *(short *)(state + 0x1A));
     index = *(short *)(state + 0x18);
     base = *(char **)(table + index * 4);
     count = *(short *)(state + 0x20);
@@ -61,7 +61,7 @@ int func_L00_003F59F0(char *moby)
         rec = base;
         do {
             *(float *)(rec + 0x20) = FastAddRotations(*(float *)(rec + 0x20), *(float *)(rec + 0x28));
-            SetChainJointOffset(base, i);
+            vaporizer_set_chain_joint_offset(base, i);
             rec += 0x30;
             i++;
         } while (i < count);
@@ -104,16 +104,16 @@ extern float D_L00_001B088C __attribute__((sda));
 extern Vector D_L00_0029AF40[];
 extern short D_L00_0029B440[][4][2];
 extern float D_L00_0029B840[][2];
-extern long long func_0027C878(int id);
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00280B90(void *packet, void *frame, int mode);
+extern long long GetEffectTextureDescriptor(int id);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void draw_world_quad(void *packet, void *frame, int mode);
 
 /* Draws a ball made of 64 textured quads around the object, a larger and flatter version than the next function. */
-void func_L00_003EFA98(char *object)
+void gfx_draw_quad_sphere_large(char *object)
 {
     RenderPacket packet;
     Vector matrix[3];
@@ -136,9 +136,9 @@ void func_L00_003EFA98(char *object)
     packet.flags = flags;
     packet.f70 = 0;
     quarter = 0.25f;
-    ClearVector128(&matrix[0]);
-    ClearVector128(&matrix[1]);
-    ClearVector128(&matrix[2]);
+    vec_clear_128(&matrix[0]);
+    vec_clear_128(&matrix[1]);
+    vec_clear_128(&matrix[2]);
     matrix[0].v[0] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * quarter;
@@ -147,7 +147,7 @@ void func_L00_003EFA98(char *object)
     packet.color[2] = color;
     packet.color[1] = color;
     packet.color[0] = color;
-    ComputeViewDirection(object + 0x10, (char *)&offset, 1);
+    cam_compute_view_direction(object + 0x10, (char *)&offset, 1);
     FastVecScale(&offset, &offset, quarter);
     u_base = &packet.uv[0][0];
     v_base = &packet.uv[0][1];
@@ -170,7 +170,7 @@ void func_L00_003EFA98(char *object)
 }
 
 /* Draws a ball made of 64 textured quads around the object, a smaller version of the previous function. */
-void func_L00_003EFD00(char *object)
+void gfx_draw_quad_sphere_small(char *object)
 {
     RenderPacket packet;
     Vector matrix[3];
@@ -191,9 +191,9 @@ void func_L00_003EFD00(char *object)
     packet.f80 = 0xFF9000000260L;
     packet.flags = flags;
     packet.f70 = 0;
-    ClearVector128(&matrix[0]);
-    ClearVector128(&matrix[1]);
-    ClearVector128(&matrix[2]);
+    vec_clear_128(&matrix[0]);
+    vec_clear_128(&matrix[1]);
+    vec_clear_128(&matrix[2]);
     matrix[0].v[0] = *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * 0.125f;
@@ -202,7 +202,7 @@ void func_L00_003EFD00(char *object)
     packet.color[2] = color;
     packet.color[1] = color;
     packet.color[0] = color;
-    ComputeViewDirection(object + 0x10, (char *)&offset, 1);
+    cam_compute_view_direction(object + 0x10, (char *)&offset, 1);
     FastVecScale(&offset, &offset, 0.25f);
     u_base = &packet.uv[0][0];
     v_base = &packet.uv[0][1];
@@ -224,10 +224,10 @@ void func_L00_003EFD00(char *object)
     }
 }
 
-extern float func_00283CE0(int);
-extern float func_002ABB18(float);
-extern float func_002A7878(float,float);
-extern float func_002A78D8(float,float);
+extern float IntToFloat(int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_random_float_range(float,float);
+extern float math_random_signed_float_range(float,float);
 extern float D_L00_001B0940 __attribute__((sda));
 extern float D_L00_001B0944 __attribute__((sda));
 extern float D_L00_001B0948 __attribute__((sda));
@@ -250,20 +250,20 @@ typedef struct {
    the entry's joint count advances. The record offset is computed once and added to the
    reloaded chain pointer at every store, as retail's addu order shows. */
 /* Adds one new joint to the Vaporizer chain at the given position with random-looking angle and speed values. */
-void func_L00_003F5750(char *object, char *position)
+void vaporizer_add_chain_joint(char *object, char *position)
 {
     char *state = *(char **)(object + 0x68);
-    char **table = (char **)GetSlotBody(0xc04, *(short *)(state + 0x1a));
+    char **table = (char **)level_get_slot_body(0xc04, *(short *)(state + 0x1a));
     short index = *(short *)(state + 0x20);
     char **entry;
     int offset = index * 0x30;
     entry = (char **)((*(short *)(state + 0x18) << 2) + (int)table);
     qcopy(((L00Joint *)(offset + (int)*entry))->position, position);
-    ((L00Joint *)(offset + (int)*entry))->angle = WrapAngleToPi(IntToFloat(index) * 0.017453294f * D_L00_001B0948);
-    ((L00Joint *)(offset + (int)*entry))->f28 = RandomFloatRange(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
+    ((L00Joint *)(offset + (int)*entry))->angle = math_wrap_angle_to_pi(IntToFloat(index) * 0.017453294f * D_L00_001B0948);
+    ((L00Joint *)(offset + (int)*entry))->f28 = math_random_float_range(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
     ((L00Joint *)(offset + (int)*entry))->length = D_L00_001B094C;
-    ((L00Joint *)(offset + (int)*entry))->f2c = RandomSignedFloatRange(D_L00_001B0950, D_L00_001B0954) * 0.016666668f;
-    SetChainJointOffset(*entry, index);
+    ((L00Joint *)(offset + (int)*entry))->f2c = math_random_signed_float_range(D_L00_001B0950, D_L00_001B0954) * 0.016666668f;
+    vaporizer_set_chain_joint_offset(*entry, index);
     (*(unsigned short *)(state + 0x20))++;
 }
 
@@ -292,45 +292,45 @@ typedef struct {
     Vector position;
 } Light;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; QuadWord q[0x260]; } Hero;
-extern u8 D_00189E20[];
-extern Vector D_L00_001B8DC0, D_L00_001BF220;
+extern u8 g_hero_state[];
+extern Vector g_camera_l00_position, D_L00_001BF220;
 extern float D_L00_00252F60[137][2];
-extern char *D_L00_001C3280[];
+extern char *g_area_hit_targets[];
 extern Light D_L00_001C6F40[];
 extern int D_L00_001B08D0 __attribute__((sda));
-extern float func_002A7940(void);
-extern float func_00283CE0(int);
-extern float func_002A7790(float);
-extern void func_002AF000(float *, float, float, float);
-extern void func_00282CF0(Vector *, const Vector *, const Vector *);
-extern void func_00282F20(Vector *, const Vector *, float);
-extern int func_002761F8(Vector *, Vector *, int, char *, int);
-extern void func_0032B598(char *, Vector *, int);
-extern void func_0032ABC0(char *);
-extern int func_00282948(int *);
-extern int func_00277F48(Vector *, int, char *, DamageRequest *, float);
-extern void func_002A8C00(char *, int, int, float, Quad16 *);
-extern void func_002A8E20(char *, DamageRequest *);
+extern float math_random_angle(void);
+extern float IntToFloat(int);
+extern float math_square(float);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void FastVecSub(Vector *, const Vector *, const Vector *);
+extern void vec_scale_to_length(Vector *, const Vector *, float);
+extern int CollLine(Vector *, Vector *, int, char *, int);
+extern void part_claim_ring_piece(char *, Vector *, int);
+extern void part_claim_debris_piece(char *);
+extern int math_fast_float_d(int *);
+extern int coll_process_hit(Vector *, int, char *, DamageRequest *, float);
+extern void make_hit_descriptor(char *, int, int, float, Quad16 *);
+extern void QueueMobyImpact(char *, DamageRequest *);
 /* Retail passes the object in $a0 although the matched definition in src/game/00327038.c
    takes no parameters, so this caller declares it without a prototype. */
-extern void func_0032A978();
-extern void func_0032AA30(void *);
-extern void func_0029F338(void *);
-extern void func_00291450(int);
-extern float func_00283180(float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_002833F0(Vector *, const Vector *);
-extern void func_0032ACF0(int);
-extern void func_0032AF50(s8 *);
-extern void func_0032B7D0(char *);
+extern void math_init_random_direction_table();
+extern void part_init_trail_sparkle_pairs(void *);
+extern void moby_mark_spawned(void *);
+extern void gfx_free_point_light(int);
+extern float math_fast_sin_or_cos_a(float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void euler_rotation_basis(Vector *, const Vector *);
+extern void part_update_debris_pieces(int);
+extern void part_update_trail_nodes(s8 *);
+extern void part_update_ring_pieces(char *);
 /* The binder: func_L00_002E6EF8 in most programs, a per-level variant in levels 08, 09, 19 and 30. */
 extern void ref_L00_003F0CC8_00(void (*)(void *), void *);
-extern void func_0032B190(void *);
+extern void gfx_update_screen_fade(void *);
 
 /* Updates the lightning burst around the hero: sparks fly out, then nearby enemies are hurt and pushed away, then the glow fades and the object removes itself. */
-void func_L00_003F0CC8(char *object)
+void hero_lightning_burst_update(char *object)
 {
     Vector point;
     DamageRequest request;
@@ -342,46 +342,46 @@ void func_L00_003F0CC8(char *object)
     int count, remaining, i;
     float progress, first_angle, second_angle;
 
-    qcopy(object + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
+    qcopy(object + 0x10, ((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
         *(unsigned char *)(object + 0x20) = 1;
         state->timer = 60;
         state->radius = 0.0f;
         for (i = 0; i < 137; i++) {
-            D_L00_00252F60[i][0] = RandomAngle();
-            D_L00_00252F60[i][1] = RandomAngle();
+            D_L00_00252F60[i][0] = math_random_angle();
+            D_L00_00252F60[i][1] = math_random_angle();
         }
     case 1:
         *(unsigned char *)(object + 0x20) = 2;
     case 2:
         progress = IntToFloat(state->timer);
         progress /= IntToFloat(60);
-        state->radius = Square(1.0f - progress) * 15.0f;
+        state->radius = math_square(1.0f - progress) * 15.0f;
         if (state->timer % 3 == 0) {
-            first_angle = RandomAngle();
-            second_angle = RandomAngle();
-            BuildSphericalOffset(point.v, state->radius, first_angle, second_angle);
-            FastVecAdd(&point, &point, (Vector *)&((Hero *)gHeroState)->b[0xE0]);
-            if (CollLine((Vector *)&((Hero *)gHeroState)->b[0xE0], &point, 0, ((Hero *)gHeroState)->ptr[0x2290 / 4], 0) != 0)
+            first_angle = math_random_angle();
+            second_angle = math_random_angle();
+            vec_build_spherical_offset(point.v, state->radius, first_angle, second_angle);
+            FastVecAdd(&point, &point, (Vector *)&((Hero *)g_hero_state)->b[0xE0]);
+            if (CollLine((Vector *)&((Hero *)g_hero_state)->b[0xE0], &point, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0) != 0)
                 qcopy(&point, &D_L00_001BF220);
-            ClaimRingPiece(object, &point, 10);
+            part_claim_ring_piece(object, &point, 10);
         }
         if (state->timer < 10 && (state->timer & 7) == 0)
-            ClaimDebrisPiece(object);
-        if (FastFloatHelperD(&state->timer) != 0) {
+            part_claim_debris_piece(object);
+        if (math_fast_float_d(&state->timer) != 0) {
             state->timer = 120;
             *(unsigned char *)(object + 0x20) = 3;
-            count = ProcessCollisionHit((Vector *)&((Hero *)gHeroState)->b[0xE0], 0, object, 0, 15.0f);
+            count = coll_process_hit((Vector *)&((Hero *)g_hero_state)->b[0xE0], 0, object, 0, 15.0f);
             if (count > 0) {
-                hit = gAreaHitTargets;
+                hit = g_area_hit_targets;
                 remaining = count;
                 do {
                     req = &request;
                     if ((*(unsigned long long *)(*hit + 0x30) & 0x500000000000ULL) != 0 &&
-                        *hit != ((Hero *)gHeroState)->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 /* moby class 3303 */ &&
+                        *hit != ((Hero *)g_hero_state)->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 /* moby class 3303 */ &&
                         *(short *)(*hit + 0xaa) != 0xbb8 /* Space Tourist */) {
-                        FastVecSub(&point, (Vector *)(*hit + 0x10), (Vector *)&((Hero *)gHeroState)->b[0xE0]);
+                        FastVecSub(&point, (Vector *)(*hit + 0x10), (Vector *)&((Hero *)g_hero_state)->b[0xE0]);
                         vec_scale_to_length(&point, &point, 1.0f);
                         /* The incoming request impulse is not initialized in retail. */
                         vec_scale_to_length(&req->impulse, &req->impulse, 1.0f);
@@ -397,22 +397,22 @@ void func_L00_003F0CC8(char *object)
                     ++hit;
                 } while (--remaining != 0);
             }
-            InitRandomDirectionTable(object);
+            math_init_random_direction_table(object);
         }
         break;
     case 3:
-        if ((state->timer & 7) == 0) ClaimDebrisPiece(object);
-        FastFloatHelperD(&state->timer);
-        InitTrailSparklePairs(object);
+        if ((state->timer & 7) == 0) part_claim_debris_piece(object);
+        math_fast_float_d(&state->timer);
+        part_init_trail_sparkle_pairs(object);
         if (state->timer == 40) *(unsigned char *)(object + 0x20) = 4;
         break;
     case 4:
-        if (FastFloatHelperD(&state->timer) != 0 && state->pending == 0) {
-            if (state->first != 0) MarkMobySpawned(state->first);
-            if (state->second != 0) MarkMobySpawned(state->second);
-            if (state->light != -1) FreePointLight(state->light);
+        if (math_fast_float_d(&state->timer) != 0 && state->pending == 0) {
+            if (state->first != 0) moby_mark_spawned(state->first);
+            if (state->second != 0) moby_mark_spawned(state->second);
+            if (state->light != -1) gfx_free_point_light(state->light);
             D_L00_001B08D0 = 0;
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
         break;
@@ -421,7 +421,7 @@ void func_L00_003F0CC8(char *object)
     progress = 1.0f - progress;
     progress *= 6.2831855f;
     progress -= 3.1415927f;
-    progress = FastSinOrCosA(progress);
+    progress = math_fast_sin_or_cos_a(progress);
     progress = (progress + 1.0f) * 0.5f;
     if (state->first != 0) {
         **(int **)(state->first + 0x68) = FloatToInt(progress * 32.0f);
@@ -431,7 +431,7 @@ void func_L00_003F0CC8(char *object)
         *(float *)(state->first + 0xc0) *= 0.5f;
         *(float *)(state->first + 0xd4) *= 0.5f;
         *(float *)(state->first + 0xe8) = progress * 1.5f;
-        qcopy(state->first + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
+        qcopy(state->first + 0x10, ((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->second != 0) {
         **(int **)(state->second + 0x68) = FloatToInt(progress * 32.0f);
@@ -439,21 +439,21 @@ void func_L00_003F0CC8(char *object)
         satellite = state->second;
         euler_rotation_basis((Vector *)(satellite + 0xc0), (Vector *)(satellite + 0xf0));
         *(float *)(state->second + 0xe8) = progress;
-        qcopy(state->second + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
+        qcopy(state->second + 0x10, ((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->light != -1) {
         light = &D_L00_001C6F40[state->light];
-        vec_scale_to_length(&point, (Vector *)&((Hero *)gHeroState)->b[0x2A0], 0.5f);
-        FastVecAdd(&light->position, (Vector *)(((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10), &point);
-        FastVecSub(&point, &gCameraPosition_L00, &light->position);
+        vec_scale_to_length(&point, (Vector *)&((Hero *)g_hero_state)->b[0x2A0], 0.5f);
+        FastVecAdd(&light->position, (Vector *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10), &point);
+        FastVecSub(&point, &g_camera_l00_position, &light->position);
         vec_scale_to_length(&point, &point, 0.15f);
         FastVecAdd(&light->position, &light->position, &point);
         light->intensity = progress;
         light->position.v[3] = 5.0f;
         light->flags = 0;
     }
-    UpdateDebrisPieces((int)object);
-    UpdateTrailNodes((s8 *)object);
-    UpdateRingPieces(object);
-    ref_L00_003F0CC8_00(UpdateScreenFade_0032B190, object);
+    part_update_debris_pieces((int)object);
+    part_update_trail_nodes((s8 *)object);
+    part_update_ring_pieces(object);
+    ref_L00_003F0CC8_00(gfx_update_screen_fade, object);
 }

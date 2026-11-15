@@ -1,28 +1,28 @@
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
-extern void func_L00_003253A0(char *,char *,char *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern float func_00283B98(float,float);
-extern int func_00277258(void *,int,void *,float);
-extern float func_00282DB0(void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *,void *,float);
-extern int func_00282948(int *);
-extern void func_0029F338(void *);
+extern void moby_mix_on_inner_data(char *,char *,char *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern float FastAddRotations(float,float);
+extern int coll_test_point(void *,int,void *,float);
+extern float FastVecDot(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *,void *,float);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *);
 extern Vector128 D_L16_001BFF70[2];
 /* Moves a bouncing object (moby class 2688) by its velocity, bounces it off walls and fades it out when it stops or gets old. */
-void func_L16_003C3870(char *object)
+void bouncing_l16_debris_update(char *object)
 {
     Vector128 correction[1];
     char *state=*(char **)(object+0x68);
     float speed;
-    MixOnInnerData(object,state,state,*(float *)(state+0x20));
+    moby_mix_on_inner_data(object,state,state,*(float *)(state+0x20));
     FastVecAdd(object+0x10,object+0x10,state);
     *(float *)(object+0xf0)=FastAddRotations(*(float *)(object+0xf0),*(float *)(state+0x10));
     *(float *)(object+0xf4)=FastAddRotations(*(float *)(object+0xf4),*(float *)(state+0x14));
     *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),*(float *)(state+0x18));
-    if (TestPointAgainstCollision(object+0x10,0,object,1.5f)!=0) {
+    if (coll_test_point(object+0x10,0,object,1.5f)!=0) {
         *(Vector128 *)(object+0x10)=D_L16_001BFF70[0];
         if (FastVecDot(state,&D_L16_001BFF70[1])<0.0f) {
             vec_scale_to_length(&D_L16_001BFF70[1],&D_L16_001BFF70[1],1.0f);
@@ -34,8 +34,8 @@ void func_L16_003C3870(char *object)
         *(int *)(state+0x24)=0;
         if (*(unsigned char *)(object+0x23)>0x60) object[0x23]=0x60;
     }
-    if (FastFloatHelperD((int *)(state+0x24))!=0) {
-        if (*(unsigned char *)(object+0x23)<5) MarkMobySpawned(object);
+    if (math_fast_float_d((int *)(state+0x24))!=0) {
+        if (*(unsigned char *)(object+0x23)<5) moby_mark_spawned(object);
         else object[0x23]=*(unsigned char *)(object+0x23)-4;
     }
 }

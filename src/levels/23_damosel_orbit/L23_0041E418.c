@@ -1,22 +1,22 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern void func_002AFFD8(void *, void *, int);
-extern char *func_0029EFD0(int);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282DD8(float *, float *, float *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern char *CreateMoby(int);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecCross(float *, float *, float *);
 
 /* func_L23_0041E418 is defined in L23_0041E418-g8.c (this unit has no $gp access for it). */
 
 /* func_L23_0041E5B0 is defined in its dedicated source unit. */
 
 /* Creates a shot object that flies in a direction and carries a damage amount. */
-char *func_L23_00422540(char *pos, char *dir, float *damage) {
+char *directed_shot_create(char *pos, char *dir, float *damage) {
     char axis[16];
     char scaled[16];
     char *obj;
     char *state;
-    ComputeViewDirection(pos, axis, 1);
+    cam_compute_view_direction(pos, axis, 1);
     obj = CreateMoby(0x118E /* moby class 4494 */);
     if (obj) {
         state = *(char **)(obj + 0x68);
@@ -65,27 +65,27 @@ char *func_L23_00422540(char *pos, char *dir, float *damage) {
 
 typedef int TI16 __attribute__((mode(TI)));
 
-extern void func_00282CF0(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
 
-extern void func_00282DD8(float *, float *, float *);
+extern void FastVecCross(float *, float *, float *);
 
-extern void func_00282F20(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
-extern float func_00283C28(float);
+extern float math_fast_float_g(float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern void func_00282D30(float *, float *, float);
+extern void FastVecScale(float *, float *, float);
 
-extern void func_00282CC0(float *, float *, float *);
+extern void FastVecAdd(float *, float *, float *);
 
-extern float D_L23_001BA640[];
+extern float g_camera_l23_position[];
 
 /* builds two vectors from the sources, rotates one by the measured angle and writes the result */
 /* Works out a curve control point by turning a sideways direction by a random angle. */
-void func_L23_004260F0(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float scale) {
+void math_compute_curve_control_point(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float scale) {
     TI16 loc[6];
     TI16 va;
     TI16 vb;
@@ -101,14 +101,14 @@ void func_L23_004260F0(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float scale)
     loc[0] = vb;
     vars = *(u8 **)(obj + 0x68);
     FastVecSub((float *)&loc[2], (float *)&loc[0], (float *)&loc[1]);
-    FastVecSub((float *)&loc[3], (float *)&loc[0], gCameraPosition_L23);
+    FastVecSub((float *)&loc[3], (float *)&loc[0], g_camera_l23_position);
     FastVecCross((float *)&loc[4], (float *)&loc[3], (float *)&loc[2]);
     vec_scale_to_length((float *)&loc[4], (float *)&loc[4], 1.0f);
     randRange = *(s16 *)(vars + 0xC);
-    angleDeg = RandomIntRange(-randRange, randRange);
+    angleDeg = math_random_int_range(-randRange, randRange);
     angleDeg = (((s32)*(u16 *)(obj + 0x96) << *(s16 *)(vars + 0xE)) + angleDeg) % 360 - 180;
-    angle = FastFloatHelperG((float)angleDeg * 0.017453294f);
-    offset = FastSinOrCosB(angle) * scale;
+    angle = math_fast_float_g((float)angleDeg * 0.017453294f);
+    offset = math_fast_sin_or_cos_b(angle) * scale;
     FastVecScale((float *)&loc[5], (float *)&loc[4], offset);
     FastVecAdd(dst, (float *)&loc[0], (float *)&loc[5]);
 }
@@ -116,13 +116,13 @@ void func_L23_004260F0(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float scale)
 /* func_L23_00426248 is defined in L23_00426248-g8.c. */
 
 /* func_L23_004265D0 is defined in L23_004265D0-g8.c. */
-extern void func_L23_004277E8(u8 *);
-extern void func_L23_004278B0(u8 *);
+extern void boss_part_init_health(u8 *);
+extern void boss_part_count_frame(u8 *);
 
 /* Per-frame update of the boss part object: runs its main update, then counts a frame. */
-void func_L23_004277B8(u8 *moby) {
-    InitBossPartHealth(moby);
-    IncrementFrameCounterA(moby);
+void boss_part_update(u8 *moby) {
+    boss_part_init_health(moby);
+    boss_part_count_frame(moby);
 }
 
 /* func_L23_004277E8 is matched in L23_0041E418-g8.c */
@@ -130,7 +130,7 @@ void func_L23_004277B8(u8 *moby) {
 
 /* increments the 16-bit counter at object + 0x96 while it stays below 0xFFFF */
 /* Counts one more frame for the object, stopping at the largest value. */
-void func_L23_004278B0(u8 *moby) {
+void boss_part_count_frame(u8 *moby) {
     u16 *counter = (u16 *)(moby + 0x96);
     u16 value = *counter;
 
@@ -156,7 +156,7 @@ void func_L23_004278B0(u8 *moby) {
 
 /* increments the 16-bit counter at object + 0x96 while it stays below 0xFFFF */
 /* Counts one more frame for the object, stopping at the largest value. */
-void func_L23_00429FF8(u8 *moby) {
+void effect_controller_count_frame(u8 *moby) {
     u16 *counter = (u16 *)(moby + 0x96);
     u16 value = *counter;
 
@@ -175,7 +175,7 @@ void func_L23_00429FF8(u8 *moby) {
 
 /* increments the 16-bit counter at object + 0x96 while it stays below 0xFFFF */
 /* Counts one more frame for the object, stopping at the largest value. */
-void func_L23_0042AD90(u8 *moby) {
+void counter_effect_count_frame(u8 *moby) {
     u16 *counter = (u16 *)(moby + 0x96);
     u16 value = *counter;
 
@@ -186,15 +186,15 @@ void func_L23_0042AD90(u8 *moby) {
 
 /* func_L23_0042ADB0 is defined in L23_0042ADB0-g8.c. */
 
-extern void func_L00_004287E8(void);
+extern void cam_swingshot_update(void);
 
-extern void func_L00_00428CE0(s32);
+extern void cam_aim_at_hero(s32);
 
 /* prepares the shared object then hands it to the shared starter */
 /* Prepares the shared object and then starts it with the given value. */
-void func_L23_0043F930(s32 param) {
-    UpdateSwingshotCamera();
-    AimCameraAtHero(param);
+void shared_object_start_with_value(s32 param) {
+    cam_swingshot_update();
+    cam_aim_at_hero(param);
 }
 
 /* func_L23_004402D8 is matched in L23_004402D8-g8.c (built with -g). */

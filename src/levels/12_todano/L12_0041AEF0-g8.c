@@ -5,14 +5,14 @@ typedef unsigned int u128 __attribute__((mode(TI)));
 typedef union { u128 quad; float value[4]; } RingVector;
 typedef struct { RingVector vertex[4]; unsigned int color[4]; float uv[4][2]; u64 tag[4]; } RingPacket;
 typedef struct { RingVector column[4]; } RingMatrix;
-extern void func_00283658(RingMatrix *, void *);
-extern void func_00283410(RingMatrix *, RingVector *);
-extern void func_00283738(RingMatrix *, RingMatrix *, RingMatrix *);
-extern void func_00280B90(RingPacket *, RingMatrix *, int);
-extern int func_00283CF0(float);
-extern u64 func_0027C878(int);
-extern float func_00283B98(float, float), func_00283180(float), func_00283198(float);
-extern int func_00283D38(unsigned int, unsigned int, float);
+extern void copy_matrix_rotation(RingMatrix *, void *);
+extern void euler_to_matrix(RingMatrix *, RingVector *);
+extern void multiply_matrix3x3(RingMatrix *, RingMatrix *, RingMatrix *);
+extern void draw_world_quad(RingPacket *, RingMatrix *, int);
+extern int FloatToInt(float);
+extern u64 GetEffectTextureDescriptor(int);
+extern float FastAddRotations(float, float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(unsigned int, unsigned int, float);
 extern float D_L12_001B1C80 __attribute__((sda));
 extern unsigned int D_L12_001B1C90 __attribute__((sda)), D_L12_001B1C8C __attribute__((sda));
 extern int D_L12_001B1CB8 __attribute__((sda));
@@ -21,7 +21,7 @@ extern float D_L12_001B1CC4 __attribute__((sda));
 extern float D_L12_001B1CD0[][2] SDATA(D_L12_001B1CD0);
 /* Retail walks X through $gp and Y through an absolute cursor. */
 extern float D_L12_001B1CD4[] NOT_SDA;
-void func_L12_0041AEF0(unsigned char *self)
+void DrawAnimatedRings(unsigned char *self)
 {
     RingPacket packets[3];
     RingMatrix matrix, rotation;
@@ -48,11 +48,11 @@ void func_L12_0041AEF0(unsigned char *self)
         radius = *(float *)(data + 0x6c) - (float)i * 0.05f;
         angle = (float)i * 0.17453295f;
         nextAngle = FastAddRotations(angle, 0.52359885f);
-        first.value[0] = FastSinOrCosA(angle) * radius;
-        first.value[1] = FastSinOrCosB(angle) * radius;
+        first.value[0] = math_fast_sin_or_cos_a(angle) * radius;
+        first.value[1] = math_fast_sin_or_cos_b(angle) * radius;
         first.value[2] = 0.0f; first.value[3] = 1.0f;
-        second.value[0] = FastSinOrCosA(nextAngle) * radius;
-        second.value[1] = FastSinOrCosB(nextAngle) * radius;
+        second.value[0] = math_fast_sin_or_cos_a(nextAngle) * radius;
+        second.value[1] = math_fast_sin_or_cos_b(nextAngle) * radius;
         second.value[2] = 0.0f; second.value[3] = 1.0f;
         z = fraction * D_L12_001B1CC4;
         qcopy(&packets[i].vertex[0], &first);

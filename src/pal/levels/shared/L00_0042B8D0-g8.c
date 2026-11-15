@@ -7,11 +7,11 @@ extern char D_00189F70[];
 extern int D_001A7BAC;
 extern float D_L00_001A8904;
 extern int D_L00_001A8FF0;
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283B98(float, float);
+extern void FastVecAdd(char *, char *, char *);
+extern float FastAddRotations(float, float);
 extern void func_PAL_L00_00425B98(char *, float *);
 extern void func_PAL_L00_00427960(char *);
-extern void func_L00_00421C50(char *);
+extern void cam_follow_update_collision(char *);
 extern void func_PAL_L00_0042B858(int);
 extern void func_PAL_L00_004276D8(char *);
 
@@ -31,15 +31,15 @@ void func_PAL_L00_0042B8D0(char *object)
     float first;
 
     D_L00_001A8904 = value;
-    func_00282CC0(local, hero, parameters);
+    FastVecAdd(local, hero, parameters);
     first = *(float *)(hero + 12);
     if (D_L00_001A8FF0 != 0) {
         first = 0.0f;
     }
-    *(float *)(local + 12) = func_00283B98(first, *(float *)(parameters + 12));
+    *(float *)(local + 12) = FastAddRotations(first, *(float *)(parameters + 12));
     func_PAL_L00_00425B98(self, (float *)local);
     func_PAL_L00_00427960(self);
-    func_L00_00421C50(self);
+    cam_follow_update_collision(self);
     func_PAL_L00_0042B858((int)self);
     func_PAL_L00_004276D8(self);
 }

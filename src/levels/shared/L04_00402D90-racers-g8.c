@@ -49,20 +49,20 @@ typedef struct {
     char pad2[0x94];
 } L04Moby;
 
-extern L04Moby *D_L04_001B24DC;
-extern L04RacePath *D_L04_001FE340[];
+extern L04Moby *g_moby_l04_pool;
+extern L04RacePath *g_route_path_table[];
 extern L04RaceDelay D_L04_002C63D4[];
-extern int D_L04_001B090C __attribute__((sda));
+extern int g_current_race_index __attribute__((sda));
 extern float D_L04_001B0928 __attribute__((sda));
-extern L04Settings D_001A7B90 __attribute__((sda));
-extern int func_002A7820(int, int);
-extern unsigned int func_L04_0040A268(int);
-extern void func_L04_004029D8(L04Moby *);
+extern L04Settings g_is_pal_video __attribute__((sda));
+extern int math_random_int_range(int, int);
+extern unsigned int race_get_course_finish_count(int);
+extern void racer_reset_for_race(L04Moby *);
 
 /* Sets up a race controller's participants: counts the 21 member slots, copies the route links of
    the first racer into the controller, gives each racer a random group (at most four per group),
    its start delay and route duration, then starts it. */
-void func_L04_0040A628(unsigned char *controller)
+void InitRaceParticipants(unsigned char *controller)
 {
     int used[10];
     L04RaceState *raceState = *(L04RaceState **)(controller + 0x68);
@@ -81,7 +81,7 @@ void func_L04_0040A628(unsigned char *controller)
         used[i] = 0;
     for (i = 0; i < 21; i++) {
         if (raceState->slots[i] != -1) {
-            racerVars = gMobyPool_L04[raceState->slots[i]].vars;
+            racerVars = g_moby_l04_pool[raceState->slots[i]].vars;
             if (!first) {
                 int *dst = raceState->branches;
                 int *src = racerVars->branches;
@@ -95,24 +95,24 @@ void func_L04_0040A628(unsigned char *controller)
             }
             racerVars->count = count;
             racerVars->owner = controller;
-            j = RandomIntRange(0, 9);
+            j = math_random_int_range(0, 9);
             while (used[j] >= 4)
-                j = RandomIntRange(0, 9);
+                j = math_random_int_range(0, 9);
             used[j]++;
             racerVars->group = j + 1;
-            startDelay = D_L04_002C63D4[gCurrentRaceIndex].delay;
+            startDelay = D_L04_002C63D4[g_current_race_index].delay;
             racerVars->f2d0 = 0;
-            if (gIsPalVideo.f00) {
+            if (g_is_pal_video.f00) {
                 startDelay = (int)((float)startDelay * 0.8333334f + 0.01f);
-                if (gCurrentRaceIndex == 0)
-                    startDelay += GetCourseFinishCount(0) * 100;
+                if (g_current_race_index == 0)
+                    startDelay += race_get_course_finish_count(0) * 100;
                 racerVars->delay = (float)startDelay * 0.006666667f;
             } else {
-                if (gCurrentRaceIndex == 0)
-                    startDelay += GetCourseFinishCount(0) * 120;
+                if (g_current_race_index == 0)
+                    startDelay += race_get_course_finish_count(0) * 120;
                 racerVars->delay = (float)startDelay * 0.005555556f;
             }
-            path = gRoutePathTable[raceState->path];
+            path = g_route_path_table[raceState->path];
             racerVars->duration = path->duration * (float)path->count;
             D_L04_001B0928 = racerVars->duration;
             racerVars->f1d4 = -1.0f;
@@ -124,8 +124,8 @@ void func_L04_0040A628(unsigned char *controller)
             racerVars->f1e0 = 0;
             racerVars->f1d8 = 0;
             racerVars->f1dc = 0;
-            ResetRacerForRace(&gMobyPool_L04[raceState->slots[i]]);
-            gMobyPool_L04[raceState->slots[i]].state = 1;
+            racer_reset_for_race(&g_moby_l04_pool[raceState->slots[i]]);
+            g_moby_l04_pool[raceState->slots[i]].state = 1;
         }
     }
 }

@@ -14,18 +14,18 @@ typedef struct {
     RotorVector position, direction;
 } RotorStatePrefix;
 extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 extern RotorVector D_L00_001AF7C0[] MACRO_ADDR;
 extern RotorVector D_L00_001AF7C0_gp[] SDATA(D_L00_001AF7C0) __attribute__((sda));
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283CE0(int);
-extern float func_00283C28(float);
-extern void func_00283410(void *, void *);
-extern void func_00283788(void *, void *, void *);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float IntToFloat(int);
+extern float math_fast_float_g(float);
+extern void euler_to_matrix(void *, void *);
+extern void multiply_matrix(void *, void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 
 void func_PAL_L00_003B0FB8(unsigned char *object)
 {
@@ -43,28 +43,28 @@ void func_PAL_L00_003B0FB8(unsigned char *object)
         int side = i & 1;
         float phase;
         unsigned long texture;
-        float radius = func_00282C10(state->direction.x * state->direction.x +
+        float radius = square_root(state->direction.x * state->direction.x +
                                     state->direction.z * state->direction.z);
-        angles.x = func_00283B98(-func_00283248(radius, state->direction.y), 1.5707963705062866f);
-        angles.y = func_00283248(state->direction.z, state->direction.x);
+        angles.x = FastAddRotations(-mat_fast_helper_a(radius, state->direction.y), 1.5707963705062866f);
+        angles.y = mat_fast_helper_a(state->direction.z, state->direction.x);
         angles.z = 0.0f;
         angles.w = 0.0f;
         D_L00_001AF7C0_gp[0].x = 0.0f;
-        phase = func_00283C28(func_00283CE0(D_L00_001B19C8 % 150) * 0.041795027f);
+        phase = math_fast_float_g(IntToFloat(g_frame_l00_counter % 150) * 0.041795027f);
         if (side)
             phase = -phase;
         D_L00_001AF7C0[0].y = phase;
         D_L00_001AF7C0[0].z = 0.0f;
         D_L00_001AF7C0[0].w = 0.0f;
-        func_00283410(&phaseMatrix, &D_L00_001AF7C0_gp[0]);
-        func_00283410(&model, &angles);
-        func_00283788(&model, &model, &phaseMatrix);
+        euler_to_matrix(&phaseMatrix, &D_L00_001AF7C0_gp[0]);
+        euler_to_matrix(&model, &angles);
+        multiply_matrix(&model, &model, &phaseMatrix);
         qcopy(&model.rows[3], &state->position);
         quad.colors[0] = 0x80808080U;
         quad.colors[1] = 0x80808080U;
         quad.colors[2] = 0x80808080U;
         quad.colors[3] = 0x80808080U;
-        texture = func_0027C878(side ? 18 : 17);
+        texture = GetEffectTextureDescriptor(side ? 18 : 17);
         quad.textureState = 0xFF9000000260UL;
         quad.texture = texture;
         quad.flags = 0x8000000048UL;
@@ -81,7 +81,7 @@ void func_PAL_L00_003B0FB8(unsigned char *object)
         quad.uv[1][0] = one; quad.uv[1][1] = one;
         quad.uv[2][0] = 0.0f; quad.uv[2][1] = 0.0f;
         quad.uv[3][0] = one; quad.uv[3][1] = 0.0f;
-        func_00280B90(&quad, &model, 1);
+        draw_world_quad(&quad, &model, 1);
     }
 }
 

@@ -56,32 +56,32 @@ typedef struct {
     u8 pad75[0x88 - 0x75];
     Moby *owner;                 
 } SoundVoice;
-extern Hero D_00189E20;
-extern SoundRecord D_00188660[];
-extern LiftPath *D_L17_001FE880[];
+extern Hero g_hero_state;
+extern SoundRecord g_sound_state[];
+extern LiftPath *g_path_l17_table[];
 extern int D_00138324[];
 extern float D_L17_001B0220 __attribute__((sda));
 extern float D_L17_001B0228 __attribute__((sda));
 extern float D_L17_001B022C __attribute__((sda));
 extern float D_L17_001B0234 __attribute__((sda));
-extern int func_002B38B8(void *);
-extern int func_002B3868(void *);
-extern int func_L00_002D40F0(void);
-extern int func_L06_003E3ED0(void *);
-extern void func_002B0C28(int, int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_L00_002D40A0(void *, int, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern void func_L17_003C3250(void *);
+extern int flag_is_third_pending_set(void *);
+extern int flag_set_first_pending(void *);
+extern int hero_get_target_state_kind(void);
+extern int hero_is_on_moby(void *);
+extern void TryClaimNotice(int, int, int);
+extern void moby_set_state(void *, int, int);
+extern void hero_start_target_state(void *, int, float);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern void platform_attach_path_to_lift(void *);
 extern float *func_PAL_L00_002D7850(int);
-extern void func_L00_002D7140(void *);
-extern float func_002AA548(float *, float *, float, float, float, float);
-extern float func_00282C48(float);
-extern int func_00282978(s16 *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void cam_end_override(void *);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern float math_fabs(float);
+extern int FastDecTimer(s16 *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves a lift between the first and the last point of its path: triangle
    starts it while the hero stands on it, it eases to the other end with its
@@ -98,37 +98,37 @@ void func_PAL_L17_003C713C(Moby *moby)
     Vec *velocity;
 
     qcopy(&old, &moby->position);
-    path = D_L17_001FE880[vars->path];
+    path = g_path_l17_table[vars->path];
     switch (moby->state) {
     case 0:
         /* Waiting at one end. */
         vars->sound = -1;
-        if (D_00189E20.groundMoby == moby && D_00189E20.groundedFrames) {
-            if (vars->needsTrigger && !func_002B38B8(moby))
+        if (g_hero_state.groundMoby == moby && g_hero_state.groundedFrames) {
+            if (vars->needsTrigger && !flag_is_third_pending_set(moby))
                 goto finish;
-            func_002B0C28(8, 0x12EC, 1);
+            TryClaimNotice(8, 0x12EC, 1);
             if (D_00138324[0] & 0x10) {
                 if (!vars->atLast) {
-                    func_002A7750(moby, 4, -1);
+                    moby_set_state(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
-                    func_00282CF0(velocity, &path->points[1], &path->points[0]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+                    FastVecSub(velocity, &path->points[1], &path->points[0]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
                 } else {
-                    func_002A7750(moby, 5, -1);
+                    moby_set_state(moby, 5, -1);
                     velocity = &vars->velocity;
                     point = path->count - 2;
                     vars->point = point;
-                    func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+                    FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
                 }
                 break;
             }
         }
-        if (moby->position.f[2] + 10.0f < D_00189E20.moby->position.f[2] && vars->atLast) {
+        if (moby->position.f[2] + 10.0f < g_hero_state.moby->position.f[2] && vars->atLast) {
             qcopy(&moby->position, &path->points[0]);
             vars->atLast = 0;
-        } else if (D_00189E20.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->atLast) {
+        } else if (g_hero_state.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->atLast) {
             qcopy(&moby->position, &path->points[path->count - 1]);
             vars->atLast = 1;
             moby->position.f[2] += 0.2f;
@@ -137,36 +137,36 @@ void func_PAL_L17_003C713C(Moby *moby)
 
     case 4:
         /* Leaving the first point. */
-        if (func_002B3868(moby))
-            func_L00_002D40A0(&moby->position, 0, moby->rotation.f[2]);
-        if (func_L00_002D40F0() == 1)
+        if (flag_set_first_pending(moby))
+            hero_start_target_state(&moby->position, 0, moby->rotation.f[2]);
+        if (hero_get_target_state_kind() == 1)
             goto finish;
-        func_002A7750(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
 
     case 5:
         /* Leaving the last point. */
-        if (func_002B3868(moby))
-            func_L00_002D40A0(&moby->position, 0, moby->rotation.f[2]);
-        if (func_L00_002D40F0() == 1)
+        if (flag_set_first_pending(moby))
+            hero_start_target_state(&moby->position, 0, moby->rotation.f[2]);
+        if (hero_get_target_state_kind() == 1)
             goto finish;
-        func_002A7750(moby, 3, -1);
+        moby_set_state(moby, 3, -1);
         break;
 
     case 1:
         /* Travelling to the last point. */
-        if (func_002B3868(moby))
+        if (flag_set_first_pending(moby))
             vars->verticalSpeed = 0.0f;
         {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
-        if (func_L06_003E3ED0(moby)) {
-            D_00189E20.f212 = 4;
-            D_00189E20.f214 = 4;
-            func_L17_003C3250(moby);
+        if (hero_is_on_moby(moby)) {
+            g_hero_state.f212 = 4;
+            g_hero_state.f214 = 4;
+            platform_attach_path_to_lift(moby);
             if (!vars->hasRecord) {
                 float *record = func_PAL_L00_002D7850(5);
                 float value;
@@ -181,20 +181,20 @@ void func_PAL_L17_003C713C(Moby *moby)
                 }
             }
         }
-        func_002AA548(&moby->position.f[2], &vars->verticalSpeed,
+        math_step_value_toward_target(&moby->position.f[2], &vars->verticalSpeed,
                       path->points[path->count - 1].f[2], 0.0028000001f, 0.0056000003f, 0.6f);
-        if (func_00282C48(moby->position.f[2] - path->points[path->count - 1].f[2]) < 0.2f) {
-            func_002A7750(moby, 0, -1);
+        if (math_fabs(moby->position.f[2] - path->points[path->count - 1].f[2]) < 0.2f) {
+            moby_set_state(moby, 0, -1);
             sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
 
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    snd_stop_voice(sound);
             }
             vars->sound = -1;
             if (vars->hasRecord) {
-                func_L00_002D7140(vars->record);
+                cam_end_override(vars->record);
                 vars->hasRecord = 0;
             }
             vars->atLast = !vars->atLast;
@@ -205,36 +205,36 @@ void func_PAL_L17_003C713C(Moby *moby)
         /* Stopped: when the count runs out, head back to the first point. */
         sound = vars->sound;
         if (sound != -1) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
 
             if (voice->owner == moby && voice->active)
-                func_002E59F8(sound);
+                snd_stop_voice(sound);
         }
         vars->sound = -1;
-        if (func_00282978(&vars->atLast)) {
-            func_002A7750(moby, 5, -1);
+        if (FastDecTimer(&vars->atLast)) {
+            moby_set_state(moby, 5, -1);
             velocity = &vars->velocity;
             point = vars->point - 1;
             vars->point = point;
-            func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-            func_00282F20(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+            FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+            vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
         }
         break;
 
     case 3:
         /* Travelling to the first point. */
-        if (func_002B3868(moby))
+        if (flag_set_first_pending(moby))
             vars->verticalSpeed = 0.0f;
         {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
-        if (func_L06_003E3ED0(moby)) {
-            D_00189E20.f212 = 4;
-            D_00189E20.f214 = 4;
-            func_L17_003C3250(moby);
+        if (hero_is_on_moby(moby)) {
+            g_hero_state.f212 = 4;
+            g_hero_state.f214 = 4;
+            platform_attach_path_to_lift(moby);
             if (!vars->hasRecord) {
                 float *record = func_PAL_L00_002D7850(5);
                 float value;
@@ -249,21 +249,21 @@ void func_PAL_L17_003C713C(Moby *moby)
                 }
             }
         }
-        func_002AA548(&moby->position.f[2], &vars->verticalSpeed,
+        math_step_value_toward_target(&moby->position.f[2], &vars->verticalSpeed,
                       path->points[0].f[2], 0.0028000001f, 0.0056000003f, 0.6f);
-        if (func_00282C48(moby->position.f[2] - path->points[0].f[2]) < 0.2f) {
+        if (math_fabs(moby->position.f[2] - path->points[0].f[2]) < 0.2f) {
             vars->atLast = 0;
-            func_002A7750(moby, 0, -1);
+            moby_set_state(moby, 0, -1);
             if (vars->hasRecord) {
-                func_L00_002D7140(vars->record);
+                cam_end_override(vars->record);
                 vars->hasRecord = 0;
             }
             sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
 
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    snd_stop_voice(sound);
             }
             vars->sound = -1;
         }
@@ -271,10 +271,10 @@ void func_PAL_L17_003C713C(Moby *moby)
     }
 
 finish:
-    if (!func_L06_003E3ED0(moby) && vars->hasRecord) {
-        func_L00_002D7140(vars->record);
+    if (!hero_is_on_moby(moby) && vars->hasRecord) {
+        cam_end_override(vars->record);
         vars->hasRecord = 0;
     }
-    func_00282CF0(&delta, &moby->position, &old);
-    func_002AD6F0(vars->motion, &delta, &moby->rotation, &moby->rotation);
+    FastVecSub(&delta, &moby->position, &old);
+    mat_combine_and_store(vars->motion, &delta, &moby->rotation, &moby->rotation);
 }

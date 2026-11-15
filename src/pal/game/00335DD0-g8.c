@@ -25,18 +25,18 @@ typedef struct {
 typedef struct { int active; unsigned char type; char pad[0x47]; short map; char pad2[0x92]; } Weapon1271;
 typedef struct { float cost,a; int frames; float b; } Effect1271;
 typedef struct { int timer,color,alpha; float zero,a,b; char *object; int state,owner,active; char pad[8]; } Slot1271;
-extern Weapon1271 D_00239BA0[];
+extern Weapon1271 g_weapon_table[];
 extern unsigned char D_001A7A80[] MACRO_ADDR;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern Effect1271 D_00237DA0[2][119];
-extern Slot1271 D_00237800[30];
+extern Slot1271 g_health_drain_slots[30];
 typedef struct { char pad[0xb8]; int owner; } Attacker341;
 extern Attacker341 *D_001B1000 __attribute__((sda));
-extern float *func_002AB1F0(void *);
-extern int func_00334100(int);
-extern void func_002A04B8(void *,int *,int *,int *);
-extern void func_00282D30(void *,void *,float),func_00282F20(void *,void *,float);
-extern void func_002A8C00(void *,void *,int,void *,float),func_002A8E20(void *,void *);
+extern float *moby_get_private_value_0(void *);
+extern int moby_find_entry_index_by_id(int);
+extern void get_moby_color(void *,int *,int *,int *);
+extern void FastVecScale(void *,void *,float),vec_scale_to_length(void *,void *,float);
+extern void make_hit_descriptor(void *,void *,int,void *,float),QueueMobyImpact(void *,void *);
 static __inline__ int IsSpecial1271(int id)
 {
     int special=0;
@@ -47,7 +47,7 @@ static __inline__ int IsSpecial1271(int id)
 }
 static __inline__ int IsEffect1271(int id)
 {
-    Weapon1271 *weapon=&D_00239BA0[D_00139568[id]];
+    Weapon1271 *weapon=&g_weapon_table[g_item_slot_to_record[id]];
     if(weapon->active) {
         int type=weapon->type;
         if(type==2 || (type==1 && IsSpecial1271(id))) return 1;
@@ -56,7 +56,7 @@ static __inline__ int IsEffect1271(int id)
 }
 static __inline__ int IsEffect3_1271(int id)
 {
-    Weapon1271 *weapon=&D_00239BA0[D_00139568[id]];
+    Weapon1271 *weapon=&g_weapon_table[g_item_slot_to_record[id]];
     int active=0;
     if(weapon->active) active=weapon->type==3;
     return active;
@@ -66,7 +66,7 @@ int func_PAL_00335DD0(char *object,int id,int owner)
     float backwards[4] __attribute__((aligned(16)));
     Hit334160 damage __attribute__((aligned(16)));
     int r,g,b;
-    int mapped=D_00239BA0[id].map;
+    int mapped=g_weapon_table[id].map;
     int mode,result=1,i;
     int mask=2;
     if(!mapped) mapped=id;
@@ -78,20 +78,20 @@ int func_PAL_00335DD0(char *object,int id,int owner)
         if(*(signed char *)(object+0x20)<0) return 1;
         if(!I(object,0x98)) return 1;
         {
-            float *health=func_002AB1F0(object);
+            float *health=moby_get_private_value_0(object);
             if(!health || *health<=0.0f) return 1;
         }
-        if(func_00334100((int)object)!=-1) return 1;
+        if(moby_find_entry_index_by_id((int)object)!=-1) return 1;
         {
             for(i=0;i<30;i++) {
-                if(!D_00237800[i].object) {
-                    Slot1271 *slot=&D_00237800[i];
+                if(!g_health_drain_slots[i].object) {
+                    Slot1271 *slot=&g_health_drain_slots[i];
                     float *health;
                     slot->state=0;
                     slot->timer=((s32)(D_00237DA0[mode][id].frames*60) * 5 + 2) / 6;
                     slot->a=D_00237DA0[mode][id].a; slot->b=((D_00237DA0[mode][id].b) * 5.0f + 2.0f) * 0.16666667f;
                     slot->object=object;slot->owner=owner;
-                    health=func_002AB1F0(object);
+                    health=moby_get_private_value_0(object);
                     *health-=D_00237DA0[mode][id].cost;
                     {
                     int colored=0;
@@ -99,23 +99,23 @@ int func_PAL_00335DD0(char *object,int id,int owner)
                         char *p=P(P(slot->object,0x68),0x10);
                         if(p && H(p,0)) {r=B(p,4);g=B(p,5);b=B(p,6);colored=1;}
                     }
-                    if(!colored) func_002A04B8(slot->object,&r,&g,&b);
+                    if(!colored) get_moby_color(slot->object,&r,&g,&b);
                     }
                     slot->color=(b<<16)+(g<<8)+r;
                     slot->alpha=0xff0000;slot->zero=0.0f;slot->active=1;
                     result=0;
                     if(*health<=slot->zero && D_001B1000) {
-                        func_00282D30(backwards,slot->object+0xc0,-1.0f);
-                        func_00282F20(damage.vector,damage.vector,0.002f);
+                        FastVecScale(backwards,slot->object+0xc0,-1.0f);
+                        vec_scale_to_length(damage.vector,damage.vector,0.002f);
                         D_001B1000->owner=slot->owner;
-                        func_002A8C00(damage.vector,D_001B1000,0x810000,backwards,0.001f);
+                        make_hit_descriptor(damage.vector,D_001B1000,0x810000,backwards,0.001f);
                         *(Quad341 *)damage.vector=*(Quad341 *)backwards;
                         damage.vector[3]=5627.9248046875f;
                         damage.flag=1;
                         damage.type=5;
                         damage.source=1;
                         damage.oclass=*(unsigned short *)(slot->object+0xaa);
-                        func_002A8E20(slot->object,&damage);
+                        QueueMobyImpact(slot->object,&damage);
                         slot->object=0;
                     }
                     break;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float ref_L02_00385E18_00;
 
@@ -14,13 +15,13 @@ extern short D_L00_001B2678;
 extern short D_L00_001B267A;
 
 /* Returns the current fade value. */
-float func_L00_0037E668(void)
+float fade_get_value(void)
 {
     return ref_L02_00385E18_00;
 }
 
 /* sets the fade value to its default (0) or its raised value (otherwise) and clears the flag */
-void func_L00_0037E670(int raised)
+void fade_set_level(int raised)
 {
     float level = 40.0f;
     if (raised) {
@@ -33,14 +34,14 @@ void func_L00_0037E670(int raised)
 }
 
 /* the reset side: clears the absolute word and the flag */
-void func_L00_0037E698(void)
+void fade_reset_level(void)
 {
     D_L00_001B26B0 = 0;
     ref_L00_0037E670_01 = 0;
 }
 
 /* records a pair of 16-bit values, then one fixed five-argument engine call */
-void func_L00_0037E6A8(int x, int y)
+void gfx_set_screen_pair_run_effect(int x, int y)
 {
     D_L00_001B2678 = x;
     D_L00_001B267A = y;

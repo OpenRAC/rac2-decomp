@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,20 +24,20 @@
  */
 #include "common.h"
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s8 ref_L11_0030ED58_00[];
 extern s32 ref_L11_0030ED58_01 __attribute__((sda));
 extern void ref_L11_0030ED58_02(s32 *, s32, s32, s32, s32);
 
 /* When the game is in state 11 and the level is in mode 2, picks one of three cues from a
    progress counter and starts it. */
-void func_L11_0030ED58(void) {
+void level_start_progress_cue(void) {
     s8 *levelState;
     s32 cueId;
     s32 progress ;
     s32 limit ;
 
-    if (gCurrentMapIndex == 11) {
+    if (g_current_map_index == 11) {
         levelState = ref_L11_0030ED58_00;
         if ((*(s32 *)((s8 *)(levelState) + (0x30))) == 2) {
             progress = (*(s32 *)((s8 *)(levelState) + (0x34)));

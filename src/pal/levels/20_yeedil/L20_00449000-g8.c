@@ -2,17 +2,17 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float func_00283CE0(int);
-extern void func_L01_002F14E8(int, int, float);
+extern float IntToFloat(int);
+extern void hud_start_overlay(int, int, float);
 extern void func_PAL_L20_004482C8(char *);
 extern void func_PAL_L20_00448428(char *);
-extern void func_002AEC48(void *, void *, int, float, float);
-extern int func_00282948(void *);
+extern void moby_update_eased_node(void *, void *, int, float, float);
+extern int math_fast_float_d(void *);
 extern void *func_PAL_L20_004489E0(char *);
-extern void func_00283098(void *, const void *, const void *);
-extern void func_002833F0(char *, char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002A93B0(void *);
+extern void matrix_mul_vec3(void *, const void *, const void *);
+extern void euler_rotation_basis(char *, char *);
+extern void FastVecSub(void *, void *, void *);
+extern void moby_update_ground_check(void *);
 extern void func_PAL_002B14F8(void *, float *, float, int, int);
 extern float D_L20_001B20B0[] SDATA(D_L20_001B20B0);
 extern float D_L20_001B2164 __attribute__((sda));
@@ -28,15 +28,15 @@ void func_PAL_L20_00449000(char *arg0) {
     unsigned short n;
 
     if (*(unsigned char *)(arg0 + 0x95) != 6) {
-        func_L01_002F14E8(0xA, 0,
+        hud_start_overlay(0xA, 0,
                          *(float *)(s1 + 0x20)
-                         / func_00283CE0(*(short *)(s1 + 0x24)));
+                         / IntToFloat(*(short *)(s1 + 0x24)));
         func_PAL_L20_004482C8(arg0);
         func_PAL_L20_00448428(arg0);
     }
-    func_002AEC48(arg0, s1 + 0x250, 0, 0.0216f, 0.43200004f);
+    moby_update_eased_node(arg0, s1 + 0x250, 0, 0.0216f, 0.43200004f);
     if (*(int *)(s1 + 0x1810) > 0) {
-        if (func_00282948(s1 + 0x1810) != 0) {
+        if (math_fast_float_d(s1 + 0x1810) != 0) {
             func_PAL_L20_004489E0(arg0);
             *(int *)(s1 + 0x1810) = -1;
         }
@@ -64,13 +64,13 @@ copy:
     }
     *(float *)(arg0 + 0xF0) = f;
     *(float *)(arg0 + 0xF4) = *(float *)(s1 + 0x1804);
-    func_00283098(&v0, D_L20_001B20B0, arg0 + 0xC0);
-    func_002833F0(arg0 + 0xC0, arg0 + 0xF0);
-    func_00283098(&v1, D_L20_001B20B0, arg0 + 0xC0);
-    func_00282CF0(&v2, &v1, &v0);
-    func_00282CF0(src, src, &v2);
+    matrix_mul_vec3(&v0, D_L20_001B20B0, arg0 + 0xC0);
+    euler_rotation_basis(arg0 + 0xC0, arg0 + 0xF0);
+    matrix_mul_vec3(&v1, D_L20_001B20B0, arg0 + 0xC0);
+    FastVecSub(&v2, &v1, &v0);
+    FastVecSub(src, src, &v2);
 done:
-    func_002A93B0(arg0);
+    moby_update_ground_check(arg0);
     n = *(unsigned short *)(arg0 + 0x96);
     arg0[0xBD] = 2;
     if (n <= 0xFFFE) {

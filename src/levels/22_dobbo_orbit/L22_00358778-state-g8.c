@@ -1,24 +1,24 @@
 #include "common.h"
 typedef union { unsigned int q __attribute__((mode(TI))); float f[4]; } Vec;
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_002A77E0(int);
-extern void func_002AFFD8(void *,void *,int);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int math_random_int_below(int);
+extern void cam_compute_view_direction(void *,void *,int);
 #define U8(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define U16(p,o) (*(unsigned short *)((char *)(p)+(o)))
 #define S16(p,o) (*(short *)((char *)(p)+(o)))
 #define I32(p,o) (*(int *)((char *)(p)+(o)))
 #define FL(p,o) (*(float *)((char *)(p)+(o)))
 #define PTR(p,o) (*(char **)((char *)(p)+(o)))
-extern void func_002B60B0(void *,float,float,float,float);
-extern void func_002A7750(void *,int,int);
-extern void func_002A7470(void *,int,int,int);
-extern int func_00277258(void *,int,int,float);
-extern void func_L22_003A3550(void *,int,float);
-extern void func_L22_003A2988(void *,float);
-extern float func_00282E48(void *,void *);
-extern void func_002B0ED8(void *,void *,int);
-extern void func_L00_00325600(void *,void *,int);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float);
+extern void moby_set_state(void *,int,int);
+extern void anim_start_blended(void *,int,int,int);
+extern int coll_test_point(void *,int,int,float);
+extern void lane_pick_random_point_away_from_ship(void *,int,float);
+extern void arena_push_point_out(void *,float);
+extern float fast_vec_dist(void *,void *);
+extern void moby_apply_damage_to_object(void *,void *,int);
+extern void vec_negate_and_forward(void *,void *,int);
 extern char *D_L22_001AF314;
 extern short D_L22_001B2A88;
 extern int D_L22_001B2A8C, D_L22_001B2A90;
@@ -27,7 +27,7 @@ extern float D_L22_001AF308;
 extern int D_L22_001B119C __attribute__((sda));
 extern char *D_L22_001C00D8 __attribute__((section(".data")));
 /* State machine of a flying enemy. It sets up its stats at the start, then picks where to spawn or respawn near the hero and starts its animations. */
-void func_L22_0040D638(char *obj) {
+void flying_enemy_update_states(char *obj) {
     Vec offset;
     int state = U8(obj,0x20);
     char *ctx = PTR(obj,0x68);
@@ -41,31 +41,31 @@ void func_L22_0040D638(char *obj) {
         FL(ctx,0x58)=0.4f; FL(ctx,0x5c)=0.4f;
         FL(ctx,0x60)=1.5707964897155762f;
         FL(ctx,0x80)=1.5533431768417358f;
-        SetControllerSpeedLimits(obj,0.006666666828095913f,0.20000001788139343f,0.0017453294713050127f,0.20943954586982727f);
+        moby_set_controller_speed_limits(obj,0.006666666828095913f,0.20000001788139343f,0.0017453294713050127f,0.20943954586982727f);
         I32(ctx,0x288)=0; I32(ctx,0x28c)=1; I32(obj,0x98)=0;
         U16(obj,0x34)=(U16(obj,0x34)|0x41)&0xefff;
-        SetMobyState(obj,1,4);
+        moby_set_state(obj,1,4);
     } else if (state == 1) {
         if (!D_L22_001AF314) goto finish;
-        SetMobyState(obj,6,4);
-        if (RandomIntBelow(2)) {
+        moby_set_state(obj,6,4);
+        if (math_random_int_below(2)) {
             S16(ctx,0x178)=0;
             U16(obj,0x34)=(U16(obj,0x34)&0xffbe)|0x1000;
             I32(obj,0x98)=I32(PTR(obj,0x24),0x10);
-            PickRandomLanePointAwayFromShip(obj+0x10,1,7.2f);
-            if (TestPointAgainstCollision(obj+0x10,1,0,3.0f) && S16(D_L22_001C00D8,0xaa)==0xedd /* moby class 3805 */ && U8(D_L22_001C00D8,0x20)!=6) {
-                char *axis=obj+0xc0+16*RandomIntBelow(2);
+            lane_pick_random_point_away_from_ship(obj+0x10,1,7.2f);
+            if (coll_test_point(obj+0x10,1,0,3.0f) && S16(D_L22_001C00D8,0xaa)==0xedd /* moby class 3805 */ && U8(D_L22_001C00D8,0x20)!=6) {
+                char *axis=obj+0xc0+16*math_random_int_below(2);
                 float scale;
-                if (RandomIntBelow(2)) scale=D_L22_001AF308;
+                if (math_random_int_below(2)) scale=D_L22_001AF308;
                 else scale=-D_L22_001AF308;
                 FastVecScale(&offset,axis,scale);
                 FastVecAdd(obj+0x10,obj+0x10,&offset);
-                PushPointOutOfArena(obj+0x10,7.2f);
+                arena_push_point_out(obj+0x10,7.2f);
             }
             qcopy(ctx+0x2a0,obj+0x10);
             I32(ctx,0x284)=0;
-            SetMobyState(obj,2,0);
-            if (U8(obj,0x43)!=1) StartAnimationBlended(obj,1,0,0);
+            moby_set_state(obj,2,0);
+            if (U8(obj,0x43)!=1) anim_start_blended(obj,1,0,0);
         } else I32(ctx,0x284)=state;
     } else if (D_L22_001B2A88==2) {
         if ((U16(D_L22_001AF314,0x34)^1)&1) {
@@ -83,7 +83,7 @@ respawn:
                     U16(obj,0x34)=(U16(obj,0x34)&0xffbe)|0x1000;
                     I32(obj,0x98)=I32(PTR(obj,0x24),0x10);
                     qcopy(obj+0x10,D_L22_00189ED0);
-                    SetMobyState(obj,8,5);
+                    moby_set_state(obj,8,5);
                     D_L22_001B2A90=D_L22_001B119C;
                     I32(ctx,0x288)=D_L22_001B2A88;
                 }
@@ -93,8 +93,8 @@ respawn:
 finish:
     if (U8(obj,0x20)!=6) {
         FL(obj,0x2c)=FL(PTR(obj,0x24),0x24)*0.4f;
-        ApplyDamageToObject(obj,ctx+0x140,0);
-        ComputeViewDirection(obj+0x10,ctx+0x290,0);
-        NegateAndForwardVector(obj+0xc0,ctx+0x290,0);
+        moby_apply_damage_to_object(obj,ctx+0x140,0);
+        cam_compute_view_direction(obj+0x10,ctx+0x290,0);
+        vec_negate_and_forward(obj+0xc0,ctx+0x290,0);
     }
 }

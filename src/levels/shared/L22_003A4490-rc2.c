@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -34,7 +35,7 @@ extern s32 ref_L22_003A4490_04 __attribute__((sda));
 
 
 /* Keeps the three parts attached to the ship lined up with it while it is being shown at the end. */
-void func_L22_003A4490(void *obj) {
+void space_ship_align_parts_at_end(void *obj) {
     void *part ;
     u8 stack_buffer[0x10];
     u8 state1;

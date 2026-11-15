@@ -7,7 +7,7 @@ typedef struct {
     char x[10];
 } Sequence;
 extern Sequence D_L06_001AF700;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0018C0D4 NOT_SDA;
 extern float D_L06_001AF620 __attribute__((sda));
 extern char D_L06_001B9840[];
@@ -17,21 +17,21 @@ typedef struct {
     u8 pad75[0x13];
     char *owner;
 } Effect;
-extern u8 D_00188660[];
-extern void func_0026FEB8(char *, ...);
-extern void func_0029F338(char *);
-extern int func_002A77E0(int);
-extern float func_00283B98(float, float);
-extern int func_00283CF0(float);
-extern float func_00282C10(float);
-extern float func_00282E48(void *, void *);
-extern int func_00283DB8(void *, float);
-extern void func_L00_002E6EF8(void *, void *);
+extern u8 g_sound_state[];
+extern void STUB_printf(char *, ...);
+extern void moby_mark_spawned(char *);
+extern int math_random_int_below(int);
+extern float FastAddRotations(float, float);
+extern int FloatToInt(float);
+extern float square_root(float);
+extern float fast_vec_dist(void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern void gfx_add_draw_callback_third(void *, void *);
 extern void func_PAL_L06_004046D8(void);
-extern int func_002E59B0(void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282948(void *);
-extern void func_002E59F8(int);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int PlayMobySound(int, int, void *);
+extern void math_fast_float_d(void *);
+extern void snd_stop_voice(int);
 typedef struct {
     float radius;
     int count;
@@ -65,21 +65,21 @@ void func_PAL_L13_003C885C(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        func_0026FEB8(D_L06_001AF6A0);
-        func_0026FEB8(D_L06_001AF6E0, *(short *)(obj + 0xB2));
-        func_0029F338(obj);
+        STUB_printf(D_L06_001AF6A0);
+        STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
+        moby_mark_spawned(obj);
     }
     switch (m->state) {
     case 0: {
         int i, j, k;
         float r;
-        if (D_001A79F0 == 10 && D_0018C0D4 == 1) {
-            func_0029F338(obj);
+        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+            moby_mark_spawned(obj);
             break;
         }
         buffer.seq = D_L06_001AF700;
         for (i = 0; i < 10; i++) {
-            for (j = 0; j < func_002A77E0(9); j++) {
+            for (j = 0; j < math_random_int_below(9); j++) {
                 u8 b = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
                 buffer.seq.x[j] = b;
@@ -87,12 +87,12 @@ void func_PAL_L13_003C885C(char *obj) {
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = func_00283B98(m->angle, 1.5707964897155762f);
+        r = FastAddRotations(m->angle, 1.5707964897155762f);
         m->mode = 0xFF;
         m->state = 1;
         m->angle = r;
         data->effect = -1;
-        data->timer = ((s32)(func_00283CF0(D_L06_001AF620 * 60.0f)) * 5 + 2) / 6;
+        data->timer = ((s32)(FloatToInt(D_L06_001AF620 * 60.0f)) * 5 + 2) / 6;
         m->flags |= 0x41;
         break;
     }
@@ -103,34 +103,34 @@ void func_PAL_L13_003C885C(char *obj) {
         h = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += h;
-        sphere[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f) {
-            if ((float)func_00283DB8(sphere, 80.0f) >= 0.0f)
-                func_L00_002E6EF8(func_PAL_L06_004046D8, obj);
+        sphere[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+            if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
+                gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
         }
-        if (!func_002E59B0(obj, data->effect))
-            data->effect = func_002E5CF8(0, 4, obj);
+        if (!snd_is_voice_playing_for_owner(obj, data->effect))
+            data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
         int i;
         float r, h;
-        func_00282948(&data->timer);
+        math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *e = (Effect *)(D_00188660 + i * 0x70);
+            Effect *e = (Effect *)(g_sound_state + i * 0x70);
             if (e->owner == obj && e->active)
-                func_002E59F8(i);
+                snd_stop_voice(i);
         }
         data->effect = -1;
         r = data->radius * 0.5f;
         h = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += h;
-        buffer.f[3] = func_00282C10(h * h + r * r);
-        if (func_00282E48(obj + 0x10, D_L06_001B9840) < 80.0f &&
-            (float)func_00283DB8(&buffer, 80.0f) >= 0.0f)
-            func_L00_002E6EF8(func_PAL_L06_004046D8, obj);
+        buffer.f[3] = square_root(h * h + r * r);
+        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+            (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
+            gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
         break;
     }
     }

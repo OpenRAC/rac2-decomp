@@ -14,30 +14,30 @@ typedef struct {
     char pad2294[0x22B4 - 0x2294];
     unsigned char mode;
 } L00_004240D8_Player;
-extern L00_004240D8_Player D_00189E20;
+extern L00_004240D8_Player g_hero_state;
 extern const float D_L00_001B14D0 __attribute__((sda));
 extern float D_L00_001B14B4 __attribute__((sda));
 extern const float D_L00_001B14C8 __attribute__((sda));
 extern float D_00138280 NOT_SDA;
 extern void *D_L00_001B1850[] __attribute__((sda));
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282C48(float);
-extern int func_00283CF0(float);
-extern int func_L00_004204A0(void *);
-extern int func_00277258(void *, void *, void *, float);
-extern int func_L00_00424070(void *, int, void *, float);
-extern int func_L00_00423CA8(void *, void *, int, float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fabs(float);
+extern int FloatToInt(float);
+extern int coll_is_point_in_grid(void *);
+extern int coll_test_point(void *, void *, void *, float);
+extern int cam_is_step_behind_plane(void *, int, void *, float);
+extern int cam_push_point_out_of_walls(void *, void *, int, float, float);
 #define F(p,n) (*(float *)((char *)(p)+(n)))
 #define S(p,n) (*(short *)((char *)(p)+(n)))
 #define P(p,n) (*(char **)((char *)(p)+(n)))
 /* Steps a probe from the owner block's position along its movement direction, testing each
    step for collisions; on a hit it records the result, may pull the follow distance in, and
    re-aims the movement vector at the hit point. */
-int func_L00_004240D8(char *obj)
+int cam_follow_sweep_probe(char *obj)
 {
     float original[4], point[4], direction[4], saved[4], previous[4], difference[4];
     char *base=P(obj,112);
@@ -52,17 +52,17 @@ int func_L00_004240D8(char *obj)
     step=D_L00_001B14D0;
     vec_scale_to_length(direction,original,1.0f);
     for(i=0;i<FloatToInt(F(state,64)-1.0f);i++) {
-        if(i>0 && !IsPointInCollisionGrid(point) &&
-           TestPointAgainstCollision(point,D_L00_001B1850[0],gHeroState.owner,step) &&
-           !IsCameraStepBehindPlane(obj,i,point,step)) {
+        if(i>0 && !coll_is_point_in_grid(point) &&
+           coll_test_point(point,D_L00_001B1850[0],g_hero_state.owner,step) &&
+           !cam_is_step_behind_plane(obj,i,point,step)) {
             qcopy(saved,D_L00_001BF220_1);
             qcopy(previous,point);
-            if(PushCameraPointOutOfWalls(obj,point,i,total,step)) {
+            if(cam_push_point_out_of_walls(obj,point,i,total,step)) {
                 result=1;
-                if (gHeroState.mode!=2 && FloatAbs(D_00138280)>0.05f) {
+                if (g_hero_state.mode!=2 && math_fabs(D_00138280)>0.05f) {
                     FastVecSub(difference,saved,previous);
                     vec_scale_to_length(difference,difference,1.0f);
-                    if(FloatAbs(FastVecDot(D_L00_001B8E50,difference))<0.75f) {
+                    if(math_fabs(FastVecDot(D_L00_001B8E50,difference))<0.75f) {
                         F(state,48) += D_L00_001B14B4;
                         S(state,52)=2180;
                         if(F(movement,44)-F(state,48)<D_L00_001B14C8)

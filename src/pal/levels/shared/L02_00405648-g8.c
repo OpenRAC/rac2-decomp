@@ -8,8 +8,8 @@ extern int D_L02_001B1714 __attribute__((nosda));
 extern int D_L02_001B1718 __attribute__((nosda));
 extern int D_L02_001B171C __attribute__((nosda));
 extern char D_L02_001A8F20[];
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
 extern void func_PAL_002BE880(void *, void *, float, u32, s32, s32);
 
 void func_PAL_L02_00405D00(void *a0)
@@ -22,9 +22,9 @@ void func_PAL_L02_00405D00(void *a0)
     int t0;
 
     s0 = *(void **)(s1 + 0x68);
-    r = func_002A7878(D_L02_001B1720, D_L02_001B1724);
+    r = math_random_float_range(D_L02_001B1720, D_L02_001B1724);
     f20 = r * 210000.0f;
-    t0 = ((s32)(func_002A7820(*(unsigned char *)(s0 + 0x75), *(unsigned char *)(s0 + 0x76))) * 5 + 2) / 6;
+    t0 = ((s32)(math_random_int_range(*(unsigned char *)(s0 + 0x75), *(unsigned char *)(s0 + 0x76))) * 5 + 2) / 6;
     if (*(short *)(s1 + 0xAA) == 0xB5A) {
         local[0] = D_L02_001B1710;
         local[1] = D_L02_001B1714;

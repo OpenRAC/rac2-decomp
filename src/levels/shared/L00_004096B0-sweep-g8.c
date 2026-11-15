@@ -36,52 +36,52 @@ extern float D_L00_001B0FB0 __attribute__((sda));
 extern float D_L00_001B0FC0 __attribute__((sda));
 extern int D_L00_001ADB2C __attribute__((sda));
 extern int D_L00_001A8FF0, D_L00_001A8FF4;
-extern char *D_0018C0B0 NOT_SDA;
-extern char *D_L00_001C3280[];
-extern unsigned char D_00139568[];
+extern char *g_hero_moby NOT_SDA;
+extern char *g_area_hit_targets[];
+extern unsigned char g_item_slot_to_record[];
 typedef struct {
     char pad00[0x74];
     float strength;
     char pad78[0x68];
 } CollisionWeaponInfo;
-extern CollisionWeaponInfo D_L00_00262570[];
+extern CollisionWeaponInfo g_weapon_l00_table[];
 
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00300190(void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002FEE70(int, void *, int);
-extern void func_002FE880(void *, float *, float);
-extern int func_002FE9D0(CollisionQuery *);
-extern int func_00300540(int);
-extern void func_002ACDE8(void *, void *, void *);
-extern int func_00277F48(void *, float, int, void *, int);
-extern int func_002ABB78(char *);
-extern char *func_002AB1F0(void *);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00282C48(float);
-extern void func_002AB668(void *, void *, float);
-extern int func_002E5CF8(int, int, char *);
-extern int func_00282978(void *);
-extern void func_002A8E20(void *, CollisionImpact *);
-extern int func_0032D758(void *, int, void *);
-extern char *func_0032C700(void *, int, int, int, int, int, int, int,
+extern void cam_compute_view_direction(char *, char *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_add_object_direction_scaled(void *, float *, float);
+extern int CollideSweptSphere(CollisionQuery *);
+extern int weapon_get_group(int);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern int coll_process_hit(void *, float, int, void *, int);
+extern int moby_is_in_special_class_range(char *);
+extern char *moby_get_private_value_0(void *);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float math_fabs(float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern int PlayMobySound(int, int, char *);
+extern int FastDecTimer(void *);
+extern void QueueMobyImpact(void *, CollisionImpact *);
+extern int StartAttachedEffect(void *, int, void *);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
-extern void func_002A9288(void *, float);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
+extern void part_queue_ground_shadow(void *, float);
 
 /* Resolve motion and contacts, select a nearby target, and apply the object's
  * impact response. The query and impact layouts reflect their measured fields. */
 /* Updates the shot with moby class 3790: it flies, bounces off walls, bends toward a nearby enemy and blows up on impact. */
-void func_L00_004096B0(char *object)
+void UpdateBouncingBlastProjectile(char *object)
 {
     CollisionVector direction, previous;
     CollisionShape shape[1];
@@ -92,15 +92,15 @@ void func_L00_004096B0(char *object)
     int contacts, contact_kind, triggered;
     float range, fade;
 
-    ComputeViewDirection(position, (char *)&direction, 1);
-    TransformVectorOrCopy(position, position);
+    cam_compute_view_direction(position, (char *)&direction, 1);
+    vec_transform_or_copy(position, position);
     if (*(unsigned char *)(object + 0x20) == 0) {
         float sweep_radius, min_facing;
 
         qcopy(&previous, position);
         FastVecAdd(position, position, state);
-        SteerEffectDirection(*(int *)(state + 0x28), state, 0);
-        AddObjectDirectionScaled(position, (float *)state, 0.0040555559f);
+        part_steer_effect_direction(*(int *)(state + 0x28), state, 0);
+        vec_add_object_direction_scaled(position, (float *)state, 0.0040555559f);
         /* Set here rather than at its use: sched1 issues this constant right after the call, which
            leaves the %hi of the copy below in $v1 and the list pointer in $a1. */
         min_facing = 1.5f;
@@ -121,24 +121,24 @@ void func_L00_004096B0(char *object)
         query.collisionFlags = 0;
         query.useOffset = 0;
         contacts = CollideSweptSphere(&query);
-        contact_kind = GetWeaponGroup(query.surface);
+        contact_kind = weapon_get_group(query.surface);
         qcopy(position, &query.position);
         qcopy(state, &query.velocity);
-        RotateVectorByQuaternion(object + 0xC0, object + 0xC0, state + 0x10);
-        RotateVectorByQuaternion(object + 0xD0, object + 0xD0, state + 0x10);
-        RotateVectorByQuaternion(object + 0xE0, object + 0xE0, state + 0x10);
+        vec_rotate_by_quaternion(object + 0xC0, object + 0xC0, state + 0x10);
+        vec_rotate_by_quaternion(object + 0xD0, object + 0xD0, state + 0x10);
+        vec_rotate_by_quaternion(object + 0xE0, object + 0xE0, state + 0x10);
         if (contacts > 0) {
             int count, i, best;
-            count = ProcessCollisionHit(position, 7.0f, 1, gHeroMoby_0018C0B0, 0);
+            count = coll_process_hit(position, 7.0f, 1, g_hero_moby, 0);
             if (count != 0) {
                 float closest = 10000.0f;
                 best = -1;
                 for (i = 0; i < count; i++) {
-                    char *target = gAreaHitTargets[i];
+                    char *target = g_area_hit_targets[i];
                     char *description;
-                    if (*(unsigned char *)(target + 0x31) == 0 || IsMobyInSpecialClassRange(target) != 0)
+                    if (*(unsigned char *)(target + 0x31) == 0 || moby_is_in_special_class_range(target) != 0)
                         continue;
-                    description = GetMobyPrivateValue0(target);
+                    description = moby_get_private_value_0(target);
                     if (description != 0 && !(*(float *)description <= 0.0f) && target != 0 &&
                         *(char **)(target + 0x24) != 0 &&
                         *(short *)(*(char **)(target + 0x24) + 0x46) == 5) {
@@ -150,8 +150,8 @@ void func_L00_004096B0(char *object)
                     }
                 }
                 if (best >= 0) {
-                    char *target = gAreaHitTargets[best];
-                    char *description = GetMobyPrivateValue0(target);
+                    char *target = g_area_hit_targets[best];
+                    char *description = moby_get_private_value_0(target);
                     float length, projection;
                     qcopy(&workspace.math.point, target + 0x10);
                     if (D_L00_001A8FF0 != 0) {
@@ -180,18 +180,18 @@ void func_L00_004096B0(char *object)
             workspace.math.point.f[2] = 0.0f;
             FastVecCross(&workspace.math.point, &workspace.math.point, &direction);
             vec_scale_to_length(&workspace.math.point, &workspace.math.point, 1.0f);
-            range = RandomSignedFloatRange(0.0f, 0.52359885f);
-            if (FloatAbs(range) < 0.00001f) {
-                BuildAxisAngleQuaternion(&workspace.math.work, &direction, range);
-                RotateVectorByQuaternion(&workspace.math.point, &workspace.math.point, &workspace.math.work);
+            range = math_random_signed_float_range(0.0f, 0.52359885f);
+            if (math_fabs(range) < 0.00001f) {
+                math_build_axis_angle_quat(&workspace.math.work, &direction, range);
+                vec_rotate_by_quaternion(&workspace.math.point, &workspace.math.point, &workspace.math.work);
             }
-            range = RandomFloatRange(0.05235988646745682f, 0.10471977293491364f);
-            BuildAxisAngleQuaternion(state + 0x10, &workspace.math.point, range);
+            range = math_random_float_range(0.05235988646745682f, 0.10471977293491364f);
+            math_build_axis_angle_quat(state + 0x10, &workspace.math.point, range);
             PlayMobySound(0, 0, object);
         }
         workspace.impact.owner = object;
         workspace.impact.flags = 0x830000;
-        workspace.impact.strength = (gItemSlotToRecord[0x25] + gWeaponTable_L00)->strength;
+        workspace.impact.strength = (g_item_slot_to_record[0x25] + g_weapon_l00_table)->strength;
         workspace.impact.count = 1;
         qcopy(&workspace.impact.force, state);
         triggered = 0;
@@ -207,11 +207,11 @@ void func_L00_004096B0(char *object)
         } else {
             if (*(short *)(state + 0x22) == 0) {
                 int count, i;
-                count = ProcessCollisionHit(object + 0x10, range, 1, gHeroMoby_0018C0B0, 0);
+                count = coll_process_hit(object + 0x10, range, 1, g_hero_moby, 0);
                 for (i = 0; i < count; i++) {
-                    char *target = gAreaHitTargets[i];
-                    char *description = GetMobyPrivateValue0(target);
-                    int special = IsMobyInSpecialClassRange(target);
+                    char *target = g_area_hit_targets[i];
+                    char *description = moby_get_private_value_0(target);
+                    int special = moby_is_in_special_class_range(target);
                     if (special != 0 || (description != 0 && *(float *)description > 0.0f &&
                                          *(short *)(description + 6) == 0)) {
                         QueueMobyImpact(target, &workspace.impact);
@@ -239,8 +239,8 @@ void func_L00_004096B0(char *object)
                 blast_range = 2.4f;
             SpawnExplosion(object + 0x10, 0, 6, 5, 6, 8, 10, 0, 0, 0, 0, D_L00_001ADB2C,
                           blast_range, 20.0f);
-            ClearEntryFlag(*(int *)(state + 0x28));
-            MarkMobySpawned(object);
+            table_clear_entry_flag(*(int *)(state + 0x28));
+            moby_mark_spawned(object);
             return;
         }
     }
@@ -248,5 +248,5 @@ void func_L00_004096B0(char *object)
     if (*(int *)(state + 0x24) != 0)
         fade = D_L00_001B0FC0;
     if (D_L00_001A8FF0 == 0 && D_L00_001A8FF4 == 0)
-        QueueGroundShadow(object, fade);
+        part_queue_ground_shadow(object, fade);
 }

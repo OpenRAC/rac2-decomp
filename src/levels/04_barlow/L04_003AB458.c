@@ -3,20 +3,20 @@
 
 typedef unsigned short u16;
 
-extern void func_00282978(void *);
-extern void func_002A0488(void *, int, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002AB8C0(void *, void *);
-extern void func_L00_002E6CF0(void *);
-extern void func_L04_003A21F8(void *, int);
+extern void FastDecTimer(void *);
+extern void set_moby_color(void *, int, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void gfx_update_color_fade(void *, void *);
+extern void gfx_add_draw_callback_first(void *);
+extern void render_water_grids(void *, int);
 extern char D_L04_002AF6C0[];
 
-extern void func_0029FCC0(void *, int, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L04_003E53D0(void *, void *);
-extern void func_L04_003E55E0(void *, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void gfx_draw_tether_beam_red(void *, void *);
+extern void gfx_draw_tether_beam_white(void *, void *);
 
 typedef struct L04_003E5318_BUF {
     float f[6];
@@ -39,13 +39,13 @@ typedef struct {
     TI2338 position;
     char pad40[0x40];
 } Record2338;
-extern void func_00115484(void *, int, int);
-extern void func_00282A28(void);
-extern int func_002A7820(int, int);
+extern void memset(void *, int, int);
+extern void math_trap_always(void);
+extern int math_random_int_range(int, int);
 extern char *D_L04_001B25CC __attribute__((sda));
 
 /* Draws the beam effect from the linked object's attachment point. */
-void func_L04_003E5318(char *mobyArg)
+void object_draw_linked_beam(char *mobyArg)
 {
     char *moby = mobyArg;
     char *vars = *(char **)(moby + 0x68);
@@ -55,24 +55,24 @@ void func_L04_003E5318(char *mobyArg)
     if (linked != 0) {
         char *linkedVars = *(char **)(linked + 0x68);
 
-        TransformMobyJointToWorld(*(char **)(linkedVars + 0x288), 0, &start);
-        start.f[4] = FastSinOrCosA(*(float *)(moby + 0xF8)) * 0.1f;
-        start.f[5] = FastSinOrCosB(*(float *)(moby + 0xF8)) * 0.1f;
+        moby_transform_joint_to_world(*(char **)(linkedVars + 0x288), 0, &start);
+        start.f[4] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * 0.1f;
+        start.f[5] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * 0.1f;
         start.z = 0;
         FastVecAdd(&start, &start, start.f + 4);
         start.f[2] = start.f[2] - 0.05f;
-        DrawTetherBeamRed(moby, &start);
-        DrawTetherBeamWhite(moby, &start);
+        gfx_draw_tether_beam_red(moby, &start);
+        gfx_draw_tether_beam_white(moby, &start);
     }
 }
 
 /* Does the per-frame upkeep of the object and counts up its age, stopping at the maximum. */
-void func_L04_003E51F0(char *moby)
+void object_update_age_timer(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     u16 age;
 
-    UpdateColorFade(moby, vars + 0x50);
+    gfx_update_color_fade(moby, vars + 0x50);
     FastDecTimer(vars + 0x2A0);
     FastDecTimer(vars + 0x2A2);
     age = *(u16 *)(moby + 0x96);
@@ -82,19 +82,19 @@ void func_L04_003E51F0(char *moby)
 }
 
 /* Releases the linked object and clears the link to it. */
-void func_L04_003E5250(char *moby)
+void object_release_linked(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(char **)(vars + 0x2AC) != 0) {
-        StartAnimationBlended(*(char **)(vars + 0x2AC), 9, 0, 3);
+        anim_start_blended(*(char **)(vars + 0x2AC), 9, 0, 3);
         *(int *)(*(char **)(*(char **)(vars + 0x2AC) + 0x68) + 0x27C) = 0;
         *(char **)(vars + 0x2AC) = 0;
     }
 }
 
 /* Runs the shared level routine on the standard list with a count of 10. */
-void func_L04_003E7FE8(void)
+void group_run_shared_routine(void)
 {
     render_water_grids(D_L04_002AF6C0, 10);
 }
@@ -102,8 +102,8 @@ void func_L04_003E7FE8(void)
 typedef unsigned char u8;
 typedef int s32;
 typedef float f32;
-extern u8 D_00188660[];
-extern char D_00189EA0[];
+extern u8 g_sound_state[];
+extern char g_hero_position[];
 extern s32 func_00342228(void *, s32);
 extern s32 func_00382FF0(s32, s32, void *);
 extern s32 func_0033D168(s32, s32);
@@ -112,12 +112,12 @@ extern void func_003317E8(void *);
 extern f32 func_0030EFA8(void *, void *);
 
 /* Keeps a sound playing for the object while the player is close, and stops it when the player moves away or the object ends. */
-void func_L04_003AB458(u8 *moby)
+void proximity_loop_sound_update(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (func_00342228(gHeroPosition, *(s32 *)vars) != 0) {
-        u8 *sound = gSoundState + *(s32 *)(vars + 8) * 0x70;
+    if (func_00342228(g_hero_position, *(s32 *)vars) != 0) {
+        u8 *sound = g_sound_state + *(s32 *)(vars + 8) * 0x70;
         if (*(u8 **)(sound + 0x88) != moby || *(u8 *)(sound + 0x74) == 0) {
             *(s32 *)(vars + 8) = func_00382FF0(0x17, 4, moby);
         }
@@ -125,19 +125,19 @@ void func_L04_003AB458(u8 *moby)
     if (func_0033D168(*(s32 *)(vars + 4), -1) < 7) {
         s32 soundId = *(s32 *)(vars + 8);
         if (soundId != -1) {
-            u8 *sound = gSoundState + soundId * 0x70;
+            u8 *sound = g_sound_state + soundId * 0x70;
             if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0)
                 func_00382AF8(soundId);
         }
         *(s32 *)(vars + 8) = -1;
         func_003317E8(moby);
     } else {
-        u8 *sound = gSoundState + *(s32 *)(vars + 8) * 0x70;
+        u8 *sound = g_sound_state + *(s32 *)(vars + 8) * 0x70;
         if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
-            if (func_0030EFA8(moby + 0x10, gHeroPosition) > 50.0f) {
+            if (func_0030EFA8(moby + 0x10, g_hero_position) > 50.0f) {
                 s32 soundId = *(s32 *)(vars + 8);
                 if (soundId != -1) {
-                    u8 *sound = gSoundState + soundId * 0x70;
+                    u8 *sound = g_sound_state + soundId * 0x70;
                     if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0)
                         func_00382AF8(soundId);
                 }
@@ -150,20 +150,20 @@ void func_L04_003AB458(u8 *moby)
 
 
 /* Switches the object, and its linked object if it has one, to new states. */
-void func_L04_003E22B0(char *moby, int stateA, int stateB, int arg3, int arg4)
+void object_set_linked_states(char *moby, int stateA, int stateB, int arg3, int arg4)
 {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(char **)(vars + 0x2AC) != 0) {
-        StartAnimationBlended(moby, stateA, arg3, arg4);
-        StartAnimationBlended(*(char **)(vars + 0x2AC), stateB, arg3, arg4);
+        anim_start_blended(moby, stateA, arg3, arg4);
+        anim_start_blended(*(char **)(vars + 0x2AC), stateB, arg3, arg4);
     } else if (*(unsigned char *)(moby + 0x43) != stateA) {
-        StartAnimationBlended(moby, stateA, arg3, arg4);
+        anim_start_blended(moby, stateA, arg3, arg4);
     }
 }
 
 /* Picks a random other slot that is in use and moves the object to that slot's position. */
-void func_L04_003E2338(char *moby)
+void SelectRandomOtherLiveSlot(char *moby)
 {
     Private2338 *vars = *(Private2338 **)(moby + 0x68);
     int values[3];
@@ -181,7 +181,7 @@ void func_L04_003E2338(char *moby)
                 if (count < 4)
                     values[count - 1] = slotIndex;
                 else
-                    TrapAlways();
+                    math_trap_always();
             }
         }
         slotIndex++;
@@ -190,7 +190,7 @@ void func_L04_003E2338(char *moby)
         slotPtr++;
     }
     if (count != 0) {
-        int pick = RandomIntRange(0, count - 1);
+        int pick = math_random_int_range(0, count - 1);
         vars->current = (unsigned char)values[pick];
         vars->position = ((Record2338 *)D_L04_001B25CC)[vars->slots[vars->current]].position;
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L09_002BC490 (Dobbo): the hero's per-frame state handler, a 147-way switch on the
    state at 0x2294 over 45 bodies (23620 bytes, level 9 only).  One function: one prologue
    (frame 0x190), one return.
@@ -31,15 +32,15 @@ typedef struct { s32 w[11]; } Rec2C;
 #define M2C_FIELD(expr, type_ptr, offset) (*(type_ptr)((s8 *)(expr) + (offset)))
 #define M2C_BITWISE(type, expr) ((type)(expr))
 #define M2C_ERROR(d) (0)
-extern char D_00138180[];
+extern char g_pad_state[];
 extern u8 D_00138354[];
-extern u8 D_00188660[];
-extern char D_00189E20[];
+extern u8 g_sound_state[];
+extern char g_hero_state[];
 extern char D_00189F10[];
-extern char D_0018C750[];
+extern char g_progress_statistics[];
 extern u8 D_0018CF10[];
 extern u32 D_001A7390 MACRO_ADDR;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern u8 D_001A7B08[0x40] MACRO_ADDR;
 extern u8 D_001A7B2A MACRO_ADDR;
 extern f32 D_L09_001A7DAC[][4] MACRO_ADDR;
@@ -55,126 +56,126 @@ extern u8 D_L09_001C3EC0[];
 extern u8 D_L09_0025EA90[];
 extern Rec2C D_L09_00260610[];
 extern u8 D_L09_00260990[];
-extern s32 func_002761F8(s32, s32, s32, s32, s32);
-extern s32 func_00277F48(f32, s32, s32, s32, s32);
-extern s32 func_00282948(s32);
-extern s32 func_00282978(s32);
-extern f32 func_00282C10(f32);
-extern f32 func_00282C48(f32);
-extern void func_00282C88(s32);
-extern void func_00282CC0(s32, s32, s32);
-extern void func_00282CF0(s32, s32, s32);
-extern void func_00282D30(s32, s32, f32);
-extern f32 func_00282DB0(s32, s32);
-extern void func_00282DD8(s32, s32, s32);
-extern f32 func_00282DF0(s32);
-extern f32 func_00282E20(s32);
-extern f32 func_00282E48(s32, s32);
-extern f32 func_00282E80(s32, s32);
-extern void func_00282F20(s32, s32, f32);
-extern void func_00282F70(s32, s32, f32);
-extern void func_00283098(s32, s32, s32);
-extern void func_002830C0(s32, s32, s32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 func_00283248(f32, f32);
-extern void func_00283410(s32, s32);
-extern void func_00283698(s32, s32);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
-extern f32 func_00283C80(f32, f32);
-extern s32 func_00283CF0(f32);
-extern void func_00290010(s32, s32, s32, f32);
-extern void func_0029FCC0(s32, s32, s32);
-extern s32 func_002A77E0(s32);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_002A88A0(s32, s32, f32, f32, f32);
-extern void func_002A8C00(s32, s32, s32, f32, s32);
-extern void func_002A8F70(s32, s32, s32, s32, s32, f32);
-extern f32 func_002AA2E8(s32, f32, f32);
-extern f32 func_002AA3A8(s32, s32, f32, f32, f32, f32);
-extern f32 func_002AA458(s32, s32, s32, f32, f32, f32);
-extern f32 func_002AA738(s32, f32, f32);
-extern void func_002AA800(s32, s32, f32, f32);
-extern f32 func_002AA898(s32, f32, s32, f32, f32, f32, s32);
-extern s32 func_002ABB78(s32);
-extern void func_002AC9F8(s32, f32);
-extern void func_002AF000(s32, f32, f32, f32);
-extern s32 func_002BF728(s32, s32, f32, f32);
-extern void func_002E59F8(s32);
-extern void func_002FD1B8(s32, s32, void *, f32, f32, f32, f32);
-extern void func_L00_002A9D38(s32, s32, f32);
-extern void func_L00_002A9E30(f32, f32, f32, f32);
-extern f32 func_L00_002A9F30(s32, s32);
-extern void func_L00_002AA0F0(f32, f32, f32);
-extern void func_L00_002AA478(s32, s32);
-extern void func_L00_002AA570(s32, s32);
-extern void func_L00_002AA750(s32, s32);
-extern void func_L00_002AA938(s32, s32, s32);
-extern void func_L00_002AABE0(s32, s32, s32);
-extern void func_L00_002AAE00(void);
-extern void func_L00_002AB0A8(f32, f32);
-extern void func_L00_002AB0C0(f32, f32);
-extern void func_L00_002AB0D8(f32, f32);
-extern void func_L00_002AB0F0(f32, f32);
-extern void func_L00_002AC578(void);
-extern s32 func_L01_002AE128(s32, s32, s32);
-extern s32 func_L00_002ADEA0(s32);
-extern void func_L00_002B35A0(void);
-extern s32 func_L00_002B3998(f32);
-extern void func_L00_002B39F0(f32, s32);
-extern void func_L00_002B3D10(void);
-extern void func_L00_002B3DC0(f32, f32, f32);
-extern void func_L00_002B3EF8(s32, f32, f32, f32);
-extern void func_L00_002B3F68(void);
-extern void func_L00_002B41B8(f32, f32);
-extern void func_L00_002B4208(f32);
-extern void func_L00_002B42D8(s32);
-extern void func_L00_002B4308(void);
-extern void func_L00_002B54F8(f32, f32);
-extern f32 func_L00_002B5590(s32);
-extern void func_L01_002B6948(f32);
-extern void func_L00_002B6560(void);
-extern void func_L07_002B5738(void);
-extern void func_L00_002B75A0(f32, f32, f32);
-extern void func_L00_002B7B80(void);
-extern void func_L00_002B8CB8(void);
-extern void func_L00_002B94D8(f32);
-extern f32 func_L00_002B9B38(s32, s32);
-extern s32 func_L00_002B9B88(s32, s32);
-extern void func_L00_002B9BB0(s32, s32, s32);
-extern void func_L00_002B9F00(f32, f32, f32);
-extern void func_L00_002BA138(s32, s32);
-extern void func_L00_002BA220(void);
-extern void func_L00_002BA508(void);
-extern void func_L00_002C9228(void);
-extern s32 func_L00_002CAF20(void);
-extern void func_L00_002D2168(s32, s32, f32);
-extern void func_L00_002D34C0(s32, s32, f32);
-extern void func_L00_002D36E0(s32, s32, f32, f32, f32);
-extern void func_L00_002D3778(s32, s32, f32);
-extern void func_L00_002D3798(s32, s32, f32);
-extern void func_L00_002D38A0(s32, s32, f32);
-extern void func_L00_002D3960(s32, s32);
-extern f32 func_L00_002D3A58(s32);
-extern f32 func_L00_002D3B00(s32);
-extern void func_L00_002D3B58(s32, s32, f32);
-extern void func_L00_002D3BD8(s32, s32, f32);
-extern s32 func_L00_002D6900(s32);
+extern s32 CollLine(s32, s32, s32, s32, s32);
+extern s32 coll_process_hit(f32, s32, s32, s32, s32);
+extern s32 math_fast_float_d(s32);
+extern s32 FastDecTimer(s32);
+extern f32 square_root(f32);
+extern f32 math_fabs(f32);
+extern void vec_clear_128(s32);
+extern void FastVecAdd(s32, s32, s32);
+extern void FastVecSub(s32, s32, s32);
+extern void FastVecScale(s32, s32, f32);
+extern f32 FastVecDot(s32, s32);
+extern void FastVecCross(s32, s32, s32);
+extern f32 FastVecLength(s32);
+extern f32 vec_length_xy(s32);
+extern f32 fast_vec_dist(s32, s32);
+extern f32 vec_distance_xy(s32, s32);
+extern void vec_scale_to_length(s32, s32, f32);
+extern void vec_fast_normalize_helper(s32, s32, f32);
+extern void matrix_mul_vec3(s32, s32, s32);
+extern void transform_vector(s32, s32, s32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 mat_fast_helper_a(f32, f32);
+extern void euler_to_matrix(s32, s32);
+extern void matrix_from_basis_rows(s32, s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern s32 FloatToInt(f32);
+extern void gauge_popup_show(s32, s32, s32, f32);
+extern void moby_transform_joint_to_world(s32, s32, s32);
+extern s32 math_random_int_below(s32);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_random_float_range(f32, f32);
+extern s32 math_solve_quadratic(s32, s32, f32, f32, f32);
+extern void make_hit_descriptor(s32, s32, s32, f32, s32);
+extern void part_queue_impact_effect(s32, s32, s32, s32, s32, f32);
+extern f32 ApproachValue(s32, f32, f32);
+extern f32 math_spring_float_to_goal(s32, s32, f32, f32, f32, f32);
+extern f32 vec_spring_to_target(s32, s32, s32, f32, f32, f32);
+extern f32 math_shortest_angle_delta(s32, f32, f32);
+extern void StepAngleTowardTarget(s32, s32, f32, f32);
+extern f32 math_approach_with_velocity(s32, f32, s32, f32, f32, f32, s32);
+extern s32 moby_is_in_special_class_range(s32);
+extern void vec_clamp_length(s32, f32);
+extern void vec_build_spherical_offset(s32, f32, f32, f32);
+extern s32 part_spawn_bubble(s32, s32, f32, f32);
+extern void snd_stop_voice(s32);
+extern void RippleDisturb(s32, s32, void *, f32, f32, f32, f32);
+extern void pad_clamp_stick_to_unit_range(s32, s32, f32);
+extern void AdjustHeroAnimationSpeedForTargetFrame(f32, f32, f32, f32);
+extern f32 math_blend_table_entries_by_clock(s32, s32);
+extern void hero_start_pose_offset(f32, f32, f32);
+extern void part_spawn_jittered_after_delay(s32, s32);
+extern void part_emit_hero_side_particles(s32, s32);
+extern void part_emit_hero_trail_spark(s32, s32);
+extern void EmitHeroRandomizedMotionEffects(s32, s32, s32);
+extern void part_emit_hero_dust_and_debris(s32, s32, s32);
+extern void EmitHeroTimedEffects(void);
+extern void cam_set_limits_first(f32, f32);
+extern void cam_set_limits_second(f32, f32);
+extern void cam_set_limits_third(f32, f32);
+extern void cam_set_limits_fourth(f32, f32);
+extern void ProbeHeroAirborneWallContact(void);
+extern s32 ProbeLedgeGrab(s32, s32, s32);
+extern s32 hero_slot_item_id(s32);
+extern void hero_update_turn_from_anim(void);
+extern s32 math_is_below_plane_within_depth(f32);
+extern void hero_resolve_stick_direction(f32, s32);
+extern void hero_update_target_speed(void);
+extern void hero_rotate_matrix(f32, f32, f32);
+extern void hero_steer_heading(s32, f32, f32, f32);
+extern void hero_set_turn_rates(void);
+extern void hero_approach_speed(f32, f32);
+extern void hero_compute_push_direction(f32);
+extern void hero_set_push_direction(s32);
+extern void hero_cancel_velocity_into_wall(void);
+extern void hero_build_move_impulse(f32, f32);
+extern f32 hero_get_speed_along_forward(s32);
+extern void hero_approach_velocity(f32);
+extern void ApplyHeroGravityAndJumpMotion(void);
+extern void UpdateHeroVelocityForStateWithYawSpring(void);
+extern void hero_l00_select_aim_target(f32, f32, f32);
+extern void hero_apply_mode_pose_offsets(void);
+extern void UpdateHeroLeanAndSwayParameters(void);
+extern void hero_shrink_vector_by_amount(f32);
+extern f32 hero_get_direction_angle_delta(s32, s32);
+extern s32 hero_play_sound(s32, s32);
+extern void snd_update_slot_object(s32, s32, s32);
+extern void hero_try_surface_push_response(f32, f32, f32);
+extern void part_emit_effects_at_nearby_mobys(s32, s32);
+extern void part_emit_hero_radial_particles(void);
+extern void hero_setup_attached_object_transform(void);
+extern void hero_update_height_offset(void);
+extern s32 hero_try_start_grab(void);
+extern void set_hero_animation(s32, s32, f32);
+extern void hero_apply_mode_transform(s32, s32, f32);
+extern void hero_build_relative_point(s32, s32, f32, f32, f32);
+extern void hero_apply_mode_transform_reversed(s32, s32, f32);
+extern void cam_offset_point_by_side_direction(s32, s32, f32);
+extern void cam_offset_point_in_view_space(s32, s32, f32);
+extern void cam_project_vector_onto_view_plane(s32, s32);
+extern f32 cam_get_view_space_vector_length(s32);
+extern f32 cam_get_view_space_height(s32);
+extern void cam_set_view_space_height(s32, s32, f32);
+extern void cam_set_view_space_vector_length(s32, s32, f32);
+extern s32 queue_copy_record_by_index(s32);
 extern s32 func_L00_002EE4D8(s32, s32, f32);
-extern s32 func_L00_0031D620(s32, s32, f32);
-extern void func_L00_00322A98(s32, s32);
-extern void func_L00_00322AC0(s32, s32, s32, f32);
-extern void func_L00_00322BE0(s32, s32);
-extern void func_L00_00323F28(s32, s32, f32, f32, f32);
-extern s32 func_L00_00325FC8(s32, s32, s32, f32);
-extern f32 func_L00_0032F038(s32);
-extern void func_L00_0041E958(f32, f32, f32);
-extern s32 func_L01_002A7248(s32);
-extern void func_L01_002B4DA0(s32);
+extern s32 math_lerp_int(s32, s32, f32);
+extern void level_init_pending_slot(s32, s32);
+extern void level_append_record_to_table(s32, s32, s32, f32);
+extern void moby_update_transform_history_followers(s32, s32);
+extern void vec_add_offset(s32, s32, f32, f32, f32);
+extern s32 math_update_angle_and_blend(s32, s32, s32, f32);
+extern f32 ReadPadFloatHistory(s32);
+extern void UpdateHeroAimTarget(f32, f32, f32);
+extern s32 hero_get_weapon_anim_id(s32);
+extern void ClipHeroVelocityAgainstWall(s32);
 /* Runs every frame for the player and handles whatever the current action is (walking, jumping, swinging, gliding and so on). */
-void func_L09_002BC490(void) {
+void hero_l09_update_state_machine(void) {
     f32 frameSlot1;
     s32 lim67;
     s32 *cnt32;
@@ -543,10 +544,10 @@ void func_L09_002BC490(void) {
     void* ptr60;
     void* ptr61;
 
-    frameSlot15 = ((Hero *)gHeroState)->i[0x2298/4];
-    ptr21 = ((Hero *)gHeroState)->ptr[0x2290/4];
+    frameSlot15 = ((Hero *)g_hero_state)->i[0x2298/4];
+    ptr21 = ((Hero *)g_hero_state)->ptr[0x2290/4];
     frameSlot16 = (s32) M2C_FIELD(ptr21, u8* , 0x43);
-    switch (((Hero *)gHeroState)->u[0x2294/4]) {                              /* switch 1 */
+    switch (((Hero *)g_hero_state)->u[0x2294/4]) {                              /* switch 1 */
     case 0x0:                                       /* switch 1 */
     case 0x1:                                       /* switch 1 */
     case 0x3:                                       /* switch 1 */
@@ -558,81 +559,81 @@ void func_L09_002BC490(void) {
     case 0x6D:                                      /* switch 1 */
     case 0x6F:                                      /* switch 1 */
     case 0x7D:                                      /* switch 1 */
-        if (((Hero *)gHeroState)->b[0x22B9] != 0) {
-            SpawnJitteredParticleAfterDelay(0xF, 0x1E);
+        if (((Hero *)g_hero_state)->b[0x22B9] != 0) {
+            part_spawn_jittered_after_delay(0xF, 0x1E);
         }
-        BuildHeroMoveImpulse(0.5f, 0.033333335f);
-        TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
-        ResolveStickInputToDirection(1.0f, 0);
-        value85 = ((Hero *)gHeroState)->u[0x2294/4];
+        hero_build_move_impulse(0.5f, 0.033333335f);
+        hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
+        hero_resolve_stick_direction(1.0f, 0);
+        value85 = ((Hero *)g_hero_state)->u[0x2294/4];
         if ((value85 == 1) || (value85 == 0x1D)) {
-            if (((Hero *)gHeroState)->b[0x22B5] != 0) {
+            if (((Hero *)g_hero_state)->b[0x22B5] != 0) {
                 (*(TI128*)v0) = 0;
                 v0[0] = 1.0f;
-                matrix_mul_vec3((s32) (((void*)gHeroState) + 0x190), (s32)((TI128*)v0), (s32)&D_L09_001B9A18[0x218]);
-                ((Hero *)gHeroState)->f[0x1A0/4] = ((Hero *)D_L09_001B9A18)->f[0];
-                SteerHeroHeading(0, 1.0f, 0.0f, 2.9088826f);
-                if ((((Hero *)gHeroState)->b[0x22BB] != 0) && (((Hero *)gHeroState)->i[0x1B8/4] == 0x78)) {
-                    if (((Hero *)gProgressStatistics)->uh[0xD8/2] < 0xFFFF) {
-                        ((Hero *)gProgressStatistics)->uh[0xD8/2]++;
+                matrix_mul_vec3((s32) (((void*)g_hero_state) + 0x190), (s32)((TI128*)v0), (s32)&D_L09_001B9A18[0x218]);
+                ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)D_L09_001B9A18)->f[0];
+                hero_steer_heading(0, 1.0f, 0.0f, 2.9088826f);
+                if ((((Hero *)g_hero_state)->b[0x22BB] != 0) && (((Hero *)g_hero_state)->i[0x1B8/4] == 0x78)) {
+                    if (((Hero *)g_progress_statistics)->uh[0xD8/2] < 0xFFFF) {
+                        ((Hero *)g_progress_statistics)->uh[0xD8/2]++;
                     }
-                    if (D_001A7390 > ((Hero *)gProgressStatistics)->u[0xDC/4]) {
-                        ((Hero *)gProgressStatistics)->u[0xDC/4] = D_001A7390;
+                    if (D_001A7390 > ((Hero *)g_progress_statistics)->u[0xDC/4]) {
+                        ((Hero *)g_progress_statistics)->u[0xDC/4] = D_001A7390;
                     }
-                    ((Hero *)gProgressStatistics)->u[0xE0/4] = ((Hero *)gProgressStatistics)->u[0xE0/4] | (1 << gCurrentMapIndex) | 0x80000000;
+                    ((Hero *)g_progress_statistics)->u[0xE0/4] = ((Hero *)g_progress_statistics)->u[0xE0/4] | (1 << g_current_map_index) | 0x80000000;
                 }
             }
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 3) {
-            if (TryStartHeroGrab() != 0) {
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 3) {
+            if (hero_try_start_grab() != 0) {
                 break;
             }
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 4) {
-            if ((((Hero *)gHeroState)->f[0x24B8/4] > 0.2f) || (value97 = M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x43), (value97 == 0xE)) || (value97 == 0xF)) {
-                if (((Hero *)gHeroState)->u[0x2294/4] == 4) {
-                    SteerHeroHeading(0, 0.002f, 0.07f, 0.1163553f);
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 4) {
+            if ((((Hero *)g_hero_state)->f[0x24B8/4] > 0.2f) || (value97 = M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43), (value97 == 0xE)) || (value97 == 0xF)) {
+                if (((Hero *)g_hero_state)->u[0x2294/4] == 4) {
+                    hero_steer_heading(0, 0.002f, 0.07f, 0.1163553f);
                 }
-                if (FloatAbs(((Hero *)gHeroState)->f[0x1A4/4]) > 0.0058177654f) {
-                    value11 = ((Hero *)gHeroState)->f[0x1A4/4] < 0.0f;
+                if (math_fabs(((Hero *)g_hero_state)->f[0x1A4/4]) > 0.0058177654f) {
+                    value11 = ((Hero *)g_hero_state)->f[0x1A4/4] < 0.0f;
                     value11 += 0xE;
-                    if (M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x43) != value11) {
+                    if (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43) != value11) {
                         set_hero_animation(value11, 0, 5.0f);
                     }
-                    scalar2 = FloatAbs(((Hero *)gHeroState)->f[0x1A4/4]) * 18.093401f;
-                    ((Hero *)gHeroState)->f[0xC20/4] = scalar2;
+                    scalar2 = math_fabs(((Hero *)g_hero_state)->f[0x1A4/4]) * 18.093401f;
+                    ((Hero *)g_hero_state)->f[0xC20/4] = scalar2;
                     if (scalar2 < 0.55f) {
-                        ((Hero *)gHeroState)->f[0xC20/4] = 0.55f;
+                        ((Hero *)g_hero_state)->f[0xC20/4] = 0.55f;
                     }
-                    if (((Hero *)gHeroState)->f[0xC20/4] > 2.5f) {
-                        ((Hero *)gHeroState)->f[0xC20/4] = 2.5f;
+                    if (((Hero *)g_hero_state)->f[0xC20/4] > 2.5f) {
+                        ((Hero *)g_hero_state)->f[0xC20/4] = 2.5f;
                     }
-                } else if (((Hero *)gHeroState)->f[0x1A4/4] == 0.0f) {
-                    if (M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x43) != 0xD) {
+                } else if (((Hero *)g_hero_state)->f[0x1A4/4] == 0.0f) {
+                    if (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43) != 0xD) {
                         set_hero_animation(0xD, 0, 7.0f);
                     }
                 }
             }
         }
-            value94 = ((Hero *)gHeroState)->u[0x2294/4];
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
+            value94 = ((Hero *)g_hero_state)->u[0x2294/4];
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
             if (value94 == 3) {
-                scalar105 = ((Hero *)gHeroState)->f[0x17C/4] + 1.0f;
+                scalar105 = ((Hero *)g_hero_state)->f[0x17C/4] + 1.0f;
                 if (scalar105 > 1.0f) {
                     scalar105 = 1.0f;
                 }
-                ptr16 = ((Hero *)gHeroState)->ptr[0x2290/4];
+                ptr16 = ((Hero *)g_hero_state)->ptr[0x2290/4];
                 scalar131 = scalar105 * 0.0075000003f;
-                ((Hero *)gHeroState)->f[0x24AC/4] = scalar131;
+                ((Hero *)g_hero_state)->f[0x24AC/4] = scalar131;
                 if (M2C_FIELD(ptr16, u8* , 0x42) == M2C_FIELD(ptr16, u8* , 0x43)) {
-                    scalar126 = ((Hero *)gHeroState)->f[0x174/4] / scalar131;
+                    scalar126 = ((Hero *)g_hero_state)->f[0x174/4] / scalar131;
                     if ((scalar126 > 5.0f) && ((f32) M2C_FIELD(ptr16, u8* , 0x41) < 5.5f)) {
                         AdjustHeroAnimationSpeedForTargetFrame(13.0f, scalar126, 0.5f, -1.0f);
-                        if (((Hero *)gHeroState)->f[0xC20/4] > 1.1f) {
-                            ((Hero *)gHeroState)->f[0xC20/4] = 1.1f;
+                        if (((Hero *)g_hero_state)->f[0xC20/4] > 1.1f) {
+                            ((Hero *)g_hero_state)->f[0xC20/4] = 1.1f;
                         }
-                    } else if ((f32) M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x41) > 6.5f) {
-                        ((Hero *)gHeroState)->f[0xC20/4] = 1.0f;
+                    } else if ((f32) M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x41) > 6.5f) {
+                        ((Hero *)g_hero_state)->f[0xC20/4] = 1.0f;
                     }
                 }
             } else if (value94 == 4) {
@@ -640,291 +641,291 @@ void func_L09_002BC490(void) {
             } else {
                 scalar131 = 0.004916667f;
             }
-            ApproachHeroSpeed(0.0f, scalar131);
-            ClearVector128((s32)(gHeroState + 0xF0));
-            ShrinkHeroVectorByAmount(scalar131);
-            if ((((Hero *)gHeroState)->b[0x1497] != 0) && (D_001A7B08[3] != 0)) {
-                value57 = (s32)(gHeroState + 0xF0);
-                if (((Hero *)gHeroState)->f[0x31C/4] > 0.2f) {
-                    ApplyHeroModeTransform(value57, value57 + 0x30, 0.0061111115f);
+            hero_approach_speed(0.0f, scalar131);
+            vec_clear_128((s32)(g_hero_state + 0xF0));
+            hero_shrink_vector_by_amount(scalar131);
+            if ((((Hero *)g_hero_state)->b[0x1497] != 0) && (D_001A7B08[3] != 0)) {
+                value57 = (s32)(g_hero_state + 0xF0);
+                if (((Hero *)g_hero_state)->f[0x31C/4] > 0.2f) {
+                    hero_apply_mode_transform(value57, value57 + 0x30, 0.0061111115f);
                 } else {
-                    ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.015000001f);
-                    if (((Hero *)gHeroState)->i[0x33C/4] != 0) {
-                        qcopy(&((Hero *)gHeroState)->q[0x80/16], &((Hero *)gHeroState)->q[0x2D0/16]);
-                        ((Hero *)gHeroState)->f[0x31C/4] = 0.0f;
-                        ((Hero *)gHeroState)->h[0x34E/2] = 0;
+                    hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.015000001f);
+                    if (((Hero *)g_hero_state)->i[0x33C/4] != 0) {
+                        qcopy(&((Hero *)g_hero_state)->q[0x80/16], &((Hero *)g_hero_state)->q[0x2D0/16]);
+                        ((Hero *)g_hero_state)->f[0x31C/4] = 0.0f;
+                        ((Hero *)g_hero_state)->h[0x34E/2] = 0;
                     }
                 }
             } else {
                 ClipHeroVelocityAgainstWall(0);
-                if (((Hero *)gHeroState)->h[0x34E/2] == 0) {
-                    ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+                if (((Hero *)g_hero_state)->h[0x34E/2] == 0) {
+                    hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
                 } else {
-                    ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0x130, 0.0069444445f);
-                    CancelHeroVelocityIntoWall();
+                    hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0x130, 0.0069444445f);
+                    hero_cancel_velocity_into_wall();
                 }
             }
         break;
     case 0x32:                                      /* switch 1 */
     case 0x33:                                      /* switch 1 */
     case 0x34:                                      /* switch 1 */
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x34) {
-            if (((Hero *)gHeroState)->i[0x1B8/4] >= 0x47) {
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x34) {
+            if (((Hero *)g_hero_state)->i[0x1B8/4] >= 0x47) {
                 (*(u16*)&D_0018CF10) = 0xFFFF;
             }
-            UpdateSoundSlotObject(5, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0xF);
-            QueueRecordsByIndex(0x16);
+            snd_update_slot_object(5, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0xF);
+            queue_copy_record_by_index(0x16);
         } else {
-            value21 = ((Hero *)gHeroState)->i[0x2440/4];
+            value21 = ((Hero *)g_hero_state)->i[0x2440/4];
             if (value21 != -1) {
-                ptr17 = (value21 * 0x70) + (s32)gSoundState;
-                if (M2C_FIELD(ptr17, s32* , 0x88) == ((Hero *)gHeroState)->ptr[0x2290/4]) {
+                ptr17 = (value21 * 0x70) + (s32)g_sound_state;
+                if (M2C_FIELD(ptr17, s32* , 0x88) == ((Hero *)g_hero_state)->ptr[0x2290/4]) {
                     if (M2C_FIELD(ptr17, u8* , 0x74) != 0) {
-                        StopSoundVoice(value21);
+                        snd_stop_voice(value21);
                     }
                 }
             }
-            ((Hero *)gHeroState)->i[0x2440/4] = -1;
+            ((Hero *)g_hero_state)->i[0x2440/4] = -1;
         }
-        if (((Hero *)gHeroState)->h[0xA4A/2] != 0) {
-            FastDecTimer((s32) (((void*)gHeroState) + 0xA4A));
-            value13 = (s32) ((u16) ((Hero *)gHeroState)->h[0xA4A/2] << 0x10) >> 0x12;
+        if (((Hero *)g_hero_state)->h[0xA4A/2] != 0) {
+            FastDecTimer((s32) (((void*)g_hero_state) + 0xA4A));
+            value13 = (s32) ((u16) ((Hero *)g_hero_state)->h[0xA4A/2] << 0x10) >> 0x12;
             EmitHeroRandomizedMotionEffects((value13 >= 9) ? 8 : value13, 0, 0);
         }
-        if ((((Hero *)gHeroState)->u[0x2294/4] == 0x32) && (((Hero *)gHeroState)->i[0xC2C/4] == 0)) {
-            scalar48 = ((Hero *)gHeroState)->f[0xC38/4];
+        if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x32) && (((Hero *)g_hero_state)->i[0xC2C/4] == 0)) {
+            scalar48 = ((Hero *)g_hero_state)->f[0xC38/4];
             if (scalar48 > 0.0f) {
                 if (scalar48 < 10.0f) {
                     EmitHeroRandomizedMotionEffects(4, 1, 0);
                 }
             }
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x33) {
-            if (((Hero *)gHeroState)->i[0x22A0/4] == 0x34) {
-                value51 = ((Hero *)gHeroState)->i[0x1B8/4];
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x33) {
+            if (((Hero *)g_hero_state)->i[0x22A0/4] == 0x34) {
+                value51 = ((Hero *)g_hero_state)->i[0x1B8/4];
                 if (value51 < 0xF) {
                     EmitHeroRandomizedMotionEffects(((s32) (0x14 - value51) / 3) + 1, 1, 0);
                 }
             }
         }
-        value52 = ((Hero *)gHeroState)->i[0x2298/4];
+        value52 = ((Hero *)g_hero_state)->i[0x2298/4];
         if (value52 == 1) {
-            if (((Hero *)gHeroState)->i[0x1B8/4] == value52) {
-                EmitHeroDustAndDebris(3, 0x10, 0);
+            if (((Hero *)g_hero_state)->i[0x1B8/4] == value52) {
+                part_emit_hero_dust_and_debris(3, 0x10, 0);
                 if (D_L09_001B2FF0 != 0) {
-                    RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 0, ((Hero *)gHeroState)->f[0x80/4], ((Hero *)gHeroState)->f[0x84/4], 0.4f, -0.3f);
+                    RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 0, ((Hero *)g_hero_state)->f[0x80/4], ((Hero *)g_hero_state)->f[0x84/4], 0.4f, -0.3f);
                 }
-                ((Hero *)gHeroState)->h[0xA4A/2] = 0x46;
+                ((Hero *)g_hero_state)->h[0xA4A/2] = 0x46;
             }
-            value35 = ((Hero *)gHeroState)->i[0xA20/4] + 1;
-            ((Hero *)gHeroState)->i[0xA20/4] = value35;
+            value35 = ((Hero *)g_hero_state)->i[0xA20/4] + 1;
+            ((Hero *)g_hero_state)->i[0xA20/4] = value35;
             if (value35 >= 0x29) {
-                ((Hero *)gHeroState)->i[0x2298/4] = 0;
+                ((Hero *)g_hero_state)->i[0x2298/4] = 0;
             }
         }
         stick_turn = 0.011635531f;
-        stick_turn += (((Hero *)gPadState)->f[0x12C/4] > ((Hero *)gPadState)->f[0x128/4] ? ((Hero *)gPadState)->f[0x12C/4] : ((Hero *)gPadState)->f[0x128/4]) * 0.008726647f;
+        stick_turn += (((Hero *)g_pad_state)->f[0x12C/4] > ((Hero *)g_pad_state)->f[0x128/4] ? ((Hero *)g_pad_state)->f[0x12C/4] : ((Hero *)g_pad_state)->f[0x128/4]) * 0.008726647f;
         scalar118 = 0.0f;
         k02 = 0.2f;
-        if ((((((Hero *)gPadState)->d[0x1A0/8] & 0xC0) == 0x80)) || (((Hero *)gHeroState)->i[0x2298/4] == 1)) {
-            scalar120 = ((Hero *)gPadState)->f[0x12C/4] * 1.5f;
+        if ((((((Hero *)g_pad_state)->d[0x1A0/8] & 0xC0) == 0x80)) || (((Hero *)g_hero_state)->i[0x2298/4] == 1)) {
+            scalar120 = ((Hero *)g_pad_state)->f[0x12C/4] * 1.5f;
             if (scalar120 > 1.0f) {
                 scalar120 = 1.0f;
             }
             if (scalar120 < k02) {
                 scalar120 = k02;
             }
-            if (((Hero *)gPadState)->i[0x1DC/4] != 0x79) {
-                value9 = ((Hero *)gHeroState)->uh[0xA42/2] + 1;
-                ((Hero *)gHeroState)->uh[0xA40/2] = 0U;
+            if (((Hero *)g_pad_state)->i[0x1DC/4] != 0x79) {
+                value9 = ((Hero *)g_hero_state)->uh[0xA42/2] + 1;
+                ((Hero *)g_hero_state)->uh[0xA40/2] = 0U;
                 scalar120 = ((f32) (s16) value9 * 0.025f) + 0.5f;
-                ((Hero *)gHeroState)->uh[0xA42/2] = (u16) value9;
+                ((Hero *)g_hero_state)->uh[0xA42/2] = (u16) value9;
                 if (scalar120 > 1.0f) {
                     scalar120 = 1.0f;
                 }
             }
-            if ((((Hero *)gHeroState)->i[0x2298/4] == 1) && (scalar120 < 0.35f)) {
+            if ((((Hero *)g_hero_state)->i[0x2298/4] == 1) && (scalar120 < 0.35f)) {
                 scalar120 = 0.35f;
             }
             scalar118 = scalar120 * 1.361357f;
-        } else if ((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0x40) {
-            scalar119 = ((Hero *)gPadState)->f[0x128/4] * 1.5f;
+        } else if ((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0x40) {
+            scalar119 = ((Hero *)g_pad_state)->f[0x128/4] * 1.5f;
             if (scalar119 > 1.0f) {
                 scalar119 = 1.0f;
             }
             if (scalar119 < k02) {
                 scalar119 = k02;
             }
-            if (((Hero *)gPadState)->i[0x1DC/4] != 0x79) {
-                cntA40 = ((Hero *)gHeroState)->uh[0xA40/2] + 1;
-                ((Hero *)gHeroState)->uh[0xA42/2] = 0U;
-                ((Hero *)gHeroState)->h[0xA40/2] = cntA40;
+            if (((Hero *)g_pad_state)->i[0x1DC/4] != 0x79) {
+                cntA40 = ((Hero *)g_hero_state)->uh[0xA40/2] + 1;
+                ((Hero *)g_hero_state)->uh[0xA42/2] = 0U;
+                ((Hero *)g_hero_state)->h[0xA40/2] = cntA40;
                 scalar119 = ((f32) (s16) cntA40 * 0.025f) + 0.5f;
                 if (scalar119 > 1.0f) {
                     scalar119 = 1.0f;
                 }
             }
-            if ((f32) ((Hero *)gHeroState)->i[0x24C0/4] < 1500.0f) {
+            if ((f32) ((Hero *)g_hero_state)->i[0x24C0/4] < 1500.0f) {
                 scalar119 = 1.0f;
             }
             scalar118 = scalar119 * -1.361357f;
         } else {
-            ((Hero *)gHeroState)->uh[0xA40/2] = 0U;
-            ((Hero *)gHeroState)->uh[0xA42/2] = 0U;
+            ((Hero *)g_hero_state)->uh[0xA40/2] = 0U;
+            ((Hero *)g_hero_state)->uh[0xA42/2] = 0U;
         }
-        if ((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0x40) {
-            ((Hero *)gHeroState)->uh[0xA4E/2] = (u16) (((Hero *)gHeroState)->uh[0xA4E/2] + 1);
-            if (((Hero *)gPadState)->f[0x128/4] > 0.75f) {
-                value8 = ((Hero *)gHeroState)->uh[0xA4C/2] + 1;
-                ((Hero *)gHeroState)->h[0xA4C/2] = value8;
+        if ((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0x40) {
+            ((Hero *)g_hero_state)->uh[0xA4E/2] = (u16) (((Hero *)g_hero_state)->uh[0xA4E/2] + 1);
+            if (((Hero *)g_pad_state)->f[0x128/4] > 0.75f) {
+                value8 = ((Hero *)g_hero_state)->uh[0xA4C/2] + 1;
+                ((Hero *)g_hero_state)->h[0xA4C/2] = value8;
                 if ((s16) value8 >= 0x5B) {
-                    value82 = ((Hero *)gProgressStatistics)->uh[0x84/2];
+                    value82 = ((Hero *)g_progress_statistics)->uh[0x84/2];
                     if (value82 <= 0xFFFEU) {
-                        ((Hero *)gProgressStatistics)->uh[0x84/2] = (u16) (value82 + 1);
+                        ((Hero *)g_progress_statistics)->uh[0x84/2] = (u16) (value82 + 1);
                     }
                 }
                 value36 = (*(s32*)&D_001A7390);
-                if ((u32) ((Hero *)gProgressStatistics)->u[0x88/4] < (u32) value36) {
-                    ((Hero *)gProgressStatistics)->u[0x88/4] = (u32) value36;
+                if ((u32) ((Hero *)g_progress_statistics)->u[0x88/4] < (u32) value36) {
+                    ((Hero *)g_progress_statistics)->u[0x88/4] = (u32) value36;
                 }
-                ((Hero *)gProgressStatistics)->i[0x8C/4] = (s32) (((Hero *)gProgressStatistics)->i[0x8C/4] | (1 << (*(s32*)&gCurrentMapIndex)) | 0x80000000);
+                ((Hero *)g_progress_statistics)->i[0x8C/4] = (s32) (((Hero *)g_progress_statistics)->i[0x8C/4] | (1 << (*(s32*)&g_current_map_index)) | 0x80000000);
             } else {
-                ((Hero *)gHeroState)->uh[0xA4C/2] = 0U;
+                ((Hero *)g_hero_state)->uh[0xA4C/2] = 0U;
             }
         } else {
-            ((Hero *)gHeroState)->uh[0xA4E/2] = 0U;
-            ((Hero *)gHeroState)->uh[0xA4C/2] = 0U;
+            ((Hero *)g_hero_state)->uh[0xA4E/2] = 0U;
+            ((Hero *)g_hero_state)->uh[0xA4C/2] = 0U;
         }
-        if (((Hero *)gPadState)->i[0x1A4/4] & 0x40) {
-            hp32 = (Hero *)gHeroState;
+        if (((Hero *)g_pad_state)->i[0x1A4/4] & 0x40) {
+            hp32 = (Hero *)g_hero_state;
             if ((D_L09_001B2388 - hp32->i[0xA54/4]) < 0x46) {
                 hp32->i[0xA50/4]++;
             }
             hp32->i[0xA54/4] = D_L09_001B2388;
         }
-        if ((s16) ((Hero *)gHeroState)->uh[0xA4E/2] >= 0x47) {
-            ((Hero *)gHeroState)->i[0xA50/4] = 0;
+        if ((s16) ((Hero *)g_hero_state)->uh[0xA4E/2] >= 0x47) {
+            ((Hero *)g_hero_state)->i[0xA50/4] = 0;
         }
-        if ((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0x80) {
-            ((Hero *)gHeroState)->i[0xA50/4] = 0;
+        if ((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0x80) {
+            ((Hero *)g_hero_state)->i[0xA50/4] = 0;
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x33) {
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x33) {
             scalar118 = 0.0f;
         }
-        scalar56 = ((Hero *)gHeroState)->f[0x94/4];
-        ApproachWithVelocity((s32) (((void*)gHeroState) + 0x94), scalar118, (s32) (((void*)gHeroState) + 0xA28), 0.015f, 0.2f, stick_turn, 0);
-        scalar78 = fast_subtract_rotations(((Hero *)gHeroState)->f[0x94/4], scalar56);
-        ResolveStickInputToDirection(1.0f, 0);
-        SteerHeroHeading(0, 0.007f, 0.08f, 0.087266475f);
-        ((Hero *)gHeroState)->f[0xA2C/4] = (f32) ((Hero *)gHeroState)->f[0x1A4/4];
-        FastFloatHelperD((s32) (((void*)gHeroState) + 0xA34));
-        if (((Hero *)gHeroState)->i[0x2298/4] == 1) {
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.10000001f;
-        } else if (((Hero *)gHeroState)->u[0x2294/4] == 0x34) {
-            if ((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0xA) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.116666675f;
+        scalar56 = ((Hero *)g_hero_state)->f[0x94/4];
+        math_approach_with_velocity((s32) (((void*)g_hero_state) + 0x94), scalar118, (s32) (((void*)g_hero_state) + 0xA28), 0.015f, 0.2f, stick_turn, 0);
+        scalar78 = fast_subtract_rotations(((Hero *)g_hero_state)->f[0x94/4], scalar56);
+        hero_resolve_stick_direction(1.0f, 0);
+        hero_steer_heading(0, 0.007f, 0.08f, 0.087266475f);
+        ((Hero *)g_hero_state)->f[0xA2C/4] = (f32) ((Hero *)g_hero_state)->f[0x1A4/4];
+        math_fast_float_d((s32) (((void*)g_hero_state) + 0xA34));
+        if (((Hero *)g_hero_state)->i[0x2298/4] == 1) {
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.10000001f;
+        } else if (((Hero *)g_hero_state)->u[0x2294/4] == 0x34) {
+            if ((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0xA) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.116666675f;
             } else {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.04666667f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.04666667f;
             }
         } else {
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.050000004f;
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.050000004f;
         }
-        scalar154 = ((Hero *)gHeroState)->f[0x24B8/4];
-        if (((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0xC0) || (((Hero *)gHeroState)->i[0x2298/4] == 1)) {
+        scalar154 = ((Hero *)g_hero_state)->f[0x24B8/4];
+        if (((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0xC0) || (((Hero *)g_hero_state)->i[0x2298/4] == 1)) {
             if (scalar154 < 1.0f) {
                 scalar154 = 1.0f;
             }
         }
-        if (((Hero *)gHeroState)->f[0x24B8/4] > 0.15f) {
+        if (((Hero *)g_hero_state)->f[0x24B8/4] > 0.15f) {
             scalar97 = 0.35f;
-            if (((Hero *)gHeroState)->u[0x2294/4] == 0x34) {
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 0x34) {
                 scalar97 = 0.4f;
             }
             if (scalar154 < scalar97) {
                 scalar154 = scalar97;
             }
         }
-        if ((((Hero *)gHeroState)->u[0x2294/4] != 0x34) || !((s32) ((Hero *)gPadState)->d[0x1A0/8] & 0xA)) {
-            ((Hero *)gHeroState)->f[0x1B0/4] = (f32) (((Hero *)gHeroState)->f[0x1B0/4] * scalar154);
+        if ((((Hero *)g_hero_state)->u[0x2294/4] != 0x34) || !((s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0xA)) {
+            ((Hero *)g_hero_state)->f[0x1B0/4] = (f32) (((Hero *)g_hero_state)->f[0x1B0/4] * scalar154);
         }
-        if (FastFloatHelperD((s32)(gHeroState + 0xA30)) != 0) {
-            heroA30 = (void*)gHeroState;
-            TransformMobyJointToWorld((s32) ((Hero *)gHeroState)->ptr[0x2290/4], 4, (s32)((TI128*)v0));
+        if (math_fast_float_d((s32)(g_hero_state + 0xA30)) != 0) {
+            heroA30 = (void*)g_hero_state;
+            moby_transform_joint_to_world((s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 4, (s32)((TI128*)v0));
             (*(TI128*)v20) = 0;
             v20[0] = 0.4f;
-            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)gHeroState)->ptr[0x2290/4] + 0xC0));
+            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)g_hero_state)->ptr[0x2290/4] + 0xC0));
             FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
-            qcopy(v10, &((Hero *)gHeroState)->q[0x110/16]);
+            qcopy(v10, &((Hero *)g_hero_state)->q[0x110/16]);
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.033333335f;
-            SpawnBubbleParticle((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
-            if ((f32) RandomIntBelow(0x64) < 40.0f) {
+            part_spawn_bubble((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            if ((f32) math_random_int_below(0x64) < 40.0f) {
                 value58 = 4;
                 value62 = 0xB;
             } else {
                 value58 = 0x28;
                 value62 = 0x5A;
             }
-            ((Hero *)heroA30)->i[0xA30/4] = RandomIntRange(value58, value62);
+            ((Hero *)heroA30)->i[0xA30/4] = math_random_int_range(value58, value62);
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x34) {
-            if (FastDecTimer((s32) (((void*)gHeroState) + 0xA38)) != 0) {
-                ptr42 = ((Hero *)gHeroState)->ptr[0x1310/4];
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x34) {
+            if (FastDecTimer((s32) (((void*)g_hero_state) + 0xA38)) != 0) {
+                ptr42 = ((Hero *)g_hero_state)->ptr[0x1310/4];
                 if (ptr42 != 0) {
                     if (M2C_FIELD(ptr42, s16* , 0xAA) == 0x261) {
                         for (value66 = 0; value66 < 4; value66++) {
-                            TransformMobyJointToWorld((s32) ptr42, value66 % 2, (s32)((TI128*)v0));
+                            moby_transform_joint_to_world((s32) ptr42, value66 % 2, (s32)((TI128*)v0));
                             (*(TI128*)v20) = 0;
                             v20[0] = -0.15f;
-                            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)gHeroState)->ptr[0x2290/4] + 0xC0));
+                            matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((Hero *)g_hero_state)->ptr[0x2290/4] + 0xC0));
                             FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
-                            v0[0] += RandomFloatRange(0.0f, 0.03f);
-                            v0[1] += RandomFloatRange(0.0f, 0.03f);
-                            v0[2] += RandomFloatRange(0.0f, 0.03f);
-                            qcopy(v10, &((Hero *)gHeroState)->q[0x110/16]);
-                            AddOffsetVector((s32) ((TI128*)v10), (s32) ((TI128*)v10), -0.012500001f, ((Hero *)gHeroState)->f[0x98/4], ((Hero *)gHeroState)->f[0x94/4]);
-                            ((Hero *)gHeroState)->h[0xA38/2] = FloatToInt((0.116666675f - ((Hero *)gHeroState)->f[0x1B4/4]) * 42.85714f);
-                            SpawnBubbleParticle((s32)((TI128*)v0), (s32) ((TI128*)v10), RandomFloatRange(6300.0f, 9450.0f), -1.0f);
+                            v0[0] += math_random_float_range(0.0f, 0.03f);
+                            v0[1] += math_random_float_range(0.0f, 0.03f);
+                            v0[2] += math_random_float_range(0.0f, 0.03f);
+                            qcopy(v10, &((Hero *)g_hero_state)->q[0x110/16]);
+                            vec_add_offset((s32) ((TI128*)v10), (s32) ((TI128*)v10), -0.012500001f, ((Hero *)g_hero_state)->f[0x98/4], ((Hero *)g_hero_state)->f[0x94/4]);
+                            ((Hero *)g_hero_state)->h[0xA38/2] = FloatToInt((0.116666675f - ((Hero *)g_hero_state)->f[0x1B4/4]) * 42.85714f);
+                            part_spawn_bubble((s32)((TI128*)v0), (s32) ((TI128*)v10), math_random_float_range(6300.0f, 9450.0f), -1.0f);
                         }
                     }
                 }
             }
-            if (((Hero *)gHeroState)->u[0x2294/4] == 0x34) {
-                ApproachHeroSpeed(0.003611111f, 0.0022222223f);
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 0x34) {
+                hero_approach_speed(0.003611111f, 0.0022222223f);
             } else {
                 goto block_198;
             }
         } else {
 block_198:
-            ApproachHeroSpeed(0.0019444445f, 0.0011111111f);
+            hero_approach_speed(0.0019444445f, 0.0011111111f);
         }
-        scalar75 = FastAddRotations(-((Hero *)gHeroState)->f[0x94/4], 0.0f);
-        value86 = ((Hero *)gHeroState)->u[0x2294/4];
+        scalar75 = FastAddRotations(-((Hero *)g_hero_state)->f[0x94/4], 0.0f);
+        value86 = ((Hero *)g_hero_state)->u[0x2294/4];
         if (value86 == 0x34) {
-            BuildSphericalOffset((s32) (((void*)gHeroState) + 0xF0), ((Hero *)gHeroState)->f[0x1B4/4], ((Hero *)gHeroState)->f[0x98/4], scalar75);
+            vec_build_spherical_offset((s32) (((void*)g_hero_state) + 0xF0), ((Hero *)g_hero_state)->f[0x1B4/4], ((Hero *)g_hero_state)->f[0x98/4], scalar75);
         } else if (value86 == 0x32) {
-            scalar121 = ((Hero *)gHeroState)->f[0x1B4/4] * BlendTableEntriesByClock((s32)D_L09_00260990, 0x1E) * 5.0f;
-            if ((((Hero *)gHeroState)->i[0x22A0/4] == 0x34) && (((Hero *)gHeroState)->i[0x1B8/4] < 0xF) && (scalar121 < 0.075f)) {
+            scalar121 = ((Hero *)g_hero_state)->f[0x1B4/4] * math_blend_table_entries_by_clock((s32)D_L09_00260990, 0x1E) * 5.0f;
+            if ((((Hero *)g_hero_state)->i[0x22A0/4] == 0x34) && (((Hero *)g_hero_state)->i[0x1B8/4] < 0xF) && (scalar121 < 0.075f)) {
                 scalar121 = 0.075f;
             }
-            BuildSphericalOffset((s32)(gHeroState + 0xF0), scalar121, ((Hero *)gHeroState)->f[0x98/4], scalar75);
+            vec_build_spherical_offset((s32)(g_hero_state + 0xF0), scalar121, ((Hero *)g_hero_state)->f[0x98/4], scalar75);
         } else if (value86 == 0x33) {
-            frameSlot2 = FastVecLength((s32) (((void*)gHeroState) + 0x160));
-            if (((Hero *)gHeroState)->i[0x22A0/4] == 0x34) {
+            frameSlot2 = FastVecLength((s32) (((void*)g_hero_state) + 0x160));
+            if (((Hero *)g_hero_state)->i[0x22A0/4] == 0x34) {
                 ApproachValue((s32) &frameSlot2, 0.0f, 0.0022222223f);
             } else {
                 ApproachValue((s32) &frameSlot2, 0.0f, 0.0011111111f);
             }
-            vec_scale_to_length((s32)(gHeroState + 0x160), (s32)(gHeroState + 0x160), frameSlot2);
-            qcopy(&((Hero *)gHeroState)->q[0xF0/16], &((Hero *)gHeroState)->q[0x160/16]);
+            vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frameSlot2);
+            qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x160/16]);
         }
         ClipHeroVelocityAgainstWall(0);
-        scalar76 = ((Hero *)gHeroState)->f[0xA2C/4] * FastSinOrCosA(scalar75) * -7.0f;
-        ApproachWithVelocity((s32) (((void*)gHeroState) + 0x90), scalar76, (s32) (((void*)gHeroState) + 0xA24), 0.007f, 0.17f, 0.020362178f, 0);
-        SetCameraLimitsSlot1(0.009f, 0.22f);
-        SetCameraLimitsSlot2(0.04f, 0.2f);
-        SetCameraLimitsSlot3(0.02f, 0.2f);
+        scalar76 = ((Hero *)g_hero_state)->f[0xA2C/4] * math_fast_sin_or_cos_a(scalar75) * -7.0f;
+        math_approach_with_velocity((s32) (((void*)g_hero_state) + 0x90), scalar76, (s32) (((void*)g_hero_state) + 0xA24), 0.007f, 0.17f, 0.020362178f, 0);
+        cam_set_limits_second(0.009f, 0.22f);
+        cam_set_limits_third(0.04f, 0.2f);
+        cam_set_limits_fourth(0.02f, 0.2f);
         scalar82 = scalar78 * 47.0f;
         ((Hero *)D_L09_0025EA90)->f[0x114/4] = scalar82;
         ((Hero *)D_L09_0025EA90)->f[0x118/4] = (f32) (scalar76 * 1.5f);
@@ -946,307 +947,307 @@ block_198:
         ((Hero *)D_L09_0025EA90)->f[0x3D8/4] = scalar23;
         break;
     case 0x73:                                      /* switch 1 */
-        value14 = 0xA - ((s32) ((Hero *)gHeroState)->i[0x1B8/4] / 3);
-        ptr29 = ((void*)gHeroState) + 0xF0;
+        value14 = 0xA - ((s32) ((Hero *)g_hero_state)->i[0x1B8/4] / 3);
+        ptr29 = ((void*)g_hero_state) + 0xF0;
         EmitHeroRandomizedMotionEffects((value14 >= 9) ? 8 : value14, 0, 0);
-        ((Hero *)gHeroState)->f[0xF8/4] = 0.0f;
+        ((Hero *)g_hero_state)->f[0xF8/4] = 0.0f;
         func_L00_002EE4D8((s32) ptr29, (s32) ptr29, vec_length_xy((s32) ptr29) * 0.92f);
         ClipHeroVelocityAgainstWall(0);
         break;
     case 0x72:                                      /* switch 1 */
-        SpawnJitteredParticleAfterDelay(0xF, 0x1E);
-        ((Hero *)gHeroState)->f[0xF8/4] = 0.0f;
-        func_L00_002EE4D8((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), vec_length_xy((s32)(gHeroState + 0xF0)) * 0.92f);
+        part_spawn_jittered_after_delay(0xF, 0x1E);
+        ((Hero *)g_hero_state)->f[0xF8/4] = 0.0f;
+        func_L00_002EE4D8((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), vec_length_xy((s32)(g_hero_state + 0xF0)) * 0.92f);
         ClipHeroVelocityAgainstWall(0);
-        UpdateHeroHeightOffset();
+        hero_update_height_offset();
         break;
     case 0x67:                                      /* switch 1 */
     case 0x7F:                                      /* switch 1 */
-        frameSlot3 = FastVecLength((s32)(gHeroState + 0x160));
+        frameSlot3 = FastVecLength((s32)(g_hero_state + 0x160));
         ApproachValue((s32) &frameSlot3, 0.0f, 0.0011111111f);
-        vec_scale_to_length((s32)(gHeroState + 0x160), (s32)(gHeroState + 0x160), frameSlot3);
-        qcopy(&((Hero *)gHeroState)->q[0xF0/16], &((Hero *)gHeroState)->q[0x160/16]);
-        if (FastFloatHelperD((s32) (((void*)(gHeroState + 0x160)) + 0x8D0)) == 2) {
-            ptr37 = ((void*)(gHeroState + 0x160)) - 0x160;
-            TransformMobyJointToWorld(M2C_FIELD(ptr37, s32* , 0x2290), 4, (s32)((TI128*)v0));
+        vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frameSlot3);
+        qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x160/16]);
+        if (math_fast_float_d((s32) (((void*)(g_hero_state + 0x160)) + 0x8D0)) == 2) {
+            ptr37 = ((void*)(g_hero_state + 0x160)) - 0x160;
+            moby_transform_joint_to_world(M2C_FIELD(ptr37, s32* , 0x2290), 4, (s32)((TI128*)v0));
             (*(TI128*)v20) = 0;
             v20[0] = 0.4f;
             matrix_mul_vec3((s32) ((TI128*)v20), (s32) ((TI128*)v20), M2C_FIELD(ptr37, s32* , 0x2290) + 0xC0);
             FastVecAdd((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)v20));
-            qcopy(v10, &((Hero *)gHeroState)->q[0x110/16]);
+            qcopy(v10, &((Hero *)g_hero_state)->q[0x110/16]);
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.025000002f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.033333335f;
-            SpawnBubbleParticle((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            part_spawn_bubble((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             value37 = M2C_FIELD(ptr37, s32* , 0x1B8);
             if (value37 < 0x28) {
                 lim67 = 5;
-                value71 = RandomIntRange(2, lim67) + ((s32) M2C_FIELD(ptr37, s32* , 0x1B8) / lim67);
+                value71 = math_random_int_range(2, lim67) + ((s32) M2C_FIELD(ptr37, s32* , 0x1B8) / lim67);
                 goto block_224;
             }
             if (value37 >= 0x47) {
-                value71 = RandomIntRange(0xA, 0x14);
+                value71 = math_random_int_range(0xA, 0x14);
 block_224:
                 M2C_FIELD(ptr37, s32* , 0xA30) = value71;
             }
         }
-        if (((Hero *)gHeroState)->f[0xA3C/4] > 0.0f) {
-            ((Hero *)gHeroState)->f[0xA3C/4] = 0.0f;
+        if (((Hero *)g_hero_state)->f[0xA3C/4] > 0.0f) {
+            ((Hero *)g_hero_state)->f[0xA3C/4] = 0.0f;
         }
-        ApproachValue((s32) (((void*)gHeroState) + 0xA3C), -0.025000002f, 0.00041666668f);
-        ((Hero *)gHeroState)->f[0xF8/4] = (f32) ((Hero *)gHeroState)->f[0xA3C/4];
+        ApproachValue((s32) (((void*)g_hero_state) + 0xA3C), -0.025000002f, 0.00041666668f);
+        ((Hero *)g_hero_state)->f[0xF8/4] = (f32) ((Hero *)g_hero_state)->f[0xA3C/4];
         break;
     case 0x35:                                      /* switch 1 */
     case 0x36:                                      /* switch 1 */
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x36) {
-            SpawnJitteredParticleAfterDelay(0xF, 0x1E);
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x36) {
+            part_spawn_jittered_after_delay(0xF, 0x1E);
         }
-        if (((Hero *)gHeroState)->f[0x174/4] > 0.025000002f) {
-            EmitHeroTrailSpark(4, 0xC);
+        if (((Hero *)g_hero_state)->f[0x174/4] > 0.025000002f) {
+            part_emit_hero_trail_spark(4, 0xC);
         }
-        if ((((Hero *)gHeroState)->u[0x2294/4] == 0x35) && (((Hero *)gHeroState)->f[0x174/4] > 0.016666668f)) {
-            EmitHeroSideParticles(0, 1);
+        if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x35) && (((Hero *)g_hero_state)->f[0x174/4] > 0.016666668f)) {
+            part_emit_hero_side_particles(0, 1);
         }
-        if (((Hero *)gHeroState)->h[0xA4A/2] != 0) {
-            ((Hero *)gHeroState)->h[0xA4A/2] -= 1;
-            value15 = ((Hero *)gHeroState)->h[0xA4A/2] >> 3;
+        if (((Hero *)g_hero_state)->h[0xA4A/2] != 0) {
+            ((Hero *)g_hero_state)->h[0xA4A/2] -= 1;
+            value15 = ((Hero *)g_hero_state)->h[0xA4A/2] >> 3;
             EmitHeroRandomizedMotionEffects((value15 >= 7) ? 6 : value15, 0, 0);
         }
-        ((Hero *)gHeroState)->f[0xC20/4] = 0.6f;
-        ResolveStickInputToDirection(0.050000004f, 0);
-        if ((((Hero *)gPadState)->i[0x1D4/4] == 0) && (((Hero *)gHeroState)->f[0x1B0/4] < 0.025000002f)) {
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.025000002f;
+        ((Hero *)g_hero_state)->f[0xC20/4] = 0.6f;
+        hero_resolve_stick_direction(0.050000004f, 0);
+        if ((((Hero *)g_pad_state)->i[0x1D4/4] == 0) && (((Hero *)g_hero_state)->f[0x1B0/4] < 0.025000002f)) {
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.025000002f;
         }
-        SteerHeroHeading(0, 0.007f, 0.08f, 0.087266475f);
-        FastFloatHelperD((s32)(gHeroState + 0x798));
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x35) {
-            if ((((Hero *)gPadState)->i[0x1D4/4] != 0) && (((Hero *)gHeroState)->i[0x798/4] != 0)) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.050000004f;
+        hero_steer_heading(0, 0.007f, 0.08f, 0.087266475f);
+        math_fast_float_d((s32)(g_hero_state + 0x798));
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x35) {
+            if ((((Hero *)g_pad_state)->i[0x1D4/4] != 0) && (((Hero *)g_hero_state)->i[0x798/4] != 0)) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.050000004f;
             }
-            if (FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) > 0.78539824f) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
+            if (math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) > 0.78539824f) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
             }
-            ApproachHeroSpeed(0.0011111111f, 0.0013888889f);
-            scalar67 = ((Hero *)gHeroState)->f[0x1B4/4] * BlendTableEntriesByClock((s32)D_L09_00260990, 0x1E) * 5.5f;
-            ((Hero *)gHeroState)->f[0xF0/4] = (f32) (FastSinOrCosA(((Hero *)gHeroState)->f[0x98/4]) * scalar67);
-            scalar25 = FastSinOrCosB(((Hero *)gHeroState)->f[0x98/4]) * scalar67;
-            ((Hero *)gHeroState)->f[0xF8/4] = 0.0f;
-            ((Hero *)gHeroState)->f[0xF4/4] = scalar25;
+            hero_approach_speed(0.0011111111f, 0.0013888889f);
+            scalar67 = ((Hero *)g_hero_state)->f[0x1B4/4] * math_blend_table_entries_by_clock((s32)D_L09_00260990, 0x1E) * 5.5f;
+            ((Hero *)g_hero_state)->f[0xF0/4] = (f32) (math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0x98/4]) * scalar67);
+            scalar25 = math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0x98/4]) * scalar67;
+            ((Hero *)g_hero_state)->f[0xF8/4] = 0.0f;
+            ((Hero *)g_hero_state)->f[0xF4/4] = scalar25;
         } else {
-            ((Hero *)gHeroState)->f[0x1B4/4] = 0.0f;
-            ClearVector128((s32)(gHeroState + 0xF0));
+            ((Hero *)g_hero_state)->f[0x1B4/4] = 0.0f;
+            vec_clear_128((s32)(g_hero_state + 0xF0));
         }
-        if ((((Hero *)gHeroState)->u[0x2294/4] == 0x35) && (((Hero *)gHeroState)->i[0xC2C/4] == 0)) {
-            scalar50 = ((Hero *)gHeroState)->f[0xC38/4];
+        if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x35) && (((Hero *)g_hero_state)->i[0xC2C/4] == 0)) {
+            scalar50 = ((Hero *)g_hero_state)->f[0xC38/4];
             if ((scalar50 > 0.0f) && (scalar50 < 10.0f)) {
                 EmitHeroRandomizedMotionEffects(4, 1, 0);
             }
         }
-        ShrinkHeroVectorByAmount(0.0011666666f);
+        hero_shrink_vector_by_amount(0.0011666666f);
         ClipHeroVelocityAgainstWall(0);
-        UpdateHeroHeightOffset();
+        hero_update_height_offset();
         break;
     case 0x85:                                      /* switch 1 */
-        ptr19 = ((Hero *)gHeroState)->ptr[0x1830/4];
-        qcopy(&((Hero *)gHeroState)->q[0x80/16], (u8 *)ptr19 + 0x10);
-        qcopy(&((Hero *)gHeroState)->q[0x90/16], (u8 *)ptr19 + 0xF0);
+        ptr19 = ((Hero *)g_hero_state)->ptr[0x1830/4];
+        qcopy(&((Hero *)g_hero_state)->q[0x80/16], (u8 *)ptr19 + 0x10);
+        qcopy(&((Hero *)g_hero_state)->q[0x90/16], (u8 *)ptr19 + 0xF0);
         break;
     case 0x2F:                                      /* switch 1 */
         anim2F = -1;
         blend2F = 0;
-        if (((Hero *)gHeroState)->b[0x1492] != 0) {
-            BuildHeroMoveImpulse(0.7f, 0.0f);
+        if (((Hero *)g_hero_state)->b[0x1492] != 0) {
+            hero_build_move_impulse(0.7f, 0.0f);
         } else {
-            BuildHeroMoveImpulse(0.5f, 0.033333335f);
+            hero_build_move_impulse(0.5f, 0.033333335f);
         }
-        TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
-        ResolveStickInputToDirection(1.0f, 0);
-        ApproachHeroSpeed(0.004916667f, 0.004916667f);
-        ClearVector128((s32)(gHeroState + 0xF0));
-        ShrinkHeroVectorByAmount(0.004916667f);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32) (((void*)(gHeroState + 0xF0)) + 0x20), 0.0069444445f);
-            CancelHeroVelocityIntoWall();
+        hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
+        hero_resolve_stick_direction(1.0f, 0);
+        hero_approach_speed(0.004916667f, 0.004916667f);
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        hero_shrink_vector_by_amount(0.004916667f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32) (((void*)(g_hero_state + 0xF0)) + 0x20), 0.0069444445f);
+            hero_cancel_velocity_into_wall();
         } else {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.015000001f);
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.015000001f);
         }
-        if ((anim2F != -1) && (M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x42) != 0x36)) {
+        if ((anim2F != -1) && (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x42) != 0x36)) {
             set_hero_animation(anim2F, 0, (f32) blend2F);
         } else {
-            ptr50 = ((Hero *)gHeroState)->ptr[0x2290/4];
+            ptr50 = ((Hero *)g_hero_state)->ptr[0x2290/4];
             if ((M2C_FIELD(ptr50, u8* , 0x60) & 2) && (M2C_FIELD(ptr50, u8* , 0x42) == 0x36)) {
-                set_hero_animation(GetHeroWeaponAnimationId_L01(0), 0, 5.0f);
+                set_hero_animation(hero_get_weapon_anim_id(0), 0, 5.0f);
             }
         }
         break;
     case 0x8A:                                      /* switch 1 */
     case 0x8B:                                      /* switch 1 */
-        TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-        ApproachHeroSpeed(0.004916667f, 0.004916667f);
-        ClearVector128((s32)(gHeroState + 0xF0));
-        ShrinkHeroVectorByAmount(0.004916667f);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32) (((void*)gHeroState) + 0x120), 0.0061111115f);
-            CancelHeroVelocityIntoWall();
+        hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+        hero_approach_speed(0.004916667f, 0.004916667f);
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        hero_shrink_vector_by_amount(0.004916667f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32) (((void*)g_hero_state) + 0x120), 0.0061111115f);
+            hero_cancel_velocity_into_wall();
         } else {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.015000001f);
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.015000001f);
         }
-        ptr61 = ((Hero *)gHeroState)->ptr[0xB10/4];
+        ptr61 = ((Hero *)g_hero_state)->ptr[0xB10/4];
         if (ptr61 != 0) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(M2C_FIELD(ptr61, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr61, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
-            SteerHeroHeading(0, 0.02f, 0.15f, 0.10471977f);
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(ptr61, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr61, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
+            hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
     case 0x23:                                      /* switch 1 */
-        TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-        ApproachHeroSpeed(0.004916667f, 0.004916667f);
-        ClearVector128((s32)(gHeroState + 0xF0));
-        ShrinkHeroVectorByAmount(0.004916667f);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32) (((void*)gHeroState) + 0x120), 0.0061111115f);
-            CancelHeroVelocityIntoWall();
+        hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+        hero_approach_speed(0.004916667f, 0.004916667f);
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        hero_shrink_vector_by_amount(0.004916667f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32) (((void*)g_hero_state) + 0x120), 0.0061111115f);
+            hero_cancel_velocity_into_wall();
         } else {
-            ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.015000001f);
+            hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.015000001f);
         }
-        ptr1 = ((Hero *)gHeroState)->ptr[0xAA4/4];
+        ptr1 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
         if (ptr1 != 0) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(M2C_FIELD(ptr1, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr1, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
-            SteerHeroHeading(0, 0.02f, 0.15f, 0.10471977f);
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(ptr1, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr1, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
+            hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
     case 0x24:                                      /* switch 1 */
-        qcopy(v0, (u8 *)((Hero *)gHeroState)->ptr[0xAA4/4] + 0x10);
-        scalar26 = fast_vec_dist((s32) (((void*)gHeroState) + 0x80), (s32)((TI128*)v0));
-        ((Hero *)gHeroState)->f[0xAB0/4] = scalar26;
-        ((Hero *)gHeroState)->f[0xAAC/4] = 60.0f;
-        if (((Hero *)gHeroState)->f[0xAA0/4] > 0.0f) {
-            ((Hero *)gHeroState)->f[0xAAC/4] = (f32) (scalar26 / ((Hero *)gHeroState)->f[0x170/4]);
+        qcopy(v0, (u8 *)((Hero *)g_hero_state)->ptr[0xAA4/4] + 0x10);
+        scalar26 = fast_vec_dist((s32) (((void*)g_hero_state) + 0x80), (s32)((TI128*)v0));
+        ((Hero *)g_hero_state)->f[0xAB0/4] = scalar26;
+        ((Hero *)g_hero_state)->f[0xAAC/4] = 60.0f;
+        if (((Hero *)g_hero_state)->f[0xAA0/4] > 0.0f) {
+            ((Hero *)g_hero_state)->f[0xAAC/4] = (f32) (scalar26 / ((Hero *)g_hero_state)->f[0x170/4]);
         }
-        value38 = ((Hero *)gHeroState)->i[0x2298/4];
+        value38 = ((Hero *)g_hero_state)->i[0x2298/4];
         if (value38 == 0) {
-            ApproachValue((s32) (((void*)gHeroState) + 0xAA0), 0.45000002f, 0.022222223f);
-            ptr46 = ((Hero *)gHeroState)->ptr[0xAA4/4];
-            scalar136 = FastMatrixHelperA(M2C_FIELD(ptr46, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr46, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
-            if (((Hero *)gHeroState)->i[0x3A0/4] != 0) {
-                if (FastDiffRots(((Hero *)gHeroState)->f[0x98/4], scalar136) > 1.5707964f) {
+            ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.45000002f, 0.022222223f);
+            ptr46 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
+            scalar136 = mat_fast_helper_a(M2C_FIELD(ptr46, f32* , 0x10) - M2C_FIELD(ptr21, f32* , 0x10), M2C_FIELD(ptr46, f32* , 0x14) - M2C_FIELD(ptr21, f32* , 0x14));
+            if (((Hero *)g_hero_state)->i[0x3A0/4] != 0) {
+                if (FastDiffRots(((Hero *)g_hero_state)->f[0x98/4], scalar136) > 1.5707964f) {
                     scalar136 = FastAddRotations(scalar136, 3.1415927f);
                 }
             }
-            ((Hero *)gHeroState)->f[0x1A0/4] = scalar136;
-            SteerHeroHeading(0, 0.03f, 0.15f, 0.12217307f);
+            ((Hero *)g_hero_state)->f[0x1A0/4] = scalar136;
+            hero_steer_heading(0, 0.03f, 0.15f, 0.12217307f);
         } else if (value38 == 1) {
-            ApproachValue((s32) (((void*)gHeroState) + 0xAA0), 0.0f, 0.011666667f);
+            ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.0f, 0.011666667f);
         }
-        if ((SolveQuadratic((s32) &frameSlot4, (s32) &frameSlot5, -0.0058333334f, ((Hero *)gHeroState)->f[0xAA0/4], 1.9f - ((Hero *)gHeroState)->f[0xAB0/4]) > 0) && (frameSlot4 > 0.0f)) {
-            ((Hero *)gHeroState)->f[0xAAC/4] = frameSlot4;
-            ((Hero *)gHeroState)->i[0x2298/4] = 1;
+        if ((math_solve_quadratic((s32) &frameSlot4, (s32) &frameSlot5, -0.0058333334f, ((Hero *)g_hero_state)->f[0xAA0/4], 1.9f - ((Hero *)g_hero_state)->f[0xAB0/4]) > 0) && (frameSlot4 > 0.0f)) {
+            ((Hero *)g_hero_state)->f[0xAAC/4] = frameSlot4;
+            ((Hero *)g_hero_state)->i[0x2298/4] = 1;
         }
-        ((Hero *)gHeroState)->h[0x226/2] = 3;
-        if (((Hero *)gHeroState)->f[0xAAC/4] < 20.0f) {
-            ((Hero *)gHeroState)->i[0xAB4/4] = 1;
+        ((Hero *)g_hero_state)->h[0x226/2] = 3;
+        if (((Hero *)g_hero_state)->f[0xAAC/4] < 20.0f) {
+            ((Hero *)g_hero_state)->i[0xAB4/4] = 1;
         }
-        if (((Hero *)gHeroState)->i[0xAB4/4] != 0) {
-            StepAngleTowardTarget((s32) (((void*)gHeroState) + 0x94), 0, 0.0f, 0.06399541f);
+        if (((Hero *)g_hero_state)->i[0xAB4/4] != 0) {
+            StepAngleTowardTarget((s32) (((void*)g_hero_state) + 0x94), 0, 0.0f, 0.06399541f);
         } else {
-            turn24 = FastAddRotations(-FastMatrixHelperA(vec_distance_xy((s32) (((void*)gHeroState) + 0x80), (s32)((TI128*)v0)), v0[2] - ((Hero *)gHeroState)->f[0x88/4]), 1.5707965f);
-            StepAngleTowardTarget((s32) (((void*)gHeroState) + 0x94), 0, turn24, 0.10762865f);
+            turn24 = FastAddRotations(-mat_fast_helper_a(vec_distance_xy((s32) (((void*)g_hero_state) + 0x80), (s32)((TI128*)v0)), v0[2] - ((Hero *)g_hero_state)->f[0x88/4]), 1.5707965f);
+            StepAngleTowardTarget((s32) (((void*)g_hero_state) + 0x94), 0, turn24, 0.10762865f);
         }
-        v20[0] = FastSinOrCosA(FastAddRotations(((Hero *)gHeroState)->f[0x98/4], -1.5707965f)) * -0.57f;
-        scalar27 = FastSinOrCosB(FastAddRotations(((Hero *)gHeroState)->f[0x98/4], -1.5707965f)) * -0.57f;
+        v20[0] = math_fast_sin_or_cos_a(FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], -1.5707965f)) * -0.57f;
+        scalar27 = math_fast_sin_or_cos_b(FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], -1.5707965f)) * -0.57f;
         v20[2] = 0;
         v20[1] = scalar27;
-        FastVecAdd((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((void*)gHeroState) + 0x80));
-        FastVecSub((s32) ((TI128*)v10), (s32) (((Hero *)gHeroState)->ptr[0xAA4/4] + 0x10), (s32) ((TI128*)v20));
-        vec_scale_to_length((s32) (((void*)gHeroState) + 0xF0), (s32) ((TI128*)v10), ((Hero *)gHeroState)->f[0xAA0/4]);
-        scalar28 = ((Hero *)gHeroState)->f[0xAAC/4];
+        FastVecAdd((s32) ((TI128*)v20), (s32) ((TI128*)v20), (s32) (((void*)g_hero_state) + 0x80));
+        FastVecSub((s32) ((TI128*)v10), (s32) (((Hero *)g_hero_state)->ptr[0xAA4/4] + 0x10), (s32) ((TI128*)v20));
+        vec_scale_to_length((s32) (((void*)g_hero_state) + 0xF0), (s32) ((TI128*)v10), ((Hero *)g_hero_state)->f[0xAA0/4]);
+        scalar28 = ((Hero *)g_hero_state)->f[0xAAC/4];
         if (scalar28 < 30.0f) {
-            ((Hero *)gHeroState)->f[0xF8/4] = (f32) (((Hero *)gHeroState)->f[0xF8/4] - ((30.0f - scalar28) * 0.008055556f));
+            ((Hero *)g_hero_state)->f[0xF8/4] = (f32) (((Hero *)g_hero_state)->f[0xF8/4] - ((30.0f - scalar28) * 0.008055556f));
         }
         break;
     case 0x25:                                      /* switch 1 */
-        ApproachValue((s32)(gHeroState + 0xABC), ((Hero *)gHeroState)->f[0xAC0/4], 0.16666667f);
-        qcopy(&((Hero *)gHeroState)->q[0xF0/16], &((Hero *)gHeroState)->q[0x110/16]);
-        FastVecScale((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.9f);
-        ((Hero *)gHeroState)->f[0xF8/4] = (f32) (((Hero *)gHeroState)->f[0xF8/4] - 0.004166667f);
-        qcopy(v0, (u8 *)((Hero *)gHeroState)->ptr[0xAA4/4] + 0x10);
-        ((Hero *)gHeroState)->f[0xAB0/4] = fast_vec_dist((s32)(gHeroState + 0x80), (s32)((TI128*)v0));
-        FastVecAdd((s32) ((TI128*)v10), (s32)(gHeroState + 0x80), (s32)(gHeroState + 0xF0));
+        ApproachValue((s32)(g_hero_state + 0xABC), ((Hero *)g_hero_state)->f[0xAC0/4], 0.16666667f);
+        qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x110/16]);
+        FastVecScale((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.9f);
+        ((Hero *)g_hero_state)->f[0xF8/4] = (f32) (((Hero *)g_hero_state)->f[0xF8/4] - 0.004166667f);
+        qcopy(v0, (u8 *)((Hero *)g_hero_state)->ptr[0xAA4/4] + 0x10);
+        ((Hero *)g_hero_state)->f[0xAB0/4] = fast_vec_dist((s32)(g_hero_state + 0x80), (s32)((TI128*)v0));
+        FastVecAdd((s32) ((TI128*)v10), (s32)(g_hero_state + 0x80), (s32)(g_hero_state + 0xF0));
         FastVecSub((s32) ((TI128*)v30), (s32) ((TI128*)v10), (s32)((TI128*)v0));
-        vec_scale_to_length((s32) ((TI128*)v30), (s32) ((TI128*)v30), ((Hero *)gHeroState)->f[0xABC/4]);
+        vec_scale_to_length((s32) ((TI128*)v30), (s32) ((TI128*)v30), ((Hero *)g_hero_state)->f[0xABC/4]);
         FastVecAdd((s32) ((TI128*)v20), (s32)((TI128*)v0), (s32) ((TI128*)v30));
-        FastVecSub((s32)(gHeroState + 0xF0), (s32) ((TI128*)v20), (s32)(gHeroState + 0x80));
+        FastVecSub((s32)(g_hero_state + 0xF0), (s32) ((TI128*)v20), (s32)(g_hero_state + 0x80));
         break;
     case 0x2B:                                      /* switch 1 */
-        if ((((Hero *)gHeroState)->i[0xC28/4] & 2) && (M2C_FIELD(ptr21, u8* , 0x43) == 0x34)) {
+        if ((((Hero *)g_hero_state)->i[0xC28/4] & 2) && (M2C_FIELD(ptr21, u8* , 0x43) == 0x34)) {
             set_hero_animation(0x35, 0xA, 12.0f);
-            ((Hero *)gHeroState)->f[0xC20/4] = 0.3f;
+            ((Hero *)g_hero_state)->f[0xC20/4] = 0.3f;
         }
-        ptr51 = ((Hero *)gHeroState)->ptr[0xAD4/4];
-        scalar81 = ((Hero *)gHeroState)->f[0xF8/4];
+        ptr51 = ((Hero *)g_hero_state)->ptr[0xAD4/4];
+        scalar81 = ((Hero *)g_hero_state)->f[0xF8/4];
         if (ptr51 != 0) {
             ptr47 = M2C_FIELD(ptr51, void** , 0x68);
             if ((ptr47 != 0) && (M2C_FIELD(ptr47, s32* , 0x34) != 0)) {
                 scalar137 = M2C_FIELD(ptr51, f32* , 0xF8);
-                if (FastDiffRots(scalar137, ((Hero *)gHeroState)->f[0x98/4]) > 90.0f) {
+                if (FastDiffRots(scalar137, ((Hero *)g_hero_state)->f[0x98/4]) > 90.0f) {
                     scalar137 = FastAddRotations(scalar137, 3.1415927f);
                 }
-                ApproachWithVelocity((s32) (((void*)gHeroState) + 0xAEC), scalar137, (s32) (((void*)gHeroState) + 0xAF8), 0.02f, 0.3f, 0.0f, 0);
+                math_approach_with_velocity((s32) (((void*)g_hero_state) + 0xAEC), scalar137, (s32) (((void*)g_hero_state) + 0xAF8), 0.02f, 0.3f, 0.0f, 0);
             }
         }
-        ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0xAEC/4];
-        SteerHeroHeading(0, 0.02f, 0.3f, 0.078539826f);
-        FastVecSub((s32)((TI128*)v0), (s32) (((Hero *)gHeroState)->ptr[0xAD4/4] + 0x10), (s32) (((void*)gHeroState) + 0x80));
+        ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0xAEC/4];
+        hero_steer_heading(0, 0.02f, 0.3f, 0.078539826f);
+        FastVecSub((s32)((TI128*)v0), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10), (s32) (((void*)g_hero_state) + 0x80));
         vec_scale_to_length((s32)((TI128*)v0), (s32)((TI128*)v0), 1.0f);
         if (v0[2] < 0.23f) {
             v0[2] = 0.23f;
         }
-        ClearVector128((s32) ((TI128*)v20));
-        v20[2] = ((Hero *)gHeroState)->f[0x98/4];
+        vec_clear_128((s32) ((TI128*)v20));
+        v20[2] = ((Hero *)g_hero_state)->f[0x98/4];
         euler_to_matrix((s32) ((TI128*)v40), (s32) ((TI128*)v20));
         matrix_from_basis_rows((s32) ((TI128*)m80), (s32) ((TI128*)v40));
         transform_vector((s32)((TI128*)v0), (s32)((TI128*)v0), (s32) ((TI128*)m80));
-        v10[0] = -FastMatrixHelperA(square_root((v0[0] * v0[0]) + (v0[2] * v0[2])), v0[1]);
-        scalar29 = FastMatrixHelperA(v0[2], v0[0]);
+        v10[0] = -mat_fast_helper_a(square_root((v0[0] * v0[0]) + (v0[2] * v0[2])), v0[1]);
+        scalar29 = mat_fast_helper_a(v0[2], v0[0]);
         v10[1] = scalar29;
-        ApproachWithVelocity((s32) (((void*)gHeroState) + 0x94), scalar29, (s32) (((void*)gHeroState) + 0xA4), 0.04f, 0.2f, 0.15998854f, 0);
-        ApproachWithVelocity((s32) (((void*)gHeroState) + 0x90), v10[0], (s32) (((void*)gHeroState) + 0xA0), 0.04f, 0.2f, 0.15998854f, 0);
-        value69 = ((Hero *)gHeroState)->f[0x88/4] < M2C_FIELD(((Hero *)gHeroState)->ptr[0xAD4/4], f32* , 0x18);
-        if (((Hero *)gHeroState)->h[0xADC/2] != 0) {
-            if ((value69 != 0) && (((Hero *)gHeroState)->i[0x1B8/4] >= 0x29) && (((Hero *)gHeroState)->f[0x24B8/4] > 0.25f)) {
-                ResolveStickInputToDirection(1.0f, 0);
-                scalar138 = ((Hero *)gHeroState)->f[0x24B8/4] * 0.0035f;
+        math_approach_with_velocity((s32) (((void*)g_hero_state) + 0x94), scalar29, (s32) (((void*)g_hero_state) + 0xA4), 0.04f, 0.2f, 0.15998854f, 0);
+        math_approach_with_velocity((s32) (((void*)g_hero_state) + 0x90), v10[0], (s32) (((void*)g_hero_state) + 0xA0), 0.04f, 0.2f, 0.15998854f, 0);
+        value69 = ((Hero *)g_hero_state)->f[0x88/4] < M2C_FIELD(((Hero *)g_hero_state)->ptr[0xAD4/4], f32* , 0x18);
+        if (((Hero *)g_hero_state)->h[0xADC/2] != 0) {
+            if ((value69 != 0) && (((Hero *)g_hero_state)->i[0x1B8/4] >= 0x29) && (((Hero *)g_hero_state)->f[0x24B8/4] > 0.25f)) {
+                hero_resolve_stick_direction(1.0f, 0);
+                scalar138 = ((Hero *)g_hero_state)->f[0x24B8/4] * 0.0035f;
                 if (scalar138 > 0.083333336f) {
                     scalar138 = 0.083333336f;
                 }
-                v30[0] = FastSinOrCosA(((Hero *)gHeroState)->f[0x1A0/4]) * scalar138;
-                scalar30 = FastSinOrCosB(((Hero *)gHeroState)->f[0x1A0/4]) * scalar138;
-                ptr9 = ((void*)gHeroState) + 0xF0;
+                v30[0] = math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0x1A0/4]) * scalar138;
+                scalar30 = math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0x1A0/4]) * scalar138;
+                ptr9 = ((void*)g_hero_state) + 0xF0;
                 (*(s32*)&v30[2]) = 0;
                 v30[1] = scalar30;
                 FastVecAdd((s32) ptr9, (s32) ptr9, (s32) ((TI128*)v30));
             }
-            if (((Hero *)gHeroState)->h[0xADC/2] != 0) {
-                ptr38 = ((void*)gHeroState) + 0x80;
-                if ((vec_distance_xy((s32) ptr38, (s32) (((Hero *)gHeroState)->ptr[0xAD4/4] + 0x10)) < (((Hero *)gHeroState)->f[0xAE0/4] * 1.57f)) || (((Hero *)gHeroState)->f[0x31C/4] > 1.5f)) {
-                    ptr30 = ((void*)gHeroState) + 0xF0;
-                    ApplyHeroModeTransform((s32) ptr30, (s32) (((void*)gHeroState) + 0x110), 0.011111111f);
-                    if ((((Hero *)gHeroState)->h[0xAFE/2] != 0) && (GetViewSpaceHeight((s32) ptr30) > 0.0f)) {
-                        FastVecSub((s32) ((TI128*)v30), (s32) ptr38, (s32) (((Hero *)gHeroState)->ptr[0xAD4/4] + 0x10));
-                        ApplyHeroModeTransform((s32) ptr30, (s32) ptr30, 0.015833333f);
+            if (((Hero *)g_hero_state)->h[0xADC/2] != 0) {
+                ptr38 = ((void*)g_hero_state) + 0x80;
+                if ((vec_distance_xy((s32) ptr38, (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10)) < (((Hero *)g_hero_state)->f[0xAE0/4] * 1.57f)) || (((Hero *)g_hero_state)->f[0x31C/4] > 1.5f)) {
+                    ptr30 = ((void*)g_hero_state) + 0xF0;
+                    hero_apply_mode_transform((s32) ptr30, (s32) (((void*)g_hero_state) + 0x110), 0.011111111f);
+                    if ((((Hero *)g_hero_state)->h[0xAFE/2] != 0) && (cam_get_view_space_height((s32) ptr30) > 0.0f)) {
+                        FastVecSub((s32) ((TI128*)v30), (s32) ptr38, (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10));
+                        hero_apply_mode_transform((s32) ptr30, (s32) ptr30, 0.015833333f);
                     }
                 }
-                scalar68 = FastVecLength((s32)(gHeroState + 0xF0)) * 0.00025f;
-                FastVecScale((s32) ((TI128*)v30), (s32)(gHeroState + 0xF0), -1.0f);
+                scalar68 = FastVecLength((s32)(g_hero_state + 0xF0)) * 0.00025f;
+                FastVecScale((s32) ((TI128*)v30), (s32)(g_hero_state + 0xF0), -1.0f);
                 vec_scale_to_length((s32) ((TI128*)v30), (s32) ((TI128*)v30), scalar68);
-                FastVecAdd((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), (s32) ((TI128*)v30));
+                FastVecAdd((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), (s32) ((TI128*)v30));
             }
         }
-        ptr48 = ((Hero *)gHeroState)->ptr[0xAD4/4];
+        ptr48 = ((Hero *)g_hero_state)->ptr[0xAD4/4];
         if (ptr48 != 0) {
             ptr22 = M2C_FIELD(ptr48, void** , 0x68);
-            ptr31 = ((void*)gHeroState) + 0xF0;
+            ptr31 = ((void*)g_hero_state) + 0xF0;
             if (ptr22 != 0) {
                 scalar31 = FastVecLength((s32) ptr31);
                 scalar32 = M2C_FIELD(ptr22, f32* , 0xC);
@@ -1257,229 +1258,229 @@ block_224:
                 }
             }
         }
-        scalar3 = FastAddRotations(((Hero *)gHeroState)->f[0x98/4], -1.5707965f);
-        ptr44 = ((void*)gHeroState) + 0x80;
-        ptr43 = ((void*)gHeroState) + 0xF0;
-        vD0[0] = FastSinOrCosA(scalar3) * 0.15f;
-        scalar4 = FastSinOrCosB(scalar3) * 0.15f;
+        scalar3 = FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], -1.5707965f);
+        ptr44 = ((void*)g_hero_state) + 0x80;
+        ptr43 = ((void*)g_hero_state) + 0xF0;
+        vD0[0] = math_fast_sin_or_cos_a(scalar3) * 0.15f;
+        scalar4 = math_fast_sin_or_cos_b(scalar3) * 0.15f;
         (*(s32*)&vD0[2]) = 0;
         vD0[1] = scalar4;
         FastVecAdd((s32) &vD0[0], (s32) &vD0[0], (s32) ptr44);
         FastVecAdd((s32) ((TI128*)v30), (s32) &vD0[0], (s32) ptr43);
-        FastVecSub((s32) ((TI128*)vC0), (s32) ((TI128*)v30), (s32) (((Hero *)gHeroState)->ptr[0xAD4/4] + 0x10));
-        vec_scale_to_length((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), ((Hero *)gHeroState)->f[0xAE4/4]);
-        FastVecAdd((s32) ((TI128*)v30), (s32) (((Hero *)gHeroState)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vC0));
+        FastVecSub((s32) ((TI128*)vC0), (s32) ((TI128*)v30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10));
+        vec_scale_to_length((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), ((Hero *)g_hero_state)->f[0xAE4/4]);
+        FastVecAdd((s32) ((TI128*)v30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vC0));
         FastVecSub((s32) ptr43, (s32) ((TI128*)v30), (s32) &vD0[0]);
-        scalar69 = ((Hero *)gHeroState)->f[0xAE4/4];
-        SpringFloatToGoal((s32) (((void*)gHeroState) + 0xAE4), (s32) (((void*)gHeroState) + 0xAE8), ((Hero *)gHeroState)->f[0xAE0/4], ((Hero *)gHeroState)->f[0xB04/4], ((Hero *)gHeroState)->f[0xB08/4], ((Hero *)gHeroState)->f[0xB0C/4]);
-        scalar70 = ((Hero *)gHeroState)->f[0xAE4/4] - scalar69;
-        if (((Hero *)gHeroState)->f[0xAE4/4] < FastVecLength((s32) ((TI128*)vC0))) {
+        scalar69 = ((Hero *)g_hero_state)->f[0xAE4/4];
+        math_spring_float_to_goal((s32) (((void*)g_hero_state) + 0xAE4), (s32) (((void*)g_hero_state) + 0xAE8), ((Hero *)g_hero_state)->f[0xAE0/4], ((Hero *)g_hero_state)->f[0xB04/4], ((Hero *)g_hero_state)->f[0xB08/4], ((Hero *)g_hero_state)->f[0xB0C/4]);
+        scalar70 = ((Hero *)g_hero_state)->f[0xAE4/4] - scalar69;
+        if (((Hero *)g_hero_state)->f[0xAE4/4] < FastVecLength((s32) ((TI128*)vC0))) {
             vec_scale_to_length((s32) ((TI128*)vC0), (s32) ((TI128*)vC0), scalar70);
             FastVecAdd((s32) ptr44, (s32) ptr44, (s32) ((TI128*)vC0));
         }
-        if ((((Hero *)gHeroState)->h[0xAFE/2] != 0) && (value69 != 0)) {
+        if ((((Hero *)g_hero_state)->h[0xAFE/2] != 0) && (value69 != 0)) {
             min2B = 0.23333335f;
             scalar5 = vec_length_xy((s32) ptr43);
             frameSlot7 = scalar5;
             if (scalar5 < min2B) {
-                SpringFloatToGoal((s32) &frameSlot7, (s32) (((void*)gHeroState) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
-                v30[0] = FastSinOrCosA(((Hero *)gHeroState)->f[0xAEC/4]) * ((Hero *)gHeroState)->f[0xAF4/4];
-                scalar6 = FastSinOrCosB(((Hero *)gHeroState)->f[0xAEC/4]);
+                math_spring_float_to_goal((s32) &frameSlot7, (s32) (((void*)g_hero_state) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
+                v30[0] = math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0xAEC/4]) * ((Hero *)g_hero_state)->f[0xAF4/4];
+                scalar6 = math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0xAEC/4]);
                 v30[2] = 0.0f;
-                v30[1] = scalar6 * ((Hero *)gHeroState)->f[0xAF4/4];
+                v30[1] = scalar6 * ((Hero *)g_hero_state)->f[0xAF4/4];
                 FastVecAdd((s32) ptr43, (s32) ptr43, (s32) ((TI128*)v30));
             }
         }
-        if ((((Hero *)gHeroState)->h[0xADC/2] != 0) && (((Hero *)gHeroState)->h[0x34E/2] != 0) && (((scalar81 < 0.0f) && (((Hero *)gHeroState)->f[0xF8/4] > 0.0f)) || (((Hero *)gHeroState)->h[0xAFC/2] != 0))) {
-            ((Hero *)gHeroState)->h[0xAFE/2] = 0;
-            scalar71 = square_root(((Hero *)gHeroState)->f[0xAE0/4] / ((Hero *)gHeroState)->f[0xAF0/4]) * 3.1415927f;
-            value7 = ((Hero *)gHeroState)->h[0xAFC/2];
+        if ((((Hero *)g_hero_state)->h[0xADC/2] != 0) && (((Hero *)g_hero_state)->h[0x34E/2] != 0) && (((scalar81 < 0.0f) && (((Hero *)g_hero_state)->f[0xF8/4] > 0.0f)) || (((Hero *)g_hero_state)->h[0xAFC/2] != 0))) {
+            ((Hero *)g_hero_state)->h[0xAFE/2] = 0;
+            scalar71 = square_root(((Hero *)g_hero_state)->f[0xAE0/4] / ((Hero *)g_hero_state)->f[0xAF0/4]) * 3.1415927f;
+            value7 = ((Hero *)g_hero_state)->h[0xAFC/2];
             if (value7 != 0) {
                 value72 = value7 == 1;
             } else {
-                (*(TI128*)v30) = ((Hero *)gHeroState)->q[0x110/16];
-                value72 = GetSpeedAlongHeroForward((s32) ((TI128*)v30)) > 0.0f;
+                (*(TI128*)v30) = ((Hero *)g_hero_state)->q[0x110/16];
+                value72 = hero_get_speed_along_forward((s32) ((TI128*)v30)) > 0.0f;
             }
             if (value72 != 0) {
                 if (M2C_FIELD(ptr21, u8* , 0x43) != 0x35) {
                     set_hero_animation(0x35, 6, 17.0f);
-                    ((Hero *)gHeroState)->h[0xAFC/2] = 1;
+                    ((Hero *)g_hero_state)->h[0xAFC/2] = 1;
                 } else {
-                    ptr49 = ((Hero *)gHeroState)->ptr[0x2290/4];
+                    ptr49 = ((Hero *)g_hero_state)->ptr[0x2290/4];
                     if (M2C_FIELD(ptr49, u8* , 0x42) == M2C_FIELD(ptr49, u8* , 0x43)) {
                         AdjustHeroAnimationSpeedForTargetFrame(42.0f, scalar71, 0.5f, -1.0f);
-                        ((Hero *)gHeroState)->h[0xAFC/2] = 0;
+                        ((Hero *)g_hero_state)->h[0xAFC/2] = 0;
                     }
                 }
             } else if (M2C_FIELD(ptr21, u8* , 0x43) != 0x35) {
                 set_hero_animation(0x35, 0x15, 9.0f);
-                ((Hero *)gHeroState)->h[0xAFC/2] = 2;
+                ((Hero *)g_hero_state)->h[0xAFC/2] = 2;
             } else {
-                ptr45 = ((Hero *)gHeroState)->ptr[0x2290/4];
+                ptr45 = ((Hero *)g_hero_state)->ptr[0x2290/4];
                 if (M2C_FIELD(ptr45, u8* , 0x42) == M2C_FIELD(ptr45, u8* , 0x43)) {
                     AdjustHeroAnimationSpeedForTargetFrame(12.0f, scalar71, 0.5f, -1.0f);
-                    ((Hero *)gHeroState)->h[0xAFC/2] = 0;
+                    ((Hero *)g_hero_state)->h[0xAFC/2] = 0;
                 }
             }
         }
         break;
     case 0x14:                                      /* switch 1 */
-        if ((((Hero *)gHeroState)->i[0xC2C/4] != 0) || (((Hero *)gHeroState)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)gHeroState)->h[0xBFC/2]].w[0x18/4])) {
-            ((Hero *)gHeroState)->c[0x1239] = 2;
+        if ((((Hero *)g_hero_state)->i[0xC2C/4] != 0) || (((Hero *)g_hero_state)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)g_hero_state)->h[0xBFC/2]].w[0x18/4])) {
+            ((Hero *)g_hero_state)->c[0x1239] = 2;
         }
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
         value67 = 0;
-        if ((((Hero *)gHeroState)->d[0x1490/8] & (0xFFFFULL << 40)) || (((Hero *)gHeroState)->b[0x149B] != 0) || (((Hero *)gHeroState)->f[0x31C/4] > 4.0f)) {
+        if ((((Hero *)g_hero_state)->d[0x1490/8] & (0xFFFFULL << 40)) || (((Hero *)g_hero_state)->b[0x149B] != 0) || (((Hero *)g_hero_state)->f[0x31C/4] > 4.0f)) {
             value67 = 1;
         }
-        value17 = ((Hero *)gHeroState)->i[0xBE4/4];
+        value17 = ((Hero *)g_hero_state)->i[0xBE4/4];
         if (value17 != 0) {
-            FastVecSub((s32)((TI128*)v0), value17 + 0x10, (s32) (((void*)gHeroState) + 0x80));
-            scalar7 = GetViewSpaceVectorLength((s32)((TI128*)v0));
+            FastVecSub((s32)((TI128*)v0), value17 + 0x10, (s32) (((void*)g_hero_state) + 0x80));
+            scalar7 = cam_get_view_space_vector_length((s32)((TI128*)v0));
             if (((scalar7 > 2.0f) && (scalar7 < 5.0f)) || (value67 != 0)) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.075f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.075f;
             }
-            ApproachHeroSpeed(0.0069444445f, 0.0069444445f);
-            vec_scale_to_length((s32) ((TI128*)v10), (s32)gHeroState, ((Hero *)gHeroState)->f[0x1B4/4]);
-            SetViewSpaceVectorLength((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.0f);
-            FastVecAdd((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), (s32) ((TI128*)v10));
+            hero_approach_speed(0.0069444445f, 0.0069444445f);
+            vec_scale_to_length((s32) ((TI128*)v10), (s32)g_hero_state, ((Hero *)g_hero_state)->f[0x1B4/4]);
+            cam_set_view_space_vector_length((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.0f);
+            FastVecAdd((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), (s32) ((TI128*)v10));
         } else {
-            if ((value67 != 0) && (((Hero *)gHeroState)->i[0x1B8/4] < 0x46)) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.075f;
+            if ((value67 != 0) && (((Hero *)g_hero_state)->i[0x1B8/4] < 0x46)) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.075f;
             }
-            ApproachHeroSpeed(0.004166667f, 0.004166667f);
-            SetViewSpaceVectorLength((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), ((Hero *)gHeroState)->f[0x1B4/4]);
+            hero_approach_speed(0.004166667f, 0.004166667f);
+            cam_set_view_space_vector_length((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), ((Hero *)g_hero_state)->f[0x1B4/4]);
         }
-        if ((((Hero *)gHeroState)->i[0xBE8/4] != 0) || (((Hero *)gHeroState)->i[0xBE4/4] != 0)) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = ((Hero *)gHeroState)->f[0xBEC/4];
-            qcopy(&((Hero *)gHeroState)->q[0x190/16], &((Hero *)gHeroState)->q[0xBC0/16]);
-            SteerHeroHeading(0, 0.05f, 0.2f, 0.2821616f);
-        } else if (((Hero *)gHeroState)->f[0xC38/4] < 25.0f) {
-            SelectHeroAimTarget(8.0f, 1.0471977f, 1.0471977f);
+        if ((((Hero *)g_hero_state)->i[0xBE8/4] != 0) || (((Hero *)g_hero_state)->i[0xBE4/4] != 0)) {
+            ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0xBEC/4];
+            qcopy(&((Hero *)g_hero_state)->q[0x190/16], &((Hero *)g_hero_state)->q[0xBC0/16]);
+            hero_steer_heading(0, 0.05f, 0.2f, 0.2821616f);
+        } else if (((Hero *)g_hero_state)->f[0xC38/4] < 25.0f) {
+            hero_l00_select_aim_target(8.0f, 1.0471977f, 1.0471977f);
         }
-        scalar52 = ((Hero *)gHeroState)->f[0x31C/4];
+        scalar52 = ((Hero *)g_hero_state)->f[0x31C/4];
         scalar144 = 0.12833333f;
         if (scalar52 > 2.25f) {
             scalar144 = 0.064166665f;
         } else if (scalar52 > 1.8f) {
             scalar144 = 0.08983333f;
         }
-        if ((((Hero *)gHeroState)->i[0xC2C/4] == 0) && (((Hero *)gHeroState)->f[0xC38/4] > 23.5f) && (((Hero *)gHeroState)->f[0x118/4] < 0.0f) && (((Hero *)gHeroState)->h[0x34E/2] != 0)) {
-            qcopy(v0, &((Hero *)gHeroState)->q[0x80/16]);
-            ApplyHeroModeTransformReversed((s32)((TI128*)v0), (s32)((TI128*)v0), -0.5f);
-            vec_scale_to_length((s32) &v40[0], (s32)gHeroState, 2.0f);
-            make_hit_descriptor((s32) ((TI128*)v10), (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0x10000, 2.0f, (s32) &v40[0]);
+        if ((((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (((Hero *)g_hero_state)->f[0xC38/4] > 23.5f) && (((Hero *)g_hero_state)->f[0x118/4] < 0.0f) && (((Hero *)g_hero_state)->h[0x34E/2] != 0)) {
+            qcopy(v0, &((Hero *)g_hero_state)->q[0x80/16]);
+            hero_apply_mode_transform_reversed((s32)((TI128*)v0), (s32)((TI128*)v0), -0.5f);
+            vec_scale_to_length((s32) &v40[0], (s32)g_hero_state, 2.0f);
+            make_hit_descriptor((s32) ((TI128*)v10), (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, 2.0f, (s32) &v40[0]);
             v10[3] = 5627.925f;
             (*(u8*)((u8*)v20+9)) = 1;
             (*(u16*)((u8*)v20+10)) = 0x47;
             (*(u8*)((u8*)v20+8)) = 0;
-            ProcessCollisionHit(0.4f, (s32)((TI128*)v0), 0x10, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], (s32) ((TI128*)v10));
+            coll_process_hit(0.4f, (s32)((TI128*)v0), 0x10, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], (s32) ((TI128*)v10));
         }
-        if (IsBelowPlaneWithinDepth(25.7f) != 0) {
-            QueueRecordsByIndex(0x19);
-            ((Hero *)gHeroState)->h[0x1FA/2] = 0x32;
+        if (math_is_below_plane_within_depth(25.7f) != 0) {
+            queue_copy_record_by_index(0x19);
+            ((Hero *)g_hero_state)->h[0x1FA/2] = 0x32;
             if (D_001A7B2A != 0) {
                 ((Hero *)D_L09_001B98C0)->f[0x180/4] = 0.1f;
                 ((Hero *)D_L09_001B98C0)->i[0x188/4] = 0x1E;
-                ((Hero *)gHeroState)->h[0x224/2] = 0x23;
+                ((Hero *)g_hero_state)->h[0x224/2] = 0x23;
                 ((Hero *)D_L09_001B98C0)->i[0x16C/4] = 0;
             }
         }
-        value39 = ((Hero *)gHeroState)->i[0x1B8/4];
+        value39 = ((Hero *)g_hero_state)->i[0x1B8/4];
         lim3 = 0xE;
         if (value39 < 9) {
-            ptr23 = ((void*)gHeroState) + 0xF0;
-            frameSlot8 = GetViewSpaceHeight((s32) ptr23);
+            ptr23 = ((void*)g_hero_state) + 0xF0;
+            frameSlot8 = cam_get_view_space_height((s32) ptr23);
             ApproachValue((s32) &frameSlot8, scalar144, 0.041666668f);
-            SetViewSpaceHeight((s32) ptr23, (s32) ptr23, frameSlot8);
+            cam_set_view_space_height((s32) ptr23, (s32) ptr23, frameSlot8);
         } else if (value39 > lim3) {
-            ptr32 = ((void*)gHeroState) + 0xF0;
-            ApplyHeroModeTransform((s32) ptr32, (s32) ptr32, 0.036111113f);
-            if (GetViewSpaceHeight((s32) ptr32) < 0.0f) {
-                ((Hero *)gHeroState)->f[0xC00/4] = 1.0f;
+            ptr32 = ((void*)g_hero_state) + 0xF0;
+            hero_apply_mode_transform((s32) ptr32, (s32) ptr32, 0.036111113f);
+            if (cam_get_view_space_height((s32) ptr32) < 0.0f) {
+                ((Hero *)g_hero_state)->f[0xC00/4] = 1.0f;
             }
             scalar139 = -0.6166667f;
             if (D_L09_001A8FF0 != 0) {
                 scalar139 = -1.1666667f;
             }
-            if (GetViewSpaceHeight((s32) ptr32) < scalar139) {
-                SetViewSpaceHeight((s32) ptr32, (s32) ptr32, scalar139);
+            if (cam_get_view_space_height((s32) ptr32) < scalar139) {
+                cam_set_view_space_height((s32) ptr32, (s32) ptr32, scalar139);
             }
         }
         break;
     case 0x15:                                      /* switch 1 */
     case 0x83:                                      /* switch 1 */
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-        if ((((Hero *)gHeroState)->i[0xC2C/4] != 0) || (((Hero *)gHeroState)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)gHeroState)->h[0xBFC/2]].w[0x18/4])) {
-            ((Hero *)gHeroState)->c[0x1239] = 2;
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+        if ((((Hero *)g_hero_state)->i[0xC2C/4] != 0) || (((Hero *)g_hero_state)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)g_hero_state)->h[0xBFC/2]].w[0x18/4])) {
+            ((Hero *)g_hero_state)->c[0x1239] = 2;
         }
-        value60 = (((Hero *)gHeroState)->i[0x22A0/4] == 1) && (((Hero *)gHeroState)->i[0x22A8/4] >= 0x15);
+        value60 = (((Hero *)g_hero_state)->i[0x22A0/4] == 1) && (((Hero *)g_hero_state)->i[0x22A8/4] >= 0x15);
         if (value60 == 0) {
-            if ((((Hero *)gHeroState)->i[0xBE8/4] != 0) || (((Hero *)gHeroState)->i[0xBE4/4] != 0)) {
+            if ((((Hero *)g_hero_state)->i[0xBE8/4] != 0) || (((Hero *)g_hero_state)->i[0xBE4/4] != 0)) {
                 value68 = 0;
-                if (((Hero *)gHeroState)->b[0x22C3] != 0) {
-                    ptr24 = ((void*)gHeroState) + 0xBC0;
-                    scalar140 = GetDirectionAngleDelta((s32) ptr24, 0);
-                    scalar98 = GetDirectionAngleDelta((s32) ptr24, 1);
+                if (((Hero *)g_hero_state)->b[0x22C3] != 0) {
+                    ptr24 = ((void*)g_hero_state) + 0xBC0;
+                    scalar140 = hero_get_direction_angle_delta((s32) ptr24, 0);
+                    scalar98 = hero_get_direction_angle_delta((s32) ptr24, 1);
                 } else {
-                    scalar140 = fast_subtract_rotations(((Hero *)gHeroState)->f[0xBEC/4], ((Hero *)gHeroState)->f[0x98/4]);
-                    scalar98 = GetShortestAngleDelta(1, ((Hero *)gHeroState)->f[0xBEC/4], ((Hero *)gHeroState)->f[0x98/4]);
+                    scalar140 = fast_subtract_rotations(((Hero *)g_hero_state)->f[0xBEC/4], ((Hero *)g_hero_state)->f[0x98/4]);
+                    scalar98 = math_shortest_angle_delta(1, ((Hero *)g_hero_state)->f[0xBEC/4], ((Hero *)g_hero_state)->f[0x98/4]);
                 }
                 if (scalar98 < 4.3633237f) {
                     value68 = 1;
                 }
                 if (scalar140 > 0.0f) {
-                    ((Hero *)gHeroState)->f[0xC20/4] = (f32) (1.0f / (scalar98 + 1.0f));
+                    ((Hero *)g_hero_state)->f[0xC20/4] = (f32) (1.0f / (scalar98 + 1.0f));
                 }
-                ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0xBEC/4];
-                qcopy(&((Hero *)gHeroState)->q[0x190/16], &((Hero *)gHeroState)->q[0xBC0/16]);
+                ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0xBEC/4];
+                qcopy(&((Hero *)g_hero_state)->q[0x190/16], &((Hero *)g_hero_state)->q[0xBC0/16]);
                 if (value68 != 0) {
-                    SteerHeroHeading(1, 0.057f, 0.2f, 0.2821616f);
+                    hero_steer_heading(1, 0.057f, 0.2f, 0.2821616f);
                 } else {
-                    SteerHeroHeading(0, 0.057f, 0.2f, 0.2821616f);
+                    hero_steer_heading(0, 0.057f, 0.2f, 0.2821616f);
                 }
             } else {
                     value61 = 1;
-                    if ((((Hero *)gHeroState)->u[0x2294/4] == 0x83) && (((Hero *)gHeroState)->i[0x1B8/4] >= 0xC)) {
+                    if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x83) && (((Hero *)g_hero_state)->i[0x1B8/4] >= 0xC)) {
                         value61 = 0;
-                    } else if ((((Hero *)gHeroState)->i[0xC2C/4] == 0) && (((Hero *)gHeroState)->f[0xC38/4] > 6.0f)) {
+                    } else if ((((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (((Hero *)g_hero_state)->f[0xC38/4] > 6.0f)) {
                         value61 = 0;
                     }
                     if (value61 != 0) {
-                        if (((Hero *)gHeroState)->u[0x2294/4] == 0x15) {
-                            SelectHeroAimTarget(14.0f, 0.52359885f, 0.78539824f);
+                        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x15) {
+                            hero_l00_select_aim_target(14.0f, 0.52359885f, 0.78539824f);
                         } else {
                             UpdateHeroAimTarget(64.0f, 0.17453295f, 0.3490659f);
                         }
                     }
                 }
         }
-        if ((((Hero *)gHeroState)->i[0xC2C/4] == 0) && (M2C_FIELD(((Hero *)gHeroState)->ptr[0x2290/4], u8* , 0x43) == 0x1A) && (IsBelowPlaneWithinDepth(33.0f) != 0)) {
-            if (((Hero *)gHeroState)->u[0x2294/4] == 0x15) {
-                SetupHeroAttachedObjectTransform();
+        if ((((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43) == 0x1A) && (math_is_below_plane_within_depth(33.0f) != 0)) {
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 0x15) {
+                hero_setup_attached_object_transform();
             }
         }
-        ApproachHeroSpeed(0.010277778f, 0.007777778f);
-        ComputeHeroPushDirection(99999.0f);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) (((void*)gHeroState) + 0xF0), (s32) ((void*)gHeroState) + 0x130, 0.0069444445f);
+        hero_approach_speed(0.010277778f, 0.007777778f);
+        hero_compute_push_direction(99999.0f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) ((void*)g_hero_state) + 0x130, 0.0069444445f);
         } else {
-            ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+            hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
             break;
         }
         break;
     case 0x13:                                      /* switch 1 */
-        if ((((Hero *)gHeroState)->i[0xC2C/4] != 0) || (((Hero *)gHeroState)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)gHeroState)->h[0xBFC/2]].w[0x20/4])) {
-            ((Hero *)gHeroState)->c[0x1239] = 2;
+        if ((((Hero *)g_hero_state)->i[0xC2C/4] != 0) || (((Hero *)g_hero_state)->f[0xC38/4] < (f32) D_L09_00260610[((Hero *)g_hero_state)->h[0xBFC/2]].w[0x20/4])) {
+            ((Hero *)g_hero_state)->c[0x1239] = 2;
         }
-        value18 = ((Hero *)gHeroState)->i[0xBE4/4];
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-        ptr39 = (((Hero *)gHeroState)->h[0xBFC/2] * 0x2C) + (s32)D_L09_00260610;
-        if ((value18 != 0) && (((Hero *)gHeroState)->i[0x1B8/4] < 4)) {
-            ptr33 = ((void*)gHeroState) + 0x80;
+        value18 = ((Hero *)g_hero_state)->i[0xBE4/4];
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+        ptr39 = (((Hero *)g_hero_state)->h[0xBFC/2] * 0x2C) + (s32)D_L09_00260610;
+        if ((value18 != 0) && (((Hero *)g_hero_state)->i[0x1B8/4] < 4)) {
+            ptr33 = ((void*)g_hero_state) + 0x80;
             scalar108 = vec_distance_xy(value18 + 0x10, (s32) ptr33);
             if ((*(s32*)&D_L09_001A8FF0) != 0) {
-                scalar108 = fast_vec_dist(((Hero *)gHeroState)->i[0xBE4/4] + 0x10, (s32) ptr33);
+                scalar108 = fast_vec_dist(((Hero *)g_hero_state)->i[0xBE4/4] + 0x10, (s32) ptr33);
             }
             scalar108 = scalar108 - 0.5f;
             if (scalar108 < 0.0f) {
@@ -1500,298 +1501,298 @@ block_224:
                 scalar151 = 1.9f;
             }
             scalar73 = scalar108 - scalar99;
-            if (FloatAbs(scalar73) < (scalar146 + 3.0f)) {
+            if (math_fabs(scalar73) < (scalar146 + 3.0f)) {
                 scalar110 = scalar73 * 1.1111112f;
                 if (scalar151 < scalar110) {
                     scalar110 = scalar151;
                 }
                 if (scalar110 > 1.0f) {
-                    ((Hero *)gHeroState)->f[0xBF4/4] = scalar110;
+                    ((Hero *)g_hero_state)->f[0xBF4/4] = scalar110;
                 }
             }
         }
         value41 = M2C_FIELD(ptr39, s32* , 4);
         switch (value41) {
         case 0:
-            if (((Hero *)gHeroState)->f[0xC38/4] < 18.0f) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = ((Hero *)gHeroState)->f[0xBF4/4] * 0.07333334f;
+            if (((Hero *)g_hero_state)->f[0xC38/4] < 18.0f) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = ((Hero *)g_hero_state)->f[0xBF4/4] * 0.07333334f;
             }
             break;
         case 1:
-            scalar53 = ((Hero *)gHeroState)->f[0xC38/4];
-            if ((((Hero *)gHeroState)->i[0xC2C/4] != 0) || (scalar53 < 9.0f)) {
+            scalar53 = ((Hero *)g_hero_state)->f[0xC38/4];
+            if ((((Hero *)g_hero_state)->i[0xC2C/4] != 0) || (scalar53 < 9.0f)) {
                 if (scalar53 > 8.0f) {
-                    ((Hero *)gHeroState)->f[0x1B0/4] = ((Hero *)gHeroState)->f[0xBF4/4] * 0.050000004f;
+                    ((Hero *)g_hero_state)->f[0x1B0/4] = ((Hero *)g_hero_state)->f[0xBF4/4] * 0.050000004f;
                 } else if (scalar53 > 7.0f) {
-                    ((Hero *)gHeroState)->f[0x1B0/4] = ((Hero *)gHeroState)->f[0xBF4/4] * 0.075f;
+                    ((Hero *)g_hero_state)->f[0x1B0/4] = ((Hero *)g_hero_state)->f[0xBF4/4] * 0.075f;
                 } else {
-                    ((Hero *)gHeroState)->f[0x1B0/4] = ((Hero *)gHeroState)->f[0xBF4/4] * 0.095f;
+                    ((Hero *)g_hero_state)->f[0x1B0/4] = ((Hero *)g_hero_state)->f[0xBF4/4] * 0.095f;
                 }
             }
             break;
         case 2:
-            if ((((Hero *)gHeroState)->i[0xC2C/4] != 0) || (((Hero *)gHeroState)->f[0xC38/4] < 12.0f)) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = ((Hero *)gHeroState)->f[0xBF4/4] * 0.06166667f;
+            if ((((Hero *)g_hero_state)->i[0xC2C/4] != 0) || (((Hero *)g_hero_state)->f[0xC38/4] < 12.0f)) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = ((Hero *)g_hero_state)->f[0xBF4/4] * 0.06166667f;
             }
             break;
         }
-        ApproachValue((s32)(gHeroState + 0xC20), 1.0f, 0.2f);
-        if ((((Hero *)gHeroState)->i[0xBE8/4] != 0) || (((Hero *)gHeroState)->i[0xBE4/4] != 0)) {
-        if (((Hero *)gHeroState)->b[0x22C3] != 0) {
-            scalar100 = GetDirectionAngleDelta((s32)(gHeroState + 0xBC0), 0);
+        ApproachValue((s32)(g_hero_state + 0xC20), 1.0f, 0.2f);
+        if ((((Hero *)g_hero_state)->i[0xBE8/4] != 0) || (((Hero *)g_hero_state)->i[0xBE4/4] != 0)) {
+        if (((Hero *)g_hero_state)->b[0x22C3] != 0) {
+            scalar100 = hero_get_direction_angle_delta((s32)(g_hero_state + 0xBC0), 0);
         } else {
-            scalar100 = fast_subtract_rotations(((Hero *)gHeroState)->f[0xBEC/4], ((Hero *)gHeroState)->f[0x98/4]);
+            scalar100 = fast_subtract_rotations(((Hero *)g_hero_state)->f[0xBEC/4], ((Hero *)g_hero_state)->f[0x98/4]);
         }
-        scalar54 = FloatAbs(scalar100);
+        scalar54 = math_fabs(scalar100);
         if ((M2C_FIELD(ptr39, s32* , 4) == 1) && (scalar100 > 0.0f)) {
-            ((Hero *)gHeroState)->f[0xC20/4] = (f32) (1.0f / (scalar54 + 1.0f));
+            ((Hero *)g_hero_state)->f[0xC20/4] = (f32) (1.0f / (scalar54 + 1.0f));
         }
-        ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0xBEC/4];
-        qcopy(&((Hero *)gHeroState)->q[0x190/16], &((Hero *)gHeroState)->q[0xBC0/16]);
-        SteerHeroHeading(0, 0.05f, 0.2f, 0.2821616f);
+        ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0xBEC/4];
+        qcopy(&((Hero *)g_hero_state)->q[0x190/16], &((Hero *)g_hero_state)->q[0xBC0/16]);
+        hero_steer_heading(0, 0.05f, 0.2f, 0.2821616f);
     } else {
         value79 = 1;
-        if ((M2C_FIELD(ptr39, s32* , 4) == 1) && (((Hero *)gHeroState)->i[0xC2C/4] == 0) && (((Hero *)gHeroState)->f[0xC38/4] > 7.0f)) {
+        if ((M2C_FIELD(ptr39, s32* , 4) == 1) && (((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (((Hero *)g_hero_state)->f[0xC38/4] > 7.0f)) {
             value79 = 0;
         }
         if (value79 != 0) {
-            SelectHeroAimTarget(5.0f, 0.78539824f, 0.78539824f);
+            hero_l00_select_aim_target(5.0f, 0.78539824f, 0.78539824f);
         }
     }
-        ApproachHeroSpeed(0.010277778f, 0.007777778f);
-        if (((Hero *)gHeroState)->i[0xBE8/4] != 0) {
-            if (((Hero *)gHeroState)->b[0x22C3] != 0) {
-                SetHeroPushDirection((s32) (((void*)gHeroState) + 0xBC0));
+        hero_approach_speed(0.010277778f, 0.007777778f);
+        if (((Hero *)g_hero_state)->i[0xBE8/4] != 0) {
+            if (((Hero *)g_hero_state)->b[0x22C3] != 0) {
+                hero_set_push_direction((s32) (((void*)g_hero_state) + 0xBC0));
             } else {
-                ComputeHeroPushDirection(((Hero *)gHeroState)->f[0xBEC/4]);
+                hero_compute_push_direction(((Hero *)g_hero_state)->f[0xBEC/4]);
             }
         } else {
-            ComputeHeroPushDirection(99999.0f);
+            hero_compute_push_direction(99999.0f);
         }
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) (((void*)gHeroState) + 0xF0), (s32) (((void*)gHeroState) + 0x130), 0.0069444445f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) (((void*)g_hero_state) + 0x130), 0.0069444445f);
         } else {
-            ptr11 = ((void*)gHeroState) + 0xF0;
-            ApplyHeroModeTransform((s32) ptr11, (s32) ptr11, 0.015000001f);
+            ptr11 = ((void*)g_hero_state) + 0xF0;
+            hero_apply_mode_transform((s32) ptr11, (s32) ptr11, 0.015000001f);
         }
-        TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
+        hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             break;
     case 0x77:                                      /* switch 1 */
-        ApproachValue((s32)(gHeroState + 0x1B4), 0.0f, 0.006666667f);
+        ApproachValue((s32)(g_hero_state + 0x1B4), 0.0f, 0.006666667f);
         if ((*(s32*)&D_L09_001A8FF0) != 0) {
-            vec_scale_to_length((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xBD0), ((Hero *)gHeroState)->f[0x1B4/4]);
-            if (((Hero *)gHeroState)->f[0x31C/4] > 0.0f) {
-                ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0x130), 0.0069444445f);
+            vec_scale_to_length((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xBD0), ((Hero *)g_hero_state)->f[0x1B4/4]);
+            if (((Hero *)g_hero_state)->f[0x31C/4] > 0.0f) {
+                hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0x130), 0.0069444445f);
             } else {
-                SetViewSpaceHeight((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.0f);
+                cam_set_view_space_height((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.0f);
             }
-            FastVecScale((s32)(gHeroState + 0x190), (s32)(gHeroState + 0xBD0), -1.0f);
+            FastVecScale((s32)(g_hero_state + 0x190), (s32)(g_hero_state + 0xBD0), -1.0f);
         } else {
-            ((Hero *)gHeroState)->f[0xF0/4] = (f32) (FastSinOrCosA(((Hero *)gHeroState)->f[0xBF0/4]) * ((Hero *)gHeroState)->f[0x1B4/4]);
-            ((Hero *)gHeroState)->f[0xF4/4] = (f32) (FastSinOrCosB(((Hero *)gHeroState)->f[0xBF0/4]) * ((Hero *)gHeroState)->f[0x1B4/4]);
-            if (((Hero *)gHeroState)->f[0x31C/4] > 0.0f) {
-                ((Hero *)gHeroState)->f[0xF8/4] = (f32) (((Hero *)gHeroState)->f[0x128/4] - 0.0069444445f);
+            ((Hero *)g_hero_state)->f[0xF0/4] = (f32) (math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0xBF0/4]) * ((Hero *)g_hero_state)->f[0x1B4/4]);
+            ((Hero *)g_hero_state)->f[0xF4/4] = (f32) (math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0xBF0/4]) * ((Hero *)g_hero_state)->f[0x1B4/4]);
+            if (((Hero *)g_hero_state)->f[0x31C/4] > 0.0f) {
+                ((Hero *)g_hero_state)->f[0xF8/4] = (f32) (((Hero *)g_hero_state)->f[0x128/4] - 0.0069444445f);
             } else {
-                ((Hero *)gHeroState)->f[0xF8/4] = 0.0f;
+                ((Hero *)g_hero_state)->f[0xF8/4] = 0.0f;
             }
-            ((Hero *)gHeroState)->f[0x1A0/4] = FastAddRotations(((Hero *)gHeroState)->f[0xBF0/4], 3.1415927f);
+            ((Hero *)g_hero_state)->f[0x1A0/4] = FastAddRotations(((Hero *)g_hero_state)->f[0xBF0/4], 3.1415927f);
         }
-        SteerHeroHeading(0, 0.05f, 0.2f, 0.2821616f);
+        hero_steer_heading(0, 0.05f, 0.2f, 0.2821616f);
         break;
     case 0x1F:                                      /* switch 1 */
-        if ((((Hero *)gHeroState)->i[0xBE8/4] != 0) || (((Hero *)gHeroState)->i[0xBE4/4] != 0)) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = ((Hero *)gHeroState)->f[0xBEC/4];
-            SteerHeroHeading(0, 0.05f, 0.2f, 0.2821616f);
-        } else if (((Hero *)gHeroState)->i[0x1B8/4] < 4) {
-            SelectHeroAimTarget(11.0f, 0.8726647f, -1.0f);
+        if ((((Hero *)g_hero_state)->i[0xBE8/4] != 0) || (((Hero *)g_hero_state)->i[0xBE4/4] != 0)) {
+            ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0xBEC/4];
+            hero_steer_heading(0, 0.05f, 0.2f, 0.2821616f);
+        } else if (((Hero *)g_hero_state)->i[0x1B8/4] < 4) {
+            hero_l00_select_aim_target(11.0f, 0.8726647f, -1.0f);
         }
         lim = 0xA;
         lim2 = 0x12;
-        value42 = ((Hero *)gHeroState)->i[0x1B8/4];
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
+        value42 = ((Hero *)g_hero_state)->i[0x1B8/4];
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
         if (value42 > lim) {
             if (value42 < 0x12) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.3f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.3f;
             }
         }
-        if ((((Hero *)gHeroState)->i[0x1B8/4] == 8) && (((Hero *)gHeroState)->f[0x184/4] < 0.33333334f)) {
-            ptr25 = ((void*)gHeroState) + 0x18E0;
-            InitPendingSlot((s32) ((Hero *)gHeroState)->ptr[0x2290/4], (s32) ptr25);
-            AppendRecordToFourEntryTable((s32) ptr25, 0x30, 2, 0.0f);
-            AppendRecordToFourEntryTable((s32) ptr25, 0x17, 4, 0.0f);
-            AppendRecordToFourEntryTable((s32) ptr25, 0xC, 6, 0.0f);
+        if ((((Hero *)g_hero_state)->i[0x1B8/4] == 8) && (((Hero *)g_hero_state)->f[0x184/4] < 0.33333334f)) {
+            ptr25 = ((void*)g_hero_state) + 0x18E0;
+            level_init_pending_slot((s32) ((Hero *)g_hero_state)->ptr[0x2290/4], (s32) ptr25);
+            level_append_record_to_table((s32) ptr25, 0x30, 2, 0.0f);
+            level_append_record_to_table((s32) ptr25, 0x17, 4, 0.0f);
+            level_append_record_to_table((s32) ptr25, 0xC, 6, 0.0f);
         }
-        sel1F = (((Hero *)gHeroState)->i[0x1B8/4] > lim2) ? 5 : 0;
-        UpdateTransformHistoryFollowers((s32) (((void*)gHeroState) + 0x18E0), sel1F);
-        if (((Hero *)gHeroState)->i[0x1B8/4] > lim) {
-            ApproachHeroSpeed(0.05277778f, 0.025f);
+        sel1F = (((Hero *)g_hero_state)->i[0x1B8/4] > lim2) ? 5 : 0;
+        moby_update_transform_history_followers((s32) (((void*)g_hero_state) + 0x18E0), sel1F);
+        if (((Hero *)g_hero_state)->i[0x1B8/4] > lim) {
+            hero_approach_speed(0.05277778f, 0.025f);
         }
-        if (((Hero *)gHeroState)->i[0xBE8/4] != 0) {
-            ComputeHeroPushDirection(((Hero *)gHeroState)->f[0xBEC/4]);
+        if (((Hero *)g_hero_state)->i[0xBE8/4] != 0) {
+            hero_compute_push_direction(((Hero *)g_hero_state)->f[0xBEC/4]);
         } else {
-            ComputeHeroPushDirection(99999.0f);
+            hero_compute_push_direction(99999.0f);
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x1F) {
-            value44 = ((Hero *)gHeroState)->i[0x1B8/4];
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x1F) {
+            value44 = ((Hero *)g_hero_state)->i[0x1B8/4];
             if ((value44 > lim) && (value44 < 0x16)) {
-                ptr40 = ((Hero *)gHeroState)->ptr[0x1220/4];
+                ptr40 = ((Hero *)g_hero_state)->ptr[0x1220/4];
                 if (ptr40 != 0) {
-                    ptr34 = ((void*)gHeroState) + 0x80;
-                    v30[0] = 2.0f * FastSinOrCosA(((Hero *)gHeroState)->f[0x98/4]);
-                    v30[1] = 2.0f * FastSinOrCosB(((Hero *)gHeroState)->f[0x98/4]);
+                    ptr34 = ((void*)g_hero_state) + 0x80;
+                    v30[0] = 2.0f * math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0x98/4]);
+                    v30[1] = 2.0f * math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0x98/4]);
                     v30[2] = 1.3f;
-                    make_hit_descriptor((s32)((TI128*)v0), (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0x30000, 3.0f, (s32) ((TI128*)v30));
+                    make_hit_descriptor((s32)((TI128*)v0), (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x30000, 3.0f, (s32) ((TI128*)v30));
                     (*(u8*)((u8*)v10+9)) = 3;
                     v0[3] = 5627.925f;
                     (*(u8*)((u8*)v10+8)) = 0;
-                    scalar79 = ((Hero *)gHeroState)->f[0x98/4];
+                    scalar79 = ((Hero *)g_hero_state)->f[0x98/4];
                     (*(u16*)((u8*)v10+10)) = M2C_FIELD(ptr40, u16* , 0xAA);
-                    v40[0] = FastSinOrCosA(scalar79) * 0.8f;
-                    scalar8 = FastSinOrCosB(scalar79) * 0.8f;
+                    v40[0] = math_fast_sin_or_cos_a(scalar79) * 0.8f;
+                    scalar8 = math_fast_sin_or_cos_b(scalar79) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = scalar8;
                     FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) ptr34);
-                    EmitEffectsAtNearbyObjects((s32) ptr40, ProcessCollisionHit(0.8f, (s32) &v40[0], 0, (s32) ptr40, (s32)((TI128*)v0)));
-                    scalar79 = FastAddRotations(((Hero *)gHeroState)->f[0x98/4], -0.8726647f);
-                    v40[0] = FastSinOrCosA(scalar79) * 0.8f;
-                    scalar10 = FastSinOrCosB(scalar79) * 0.8f;
+                    part_emit_effects_at_nearby_mobys((s32) ptr40, coll_process_hit(0.8f, (s32) &v40[0], 0, (s32) ptr40, (s32)((TI128*)v0)));
+                    scalar79 = FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], -0.8726647f);
+                    v40[0] = math_fast_sin_or_cos_a(scalar79) * 0.8f;
+                    scalar10 = math_fast_sin_or_cos_b(scalar79) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = scalar10;
                     FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) ptr34);
-                    EmitEffectsAtNearbyObjects((s32) ptr40, ProcessCollisionHit(0.8f, (s32) &v40[0], 0, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], (s32)((TI128*)v0)));
-                    scalar79 = FastAddRotations(((Hero *)gHeroState)->f[0x98/4], 0.8726647f);
-                    v40[0] = FastSinOrCosA(scalar79) * 0.8f;
-                    scalar12 = FastSinOrCosB(scalar79) * 0.8f;
+                    part_emit_effects_at_nearby_mobys((s32) ptr40, coll_process_hit(0.8f, (s32) &v40[0], 0, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], (s32)((TI128*)v0)));
+                    scalar79 = FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], 0.8726647f);
+                    v40[0] = math_fast_sin_or_cos_a(scalar79) * 0.8f;
+                    scalar12 = math_fast_sin_or_cos_b(scalar79) * 0.8f;
                     v40[2] = 0.55f;
                     v40[1] = scalar12;
                     FastVecAdd((s32) &v40[0], (s32) &v40[0], (s32) ptr34);
-                    EmitEffectsAtNearbyObjects((s32) ptr40, ProcessCollisionHit(0.8f, (s32) &v40[0], 0, (s32) ptr40, (s32)((TI128*)v0)));
+                    part_emit_effects_at_nearby_mobys((s32) ptr40, coll_process_hit(0.8f, (s32) &v40[0], 0, (s32) ptr40, (s32)((TI128*)v0)));
                 }
             }
         }
-        if (((Hero *)gHeroState)->i[0x1B8/4] >= 0xB) {
-            TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
+        if (((Hero *)g_hero_state)->i[0x1B8/4] >= 0xB) {
+            hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
         }
         ClipHeroVelocityAgainstWall(1);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0x120, 0.0061111115f);
-            CancelHeroVelocityIntoWall();
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0x120, 0.0061111115f);
+            hero_cancel_velocity_into_wall();
             break;
         }
-        ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+        hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
         break;
     case 0x22:                                      /* switch 1 */
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-        if (((Hero *)gHeroState)->i[0xBE8/4] != 0) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0xBEC/4];
-            qcopy(&((Hero *)gHeroState)->q[0x190/16], &((Hero *)gHeroState)->q[0xBC0/16]);
-            SteerHeroHeading(0, 0.04f, 0.2f, 0.2821616f);
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+        if (((Hero *)g_hero_state)->i[0xBE8/4] != 0) {
+            ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0xBEC/4];
+            qcopy(&((Hero *)g_hero_state)->q[0x190/16], &((Hero *)g_hero_state)->q[0xBC0/16]);
+            hero_steer_heading(0, 0.04f, 0.2f, 0.2821616f);
         } else {
-            SelectHeroAimTarget(11.0f, 0.8726647f, -1.0f);
+            hero_l00_select_aim_target(11.0f, 0.8726647f, -1.0f);
         }
-        ApproachHeroSpeed(0.008333334f, 0.009722223f);
-        ComputeHeroPushDirection(99999.0f);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0x110, 0.015000001f);
-            CancelHeroVelocityIntoWall();
+        hero_approach_speed(0.008333334f, 0.009722223f);
+        hero_compute_push_direction(99999.0f);
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0x110, 0.015000001f);
+            hero_cancel_velocity_into_wall();
             break;
         }
-        ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+        hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
         break;
     case 0x2:                                       /* switch 1 */
     case 0x70:                                      /* switch 1 */
         value55 = 0;
-        if ((((Hero *)gHeroState)->b[0x1494] != 0) && (((Hero *)gHeroState)->f[0x24C4/4] < 0.25f)) {
+        if ((((Hero *)g_hero_state)->b[0x1494] != 0) && (((Hero *)g_hero_state)->f[0x24C4/4] < 0.25f)) {
             value55 = 1;
         }
-        if ((((Hero *)gHeroState)->b[0x22B9] != 0) || (value55 != 0)) {
-            if (((Hero *)gHeroState)->f[0x174/4] > 0.016666668f) {
-                EmitHeroSideParticles(0, 2);
+        if ((((Hero *)g_hero_state)->b[0x22B9] != 0) || (value55 != 0)) {
+            if (((Hero *)g_hero_state)->f[0x174/4] > 0.016666668f) {
+                part_emit_hero_side_particles(0, 2);
             }
-            if (((Hero *)gHeroState)->f[0x174/4] > 0.008333334f) {
-                EmitHeroTrailSpark(2, 4);
+            if (((Hero *)g_hero_state)->f[0x174/4] > 0.008333334f) {
+                part_emit_hero_trail_spark(2, 4);
             }
             EmitHeroRandomizedMotionEffects(5, 2, 0);
         }
-        if (((Hero *)gHeroState)->h[0x1454/2] == 0) {
-            if (((Hero *)gHeroState)->f[0x174/4] < 0.028333336f) {
-                ((Hero *)gHeroState)->b[0x40C] = 1U;
-                if ((FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) > 2.0943954f) && (((Hero *)gHeroState)->f[0x24B8/4] == 1.0f)) {
-                    ((Hero *)gHeroState)->b[0x40F] = 1U;
+        if (((Hero *)g_hero_state)->h[0x1454/2] == 0) {
+            if (((Hero *)g_hero_state)->f[0x174/4] < 0.028333336f) {
+                ((Hero *)g_hero_state)->b[0x40C] = 1U;
+                if ((math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) > 2.0943954f) && (((Hero *)g_hero_state)->f[0x24B8/4] == 1.0f)) {
+                    ((Hero *)g_hero_state)->b[0x40F] = 1U;
                 }
             }
             scalar74 = ReadPadFloatHistory(1);
-            if ((FastDiffRots(scalar74, ReadPadFloatHistory(7)) > 1.9198624f) && (FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) > 1.2217306f) && (((Hero *)gHeroState)->f[0x24B8/4] == 1.0f)) {
-                ((Hero *)gHeroState)->b[0x40F] = 1U;
-                ((Hero *)gHeroState)->b[0x40C] = 1U;
+            if ((FastDiffRots(scalar74, ReadPadFloatHistory(7)) > 1.9198624f) && (math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) > 1.2217306f) && (((Hero *)g_hero_state)->f[0x24B8/4] == 1.0f)) {
+                ((Hero *)g_hero_state)->b[0x40F] = 1U;
+                ((Hero *)g_hero_state)->b[0x40C] = 1U;
             }
-            if (FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) < 0.087266475f) {
-                ((Hero *)gHeroState)->b[0x40C] = 0U;
+            if (math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) < 0.087266475f) {
+                ((Hero *)g_hero_state)->b[0x40C] = 0U;
             }
         }
-        if ((((Hero *)gHeroState)->b[0x40F] != 0) && (FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) < 0.06981318f)) {
-            ((Hero *)gHeroState)->b[0x40F] = 0U;
+        if ((((Hero *)g_hero_state)->b[0x40F] != 0) && (math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) < 0.06981318f)) {
+            ((Hero *)g_hero_state)->b[0x40F] = 0U;
         }
-        if (((Hero *)gHeroState)->f[0x24B8/4] < 0.2f) {
-            if (((Hero *)gHeroState)->i[0x410/4] != 0) {
-                ((Hero *)gHeroState)->b[0x40F] = 1U;
+        if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
+            if (((Hero *)g_hero_state)->i[0x410/4] != 0) {
+                ((Hero *)g_hero_state)->b[0x40F] = 1U;
             }
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
-            qcopy(&((Hero *)gHeroState)->q[0x190/16], &((Hero *)gHeroState)->q[0x3F0/16]);
-            ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0x408/4];
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
+            qcopy(&((Hero *)g_hero_state)->q[0x190/16], &((Hero *)g_hero_state)->q[0x3F0/16]);
+            ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x408/4];
         } else {
-            UpdateHeroTargetSpeed();
-            if ((hero_slot_item_id(0) == 0xA) && ((((Hero *)gHeroState)->f[0x24BC/4] == 1.0f) || (((Hero *)gHeroState)->i[0x410/4] != 0)) && (((Hero *)gHeroState)->b[0x22BA] == 0)) {
-                qcopy(&((Hero *)gHeroState)->q[0x3F0/16], &((Hero *)gHeroState)->q[0x190/16]);
-                ((Hero *)gHeroState)->i[0x410/4] = 1;
-                ((Hero *)gHeroState)->f[0x408/4] = ((Hero *)gHeroState)->f[0x1A0/4];
+            hero_update_target_speed();
+            if ((hero_slot_item_id(0) == 0xA) && ((((Hero *)g_hero_state)->f[0x24BC/4] == 1.0f) || (((Hero *)g_hero_state)->i[0x410/4] != 0)) && (((Hero *)g_hero_state)->b[0x22BA] == 0)) {
+                qcopy(&((Hero *)g_hero_state)->q[0x3F0/16], &((Hero *)g_hero_state)->q[0x190/16]);
+                ((Hero *)g_hero_state)->i[0x410/4] = 1;
+                ((Hero *)g_hero_state)->f[0x408/4] = ((Hero *)g_hero_state)->f[0x1A0/4];
             } else {
-                qcopy(&((Hero *)gHeroState)->q[0x3F0/16], &((Hero *)gHeroState)->q[0x0/16]);
-                ((Hero *)gHeroState)->f[0x408/4] = ((Hero *)gHeroState)->f[0x98/4];
+                qcopy(&((Hero *)g_hero_state)->q[0x3F0/16], &((Hero *)g_hero_state)->q[0x0/16]);
+                ((Hero *)g_hero_state)->f[0x408/4] = ((Hero *)g_hero_state)->f[0x98/4];
             }
         }
-        if (((Hero *)gHeroState)->f[0xA70/4] > 0.0f) {
-            pA60 = ((void*)gHeroState) + 0xA60;
-            BuildHeroMoveImpulse(0.7f, 0.0f);
-            (*(TI128*)v0) = ((Hero *)gHeroState)->q[0xA60/16];
-            scalar55 = ((Hero *)gHeroState)->f[0x1B0/4] + GetSpeedAlongHeroForward((s32)((TI128*)v0));
-            ((Hero *)gHeroState)->f[0x1B0/4] = scalar55;
+        if (((Hero *)g_hero_state)->f[0xA70/4] > 0.0f) {
+            pA60 = ((void*)g_hero_state) + 0xA60;
+            hero_build_move_impulse(0.7f, 0.0f);
+            (*(TI128*)v0) = ((Hero *)g_hero_state)->q[0xA60/16];
+            scalar55 = ((Hero *)g_hero_state)->f[0x1B0/4] + hero_get_speed_along_forward((s32)((TI128*)v0));
+            ((Hero *)g_hero_state)->f[0x1B0/4] = scalar55;
             if (scalar55 < 0.011666667f) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.011666667f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.011666667f;
             }
-            ClearVector128((s32) pA60);
+            vec_clear_128((s32) pA60);
         }
         scalar141 = 1.0f;
-        if (((Hero *)gHeroState)->h[0x1454/2] != 0) {
-            UpdateHeroTurnFromAnimation();
+        if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
+            hero_update_turn_from_anim();
         } else {
-            ((Hero *)gHeroState)->f[0x1458/4] = (f32) ((Hero *)gHeroState)->f[0x98/4];
-            qcopy(&((Hero *)gHeroState)->q[0x1440/16], &((Hero *)gHeroState)->q[0x0/16]);
-            if ((((Hero *)gHeroState)->i[0x2298/4] == 1) && (((Hero *)gHeroState)->b[0x40F] == 0) && (((Hero *)gHeroState)->b[0x22BA] == 0)) {
-                SteerHeroHeading(0, 0.02f, 0.17f, 0.16580631f);
+            ((Hero *)g_hero_state)->f[0x1458/4] = (f32) ((Hero *)g_hero_state)->f[0x98/4];
+            qcopy(&((Hero *)g_hero_state)->q[0x1440/16], &((Hero *)g_hero_state)->q[0x0/16]);
+            if ((((Hero *)g_hero_state)->i[0x2298/4] == 1) && (((Hero *)g_hero_state)->b[0x40F] == 0) && (((Hero *)g_hero_state)->b[0x22BA] == 0)) {
+                hero_steer_heading(0, 0.02f, 0.17f, 0.16580631f);
             } else {
-                scalar83 = FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]);
-                if (((((Hero *)gHeroState)->f[0x24B8/4] < 0.9f) || ((((Hero *)gHeroState)->b[0x22BA] != 0) && (((Hero *)gHeroState)->b[0x40F] == 0))) && (scalar83 > 0.78539824f)) {
+                scalar83 = math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]);
+                if (((((Hero *)g_hero_state)->f[0x24B8/4] < 0.9f) || ((((Hero *)g_hero_state)->b[0x22BA] != 0) && (((Hero *)g_hero_state)->b[0x40F] == 0))) && (scalar83 > 0.78539824f)) {
                     scalar141 = 0.0f;
                 }
-                SetHeroTurnRates();
+                hero_set_turn_rates();
             }
         }
-        ApplyHeroModePoseOffsets();
+        hero_apply_mode_pose_offsets();
         UpdateHeroLeanAndSwayParameters();
-        if (((Hero *)gHeroState)->b[0x40F] != 0) {
-            scalar155 = 0.09916667f - (FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]) * 0.029178405f);
+        if (((Hero *)g_hero_state)->b[0x40F] != 0) {
+            scalar155 = 0.09916667f - (math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]) * 0.029178405f);
             if (scalar155 < 0.0f) {
                 scalar155 = 0.0f;
             }
-            if (scalar155 < ((Hero *)gHeroState)->f[0x1B0/4]) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = scalar155;
+            if (scalar155 < ((Hero *)g_hero_state)->f[0x1B0/4]) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = scalar155;
             }
         }
         k005 = scalar141 * 0.005f;
         scalar142 = 0.0055555557f;
-        if (((Hero *)gHeroState)->b[0x40F] != 0) {
-            scalar127 = 2.617994f - ((Hero *)gHeroState)->f[0x1A8/4];
+        if (((Hero *)g_hero_state)->b[0x40F] != 0) {
+            scalar127 = 2.617994f - ((Hero *)g_hero_state)->f[0x1A8/4];
             if (scalar127 > 1.0f) {
                 scalar127 = 1.0f;
             }
@@ -1799,81 +1800,81 @@ block_224:
                 scalar127 = 0.2f;
             }
             scalar142 = 0.004722222f;
-            ((Hero *)gHeroState)->f[0x1B0/4] = (f32) (((Hero *)gHeroState)->f[0x1B0/4] * scalar127);
+            ((Hero *)g_hero_state)->f[0x1B0/4] = (f32) (((Hero *)g_hero_state)->f[0x1B0/4] * scalar127);
         }
-        scalar84 = FloatAbs(((Hero *)gHeroState)->f[0x1A8/4]);
-        if ((((Hero *)gHeroState)->f[0x24B8/4] < 0.75f) && (scalar84 > 0.6108653f)) {
+        scalar84 = math_fabs(((Hero *)g_hero_state)->f[0x1A8/4]);
+        if ((((Hero *)g_hero_state)->f[0x24B8/4] < 0.75f) && (scalar84 > 0.6108653f)) {
             scalar128 = 1.0f - (scalar84 * 0.4f);
             if (scalar128 < 0.0f) {
                 scalar128 = 0.0f;
             }
-            ((Hero *)gHeroState)->f[0x1B0/4] = (f32) (((Hero *)gHeroState)->f[0x1B0/4] * scalar128);
+            ((Hero *)g_hero_state)->f[0x1B0/4] = (f32) (((Hero *)g_hero_state)->f[0x1B0/4] * scalar128);
         }
-        ApproachHeroSpeed(k005, scalar142);
-        if ((((Hero *)gHeroState)->b[0x40C] != 0) || (((Hero *)gHeroState)->h[0x1454/2] != 0)) {
-            if (((Hero *)gHeroState)->b[0x22C3] == 0) {
-                if (((Hero *)gHeroState)->h[0x1454/2] != 0) {
-                    ComputeHeroPushDirection(((Hero *)gHeroState)->f[0x1458/4]);
+        hero_approach_speed(k005, scalar142);
+        if ((((Hero *)g_hero_state)->b[0x40C] != 0) || (((Hero *)g_hero_state)->h[0x1454/2] != 0)) {
+            if (((Hero *)g_hero_state)->b[0x22C3] == 0) {
+                if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
+                    hero_compute_push_direction(((Hero *)g_hero_state)->f[0x1458/4]);
                 } else {
-                    ComputeHeroPushDirection(((Hero *)gHeroState)->f[0x1A0/4]);
+                    hero_compute_push_direction(((Hero *)g_hero_state)->f[0x1A0/4]);
                 }
-            } else if (((Hero *)gHeroState)->h[0x1454/2] != 0) {
-                SetHeroPushDirection((s32) (((void*)gHeroState) + 0x1440));
+            } else if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
+                hero_set_push_direction((s32) (((void*)g_hero_state) + 0x1440));
             } else {
-                SetHeroPushDirection((s32) (((void*)gHeroState) + 0x190));
+                hero_set_push_direction((s32) (((void*)g_hero_state) + 0x190));
             }
         } else {
-            ComputeHeroPushDirection(99999.0f);
+            hero_compute_push_direction(99999.0f);
         }
         ClipHeroVelocityAgainstWall(1);
-        if (((Hero *)gHeroState)->h[0x214/2] != 0) {
-            TryHeroSurfacePushResponse(5.0f, 0.2f, 0.35f);
+        if (((Hero *)g_hero_state)->h[0x214/2] != 0) {
+            hero_try_surface_push_response(5.0f, 0.2f, 0.35f);
         }
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0x130, 0.0069444445f);
-            CancelHeroVelocityIntoWall();
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0x130, 0.0069444445f);
+            hero_cancel_velocity_into_wall();
             break;
         }
-        ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+        hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
         break;
     case 0x7B:                                      /* switch 1 */
-        UpdateSoundSlotObject(4, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0xD);
-        ResolveStickInputToDirection(1.0f, 0);
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.19166668f;
-        ClampStickToUnitRange((s32)((TI128*)v0), (s32) (((void*)gHeroState) + 0x9F0), 0.17f);
-        scalar147 = (((Hero *)gHeroState)->f[0x24B8/4] * 0.020362178f) * v0[0];
+        snd_update_slot_object(4, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0xD);
+        hero_resolve_stick_direction(1.0f, 0);
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.19166668f;
+        pad_clamp_stick_to_unit_range((s32)((TI128*)v0), (s32) (((void*)g_hero_state) + 0x9F0), 0.17f);
+        scalar147 = (((Hero *)g_hero_state)->f[0x24B8/4] * 0.020362178f) * v0[0];
         if ((*(s32*)&D_L09_001A8FF0) == 0) {
-            if (((Hero *)gHeroState)->i[0x1B8/4] < 0x3C) {
+            if (((Hero *)g_hero_state)->i[0x1B8/4] < 0x3C) {
                 scalar147 *= 0.1f;
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.5f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.5f;
             }
         }
-        if (((Hero *)gHeroState)->f[0x24B8/4] > 0.2f) {
-            RotateHeroMatrix(0.0f, 0.0f, scalar147);
+        if (((Hero *)g_hero_state)->f[0x24B8/4] > 0.2f) {
+            hero_rotate_matrix(0.0f, 0.0f, scalar147);
         }
-        ApproachHeroSpeed(0.027777778f, 0.004166667f);
-        ComputeHeroPushDirection(99999.0f);
+        hero_approach_speed(0.027777778f, 0.004166667f);
+        hero_compute_push_direction(99999.0f);
         if ((*(s32*)&D_L09_001A8FF0) != 0) {
-            qcopy(v10, &((Hero *)gHeroState)->q[0x2D0/16]);
-            ApplyHeroModeTransformReversed((s32) ((TI128*)v10), (s32) ((TI128*)v10), 0.17f);
-            SpringVectorToTarget((s32) (((void*)gHeroState) + 0x80), (s32) ((TI128*)v10), (s32) (((void*)gHeroState) + 0xA00), 0.04f, 0.3f, 0.125f);
+            qcopy(v10, &((Hero *)g_hero_state)->q[0x2D0/16]);
+            hero_apply_mode_transform_reversed((s32) ((TI128*)v10), (s32) ((TI128*)v10), 0.17f);
+            vec_spring_to_target((s32) (((void*)g_hero_state) + 0x80), (s32) ((TI128*)v10), (s32) (((void*)g_hero_state) + 0xA00), 0.04f, 0.3f, 0.125f);
         } else {
-            SpringFloatToGoal((s32) (((void*)gHeroState) + 0x88), (s32) (((void*)gHeroState) + 0xA00), ((Hero *)gHeroState)->f[0x318/4] + 0.17f, 0.04f, 0.3f, 0.125f);
+            math_spring_float_to_goal((s32) (((void*)g_hero_state) + 0x88), (s32) (((void*)g_hero_state) + 0xA00), ((Hero *)g_hero_state)->f[0x318/4] + 0.17f, 0.04f, 0.3f, 0.125f);
         }
-        FastVecScale((s32) ((TI128*)v10), (s32)(gHeroState + 0x110), 3.0f);
-        FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32)(gHeroState + 0xE0));
-        value29 = ProcessCollisionHit(0.57f, (s32) ((TI128*)v10), 0, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0);
+        FastVecScale((s32) ((TI128*)v10), (s32)(g_hero_state + 0x110), 3.0f);
+        FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32)(g_hero_state + 0xE0));
+        value29 = coll_process_hit(0.57f, (s32) ((TI128*)v10), 0, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0);
         if (value29 != 0) {
-            FastVecScale((s32) ((TI128*)v20), (s32)(gHeroState + 0x110), 7.0f);
+            FastVecScale((s32) ((TI128*)v20), (s32)(g_hero_state + 0x110), 7.0f);
             for (value64 = 0; value64 < value29; value64++) {
-                if (IsMobyInSpecialClassRange(((s32 *)D_L09_001C3EC0)[value64]) != 0) {
-                    QueueImpactEffect(((s32 *)D_L09_001C3EC0)[value64], (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0x10000, (s32) (((void*)gHeroState) + 0x80), (s32) ((TI128*)v20), 1.0f);
+                if (moby_is_in_special_class_range(((s32 *)D_L09_001C3EC0)[value64]) != 0) {
+                    part_queue_impact_effect(((s32 *)D_L09_001C3EC0)[value64], (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, (s32) (((void*)g_hero_state) + 0x80), (s32) ((TI128*)v20), 1.0f);
                 }
             }
         }
-        SetCameraLimitsSlot0(0.017f, 0.3f);
-        SetCameraLimitsSlot2(0.025f, 0.3f);
-        SetCameraLimitsSlot3(0.03f, 0.27f);
+        cam_set_limits_first(0.017f, 0.3f);
+        cam_set_limits_third(0.025f, 0.3f);
+        cam_set_limits_fourth(0.03f, 0.27f);
         scalar156 = scalar147 * 27.0f;
         if (scalar156 > 1.7f) {
             scalar156 = 1.7f;
@@ -1887,182 +1888,182 @@ block_224:
         break;
     case 0x17:                                      /* switch 1 */
     case 0x18:                                      /* switch 1 */
-        FastVecSub((s32)(gHeroState + 0x190), (s32)(gHeroState + 0x560), (s32)(gHeroState + 0x550));
-        ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(((Hero *)gHeroState)->f[0x190/4], ((Hero *)gHeroState)->f[0x194/4]);
-        SteerHeroHeading(0, 0.04f, 0.2f, 0.10471977f);
-        if (((Hero *)gHeroState)->b[0x22C3] != 2) {
-            StepAngleTowardTarget((s32)(gHeroState + 0x94), 0, 0.0f, 0.078539826f);
+        FastVecSub((s32)(g_hero_state + 0x190), (s32)(g_hero_state + 0x560), (s32)(g_hero_state + 0x550));
+        ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x190/4], ((Hero *)g_hero_state)->f[0x194/4]);
+        hero_steer_heading(0, 0.04f, 0.2f, 0.10471977f);
+        if (((Hero *)g_hero_state)->b[0x22C3] != 2) {
+            StepAngleTowardTarget((s32)(g_hero_state + 0x94), 0, 0.0f, 0.078539826f);
         }
-        FastVecSub((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0x550), (s32)(gHeroState + 0x80));
-        ClampVectorLength((s32)(gHeroState + 0xF0), 0.06666667f);
-        ApproachValue((s32)(gHeroState + 0x580), ((Hero *)gHeroState)->f[0x88/4], 0.050000004f);
+        FastVecSub((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0x550), (s32)(g_hero_state + 0x80));
+        vec_clamp_length((s32)(g_hero_state + 0xF0), 0.06666667f);
+        ApproachValue((s32)(g_hero_state + 0x580), ((Hero *)g_hero_state)->f[0x88/4], 0.050000004f);
         break;
     case 0x19:                                      /* switch 1 */
     case 0x1A:                                      /* switch 1 */
-        FastVecSub((s32)(gHeroState + 0x190), (s32)(gHeroState + 0x560), (s32)(gHeroState + 0x550));
-        ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(((Hero *)gHeroState)->f[0x190/4], ((Hero *)gHeroState)->f[0x194/4]);
-        SteerHeroHeading(0, 0.02f, 0.2f, 0.078539826f);
-        FastVecSub((s32) ((TI128*)v60), (s32)(gHeroState + 0x560), (s32)(gHeroState + 0x550));
-        ClearVector128((s32)(gHeroState + 0xF0));
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x19) {
-            FastVecCross((s32) &v40[0], (s32)(gHeroState + 0x2C0), (s32) ((TI128*)v60));
+        FastVecSub((s32)(g_hero_state + 0x190), (s32)(g_hero_state + 0x560), (s32)(g_hero_state + 0x550));
+        ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x190/4], ((Hero *)g_hero_state)->f[0x194/4]);
+        hero_steer_heading(0, 0.02f, 0.2f, 0.078539826f);
+        FastVecSub((s32) ((TI128*)v60), (s32)(g_hero_state + 0x560), (s32)(g_hero_state + 0x550));
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x19) {
+            FastVecCross((s32) &v40[0], (s32)(g_hero_state + 0x2C0), (s32) ((TI128*)v60));
         } else {
-            FastVecCross((s32) &v40[0], (s32) ((TI128*)v60), (s32)(gHeroState + 0x2C0));
+            FastVecCross((s32) &v40[0], (s32) ((TI128*)v60), (s32)(g_hero_state + 0x2C0));
         }
         vec_scale_to_length((s32) &v40[0], (s32) &v40[0], 0.2f);
-        FastVecAdd((s32) &v50[0], (s32)(gHeroState + 0x80), (s32) &v40[0]);
-        if ((ProbeLedgeGrab((s32)(gHeroState + 0x80), (s32)(gHeroState + 0x90), 0) != 0) && (ProbeLedgeGrab((s32) &v50[0], (s32)(gHeroState + 0x90), (s32)((TI128*)v0)) != 0)) {
-            FastVecSub((s32)(gHeroState + 0xF0), (s32)((TI128*)v0), (s32)(gHeroState + 0x80));
-            value76 = FloatToInt(((Hero *)gHeroState)->f[0xC38/4]) * 4;
+        FastVecAdd((s32) &v50[0], (s32)(g_hero_state + 0x80), (s32) &v40[0]);
+        if ((ProbeLedgeGrab((s32)(g_hero_state + 0x80), (s32)(g_hero_state + 0x90), 0) != 0) && (ProbeLedgeGrab((s32) &v50[0], (s32)(g_hero_state + 0x90), (s32)((TI128*)v0)) != 0)) {
+            FastVecSub((s32)(g_hero_state + 0xF0), (s32)((TI128*)v0), (s32)(g_hero_state + 0x80));
+            value76 = FloatToInt(((Hero *)g_hero_state)->f[0xC38/4]) * 4;
             value80 = (s32)D_L09_001ACEE8;
-            vec_scale_to_length((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), *(f32*)(value76 + value80) * 0.5f);
+            vec_scale_to_length((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), *(f32*)(value76 + value80) * 0.5f);
         }
         break;
     case 0x76:                                      /* switch 1 */
-        ((Hero *)gHeroState)->f[0x1A0/4] = ((Hero *)gHeroState)->f[0x32C/4];
-        ((Hero *)gHeroState)->f[0x1B0/4] = 0.09166667f;
-        ApproachHeroVelocity_L01(0.0069444445f);
-        ApplyHeroModeTransform((s32) (((void*)gHeroState) + 0xF0), (s32) ((void*)gHeroState) + 0x130, 0.005f);
+        ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0x32C/4];
+        ((Hero *)g_hero_state)->f[0x1B0/4] = 0.09166667f;
+        hero_approach_velocity(0.0069444445f);
+        hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) ((void*)g_hero_state) + 0x130, 0.005f);
         break;
     case 0x6:                                       /* switch 1 */
     case 0x2C:                                      /* switch 1 */
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x2C) {
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x2C) {
             scalar113 = 0.0f;
-            if (((Hero *)gHeroState)->f[0x31C/4] > 4.0f) {
+            if (((Hero *)g_hero_state)->f[0x31C/4] > 4.0f) {
                 scalar113 = 0.43633235f;
             }
-            qcopy(v0, &((Hero *)gHeroState)->q[0x90/16]);
-            ApproachWithVelocity((s32) &v0[1], scalar113, (s32) (((void*)gHeroState) + 0xA4), 0.02f, 0.3f, 0.043633237f, 0);
-            ApproachWithVelocity((s32)((TI128*)v0), 0.0f, (s32) (((void*)gHeroState) + 0xA0), 0.02f, 0.3f, 0.043633237f, 0);
-            StartHeroPoseOffset(((Hero *)gHeroState)->f[0xA0/4], ((Hero *)gHeroState)->f[0xA4/4], 0.0f);
-            if (((Hero *)gHeroState)->f[0x31C/4] > 1.0f) {
-                ((Hero *)gHeroState)->i[0x2298/4] = 1;
+            qcopy(v0, &((Hero *)g_hero_state)->q[0x90/16]);
+            math_approach_with_velocity((s32) &v0[1], scalar113, (s32) (((void*)g_hero_state) + 0xA4), 0.02f, 0.3f, 0.043633237f, 0);
+            math_approach_with_velocity((s32)((TI128*)v0), 0.0f, (s32) (((void*)g_hero_state) + 0xA0), 0.02f, 0.3f, 0.043633237f, 0);
+            hero_start_pose_offset(((Hero *)g_hero_state)->f[0xA0/4], ((Hero *)g_hero_state)->f[0xA4/4], 0.0f);
+            if (((Hero *)g_hero_state)->f[0x31C/4] > 1.0f) {
+                ((Hero *)g_hero_state)->i[0x2298/4] = 1;
             }
         }
-        UpdateHeroTargetSpeed();
-        if (((Hero *)gHeroState)->h[0x1E0/2] == 0) {
+        hero_update_target_speed();
+        if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
             UpdateHeroVelocityForStateWithYawSpring();
         }
-        ptr60 = ((void*)gHeroState) + 0xF0;
-        ApplyHeroModePoseOffsets();
-        BuildHeroMoveImpulse(0.7f, 0.0f);
-        ApplyHeroModeTransform((s32) ptr60, (s32) ptr60, ((Hero *)gHeroState)->f[0xA80/4]);
-        if (GetViewSpaceHeight((s32) ptr60) < -0.8333334f) {
-            SetViewSpaceHeight((s32) ptr60, (s32) ptr60, -0.8333334f);
+        ptr60 = ((void*)g_hero_state) + 0xF0;
+        hero_apply_mode_pose_offsets();
+        hero_build_move_impulse(0.7f, 0.0f);
+        hero_apply_mode_transform((s32) ptr60, (s32) ptr60, ((Hero *)g_hero_state)->f[0xA80/4]);
+        if (cam_get_view_space_height((s32) ptr60) < -0.8333334f) {
+            cam_set_view_space_height((s32) ptr60, (s32) ptr60, -0.8333334f);
         }
         break;
     case 0x74:                                      /* switch 1 */
-        ((Hero *)gHeroState)->c[0x22BC] = 1;
-        ptr2 = ((void*)gHeroState) + 0xF0;
-        ApproachValue((s32) (((void*)gHeroState) + 0xA88), ((Hero *)gHeroState)->f[0xA90/4], 0.0024240687f);
-        ApproachValue((s32) (((void*)gHeroState) + 0xA8C), ((Hero *)gHeroState)->f[0xA94/4], 0.0024240687f);
-        StartHeroPoseOffset(((Hero *)gHeroState)->f[0xA88/4], ((Hero *)gHeroState)->f[0xA8C/4], 0.0f);
+        ((Hero *)g_hero_state)->c[0x22BC] = 1;
+        ptr2 = ((void*)g_hero_state) + 0xF0;
+        ApproachValue((s32) (((void*)g_hero_state) + 0xA88), ((Hero *)g_hero_state)->f[0xA90/4], 0.0024240687f);
+        ApproachValue((s32) (((void*)g_hero_state) + 0xA8C), ((Hero *)g_hero_state)->f[0xA94/4], 0.0024240687f);
+        hero_start_pose_offset(((Hero *)g_hero_state)->f[0xA88/4], ((Hero *)g_hero_state)->f[0xA8C/4], 0.0f);
         func_L00_002EE4D8((s32) ptr2, (s32) ptr2, vec_length_xy((s32) ptr2) * 0.9f);
-        ApplyHeroModeTransform((s32) ptr2, (s32) ptr2, ((Hero *)gHeroState)->f[0xA80/4]);
-        if (GetViewSpaceHeight((s32) ptr2) < -0.8333334f) {
-            SetViewSpaceHeight((s32) ptr2, (s32) ptr2, -0.8333334f);
+        hero_apply_mode_transform((s32) ptr2, (s32) ptr2, ((Hero *)g_hero_state)->f[0xA80/4]);
+        if (cam_get_view_space_height((s32) ptr2) < -0.8333334f) {
+            cam_set_view_space_height((s32) ptr2, (s32) ptr2, -0.8333334f);
         }
         break;
     case 0x82:                                      /* switch 1 */
-        UpdateSoundSlotObject(4, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0xD);
-        ang82 = (f32) LerpInt(0x2D0, 0xB4, ((Hero *)gHeroState)->f[0x5B0/4] * 0.02f) * 0.00029088825f;
-        ShowGaugePopup(2, UpdateAngleAndBlend((s32) (((void*)gHeroState) + 0x5A0), 0x60FFFFFF, 0x40FFC0A0, ang82), 0, 1.0f - (((Hero *)gHeroState)->f[0x5B0/4] * 0.02f));
-        value56 = (s32) ((Hero *)gPadState)->d[0x1A0/8] & 0x40;
-        if (((Hero *)gHeroState)->f[0x5B0/4] == 0.0f) {
+        snd_update_slot_object(4, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0xD);
+        ang82 = (f32) math_lerp_int(0x2D0, 0xB4, ((Hero *)g_hero_state)->f[0x5B0/4] * 0.02f) * 0.00029088825f;
+        gauge_popup_show(2, math_update_angle_and_blend((s32) (((void*)g_hero_state) + 0x5A0), 0x60FFFFFF, 0x40FFC0A0, ang82), 0, 1.0f - (((Hero *)g_hero_state)->f[0x5B0/4] * 0.02f));
+        value56 = (s32) ((Hero *)g_pad_state)->d[0x1A0/8] & 0x40;
+        if (((Hero *)g_hero_state)->f[0x5B0/4] == 0.0f) {
             value56 = 0;
         }
         if (value56 != 0) {
-            ApproachValue((s32) (((void*)gHeroState) + 0x5B0), 0.0f, 0.1f);
-            ptr13 = ((void*)gHeroState) + 0xF0;
-            OffsetPointInViewSpace((s32) ptr13, (s32) ptr13, 0.025f);
+            ApproachValue((s32) (((void*)g_hero_state) + 0x5B0), 0.0f, 0.1f);
+            ptr13 = ((void*)g_hero_state) + 0xF0;
+            cam_offset_point_in_view_space((s32) ptr13, (s32) ptr13, 0.025f);
         } else {
-            ApproachValue((s32) (((void*)gHeroState) + 0x5B0), 0.0f, 0.02f);
+            ApproachValue((s32) (((void*)g_hero_state) + 0x5B0), 0.0f, 0.02f);
         }
-        if (((Hero *)gPadState)->i[0x1A4/4] & 0x40) {
-            ApproachValue((s32)(gHeroState + 0x5B0), 0.0f, 0.5f);
+        if (((Hero *)g_pad_state)->i[0x1A4/4] & 0x40) {
+            ApproachValue((s32)(g_hero_state + 0x5B0), 0.0f, 0.5f);
         }
-        ApplyHeroModeTransform((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.0075000003f);
-        if (GetViewSpaceHeight((s32)(gHeroState + 0xF0)) > 0.10000001f) {
-            SetViewSpaceHeight((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), 0.10000001f);
+        hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.0075000003f);
+        if (cam_get_view_space_height((s32)(g_hero_state + 0xF0)) > 0.10000001f) {
+            cam_set_view_space_height((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), 0.10000001f);
         }
-        if (GetViewSpaceHeight((s32)(gHeroState + 0xF0)) < -0.20000002f) {
-            SetViewSpaceHeight((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), -0.20000002f);
+        if (cam_get_view_space_height((s32)(g_hero_state + 0xF0)) < -0.20000002f) {
+            cam_set_view_space_height((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), -0.20000002f);
         }
-        scalar35 = GetViewSpaceHeight((s32)(gHeroState + 0xF0));
-        if ((((Hero *)gHeroState)->f[0x5B0/4] > 25.0f) && (((Hero *)gHeroState)->h[0x5BE/2] < 0x5A) && (scalar35 < 0.0f) && (scalar87 = ((Hero *)gHeroState)->f[0x31C/4], (scalar87 < 1.2f))) {
+        scalar35 = cam_get_view_space_height((s32)(g_hero_state + 0xF0));
+        if ((((Hero *)g_hero_state)->f[0x5B0/4] > 25.0f) && (((Hero *)g_hero_state)->h[0x5BE/2] < 0x5A) && (scalar35 < 0.0f) && (scalar87 = ((Hero *)g_hero_state)->f[0x31C/4], (scalar87 < 1.2f))) {
             scalar91 = (scalar87 - 0.25f) * 1.0526315f;
-            ((Hero *)gHeroState)->h[0x5BE/2] = (s16) ((u16) ((Hero *)gHeroState)->h[0x5BE/2] + 1);
+            ((Hero *)g_hero_state)->h[0x5BE/2] = (s16) ((u16) ((Hero *)g_hero_state)->h[0x5BE/2] + 1);
             if (scalar91 < 0.0f) {
                 scalar91 = 0.0f;
             }
-            SetViewSpaceHeight((s32)(gHeroState + 0xF0), (s32)(gHeroState + 0xF0), scalar35 * scalar91);
-            if (((Hero *)gHeroState)->f[0x31C/4] < 0.25f) {
-                SpringFloatToGoal((s32)(gHeroState + 0x88), (s32)(gHeroState + 0x5B4), ((Hero *)gHeroState)->f[0x318/4] + 0.25f, 0.027f, 0.3f, 0.083333336f);
+            cam_set_view_space_height((s32)(g_hero_state + 0xF0), (s32)(g_hero_state + 0xF0), scalar35 * scalar91);
+            if (((Hero *)g_hero_state)->f[0x31C/4] < 0.25f) {
+                math_spring_float_to_goal((s32)(g_hero_state + 0x88), (s32)(g_hero_state + 0x5B4), ((Hero *)g_hero_state)->f[0x318/4] + 0.25f, 0.027f, 0.3f, 0.083333336f);
             }
         } else if (scalar35 > 0.0f) {
-            ((Hero *)gHeroState)->h[0x5BE/2] = 0;
+            ((Hero *)g_hero_state)->h[0x5BE/2] = 0;
         }
-        (*(f32*)&D_L09_001B9C88) = GetViewSpaceHeight((s32)(gHeroState + 0xF0));
-        ApplyHeroModePoseOffsets();
-        ResolveStickInputToDirection(((Hero *)gHeroState)->f[0x24B8/4] * 0.20000002f, 0);
-        if (((Hero *)gHeroState)->f[0x24B8/4] < 0.2f) {
-            ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0x98/4];
+        (*(f32*)&D_L09_001B9C88) = cam_get_view_space_height((s32)(g_hero_state + 0xF0));
+        hero_apply_mode_pose_offsets();
+        hero_resolve_stick_direction(((Hero *)g_hero_state)->f[0x24B8/4] * 0.20000002f, 0);
+        if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
+            ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x98/4];
         }
-        SteerHeroHeading(0, 0.027f, 0.3f, ((Hero *)gHeroState)->f[0x24B8/4] * 0.087266475f);
+        hero_steer_heading(0, 0.027f, 0.3f, ((Hero *)g_hero_state)->f[0x24B8/4] * 0.087266475f);
         scalar114 = 0.0013888889f;
-        if (((Hero *)gHeroState)->f[0x24B8/4] < 0.2f) {
+        if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
             scalar114 = 0.00055555557f;
         }
-        ApproachHeroVelocity_L01(scalar114);
+        hero_approach_velocity(scalar114);
         break;
     case 0x8:                                       /* switch 1 */
         if (hero_slot_item_id(3) == 2) {
-            value23 = ((Hero *)gHeroState)->i[0x243C/4];
+            value23 = ((Hero *)g_hero_state)->i[0x243C/4];
             if (value23 != -1) {
-                ptr14 = (value23 * 0x70) + (s32)gSoundState;
-                if ((M2C_FIELD(ptr14, s32* , 0x88) == ((Hero *)gHeroState)->ptr[0x2290/4]) && (M2C_FIELD(ptr14, u8* , 0x74) != 0)) {
-                    StopSoundVoice(value23);
+                ptr14 = (value23 * 0x70) + (s32)g_sound_state;
+                if ((M2C_FIELD(ptr14, s32* , 0x88) == ((Hero *)g_hero_state)->ptr[0x2290/4]) && (M2C_FIELD(ptr14, u8* , 0x74) != 0)) {
+                    snd_stop_voice(value23);
                 }
             }
-            ((Hero *)gHeroState)->i[0x243C/4] = -1;
-            UpdateSoundSlotObject(3, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 2);
+            ((Hero *)g_hero_state)->i[0x243C/4] = -1;
+            snd_update_slot_object(3, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 2);
         } else {
-            value24 = ((Hero *)gHeroState)->i[0x2438/4];
+            value24 = ((Hero *)g_hero_state)->i[0x2438/4];
             if (value24 != -1) {
-                ptr15 = (value24 * 0x70) + (s32)gSoundState;
-                if ((M2C_FIELD(ptr15, s32* , 0x88) == ((Hero *)gHeroState)->ptr[0x2290/4]) && (M2C_FIELD(ptr15, u8* , 0x74) != 0)) {
-                    StopSoundVoice(value24);
+                ptr15 = (value24 * 0x70) + (s32)g_sound_state;
+                if ((M2C_FIELD(ptr15, s32* , 0x88) == ((Hero *)g_hero_state)->ptr[0x2290/4]) && (M2C_FIELD(ptr15, u8* , 0x74) != 0)) {
+                    snd_stop_voice(value24);
                 }
             }
-            ((Hero *)gHeroState)->i[0x2438/4] = -1;
-            UpdateSoundSlotObject(4, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0xD);
+            ((Hero *)g_hero_state)->i[0x2438/4] = -1;
+            snd_update_slot_object(4, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0xD);
         }
         scalar152 = 0.050000004f;
-        if (((Hero *)gHeroState)->i[0x1338/4] == 3) {
+        if (((Hero *)g_hero_state)->i[0x1338/4] == 3) {
             scalar152 = 0.083333336f;
         }
         scalar153 = 0.72f;
-        scalar42 = ((Hero *)gHeroState)->f[0x24C8/4];
-        if (((Hero *)gHeroState)->b[0x24EF] != 0) {
+        scalar42 = ((Hero *)g_hero_state)->f[0x24C8/4];
+        if (((Hero *)g_hero_state)->b[0x24EF] != 0) {
             scalar152 = 0.12833333f;
             scalar153 = 0.98640007f;
         }
         if (scalar42 != 0.0f) {
             scalar153 = scalar42;
         }
-        ptr27 = ((void*)gHeroState) + 0xF0;
-        frameSlot14 = GetViewSpaceHeight((s32) ptr27);
-        ResolveStickInputToDirection(scalar152, 0);
-        SteerHeroHeading(0, 0.025f, 0.3f, 0.20943955f);
-        ApproachHeroSpeed(0.004166667f, 0.0019444445f);
-        ComputeHeroPushDirection(99999.0f);
-        ApplyHeroModePoseOffsets();
-        ProjectVectorOntoViewPlane((s32) ptr27, (s32) ptr27);
-        SpringFloatToGoal((s32) &frameSlot14, (s32) (((void*)gHeroState) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
-        ApplyHeroModeTransform((s32) ptr27, (s32) ptr27, -frameSlot14);
-        scalar36 = ((Hero *)gHeroState)->f[0x88/4];
-        if (scalar36 < ((Hero *)gHeroState)->f[0x490/4]) {
-            ApproachValue((s32) (((void*)gHeroState) + 0x490), scalar36, 0.06666667f);
+        ptr27 = ((void*)g_hero_state) + 0xF0;
+        frameSlot14 = cam_get_view_space_height((s32) ptr27);
+        hero_resolve_stick_direction(scalar152, 0);
+        hero_steer_heading(0, 0.025f, 0.3f, 0.20943955f);
+        hero_approach_speed(0.004166667f, 0.0019444445f);
+        hero_compute_push_direction(99999.0f);
+        hero_apply_mode_pose_offsets();
+        cam_project_vector_onto_view_plane((s32) ptr27, (s32) ptr27);
+        math_spring_float_to_goal((s32) &frameSlot14, (s32) (((void*)g_hero_state) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
+        hero_apply_mode_transform((s32) ptr27, (s32) ptr27, -frameSlot14);
+        scalar36 = ((Hero *)g_hero_state)->f[0x88/4];
+        if (scalar36 < ((Hero *)g_hero_state)->f[0x490/4]) {
+            ApproachValue((s32) (((void*)g_hero_state) + 0x490), scalar36, 0.06666667f);
         }
         ProbeHeroAirborneWallContact();
         break;
@@ -2087,255 +2088,255 @@ block_224:
     case 0x81:                                      /* switch 1 */
     case 0x89:                                      /* switch 1 */
     case 0x92:                                      /* switch 1 */
-        if ((((Hero *)gHeroState)->u[0x2294/4] == 0x1B) && (((Hero *)gHeroState)->h[0x24FC/2] == 0) && (((Hero *)gHeroState)->i[0x1338/4] == 3)) {
-            if (IsBelowPlaneWithinDepth(10.0f) != 0) {
-                PlayHeroSound(4, 0);
+        if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x1B) && (((Hero *)g_hero_state)->h[0x24FC/2] == 0) && (((Hero *)g_hero_state)->i[0x1338/4] == 3)) {
+            if (math_is_below_plane_within_depth(10.0f) != 0) {
+                hero_play_sound(4, 0);
             }
         }
-        if ((((Hero *)gHeroState)->h[0x528/2] != 0) && (((Hero *)gHeroState)->b[0x1492] != 0)) {
-            ((Hero *)gHeroState)->f[0x1B0/4] = (f32) ((Hero *)gHeroState)->f[0x1B4/4];
+        if ((((Hero *)g_hero_state)->h[0x528/2] != 0) && (((Hero *)g_hero_state)->b[0x1492] != 0)) {
+            ((Hero *)g_hero_state)->f[0x1B0/4] = (f32) ((Hero *)g_hero_state)->f[0x1B4/4];
         } else {
-            if (((Hero *)gHeroState)->b[0x49C] != 0) {
-                ResolveStickInputToDirection(0.09916667f, 0);
+            if (((Hero *)g_hero_state)->b[0x49C] != 0) {
+                hero_resolve_stick_direction(0.09916667f, 0);
             }
-            ResolveStickInputToDirection(((Hero *)gHeroState)->f[0x4A4/4], 0);
+            hero_resolve_stick_direction(((Hero *)g_hero_state)->f[0x4A4/4], 0);
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x12) {
-            if (((Hero *)gHeroState)->i[0x1B8/4] == 0x14) {
-                EmitHeroDustAndDebris(3, 0x10, 1);
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x12) {
+            if (((Hero *)g_hero_state)->i[0x1B8/4] == 0x14) {
+                part_emit_hero_dust_and_debris(3, 0x10, 1);
                 if (D_L09_001B2FF0 != 0) {
-                    RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 0, ((Hero *)gHeroState)->f[0x80/4], ((Hero *)gHeroState)->f[0x84/4], 0.4f, 0.35f);
+                    RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 0, ((Hero *)g_hero_state)->f[0x80/4], ((Hero *)g_hero_state)->f[0x84/4], 0.4f, 0.35f);
                 }
             }
-            scalar43 = ((Hero *)gHeroState)->f[0xC38/4];
+            scalar43 = ((Hero *)g_hero_state)->f[0xC38/4];
             if ((scalar43 >= 4.0f) && (scalar43 <= 7.0f)) {
                 EmitHeroRandomizedMotionEffects(7, 0, 0);
             }
         }
-        value5 = ((Hero *)gHeroState)->h[0x4AC/2];
-        value20 = ((Hero *)gHeroState)->i[0x1B8/4];
+        value5 = ((Hero *)g_hero_state)->h[0x4AC/2];
+        value20 = ((Hero *)g_hero_state)->i[0x1B8/4];
         if (value20 == value5) {
-            qcopy(&((Hero *)gHeroState)->q[0x460/16], &((Hero *)gHeroState)->q[0x80/16]);
+            qcopy(&((Hero *)g_hero_state)->q[0x460/16], &((Hero *)g_hero_state)->q[0x80/16]);
         }
-        if ((((Hero *)gHeroState)->b[0x49C] != 0) || ((value20 < value5) && (value92 = ((Hero *)gHeroState)->u[0x2294/4], (value92 != 0xB)) && (value92 != 0x10) && (value92 != 0xC) && (value92 != 0x11) && (value92 != 0x1B) && (value92 != 0x89) && (value92 != 0x48))) {
-            SteerHeroHeading(0, 0.015f, 0.2f, 0.2501639f);
-            scalar63 = ((Hero *)gHeroState)->f[0x1B4/4];
-            if ((u8) ((Hero *)gHeroState)->b[0x49C] >= 2U) {
-                ((Hero *)gHeroState)->f[0x1B4/4] = (f32) (scalar63 * 0.4f);
+        if ((((Hero *)g_hero_state)->b[0x49C] != 0) || ((value20 < value5) && (value92 = ((Hero *)g_hero_state)->u[0x2294/4], (value92 != 0xB)) && (value92 != 0x10) && (value92 != 0xC) && (value92 != 0x11) && (value92 != 0x1B) && (value92 != 0x89) && (value92 != 0x48))) {
+            hero_steer_heading(0, 0.015f, 0.2f, 0.2501639f);
+            scalar63 = ((Hero *)g_hero_state)->f[0x1B4/4];
+            if ((u8) ((Hero *)g_hero_state)->b[0x49C] >= 2U) {
+                ((Hero *)g_hero_state)->f[0x1B4/4] = (f32) (scalar63 * 0.4f);
             }
-            if (((Hero *)gHeroState)->h[0x1454/2] != 0) {
-                ComputeHeroPushDirection(((Hero *)gHeroState)->f[0x1458/4]);
+            if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
+                hero_compute_push_direction(((Hero *)g_hero_state)->f[0x1458/4]);
             } else {
-                ComputeHeroPushDirection(99999.0f);
+                hero_compute_push_direction(99999.0f);
             }
-            ((Hero *)gHeroState)->f[0x1B4/4] = scalar63;
-            if (((Hero *)gHeroState)->b[0x49C] != 1) {
-                ApproachHeroSpeed(((Hero *)gHeroState)->f[0x500/4], ((Hero *)gHeroState)->f[0x504/4]);
+            ((Hero *)g_hero_state)->f[0x1B4/4] = scalar63;
+            if (((Hero *)g_hero_state)->b[0x49C] != 1) {
+                hero_approach_speed(((Hero *)g_hero_state)->f[0x500/4], ((Hero *)g_hero_state)->f[0x504/4]);
             }
-            if (((Hero *)gHeroState)->b[0x49C] != 0) {
+            if (((Hero *)g_hero_state)->b[0x49C] != 0) {
                 if ((*(s32*)&D_00138354) != 0) {
-                    if (((Hero *)gHeroState)->h[0x34A/2] != 0) {
-                        ((Hero *)gHeroState)->f[0x1B4/4] = 0.0f;
+                    if (((Hero *)g_hero_state)->h[0x34A/2] != 0) {
+                        ((Hero *)g_hero_state)->f[0x1B4/4] = 0.0f;
                     }
                 }
-                if (((Hero *)gHeroState)->b[0x49C] != 0) {
-                    ShrinkHeroVectorByAmount(((Hero *)gHeroState)->f[0x504/4]);
+                if (((Hero *)g_hero_state)->b[0x49C] != 0) {
+                    hero_shrink_vector_by_amount(((Hero *)g_hero_state)->f[0x504/4]);
                 }
             }
-            BuildHeroMoveImpulse(0.5f, 0.033333335f);
-            if (((Hero *)gHeroState)->u[0x2294/4] == 9) {
-                value46 = ((Hero *)gHeroState)->i[0x1B8/4];
-                if (value46 < (((Hero *)gHeroState)->h[0x4AC/2] + 4)) {
-                    OffsetPointBySideDirection((s32) (((void*)gHeroState) + 0xF0), (s32) (((void*)gHeroState) + 0xF0), (f32) value46 * 0.0044444446f);
+            hero_build_move_impulse(0.5f, 0.033333335f);
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 9) {
+                value46 = ((Hero *)g_hero_state)->i[0x1B8/4];
+                if (value46 < (((Hero *)g_hero_state)->h[0x4AC/2] + 4)) {
+                    cam_offset_point_by_side_direction((s32) (((void*)g_hero_state) + 0xF0), (s32) (((void*)g_hero_state) + 0xF0), (f32) value46 * 0.0044444446f);
                 }
             }
-            if (((Hero *)gHeroState)->u[0x2294/4] == 0xA) {
-                value47 = ((Hero *)gHeroState)->i[0x1B8/4];
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 0xA) {
+                value47 = ((Hero *)g_hero_state)->i[0x1B8/4];
                 if (value47 < 0x22) {
-                    OffsetPointBySideDirection((s32) (((void*)gHeroState) + 0xF0), (s32) (((void*)gHeroState) + 0xF0), (f32) value47 * 0.014722222f);
+                    cam_offset_point_by_side_direction((s32) (((void*)g_hero_state) + 0xF0), (s32) (((void*)g_hero_state) + 0xF0), (f32) value47 * 0.014722222f);
                 }
             }
-            if ((((Hero *)gHeroState)->i[0x1B8/4] < 0xA) && (((Hero *)gHeroState)->f[0x24B8/4] > 0.2f)) {
-                qcopy(v0, &((Hero *)gHeroState)->q[0x80/16]);
-                OffsetPointInViewSpace((s32)((TI128*)v0), (s32)((TI128*)v0), 0.5f);
-                OffsetPointBySideDirection((s32) ((TI128*)v10), (s32)((TI128*)v0), 0.95f);
-                if (CollLine((s32)((TI128*)v0), (s32) ((TI128*)v10), 4, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0) != 0) {
-                    ((Hero *)gHeroState)->h[0x524/2] = 1;
+            if ((((Hero *)g_hero_state)->i[0x1B8/4] < 0xA) && (((Hero *)g_hero_state)->f[0x24B8/4] > 0.2f)) {
+                qcopy(v0, &((Hero *)g_hero_state)->q[0x80/16]);
+                cam_offset_point_in_view_space((s32)((TI128*)v0), (s32)((TI128*)v0), 0.5f);
+                cam_offset_point_by_side_direction((s32) ((TI128*)v10), (s32)((TI128*)v0), 0.95f);
+                if (CollLine((s32)((TI128*)v0), (s32) ((TI128*)v10), 4, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0) != 0) {
+                    ((Hero *)g_hero_state)->h[0x524/2] = 1;
                 }
             }
         } else {
             UpdateHeroVelocityForStateWithYawSpring();
-            if (((Hero *)gHeroState)->u[0x2294/4] == 0x12) {
-                ptr28 = ((void*)gHeroState) + 0xF0;
+            if (((Hero *)g_hero_state)->u[0x2294/4] == 0x12) {
+                ptr28 = ((void*)g_hero_state) + 0xF0;
                 scalar92 = vec_length_xy((s32) ptr28);
                 if (scalar92 > 0.06166667f) {
                     scalar92 = 0.06166667f;
                 }
-                FastVectorNormalizeHelper((s32) ptr28, (s32) ptr28, scalar92);
+                vec_fast_normalize_helper((s32) ptr28, (s32) ptr28, scalar92);
             }
         }
-        scalar44 = ((Hero *)gHeroState)->f[0x318/4];
-        scalar88 = ((Hero *)gHeroState)->f[0x490/4];
+        scalar44 = ((Hero *)g_hero_state)->f[0x318/4];
+        scalar88 = ((Hero *)g_hero_state)->f[0x490/4];
         if (scalar88 < scalar44) {
             scalar22 = scalar88 + 0.10000001f;
-            ((Hero *)gHeroState)->f[0x490/4] = scalar22;
+            ((Hero *)g_hero_state)->f[0x490/4] = scalar22;
             if (scalar44 < scalar22) {
-                ((Hero *)gHeroState)->f[0x490/4] = scalar44;
+                ((Hero *)g_hero_state)->f[0x490/4] = scalar44;
             }
         }
-        scalar45 = ((Hero *)gHeroState)->f[0x88/4];
-        if (scalar45 < ((Hero *)gHeroState)->f[0x490/4]) {
-            ((Hero *)gHeroState)->f[0x490/4] = scalar45;
+        scalar45 = ((Hero *)g_hero_state)->f[0x88/4];
+        if (scalar45 < ((Hero *)g_hero_state)->f[0x490/4]) {
+            ((Hero *)g_hero_state)->f[0x490/4] = scalar45;
         }
-        if ((((Hero *)gHeroState)->h[0x4AC/2] < ((Hero *)gHeroState)->i[0x1B8/4]) && (GetViewSpaceHeight((s32) (((void*)gHeroState) + 0xF0)) < 0.001f) && ((((Hero *)gHeroState)->b[0x49D] == 0) || (((Hero *)gHeroState)->i[0x1B8/4] > ((Hero *)gHeroState)->i[0x434/4])) && ((((Hero *)gHeroState)->u[0x2294/4] != 0xE) || (((Hero *)gHeroState)->i[0x1B8/4] >= 0x12))) {
-            scalar46 = ((Hero *)gHeroState)->f[0x458/4];
-            ((Hero *)gHeroState)->b[0x49E] = 1U;
+        if ((((Hero *)g_hero_state)->h[0x4AC/2] < ((Hero *)g_hero_state)->i[0x1B8/4]) && (cam_get_view_space_height((s32) (((void*)g_hero_state) + 0xF0)) < 0.001f) && ((((Hero *)g_hero_state)->b[0x49D] == 0) || (((Hero *)g_hero_state)->i[0x1B8/4] > ((Hero *)g_hero_state)->i[0x434/4])) && ((((Hero *)g_hero_state)->u[0x2294/4] != 0xE) || (((Hero *)g_hero_state)->i[0x1B8/4] >= 0x12))) {
+            scalar46 = ((Hero *)g_hero_state)->f[0x458/4];
+            ((Hero *)g_hero_state)->b[0x49E] = 1U;
             if (scalar46 != 0.0f) {
-                ((Hero *)gHeroState)->f[0x520/4] = scalar46;
+                ((Hero *)g_hero_state)->f[0x520/4] = scalar46;
             }
         }
-        if (((Hero *)gHeroState)->b[0x22B4] == 0) {
-            ApplyHeroModePoseOffsets();
+        if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
+            hero_apply_mode_pose_offsets();
         }
-        value93 = ((Hero *)gHeroState)->u[0x2294/4];
+        value93 = ((Hero *)g_hero_state)->u[0x2294/4];
         if ((value93 == 0x10) || (value93 == 0xD)) {
-            UpdateTransformHistoryFollowers((s32) (((void*)gHeroState) + 0x18E0), (((Hero *)gHeroState)->i[0x1B8/4] < 0xD) ? 0 : 2);
+            moby_update_transform_history_followers((s32) (((void*)g_hero_state) + 0x18E0), (((Hero *)g_hero_state)->i[0x1B8/4] < 0xD) ? 0 : 2);
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x81) {
-            UpdateTransformHistoryFollowers((s32) (((void*)gHeroState) + 0x18E0), (((Hero *)gHeroState)->i[0x1B8/4] < 0xE) ? 0 : 2);
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x81) {
+            moby_update_transform_history_followers((s32) (((void*)g_hero_state) + 0x18E0), (((Hero *)g_hero_state)->i[0x1B8/4] < 0xE) ? 0 : 2);
         }
-        if (((Hero *)gHeroState)->u[0x2294/4] == 0x10) {
-            if (((Hero *)gHeroState)->i[0x1B8/4] >= 9) {
-                if (((Hero *)gHeroState)->f[0xC38/4] < 28.0f) {
-                    BuildHeroRelativePoint((s32)((TI128*)v0), 1, 0.8f, 0.0f, 0.3f);
-                    value34 = ProcessCollisionHit(0.9f, (s32)((TI128*)v0), 0, (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0);
+        if (((Hero *)g_hero_state)->u[0x2294/4] == 0x10) {
+            if (((Hero *)g_hero_state)->i[0x1B8/4] >= 9) {
+                if (((Hero *)g_hero_state)->f[0xC38/4] < 28.0f) {
+                    hero_build_relative_point((s32)((TI128*)v0), 1, 0.8f, 0.0f, 0.3f);
+                    value34 = coll_process_hit(0.9f, (s32)((TI128*)v0), 0, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0);
                     if (value34 != 0) {
-                        FastVecScale((s32) ((TI128*)v10), (s32) (((void*)gHeroState) + 0x110), 7.0f);
+                        FastVecScale((s32) ((TI128*)v10), (s32) (((void*)g_hero_state) + 0x110), 7.0f);
                         for (value65 = 0; value65 < value34; value65++) {
-                            if (IsMobyInSpecialClassRange(((s32 *)D_L09_001C3EC0)[value65]) != 0) {
-                                QueueImpactEffect(((s32 *)D_L09_001C3EC0)[value65], (s32) ((Hero *)gHeroState)->ptr[0x2290/4], 0x10000, (s32) (((void*)gHeroState) + 0x80), (s32) ((TI128*)v10), 1.0f);
+                            if (moby_is_in_special_class_range(((s32 *)D_L09_001C3EC0)[value65]) != 0) {
+                                part_queue_impact_effect(((s32 *)D_L09_001C3EC0)[value65], (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, (s32) (((void*)g_hero_state) + 0x80), (s32) ((TI128*)v10), 1.0f);
                             }
                         }
                     }
                 }
             }
         }
-        if ((((Hero *)gHeroState)->u[0x2294/4] == 0x38) && (((Hero *)gHeroState)->b[0x49E] == 0) && (((Hero *)gHeroState)->f[0xF8/4] > 0.025000002f)) {
+        if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x38) && (((Hero *)g_hero_state)->b[0x49E] == 0) && (((Hero *)g_hero_state)->f[0xF8/4] > 0.025000002f)) {
             EmitHeroTimedEffects();
         }
         ApplyHeroGravityAndJumpMotion();
         ProbeHeroAirborneWallContact();
         break;
     case 0x16:                                      /* switch 1 */
-        scalar135 = GetViewSpaceVectorLength((s32)(gHeroState + 0xF0));
+        scalar135 = cam_get_view_space_vector_length((s32)(g_hero_state + 0xF0));
         scalar93 = 0.0011111111f;
-        if ((((Hero *)gHeroState)->h[0x34E/2] == 0) && (((Hero *)gHeroState)->i[0x1B8/4] >= 0xB)) {
+        if ((((Hero *)g_hero_state)->h[0x34E/2] == 0) && (((Hero *)g_hero_state)->i[0x1B8/4] >= 0xB)) {
             scalar93 = 0.0027777778f;
         }
         scalar135 = scalar135 - scalar93;
         if (scalar135 < 0.0f) {
             scalar135 = 0.0f;
         }
-        if (((Hero *)gHeroState)->b[0x1497] != 0) {
-            TryHeroSurfacePushResponse(3.7f, 0.0f, 0.35f);
+        if (((Hero *)g_hero_state)->b[0x1497] != 0) {
+            hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
         }
-        ptr59 = ((void*)gHeroState) + 0xF0;
-        SetViewSpaceVectorLength((s32) ptr59, (s32) ptr59, scalar135);
-        ApplyHeroModeTransform((s32) ptr59, (s32) ptr59, 0.004f);
+        ptr59 = ((void*)g_hero_state) + 0xF0;
+        cam_set_view_space_vector_length((s32) ptr59, (s32) ptr59, scalar135);
+        hero_apply_mode_transform((s32) ptr59, (s32) ptr59, 0.004f);
         break;
     case 0x8C:                                      /* switch 1 */
         qzero(D_00189F10);
-        ((Hero *)gHeroState)->f[0xF8/4] = -0.38333336f;
+        ((Hero *)g_hero_state)->f[0xF8/4] = -0.38333336f;
         break;
     case 0x62:                                      /* switch 1 */
-        FastVecSub((s32)((TI128*)v0), (s32)(gHeroState + 0x18A0), (s32)(gHeroState + 0x80));
-        ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(v0[0], v0[1]);
+        FastVecSub((s32)((TI128*)v0), (s32)(g_hero_state + 0x18A0), (s32)(g_hero_state + 0x80));
+        ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(v0[0], v0[1]);
         scalar24 = vec_length_xy((s32)((TI128*)v0));
         if (scalar24 > 0.2f) {
-            hp32 = (Hero *)gHeroState;
+            hp32 = (Hero *)g_hero_state;
             hp32->f[0x24B8/4] = 1.0f;
-            ((Hero *)gHeroState)->f[0x1A0/4] = FastMatrixHelperA(v0[0], v0[1]);
-            ((Hero *)gHeroState)->f[0x1B0/4] = scalar24;
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(v0[0], v0[1]);
+            ((Hero *)g_hero_state)->f[0x1B0/4] = scalar24;
             if (scalar24 < D_L09_001A7DAC[0][2]) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = D_L09_001A7DAC[0][1] * 0.016666668f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = D_L09_001A7DAC[0][1] * 0.016666668f;
             } else {
-                ((Hero *)gHeroState)->f[0x1B0/4] = D_L09_001A7DAC[1][1] * 0.016666668f;
+                ((Hero *)g_hero_state)->f[0x1B0/4] = D_L09_001A7DAC[1][1] * 0.016666668f;
             }
-            if (((Hero *)gHeroState)->b[0x22B4] == 1) {
-                ((Hero *)gHeroState)->f[0x1B0/4] = 0.015000001f;
+            if (((Hero *)g_hero_state)->b[0x22B4] == 1) {
+                ((Hero *)g_hero_state)->f[0x1B0/4] = 0.015000001f;
             }
         } else {
-            ((Hero *)gHeroState)->f[0x24B8/4] = 1.0f;
-            ((Hero *)gHeroState)->f[0x1A0/4] = (f32) ((Hero *)gHeroState)->f[0x18AC/4];
-            ((Hero *)gHeroState)->f[0x1B0/4] = 0.0f;
+            ((Hero *)g_hero_state)->f[0x24B8/4] = 1.0f;
+            ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x18AC/4];
+            ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
         }
         frameSlot1 = 1.0f;
-        if (((Hero *)gHeroState)->b[0x22B4] == 3) {
-            SteerHeroHeading(0, 0.03f, 0.3f, 0.093084246f);
-        } else if (((Hero *)gHeroState)->b[0x22B4] == 1) {
-            SteerHeroHeading(0, 0.03f, 0.3f, 0.13089971f);
-        } else if (((Hero *)gHeroState)->b[0x22B4] == 0) {
-            SteerHeroHeading(0, 0.03f, 0.3f, 0.13089971f);
+        if (((Hero *)g_hero_state)->b[0x22B4] == 3) {
+            hero_steer_heading(0, 0.03f, 0.3f, 0.093084246f);
+        } else if (((Hero *)g_hero_state)->b[0x22B4] == 1) {
+            hero_steer_heading(0, 0.03f, 0.3f, 0.13089971f);
+        } else if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
+            hero_steer_heading(0, 0.03f, 0.3f, 0.13089971f);
         }
-        if (((Hero *)gHeroState)->b[0x22B4] == 0) {
-            ApplyHeroModePoseOffsets();
+        if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
+            hero_apply_mode_pose_offsets();
         }
-        ApproachHeroSpeed(frameSlot1 * 0.005f, 0.0055555557f);
-        ComputeHeroPushDirection(99999.0f);
-        if (((Hero *)gHeroState)->b[0x22B4] == 0) {
+        hero_approach_speed(frameSlot1 * 0.005f, 0.0055555557f);
+        hero_compute_push_direction(99999.0f);
+        if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
             ClipHeroVelocityAgainstWall(1);
         }
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0x110, 0.0069444445f);
-            CancelHeroVelocityIntoWall();
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0x110, 0.0069444445f);
+            hero_cancel_velocity_into_wall();
             break;
         }
-        ApplyHeroModeTransform((s32) ((void*)gHeroState) + 0xF0, (s32) ((void*)gHeroState) + 0xF0, 0.015000001f);
+        hero_apply_mode_transform((s32) ((void*)g_hero_state) + 0xF0, (s32) ((void*)g_hero_state) + 0xF0, 0.015000001f);
         break;
     case 0x63:                                      /* switch 1 */
-        FastVecSub((s32)((TI128*)v0), (s32)(gHeroState + 0x18A0), (s32)(gHeroState + 0x80));
-        if (FastVecDot((s32)((TI128*)v0), (s32)(gHeroState + 0x160)) < 0.0f) {
-            ClearVector128((s32)(gHeroState + 0x160));
+        FastVecSub((s32)((TI128*)v0), (s32)(g_hero_state + 0x18A0), (s32)(g_hero_state + 0x80));
+        if (FastVecDot((s32)((TI128*)v0), (s32)(g_hero_state + 0x160)) < 0.0f) {
+            vec_clear_128((s32)(g_hero_state + 0x160));
         }
-        ClearVector128((s32)(gHeroState + 0xF0));
-        ShrinkHeroVectorByAmount(0.0075000003f);
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        hero_shrink_vector_by_amount(0.0075000003f);
         ClipHeroVelocityAgainstWall(0);
-        if (((Hero *)gHeroState)->h[0x34E/2] != 0) {
-            ApplyHeroModeTransform((s32) ((void*)(gHeroState + 0xF0)), (s32) ((void*)(gHeroState + 0x18A0)) - 0x1790, 0.0069444445f);
-            CancelHeroVelocityIntoWall();
+        if (((Hero *)g_hero_state)->h[0x34E/2] != 0) {
+            hero_apply_mode_transform((s32) ((void*)(g_hero_state + 0xF0)), (s32) ((void*)(g_hero_state + 0x18A0)) - 0x1790, 0.0069444445f);
+            hero_cancel_velocity_into_wall();
             break;
         }
-        ApplyHeroModeTransform((s32) ((void*)(gHeroState + 0xF0)), (s32) ((void*)(gHeroState + 0xF0)), 0.015000001f);
+        hero_apply_mode_transform((s32) ((void*)(g_hero_state + 0xF0)), (s32) ((void*)(g_hero_state + 0xF0)), 0.015000001f);
         break;
     case 0x3C:                                      /* switch 1 */
     case 0x64:                                      /* switch 1 */
-        ClearVector128((s32)(gHeroState + 0xF0));
+        vec_clear_128((s32)(g_hero_state + 0xF0));
         break;
     case 0x65:                                      /* switch 1 */
-        ClearVector128((s32)(gHeroState + 0xF0));
-        if (((f32) ((Hero *)gHeroState)->i[0x18C0/4] * 0.5f) < (((Hero *)gHeroState)->f[0x334/4] - ((Hero *)gHeroState)->f[0x88/4])) {
-            ((Hero *)gHeroState)->f[0xF8/4] = -0.004166667f;
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        if (((f32) ((Hero *)g_hero_state)->i[0x18C0/4] * 0.5f) < (((Hero *)g_hero_state)->f[0x334/4] - ((Hero *)g_hero_state)->f[0x88/4])) {
+            ((Hero *)g_hero_state)->f[0xF8/4] = -0.004166667f;
         } else {
-            ((Hero *)gHeroState)->f[0xF8/4] = -0.016666668f;
+            ((Hero *)g_hero_state)->f[0xF8/4] = -0.016666668f;
         }
         break;
     case 0x79:                                      /* switch 1 */
-        EmitHeroRadialParticles();
+        part_emit_hero_radial_particles();
         /* fallthrough */
     case 0x78:                                      /* switch 1 */
-        ClearVector128((s32)(gHeroState + 0xF0));
-        M2C_FIELD(((void*)(gHeroState + 0xF0)), f32* , 8) = -0.016666668f;
+        vec_clear_128((s32)(g_hero_state + 0xF0));
+        M2C_FIELD(((void*)(g_hero_state + 0xF0)), f32* , 8) = -0.016666668f;
         break;
     case 0x60:                                      /* switch 1 */
     case 0x61:                                      /* switch 1 */
-        ClearVector128((s32)(gHeroState + 0xF0));
+        vec_clear_128((s32)(g_hero_state + 0xF0));
         break;
     }
-    if (frameSlot15 != ((Hero *)gHeroState)->i[0x2298/4]) {
-        ((Hero *)gHeroState)->i[0x1C0/4] = 0;
+    if (frameSlot15 != ((Hero *)g_hero_state)->i[0x2298/4]) {
+        ((Hero *)g_hero_state)->i[0x1C0/4] = 0;
     }
     if (frameSlot16 != M2C_FIELD(ptr21, u8* , 0x43)) {
-        ((Hero *)gHeroState)->i[0x1C4/4] = 0;
+        ((Hero *)g_hero_state)->i[0x1C4/4] = 0;
     }
 }
 

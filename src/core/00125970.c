@@ -17,7 +17,7 @@ extern char r1_D_00153130[];
  * 9 bytes before the end and compare it against a build number. Same
  * open/read/close triplet as r1_func_0012D2A0 above. */
 /* Reads a small text file from disc and checks if the build number in it is newer than a fixed number. */
-int func_00125970(void) {
+int load_check_build_number_file(void) {
     int fd;
     char buf[0x100];
     char *writePtr;
@@ -63,7 +63,7 @@ extern int r1_func_00121D18(void);
 
 /* rac1-decomp src/core/00121D18.c: func_00125A20 */
 /* Fills a display settings structure for the given picture format, size and position, based on the TV mode. */
-void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short dy) {
+void sceGsSetDefDispEnv(GsDispEnv *disp, short psm, short w, short h, short dx, short dy) {
     GsGParam *gParam;
     int dx1, dy1, dx2, dy2;
     int mode;
@@ -148,7 +148,7 @@ void func_00125A20(GsDispEnv *disp, short psm, short w, short h, short dx, short
  * privileged registers, picking the register set by the mode flag at
  * offset 6 of the GParam block (r1_func_00121D08's return). */
 /* Writes the display settings to the graphics chip registers. */
-void func_00125D94(GsDispEnv *env) {
+void sceGsPutDispEnv(GsDispEnv *env) {
     GsGParam *gParam = r1_func_00121D08();
 
     if (gParam->version == 1) {

@@ -42,23 +42,23 @@ typedef struct {
 } PoseMoby;
 typedef struct { unsigned char data[256]; } AttachObject;
 
-extern AttachObject *D_L01_001B255C __attribute__((sda));
+extern AttachObject *g_moby_l01_table __attribute__((sda));
 extern PoseRecord *D_L01_001B264C MACRO_ADDR;
 extern unsigned char D_001A7B0B[];
 extern unsigned char D_001A7B2A[];
-extern float func_00283180(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002AA150(float, float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_move_angle_toward_target(float, float, float);
+extern void moby_set_state(void *, int, int);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Eases into its table pose once its command byte is set, its linked moby is
    missing or dying (state 0xFE/0xFD), D_001A7B0B is clear or D_001A7B2A set;
    then sets bit 2 of its flags. */
 /* Moves the object smoothly to a set position and angle when triggered, then keeps it there. */
-void func_L01_00405300(PoseMoby *moby)
+void move_to_pose_update(PoseMoby *moby)
 {
     float position[4], rotation[4], delta[4];
     PoseMotion *p = moby->vars;
@@ -72,27 +72,27 @@ void func_L01_00405300(PoseMoby *moby)
         p->flags |= 1;
         qcopy(p->start_position, moby->position);
         qcopy(p->start_rotation, moby->rotation);
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (moby->command || p->link == -1 ||
-            gMobyTable_L01[p->link].data[0x20] == 0xfe ||
-            gMobyTable_L01[p->link].data[0x20] == 0xfd ||
+            g_moby_l01_table[p->link].data[0x20] == 0xfe ||
+            g_moby_l01_table[p->link].data[0x20] == 0xfd ||
             !D_001A7B0B[0] || D_001A7B2A[0])
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         moby->hit_slot = 255;
         break;
     case 2:
         p->t += 1.0f / p->duration;
         if (p->t > 1.0f) p->t = 1.0f;
-        blend = (1.0f - FastSinOrCosA(p->t * 3.1415927f)) * 0.5f;
+        blend = (1.0f - math_fast_sin_or_cos_a(p->t * 3.1415927f)) * 0.5f;
         FastVecSub(delta, D_L01_001B264C[p->index].position, p->start_position);
         FastVecScale(delta, delta, blend);
         FastVecAdd(moby->position, p->start_position, delta);
-        moby->rotation[2] = MoveAngleTowardTarget(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
-        moby->rotation[1] = MoveAngleTowardTarget(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
-        moby->rotation[0] = MoveAngleTowardTarget(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
-        if (p->t >= 1.0f) SetMobyState(moby, 3, -1);
+        moby->rotation[2] = math_move_angle_toward_target(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
+        moby->rotation[1] = math_move_angle_toward_target(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
+        moby->rotation[0] = math_move_angle_toward_target(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
+        if (p->t >= 1.0f) moby_set_state(moby, 3, -1);
         break;
     case 3:
         moby->flags |= 2;
@@ -100,6 +100,6 @@ void func_L01_00405300(PoseMoby *moby)
     }
     if (moby->state < 3) {
         FastVecSub(delta, moby->position, position);
-        CombineTransformsAndStore(p->track, delta, rotation, moby->rotation);
+        mat_combine_and_store(p->track, delta, rotation, moby->rotation);
     }
 }

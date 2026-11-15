@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,16 +31,16 @@ struct R192V {
     f32 w;
 } __attribute__((aligned(16)));
 
-extern f32 func_002A7878(f32, f32);
-extern void func_0029FCC0(void *, s32, struct R192V *);
-extern void func_002820D0(struct R192V *, s32, s32, f32, f32, f32);
+extern f32 math_random_float_range(f32, f32);
+extern void moby_transform_joint_to_world(void *, s32, struct R192V *);
+extern void gfx_draw_billboard_quad_with_uv(struct R192V *, s32, s32, f32, f32, f32);
 
 /* Draws a small glowing flash of random size at one joint of the robot enemy. */
-void func_003225C0(void *moby) {
+void robot_draw_joint_flash(void *moby) {
     struct R192V position;
     f32 size;
-    position.z += RandomFloatRange(0.1f, 0.4f);
-    TransformMobyJointToWorld(moby, 4, &position);
-    size = RandomFloatRange(0.5f, 0.75f);
-    DrawBillboardQuadWithUv(&position, 0x40, 0, size, RandomFloatRange(0.025f, 0.05f), 0.08f);
+    position.z += math_random_float_range(0.1f, 0.4f);
+    moby_transform_joint_to_world(moby, 4, &position);
+    size = math_random_float_range(0.5f, 0.75f);
+    gfx_draw_billboard_quad_with_uv(&position, 0x40, 0, size, math_random_float_range(0.025f, 0.05f), 0.08f);
 }

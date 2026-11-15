@@ -1,8 +1,8 @@
 #include "names.h"
-extern void func_L00_00310D30(unsigned char *, unsigned char *);
+extern void AdvanceAndDecodeAnimationFrames(unsigned char *, unsigned char *);
 
 /* Sets up an animation state from a source animation and optionally advances it right away. */
-void func_L00_00311080(unsigned char *source, unsigned char *state, int valueA, int valueB, int frameCount, int advanceNow)
+void initialize_moby_animation_blend(unsigned char *source, unsigned char *state, int valueA, int valueB, int frameCount, int advanceNow)
 {
     state[0x22] = source[0x43];
     state[0x20] = source[0x41];

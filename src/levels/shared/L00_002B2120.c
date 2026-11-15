@@ -14,31 +14,31 @@ typedef struct {
     unsigned char b22BE;
 } Hero_2B2120;
 
-extern Hero_2B2120 D_00189E20;
-extern int func_L00_002ADF80(void);
-extern void func_L00_002AFBF0(void);
-extern void func_L00_002B0968(char *);
-extern void func_L00_002D4A38(void);
-extern void func_L00_002A7E60(void);
-extern void func_L00_002B1F90(void);
+extern Hero_2B2120 g_hero_state;
+extern int hero_is_in_special_kind_or_mode(void);
+extern void SpawnHeroItemMobies(void);
+extern void update_hero_item_mobys(char *);
+extern void level_fade_glow_colors(void);
+extern void hero_update_item_glow(void);
+extern void UpdateHeroSlotCallbacks(void);
 
 /* Sets the hero lock flags for the current state, then updates the hero item slots and related effects. */
-void func_L00_002B2120(void)
+void hero_update_items_and_flags(void)
 {
-    int mode = gHeroState.mode;
+    int mode = g_hero_state.mode;
 
-    if ((unsigned int)(mode - 0x15) < 2 || mode == 0x1F || IsHeroInSpecialKindOrMode() != 0) {
-        gHeroState.b22B7 = 1;
-        gHeroState.b22BC = 1;
+    if ((unsigned int)(mode - 0x15) < 2 || mode == 0x1F || hero_is_in_special_kind_or_mode() != 0) {
+        g_hero_state.b22B7 = 1;
+        g_hero_state.b22BC = 1;
     }
-    if (IsHeroInSpecialKindOrMode() != 0 || gHeroState.state == 0x31 || gHeroState.mode == 3 ||
-        gHeroState.state == 0x12 || gHeroState.state == 0x82)
-        gHeroState.b22BE = 1;
+    if (hero_is_in_special_kind_or_mode() != 0 || g_hero_state.state == 0x31 || g_hero_state.mode == 3 ||
+        g_hero_state.state == 0x12 || g_hero_state.state == 0x82)
+        g_hero_state.b22BE = 1;
     else
-        gHeroState.b22BE = 0;
+        g_hero_state.b22BE = 0;
     SpawnHeroItemMobies();
-    update_hero_item_mobys(gHeroState.moby);
-    FadeLevelGlowColors();
-    UpdateEquippedItemGlow();
+    update_hero_item_mobys(g_hero_state.moby);
+    level_fade_glow_colors();
+    hero_update_item_glow();
     UpdateHeroSlotCallbacks();
 }

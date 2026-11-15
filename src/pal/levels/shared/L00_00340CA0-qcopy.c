@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Quad __attribute__((mode(TI)));
 typedef struct {
@@ -10,23 +11,23 @@ typedef struct {
     union { Quad q; float f[4]; } position;
     float payload[8];
 } Particle;
-extern Particle *func_002B9030(int);
-extern int func_00283CF0(float);
+extern Particle *part_alloc(int);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 extern unsigned char *D_L00_001FEAAC;
 
 Particle *func_PAL_L00_00340CA0(float life,float rotation,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
 {
     Particle *p;
     if(!size) return 0;
-    p=func_002B9030(0x5b);
+    p=part_alloc(0x5b);
     if(p) {
         float *out;
         p->position.q=*position;
-        p->position.f[3]=func_00283CE0(weight);
+        p->position.f[3]=IntToFloat(weight);
         p->color=color;
-        p->alpha=func_00283CF0(4.0f)-96;
+        p->alpha=FloatToInt(4.0f)-96;
         if(flags!=-1) p->b3=flags; else p->b3=0x48;
         p->b1=0;
         p->life=life;

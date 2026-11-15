@@ -5,16 +5,16 @@ typedef int TI __attribute__((mode(TI)));
 
 extern int D_001B53A0[];
 
-extern TI func_00334710(int, TI *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern float func_002831B0(float);
+extern TI hero_copy_vector_to_out(int, TI *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern float math_fast_angle_helper(float);
 
 /* Works out how far, as a signed angle, a point in front of the camera is turned away from the object. */
-float func_003348A8(u8 *moby, float distance) {
+float cam_compute_signed_angle_to_point(u8 *moby, float distance) {
     float base[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     float toPoint[4] __attribute__((aligned(16)));
@@ -25,7 +25,7 @@ float func_003348A8(u8 *moby, float distance) {
     float length;
     float angle;
 
-    CopyHeroVectorToOut((int)moby, (TI *)base);
+    hero_copy_vector_to_out((int)moby, (TI *)base);
     FastVecScale(offset, camera + 8, distance);
     FastVecAdd(offset, offset, base);
     FastVecSub(toPoint, offset, moby + 0x30);
@@ -37,7 +37,7 @@ float func_003348A8(u8 *moby, float distance) {
     if (length == 0.0f) {
         return 0.0f;
     }
-    angle = 1.5707964f - FastAngleHelper(sideDot / length);
+    angle = 1.5707964f - math_fast_angle_helper(sideDot / length);
     if (FastVecDot(toPoint, moby + 0x20) < 0.0f) {
         angle = -angle;
     }

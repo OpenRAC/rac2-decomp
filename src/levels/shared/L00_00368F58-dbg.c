@@ -8,10 +8,10 @@ extern float D_001B24DC __attribute__((sda));
 
 extern float D_001B24E0[];
 
-extern void func_002EF080(int);
+extern void SetTfragDists(int);
 
 /* Works out three scale values from the frame time, using a limit between 1 and 4, then updates the display. */
-void func_L00_00368F58(int force)
+void gfx_update_frame_time_scales(int force)
 {
     float value = 0.62f / D_001BD370;
     float four;

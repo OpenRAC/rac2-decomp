@@ -6,14 +6,14 @@ extern int D_L14_001B1680 __attribute__((sda));
 extern int D_L14_001B1684 __attribute__((sda));
 extern float D_L14_001B1678 __attribute__((sda));
 extern char D_L14_001B9500[];
-extern long func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern void func_002FC560(int, long);
+extern long GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern void VU1_addGSregister(int, long);
 typedef float RibbonVector[4] __attribute__((aligned(16)));
 typedef struct { float v[4]; } RibbonPoint;
 typedef int TI128 __attribute__((mode(TI)));
@@ -39,11 +39,11 @@ typedef struct {
     long primitive, texture, mode, flags;
 } RibbonMaterial;
 
-extern void func_L11_0046BC08(void *self);
-extern void func_L14_00422498(void *self);
-extern void func_L00_002E6EF8(void (*callback)(char *), void *object);
-extern void func_L14_004228C0(char *object);
-extern int func_00291308(float *position, float range, float radius, int color);
+extern void ResetBoltPointsToLine(void *self);
+extern void part_rebuild_lightning_bolt(void *self);
+extern void gfx_add_draw_callback_third(void (*callback)(char *), void *object);
+extern void gfx_draw_ribbon_pair(char *object);
+extern int gfx_add_point_light(float *position, float range, float radius, int color);
 
 extern int D_L14_001B1618 __attribute__((sda));
 extern float D_L14_001B1688 __attribute__((sda));
@@ -55,7 +55,7 @@ extern char D_L14_002594F0[][0x280];
 /* Moves the ribbon's head to the object's position, eases its height and adds it to the
    head; when the state is dirty, refreshes the newest four points of the ribbon's row from
    the shape table and queues the draw callback. On the first update it resets the state. */
-void func_L14_004221D8(char *self)
+void ribbon_update(char *self)
 {
     RibbonOwnerState *st = *(RibbonOwnerState **)(self + 0x68);
     float v[4] __attribute__((aligned(16)));
@@ -76,18 +76,18 @@ void func_L14_004221D8(char *self)
     ResetBoltPointsToLine(self);
 
     if (st->dirty != 0) {
-        RebuildLightningBolt(self);
+        part_rebuild_lightning_bolt(self);
         count = D_L14_001B1618;
         src = D_L14_001FE1C0[st->shape];
         for (i = count - 4; i < count; i++) {
             qcopy_nc(&D_L14_002594F0[st->row][i * 16], src + i * 16 + 0x10);
         }
-        AddDrawCallbackToList3(DrawRibbonPair, self);
+        gfx_add_draw_callback_third(gfx_draw_ribbon_pair, self);
     }
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         st->dirty = 0;
-        st->handle = AddPointLight((float *)&st->pos, 0.0f, 0.0f, 0);
+        st->handle = gfx_add_point_light((float *)&st->pos, 0.0f, 0.0f, 0);
         *(unsigned char *)(self + 0x20) = 1;
         st->count = D_L14_001B1618;
         st->coreColor = D_L14_001B1680;
@@ -99,7 +99,7 @@ void func_L14_004221D8(char *self)
 }
 
 /* Draws a scrolled core and a camera-facing halo, with colours from the owner. */
-void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAlpha, int count, float coreWidth, float haloWidth, float extend)
+void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int alpha, int outerAlpha, int count, float coreWidth, float haloWidth, float extend)
 {
     RibbonVector coreVertices[4];
     RibbonMaterial core;

@@ -21,7 +21,7 @@ extern void func_328A38(s32 a, s32 b);
 /* Walks the 0x68 context's two counters: one stamps the record's byte 0x20D and the other
    gives the modulus the first is folded by, or zero when it is not positive. */
 /* Passes the turn to the next member of the creature's group. */
-void func_L08_00424ED0(char *moby) {
+void group_advance_turn(char *moby) {
     char *vars;
     s32 groupSize;
     if (*(u8 *)(moby + 0x21) == 0xFF) {
@@ -47,7 +47,7 @@ void func_L08_00424ED0(char *moby) {
 
 
 /* Stops the sounds this creature is playing and marks it as finished. */
-void func_L08_00425448(char *moby) {
+void creature_release_sounds(char *moby) {
     char *vars;
     vars = *(char **)(moby + 0x68);
     if (*(u8 *)(moby + 0x21) != 0xFF) {
@@ -63,7 +63,7 @@ void func_L08_00425448(char *moby) {
 }
 
 /* Returns 1 when the moby with this handle is missing or gone, otherwise 0. */
-s32 func_L08_004254D0(s32 handle) {
+s32 moby_handle_is_gone(s32 handle) {
     s32 table;
     s32 offset;
     s32 entry;
@@ -81,7 +81,7 @@ s32 func_L08_004254D0(s32 handle) {
 }
 
 /* Returns 1 when the moby with this handle is missing, gone, or past its early states, otherwise 0. */
-s32 func_L08_00425518(s32 handle) {
+s32 moby_handle_is_past_early_state(s32 handle) {
     s32 entry;
     s32 offset;
     u8 state;
@@ -100,36 +100,36 @@ s32 func_L08_00425518(s32 handle) {
 }
 
 
-extern f32 func_002A7878(f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern char D_00189EA0[];
+extern f32 math_random_float_range(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern char g_hero_position[];
 
 /* func_L08_00425628 is isolated in L08_00425628.c. */
 
-extern void func_L08_00425628(char *);
+extern void UpdateTaboraSwingTarget(char *);
 
 /* The swing angle is folded into the moby's frame and the subobject is ticked. */
 /* Picks a random spot around the creature (kept away from the hero), then picks its final target point. */
-void func_L08_004257A0(char *moby) {
+void creature_pick_random_target(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     f32 local[4];
     f32 minAngle = -3.1415927f;
     f32 maxAngle = 3.1415927f;
     f32 angle;
 
-    angle = RandomFloatRange(minAngle, maxAngle);
-    *(f32 *)(vars + 0x180) = FastSinOrCosA(angle) * (f32)*(u8 *)(vars + 0x20F);
-    angle = RandomFloatRange(minAngle, maxAngle);
-    *(f32 *)(vars + 0x184) = FastSinOrCosB(angle) * (f32)*(u8 *)(vars + 0x20F);
+    angle = math_random_float_range(minAngle, maxAngle);
+    *(f32 *)(vars + 0x180) = math_fast_sin_or_cos_a(angle) * (f32)*(u8 *)(vars + 0x20F);
+    angle = math_random_float_range(minAngle, maxAngle);
+    *(f32 *)(vars + 0x184) = math_fast_sin_or_cos_b(angle) * (f32)*(u8 *)(vars + 0x20F);
     *(f32 *)(vars + 0x188) = 0.0f;
     FastVecAdd(vars + 0x180, vars + 0x180, vars + 0x170);
     *(f32 *)(vars + 0x188) = *(f32 *)(vars + 0x188) + 6.5f;
     if (*(s16 *)(vars + 0x1B6) != 0) {
-        FastVecSub(local, vars + 0x180, (void *)gHeroPosition);
+        FastVecSub(local, vars + 0x180, (void *)g_hero_position);
         *(s32 *)&local[2] = 0;
         vec_scale_to_length(local, local, 3.0f);
         FastVecAdd(vars + 0x180, vars + 0x180, local);
@@ -137,19 +137,19 @@ void func_L08_004257A0(char *moby) {
     UpdateTaboraSwingTarget(moby);
 }
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern f32 func_00282DF0(void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_L01_00337A60(void *, void *, void *, s32);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern f32 FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void math_closest_point_on_polygon_edge(void *, void *, void *, s32);
 extern int *D_L08_001FE7C0[];
 
 /* The actor's per-frame world transform: the record's own position goes through the
    model's matrix, is scaled, and is folded into the model; when the actor names a part,
    the part's table entry replaces it, and the model's own length ends up in the radius. */
 /* Works out the spot the creature aims at, bent around its leader when close, and shifts it by the path points. */
-void func_L08_004258D0(char *moby) {
+void creature_compute_aim_point(char *moby) {
     f32 offset[4];
     f32 ownOffset[4];
     f32 sideways[4];
@@ -187,7 +187,7 @@ void func_L08_004258D0(char *moby) {
     if (idx != -1) {
         int *list = D_L08_001FE7C0[idx];
 
-        ClosestPointOnPolygonEdge(vars + 0x180, vars + 0x180, (char *)list + 0x10, *list);
+        math_closest_point_on_polygon_edge(vars + 0x180, vars + 0x180, (char *)list + 0x10, *list);
     }
     *(f32 *)(vars + 0x188) = *(f32 *)(vars + 0x1C8);
 }
@@ -195,7 +195,7 @@ void func_L08_004258D0(char *moby) {
 /* func_L08_00425AA8 is isolated in L08_00425AA8.c. */
 
 /* Halves the size of the linked effect when it belongs to one of four certain kinds of moby. */
-void func_L08_00425EB0(char *moby) {
+void moby_halve_linked_scale(char *moby) {
     char *link;
     char *target;
     s16 classId;
@@ -214,39 +214,39 @@ void func_L08_00425EB0(char *moby) {
     }
 }
 
-extern void func_L08_00425398(char *);
-extern int func_002B0ED8(char *, char *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern char D_00189EA0[];
+extern void moby_update_ground_probe(char *);
+extern int moby_apply_damage_to_object(char *, char *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern char g_hero_position[];
 
 /* The record's whole per-frame pass: the sibling step, the aim vector copied out of the
    sub-object, the shared sprite pass, then the dispatch the shared tag call returns. */
 /* Runs the creature's body each frame and reacts to hits: pushes it back, and cleans up on death. */
-void func_L08_00425F28(char *moby) {
+void creature_update_hit_reaction(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     int hitResult;
 
-    UpdateGroundHeightProbe(moby);
+    moby_update_ground_probe(moby);
     *(f32 *)(moby + 0x2C) = *(f32 *)(*(char **)(moby + 0x24) + 0x24);
-    HalveLinkedMobyScale(moby);
-    hitResult = ApplyDamageToObject(moby, vars + 0x50, 0);
+    moby_halve_linked_scale(moby);
+    hitResult = moby_apply_damage_to_object(moby, vars + 0x50, 0);
     if (hitResult == 0) {
         return;
     }
     if (hitResult == 1) {
         float push[4];
 
-        FastVecSub(push, moby + 0x10, gHeroPosition);
+        FastVecSub(push, moby + 0x10, g_hero_position);
         vec_scale_to_length(vars + 0x1A0, push, 0.16666667f);
     } else {
         if (hitResult == 4) {
             *(unsigned char *)(vars + 0xC6) = 0;
             *(s32 *)(vars + 0xCC) = -1;
         }
-        AdvanceGroupTurn(moby);
+        group_advance_turn(moby);
     }
-    ReleaseCreatureSounds(moby);
+    creature_release_sounds(moby);
 }
 
 /* func_L08_00425FE8 is isolated in L08_00425FE8.c. */
@@ -258,11 +258,11 @@ void func_L08_00425F28(char *moby) {
 /* func_L08_00429238 is isolated in L08_00429238.c. */
 
 
-extern s32 D_L08_001B39A0[];
+extern s32 g_beam_slot_state[];
 extern s32 D_L08_001B39E0[];
 extern s32 D_L08_001B39F0[];
-extern s32 D_L08_001B3A30[];
-extern void func_00291450(s32 a0);
+extern s32 g_beam_slot_key[];
+extern void gfx_free_point_light(s32 a0);
 
 /* func_L08_004290E8 is isolated in L08_004290E8.c. */
 

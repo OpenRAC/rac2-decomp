@@ -3,18 +3,18 @@
 
 
 #include "common.h"
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00282DF0(float *);
-extern void func_00282F20(float *, float *, float);
-extern int func_002A7EA0(char *, char *, char *, int, float, float, float, float);
-extern float func_002AA2E8(float *, float, float);
-extern void func_002AA548(float *, char *, float, float, float, float);
-extern void func_002AAA00(char *, float, float, float, float, char *, int);
-extern float func_00283C80(float, float);
-extern int func_L02_0032E998(char *, int, float *, char *, int, char *, char *, float,
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(float *, float *, float *);
+extern float FastVecLength(float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern int moby_move_over_ground(char *, char *, char *, int, float, float, float, float);
+extern float ApproachValue(float *, float, float);
+extern void math_step_value_toward_target(float *, char *, float, float, float, float);
+extern void math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
+extern float FastDiffRots(float, float);
+extern int ComputeRegionRouteHeading(char *, int, float *, char *, int, char *, char *, float,
                              float);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Turns the actor toward its target and keeps the two angles it stores at +0x470 and
    +0x474 of its state; returns 1 when the actor's state changed. */
@@ -30,37 +30,37 @@ int func_PAL_L06_004235E8(char *a0, char *a1, float f1, float f2, float f3, floa
     float t;
     int ret = 0;
 
-    func_00282CF0(v, (float *)a1, (float *)(a0 + 0x10));
+    FastVecSub(v, (float *)a1, (float *)(a0 + 0x10));
     v[2] = 0.0f;
-    f24 = func_00282DF0(v);
+    f24 = FastVecLength(v);
     t = f2 * 0.0012f;
     if (f3 < f24) {
         int c = *(int *)(st + 0x480);
 
         out = 0.0f;
-        func_L02_0032E998(a0 + 0x10, (int)a1, &out, st + 0x260, c, st + 0x488,
+        ComputeRegionRouteHeading(a0 + 0x10, (int)a1, &out, st + 0x260, c, st + 0x488,
                           st + 0x48C, f4, 0.5f);
-        func_002AAA00(a0 + 0xF8, out, 0.005445428f,
+        math_approach_target_with_direction_mode(a0 + 0xF8, out, 0.005445428f,
                       0.005445428f, 0.35604724f, st + 0x474, 0);
-        if (func_00283C80(*(float *)(a0 + 0xF8), out) < 1.3089970350265503f) {
-            func_002AA548(&d, st + 0x470, f24, t, t, f2 * 0.020000001f);
+        if (FastDiffRots(*(float *)(a0 + 0xF8), out) < 1.3089970350265503f) {
+            math_step_value_toward_target(&d, st + 0x470, f24, t, t, f2 * 0.020000001f);
         } else {
             *(float *)(st + 0x470) = 0.0f;
         }
     } else {
-        func_002AAA00(a0 + 0xF8, f1, 0.005445428f,
+        math_approach_target_with_direction_mode(a0 + 0xF8, f1, 0.005445428f,
                       0.005445428f, 0.35604724f, st + 0x474, 0);
-        func_002AA2E8((float *)(st + 0x470), 0.0f, t);
+        ApproachValue((float *)(st + 0x470), 0.0f, t);
         if (*(float *)(st + 0x470) == 0.0f) {
-            if (func_00283C80(*(float *)(a0 + 0xF8), f1) < 0.0872664749622345f) {
+            if (FastDiffRots(*(float *)(a0 + 0xF8), f1) < 0.0872664749622345f) {
                 *(float *)(st + 0x474) = 0.0f;
                 ret = 1;
             }
         }
     }
-    func_00282F20(w, (float *)(a0 + 0xC0), *(float *)(st + 0x470));
-    func_00282CC0(x, w, (float *)(a0 + 0x10));
-    if (func_002A7EA0(a0, a0 + 0x10, (char *)x, 0, 0.8999999761581421f, 1.0f, 0.5f,
+    vec_scale_to_length(w, (float *)(a0 + 0xC0), *(float *)(st + 0x470));
+    FastVecAdd(x, w, (float *)(a0 + 0x10));
+    if (moby_move_over_ground(a0, a0 + 0x10, (char *)x, 0, 0.8999999761581421f, 1.0f, 0.5f,
                      0.7853982448577881f) == 0) {
         *(int *)(st + 0x5A8) = *(int *)(st + 0x5A8) + 1;
     }

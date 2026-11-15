@@ -81,12 +81,12 @@ typedef struct {
     float f2ec;
 } L01_003BFE48_STATE;
 
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_L01_003377C8(void *);
-extern void func_L01_003A6280(void *, void *, int, float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003BFDC8(void *, int, int, int);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void path_l01_compute_segment_lengths(void *);
+extern void moby_spawn_linked_helper(void *, void *, int, float, float);
+extern void moby_set_state(void *, int, int);
+extern void moby_set_animation_and_speed(void *, int, int, int);
 extern char *D_L01_001FE180[];
 extern float D_L01_001AFE50 __attribute__((sda));
 extern float D_L01_001AFE5C __attribute__((sda));
@@ -121,8 +121,8 @@ void func_PAL_L01_003C3C80(L01_003BFE48_OBJ *obj)
     s->fcf = -1;
     s->fd2 = -1;
     s->fd3 = -1;
-    s->f48 = func_00283CF0(40.0f);
-    s->f4a = func_00283CF0(28.0f);
+    s->f48 = FloatToInt(40.0f);
+    s->f4a = FloatToInt(28.0f);
     s->f2a = 48;
     s->f28 = 4;
     s->f29 = 1;
@@ -139,27 +139,27 @@ void func_PAL_L01_003C3C80(L01_003BFE48_OBJ *obj)
     s->f140 = 0.3490659f;
     s->f160 = 0.52359885f;
     s->f15c = D_L01_001AFE50 * 0.00040000002f;
-    func_002B60B0(obj, D_L01_001AFE74 * 0.00040000002f,
+    moby_set_controller_speed_limits(obj, D_L01_001AFE74 * 0.00040000002f,
                  D_L01_001AFE80 * 0.020000001f,
                  D_L01_001AFE78 * 6.981318e-06f,
                  D_L01_001AFE7C * 0.0003490659f);
     s->f28 = 3;
     obj->fbc = 0;
     if (s->f2c8 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c8]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[s->f2c8]);
     }
     if (s->f2c4 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c4]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[s->f2c4]);
     }
     if (s->f2c0 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c0]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[s->f2c0]);
     }
-    func_L01_003A6280(obj, (char *)obj + 0x10, 11, 1.2f, 2.0f);
+    moby_spawn_linked_helper(obj, (char *)obj + 0x10, 11, 1.2f, 2.0f);
     s->f2e1 = 1;
     s->f2e0 = 0;
     s->f2e2 = 0;
     s->f2e8 = obj->f18;
     s->f2ec = D_L01_001AFE5C;
-    func_002A7750(obj, 0, 1);
-    func_L01_003BFDC8(obj, 0, 0, 2);
+    moby_set_state(obj, 0, 1);
+    moby_set_animation_and_speed(obj, 0, 0, 2);
 }

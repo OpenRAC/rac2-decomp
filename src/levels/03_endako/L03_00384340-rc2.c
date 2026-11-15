@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -35,7 +36,7 @@ extern s8 ref_L03_00384340_06[];
 
 
 /* Updates a group of linked effect objects. At start it fills in each entry from two values, then it switches between two states depending on a timed check. */
-void func_L03_00384340(void *moby) {
+void linked_effect_group_update(void *moby) {
     void *mobyCopy  = moby;
     s32 *idList  = (*(s32 **)((s8 *)(moby) + (0x68)));
     s32 stateOrBase  = (*(u8 *)((s8 *)(moby) + (0x20)));

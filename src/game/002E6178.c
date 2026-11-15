@@ -14,16 +14,16 @@ typedef struct {
     EquipState *state;
 } EquipPiece;
 
-extern EquipPiece *func_0029EFD0(int);
-extern void func_002E6120(void);
-extern EquipPiece *D_00152C00;
-extern unsigned int D_001A7AF0 MACRO_ADDR;
+extern EquipPiece *CreateMoby(int);
+extern void hero_destroy_equipment_pieces(void);
+extern EquipPiece *g_hero_moby_default;
+extern unsigned int g_equipment_bits MACRO_ADDR;
 extern short D_001A8C28[] MACRO_ADDR, D_001A8C30[] MACRO_ADDR, D_001A8C38[] MACRO_ADDR, D_001A8C40[] MACRO_ADDR;
 extern short D_001A8C48[] MACRO_ADDR, D_001A8C50[] MACRO_ADDR, D_001A8C58[] MACRO_ADDR;
-extern EquipPiece *D_00214920[];
+extern EquipPiece *g_equipment_pieces[];
 
 /* Spawns the hero's equipment pieces from the equipment bits and flags them. */
-void func_002E6178(EquipPiece *base)
+void SpawnEquipmentPieces(EquipPiece *base)
 {
     EquipPiece **parts;
     EquipPiece **p;
@@ -33,12 +33,12 @@ void func_002E6178(EquipPiece *base)
     int chassis, partA, partB, partC, partD, partE, partF, count;
 
     if (!base)
-        base = gHeroMoby_00152C00;
-    DestroyEquipmentPieces();
+        base = g_hero_moby_default;
+    hero_destroy_equipment_pieces();
     count = 5;
     base->alpha = 255;
-    parts = gEquipmentPieces;
-    equipment = gEquipmentBits;
+    parts = g_equipment_pieces;
+    equipment = g_equipment_bits;
     chassis = (equipment >> 2) & 3;
     partA = (equipment >> 4) & 1;
     partB = (equipment >> 6) & 1;
@@ -65,9 +65,9 @@ void func_002E6178(EquipPiece *base)
     parts[count++] = CreateMoby(D_001A8C50[partE]);
     piece = parts[count++] = CreateMoby(D_001A8C50[partE]);
     piece->flags |= 0x8000;
-    if ((gEquipmentBits >> 12) & 1)
+    if ((g_equipment_bits >> 12) & 1)
         parts[count++] = CreateMoby(0x10E2 /* moby class 4322 */);
-    if ((gEquipmentBits >> 13) & 1)
+    if ((g_equipment_bits >> 13) & 1)
         parts[count++] = CreateMoby(0x10E4 /* moby class 4324 */);
     if (partF)
         parts[count] = CreateMoby(D_001A8C58[partF]);

@@ -1,26 +1,27 @@
+#include "names.h"
 /* func_PAL_L00_003BEE68, the PAL copy of func_L00_003BB1F8: the same C, where rename func_L00_003BD510 becomes func_PAL_L00_003C11A0; scale (char *)func_002A7820_1(8, 20); rename func_002EE178_1 becomes func_00282D30; rename func_802EE3D0_1 becomes func_00282F20; rename func_802EE138_1 becomes func_00282CF0; rename func_002A7878_2 becomes func_002A7878; rename func_002A7820_1 becomes func_002A7820. */
 #include "common.h"
 
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_002833F0(void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern float func_00282DF0(void *);
-extern void func_002ACF68(void *, void *, void *, int, float);
-extern int func_00277258(void *, int, void *, float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern float FastVecLength(void *);
+extern void mat_build_rotation_toward_vector(void *, void *, void *, int, float);
+extern int coll_test_point(void *, int, void *, float);
 extern char *D_L00_001BF218;
-extern char *D_0018C0B0;
+extern char *g_hero_moby;
 extern char D_L00_001BF230[];
 typedef struct { float x, y, z; int unused; float position[4]; } EffectLightRecord;
 extern EffectLightRecord D_L00_001C6F40[];
-extern float func_00282DB0(void *, void *);
-extern void func_00283028(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
 extern void func_PAL_L00_003C11A0(float *, float *, int, int);
-extern void func_002E5CF8(int, int, void *);
-extern void func_L00_003BC998(char *, char *);
+extern void PlayMobySound(int, int, void *);
+extern void spark_spawn_orbit(char *, char *);
 
 extern void func_802EE138_1(float *off, float *v, char *p);
 
@@ -65,34 +66,34 @@ char *func_PAL_L00_003BEE68(char *self)
     EffectLightRecord *light;
     int light_index;
     float f;
-    *(float *)(self + 0xF0) = func_00283B98(*(float *)(self + 0xF0), 0.062831864f);
-    *(float *)(self + 0xF4) = func_00283BE0(*(float *)(self + 0xF4), 0.015707966f);
+    *(float *)(self + 0xF0) = FastAddRotations(*(float *)(self + 0xF0), 0.062831864f);
+    *(float *)(self + 0xF4) = fast_subtract_rotations(*(float *)(self + 0xF4), 0.015707966f);
     *(int *)(self + 0xFC) = 0;
-    func_002833F0(self + 0xC0, self + 0xF0);
+    euler_rotation_basis(self + 0xC0, self + 0xF0);
     qcopy(saved, self + 0x10);
-    func_00282CC0(self + 0x10, ctx, self + 0x10);
-    func_002FEE70(*(int *)(ctx + 0x50), ctx, 0);
-    func_00300190(self + 0x10, self + 0x10);
-    func_00300248(ctx, ctx);
-    if (func_00282DF0(ctx) != 0.0f && func_00282DF0(ctx + 0x20) != 0.0f)
-        func_002ACF68(ctx, ctx, ctx + 0x20, 0, 0.075f);
-    if (func_00277258(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
+    FastVecAdd(self + 0x10, ctx, self + 0x10);
+    part_steer_effect_direction(*(int *)(ctx + 0x50), ctx, 0);
+    vec_transform_or_copy(self + 0x10, self + 0x10);
+    shop_trigger_current_state_effect(ctx, ctx);
+    if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
+        mat_build_rotation_toward_vector(ctx, ctx, ctx + 0x20, 0, 0.075f);
+    if (coll_test_point(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
         p = D_L00_001BF218;
-        if (p && p != D_0018C0B0 && *(short *)(p + 0xAA) != 0x5CA)
+        if (p && p != g_hero_moby && *(short *)(p + 0xAA) != 0x5CA)
             hit = (*(unsigned short *)(p + 0x34) & 0x1000) ? p : 0;
         qcopy(self + 0x10, D_L00_001BF230);
         func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
-        func_00283028(ctx, ctx, normal);
-        f = func_00282DB0(ctx, normal);
+        vec_fast_normalize(ctx, ctx, normal);
+        f = FastVecDot(ctx, normal);
         func_002EE178_1((char *)projection, (char *)normal, f);
         func_802EE138_1(remainder, (float *)ctx, (char *)projection);
         func_002EE178_1(ctx, (char *)projection, 0.85f);
-        func_00282CC0(ctx, remainder, ctx);
+        FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
         func_PAL_L00_003C11A0(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
         func_PAL_L00_003C11A0(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
-        func_002E5CF8(1, 0, self);
+        PlayMobySound(1, 0, self);
     }
     light_index = *(int *)(ctx + 0x5C);
     if (light_index != -1) {
@@ -115,7 +116,7 @@ char *func_PAL_L00_003BEE68(char *self)
         self[0x20] = 3;
     }
     if (*(int *)(ctx + 0x58) < 8)
-        func_L00_003BC998(self, (((int)((char *)func_002A7820_1(8, 20)) * 5 + 2) / 6));
+        spark_spawn_orbit(self, (((int)((char *)func_002A7820_1(8, 20)) * 5 + 2) / 6));
     return hit;
 }
 
@@ -163,7 +164,7 @@ extern Rac2Native_003BC998_Slot D_L00_0023F060[];
    in their own variables, and the two owner words are stored in the order 0x9C, 0x98, so that
    cc1 keeps the table base and the output pointer in registers and fills the delay slots the
    way retail does. */
-void func_L00_003BC998(char *owner, char *arg1);
+void spark_spawn_orbit(char *owner, char *arg1);
 
 /* Near miss: nonmatching/levels/func_L00_003BCDC0.c - every instruction present but the
    loop test is `sltu` here against retail's `slt`, and the base is derived from the end
@@ -180,7 +181,7 @@ void func_PAL_L00_003C11A0(float *position, float *direction, int count, int col
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
 /* The four floats are declared before the two other arguments, which sets the order this caller
    evaluates them in (the registers are the same either way). */
-extern void func_002833F0(void *out, void *in);
+extern void euler_rotation_basis(void *out, void *in);
 
 /* Copies the caller's 16-byte block into a stack scratch area, runs the three-argument starter on
    it, then fills the scratch area's upper half from the state block's 0xB4 float and the pair

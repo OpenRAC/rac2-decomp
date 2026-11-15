@@ -23,17 +23,17 @@ extern int D_001AA0F8 __attribute__((sda));
 extern int D_001AA0FC __attribute__((sda));
 extern int D_001AA104 __attribute__((sda));
 extern int D_001B170C;
-extern int D_001A8BB8;
-extern int D_001A79F0;
-extern int D_001A8BB0;
+extern int g_requested_game_mode;
+extern int g_current_map_index;
+extern int g_current_game_mode;
 extern int D_0018C2EC __attribute__((nosda));
 extern int D_001C4F40 __attribute__((nosda));
 extern int D_001A8B88[2];
 extern int D_001B1D50[2];
-extern void func_002858B0(int);
+extern void menu_set_setting(int);
 
 /* Starts a request for a slot, unless one is already running or the slot is blocked, and returns a code saying whether it started. */
-int func_002B49E0(int index, int mode, int argA, int argB, unsigned char *flag)
+int request_begin_slot(int index, int mode, int argA, int argB, unsigned char *flag)
 {
     int result;
     int entry;
@@ -41,7 +41,7 @@ int func_002B49E0(int index, int mode, int argA, int argB, unsigned char *flag)
     if (flag != 0)
         *flag = 0;
     result = -1;
-    if (gRequestedGameMode == -2)
+    if (g_requested_game_mode == -2)
         result = 0;
     if (mode == 1 && !(D_001AA100 < 8))
         result = -2;
@@ -55,23 +55,23 @@ int func_002B49E0(int index, int mode, int argA, int argB, unsigned char *flag)
     D_001AA0F8 = argA;
     D_001AA0FC = argB;
     D_001AA104 = (int)flag;
-    gRequestedGameMode = index;
-    if ((gCurrentMapIndex == 8 && D_001C4F40 == 1) || (gCurrentMapIndex == 0x13 && D_001C4F40 == 0)) {
+    g_requested_game_mode = index;
+    if ((g_current_map_index == 8 && D_001C4F40 == 1) || (g_current_map_index == 0x13 && D_001C4F40 == 0)) {
         if ((unsigned)(index - 3) < 2) {
             D_001B170C = 2;
             if (index == 4)
-                SetMenuSetting(2);
+                menu_set_setting(2);
         }
     }
-    if ((unsigned)(gCurrentMapIndex - 22) < 2) {
+    if ((unsigned)(g_current_map_index - 22) < 2) {
         if ((unsigned)(index - 3) < 2) {
             D_001B170C = 3;
             if (index == 4)
-                SetMenuSetting(3);
+                menu_set_setting(3);
         }
     }
     if (mode == 1) {
-        D_001B1D50[D_001AA100++] = gCurrentGameMode;
+        D_001B1D50[D_001AA100++] = g_current_game_mode;
     }
     return result;
 }

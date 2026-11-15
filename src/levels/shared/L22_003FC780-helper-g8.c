@@ -2,12 +2,12 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *func_0029EFD0(int);
-extern void func_00283360(void *);
+extern char *CreateMoby(int);
+extern void set_identity_rotation_rows(void *);
 extern int D_L22_001AF37C;
 
 /* Creates a moby of class 3643 linked to the owner at the given position, with a size scale; a nonzero flag gives it a staggered timer. */
-char *func_L22_003FC780(char *owner, TI128 *pos, int staggered, f32 scale) {
+char *linked_scaled_object_spawn_spin_shrink(char *owner, TI128 *pos, int staggered, f32 scale) {
     char *created = CreateMoby(0xE3B /* moby class 3643 */);
     if (created != 0) {
         u8 *ctl = *(u8 **)(created + 0x68);

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from public GNU GCC fp-bit.c (_fpadd_parts, double configuration).
  * https://github.com/gcc-mirror/gcc/blob/17b916df3d859b72736d537f6c2a98b2d76decf8/gcc/config/fp-bit.c
  * RAC2 adaptation updated on 21 October 2026. This distribution uses the GPLv3
@@ -7,15 +8,15 @@
 /* This is a software floating point library which can be used instead of
    the floating point routines in libgcc1.c for targets without hardware
    floating point.
- Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+ Copyright (C) 1994, 1995, 1996, 1997, 1998 free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+free Software Foundation; either version 2, or (at your option) any
 later version.
 
 In addition to the permissions in the GNU General Public License, the
-Free Software Foundation gives you unlimited permission to link the
+free Software Foundation gives you unlimited permission to link the
 compiled version of this file with other programs, and to distribute
 those programs without any restriction coming from the use of this
 file.  (The General Public License restrictions do apply in other
@@ -29,7 +30,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -82,10 +83,10 @@ typedef enum
 
 typedef DoubleParts fp_number_type;
 
-extern fp_number_type D_00141810;
+extern fp_number_type g_double_parts_nan;
 
 static __inline__ fp_number_type *nan_parts(void) {
-    return &gDoublePartsNaN;
+    return &g_double_parts_nan;
 }
 
 static __inline__ int fp_isnan(fp_number_type *number) {
@@ -101,7 +102,7 @@ static __inline__ int fp_iszero(fp_number_type *number) {
 }
 
 /* Adds two unpacked doubles and gives back the unpacked sum, handling zero, infinity and not-a-number. */
-fp_number_type *func_00122800(fp_number_type *a, fp_number_type *b,
+fp_number_type *fp_add_double_parts(fp_number_type *a, fp_number_type *b,
                               fp_number_type *tmp) {
   intfrac tfraction;
 

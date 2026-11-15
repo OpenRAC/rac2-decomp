@@ -8,7 +8,7 @@
 extern u8 D_001A7A0A;
 
 /* Resident byte, below the level's own region so the same address holds in every program. */
-unsigned char func_L00_002F43D0(void)
+unsigned char level_get_resident_byte(void)
 {
     return D_001A7A0A;
 }

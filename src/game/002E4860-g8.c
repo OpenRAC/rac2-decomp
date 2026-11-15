@@ -7,13 +7,13 @@
 
 extern s32 D_001A7B9C;
 extern s32 D_001A7BA0;
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 
 /* Sets the starting volume of each of the six sound groups. */
-void func_002E4860(void)
+void snd_set_default_group_volumes(void)
 {
     struct Layout { char reserved[0x48]; int group0Volume,group1Volume,group2Volume,group3Volume,group4Volume,group5Volume; };
-    struct Layout *soundState = (struct Layout *)gSoundState;
+    struct Layout *soundState = (struct Layout *)g_sound_state;
     int maxVolume = D_001A7BA0;
     soundState->group0Volume = maxVolume * 7 / 10;
     soundState->group1Volume = D_001A7B9C;

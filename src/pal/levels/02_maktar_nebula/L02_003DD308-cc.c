@@ -1,22 +1,23 @@
+#include "names.h"
 /* func_PAL_L02_003DD308, the PAL copy of func_L02_003D91A0: the same C, where rename func_002A96A0 becomes func_PAL_002AA108; rename func_002AB800 becomes func_PAL_002AC290; rename func_L02_003D9728 becomes func_PAL_L02_003DD890; rename func_L02_003D9E68 becomes func_PAL_L02_003DDFD0. */
 #include "common.h"
 
-extern int D_L02_001B359C[] __attribute__((sda));
+extern int g_moby_l02_pool[] __attribute__((sda));
 /* Read-only view: these loads may pass the state stores, as in retail. */
 extern const int D_L02_001B359C_1[] __attribute__((sda));
 extern int D_L02_001FF6B8[];
-extern int func_00283CF0(float);
-extern void func_002A04B8(char *, void *, void *, void *);
-extern void func_00282A60(void *, int, int);
-extern void func_L02_003DB6D8(char *);
-extern void *func_002A9640(char *, int, int);
+extern int FloatToInt(float);
+extern void get_moby_color(char *, void *, void *, void *);
+extern void mem_clear(void *, int, int);
+extern void brawler_switch_off_actor(char *);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern float func_PAL_002AA108(char *, void *);
 extern void func_PAL_002AC290(int, char *);
-extern void func_002A7750(char *, int, int);
-extern void func_002AF1D0(char *, char *, int, int);
-extern int func_002B3BA8(char *, int, int, int, float, float);
-extern void func_L02_003D4990(char *);
-extern void func_L02_003FC020(void *, void *);
+extern void moby_set_state(char *, int, int);
+extern void moby_copy_joint_transform_to_object(char *, char *, int, int);
+extern int weapon_select_aim_target(char *, int, int, int, float, float);
+extern void chainblade_advance_health_phase(char *);
+extern void arena_set_current_boss(void *, void *);
 extern void func_PAL_L02_003DD890(char *);
 extern void func_PAL_L02_003DDFD0(char *);
 
@@ -40,8 +41,8 @@ void func_PAL_L02_003DD308(char *self) {
     float amount;
     if (*(unsigned char *)(self + 0x20) == 0) {
         struct InitPrefix *initial = (struct InitPrefix *)state;
-        initial->flag = func_00283CF0(15.0f);
-        initial->limit = func_00283CF0(24.0f);
+        initial->flag = FloatToInt(15.0f);
+        initial->limit = FloatToInt(24.0f);
         initial->active = 1;
         initial->mode = 3;
         initial->blend = 0.5f;
@@ -59,11 +60,11 @@ void func_PAL_L02_003DD308(char *self) {
         entry = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
         *(unsigned short *)(entry + 0x34) |= 6;
         *(short *)(state + 0x286) = 50;
-        func_002A04B8(self, state + 0x270, state + 0x274, state + 0x278);
-        func_00282A60(state + 0x170, 0, 0x40);
-        func_00282A60(state + 0x1B0, 0, 0x40);
-        func_L02_003DB6D8(self);
-        *(char **)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C[0] + 0xB8) = self;
+        get_moby_color(self, state + 0x270, state + 0x274, state + 0x278);
+        mem_clear(state + 0x170, 0, 0x40);
+        mem_clear(state + 0x1B0, 0, 0x40);
+        brawler_switch_off_actor(self);
+        *(char **)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + g_moby_l02_pool[0] + 0xB8) = self;
         *(int *)(state + 0x250) = 0x40FF00EA;
         *(int *)(state + 0x258) = 0x40FF00EA;
         *(int *)(state + 0x264) = 0;
@@ -72,7 +73,7 @@ void func_PAL_L02_003DD308(char *self) {
         *(short *)(state + 0x282) = 0;
         return;
     }
-    damage = func_002A9640(self, 0x10000, 0);
+    damage = part_find_owned_effect_slot(self, 0x10000, 0);
     amount = func_PAL_002AA108(self, damage);
     if (damage && *(char **)(damage + 0x20)) {
         source = *(char **)(damage + 0x20);
@@ -93,21 +94,21 @@ void func_PAL_L02_003DD308(char *self) {
                     *(unsigned char *)(attacker + 0x43) != 255 ? *(unsigned char *)(attacker + 0x43)
                                                                : *(unsigned char *)(attacker + 0x42);
                 *(short *)(state + 0x28E) = *(unsigned char *)(self + 0xBC);
-                func_002A7750(self, 9, -1);
+                moby_set_state(self, 9, -1);
                 *(float *)(state + 0x24C) = 0.27925274f;
             }
             if (*(float *)(state + 0x20) <= 0.0f) {
                 *(float *)(state + 0x24C) = 0.5585055f;
-                func_002A7750(self, 10, -1);
+                moby_set_state(self, 10, -1);
             }
         }
     }
     *(unsigned char *)(self + 0xA8) = 255;
-    *(unsigned char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C[0] + 0xA8) = 255;
-    owner = (char *)(D_L02_001B359C[0] + (*(int *)(*(char **)(self + 0x68) + 0x244) << 8));
+    *(unsigned char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + g_moby_l02_pool[0] + 0xA8) = 255;
+    owner = (char *)(g_moby_l02_pool[0] + (*(int *)(*(char **)(self + 0x68) + 0x244) << 8));
     if (owner && *(char **)(*(char **)(self + 0x68) + 0x260))
-        func_002AF1D0(owner, *(char **)(*(char **)(self + 0x68) + 0x260), 4, 0);
-    *(short *)(state + 0x284) = func_002B3BA8(self, *(int *)(state + 0x268), 0, 0, 100.0f, 100.0f);
+        moby_copy_joint_transform_to_object(owner, *(char **)(*(char **)(self + 0x68) + 0x260), 4, 0);
+    *(short *)(state + 0x284) = weapon_select_aim_target(self, *(int *)(state + 0x268), 0, 0, 100.0f, 100.0f);
     part = *(char **)(state + 0x160);
     *(char **)(state + 0x240) = part;
     if (*(unsigned char *)(self + 0x20) != 3)
@@ -116,10 +117,10 @@ void func_PAL_L02_003DD308(char *self) {
         source = *(char **)(state + 0x264);
         if (source && *(unsigned char *)(source + 0x20) != 254 && *(unsigned char *)(source + 0x20) != 253 &&
             *(unsigned char *)(source + 0x20) >= 3) {
-            func_L02_003D4990(*(char **)(state + 0x264));
-            func_L02_003FC020(*(void **)(self + 0xB8), *(void **)(state + 0x264));
+            chainblade_advance_health_phase(*(char **)(state + 0x264));
+            arena_set_current_boss(*(void **)(self + 0xB8), *(void **)(state + 0x264));
         }
-        func_L02_003DB6D8(self);
+        brawler_switch_off_actor(self);
     }
     func_PAL_L02_003DD890(self);
     func_PAL_L02_003DDFD0(self);

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -47,15 +48,15 @@ s32 func_PAL_L16_0041C9E8(char *arg0) {
 /* func_L16_00419140 is defined in L16_00419140-g8.c. */
 
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern void func_00315728(char *, char *, s32, char *, f32);
 extern void func_00315948(char *, char *);
 
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
-extern s32 func_002829D8(char *);
-extern void func_L16_0041C948(char *);
-extern void func_002A7750(char *, s32, s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
+extern s32 vec_fast_helper_b(char *);
+extern void gfx_submit_subobject_angle_scale(char *);
+extern void moby_set_state(char *, s32, s32);
 
 
 /* func_L16_0041C990 is defined in L16_0041C990-g8.c. */

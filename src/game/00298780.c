@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_87e90c235703f6b4_LeafSelect9State15Layout {
@@ -12,6 +13,6 @@ typedef struct Rac2Native_87e90c235703f6b4_LeafSelect9State15Layout {
 extern Rac2Native_87e90c235703f6b4_LeafSelect9State15Layout D_001393E0_1;
 
 extern int D_001A7420_5;
-extern void func_00298780(void);
+extern void save_menu_select_entry_b(void);
 
 

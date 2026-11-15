@@ -1,9 +1,9 @@
 #include "names.h"
 /* Wraps an angle into [-pi, pi): shifts it by pi, takes the fractional part of the turn
    count and scales it back. */
-extern float func_00283CC8(float x, float *whole);
+extern float SplitFloatFraction(float x, float *whole);
 
-float func_002ABB18(float x)
+float math_wrap_angle_to_pi(float x)
 {
     float whole;
 

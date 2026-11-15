@@ -17,19 +17,19 @@ extern u8 *D_L03_001B2A1C __attribute__((sda));
 extern s32 D_L03_001B108C __attribute__((sda));
 extern u32 D_L03_001B1058 __attribute__((sda));
 
-extern void func_002A7750(void *entity, int a, int b);
-extern int func_002A77E0(int id);
+extern void moby_set_state(void *entity, int a, int b);
+extern int math_random_int_below(int id);
 
 /* The engine's particle and light helpers, called with the level's own copies. */
-extern void func_00282948(void *target);
-extern void func_00282978(void *target);
-extern void func_002AEC48(void *entity, void *target, int a, float f0, float f1);
-extern void func_002AFDD8(void *entity, void *out, void *target, int a);
-extern void func_0029FCC0(void *entity, int a, void *out);
-extern u8 *func_002BDCE8(void *p, float f0, float f1, float f2, int z, void *local,
+extern void math_fast_float_d(void *target);
+extern void FastDecTimer(void *target);
+extern void moby_update_eased_node(void *entity, void *target, int a, float f0, float f1);
+extern void vec_transform_by_object_or_given(void *entity, void *out, void *target, int a);
+extern void moby_transform_joint_to_world(void *entity, int a, void *out);
+extern u8 *SpawnSpinningSparkParticle(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
-extern int func_00283CF0(float f);
-extern void func_002B0990(void *entity, float *target, float f, int a, int b);
+extern int FloatToInt(float f);
+extern void value_set_and_smooth(void *entity, float *target, float f, int a, int b);
 
 /* The level's own float, reached through $gp. */
 extern float D_L03_001B1BF0 __attribute__((sda));
@@ -38,9 +38,9 @@ extern float D_L03_001B1BF0 __attribute__((sda));
 extern f32 D_L03_001B1C00 __attribute__((sda));
 extern f32 D_L03_001B1C04 __attribute__((sda));
 
-extern void func_002AB650(u8 *a0);
-extern s32 func_002B38B8();
-extern void func_L00_003294F0(unsigned char *entity, int enabled);
+extern void hero_copy_field_to_moby(u8 *a0);
+extern s32 flag_is_third_pending_set();
+extern void moby_set_flag_bit(unsigned char *entity, int enabled);
 
 /* What the engine builds a particle from: two words, then two floats. */
 typedef struct {
@@ -56,7 +56,7 @@ extern u8 *D_L03_001FB5A0[];
 /* Picks the entity's next behaviour.  A global word chooses it when it is not
  * negative; else the state's own counters do, each one running down as it is
  * used.  Every behaviour sets up its timers and calls. */
-void func_L03_003F62C8(u8 *entity) {
+void boss_choose_next_behaviour(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 sel;
 
@@ -72,16 +72,16 @@ void func_L03_003F62C8(u8 *entity) {
         state[0x30B]--;
         sel = 2;
     } else {
-        sel = RandomIntBelow(state[0x308] + 1);
+        sel = math_random_int_below(state[0x308] + 1);
     }
 
     switch (sel) {
     case 0:
-        SetMobyState(entity, 7, 3);
+        moby_set_state(entity, 7, 3);
         if (state[0x308] >= 2) {
             *(float *)(state + 0x2F8) = 0.6981318f;
             *(float *)(state + 0x2FC) = -0.6981318f;
-        } else if (RandomIntBelow(2) != 0) {
+        } else if (math_random_int_below(2) != 0) {
             *(float *)(state + 0x2F8) = 0.6981318f;
         } else {
             *(float *)(state + 0x2FC) = -0.6981318f;
@@ -90,12 +90,12 @@ void func_L03_003F62C8(u8 *entity) {
         break;
     case 1:
         *(u32 *)(state + 0x2E4) = 300;
-        SetMobyState(entity, 9, 4);
-        state[0x309] = RandomIntBelow(2) + 1;
+        moby_set_state(entity, 9, 4);
+        state[0x309] = math_random_int_below(2) + 1;
         break;
     case 2:
         *(u32 *)(state + 0x2E4) = D_L03_001B1058;
-        SetMobyState(entity, 12, 5);
+        moby_set_state(entity, 12, 5);
         state[0x309] = 1;
         break;
     }
@@ -103,7 +103,7 @@ void func_L03_003F62C8(u8 *entity) {
 
 /* Walks the entity's stream, storing 1 at +0x2D6 of every record whose halfword
  * at +0xAA is 0xFFC.  Twin of func_L01_003B5290 (same file layout, level 1). */
-void func_L03_0041D0A8(u8 *entity) {
+void sweeper_bot_mark_stream(u8 *entity) {
     u8 *list;
     u8 *p;
     u8 *base;
@@ -130,7 +130,7 @@ void func_L03_0041D0A8(u8 *entity) {
 }
 
 /* Same walk as func_L03_0041D0A8 after seeding two state halfwords. */
-void func_L03_0041E240(u8 *entity) {
+void rivet_bot_mark_stream(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u8 *list;
     u8 *p;
@@ -164,7 +164,7 @@ void func_L03_0041E240(u8 *entity) {
  * the record's own fields in.  The two blocks fill the FIRST particle's header again, and
  * the second one keeps its own pointer to the sub-record: both are the original's own
  * wording, and the compiler's schedule depends on it. */
-void func_L03_0041DFA8(u8 *entity) {
+void part_fire_blend_particles(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     float buf[4];
     ParticleSetup setup;
@@ -177,15 +177,15 @@ void func_L03_0041DFA8(u8 *entity) {
     u8 *data;
     u8 *data2;
 
-    FastFloatHelperD(state + 0x34C);
+    math_fast_float_d(state + 0x34C);
     FastDecTimer(state + 0x330);
     FastDecTimer(state + 0x332);
-    UpdateEasedNode(entity, state + 0x220, 0, 0.03f, 0.3f);
-    UpdateEasedNode(entity, state + 0x2A0, 1, 0.03f, 0.3f);
+    moby_update_eased_node(entity, state + 0x220, 0, 0.03f, 0.3f);
+    moby_update_eased_node(entity, state + 0x2A0, 1, 0.03f, 0.3f);
     timer = *(u16 *)(entity + 0x96);
     if (timer <= 0xFFFE)
         *(u16 *)(entity + 0x96) = timer + 1;
-    TransformVectorByObjectOrGiven(entity, buf, state + 0x1A0, 0);
+    vec_transform_by_object_or_given(entity, buf, state + 0x1A0, 0);
     f = buf[1] * D_L03_001B1BF0;
     *(float *)(entity + 0xF0) = f;
     /* The four words the engine reads the particle's setup from, in the order the
@@ -194,10 +194,10 @@ void func_L03_0041DFA8(u8 *entity) {
     setup.c = -0.02f;
     setup.d = 1.0f;
     setup.b = 0;
-    count = RandomIntBelow(16);
-    if (RandomIntBelow(2))
+    count = math_random_int_below(16);
+    if (math_random_int_below(2))
         count = -count;
-    TransformMobyJointToWorld(entity, 4, vec);
+    moby_transform_joint_to_world(entity, 4, vec);
     vec[2] += 0.1f;
     particle = SpawnSpinningSparkParticle(vec, 0.1f, 1.0f, 0.9f, count, &setup,
                              105000.0f, 0xDF204080, 0);
@@ -221,12 +221,12 @@ void func_L03_0041DFA8(u8 *entity) {
         data2[0xB] = particle[0xA];
     }
     if (entity[0x31] != 0)
-        SetValueAndStartSmoothChange(entity, (float *)(state + 0x360), 2.5f, 5, 1);
+        value_set_and_smooth(entity, (float *)(state + 0x360), 2.5f, 5, 1);
 }
 
 /* Sets the entity up for a shot: the state's own counter, its two blend rates and the
  * frame the shot was prepared on. */
-s32 func_L03_0041F090(u8 *entity) {
+s32 entity_prepare_shot(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     f32 f0;
     f32 f1;
@@ -235,7 +235,7 @@ s32 func_L03_0041F090(u8 *entity) {
     if (*(s32 *)(state + 0x284) == -1) return 0;
     if (entity[0x20] != 9) return 0;
 
-    if (IsThirdPendingFlagSet() == 0) {
+    if (flag_is_third_pending_set() == 0) {
         entity[0xA8] = 0xFF;
         f1 = D_L03_001B1C00 * 0.00027777778450399637f;
         f0 = D_L03_001B1C04 * 0.016666668f;
@@ -248,8 +248,8 @@ s32 func_L03_0041F090(u8 *entity) {
         *(f32 *)(state + 0x20) = (f32)v0;
         entity[0xA8] = 0xFF;
         *(u32 *)(entity + 0x98) = *(u32 *)(*(u8 **)(entity + 0x24) + 0x10);
-        CopyHeroField38ToMoby(entity);
-        SetObjectFlagBit(entity, 1);
+        hero_copy_field_to_moby(entity);
+        moby_set_flag_bit(entity, 1);
         return 1;
     }
     return 0;
@@ -276,7 +276,7 @@ extern s32 func_3240F0(u8 *a0);
 extern void func_324138(u8 *a0, s32 a1);
 
 /* Per-frame update of a scripted light moby: when the level is in mode 2 it flashes a colour and follows a timed cutscene step. */
-void func_L03_004198B0(u8 *entity) {
+void scripted_light_update(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 old, next, base, rem;
     s32 arg1, arg2, arg3;

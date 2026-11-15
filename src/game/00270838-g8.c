@@ -19,9 +19,9 @@ typedef struct {
 Def70838;
 extern Def70838 *D_001B1504 __attribute__((section(".sdata")));
 extern char *D_001B1380 __attribute__((section(".sdata")));
-extern char D_00189E20[], D_00189EA0[];
-extern int func_002ACBC8(void *, int);
-int func_00270838(unsigned char *cur, unsigned char *other) {
+extern char g_hero_state[], g_hero_position[];
+extern int IsPointInCuboid(void *, int);
+int Camera_ActivationCheckPriority(unsigned char *cur, unsigned char *other) {
     unsigned char *state = (unsigned char *)cur+0x74;
     if ((unsigned char)cur[0x7c]==0) return 0;
     {
@@ -44,11 +44,11 @@ int func_00270838(unsigned char *cur, unsigned char *other) {
         case 4: {
             Info70838 *info = D_001B1504[*(short *)(cur+0x84)].info;
             if (other && *(short *)(other+0x7e)==0 && !(state[8]>(unsigned char)other[0x7c])) return 0;
-            if (IsPointInCuboid(gHeroPosition, info->clip)) return 1;
+            if (IsPointInCuboid(g_hero_position, info->clip)) return 1;
             break;
         }
         case 7: {
-            char *base = gHeroState;
+            char *base = g_hero_state;
             short e = *(short *)(cur+0x86);
             if (e!=*(int *)(base+0x24a0)) return 0;
             if (*(short *)(other+0x7e)==0 && !(state[8]>(unsigned char)other[0x7c])) return 0;

@@ -28,7 +28,7 @@ extern int D_L06_001B2374 __attribute__((sda));
 
 /* shared native body of family bc82131e */
 /* Writes a number as text, with a space or comma between each group of three digits. */
-void func_002F9BC0(char *dst, int value)
+void text_format_number_with_separators(char *dst, int value)
 {
     if (value > 999999)
         func_00115DA8_1(dst, D_L00_001AD6B0, value / 1000000, (value / 1000) % 1000, value % 1000);
@@ -47,33 +47,33 @@ void func_002F9BC0(char *dst, int value)
 
 
 extern volatile int D_001A7A20[] __attribute__((sda));
-extern void func_002FAD68(int);
+extern void shop_mark_item_owned(int);
 
 /* Marks each special weapon bought this visit as owned in the shop list, then clears the
    flag that triggered it. */
-void func_002FADB0(void)
+void shop_mark_bought_special_items_owned(void)
 {
-    if (D_001A7A20[0] & 1) MarkShopItemOwned(12);
-    if (D_001A7A20[0] & 2) MarkShopItemOwned(53);
-    if (D_001A7A20[0] & 4) MarkShopItemOwned(17);
-    if (D_001A7A20[0] & 8) MarkShopItemOwned(14);
-    if (D_001A7A20[0] & 16) MarkShopItemOwned(18);
+    if (D_001A7A20[0] & 1) shop_mark_item_owned(12);
+    if (D_001A7A20[0] & 2) shop_mark_item_owned(53);
+    if (D_001A7A20[0] & 4) shop_mark_item_owned(17);
+    if (D_001A7A20[0] & 8) shop_mark_item_owned(14);
+    if (D_001A7A20[0] & 16) shop_mark_item_owned(18);
     D_001A7A20[0] &= ~128;
 }
 
 
-extern void func_002B7AD0(void);
+extern void load_request_disc_read_break(void);
 extern int ref_L00_002FB170_00[];
 
 /* Stops the shop preview and clears its two active flags. */
-void func_002FB170(void) { RequestDiscReadBreak(); ref_L00_002FB170_00[0x23] = 0; ref_L00_002FB170_00[0x22] = 0; }
+void shop_clear_preview(void) { load_request_disc_read_break(); ref_L00_002FB170_00[0x23] = 0; ref_L00_002FB170_00[0x22] = 0; }
 
 
 typedef struct { int key; int value; } Func002FBFB8Entry;
 extern Func002FBFB8Entry D_00264F70[];
 
 /* Looks up a key in the table and returns its matching value, or -1 if it is not there. */
-int func_002FBFB8(int key)
+int game_lookup_table_value_by_key(int key)
 {
     if (D_00264F70[0].key >= 0) {
         Func002FBFB8Entry *entry = D_00264F70;
@@ -88,12 +88,12 @@ int func_002FBFB8(int key)
 }
 
 
-extern int func_002FBFB8(int);
+extern int game_lookup_table_value_by_key(int);
 extern unsigned char D_001395B8[];
 /* Checks one bit of the save byte that belongs to a key; returns 1 if it is set. */
-int func_002FC010(int key, int bit)
+int save_test_flag_bit_2(int key, int bit)
 {
-    int index = LookupTableValueByKey(key);
+    int index = game_lookup_table_value_by_key(key);
     if (index >= 0) {
         unsigned char value = D_001395B8[index] & (1 << bit);
         D_001395B8[index] = value;
@@ -103,7 +103,7 @@ int func_002FC010(int key, int bit)
 }
 
 /* Starts a transfer on DMA channel 0 from the given list address and waits until it is done. */
-void func_002FC070(int listAddress)
+void gfx_start_dma_channel0_and_wait(int listAddress)
 {
     while (((int)D0_CHCR) & 0x100)
         Fbbb7bee1_FUN_00282A38(16);
@@ -122,7 +122,7 @@ void func_002FC070(int listAddress)
 
 /* shared native body of family 74e6a904f3b4f71c (default profile) */
 /* Switches to the other of the two packet buffers and works out where drawing into it starts. */
-void func_002FC220(void)
+void gfx_swap_packet_buffer(void)
 {
     int nextBuffer;
     int target;

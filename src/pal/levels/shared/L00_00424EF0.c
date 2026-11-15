@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern float func_00283248(float x, float y);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern float func_002A7878(float a, float b);
-extern int func_00283CF0(float value);
-extern float D_L00_001B8DC0[];
-extern float func_002A7878(float a, float b);
-extern float func_002A78D8(float a, float b);
-extern int func_00283CF0(float a);
-extern float func_00283B98(float a, float b);
-extern void func_002AF000(float *p, float a, float b, float c);
+extern float mat_fast_helper_a(float x, float y);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern float math_random_float_range(float a, float b);
+extern int FloatToInt(float value);
+extern float g_camera_l00_position[];
+extern float math_random_float_range(float a, float b);
+extern float math_random_signed_float_range(float a, float b);
+extern int FloatToInt(float a);
+extern float FastAddRotations(float a, float b);
+extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 extern void func_PAL_002C23B8(float *out, float *in, int a2, int a3, unsigned int a4, int a5,
                            float f1, float f2, float f3, float f4, float f5);
 
@@ -32,25 +33,25 @@ void func_PAL_L00_004253C0(float *pos)
     int n;
     int id;
 
-    func_00282CF0(v, D_L00_001B8DC0, pos);
-    f28 = func_00283248(v[0], v[1]);
+    FastVecSub(v, g_camera_l00_position, pos);
+    f28 = mat_fast_helper_a(v[0], v[1]);
     n = 19;
     do {
         n--;
-        f21 = func_002A7878(0.5f, 1.0f);
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        size = func_002A7878(0.05f, 0.2f) * 210000.0f;
-        f20 = func_002A7878(0.0f, 1.3962636f);
-        r = func_00283B98(f28, func_002A78D8(0.0f, 1.3962636f));
-        func_002AF000(dir, f21 * (0.020000001f), r, f20);
-        r = func_002A78D8(0.0f, 0.1f);
+        f21 = math_random_float_range(0.5f, 1.0f);
+        id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        size = math_random_float_range(0.05f, 0.2f) * 210000.0f;
+        f20 = math_random_float_range(0.0f, 1.3962636f);
+        r = FastAddRotations(f28, math_random_signed_float_range(0.0f, 1.3962636f));
+        vec_build_spherical_offset(dir, f21 * (0.020000001f), r, f20);
+        r = math_random_signed_float_range(0.0f, 0.1f);
         out[0] = pos[0] + r;
-        r = func_002A78D8(0.0f, 0.1f);
+        r = math_random_signed_float_range(0.0f, 0.1f);
         out[1] = pos[1] + r;
-        r = func_002A78D8(0.0f, 0.1f);
+        r = math_random_signed_float_range(0.0f, 0.1f);
         out[2] = pos[2] + r;
         func_PAL_002C23B8(out, dir, 25, 127, 0x7F7F7F, id,
-                      func_002A7878(0.05f, 0.2f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
+                      math_random_float_range(0.05f, 0.2f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     } while (n >= 0);
 }
 

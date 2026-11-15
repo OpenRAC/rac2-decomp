@@ -5,14 +5,14 @@ extern float D_L05_001B1538 __attribute__((sda));
 extern float D_L05_001B1534 __attribute__((sda));
 extern float D_L05_001B1530 __attribute__((sda));
 extern char *D_L05_001BFB18 __attribute__((nosda));
-extern void func_00282F20(void *, void *, float);
-extern int func_00277F48(void *, float, int, char *, void *);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002A7820(int, int);
-extern char *func_002BDCE8(void *, float, float, float, float, int, void *, u32, int);
-extern int func_002A77E0(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern int coll_process_hit(void *, float, int, char *, void *);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int math_random_int_range(int, int);
+extern char *SpawnSpinningSparkParticle(void *, float, float, float, float, int, void *, u32, int);
+extern int math_random_int_below(int);
 
 typedef int ImpactTI __attribute__((mode(TI)));
 typedef union { ImpactTI q; float f[4]; } ImpactVector;
@@ -28,7 +28,7 @@ typedef struct {
 
 /* Queues an impact request (func_00277F48) from the object at pos, then, when the
    object in D_L05_001BFB18 has class 0x956, spawns twenty spark particles there. */
-void func_L05_004276E8(char *object, char *state, float *pos)
+void projectile_apply_impact_sparks(char *object, char *state, float *pos)
 {
     ImpactParams p;
     ImpactVector origin, direction;
@@ -51,7 +51,7 @@ void func_L05_004276E8(char *object, char *state, float *pos)
     p.type = 3;
     p.subtype = 2;
     p.id = *(unsigned short *)(object + 0xAA);
-    ProcessCollisionHit(pos, *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530,
+    coll_process_hit(pos, *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530,
                   1, *(char **)(state + 0x20), &p);
     if (D_L05_001BFB18 && *(short *)(D_L05_001BFB18 + 0xAA) == 0x956) {
         count = 20.0f;
@@ -59,19 +59,19 @@ void func_L05_004276E8(char *object, char *state, float *pos)
         spread = 2.0f;
         qcopy(&origin, object + 0x10);
         for (i = 0; (float)i < count; i++) {
-            pos[0] = origin.f[0] + RandomSignedFloatRange(0.0f, spread);
-            pos[1] = origin.f[1] + RandomSignedFloatRange(0.0f, spread);
-            pos[2] = origin.f[2] + RandomSignedFloatRange(0.0f, spread);
-            a = RandomAngle();
-            b = RandomAngle();
-            BuildSphericalOffset(&direction, 0.050000004f, a, b);
-            spin = RandomIntRange(-3, 3);
+            pos[0] = origin.f[0] + math_random_signed_float_range(0.0f, spread);
+            pos[1] = origin.f[1] + math_random_signed_float_range(0.0f, spread);
+            pos[2] = origin.f[2] + math_random_signed_float_range(0.0f, spread);
+            a = math_random_angle();
+            b = math_random_angle();
+            vec_build_spherical_offset(&direction, 0.050000004f, a, b);
+            spin = math_random_int_range(-3, 3);
             particle = SpawnSpinningSparkParticle(pos, 0.0f, 1.0f, 1.0f, speed * 210000.0f, spin,
                                      &direction, 0x7fffffff, 0);
             if (particle) {
                 *(short *)(particle + 0xA) = 120;
                 data = particle + 0x20;
-                particle[8] = RandomIntBelow(255);
+                particle[8] = math_random_int_below(255);
                 particle[3] = 0x44;
                 *(int *)(data + 4) = 2;
                 data[0xA] = 127;

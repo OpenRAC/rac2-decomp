@@ -5,13 +5,13 @@ extern float D_001AB9E4 __attribute__((sda));
 extern float D_001AB9E8 __attribute__((sda));
 extern float D_001B23A8;
 extern char *D_001A8CFC;
-extern int D_00138180[];
-extern int func_00336D50(void *, int);
-extern int func_002A9588(int, int, int, int, int);
-extern void func_00283388(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_0028FC48(int, int, int, int, u64, int);
-extern void func_00300AA8(int, int, void *, float, float, float);
+extern int g_pad_state[];
+extern int table_find_by_id(void *, int);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern void set_identity_matrix(void *);
+extern void FastVecScale(void *, void *, float);
+extern void AppendScreenRectPacket(int, int, int, int, u64, int);
+extern void DrawNativeQuads(int, int, void *, float, float, float);
 static __inline__ float menu_vector_offset(float value, float offset)
 {
     if (D_001B23A0 == 1) value += offset;
@@ -26,11 +26,11 @@ static __inline__ int menu_screen_y(float value, float offset)
 }
 
 /* Draws the up and down arrows and the frame beside the scrolling five-row menu list. */
-void func_002CEBD0(void) {
+void menu_draw_scroll_arrows_and_frame(void) {
     float vectors[16];
     int arrowSprite, dimColor, arrowColor, topY, bottomY;
-    arrowSprite = FindTableEntryById(D_001A8CFC + 0x8710, 74);
-    dimColor = PingPongBlendValues(0x60442D00, 0x55F0C070, 25, 0, 0);
+    arrowSprite = table_find_by_id(D_001A8CFC + 0x8710, 74);
+    dimColor = math_ping_pong_blend_values(0x60442D00, 0x55F0C070, 25, 0, 0);
     set_identity_matrix(vectors);
     vectors[0] = 0.0f;
     vectors[2] = menu_vector_offset(D_001B23A8, 0.07f);
@@ -38,7 +38,7 @@ void func_002CEBD0(void) {
     vectors[10] = 0.0f;
     FastVecScale(vectors, vectors, *(float *)((char *)arrowSprite + 12));
     FastVecScale(vectors+8, vectors+8, *(float *)((char *)arrowSprite + 12));
-    arrowColor = gPadState[0x1c0/4] & 0x1000 ? 0x80F0F0F0 : dimColor;
+    arrowColor = g_pad_state[0x1c0/4] & 0x1000 ? 0x80F0F0F0 : dimColor;
     DrawNativeQuads(arrowSprite, arrowColor, vectors, 58.0f, (float)menu_screen_y(457.0f, D_001AB9E4), 0.0f);
     vectors[0] = 0.0f;
     vectors[2] = menu_vector_offset(-D_001B23A8, -0.07f);
@@ -46,7 +46,7 @@ void func_002CEBD0(void) {
     vectors[10] = 0.0f;
     FastVecScale(vectors, vectors, *(float *)((char *)arrowSprite + 12));
     FastVecScale(vectors+8, vectors+8, *(float *)((char *)arrowSprite + 12));
-    arrowColor = gPadState[0x1c0/4] & 0x4000 ? 0x80F0F0F0 : dimColor;
+    arrowColor = g_pad_state[0x1c0/4] & 0x4000 ? 0x80F0F0F0 : dimColor;
     DrawNativeQuads(arrowSprite, arrowColor, vectors, 44.0f, (float)menu_screen_y(187.0f, D_001AB9E4), 0.0f);
     topY = menu_screen_y(278.0f, D_001AB9E8);
     bottomY = menu_screen_y(369.0f, D_001AB9E8);

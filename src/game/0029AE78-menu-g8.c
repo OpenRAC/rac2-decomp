@@ -5,16 +5,16 @@
 extern int D_001A9A50 __attribute__((sda)), D_001A9A54 __attribute__((sda)), D_001A9A58 __attribute__((sda));
 extern int D_001A9AD8 __attribute__((sda));
 extern int D_001A9AC8[4] __attribute__((sda));
-extern int D_001A8C64 MACRO_ADDR;
+extern int g_notice_owner MACRO_ADDR;
 extern char *D_001A8CFC MACRO_ADDR;
 extern char *D_001A8CFC_gp SDATA(D_001A8CFC);
 typedef struct { char pad[0x1C0]; int flags; int pad2[2]; int state; } MenuInput;
-extern MenuInput D_00138180;
-extern void func_0029BA58(void), func_0029B910(void);
-extern void func_0033A688(void *), func_0033A9F8(void *, int), func_0033A9E0(void *, int);
-extern int func_00349190(void *, void *), func_002ED8A0(int);
-extern void func_00349488(void *);
-extern void func_0033A9D0(char *, int, int);
+extern MenuInput g_pad_state;
+extern void menu_update_mission_select_enable(void), RefreshMissionMenuItems(void);
+extern void circle_menu_position_label(void *), circle_menu_set_enabled(void *, int), circle_menu_set_selection(void *, int);
+extern int UpdateDirectionSelection(void *, void *), table_find_last_used_entry(int);
+extern void menu_clear_field_150(void *);
+extern void circle_menu_set_entry_mode(char *, int, int);
 
 /* Mission record table entry (0x28 bytes). */
 typedef struct {
@@ -41,36 +41,36 @@ typedef struct {
     int text;                    /* +0x14 */
 } MissionMenuItem;
 
-extern MissionRecord D_00262940[];
-extern MissionMenuItem D_00256418[];
+extern MissionRecord g_mission_records[];
+extern MissionMenuItem g_mission_menu_items[];
 
 /* Refresh the four mission menu items from the mission IDs in D_001A9AC8:
  * a known mission's item gets its count, id and color and is passed to
  * func_0033A9D0 with 0, an unknown one with 2. */
-void func_0029B910(void) {
+void RefreshMissionMenuItems(void) {
     int i;
     int *ids;
     if (D_001A8CFC != 0) {
         ids = D_001A9AC8;
         for (i = 0; i < 4; i++) {
-            int idx = FindLastUsedChainEntry(ids[i]);
+            int idx = table_find_last_used_entry(ids[i]);
             if (idx >= 0) {
-                gMissionMenuItems[i].second = gMissionRecords[idx].count;
-                gMissionMenuItems[i].id = gMissionRecords[idx].level;
-                gMissionMenuItems[i].color = gMissionRecords[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
-                SetCircleMenuEntryMode(D_001A8CFC + 0x3F138, i, 0);
+                g_mission_menu_items[i].second = g_mission_records[idx].count;
+                g_mission_menu_items[i].id = g_mission_records[idx].level;
+                g_mission_menu_items[i].color = g_mission_records[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
+                circle_menu_set_entry_mode(D_001A8CFC + 0x3F138, i, 0);
             } else {
-                SetCircleMenuEntryMode(D_001A8CFC + 0x3F138, i, 2);
+                circle_menu_set_entry_mode(D_001A8CFC + 0x3F138, i, 2);
             }
         }
     }
 }
-int func_0029BB30(void) {
+int UpdateMissionSelectionMenu(void) {
  int result, changed;
  if (D_001A9A50 == 0) return -1;
- if (gNoticeOwner != 0) return -1;
+ if (g_notice_owner != 0) return -1;
  if (D_001A8CFC_gp != 0) {
-  UpdateMissionSelectMenuEnable();
+  menu_update_mission_select_enable();
   {
    int enabled = 0;
    switch (D_001A9A54) {
@@ -78,27 +78,27 @@ int func_0029BB30(void) {
     case 1:
      changed = 0;
      RefreshMissionMenuItems();
-     if (gPadState.flags & 0x10) {
+     if (g_pad_state.flags & 0x10) {
       D_001A9AD8 = 1;
-      gPadState.state = 2;
+      g_pad_state.state = 2;
      } else if (D_001A9AD8 != 0) {
       D_001A9AD8 = 0;
       changed = 1;
      }
-     PositionCircleMenuLabel(D_001A8CFC + 0x3F138);
+     circle_menu_position_label(D_001A8CFC + 0x3F138);
      enabled = D_001A9AD8;
      break;
     default: changed = 0; break;
    }
-   SetCircleMenuEnabled(D_001A8CFC + 0x3F138, enabled);
+   circle_menu_set_enabled(D_001A8CFC + 0x3F138, enabled);
   }
-  result = UpdateDirectionSelection(D_001A8CFC + 0x3C950, &gPadState);
-  if (result >= 0 && FindLastUsedChainEntry(D_001A9AC8[result]) < 0) result = -1;
+  result = UpdateDirectionSelection(D_001A8CFC + 0x3C950, &g_pad_state);
+  if (result >= 0 && table_find_last_used_entry(D_001A9AC8[result]) < 0) result = -1;
   if (changed) {
-   ClearMenuField0x150(D_001A8CFC_gp + 0x3C950);
+   menu_clear_field_150(D_001A8CFC_gp + 0x3C950);
    if (D_001A9A58 < 0) D_001A9A58 = result;
   }
-  SetCircleMenuSelection(D_001A8CFC + 0x3F138, result);
+  circle_menu_set_selection(D_001A8CFC + 0x3F138, result);
   return changed ? result : -1;
  }
  D_001A9A50--;

@@ -22,19 +22,19 @@ extern ParticleColors99268 D_L05_001AEC00;
 extern void func_33B330(void *, float, float, float);
 
 extern int D_L05_00221D3C;
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
 extern char *D_L05_001BFB18;
-extern void func_00283658(void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern int func_00283DB8(void *, float);
+extern void copy_matrix_rotation(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern int math_fast_helper_a(void *, float);
 
-extern int func_002ED688(char *);
+extern int moby_get_motion_data(char *);
 
-extern void func_002EE678(char *, int);
+extern void follower_set_state(char *, int);
 
 extern int func_002A7820_1(int, int);
 
@@ -45,13 +45,13 @@ extern int D_L05_00221D10[];
 extern int D_L05_00221D28;
 
 extern /* Clears all the link fields of an object so it is free again. */
-void func_L05_0037BB28(char *);
+void moby_clear_links(char *);
 
-extern void func_L05_0037BD40(char *);
+extern void group_swap_with_free_member(char *);
 
-extern void func_L05_0037BC08(char *);
+extern void group_free_members_and_self(char *);
 
-extern void func_L05_0037BF48(char *);
+extern void group_layout_members_in_grid(char *);
 
 extern float func_332B50(float, float);
 
@@ -77,33 +77,33 @@ typedef struct {
     int pad2;
 } Record233560;
 extern Record233560 D_L05_00233560[24];
-extern void func_L00_003F26C8(char *, char *);
-extern float func_002A7878(float, float);
-extern void func_00281EB8(void *, int, int, int, float, float, float);
+extern void gfx_draw_jittered_curve(char *, char *);
+extern float math_random_float_range(float, float);
+extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
 
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern int func_00282948(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecSub(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern int math_fast_float_d(void *);
 
 typedef unsigned int Quad37DA58 __attribute__((mode(TI)));
 extern char D_L05_001B96C0[];
-extern void func_00282F20(void *, void *, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern char *func_002C2210(void *, int, float, float, int, int, int, void *, int, float);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern int func_00283CF0(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern char *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern int FloatToInt(float);
 
 /* looks up an object, then sets flags, arms a stored value and calls one of two helper pairs before building a timer */
-void func_L05_0037B6D0(char *obj)
+void moby_start_movement_state(char *obj)
 {
     char *vars;
 
-    vars = (char *)GetMobyMotionData(obj);
+    vars = (char *)moby_get_motion_data(obj);
     if (vars == 0)
         return;
     if (*(int *)(vars + 288) == 0)
@@ -114,10 +114,10 @@ void func_L05_0037B6D0(char *obj)
 
         *(int *)(vars + 280) = one;
         counters[3] += one;
-        if (GetObjectStateValue(obj) != 5) {
-            SetFollowerState(obj, 4);
-            *(float *)(vars + 120) = (Rand() & 1) ? -1.0f : 1.0f;
-            if (Rand() & 1)
+        if (moby_get_state_value(obj) != 5) {
+            follower_set_state(obj, 4);
+            *(float *)(vars + 120) = (func_001163B0() & 1) ? -1.0f : 1.0f;
+            if (func_001163B0() & 1)
                 *(float *)(vars + 116) = -1.0f;
             else
                 *(float *)(vars + 116) = 1.0f;
@@ -125,7 +125,7 @@ void func_L05_0037B6D0(char *obj)
             *(int *)(vars + 112) = 0;
             *(int *)(vars + 124) = 0;
         } else {
-            SetFollowerState(obj, 7);
+            follower_set_state(obj, 7);
         }
         *(int *)(vars + 304) = func_002A7820_1(120, 500);
     } else {
@@ -133,10 +133,10 @@ void func_L05_0037B6D0(char *obj)
 
         *(int *)(vars + 280) = 1;
         counters[3] += 1;
-        if (GetObjectStateValue(obj) != 5)
-            SetFollowerState(obj, 4);
+        if (moby_get_state_value(obj) != 5)
+            follower_set_state(obj, 4);
         else
-            SetFollowerState(obj, 7);
+            follower_set_state(obj, 7);
         *(int *)(vars + 304) = func_002A7820_1(120, 500);
         *(int *)(vars + 252) = 0;
     }
@@ -147,12 +147,12 @@ void func_L05_0037B6D0(char *obj)
 
 
 /* Checks if the player is close enough, in front of the object and visible, and sets two flags for it. */
-void func_L05_0037B948(char *obj, int check, float range)
+void moby_check_player_in_view_and_range(char *obj, int check, float range)
 {
     float angles[4];
     float matrix[16];
     float sphere[4];
-    char *vars = (char *)GetMobyMotionData(obj);
+    char *vars = (char *)moby_get_motion_data(obj);
     float angle;
     float elevation;
     float limit;
@@ -174,19 +174,19 @@ void func_L05_0037B948(char *obj, int check, float range)
             return;
     }
     copy_matrix_rotation(matrix, obj + 0xC0);
-    GetEulerAnglesFromMatrix(matrix, angles);
-    angle = FastDiffRots(FastMatrixHelperA(
+    mat_get_euler_angles(matrix, angles);
+    angle = FastDiffRots(mat_fast_helper_a(
         *(float *)(*(char **)(vars + 0x120) + 0x10) - *(float *)(obj + 0x10),
         *(float *)(*(char **)(vars + 0x120) + 0x14) - *(float *)(obj + 0x14)), angles[2]);
     elevation = vec_distance_xy(*(char **)(vars + 0x120) + 0x10, obj + 0x10);
-    elevation = FastDiffRots(FastMatrixHelperA(elevation,
+    elevation = FastDiffRots(mat_fast_helper_a(elevation,
         *(float *)(*(char **)(vars + 0x120) + 0x18) - *(float *)(obj + 0x18)), 0.0f);
     if (angle <= limit && elevation <= limit)
         *(int *)(vars + 0x104) = 1;
     if (check) {
         qcopy(sphere, obj + 0x10);
         sphere[3] = 0.1f;
-        if (FastMathHelperA(sphere, 256.0f) == -1)
+        if (math_fast_helper_a(sphere, 256.0f) == -1)
             return;
     }
     *(int *)(vars + 0x108) = 1;
@@ -203,7 +203,7 @@ struct S_L05_0037BB28 {
     int f20;
 };
 
-void func_L05_0037BB28(char *object)
+void moby_clear_links(char *object)
 {
     struct S_L05_0037BB28 *p = (struct S_L05_0037BB28 *)func_379CA0(object);
 
@@ -218,9 +218,9 @@ void func_L05_0037BB28(char *object)
 }
 
 /* Returns the object's link value, or zero. */
-int func_L05_0037BB90(char *obj)
+int moby_get_link_value(char *obj)
 {
-    int *vars = (int *)GetMobyMotionData(obj);
+    int *vars = (int *)moby_get_motion_data(obj);
 
     if (vars == 0)
         return 0;
@@ -228,9 +228,9 @@ int func_L05_0037BB90(char *obj)
 }
 
 /* Returns 1 if the object is in use, else 0. */
-int func_L05_0037BBB8(char *obj)
+int moby_is_in_use(char *obj)
 {
-    int *vars = (int *)GetMobyMotionData(obj);
+    int *vars = (int *)moby_get_motion_data(obj);
 
     if (vars == 0)
         return 0;
@@ -240,24 +240,24 @@ int func_L05_0037BBB8(char *obj)
 }
 
 /* Frees an object from its parent and rearranges the remaining group members. */
-void func_L05_0037BE98(char *obj)
+void moby_release_from_group(char *obj)
 {
-    int *parentVars = (int *)GetMobyMotionData(obj);
+    int *parentVars = (int *)moby_get_motion_data(obj);
     char *child;
     int *groupVars;
 
     if (parentVars == 0)
         return;
-    if (GetObjectLinkValue(obj) != 0)
-        SwapObjectWithFreeGroupMember(obj);
+    if (moby_get_link_value(obj) != 0)
+        group_swap_with_free_member(obj);
     child = (char *)parentVars[4];
-    groupVars = (int *)GetMobyMotionData(child);
+    groupVars = (int *)moby_get_motion_data(child);
     groupVars[6] = groupVars[6] - 1;
-    ClearObjectLinks(obj);
+    moby_clear_links(obj);
     if (groupVars[6] < D_L05_00221D28)
-        FreeGroupMembersAndSelf(child);
+        group_free_members_and_self(child);
     else
-        LayoutGroupMembersInGrid(child);
+        group_layout_members_in_grid(child);
 }
 
 /* func_L05_0037BF48 is in L05_0037BF48.c. */
@@ -265,9 +265,9 @@ void func_L05_0037BE98(char *obj)
 /* func_L05_0037C160 is in L05_0037C160.c. */
 
 /* Stores a value on the object. */
-void func_L05_0037CDD8(char *obj, int value)
+void moby_l05_set_state_value(char *obj, int value)
 {
-    int *vars = (int *)GetMobyMotionData(obj);
+    int *vars = (int *)moby_get_motion_data(obj);
 
     if (vars != 0)
         *(int *)((char *)vars + 0x114) = value;
@@ -275,9 +275,9 @@ void func_L05_0037CDD8(char *obj, int value)
 
 
 /* Returns the value stored on the object, or zero. */
-int func_L05_0037CEB8(char *obj)
+int moby_get_state_value(char *obj)
 {
-    int *p = (int *)GetMobyMotionData(obj);
+    int *p = (int *)moby_get_motion_data(obj);
 
     if (p == 0)
         return 0;
@@ -297,10 +297,10 @@ struct S_L05_002A1800 {
 
 extern struct S_L05_002A1800 D_L05_002A1800[];
 
-extern int func_002ED8A0(int);
+extern int table_find_last_used_entry(int);
 
 /* Copies the default values into the working values of 15 table entries and picks one entry from a lookup. */
-void func_L05_0037D6E8(void)
+void table_reset_working_values(void)
 {
     int i;
 
@@ -308,7 +308,7 @@ void func_L05_0037D6E8(void)
         D_L05_002A1800[i].f14 = D_L05_002A1800[i].f0C;
     D_L05_002A1800[7].f14 = D_L05_002A1800[7].f0C;
     D_L05_002A1800[13].f14 = D_L05_002A1800[13].f0C;
-    i = FindLastUsedChainEntry(6);
+    i = table_find_last_used_entry(6);
     D_L05_002A1800[i].f14 = D_L05_002A1800[i].f10;
 }
 
@@ -316,7 +316,7 @@ void func_L05_0037D6E8(void)
 
 /* Emits count pairs of particles at position, jittering it each time; each pair drifts at a random
    angle around the flattened direction from position to the camera, and rises at a random speed. */
-void func_L05_0037DA58(float *position, int count, int color, int duration)
+void EmitParticlePairBurst(float *position, int count, int color, int duration)
 {
     float velocity[4], point[4], direction[4], axis[4], half[4];
     float size, angle;
@@ -329,23 +329,23 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
     vec_scale_to_length(half, direction, 0.5f);
     direction[2] = 0;
     for (i = 0; i < count; i++) {
-        size = RandomFloatRange(0.5f, 2.0f);
-        sign = RandomIntBelow(2);
+        size = math_random_float_range(0.5f, 2.0f);
+        sign = math_random_int_below(2);
         if (!sign) --sign;
-        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
-        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
-        vec_scale_to_length(velocity, velocity, RandomFloatRange(0.05f, 3.0f) * (1.0f/60.0f));
-        velocity[2] = RandomFloatRange(1.0f, 5.0f) * (1.0f/60.0f);
+        angle = math_random_float_range(-1.0471977f, 1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
+        vec_scale_to_length(velocity, velocity, math_random_float_range(0.05f, 3.0f) * (1.0f/60.0f));
+        velocity[2] = math_random_float_range(1.0f, 5.0f) * (1.0f/60.0f);
         FastVecAdd(point, position, half);
-        position[0] += RandomSignedFloatRange(0, 0.15f);
-        position[1] += RandomSignedFloatRange(0, 0.15f);
-        position[2] += RandomSignedFloatRange(0, 0.15f);
-        particle = SpawnGroundEffectParticle(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
+        position[0] += math_random_signed_float_range(0, 0.15f);
+        position[1] += math_random_signed_float_range(0, 0.15f);
+        position[2] += math_random_signed_float_range(0, 0.15f);
+        particle = part_spawn_ground_effect(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
         }
-        particle = SpawnGroundEffectParticle(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
+        particle = part_spawn_ground_effect(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
@@ -361,18 +361,18 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
 
 /* Walks the twenty-four records, and for each one the object owns updates it and, while it is
    not active, lays the three colours over its vector. */
-void func_L05_00398018(char *owner)
+void record_update_owned_effects(char *owner)
 {
     int i;
     for (i = 0; i < 24; i++) {
         Record233560 *record = &D_L05_00233560[i];
         float *position = &record->f[12];
         if (record->owner == owner) {
-            DrawJitteredCurve(owner, (char *)record);
+            gfx_draw_jittered_curve(owner, (char *)record);
             if (record->active == 0) {
-                DrawBillboardQuad_00281EB8(position, 0x31, 0x3F0000FF, 1, RandomFloatRange(0.065f, 0.1f) * 5.0f, 1.25f, 0.0f);
-                DrawBillboardQuad_00281EB8(position, 0x31, 0x5F7F7F7F, 1, RandomFloatRange(0.0325f, 0.06f) * 5.0f, 1.24f, 0.0f);
-                DrawBillboardQuad_00281EB8(position, 0xB, 0x1000003F, 1, RandomFloatRange(0.07f, 0.15f) * 5.0f, 1.23f, 0.0f);
+                gfx_draw_billboard_quad(position, 0x31, 0x3F0000FF, 1, math_random_float_range(0.065f, 0.1f) * 5.0f, 1.25f, 0.0f);
+                gfx_draw_billboard_quad(position, 0x31, 0x5F7F7F7F, 1, math_random_float_range(0.0325f, 0.06f) * 5.0f, 1.24f, 0.0f);
+                gfx_draw_billboard_quad(position, 0xB, 0x1000003F, 1, math_random_float_range(0.07f, 0.15f) * 5.0f, 1.23f, 0.0f);
             }
         }
     }
@@ -382,7 +382,7 @@ void func_L05_00398018(char *owner)
 /* Walks the twenty-four records: for each one the object owns, jitters its position, moves it to
    the object carrying its offset along, steps its six angles (faster while active), rebuilds its two
    vectors and interpolates between position and end; both timers then retire the record. */
-void func_L05_00398618(char *obj)
+void record_animate_owned(char *obj)
 {
     float delta[4] __attribute__((aligned(16)));
     int i;
@@ -393,9 +393,9 @@ void func_L05_00398618(char *obj)
             Record233560 *p = r;
             float *end = &p->f[16];
             float *pos = &p->f[8];
-            p->f[8] += RandomFloatRange(-0.1f, 0.1f);
-            p->f[9] += RandomFloatRange(-0.1f, 0.1f);
-            p->f[10] += RandomFloatRange(-0.1f, 0.1f);
+            p->f[8] += math_random_float_range(-0.1f, 0.1f);
+            p->f[9] += math_random_float_range(-0.1f, 0.1f);
+            p->f[10] += math_random_float_range(-0.1f, 0.1f);
             FastVecSub(delta, end, pos);
             qcopy(pos, obj + 0x10);
             FastVecAdd(end, pos, delta);
@@ -414,19 +414,19 @@ void func_L05_00398618(char *obj)
                 p->f[30] = FastAddRotations(p->f[30], p->f[33] * 50.0f);
                 p->f[31] = FastAddRotations(p->f[31], p->f[34] * 50.0f);
             }
-            p->f[0] = FastSinOrCosA(p->f[20]) * p->f[26];
-            p->f[1] = FastSinOrCosB(p->f[21]) * p->f[27];
-            p->f[2] = -FastSinOrCosB(p->f[22]) * p->f[28];
-            p->f[4] = FastSinOrCosA(p->f[29]) * p->f[35];
-            p->f[5] = FastSinOrCosB(p->f[30]) * p->f[36];
-            p->f[6] = -FastSinOrCosB(p->f[31]) * p->f[37];
+            p->f[0] = math_fast_sin_or_cos_a(p->f[20]) * p->f[26];
+            p->f[1] = math_fast_sin_or_cos_b(p->f[21]) * p->f[27];
+            p->f[2] = -math_fast_sin_or_cos_b(p->f[22]) * p->f[28];
+            p->f[4] = math_fast_sin_or_cos_a(p->f[29]) * p->f[35];
+            p->f[5] = math_fast_sin_or_cos_b(p->f[30]) * p->f[36];
+            p->f[6] = -math_fast_sin_or_cos_b(p->f[31]) * p->f[37];
             if (*(int *)(state + 0x24))
                 lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.55f);
             else
                 lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.4f);
-            if (FastFloatHelperD(&p->active)) {
+            if (math_fast_float_d(&p->active)) {
                 if (p->dying == 0) p->dying = 1;
-                if (FastFloatHelperD(&p->timer)) p->owner = 0;
+                if (math_fast_float_d(&p->timer)) p->owner = 0;
             }
         }
     }
@@ -437,7 +437,7 @@ void func_L05_00398618(char *obj)
 /* func_L05_00398F18 is in L05_00398F18.c. */
 
 /* Spawns a burst of particles around the object: debris, smoke and sparks. */
-void func_L05_00399268(char *obj)
+void EmitScaledParticleBurst(char *obj)
 {
     float pos[4];
     float vel[4];
@@ -493,7 +493,7 @@ void func_L05_00399268(char *obj)
         if (p) {
             d = p + 0x20;
             {
-                int index = Rand() % 2;
+                int index = func_001163B0() % 2;
                 p[3] = colors.v[index];
             }
             if (*(int *)(s + 0x3C))
@@ -517,7 +517,7 @@ void func_L05_00399268(char *obj)
 
 
 /* Fills in the starting values of the object's private variables. */
-void func_L05_003CD4C0(char *object)
+void moby_init_private_vars(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float *f = (float *)state;
@@ -556,7 +556,7 @@ void func_L05_003CD4C0(char *object)
 /* func_L05_003CFAB8 is in L05_0037B6D0-g8.c. */
 
 /* Converts an object id into a table index. */
-int func_L05_003CFC28(int classId)
+int moby_class_id_to_table_index(int classId)
 {
     if (classId == 0x971)
         return 4;
@@ -581,7 +581,7 @@ extern void func_33B330(void *, float, float, float);
 
 /* Gives the object its reach: the table's entry for the object's id picks the record, and
  * the record takes the cone the object was given. */
-void func_L05_003D0320(char *obj)
+void moby_init_reach_and_position(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
@@ -608,7 +608,7 @@ void func_L05_003D0320(char *obj)
 /* func_L05_003D0728 is in the sibling unit L05_003D0728-g8.c. */
 
 /* Picks a random point inside a box and moves it by a matrix. */
-void func_L05_003D08C0(float *out, char *matrix)
+void math_random_point_in_box_transformed(float *out, char *matrix)
 {
     out[0] = func_332B50(-1.0f, 1.0f);
     out[1] = func_332B50(-1.0f, 1.0f);
@@ -622,20 +622,20 @@ void func_L05_003D08C0(float *out, char *matrix)
 
 /* func_L05_003D0B20 is in L05_003D0B20-g8.c. */
 
-extern void func_002AFFD8(char *a0, char *a1, int a2);
+extern void cam_compute_view_direction(char *a0, char *a1, int a2);
 
-extern float *func_002AB1F0(char *a0);
+extern float *moby_get_private_value_0(char *a0);
 
-extern void func_00282D30(void *a0, void *a1, float a2);
+extern void FastVecScale(void *a0, void *a1, float a2);
 
-extern void func_00282CC0(void *a0, void *a1, void *a2);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
 
-extern void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
+extern void moby_rotate_toward_vector(void *a0, void *a1, void *a2, void *a3,
                               float f0, float f1, float f2, void *a4);
 
 /* Builds the pair of vectors the timer wants: the object's own matrix, scaled by the value the
  * looked-up sub-object holds, and that scaled matrix combined with the sub-object's table. */
-void func_L05_003D1058(char *a0, char *a1, char *a2, char *a3, float f0, float f1, float f2)
+void moby_build_timer_vectors_from_matrix(char *a0, char *a1, char *a2, char *a3, float f0, float f1, float f2)
 {
     float v0[4];
     float v1[4];
@@ -648,42 +648,42 @@ void func_L05_003D1058(char *a0, char *a1, char *a2, char *a3, float f0, float f
         return;
     if (*(unsigned char *)(a2 + 0x20) == 0xFD)
         return;
-    ComputeViewDirection(a0, (char *)v0, 1);
-    p = GetMobyPrivateValue0(a2);
+    cam_compute_view_direction(a0, (char *)v0, 1);
+    p = moby_get_private_value_0(a2);
     FastVecScale(v1, v0, *(float *)((char *)p + 0x10));
     FastVecAdd(v2, (float *)(a2 + 0x10), v1);
-    RotateObjectTowardVector(a0, a1, v2, a3, f0, f1, f2, v0);
+    moby_rotate_toward_vector(a0, a1, v2, a3, f0, f1, f2, v0);
 }
 
-extern void func_00282CF0(void *out, void *a, void *b);
+extern void FastVecSub(void *out, void *a, void *b);
 
-extern float func_00282DF0(void *v);
+extern float FastVecLength(void *v);
 
-extern void func_00282DD8(void *out, void *a, void *b);
+extern void FastVecCross(void *out, void *a, void *b);
 
-extern float func_00282DB0(void *a, void *b);
+extern float FastVecDot(void *a, void *b);
 
-extern void func_00282F20(void *out, void *in, float scale);
+extern void vec_scale_to_length(void *out, void *in, float scale);
 
-extern void func_00282D30(void *out, void *in, float scale);
+extern void FastVecScale(void *out, void *in, float scale);
 
-extern float func_00282C48(float x);
+extern float math_fabs(float x);
 
-extern float func_002831B0(float x);
+extern float math_fast_angle_helper(float x);
 
-extern float func_00283198(float x);
+extern float math_fast_sin_or_cos_b(float x);
 
-extern float func_00283180(float x);
+extern float math_fast_sin_or_cos_a(float x);
 
-extern void func_002ACF68(void *out, void *in, void *tmp, int mode, float value);
+extern void mat_build_rotation_toward_vector(void *out, void *in, void *tmp, int mode, float value);
 
-extern void func_002ACDE8(void *out, void *in, void *v);
+extern void vec_rotate_by_quaternion(void *out, void *in, void *v);
 
-extern float func_002703B0(void *obj, float p1, float p2, float p3, float p4, float p5);
+extern float math_step_spring_damper_stored(void *obj, float p1, float p2, float p3, float p4, float p5);
 
 /* Rotates an object onto a vector: builds the axis vectors, then hands the object a
    quaternion-like value scaled by the angle it makes with the target. */
-void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
+void moby_rotate_toward_vector(void *a0, void *a1, void *a2, void *a3,
                       float f0, float f1, float f2, void *a4)
 {
     float v0[4];
@@ -701,7 +701,7 @@ void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
     if (len == 0.0f)
         return;
     if (len < 1.5f) {
-        BuildRotationTowardVector(a1, a1, v0, 0, 0.5f);
+        mat_build_rotation_toward_vector(a1, a1, v0, 0, 0.5f);
         return;
     }
     FastVecCross(v1, v0, a1);
@@ -709,17 +709,17 @@ void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
     prod = FastVecLength(a1) * FastVecLength(v0);
     if (prod == 0.0f)
         return;
-    ang = FastAngleHelper(dot / prod);
+    ang = math_fast_angle_helper(dot / prod);
     diff = 1.5707964f - ang;
-    if (FloatAbs(diff) > 2.879793643951416f) {
+    if (math_fabs(diff) > 2.879793643951416f) {
         FastVecCross(v2, a1, a4);
         FastVecCross(v1, v2, a1);
     }
     vec_scale_to_length(v1, v1, 1.0f);
-    r = StepSpringDamperStored(a3, 0.0f, diff * 0.5f, f0, f1, f2);
-    FastVecScale(v1, v1, FastSinOrCosB(r));
-    v1[3] = FastSinOrCosA(r);
-    RotateVectorByQuaternion(a1, a1, v1);
+    r = math_step_spring_damper_stored(a3, 0.0f, diff * 0.5f, f0, f1, f2);
+    FastVecScale(v1, v1, math_fast_sin_or_cos_b(r));
+    v1[3] = math_fast_sin_or_cos_a(r);
+    vec_rotate_by_quaternion(a1, a1, v1);
 }
 
 /* func_L05_003D1368 is in L05_003D1368-g8.c. */
@@ -727,7 +727,7 @@ void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
 /* func_L05_003D15E8 is in L05_003D15E8.c. */
 
 /* Starts the object: sets its state, a flag and a random starting position. */
-void func_L05_003D18E0(char *obj)
+void moby_init_state_and_position(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
@@ -754,7 +754,7 @@ void func_L05_003D18E0(char *obj)
 
 
 /* Spawns the object's effect after three guards, then runs the timer. */
-void func_L05_003D19F0(char *object)
+void moby_spawn_effect_after_guards(char *object)
 {
     char *s1 = *(char **)(object + 0x68);
     char *r;

@@ -15,7 +15,7 @@ extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3BB0(void *, void *, void *);
 extern void func_002F3AF0(void *, void *, float);
 extern void func_002F3A80(void *, void *, void *);
-extern int func_L22_003A2780(void *, void *, void *);
+extern int WalkPathIsClear(void *, void *, void *);
 
 typedef struct ScanSub_003A4938 {
     char pad[0x2A0];
@@ -34,7 +34,7 @@ static inline int SlotAt(int i) {
  * last points of the slot's record, and the slot is marked spent once
  * func_L22_003A2780 accepts both pairs. */
 /* Picks the next flight lane that has not been checked yet and tests whether it is clear to fly along. */
-void func_L22_003A4938(char *obj) {
+void space_ship_pick_next_lane_to_check(char *obj) {
     float a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4], j[4];
     char *vars;
     int old = D_L22_001AF3C4;

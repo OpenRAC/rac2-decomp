@@ -11,26 +11,26 @@ typedef int s32_F09f721e0;
 typedef float f32_F09f721e0;
 #endif
 
-extern s32_F09f721e0 func_00336E40 (s32_F09f721e0, s32_F09f721e0);
+extern s32_F09f721e0 pool_alloc_cell (s32_F09f721e0, s32_F09f721e0);
 
-extern s32_F09f721e0 func_00336DA8 (s32_F09f721e0, s32_F09f721e0);
+extern s32_F09f721e0 ui_return_second_arg (s32_F09f721e0, s32_F09f721e0);
 
-extern void func_0033ABD8 (s32_F09f721e0, s32_F09f721e0, const void *);
+extern void prompt_bar_init (s32_F09f721e0, s32_F09f721e0, const void *);
 
-extern s32_F09f721e0 func_00288FB8 (s32_F09f721e0);
+extern s32_F09f721e0 GetLocalizedString (s32_F09f721e0);
 
-extern void func_0033B050 (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
+extern void prompt_bar_set_texts (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
 
-extern void func_0033B030 (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
+extern void prompt_bar_set_text_offsets (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
 
-extern void func_0033B0A8 (s32_F09f721e0, f32_F09f721e0);
+extern void prompt_bar_set_spacing (s32_F09f721e0, f32_F09f721e0);
 
-extern void func_0033BE98 (s32_F09f721e0, s32_F09f721e0);
+extern void screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
 
 extern s32_F09f721e0 D_L04_001AE040 __attribute__ ((sda));
 
 /* Sets up the screen-adjust menu: its button prompt bar, labels and position. */
-void func_0033BD70 (s32_F09f721e0 self, s32_F09f721e0 arg)
+void screen_adjust_menu_init (s32_F09f721e0 self, s32_F09f721e0 arg)
 {
   s32_F09f721e0 prompt;
   s32_F09f721e0 allocation;
@@ -38,7 +38,7 @@ void func_0033BD70 (s32_F09f721e0 self, s32_F09f721e0 arg)
   *(s32_F09f721e0 *) self = arg;
   if (arg != 0)
     {
-      allocation = ReturnSecondArgument (16, AllocPoolCell (arg, arg));
+      allocation = ui_return_second_arg (16, pool_alloc_cell (arg, arg));
       *(s32_F09f721e0 *) (self + 684) = allocation;
       ((s32_F09f721e0 *) allocation)[1] = 0;
       ((s32_F09f721e0 *) allocation)[2] = 0;
@@ -48,13 +48,13 @@ void func_0033BD70 (s32_F09f721e0 self, s32_F09f721e0 arg)
   prompt = self + 8;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[0] = 255.0f;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[1] = 195.0f;
-  InitButtonPromptBar (prompt, arg, &D_L04_001AE040);
+  prompt_bar_init (prompt, arg, &D_L04_001AE040);
   textA = GetLocalizedString (12773);
   textB = GetLocalizedString (11598);
-  SetButtonPromptTexts (prompt, textA, textB, GetLocalizedString (11599));
-  SetButtonPromptTextOffsets (prompt, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-  SetButtonPromptSpacing (prompt, 0.65f);
+  prompt_bar_set_texts (prompt, textA, textB, GetLocalizedString (11599));
+  prompt_bar_set_text_offsets (prompt, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+  prompt_bar_set_spacing (prompt, 0.65f);
   *(s32_F09f721e0 *) (self + 680) = 0;
   *(s32_F09f721e0 *) (prompt + 668) = 0;
-  UpdateScreenAdjustMenu (self, 0);
+  screen_adjust_menu_update (self, 0);
 }

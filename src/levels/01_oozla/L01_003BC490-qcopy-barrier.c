@@ -13,13 +13,13 @@ typedef struct {
     u8 unknown40[0xB0];
     float rotationX, rotationY, rotationZ;
 } CtorObject;
-extern void *func_0029EFD0(int);
-extern float func_002A7878(float, float);
+extern void *CreateMoby(int);
+extern float math_random_float_range(float, float);
 extern void func_002A0F48(void *);
 
 /* Install the full position and owner identity before activating the new object. */
 /* Creates a copy of the breakable object at the given position, using the colour and owner of the original. */
-CtorObject *func_L01_003BC490(CtorObject *owner, const CtorVector *position)
+CtorObject *breakable_spawn_copy(CtorObject *owner, const CtorVector *position)
 {
     CtorObject *object = CreateMoby(0xA26 /* moby class 2598 */);
     if (object != 0) {
@@ -30,7 +30,7 @@ CtorObject *func_L01_003BC490(CtorObject *owner, const CtorVector *position)
         object->position = *position;
         object->rotationX = owner->rotationX;
         object->rotationY = owner->rotationY;
-        object->rotationZ = RandomFloatRange(-3.1415927f, 3.1415927f);
+        object->rotationZ = math_random_float_range(-3.1415927f, 3.1415927f);
         object->ownerIdentity = owner->ownerIdentity;
         func_002A0F48(object);
     }

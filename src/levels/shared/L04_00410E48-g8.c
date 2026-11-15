@@ -5,15 +5,15 @@
    expands it to the retail's absolute lui + load through the destination register. -G0
    splits the address into a high-part register of its own. */
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 
 /* shared native body of family 8c88be3bc489ab9e */
 /* Tells whether a racer is in the right animation window for a certain jump on level 11 and is still below a height limit. */
-int func_L04_00410E48(int animId, int animFrame, float limit)
+int racer_is_in_jump_window(int animId, int animFrame, float limit)
 {
     int result = 0;
 
-    if (gCurrentMapIndex != 11) goto end;
+    if (g_current_map_index != 11) goto end;
 
     if (animId == -1) {
         if (animFrame >= 166) {

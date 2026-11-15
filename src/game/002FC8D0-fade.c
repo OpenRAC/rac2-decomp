@@ -10,18 +10,18 @@ typedef struct {
     unsigned char spin;
 } PreviewState;
 
-extern PreviewState D_001B2310 __attribute__((sda));
-extern short D_001A6480[];
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_002FC560(int, long long);
-extern void func_0027DE50(int, int, int, int, u64);
+extern PreviewState g_object_preview_state __attribute__((sda));
+extern short g_screen_adjust_offsets[];
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void VU1_addGSregister(int, long long);
+extern void gfx_draw_colored_rectangle(int, int, int, int, u64);
 
 /* Draws a black overlay on the screen whose strength follows the preview timer, to fade the screen. */
-void func_002FFCF8(void)
+void shop_draw_preview_fade_overlay(void)
 {
     int v;
     VU1_addGSregister(0x42, 0x44);
-    v = FloatToInt((1.0f - IntToFloat(gObjectPreviewState.frames) * gObjectPreviewState.rate) * 255.0f);
-    DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (u64)(v << 24));
+    v = FloatToInt((1.0f - IntToFloat(g_object_preview_state.frames) * g_object_preview_state.rate) * 255.0f);
+    gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (u64)(v << 24));
 }

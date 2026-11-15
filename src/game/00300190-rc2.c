@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,16 +26,16 @@
 
 extern s32 D_001AD7EC;
 extern s8 D_001A8BD0;
-extern s32 D_0018C0B0[];
-extern void func_002AD0E0(s32, s32, void *, void *, void *, void *);
+extern s32 g_hero_moby[];
+extern void moby_transform_point_and_rotation_by_parent(s32, s32, void *, void *, void *, void *);
 typedef int TI __attribute__((mode(TI)));
 
 /* Copies a 4-float vector, passing it through the current transform when one is set. */
-void func_00300190(void *dest, void *source) {
+void vec_transform_or_copy(void *dest, void *source) {
     s8 scratch[16];
     s32 transform = D_001AD7EC;
     if (transform != 0) {
-        TransformPointAndRotationByParent(gHeroMoby_0018C0B0[0], transform, source, &D_001A8BD0, dest, scratch);
+        moby_transform_point_and_rotation_by_parent(g_hero_moby[0], transform, source, &D_001A8BD0, dest, scratch);
         return;
     }
     *(TI *)dest = *(TI *)source;

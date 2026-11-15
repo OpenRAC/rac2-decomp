@@ -1,22 +1,22 @@
 #include "common.h"
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 /* Observed eight GPR arguments, two FP arguments and four stack words. */
-extern void *func_0032C700(float, float, void *, int, int, int, int, int, int, int, int, int, int, void *);
-extern void func_002FE8D8(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_002AF000(float *, float, float, float);
-extern void func_00283098(void *, void *, void *);
-extern char *func_L00_00409558(void *, void *, int, int);
-extern void func_002FEE50(int);
+extern void *SpawnExplosion(float, float, void *, int, int, int, int, int, int, int, int, int, int, void *);
+extern void moby_get_facing_direction(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern char *tumbling_debris_create(void *, void *, int, int);
+extern void table_clear_entry_flag(int);
 extern void *D_L00_001ADB2C MACRO_ADDR;
 extern int D_L00_001B0C24 __attribute__((sda));
 
 /* Build a surface-aligned frame, then launch the configured number of fragments. */
 
-void func_L00_003FF530(char *object) {
+void shot_spawn_fragments(char *object) {
     float basis[3][4];
     float perpendicular[4];
     float direction[4];
@@ -36,7 +36,7 @@ void func_L00_003FF530(char *object) {
                        0, 1, 0, D_L00_001ADB2C);
         strength += 0.3f;
     }
-    GetObjectFacingDirection(position, basis[2]);
+    moby_get_facing_direction(position, basis[2]);
     perpendicular[0] = basis[2][2];
     perpendicular[1] = basis[2][2];
     perpendicular[2] = -(basis[2][0] + basis[2][1]);
@@ -44,19 +44,19 @@ void func_L00_003FF530(char *object) {
     FastVecCross(basis[1], basis[0], basis[2]);
     basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
     for (i = 0; i < D_L00_001B0C24; i++) {
-        heading = RandomAngle();
+        heading = math_random_angle();
         if (*(int *)(state + 0x2C) != 0) {
-            elevation = RandomFloatRange(0.698131799697876f, 1.3089970350265503f);
-            speed = RandomFloatRange(4.0f, 12.0f) * 0.016666668f;
+            elevation = math_random_float_range(0.698131799697876f, 1.3089970350265503f);
+            speed = math_random_float_range(4.0f, 12.0f) * 0.016666668f;
         } else {
-            elevation = RandomFloatRange(0.8726646900177002f, 1.5707964897155762f);
-            speed = RandomFloatRange(4.0f, 9.0f) * 0.016666668f;
+            elevation = math_random_float_range(0.8726646900177002f, 1.5707964897155762f);
+            speed = math_random_float_range(4.0f, 9.0f) * 0.016666668f;
         }
-        BuildSphericalOffset(direction, speed, heading, elevation);
+        vec_build_spherical_offset(direction, speed, heading, elevation);
         direction[3] = 0.0f;
         matrix_mul_vec3(direction, direction, basis);
-        fragment = CreateTumblingDebris(position, direction, i, *(int *)(state + 0x2C));
+        fragment = tumbling_debris_create(position, direction, i, *(int *)(state + 0x2C));
         if (fragment != 0) *(int *)(fragment + 0xB8) = *(int *)(object + 0xB8);
     }
-    ClearEntryFlag(*(int *)(state + 0x30));
+    table_clear_entry_flag(*(int *)(state + 0x30));
 }

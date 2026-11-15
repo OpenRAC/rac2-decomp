@@ -200,7 +200,7 @@ extern s32 ref_L22_0039CDC0_11(s32, s32, void *);
 extern f32 D_L22_001AF2B0 __attribute__((sda));
 extern f32 D_L22_001AF2C8 __attribute__((sda));
 extern ProjectileObject *ref_L22_0039CDC0_12[] __attribute__((sda));
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern Quad D_L22_001B1930 __attribute__((sda));
 
 /* Spawns a class-0x100 moby at `position` with the owner's orientation and a 150-frame
@@ -247,7 +247,7 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
                 data->mode = 0;
             }
         }
-        if (owner == D_00189E20.moby)
+        if (owner == g_hero_state.moby)
             data->player = 1;
         if (!data->mode && data->target) {
             ref_L22_0039CDC0_2(&offset, &data->target->basis[2], 5.0f);
@@ -268,16 +268,16 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
                 reject = 1;
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);
-            if ((owner == D_00189E20.moby && !data->target->targetable)
+            if ((owner == g_hero_state.moby && !data->target->targetable)
                 || dot < D_L22_001AF2C8 || distance > 50.0f || reject)
                 data->target = 0;
-            if (owner == D_00189E20.moby) {
+            if (owner == g_hero_state.moby) {
                 if (data->target) {
-                    D_00189E20.aim = &data->direction;
-                } else if (D_00189E20.state == 0x5b) {
+                    g_hero_state.aim = &data->direction;
+                } else if (g_hero_state.state == 0x5b) {
                     qcopy(&D_L22_001B1930, &owner->basis[2]);
                     ref_L22_0039CDC0_2(&D_L22_001B1930, &D_L22_001B1930, -1.0f);
-                    D_00189E20.aim = &D_L22_001B1930;
+                    g_hero_state.aim = &D_L22_001B1930;
                     qcopy(&data->direction, &D_L22_001B1930);
                     data->mode = 0;
                     data->target = (ProjectileObject *)1;

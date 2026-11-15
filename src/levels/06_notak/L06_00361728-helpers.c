@@ -6,19 +6,19 @@ typedef struct {
     unsigned char gap[0x21A0]; char *target; int state;
     int unused; int mode;
 } PlayerView;
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 extern char *D_L06_001B281C;
 extern short D_L06_001B2970[] __attribute__((sda));
-extern float func_00282E80(char *, char *);
+extern float vec_distance_xy(char *, char *);
 
 /* Find the nearest active target and fill the target's position frames. */
-int func_L06_00361728(char *moby, char *target, float distance)
+int moby_find_nearest_target(char *moby, char *target, float distance)
 {
-    char *best = gHeroState.target;
+    char *best = g_hero_state.target;
     int kind = 0;
     int index;
-    if (gHeroState.mode == 0x18 ||
-        gHeroState.state == 0x6F) {
+    if (g_hero_state.mode == 0x18 ||
+        g_hero_state.state == 0x6F) {
         best = 0;
         kind = 2;
     }
@@ -42,9 +42,9 @@ int func_L06_00361728(char *moby, char *target, float distance)
         *(char **)(target + 0x40) = best;
         qcopy(target, (best + 0x10));
         qcopy((target + 0x10), (best + 0xF0));
-        if (best == gHeroState.target) {
-            qcopy((target + 0x20), &gHeroState.first);
-            qcopy((target + 0x30), &gHeroState.second);
+        if (best == g_hero_state.target) {
+            qcopy((target + 0x20), &g_hero_state.first);
+            qcopy((target + 0x30), &g_hero_state.second);
         } else {
             qcopy((target + 0x30), target);
             *(float *)(target + 0x38) += 0.6f;

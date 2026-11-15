@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_0033C760 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -8,9 +9,9 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *func_002B9030(int);
+extern char *part_alloc(int);
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 typedef struct {
     u8 pad00[0x78];
@@ -20,8 +21,8 @@ typedef struct {
 extern L02_Palette D_L02_00200080;
 
 /* Creates one link of the glowing chain, joins it to the previous link and returns it. */
-char *func_L02_0033C760(TI128 *pos, char *prev, int flag, float scale) {
-    char *node = AllocParticle(0x1E);
+char *part_spawn_chain_link(TI128 *pos, char *prev, int flag, float scale) {
+    char *node = part_alloc(0x1E);
     char *tail;
     char *ptail;
 

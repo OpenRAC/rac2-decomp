@@ -1,38 +1,38 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern char *func_0029EFD0(int id);
-extern float func_002A7878(float a, float b);
-extern float func_002A7940(void);
-extern void func_002C2210(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
+extern char *CreateMoby(int id);
+extern float math_random_float_range(float a, float b);
+extern float math_random_angle(void);
+extern void part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
 extern char D_L11_001A8F20[] __attribute__((sda));
 
 
-extern void func_002B60B0(char *, float, float, float, float);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002A7750(char *, int, int);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern void anim_start_blended(char *, int, int, int);
+extern void moby_set_state(char *, int, int);
 extern void func_002A05A8(char *);
-extern void func_002A0488(char *, int, int, int);
-extern int func_002B3380(char *, char *, char *);
-extern void func_L11_003973F8(char *, int, float, float);
+extern void set_moby_color(char *, int, int, int);
+extern int part_spawn_damage_debris(char *, char *, char *);
+extern void moby_spawn_linked(char *, int, float, float);
 
-extern void func_002A04B8(char *, int *, int *, int *);
+extern void get_moby_color(char *, int *, int *, int *);
 
 extern void func_00282D30_2(char *dst, char *src, float scale);
 
 extern void func_32C9E0();
 extern void func_32C700();
 extern void func_324560(char *a0);
-extern void func_L11_00441978(s32 a0, int a1);
+extern void arena_add_waiting_fighter(s32 a0, int a1);
 extern void func_323688(char *a0, char *a1);
-extern void func_00282A60(char *a0, int a1, int a2);
+extern void mem_clear(char *a0, int a1, int a2);
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_L11_00449330(char *self, TI128 *pos);
+extern void security_robot_destroy_held_item(char *self, TI128 *pos);
 extern char *func_3224B0(int a0);
 extern void func_324F00(char *a0);
 extern void func_3362A8(char *a0, s32 a1, int a2, int a3);
 extern void func_300180(void *a0);
-extern void func_L00_003D7250(char *a0, char *a1, float a2, int a3, int a4, int a5);
+extern void gfx_draw_two_layer_glow_sprite(char *a0, char *a1, float a2, int a3, int a4, int a5);
 extern void func_338398(char *a0, char *a1, float a2, int a3, int a4);
 extern void func_32E480(char *a0, char *a1, float f12, float f13, float f14,
                         int a2, int a3, int a4, int a5);
@@ -58,7 +58,7 @@ extern s32 func_33C800(char *a0, s32 a1, s32 a2, s32 a3, float f12, float f13);
 /* func_L11_004484A8 is defined in L11_004465F8-g8.c. */
 
 /* Finishes the robot's frame: lets go of its held item, counts up the state timer and refreshes its shadow and light effects. */
-void func_L11_00448848(char *object)
+void security_robot_finish_frame(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
@@ -74,7 +74,7 @@ void func_L11_00448848(char *object)
 }
 
 /* Makes the robot stand still, using the idle pose that matches whether it holds an item. */
-void func_L11_00448908(char *object)
+void security_robot_play_idle(char *object)
 {
     if (*(s32 *)(*(char **)(object + 0x68) + 0x354) != 0) {
         func_32C9E0(object, 4, 2);
@@ -90,7 +90,7 @@ void func_L11_00448908(char *object)
 /* func_L11_00448AA8 is in L11_00448AA8.c. */
 
 /* Tells whether the robot holds an item and is in one of its attack or throw states. */
-s32 func_L11_00448CE0(char *object)
+s32 security_robot_is_holding_item_attacking(char *object)
 {
     s32 result = 0;
     u8 stateByte;
@@ -107,14 +107,14 @@ s32 func_L11_00448CE0(char *object)
    last one with its sign bit set; a walk stops when the object's group byte (+0x21) is 0xFF or
    above the limit at D_L11_001B35B8. The records' base is read bare (`lui`/`lw` in one register:
    `sda` in this -G0 unit), the limit is a $gp word. */
-extern u16 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((sda));
+extern u16 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((sda));
 extern s32 D_L11_001B35B8[] __attribute__((sda));
-extern f32 func_00282E80(u8 *, u8 *);
-extern s32 func_L11_00441868(u8 *, s32);
+extern f32 vec_distance_xy(u8 *, u8 *);
+extern s32 arena_consume_waiting_fighter(u8 *, s32);
 /* Runs what the id in its second argument names on the object and returns a value the caller
    keeps; the arguments are read in this order (object, id, two floats, two ints). */
-extern s32 func_002B3BA8(u8 *, s32, f32, f32, s32, s32);
+extern s32 weapon_select_aim_target(u8 *, s32, f32, f32, s32, s32);
 
 /* The pairing step of a kind-0xD98 object (state block at +0x68: partner +0x350, phase +0x366,
    the halfword at +0x36A). Below state 4 it forgets its partner and its phase. In phase 1 it
@@ -128,7 +128,7 @@ extern s32 func_002B3BA8(u8 *, s32, f32, f32, s32, s32);
    phase 2 and +0x36A = 2 on both sides. The state block of the partner being checked and that
    of the object chosen are two variables (one per role), and the group byte goes through a
    halfword local so that each loop test loads it once. */
-void func_L11_00448DF8(u8 *self)
+void security_robot_update_pairing(u8 *self)
 {
     u8 *state = *(u8 **)(self + 0x68);
     u16 *idPtr;
@@ -145,13 +145,13 @@ void func_L11_00448DF8(u8 *self)
     } else {
         if (*(s16 *)(state + 0x366) == 1) {
             *(s16 *)(state + 0x36A) =
-                SelectAimTarget_002B3BA8(self, *(s32 *)(state + 0x360), 100.0f, 100.0f, 0, 0);
+                weapon_select_aim_target(self, *(s32 *)(state + 0x360), 100.0f, 100.0f, 0, 0);
             *(u8 **)(state + 0x350) = *(u8 **)(state + 0x220);
             return;
-        } else if (ConsumeWaitingFighterOfClass(*(u8 **)(self + 0xB8), *(s16 *)(self + 0xAA))) {
+        } else if (arena_consume_waiting_fighter(*(u8 **)(self + 0xB8), *(s16 *)(self + 0xAA))) {
             *(s16 *)(state + 0x366) = 1;
             *(s16 *)(state + 0x36A) =
-                SelectAimTarget_002B3BA8(self, *(s32 *)(state + 0x360), 100.0f, 100.0f, 0, 0);
+                weapon_select_aim_target(self, *(s32 *)(state + 0x360), 100.0f, 100.0f, 0, 0);
             *(u8 **)(state + 0x350) = *(u8 **)(state + 0x220);
             return;
         }
@@ -179,11 +179,11 @@ void func_L11_00448DF8(u8 *self)
         }
         best = 0;
         bestDistance = 1000.0f;
-        for (idPtr = gGroupIdLists[self[0x21]];
+        for (idPtr = g_group_id_lists[self[0x21]];
              (group = self[0x21]) != 0xFF && group <= D_L11_001B35B8[0] && idPtr != 0 &&
-             ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == gGroupIdLists[group]);
+             ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_group_id_lists[group]);
              idPtr++) {
-            entry = gMobyTable_L11 + ((*idPtr & 0x7FFF) << 8);
+            entry = g_moby_l11_table + ((*idPtr & 0x7FFF) << 8);
             if (entry == 0)
                 break;
             if (entry[0x20] != 0xFE) {
@@ -212,27 +212,27 @@ void func_L11_00448DF8(u8 *self)
     *(s16 *)(state + 0x366) = 0;
 }
 
-extern float func_0029F530(char *);
-extern void func_0029FCC0(char *, int, void *);
-extern void func_L00_0031BDC0(void *, void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern int func_002A8C28(char *, void *, int, float, float, float, int, int, int);
-extern int func_002E5CF8(int, int, char *);
+extern float moby_get_anim_value(char *);
+extern void moby_transform_joint_to_world(char *, int, void *);
+extern void coll_project_point_on_segment(void *, void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern int coll_sweep_from_object(char *, void *, int, float, float, float, int, int, int);
+extern int PlayMobySound(int, int, char *);
 
 /* While the robot swings its arm, hurts the hero if the arm sweeps through the hero's position. */
-void func_L11_00449098(char *object)
+void security_robot_damage_along_arm_swing(char *object)
 {
     float start[4], end[4], closest[4], remaining[4], span[4];
     char *state;
     float time, fraction;
 
-    time = GetMobyAnimationValue(object);
+    time = moby_get_anim_value(object);
     state = *(char **)(object + 0x68);
     if (19.0f <= time && time <= 31.0f) {
-        TransformMobyJointToWorld(object, 0, start);
-        TransformMobyJointToWorld(object, 1, end);
-        ProjectPointOnSegment(closest, start, end,
+        moby_transform_joint_to_world(object, 0, start);
+        moby_transform_joint_to_world(object, 1, end);
+        coll_project_point_on_segment(closest, start, end,
                          *(char **)(state + 0x350) + 0x10);
         FastVecSub(remaining, closest, end);
         FastVecSub(span, start, end);
@@ -242,20 +242,20 @@ void func_L11_00449098(char *object)
             fraction = 0.0f;
         if (fraction > 1.0f)
             fraction = 1.0f;
-        if (SweepCollisionFromObject(object, closest, 0x10001,
+        if (coll_sweep_from_object(object, closest, 0x10001,
                          fraction * 0.35f + 0.15f,
                          (float)*(unsigned char *)(state + 0x34), 1.0f, 0, 1, 0)
             && *(short *)(state + 0x368) == 0) {
             PlayMobySound(5, 0, object);
             *(short *)(state + 0x368) = 1;
         }
-        SweepCollisionFromObject(object, end, 0x10001, 0.5f,
+        coll_sweep_from_object(object, end, 0x10001, 0.5f,
                       (float)*(unsigned char *)(state + 0x34), 1.0f, 0, 1, 0);
     }
 }
 
 /* Creates the item the robot holds and attaches it to the robot. */
-void func_L11_004492A0(char *object)
+void security_robot_spawn_held_item(char *object)
 {
     char *state = *(char **)(object + 0x68);
     s32 child = (s32)(long)func_3224B0(0x9D8 /* moby class 2520 */);
@@ -276,7 +276,7 @@ void func_L11_004492A0(char *object)
    so the calls to it from this unit go through its symbol. */
 
 /* Sets the security robot up when it appears: its turn speeds, starting pose, flags and held item. */
-void func_L11_004496A0(char *object, int mode, int active) {
+void security_robot_init(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     int colors[3];
     int green, blue;
@@ -285,7 +285,7 @@ void func_L11_004496A0(char *object, int mode, int active) {
     *(short *)(state + 0x366) = 0;
     *(float *)(state + 0x20) = *(short *)(state + 0x24);
     *(short *)(state + 0x36E) = active;
-    SetControllerSpeedLimits(object, 0.0055555556900799274f, 0.10333333909511566f,
+    moby_set_controller_speed_limits(object, 0.0055555556900799274f, 0.10333333909511566f,
                   0.0034906589426100254f, 0.41887909173965454f);
     *(u8 *)(state + 0x6A) = 0;
     *(u8 *)(state + 0x2E) = 1;
@@ -293,22 +293,22 @@ void func_L11_004496A0(char *object, int mode, int active) {
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x1000) & 0xFFB9;
     *(int *)(object + 0x98) = *(int *)(*(char **)(object + 0x24) + 0x10);
     if (*(short *)(state + 0x36E) != 0) {
-        SetMobyState(object, 4, 2);
+        moby_set_state(object, 4, 2);
         *(u16 *)(object + 0x34) |= 0x100;
-        StartAnimationBlended(object, 0, 0, 0);
+        anim_start_blended(object, 0, 0, 0);
         func_002A05A8(object);
-        SpawnLinkedMoby(object, 0, 2.0f, 2.0f);
+        moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {
         if (*(u8 *)(object + 0x43) != 0)
-            StartAnimationBlended(object, 0, 0, 10);
-        SetMobyState(object, 3, 1);
+            anim_start_blended(object, 0, 0, 10);
+        moby_set_state(object, 3, 1);
         *(u8 *)(object + 0x31) = 1;
         *(u16 *)(object + 0x34) &= 0xFEFE;
     }
-    SpawnRobotHeldItem(object);
+    security_robot_spawn_held_item(object);
     *(short *)(state + 0x36C) = mode;
     *(int *)(state + 0x200) = 0;
-    SpawnDamageDebrisOnHealthLoss(object, state + 0x1F0, state + 0x20);
+    part_spawn_damage_debris(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
         set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
@@ -324,7 +324,7 @@ void func_L11_004496A0(char *object, int mode, int active) {
 }
 
 /* Puts the security robot to rest: hides it, lets go of its partner and held item, and resets its effects. */
-void func_L11_00449878(char *objectArg)
+void security_robot_deactivate(char *objectArg)
 {
     char *object = objectArg;
     char *state;
@@ -338,12 +338,12 @@ void func_L11_00449878(char *objectArg)
     *(s32 *)(object + 0x98) = 0;
     state = *(char **)(object + 0x68);
     if (*(s16 *)(state + 0x366) == 1)
-        AddWaitingFighterOfClass(*(s32 *)(object + 0xB8), 0xD98);
+        arena_add_waiting_fighter(*(s32 *)(object + 0xB8), 0xD98);
     *(s16 *)(state + 0x366) = 0;
     *(s32 *)(state + 0x350) = 0;
     if (*(s32 *)(state + 0x354) != 0) {
         itemPos = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
-        DestroyRobotHeldItem(object, &itemPos);
+        security_robot_destroy_held_item(object, &itemPos);
     }
     if (*(u8 *)(state + 0x2B1) != 0) {
         f32 unit = 1.0f;
@@ -353,21 +353,21 @@ void func_L11_00449878(char *objectArg)
         *(f32 *)(state + 0x2D4) = unit;
         *(f32 *)(state + 0x2D0) = unit;
         func_323688(object, state + 0x2B0);
-        ClearMemory(state + 0x2B0, 0, 0x40);
+        mem_clear(state + 0x2B0, 0, 0x40);
     }
 }
 
-extern void func_0029F978(char *a0, int a1, char *a2);
-extern void func_002A7A00(void *a0, float f12, float f13);
-extern void func_002B0A68(char *a0, int a1, void *a2, float f12, float f13, float f14,
+extern void AttachManipulator(char *a0, int a1, char *a2);
+extern void vec_random_direction(void *a0, float f12, float f13);
+extern void part_spawn_masked_debris(char *a0, int a1, void *a2, float f12, float f13, float f14,
                         float f15, int a3);
-extern void func_L02_003FC248(char *a0, int a1, int a2);
-extern void func_L01_003E9CF8(char *a0, int a1, char *a2);
+extern void moby_set_anim_type_three(char *a0, int a1, int a2);
+extern void part_queue_moby_for_glow(char *a0, int a1, char *a2);
 
 /* The moby's death path: clears the spawn flags, hands the last position to the scene
    manager, resets the 0x2B0 rig and leaves the object in its dead state. */
 /* Kills the security robot, then either resets it right away or schedules the reset. */
-void func_L11_00449970(char *object, int skipFade, int resetNow)
+void security_robot_kill(char *object, int skipFade, int resetNow)
 {
     char *state = *(char **)(object + 0x68);
     char *rig;
@@ -376,32 +376,32 @@ void func_L11_00449970(char *object, int skipFade, int resetNow)
 
     *(s32 *)(state + 0x20) = 0;
     if (*(s16 *)(state + 0x366) == 1)
-        AddWaitingFighterOfClass(*(s32 *)(object + 0xB8), 0xD98);
+        arena_add_waiting_fighter(*(s32 *)(object + 0xB8), 0xD98);
     *(s16 *)(state + 0x366) = 0;
     *(s32 *)(state + 0x350) = 0;
     if (*(s32 *)(state + 0x354) != 0) {
         burstDir = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
-        DestroyRobotHeldItem(object, &burstDir);
+        security_robot_destroy_held_item(object, &burstDir);
     }
     if (*(u8 *)(state + 0x2B1) == 0) {
         rig = state + 0x2B0;
-        ClearMemory(rig, 0, 0x40);
+        mem_clear(rig, 0, 0x40);
         AttachManipulator(object, 3, rig);
         tiny = 1.0e-4f;
         *(u8 *)(state + 0x2B2) = 1;
         *(f32 *)(state + 0x2D8) = tiny;
         *(f32 *)(state + 0x2D4) = tiny;
         *(f32 *)(state + 0x2D0) = tiny;
-        RandomDirectionVector((char *)&burstDir, 1.0f / 60.0f, 0.0500000045f);
-        SpawnDebrisForMaskedParts(object, 0x20, (char *)&burstDir, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        vec_random_direction((char *)&burstDir, 1.0f / 60.0f, 0.0500000045f);
+        part_spawn_masked_debris(object, 0x20, (char *)&burstDir, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     *(s32 *)(object + 0x98) = 0;
     if (skipFade == 0)
-        SetMobyAnimTypeThree(object, 0, -1);
+        moby_set_anim_type_three(object, 0, -1);
     if (resetNow == 0)
-        QueueMobyForGlowEffect(object, 0, (char *)DeactivateSecurityRobot);
+        part_queue_moby_for_glow(object, 0, (char *)security_robot_deactivate);
     else
-        DeactivateSecurityRobot(object);
+        security_robot_deactivate(object);
 }
 
 /* func_L11_00449AD8 is defined in L11_00449AD8-helpers.c. */
@@ -413,7 +413,7 @@ void func_L11_00449970(char *object, int skipFade, int resetNow)
 /* func_L11_0044BD68 is in L11_0044BD68-g8.c. */
 
 /* Finishes the smasher robot's frame: counts up the state timer and refreshes its shadow and light effects. */
-void func_L11_0044C0F0(char *object)
+void smasher_robot_finish_frame(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
@@ -433,7 +433,7 @@ void func_L11_0044C0F0(char *object)
    arms the 0x4CA gate through the 0xB8 handle and runs the 100-unit smash into it */
 /*W23B*/
 /* Same body as func_L02_003F16F0, with this function's own callees. */
-void func_L11_0044C268(char *object) {
+void smasher_robot_update_pairing(char *object) {
     char *state = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(object + 0x20) < 4) {
@@ -443,14 +443,14 @@ void func_L11_0044C268(char *object) {
 
     if (*(short *)(state + 0x4CA) == 1) {
         *(short *)(state + 0x4C8) =
-            SelectAimTarget_002B3BA8(object, *(int *)(state + 0x4C4), 100.0f, 100.0f, 0, 0);
+            weapon_select_aim_target(object, *(int *)(state + 0x4C4), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x490) = *(int *)(state + 0x220);
     } else {
-        if (ConsumeWaitingFighterOfClass(*(int *)(object + 0xB8), *(short *)(object + 0xAA)) == 0)
+        if (arena_consume_waiting_fighter(*(int *)(object + 0xB8), *(short *)(object + 0xAA)) == 0)
             goto done;
         *(short *)(state + 0x4CA) = 1;
         *(short *)(state + 0x4C8) =
-            SelectAimTarget_002B3BA8(object, *(int *)(state + 0x4C4), 100.0f, 100.0f, 0, 0);
+            weapon_select_aim_target(object, *(int *)(state + 0x4C4), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x490) = *(int *)(state + 0x220);
     }
     return;
@@ -462,7 +462,7 @@ done:
 
 
 /* Sets the smasher robot up when it appears: its turn speeds, starting pose and flags. */
-void func_L11_0044C328(char *object, int mode, int active) {
+void smasher_robot_init(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     char **slot;
     char *collision, *health;
@@ -473,19 +473,19 @@ void func_L11_0044C328(char *object, int mode, int active) {
     *(u8 *)(state + 0x2E) = 1;
     *(float *)(state + 0x20) = *(short *)(state + 0x24);
     *(short *)(state + 0x4D2) = active;
-    SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f,
+    moby_set_controller_speed_limits(object, 0.004444444552063942f, 0.13333334028720856f,
                   0.0011635529808700085f, 0.10471977293491364f);
     *(u8 *)(object + 0x7F) = 0;
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x1000) & 0xFFB9;
     *(int *)(object + 0x98) = *(int *)(*(char **)(object + 0x24) + 0x10);
     if (*(short *)(state + 0x4D2) != 0) {
-        SetMobyState(object, 4, 2);
+        moby_set_state(object, 4, 2);
         *(u16 *)(object + 0x34) |= 0x100;
-        StartAnimationBlended(object, 2, 0, 0);
+        anim_start_blended(object, 2, 0, 0);
         func_002A05A8(object);
-        SpawnLinkedMoby(object, 0, 2.0f, 2.0f);
+        moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {
-        SetMobyState(object, 3, 0);
+        moby_set_state(object, 3, 0);
         *(u8 *)(object + 0x31) = 1;
         *(u16 *)(object + 0x34) &= 0xFEFE;
     }
@@ -502,7 +502,7 @@ void func_L11_0044C328(char *object, int mode, int active) {
     }
     *(short *)(state + 0x4D0) = mode;
     *(int *)(state + 0x200) = 0;
-    SpawnDamageDebrisOnHealthLoss(object, collision, health);
+    part_spawn_damage_debris(object, collision, health);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
         set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
@@ -511,32 +511,32 @@ void func_L11_0044C328(char *object, int mode, int active) {
     }
 }
 
-extern void func_L11_00441978(int, int);
-extern void func_0032C700(char *, int, int, int, int, int, int, int,
+extern void arena_add_waiting_fighter(int, int);
+extern void SpawnExplosion(char *, int, int, int, int, int, int, int,
                          float, float, int, int, int, int);
-extern void func_002E5DA0(int, int, char *, int);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B0A68(char *, int, void *, float, float, float, float, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_masked_debris(char *, int, void *, float, float, float, float, int);
 
 /* Puts the smasher robot to rest: lets go of its pairing, shows a burst of effects and hides it. */
-void func_L11_0044C4F0(char *object) {
+void smasher_robot_deactivate(char *object) {
     char *state = *(char **)(object + 0x68);
     float direction[4];
     char **slot;
     int i;
 
     if (*(short *)(state + 0x4CA) == 1)
-        AddWaitingFighterOfClass(*(int *)(object + 0xB8), 0xDCF /* moby class 3535 */);
+        arena_add_waiting_fighter(*(int *)(object + 0xB8), 0xDCF /* moby class 3535 */);
     *(short *)(state + 0x4CA) = 0;
     *(int *)(state + 0x490) = 0;
     if (*(u8 *)(object + 0x31) != 0) {
         SpawnExplosion(object + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1,
                      0.5f, 0.0f, 1, 0, 0, 0);
-        PlaySoundFromClassBank(0, 0, object, 0xDF7);
-        RandomDirectionVector(direction, 0.033333335071802139f, 0.083333335816860199f);
+        snd_play_from_class_bank(0, 0, object, 0xDF7);
+        vec_random_direction(direction, 0.033333335071802139f, 0.083333335816860199f);
         FastVecAdd(direction, direction, state + 0xD0);
-        SpawnDebrisForMaskedParts(object, 0x7F0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        part_spawn_masked_debris(object, 0x7F0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     slot = (char **)(state + 0x4A0);
     for (i = 1; i >= 0; i--) {
@@ -547,9 +547,9 @@ void func_L11_0044C4F0(char *object) {
         }
         slot++;
     }
-    StartAnimationBlended(object, 0, 0, 3);
+    anim_start_blended(object, 0, 0, 3);
     func_002A05A8(object);
-    SetMobyState(object, 1, 0);
+    moby_set_state(object, 1, 0);
     *(u8 *)(object + 0x31) = 0;
     *(int *)(object + 0x98) = 0;
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) & 0xEFFF) | 0x47;
@@ -558,7 +558,7 @@ void func_L11_0044C4F0(char *object) {
 /* func_L11_0044C688 is defined in L11_0044C688-helpers.c. */
 
 /* Remembers what the smasher robot was doing and makes it turn around. */
-void func_L11_0044C818(char *object)
+void smasher_robot_start_turn_around(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
@@ -570,7 +570,7 @@ void func_L11_0044C818(char *object)
 /* func_L11_0044C850 is defined in L11_004465F8-aim-0044C850-g8.c. */
 
 /* Spawns a small flying bit from the robot with the given speed, spin and position. */
-char *func_L11_00450328(char *owner, TI128 *velocity, TI128 *position, float lifeScale)
+char *robot_spawn_debris(char *owner, TI128 *velocity, TI128 *position, float lifeScale)
 {
     char *projectile = CreateMoby(0xDD9 /* moby class 3545 */);
 
@@ -588,25 +588,25 @@ char *func_L11_00450328(char *owner, TI128 *velocity, TI128 *position, float lif
         qcopy(vars, velocity);
         *(float *)(vars + 0x14) = lifeScale;
         *(char **)(vars + 0x10) = owner;
-        *(float *)(vars + 0x18) = RandomAngle();
-        *(float *)(vars + 0x1C) = RandomFloatRange(0.20943954586982727f, 0.6283186078071594f);
+        *(float *)(vars + 0x18) = math_random_angle();
+        *(float *)(vars + 0x1C) = math_random_float_range(0.20943954586982727f, 0.6283186078071594f);
         *(float *)(vars + 0x20) = 0.15f;
         *(unsigned char *)(projectile + 0x23) = 0x80;
         *(unsigned short *)(projectile + 0x34) |= 0x100;
-        *(float *)(projectile + 0x2C) = RandomFloatRange(0.005f, 0.00625f);
+        *(float *)(projectile + 0x2C) = math_random_float_range(0.005f, 0.00625f);
         *(int *)(vars + 0x24) = 0;
         *(unsigned short *)(projectile + 0x34) |= 0x200;
-        size = RandomFloatRange(2.0f, 4.0f);
+        size = math_random_float_range(2.0f, 4.0f);
         *(unsigned short *)(projectile + 0x34) |= 0x41;
-        SpawnGroundEffectParticle(projectile + 0x10, 4, 0x801060E0, 0, 10, D_L11_001A8F20, size * 0.3f, size, 0.0f, 0);
-        SpawnGroundEffectParticle(projectile + 0x10, 4, -1, 1, -10, D_L11_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(projectile + 0x10, 4, 0x801060E0, 0, 10, D_L11_001A8F20, size * 0.3f, size, 0.0f, 0);
+        part_spawn_ground_effect(projectile + 0x10, 4, -1, 1, -10, D_L11_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
     }
     return projectile;
 }
 
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L11_00450748(char *vectors, float scale)
+void vec_l11_scale_four(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -619,7 +619,7 @@ void func_L11_00450748(char *vectors, float scale)
 /* func_L11_00452450 is defined in L11_004465F8-g8.c. */
 
 /* Finishes the flamethrower robot's frame: counts up the state timer and refreshes its shadow and light effects. */
-void func_L11_00452810(char *object)
+void flamethrower_robot_finish_frame(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
@@ -630,21 +630,21 @@ void func_L11_00452810(char *object)
 }
 
 /* Adds three small light effects on the flamethrower robot while it is active. */
-void func_L11_004528A0(char *object)
+void flamethrower_robot_add_lights(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float size;
 
     if (*(u8 *)(object + 0x95) != 0) {
-        DrawTwoLayerGlowSprite(object, state + 0x270, 0.125f, 0x36F6, 0x20000000, 0x20000000);
+        gfx_draw_two_layer_glow_sprite(object, state + 0x270, 0.125f, 0x36F6, 0x20000000, 0x20000000);
         size = 0.15f;
-        DrawTwoLayerGlowSprite(object, state + 0x280, size, 0x1050B0, 0x30000000, 0x20000000);
-        DrawTwoLayerGlowSprite(object, state + 0x290, size, 0x1050B0, 0x10000000, 0x30000000);
+        gfx_draw_two_layer_glow_sprite(object, state + 0x280, size, 0x1050B0, 0x30000000, 0x20000000);
+        gfx_draw_two_layer_glow_sprite(object, state + 0x290, size, 0x1050B0, 0x10000000, 0x30000000);
     }
 }
 
 /* Sets the flamethrower robot up when it appears: its turn speeds, starting pose and flags. */
-void func_L11_00452C58(char *object, int mode, int active) {
+void flamethrower_robot_init(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
 
     *(u8 *)(state + 0x2E) = 1;
@@ -652,28 +652,28 @@ void func_L11_00452C58(char *object, int mode, int active) {
     *(short *)(state + 0x2D2) = 1;
     *(float *)(state + 0x20) = *(short *)(state + 0x24);
     *(short *)(state + 0x2D8) = active;
-    SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f,
+    moby_set_controller_speed_limits(object, 0.004444444552063942f, 0.13333334028720856f,
                   0.0011635529808700085f, 0.10471977293491364f);
     if (*(u8 *)(object + 0x43) != 2)
-        StartAnimationBlended(object, 2, 0, 0);
+        anim_start_blended(object, 2, 0, 0);
     *(u8 *)(object + 0x7F) = 0;
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x1000) & 0xFFB9;
     *(int *)(object + 0x98) = *(int *)(*(char **)(object + 0x24) + 0x10);
     if (*(short *)(state + 0x2D8) != 0) {
-        SetMobyState(object, 4, 2);
+        moby_set_state(object, 4, 2);
         *(u16 *)(object + 0x34) |= 0x100;
-        StartAnimationBlended(object, 2, 0, 0);
+        anim_start_blended(object, 2, 0, 0);
         func_002A05A8(object);
-        SpawnLinkedMoby(object, 0, 2.0f, 2.0f);
+        moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {
-        SetMobyState(object, 3, 0);
+        moby_set_state(object, 3, 0);
         *(u8 *)(object + 0x31) = 1;
         *(u16 *)(object + 0x34) &= 0xFEFE;
     }
     *(short *)(state + 0x2D4) = mode;
     *(u8 *)(state + 0x6A) = 0;
     *(int *)(state + 0x200) = 0;
-    SpawnDamageDebrisOnHealthLoss(object, state + 0x1F0, state + 0x20);
+    part_spawn_damage_debris(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
         set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
@@ -683,7 +683,7 @@ void func_L11_00452C58(char *object, int mode, int active) {
 }
 
 /* Puts the flamethrower robot to rest: shows a burst of effects and hides it. */
-void func_L11_00452DF8(char *object) {
+void flamethrower_robot_deactivate(char *object) {
     char *state = *(char **)(object + 0x68);
     float direction[4];
 
@@ -692,14 +692,14 @@ void func_L11_00452DF8(char *object) {
     if (*(u8 *)(object + 0x31) != 0) {
         SpawnExplosion(object + 0x10, 0, 5, 5, 25, 20, 10, 1,
                      0.5f, 0.0f, 1, 0, 0, 0);
-        PlaySoundFromClassBank(0, 0, object, 0xDF7);
-        RandomDirectionVector(direction, 0.083333335816860199f, 0.11666667461395264f);
+        snd_play_from_class_bank(0, 0, object, 0xDF7);
+        vec_random_direction(direction, 0.083333335816860199f, 0.11666667461395264f);
         FastVecAdd(direction, direction, state + 0xD0);
-        SpawnDebrisForMaskedParts(object, 0xFF0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        part_spawn_masked_debris(object, 0xFF0, direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
-    StartAnimationBlended(object, 0, 0, 3);
+    anim_start_blended(object, 0, 0, 3);
     func_002A05A8(object);
-    SetMobyState(object, 1, 0);
+    moby_set_state(object, 1, 0);
     *(u8 *)(object + 0x31) = 0;
     *(int *)(object + 0x98) = 0;
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) & 0xEFFF) | 0x47;
@@ -709,7 +709,7 @@ void func_L11_00452DF8(char *object) {
 /* func_L11_00452F30 is defined in L11_00452F30-helpers.c. */
 
 /* Makes the flamethrower robot turn around. */
-void func_L11_004530C0(char *object)
+void flamethrower_robot_start_turn_around(char *object)
 {
     func_32C9E0(object, 6, 3);
 }

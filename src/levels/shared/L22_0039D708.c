@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern void ref_L22_003A4FF8_00(void);
-extern int func_L22_003A2DF8(int, float);
+extern int math_get_float_bit(int, float);
 
 typedef struct Rec_003A2D58 {
     int count;
@@ -24,7 +24,7 @@ extern Rec_003A2D58 *D_L22_001FE940[];
 
 /* func_L22_003A1ED8 is defined in L22_003A1ED8.c. */
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 typedef int Quad_2160 __attribute__((mode(TI)));
 typedef union Path_2160 { Quad_2160 q; float f[4]; int count; } Path_2160;
@@ -46,16 +46,16 @@ typedef struct State_2160 {
 } State_2160;
 extern void func_002F3AB0(void *, void *, void *);
 extern float func_002F3C40(void *, void *);
-extern int func_L22_003A2780(char *, Quad_2160 *, Quad_2160 *);
-extern int func_L22_003A1ED8(void *);
-extern void func_L22_003A2988(void *, float);
-extern void func_L22_003A2A28(void *, int);
-extern void func_L22_003A2E50(char *, int, int, float);
+extern int WalkPathIsClear(char *, Quad_2160 *, Quad_2160 *);
+extern int space_ship_trace_safe_point_ahead(void *);
+extern void arena_push_point_out(void *, float);
+extern void lane_store_nearest_point_as_current(void *, int);
+extern void WalkPathPickNext(char *, int, int, float);
 extern void func_00321298(void *, void *, void *, void *);
 extern void func_0032FEB8(void *, void *);
 extern float func_0032A758(void *, void *, int);
 /* Steers the ship along its flight lanes toward a target point. It picks a lane, moves from point to point and goes around anything in the way. */
-void func_L22_003A2160(char *obj) {
+void WalkPathUpdate(char *obj) {
     char target[16], flat[16], point[16];
     float distances[2];
     State_2160 *st = *(State_2160 **)(obj + 0x68);
@@ -63,8 +63,8 @@ void func_L22_003A2160(char *obj) {
     float distance;
     qcopy_nc(target, st->target);
     qcopy_nc(flat, st->target);
-    PushPointOutOfArena(flat, 0.0f);
-    if (st->target == gHeroPosition) hit = st->target_hit;
+    arena_push_point_out(flat, 0.0f);
+    if (st->target == g_hero_position) hit = st->target_hit;
     else hit = WalkPathIsClear(obj, (Quad_2160 *)(obj + 0x10), (Quad_2160 *)st->target);
     if (!hit && st->state == 0) st->state = 1;
     active = 1;
@@ -74,7 +74,7 @@ void func_L22_003A2160(char *obj) {
         }
     } else if (st->state == 4) {
         if (hit) { st->avoiding = 0; active = 0; }
-    } else if (st->target == gHeroPosition && st->target_hit) {
+    } else if (st->target == g_hero_position && st->target_hit) {
         st->avoiding = 0; active = 0;
     } else if (!st->state && hit) {
         st->avoiding = 0; active = 0;
@@ -86,7 +86,7 @@ void func_L22_003A2160(char *obj) {
             if (func_002F3C40((obj + 0x10), st->avoidance) < 10.0f) st->avoiding = 0;
             qcopy(target, st->avoidance);
         } else {
-            if (TraceSafePointAheadOfShip(obj)) {
+            if (space_ship_trace_safe_point_ahead(obj)) {
                 qcopy(target, st->avoidance);
                 qcopy(st->previous, (obj + 0x10));
             }
@@ -98,7 +98,7 @@ void func_L22_003A2160(char *obj) {
     switch (state) {
     case 1: {
         Path_2160 *rec;
-        StoreNearestLanePointAsCurrent(obj, 1);
+        lane_store_nearest_point_as_current(obj, 1);
         rec = (Path_2160 *)D_L22_001FE940[st->paths[st->path]];
         qcopy_nc(point, rec + (st->point + 1));
         st->state = 2;
@@ -126,7 +126,7 @@ void func_L22_003A2160(char *obj) {
             else st->direction = 1;
             func_00321298(st->waypoint, point, rec + (st->direction + 1), (obj + 0x10));
         }
-        PushPointOutOfArena(st->waypoint, 0.0f);
+        arena_push_point_out(st->waypoint, 0.0f);
         break;
     }
     case 2:
@@ -150,7 +150,7 @@ void func_L22_003A2160(char *obj) {
                     else st->point = next;
                 }
                 qcopy(st->waypoint, (Path_2160 *)D_L22_001FE940[st->paths[st->path]] + (st->point + 1));
-                PushPointOutOfArena(st->waypoint, 0.0f);
+                arena_push_point_out(st->waypoint, 0.0f);
             }
             qcopy(target, st->waypoint);
         }
@@ -168,17 +168,17 @@ finish:
 }
 
 typedef int Quad_003A2780 __attribute__((mode(TI)));
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_L22_003A2988(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern void arena_push_point_out(void *, float);
 
 /* Walks from FROM to TO in steps of 8 units, each point dropped by the placement helper, and
  * returns 1 when no segment of the walk hits anything. Points over 50 units apart fail. */
 /* Checks that nothing blocks the straight way between two points. */
-int func_L22_003A2780(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
+int WalkPathIsClear(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
     struct { Quad_003A2780 end, step, previous, next, cursor, scaled; } v;
     char *state = *(char **)(obj + 0x68);
     int last;
@@ -186,12 +186,12 @@ int func_L22_003A2780(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
 
     if (fast_vec_dist(from, to) > 50.0f) return 0;
     qcopy(&v.end, to);
-    PushPointOutOfArena(&v.end, *(float *)(state + 0x114) + *(float *)(state + 0x110));
+    arena_push_point_out(&v.end, *(float *)(state + 0x114) + *(float *)(state + 0x110));
     FastVecSub(&v.step, &v.end, from);
     vec_scale_to_length(&v.step, &v.step, 8.0f);
     qcopy(&v.cursor, from);
     qcopy(&v.previous, from);
-    PushPointOutOfArena(&v.previous, *(float *)(state + 0x114) + *(float *)(state + 0x110));
+    arena_push_point_out(&v.previous, *(float *)(state + 0x114) + *(float *)(state + 0x110));
     last = 0;
     do {
         dist = fast_vec_dist(&v.cursor, &v.end);
@@ -200,10 +200,10 @@ int func_L22_003A2780(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
             vec_scale_to_length(&v.scaled, &v.step, dist);
             last = 1;
             FastVecAdd(&v.next, &v.cursor, &v.scaled);
-            PushPointOutOfArena(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
+            arena_push_point_out(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
         } else {
             FastVecAdd(&v.next, &v.cursor, &v.step);
-            PushPointOutOfArena(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
+            arena_push_point_out(&v.next, *(float *)(state + 0x114) + *(float *)(state + 0x110));
         }
         if (CollLine(&v.previous, &v.next, 0x12, 0, 0)) return 0;
         qcopy(&v.previous, &v.next);
@@ -216,12 +216,12 @@ int func_L22_003A2780(char *obj, Quad_003A2780 *from, Quad_003A2780 *to) {
 
 /* func_L22_003A2A28 is defined in L22_003A2A28-qcopy-barrier.c. */
 
-extern int func_L22_003A48F8(int);
+extern int list_is_key_missing(int);
 
 /* Collects the set bit positions of VALUE, keeping those a null FLAG lets
  * through and, otherwise, those the shared table scan accepts. */
 /* Lists which lanes are switched on in a bit mask. */
-int func_L22_003A2CB8(float value, int unused, int *out, int flag) {
+int lane_list_enabled_from_mask(float value, int unused, int *out, int flag) {
     int pos = 0;
     int count = 0;
     unsigned int mask;
@@ -232,7 +232,7 @@ int func_L22_003A2CB8(float value, int unused, int *out, int flag) {
     o = out;
     while (pos < 32) {
         if (mask & 1) {
-            if (flag == 0 || IsKeyMissingFromList(pos) != 0) {
+            if (flag == 0 || list_is_key_missing(pos) != 0) {
                 *o = pos;
                 o++;
                 count++;
@@ -245,30 +245,30 @@ int func_L22_003A2CB8(float value, int unused, int *out, int flag) {
 }
 
 /* Tells which end of a lane is the entry end for the given mask bit. Returns 0 for the start or the last point number. */
-int func_L22_003A2D58(char *obj, int laneSlot, int bit) {
+int lane_get_entry_end(char *obj, int laneSlot, int bit) {
     char *laneIds = *(char **)(obj + 0x68) + 0x2A0;
     int *slot = (int *)(laneIds + laneSlot * 4);
     Rec_003A2D58 *rec;
     int lastPoint;
     rec = D_L22_001FE940[*slot];
-    if (GetFloatBit(bit, rec->angle) != 0) return 0;
+    if (math_get_float_bit(bit, rec->angle) != 0) return 0;
     rec = D_L22_001FE940[*slot];
     lastPoint = rec->count - 1;
     rec = (Rec_003A2D58 *)((char *)rec + lastPoint * 16);
-    GetFloatBit(bit, rec->angle);
+    math_get_float_bit(bit, rec->angle);
     return lastPoint;
 }
 
 /* Returns bit BIT of VALUE's raw pattern. */
 /* Reads one bit of a number stored in a float. */
-int func_L22_003A2DF8(int bit, float value) {
+int math_get_float_bit(int bit, float value) {
     F32Bits bits;
     bits.f = value;
     return (bits.u >> bit) & 1;
 }
 
 /* Remembers the lane the ship just chose and keeps a short history of the last three lanes. */
-void func_L22_003A2E10(char *obj, int laneId) {
+void lane_remember_chosen(char *obj, int laneId) {
     char *vars = *(char **)(obj + 0x68);
     unsigned short previousLane = *(unsigned short *)(vars + 0x354);
     int i = (short)*(short *)(vars + 0x35E);
@@ -280,11 +280,11 @@ void func_L22_003A2E10(char *obj, int laneId) {
     *(unsigned short *)(vars + 0x354) = laneId;
 }
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern void func_002F3AB0(void *, void *, void *);
 extern float func_002F3C40(void *, void *);
 extern int func_0031FC88(int);
-extern int func_L22_003A6128(float);
+extern int mask_is_single_bit_set_and_valid(float);
 extern float func_002F3B88(void *, void *);
 extern float func_002F39F0(float);
 extern void func_002F3BB0(void *, void *, void *);
@@ -295,7 +295,7 @@ struct PathIds {
     int ids[32];
 };
 /* Chooses the next lane for the ship at a junction. Depending on the mode it picks randomly, the nearest lane or the one that fits the ship's heading best. */
-void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
+void WalkPathPickNext(char *obj, int mode, int filter, float bits) {
     int ids[4];
     char *points[4];
     union Endpoint { int value; unsigned short half[2]; } ends[4];
@@ -304,7 +304,7 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
     int count, i, selected, blocked, end, id;
     char *rec;
     float best, score;
-    count = ListEnabledLanesFromMask(bits, (int)obj, ids, filter);
+    count = lane_list_enabled_from_mask(bits, (int)obj, ids, filter);
     if (!count) {
         int direction = *(short *)(p + 0x352);
         *(short *)(p + 0x352) = -direction;
@@ -312,15 +312,15 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
     }
     if (!mode) {
         id = ids[func_0031FC88(count)];
-        end = GetLaneEntryEnd(obj, id, *(short *)(p + 0x354));
+        end = lane_get_entry_end(obj, id, *(short *)(p + 0x354));
         *(short *)(p + 0x352) = end == 0 ? 1 : -1;
         *(short *)(p + 0x356) = end;
-        RememberChosenLane(obj, id);
+        lane_remember_chosen(obj, id);
         return;
     }
     for (i = 0; i < count; i++) {
         id = ids[i];
-        ends[i].value = GetLaneEntryEnd(obj, id, *(short *)(p + 0x354));
+        ends[i].value = lane_get_entry_end(obj, id, *(short *)(p + 0x354));
         rec = (char *)D_L22_001FE940[((struct PathIds *)p)->ids[id]];
         if (!ends[i].value) points[i] = rec + *(int *)rec * 16;
         else points[i] = rec + 16;
@@ -332,7 +332,7 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
         best = 30000.0f;
         for (j = 0; j < count; j++) {
             rejected = 0;
-            if (filter) rejected = IsSingleBitSetAndValid(*(float *)(points[j] + 12));
+            if (filter) rejected = mask_is_single_bit_set_and_valid(*(float *)(points[j] + 12));
             score = func_002F3C40(points[j], *(void **)(p + 0x3AC));
             if ((score < best && !rejected) || count == 1) {
                 selected = j;
@@ -346,8 +346,8 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
         best = -30000.0f;
         for (k = 0; k < count; k++) {
             rejected = 0;
-            if (filter) rejected = IsSingleBitSetAndValid(*(float *)(points[k] + 12));
-            func_002F3AB0(a, gHeroPosition, obj + 0x10);
+            if (filter) rejected = mask_is_single_bit_set_and_valid(*(float *)(points[k] + 12));
+            func_002F3AB0(a, g_hero_position, obj + 0x10);
             func_002F3AB0(b, points[k], obj + 0x10);
             score = func_002F3B88(a, b);
             if ((best < score && !rejected) || count == 1) {
@@ -364,7 +364,7 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
         int n;
         for (n = 0; n < count; n++) {
             blocked = 0;
-            if (filter) blocked = IsSingleBitSetAndValid(*(float *)(points[n] + 12));
+            if (filter) blocked = mask_is_single_bit_set_and_valid(*(float *)(points[n] + 12));
             func_002F3AB0(a, p + 0x3F0, p + 0x400);
             func_002F3AB0(b, points[n], p + 0x400);
             func_002F3D60(c, a, 1.0f);
@@ -394,7 +394,7 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
         *(short *)(p + 0x352) = -1;
     }
     *(short *)(p + 0x356) = ends[selected].half[0];
-    RememberChosenLane(obj, id);
+    lane_remember_chosen(obj, id);
 }
 
 
@@ -411,12 +411,12 @@ typedef struct PathRec_003A36A0 {
     Quad_003A2780 pts[1];
 } PathRec_003A36A0;
 extern Quad_003A2780 D_L22_001C00E0;
-extern void func_L22_003A3CA0(char *);
-extern int func_002A77E0(int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_L22_003A3B50(void *, int);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, float);
+extern void pickup_reset_tables(char *);
+extern int math_random_int_below(int);
+extern void *memset(void *, int, unsigned int);
+extern void SpawnRandomKindAt(void *, int);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, float);
 
 /* Picks seven different points at random from the 32 paths in ST->ids and spawns an object at
  * each one, skipping five of the paths, then probes the points of the other_id path, spawning
@@ -424,7 +424,7 @@ extern void func_00282D30(void *, void *, float);
  * `% 3` results are unused: retail keeps only their zero-divisor guards (divisor 3, `beql`,
  * `break 0,7`), so the dividend is a reconstruction. */
 /* Spawns the first pickups around the arena. Seven are placed at random spots on the lanes and some more along one special lane. */
-void func_L22_003A36A0(char *obj) {
+void pickup_spawn_initial(char *obj) {
     struct {
         int cumulative[32];
         int selected[7];
@@ -435,8 +435,8 @@ void func_L22_003A36A0(char *obj) {
     int total = 0, i, j, next, unused, chosen, duplicate, n, spawned;
     Quad_003A2780 *pt;
 
-    ResetPickupTables(obj);
-    RandomIntBelow(3);
+    pickup_reset_tables(obj);
+    math_random_int_below(3);
     memset(v.selected, -1, 28);
     for (i = 0; i < 32; i++) {
         v.cumulative[i] = total;
@@ -445,7 +445,7 @@ void func_L22_003A36A0(char *obj) {
     for (i = 0; i < 7; i++) {
         duplicate = 1;
         do {
-            chosen = RandomIntBelow(total);
+            chosen = math_random_int_below(total);
             for (j = 0; j < 7; j++) {
                 if (chosen == v.selected[j]) {
                     duplicate = 1;
@@ -476,7 +476,7 @@ void func_L22_003A36A0(char *obj) {
     for (i = 0, spawned = 0; i < n && spawned < 27; i++) {
         unused = i % 3;
         pt = &rec->pts[i];
-        ComputeViewDirection(pt, &v.normal, 0);
+        cam_compute_view_direction(pt, &v.normal, 0);
         FastVecScale(&v.point, &v.normal, 6.0f);
         FastVecScale(&v.low, &v.normal, -3.0f);
         FastVecAdd(&v.point, &v.point, pt);
@@ -509,7 +509,7 @@ extern void func_0039CDC0(void *, void *, int, int, int);
 
 /* Runs the two optional child passes while the controller's counter lasts. */
 /* Runs the effect for the ship's attached part once for each side, then counts one use down. */
-void func_L22_003A47E8(char *obj, int flags, int a2, int a3, int a4) {
+void space_ship_run_attached_part_effect(char *obj, int flags, int a2, int a3, int a4) {
     char *vars = *(char **)(obj + 0x68);
     char point[16];
     if (D_L22_001B2AB4[0]->f8 == 0) return;
@@ -529,35 +529,35 @@ void func_L22_003A47E8(char *obj, int flags, int a2, int a3, int a4) {
 /* func_L22_003A4938 is defined in L22_0039D708-scan.c. */
 
 extern float D_L22_001B2AA4 __attribute__((sda));
-extern char *D_0018C0B0;
+extern char *g_hero_moby;
 extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3D60(void *, void *, float);
 extern void func_002F3AF0(void *, void *, float);
 extern void func_002F3A80(void *, void *, void *);
-extern void func_L22_003A2B90(void *, void *, void *, int);
-extern void func_L22_003A2988(void *, float);
+extern void lane_find_nearest_point(void *, void *, void *, int);
+extern void arena_push_point_out(void *, float);
 
 /* Builds the sub-object's three local matrices around its fixed offset and
  * hands the result to the placement helper. */
 /* Works out a point just ahead of the ship and finds the nearest lane point to it, to aim at. */
-void func_L22_003A4EE8(char *obj) {
+void lane_find_point_ahead_of_ship(char *obj) {
     char ahead[16];
     char back[16];
     char aim[16];
     char *vars = *(char **)(obj + 0x68);
     func_002F3AB0(ahead, obj + 0x10, vars + 0x3F0);
     func_002F3D60(ahead, ahead, D_L22_001B2AA4 * 4.0f);
-    func_002F3AF0(back, gHeroMoby_0018C0B0 + 0xE0, -D_L22_001B2AA4 * 4.0f);
+    func_002F3AF0(back, g_hero_moby + 0xE0, -D_L22_001B2AA4 * 4.0f);
     func_002F3A80(aim, ahead, back);
     func_002F3AF0(aim, aim, 0.5f);
     func_002F3A80(aim, aim, vars + 0x3F0);
-    FindNearestLanePoint(obj, vars + 0x3B0, aim, 1);
-    PushPointOutOfArena(vars + 0x3B0, 0.0f);
+    lane_find_nearest_point(obj, vars + 0x3B0, aim, 1);
+    arena_push_point_out(vars + 0x3B0, 0.0f);
     *(char **)(vars + 0x3AC) = vars + 0x3B0;
 }
 
 /* Calls a level helper and always says it worked. */
-int func_L22_003A4FF8(void) {
+int level_call_helper_return_true(void) {
     ref_L22_003A4FF8_00();
     return 1;
 }

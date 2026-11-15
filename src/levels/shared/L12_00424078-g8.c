@@ -8,11 +8,11 @@ extern u8 *D_L12_001B2E9C[3] __attribute__((sda)); /* entity base, read bare (lu
 extern s16 *D_L12_001FB960[];
 extern int D_L12_001B29C8 __attribute__((sda));
 extern char D_L12_001B2040[], D_L12_001B2070[];
-extern void func_0026FEB8(void *, int);
+extern void STUB_printf(void *, int);
 extern void func_L12_0031E1D0(void *, int, int);
-extern int func_002A8508(int, int);
-extern float func_00283CE0(int);
-extern int func_L01_0031BC68(int, int, float);
+extern int moby_count_group_not_in_state(int, int);
+extern float IntToFloat(int);
+extern int PulseColor(int, int, float);
 
 /* State 0 packs two colours from the byte values in words 0-3 and 4-7 into words 10 and 11
  * and counts the target ids in words 12-15 (up to four, ended by -1) into word 9; state 1,
@@ -21,7 +21,7 @@ extern int func_L01_0031BC68(int, int, float);
  * comes from func_L01_0031BC68 with words 10 and 11 and a phase angle of D_L12_001B29C8 modulo
  * the period in word 8. */
 /* Makes a group of lights pulse between two colours once the group is switched on. */
-void func_L12_00424078(u8 *obj) {
+void pulsing_light_group_update(u8 *obj) {
     int *vars = *(int **)(obj + 0x68);
     int i;
     int n;
@@ -57,7 +57,7 @@ void func_L12_00424078(u8 *obj) {
         }
         break;
     case 1:
-        if (CountMobysInGroupNotInState(obj[0x21], -1) >= 2) {
+        if (moby_count_group_not_in_state(obj[0x21], -1) >= 2) {
             ids = D_L12_001FB960[obj[0x21]];
             do {
                 member = D_L12_001B2E9C[0] + ((*(u16 *)ids & 0x7FFF) << 8);

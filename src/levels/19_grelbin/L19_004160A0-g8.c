@@ -16,61 +16,61 @@ typedef struct {
     char *target;
     int mode;
 } GrelbinContext;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char D_L19_001A8F20[] MACRO_ADDR;
 extern char D_L19_001BFEA0[], D_L19_001B9900[];
 extern char D_L19_001FF5C0[];
 typedef struct { char pad[0x464]; u8 entries[1]; } ActorFlags;
 extern ActorFlags D_L19_0021EA30;
 extern char *D_L19_001FB5A0[];
-extern char *D_L19_001B2A1C __attribute__((sda));
-extern void func_00310C88(void *);
+extern char *g_moby_l19_array __attribute__((sda));
+extern void moby_fade_out_update(void *);
 extern int D_L19_001B1BF8 __attribute__((sda));
-extern int D_L19_001B1D20 __attribute__((sda));
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_active_yeti_count __attribute__((sda));
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned char D_0019B4A8[];
-extern int func_002ACD38(void *);
-extern int func_00283CF0(float);
-extern void func_L00_002D7140(void *);
-extern int func_L19_004170D8(void *);
-extern int func_002A8508(int,int);
-extern void func_002A7750(void *,int,int);
-extern void func_002A7470(void *,int,int,int);
-extern int func_00282978(void *);
-extern int func_002A7820(int,int);
-extern float func_00283248(float,float);
-extern int func_L01_00322288(void *,float);
-extern char *func_L00_002D70A0(int);
-extern void func_002AA548(void *,void *,float,float,float,float);
-extern float func_00282E80(void *,void *);
-extern void func_002A6C58(void *,int,int);
-extern void func_0029F338(void *);
-extern int func_002AEB60(void *,float);
-extern char *func_0029EFD0(int);
+extern int moby_is_in_selected_zone(void *);
+extern int FloatToInt(float);
+extern void cam_end_override(void *);
+extern int leviathan_update_helper(void *);
+extern int moby_count_group_not_in_state(int,int);
+extern void moby_set_state(void *,int,int);
+extern void anim_start_blended(void *,int,int,int);
+extern int FastDecTimer(void *);
+extern int math_random_int_range(int,int);
+extern float mat_fast_helper_a(float,float);
+extern int moby_start_effect_from_entry(void *,float);
+extern char *cam_alloc_override_slot(int);
+extern void math_step_value_toward_target(void *,void *,float,float,float,float);
+extern float vec_distance_xy(void *,void *);
+extern void SetDeathBits(void *,int,int);
+extern void moby_mark_spawned(void *);
+extern int math_is_value_within_step(void *,float);
+extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
-extern void func_002AB650(void *);
-extern float func_0029F530(void *);
-extern void func_002A7A00(void *,float,float);
-extern float func_00282C48(float);
-extern void func_00282CC0(void *,void *,void *);
-extern char *func_00273730(void *,int,int,int,void *,void *,void *,int,float,float);
-extern void func_002B37E8(void *,void *);
-extern int func_002A77E0(int);
-extern void func_002E5CF8(int,int,void *);
-extern void func_L00_002E6CF0(void (*)(void *),void *);
-extern void func_L19_00417A58(void *), func_L19_00417CA0(void *), func_L19_00417F88(void *);
-extern void func_002A7988(void *,float,float);
-extern float func_002A78D8(float,float), func_002A7878(float,float);
-extern char *func_002C7970(void *,void *,int,int,int,int,int,float,float,float,int);
-extern void func_002A8C00(void *,void *,int,void *,float);
-extern void func_0029FC20(void *,int,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CF0(void *,void *,void *);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern void func_L19_00417A00(void *);
+extern void hero_copy_field_to_moby(void *);
+extern float moby_get_anim_value(void *);
+extern void vec_random_direction(void *,float,float);
+extern float math_fabs(float);
+extern void FastVecAdd(void *,void *,void *);
+extern char *cam_moby_create(void *,int,int,int,void *,void *,void *,int,float,float);
+extern void moby_init_child_from_parent(void *,void *);
+extern int math_random_int_below(int);
+extern void PlayMobySound(int,int,void *);
+extern void gfx_add_draw_callback_first(void (*)(void *),void *);
+extern void leviathan_draw_charge_flash(void *), part_emit_beam_muzzle_glow(void *), DrawGrelbinBeamEffect(void *);
+extern void part_spawn_random_direction_effect(void *,float,float);
+extern float math_random_signed_float_range(float,float), math_random_float_range(float,float);
+extern char *part_spawn_fading_drift(void *,void *,int,int,int,int,int,float,float,float,int);
+extern void make_hit_descriptor(void *,void *,int,void *,float);
+extern void moby_transform_joint_point(void *,int,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecSub(void *,void *,void *);
+extern int CollLine(void *,void *,int,void *,void *);
+extern void moby_tick_timers_age(void *);
 
 /* Updates the Arctic Leviathan every frame. It turns toward its target, walks, fires and bursts in turn, and blows apart when it is destroyed. */
-void func_L19_004160A0(char *moby)
+void leviathan_update(char *moby)
 {
     float burstVel[4] __attribute__((aligned(16)));
     float particleVel[4] __attribute__((aligned(16)));
@@ -85,8 +85,8 @@ void func_L19_004160A0(char *moby)
     float sizeScale=0.0f;
     u16 flags;
 
-    if (((GrelbinContext *)gHeroState)->mode == 0x6F) return;
-    if (!IsObjectInSelectedZone(moby+0x10)) {
+    if (((GrelbinContext *)g_hero_state)->mode == 0x6F) return;
+    if (!moby_is_in_selected_zone(moby+0x10)) {
         B(moby,0x30)=FloatToInt((float)S(moby,0x32)+15.0f);
         return;
     }
@@ -98,12 +98,12 @@ void func_L19_004160A0(char *moby)
         char *child=P(vars,0x2F0);
         if (child) H(child,0x34)&=0xFF7F;
     }
-    if ((unsigned)(B(moby,0x95)-2)>=2 || ((GrelbinContext *)gHeroState)->mode==0x31 || F(vars,0x20)<=0.0f) {
-        if (W(vars,0x310)) { EndCameraOverride(P(vars,0x314)); W(vars,0x310)=0; }
+    if ((unsigned)(B(moby,0x95)-2)>=2 || ((GrelbinContext *)g_hero_state)->mode==0x31 || F(vars,0x20)<=0.0f) {
+        if (W(vars,0x310)) { cam_end_override(P(vars,0x314)); W(vars,0x310)=0; }
     }
-    if (UpdateLeviathanHelperObject(moby)) {
-        if (W(vars,0x310)) {EndCameraOverride(P(vars,0x314)); W(vars,0x310)=0;}
-        MarkMobySpawned(moby);
+    if (leviathan_update_helper(moby)) {
+        if (W(vars,0x310)) {cam_end_override(P(vars,0x314)); W(vars,0x310)=0;}
+        moby_mark_spawned(moby);
         return;
     }
     switch (B(moby,0x95)) {
@@ -112,53 +112,53 @@ void func_L19_004160A0(char *moby)
         char *idleTarget;
         canAct=1;
         if (B(moby,0x21)!=0xFF && D_L19_001FB5A0[B(moby,0x21)]) {
-            if (CountMobysInGroupNotInState(W(vars,0x308),-1)) canAct=0;
+            if (moby_count_group_not_in_state(W(vars,0x308),-1)) canAct=0;
         }
         if (W(vars,0x30C)!=-1) {
-            idleTarget=gMobyArray_L19+(W(vars,0x30C)<<8);
+            idleTarget=g_moby_l19_array+(W(vars,0x30C)<<8);
             if (idleTarget && B(idleTarget,0x20)!=0xFE && B(idleTarget,0x20)!=0xFD) canAct=0;
         }
         if (canAct) {
             if (W(vars,0x2FC)==1) {
-                SetMobyState(moby,4,2);
-                if (B(moby,0x43)) StartAnimationBlended(moby,0,0,10);
+                moby_set_state(moby,4,2);
+                if (B(moby,0x43)) anim_start_blended(moby,0,0,10);
             } else if (W(vars,0x220) && FastDecTimer(vars+0x21E)) {
-                SetMobyState(moby,2,1);
+                moby_set_state(moby,2,1);
                 W(vars,0x220)=0;
-                if (W(vars,0x218)<300) W(vars,0x218)=RandomIntRange(480,600);
+                if (W(vars,0x218)<300) W(vars,0x218)=math_random_int_range(480,600);
             }
         }
         idleTarget=P(vars,0x200);
-        StartMobyEffectFromEntry(moby,FastMatrixHelperA(F(idleTarget,0x10)-F(moby,0x10),F(idleTarget,0x14)-F(moby,0x14)));
+        moby_start_effect_from_entry(moby,mat_fast_helper_a(F(idleTarget,0x10)-F(moby,0x10),F(idleTarget,0x14)-F(moby,0x14)));
         break;
     }
     case 1:
         if ((W(vars,0x2FC)==1 || W(vars,0x2F8)==1) && B(moby,0x20)!=11) {
-            SetMobyState(moby,7,2);
-            if (B(moby,0x43)!=2) StartAnimationBlended(moby,2,0,10);
+            moby_set_state(moby,7,2);
+            if (B(moby,0x43)!=2) anim_start_blended(moby,2,0,10);
         }
         break;
     case 2:
     {
         char *attackTarget;
-        if (!W(vars,0x310) && ((GrelbinContext *)gHeroState)->mode!=0x31) {
-            P(vars,0x314)=AllocCameraOverrideSlot(5);
+        if (!W(vars,0x310) && ((GrelbinContext *)g_hero_state)->mode!=0x31) {
+            P(vars,0x314)=cam_alloc_override_slot(5);
             F(P(vars,0x314),0)=10.0f;
             F(P(vars,0x314),4)=0.1f;
             W(P(vars,0x314),0xC)=0;
             W(vars,0x310)=1;
         }
         attackTarget=P(vars,0x200);
-        StartMobyEffectFromEntry(moby,FastMatrixHelperA(F(attackTarget,0x10)-F(moby,0x10),F(attackTarget,0x14)-F(moby,0x14)));
-        if (B(moby,0x20)!=4) StepValueTowardTarget(moby+0x18,vars+0x2D4,F(vars,0x2D0),0.003888888983f,0.003888888983f,0.7000000477f);
+        moby_start_effect_from_entry(moby,mat_fast_helper_a(F(attackTarget,0x10)-F(moby,0x10),F(attackTarget,0x14)-F(moby,0x14)));
+        if (B(moby,0x20)!=4) math_step_value_toward_target(moby+0x18,vars+0x2D4,F(vars,0x2D0),0.003888888983f,0.003888888983f,0.7000000477f);
         if (B(moby,0x20)!=4 && B(moby,0x20)!=11) {
-            if (vec_distance_xy(moby+0x10,((GrelbinContext *)gHeroState)->position)<12.0f) F(vars,0x2D0)=F(vars,0x2D8)-10.0f;
-            else if (vec_distance_xy(moby+0x10,((GrelbinContext *)gHeroState)->position)<26.0f) F(vars,0x2D0)=F(vars,0x2D8)-7.0f;
+            if (vec_distance_xy(moby+0x10,((GrelbinContext *)g_hero_state)->position)<12.0f) F(vars,0x2D0)=F(vars,0x2D8)-10.0f;
+            else if (vec_distance_xy(moby+0x10,((GrelbinContext *)g_hero_state)->position)<26.0f) F(vars,0x2D0)=F(vars,0x2D8)-7.0f;
             else F(vars,0x2D0)=F(vars,0x2D8)-4.0f;
         }
         if (W(vars,0x2FC)!=1 && W(vars,0x2F8)!=1 && B(moby,0x20)!=4 && B(moby,0x20)!=7 && B(moby,0x20)!=8 && B(moby,0x20)!=9 && B(moby,0x20)!=11) {
-            SetMobyState(moby,2,1);
-            if (B(moby,0x43)!=1) StartAnimationBlended(moby,1,0,10);
+            moby_set_state(moby,2,1);
+            if (B(moby,0x43)!=1) anim_start_blended(moby,1,0,10);
         }
         break;
     }
@@ -166,25 +166,25 @@ void func_L19_004160A0(char *moby)
     {
         char *dyingTarget;
         dyingTarget=P(vars,0x200);
-        StartMobyEffectFromEntry(moby,FastMatrixHelperA(F(dyingTarget,0x10)-F(moby,0x10),F(dyingTarget,0x14)-F(moby,0x14)));
-        if (B(moby,0x20)!=4) StepValueTowardTarget(moby+0x18,vars+0x2D4,F(vars,0x2D0),0.3888888955f,0.3888888955f,0.7000000477f);
+        moby_start_effect_from_entry(moby,mat_fast_helper_a(F(dyingTarget,0x10)-F(moby,0x10),F(dyingTarget,0x14)-F(moby,0x14)));
+        if (B(moby,0x20)!=4) math_step_value_toward_target(moby+0x18,vars+0x2D4,F(vars,0x2D0),0.3888888955f,0.3888888955f,0.7000000477f);
         /* fall through */
     }
     case 3:
-        if (B(moby,0x60)&2) {SetDeathBits(moby,0,3);MarkMobySpawned(moby);return;}
+        if (B(moby,0x60)&2) {SetDeathBits(moby,0,3);moby_mark_spawned(moby);return;}
     {
     char *childState;
-    if (F(vars,0x20)<=0.0f && IsValueWithinStepOfThreshold(moby,45.0f) && !(D_L19_0021EA30.entries[(s16)(flags=H(moby,0xB2))])) {
-        int counts=D_0019B4A8[((s16)flags>>1)+(gCurrentMapIndex<<10)];
+    if (F(vars,0x20)<=0.0f && math_is_value_within_step(moby,45.0f) && !(D_L19_0021EA30.entries[(s16)(flags=H(moby,0xB2))])) {
+        int counts=D_0019B4A8[((s16)flags>>1)+(g_current_map_index<<10)];
         if (!((flags&1) ? (counts>>4)&7 : counts&7)) {
             spawnedActor=CreateMoby(0x1266 /* moby class 4710 */);
             if (spawnedActor) {
                 u16 id=H(moby,0xB2);
                 if (id&1) {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(gCurrentMapIndex<<10));
+                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
                     if (((*marks>>4)&7)!=7) *marks+=0x10;
                 } else {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(gCurrentMapIndex<<10));
+                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
                     if ((*marks&7)!=7) *marks+=1;
                 }
                 B(spawnedActor,0x23)=0x50;
@@ -193,9 +193,9 @@ void func_L19_004160A0(char *moby)
                 B(spawnedActor,0x20)=0; B(spawnedActor,0xBC)=0;
                 qcopy(spawnedActor+0x10,P(vars,0x2F0)+0x10);
                 F(spawnedActor,0x18)+=1.0f;
-                func_002A0F48(spawnedActor);CopyHeroField38ToMoby(spawnedActor);
+                func_002A0F48(spawnedActor);hero_copy_field_to_moby(spawnedActor);
                 childState=P(spawnedActor,0x68); F(childState,0)=0.1f;
-                StartAnimationBlended(spawnedActor,1,0,20);
+                anim_start_blended(spawnedActor,1,0,20);
                 F(spawnedActor,0x48)=F(childState,0)+F(childState,0);B(spawnedActor,0x20)=2;
             }
         }
@@ -207,7 +207,7 @@ void func_L19_004160A0(char *moby)
     case 4:
     {
         char *newActor;
-        if (GetMobyAnimationValue(moby)>=4.0f && !W(vars,0x304) && !B(moby,0x42)) {
+        if (moby_get_anim_value(moby)>=4.0f && !W(vars,0x304) && !B(moby,0x42)) {
             char *shake=D_L19_001B9900;
             int j;
             F(shake,0x160)=0.25f;
@@ -216,88 +216,88 @@ void func_L19_004160A0(char *moby)
             W(moby,0x98)=W(P(moby,0x24),0x10);W(vars,0x304)=1;
             for (j=0;j<5;j++) {
                 char *effect,*src;
-                RandomDirectionVector(burstVel,0.2833333611f,0.3500000238f);
-                burstVel[2]=FloatAbs(burstVel[2])*6.5f;
+                vec_random_direction(burstVel,0.2833333611f,0.3500000238f);
+                burstVel[2]=math_fabs(burstVel[2])*6.5f;
                 if (burstVel[2]>1.2500001192f) burstVel[2]=1.2500001192f;
                 FastVecAdd(burstVel,burstVel,D_L19_001A8F20);
                 src=P(vars,0x2F0);
-                effect=CreateCameraMoby(src,1,S(src,0xAA),j,src+0x10,src+0xF0,burstVel,0xFF,180.0f,45.0f);
-                P(effect,0x64)=(char *)UpdateFadeOutMoby;
+                effect=cam_moby_create(src,1,S(src,0xAA),j,src+0x10,src+0xF0,burstVel,0xFF,180.0f,45.0f);
+                P(effect,0x64)=(char *)moby_fade_out_update;
             }
             newActor=CreateMoby(0x1208 /* moby class 4616 */);
             if (newActor) {
-                InitChildObjectFromParent(newActor,P(vars,0x2F0));
+                moby_init_child_from_parent(newActor,P(vars,0x2F0));
                 H(newActor,0x32)=H(moby,0x32);B(newActor,0x30)=B(moby,0x30);
                 oldChild=P(vars,0x2F0);
                 {
                     int row;
                     for (row=0;row<4;row++) qcopy_nc(newActor+0xC0+row*16,oldChild+0xC0+row*16);
                 }
-                MarkMobySpawned(P(vars,0x2F0));P(vars,0x2F0)=newActor;
+                moby_mark_spawned(P(vars,0x2F0));P(vars,0x2F0)=newActor;
             }
         }
         if (B(moby,0x60)&2) {
             F(vars,0x2D0)=F(vars,0x2D8)-7.0f;
-            SetMobyState(moby,7,-1);
-            if (B(moby,0x43)!=2) StartAnimationBlended(moby,2,0,10);
+            moby_set_state(moby,7,-1);
+            if (B(moby,0x43)!=2) anim_start_blended(moby,2,0,10);
         }
         break;
     }
     case 2:
         if (B(moby,0x60)&2) {
             count=B(moby,0x43);
-            if (count!=RandomIntBelow(2)+3) StartAnimationBlended(moby,RandomIntBelow(2)+3,0,2);
-            SetMobyState(moby,3,-1);
+            if (count!=math_random_int_below(2)+3) anim_start_blended(moby,math_random_int_below(2)+3,0,2);
+            moby_set_state(moby,3,-1);
         }
         break;
     case 3:
         if (B(moby,0x60)&2) {
-            if (B(moby,0x43)!=1) StartAnimationBlended(moby,1,0,4);
-            SetMobyState(moby,2,-1);
+            if (B(moby,0x43)!=1) anim_start_blended(moby,1,0,4);
+            moby_set_state(moby,2,-1);
         }
         break;
     case 5:
         if (B(moby,0x60)&2) {
-            SetMobyState(moby,7,-1);
-            if (B(moby,0x43)!=2) StartAnimationBlended(moby,2,0,6);
+            moby_set_state(moby,7,-1);
+            if (B(moby,0x43)!=2) anim_start_blended(moby,2,0,6);
         }
         break;
     case 7:
-        if (IsValueWithinStepOfThreshold(moby,13.0f)) PlayMobySound(4,0,moby);
-        if (GetMobyAnimationValue(moby)>17.0f && B(moby,0x42)==2) {
-            F(moby,0x48)=0.5f;AddDrawCallbackToList1(DrawLeviathanChargeFlash,moby);
+        if (math_is_value_within_step(moby,13.0f)) PlayMobySound(4,0,moby);
+        if (moby_get_anim_value(moby)>17.0f && B(moby,0x42)==2) {
+            F(moby,0x48)=0.5f;gfx_add_draw_callback_first(leviathan_draw_charge_flash,moby);
             if (B(moby,0x60)&2) {
                 qcopy(vars+0x2E0,vars+0x1F0);
-                SetMobyState(moby,8,-1);
-                if (B(moby,0x43)!=4) StartAnimationBlended(moby,4,20,20);
+                moby_set_state(moby,8,-1);
+                if (B(moby,0x43)!=4) anim_start_blended(moby,4,20,20);
             }
         }
         break;
     case 8:
-        AddDrawCallbackToList1(EmitBeamMuzzleGlow,moby);
-        if (F(vars,0x22C)>=1.0f) {PlayMobySound(3,0,moby);SetMobyState(moby,9,-1);}
+        gfx_add_draw_callback_first(part_emit_beam_muzzle_glow,moby);
+        if (F(vars,0x22C)>=1.0f) {PlayMobySound(3,0,moby);moby_set_state(moby,9,-1);}
         break;
     case 9:
     {
         char *particle;
-        AddDrawCallbackToList1(DrawGrelbinBeamEffect,moby);
+        gfx_add_draw_callback_first(DrawGrelbinBeamEffect,moby);
         qcopy(burstVel,D_L19_001BFEA0);
         for (i=9;i>=0;i--) {
-            SpawnRandomDirectionEffect(particleVel,0.2333333492f,0.2666666806f);
+            part_spawn_random_direction_effect(particleVel,0.2333333492f,0.2666666806f);
             if (particleVel[2]<0.0f) particleVel[2]=-particleVel[2];
-            count=FloatToInt(RandomSignedFloatRange(2.0f,5.0f));
-            sizeScale=RandomFloatRange(0.6f,1.0f);
-            SpawnFadingDriftParticle(vars+0x2C0,particleVel,20,0x804020,count,127,127,210000.0f*sizeScale,2100.0f,0.00405555591f,D_L19_001B1BF8);
-            count=FloatToInt(RandomSignedFloatRange(2.0f,5.0f));
-            sizeScale=RandomFloatRange(0.6f,1.0f);
-            particle=SpawnFadingDriftParticle(vars+0x2C0,particleVel,20,0x804040,count,48,48,630000.0f*sizeScale,4200.0f,0.00405555591f,0);
+            count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
+            sizeScale=math_random_float_range(0.6f,1.0f);
+            part_spawn_fading_drift(vars+0x2C0,particleVel,20,0x804020,count,127,127,210000.0f*sizeScale,2100.0f,0.00405555591f,D_L19_001B1BF8);
+            count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
+            sizeScale=math_random_float_range(0.6f,1.0f);
+            particle=part_spawn_fading_drift(vars+0x2C0,particleVel,20,0x804040,count,48,48,630000.0f*sizeScale,4200.0f,0.00405555591f,0);
             if (particle) {
                 char *g=D_L19_001FF5C0;
                 B(particle,2)=B(P(g,0xD4),0);
             }
         }
         make_hit_descriptor(hitMatrix,moby,0x10001,D_L19_001A8F20,(float)B(vars,0x34));
-        TransformMobyJointPoint(moby,0,bodyMatrix);
+        moby_transform_joint_point(moby,0,bodyMatrix);
         qcopy(particleVel,bodyMatrix+0x30);
         vec_scale_to_length(offset,bodyMatrix,0.25f);
         FastVecAdd(particleVel,particleVel,offset);
@@ -309,8 +309,8 @@ void func_L19_004160A0(char *moby)
             F(vars,0x234)-=0.05f;
             if (F(vars,0x234)<=0.0f) {
                 F(vars,0x22C)=0.0f;F(vars,0x230)=1.0f;F(vars,0x228)=0.1f;F(vars,0x234)=0.1f;F(vars,0x238)=0.1f;
-                SetMobyState(moby,10,-1);
-                if (B(moby,0x43)!=3) StartAnimationBlended(moby,3,0,10);
+                moby_set_state(moby,10,-1);
+                if (B(moby,0x43)!=3) anim_start_blended(moby,3,0,10);
             }
         } else {
             F(vars,0x234)+=0.1f;if (F(vars,0x234)>1.0f) F(vars,0x234)=1.0f;
@@ -320,32 +320,32 @@ void func_L19_004160A0(char *moby)
     }
     case 10:
         if (B(moby,0x60)&2) {
-            SetMobyState(moby,7,-1);
-            if (B(moby,0x43)!=2) StartAnimationBlended(moby,2,0,10);
+            moby_set_state(moby,7,-1);
+            if (B(moby,0x43)!=2) anim_start_blended(moby,2,0,10);
         }
         break;
     case 11:
     {
         char *finalTarget;
         finalTarget=P(vars,0x200);
-        if (finalTarget && S(finalTarget,0xAA)==0x10D0 /* Y.E.T.I. */) StartMobyEffectFromEntry(P(vars,0x200),FastMatrixHelperA(F(moby,0x10)-F(finalTarget,0x10),F(moby,0x14)-F(finalTarget,0x14)));
+        if (finalTarget && S(finalTarget,0xAA)==0x10D0 /* Y.E.T.I. */) moby_start_effect_from_entry(P(vars,0x200),mat_fast_helper_a(F(moby,0x10)-F(finalTarget,0x10),F(moby,0x14)-F(finalTarget,0x14)));
         if (B(moby,0x60)&2) {
             F(vars,0x2D0)=F(vars,0x2D8)-4.0f;
             if (W(vars,0x2FC)!=1 && W(vars,0x2F8)!=1) {
-                SetMobyState(moby,7,2);
-                if (B(moby,0x43)!=2) StartAnimationBlended(moby,2,0,10);
+                moby_set_state(moby,7,2);
+                if (B(moby,0x43)!=2) anim_start_blended(moby,2,0,10);
             } else {
-                SetMobyState(moby,2,1);
-                if (B(moby,0x43)!=1) StartAnimationBlended(moby,1,0,10);
+                moby_set_state(moby,2,1);
+                if (B(moby,0x43)!=1) anim_start_blended(moby,1,0,10);
             }
         }
-        if (IsValueWithinStepOfThreshold(moby,11.0f) && B(moby,0x42)==6) {
+        if (math_is_value_within_step(moby,11.0f) && B(moby,0x42)==6) {
             GrelbinContext *ctx;
             char *next;
             char *dead=P(vars,0x200);
-            --gActiveYetiCount;
-            MarkMobySpawned(dead);
-            ctx=(GrelbinContext *)gHeroState;
+            --g_active_yeti_count;
+            moby_mark_spawned(dead);
+            ctx=(GrelbinContext *)g_hero_state;
             next=ctx->target;
             W(vars,0x204)=1;
             P(vars,0x200)=next;
@@ -354,5 +354,5 @@ void func_L19_004160A0(char *moby)
         break;
     }
     }
-    TickMobyTimersAndAge(moby);
+    moby_tick_timers_age(moby);
 }

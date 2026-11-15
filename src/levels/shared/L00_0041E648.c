@@ -5,20 +5,20 @@ typedef struct { Quad128 vertices[4]; unsigned int colors[4]; float uv[4][2]; lo
 typedef union { QuadPacket raw; StripPayload view; } StripPacket;
 typedef unsigned int Rac2Native_9da4b6b15b3cf4a0_RecordWord180;
 typedef unsigned long long Rac2Native_9da4b6b15b3cf4a0_RecordValue180;
-extern int func_L00_0032A088(int id, int index);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
-extern void func_002FC560(Rac2Native_9da4b6b15b3cf4a0_RecordWord180,Rac2Native_9da4b6b15b3cf4a0_RecordValue180);
-extern void func_00281DE8(QuadPacket *,int,int,int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00280B90(void *,void *,int);
+extern int level_get_slot_body(int id, int index);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
+extern void VU1_addGSregister(Rac2Native_9da4b6b15b3cf4a0_RecordWord180,Rac2Native_9da4b6b15b3cf4a0_RecordValue180);
+extern void gfx_init_quad_packet_state(QuadPacket *,int,int,int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void draw_world_quad(void *,void *,int);
 /* Draws the trail strip along the owner table path, fading the alpha near the end of its life. */
-void func_L00_0041E648(void *self,int color,int alpha)
+void rocket_draw_ribbon_strip(void *self,int color,int alpha)
 {
     StripPacket packet;
     Quad128 direction,side;
@@ -26,11 +26,11 @@ void func_L00_0041E648(void *self,int color,int alpha)
     Quad128 **table;
     int index;
     float fraction,uvStep,width;
-    table=(Quad128 **)GetSlotBody(*(int *)(state+0x50),*(int *)(state+0x3c));
-    if(!table) { ClearEntryFlag(*(int *)(state+0x6c)); MarkMobySpawned(object); return; }
+    table=(Quad128 **)level_get_slot_body(*(int *)(state+0x50),*(int *)(state+0x3c));
+    if(!table) { table_clear_entry_flag(*(int *)(state+0x6c)); moby_mark_spawned(object); return; }
     if(*(int *)(state+0x54)<3) return;
     VU1_addGSregister(0x47,0x5360bULL);
-    InitQuadPacketState(&packet.raw,11,1,128);
+    gfx_init_quad_packet_state(&packet.raw,11,1,128);
     packet.view.uv[0][0]=0; packet.view.uv[0][1]=0;
     packet.view.uv[1][0]=0; packet.view.uv[1][1]=1;
     packet.view.uv[2][0]=0.5f; packet.view.uv[2][1]=0;

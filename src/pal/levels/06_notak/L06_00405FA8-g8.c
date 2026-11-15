@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "common.h"
-extern void func_002A7750(void *, int, int);
-extern int func_002A9640(void *, int, int);
-extern void func_L00_0032A258(void *, void *, void *, void *, int, int, int, int,
+extern void moby_set_state(void *, int, int);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int,
                                int, int, int);
-extern void func_L01_0031A278(char *, float *, float, float, float);
-extern void func_L06_00402230(char *);
-extern void func_0029F338(void *);
+extern void moby_compute_local_point(char *, float *, float, float, float);
+extern void part_emit_rings(char *);
+extern void moby_mark_spawned(void *);
 extern float D_L06_001B0020 __attribute__((sda));
 extern float D_L06_001B0028 __attribute__((sda));
 extern float D_L06_001B0030 __attribute__((sda));
@@ -25,21 +25,21 @@ void func_PAL_L06_004061B8(char *a0)
     case 0:
         if (*(int *)(s1 + 4) != 0)
             *(unsigned short *)(s0 + 0x34) |= 0x8000;
-        func_002A7750(s0, 1, -1);
+        moby_set_state(s0, 1, -1);
         break;
     case 1:
-        if (func_002A9640(s0, 0x4010000, 0) != 0) {
+        if (part_find_owned_effect_slot(s0, 0x4010000, 0) != 0) {
             if (*(int *)s1 == 0)
-                func_002A7750(s0, 2, -1);
+                moby_set_state(s0, 2, -1);
         }
         *(unsigned char *)(s0 + 0xA8) = 0xFF;
         break;
     case 2:
-        func_L00_0032A258(s0, &D_L06_001B0030, &D_L06_001B0028, &D_L06_001B0020,
+        part_explode_object_into_pieces(s0, &D_L06_001B0030, &D_L06_001B0028, &D_L06_001B0020,
                           0xFFFF, 0, D_L06_001B0050, 6, 0xFFFF, 0xFF, 0);
-        func_L01_0031A278(s0, buf, 1.0f, 1.0f, 3.0f);
-        func_L06_00402230(s0);
-        func_0029F338(s0);
+        moby_compute_local_point(s0, buf, 1.0f, 1.0f, 3.0f);
+        part_emit_rings(s0);
+        moby_mark_spawned(s0);
         break;
     }
 }

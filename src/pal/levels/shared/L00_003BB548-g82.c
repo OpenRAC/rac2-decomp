@@ -1,20 +1,20 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_0029FCC0(void *, int, void *);
-extern int func_00282948(char *);
-extern char D_00189E20[];
-extern void func_002FDF40(void *, void *, int, int, float, float, float, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int math_fast_float_d(char *);
+extern char g_hero_state[];
+extern void CalculateAimedLaunchVelocity(void *, void *, int, int, float, float, float, float);
 extern int func_PAL_002FF5F8(void *, void *, void *, void *, void *, char **, int *, float);
-extern int func_00300540(int);
-extern void func_002FE8D8(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_L00_002D3F30(int, int);
-extern int func_002B0CE0(int, int, int);
+extern int weapon_get_group(int);
+extern void moby_get_facing_direction(void *, void *);
+extern float FastVecDot(void *, void *);
+extern int weapon_spend_ammo(int, int);
+extern int ForceClaimNotice(int, int, int);
 extern void func_PAL_L00_002AF458(void);
 extern void func_PAL_L00_002AF6C0(void);
-extern void func_002E5CF8(int, int, void *);
-extern char *func_L00_003DE088(void *, void *);
+extern void PlayMobySound(int, int, void *);
+extern char *spider_bot_spawn(void *, void *);
 extern void ref_L00_003B7D48_00(void (*)(void *), void *);
 extern void func_PAL_L00_003BBD00(void *);
 typedef struct OBJ2 {
@@ -39,18 +39,18 @@ void func_PAL_L00_003BB8F0(char *m) {
     float height;
 
     {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
 
         if (*(int *)(g + 0x1244) == 3)
             D_L00_001AFBC0 = 0;
-        func_0029FCC0(m, 0, pos);
+        moby_transform_joint_to_world(m, 0, pos);
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
-        func_002FDF40(sweep, pos, 0, 0, 1.6f, height, 0.16000001f, 0.0044f);
+        CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.16000001f, 0.0044f);
     }
     *(int *)(d + 0x24) = func_PAL_002FF5F8(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.0044f);
-    result = func_00300540(aux);
+    result = weapon_get_group(aux);
     if (D_L00_001A8F00 || D_L00_001A8F08 != -2)
         *(int *)(d + 0x2C) = 1;
     if (D_L00_001A8FF4 && *(float *)(d + 8) < 462.42999267578125f)
@@ -58,7 +58,7 @@ void func_PAL_L00_003BB8F0(char *m) {
     if (result || !*(int *)(d + 0x24) || !*(int *)(d + 0x28))
         goto blocked;
     {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
 
         state = *(int *)(g + 0x2294);
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
@@ -70,18 +70,18 @@ void func_PAL_L00_003BB8F0(char *m) {
         if (hit && (*(short *)(hit + 0xAA) == 0xB21 || *(short *)(hit + 0xAA) == 0xB5B))
             goto blocked;
     }
-    func_002FE8D8(d, normal);
-    if (!(func_00282DB0(d + 0x10, normal) < 0.75f))
+    moby_get_facing_direction(d, normal);
+    if (!(FastVecDot(d + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
     *(int *)(d + 0x2C) = 1;
 timer:
     {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
 
         ready = 1;
         if (*(int *)(g + 0x2294) == 29) {
-            if (!func_00282948(g + 0x2534))
+            if (!math_fast_float_d(g + 0x2534))
                 ready = 0;
         } else
             *(int *)(g + 0x2534) = 33;
@@ -94,37 +94,37 @@ timer:
         *(int *)(d + 0x24) = 0;
         /* falls through */
     case 1: {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
 
         if ((D_00138324 & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
             !*(int *)(d + 0x2C) && ready) {
-            if (func_L00_002D3F30(-1, 1)) {
+            if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
+                ForceClaimNotice(6, 0, 1);
                 *(short *)(g + 0x1D2) = 0;
                 func_PAL_L00_002AF458();
                 *(unsigned char *)(m + 0x20) = 2;
                 *(int *)(d + 0x20) = 10;
                 *(int *)(d + 0x28) = 0;
             } else
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, m);
         }
         break;
     }
     case 2:
-        if (func_00282948(d + 0x20)) {
-            char *p = func_L00_003DE088(pos, sweep);
+        if (math_fast_float_d(d + 0x20)) {
+            char *p = spider_bot_spawn(pos, sweep);
 
             if (p)
                 *(char **)(p + 0xB8) = m;
-            func_002E5CF8(1, 0, m);
+            PlayMobySound(1, 0, m);
             func_PAL_L00_002AF6C0();
             *(unsigned char *)(m + 0x20) = 3;
             *(int *)(d + 0x20) = 4;
         }
         break;
     case 3:
-        if (func_00282948(d + 0x20))
+        if (math_fast_float_d(d + 0x20))
             *(unsigned char *)(m + 0x20) = 1;
         break;
     }

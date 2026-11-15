@@ -14,10 +14,10 @@ extern BorderOffset_00338AD8 ref_00338AD8_00;
 extern BorderOffset_00338AD8 ref_00338AD8_01;
 extern TextOffset_00338AD8 ref_00338AD8_02[] __attribute__((sda));
 extern TextOffset_00338AD8 ref_00338AD8_02_gp[] SDATA(ref_00338AD8_02);
-extern void func_0027EAE8(int, int, int, int, int, void *);
-extern void func_00335E38(void *, float, float, float, float);
-extern void func_00335F88(void *, float, float, float, float);
-extern void func_00336320(void *);
+extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern void object_set_second_float4(void *, float, float, float, float);
+extern void gfx_draw_screen_element_stored(void *);
 extern float func_PAL_0033A598(void *, int);
 extern void func_PAL_0027FE88(float, float, long, signed char *, int, float);
 
@@ -34,36 +34,36 @@ void func_PAL_0033A9B0(char *object)
     colors[1] = colors[0];
     colors[2] = colors[0];
     colors[3] = colors[0];
-    func_0027EAE8((int)((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)),
+    gfx_draw_screen_rectangle((int)((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)),
                  (int)((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)),
                  (int)((*(float **)object)[0] + (float)*(int *)(object + 0x1a8)),
                  (int)((*(float **)object)[1] + (float)*(int *)(object + 0x1ac)), 0xfffff0, colors);
     corner = ref_00338AD8_00;
     edge = ref_00338AD8_01;
-    func_00335E38(top, ((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - corner.x,
+    object_set_first_float4(top, ((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - corner.x,
                       ((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - corner.y, 0.0f, 0.0f);
-    func_00335F88(top, -1.0f, 1.0f, 0.0f, 0.0f);
-    func_00336320(top);
-    func_00335E38(top, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + corner.x + 1.0f,
+    object_set_second_float4(top, -1.0f, 1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(top);
+    object_set_first_float4(top, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + corner.x + 1.0f,
                       ((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - corner.y, 0.0f, 0.0f);
-    func_00335F88(top, 1.0f, 1.0f, 0.0f, 0.0f);
-    func_00336320(top);
-    func_00335E38(side, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + edge.x,
+    object_set_second_float4(top, 1.0f, 1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(top);
+    object_set_first_float4(side, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + edge.x,
                        ((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - edge.y, 0.0f, 0.0f);
-    func_00335F88(side, 1.0f, 1.0f, 0.0f, 0.0f);
-    func_00336320(side);
-    func_00335E38(side, ((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - edge.x + 1.0f,
+    object_set_second_float4(side, 1.0f, 1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(side);
+    object_set_first_float4(side, ((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - edge.x + 1.0f,
                        ((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - edge.y, 0.0f, 0.0f);
-    func_00335F88(side, -1.0f, 1.0f, 0.0f, 0.0f);
-    func_00336320(side);
-    func_00335E38(side, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + edge.x,
+    object_set_second_float4(side, -1.0f, 1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(side);
+    object_set_first_float4(side, (*(float **)object)[0] + (float)*(int *)(object + 0x1a8) + edge.x,
                        (((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - edge.y) + *(float *)(object + 0x1d0), 0.0f, 0.0f);
-    func_00335F88(side, 1.0f, -1.0f, 0.0f, 0.0f);
-    func_00336320(side);
-    func_00335E38(side, (((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - edge.x) + 1.0f,
+    object_set_second_float4(side, 1.0f, -1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(side);
+    object_set_first_float4(side, (((*(float **)object)[0] - (float)*(int *)(object + 0x1a8)) - edge.x) + 1.0f,
                        (((*(float **)object)[1] - (float)*(int *)(object + 0x1ac)) - edge.y) + *(float *)(object + 0x1d0), 0.0f, 0.0f);
-    func_00335F88(side, -1.0f, -1.0f, 0.0f, 0.0f);
-    func_00336320(side);
+    object_set_second_float4(side, -1.0f, -1.0f, 0.0f, 0.0f);
+    gfx_draw_screen_element_stored(side);
     x = (*(float **)object)[0];
     y = (*(float **)object)[1];
     textX = (int)((x - (float)*(int *)(object + 0x1a8)) + (float)*(int *)(object + 0x1bc));

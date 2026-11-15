@@ -33,22 +33,22 @@ extern PuzzleNode D_L03_0029BBF0[14];
 extern int D_0024A7B0[14][6];
 extern u16 D_L03_001B0B5C __attribute__((sda));
 extern f32 D_L03_001B36B0[4] __attribute__((sda));
-extern void func_00282F20(void *, void *, f32);
-extern f32 func_00282DB0(void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern void func_002A91F0(void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern f32 FastVecDot(void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void mat_build_rotation_from_angles(void *, void *);
 extern void func_001163A0(unsigned int);
-extern void func_L03_003E2968(u8 *);
-extern void func_L03_003E2C08(u8 *);
-extern void func_L03_003E3308(u8 *);
-extern void func_L03_003E3430(u8 *);
+extern void path_puzzle_generate_route(u8 *);
+extern void SelectPathStepNodes(u8 *);
+extern void choice_list_build(u8 *);
+extern void path_puzzle_choose_next_node(u8 *);
 
 /* Sets the fourteen node vectors to unit length and lists in each node's row of the shared
    six-entry neighbour table the nodes whose direction is close to its own (dot product above
    0.5, or above -0.1 when none of the node's components is zero); then sets the orientation
    from the angles at +0xF0, builds the path (func_L03_003E2968, func_L03_003E2C08) and the
    choice list, and starts the walk at node 0 with the starting timer. */
-void func_L03_003E26C8(u8 *moby) {
+void InitializePathPuzzle(u8 *moby) {
     PuzzlePath *pathState = *(PuzzlePath **)(moby + 0x68);
     u8 *position;
     u8 *rotation;
@@ -83,13 +83,13 @@ void func_L03_003E26C8(u8 *moby) {
         }
     }
 
-    GetEulerAnglesFromMatrix(rotation, position);
-    BuildRotationFromAngles(D_L03_001B36B0, position);
-    Srand(pathState->sound);
-    GeneratePathPuzzleRoute(moby);
+    mat_get_euler_angles(rotation, position);
+    mat_build_rotation_from_angles(D_L03_001B36B0, position);
+    func_001163A0(pathState->sound);
+    path_puzzle_generate_route(moby);
     SelectPathStepNodes(moby);
-    BuildChoiceList(moby);
-    ChoosePathPuzzleNextNode(moby);
+    choice_list_build(moby);
+    path_puzzle_choose_next_node(moby);
 
     for (m = 0; m < 16; m++) {
         pathState->order[m] = 255;

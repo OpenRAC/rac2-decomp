@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -33,13 +34,13 @@ typedef struct {
     void *ptrs[9];
 } Ctx;
 
-extern Ctx D_00189E20;
-extern s8 D_00188660[];
+extern Ctx g_hero_state;
+extern s8 g_sound_state[];
 
 /* Goes through nine tracked slots. If a slot still points at a live entry it runs a cleanup on it, then marks the slot as empty. */
-void func_L00_002A6708(void) {
-    Ctx *ctx = &gHeroState;
-    s8 *table = gSoundState;
+void hero_clear_tracked_slots(void) {
+    Ctx *ctx = &g_hero_state;
+    s8 *table = g_sound_state;
     void **ownerPtrs = ctx->ptrs;
     s32 *slotPtr = ctx->slots;
     s32 byteOffset = 0;

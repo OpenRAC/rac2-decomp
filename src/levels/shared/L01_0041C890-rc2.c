@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -30,7 +31,7 @@ extern f32 ref_L01_0041C890_01(f32, f32);
 extern void ref_L01_0041C890_02(void *);
 
 /* Moves a falling piece with gravity and spin, and finishes it when its countdown reaches zero. */
-void func_L01_0041C890(s8 *moby) {
+void falling_l01_debris_update(s8 *moby) {
     s8 *vars;
     s8 *positionPtr;
     s8 *rotationPtr;

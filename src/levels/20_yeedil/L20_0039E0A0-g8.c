@@ -12,7 +12,7 @@ extern int D_L20_001B2FB8;
 extern char *D_L20_001B2F9C;
 
 /* Counts how many objects of a group are still alive (not in state 6). */
-s32 func_L20_0039E0A0(s32 group) {
+s32 group_count_live_members(s32 group) {
     char *idList = D_L20_001FBB20[group];
     s32 groupByte = group & 0xFF;
     s32 count = 0;

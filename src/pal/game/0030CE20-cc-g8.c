@@ -1,7 +1,8 @@
+#include "names.h"
 /* func_PAL_0030CE20, the PAL copy of func_0030BA38: the same C, where wrap ref_L00_0030BA38_01 (({e}) * 1.2f). */
 
-extern void func_0030BBA0(void *, int, int, int, float, float, float);
-extern void func_0030C188(void *);
+extern void DrawBeamAndArcTwoPassQuads(void *, int, int, int, float, float, float);
+extern void beam_draw_anchor_glow(void *);
 
 /* The globals below are read through $gp (small data) or absolutely, and each of
    them sits at another address in every program, so the names carry no level. */
@@ -35,24 +36,24 @@ void func_PAL_0030CE20(void *object) {
     {
         char *first = ref_L00_0030BA38_12;
 
-        func_0030BBA0(first, ref_L00_0030BA38_02, ref_L00_0030BA38_03,
+        DrawBeamAndArcTwoPassQuads(first, ref_L00_0030BA38_02, ref_L00_0030BA38_03,
             *(short *)((char *)unit + 0x3E), ref_L00_0030BA38_04,
             ref_L00_0030BA38_05, ref_L00_0030BA38_06);
-        func_0030BBA0(first + 0x140, ref_L00_0030BA38_07, ref_L00_0030BA38_08,
+        DrawBeamAndArcTwoPassQuads(first + 0x140, ref_L00_0030BA38_07, ref_L00_0030BA38_08,
             *(short *)((char *)unit + 0x3E), ref_L00_0030BA38_09,
             ref_L00_0030BA38_10, ref_L00_0030BA38_11);
     }
     {
         char *second = ref_L00_0030BA38_13;
 
-        func_0030BBA0(second, ref_L00_0030BA38_14, ref_L00_0030BA38_14, 5,
+        DrawBeamAndArcTwoPassQuads(second, ref_L00_0030BA38_14, ref_L00_0030BA38_14, 5,
             ref_L00_0030BA38_09, ref_L00_0030BA38_10, 0.2f);
-        func_0030BBA0(second + 0x50, ref_L00_0030BA38_15, ref_L00_0030BA38_15, 5,
+        DrawBeamAndArcTwoPassQuads(second + 0x50, ref_L00_0030BA38_15, ref_L00_0030BA38_15, 5,
             ref_L00_0030BA38_09, ref_L00_0030BA38_10, 0.2f);
-        func_0030BBA0(second + 0xA0, ref_L00_0030BA38_16, ref_L00_0030BA38_16, 5,
+        DrawBeamAndArcTwoPassQuads(second + 0xA0, ref_L00_0030BA38_16, ref_L00_0030BA38_16, 5,
             ref_L00_0030BA38_09, ref_L00_0030BA38_10, 0.2f);
-        func_0030BBA0(second + 0xF0, ref_L00_0030BA38_17, ref_L00_0030BA38_17, 5,
+        DrawBeamAndArcTwoPassQuads(second + 0xF0, ref_L00_0030BA38_17, ref_L00_0030BA38_17, 5,
             ref_L00_0030BA38_09, ref_L00_0030BA38_10, 0.2f);
     }
-    func_0030C188(object);
+    beam_draw_anchor_glow(object);
 }

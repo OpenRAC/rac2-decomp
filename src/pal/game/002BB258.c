@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002B9180(char *);
-extern void func_00282CC0(char *, char *, char *);
+extern void part_kill(char *);
+extern void FastVecAdd(char *, char *, char *);
 typedef int TI __attribute__((mode(TI)));
-extern float func_002B0520(TI *pos);
-extern int D_001A79F0 MACRO_ADDR;
+extern float coll_get_heightmap_height(TI *pos);
+extern int g_current_map_index MACRO_ADDR;
 extern float D_001B1DC0[] MACRO_ADDR;
 
 void func_PAL_002BB258(char *p)
@@ -18,31 +18,31 @@ void func_PAL_002BB258(char *p)
     int x, y;
     float h;
 
-    if (D_001A79F0 == 15) {
+    if (g_current_map_index == 15) {
         if (f[6] < lim) {
-            func_002B9180(p);
+            part_kill(p);
             return;
         }
     } else if (f[6] < lim || f[4] < 0.0f || f[5] < 0.0f || f[4] > 1024.0f || f[5] > 1024.0f) {
-        func_002B9180(p);
+        part_kill(p);
         return;
     }
     x = (int)f[8];
     y = (int)f[9];
-    func_00282CC0((char *)tmp, (char *)s, (char *)D_001B1DC0);
-    func_00282CC0((char *)(f + 8), (char *)(f + 8), (char *)tmp);
-    func_00282CC0((char *)(f + 4), (char *)(f + 4), (char *)tmp);
+    FastVecAdd((char *)tmp, (char *)s, (char *)D_001B1DC0);
+    FastVecAdd((char *)(f + 8), (char *)(f + 8), (char *)tmp);
+    FastVecAdd((char *)(f + 4), (char *)(f + 4), (char *)tmp);
     if (*(short *)(p + 0xA) != 2 && (x != (int)f[8] || y != (int)f[9])) {
         c1 = *(TI *)(f + 8);
-        h = func_002B0520(&c1);
+        h = coll_get_heightmap_height(&c1);
         if (h >= D_001B1DC0[4]) {
             c2 = *(TI *)(f + 8);
-            lim = func_002B0520(&c2);
+            lim = coll_get_heightmap_height(&c2);
         } else {
             lim = D_001B1DC0[4];
         }
         if (f[10] < lim) {
-            func_002B9180(p);
+            part_kill(p);
             return;
         }
     }
@@ -51,7 +51,7 @@ void func_PAL_002BB258(char *p)
 }
 
 
-extern char *func_002B9030(int size);
+extern char *part_alloc(int size);
 extern int ref_002BA8A0_01(float f);
 extern unsigned char *ref_002BA8A0_00;
 
@@ -59,7 +59,7 @@ extern unsigned char *ref_002BA8A0_00;
  * first 16 bytes into the record and fills the record's header. */
 void func_PAL_002BB458(void *a0, int a1)
 {
-    char *obj = (char *)func_002B9030(1);
+    char *obj = (char *)part_alloc(1);
     unsigned char byte;
     int r;
 
@@ -81,7 +81,7 @@ void func_PAL_002BB458(void *a0, int a1)
 }
 
 
-extern int func_00282978(char *);
+extern int FastDecTimer(char *);
 extern unsigned char *D_001F2544;
 
 /* func_PAL_002BB530, the PAL copy of func_002BA978: the same C, with a lifetime of 22 frames for
@@ -90,8 +90,8 @@ void func_PAL_002BB530(char *self)
 {
     int alpha = *(short *)(self + 0xA) * *(int *)(self + 0x20) / 22;
     *(unsigned int *)(self + 4) = (*(unsigned int *)(self + 4) & 0xFFFFFFu) | (alpha << 24);
-    if (func_00282978(self + 0xA)) {
-        func_002B9180(self);
+    if (FastDecTimer(self + 0xA)) {
+        part_kill(self);
     } else {
         self[2] = D_001F2544[(22 - *(short *)(self + 0xA)) * 9 / 22];
     }

@@ -19,7 +19,7 @@ extern long r1_func_0012AAC8(void *, int);
    both land in one slot here (frame still 0x10 short of retail's 0x70,
    see c1-c4). */
 /* Sends data to the video chip with DMA for color conversion, then waits until it is done. */
-void func_0012E110(void *decoder, unsigned int address, int blockCount) {
+void mpeg_send_data_to_ipu(void *decoder, unsigned int address, int blockCount) {
     char *dec = (char *)decoder;
     int intrState;
     int event[8];
@@ -65,7 +65,7 @@ typedef struct {
 /* rac1-decomp src/core/0012A2F0.c: func_0012E378 */
 /* libmpeg chunked DMA copy: arm the channel-3 callback with a progress record, start the transfer, wait for all chunks. */
 /* Sends a large block to the video chip in chunks using DMA and waits for every chunk to finish. */
-void func_0012E378(void *decoder, unsigned int address, int byteCount) {
+void mpeg_send_data_to_ipu_chunked(void *decoder, unsigned int address, int byteCount) {
     char *dec = (char *)decoder;
     int event[8];
     CscRec_2A558 progress;
@@ -119,7 +119,7 @@ ASM_FUNC("asm/core", func_0012E538);
    load-bearing (LEVERS.md lever 3): arg1's +0x8 store has to come before
    its +0xC store, after the other fields in retail's order. */
 /* Sets up a bit stream reader on a ring buffer and resets it. */
-void func_0012E890(void *stream, int startAddr, int bufferStart, int bufferSize) {
+void mpeg_init_bit_stream(void *stream, int startAddr, int bufferStart, int bufferSize) {
     char *bs = (char *)stream;
     *(int *)(bs + 0x28) = bufferSize;
     *(int *)(bs + 0x8) = startAddr;
@@ -146,7 +146,7 @@ extern void r1_func_0012A718();
 
 /* rac1-decomp src/core/0012A2F0.c: func_0012E608 */
 /* Copies a decoded picture to the video chip with DMA, then converts its colors. */
-void func_0012E608(void *decoder, int *picture) {
+void mpeg_store_reference_image(void *decoder, int *picture) {
     char *dec = (char *)decoder;
     int event[8];
     int transfer[4];

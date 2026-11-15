@@ -1,40 +1,40 @@
 #include "common.h"
-extern char *func_002ED688(char *);
-extern void func_L05_00416E08(char *);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282C88(char *);
-extern void func_0029FCC0(char *, int, char *);
-extern void func_L05_00415EE8(int, int);
+extern char *moby_get_motion_data(char *);
+extern void donor_transform_copy(char *);
+extern void FastVecSub(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void vec_clear_128(char *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void feltzin_helper_clear_slot(int, int);
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern int func_00282948(void *);
-extern int func_L05_0037AFD0(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002AB600(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00283CE0(int);
-extern float func_002A7790(float);
-extern void func_00283810(void *, void *, void *, float);
-extern void func_00283958(void *, void *);
-extern void func_L05_00416EC0(char *, int);
-extern void func_L05_00416F80(char *, char *);
-extern void func_002AC728(void *, void *, int, float, float);
+extern int math_fast_float_d(void *);
+extern int moby_get_sub_object_stored_value(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void mat_transform_via_copy(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float IntToFloat(int);
+extern float math_square(float);
+extern void vec_fast_normalize3(void *, void *, void *, float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void object_step_along_direction(char *, int);
+extern void feltzin_helper_check_hit_attach(char *, char *);
+extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
 
-extern void func_0029F338(void *);
-extern int func_L05_00417088(char *);
+extern void moby_mark_spawned(void *);
+extern int feltzin_helper_end_if_hit(char *);
 /* Per-frame update of the small homing helper object: it follows its owner, curves toward the hero, drifts in a short flight, and ends by bursting and freeing itself. */
-void func_L05_00416918(char *object)
+void homing_helper_update(char *object)
 {
     char matrix[0x30];
     char delta[0x10], rot0[0x10], rot1[0x10], rot2[0x10], point[0x10];
     Vec up;
     char *target, *position;
     char *sub = *(char **)(object + 0x68);
-    target = GetMobyMotionData(*(char **)(sub + 0x50));
+    target = moby_get_motion_data(*(char **)(sub + 0x50));
     up.q = 0;
     up.f[2] = 1.0f;
     switch (*(unsigned char *)(object + 0x20)) {
@@ -43,8 +43,8 @@ void func_L05_00416918(char *object)
         object[0x20] = 1;
         /* fall through */
     case 1:
-        CopyDonorTransform(object);
-        if (!GetSubObjectStoredValue(*(char **)(sub + 0x50))) object[0x20] = 4;
+        donor_transform_copy(object);
+        if (!moby_get_sub_object_stored_value(*(char **)(sub + 0x50))) object[0x20] = 4;
         break;
     case 2: {
         char *forward = object + 0xC0;
@@ -62,26 +62,26 @@ void func_L05_00416918(char *object)
         velocity = sub + 0x40;
         euler_rotation_basis(matrix, velocity);
         multiply_matrix3x3(forward, forward, matrix);
-        TransformMatrixViaCopy(rot0, forward);
+        mat_transform_via_copy(rot0, forward);
         FastVecSub(delta, *(char **)(target + 0x120) + 0x10, position);
         vec_scale_to_length(forward, delta, 1.0f);
         FastVecCross(right, forward, &up);
         vec_scale_to_length(right, right, *(int *)(sub + 0x54) ? -1.0f : 1.0f);
         drift = sub + 0x30;
         FastVecCross(normal, right, forward);
-        TransformMatrixViaCopy(rot1, forward);
+        mat_transform_via_copy(rot1, forward);
         fraction = IntToFloat(*(int *)(sub + 0x58));
         fraction /= IntToFloat(180);
-        FastVectorNormalize3(rot2, rot0, rot1, Square(1.0f - fraction));
+        vec_fast_normalize3(rot2, rot0, rot1, math_square(1.0f - fraction));
         quaternion_to_rotation_basis(rot2, forward);
-        StepObjectAlongDirection(object, 0);
+        object_step_along_direction(object, 0);
         FastVecAdd(position, drift, position);
         FastVecScale(drift, drift, .99f);
         FastVecScale(velocity, velocity, .99f);
         if (*(int *)(sub + 0x58) < 45) *(int *)(object + 0x98) = *(int *)(*(char **)(object + 0x24) + 0x10);
-        if (FastFloatHelperD(sub + 0x58)) {
+        if (math_fast_float_d(sub + 0x58)) {
             object[0x20] = 3;
-            ClearVector128(velocity);
+            vec_clear_128(velocity);
             *(int *)(sub + 0x5C) = 0;
         }
         break;
@@ -97,7 +97,7 @@ void func_L05_00416918(char *object)
         qcopy(sub + 0x10, right);
         normal = object + 0xE0;
         qcopy(sub + 0x20, normal);
-        TransformMobyJointToWorld(object, 0, delta);
+        moby_transform_joint_to_world(object, 0, delta);
         FastVecSub(delta, *(char **)(target + 0x120) + 0x10, delta);
         vec_scale_to_length(forward, delta, 1.0f);
         FastVecCross(right, forward, &up);
@@ -109,21 +109,21 @@ void func_L05_00416918(char *object)
         *(int *)(object + 0xEC) = 0;
         vec_scale_to_length(delta, delta, *(float *)(sub + 0x5C));
         FastVecAdd(delta, delta, drift);
-        StepObjectAlongDirection(object, 0);
-        TransformMobyJointToWorld(object, 0, point);
+        object_step_along_direction(object, 0);
+        moby_transform_joint_to_world(object, 0, point);
         FastVecAdd(object + 0x10, delta, object + 0x10);
         FastVecScale(drift, drift, .99f);
         *(float *)(sub + 0x5C) += 0.09722222388f;
-        CheckHelperHitAndAttach(object, point);
+        feltzin_helper_check_hit_attach(object, point);
         break;
     }
     case 4:
-        SpawnExplosionWithSparks(object, object + 0x10, -1, 3.0f, 13.0f);
-        ClearHelperSlot(*(int *)(sub + 0x50), *(int *)(sub + 0x54));
-        MarkMobySpawned(object);
+        part_spawn_explosion_with_sparks(object, object + 0x10, -1, 3.0f, 13.0f);
+        feltzin_helper_clear_slot(*(int *)(sub + 0x50), *(int *)(sub + 0x54));
+        moby_mark_spawned(object);
         return;
     }
-    EndHelperMobyIfHit(object);
+    feltzin_helper_end_if_hit(object);
 }
 
 

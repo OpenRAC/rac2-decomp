@@ -1,39 +1,39 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *D_L01_001B255C;
+extern u8 *g_moby_l01_table;
 extern u32 D_L01_001FB020[];
 extern u8 *func_00305EE8(int);
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0019B4A8[];
 extern u8 D_0019B2E8[];
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
 extern LevelSaveState D_L01_0021D840;
 extern LevelSaveState D_L01_0021E4B0;
-extern u8 D_00188660[], D_00189EA0[];
+extern u8 g_sound_state[], g_hero_position[];
 extern u8 D_L01_001AFE18[] MACRO_ADDR;
 extern int D_001A79F0_gp SDATA(D_001A79F0);
 extern float D_L01_001B0794 __attribute__((sda));
 extern float D_L01_001B0798 __attribute__((sda));
 extern float D_L01_001B079C __attribute__((sda));
 extern float D_L01_001B07A0 __attribute__((sda));
-extern void func_0029F338(void *);
-extern void func_002A7398(void *, int, int);
-extern int func_002A8508(int, int);
-extern void func_0029F390(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
+extern void moby_mark_spawned(void *);
+extern void anim_start_immediate(void *, int, int);
+extern int moby_count_group_not_in_state(int, int);
+extern void update_moby_animation_state(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
+extern int PlayMobySound(int, int, void *);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
 extern float func_PAL_L01_003BEB40(void);
-extern void *func_002C19D8(void *position, float size, void *owner, float spin, int color);
-extern int func_002A9640(void *, int, int);
+extern void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color);
+extern int part_find_owned_effect_slot(void *, int, int);
 extern void func_PAL_L01_003DD0E8(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_L01_003DCCC8(void *);
-extern int func_002E59B0(void *, int);
-extern int func_002ACBC8(void *, int);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int IsPointInCuboid(void *, int);
 typedef struct {
     u8 pad[0x50];
     int mode;
@@ -65,11 +65,11 @@ void func_PAL_L01_003DD368(u8 *a0)
             u16 id = *(u16 *)(a0 + 0xB2);
             int bits;
             if (D_L01_0021E4B0.collected[(short)id] ||
-                (bits = D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)],
+                (bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)],
                  (id & 1) ? ((bits >> 4) & 7) : (bits & 7))) {
                 if (state->childIndex != -1)
-                    func_0029F338(D_L01_001B255C + (state->childIndex << 8));
-                func_0029F338(a0);
+                    moby_mark_spawned(g_moby_l01_table + (state->childIndex << 8));
+                moby_mark_spawned(a0);
                 return;
             }
         }
@@ -80,95 +80,95 @@ void func_PAL_L01_003DD368(u8 *a0)
             *(u16 *)(a0 + 0x32) = 0x3FF;
             a0[0x30] = 255;
             if (state->parentIndex != -1) {
-                u8 *parent = D_L01_001B255C + (state->parentIndex << 8);
+                u8 *parent = g_moby_l01_table + (state->parentIndex << 8);
                 if (parent) {
                     if (*(u8 **)(parent + 0x68) && *(int *)(*(u8 **)(parent + 0x68) + 0xC8))
-                        func_002A7398(a0, 6, 0);
+                        anim_start_immediate(a0, 6, 0);
                     else
-                        func_002A7398(a0, 9, 0);
+                        anim_start_immediate(a0, 9, 0);
                 }
             }
             *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B0794;
             break;
         case 1:
             *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B0798;
-            func_002A7398(a0, 2, 0);
+            anim_start_immediate(a0, 2, 0);
             break;
         case 2:
             *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B079C;
-            func_002A7398(a0, 4, 0);
+            anim_start_immediate(a0, 4, 0);
             if (state->linkIndex != -1)
-                state->linkCount = func_002A8508(state->linkIndex, -1);
+                state->linkCount = moby_count_group_not_in_state(state->linkIndex, -1);
             break;
         case 3:
             *(int *)(a0 + 0x98) = 0;
             *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B07A0;
-            func_002A7398(a0, 10, 0);
+            anim_start_immediate(a0, 10, 0);
             break;
         }
         if (state->parentIndex != -1) {
-            p = D_L01_001B255C + (state->parentIndex << 8);
+            p = g_moby_l01_table + (state->parentIndex << 8);
             if (p) {
                 a0[0x40] = p[0x40];
                 a0[0x41] = p[0x41];
                 *(float *)(a0 + 0x44) = *(float *)(p + 0x44);
-                func_0029F390(a0);
+                update_moby_animation_state(a0);
             }
         }
-        func_002A7750(a0, 1, -1);
+        moby_set_state(a0, 1, -1);
         break;
     case 1:
         switch (state->mode) {
         case 1:
-            if (state->soundIndex == -1 && !func_002A77E0(79))
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+            if (state->soundIndex == -1 && !math_random_int_below(79))
+                state->soundIndex = PlayMobySound(0, 0, a0);
             if (a0[0x60] & 2) {
-                if (!func_002A77E0(3)) {
+                if (!math_random_int_below(3)) {
                     if (a0[0x43] != 2)
-                        func_PAL_002A7E68(a0, 2, 0, func_002A7820(8, 15));
+                        func_PAL_002A7E68(a0, 2, 0, math_random_int_range(8, 15));
                 } else if (a0[0x43] != 1)
-                    func_PAL_002A7E68(a0, 1, 0, func_002A7820(8, 15));
-                *(float *)(a0 + 0x48) = func_002A7878(0.7f, 1.1f);
+                    func_PAL_002A7E68(a0, 1, 0, math_random_int_range(8, 15));
+                *(float *)(a0 + 0x48) = math_random_float_range(0.7f, 1.1f);
             }
-            if (!func_002A77E0(19)) {
+            if (!math_random_int_below(19)) {
                 qcopy(v, a0 + 0x10);
                 v[2] = func_PAL_L01_003BEB40();
-                f = func_002A7878(0.2f, 2.0f);
-                color = ((func_002A77E0(6) + 20) << 24) | 0x5060;
-                func_002C19D8(v, f, D_L01_001AFE18, 1.2e+04f, color);
+                f = math_random_float_range(0.2f, 2.0f);
+                color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
+                part_spawn_drifting(v, f, D_L01_001AFE18, 1.2e+04f, color);
             }
             hit = 0;
-            if (func_002A9640(a0, 0x10001, 0))
+            if (part_find_owned_effect_slot(a0, 0x10001, 0))
                 hit = 1;
-            if (func_002ACBC8(D_00189EA0, state->hitIndex))
+            if (IsPointInCuboid(g_hero_position, state->hitIndex))
                 hit = 1;
             if (hit) {
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+                state->soundIndex = PlayMobySound(0, 0, a0);
                 func_PAL_L01_003DD0E8(a0, 3, 10, 1);
                 if (a0[0x43] != 3)
                     func_PAL_002A7E68(a0, 3, 0, 10);
-                func_002A7750(a0, 2, -1);
+                moby_set_state(a0, 2, -1);
             }
             break;
         case 2:
             switch (a0[0xBC]) {
             case 0:
-                if (state->soundIndex == -1 && !func_002A77E0(89))
-                    state->soundIndex = func_002E5CF8(0, 0, a0);
+                if (state->soundIndex == -1 && !math_random_int_below(89))
+                    state->soundIndex = PlayMobySound(0, 0, a0);
                 {
-                    int detected = func_002A9640(a0, 0x10001, 0);
+                    int detected = part_find_owned_effect_slot(a0, 0x10001, 0);
                     flag = 0;
                     if (detected) {
                         flag = 1;
-                        func_L01_003D87B8(state->linkIndex);
+                        muckdweller_flag_group(state->linkIndex);
                     }
                 }
                 if (state->linkIndex != -1 && state->linkCount) {
-                    if (func_002A8508(state->linkIndex, -1) < state->linkCount)
+                    if (moby_count_group_not_in_state(state->linkIndex, -1) < state->linkCount)
                         flag = 1;
                 }
                 if (flag) {
-                    state->soundIndex = func_002E5CF8(0, 0, a0);
+                    state->soundIndex = PlayMobySound(0, 0, a0);
                     func_PAL_L01_003DCCC8(a0);
                     func_PAL_L01_003DCCC8(a0);
                     func_PAL_L01_003DCCC8(a0);
@@ -183,7 +183,7 @@ void func_PAL_L01_003DD368(u8 *a0)
                 if (a0[0x60] & 2) {
                     if (a0[0x43] != 3)
                         func_PAL_002A7E68(a0, 3, 0, 15);
-                    func_002A7750(a0, 2, -1);
+                    moby_set_state(a0, 2, -1);
                 }
                 break;
             }
@@ -191,15 +191,15 @@ void func_PAL_L01_003DD368(u8 *a0)
         case 3:
             *(int *)(a0 + 0x98) = 0;
             if (state->parentIndex != -1) {
-                p = D_L01_001B255C + (state->parentIndex << 8);
+                p = g_moby_l01_table + (state->parentIndex << 8);
                 if (!p || p[0x20] == 254 || p[0x20] == 253) {
-                    func_L01_003D8AD0(a0);
+                    level_record_moby_collected(a0);
                 } else {
                     qcopy(a0 + 0x10, p + 0x10);
                     qcopy(a0 + 0xF0, p + 0xF0);
                 }
             }
-            if (func_002ACBC8(D_00189EA0, state->hitIndex)) {
+            if (IsPointInCuboid(g_hero_position, state->hitIndex)) {
                 /* Retail shares state 2's counter and delete tails. */
                 if (state->persistent) {
                     if (a0[0xB0] != 255) {
@@ -214,21 +214,21 @@ void func_PAL_L01_003DD368(u8 *a0)
             }
             /* Falls through to the sound trigger used by mode zero. */
         case 0:
-            if (state->soundIndex == -1 && !func_002A77E0(89))
-                state->soundIndex = func_002E5CF8(0, 0, a0);
+            if (state->soundIndex == -1 && !math_random_int_below(89))
+                state->soundIndex = PlayMobySound(0, 0, a0);
             break;
         }
         break;
     case 2:
         if (state->mode == 2) {
             func_PAL_L01_003DCCC8(a0);
-        } else if (state->mode == 1 && !func_002A77E0(4)) {
+        } else if (state->mode == 1 && !math_random_int_below(4)) {
             func_PAL_L01_003DD0E8(a0, 3, 10, 1);
             qcopy(v, a0 + 0x10);
             v[2] = func_PAL_L01_003BEB40();
-            f = func_002A7878(0.2f, 2.0f);
-            color = ((func_002A77E0(6) + 20) << 24) | 0x5060;
-            func_002C19D8(v, f, D_L01_001AFE18, 1.2e+04f, color);
+            f = math_random_float_range(0.2f, 2.0f);
+            color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
+            part_spawn_drifting(v, f, D_L01_001AFE18, 1.2e+04f, color);
         }
         if (a0[0x60] & 2) {
             if (state->persistent) {
@@ -253,20 +253,20 @@ persist_low:
                 }
             } else {
 delete_cleanup:
-                func_L01_003D8AD0(a0);
+                level_record_moby_collected(a0);
             }
 delete_current:
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
             return;
         }
         break;
     }
     /* Retail stores the index three times; the slot found by the scan is discarded. */
-    if (!func_002E59B0(a0, state->soundIndex)) {
+    if (!snd_is_voice_playing_for_owner(a0, state->soundIndex)) {
         state->soundIndex = -1;
         for (i = 0; i < 52; i++) {
             state->soundIndex = -1;
-            entry = D_00188660 + i * 0x70;
+            entry = g_sound_state + i * 0x70;
             if (*(u8 **)(entry + 0x88) == a0 && entry[0x74]) {
                 state->soundIndex = i;
                 break;
@@ -290,8 +290,8 @@ delete_current:
                 }
             }
         } else {
-            func_L01_003D8AD0(a0);
+            level_record_moby_collected(a0);
         }
-        func_0029F338(a0);
+        moby_mark_spawned(a0);
     }
 }

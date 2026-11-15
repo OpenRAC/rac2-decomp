@@ -9,7 +9,7 @@ extern void ref_L01_002E1680_03(float *, float *, float *);
 extern char *ref_L01_002E1680_04(float, float *, float, float, float, int, float *, int, int);
 
 /* Spawns count short-lived sparks at a position, each with a random spread, a direction from the matrix and a tint taken from the colour; optionally marks them with effect type 0x44. */
-void func_L01_002E1680(float *origin, float *directionMatrix, int count, int color, int markEffect, float g, float h, float k) {
+void part_l01_spawn_spark_burst(float *origin, float *directionMatrix, int count, int color, int markEffect, float g, float h, float k) {
     float v[4];
     float spread;
     int tint;

@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_00282978(void *timer);
-extern void func_002B9180(void *particle);
-extern int func_00283CF0(float f);
-extern void func_0029FCC0(void *object, int joint, void *out);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, float scale);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern char D_001B5340[];
+extern int FastDecTimer(void *timer);
+extern void part_kill(void *particle);
+extern int FloatToInt(float f);
+extern void moby_transform_joint_to_world(void *object, int joint, void *out);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, float scale);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern char g_camera_eye_state[];
 extern unsigned char *D_001F25B4;
 #define SIZE   (*(float *)(p + 0xC))
 #define ALPHA  (*(float *)(q + 4))
@@ -27,8 +27,8 @@ void func_PAL_002BF8A8(char *p)
     if (p == 0)
         return;
     q = p + 0x20;
-    if (func_00282978(p + 0xA) || *(char **)q == 0 || *(signed char *)(*(char **)q + 0x20) < 0) {
-        func_002B9180(p);
+    if (FastDecTimer(p + 0xA) || *(char **)q == 0 || *(signed char *)(*(char **)q + 0x20) < 0) {
+        part_kill(p);
         return;
     }
     FRAME = (*(unsigned short *)(q + 0xC) + 1) & 15;
@@ -42,7 +42,7 @@ void func_PAL_002BF8A8(char *p)
             SIZE = 159600.0f;
     }
     SPIN += 0.0012f;
-    p[8] = func_00283CF0(SPIN * 255.0f);
+    p[8] = FloatToInt(SPIN * 255.0f);
     p[2] = D_001F25B4[FRAME];
     if (SIZE <= 159600.0f || SPEED > 0.0f)
         ALPHA += SPEED;
@@ -51,7 +51,7 @@ void func_PAL_002BF8A8(char *p)
             SPEED = -SPEED;
             ALPHA += SPEED;
         } else if (ALPHA < 0.0f) {
-            func_002B9180(p);
+            part_kill(p);
             return;
         }
     } else {
@@ -59,16 +59,16 @@ void func_PAL_002BF8A8(char *p)
             SPEED = -SPEED;
             ALPHA += SPEED;
         } else if (ALPHA < 0.0f) {
-            func_002B9180(p);
+            part_kill(p);
             return;
         }
     }
-    *(int *)(p + 4) = (*(int *)(p + 4) & 0xFFFFFF) + (func_00283CF0(ALPHA * 256.0f) << 24);
+    *(int *)(p + 4) = (*(int *)(p + 4) & 0xFFFFFF) + (FloatToInt(ALPHA * 256.0f) << 24);
     EASE += (1.0f - EASE) * 0.21000001f;
     if (JOINT != -1) {
-        func_0029FCC0(*(void **)q, JOINT, pos);
-        func_00282CF0(delta, D_001B5340, pos);
-        func_00282F20(delta, delta, EASE);
-        func_00282CC0(p + 0x10, pos, delta);
+        moby_transform_joint_to_world(*(void **)q, JOINT, pos);
+        FastVecSub(delta, g_camera_eye_state, pos);
+        vec_scale_to_length(delta, delta, EASE);
+        FastVecAdd(p + 0x10, pos, delta);
     }
 }

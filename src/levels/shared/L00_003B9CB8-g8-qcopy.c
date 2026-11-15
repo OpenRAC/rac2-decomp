@@ -4,15 +4,15 @@
 /* The grouped quadword copy: the R5900 lq/sq pair with both addresses in registers. */
 typedef int Rac2TI128 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int id);
+extern void *CreateMoby(int id);
 
-extern int func_002FED90(void *a0, void *a1, float f12, float f13, float f14);
+extern int part_alloc_effect_slot(void *a0, void *a1, float f12, float f13, float f14);
 
-extern int func_L00_002FCF18(void *a0, float f12, float f13, float f14, float f15, float f16);
+extern int part_l00_alloc_effect_slot_2(void *a0, float f12, float f13, float f14, float f15, float f16);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_002833F0(void *a0, void *a1);
+extern void euler_rotation_basis(void *a0, void *a1);
 
 /* The counter the level keeps for these objects. The sda attribute and this unit's -G8
    make the reference to it $gp-relative, the way retail has it. */
@@ -21,7 +21,7 @@ extern unsigned int D_L00_001AFDA0 __attribute__((sda));
 /* Creates the level's own object, fills the header the object carries, copies the two
    16-byte records it is given into it, and lets the shared helpers set the rest up.
    The object is returned; a null one is returned unchanged. */
-void *func_L00_003BB080(char *owner, char *param, char *position, char *vector)
+void *effect_spawn_moby(char *owner, char *param, char *position, char *vector)
 {
     char *newMoby;
     char *vars;
@@ -46,15 +46,15 @@ void *func_L00_003BB080(char *owner, char *param, char *position, char *vector)
         *(Rac2TI128 *)vars = *(Rac2TI128 *)vector;
         *(Rac2TI128 *)(vars + 0x20) = *(Rac2TI128 *)vector;
 
-        *(int *)(vars + 0x50) = AllocEffectSlot_002FED90(newMoby, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(vars + 0x50) = part_alloc_effect_slot(newMoby, 0, 1.0f, 1.0f, 1.0f);
         *(int *)(vars + 0x54) = 0;
         *(int *)(vars + 0x58) = 0;
         *(unsigned char *)(newMoby + 0x20) = 0;
         D_L00_001AFDA0 = D_L00_001AFDA0 + 1;
-        *(int *)(vars + 0x5C) = AllocateEffectSlot_L00_2(posPtr, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
-        *(float *)(newMoby + 0xF0) = RandomAngle();
-        *(float *)(newMoby + 0xF4) = RandomAngle();
-        *(float *)(newMoby + 0xF8) = RandomAngle();
+        *(int *)(vars + 0x5C) = part_l00_alloc_effect_slot_2(posPtr, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
+        *(float *)(newMoby + 0xF0) = math_random_angle();
+        *(float *)(newMoby + 0xF4) = math_random_angle();
+        *(float *)(newMoby + 0xF8) = math_random_angle();
         *(float *)(newMoby + 0xFC) = 0.0f;
         euler_rotation_basis(newMoby + 0xC0, newMoby + 0xF0);
     }

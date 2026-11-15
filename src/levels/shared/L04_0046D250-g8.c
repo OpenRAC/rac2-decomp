@@ -35,7 +35,7 @@ typedef struct {
     char bytes[0x100];
 } CameraRecord;
 extern CameraEntry *D_L04_001B1E84;
-extern CameraRecord *D_L04_001B24DC;
+extern CameraRecord *g_moby_l04_pool;
 extern float D_L04_001B1C8C __attribute__((sda));
 extern float D_L04_001B1C90 __attribute__((sda));
 extern float D_L04_001B1C94 __attribute__((sda));
@@ -43,30 +43,30 @@ extern float D_L04_001B1CAC __attribute__((sda));
 extern int D_L04_001B1CC4 __attribute__((sda));
 extern int D_L04_001B1CCC __attribute__((sda));
 extern float D_L04_001B1CD0 __attribute__((sda));
-extern CameraPlayer D_00189E20;
+extern CameraPlayer g_hero_state;
 extern CameraCollision D_L04_001BFAC0;
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00282E20(void *);
-extern void func_00282948(int *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern int func_00277258(void *, int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void ApproachValue(float *, float, float);
+extern float vec_length_xy(void *);
+extern void math_fast_float_d(int *);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern int coll_test_point(void *, int, int, float);
 /* Smooth a player-relative camera offset, then resolve movement collisions.
  * Debug line labels preserve the horizontal scaling division's padding. */
-void func_L04_0046D250(CameraObject *obj) {
+void UpdatePlayerRelativeCameraPosition(CameraObject *obj) {
     CameraVector old, offset, negative, projection, axis, center, velocity, rotated, delta;
     char *entry, *state, *hit;
     CameraVector *motion;
     float scale;
     float smoothing;
     old.q = obj->position.q;
-    entry = (char *)&gMobyPool_L04[*(int *)(D_L04_001B1E84[obj->index].definition + 0x60)];
+    entry = (char *)&g_moby_l04_pool[*(int *)(D_L04_001B1E84[obj->index].definition + 0x60)];
     state = *(char **)(entry + 0x68);
     smoothing = D_L04_001B1CAC;
     motion = (CameraVector *)(obj->motion + 0x70);
@@ -83,8 +83,8 @@ void func_L04_0046D250(CameraObject *obj) {
         if (D_L04_001B1CCC == -1 && (*(int *)(state + 0x278) > 0 || *(int *)(state + 0x338) > 0)) D_L04_001B1CCC = 90;
         if (*(int *)(state + 0x278) <= 0 && *(int *)(state + 0x338) <= 0) D_L04_001B1CCC = -1;
     }
-    FastVecScale(&negative, &gHeroState, -1.0f);
-    qcopy(&center, &gHeroState.position);
+    FastVecScale(&negative, &g_hero_state, -1.0f);
+    qcopy(&center, &g_hero_state.position);
     velocity.q = 0;
     velocity.f[2] = 1.0f;
     velocity.f[3] = 1.0f;
@@ -93,7 +93,7 @@ void func_L04_0046D250(CameraObject *obj) {
     vec_scale_to_length(&projection, &projection, 1.0f);
     FastVecCross(&negative, &axis, &projection);
     transform_vector(&rotated, &offset, &negative);
-    FastVecSub(&delta, &rotated, &gHeroState.position);
+    FastVecSub(&delta, &rotated, &g_hero_state.position);
     lerp_vector(motion, motion, &delta, smoothing);
     velocity.q = motion->q;
     if (D_L04_001B1CCC > 0) {
@@ -105,9 +105,9 @@ void func_L04_0046D250(CameraObject *obj) {
             velocity.f[0] *= scale;
             velocity.f[1] *= scale;
         }
-        FastFloatHelperD(&D_L04_001B1CCC);
+        math_fast_float_d(&D_L04_001B1CCC);
     }
-    FastVecAdd(&obj->position, &gHeroState.position, &velocity);
+    FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
     if (CollLine(&old, &obj->position, 4, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
@@ -116,15 +116,15 @@ void func_L04_0046D250(CameraObject *obj) {
             FastVecAdd(&obj->position, &old, &velocity);
         }
     }
-    if (CollLine(&gHeroState.position, &obj->position, 2, 0, 0)) {
+    if (CollLine(&g_hero_state.position, &obj->position, 2, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
-            FastVecSub(&rotated, &D_L04_001BFAC0.point, &gHeroState.position);
+            FastVecSub(&rotated, &D_L04_001BFAC0.point, &g_hero_state.position);
             FastVecScale(&velocity, &rotated, 0.95f);
-            FastVecAdd(&obj->position, &gHeroState.position, &velocity);
+            FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
         }
     }
-    if (TestPointAgainstCollision(&obj->position, 4, 0, 0.15f)) {
+    if (coll_test_point(&obj->position, 4, 0, 0.15f)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */)) obj->position.q = D_L04_001BFAC0.position.q;
     }

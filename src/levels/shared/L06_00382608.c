@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern void func_0026FEB8(const char *, ...);
+extern void STUB_printf(const char *, ...);
 extern const char D_L06_001AA660[];
-extern char *D_L06_001FE500[];
+extern char *g_path_list[];
 extern float D_L06_001B9A90[];
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
-extern unsigned char *func_L03_00339128(void *, void *, int, int, float, unsigned char, short, unsigned char);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern unsigned char *effect_create_timed(void *, void *, int, int, float, unsigned char, short, unsigned char);
 
 /* Walks along a stored path and puts a marker at each point, or the point number as digits. */
-void func_L06_00382608(void *data, int path, int owner, int flags, int stride, float scale)
+void DrawPath(void *data, int path, int owner, int flags, int stride, float scale)
 {
     float previous[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
@@ -23,7 +23,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
         STUB_printf(D_L06_001AA660);
         return;
     }
-    polygon = gPathList[path];
+    polygon = g_path_list[path];
     timer = (flags & 0x40) ? -1 : 2;
     qcopy(previous, polygon + 0x10);
     index = 0;
@@ -39,17 +39,17 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
             qcopy(point, polygon + (index * 16 + 0x10));
             switch (flags & 7) {
             case 1:
-                CreateTimedEffectEntry(point, data, 0, owner, scale, 0x7F, timer, 0xFF);
+                effect_create_timed(point, data, 0, owner, scale, 0x7F, timer, 0xFF);
                 break;
             case 2:
-                CreateTimedEffectEntry(point, data, one, owner, scale, 0x7F, timer, 0xFF);
+                effect_create_timed(point, data, one, owner, scale, 0x7F, timer, 0xFF);
                 break;
             case 4:
                 point[2] += scale * 0.5f;
                 {
                     int n = index;
                     do {
-                        CreateTimedEffectEntry(point, data, n % 10 + 2, owner, scale, 0x7F, timer, 0xFF);
+                        effect_create_timed(point, data, n % 10 + 2, owner, scale, 0x7F, timer, 0xFF);
                         FastVecAdd(point, point, advance);
                         n /= 10;
                     } while (n != 0);

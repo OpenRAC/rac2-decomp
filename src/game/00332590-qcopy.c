@@ -14,12 +14,12 @@ typedef struct {
     char *vars;
 } Moby_332590;
 
-extern Moby_332590 *func_0029EFD0(int size);
-extern int func_002FED90(Moby_332590 *object, TI128 *src, float x, float y, float z);
-extern void func_00282CF0(void *dst, void *a, void *b);
+extern Moby_332590 *CreateMoby(int size);
+extern int part_alloc_effect_slot(Moby_332590 *object, TI128 *src, float x, float y, float z);
+extern void FastVecSub(void *dst, void *a, void *b);
 
 /* Creates a moby of class 3755 at the given position and fills in its start vector, direction and owner. */
-Moby_332590 *func_00332590(int owner, TI128 *pos, void *targetPos, TI128 *startVec)
+Moby_332590 *projectile_create(int owner, TI128 *pos, void *targetPos, TI128 *startVec)
 {
     Moby_332590 *moby;
     char *vars;
@@ -32,7 +32,7 @@ Moby_332590 *func_00332590(int owner, TI128 *pos, void *targetPos, TI128 *startV
         moby->state20 = 0;
         moby->position = *pos;
         *(TI128 *)vars = *startVec;
-        *(int *)(vars + 0x30) = AllocEffectSlot_002FED90(moby, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(vars + 0x30) = part_alloc_effect_slot(moby, 0, 1.0f, 1.0f, 1.0f);
         FastVecSub(vars + 0x20, targetPos, pos);
         *(int *)(vars + 0x34) = owner;
     }

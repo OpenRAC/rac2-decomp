@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L04_0041E49C, the PAL copy of func_L04_00419918: the same C, where rename func_L00_002B9D60 becomes func_PAL_L00_002B9CD8; rename func_L04_002E7C08 becomes func_PAL_L04_002E7DA8; rename func_L00_00303530 becomes func_PAL_L00_00305110; rename func_0029B758 becomes func_PAL_0029C0F0; rename func_002E4AC8 becomes func_PAL_002E5898; rename func_L04_0040A958 becomes func_PAL_L04_0040EEE0; rename func_L04_00418A58 becomes func_PAL_L04_0041D5F0; rename func_002A05A8 becomes func_PAL_002A0F68; rename func_00288E18 becomes func_PAL_00289730; rename func_L04_00412308 becomes func_PAL_L04_004169C0; rename func_L04_00418BF0 becomes func_PAL_L04_0041D788; rename func_L00_002B30E8 becomes func_PAL_L00_002B3000. */
 /* func_PAL_L04_0041E49C, the hoverbike race controller of Barlow and Joba. Its own -G8 unit,
  * built with -g (config/cflags.txt): the line notes give retail's nop pair before case 2's div.s. */
@@ -6,14 +7,14 @@
 typedef float Vector[4] __attribute__((aligned(16)));
 typedef int Quad __attribute__((mode(TI)));
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 typedef struct { char pad[0x74]; unsigned char active; char pad2[0x13]; char *owner; } SoundSlot;
-extern SoundSlot D_00188660[];
+extern SoundSlot g_sound_state[];
 extern int D_00138320 NOT_SDA;
 extern int D_00138324 NOT_SDA;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern int D_001A7904 MACRO_ADDR;
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern int D_L04_001A7CD0 MACRO_ADDR;
 extern float D_L04_001A7CCC MACRO_ADDR;
 extern int D_L04_001A7CD4 MACRO_ADDR;
@@ -22,8 +23,8 @@ extern int D_L04_001A8ED0 MACRO_ADDR;
 extern int D_L04_001A8ED0_flags[] __asm__("D_L04_001A8ED0") MACRO_ADDR;
 extern int D_L04_001A8F00 MACRO_ADDR;
 extern int D_L04_001A8F08 MACRO_ADDR;
-extern int D_L04_001A8FE4 MACRO_ADDR;
-extern int D_L04_001A8FE8 MACRO_ADDR;
+extern int g_current_lap MACRO_ADDR;
+extern int g_race_time_ticks MACRO_ADDR;
 extern void *D_L04_001AA6A0 MACRO_ADDR;
 extern void *D_L04_001AA6A4 MACRO_ADDR;
 extern void *D_L04_001AA6A8 MACRO_ADDR;
@@ -34,7 +35,7 @@ extern int D_L04_001B08F8 __attribute__((sda));
 extern int D_L04_001B08FC __attribute__((sda));
 extern int D_L04_001B0900 __attribute__((sda));
 extern int D_L04_001B0908 __attribute__((sda));
-extern int D_L04_001B090C __attribute__((sda));
+extern int g_current_race_index __attribute__((sda));
 /* D_L04_001B0910 in Barlow; in Joba that name is bound to another variable. */
 extern int ref_L04_00419918_01 __attribute__((sda));
 extern u8 *D_L04_001B0914 __attribute__((sda));
@@ -49,7 +50,7 @@ extern int D_L04_001B0BBC __attribute__((sda));
 extern int D_L04_001B0BC0 __attribute__((sda));
 extern float D_L04_001B1F20 __attribute__((sda));
 extern int D_L04_001B2008 __attribute__((sda));
-extern u8 *D_L04_001B24DC MACRO_ADDR;
+extern u8 *g_moby_l04_pool MACRO_ADDR;
 extern u8 *D_L04_001B25CC MACRO_ADDR;
 extern int D_L04_001B31D4 MACRO_ADDR;
 extern char D_L04_001B31A0[] MACRO_ADDR;
@@ -60,75 +61,75 @@ extern float D_L04_001BDC30 NOT_SDA;
 extern void func_PAL_L00_002B3000(void);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
 extern int func_PAL_L04_002E7DA8(int, int);
-extern void func_00272198(float);
-extern int func_00277258(void *, int, void *, float);
-extern void func_0027AB40(void);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_0027D330(int);
-extern int func_00282948(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00283360(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00288308(int);
+extern void cam_set_transition_frames(float);
+extern int coll_test_point(void *, int, void *, float);
+extern void UpdateViewContext(void);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void FadeToBlack(int);
+extern int math_fast_float_d(void *);
+extern float fast_vec_dist(void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void set_identity_rotation_rows(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void help_unlock_entry(int);
 extern int func_PAL_00289730(int, int);
 extern void func_PAL_L00_00305110(int, int);
 extern void func_PAL_0029C0F0(int, void *);
-extern void func_0029F338(void *);
-extern void func_0029F978(void *, int, void *);
+extern void moby_mark_spawned(void *);
+extern void AttachManipulator(void *, int, void *);
 extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(void *);
-extern void func_002A7398(void *, int, int);
-extern float func_002A7878(float, float);
-extern void func_002A91F0(void *, float *);
-extern void func_002A93B0(void *);
-extern void func_002AD7B8(int);
-extern int func_002B0C28(int, int, int);
-extern int func_L00_003268E8(int);
-extern int func_002B38B8(void *);
-extern void func_L01_00323310(int, int);
-extern void func_002C96F8(float, float, void *, void *, void *, void *);
-extern void func_002DF3F8(void *, void *);
+extern void anim_start_immediate(void *, int, int);
+extern float math_random_float_range(float, float);
+extern void mat_build_rotation_from_angles(void *, float *);
+extern void moby_update_ground_check(void *);
+extern void moby_mark_flag_and_append_to_list(int);
+extern int TryClaimNotice(int, int, int);
+extern int level_release_matching_resource(int);
+extern int flag_is_third_pending_set(void *);
+extern void script_queue_keyed_request(int, int);
+extern void anim_sample_key_track(float, float, void *, void *, void *, void *);
+extern void level_capture_checkpoint_state(void *, void *);
 extern int func_PAL_002E5898(void);
-extern int func_002E59B0(void *, int);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002E5E58(int, int, void *);
-extern int func_L00_0035F5A0(int, int, void *);
-extern int func_L01_00355BA0(int, int);
-extern void func_L00_003672F8(void);
-extern int func_L04_00400AB0(void *, void *, int);
-extern int func_L04_0040A1D0(int);
-extern int func_L04_0040A268(int);
-extern void func_L04_0040A310(void *);
-extern void func_L04_0040A3B8(void *, int);
-extern void func_L04_0040A5C0(void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
+extern int snd_start_in_slot(int, int, void *);
+extern int snd_set_slot_field(int, int);
+extern void state_set_flag_one(void);
+extern int FindNearestRoutePointIndex(void *, void *, int);
+extern int race_get_course_win_count(int);
+extern int race_get_course_finish_count(int);
+extern void part_refresh_active_records(void *);
+extern void racer_reset_state(void *, int);
+extern void racer_activate_linked(void *);
 extern void func_PAL_L04_0040EEE0(void *, int);
-extern void func_L04_0040AC30(void *, void *);
-extern void func_L04_0040BA68(void *, void *);
-extern void func_L04_0040E248(void *, void *);
-extern void func_L04_0040F5D0(void *);
-extern void func_L04_00410518(void *, void *, void *, void *, void *, int);
-extern int func_L04_00410E48(int, int, float);
+extern void racer_release_link_state(void *, void *);
+extern void UpdateRaceSelectionMenu(void *, void *);
+extern void racer_release_sound_handles(void *, void *);
+extern void race_recompute_branch_route_links(void *);
+extern void FindNearestRoutePoint(void *, void *, void *, void *, void *, int);
+extern int racer_is_in_jump_window(int, int, float);
 extern int func_PAL_L04_004169C0(void *, void *);
-extern void func_L04_00412E38(void *, void *, float, float);
-extern void func_L04_00415EA8(void *);
-extern void func_L04_00417308(void);
+extern void math_step_angle_offset(void *, void *, float, float);
+extern void trail_clear_by_owner(void *);
+extern void hud_draw_race_ruler(void);
 extern void func_PAL_L04_0041D5F0(void *, void *);
 extern void func_PAL_L04_0041D788(void *, void *);
-extern void func_L04_004195E0(void *);
-extern void func_L04_0043ABE0(void);
-extern void func_L04_0040AC80(void);
+extern void hoverbike_init_race_course(void *);
+extern void barlow_init_animation_paths(void);
+extern void race_set_state_flags_a(void);
 /* func_L04_0040AC98 in Barlow; Joba places its copy elsewhere. */
 extern void ref_L04_00419918_00(void);
-extern void func_L04_0040ACA8(void);
-extern void func_L04_0040AD28(void);
-extern void func_L04_0040CDD0(void);
-extern void func_L04_00411298(void);
-extern void func_00132B28(int);
-extern void func_00132028(void);
+extern void race_set_state_flags_c(void);
+extern void race_draw_results_panel(void);
+extern void racer_draw_glow_effects(void);
+extern void DrawRaceStandingsHud(void);
+extern void snd_send_cmd23(int);
+extern void snd_Pump(void);
 
 #define M_(p, t, o) (((struct { u8 pad[o]; t v; } *)(p))->v)
 #define I(p, o) M_(p, int, o)
@@ -156,11 +157,11 @@ void func_PAL_L04_0041E49C(u8 *self)
     int id;
     float d;
 
-    if (self[0x31] != 0 && func_00282E48(self + 0x10, D_L04_001B9680) < 24.0f) {
-        func_002A93B0(self);
+    if (self[0x31] != 0 && fast_vec_dist(self + 0x10, D_L04_001B9680) < 24.0f) {
+        moby_update_ground_check(self);
         self[0x6F] = 22;
     }
-    if ((D_L04_001A8F08 == 2 || D_L04_001A8F00 == 2) && D_L04_001B0BC0 == 0 && D_001A79F0 != 11) {
+    if ((D_L04_001A8F08 == 2 || D_L04_001A8F00 == 2) && D_L04_001B0BC0 == 0 && g_current_map_index != 11) {
         H(self, 0x34) = (H(self, 0x34) | 0x41) & ~0x1000;
         I(self, 0x98) = 0;
         D_L04_001B0BC0 = 1;
@@ -180,23 +181,23 @@ void func_PAL_L04_0041E49C(u8 *self)
         I(s, 0x328) = -1;
         I(s, 0x330) = -1;
         I(s, 0x334) = -1;
-        D_L04_001AA6A0 = func_L04_0040AC80;
+        D_L04_001AA6A0 = race_set_state_flags_a;
         D_L04_001AA6A4 = ref_L04_00419918_00;
-        D_L04_001AA6A8 = func_L04_0040ACA8;
+        D_L04_001AA6A8 = race_set_state_flags_c;
         D_L04_001AA6AC = ref_L04_00419918_00;
-        func_00283360(D_L04_001B31A0);
+        set_identity_rotation_rows(D_L04_001B31A0);
         D_L04_001B0914 = self;
-        func_L04_0043ABE0();
+        barlow_init_animation_paths();
         self[0x30] = 0x40;
         H(self, 0x32) = 0x40;
         self[0x20] = 1;
-        func_L04_0040F5D0(self);
+        race_recompute_branch_route_links(self);
         H(self, 0x34) |= 0x400;
         if (D_001A7904 == 3) {
             D_L04_001B08FC = 1;
             func_PAL_L00_002B9CD8(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70, 0, 1);
             D_001A7904 = 0;
-            func_L00_003672F8();
+            state_set_flag_one();
         } else {
             D_L04_001B08FC = 0;
         }
@@ -213,7 +214,7 @@ void func_PAL_L04_0041E49C(u8 *self)
         I(s, 0x318) = 0;
         I(s, 0x498) = 0;
         I(s, 0x640) = 0;
-        if (D_001A79F0 == 4) {
+        if (g_current_map_index == 4) {
             I(s, 0x648) = 0x48;
             I(s, 0x644) = 0x4D;
         } else {
@@ -238,30 +239,30 @@ void func_PAL_L04_0041E49C(u8 *self)
         I(s, 0x340) = 0;
         I(s, 0x344) = 0;
         for (k = 0; k < 5; k++) {
-            I(s, 0x344) += func_L04_0040A1D0(k);
-            I(s, 0x340) += func_L04_0040A268(k);
+            I(s, 0x344) += race_get_course_win_count(k);
+            I(s, 0x340) += race_get_course_finish_count(k);
         }
         for (k = 0; k < 6; k++) {
-            fp[k] = func_002A7878(0.0f, 1.0f);
+            fp[k] = math_random_float_range(0.0f, 1.0f);
         }
-        if (D_001A79F0 == 11 && func_L04_0040A1D0(0) > 0 && D_001A7AF8[0x36] == 0) {
-            func_00288308(0x36);
-        } else if (D_001A79F0 == 4 && func_L04_0040A1D0(0) > 0) {
-            func_002AD7B8(5);
+        if (g_current_map_index == 11 && race_get_course_win_count(0) > 0 && g_item_owned_flags[0x36] == 0) {
+            help_unlock_entry(0x36);
+        } else if (g_current_map_index == 4 && race_get_course_win_count(0) > 0) {
+            moby_mark_flag_and_append_to_list(5);
         }
         if (s[0x441] == 0) {
-            func_0029F978(self, 5, s + 0x440);
+            AttachManipulator(self, 5, s + 0x440);
         }
         return;
     case 1:
         flag = D_L04_001B08FC != 0;
-        if (I(s, 0x238) == -1 || func_002B38B8(MOBY(I(s, 0x238))) != 0) {
-            func_L04_00412E38(self, s, 0.02f, 0.00029f);
+        if (I(s, 0x238) == -1 || flag_is_third_pending_set(MOBY(I(s, 0x238))) != 0) {
+            math_step_angle_offset(self, s, 0.02f, 0.00029f);
             flag = 1;
-            F(self, 0x18) = F(s, 0x2D8) + func_00283198(F(s, 0x38C)) * 0.04f;
+            F(self, 0x18) = F(s, 0x2D8) + math_fast_sin_or_cos_b(F(s, 0x38C)) * 0.04f;
             qzero_nc(a);
             a[0] = F(s, 0x38C);
-            func_002A91F0(s + 0x450, a);
+            mat_build_rotation_from_angles(s + 0x450, a);
             if (I(s, 0x238) != -1) {
                 u8 *m = MOBY(I(s, 0x238));
 
@@ -274,22 +275,22 @@ void func_PAL_L04_0041E49C(u8 *self)
                 }
             }
         }
-        d = func_00282E48(D_00189E20 + 0x80, self + 0x10);
+        d = fast_vec_dist(g_hero_state + 0x80, self + 0x10);
         if (D_L04_001B08FC == 0) {
             if (!flag || !(d < 5.5f) || D_L04_001B2008 < 4) {
                 return;
             }
-            if (I(D_00189E20, 0x229C) == 0x1F || I(D_00189E20, 0x2294) == 0x1D
-                || I(D_00189E20, 0x2294) == 0x1C || I(D_00189E20, 0x2294) == 1
+            if (I(g_hero_state, 0x229C) == 0x1F || I(g_hero_state, 0x2294) == 0x1D
+                || I(g_hero_state, 0x2294) == 0x1C || I(g_hero_state, 0x2294) == 1
                 || D_L04_001A8F00 == 2 || D_L04_001A8F08 == 2) {
                 return;
             }
-            if (D_L04_001B0924 == 0 && func_002E59B0(self, I(s, 0x330)) == 0) {
-                I(s, 0x330) = func_L00_0035F5A0(D_001A79F0 == 4 ? 0x16 : 0x1A, 5, self);
-                func_L01_00355BA0(I(s, 0x330), func_00283CF0(func_00283CE0(0x400) * 0.75f));
+            if (D_L04_001B0924 == 0 && snd_is_voice_playing_for_owner(self, I(s, 0x330)) == 0) {
+                I(s, 0x330) = snd_start_in_slot(g_current_map_index == 4 ? 0x16 : 0x1A, 5, self);
+                snd_set_slot_field(I(s, 0x330), FloatToInt(IntToFloat(0x400) * 0.75f));
             }
         }
-        func_002B0C28(4, 0x12f3, 1);
+        TryClaimNotice(4, 0x12f3, 1);
         if (D_L04_001B08FC == 0 && D_L04_001B0924 == 0 && !(D_00138324 & 0x10)) {
             return;
         }
@@ -297,24 +298,24 @@ void func_PAL_L04_0041E49C(u8 *self)
             int sound = I(s, 0x330);
 
             if (sound != -1) {
-                SoundSlot *slot = (SoundSlot *)((char *)D_00188660 + sound * 0x70);
+                SoundSlot *slot = (SoundSlot *)((char *)g_sound_state + sound * 0x70);
 
                 if (slot->owner == (char *)self && slot->active) {
-                    func_002E59F8(sound);
+                    snd_stop_voice(sound);
                 }
             }
             I(s, 0x330) = -1;
         }
-        if (D_001A79F0 == 0xCE) {
+        if (g_current_map_index == 0xCE) {
             func_PAL_L04_002E7DA8(0x86, 1);
         } else {
             if (I(s, 0x198) != -1) {
                 if (I(s, 0x19C) != -1) {
-                    func_002DF3F8(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70);
+                    level_capture_checkpoint_state(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70);
                 } else {
-                    func_002DF3F8(self + 0x10, self + 0xF0);
+                    level_capture_checkpoint_state(self + 0x10, self + 0xF0);
                 }
-                func_0027D330(0xd);
+                FadeToBlack(0xd);
                 func_PAL_L00_002B9CD8(NODE(I(s, 0x198)) + 0x30, NODE(I(s, 0x198)) + 0x70, 0x31, 1);
                 Q(self, 0xd) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(self, 0xF0) = Q(NODE(I(s, 0x198)), 0x70);
@@ -334,8 +335,8 @@ void func_PAL_L04_0041E49C(u8 *self)
             F(s, 0x48) = 0.6f;
             F(s, 0x4C) = 0.0048f;
             I(s, 0x270) = 0;
-            D_L04_001A8FE4 = 0;
-            D_L04_001A8FE8 = 0;
+            g_current_lap = 0;
+            g_race_time_ticks = 0;
             D_L04_001B0918 = 0;
             I(s, 0x31C) = 0;
         }
@@ -357,20 +358,20 @@ void func_PAL_L04_0041E49C(u8 *self)
         if (D_L04_001B0924 != 0) {
             self[0xBC] = 2;
         } else {
-            func_PAL_0029C0F0(0, func_L04_0040AD28);
+            func_PAL_0029C0F0(0, race_draw_results_panel);
             self[0xBC] = 0;
         }
         D_L04_001B08FC = 0;
         I(s, 0x394) = 125;
         self[0x30] = 0xFF;
-        func_L00_003268E8(4);
-        D_00189E20[0x22B5] = 1;
-        I(P(D_00189E20, 0x2290), 0x98) = 0;
-        func_L01_00323310(I(s, 0x488), -1);
+        level_release_matching_resource(4);
+        g_hero_state[0x22B5] = 1;
+        I(P(g_hero_state, 0x2290), 0x98) = 0;
+        script_queue_keyed_request(I(s, 0x488), -1);
         return;
     case 2:
-        if (I(D_00189E20, 0x2294) == 0x86) {
-            u8 *bike = P(D_00189E20, 0x2290);
+        if (I(g_hero_state, 0x2294) == 0x86) {
+            u8 *bike = P(g_hero_state, 0x2290);
             float ratio = F(bike, 0x2C) / F(P(bike, 0x24), 0x24);
 
             F(self, 0x2C) = F(P(self, 0x24), 0x24) * ratio;
@@ -379,7 +380,7 @@ void func_PAL_L04_0041E49C(u8 *self)
         if (D_L04_001B0908 != 0) {
             D_L04_001A8ED0 = 2;
             func_PAL_002E5898();
-            func_0027D330(0xd);
+            FadeToBlack(0xd);
             if (D_L04_001B0908 == 2) {
                 func_PAL_L04_0040EEE0(self, 1);
             } else {
@@ -391,7 +392,7 @@ void func_PAL_L04_0041E49C(u8 *self)
         if (ref_L04_00419918_01 != 0) {
             D_L04_001A8ED0 = 1;
             H(self, 0x34) &= ~0x41;
-            func_L04_0040AC30(self, s);
+            racer_release_link_state(self, s);
             I(s, 0x320) = -1;
             self[0x20] = 4;
             ref_L04_00419918_01 = 0;
@@ -400,13 +401,13 @@ void func_PAL_L04_0041E49C(u8 *self)
         switch (self[0xBC]) {
         case 0:
             D_L04_001B0BBC = 0;
-            func_L04_0040BA68(self, s);
-            func_PAL_0029C0F0(0, func_L04_0040AD28);
+            UpdateRaceSelectionMenu(self, s);
+            func_PAL_0029C0F0(0, race_draw_results_panel);
             return;
         case 1:
             func_PAL_L04_0041D5F0(self, s);
             if (*(u8 *)&D_00138324 != 0) {
-                func_002E5E58(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
                 self[0xBC] = 3;
             }
             return;
@@ -424,21 +425,21 @@ void func_PAL_L04_0041E49C(u8 *self)
                 Q(o, 0xd) = Q(self, 0xd);
                 Q(o, 0xF0) = Q(self, 0xF0);
                 o[0x30] = 0;
-                func_002A7398(o, 0, 0);
+                anim_start_immediate(o, 0, 0);
                 func_PAL_002A0F68(o);
                 func_002A0F48(o);
             }
             H(self, 0x34) &= ~0x41;
             D_L04_001B091C = 0;
             D_L04_001B31D4 = 0;
-            func_PAL_0029C0F0(0, func_L04_00417308);
+            func_PAL_0029C0F0(0, hud_draw_race_ruler);
             D_L04_001B0930 = 0;
             D_L04_001B0938 = 0;
-            func_L04_00415EA8(0);
+            trail_clear_by_owner(0);
             D_L04_001B08F0 = 0;
-            func_L04_004195E0(self);
-            D_00189E20[0x22B5] = 1;
-            I(P(D_00189E20, 0x2290), 0x98) = 0;
+            hoverbike_init_race_course(self);
+            g_hero_state[0x22B5] = 1;
+            I(P(g_hero_state, 0x2290), 0x98) = 0;
             if (D_L04_001B0924 != 0) {
                 self[0xBC] = 1;
                 H(self, 0x96) = 100;
@@ -448,29 +449,29 @@ void func_PAL_L04_0041E49C(u8 *self)
             self[0xBC] = 3;
         case 3:
             D_L04_001B092C = 0;
-            func_L04_0040A5C0(self);
-            func_L04_0040A310(self);
+            racer_activate_linked(self);
+            part_refresh_active_records(self);
             self[0xBC] = 4;
         case 4:
             func_PAL_L04_0041D5F0(self, s);
             if (I(s, 0x394) < 100 && D_L04_001B31D4 == 0) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 75 && D_L04_001B31D4 == 1) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 50 && D_L04_001B31D4 == 2) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 25 && D_L04_001B31D4 == 3) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             }
-            func_00282948(s + 0x394);
+            math_fast_float_d(s + 0x394);
             if (I(s, 0x394) != 0) {
                 return;
             }
-            func_002E5CF8(0xE, 0, self);
+            PlayMobySound(0xE, 0, self);
             self[0xBC] = 5;
             if (D_00138320 & 0x40) {
                 D_L04_001B0930 = 0;
@@ -488,16 +489,16 @@ void func_PAL_L04_0041E49C(u8 *self)
                 return;
             }
             func_PAL_L04_0041D788(self, s);
-            func_L00_002E6EF8(func_L04_0040CDD0, self);
-            if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
-                func_L04_0040E248(self, s);
+            gfx_add_draw_callback_third(racer_draw_glow_effects, self);
+            if (F(self, 0x18) < F(s, 0x26C) || racer_is_in_jump_window(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
+                racer_release_sound_handles(self, s);
                 self[0xBC] = 6;
                 H(self, 0x96) = 1;
             }
             if (D_L04_001B0900 == 0) {
                 return;
             }
-            func_0027D330(0xd);
+            FadeToBlack(0xd);
             func_PAL_L04_0040EEE0(self, 1);
             I(s, 0x340) = 0;
             D_L04_001B0900 = 0;
@@ -511,14 +512,14 @@ void func_PAL_L04_0041E49C(u8 *self)
                 I(s, 0x724) = 0;
             }
             I(s, 0x720) = 0;
-            func_L00_002E6EF8(func_L04_0040CDD0, self);
+            gfx_add_draw_callback_third(racer_draw_glow_effects, self);
             o = 0;
             I(s, 0x30C) = 0;
             I(s, 0x27C) = 0;
             if (I(s, 0x1DC) != -1) {
                 o = MOBY(I(s, 0x1DC));
             }
-            func_L04_0040E248(self, s);
+            racer_release_sound_handles(self, s);
             if (o != 0) {
                 H(o, 0x34) |= 0x41;
                 if (D_L04_001B08F4 != 0) {
@@ -537,7 +538,7 @@ void func_PAL_L04_0041E49C(u8 *self)
             if (--H(self, 0x96) != 0) {
                 return;
             }
-            func_0027D330(0xd);
+            FadeToBlack(0xd);
             ids = (IdList *)(s + 0x110);
             id = ids->v[I(s, 0x270)];
             if (id != -1) {
@@ -551,15 +552,15 @@ void func_PAL_L04_0041E49C(u8 *self)
                 Q(b, 0) = Q(NODE(I(s, 0x198)), 0x70);
             }
             D_L04_001B1F20 = 1.0f;
-            func_00272198(8.0f);
-            if (func_00277258(a, 4, self, F(s, 0x20)) != 0) {
+            cam_set_transition_frames(8.0f);
+            if (coll_test_point(a, 4, self, F(s, 0x20)) != 0) {
                 Q(a, 0) = D_L04_001BFAF0;
             }
-            func_L04_0040A3B8(self, 1);
-            func_L04_00415EA8(self);
+            racer_reset_state(self, 1);
+            trail_clear_by_owner(self);
             func_PAL_L00_002B9CD8(a, b, 0x31, 1);
-            D_00189E20[0x22B7] = 1;
-            D_00189E20[0x22B5] = 1;
+            g_hero_state[0x22B7] = 1;
+            g_hero_state[0x22B5] = 1;
             I(s, 0x49C) = -1;
             I(s, 0x4A0) = -1;
             F(s, 0x4A4) = -1.0f;
@@ -568,12 +569,12 @@ void func_PAL_L04_0041E49C(u8 *self)
             I(s, 0x4AC) = 0;
             Q(self, 0x10) = Q(a, 0);
             Q(self, 0xF0) = Q(b, 0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, g_current_lap);
             H(self, 0x34) &= ~0x41;
             if (o != 0) {
                 Q(o, 0x10) = Q(self, 0x10);
                 Q(o, 0xF0) = Q(self, 0xF0);
-                func_002A7398(o, 0, 0);
+                anim_start_immediate(o, 0, 0);
                 func_PAL_002A0F68(o);
                 func_002A0F48(o);
                 H(o, 0x34) &= ~0x41;
@@ -591,24 +592,24 @@ void func_PAL_L04_0041E49C(u8 *self)
         D_L04_001A8ED0 = 1;
         func_PAL_L04_0041D5F0(self, s);
         D_L04_001B08F8++;
-        if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
+        if (F(self, 0x18) < F(s, 0x26C) || racer_is_in_jump_window(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
             float ahead, along;
-            int node = func_L04_00400AB0(self, P(s, 0x6D0), 1);
+            int node = FindNearestRoutePointIndex(self, P(s, 0x6D0), 1);
 
             /* The path's points are 16-byte records from +0x10. */
             Q(self, 0x10) = Q(((Vector *)P(s, 0x6D0))[node], 0x10);
-            along = func_00283CE0(node) * F(P(s, 0x6D0), 0x1C);
+            along = IntToFloat(node) * F(P(s, 0x6D0), 0x1C);
             if (D_L04_001B08F0 != 0) {
                 ahead = along + 15.0f;
             } else {
                 ahead = along + 5.0f;
             }
             F(s, 0x6D8) = ahead;
-            func_002C96F8(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            anim_sample_key_track(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, g_current_lap);
         }
-        func_PAL_0029C0F0(0, func_L04_00411298);
-        func_00282948(s + 0x398);
+        func_PAL_0029C0F0(0, DrawRaceStandingsHud);
+        math_fast_float_d(s + 0x398);
         if (D_L04_001A7CD0 == 0) {
             if (I(s, 0x398) > 0 || !(D_00138324 & 0x10)) {
                 return;
@@ -620,12 +621,12 @@ void func_PAL_L04_0041E49C(u8 *self)
         if (D_L04_001A7CD4 != 1) {
             return;
         }
-        func_00132B28(0x5D);
-        func_00132028();
+        snd_send_cmd23(0x5D);
+        snd_Pump();
         D_L04_001A8ED0_flags[5] = 0;
-        func_L04_0040AC30(self, s);
+        racer_release_link_state(self, s);
         self[0x20] = 4;
-        func_L01_00323310(I(s, 0x488), -1);
+        script_queue_keyed_request(I(s, 0x488), -1);
         return;
     case 4:
         D_L04_001A8ED0 = 1;
@@ -642,35 +643,35 @@ void func_PAL_L04_0041E49C(u8 *self)
         if ((unsigned int)(D_L04_001A7CD4 - 1) >= 2) {
             return;
         }
-        func_L04_0040A310(self);
+        part_refresh_active_records(self);
         D_L04_001A8ED0 = 0;
         H(self, 0x34) &= ~0x41;
         func_PAL_0029C0F0(0, 0);
         if (I(s, 0x19C) != -1) {
-            if (I(s, 0x320) == -1 || (D_L04_001B090C == 0 && func_L04_0040A1D0(0) == 1)) {
+            if (I(s, 0x320) == -1 || (g_current_race_index == 0 && race_get_course_win_count(0) == 1)) {
                 u8 *bike;
 
                 path = I(s, 0x480);
-                if (D_001A79F0 == 11) {
+                if (g_current_map_index == 11) {
                     path = I(s, 0x484);
                 }
                 Q(a, 0) = Q(NODE(I(s, 0x19C)), 0x70);
                 if (D_L04_001B0BBC != 0) {
                     a[2] = 0.92f;
                 }
-                if (I(s, 0x320) == 1 && D_L04_001B090C == 0) {
-                    D_L04_001B090C = I(s, 0x320);
+                if (I(s, 0x320) == 1 && g_current_race_index == 0) {
+                    g_current_race_index = I(s, 0x320);
                 }
                 if (D_L04_001B08F4 != 0) {
-                    func_0029F338(D_L04_001B08F4);
+                    moby_mark_spawned(D_L04_001B08F4);
                     D_L04_001B08F4 = 0;
                 }
-                bike = P(D_00189E20, 0x2290);
-                D_00189E20[0x22B5] = 0;
+                bike = P(g_hero_state, 0x2290);
+                g_hero_state[0x22B5] = 0;
                 I(bike, 0x98) = I(P(bike, 0x24), 0x10);
                 func_PAL_L00_002B9CD8(NODE(I(s, 0x19C)) + 0x30, a, 0, 1);
                 {
-                    u8 *ride = P(D_00189E20, 0x2290);
+                    u8 *ride = P(g_hero_state, 0x2290);
 
                     F(ride, 0x2C) = F(P(ride, 0x24), 0x24);
                 }
@@ -680,11 +681,11 @@ void func_PAL_L04_0041E49C(u8 *self)
                 F(self, 0x2C) = F(P(self, 0x24), 0x24);
                 func_PAL_L00_00305110(0, path);
                 {
-                    float q = func_00283198(0.56217057f) / func_00283180(0.56217057f);
+                    float q = math_fast_sin_or_cos_b(0.56217057f) / math_fast_sin_or_cos_a(0.56217057f);
 
                     D_L04_001BDC30 = q;
                 }
-                func_0027AB40();
+                UpdateViewContext();
                 for (k = 0; k < 21; k++) {
                     int id = ((int *)(s + 0x1E4))[k];
 
@@ -694,17 +695,17 @@ void func_PAL_L04_0041E49C(u8 *self)
                         I(rider, 0x2C8) = 0;
                         rider[0x251] = 0;
                         if (P(rider, 0x8C) != 0) {
-                            func_0029F338(P(rider, 0x8C));
+                            moby_mark_spawned(P(rider, 0x8C));
                             P(rider, 0x8C) = 0;
                         }
                     }
                 }
                 return;
             }
-            if (func_L04_0040A1D0(D_L04_001B090C) == 1) {
-                D_L04_001B090C++;
-                if (D_L04_001B090C >= 5) {
-                    D_L04_001B090C = 4;
+            if (race_get_course_win_count(g_current_race_index) == 1) {
+                g_current_race_index++;
+                if (g_current_race_index >= 5) {
+                    g_current_race_index = 4;
                 }
             }
             func_PAL_L04_0040EEE0(self, 1);

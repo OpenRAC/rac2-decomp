@@ -32,22 +32,22 @@ extern float D_L08_001B1EA4 __attribute__((sda));
 extern float D_L08_001B1EA8 __attribute__((sda));
 extern float D_L08_001B1EC4 __attribute__((sda));
 extern u8 *D_L08_001B1EC8 __attribute__((sda));
-extern u8 D_0019B2E8[], D_00189E20[];
-extern int D_001A79F0;
-extern void func_00282A60(void *destination, int value, int size);
-extern unsigned long func_0027C878(int texture);
-extern int func_002B38B8(u8 *moby);
-extern int func_L00_0035F5A0(int index, int value, int moby);
-extern float func_00283BE0(float angle, float bound);
-extern float func_00283180(float angle);
-extern float func_00283B98(float angle, float velocity);
-extern float func_00283CE0(int value);
-extern float func_002ABB18(float angle);
-extern float func_00283198(float angle);
-extern float func_00283D00(float value, float divisor);
-extern int func_00283DB8(void *position, float radius);
-extern void func_L08_0042E678(void *moby);
-extern void func_L00_002E6CF0(void (*callback)(void *), void *moby);
+extern u8 D_0019B2E8[], g_hero_state[];
+extern int g_current_map_index;
+extern void mem_clear(void *destination, int value, int size);
+extern unsigned long GetEffectTextureDescriptor(int texture);
+extern int flag_is_third_pending_set(u8 *moby);
+extern int snd_start_in_slot(int index, int value, int moby);
+extern float fast_subtract_rotations(float angle, float bound);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float FastAddRotations(float angle, float velocity);
+extern float IntToFloat(int value);
+extern float math_wrap_angle_to_pi(float angle);
+extern float math_fast_sin_or_cos_b(float angle);
+extern float fast_fmod(float value, float divisor);
+extern int math_fast_helper_a(void *position, float radius);
+extern void DrawLayeredDoorQuads(void *moby);
+extern void gfx_add_draw_callback_first(void (*callback)(void *), void *moby);
 
 /* The four measured state floats occupy one 16-byte parameter block. */
 typedef struct { float upper, lower, phase, rate; } DoorState;
@@ -82,7 +82,7 @@ void func_L08_0042EF00(u8 *moby)
     switch (moby[0x95]) {
     case 0:
         if (D_L08_001B2508 != D_L08_001B1EC0) {
-            ClearMemory(D_L08_002B2540, 0, 128);
+            mem_clear(D_L08_002B2540, 0, 128);
             D_L08_001B1ECC = 0;
         }
         data->rate *= 0.0002908882452175021f;
@@ -127,7 +127,7 @@ void func_L08_0042EF00(u8 *moby)
         third->alpha = alpha;
         ((DoorObject *)moby)->drawMode = 0;
         ((DoorObject *)moby)->flags |= 1;
-        if (D_0019B2E8[moby[0xb0] + gCurrentMapIndex * 16] & 0x80) {
+        if (D_0019B2E8[moby[0xb0] + g_current_map_index * 16] & 0x80) {
             data->phase = 3.1415927410125732f;
             moby[0x95] = 3;
         } else {
@@ -135,9 +135,9 @@ void func_L08_0042EF00(u8 *moby)
         }
         break;
     case 1:
-        if ((D_0019B2E8[moby[0xb0] + gCurrentMapIndex * 16] & 0x80) || IsThirdPendingFlagSet(moby)) {
-            if (gCurrentMapIndex == 19)
-                StartEffectInSlot(18, 0, (int)moby);
+        if ((D_0019B2E8[moby[0xb0] + g_current_map_index * 16] & 0x80) || flag_is_third_pending_set(moby)) {
+            if (g_current_map_index == 19)
+                snd_start_in_slot(18, 0, (int)moby);
             moby[0x95] = 2;
         }
         break;
@@ -153,16 +153,16 @@ void func_L08_0042EF00(u8 *moby)
     if (moby[0x95] != 2 || data->phase >= 3.1415927410125732f || data->phase < -3.0f)
         data->rate = 0;
     half = (data->upper - data->lower) * 0.5f;
-    phase = FastSinOrCosA(fast_subtract_rotations(data->phase, 3.1415927410125732f));
+    phase = math_fast_sin_or_cos_a(fast_subtract_rotations(data->phase, 3.1415927410125732f));
     *(float *)(moby + 0x18) = data->lower + (phase * half + half);
-    if (gHeroState[0x22b4] == 4 ||
-        (*(int *)(gHeroState + 0x229c) != 20 && *(int *)(gHeroState + 0x229c) != 25 &&
-         *(int *)(gHeroState + 0x2294) != 0x39 && *(int *)(gHeroState + 0x2294) != 0x78 &&
-         *(int *)(gHeroState + 0x2294) != 0x79))
+    if (g_hero_state[0x22b4] == 4 ||
+        (*(int *)(g_hero_state + 0x229c) != 20 && *(int *)(g_hero_state + 0x229c) != 25 &&
+         *(int *)(g_hero_state + 0x2294) != 0x39 && *(int *)(g_hero_state + 0x2294) != 0x78 &&
+         *(int *)(g_hero_state + 0x2294) != 0x79))
         data->phase = FastAddRotations(data->phase, data->rate);
     data->rate = rate;
     if (D_L08_001B2508 != D_L08_001B1EC0) {
-        phase = FastSinOrCosB(WrapAngleToPi(IntToFloat(D_L08_001B2508) * D_L08_001B1EA4));
+        phase = math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L08_001B2508) * D_L08_001B1EA4));
         D_L08_001B1EC4 = D_L08_001B1EA8 * phase;
         uv = fast_fmod(IntToFloat(D_L08_001B2508) * D_L08_001B1EA0, 1.0f);
         corner = uv + 2.0f;
@@ -180,8 +180,8 @@ void func_L08_0042EF00(u8 *moby)
     }
     qcopy(position, moby + 0x10);
     position[3] = (*(float *)(moby + 0x2c) * 11.319999694824219f) / *(float *)(*(u8 **)(moby + 0x24) + 0x24);
-    if (FastMathHelperA(position, (float)*(short *)(moby + 0x32)) != -1) {
-        AddDrawCallbackToList1(DrawLayeredDoorQuads, moby);
+    if (math_fast_helper_a(position, (float)*(short *)(moby + 0x32)) != -1) {
+        gfx_add_draw_callback_first(DrawLayeredDoorQuads, moby);
         D_L08_001B1EC8 = moby;
         D_L08_002B2540[D_L08_001B1ECC++] = moby;
         D_L08_002B2540[D_L08_001B1ECC] = 0;

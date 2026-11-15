@@ -3,20 +3,20 @@
 
 extern int D_L02_001B01E0 __attribute__((sda));
 extern int D_L02_001FF6B8[];
-extern float D_L02_001BA500[4];
-extern int func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
-extern void *func_002A9640(char *, int, int);
-extern int func_002B0ED8(char *, void *, int);
-extern void func_002A7470(char *, int, int, int);
-extern void func_L02_003DB880(char *);
-extern void func_L02_003FC020(void *, void *);
-extern void func_L02_003D4900(char *);
-extern int func_002B3BA8(char *, int, int, int, float, float);
+extern float g_camera_l02_position[4];
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
+extern void *part_find_owned_effect_slot(char *, int, int);
+extern int moby_apply_damage_to_object(char *, void *, int);
+extern void anim_start_blended(char *, int, int, int);
+extern void brawler_advance_damage_stage(char *);
+extern void arena_set_current_boss(void *, void *);
+extern void chainblade_reset_to_idle(char *);
+extern int weapon_select_aim_target(char *, int, int, int, float, float);
 
 /* Sets up the Chainblade's starting values on its first frame, then handles the hits it takes and the hurt animations. */
-void func_L02_003D4308(char *self) {
+void chainblade_handle_hits(char *self) {
     char *state = *(char **)(self + 0x68);
     char *damage;
 
@@ -45,16 +45,16 @@ void func_L02_003D4308(char *self) {
         *(float *)(state + 0x140) = 0.52359885f;
         *(float *)(state + 0x144) = 0.01f;
         *(float *)(state + 0x13C) = 0.0055555557f;
-        ResetChainbladeToIdle(self);
+        chainblade_reset_to_idle(self);
     }
     if (*(unsigned char *)(self + 0x31)) {
-        if (fast_vec_dist(self + 0x10, gCameraPosition_L02) < 60.0f) {
-            UpdateMobyGroundCheck(self);
+        if (fast_vec_dist(self + 0x10, g_camera_l02_position) < 60.0f) {
+            moby_update_ground_check(self);
             *(unsigned char *)(self + 0x6F) = 0x38;
         }
     }
     if (*(short *)(state + 0x330) == 0) {
-        damage = FindOwnedEffectSlot(self, 0x10000, 0);
+        damage = part_find_owned_effect_slot(self, 0x10000, 0);
         if (damage) {
             if (*(unsigned char *)(self + 0x20) < 5 ||
                 (*(unsigned char *)(self + 0x20) == 10 && *(short *)(state + 0x324) < 5))
@@ -68,7 +68,7 @@ void func_L02_003D4308(char *self) {
             }
             D_L02_001FF6B8[*(unsigned char *)(state + 0x37)] += (int)(*(float *)(damage + 0x2C) * 32.0f);
         }
-        if (ApplyDamageToObject(self, state + 0x60, 0)) {
+        if (moby_apply_damage_to_object(self, state + 0x60, 0)) {
             if (*(int *)(self + 0x98) == 0)
                 *(int *)(self + 0x98) = *(int *)(*(char **)(self + 0x24) + 0x10);
             {
@@ -78,23 +78,23 @@ void func_L02_003D4308(char *self) {
             }
             if (*(unsigned char *)(self + 0x95) == 4) {
                 if (*(unsigned char *)(self + 0x43) != 16)
-                    StartAnimationBlended(self, 16, 0, 3);
+                    anim_start_blended(self, 16, 0, 3);
             }
             if (*(unsigned char *)(self + 0x95) == 3 && *(float *)(state + 0x20) <= 0.0f) {
                 if (*(unsigned char *)(self + 0x43) != 4)
-                    StartAnimationBlended(self, 4, 0, 3);
+                    anim_start_blended(self, 4, 0, 3);
             }
         }
         if (*(unsigned char *)(self + 0x20) != 0 && *(unsigned char *)(state + 0x2E) == 2) {
             char *source = *(char **)(state + 0x310);
             if (source && *(unsigned char *)(source + 0x20) != 0xFE &&
                 *(unsigned char *)(source + 0x20) != 0xFD && *(unsigned char *)(source + 0x20) >= 3) {
-                AdvanceDamageStage(source);
-                SetCurrentArenaBoss(*(void **)(self + 0xB8), *(void **)(state + 0x310));
+                brawler_advance_damage_stage(source);
+                arena_set_current_boss(*(void **)(self + 0xB8), *(void **)(state + 0x310));
             }
-            ResetChainbladeToIdle(self);
+            chainblade_reset_to_idle(self);
         }
     }
-    *(short *)(state + 0x322) = SelectAimTarget_002B3BA8(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
+    *(short *)(state + 0x322) = weapon_select_aim_target(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
     *(int *)(state + 0x30C) = *(int *)(state + 0x210);
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -32,7 +33,7 @@ extern s32 D_00141848;
 extern s32 D_001363A4;
 
 /* Calls the saved callback function with its saved argument, if one is set and the system is not busy. */
-void func_001248B0(void) {
+void cd_call_saved_callback(void) {
     void (*callback)(s32);
 
     callback = (void (*)(s32))D_00141844;

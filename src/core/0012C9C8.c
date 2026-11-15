@@ -1,43 +1,43 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_0012C3B0(void *);
+extern void mpeg_wait_ipu_idle(void *);
 
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *, int);
 
-extern void func_0012C788(void *, int);
+extern void mpeg_skip_bits(void *, int);
 
-extern void func_0012C9C8(void *);
+extern void mpeg_skip_to_start_code(void *);
 
-extern int func_0012CA48(void *);
+extern int mpeg_read_slice_header_extra(void *);
 
-extern int func_0012C878(void *, int);
+extern int mpeg_read_bits(void *, int);
 
-extern void func_0012CFA0(void *);
+extern void mpeg_skip_extra_info_bits(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00128BA8 */
 /* Skips ahead in the video stream to the next start code. */
-void func_0012C9C8(void *decoderPtr) {
+void mpeg_skip_to_start_code(void *decoderPtr) {
     int pad;
 
-    WaitIpuIdle(decoderPtr);
+    mpeg_wait_ipu_idle(decoderPtr);
     pad = -(((int)IPU_BP) & 7) & 7;
     if (pad != 0) {
-        SkipMpegBits(decoderPtr, pad);
+        mpeg_skip_bits(decoderPtr, pad);
     }
-    while (PeekMpegBits(decoderPtr, 0x18) != 1) {
-        SkipMpegBits(decoderPtr, 8);
+    while (mpeg_peek_bits(decoderPtr, 0x18) != 1) {
+        mpeg_skip_bits(decoderPtr, 8);
     }
 }
 
 /* rac1-decomp src/core/00125630.c: func_00128C28 */
 /* Reads the rest of a slice header: the quantiser scale and any extra bytes. Always returns 0. */
-int func_0012CA48(void *decoderPtr) {
-    *(int *)((char *)decoderPtr + 0x1B4) = ReadMpegBits(decoderPtr, 5);
-    if (ReadMpegBits(decoderPtr, 1) != 0) {
-        ReadMpegBits(decoderPtr, 1);
-        SkipMpegBits(decoderPtr, 7);
-        SkipMpegExtraInfoBits(decoderPtr);
+int mpeg_read_slice_header_extra(void *decoderPtr) {
+    *(int *)((char *)decoderPtr + 0x1B4) = mpeg_read_bits(decoderPtr, 5);
+    if (mpeg_read_bits(decoderPtr, 1) != 0) {
+        mpeg_read_bits(decoderPtr, 1);
+        mpeg_skip_bits(decoderPtr, 7);
+        mpeg_skip_extra_info_bits(decoderPtr);
     }
     return 0;
 }
@@ -47,7 +47,7 @@ extern int r1_func_00128A58_0012CBC0(void *, int);
 
 extern void r1_func_00129180_0012CBC0(void *);
 
-extern void func_0012CBC0(void *);
+extern void mpeg_read_picture_header(void *);
 
 extern void r1_func_00128E68_0012CBC0(void *);
 
@@ -71,7 +71,7 @@ extern void r1_func_001291C8_0012CBC0();
  * (x-2)<2u range check; B_TYPE alone is a plain ==3.
  */
 /* Reads a picture header: its type and the precision of its motion vectors. */
-void func_0012CBC0(void *decoderPtr) {
+void mpeg_read_picture_header(void *decoderPtr) {
     char *s = (char *)decoderPtr;
     int temporal_reference = r1_func_00128A58_0012CBC0(s, 10);
 
@@ -116,40 +116,40 @@ typedef struct {
 } PicExt_0012CDB0;
 
 /* Reads the picture coding extension: motion vector precision, field or frame layout and scan settings. */
-void func_0012CDB0(void *decoderPtr) {
+void mpeg_read_picture_coding_extension(void *decoderPtr) {
     PicExt_0012CDB0 *dec = decoderPtr;
     int pictureStructureBits;
     int qScaleCtrl;
     int vlcFormatCtrl;
     int altScanCtrl;
 
-    dec->f_code00 = ReadMpegBits(dec, 4);
-    dec->f_code01 = ReadMpegBits(dec, 4);
-    dec->f_code10 = ReadMpegBits(dec, 4);
-    dec->f_code11 = ReadMpegBits(dec, 4);
-    *(int *)0x10002010 = (*(int *)0x10002010 & 0xFFFCFFFF) | (ReadMpegBits(dec, 2) << 0x10);
-    pictureStructureBits = ReadMpegBits(dec, 2);
+    dec->f_code00 = mpeg_read_bits(dec, 4);
+    dec->f_code01 = mpeg_read_bits(dec, 4);
+    dec->f_code10 = mpeg_read_bits(dec, 4);
+    dec->f_code11 = mpeg_read_bits(dec, 4);
+    *(int *)0x10002010 = (*(int *)0x10002010 & 0xFFFCFFFF) | (mpeg_read_bits(dec, 2) << 0x10);
+    pictureStructureBits = mpeg_read_bits(dec, 2);
     dec->picture_structure = pictureStructureBits;
     if (dec->pict_struct0 == 0) {
         dec->pict_struct0 = pictureStructureBits;
     }
-    dec->top_field_first = ReadMpegBits(dec, 1);
-    dec->frame_pred_frame_dct = ReadMpegBits(dec, 1);
-    dec->concealment_mvs = ReadMpegBits(dec, 1);
-    qScaleCtrl = (IPU_CTRL & 0xFFBFFFFF) | (ReadMpegBits(dec, 1) << 0x16);
+    dec->top_field_first = mpeg_read_bits(dec, 1);
+    dec->frame_pred_frame_dct = mpeg_read_bits(dec, 1);
+    dec->concealment_mvs = mpeg_read_bits(dec, 1);
+    qScaleCtrl = (IPU_CTRL & 0xFFBFFFFF) | (mpeg_read_bits(dec, 1) << 0x16);
     IPU_CTRL = qScaleCtrl;
-    vlcFormatCtrl = (IPU_CTRL & 0xFFDFFFFF) | (ReadMpegBits(dec, 1) << 0x15);
+    vlcFormatCtrl = (IPU_CTRL & 0xFFDFFFFF) | (mpeg_read_bits(dec, 1) << 0x15);
     IPU_CTRL = vlcFormatCtrl;
-    altScanCtrl = (IPU_CTRL & 0xFFEFFFFF) | (ReadMpegBits(dec, 1) << 0x14);
+    altScanCtrl = (IPU_CTRL & 0xFFEFFFFF) | (mpeg_read_bits(dec, 1) << 0x14);
     IPU_CTRL = altScanCtrl;
-    dec->repeat_first_field = ReadMpegBits(dec, 1);
-    ReadMpegBits(dec, 1);
-    dec->progressive_frame = ReadMpegBits(dec, 1);
-    if (ReadMpegBits(dec, 1) != 0) {
-        ReadMpegBits(dec, 1);
-        ReadMpegBits(dec, 3);
-        ReadMpegBits(dec, 1);
-        ReadMpegBits(dec, 7);
-        ReadMpegBits(dec, 8);
+    dec->repeat_first_field = mpeg_read_bits(dec, 1);
+    mpeg_read_bits(dec, 1);
+    dec->progressive_frame = mpeg_read_bits(dec, 1);
+    if (mpeg_read_bits(dec, 1) != 0) {
+        mpeg_read_bits(dec, 1);
+        mpeg_read_bits(dec, 3);
+        mpeg_read_bits(dec, 1);
+        mpeg_read_bits(dec, 7);
+        mpeg_read_bits(dec, 8);
     }
 }

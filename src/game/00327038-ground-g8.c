@@ -13,22 +13,22 @@ extern int D_001B27C4;
 extern float D_001B0108 __attribute__((sda));
 extern float D_001B0134 __attribute__((sda));
 extern float D_001B0130 __attribute__((sda));
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern int func_00300540(int);
-extern int func_00282C30(int);
-extern float func_00283CE0(int);
-extern float func_00283198(float), func_00283180(float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern int weapon_get_group(int);
+extern int subtract_integer_with_clamp(int);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 /* Casts the eight ground probes in a fixed order. A hit on a surface that
    func_00300540 accepts sets states 9/10 instead; otherwise the hit point
@@ -37,7 +37,7 @@ extern void func_00283738(void *, void *, void *);
    third row (+0xE0) follows the mean normal of the kept points and eases
    the position (+0x10) toward their centre along D_001B27B0. Without any
    hit it sets state 4 and a velocity along the first row. */
-void func_00327380(char *object)
+void vehicle_align_to_ground_surface(char *object)
 {
     float (*probes)[4] = D_0022AFA0;
     float edges[8][4];
@@ -52,9 +52,9 @@ void func_00327380(char *object)
     float inv, angle;
     char *vehicle = object;
 
-    ClearVector128(center);
+    vec_clear_128(center);
     hit = 0;
-    ClearVector128(normal);
+    vec_clear_128(normal);
     vec_scale_to_length(offset, D_001B27B0, D_001B0108 + D_001B0108);
     points = D_0022B020;
     out = points;
@@ -64,7 +64,7 @@ void func_00327380(char *object)
         FastVecAdd(a, probe, offset);
         if (CollLine(probe, a, 18, object, 0)) {
             hit = 1;
-            if (GetWeaponGroup(GetCollHitMaterial())) {
+            if (weapon_get_group(GetCollHitMaterial())) {
                 object[0x20] = 9;
                 *(int *)(state + 0x20) = 10;
                 continue;
@@ -109,8 +109,8 @@ void func_00327380(char *object)
             vec_scale_to_length(b, a, 1.0f);
             FastVecCross(axis, c, b);
             angle = FastVecDot(c, b) * (D_001B0134 * 0.5f);
-            FastVecScale(b, axis, FastSinOrCosB(angle));
-            b[3] = FastSinOrCosA(angle);
+            FastVecScale(b, axis, math_fast_sin_or_cos_b(angle));
+            b[3] = math_fast_sin_or_cos_a(angle);
             quaternion_to_rotation_basis(b, matrix);
             multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
             FastVecScale(center, center, inv);

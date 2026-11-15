@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern char *func_0029EFD0(int);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_L11_00460258(void *, int);
-extern void func_002E5DA0(int, int, char *, int);
+extern char *CreateMoby(int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void part_l11_spawn_spark_ring(void *, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 
 extern float D_L11_001B22C4 __attribute__((sda));
 extern int D_L11_001B22CC __attribute__((sda));
@@ -39,7 +39,7 @@ typedef struct {
 
 /* Creates the object-type 0xE7B effect for an owner: copies the start velocity and position,
    picks a random heading and turn rate, and registers it. Returns the new object or NULL. */
-char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float paramA, float paramB,
+char *joba_swirl_effect_create(char *owner, void *velocity, void *position, float paramA, float paramB,
                         float scale, float paramD)
 {
     SpawnObject *obj = (SpawnObject *)CreateMoby(0xE7B /* moby class 3707 */);
@@ -60,8 +60,8 @@ char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float param
         state->owner = owner;
         state->parameterA = paramA;
         state->parameterB = paramB;
-        state->heading = RandomAngle();
-        state->turn = RandomFloatRange(0.0523598865f, 0.104719773f);
+        state->heading = math_random_angle();
+        state->turn = math_random_float_range(0.0523598865f, 0.104719773f);
         state->parameterD = paramD;
 
         obj->kind = 255;
@@ -69,8 +69,8 @@ char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float param
         arg = D_L11_001B22CC;
         obj->scale = D_L11_001B22C4 * scale;
         obj->flags = 0x1008;
-        SpawnSparkRing_L11(obj->position, arg);
-        PlaySoundFromClassBank(0, 0, (char *)obj, 0xE7B);
+        part_l11_spawn_spark_ring(obj->position, arg);
+        snd_play_from_class_bank(0, 0, (char *)obj, 0xE7B);
     }
     return (char *)obj;
 }

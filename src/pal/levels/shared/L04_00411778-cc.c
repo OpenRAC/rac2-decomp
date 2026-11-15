@@ -14,21 +14,21 @@ typedef struct {
 } B1202Packet;
 
 extern int D_L04_001B2008[] __attribute__((sda));
-extern float func_00283CE0(int);
-extern float func_00283D00(float, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_00283C28(float);
-extern float func_00283B98(float, float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_00283410(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern unsigned long long func_0027C878(int);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00280B90(void *, void *, int);
-extern void func_L04_0040DCA8(void *, int, unsigned int, int, float, float, float, float);
+extern float IntToFloat(int);
+extern float fast_fmod(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_float_g(float);
+extern float FastAddRotations(float, float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void euler_to_matrix(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void draw_world_quad(void *, void *, int);
+extern void gfx_l04_draw_billboard_sprite(void *, int, unsigned int, int, float, float, float, float);
 /* Integer and float arguments keep their order within each EE register bank. */
-extern void func_L00_003F8280(void *, int, int, float, float, float, float, float);
+extern void gfx_draw_flash_quad(void *, int, int, float, float, float, float, float);
 
 /* This unit is built with -g: retail's nops before the two latitude divisions
  * are the assembler's div.s floor after a line label, so keep one statement per
@@ -46,36 +46,36 @@ void func_PAL_L04_00411778(unsigned char *m, int alpha)
     int i, j;
     int rows = 10, cols = 10;
 
-    t = func_00283198(func_00283D00(func_00283CE0(D_L04_001B2008[0]), 150.33334f) * 0.0066518844f * 6.283186f);
+    t = math_fast_sin_or_cos_b(fast_fmod(IntToFloat(D_L04_001B2008[0]), 150.33334f) * 0.0066518844f * 6.283186f);
     t = (t + 1.0f) * 0.5f;
     if (alpha == -1) {
-        color = func_00283D38(0x1fb43264, 0x1f502800, t);
+        color = FastTweenColor(0x1fb43264, 0x1f502800, t);
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
-        color = func_00283D38(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
+        color = FastTweenColor(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
     }
-    offset = func_00283D00(func_00283CE0(D_L04_001B2008[0]), 25.333334f) * 0.039473683f;
-    func_00283410(matrix, m + 0xf0);
+    offset = fast_fmod(IntToFloat(D_L04_001B2008[0]), 25.333334f) * 0.039473683f;
+    euler_to_matrix(matrix, m + 0xf0);
     *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(m + 0x10);
-    func_00282F20(matrix[0], matrix[0], 0.4f);
-    func_00282F20(matrix[1], matrix[1], 0.35f);
-    func_00282F20(matrix[2], matrix[2], 0.35f);
-    packet.texture = func_0027C878(21);
+    vec_scale_to_length(matrix[0], matrix[0], 0.4f);
+    vec_scale_to_length(matrix[1], matrix[1], 0.35f);
+    vec_scale_to_length(matrix[2], matrix[2], 0.35f);
+    packet.texture = GetEffectTextureDescriptor(21);
     packet.mode = 0xff9000000260ULL;
     packet.flags = 0x8000000048ULL;
     packet.primitive = 0;
     for (i = 0; i < rows; i++) {
-        lat0 = func_00283CE0(i) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
-        lat1 = func_00283CE0(i + 1) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
-        v0 = (func_00283198(lat0) + 1.0f) * 0.5f;
-        v1 = (func_00283198(lat1) + 1.0f) * 0.5f;
+        lat0 = IntToFloat(i) * 3.141593f / IntToFloat(rows) - 1.5707965f;
+        lat1 = IntToFloat(i + 1) * 3.141593f / IntToFloat(rows) - 1.5707965f;
+        v0 = (math_fast_sin_or_cos_b(lat0) + 1.0f) * 0.5f;
+        v1 = (math_fast_sin_or_cos_b(lat1) + 1.0f) * 0.5f;
         for (j = 0; j < cols; j++) {
-            lon0 = func_00283C28(func_00283CE0(j) * 6.283186f / func_00283CE0(cols));
-            lon1 = func_00283C28(func_00283CE0(j + 1) * 6.283186f / func_00283CE0(cols));
-            cos0 = func_00283180(lon0);
-            cos1 = func_00283180(lon1);
+            lon0 = math_fast_float_g(IntToFloat(j) * 6.283186f / IntToFloat(cols));
+            lon1 = math_fast_float_g(IntToFloat(j + 1) * 6.283186f / IntToFloat(cols));
+            cos0 = math_fast_sin_or_cos_a(lon0);
+            cos1 = math_fast_sin_or_cos_a(lon1);
             u0 = offset + (cos0 + 1.0f) * 0.5f;
             t = offset + (cos1 + 1.0f) * 0.5f;
             packet.uv[1][1] = v0;
@@ -90,34 +90,34 @@ void func_PAL_L04_00411778(unsigned char *m, int alpha)
             packet.uv[1][0] = t;
             packet.uv[2][0] = u0;
             packet.uv[3][0] = t;
-            func_002AF000(packet.vertex[0].f, 1.0f, lon0, lat0);
-            func_002AF000(packet.vertex[1].f, 1.0f, lon1, lat0);
-            func_002AF000(packet.vertex[2].f, 1.0f, lon0, lat1);
-            func_002AF000(packet.vertex[3].f, 1.0f, lon1, lat1);
+            vec_build_spherical_offset(packet.vertex[0].f, 1.0f, lon0, lat0);
+            vec_build_spherical_offset(packet.vertex[1].f, 1.0f, lon1, lat0);
+            vec_build_spherical_offset(packet.vertex[2].f, 1.0f, lon0, lat1);
+            vec_build_spherical_offset(packet.vertex[3].f, 1.0f, lon1, lat1);
             packet.vertex[0].f[3] = 1.0f;
             packet.vertex[1].f[3] = 1.0f;
             packet.vertex[2].f[3] = 1.0f;
             packet.vertex[3].f[3] = 1.0f;
-            func_00280B90(&packet, matrix, 0);
+            draw_world_quad(&packet, matrix, 0);
         }
     }
-    *(float *)(p + 0x4b4) = func_00283B98(*(float *)(p + 0x4b4), 0.01f);
-    *(float *)(p + 0x4b8) = func_00283B98(*(float *)(p + 0x4b8), -0.007f);
-    *(float *)(p + 0x4bc) = func_00283B98(*(float *)(p + 0x4bc), 0.007f);
-    *(float *)(p + 0x4c0) = func_00283B98(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
+    *(float *)(p + 0x4b4) = FastAddRotations(*(float *)(p + 0x4b4), 0.01f);
+    *(float *)(p + 0x4b8) = FastAddRotations(*(float *)(p + 0x4b8), -0.007f);
+    *(float *)(p + 0x4bc) = FastAddRotations(*(float *)(p + 0x4bc), 0.007f);
+    *(float *)(p + 0x4c0) = FastAddRotations(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
     if (alpha == -1) {
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
         a = (unsigned int)alpha << 24;
         c = a | 0xc8c8c8;
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(m + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
     }
-    func_L00_003F8280(m + 0x10, *(int *)(p + 0x644), 0, 0.32f, 0.5f, *(float *)(p + 0x4c0), 0.0f, 0.0f);
+    gfx_draw_flash_quad(m + 0x10, *(int *)(p + 0x644), 0, 0.32f, 0.5f, *(float *)(p + 0x4c0), 0.0f, 0.0f);
 }

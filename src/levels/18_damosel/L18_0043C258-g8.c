@@ -1,18 +1,18 @@
 #include "common.h"
 
-extern void *func_002A9640(void *, int, int);
-extern float func_002A96A0(void *, void *);
-extern void func_002AB800(void *, void *), func_002AB8C0(void *, void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float), func_00283B98(float, float);
-extern int func_002ACBC8(void *, int), func_002B3868(void *);
-extern void func_0029F338(void *), func_00282948(void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_002B0A68(void *, int, void *, float, float, float, float, int);
-extern void func_00282F20(void *, void *, float), func_00283098(void *, void *, void *), func_002ACB48(void *, float), func_00282CC0(void *, void *, void *);
-extern u8 D_00189EA0[];
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern float moby_update_aim_target_strength(void *, void *);
+extern void gfx_start_color_fade(void *, void *), gfx_update_color_fade(void *, void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float), FastAddRotations(float, float);
+extern int IsPointInCuboid(void *, int), flag_set_first_pending(void *);
+extern void moby_mark_spawned(void *), math_fast_float_d(void *);
+extern int PlayMobySound(int, int, void *);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
+extern void vec_scale_to_length(void *, void *, float), matrix_mul_vec3(void *, void *, void *), vec_add_random_offset(void *, float), FastVecAdd(void *, void *, void *);
+extern u8 g_hero_position[];
 extern u8 D_L18_001A8F20[] __attribute__((sda));
 extern float D_L18_001B1AB0 __attribute__((sda));
 extern float D_L18_001B1AB4 __attribute__((sda));
@@ -25,8 +25,8 @@ extern int D_L18_001B1AD0 __attribute__((sda));
 extern int D_L18_001B1AD4 __attribute__((sda));
 extern u8 D_L18_001B1AE0[] SDATA(D_L18_001B1AE0);
 extern u8 D_L18_001B1AF0[] SDATA(D_L18_001B1AF0);
-extern u8 *func_L18_003F75E8(int, int *);
-extern void func_L18_003F76F0(void *, void *, void *);
+extern u8 *protopet_count_group(int, int *);
+extern void protopet_launch_shot(void *, void *, void *);
 
 typedef struct {
     u8 pad00[0x20];
@@ -59,7 +59,7 @@ typedef struct {
 } LauncherObject;
 
 /* Updates a launcher (moby class 4440) that hops up and down and shoots out child objects when the player triggers it. It breaks when its health runs out. */
-void func_L18_0043C258(LauncherObject *obj) {
+void UpdateBouncingChildLauncher(LauncherObject *obj) {
     LauncherState *vars = obj->state;
     u8 *child;
     float damage, z;
@@ -67,20 +67,20 @@ void func_L18_0043C258(LauncherObject *obj) {
     float muzzlePos[4] __attribute__((aligned(16)));
     int zero;
 
-    damage = UpdateAimTargetStrength(obj, FindOwnedEffectSlot(obj, 0x10000, 0));
+    damage = moby_update_aim_target_strength(obj, part_find_owned_effect_slot(obj, 0x10000, 0));
     vars->health -= damage;
     if (damage > 0.0f) {
-        StartColorFade(obj, vars->transform);
+        gfx_start_color_fade(obj, vars->transform);
         if (vars->health <= 0.0f) {
             SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-            SpawnDebrisForMaskedParts(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
+            part_spawn_masked_debris(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
             PlayMobySound(1, 0, obj);
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
             return;
         }
     }
     obj->opacity = 255;
-    UpdateColorFade(obj, vars->transform);
+    gfx_update_color_fade(obj, vars->transform);
     switch (obj->mode) {
     case 0:
         vars->baseZ = obj->position[2];
@@ -90,21 +90,21 @@ void func_L18_0043C258(LauncherObject *obj) {
         }
         vars->fireTimer = -1;
         vars->scale = 1;
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (vars->startRegion != -1 && IsPointInCuboid(gHeroPosition, vars->startRegion))
-            SetMobyState(obj, 2, -1);
+        if (vars->startRegion != -1 && IsPointInCuboid(g_hero_position, vars->startRegion))
+            moby_set_state(obj, 2, -1);
         break;
     case 2:
-        if (SetFirstPendingFlag(obj)) {
+        if (flag_set_first_pending(obj)) {
             obj->rotation[0] = 0;
             obj->rotation[1] = 0;
             z = obj->rotation[0];
             obj->position[2] = vars->baseZ;
-            vars->velocityZ += RandomFloatRange(z, D_L18_001B1AB0 * (1.0f / 60.0f));
-            vars->turnX = RandomFloatRange(z, D_L18_001B1AB4 * 0.0002908882452175021f);
-            vars->turnY = RandomFloatRange(z, D_L18_001B1AB8 * 0.0002908882452175021f);
+            vars->velocityZ += math_random_float_range(z, D_L18_001B1AB0 * (1.0f / 60.0f));
+            vars->turnX = math_random_float_range(z, D_L18_001B1AB4 * 0.0002908882452175021f);
+            vars->turnY = math_random_float_range(z, D_L18_001B1AB8 * 0.0002908882452175021f);
             obj->position[2] = vars->baseZ;
             PlayMobySound(0, 0, obj);
         }
@@ -119,34 +119,34 @@ void func_L18_0043C258(LauncherObject *obj) {
                 obj->rotation[1] = FastAddRotations(-vars->turnY, obj->rotation[1]);
             }
         } else {
-            SetMobyState(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
         }
         if (vars->fireTimer == 0) {
             zero = 0;
-            child = CountGroupProtopets(vars->childId, &zero);
+            child = protopet_count_group(vars->childId, &zero);
             if (child) {
                 vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
-                AddRandomOffsetToVector(velocity, D_L18_001B1ABC * (1.0f / 60.0f));
+                vec_add_random_offset(velocity, D_L18_001B1ABC * (1.0f / 60.0f));
                 matrix_mul_vec3(muzzlePos, D_L18_001B1AE0, obj->matrix);
                 FastVecAdd(muzzlePos, muzzlePos, obj->position);
-                LaunchProtopetShot(child, muzzlePos, velocity);
+                protopet_launch_shot(child, muzzlePos, velocity);
                 *(s32 *)(child + 0xB8) = (s32)obj;
-                vars->fireTimer = RandomIntRange(D_L18_001B1AD0, D_L18_001B1AD4);
+                vars->fireTimer = math_random_int_range(D_L18_001B1AD0, D_L18_001B1AD4);
             }
         } else if (vars->fireTimer == -1) {
-            if (vars->fireRegion != -1 && IsPointInCuboid(gHeroPosition, vars->fireRegion)) {
+            if (vars->fireRegion != -1 && IsPointInCuboid(g_hero_position, vars->fireRegion)) {
                 vars->fireTimer++;
                 SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
                 PlayMobySound(1, 0, obj);
                 vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
-                AddRandomOffsetToVector(muzzlePos, D_L18_001B1ABC * (1.0f / 60.0f));
+                vec_add_random_offset(muzzlePos, D_L18_001B1ABC * (1.0f / 60.0f));
                 FastVecAdd(velocity, velocity, muzzlePos);
-                SpawnDebrisForMaskedParts(obj, 5, velocity, 3, 6, 3, 6, 255);
+                part_spawn_masked_debris(obj, 5, velocity, 3, 6, 3, 6, 255);
             }
         } else {
-            FastFloatHelperD(&vars->fireTimer);
+            math_fast_float_d(&vars->fireTimer);
         }
         break;
     }

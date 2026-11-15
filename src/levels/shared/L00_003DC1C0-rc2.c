@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,7 +25,7 @@
  */
 #include "common.h"
 
-extern s8 D_00189E20[];
+extern s8 g_hero_state[];
 extern f32 ref_L00_003DC1C0_00 __attribute__((sda));
 extern f32 ref_L00_003DC1C0_01 __attribute__((sda));
 extern f32 ref_L00_003DC1C0_02 __attribute__((sda));
@@ -35,12 +36,12 @@ extern void ref_L00_003DC1C0_06(s32, s32, s32, f32);
 extern void ref_L00_003DC1C0_07(s32, s32, s32, s32, f32, f32, f32, f32);
 
 /* Tries to throw something in an arc away from the camera and, if that fails, tilts the vector a little. */
-s32 func_L00_003DC1C0(s32 object, s32 outVector, s32 unused, s32 flags) {
+s32 weapon_throw_along_camera_arc(s32 object, s32 outVector, s32 unused, s32 flags) {
     s8 *camera;
     s32 cameraUp;
     s32 result;
 
-    camera = gHeroState;
+    camera = g_hero_state;
     result = ref_L00_003DC1C0_04(*(s32 *)(camera + 0x2290) + 0xC0, 5, 0, flags, ref_L00_003DC1C0_01, *(f32 *)(camera + 0x98), 0.39269909f, 0.39269909f);
     ref_L00_003DC1C0_07(outVector, object + 0x10, result, 0, ref_L00_003DC1C0_02, ref_L00_003DC1C0_05(ref_L00_003DC1C0_02, ref_L00_003DC1C0_01), ref_L00_003DC1C0_00 * 0.016666668f, ref_L00_003DC1C0_03 * 0.00027777778f);
     if (result == 0) {

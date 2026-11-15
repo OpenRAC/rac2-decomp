@@ -8,7 +8,7 @@ extern float func_332C18(void);
 extern void func_33B330(char *dst, float a, float b, float c);
 extern char *func_379CA0(char *object);
 extern void func_37AEC0(char *object, int flag);
-extern void func_L05_0041CA70(char *obj);
+extern void feltzin_enemy_init_position_fast(char *obj);
 extern int D_L05_00221D10[];
 extern char *D_L05_001B2614 __attribute__((sda));
 

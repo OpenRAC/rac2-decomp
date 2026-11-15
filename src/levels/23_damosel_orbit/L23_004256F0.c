@@ -12,13 +12,13 @@ typedef int s32;
 
 typedef int TI16 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int size);
+extern void *CreateMoby(int size);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
 /* allocates the record, fills its sub-record from the arguments, then draws three samples into it */
 /* Creates a ribbon trail object that follows a start point and aims at a target point. */
-void *func_L23_004256F0(u8 *startPos, u8 *owner, u8 *targetPos, u8 alpha, u8 outerAlpha, short randRange, short angleShift, s32 baseColor, float coreWidth, float width,
+void *ribbon_trail_create(u8 *startPos, u8 *owner, u8 *targetPos, u8 alpha, u8 outerAlpha, short randRange, short angleShift, s32 baseColor, float coreWidth, float width,
                         float extend, float curveScale, s32 outerColor, s32 drawTwice, s32 lifetime, s32 useOverride) {
     u8 *ribbon;
     u8 *vars;
@@ -45,9 +45,9 @@ void *func_L23_004256F0(u8 *startPos, u8 *owner, u8 *targetPos, u8 alpha, u8 out
         *(u8 **)(vars + 0x20) = targetPos;
         *(u8 **)(vars + 0x24) = startPos;
         *(TI16 *)(ribbon + 0x10) = *(TI16 *)startPos;
-        *(float *)(ribbon + 0xF0) = RandomAngle();
-        *(float *)(ribbon + 0xF4) = RandomAngle();
-        *(float *)(ribbon + 0xF8) = RandomAngle();
+        *(float *)(ribbon + 0xF0) = math_random_angle();
+        *(float *)(ribbon + 0xF4) = math_random_angle();
+        *(float *)(ribbon + 0xF8) = math_random_angle();
         ribbon[0x20] = 0;
     }
     return ribbon;

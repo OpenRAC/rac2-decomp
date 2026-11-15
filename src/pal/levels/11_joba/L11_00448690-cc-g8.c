@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L11_00448690, the PAL copy of func_L11_00442E38: the same C. */
 
 typedef int s32;
@@ -13,9 +14,9 @@ typedef short s16;
 typedef float f32;
 
 /* Small-data controls: the four measured globals the level's script hooks share. */
-extern u8 *D_L11_001B359C[3] __attribute__((sda));
+extern u8 *g_moby_l11_table[3] __attribute__((sda));
 
-extern u8 *D_L11_001FC420[];
+extern u8 *g_group_id_lists[];
 
 /* One class record of the measured class table: six halfwords, then the two flag
    bytes at 0x14 and 0x15.  The record is 26 bytes long. */
@@ -33,7 +34,7 @@ typedef struct {
 } JobaClassTableView;
 
 /* The class table itself: an array of pointers to the per-class entries. */
-extern u32 D_L11_001B14F8 __attribute__((sda));
+extern u32 g_arena_challenge_table __attribute__((sda));
 
 /* Checks the state's six counters against the class record and reports whether the
    class may still be used. */
@@ -59,10 +60,10 @@ extern u32 D_L11_001B14F8 __attribute__((sda));
 extern s32 D_L11_001B35B8_1[] __attribute__((sda));
 extern f32 D_L11_001B1614 __attribute__((sda));
 extern f32 D_L11_001B1618 __attribute__((sda));
-extern s32 func_00312B58(u8 *);
-extern s32 func_L02_00416800(u8 *);
-extern s32 func_002A77E0(s32);
-extern void func_L02_00416720(u8 *, u8 *, f32, f32);
+extern s32 moby_is_state_six(u8 *);
+extern s32 moby_is_state_one_cleared_vars(u8 *);
+extern s32 math_random_int_below(s32);
+extern void teleporter_bind_captured_object(u8 *, u8 *, f32, f32);
 
 /* Leaves the function when the group is 0xFF or empty; the braces it opens close in END_IDS. */
 #define FOR_EACH_ID(p, off) \
@@ -127,7 +128,7 @@ extern void func_L02_00416720(u8 *, u8 *, f32, f32);
 void func_PAL_L11_00448690(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     JobaClassTableView *entry =
-        ((JobaClassTableView **)&D_L11_001B14F8)[*(s16 *)(state + 0x1F0)];
+        ((JobaClassTableView **)&g_arena_challenge_table)[*(s16 *)(state + 0x1F0)];
     u8 *rec = (u8 *)&entry->records[*(s16 *)(state + 0x1F2)];
     u8 *buf[16];
     u16 *p;

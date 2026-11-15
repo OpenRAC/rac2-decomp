@@ -43,30 +43,30 @@ typedef struct {
     u64 regs;
 } DrawPacket;
 
-extern void func_002A04B8(void *, int *, int *, int *);
-extern void func_002A0488(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern int func_00283D38(int, int, float);
-extern void func_L00_002E6EF8(void (*)(char *), char *);
-extern int func_L00_00324120(void *);
-extern void func_L14_00328E70(void *, void *, void *);
-extern void func_L14_00328E90(void *, void *, void *);
-extern void func_L14_003E2238(void *);
-extern float func_L14_003E22A8(void *);
-extern void func_L14_003E2328(char *self);
-extern void func_L14_003E2688(void *, void *, int, void *, void *, void *, int, int);
-extern void func_L14_003E2980(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_002FC560(int, u64);
+extern void get_moby_color(void *, int *, int *, int *);
+extern void set_moby_color(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern int FastTweenColor(int, int, float);
+extern void gfx_add_draw_callback_third(void (*)(char *), char *);
+extern int hero_is_current_selected_id(void *);
+extern void moby_copy_pos_rot(void *, void *, void *);
+extern void moby_pass_pos_rot_to_helper(void *, void *, void *);
+extern void moby_rebuild_matrix_scaled(void *);
+extern float moby_get_state_progress(void *);
+extern void DrawFadingField(char *self);
+extern void gfx_calc_wobble_quad_corner(void *, void *, int, void *, void *, void *, int, int);
+extern void part_l14_spawn_flash(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void VU1_addGSregister(int, u64);
 
 /* The level's entity array, read as a bare symbol (lui/lw) as in the level's other units. */
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
@@ -88,7 +88,7 @@ extern int D_L14_001B04D0 __attribute__((sda));
    cross-jumps the copies into one tail, as in retail); the on state can pass a request on to
    the linked entity when that is another field (class 0xAFE). */
 /* Draws the field: a quad of four corners scaled by the fade, then an 8 x 8 grid of cells. */
-void func_L14_003E2328(char *self) {
+void DrawFadingField(char *self) {
     DrawPacket p __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
@@ -109,11 +109,11 @@ void func_L14_003E2328(char *self) {
     FastVecScale(off, a, D_L14_001B04C0);
     FastVecAdd(pos, pos, off);
     for (i = 0; i < 4; i++) {
-        FastVecScale(p.pos[i], D_L14_001AA250[i], D_L14_001B04BC * GetStateProgressFraction(self));
+        FastVecScale(p.pos[i], D_L14_001AA250[i], D_L14_001B04BC * moby_get_state_progress(self));
         transform_vector(p.pos[i], p.pos[i], a);
         qcopy(corners[i], p.pos[i]);
     }
-    InitQuadPacketState(&p, 0x3C, 1, 0x80);
+    gfx_init_quad_packet_state(&p, 0x3C, 1, 0x80);
     p.regs = 0x800000004AULL;
     p.color[0] = p.color[1] = p.color[2] = p.color[3] = 0x80808080;
     p.uv[0][0] = 0;
@@ -126,17 +126,17 @@ void func_L14_003E2328(char *self) {
     p.uv[3][1] = 1;
     VU1_addGSregister(0x47, 0x31001);
     draw_world_quad(&p, 0, 0);
-    InitQuadPacketState(&p, -1, 2, 0x80);
+    gfx_init_quad_packet_state(&p, -1, 2, 0x80);
     p.regs = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x53001);
     FastVecSub(x, corners[2], corners[0]);
     FastVecSub(y, corners[1], corners[0]);
     for (j = 0; j < 8; j++) {
         for (k = 0; k < 8; k++) {
-            ComputeWobblingQuadCorner(self, &p, 0, corners, x, y, j, k);
-            ComputeWobblingQuadCorner(self, &p, 1, corners, x, y, j, k + 1);
-            ComputeWobblingQuadCorner(self, &p, 2, corners, x, y, j + 1, k);
-            ComputeWobblingQuadCorner(self, &p, 3, corners, x, y, j + 1, k + 1);
+            gfx_calc_wobble_quad_corner(self, &p, 0, corners, x, y, j, k);
+            gfx_calc_wobble_quad_corner(self, &p, 1, corners, x, y, j, k + 1);
+            gfx_calc_wobble_quad_corner(self, &p, 2, corners, x, y, j + 1, k);
+            gfx_calc_wobble_quad_corner(self, &p, 3, corners, x, y, j + 1, k + 1);
             draw_world_quad(&p, 0, 0);
         }
     }

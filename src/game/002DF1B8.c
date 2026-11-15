@@ -3,7 +3,7 @@
 
 /* rac1-decomp src/core/00118A40.c: func_001191C0 */
 /* Always returns 1. */
-int func_002DF1B8(void) {
+int menu_always_return_true(void) {
     return 1;
 }
 
@@ -12,7 +12,7 @@ extern void *D_001F2854;
 extern char D_00259458[];
 
 /* Returns true when the current menu screen is the one at D_00259458. */
-int func_002DF1D0(void) {
+int menu_is_known_screen_active(void) {
     return D_001F2854 == D_00259458;
 }
 

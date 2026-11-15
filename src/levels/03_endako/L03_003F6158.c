@@ -6,17 +6,17 @@ typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; short h[0x1300]; int i[0x980]; float f[0x980]; void *ptr[0x980]; TI128 q[0x260]; } Hero;
 
-extern char D_00189E20[];
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern void func_002AEC48(void *, void *, int, float, float);
-extern void func_002B0990(void *, void *, int, int, float);
-extern void func_002A7470(void *, int, int, int);
+extern char g_hero_state[];
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void moby_update_eased_node(void *, void *, int, float, float);
+extern void value_set_and_smooth(void *, void *, int, int, float);
+extern void anim_start_blended(void *, int, int, int);
 
 /* Keeps a helper object attached to the boss and points it at the hero. */
-void func_L03_003F6158(char *entity) {
+void endako_boss_update_attachment(char *entity) {
     char *state = *(char **)(entity + 0x68);
     char *obj = *(char **)(state + 0x2C4);
 
@@ -24,7 +24,7 @@ void func_L03_003F6158(char *entity) {
         char *made = CreateMoby(0xC49 /* moby class 3145 */);
         *(char **)(state + 0x2C4) = made;
         if (made != 0) {
-            InitChildObjectFromParent(made, 0);
+            moby_init_child_from_parent(made, 0);
         }
         return;
     }
@@ -39,16 +39,16 @@ void func_L03_003F6158(char *entity) {
         (*(char **)(state + 0x2C4))[0x31] = 1;
         cur = *(char **)(state + 0x2C4);
         *(float *)(state + 0x278) = fast_subtract_rotations(
-            FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(float *)(cur + 0x10),
-                          ((Hero *)gHeroState)->f[0x84 / 4] - *(float *)(cur + 0x14)),
+            mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(float *)(cur + 0x10),
+                          ((Hero *)g_hero_state)->f[0x84 / 4] - *(float *)(cur + 0x14)),
             *(float *)(entity + 0xF8));
-        UpdateEasedNode(*(char **)(state + 0x2C4), state + 0x210, 0, 0.03f, 0.3f);
-        SetValueAndStartSmoothChange(*(char **)(state + 0x2C4), state + 0x210, 0, 1, 2.5f);
+        moby_update_eased_node(*(char **)(state + 0x2C4), state + 0x210, 0, 0.03f, 0.3f);
+        value_set_and_smooth(*(char **)(state + 0x2C4), state + 0x210, 0, 1, 2.5f);
     }
     {
         u8 *last = *(u8 **)(state + 0x2C4);
         if ((last[0x60] & 2) && last[0x43] == 1) {
-            StartAnimationBlended(last, 0, 0, 10);
+            anim_start_blended(last, 0, 0, 10);
         }
     }
 }

@@ -10,26 +10,26 @@ extern float D_L20_001B2124 __attribute__((sda));
 
 extern float D_L20_001B2134 __attribute__((sda));
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern Rec_42550 *D_L20_001B308C;
 
-extern float func_002AA2E8(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
-extern void func_002AA800(char *, int, float, float);
+extern void StepAngleTowardTarget(char *, int, float, float);
 
-extern float func_00282E80(char *, char *);
+extern float vec_distance_xy(char *, char *);
 
-extern float func_002A89A8(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern int func_L01_00322288(char *, float);
+extern int moby_start_effect_from_entry(char *, float);
 
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 /* Makes the enemy fall and bounce on the ground while it turns toward the hero or its target. Returns 1 when the bouncing has stopped. */
-int func_L20_00442550(char *moby) {
+int UpdateBouncingMoby(char *moby) {
     char *self = moby;
     char *vars = *(char **)(moby + 0x68);
     char *hero;
@@ -44,7 +44,7 @@ int func_L20_00442550(char *moby) {
         StepAngleTowardTarget(vars + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
     }
     value = *(float *)(vars + 0xF8);
-    hero = gHeroState;
+    hero = g_hero_state;
     *(float *)(self + 0x18) += value;
 
     *(float *)(vars + 0xF8) -= *(float *)(vars + 0x7C);
@@ -57,18 +57,18 @@ int func_L20_00442550(char *moby) {
             value = *(float *)(hero + 0x88);
             value += 5.0f;
             *(float *)(hero + 0x88) = value;
-            value = ProbeGroundHeightBelow(heroPos, 0, 0.5f);
+            value = coll_probe_ground_height_below(heroPos, 0, 0.5f);
             *(float *)(hero + 0x88) = value;
             *(unsigned short *)(hero + 0x1E0) = 5;
             *(unsigned short *)(hero + 0x1F0) = 5;
         }
         pathIndex = *(int *)(vars + 0x230);
         pathPoint = (Rec_42550 *)((pathIndex << 7) + (unsigned int)D_L20_001B308C);
-        value = FastMatrixHelperA(pathPoint->pointX - *(float *)(self + 0x10), pathPoint->pointY - *(float *)(self + 0x14));
-        StartMobyEffectFromEntry(self, value);
+        value = mat_fast_helper_a(pathPoint->pointX - *(float *)(self + 0x10), pathPoint->pointY - *(float *)(self + 0x14));
+        moby_start_effect_from_entry(self, value);
 
     } else {
-        StartMobyEffectFromEntry(self, FastMatrixHelperA(
+        moby_start_effect_from_entry(self, mat_fast_helper_a(
             *(float *)(hero + 0x80) - *(float *)(self + 0x10),
             *(float *)(hero + 0x84) - *(float *)(self + 0x14)));
     }

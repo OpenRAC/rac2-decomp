@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -28,7 +29,7 @@ extern void ref_L03_0038AA20_00(s8 *, s32, s32, s32, s32, s32, s32, f32, f32, f3
 extern s8 ref_L03_0038AA20_01[];
 
 /* Draws four pairs of beam or ray segments for an object, one pair per step, using values from its private data. */
-void func_L03_0038AA20(s8 *moby) {
+void gfx_draw_beam_segment_pairs(s8 *moby) {
     s8 *vars;
     s32 i;
     s32 tableLow;

@@ -12,23 +12,23 @@ extern float ref_00302470_09 SDATA(ref_00302470_09);
 extern int ref_00302470_01 SDATA(ref_00302470_01);
 extern ParticleVector ref_00302470_02 __attribute__((nosda));
 extern int D_001A7A10[] MACRO_ADDR;
-extern char *D_0018C0B0 __attribute__((nosda));
-extern float func_00282E48(void *, void *);
-extern char *func_0029EFD0(int);
-extern void func_002833F0(void *, void *);
-extern void func_002AEC18(void *, int);
-extern void func_002A04B8(void *, u32 *, u32 *, u32 *);
-extern void func_002A0468(unsigned long long *, unsigned long long,
+extern char *g_hero_moby __attribute__((nosda));
+extern float fast_vec_dist(void *, void *);
+extern char *CreateMoby(int);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_set_light_color(void *, int);
+extern void get_moby_color(void *, u32 *, u32 *, u32 *);
+extern void gfx_pack_render_command_fields(unsigned long long *, unsigned long long,
     unsigned long long, unsigned long long, unsigned long long);
-extern void func_002A0488(void *, u32, u32, u32);
-extern int func_002A77E0(int);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AB668(void *, int, float);
-extern int func_003022A0(char *, char *, float, float);
+extern void set_moby_color(void *, u32, u32, u32);
+extern int math_random_int_below(int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_build_axis_angle_quat(void *, int, float);
+extern int pickup_start_fly_to_target(char *, char *, float, float);
 extern void func_002A0F48(void *);
 
 typedef struct BoltVars {
@@ -66,7 +66,7 @@ typedef struct BoltSpawnObject {
     ParticleVector rotation;
 } BoltSpawnObject;
 /* Allocate the denomination near the camera and initialize its pickup motion. */
-BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *velocity, u32 flags, int value, int kind)
+BoltSpawnObject *moby_spawn_bolt_pickup(BoltSpawnObject *source, void *position, void *velocity, u32 flags, int value, int kind)
 {
     BoltSpawnObject *object, *parent;
     BoltVars *state;
@@ -103,25 +103,25 @@ BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *ve
     object->state=1;
     object->scale=object->objectClass->scale*scale;
     euler_rotation_basis(orientation,&object->rotation);
-    SetMobyLightColor(object,ref_00302470_01);
+    moby_set_light_color(object,ref_00302470_01);
     get_moby_color(object,&red,&green,&blue);
-    PackRenderCommandFields((unsigned long long *)object,0,13,0,0);
+    gfx_pack_render_command_fields((unsigned long long *)object,0,13,0,0);
     set_moby_color(object,red,green,blue);
     qcopy(&object->position,position);
     qcopy(&state->velocity,velocity);
-    if (RandomIntBelow(2)) state->flags|=1;
-    state->angle=RandomAngle();
-    state->phase=RandomAngle();
+    if (math_random_int_below(2)) state->flags|=1;
+    state->angle=math_random_angle();
+    state->phase=math_random_angle();
     state->startZ=object->position.f[2];
-    spin=RandomFloatRange(0.0f,720.0f)*0.00029088825f;
+    spin=math_random_float_range(0.0f,720.0f)*0.00029088825f;
     FastVecSub(&difference,&source->position,&object->position);
     FastVecCross(&crossed,&state->velocity,&difference);
     vec_scale_to_length(&state->spin,&crossed,1.0f);
-    BuildAxisAngleQuaternion(&state->spin,(int)(&state->spin),spin);
+    math_build_axis_angle_quat(&state->spin,(int)(&state->spin),spin);
     if (flags&2) {
         angle=0.0f;
-        if (flags&0x10) angle=RandomFloatRange(-30.0f,30.0f)*0.017453294f;
-        StartPickupFlyToTarget((char *)object,gHeroMoby_0018C0B0,angle,0.0f);
+        if (flags&0x10) angle=math_random_float_range(-30.0f,30.0f)*0.017453294f;
+        pickup_start_fly_to_target((char *)object,g_hero_moby,angle,0.0f);
     }
     func_002A0F48(object);
     }

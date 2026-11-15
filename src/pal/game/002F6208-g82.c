@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 #include "common.h"
 typedef struct { u8 pad00[0xC]; u8 kind; u8 pad0D[3]; f32 w0[4]; } CamRec_2F5AF8;
 typedef struct { u8 pad00[0x38]; s32 index; u8 pad3C[0x68 - 0x3C]; CamRec_2F5AF8 *recs; } CamList_2F5AF8;
@@ -16,20 +16,20 @@ typedef struct {
     f32 pad38C;
     f32 row2[3];
 } Cam_2F5AF8;
-extern CamList_2F5AF8 D_001B8840;
+extern CamList_2F5AF8 g_scene_playback_state;
 extern CamView_2F5AF8 D_001B9040;
-extern Cam_2F5AF8 D_001B5200;
+extern Cam_2F5AF8 g_active_camera;
 extern u8 D_001A7A40;
 extern f32 D_001A8C74;
 extern f32 D_001A8C78;
 extern f32 D_001B5360[12];
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 extern void func_00129178(f32 *);
-extern void func_001292C0(f32 *, f32 *, f32);
-extern void func_00129368(f32 *, f32 *, f32);
-extern void func_00129218(f32 *, f32 *, f32);
-extern void func_00282F20(f32 *, f32 *, f32);
-extern void func_00282CF0(f32 *, f32 *, f32 *);
+extern void pad_vib_routine_f(f32 *, f32 *, f32);
+extern void pad_vib_routine_g(f32 *, f32 *, f32);
+extern void pad_vib_routine_e(f32 *, f32 *, f32);
+extern void vec_scale_to_length(f32 *, f32 *, f32);
+extern void FastVecSub(f32 *, f32 *, f32 *);
 extern void func_PAL_002717F8(f32 *, int);
 
 u8 func_PAL_002F6A48(void)
@@ -42,32 +42,32 @@ u8 func_PAL_002F6A48(void)
     f32 k;
     u8 kind;
 
-    rec = &D_001B8840.recs[D_001B8840.index];
+    rec = &g_scene_playback_state.recs[g_scene_playback_state.index];
     w = rec->w0;
     kind = rec->kind;
     scale = w[3];
     D_001B9040.scale = scale;
     if (D_001A7A40 != 0)
         D_001B9040.scale = scale * D_001A8C74;
-    func_0027AB40();
-    qcopy(D_001B5200.pos, rec);
+    UpdateViewContext();
+    qcopy(g_active_camera.pos, rec);
     func_00129178(m);
-    func_001292C0(m, m, w[0]);
-    func_00129368(m, m, w[1]);
-    func_00129218(m, m, w[2]);
-    D_001B5200.row0[0] = -m[8];
-    D_001B5200.row1[0] = -m[0];
-    D_001B5200.row2[0] = m[4];
-    D_001B5200.row0[1] = -m[9];
-    D_001B5200.row1[1] = -m[1];
-    D_001B5200.row2[1] = m[5];
-    D_001B5200.row0[2] = -m[10];
-    D_001B5200.row1[2] = -m[2];
-    D_001B5200.row2[2] = m[6];
+    pad_vib_routine_f(m, m, w[0]);
+    pad_vib_routine_g(m, m, w[1]);
+    pad_vib_routine_e(m, m, w[2]);
+    g_active_camera.row0[0] = -m[8];
+    g_active_camera.row1[0] = -m[0];
+    g_active_camera.row2[0] = m[4];
+    g_active_camera.row0[1] = -m[9];
+    g_active_camera.row1[1] = -m[1];
+    g_active_camera.row2[1] = m[5];
+    g_active_camera.row0[2] = -m[10];
+    g_active_camera.row1[2] = -m[2];
+    g_active_camera.row2[2] = m[6];
     if (D_001A7A40 != 0 && (k = D_001A8C78) != 0.0f) {
-        qcopy(t, D_001B5200.row0);
-        func_00282F20(t, t, k);
-        func_00282CF0(D_001B5200.pos, D_001B5200.pos, t);
+        qcopy(t, g_active_camera.row0);
+        vec_scale_to_length(t, t, k);
+        FastVecSub(g_active_camera.pos, g_active_camera.pos, t);
     }
     func_PAL_002717F8(&D_001B5360[0], 0);
     func_PAL_002717F8(&D_001B5360[4], 1);

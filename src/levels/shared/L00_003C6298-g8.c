@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 
@@ -14,13 +15,13 @@ extern Rac2Native_9cdc323a4d0c2fbd_Vector16 D_L00_002472C0[];
 extern unsigned int D_L00_001B0138 __attribute__((sda));
 
 /* True when the shared mode word equals four. */
-int func_L00_003CBBD0(void)
+int sheepinator_is_mode_four(void)
 {
     return (D_L00_001B0138 ^ 4) == 0;
 }
 
 /* Clears the first word of five consecutive 16-byte records, from the last one down, then the mode word. */
-void func_L00_003CBBE0(void)
+void sheepinator_clear_records(void)
 {
     int i;
 

@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned int handle; short track,volume,flags,state,fade_flags,unknown,crossfade_enabled,unknown2; int poll_interval,remaining_time,unknown1C,slot; } Channel;
 typedef struct { int unknown0; short read_state; unsigned char break_requested,updates_suspended; int read_sector,unknownC,read_sector_count,read_dst; void (*callback)(int,int); int callback_data,unknown20,queued_secondary_track,queued_volume; short crossfade_state,pad2E; int crossfade_remaining_time,crossfade_interval,retry_timer; short requested_track,requested_transition_track; int mode; Channel primary,secondary,transition; } State;
-extern unsigned char D_001A63A8[];
+extern unsigned char g_music_state[];
 #define S (*(State *)D_001A63A8)
-extern int func_00282948(void *);
-extern void func_002B6E78(int,int,int),func_002B6F70(int,int,int),func_002B6D80(int,int,int);
-extern int func_002B7088(int,int,int,int);
-extern void func_002B6958(int,int,int,int);
-extern void func_00132B88(int,int,int,int,int,int,void (*)(int,long),long);
-extern void func_002B7FF0(int,long),func_00133400(int),func_002B7380(void *);
-extern int func_00133580(int),func_002B7B18(int,int,int);
-extern void func_0026FEB8(void *);
+extern int math_fast_float_d(void *);
+extern void snd_start_music_stream_no_loop(int,int,int),snd_queue_music_transition_stream(int,int,int),snd_start_music_stream(int,int,int);
+extern int snd_start_music_transition(int,int,int,int);
+extern void snd_play_stream_by_id(int,int,int,int);
+extern void snd_send_cmd21_callback(int,int,int,int,int,int,void (*)(int,long),long);
+extern void request_store_result_once(int,long),snd_send_cmd46(int),snd_update_music_channel(void *);
+extern int snd_CheckLoadInProgress(int),load_start_disc_read(int,int,int);
+extern void STUB_printf(void *);
 extern char D_001AA1B0[],D_001AA1C0[],D_001AA1D0[];
 
 void func_PAL_002B8130(void) {
@@ -26,16 +27,16 @@ void func_PAL_002B8130(void) {
     if (!(S.primary.fade_flags & 0x8000) && !(S.primary.state & 0x8000)) {
         if (S.primary.handle == 0 && (S.primary.flags & 1) &&
             S.requested_track == -1) {
-            func_002B6E78(S.primary.track, (short)S.primary.flags,
+            snd_start_music_stream_no_loop(S.primary.track, (short)S.primary.flags,
                               S.primary.volume);
         } else if (S.primary.handle != 0) {
             if (S.primary.handle != 0xFFFFFFFF && S.primary.state == 8) {
-                func_002B6F70(S.primary.track, S.primary.flags,
+                snd_queue_music_transition_stream(S.primary.track, S.primary.flags,
                                        S.primary.volume);
             }
         }
     }
-    if (func_00282948(&S.retry_timer) != 0) {
+    if (math_fast_float_d(&S.retry_timer) != 0) {
         requested_track = S.requested_track;
         if (requested_track != -1 && S.crossfade_state == 0) {
             if (S.primary.track != requested_track) {
@@ -49,7 +50,7 @@ void func_PAL_002B8130(void) {
                         S.crossfade_state=6;
                     }
                     S.retry_timer=250;
-                } else if (func_002B7088(requested_track,S.requested_transition_track,S.primary.flags,S.primary.volume)) {
+                } else if (snd_start_music_transition(requested_track,S.requested_transition_track,S.primary.flags,S.primary.volume)) {
                     S.retry_timer=350;
                 }
             } else {
@@ -63,7 +64,7 @@ void func_PAL_002B8130(void) {
                 S.secondary.state = 5;
             }
         } else {
-            func_002B6958(S.queued_secondary_track, 0, S.queued_volume, 0x400);
+            snd_play_stream_by_id(S.queued_secondary_track, 0, S.queued_volume, 0x400);
             S.queued_volume=0;
             S.queued_secondary_track = -1;
         }
@@ -76,8 +77,8 @@ void func_PAL_002B8130(void) {
             fade_volume=S.primary.volume*S.transition.remaining_time/S.crossfade_interval;
             handle=S.primary.handle;
             S.primary.handle=0xFFFFFFFF;
-            func_00132B88(handle,5,fade_volume,0,0,0,func_002B7FF0,(long)&S.primary.handle);
-            if(func_00282948(&S.transition.remaining_time)) { S.crossfade_state=3; S.primary.state=5; }
+            snd_send_cmd21_callback(handle,5,fade_volume,0,0,0,request_store_result_once,(long)&S.primary.handle);
+            if(math_fast_float_d(&S.transition.remaining_time)) { S.crossfade_state=3; S.primary.state=5; }
             break;
         case 2:
             /* Fade the primary stream against the transition's remaining time. */
@@ -96,14 +97,14 @@ void func_PAL_002B8130(void) {
             } else if (S.primary.state != 9) {
                 /* The callback receives the old handle; mark its slot pending before submission. */
                 *(unsigned int *)&S.primary.handle = 0xFFFFFFFF;
-                func_00132B88(handle, 5, fade_volume, 0, 0, 0, func_002B7FF0,
+                snd_send_cmd21_callback(handle, 5, fade_volume, 0, 0, 0, request_store_result_once,
                                         (long)&S.primary.handle);
             }
             break;
         case 3:
             if (S.primary.state == 0 && (S.transition.crossfade_enabled != 0 ||
                                                    S.transition.handle == 0)) {
-                func_002B6D80(S.requested_track, S.primary.flags,
+                snd_start_music_stream(S.requested_track, S.primary.flags,
                                     S.primary.volume);
                 S.requested_track = -1;
                 S.crossfade_state = 4;
@@ -115,7 +116,7 @@ void func_PAL_002B8130(void) {
                     S.transition.state != 4 ||
                     (S.transition.crossfade_enabled == 0 &&
                      S.transition.handle == 0)) {
-                    func_00133400(S.primary.handle);
+                    snd_send_cmd46(S.primary.handle);
                     S.primary.state = 8;
                     S.crossfade_state = 5;
                 }
@@ -129,22 +130,22 @@ void func_PAL_002B8130(void) {
             break;
         }
     }
-    func_002B7380(&S.primary.handle);
-    func_002B7380(&S.transition.handle);
-    func_002B7380(&S.secondary.handle);
+    snd_update_music_channel(&S.primary.handle);
+    snd_update_music_channel(&S.transition.handle);
+    snd_update_music_channel(&S.secondary.handle);
     if (S.break_requested != 0) {
-        func_0026FEB8(D_001AA1B0);
-        if (func_00133580(1) == 0) {
+        STUB_printf(D_001AA1B0);
+        if (snd_CheckLoadInProgress(1) == 0) {
             S.read_state = 0;
             S.break_requested = 0;
-            func_0026FEB8(D_001AA1C0);
-            if(S.callback) { void (*cb)(int,int)=S.callback; int data=S.callback_data; S.callback=0; S.callback_data=0; func_0026FEB8(D_001AA1D0); cb(data,0); }
+            STUB_printf(D_001AA1C0);
+            if(S.callback) { void (*cb)(int,int)=S.callback; int data=S.callback_data; S.callback=0; S.callback_data=0; STUB_printf(D_001AA1D0); cb(data,0); }
         }
     } else {
         pending_state = S.read_state;
         if (pending_state == 2) {
             S.read_state = 0;
-            func_002B7B18(S.read_dst, S.read_sector,
+            load_start_disc_read(S.read_dst, S.read_sector,
                                     S.read_sector_count);
             if (S.read_state == 0) {
                 S.read_state = pending_state;

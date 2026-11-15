@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_003C7548, the PAL copy of func_L00_003C37C8: the same C, where rename func_L00_003C3920 becomes func_PAL_L00_003C76A0; rename func_L00_003A98E8 becomes func_PAL_L00_003AD088. */
 
 /* Reads the small counter in the shared data area and reports whether it equals two. */
@@ -6,7 +7,7 @@
    from the last record of each table, and finally the shared flag word. */
 /* Clears the shared flag word this file's small-data area holds at 0x1AFF98. */
 /* Gate followed by a fixed sequence of four bound helpers on the state record at offset 0x68. */
-extern char D_00139568[];
+extern char g_item_slot_to_record[];
 
 typedef struct {
     char prefix[0x760];
@@ -18,19 +19,19 @@ typedef struct {
 } Player37;
 extern Player37 D_00189E20_13;
 
-extern char D_L00_00262570[];
+extern char g_weapon_l00_table[];
 
 /* A float in the boot's small data: the sda attribute and this unit's -G8 make the
    reference to it $gp-relative, the way retail has it. */
 extern float D_001AFF08 __attribute__((sda));
 
-extern void func_00282F20(void *a0, void *a1, float f);
+extern void vec_scale_to_length(void *a0, void *a1, float f);
 
 extern void func_PAL_L00_003C76A0(char *a0, char *a1, void *a2);
 
-extern void func_L00_0032A1A8(int a0, char *a1, void *a2, float f);
+extern void vec_compute_object_to_target(int a0, char *a1, void *a2, float f);
 
-extern float func_00282DF0(void *a0);
+extern float FastVecLength(void *a0);
 
 extern void *func_PAL_L00_003AD088(char *a0, void *a1, char *a2, int a3, float f12, float f13, float f14);
 
@@ -52,24 +53,24 @@ void func_PAL_L00_003C7548(char *a0, char *a1)
     int mode;
     void *v;
 
-    rec = D_L00_00262570 + (unsigned char)D_00139568[0x19] * 0xE0;
+    rec = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
     f0 = *(float *)(rec + 0x50);
     f20 = f0 * 0.020000001f;
     mode = D_00189E20_13.state;
     if (mode == 1)
-        func_00282F20(scratch, a0 + 0xD0, -f20);
+        vec_scale_to_length(scratch, a0 + 0xD0, -f20);
     else
-        func_00282F20(scratch, D_00189E20_13.vector, f20);
+        vec_scale_to_length(scratch, D_00189E20_13.vector, f20);
 
-    rec2 = D_L00_00262570 + (unsigned char)D_00139568[0x19] * 0xE0;
+    rec2 = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
     f21 = *(float *)(rec2 + 0x70);
     func_PAL_L00_003C76A0(a0, a1, scratch);
 
     mode = D_00189E20_13.mode;
     if (mode != 0)
-        func_L00_0032A1A8(mode, a1, scratch, f20);
+        vec_compute_object_to_target(mode, a1, scratch, f20);
 
-    f0 = func_00282DF0(scratch);
+    f0 = FastVecLength(scratch);
     f14 = D_001AFF08;
     v = func_PAL_L00_003AD088(a1, scratch, a0, 0, f0, f21, f14);
     *(int *)ctx = (int)v;

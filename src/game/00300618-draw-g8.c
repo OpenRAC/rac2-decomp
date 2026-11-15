@@ -3,7 +3,7 @@
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
 typedef struct { float x,y,z,w; } V4_F213135aa;
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
 typedef unsigned long long NativeCompactU64;
 typedef union {
@@ -25,8 +25,8 @@ typedef struct {
     char pad0C[0x14];
     u32 field20;
 } NativeSpawnHeader;
-extern void func_00300748(NativeSpawnHeader *, char *, float);
-extern void func_00283388(float *);
+extern void anim_build_bone_pose(NativeSpawnHeader *, char *, float);
+extern void set_identity_matrix(float *);
 /* Partial native draw header through the packed-vertex tint field. */
 typedef struct {
     short vertexCount, quadCount, boneCount, textureCount, frameCount, boneStride;
@@ -48,7 +48,7 @@ typedef struct {
 } TextureUpload;
 typedef struct { NativeCompactU64 color, coordinate, position, reserved18; } ScratchVertex;
 extern int D_001A72D0;
-extern int D_001A7350[2];
+extern int g_screen_offset_x[2];
 extern u8 D_001A7BB1;
 extern int ref_00300AA8_00;
 extern TextureUpload ref_00300AA8_01[64];
@@ -59,16 +59,16 @@ extern NativeDrawView ref_00300AA8_03;
 extern ParticleWord ref_00300AA8_06 SDATA(ref_00300AA8_06);
 /* The DMA packet cursor: the DMA controller reads the packets the cursor advances over,
    so the queue is volatile. */
-extern volatile unsigned int * volatile D_001B22A8;
+extern volatile unsigned int * volatile g_dma_packet_cursor;
 extern volatile unsigned int *nativeQueue SDATA(D_001B22A8);
-extern void func_00300910(void);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283788(void *, void *, void *);
+extern void gfx_begin_packet_chain(void);
+extern void FastVecScale(void *, void *, float);
+extern void multiply_matrix(void *, void *, void *);
 extern void func_0029D258(void *, void *, int, int);
 extern void func_0029D398(void *, void *, int, u32, int);
 
 /* Upload referenced textures, transform the native vertices and submit each quad. */
-void func_00300AA8(char *object, float x, float y, int flags, float frame, float *transform)
+void DrawNativeQuads(char *object, float x, float y, int flags, float frame, float *transform)
 {
     NativeDrawHeaderView *header=(NativeDrawHeaderView *)object;
     float matrix[16] __attribute__((aligned(16)));
@@ -126,17 +126,17 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             ref_00300AA8_00=queued+1;
         }
     }
-    BeginPacketChain();
+    gfx_begin_packet_chain();
     FastVecScale(transform+12,transform+12,166.66600036621094f);
     nativeProjection[0]=ref_00300AA8_03.scale[0]/ref_00300AA8_03.size[0];
     ref_00300AA8_02[9]=-(ref_00300AA8_03.scale[1]/ref_00300AA8_03.size[1]);
     if (D_001A7BB1) ref_00300AA8_02[9]*=0.7500000596046448f;
     multiply_matrix(matrix,nativeProjection,transform);
-    matrix[12]+=(float)gScreenOffsetX[0]+x*16.0f;
-    matrix[13]+=(float)gScreenOffsetX[1]+y*16.0f;
+    matrix[12]+=(float)g_screen_offset_x[0]+x*16.0f;
+    matrix[13]+=(float)g_screen_offset_x[1]+y*16.0f;
     /* PS2 scratchpad identity matrix and expanded skinning records. */
     set_identity_matrix((float *)0x70001fc0);
-    if (header->frameCount) BuildBonePoseFromFrames((NativeSpawnHeader *)header,(char *)0x70002000,frame);
+    if (header->frameCount) anim_build_bone_pose((NativeSpawnHeader *)header,(char *)0x70002000,frame);
     if (!header->packed) func_0029D258(header->vertices,matrix,header->vertexCount,flags);
     else func_0029D398(header->vertices,matrix,header->vertexCount,header->tint,flags);
     scratch=(ScratchVertex *)0x70000000;
@@ -149,14 +149,14 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             --quadIndex;
         } else {
             nativeQueue[0]=0x10000008;
-            gDmaPacketCursor[1]=0;
-            gDmaPacketCursor[2]=0;
-            gDmaPacketCursor[3]=0x50000008;
-            tagPacket=gDmaPacketCursor+4;
-            gDmaPacketCursor=tagPacket;
+            g_dma_packet_cursor[1]=0;
+            g_dma_packet_cursor[2]=0;
+            g_dma_packet_cursor[3]=0x50000008;
+            tagPacket=g_dma_packet_cursor+4;
+            g_dma_packet_cursor=tagPacket;
             qcopy((void *)tagPacket,&ref_00300AA8_06);
             packet=tagPacket+4;
-            gDmaPacketCursor=packet;
+            g_dma_packet_cursor=packet;
             payload=(volatile NativeCompactU64 *)packet;
             payload[0]=command;
             payload[1]=0x5c;
@@ -172,7 +172,7 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             vertex=quad[2];
             source=&scratch[vertex].color;
             payload[11]=*source++; payload[12]=source[0]; payload[13]=source[1];
-            gDmaPacketCursor+=0x1c;
+            g_dma_packet_cursor+=0x1c;
         }
     }
 }

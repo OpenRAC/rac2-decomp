@@ -22,52 +22,52 @@ typedef struct {
     unsigned short max;
     char pad4[0x50];
 } VendorItem;
-extern VendorState D_0021F240;
-extern unsigned char D_00139568[];
-extern int D_00139688[];
-extern char D_00239BA0[];
+extern VendorState g_vendor_menu_state;
+extern unsigned char g_item_slot_to_record[];
+extern int g_item_ammo_counts[];
+extern char g_weapon_table[];
 extern char D_001AD3D0[];
-extern int D_001A7340;
-extern int D_001A79F8;
+extern int g_screen_width;
+extern int g_player_bolts;
 extern float D_001B2280;
-extern char *func_00288FB8(int);
-extern char *func_00115690(char *, char *);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
-extern void func_0027FA10(int, int, unsigned long, char *, int);
-extern void func_0027F5B8(int, int, unsigned long, char *, int);
-extern void func_002F9BC0(char *, int);
-extern void func_00288870(void *, int, int);
-extern int func_002F6510(void);
-extern int func_0028E588(int, int);
-extern int func_0028EA58(int, int, int, int, int, void *);
+extern char *GetLocalizedString(int);
+extern char *strcpy(char *, char *);
+extern int sprintf(char *, char *, ...);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
+extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
+extern void text_draw_medium(int, int, unsigned long, char *, int);
+extern void text_format_number_with_separators(char *, int);
+extern void help_copy_record_at_depth(void *, int, int);
+extern int GetSelectedShopItemPrice(void);
+extern int GetIconFrame(int, int);
+extern int hud_draw_sprite_gradient(int, int, int, int, int, void *);
 
 /* Draws the selected vendor item, its price and the purchase/maximum-ammo prompt. */
-void func_002FA880(void)
+void DrawVendorPurchasePrompt(void)
 {
     char text[256];
     char info[224];
     int available = 1;
     VendorState *v;
     int color = 0x80F0F0F0;
-    v = &gVendorMenuState;
+    v = &g_vendor_menu_state;
     if (v->slots[v->index].kind == available) {
         int id = v->slots[v->index].id;
         char *copied;
         char *fmt = D_001AD3D0;
-        if (gItemAmmoCounts[id] >=
-            ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 224))->max)
+        if (g_item_ammo_counts[id] >=
+            ((VendorItem *)(g_weapon_table + g_item_slot_to_record[id] * 224))->max)
             available = 0;
-        copied = strcpy(text, GetLocalizedString(((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 224))->text));
-        Sprintf(text, fmt, copied, GetLocalizedString(0x2DC9));
-        DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
-        FormatNumberWithSeparators_002F9BC0(text, ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[v->slots[v->index].id] * 224))->price);
-        if (gPlayerBolts < ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[v->slots[v->index].id] * 224))->price)
+        copied = strcpy(text, GetLocalizedString(((VendorItem *)(g_weapon_table + g_item_slot_to_record[id] * 224))->text));
+        sprintf(text, fmt, copied, GetLocalizedString(0x2DC9));
+        text_draw_centered_medium(g_screen_width >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
+        text_format_number_with_separators(text, ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price);
+        if (g_player_bolts < ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price)
             color = (int)0x802020F0;
     } else {
-        if (gVendorMenuState.slots[gVendorMenuState.index].owned) {
+        if (g_vendor_menu_state.slots[g_vendor_menu_state.index].owned) {
             int special = 0;
-            switch (gVendorMenuState.slots[gVendorMenuState.index].id) {
+            switch (g_vendor_menu_state.slots[g_vendor_menu_state.index].id) {
             case 12:
             case 14:
             case 17:
@@ -75,26 +75,26 @@ void func_002FA880(void)
             case 53:
                 special = 1;
             }
-            CopyHelpRecordAtDepth(info, gVendorMenuState.slots[gVendorMenuState.index].id, special ? 1 : 2);
-            DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(*(int *)(info + 8)), -1);
+            help_copy_record_at_depth(info, g_vendor_menu_state.slots[g_vendor_menu_state.index].id, special ? 1 : 2);
+            text_draw_centered_medium(g_screen_width >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(*(int *)(info + 8)), -1);
         } else {
-            DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[gVendorMenuState.slots[gVendorMenuState.index].id] * 224))->text), -1);
+            text_draw_centered_medium(g_screen_width >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(((VendorItem *)(g_weapon_table + g_item_slot_to_record[g_vendor_menu_state.slots[g_vendor_menu_state.index].id] * 224))->text), -1);
         }
-        FormatNumberWithSeparators_002F9BC0(text, GetSelectedShopItemPrice());
-        if (gPlayerBolts < GetSelectedShopItemPrice())
+        text_format_number_with_separators(text, GetSelectedShopItemPrice());
+        if (g_player_bolts < GetSelectedShopItemPrice())
             color = (int)0x802020F0;
     }
     if (available) {
         int tex;
-        DrawTextRightAlignedMediumFont(220, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x114E), -1);
+        text_draw_right_aligned_medium(220, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x114E), -1);
         ((int *)info)[0] = 0x60F0F0B0;
         ((int *)info)[1] = 0x60F0F0B0;
         ((int *)info)[2] = 0x60F0F0B0;
         ((int *)info)[3] = 0x60F0F0B0;
         tex = GetIconFrame(0x7567, 0);
-        DrawHudSpriteGradient(tex, 236, (int)(D_001B2280 * 210.0f + 0.5f), 16, (int)(D_001B2280 * 16.0f + 0.5f), info);
-        DrawTextMediumFont(256, (int)(D_001B2280 * 210.0f + 0.5f), color, text, -1);
+        hud_draw_sprite_gradient(tex, 236, (int)(D_001B2280 * 210.0f + 0.5f), 16, (int)(D_001B2280 * 16.0f + 0.5f), info);
+        text_draw_medium(256, (int)(D_001B2280 * 210.0f + 0.5f), color, text, -1);
     } else {
-        DrawTextCenteredMediumFont(259, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x1126), -1);
+        text_draw_centered_medium(259, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x1126), -1);
     }
 }

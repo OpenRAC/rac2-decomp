@@ -12,82 +12,82 @@ typedef struct {
     char pad1D0[0x1A0]; int mode; char pad374[4]; int next_mode;
 } SceneFrame;
 extern SceneEntry *D_001B1B5C MACRO_ADDR;
-extern SceneFrame D_001B8840;
-extern int D_001A8BB0;
-extern int D_001A8BB8;
+extern SceneFrame g_scene_playback_state;
+extern int g_current_game_mode;
+extern int g_requested_game_mode;
 extern int D_001B169C __attribute__((sda));
 extern int D_001B1594 __attribute__((sda));
 extern int D_001B1598;
 extern int D_001B1598_GP SDATA(D_001B1598);
 extern int D_001A8BB0_GP SDATA(D_001A8BB0);
 
-extern void func_002EB7E8(void);
-extern void func_002FC280(void);
-extern void func_002FC220(void);
-extern void func_00284FC0(void);
-extern void func_00285338(void);
-extern void func_00284EA8(void);
-extern void func_00298F00(void);
-extern void func_00279D18(void);
-extern void func_0029FB20(void);
-extern void func_0027B858(void);
-extern void func_002B9000(void);
-extern int func_002EB1E0(void);
-extern void func_00284F40(int);
-extern void func_0027BD70(void);
-extern void func_002FC3C0(int);
-extern int func_001261F0(int);
-extern void func_002EBAA8(void);
+extern void cutscene_start_scripted(void);
+extern void SubmitBufferedDmaChain(void);
+extern void gfx_swap_packet_buffer(void);
+extern void PutDrawBufferSmall(void);
+extern void gfx_queue_second_strip_packet(void);
+extern void gfx_append_draw_list_header(void);
+extern void mc_update_state(void);
+extern void gfx_build_view_matrices(void);
+extern void moby_update_watched_objects(void);
+extern void gfx_write_clear_color_packets(void);
+extern void pad_poll_ports(void);
+extern int cutscene_update_scripted_actors(void);
+extern void gfx_append_draw_list_buffer_tag(int);
+extern void RenderFrame(void);
+extern void gfx_wait_for_dma_status_bits(int);
+extern int sceGsSyncV(int);
+extern void cutscene_end_scripted(void);
 
-int func_002EBC70(int unused)
+int PlayBonusReelWithGameLoop(int unused)
 {
     SceneEntry *prev;
     SceneEntry *entry;
     int i;
     int value;
 
-    StartScriptedScene();
+    cutscene_start_scripted();
     prev = D_001B1B5C;
     i = 0;
-    if (i < gScenePlaybackState.count) {
+    if (i < g_scene_playback_state.count) {
         do {
             do {
-                entry = gScenePlaybackState.entries[i];
+                entry = g_scene_playback_state.entries[i];
                 if (entry != 0 && prev != entry) {
                     entry->previous = prev;
                     prev = entry;
                 }
             } while (0);
             i++;
-        } while (i < gScenePlaybackState.count);
+        } while (i < g_scene_playback_state.count);
     }
-    gCurrentGameMode = 2;
+    g_current_game_mode = 2;
     do {
         SubmitBufferedDmaChain();
-        SwapPacketBuffer();
+        gfx_swap_packet_buffer();
         PutDrawBufferSmall();
-        QueueSecondStripPacket();
-        AppendDrawListHeader();
-        UpdateMemoryCardState();
-        BuildViewMatrices();
-        UpdateWatchedObjects();
-        WriteClearColorPackets();
+        gfx_queue_second_strip_packet();
+        gfx_append_draw_list_header();
+        mc_update_state();
+        gfx_build_view_matrices();
+        moby_update_watched_objects();
+        gfx_write_clear_color_packets();
         D_001B169C = -1;
-        PollPadPorts();
-        value = UpdateScriptedSceneActors();
-        AppendDrawListBufferTag(0);
+        pad_poll_ports();
+        value = cutscene_update_scripted_actors();
+        gfx_append_draw_list_buffer_tag(0);
         D_001B1594 = 0x131;
         RenderFrame();
-        if (gRequestedGameMode != -2) {
-            gCurrentGameMode = gRequestedGameMode;
-            gRequestedGameMode = -2;
+        if (g_requested_game_mode != -2) {
+            g_current_game_mode = g_requested_game_mode;
+            g_requested_game_mode = -2;
         }
-        WaitForDmaStatusBits(1);
-        GetGsCurrentField(0);
+        gfx_wait_for_dma_status_bits(1);
+        sceGsSyncV(0);
         D_001B1598_GP = D_001B1598 + 1;
-    } while (gCurrentGameMode == 2);
+    } while (g_current_game_mode == 2);
     D_001A8BB0_GP = 0;
-    EndScriptedScene();
+    cutscene_end_scripted();
     return value;
 }
 

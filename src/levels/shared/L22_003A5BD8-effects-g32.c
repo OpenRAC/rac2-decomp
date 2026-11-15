@@ -18,21 +18,21 @@ typedef struct {
 } ParticleSettings;
 extern ParticleSettings ref_L22_003A5BD8_11 __attribute__((sda)), ref_L22_003A5BD8_12 __attribute__((sda)), ref_L22_003A5BD8_13 __attribute__((sda));
 extern u8 D_L22_001B9C80[];
-extern void func_0029FCC0(void *, int, void *);
-extern float func_00282DF0(void *, void *), func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern void func_00282F20(void *, void *, float), func_002ACB48(void *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *), func_002830C0(void *, void *, void *);
-extern void * func_L02_003449D8(void *, void *, void *, void *, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float FastVecLength(void *, void *), math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern void vec_scale_to_length(void *, void *, float), vec_add_random_offset(void *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *), transform_vector(void *, void *, void *);
+extern void * enemy_spawn_record(void *, void *, void *, void *, int);
 
 /* Emit sprays from two transformed offsets, optionally mirrored about Y. */
-void func_L22_003A5BD8(u8 * obj, int index, int flip) {
+void part_spray_thruster(u8 * obj, int index, int flip) {
     float socketPos[4], x[4], y[4], z[4], origin[4], dir[4], vel[4], pos[4], offsetA[4], offsetB[4], tmp[4];
     u8 * ctl = *(u8 **)(obj + 0x68);
     float strength;
     int i;
 
-    TransformMobyJointToWorld(obj, index, socketPos);
+    moby_transform_joint_to_world(obj, index, socketPos);
     qcopy(x, obj + 0xC0);
     qcopy(y, obj + 0xD0);
     qcopy(z, obj + 0xE0);
@@ -40,7 +40,7 @@ void func_L22_003A5BD8(u8 * obj, int index, int flip) {
     qcopy(dir, obj + 0xE0);
     strength = FastVecLength(ctl + 0x1B0, x);
     {
-        float jitter = RandomFloatRange(0.0f, 0.1f);
+        float jitter = math_random_float_range(0.0f, 0.1f);
         strength *= 60.0f;
         strength += jitter;
     }
@@ -61,21 +61,21 @@ void func_L22_003A5BD8(u8 * obj, int index, int flip) {
     vec_scale_to_length(tmp, tmp, ref_L22_003A5BD8_02);
     FastVecAdd(pos, pos, tmp);
     for (i = 0; i < ref_L22_003A5BD8_03; i++) {
-        float jitter = RandomFloatRange(0.0f, strength * ref_L22_003A5BD8_04);
+        float jitter = math_random_float_range(0.0f, strength * ref_L22_003A5BD8_04);
         vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_05 + jitter) * (1.0f / 60.0f)));
-        AddRandomOffsetToVector(pos, ref_L22_003A5BD8_06);
-        SpawnEnemyRecord(pos, vel, &ref_L22_003A5BD8_11, (void *)RandomIntBelow(2), 1);
+        vec_add_random_offset(pos, ref_L22_003A5BD8_06);
+        enemy_spawn_record(pos, vel, &ref_L22_003A5BD8_11, (void *)math_random_int_below(2), 1);
     }
     transform_vector(pos, offsetB, x);
     FastVecAdd(pos, pos, socketPos);
     for (i = 0; (float)i < strength * (float)ref_L22_003A5BD8_10 + 2.0f; i++) {
-        float jitter = RandomFloatRange(0.0f, strength * ref_L22_003A5BD8_07);
+        float jitter = math_random_float_range(0.0f, strength * ref_L22_003A5BD8_07);
         vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_08 + jitter) * (1.0f / 60.0f)));
-        AddRandomOffsetToVector(pos, ref_L22_003A5BD8_09);
-        SpawnEnemyRecord(pos, vel, &ref_L22_003A5BD8_12, (void *)RandomIntBelow(2), 1);
-        jitter = RandomFloatRange(0.0f, strength * ref_L22_003A5BD8_07);
+        vec_add_random_offset(pos, ref_L22_003A5BD8_09);
+        enemy_spawn_record(pos, vel, &ref_L22_003A5BD8_12, (void *)math_random_int_below(2), 1);
+        jitter = math_random_float_range(0.0f, strength * ref_L22_003A5BD8_07);
         vec_scale_to_length(vel, dir, -((ref_L22_003A5BD8_08 + jitter) * (1.0f / 60.0f)));
-        AddRandomOffsetToVector(pos, ref_L22_003A5BD8_09);
-        SpawnEnemyRecord(pos, vel, &ref_L22_003A5BD8_13, (void *)RandomIntBelow(2), 1);
+        vec_add_random_offset(pos, ref_L22_003A5BD8_09);
+        enemy_spawn_record(pos, vel, &ref_L22_003A5BD8_13, (void *)math_random_int_below(2), 1);
     }
 }

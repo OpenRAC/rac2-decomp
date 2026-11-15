@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef struct { char pad00[0x20]; short unk20; short unk22; } Sel52C00;
-extern Sel52C00 D_00152C00;
+extern Sel52C00 g_hero_moby_default;
 extern float ref_L00_00360ED0_00 MACRO_ADDR;
 extern int ref_L00_00360ED0_01 MACRO_ADDR;
 extern int ref_L00_00360ED0_02 __attribute__((sda));
@@ -16,7 +16,7 @@ typedef struct {
 } State2E71B8;
 extern World2E71B8 ref_L00_00360ED0_03;
 extern State2E71B8 ref_L00_00360ED0_04;
-extern void func_002FC138(void);
+extern void gfx_select_packet_buffer_setup(void);
 extern void func_US2_002E7BE0(int);
 
 void func_US2_002E8010(void)
@@ -24,9 +24,9 @@ void func_US2_002E8010(void)
     int base;
 
     ref_L00_00360ED0_00 = 1.0f;
-    D_00152C00.unk20 = 0;
-    D_00152C00.unk22 = -1;
-    func_002FC138();
+    g_hero_moby_default.unk20 = 0;
+    g_hero_moby_default.unk22 = -1;
+    gfx_select_packet_buffer_setup();
 
     base = ref_L00_00360ED0_01 - 0x60000;
     ref_L00_00360ED0_04.unk6C = ref_L00_00360ED0_03.unk0C + base;

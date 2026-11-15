@@ -1,10 +1,11 @@
+#include "names.h"
 /* Standalone declarations recovered from src/levels/shared/L02_00410450.c. */
 typedef unsigned char u8;
 
 extern void func_0032B890(int, int, int);
 
 /* Shows one of several on-screen messages, chosen by a number kept in the object. */
-void func_L02_004114A0(u8 *object) {
+void hud_show_message_for_state(u8 *object) {
     int selector = *(int *)(*(void **)(object + 0x68) + 0x10);
     int messageId;
 

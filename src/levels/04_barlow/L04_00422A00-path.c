@@ -2,11 +2,11 @@
 typedef unsigned char u8;
 typedef float f32;
 struct BarlowAnimation { int frames; u8 unused[24]; f32 dustartn; };
-extern struct BarlowAnimation *D_L04_001FE340[];
+extern struct BarlowAnimation *g_route_path_table[];
 extern u8 D_L04_001B1280[];
-extern void func_0026FEB8(const char *, ...);
-extern void func_00282D30(f32, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void STUB_printf(const char *, ...);
+extern void FastVecScale(f32, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern int D_L04_001B12B0[][2] __attribute__((sda));
 extern f32 D_L04_0026D370[][4];
 extern f32 D_L04_001B3300[] __attribute__((sda));
@@ -44,7 +44,7 @@ extern f32 D_L04_001B3468[] __attribute__((sda));
 extern f32 D_L04_001B3488 __attribute__((sda));
 
 /* Finds where on the screen the Barlow walk path is for the current animation and frame, and remembers which path piece it is on. */
-void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *currentPath, int *currentSegment, u8 *data) {
+void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *currentPath, int *currentSegment, u8 *data) {
     f32 point[4], movement[4];
     int (*points)[2];
     f32 (*vectors)[4], *lengths, *starts;
@@ -52,7 +52,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
     f32 progress, start;
     struct BarlowAnimation *timing;
     if (animation == -1 && frame >= 0 && frame <= 151) {
-        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
+        timing = g_route_path_table[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 0)) / (timing->dustartn * 151.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -64,7 +64,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 7;
         path = 1;
     } else if (animation == -1 && frame >= 151 && frame <= 174) {
-        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
+        timing = g_route_path_table[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 151)) / (timing->dustartn * 23.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -76,7 +76,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 3;
         path = 2;
     } else if (animation == -1 && frame >= 174 && frame <= 312) {
-        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
+        timing = g_route_path_table[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 174)) / (timing->dustartn * 138.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -88,7 +88,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 11;
         path = 3;
     } else if (animation == -1 && frame >= 312 && frame <= 500) {
-        timing = gRoutePathTable[*(int *)(data + 0x1A8)];
+        timing = g_route_path_table[*(int *)(data + 0x1A8)];
         start = (timing->dustartn * (f32)(frame - 312)) / (timing->dustartn * 186.0f);
         if (start > 1.0f)
             start = 1.0f;
@@ -100,7 +100,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 6;
         path = 4;
     } else if (animation == 0) {
-        timing = gRoutePathTable[*(int *)(data + 0x1AC)];
+        timing = g_route_path_table[*(int *)(data + 0x1AC)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
@@ -112,7 +112,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 9;
         path = 5;
     } else if (animation == 2) {
-        timing = gRoutePathTable[*(int *)(data + 0x1B4)];
+        timing = g_route_path_table[*(int *)(data + 0x1B4)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
@@ -124,7 +124,7 @@ void func_L04_0043AD48(int *outX, int *outY, int animation, int frame, int *curr
         count = 3;
         path = 6;
     } else if (animation == 1) {
-        timing = gRoutePathTable[*(int *)(data + 0x1B0)];
+        timing = g_route_path_table[*(int *)(data + 0x1B0)];
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;

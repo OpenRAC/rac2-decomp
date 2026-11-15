@@ -12,92 +12,92 @@ extern int D_001AB850[1] __attribute__((sda));
 extern int D_001AB890[1] __attribute__((sda));
 extern int D_001AB8D0[1] __attribute__((sda));
 extern int D_002614E8[];
-extern unsigned char D_00189E20[];
-extern int func_0026F7C0(void), func_0026F7C8(void), func_0026F7D0(void), func_0026F7D8(void), func_0026F7E0(void), func_0026F7E8(void), func_0026F7F0(void), func_002DF1B8(void);
-extern void func_00348570(char *, int), func_00348578(char *, int), func_00348580(char *, int *), func_00348630(char *, int, int), func_00348640(char *, int, int *), func_003489E8(char *, int);
+extern unsigned char g_hero_state[];
+extern int stub_empty_22(void), stub_empty_23(void), stub_empty_24(void), stub_empty_25(void), stub_empty_26(void), stub_empty_27(void), stub_empty_28(void), menu_always_return_true(void);
+extern void menu_set_field_448(char *, int), menu_set_field_44c(char *, int), menu_load_sprites_from_values(char *, int *), menu_set_table_slot(char *, int, int), menu_set_icon_count_and_icons(char *, int, int *), UpdateMenuChoiceListWidgets(char *, int);
 #define MENU (D_001A8CFC[0] + 0x39140)
 /* Sets up the choices shown in the menu list, depending on what the game is doing. */
-void func_002CAF18(void)
+void ConfigureMenuChoiceList(void)
 {
     if (!D_001A8CFC[0]) return;
-    if (EmptyStubF7E0()) {
-        SetMenuField0x44C(MENU, 1);
-        SetMenuIconCountAndIcons(MENU, 5, D_001AB7F0);
-        LoadMenuSpritesFromValues(MENU, D_001AB7A8);
+    if (stub_empty_26()) {
+        menu_set_field_44c(MENU, 1);
+        menu_set_icon_count_and_icons(MENU, 5, D_001AB7F0);
+        menu_load_sprites_from_values(MENU, D_001AB7A8);
         { char *p = MENU;
         *(int **)(p + 0x414) = D_001AB850;
-        SetMenuField0x448(p, 0);
+        menu_set_field_448(p, 0);
         }
-        SetMenuTableSlot(MENU, 0, 1);
-        SetMenuTableSlot(MENU, 2, 1);
-        SetMenuTableSlot(MENU, 3, 1);
-        SetMenuTableSlot(MENU, 1, 1);
-        SetMenuTableSlot(MENU, 4, 1);
+        menu_set_table_slot(MENU, 0, 1);
+        menu_set_table_slot(MENU, 2, 1);
+        menu_set_table_slot(MENU, 3, 1);
+        menu_set_table_slot(MENU, 1, 1);
+        menu_set_table_slot(MENU, 4, 1);
         { char *p = MENU; *(int *)(p + 0x43C) = 0; }
-    } else if (EmptyStubF7C8() && EmptyStubF7D0()) {
-        SetMenuField0x44C(MENU, 1);
-        SetMenuIconCountAndIcons(MENU, 5, D_001AB808);
-        LoadMenuSpritesFromValues(MENU, D_001AB7A8);
+    } else if (stub_empty_23() && stub_empty_24()) {
+        menu_set_field_44c(MENU, 1);
+        menu_set_icon_count_and_icons(MENU, 5, D_001AB808);
+        menu_load_sprites_from_values(MENU, D_001AB7A8);
         { char *p = MENU;
         *(int **)(p + 0x414) = D_001AB890;
-        SetMenuTableSlot(p, 0, 1);
+        menu_set_table_slot(p, 0, 1);
         }
-        SetMenuTableSlot(MENU, 1, EmptyStubF7C0() ^ 1);
-        SetMenuTableSlot(MENU, 2, EmptyStubF7C0() ^ 1);
-        SetMenuTableSlot(MENU, 3, 1);
-        SetMenuTableSlot(MENU, 4, EmptyStubF7C0() ^ 1);
-        SetMenuField0x448(MENU, 0);
+        menu_set_table_slot(MENU, 1, stub_empty_22() ^ 1);
+        menu_set_table_slot(MENU, 2, stub_empty_22() ^ 1);
+        menu_set_table_slot(MENU, 3, 1);
+        menu_set_table_slot(MENU, 4, stub_empty_22() ^ 1);
+        menu_set_field_448(MENU, 0);
         { char *p = MENU; *(int *)(p + 0x43C) = 0; }
-    } else if (EmptyStubF7D8()) {
-        SetMenuField0x44C(MENU, 1);
-        SetMenuIconCountAndIcons(MENU, 3, D_001AB820);
-        LoadMenuSpritesFromValues(MENU, D_001AB7A8);
+    } else if (stub_empty_25()) {
+        menu_set_field_44c(MENU, 1);
+        menu_set_icon_count_and_icons(MENU, 3, D_001AB820);
+        menu_load_sprites_from_values(MENU, D_001AB7A8);
         { char *p = MENU;
         *(int **)(p + 0x414) = D_001AB8D0;
-        SetMenuField0x448(p, 0);
+        menu_set_field_448(p, 0);
         }
-        SetMenuTableSlot(MENU, 0, 1);
-        SetMenuTableSlot(MENU, 1, 1);
-        SetMenuTableSlot(MENU, 2, 1);
+        menu_set_table_slot(MENU, 0, 1);
+        menu_set_table_slot(MENU, 1, 1);
+        menu_set_table_slot(MENU, 2, 1);
         { char *p = MENU; *(int *)(p + 0x43C) = 0; }
-    } else if (EmptyStubF7F0() == 0x31 || EmptyStubF7E8() || EmptyStubF7F0() == 0x1C) {
-        SetMenuField0x44C(MENU, 1);
-        SetMenuIconCountAndIcons(MENU, 2, D_001AB830);
-        LoadMenuSpritesFromValues(MENU, D_001AB7A8);
+    } else if (stub_empty_28() == 0x31 || stub_empty_27() || stub_empty_28() == 0x1C) {
+        menu_set_field_44c(MENU, 1);
+        menu_set_icon_count_and_icons(MENU, 2, D_001AB830);
+        menu_load_sprites_from_values(MENU, D_001AB7A8);
         { char *p = MENU;
         *(int **)(p + 0x414) = D_001AB838;
-        SetMenuField0x448(p, 0);
+        menu_set_field_448(p, 0);
         }
-        SetMenuTableSlot(MENU, 0, 1);
-        SetMenuTableSlot(MENU, 1, 1);
+        menu_set_table_slot(MENU, 0, 1);
+        menu_set_table_slot(MENU, 1, 1);
         { char *p = MENU; *(int *)(p + 0x43C) = 0; }
     } else {
-        SetMenuField0x44C(MENU, 1);
-        SetMenuIconCountAndIcons(MENU, 7, D_001AB7D0);
-        LoadMenuSpritesFromValues(MENU, D_001AB7A8);
+        menu_set_field_44c(MENU, 1);
+        menu_set_icon_count_and_icons(MENU, 7, D_001AB7D0);
+        menu_load_sprites_from_values(MENU, D_001AB7A8);
         { char *p = MENU;
         *(int **)(p + 0x414) = D_002614E8;
-        if (gHeroState[0x22B4] == 1) {
-            SetMenuTableSlot(p, 0, 0);
-            SetMenuTableSlot(MENU, 1, 0);
-            SetMenuTableSlot(MENU, 2, 0);
+        if (g_hero_state[0x22B4] == 1) {
+            menu_set_table_slot(p, 0, 0);
+            menu_set_table_slot(MENU, 1, 0);
+            menu_set_table_slot(MENU, 2, 0);
         } else {
-            SetMenuTableSlot(p, 0, 1);
-            SetMenuTableSlot(MENU, 1, 1);
-            SetMenuTableSlot(MENU, 2, 1);
+            menu_set_table_slot(p, 0, 1);
+            menu_set_table_slot(MENU, 1, 1);
+            menu_set_table_slot(MENU, 2, 1);
         }
         }
-        SetMenuTableSlot(MENU, 3, 1);
-        SetMenuTableSlot(MENU, 4, 1);
-        SetMenuTableSlot(MENU, 5, 1);
-        if (AlwaysReturnTrue()) {
-            SetMenuField0x448(MENU, 1);
-            SetMenuTableSlot(MENU, 6, 1);
+        menu_set_table_slot(MENU, 3, 1);
+        menu_set_table_slot(MENU, 4, 1);
+        menu_set_table_slot(MENU, 5, 1);
+        if (menu_always_return_true()) {
+            menu_set_field_448(MENU, 1);
+            menu_set_table_slot(MENU, 6, 1);
         } else {
-            SetMenuField0x448(MENU, 0);
-            SetMenuTableSlot(MENU, 6, 0);
+            menu_set_field_448(MENU, 0);
+            menu_set_table_slot(MENU, 6, 0);
         }
-        if (gHeroState[0x22B4] == 1) { char *p = MENU; *(int *)(p + 0x43C) = 3; }
+        if (g_hero_state[0x22B4] == 1) { char *p = MENU; *(int *)(p + 0x43C) = 3; }
         else { char *p = MENU; *(int *)(p + 0x43C) = 0; }
     }
     UpdateMenuChoiceListWidgets(MENU, 0);

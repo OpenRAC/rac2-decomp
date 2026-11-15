@@ -12,7 +12,7 @@ typedef struct { s32 field00; u8 remainder[12]; } JobaPolygonHeaderView;
 
 extern JobaPolygonHeaderView *D_L11_001FF580[];
 
-extern s32 func_002A8AF0(f32 *point, f32 *vertices, s32 count);
+extern s32 point_in_path_xy(f32 *point, f32 *vertices, s32 count);
 
 /* Consumes one positive counter selected by the measured class identifier. */
 typedef struct {
@@ -28,7 +28,7 @@ extern void func_2F8AD0(void *, void *);
 extern void func_31F338(void);
 
 /* Counts one more frame for the arena and starts its timer. */
-void func_L11_00440160(u8 *obj) {
+void arena_end_frame(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     u16 *counter = (u16 *)(obj + 0x96);
     if (*counter <= 0xFFFE) {
@@ -43,7 +43,7 @@ void func_L11_00440160(u8 *obj) {
 extern void func_32C9E0();
 
 /* Clears the arena's counters and slots so a new challenge can start. */
-void func_L11_004401C0(u8 *obj) {
+void arena_reset_state(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 i;
     s32 *wordPtr = (s32 *)(state + 0x134);
@@ -67,16 +67,16 @@ void func_L11_004401C0(u8 *obj) {
 /* func_L11_00440790 lives in L11_00440238-g8.c (its source unit has the retail small-data view). */
 
 /* Finds the class entry the identifier names and hands it to that class's handler. */
-extern u8 *D_L11_001FC420[];
+extern u8 *g_group_id_lists[];
 
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
 
-extern void func_L11_003F2F38(u8 *);
+extern void joba_rail_reset(u8 *);
 
-extern void func_L11_00439950(u8 *);
+extern void rotor_reset_group(u8 *);
 
 /* Wakes up the boss of the asked kind and counts it. */
-u8 *func_L11_00440868(u8 *obj, s32 id) {
+u8 *arena_activate_boss_of_class(u8 *obj, s32 id) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 index = *(s32 *)(state + 0xC0);
     u16 *cursor;
@@ -86,25 +86,25 @@ u8 *func_L11_00440868(u8 *obj, s32 id) {
     if (index == 0xFF) {
         return 0;
     }
-    list = gGroupIdLists[index];
+    list = g_group_id_lists[index];
     if (list == 0) {
         return 0;
     }
     cursor = (u16 *)list;
     do {
         u16 value = *cursor & 0x7FFF;
-        record = gMobyTable_L11 + (value << 8);
+        record = g_moby_l11_table + (value << 8);
 
         if (record != 0 && record[0x20] != 0xFE && record[0x20] != 0xFD &&
             *(s16 *)(record + 0xAA) == id && record[0x20] == 1) {
             *(u32 *)(record + 0xB8) = (u32)obj;
             switch (id) {
             case 0xD4A /* moby class 3402 */:
-                ResetRotorGroup(record);
+                rotor_reset_group(record);
                 *(s32 *)(state + 0x118) += 1;
                 return record;
             case 0xB3A /* Arachnoid */:
-                ResetJobaRailObject(record);
+                joba_rail_reset(record);
                 *(s32 *)(state + 0x11C) += 1;
                 return record;
             }
@@ -139,12 +139,12 @@ typedef struct {
 } GroupVars440B28;
 extern char *D_001B359C __attribute__((sda));
 extern unsigned short *D_001FC420[];
-extern float func_00283248(float, float);
-extern void func_002833F0(void *, void *);
-extern void func_L11_00436910(void *, int, int);
+extern float mat_fast_helper_a(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void enemy_init_state(void *, int, int);
 
 /* Sends the first free fighter of one kind toward a target point. */
-int func_L11_00440B28(u8 *object, float *target)
+int arena_launch_fighter_toward_target(u8 *object, float *target)
 {
     GroupMoby440B28 *member;
     unsigned short *list;
@@ -167,10 +167,10 @@ int func_L11_00440B28(u8 *object, float *target)
             qcopy(member->pos, target);
             member->fF0 = 0.0f;
             member->fF4 = -1.5707965f;
-            dx = target[0] - ((float *)GetArenaCenterPoint(object))[0];
-            member->fF8 = FastMatrixHelperA(dx, target[1] - ((float *)GetArenaCenterPoint(object))[1]);
+            dx = target[0] - ((float *)arena_get_center_point(object))[0];
+            member->fF8 = mat_fast_helper_a(dx, target[1] - ((float *)arena_get_center_point(object))[1]);
             euler_rotation_basis(member->rot, &member->fF0);
-            InitEnemyState(member, 0, 1);
+            enemy_init_state(member, 0, 1);
             return 1;
         }
     } while ((short)*cursor++ >= 0);
@@ -179,13 +179,13 @@ int func_L11_00440B28(u8 *object, float *target)
 
 /* Returns the state's 0x200 halfword. */
 /* Returns how many fighters of one kind the arena counted. */
-s16 func_L11_00440C80(u8 *obj) {
+s16 arena_get_fighter_count(u8 *obj) {
     return *(s16 *)(*(u8 **)(obj + 0x68) + 0x200);
 }
 
-extern s32 func_L02_003D77B8(u8 *);
-extern s32 func_L02_003D77F8(u8 *);
-extern void func_L02_003D7868(u8 *, u8 *);
+extern s32 moby_has_free_child_slot_state2(u8 *);
+extern s32 moby_has_any_child_slot_used(u8 *);
+extern void moby_attach_child_first_free_slot(u8 *, u8 *);
 
 /* The weight word (+0x20) of OTHER's state. */
 #define WEIGHT (*(f32 *)(*(u8 **)(other + 0x68) + 0x20))
@@ -195,13 +195,13 @@ extern void func_L02_003D7868(u8 *, u8 *);
    0xDF4 +0x108, 0xDF7 +0x10C, 0xDF9 +0x110 unless the group refuses it, 0xD37 +0x114) and
    its state's weight set to 1.0. Returns 1 when added, else 0. */
 /* Adds a fighter to the current squad and counts it by kind. Returns 1 when it was added. */
-s32 func_L11_00440C90(u8 *obj, u8 *other)
+s32 arena_add_fighter_to_squad(u8 *obj, u8 *other)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     u8 *slots = state + 0x120;
 
     if (*(u8 **)(slots + (*(s32 *)(state + 0x18C) << 2)) != 0 &&
-        HasFreeChildSlotInState2(*(u8 **)(slots + *(s32 *)(state + 0x18C) * 4)) != 0) {
+        moby_has_free_child_slot_state2(*(u8 **)(slots + *(s32 *)(state + 0x18C) * 4)) != 0) {
         switch (*(s16 *)(other + 0xAA)) {
         case 0xD98 /* Joba security robot */:
             *(s32 *)(state + 0x100) += 1;
@@ -220,7 +220,7 @@ s32 func_L11_00440C90(u8 *obj, u8 *other)
             WEIGHT = 1.0f;
             break;
         case 0xDF9 /* Joba fighter */:
-            if (HasAnyChildSlotUsed(*(u8 **)(slots + (*(s32 *)(state + 0x18C) << 2))) != 0)
+            if (moby_has_any_child_slot_used(*(u8 **)(slots + (*(s32 *)(state + 0x18C) << 2))) != 0)
                 return 0;
             *(s32 *)(state + 0x110) += 1;
             WEIGHT = 1.0f;
@@ -230,7 +230,7 @@ s32 func_L11_00440C90(u8 *obj, u8 *other)
             WEIGHT = 1.0f;
             break;
         }
-        AttachChildToFirstFreeSlot(*(u8 **)(state + (*(s32 *)(state + 0x18C) << 2) + 0x120), other);
+        moby_attach_child_first_free_slot(*(u8 **)(state + (*(s32 *)(state + 0x18C) << 2) + 0x120), other);
         return 1;
     }
     return 0;
@@ -246,7 +246,7 @@ extern s32 func_417238(s32);
 extern void func_4172E8(s32);
 
 /* Refreshes every squad slot that is in use. */
-void func_L11_00441090(u8 *obj) {
+void arena_refresh_squad_slots(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 i;
     for (i = 0; i <= *(s32 *)(state + 0x18C); i++) {
@@ -265,7 +265,7 @@ void func_L11_00441090(u8 *obj) {
 extern s32 func_417270(s32);
 
 /* Empties all squad slots once every squad is finished. */
-void func_L11_00441108(u8 *obj) {
+void arena_clear_squad_slots_when_done(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 i;
     s32 accepted = 1;
@@ -290,27 +290,27 @@ void func_L11_00441108(u8 *obj) {
 }
 
 /* hands every entry of the class list to its measured handler */
-extern u8 *D_L11_001FC420[];
+extern u8 *g_group_id_lists[];
 
-extern u8 *D_L11_001B359C;
+extern u8 *g_moby_l11_table;
 
-extern void func_L11_00449878(u8 *);
+extern void security_robot_deactivate(u8 *);
 
-extern void func_L11_0044C4F0(u8 *);
+extern void smasher_robot_deactivate(u8 *);
 
-extern void func_L11_00452DF8(u8 *);
+extern void flamethrower_robot_deactivate(u8 *);
 
-extern void func_L11_00454DD8(u8 *);
+extern void drone_reset_to_idle(u8 *);
 
-extern void func_L11_00456540(u8 *);
+extern void fighter_reset_to_idle(u8 *);
 
-extern void func_L11_00436A78(u8 *);
+extern void enemy_reset_to_idle(u8 *);
 
-extern void func_L11_00439BF0(u8 *);
+extern void chain_creature_clear_sound_flags(u8 *);
 
-extern void func_L11_0043AB28(u8 *);
+extern void drone_kill_with_effects(u8 *);
 
-extern void func_L11_003F3098(u8 *);
+extern void joba_enemy_reset(u8 *);
 
 /* The class table base read through an incomplete `sda` array: cc1 emits the one-instruction
    load, which the assembler expands absolute (`lui $r` / `lw $r,%lo($r)`) and which is not
@@ -318,7 +318,7 @@ extern void func_L11_003F3098(u8 *);
 extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
 
 /* Calls the matching handler for every fighter in the arena group. */
-void func_L11_004411C8(u8 *obj)
+void arena_run_member_handlers(u8 *obj)
 {
     s32 index = *(s32 *)(*(u8 **)(obj + 0x68) + 0xC0);
     u16 *cursor;
@@ -327,7 +327,7 @@ void func_L11_004411C8(u8 *obj)
 
     if (index == 0xFF)
         return;
-    list = gGroupIdLists[index];
+    list = g_group_id_lists[index];
     if (list == 0)
         return;
     cursor = (u16 *)list;
@@ -335,31 +335,31 @@ void func_L11_004411C8(u8 *obj)
         entry = D_L11_001B359C_base[0] + ((*cursor & 0x7FFF) << 8);
         switch (*(s16 *)(entry + 0xAA)) {
         case 0xD98 /* Joba security robot */:
-            DeactivateSecurityRobot(entry);
+            security_robot_deactivate(entry);
             break;
         case 0xDCF /* Joba smasher robot */:
-            DeactivateSmasherRobot(entry);
+            smasher_robot_deactivate(entry);
             break;
         case 0xDF4 /* moby class 3572 */:
-            DeactivateFlamethrowerRobot(entry);
+            flamethrower_robot_deactivate(entry);
             break;
         case 0xDF7 /* moby class 3575 */:
-            ResetJobaDroneToIdle(entry);
+            drone_reset_to_idle(entry);
             break;
         case 0xDF9 /* Joba fighter */:
-            ResetJobaFighterToIdle(entry);
+            fighter_reset_to_idle(entry);
             break;
         case 0xD37 /* moby class 3383 */:
-            ResetEnemyToIdle(entry);
+            enemy_reset_to_idle(entry);
             break;
         case 0xD4A /* moby class 3402 */:
-            ClearChainSoundAndFlags(entry);
+            chain_creature_clear_sound_flags(entry);
             break;
         case 0xD4B /* moby class 3403 */:
-            KillDroneWithEffects(entry);
+            drone_kill_with_effects(entry);
             break;
         case 0xB3A /* Arachnoid */:
-            ResetJobaEnemy(entry);
+            joba_enemy_reset(entry);
             break;
         }
     } while (*(s16 *)cursor++ >= 0);
@@ -374,7 +374,7 @@ typedef struct { u8 pad[0x284]; s32 field284; s32 field288; } JobaFlagBlockView;
 extern JobaFlagBlockView D_L11_001BA780;
 
 /* Remembers which boss is in charge of the arena music and its health bar. */
-void func_L11_004417A8(u8 *object, s32 value) {
+void arena_set_boss_owner(u8 *object, s32 value) {
     u8 *state = *(u8 **)(object + 0x68);
     if (D_L11_001BA780.field284 == *(s32 *)(state + 0x184)) {
         D_L11_001BA780.field284 = 0;
@@ -390,14 +390,14 @@ void func_L11_004417A8(u8 *object, s32 value) {
 extern u8 *D_L11_001B368C __attribute__((sda));
 
 /* Returns the position of the arena's center point. */
-u8 *func_L11_004417E8(u8 *object) {
+u8 *arena_get_center_point(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     return D_L11_001B368C + (*(s32 *)(state + 0x168) << 7) + 0x30;
 }
 
 /* returns zero for a missing state polygon index or dispatches its point query to the integrated crossing-parity helper */
 /* Tells whether a point is inside the arena's floor shape. */
-s32 func_L11_00441808(u8 *object, f32 *point) {
+s32 arena_is_point_in_polygon(u8 *object, f32 *point) {
     u8 *state = *(u8 **)(object + 0x68);
     s32 index = *(s32 *)(state + 0x164);
     JobaPolygonHeaderView *header;
@@ -413,13 +413,13 @@ s32 func_L11_00441808(u8 *object, f32 *point) {
 
 /* Returns the state's 0xC0 word. */
 /* Returns the number of the arena's main group. */
-s32 func_L11_00441858(u8 *obj) {
+s32 arena_get_group_index(u8 *obj) {
     return *(s32 *)(*(u8 **)(obj + 0x68) + 0xC0);
 }
 
 /* consumes one positive signed state counter selected by a measured class identifier and reports success */
 /* Uses up one waiting fighter of the asked kind. Returns 1 if there was one. */
-s32 func_L11_00441868(u8 *object, s32 class_id) {
+s32 arena_consume_waiting_fighter(u8 *object, s32 class_id) {
     JobaClassCounterView *state = *(JobaClassCounterView **)(object + 0x68);
     switch (class_id) {
         case 0xd98 /* Joba security robot */:
@@ -447,7 +447,7 @@ s32 func_L11_00441868(u8 *object, s32 class_id) {
 /* increments one signed state counter selected by a measured class identifier */
 /* Increments the state counter selected by the measured class identifier. */
 /* Adds one waiting fighter of the asked kind. */
-void func_L11_00441978(u8 *object, s32 class_id) {
+void arena_add_waiting_fighter(u8 *object, s32 class_id) {
     JobaClassCounterView *state = *(JobaClassCounterView **)(object + 0x68);
     switch (class_id) {
         case 0xd98 /* Joba security robot */: state->fielde0++; break;
@@ -472,34 +472,34 @@ extern s32 D_L11_001B35B8[] __attribute__((sda));
          ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L11_001FC420[GROUP(off)]); \
          p++)
 
-extern s16 func_L02_004024A0(u8 *);
-extern void func_L02_004024B0(u8 *);
-extern void func_L02_004024C0(u8 *);
+extern s16 moby_get_vars_counter(u8 *);
+extern void moby_set_vars_counter_to_1(u8 *);
+extern void moby_clear_vars_counter(u8 *);
 
 /* Counts the entities of the object's group (state word 0xC8) for which func_L02_004024A0
    holds, then sets (func_L02_004024B0) or clears (func_L02_004024C0) entities until the count
    equals the second argument. */
 /* Switches fighters in the first group on or off until the wanted number are active. */
-void func_L11_00441A58(u8 *object, s32 count) {
+void arena_set_group_a_active_count(u8 *object, s32 count) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
     s32 activeCount = 0;
 
     FOR_EACH_ID(cursor, 0xC8) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
-        if (GetMobyVarsCounter(member))
+        if (moby_get_vars_counter(member))
             activeCount++;
     }
     if (activeCount < count) {
         FOR_EACH_ID(cursor, 0xC8) {
-            member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+            member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            if (!GetMobyVarsCounter(member)) {
-                SetMobyVarsCounterTo1(member);
+            if (!moby_get_vars_counter(member)) {
+                moby_set_vars_counter_to_1(member);
                 activeCount++;
                 if (activeCount >= count)
                     break;
@@ -507,11 +507,11 @@ void func_L11_00441A58(u8 *object, s32 count) {
         }
     } else if (activeCount > count) {
         FOR_EACH_ID(cursor, 0xC8) {
-            member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+            member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            if (GetMobyVarsCounter(member)) {
-                ClearMobyVarsCounter(member);
+            if (moby_get_vars_counter(member)) {
+                moby_clear_vars_counter(member);
                 activeCount--;
                 if (activeCount <= count)
                     break;
@@ -520,34 +520,34 @@ void func_L11_00441A58(u8 *object, s32 count) {
     }
 }
 
-extern s32 func_L02_003D7300(u8 *);
-extern void func_L02_003D7310(u8 *);
-extern void func_L02_003D7320(u8 *);
+extern s32 moby_get_busy_flag(u8 *);
+extern void moby_set_busy_flag(u8 *);
+extern void moby_clear_busy_flag(u8 *);
 
 /* Counts the entities of the object's group (state word 0xCC) for which func_L02_003D7300
    holds, then sets (func_L02_003D7310) or clears (func_L02_003D7320) entities until the count
    equals the second argument. */
 /* Switches fighters in the second group on or off until the wanted number are active. */
-void func_L11_00441D08(u8 *object, s32 count) {
+void arena_set_group_b_active_count(u8 *object, s32 count) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
     s32 activeCount = 0;
 
     FOR_EACH_ID(cursor, 0xCC) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
-        if (GetMobyBusyFlag(member))
+        if (moby_get_busy_flag(member))
             activeCount++;
     }
     if (activeCount < count) {
         FOR_EACH_ID(cursor, 0xCC) {
-            member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+            member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            if (!GetMobyBusyFlag(member)) {
-                SetMobyBusyFlag(member);
+            if (!moby_get_busy_flag(member)) {
+                moby_set_busy_flag(member);
                 activeCount++;
                 if (activeCount >= count)
                     break;
@@ -555,11 +555,11 @@ void func_L11_00441D08(u8 *object, s32 count) {
         }
     } else if (activeCount > count) {
         FOR_EACH_ID(cursor, 0xCC) {
-            member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+            member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            if (GetMobyBusyFlag(member)) {
-                ClearMobyBusyFlag(member);
+            if (moby_get_busy_flag(member)) {
+                moby_clear_busy_flag(member);
                 activeCount--;
                 if (activeCount <= count)
                     break;
@@ -568,8 +568,8 @@ void func_L11_00441D08(u8 *object, s32 count) {
     }
 }
 
-extern float func_L02_002F21C0(void *, void *);
-extern char D_00189EA0[];
+extern float vec_distance_squared_xy(void *, void *);
+extern char g_hero_position[];
 
 /* Over the entities of the object's group (state word 0xC0): first resets the "armed" halfword
    (1 -> 0) of the state of every entity of the four measured classes and reports its class to
@@ -577,7 +577,7 @@ extern char D_00189EA0[];
    and at least 4, halfword not 1) that func_L02_002F21C0 puts nearest to D_00189EA0, and arms
    its halfword when func_L11_00441868 consumes the class's counter. */
 /* Marks the fighters nearest to the player as the next ones to attack. */
-void func_L11_00441350(u8 *object) {
+void arena_mark_nearest_fighters_to_attack(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
@@ -588,32 +588,32 @@ void func_L11_00441350(u8 *object) {
     s32 readyFlag;
 
     FOR_EACH_ID(cursor, 0xC0) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
         switch (*(s16 *)(member + 0xAA)) {
         case 0xD98 /* Joba security robot */:
             if (*(s16 *)(*(u8 **)(member + 0x68) + 0x366) == 1) {
                 *(s16 *)(*(u8 **)(member + 0x68) + 0x366) = 0;
-                AddWaitingFighterOfClass(object, *(s16 *)(member + 0xAA));
+                arena_add_waiting_fighter(object, *(s16 *)(member + 0xAA));
             }
             break;
         case 0xDCF /* Joba smasher robot */:
             if (*(s16 *)(*(u8 **)(member + 0x68) + 0x4CA) == 1) {
                 *(s16 *)(*(u8 **)(member + 0x68) + 0x4CA) = 0;
-                AddWaitingFighterOfClass(object, *(s16 *)(member + 0xAA));
+                arena_add_waiting_fighter(object, *(s16 *)(member + 0xAA));
             }
             break;
         case 0xDF9 /* Joba fighter */:
             if (*(s16 *)(*(u8 **)(member + 0x68) + 0x256) == 1) {
                 *(s16 *)(*(u8 **)(member + 0x68) + 0x256) = 0;
-                AddWaitingFighterOfClass(object, *(s16 *)(member + 0xAA));
+                arena_add_waiting_fighter(object, *(s16 *)(member + 0xAA));
             }
             break;
         case 0xD37 /* moby class 3383 */:
             if (*(s16 *)(*(u8 **)(member + 0x68) + 0x282) == 1) {
                 *(s16 *)(*(u8 **)(member + 0x68) + 0x282) = 0;
-                AddWaitingFighterOfClass(object, *(s16 *)(member + 0xAA));
+                arena_add_waiting_fighter(object, *(s16 *)(member + 0xAA));
             }
             break;
         }
@@ -623,7 +623,7 @@ void func_L11_00441350(u8 *object) {
         nearest = 0;
         bestDistance = 10000.0f;
         FOR_EACH_ID(cursor, 0xC0) {
-            member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+            member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
             readyFlag = -1;
@@ -658,9 +658,9 @@ void func_L11_00441350(u8 *object) {
                 continue;
             if (nearest == 0) {
                 nearest = member;
-                bestDistance = DistanceSquaredXY(nearest + 0x10, gHeroPosition);
+                bestDistance = vec_distance_squared_xy(nearest + 0x10, g_hero_position);
             } else {
-                distance = DistanceSquaredXY(member + 0x10, gHeroPosition);
+                distance = vec_distance_squared_xy(member + 0x10, g_hero_position);
                 if (distance < bestDistance) {
                     nearest = member;
                     bestDistance = distance;
@@ -670,19 +670,19 @@ void func_L11_00441350(u8 *object) {
         if (nearest != 0) {
             switch (*(s16 *)(nearest + 0xAA)) {
             case 0xD98 /* Joba security robot */:
-                if (ConsumeWaitingFighterOfClass(object, 0xD98 /* Joba security robot */))
+                if (arena_consume_waiting_fighter(object, 0xD98 /* Joba security robot */))
                     *(s16 *)(*(u8 **)(nearest + 0x68) + 0x366) = 1;
                 break;
             case 0xDCF /* Joba smasher robot */:
-                if (ConsumeWaitingFighterOfClass(object, 0xDCF /* Joba smasher robot */))
+                if (arena_consume_waiting_fighter(object, 0xDCF /* Joba smasher robot */))
                     *(s16 *)(*(u8 **)(nearest + 0x68) + 0x4CA) = 1;
                 break;
             case 0xDF9 /* Joba fighter */:
-                if (ConsumeWaitingFighterOfClass(object, 0xDF9 /* Joba fighter */))
+                if (arena_consume_waiting_fighter(object, 0xDF9 /* Joba fighter */))
                     *(s16 *)(*(u8 **)(nearest + 0x68) + 0x256) = 1;
                 break;
             case 0xD37 /* moby class 3383 */:
-                if (ConsumeWaitingFighterOfClass(object, 0xD37 /* moby class 3383 */))
+                if (arena_consume_waiting_fighter(object, 0xD37 /* moby class 3383 */))
                     *(s16 *)(*(u8 **)(nearest + 0x68) + 0x282) = 1;
                 break;
             }
@@ -692,26 +692,26 @@ void func_L11_00441350(u8 *object) {
 
 /* func_L11_00441FB8 lives in L11_00441FB8.c. */
 
-extern s32 func_L11_00441FB8(u8 *, u8 *, s32);
-extern void func_L02_003FC248(u8 *, s32, s32);
-extern void func_L11_00449970(u8 *, s32, s32);
-extern s32 func_L11_0043A800(u8 *);
-extern void func_L01_003E9CF8(u8 *, s32, void (*)(u8 *));
-extern void func_L00_002B30E8(void);
-extern u8 D_00189E20[];
+extern s32 arena_is_target_outside(u8 *, u8 *, s32);
+extern void moby_set_anim_type_three(u8 *, s32, s32);
+extern void security_robot_kill(u8 *, s32, s32);
+extern s32 drone_is_state_at_least_four(u8 *);
+extern void part_queue_moby_for_glow(u8 *, s32, void (*)(u8 *));
+extern void hero_record_play_counters(void);
+extern u8 g_hero_state[];
 
 /* Hands every entity of the object's group (state word 0xC0) that the shared test func_L11_00441FB8
    accepts, and whose state byte is not 0xFE, 0xFD or below 3, to the handler of its class (the
    halfword at +0xAA); then runs the test once more on the entity D_00189E20 holds at +0x2290. */
 /* Lets every fighter that is inside the arena act, and checks the player too. */
-void func_L11_00442170(u8 *object) {
+void arena_update_fighters_inside(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
     u8 *player;
 
     FOR_EACH_ID(cursor, 0xC0) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
         if (member[0x20] == 0xFE)
@@ -720,41 +720,41 @@ void func_L11_00442170(u8 *object) {
             continue;
         if (member[0x20] < 3)
             continue;
-        if (IsTargetOutsideArena(object, member, 0) == 0)
+        if (arena_is_target_outside(object, member, 0) == 0)
             continue;
         switch (*(s16 *)(member + 0xAA)) {
         case 0xD98 /* Joba security robot */:
-            KillSecurityRobot(member, 0, 0);
+            security_robot_kill(member, 0, 0);
             break;
         case 0xDCF /* Joba smasher robot */:
-            SetMobyAnimTypeThree(member, 0, -1);
-            DeactivateSmasherRobot(member);
+            moby_set_anim_type_three(member, 0, -1);
+            smasher_robot_deactivate(member);
             break;
         case 0xDF4 /* moby class 3572 */:
-            SetMobyAnimTypeThree(member, 0, -1);
-            DeactivateFlamethrowerRobot(member);
+            moby_set_anim_type_three(member, 0, -1);
+            flamethrower_robot_deactivate(member);
             break;
         case 0xDF7 /* moby class 3575 */:
-            SetMobyAnimTypeThree(member, 0, -1);
-            ResetJobaDroneToIdle(member);
+            moby_set_anim_type_three(member, 0, -1);
+            drone_reset_to_idle(member);
             break;
         case 0xDF9 /* Joba fighter */:
-            SetMobyAnimTypeThree(member, 0, -1);
-            QueueMobyForGlowEffect(member, 0, ResetJobaFighterToIdle);
+            moby_set_anim_type_three(member, 0, -1);
+            part_queue_moby_for_glow(member, 0, fighter_reset_to_idle);
             break;
         case 0xD37 /* moby class 3383 */:
-            SetMobyAnimTypeThree(member, 0, -1);
-            ResetEnemyToIdle(member);
+            moby_set_anim_type_three(member, 0, -1);
+            enemy_reset_to_idle(member);
             break;
         case 0xD4B /* moby class 3403 */:
-            if (IsStateAtLeastFour(member))
-                KillDroneWithEffects(member);
+            if (drone_is_state_at_least_four(member))
+                drone_kill_with_effects(member);
             break;
         }
     }
-    player = gHeroState;
-    if (IsTargetOutsideArena(object, *(u8 **)(player + 0x2290), 1))
-        RecordHeroPlayCounters();
+    player = g_hero_state;
+    if (arena_is_target_outside(object, *(u8 **)(player + 0x2290), 1))
+        hero_record_play_counters();
 }
 
 /* func_L11_004423F8 lives in the sibling small-data unit (L11_0043E1A0-g8.c). */
@@ -763,12 +763,12 @@ void func_L11_00442170(u8 *object) {
 
 /* func_L11_00442B60 is defined in its dedicated source unit. */
 
-extern void func_L02_003A6F78(u8 *);
+extern void moby_finish_release_child(u8 *);
 
 /* Runs func_L02_003A6F78 on every entity of the object's two groups (state words 0x178 and
    0x174); an empty group, or a group word of 0xFF, ends the function. */
 /* Runs the same helper on every member of the two spawn point groups. */
-void func_L11_00442C80(u8 *object) {
+void arena_run_helper_on_spawn_groups(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u16 *firstEntry;
@@ -776,29 +776,29 @@ void func_L11_00442C80(u8 *object) {
 
     if (GROUP(0x178) == 0xFF)
         return;
-    firstEntry = (u16 *)gGroupIdLists[GROUP(0x178)];
+    firstEntry = (u16 *)g_group_id_lists[GROUP(0x178)];
     if (firstEntry == 0)
         return;
     for (cursor = firstEntry; (GROUP(0x178) & 0xFF) != 0xFF && GROUP(0x178) <= D_L11_001B35B8[0] && cursor != 0 &&
-                ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)gGroupIdLists[GROUP(0x178)]);
+                ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x178)]);
          cursor++) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
-        FinishObjectAndReleaseChild(member);
+        moby_finish_release_child(member);
     }
     if (GROUP(0x174) == 0xFF)
         return;
-    firstEntry = (u16 *)gGroupIdLists[GROUP(0x174)];
+    firstEntry = (u16 *)g_group_id_lists[GROUP(0x174)];
     if (firstEntry == 0)
         return;
     for (cursor = firstEntry; (GROUP(0x174) & 0xFF) != 0xFF && GROUP(0x174) <= D_L11_001B35B8[0] && cursor != 0 &&
-                ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)gGroupIdLists[GROUP(0x174)]);
+                ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x174)]);
          cursor++) {
-        member = gMobyTable_L11 + ((*cursor & 0x7FFF) << 8);
+        member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
-        FinishObjectAndReleaseChild(member);
+        moby_finish_release_child(member);
     }
 }
 
@@ -818,7 +818,7 @@ extern u32 D_L11_002BB0E0[];
 extern void *jtbl_002BB0E0[13];
 
 /* Returns the text number of a challenge's title. */
-s32 func_L11_00443CE0(s32 index) {
+s32 arena_get_challenge_title_text_id(s32 index) {
     static void * volatile tab[] = {
         &&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7,
         &&c8, &&c9, &&c10, &&c11, &&c12
@@ -877,13 +877,13 @@ typedef struct {
     s32 field68;
 } JobaCallSlotView;
 
-extern u8 D_001A63A8[];
+extern u8 g_music_state[];
 
 /* Claims the shared call slot for the state entry the caller's class identifier
    selects, unless the slot is already busy or waiting. */
 
 /* Starts a voice line for the arena. Returns 1 if the line could be started. */
-s32 func_L11_00445D28(u8 *obj, s32 idx) {
+s32 arena_queue_voice_line(u8 *obj, s32 idx) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 lineValue;
 
@@ -898,7 +898,7 @@ s32 func_L11_00445D28(u8 *obj, s32 idx) {
         lineValue = slotPtr[0x98];
     }
     {
-        JobaCallSlotView *slot = (JobaCallSlotView *)gMusicState;
+        JobaCallSlotView *slot = (JobaCallSlotView *)g_music_state;
 
         if (slot->field68 != 0) {
             goto fail;
@@ -922,10 +922,10 @@ fail:
 /* func_L11_00446020 lives in L11_00446020-g8.c. */
 
 /* hands the state's 0x1C4 field to the shared helper, after the caller's argument */
-extern int func_L00_003206B8(void *, int);
+extern int coll_point_inside_record_volume(void *, int);
 
 /* Tells whether a point is inside the arena's inner zone. */
-int func_L11_004461C0(u8 *object, u8 *point) {
+int arena_is_point_in_inner_zone(u8 *object, u8 *point) {
     u8 *state = *(u8 **)(object + 0x68);
-    return IsPointInsideRecordVolume(point, *(int *)(state + 0x1C4));
+    return coll_point_inside_record_volume(point, *(int *)(state + 0x1C4));
 }

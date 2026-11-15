@@ -20,9 +20,9 @@ typedef struct {
     } status;
 } PrintFile;
 
-extern void func_00115228(void);
-extern double func_001182B8(double);
-extern char *func_001185E8(double, int, char, int);
+extern void libc_init_stdio_state(void);
+extern double __ieee754_log10(double);
+extern char *str_format_float_digits(double, int, char, int);
 
 extern void *D_00133E74 NOT_SDA;
 extern int D_00133B80 NOT_SDA;
@@ -32,8 +32,8 @@ extern char D_0013A560[];
 extern char D_0013A578[];
 extern char D_0013A580[];
 extern char D_0013A598[];
-extern int func_00115FC0(void *, int *, const char *, unsigned int, int *);
-extern int func_00118BC0(int, const char *, unsigned int, int);
+extern int MultibyteToWideCharReentrant(void *, int *, const char *, unsigned int, int *);
+extern int BufferedWrite128(int, const char *, unsigned int, int);
 extern void *memcpy(void *, const void *, unsigned int) __asm__("func_001153D4");
 extern void *memchr(const void *, int, unsigned int) __asm__("func_00115250");
 extern unsigned int strlen(const char *) __asm__("func_001157AC");
@@ -58,7 +58,7 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
 #define UARG() (flags & 0x20 ? GET(unsigned long long) : flags & 0x10 ? GET(unsigned long) : flags & 0x40 ? (unsigned long)(unsigned short)GET(int) : (unsigned long)GET(unsigned int))
 
 /* Prints text from a format string, including decimal numbers. */
-int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
+int VfprintfFloat(void *data, PrintFile *fp, const char *fmt0, char *ap)
 {
     register char *fmt;
     register int ch;
@@ -84,7 +84,7 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
     char ox[2];
     int state;
 
-    InitLibraryStdioState();
+    libc_init_stdio_state();
     state = 0;
     fmt = (char *)fmt0;
     ret = 0;
@@ -210,7 +210,7 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
                     dot = 0;
                     if (prec == 0) prec = 1;
                 }
-                cp = FormatFloatDigits(fvalue, prec, ch, dot);
+                cp = str_format_float_digits(fvalue, prec, ch, dot);
                 size = strlen(cp);
                 break;
             }

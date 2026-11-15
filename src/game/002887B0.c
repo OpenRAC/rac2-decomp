@@ -49,18 +49,18 @@ typedef struct {
     unsigned char pad94[0x4C];
 } ClassRecord;
 
-extern ClassRecord D_00239BA0[];
+extern ClassRecord g_weapon_table[];
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 
 extern int D_00139868[];
 
-extern int func_00287FF8(int, int);
+extern int menu_seek_chain_entry(int, int);
 
 /* Starts a help entry with the short or long variant depending on its id. Returns whether it started. */
-int func_002887B0(int helpId)
+int help_start_entry(int helpId)
 {
-    ClassRecord *record = &gWeaponTable_00239BA0[gItemSlotToRecord[helpId]];
+    ClassRecord *record = &g_weapon_table[g_item_slot_to_record[helpId]];
     int result = 0;
 
     if (record->word00 != 0) {
@@ -72,9 +72,9 @@ int func_002887B0(int helpId)
             break;
         }
         if (isSmall)
-            result = SeekChainEntry(helpId, 1);
+            result = menu_seek_chain_entry(helpId, 1);
         else
-            result = SeekChainEntry(helpId, 2);
+            result = menu_seek_chain_entry(helpId, 2);
         if (result != 0)
             D_00139868[helpId] = 0;
     }

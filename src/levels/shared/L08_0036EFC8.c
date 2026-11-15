@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L08_0036EFC8 (100 bytes; levels 08, 19): sets the low two flag bits of the current
    object and, when there is one, of every object in the null-terminated list, and clears
    each one's class word. The counterpart of func_L08_0036F030. */
@@ -7,7 +8,7 @@ extern u8 *D_L08_00152C00;
 extern u8 *D_L08_00221AE0[];
 
 /* Turns on the two low flag bits for the current object and every object in its list, and clears their class word. */
-void func_L08_0036EFC8(void)
+void moby_disable_object_list_flags(void)
 {
     s32 i;
 

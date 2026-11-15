@@ -1,8 +1,8 @@
 #include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
-extern unsigned char D_00189E20[];
-extern unsigned char D_00138180[];
+extern unsigned char g_hero_state[];
+extern unsigned char g_pad_state[];
 #define H ((Hero *)D_00189E20)
 #define PAD ((Hero *)D_00138180)
 
@@ -17,45 +17,45 @@ extern u16 D_L00_001B0C04 __attribute__((sda));
 extern u16 D_L00_001B0C08 __attribute__((sda));
 extern int D_L00_001B0C0C __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
-extern AimEntry D_L00_00262570[];
-extern void func_L00_003FE8D0(char *);
-extern void func_L00_002C42E0(int, int);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_00282978(s16 *);
-extern int func_00282948(int *);
-extern void func_002829D8(float *);
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002AF568(void);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_002D4040(int);
-extern int func_L00_002D3F30(int, int);
+extern AimEntry g_weapon_l00_table[];
+extern void moby_init_private_data(char *);
+extern void hero_l00_set_action(int, int);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int FastDecTimer(s16 *);
+extern int math_fast_float_d(int *);
+extern void vec_fast_helper_b(float *);
+extern void cancel_hero_item_animation(void);
+extern void start_equipped_item_animation(void);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int get_ammo(int);
+extern int weapon_spend_ammo(int, int);
 /* The caller deliberately supplies a sixth GPR word (4) in the call slot;
  * retail overwrites it before consumption. Original return/unused-formal
  * intent remains unqualified, but the observed call prefix is preserved. */
-extern void func_00273318(float, float, float, void *, u32, void *, int, int, int);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L00_003FE920(char *, void *, int, void *);
-extern void func_L00_003FEAC8(char *, void *, void *, int);
-extern void func_L00_003FE280(char *, char *);
-extern s32 func_002AB1F0(u8 *);
-extern void func_002FDF40(float, float, float, float, void *, void *, void *, void *);
-extern int func_002FE5A0(float, void *, void *, void *, void *, void *, int *, int *);
-extern void func_L00_003FE310(void *, void *, void *);
-extern int func_L00_003FE2D0(int, int, int);
+extern void hud_add_moby_marker(float, float, float, void *, u32, void *, int, int, int);
+extern int PlayMobySound(int, int, char *);
+extern void weapon_compute_spread_shot_velocity(char *, void *, int, void *);
+extern void part_spawn_linked_effect_with_sparks(char *, void *, void *, int);
+extern void moby_compute_offset_point(char *, char *);
+extern s32 moby_get_private_value_0(u8 *);
+extern void CalculateAimedLaunchVelocity(float, float, float, float, void *, void *, void *, void *);
+extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *, void *, int *, int *);
+extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
+extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
 extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
-extern int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern void func_L00_002D6B70(void);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L00_003FE490(void *);
+extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void slot_reset_active(void);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void moby_draw_attached_effect(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
 typedef struct { float timer; s16 delay; s16 repeat; int index; int pad0C; char *list[0]; } BeamState;
 
 /* Per-frame update of the Tetrabomb Gun weapon: aims, fires and runs the reload timer. */
-void func_L00_003FE4C8(unsigned char *object) {
+void tetrabomb_gun_update(unsigned char *object) {
     float origin[4];
     float destination[4];
     AimEntry *entry;
@@ -70,23 +70,23 @@ void func_L00_003FE4C8(unsigned char *object) {
     int i;
     int phase;
 
-    InitObjectPrivateData(object);
-    if (H->i[2213] == 1) SetHeroAction_L00(29, 1);
+    moby_init_private_data(object);
+    if (H->i[2213] == 1) hero_l00_set_action(29, 1);
     if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
-        StartAnimationBlendedWithFlags(object, 1, 0, 6, 0);
+        anim_start_blended_with_flags(object, 1, 0, 6, 0);
     if (state->repeat != 0 && FastDecTimer(&state->repeat)) cancel_hero_item_animation();
     matrix_mul_vec3(origin, D_L00_001B0BF0, object + 0xC0);
     FastVecAdd(origin, origin, object + 0x10);
-    FastVectorHelperB(&state->timer);
+    vec_fast_helper_b(&state->timer);
     allowed = 1;
     if (H->i[2213] == 29) {
-        if (!FastFloatHelperD(&H->i[2381])) allowed = 0;
+        if (!math_fast_float_d(&H->i[2381])) allowed = 0;
         else {
             if (state->timer > 0.0f || !get_ammo(-1) || object[0x20] != 1)
                 color = 0x600000FF;
             else color = 0x600FFF0F;
-            AddMobyMarker(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
+            hud_add_moby_marker(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
         }
     } else H->i[2381] = 40;
     phase = (u8)object[0x20];
@@ -94,9 +94,9 @@ void func_L00_003FE4C8(unsigned char *object) {
         if (D_L00_001A8F00 != 0 || !allowed || state->timer != 0.0f || H->b[8892] != 0 ||
             (u8)object[0x42] > 1 || !(PAD->u[104] & H->u[1164]) || H->i[1168] < 23) return;
         if (get_ammo(-1)) {
-            SpendWeaponAmmo(-1, 1);
+            weapon_spend_ammo(-1, 1);
             D_L00_001B2BE8 = phase;
-            if (H->i[2213] != 29) StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
+            if (H->i[2213] != 29) anim_start_blended_with_flags(object, 2, 0, 2, 0);
             PlayMobySound(0, 0, object);
             start_equipped_item_animation();
             object[0x20] = 2;
@@ -107,12 +107,12 @@ void func_L00_003FE4C8(unsigned char *object) {
             PlayMobySound(1, 0, object);
             D_L00_001B2BE8 = 0;
         }
-        entry = gWeaponTable_L00 + D_00139581[0];
+        entry = g_weapon_l00_table + D_00139581[0];
         state->timer = 1.0f / entry->rate;
     } else if (phase == 2) {
         if (!FastDecTimer(&state->delay)) return;
-        ComputeSpreadShotVelocity(object, destination, state->index, origin);
-        SpawnLinkedEffectWithSparks(object, origin, destination, state->index);
+        weapon_compute_spread_shot_velocity(object, destination, state->index, origin);
+        part_spawn_linked_effect_with_sparks(object, origin, destination, state->index);
         index = state->index + 1;
         state->index = index;
         if (index >= D_L00_001B0C0C) object[0x20] = 3;

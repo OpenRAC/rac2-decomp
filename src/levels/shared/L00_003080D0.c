@@ -10,12 +10,12 @@ typedef struct Map80D0 {
     unsigned char mask[32][4];
 } Map80D0;
 extern Map80D0 D_L00_001C93A0;
-extern int func_L00_00308700(int);
-extern int D_001A79F0 __attribute__((sda));
-extern int func_L00_00308538(void);
-extern void func_00297FE8(float, float, float *, float *, int);
+extern int level_lookup_cache_entry(int);
+extern int g_current_map_index __attribute__((sda));
+extern int level_dispatch_event_once(void);
+extern void map_convert_world_to_map_position(float, float, float *, float *, int);
 /* Clears the unexplored-map bits around a world position wherever the map colour matches the colour at that spot. */
-void func_L00_003080D0(float *position)
+void coll_clear_map_bits_around_pos(float *position)
 {
     float px, py;
     int x, y, maxY, maxX, minY, minX;
@@ -27,9 +27,9 @@ void func_L00_003080D0(float *position)
     int bit;
     if (D_L00_001C93A0.active == 0)
         return;
-    if (DispatchLevelEventOnce())
+    if (level_dispatch_event_once())
         return;
-    ConvertWorldToMapPosition(position[0], position[1], &px, &py, gCurrentMapIndex);
+    map_convert_world_to_map_position(position[0], position[1], &px, &py, g_current_map_index);
     x = (int)(px * 512.0f) + 1;
     y = (int)(py * 512.0f) + 1;
     if (x < 0 || y < 0 || x >= 512 || y >= 512)
@@ -43,7 +43,7 @@ void func_L00_003080D0(float *position)
     if (minX < 0) minX = 0;
     if (maxX >= 512) maxX = 511;
     regionRow = (y >> 5) * 16;
-    LookupCacheEntry((x >> 5) + regionRow);
+    level_lookup_cache_entry((x >> 5) + regionRow);
     sampleRow = y & 31;
     sampleRow *= 16;
     {
@@ -70,7 +70,7 @@ void func_L00_003080D0(float *position)
                     int dx = col - x + 16;
                     if ((*(D_L00_001C93A0.mask[0] + (dx / 8 + (dy << 2))) >> (dx % 8)) & 1)
                         continue;
-                    LookupCacheEntry((col >> 5) + regionRow);
+                    level_lookup_cache_entry((col >> 5) + regionRow);
                     sample = (col & 31) / 2;
                     sample = *(D_L00_001C93A0.samples + sample + sampleRow);
                     if (col & 1) sample >>= 4;

@@ -8,28 +8,28 @@ typedef union {
     struct { char prefix[0x144]; PurchaseRow rows[0]; } group;
     struct { char prefix[0x148]; PurchaseRow rows[0]; } cost;
 } PurchaseModel;
-extern PurchaseModel D_L00_0022F7C0;
-extern char D_00138180[];
+extern PurchaseModel g_purchase_menu_model;
+extern char g_pad_state[];
 /* Retail rereads this byte between its bit test and update at 003742B0/003742C4. */
 extern unsigned char D_001A7A80[] MACRO_ADDR;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x98]; int flag[3]; char tail[0x3C]; } Metadata;
-extern char D_L00_00262570[];
+extern char g_weapon_l00_table[];
 /* Runtime menu parameters; the element count belongs to the selected menu. */
 extern int D_L00_001AD4F0[] SDATA(D_L00_001AD4F0);
 extern void ref_L00_00373F48_00(void);
-extern int func_002B0D70(void);
-extern int func_002E5CF8(int, int, char *);
-extern int func_00288FB8(int);
-extern void func_002F88D8(void *);
-extern int func_L00_00326950(int);
-extern void func_L00_002F5890(int);
-extern void func_002F73A8(void);
-extern void func_002FB1A0(void);
+extern int save_count_items_above_baseline(void);
+extern int PlayMobySound(int, int, char *);
+extern int GetLocalizedString(int);
+extern void shop_set_message_text(void *);
+extern int level_try_spend_counter(int);
+extern void level_spawn_on_second_mode(int);
+extern void BuildShopChannelList(void);
+extern void PrepareVendorSelectionPreview(void);
 
 /* Handles buying an upgrade in the shop: waits for the player to confirm, charges the bolts and marks the upgrade as owned. */
-void func_L00_00373F48(int *answer) {
-    PurchaseModel *model = &gPurchaseMenuModel;
+void UpdateItemPurchaseConfirmation(int *answer) {
+    PurchaseModel *model = &g_purchase_menu_model;
     int cost = model->cost.rows[model->head.index].value;
     int state = model->head.state;
     int category;
@@ -38,50 +38,50 @@ void func_L00_00373F48(int *answer) {
     if (state == 1) {
         if (*(int *)((char *)model + 0x740) != 0) {
             ref_L00_00373F48_00();
-            gPurchaseMenuModel.head.state = 2;
-        } else gPurchaseMenuModel.head.state = 0;
+            g_purchase_menu_model.head.state = 2;
+        } else g_purchase_menu_model.head.state = 0;
     } else if (state == 2) {
-        if (*(unsigned int *)(gPadState + 0x1C4) & 0x10) {
+        if (*(unsigned int *)(g_pad_state + 0x1C4) & 0x10) {
             *answer = 0;
-            gPurchaseMenuModel.head.state = 4;
-        } else if (*(unsigned int *)(gPadState + 0x1C4) & 0x40)
-            gPurchaseMenuModel.head.state = 3;
+            g_purchase_menu_model.head.state = 4;
+        } else if (*(unsigned int *)(g_pad_state + 0x1C4) & 0x40)
+            g_purchase_menu_model.head.state = 3;
     } else if (state == 3) {
         *answer = 0;
-        if (CountItemsAboveBaseline() < cost) {
+        if (save_count_items_above_baseline() < cost) {
             PlayMobySound(2, 17, *(char **)((char *)model + 0x28));
-            gPurchaseMenuModel.head.state = 4;
+            g_purchase_menu_model.head.state = 4;
         } else {
-            int g = gPurchaseMenuModel.group.rows[model->head.index].value;
-            int c = gPurchaseMenuModel.category.rows[model->head.index].value;
+            int g = g_purchase_menu_model.group.rows[model->head.index].value;
+            int c = g_purchase_menu_model.category.rows[model->head.index].value;
             if ((unsigned long)D_001A7A80[g] & ((1U << (c * 2)) & 255UL)) *answer = 0;
             else *answer = 1;
-            gPurchaseMenuModel.head.state = 4;
+            g_purchase_menu_model.head.state = 4;
         }
     } else if (state == 4) {
         if (*answer != 0) {
-        if (CountItemsAboveBaseline() >= cost) {
-            SetShopMessageText((void *)GetLocalizedString(0x2DCB));
+        if (save_count_items_above_baseline() >= cost) {
+            shop_set_message_text((void *)GetLocalizedString(0x2DCB));
             PlayMobySound(7, 17, *(char **)((char *)model + 0x28));
-            TrySpendCounter(cost);
-            SpawnOnSecondMode(D_L00_001AD4F0[model->head.index]);
-            category = gPurchaseMenuModel.category.rows[gPurchaseMenuModel.head.index].value;
-            group = gPurchaseMenuModel.group.rows[gPurchaseMenuModel.head.index].value;
+            level_try_spend_counter(cost);
+            level_spawn_on_second_mode(D_L00_001AD4F0[model->head.index]);
+            category = g_purchase_menu_model.category.rows[g_purchase_menu_model.head.index].value;
+            group = g_purchase_menu_model.group.rows[g_purchase_menu_model.head.index].value;
             switch (category) {
-            case 0: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[0]; break;
-            case 1: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[1]; break;
-            case 2: enabled = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group] * 0xE0))->flag[2]; break;
+            case 0: enabled = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group] * 0xE0))->flag[0]; break;
+            case 1: enabled = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group] * 0xE0))->flag[1]; break;
+            case 2: enabled = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group] * 0xE0))->flag[2]; break;
             default: enabled = 0; break;
             }
             if (enabled) { int t = (1 << (category * 2)) | D_001A7A80[group]; D_001A7A80[group] = t; }
             {
-            int category2 = gPurchaseMenuModel.category.rows[gPurchaseMenuModel.head.index].value;
-            int group2 = gPurchaseMenuModel.group.rows[gPurchaseMenuModel.head.index].value;
+            int category2 = g_purchase_menu_model.category.rows[g_purchase_menu_model.head.index].value;
+            int group2 = g_purchase_menu_model.group.rows[g_purchase_menu_model.head.index].value;
             int enabled2;
             switch (category2) {
-            case 0: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[0]; break;
-            case 1: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[1]; break;
-            case 2: enabled2 = ((Metadata *)(gWeaponTable_L00 + gItemSlotToRecord[group2] * 0xE0))->flag[2]; break;
+            case 0: enabled2 = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group2] * 0xE0))->flag[0]; break;
+            case 1: enabled2 = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group2] * 0xE0))->flag[1]; break;
+            case 2: enabled2 = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group2] * 0xE0))->flag[2]; break;
             default: enabled2 = 0; break;
             }
             if (enabled2) {
@@ -94,11 +94,11 @@ void func_L00_00373F48(int *answer) {
             }
             BuildShopChannelList();
         } else {
-            SetShopMessageText((void *)GetLocalizedString(0x2DCC));
+            shop_set_message_text((void *)GetLocalizedString(0x2DCC));
             PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
         }
         } else PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
-        gPurchaseMenuModel.head.state = 0;
+        g_purchase_menu_model.head.state = 0;
         PrepareVendorSelectionPreview();
     }
 }

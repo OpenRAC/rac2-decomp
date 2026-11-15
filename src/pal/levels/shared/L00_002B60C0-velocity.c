@@ -33,19 +33,19 @@ typedef struct {
     u8 pad22A0[0x22C3 - 0x22A0];
     u8 moveMode;                     
 } HeroVelocity;
-extern HeroVelocity D_00189E20;
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282E20(void *);
-extern float func_L00_002D3A58(void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F70(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_002D3B58(void *, void *, float);
-extern void func_L00_002D3BD8(void *, void *, float);
-extern float func_L00_002B5590(void *);
+extern HeroVelocity g_hero_state;
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float vec_length_xy(void *);
+extern float cam_get_view_space_vector_length(void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_set_view_space_height(void *, void *, float);
+extern void cam_set_view_space_vector_length(void *, void *, float);
+extern float hero_get_speed_along_forward(void *);
 
 /* Moves the hero's velocity toward the requested one, accelerating harder when reversing. */
 void func_PAL_L00_002B60C0(float rate)
@@ -55,20 +55,20 @@ void func_PAL_L00_002B60C0(float rate)
     float u[4] __attribute__((aligned(16)));
     float angle, speed, dot, len, velLen;
 
-    switch (D_00189E20.moveMode) {
+    switch (g_hero_state.moveMode) {
     case 0:
-        angle = D_00189E20.inputAngle;
-        speed = D_00189E20.inputSpeed;
-        if (D_00189E20.f229C == 4 && D_00189E20.f524 && D_00189E20.f287)
+        angle = g_hero_state.inputAngle;
+        speed = g_hero_state.inputSpeed;
+        if (g_hero_state.f229C == 4 && g_hero_state.f524 && g_hero_state.f287)
             speed = 0.10000001f;
-        if (D_00189E20.f34A && D_00189E20.f2294 == 14 && speed > 0.020000001f)
+        if (g_hero_state.f34A && g_hero_state.f2294 == 14 && speed > 0.020000001f)
             speed = 0.020000001f;
-        v[0] = func_00283180(angle) * speed;
-        v[1] = func_00283198(angle) * speed;
-        v[2] = D_00189E20.velocity[2];
-        dot = -(D_00189E20.velocity[0] * v[0] + D_00189E20.velocity[1] * v[1]);
-        len = func_00282E20(v);
-        velLen = func_00282E20(D_00189E20.velocity);
+        v[0] = math_fast_sin_or_cos_a(angle) * speed;
+        v[1] = math_fast_sin_or_cos_b(angle) * speed;
+        v[2] = g_hero_state.velocity[2];
+        dot = -(g_hero_state.velocity[0] * v[0] + g_hero_state.velocity[1] * v[1]);
+        len = vec_length_xy(v);
+        velLen = vec_length_xy(g_hero_state.velocity);
         if (len == 0.0f || velLen == 0.0f) {
             dot = 0.0f;
         } else {
@@ -82,26 +82,26 @@ void func_PAL_L00_002B60C0(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
-        if (func_00282E20(v) > rate)
-            func_00282F70(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
-        qcopy(D_00189E20.lastVelocity, D_00189E20.velocity);
-        *(Quad *)t = *(Quad *)D_00189E20.vecA60;
-        D_00189E20.f1B4 = D_00189E20.f178 - func_L00_002B5590(t);
-        if (D_00189E20.f1454)
-            D_00189E20.f1B4 = D_00189E20.f174;
+        FastVecSub(v, v, g_hero_state.velocity);
+        if (vec_length_xy(v) > rate)
+            vec_fast_normalize_helper(v, v, rate);
+        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, v);
+        qcopy(g_hero_state.lastVelocity, g_hero_state.velocity);
+        *(Quad *)t = *(Quad *)g_hero_state.vecA60;
+        g_hero_state.f1B4 = g_hero_state.f178 - hero_get_speed_along_forward(t);
+        if (g_hero_state.f1454)
+            g_hero_state.f1B4 = g_hero_state.f174;
         break;
     case 1:
     case 2:
-        *(Quad *)t = *(Quad *)D_00189E20.targetDir;
-        speed = D_00189E20.inputSpeed;
-        func_L00_002D3B58(v, t, 0.0f);
-        func_00282F20(v, v, speed);
-        func_L00_002D3B58(u, D_00189E20.velocity, 0.0f);
-        dot = -func_00282DB0(u, v);
-        len = func_L00_002D3A58(v);
-        velLen = func_L00_002D3A58(D_00189E20.velocity);
+        *(Quad *)t = *(Quad *)g_hero_state.targetDir;
+        speed = g_hero_state.inputSpeed;
+        cam_set_view_space_height(v, t, 0.0f);
+        vec_scale_to_length(v, v, speed);
+        cam_set_view_space_height(u, g_hero_state.velocity, 0.0f);
+        dot = -FastVecDot(u, v);
+        len = cam_get_view_space_vector_length(v);
+        velLen = cam_get_view_space_vector_length(g_hero_state.velocity);
         if (len == 0.0f || velLen == 0.0f) {
             dot = 0.0f;
         } else {
@@ -115,14 +115,14 @@ void func_PAL_L00_002B60C0(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
-        func_L00_002D3B58(v, v, 0.0f);
-        if (func_L00_002D3A58(v) > rate)
-            func_L00_002D3BD8(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
-        D_00189E20.f1B4 = D_00189E20.f178;
-        if (D_00189E20.f1454)
-            D_00189E20.f1B4 = D_00189E20.f174;
+        FastVecSub(v, v, g_hero_state.velocity);
+        cam_set_view_space_height(v, v, 0.0f);
+        if (cam_get_view_space_vector_length(v) > rate)
+            cam_set_view_space_vector_length(v, v, rate);
+        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, v);
+        g_hero_state.f1B4 = g_hero_state.f178;
+        if (g_hero_state.f1454)
+            g_hero_state.f1B4 = g_hero_state.f174;
         break;
     }
 }

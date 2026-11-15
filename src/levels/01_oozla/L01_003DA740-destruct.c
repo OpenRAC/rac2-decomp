@@ -16,18 +16,18 @@ extern float D_L01_001B1640_gp[] SDATA(D_L01_001B1640);
 extern float D_L01_001B1644[] NOT_SDA;
 extern float D_L01_001B1648[] NOT_SDA;
 
-extern void func_002A7750(void *, int, int);
-extern void *func_002A9640(void *, int, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_002B0A68(void *, int, float *, unsigned char, float, float, float, float);
-extern void func_L00_00324F18(void *, void *, float, float, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_L01_002E1680(float *, float *, int, int, int, float, float, float);
-extern void func_L00_00326110(void *, int, float);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern void func_0029F338(void *);
+extern void moby_set_state(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_masked_debris(void *, int, float *, unsigned char, float, float, float, float);
+extern void vec_local_offset_to_world(void *, void *, float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void part_l01_spawn_spark_burst(float *, float *, int, int, int, float, float, float);
+extern void part_spawn_scaled_bolts(void *, int, float);
+extern int PlayMobySound(int, int, void *);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *);
 
 typedef struct { int blocked, timer; } DestructionState;
 
@@ -57,7 +57,7 @@ typedef struct {
    and once func_002B3868 reports done hides itself, counts in D_L01_001B3468
    for 120 frames and deletes itself. */
 /* Breakable object. When something hits it, it breaks into pieces, hides, and removes itself after a short wait. */
-void func_L01_0040F958(DestructionMoby *object)
+void breakable_l01_object_update_2(DestructionMoby *object)
 {
     float velocity[4] __attribute__((aligned(16)));
     EffectVector tilt;
@@ -67,12 +67,12 @@ void func_L01_0040F958(DestructionMoby *object)
     switch (object->state) {
     case 0:
         D_L01_001AEC38++;
-        SetMobyState(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (FindOwnedEffectSlot(object, 0x4010000, 0) && !state->blocked) {
+        if (part_find_owned_effect_slot(object, 0x4010000, 0) && !state->blocked) {
             D_L01_001AEC38--;
-            SetMobyState(object, 2, -1);
+            moby_set_state(object, 2, -1);
         }
         object->hit_slot = 255;
         break;
@@ -80,29 +80,29 @@ void func_L01_0040F958(DestructionMoby *object)
         FastVecScale(velocity, object->rot_row1, -0.06666667014360428f);
         if (object->visible && D_L01_001B2090_gp[0] < 0.9f && D_L01_001B208C_gp[0] < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0[0]) {
-            SpawnDebrisForMaskedParts(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
+            part_spawn_masked_debris(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             tilt.q = 0;
             tilt.f[1] = -0.015000000596046448f;
-            LocalOffsetToWorld(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
+            vec_local_offset_to_world(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
             matrix_mul_vec3(tilt.f, tilt.f, object->rot_row0);
-            SpawnSparkBurst_L01(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
+            part_l01_spawn_spark_burst(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
         } else
-            SpawnDebrisForMaskedParts(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
-        SpawnScaledBolts(object, 1, 0.0f);
+            part_spawn_masked_debris(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
+        part_spawn_scaled_bolts(object, 1, 0.0f);
         PlayMobySound(0, 0, object);
-        SetMobyState(object, 3, -1);
+        moby_set_state(object, 3, -1);
         break;
     case 3:
-        if (SetFirstPendingFlag(object)) {
+        if (flag_set_first_pending(object)) {
             object->visible = 0;
             object->collision_disable = 0;
             object->flags |= 1;
             state->timer = 120;
             D_L01_001B3468++;
         }
-        if (FastFloatHelperD(&state->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             D_L01_001B3468--;
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
         }
         break;
     }

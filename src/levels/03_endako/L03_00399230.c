@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void func_324168(s32 a0, s32 a1);
 extern void func_30D710(s32 a0, s32 a1);
 extern void func_32C010();
@@ -9,7 +9,7 @@ extern void *func_31DD78(char *a0, s32 a1, s32 a2);
 extern s32  func_32AB10(char *a0);
 extern s32  func_360A80(s32 a0, s32 a1, char *a2);
 extern void func_311758(void *a0);
-extern void func_L03_003D11E0(char *a0);
+extern void part_emit_debris_burst(char *a0);
 extern void func_31B920(char *a0, s32 a1, s32 a2);
 extern f32  func_31BAE8(f32 a0, f32 a1);
 extern f32  func_2F0000(f32 a0, f32 a1);
@@ -79,19 +79,19 @@ typedef struct {
 /* func_L03_003C72A8 is defined in L03_003C72A8-g8.c. */
 
 /* Starts the console's remote view: clears its counters and moves it to state 2. */
-void func_L03_003C7A40(char *moby)
+void console_start_remote_view(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
     *(u16 *)(vars + 0x106) = 0;
     *(s32 *)(vars + 0x100) = 0;
     *(u16 *)(moby + 0x34) |= 0x400;
-    SetMobyState(moby, 2, -1);
+    moby_set_state(moby, 2, -1);
     *(s32 *)(moby + 0x9C) = 0;
 }
 
 /* Marks the console as finished with its remote view. */
-void func_L03_003C7A88(char *moby)
+void console_end_remote_view(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -110,7 +110,7 @@ void func_L03_003C7A88(char *moby)
    The mode is kept in $v0 across the call, so the store lands in the call's
    delay slot. */
 /* Stores a mode in the object, builds its mode record and then releases the object. */
-void func_L03_003C85F8(char *moby, s32 mode)
+void object_store_mode_release(char *moby, s32 mode)
 {
     char buf[0x10];
     char *vars = *(char **)(moby + 0x68);
@@ -137,7 +137,7 @@ void func_L03_003C85F8(char *moby, s32 mode)
 /* Picks the actor's next motion slot: case 0 draws a random turn rate, case 1
    re-checks the 0x70-stride table entry before refreshing the aim. */
 /* Turns a spinning object toward a random heading and keeps its sound playing while it is active. */
-void func_L03_003CBD70(char *moby)
+void ant_ring_update(char *moby)
 {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
@@ -169,7 +169,7 @@ void func_L03_003CBD70(char *moby)
 /* func_L03_003CF0C0 is defined in L03_003CF0C0-g8.c. */
 
 /* Tells whether the object is in state 2, 3 or 4. */
-s32 func_L03_003CF7B8(u8 *moby)
+s32 actor_is_in_states_two_to_four(u8 *moby)
 {
     return (u8)(moby[0x20] - 2) < 3;
 }
@@ -177,7 +177,7 @@ s32 func_L03_003CF7B8(u8 *moby)
 /* func_L03_003CF7C8 is in L03_003CF7C8.c. */
 
 /* Sets up an object on its first frame and then keeps updating its attached effect. */
-void func_L03_003CFB30(char *moby)
+void attached_effect_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -185,7 +185,7 @@ void func_L03_003CFB30(char *moby)
     case 0:
         *(s32 *)(vars + 0x5C) |= 1;
         func_32C010(moby, vars + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         func_32C328(moby, vars + 0x60, 0);
@@ -196,14 +196,14 @@ void func_L03_003CFB30(char *moby)
 /* func_L03_003D0300 is defined in L03_003D0300-g8.c. */
 
 /* Waits until the object is hit or triggered, then runs its break routine and releases it. */
-void func_L03_003D1100(char *moby)
+void break_on_hit_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
         *(s32 *)(vars + 0x5C) |= 8;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1: {
         char *hit = (char *)func_31DD78(moby, 0x10000, 0);
@@ -212,7 +212,7 @@ void func_L03_003D1100(char *moby)
         if (func_32AB10(moby) != 0
             || (hit != 0 && (hitMoby = *(s32 *)(hit + 0x20)) != 0
                 && *(s16 *)(hitMoby + 0xAA) == 0xB1B /* moby class 2843 */)) {
-            EmitDebrisAndParticleBurst(moby);
+            part_emit_debris_burst(moby);
             func_360A80(0, 0, moby);
             func_311758(moby);
         } else {
@@ -231,7 +231,7 @@ void func_L03_003D1100(char *moby)
 
 
 /* Ends a scripted scene: restores the linked object so it shows and can be hit again. */
-void func_L03_003D1FB0(char *moby)
+void object_restore_linked_after_scene(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -248,7 +248,7 @@ void func_L03_003D1FB0(char *moby)
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
 /* Cleans up when the remote view ends: gives control back to the player and resets the camera. */
-void func_L03_003D20F8(char *moby)
+void console_remote_view_cleanup(char *moby)
 {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
@@ -286,14 +286,14 @@ void func_L03_003D20F8(char *moby)
 
 
 /* Spawns object class 0xB1B owned by `owner` and fills its 0x10E state record. */
-extern void *func_0029EFD0(int);
+extern void *CreateMoby(int);
 extern void func_002A0F48(void *);
 
 /* Spawns a kind-0xB1B object owned by OWNER at POSITION: opaque, a 0.015 rate, its state
    taking the two vectors, the three floats (in reverse order), a 0x10E word and the
    three bytes (the last twice). Returns the object, or 0. */
 /* Creates a new object of one kind and fills in its start values. Returns it, or 0 if none could be made. */
-u8 *func_L03_003E18D8(char *owner, void *position, void *first, void *second,
+u8 *object_spawn_and_init(char *owner, void *position, void *first, void *second,
                         u8 a, u8 b, u8 c, f32 x, f32 y, f32 z)
 {
     u8 *object;

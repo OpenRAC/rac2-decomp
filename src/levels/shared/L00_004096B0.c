@@ -5,15 +5,15 @@ typedef union { Vector128 bits; float f[4]; } __attribute__((aligned(16))) BeamV
 typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { float vertices[4][4]; unsigned int colors[4]; float uv[4][2]; u64 registers[4]; } __attribute__((aligned(16))) BeamQuad;
 
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L00_0040DF58(char *, char *);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void SpawnBurstEffects(char *, char *);
 extern char D_L00_001B8C80[];
 typedef struct SpawnState {
     short life;
@@ -96,17 +96,17 @@ typedef struct Obj_F23626ad8 {
 } Obj_F23626ad8;
 #endif
 
-extern void func_002A0488(Node24_F23626ad8 *a, unsigned char b, unsigned char c, unsigned char d);
+extern void set_moby_color(Node24_F23626ad8 *a, unsigned char b, unsigned char c, unsigned char d);
 
 extern void func_00282CF0_9(char *local, char *first, char *second);
 
 extern void func_00282CC0_15(char *target, char *first, char *local);
 
-extern void func_002AFFD8(char *a0, void *a1, int a2);
+extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
-extern void func_00282D30(void *a0, void *a1, float f12);
+extern void FastVecScale(void *a0, void *a1, float f12);
 
-extern void func_L00_00411F48(char *a0);
+extern void lightning_arcs_update_owned(char *a0);
 
 extern char ref_L00_004117B8_00[];
 
@@ -143,7 +143,7 @@ typedef struct {
 /* func_L00_0040D058 is defined in L00_0040D058-ribbon.c. */
 
 /* Creates a glowing flare effect facing the camera at a position, with the given size and colour. It also gives the camera a small shake when the flare is close. */
-char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+char *flare_spawn(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xf6d /* moby class 3949 */);
@@ -162,7 +162,7 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
         camera = D_L00_001B8C80 + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(object + 0x10, (char *)up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
@@ -183,7 +183,7 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
             if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
@@ -195,7 +195,7 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
             if (state->flags != 0) {
                 FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = FastAngleHelper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -213,7 +213,7 @@ char *func_L00_0040DC08(float size, char *position, int trigger, int kind, int r
 
 /* Tests the handle cached in the object and, while the handle reports itself already released, drops the next sub-handle, otherwise runs the object's destroy helper. */
 /* Per-frame update for the flare effect (moby class 3949): waits for its handle to be released, then removes the object. */
-void func_L00_0040DF00(char *object)
+void flare_update(char *object)
 {
     char *handle = *(char **)(object + 104);
 
@@ -237,7 +237,7 @@ void func_L00_0040DF00(char *object)
    2 above 30, else 1. The two lower bounds stay in variables, which is what keeps them in
    registers instead of an immediate compare. */
 /* Turns the object's charge level into a grade from 1 (low) to 4 (full). */
-int func_L00_00410840(char *object)
+int weapon_get_charge_grade(char *object)
 {
     int value = *(short *)(*(int *)(object + 0x68) + 0x1A);
     int upper = 0x3C;
@@ -256,7 +256,7 @@ int func_L00_00410840(char *object)
 /* func_L00_00410888 is defined in L00_00410888-g8.c. */
 
 /* Does nothing. Several object classes use it as an empty update. */
-void func_L00_00410D18(void)
+void moby_update_empty_alt(void)
 {
 }
 
@@ -264,7 +264,7 @@ void func_L00_00410D18(void)
 
 /* Calls a helper with a referenced node and three identity bytes of the object, then copies those bytes into a linked record when a node flag bit is set and the record exists with a non-zero leading short. */
 /* Applies the slot's colour to its target, and copies it into the target's linked record when that record allows it. */
-void func_L00_004110D8(Obj_F23626ad8 *slot)
+void target_apply_slot_color(Obj_F23626ad8 *slot)
 {
     Node24_F23626ad8 *target;
     Node16_F23626ad8 *record;
@@ -294,7 +294,7 @@ void func_L00_004110D8(Obj_F23626ad8 *slot)
    +0x0C word, then its first three words added to the buffer. The block's address differs
    from level to level, so it takes a per-level name. */
 /* Updates the positions of the 30 tracked targets, then redraws the lightning arcs of this object. */
-void func_L00_004117B8(char *moby)
+void tracked_target_offsets_update(char *moby)
 {
     char *slot = ref_L00_004117B8_00;
     char *owner = moby;
@@ -305,7 +305,7 @@ void func_L00_004117B8(char *moby)
     for (i = 0x1D; i >= 0; i--) {
         if (*(char **)(slot + 0x18) != 0) {
             target = *(char **)(slot + 0x18);
-            ComputeViewDirection(target + 0x10, offset, 1);
+            cam_compute_view_direction(target + 0x10, offset, 1);
             target = *(char **)(slot + 0x18);
             FastVecScale(offset, offset, *(float *)(target + 0xC) * 0.0008300250046886504f);
             target = *(char **)(slot + 0x18);
@@ -315,22 +315,22 @@ void func_L00_004117B8(char *moby)
         }
         slot = slot + 0x30;
     }
-    UpdateOwnedLightningArcs(owner);
+    lightning_arcs_update_owned(owner);
 }
 
 
 extern char D_L00_00256BC0[];
-extern char *func_002AB1F0(char *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float), func_00283198(float), func_00283CE0(int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern int func_00282948(void *);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_L00_00412928(void *, int, int);
+extern char *moby_get_private_value_0(char *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), IntToFloat(int);
+extern void FastVecAdd(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern int math_fast_float_d(void *);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void part_emit_spark_particle_pairs(void *, int, int);
 /* Moves each of this object's 48 flying pieces toward its target. When a piece arrives it hits the target with damage and sparks, and the piece is freed. */
-void func_L00_00411B30(char *moby)
+void tumbling_pieces_update(char *moby)
 {
     Vector128 offsetVec[1];
     char hitEvent[48];
@@ -343,9 +343,9 @@ void func_L00_00411B30(char *moby)
         currentPos = record + 0x20;
         qcopy(currentPos, record + 0x40);
         if (*(char **)(record + 0xb4)) {
-            linkData = GetMobyPrivateValue0(*(char **)(record + 0xb4));
+            linkData = moby_get_private_value_0(*(char **)(record + 0xb4));
             if (linkData) {
-                ComputeViewDirection(*(char **)(record + 0xb4) + 0x10, offsetVec, 1);
+                cam_compute_view_direction(*(char **)(record + 0xb4) + 0x10, offsetVec, 1);
                 FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
                 FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb4) + 0x10);
                 FastVecAdd(currentPos, offsetVec, currentPos);
@@ -366,17 +366,17 @@ void func_L00_00411B30(char *moby)
             *(float *)(record + 136) = FastAddRotations(*(float *)(record + 136), *(float *)(record + 148));
             *(float *)(record + 140) = FastAddRotations(*(float *)(record + 140), *(float *)(record + 152));
         }
-        *(float *)(record + 0) = FastSinOrCosA(*(float *)(record + 96)) * *(float *)(record + 120);
-        *(float *)(record + 4) = FastSinOrCosB(*(float *)(record + 100)) * *(float *)(record + 124);
-        *(float *)(record + 8) = -FastSinOrCosB(*(float *)(record + 104)) * *(float *)(record + 128);
-        *(float *)(record + 16) = FastSinOrCosA(*(float *)(record + 132)) * *(float *)(record + 156);
-        *(float *)(record + 20) = FastSinOrCosB(*(float *)(record + 136)) * *(float *)(record + 160);
-        *(float *)(record + 24) = -FastSinOrCosB(*(float *)(record + 140)) * *(float *)(record + 164);
+        *(float *)(record + 0) = math_fast_sin_or_cos_a(*(float *)(record + 96)) * *(float *)(record + 120);
+        *(float *)(record + 4) = math_fast_sin_or_cos_b(*(float *)(record + 100)) * *(float *)(record + 124);
+        *(float *)(record + 8) = -math_fast_sin_or_cos_b(*(float *)(record + 104)) * *(float *)(record + 128);
+        *(float *)(record + 16) = math_fast_sin_or_cos_a(*(float *)(record + 132)) * *(float *)(record + 156);
+        *(float *)(record + 20) = math_fast_sin_or_cos_b(*(float *)(record + 136)) * *(float *)(record + 160);
+        *(float *)(record + 24) = -math_fast_sin_or_cos_b(*(float *)(record + 140)) * *(float *)(record + 164);
         qcopy(record + 0x30, record + 0x50);
         if (*(char **)(record + 0xb0)) {
-            linkData = GetMobyPrivateValue0(*(char **)(record + 0xb0));
+            linkData = moby_get_private_value_0(*(char **)(record + 0xb0));
             if (linkData) {
-                ComputeViewDirection(*(char **)(record + 0xb0) + 0x10, offsetVec, 1);
+                cam_compute_view_direction(*(char **)(record + 0xb0) + 0x10, offsetVec, 1);
                 FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
                 FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb0) + 0x10);
                 FastVecAdd(record + 0x30, offsetVec, record + 0x30);
@@ -388,7 +388,7 @@ void func_L00_00411B30(char *moby)
         fraction /= IntToFloat(*(int *)(activeRecord + 0xbc));
         startPos = activeRecord + 0x20;
         lerp_vector(currentPos, startPos, currentPos, 1.0f - fraction);
-        if (!FastFloatHelperD(activeRecord + 0xb8)) continue;
+        if (!math_fast_float_d(activeRecord + 0xb8)) continue;
         if (*(int *)(*(char **)(activeRecord + 0xb0) + 0x98) && !*(int *)(activeRecord + 0xc0) && *(int *)(activeRecord + 0xc4)) {
             FastVecSub(offsetVec, currentPos, startPos);
             vec_scale_to_length(offsetVec, offsetVec, 0.033333335f);
@@ -400,15 +400,15 @@ void func_L00_00411B30(char *moby)
             *(short *)(hitEvent + 0x1a) = *(short *)(moby + 0xaa);
             QueueMobyImpact(*(char **)(activeRecord + 0xb0), hitEvent);
             *(int *)(activeRecord + 0xc0) = 1;
-            EmitSparkParticlePairs(currentPos, 10, 1);
+            part_emit_spark_particle_pairs(currentPos, 10, 1);
         }
-        if (FastFloatHelperD(activeRecord + 0xa8)) *(int *)(activeRecord + 0xac) = 0;
+        if (math_fast_float_d(activeRecord + 0xa8)) *(int *)(activeRecord + 0xac) = 0;
     }
 }
 
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_00412088(char *record)
+void effect_reset_record(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -444,7 +444,7 @@ void func_L00_00412088(char *record)
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
 /* Works out the next point of a curve from the two points before it. */
-void func_L00_00412408(Vec16_Fc936841d *points, int index)
+void curve_extend_from_two_points(Vec16_Fc936841d *points, int index)
 {
     char delta[16];
 

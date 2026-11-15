@@ -1,8 +1,8 @@
 #include "common.h"
 extern float Fe617c30b_FUN_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_002B9180(char *);
-extern void func_00282CC0(char *, char *, char *);
+extern int FloatToInt(float);
+extern void part_kill(char *);
+extern void FastVecAdd(char *, char *, char *);
 typedef int Quad_BB100 __attribute__((mode(TI)));
 typedef struct ParticleConfig_BB100 {
     float force[4];
@@ -30,13 +30,13 @@ typedef struct Particle_BB100 {
     float position[4];
     ParticleMotion_BB100 motion;
 } Particle_BB100;
-extern int func_00282978(void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_002AB168(void *, void *, void *, float);
-extern void func_00283410(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282FB8(void *, void *, float);
+extern int FastDecTimer(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_add_along_axis(void *, void *, void *, float);
+extern void euler_to_matrix(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void vec_fast_divide_helper(void *, void *, float);
 extern float D_001BAFC0[];
 #define PF(p,o) (*(float *)((char *)(p)+(o)))
 #define PI(p,o) (*(int *)((char *)(p)+(o)))
@@ -51,7 +51,7 @@ static __inline__ int frac_byte(float value, float scale)
     return result;
 }
 /* Moves an effect particle each frame. It bounces off walls, changes colour, fade, size and spin, and is removed when it is out of range or invisible. */
-void func_002BB100(Particle_BB100 *particle)
+void UpdateCollidingEffectParticle(Particle_BB100 *particle)
 {
     float next[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
@@ -70,7 +70,7 @@ void func_002BB100(Particle_BB100 *particle)
     config = motion->config;
     if ((config->flags&1) && CollLine(particle->position,next,4,particle,0)) {
         velocity[0]=motion->velocity[0]; velocity[1]=motion->velocity[1]; velocity[2]=motion->velocity[2];
-        AddVectorAlongAxis(temp,velocity,D_001BAFC0,config->bounce);
+        vec_add_along_axis(temp,velocity,D_001BAFC0,config->bounce);
         motion->velocity[0]=temp[0]; motion->velocity[1]=temp[1]; motion->velocity[2]=temp[2];
         vec_scale_to_length(offset,D_001BAFC0,0.055f);
         FastVecAdd((char *)particle->position,(char *)(D_001BAFC0-8),(char *)offset);
@@ -114,14 +114,14 @@ void func_002BB100(Particle_BB100 *particle)
             transform_vector(temp,config,matrix);
         } else *(Quad_BB100 *)temp=*(Quad_BB100 *)config;
         FastVecAdd((char *)next,(char *)next,(char *)temp);
-        FastVectorDivideHelper(next,next,config->damping);
+        vec_fast_divide_helper(next,next,config->damping);
         motion->velocity[0]=next[0];motion->velocity[1]=next[1];motion->velocity[2]=next[2];
     }
     particle->size+=config->sizeStep;
     if(particle->size<config->sizeMin)particle->size=config->sizeMin;
     if(particle->size>config->sizeMax)particle->size=config->sizeMax;
     motion->spin+=config->spinStep;
-    if(motion->alpha<=0.0f || FastDecTimer(&particle->life) || particle->position[0]<config->minimum[0] || particle->position[1]<config->minimum[1] || particle->position[2]<config->minimum[2] || particle->position[0]>config->maximum[0] || particle->position[1]>config->maximum[1] || particle->position[2]>config->maximum[2]) KillParticle((char *)particle);
+    if(motion->alpha<=0.0f || FastDecTimer(&particle->life) || particle->position[0]<config->minimum[0] || particle->position[1]<config->minimum[1] || particle->position[2]<config->minimum[2] || particle->position[0]>config->maximum[0] || particle->position[1]>config->maximum[1] || particle->position[2]>config->maximum[2]) part_kill((char *)particle);
 }
 #undef PF
 #undef PI

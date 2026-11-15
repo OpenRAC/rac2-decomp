@@ -5,86 +5,86 @@
 typedef unsigned char u8;
 typedef short s16;
 typedef int s32;
-extern char D_00188660[];
+extern char g_sound_state[];
 extern u8 *D_L10_001B251C __attribute__((sda));
 extern u8 *D_L10_001C3B40[];
 extern char ref_L10_00418D88_00[];
-extern s32 func_002ED688(u8 *);
-extern int func_L00_00367720(void);
-extern void func_L10_004190F0(u8 *);
-extern void func_L05_00379E60(int, int, int, int);
-extern void func_L05_0037C160(u8 *);
-extern int func_L05_0037B538(u8 *, int, int, int);
-extern void func_002E59F8(s32);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L05_0037B948(u8 *, int, float);
-extern void func_L10_004191E8(void *);
-extern int func_L05_0037B888(char *);
-extern void func_L05_0037B6D0(char *);
-extern int func_00282948(void *);
-extern void func_L10_00419348(u8 *);
-extern int func_00277F48(void *, int, void *, int, float);
-extern int func_002E5DA0(int, int, char *, int);
+extern s32 moby_get_motion_data(u8 *);
+extern int state_get_stored_pointer_value(void);
+extern void flying_object_restore_state(u8 *);
+extern void level_append_object(int, int, int, int);
+extern void moby_update_movement_state(u8 *);
+extern int moby_process_collision_hit(u8 *, int, int, int);
+extern void snd_stop_voice(s32);
+extern int PlayMobySound(int, int, char *);
+extern void moby_check_player_in_view_and_range(u8 *, int, float);
+extern void lightning_object_update_state(void *);
+extern int moby_can_take_next_step(char *);
+extern void moby_start_movement_state(char *);
+extern int math_fast_float_d(void *);
+extern void part_l10_spawn_tail_trail_marks(u8 *);
+extern int coll_process_hit(void *, int, void *, int, float);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 typedef struct { char pad0[0x104]; int f104; int f108; int pad10c; int f110; int pad114[2]; int f11C; u8 *f120; } Motion;
 
 /* Updates the two attack modes, chooses a live target and maintains its sound. */
 /* Update for moby class 3987, a flying enemy. It attacks, picks a live target and keeps its sound going. */
-void func_L10_00418D88(u8 *self) {
+void flying_l10_enemy_update(u8 *self) {
     char *state = *(char **)(self + 0x68);
-    Motion *motion = (Motion *)GetMobyMotionData(self);
+    Motion *motion = (Motion *)moby_get_motion_data(self);
     Motion *otherMotion;
     u8 *target, *current;
     int handle, i, count;
     switch (self[0x20]) {
     case 0:
         self[0x30] = 255;
-        if (!GetStoredPointerValue()) return;
-        RestoreFlyingObjectState(self);
+        if (!state_get_stored_pointer_value()) return;
+        flying_object_restore_state(self);
         if (*(int *)(state + 0x264))
-            AppendLevelObject((int)self, (int)ref_L10_00418D88_00, 0, 0);
+            level_append_object((int)self, (int)ref_L10_00418D88_00, 0, 0);
         break;
     case 1:
         *(float *)(self + 0x2C) = 0.019999999552965164f;
-        UpdateObjectMovementState(self);
-        if (ProcessObjectCollisionHit(self, 0, 0, 0)) {
+        moby_update_movement_state(self);
+        if (moby_process_collision_hit(self, 0, 0, 0)) {
             handle = *(int *)(state + 0x26C);
             if (handle != -1) {
-                char *e = gSoundState + handle * 0x70;
-                if (*(u8 **)(e + 0x88) == self && *(u8 *)(e + 0x74)) StopSoundVoice(handle);
+                char *e = g_sound_state + handle * 0x70;
+                if (*(u8 **)(e + 0x88) == self && *(u8 *)(e + 0x74)) snd_stop_voice(handle);
             }
             *(int *)(state + 0x26C) = -1;
             PlayMobySound(1, 0, (char *)self);
         }
         if (motion->f110) {
-            CheckPlayerInViewAndRange(self, 0, 176.0f);
+            moby_check_player_in_view_and_range(self, 0, 176.0f);
             if (*(int *)(state + 0x260) != -1) {
                 motion->f11C = 1;
                 motion->f120 = D_L10_001B251C + (*(int *)(state + 0x260) << 8);
             }
-            if (motion->f108 && motion->f104) UpdateLightningObjectState(self);
-            if (CanObjectTakeNextStep((char *)self)) StartObjectMovementState((char *)self);
-            FastFloatHelperD(state + 0x268);
-            SpawnTailTrailMarks_L10(self);
+            if (motion->f108 && motion->f104) lightning_object_update_state(self);
+            if (moby_can_take_next_step((char *)self)) moby_start_movement_state((char *)self);
+            math_fast_float_d(state + 0x268);
+            part_l10_spawn_tail_trail_marks(self);
         }
         break;
     case 2:
         *(float *)(self + 0x2C) = 0.07999999821186066f;
-        UpdateObjectMovementState(self);
-        ProcessObjectCollisionHit(self, 0, 0, 0);
+        moby_update_movement_state(self);
+        moby_process_collision_hit(self, 0, 0, 0);
         if (!motion->f110) break;
-        CheckPlayerInViewAndRange(self, 0, 176.0f);
+        moby_check_player_in_view_and_range(self, 0, 176.0f);
         current = motion->f120;
         if (current) {
-            otherMotion = (Motion *)GetMobyMotionData(current);
+            otherMotion = (Motion *)moby_get_motion_data(current);
             if (!otherMotion->f110) motion->f120 = 0;
         }
         if (!current || !motion->f120) {
-            count = ProcessCollisionHit(self + 0x10, 0, self, 0, 80.0f);
+            count = coll_process_hit(self + 0x10, 0, self, 0, 80.0f);
             for (i = 0; i < count; i++) {
                 target = D_L10_001C3B40[i];
                 if (*(s16 *)(target + 0xAA) == 0xCBE /* moby class 3262 */) {
-                    otherMotion = (Motion *)GetMobyMotionData(target);
+                    otherMotion = (Motion *)moby_get_motion_data(target);
                     if (otherMotion->f110) {
                         motion->f120 = target;
                         motion->f11C = 0;
@@ -93,15 +93,15 @@ void func_L10_00418D88(u8 *self) {
                 }
             }
         }
-        if (motion->f104) UpdateLightningObjectState(self);
-        if (CanObjectTakeNextStep((char *)self)) StartObjectMovementState((char *)self);
-        FastFloatHelperD(state + 0x268);
-        SpawnTailTrailMarks_L10(self);
+        if (motion->f104) lightning_object_update_state(self);
+        if (moby_can_take_next_step((char *)self)) moby_start_movement_state((char *)self);
+        math_fast_float_d(state + 0x268);
+        part_l10_spawn_tail_trail_marks(self);
         break;
     }
     {
-    char *e = gSoundState + *(int *)(state + 0x26C) * 0x70;
+    char *e = g_sound_state + *(int *)(state + 0x26C) * 0x70;
     if (*(u8 **)(e + 0x88) != self || !*(u8 *)(e + 0x74))
-        *(int *)(state + 0x26C) = PlaySoundFromClassBank(3, 6, (char *)self, 0xF93);
+        *(int *)(state + 0x26C) = snd_play_from_class_bank(3, 6, (char *)self, 0xF93);
     }
 }

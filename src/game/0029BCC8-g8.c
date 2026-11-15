@@ -2,11 +2,11 @@
 /* func_0029BCD8 is in 0029BCC8-g8.c (it reaches small data through $gp). */
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_0029BB30(void);
-extern unsigned int func_00285840(void);
-extern void func_0029B858(void);
+extern void UpdateMissionSelectionMenu(void);
+extern unsigned int menu_get_saved_state(void);
+extern void level_run_update(void);
 
 typedef int (*Fn)(void);
 
@@ -23,7 +23,7 @@ typedef struct {
 } Sub;
 
 /* Runs the per-frame level callbacks and draws or updates the level, unless a callback asks to stop. */
-void func_0029BCD8(void)
+void level_run_callbacks(void)
 {
     int i;
     int result;
@@ -58,9 +58,9 @@ void func_0029BCD8(void)
     if (result != 0)
         return;
 states:
-    if (gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 5) {
-        if (gCurrentGameMode[0] == 4) {
-            if (GetSavedMenuState() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (menu_get_saved_state() != 7)
                 return;
         }
     }
@@ -69,17 +69,17 @@ states:
         char *b = g + 0x38000;
         g = (char *)((Sub *)b)->cb1;
         ((Fn)g)();
-        RunLevelObjectUpdate();
+        level_run_update();
     }
 }
 
 /* func_0029BF08: the same level-object callback tables as func_0029BCD8, but at
    different offsets, plus a camera projection scale written around a call. */
 extern int ref_L00_0030CFE0_00[] __attribute__((sda));
-extern void func_00290680(void);
+extern void hud_update_letterbox_bars(void);
 extern void func_0029BEB8(void);
 extern void func_0029BE88(void);
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 typedef unsigned int (*Cb)(void);
 
@@ -103,7 +103,7 @@ typedef struct { char pad[0xB0]; float scale; } CamBf;
 extern CamBf ref_L00_0030CFE0_01;
 
 /* Like the previous routine, but also draws the level with a temporary camera scale. */
-void func_0029BF08(void)
+void level_run_callbacks_and_draw(void)
 {
     int result;
     int i;
@@ -118,7 +118,7 @@ void func_0029BF08(void)
     if (D_001A8CFC[0] == 0)
         goto states;
 
-    UpdateLetterboxBars();
+    hud_update_letterbox_bars();
     result = 0;
     func_0029BEB8();
 
@@ -142,9 +142,9 @@ void func_0029BF08(void)
         return;
 
 states:
-    if (gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 5) {
-        if (gCurrentGameMode[0] == 4) {
-            if (GetSavedMenuState() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (menu_get_saved_state() != 7)
                 return;
         }
     }
@@ -179,7 +179,7 @@ typedef struct Entry29D830 {
     short result;
 } Entry29D830;
 typedef struct { char pad[0x230]; int index; } Base29D830;
-extern Base29D830 D_001C4FA0;
+extern Base29D830 g_map_overlay_state;
 extern Entry29D830 *D_00258BA0[];
 typedef struct { int unused; int count; Entry29D830 *list; } State29D830;
 extern State29D830 D_001B1A50[] __attribute__((sda));
@@ -187,16 +187,16 @@ extern unsigned char D_001A7BE8[] MACRO_ADDR;
 extern int func_0029D9D0(int, int);
 
 /* Updates the state of each entry in the current list, runs their checks, and returns 1 when none are still pending. */
-int func_0029D830(void)
+int menu_update_entry_states(void)
 {
     Entry29D830 *e;
 
-    D_001B1A50[0].list = D_00258BA0[gMapOverlayState.index];
+    D_001B1A50[0].list = D_00258BA0[g_map_overlay_state.index];
     if (D_001B1A50[0].list == 0)
         return 0;
     e = D_001B1A50[0].list;
     for (; e->id != 0; e++) {
-        if ((e->flags & 4) && D_001A7BE8[gMapOverlayState.index] == 0) {
+        if ((e->flags & 4) && D_001A7BE8[g_map_overlay_state.index] == 0) {
             e->state = 0;
             continue;
         }

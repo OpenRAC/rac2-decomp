@@ -1,41 +1,41 @@
 #include "common.h"
 
-extern int D_L10_001B13A4 __attribute__((sda));
+extern int g_mission_initialized __attribute__((sda));
 extern int D_L10_00221CFC __attribute__((section(".data")));
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(int);
-extern unsigned char **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
-extern void func_L05_0037B280(void *, int);
-extern void func_L10_00425798(void);
-extern void func_L10_00425410(int, void *);
-extern void *func_L05_00379ED0(int);
-extern int func_L05_0037B3A0(void *);
-extern void func_L10_00423DC8(void *, int);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(int);
+extern unsigned char **level_get_object_list(void);
+extern int level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(void *, int);
+extern void cloud_destroy_leftover_objects(void);
+extern void cloud_spawn_objects(int, void *);
+extern void *level_find_object_by_class_id(int);
+extern int list_count_ready_objects(void *);
+extern void hrugis_finish_mission_reward(void *, int);
 
 /* Mission controller for the third challenge: sets up on the first frame, then ends the round
    once every class 3982 target is gone. */
-void func_L10_00424448(void *object)
+void mission_third_update(void *object)
 {
     unsigned char **entries;
     int i, count;
 
-    if (!gMissionInitialized) {
+    if (!g_mission_initialized) {
         D_L10_00221CFC = 0;
-        gMissionInitialized = 1;
+        g_mission_initialized = 1;
         music_Unpause();
-        InitAllRegisteredEntries();
-        SetPlayerStateField13(0);
-        entries = GetLevelObjectList();
-        count = GetLevelSavedValue();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        entries = level_get_object_list();
+        count = level_get_saved_value();
         for (i = 0; i < count; i++) {
             if (*(short *)(entries[i] + 0xAA) == 0xF8E /* moby class 3982 */)
-                SpawnEntryListObjectsWithFlag(entries[i], 1);
+                entry_spawn_list_objects_with_flag(entries[i], 1);
         }
-        DestroyLeftoverCloudObjects();
-        SpawnCloudObjects(0x32, (void *)0xC);
+        cloud_destroy_leftover_objects();
+        cloud_spawn_objects(0x32, (void *)0xC);
     }
-    if (!CountReadyListObjects(FindLevelObjectByClassId(0xF8E /* moby class 3982 */)))
-        FinishMissionAndGrantReward(object, 2);
+    if (!list_count_ready_objects(level_find_object_by_class_id(0xF8E /* moby class 3982 */)))
+        hrugis_finish_mission_reward(object, 2);
 }

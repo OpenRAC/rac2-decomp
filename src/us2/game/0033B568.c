@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { float x, y, width, height; } TitlePosition;
-extern void func_00336710(void *, void *, void *);
-extern int func_00335E20(void *);
+extern void object_init_derived_c(void *, void *, void *);
+extern int object_get_fourth_field(void *);
 extern void func_US2_003377B0(void *, void *, void *);
-extern int *func_00336DA8(int, int);
-extern int func_00336E40(void *);
-extern void func_00335F88(void *, float, float, float, float);
+extern int *ui_return_second_arg(int, int);
+extern int pool_alloc_cell(void *);
+extern void object_set_second_float4(void *, float, float, float, float);
 extern float D_001B23A4 __attribute__((sda));
 extern char D_001ADC88[];
 
@@ -21,7 +22,7 @@ void func_US2_0033B568(unsigned char *obj, void *arg)
     *(int *)(obj + 0x208) = 0;
     *(void **)(obj + 0x210) = arg;
     if (arg != 0) {
-        int *alloc = func_00336DA8(16, func_00336E40(arg));
+        int *alloc = ui_return_second_arg(16, pool_alloc_cell(arg));
         *(int **)(obj + 0x20C) = alloc;
         alloc[1] = 0;
         alloc[2] = 0;
@@ -40,12 +41,12 @@ void func_US2_0033B568(unsigned char *obj, void *arg)
     text = D_001ADC88;
     p = *(TitlePosition **)(obj + 0x20C);
     p->y = v;
-    func_00336710(obj + 0x134, text, *(void **)(obj + 0x210));
-    func_00335F88(obj + 0x134, 24.0f, 24.0f, 0.0f, 0.0f);
-    *(int *)func_00335E20(obj + 0x134) = 0x60F0F0B0;
+    object_init_derived_c(obj + 0x134, text, *(void **)(obj + 0x210));
+    object_set_second_float4(obj + 0x134, 24.0f, 24.0f, 0.0f, 0.0f);
+    *(int *)object_get_fourth_field(obj + 0x134) = 0x60F0F0B0;
     v = 65.0f;
     *(float *)(obj + 0x214) = v;
     func_US2_003377B0(obj + 0x170, text, *(void **)(obj + 0x210));
-    *(int *)func_00335E20(obj + 0x170) = 0x80F0F0F0;
-    func_00335F88(obj + 0x170, 0.7f, 0.7f, 0.0f, 0.0f);
+    *(int *)object_get_fourth_field(obj + 0x170) = 0x80F0F0F0;
+    object_set_second_float4(obj + 0x170, 0.7f, 0.7f, 0.0f, 0.0f);
 }

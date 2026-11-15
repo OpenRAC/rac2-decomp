@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,15 +24,15 @@
  */
 #include "common.h"
 
-extern s32 func_0011D620(s8 *a0, s32 a1, s32 a2, s8 *a3, s32 t0, s32 *t1, s32 t2, s32 t3, s32 s9);
-extern s32 func_0011D810(s8 *a0, s32 a1);
-extern void func_00128898(s8 *a0);
+extern s32 sceSifCallRpc(s8 *a0, s32 a1, s32 a2, s8 *a3, s32 t0, s32 *t1, s32 t2, s32 t3, s32 s9);
+extern s32 sif_rpc_is_handle_valid(s8 *a0, s32 a1);
+extern void debug_print_stub(s8 *a0);
 extern s8 D_00143130[];
 extern s8 D_00143180[];
 extern s8 D_0013B990[];
 
 /* Sends a command with extra data to the vibration (rumble) server. Returns 1 on success. */
-s32 func_001286C8(s32 port, s32 command, s32 *sizePtr, u8 *data) {
+s32 dbc_send_vibration_command(s32 port, s32 command, s32 *sizePtr, u8 *data) {
     s32 i;
     s32 result;
     s8 *packet;
@@ -48,12 +49,12 @@ s32 func_001286C8(s32 port, s32 command, s32 *sizePtr, u8 *data) {
             i += 1;
         } while (i < *sizePtr);
     }
-    if (IsRpcHandleValid(D_00143130, i) == 1) {
+    if (sif_rpc_is_handle_valid(D_00143130, i) == 1) {
         return 0;
     }
-    result = CallRpcServer(D_00143130, 0x8000091B, 1, D_00143180, 0x400, D_00143180, 0x400, 0, 0);
+    result = sceSifCallRpc(D_00143130, 0x8000091B, 1, D_00143180, 0x400, D_00143180, 0x400, 0, 0);
     if (result < 0) {
-        DebugPrintStub(D_0013B990);
+        debug_print_stub(D_0013B990);
         return 0;
     }
     return 1;

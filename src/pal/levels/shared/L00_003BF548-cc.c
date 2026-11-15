@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_PAL_L00_003BF548, the PAL copy of func_L00_003BB8B8: the same C. */
 #include "common.h"
 
-extern void func_002833F0(void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 typedef struct { float x, y, z; int unused; float position[4]; } EffectLightRecord;
 extern EffectLightRecord D_L00_001C6F40[];
-extern void func_L00_003BD510(float *, float *, int, int);
-extern void func_L00_003BC998(char *, char *);
+extern void part_l00_spawn_spark_burst_2(float *, float *, int, int);
+extern void spark_spawn_orbit(char *, char *);
 
 /* The vector the aim helpers read, at 0x001B8C80. */
 typedef struct {
@@ -33,12 +34,12 @@ extern L00AimVector D_L00_001B8C80;
 /* Opens the block, lays seven oriented sprites over it from two helper draws and the shared
    colour word, then runs the two slot-table passes and closes the block. */
 extern int D_L00_0023DDA0[];
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern void func_00282C88(void *);
-extern char *func_002AB1F0(char *);
-extern void func_L00_003252A8(char *, void *, int);
-extern void func_00282D30(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void vec_clear_128(void *);
+extern char *moby_get_private_value_0(char *);
+extern void moby_forward_position_call(char *, void *, int);
+extern void FastVecScale(void *, void *, float);
 
 /* Claims the first free one of the thirty 0xA0-byte records at D_L00_0023DDA0 for self:
    counts it in self's data, copies self's position, draws three triples from the ranges
@@ -69,36 +70,36 @@ void func_PAL_L00_003BF548(char *self, char *target, int count)
             max_scale = 0.005f;
             min_dist = 3.25f;
             max_dist = 4.75f;
-            *(float *)(p + 64) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 68) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 72) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 100) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 104) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 108) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 76) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 80) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 84) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 112) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 116) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 120) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 88) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 92) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 96) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 124) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 128) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 132) = func_002A7878(min_dist, max_dist);
-            func_00282C88(p);
-            func_00282C88(p + 0x10);
+            *(float *)(p + 64) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 68) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 72) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 100) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 104) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 108) = math_random_float_range(min_angle, max_angle);
+            *(float *)(p + 76) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 80) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 84) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 112) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 116) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 120) = math_random_signed_float_range(min_scale, max_scale);
+            *(float *)(p + 88) = math_random_float_range(min_dist, max_dist);
+            *(float *)(p + 92) = math_random_float_range(min_dist, max_dist);
+            *(float *)(p + 96) = math_random_float_range(min_dist, max_dist);
+            *(float *)(p + 124) = math_random_float_range(min_dist, max_dist);
+            *(float *)(p + 128) = math_random_float_range(min_dist, max_dist);
+            *(float *)(p + 132) = math_random_float_range(min_dist, max_dist);
+            vec_clear_128(p);
+            vec_clear_128(p + 0x10);
             *(int *)(p + 0x94) = count;
             *(int *)(p + 0x98) = count;
             *(char **)(p + 0x90) = target;
             *(int *)(p + 0x9C) = 0;
             *(int *)(p + 0x88) = 17;
-            info = func_002AB1F0(target);
+            info = moby_get_private_value_0(target);
             if (info) {
-                func_L00_003252A8(target, v, 1);
-                func_00282D30(v, v, *(float *)(info + 0x10));
-                func_00282CC0(p + 0x30, v, target + 0x10);
+                moby_forward_position_call(target, v, 1);
+                FastVecScale(v, v, *(float *)(info + 0x10));
+                FastVecAdd(p + 0x30, v, target + 0x10);
             } else {
                 qcopy(p + 0x30, target_position);
             }
@@ -145,7 +146,7 @@ extern Rac2Native_003BC998_Slot D_L00_0023F060[];
    in their own variables, and the two owner words are stored in the order 0x9C, 0x98, so that
    cc1 keeps the table base and the output pointer in registers and fills the delay slots the
    way retail does. */
-void func_L00_003BC998(char *owner, char *arg1);
+void spark_spawn_orbit(char *owner, char *arg1);
 
 /* Near miss: nonmatching/levels/func_L00_003BCDC0.c - every instruction present but the
    loop test is `sltu` here against retail's `slt`, and the base is derived from the end
@@ -154,7 +155,7 @@ void func_L00_003BC998(char *owner, char *arg1);
 /* Emits count pairs of sparks at position, moving along direction turned by a random rotation;
    position is jittered a little before each pair. Both arms of the random-bit test are the same
    code: retail keeps the test, so it stays. */
-void func_L00_003BD510(float *position, float *direction, int count, int color);
+void part_l00_spawn_spark_burst_2(float *position, float *direction, int count, int color);
 
 /* func_L00_003BD7E0 is in L00_003B9CB8-update.c. */
 
@@ -162,7 +163,7 @@ void func_L00_003BD510(float *position, float *direction, int count, int color);
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
 /* The four floats are declared before the two other arguments, which sets the order this caller
    evaluates them in (the registers are the same either way). */
-extern void func_002833F0(void *out, void *in);
+extern void euler_rotation_basis(void *out, void *in);
 
 /* Copies the caller's 16-byte block into a stack scratch area, runs the three-argument starter on
    it, then fills the scratch area's upper half from the state block's 0xB4 float and the pair

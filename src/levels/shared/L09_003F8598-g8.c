@@ -14,14 +14,14 @@ extern unsigned char *D_L09_001FE6C0[];
 
 extern int D_L09_001B0F58 __attribute__((sda));
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
-extern int func_L09_003F72A8(unsigned char *);
+extern int trooper_legs_find_largest_value(unsigned char *);
 
-extern int func_L09_003F71C8(unsigned char *, int);
+extern int trooper_legs_count_with_value(unsigned char *, int);
 
 /* Finds the nearest suitable enemy and hands it this enemy's path and job. */
-void func_L09_003F8598(unsigned char *object) {
+void TransferStateToNearestEligibleObject(unsigned char *object) {
     unsigned char *source_data = *(unsigned char **)(object + 0x68);
     TI128 position;
     unsigned short *list;
@@ -58,10 +58,10 @@ void func_L09_003F8598(unsigned char *object) {
         if ((candidate_data[0x302] & 1) == 0)
             continue;
         if (*(int *)(source_data + 0x420) != -1) {
-            group = FindLargestGroupLegsValue(object) + 1;
+            group = trooper_legs_find_largest_value(object) + 1;
             if (group != *(int *)(candidate_data + 0x420))
                 continue;
-            if (CountGroupLegsWithValue(candidate, group) >= *(int *)(candidate_data + 0x42C))
+            if (trooper_legs_count_with_value(candidate, group) >= *(int *)(candidate_data + 0x42C))
                 continue;
         }
         if (*(int *)(source_data + 0x424) != 0 && *(int *)(source_data + 0x424) != *(int *)(candidate_data + 0x424))

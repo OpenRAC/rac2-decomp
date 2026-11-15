@@ -5,7 +5,7 @@ extern void r1_func_00118CF0(void *);
 
 extern void r1_func_00118CE0(void *);
 
-extern int func_0011F8D0(void);
+extern int boot_test_hw_bit_field(void);
 
 /* rac1-decomp src/core/0011D0D0.c: func_0011D370 */
 /*
@@ -18,7 +18,7 @@ extern int func_0011F8D0(void);
  * bytes against 56, which is what kept this a stub.
  */
 /* Copies a block of words from one place to another and returns zero. */
-int func_0011F888(int *dst, int *src, unsigned int nbytes) {
+int mem_copy_words_ret_zero(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
         *dst++ = *src++;
@@ -34,7 +34,7 @@ ASM_FUNC("asm/core", func_0011F8C0);
    the field read back as 0. `srl` (not `sra`) at the end is the tell that
    the scratch word is unsigned. */
 /* Tests a hardware setting by changing it, reading it back and restoring it. Returns whether the test passed. */
-int func_0011F8D0(void) {
+int boot_test_hw_bit_field(void) {
     unsigned int saved;
     unsigned int cur;
     r1_func_00118CF0(&saved);

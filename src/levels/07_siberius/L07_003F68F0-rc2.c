@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -28,7 +29,7 @@ extern f32 ref_L07_003F68F0_01(f32);
 extern f32 ref_L07_003F68F0_02(f32, f32);
 
 /* Swings the object's yaw back and forth: adds the step to a swing angle and sets the yaw around its rest yaw. */
-void func_L07_003F68F0(s8 *moby, f32 turnStep) {
+void swing_update_yaw(s8 *moby, f32 turnStep) {
     s8 *vars;
     f32 swingAngle;
     f32 yaw;

@@ -7,12 +7,12 @@ extern SolTextPair2 D_L00_001AE110;
 extern char D_L00_001AE118[];
 extern unsigned char D_001A7B94 __attribute__((sda));
 extern unsigned char D_001A7B95 __attribute__((sda));
-extern void func_0033AF48(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
-extern int func_0027FAA8(int, int, unsigned long, char *, int);
+extern void prompt_bar_draw(void *);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
-void func_0033CC20(char *object)
+void two_toggle_a_draw(char *object)
 {
     char buffer[128];
     SolTextPair2 pair;
@@ -22,18 +22,18 @@ void func_0033CC20(char *object)
     char *format;
     int color;
 
-    DrawButtonPromptBar(object + 8);
+    prompt_bar_draw(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
     first = GetLocalizedString(0x2DDF);
     second = GetLocalizedString(pair.ids[D_001A7B95 != 0]);
-    Sprintf(buffer, format, first, second);
-    DrawTextCenteredSmallFont(0x100, 0x96, color, buffer, -1);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_small(0x100, 0x96, color, buffer, -1);
 
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
     label = GetLocalizedString(0x2DDE);
     second = GetLocalizedString(pair.ids[D_001A7B94 != 0]);
-    Sprintf(buffer, format, label, second);
-    DrawTextCenteredSmallFont(0x100, 0xBE, color, buffer, -1);
+    sprintf(buffer, format, label, second);
+    text_draw_centered_small(0x100, 0xBE, color, buffer, -1);
 }

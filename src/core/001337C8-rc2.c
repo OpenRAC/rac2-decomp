@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,9 +25,9 @@
  */
 #include "common.h"
 
-extern s32 func_00132C48();
+extern s32 snd_SendCommandSync();
 
 /* Sends sound command 0x4A, which has no data. */
-void func_001337C8(void) {
+void snd_send_cmd4a(void) {
     snd_SendCommandSync(0x4A, 0, 0);
 }

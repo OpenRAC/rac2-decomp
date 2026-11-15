@@ -8,30 +8,30 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L23_001B1484 __attribute__((sda));
-extern char D_00189E20[];
-extern s32 D_L23_00259050[3][60];
+extern char *g_mothership_boss_moby __attribute__((sda));
+extern char g_hero_state[];
+extern s32 g_effect_pools[3][60];
 extern s32 D_L23_001B3738[3] __attribute__((sda));
 extern s32 D_L23_001B3744 MACRO_ADDR;
 extern float D_L23_001B1414 __attribute__((sda));
 extern TI128 D_L23_001C0AA0;
-extern float func_00282E48(char *, char *);
-extern int func_L23_0041D1F0(char *, int, int, int);
-extern void func_002A7750(unsigned char *, unsigned char, int);
-extern float func_L23_0041E220(char *);
-extern int func_002A77E0(int);
-extern int func_L23_0041D0A0(char *, int, float);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_L23_00418650(char *, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_L23_0041C7D8(void *, int);
+extern float fast_vec_dist(char *, char *);
+extern int boss_raise_stat_by_step(char *, int, int, int);
+extern void moby_set_state(unsigned char *, unsigned char, int);
+extern float moby_get_scale_by_class(char *);
+extern int math_random_int_below(int);
+extern int boss_pick_random_spawn_point(char *, int, float);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern void mothership_project_point_onto_surface(char *, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern void part_spawn_random_row_effect(void *, int);
 
 /* Refresh the active effect pools, then choose a new free spawn position. */
-void func_L23_0041CD58(char *object) {
+void boss_update_effect_pools(char *object) {
     TI128 loc[2];
     TI128 *offset;
-    char *state = *(char **)(gMothershipBossMoby + 0x68);
+    char *state = *(char **)(g_mothership_boss_moby + 0x68);
     int group = 0;
     int remaining;
     int next;
@@ -45,7 +45,7 @@ void func_L23_0041CD58(char *object) {
     char *axis;
     float scale;
     do {
-        s32 (*rows)[60] = gEffectPools;
+        s32 (*rows)[60] = g_effect_pools;
 
         count = &D_L23_001B3738[group];
         slot = (char **)rows[group];
@@ -53,12 +53,12 @@ void func_L23_0041CD58(char *object) {
         remaining = 49;
         do {
             if (*slot && *(float *)(state + 0x20) > 0.0f) {
-                char *hero = gHeroState;
+                char *hero = g_hero_state;
 
                 if ((*(unsigned char **)(hero + 0x2290))[0x43] != 6 && fast_vec_dist(*slot + 0x10, hero + 0x80) < 12.0f) {
-                    if (RaiseStatByStep(object, (int)*slot, group, 1)) {
+                    if (boss_raise_stat_by_step(object, (int)*slot, group, 1)) {
                         if (((unsigned char *)*slot)[0x20] == 0) {
-                            SetMobyState((unsigned char *)*slot, 16, 0);
+                            moby_set_state((unsigned char *)*slot, 16, 0);
                             (*slot)[0x23] = 127;
                         }
                         oldCount = *count;
@@ -67,7 +67,7 @@ void func_L23_0041CD58(char *object) {
                         *count = oldCount - 1;
                         D_L23_001B3744 = oldTotal - 1;
                     } else {
-                        alpha = GetMobyScaleByClass(*slot) * 0.083333336f;
+                        alpha = moby_get_scale_by_class(*slot) * 0.083333336f;
                         if (alpha > 1.0f) alpha = 1.0f;
                         else if (alpha < 0.1f) alpha = 0.1f;
                         (*slot)[0x23] = (int)(alpha * 127.0f);
@@ -79,22 +79,22 @@ void func_L23_0041CD58(char *object) {
         } while (remaining >= 0);
         group = next;
     } while (group < 3);
-    if (!RandomIntBelow(30) && D_L23_001B3744 < 12) {
-        PickRandomSpawnPoint((char *)&loc[0], 1, 0.0f);
+    if (!math_random_int_below(30) && D_L23_001B3744 < 12) {
+        boss_pick_random_spawn_point((char *)&loc[0], 1, 0.0f);
         offset = &loc[1];
         spawnGroup = 0;
         do {
-            spawnSlot = (char **)gEffectPools[spawnGroup];
+            spawnSlot = (char **)g_effect_pools[spawnGroup];
             next = spawnGroup + 1;
             remaining = 49;
             do {
                 if (*spawnSlot && fast_vec_dist(*spawnSlot + 16, (char *)&loc[0]) < 4.0f) {
-                    axis = *spawnSlot + (RandomIntBelow(2) * 16 + 0xC0);
-                    if (RandomIntBelow(2)) scale = D_L23_001B1414;
+                    axis = *spawnSlot + (math_random_int_below(2) * 16 + 0xC0);
+                    if (math_random_int_below(2)) scale = D_L23_001B1414;
                     else scale = -D_L23_001B1414;
                     FastVecScale((char *)offset, axis, scale);
                     FastVecAdd((char *)&loc[0], (char *)&loc[0], (char *)offset);
-                    ProjectPointOntoPlanetSurface((char *)&loc[0], 0.0f);
+                    mothership_project_point_onto_surface((char *)&loc[0], 0.0f);
                 }
                 remaining--;
                 spawnSlot++;
@@ -102,9 +102,9 @@ void func_L23_0041CD58(char *object) {
             spawnGroup = next;
         } while (spawnGroup < 3);
         *offset = loc[0];
-        ProjectPointOntoPlanetSurface((char *)offset, 3.0f);
+        mothership_project_point_onto_surface((char *)offset, 3.0f);
         if (CollLine(offset, &loc[0], 18, 0, 0))
             loc[0] = D_L23_001C0AA0;
-        SpawnRandomRowEffect(&loc[0], 0);
+        part_spawn_random_row_effect(&loc[0], 0);
     }
 }

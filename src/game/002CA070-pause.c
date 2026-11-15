@@ -86,11 +86,11 @@ typedef struct {
     void (*upd)(void);
 } Cutscene;
 
-extern int D_001BAF80[];
-extern Menu D_001F2840;
+extern int g_collision_hit[];
+extern Menu g_pause_menu_state;
 extern View D_001B9040;
 extern Buffers D_001BAEC0;
-extern Snd D_001C4FA0;
+extern Snd g_map_overlay_state;
 extern Cutscene D_00210A40;
 extern int D_0025A190[], D_0025E488[], D_00261238[], D_00259458[], D_00259328[], D_0025A738[], D_00259018[], D_00258D70[];
 extern int D_001A8C8C[] __attribute__((sda));
@@ -101,115 +101,115 @@ extern int D_001B1598[] __attribute__((sda));
 extern int D_001B1598_sda __attribute__((sda));
 extern int D_001A72D4[] __attribute__((sda));
 extern int D_001A72D8[] __attribute__((sda));   /* the two frame buffers */
-extern int D_001A7340[] __attribute__((sda));   /* the screen size pair: [0] width, [1] height */
+extern int g_screen_width[] __attribute__((sda));   /* the screen size pair: [0] width, [1] height */
 extern int D_001A7398[] __attribute__((sda));
 extern u8 D_001AA4B0[16] __attribute__((sda));
 extern u8 D_001AA490[16] __attribute__((sda));
 extern u8 D_001AA4A0[16] __attribute__((sda));
 extern u8 D_001C2AD0[];
-extern u8 D_001B5340[];
+extern u8 g_camera_eye_state[];
 
-extern void func_002C9C60(float);
-extern void func_002D5E98(void *);
-extern void func_002CB648(void);
-extern int func_002CB510(int);
-extern void func_002C9AD8(void *);
-extern void func_00295C50(int);
-extern int func_0029D830(void);
-extern void func_00282D30(void *, void *, float);
-extern void func_0027AB40(void);
-extern void func_002C9C90(void);
-extern void func_00279D18(void);
-extern void func_002FC3C0(int);
-extern int func_001261F0(int);
-extern void func_002DE3A0(int);
-extern void func_002FC1D8(void);
-extern void func_002954C0(void);
-extern void func_0028AFE8(int);
-extern void func_0028ACB0(int);
-extern void func_002FC8D0(int, int, int);
-extern void func_002C9F68(void);
-extern void func_0028B338(int);
+extern void menu_set_pause_scale_inverse(float);
+extern void menu_start_action(void *);
+extern void menu_draw_level_select_list(void);
+extern int RebuildLevelSelectAvailability(int);
+extern void menu_ring_list_step_forward(void *);
+extern void map_set_current_and_refresh(int);
+extern int menu_update_entry_states(void);
+extern void FastVecScale(void *, void *, float);
+extern void UpdateViewContext(void);
+extern void cam_reset_active_position(void);
+extern void gfx_build_view_matrices(void);
+extern void gfx_wait_for_dma_status_bits(int);
+extern int sceGsSyncV(int);
+extern void menu_stream_chunk_table_init(int);
+extern void gfx_reset_packet_buffer(void);
+extern void map_reset_cache_and_reload(void);
+extern void hud_unlink_bank_group(int);
+extern void LoadStashedHudBanks(int);
+extern void gfx_copy_image_to_gs_blocks(int, int, int);
+extern void menu_upload_pause_background_to_gs(void);
+extern void select_moby_context(int);
 
 /* Sets up the pause or cutscene screen: picks the menu page for the current state, resets the camera and screen buffers, and lays out the memory areas used while paused. */
-void func_002CA070(void)
+void menu_enter_pause_state(void)
 {
     int queued = 0;
     int s, j, k, n, gsBase, gsAfterBackground;
     int *bufferPtr;
     void (*upd)(void);
 
-    gCollisionHit[4] |= 0x80000000;
-    gPauseMenuState.unk134 = 0;
-    gPauseMenuState.unkE0 = 0;
-    switch (gPauseMenuState.state) {
+    g_collision_hit[4] |= 0x80000000;
+    g_pause_menu_state.unk134 = 0;
+    g_pause_menu_state.unkE0 = 0;
+    switch (g_pause_menu_state.state) {
     case 0:
     case 7:
     case 9:
         break;
     case 2:
         queued = 1;
-        gPauseMenuState.page = D_0025A190;
-        gPauseMenuState.next = D_0025A190;
+        g_pause_menu_state.page = D_0025A190;
+        g_pause_menu_state.next = D_0025A190;
         break;
     case 3:
-        gPauseMenuState.page = 0;
-        gPauseMenuState.next = 0;
+        g_pause_menu_state.page = 0;
+        g_pause_menu_state.next = 0;
         break;
     case 4:
-        gPauseMenuState.page = D_0025E488;
-        gPauseMenuState.next = D_0025E488;
+        g_pause_menu_state.page = D_0025E488;
+        g_pause_menu_state.next = D_0025E488;
         queued = 1;
-        SetPauseScaleInverse(6.0f);
+        menu_set_pause_scale_inverse(6.0f);
         break;
     case 11:
-        gPauseMenuState.next = gPauseMenuState.page = D_00261238;
-        D_001A8C8C[0] = gPauseMenuState.unk134 = 1;
-        gPauseMenuState.state = 5;
-        StartMenuAction(D_001AA4B0);
+        g_pause_menu_state.next = g_pause_menu_state.page = D_00261238;
+        D_001A8C8C[0] = g_pause_menu_state.unk134 = 1;
+        g_pause_menu_state.state = 5;
+        menu_start_action(D_001AA4B0);
         break;
     case 5:
-        gPauseMenuState.page = D_00261238;
-        gPauseMenuState.next = D_00261238;
-        gPauseMenuState.unk134 = 1;
+        g_pause_menu_state.page = D_00261238;
+        g_pause_menu_state.next = D_00261238;
+        g_pause_menu_state.unk134 = 1;
         D_001A8C8C[0] = 1;
         break;
     case 6:
-        gPauseMenuState.page = D_00259458;
-        gPauseMenuState.next = D_00259458;
+        g_pause_menu_state.page = D_00259458;
+        g_pause_menu_state.next = D_00259458;
         break;
     case 1:
-        gPauseMenuState.page = D_00259328;
-        gPauseMenuState.next = D_00259328;
+        g_pause_menu_state.page = D_00259328;
+        g_pause_menu_state.next = D_00259328;
         break;
     case 10:
-        gPauseMenuState.page = D_0025A738;
-        gPauseMenuState.next = D_0025A738;
+        g_pause_menu_state.page = D_0025A738;
+        g_pause_menu_state.next = D_0025A738;
         break;
     case 8:
-        gPauseMenuState.page = D_00259018;
-        gPauseMenuState.next = D_00259018;
+        g_pause_menu_state.page = D_00259018;
+        g_pause_menu_state.next = D_00259018;
         D_00210A40.a = 0x18;
         D_00210A40.b = 0x18;
         D_00210A40.c = D_00258D70;
-        D_00210A40.upd = DrawLevelSelectList;
+        D_00210A40.upd = menu_draw_level_select_list;
         D_00210A40.init = RebuildLevelSelectAvailability;
         D_00210A40.init(0);
-        StepRingListForward(&D_00210A40);
+        menu_ring_list_step_forward(&D_00210A40);
         break;
     }
 
-    if (gPauseMenuState.hasQueued != 0) {
-        D_001A7478[0] = gPauseMenuState.unk140;
-        gPauseMenuState.page = gPauseMenuState.queued;
-        gPauseMenuState.next = gPauseMenuState.queued;
-        if (gPauseMenuState.state == 2 || gPauseMenuState.state == 4) {
-            SetCurrentMapAndRefresh(gPauseMenuState.unkF4);
+    if (g_pause_menu_state.hasQueued != 0) {
+        D_001A7478[0] = g_pause_menu_state.unk140;
+        g_pause_menu_state.page = g_pause_menu_state.queued;
+        g_pause_menu_state.next = g_pause_menu_state.queued;
+        if (g_pause_menu_state.state == 2 || g_pause_menu_state.state == 4) {
+            map_set_current_and_refresh(g_pause_menu_state.unkF4);
             queued = 1;
-            UpdateEntryStates();
+            menu_update_entry_states();
         }
-        gPauseMenuState.queued = 0;
-        gPauseMenuState.hasQueued = 0;
+        g_pause_menu_state.queued = 0;
+        g_pause_menu_state.hasQueued = 0;
     }
 
     {
@@ -220,13 +220,13 @@ void func_002CA070(void)
         qzero_nc(camera);
     }
     qzero_nc(D_001C2AD0 + 0x10);
-    qcopy(gPauseMenuState.v50, gCameraState_001B5340);
-    qcopy(gPauseMenuState.v60, gCameraState_001B5340 + 0x10);
+    qcopy(g_pause_menu_state.v50, g_camera_eye_state);
+    qcopy(g_pause_menu_state.v60, g_camera_eye_state + 0x10);
     {
         float zfar = 524288.0f;
         float fog = 255.0f;
         float scale = 0.62f;
-        gPauseMenuState.unkF8 = D_001B9040.fB0;
+        g_pause_menu_state.unkF8 = D_001B9040.fB0;
         D_001B9040.fB0 = scale;
         D_001B9040.f21C = zfar;
         D_001B9040.f228 = fog;
@@ -234,10 +234,10 @@ void func_002CA070(void)
         D_001B9040.i218 = 0;
     }
     UpdateViewContext();
-    ResetActiveCameraPosition();
-    BuildViewMatrices();
-    WaitForDmaStatusBits(1);
-    GetGsCurrentField(0);
+    cam_reset_active_position();
+    gfx_build_view_matrices();
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598_sda = D_001B1598[0] + 1;
 
     if (queued) {
@@ -246,14 +246,14 @@ void func_002CA070(void)
         areaB = D_001BAEC0.f10 + 0x30000;
         areaC = areaA + 0x3C000;
         areaD = areaB + 0xE0000;
-        gPauseMenuState.unk10C = areaC + 0x11800;
+        g_pause_menu_state.unk10C = areaC + 0x11800;
         D_001B22B0[0] = 0x30000;
-        gPauseMenuState.unk114 = areaA;
-        gPauseMenuState.unk20 = areaB;
-        gPauseMenuState.unk118 = areaC;
-        gPauseMenuState.unk11C = areaD;
-        gPauseMenuState.unk110 = areaD;
-        InitStreamChunkTable(0);
+        g_pause_menu_state.unk114 = areaA;
+        g_pause_menu_state.unk20 = areaB;
+        g_pause_menu_state.unk118 = areaC;
+        g_pause_menu_state.unk11C = areaD;
+        g_pause_menu_state.unk110 = areaD;
+        menu_stream_chunk_table_init(0);
     } else {
         int areaA, areaB, areaC, areaD, areaE, areaF;
         areaA = D_001BAEC0.fC + 0x60000;
@@ -264,48 +264,48 @@ void func_002CA070(void)
         areaD = areaB + 0xE0000;
         areaE = areaC + 0xC1000;
         areaF = areaD + 0x60800;
-        gPauseMenuState.unk10C = areaE;
+        g_pause_menu_state.unk10C = areaE;
         D_001B22B0[0] = 0x60000;
-        gPauseMenuState.unk114 = areaA;
-        gPauseMenuState.unk20 = areaB;
-        gPauseMenuState.unk118 = areaC;
-        gPauseMenuState.unk11C = areaD;
-        gPauseMenuState.unk110 = areaF;
-        InitStreamChunkTable(1);
+        g_pause_menu_state.unk114 = areaA;
+        g_pause_menu_state.unk20 = areaB;
+        g_pause_menu_state.unk118 = areaC;
+        g_pause_menu_state.unk11C = areaD;
+        g_pause_menu_state.unk110 = areaF;
+        menu_stream_chunk_table_init(1);
     }
     D_001A8BC0 = 0x2000;
-    ResetPacketBuffer();
+    gfx_reset_packet_buffer();
     if (queued) {
-        ResetMapCacheAndReload();
+        map_reset_cache_and_reload();
     }
-    UnlinkHudBankGroup(0);
+    hud_unlink_bank_group(0);
     if (queued) {
         LoadStashedHudBanks(1);
     } else {
         LoadStashedHudBanks(0);
     }
-    if (gPauseMenuState.unkD0 == 0) {
-        CopyImageToGsBlocks(gPauseMenuState.unk20, D_001A72D8[1], gScreenWidth[1] << 11);
+    if (g_pause_menu_state.unkD0 == 0) {
+        gfx_copy_image_to_gs_blocks(g_pause_menu_state.unk20, D_001A72D8[1], g_screen_width[1] << 11);
     } else {
-        UploadPauseBackgroundToGs();
+        menu_upload_pause_background_to_gs();
     }
     gsBase = D_001A72D4[0];
-    gPauseMenuState.unk28 = gsBase;
+    g_pause_menu_state.unk28 = gsBase;
     if (queued) {
-        gMapOverlayState.unk24C = gsBase;
+        g_map_overlay_state.unk24C = gsBase;
         gsAfterBackground = gsBase + 0x40000;
-        gMapOverlayState.unk250 = gsAfterBackground;
+        g_map_overlay_state.unk250 = gsAfterBackground;
         D_001A72D4[0] = gsAfterBackground + 0x400;
         for (j = 0; j < 4; j++) {
             int bufferAddr = D_001A72D4[0];
-            gMapOverlayState.bufs[j] = bufferAddr;
+            g_map_overlay_state.bufs[j] = bufferAddr;
             D_001A72D4[0] = bufferAddr + 0x4000;
         }
     } else {
         int bufferIndex;
-        gMapOverlayState.unk24C = 0;
-        gMapOverlayState.unk250 = 0;
-        bufferPtr = &gMapOverlayState.bufs[3];
+        g_map_overlay_state.unk24C = 0;
+        g_map_overlay_state.unk250 = 0;
+        bufferPtr = &g_map_overlay_state.bufs[3];
         for (bufferIndex = 0; bufferIndex < 4; bufferIndex++) {
             *bufferPtr = 0;
             bufferPtr--;
@@ -313,7 +313,7 @@ void func_002CA070(void)
     }
     select_moby_context(1);
     for (k = 0; k < 4; k++) {
-        gPauseMenuState.unk40[k] = D_001A7398[k];
-        gPauseMenuState.unk30[k] = D_001A7398[k];
+        g_pause_menu_state.unk40[k] = D_001A7398[k];
+        g_pause_menu_state.unk30[k] = D_001A7398[k];
     }
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from RAC1's render_data_processor_linked_effect in
    src/overlays/l10_orxon/platforms_doors_and_bombthrower.c (GPL-3.0). */
 /* func_PAL_L06_003E8E68, the PAL copy of func_L06_003E57E8: the same C, where the
@@ -6,16 +7,16 @@
 #include "common.h"
 extern char *D_L06_001B281C;
 extern char D_L06_001B9840[];
-extern float func_00282E48(char *,char *);
-extern void func_002833B8(void *,float);
-extern void func_00283410(void *,void *);
-extern void func_00283788(void *,void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int,int,float);
-extern unsigned long func_0027C878(int);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00280B90(void *,void *,int);
+extern float fast_vec_dist(char *,char *);
+extern void set_scale_matrix(void *,float);
+extern void euler_to_matrix(void *,void *);
+extern void multiply_matrix(void *,void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int,int,float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void FastVecAdd(void *,void *,void *);
+extern void draw_world_quad(void *,void *,int);
 extern int D_L06_001AF550 __attribute__((sda)),D_L06_001AF554 __attribute__((sda)),D_L06_001AF558 __attribute__((sda)),D_L06_001AF55C __attribute__((sda));
 extern int D_L06_001AF570 __attribute__((sda)),D_L06_001AF574 __attribute__((sda));
 extern float D_L06_001AF578[] SDATA(D_L06_001AF578);
@@ -51,11 +52,11 @@ void func_PAL_L06_003E8E68(u8 *moby) {
     float *matrix2, *uv1, *uv2;
 
     {
-        float distance = func_00282E48(moby + 0x10, D_L06_001B9840);
+        float distance = fast_vec_dist(moby + 0x10, D_L06_001B9840);
         if (distance > 48.0f) fade = (80.0f - distance) * 0.03125f;
         else fade = 1.0f;
     }
-    func_002833B8(buffers.rotation, *(float *)data * 0.5f);
+    set_scale_matrix(buffers.rotation, *(float *)data * 0.5f);
     matrix1 = buffers.front.uv;
     matrix2 = buffers.back.uv;
     uv1 = matrix1 + 1;
@@ -63,14 +64,14 @@ void func_PAL_L06_003E8E68(u8 *moby) {
     {
         int n;
         for (n = 0; n < *(int *)(data + 4); n++) {
-            func_00283410(scratch + n * 0x40, moby + 0xf0);
-            func_00283788(scratch + n * 0x40, scratch + n * 0x40, buffers.rotation);
+            euler_to_matrix(scratch + n * 0x40, moby + 0xf0);
+            multiply_matrix(scratch + n * 0x40, scratch + n * 0x40, buffers.rotation);
             *(Quad57 *)(scratch + n * 0x40 + 0x30) = *(Quad57 *)(moby + 0x10);
-            *(float *)(scratch + n * 0x40 + 0x38) += func_00283CE0(n + 1) * *(float *)(data + 8);
+            *(float *)(scratch + n * 0x40 + 0x38) += IntToFloat(n + 1) * *(float *)(data + 8);
         }
     }
     {
-        u64 texture = func_0027C878(14);
+        u64 texture = GetEffectTextureDescriptor(14);
         u64 packet_flags = (u64)D_L06_001AF550 | ((u64)D_L06_001AF554 << 2);
         packet_flags |= (u64)D_L06_001AF558 << 4;
         packet_flags |= (u64)D_L06_001AF55C << 6;
@@ -116,22 +117,22 @@ void func_PAL_L06_003E8E68(u8 *moby) {
                 age = *(int *)(ages + (order[i] * 4 + group_age));
                 group_vertices = group * 0x2580;
                 if (age > D_L06_001B31B4) {
-                    progress = func_00283CE0(age - D_L06_001B31B4) /
-                               func_00283CE0(D_L06_001B31B0 - D_L06_001B31B4);
+                    progress = IntToFloat(age - D_L06_001B31B4) /
+                               IntToFloat(D_L06_001B31B0 - D_L06_001B31B4);
                 } else {
-                    progress = 1.0f - func_00283CE0(age) /
-                               func_00283CE0(D_L06_001B31B4);
+                    progress = 1.0f - IntToFloat(age) /
+                               IntToFloat(D_L06_001B31B4);
                 }
-                color = func_00283D38(D_L06_001AF570, D_L06_001AF574, progress);
+                color = FastTweenColor(D_L06_001AF570, D_L06_001AF574, progress);
                 color = (color & 0xffffff) +
-                        (func_00283CF0(fade * fade *
-                         func_00283CE0((int)color >> 24)) << 24);
+                        (FloatToInt(fade * fade *
+                         IntToFloat((int)color >> 24)) << 24);
                 if (moby[0x20] == 2) {
-                    float alpha = func_00283CE0(*(int *)(data + 0x34));
+                    float alpha = IntToFloat(*(int *)(data + 0x34));
                     float duration;
                     alpha *= 255.0f;
                     duration = (ref_PAL_L06_003E8E68_00 * 300.0f + 2.0f) * 0.16666667f;
-                    color = (func_00283CF0(alpha / duration) << 24) | 0xffffff;
+                    color = (FloatToInt(alpha / duration) << 24) | 0xffffff;
                 }
                 vertex = 0;
                 offset = i * 0x40;
@@ -141,10 +142,10 @@ void func_PAL_L06_003E8E68(u8 *moby) {
                 buffers.back.color[1] = color;
                 buffers.back.color[0] = color;
                 for (; vertex < 4; vertex++) {
-                    func_00282CC0(buffers.back.xyz[vertex], (char *)D_L06_001AF5A0 + vertex * 0x10,
+                    FastVecAdd(buffers.back.xyz[vertex], (char *)D_L06_001AF5A0 + vertex * 0x10,
                         (char *)((float (*)[80])(base + group_vertices))[(row + (vertex >> 1))] + order[i] * 0x10);
                 }
-                func_00280B90(buffers.back.xyz, scratch + offset, 0);
+                draw_world_quad(buffers.back.xyz, scratch + offset, 0);
             }
             row = next_row;
         } while (row < 19);

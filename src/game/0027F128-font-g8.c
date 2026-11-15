@@ -3,15 +3,15 @@
 typedef unsigned char u8;
 typedef unsigned long u64;
 typedef int s32;
-extern void func_002FC560(unsigned int,unsigned long);
+extern void VU1_addGSregister(unsigned int,unsigned long);
 /* Adapted from RAC1 draw.c func_001F6668_r (GPL-3.0), the FontPrint counterpart. */
 struct Glyph_F6668 { u8 u,v; signed char top,adv; };
 extern int D_001B166C;
 extern int D_001B1668 __attribute__((sda));
 extern int D_001A89B0[8] __attribute__((sda));
-extern void func_0027E018(int,int,int,int,int,int,int,int,long,long);
+extern void DrawTexturedQuad(int,int,int,int,int,int,int,int,long,long);
 /* Draws a line of text one letter at a time. Special bytes change the color or add little icons. */
-void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 texture,
+void text_draw_line(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 texture,
                       u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
     s32 character_count;
@@ -71,14 +71,14 @@ void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 t
     } while (*cursor != 0);
 }
 
-extern float func_00283CE0(int);
-extern void func_0027E1A0(float x, float y, float draw_width, float draw_height,
+extern float IntToFloat(int);
+extern void EmitTexturedRectangle(float x, float y, float draw_width, float draw_height,
                          int u, int v, int width, int height,
                          unsigned int *colors, u64 texture);
 
 /* The scaled, floating-point counterpart of func_0027F2A8. */
 /* Draws text letter by letter at a chosen size, with smooth scaling. */
-void func_0027F640(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
+void FontPrintScaled(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
                    u64 texture, u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
     unsigned int colors[4];

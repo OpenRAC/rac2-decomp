@@ -12,10 +12,10 @@ typedef struct OBJ_3B0AB0 {
 
 extern char D_L00_0023BB78[];
 
-extern void func_002B9180(void *);
+extern void part_kill(void *);
 
 /* Removes the effect object tied to a trail point if it still belongs to that point. */
-void func_L00_003B0AB0(int idx)
+void node_free_effect_object(int idx)
 {
     unsigned char index = idx;
     char *base = D_L00_0023BB78;
@@ -28,7 +28,7 @@ void func_L00_003B0AB0(int idx)
 
         if ((obj->f0 & 0x80FF) == 0x51)
             if (extra->f17 == index) {
-                KillParticle(obj);
+                part_kill(obj);
                 *(OBJ_3B0AB0 **)slot = 0;
             }
     }

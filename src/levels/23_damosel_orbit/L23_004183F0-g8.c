@@ -23,26 +23,26 @@ extern volatile int D_L23_001B36B0;
 
 extern char *D_L23_00259560[];
 
-extern void func_0029FCC0(char *, int, char *);
+extern void moby_transform_joint_to_world(char *, int, char *);
 
-extern void func_0029FC20(char *, int, char *);
+extern void moby_transform_joint_point(char *, int, char *);
 
-extern void func_00282D30(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
-extern int func_00282948(char *);
+extern int math_fast_float_d(char *);
 
-extern void func_0029F338(int);
+extern void moby_mark_spawned(int);
 
-extern int func_L23_003C19E0(char *, float *);
+extern int weapon_get_targetable_point(char *, float *);
 
-extern void func_L23_003C1AB0(char *);
+extern void moby_select_play_anim(char *);
 
-extern void func_L23_00418160(char *);
+extern void mothership_fire_gun_at_target(char *);
 
 /* Updates the gun: follows its joint, ends the shot when the timer runs out, and picks the nearest visible target to fire at. */
-void func_L23_004183F0(char *moby) {
+void mothership_update_gun_pick_target(char *moby) {
     char *state = *(char **)(moby + 0x68);
     float backOffset[4];
     float jointPos[4];
@@ -58,25 +58,25 @@ void func_L23_004183F0(char *moby) {
     int visible;
 
     if (*(int *)(state + 0x59C) != 0) {
-        TransformMobyJointToWorld(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
+        moby_transform_joint_to_world(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
         D_L23_001B3800 = *(TI128 *)jointPos;
         FastVecScale(D_L23_001B3810, moby + 0xE0, D_L23_001B15B4);
         FastVecAdd(D_L23_001B3810, D_L23_001B3810, *(char **)(state + 0x59C) + 0x10);
-        TransformMobyJointPoint(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
+        moby_transform_joint_point(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
         FastVecScale((char *)backOffset, (char *)(jointMatrix + 8), -16.0f);
         FastVecAdd((char *)jointPos, (char *)jointPos, (char *)backOffset);
-        FastFloatHelperD(state + 0x598);
+        math_fast_float_d(state + 0x598);
         if (*(int *)(state + 0x598) == 0) {
             *(int *)(state + 0x59C) = 0;
             *(int *)(state + 0x594) = (*(int *)(state + 0x594) + 1) % 4;
             effectA = D_L23_001B37F0;
             if (effectA != 0) {
-                MarkMobySpawned(effectA);
+                moby_mark_spawned(effectA);
                 D_L23_001B37F0 = 0;
             }
             effectB = D_L23_001B37F4;
             if (effectB != 0) {
-                MarkMobySpawned(effectB);
+                moby_mark_spawned(effectB);
                 D_L23_001B37F4 = 0;
             }
         }
@@ -97,7 +97,7 @@ void func_L23_004183F0(char *moby) {
             char *obj = D_L23_00259560[j];
 
             visible = !(*(unsigned short *)(obj + 0x34) & 1);
-            if (visible && GetTargetablePointInFront(obj, &dist) != 0) {
+            if (visible && weapon_get_targetable_point(obj, &dist) != 0) {
                 if (best == 0) {
                     best = obj;
                     bestDist = dist;
@@ -109,7 +109,7 @@ void func_L23_004183F0(char *moby) {
         }
     }
     if (best != 0)
-        SelectObjectAndPlayAnim(best);
+        moby_select_play_anim(best);
     if (*(int *)(state + 0x590) != 0 && *(int *)(state + 0x598) <= 0)
-        FireGunAtTarget(moby);
+        mothership_fire_gun_at_target(moby);
 }

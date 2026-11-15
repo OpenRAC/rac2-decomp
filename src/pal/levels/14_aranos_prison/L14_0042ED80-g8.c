@@ -18,21 +18,21 @@ typedef struct {
 
 #define DAMAGE(p) ((DamageBlock *)((p) + 0x140))
 
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_00325B70(void *, void *, int, int);
-extern float func_002B0178(void *, void *, void *);
-extern void func_002A7750(void *, int, int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void enemy_spawn_child_parts(void *, void *, int, int);
+extern float coll_get_ground_distance_below(void *, void *, void *);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_L14_003DF650(void *);
-extern void func_002A93B0(void *);
-extern float func_00282E48(void *, void *);
+extern void moby_init_with_callback(void *);
+extern void moby_update_ground_check(void *);
+extern float fast_vec_dist(void *, void *);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern void func_PAL_L14_0042F200(void *);
-extern void func_00325D30(void *, void *);
-extern int func_002B3BA8(void *, int, void *, int, float, float);
+extern void group_destroy_attached_parts(void *, void *);
+extern int weapon_select_aim_target(void *, int, void *, int, float, float);
 extern char D_L14_001B9500[];
-extern int D_L14_001B259C __attribute__((sda));
+extern int g_moby_l14_pool __attribute__((sda));
 extern float D_L14_001B1948 __attribute__((sda));
 extern int D_L14_001B1950 __attribute__((sda));
 extern int D_L14_001B1954[] __attribute__((sda));
@@ -44,8 +44,8 @@ int func_PAL_L14_0042ED80(unsigned char *o)
     unsigned char *p = *(unsigned char **)(o + 0x68);
     float turn;
     if (o[0x20] == 0) {
-        p[0x48] = func_00283CF0(15.0f);
-        p[0x4A] = func_00283CF0(9.6f);
+        p[0x48] = FloatToInt(15.0f);
+        p[0x4A] = FloatToInt(9.6f);
         DAMAGE(p)->hit_anim = 6;
         DAMAGE(p)->f3c = 0.15f;
         DAMAGE(p)->hit_anim_mode = 2;
@@ -58,30 +58,30 @@ int func_PAL_L14_0042ED80(unsigned char *o)
         FLOAT_AT(p, 0x74) = FLOAT_AT(p, 0x70) = 0.0072000003f;
         FLOAT_AT(p, 0x68) = FLOAT_AT(p, 0x64) = 0.005026549f;
         FLOAT_AT(p, 0x60) = 3.1415927f;
-        FLOAT_AT(p, 0x12C) = func_002A77E0(2) ? -turn : turn;
+        FLOAT_AT(p, 0x12C) = math_random_int_below(2) ? -turn : turn;
         U16_AT(p, 0x132) = ((s32)(D_L14_001B1950) * 5 + 2) / 6;
         U16_AT(p, 0x134) = ((s32)(D_L14_001B1954[0]) * 5 + 2) / 6;
         p[0x2E] = 1;
         qcopy(p + 0x2E0, o + 0x10);
         INT_AT(p, 0x31C) = 1;
         FLOAT_AT(p, 0x2B4) = 4.0f;
-        func_00325B70(o, p + 0x300, 0, 2);
+        enemy_spawn_child_parts(o, p + 0x300, 0, 2);
         FLOAT_AT(p, 0x20) = 3.0f;
         U16_AT(p, 0x24) = 3;
         FLOAT_AT(o, 0x18) += 0.5f;
-        func_002B0178(o + 0x10, o, o + 0x10);
+        coll_get_ground_distance_below(o + 0x10, o, o + 0x10);
         if (INT_AT(p, 0x2BC) != -1) {
-            func_002A7750(o, 7, 3);
+            moby_set_state(o, 7, 3);
             if (o[0x43]) func_PAL_002A7E68(o, 0, 0, 0);
         } else {
-            func_002A7750(o, 1, 0);
+            moby_set_state(o, 1, 0);
             if (o[0x43] != 2) func_PAL_002A7E68(o, 2, 0, 0);
         }
         if (INT_AT(p, 0x2B8) != -1)
-            func_L14_003DF650((char *)D_L14_001B259C + INT_AT(p, 0x2B8) * 256);
+            moby_init_with_callback((char *)g_moby_l14_pool + INT_AT(p, 0x2B8) * 256);
     }
-    if (o[0x31] && func_00282E48(o + 0x10, D_L14_001B9500) < 24.0f) {
-        func_002A93B0(o);
+    if (o[0x31] && fast_vec_dist(o + 0x10, D_L14_001B9500) < 24.0f) {
+        moby_update_ground_check(o);
         o[0x6F] = 22;
     }
     if (func_PAL_002B1A50(o, (char *)DAMAGE(p), 0) && FLOAT_AT(p, 0x20) <= 0.0f) {
@@ -90,9 +90,9 @@ int func_PAL_L14_0042ED80(unsigned char *o)
     }
     if (p[0x2E] == 2) {
         if (p + 0x300)
-            func_00325D30(o, p + 0x300);
+            group_destroy_attached_parts(o, p + 0x300);
         return 1;
     }
-    INT_AT(p, 0x2F0) = func_002B3BA8(o, INT_AT(p, 0x2B0), 0, 0, FLOAT_AT(p, 0x2B4), 1.5f);
+    INT_AT(p, 0x2F0) = weapon_select_aim_target(o, INT_AT(p, 0x2B0), 0, 0, FLOAT_AT(p, 0x2B4), 1.5f);
     return 0;
 }

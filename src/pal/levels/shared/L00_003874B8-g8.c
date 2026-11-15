@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_003874B8, the PAL copy of func_L00_00384678 (src/levels/shared/L00_00384678-g8.c):
  * the same C, with the frame steps at 50 Hz and the lift delay rescaled. Built with -G8
  * (gp-relative vectors) and the qcopy and gcse-unsplit-edges profile in config/cflags.txt.
@@ -43,22 +44,22 @@ extern float D_L00_001AEE00 __attribute__((sda));
 extern float D_L00_001AEE04 __attribute__((sda));
 extern float D_L00_001AED60 __attribute__((sda));
 extern float D_L00_001AEDB8 __attribute__((sda));
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
-extern float func_002AA2E8(float *, float, float);
-extern int func_002E5CF8(int, int, char *);
-extern int func_00282948(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void *func_002A9640(void *, s32, s32);
-extern int func_002A77E0(int);
-extern void func_00282F20(void *, void *, float);
+extern float ApproachValue(float *, float, float);
+extern int PlayMobySound(int, int, char *);
+extern int math_fast_float_d(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
+extern int math_random_int_below(int);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_PAL_L00_00388038(void *, void *);
 extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(char *);
-extern s32 func_L00_0031D620(s32, s32, f32);
-extern char *func_L00_00384D40(char *, void *, void *);
+extern s32 math_lerp_int(s32, s32, f32);
+extern char *hoverbomb_create_projectile(char *, void *, void *);
 
 void func_PAL_L00_003874B8(char *obj)
 {
@@ -73,9 +74,9 @@ void func_PAL_L00_003874B8(char *obj)
 
     st = *(Board_384678 **)(obj + 0x68);
     if (0.0f < st->drop)
-        func_002AA2E8(&st->drop, 0.0f, 0.0050000004f);
+        ApproachValue(&st->drop, 0.0f, 0.0050000004f);
     else
-        func_002AA2E8(&st->drop, -0.2f, 0.00040000002f);
+        ApproachValue(&st->drop, -0.2f, 0.00040000002f);
     all = 1;
     for (scan = 0; scan < 24; scan++) {
         if ((((Tile_384678 *)D_L00_00232A60[scan])->flags ^ 1) & 1) {
@@ -94,8 +95,8 @@ void func_PAL_L00_003874B8(char *obj)
         }
     }
     if (st->timer != 0 && st->timer % 5 == 0)
-        func_002E5CF8(0, 0, D_L00_00232A60[0]);
-    func_00282948(&st->timer);
+        PlayMobySound(0, 0, D_L00_00232A60[0]);
+    math_fast_float_d(&st->timer);
     *(TI128 *)base = *(TI128 *)D_L00_001AED40;
     base[1] += st->x - st->drop;
     base[2] += st->y;
@@ -109,32 +110,32 @@ void func_PAL_L00_003874B8(char *obj)
 
     hit = 0;
     for (i = 0; i < 24; i++) {
-        func_00282D30(va.f, D_L00_001AEDF0, (float)(i / 8));
-        func_00282D30(vb, D_L00_001AEDE0, (float)(i % 8));
-        func_00282CC0(va.f, va.f, vb);
-        func_00282CC0(va.f, va.f, base);
-        func_00283098(D_L00_00232A60[i] + 0x10, va.f, D_L00_001B8DC0 + 0x230);
-        func_00282CC0(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, D_L00_001B8DC0);
+        FastVecScale(va.f, D_L00_001AEDF0, (float)(i / 8));
+        FastVecScale(vb, D_L00_001AEDE0, (float)(i % 8));
+        FastVecAdd(va.f, va.f, vb);
+        FastVecAdd(va.f, va.f, base);
+        matrix_mul_vec3(D_L00_00232A60[i] + 0x10, va.f, g_camera_l00_position + 0x230);
+        FastVecAdd(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, g_camera_l00_position);
         *(float *)(D_L00_00232A60[i] + 0x2C) = *(float *)(((Tile_384678 *)D_L00_00232A60[i])->cls + 0x24) * D_L00_001AED60;
         if ((((Tile_384678 *)D_L00_00232A60[i])->flags ^ 1) & 1) {
             hit++;
-            if (func_002A9640(D_L00_00232A60[i], -1, 0)) {
-                if (!func_002A77E0(3))
-                    func_002E5CF8(0, 0, D_L00_00232A60[i]);
+            if (part_find_owned_effect_slot(D_L00_00232A60[i], -1, 0)) {
+                if (!math_random_int_below(3))
+                    PlayMobySound(0, 0, D_L00_00232A60[i]);
                 ((Tile_384678 *)D_L00_00232A60[i])->flags |= 0x41;
                 ((Tile_384678 *)D_L00_00232A60[i])->flags &= 0xEFFF;
                 *(s32 *)(D_L00_00232A60[i] + 0x98) = 0;
                 *(u8 *)(D_L00_00232A60[i] + 0xA8) = 0xFF;
-                func_00282F20(vc, D_L00_00232A60[i] + 0xE0, 0.05f);
-                func_00282CC0(vc, vc, D_L00_00232A60[i] + 0x10);
+                vec_scale_to_length(vc, D_L00_00232A60[i] + 0xE0, 0.05f);
+                FastVecAdd(vc, vc, D_L00_00232A60[i] + 0x10);
                 func_PAL_L00_00388038(D_L00_00232A60[i], vc);
             }
             func_PAL_002A0F68(D_L00_00232A60[i]);
             func_002A0F48(D_L00_00232A60[i]);
         }
     }
-    pick = func_002A77E0(hit);
-    if (hit != 0 && func_00282948(&st->liftTimer)) {
+    pick = math_random_int_below(hit);
+    if (hit != 0 && math_fast_float_d(&st->liftTimer)) {
         for (count = 0; count < 24; count++) {
             if (!((((Tile_384678 *)D_L00_00232A60[count])->flags ^ 1) & 1))
                 continue;
@@ -145,13 +146,13 @@ void func_PAL_L00_003874B8(char *obj)
                 t = 1.0f;
             else if (t < 0.0f)
                 t = 0.0f;
-            st->liftTimer = (func_L00_0031D620(1, 0xF0, t) * 5 + 2) / 6;
+            st->liftTimer = (math_lerp_int(1, 0xF0, t) * 5 + 2) / 6;
             va.q = 0;
             va.f[2] = 0.05f;
-            func_00283098(va.f, va.f, D_L00_00232A60[count] + 0xC0);
-            func_00282CC0(va.f, va.f, D_L00_00232A60[count] + 0x10);
-            func_00282F20(vb, D_L00_00232A60[count] + 0xC0, D_L00_001AEDB8 * 0.020000001f);
-            func_L00_00384D40(D_L00_00232A60[count], va.f, vb);
+            matrix_mul_vec3(va.f, va.f, D_L00_00232A60[count] + 0xC0);
+            FastVecAdd(va.f, va.f, D_L00_00232A60[count] + 0x10);
+            vec_scale_to_length(vb, D_L00_00232A60[count] + 0xC0, D_L00_001AEDB8 * 0.020000001f);
+            hoverbomb_create_projectile(D_L00_00232A60[count], va.f, vb);
         }
     }
 }

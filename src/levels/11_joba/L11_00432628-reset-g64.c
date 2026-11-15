@@ -50,15 +50,15 @@ struct RotorObject {
     /* 0x98 */ int f98;
 };
 
-extern char *D_L11_001B359C;
+extern char *g_moby_l11_table;
 extern float D_L11_001B1240[12] __attribute__((sda));
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_L11_00437DC0(void *, int, int, int);
-extern void func_L11_00437E68(void *, int, int, int);
-extern void func_002A04B8(void *, int *, int *, int *);
-extern void func_002A0488(void *, int, int, int);
-extern void func_L11_0043A9D8(void *);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void chain_creature_set_segments_anim(void *, int, int, int);
+extern void chain_creature_set_linked_anim(void *, int, int, int);
+extern void get_moby_color(void *, int *, int *, int *);
+extern void set_moby_color(void *, int, int, int);
+extern void rotor_reaim_random_spin(void *);
 
 /* The record of the level's 256-byte table that the state lists at `i`, and the one it links to. */
 #define LISTED_RECORD(obj, i) \
@@ -69,7 +69,7 @@ extern void func_L11_0043A9D8(void *);
 /* Resets the ten rotors: re-arms the object and the ten records its state lists (each re-aimed
    and given the object's colour), reloads the twelve default weights, refreshes the linked
    record and restores a pending colour. */
-void func_L11_00439950(struct RotorObject *obj)
+void rotor_reset_group(struct RotorObject *obj)
 {
     struct RotorState *state = obj->state;
     int red, green, blue;
@@ -83,17 +83,17 @@ void func_L11_00439950(struct RotorObject *obj)
     obj->flags = (obj->flags | 0x1000) & 0xFFB9;
     obj->f7F = 0;
     state->f378 = 10;
-    SetMobyState(obj, 2, 0);
+    moby_set_state(obj, 2, 0);
     if (obj->f43)
-        StartAnimationBlended(obj, 0, 0, 0);
-    SetSegmentsAnimation(obj, 1, 0, 0);
-    SetLinkedRecordAnimation(obj, 1, 0, 0);
+        anim_start_blended(obj, 0, 0, 0);
+    chain_creature_set_segments_anim(obj, 1, 0, 0);
+    chain_creature_set_linked_anim(obj, 1, 0, 0);
     state->f374 = -1;
     get_moby_color(obj, &red, &green, &blue);
 
     for (i = 0; i < 10; i++) {
         state->armed[i] = 0;
-        ReaimRotorWithRandomSpin(LISTED_RECORD(obj, i));
+        rotor_reaim_random_spin(LISTED_RECORD(obj, i));
         set_moby_color(LISTED_RECORD(obj, i), red, green, blue);
     }
 

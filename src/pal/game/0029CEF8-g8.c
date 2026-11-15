@@ -1,24 +1,25 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_001A8CFC;
-extern int func_003418C0(void *, int);
+extern int tab_menu_update(void *, int);
 
 int func_PAL_0029CEF8(int value) {
     if (D_001A8CFC != 0)
-        return func_003418C0(D_001A8CFC + 0x3C210, value);
+        return tab_menu_update(D_001A8CFC + 0x3C210, value);
     return 0;
 }
 
-extern void func_003438E8(void *);
+extern void item_menu_draw(void *);
 
 void func_PAL_0029CF38(void) {
     if (D_001A8CFC != 0)
-        func_003438E8(D_001A8CFC + 0x3C530);
+        item_menu_draw(D_001A8CFC + 0x3C530);
 }
 
-extern int func_00343798(void *, int);
+extern int item_menu_update(void *, int);
 
 int func_PAL_0029CF68(int value) {
     if (D_001A8CFC != 0)
-        return func_00343798(D_001A8CFC + 0x3C530, value);
+        return item_menu_update(D_001A8CFC + 0x3C530, value);
     return 0;
 }

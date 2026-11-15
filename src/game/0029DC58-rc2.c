@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 D_001397E0[];
 extern u8 D_001A7A0A;
 /* Returns 1 when one status bit is set and a flag byte is clear, otherwise 0. */
-s32 func_0029DC58(void) {
+s32 menu_is_status_bit_set_flag_clear(void) {
     s32 result;
 
     if ((D_001A7A0A != 0) || (result = 1, ((*(s32 *)((s32)D_001397E0) & 0x08000000) == 0))) {

@@ -1,44 +1,44 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_L04_00423178(void *);
-extern void func_L01_003128C0(void *);
-extern int func_002ACBC8(void *, int);
-extern void func_L01_003246D0(int);
-extern int func_00288AA0(void *, int);
-extern int func_00288BE8(void *);
-extern int func_002F5D10(void);
-extern void func_002F5CC8(void);
-extern void func_002A7750(void *, int, int);
-extern void func_00288308(int);
-extern int func_002AD860(int);
+extern void moby_reset_matching_effects(void *);
+extern void moby_reset_vars_defaults(void *);
+extern int IsPointInCuboid(void *, int);
+extern void level_apply_index_for_key(int);
+extern int req_push_queue(void *, int);
+extern int req_launch_queued(void *);
+extern int game_is_either_mode_two(void);
+extern void game_set_slowdown_factor(void);
+extern void moby_set_state(void *, int, int);
+extern void help_unlock_entry(int);
+extern int moby_handle_request_slot_state(int);
 extern void func_US2_002B1880(int, int);
-extern void func_002A0430(int);
-extern void func_002DF3F8(void *, void *);
-extern int func_0029B3E0(int, int);
-extern void func_0029F338(void *);
-extern int func_00282978(void *);
-extern int func_00282948(void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00282DF0(void *);
-extern float func_00283B98(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283BE0(float, float);
-extern float func_00282E20(void *);
-extern void func_002AEC48(void *, void *, int, float, float);
+extern void moby_mark_table_entry_flagged(int);
+extern void level_capture_checkpoint_state(void *, void *);
+extern int MemcardSave(int, int);
+extern void moby_mark_spawned(void *);
+extern int FastDecTimer(void *);
+extern int math_fast_float_d(void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern void anim_start_blended(void *, int, int, int);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float FastVecLength(void *);
+extern float FastAddRotations(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern float vec_length_xy(void *);
+extern void moby_update_eased_node(void *, void *, int, float, float);
 extern unsigned char D_001A7B2E, D_001A7A40;
 extern int D_001397D8 NOT_SDA;
 extern unsigned char D_0013960F NOT_SDA;
 extern int D_L11_001A8F00;
 extern volatile int D_L11_001B32E8[] MACRO_ADDR;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_0019B2E8[][16];
 extern unsigned char D_L11_001C0AC0[];
 typedef struct {
@@ -50,7 +50,7 @@ typedef struct {
     unsigned char padF0[0x20];
     float velocity[4];
 } JobaPlayerView;
-extern JobaPlayerView D_00189E20;
+extern JobaPlayerView g_hero_state;
 extern char D_00189F00[];
 
 void func_US2_L11_003F9A50(unsigned char *moby) {
@@ -61,27 +61,27 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
     int track, i;
     float speed, angle, pitch, heading;
 
-    func_L04_00423178(moby);
+    moby_reset_matching_effects(moby);
     switch (moby[0x20]) {
     case 0:
         if (D_001A7B2E) {
-            func_0029F338(moby);
+            moby_mark_spawned(moby);
             return;
         }
         {
-            func_L01_003128C0(moby);
+            moby_reset_vars_defaults(moby);
             if (D_001397D8 & 0x10000)
-                func_002A7750(moby, 3, -1);
+                moby_set_state(moby, 3, -1);
             else
-                func_002A7750(moby, 1, -1);
+                moby_set_state(moby, 1, -1);
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189E20.position, *(int *)(data + 0x120))) {
-            func_L01_003246D0((int)moby);
-            if (func_00288AA0(D_L11_001C0AC0, 0x70)) {
-                func_00288BE8(D_L11_001C0AC0);
-                func_002A7750(moby, 2, -1);
+        if (IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
+            level_apply_index_for_key((int)moby);
+            if (req_push_queue(D_L11_001C0AC0, 0x70)) {
+                req_launch_queued(D_L11_001C0AC0);
+                moby_set_state(moby, 2, -1);
             }
         }
         break;
@@ -91,21 +91,21 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
+        if (!game_is_either_mode_two()) {
             D_L11_001B32E8[0] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
-            func_002A7750(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
         if (D_0013960F &&
-            func_002ACBC8(D_00189E20.position, *(int *)(data + 0x120))) {
-            func_L01_003246D0((int)moby);
-            if (func_00288AA0(D_L11_001C0AC0, 0x71)) {
-                func_00288BE8(D_L11_001C0AC0);
-                func_002F5CC8();
-                func_002A7750(moby, 4, -1);
+            IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
+            level_apply_index_for_key((int)moby);
+            if (req_push_queue(D_L11_001C0AC0, 0x71)) {
+                req_launch_queued(D_L11_001C0AC0);
+                game_set_slowdown_factor();
+                moby_set_state(moby, 4, -1);
             }
         }
         break;
@@ -115,33 +115,33 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
+        if (!game_is_either_mode_two()) {
             D_L11_001B32E8[0] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
             if (!D_001A7B2E) {
-                func_00288308(0x36);
-                func_002AD860(0x36);
+                help_unlock_entry(0x36);
+                moby_handle_request_slot_state(0x36);
                 func_US2_002B1880(0x1232, -1);
                 if (moby[0xB0] != 255) {
-                    if (!(D_0019B2E8[D_001A79F0][moby[0xB0]] & 0x80))
-                        func_002A0430(moby[0xB0]);
-                    func_002DF3F8(D_00189E20.position, D_00189E20.rotation);
+                    if (!(D_0019B2E8[g_current_map_index][moby[0xB0]] & 0x80))
+                        moby_mark_table_entry_flagged(moby[0xB0]);
+                    level_capture_checkpoint_state(g_hero_state.position, g_hero_state.rotation);
                 } else {
-                    func_0029B3E0(0, -1);
+                    MemcardSave(0, -1);
                 }
             }
-            func_0029F338(moby);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
 
     if (moby[0x20] != 0) {
-        if (moby[0x43] == 1 && func_00282978(data + 0x11E)) {
-            *(u16 *)(data + 0x11E) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (moby[0x43] == 1 && FastDecTimer(data + 0x11E)) {
+            *(u16 *)(data + 0x11E) = FloatToInt(math_random_float_range(1200.0f, 2400.0f));
         } else if ((moby[0x60] & 2) && moby[0x43] != 1) {
-            func_002A7470(moby, 1, 0, 10);
+            anim_start_blended(moby, 1, 0, 10);
         }
     }
 
@@ -149,25 +149,25 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
     track = 0;
     if (moby[0x43] == 1) {
         track = 1;
-        if (func_00282E80(moby + 0x10, D_00189E20.position) < 8.0f &&
-            func_00283C80(*(float *)(moby + 0xF8),
-                func_00283248(D_00189E20.aim[0] - *(float *)(moby + 0x10),
-                              D_00189E20.aim[1] - *(float *)(moby + 0x14))) < 1.5707964897155762f) {
-            if (func_00282DF0(D_00189E20.velocity) > 0.01f)
+        if (vec_distance_xy(moby + 0x10, g_hero_state.position) < 8.0f &&
+            FastDiffRots(*(float *)(moby + 0xF8),
+                mat_fast_helper_a(g_hero_state.aim[0] - *(float *)(moby + 0x10),
+                              g_hero_state.aim[1] - *(float *)(moby + 0x14))) < 1.5707964897155762f) {
+            if (FastVecLength(g_hero_state.velocity) > 0.01f)
                 *(int *)(data + 0x114) = 120;
             else
-                func_00282948(data + 0x114);
+                math_fast_float_d(data + 0x114);
         } else if (*(int *)(data + 0x114)) {
             *(int *)(data + 0x114) = 0;
             qcopy(data + 0x100, D_00189F00);
         }
-        if (func_00282948(data + 0x118)) {
-            *(int *)(data + 0x118) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            heading = func_00283B98(*(float *)(moby + 0xF8),
-                func_002A7878(-90.0f, 90.0f) * 0.01745329424738884f);
-            angle = func_002A7878(0.0f, 30.0f);
-            func_002AF000(data + 0x100, 6.0f, heading, angle * 0.01745329424738884f);
-            func_00282CC0(data + 0x100, data + 0x100, moby + 0x10);
+        if (math_fast_float_d(data + 0x118)) {
+            *(int *)(data + 0x118) = FloatToInt(math_random_float_range(180.0f, 300.0f));
+            heading = FastAddRotations(*(float *)(moby + 0xF8),
+                math_random_float_range(-90.0f, 90.0f) * 0.01745329424738884f);
+            angle = math_random_float_range(0.0f, 30.0f);
+            vec_build_spherical_offset(data + 0x100, 6.0f, heading, angle * 0.01745329424738884f);
+            FastVecAdd(data + 0x100, data + 0x100, moby + 0x10);
         }
         if (*(int *)(data + 0x114)) {
             qcopy(target, D_00189F00);
@@ -180,9 +180,9 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
     if (track) {
         qcopy(origin, moby + 0x10);
         origin[2] += 2.0f;
-        func_00282CF0(delta, target, origin);
-        angle = func_00283BE0(func_00283248(delta[0], delta[1]), *(float *)(moby + 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, origin);
+        angle = fast_subtract_rotations(mat_fast_helper_a(delta[0], delta[1]), *(float *)(moby + 0xF8));
+        pitch = -mat_fast_helper_a(vec_length_xy(delta), delta[2]);
         if (angle > 1.5707964897155762f)
             angle = 1.5707964897155762f;
         else if (angle < -1.5707964897155762f)
@@ -198,5 +198,5 @@ void func_US2_L11_003F9A50(unsigned char *moby) {
     if (D_001A7A40)
         *(float *)(data + 0x70) = 2.75f;
     for (i = 0; i < 2; i++)
-        func_002AEC48(moby, data + i * 0x80, i, speed, 0.3f);
+        moby_update_eased_node(moby, data + i * 0x80, i, speed, 0.3f);
 }

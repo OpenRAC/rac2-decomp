@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_0033A248, the PAL copy of func_003384C0: the same C. */
 
 typedef int s32;
@@ -11,7 +12,7 @@ typedef unsigned int u32;
  /* text width */
 
 /* Text box laid out by func_00337C10/func_00337E30: text at +0xA8, its line table at +0x1D8. */
-extern int func_00115DA8(char *, char *, ...); /* formats into a buffer */
+extern int sprintf(char *, char *, ...); /* formats into a buffer */
  /* screen size: [1] = height */
 extern void func_PAL_0033A248(char *, unsigned int, unsigned int, float, float, float, float);
 
@@ -43,9 +44,9 @@ typedef struct {
     float fB0;
 } ViewState;
 extern ViewState D_001B9040;
-extern void func_0027AB40(void);
-extern int func_00335E08(void);
-extern void func_00300A00(int, float, float, unsigned int, float, float, float);
+extern void UpdateViewContext(void);
+extern int object_get_stored_counter(void);
+extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, float, float, float);
 
 /* Draws a frame when the level object exists: with the view scale at +0xB0 of D_001B9040
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
@@ -61,30 +62,30 @@ void func_PAL_0033A248(char *obj, unsigned int alpha, unsigned int color, float 
         scale = 1.0f;
         saved = view->fB0;
         view->fB0 = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         uv = ((bottom - top) - 26.0f) * 0.008928571827709675f;
         uv = uv * 0.3110000193119049f + 0.03750000149011612f;
-        if (func_00335E08() == 1)
+        if (object_get_stored_counter() == 1)
             scale = 0.9f;
         alpha <<= 24;
         alpha |= color;
-        func_00300A00(*(int *)(obj + 0x222c), left, top, alpha, -1.0f, scale, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x222c), left, top, alpha, -1.0f, scale, uv);
         border = 16.0f;
-        func_00300A00(*(int *)(obj + 0x222c), right, top, alpha, 1.0f, scale, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x222c), right, top, alpha, 1.0f, scale, uv);
         uv = ((right - left) - 150.0f) * 0.003267973894253373f;
         insetLeft = left + border;
         insetRight = right - border;
         uv = uv * 0.43300002813339233f + 0.10199999809265137f;
-        func_00300A00(*(int *)(obj + 0x2230), insetLeft, top, alpha, -1.0f, 1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2230), insetRight, top, alpha, 1.0f, 1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2230), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2230), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetLeft, top, alpha, -1.0f, 1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetRight, top, alpha, 1.0f, 1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
         view->fB0 = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }
 
-extern int func_00115DA8(char *, char *, ...);
+extern int sprintf(char *, char *, ...);
 
 /* Writes the localised text `text_id` (with `value` as its only argument) into the
    buffer at +0x1E14 of the object, then initialises the sub-object at +0x1D6C with a

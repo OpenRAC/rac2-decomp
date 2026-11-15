@@ -11,18 +11,18 @@ extern PathRoute *D_L15_001FE480[] NOT_SDA;
 extern int D_L15_001B3698 MACRO_ADDR;
 extern char *D_L15_001B261C MACRO_ADDR;
 extern PathVector D_L15_001B97C0 NOT_SDA;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_0019B278[];
-extern void func_002B7320(void), func_0029F338(void *), func_L05_0037B210(void), func_L05_00379F28(int), func_L05_00379F18(int), func_PAL_L05_0037D9D0(char *, int);
-extern char **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void), func_L00_0042B730(void *), func_00282948(int *);
-extern char *func_0029EFD0(int), *func_L05_00379ED0(int);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *), func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *), func_00282E48(void *, void *);
-extern void func_PAL_L15_00436118(void *, int), func_L15_0042FD40(void *);
-extern void *func_00288FB8(int);
-extern void func_PAL_L00_0030FBC0(void *, int), func_L05_0037ADD8(float), func_L05_00424980(void *, int), func_L05_00424970(void *, unsigned int);
-extern int func_002E5DA0(int, int, void *, int);
+extern void music_Unpause(void), moby_mark_spawned(void *), entry_init_all_registered(void), hero_set_state_value_b(int), hero_set_state_value_a(int), func_PAL_L05_0037D9D0(char *, int);
+extern char **level_get_object_list(void);
+extern int level_get_saved_value(void), level_get_saved_value_b(void *), math_fast_float_d(int *);
+extern char *CreateMoby(int), *level_find_object_by_class_id(int);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *), fast_vec_dist(void *, void *);
+extern void func_PAL_L15_00436118(void *, int), ResetGornStageCounters(void *);
+extern void *GetLocalizedString(int);
+extern void func_PAL_L00_0030FBC0(void *, int), hero_add_clamped_stat(float), effect_set_enabled(void *, int), effect_set_color(void *, unsigned int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern char *func_PAL_L05_00432530(void *, int, int, int);
 extern int D_L15_001B1534 __attribute__((sda));
 extern char * D_L15_001B1584 __attribute__((sda));
@@ -64,18 +64,18 @@ void func_PAL_L15_00436A10(char *self)
         init = 1;
         D_L15_001B1598 = 0; index = 0; misses = 0;
         D_L15_001B3698 = 0; D_L15_00221E10.reset = 0;
-        func_002B7320();
-        if (effect) func_0029F338(effect);
-        func_L05_0037B210(); effect = 0;
-        func_L05_00379F28(1);
+        music_Unpause();
+        if (effect) moby_mark_spawned(effect);
+        entry_init_all_registered(); effect = 0;
+        hero_set_state_value_b(1);
         D_L15_00221E10.route = *(int *)(state + 0x30);
-        func_L05_00379F18(0);
-        list = func_L05_00379EB8(); n = func_L00_004272A0();
+        hero_set_state_value_a(0);
+        list = level_get_object_list(); n = level_get_saved_value();
         for (i = 0; i < n; i++) if (*(short *)(list[i] + 0xAA) == 0xF82) func_PAL_L05_0037D9D0(list[i], 1);
         path = D_L15_001FE480[*(int *)(state + 0x30)];
         while ((!first || !next) && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {
-            object = func_0029EFD0(0x114A);
+            object = CreateMoby(0x114A);
             ((unsigned char *)object)[0x30] = 0xFF;
             objectFlags = *(unsigned short *)(object + 0x34);
             oldFirst = first;
@@ -83,17 +83,17 @@ void func_PAL_L15_00436A10(char *self)
             *(unsigned short *)(object + 0x34) = objectFlags | 0x100;
             if (!oldFirst) first = object; else next = object;
             if (index == path->pointCount - 1) {
-                func_00282CF0(object + 0xC0, &path->point[index - 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index - 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, -1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
             } else {
-                func_00282CF0(object + 0xC0, &path->point[index + 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index + 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, 1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
             }
-            func_00282DD8(object + 0xD0, object + 0xC0, &up);
-            func_00282F20(object + 0xD0, object + 0xD0, 1);
-            func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+            FastVecCross(object + 0xD0, object + 0xC0, &up);
+            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
+            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
             qcopy(object + 0x10, &path->point[index]);
             *(int *)(object + 0x1C) = 0;
             }
@@ -101,49 +101,49 @@ void func_PAL_L15_00436A10(char *self)
         }
     }
     if (!first && !next && !waiting) { func_PAL_L15_00436118(self, 3); return; }
-    if (func_L00_0042B730(func_L05_00379ED0(0xF82))) {
+    if (level_get_saved_value_b(level_find_object_by_class_id(0xF82))) {
         waiting = 1;
-        if (func_00282948((int *)(state + 0x64))) { waiting = 0; *(int *)(state + 0x64) = 200; func_L15_0042FD40(self); func_L05_0037B210(); }
-        else func_PAL_L00_0030FBC0(func_00288FB8(0x10F6), -1);
+        if (math_fast_float_d((int *)(state + 0x64))) { waiting = 0; *(int *)(state + 0x64) = 200; ResetGornStageCounters(self); entry_init_all_registered(); }
+        else func_PAL_L00_0030FBC0(GetLocalizedString(0x10F6), -1);
     } else if (misses >= 12) {
         waiting = 1;
-        if (!func_00282948((int *)(state + 0x64))) func_PAL_L00_0030FBC0(func_00288FB8(0x10F6), -1);
-        else { waiting = 0; *(int *)(state + 0x64) = 200; func_L15_0042FD40(self); func_L05_0037B210(); }
+        if (!math_fast_float_d((int *)(state + 0x64))) func_PAL_L00_0030FBC0(GetLocalizedString(0x10F6), -1);
+        else { waiting = 0; *(int *)(state + 0x64) = 200; ResetGornStageCounters(self); entry_init_all_registered(); }
     }
     if (waiting) return;
     count = D_L15_001B3698 + 1;
     if (count < 2) return;
     hero = D_L15_001B261C + (*(int *)(state + 0x20) << 8);
     qcopy(&camera, &D_L15_001B97C0);
-    func_00282CF0(&fromCamera, &camera, first + 0x10);
-    func_00282F20(&fromCamera, &fromCamera, 1);
-    func_00282CF0(&fromHero, hero + 0x10, first + 0x10);
-    func_00282F20(&fromHero, &fromHero, 1);
-    heroDot = func_00282DB0(first + 0xC0, &fromHero);
-    cameraDot = func_00282DB0(first + 0xC0, &fromCamera);
+    FastVecSub(&fromCamera, &camera, first + 0x10);
+    vec_scale_to_length(&fromCamera, &fromCamera, 1);
+    FastVecSub(&fromHero, hero + 0x10, first + 0x10);
+    vec_scale_to_length(&fromHero, &fromHero, 1);
+    heroDot = FastVecDot(first + 0xC0, &fromHero);
+    cameraDot = FastVecDot(first + 0xC0, &fromCamera);
     if ((heroDot != oldHero && heroDot > 0) || (cameraDot != oldCamera && cameraDot > 0)) {
         path = D_L15_001FE480[*(int *)(state + 0x30)];
-        if (func_00282E48(&camera, first + 0x10) <= 1.25f || func_00282E48(hero + 0x10, first + 0x10) <= 1.25f) {
-            func_002E5DA0(15, 0, self, 0xFBF); func_L05_0037ADD8(0.5f);
-        } else { func_L05_0037ADD8(-0.75f); misses++; }
-        func_0029F338(first); first = next; next = 0;
+        if (fast_vec_dist(&camera, first + 0x10) <= 1.25f || fast_vec_dist(hero + 0x10, first + 0x10) <= 1.25f) {
+            snd_play_from_class_bank(15, 0, self, 0xFBF); hero_add_clamped_stat(0.5f);
+        } else { hero_add_clamped_stat(-0.75f); misses++; }
+        moby_mark_spawned(first); first = next; next = 0;
         while (!next && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {
-            object = func_0029EFD0(0x114A);
+            object = CreateMoby(0x114A);
             ((PathObject *)object)->alpha = 0xFF; ((PathObject *)object)->colour = 0x1FF; ((PathObject *)object)->flags |= 0x100;
             next = object;
             if (index == path->pointCount - 1) {
-                func_00282CF0(object + 0xC0, &path->point[index - 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index - 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, -1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
             } else {
-                func_00282CF0(object + 0xC0, &path->point[index + 1], &path->point[index]);
+                FastVecSub(object + 0xC0, &path->point[index + 1], &path->point[index]);
                 *(int *)(object + 0xCC) = 0;
-                func_00282F20(object + 0xC0, object + 0xC0, 1);
+                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
             }
-            func_00282DD8(object + 0xD0, object + 0xC0, &up);
-            func_00282F20(object + 0xD0, object + 0xD0, 1);
-            func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+            FastVecCross(object + 0xD0, object + 0xC0, &up);
+            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
+            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
             qcopy(object + 0x10, &path->point[index]);
             *(int *)(object + 0x1C) = 0;
             }
@@ -152,10 +152,10 @@ void func_PAL_L15_00436A10(char *self)
     }
     oldHero = heroDot; oldCamera = cameraDot;
     if (first) {
-        func_L05_00424980(first, 1);
-        if (next) func_L05_00424970(first, 0x40008000);
-        else func_L05_00424970(first, 0x4000C6FF);
+        effect_set_enabled(first, 1);
+        if (next) effect_set_color(first, 0x40008000);
+        else effect_set_color(first, 0x4000C6FF);
     }
-    if (next) { func_L05_00424980(next, 1); func_L05_00424970(next, 0x40808000); }
-    else if (!misses && !effect && !D_0019B278[D_001A79F0 * 4]) effect = func_PAL_L05_00432530(first + 0x10, 0, -1, -1);
+    if (next) { effect_set_enabled(next, 1); effect_set_color(next, 0x40808000); }
+    else if (!misses && !effect && !D_0019B278[g_current_map_index * 4]) effect = func_PAL_L05_00432530(first + 0x10, 0, -1, -1);
 }

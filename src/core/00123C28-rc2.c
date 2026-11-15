@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,8 +26,8 @@
 
 extern s32 func_00115544(s32, s32);
 extern s32 func_001157AC(s32);
-extern s32 func_00123530(s32, s32);
-extern s32 func_00123578(s32, s32);
+extern s32 eh_read_uleb128(s32, s32);
+extern s32 eh_read_sleb128(s32, s32);
 
 extern s8 D_0013B060[];
 extern s8 D_0013B068[];
@@ -36,7 +37,7 @@ typedef struct {
 } __attribute__((packed)) UA32;
 
 /* Reads the shared header of a frame record and gives back where its instructions start. */
-s8 *func_00123C28(s32 fde, s32 info) {
+s8 *eh_extract_cie_info(s32 fde, s32 info) {
     s32 ulebValue[4];
     s32 ciePtr;
     s32 augEnd;
@@ -44,22 +45,22 @@ s8 *func_00123C28(s32 fde, s32 info) {
 
     ciePtr = (fde - *(s32 *)(fde + 4)) + 0xD;
     *(s32 *)info = ciePtr;
-    if (strcmp_00115544(ciePtr, (s32) D_0013B060) != 0 && strcmp_00115544(*(s32 *)info, (s32) D_0013B068) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
+    if (func_00115544(ciePtr, (s32) D_0013B060) != 0 && func_00115544(*(s32 *)info, (s32) D_0013B068) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
         return 0;
     }
-    augEnd = *(s32 *)info + strlen_001157AC(*(s32 *)info);
+    augEnd = *(s32 *)info + func_001157AC(*(s32 *)info);
     readPtr = augEnd + 1;
-    if (strcmp_00115544(*(s32 *)info, (s32) D_0013B068) == 0) {
+    if (func_00115544(*(s32 *)info, (s32) D_0013B068) == 0) {
         *(s32 *)(info + 4) = ((UA32 *)readPtr)->v;
         readPtr = augEnd + 5;
     } else {
         *(s32 *)(info + 4) = 0;
     }
-    readPtr = ReadSignedLeb128(ReadUnsignedLeb128(readPtr, info + 8), info + 0xC);
+    readPtr = eh_read_sleb128(eh_read_uleb128(readPtr, info + 8), info + 0xC);
     *(s32 *)(info + 0x10) = *(u8 *)readPtr;
     readPtr = readPtr + 1;
     if (*(s8 *)*(s32 *)info == 0x7A) {
-        readPtr = ReadUnsignedLeb128(readPtr, (s32) ulebValue) + ulebValue[0];
+        readPtr = eh_read_uleb128(readPtr, (s32) ulebValue) + ulebValue[0];
     }
     return (s8 *) readPtr;
 }

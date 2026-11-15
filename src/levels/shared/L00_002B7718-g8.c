@@ -16,7 +16,7 @@ typedef struct {
     unsigned char pad22c4[552];
     short f24ec;
 } Root;
-extern Root D_00189E20;
+extern Root g_hero_state;
 typedef struct {
     unsigned char pad110[272];
     float f110;
@@ -50,38 +50,38 @@ typedef struct {
 extern Pose D_L00_0025BE10;
 extern int ref_L00_002B7718_0 __attribute__((sda));
 extern int D_L00_001A8FF4;
-extern void func_002830C0(void *, void *, void *);
-extern void func_L00_002AB0C0(float, float);
-extern float func_00282E48(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void cam_set_limits_second(float, float);
+extern float fast_vec_dist(void *, void *);
 
 /* Tilts the hero's head, spine and arms toward where the stick or aim points, with limits that depend on what the hero is doing. */
-void func_L00_002B7718(void)
+void UpdateHeroTiltPoseTargets(void)
 {
     union { Vec q; float f[4]; } vector;
     float limit, x, y, z;
     int flag;
 
-    if (gHeroState.f348 && !gHeroState.f22ba) {
+    if (g_hero_state.f348 && !g_hero_state.f22ba) {
         vector.q = 0;
         vector.f[2] = -1.0f;
-        transform_vector(&vector, &vector, (char *)&gHeroState + 0x40);
-        SetCameraLimitsSlot1(0.013f, 0.3f);
+        transform_vector(&vector, &vector, (char *)&g_hero_state + 0x40);
+        cam_set_limits_second(0.013f, 0.3f);
         limit = 0.36651918292045593f;
-        if (gHeroState.f2294 == 109)
+        if (g_hero_state.f2294 == 109)
             limit = 0.087266475f;
-        else if (gHeroState.f2294 == 110 || gHeroState.f2294 == 4)
+        else if (g_hero_state.f2294 == 110 || g_hero_state.f2294 == 4)
             limit = 0.19198623299598694f;
-        if (gHeroState.f22bb && limit > 0.12217305600643158f)
+        if (g_hero_state.f22bb && limit > 0.12217305600643158f)
             limit = 0.12217305600643158f;
-        if (gHeroState.f33c && limit > 0.15707965195178986f)
+        if (g_hero_state.f33c && limit > 0.15707965195178986f)
             limit = 0.15707965195178986f;
-        if (!gHeroState.f24ec) {
+        if (!g_hero_state.f24ec) {
             x = vector.f[0] * 0.6981318f;
             if (x > limit) x = limit;
             else if (x < -limit) x = -limit;
             D_L00_0025BE10.f114 = x;
             D_L00_0025BE10.f274 = -x * 0.5f;
-            if (gHeroState.f22bb) {
+            if (g_hero_state.f22bb) {
                 D_L00_0025BE10.f5e4 = -x;
                 D_L00_0025BE10.f694 = -x;
             }
@@ -111,16 +111,16 @@ void func_L00_002B7718(void)
         D_L00_0025BE10.fa00 = y * 0.7f;
         D_L00_0025BE10.fab0 = y * 0.7f;
     }
-    if (gHeroState.f22c3 == 1 || ref_L00_002B7718_0) {
+    if (g_hero_state.f22c3 == 1 || ref_L00_002B7718_0) {
         vector.q = 0;
         vector.f[0] = 330.0f;
         vector.f[1] = 245.0f;
         vector.f[2] = 138.0f;
         flag = 0;
-        if (fast_vec_dist((char *)&gHeroState + 0x80, &vector) < 35.0f)
+        if (fast_vec_dist((char *)&g_hero_state + 0x80, &vector) < 35.0f)
             flag = 1;
         if (D_L00_001A8FF4) flag = 1;
-        if (gHeroState.f22bb && flag) {
+        if (g_hero_state.f22bb && flag) {
             D_L00_0025BE10.f6d4 = 0.05f;
             D_L00_0025BE10.f6d8 = 0.3f;
             D_L00_0025BE10.f694 = -0.22689282894134521f;

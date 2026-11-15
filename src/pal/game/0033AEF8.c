@@ -1,21 +1,22 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_003361A8(void *p);
-extern void func_00336968(void *p);
+extern void object_construct_derived_a(void *p);
+extern void hud_construct_widget_base(void *p);
 
 /* func_00338F58 is matched in 00338F58.c. */
 
 /* Initialises eight sub-objects at byte offsets 8, 84, 160, 236 (step 76) and 312, 384, 456, 528 (step 72) of the argument with two different helpers and returns the argument. */
 void *func_PAL_0033AEF8(char *a0)
 {
-    func_003361A8(a0 + 8);
-    func_003361A8(a0 + 84);
-    func_003361A8(a0 + 160);
-    func_003361A8(a0 + 236);
-    func_00336968(a0 + 312);
-    func_00336968(a0 + 400);
-    func_00336968(a0 + 488);
-    func_00336968(a0 + 576);
+    object_construct_derived_a(a0 + 8);
+    object_construct_derived_a(a0 + 84);
+    object_construct_derived_a(a0 + 160);
+    object_construct_derived_a(a0 + 236);
+    hud_construct_widget_base(a0 + 312);
+    hud_construct_widget_base(a0 + 400);
+    hud_construct_widget_base(a0 + 488);
+    hud_construct_widget_base(a0 + 576);
     return a0;
 }
 
@@ -30,18 +31,18 @@ typedef struct {
     unsigned int levels;
 } Statistics_0033B218;
 
-extern void func_00335E38(void *, float, float, float, float);
-extern int func_002DF1F8(void *, int);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern int text_format_location_name(void *, int);
 
 extern Float2_0033B218 ref_L00_0042EC50_00;
 extern Float2_0033B218 ref_L00_0042EC50_01;
 extern Float2_0033B218 ref_L00_0042EC50_02;
 
-extern int D_001B1688 __attribute__((sda));
+extern int g_game_time __attribute__((sda));
 extern int D_001C51D0;
 extern unsigned int D_001A7390 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
-extern Statistics_0033B218 D_0018C750;
+extern int g_current_map_index __attribute__((sda));
+extern Statistics_0033B218 g_progress_statistics;
 
 /* func_PAL_0033B218, the PAL copy of func_00339320: the same C, where the widgets from +0x180 sit 0x10 and 0x20 further on,
    the object at +0x258 is at +0x298, and the highest level time is scaled to 50 Hz before it is compared and kept. */
@@ -55,23 +56,23 @@ int func_PAL_0033B218(char *a0)
     Float2_0033B218 g1 = ref_L00_0042EC50_01;
     Float2_0033B218 g2 = ref_L00_0042EC50_02;
 
-    func_00335E38(a0 + 8, z0.x + (*(float **)(a0 + 4))[0], z0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0x54, z3.x + (*(float **)(a0 + 4))[0], z3.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0xA0, z1.x + (*(float **)(a0 + 4))[0], z1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0xEC, z2.x + (*(float **)(a0 + 4))[0], z2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0x138, g0.x + (*(float **)(a0 + 4))[0], g0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0x190, g1.x + (*(float **)(a0 + 4))[0], g1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_00335E38(a0 + 0x1E8, g2.x + (*(float **)(a0 + 4))[0], g2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    func_002DF1F8(a0 + 0x298, D_001C51D0);
-    if (D_001B1688 >= 11) {
-        if (D_0018C750.count < 0xffff) D_0018C750.count++;
+    object_set_first_float4(a0 + 8, z0.x + (*(float **)(a0 + 4))[0], z0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0x54, z3.x + (*(float **)(a0 + 4))[0], z3.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0xA0, z1.x + (*(float **)(a0 + 4))[0], z1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0xEC, z2.x + (*(float **)(a0 + 4))[0], z2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0x138, g0.x + (*(float **)(a0 + 4))[0], g0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0x190, g1.x + (*(float **)(a0 + 4))[0], g1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(a0 + 0x1E8, g2.x + (*(float **)(a0 + 4))[0], g2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    text_format_location_name(a0 + 0x298, D_001C51D0);
+    if (g_game_time >= 11) {
+        if (g_progress_statistics.count < 0xffff) g_progress_statistics.count++;
     }
-    if (((int)D_001A7390 * 5 + 2) / 6 > D_0018C750.maximum) D_0018C750.maximum = ((int)D_001A7390 * 5 + 2) / 6;
-    D_0018C750.levels = (D_0018C750.levels | (1u << D_001A79F0)) | 0x80000000u;
+    if (((int)D_001A7390 * 5 + 2) / 6 > g_progress_statistics.maximum) g_progress_statistics.maximum = ((int)D_001A7390 * 5 + 2) / 6;
+    g_progress_statistics.levels = (g_progress_statistics.levels | (1u << g_current_map_index)) | 0x80000000u;
     return 0;
 }
 
-extern void func_00336320(char *a);
+extern void gfx_draw_screen_element_stored(char *a);
 extern void func_PAL_00338770(char *a);
 
 /* early-returns when a 32-bit field is zero, otherwise calls one helper four times and another three times with fixed byte offsets off the argument pointer. */
@@ -79,10 +80,10 @@ void func_PAL_0033B4B8(char *a0)
 {
     if (*(int *)(a0 + 728) == 0)
         return;
-    func_00336320(a0 + 8);
-    func_00336320(a0 + 84);
-    func_00336320(a0 + 160);
-    func_00336320(a0 + 236);
+    gfx_draw_screen_element_stored(a0 + 8);
+    gfx_draw_screen_element_stored(a0 + 84);
+    gfx_draw_screen_element_stored(a0 + 160);
+    gfx_draw_screen_element_stored(a0 + 236);
     func_PAL_00338770(a0 + 312);
     func_PAL_00338770(a0 + 400);
     func_PAL_00338770(a0 + 488);
@@ -95,19 +96,19 @@ typedef unsigned char u8;
 
 void func_PAL_0033B688(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
 
-extern void func_0033AE18(unsigned char *owner, int value);
+extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
 void func_PAL_0033B698(unsigned char *owner, int value)
 {
-    func_0033AE18(owner + 8, value);
+    prompt_bar_set_texts_enabled(owner + 8, value);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
 void func_PAL_0033B6B8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
 
 extern int func_00288FB8_3(int);
-extern void func_0033B050(char *, int, int, int);
-extern void func_0033B0A8(char *, float);
+extern void prompt_bar_set_texts(char *, int, int, int);
+extern void prompt_bar_set_spacing(char *, float);
 
 /* Calls a one-argument helper three times with three fixed small integers, passes the three results and a pointer plus 8 to a four-argument helper, calls a two-argument helper with the same address and 0.0f, then clears the word at offset 764. */
 void func_PAL_0033B6C0(char *p)
@@ -115,8 +116,8 @@ void func_PAL_0033B6C0(char *p)
     int first = func_00288FB8_3(2991);
     int second = func_00288FB8_3(2989);
 
-    func_0033B050(p + 8, first, second, func_00288FB8_3(2912));
-    func_0033B0A8(p + 8, 0.0f);
+    prompt_bar_set_texts(p + 8, first, second, func_00288FB8_3(2912));
+    prompt_bar_set_spacing(p + 8, 0.0f);
     *(int *)(p + 812) = 0;
 }
 
@@ -148,14 +149,14 @@ typedef struct {
     float x, y;
 } Point2_0033BE50;
 
-extern void *func_00115484(void *, int, int);
-extern void func_00335F88(void *, float, float, float, float);
-extern int func_00288FB8(int);
-extern void func_00336A38(void *, int);
+extern void *memset(void *, int, int);
+extern void object_set_second_float4(void *, float, float, float, float);
+extern int GetLocalizedString(int);
+extern void hud_set_widget_field_b(void *, int);
 extern Point2_0033BE50 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
 extern Point2_0033BE50 D_001ADD00 __attribute__((sda));
 extern Point2_0033BE50 D_001ADD00_gp __asm__("D_001ADD00__gp") __attribute__((section(".sdata")));
-extern char D_001C4FA0[];
+extern char g_map_overlay_state[];
 extern int D_00258D70[];
 extern char D_001ADC88[];
 
@@ -170,53 +171,53 @@ int func_PAL_0033BE50(char *obj, int unused)
     char *base;
     int index;
 
-    func_00115484(&z0, 0, 8);
-    func_00115484(&z1, 0, 8);
-    func_00115484(&z2, 0, 8);
-    func_00115484(&z3, 0, 8);
+    memset(&z0, 0, 8);
+    memset(&z1, 0, 8);
+    memset(&z2, 0, 8);
+    memset(&z3, 0, 8);
     title = D_001ADCE0;
     list = D_001ADCE8;
     prev = D_001ADCF0;
     next = D_001ADCF8;
-    func_00335F88(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335E38(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
+    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_first_float4(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
                   z0.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
                   z3.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0xA0, z1.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0xA0, z1.x + (*(float **)(obj + 4))[0],
                   z1.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0xEC, z2.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0xEC, z2.x + (*(float **)(obj + 4))[0],
                   z2.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x138, title.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x138, title.x + (*(float **)(obj + 4))[0],
                   title.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x190, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x190, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x1E8, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x1E8, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 18.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x240, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x240, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 36.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x298, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x298, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 54.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x2F0, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x2F0, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 72.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x348, list.x + 8.0f + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x348, list.x + 8.0f + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 90.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x3A0, prev.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x3A0, prev.x + (*(float **)(obj + 4))[0],
                   prev.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x3F8, next.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x3F8, next.x + (*(float **)(obj + 4))[0],
                   next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    base = D_001C4FA0;
-    func_002DF1F8(obj + 0x450, *(int *)(base + 0x230));
+    base = g_map_overlay_state;
+    text_format_location_name(obj + 0x450, *(int *)(base + 0x230));
     index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
     if (index >= 0)
-        func_00336A38(obj + 0x3F8, func_00288FB8(index));
+        hud_set_widget_field_b(obj + 0x3F8, GetLocalizedString(index));
     else
-        func_00336A38(obj + 0x3F8, (int)D_001ADC88);
+        hud_set_widget_field_b(obj + 0x3F8, (int)D_001ADC88);
     return 0;
 }
 

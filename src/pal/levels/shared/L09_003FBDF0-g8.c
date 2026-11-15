@@ -5,8 +5,8 @@ extern const char D_L09_001B10A8[];
 extern float D_L09_001B0F0C __attribute__((sda)), D_L09_001B0F10 __attribute__((sda));
 extern float D_L09_001B0F14 __attribute__((sda)), D_L09_001B0F18 __attribute__((sda));
 extern float D_L09_001B0F1C __attribute__((sda)), D_L09_001B0F20 __attribute__((sda));
-extern void func_0026FEB8(const char *, ...);
-extern void func_002B60B0(void *, float, float, float, float);
+extern void STUB_printf(const char *, ...);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
@@ -14,13 +14,13 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 
 void func_PAL_L09_003FBDF0(char *object, int state, int a2, int a3) {
     char *data = *(char **)(object+0x68);
-    func_0026FEB8(D_L09_001B10A8, *(short *)(object+0xB2), state);
+    STUB_printf(D_L09_001B10A8, *(short *)(object+0xB2), state);
     if (state == 12) {
-        func_002B60B0(object, D_L09_001B0F0C * 0.00040000002f, D_L09_001B0F10 * 0.020000001f,
+        moby_set_controller_speed_limits(object, D_L09_001B0F0C * 0.00040000002f, D_L09_001B0F10 * 0.020000001f,
                       D_L09_001B0F1C * 6.981318e-06f, D_L09_001B0F20 * 0.0003490659f);
         F(data,0x118) += F(data,0x118);
     } else {
-        func_002B60B0(object, D_L09_001B0F14 * 0.00040000002f, D_L09_001B0F18 * 0.020000001f,
+        moby_set_controller_speed_limits(object, D_L09_001B0F14 * 0.00040000002f, D_L09_001B0F18 * 0.020000001f,
                       D_L09_001B0F1C * 6.981318e-06f, D_L09_001B0F20 * 0.0003490659f);
         F(data,0x118) += F(data,0x118);
     }

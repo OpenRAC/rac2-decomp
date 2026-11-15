@@ -1,17 +1,17 @@
 #include "names.h"
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00282DF0(float *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282D30(void *, void *, float);
-extern int func_002E5CF8(int, int, void *);
-extern float func_002A7798(float);
-extern void func_002A8240(void *, void *, int, float, float, float);
-extern void func_002A7CA0(void *, float, float, float, float, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(float *, float *, float *);
+extern float FastVecLength(float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecScale(void *, void *, float);
+extern int PlayMobySound(int, int, void *);
+extern float math_ease_out_quad(float);
+extern void moby_move_and_collide(void *, void *, int, float, float, float);
+extern void MobySpringTurn(void *, float, float, float, float, void *);
 extern char D_L06_00188660[];
 
 /* Steps the follower's weight toward its goal and blends the state vectors; returns 1 on arrival. */
-int func_L06_00420548(char *moby, float accel, float maxSpeed, float targetYaw, float blend)
+int actor_move_toward_goal(char *moby, float accel, float maxSpeed, float targetYaw, float blend)
 {
     char *handleRecord;
     float distance;
@@ -35,14 +35,14 @@ int func_L06_00420548(char *moby, float accel, float maxSpeed, float targetYaw, 
         speed -= accelStep;
         done = 1;
     } else {
-        speed += accelStep * EaseOutQuad((maxStep - speed) / maxStep);
+        speed += accelStep * math_ease_out_quad((maxStep - speed) / maxStep);
     }
     vec_scale_to_length(toGoal, toGoal, speed);
     velocity = vars + 0x230;
     FastVecScale(velocity, velocity, blend);
     FastVecScale(toGoal, toGoal, 1.0f - blend);
     FastVecAdd(velocity, velocity, toGoal);
-    MoveAndCollideObject(moby, velocity, 0, 0.0f, 1.5f, 0.0f);
+    moby_move_and_collide(moby, velocity, 0, 0.0f, 1.5f, 0.0f);
     MobySpringTurn(moby, targetYaw, 0.0005817765f, 0.0017453294713050127f, 0.03490659222006798f, vars + 0x25C);
     return done;
 }

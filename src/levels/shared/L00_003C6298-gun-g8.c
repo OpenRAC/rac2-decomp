@@ -26,13 +26,13 @@ typedef struct {
     char pad22B9[0x233]; short aiming;
     char pad24EE[0x46]; int timer;
 } Hero;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern Statistics D_0018C360[];
 extern unsigned int D_001A7390 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned int D_00138320 NOT_SDA;
 extern unsigned char D_00139578 NOT_SDA;
-extern Weapon D_L00_00262570[];
+extern Weapon g_weapon_l00_table[];
 extern int D_L00_001B2A0C MACRO_ADDR;
 extern int D_L00_001B2A04 MACRO_ADDR;
 extern int D_L00_001B2A08 MACRO_ADDR;
@@ -50,43 +50,43 @@ extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern int D_L00_001A903C[] MACRO_ADDR;
 extern Light D_L00_001C6F40[];
 typedef struct { char prefix[0x74]; unsigned char active; char pad75[0x13]; char *owner; } SoundView;
-extern char D_00188660[];
+extern char g_sound_state[];
 extern Vec D_L00_001B8C80[];
-extern int func_00282978(void *);
-extern int func_00282948(void *);
-extern void func_002A7470(void *, int, int, int);
-extern void func_L00_002AF568(void);
-extern void func_L00_002AF7D0(void);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_L00_002C42E0(int, int);
-extern void func_00283678(void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00282E20(void *);
+extern int FastDecTimer(void *);
+extern int math_fast_float_d(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern void start_equipped_item_animation(void);
+extern void cancel_hero_item_animation(void);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void hero_l00_set_action(int, int);
+extern void copy_matrix3x4(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float vec_length_xy(void *);
 extern char *ref_L00_003C6298_00(void *, void *, void *, void *);
-extern char *func_002AB1F0(void *);
-extern float func_00283CE0(int);
-extern float func_002AA140(float, float, float);
-extern int func_L00_00325FC8(void *, int, int, float);
-extern void func_00290010(int, int, int, float);
-extern int func_002E5E58(int, int, void *);
-extern void func_002B0A18(int, int);
-extern int func_002E5CF8(int, int, void *);
-extern void *func_L00_00403730(void *);
-extern void func_L00_003C6B98(void *);
-extern int func_00291308(float, void *, int, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002E59B0(void *, int);
-extern void func_00291450(int);
-extern void func_002E59F8(int);
-extern void func_002A75E0(void *, int, int, int, int);
+extern char *moby_get_private_value_0(void *);
+extern float IntToFloat(int);
+extern float math_lerp_float(float, float, float);
+extern int math_update_angle_and_blend(void *, int, int, float);
+extern void gauge_popup_show(int, int, int, float);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void value_set_entry_by_index(int, int);
+extern int PlayMobySound(int, int, void *);
+extern void *sheep_spawn_from_object(void *);
+extern void lightning_l00_beam_update(void *);
+extern int gfx_add_point_light(float, void *, int, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern void gfx_free_point_light(int);
+extern void snd_stop_voice(int);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
 
 /* Per-frame update of the Sheepinator weapon. While fire is held it aims the beam, picks a target, drains its health, turns it into a sheep when done, and plays the light and sound. When fire is released it fades the light and stops the sound. */
-void func_L00_003C6298(char *owner)
+void sheepinator_update(char *owner)
 {
     Vec direction;
     union {
@@ -102,7 +102,7 @@ void func_L00_003C6298(char *owner)
     float rate, scale;
 
     special = 0;
-    if (gHeroState.weapon == 3) special = 1;
+    if (g_hero_state.weapon == 3) special = 1;
     if (!FIELD(owner, unsigned char, 0x20)) {
         FIELD(owner, unsigned char, 0x20) = 1;
         D_L00_001B2A04 = -1;
@@ -111,42 +111,42 @@ void func_L00_003C6298(char *owner)
     }
     FastDecTimer(&context->timer);
     allowed = 1;
-    if (gHeroState.state == 29) {
-        if (!FastFloatHelperD(&gHeroState.timer)) allowed = 0;
-    } else gHeroState.timer = 40;
+    if (g_hero_state.state == 29) {
+        if (!math_fast_float_d(&g_hero_state.timer)) allowed = 0;
+    } else g_hero_state.timer = 40;
 
-    if ((unsigned int)gHeroState.mode < 2 &&
-        (D_00138320 & gHeroState.input) && allowed) {
+    if ((unsigned int)g_hero_state.mode < 2 &&
+        (D_00138320 & g_hero_state.input) && allowed) {
         if (FIELD(owner, unsigned char, 0x43) != 2)
-            StartAnimationBlended(owner, 2, 0, 0);
-        if (!gHeroState.flag) start_equipped_item_animation();
+            anim_start_blended(owner, 2, 0, 0);
+        if (!g_hero_state.flag) start_equipped_item_animation();
         if (!context->active) {
             context->active = 1;
             if (D_0018C360[16].count < 65535) D_0018C360[16].count++;
             if (D_001A7390 > D_0018C360[16].maximum) D_0018C360[16].maximum = D_001A7390;
-            D_0018C360[16].levels = (D_0018C360[16].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+            D_0018C360[16].levels = (D_0018C360[16].levels | (1u << g_current_map_index)) | 0x80000000u;
         }
         if (!context->timer) context->timer = 15;
-        TransformMobyJointToWorld(owner, 0, context);
-        if (gHeroState.state == 1) SetHeroAction_L00(29, 1);
+        moby_transform_joint_to_world(owner, 0, context);
+        if (g_hero_state.state == 1) hero_l00_set_action(29, 1);
         direction.q = 0;
-        if (gHeroState.state == 29 &&
-            (FIELD(gHeroState.object, unsigned short, 0x34) & 1)) {
+        if (g_hero_state.state == 29 &&
+            (FIELD(g_hero_state.object, unsigned short, 0x34) & 1)) {
             copy_matrix3x4(work.aim.matrix, D_L00_001B8C80);
             matrix_from_basis_rows(work.aim.inverse, work.aim.matrix);
             direction.f[2] = 1.0f;
             transform_vector(&direction, &direction, work.aim.inverse);
-        } else if (gHeroState.aiming == 1) {
+        } else if (g_hero_state.aiming == 1) {
             FastVecScale(&direction, owner + 0xD0, -1.0f);
         } else {
             direction.f[0] = 1.0f;
-            matrix_mul_vec3(&direction, &direction, gHeroState.matrix);
+            matrix_mul_vec3(&direction, &direction, g_hero_state.matrix);
         }
-        context->yaw = FastMatrixHelperA(direction.f[0], direction.f[1]);
-        context->pitch = FastMatrixHelperA(vec_length_xy(&direction), direction.f[2]);
+        context->yaw = mat_fast_helper_a(direction.f[0], direction.f[1]);
+        context->pitch = mat_fast_helper_a(vec_length_xy(&direction), direction.f[2]);
         work.aim.matrix[0].q = context->position.q;
         target = ref_L00_003C6298_00(owner, work.aim.matrix, &context->yaw, &context->pitch);
-        FastFloatHelperD(&context->cooldown);
+        math_fast_float_d(&context->cooldown);
         if (context->target) {
             unsigned char state = FIELD(context->target, unsigned char, 0x20);
             if (state == 254) goto clear_target;
@@ -159,7 +159,7 @@ clear_target:
         if (!target) {
             if (!context->cooldown) goto no_target;
         } else {
-            definition = GetMobyPrivateValue0(target);
+            definition = moby_get_private_value_0(target);
             if (target != context->target && !context->cooldown) {
                 context->target = target;
                 context->health = IntToFloat(FIELD(definition, short, 4));
@@ -170,7 +170,7 @@ clear_target:
         }
         {
             float ticks = 1.0f;
-            weapon = (char *)&gWeaponTable_L00[D_00139578];
+            weapon = (char *)&g_weapon_l00_table[D_00139578];
             upgraded = 0;
             if (FIELD(weapon, int, 0)) upgraded = FIELD(weapon, unsigned char, 4) == 2;
             if (upgraded) D_L00_001AFFA8 = 35.0f;
@@ -184,27 +184,27 @@ clear_target:
 no_target:
         D_L00_001AFFC8 = 1.0f;
 have_target:
-        rate = LerpFloat_002AA140(D_L00_001AFFB8[0], D_L00_001AFFB8[1], D_L00_001AFFC8);
-        ShowGaugePopup(1, UpdateAngleAndBlend(context->beam, D_L00_001AFFB0_sda, D_L00_001AFFB0[1], rate * 0.0002908882452175021f), 0, D_L00_001AFFC8);
+        rate = math_lerp_float(D_L00_001AFFB8[0], D_L00_001AFFB8[1], D_L00_001AFFC8);
+        gauge_popup_show(1, math_update_angle_and_blend(context->beam, D_L00_001AFFB0_sda, D_L00_001AFFB0[1], rate * 0.0002908882452175021f), 0, D_L00_001AFFC8);
         if (context->target && context->remaining <= 0.0f) {
             int target_class = FIELD(context->target, short, 0xAA);
-            if (gCurrentMapIndex == 12 && target_class == 0xFB4 /* Mutant Test-Squirrel */) {
+            if (g_current_map_index == 12 && target_class == 0xFB4 /* Mutant Test-Squirrel */) {
                 D_L00_001B0E30[0] = D_L00_001B0E30[0] + 1;
                 if (D_L00_001B0E30[0] >= 16 && !D_001A7A60[22]) {
                     D_001A7A60[22] = 1;
-                    PlaySoundFromGlobalBank(1, 0, 0);
-                    SetEntryValueByIndex(0x1233, -1);
+                    snd_play_from_global_bank(1, 0, 0);
+                    value_set_entry_by_index(0x1233, -1);
                     D_L00_001A903C[0] = 1;
                 }
             }
             PlayMobySound(3, 0, owner);
-            SpawnSheepFromObject(context->target);
+            sheep_spawn_from_object(context->target);
             D_L00_001AFFAC++;
             context->target = 0;
         }
-        UpdateLightningBeamMoby_L00(owner);
+        lightning_l00_beam_update(owner);
         if (D_L00_001B2A04 == -1)
-            D_L00_001B2A04 = AddPointLight(7.5f, owner + 0x10, 0x207F7F, 0.0f);
+            D_L00_001B2A04 = gfx_add_point_light(7.5f, owner + 0x10, 0x207F7F, 0.0f);
         if (D_L00_001B2A04 >= 0) {
             float light_x, light_y, light_z;
             Light *light;
@@ -220,7 +220,7 @@ have_target:
             light->position.f[2] = light_z;
             light->position.f[0] = light_x;
         }
-        if (!IsVoicePlayingForOwner(owner, D_L00_001B2A0C))
+        if (!snd_is_voice_playing_for_owner(owner, D_L00_001B2A0C))
             D_L00_001B2A0C_sda = PlayMobySound(1, 4, owner);
     } else {
         context->target = 0;
@@ -247,30 +247,30 @@ have_target:
                 FIELD(color, float, 4) = rate;
                 FIELD(color, float, 8) = rate * 0.25f;
             }
-            if (FastFloatHelperD(&D_L00_001B2A08)) {
-                FreePointLight(D_L00_001B2A04);
+            if (math_fast_float_d(&D_L00_001B2A08)) {
+                gfx_free_point_light(D_L00_001B2A04);
                 D_L00_001B2A04 = -1;
             }
         }
         if (D_L00_001B2A04 >= 0) {
             if (D_L00_001B2A08_sda) goto sound_cleanup;
-            FreePointLight(D_L00_001B2A04);
+            gfx_free_point_light(D_L00_001B2A04);
             D_L00_001B2A04 = -1;
         }
 sound_cleanup:
         if (D_L00_001B2A0C >= 0) {
             int sound = D_L00_001B2A0C;
             if (sound != -1) {
-                SoundView *entry = (SoundView *)(gSoundState + sound * 0x70);
-                if (entry->owner == owner && entry->active) StopSoundVoice(sound);
+                SoundView *entry = (SoundView *)(g_sound_state + sound * 0x70);
+                if (entry->owner == owner && entry->active) snd_stop_voice(sound);
             }
             D_L00_001B2A0C = -1;
         }
-        if (FIELD(owner, unsigned char, 0x60) & 2) StartAnimationBlendedWithFlags(owner, 1, 0, 1, 0);
+        if (FIELD(owner, unsigned char, 0x60) & 2) anim_start_blended_with_flags(owner, 1, 0, 1, 0);
         cancel_hero_item_animation();
     }
     if (special && D_L00_001B2A04 >= 0) {
-        FreePointLight(D_L00_001B2A04);
+        gfx_free_point_light(D_L00_001B2A04);
         D_L00_001B2A04 = -1;
     }
 }

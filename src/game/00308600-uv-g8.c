@@ -17,30 +17,30 @@ extern UV_2B4918 D_001AED70[] SDATA(D_001AED70);
 /* Retail constructs the V-component address absolutely, the U base through GP. */
 extern UV_2B4918 beam_uv_absolute[] __asm__("D_001AED70") MACRO_ADDR;
 extern float D_001AED30[][4] SDATA(D_001AED30);
-extern float D_001B5340[];
+extern float g_camera_eye_state[];
 extern UV_2B4918 D_00265FA0[];
 extern float D_00265360[][4];
 extern P3_2B4918 D_00228840[];
 extern int D_002665C0[];
-extern char D_00189E20[];
-extern void func_0029FD48(void *, int, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00283388(void *);
-extern void func_00283788(void *, void *, void *);
-extern long func_0027C878(int);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7878(float, float);
-extern void func_00280B90(void *, void *, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(int, long);
-extern void func_00280328(void);
-extern void func_00281810(int, void *, void *, void *, int);
+extern char g_hero_state[];
+extern void moby_transform_point_list(void *, int, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void set_identity_matrix(void *);
+extern void multiply_matrix(void *, void *, void *);
+extern long GetEffectTextureDescriptor(int);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern void draw_world_quad(void *, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(int, long);
+extern void font_queue_vu_state(void);
+extern void part_draw_glint_effect(int, void *, void *, void *, int);
 
 /* Draws the moby's beam: orients the moby along its child's two joints, draws three quads and a ribbon of 196 points. */
-void func_00308768(char *moby) {
+void draw_joint_aligned_beam_effect(char *moby) {
     Quad_2B4918 quad;
     BeamVec basis[4];
     BeamVec jointPoints[2];
@@ -66,10 +66,10 @@ void func_00308768(char *moby) {
     quad.tag[0] = 0;
     if (data->f4 != 0) {
         ids = D_001AED90;
-        TransformMobyPointList(child, 2, &ids, jointPoints);
+        moby_transform_point_list(child, 2, &ids, jointPoints);
     } else {
         ids = D_001AED98;
-        TransformMobyPointList(child, 2, &ids, jointPoints);
+        moby_transform_point_list(child, 2, &ids, jointPoints);
     }
     *(Q_2B4918 *)&up = 0;
     up.y = 1.0f;
@@ -101,7 +101,7 @@ void func_00308768(char *moby) {
         } else {
             float *v = quad.pos[i];
             FastVecScale(v, D_001AECF0[i], data->f2C);
-            v[2] -= RandomFloatRange(0.0f, 0.1f);
+            v[2] -= math_random_float_range(0.0f, 0.1f);
         }
         quad.uv[i][0] = D_001AED70[i].u;
         quad.uv[i][1] = beam_uv_absolute[i].v;
@@ -113,16 +113,16 @@ void func_00308768(char *moby) {
         } else {
             float *v = quad.pos[i];
             FastVecScale(v, D_001AED30[i], data->f2C);
-            v[2] -= RandomFloatRange(0.0f, 0.1f);
+            v[2] -= math_random_float_range(0.0f, 0.1f);
         }
     }
     draw_world_quad(&quad, worldMatrix, 0);
     quad.tag[1] = GetEffectTextureDescriptor(0xB);
     FastVecScale(&d, &basis[2], -0.13f);
     FastVecAdd(&d, &d, &basis[3]);
-    FastVecSub(&a, gCameraState_001B5340, &d);
+    FastVecSub(&a, g_camera_eye_state, &d);
     vec_scale_to_length(&a, &a, 1.0f);
-    FastVecCross(&b, &a, gHeroState + 0x2C0);
+    FastVecCross(&b, &a, g_hero_state + 0x2C0);
     vec_scale_to_length(&b, &b, -1.0f);
     FastVecCross(&c, &b, &a);
     quad.col[0] = quad.col[1] = quad.col[2] = quad.col[3] = 0x7F2020FF;
@@ -148,6 +148,6 @@ void func_00308768(char *moby) {
             D_00265FA0[i].v += 7.0f;
         }
     }
-    DrawGlintEffect(0x94, D_00228840, D_002665C0, D_00265FA0, 1);
-    DrawGlintEffect(0x32, &D_00228840[0x92], &D_002665C0[0x92], &D_00265FA0[0x92], 1);
+    part_draw_glint_effect(0x94, D_00228840, D_002665C0, D_00265FA0, 1);
+    part_draw_glint_effect(0x32, &D_00228840[0x92], &D_002665C0[0x92], &D_00265FA0[0x92], 1);
 }

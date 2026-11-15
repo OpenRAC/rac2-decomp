@@ -15,27 +15,27 @@ typedef struct {
     int lastState;
     int mode;
 } SearchHero;
-extern SearchHero D_00189E20;
+extern SearchHero g_hero_state;
 extern short D_L04_001B2630[] MACRO_ADDR __attribute__((sda));
-extern char *D_L04_001B24DC;
-extern int func_002ACBC8(void *, int);
-extern int func_002A8AF0(void *, void *, int);
-extern float func_00282E80(void *, void *);
+extern char *g_moby_l04_pool;
+extern int IsPointInCuboid(void *, int);
+extern int point_in_path_xy(void *, void *, int);
+extern float vec_distance_xy(void *, void *);
 
 /* Picks the hero, or the closest listed moby of class 0xCB or 0x76C in state 3 that lies within
    distance and passes the area (or region) tests, and fills out with its position and motion.
    Returns 0 for the hero, 1 for a moby and 2 when neither qualifies. */
-int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, void *region,
+int FindHeroOrMobyTarget(char *source, SearchOutput *out, int *areas, int count, void *region,
                       int regionCount, float distance)
 {
-    char *best = gHeroState.moby;
+    char *best = g_hero_state.moby;
     int result = 0;
     char *velocity, *previous, *next;
     int i, j, valid;
     char *m;
     float d;
 
-    if (gHeroState.mode == 24 || gHeroState.state == 0x6F) {
+    if (g_hero_state.mode == 24 || g_hero_state.state == 0x6F) {
         best = 0;
         result = 2;
         velocity = (char *)out->velocity;
@@ -52,7 +52,7 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
             next = (char *)out->next;
         } while (0);
         for (; i < limit; i++) {
-            if (IsPointInCuboid((char *)&gHeroState + 0x80, areas[i])) {
+            if (IsPointInCuboid((char *)&g_hero_state + 0x80, areas[i])) {
                 best = 0;
                 result = 2;
                 break;
@@ -63,13 +63,13 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         previous = (char *)out->previous;
         next = (char *)out->next;
         if (region && regionCount > 0
-            && !point_in_path_xy((char *)&gHeroState + 0x80, region, regionCount)) {
+            && !point_in_path_xy((char *)&g_hero_state + 0x80, region, regionCount)) {
             best = 0;
             result = 2;
         }
     }
     for (j = 1; j <= D_L04_001B2630[0]; j++) {
-        m = gMobyPool_L04 + (D_L04_001B2630[j] << 8);
+        m = g_moby_l04_pool + (D_L04_001B2630[j] << 8);
         if (m && (WSHORT(m, 0xAA) == 0xCB /* Decoy */ || WSHORT(m, 0xAA) == 0x76C /* moby class 1900 */) && WBYTE(m, 0x20) != 0xFE
             && WBYTE(m, 0x20) != 0xFD && WBYTE(m, 0x20) == 3) {
             valid = 1;
@@ -97,9 +97,9 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         out->moby = best;
         qcopy(out, best + 0x10);
         qcopy(velocity, best + 0xF0);
-        if (best == gHeroState.moby) {
-            qcopy(previous, (char *)&gHeroState + 0xD0);
-            qcopy(next, (char *)&gHeroState + 0xE0);
+        if (best == g_hero_state.moby) {
+            qcopy(previous, (char *)&g_hero_state + 0xD0);
+            qcopy(next, (char *)&g_hero_state + 0xE0);
         } else {
             qcopy(next, out);
             out->next[2] += 0.6f;

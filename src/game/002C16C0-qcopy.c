@@ -12,18 +12,18 @@ typedef struct {
     float payload[8];
 } Particle;
 
-extern Particle *func_002B9030(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
+extern Particle *part_alloc(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
 extern unsigned char *D_001F25F0;
 
 /* Another func_002C2210-style effect record (kind 0x2C): the colour split into its bytes in
    the payload, a byte count from `count` and the remaining sizes as given. */
 /* Creates a coloured burst particle with the given size, colour and speed. */
-Particle *func_002C16C0(Quad *position, float *vector, int size, int alpha, int rgb, int count,
+Particle *part_spawn_burst(Quad *position, float *vector, int size, int alpha, int rgb, int count,
                         float life, float second, float third, float fourth, float phase)
 {
-    Particle *p = AllocParticle(0x2C);
+    Particle *p = part_alloc(0x2C);
     if (p) {
         unsigned char *out;
         p->position.q = *position;
@@ -34,7 +34,7 @@ Particle *func_002C16C0(Quad *position, float *vector, int size, int alpha, int 
         p->life = life;
         p->b1 = 0;
         p->b3 = 0x48;
-        p->seed = RandomIntBelow(255);
+        p->seed = math_random_int_below(255);
         p->b2 = *D_001F25F0;
         p->size = size;
         ((float *)out)[0] = vector[0];

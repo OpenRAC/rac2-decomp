@@ -9,29 +9,29 @@ typedef struct {
     short key;
 } Obj_389848;
 
-extern void func_L13_00389848(Obj_389848 *);
+extern void level_list_add_key(Obj_389848 *);
 
-extern void func_002AB8C0(char *, char *);
+extern void gfx_update_color_fade(char *, char *);
 
-extern void *func_002A9640(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 
-extern int func_00282978(void *);
+extern int FastDecTimer(void *);
 
-extern f32 func_002A96A0(char *, char *);
+extern f32 moby_update_aim_target_strength(char *, char *);
 
-extern void func_002B3380(char *, char *, char *);
+extern void part_spawn_damage_debris(char *, char *, char *);
 
-extern void func_00282F20(f32 *, char *, f32);
+extern void vec_scale_to_length(f32 *, char *, f32);
 
-extern void func_00282CC0(f32 *, f32 *, f32 *);
+extern void FastVecAdd(f32 *, f32 *, f32 *);
 
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 
-extern void func_0032C700(void *, int, int, int, int, int, int, int, int, int, int, int,
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int,
                           f32, f32);
 
 /* Updates an enemy that loses health over time, and makes a small explosion and removes it when its health runs out. */
-void func_L13_003ECEA8(char *a0)
+void decaying_enemy_update(char *a0)
 {
     char *self = a0;
     char *ctl;
@@ -47,11 +47,11 @@ void func_L13_003ECEA8(char *a0)
     state = *(unsigned char *)(self + 0x20);
     switch (state) {
     case 0:
-        AddKeyToLevelList((Obj_389848 *)self);
+        level_list_add_key((Obj_389848 *)self);
         *(unsigned char *)(self + 0x20) = 1;
     case 1:
-        UpdateColorFade(self, ctl + 0x50);
-        child = (char *)FindOwnedEffectSlot(self, 1, 0);
+        gfx_update_color_fade(self, ctl + 0x50);
+        child = (char *)part_find_owned_effect_slot(self, 1, 0);
         if (FastDecTimer(ctl + 0x26) == 0)
             child = 0;
         if (child != 0) {
@@ -62,7 +62,7 @@ void func_L13_003ECEA8(char *a0)
                     *(f32 *)(child + 0x2C) = scale * *(f32 *)(ctl + 0xF8);
             }
         } else {
-            child = (char *)FindOwnedEffectSlot(self, 0x10000, 0);
+            child = (char *)part_find_owned_effect_slot(self, 0x10000, 0);
             if (child != 0) {
                 scale = *(f32 *)(child + 0x2C);
                 scale *= 0.5f;
@@ -74,10 +74,10 @@ void func_L13_003ECEA8(char *a0)
                 }
             }
         }
-        scale = UpdateAimTargetStrength(self, child);
+        scale = moby_update_aim_target_strength(self, child);
         *(unsigned char *)(self + 0xA8) = 0xFF;
         *(f32 *)(ctl + 0x20) -= scale;
-        SpawnDamageDebrisOnHealthLoss(self, ctl + 0x100, ctl + 0x20);
+        part_spawn_damage_debris(self, ctl + 0x100, ctl + 0x20);
         if (*(f32 *)(ctl + 0x20) <= 0.0f) {
             {
             f32 *v = vec;
@@ -89,7 +89,7 @@ void func_L13_003ECEA8(char *a0)
             FastVecAdd(vec, tmp1, vec);
             SpawnExplosion(vec, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0,
                           0.75f, 20.0f);
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
         }
     }
 }

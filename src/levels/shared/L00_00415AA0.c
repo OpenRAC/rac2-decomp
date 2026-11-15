@@ -8,20 +8,20 @@ typedef struct {
     int unused14, effect, flash, unused20, unused24, unused28, unused2C, unused30, unused34, visible;
 } Context;
 typedef struct { unsigned char prefix[0x150]; short width, height; } Screen;
-extern Screen D_001A6480;
-extern Vector D_L00_001B8DC0;
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027DE50(int, int, int, int, unsigned long);
+extern Screen g_screen_adjust_offsets;
+extern Vector g_camera_l00_position;
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_draw_colored_rectangle(int, int, int, int, unsigned long);
 extern void ref_L00_00415AA0_00(void *, float, float, float, float, float, int, int);
-extern void func_002AFFD8(char *, char *, int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void cam_compute_view_direction(char *, char *, int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
 static inline float lerp(float a, float b, float t)
 {
@@ -29,7 +29,7 @@ static inline float lerp(float a, float b, float t)
 }
 
 /* Flashes the screen white near the end of the effect, draws a glow, and shows a small sprite that fades with a timer. */
-void func_L00_00415AA0(char *object)
+void screen_flash_and_glow_draw(char *object)
 {
     Packet packet;
     Vector up, difference, unit, center, horizontal, vertical, corner;
@@ -40,7 +40,7 @@ void func_L00_00415AA0(char *object)
 
     if (context->end - context->current < 2 && context->active != 0 && context->flash != 0) {
         VU1_addGSregister(0x42, 0x48);
-        DrawColoredRectangle(0, gScreenAdjustOffsets.height, 0, gScreenAdjustOffsets.width, 0xFFFFFFFF80808080UL);
+        gfx_draw_colored_rectangle(0, g_screen_adjust_offsets.height, 0, g_screen_adjust_offsets.width, 0xFFFFFFFF80808080UL);
     }
     if (context->effect != 0) {
         delta = context->end - context->current;
@@ -54,10 +54,10 @@ void func_L00_00415AA0(char *object)
     }
     if (context->active != 0) {
         width = 0.075f;
-        ComputeViewDirection(object + 0x10, (char *)&up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)&up, 1);
         opacity = IntToFloat(context->active);
         opacity *= context->opacity;
-        InitQuadPacketState(&packet, 11, 4, 0x80);
+        gfx_init_quad_packet_state(&packet, 11, 4, 0x80);
         color = ((unsigned int)FloatToInt(opacity * 255.0f) << 24) | 0xFFFFFFu;
         packet.colors[3] = color;
         packet.colors[2] = color;
@@ -71,9 +71,9 @@ void func_L00_00415AA0(char *object)
         packet.uv[5] = 0.0f;
         packet.uv[6] = 1.0f;
         packet.uv[7] = 1.0f;
-        FastVecSub(&difference, object + 0x10, &gCameraPosition_L00);
+        FastVecSub(&difference, object + 0x10, &g_camera_l00_position);
         vec_scale_to_length(&unit, &difference, 0.1f);
-        FastVecAdd(&center, &gCameraPosition_L00, &unit);
+        FastVecAdd(&center, &g_camera_l00_position, &unit);
         FastVecCross(&horizontal, &difference, &up);
         vec_scale_to_length(&horizontal, &horizontal, width);
         FastVecCross(&vertical, &horizontal, &difference);

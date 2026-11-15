@@ -7,24 +7,24 @@ typedef struct {
     TI128 position;
     char tail[0x40];
 } PositionRecord;
-extern float func_002A89A8(void *, int, float);
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern int func_002A7820(int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern char *func_002A9640(void *, int, int);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern int math_random_int_range(int, int);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern char *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern void func_00291450(int);
-extern int func_002B3BA8(void *, int, float, float, int, int);
+extern void gfx_free_point_light(int);
+extern int weapon_select_aim_target(void *, int, float, float, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_L04_003E22B0(unsigned char *, int, int, int, int);
-extern void func_L04_00412AF8(void *, void *);
+extern void object_set_linked_states(unsigned char *, int, int, int, int);
+extern void find_point_across_line(void *, void *);
 extern void func_PAL_L04_003E9100(unsigned char *);
-extern void func_L04_003E5298(void *);
+extern void moby_l04_set_group_alert_flag(void *);
 extern char *D_L04_001B25CC __attribute__((sda));
 extern char D_L04_001B9680[];
 
@@ -36,13 +36,13 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
     float scale;
 
     if (*(unsigned char *)(moby + 0x20) == 0) {
-        float ground = func_002A89A8(moby + 0x10, 0, 0.5f);
+        float ground = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
 
         *(unsigned char **)(vars + 0x18) = vars + 0x140;
         *(float *)(moby + 0x18) = ground;
         *(int *)(vars + 0x2D0) = 0;
-        *(unsigned char *)(vars + 0x48) = func_00283CF0(20.0f);
-        result = func_00283CF0(11.2f);
+        *(unsigned char *)(vars + 0x48) = FloatToInt(20.0f);
+        result = FloatToInt(11.2f);
         *(int *)(vars + 0xA8) = 3;
         *(float *)(vars + 0x90) = 0.5f;
         *(float *)(vars + 0x94) = 0.5f;
@@ -72,13 +72,13 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
         *(float *)(vars + 0x150) = 1.483530f;
         *(float *)(vars + 0x170) = 0.52359885f;
         *(float *)(vars + 0x16C) = 0.008f;
-        func_002B60B0(moby, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+        moby_set_controller_speed_limits(moby, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         qcopy(vars + 0x110, moby + 0x10);
         scale = 1.25f;
         *(float *)(vars + 0x120) = scale;
         *(float *)(vars + 0x12C) = *(float *)(vars + 0x2C0);
         *(float *)(vars + 0x130) = 10.0f;
-        result = func_002A7820(100, 583);
+        result = math_random_int_range(100, 583);
         vars[0x28] = 3;
         vars[0x29] = 1;
         vars[0x2E] = 1;
@@ -86,27 +86,27 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
         *(float *)(vars + 0x2E4) = vars[0x34];
         *(float *)(vars + 0x2E8) = vars[0x34];
         *(float *)(vars + 0x30) = 0.75f;
-        func_002A7750(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         if (*(int *)(vars + 0x2F0) != -1) {
             *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.4f;
             vars[0x306] = 0;
             *(TI128 *)(vars + 0x280) = *(TI128 *)(moby + 0x10) =
                 ((PositionRecord *)D_L04_001B25CC)[*(int *)(vars + 0x2F0)].position;
-            func_L04_003E22B0(moby, 1, 1,
-                func_002A77E0(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x4C) + 0x10)), 8);
-            *(short *)(vars + 0x300) = ((s32)(func_002A7820(1200, 3000)) * 5 + 2) / 6;
-            func_002A7750(moby, 5, 0);
+            object_set_linked_states(moby, 1, 1,
+                math_random_int_below(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x4C) + 0x10)), 8);
+            *(short *)(vars + 0x300) = ((s32)(math_random_int_range(1200, 3000)) * 5 + 2) / 6;
+            moby_set_state(moby, 5, 0);
             *(float *)(vars + 0x140) *= 0.4f;
             vars[0x307] = 0;
             *(float *)(vars + 0x144) = *(float *)(vars + 0x140) + 0.01f;
         } else {
-            func_L04_003E22B0(moby, 4, 1,
-                func_002A77E0(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x58) + 0x10)), 0);
-            *(float *)(moby + 0x48) = func_002A7878(0.5f, scale);
+            object_set_linked_states(moby, 4, 1,
+                math_random_int_below(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x58) + 0x10)), 0);
+            *(float *)(moby + 0x48) = math_random_float_range(0.5f, scale);
         }
     }
-    if (*(unsigned char *)(moby + 0x31) && func_00282E48(moby + 0x10, D_L04_001B9680) < 24.0f) {
-        func_002A93B0(moby);
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
+        moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
     if (vars[0x2E] == 2) {
@@ -114,11 +114,11 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
         return 1;
     }
     if (*(int *)(vars + 0x2F0) != -1) {
-        hit = func_002A9640(moby, 0x10000, 1);
+        hit = part_find_owned_effect_slot(moby, 0x10000, 1);
         if (moby[0x20] == 22 || vars[0x307]) {
             moby[0xA8] = 255;
         } else if (hit) {
-            func_L04_00412AF8(moby, vars + 0x280);
+            find_point_across_line(moby, vars + 0x280);
             *(float *)(hit + 0x2C) = *(short *)(vars + 0x24) * 0.3f;
         }
         if (vars[0x307]) {
@@ -129,7 +129,7 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
     if (result) {
         *(int *)(vars + 0x2D0) = 0;
         if (*(int *)(vars + 0x2E0) >= 0) {
-            func_00291450(*(int *)(vars + 0x2E0));
+            gfx_free_point_light(*(int *)(vars + 0x2E0));
             *(int *)(vars + 0x2E0) = -1;
         }
         if (result == 5) {
@@ -152,22 +152,22 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
                 break;
             }
         }
-        func_L04_003E5298(moby);
+        moby_l04_set_group_alert_flag(moby);
         if (!moby[0x95]) {
             if (*(int *)(vars + 0x2CC) != -1) {
-                func_002A7750(moby, 9, 1);
-                func_L04_003E22B0(moby, 4, 3, 0, 10);
+                moby_set_state(moby, 9, 1);
+                object_set_linked_states(moby, 4, 3, 0, 10);
             } else {
-                func_002A7750(moby, 8, 1);
-                *(short *)(vars + 0x2A0) = ((s32)(func_002A7820(580, 600)) * 5 + 2) / 6;
-                func_L04_003E22B0(moby, 6, 5, 0, 8);
+                moby_set_state(moby, 8, 1);
+                *(short *)(vars + 0x2A0) = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
+                object_set_linked_states(moby, 6, 5, 0, 8);
             }
         }
     }
     if (*(int *)(vars + 0x2F0) != -1) {
         *(float *)(vars + 0x20) = *(short *)(vars + 0x24);
     }
-    *(int *)(vars + 0x258) = func_002B3BA8(moby, *(int *)(vars + 0x250), *(float *)(vars + 0x298), 10.0f, 0, 0);
-    *(int *)(vars + 0x25C) = func_002B3BA8(moby, *(int *)(vars + 0x254), *(float *)(vars + 0x29C), 10.0f, 0, 0);
+    *(int *)(vars + 0x258) = weapon_select_aim_target(moby, *(int *)(vars + 0x250), *(float *)(vars + 0x298), 10.0f, 0, 0);
+    *(int *)(vars + 0x25C) = weapon_select_aim_target(moby, *(int *)(vars + 0x254), *(float *)(vars + 0x29C), 10.0f, 0, 0);
     return 0;
 }

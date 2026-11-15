@@ -1,9 +1,9 @@
 #include "common.h"
-extern float func_00282C10(float);
-extern float func_00282C48(float);
-extern float func_002AA2E8(float *, float, float);
+extern float square_root(float);
+extern float math_fabs(float);
+extern float ApproachValue(float *, float, float);
 /* Moves a value smoothly toward a target using a speed that speeds up and slows down, and returns how far it moved. */
-float func_002AA548(float *value, float *velocity, float target,
+float math_step_value_toward_target(float *value, float *velocity, float target,
                    float step, float acceleration, float maximum)
 {
     float diff;
@@ -19,9 +19,9 @@ float func_002AA548(float *value, float *velocity, float target,
         float speed = *velocity;
         if (0.0f <= speed * diff) {
             stopping = ((speed * speed) / acceleration) * 0.5f;
-            if (FloatAbs(diff) < stopping) {
-                magnitude = FloatAbs(diff);
-                magnitude += FloatAbs(*velocity);
+            if (math_fabs(diff) < stopping) {
+                magnitude = math_fabs(diff);
+                magnitude += math_fabs(*velocity);
                 if (stopping < magnitude)
                     ApproachValue(velocity, 0.0f, acceleration);
                 else
@@ -35,8 +35,8 @@ float func_002AA548(float *value, float *velocity, float target,
                 else
                     ApproachValue(velocity, desired, step);
             }
-            magnitude = FloatAbs(diff);
-            if (FloatAbs(*velocity) < magnitude) {
+            magnitude = math_fabs(diff);
+            if (math_fabs(*velocity) < magnitude) {
                 *value = *value + *velocity;
                 return *velocity;
             }

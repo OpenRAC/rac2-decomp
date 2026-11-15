@@ -7,14 +7,14 @@ extern unsigned char D_001CE4E0[];
 extern short D_001CE300[];
 extern char *D_001CDB80[];
 extern int D_001D0E00[];
-extern void func_002B65B8(int, int);
-extern void func_002934F8(char *, int, int, int);
+extern void moby_queue_class_update(int, int);
+extern void tex_relocate_block(char *, int, int, int);
 
 /* Registers a loaded object in the class cache tables, or only reserves a slot when no object is given. */
-void func_00293890(char *object, int mapBase, int mapEntries, int id)
+void load_register_class_cache_object(char *object, int mapBase, int mapEntries, int id)
 {
     if (object == 0) {
-        QueueMobyClassUpdate(id, 1);
+        moby_queue_class_update(id, 1);
         D_001CE4E0[id] = *(unsigned char *)&D_001B1B44;
         D_001B1B44 = D_001B1B44 + 1;
     } else {
@@ -24,9 +24,9 @@ void func_00293890(char *object, int mapBase, int mapEntries, int id)
         D_001D0E00[D_001B1B40] = (unsigned char)object[0x2D] << 10;
         if ((unsigned char)object[0x2D] == 255)
             D_001D0E00[D_001B1B40] = 0x100000;
-        QueueMobyClassUpdate(id, 0);
+        moby_queue_class_update(id, 0);
         ++D_001B1B40;
-        RelocateTextureBlock(object, mapBase, mapEntries, id);
+        tex_relocate_block(object, mapBase, mapEntries, id);
     }
 }
 
@@ -115,14 +115,14 @@ struct TransferState {
     struct Moby *slots[1];/* 0x18C */
 };
 
-extern struct TransferState D_001B8840;
-extern struct RenderGlobals D_00189E20;
+extern struct TransferState g_scene_playback_state;
+extern struct RenderGlobals g_hero_state;
 extern struct Moby *D_001B159C __attribute__((sda));
 
-extern void func_0011AEA0(int);
-extern void func_0029D4D0(int, int);
-extern struct Moby *func_0029EFD0(int);
-extern void func_0029F0C8(struct Moby *, int);
+extern void FlushCache(int);
+extern void fast_decompress(int, int);
+extern struct Moby *CreateMoby(int);
+extern void moby_init_instance(struct Moby *, int);
 
 /* The table of the two slots a load reserves. */
 struct LoadSlots {
@@ -135,7 +135,7 @@ extern int D_001A933C __attribute__((sda));
 
 /* Release the slot the object holds: remember its entry in the table of the two
    slots, then clear the object's own reference to it. */
-void func_00294130(int *entry, int doRelease)
+void load_release_class_cache_slot(int *entry, int doRelease)
 {
     if (doRelease != 0) {
         if (entry[1] >= 0) {
@@ -152,7 +152,7 @@ out:
 /* UpdateWorldObjectAnimation: relocate the model record loaded for the current chunk and
    hook each of its parts to a moby, spawning one and initialising it the first time; each
    part's pointer table is made absolute. */
-void func_00293D30(void)
+void load_relocate_world_object_parts(void)
 {
     struct ModelRec *rec;
     struct Moby *moby;
@@ -167,24 +167,24 @@ void func_00293D30(void)
     int partCount;
 
     FlushCache(0);
-    fast_decompress(gScenePlaybackState.unk70, (int)gScenePlaybackState.rec);
+    fast_decompress(g_scene_playback_state.unk70, (int)g_scene_playback_state.rec);
     FlushCache(0);
 
-    rec = gScenePlaybackState.rec;
-    gScenePlaybackState.unk38 = 0;
+    rec = g_scene_playback_state.rec;
+    g_scene_playback_state.unk38 = 0;
     partOffsets = rec->part_off;
-    gScenePlaybackState.unk40 = rec->flags;
+    g_scene_playback_state.unk40 = rec->flags;
     partCount = rec->part_count;
-    gScenePlaybackState.unk48 = rec->pad08;
-    gScenePlaybackState.num_parts = rec->num_parts;
-    gScenePlaybackState.unk68 = (u32)rec + rec->end_off;
+    g_scene_playback_state.unk48 = rec->pad08;
+    g_scene_playback_state.num_parts = rec->num_parts;
+    g_scene_playback_state.unk68 = (u32)rec + rec->end_off;
     if (partCount < 0x400) {
-        gScenePlaybackState.unk4C = 0;
+        g_scene_playback_state.unk4C = 0;
     } else {
-        gScenePlaybackState.unk4C = (u32)rec + partCount;
+        g_scene_playback_state.unk4C = (u32)rec + partCount;
     }
 
-    for (i = 0; i < gScenePlaybackState.num_parts; i++) {
+    for (i = 0; i < g_scene_playback_state.num_parts; i++) {
         partOffset = *partOffsets++;
         partData = (int *)((u8 *)rec + partOffset);
         classId = partData[0];
@@ -194,11 +194,11 @@ void func_00293D30(void)
         if (classId == 0x215 /* moby class 533 */ || classId == 0x10D1 /* moby class 4305 */) {
             classId = 0xD54 /* moby class 3412 */;
         }
-        moby = gScenePlaybackState.slots[i];
+        moby = g_scene_playback_state.slots[i];
         if (moby == 0) {
             if (classId == 0) {
                 moby = D_001B159C;
-                InitMobyInstance(moby, 0);
+                moby_init_instance(moby, 0);
             } else {
                 moby = CreateMoby(classId);
             }
@@ -206,10 +206,10 @@ void func_00293D30(void)
             moby->unk34 |= 6;
             moby->flag72 = 0xFF;
             moby->unk94 = 0;
-            if (gHeroState.color_src == 0) {
+            if (g_hero_state.color_src == 0) {
                 moby->color = 0x38383800000000ULL;
             } else {
-                moby->color = gHeroState.color_src->color;
+                moby->color = g_hero_state.color_src->color;
             }
             if (moby->parts->flag) {
                 moby->flag73 = 0x18;
@@ -218,9 +218,9 @@ void func_00293D30(void)
             moby->parts->used = partIndex + 1;
             moby->idx = partIndex;
             moby->slot = partIndex;
-            gScenePlaybackState.slots[i] = moby;
+            g_scene_playback_state.slots[i] = moby;
             if (moby->class_id == 0xD54) {
-                gScenePlaybackState.unk54 = (u32)moby;
+                g_scene_playback_state.unk54 = (u32)moby;
             }
         }
         moby->model = modelEnd;

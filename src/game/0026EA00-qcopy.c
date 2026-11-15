@@ -8,22 +8,22 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char D_001B5490[];
 extern char D_001B5570[];
-extern int func_00271130(void *, void *);
-extern int func_002712D8(void *, void *);
+extern int cam_advance_blend(void *, void *);
+extern int cam_advance_orbit_transition(void *, void *);
 
 /* Runs the current object through the resident visibility test, then copies
    its four 16-byte blocks into the resident snapshots and clears the test
    state. */
-void func_002718B8(char *object)
+void moby_test_and_snapshot(char *object)
 {
     unsigned char *state = (unsigned char *)D_001B5490;
     char *dest;
     int ok;
 
     if (state[2] == 0)
-        ok = AdvanceCameraBlend(object, state + 0x10);
+        ok = cam_advance_blend(object, state + 0x10);
     else
-        ok = AdvanceCameraOrbitTransition(object, state + 0x70);
+        ok = cam_advance_orbit_transition(object, state + 0x70);
     if (ok == 0)
         return;
 
@@ -37,7 +37,7 @@ void func_002718B8(char *object)
 }
 
 /* Copies the resident object's saved vectors back into its working ones. */
-void func_00270EA8(void)
+void moby_restore_vectors(void)
 {
     unsigned char *object = (unsigned char *)D_001B5490;
 
@@ -48,11 +48,11 @@ void func_00270EA8(void)
 }
 
 extern char D_00189F70[];
-extern void func_00282CC0(char *first, char *second, char *third);
+extern void FastVecAdd(char *first, char *second, char *third);
 
 /* Copies the resident object's two vectors and asks the engine to rebuild its
    matrix when the object's type says so. */
-void func_00270E30(void)
+void moby_save_vectors(void)
 {
     unsigned char *object = (unsigned char *)D_001B5490;
 
@@ -79,13 +79,13 @@ typedef struct {
 extern int D_0018C0B4;
 extern int D_001A7348[] __attribute__((sda));
 extern F273418Marks D_001B7600;
-extern void func_00272CB0(void);
-extern void func_00279BD8(void *, void *);
-extern void func_002729A0(void *, float, float);
-extern float func_00283CE0(int);
+extern void DrawTargetReticle(void);
+extern void gfx_project_world_point_to_screen(void *, void *);
+extern void gfx_draw_screen_sprite(void *, float, float);
+extern float IntToFloat(int);
 
 /* Draws the reticle, then draws each marker on the screen at its projected spot. */
-void func_00273418(void) {
+void hud_draw_reticle_and_markers(void) {
     float base[4] __attribute__((aligned(16)));
     float vec[4] __attribute__((aligned(16)));
     F273418Mark *m;
@@ -103,64 +103,64 @@ void func_00273418(void) {
             m = &D_001B7600.e[i];
             if (m->obj != 0 && m->obj[0x20] != 0xFE && m->obj[0x20] != 0xFD) {
                 if (m->flag != 0) {
-                    ProjectWorldPointToScreen(vec, m);
+                    gfx_project_world_point_to_screen(vec, m);
                     vec[0] = (vec[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
                     vec[1] = (vec[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
                 } else {
                     qcopy(vec, base);
                 }
-                DrawScreenSprite(m, vec[0], vec[1]);
+                gfx_draw_screen_sprite(m, vec[0], vec[1]);
             }
         }
         D_001B7600.count = 0;
     }
 }
 
-extern char D_001B5200[];
+extern char g_active_camera[];
 extern char D_0018B2F0[];
 extern unsigned char D_001A7A44[] __attribute__((sda));
-extern void func_002721C8(void);
-extern void func_00272280(void);
-extern void func_00271FD8(void);
-extern void func_00271B90(void);
-extern int func_00270A48(void);
-extern void func_00270EE0(void *);
-extern int func_0026F7B8(void);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AB6D8(void *, void *);
-extern void func_00271958(void *, int);
-extern void func_00271E88(void);
-extern void func_002735A0(void *);
-extern void func_00270018(void);
+extern void cam_update_scalar_transition(void);
+extern void cam_update_second_scalar_transition(void);
+extern void cam_select_coll_masks(void);
+extern void cam_update_follow_hero(void);
+extern int cam_update_active(void);
+extern void cam_begin_mode_change(void *);
+extern int stub_empty_21(void);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void mat_get_euler_angles(void *, void *);
+extern void cam_update_shake(void *, int);
+extern void cam_update_grounded(void);
+extern void gfx_blend_fog_from_cam_region(void *);
+extern void cam_update_fov_transition(void);
 
 /* Updates the camera state each frame: copies the target object's vectors into it and rebuilds its derived vectors. */
-void func_00272368(void) {
-    char *camera = gActiveCamera;
+void cam_update_state(void) {
+    char *camera = g_active_camera;
     char *target;
     char *vectors;
     char *tail;
     char *unused;
 
     *(int *)(camera + 0x404) = *(int *)(camera + 0x404) + 1;
-    UpdateScalarTransition();
-    UpdateSecondScalarTransition();
-    SelectCameraCollisionMasks();
-    UpdateCameraFollowHero();
-    UpdateActiveCamera();
+    cam_update_scalar_transition();
+    cam_update_second_scalar_transition();
+    cam_select_coll_masks();
+    cam_update_follow_hero();
+    cam_update_active();
     target = *(char **)(camera + 0x190);
     if ((unsigned)(*(unsigned short *)(camera + 0x290) - 1) < 2)
-        BeginCameraModeChange(*(void **)(camera + 0x194));
+        cam_begin_mode_change(*(void **)(camera + 0x194));
     if (*(short *)(camera + 0x290) == 3) {
-        TestAndSnapshotObject(target);
+        moby_test_and_snapshot(target);
     } else {
         qcopy(camera + 0x140, target + 0x30);
         qcopy(camera + 0x370, target);
         qcopy(camera + 0x380, target + 0x10);
         qcopy(camera + 0x390, target + 0x20);
     }
-    if (EmptyStubF7B8()) {
-        vectors = gActiveCamera + 0x140;
+    if (stub_empty_21()) {
+        vectors = g_active_camera + 0x140;
         qcopy(vectors, D_0018B2F0);
         qcopy(vectors + 0x230, D_0018B2F0 + 0x10);
         FastVecCross(vectors + 0x240, vectors + 0x230, D_0018B2F0 - 0x14B0);
@@ -168,15 +168,15 @@ void func_00272368(void) {
         FastVecCross(vectors + 0x250, vectors + 0x240, vectors + 0x230);
         vec_scale_to_length(vectors + 0x250, vectors + 0x250, 1.0f);
     }
-    tail = gActiveCamera + 0x370;
-    GetEulerAnglesFromMatrix(tail, tail - 0x220);
-    UpdateCameraShake(tail - 0x210, 0);
-    UpdateCameraShake(tail - 0x200, 1);
-    UpdateCameraShake(tail - 0x1F0, 2);
-    UpdateCameraGrounded();
-    BlendFogFromCameraRegion(tail - 0x230);
+    tail = g_active_camera + 0x370;
+    mat_get_euler_angles(tail, tail - 0x220);
+    cam_update_shake(tail - 0x210, 0);
+    cam_update_shake(tail - 0x200, 1);
+    cam_update_shake(tail - 0x1F0, 2);
+    cam_update_grounded();
+    gfx_blend_fog_from_cam_region(tail - 0x230);
     if (D_001A7A44[0])
         FastVecCross(tail + 0x10, tail + 0x20, tail);
-    UpdateCameraFovTransition();
+    cam_update_fov_transition();
     qzero(tail + 0x50);
 }

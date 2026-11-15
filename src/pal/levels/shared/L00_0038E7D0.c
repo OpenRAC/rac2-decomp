@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char D_00189E20[];
-extern void func_0029F390(void *);
+extern char g_hero_state[];
+extern void update_moby_animation_state(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 
 void func_PAL_L00_0038E7D0(unsigned char *target)
 {
-    char *globals = D_00189E20;
+    char *globals = g_hero_state;
     int state;
     unsigned char *source;
     int oldState;
@@ -26,7 +27,7 @@ void func_PAL_L00_0038E7D0(unsigned char *target)
             target[0x41] = flag;
             if ((*(unsigned char **)(globals + 0x2290))[0x42] != (*(unsigned char **)(globals + 0x2290))[0x43])
                 target[0x40] = flag;
-            func_0029F390(target);
+            update_moby_animation_state(target);
         } else func_PAL_002A7E68(target, state, 0, 6);
     } else {
         int old = target[0x43];

@@ -14,21 +14,21 @@ typedef struct {
 
 typedef struct { float x, y, z, w; } Vec16_Fc936841d;
 
-extern u64 func_0027C878(int);
-extern void func_0031F1A8(Vec16_Fc936841d *, int);
-extern void func_0031E750(char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
-extern void func_00282DD8(char *, char *, char *);
-extern float D_001B5340[4];
-extern float func_002A7878(float, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void gfx_extrapolate_ribbon_point(Vec16_Fc936841d *, int);
+extern void gfx_init_small_quad_packet(char *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
+extern void FastVecCross(char *, char *, char *);
+extern float g_camera_eye_state[4];
+extern float math_random_float_range(float, float);
 
 /* Draw a two-layer (outer and textured inner) ribbon along sampled beam points. */
-void func_0031F210(void *owner, unsigned int opacity, float points[][4], int count)
+void DrawVariableWidthTwoLayerRibbon(void *owner, unsigned int opacity, float points[][4], int count)
 {
     BeamQuad outer, inner __attribute__((aligned(16)));
     Vector frame[4];
@@ -55,12 +55,12 @@ void func_0031F210(void *owner, unsigned int opacity, float points[][4], int cou
     inner.colors[0] = innerColor;
     outerWidth.f[3] = 1.0f;
     innerWidth.f[3] = 1.0f;
-    outerWidth.f[2] = RandomFloatRange(0.02f, 0.1f);
-    innerWidth.f[2] = RandomFloatRange(0.15f, 0.3f);
+    outerWidth.f[2] = math_random_float_range(0.02f, 0.1f);
+    innerWidth.f[2] = math_random_float_range(0.15f, 0.3f);
 
-    ExtrapolateRibbonPoint((Vec16_Fc936841d *)points, count);
-    InitSmallQuadPacket((char *)&outer);
-    InitSmallQuadPacket((char *)&inner);
+    gfx_extrapolate_ribbon_point((Vec16_Fc936841d *)points, count);
+    gfx_init_small_quad_packet((char *)&outer);
+    gfx_init_small_quad_packet((char *)&inner);
 
     outer.uv[0][0] = 0.0f;
     outer.uv[0][1] = 0.0f;
@@ -82,7 +82,7 @@ void func_0031F210(void *owner, unsigned int opacity, float points[][4], int cou
 
     FastVecSub(frame[0], initial, points[0]);
     vec_scale_to_length(frame[0], frame[0], 1.0f);
-    FastVecSub(frame[1], gCameraState_001B5340, points[0]);
+    FastVecSub(frame[1], g_camera_eye_state, points[0]);
     FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1.0f);
     FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);
@@ -107,7 +107,7 @@ void func_0031F210(void *owner, unsigned int opacity, float points[][4], int cou
 
         FastVecSub(frame[0], points[index + 1], points[index]);
         vec_scale_to_length(frame[0], frame[0], 1.0f);
-        FastVecSub(frame[1], gCameraState_001B5340, points[index]);
+        FastVecSub(frame[1], g_camera_eye_state, points[index]);
         FastVecCross((char *)frame[2], (char *)frame[1], (char *)frame[0]);
         vec_scale_to_length(frame[2], frame[2], 1.0f);
         FastVecCross((char *)frame[1], (char *)frame[0], (char *)frame[2]);

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ extern s8 *ref_L14_00425C08_00(s32);
 extern void ref_L14_00425C08_01(s8 *, s8 *, s32, s32);
 
 /* Returns the helper moby linked to this one, creating a new one (class 4418) if it is missing or dead. */
-s8 *func_L14_00425C08(s8 *self) {
+s8 *moby_get_or_create_linked(s8 *self) {
     s8 *vars;
     s8 *existing;
     s8 *created;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L09_003F7B28 (292 bytes; 09_dobbo, 12_todano, 20_yeedil). The direction word that
  * retail builds in $t0 (-1, or 1 when the frame's index is below its end) is the fifth integer
  * argument of func_L09_0033E8B0, as in func_L09_0033E8B0_1's callers. The frame's index and end
@@ -11,16 +12,16 @@ extern u32 D_L09_001FE6C0[];
 
 extern int func_L09_0033E8B0_2(char *object, int index, void *out, int a, int b, float f);
 
-extern int func_L09_0033E658(int index);
+extern int path_get_entry_id(int index);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_002AAA00(void *, void *, int, float, float, float, float);
+extern float math_approach_target_with_direction_mode(void *, void *, int, float, float, float, float);
 
 /* Steps the run's frame to the next entry of the level's table and hands the
    distance from the object to that entry's point to the stage. */
 /* Walks the enemy along its path to the next point and turns it to face along the way. */
-int func_L09_003F7B28(char *object, int index)
+int enemy_walk_to_next_path_point(char *object, int index)
 {
     char *frame = *(char **)(object + 0x68);
     int ret = 1;
@@ -41,16 +42,16 @@ int func_L09_003F7B28(char *object, int index)
             ret = 0;
     }
     step = idx + 1;
-    if (GetPathTableEntryId(index) < step) {
+    if (path_get_entry_id(index) < step) {
         float *rec = (float *)(D_L09_001FE6C0[index] + step * 16);
 
-        dist = FastMatrixHelperA(rec[4] - *(float *)(object + 0x10),
+        dist = mat_fast_helper_a(rec[4] - *(float *)(object + 0x10),
                              rec[5] - *(float *)(object + 0x14));
     } else {
-        dist = FastMatrixHelperA(*(float *)(frame + 0x1F0) - *(float *)(object + 0x10),
+        dist = mat_fast_helper_a(*(float *)(frame + 0x1F0) - *(float *)(object + 0x10),
                              *(float *)(frame + 0x1F4) - *(float *)(object + 0x14));
     }
-    ApproachTargetWithDirectionMode(object + 0xF8, frame + 0x1B4, 0, dist, *(float *)(frame + 0x114), *(float *)(frame + 0x118),
+    math_approach_target_with_direction_mode(object + 0xF8, frame + 0x1B4, 0, dist, *(float *)(frame + 0x114), *(float *)(frame + 0x118),
                   *(float *)(frame + 0x11C));
     return ret;
 }

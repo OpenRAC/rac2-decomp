@@ -60,23 +60,23 @@ extern s32 D_L23_001B1AC8 __attribute__((sda));
 extern float D_L23_001B1AD0 __attribute__((sda));
 extern float D_L23_001B1AD4 __attribute__((sda));
 extern float D_L23_001B1AE0 __attribute__((nosda));
-extern float D_L23_001BA640[];
+extern float g_camera_l23_position[];
 
-extern void func_L00_00412088(L23Quad *);
-extern void func_00281DE8(L23Quad *, s32, s32, s32);
-extern void func_00280B90(L23Quad *, void *, s32);
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00282DD8(float *, float *, float *);
-extern void func_00282F20(float *, float *, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern float func_002A7940(void);
-extern void func_00281EB8(u8 *, s32, u32, s32, float, float, float);
+extern void effect_reset_record(L23Quad *);
+extern void gfx_init_quad_packet_state(L23Quad *, s32, s32, s32);
+extern void draw_world_quad(L23Quad *, void *, s32);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern void FastVecCross(float *, float *, float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(u8 *, s32, u32, s32, float, float, float);
 
 /* Draws a glowing beam with scrolling texture and a bright spot at its end. */
-void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 unused4, u8 *obj) {
+void gfx_l23_draw_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 unused4, u8 *obj) {
     L23Quad q;
     float vrel[4] __attribute__((aligned(16)));
     float vaxis[4] __attribute__((aligned(16)));
@@ -97,8 +97,8 @@ void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 u
     int j;
 
     vars = *(L23BeamVars **)(obj + 0x68);
-    ResetEffectRecord(&q);
-    InitQuadPacketState(&q, D_L23_001B1A70, 1, 0x80);
+    effect_reset_record(&q);
+    gfx_init_quad_packet_state(&q, D_L23_001B1A70, 1, 0x80);
     q.rgba[1] = D_L23_001B1A8C << 24;
     q.rgba[1] |= D_L23_001B1A88 << 16;
     q.rgba[1] |= D_L23_001B1A84 << 8;
@@ -132,7 +132,7 @@ void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 u
     if (vars->scroll >= 4.0f) {
         vars->scroll -= 4.0f;
     }
-    FastVecSub(rel, (float *)(obj + 0x10), gCameraPosition_L23);
+    FastVecSub(rel, (float *)(obj + 0x10), g_camera_l23_position);
     vec_scale_to_length(axis, vars->dir, -vars->len);
     FastVecAdd(tip, (float *)(obj + 0x10), axis);
     FastVecCross(side, rel, axis);
@@ -165,8 +165,8 @@ void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 u
     q.uv[3][0] = 1.0f;
     q.uv[3][1] = 1.0f;
     angle = vars->spin;
-    sinAngle = FastSinOrCosA(angle);
-    cosAngle = FastSinOrCosB(angle);
+    sinAngle = math_fast_sin_or_cos_a(angle);
+    cosAngle = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
         uvOffset[0] = q.uv[j][0] - 0.5f;
         uvOffset[1] = q.uv[j][1] - 0.5f;
@@ -176,7 +176,7 @@ void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 u
         q.uv[j][1] += 0.5f;
     }
     vars->spin = FastAddRotations(vars->spin, D_L23_001B1A6C * 0.017453294f);
-    InitQuadPacketState(&q, D_L23_001B1A74, 1, 0x80);
+    gfx_init_quad_packet_state(&q, D_L23_001B1A74, 1, 0x80);
     q.d70 = 5;
 
     q.rgba[1] = D_L23_001B1A60 << 24;
@@ -260,6 +260,6 @@ void func_L23_00428490(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 u
     FastVecSub((float *)&q.corner[3], tip, side);
     draw_world_quad(&q, 0, 0);
 
-    DrawBillboardQuad_00281EB8(obj + 0x10, D_L23_001B1A58, D_L23_001B1A5C, 1, vars->glow, 0.08f, RandomAngle());
-    DrawBillboardQuad_00281EB8(obj + 0x10, D_L23_001B1A58, 0x80808080, 1, vars->glow * 0.4f, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(obj + 0x10, D_L23_001B1A58, D_L23_001B1A5C, 1, vars->glow, 0.08f, math_random_angle());
+    gfx_draw_billboard_quad(obj + 0x10, D_L23_001B1A58, 0x80808080, 1, vars->glow * 0.4f, 0.08f, math_random_angle());
 }

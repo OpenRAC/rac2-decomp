@@ -21,13 +21,13 @@ extern int D_L26_001B0478 __attribute__((sda));
 
 extern int D_L26_001B047C;
 
-extern void func_00281A08(void *, int, void *, void *, int, int, int, int, float);
+extern void part_draw_trail_ribbon(void *, int, void *, void *, int, int, int, int, float);
 
 /* For every entity of the object's group, hands six slots of its private state (+0x80 and +0x100,
    the words at +0x190 and +0x194 and the float at +0x198) to the resident effect scheduler,
    together with the level's float template D_L26_002967A0 and the two words D_L26_001B0478 and
    D_L26_001B047C. */
-void func_L26_003D4AE8(u8 *object) {
+void part_submit_group_trail_effects(u8 *object) {
     u16 *groupIds;
     u8 *entity;
     u8 *state;
@@ -40,7 +40,7 @@ void func_L26_003D4AE8(u8 *object) {
         if (entity == 0)
             break;
         state = *(u8 **)(entity + 0x68);
-        DrawTrailRibbon_00281A08(D_L26_002967A0, 6, state + 0x80, state + 0x100, *(int *)(state + 0x194),
+        part_draw_trail_ribbon(D_L26_002967A0, 6, state + 0x80, state + 0x100, *(int *)(state + 0x194),
                       *(int *)(state + 0x190), D_L26_001B0478, D_L26_001B047C, *(float *)(state + 0x198));
     }
 }
@@ -57,23 +57,23 @@ extern float D_L26_001B05D8 __attribute__((sda));
 extern unsigned short D_L26_001B05E0 __attribute__((sda));
 extern unsigned short D_L26_001B05E4;
 extern float D_L26_001B8B80[4];
-extern float func_002B0360(char *);
-extern int func_002A77E0(int);
-extern void func_00325B70(char *, char **, int, int);
-extern void func_002A7750(unsigned char *, unsigned char, int);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_L26_003DC128(void *);
-extern int func_002B3BA8(void *, int, void *, int, float, float);
-extern void func_00283698(void *, void *);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00325D30(char *, char *);
+extern float gravity_get_center_distance(char *);
+extern int math_random_int_below(int);
+extern void enemy_spawn_child_parts(char *, char **, int, int);
+extern void moby_set_state(unsigned char *, unsigned char, int);
+extern void anim_start_blended(void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void moby_l26_set_group_alert_flag(void *);
+extern int weapon_select_aim_target(void *, int, void *, int, float, float);
+extern void matrix_from_basis_rows(void *, void *);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void group_destroy_attached_parts(char *, char *);
 
 /* Sets up a flying creature on its first frame. Each frame after that it reacts to the hero being
    close, updates its movement and returns 1 once it is finished and should be removed. */
-int func_L26_003DBE18(unsigned char *object) {
+int flying_creature_update_state(unsigned char *object) {
     char *private = *(char **)(object + 0x68);
     float height;
     float turn;
@@ -83,14 +83,14 @@ int func_L26_003DBE18(unsigned char *object) {
         private[0x60] = 7;
         *(float *)(private + 0x84) = 0.8f;
         *(float *)(private + 0x8C) = 0.15f;
-        height = GetDistanceFromGravityCenter((char *)object + 0x10) - 1.5f;
+        height = gravity_get_center_distance((char *)object + 0x10) - 1.5f;
         turn = D_L26_001B05D8;
         *(float *)(private + 0x100) = 1.0f;
         turn *= 0.017453294f;
         *(float *)(private + 0x90) = height;
         *(float *)(private + 0x104) = 0.5f;
         {
-            int flip = RandomIntBelow(2);
+            int flip = math_random_int_below(2);
             float angle = turn;
             if (flip) angle = -angle;
             *(float *)(private + 0x1DC) = angle;
@@ -103,20 +103,20 @@ int func_L26_003DBE18(unsigned char *object) {
             *(short *)(private + 0x24) = 3;
             *(float *)(private + 0x20) = 3.0f;
         }
-        SpawnEnemyChildParts((char *)object, (char **)(private + 0x270), 0, 2);
-        SetMobyState(object, 1, 0);
-        if (object[0x43]) StartAnimationBlended(object, 0, 0, 0);
+        enemy_spawn_child_parts((char *)object, (char **)(private + 0x270), 0, 2);
+        moby_set_state(object, 1, 0);
+        if (object[0x43]) anim_start_blended(object, 0, 0, 0);
     }
     if (object[0x31] && fast_vec_dist(object + 0x10, D_L26_001B8B80) < 24.0f) {
-        UpdateMobyGroundCheck(object);
+        moby_update_ground_check(object);
         object[0x6F] = 0x16;
     }
-    if (ApplyDamageToObject(object, private + 0x50, 0)) SetGroupMobyAlertFlagL26(object);
-    *(short *)(private + 0x224) = SelectAimTarget_002B3BA8(object, *(int *)(private + 0x210), 0, 0, 16.0f, 0.0f);
+    if (moby_apply_damage_to_object(object, private + 0x50, 0)) moby_l26_set_group_alert_flag(object);
+    *(short *)(private + 0x224) = weapon_select_aim_target(object, *(int *)(private + 0x210), 0, 0, 16.0f, 0.0f);
     matrix_from_basis_rows(private + 0x230, object + 0xC0);
-    ComputeViewDirection((char *)object + 0x10, private + 0x260, 0);
+    cam_compute_view_direction((char *)object + 0x10, private + 0x260, 0);
     if ((unsigned char)private[0x2E] == 2) {
-        DestroyAttachedParts((char *)object, private + 0x270);
+        group_destroy_attached_parts((char *)object, private + 0x270);
         return 1;
     }
     return 0;

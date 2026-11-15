@@ -18,10 +18,10 @@ extern float D_L14_001B05C8 __attribute__((sda));
 extern float D_L14_001B05CC __attribute__((sda));
 extern float D_L14_001B05C0 __attribute__((sda));
 extern float D_L14_001B05C4 __attribute__((sda));
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 /* Blends two numbers on a linked object based on how far its position has moved between two key points. */
-void func_L14_003E4EA0(char *self)
+void moby_update_keyframe_span_blend(char *self)
 {
     char *state = *(char **)(self + 0x68);
     char *linked = *(char **)(state + 0x30);
@@ -60,9 +60,9 @@ void func_L14_003E4EA0(char *self)
     }
     keyStart = (float)*(s16 *)(state + (s16)keyIndex * 2);
     span = (float)(nextKey - *(s16 *)(state + (s16)keyIndex * 2));
-    ratioA = FloatAbs((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)position - keyStart) / span);
+    ratioA = math_fabs((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)position - keyStart) / span);
     blendA = D_L14_001B05C8 - ratioA;
-    ratioB = FloatAbs((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - keyStart) / span);
+    ratioB = math_fabs((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - keyStart) / span);
     out0 = blendA * D_L14_001B05C0;
     out1 = (D_L14_001B05CC - ratioB) * D_L14_001B05C4;
     *(float *)(linkedVars + 0x40) = out0;

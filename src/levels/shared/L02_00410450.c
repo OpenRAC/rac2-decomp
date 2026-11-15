@@ -6,11 +6,11 @@ typedef unsigned char u8;
 extern void func_0032B890(int, int, int);
 
 typedef struct { u8 *child; float speed,turn,height; } CaptureState;
-extern int func_00312B58(void *);
-extern int func_002B3868(void *);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern float func_00283B98(float,float);
+extern int moby_is_state_six(void *);
+extern int flag_set_first_pending(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern float FastAddRotations(float,float);
 
 extern void func_0031E6A0(void *, int, int);
 extern int func_0031E770(int);
@@ -38,21 +38,21 @@ extern float func_0031E8D0(void);
 /* func_L02_00411530 is matched in L02_00411530.c (built with -frac2-hazard-labels). */
 
 /* True while the record's state byte still says 2. */
-int func_L02_004127F8(u8 *object) {
+int moby_is_state_two(u8 *object) {
     return *(u8 *)(object + 0x20) == 2;
 }
 
 /* Copies the sub-object's byte 0x40 down to its byte 0x25. */
-void func_L02_00414D48(u8 *object) {
+void moby_copy_sub_byte_40_to_25(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     *(u8 *)(vars + 0x25) = *(u8 *)(vars + 0x40);
 }
 
 /* Advance the captured child's rising and settling states. */
-void func_L02_004164A8(u8 *object)
+void capture_lift_update(u8 *object)
 {
     CaptureState *state=*(CaptureState **)(object+0x68);
-    if (state->child && IsMobyInState6(state->child)) {
+    if (state->child && moby_is_state_six(state->child)) {
         state->child=0;
         state->speed=0;
     }
@@ -60,27 +60,27 @@ void func_L02_004164A8(u8 *object)
     case 0:
         state->child=0;
         state->speed=0;
-        SetMobyState(object,1,-1);
-        if(object[0x43]) StartAnimationBlended(object,0,0,7);
+        moby_set_state(object,1,-1);
+        if(object[0x43]) anim_start_blended(object,0,0,7);
         return;
     case 2:
-        if (SetFirstPendingFlag(object)) {
-            if(object[0x43]!=1) StartAnimationBlended(object,1,0,7);
+        if (flag_set_first_pending(object)) {
+            if(object[0x43]!=1) anim_start_blended(object,1,0,7);
             *(float *)(object+0x48)=1;
         }
         if (!state->child) {
-            SetMobyState(object,4,-1);
+            moby_set_state(object,4,-1);
             return;
         }
         *(float *)(state->child+0x18)+=state->speed;
         *(float *)(state->child+0xF8)=FastAddRotations(*(float *)(state->child+0xF8),state->turn);
         if (!(object[0x60]&2)) return;
-        SetMobyState(object,3,-1);
+        moby_set_state(object,3,-1);
         return;
     case 3:
-        if (SetFirstPendingFlag(object)) *(float *)(object+0x48)=0;
+        if (flag_set_first_pending(object)) *(float *)(object+0x48)=0;
         if (!state->child) {
-            SetMobyState(object,4,-1);
+            moby_set_state(object,4,-1);
             return;
         }
         {
@@ -91,17 +91,17 @@ void func_L02_004164A8(u8 *object)
             if (!(*(float *)(state->child+0x18)>*(float *)(object+0x18)+0.2f)) return;
             *(int *)(data+0xAC)=8;
         }
-        SetMobyState(object,4,-1);
+        moby_set_state(object,4,-1);
         return;
     case 4:
-        if (SetFirstPendingFlag(object)) {
-            if(object[0x43]!=2) StartAnimationBlended(object,2,0,7);
+        if (flag_set_first_pending(object)) {
+            if(object[0x43]!=2) anim_start_blended(object,2,0,7);
             *(float *)(object+0x48)=1;
         }
         if (!(object[0x60]&2)) return;
         if (state->child) state->height=*(float *)(state->child+0x18);
-        SetMobyState(object,1,-1);
-        if(object[0x43]) StartAnimationBlended(object,0,0,7);
+        moby_set_state(object,1,-1);
+        if(object[0x43]) anim_start_blended(object,0,0,7);
         return;
     case 1:
         if (!state->child) return;
@@ -116,7 +116,7 @@ void func_L02_004164A8(u8 *object)
 /* func_L02_00416720 is defined in L02_00410450-qcopy.c. */
 
 /* True when the record is in state 1 and its sub-object holds a cleared origin. */
-int func_L02_00416800(void *object) {
+int moby_is_state_one_cleared_vars(void *object) {
     int result;
     void *vars;
 
@@ -134,7 +134,7 @@ int func_L02_00416800(void *object) {
 /* func_L02_00422270 is defined in L02_00422270-g8.c. */
 
 /* Rebuilds the sub-object's frame from the record's own transform. */
-void func_L02_004224C8(u8 *object) {
+void moby_rebuild_frame_from_transform(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     u8 *position = object + 0x10;
 
@@ -146,19 +146,19 @@ void func_L02_004224C8(u8 *object) {
 
 /* func_L02_00422538 is defined in L02_00410450-g8.c (this unit has no $gp access for it). */
 
-extern void func_L02_00422720(u8 *);
-extern void func_L02_00422BB8(u8 *);
-extern void func_L02_00422D68(u8 *);
+extern void gfx_l02_draw_beam_strips(u8 *);
+extern void gfx_draw_beam_end_flare(u8 *);
+extern void gfx_draw_beam_spark_point(u8 *);
 
 /* One setup pass, then the five body passes of the resident effect. */
-void func_L02_00422638(u8 *object) {
+void gfx_draw_beam_effect_passes(u8 *object) {
     int i;
 
-    DrawBeamStrips_L02(object);
+    gfx_l02_draw_beam_strips(object);
     i = 4;
-    DrawBeamEndFlare(object);
+    gfx_draw_beam_end_flare(object);
     do {
-        DrawBeamSparkPoint(object);
+        gfx_draw_beam_spark_point(object);
     } while (--i >= 0);
 }
 
@@ -171,7 +171,7 @@ void func_L02_00422638(u8 *object) {
 
 /* Restarts the record's resident effect once it has settled, picking the
    variant by the resident query and the record's own byte 0x43. */
-void func_L02_0042ED48(u8 *object) {
+void moby_start_idle_anim_variant(u8 *object) {
     u8 *self = object;
 
     if (*(u8 *)(self + 0x20) != 0)
@@ -190,7 +190,7 @@ void func_L02_0042ED48(u8 *object) {
 
 
 /* Picks the evasive state the object should take while the resident timer runs. */
-void func_L02_0043FA98(u8 *object) {
+void moby_pick_evasive_anim_state(u8 *object) {
     u8 *self = object;
     u8 *vars = *(u8 **)(self + 0x68);
     int nextMode;

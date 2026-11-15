@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_002B3E90, the PAL copy of func_L00_002B3F68: the same C, where 0.022f becomes
    0.031680003f; 0.02f becomes 0.028800001f; 0.01f becomes 0.014400001f; 0.09308424592018127f
    becomes 0.11170109f; 0.06399541348218918f becomes 0.0767945f; 0.03199770674109459f becomes
@@ -13,13 +14,13 @@ typedef struct {
     unsigned char gap2[0x1FF];
     float speed;
 } MovementView;
-extern char D_00189E20[];
-extern int func_L00_002ADEA0(int index);
-extern void func_L00_002B3EF8(int index, float a, float b, float c);
+extern char g_hero_state[];
+extern int hero_slot_item_id(int index);
+extern void hero_steer_heading(int index, float a, float b, float c);
 
 void func_PAL_L00_002B3E90(void)
 {
-    float speed = ((MovementView *)D_00189E20)->speed;
+    float speed = ((MovementView *)g_hero_state)->speed;
     float first;
     float second;
     float third;
@@ -32,7 +33,7 @@ void func_PAL_L00_002B3E90(void)
         if (first < 0.014400001f)
             first = 0.014400001f;
     }
-    if (((MovementView *)D_00189E20)->speed == 1.0f) {
+    if (((MovementView *)g_hero_state)->speed == 1.0f) {
         third = 0.11170109f;
     } else {
         third = speed * 0.0767945f;
@@ -42,18 +43,18 @@ void func_PAL_L00_002B3E90(void)
             third = 0.03839725f;
     }
     second = 0.38880002f;
-    if (((MovementView *)D_00189E20)->alternate) {
+    if (((MovementView *)g_hero_state)->alternate) {
         first = 0.050400004f;
         third = 0.23387417f;
     }
-    switch (func_L00_002ADEA0(0)) {
+    switch (hero_slot_item_id(0)) {
     case 16:
     case 28:
     case 29:
     case 30:
     case 39:
     case 46:
-        if (((MovementView *)D_00189E20)->special && !((MovementView *)D_00189E20)->alternate) {
+        if (((MovementView *)g_hero_state)->special && !((MovementView *)g_hero_state)->alternate) {
             if (speed > 0.95f) {
                 first = 0.024480002f;
                 second = 0.2592f;
@@ -68,5 +69,5 @@ void func_PAL_L00_002B3E90(void)
     default:
         break;
     }
-    func_L00_002B3EF8(0, first, second, third);
+    hero_steer_heading(0, first, second, third);
 }

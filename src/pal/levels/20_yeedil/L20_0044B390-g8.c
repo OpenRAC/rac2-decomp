@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_002A7750(unsigned char *, int, int);
-extern void func_0029FCC0(char *, int, char *);
-extern float func_00282E80(void *, void *);
-extern void func_L00_003294F0(unsigned char *, int);
-extern void func_002A0430(unsigned int);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void moby_set_state(unsigned char *, int, int);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern float vec_distance_xy(void *, void *);
+extern void moby_set_flag_bit(unsigned char *, int);
+extern void moby_mark_table_entry_flagged(unsigned int);
 extern void func_PAL_L20_002C59B0(int);
 typedef struct {
     char reserved00[0xBC];
@@ -39,38 +39,38 @@ void func_PAL_L20_0044B390(unsigned char *object)
     YeedilActivation *state = *(YeedilActivation **)(object + 0x68);
     int color;
     if (!state) return;
-    state->angle = func_00283B98(state->angle, 0.12566373f);
-    color = func_00283CF0((func_00283198(state->angle) * 4.0f - 3.0f) * 128.0f);
+    state->angle = FastAddRotations(state->angle, 0.12566373f);
+    color = FloatToInt((math_fast_sin_or_cos_b(state->angle) * 4.0f - 3.0f) * 128.0f);
     if (color > 128) color = 128;
     else if (color < 32) color = 32;
     if (object[0x20] == 0) {
         *(unsigned short *)(object + 0x34) |= 0x10;
-        func_002A7750(object, 1, -1);
+        moby_set_state(object, 1, -1);
     } else if (object[0x20] == 1) {
         float distance;
-        func_0029FCC0((char *)object, 0, (char *)point);
-        distance = func_00282E80(D_00189E20.position, point);
+        moby_transform_joint_to_world((char *)object, 0, (char *)point);
+        distance = vec_distance_xy(g_hero_state.position, point);
         state->activated = 0;
-        if (D_00189E20.owner == object && D_00189E20.active &&
+        if (g_hero_state.owner == object && g_hero_state.active &&
             distance < *(float *)(object + 0x2C) * 0.5f / *(float *)(*(char **)(object + 0x24) + 0x24)) {
             int missing = -1;
             int enabled;
             int *entry;
             int remaining;
-            func_002A7750(object, 2, missing);
+            moby_set_state(object, 2, missing);
             enabled = 1;
             entry = state->objects;
             for (remaining = 3; remaining >= 0; entry++, remaining--) {
                 int index = *entry;
                 if (index != missing) {
                     if (entry[4]) {
-                        func_L00_003294F0((unsigned char *)&yeedilObjectsGp[index], enabled);
+                        moby_set_flag_bit((unsigned char *)&yeedilObjectsGp[index], enabled);
                     } else {
                         D_L20_001B2F9C[index].enabled = enabled;
                     }
                 }
             }
-            func_002A0430(state->event);
+            moby_mark_table_entry_flagged(state->event);
             if (state->callback) func_PAL_L20_002C59B0(0);
         }
         *(unsigned int *)(object + 0x78) = color | (0x80 << 24);

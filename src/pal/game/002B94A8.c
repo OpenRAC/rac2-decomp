@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 struct PadState {
     u8 pad_0[0x100] __attribute__((aligned(16)));
     f32 analog[16];                      
@@ -44,9 +44,9 @@ struct PadState {
 };
 typedef struct PadState PadState;
 extern struct { s32 word; u8 mirror; u8 rest[7]; } D_001A7A40 MACRO_ADDR;
-extern float func_00282E20(float *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
+extern float vec_length_xy(float *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
 
 void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
     float v[2];
@@ -64,7 +64,7 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
             if (d < 0)
                 d = -d;
             if (d >= 0x30) {
-                float f = func_00283CE0(d - 0x30) / func_00283CE0(0x4C);
+                float f = IntToFloat(d - 0x30) / IntToFloat(0x4C);
                 p->analog[i] = f;
                 if (f > 1.0f) {
                     p->analog[i] = 1.0f;
@@ -77,7 +77,7 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
     }
     if (len >= 0x12) {
         for (i = 4; i < 16; i++) {
-            p->analog[i] = func_00283CE0(buf[i + 2]) * 0.003921569f;
+            p->analog[i] = IntToFloat(buf[i + 2]) * 0.003921569f;
         }
     }
     if (D_001A7A40.mirror) {
@@ -156,8 +156,8 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
     }
     v[0] = p->analog[2];
     v[1] = p->analog[3];
-    mag = func_00282E20(v);
-    ang = func_00283248(v[0], v[1]);
+    mag = vec_length_xy(v);
+    ang = mat_fast_helper_a(v[0], v[1]);
     p->hist_mag[p->hist_idx] = mag;
     p->hist_ang[p->hist_idx] = ang;
     if (mag > 0.9f) {
@@ -168,7 +168,7 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
         }
         if (!(p->pressed & 0x10000)) {
             for (k = 1; k < 4; k++) {
-                if (func_00283C80(p->hist_ang[(p->hist_idx - k + 30) % 30], ang) >
+                if (FastDiffRots(p->hist_ang[(p->hist_idx - k + 30) % 30], ang) >
                     0.959931194782257080078125f) {
                     p->pressed |= 0x10000;
                     break;
@@ -201,12 +201,12 @@ typedef struct {
     short active;
     int value;
 } State_2B8518;
-extern State_2B8518 D_00138180;
+extern State_2B8518 g_pad_state;
 
 void func_PAL_002B9BB8(void) {
-    extern void func_002B85F8(void *);
+    extern void poll_pad_device_state(void *);
     extern State_2B8518 D_00138500;
-    func_002B85F8(&D_00138180);
-    func_002B85F8(&D_00138500);
+    poll_pad_device_state(&g_pad_state);
+    poll_pad_device_state(&D_00138500);
 }
 

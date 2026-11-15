@@ -29,55 +29,55 @@ extern float D_L20_001B2454 __attribute__((sda));
 
 extern int D_L20_001B2AC8 __attribute__((sda));
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00282F20(void *dst, void *src, float x);
+extern void vec_scale_to_length(void *dst, void *src, float x);
 
-extern float func_00282E20(void *vec);
+extern float vec_length_xy(void *vec);
 
-extern void func_00282F70(char *a, char *b);
+extern void vec_fast_normalize_helper(char *a, char *b);
 
-extern void func_002C9218(char *a, char *b, char *c, float f);
+extern void path_push_point_away(char *a, char *b, char *c, float f);
 
-extern void func_0032DA58(char *, char *, void *, float);
+extern void part_spawn_blast_effect_moby(char *, char *, void *, float);
 
 /* func_002A8C28 returns a value here: retail keeps $v0 live after the call,
    and only a non-void prototype gives the flag word $v1 instead of $v0. */
-extern int func_002A8C28(char *, char *, int, int, float, float, float, int, int);
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern void func_002A9288(char *, float);
+extern void part_queue_ground_shadow(char *, float);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern float func_002AAA00(char *a, char *b, int c, float d, float e, float f,
+extern float math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f,
                             float g);
 
-extern float func_002AA2E8(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
-extern void *func_0029EFD0(int);
+extern void *CreateMoby(int);
 
-extern void func_002B37E8(u8 *, u8 *);
+extern void moby_init_child_from_parent(u8 *, u8 *);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern float func_002A7878(float a, float b);
+extern float math_random_float_range(float a, float b);
 
-extern int func_00277F48(float f, char *a, int b, char *c, int d);
+extern int coll_process_hit(float f, char *a, int b, char *c, int d);
 
-extern void func_L20_00444C18(char *arg0, char *arg1);
+extern void moby_local_to_world_point(char *arg0, char *arg1);
 
 extern char D_L20_001B9FC0[] __attribute__((nosda));
 
 /* Turns the turret to face its target and eases its yaw and pitch toward the aimed angles. */
-void func_L20_0044AA88(char *moby) {
+void turret_turn_toward_target(char *moby) {
     char *state = *(char **)(moby + 0x68);
     char *angles = moby + 0xF8;
     float deltaX = *(float *)(state + 0x140) - *(float *)(moby + 0x10);
@@ -86,8 +86,8 @@ void func_L20_0044AA88(char *moby) {
     float turnStep = D_L20_001B2454 * 0.000290888245f;
     float heading;
 
-    heading = FastMatrixHelperA(deltaX, deltaY);
-    ApproachTargetWithDirectionMode(angles, state + 0x1A4, 0, heading, smallStep, smallStep, turnStep);
+    heading = mat_fast_helper_a(deltaX, deltaY);
+    math_approach_target_with_direction_mode(angles, state + 0x1A4, 0, heading, smallStep, smallStep, turnStep);
     turnStep = turnStep * 4.0f;
     ApproachValue(moby + 0x0F0, *(float *)(state + 0x1A8), turnStep);
     *(float *)(state + 0x1A8) = 0.0f;
@@ -96,17 +96,17 @@ void func_L20_0044AA88(char *moby) {
 }
 
 /* Makes the object vanish with an impact effect and puts it back into its resting state. */
-void func_L20_00449AE8(char *moby) {
+void moby_vanish_with_effect(char *moby) {
     TI128 offset;
 
     FastVecSub(&offset, D_L20_001B9FC0, moby + 0x10);
     vec_scale_to_length(&offset, &offset, 1.0f);
-    SpawnBlastEffectMoby(moby, moby + 0x10, &offset, *(float *)(moby + 0x18) - 0.5f);
-    SweepCollisionFromObject(moby, moby + 0x10, 0x10000, 0, 6.0f, D_L20_001B23EC, 2.0f,
+    part_spawn_blast_effect_moby(moby, moby + 0x10, &offset, *(float *)(moby + 0x18) - 0.5f);
+    coll_sweep_from_object(moby, moby + 0x10, 0x10000, 0, 6.0f, D_L20_001B23EC, 2.0f,
                   1, 0);
     *(int *)(moby + 0x98) = 0;
     *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
-    SetMobyState(moby, 1, -1);
+    moby_set_state(moby, 1, -1);
 }
 
 /* func_L20_0044A838 is defined in L20_0044A838-g8.c. */
@@ -136,17 +136,17 @@ typedef struct {
 } Moby449FD0;
 
 /* Creates a new projectile (moby class 4846) at a position, with a direction, speed and lifetime, and returns it. */
-char *func_L20_00449FD0(char *template, char *position, char *direction, float speed, int lifetime,
+char *yeedil_projectile_spawn(char *template, char *position, char *direction, float speed, int lifetime,
                         float extraValue) {
     char *projectile;
     char *state;
 
     projectile = CreateMoby(0x12EE /* moby class 4846 */);
     if (projectile != 0) {
-        InitChildObjectFromParent((u8 *)projectile, (u8 *)template);
+        moby_init_child_from_parent((u8 *)projectile, (u8 *)template);
         qcopy(projectile + 0x10, position);
-        *(float *)(projectile + 0xF0) = RandomAngle();
-        *(float *)(projectile + 0xF4) = RandomAngle();
+        *(float *)(projectile + 0xF0) = math_random_angle();
+        *(float *)(projectile + 0xF4) = math_random_angle();
         euler_rotation_basis(projectile + 0xC0, projectile + 0xF0);
         ((Moby449FD0 *)projectile)->state = 1;
         ((Moby449FD0 *)projectile)->flags |= 0x100;
@@ -158,7 +158,7 @@ char *func_L20_00449FD0(char *template, char *position, char *direction, float s
         *(int *)(state + 0x18) = lifetime;
         *(float *)(state + 0x1C) = extraValue;
         *(int *)(state + 0x20) = 0x3C;
-        *(float *)(state + 0x10) = RandomFloatRange(10.0f, 20.0f) * 0.00027777778f;
+        *(float *)(state + 0x10) = math_random_float_range(10.0f, 20.0f) * 0.00027777778f;
     }
     return projectile;
 }

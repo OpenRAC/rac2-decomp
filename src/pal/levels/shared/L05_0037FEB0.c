@@ -14,7 +14,7 @@ struct S_L05_002A1800 {
 
 extern struct S_L05_002A1800 D_L05_002A1800[];
 
-extern int func_002ED8A0(int);
+extern int table_find_last_used_entry(int);
 
 void func_PAL_L05_0037FEB0(void)
 {
@@ -24,6 +24,6 @@ void func_PAL_L05_0037FEB0(void)
         D_L05_002A1800[i].f14 = D_L05_002A1800[i].f0C;
     D_L05_002A1800[7].f14 = ((s32)D_L05_002A1800[7].f0C * 5 + 2) / 6;
     D_L05_002A1800[13].f14 = ((s32)D_L05_002A1800[13].f0C * 5 + 2) / 6;
-    i = func_002ED8A0(6);
+    i = table_find_last_used_entry(6);
     D_L05_002A1800[i].f14 = D_L05_002A1800[i].f10;
 }

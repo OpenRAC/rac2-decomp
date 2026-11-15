@@ -6,7 +6,7 @@ extern int *D_L00_001B2B24[] MACRO_ADDR;
 extern int *D_L00_001B2B28[] MACRO_ADDR;
 
 /* Clears three effect buffers back to zero. */
-void func_L00_003DC350(void)
+void part_clear_effect_buffers(void)
 {
     int *p;
     int i;

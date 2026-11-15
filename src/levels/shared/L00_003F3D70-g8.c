@@ -1,42 +1,42 @@
 #include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
-extern unsigned char D_00189E20[];
-extern unsigned char D_00138180[];
+extern unsigned char g_hero_state[];
+extern unsigned char g_pad_state[];
 #define H ((Hero *)D_00189E20)
 #define PAD ((Hero *)D_00138180)
 
 typedef int ShotWord128 __attribute__((mode(TI)));
 typedef union { ShotWord128 word; float f[4]; } ShotVector;
 typedef struct { char prefix[0x50]; float speed, cooldown; char suffix[0xE0-0x58]; } ShotTuning;
-extern ShotTuning D_L00_00262570[];
+extern ShotTuning g_weapon_l00_table[];
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 
 extern float D_L00_001B08F8 __attribute__((sda));
 extern float D_L00_0025C64C[];
-extern void func_L00_0037E000(void *);
-extern void func_002A75E0(void *, int, int, int, int);
-extern void func_L00_002C42E0(int, int);
-extern void func_00273318(void *, unsigned int, int, int, int, int, float, float, float);
-extern int func_00282948(void *);
-extern int func_002829D8(void *);
-extern int func_L00_002D3F30(int, int);
-extern int func_L00_002D4040(int);
-extern void func_0029FCC0(char *, int, char *);
-extern int func_002E5CF8(int, int, char *);
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_0037FA90(char *, char *, float, float, float);
-extern void func_L00_0032A1A8(char *, char *, char *, float);
-extern char *func_L00_003AA4C8(void *, void *, void *, void *);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_002AB668(void *, int, float);
-extern void func_002ACDE8(void *, void *, void *);
+extern void ReleaseDeadOrExpiredSlots(void *);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern void hero_l00_set_action(int, int);
+extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
+extern int math_fast_float_d(void *);
+extern int vec_fast_helper_b(void *);
+extern int weapon_spend_ammo(int, int);
+extern int get_ammo(int);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern int PlayMobySound(int, int, char *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_compute_aim_direction(char *, char *, float, float, float);
+extern void vec_compute_object_to_target(char *, char *, char *, float);
+extern char *effect_spawn_owned_moby(void *, void *, void *, void *);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void math_build_axis_angle_quat(void *, int, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
 
 /* Updates the HK-22 moby (class 3310). When the fire button is pressed and the weapon is
    ready, it fires three shots in a small spread, aimed at the locked-on target if there is
    one, and starts the cooldown. */
-void func_L00_003F3D70(unsigned char *object) {
+void hk22_update(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     ShotVector aim, velocity, position, direction, rotation, rotated;
     char *spawn, *target;
@@ -48,29 +48,29 @@ void func_L00_003F3D70(unsigned char *object) {
         object[0x20] = 1;
     ReleaseDeadOrExpiredSlots(H->ptr[2212]);
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
-        StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
+        anim_start_blended_with_flags(object, 1, 0, 2, 0);
     *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * D_L00_001B08F8;
     D_L00_0025C64C[0] = 0.1f;
     if (H->i[2213] == 1)
-        SetHeroAction_L00(0x1D, 1);
+        hero_l00_set_action(0x1D, 1);
     if (H->i[2213] == 0x1D) {
         if (*(float *)state > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else color = 0x600FFF0F;
-        AddMobyMarker(object, color, 0, 0x27, -1, 4, 2.0f, 0.0f, 90.0f);
+        hud_add_moby_marker(object, color, 0, 0x27, -1, 4, 2.0f, 0.0f, 90.0f);
     }
     if (H->ptr[1300])
         H->ptr[766] = H->ptr[1300];
     allowed = 1;
     if (H->i[2213] == 0x1D) {
-        if (!FastFloatHelperD(&H->i[2381])) allowed = 0;
+        if (!math_fast_float_d(&H->i[2381])) allowed = 0;
     } else H->i[2381] = 0x28;
-    if (FastVectorHelperB(state) && !H->b[8892] && H->i[1168] > 22 && allowed) {
-        if ((PAD->u[104] & H->u[1164]) && SpendWeaponAmmo(-1, 1)) {
-            TransformMobyJointToWorld((char *)object, 0, (char *)&aim);
+    if (vec_fast_helper_b(state) && !H->b[8892] && H->i[1168] > 22 && allowed) {
+        if ((PAD->u[104] & H->u[1164]) && weapon_spend_ammo(-1, 1)) {
+            moby_transform_joint_to_world((char *)object, 0, (char *)&aim);
             PlayMobySound(0, 0, (char *)object);
-            StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
-            speed = (gWeaponTable_L00 + gItemSlotToRecord[0x18])->speed * 0.016666668f;
+            anim_start_blended_with_flags(object, 2, 0, 2, 0);
+            speed = (g_weapon_l00_table + g_item_slot_to_record[0x18])->speed * 0.016666668f;
             if (H->h[4726] == 1) {
                 vec_scale_to_length(&velocity, object + 0xD0, -speed);
                 qcopy(&position, &aim);
@@ -78,31 +78,31 @@ void func_L00_003F3D70(unsigned char *object) {
                 vec_scale_to_length(&velocity, &(*(ShotVector *)&H->b[0x760]), speed);
                 qcopy(&position, &aim);
                 if (H->i[1344])
-                    ComputeAimDirection((char *)&velocity, (char *)&position, speed, 32.0f, 0.6981318f);
+                    math_compute_aim_direction((char *)&velocity, (char *)&position, speed, 32.0f, 0.6981318f);
             }
             target = 0;
             if (H->ptr[766]) {
-                ComputeObjectToTargetVector(H->ptr[766], (char *)&position, (char *)&velocity, speed);
+                vec_compute_object_to_target(H->ptr[766], (char *)&position, (char *)&velocity, speed);
                 target = H->ptr[766];
             }
-            spawn = SpawnOwnedEffectMoby(&position, &velocity, object, target);
+            spawn = effect_spawn_owned_moby(&position, &velocity, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
             if (H->h[420] != 0)
                 qcopy(&direction, H->ptr[2212] + 0xE0);
             else
-                ComputeViewDirection((char *)object + 0x10, (char *)&direction, 1);
-            BuildAxisAngleQuaternion(&rotation, (int)&direction, -0.122173056f);
-            RotateVectorByQuaternion(&rotated, &velocity, &rotation);
-            spawn = SpawnOwnedEffectMoby(&position, &rotated, object, target);
+                cam_compute_view_direction((char *)object + 0x10, (char *)&direction, 1);
+            math_build_axis_angle_quat(&rotation, (int)&direction, -0.122173056f);
+            vec_rotate_by_quaternion(&rotated, &velocity, &rotation);
+            spawn = effect_spawn_owned_moby(&position, &rotated, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
-            BuildAxisAngleQuaternion(&rotation, (int)&direction, 0.122173056f);
-            RotateVectorByQuaternion(&rotated, &velocity, &rotation);
-            spawn = SpawnOwnedEffectMoby(&position, &rotated, object, target);
+            math_build_axis_angle_quat(&rotation, (int)&direction, 0.122173056f);
+            vec_rotate_by_quaternion(&rotated, &velocity, &rotation);
+            spawn = effect_spawn_owned_moby(&position, &rotated, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
-            entry = gWeaponTable_L00 + gItemSlotToRecord[0x18];
+            entry = g_weapon_l00_table + g_item_slot_to_record[0x18];
             *(float *)state = 1.0f / entry->cooldown;
         } else if ((PAD->u[105] & H->u[1164]) && !get_ammo(-1) && !H->b[8892]) {
             PlayMobySound(0, 0, (char *)object);

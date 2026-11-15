@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char D_00138180[];
+extern char g_pad_state[];
 extern float D_001AE5F4 __attribute__((sda));
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
 #define RANGES (*(float (**)[2])(object + 0x144))
 
 int func_PAL_0034B358(char *object)
@@ -16,15 +17,15 @@ int func_PAL_0034B358(char *object)
     if (--*(int *)(object + 0x154) < 0)
         *(int *)(object + 0x154) = 0;
     if (*(int *)(object + 0x154) == 0) {
-        pad = D_00138180;
+        pad = g_pad_state;
         x = *(float *)(pad + 0x148);
         y = *(float *)(pad + 0x14C);
-        magnitude = func_00282C10(x*x + y*y);
+        magnitude = square_root(x*x + y*y);
         if (magnitude != 0.0f) {
             x /= magnitude;
             y /= magnitude;
         }
-        angle = func_00283248(x, y);
+        angle = mat_fast_helper_a(x, y);
         i = 0;
         if (*(int *)(object + 0x150) == 0)
             *(int *)(object + 0x14C) = -1;

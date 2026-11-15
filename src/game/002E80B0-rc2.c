@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,19 +24,19 @@
  */
 #include "common.h"
 
-extern void func_0011AEA0();
-extern s32 func_00291850();
-extern s32 func_0029D4D0();
+extern void FlushCache();
+extern s32 UploadMipTexture();
+extern s32 fast_decompress();
 extern s32 D_001A7288;
 extern s32 D_001A72D0;
 extern s32 D_001A72D4;
 extern u8 D_001A7BB4;
-extern s32 D_001B22A8;
+extern s32 g_dma_packet_cursor;
 extern s64 D_001B2160;
 extern s64 D_001B2168;
 
 /* Loads a data block for the next scene and keeps its first two values for drawing. */
-void func_002E80B0(void) {
+void scene_load_texture_block(void) {
     s64 values[4];
     s32 levelIndex;
     s32 clampedIndex;
@@ -47,9 +48,9 @@ void func_002E80B0(void) {
         levelIndex = D_001A7BB4 - 1;
         clampedIndex = (levelIndex > -1) ? levelIndex : 0;
         FlushCache(0);
-        fast_decompress(archive + *(s32 *)(archive + 0x50), gDmaPacketCursor);
+        fast_decompress(archive + *(s32 *)(archive + 0x50), g_dma_packet_cursor);
         FlushCache(0);
-        loaded = gDmaPacketCursor;
+        loaded = g_dma_packet_cursor;
         D_001A72D0 = D_001A72D4;
         UploadMipTexture(loaded + *(s32 *)(loaded + 4), values);
         D_001B2160 = values[0];

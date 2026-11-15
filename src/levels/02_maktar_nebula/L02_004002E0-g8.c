@@ -13,12 +13,12 @@ extern s32 D_L02_001B14EC __attribute__((sda));
 extern s32 D_L02_001B1500 __attribute__((sda));
 extern s32 D_L02_001B1504 __attribute__((sda));
 extern s32 D_L02_001B1508 __attribute__((sda));
-extern short D_001A6480[];
-extern float func_00283CE0(short);
-extern void func_002FC560(int, long long);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
-extern long long func_0027C878(int);
-extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
+extern short g_screen_adjust_offsets[];
+extern float IntToFloat(short);
+extern void VU1_addGSregister(int, long long);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
+extern long long GetEffectTextureDescriptor(int);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
 /* Draws the transition overlay. The height at +0x124 of the object's state drops by D_L02_001B14F8;
    func_00283CE0 turns it into a ratio, which is divided by the screen height (D_001A6480[0xA9]) and
@@ -29,7 +29,7 @@ extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long 
    (config/cflags.txt): retail has two nops in front of the division, which the assembler puts after
    a line label, so the division is a statement of its own. */
 /* Draws a screen-wipe transition that fades the screen and slides a band down it. */
-void func_L02_004002E0(char *actor) {
+void gfx_draw_screen_wipe(char *actor) {
     char *state = *(char **)(actor + 0x68);
     s32 color;
     float ratio;
@@ -44,7 +44,7 @@ void func_L02_004002E0(char *actor) {
     color = D_L02_001B14F0;
     *(u16 *)(state + 0x124) -= D_L02_001B14F8;
     ratio = IntToFloat(*(u16 *)(state + 0x124));
-    height = (float)gScreenAdjustOffsets[0xA9];
+    height = (float)g_screen_adjust_offsets[0xA9];
     ratio = ratio / height;
     ratio = ratio * ratio;
     {
@@ -55,9 +55,9 @@ void func_L02_004002E0(char *actor) {
     }
     VU1_addGSregister(0x42, 0x8000000049LL);
     for (i = 0; i < D_L02_001B14F4; i++)
-        AppendScreenRectPacket(0, 0, gScreenAdjustOffsets[0xA8], gScreenAdjustOffsets[0xA9], color, 0);
+        AppendScreenRectPacket(0, 0, g_screen_adjust_offsets[0xA8], g_screen_adjust_offsets[0xA9], color, 0);
     VU1_addGSregister(0x42, 0x8000000044LL);
-    screen = gScreenAdjustOffsets;
+    screen = g_screen_adjust_offsets;
     AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
     spriteId = GetEffectTextureDescriptor(0x10);
     color = D_L02_001B1504;

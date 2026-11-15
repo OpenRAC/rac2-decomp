@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int ref_L01_00320AE8_00 __attribute__((sda));
 
@@ -11,19 +12,19 @@ extern int ref_L04_0034E130_00 __attribute__((sda));
 extern int ref_L01_00320B20_00;
 
 /* Tells whether the counter is above zero. */
-int func_L00_0032B270(void)
+int level_is_counter_positive(void)
 {
     return ref_L01_00320AE8_00 > 0;
 }
 
 /* Stores a raw input value. */
-void func_L00_0032B280(unsigned int value)
+void pad_set_raw_input_value(unsigned int value)
 {
     D_L00_001AA430 = value;
 }
 
 /* Counts a timer down by one and keeps it from going below zero. */
-void func_L00_0032B288(void)
+void level_decrement_counter_clamped(void)
 {
     int value = (int)((unsigned int)ref_L04_0034E130_00 - 1u);
     ref_L04_0034E130_00 = value;
@@ -32,7 +33,7 @@ void func_L00_0032B288(void)
 }
 
 /* Stores a value in a global setting. */
-void func_L00_0032B2A8(int value)
+void level_set_global_setting_value(int value)
 {
     ref_L01_00320B20_00 = value;
 }
@@ -47,7 +48,7 @@ extern int D_L00_001AA444 __attribute__((sda));
    and clears the two small-data cells that follow.  The two identical stores are
    written in the order this cc1 emits them (it swaps them otherwise). */
 /* Resets the input state with a new value. */
-void func_L00_0032B500(int value)
+void pad_reset_input_state(int value)
 {
     D_L00_001A8F00 = value;
     D_L00_001A8F08 = -2;
@@ -63,7 +64,7 @@ void func_L00_0032B500(int value)
 extern int ref_L00_00320DE0_00();
 
 /* Starts the attachment on the object when it has one, and marks it as started. */
-void func_L00_0032C5E8(char *object, char *owner)
+void moby_start_attachment(char *object, char *owner)
 {
     char *record = owner;
 

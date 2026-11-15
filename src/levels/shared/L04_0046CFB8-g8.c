@@ -16,32 +16,32 @@ typedef struct {
 } CameraPreset;
 
 extern CameraEntry *D_L04_001B1E84;
-extern char *D_L04_001B24DC;
+extern char *g_moby_l04_pool;
 extern int D_L04_001B1CB8 __attribute__((sda));
 extern int D_L04_001B1CBC __attribute__((sda));
 extern float D_L04_001B1CC0 __attribute__((sda));
 extern int D_L04_001B1CC4 __attribute__((sda));
 extern int D_L04_001B1CC8 __attribute__((sda));
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern CameraPreset D_L04_002C6F00[], D_L04_002C7100[];
 extern char ref_L04_0046CFB8_00[];
 extern float D_L04_001BDC30[];
-extern int func_002ACBC8(void *, int);
-extern void func_L04_0046CD68(void *, int);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_002A7878(float, float);
-extern void func_0027AB40(void);
-extern void func_L04_0046D6A8(void *);
-extern void func_L04_0046D250(void *);
+extern int IsPointInCuboid(void *, int);
+extern void cam_init_follow_offset(void *, int);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_random_float_range(float, float);
+extern void UpdateViewContext(void);
+extern void cam_look_at_player(void *);
+extern void UpdatePlayerRelativeCameraPosition(void *);
 
 /* Pick the camera for the region the target moby stands in: entering one of
  * the definition's sixteen cuboids either switches to that region's fixed
  * preset or flips the follow side; outside every region the follow camera runs. */
-void func_L04_0046CFB8(char *obj)
+void UpdateRegionCamera(char *obj)
 {
     char *definition = D_L04_001B1E84[*(short *)(obj + 0x84)].definition;
-    char *moby = gMobyPool_L04 + (*(int *)(definition + 0x60) << 8);
+    char *moby = g_moby_l04_pool + (*(int *)(definition + 0x60) << 8);
     int follow = 0;
     int i;
     float sine;
@@ -57,9 +57,9 @@ void func_L04_0046CFB8(char *obj)
             if (D_L04_001B1CBC != -1) {
                 if (D_L04_001B1CC4) D_L04_001B1CC4 = 0;
                 else D_L04_001B1CC4 = 1;
-                InitFollowCameraOffset(obj, 1);
-                sine = FastSinOrCosB(0.562170565f);
-                D_L04_001BDC30[0] = sine / FastSinOrCosA(0.562170565f);
+                cam_init_follow_offset(obj, 1);
+                sine = math_fast_sin_or_cos_b(0.562170565f);
+                D_L04_001BDC30[0] = sine / math_fast_sin_or_cos_a(0.562170565f);
                 UpdateViewContext();
                 D_L04_001B1CC8 = 0;
                 D_L04_001B1CBC = D_L04_001B1CB8;
@@ -67,9 +67,9 @@ void func_L04_0046CFB8(char *obj)
             follow = 1;
         } else {
             if (D_L04_001B1CB8 != D_L04_001B1CBC) {
-                if (RandomFloatRange(0, 1) < .65f) {
+                if (math_random_float_range(0, 1) < .65f) {
                     D_L04_001B1CC8 = 1;
-                    if (gCurrentMapIndex == 4 || (int)ref_L04_0046CFB8_00 == 40) {
+                    if (g_current_map_index == 4 || (int)ref_L04_0046CFB8_00 == 40) {
                         CameraPreset *preset = &D_L04_002C6F00[D_L04_001B1CB8];
                         qcopy(obj + 0x30, preset);
                         D_L04_001B1CC0 = preset->fov;
@@ -81,17 +81,17 @@ void func_L04_0046CFB8(char *obj)
                 } else {
                     if (D_L04_001B1CC4) D_L04_001B1CC4 = 0;
                     else D_L04_001B1CC4 = 1;
-                    InitFollowCameraOffset(obj, 1);
+                    cam_init_follow_offset(obj, 1);
                     D_L04_001B1CC8 = 0;
                 }
                 D_L04_001B1CBC = D_L04_001B1CB8;
             }
             if (D_L04_001B1CC8) {
                 float half = D_L04_001B1CC0 * .5f;
-                float sine2 = FastSinOrCosB(half);
-                D_L04_001BDC30[0] = sine2 / FastSinOrCosA(half);
+                float sine2 = math_fast_sin_or_cos_b(half);
+                D_L04_001BDC30[0] = sine2 / math_fast_sin_or_cos_a(half);
                 UpdateViewContext();
-                ApplyCameraLookAtPlayer(obj);
+                cam_look_at_player(obj);
             } else {
                 follow = 1;
             }
@@ -101,6 +101,6 @@ void func_L04_0046CFB8(char *obj)
     }
     if (follow) {
         UpdatePlayerRelativeCameraPosition(obj);
-        ApplyCameraLookAtPlayer(obj);
+        cam_look_at_player(obj);
     }
 }

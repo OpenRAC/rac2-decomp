@@ -2,11 +2,11 @@
 #include "names.h"
 
 extern int D_L23_001B36F0 __attribute__((sda));
-extern void func_L23_003BFFC0(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
+extern void moby_play_anim_and_link(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
 extern void func_367150(int);
 
 /* Puts the enemy and its helper object back to their calm starting state and resets its health timer. */
-void func_L23_003C00D0(char *moby) {
+void enemy_reset_calm(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     int none = -1;
 
@@ -20,7 +20,7 @@ void func_L23_003C00D0(char *moby) {
     *(int *)(vars + 0x25C) = 0;
     *(short *)(vars + 0x26) = 2;
     *(float *)(vars + 0x20) = (float)*(short *)(vars + 0x24);
-    PlayAnimOnObjectAndLink(moby, 1, 0, 0, 3, 1.0f);
+    moby_play_anim_and_link(moby, 1, 0, 0, 3, 1.0f);
     {
         unsigned short d = D_L23_001B36F0;
         float f = (float)D_L23_001B36F0;

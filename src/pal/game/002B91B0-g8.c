@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_00128C18(int socket);
-extern int func_00128B28(int socket, void *profile);
-extern int func_00128F48(int socket, void *profile);
-extern int func_00128A48(int socket, void *data);
-extern void func_00128FD0(int socket, int profile_size, void *profile, int data_size, void *data);
-extern void func_002B8888(void *pad);
+extern int scePad2GetState(int socket);
+extern int pad_read_button_mask(int socket, void *profile);
+extern int pad_send_command(int socket, void *profile);
+extern int pad_read_record(int socket, void *data);
+extern void sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
+extern void ClearPadInput(void *pad);
 extern void func_PAL_002B94A8(void *pad, void *data, int size);
 extern int D_001A7428;
 typedef struct {
@@ -26,7 +26,7 @@ typedef struct {
     unsigned char pad1e0[0x168];
     int latched_held;
 } PadPollState;
-extern PadPollState D_00138180;
+extern PadPollState g_pad_state;
 
 void func_PAL_002B91B0(void *arg)
 {
@@ -39,14 +39,14 @@ void func_PAL_002B91B0(void *arg)
     p->prev_held = p->latched_held;
     p->prev_raw_held = p->raw_held;
     p->raw_held = 0;
-    status = func_00128C18(p->socket);
+    status = scePad2GetState(p->socket);
     p->device_state = status;
     if (status == 1) {
         switch (p->profile_state) {
         case 0: {
             int n;
 
-            n = func_00128B28(p->socket, buf);
+            n = pad_read_button_mask(p->socket, buf);
             if (*(unsigned int *)buf == 0xFFFFFFFF)
                 p->profile_mask = 0x79;
             else
@@ -61,7 +61,7 @@ void func_PAL_002B91B0(void *arg)
             }
             for (i = n; i < 4; i++)
                 p->profile[i] = buf[i];
-            n = func_00128F48(p->socket, buf);
+            n = pad_send_command(p->socket, buf);
             if (n < 5) {
                 for (i = 0; i < n; i++)
                     p->act[i] = buf[i];
@@ -70,11 +70,11 @@ void func_PAL_002B91B0(void *arg)
             }
             for (i = n; i < 4; i++)
                 p->act[i] = buf[i];
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
         case 1:
-            n = func_00128A48(p->socket, buf);
+            n = pad_read_record(p->socket, buf);
             vibration = 0;
             if (p->act[0] & 2)
                 vibration = p->vibration1;
@@ -83,18 +83,18 @@ void func_PAL_002B91B0(void *arg)
 
                 vibration = shifted | (p->vibration0 & 1);
             }
-            func_00128FD0(p->socket, 1, p->act, 2, &vibration);
+            sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
             func_PAL_002B94A8(p, buf, n);
             break;
         case 2:
-            func_002B8888(p);
+            ClearPadInput(p);
             break;
         }
     } else {
-        func_002B8888(p);
+        ClearPadInput(p);
         p->profile_state = 0;
     }
     p->vibration0 = 0;
     p->vibration1 = 0;
-    D_001A7428 = D_00138180.device_state == 0;
+    D_001A7428 = g_pad_state.device_state == 0;
 }

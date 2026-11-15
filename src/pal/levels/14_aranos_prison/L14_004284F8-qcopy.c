@@ -2,10 +2,10 @@
 
 #include "common.h"
 typedef int L14_TI128 __attribute__((mode(TI)));
-extern void func_002B60B0(char *, float, float, float, float);
-extern int func_L02_0032E508(char *, int, void *, int);
-extern int func_002A77E0(int);
-extern void func_002A7750(char *, int, int);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern int path_build_route_nodes(char *, int, void *, int);
+extern int math_random_int_below(int);
+extern void moby_set_state(char *, int, int);
 typedef struct {
     unsigned char pad00[0x20];
     float f20;
@@ -112,7 +112,7 @@ void func_PAL_L14_00428558(char *a0)
     s->f13C = 0.008f;
     s->i14C = -1;
     s->f120 = 3.141590118408203f;
-    func_002B60B0(a0, 0.0048f, 0.120000005f,
+    moby_set_controller_speed_limits(a0, 0.0048f, 0.120000005f,
                 0.005026549f, 0.25132746f);
 
     s->f740 = s->f740 * 0.01745329424738884f;
@@ -120,14 +120,14 @@ void func_PAL_L14_00428558(char *a0)
     s->p15C = s->area600;
     if (s->i738 != -1)
         s->i14C = s->i738;
-    s->i750 = func_L02_0032E508(a0, s->i73C, s->area200, 0x20);
-    s->h77C = func_002A77E0(2);
+    s->i750 = path_build_route_nodes(a0, s->i73C, s->area200, 0x20);
+    s->h77C = math_random_int_below(2);
 
     s->vec710 = *(L14_TI128 *)(a0 + 0x10);
 
     n = s->h774;
     if (n > 0 && (n != 3 || s->i730 != -1))
-        func_002A7750(a0, n, 1);
+        moby_set_state(a0, n, 1);
     else
-        func_002A7750(a0, 1, 1);
+        moby_set_state(a0, 1, 1);
 }

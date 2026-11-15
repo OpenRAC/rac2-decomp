@@ -3,12 +3,12 @@
 
 typedef float f32;
 
-extern float func_00282C48(float a0);
+extern float math_fabs(float a0);
 
 /* Damped follow step: blends the velocity at a1 toward the spring term, then
    advances the position at a0 and passes the remaining offset to func_00282C48. */
 /* Moves a value toward a target with a springy pull that slows over time. */
-float func_L01_003CE7D8(f32 *value, f32 *velocity, f32 target, f32 strength, f32 damping, f32 range)
+float math_step_damped_spring(f32 *value, f32 *velocity, f32 target, f32 strength, f32 damping, f32 range)
 {
     f32 work, speed, current;
 
@@ -38,5 +38,5 @@ float func_L01_003CE7D8(f32 *value, f32 *velocity, f32 target, f32 strength, f32
     work = work + speed;
     target = target - work;
     *value = work;
-    return FloatAbs(target);
+    return math_fabs(target);
 }

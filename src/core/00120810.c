@@ -16,7 +16,7 @@ typedef struct
 } old_exception_table;
 
 /* Looks up the exception handler for a code address in an old-style table. */
-void *func_00120810(void *pc, old_exception_table *table) {
+void *eh_find_old_handler(void *pc, old_exception_table *table) {
     if (table) {
         int pos;
         int best = -1;

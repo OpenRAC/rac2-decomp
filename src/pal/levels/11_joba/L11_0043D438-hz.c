@@ -56,24 +56,24 @@ struct RotorObject {
     /* 0xC0 */ struct RotorAxis basis[3];
 };
 
-extern char D_00188660[];
+extern char g_sound_state[];
 extern void func_3739C0(int);
-extern float func_00283CE0(int);
-extern float func_002AA140(float, float, float);
+extern float IntToFloat(int);
+extern float math_lerp_float(float, float, float);
 
-extern int D_L11_001B359C __attribute__((sda));
+extern int g_moby_l11_table __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void FastVecAdd(void *, void *, void *);
 
 static inline void stop_owned_sound(char *state, char *p)
 {
     int slot = *(int *)(state + 0x14);
 
     if (slot != -1) {
-        char *e = D_00188660 + slot * 0x70;
+        char *e = g_sound_state + slot * 0x70;
 
         if (*(char **)(e + 0x88) == p && *(unsigned char *)(e + 0x74))
             func_3739C0(slot);
@@ -81,8 +81,8 @@ static inline void stop_owned_sound(char *state, char *p)
     *(int *)(state + 0x14) = -1;
 }
 
-extern void func_00282C88(void *);
-extern void func_00282D30(void *, void *, float);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *, void *, float);
 
 typedef union Quad {
     TI128 q;
@@ -105,20 +105,20 @@ void func_PAL_L11_0043D438(void *object)
     float damping;
     int i;
 
-    func_00282C88(&gravity);
+    vec_clear_128(&gravity);
     pos = state->points;
     old = state->oldPoints;
     gravity.f[2] = -1.0f / 500.0f;
 
-    t = func_00283CE0(state->ropeCount);
-    damping = func_002AA140(0.97f, 0.98f, (t -= 2.0f) / func_00283CE0(8));
+    t = IntToFloat(state->ropeCount);
+    damping = math_lerp_float(0.97f, 0.98f, (t -= 2.0f) / IntToFloat(8));
 
     for (i = 12; i >= 0; i--, pos++, old++) {
         qcopy(&saved, pos);
-        func_00282CF0(delta.f, *pos, *old);
-        func_00282D30(&delta, &delta, damping);
-        func_00282CC0(pos, pos, &delta);
-        func_00282CC0(pos, pos, &gravity);
+        FastVecSub(delta.f, *pos, *old);
+        FastVecScale(&delta, &delta, damping);
+        FastVecAdd(pos, pos, &delta);
+        FastVecAdd(pos, pos, &gravity);
         qcopy(old, &saved);
     }
 }

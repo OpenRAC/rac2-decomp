@@ -27,16 +27,16 @@ extern char D_001A7578[];
 extern char D_001A78D0[];
 extern char D_0013BFF8[];
 
-extern void func_001322B8(void *, int);
-extern int func_0011D810(void *);
-extern int func_0011D620(void *, int, int, void *, int, void *, int, void *, int);
-extern void func_00115D48(char *, ...);
-extern void func_0011AEA0(int);
-extern int func_00132028(void);
-extern void func_001330D0(void);
+extern void snd_prepare_reply_buffer(void *, int);
+extern int sif_rpc_is_handle_valid(void *);
+extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, void *, int);
+extern void printf(char *, ...);
+extern void FlushCache(int);
+extern int snd_Pump(void);
+extern void snd_commit_queued_command(void);
 
 /* Queues a sound command with its data and an optional reply callback. Waits if the queue is full. */
-void func_00132DF0(int command, int size, unsigned char *data, int callback, long callbackData)
+void snd_queue_command(int command, int size, unsigned char *data, int callback, long callbackData)
 {
     int paddedSize;
     int waitCount;
@@ -47,14 +47,14 @@ void func_00132DF0(int command, int size, unsigned char *data, int callback, lon
 
     heldFlag = 0;
     if (D_001A74C4 == 0 && D_001A7480 == 0 && size == 0 && callback == 0) {
-        PrepareSoundReplyBuffer(D_001A7080, 1);
-        while (IsRpcHandleValid(D_001A7040) != 0) {
+        snd_prepare_reply_buffer(D_001A7080, 1);
+        while (sif_rpc_is_handle_valid(D_001A7040) != 0) {
             if (D_001A74F8 == 0)
-                Printf(D_001A7578);
+                printf(D_001A7578);
             snd_Pump();
             FlushCache(0);
         }
-        CallRpcServer(D_001A7040, command, 1, 0, 0, D_001A7080, 0xC, 0, 0);
+        sceSifCallRpc(D_001A7040, command, 1, 0, 0, D_001A7080, 0xC, 0, 0);
         return;
     }
     paddedSize = size + 4;
@@ -68,11 +68,11 @@ void func_00132DF0(int command, int size, unsigned char *data, int callback, lon
         }
         snd_Pump();
         if (waitCount == 1 && D_001A74F8 == 0)
-            Printf(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
+            printf(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
         waitCount++;
     }
     if (waitCount != 0 && D_001A74F8 == 0)
-        Printf(D_001A78D0, waitCount);
+        printf(D_001A78D0, waitCount);
     if (heldFlag != 0)
         D_001A74C4 = 1;
     dest = (unsigned char *)D_001A74A0[D_001A74C0] - (D_001A74A8[D_001A74C0] - 0x1000);
@@ -86,5 +86,5 @@ void func_00132DF0(int command, int size, unsigned char *data, int callback, lon
     bufIdx = D_001A74C0;
     D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].fn = callback;
     D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].data = callbackData;
-    CommitQueuedSoundCommand();
+    snd_commit_queued_command();
 }

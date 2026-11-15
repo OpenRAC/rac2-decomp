@@ -1,25 +1,26 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
-extern char *D_001B23CC[] __attribute__((sda));
-extern void func_00350918(void *);
-extern void func_00351E48(u8 *);
-extern void func_00351B20(void *);
-extern char *D_001B23CC[] __attribute__((sda));
-extern char *D_001B23CC[] __attribute__((sda));
-extern char *D_001B23CC[] __attribute__((sda));
+extern char *g_movie_player_state[] __attribute__((sda));
+extern void mpeg_vibuf_reset(void *);
+extern void mpeg_vobuf_reset(u8 *);
+extern void mpeg_dec_run_loop(void *);
+extern char *g_movie_player_state[] __attribute__((sda));
+extern char *g_movie_player_state[] __attribute__((sda));
+extern char *g_movie_player_state[] __attribute__((sda));
 
 void func_US2_003527C8(unsigned char *object)
 {
     char *base;
-    func_00350918(object + 0x48);
-    func_00351E48(D_001B23CC[0] + 0xD9168);
-    func_00351B20(object);
-    base = D_001B23CC[0];
+    mpeg_vibuf_reset(object + 0x48);
+    mpeg_vobuf_reset(g_movie_player_state[0] + 0xD9168);
+    mpeg_dec_run_loop(object);
+    base = g_movie_player_state[0];
     while (*(int *)(base + 0xD9174)) {
-        if (func_003518D8(object) == 1) break;
-        base = D_001B23CC[0];
+        if (videoDecGetState(object) == 1) break;
+        base = g_movie_player_state[0];
     }
-    func_003518E0(object, 3);
+    mpeg_dec_swap_state(object, 3);
 }
 

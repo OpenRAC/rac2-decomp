@@ -19,12 +19,12 @@ extern float func_309B80(float f12, float f13);
 
 
 /* Checks a cloud object against a world test and returns true when it is blocked. */
-int func_L10_0042E590(int object) {
+int cloud_check_object_blocked(int object) {
     return func_337518(object, (char *)0x230000, 0) != 0;
 }
 
 /* Spawns the given number of cloud objects. */
-void func_L10_00425410(int count, void *arg) {
+void cloud_spawn_objects(int count, void *arg) {
     int i;
 
     if (count > 0) {
@@ -37,7 +37,7 @@ void func_L10_00425410(int count, void *arg) {
 }
 
 /* Returns the pointer kept in a level global. */
-void *func_L10_00449AD0(void) {
+void *level_get_global_pointer(void) {
     return D_L10_001ADE90;
 }
 
@@ -61,9 +61,9 @@ extern void func_32AF78(void *a0);
 
 /* func_L10_0042B500 is defined in L10_00424028-cloud-g8.c. */
 
-extern u8 *func_0029EFD0(s32);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
+extern u8 *CreateMoby(s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
 
 #define L10_PARTNER(state) (*(u8 **)((state) + 4))
 
@@ -72,7 +72,7 @@ extern f32 func_00283BE0(f32, f32);
    moves the body up 6 (facing pi) or down 6 by the state flag; both states then ease the
    +0xF8 value with one of two helpers and copy the angle, that value and the position to
    the partner. */
-void func_L10_0042BCA0(u8 *object)
+void cloud_body_update(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
 

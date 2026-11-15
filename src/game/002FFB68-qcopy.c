@@ -4,24 +4,24 @@
 typedef float V4_F2FFB68[4] __attribute__((aligned(16)));
 
 extern s16 D_001B231A MACRO_ADDR;
-extern char D_00239BA0[];
-extern char D_00189E20[];
+extern char g_weapon_table[];
+extern char g_hero_state[];
 
 /* Hero fields: a word in each 0x50-byte record from 0x1220 and a word table at 0x22E4. */
 typedef struct { u8 pad[0x1220]; s32 word; } HeroRec50;
 typedef struct { u8 pad[0x22E4]; s32 word[1]; } HeroTable;
 extern s32 D_001A7398[] MACRO_ADDR;
 
-extern void func_002FF3F8(void);
-extern void func_0029F338(void *);
-extern s32 func_00294630(s32);
-extern void func_00294420(s32);
-extern void func_002B7CE0(s32);
-extern void func_00294988(s32);
-extern char *func_002FF300(s32, s32);
+extern void shop_setup_preview_object(void);
+extern void moby_mark_spawned(void *);
+extern s32 load_is_class_cached(s32);
+extern void LoadClassIntoFreeCacheSlot(s32);
+extern void snd_pump_music_and_disc_read(s32);
+extern void SwitchCachedDiscAsset(s32);
+extern char *part_init_shared_effect_object(s32, s32);
 
 /* Spawns the object for the current mode and hands it the caller's position and rotation. */
-char *func_002FFB68(char *obj)
+char *part_spawn_mode_effect_object(char *obj)
 {
     V4_F2FFB68 pos, rot;
     s32 mode = -1;
@@ -33,30 +33,30 @@ char *func_002FFB68(char *obj)
     qcopy(pos, obj + 0x10);
     qcopy(rot, obj + 0xF0);
     if (id == 0x4D || id == 0x6B || id == 0x6C) {
-        SetupPreviewObject();
+        shop_setup_preview_object();
         mode = 0;
     } else if (id == 0x3D || id == 0x49 || id == 0x5D || id == 0x5E) {
-        SetupPreviewObject();
+        shop_setup_preview_object();
         mode = 1;
     } else {
-        MarkMobySpawned(obj);
-        rec = gWeaponTable_00239BA0 + id * 0xE0;
-        if (IsClassCached(*(s32 *)(rec + 0x14)) == 0) {
+        moby_mark_spawned(obj);
+        rec = g_weapon_table + id * 0xE0;
+        if (load_is_class_cached(*(s32 *)(rec + 0x14)) == 0) {
             LoadClassIntoFreeCacheSlot(*(s32 *)(rec + 0x14));
-            PumpMusicAndDiscRead(1);
+            snd_pump_music_and_disc_read(1);
         }
         SwitchCachedDiscAsset(*(s32 *)(rec + 0x14));
     }
-    rec = gWeaponTable_00239BA0 + id * 0xE0;
-    spawned = InitSharedEffectObject(*(s32 *)(rec + 0x14), mode);
+    rec = g_weapon_table + id * 0xE0;
+    spawned = part_init_shared_effect_object(*(s32 *)(rec + 0x14), mode);
     if (spawned != 0) {
         qcopy(spawned + 0x10, pos);
         qcopy(spawned + 0xF0, rot);
         if (mode < 0) {
             slot = *(s32 *)(rec + 0xC);
             D_001A7398[slot] = 0;
-            ((HeroRec50 *)(gHeroState + slot * 0x50))->word = 0;
-            ((HeroTable *)gHeroState)->word[slot] = 0;
+            ((HeroRec50 *)(g_hero_state + slot * 0x50))->word = 0;
+            ((HeroTable *)g_hero_state)->word[slot] = 0;
         }
     }
     return spawned;

@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_001B19A0[] __attribute__((section(".sdata")));
 extern char D_77FCB227[];
 extern int D_001A8C70;
@@ -15,19 +16,19 @@ typedef struct {
 } Global001A7A00;
 extern Global001A7A00 D_001A7A00 __attribute__((section(".sdata")));
 extern int D_0018D198[], D_0018D208[];
-extern char *D_001F1700[];
+extern char *g_path_table[];
 extern char D_001A9F58[], D_001A9F68[], D_001A9F78[], D_001A9F88[];
-extern void func_00282C88(void *);
-extern int func_002A77E0(int);
-extern void func_0026FEB8(char *, ...);
-extern float func_00283CE0(int);
-extern double func_001234F0(float);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7940(void), func_00283180(float), func_00283198(float), func_002A7878(float,float);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
-extern int func_002A88A0(float *, float *, float, float, float);
-extern void func_002C94C8(int, void *, void *, void *);
+extern void vec_clear_128(void *);
+extern int math_random_int_below(int);
+extern void STUB_printf(char *, ...);
+extern float IntToFloat(int);
+extern double __extendsfdf2(float);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_angle(void), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), math_random_float_range(float,float);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
+extern int math_solve_quadratic(float *, float *, float, float, float);
+extern void SegmentCrossPolyline(int, void *, void *, void *);
 extern void func_PAL_00303578(void *, void *, void *, int, int, int);
 
 void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, int maximum, float height)
@@ -37,7 +38,7 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
     int ones, fives, twenties, fifties, hundreds, fivehundreds, thousands;
     int value, remaining, enabled, q;
     float angle, x, y, duration;
-    func_00282C88(offset);
+    vec_clear_128(offset);
     ones=0; fives=0; twenties=0; fifties=0; hundreds=0; fivehundreds=0; thousands=0;
     if (!(flags & 32) && (unsigned char)object[0xb0] != 255 &&
         (unsigned int)(*(unsigned short *)(object+0xaa)-500) >= 41)
@@ -53,18 +54,18 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
     }
     if (!flags || (!low && !high)) return;
     if (low <= 0) low=1;
-    value=func_002A77E0(high-low+1)+low;
+    value=math_random_int_below(high-low+1)+low;
     if (D_001A7A00.x0A || D_001A7A00.x0B) value*=2;
-    if (value<500 && enabled && D_0018D198[D_001A79F0]) {
-        int rate=D_0018D208[D_001A79F0]*3000/D_0018D198[D_001A79F0];
+    if (value<500 && enabled && D_0018D198[g_current_map_index]) {
+        int rate=D_0018D208[g_current_map_index]*3000/D_0018D198[g_current_map_index];
         if (D_001A7A00.x0A || D_001A7A00.x0B) rate/=2;
         #define limit ((int)D_77FCB227)
         if (rate<limit/2) {
             if (rate<=limit*3/10) {
-                func_0026FEB8(D_001A9F58);
+                STUB_printf(D_001A9F58);
                 value*=5;
             } else {
-                func_0026FEB8(D_001A9F68,(limit*19/30-rate)/(limit/15));
+                STUB_printf(D_001A9F68,(limit*19/30-rate)/(limit/15));
                 value=value*(limit*19/30-rate)/(limit/15);
             }
             if (D_001A7A00.x0B) {
@@ -72,10 +73,10 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
             } else if(value>limit*5/3) value=limit*5/3;
         } else if (limit<rate) {
             if (limit*7/6<rate) {
-                func_0026FEB8(D_001A9F78,0x3fb99999a0000000L);
+                STUB_printf(D_001A9F78,0x3fb99999a0000000L);
                 value/=10;
             } else {
-                func_0026FEB8(D_001A9F78,func_001234F0(func_00283CE0((limit*6/5-rate)/(limit*4/15))));
+                STUB_printf(D_001A9F78,__extendsfdf2(IntToFloat((limit*6/5-rate)/(limit*4/15))));
                 value=value*(limit*6/5-rate)/(limit*4/15);
             }
             if(value<=0) value=1;
@@ -108,7 +109,7 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
 #undef SPLIT
         ones = remaining;
         if (thousands < 0 || fivehundreds < 0 || hundreds < 0 || fifties < 0 || twenties < 0 || fives < 0 || ones < 0) {
-            func_0026FEB8(D_001A9F88);
+            STUB_printf(D_001A9F88);
             thousands = thousands < 0 ? 0 : thousands; fivehundreds = fivehundreds < 0 ? 0 : fivehundreds;
             hundreds = hundreds < 0 ? 0 : hundreds; fifties = fifties < 0 ? 0 : fifties;
             twenties = twenties < 0 ? 0 : twenties; fives = fives < 0 ? 0 : fives;
@@ -116,31 +117,31 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
         }
     }
     while(ones||fives||twenties||fifties||hundreds||fivehundreds||thousands){
-        func_00282D30(position,object,0.0009765625f);
-        angle=func_002A7940();
-        x=func_00283180(angle)*0.020000001f*func_002A7878(0,3);
+        FastVecScale(position,object,0.0009765625f);
+        angle=math_random_angle();
+        x=math_fast_sin_or_cos_a(angle)*0.020000001f*math_random_float_range(0,3);
         velocity[0]=x;
-        y=func_00283198(angle)*0.020000001f*func_002A7878(0,3);
+        y=math_fast_sin_or_cos_b(angle)*0.020000001f*math_random_float_range(0,3);
         velocity[1]=y;velocity[2]=0;
-        velocity[2]=func_002A7878(3.700000047683716f,6)*0.020000001f;
+        velocity[2]=math_random_float_range(3.700000047683716f,6)*0.020000001f;
         half[0]=velocity[0];half[1]=velocity[1];half[2]=0;
-        func_00282F20(half,half,0.5f);
-        func_00282CC0(position,position,half);
+        vec_scale_to_length(half,half,0.5f);
+        FastVecAdd(position,position,half);
         position[2]+=height;
         if(surface>=0){
             duration=120;
-            if((float)func_002A88A0(&t0,&t1,-0.0021600001f,velocity[2]-(-0.0021600001f),position[2]-*(float *)(D_001F1700[surface]+24))>=1 && t0>0 && t0<duration)duration=t0;
-            func_00282D30(end,velocity,duration);
-            func_00282CC0(end,end,object+16);
-            func_002C94C8(surface,object+16,end,hit);
-            func_00282CF0(end,hit,position);
+            if((float)math_solve_quadratic(&t0,&t1,-0.0021600001f,velocity[2]-(-0.0021600001f),position[2]-*(float *)(g_path_table[surface]+24))>=1 && t0>0 && t0<duration)duration=t0;
+            FastVecScale(end,velocity,duration);
+            FastVecAdd(end,end,object+16);
+            SegmentCrossPolyline(surface,object+16,end,hit);
+            FastVecSub(end,hit,position);
             end[2]=0;
-            func_00282F20(correction,end,0.25f);
-            func_00282CF0(end,end,correction);
-            func_00282D30(end,end,1/duration);
+            vec_scale_to_length(correction,end,0.25f);
+            FastVecSub(end,end,correction);
+            FastVecScale(end,end,1/duration);
             velocity[0]=end[0];velocity[1]=end[1];
         }
-        func_00282CC0(velocity,velocity,offset);
+        FastVecAdd(velocity,velocity,offset);
         if(thousands){func_PAL_00303578(object,position,velocity,flags,1000,enabled);thousands--;}
         else if(fivehundreds){func_PAL_00303578(object,position,velocity,flags,500,enabled);fivehundreds--;}
         else if(hundreds){func_PAL_00303578(object,position,velocity,flags,100,enabled);hundreds--;}

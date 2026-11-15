@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
 typedef unsigned short u16;
-extern int func_00282948(void *);
-extern void func_L00_002E6EF8(char *, char *);
-extern void func_L00_0030CF60(void);
+extern int math_fast_float_d(void *);
+extern void gfx_add_draw_callback_third(char *, char *);
+extern void module_l00_call_handler_2(void);
 extern char D_L02_004004D8[];
 extern u8 D_001395B8[];
 
@@ -16,9 +17,9 @@ void func_PAL_L02_003FF640(char *a0) {
 
     if (timer <= 0xFFFE)
         *(u16 *)(s0 + 0x96) = timer + 1;
-    func_00282948(obj + 0xE4);
+    math_fast_float_d(obj + 0xE4);
     if (*(u8 *)(s0 + 0x20) > 1)
-        func_L00_002E6EF8(D_L02_004004D8, s0);
-    func_L00_0030CF60();
+        gfx_add_draw_callback_third(D_L02_004004D8, s0);
+    module_l00_call_handler_2();
 }
 

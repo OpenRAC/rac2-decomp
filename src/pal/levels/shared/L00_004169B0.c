@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef struct {
@@ -13,9 +14,9 @@ typedef struct {
     char pad[0xD0 - 0x30 - sizeof(Sub_411F48)];
 } Ent_411F48;
 extern Ent_411F48 ref_L00_00411F48_00[];
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, unsigned int, int, float, float, float);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float, float);
 extern void func_PAL_L00_004170B0(char *object, char *state);
 
 void func_PAL_L00_00416DC8(char *a0)
@@ -28,8 +29,8 @@ void func_PAL_L00_00416DC8(char *a0)
         if (e->sub.owner == a0) {
             func_PAL_L00_004170B0(a0, (char *)e);
             if (e->sub.busy == 0) {
-                func_00281EB8(&e->sub, 0x31, (func_002A7820(0x50, 0x60) << 24) | 0x103080, 1, 0.5f, 0.1f, func_002A7940());
-                func_00281EB8(&e->sub, 0x31, (func_002A7820(0x50, 0x60) << 24) | 0xFFFFFF, 1, 0.5f, 0.1f, func_002A7940());
+                gfx_draw_billboard_quad(&e->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0x103080, 1, 0.5f, 0.1f, math_random_angle());
+                gfx_draw_billboard_quad(&e->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0xFFFFFF, 1, 0.5f, 0.1f, math_random_angle());
             }
         }
     }

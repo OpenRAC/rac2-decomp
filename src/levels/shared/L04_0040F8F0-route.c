@@ -25,23 +25,23 @@ typedef struct {
     int entries[4];
 } RouteState;
 
-extern Route *D_L04_001FE340[];
+extern Route *g_route_path_table[];
 extern char D_L04_001B3190[] __attribute__((sda));
 extern char D_L04_001B31A0[] __attribute__((sda));
 extern char D_L04_001B31B0[] __attribute__((sda));
 extern char D_L04_001B31C0[] __attribute__((sda));
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
-extern float func_00282C48(float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00283360(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern float math_fabs(float);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void set_identity_rotation_rows(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 extern void func_001290E0(void *, void *);
-extern void func_L01_00311C18(void *, void *, void *, void *);
+extern void math_closest_point_on_segment(void *, void *, void *, void *);
 
 /* Rebuilds the frame at D_L04_001B3190 from a segment, keeping the previous direction
    when the new one is degenerate or reversed. */
@@ -61,14 +61,14 @@ extern void func_L01_00311C18(void *, void *, void *, void *);
 
 /* Distance of the object along its route, measured on the segments either side of `point`
    of the current route (link -1) or of one of its links. */
-float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int point, int mode, int update)
+float ProjectLinkedRouteDistance(RouteObject *object, RouteState *state, int link, int point, int mode, int update)
 {
     float saved[4] __attribute__((aligned(16)));
     float delta0[4] __attribute__((aligned(16)));
     float delta1[4] __attribute__((aligned(16)));
     float projected0[4] __attribute__((aligned(16)));
     float projected1[4] __attribute__((aligned(16)));
-    Route *base = gRoutePathTable[state->route];
+    Route *base = g_route_path_table[state->route];
     int orient = point >= 2;
     Route *path, *other = 0;
     int next, previous;
@@ -82,8 +82,8 @@ float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int po
         int wrapPrev = (point + before) % base->count;
         int wrapNext = (point + after) % base->count;
 
-        ClosestPointOnSegment(projected0, &base->points[wrapPrev], &base->points[point], object->pos);
-        ClosestPointOnSegment(projected1, &base->points[point], &base->points[wrapNext], object->pos);
+        math_closest_point_on_segment(projected0, &base->points[wrapPrev], &base->points[point], object->pos);
+        math_closest_point_on_segment(projected1, &base->points[point], &base->points[wrapNext], object->pos);
         FastVecSub(delta0, projected0, object->pos);
         FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
@@ -98,15 +98,15 @@ float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int po
         }
     }
 
-    path = gRoutePathTable[state->links[link]];
+    path = g_route_path_table[state->links[link]];
     next = point + 1;
     previous = point - 1;
     if (previous == -1) {
         if (state->entries[link] != -1)
-            other = gRoutePathTable[state->links[state->entries[link]]];
+            other = g_route_path_table[state->links[state->entries[link]]];
         else other = base;
-        ClosestPointOnSegment(projected0, &other->points[FloatToInt(path->points[1].w)], &path->points[point], object->pos);
-        ClosestPointOnSegment(projected1, &path->points[point], &path->points[next], object->pos);
+        math_closest_point_on_segment(projected0, &other->points[FloatToInt(path->points[1].w)], &path->points[point], object->pos);
+        math_closest_point_on_segment(projected1, &path->points[point], &path->points[next], object->pos);
         FastVecSub(delta0, projected0, object->pos);
         FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
@@ -117,10 +117,10 @@ float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int po
         previous = 0;
     } else if (next > path->count - 1) {
         if (state->exits[link] != -1)
-            other = gRoutePathTable[state->links[state->exits[link]]];
+            other = g_route_path_table[state->links[state->exits[link]]];
         else other = base;
-        ClosestPointOnSegment(projected0, &path->points[point], &path->points[previous], object->pos);
-        ClosestPointOnSegment(projected1, &other->points[FloatToInt(path->points[2].w)], &path->points[point], object->pos);
+        math_closest_point_on_segment(projected0, &path->points[point], &path->points[previous], object->pos);
+        math_closest_point_on_segment(projected1, &other->points[FloatToInt(path->points[2].w)], &path->points[point], object->pos);
         FastVecSub(delta0, projected0, object->pos);
         FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
@@ -131,8 +131,8 @@ float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int po
         next = point;
     }
 
-    ClosestPointOnSegment(projected0, &path->points[previous], &path->points[point], object->pos);
-    ClosestPointOnSegment(projected1, &path->points[point], &path->points[next], object->pos);
+    math_closest_point_on_segment(projected0, &path->points[previous], &path->points[point], object->pos);
+    math_closest_point_on_segment(projected1, &path->points[point], &path->points[next], object->pos);
     FastVecSub(delta0, projected0, object->pos);
     FastVecSub(delta1, projected1, object->pos);
     distance = func_L00_002EE290(delta0);

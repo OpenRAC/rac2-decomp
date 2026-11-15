@@ -13,51 +13,51 @@ typedef struct {
     float scale;
 } Row_0033B910;
 
-extern void func_00336320(char *);
-extern void func_00336A78(char *);
-extern void func_00336828(char *);
-extern void func_00335E38(void *, float, float, float, float);
-extern void func_00336920(char *, int, int);
-extern void func_00335F88(void *, float, float, float, float);
-extern int *func_00335E20(char *);
-extern float *func_00335E10(char *);
-extern void func_0028FAB8(int, int, int, int, unsigned long long, int);
-extern Row_0033B910 D_00265140[];
+extern void gfx_draw_screen_element_stored(char *);
+extern void text_label_draw(char *);
+extern void hud_draw_colored_quad_widget(char *);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern void hud_set_widget_value_pair(char *, int, int);
+extern void object_set_second_float4(void *, float, float, float, float);
+extern int *object_get_fourth_field(char *);
+extern float *object_get_first_field(char *);
+extern void gfx_draw_screen_line(int, int, int, int, unsigned long long, int);
+extern Row_0033B910 g_map_spot_table[];
 extern unsigned char D_001A7BC8[] MACRO_ADDR;
 extern unsigned char D_001A7BE8[] MACRO_ADDR;
-extern char D_001C4FA0[];
+extern char g_map_overlay_state[];
 
 static __inline__ void SetColor_0033B910(char *w, int c)
 {
-    *GetFieldC(w) = c;
+    *object_get_fourth_field(w) = c;
 }
 
 /* Draws the map screen: title, labels, each of the 21 map spots, and the frame lines. */
-void func_0033B910(char *screen)
+void map_screen_draw(char *screen)
 {
     int i;
     char *game;
 
-    DrawScreenElementAtStoredPosition(screen);
-    DrawScreenElementAtStoredPosition(screen + 0x4C);
-    DrawScreenElementAtStoredPosition(screen + 0x98);
-    DrawAlignedTextLabel(screen + 0x1D8);
-    DrawAlignedTextLabel(screen + 0x220);
-    DrawAlignedTextLabel(screen + 0x268);
-    DrawColoredQuadWidget(screen + 0x2B0);
+    gfx_draw_screen_element_stored(screen);
+    gfx_draw_screen_element_stored(screen + 0x4C);
+    gfx_draw_screen_element_stored(screen + 0x98);
+    text_label_draw(screen + 0x1D8);
+    text_label_draw(screen + 0x220);
+    text_label_draw(screen + 0x268);
+    hud_draw_colored_quad_widget(screen + 0x2B0);
     for (i = 0; i < 21; i++) {
-        SetFirstFloat4(screen + 0x2EC, (float)gMapSpotTable[i].x + (*(float **)(screen + 0x1C8))[0],
-                      (float)gMapSpotTable[i].y + (*(float **)(screen + 0x1C8))[1], 0.0f, 0.0f);
-        SetWidgetValuePair(screen + 0x2EC, 0xE99E, gMapSpotTable[i].text);
-        SetSecondFloat4(screen + 0x2EC, gMapSpotTable[i].scale, gMapSpotTable[i].scale, 0.0f, 0.0f);
+        object_set_first_float4(screen + 0x2EC, (float)g_map_spot_table[i].x + (*(float **)(screen + 0x1C8))[0],
+                      (float)g_map_spot_table[i].y + (*(float **)(screen + 0x1C8))[1], 0.0f, 0.0f);
+        hud_set_widget_value_pair(screen + 0x2EC, 0xE99E, g_map_spot_table[i].text);
+        object_set_second_float4(screen + 0x2EC, g_map_spot_table[i].scale, g_map_spot_table[i].scale, 0.0f, 0.0f);
         if (D_001A7BE8[i] == 0)
             SetColor_0033B910(screen + 0x2EC, 0x70A0C0C0);
         else
             SetColor_0033B910(screen + 0x2EC, 0x7029A1FF);
         if (D_001A7BC8[i] != 0)
-            DrawColoredQuadWidget(screen + 0x2EC);
+            hud_draw_colored_quad_widget(screen + 0x2EC);
     }
-    game = gMapOverlayState;
+    game = g_map_overlay_state;
     if (*(int *)(game + 0x230) < 21) {
         char *first = screen + 0xE4;
         char *mid = screen + 0x130;
@@ -72,21 +72,21 @@ void func_0033B910(char *screen)
             r += 76;
             q += 76;
         }
-        DrawScreenLine((int)(GetFirstField(first)[0] + 1.0f),
-                      (int)(GetFirstField(mid)[1] + 6.0f),
-                      (int)(GetFirstField(first)[0] + 1.0f),
-                      (int)(GetFirstField(first)[1] - 4.0f), 0x180000FF, 0);
-        DrawScreenLine((int)(GetFirstField(bar)[0] + 8.0f),
-                      (int)(GetFirstField(bar)[1] + 2.0f),
-                      (int)(GetFirstField(bar)[0] + 304.0f),
-                      (int)(GetFirstField(bar)[1] + 2.0f), 0x180000FF, 0);
-        DrawScreenLine((int)(GetFirstField(first)[0] + 1.0f),
-                      (int)(GetFirstField(mid)[1] + 6.0f),
-                      (int)(GetFirstField(first)[0] + 1.0f),
-                      (int)(GetFirstField(first)[1] - 4.0f), 0x180000FF, 0);
-        DrawScreenLine((int)(GetFirstField(bar)[0] + 8.0f),
-                      (int)(GetFirstField(bar)[1] + 2.0f),
-                      (int)(GetFirstField(bar)[0] + 304.0f),
-                      (int)(GetFirstField(bar)[1] + 2.0f), 0x180000FF, 0);
+        gfx_draw_screen_line((int)(object_get_first_field(first)[0] + 1.0f),
+                      (int)(object_get_first_field(mid)[1] + 6.0f),
+                      (int)(object_get_first_field(first)[0] + 1.0f),
+                      (int)(object_get_first_field(first)[1] - 4.0f), 0x180000FF, 0);
+        gfx_draw_screen_line((int)(object_get_first_field(bar)[0] + 8.0f),
+                      (int)(object_get_first_field(bar)[1] + 2.0f),
+                      (int)(object_get_first_field(bar)[0] + 304.0f),
+                      (int)(object_get_first_field(bar)[1] + 2.0f), 0x180000FF, 0);
+        gfx_draw_screen_line((int)(object_get_first_field(first)[0] + 1.0f),
+                      (int)(object_get_first_field(mid)[1] + 6.0f),
+                      (int)(object_get_first_field(first)[0] + 1.0f),
+                      (int)(object_get_first_field(first)[1] - 4.0f), 0x180000FF, 0);
+        gfx_draw_screen_line((int)(object_get_first_field(bar)[0] + 8.0f),
+                      (int)(object_get_first_field(bar)[1] + 2.0f),
+                      (int)(object_get_first_field(bar)[0] + 304.0f),
+                      (int)(object_get_first_field(bar)[1] + 2.0f), 0x180000FF, 0);
     }
 }

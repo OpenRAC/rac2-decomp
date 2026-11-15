@@ -3,18 +3,18 @@
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 extern void func_PAL_002A7650(void *, int, int);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F70(void *, void *, float);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
 extern void *func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
-extern void func_002AD330(void *, void *, void *, void *);
+extern void moby_transform_point_by_attachment(void *, void *, void *, void *);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
-extern void func_002A7750(u8 *, int, int);
-extern void func_0029F338(void *);
-extern u8 D_00188660[];
-extern u8 D_00189EA0[];
+extern void moby_set_state(u8 *, int, int);
+extern void moby_mark_spawned(void *);
+extern u8 g_sound_state[];
+extern u8 g_hero_position[];
 extern float D_L07_001B0AAC __attribute__((sda));
 
 void func_PAL_L07_003E9FD0(u8 *obj) {
@@ -33,25 +33,25 @@ void func_PAL_L07_003E9FD0(u8 *obj) {
     }
     slot = *(s32 *)(st + 0x264);
     if (slot != -1) {
-        rec = D_00188660 + slot * 0x70;
+        rec = g_sound_state + slot * 0x70;
         if (*(u8 **)(rec + 0x88) == obj && rec[0x74] != 0) {
-            func_002E59F8(slot);
+            snd_stop_voice(slot);
         }
     }
     *(s32 *)(st + 0x264) = -1;
-    func_002E5CF8(0, 0, obj);
+    PlayMobySound(0, 0, obj);
     pos = obj + 0x10;
     a.q = 0;
     a.f[2] = 0.5f;
-    func_00282CC0(&a, &a, pos);
+    FastVecAdd(&a, &a, pos);
     func_PAL_L00_003FB330(&a, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(st + 0x260));
-    func_00282CF0(b, pos, D_00189EA0);
+    FastVecSub(b, pos, g_hero_position);
     b[2] = 0.0f;
-    func_00282F70(b, b, 0.080000006f);
+    vec_fast_normalize_helper(b, b, 0.080000006f);
     toward = *(u8 **)(st + 0x260);
     if (toward != 0) {
-        func_002AD330(obj, toward, pos, c);
-        func_00282CC0(b, b, c);
+        moby_transform_point_by_attachment(obj, toward, pos, c);
+        FastVecAdd(b, b, c);
     }
     func_PAL_002B15D8(obj, 3, b, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     count = *(u16 *)(st + 0x21A) - 1;
@@ -60,21 +60,21 @@ void func_PAL_L07_003E9FD0(u8 *obj) {
         *(s16 *)(st + 0x88) = 0;
         *(s32 *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(obj, 8, 4);
+        moby_set_state(obj, 8, 4);
         st[0x2E] = 1;
         *(f32 *)(st + 0x20) = *(s16 *)(st + 0x24);
     } else {
-        func_0029F338(obj);
+        moby_mark_spawned(obj);
     }
 }
 
-extern int func_002AD0E0(void *, void *, void *, void *, void *, void *);
-extern void func_002A7A00(void *, float, float);
-extern int func_002A7820(int, int);
-extern void func_00283098(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern void *func_002C3150(void *, void *, int, float, unsigned char, unsigned char, int);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern void vec_random_direction(void *, float, float);
+extern int math_random_int_range(int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern void *part_spawn_hero_relative(void *, void *, int, float, unsigned char, unsigned char, int);
 extern float D_L07_001B0AD8 __attribute__((sda));
 extern float D_L07_001B0AB0 __attribute__((sda));
 extern float D_L07_001B0AB4[] __attribute__((sda));
@@ -94,8 +94,8 @@ void func_PAL_L07_003EA1F8(char *arg)
 
     qzero_nc(angles);
     if (*(void **)(state + 0x260)) {
-        func_002AD0E0(arg, *(void **)(state + 0x260), arg + 0x10, angles, carryDelta, angles);
-        func_00282CF0(carryDelta, carryDelta, arg + 0x10);
+        moby_transform_point_and_rotation_by_parent(arg, *(void **)(state + 0x260), arg + 0x10, angles, carryDelta, angles);
+        FastVecSub(carryDelta, carryDelta, arg + 0x10);
     } else {
         qzero_nc(carryDelta);
     }
@@ -107,15 +107,15 @@ void func_PAL_L07_003EA1F8(char *arg)
         position[2] = D_L07_001B0AD8;
         if (!side)
             position[2] = -position[2];
-        func_002A7A00(velocity, D_L07_001B0AB0 * (0.020000001f),
+        vec_random_direction(velocity, D_L07_001B0AB0 * (0.020000001f),
                       D_L07_001B0AB4[0] * (0.020000001f));
-        func_00282CC0(velocity, velocity, carryDelta);
-        randomValue = ((s32)(func_002A7820(D_L07_001B0AD0[0], D_L07_001B0AD0[1])) * 5 + 2) / 6;
-        func_00283098(position, position, arg + 0xC0);
+        FastVecAdd(velocity, velocity, carryDelta);
+        randomValue = ((s32)(math_random_int_range(D_L07_001B0AD0[0], D_L07_001B0AD0[1])) * 5 + 2) / 6;
+        matrix_mul_vec3(position, position, arg + 0xC0);
         randomValue = (unsigned char)randomValue;
-        func_00282CC0(position, position, arg + 0x10);
-        scale = func_002A7878(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
-        randomByte = func_002A77E0(255);
-        func_002C3150(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);
+        FastVecAdd(position, position, arg + 0x10);
+        scale = math_random_float_range(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
+        randomByte = math_random_int_below(255);
+        part_spawn_hero_relative(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);
     }
 }

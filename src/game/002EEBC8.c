@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern void func_0011CF78(int);
-extern int func_0011D450(void *, int, int);
-extern int func_0011D810(void *);
-extern int func_0011D620(void *, int, int, void *, int, void *, int, void *, void *);
+extern void sceSifInitRpc(int);
+extern int sceSifBindRpc(void *, int, int);
+extern int sif_rpc_is_handle_valid(void *);
+extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, void *, void *);
 typedef struct {
     int base, size, cd[10], cursor, count, extra;
 } RpcBufferState;
@@ -12,16 +12,16 @@ extern int D_00215050[][4];
 
 /* Bind asynchronously, obtain the remote buffer descriptor and clear the slots. */
 /* Connects to the remote IO server, waits until it is ready, reads its buffer size, and clears the table of 64 buffer slots. */
-void func_002EEBC8(void) {
+void iop_init_remote_buffer_server(void) {
     int reply[4];
     int i;
-    InitSifRpc(0);
+    sceSifInitRpc(0);
     for (;;) {
-        if (BindRpcServer(D_001A7240.cd, 0x11, 1) < 0) {
+        if (sceSifBindRpc(D_001A7240.cd, 0x11, 1) < 0) {
             for (;;) {
             }
         }
-        while (IsRpcHandleValid(D_001A7240.cd) != 0) {
+        while (sif_rpc_is_handle_valid(D_001A7240.cd) != 0) {
         }
         if (D_001A7240.cd[9] != 0) {
             goto bound;
@@ -32,7 +32,7 @@ void func_002EEBC8(void) {
         }
     }
 bound:
-    CallRpcServer(D_001A7240.cd, 2, 0, 0, 0, reply, 16, 0, 0);
+    sceSifCallRpc(D_001A7240.cd, 2, 0, 0, 0, reply, 16, 0, 0);
     D_001A7240.base = reply[0];
     D_001A7240.size = reply[1];
     D_001A7240.cursor = reply[0];

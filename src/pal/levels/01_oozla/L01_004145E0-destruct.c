@@ -11,18 +11,18 @@ extern float D_L01_001B208C_gp[] SDATA(D_L01_001B208C);
 extern float D_L01_001B1640_gp[] SDATA(D_L01_001B1640);
 extern float D_L01_001B1644[] NOT_SDA;
 extern float D_L01_001B1648[] NOT_SDA;
-extern void func_002A7750(void *, int, int);
-extern void *func_002A9640(void *, int, int);
-extern void func_00282D30(void *, void *, float);
+extern void moby_set_state(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern void FastVecScale(void *, void *, float);
 extern void func_PAL_002B15D8(void *, int, float *, unsigned char, float, float, float, float);
-extern void func_L00_00324F18(void *, void *, float, float, float);
-extern void func_00283098(void *, void *, void *);
+extern void vec_local_offset_to_world(void *, void *, float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_PAL_L01_002E2968(float *, float *, int, int, int, float, float, float);
 extern void func_PAL_L00_003281C0(void *, int, float);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern void func_0029F338(void *);
+extern int PlayMobySound(int, int, void *);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *);
 typedef struct { int blocked, timer; } DestructionState;
 typedef struct {
     unsigned char pad00[0x20];
@@ -56,42 +56,42 @@ void func_PAL_L01_00414BD8(DestructionMoby *object)
     switch (object->state) {
     case 0:
         D_L01_001AEC38++;
-        func_002A7750(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (func_002A9640(object, 0x4010000, 0) && !state->blocked) {
+        if (part_find_owned_effect_slot(object, 0x4010000, 0) && !state->blocked) {
             D_L01_001AEC38--;
-            func_002A7750(object, 2, -1);
+            moby_set_state(object, 2, -1);
         }
         object->hit_slot = 255;
         break;
     case 2:
-        func_00282D30(velocity, object->rot_row1, -0.080000006f);
+        FastVecScale(velocity, object->rot_row1, -0.080000006f);
         if (object->visible && D_L01_001B2090_gp[0] < 0.9f && D_L01_001B208C_gp[0] < 0.9f &&
             D_L01_001B3468 < D_L01_001B15E0[0]) {
             func_PAL_002B15D8(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             tilt.q = 0;
             tilt.f[1] = -0.018000001f;
-            func_L00_00324F18(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
-            func_00283098(tilt.f, tilt.f, object->rot_row0);
+            vec_local_offset_to_world(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
+            matrix_mul_vec3(tilt.f, tilt.f, object->rot_row0);
             func_PAL_L01_002E2968(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.008f, 1.0f, 1.0299999713897705f);
         } else
             func_PAL_002B15D8(object, 2, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
         func_PAL_L00_003281C0(object, 1, 0.0f);
-        func_002E5CF8(0, 0, object);
-        func_002A7750(object, 3, -1);
+        PlayMobySound(0, 0, object);
+        moby_set_state(object, 3, -1);
         break;
     case 3:
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             object->visible = 0;
             object->collision_disable = 0;
             object->flags |= 1;
             state->timer = 100;
             D_L01_001B3468++;
         }
-        if (func_00282948(&state->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             D_L01_001B3468--;
-            func_0029F338(object);
+            moby_mark_spawned(object);
         }
         break;
     }

@@ -7,11 +7,11 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 
-extern u8 *func_L00_002D70A0(s32 a0);
-extern f32 func_00283248(f32 a, f32 b);
-extern f32 func_00283B98(f32 a, f32 b);
-extern f32 func_00283BE0(f32 a, f32 b);
-extern void func_002AAA00(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
+extern u8 *cam_alloc_override_slot(s32 a0);
+extern f32 mat_fast_helper_a(f32 a, f32 b);
+extern f32 FastAddRotations(f32 a, f32 b);
+extern f32 fast_subtract_rotations(f32 a, f32 b);
+extern void math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
 
 /* The level's own two floats. */
 extern f32 D_L03_001B1090 __attribute__((sda));
@@ -19,11 +19,11 @@ extern f32 D_L03_001B1094 __attribute__((sda));
 
 /* The boot's block and its pointer word. */
 typedef struct { u8 pad[0x80]; f32 x, y; } Hero;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern u8 *D_L03_001B99D0 __attribute__((nosda));
 
 /* Eases a view angle toward the boss relative to the hero while the boss is awake. */
-void func_L03_003F64E8(u8 *entity) {
+void endako_boss_ease_view_angle(u8 *entity) {
     u8 *state;
     u8 *obj;
     u8 *s0;
@@ -39,23 +39,23 @@ void func_L03_003F64E8(u8 *entity) {
     if (entity[0x95] < 2)
         return;
     if (*(u8 **)(state + 0x2C8) == 0)
-        *(u8 **)(state + 0x2C8) = AllocCameraOverrideSlot(5);
+        *(u8 **)(state + 0x2C8) = cam_alloc_override_slot(5);
     obj = *(u8 **)(state + 0x2C8);
     { f32 x = D_L03_001B1090; f32 y = D_L03_001B1094;
     *(f32 *)obj = x;
     *(f32 *)(*(u8 **)(state + 0x2C8) + 4) = y; }
 
-    f12 = *(f32 *)(entity + 0x10) - gHeroState.x;
-    f13 = *(f32 *)(entity + 0x14) - gHeroState.y;
+    f12 = *(f32 *)(entity + 0x10) - g_hero_state.x;
+    f13 = *(f32 *)(entity + 0x14) - g_hero_state.y;
     s0 = *(u8 **)(D_L03_001B99D0 + 0x70);
-    first = FastMatrixHelperA(f12, f13);
+    first = mat_fast_helper_a(f12, f13);
     /* The base moves on between the two reads: combine cannot then fold the
      * second read's address, so retail's addiu and based load remain. */
     { f32 *rot = (f32 *)(s0 + 0x160);
     f12 = rot[0];
     s0 += 0x1C0;
     f13 = rot[1]; }
-    f0 = FastMatrixHelperA(f12, f13);
+    f0 = mat_fast_helper_a(f12, f13);
 
     f13 = 3.14159274f;
     f0 = FastAddRotations(f0, f13);
@@ -66,7 +66,7 @@ void func_L03_003F64E8(u8 *entity) {
     f15 = 0.20943954586982727f;
     local = f0;
     f12 = 0.0f;
-    ApproachTargetWithDirectionMode(&local, state + 0xCC, f12, f13, f14, f15, 0);
+    math_approach_target_with_direction_mode(&local, state + 0xCC, f12, f13, f14, f15, 0);
 
     *(f32 *)(s0 + 0x1C) = 1.0f;
     *(f32 *)(s0 + 0x14) = -*(f32 *)(state + 0xCC);

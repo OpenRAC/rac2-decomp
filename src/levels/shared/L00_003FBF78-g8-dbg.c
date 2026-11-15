@@ -26,20 +26,20 @@ typedef struct {
 } L00FadeRecord;
 extern L00FadeRecord D_L00_001BD2C0;
 
-extern void func_00282948(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_0027AB40(void);
+extern void math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void UpdateViewContext(void);
 
 /* Fades the screen settings toward their end values while a countdown runs. */
-void func_L00_003FBF78(void)
+void cam_update_screen_fade(void)
 {
     float ratio;
 
     if (D_L00_001B0B64 <= 0) {
         return;
     }
-    FastFloatHelperD(&D_L00_001B0B64);
+    math_fast_float_d(&D_L00_001B0B64);
     ratio = IntToFloat(D_L00_001B0B64) / IntToFloat(D_L00_001B0B60);
     D_L00_001BD2C0.i230 =
         FloatToInt(IntToFloat(D_L00_001B1980[0]) + (255.0f - IntToFloat(D_L00_001B1980[0])) * ratio);

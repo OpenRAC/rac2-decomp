@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char *D_L02_001FF1C0[];
-extern void func_00282C88(void *);
-extern float func_00282E80(void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282E48(void *, void *);
-extern int func_00283CF0(float);
+extern char *g_route_polygons[];
+extern void vec_clear_128(void *);
+extern float vec_distance_xy(void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float fast_vec_dist(void *, void *);
+extern int FloatToInt(float);
 
 /* Prepares the actor's path (built with -g: the line labels pad the two divisions with nops).
    The table entry the state names holds a count and 16-byte points from +0x10: the fourth float
@@ -17,14 +17,14 @@ extern int func_00283CF0(float);
    at +0x1C become the words at +0x3C and +0x40. The guarded do-while with a second pointer walked beside
    the point index is the loop shape retail has. */
 /* Works out the middle and size of a path of points, plus two timing counts, when the actor is set up. */
-void func_L02_003EEAD8(char *actor) {
+void path_init_bounds(char *actor) {
     char *state = *(char **)(actor + 0x68);
-    char *entry = gRoutePolygons[*(int *)state];
+    char *entry = g_route_polygons[*(int *)state];
     float pointSum[4];
     int i;
     int j;
 
-    ClearVector128(pointSum);
+    vec_clear_128(pointSum);
     i = 0;
     if (*(int *)entry - 1 > 0) {
         char *nextPoint = entry + 0x20;

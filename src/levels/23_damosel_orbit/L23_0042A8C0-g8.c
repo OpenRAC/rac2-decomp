@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L23_0042A8C0 is a unit of its own for its mixed $gp and macro addresses. The non-clobbering
    transfers write only its private stack rows and the ring's edge table, so the ring index stays
    live across them. D_L23_001B1B98 has two names because retail keeps both of its stores, which
@@ -12,7 +13,7 @@ typedef struct Edge_0042A8C0 {
     s16 d;
 } Edge_0042A8C0;
 
-extern u8 *D_L23_001B1484 MACRO_ADDR;
+extern u8 *g_mothership_boss_moby MACRO_ADDR;
 
 extern float D_L23_001B1470 MACRO_ADDR;
 
@@ -64,32 +65,32 @@ extern s16 D_L23_001B1C38 __attribute__((sda));
 
 extern s16 D_L23_001B1C3C __attribute__((sda));
 
-extern void func_00291450(s32);
+extern void gfx_free_point_light(s32);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern s32 func_L00_002FCF18(void *, float, float, float, float, float);
+extern s32 part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 
-extern s32 func_L23_0041C0B0(void);
+extern s32 mothership_is_blast_cooling_down(void);
 
 extern void func_L03_002EFB60(void *, void *, float);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
-extern void *func_L23_004256F0(void *, u8 *, void *, u8, u8, s16, s16, float, float, float, float, s32, s32, s32,
+extern void *ribbon_trail_create(void *, u8 *, void *, u8, u8, s16, s16, float, float, float, float, s32, s32, s32,
                                s32, s32);
 
 /* Refreshes the sound handle, builds a rotation from the state's matrix rows and the roll angle, picks the next slot of the 15-entry ring, rewrites the slot's
    two edge vectors from the edge table and starts the effect object with them. */
-void func_L23_0042A8C0(u8 *moby) {
+void hero_spawn_trail_effect(u8 *moby) {
     u8 *vars;
     float m[16] __attribute__((aligned(16)));
     float v60[4] __attribute__((aligned(16)));
@@ -108,18 +109,18 @@ void func_L23_0042A8C0(u8 *moby) {
     s32 e;
     u8 *hero;
 
-    if (gMothershipBossMoby != 0) {
+    if (g_mothership_boss_moby != 0) {
         D_L23_001B39D0 = D_L23_001B1470 * D_L23_001B1C60;
         if (D_L23_001B1B96 != -1) {
-            FreePointLight(D_L23_001B1B96);
+            gfx_free_point_light(D_L23_001B1B96);
         }
-        FastVecScale(v60, gMothershipBossMoby + 0xE0, 5.0f);
-        FastVecAdd(v60, v60, gMothershipBossMoby + 0x10);
-        r1 = RandomFloatRange(0.0f, 1.3f) + 1.3f;
-        r2 = RandomFloatRange(0.0f, 1.3f) + 1.3f;
-        r3 = RandomFloatRange(0.0f, 1.35f) + 1.6f;
-        D_L23_001B1B96 = AllocateEffectSlot_L00_2(v60, 10.0f, 0.0f, r1, r2, r3);
-        if (IsBlastCoolingDown() == 0) {
+        FastVecScale(v60, g_mothership_boss_moby + 0xE0, 5.0f);
+        FastVecAdd(v60, v60, g_mothership_boss_moby + 0x10);
+        r1 = math_random_float_range(0.0f, 1.3f) + 1.3f;
+        r2 = math_random_float_range(0.0f, 1.3f) + 1.3f;
+        r3 = math_random_float_range(0.0f, 1.35f) + 1.6f;
+        D_L23_001B1B96 = part_l00_alloc_effect_slot_2(v60, 10.0f, 0.0f, r1, r2, r3);
+        if (mothership_is_blast_cooling_down() == 0) {
             flag = 0;
             f21 = D_L23_001B1C4C - D_L23_001B1C4C * 0.5f;
             f20 = D_L23_001B1C50 - D_L23_001B1C50 * 0.5f;
@@ -131,13 +132,13 @@ void func_L23_0042A8C0(u8 *moby) {
             f20 = D_L23_001B1C50;
         }
         vars = *(u8 **)(moby + 0x68);
-        hero = gMothershipBossMoby;
+        hero = g_mothership_boss_moby;
         qcopy_nc(m, hero + 0xC0);
         qcopy_nc(m + 4, hero + 0xD0);
         qcopy_nc(m + 8, hero + 0xE0);
         qzero_nc(m + 12);
         func_L03_002EFB60(m, m, D_L23_001B1C0C);
-        qcopy(m + 12, gMothershipBossMoby + 0x10);
+        qcopy(m + 12, g_mothership_boss_moby + 0x10);
         m[15] = 1.0f;
         rot = m;
         qzero_nc(v70);
@@ -157,7 +158,7 @@ void func_L23_0042A8C0(u8 *moby) {
         transform_vector(vC0, D_L23_002A6390[D_L23_002A7A70[e].b], m);
         qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2], vB0);
         qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1], vC0);
-        CreateRibbonTrail(D_L23_0025EC40[D_L23_001B1B98_2 * 2], moby, D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1],
+        ribbon_trail_create(D_L23_0025EC40[D_L23_001B1B98_2 * 2], moby, D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1],
                           D_L23_001B1C58, D_L23_001B1C5C, D_L23_001B1C38, D_L23_001B1C3C, f21, f20, f22,
                           D_L23_001B1C34, D_L23_001B1C40, D_L23_001B1C44, flag, D_L23_001B1C48, 0);
     }

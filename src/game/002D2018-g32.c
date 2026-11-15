@@ -8,29 +8,29 @@ typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 typedef struct { char reserved00[0x34]; int text; int f38; int timer; } MenuPanel;
 typedef struct { short text; short pad; } MenuText;
 
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
-extern int func_002E5E58(int, unsigned int, void *);
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int D_001ABA60 __attribute__((sda));
 extern MenuPanel D_0025CAA0[];
 extern int D_0025CB50[];
 extern MenuText D_001ABD6A[] MACRO_ADDR;
 
 /* Handles left and right on the six-page viewer and updates the page text and its scroll timer. */
-int func_002D2018(void)
+int page_viewer_handle_input_short(void)
 {
     int result = 0;
-    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int flags = ((CallbackMenuState *)&g_pad_state)->flags;
     int oldCursor = D_001ABA60;
 
     if (flags & 0x10) {
         int value;
         int returnCode;
         D_001ABA60 = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             returnCode = -1;
             goto finish;
         }
@@ -43,16 +43,16 @@ finish:
         result = 1;
     } else if (flags & 0x8000) {
         if (oldCursor > 0)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         if (--D_001ABA60 < 0)
             D_001ABA60 = 0;
     } else if (flags & 0x2000) {
         if (oldCursor < 5)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         if (++D_001ABA60 > 5)
             D_001ABA60 = 5;
     }

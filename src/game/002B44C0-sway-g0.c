@@ -35,23 +35,23 @@ typedef struct {
     int state;
 } Player_2B44C0;
 
-extern Player_2B44C0 D_00189E20;
-extern void func_00115484(void *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AFDD8(char *, void *, void *, void *);
-extern int func_00282948(void *);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002B0158(char *, void *, void *, float);
-extern char *func_002AD0B0(char *);
-extern void func_002AD6F0(char *, void *, void *, void *);
+extern Player_2B44C0 g_hero_state;
+extern void memset(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_transform_by_object_or_given(char *, void *, void *, void *);
+extern int math_fast_float_d(void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void gravity_offset_object_position(char *, void *, void *, float);
+extern char *moby_get_private_value_2(char *);
+extern void mat_combine_and_store(char *, void *, void *, void *);
 
 /* Makes an object sway like a spring: it is pushed toward a target or the player, wobbles and settles, and its position and tilt follow. */
-void func_002B44C0(char *self, Sway_2B44C0 *sway, float *target)
+void moby_update_sway(char *self, Sway_2B44C0 *sway, float *target)
 {
     float old_position[4];
     float old_rotation[4];
@@ -73,16 +73,16 @@ void func_002B44C0(char *self, Sway_2B44C0 *sway, float *target)
     memset(push, 0, 16);
     if (target != 0)
         goto target_delta;
-    if (gHeroState.target == self && gHeroState.state >= 2)
+    if (g_hero_state.target == self && g_hero_state.state >= 2)
         goto player_delta;
     goto decay;
 target_delta:
     FastVecSub(delta, target, self + 0x10);
     goto active;
 player_delta:
-    FastVecSub(delta, &gHeroState.position, self + 0x10);
+    FastVecSub(delta, &g_hero_state.position, self + 0x10);
 active:
-    TransformVectorByObjectOrGiven(self, delta, delta, 0);
+    vec_transform_by_object_or_given(self, delta, delta, 0);
     FastVecSub(delta, delta, &sway->offset);
     push[0] = -delta[1] * sway->scale[0];
     push[1] = delta[0] * sway->scale[1];
@@ -94,14 +94,14 @@ active:
     }
     goto update;
 decay:
-    FastFloatHelperD(&sway->timer);
+    math_fast_float_d(&sway->timer);
 update:
     for (i = 0; i < 3; i++) {
         sway->velocity[i] += sway->spring[i] * (push[i] - sway->position[i]);
         sway->velocity[i] -= sway->damping[i] * sway->velocity[i];
         sway->position[i] += sway->velocity[i];
         sway->phase[i] = FastAddRotations(sway->phase[i], sway->speed[i]);
-        delta[i] = sway->amplitude[i] * FastSinOrCosB(sway->phase[i]);
+        delta[i] = sway->amplitude[i] * math_fast_sin_or_cos_b(sway->phase[i]);
     }
     *(Vec128_2B44C0 *)work = 0;
     work[0] = sway->position[0] + delta[0];
@@ -129,10 +129,10 @@ update:
         roll = sway->limit[2];
     else if (roll < -sway->limit[2])
         roll = -sway->limit[2];
-    OffsetObjectPositionAlongGravity(self, self + 0x10, self + 0x10, roll);
-    body = GetMobyPrivateValue2(self);
+    gravity_offset_object_position(self, self + 0x10, self + 0x10, roll);
+    body = moby_get_private_value_2(self);
     if (body != 0) {
         FastVecSub(step, self + 0x10, old_position);
-        CombineTransformsAndStore(body, step, old_rotation, self + 0xF0);
+        mat_combine_and_store(body, step, old_rotation, self + 0xF0);
     }
 }

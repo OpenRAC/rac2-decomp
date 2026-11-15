@@ -10,14 +10,14 @@ extern float func_00282E80_1(char *, float *);
 extern float func_00282C48_6(float);
 
 /* Sets the first pending flag on the object and reports whether it was newly set. */
-s32 func_002B3868(u8 *moby) {
+s32 flag_set_first_pending(u8 *moby) {
  u8 flags=moby[0xbe];
  if(((flags^1)&1)!=0) {moby[0xbe]=flags|1;return 1;}
  return 0;
 }
 
 /* Sets the second pending flag and reports whether it was newly set. */
-s32 func_002B3890(u8 *moby) {
+s32 flag_set_second_pending(u8 *moby) {
     u8 flags = moby[0xBE];
     if ((flags & 2) == 0) {
         moby[0xBE] = flags | 2;
@@ -27,19 +27,19 @@ s32 func_002B3890(u8 *moby) {
 }
 
 /* Tells whether the third pending flag on the object is set. */
-s32 func_002B38B8(u8 *moby) {
+s32 flag_is_third_pending_set(u8 *moby) {
     return moby[0xBE] & 4;
 }
 
-extern float func_00282E80(char *, float *);
-extern float func_00282E48(char *, char *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
+extern float vec_distance_xy(char *, float *);
+extern float fast_vec_dist(char *, char *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
 extern int D_001A8CA0 __attribute__((sda));
-extern int D_0018C0B0;
+extern int g_hero_moby;
 
 /* Rates how good a target is to aim at: its distance, made worse when it is off to the side, and worse again for the player. */
-float func_002B38C8(char *object, char *target)
+float weapon_rate_aim_target(char *object, char *target)
 {
     char *position = object + 0x10;
     char *destination = target + 0x10;
@@ -49,12 +49,12 @@ float func_002B38C8(char *object, char *target)
         value = fast_vec_dist(position, destination);
     distance = value;
     if (D_001A8CA0 == 0) {
-        float angle = FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(object + 0x10),
+        float angle = mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
                                   *(float *)(target + 0x14) - *(float *)(object + 0x14));
         angle = FastDiffRots(angle, *(float *)(object + 0xF8));
         distance = distance + angle * distance;
     }
-    if (target == (char *)gHeroMoby_0018C0B0)
+    if (target == (char *)g_hero_moby)
         distance += 42.0f;
     return distance;
 }
@@ -63,7 +63,7 @@ float func_002B38C8(char *object, char *target)
 
 /* Calls a callee on (second pointer, first pointer + 16); if the result is not below the first float argument it returns 0, otherwise it evaluates a second callee on (a float at second+8 minus a float at first+24) and returns 1 when that is below the second float argument, else 0. */
 /* Checks that the target is close enough in the flat distance and also close enough in height. */
-int func_002B3B20(char *moby, char *point, float maxRange, float maxHeight)
+int weapon_is_target_in_range(char *moby, char *point, float maxRange, float maxHeight)
 {
     float distance = func_00282E80_1(point, (float *)(moby + 16));
 
@@ -84,7 +84,7 @@ typedef struct {
 extern Record_2B4038 D_00240450[];
 
 /* Tells whether the saved record at the given index holds the given value. */
-int func_002B4038(int value, int index) {
+int save_is_record_value(int value, int index) {
     return D_00240450[index].value == value;
 }
 
@@ -95,15 +95,15 @@ typedef struct {
     float angles[4];
     PoseVector128 change[4];
 } PoseWorkspace;
-extern void func_00283410(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00283788(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AB6D8(float *, float *);
+extern void euler_to_matrix(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void multiply_matrix(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void mat_get_euler_angles(float *, float *);
 
 /* Turns the object by the given angles so that a chosen point stays where it is, moving the object to make up for it. */
-void func_002B4090(char *self, PoseVector128 *point, float x, float y, float z)
+void moby_rotate_about_point(char *self, PoseVector128 *point, float x, float y, float z)
 {
     PoseWorkspace work;
     work.initial = *point;
@@ -117,7 +117,7 @@ void func_002B4090(char *self, PoseVector128 *point, float x, float y, float z)
     transform_vector(&work.current, &work.initial, work.matrix);
     FastVecSub(&work.delta, &work.previous, &work.current);
     FastVecAdd(self + 0x10, self + 0x10, &work.delta);
-    GetEulerAnglesFromMatrix((float *)work.matrix, (float *)(self + 0xF0));
+    mat_get_euler_angles((float *)work.matrix, (float *)(self + 0xF0));
 }
 
 
@@ -128,22 +128,22 @@ void func_002B4090(char *self, PoseVector128 *point, float x, float y, float z)
 extern int D_001AA0F0 __attribute__((sda));
 
 /* Stores a value in a global setting. */
-void func_002B49B0(int value) {
+void request_set_setting_a(int value) {
     D_001AA0F0 = value;
 }
 
 extern int D_001AA0F4 __attribute__((sda));
 
 /* Stores a value in a second global setting. */
-void func_002B49C0(int value) {
+void request_set_setting_b(int value) {
     D_001AA0F4 = value;
 }
 
-extern int D_001A8BB8 __attribute__((sda));
+extern int g_requested_game_mode __attribute__((sda));
 
 /* Tells whether the current request slot is the given one. */
-int func_002B49C8(int value) {
-    return gRequestedGameMode == value;
+int request_is_current_slot(int value) {
+    return g_requested_game_mode == value;
 }
 
 /* func_002B49E0 is matched in 002B49E0-g8.c. */
@@ -154,38 +154,38 @@ int func_002B49C8(int value) {
 
 /* func_002B4C18 is matched in 002B3868-g8.c (small data through $gp). */
 
-extern char *func_002B5D28(void *);
-extern float func_00283B98(float, float);
-extern int func_00282978(short *);
-extern int func_002A7820(int, int);
-extern int func_002B50E0(void *, void *, float);
+extern char *moby_get_controller(void *);
+extern float FastAddRotations(float, float);
+extern int FastDecTimer(short *);
+extern int math_random_int_range(int, int);
+extern int moby_step_controller(void *, void *, float);
 
 /* Turns toward the target by a limited angle (with an optional side-to-side swing), then runs the movement step. */
-int func_002B4FF0(char *self, float *target, float amount)
+int moby_turn_toward_target_and_step(char *self, float *target, float amount)
 {
-    char *data = GetMovementController(self);
+    char *data = moby_get_controller(self);
     float angle;
     if (data == 0)
         return 8;
-    angle = FastMatrixHelperA(target[0] - *(float *)(self + 0x10),
+    angle = mat_fast_helper_a(target[0] - *(float *)(self + 0x10),
                          target[1] - *(float *)(self + 0x14));
     angle = FastAddRotations(angle, amount);
     if (*(float *)(data + 0xDC) != 0.0f) {
         angle = FastAddRotations(angle, *(float *)(data + 0xDC));
         if (FastDecTimer((short *)(data + 0xE0))) {
             *(float *)(data + 0xDC) = -*(float *)(data + 0xDC);
-            *(short *)(data + 0xE0) = RandomIntRange(*(short *)(data + 0xE2), *(short *)(data + 0xE4));
+            *(short *)(data + 0xE0) = math_random_int_range(*(short *)(data + 0xE2), *(short *)(data + 0xE4));
         }
     }
-    return StepMovementController(self, target, angle);
+    return moby_step_controller(self, target, angle);
 }
 
 
 /* func_002B50E0 is matched in 002B50E0.c. */
 
-extern int func_002B50E0(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
 
 /* Runs the movement step on an object using its own position and heading. */
-void func_002B5258(char *moby) {
-    StepMovementController(moby, moby + 0x10, *(float *)(moby + 0xF8));
+void moby_step_at_own_position(char *moby) {
+    moby_step_controller(moby, moby + 0x10, *(float *)(moby + 0xF8));
 }

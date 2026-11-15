@@ -1,17 +1,17 @@
 #include "common.h"
 
 struct family_27f9_object;
-extern float func_002A7E08(struct family_27f9_object *, float *, float *, float, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002AA458(void *, void *, void *, float, float, float);
-extern void func_L02_00332D28(char *, char *, void *, void *, char *);
+extern float moby_turn_toward_position(struct family_27f9_object *, float *, float *, float, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float vec_spring_to_target(void *, void *, void *, float, float, float);
+extern void coll_move_resolve_collisions(char *, char *, void *, void *, char *);
 extern char *D_L09_001FE6C0[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L09_001A8F20[] MACRO_ADDR;
 
 /* Moves the enemy toward its target and along its path, and keeps it from sliding through walls. */
-void func_L09_003F9970(char *object)
+void enemy_move_along_path(char *object)
 {
     float endpoint[4] __attribute__((aligned(16)));
     float before[4] __attribute__((aligned(16)));
@@ -19,17 +19,17 @@ void func_L09_003F9970(char *object)
     char *data;
     char *path;
     qcopy(before, object + 0x10);
-    TurnTowardPosition((struct family_27f9_object *)object, *(float **)(state + 0x200),
+    moby_turn_toward_position((struct family_27f9_object *)object, *(float **)(state + 0x200),
         (float *)(state + 0x4B4), *(float *)(state + 0x114), *(float *)(state + 0x118),
         *(float *)(state + 0x11C));
     if (*(int *)(state + 0x2BC) != 255) {
         path = D_L09_001FE6C0[*(int *)(state + 0x2BC)];
         qcopy(endpoint, path + *(int *)path * 16);
         FastVecSub(endpoint, endpoint, path + 0x10);
-        FastVecAdd(endpoint, endpoint, gHeroPosition);
+        FastVecAdd(endpoint, endpoint, g_hero_position);
         data = *(char **)(*(char **)(object + 0x68) + 0x18);
-        SpringVectorToTarget(object + 0x10, endpoint, state + 0x4B8, *(float *)(state + 0x120),
+        vec_spring_to_target(object + 0x10, endpoint, state + 0x4B8, *(float *)(state + 0x120),
             *(float *)(state + 0x124), *(float *)(state + 0x128));
-        MoveObjectAndResolveCollisions(object, data, before, D_L09_001A8F20, 0);
+        coll_move_resolve_collisions(object, data, before, D_L09_001A8F20, 0);
     }
 }

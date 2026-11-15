@@ -27,28 +27,28 @@ typedef struct {
     char pad340[0x34E - 0x340];
     short busy;                             /* 0x34E */
 } Hero_L13_0041B670;
-extern Hero_L13_0041B670 D_00189E20;
-extern int D_001A79F0;
+extern Hero_L13_0041B670 g_hero_state;
+extern int g_current_map_index;
 extern unsigned char D_0019B2E8[];
 extern unsigned int D_00138324[];
 extern int D_L13_001A8FB4;
 extern Ring_L13 *D_L13_001B291C;
 extern unsigned char D_0018C0D5[];
 extern MotionSettings_L13 D_L13_001B16D8 __attribute__((sda));
-extern void func_L13_0041BA60(Ring_L13 *);
-extern int func_002E5CF8(int, int, Ring_L13 *);
-extern void func_L00_002D40A0(float *, int, float);
-extern int func_002A8C28(void *, void *, int, int, int, int, float, float, float);
-extern int func_L00_002D40F0(void);
-extern void func_L00_002B9D60(void *, void *, int, int);
-extern void func_00288CB0(int, int);
-extern void func_L13_0041BAE0(void *);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern float func_002AA2E8(float *, float, float);
-extern float func_002AA548(float *, float *, float, float, float, float);
+extern void warp_ring_show_help(Ring_L13 *);
+extern int PlayMobySound(int, int, Ring_L13 *);
+extern void hero_start_target_state(float *, int, float);
+extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
+extern int hero_get_target_state_kind(void);
+extern void hero_reset_position_and_direction(void *, void *, int, int);
+extern void data_set_small_value_and_refresh(int, int);
+extern void DrawMobyRadiusRing(void *);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern float ApproachValue(float *, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
 /* Updates the warp ring moby of class 3921: waits for the player to use it, plays the warp effect, then sends the player to the linked ring. */
-void func_L13_0041B670(Ring_L13 *object)
+void warp_ring_update(Ring_L13 *object)
 {
     float position[4] __attribute__((aligned(16)));
     RingState_L13 *state = object->state;
@@ -63,13 +63,13 @@ void func_L13_0041B670(Ring_L13 *object)
         object->mode = 1;
         return;
     case 1:
-        if (state->flagA >= 0 && !(D_0019B2E8[state->flagA + gCurrentMapIndex * 16] & 0x80))
+        if (state->flagA >= 0 && !(D_0019B2E8[state->flagA + g_current_map_index * 16] & 0x80))
             return;
         if (state->primary == -1 && state->locked == 0 && state->busy == 0)
             return;
-        if (gHeroState.target != object || gHeroState.busy != 0)
+        if (g_hero_state.target != object || g_hero_state.busy != 0)
             return;
-        ShowWarpRingHelpMessage(object);
+        warp_ring_show_help(object);
         if (!(D_00138324[0] & 0x10))
             return;
         if (D_L13_001A8FB4 == 11) {
@@ -77,12 +77,12 @@ void func_L13_0041B670(Ring_L13 *object)
             object->mode = 2;
             state->i28 = 0;
             state->i2C = 0;
-            StartHeroTargetState(object->position, 0, object->fF8);
-            SweepCollisionFromObject(object, object->position, 0x10000, 0, 1, 0, 1.5f, 20.0f, 1.0f);
+            hero_start_target_state(object->position, 0, object->fF8);
+            coll_sweep_from_object(object, object->position, 0x10000, 0, 1, 0, 1.5f, 20.0f, 1.0f);
         }
         return;
     case 2:
-        code = GetHeroTargetStateKind();
+        code = hero_get_target_state_kind();
         if (code == 2) {
             state->timer = 1.95f;
             object->mode = 3;
@@ -94,12 +94,12 @@ void func_L13_0041B670(Ring_L13 *object)
         if (state->timer == 0.0f) {
             if (state->busy == 0 && state->locked == 0) {
                 destination = &D_L13_001B291C[state->primary];
-                if (state->secondary != -1 && (D_0019B2E8[state->flagB + gCurrentMapIndex * 16] & 0x80))
+                if (state->secondary != -1 && (D_0019B2E8[state->flagB + g_current_map_index * 16] & 0x80))
                     destination = &D_L13_001B291C[state->secondary];
                 target_state = destination->state;
                 qcopy(position, destination->position);
                 position[2] += 0.2f;
-                ResetHeroPositionAndDirection(position, destination->fF0, 0, 1);
+                hero_reset_position_and_direction(position, destination->fF0, 0, 1);
                 D_0018C0D5[0] = 1;
                 destination->mode = 4;
                 target_state->timer = 0.0f;
@@ -116,30 +116,30 @@ void func_L13_0041B670(Ring_L13 *object)
                 state->f20 = 0;
             } else {
                 if (state->locked)
-                    SetSmallDataValueAndRefresh(13, 1);
+                    data_set_small_value_and_refresh(13, 1);
                 else
-                    SetSmallDataValueAndRefresh(21, 1);
+                    data_set_small_value_and_refresh(21, 1);
             }
             return;
         }
-        AddDrawCallbackToList1(DrawMobyRadiusRing, object);
+        gfx_add_draw_callback_first(DrawMobyRadiusRing, object);
         ApproachValue(&state->timer, 0.0f, 0.06666667f);
         return;
     case 4:
         if (state->timer < 1.95f) {
-            AddDrawCallbackToList1(DrawMobyRadiusRing, object);
+            gfx_add_draw_callback_first(DrawMobyRadiusRing, object);
             ApproachValue(&state->timer, 1.95f, 0.06666667f);
             return;
         }
         if (state->f24 > 0.0f) {
-            StepValueTowardTarget(&state->f24, (float *)&state->i28, 0.0f,
+            math_step_value_toward_target(&state->f24, (float *)&state->i28, 0.0f,
                 D_L13_001B16D8.acceleration * 0.00027777778f,
                 D_L13_001B16D8.deceleration * 0.00027777778f,
                 D_L13_001B16D8.speed * 0.016666668f);
             return;
         }
         if (state->f20 > 0.0f) {
-            StepValueTowardTarget(&state->f20, (float *)&state->i2C, 0.0f,
+            math_step_value_toward_target(&state->f20, (float *)&state->i2C, 0.0f,
                 D_L13_001B16D8.acceleration * 0.00027777778f,
                 D_L13_001B16D8.deceleration * 0.00027777778f,
                 D_L13_001B16D8.speed * 0.016666668f);

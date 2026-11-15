@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern char *func_0029EFD0(int);
-extern int func_00283CF0(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern char *CreateMoby(int);
+extern int FloatToInt(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 extern float D_L05_001B154C __attribute__((sda));
 extern float D_L05_001B1550 __attribute__((sda));
 extern int D_L05_001B1554 __attribute__((sda));
@@ -16,7 +16,7 @@ extern float D_L05_001B1524 __attribute__((sda));
 extern float D_L05_001B1528 __attribute__((sda));
 
 /* Creates a moving projectile object that travels from a position along a direction, with a lifetime counted in frames. */
-char *func_L05_00427090(char *pos, char *vec, int a2, char *target, int flag, int extraParam)
+char *projectile_spawn_with_target(char *pos, char *vec, int a2, char *target, int flag, int extraParam)
 {
     char *projectile = CreateMoby(0x1182);
 
@@ -55,7 +55,7 @@ char *func_L05_00427090(char *pos, char *vec, int a2, char *target, int flag, in
 }
 
 /* Creates a second kind of moving projectile object, like the one above but without the extra value. */
-char *func_L05_00427988(char *pos, char *vec, int a2, char *target, int flag)
+char *projectile_l05_spawn(char *pos, char *vec, int a2, char *target, int flag)
 {
     char *projectile = CreateMoby(0x1191);
 

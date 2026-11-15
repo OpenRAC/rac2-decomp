@@ -13,21 +13,21 @@ typedef struct {
     u64 zero, texture, mode, primitive;
 } Ribbon98A;
 
-extern u64 func_0027C878(int);
-extern void func_L00_003A2570(void *, int);
-extern void func_L00_003B2900(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void beam_extend_trail_point(void *, int);
+extern void transform_reset_record(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
 extern char D_L05_001B96C0[];
 
 /* Draw two textured strips along the points, scrolling the wider strip's U coordinate. */
 /* Draws a two-layer scrolling ribbon through a list of points, one band at a time. */
-void func_L05_00398A38(char *obj, int count, Vec98A *points, int n)
+void DrawScrollingTwoLayerRibbon(char *obj, int count, Vec98A *points, int n)
 {
     Ribbon98A inner, outer;
     Vec98A tangent, view, right, pos, thin, wide;
@@ -55,9 +55,9 @@ void func_L05_00398A38(char *obj, int count, Vec98A *points, int n)
     outer.color[0] = color;
     thin.f[3] = 1.0f;
     wide.f[3] = 1.0f;
-    ExtendTrailPoint(points, n);
-    ResetTransformRecord(&inner);
-    ResetTransformRecord(&outer);
+    beam_extend_trail_point(points, n);
+    transform_reset_record(&inner);
+    transform_reset_record(&outer);
     inner.uv[0] = 0;
     inner.uv[1] = 0;
     inner.uv[2] = 0;

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,17 +25,17 @@
  */
 #include "common.h"
 
-extern volatile s32 D_001A7344;
+extern volatile s32 g_screen_height;
 extern void ref_L00_00382BF0_00(void *, s32, s8 *);
 extern f32 ref_L00_00382BF0_01(void *, s8 *);
 extern void ref_L00_00382BF0_02(s32, s32 *, s32 *);
 extern s32 ref_L00_00382BF0_03(s32, u16, u16, s32, s32, s32, f32 *);
-extern s32 D_001A7340 __attribute__((sda));
+extern s32 g_screen_width __attribute__((sda));
 extern f32 ref_L00_00382BF0_04 __attribute__((sda));
 extern s8 ref_L00_00382BF0_05[];
 
 /* Returns how visible the sun is on screen, or -1 if it is off screen or hidden behind something. */
-f32 func_L00_00382BF0(void *object) {
+f32 lens_flare_get_visibility(void *object) {
     s8 point[0x10];
     s32 screenX;
     s32 screenY;
@@ -45,7 +46,7 @@ f32 func_L00_00382BF0(void *object) {
     ref_L00_00382BF0_00(point, vars, ref_L00_00382BF0_05);
     depth = ref_L00_00382BF0_01(point, ref_L00_00382BF0_05 + 0x230);
     ref_L00_00382BF0_02(vars, &screenX, &screenY);
-    if ((screenX < 0) || (screenX >= (gScreenWidth - 0x10)) || (screenY < 0) || (screenY >= (gScreenHeight - 8)) || !(depth > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) screenX, (u16) screenY, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
+    if ((screenX < 0) || (screenX >= (g_screen_width - 0x10)) || (screenY < 0) || (screenY >= (g_screen_height - 8)) || !(depth > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) screenX, (u16) screenY, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
         ref_L00_00382BF0_04 = -1.0f;
     }
     return ref_L00_00382BF0_04;

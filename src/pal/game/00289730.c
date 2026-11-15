@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_00289730, the PAL copy of func_00288E18: the same C, with the tests of D_001A8BB0 and
  * D_001B1688 added before the stores. */
@@ -7,16 +8,16 @@ typedef struct { char reserved00[0x24]; int key; char reserved28[0x40]; int acti
                 short unk6C; char reserved6E[4]; unsigned short unk72; } SelectorOwner;
 typedef struct { unsigned short key; char reserved02[10]; } SelectorRow;
 extern SelectorState ref_L00_00288E18_00;
-extern SelectorOwner D_001A63A8;
-extern SelectorRow D_0018C958[];
-extern int D_001A8BB0 __attribute__((sda));
-extern int D_001B1688 __attribute__((sda));
+extern SelectorOwner g_music_state;
+extern SelectorRow g_subtitle_history[];
+extern int g_current_game_mode __attribute__((sda));
+extern int g_game_time __attribute__((sda));
 int func_PAL_00289730(int key, int selection)
 {
     SelectorState *state = &ref_L00_00288E18_00;
-    if (state->active == 0 && state->key == -1 && D_001A63A8.active == 0 &&
-        D_001A63A8.key == -1 && D_0018C958[selection].key != 65535 &&
-        D_001A8BB0 != 6 && D_001B1688 >= 6) {
+    if (state->active == 0 && state->key == -1 && g_music_state.active == 0 &&
+        g_music_state.key == -1 && g_subtitle_history[selection].key != 65535 &&
+        g_current_game_mode != 6 && g_game_time >= 6) {
         state->key = key;
         state->selection = selection;
         state->value40 = 0;

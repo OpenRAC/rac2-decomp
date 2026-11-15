@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002BA8A0: the particle record's constructor. The source's field 8 is nudged up
  * by 0.2 before the 16-byte copy, which is qcopy() (retail copies the updated value and
  * keeps both addresses in registers), and the header stores are in retail's order. The
@@ -5,7 +6,7 @@
  * levels, hence the two ref_ names. */
 #include "common.h"
 
-extern char *func_002B9030(int size);
+extern char *part_alloc(int size);
 
 extern int ref_002BA8A0_01(float f);
 
@@ -15,9 +16,9 @@ extern unsigned char *ref_002BA8A0_00;
 
 /* Allocates a one-byte record, nudges the source's field 8 up by 0.2, copies the source's
  * first 16 bytes into the record and fills the record's header. */
-void func_002BA8A0(void *a0, int a1)
+void part_spawn_glow(void *a0, int a1)
 {
-    char *obj = (char *)AllocParticle(1);
+    char *obj = (char *)part_alloc(1);
     unsigned char byte;
     int r;
 

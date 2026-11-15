@@ -15,16 +15,16 @@ typedef struct {
 
 extern char r1_D_00153888[];
 
-extern void func_0012C3B0(void *);
+extern void mpeg_wait_ipu_idle(void *);
 
 extern void r1_func_0012BC78(int, void *);
 
 extern void r1_func_0012C468(void *, void *);
 
-extern int func_0012B1C0(void *);
+extern int mpeg_wait_block_decode_done(void *);
 
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
-extern short func_0012C508(int, int);
+extern short mpeg_read_ipu_vlc_code(int, int);
 
 struct MpegDecoder;
 extern void r1_func_0012C430(void *, char *, int);
@@ -66,7 +66,7 @@ typedef struct {
 
 /* rac1-decomp src/core/00125630.c: func_00129450 */
 /* Motion-compensate one macroblock (or wait for the intra IDCT) and record its output slot. */
-int func_00129450(void *decoder, int mbAddr, int mbInc, int mbType, int motionType,
+int mpeg_decode_macroblock_motion(void *decoder, int mbAddr, int mbInc, int mbType, int motionType,
                   void *pmv, void *mvfs, void *dmv) {
     Dec00125630 *d = (Dec00125630 *)decoder;
     int intra;
@@ -181,11 +181,11 @@ typedef struct {
     u8 *work; /* 0x81C */
 } MpegDecoderC;
 
-extern void func_00129DA8(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
+extern void _getRef0(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
                           int yofs, int h, int bx, int by, int dx, int dy,
                           int fieldpred, int avg);
 
-extern void func_0012B3E0(MpegDecoderC *d, int DMV[][2], int *dmvector, int mvx,
+extern void mpeg_compute_dual_prime_vectors(MpegDecoderC *d, int DMV[][2], int *dmvector, int mvx,
                           int mvy);
 
 /* _errMessage takes one argument, this call site hands it three; the alias is
@@ -203,7 +203,7 @@ extern MpegMcFuncC D_00137ED0[];
 extern MpegMcFuncC D_00137EF0[];
 
 /* Works out which reference pictures to copy from for one macroblock, going forward and backward, and queues the copy jobs. */
-void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type,
+void mpeg_queue_reference_fetches(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type,
                    int pmv[2][2][2], int mvfs[2][2], int *dmvector) {
     int dmv[2][2];
     MpegRefImageC *refs[2][2];
@@ -227,7 +227,7 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
                 _getRef0(d, d->ref_images[0], mvfs[1][0], 1, 0, 8, bx, by,
                               pmv[1][0][0], pmv[1][0][1] >> 1, same, 0);
             } else if (motion_type == 3) {
-                ComputeMpegDualPrimeVectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1] >> 1);
+                mpeg_compute_dual_prime_vectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1] >> 1);
                 _getRef0(d, d->ref_images[0], 0, 0, 0, 8, bx, by, pmv[0][0][0],
                               pmv[0][0][1] >> 1, same, 0);
                 _getRef0(d, d->ref_images[0], 1, 0, 0, 8, bx, by, dmv[0][0],
@@ -263,7 +263,7 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
                               pmv[1][0][0], pmv[1][0][1], 0, 0);
             } else if (motion_type == 3) {
                 same = d->second_field ? motion_type - 2 : 0;
-                ComputeMpegDualPrimeVectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1]);
+                mpeg_compute_dual_prime_vectors(d, dmv, dmvector, pmv[0][0][0], pmv[0][0][1]);
                 _getRef0(d, refs[0][currentfield], 0, 0, 0, 16, bx, by,
                               pmv[0][0][0], pmv[0][0][1], 0, 0);
                 _getRef0(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
@@ -302,7 +302,7 @@ void func_001296A0(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type
 }
 
 /* Queues the copy of one block from a reference picture, working out where to read it and which copy or average routine to use. */
-void func_00129DA8(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
+void _getRef0(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
                    int yofs, int h, int bx, int by, int dx, int dy, int fieldpred,
                    int avg) {
     MpegMcFetchC *ye;
@@ -445,7 +445,7 @@ typedef struct {
 
 /* rac1-decomp src/core/00125630.c: func_0012A1C8 */
 /* Run a channel's per-block callbacks, then hand its buffer to the output routine. */
-void func_0012A1C8(void *decoderPtr, int idx) {
+void mpeg_run_block_callbacks(void *decoderPtr, int idx) {
     Dec001263A8 *decoder = (Dec001263A8 *)decoderPtr;
     int i;
 
@@ -503,7 +503,7 @@ ASM_FUNC("asm/core", func_0012B0D8);
 
 /* rac1-decomp src/core/00125630.c: func_00127378 */
 /* Sets or clears one flag bit in the video decoder chip control register. */
-void func_0012B198(int bitValue) {
+void mpeg_set_control_flag(int bitValue) {
     unsigned int *ctrlReg = (unsigned int *)0x10002010;
     *ctrlReg = (*ctrlReg & 0xFF7FFFFF) | (bitValue << 23);
 }
@@ -511,7 +511,7 @@ void func_0012B198(int bitValue) {
 /* rac1-decomp src/core/00125630.c: func_001273A0 */
 /* _waitBdecOut (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Waits for the video decoder chip to finish its current block, and resets it if it hit an error. */
-int func_0012B1C0(void *decoderPtr) {
+int mpeg_wait_block_decode_done(void *decoderPtr) {
     MpegDec *d = decoderPtr;
     int cb1[8];
     int cb2[8];
@@ -522,7 +522,7 @@ int func_0012B1C0(void *decoderPtr) {
     unsigned int rest;
 
     ret = 1;
-    WaitIpuIdle(d);
+    mpeg_wait_ipu_idle(d);
     if (D3_QWC != 0 && !(IPU_CTRL & 0x4000)) {
         do {
             if (D4_QWC == 0 && !(D4_CHCR & 0x100)) {
@@ -565,6 +565,6 @@ int func_0012B1C0(void *decoderPtr) {
    2.9-ee turns a void one-call function into a bare tail jump (8 bytes
    against 28). */
 /* Reads the small dual-prime motion value from the video stream. */
-short func_0012B3C0(int decoder) {
-    return ReadIpuVlcCode(decoder, 3);
+short mpeg_read_dual_prime_value(int decoder) {
+    return mpeg_read_ipu_vlc_code(decoder, 3);
 }

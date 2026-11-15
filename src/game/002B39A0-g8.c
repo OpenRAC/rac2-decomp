@@ -25,17 +25,17 @@ typedef struct {
 
 extern Record30_2B39A0 *D_001B17C0;
 extern Pick8_2B39A0 **D_001B17BC;
-extern int D_001B1688;
-extern float func_002B38C8(char *, char *);
+extern int g_game_time;
+extern float weapon_rate_aim_target(char *, char *);
 
 /* Picks the best target from the list for the given slot: the only one if there is one, else the one with the lowest aim rating. */
-char *func_002B39A0(char *self, int index, int *out)
+char *weapon_pick_best_linked_target(char *self, int index, int *out)
 {
     int i;
     char *result;
     float best;
 
-    if (index < 0 || !(index < *(int *)D_001B17C0) || gGameTime < 2)
+    if (index < 0 || !(index < *(int *)D_001B17C0) || g_game_time < 2)
         return 0;
     D_001B17C0[index + 1].mark = 10;
     if (D_001B17BC[index]->count == 0)
@@ -48,7 +48,7 @@ char *func_002B39A0(char *self, int index, int *out)
     result = 0;
     for (i = 0; i < D_001B17BC[index]->count; i++) {
         if (D_001B17BC[index][i].target != 0) {
-            float d = RateAimTarget(self, D_001B17BC[index][i].target);
+            float d = weapon_rate_aim_target(self, D_001B17BC[index][i].target);
             if (d < best) {
                 best = d;
                 result = D_001B17BC[index][i].target;

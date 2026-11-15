@@ -12,24 +12,24 @@ typedef struct {
     int flags0, flags1, enabled, surface, active;
     float tolerance;
 } BounceQuery;
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00300190(void *, void *);
-extern void func_00300248(int, int);
-extern void func_002FEE70(int, void *, int);
-extern void func_002FE880(void *, float *, float);
-extern int func_002FE9D0(BounceQuery *);
-extern int func_002AB1F0(unsigned char *);
-extern void func_002FE8D8(void *, float *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_002E5CF8(int, int, char *);
-extern char *func_L00_003EF3E0(BounceWord128 *, BounceWord128 *);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
-extern float func_00283B98(float, float);
-extern void func_002A9288(void *, float);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(int, int);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_add_object_direction_scaled(void *, float *, float);
+extern int CollideSweptSphere(BounceQuery *);
+extern int moby_get_private_value_0(unsigned char *);
+extern void moby_get_facing_direction(void *, float *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int PlayMobySound(int, int, char *);
+extern char *blast_spawn(BounceWord128 *, BounceWord128 *);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
+extern float FastAddRotations(float, float);
+extern void part_queue_ground_shadow(void *, float);
 extern float D_L00_001B0808;
 extern float D_L00_001B0828 __attribute__((sda));
 extern float D_L00_001B082C __attribute__((sda));
@@ -51,7 +51,7 @@ typedef struct {
 } BounceWorkspace;
 
 /* Updates a flying Gravity Bomb: it moves and bounces, sticks or explodes on a hit, and removes itself when it leaves the level. */
-void func_L00_003EE920(unsigned char *object) {
+void gravity_bomb_projectile_update(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;
     int collision;
@@ -62,12 +62,12 @@ void func_L00_003EE920(unsigned char *object) {
         object[0x20] = 1;
     case 1:
         qcopy(&work.previous, object + 0x10);
-        ComputeViewDirection((char *)&work.previous, (char *)&work.aim, 1);
+        cam_compute_view_direction((char *)&work.previous, (char *)&work.aim, 1);
         FastVecAdd(object + 0x10, object + 0x10, state);
-        TransformVectorOrCopy(object + 0x10, object + 0x10);
-        TriggerCurrentStateEffect((int)state, (int)state);
-        SteerEffectDirection(BI(state, 0x34), state, 0);
-        AddObjectDirectionScaled(object + 0x10, (float *)state, D_L00_001B0808 * 0.00027777778f);
+        vec_transform_or_copy(object + 0x10, object + 0x10);
+        shop_trigger_current_state_effect((int)state, (int)state);
+        part_steer_effect_direction(BI(state, 0x34), state, 0);
+        vec_add_object_direction_scaled(object + 0x10, (float *)state, D_L00_001B0808 * 0.00027777778f);
         work.excluded[0] = 0;
         work.excluded[1] = 0xCE3 /* Gravity Bomb */;
         qcopy(&work.query.previous, &work.previous);
@@ -91,8 +91,8 @@ void func_L00_003EE920(unsigned char *object) {
         if (work.query.hit) {
             category = *(short *)(*(char **)(work.query.hit + 0x24) + 0x46);
             if (category == 5 || category == 9 || (*(unsigned short *)(work.query.hit + 0x34) & 0x4000)) {
-                info = (char *)GetMobyPrivateValue0(work.query.hit);
-                GetObjectFacingDirection(work.query.hit + 0x10, work.normal.f);
+                info = (char *)moby_get_private_value_0(work.query.hit);
+                moby_get_facing_direction(work.query.hit + 0x10, work.normal.f);
                 qcopy(&work.point, object + 0x10);
                 if (info) {
                     FastVecScale(&work.offset, &work.normal, BF(info, 0x10));
@@ -114,19 +114,19 @@ void func_L00_003EE920(unsigned char *object) {
         break;
     case 2:
         PlayMobySound(0, 0, (char *)object);
-        spawn = SpawnBlastMoby((BounceWord128 *)(object + 0x10), (BounceWord128 *)(state + 0x20));
+        spawn = blast_spawn((BounceWord128 *)(object + 0x10), (BounceWord128 *)(state + 0x20));
         BI(spawn, 0xB8) = BI(state, 0x30);
-        ClearEntryFlag(BI(state, 0x34));
-        MarkMobySpawned(object);
+        table_clear_entry_flag(BI(state, 0x34));
+        moby_mark_spawned(object);
         return;
     }
     BF(object, 0xF0) = FastAddRotations(BF(object, 0xF0), BF(state, 0x10));
     BF(object, 0xF4) = FastAddRotations(BF(object, 0xF4), BF(state, 0x14));
-    QueueGroundShadow(object, 0.2f);
+    part_queue_ground_shadow(object, 0.2f);
     if (BF(object, 0x10) < 2.0f || BF(object, 0x10) > 1021.0f ||
         BF(object, 0x14) < 2.0f || BF(object, 0x14) > 1021.0f ||
         BF(object, 0x18) < 2.0f || BF(object, 0x18) > 1021.0f) {
-        ClearEntryFlag(BI(state, 0x34));
-        MarkMobySpawned(object);
+        table_clear_entry_flag(BI(state, 0x34));
+        moby_mark_spawned(object);
     }
 }

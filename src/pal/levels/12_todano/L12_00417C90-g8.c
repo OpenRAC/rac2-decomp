@@ -7,7 +7,7 @@ extern f32 D_L12_001B17FC __attribute__((sda));
 extern f32 D_L12_001B1800 __attribute__((sda));
 extern f32 D_L12_001B1804 __attribute__((sda));
 extern f32 D_L12_001B1808 __attribute__((sda));
-extern void func_002B60B0(u8 *, f32, f32, f32, f32);
+extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 typedef struct StateData {
     u8 pad_0[97];
@@ -49,7 +49,7 @@ void func_PAL_L12_00417C90(u8 *a0, s32 a1, s32 a2, s32 a3) {
         f1 = D_L12_001B17F8;
         f2 = D_L12_001B1804;
         f3 = D_L12_001B1808;
-        func_002B60B0(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
+        moby_set_controller_speed_limits(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
             f2 * 6.981318e-06f,
             f3 * 0.0003490659f);
         q->field_118 = q->field_118 * 2.0f;
@@ -58,7 +58,7 @@ void func_PAL_L12_00417C90(u8 *a0, s32 a1, s32 a2, s32 a3) {
         f1 = D_L12_001B1800;
         f2 = D_L12_001B1804;
         f3 = D_L12_001B1808;
-        func_002B60B0(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
+        moby_set_controller_speed_limits(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
             f2 * 6.981318e-06f,
             f3 * 0.0003490659f);
         q->field_118 = q->field_118 * 2.0f;

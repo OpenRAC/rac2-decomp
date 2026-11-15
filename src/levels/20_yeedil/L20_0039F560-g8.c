@@ -16,21 +16,21 @@ extern Vector D_L20_0029DC20[];
 extern float D_L20_0029EE40[][2];
 extern Vector D_L20_0029F760[];
 extern short D_L20_0029FD60[32][4];
-extern unsigned long long func_0027C878(int);
-extern void func_002FC560(unsigned int,unsigned long long);
-extern void func_00282C98(void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern int func_00283CF0(float);
-extern void func_00280328(void);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00281810(int,void *,void *,void *,int);
-extern void func_00280B90(QuadPacket *,void *,int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(unsigned int,unsigned long long);
+extern void vec_copy_helper_a(void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern int FloatToInt(float);
+extern void font_queue_vu_state(void);
+extern void transform_vector(void *,void *,void *);
+extern void part_draw_glint_effect(int,void *,void *,void *,int);
+extern void draw_world_quad(QuadPacket *,void *,int);
 
 /* Draws the glowing ball of the electric orb and the small flares around it. */
-void func_L20_0039F560(u8 *object)
+void electric_orb_draw_ball(u8 *object)
 {
     QuadPacket packet;
     Vector basis[4], up, relative, transformed;
@@ -45,7 +45,7 @@ void func_L20_0039F560(u8 *object)
     packet.flags=0x8000000044ULL;
     packet.reserved=0;
     VU1_addGSregister(0x47,0x53001);
-    VectorCopyHelperA(&up);
+    vec_copy_helper_a(&up);
     basis[3].q=*(Quadword *)(object+0x10);
     basis[3].f[3]=1.0f;
     FastVecSub(&relative,&D_L20_001B9FC0,&basis[3]);
@@ -71,9 +71,9 @@ void func_L20_0039F560(u8 *object)
         D_L20_0023D8D0[j][2]=transformed.f[2];
         colors[j]=packet.color[0];
     }
-    DrawGlintEffect(148,D_L20_0023D8D0,colors,D_L20_0029EE40,1);
-    DrawGlintEffect(109,D_L20_0023D8D0[146],colors+146,D_L20_0029EE40[146],1);
-    DrawGlintEffect(36,D_L20_0023D8D0[254],colors+254,D_L20_0029EE40[254],1);
+    part_draw_glint_effect(148,D_L20_0023D8D0,colors,D_L20_0029EE40,1);
+    part_draw_glint_effect(109,D_L20_0023D8D0[146],colors+146,D_L20_0029EE40[146],1);
+    part_draw_glint_effect(36,D_L20_0023D8D0[254],colors+254,D_L20_0029EE40[254],1);
     packet.texture=GetEffectTextureDescriptor(11);
     packet.flags=0x8000000048ULL;
     rgba=FloatToInt(*(float *)(state+0x14)*64.0f);

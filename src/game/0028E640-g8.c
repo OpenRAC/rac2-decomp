@@ -24,7 +24,7 @@ extern int D_001A72D0_gp SDATA(D_001A72D0);
 extern int D_001A72DC;
 
 /* Finds a picture in video memory, sending it there first if it is not loaded yet, and gives the drawing setting for it. */
-u64 func_0028E640(int index)
+u64 GetFrameTexture(int index)
 {
     short *pair = (short *)((index << 2) + (u32)D_001B1890);
     TextureEntry *palette = D_001B1898 + pair[0];

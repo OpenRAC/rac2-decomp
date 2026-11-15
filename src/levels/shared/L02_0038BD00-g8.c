@@ -45,10 +45,10 @@ struct PrivateData {
     float secondary[3][4];
 };
 
-extern short *D_L02_001FC060[];
-extern struct Rail *D_L02_001FF1C0[];
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
-extern int D_001A79F0;
+extern short *g_entity_group_lists[];
+extern struct Rail *g_route_polygons[];
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
+extern int g_current_map_index;
 /* Two random ranges, each read as a lower and an upper bound. */
 extern int D_L02_001AEE30[] __attribute__((sda));
 extern float D_L02_001AEE38[] __attribute__((sda));
@@ -58,18 +58,18 @@ extern float D_L02_001AEED0[2][4];
 extern float D_L02_001AEEF0[2][4];
 extern float D_L02_001AEF10[2][4];
 extern float D_L02_001AEF30[2][4];
-extern float func_00282E48(void *, void *);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_00282C88(void *);
-extern float func_002A78D8(float, float);
-extern int func_002A7820(int, int);
-extern void func_00282D30(void *, void *, float);
+extern float fast_vec_dist(void *, void *);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_clear_128(void *);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern void FastVecScale(void *, void *, float);
 
 /* Sets up a group of objects that ride along a rail. It shuffles the group, spaces the members out along the rail with random speeds, and sets their attachment points by model type. */
-void func_L02_0038BD00(struct Object *owner, int group) {
+void InitRailGroupMembers(struct Object *owner, int group) {
     float vectors[6][4];
     struct PrivateData *data;
     struct Object *object;
@@ -82,25 +82,25 @@ void func_L02_0038BD00(struct Object *owner, int group) {
     float (*scaled)[4];
     float segmentLength, endDistance, spacing, speed, railCount, numerator;
 
-    cursor = gEntityGroupLists[group];
+    cursor = g_entity_group_lists[group];
     if (!cursor)
         return;
     data = owner->data;
     owner->flags30 = 0xFF;
-    rail = gRoutePolygons[data->railIndex];
+    rail = g_route_polygons[data->railIndex];
     segmentLength = 1.0f / fast_vec_dist(rail->point[0], rail->point[1]);
     railCount = (float)rail->count;
     endDistance = fast_vec_dist(rail->point[0], rail->point[rail->count - 1]);
     data->closed = endDistance < 5.0f;
     data->rail = rail;
     data->step = data->f08 * (segmentLength * 0.01666666753590107f);
-    cursor = gEntityGroupLists[group];
+    cursor = g_entity_group_lists[group];
     i = 0;
     total = 1;
     while (!(cursor[i] & 0x8000)) {
         if (i > 0) {
             short temporary;
-            j = RandomIntBelow(i);
+            j = math_random_int_below(i);
             temporary = cursor[j];
             cursor[j] = cursor[i];
             cursor[i] = temporary;
@@ -110,24 +110,24 @@ void func_L02_0038BD00(struct Object *owner, int group) {
     }
     spacing = ((float)rail->count * 0.4f) / (float)total;
     speed = (data->step * 0.25f) / spacing;
-    cursor = gEntityGroupLists[group];
+    cursor = g_entity_group_lists[group];
     index = total - 1;
     do {
-        object = (struct Object *)((char *)gMobyPool_L02 + (*cursor & 0x7FFF) * 256);
+        object = (struct Object *)((char *)g_moby_l02_pool + (*cursor & 0x7FFF) * 256);
         data = object->data;
         if (object != owner)
             object->flags34 |= 2;
         numerator = IntToFloat(index);
         data->position = numerator / IntToFloat(total) * railCount;
         data->spacing = spacing;
-        data->speed = speed * RandomFloatRange(0.75f, 1.25f);
-        data->phase = RandomAngle();
+        data->speed = speed * math_random_float_range(0.75f, 1.25f);
+        data->phase = math_random_angle();
         data->enabled = 1;
-        ClearVector128(data->vector20);
-        data->vector20[2] = data->f04 * RandomSignedFloatRange(0.5f, 1.0f);
-        data->u76 = RandomIntRange(D_L02_001AEE30[0], D_L02_001AEE30[1]);
-        data->f68 = RandomAngle();
-        data->f6c = RandomSignedFloatRange(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0002908882452175021f;
+        vec_clear_128(data->vector20);
+        data->vector20[2] = data->f04 * math_random_signed_float_range(0.5f, 1.0f);
+        data->u76 = math_random_int_range(D_L02_001AEE30[0], D_L02_001AEE30[1]);
+        data->f68 = math_random_angle();
+        data->f6c = math_random_signed_float_range(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0002908882452175021f;
         scale = object->scale / *(float *)(object->model + 0x24);
         data->i18 = -1;
         data->i1c = 0;
@@ -409,7 +409,7 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             }
         }
         object->state = 1;
-        if (gCurrentMapIndex != 3)
+        if (g_current_map_index != 3)
             object->flags32 = 0xBE;
         index--;
     } while ((short)*cursor++ >= 0);

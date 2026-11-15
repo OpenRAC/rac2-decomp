@@ -68,24 +68,24 @@ extern float ref_L16_00405818_38 __attribute__((sda));
 extern float ref_L16_00405818_39 __attribute__((nosda));
 extern float ref_L16_00405818_40[];
 
-extern void func_L11_00458D00(L23Quad *);
-extern void func_00281DE8(L23Quad *, s32, s32, s32);
-extern void func_00280B90(L23Quad *, void *, s32);
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00282DD8(float *, float *, float *);
-extern void func_00282F20(float *, float *, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern float func_002A7940(void);
-extern void func_00281EB8(u8 *, s32, u32, s32, float, float, float);
+extern void part_reset_quad_record_b(L23Quad *);
+extern void gfx_init_quad_packet_state(L23Quad *, s32, s32, s32);
+extern void draw_world_quad(L23Quad *, void *, s32);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern void FastVecCross(float *, float *, float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(u8 *, s32, u32, s32, float, float, float);
 
 
 /* Same body as func_L23_00428490, with this function's own callees. */
 extern void ref_L16_00405818_00(L23Quad *);
 /* Draws a glowing beam as several scrolling, spinning quads plus two glows at the start. */
-void func_L16_00405818(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unusedArg3, s32 unusedArg4, u8 *object) {
+void gfx_draw_beam_quads_glows(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unusedArg3, s32 unusedArg4, u8 *object) {
     L23Quad quad;
     float vrel[4] __attribute__((aligned(16)));
     float vaxis[4] __attribute__((aligned(16)));
@@ -107,7 +107,7 @@ void func_L16_00405818(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unuse
 
     vars = *(L23BeamVars **)(object + 0x68);
     ref_L16_00405818_00(&quad);
-    InitQuadPacketState(&quad, ref_L16_00405818_05, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, ref_L16_00405818_05, 1, 0x80);
     quad.rgba[1] = ref_L16_00405818_23 << 24;
     quad.rgba[1] |= ref_L16_00405818_22 << 16;
     quad.rgba[1] |= ref_L16_00405818_21 << 8;
@@ -174,8 +174,8 @@ void func_L16_00405818(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unuse
     quad.uv[3][0] = 1.0f;
     quad.uv[3][1] = 1.0f;
     angle = vars->spin;
-    sinAngle = FastSinOrCosA(angle);
-    cosAngle = FastSinOrCosB(angle);
+    sinAngle = math_fast_sin_or_cos_a(angle);
+    cosAngle = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
         uvOffset[0] = quad.uv[j][0] - 0.5f;
         uvOffset[1] = quad.uv[j][1] - 0.5f;
@@ -185,7 +185,7 @@ void func_L16_00405818(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unuse
         quad.uv[j][1] += 0.5f;
     }
     vars->spin = FastAddRotations(vars->spin, ref_L16_00405818_18 * 0.017453294f);
-    InitQuadPacketState(&quad, ref_L16_00405818_19, 1, 0x80);
+    gfx_init_quad_packet_state(&quad, ref_L16_00405818_19, 1, 0x80);
     quad.d70 = 5;
 
     quad.rgba[1] = ref_L16_00405818_15 << 24;
@@ -269,6 +269,6 @@ void func_L16_00405818(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unuse
     FastVecSub((float *)&quad.corner[3], tip, side);
     draw_world_quad(&quad, 0, 0);
 
-    DrawBillboardQuad_00281EB8(object + 0x10, ref_L16_00405818_13, ref_L16_00405818_14, 1, ref_L16_00405818_43, 0.08f, RandomAngle());
-    DrawBillboardQuad_00281EB8(object + 0x10, ref_L16_00405818_13, 0x80808080, 1, ref_L16_00405818_43 * 0.4f, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(object + 0x10, ref_L16_00405818_13, ref_L16_00405818_14, 1, ref_L16_00405818_43, 0.08f, math_random_angle());
+    gfx_draw_billboard_quad(object + 0x10, ref_L16_00405818_13, 0x80808080, 1, ref_L16_00405818_43 * 0.4f, 0.08f, math_random_angle());
 }

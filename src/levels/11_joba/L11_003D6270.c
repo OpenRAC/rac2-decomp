@@ -1,42 +1,42 @@
 #include "common.h"
 
-extern void func_002A7750(u8 *arg0, s32 arg1, s32 arg2);
+extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
 
-extern u8 *func_002A9640(s32 arg0, s32 arg1, s32 arg2);
+extern u8 *part_find_owned_effect_slot(s32 arg0, s32 arg1, s32 arg2);
 
-extern void func_002A7470(u8 *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void anim_start_blended(u8 *arg0, s32 arg1, s32 arg2, s32 arg3);
 
 extern void func_002A05A8(u8 *arg0);
 
-extern s32 func_002E59B0(u8 *arg0, s32 arg1);
+extern s32 snd_is_voice_playing_for_owner(u8 *arg0, s32 arg1);
 
-extern s32 func_002E5CF8(s32 arg0, s32 arg1, u8 *arg2);
+extern s32 PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 
-extern void func_002E59F8(s32 arg0);
+extern void snd_stop_voice(s32 arg0);
 
-extern s32 func_00283CF0(f32 arg0);
+extern s32 FloatToInt(f32 arg0);
 
-extern void func_002A04B8(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3);
+extern void get_moby_color(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3);
 
-extern void func_002A93B0(u8 *arg0);
+extern void moby_update_ground_check(u8 *arg0);
 
-extern f32 func_00282E48(u8 *arg0, u8 *arg1);
+extern f32 fast_vec_dist(u8 *arg0, u8 *arg1);
 
-extern void func_L11_003F1D18();
+extern void joba_enemy_init();
 
-extern void func_L11_003F1DB0(u8 *arg0);
+extern void joba_enemy_apply_damage(u8 *arg0);
 
-extern void func_L11_003F1F48(u8 *arg0);
+extern void joba_enemy_update_state_machine(u8 *arg0);
 
-extern void func_L11_003F2A30(u8 *arg0);
+extern void joba_enemy_update_orbit(u8 *arg0);
 
-extern void func_L11_003F2C28(u8 *arg0);
+extern void joba_enemy_update_effects(u8 *arg0);
 
-extern s32 func_L11_003F2E00(u8 *arg0);
+extern s32 joba_enemy_is_active(u8 *arg0);
 
-extern void func_L11_003F3098(u8 *arg0);
+extern void joba_enemy_reset(u8 *arg0);
 
-extern void func_L11_003F31C0(u8 *arg0);
+extern void joba_enemy_clear_counters(u8 *arg0);
 
 extern u8 D_L11_00188660[];
 
@@ -48,33 +48,33 @@ extern s32 D_L11_001A8FF4 __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern f32 func_002B04E0(u8 *a0, f32 *a1, s32 a2);
+extern f32 vec_get_heading_angle(u8 *a0, f32 *a1, s32 a2);
 
-extern f32 func_00282E80(u8 *a0, u8 *a1);
+extern f32 vec_distance_xy(u8 *a0, u8 *a1);
 
-extern void func_00282CF0(f32 *a0, const f32 *a1, const f32 *a2);
+extern void FastVecSub(f32 *a0, const f32 *a1, const f32 *a2);
 
 extern u8 D_L11_00189EA0[];
 
-extern void func_L11_003F3CB8(u8 *arg0);
+extern void joba_beams_draw(u8 *arg0);
 
 /* The entity table's base and the current level, read as retail's tied absolute loads. */
-extern u8 *D_L11_001B359C[] __attribute__((sda));
+extern u8 *g_moby_l11_table[] __attribute__((sda));
 
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 g_current_map_index[] __attribute__((sda));
 
 /* Per-level flag bytes, sixteen per level. */
 extern u8 D_0019B2E8[][16];
 
-extern void func_00282F20(void *, void *, f32);
+extern void vec_scale_to_length(void *, void *, f32);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern s32 func_002B38B8(u8 *);
+extern s32 flag_is_third_pending_set(u8 *);
 
-extern f32 func_00283BE0(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
 
-extern f32 func_002AA548(void *, void *, f32, f32, f32, f32);
+extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 
 /* Defined in L11_003D6270-path.c. */
 
@@ -85,26 +85,26 @@ extern f32 func_002AA548(void *, void *, f32, f32, f32, f32);
 
 /* Per-frame update for the Joba enemy. On the first frame it sets itself up; after that it
    runs damage, its state machine, its movement and its effects. */
-void func_L11_003F1C68(u8 *mobyArg) {
+void arachnoid_update(u8 *mobyArg) {
     u8 *moby = mobyArg;
     if (*(u8 *)(moby + 0x20) == 0) {
-        InitJobaEnemy();
+        joba_enemy_init();
     } else {
-        if (IsJobaEnemyActive(moby) != 0)
+        if (joba_enemy_is_active(moby) != 0)
             return;
         if (*(u8 *)(moby + 0x31) != 0
             && fast_vec_dist(moby + 0x10, D_L11_001BA8C0) < 48.0f) {
-            UpdateMobyGroundCheck(moby);
+            moby_update_ground_check(moby);
             *(u8 *)(moby + 0x6F) = 0x2D;
         }
-        ApplyJobaEnemyDamage(moby);
-        UpdateJobaEnemyStateMachine(moby);
-        UpdateJobaEnemyOrbit(moby);
-        UpdateJobaEnemyEffects(moby);
+        joba_enemy_apply_damage(moby);
+        joba_enemy_update_state_machine(moby);
+        joba_enemy_update_orbit(moby);
+        joba_enemy_update_effects(moby);
     }
 }
 /* Sets up a new Joba enemy: fills in its starting values and puts it in its idle state. */
-void func_L11_003F1D18(u8 *mobyArg) {
+void joba_enemy_init(u8 *mobyArg) {
     u8 *moby = mobyArg;
     u8 *vars = *(u8 **)(moby + 0x68);
     *(u8 *)(vars + 0x48) = FloatToInt(15.0f);
@@ -114,7 +114,7 @@ void func_L11_003F1D18(u8 *mobyArg) {
     *(f32 *)(vars + 0x30) = 1.5f;
     *(u8 *)(vars + 0x29) = 1;
     *(u16 *)(moby + 0x34) |= 0x100;
-    ResetJobaEnemy(moby);
+    joba_enemy_reset(moby);
     *(s32 *)(vars + 0x290) = -1;
 }
 
@@ -128,7 +128,7 @@ void func_L11_003F1D18(u8 *mobyArg) {
 
 
 /* True when the engine's two global gates are both clear and the stage byte is not nine. */
-s32 func_L11_003F2E00(u8 *moby) {
+s32 joba_enemy_is_active(u8 *moby) {
     s32 result = 0;
 
     if (D_L11_001A8FF0 == 0 || D_L11_001A8FF4 == 0)
@@ -137,41 +137,41 @@ s32 func_L11_003F2E00(u8 *moby) {
 }
 
 /* Puts the enemy back into state 4. */
-void func_L11_003F2D18(u8 *moby) {
-    SetMobyState(moby, 4, -1);
+void joba_enemy_return_state(u8 *moby) {
+    moby_set_state(moby, 4, -1);
 }
 
 /* Remembers the enemy's current state, then switches it to its hit reaction state. */
-void func_L11_003F2DC8(u8 *mobyArg) {
+void joba_enemy_enter_hit_reaction(u8 *mobyArg) {
     u8 *moby = mobyArg;
     s32 vars = *(s32 *)(moby + 0x68);
     u8 oldState = *(u8 *)(moby + 0x20);
     u8 savedValue = *(u8 *)(moby + 0x95);
     *(u8 *)(moby + 0x94) = oldState;
     *(u16 *)(vars + 0x294) = savedValue;
-    SetMobyState(mobyArg, 3, -1);
+    moby_set_state(mobyArg, 3, -1);
 }
 
 /* Reports the signed area of the triangle (arg0, arg1, arg2). */
-f32 func_L11_003F2F00(f32 *pointA, f32 *pointB, f32 *pointC) {
+f32 math_signed_triangle_area(f32 *pointA, f32 *pointB, f32 *pointC) {
     return (pointA[0] - pointC[0]) * (pointB[1] - pointC[1])
          - (pointA[1] - pointC[1]) * (pointB[0] - pointC[0]);
 }
 
 
 /* Resets the enemy to its idle look and clears its counters. */
-void func_L11_003F3098(u8 *moby) {
-    ClearJobaEnemyCounters(moby);
-    StartAnimationBlended(moby, 0, 0, 3);
+void joba_enemy_reset(u8 *moby) {
+    joba_enemy_clear_counters(moby);
+    anim_start_blended(moby, 0, 0, 3);
     func_002A05A8(moby);
-    SetMobyState(moby, 1, 0);
+    moby_set_state(moby, 1, 0);
     *(u8 *)(moby + 0x31) = 0;
     *(s32 *)(moby + 0x98) = 0;
     *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 1) & 0xEFFF;
 }
 
 /* Clears one pair of the enemy's counters and sets the other pair to 1. */
-void func_L11_003F3108(u8 *moby) {
+void joba_enemy_set_counters_one(u8 *moby) {
     s32 i = 1;
     u16 *counters = (u16 *)(*(u8 **)(moby + 0x68) + 0x278);
     do {
@@ -184,7 +184,7 @@ void func_L11_003F3108(u8 *moby) {
 
 /* Clears one pair of the enemy's counters, sets the other pair to 2 and starts its sound
    effect if it has none. */
-void func_L11_003F3140(u8 *mobyArg) {
+void joba_enemy_set_counters_two(u8 *mobyArg) {
     s32 i = 1;
     u8 *moby = mobyArg;
     u8 *vars = *(u8 **)(moby + 0x68);
@@ -195,13 +195,13 @@ void func_L11_003F3140(u8 *mobyArg) {
         i--;
         counters++;
     } while (i >= 0);
-    if (IsVoicePlayingForOwner(moby, *(s32 *)(vars + 0x290)) == 0) {
+    if (snd_is_voice_playing_for_owner(moby, *(s32 *)(vars + 0x290)) == 0) {
         *(s32 *)(vars + 0x290) = PlayMobySound(2, 4, moby);
     }
 }
 
 /* Clears the enemy's counters and stops its sound effect. */
-void func_L11_003F31C0(u8 *mobyArg) {
+void joba_enemy_clear_counters(u8 *mobyArg) {
     s32 i = 1;
     u8 *moby = mobyArg;
     u8 *vars = *(u8 **)(moby + 0x68);
@@ -217,7 +217,7 @@ void func_L11_003F31C0(u8 *mobyArg) {
     if (soundIndex != -1) {
         u8 *sound = D_L11_00188660 + soundIndex * 0x70;
         if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
-            StopSoundVoice(soundIndex);
+            snd_stop_voice(soundIndex);
         }
     }
     *(s32 *)(vars + 0x290) = -1;
@@ -255,67 +255,67 @@ void func_L11_003F31C0(u8 *mobyArg) {
    places the linked table entity at this one's position, offset along two of its axes. */
 /* Swings a part of the object between a few angles and keeps a linked object attached in
    front of it. */
-void func_L11_004169E0(u8 *mobyArg) {
+void swinging_linked_moby_update(u8 *mobyArg) {
     f32 frontOffset[4], sideOffset[4];
     u8 *moby = mobyArg;
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *linked = gMobyTable_L11[0] + *(s32 *)vars * 256;
+    u8 *linked = g_moby_l11_table[0] + *(s32 *)vars * 256;
     u8 *pos;
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (IsThirdPendingFlagSet(linked)) {
+        if (flag_is_third_pending_set(linked)) {
             PlayMobySound(0, 0, moby);
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
-        if (D_0019B2E8[gCurrentMapIndex[0]][*(u8 *)(moby + 0xB0)] & 0x80) {
+        if (D_0019B2E8[g_current_map_index[0]][*(u8 *)(moby + 0xB0)] & 0x80) {
             *(f32 *)(moby + 0xF0) = fast_subtract_rotations(*(f32 *)(moby + 0xF0), 1.5707964897155762f);
-            SetMobyState(moby, 6, -1);
+            moby_set_state(moby, 6, -1);
         }
         break;
     case 2:
-        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0005332950968295336f,
+        math_step_value_toward_target(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0005332950968295336f,
                       174.53294372558594f, 290.8882751464844f);
         if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(vars + 4) = 0;
-            SetMobyState(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
             PlayMobySound(1, 0, moby);
         }
         break;
     case 3:
-        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.3089970350265503f, 0.01745329424738884f,
+        math_step_value_toward_target(moby + 0xF0, vars + 4, -1.3089970350265503f, 0.01745329424738884f,
                       0.0004363323678262532f, 0.872664749622345f);
         if (*(f32 *)(moby + 0xF0) >= -1.3089970350265503f) {
             *(s32 *)(vars + 4) = 0;
-            SetMobyState(moby, 4, -1);
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 4:
-        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
+        math_step_value_toward_target(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
                       0.174532949924469f, 2.9088826179504395f);
         if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(vars + 4) = 0;
-            SetMobyState(moby, 5, -1);
+            moby_set_state(moby, 5, -1);
             PlayMobySound(1, 0, moby);
         }
         break;
     case 5:
-        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.483530044555664f, 0.01745329424738884f,
+        math_step_value_toward_target(moby + 0xF0, vars + 4, -1.483530044555664f, 0.01745329424738884f,
                       0.0004363323678262532f, 0.872664749622345f);
         if (*(f32 *)(moby + 0xF0) >= -1.483530044555664f) {
             *(s32 *)(vars + 4) = 0;
-            SetMobyState(moby, 6, -1);
+            moby_set_state(moby, 6, -1);
         }
         break;
     case 6:
-        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
+        math_step_value_toward_target(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
                       0.174532949924469f, 2.9088826179504395f);
         if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
             *(s32 *)(vars + 4) = 0;
-            SetMobyState(moby, 7, -1);
+            moby_set_state(moby, 7, -1);
             PlayMobySound(1, 0, moby);
         }
         break;
@@ -334,9 +334,9 @@ void func_L11_004169E0(u8 *mobyArg) {
 /* Reports whether the helper found the measured resource and updates its timer. */
 /* Checks whether the enemy's damage source still exists and takes its damage off the
    enemy's health. */
-s32 func_L11_00420C38(u8 *mobyArg) {
+s32 joba_enemy_apply_source_damage(u8 *mobyArg) {
     u8 *vars = *(u8 **)(mobyArg + 0x68);
-    u8 *source = FindOwnedEffectSlot(*(s32 *)(vars + 0x280), 0x10000, 0);
+    u8 *source = part_find_owned_effect_slot(*(s32 *)(vars + 0x280), 0x10000, 0);
     if (source != 0) {
         *(f32 *)(vars + 0x20) = *(f32 *)(vars + 0x20) - *(f32 *)(source + 0x2C);
         return 1;

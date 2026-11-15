@@ -1,9 +1,10 @@
+#include "names.h"
 /* func_PAL_L05_00447F28, the PAL copy of func_L05_00441D40: the same C, where 0.016666668f becomes
    0.020000001f. */
 #include "include_asm.h"
 #include "common.h"
 
-extern int D_L05_001B1B20 __attribute__((sda));
+extern int g_ship_state __attribute__((sda));
 
 extern char *D_L05_001B1EC4 MACRO_ADDR;
 extern char *D_L05_001B251C MACRO_ADDR;
@@ -29,11 +30,11 @@ extern float D_L05_001B1A18 __attribute__((sda));
 extern float D_L05_001B1AC0 __attribute__((sda));
 extern int D_L05_001B1B74 __attribute__((sda));
 extern int D_L05_001B1B78 __attribute__((sda));
-extern void func_00282C88(void *a0);
-extern void func_L05_00441EA0(void *a0);
-extern void func_L00_002E54E0(float a0);
+extern void vec_clear_128(void *a0);
+extern void cam_load_entry_vectors(void *a0);
+extern void gfx_set_clamped_view_distance(float a0);
 extern void func_L05_003D1E20(void);
-extern void func_L05_00442720(void);
+extern void ship_save_settings(void);
 
 typedef struct Block_00441D40 {
     float f00, f04, f08, f0C, f10, f14;
@@ -122,7 +123,7 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     state->pos[0] = D_L05_001B1A10;
     state->pos[1] = D_L05_001B1A14;
     state->pos[2] = D_L05_001B1A18;
-    func_00282C88(state->v10);
+    vec_clear_128(state->v10);
     state->f40 = 0;
     state->f44 = 0;
 
@@ -142,10 +143,10 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     blk->f24 = 0;
     blk->f1E = 0;
     blk->f1F = 0;
-    func_00282C88(state2->blk.v50);
-    func_00282C88(state2->blk.v60);
-    func_L05_00441EA0(object);
-    func_L00_002E54E0(4096.0f);
+    vec_clear_128(state2->blk.v50);
+    vec_clear_128(state2->blk.v60);
+    cam_load_entry_vectors(object);
+    gfx_set_clamped_view_distance(4096.0f);
 
     table = (Slot_00441D40 *)D_L05_001B1EC4;
     actors = D_L05_001B251C;
@@ -161,9 +162,9 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     vars->rate = rate;
     vars->f214 = -1;
     object->f7E = 0;
-    D_L05_001B1B20 = 0;
+    g_ship_state = 0;
     func_L05_003D1E20();
     D_L05_001B1B74 = 0;
     D_L05_001B1B78 = 0;
-    func_L05_00442720();
+    ship_save_settings();
 }

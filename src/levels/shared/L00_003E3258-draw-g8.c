@@ -22,23 +22,23 @@ extern int *D_L00_001B2B58 MACRO_ADDR;
 extern short D_L00_002983B0[][4][2];
 extern RenderVec5BD8 D_L00_002976D0[];
 extern float D_L00_00299130[][2];
-extern RenderVec5BD8 D_L00_001B8DC0;
-extern unsigned long func_0027C878(int);
-extern void func_00282C88(void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00283098(void *,void *,void *);
-extern float func_00282E20(void *);
+extern RenderVec5BD8 g_camera_l00_position;
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *,void *,float);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern float vec_length_xy(void *);
 extern float ref_L00_003E5BD8_00(float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern float func_00282DB0(void *,void *);
-extern char * func_L00_003E6778(char *,int,float,float,void *);
-extern void func_00280B90(void *,int,int);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern float FastVecDot(void *,void *);
+extern char * AllocateOwnedEffectParticle(char *,int,float,float,void *);
+extern void draw_world_quad(void *,int,int);
 
 /* Draws the large blast shell around the object as 215 quads, skipping the ones that face away from the camera. */
-void func_L00_003E5BD8(char *object_)
+void blast_draw_shell_mesh(char *object_)
 {
     Quad5BD8 quad;
     RenderVec5BD8 matrix[3];
@@ -55,9 +55,9 @@ void func_L00_003E5BD8(char *object_)
     quad.gs[2] = 0xFF9000000260UL;
     quad.gs[0] = 0;
     quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3] = D_L00_001B0618 + (*(int *)(data+28) << 24);
-    ClearVector128(matrix[0]);
-    ClearVector128(matrix[1]);
-    ClearVector128(matrix[2]);
+    vec_clear_128(matrix[0]);
+    vec_clear_128(matrix[1]);
+    vec_clear_128(matrix[2]);
     matrix[0][0] = 1.0f;
     matrix[1][1] = 1.0f;
     matrix[2][2] = *(float *)(data+16)*0.865f;
@@ -79,7 +79,7 @@ void func_L00_003E5BD8(char *object_)
         matrix_mul_vec3(quad.vertices[1],quad.vertices[1],matrix);
         matrix_mul_vec3(quad.vertices[2],quad.vertices[2],matrix);
         matrix_mul_vec3(quad.vertices[3],quad.vertices[3],matrix);
-        ClearVector128(center);
+        vec_clear_128(center);
         for(i=0;i<4;i++) {
             quad.uv[i][0] -= quad.vertices[i][2]*0.125f;
             quad.vertices[i][0] *= ref_L00_003E5BD8_00(quad.vertices[i][2]) + 2.0f;
@@ -91,7 +91,7 @@ void func_L00_003E5BD8(char *object_)
             FastVecAdd(center,center,quad.vertices[i]);
         }
         FastVecScale(center,center,0.25f);
-        FastVecSub(normal,center,gCameraPosition_L00);
+        FastVecSub(normal,center,g_camera_l00_position);
         vec_scale_to_length(normal,normal,1.0f);
         FastVecSub(edge1,quad.vertices[2],quad.vertices[0]);
         FastVecSub(edge2,quad.vertices[2],quad.vertices[1]);

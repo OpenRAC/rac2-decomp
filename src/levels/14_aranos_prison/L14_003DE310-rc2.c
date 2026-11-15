@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -25,7 +26,7 @@
 #include "common.h"
 
 /* Forgets any of the four linked mobys that have died or run out of health. */
-void func_L14_003DE310(s8 *moby) {
+void moby_clear_dead_linked(s8 *moby) {
     s32 remaining;
     s8 **slot;
     s8 *linked;

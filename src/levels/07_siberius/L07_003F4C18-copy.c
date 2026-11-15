@@ -1,11 +1,11 @@
 #include "common.h"
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002AFDD8(char *, char *, char *, char *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
 
 /* Gets the world positions of the two ends of the beam, following its support object if it has one. */
-void func_L07_003F4C18(u8 *moby, u8 *start, u8 *end)
+void beam_get_end_points(u8 *moby, u8 *start, u8 *end)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
 

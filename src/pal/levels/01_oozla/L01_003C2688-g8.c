@@ -7,7 +7,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern s32 D_L01_001AFE44 __attribute__((sda));
 extern s32 D_L01_001AFE48 __attribute__((sda));
 extern s32 D_L01_001A8F40 __attribute__((sda));
@@ -64,7 +64,7 @@ void func_PAL_L01_003C2688(u8 *moby)
     s32 near;
 
     data = *(u8 **)(moby + 0x68);
-    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6F) {
+    if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
         if (*(s16 *)(data + 0x202) != -1) {
             *(s32 *)(data + 0x204) = 0;
             func_002F2A30(*(s16 *)(data + 0x202));
@@ -292,9 +292,9 @@ void func_PAL_L01_003C2688(u8 *moby)
         }
         *(f32 *)(data + 0x22C) = *(f32 *)(data + 0x20C);
         *(s32 *)(data + 0x29C) = *(s32 *)(data + 0x298);
-        if (*(s32 *)(data + 0x114) == 0 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x31 ||
-            ((Hero *)D_00189E20)->i[0x229C / 4] == 0x11 || ((Hero *)D_00189E20)->i[0x229C / 4] == 0x12 ||
-            D_L01_001A8F40 == 2 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6F) {
+        if (*(s32 *)(data + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
+            ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
+            D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             *(s32 *)(data + 0x114) = 0;
             if (*(s32 *)(data + 0x238) == 0) {
                 *(f32 *)(data + 0x22C) = 0;
@@ -377,9 +377,9 @@ void func_PAL_L01_003C2688(u8 *moby)
         *(f32 *)(data + 0x22C) = 0;
         *(s32 *)(data + 0x29C) = *(s32 *)(data + 0x298);
         near = func_003165E8(moby + 0x10, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0;
-        if (*(s32 *)(data + 0x114) == 0 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x31 ||
-            ((Hero *)D_00189E20)->i[0x229C / 4] == 0x11 || ((Hero *)D_00189E20)->i[0x229C / 4] == 0x12 ||
-            !near || D_L01_001A8F40 == 2 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6F) {
+        if (*(s32 *)(data + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
+            ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
+            !near || D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             if (*(s32 *)(data + 0x238) != 0) {
                 func_003BDBB0(moby);
                 *(s32 *)(data + 0x230) = 0;

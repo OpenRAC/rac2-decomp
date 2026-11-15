@@ -3,15 +3,15 @@ extern float D_L19_001B1D5C __attribute__((sda));
 extern float D_L19_001B1D60 __attribute__((sda));
 extern float D_L19_001B1D64 __attribute__((sda));
 extern float D_L19_001B1D68 __attribute__((sda));
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00282E80(void *, void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002B3868(void *);
-extern void func_002E5CF8(int, int, void *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float vec_distance_xy(void *, void *);
+extern void moby_set_state(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern void PlayMobySound(int, int, void *);
 typedef struct { u8 *other; float angle, height, time; } LiftState;
 /* Lowers and rotates the lift, waits for the linked object to leave, then resets it. */
-void func_L19_0041E5B0(u8 *moby)
+void grelbin_lift_update(u8 *moby)
 {
     LiftState *vars = *(LiftState **)(moby + 0x68);
     switch (moby[0x20]) {
@@ -24,25 +24,25 @@ void func_L19_0041E5B0(u8 *moby)
         height = *(float *)(moby + 0x18) - D_L19_001B1D5C;
         *(float *)(moby + 0xF8) = angle;
         *(float *)(moby + 0x18) = height;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
         if (vars->other && vars->other[0x20] != 0xFE && vars->other[0x20] != 0xFD) {
             vars->time = 0;
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        if (SetFirstPendingFlag(moby)) PlayMobySound(0, 0, moby);
+        if (flag_set_first_pending(moby)) PlayMobySound(0, 0, moby);
         vars->time += 1.0f / D_L19_001B1D60;
         if (vars->time > 1.0f) {
             vars->time = 0;
             *(float *)(moby + 0x18) = vars->height;
             moby[0xBC] = 1;
-            SetMobyState(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
         } else {
-            float ease = (FastSinOrCosA(vars->time * 3.1415927f) + 1.0f) * 0.5f;
+            float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             if (ease > 1.0f) ease = 1.0f;
             else if (ease < 0.0f) ease = 0.0f;
             *(float *)(moby + 0x18) = vars->height - ease * D_L19_001B1D5C;
@@ -54,9 +54,9 @@ void func_L19_0041E5B0(u8 *moby)
             vars->time = 0;
             *(float *)(moby + 0xF8) = vars->angle;
             moby[0xBC] = 2;
-            SetMobyState(moby, 4, -1);
+            moby_set_state(moby, 4, -1);
         } else {
-            float ease = (FastSinOrCosA(vars->time * 3.1415927f) + 1.0f) * 0.5f;
+            float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             *(float *)(moby + 0xF8) = FastAddRotations(vars->angle, ease * 3.1415927f);
         }
         break;
@@ -66,18 +66,18 @@ void func_L19_0041E5B0(u8 *moby)
             moby[0xBC] = 3;
             vars->other = 0;
             vars->time = 1.0f;
-            SetMobyState(moby, 5, -1);
+            moby_set_state(moby, 5, -1);
         }
         break;
     case 5:
-        if (SetFirstPendingFlag(moby)) PlayMobySound(1, 0, moby);
+        if (flag_set_first_pending(moby)) PlayMobySound(1, 0, moby);
         vars->time -= 1.0f / D_L19_001B1D64;
         if (vars->time <= 0.0f) {
             vars->time = 1.0f;
             *(float *)(moby + 0xF8) = FastAddRotations(vars->angle, 3.1415927f);
-            SetMobyState(moby, 6, -1);
+            moby_set_state(moby, 6, -1);
         } else {
-            float ease = (FastSinOrCosA(vars->time * 3.1415927f) + 1.0f) * 0.5f;
+            float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             *(float *)(moby + 0xF8) = FastAddRotations(vars->angle, ease * 3.1415927f);
         }
         break;
@@ -88,9 +88,9 @@ void func_L19_0041E5B0(u8 *moby)
             vars->time = 0;
             moby[0xBC] = 0;
             *(float *)(moby + 0x18) = height;
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
         } else {
-            float ease = (FastSinOrCosA(vars->time * 3.1415927f) + 1.0f) * 0.5f;
+            float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             if (ease > 1.0f) ease = 1.0f;
             else if (ease < 0.0f) ease = 0.0f;
             *(float *)(moby + 0x18) = vars->height - ease * D_L19_001B1D5C;

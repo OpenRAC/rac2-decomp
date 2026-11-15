@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_0028B950(void *);
+extern int hud_init_counter_values(void *);
 
 int func_PAL_L00_002F8BE8(char *self) {
     *(short *)(self + 0x48) = 0;
@@ -9,7 +9,7 @@ int func_PAL_L00_002F8BE8(char *self) {
     *(int *)(self + 0x58) = 0x20;
     *(int *)(self + 0x7C) = 0x26;
     *(int *)(self + 0x5C) = 0x20;
-    return func_0028B950(self);
+    return hud_init_counter_values(self);
 }
 
 

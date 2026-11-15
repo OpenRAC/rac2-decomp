@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: GPL-3.0-only
  * OpenRAC nonmatching d43c3b99b984fb63556c844a21ee99e8e31d2deb; nonmatching/game/func_002D5048.c
  */
@@ -34,21 +35,21 @@ typedef struct {
     int fallback;
 } CallbackState;
 typedef struct { char reserved00[0x1C4]; int flags; } MenuGameState;
-extern MenuGameState D_00138180;
-extern CallbackState D_001F2840;
+extern MenuGameState g_pad_state;
+extern CallbackState g_pause_menu_state;
 extern unsigned char D_001A7BB4;
 extern int D_0025E0B0 __attribute__((nosda));
 /* Checks whether a menu item matches the current selection and reports accept, cancel or nothing based on the buttons pressed. */
-int func_002D5048(int selection)
+int menu_check_selection_input(int selection)
 {
-    CallbackState *state = &gPauseMenuState;
+    CallbackState *state = &g_pause_menu_state;
     D_0025E0B0 = D_001A7BB4;
     if (*(int *)(state->source + 0xE8) != selection)
         return 0;
-    if ((gPadState.flags & 0x900) && state->fallback == 0)
+    if ((g_pad_state.flags & 0x900) && state->fallback == 0)
         return 1;
-    if (gPadState.flags & 0x10) {
-        CallbackState *update = &gPauseMenuState;
+    if (g_pad_state.flags & 0x10) {
+        CallbackState *update = &g_pause_menu_state;
         int value = *(int *)(update->source + 0xE0);
         int result;
         if (value != 0)

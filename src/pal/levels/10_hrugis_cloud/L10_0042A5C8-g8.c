@@ -19,7 +19,7 @@ extern int D_L10_001B3548 __attribute__((sda));
 extern int D_L10_001B3544 __attribute__((sda));
 /* The count shown beside the icon is the fourth word of this block. Read as an element, it stays a
    two-word load, which keeps it out of the timer test's delay slot as in retail. */
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern u8 *D_L10_001A904C;
 /* The settings block; PAL's language byte is its member at 0x24. */
 typedef struct {
@@ -27,7 +27,7 @@ typedef struct {
     u8 language;
     u8 pad25[3];
 } Settings;
-extern Settings D_001A7B90 __attribute__((sda));
+extern Settings g_is_pal_video __attribute__((sda));
 /* the selected kind, -2 for none */
 extern s32 D_L10_001B13A0 __attribute__((sda));
 extern int D_L10_001B14A8 __attribute__((sda)), D_L10_001B14B0 __attribute__((sda));
@@ -37,15 +37,15 @@ extern float D_L10_001B2D84;
 extern int D_L10_001B2D80;
 extern Block D_L10_001B1520;
 extern char D_L10_001B1530[] MACRO_ADDR;
-extern void *func_00336D50(void *, s32);
+extern void *table_find_by_id(void *, s32);
 /* (sprite, color, x, y, scale, alpha, angle) */
-extern void func_00300A00(void *, u32, f32, f32, f32, f32, f32);
-extern s32 func_00282948(void *);
-extern f32 func_00283CE0(s32);
-extern void *func_0028E588(s32, s32);
-extern void func_0028EA58(void *, s32, s32, s32, s32, Block *);
-extern s32 func_00115DA8(char *, const char *, ...);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern void gfx_draw_scaled_object_two_axes(void *, u32, f32, f32, f32, f32, f32);
+extern s32 math_fast_float_d(void *);
+extern f32 IntToFloat(s32);
+extern void *GetIconFrame(s32, s32);
+extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
+extern s32 sprintf(char *, const char *, ...);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -108,7 +108,7 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
     Block color;
 
     if (D_L10_001B3548 == 0) {
-        D_L10_001B3544 = D_001A79F0[3];
+        D_L10_001B3544 = g_current_map_index[3];
         D_L10_001B3548 = 1;
     }
     if (D_L10_001A904C == 0)
@@ -117,10 +117,10 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
         HUD_SPRITE(0xBD, 0x60442D00, D_L10_001B14A8, D_L10_001B14AC, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, D_L10_001B14A8, D_L10_001B14AC, -1.0f, 1.0f, 0.0f);
     }
-    if (second && D_L10_001B3544 < D_001A79F0[3]) {
-        if (func_00282948(state + 0x4C) == 0) {
+    if (second && D_L10_001B3544 < g_current_map_index[3]) {
+        if (math_fast_float_d(state + 0x4C) == 0) {
             if (*(s32 *)(state + 0x4C) >= 291) {
-                fade = func_00283CE0(250 - *(s32 *)(state + 0x4C)) * 0.1f;
+                fade = IntToFloat(250 - *(s32 *)(state + 0x4C)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -128,7 +128,7 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
             } else if (*(s32 *)(state + 0x4C) < 10) {
-                fade = func_00283CE0(*(s32 *)(state + 0x4C)) * 0.1f;
+                fade = IntToFloat(*(s32 *)(state + 0x4C)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -141,15 +141,15 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L10_001B14B0, D_L10_001B14B4, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L10_001B14B0, D_L10_001B14B4, 1.0f, 1.0f, 0.0f);
                 color = D_L10_001B1520;
-                func_0028EA58(func_0028E588(0xEAA2, 3), D_L10_001B14B0 - 51,
+                hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), D_L10_001B14B0 - 51,
                               screen_coord(D_L10_001B2D80, (f32)(D_L10_001B14B4 - 13), 1.0f), 28, 28, &color);
-                func_00115DA8(text, D_L10_001B1530, D_001A79F0[3]);
+                sprintf(text, D_L10_001B1530, g_current_map_index[3]);
                 textX = D_L10_001B14B0 + 5;
-                func_0027F5B8(textX, label_y((void *)textX, (f32)(D_L10_001B14B4 + 2), D_L10_001B2D84, 0.5f, 1),
+                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L10_001B14B4 + 2), D_L10_001B2D84, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {
-            D_L10_001B3544 = D_001A79F0[3];
+            D_L10_001B3544 = g_current_map_index[3];
             *(s32 *)(state + 0x4C) = 250;
         }
     }
@@ -158,7 +158,7 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
         HUD_SPRITE(0xC2, 0x55F0C070, D_L10_001B14B8, D_L10_001B14BC, 1.35f, 1.0f, 0.0f);
     }
     if (fourth) {
-        if ((D_001A7B90.language == 3 || D_001A7B90.language == 4) && D_L10_001B13A0 == 2) {
+        if ((g_is_pal_video.language == 3 || g_is_pal_video.language == 4) && D_L10_001B13A0 == 2) {
             LANGUAGE_SPRITE(0xC1, 0x60442D00);
             LANGUAGE_SPRITE(0xC2, 0x55F0C070);
         } else {

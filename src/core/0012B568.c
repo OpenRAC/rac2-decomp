@@ -2,35 +2,35 @@
 #include "structs.h"
 
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
-extern short func_0012C508(int, int);
+extern short mpeg_read_ipu_vlc_code(int, int);
 
 extern char r1_D_001538A8[];
 
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *, int);
 
-extern void func_0012C788(void *, int);
+extern void mpeg_skip_bits(void *, int);
 
 extern void r1_func_0012C430(void *, char *, int);
 
-extern int func_0012B568(void *);
+extern int mpeg_read_mb_address_increment(void *);
 
-extern void func_0012C3B0(void *);
+extern void mpeg_wait_ipu_idle(void *);
 
 extern void r1_func_0012C468(void *, void *);
 
 extern char r1_D_001538E0[];
 
-extern int func_0012B8B0(void *, int);
+extern int mpeg_decode_slice_macroblocks(void *, int);
 
-extern int func_0012B1C0(void *);
+extern int mpeg_wait_block_decode_done(void *);
 
 extern int r1_func_001263A8(void *, int);
 
-extern int func_0012B678(void *);
+extern int mpeg_decode_picture(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00127748 */
 /* Reads how many macroblocks to advance, adding 33 for each escape code in the stream. */
-int func_0012B568(void *decoderPtr) {
+int mpeg_read_mb_address_increment(void *decoderPtr) {
     char *dec = (char *)decoderPtr;
     unsigned int code;
     int val = 0;
@@ -38,16 +38,16 @@ int func_0012B568(void *decoderPtr) {
     int ret;
 
     do {
-        code = ReadIpuVlcCode((int)dec, 0);
+        code = mpeg_read_ipu_vlc_code((int)dec, 0);
         switch (code) {
         case 35:
             cont = 1;
             val += 33;
             break;
         case 0:
-            ret = PeekMpegBits(dec, 11);
+            ret = mpeg_peek_bits(dec, 11);
             if (*(int *)(dec + 0x848) != 0 && ret == 15) {
-                SkipMpegBits(dec, 11);
+                mpeg_skip_bits(dec, 11);
                 cont = 1;
             } else {
                 r1_func_0012C430(dec, r1_D_001538A8, code);
@@ -70,7 +70,7 @@ int func_0012B568(void *decoderPtr) {
 
 /* rac1-decomp src/core/00125630.c: func_00127858 */
 /* Decodes every macroblock of one picture and returns 1 on success, 0 on a stream error. */
-int func_0012B678(void *decoderPtr) {
+int mpeg_decode_picture(void *decoderPtr) {
     char *dec = (char *)decoderPtr;
     int mbCount;
     int ret;
@@ -84,11 +84,11 @@ int func_0012B678(void *decoderPtr) {
     }
 
     do {
-        ret = DecodeMpegSliceMacroblocks(dec, mbCount);
+        ret = mpeg_decode_slice_macroblocks(dec, mbCount);
     } while (ret == 1 || ret == 3);
 
-    WaitIpuIdle(dec);
-    if (WaitMpegBlockDecodeDone(dec) == 0) {
+    mpeg_wait_ipu_idle(dec);
+    if (mpeg_wait_block_decode_done(dec) == 0) {
         ret = 2;
     }
 

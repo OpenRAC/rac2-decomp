@@ -4,7 +4,7 @@ extern void func_31B090(void *,void *,void *,s32);
 extern void func_313DD8(void *,f32,f32);
 extern f32 func_2E4508(void *,void *);
 extern s32 func_2E3F80(s32 *);
-extern f32 func_L07_003F90E8(s32,s32,f32,f32);
+extern f32 math_interpolate_between_limits(s32,s32,f32,f32);
 extern s32 func_2E5470(f32);
 extern s32 func_310AD8(s32,s32);
 extern f32 func_310B30(f32,f32);
@@ -30,7 +30,7 @@ extern Target D_L07_001B90C0;
 typedef struct {u8 pad[0x38];f32 value;u8 rest[0x80-0x3c];} Record;
 extern Record *D_L07_001B23CC;
 /* Works out where a flying enemy should drift next. In one mode it follows its parent; in the other it picks a new circling direction around the player every so often and bobs up and down. */
-void func_L07_003F8430(u8 *moby)
+void flyer_steer(u8 *moby)
 {
  f32 offset[4];
  u8 *vars=*(u8 **)(moby+0x68);
@@ -55,7 +55,7 @@ void func_L07_003F8430(u8 *moby)
    else if(distance>D_L07_001B1098) needsNewHeading=1;
    if(func_2E3F80((s32 *)(vars+0x440))) {
     needsNewHeading=1;
-    *(s32 *)(vars+0x440)=func_2E5470(InterpolateBetweenLimits(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC));
+    *(s32 *)(vars+0x440)=func_2E5470(math_interpolate_between_limits(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC));
     *(s32 *)(vars+0x440)+=func_310AD8(0,60);
    }
    if(needsNewHeading) {

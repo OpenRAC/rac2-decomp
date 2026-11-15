@@ -1,8 +1,9 @@
+#include "names.h"
 /* func_PAL_00295820: PAL copy of func_00294F10 (src/game/00294BC8-map-setup-g64.c),
  * the map screen setup, with the same flags. */
 #include "common.h"
-extern unsigned int func_00294EC8(int);
-extern int D_001C4FA0[];
+extern unsigned int save_test_flag_bit(int);
+extern int g_map_overlay_state[];
 extern int D_001A7A78_3[] __attribute__((sda));
 typedef struct { int sector, size; } MapFile;
 typedef struct {
@@ -24,14 +25,14 @@ extern unsigned char D_001A7B80[] MACRO_ADDR;
 extern char *D_001BAED0 __attribute__((nosda));
 extern char D_001A95A0[], D_001A95B8[];
 extern unsigned char D_0018D2F8[];
-extern void func_00295C50(int);
+extern void map_set_current_and_refresh(int);
 extern int func_PAL_002B8838(void *, int, int);
-extern int func_002EED58(void *, int, int, char *);
+extern int gfx_alloc_buffer_slot(void *, int, int, char *);
 extern int func_PAL_0029DE68(void *, void *);
-extern void *func_0028B2B8(int, int, char *, int);
-extern void func_00282B50(void *, void *, int);
-extern void func_00297730(char *, unsigned char *, int);
-extern void func_00297400(u8 *, u8 *, short *);
+extern void *hud_alloc_mem(int, int, char *, int);
+extern void mem_fast_helper_c(void *, void *, int);
+extern void map_decode_occlusion(char *, unsigned char *, int);
+extern void map_build_mask_bitmap(u8 *, u8 *, short *);
 
 void func_PAL_00295820(void)
 {
@@ -41,14 +42,14 @@ void func_PAL_00295820(void)
     int bytes;
     int none = -1;
 
-    D_001C4FA0[4] = 1;
+    g_map_overlay_state[4] = 1;
     { int i; for (i = 0; i < 21; i++) {
-        D_001C4FA0[0x108 / 4 + i] = D_00256028[i][0];
-        ((float *)D_001C4FA0)[0xB4 / 4 + i] = 0.65f;
-        D_001C4FA0[0x15C / 4 + i] = D_00256028[i][1];
+        g_map_overlay_state[0x108 / 4 + i] = D_00256028[i][0];
+        ((float *)g_map_overlay_state)[0xB4 / 4 + i] = 0.65f;
+        g_map_overlay_state[0x15C / 4 + i] = D_00256028[i][1];
     } }
-    D_001C4FA0[0x238 / 4] = none;
-    func_00295C50(D_001A7A78_3[0]);
+    g_map_overlay_state[0x238 / 4] = none;
+    map_set_current_and_refresh(D_001A7A78_3[0]);
     { int i; for (i = 0; i < 21; i++) {
         float sx, sy;
         x0 = D_00255C30[i].x0;
@@ -83,48 +84,48 @@ void func_PAL_00295820(void)
         D_001A94E8_gp[i].by = sy;
         D_001A94E8_gp[i].ay = v0 - sy * y0;
     } }
-    if ((((MapToc *)D_0014B5C0_1)->files0[D_001C4FA0[0x230 / 4]].size != 0 && !D_001A7B80[5])
-        || (((MapToc *)D_0014B5C0_1)->files1[D_001C4FA0[0x230 / 4]].size != 0 && D_001A7B80[5])) {
-        D_001C4FA0[0x28 / 4] = 1;
+    if ((((MapToc *)D_0014B5C0_1)->files0[g_map_overlay_state[0x230 / 4]].size != 0 && !D_001A7B80[5])
+        || (((MapToc *)D_0014B5C0_1)->files1[g_map_overlay_state[0x230 / 4]].size != 0 && D_001A7B80[5])) {
+        g_map_overlay_state[0x28 / 4] = 1;
         if (D_001A7B80[5])
-            bytes = ((MapToc *)D_0014B5C0_1)->files1[D_001C4FA0[0x230 / 4]].size << 7;
+            bytes = ((MapToc *)D_0014B5C0_1)->files1[g_map_overlay_state[0x230 / 4]].size << 7;
         else
-            bytes = ((MapToc *)D_0014B5C0_1)->files0[D_001C4FA0[0x230 / 4]].size << 7;
+            bytes = ((MapToc *)D_0014B5C0_1)->files0[g_map_overlay_state[0x230 / 4]].size << 7;
         scratch = D_001BAED0;
         packed = scratch + 0x9A800;
         if (D_001A7B80[5]) {
-            func_PAL_002B8838(packed, ((MapToc *)D_0014B5C0_1)->files1[D_001C4FA0[0x230 / 4]].sector + ((MapToc *)D_0014B5C0_1)->base, ((MapToc *)D_0014B5C0_1)->files1[D_001C4FA0[0x230 / 4]].size);
-            D_001C4FA0[0x23C / 4] = 1;
+            func_PAL_002B8838(packed, ((MapToc *)D_0014B5C0_1)->files1[g_map_overlay_state[0x230 / 4]].sector + ((MapToc *)D_0014B5C0_1)->base, ((MapToc *)D_0014B5C0_1)->files1[g_map_overlay_state[0x230 / 4]].size);
+            g_map_overlay_state[0x23C / 4] = 1;
         } else {
-            func_PAL_002B8838(packed, ((MapToc *)D_0014B5C0_1)->files0[D_001C4FA0[0x230 / 4]].sector + ((MapToc *)D_0014B5C0_1)->base, ((MapToc *)D_0014B5C0_1)->files0[D_001C4FA0[0x230 / 4]].size);
-            D_001C4FA0[0x23C / 4] = 0;
+            func_PAL_002B8838(packed, ((MapToc *)D_0014B5C0_1)->files0[g_map_overlay_state[0x230 / 4]].sector + ((MapToc *)D_0014B5C0_1)->base, ((MapToc *)D_0014B5C0_1)->files0[g_map_overlay_state[0x230 / 4]].size);
+            g_map_overlay_state[0x23C / 4] = 0;
         }
-        D_001C4FA0[0x238 / 4] = func_002EED58(packed, bytes, 0x3C00, D_001A95A0);
-        D_001C4FA0[0x240 / 4] = bytes;
+        g_map_overlay_state[0x238 / 4] = gfx_alloc_buffer_slot(packed, bytes, 0x3C00, D_001A95A0);
+        g_map_overlay_state[0x240 / 4] = bytes;
         func_PAL_0029DE68(packed, scratch);
         {
             int size = ((int *)scratch)[1] - ((int *)scratch)[0];
-            D_001C4FA0[0] = (int)func_0028B2B8(size, 0, D_001A95B8, 0x2EB);
-            func_00282B50((void *)D_001C4FA0[0], scratch + ((int *)scratch)[0], size);
+            g_map_overlay_state[0] = (int)hud_alloc_mem(size, 0, D_001A95B8, 0x2EB);
+            mem_fast_helper_c((void *)g_map_overlay_state[0], scratch + ((int *)scratch)[0], size);
         }
-        D_001C4FA0[0] += 8;
-        D_001C4FA0[1] = D_001C4FA0[0];
+        g_map_overlay_state[0] += 8;
+        g_map_overlay_state[1] = g_map_overlay_state[0];
         {
             int size = ((int *)scratch)[2] - ((int *)scratch)[1];
-            D_001C4FA0[5] = (int)func_0028B2B8(size, 0, D_001A95B8, 0x2FC);
-            func_00282B50((void *)D_001C4FA0[5], scratch + ((int *)scratch)[1], size);
+            g_map_overlay_state[5] = (int)hud_alloc_mem(size, 0, D_001A95B8, 0x2FC);
+            mem_fast_helper_c((void *)g_map_overlay_state[5], scratch + ((int *)scratch)[1], size);
         }
-        D_001C4FA0[2] = (int)func_0028B2B8(0x1000, 0, D_001A95B8, 0x303);
+        g_map_overlay_state[2] = (int)hud_alloc_mem(0x1000, 0, D_001A95B8, 0x303);
         for (i = 0; i < 8; i++) {
-            D_001C4FA0[0x30 / 4 + i * 4] = -1;
-            D_001C4FA0[0x34 / 4 + i * 4] = -1;
-            D_001C4FA0[0x38 / 4 + i * 4] = D_001C4FA0[2] + (i << 9);
+            g_map_overlay_state[0x30 / 4 + i * 4] = -1;
+            g_map_overlay_state[0x34 / 4 + i * 4] = -1;
+            g_map_overlay_state[0x38 / 4 + i * 4] = g_map_overlay_state[2] + (i << 9);
         }
-        D_001C4FA0[3] = (int)func_0028B2B8(0x8000, 0, D_001A95B8, 0x30C);
-        if (func_00294EC8(D_001C4FA0[0x230 / 4]))
-            func_00297730((char *)D_001C4FA0[3], D_0018D2F8 + (D_001C4FA0[0x230 / 4] << 11), D_001C4FA0[5]);
+        g_map_overlay_state[3] = (int)hud_alloc_mem(0x8000, 0, D_001A95B8, 0x30C);
+        if (save_test_flag_bit(g_map_overlay_state[0x230 / 4]))
+            map_decode_occlusion((char *)g_map_overlay_state[3], D_0018D2F8 + (g_map_overlay_state[0x230 / 4] << 11), g_map_overlay_state[5]);
         else
-            func_00297400((u8 *)D_001C4FA0[3], (u8 *)D_001C4FA0[0], (short *)D_001C4FA0[1]);
+            map_build_mask_bitmap((u8 *)g_map_overlay_state[3], (u8 *)g_map_overlay_state[0], (short *)g_map_overlay_state[1]);
         {
             int i, j;
             float limit = 256.0f, center = 15.5f;
@@ -134,15 +135,15 @@ void func_PAL_00295820(void)
                 for (j = 0; j < 32; j++) {
                     float dx = center - (float)j;
                     if (dx * dx + dy2 > limit)
-                        ((u8 *)D_001C4FA0 + 0x1B0)[j / 8 + (i << 2)] |= 1 << (j % 8);
+                        ((u8 *)g_map_overlay_state + 0x1B0)[j / 8 + (i << 2)] |= 1 << (j % 8);
                 }
             }
         }
     } else {
-        D_001C4FA0[0] = 0;
-        D_001C4FA0[2] = 0;
-        D_001C4FA0[3] = 0;
-        D_001C4FA0[1] = 0;
-        D_001C4FA0[0x28 / 4] = 0;
+        g_map_overlay_state[0] = 0;
+        g_map_overlay_state[2] = 0;
+        g_map_overlay_state[3] = 0;
+        g_map_overlay_state[1] = 0;
+        g_map_overlay_state[0x28 / 4] = 0;
     }
 }

@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_00282CC0(char *a, int *b, char *c);
-extern void func_00300190(char *a, char *b);
-extern void func_002FEE70(int a, int *b, int c);
-extern int func_00282948(char *a);
+extern void FastVecAdd(char *a, int *b, char *c);
+extern void vec_transform_or_copy(char *a, char *b);
+extern void part_steer_effect_direction(int a, int *b, int c);
+extern int math_fast_float_d(char *a);
 extern void ref_L00_00403D58_00(void (*f)(char *), char *arg);
-extern void func_L00_00404168(char *arg);
+extern void smoky_spark_effect_update(char *arg);
 extern void func_PAL_L00_00408978(char *arg, void *p);
-extern void func_002FEE50(int a);
-extern void func_0029F338(char *arg);
-extern void func_0029F338(char *arg);
+extern void table_clear_entry_flag(int a);
+extern void moby_mark_spawned(char *arg);
+extern void moby_mark_spawned(char *arg);
 extern TI128 D_L00_001BF220;
 
 void func_PAL_L00_00408740(char *arg)
@@ -26,19 +27,19 @@ void func_PAL_L00_00408740(char *arg)
     case 1:
         p = arg + 16;
         *(TI128 *)&tmp = *(TI128 *)p;
-        func_00282CC0(p, o, p);
-        func_00300190(p, p);
-        func_002FEE70(o[7], o, 0);
+        FastVecAdd(p, o, p);
+        vec_transform_or_copy(p, p);
+        part_steer_effect_direction(o[7], o, 0);
         func_PAL_L00_00408978(arg, &tmp);
-        if (func_00282948((char *)o + 16) != 0)
+        if (math_fast_float_d((char *)o + 16) != 0)
             arg[32] = 2;
         break;
     case 2:
-        func_002FEE50(o[7]);
-        func_0029F338(arg);
+        table_clear_entry_flag(o[7]);
+        moby_mark_spawned(arg);
         return;
     default:
         break;
     }
-    ref_L00_00403D58_00(func_L00_00404168, arg);
+    ref_L00_00403D58_00(smoky_spark_effect_update, arg);
 }

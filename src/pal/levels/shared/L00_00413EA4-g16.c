@@ -49,50 +49,50 @@ typedef struct {
 typedef struct { u8 pad00[4]; u8 active; u8 pad05[0x13]; Moby *owner; u8 pad1C[0x54]; } SoundSlot;
 typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry;
 typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
-extern u8 D_00189E20[], D_00139568[];
-extern u32 D_00138180[];
-extern int D_00139688[];
-extern u16 D_0018C958[];
-extern SoundSlot D_00188660[];
+extern u8 g_hero_state[], g_item_slot_to_record[];
+extern u32 g_pad_state[];
+extern int g_item_ammo_counts[];
+extern u16 g_subtitle_history[];
+extern SoundSlot g_sound_state[];
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern Vector D_L00_001B1270 __attribute__((sda));
-extern float D_L00_001B8DC0[];
-extern Moby *D_L00_001C3280[];
-extern CollisionResult D_L00_001BF200;
+extern float g_camera_l00_position[];
+extern Moby *g_area_hit_targets[];
+extern CollisionResult g_collision_result;
 extern WeaponEntry D_00262570[];
 extern u8 D_0029FCC8[];
 extern void func_PAL_L00_002C4480(int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002829D8(void *);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_L00_002D4040(int);
-extern void func_00273318(void *, float, unsigned int, void *, int, float, int, float, int);
-extern Moby *func_L00_00324D18(void *, void *, float, float, float, float, float, int);
-extern float *func_002AB1F0(Moby *);
-extern int func_002ABB78(Moby *);
-extern float func_00282E48(void *, void *);
-extern float func_00282C48(float);
-extern int func_00282948(int *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_fast_helper_b(void *);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int get_ammo(int);
+extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);
+extern Moby *moby_get_or_find_target(void *, void *, float, float, float, float, float, int);
+extern float *moby_get_private_value_0(Moby *);
+extern int moby_is_in_special_class_range(Moby *);
+extern float fast_vec_dist(void *, void *);
+extern float math_fabs(float);
+extern int math_fast_float_d(int *);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
 extern void ref_L00_0040F6A0_00(void (*)(Moby *), Moby *);
 extern void func_PAL_L00_00415498(Moby *);
-extern float func_002A7940(void);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
+extern float math_random_angle(void);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
 extern void *func_PAL_002C23B8(void *, void *, int, int, unsigned int, int, float, float, float, float, float);
 extern int func_PAL_L00_00415648(Moby *);
-extern int func_00277F48(float, void *, int, void *, void *);
+extern int coll_process_hit(float, void *, int, void *, void *);
 extern void func_PAL_L00_00415690(Moby *, int);
 extern void func_PAL_L00_00415238(Moby *, Vector *, int);
 extern void func_PAL_L00_002AF458(void);
-extern int func_L00_002D6998(void *);
+extern int slot_copy_records_to_free(void *);
 extern int func_PAL_00289730(int, int);
-extern void func_L00_002D6B70(int);
+extern void slot_reset_active(int);
 extern void func_PAL_L00_00415310(Moby *, Vector *);
 extern void func_PAL_L00_00414F80(Moby *, Vector *);
 #define HERO ((Hero *)D_00189E20)
@@ -123,8 +123,8 @@ void func_PAL_L00_004144A8(Moby *moby)
     }
     if (HERO->i[0x2294 / 4] == 1)
         func_PAL_L00_002C4480(0x1D, 1);
-    func_00283098(&nozzle, &D_L00_001B1270, &moby->right);
-    func_00282CC0(&nozzle, &nozzle, &moby->position);
+    matrix_mul_vec3(&nozzle, &D_L00_001B1270, &moby->right);
+    FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
         HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
 
@@ -136,56 +136,56 @@ void func_PAL_L00_004144A8(Moby *moby)
         }
         vars->aiming = 1;
         spread = 0.06981317699f;
-        if (vars->cooldown > 0.0f && func_L00_002D4040(-1))
+        if (vars->cooldown > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
-        func_00273318(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
+        hud_add_moby_marker(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
         qcopy(&direction, &HERO->q[0x760 / 16]);
-        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+        FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
     } else {
         vars->aiming = 0;
         spread = 0.349065899848938f;
         if (HERO->h[0x24EC / 2] != 0) {
-            func_00282D30(&direction, &moby->forward, -1.0f);
+            FastVecScale(&direction, &moby->forward, -1.0f);
             } else {
             qcopy(&direction, &HERO->q[0x760 / 16]);
             }
-        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+        FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
     }
-    func_002829D8(&vars->cooldown);
+    vec_fast_helper_b(&vars->cooldown);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
-        func_002A75E0(moby, 1, 0, 2, 0);
-    candidate = func_L00_00324D18(&origin, &direction, spread, spread, 75.0f, spread, spread, 1);
+        anim_start_blended_with_flags(moby, 1, 0, 2, 0);
+    candidate = moby_get_or_find_target(&origin, &direction, spread, spread, 75.0f, spread, spread, 1);
 
     if (vars->target != 0) {
-        float *hp = func_002AB1F0(vars->target);
+        float *hp = moby_get_private_value_0(vars->target);
         if (vars->target == 0 || vars->target->state == 0xFE || vars->target->state == 0xFD ||
             (hp != 0 && *hp <= 0.0f) || vars->target->alive == 0 || HERO->h[0x24EC / 2] != 0) {
             vars->target = 0;
             vars->candidateTimer = 4;
         } else if (candidate != vars->target) {
-            if (func_00282948(&vars->lockTimer)) {
+            if (math_fast_float_d(&vars->lockTimer)) {
                 vars->target = 0;
                 vars->candidateTimer = 4;
             }
         } else {
             float distance;
             vars->lockTimer = 4;
-            distance = func_00282E48(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
-            func_00282D30(&aim, &candidate->up, vars->lockHeight);
-            func_00282CC0(&aim, &candidate->position, &aim);
-            func_00273318(moby, func_00282C48(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
+            distance = fast_vec_dist(g_camera_l00_position, &candidate->position) * 0.006666667f;
+            FastVecScale(&aim, &candidate->up, vars->lockHeight);
+            FastVecAdd(&aim, &candidate->position, &aim);
+            hud_add_moby_marker(moby, math_fabs(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
             HERO->ptr[0xBF8 / 4] = (char *)candidate;
         }
     } else if (candidate == vars->candidate) {
-        if (func_00282948(&vars->candidateTimer)) {
+        if (math_fast_float_d(&vars->candidateTimer)) {
             float *health;
             vars->target = candidate;
             vars->lockTimer = 4;
-            health = func_002AB1F0(candidate);
+            health = moby_get_private_value_0(candidate);
             if (health == 0)
                 vars->lockHeight = 0.1f;
             else
@@ -199,7 +199,7 @@ void func_PAL_L00_004144A8(Moby *moby)
 
     ready = 1;
     if (HERO->i[0x2294 / 4] == 0x1D) {
-        if (!func_00282948(&HERO->i[0x2534 / 4]))
+        if (!math_fast_float_d(&HERO->i[0x2534 / 4]))
             ready = 0;
     } else {
         HERO->i[0x2534 / 4] = 0x21;
@@ -207,37 +207,37 @@ void func_PAL_L00_004144A8(Moby *moby)
 
     released = 0;
     charged = 0;
-    if ((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && func_L00_002D4040(-1)) {
-        SoundSlot *slot = &D_00188660[vars->chargeSound];
+    if ((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1)) {
+        SoundSlot *slot = &g_sound_state[vars->chargeSound];
         int level;
         vars->charge++;
         if (slot[1].owner != moby || !slot[1].active)
-            vars->chargeSound = func_002E5CF8(6, 4, moby);
+            vars->chargeSound = PlayMobySound(6, 4, moby);
         ref_L00_0040F6A0_00(func_PAL_L00_00415498, moby);
-        level = D_00139688[HERO->i[0x1248 / 4]];
+        level = g_item_ammo_counts[HERO->i[0x1248 / 4]];
         if (level >= 5)
             level = 4;
         if (level * 18 < vars->charge) {
             float size;
             int life;
-            func_002ACEC0(&work, &moby->up, &moby->forward, func_002A7940());
-            func_00282D30(&work, &work, func_002A7878(1.5f, 2.0f) * 0.020000001f);
-            life = func_00283CF0(func_002A78D8(1.0f, 3.0f));
-            size = func_002A7878(0.45f, 0.75f) * 210000.0f;
-            spark.f[0] = nozzle.f[0] + func_002A78D8(0.0f, 0.1f);
-            spark.f[1] = nozzle.f[1] + func_002A78D8(0.0f, 0.1f);
-            spark.f[2] = nozzle.f[2] + func_002A78D8(0.0f, 0.1f);
+            math_apply_axis_rotation_to_quat(&work, &moby->up, &moby->forward, math_random_angle());
+            FastVecScale(&work, &work, math_random_float_range(1.5f, 2.0f) * 0.020000001f);
+            life = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
+            size = math_random_float_range(0.45f, 0.75f) * 210000.0f;
+            spark.f[0] = nozzle.f[0] + math_random_signed_float_range(0.0f, 0.1f);
+            spark.f[1] = nozzle.f[1] + math_random_signed_float_range(0.0f, 0.1f);
+            spark.f[2] = nozzle.f[2] + math_random_signed_float_range(0.0f, 0.1f);
             func_PAL_002C23B8(&spark, &work, 12, 0x7F, 0x7F7F7F, life, size, 500.0f, 1.0f, 0.0f, 0.0f);
         }
     } else {
         if (vars->chargeSound != -1) {
-            SoundSlot *slot = &D_00188660[vars->chargeSound];
+            SoundSlot *slot = &g_sound_state[vars->chargeSound];
             if (slot[1].owner == moby && slot[1].active)
-                func_002E59F8(vars->chargeSound);
+                snd_stop_voice(vars->chargeSound);
         }
         vars->chargeSound = -1;
-        if ((D_00138180[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !func_L00_002D4040(-1))
-            func_002E5CF8(1, 0, moby);
+        if ((g_pad_state[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !get_ammo(-1))
+            PlayMobySound(1, 0, moby);
         if (vars->charge != 0) {
             released = 1;
             charged = func_PAL_L00_00415648(moby);
@@ -248,18 +248,18 @@ void func_PAL_L00_004144A8(Moby *moby)
 
     if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
         HERO->i[0x1240 / 4] >= 19) {
-        if (func_L00_002D4040(-1)) {
+        if (get_ammo(-1)) {
             if (candidate == 0) {
                 int count, i;
-                func_00282D30(&work, &moby->forward, -1.0f);
-                func_00282CC0(&work, &work, &moby->position);
-                func_00282D30(&spark, &moby->right, 0.275f);
-                func_00282CC0(&work, &work, &spark);
-                count = func_00277F48(1.0f, &work, 1, HERO->ptr[0x2290 / 4], 0);
+                FastVecScale(&work, &moby->forward, -1.0f);
+                FastVecAdd(&work, &work, &moby->position);
+                FastVecScale(&spark, &moby->right, 0.275f);
+                FastVecAdd(&work, &work, &spark);
+                count = coll_process_hit(1.0f, &work, 1, HERO->ptr[0x2290 / 4], 0);
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
-                        Moby *hit = D_L00_001C3280[i];
-                        float *hp = func_002AB1F0(hit);
+                        Moby *hit = g_area_hit_targets[i];
+                        float *hp = moby_get_private_value_0(hit);
                         if (hit->alive == 0)
                             continue;
                         if (hit->health <= 0)
@@ -276,10 +276,10 @@ void func_PAL_L00_004144A8(Moby *moby)
                             continue;
                         if (hp == 0)
                             continue;
-                        if (!(*hp > 0.0f) && !func_002ABB78(hit))
+                        if (!(*hp > 0.0f) && !moby_is_in_special_class_range(hit))
                             continue;
                         if (hit->model == 0 || hit->model->kind != 5) {
-                            candidate = D_L00_001BF200.hit;
+                            candidate = g_collision_result.hit;
                             vars->target = candidate;
                             break;
                         }
@@ -289,26 +289,26 @@ void func_PAL_L00_004144A8(Moby *moby)
             vars->flash = 12;
             func_PAL_L00_00415690(moby, charged);
             func_PAL_L00_00415238(moby, &nozzle, charged);
-            func_002A75E0(moby, 2, 0, 2, 0);
+            anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             func_PAL_L00_002AF458();
-            vars->sound = func_L00_002D6998(D_0029FCC8);
+            vars->sound = slot_copy_records_to_free(D_0029FCC8);
             if (charged)
-                D_0018C958[0x3A8 / 2] = 0xFFFF;
-            else if (D_0018C958[0x3A8 / 2] < 40 && ++D_0018C958[0x3A8 / 2] == 40)
+                g_subtitle_history[0x3A8 / 2] = 0xFFFF;
+            else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
                 func_PAL_00289730(0x9F7, 0x4E);
         }
-        if (!((D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && func_L00_002D4040(-1) && HERO->b[0x22B8]) &&
+        if (!((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
             vars->sound >= 0) {
-            func_L00_002D6B70(vars->sound);
+            slot_reset_active(vars->sound);
             vars->sound = -1;
         }
         {
-            WeaponEntry *weapon = D_00262570 + D_00139568[0x1B];
+            WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
             vars->cooldown = 1.0f / weapon->rate;
         }
     }
 
-    if (vars->beam >= 0 && func_00282948(&vars->beamTimer))
+    if (vars->beam >= 0 && math_fast_float_d(&vars->beamTimer))
         func_PAL_L00_00415310(moby, &nozzle);
     func_PAL_L00_00414F80(moby, &nozzle);
 }

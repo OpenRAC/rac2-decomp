@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_002E37B0(void);
+extern void gfx_resident_table_reset(void);
 
-extern void func_002E3548(void);
+extern void gfx_update_all_view_transforms(void);
 
-extern void func_002E3820(void);
+extern void gfx_link_packet_chain(void);
 
-extern void func_002FC560(unsigned int, unsigned long);
+extern void VU1_addGSregister(unsigned int, unsigned long);
 
-extern void func_L02_00363D78(void);
+extern void sky_update_effects(void);
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
 extern int D_001A72E0;
 
@@ -23,19 +23,19 @@ extern int D_L02_001B33D0;
    92-of-96-byte candidate is recorded in nonmatching/levels/func_L02_003CB090.c
    (residue: branch-likely + which register gets the absolute address). */
 
-extern int func_002ACBC8(void *point, int index);
+extern int IsPointInCuboid(void *point, int index);
 
-extern void func_00282CF0(float *out, const float *a, const float *b);
+extern void FastVecSub(float *out, const float *a, const float *b);
 
-extern void func_00283098(float *out, const float *a, const float *b);
+extern void matrix_mul_vec3(float *out, const float *a, const float *b);
 
-extern void func_L02_002DCEA0(int a0, float a1);
+extern void timer_start_countdown(int a0, float a1);
 
-extern void func_L00_002B9D60(int a0, int a1, int a2, int a3);
+extern void hero_reset_position_and_direction(int a0, int a1, int a2, int a3);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern char D_L02_001BA500[];
+extern char g_camera_l02_position[];
 
 extern char *D_L02_001B368C;
 
@@ -43,62 +43,62 @@ extern float D_L02_001B2FE0 __attribute__((sda));
 
 
 /* Runs the level's background update each frame: the sky when the game state is 2, the normal backdrop otherwise. */
-void func_L02_00300738(void) {
-    ResetResidentTable();
+void level_update_background(void) {
+    gfx_resident_table_reset();
     D_L02_001B33D0 = (int)D_L02_00280A10;
 
-    if (gCurrentMapIndex == 2)
-        UpdateSkyEffects();
+    if (g_current_map_index == 2)
+        sky_update_effects();
     else
-        UpdateAllViewTransforms();
-    LinkRenderPacketChain();
+        gfx_update_all_view_transforms();
+    gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x4E, 0x01000000 | (D_001A72E0 >> 13));
 }
 
 /* Flags the actor's target when its record is on screen, and refreshes it afterwards. */
-void func_L02_003D02F0(char *self) {
+void grab_target_update_highlight(char *self) {
     char *state = *(char **)(self + 0x68);
     float offset[4];
 
     if (*(int *)(state + 0xDC) == 0) {
-        if (IsPointInCuboid(gHeroPosition, *(int *)(state + 0xC4)) != 0) {
-            FastVecSub(offset, (float *)gCameraPosition_L02,
+        if (IsPointInCuboid(g_hero_position, *(int *)(state + 0xC4)) != 0) {
+            FastVecSub(offset, (float *)g_camera_l02_position,
                           (float *)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x30));
             matrix_mul_vec3(offset, offset, (float *)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x40));
             if (offset[0] > 0.0f) {
                 *(int *)(state + 0xDC) = 1;
-                StartTimedCountdown(1, 10.0f);
+                timer_start_countdown(1, 10.0f);
             }
         }
     } else {
         if (D_L02_001B2FE0 >= 1.0f) {
-            ResetHeroPositionAndDirection((int)gHeroPosition,
+            hero_reset_position_and_direction((int)g_hero_position,
                               (int)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x70), 0, 1);
-            *(short *)(gHeroPosition + 0x160) = 10;
+            *(short *)(g_hero_position + 0x160) = 10;
         }
     }
 }
 
-extern unsigned short *D_L02_001FC060[];
+extern unsigned short *g_entity_group_lists[];
 
-extern unsigned char *D_L02_001B359C;
+extern unsigned char *g_moby_l02_pool;
 
 /* Answers 1 when the object's group holds an armed 0x9CA entity (class byte 6, state word
    +0x2F6 == 1) that is not being freed (state byte 0xFE or 0xFD). */
-int func_L02_003D18D8(unsigned char *self) {
+int armed_enemy_has_partner_in_group(unsigned char *self) {
     unsigned short *groupList;
     unsigned short *entry;
     unsigned char *entity;
 
     if (self[0x21] == 0xFF)
         return 0;
-    groupList = gEntityGroupLists[self[0x21]];
+    groupList = g_entity_group_lists[self[0x21]];
     if (groupList == 0)
         return 0;
     entry = groupList;
     do {
-        entity = gMobyPool_L02 + ((*entry & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*entry & 0x7FFF) << 8);
         if (entity != 0 && entity[0x20] != 0xFE && entity[0x20] != 0xFD && *(short *)(entity + 0xAA) == 0x9CA /* moby class 2506 */ &&
             entity[0x95] == 6 && *(short *)(*(unsigned char **)(entity + 0x68) + 0x2F6) == 1)
             return 1;
@@ -108,11 +108,11 @@ int func_L02_003D18D8(unsigned char *self) {
 
 extern int D_L02_001B35B8 __attribute__((sda));
 
-extern int func_002B3BA8(char *, int, float, float, int, int);
+extern int weapon_select_aim_target(char *, int, float, float, int, int);
 
-extern int func_L02_003FC0D0(int, short);
+extern int arena_take_enemy_quota(int, short);
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 /* Pairs the actor with a partner: keeps the one it already has (state +0x2E0, mode +0x2F6),
    or picks the nearest free 0x9CA entity of its group and links the two.
@@ -120,7 +120,7 @@ extern float func_00282E80(void *, void *);
    one, which gives retail's `b` to that store); a `goto` to the shared store instead leaves
    `state` one reference short, and global.c then gives `self` the lower saved register. The
    two early stores are in the reverse of retail's order (the scheduler swaps them). */
-void func_L02_003D1998(char *self) {
+void armed_enemy_find_partner(char *self) {
     char *state = *(char **)(self + 0x68);
     unsigned char *partner;
     unsigned short *entry;
@@ -135,12 +135,12 @@ void func_L02_003D1998(char *self) {
     }
     if (*(short *)(state + 0x2F6) == 1) {
         *(short *)(state + 0x2FA) =
-            SelectAimTarget_002B3BA8(self, *(int *)(state + 0x2F0), 100.0f, 100.0f, 0, 0);
+            weapon_select_aim_target(self, *(int *)(state + 0x2F0), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x2E0) = *(int *)(state + 0x200);
-    } else if (TakeEnemyQuota(*(int *)(self + 0xB8), *(short *)(self + 0xAA)) != 0) {
+    } else if (arena_take_enemy_quota(*(int *)(self + 0xB8), *(short *)(self + 0xAA)) != 0) {
         *(short *)(state + 0x2F6) = 1;
         *(short *)(state + 0x2FA) =
-            SelectAimTarget_002B3BA8(self, *(int *)(state + 0x2F0), 100.0f, 100.0f, 0, 0);
+            weapon_select_aim_target(self, *(int *)(state + 0x2F0), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x2E0) = *(int *)(state + 0x200);
     } else if (*(short *)(state + 0x2F6) == 2 && *(char **)(state + 0x2E0) != 0) {
         char *partnerState;
@@ -164,13 +164,13 @@ void func_L02_003D1998(char *self) {
     } else {
         nearestDist = 1000.0f;
         nearestEntity = 0;
-        for (entry = gEntityGroupLists[*(unsigned char *)(self + 0x21)];
+        for (entry = g_entity_group_lists[*(unsigned char *)(self + 0x21)];
              *(unsigned char *)(self + 0x21) != 0xFF &&
              *(unsigned char *)(self + 0x21) <= D_L02_001B35B8 && entry != 0 &&
              ((entry != 0 && (short)entry[-1] >= 0) ||
-              entry == gEntityGroupLists[*(unsigned char *)(self + 0x21)]);
+              entry == g_entity_group_lists[*(unsigned char *)(self + 0x21)]);
              entry++) {
-            entity = gMobyPool_L02 + ((*entry & 0x7FFF) << 8);
+            entity = g_moby_l02_pool + ((*entry & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x20] != 0xFE) {

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 extern u8 D_L03_001A8F20[] MACRO_ADDR;
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 typedef struct { float v[4]; } __attribute__((aligned(16))) VecF720;
 typedef struct { VecF720 v[4]; int color[4]; float uv[4][2]; u64 r70, tex, r80, r88; } QuadF720;
 extern float D_L03_001B1C10[4] __attribute__((sda));
@@ -15,21 +15,21 @@ extern float D_L03_001B1C98[2] __attribute__((sda));
 extern float D_L03_001B1CA0[8] __attribute__((sda));
 extern float D_L03_001B1CA4[] MACRO_ADDR;
 extern int D_L03_001B1CC0[2] __attribute__((sda));
-extern int D_L03_001B2548, D_L03_001B1C8C;
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002E59B0(void *, int);
+extern int g_frame_l03_counter, D_L03_001B1C8C;
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern int snd_is_voice_playing_for_owner(void *, int);
 /* Draws the laser beam as glowing strips with a fading trail and plays its sound. */
-void func_L03_0041F720(u8 *obj)
+void DrawBeamQuadsAndRingTrail(u8 *obj)
 {
     QuadF720 q[2];
     VecF720 cross, delta, side, start, end;
@@ -85,7 +85,7 @@ void func_L03_0041F720(u8 *obj)
             draw_world_quad(quads + 1, 0, 1);
             for (n = 3, j = 0; n >= 0; n--, j++) { q[0].uv[j][0] = .5f; q[0].uv[j][1] = .5f; }
             alpha = .1f;
-            if (gFrameCounter_L03 & 1) alpha = 0;
+            if (g_frame_l03_counter & 1) alpha = 0;
             c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha);
             q[0].color[0] = q[0].color[1] = c;
             c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha + D_L03_001B1C90);
@@ -115,29 +115,29 @@ void func_L03_0041F720(u8 *obj)
             draw_world_quad(&q[0], 0, 1);
             if (*(int *)(state + 0x340) == -1)
                 *(int *)(state + 0x340) = PlayMobySound(5, 4, obj);
-            else if (!IsVoicePlayingForOwner(obj, *(int *)(state + 0x340)))
+            else if (!snd_is_voice_playing_for_owner(obj, *(int *)(state + 0x340)))
                 *(int *)(state + 0x340) = PlayMobySound(5, 4, obj);
         }
     }
 }
 
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern u8 *func_002A9640(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(void *);
-extern void func_L00_00324F18(void *, void *, float, float, float);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_L03_00421930(void);
-extern void func_L00_0032A530(void *, void *, void *, void *, int, int, int, int, int, int, void *);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern u8 *part_find_owned_effect_slot(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(void *);
+extern void vec_local_offset_to_world(void *, void *, float, float, float);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void fading_effect_update(void);
+extern void ScatterObjectPieces(void *, void *, void *, void *, int, int, int, int, int, int, void *);
 typedef struct { u8 pad[0x120]; int entries[10]; int count; int active; } EntryGroup;
 extern u8 D_L03_00259A30[];
 typedef struct { u8 header[0x464]; u8 entries[0]; } TriggerTable;
 extern TriggerTable D_L03_0021EA30;
 extern u8 D_0019B4A8[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 typedef struct { unsigned short key; char reserved02[10]; } SelectorRow;
-extern SelectorRow D_0018C958[];
+extern SelectorRow g_subtitle_history[];
 extern int D_L03_001B2A38;
 extern u8 *D_L03_001B2A1C;
 extern u16 *D_L03_001FB5A0[];
@@ -149,7 +149,7 @@ extern float D_L03_001B1DA0[2] __attribute__((sda)), D_L03_001B1DA8[2] __attribu
    2. States 2 and 3 spawn rows of three explosions at rising heights on a timer, then state 3 raises
    the counter (up to 7), sets subtitle row 60's key to 0xFFFF, scatters the object's pieces and removes it. The row
    pointer is set at the store so the table keeps its own lui/addiu base, as retail has it. */
-void func_L03_00421398(u8 *obj)
+void endako_exploding_barrier_update(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     u8 pos[16] __attribute__((aligned(16)));
@@ -160,7 +160,7 @@ void func_L03_00421398(u8 *obj)
     SelectorRow *rows;
 
     if (!state) {
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
         return;
     }
     switch (obj[0x20]) {
@@ -175,21 +175,21 @@ void func_L03_00421398(u8 *obj)
         }
         index = *(s16 *)(obj + 0xB2);
         if (D_L03_0021EA30.entries[index]) {
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
         } else {
-            bits = D_0019B4A8[(index >> 1) + (gCurrentMapIndex << 10)];
+            bits = D_0019B4A8[(index >> 1) + (g_current_map_index << 10)];
             if (*(u16 *)(obj + 0xB2) & 1) {
-                if ((bits >> 4) & 7) MarkMobySpawned(obj);
-                else SetMobyState(obj, 1, -1);
+                if ((bits >> 4) & 7) moby_mark_spawned(obj);
+                else moby_set_state(obj, 1, -1);
             } else {
-                if (bits & 7) MarkMobySpawned(obj);
-                else SetMobyState(obj, 1, -1);
+                if (bits & 7) moby_mark_spawned(obj);
+                else moby_set_state(obj, 1, -1);
             }
         }
         break;
     }
     case 1:
-        hit = FindOwnedEffectSlot(obj, 0x10000, 0);
+        hit = part_find_owned_effect_slot(obj, 0x10000, 0);
         if (hit && (other = *(u8 **)(hit + 0x20)) && *(s16 *)(other + 0xAA) == 0xCFC /* moby class 3324 */ &&
             *(float *)(obj + 0x18) <= *(float *)(other + 0x18) + 0.5f) {
             for (p = D_L03_001FB5A0[obj[0x21]];
@@ -197,50 +197,50 @@ void func_L03_00421398(u8 *obj)
                  ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[obj[0x21]]); p++) {
                 other = D_L03_001B2A1C + ((*p & 0x7FFF) << 8);
                 if (!other) break;
-                SetMobyState(other, 2, -1);
+                moby_set_state(other, 2, -1);
             }
         }
         obj[0xA8] = 0xFF;
         break;
     case 2:
-        if (SetFirstPendingFlag(obj)) {
+        if (flag_set_first_pending(obj)) {
             *(int *)(state + 4) = 230;
             for (i = -1; i < 2; i++) {
-                LocalOffsetToWorld(obj, pos, (float)(i << 3), -6.0f, 5.0f);
+                vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 5.0f);
                 SpawnExplosion(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, 0, 0);
             }
             *(int *)(state + 4) = 10;
-        } else if (FastFloatHelperD(state + 4)) {
+        } else if (math_fast_float_d(state + 4)) {
             for (i = -1; i < 2; i++) {
-                LocalOffsetToWorld(obj, pos, (float)(i << 3), -6.0f, 15.0f);
+                vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 15.0f);
                 SpawnExplosion(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, 0, 0);
             }
             *(int *)(state + 4) = 10;
-            SetMobyState(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
         }
         break;
     case 3:
-        if (!FastFloatHelperD(state + 4)) break;
+        if (!math_fast_float_d(state + 4)) break;
         for (i = -1; i < 2; i++) {
-            LocalOffsetToWorld(obj, pos, (float)(i << 3), -6.0f, 25.0f);
+            vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 25.0f);
             SpawnExplosion(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, i == 0, 0);
         }
         if (*(u16 *)(obj + 0xB2) & 1) {
-            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (gCurrentMapIndex << 10));
+            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (gCurrentMapIndex << 10));
+            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if ((*counter & 7) != 7) *counter += 1;
         }
-        rows = gSubtitleHistory;
+        rows = g_subtitle_history;
         rows[60].key = 0xFFFF;
         if (*(int *)state)
             ScatterObjectPieces(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
-                              0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, UpdateFadingEffect_L03);
+                              0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, fading_effect_update);
         else
             ScatterObjectPieces(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, 0);
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
         break;
     }
 }

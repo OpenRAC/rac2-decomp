@@ -25,9 +25,9 @@ typedef struct malloc_chunk *mbinptr;
 typedef u32 INTERNAL_SIZE_T;
 typedef void Void_t;
 
-extern void func_00116300(struct _reent *);
-extern void func_00116360(struct _reent *);
-extern int func_00117108(struct _reent *, u32);
+extern void malloc_lock_acquire(struct _reent *);
+extern void malloc_lock_release(struct _reent *);
+extern int malloc_trim_reentrant(struct _reent *, u32);
 
 extern u64 D_001345F0;
 extern u64 D_001345F8;
@@ -143,7 +143,7 @@ extern u32 D_001341E8[];
 #define RCALL reent_ptr,
 
 /* Gives a heap block back and joins it with free blocks next to it. */
-void func_00116E10(struct _reent *reent_ptr, Void_t *mem) {
+void FreeReentrant(struct _reent *reent_ptr, Void_t *mem) {
   mchunkptr p;         /* chunk corresponding to mem */
   INTERNAL_SIZE_T hd;  /* its head field */
   INTERNAL_SIZE_T sz;  /* its size */

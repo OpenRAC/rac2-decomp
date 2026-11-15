@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 
 
 typedef int s32;
@@ -35,7 +36,7 @@ SOFTWARE.
 
 */
 /* Waits until the picture unit is idle, or tells whether it is busy. */
-u32 func_00130DB8(s32 mode) {
+u32 sceIpuSync(s32 mode) {
     u32 result;
 
     result = 0;

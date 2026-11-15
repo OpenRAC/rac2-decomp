@@ -2,19 +2,19 @@
 
 extern int D_L20_001B20EC __attribute__((sda));
 extern char *D_L20_001FEC80[];
-extern int func_L20_0039E0A0(int);
-extern int func_00282948(char *);
-extern float func_L20_00444B48(int, int, float, float);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern void func_00282D08(float *, const void *, const void *, float);
-extern float func_002A89A8(char *, int, float);
-extern int func_00277258(void *, int, void *, float);
-extern u8 *func_L20_0039DBC8(void *, int, const float *);
+extern int group_count_live_members(int);
+extern int math_fast_float_d(char *);
+extern float level_interpolate_by_counter(int, int, float, float);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern void lerp_vector(float *, const void *, const void *, float);
+extern float coll_probe_ground_height_below(char *, int, float);
+extern int coll_test_point(void *, int, void *, float);
+extern u8 *trooper_spawn_from_free_slot(void *, int, const float *);
 
 /* Every so often tries to place new helper enemies at random spots along the edge of the arena, four at a time or six when the boss is angry. */
-void func_L20_004429F0(char *object)
+void yeedil_boss_spawn_minions_edge(char *object)
 {
     /* Interpolation, ground probing and collision use the complete quadword,
      * including the fourth lane even though this controller edits only XYZ. */
@@ -30,13 +30,13 @@ void func_L20_004429F0(char *object)
         return;
     if (*(u8 *)(object + 0x95) == 5)
         return;
-    if (CountLiveGroupMembers(*(int *)(state + 0x23C)) != 0)
+    if (group_count_live_members(*(int *)(state + 0x23C)) != 0)
         return;
-    if (FastFloatHelperD(state + 0x1848) == 0 && D_L20_001B20EC == 0)
+    if (math_fast_float_d(state + 0x1848) == 0 && D_L20_001B20EC == 0)
         return;
     rate = 60.0f;
     requested = 4;
-    interval = InterpolateByProgressCounter(5, 20, 0.0f, rate);
+    interval = level_interpolate_by_counter(5, 20, 0.0f, rate);
     attempts = 0;
     spawned = 0;
     *(int *)(state + 0x1848) = FloatToInt((float)(int)(interval * rate)) + 1200;
@@ -47,15 +47,15 @@ void func_L20_004429F0(char *object)
         float height = 1.0f;
         float blend;
         sides = 6;
-        first = RandomIntBelow(6);
+        first = math_random_int_below(6);
         next = (first + 1) % sides;
-        blend = RandomFloatRange(0.2f, 0.8f);
+        blend = math_random_float_range(0.2f, 0.8f);
         lerp_vector(point, polygon + (first * 16 + 16),
                      polygon + (next * 16 + 16), blend);
-        point[2] = ProbeGroundHeightBelow((char *)point, 0, 0.5f) + height;
-        if (TestPointAgainstCollision(point, 0, 0, 0.9f) == 0) {
+        point[2] = coll_probe_ground_height_below((char *)point, 0, 0.5f) + height;
+        if (coll_test_point(point, 0, 0, 0.9f) == 0) {
             point[2] -= height;
-            if (SpawnTrooperFromFreeSlot(object, *(int *)(state + 0x23C), point) == 0)
+            if (trooper_spawn_from_free_slot(object, *(int *)(state + 0x23C), point) == 0)
                 break;
             ++spawned;
         }

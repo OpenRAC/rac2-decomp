@@ -33,19 +33,19 @@ typedef struct {
     f32 fFC;
 } Obj_416A50;
 
-extern void func_L01_00417090(Obj_416A50 *a0);
+extern void part_spawn_sparkle_drift(Obj_416A50 *a0);
 extern float D_L01_001B1A58 __attribute__((sda));
 extern float D_L01_001B1A5C __attribute__((sda));
 extern float D_L01_001B1A60 __attribute__((sda));
 extern float D_L01_001B1A74 __attribute__((sda));
 extern int D_L01_001B1A98 __attribute__((sda));
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern int func_002A77E0(int);
-extern void func_L01_00416C08(Obj_416A50 *);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern int math_random_int_below(int);
+extern void gfx_draw_glow_rings(Obj_416A50 *);
 
 /* Keeps a moby bobbing up and down and turning toward its target angles while it is in its running state. */
-void func_L01_00416A50(Obj_416A50 *moby)
+void bobbing_l01_moby_update_2(Obj_416A50 *moby)
 {
     State_416A50 *vars = moby->st;
     float bobSine;
@@ -53,7 +53,7 @@ void func_L01_00416A50(Obj_416A50 *moby)
     moby->f2C = moby->cls->f24 * D_L01_001B1A58;
 
     if (moby->b20 == 1) {
-        bobSine = FastSinOrCosB(moby->fFC);
+        bobSine = math_fast_sin_or_cos_b(moby->fFC);
         moby->f18 = vars->f18 + D_L01_001B1A5C + D_L01_001B1A60 * bobSine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
@@ -61,7 +61,7 @@ void func_L01_00416A50(Obj_416A50 *moby)
         moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * D_L01_001B1A74);
     }
 
-    DrawGlowRings(moby);
-    if (RandomIntBelow(D_L01_001B1A98) == 0)
-        SpawnSparkleTrail(moby);
+    gfx_draw_glow_rings(moby);
+    if (math_random_int_below(D_L01_001B1A98) == 0)
+        part_spawn_sparkle_drift(moby);
 }

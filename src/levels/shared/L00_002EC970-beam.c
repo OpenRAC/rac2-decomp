@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_002EC970 (DrawTaperedBeam): draws two beams of quads, an inner and an outer one, along a
  * path of points, narrowing by 0.75 per segment. A unit of its own for -frac2-zero-ti-por.
  *
@@ -18,19 +19,19 @@ typedef struct {
     unsigned long tag, tex, alpha, test;
 } Beam;
 
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_002A7878(float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern float func_00283CE0(int);
-extern void func_00280B90(void *, void *, int);
-extern char D_L00_001B8DC0[];
+extern float IntToFloat(int);
+extern void draw_world_quad(void *, void *, int);
+extern char g_camera_l00_position[];
 
-void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int index, float u0, float du)
+void DrawTaperedBeam(Vector4 *start, Vector4 *points, unsigned int color, int index, float u0, float du)
 {
     int count = index;
     Vector4 origin;
@@ -40,18 +41,18 @@ void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int 
     float width;
 
     pos->bits = start->bits;
-    InitQuadPacketState(&first, 23, 1, 0x80);
-    InitQuadPacketState(&second, 23, 1, 0x80);
+    gfx_init_quad_packet_state(&first, 23, 1, 0x80);
+    gfx_init_quad_packet_state(&second, 23, 1, 0x80);
     nearSize.bits = 0;
     farSize.bits = 0;
     first.color[0] = first.color[1] = color | 0x7F000000;
     second.color[0] = second.color[1] = color | 0x3F000000;
     nearSize.f[3] = 1;
     farSize.f[3] = 1;
-    width = RandomFloatRange(0.2f, 0.45f);
+    width = math_random_float_range(0.2f, 0.45f);
     nearSize.f[2] = width;
     farSize.f[2] = width * 1.5f;
-    if (!(Rand() & 1)) {
+    if (!(func_001163B0() & 1)) {
         first.uv[0] = u0; first.uv[1] = 0; first.uv[2] = u0; first.uv[3] = 1;
         first.uv[4] = du + u0; first.uv[5] = 0; first.uv[6] = du + u0; first.uv[7] = 1;
         second.uv[0] = u0; second.uv[1] = 0; second.uv[2] = u0; second.uv[3] = 1;
@@ -63,7 +64,7 @@ void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int 
         second.uv[4] = du + u0; second.uv[5] = 1; second.uv[6] = du + u0; second.uv[7] = 0;
     }
     FastVecSub(&basis[0], points, pos); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], gCameraPosition_L00, pos); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], g_camera_l00_position, pos); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     qcopy(&basis[3], pos);
     qcopy(&first.point[0], &nearSize); qcopy(&second.point[0], &farSize);
@@ -75,7 +76,7 @@ void func_L00_002EC970(Vector4 *start, Vector4 *points, unsigned int color, int 
         Vector4 *to = &points[index + 1], *from = &points[index];
         Beam *b = &first, *c = &second;
         FastVecSub(&basis[0], to, from); vec_scale_to_length(&basis[0], &basis[0], 1);
-        FastVecSub(&basis[1], gCameraPosition_L00, from); FastVecCross(&basis[2], &basis[1], &basis[0]);
+        FastVecSub(&basis[1], g_camera_l00_position, from); FastVecCross(&basis[2], &basis[1], &basis[0]);
         vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
         qcopy(&basis[3], from);
         nearSize.f[2] *= 0.75f; farSize.f[2] = nearSize.f[2] * 1.5f;

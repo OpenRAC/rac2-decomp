@@ -7,7 +7,7 @@ extern f32 func_2EF110(f32 *);
 extern f32 D_L03_001B0648 __attribute__((sda));
 
 /* Creates a moby of class 2562 at the given spot, pointing along the given direction, and returns it (or 0 if none was made). */
-char *func_L03_003D18F8(char *parent, char *position, f32 *direction, s32 lifetime)
+char *trail_projectile_spawn(char *parent, char *position, f32 *direction, s32 lifetime)
 {
     char *newMoby = func_3113F0(0xA02 /* moby class 2562 */);
     char *vars;

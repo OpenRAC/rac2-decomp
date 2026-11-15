@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00283B98(float a0, float a1);
+extern float FastAddRotations(float a0, float a1);
 typedef struct {
     char pad_000[0x140];
     float x_140;
@@ -10,17 +10,17 @@ typedef struct {
 } Aimvec_F0b10;
 extern Aimvec_F0b10 D_L00_001B8C80;
 extern Aimvec_F0b10 D_L00_001B8C80;
-extern void func_0029F338(char *);
-extern int func_002ACBC8(void *, int);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
+extern void moby_mark_spawned(char *);
+extern int IsPointInCuboid(void *, int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
 extern void func_L00_0036EF68(char *, int, int, int);
 extern void ref_L00_003F3160_00(void *, void *);
-extern void func_L00_003F3518(char *);
+extern void gfx_draw_lit_group_points(char *);
 extern int D_L00_001A9018 __attribute__((sda));
 extern unsigned short **D_L00_001A9014 __attribute__((sda));
 extern unsigned char *D_L00_001B2514 __attribute__((sda));
-extern void func_0029F338(char *a0);
+extern void moby_mark_spawned(char *a0);
 
 /* A three-state object whose record (the pointer at +0x68) carries a group index at +0, two
    RGB triples and two RGBA quadruples as separate bytes, a packed colour at +0x10 and a few
@@ -49,7 +49,7 @@ void func_PAL_L00_003F7528(char *obj)
     case 0:
         group = *(int *)st;
         if (group >= D_L00_001A9018 || D_L00_001A9014[group] == 0 || group == -1) {
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
             return;
         }
         *(float *)(st + 8) = *(float *)(st + 8) * 0.017453294f;
@@ -78,25 +78,25 @@ void func_PAL_L00_003F7528(char *obj)
         if (*(float *)(st + 0x40) == 0.0f && *(float *)(st + 0x44) == 0.0f &&
             *(float *)(st + 0x48) == 0.0f)
             *(int *)(st + 0x6C) = 1;
-        ref_L00_003F3160_00((void *)func_L00_003F3518, obj);
+        ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, obj);
         obj[0x20] = 2;
         return;
     case 1:
         if (*(int *)(st + 0x64) != -1) {
-            if (func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
+            if (IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
                 return;
         }
-        angle = func_00283B98(*(float *)(st + 0xC), *(float *)(st + 4));
+        angle = FastAddRotations(*(float *)(st + 0xC), *(float *)(st + 4));
         prev = *(int *)(st + 0x10);
         *(float *)(st + 0xC) = angle;
         if (*(float *)(st + 8) != 0.0f) {
             target = *(int *)(st + 0x14);
             if (angle > *(float *)(st + 8))
                 target = *(int *)(st + 0x18);
-            *(int *)(st + 0x10) = func_00283D38(prev, target, 0.120000005f);
+            *(int *)(st + 0x10) = FastTweenColor(prev, target, 0.120000005f);
         } else {
-            *(int *)(st + 0x10) = func_00283D38(*(int *)(st + 0x14), *(int *)(st + 0x18),
-                                                func_00283198(angle) * 0.5f + 0.5f);
+            *(int *)(st + 0x10) = FastTweenColor(*(int *)(st + 0x14), *(int *)(st + 0x18),
+                                                math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f);
         }
         if (*(int *)(st + 0x10) == prev)
             return;
@@ -111,8 +111,8 @@ void func_PAL_L00_003F7528(char *obj)
         return;
     case 2:
         if (*(int *)(st + 0x64) == -1 ||
-            func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
-            ref_L00_003F3160_00((void *)func_L00_003F3518, obj);
+            IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
+            ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, obj);
         return;
     }
 }

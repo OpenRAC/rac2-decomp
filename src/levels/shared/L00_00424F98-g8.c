@@ -23,9 +23,9 @@ extern float D_00138280[];
 extern float D_00138284[];
 extern s32 D_001A7BA8 MACRO_ADDR;
 extern s32 D_001A7BA4 MACRO_ADDR;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern unsigned int D_001A7390 MACRO_ADDR;
-extern L00_00424F98_Counter D_0018C750;
+extern L00_00424F98_Counter g_progress_statistics;
 extern s32 ref_L00_00424F98_00 __attribute__((sda));
 extern s32 ref_L00_00424F98_01 __attribute__((sda));
 extern float ref_L00_00424F98_02 __attribute__((sda));
@@ -33,7 +33,7 @@ extern float ref_L00_00424F98_03 SDATA(ref_L00_00424F98_03);
 
 /* The vehicle's steering and throttle inputs, with the stunt counter: holding the
    stick centred for a second counts one run and records the best time. */
-void func_L00_00424F98(char *vehicle, float *steerOut, float *throttleOut)
+void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttleOut)
 {
     L00_00424F98_Input *input = (L00_00424F98_Input *)(*(char **)(vehicle + 0x70) + 0x1C0);
     L00_00424F98_Counter *counter;
@@ -54,7 +54,7 @@ void func_L00_00424F98(char *vehicle, float *steerOut, float *throttleOut)
             *steerOut = input->steer;
     } else {
         input->steer_out = ref_L00_00424F98_02;
-        counter = &gProgressStatistics;
+        counter = &g_progress_statistics;
         runCount = counter->count;
         if ((unsigned short)runCount < 3U) {
             ref_L00_00424F98_00++;
@@ -64,7 +64,7 @@ void func_L00_00424F98(char *vehicle, float *steerOut, float *throttleOut)
                 if (D_001A7390 > counter->best)
                     counter->best = D_001A7390;
                 ref_L00_00424F98_01 = 1;
-                counter->flags = (counter->flags | (1u << gCurrentMapIndex)) | 0x80000000u;
+                counter->flags = (counter->flags | (1u << g_current_map_index)) | 0x80000000u;
             }
         }
     }

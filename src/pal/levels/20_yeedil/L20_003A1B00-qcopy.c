@@ -13,15 +13,15 @@ typedef union {
     float f[4];
 } Vector;
 
-extern int func_002B3868(unsigned char *);
+extern int flag_set_first_pending(unsigned char *);
 
-extern void func_002A7750(unsigned char *, int, int);
+extern void moby_set_state(unsigned char *, int, int);
 
-extern int func_00282948(int *);
+extern int math_fast_float_d(int *);
 
-extern void func_00282CF0(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
 
-extern void func_002AD6F0(void *, const void *, const void *, const void *);
+extern void mat_combine_and_store(void *, const void *, const void *, const void *);
 
 /* Two-state mover. State 0 records the start position (object + 0x10) in state + 0x60 when
    func_002B3868 returns nonzero, and switches to state 1. State 1 steps the timer at
@@ -39,15 +39,15 @@ void func_PAL_L20_003A1B00(unsigned char *object) {
     oldRotation.q = *(TI128 *)(object + 0xF0);
     switch (object[0x20]) {
     case 0:
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             *(TI128 *)(state + 0x60) = *(TI128 *)(object + 0x10);
             *(int *)(state + 0x78) = ((s32)*(int *)(state + 0x78) * 5 + 2) / 6;
         }
-        func_002A7750(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (func_002B3868(object)) *(int *)(state + 0x7C) = *(int *)(state + 0x78);
-        if (func_00282948((int *)(state + 0x7C))) func_002A7750(object, 1, -1);
+        if (flag_set_first_pending(object)) *(int *)(state + 0x7C) = *(int *)(state + 0x78);
+        if (math_fast_float_d((int *)(state + 0x7C))) moby_set_state(object, 1, -1);
         *(TI128 *)(object + 0x10) = *(TI128 *)(state + 0x60);
         phase = (float)*(int *)(state + 0x7C) / (float)*(int *)(state + 0x78) + *(float *)(state + 0x80);
         high = *(float *)(state + 0x70);
@@ -57,6 +57,6 @@ void func_PAL_L20_003A1B00(unsigned char *object) {
         *(float *)(object + 0x14) = z + (low + (high - low) * phase);
         break;
     }
-    func_00282CF0(&delta, object + 0x10, &oldPosition);
-    func_002AD6F0(state + 0x20, &delta, &oldRotation, object + 0xF0);
+    FastVecSub(&delta, object + 0x10, &oldPosition);
+    mat_combine_and_store(state + 0x20, &delta, &oldRotation, object + 0xF0);
 }

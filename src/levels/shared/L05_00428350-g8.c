@@ -3,9 +3,9 @@
 
 /* The two small-data words below are reached through $gp in ordinary flow, not
    in a delay slot, so this unit has to be the -G8 sibling of L05_00428350.c. */
-extern int D_L05_001B1B20 __attribute__((sda));
+extern int g_ship_state __attribute__((sda));
 
-extern int D_L05_001B1B24 __attribute__((sda));
+extern int g_ship_transition_timer __attribute__((sda));
 
 /* Three per-slot tables indexed by the state's slot number. Each is an incomplete sda array:
    cc1 then keeps every table address as one `la`, which the assembler expands to an adjacent
@@ -15,16 +15,16 @@ extern int D_L05_001B3598[] __attribute__((sda));
 extern int D_L05_001B35B0[] __attribute__((sda));
 extern float D_L05_001B157C __attribute__((sda));
 extern char D_L05_001B96C0[];
-extern float func_00282E48(void *, void *);
-extern int func_00282978(void *);
-extern void func_0029F338(void *);
-extern void func_L00_002E6DB8(void *, void *);
-extern void func_L05_00428518(void *);
+extern float fast_vec_dist(void *, void *);
+extern int FastDecTimer(void *);
+extern void moby_mark_spawned(void *);
+extern void gfx_add_draw_callback_second(void *, void *);
+extern void DrawExpandingBillboardEffect(void *);
 
 extern char *D_L05_001B1EC4 MACRO_ADDR;
 extern char *D_L05_001B251C MACRO_ADDR;
-extern int D_001A79F0 __attribute__((sda));
-extern int func_L05_00379F38(void);
+extern int g_current_map_index __attribute__((sda));
+extern int hero_get_state_value_b(void);
 extern float D_L05_001B1AB4 __attribute__((sda));
 extern float D_L05_001B1AB8 __attribute__((sda));
 extern float D_L05_001B1ABC __attribute__((sda));
@@ -91,17 +91,17 @@ typedef struct {
 
 /* Reports 1 while the second word is set; otherwise whether the first word,
    minus two, is below two as an unsigned value. */
-int func_L05_00442860(void)
+int cam_is_mode_active(void)
 {
-    if (gShipTransitionTimer != 0)
+    if (g_ship_transition_timer != 0)
         return 1;
-    return (unsigned int)(gShipState - 2) < 2;
+    return (unsigned int)(g_ship_state - 2) < 2;
 }
 
 /* On the first pass seeds the slot's speed and timer, then picks the state's +0x40 rate from
    the distance to D_L05_001B96C0; afterwards either chains func_L05_00428518 or releases the
    slot and drops the live count. */
-void func_L05_00428350(char *object)
+void expanding_effect_update(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
@@ -120,11 +120,11 @@ void func_L05_00428350(char *object)
     }
     if (!FastDecTimer(state)) {
         FastDecTimer(state + 4);
-        AddDrawCallbackToList2(DrawExpandingBillboardEffect, object);
+        gfx_add_draw_callback_second(DrawExpandingBillboardEffect, object);
     } else {
         D_L05_001B35B0[*(int *)(state + 0x3C)] = 0;
         D_L05_001B157C -= 1.0f;
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
     }
 }
 
@@ -132,7 +132,7 @@ void func_L05_00428350(char *object)
    func_L05_00379F38 reports set (its middle vector depends on D_001A79F0 == 15), the
    second (which also overrides the look) when D_001A79F0 is 15, the third otherwise. The
    struct field stores let the scheduler hoist the global loads past them as retail does. */
-void func_L05_00442880(char *object)
+void cam_load_parameter_set(char *object)
 {
     Record_L05_00442880 *record = *(Record_L05_00442880 **)(object + 0x70);
     Params_L05_00442880 *params = &record->params;
@@ -148,8 +148,8 @@ void func_L05_00442880(char *object)
     look->b[0] = D_L05_001B1A88;
     look->c = D_L05_001B1A94;
     look->d = D_L05_001B1A98;
-    if (GetPlayerStateField15()) {
-        if (gCurrentMapIndex == 15) {
+    if (hero_get_state_value_b()) {
+        if (g_current_map_index == 15) {
             params->b[0] = D_L05_001B1A34;
             params->b[1] = D_L05_001B1A38;
             params->b[2] = D_L05_001B1A3C;
@@ -163,7 +163,7 @@ void func_L05_00442880(char *object)
         params->a[2] = D_L05_001B1A24;
         params->c = D_L05_001B1A78;
         params->d = D_L05_001B1A74;
-    } else if (gCurrentMapIndex == 15) {
+    } else if (g_current_map_index == 15) {
         params->b[0] = D_L05_001B1B84;
         params->b[1] = D_L05_001B1B88;
         params->b[2] = D_L05_001B1B8C;
@@ -201,19 +201,19 @@ typedef struct ListMoby_0042C928 {
 } ListMoby_0042C928;
 extern u8 D_0019B278[] MACRO_ADDR;
 extern int D_001A79F0_1;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 extern float D_L05_001B1748 __attribute__((sda));
 extern float D_L05_001B174C __attribute__((sda));
 extern float D_L05_001B1750 __attribute__((sda));
 extern ListMoby_0042C928 *D_L05_001B1780 __attribute__((sda));
 extern ListMoby_0042C928 *D_L05_001B2528;
-extern char *func_0029EFD0(s32 a0);
-extern float func_002A7940(void);
-extern void func_L01_00397950(char *a0);
-extern void func_002A0488(char *a0, s32 a1, s32 a2, s32 a3);
+extern char *CreateMoby(s32 a0);
+extern float math_random_angle(void);
+extern void moby_init_randomized_vars(char *a0);
+extern void set_moby_color(char *a0, s32 a1, s32 a2, s32 a3);
 
 /* Creates a collectible of class 0x126C at a position, unless that one has already been collected. */
-char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
+char *pickup_spawn_if_not_taken(float *pos, u32 kind, s32 a2, s32 a3)
 {
     char *moby;
     char *vars;
@@ -227,7 +227,7 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         float x, y, z, r;
 
         vars = *(char **)(moby + 0x68);
-        *(long *)(moby + 0x38) = *(long *)(gHeroMoby_0018C0B0 + 0x38);
+        *(long *)(moby + 0x38) = *(long *)(g_hero_moby + 0x38);
         qcopy(moby + 0x10, pos);
         *(s16 *)(moby + 0x32) = 0x40;
         *(u8 *)(moby + 0x30) = 0x40;
@@ -235,10 +235,10 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         *(u32 *)vars = kind;
         qcopy(vars + 0x10, moby + 0x10);
         *(float *)(vars + 0x1C) = *(float *)(moby + 0xF8);
-        *(float *)(moby + 0xF0) = RandomAngle();
-        *(float *)(moby + 0xF4) = RandomAngle();
-        *(float *)(moby + 0xF8) = RandomAngle();
-        r = RandomAngle();
+        *(float *)(moby + 0xF0) = math_random_angle();
+        *(float *)(moby + 0xF4) = math_random_angle();
+        *(float *)(moby + 0xF8) = math_random_angle();
+        r = math_random_angle();
         x = D_L05_001B1748;
         y = D_L05_001B174C;
         z = D_L05_001B1750;
@@ -252,7 +252,7 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         *(float *)(vars + 0x68) = x;
         *(float *)(vars + 0x64) = y;
         *(u8 *)(moby + 0x20) = 1;
-        InitRandomizedMobyVars(moby);
+        moby_init_randomized_vars(moby);
         set_moby_color(moby, 0x82, 0x82, 0x82);
         if (D_L05_001B1780 == 0) {
             for (p = D_L05_001B2528; p != 0; p = p->next) {
@@ -270,11 +270,11 @@ extern float D_L05_001B1A18 __attribute__((sda));
 extern float D_L05_001B1AC0 __attribute__((sda));
 extern int D_L05_001B1B74 __attribute__((sda));
 extern int D_L05_001B1B78 __attribute__((sda));
-extern void func_00282C88(void *a0);
-extern void func_L05_00441EA0(void *a0);
-extern void func_L00_002E54E0(float a0);
+extern void vec_clear_128(void *a0);
+extern void cam_load_entry_vectors(void *a0);
+extern void gfx_set_clamped_view_distance(float a0);
 extern void func_L05_003D1E20(void);
-extern void func_L05_00442720(void);
+extern void ship_save_settings(void);
 
 typedef struct Block_00441D40 {
     float f00, f04, f08, f0C, f10, f14;
@@ -348,7 +348,7 @@ typedef struct Object_00441D40 {
 } Object_00441D40;
 
 /* Sets up the starting state of the level's camera object: default position, blocks and rates. */
-void func_L05_00441D40(Object_00441D40 *object)
+void cam_init_state(Object_00441D40 *object)
 {
     State_00441D40 *state;
     State_00441D40 *state2;
@@ -364,7 +364,7 @@ void func_L05_00441D40(Object_00441D40 *object)
     state->pos[0] = D_L05_001B1A10;
     state->pos[1] = D_L05_001B1A14;
     state->pos[2] = D_L05_001B1A18;
-    ClearVector128(state->v10);
+    vec_clear_128(state->v10);
     state->f40 = 0;
     state->f44 = 0;
 
@@ -384,10 +384,10 @@ void func_L05_00441D40(Object_00441D40 *object)
     blk->f24 = 0;
     blk->f1E = 0;
     blk->f1F = 0;
-    ClearVector128(state2->blk.v50);
-    ClearVector128(state2->blk.v60);
-    LoadCameraEntryVectors(object);
-    SetClampedViewDistance(4096.0f);
+    vec_clear_128(state2->blk.v50);
+    vec_clear_128(state2->blk.v60);
+    cam_load_entry_vectors(object);
+    gfx_set_clamped_view_distance(4096.0f);
 
     table = (Slot_00441D40 *)D_L05_001B1EC4;
     actors = D_L05_001B251C;
@@ -403,11 +403,11 @@ void func_L05_00441D40(Object_00441D40 *object)
     vars->rate = rate;
     vars->f214 = -1;
     object->f7E = 0;
-    gShipState = 0;
+    g_ship_state = 0;
     func_L05_003D1E20();
     D_L05_001B1B74 = 0;
     D_L05_001B1B78 = 0;
-    SaveShipSettings();
+    ship_save_settings();
 }
 
 extern float D_L05_001B1680 __attribute__((sda));
@@ -440,13 +440,13 @@ extern int D_L05_001B1714 __attribute__((sda));
 extern int D_L05_001B1718 __attribute__((sda));
 extern int D_L05_001B171C __attribute__((sda));
 extern int D_L05_001B1720 __attribute__((sda));
-extern float func_00283180(float), func_00283198(float);
-extern void func_L05_0042BB10(void *);
-extern void func_L05_0042B2C0(void *, void *, float, float, int, int,
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern void gfx_draw_tiled_ground_quad(void *);
+extern void gfx_build_textured_ring_strip(void *, void *, float, float, int, int,
                            float, float, float, float);
 
 /* Advances five wrapped phases, then draws four layers along the actor heading. */
-void func_L05_0042AFE0(u8 *actor)
+void gfx_draw_scrolling_stream_layers(u8 *actor)
 {
     float direction[4] __attribute__((aligned(16)));
     D_L05_001B16D4 += D_L05_001B16D8;
@@ -464,20 +464,20 @@ void func_L05_0042AFE0(u8 *actor)
     D_L05_001B170C += D_L05_001B1710;
     if (D_L05_001B170C > 7.0f) D_L05_001B170C -= 7.0f;
     else if (D_L05_001B170C < -7.0f) D_L05_001B170C += 7.0f;
-    direction[0] = FastSinOrCosA(*(float *)(actor + 0xF8));
-    direction[1] = FastSinOrCosB(*(float *)(actor + 0xF8));
+    direction[0] = math_fast_sin_or_cos_a(*(float *)(actor + 0xF8));
+    direction[1] = math_fast_sin_or_cos_b(*(float *)(actor + 0xF8));
     direction[2] = 0.0f;
-    DrawTiledGroundQuad(actor);
-    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B16A0, D_L05_001B1684, D_L05_001B1718, D_L05_001B16A8,
+    gfx_draw_tiled_ground_quad(actor);
+    gfx_build_textured_ring_strip(actor + 0x10, direction, D_L05_001B16A0, D_L05_001B1684, D_L05_001B1718, D_L05_001B16A8,
                      D_L05_001B16D0 * 0.03225806355f,
                      D_L05_001B16CC * 0.2f, 0.0f, D_L05_001B16D4);
-    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1714, D_L05_001B16A4,
+    gfx_build_textured_ring_strip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1714, D_L05_001B16A4,
                      D_L05_001B16B8 * 0.03225806355f,
                      D_L05_001B16B4 * 0.2f, D_L05_001B16FC, D_L05_001B16D4);
-    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1720, D_L05_001B16B0,
+    gfx_build_textured_ring_strip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1720, D_L05_001B16B0,
                      D_L05_001B16C8 * 0.03225806355f,
                      D_L05_001B16C4 * 0.2f, D_L05_001B1704, D_L05_001B16E8);
-    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B171C, D_L05_001B16AC,
+    gfx_build_textured_ring_strip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B171C, D_L05_001B16AC,
                      D_L05_001B16C0 * 0.03225806355f,
                      D_L05_001B16BC * 0.2f, D_L05_001B170C, D_L05_001B16D4);
 }

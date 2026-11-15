@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_00449C78, the PAL copy of func_L20_004441D8: the same C, where the acceleration factor
  * 1/60 becomes 0.02, the two lifetimes c and d are scaled to 50 Hz and 60 becomes 50.
  * Built with -frac2-sticky-volatile-refs: qzero_nc's volatile asm keeps the delay-slot search of
@@ -17,7 +18,7 @@ extern char *D_L20_001B3614 __attribute__((section(".sdata")));
 extern char *D_L20_001B2F9C __attribute__((section(".sdata")));
 extern char *D_L20_001B308C __attribute__((section(".sdata")));
 extern char *D_L20_001B2FA0 __attribute__((section(".sdata")));
-extern char *D_0018C0B0 __attribute__((nosda));
+extern char *g_hero_moby __attribute__((nosda));
 extern char D_L20_001A8F20[] __attribute__((section(".sdata")));
 extern int D_L20_001B2FB8 __attribute__((sda));
 extern int D_L20_001B220C __attribute__((sda));
@@ -34,21 +35,21 @@ extern float D_L20_001B2250[] MACRO_ADDR;
 extern float D_L20_001B2250_gp SDATA(D_L20_001B2250);
 extern float D_L20_001B2BE8 __attribute__((sda));
 
-extern void func_002E5CF8(int, int, void *);
-extern void func_0029F338(void *);
-extern void func_00282C90(void *);
-extern void func_00282C88(void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00282C48(float);
-extern float func_002A89A8(void *, int, float);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern int func_00283D38(int, int, float);
-extern char *func_002AB1F0(void *);
-extern void func_002A8F70(char *object, int kind, int bits, float strength, void *position, void *vector);
-extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void PlayMobySound(int, int, void *);
+extern void moby_mark_spawned(void *);
+extern void vec_store_helper(void *);
+extern void vec_clear_128(void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_fabs(float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern int FastTweenColor(int, int, float);
+extern char *moby_get_private_value_0(void *);
+extern void part_queue_impact_effect(char *object, int kind, int bits, float strength, void *position, void *vector);
+extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern char *func_PAL_L20_0044E630(char *, char *, char *, char *);
 
 typedef union {
@@ -83,7 +84,7 @@ void func_PAL_L20_00449C78(char *self) {
     int d;
     float sample;
 
-    func_002E5CF8(17, 0, self);
+    PlayMobySound(17, 0, self);
     {
         unsigned short *list = D_L20_001A9014[s->groups[s->groupIndex]];
 
@@ -125,11 +126,11 @@ void func_PAL_L20_00449C78(char *self) {
                 goto nextObject;
             }
         hit:
-            if (!(func_00282C48(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
+            if (!(math_fabs(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
                 bound = D_L20_001B2FA0;
                 goto nextObject;
             }
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
             bound = D_L20_001B2FA0;
         nextObject:
             obj += 256;
@@ -158,14 +159,14 @@ objectsDone:
             }
             if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = func_002AB1F0(e);
+                    char *info = moby_get_private_value_0(e);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                func_002A8F70(e, (int)D_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, D_L20_001A8F20);
             }
         }
     }
@@ -184,57 +185,57 @@ objectsDone:
             }
             if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = func_002AB1F0(e);
+                    char *info = moby_get_private_value_0(e);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                func_002A8F70(e, (int)D_0018C0B0, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, D_L20_001A8F20);
             }
         }
     }
-    sample = func_002A89A8(selfPos, 0, 0.5f) - 2.0f;
+    sample = coll_probe_ground_height_below(selfPos, 0, 0.5f) - 2.0f;
     height = F(self, 0x18) - 0.5f;
     D_L20_001B2BE8 = sample;
     {
         int i;
 
         for (i = 0; i < D_L20_001B220C; i++) {
-            func_00282C90(&pos);
-            pos.f[0] = func_002A7878(-1.0f, 1.0f);
-            pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
-            pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
-            sample = func_002A7878(0.0f, 1.0f);
-            a = func_00283D38(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
-            sample = func_002A7878(0.0f, 1.0f);
-            b = func_00283D38(D_L20_001B2210[2], D_L20_001B2210[3], sample);
-            scale = D_L20_001B2220[func_002A77E0(2)];
-            func_00282C88(&vel);
+            vec_store_helper(&pos);
+            pos.f[0] = math_random_float_range(-1.0f, 1.0f);
+            pos.f[1] = math_random_float_range(-1.0f, 1.0f);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
+            sample = math_random_float_range(0.0f, 1.0f);
+            a = FastTweenColor(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
+            sample = math_random_float_range(0.0f, 1.0f);
+            b = FastTweenColor(D_L20_001B2210[2], D_L20_001B2210[3], sample);
+            scale = D_L20_001B2220[math_random_int_below(2)];
+            vec_clear_128(&vel);
             vel.f[3] = scale;
-            func_00282C88(&acc);
+            vec_clear_128(&acc);
             acc.f[3] = scale;
-            acc.f[2] = func_002A7878(D_L20_001B2240_gp[0], D_L20_001B2240[1]) * 0.020000001f;
-            c = (func_002A7820(1, D_L20_001B2230_gp) * 5 + 2) / 6;
-            d = (func_002A7820(D_L20_001B2230[1], D_L20_001B2230[2]) * 5 + 2) / 6;
-            func_002BAA28(&pos, &vel, &acc, a, b, c, d, 50, D_L20_001B222C);
+            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[0], D_L20_001B2240[1]) * 0.020000001f;
+            c = (math_random_int_range(1, D_L20_001B2230_gp) * 5 + 2) / 6;
+            d = (math_random_int_range(D_L20_001B2230[1], D_L20_001B2230[2]) * 5 + 2) / 6;
+            part_spawn_trail(&pos, &vel, &acc, a, b, c, d, 50, D_L20_001B222C);
         }
     }
     {
         int i;
 
         for (i = 0; i < D_L20_001B2248; i++) {
-            func_00282C90(&pos);
-            pos.f[0] = func_002A7878(-1.0f, 1.0f);
-            pos.f[1] = func_002A7878(-1.0f, 1.0f);
-            func_002830C0(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
-            pos.f[2] = height + func_002A7878(-0.5f, 0.5f);
+            vec_store_helper(&pos);
+            pos.f[0] = math_random_float_range(-1.0f, 1.0f);
+            pos.f[1] = math_random_float_range(-1.0f, 1.0f);
+            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
             qzero_nc(&vel);
-            vel.f[2] = func_002A7940();
+            vel.f[2] = math_random_angle();
             qzero_nc(&acc);
-            acc.f[2] = func_002A7878(D_L20_001B2240_gp[4], D_L20_001B2250[1]) * 0.020000001f;
+            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[4], D_L20_001B2250[1]) * 0.020000001f;
             func_PAL_L20_0044E630(self, (char *)&pos, (char *)&vel, (char *)&acc);
         }
     }

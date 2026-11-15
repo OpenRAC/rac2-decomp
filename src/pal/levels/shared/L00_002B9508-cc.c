@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_002B9508, the PAL copy of func_L00_002B9598: the same C, where rename-macro func_L00_002B4458 becomes func_PAL_L00_002B4380; lit 0.2f becomes 0.28800002f; rename func_00282CC0_3 becomes func_00282CC0; rename func_00282C88_5 becomes func_00282C88; rename func_00282E20_3 becomes func_00282E20; rename func_00282CF0_3 becomes func_00282CF0; rename func_00283248_5 becomes func_00283248; rename func_00282D30_4 becomes func_00282D30. */
 #include "common.h"
 
@@ -6,11 +7,11 @@
 typedef int TI_F41eb487e __attribute__((mode(TI)));
 #endif
 
-extern void func_00282D30(void *a, void *b, float value);
+extern void FastVecScale(void *a, void *b, float value);
 
-extern void func_00282CF0(void *a, void *b, void *c);
+extern void FastVecSub(void *a, void *b, void *c);
 
-extern void func_00282CC0(void *a, void *b, void *c);
+extern void FastVecAdd(void *a, void *b, void *c);
 
 #ifndef RAC2_T_VEC4_F41EB487E
 #define RAC2_T_VEC4_F41EB487E
@@ -36,11 +37,11 @@ typedef struct {
 
 extern ResidentState_F41eb487e D_00189E20_5;
 
-extern void func_00282C88(void *a);
+extern void vec_clear_128(void *a);
 
-extern float func_00283248(float a, float b);
+extern float mat_fast_helper_a(float a, float b);
 
-extern float func_00282E20(void *p);
+extern float vec_length_xy(void *p);
 
 typedef struct {
     u8 pad0[0x88];
@@ -78,16 +79,16 @@ typedef struct {
     float f24b8;
 } State9598;
 extern State9598 D_00189E20_9598;
-extern void func_L00_002B39F0(int, float);
-extern void func_L00_002B3EF8(int, float, float, float);
-extern void func_L00_002B54F8(float, float);
+extern void hero_resolve_stick_direction(int, float);
+extern void hero_steer_heading(int, float, float, float);
+extern void hero_build_move_impulse(float, float);
 extern void ref_L00_002B9598_0(int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282C48(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fabs(float);
 extern int D_00138354;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
@@ -100,26 +101,26 @@ void func_PAL_L00_002B9508(void)
     float delta[4] __attribute__((aligned(16)));
     float correction[4] __attribute__((aligned(16)));
     float x, limit, t, angle, scale, step, length, adjustment;
-    func_L00_002B39F0(0, 1.0f);
-    func_L00_002B3EF8(0, 0.028800001f, 0.28800002f, 0.07330384f);
+    hero_resolve_stick_direction(0, 1.0f);
+    hero_steer_heading(0, 0.028800001f, 0.28800002f, 0.07330384f);
     if (D_00189E20_9598.f2294 == 19) {
         if (D_00189E20_9598.f24b8 < 0.2f) D_00189E20_9598.f1a0 = D_00189E20_9598.f98;
         D_00189E20_9598.f1b0 = 0.4f;
     } else if (D_00189E20_9598.f2294 == 21) D_00189E20_9598.f1b0 = 0.0f;
-    desired[0] = func_00283180(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.11800001f;
-    desired[1] = func_00283198(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.11800001f;
+    desired[0] = math_fast_sin_or_cos_a(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.11800001f;
+    desired[1] = math_fast_sin_or_cos_b(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.11800001f;
     desired[2] = 0.0f;
     qcopy_nc(original, desired);
     if (D_00189E20_9598.fa70 > 0.0f) {
-        func_L00_002B54F8(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy_nc(previous, D_00189E20_9598.va60);
-        func_00282CC0(desired, desired, D_00189E20_9598.va60);
-        func_00282C88(D_00189E20_9598.va60);
+        FastVecAdd(desired, desired, D_00189E20_9598.va60);
+        vec_clear_128(D_00189E20_9598.va60);
     }
     x = -(D_00189E20_9598.vf0[0] * desired[0] + D_00189E20_9598.vf0[1] * desired[1]);
     if (x > 0.0f) {
-        x /= func_00282E20(desired);
-        x /= func_00282E20(D_00189E20_9598.vf0);
+        x /= vec_length_xy(desired);
+        x /= vec_length_xy(D_00189E20_9598.vf0);
     }
     if (x > 1.0f) x = 1.0f;
     if (x < 0.0f) x = 0.0f;
@@ -130,44 +131,44 @@ void func_PAL_L00_002B9508(void)
         limit = 0.0044f;
     if (D_00189E20_9598.f170 > 0.11800001f) limit = 0.0052000005f;
     if (D_00189E20_9598.fa70 > 0.0f) {
-        x = -func_00282DB0(original, previous);
-        length = func_00282DF0(original);
+        x = -FastVecDot(original, previous);
+        length = FastVecLength(original);
         if (length > 0.0f) x /= length;
-        length = func_00282E20(previous);
+        length = vec_length_xy(previous);
         adjustment = (length - x) / length * 0.0012f;
         if (D_00189E20_9598.f24b8 < 0.3f && adjustment < 0.0012f) adjustment = 0.0012f;
         if (limit < adjustment) limit = adjustment;
     }
-    func_00282CF0(delta, desired, D_00189E20_9598.v140);
+    FastVecSub(delta, desired, D_00189E20_9598.v140);
     delta[2] = 0.0f;
-    if (func_00282DF0(delta) > limit) func_00282F20(delta, delta, limit);
-    func_00282CC0(D_00189E20_9598.vf0, D_00189E20_9598.v140, delta);
+    if (FastVecLength(delta) > limit) vec_scale_to_length(delta, delta, limit);
+    FastVecAdd(D_00189E20_9598.vf0, D_00189E20_9598.v140, delta);
     if (D_00189E20_9598.f320 > 0.087266475f) {
-        angle = func_00283248(D_00189E20_9598.v2a0[0], D_00189E20_9598.v2a0[1]);
+        angle = mat_fast_helper_a(D_00189E20_9598.v2a0[0], D_00189E20_9598.v2a0[1]);
         scale = D_00189E20_9598.f320 * 0.20371832f;
         step = D_00189E20_9598.f320 * 0.004329014f;
-        delta[0] = func_00283180(angle) * scale;
-        delta[1] = func_00283198(angle) * scale;
+        delta[0] = math_fast_sin_or_cos_a(angle) * scale;
+        delta[1] = math_fast_sin_or_cos_b(angle) * scale;
         delta[2] = 0.0f;
-        func_00282CF0(correction, delta, D_00189E20_9598.vf0);
+        FastVecSub(correction, delta, D_00189E20_9598.vf0);
         correction[2] = 0.0f;
-        if (func_00282DF0(correction) > step) func_00282F20(correction, correction, step);
-        func_00282CC0(D_00189E20_9598.vf0, D_00189E20_9598.vf0, correction);
+        if (FastVecLength(correction) > step) vec_scale_to_length(correction, correction, step);
+        FastVecAdd(D_00189E20_9598.vf0, D_00189E20_9598.vf0, correction);
     }
     qcopy_nc(delta, D_00189E20_9598.vf0);
     delta[2] = 0.0f;
-    D_00189E20_9598.f400 = func_00282DB0(delta, desired);
-    t = func_00282DF0(desired);
+    D_00189E20_9598.f400 = FastVecDot(delta, desired);
+    t = FastVecLength(desired);
     if (t > 0.0f) D_00189E20_9598.f400 /= t * 0.11800001f;
     ref_L00_002B9598_0(0);
     if (D_00189E20_9598.f404 < 0.017453294f && D_00189E20_9598.f324 > 0.087266475f)
-        func_00282D30(D_00189E20_9598.vf0, D_00189E20_9598.vf0, func_00283180(D_00189E20_9598.f324));
+        FastVecScale(D_00189E20_9598.vf0, D_00189E20_9598.vf0, math_fast_sin_or_cos_a(D_00189E20_9598.f324));
     D_00189E20_9598.f404 = D_00189E20_9598.f324;
-    if (func_00282C48(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
+    if (math_fabs(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
 }
 
 /* The resident block the slot table lives in, and the two vector helpers. */
-extern float func_00283248(float a, float b);
+extern float mat_fast_helper_a(float a, float b);
 
 /* Transform the direction into resident space and return its selected angle delta. */
 /* The resident id this forwards, and the helper it calls. */
@@ -211,7 +212,7 @@ typedef struct {
 extern ResidentState_A508 D_00189E20_A508;
 
 /* The level vector at +0x150 of the block func_L00_002BA410 queries. */
-extern void func_00282C88(void *m);
+extern void vec_clear_128(void *m);
 /* Once per hero state, set up the object at resident +0x1220 (the special case uses a stored angle
    and the level vector at +0x150 of the block func_L00_002BA410 queries, otherwise the unit scale
    and the parent transform) and pass the composed transform to the object at +0xF0.

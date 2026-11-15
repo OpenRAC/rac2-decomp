@@ -11,34 +11,34 @@ typedef struct {
     int arg20;
 } AreaMessage_F3B3AF8;
 
-extern int D_L00_001B19C8;
+extern int g_frame_l00_counter;
 extern char *D_L00_001B1EA8 __attribute__((sda));
 extern float D_L00_001AF8C0 __attribute__((sda));
-extern char *D_0018C0B0[];
-extern void func_00282C88(void *);
-extern int func_00277F48(void *, float, int, void *, void *);
-extern float func_00282E48(void *, void *);
+extern char *g_hero_moby[];
+extern void vec_clear_128(void *);
+extern int coll_process_hit(void *, float, int, void *, void *);
+extern float fast_vec_dist(void *, void *);
 extern void ref_L00_003B3AF8_00(void *, void *);
 
 /* Broadcasts an area message from the object, then hands the object to every kind-0x13
    object of the list within the same radius. */
-void func_L00_003B3AF8(char *object)
+void blast_broadcast_area_message(char *object)
 {
     AreaMessage_F3B3AF8 msg;
     char *cursor;
 
-    if (gFrameCounter_L00 & 1) {
+    if (g_frame_l00_counter & 1) {
         msg.source = object;
         msg.flags = 0x10000;
         msg.kind = 8;
         msg.sub = 0;
         msg.id = *(u16 *)(object + 0xAA);
         msg.arg1C = 0;
-        ClearVector128(&msg);
+        vec_clear_128(&msg);
         msg.v[3] = 5627.9248f;
         msg.arg20 = 0;
-        ProcessCollisionHit(object + 0x10, D_L00_001AF8C0, 0, gHeroMoby_0018C0B0[0], &msg);
-        if (gFrameCounter_L00 & 1) {
+        coll_process_hit(object + 0x10, D_L00_001AF8C0, 0, g_hero_moby[0], &msg);
+        if (g_frame_l00_counter & 1) {
             cursor = D_L00_001B1EA8;
             while (cursor) {
                 int kind = *(unsigned char *)(cursor + 0x20);

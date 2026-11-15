@@ -1,10 +1,10 @@
 #include "common.h"
-extern s32 func_00283CF0(float);
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern void func_002A7750(u8 *, s32, s32);
-extern void func_L18_003F7590(u8 *);
-extern s32 func_L18_0032B768(u8 *, s32, s32);
-extern u8 *D_L18_001B281C MACRO_ADDR;
+extern s32 FloatToInt(float);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern void moby_set_state(u8 *, s32, s32);
+extern void protopet_reset_to_idle(u8 *);
+extern s32 moby_set_table_entry_byte(u8 *, s32, s32);
+extern u8 *g_moby_l18_table MACRO_ADDR;
 typedef struct {
     u8 reserved00[0x20];
     float animation;
@@ -30,7 +30,7 @@ typedef struct {
 } InitializationFields;
 
 /* Sets up a new Protopet: its timings, speeds, sizes and starting animation. */
-void func_L18_003F5198(u8 *object)
+void protopet_init(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     s16 mode;
@@ -60,18 +60,18 @@ void func_L18_003F5198(u8 *object)
     *(float *)(state + 0x108) = 2.0f;
     *(float *)(state + 0x10C) = 5.0f;
     *(float *)(state + 0x110) = 1.5707964897155762f;
-    SetControllerSpeedLimits(object, 0.004444444552063942f, 0.13333334028720856f, 0.0034906589426100254f, 0.20943954586982727f);
+    moby_set_controller_speed_limits(object, 0.004444444552063942f, 0.13333334028720856f, 0.0034906589426100254f, 0.20943954586982727f);
     if (*(s32 *)(state + 0x260) != -1) *(s32 *)(state + 0x13C) = *(s32 *)(state + 0x260);
     *(float *)(state + 0x268) = *(float *)(object + 0x2C);
-    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = gMobyTable_L18 + (*(s32 *)(state + 0x280) << 8);
+    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = g_moby_l18_table + (*(s32 *)(state + 0x280) << 8);
     *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-    SetMobyState(object, 6, 2);
+    moby_set_state(object, 6, 2);
     mode = *(s16 *)(state + 0x296);
     if (mode == 14) {
-        if (*(s32 *)(state + 0x26C) != -1) SetMobyState(object, 14, 2);
-    } else if (mode == 1) ResetToIdle(object);
-    else if (mode == 2) SetMobyState(object, 2, 0);
+        if (*(s32 *)(state + 0x26C) != -1) moby_set_state(object, 14, 2);
+    } else if (mode == 1) protopet_reset_to_idle(object);
+    else if (mode == 2) moby_set_state(object, 2, 0);
     qcopy((state + 0x210), (object + 0x10));
     qcopy((state + 0x220), (object + 0xF0));
-    SetTableEntryByte(object, 0, 3);
+    moby_set_table_entry_byte(object, 0, 3);
 }

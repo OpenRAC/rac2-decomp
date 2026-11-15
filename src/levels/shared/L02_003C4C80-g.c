@@ -14,9 +14,9 @@ extern L02Pair2 D_L02_001AFE20;
 extern L02Pair D_L02_001AFE28;
 extern L02Pair D_L02_001AFE30;
 
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
 
 typedef struct {
     char pad0[0x20];
@@ -30,7 +30,7 @@ typedef struct {
 /* Turns the two angles at state +0x128 towards the pair at D_L02_001AFE20, then tints the
    owner: kind 5 blends from the mean of both angles' sines, any other kind from the larger of
    the two, to the fourth power. */
-void func_L02_003C4C80(L02Owner *self)
+void part_update_pulsing_glow_tint(L02Owner *self)
 {
     char *state = self->state;
     L02Pair2 turn = D_L02_001AFE20;
@@ -50,13 +50,13 @@ void func_L02_003C4C80(L02Owner *self)
         step++;
     }
     if (self->kind == 5) {
-        t = FastSinOrCosB(*(float *)(state + 0x128));
-        t = t + FastSinOrCosB(*(float *)(state + 0x12C));
+        t = math_fast_sin_or_cos_b(*(float *)(state + 0x128));
+        t = t + math_fast_sin_or_cos_b(*(float *)(state + 0x12C));
         t = t * 0.25f;
         self->tint = FastTweenColor(high.a, high.b, t + 0.5f);
     } else {
-        a = FastSinOrCosB(*(float *)(state + 0x128)) * 0.5f + 0.5f;
-        b = FastSinOrCosB(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
+        a = math_fast_sin_or_cos_b(*(float *)(state + 0x128)) * 0.5f + 0.5f;
+        b = math_fast_sin_or_cos_b(*(float *)(state + 0x12C)) * 0.5f + 0.5f;
         if (a < b)
             a = b;
         {

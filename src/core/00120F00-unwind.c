@@ -32,12 +32,12 @@ struct eh_context
 
 extern char *(*D_00135D38)(void);
 
-extern void func_00120368(void);
+extern void call_terminate_handler(void);
 extern void *memcpy(void *, const void *, unsigned int);
 
-extern struct frame_state *func_001240C8(void *, struct frame_state *);
+extern struct frame_state *__frame_state_for(void *, struct frame_state *);
 
-extern void *func_00120BD0(struct eh_context *, void *, frame_state *,
+extern void *eh_throw_helper(struct eh_context *, void *, frame_state *,
 			   frame_state **);
 
 /* We first search for an exception handler, and if we don't find it, we call
@@ -47,7 +47,7 @@ extern void *func_00120BD0(struct eh_context *, void *, frame_state *,
    control into the handler.  */
 
 /* Throws an exception: finds the handler up the call stack and jumps to it. */
-void func_00120F00(void)
+void __throw(void)
 {
   struct eh_context *eh = (struct eh_context *)(*D_00135D38) ();
   void *pc, *handler;
@@ -59,13 +59,13 @@ void func_00120F00(void)
      try and rethrow an exception, when there is no exception currently
      active.  */
   if (! eh->info)
-    CallTerminateHandler ();
+    call_terminate_handler ();
 
   /* Start at our stack frame.  */
 label:
-  udata = GetFrameStateForPc (&&label, udata);
+  udata = __frame_state_for (&&label, udata);
   if (! udata)
-    CallTerminateHandler ();
+    call_terminate_handler ();
 
   /* We need to get the value from the CFA register. */
   udata->cfa = __builtin_dwarf_cfa ();
@@ -79,7 +79,7 @@ label:
   /* Now reset pc to the right throw point.  */
   pc = __builtin_extract_return_addr (__builtin_return_address (0)) - 1;
 
-  handler = ThrowHelper (eh, pc, my_udata, &udata);
+  handler = eh_throw_helper (eh, pc, my_udata, &udata);
 
   /* Now go!  */
 

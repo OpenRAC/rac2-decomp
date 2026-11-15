@@ -19,15 +19,15 @@ typedef struct {
     s32 count;
 } DebugMarks;
 
-extern s32 D_001A8BB0;
+extern s32 g_current_game_mode;
 extern s32 D_001A8630 __attribute__((sda));
 extern DebugMarks D_001B7600;
 
 /* Adds a marker (for an object or a position) to the list of markers drawn this frame. */
-void func_00273318(void *moby, f32 scale, u32 color, void *pos, s32 type, f32 size, s32 arg, f32 angle, s32 unused) {
+void hud_add_moby_marker(void *moby, f32 scale, u32 color, void *pos, s32 type, f32 size, s32 arg, f32 angle, s32 unused) {
     DebugMark *mark;
 
-    if (gCurrentGameMode != 2 && D_001B7600.count < 6) {
+    if (g_current_game_mode != 2 && D_001B7600.count < 6) {
         mark = &D_001B7600.e[D_001B7600.count];
         mark->moby = moby;
         mark->scale = scale;

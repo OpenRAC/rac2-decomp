@@ -20,16 +20,16 @@ typedef struct {
     ParticleMotion_002C36D0 motion;
 } Particle_002C36D0;
 
-extern Particle_002C36D0 *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern int func_002A77E0(int);
+extern Particle_002C36D0 *part_alloc(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern int math_random_int_below(int);
 extern unsigned char *D_001F2638;
 
 /* Creates a bluish particle that fades out over the given life. */
-Particle_002C36D0 *func_002C36D0(TI128 *position, int life, int kind, int extra)
+Particle_002C36D0 *part_spawn_bluish_fade(TI128 *position, int life, int kind, int extra)
 {
-    Particle_002C36D0 *p = AllocParticle(0x3E);
+    Particle_002C36D0 *p = part_alloc(0x3E);
 
     if (p != 0) {
         ParticleMotion_002C36D0 *m = &p->motion;
@@ -40,7 +40,7 @@ Particle_002C36D0 *func_002C36D0(TI128 *position, int life, int kind, int extra)
         p->unk01 = 0;
         p->unk03 = 0x48;
         p->unk0C = 30000.0f;
-        p->unk08 = RandomIntBelow(0xFF);
+        p->unk08 = math_random_int_below(0xFF);
         m->kind = kind;
         m->unk03 = extra;
         if (kind >= 2) {

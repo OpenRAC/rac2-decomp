@@ -1,46 +1,47 @@
+#include "names.h"
 /* func_PAL_L01_003DF4D8, the PAL copy of func_L01_003DAE58: the same C at 50 Hz, with its frame counts,
    rates and accelerations rescaled and the random wait in state 3 scaled by 5/6. */
 #include "common.h"
 
-extern void func_L01_003DD3A0(void *);
+extern void muckdweller_update_targeting(void *);
 extern void func_PAL_L01_003E1648(void *);
 extern void func_PAL_L01_003E05D0(void *);
 extern void func_PAL_L01_003E1DB0(void *);
-extern void func_L01_003DCE70(void *, void *);
+extern void muckdweller_find_farthest_anchor(void *, void *);
 extern void func_PAL_L01_003E1448(void *, void *);
 extern void func_PAL_L01_003E14E0(void *, void *);
 extern void func_PAL_L01_003E0710(void *, s32);
-extern void func_L01_003DBB88(void *, s32);
-extern void func_L01_003E9CF8(void *, s32, s32);
-extern s32 func_00282978(void *);
+extern void part_spawn_puffs_around_point(void *, s32);
+extern void part_queue_moby_for_glow(void *, s32, s32);
+extern s32 FastDecTimer(void *);
 extern s32 func_001163B0(void);
-extern s32 func_002A7820(s32, s32);
-extern s32 func_002A77E0(s32);
-extern s32 func_002B1C20(void *, void *);
-extern s32 func_L00_0031BE88(void *);
+extern s32 math_random_int_range(s32, s32);
+extern s32 math_random_int_below(s32);
+extern s32 moby_dispatch_action_by_kind(void *, void *);
+extern s32 level_has_pending_inner_flag(void *);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 extern void func_PAL_002A7650(void *, s32, s32);
-extern f32 func_00282C48(f32);
-extern f32 func_00282DF0(void *);
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 func_0029F530(void *);
-extern f32 func_002A78D8(f32, f32);
-extern f32 func_002A89A8(void *, s32, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00283098(void *, void *, void *);
-extern void func_00283410(void *, void *);
-extern void func_00283698(void *, void *);
-extern f32 func_L00_0031CDD0(void *, void *, void *, f32, f32);
-extern void func_002A7CA0(void *, f32, f32, f32, f32, void *);
-extern f32 func_002AAA00(void *, f32, f32, f32, f32, void *, s32);
-extern void func_002A8D70(void *, s32, s32, s32, s32, s32, f32, f32, f32);
-extern u8 D_00189E20[];
+extern f32 math_fabs(f32);
+extern f32 FastVecLength(void *);
+extern f32 vec_distance_xy(void *, void *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 moby_get_anim_value(void *);
+extern f32 math_random_signed_float_range(f32, f32);
+extern f32 coll_probe_ground_height_below(void *, s32, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void euler_to_matrix(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern f32 weapon_compute_shot_launch_speed(void *, void *, void *, f32, f32);
+extern void MobySpringTurn(void *, f32, f32, f32, f32, void *);
+extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, s32);
+extern void coll_test_hit_at_bone(void *, s32, s32, s32, s32, s32, f32, f32, f32);
+extern u8 g_hero_state[];
 extern u8 D_L01_001AC5A0[] MACRO_ADDR;
 
 /* A 16-bit struct stays in HImode, so a local copy loads with lhu and tests with sll. */
@@ -67,7 +68,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
     s32 result;
 
     if (obj[0x95])
-        func_L01_003DD3A0(obj);
+        muckdweller_update_targeting(obj);
     switch (obj[0x95]) {
     case 0:
         func_PAL_L01_003E1648(obj);
@@ -78,18 +79,18 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             I(obj, 0x98) = 0;
             obj[0x31] = 0;
         }
-        if (I(state, 0x2F4) == 1 && func_00282978(state + 0x3D4)) {
+        if (I(state, 0x2F4) == 1 && FastDecTimer(state + 0x3D4)) {
             if (state[0x3D0]) {
-                func_L01_003DCE70(obj, pos);
-                func_00282CF0(delta, pos, obj + 0x10);
+                muckdweller_find_farthest_anchor(obj, pos);
+                FastVecSub(delta, pos, obj + 0x10);
                 rate = 0.033333335071802139282f;
-                if (func_00282DF0(delta) * rate < 0.16000001f)
-                    speed = func_00282DF0(delta) * rate;
+                if (FastVecLength(delta) * rate < 0.16000001f)
+                    speed = FastVecLength(delta) * rate;
                 else
                     speed = 0.16000001f;
-                func_00282F20(delta, delta, speed);
+                vec_scale_to_length(delta, delta, speed);
                 height = 0;
-                delta[2] = func_L00_0031CDD0(obj + 0x10, pos, &height, speed, -0.0072000003f);
+                delta[2] = weapon_compute_shot_launch_speed(obj + 0x10, pos, &height, speed, -0.0072000003f);
                 qcopy(state + 0x190, delta);
                 qcopy(state + 0x390, pos);
                 if (obj[0x43] != 12)
@@ -99,29 +100,29 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                 I(obj, 0x98) = I(*(u8 **)(obj + 0x24), 0x10);
                 obj[0x31] = 1;
                 U(obj, 0x34) &= 0xfffe;
-                func_002A7750(obj, 0, 2);
+                moby_set_state(obj, 0, 2);
             } else {
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
                 if (obj[0x43] != 7)
-                    func_PAL_002A7E68(obj, 7, 0, func_002A7820(7, 12));
-                func_002A7750(obj, 3, 3);
+                    func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
+                moby_set_state(obj, 3, 3);
             }
         }
         break;
     case 2: {
         f32 distance;
 
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x190);
-        func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x190);
+        MobySpringTurn(obj, mat_fast_helper_a(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                       F(state, 0x1D4), F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
         F(state, 0x198) -= 0.0072000003f;
-        if (F(state, 0x198) <= 0 && func_00282C48(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
+        if (F(state, 0x198) <= 0 && math_fabs(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
             F(obj, 0x48) = 1;
             F(obj, 0x18) = F(state, 0x398);
             F(state, 0x198) = 0;
-            distance = func_00282E80(obj + 0x10, state + 0x390);
-            if (distance < func_00282DF0(state + 0x190)) {
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
+            if (distance < FastVecLength(state + 0x190)) {
                 qcopy(obj + 0x10, state + 0x390);
                 qzero(state + 0x190);
             }
@@ -130,15 +131,15 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                 if (obj[0x43] != 6)
                     func_PAL_002A7E68(obj, 6, 0, 10);
                 F(obj, 0x48) = 1;
-                F(state, 0x3DC) = func_002A78D8(20, 45) * 0.01745329424738884f;
+                F(state, 0x3DC) = math_random_signed_float_range(20, 45) * 0.01745329424738884f;
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
                 if (state[0x3D3])
-                    func_002A7750(obj, 2, 3);
+                    moby_set_state(obj, 2, 3);
                 else {
                     if (I(state, 0x3C0) != -1)
                         I(state, 0x1FC) = I(state, 0x3C0);
-                    func_002A7750(obj, 3, 3);
+                    moby_set_state(obj, 3, 3);
                 }
             }
         }
@@ -148,13 +149,13 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         switch (obj[0x20]) {
         case 1:
             if ((obj[0x60] & 2) && !H(state, 0x3D8)) {
-                int wait = func_002A7820(180, 440);
+                int wait = math_random_int_range(180, 440);
 
                 wait = ((s32)(wait) * 5 + 2) / 6;
                 H(state, 0x3D8) = wait;
                 if (obj[0x43] != 6)
-                    func_PAL_002A7E68(obj, 6, 7, func_002A7820(7, 12));
-                func_002A7750(obj, 2, -1);
+                    func_PAL_002A7E68(obj, 6, 7, math_random_int_range(7, 12));
+                moby_set_state(obj, 2, -1);
             }
             break;
         case 2:
@@ -167,12 +168,12 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                     H(state, 0x3D6) = 300;
                     if (I(state, 0x408) != -1) {
                         if (obj[0x43] != 7)
-                            func_PAL_002A7E68(obj, 7, 0, func_002A7820(7, 12));
-                        func_002A7750(obj, 3, -1);
+                            func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
+                        moby_set_state(obj, 3, -1);
                     } else {
                         if (obj[0x43] != (func_001163B0() & 1) + 2)
-                            func_PAL_002A7E68(obj, (func_001163B0() & 1) + 2, 0, func_002A7820(7, 12));
-                        func_002A7750(obj, 5, -1);
+                            func_PAL_002A7E68(obj, (func_001163B0() & 1) + 2, 0, math_random_int_range(7, 12));
+                        moby_set_state(obj, 5, -1);
                     }
                 } else {
                     Timer16 timer = *(Timer16 *)(state + 0x3D8);
@@ -183,11 +184,11 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                         H(state, 0x3D8) = 100;
                         if (obj[0x43] != (func_001163B0() & 1))
                             func_PAL_002A7E68(obj, func_001163B0() & 1, 0, 12);
-                        func_002A7750(obj, 1, 3);
+                        moby_set_state(obj, 1, 3);
                     } else if (!timer.value && I(state, 0x408) == -1) {
                         if (obj[0x43] != (func_001163B0() & 1) + 4)
                             func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-                        func_002A7750(obj, 1, 3);
+                        moby_set_state(obj, 1, 3);
                     }
                 }
             }
@@ -196,7 +197,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             f32 distance;
 
             func_PAL_L01_003E14E0(obj, state + 0x390);
-            distance = func_00282E80(obj + 0x10, state + 0x390);
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
             if (obj[0x60] & 2) {
                 if ((H(*(u8 **)(state + 0x2F0), 0xAA) != 0xB1A && distance <= 3) ||
                     (H(*(u8 **)(state + 0x2F0), 0xAA) == 0xB1A && distance < 1)) {
@@ -204,21 +205,21 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                     F(state, 0x3F4) = 0.3f;
                     I(state, 0x3F0) = 0;
                     if (obj[0x43] != 8)
-                        func_PAL_002A7E68(obj, 8, 0, func_002A7820(4, 7));
-                    func_002A7750(obj, 0, 4);
+                        func_PAL_002A7E68(obj, 8, 0, math_random_int_range(4, 7));
+                    moby_set_state(obj, 0, 4);
                 }
-                if (I(state, 0x2F4) != 1 && !H(state, 0x3D6) && I(state, 0x408) == -1 && !func_002A77E0(39)) {
-                    if (!func_002A77E0(3)) {
+                if (I(state, 0x2F4) != 1 && !H(state, 0x3D6) && I(state, 0x408) == -1 && !math_random_int_below(39)) {
+                    if (!math_random_int_below(3)) {
                         I(state, 0x404) = 150;
                         F(state, 0x3F4) = 0.3f;
                         I(state, 0x3F0) = 0;
                         if (obj[0x43] != 8)
-                            func_PAL_002A7E68(obj, 8, 0, func_002A7820(4, 7));
-                        func_002A7750(obj, 0, 4);
+                            func_PAL_002A7E68(obj, 8, 0, math_random_int_range(4, 7));
+                        moby_set_state(obj, 0, 4);
                     } else {
                         if (obj[0x43] != 6)
-                            func_PAL_002A7E68(obj, 6, 0, func_002A7820(12, 18));
-                        func_002A7750(obj, 4, 3);
+                            func_PAL_002A7E68(obj, 6, 0, math_random_int_range(12, 18));
+                        moby_set_state(obj, 4, 3);
                     }
                 }
             }
@@ -227,21 +228,21 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         case 4:
             func_PAL_L01_003E1448(obj, state + 0x2B0);
             if (obj[0x60] & 2) {
-                if (!I(state, 0x404) || func_00282E80(obj + 0x10, D_00189E20 + 0x80) > 7) {
+                if (!I(state, 0x404) || vec_distance_xy(obj + 0x10, g_hero_state + 0x80) > 7) {
                     H(state, 0x3D8) = 50;
                     if (obj[0x43] != (func_001163B0() & 1) + 4)
                         func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-                    func_002A7750(obj, 1, 3);
+                    moby_set_state(obj, 1, 3);
                 }
             }
             break;
         case 5:
-            func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+            MobySpringTurn(obj, mat_fast_helper_a(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                           F(state, 0x1D4) * 2, F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
             if (obj[0x60] & 2) {
                 if (obj[0x43] != 7)
-                    func_PAL_002A7E68(obj, 7, 0, func_002A7820(7, 12));
-                func_002A7750(obj, 3, -1);
+                    func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
+                moby_set_state(obj, 3, -1);
             }
             break;
         }
@@ -250,37 +251,37 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         f32 distance;
         u8 *target;
 
-        distance = func_0029F530(obj);
+        distance = moby_get_anim_value(obj);
         target = *(u8 **)(state + 0x2F0);
-        func_002AAA00(obj + 0xF8, func_00283248(F(target, 0x10) - F(obj, 0x10), F(target, 0x14) - F(obj, 0x14)),
+        math_approach_target_with_direction_mode(obj + 0xF8, mat_fast_helper_a(F(target, 0x10) - F(obj, 0x10), F(target, 0x14) - F(obj, 0x14)),
                       F(state, 0x1D4), F(state, 0x1D8), F(state, 0x1DC), state + 0x274, 0);
         if (obj[0x42] == 8 && distance >= 18 && distance <= 23) {
             F(obj, 0x48) = 0.4f;
-            func_002A8D70(obj, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
+            coll_test_hit_at_bone(obj, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
             func_PAL_L01_003E0710(obj, 0);
         } else {
             F(obj, 0x48) = 1;
             func_PAL_L01_003E0710(obj, 1);
         }
         if (obj[0x42] == 8 && distance >= 25) {
-            F(state, 0x380) = func_00283180(F(obj, 0xF8)) * 3.25f;
-            F(state, 0x384) = func_00283198(F(obj, 0xF8)) * 3.25f;
+            F(state, 0x380) = math_fast_sin_or_cos_a(F(obj, 0xF8)) * 3.25f;
+            F(state, 0x384) = math_fast_sin_or_cos_b(F(obj, 0xF8)) * 3.25f;
             I(state, 0x388) = 0;
-            func_00282CC0(state + 0x380, state + 0x380, obj + 0x10);
-            F(state, 0x388) = func_002A89A8(state + 0x380, 0, 0.5f) + 0.025f;
-            func_L01_003DBB88(obj, 1);
+            FastVecAdd(state + 0x380, state + 0x380, obj + 0x10);
+            F(state, 0x388) = coll_probe_ground_height_below(state + 0x380, 0, 0.5f) + 0.025f;
+            part_spawn_puffs_around_point(obj, 1);
         }
         if (obj[0x60] & 2) {
             if (obj[0x43] != 6)
-                func_PAL_002A7E68(obj, 6, 0, func_002A7820(12, 18));
-            func_002A7750(obj, 4, 3);
+                func_PAL_002A7E68(obj, 6, 0, math_random_int_range(12, 18));
+            moby_set_state(obj, 4, 3);
         }
         break;
     }
     case 5:
-        result = func_002B1C20(obj, state + 0x110);
+        result = moby_dispatch_action_by_kind(obj, state + 0x110);
         if (result & 1)
-            func_002A7750(obj, 0, 6);
+            moby_set_state(obj, 0, 6);
         else if (result & 2) {
             I(state, 0x410) = -1;
             func_PAL_L01_003E05D0(obj);
@@ -292,37 +293,37 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             H(state, 0x3D8) = 25;
             if (obj[0x43] != (func_001163B0() & 1) + 4)
                 func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-            func_002A7750(obj, 1, 3);
+            moby_set_state(obj, 1, 3);
         }
         break;
     case 6:
         func_PAL_002A7650(obj, 0, 3);
         func_PAL_L01_003E05D0(obj);
-        func_L01_003DBB88(obj, 1);
-        func_L01_003E9CF8(obj, 0, 0);
+        part_spawn_puffs_around_point(obj, 1);
+        part_queue_moby_for_glow(obj, 0, 0);
         break;
     }
     if (obj[0x95] != 5 && obj[0x95] >= 3) {
         *(UpdateQuad *)pos = 0;
         pos[2] = F(obj, 0xF8);
         *(UpdateQuad *)delta = *(UpdateQuad *)pos;
-        func_00283410(matrix, delta);
-        func_00283698(inverse, matrix);
-        func_00283698(oldInverse, obj + 0xC0);
+        euler_to_matrix(matrix, delta);
+        matrix_from_basis_rows(inverse, matrix);
+        matrix_from_basis_rows(oldInverse, obj + 0xC0);
         {
             f32 *v;
             u8 *target = *(u8 **)(state + 0x248);
 
-            if (target && !func_L00_0031BE88(target)) {
+            if (target && !level_has_pending_inner_flag(target)) {
                 v = pos;
                 qcopy(v, D_L01_001AC5A0);
             } else
-                func_00282F20(pos, state + 0x210, 1);
+                vec_scale_to_length(pos, state + 0x210, 1);
             v = pos;
-            func_00283098(v, v, inverse);
+            matrix_mul_vec3(v, v, inverse);
         }
-        angle = func_00283248(pos[2], pos[0]);
-        pitch = -func_00283248(pos[2], pos[1]);
+        angle = mat_fast_helper_a(pos[2], pos[0]);
+        pitch = -mat_fast_helper_a(pos[2], pos[1]);
         if (angle > 0.69813179969787597656f)
             angle = 0.69813179969787597656f;
         else if (angle < -0.69813179969787597656f)
@@ -331,9 +332,9 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             pitch = 0.69813179969787597656f;
         else if (pitch < -0.69813179969787597656f)
             pitch = -0.69813179969787597656f;
-        func_002AAA00(obj + 0xF4, angle, 0.0025132746f, 0.0025132746f,
+        math_approach_target_with_direction_mode(obj + 0xF4, angle, 0.0025132746f, 0.0025132746f,
                       0.12566373f, state + 0x3EC, 0);
-        func_002AAA00(obj + 0xF0, pitch, 0.0025132746f, 0.0025132746f,
+        math_approach_target_with_direction_mode(obj + 0xF0, pitch, 0.0025132746f, 0.0025132746f,
                       0.12566373f, state + 0x3E8, 0);
     }
     func_PAL_L01_003E1DB0(obj);

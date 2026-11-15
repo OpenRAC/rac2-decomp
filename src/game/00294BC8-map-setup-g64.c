@@ -1,8 +1,9 @@
+#include "names.h"
 /* Map screen setup: UI map coefficients, then load and unpack the level map.
  * Own unit for -G64 small data and the SN la-addend assembler option. */
 #include "common.h"
-extern unsigned int func_00294EC8(int);
-extern int D_001C4FA0[];
+extern unsigned int save_test_flag_bit(int);
+extern int g_map_overlay_state[];
 extern int D_001A79F0_3[] __attribute__((sda));
 typedef struct { int sector, size; } MapFile;
 typedef struct {
@@ -20,21 +21,21 @@ extern UiMapEndpoints D_00255C30[];
 extern UiMapCoefficients D_00255ED0[];
 extern UiMapEndpoints D_001A93D0_gp[2] SDATA(D_001A93D0);
 extern UiMapCoefficients D_001A9428_gp[2] SDATA(D_001A9428);
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern char *D_001BAED0 __attribute__((nosda));
 extern char D_001A95A0[], D_001A95B8[];
 extern unsigned char D_0018D278[];
-extern void func_00295C50(int);
-extern int func_002B7C80(void *, int, int);
-extern int func_002EED58(void *, int, int, char *);
-extern int func_0029D4D0(void *, void *);
-extern void *func_0028B2B8(int, int, char *, int);
-extern void func_00282B50(void *, void *, int);
-extern void func_00297730(char *, unsigned char *, int);
-extern void func_00297400(u8 *, u8 *, short *);
+extern void map_set_current_and_refresh(int);
+extern int load_read_disc_with_pause(void *, int, int);
+extern int gfx_alloc_buffer_slot(void *, int, int, char *);
+extern int fast_decompress(void *, void *);
+extern void *hud_alloc_mem(int, int, char *, int);
+extern void mem_fast_helper_c(void *, void *, int);
+extern void map_decode_occlusion(char *, unsigned char *, int);
+extern void map_build_mask_bitmap(u8 *, u8 *, short *);
 
 /* Sets up the map screen: works out the screen-to-map scaling values, then loads and unpacks the level's map picture. */
-void func_00294F10(void)
+void map_setup_screen(void)
 {
     int i;
     float u0, y0, v0, x1, u1, x0, y1, v1;
@@ -42,14 +43,14 @@ void func_00294F10(void)
     int bytes;
     int none = -1;
 
-    gMapOverlayState[4] = 1;
+    g_map_overlay_state[4] = 1;
     { int i; for (i = 0; i < 21; i++) {
-        gMapOverlayState[0x108 / 4 + i] = D_00256028[i][0];
-        ((float *)gMapOverlayState)[0xB4 / 4 + i] = 0.65f;
-        gMapOverlayState[0x15C / 4 + i] = D_00256028[i][1];
+        g_map_overlay_state[0x108 / 4 + i] = D_00256028[i][0];
+        ((float *)g_map_overlay_state)[0xB4 / 4 + i] = 0.65f;
+        g_map_overlay_state[0x15C / 4 + i] = D_00256028[i][1];
     } }
-    gMapOverlayState[0x238 / 4] = none;
-    SetCurrentMapAndRefresh(D_001A79F0_3[0]);
+    g_map_overlay_state[0x238 / 4] = none;
+    map_set_current_and_refresh(D_001A79F0_3[0]);
     { int i; for (i = 0; i < 21; i++) {
         float sx, sy;
         x0 = D_00255C30[i].x0;
@@ -84,48 +85,48 @@ void func_00294F10(void)
         D_001A9428_gp[i].by = sy;
         D_001A9428_gp[i].ay = v0 - sy * y0;
     } }
-    if ((((MapToc *)D_0014B540_1)->files0[gMapOverlayState[0x230 / 4]].size != 0 && !gItemOwnedFlags[5])
-        || (((MapToc *)D_0014B540_1)->files1[gMapOverlayState[0x230 / 4]].size != 0 && gItemOwnedFlags[5])) {
-        gMapOverlayState[0x28 / 4] = 1;
-        if (gItemOwnedFlags[5])
-            bytes = ((MapToc *)D_0014B540_1)->files1[gMapOverlayState[0x230 / 4]].size << 7;
+    if ((((MapToc *)D_0014B540_1)->files0[g_map_overlay_state[0x230 / 4]].size != 0 && !g_item_owned_flags[5])
+        || (((MapToc *)D_0014B540_1)->files1[g_map_overlay_state[0x230 / 4]].size != 0 && g_item_owned_flags[5])) {
+        g_map_overlay_state[0x28 / 4] = 1;
+        if (g_item_owned_flags[5])
+            bytes = ((MapToc *)D_0014B540_1)->files1[g_map_overlay_state[0x230 / 4]].size << 7;
         else
-            bytes = ((MapToc *)D_0014B540_1)->files0[gMapOverlayState[0x230 / 4]].size << 7;
+            bytes = ((MapToc *)D_0014B540_1)->files0[g_map_overlay_state[0x230 / 4]].size << 7;
         scratch = D_001BAED0;
         packed = scratch + 0x9A800;
-        if (gItemOwnedFlags[5]) {
-            ReadDiscWithPause(packed, ((MapToc *)D_0014B540_1)->files1[gMapOverlayState[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files1[gMapOverlayState[0x230 / 4]].size);
-            gMapOverlayState[0x23C / 4] = 1;
+        if (g_item_owned_flags[5]) {
+            load_read_disc_with_pause(packed, ((MapToc *)D_0014B540_1)->files1[g_map_overlay_state[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files1[g_map_overlay_state[0x230 / 4]].size);
+            g_map_overlay_state[0x23C / 4] = 1;
         } else {
-            ReadDiscWithPause(packed, ((MapToc *)D_0014B540_1)->files0[gMapOverlayState[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files0[gMapOverlayState[0x230 / 4]].size);
-            gMapOverlayState[0x23C / 4] = 0;
+            load_read_disc_with_pause(packed, ((MapToc *)D_0014B540_1)->files0[g_map_overlay_state[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files0[g_map_overlay_state[0x230 / 4]].size);
+            g_map_overlay_state[0x23C / 4] = 0;
         }
-        gMapOverlayState[0x238 / 4] = AllocateBufferSlot(packed, bytes, 0x3C00, D_001A95A0);
-        gMapOverlayState[0x240 / 4] = bytes;
+        g_map_overlay_state[0x238 / 4] = gfx_alloc_buffer_slot(packed, bytes, 0x3C00, D_001A95A0);
+        g_map_overlay_state[0x240 / 4] = bytes;
         fast_decompress(packed, scratch);
         {
             int size = ((int *)scratch)[1] - ((int *)scratch)[0];
-            gMapOverlayState[0] = (int)AllocHudMemory(size, 0, D_001A95B8, 0x2EB);
-            FastMemoryHelperC((void *)gMapOverlayState[0], scratch + ((int *)scratch)[0], size);
+            g_map_overlay_state[0] = (int)hud_alloc_mem(size, 0, D_001A95B8, 0x2EB);
+            mem_fast_helper_c((void *)g_map_overlay_state[0], scratch + ((int *)scratch)[0], size);
         }
-        gMapOverlayState[0] += 8;
-        gMapOverlayState[1] = gMapOverlayState[0];
+        g_map_overlay_state[0] += 8;
+        g_map_overlay_state[1] = g_map_overlay_state[0];
         {
             int size = ((int *)scratch)[2] - ((int *)scratch)[1];
-            gMapOverlayState[5] = (int)AllocHudMemory(size, 0, D_001A95B8, 0x2FC);
-            FastMemoryHelperC((void *)gMapOverlayState[5], scratch + ((int *)scratch)[1], size);
+            g_map_overlay_state[5] = (int)hud_alloc_mem(size, 0, D_001A95B8, 0x2FC);
+            mem_fast_helper_c((void *)g_map_overlay_state[5], scratch + ((int *)scratch)[1], size);
         }
-        gMapOverlayState[2] = (int)AllocHudMemory(0x1000, 0, D_001A95B8, 0x303);
+        g_map_overlay_state[2] = (int)hud_alloc_mem(0x1000, 0, D_001A95B8, 0x303);
         for (i = 0; i < 8; i++) {
-            gMapOverlayState[0x30 / 4 + i * 4] = -1;
-            gMapOverlayState[0x34 / 4 + i * 4] = -1;
-            gMapOverlayState[0x38 / 4 + i * 4] = gMapOverlayState[2] + (i << 9);
+            g_map_overlay_state[0x30 / 4 + i * 4] = -1;
+            g_map_overlay_state[0x34 / 4 + i * 4] = -1;
+            g_map_overlay_state[0x38 / 4 + i * 4] = g_map_overlay_state[2] + (i << 9);
         }
-        gMapOverlayState[3] = (int)AllocHudMemory(0x8000, 0, D_001A95B8, 0x30C);
-        if (TestSavedFlagBit(gMapOverlayState[0x230 / 4]))
-            DecodeOcclusionMap((char *)gMapOverlayState[3], D_0018D278 + (gMapOverlayState[0x230 / 4] << 11), gMapOverlayState[5]);
+        g_map_overlay_state[3] = (int)hud_alloc_mem(0x8000, 0, D_001A95B8, 0x30C);
+        if (save_test_flag_bit(g_map_overlay_state[0x230 / 4]))
+            map_decode_occlusion((char *)g_map_overlay_state[3], D_0018D278 + (g_map_overlay_state[0x230 / 4] << 11), g_map_overlay_state[5]);
         else
-            BuildMapMaskBitmap((u8 *)gMapOverlayState[3], (u8 *)gMapOverlayState[0], (short *)gMapOverlayState[1]);
+            map_build_mask_bitmap((u8 *)g_map_overlay_state[3], (u8 *)g_map_overlay_state[0], (short *)g_map_overlay_state[1]);
         {
             int i, j;
             float limit = 256.0f, center = 15.5f;
@@ -135,15 +136,15 @@ void func_00294F10(void)
                 for (j = 0; j < 32; j++) {
                     float dx = center - (float)j;
                     if (dx * dx + dy2 > limit)
-                        ((u8 *)gMapOverlayState + 0x1B0)[j / 8 + (i << 2)] |= 1 << (j % 8);
+                        ((u8 *)g_map_overlay_state + 0x1B0)[j / 8 + (i << 2)] |= 1 << (j % 8);
                 }
             }
         }
     } else {
-        gMapOverlayState[0] = 0;
-        gMapOverlayState[2] = 0;
-        gMapOverlayState[3] = 0;
-        gMapOverlayState[1] = 0;
-        gMapOverlayState[0x28 / 4] = 0;
+        g_map_overlay_state[0] = 0;
+        g_map_overlay_state[2] = 0;
+        g_map_overlay_state[3] = 0;
+        g_map_overlay_state[1] = 0;
+        g_map_overlay_state[0x28 / 4] = 0;
     }
 }

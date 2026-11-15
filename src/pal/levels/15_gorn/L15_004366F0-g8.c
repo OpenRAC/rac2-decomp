@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_PAL_L15_004366F0, the PAL copy of func_L15_00430B30: the same C, which also deletes the two tracked mobys. */
 typedef signed short s16;
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
 
-extern void func_0029F338(void *);
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(s32 a0);
-extern u8 **func_L05_00379EB8(void);
-extern s32 func_L00_004272A0(void);
+extern void moby_mark_spawned(void *);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(s32 a0);
+extern u8 **level_get_object_list(void);
+extern s32 level_get_saved_value(void);
 extern void func_PAL_L05_0037D9D0(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
@@ -38,11 +39,11 @@ void func_PAL_L15_004366F0(u8 *arg0) {
     if (D_L15_001B1534 == 0) {
         D_L15_00221E10.timer = 0;
         D_L15_001B1534 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        p = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        p = level_get_object_list();
+        count = level_get_saved_value();
         if (count > 0) {
             n = count;
             do {
@@ -56,11 +57,11 @@ void func_PAL_L15_004366F0(u8 *arg0) {
             } while (n);
         }
         if (D_L15_001B1584 != 0) {
-            func_0029F338(D_L15_001B1584);
+            moby_mark_spawned(D_L15_001B1584);
             D_L15_001B1584 = 0;
         }
         if (D_L15_001B1588 != 0) {
-            func_0029F338(D_L15_001B1588);
+            moby_mark_spawned(D_L15_001B1588);
             D_L15_001B1588 = 0;
         }
     }

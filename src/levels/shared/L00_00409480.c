@@ -1,11 +1,11 @@
 #include "common.h"
-extern int func_00283CF0(float);
-extern void func_002FC560(unsigned int reg, unsigned long value);
-extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);
-extern short D_001A6480[];
+extern int FloatToInt(float);
+extern void VU1_addGSregister(unsigned int reg, unsigned long value);
+extern void gfx_draw_colored_rectangle(int a, int b, int c, int d, unsigned long e);
+extern short g_screen_adjust_offsets[];
 
 /* Draws a gray flash over the whole screen that fades out as time passes. */
-void func_L00_00409480(char *arg)
+void gfx_draw_screen_flash_fade(char *arg)
 {
     int *vars = *(int **)(arg + 104);
     short *display;
@@ -18,9 +18,9 @@ void func_L00_00409480(char *arg)
     rgba |= gray << 8;
     rgba |= gray;
     VU1_addGSregister(66, 72);
-    display = gScreenAdjustOffsets;
-    DrawColoredRectangle(0, display[0xA9], 0, display[0xA8], rgba);
-    DrawColoredRectangle(0, display[0xA9], 0, display[0xA8], rgba);
-    DrawColoredRectangle(0, display[0xA9], 0, display[0xA8], rgba);
-    DrawColoredRectangle(0, display[0xA9], 0, display[0xA8], rgba);
+    display = g_screen_adjust_offsets;
+    gfx_draw_colored_rectangle(0, display[0xA9], 0, display[0xA8], rgba);
+    gfx_draw_colored_rectangle(0, display[0xA9], 0, display[0xA8], rgba);
+    gfx_draw_colored_rectangle(0, display[0xA9], 0, display[0xA8], rgba);
+    gfx_draw_colored_rectangle(0, display[0xA9], 0, display[0xA8], rgba);
 }

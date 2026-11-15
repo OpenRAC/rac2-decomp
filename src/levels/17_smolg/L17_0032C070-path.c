@@ -2,29 +2,29 @@
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern char *D_L17_001FE880[];
+extern char *g_path_l17_table[];
 /* One storage identity supplies the absolute loop entry and GP backedge load. */
 extern int D_L17_001B2748[] __attribute__((sda));
-extern void func_002C96F8(float, float, void *, int *, float *, void *);
-extern float func_00283CE0(int);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00282E80(void *, void *);
-extern float func_00282DF0(void *);
-extern float func_002AAA00(void *, float, void *, int, float, float, float);
+extern void anim_sample_key_track(float, float, void *, int *, float *, void *);
+extern float IntToFloat(int);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float vec_distance_xy(void *, void *);
+extern float FastVecLength(void *);
+extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
 /* Both declarations preserve the EE interface: a0/a1/a2 and f12/f13/f14/f15,
    with no stack arguments. The pitch call interleaves the two register banks. */
 extern float func_002AAA00_pitch(void *, float, void *, float, float, float, int)
     __asm__("func_002AAA00");
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F70(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_002A05A8(void *);
 extern void func_002A0F48(void *);
-extern float func_00283198(float);
-extern float func_00283180(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
 
 /* A path of D_L17_001FE880. */
 typedef struct {
@@ -66,7 +66,7 @@ struct ChainMoby {
 
 /* Puts the leading link at the start of its path, facing along the first
    segment, and lines the following links up behind it. */
-int func_L17_003BCC30(ChainMoby *moby)
+int PlacePathFollowerChainAtStart(ChainMoby *moby)
 {
     Vec rear;
     Vec start;
@@ -81,9 +81,9 @@ int func_L17_003BCC30(ChainMoby *moby)
 
     if (vars->path == -1)
         return 0;
-    path = (ChainPath *)gPathTable_L17[vars->path];
+    path = (ChainPath *)g_path_l17_table[vars->path];
     start.q = path->points[0].q;
-    angle = FastMatrixHelperA(path->points[1].f[0] - path->points[0].f[0],
+    angle = mat_fast_helper_a(path->points[1].f[0] - path->points[0].f[0],
                           path->points[1].f[1] - path->points[0].f[1]);
     moby->position.q = start.q;
     qzero_nc(&moby->rotation);
@@ -92,8 +92,8 @@ int func_L17_003BCC30(ChainMoby *moby)
     vars->pitchSpeed = 0;
 
     /* The leader's rear hitch. */
-    rear.f[0] = FastSinOrCosA(angle) * -vars->halfLength;
-    rear.f[1] = FastSinOrCosB(angle) * -vars->halfLength;
+    rear.f[0] = math_fast_sin_or_cos_a(angle) * -vars->halfLength;
+    rear.f[1] = math_fast_sin_or_cos_b(angle) * -vars->halfLength;
     rear.f[2] = 0;
     FastVecAdd(&rear, &rear, &moby->position);
 
@@ -103,16 +103,16 @@ int func_L17_003BCC30(ChainMoby *moby)
         linkVars = link->vars;
 
         /* Leave the gap behind the rear hitch, then centre the link behind that. */
-        hitch.f[0] = FastSinOrCosA(angle) * -vars->gap;
-        hitch.f[1] = FastSinOrCosB(angle) * -vars->gap;
+        hitch.f[0] = math_fast_sin_or_cos_a(angle) * -vars->gap;
+        hitch.f[1] = math_fast_sin_or_cos_b(angle) * -vars->gap;
         hitch.f[2] = 0;
         FastVecAdd(&hitch, &hitch, &rear);
-        back.f[0] = FastSinOrCosA(angle) * -linkVars->halfLength;
-        back.f[1] = FastSinOrCosB(angle) * -linkVars->halfLength;
+        back.f[0] = math_fast_sin_or_cos_a(angle) * -linkVars->halfLength;
+        back.f[1] = math_fast_sin_or_cos_b(angle) * -linkVars->halfLength;
         back.f[2] = 0;
         FastVecAdd(&link->position, &back, &hitch);
         link->position.f[2] = moby->position.f[2];
-        link->rotation.f[2] = FastAddRotations(FastMatrixHelperA(hitch.f[0] - link->position.f[0],
+        link->rotation.f[2] = FastAddRotations(mat_fast_helper_a(hitch.f[0] - link->position.f[0],
                                                           hitch.f[1] - link->position.f[1]),
                                             1.5707965f);
         link->rotation.f[1] = 0;
@@ -133,7 +133,7 @@ int func_L17_003BCC30(ChainMoby *moby)
 
 /* Samples the leader's path, then positions and turns each linked follower
    relative to the preceding object's transformed attachment point. */
-int func_L17_003BCEC0(char *obj)
+int UpdatePathFollowerChain(char *obj)
 {
     Vec anchor, target, other, desired, delta;
     float *heading, *pitch;
@@ -147,28 +147,28 @@ int func_L17_003BCEC0(char *obj)
 
     if (*(int *)vars == -1)
         return 0;
-    path = gPathTable_L17[*(int *)vars];
+    path = g_path_l17_table[*(int *)vars];
     length = IntToFloat(*(int *)path) * *(float *)(path + 0x1C);
     *(float *)(vars + 0xC) += *(float *)(vars + 0x10) * 0.016666668f;
     if (length < *(float *)(vars + 0xC))
         *(float *)(vars + 0xC) = length - *(float *)(vars + 0xC);
-    SampleKeyTrack(*(float *)(vars + 0xC), *(float *)(path + 0x1C),
+    anim_sample_key_track(*(float *)(vars + 0xC), *(float *)(path + 0x1C),
                  path, &index, &fraction, obj + 0x10);
     phase = *(float *)(vars + 0xC) + *(float *)(vars + 0x28);
     if (length < phase)
         phase -= length;
-    SampleKeyTrack(phase, *(float *)(path + 0x1C), path, &index, &fraction, &target);
+    anim_sample_key_track(phase, *(float *)(path + 0x1C), path, &index, &fraction, &target);
     heading = (float *)(obj + 0xF8);
     pitch = (float *)(obj + 0xF4);
     low = 0.00043633237f;
     middle = 0.00087266474f;
     high = 0.052359887f;
-    angle = FastAddRotations(FastMatrixHelperA(target.f[0] - *(float *)(obj + 0x10),
+    angle = FastAddRotations(mat_fast_helper_a(target.f[0] - *(float *)(obj + 0x10),
                                       target.f[1] - *(float *)(obj + 0x14)), 1.5707965f);
-    ApproachTargetWithDirectionMode(heading, angle, vars + 0x18, 0, low, middle, high);
-    angle = FastMatrixHelperA(vec_distance_xy(obj + 0x10, &target),
+    math_approach_target_with_direction_mode(heading, angle, vars + 0x18, 0, low, middle, high);
+    angle = mat_fast_helper_a(vec_distance_xy(obj + 0x10, &target),
                          target.f[2] - *(float *)(obj + 0x18));
-    ApproachTargetWithDirectionMode(pitch, angle, vars + 0x14, 0, low, middle, high);
+    math_approach_target_with_direction_mode(pitch, angle, vars + 0x14, 0, low, middle, high);
     qzero_nc(&anchor);
     anchor.f[1] = *(float *)(vars + 0x24);
     matrix_mul_vec3(&anchor, &anchor, obj + 0xC0);
@@ -189,16 +189,16 @@ int func_L17_003BCEC0(char *obj)
         matrix_mul_vec3(&other, &other, nextLink + 0xC0);
         FastVecAdd(&other, &other, nextLink + 0x10);
         FastVecSub(&desired, &other, &anchor);
-        FastVectorNormalizeHelper(&desired, &desired, *(float *)(vars + 0x20));
+        vec_fast_normalize_helper(&desired, &desired, *(float *)(vars + 0x20));
         FastVecAdd(&desired, &desired, &anchor);
         desired.f[2] = anchor.f[2];
         FastVecSub(&delta, &desired, nextLink + 0x10);
         vec_scale_to_length(&delta, &delta, FastVecLength(&delta) - *(float *)(vars + 0x24));
         FastVecAdd(nextLink + 0x10, &delta, nextLink + 0x10);
-        angle = FastAddRotations(FastMatrixHelperA(desired.f[0] - *(float *)(nextLink + 0x10),
+        angle = FastAddRotations(mat_fast_helper_a(desired.f[0] - *(float *)(nextLink + 0x10),
                                           desired.f[1] - *(float *)(nextLink + 0x14)), 1.5707965f);
-        ApproachTargetWithDirectionMode(nextHeading, angle, nextVars + 0x18, 0, low, middle, high);
-        angle = FastMatrixHelperA(vec_distance_xy(nextLink + 0x10, &desired),
+        math_approach_target_with_direction_mode(nextHeading, angle, nextVars + 0x18, 0, low, middle, high);
+        angle = mat_fast_helper_a(vec_distance_xy(nextLink + 0x10, &desired),
                              desired.f[2] - *(float *)(nextLink + 0x18));
         func_002AAA00_pitch(nextPitch, angle, nextVars + 0x14, low, middle, high, 0);
         func_002A05A8(nextLink);

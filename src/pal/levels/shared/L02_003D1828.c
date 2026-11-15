@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern char *D_L02_001FC060[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern char *g_entity_group_lists[];
 extern int D_L02_001B35B8 __attribute__((sda));
 typedef int L02Word;
 extern L02Word D_L02_001B35B8 __attribute__((sda));
@@ -14,12 +15,12 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
 
     if (arg0[0x21] == 0xFF)
         return;
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
+    q = (unsigned short *)g_entity_group_lists[arg0[0x21]];
     while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
+           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[arg0[0x21]])) {
         char *o;
 
-        e = D_L02_001B359C + ((*q & 0x7FFF) << 8);
+        e = g_moby_l02_pool + ((*q & 0x7FFF) << 8);
         if (e == 0)
             break;
         o = *(char **)(e + 0x68);
@@ -30,9 +31,9 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
 }
 
 #include "common.h"
-extern void func_L02_00333438(char *, char *);
-extern int func_L01_00321178(char *, char *);
-extern int func_002B4FF0(char *, float *, float);
+extern void moby_aim_at_target_offset(char *, char *);
+extern int moby_l01_turn_toward_target(char *, char *);
+extern int moby_turn_toward_target_and_step(char *, float *, float);
 extern int D_L02_001A8FF0 __attribute__((sda));
 
 /* Runs the kind's entry hook: the first when the level flag is set, the second when the third
@@ -41,10 +42,10 @@ void func_PAL_L02_003D2898(char *a0, char *a1, int a2) {
     char *p = *(char **)(a0 + 0x68);
 
     if (D_L02_001A8FF0)
-        func_L02_00333438(a0, a1);
+        moby_aim_at_target_offset(a0, a1);
     else if (a2 == 0)
-        func_L01_00321178(a0, a1);
+        moby_l01_turn_toward_target(a0, a1);
     else
-        func_002B4FF0(a0, (float *)a1, *(float *)(p + 0x31C));
+        moby_turn_toward_target_and_step(a0, (float *)a1, *(float *)(p + 0x31C));
 }
 

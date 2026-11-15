@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_004079C8 needs -G64 -Wa,-G64: its 64-byte corner table D_L00_001B0F20 is reached
    through $gp. Same packet layout as func_L00_00407C18 and func_L00_00396078. The packet's GS
    registers are set in RAC1's order (texture, flags, mode, primitive); the record is reached by
@@ -15,16 +16,16 @@ typedef struct {
 } DrawPacket79C8;
 typedef struct { unsigned char pad[4]; unsigned char active; unsigned char rest[219]; } Record;
 
-extern u64 func_0027C878(int);
-extern int func_00283CF0(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern int FloatToInt(float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 extern unsigned char D_001395B0 __attribute__((nosda));
-extern Record D_L00_00262570[];
+extern Record g_weapon_l00_table[];
 extern unsigned int D_L00_001B0EC0 __attribute__((sda));
 extern unsigned int D_L00_001B0EBC __attribute__((sda));
 extern int D_L00_001B2D30[] __attribute__((sda));
@@ -41,7 +42,7 @@ extern Vec D_0018A0E0 __attribute__((nosda));
    D_L00_001B2D00[i] and colour D_L00_001B0EC0 or D_L00_001B0EBC by the current record's
    active byte. */
 /* Draws the three bright sparks that run along the Sheepinator beam. */
-void func_L00_004079C8(void)
+void DrawLightningArcSparks(void)
 {
     DrawPacket79C8 packet;
     Vec basis[4], vertex;
@@ -55,7 +56,7 @@ void func_L00_004079C8(void)
     packet.regs[0] = 0;
     packet.params[0] = 0; packet.params[1] = 0; packet.params[2] = 0; packet.params[3] = 1;
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
-    color = (gWeaponTable_L00 + D_001395B0)->active ? D_L00_001B0EC0 : D_L00_001B0EBC;
+    color = (g_weapon_l00_table + D_001395B0)->active ? D_L00_001B0EC0 : D_L00_001B0EBC;
     for (i = 0; i < 3; i++) {
         if (D_L00_001B2D30[i]) {
             c = (color & 0xFFFFFF) | (FloatToInt(D_L00_001B2D00[i]) << 24);

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,16 +25,16 @@
  */
 #include "common.h"
 
-extern f32 func_00283CE0(s32);
-extern s8 D_001B5200[];
+extern f32 IntToFloat(s32);
+extern s8 g_active_camera[];
 
 /* Sets a camera value: snaps it to the target, or eases to it over a number of frames. */
-void func_0026FF08(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32 extra3) {
+void cam_set_value_target(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32 extra3) {
     f32 stepPerFrame;
 
     switch (mode) {
     case 0: {
-        s8 *camera = gActiveCamera;
+        s8 *camera = g_active_camera;
         (*(s8 *)((char *)(camera) + (0x3E9))) = 1;
         (*(f32 *)((char *)(camera) + (0x3D4))) = target;
         (*(s8 *)((char *)(camera) + (0x3E8))) = 0;
@@ -42,11 +43,11 @@ void func_0026FF08(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32
     case 1:
     case 2:
         if (frames == 0) {
-            s8 *camera = gActiveCamera;
+            s8 *camera = g_active_camera;
             (*(f32 *)((char *)(camera) + (0x3D4))) = target;
             (*(s8 *)((char *)(camera) + (0x3E8))) = 0;
         } else {
-            s8 *camera = gActiveCamera;
+            s8 *camera = g_active_camera;
             (*(s16 *)((char *)(camera) + (0x3EA))) = frames;
             stepPerFrame = 1.0f / IntToFloat(frames);
             (*(s8 *)((char *)(camera) + (0x3E8))) = mode;
@@ -54,12 +55,12 @@ void func_0026FF08(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32
             (*(f32 *)((char *)(camera) + (0x3EC))) = stepPerFrame;
         }
         {
-            s8 *camera = gActiveCamera;
+            s8 *camera = g_active_camera;
             (*(s8 *)((char *)(camera) + (0x3E9))) = 1;
         }
         break;
     case 3: {
-        s8 *camera = gActiveCamera;
+        s8 *camera = g_active_camera;
         (*(s8 *)((char *)(camera) + (0x3E8))) = mode;
         (*(f32 *)((char *)(camera) + (0x3D4))) = target;
         (*(s8 *)((char *)(camera) + (0x3E9))) = 1;

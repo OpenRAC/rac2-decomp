@@ -106,7 +106,7 @@ extern void r1_func_0011AD70(void *, s32);
 /* rac1-decomp src/core/00119D88.c: func_0011C5C0 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/library/sceRead.c, sceRead. */
 /* Reads bytes from an open file into a buffer. Returns the byte count or a negative error code. */
-s32 func_0011E4E0(s32 fd, void *buffer, s32 length)
+s32 sceRead(s32 fd, void *buffer, s32 length)
 {
     struct FsReadRequest *request;
     struct SifFileSlot *file_slot;
@@ -183,16 +183,16 @@ extern int D_00134744;
 extern char D_00140140[];
 extern int D_00140180[];
 extern int D_001401C0[];
-extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
+extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
 
 /* Sends a three-value command to the RPC server and returns its answer, or 0 if the server is not bound. */
-int func_0011E828(int first, int second, int third) {
+int iop_remote_cmd_send3(int first, int second, int third) {
     if (D_00134744 < 0)
         return 0;
     D_001401C0[0] = second;
     D_001401C0[1] = first;
     D_001401C0[2] = third;
-    if (CallRpcServer(D_00140140, 4, 0, D_001401C0, 12, D_00140180, 4, 0, 0) < 0)
+    if (sceSifCallRpc(D_00140140, 4, 0, D_001401C0, 12, D_00140180, 4, 0, 0) < 0)
         return 0;
     return D_00140180[0];
 }
@@ -201,14 +201,14 @@ extern int D_00134744;
 extern char D_00140140[];
 extern int D_00140180[];
 extern int D_001401C0[];
-extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
+extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
 
 /* Sends a one-value command to the RPC server and returns its answer, or 0 if the server is not bound. */
-int func_0011E8A8(int value) {
+int iop_remote_cmd_send1(int value) {
     if (D_00134744 < 0)
         return 0;
     D_001401C0[0] = value;
-    if (CallRpcServer(D_00140140, 2, 0, D_001401C0, 4, D_00140180, 4, 0, 0) < 0)
+    if (sceSifCallRpc(D_00140140, 2, 0, D_001401C0, 4, D_00140180, 4, 0, 0) < 0)
         return -1;
     return D_00140180[0];
 }

@@ -9,18 +9,18 @@ extern Vector128 D_L16_001B34A0[] __attribute__((sda));
 extern Vector128 D_L16_001B34B0[] __attribute__((sda));
 extern Vector128 D_L16_001B34C0[] __attribute__((sda));
 extern Vector128 D_L16_001AF440 __attribute__((sda));
-extern void func_00335438(void *,void *,int,int,int);
-extern void func_002833F0(void *,void *);
-extern void func_00283698(void *,void *);
-extern void func_002A91F0(void *,float *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_002AB6D8(float *,float *);
+extern void SetCamera5Pose(void *,void *,int,int,int);
+extern void euler_rotation_basis(void *,void *);
+extern void matrix_from_basis_rows(void *,void *);
+extern void mat_build_rotation_from_angles(void *,float *);
+extern void FastVecSub(void *,void *,void *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void mat_get_euler_angles(float *,float *);
 /* Sets up the camera move toward the object's chosen target, recording where the camera starts and where it should end. */
-void func_L16_00395D30(char *object)
+void cam_start_blend_to_target(char *object)
 {
     AimWorkspace local;
     char *state=*(char **)(object+0x68);
@@ -35,7 +35,7 @@ void func_L16_00395D30(char *object)
     *(int *)(state+0x4c)=0; *(int *)(state+0x50)=0;
     euler_rotation_basis(local.rotation,state+0x20);
     matrix_from_basis_rows(local.inverse,local.rotation);
-    BuildRotationFromAngles(D_L16_001B3490,(float *)cameraPosition);
+    mat_build_rotation_from_angles(D_L16_001B3490,(float *)cameraPosition);
     FastVecSub(D_L16_001B34B0,camera,state+0x10);
     matrix_mul_vec3(D_L16_001B34B0,D_L16_001B34B0,local.inverse);
     vec_scale_to_length(&local.point,target+0xe0,3.0f);
@@ -46,6 +46,6 @@ void func_L16_00395D30(char *object)
     FastVecCross(&local.axes[1],&local.axes[0],&local.axes[2]);
     matrix_mul_vec3(D_L16_001B34C0,&D_L16_001AF440,local.axes);
     matrix_mul_vec3(D_L16_001B34C0,D_L16_001B34C0,local.inverse);
-    GetEulerAnglesFromMatrix((float *)local.axes,(float *)&local.angles);
-    BuildRotationFromAngles(D_L16_001B34A0,(float *)&local.angles);
+    mat_get_euler_angles((float *)local.axes,(float *)&local.angles);
+    mat_build_rotation_from_angles(D_L16_001B34A0,(float *)&local.angles);
 }

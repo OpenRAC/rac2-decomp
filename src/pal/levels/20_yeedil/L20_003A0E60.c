@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_L20_0039DF18(char *, int);
+extern int trooper_spawn_parts(char *, int);
 extern void *func_00325040(int);
 extern void func_0033E708(char *, char *);
 extern char *func_00338198(char *);
@@ -11,7 +11,7 @@ extern void func_00327AD0(void *);
 extern void func_003381E0(void *, void *);
 extern void func_00338830(void *, u32, int, int);
 extern void func_0032F2D0(void *, int, int, int);
-extern f32 func_00282E80(void *, void *);
+extern f32 vec_distance_xy(void *, void *);
 
 int func_PAL_L20_003A0E60(char *arg0, int arg1) {
     char *s0;

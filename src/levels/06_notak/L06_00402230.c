@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void func_00282F20(void *, void *, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_002A7878(float low, float high);
-extern void func_00283098(float *out, float *in, char *matrix);
-extern void func_L06_00463D40(char *moby, float *position, float *velocity,
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_random_float_range(float low, float high);
+extern void matrix_mul_vec3(float *out, float *in, char *matrix);
+extern void part_spawn_spark_moby(char *moby, float *position, float *velocity,
                              int flags, float size, float life);
 
 /* Emit three rings of particles around the moby's local frame.
@@ -13,7 +13,7 @@ extern void func_L06_00463D40(char *moby, float *position, float *velocity,
  * the 0.0f a second use, so loop.c keeps it in a callee-saved register
  * instead of substituting it into the single call argument. This unit is
  * built with -g, as line notes bound haifa-sched's regions here. */
-void func_L06_00402230(char *moby)
+void part_emit_rings(char *moby)
 {
     float position[4];
     float velocity[4];
@@ -24,21 +24,21 @@ void func_L06_00402230(char *moby)
         do {
             float shell, angle, size, life;
             if (ring != 0 || !(spoke & 1)) {
-                shell = (float)ring + RandomFloatRange(0.0f, 1.0f);
+                shell = (float)ring + math_random_float_range(0.0f, 1.0f);
                 angle = 1.57079637f * ((float)spoke + (1.0f / 3.0f) * shell);
-                velocity[0] = FastSinOrCosA(angle);
-                velocity[1] = FastSinOrCosB(angle) * 0.25f;
+                velocity[0] = math_fast_sin_or_cos_a(angle);
+                velocity[1] = math_fast_sin_or_cos_b(angle) * 0.25f;
                 velocity[2] = 0.0f;
                 velocity[2] = ((float)ring - 0.5f) * 0.25f;
                 vec_scale_to_length(velocity, velocity,
-                              RandomFloatRange(8.0f, 14.0f) * (1.0f / 60.0f));
+                              math_random_float_range(8.0f, 14.0f) * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, moby + 0xC0);
                 position[0] = *(float *)(moby + 0x10) + velocity[0];
                 position[1] = *(float *)(moby + 0x14) + velocity[1] * 3.0f;
                 position[2] = *(float *)(moby + 0x18) + 0.75f + shell * 0.5f;
-                size = RandomFloatRange(0.25f, 1.0f);
-                life = RandomFloatRange(0.25f, 1.25f);
-                SpawnSparkParticleMoby(moby, position, velocity, 0, size, life);
+                size = math_random_float_range(0.25f, 1.0f);
+                life = math_random_float_range(0.25f, 1.25f);
+                part_spawn_spark_moby(moby, position, velocity, 0, size, life);
             }
             spoke++;
         } while (spoke < 4);

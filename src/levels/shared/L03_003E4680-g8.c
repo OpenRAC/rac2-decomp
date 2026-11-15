@@ -21,16 +21,16 @@ typedef struct MuseumPlayer {
     char pad2298[0x30];
     int action;
 } MuseumPlayer;
-extern MuseumPlayer D_00189E20;
+extern MuseumPlayer g_hero_state;
 typedef struct MuseumInput {
     char pad[0x1A0];
     union { unsigned long long mask; struct { unsigned low, high; } words; } buttons;
 } MuseumInput;
-extern MuseumInput D_00138180;
+extern MuseumInput g_pad_state;
 typedef struct MuseumGameState { char pad[0x33]; unsigned char mode; } MuseumGameState;
-extern MuseumGameState D_00139568;
+extern MuseumGameState g_item_slot_to_record;
 extern unsigned char D_0019B4A8[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned char D_001A7B2B;
 typedef struct MuseumCompletion { char pad[0x464]; unsigned char complete[0]; } MuseumCompletion;
 extern char D_L03_0021EA30[];
@@ -44,28 +44,28 @@ extern float D_L03_001B9C14 NOT_SDA, D_L03_001B2464 MACRO_ADDR;
 extern int D_L03_001A8F00;
 extern int D_L03_001B0B50 MACRO_ADDR, D_L03_001B0B58 MACRO_ADDR, D_L03_001B0B5C MACRO_ADDR, D_L03_001B0B60 MACRO_ADDR;
 extern int D_L03_0029BCD0[][4];
-extern void func_002A7750(char *,int,int), func_L00_003294F0(char *,int);
-extern int func_002B3868(char *);
-extern void func_L03_003E5070(char *),func_L03_003E50E0(char *),func_L03_003E5170(char *);
-extern int func_002B0CE0(int,int,int);
-extern int func_00294630(int);
-extern void func_00294420(int),func_L00_002C8BA8(int);
-extern int func_L03_002C6F08(int,int);
-extern void func_00283098(void *,void *,void *),func_00282CC0(void *,void *,void *),func_00282CF0(void *,void *,void *);
-extern float func_00283B98(float,float),func_00283248(float,float),func_00282E80(void *,void *);
-extern void func_L00_002D40A0(void *,int,float);
-extern int func_L00_002D40F0(void);
-extern void func_L00_002D2168(int,int,float),func_0026FF08(int,int,float,float,float,float);
-extern void func_00335438(void *,void *,int,int,int),func_00335370(void *),func_003353C8(void *);
-extern void func_002AC9F8(void *,float),func_002AA800(void *,int,float,float);
-extern float func_002AA2E8(float *,float,float);
-extern int func_002B49E0(int,int,char *,int,int);
-extern void func_00283360(void *),func_00282C88(void *),func_002833F0(void *,void *),func_L00_0042A500(int);
-extern int func_002E5CF8(int,int,char *);
-extern void func_L01_00323310(int,int);
-extern void func_00335370(void *),func_003353C8(void *),func_00335438(void *,void *,int,int,int);
+extern void moby_set_state(char *,int,int), moby_set_flag_bit(char *,int);
+extern int flag_set_first_pending(char *);
+extern void infiltrator_ball_spawn_for_moby(char *),moby_update_attached_child(char *),gadget_reset_state(char *);
+extern int ForceClaimNotice(int,int,int);
+extern int load_is_class_cached(int);
+extern void LoadClassIntoFreeCacheSlot(int),hero_start_loader_state(int);
+extern int hero_l03_enter_state(int,int);
+extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
+extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
+extern void hero_start_target_state(void *,int,float);
+extern int hero_get_target_state_kind(void);
+extern void set_hero_animation(int,int,float),cam_set_value_target(int,int,float,float,float,float);
+extern void SetCamera5Pose(void *,void *,int,int,int),object_copy_vector_to_selected(void *),cam_set_state_rotation(void *);
+extern void vec_clamp_length(void *,float),StepAngleTowardTarget(void *,int,float,float);
+extern float ApproachValue(float *,float,float);
+extern int request_begin_slot(int,int,char *,int,int);
+extern void set_identity_rotation_rows(void *),vec_clear_128(void *),euler_rotation_basis(void *,void *),cam_reset_entry(int);
+extern int PlayMobySound(int,int,char *);
+extern void script_queue_keyed_request(int,int);
+extern void object_copy_vector_to_selected(void *),cam_set_state_rotation(void *),SetCamera5Pose(void *,void *,int,int,int);
 typedef struct { char pad[0x3C]; short a; char p3e[10]; short b; } MenuState;
-extern MenuState D_001A63A8;
+extern MenuState g_music_state;
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define U(p,o) (*(unsigned short *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
@@ -95,7 +95,7 @@ typedef struct MuseumExhibit {
     int resume;
 } MuseumExhibit;
 /* Runs the Infiltrator lock (moby class 2857): waits for the player to press the button, plays the camera move, starts the puzzle and marks the lock as opened when it is solved. */
-void func_L03_003E4680(char *obj) {
+void infiltrator_lock_update(char *obj) {
     MuseumExhibit *lockVars = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
@@ -107,13 +107,13 @@ void func_L03_003E4680(char *obj) {
         unsigned short id = U(obj,0xB2);
         char *displayMoby;
         if (((MuseumCompletion *)D_L03_0021EA30)->complete[(short)id]
-            || (state = D_0019B4A8[((short)id>>1)+(gCurrentMapIndex<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
-            SetMobyState(obj,8,-1);
-            SetObjectFlagBit(obj,1);
-            for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) SetObjectFlagBit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+            || (state = D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
+            moby_set_state(obj,8,-1);
+            moby_set_flag_bit(obj,1);
+            for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
         } else {
-            SetMobyState(obj,1,-1);
-            SpawnInfiltratorBallForMoby(obj);
+            moby_set_state(obj,1,-1);
+            infiltrator_ball_spawn_for_moby(obj);
             displayMoby=(char *)lockVars->display;
             qcopy(displayMoby+0x10,obj+0x10);
             F(displayMoby,0x18)+=1.0f;
@@ -123,87 +123,87 @@ void func_L03_003E4680(char *obj) {
         break;
     }
     case 1:
-        if (gHeroState.focus!=obj || D_L03_001B2940<16 || !D_001A7B2B) break;
+        if (g_hero_state.focus!=obj || D_L03_001B2940<16 || !D_001A7B2B) break;
         ForceClaimNotice(12,0x27F0,1);
-        if (!IsClassCached(((MuseumSound *)D_L03_00266DA0)[gItemSlotToRecord.mode].handle)) {
-            LoadClassIntoFreeCacheSlot(((MuseumSound *)D_L03_00266DA0)[gItemSlotToRecord.mode].handle);
+        if (!load_is_class_cached(((MuseumSound *)D_L03_00266DA0)[g_item_slot_to_record.mode].handle)) {
+            LoadClassIntoFreeCacheSlot(((MuseumSound *)D_L03_00266DA0)[g_item_slot_to_record.mode].handle);
             break;
         }
-        if (gPadState.buttons.words.high&0x10) {
-            lockVars->saved=gHeroState.saved;
-            gHeroState.action=0x33;
-            SetMobyState(obj,2,-1);
+        if (g_pad_state.buttons.words.high&0x10) {
+            lockVars->saved=g_hero_state.saved;
+            g_hero_state.action=0x33;
+            moby_set_state(obj,2,-1);
         }
         break;
     case 2: {
         unsigned int cameraState;
-        if (SetFirstPendingFlag(obj)) {
+        if (flag_set_first_pending(obj)) {
             matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
             FastVecAdd(vec,vec,obj+0x10);
-            StartHeroTargetState(vec,0,FastAddRotations(F(obj,0xF8),3.1415927f));
+            hero_start_target_state(vec,0,FastAddRotations(F(obj,0xF8),3.1415927f));
         }
-        cameraState=GetHeroTargetStateKind();
-        if (cameraState==2) SetMobyState(obj,3,-1);
-        else if ((AdvanceMuseumTimer(obj)>=301)) {ResetGadgetState(obj);StartHeroLoaderState(0);SetMobyState(obj,1,-1);}
-        else if (!cameraState) {ResetGadgetState(obj);SetMobyState(obj,1,-1);}
+        cameraState=hero_get_target_state_kind();
+        if (cameraState==2) moby_set_state(obj,3,-1);
+        else if ((AdvanceMuseumTimer(obj)>=301)) {gadget_reset_state(obj);hero_start_loader_state(0);moby_set_state(obj,1,-1);}
+        else if (!cameraState) {gadget_reset_state(obj);moby_set_state(obj,1,-1);}
         break;
     }
     case 3:
-        if (SetFirstPendingFlag(obj)) {
+        if (flag_set_first_pending(obj)) {
             PlayMobySound(0,0,obj);
-            EnterHeroState_L03(0x6F,0);set_hero_animation(0x54,0,20.0f);
-            FastVecSub(vec,D_L03_001B9980,gHeroState.position);
-            matrix_mul_vec3(vec,vec,gHeroState.matrix40);
+            hero_l03_enter_state(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            FastVecSub(vec,D_L03_001B9980,g_hero_state.position);
+            matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
             SetCamera5Pose(D_L03_001B9980,D_L03_001B9980,3,120,0);
             lockVars->fade=0;
         }
         matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
         FastVecAdd(vec,vec,obj+0x10);
-        FastVecSub(gHeroState.velocity,vec,gHeroState.position);
-        gHeroState.velocity[2]=0;
-        ClampVectorLength(gHeroState.velocity,0.012500001f);
-        StepAngleTowardTarget(gHeroState.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.017453296f);
-        gHeroState.mode=3;
-        if ((gHeroState.flags&2) && B(gHeroState.animation,0x43)==0x54) set_hero_animation(0x55,0,7.0f);
-        if (gHeroState.animationId!=0x6F) {ResetGadgetState(obj);SetMobyState(obj,1,-1);}
-        matrix_mul_vec3(pos,D_L03_001B0C80_gp,&gHeroState);
-        FastVecAdd(pos,pos,gHeroState.position);
+        FastVecSub(g_hero_state.velocity,vec,g_hero_state.position);
+        g_hero_state.velocity[2]=0;
+        vec_clamp_length(g_hero_state.velocity,0.012500001f);
+        StepAngleTowardTarget(g_hero_state.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.017453296f);
+        g_hero_state.mode=3;
+        if ((g_hero_state.flags&2) && B(g_hero_state.animation,0x43)==0x54) set_hero_animation(0x55,0,7.0f);
+        if (g_hero_state.animationId!=0x6F) {gadget_reset_state(obj);moby_set_state(obj,1,-1);}
+        matrix_mul_vec3(pos,D_L03_001B0C80_gp,&g_hero_state);
+        FastVecAdd(pos,pos,g_hero_state.position);
         qzero_nc(rot);
-        matrix_mul_vec3(target,D_L03_001B0C90_gp,&gHeroState);
-        FastVecAdd(target,target,gHeroState.position);
-        rot[2]=FastMatrixHelperA(target[0]-pos[0],target[1]-pos[1]);
-        rot[1]=-FastMatrixHelperA(vec_distance_xy(pos,target),target[2]-pos[2]);
-        CopyVectorToSelectedObject(pos);SetCameraStateRotation(rot);
+        matrix_mul_vec3(target,D_L03_001B0C90_gp,&g_hero_state);
+        FastVecAdd(target,target,g_hero_state.position);
+        rot[2]=mat_fast_helper_a(target[0]-pos[0],target[1]-pos[1]);
+        rot[1]=-mat_fast_helper_a(vec_distance_xy(pos,target),target[2]-pos[2]);
+        object_copy_vector_to_selected(pos);cam_set_state_rotation(rot);
         if ((AdvanceMuseumTimer(obj)>=61)) {
-            SetMobyState(obj,4,-1);
-            lockVars->resume=gMusicState.a==-1?gMusicState.b:gMusicState.a;
-            QueueKeyedRequest(lockVars->music,lockVars->volume);
+            moby_set_state(obj,4,-1);
+            lockVars->resume=g_music_state.a==-1?g_music_state.b:g_music_state.a;
+            script_queue_keyed_request(lockVars->music,lockVars->volume);
         }
         break;
     case 4: {
         unsigned int elapsed;
-        if (SetFirstPendingFlag(obj)) {
+        if (flag_set_first_pending(obj)) {
             PlayMobySound(0,0,obj);
             D_L03_001B9C14=0.017453294f;
-            SetCameraValueTarget(30,1,0.017453294f,0.005f,0.2f,0.0f);
+            cam_set_value_target(30,1,0.017453294f,0.005f,0.2f,0.0f);
         }
-        gHeroState.mode=3;
-        if (gHeroState.animationId!=0x6F) {ResetGadgetState(obj);SetMobyState(obj,1,-1);break;}
+        g_hero_state.mode=3;
+        if (g_hero_state.animationId!=0x6F) {gadget_reset_state(obj);moby_set_state(obj,1,-1);break;}
         if ((AdvanceMuseumTimer(obj)<21)) break;
         ApproachValue(&lockVars->fade,1.0f,0.116666675f);
         elapsed=U(obj,0x96);
         D_L03_001B2464=lockVars->fade;
         if (elapsed<31) break;
         D_L03_001B9C14=1.1243411f;
-        SetCameraValueTarget(1,0,1.1243411f,0.005f,0.2f,0.0f);
-        if (!BeginSlotRequest(7,1,obj,0,0)) SetMobyState(obj,5,-1);
+        cam_set_value_target(1,0,1.1243411f,0.005f,0.2f,0.0f);
+        if (!request_begin_slot(7,1,obj,0,0)) moby_set_state(obj,5,-1);
         break;
     }
     case 5:
         if (D_L03_001A8F00==7) {
             int i;
             qzero_nc(D_L03_001B9980);
-            SpawnInfiltratorBallForMoby(obj);
+            infiltrator_ball_spawn_for_moby(obj);
             D_L03_001B0B50=0;
             /* Pointer arithmetic, not trackIds[i]: an array field of a BLKmode struct would form lockVars+0xC in its own
              * register ahead of the loop's duplicated exit test. The scalar globals leave the loop through load_mems. */
@@ -219,41 +219,41 @@ void func_L03_003E4680(char *obj) {
             B(lockVars->display,0x31)=1;
             U(lockVars->display,0x34)&=~0x80;
             set_identity_rotation_rows(D_L03_001B9BB0);
-            ClearVector128((char *)lockVars->display+0xF0);
+            vec_clear_128((char *)lockVars->display+0xF0);
             F(lockVars->display,0xF4)=-1.5707964f;
             euler_rotation_basis((char *)lockVars->display+0xC0,(char *)lockVars->display+0xF0);
-            SetMobyState(obj,6,-1);
+            moby_set_state(obj,6,-1);
         } else if ((AdvanceMuseumTimer(obj)>=6)) {
-            ResetGadgetState(obj);
-            QueueKeyedRequest(lockVars->resume,lockVars->volume);
-            SetMobyState(obj,1,-1);
+            gadget_reset_state(obj);
+            script_queue_keyed_request(lockVars->resume,lockVars->volume);
+            moby_set_state(obj,1,-1);
         }
         break;
     case 6:
-        if (D_L03_001A8F00==7) {set_identity_rotation_rows(D_L03_001B9BB0);UpdateAttachedChild(obj);break;}
-        ResetGadgetState(obj);
-        QueueKeyedRequest(lockVars->resume,lockVars->volume);
-        if (lockVars->cleanupId!=-1) ResetCameraEntry(lockVars->cleanupId);
+        if (D_L03_001A8F00==7) {set_identity_rotation_rows(D_L03_001B9BB0);moby_update_attached_child(obj);break;}
+        gadget_reset_state(obj);
+        script_queue_keyed_request(lockVars->resume,lockVars->volume);
+        if (lockVars->cleanupId!=-1) cam_reset_entry(lockVars->cleanupId);
         if (lockVars->completed) {
-            SetMobyState(obj,7,-1);
+            moby_set_state(obj,7,-1);
             if (B(obj,0xB0)!=255) {
                 unsigned short id;
                 unsigned char *savedByte;
                 id=U(obj,0xB2);
-                if (id&1) {savedByte=D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));if (((*savedByte>>4)&7)!=7) *savedByte+=16;}
-                else {savedByte=D_0019B4A8+(((short)id>>1)+(gCurrentMapIndex<<10));if ((*savedByte&7)!=7) ++*savedByte;}
+                if (id&1) {savedByte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if (((*savedByte>>4)&7)!=7) *savedByte+=16;}
+                else {savedByte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if ((*savedByte&7)!=7) ++*savedByte;}
             }
-            if (gCurrentMapIndex==19) {
+            if (g_current_map_index==19) {
                 int j;
-                for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) SetObjectFlagBit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+                for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
             }
-        } else {StartHeroLoaderState(0);SetMobyState(obj,1,-1);}
+        } else {hero_start_loader_state(0);moby_set_state(obj,1,-1);}
         break;
     case 7: {
         int j;
-        SetObjectFlagBit(obj,1);
-        for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) SetObjectFlagBit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
-        StartHeroLoaderState(0);SetMobyState(obj,8,-1);
+        moby_set_flag_bit(obj,1);
+        for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+        hero_start_loader_state(0);moby_set_state(obj,8,-1);
         break;
     }
     }

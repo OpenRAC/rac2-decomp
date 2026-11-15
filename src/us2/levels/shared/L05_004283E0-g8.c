@@ -1,14 +1,15 @@
 #include "include_asm.h"
-extern int D_001A79F0;
-extern float func_00282E48(void *, void *);
-extern float func_002AA458(void *, void *, void *, float, float, float);
-extern float func_00283B98(float, float);
-extern void func_L05_0037AB88(int, int);
+#include "names.h"
+extern int g_current_map_index;
+extern float fast_vec_dist(void *, void *);
+extern float vec_spring_to_target(void *, void *, void *, float, float, float);
+extern float FastAddRotations(float, float);
+extern void slot_add_value_clamped(int, int);
 extern void func_0029CC50(int, int, int);
-extern int func_002E5DA0(int, int, char *, int);
-extern void func_0029F338(void *);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern void moby_mark_spawned(void *);
 extern int D_L05_001B1500 __attribute__((sda));
-extern void func_L05_004268E8(char *);
+extern void glow_l05_ring_draw(char *);
 
 /* Same shape as func_L05_004260B8, on its own data slot and with its own tail. */
 void func_US2_L05_004283E0(char *object)
@@ -17,10 +18,10 @@ void func_US2_L05_004283E0(char *object)
     float scale;
 
     if (D_L05_001B1500 != 0) {
-        scale = func_00282E48((void *)(D_L05_001B1500 + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001B1500 + 0x10), object + 0x10);
 
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+        if (g_current_map_index == 0x14) {
+            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -35,18 +36,18 @@ void func_US2_L05_004283E0(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:
         if (scale < 0.5f) {
-            func_L05_0037AB88(3, 10);
+            slot_add_value_clamped(3, 10);
             func_0029CC50(0x1287, 10, -1);
-            func_002E5DA0(0xC, 0, object, 0xFBF);
-            func_0029F338(object);
+            snd_play_from_class_bank(0xC, 0, object, 0xFBF);
+            moby_mark_spawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
-    func_L05_004268E8(object);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
+    glow_l05_ring_draw(object);
 }

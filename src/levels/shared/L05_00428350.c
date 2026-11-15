@@ -12,27 +12,27 @@ typedef struct {
 
 extern Vector D_0018A0E0;
 extern Vector ref_L05_0042F4E8_01[4];
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C768(int, float *, float *);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_world_to_screen_unit(int, float *, float *);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282DD8(char *, char *, char *);
-extern void func_00280B90(char *, int, int);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecCross(char *, char *, char *);
+extern void draw_world_quad(char *, int, int);
 extern char ref_L05_0042F4E8_00[];
 
 
-extern int D_001A7350 __attribute__((sda));
+extern int g_screen_offset_x __attribute__((sda));
 
-extern int D_001A7354 __attribute__((sda));
+extern int g_screen_offset_y __attribute__((sda));
 
 extern void func_2FC560(char *out, char *src);
 
@@ -44,9 +44,9 @@ extern void func_00282CC0_14(char *target, char *first, char *local);
 
 extern char *D_L05_001B9710;
 
-extern int func_00282978(void *);
+extern int FastDecTimer(void *);
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 /* The call target and the callback it registers are not the same function in
    every level this unit is placed in, so neither name may state an address. */
@@ -97,13 +97,13 @@ extern void func_2EB6E8(void);
 
 extern int D_00221D94;
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
 extern char *D_001B1EC4;
 
 extern char *D_001B251C;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern char D_0019B2E8[];
 
@@ -118,7 +118,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* Creates the 0x1226 object, seeds its flags from the caller's two floats and copies the
    caller's quadword into the object's transform slot. */
-char *func_L05_0042BCE0(char *a0, char *a1, float f12, float f13)
+char *stream_spawn_piece(char *a0, char *a1, float f12, float f13)
 {
     char *obj = func_328508((char *)0x1226);
 
@@ -146,7 +146,7 @@ char *func_L05_0042BCE0(char *a0, char *a1, float f12, float f13)
 
 /* Two bound helpers at the node's +0x68; the second call registers a callback
    and the context, the other branch calls a one-argument helper. */
-void func_L05_0042E4E8(char *a0)
+void moby_register_callback(char *a0)
 {
     char *context = a0;
     char *node = *(char **)(context + 0x68);
@@ -155,12 +155,12 @@ void func_L05_0042E4E8(char *a0)
         FastDecTimer(node + 4);
         ref_L05_0042E4E8_01(&ref_L05_0042E4E8_00, context);
     } else {
-        MarkMobySpawned(context);
+        moby_mark_spawned(context);
     }
 }
 
 /* Draws a camera-facing quad, then redraws it with jittered, clamped screen-projected UVs. */
-void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
+void gfx_l05_draw_jittered_billboard_quad(Vector *position, float size, float offset, float roll,
                        float unused, float jitter, int texture, int mode)
 {
     RenderPacket packet;
@@ -176,7 +176,7 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    InitQuadPacketState(&packet, texture, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -241,10 +241,10 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
             FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
             FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -255,10 +255,10 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -266,7 +266,7 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    InitQuadPacketState(&packet, -1, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x33001ULL);
     draw_world_quad((char *)&packet, 0, 0);
@@ -277,7 +277,7 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
 /* func_L05_00430318 is defined in x-qcopy.c. */
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
-void func_L05_00430BF0(Vec16_Fc936841d *object, int index)
+void vec_derive_from_neighbours(Vec16_Fc936841d *object, int index)
 {
     char local[16];
 
@@ -324,15 +324,15 @@ void func_L05_00430BF0(Vec16_Fc936841d *object, int index)
 /* func_L05_00444840 is defined in L05_00444840-g8.c. */
 
 /* Converts a two-float record to the coordinate pair the level's bias words expect. */
-void func_L05_00444D60(char *a0, int *a1, int *a2, int a3)
+void gfx_convert_float_pair_bias_coords(char *a0, int *a1, int *a2, int a3)
 {
     float local[2];
     float bias;
 
     func_2FC560((char *)local, a0);
-    bias = (float)gScreenOffsetX;
+    bias = (float)g_screen_offset_x;
     *a1 = func_307778((local[0] - bias) * 0.0625f);
-    bias = (float)gScreenOffsetY;
+    bias = (float)g_screen_offset_y;
     *a2 = func_307778((local[1] - bias) * 0.0625f) + a3;
 }
 
@@ -344,7 +344,7 @@ void func_L05_00444D60(char *a0, int *a1, int *a2, int a3)
 /* Reads a state word from a fixed global; unless its +0x86 halfword is 0x19 it
    returns 0, otherwise it reports whether the signed halfword reached through
    the pointer at +0x70, offset +0xD8, is non-zero. */
-int func_L05_00445980(void)
+int hero_is_state_flag_set(void)
 {
     char *base = D_L05_001B9710;
 
@@ -359,10 +359,10 @@ typedef struct { char data[128]; } InstanceRecord_4459B0;
 extern ModelSlot_4459B0 *D_L05_001B1EC4 MACRO_ADDR;
 extern ModelRecord_4459B0 *D_L05_001B251C MACRO_ADDR;
 extern InstanceRecord_4459B0 *D_L05_001B260C MACRO_ADDR;
-extern int func_002ACBC8(void *, int);
-extern float func_00282DB0(char *, char *);
+extern int IsPointInCuboid(void *, int);
+extern float FastVecDot(char *, char *);
 /* Tells whether the object is close enough to any of its twelve linked points to count as touching one. */
-int func_L05_004459B0(void *arg)
+int path_is_touching_linked_point(void *arg)
 {
     char *self = arg;
     char *entry;

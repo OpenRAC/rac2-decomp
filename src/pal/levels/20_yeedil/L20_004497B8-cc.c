@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_004497B8, the PAL copy of func_L20_00443D58: the same C, where rename func_L20_00443B60 becomes func_PAL_L20_004495C0; rename func_L20_00449FD0 becomes func_PAL_L20_0044FC48; scale func_002A7820(0x12C, 0x258). */
 #include "common.h"
 
@@ -22,7 +23,7 @@ extern unsigned int D_L20_001B2F9C __attribute__((sda));
    as in func_L20_0039E0A0. The bound D_L20_001B2FB8 does not change in the loop, so cc1 hoists
    its repeated test into a register known to be zero, which the loop still tests (retail's
    `daddu $t0,$zero,$zero` and `bnez $t0`). */
-extern void func_002A8C28(char *, char *, int, int, float, float, float, int,
+extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 /* func_L20_00440598 is defined in L20_00440598-g8.c (it reaches data through $gp and needs -frac2-hazard-labels). */
 
@@ -36,12 +37,12 @@ extern void func_002A8C28(char *, char *, int, int, float, float, float, int,
 
 /* func_L20_00442550 is defined in L20_00442550-g8.c. */
 
-extern void func_002A8C28(char *, char *, int, int, float, float, float, int,
+extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 
 /* func_L20_004429F0 is defined in L20_004429F0-g8.c. */
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
 /* func_L20_00442CD8 is defined in L20_00442CD8-g8.c. */
 
@@ -80,7 +81,7 @@ char *func_PAL_L20_004497B8(char *arg0) {
     f = 1.0471977f;
     func_PAL_L20_004495C0(arg0, (char *)&a, (char *)&b, &f);
     g = f;
-    r = (((int)(func_002A7820(0x12C, 0x258)) * 5 + 2) / 6);
+    r = (((int)(math_random_int_range(0x12C, 0x258)) * 5 + 2) / 6);
     return func_PAL_L20_0044FC48(arg0, (char *)&a, (char *)&b, g, r, (float)*(unsigned char *)(state + 0x36));
 }
 
@@ -105,13 +106,13 @@ char *func_PAL_L20_004497B8(char *arg0) {
 /* func_L20_004451C0 is defined in L20_004451C0-g16.c (it reaches two 16-byte vectors through $gp). */
 
 /* The level's own jump table (the label of the data blob at 0x002B5960). */
-extern int func_002B3868(char *);
+extern int flag_set_first_pending(char *);
 
-extern int func_002B38B8(char *);
+extern int flag_is_third_pending_set(char *);
 
-extern void func_002AA548(char *, char *, float, float, float, float);
+extern void math_step_value_toward_target(char *, char *, float, float, float, float);
 
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern unsigned char D_0019B2E8[];
 /* The five behaviours the object's state byte selects; the table in the level's data
@@ -119,19 +120,19 @@ extern unsigned char D_0019B2E8[];
 /* func_L20_00445890 is defined in L20_00445890-g8.c. */
 
 /* The level's own jump table (the label of the data blob at 0x002B5980). */
-extern int func_002B3868(char *);
+extern int flag_set_first_pending(char *);
 
-extern int func_002B38B8(char *);
+extern int flag_is_third_pending_set(char *);
 
-extern void func_002AA548(char *, char *, float, float, float, float);
+extern void math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern unsigned char D_0019B2E8[];
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 typedef struct { char pad[0x74]; unsigned char active; char pad2[0x13]; char *owner; } SoundSlot;
-extern SoundSlot D_00188660[];
+extern SoundSlot g_sound_state[];
 /* func_L20_00447640 is defined in L20_00447640-g8.c (it reads D_L20_001B2FB8 through $gp). */
 
 /* func_L20_00447748 is defined in L20_00447748-g8.c. */

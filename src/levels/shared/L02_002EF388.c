@@ -1,18 +1,19 @@
+#include "names.h"
 /* Fuse an object with up to three linked objects: record each link, its offset and
    relative angles in the inverse frame, then reset the object to the new pose.
    The object fields are written as expressions at each use. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *func_0029EFD0(int);
-extern int func_L02_003272D8(char *);
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002AE730(float *, int *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002AB6D8(float *, float *);
-extern void func_002833F0(void *, void *);
+extern u8 *CreateMoby(int);
+extern int moby_pack_handle(char *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_pack_direction(float *, int *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void mat_get_euler_angles(float *, float *);
+extern void euler_rotation_basis(void *, void *);
 
 typedef struct {
     char pad00[0x10];
@@ -22,7 +23,7 @@ typedef struct {
     int offset[3];        /* 0x40 */
     int angle[3];         /* 0x4C */
 } FuseData;
-int func_L02_002EF388(u8 *object, TI128 *position, TI128 *rotation, u8 **links, int count) {
+int moby_fuse_linked_objects(u8 *object, TI128 *position, TI128 *rotation, u8 **links, int count) {
     float inverse[16] __attribute__((aligned(16)));
     float relative[4] __attribute__((aligned(16)));
     /* The three-row product occupies rows 0..2; the angle output shares row 3.
@@ -42,19 +43,19 @@ int func_L02_002EF388(u8 *object, TI128 *position, TI128 *rotation, u8 **links, 
     data = *(FuseData **)(fused + 0x68);
     data->owner[0] = object;
     data->flags[0] = *(u16 *)(object + 0x34);
-    data->handle[0] = PackObjectHandle((char *)object);
+    data->handle[0] = moby_pack_handle((char *)object);
     matrix_from_basis_rows(inverse, object + 0xC0);
     for (i = 0; i < count && i < 3; i++) {
         if (links[i]) {
             data->owner[i + 1] = links[i];
             data->flags[i + 1] = *(u16 *)(links[i] + 0x34);
-            data->handle[i + 1] = PackObjectHandle((char *)links[i]);
+            data->handle[i + 1] = moby_pack_handle((char *)links[i]);
             FastVecSub(relative, links[i] + 0x10, (TI128 *)(object + 0x10));
             matrix_mul_vec3(relative, relative, inverse);
-            PackDirectionVector(relative, &data->offset[i]);
+            vec_pack_direction(relative, &data->offset[i]);
             multiply_matrix3x3(rotationWork.full, inverse, links[i] + 0xC0);
-            GetEulerAnglesFromMatrix(rotationWork.full, rotationWork.view.angles);
-            PackDirectionVector(rotationWork.view.angles, &data->angle[i]);
+            mat_get_euler_angles(rotationWork.full, rotationWork.view.angles);
+            vec_pack_direction(rotationWork.view.angles, &data->angle[i]);
             *(u16 *)(links[i] + 0x34) |= 0x102;
             *(u16 *)(links[i] + 0x34) |= 1;
             links[i][0x31] = 0;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_002A5048 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
 #include "names.h"
@@ -5,19 +6,19 @@
 typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
 extern u8 D_0018C0D4;
-extern void *func_L00_002A4FE8(int);
-extern float func_00282C48(float);
-extern float func_002AA898(float *, float, float *, float, float, float, int);
-extern float func_002AA3A8(float *, float *, float, float, float, float);
-extern void func_0029F978(u8 *, unsigned int, u8 *);
-extern void func_0029F9F0(char *, char *);
-extern void func_002A91F0(void *, float *);
-extern void func_00282C88(Quad *);
+extern void *attachment_get_owner_by_kind(int);
+extern float math_fabs(float);
+extern float math_approach_with_velocity(float *, float, float *, float, float, float, int);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern void AttachManipulator(u8 *, unsigned int, u8 *);
+extern void moby_detach_manipulator(char *, char *);
+extern void mat_build_rotation_from_angles(void *, float *);
+extern void vec_clear_128(Quad *);
 
 /* Update an active attachment's orientation/position and link or retire its record. */
-void func_L00_002A5048(u8 *node)
+void attachment_update_record(u8 *node)
 {
-    u8 *owner = GetAttachmentOwnerByKind(*(short *)(node + 0xA2));
+    u8 *owner = attachment_get_owner_by_kind(*(short *)(node + 0xA2));
     float *angles;
     Quad *position;
 
@@ -36,39 +37,39 @@ void func_L00_002A5048(u8 *node)
         *(float *)(node + 0x90) == 0.0f &&
         *(float *)(node + 0x94) == 0.0f &&
         *(float *)(node + 0x98) == 0.0f &&
-        FloatAbs(*(float *)(node + 0x70)) < 0.003f &&
-        FloatAbs(*(float *)(node + 0x74)) < 0.003f &&
-        FloatAbs(*(float *)(node + 0x78)) < 0.003f &&
+        math_fabs(*(float *)(node + 0x70)) < 0.003f &&
+        math_fabs(*(float *)(node + 0x74)) < 0.003f &&
+        math_fabs(*(float *)(node + 0x78)) < 0.003f &&
         *(float *)(node + 0xAC) == 1.0f &&
-        FloatAbs(*(float *)(node + 0x40)) < 0.005f &&
-        FloatAbs(*(float *)(node + 0x44)) < 0.005f &&
-        FloatAbs(*(float *)(node + 0x48)) < 0.005f) {
+        math_fabs(*(float *)(node + 0x40)) < 0.005f &&
+        math_fabs(*(float *)(node + 0x44)) < 0.005f &&
+        math_fabs(*(float *)(node + 0x48)) < 0.005f) {
         if (node[1] != 0)
-            DetachManipulator((char *)owner, (char *)node);
+            moby_detach_manipulator((char *)owner, (char *)node);
     } else {
         angles = (float *)(node + 0x40);
         position = (Quad *)(node + 0x70);
-        ApproachWithVelocity(angles, *(float *)(node + 0x60), (float *)(node + 0x50),
+        math_approach_with_velocity(angles, *(float *)(node + 0x60), (float *)(node + 0x50),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        ApproachWithVelocity((float *)(node + 0x44), *(float *)(node + 0x64), (float *)(node + 0x54),
+        math_approach_with_velocity((float *)(node + 0x44), *(float *)(node + 0x64), (float *)(node + 0x54),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        ApproachWithVelocity((float *)(node + 0x48), *(float *)(node + 0x68), (float *)(node + 0x58),
+        math_approach_with_velocity((float *)(node + 0x48), *(float *)(node + 0x68), (float *)(node + 0x58),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        SpringFloatToGoal((float *)position, (float *)(node + 0x80),
+        math_spring_float_to_goal((float *)position, (float *)(node + 0x80),
                      *(float *)(node + 0x90), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
-        SpringFloatToGoal((float *)(node + 0x74), (float *)(node + 0x84),
+        math_spring_float_to_goal((float *)(node + 0x74), (float *)(node + 0x84),
                      *(float *)(node + 0x94), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
-        SpringFloatToGoal((float *)(node + 0x78), (float *)(node + 0x88),
+        math_spring_float_to_goal((float *)(node + 0x78), (float *)(node + 0x88),
                      *(float *)(node + 0x98), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
         if (node[1] == 0)
             AttachManipulator(owner, *(short *)(node + 0xA0), node);
-        BuildRotationFromAngles(node + 0x10, angles);
+        mat_build_rotation_from_angles(node + 0x10, angles);
         *(Quad *)(node + 0x30) = *position;
         *(float *)(node + 0x20) = *(float *)(node + 0xAC);
         *(float *)(node + 0x24) = *(float *)(node + 0xAC);
         *(float *)(node + 0x28) = *(float *)(node + 0xAC);
     }
-    ClearVector128((Quad *)(node + 0x90));
-    ClearVector128((Quad *)(node + 0x60));
+    vec_clear_128((Quad *)(node + 0x90));
+    vec_clear_128((Quad *)(node + 0x60));
     *(float *)(node + 0xAC) = 1.0f;
 }

@@ -10,13 +10,13 @@
 typedef int s32;
 typedef float f32;
 
-extern f32 func_00283CE0(s32);
+extern f32 IntToFloat(s32);
 
-extern int func_00283CF0(f32);
+extern int FloatToInt(f32);
 
 /* Rounds a value up to the next multiple of sixteen; an already aligned value is returned
    unchanged. */
-s32 func_L00_0041A490(s32 value)
+s32 mem_align_up_sixteen_alt(s32 value)
 {
     s32 divisor = 16;
     f32 fdiv;

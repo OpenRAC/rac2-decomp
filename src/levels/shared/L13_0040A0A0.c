@@ -1,18 +1,18 @@
 #include "common.h"
-extern void func_L13_00409B08(char *, char *);
-extern float func_00282E48(void *, void *);
-extern float func_L02_00329410(char *, float *, const void *);
-extern float func_002AFF38(char *, char *, char *);
-extern void func_002AFD88(float, float, float, char *, char *);
+extern void moby_probe_ground(char *, char *);
+extern float fast_vec_dist(void *, void *);
+extern float math_facing_angle_from_vector(char *, float *, const void *);
+extern float vec_get_vertical_offset(char *, char *, char *);
+extern void vec_add_transformed_point(float, float, float, char *, char *);
 extern char D_L13_001B2590[] MACRO_ADDR;
 
-void func_L13_0040A0A0(char *object, char *state, char *target,
+void creature_resolve_ground_coll(char *object, char *state, char *target,
                        char *old_position, char *transform)
 {
     int blocked = 0;
     char *position;
     float height;
-    ProbeGroundBelowMoby(object, state);
+    moby_probe_ground(object, state);
     height = fast_vec_dist(object + 0x10, D_L13_001B2590);
     if (height < *(float *)(state + 0x90) - *(float *)(state + 8)) {
         *(int *)(state + 0x94) |= 2;
@@ -25,7 +25,7 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
         }
     }
     if (*(short *)(state + 0xc0) != 0) {
-        if (*(float *)(state + 0x10) < ComputeFacingAngleFromVector(object, (float *)(state + 0x50), 0)) {
+        if (*(float *)(state + 0x10) < math_facing_angle_from_vector(object, (float *)(state + 0x50), 0)) {
             *(int *)(state + 0x94) |= 4;
             blocked = 1;
         }
@@ -33,13 +33,13 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
     position = object + 0x10;
     if (blocked) {
         qcopy(position, old_position);
-        ProbeGroundBelowMoby(object, state);
+        moby_probe_ground(object, state);
         height = fast_vec_dist(position, D_L13_001B2590);
     }
     if (height <= *(float *)(state + 0x90) + 0.005f) {
-        GetVerticalOffset(object, state + 0xa0, 0);
+        vec_get_vertical_offset(object, state + 0xa0, 0);
         if (transform != 0)
-            AddTransformedPointToVector(0.0f, 0.0f, *(float *)(state + 0x90) - height, object, position);
+            vec_add_transformed_point(0.0f, 0.0f, *(float *)(state + 0x90) - height, object, position);
         *(short *)(state + 0xc2) = 0;
         *(short *)(state + 0xc0) += 1;
     } else if (*(float *)(state + 0x90) + *(float *)(state + 0xc) <= height) {

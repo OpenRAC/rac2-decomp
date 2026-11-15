@@ -3,12 +3,12 @@
 /* The value is taken through a named s64 local: writing `(int)*(s64 *)p`
    directly folds the load into a 32-bit `lw`, while the local keeps retail's
    `ld` plus the truncdisi2 pair (dsll32/dsra32). */
-extern char *func_001240C8(int, int);
-extern void *func_00120A30(int, void *, int);
+extern char *__frame_state_for(int, int);
+extern void *eh_get_saved_register_addr(int, void *, int);
 
 /* Works out the stack frame of the caller, filling in its saved register data. */
-char *func_00120B38(int pc, char *udata, int subUdata) {
-    char *nextFrame = GetFrameStateForPc(pc, subUdata);
+char *eh_next_stack_level(int pc, char *udata, int subUdata) {
+    char *nextFrame = __frame_state_for(pc, subUdata);
     int reg;
     s64 value;
 
@@ -16,7 +16,7 @@ char *func_00120B38(int pc, char *udata, int subUdata) {
         return 0;
     reg = *(u16 *)(nextFrame + 0x298);
     if (*(s8 *)(udata + reg + 0x29C) != 0) {
-        value = *(s64 *)GetSavedRegisterAddress(reg, udata, 0);
+        value = *(s64 *)eh_get_saved_register_addr(reg, udata, 0);
         *(int *)nextFrame = value;
     } else {
         *(int *)nextFrame = *(int *)udata;

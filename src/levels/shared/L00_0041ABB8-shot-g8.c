@@ -2,23 +2,23 @@
 
 typedef int Quad128 __attribute__((mode(TI)));
 
-extern char *func_0029EFD0(int);
-extern void func_0029F338(void *);
+extern char *CreateMoby(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern char *func_002AB1F0(char *);
-extern void func_002AFFD8(void *, void *, int);
-extern int func_002B4038(int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern char *moby_get_private_value_0(char *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern int save_is_record_value(int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 /* The floats are declared between the integer arguments, which keeps a1's late setup. */
-extern int func_002FED90(void *, float, float, float, void *);
-extern void func_L00_0037FA90(void *, void *, float, float, float);
+extern int part_alloc_effect_slot(void *, float, float, float, void *);
+extern void math_compute_aim_direction(void *, void *, float, float, float);
 extern void ref_L00_0041EB38_00(void (*)(void *), void *);
-extern void func_L00_0041F570(void *);
+extern void shot_update_and_draw_trail(void *);
 
 /* One 224-byte row of the weapon table. */
 typedef struct {
@@ -44,16 +44,16 @@ typedef struct {
     float fade;                   /* 0x40 */
 } ShotState;
 
-extern ShotKind D_L00_00262570[];
+extern ShotKind g_weapon_l00_table[];
 extern char D_00139570[];
-extern Quad128 D_00189EA0 __attribute__((nosda));
-extern char D_00189E20[];
+extern Quad128 g_hero_position __attribute__((nosda));
+extern char g_hero_state[];
 extern float D_L00_001B1498 __attribute__((sda));
 extern float D_L00_001B1494 __attribute__((sda));
 extern unsigned int D_L00_001B1490 __attribute__((sda));
 
 /* Spawn object 0xC89 at origin, aimed along the owner, at target or along the hero. */
-char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
+char *SpawnAimedShot(Quad128 *origin, char *owner, char *target)
 {
     Quad128 normal, position;
     char *object, *collision, *hero;
@@ -70,8 +70,8 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         *(char **)(object + 0xB8) = owner;
         object[0x20] = 0;
         state = *(ShotState **)(object + 0x68);
-        speed = (gWeaponTable_L00 + ((unsigned char *)D_00139570)[0x16])->speed * 0.016666668f;
-        hero = gHeroState;
+        speed = (g_weapon_l00_table + ((unsigned char *)D_00139570)[0x16])->speed * 0.016666668f;
+        hero = g_hero_state;
         if (*(short *)(hero + 0x24EC) == 1) {
             vec_scale_to_length(state->velocity, owner + 0xD0, -speed);
             *(Quad128 *)(object + 0x10) = *origin;
@@ -80,16 +80,16 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
                 char *point = target + 0x10;
 
                 qcopy(&position, point);
-                collision = GetMobyPrivateValue0(target);
+                collision = moby_get_private_value_0(target);
                 if (collision) {
-                    ComputeViewDirection(point, &normal, 1);
+                    cam_compute_view_direction(point, &normal, 1);
                     FastVecScale(&normal, &normal, *(float *)(collision + 0x10));
                     FastVecAdd(&position, &position, &normal);
                 }
                 FastVecSub(state->velocity, &position, origin);
                 vec_scale_to_length(state->velocity, state->velocity, speed);
             } else if (*(int *)(hero + 0x1500)) {
-                ComputeAimDirection(state->velocity, origin, speed, 30.0f, 0.3490658998f);
+                math_compute_aim_direction(state->velocity, origin, speed, 30.0f, 0.3490658998f);
             } else {
                 vec_scale_to_length(state->velocity, hero + 0x760, speed);
             }
@@ -103,7 +103,7 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         object[0x20] = 0;
         state->target = target;
         if (target) {
-            collision = GetMobyPrivateValue0(target);
+            collision = moby_get_private_value_0(target);
             if (collision)
                 *(unsigned short *)(collision + 0x1E) |= 0x80;
         }
@@ -112,8 +112,8 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         state->ownerIndex = ownerIndex;
         ownerKind = *(short *)(owner + 0xAA);
         state->ownerKind = ownerKind;
-        if (!IsSavedRecordValue(ownerKind, ownerIndex)) {
-            MarkMobySpawned(object);
+        if (!save_is_record_value(ownerKind, ownerIndex)) {
+            moby_mark_spawned(object);
             return 0;
         }
         state->frame = 0;
@@ -125,10 +125,10 @@ char *func_L00_0041EB38(Quad128 *origin, char *owner, char *target)
         if ((int)D_L00_001B1490 > 15)
             D_L00_001B1490 = 0;
         position = *(Quad128 *)(object + 0x10);
-        *(Quad128 *)(object + 0x10) = gHeroPosition;
-        state->handle = AllocEffectSlot_002FED90(object, 1.0f, 1.0f, 1.0f, 0);
+        *(Quad128 *)(object + 0x10) = g_hero_position;
+        state->handle = part_alloc_effect_slot(object, 1.0f, 1.0f, 1.0f, 0);
         *(Quad128 *)(object + 0x10) = position;
-        ref_L00_0041EB38_00(UpdateAndDrawShotTrail, object);
+        ref_L00_0041EB38_00(shot_update_and_draw_trail, object);
         func_002A0F48(object);
     }
     return object;

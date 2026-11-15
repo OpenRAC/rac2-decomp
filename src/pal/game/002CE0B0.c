@@ -3,20 +3,20 @@
 #include "common.h"
 extern int D_00138344;
 extern int func_PAL_0029CB00(int);
-extern unsigned int func_0026F7E0(void);
-extern unsigned int func_0026F7E0(void);
-extern unsigned int func_0026F7E0(void);
-extern unsigned int func_0026F7F0(void);
-extern unsigned int func_0026F7F0(void);
-extern unsigned int func_0026F7F8(void);
-extern int func_002CB7D0(int);
-extern int func_002CB820(int);
-extern int func_002CB8A0(int);
+extern unsigned int stub_empty_26(void);
+extern unsigned int stub_empty_26(void);
+extern unsigned int stub_empty_26(void);
+extern unsigned int stub_empty_28(void);
+extern unsigned int stub_empty_28(void);
+extern unsigned int stub_empty_29(void);
+extern int menu_handle_step_simple(int);
+extern int menu_handle_mode_action(int);
+extern int menu_run_action_by_index(int);
 extern int func_PAL_002CC7B8(int);
-extern void func_002E5E58(int, unsigned int, void *);
-extern unsigned int func_0026F7D0(void);
-extern unsigned int func_0026F7D8(void);
-extern unsigned int func_0026F7E8(void);
+extern void snd_play_from_global_bank(int, unsigned int, void *);
+extern unsigned int stub_empty_24(void);
+extern unsigned int stub_empty_25(void);
+extern unsigned int stub_empty_27(void);
 
 int func_PAL_002CE0B0(void)
 {
@@ -27,45 +27,45 @@ int func_PAL_002CE0B0(void)
         res = 1;
     } else if (flags & 0x40) {
         res = func_PAL_0029CB00(flags);
-        if (func_0026F7D0() && func_0026F7D8()) {
+        if (stub_empty_24() && stub_empty_25()) {
             res = func_PAL_002CC7B8(res);
-        } else if (func_0026F7E8()) {
-            res = func_002CB820(res);
-        } else if (func_0026F7E0()) {
+        } else if (stub_empty_27()) {
+            res = menu_handle_mode_action(res);
+        } else if (stub_empty_26()) {
             res = func_PAL_002CC8C8(res);
-        } else if (func_0026F7F8() == 0x31) {
-            res = func_002CB7D0(res);
-        } else if (func_0026F7F0()) {
-            res = func_002CB7D0(res);
-        } else if (func_0026F7F8() == 0x1C) {
-            res = func_002CB7D0(res);
+        } else if (stub_empty_29() == 0x31) {
+            res = menu_handle_step_simple(res);
+        } else if (stub_empty_28()) {
+            res = menu_handle_step_simple(res);
+        } else if (stub_empty_29() == 0x1C) {
+            res = menu_handle_step_simple(res);
         } else {
-            res = func_002CB8A0(res);
+            res = menu_run_action_by_index(res);
         }
     } else {
         func_PAL_0029CB00(flags);
     }
 
     if (res) {
-        func_002E5E58(0x12, 0, 0);
+        snd_play_from_global_bank(0x12, 0, 0);
     }
     return res;
 }
 
 
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 extern void func_0029C138(void);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
 
 int func_PAL_002CE1E8(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C138();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 

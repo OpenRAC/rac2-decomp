@@ -3,14 +3,14 @@
 /* Adapted from RAC1 src/game/loaders.c: upload_mip_texture (GPL-3.0).
  * Upload the palette and mip levels, then construct TEX0, TEX1 and MIPTBP1.
  * The per-file block-order option preserves the palette switch layout. */
-extern int func_00282A18(int);
+extern int log2dim(int);
 typedef struct { long w[12]; } GsLoadImage __attribute__((aligned(16)));
 extern int func_00126288(GsLoadImage *, short, short, short, short, short, short, short);
-extern void func_0011AEA0(int);
-extern int func_001265B0(GsLoadImage *, void *);
-extern int func_001244B8(int, unsigned short);
+extern void FlushCache(int);
+extern int sceGsExecLoadImage(GsLoadImage *, void *);
+extern int gfx_wait_paths_idle(int, unsigned short);
 extern int D_001A72D0 __attribute__((sda));
-extern void func_00282A60(unsigned int *, unsigned int, int);
+extern void mem_clear(unsigned int *, unsigned int, int);
 typedef struct {
     u8 pad0[8];
     s32 width;
@@ -35,7 +35,7 @@ typedef struct {
 } MipUpload;
 
 /* Uploads a texture and its mip levels to video memory and fills the three texture registers for it. */
-s32 func_00291850(MipTexture *tex, unsigned long *regs)
+s32 UploadMipTexture(MipTexture *tex, unsigned long *regs)
 {
     MipUpload upload;
     GsLoadImage load_image;
@@ -46,7 +46,7 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
     unsigned long pal;
     unsigned long lod;
 
-    ClearMemory((unsigned int *)&upload, 0, sizeof(upload));
+    mem_clear((unsigned int *)&upload, 0, sizeof(upload));
     switch (tex->psm) {
     case 0:
     case 2:
@@ -100,8 +100,8 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
             func_00126288(&load_image, upload.palette_block, 1, tex->palette_psm, 0, 0, 16, 16);
         }
         FlushCache(0);
-        ExecGsLoadImage(&load_image, (void *)upload.palette_address);
-        WaitGsPathsIdle(0, 0);
+        sceGsExecLoadImage(&load_image, (void *)upload.palette_address);
+        gfx_wait_paths_idle(0, 0);
     }
     for (i = 1; i < tex->mip_count; i++) {
         upload.mip_sizes[i] = upload.mip_sizes[i - 1] >> 2;
@@ -117,8 +117,8 @@ s32 func_00291850(MipTexture *tex, unsigned long *regs)
         func_00126288(&load_image, upload.blocks[i], *width, tex->psm, 0, 0,
                       tex->width >> i, tex->height >> i);
         FlushCache(0);
-        ExecGsLoadImage(&load_image, (void *)upload.mip_addresses[i]);
-        WaitGsPathsIdle(0, 0);
+        sceGsExecLoadImage(&load_image, (void *)upload.mip_addresses[i]);
+        gfx_wait_paths_idle(0, 0);
         bytes = upload.mip_sizes[0] >> (i * 2);
         if (bytes <= 0xFF) {
             bytes = 0x100;

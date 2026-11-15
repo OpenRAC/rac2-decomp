@@ -6,11 +6,11 @@ typedef int s32;
 typedef unsigned int u32;
 typedef float f32;
 typedef int Quad __attribute__((mode(TI)));
-extern s32 func_L18_0032B768(u8 *, s32, s32);
-extern void func_002A7750(u8 *, u8, s32);
+extern s32 moby_set_table_entry_byte(u8 *, s32, s32);
+extern void moby_set_state(u8 *, u8, s32);
 
 /* Activates the waiting object at its supplied position and saves its impulse. */
-void func_L18_003F76F0(u8 *self, void *position, void *impulse) {
+void protopet_launch_shot(u8 *self, void *position, void *impulse) {
     u8 *state;
     if ((u32)(self[0x20] - 1) >= 2) return;
     state = *(u8 **)(self + 0x68);
@@ -21,8 +21,8 @@ void func_L18_003F76F0(u8 *self, void *position, void *impulse) {
     *(s32 *)(self + 0x98) = *(s32 *)(*(u8 **)(self + 0x24) + 0x10);
     self[0x31] = 0;
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & ~2) | 1;
-    SetTableEntryByte(self, 0, 3);
-    SetMobyState(self, 3, 0);
+    moby_set_table_entry_byte(self, 0, 3);
+    moby_set_state(self, 3, 0);
     *(s32 *)(self + 0x98) = *(s32 *)(*(u8 **)(self + 0x24) + 0x10);
     *(u16 *)(self + 0x34) |= 0x1000;
     *(Quad *)(self + 0x10) = *(Quad *)position;

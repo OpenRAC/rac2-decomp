@@ -4,12 +4,12 @@
 extern float D_L30_001AEE90 __attribute__((sda));
 extern float D_L30_001AEE94 __attribute__((sda));
 extern char D_L30_001AEE98[];
-extern void func_0026FEB8(const char *, ...);
+extern void STUB_printf(const char *, ...);
 extern void func_001163A0(unsigned int);
-extern int func_002A77E0(int);
-extern void func_002A7750(u8 *, int, int);
-extern void func_002AEE70(u8 *, u8 *, u8 *, float, float, float);
-extern float func_00283B98(float, float);
+extern int math_random_int_below(int);
+extern void moby_set_state(u8 *, int, int);
+extern void math_update_wrapped_angle_offset(u8 *, u8 *, u8 *, float, float, float);
+extern float FastAddRotations(float, float);
 
 /* Steps one record: with the state byte clear it copies the record's own angle into the
    state block, and once the state index reaches thirteen it redraws the record with a fresh
@@ -30,19 +30,19 @@ void func_PAL_L30_003890DC(u8 *object) {
             short a2 = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            func_0026FEB8(D_L30_001AEE98, a1, a2);
+            STUB_printf(D_L30_001AEE98, a1, a2);
             func_001163A0(ticks);
-            *(int *)state = func_002A77E0(13);
+            *(int *)state = math_random_int_below(13);
         }
         *(u16 *)(object + 0x7C) = 1 << *(int *)state;
-        func_002A7750(object, 1, -1);
+        moby_set_state(object, 1, -1);
     } else {
         float f0 = D_L30_001AEE94;
 
-        func_002AEE70(object, state + 4, state + 8, D_L30_001AEE90,
+        math_update_wrapped_angle_offset(object, state + 4, state + 8, D_L30_001AEE90,
                       f0 * 0.0003490659f, *(float *)(state + 0xC));
         *(float *)(object + 0xF8) =
-            func_00283B98(*(float *)(object + 0xF8), 0.01745329424738884f);
+            FastAddRotations(*(float *)(object + 0xF8), 0.01745329424738884f);
         *(u16 *)(object + 0x96) = 0;
     }
     v = *(u16 *)(object + 0x96);

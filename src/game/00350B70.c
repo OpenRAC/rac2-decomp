@@ -7,14 +7,14 @@ typedef int s32;
 typedef unsigned char u8;
 
 /* func_003512B8 : rounds a field to a multiple of 2048 under a semaphore */
-extern s32 func_0011AC60(s32);
+extern s32 WaitSema(s32);
 
-extern s32 func_0011AC40(s32);
+extern s32 SignalSema(s32);
 
 /* func_00351268 : waits, then combines two fields shifted by 11 */
-extern s32 func_0011AC60(s32 a0);
+extern s32 WaitSema(s32 a0);
 
-extern s32 func_0011AC40(s32 a0);
+extern s32 SignalSema(s32 a0);
 
 typedef struct ViBuf {
     int base;               /* 0x0 */
@@ -29,21 +29,21 @@ typedef struct ViBuf {
     int f44;                /* 0x44 */
 } ViBuf;
 
-extern void func_0034F780(char *);
+extern void mpeg_set_debug_value(char *);
 extern char D_001AE848[];
-extern void func_00350808(unsigned int);
-extern int func_00350750(ViBuf *, unsigned int);
-extern void func_00350878(unsigned long *, unsigned long, unsigned long, unsigned long);
+extern void mpeg_start_dma4(unsigned int);
+extern int mpeg_vibuf_addr_to_slot(ViBuf *, unsigned int);
+extern void scTag2(unsigned long *, unsigned long, unsigned long, unsigned long);
 
 /* Adds a number of bytes to the amount of data waiting in the video buffer. */
-void func_00350B70(u8 *buf, s32 byteCount) {
+void mpeg_vibuf_add_pending_bytes(u8 *buf, s32 byteCount) {
     WaitSema(*(s32 *)(buf+0x40));
     *(s32 *)(buf+0x14) += (s32)byteCount;
     *(long *)(buf+0x48) = (long)byteCount + *(long *)(buf+0x48);
     SignalSema(*(s32 *)(buf+0x40));
 }
 /* Refills the video buffer's DMA tags after the decoder has used up some data, then restarts the transfer. */
-int func_00350BC8(ViBuf *vb) {
+int viBufAddDMA(ViBuf *vb) {
     int linkPrev = 0;
     unsigned int chcr;
     int idx;
@@ -55,12 +55,12 @@ int func_00350BC8(ViBuf *vb) {
 
     WaitSema(vb->sema);
     if (vb->f44 == 0) {
-        SetMovieDebugValue(D_001AE848);
+        mpeg_set_debug_value(D_001AE848);
         return 0;
     }
-    StartDmaChannel4(5);
+    mpeg_start_dma4(5);
     chcr = D4_CHCR;
-    readSlot = ViBufAddressToSlot(vb, D4_MADR);
+    readSlot = mpeg_vibuf_addr_to_slot(vb, D4_MADR);
     usedSlots = (readSlot + vb->count - vb->fC) % vb->count;
     vb->fC = (vb->fC + usedSlots) % vb->count;
     vb->f10 -= usedSlots;
@@ -88,7 +88,7 @@ int func_00350BC8(ViBuf *vb) {
         if (linkPrev) {
             chcr = (chcr & 0x0FFFFFFF) | 0x30000000;
         }
-        StartDmaChannel4(chcr | 0x100);
+        mpeg_start_dma4(chcr | 0x100);
     }
     SignalSema(vb->sema);
     return 1;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Decode the compressed one-bit occlusion map into 0x8000 output bytes.
  * Adapted from OpenRAC/rac1-decomp src/game/menu.c:
  * decode_compressed_occlusion_map, GPL-3.0, revision
@@ -9,11 +10,11 @@
  */
 #include "common.h"
 
-extern void func_00282A60(void *, unsigned int, int);
-extern void func_00282B50(void *, const void *, int);
+extern void mem_clear(void *, unsigned int, int);
+extern void mem_fast_helper_c(void *, const void *, int);
 
 
-void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *spans) {
+void map_decode_compressed_occlusion(void *dst, const unsigned char *ctrl, const unsigned char *spans) {
     unsigned char *dst_end;
     unsigned char *end;
     const unsigned char *span;
@@ -34,7 +35,7 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
     span = spans;
     count = *ctrl >> 1;
     ctrl++;
-    ClearMemory((void *)0x70000000, 0, 0x2400);
+    mem_clear((void *)0x70000000, 0, 0x2400);
     bit = 1;
     cursor = (unsigned char *)0x70000000;
     for (;;) {
@@ -71,12 +72,12 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
             *w |= *r++ << 7;
             w++;
         } while (r < end);
-        FastMemoryHelperC(dst, (void *)0x70000000, 0x400);
+        mem_fast_helper_c(dst, (void *)0x70000000, 0x400);
         dst = next_dst;
         if (next_dst == dst_end) {
             return;
         }
-        ClearMemory((void *)0x70000000, 0, 0x2000);
+        mem_clear((void *)0x70000000, 0, 0x2000);
         wrapped = cursor - 0x2000;
         from = (unsigned char *)0x70002000;
         to = (unsigned char *)0x70000000;
@@ -85,7 +86,7 @@ void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *sp
                 *to++ = *from++;
             } while (from < cursor);
         }
-        ClearMemory((void *)0x70002000, 0, 0x400);
+        mem_clear((void *)0x70002000, 0, 0x400);
         cursor = wrapped;
     }
 }

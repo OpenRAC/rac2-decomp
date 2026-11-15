@@ -1,10 +1,11 @@
+#include "names.h"
 /* func_L00_004233F8 (follow_camera_setup): own unit for -G8 with the
  * quadword-copy profile. Counterpart: RAC1 src/overlays/shared/follow_camera.c,
  * follow_camera_setup; the state layout here follows RAC2's measured offsets.
  */
 #include "common.h"
 typedef unsigned int CameraQuad __attribute__((mode(TI)));
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 extern CameraQuad D_0018A0E0;
 extern int D_L00_001B1580 SDATA(D_L00_001B1580), D_L00_001B1584 SDATA(D_L00_001B1584);
 extern unsigned short D_L00_001B1514 SDATA(D_L00_001B1514), D_L00_001B1518 SDATA(D_L00_001B1518);
@@ -15,15 +16,15 @@ extern int D_L00_001B1854;
 typedef struct { unsigned char pad0[0x86]; short mode; } CameraControl;
 extern CameraControl *D_L00_001B8E14[];
 
-extern void func_00282C88(void *);
-extern void func_L00_00423290(unsigned char *);
-extern float func_00283CE0(int);
-extern void func_L00_00420638(char *);
-extern void func_L00_00423038(int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
+extern void vec_clear_128(void *);
+extern void cam_follow_init_from_hero(unsigned char *);
+extern float IntToFloat(int);
+extern void cam_init_state_vectors(char *);
+extern void cam_follow_update_orientation(int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
 #define CF(p, o) (*(float *)((p) + (o)))
 #define CI(p, o) (*(int *)((p) + (o)))
 #define CS(p, o) (*(short *)((p) + (o)))
@@ -69,7 +70,7 @@ typedef struct {
 } CameraOwner;
 
 /* Resets the follow camera to its starting settings (speeds, limits, counters). It then places the camera behind the hero. */
-void func_L00_004233F8(CameraOwner *owner)
+void follow_camera_setup(CameraOwner *owner)
 {
     CameraQuad projected, difference;
     CameraSettings *camera = &owner->state->camera;
@@ -80,7 +81,7 @@ void func_L00_004233F8(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = gHeroState + 0x80;
+    unsigned char *initialPosition = g_hero_state + 0x80;
     unsigned char *hero;
     D_L00_001B1580 = 0;
     D_L00_001B1584 = 0;
@@ -171,9 +172,9 @@ void func_L00_004233F8(CameraOwner *owner)
     tracker->f3C = D_L00_001B14DC;
     tracker->f40 = D_L00_001B14D8;
     tracker->i48 = D_L00_001B1854;
-    ClearVector128(tracker->direction);
+    vec_clear_128(tracker->direction);
     if (owner->handoff == 2) {
-        InitFollowCameraFromHero((unsigned char *)owner);
+        cam_follow_init_from_hero((unsigned char *)owner);
         *(CameraQuad *)(owner->previous) = *(CameraQuad *)owner;
         if (D_L00_001B8E14[0]->mode == 7 && CS(hero, 0x34C) == 0)
             orientation->h0 = 0;
@@ -182,8 +183,8 @@ void func_L00_004233F8(CameraOwner *owner)
             orientation->f24 = 1.0f / IntToFloat((short)D_L00_001B1518);
         }
     } else {
-        InitCameraStateVectors((char *)owner);
-        UpdateFollowCameraOrientation(1);
+        cam_init_state_vectors((char *)owner);
+        cam_follow_update_orientation(1);
     }
     FastVecSub(movement, owner->pos, camera->direction);
     *(CameraQuad *)(movement->previous) = *(CameraQuad *)movement;

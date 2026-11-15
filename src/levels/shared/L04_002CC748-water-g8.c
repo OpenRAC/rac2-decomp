@@ -1,23 +1,24 @@
+#include "names.h"
 /* The -G8 sibling of L04_002CC748.c for the water grid renderer: its globals are read through $gp
    and the packet cursor through a macro address. */
 #include "common.h"
 /* Adapted from RAC1 render_water_grids, GPL-3.0, with RAC2 blend/GS setup. */
-extern void func_L04_003A0FC8(void);
-extern void func_002FC560(u32,u64);
-extern float func_002A7798(float);
-extern int func_00283D38(int,int,float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
-extern int func_00282BE0(void *);
-extern void func_L04_0032F1D8(void *,void *);
-extern void func_L04_0032F3C0(void *);
-extern void func_L04_003A0C40(void *);
-extern void func_L04_003A00E8(void *);
-extern u64 func_0027C878(int);
-extern void func_L04_003A0CE8(void *,int,int);
+extern void BuildWaterRenderSetupPacket(void);
+extern void VU1_addGSregister(u32,u64);
+extern float math_ease_out_quad(float);
+extern int FastTweenColor(int,int,float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
+extern int is_vector_outside_clip(void *);
+extern void ripple_heights_to_scratchpad(void *,void *);
+extern void water_submit_patch_at_pos(void *);
+extern void water_fill_grid_points(void *);
+extern void water_scroll_texture_coords(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void water_cull_and_submit_tile(void *,int,int);
 extern char D_L04_001B9680[];
 extern union { u32 *words; char *bytes; } D_L04_001B2C48 MACRO_ADDR;
 extern int D_L04_001ADA30 __attribute__((sda));
@@ -47,11 +48,11 @@ extern WaterAlphaState ref_L04_003A21F8_01 SDATA(ref_L04_003A21F8_01);
 /* Both arms end in the same call, so jump2 merges them, and the test on the value already in a
    register leaves no instruction. Until then it ends a block right after the call. */
 static inline float water_ease(float t, s32 reverse, float scale) {
-    if (reverse) return scale * EaseOutQuad(t);
-    return EaseOutQuad(t);
+    if (reverse) return scale * math_ease_out_quad(t);
+    return math_ease_out_quad(t);
 }
 /* Draws every active water patch: fades it in or out, skips ones off screen, and sends their wave tiles to the screen. */
-void func_L04_003A21F8(WaterGrid *waterGrid, s32 count) {
+void render_water_grids(WaterGrid *waterGrid, s32 count) {
     f32 corners[4][4];
     f32 near_clip[4];
     f32 far_clip[4];
@@ -130,9 +131,9 @@ void func_L04_003A21F8(WaterGrid *waterGrid, s32 count) {
 
         twice=blend+blend;
         ripple_heights_to_scratchpad((void *)0x70000000, (u8 *)waterGrid + ((*(s32 *)&D_L04_001AD82C) * 0x5c0 + 0x50));
-        SubmitWaterPatchAtPos(waterGrid);
-        FillWaterGridPoints(waterGrid);
-        ScrollWaterTextureCoords(waterGrid);
+        water_submit_patch_at_pos(waterGrid);
+        water_fill_grid_points(waterGrid);
+        water_scroll_texture_coords(waterGrid);
         if (waterGrid->edges & 1) {
             height = (f32 *)0x70002008;
             for (n = 0x10; n >= 0; n--, height += 3) *height = waterGrid->position[2];
@@ -203,7 +204,7 @@ void func_L04_003A21F8(WaterGrid *waterGrid, s32 count) {
         (*(u32 *)&D_L04_001AD88C) = waterGrid->alpha2;
         (*(u32 *)&D_L04_001AD890) = alpha_index;
         for (index = 0; index < 16; index++, mask = (s32)mask >> 1) {
-            if (mask & 1) CullAndSubmitWaterTile(waterGrid, index, mode);
+            if (mask & 1) water_cull_and_submit_tile(waterGrid, index, mode);
         }
 next_entity:
         i++;

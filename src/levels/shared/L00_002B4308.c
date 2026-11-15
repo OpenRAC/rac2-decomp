@@ -1,14 +1,14 @@
 #include "common.h"
 /* Projects the horizontal velocity onto a copied direction before reducing its Z component. */
-extern float func_00282E20(char *);
-extern float func_00283248(float, float);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
+extern float vec_length_xy(char *);
+extern float mat_fast_helper_a(float, float);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
 extern void func_001290E0(int *, int *);
 extern unsigned char D_00189E20_1[];
 
 /* When the hero runs into a wall, takes away the part of the hero speed that goes into it and slows the hero down a little. */
-void func_L00_002B4308(void)
+void hero_cancel_velocity_into_wall(void)
 {
     char *hero = (char *)D_00189E20_1;
     float distance;
@@ -27,7 +27,7 @@ void func_L00_002B4308(void)
     if (!(0.0f < *(float *)(hero + 0x238)))
         return;
     distance = vec_length_xy(hero + 0x230);
-    angle = FastMatrixHelperA(*(float *)(hero + 0x238), distance);
+    angle = mat_fast_helper_a(*(float *)(hero + 0x238), distance);
     if (!(angle >= 0.8726646900177002f))
         return;
     qcopy(vector, hero + 0x230);

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ typedef int TI __attribute__((mode(TI)));
 extern void ref_L22_0040DD20_00(void *a, void *b);
 
 /* Calls a helper on the object with a zeroed 16-byte vector. */
-void func_L22_0040DD20(void *moby) {
+void moby_call_with_zero_vector(void *moby) {
     TI zeroVec = 0;
     ref_L22_0040DD20_00(moby, &zeroVec);
 }

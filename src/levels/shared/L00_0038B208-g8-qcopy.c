@@ -3,9 +3,9 @@
 /* Advances a trail object's phase and draws its four-vertex strips. The template, state and packet
  * layouts are measured from this function; the four selected rows stay in separate locals because
  * retail spills each one on its own, and the hero's moby is read through the cast on every use. */
-extern int D_L00_001B19C8;
-extern int func_00283CF0(float);
-extern void func_00282D30(void *, void *, float);
+extern int g_frame_l00_counter;
+extern int FloatToInt(float);
+extern void FastVecScale(void *, void *, float);
 typedef int TrailQuad __attribute__((mode(TI)));
 typedef union { TrailQuad q; float f[4]; } TrailVector;
 typedef struct {
@@ -35,15 +35,15 @@ typedef struct {
 } TrailPacket;
 typedef struct { char pad[0x2290]; u8 *moby; } TrailHero;
 
-extern TrailHero D_00189E20;
+extern TrailHero g_hero_state;
 extern TrailTemplate D_L00_00290C78[];
 extern int D_L00_001B2740;
 extern float D_L00_001AEFD8 __attribute__((sda));
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 
 /* Advance and draw the four-vertex strips for the current weapon trail. */
-void func_L00_0038B208(char *object)
+void UpdateTrailStrips(char *object)
 {
     TrailPacket packet;
     int selected0, selected1, selected2, selected3;
@@ -56,7 +56,7 @@ void func_L00_0038B208(char *object)
     if (state == 0 || state->phase == 0.0f)
         return;
     if (state->phase == 1.0f) {
-        if (gHeroState.moby[0x42] != gHeroState.moby[0x43] || gHeroState.moby[0x42] == 255) {
+        if (g_hero_state.moby[0x42] != g_hero_state.moby[0x43] || g_hero_state.moby[0x42] == 255) {
             state->phase = 0.0f;
             return;
         }
@@ -66,11 +66,11 @@ void func_L00_0038B208(char *object)
     primitive = 1;
     baseColor = 0x00808080;
     alpha = 1.0f;
-    kind = gHeroState.moby[0x42];
+    kind = g_hero_state.moby[0x42];
     if ((unsigned)(kind - 23) >= 3 && kind != 43)
         kind = state->kind;
     else
-        kind = gHeroState.moby[0x42];
+        kind = g_hero_state.moby[0x42];
     if (kind == 23) {
         state->kind = 23;
         shapeIndex = 0;
@@ -96,13 +96,13 @@ void func_L00_0038B208(char *object)
     selected2 = shape->selected[2];
     selected3 = shape->selected[3];
     if (phase == 1.0f) {
-        u8 *moby = gHeroState.moby;
+        u8 *moby = g_hero_state.moby;
         qcopy(&state->basis[0], moby + 0xC0);
         qcopy(&state->basis[1], moby + 0xD0);
         qcopy(&state->basis[2], moby + 0xE0);
-        D_L00_001B2740 = gFrameCounter_L00;
+        D_L00_001B2740 = g_frame_l00_counter;
     }
-    frame = gFrameCounter_L00;
+    frame = g_frame_l00_counter;
     elapsed = frame - D_L00_001B2740;
     if (elapsed <= 0)
         elapsed = 1;
@@ -110,7 +110,7 @@ void func_L00_0038B208(char *object)
     state->phase = advanced;
     D_L00_001B2740 = frame;
     if ((float)(shape->count * 2) <= advanced) {
-        int current = gHeroState.moby[0x42];
+        int current = g_hero_state.moby[0x42];
         if ((unsigned)(current - 23) >= 3 && current != 43)
             state->phase = 0.0f;
         return;
@@ -119,7 +119,7 @@ void func_L00_0038B208(char *object)
     packet.tag = 0xFF9000000260ULL;
     packet.count = 5;
     packet.primitive = ((u64)primitive << 2) | 0x8000000040ULL;
-    qcopy(&state->position, gHeroState.moby + 0x10);
+    qcopy(&state->position, g_hero_state.moby + 0x10);
     for (segment = 0; segment < shape->count; segment++) {
         for (vertex = 0; vertex < 4; vertex++) {
             int index = shape->indices[segment][vertex * 2];

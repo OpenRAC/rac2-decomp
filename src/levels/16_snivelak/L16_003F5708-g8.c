@@ -24,22 +24,22 @@ extern int D_L16_001B1108 __attribute__((sda));
 extern int D_L16_001B110C[] __attribute__((sda));   /* lifetime bounds */
 extern int D_L16_001B1110[] __attribute__((sda));
 
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00282C48(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern void func_00282C88(void *);
-extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float math_fabs(float);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern void vec_clear_128(void *);
+extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Emits randomly positioned particles outside the central rectangle, each with colours blended
    at random between two pairs, a random size from the table and random lifetimes. */
 /* Spawns coloured particles around the object, skipping a box in the middle. */
-void func_L16_003F5708(char *object)
+void EmitParticlesOutsideCentralBox(char *object)
 {
     float position[4];
     float random[4];
@@ -52,27 +52,27 @@ void func_L16_003F5708(char *object)
 
     for (i = 0; (float)i < D_L16_001B10E4; ++i) {
         *(Quadword *)random = 0;
-        random[0] = RandomSignedFloatRange(0.0f, 26.0f);
-        random[1] = RandomSignedFloatRange(0.0f, 8.0f);
-        random[2] = RandomFloatRange(0.0f, 30.0f);
+        random[0] = math_random_signed_float_range(0.0f, 26.0f);
+        random[1] = math_random_signed_float_range(0.0f, 8.0f);
+        random[2] = math_random_float_range(0.0f, 30.0f);
         *(Quadword *)position = *(Quadword *)random;
-        if (FloatAbs(position[0]) < 9.0f && FloatAbs(position[2]) < 25.0f)
+        if (math_fabs(position[0]) < 9.0f && math_fabs(position[2]) < 25.0f)
             continue;
         scale = *(float *)(object + 44) / *(float *)(*(char **)(object + 36) + 36);
         FastVecScale(position, position, scale);
         matrix_mul_vec3(position, position, object + 192);
         FastVecAdd(position, position, object + 16);
-        blend = RandomFloatRange(0.0f, 1.0f);
+        blend = math_random_float_range(0.0f, 1.0f);
         first = FastTweenColor(D_L16_001B10E8, D_L16_001B10EC[0], blend);
-        blend = RandomFloatRange(0.0f, 1.0f);
+        blend = math_random_float_range(0.0f, 1.0f);
         second = FastTweenColor(D_L16_001B10F0[0], D_L16_001B10F4[0], blend);
-        size = D_L16_001B10F8[RandomIntBelow(2)];
-        ClearVector128(random);
+        size = D_L16_001B10F8[math_random_int_below(2)];
+        vec_clear_128(random);
         random[3] = size;
-        ClearVector128(direction);
+        vec_clear_128(direction);
         direction[3] = size;
-        third = RandomIntRange(1, D_L16_001B1108);
-        fourth = RandomIntRange(D_L16_001B110C[0], D_L16_001B1110[0]);
-        SpawnTrailParticle_002BAA28(position, random, direction, first, second, third, fourth, 60, D_L16_001B1104);
+        third = math_random_int_range(1, D_L16_001B1108);
+        fourth = math_random_int_range(D_L16_001B110C[0], D_L16_001B1110[0]);
+        part_spawn_trail(position, random, direction, first, second, third, fourth, 60, D_L16_001B1104);
     }
 }

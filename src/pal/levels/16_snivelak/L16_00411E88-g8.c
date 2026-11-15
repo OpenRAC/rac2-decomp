@@ -3,18 +3,18 @@
 /* func_PAL_L16_00411E88, the PAL copy of func_L16_0040CF98: the same C, where the lead doubling
    becomes 2 * 5/6 and the turn rates take a 6/5 squared correction at 50 Hz. */
 
-extern void func_00282948(void *);
-extern s32 func_00282978(void *);
-extern void func_0029FCC0(void *, s32, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
-extern void func_002AEC48(void *, void *, s32, float, float);
+extern void math_fast_float_d(void *);
+extern s32 FastDecTimer(void *);
+extern void moby_transform_joint_to_world(void *, s32, void *);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
+extern void moby_update_eased_node(void *, void *, s32, float, float);
 extern u8 D_L16_00189F30[] __attribute__((nosda));
 extern float D_L16_001B1640 __attribute__((sda));
 extern float D_L16_001B1644 __attribute__((sda));
@@ -29,30 +29,30 @@ void func_PAL_L16_00411E88(u8 *arg)
     float scale;
     float rate;
     state = *(u8 **)(arg + 0x68);
-    func_00282948(state + 0x238);
-    func_00282978(state + 0x23C);
+    math_fast_float_d(state + 0x238);
+    FastDecTimer(state + 0x23C);
     if (*(u16 *)(arg + 0x96) < 0xFFFF) ++*(u16 *)(arg + 0x96);
-    func_0029FCC0(arg, 0, temp);
+    moby_transform_joint_to_world(arg, 0, temp);
     if (arg[0x20] != 4) {
         origin = state + 0x1F0;
-        value = func_00282E48(temp, origin) - 1.0f;
-        func_00282D30(target, D_L16_00189F30, value * 1.6666666f);
+        value = fast_vec_dist(temp, origin) - 1.0f;
+        FastVecScale(target, D_L16_00189F30, value * 1.6666666f);
         target[2] = 0.0f;
-        func_00282CC0(target, target, origin);
-        func_00282CF0(temp, target, temp);
-        *(float *)(state + 0x2B8) = func_00283BE0(func_00283248(temp[0], temp[1]), *(float *)(arg + 0xF8));
-        func_0029FCC0(arg, 1, temp);
-        func_00282CF0(temp, target, temp);
-        value = func_00283BE0(-func_00283248(func_00282E20(temp), temp[2]), *(float *)(arg + 0xF4));
+        FastVecAdd(target, target, origin);
+        FastVecSub(temp, target, temp);
+        *(float *)(state + 0x2B8) = fast_subtract_rotations(mat_fast_helper_a(temp[0], temp[1]), *(float *)(arg + 0xF8));
+        moby_transform_joint_to_world(arg, 1, temp);
+        FastVecSub(temp, target, temp);
+        value = fast_subtract_rotations(-mat_fast_helper_a(vec_length_xy(temp), temp[2]), *(float *)(arg + 0xF4));
         if (value > 0.523598849773407f) value = 0.523598849773407f;
         else if (value < -0.523598849773407f) value = -0.523598849773407f;
         *(float *)(state + 0x334) = value;
         scale = 0.5f;
     } else {
-        *(float *)(state + 0x2B8) = func_00283B98(*(float *)(state + 0x298), 0.523598849773407f);
+        *(float *)(state + 0x2B8) = FastAddRotations(*(float *)(state + 0x298), 0.523598849773407f);
         scale = 0.085f;
     }
     rate = scale * 1.44f;
-    func_002AEC48(arg, state + 0x250, 0, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
-    func_002AEC48(arg, state + 0x2D0, 1, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
+    moby_update_eased_node(arg, state + 0x250, 0, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
+    moby_update_eased_node(arg, state + 0x2D0, 1, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
 }

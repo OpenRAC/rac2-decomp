@@ -2,18 +2,18 @@
 #include "names.h"
 /* Glow ring: four pulsing sprites along the actor's facing (no lift). */
 extern unsigned char ref_L00_003FF890_00[];
-extern void func_00282CF0(float *, void *, float *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282CC0(float *, float *, float *);
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern void *func_00283D38(unsigned int, unsigned int, float);
-extern int func_00283CF0(float);
-extern void *func_002C2FD8(void *, void *, int, int, int, int, int, float);
+extern void FastVecSub(float *, void *, float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecAdd(float *, float *, float *);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern void *FastTweenColor(unsigned int, unsigned int, float);
+extern int FloatToInt(float);
+extern void *part_spawn_fading(void *, void *, int, int, int, int, int, float);
 
 typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowState;
-void func_L00_003FF890(unsigned char *object)
+void glow_ring_effect_update(unsigned char *object)
 {
     GlowState *st = *(GlowState **)(object + 0x68);
     float m[4];
@@ -33,11 +33,11 @@ void func_L00_003FF890(unsigned char *object)
             st->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
             st->phase[i] = v + 255.0f;
-        if (FastFloatHelperD(&st->alpha[i]))
+        if (math_fast_float_d(&st->alpha[i]))
             st->alpha[i] = 0xFF;
-        v = FloatAbs(0.5f - IntToFloat(0xFF - st->alpha[i]) * 0.0039215689f);
+        v = math_fabs(0.5f - IntToFloat(0xFF - st->alpha[i]) * 0.0039215689f);
         color = FastTweenColor(0x4040FFFF, 0x1040FFFF, v);
-        SpawnFadingParticle_002C2FD8(m, color, FloatToInt(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
+        part_spawn_fading(m, color, FloatToInt(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
         FastVecAdd(m, m, q);
     }
 }

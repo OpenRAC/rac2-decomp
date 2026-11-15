@@ -10,7 +10,7 @@ extern int D_L00_001AFA1C __attribute__((sda));
 extern float D_L00_001B28D8 __attribute__((sda));
 
 /* Resets the four slots of each of three short tables and clears the paired latches. */
-void func_L00_003B4E88(void)
+void jitter_trail_reset_slots(void)
 {
     int i;
     for (i = 0; i < 4; i++) {

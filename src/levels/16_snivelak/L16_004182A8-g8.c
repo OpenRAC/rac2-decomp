@@ -1,12 +1,12 @@
 #include "common.h"
 extern int D_L16_001B1C38 __attribute__((sda));
-extern float func_002A78D8(float,float);
-extern int func_00283CF0(float);
-extern long long func_0027C878(int);
-extern void func_00283410(void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00280B90(void *,void *,int);
-extern void func_L16_00418218(void *);
+extern float math_random_signed_float_range(float,float);
+extern int FloatToInt(float);
+extern long long GetEffectTextureDescriptor(int);
+extern void euler_to_matrix(void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void draw_world_quad(void *,void *,int);
+extern void gfx_init_quad_packet_table(void *);
 /* The record func_L16_00418218 resets: four vertices, four words, eight floats,
    then three 64-bit fields. */
 typedef struct {
@@ -34,7 +34,7 @@ typedef struct {
 
 /* The caller supplies an unused scale in F12; the body replaces it before use. */
 /* Draws two fading, randomly tinted strips of ground effect around a hit point. */
-void func_L16_004182A8(char *moby, char *hitPoint, float unused_scale, int baseColor, int fadeA, int fadeB) {
+void part_draw_ground_strip(char *moby, char *hitPoint, float unused_scale, int baseColor, int fadeA, int fadeB) {
     L16_004182A8_frame fr;
     char *vars;
     long long textureId;
@@ -44,8 +44,8 @@ void func_L16_004182A8(char *moby, char *hitPoint, float unused_scale, int baseC
 
     vars = *(char **)(moby + 0x68);
 
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 5.0f)) << 24);
-    InitQuadPacketTable(&fr.rec);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
+    gfx_init_quad_packet_table(&fr.rec);
 
     fr.rec.f[0] = *(float *)(vars + 0x10);
     fr.rec.f[1] = 0.0f;
@@ -63,11 +63,11 @@ void func_L16_004182A8(char *moby, char *hitPoint, float unused_scale, int baseC
     fr.rec.p[0] = baseColor + fadeA;
     fr.rec.q = 0LL;
 
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = baseColor + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = baseColor + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = baseColor + fadeA;
 
     fr.dir[2] = *(float *)(moby + 0xF8);
@@ -92,13 +92,13 @@ void func_L16_004182A8(char *moby, char *hitPoint, float unused_scale, int baseC
     fr.rec.f[2] = *(float *)(vars + 0x18);
     fr.rec.f[3] = 1.0f;
     fr.t = tv;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[0] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[1] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[2] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(RandomSignedFloatRange(0.0f, 9.0f)) << 24);
+    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
     fr.rec.p[3] = baseColor + fadeB;
     fr.rec.f[4] = *(float *)(vars + 0x18) + 1.0f;
     fr.rec.f[5] = 0.0f;

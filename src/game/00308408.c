@@ -4,14 +4,14 @@
  * -g gives the pre-div.s nop (a line label before the multiply). */
 typedef int TI __attribute__((mode(TI)));
 
-extern char *func_0029EFD0(s32);
-extern float func_002A7878(float low, float high);
-extern void func_002A0488(void *moby, u8 r, u8 g, u8 b);
-extern float func_00283CE0(s32 value);
+extern char *CreateMoby(s32);
+extern float math_random_float_range(float low, float high);
+extern void set_moby_color(void *moby, u8 r, u8 g, u8 b);
+extern float IntToFloat(s32 value);
 extern void func_002A0F48(void *moby);
 
 /* Creates a ring-shaped shockwave effect at a position. The ring starts with a random spin and grows in size. */
-char *func_00308408(char *parent, char *pos, char *childpos, s32 index, u8 r, u8 g, u8 b, u8 a, f32 scale)
+char *part_spawn_shockwave_ring(char *parent, char *pos, char *childpos, s32 index, u8 r, u8 g, u8 b, u8 a, f32 scale)
 {
     char *moby;
     char *vars;
@@ -22,9 +22,9 @@ char *func_00308408(char *parent, char *pos, char *childpos, s32 index, u8 r, u8
     if (moby != 0) {
         vars = *(char **)(moby + 0x68);
         *(TI *)randomAngles = 0;
-        randomAngles[0] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        randomAngles[1] = RandomFloatRange(-3.1415927f, 3.1415927f);
-        randomAngles[2] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        randomAngles[0] = math_random_float_range(-3.1415927f, 3.1415927f);
+        randomAngles[1] = math_random_float_range(-3.1415927f, 3.1415927f);
+        randomAngles[2] = math_random_float_range(-3.1415927f, 3.1415927f);
         *(TI *)anglesCopy = *(TI *)randomAngles;
         *(u8 *)(moby + 0x20) = 0;
         *(u8 *)(moby + 0x23) = a;

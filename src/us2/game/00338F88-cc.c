@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_00338F88, the USA v2.00 copy of func_003380B0: the same C, where rename func_003384C0 becomes func_US2_00339398. */
 
 typedef int s32;
@@ -11,14 +12,14 @@ typedef unsigned int u32;
  /* text width */
 
 /* Text box laid out by func_00337C10/func_00337E30: text at +0xA8, its line table at +0x1D8. */
-extern int func_00115DA8(char *, char *, ...); /* formats into a buffer */
+extern int sprintf(char *, char *, ...); /* formats into a buffer */
 extern char D_001ADB58[], D_001ADB68[], D_001ADB78[], D_001ADB90[];
 extern char D_001ADBB0[], D_001ADBB8[], D_001ADBC8[];
-extern int D_001A7340[] __attribute__((sda)); /* screen size: [1] = height */
-extern void func_00280190(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_00280200(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_00280270(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_0027EB88(int top, int bottom, int left, int right, int alpha, int color);
+extern int g_screen_width[] __attribute__((sda)); /* screen size: [1] = height */
+extern void text_draw_window_small(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void text_draw_window_medium(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void text_draw_window_large(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int alpha, int color);
 extern void func_US2_00339398(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields. */
@@ -54,28 +55,28 @@ void func_US2_00338F88(void *object, short *box, int style, char *text, int mode
     if (first) {
         if (second) {
             if (third) {
-                if (single) func_00115DA8(buffer, D_001ADB58, text, 1, first, 1, second);
-                else func_00115DA8(buffer, D_001ADB68, text, 1, 1, first, 1, second);
+                if (single) sprintf(buffer, D_001ADB58, text, 1, first, 1, second);
+                else sprintf(buffer, D_001ADB68, text, 1, 1, first, 1, second);
             } else {
-                if (single) func_00115DA8(buffer, D_001ADB78, text, 1, first, second);
-                else func_00115DA8(buffer, D_001ADB90, text, 1, 1, first, second);
+                if (single) sprintf(buffer, D_001ADB78, text, 1, first, second);
+                else sprintf(buffer, D_001ADB90, text, 1, 1, first, second);
             }
         } else {
-            if (single) func_00115DA8(buffer, D_001ADBB0, text, 1, first);
-            else func_00115DA8(buffer, D_001ADBB8, text, 1, 1, first);
+            if (single) sprintf(buffer, D_001ADBB0, text, 1, first);
+            else sprintf(buffer, D_001ADBB8, text, 1, 1, first);
         }
     } else {
-        func_00115DA8(buffer, D_001ADBC8, text);
+        sprintf(buffer, D_001ADBC8, text);
     }
     box[9] |= 4;
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: text_draw_window_medium(box, style, buffer, length); break;
+    case 1: text_draw_window_small(box, style, buffer, length); break;
+    case 2: text_draw_window_large(box, style, buffer, length); break;
     }
     if (center) {
         int height = (unsigned short)box[7];
-        int newTop = (D_001A7340[1] - (short)height) >> 1;
+        int newTop = (g_screen_width[1] - (short)height) >> 1;
         int middle = newTop + ((short)height >> 1);
 
         box[1] = newTop + height;
@@ -83,9 +84,9 @@ void func_US2_00338F88(void *object, short *box, int style, char *text, int mode
         box[0] = newTop;
     }
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: text_draw_window_medium(box, style, buffer, length); break;
+    case 1: text_draw_window_small(box, style, buffer, length); break;
+    case 2: text_draw_window_large(box, style, buffer, length); break;
     }
     halfWidth = (box[6] >> 1) + 10;
     halfHeight = (box[7] >> 1) + 5;
@@ -96,12 +97,12 @@ void func_US2_00338F88(void *object, short *box, int style, char *text, int mode
     left = x - halfWidth;
     right = x + halfWidth;
     bottom = y + halfHeight;
-    func_0027EB88(top, bottom, left, right, 96, 0x60442D00);
+    gfx_draw_rounded_box(top, bottom, left, right, 96, 0x60442D00);
     func_US2_00339398(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: text_draw_window_medium(box, style, buffer, length); break;
+    case 1: text_draw_window_small(box, style, buffer, length); break;
+    case 2: text_draw_window_large(box, style, buffer, length); break;
     }
     box[9] = flags;
 }
@@ -118,7 +119,7 @@ extern ViewState D_001B9040;
    from the frame's height, then from its width. Colour = alpha << 24 | color. */
 void func_US2_00339398(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right);
 
-extern int func_00115DA8(char *, char *, ...);
+extern int sprintf(char *, char *, ...);
 
 /* Writes the localised text `text_id` (with `value` as its only argument) into the
    buffer at +0x1E14 of the object, then initialises the sub-object at +0x1D6C with a

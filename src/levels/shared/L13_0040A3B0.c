@@ -6,17 +6,17 @@
 
 typedef int Rac2TI128 __attribute__((mode(TI)));
 
-extern float func_002B04E0(char *a0, void *out, char *a2);
+extern float vec_get_heading_angle(char *a0, void *out, char *a2);
 
 /* The four floats are declared before the two other arguments, which sets the order this caller
    evaluates them in (the registers are the same either way), as for func_L00_003BFF68. */
-extern void func_002AAA00(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
+extern void math_approach_target_with_direction_mode(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
 
-extern void func_002833F0(void *out, void *in);
+extern void euler_rotation_basis(void *out, void *in);
 
-extern void func_00283738(char *a0, char *a1, void *a2);
+extern void multiply_matrix3x3(char *a0, char *a1, void *a2);
 
-extern float func_00282C48(float f);
+extern float math_fabs(float f);
 
 /* Copies the caller's 16-byte block into a stack scratch area, runs the starter on it, then
    fills the scratch area's upper half from the state block's 0xB4 float and the pair helper
@@ -24,19 +24,19 @@ extern float func_00282C48(float f);
    twin of func_L00_003BFF68 with fixed turn rates. One `char scratch[0x50]` gives retail's
    frame. */
 /* Turns a creature toward a wanted direction and returns how much it turned. */
-float func_L13_0040A3B0(char *a0, char *a1, char *a2, char *a3)
+float creature_turn_toward_target(char *a0, char *a1, char *a2, char *a3)
 {
     char scratch[0x50];
     float f;
 
     *(Rac2TI128 *)scratch = *(Rac2TI128 *)a2;
-    f = GetHeadingAngleOfVector(a0, scratch, a3);
+    f = vec_get_heading_angle(a0, scratch, a3);
     *(int *)(scratch + 0x40) = 0;
-    ApproachTargetWithDirectionMode(scratch + 0x40, f, 0.0034906589426100254f, 0.0034906589426100254f,
+    math_approach_target_with_direction_mode(scratch + 0x40, f, 0.0034906589426100254f, 0.0034906589426100254f,
                   0.29786956310272217f, a1 + 0xB4, 0);
     *(Rac2TI128 *)scratch = 0;
     *(float *)(scratch + 8) = *(float *)(a1 + 0xB4);
     euler_rotation_basis(scratch + 0x10, scratch);
     multiply_matrix3x3(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
-    return FloatAbs(f) - FloatAbs(*(float *)(a1 + 0xB4));
+    return math_fabs(f) - math_fabs(*(float *)(a1 + 0xB4));
 }

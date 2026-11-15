@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial C views; original types and object ownership are unknown. */
 typedef unsigned long QwenRecovery_339fe89f21bc_WrapperWaitMaskU64;
@@ -34,14 +35,14 @@ extern Rac2Native_3646a0ca5397f72d_u32 ref_L00_0037B818_00;
 extern Rac2Native_3646a0ca5397f72d_u8 ref_L00_0037B818_01[];
 
 /* Waits until none of the given status bits are set any more. */
-void func_002FC3C0(QwenRecovery_339fe89f21bc_WrapperWaitMaskU64 mask)
+void gfx_wait_for_dma_status_bits(QwenRecovery_339fe89f21bc_WrapperWaitMaskU64 mask)
 {
     while (ref_L00_0037B368_01 & mask)
         ref_L00_0037B368_00(0x400);
 }
 
 /* Adds one 16-byte entry to the packet list that points at a block of data. */
-void func_002FC410(Rac2Native_4e44694cc39e7084_u32 data_address, Rac2Native_4e44694cc39e7084_u32 tag_bits)
+void VU1_addDataRef(Rac2Native_4e44694cc39e7084_u32 data_address, Rac2Native_4e44694cc39e7084_u32 tag_bits)
 {
     *(Rac2Native_4e44694cc39e7084_u32 *)(ref_L00_0037B3B8_00 + 0) = tag_bits | 0x30000000u;
     *(Rac2Native_4e44694cc39e7084_u32 *)(ref_L00_0037B3B8_00 + 4) = data_address;
@@ -53,7 +54,7 @@ void func_002FC410(Rac2Native_4e44694cc39e7084_u32 data_address, Rac2Native_4e44
 /* func_002FC468 is matched in 002FC468.c (-G0: D_001B22A8 is loaded absolutely). */
 
 /* Adds one 16-byte entry to the packet list that carries a single command word. */
-void func_002FC518(Rac2Native_ae24050903bcaa08_u32 final_word)
+void vu1_add_vif_code(Rac2Native_ae24050903bcaa08_u32 final_word)
 {
     *(Rac2Native_ae24050903bcaa08_u32 *)(ref_L00_0037B4C0_00 + 0) = 0x10000000u;
     *(Rac2Native_ae24050903bcaa08_u32 *)(ref_L00_0037B4C0_00 + 4) = 0;
@@ -63,7 +64,7 @@ void func_002FC518(Rac2Native_ae24050903bcaa08_u32 final_word)
 }
 
 /* Adds a 48-byte entry to the packet list that writes one value to a graphics register. */
-void func_002FC560(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 final_word, Rac2Native_9da4b6b15b3cf4a0_RecordValue180 value)
+void VU1_addGSregister(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 final_word, Rac2Native_9da4b6b15b3cf4a0_RecordValue180 value)
 {
     *(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 *)(ref_L00_0037B508_00 + 0) = 0x10000002u;
     *(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 *)(ref_L00_0037B508_00 + 4) = 0;
@@ -86,7 +87,7 @@ void func_002FC560(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 final_word, Rac2Nat
 
 
 /* Adds two entries to the packet list that send a fixed block of eleven 16-byte pieces of data. */
-void func_002FC870(void)
+void gfx_append_fixed_dma_block_tags(void)
 {
     *(Rac2Native_3646a0ca5397f72d_u32 *)(ref_L00_0037B818_00 + 0) = 0x3000000bu;
     *(Rac2Native_3646a0ca5397f72d_u32 *)(ref_L00_0037B818_00 + 4) = (Rac2Native_3646a0ca5397f72d_u32)ref_L00_0037B818_01;

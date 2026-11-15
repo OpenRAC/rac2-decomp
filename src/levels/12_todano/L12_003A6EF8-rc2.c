@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern void ref_L12_003A6EF8_02(void *, void *, s32 *);
 
 /* Checks a level-wide setting and, when it differs from the one this object remembers, saves
    the new one and calls a callback for the object. */
-void func_L12_003A6EF8(void *moby) {
+void moby_sync_level_setting(void *moby) {
     s32 *current;
     s8 *vars;
 

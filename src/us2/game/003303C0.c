@@ -5,11 +5,11 @@
    first axis is negated only while the byte D_US2_001A7A4C is clear, as in
    func_US2_00327AB0. */
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern unsigned char D_US2_001A7A4C MACRO_ADDR;
-extern void func_00282C88(float *buf);
-extern float func_00282DF0(float *buf);
-extern float D_001B284C MACRO_ADDR;
+extern void vec_clear_128(float *buf);
+extern float FastVecLength(float *buf);
+extern float g_stick_length MACRO_ADDR;
 
 void func_US2_00330BE8(char *obj)
 {
@@ -18,14 +18,14 @@ void func_US2_00330BE8(char *obj)
     float a, b, x;
 
     if (D_US2_001A7A4C != 0) {
-        char *d = D_00189E20;
+        char *d = g_hero_state;
         *(float *)(e + 84) = *(float *)(d + 8112);
     } else {
-        char *d = D_00189E20;
+        char *d = g_hero_state;
         *(float *)(e + 84) = -*(float *)(d + 8112);
     }
     {
-        char *d = D_00189E20;
+        char *d = g_hero_state;
         a = *(float *)(e + 84);
         b = -*(float *)(d + 8116);
     }
@@ -43,8 +43,8 @@ void func_US2_00330BE8(char *obj)
     } else if (x < -1.0f) {
         *(float *)(e + 80) = -1.0f;
     }
-    func_00282C88(buf);
+    vec_clear_128(buf);
     buf[0] = *(float *)(e + 80);
     buf[1] = *(float *)(e + 84);
-    D_001B284C = func_00282DF0(buf);
+    g_stick_length = FastVecLength(buf);
 }

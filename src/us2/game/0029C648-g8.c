@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_001A8CFC;
 extern int func_US2_00349728(void *, int);
@@ -21,7 +22,7 @@ int func_US2_0029D040(int value) {
    projection scale set around it, as the tail of func_0029BF08 does in v1.01. */
 typedef struct { char pad[0xB0]; float scale; } CamCc;
 extern CamCc ref_L00_0030CFE0_01;
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 extern void func_US2_0034F220(void *);
 
 void func_US2_0029CC48(void)
@@ -30,9 +31,9 @@ void func_US2_0029CC48(void)
         float saved = ref_L00_0030CFE0_01.scale;
 
         ref_L00_0030CFE0_01.scale = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         func_US2_0034F220(D_001A8CFC + 0x36F28);
         ref_L00_0030CFE0_01.scale = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }

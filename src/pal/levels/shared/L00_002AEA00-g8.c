@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad0[0xE98];
@@ -24,12 +25,12 @@ typedef struct {
     char first[0x600];
     char second[0x600];
 } BufferAF3D8;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern StateAF3D8 D_00189E20_26;
 extern int D_L00_001A7D00[2] __attribute__((sda));
 extern BufferAF3D8 D_L00_001B7400[];
-extern char D_L00_00262570[];
-extern int func_L00_002ADEA0(int);
+extern char g_weapon_l00_table[];
+extern int hero_slot_item_id(int);
 extern char *ref_L00_002AF3D8_0(int, int);
 extern void ref_L00_002AF3D8_1(int, void *, int, int, int, int);
 
@@ -41,7 +42,7 @@ void func_PAL_L00_002AF2C8(int arg0, int arg1)
         !D_00189E20_26.active || arg0 || !arg1)
         return;
 
-    id = ((EntryAF3D8 *)D_L00_00262570)[D_00139568[func_L00_002ADEA0(0)]].id;
+    id = ((EntryAF3D8 *)g_weapon_l00_table)[g_item_slot_to_record[hero_slot_item_id(0)]].id;
     if (id == -1)
         return;
 

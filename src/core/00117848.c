@@ -67,7 +67,7 @@ do {								\
 static const double one = 1.0, Zero[] = { 0.0, -0.0 };
 
 /* Gives the remainder after dividing one decimal number by another. */
-double func_00117848(double x, double y)
+double __ieee754_fmod(double x, double y)
 {
 	s32 n,hx,hy,hz,ix,iy,sx,i;
 	u32 lx,ly,lz;

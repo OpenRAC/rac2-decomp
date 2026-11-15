@@ -9,15 +9,15 @@ typedef struct {
     float position[4];
     float payload[8];
 } Particle;
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern int func_00283CF0(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern int FloatToInt(float);
 
 /* Particle tick: age, fade the alpha by 0.01 a frame and drift; dead at zero. */
 /* Updates a particle that drifts, slows down and fades out until it is invisible. */
-void func_002C00F0(Particle *p)
+void part_update_fading_drift(Particle *p)
 {
     float *payload = p->payload;
     float alpha;
@@ -30,7 +30,7 @@ void func_002C00F0(Particle *p)
     p->color |= FloatToInt(payload[5] * 255.0f) << 24;
     if (payload[5] <= 0.0f) {
 kill:
-        KillParticle(p);
+        part_kill(p);
     } else {
         FastVecAdd(p->position, p->position, payload);
         FastVecScale(payload, payload, 0.98f);

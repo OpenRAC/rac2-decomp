@@ -17,14 +17,14 @@ extern T5 D_L04_001B0B78;
 extern char D_L04_001B0B90[];
 extern u8 *D_L04_001B0914 __attribute__((sda));
 extern s32 D_L04_001B091C __attribute__((sda));
-extern s32 D_L04_001B090C __attribute__((sda));
+extern s32 g_current_race_index __attribute__((sda));
 extern s32 D_L04_001B0B70 __attribute__((sda));
 extern s32 D_L04_001B0B74 __attribute__((sda));
-extern u8 *D_L04_001B24DC __attribute__((sda));
-extern s32 D_L04_001A8FE8;
-extern s32 D_L04_001A8FE4;
-extern s32 D_001A7340;
-extern s32 D_001A79F0;
+extern u8 *g_moby_l04_pool __attribute__((sda));
+extern s32 g_race_time_ticks;
+extern s32 g_current_lap;
+extern s32 g_screen_width;
+extern s32 g_current_map_index;
 extern s32 D_L04_001A904C;
 extern float D_L04_001B2D44;
 extern char D_L04_001B3190[] MACRO_ADDR;
@@ -34,52 +34,52 @@ extern float D_L04_001B31A0_view[] __asm__("D_L04_001B31A0") MACRO_ADDR;
 extern float D_L04_001B31D0;
 extern char D_L04_001BDB80[];
 typedef struct { char pad[0x24]; int kind; u8 *owner; char tail[0x3C]; int active; char pad2[6]; u16 state; } OwnerContext;
-extern OwnerContext D_001A63A8;
+extern OwnerContext g_music_state;
 extern Slot D_L04_002605D0[];
-extern Rec D_L04_002C63C0[];
+extern Rec g_race_challenge_table[];
 extern s32 D_L04_002CA1E0[];
 
 extern int func_001157AC(char *);
-extern int func_00115DA8(char *, char *, ...);
-extern void func_0027AB40(void);
-extern void func_0027EAE8(int, int, int, int, int, void *);
-extern void func_0027EB88(int, int, int, int, int, int);
-extern void func_0027F5B8(int, int, unsigned long long, char *, int);
-extern int func_0027FB40(int, int, unsigned long long, char *, int);
-extern int func_0027FBD8(int, int, unsigned long long, char *, int);
-extern int func_00282948(void *);
-extern float func_00282C48(float);
-extern void func_00282CD8(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283248(float, float);
-extern void func_00283388(void *);
-extern void func_00283410(void *, void *);
-extern void func_00283698(void *, void *);
-extern float func_00283BE0(float, float);
-extern int func_00283D38(int, int, float);
-extern char *func_00288FB8(int);
-extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
-extern void func_0028FC48(int, int, int, int, unsigned long long, int);
-extern void func_0029B658(int, int, float, float, float, float);
-extern float func_002AA2E8(float *, float, float);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern f32 func_002AAA00(void *, float, float, float, float, void *, int);
-extern int func_002B6D28(void);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_00300A00(void *, float, int, float, float, float, float);
-extern void func_00300AA8(void *, float, float, int, float, void *);
-extern s32 func_00336D50(void *, int);
-extern void func_L04_0040C880(u8 *);
-extern void func_L04_00416E38();
-extern void func_L04_00417028(u8 *);
-extern void func_L04_0043AD48(void *, void *, int, int, void *, void *, void *);
+extern int sprintf(char *, char *, ...);
+extern void UpdateViewContext(void);
+extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
+extern void gfx_draw_rounded_box(int, int, int, int, int, int);
+extern void text_draw_medium(int, int, unsigned long long, char *, int);
+extern int text_draw_centered_medium(int, int, unsigned long long, char *, int);
+extern int text_draw_centered_large(int, int, unsigned long long, char *, int);
+extern int math_fast_float_d(void *);
+extern float math_fabs(float);
+extern void add_vectors(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float mat_fast_helper_a(float, float);
+extern void set_identity_matrix(void *);
+extern void euler_to_matrix(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern int FastTweenColor(int, int, float);
+extern char *GetLocalizedString(int);
+extern int GetIconFrame(int, int);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, void *);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long long, int);
+extern void level_set_rect(int, int, float, float, float, float);
+extern float ApproachValue(float *, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern f32 math_approach_target_with_direction_mode(void *, float, float, float, float, void *, int);
+extern int snd_resume_music_stream(void);
+extern int PlayMobySound(int, int, void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_draw_scaled_object_two_axes(void *, float, int, float, float, float, float);
+extern void DrawNativeQuads(void *, float, float, int, float, void *);
+extern s32 table_find_by_id(void *, int);
+extern void hud_draw_race_banner(u8 *);
+extern void menu_draw_box_two_labels();
+extern void DrawRaceTimerHud(u8 *);
+extern void GetAnimationPathPoint(void *, void *, int, int, void *, void *, void *);
 
 typedef struct { char pad[0x1C4]; s32 m1C4, m1C8, m1CC, m1D0; float m1D4; s32 m1D8, m1DC, m1E0; } Marker;
 #define OM(o) ((Marker *)(o))
@@ -205,7 +205,7 @@ static __inline__ int label_y4(void *handle, float value, float scale, float hal
 #define LY(hd, k) label_y((void *)(hd), (k), D_L04_001B2D44, 0.5f, 1)
 
 /* Draws the race screen: the progress ruler, the rank rows and the markers for each racer. */
-s32 func_L04_00417308(void)
+s32 hud_draw_race_ruler(void)
 {
     T4 A = D_L04_001B0B50;
     T4 B = D_L04_001B0B60;
@@ -242,49 +242,49 @@ s32 func_L04_00417308(void)
 
     n20 = 1;
     if (h[0xBC] == n20)
-        DrawMenuBoxWithTwoLabels();
+        menu_draw_box_two_labels();
     if (D_L04_001B091C > 0) {
         DrawRaceTimerHud(h);
-        FastFloatHelperD(&D_L04_001B091C);
+        math_fast_float_d(&D_L04_001B091C);
         if (D_L04_001B091C == 0xAD)
             PlayMobySound(0xD, 0, h);
-    } else if (FloatAbs(F(p, 0x4A4)) > 1.5707964f) {
-        DrawRoundedBox(HC(112.0f), HC(142.0f), 0xAF, gScreenWidth - 0xAF, 0x60, 0x60442D00);
-        SetLevelObjectRect(0x60, 0x55F0C070, (float)HC(112.0f), (float)HC(142.0f) /* FAKEMATCH: was HCN; drops one n20 ref so n20 lands at 23/250 */, 175.0f,
-                      (float)(gScreenWidth - 0xAF));
+    } else if (math_fabs(F(p, 0x4A4)) > 1.5707964f) {
+        gfx_draw_rounded_box(HC(112.0f), HC(142.0f), 0xAF, g_screen_width - 0xAF, 0x60, 0x60442D00);
+        level_set_rect(0x60, 0x55F0C070, (float)HC(112.0f), (float)HC(142.0f) /* FAKEMATCH: was HCN; drops one n20 ref so n20 lands at 23/250 */, 175.0f,
+                      (float)(g_screen_width - 0xAF));
         {
             int x, y, len;
-            do { s = GetLocalizedString(0x2F95); x = gScreenWidth / 2; y = label_y((void *)x, 118.0f, D_L04_001B2D44, 0.5f, n20); } while (0); len = strlen_001157AC(s);
-            DrawTextCenteredLargeFont(x, y, 0x700000E4, s, len);
+            do { s = GetLocalizedString(0x2F95); x = g_screen_width / 2; y = label_y((void *)x, 118.0f, D_L04_001B2D44, 0.5f, n20); } while (0); len = func_001157AC(s);
+            text_draw_centered_large(x, y, 0x700000E4, s, len);
         }
         if (I(p, 0x76C) == 0) {
-            OwnerContext *context = &gMusicState;
+            OwnerContext *context = &g_music_state;
             I(p, 0x76C) = n20;
             if ((context->active != 0 || context->kind != -1) && (u16)(context->state - 6) >= 2)
                 context->state = 5;
         }
         if (I(p, 0x76C) != 0) {
-            OwnerContext *context = &gMusicState;
+            OwnerContext *context = &g_music_state;
             if (!context->active && context->kind == -1) {
                 context->kind = I(p, 0x760) + 0xBB8;
                 context->owner = h;
             }
-            ResumeMusicStream();
+            snd_resume_music_stream();
         }
     }
-    if (FloatAbs(F(p, 0x4A4)) < 1.5707964f && I(p, 0x76C) != 0) {
-        OwnerContext *context = &gMusicState;
+    if (math_fabs(F(p, 0x4A4)) < 1.5707964f && I(p, 0x76C) != 0) {
+        OwnerContext *context = &g_music_state;
         I(p, 0x76C) = 0;
         if ((u16)(context->state - 6) >= 2)
             context->state = 5;
     }
-    if ((u32)(h[0xBC] - 1) < 4 || gRaceTimeTicks < 0x3C)
-        DrawRaceBannerHud(h);
+    if ((u32)(h[0xBC] - 1) < 4 || g_race_time_ticks < 0x3C)
+        hud_draw_race_banner(h);
     if (D_L04_001A904C != 0) {
-        { float q = FastSinOrCosB(0.56217057f) / FastSinOrCosA(0.56217057f); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
+        { float q = math_fast_sin_or_cos_b(0.56217057f) / math_fast_sin_or_cos_a(0.56217057f); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
         UpdateViewContext();
-        { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D); DrawScaledObjectTwoAxes(spr, 10.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E); DrawScaledObjectTwoAxes(spr, 10.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D); gfx_draw_scaled_object_two_axes(spr, 10.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E); gfx_draw_scaled_object_two_axes(spr, 10.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (I(p, 0x360) != 0) {
             float fr;
             va = A.v[I(p, 0x360) - 1];
@@ -298,11 +298,11 @@ s32 func_L04_00417308(void)
             case 2: idx = 1; break;
             case 3: idx = 2; break;
             }
-            DrawHudSpriteGradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
+            hud_draw_sprite_gradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
             fr = (float)I(p, 0x364) / (float)C.v[I(p, 0x360)];
             if (fr > 1.0f) fr = 1.0f;
             if (fr < 0.0f) fr = 0.0f;
-            DrawScreenRectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0);
+            gfx_draw_screen_rectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0);
         }
         n33 = I(p, 0x33C);
         if (n33 > 0) {
@@ -316,7 +316,7 @@ s32 func_L04_00417308(void)
             if (D_L04_001B0B74 > 0)
                 D_L04_001B0B74 = D_L04_001B0B74 - 1;
             col = FastTweenColor(0x603F00B2, 0x800000FF, (float)D_L04_001B0B74 * 0.022222223f);
-            { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x35); DrawScaledObjectTwoAxes(spr, 11.0f, col, (float)LY(spr, 10.0f), 1.0f, 1.0f, (float)D_L04_001B0B70); }
+            { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x35); gfx_draw_scaled_object_two_axes(spr, 11.0f, col, (float)LY(spr, 10.0f), 1.0f, 1.0f, (float)D_L04_001B0B70); }
         } else {
             D_L04_001B0B70 = 0;
         }
@@ -332,18 +332,18 @@ s32 func_L04_00417308(void)
         vF0.i[1] = 0x603F00B2;
         vF0.i[2] = 0x603F00B2;
         vF0.i[3] = 0x603F00B2;
-        DrawScreenRectangle(0x1A, label_y((void *)&vF0, (float)(0x62 - (int)(fa * 74.0f)), D_L04_001B2D44, 0.5f, one4), 0x26, HC(98.0f), 0xFFFFF0,
+        gfx_draw_screen_rectangle(0x1A, label_y((void *)&vF0, (float)(0x62 - (int)(fa * 74.0f)), D_L04_001B2D44, 0.5f, one4), 0x26, HC(98.0f), 0xFFFFF0,
                       &vF0);
         }
-        { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); DrawScaledObjectTwoAxes(spr, 498.0f, 0x60442D00, (float)label_y(spr, 10.0f, D_L04_001B2D44, 0.5f, one4), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x40); DrawScaledObjectTwoAxes(spr, 498.0f, 0x55F0C070, (float)label_y(spr, 10.0f, D_L04_001B2D44, 0.5f, one4), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); DrawScaledObjectTwoAxes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        if (gCurrentMapIndex == 4)
-            { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x42); DrawScaledObjectTwoAxes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x60442D00, (float)label_y(spr, 10.0f, D_L04_001B2D44, 0.5f, one4), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x40); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)label_y(spr, 10.0f, D_L04_001B2D44, 0.5f, one4), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        if (g_current_map_index == 4)
+            { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x42); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         else
-            { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x30); DrawScaledObjectTwoAxes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        if (gCurrentMapIndex == 4 && (gRaceChallengeTable[gCurrentRaceIndex].flags & 4))
-            { void *spr = (void *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x43); DrawScaledObjectTwoAxes(spr, 498.0f, 0x60FFDE8D, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+            { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x30); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        if (g_current_map_index == 4 && (g_race_challenge_table[g_current_race_index].flags & 4))
+            { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x43); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x60FFDE8D, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         n20 = I(p, 0x320);
         if ((u32)(n20 - 1) >= 0x14)
             n20 = 0x14;
@@ -356,13 +356,13 @@ s32 func_L04_00417308(void)
             /* FAKEMATCH: call inside the rank-row group so the 24.0 li.s precedes the s copy (0xAF8); label_y4 with n20 active keeps n20 (23/250 = 0.368..0.375 window) above s and below the s1 allocno */
             do { s = GetLocalizedString(k); y = label_y4((void *)n20, 24.0f, D_L04_001B2D44, 0.5f, n20); } while (0);
             c = B.v[n20 < 4 ? n20 - 1 : 3];
-            DrawTextMediumFont(mcol, y, c, s, -1);
+            text_draw_medium(mcol, y, c, s, -1);
         }
         {
-            int r = Sprintf(buf, D_L04_001B0B90, gCurrentLap + 1, 3);
+            int r = sprintf(buf, D_L04_001B0B90, g_current_lap + 1, 3);
             int y = label_y3((void *)r, 71.0f, D_L04_001B2D44, 0.5f, 1);
-            int len = strlen_001157AC(buf);
-            DrawTextCenteredMediumFont(0x1D5, y, 0x60F0F0F0, buf, len);
+            int len = func_001157AC(buf);
+            text_draw_centered_medium(0x1D5, y, 0x60F0F0F0, buf, len);
         }
         set_identity_matrix(m);
         matrix_from_basis_rows(m, &D_L04_001B31A0);
@@ -418,8 +418,8 @@ s32 func_L04_00417308(void)
         if (fa < -1.0f)
             fa = -1.0f;
         sy3 = (int)(fa * 13.0f) + 0x24;
-        obj = (u8 *)(u32)FindTableEntryById((void *)(u32)(D_L04_001A904C + 0x8710), 0x3E);
-        f21 = FastMatrixHelperA(D_L04_001B31A0, D_L04_001B31A0_view[1]);
+        obj = (u8 *)(u32)table_find_by_id((void *)(u32)(D_L04_001A904C + 0x8710), 0x3E);
+        f21 = mat_fast_helper_a(D_L04_001B31A0, D_L04_001B31A0_view[1]);
         j = 0;
         none = -1; /* FAKEMATCH: set-once -1 after j = 0 puts j's daddu fp before the hoisted -1 (0x1070/0x1090) */
         one2 = 1;
@@ -428,7 +428,7 @@ s32 func_L04_00417308(void)
         do {
             ne = *(s32 *)((int)arr + (j << 2));
             if (ne != none) {
-                e = gMobyPool_L04 + (ne << 8);
+                e = g_moby_l04_pool + (ne << 8);
                 o = *(u8 **)(e + 0x68);
                 if (e[0x20] == 2 || h[0xBC] == one2 || h[0xBC] == 3) {
                     FastVecSub(&vE0, e + 0x10, D_L04_001B3190);
@@ -454,14 +454,14 @@ s32 func_L04_00417308(void)
                         if (OM(o)->m1D4 == -1.0f)
                             OM(o)->m1D4 = tmp;
                         else
-                            ApproachTargetWithDirectionMode(o + 0x1D4, tmp, 0.002327106f, 0.002327106f, 4.712389f,
+                            math_approach_target_with_direction_mode(o + 0x1D4, tmp, 0.002327106f, 0.002327106f, 4.712389f,
                                           o + 0x1E0, 0);
                         v = OM(o)->m1CC;
                         if (v == none) {
                             OM(o)->m1CC = sy;
                         } else {
                             tmp = (float)v;
-                            StepValueTowardTarget(&tmp, o + 0x1D8, (float)sy, 0.1388889f, 0.1388889f,
+                            math_step_value_toward_target(&tmp, o + 0x1D8, (float)sy, 0.1388889f, 0.1388889f,
                                           5.8333335f);
                             OM(o)->m1CC = (int)tmp;
                         }
@@ -470,7 +470,7 @@ s32 func_L04_00417308(void)
                             OM(o)->m1D0 = sy2;
                         } else {
                             tmp = (float)v;
-                            StepValueTowardTarget(&tmp, o + 0x1DC, (float)sy2, 0.1388889f, 0.1388889f,
+                            math_step_value_toward_target(&tmp, o + 0x1DC, (float)sy2, 0.1388889f, 0.1388889f,
                                           5.8333335f);
                             OM(o)->m1D0 = (int)tmp;
                         }
@@ -502,14 +502,14 @@ s32 func_L04_00417308(void)
         if (F(p, 0x4A4) == -1.0f)
             F(p, 0x4A4) = fa;
         else
-            ApproachTargetWithDirectionMode(p + 0x4A4, fa, 0.002327106f, 0.002327106f, 4.712389f, p + 0x4B0, 0);
+            math_approach_target_with_direction_mode(p + 0x4A4, fa, 0.002327106f, 0.002327106f, 4.712389f, p + 0x4B0, 0);
         I(p, 0x49C) = 0x183;
         v3 = I(p, 0x4A0);
         if (v3 == -1) {
             I(p, 0x4A0) = sy3;
         } else {
             tmp = (float)v3;
-            StepValueTowardTarget(&tmp, p + 0x4AC, (float)sy3, 0.1388889f, 0.1388889f, 5.8333335f);
+            math_step_value_toward_target(&tmp, p + 0x4AC, (float)sy3, 0.1388889f, 0.1388889f, 5.8333335f);
             I(p, 0x4A0) = (int)tmp;
         }
         vD0.f[1] = F(p, 0x4A4);
@@ -524,7 +524,7 @@ s32 func_L04_00417308(void)
         VU1_addGSregister(0x47, 0x5360B);
         if (h[0x20] != 3) {
             fe = F(p, 0x28C) * 0.008726647f;
-            { float q = FastSinOrCosB(fe) / FastSinOrCosA(fe); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
+            { float q = math_fast_sin_or_cos_b(fe) / math_fast_sin_or_cos_a(fe); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
             UpdateViewContext();
         }
     }

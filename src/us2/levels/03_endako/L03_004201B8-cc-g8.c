@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L03_004201B8, the USA v2.00 copy of func_L03_0041EAE0: the same C, where rename func_002B0A18 becomes func_US2_002B1880; rename func_002A6C58 becomes func_US2_002A7AA8. */
 #include "common.h"
 
@@ -5,24 +6,24 @@
  * Its state record is written through struct members: their MEMs are
  * in-struct, which lets the scheduler place the $gp scalar loads above the
  * record's stores as retail does. */
-extern void func_002E59F8(int);
-extern void func_002A7750(void *,int,int);
-extern void func_002A7398(void *,int,int);
-extern int func_00283CF0(float);
-extern void *func_002A9640(void *,u32,int);
-extern int func_002B0ED8(void *,void *,int);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
-extern void func_00282F20(void *,void *,float);
-extern void func_002B0A68(void *,int,void *,float,float,float,float,u8);
-extern int func_002E5E58(int,int,void *);
+extern void snd_stop_voice(int);
+extern void moby_set_state(void *,int,int);
+extern void anim_start_immediate(void *,int,int);
+extern int FloatToInt(float);
+extern void *part_find_owned_effect_slot(void *,u32,int);
+extern int moby_apply_damage_to_object(void *,void *,int);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern void vec_scale_to_length(void *,void *,float);
+extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,u8);
+extern int snd_play_from_global_bank(int,int,void *);
 extern void func_US2_002B1880(int,int);
-extern int func_002E5CF8(int,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern void func_US2_002A7AA8(void *,int,int);
-extern void func_0029F338(void *);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *);
+extern void moby_mark_spawned(void *);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *);
 extern u8 *D_L03_001FE700[] NOT_SDA;
 extern float D_L03_001B1C00 __attribute__((sda));
 extern float D_L03_001B1C04 __attribute__((sda));
@@ -93,13 +94,13 @@ void func_US2_L03_004201B8(u8 *entity) {
     float a,b;
     if(entity[0x20]==0) {
         if(st->f340!=-1) {
-            func_002E59F8(st->f340);
+            snd_stop_voice(st->f340);
             st->f340=-1;
         }
         *(s16 *)(*(u8 **)(entity+0x24)+0x46)=5;
         if(st->f288) {
-            func_002A7750(entity,4,1);
-            func_002A7398(entity,0,0);
+            moby_set_state(entity,4,1);
+            anim_start_immediate(entity,0,0);
             st->f20=3;
             st->f24=3;
             st->f33C=4.5f;
@@ -107,29 +108,29 @@ void func_US2_L03_004201B8(u8 *entity) {
             pathIndex=st->f280;
             if(pathIndex==-1) {
                 if(st->f340!=-1) {
-                    func_002E59F8(st->f340);
+                    snd_stop_voice(st->f340);
                     st->f340=-1;
                 }
-                func_0029F338(entity);
+                moby_mark_spawned(entity);
                 return;
             }
             qcopy(entity+0x10,D_L03_001FE700[pathIndex]+16);
             st->f148|=0x210;
             st->f32C=1;
             if(st->f28C) {
-                func_002A7750(entity,9,4);
-                func_002A7398(entity,0,0);
+                moby_set_state(entity,9,4);
+                anim_start_immediate(entity,0,0);
                 st->f33C=0;
                 *(int *)(entity+0x98)=0;
                 *(u16 *)(entity+0x34)=(*(u16 *)(entity+0x34)|0x41)&0xEFFF;
             } else {
-                func_002A7750(entity,3,0);
-                func_002A7398(entity,0,0);
+                moby_set_state(entity,3,0);
+                anim_start_immediate(entity,0,0);
                 st->f33C=6;
             }
         }
-        st->f48=func_00283CF0(20);
-        st->f4A=func_00283CF0(17.6f);
+        st->f48=FloatToInt(20);
+        st->f4A=FloatToInt(17.6f);
         st->f70=8;
         st->fA8=3;
         st->f90=0.5f;
@@ -153,37 +154,37 @@ void func_US2_L03_004201B8(u8 *entity) {
         *(float *)(entity+0x2C)=*(float *)(*(u8 **)(entity+0x24)+0x24)*D_L03_001B1C0C;
         st->f290=0;
     }
-    hit=func_002A9640(entity,0x10000,0);
+    hit=part_find_owned_effect_slot(entity,0x10000,0);
     if(hit && *(u8 **)((u8 *)hit+0x20)) {
         u8 *other=*(u8 **)((u8 *)hit+0x20);
         if(*(s16 *)(other+0xAA)==0xFFD && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
     }
-    if(func_002B0ED8(entity,st->f60,0) && st->f20<=0) {
-        func_00283098(point,D_L03_001B1C30,entity+0xC0);
-        func_00282CC0(point,point,entity+0x10);
-        func_0032C700(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-        func_00282F20(velocity,st->fE0,0.06666667f);
-        func_002B0A68(entity,31,velocity,3,6,3,6,255);
+    if(moby_apply_damage_to_object(entity,st->f60,0) && st->f20<=0) {
+        matrix_mul_vec3(point,D_L03_001B1C30,entity+0xC0);
+        FastVecAdd(point,point,entity+0x10);
+        SpawnExplosion(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
+        vec_scale_to_length(velocity,st->fE0,0.06666667f);
+        part_spawn_masked_debris(entity,31,velocity,3,6,3,6,255);
         if(D_0018C0B4==49) {
             D_L03_001A9044_gp=D_L03_001A9044[0]+1;
             if(D_L03_001A9044_gp>=10 && !D_001A7A60[0x1C]) {
                 D_001A7A60[0x1C]=1;
-                func_002E5E58(1,0,0);
+                snd_play_from_global_bank(1,0,0);
                 func_US2_002B1880(0x1233,-1);
                 D_L03_001A903C[0]=1;
             }
         }
-        func_002E5CF8(3,0,entity);
+        PlayMobySound(3,0,entity);
         func_US2_002A7AA8(entity,0,3);
         if(st->f340!=-1) {
-            func_002E59F8(st->f340);
+            snd_stop_voice(st->f340);
             st->f340=-1;
         }
-        func_0029F338(entity);
+        moby_mark_spawned(entity);
         return;
     }
-    if(entity[0x31] && func_00282E48(entity+0x10,D_L03_001B9980)<24) {
-        func_002A93B0(entity);
+    if(entity[0x31] && fast_vec_dist(entity+0x10,D_L03_001B9980)<24) {
+        moby_update_ground_check(entity);
         entity[0x6F]=22;
     }
 }

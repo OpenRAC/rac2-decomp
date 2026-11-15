@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00282C88(void *);
-extern void func_002A7A00(void *, float, float);
-extern float func_002A7878(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
+extern void vec_clear_128(void *);
+extern void vec_random_direction(void *, float, float);
+extern float math_random_float_range(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
 extern u8 *D_L02_001B359C_tbl[] __asm__("D_L02_001B359C") __attribute__((sda));
 typedef struct {
     f32 x;
@@ -23,10 +23,10 @@ typedef struct {
     L02Range_CF1B8 r[2];
 } L02Ranges_CF1B8;
 extern L02Ranges_CF1B8 D_L02_001B00E8;
-extern void func_00282C88(void *);
-extern int func_002A77E0(int);
-extern void *func_002C3150(void *, void *, int, int, int, int, float);
-extern void func_002A7A00(void *, float, float);
+extern void vec_clear_128(void *);
+extern int math_random_int_below(int);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void vec_random_direction(void *, float, float);
 
 void func_PAL_L02_003D31A0(u8 *self)
 {
@@ -38,15 +38,15 @@ void func_PAL_L02_003D31A0(u8 *self)
     f32 pos[4] __attribute__((aligned(16)));
     s32 i;
 
-    func_00282C88(vel);
-    func_002C3150(self + 0x10, vel, kind.a, ((s32)(func_002A7820(count.r[0].a, count.r[0].b)) * 5 + 2) / 6 & 0xFF,
-                  func_002A77E0(0xFF) & 0xFF, 0, size.x);
+    vec_clear_128(vel);
+    part_spawn_hero_relative(self + 0x10, vel, kind.a, ((s32)(math_random_int_range(count.r[0].a, count.r[0].b)) * 5 + 2) / 6 & 0xFF,
+                  math_random_int_below(0xFF) & 0xFF, 0, size.x);
     for (i = 0; i < 1; i++) {
-        func_002A7A00(pos, 0.0f, 0.5f);
-        func_00282CC0(pos, pos, self + 0x10);
-        vel[2] = -(func_002A7878(speed.x, speed.y) * 0.020000001f);
-        func_002C3150(pos, vel, kind.b, ((s32)(func_002A7820(count.r[1].a, count.r[1].b)) * 5 + 2) / 6 & 0xFF,
-                      func_002A77E0(0xFF) & 0xFF, 0, size.y);
+        vec_random_direction(pos, 0.0f, 0.5f);
+        FastVecAdd(pos, pos, self + 0x10);
+        vel[2] = -(math_random_float_range(speed.x, speed.y) * 0.020000001f);
+        part_spawn_hero_relative(pos, vel, kind.b, ((s32)(math_random_int_range(count.r[1].a, count.r[1].b)) * 5 + 2) / 6 & 0xFF,
+                      math_random_int_below(0xFF) & 0xFF, 0, size.y);
     }
 }
 

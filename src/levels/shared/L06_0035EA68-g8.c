@@ -6,7 +6,7 @@ typedef struct {
     char x[10];
 } Sequence;
 extern Sequence D_L06_001AF700;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0018C0D4 NOT_SDA;
 extern float D_L06_001AF620 __attribute__((sda));
 extern char D_L06_001B9840[];
@@ -16,21 +16,21 @@ typedef struct {
     u8 pad75[0x13];
     char *owner;
 } Effect;
-extern u8 D_00188660[];
-extern void func_0026FEB8(char *, ...);
-extern void func_0029F338(char *);
-extern int func_002A77E0(int);
-extern float func_00283B98(float, float);
-extern int func_00283CF0(float);
-extern float func_00282C10(float);
-extern float func_00282E48(void *, void *);
-extern int func_00283DB8(void *, float);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L06_003E57E8(void);
-extern int func_002E59B0(void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282948(void *);
-extern void func_002E59F8(int);
+extern u8 g_sound_state[];
+extern void STUB_printf(char *, ...);
+extern void moby_mark_spawned(char *);
+extern int math_random_int_below(int);
+extern float FastAddRotations(float, float);
+extern int FloatToInt(float);
+extern float square_root(float);
+extern float fast_vec_dist(void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void gfx_l06_draw_ribbon_effect(void);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int PlayMobySound(int, int, void *);
+extern void math_fast_float_d(void *);
+extern void snd_stop_voice(int);
 typedef struct {
     float radius;
     int count;
@@ -57,10 +57,10 @@ typedef struct {
 extern char D_L06_001AFFA0[], D_L06_001AFFE0[];
 extern Sequence D_L06_001B0000;
 extern float D_L06_001AFF20 __attribute__((sda));
-extern void func_L06_004009B8(void);
+extern void gfx_draw_ripple_grid(void);
 
 /* Updates moby class 1067, a flowing ribbon of glowing strips. It picks a random order for the strips, plays a hum, and starts drawing the ribbon when the player is near. */
-void func_L06_003E5428(char *obj) {
+void ribbon_effect_update(char *obj) {
     Object *moby = (Object *)obj;
     Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
@@ -72,19 +72,19 @@ void func_L06_003E5428(char *obj) {
     if (data->valid == -1) {
         STUB_printf(D_L06_001AF6A0);
         STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
     }
     switch (moby->state) {
     case 0: {
         int i, j, k;
         float sphereRadius;
-        if (gCurrentMapIndex == 10 && D_0018C0D4 == 1) {
-            MarkMobySpawned(obj);
+        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+            moby_mark_spawned(obj);
             break;
         }
         buffer.seq = D_L06_001AF700;
         for (i = 0; i < 10; i++) {
-            for (j = 0; j < RandomIntBelow(9); j++) {
+            for (j = 0; j < math_random_int_below(9); j++) {
                 u8 tmp = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
                 buffer.seq.x[j] = tmp;
@@ -110,22 +110,22 @@ void func_L06_003E5428(char *obj) {
         sphere[2] += halfHeight;
         sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
-            if ((float)FastMathHelperA(sphere, 80.0f) >= 0.0f)
-                AddDrawCallbackToList3(DrawRibbonEffect_L06, obj);
+            if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
+                gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
         }
-        if (!IsVoicePlayingForOwner(obj, data->effect))
+        if (!snd_is_voice_playing_for_owner(obj, data->effect))
             data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
         int i;
         float sphereRadius, halfHeight;
-        FastFloatHelperD(&data->timer);
+        math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *soundEffect = (Effect *)(gSoundState + i * 0x70);
+            Effect *soundEffect = (Effect *)(g_sound_state + i * 0x70);
             if (soundEffect->owner == obj && soundEffect->active)
-                StopSoundVoice(i);
+                snd_stop_voice(i);
         }
         data->effect = -1;
         sphereRadius = data->radius * 0.5f;
@@ -134,15 +134,15 @@ void func_L06_003E5428(char *obj) {
         buffer.f[2] += halfHeight;
         buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
-            (float)FastMathHelperA(&buffer, 80.0f) >= 0.0f)
-            AddDrawCallbackToList3(DrawRibbonEffect_L06, obj);
+            (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
+            gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
         break;
     }
     }
 }
 
 /* Updates moby class 2208, another flowing ribbon of glowing strips. It works like the first one but uses its own settings and drawing. */
-void func_L06_004005F8(char *obj) {
+void ribbon_effect_update_variant(char *obj) {
     Object *moby = (Object *)obj;
     Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
@@ -154,19 +154,19 @@ void func_L06_004005F8(char *obj) {
     if (data->valid == -1) {
         STUB_printf(D_L06_001AFFA0);
         STUB_printf(D_L06_001AFFE0, *(short *)(obj + 0xB2));
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
     }
     switch (moby->state) {
     case 0: {
         int i, j, k;
         float sphereRadius;
-        if (gCurrentMapIndex == 10 && D_0018C0D4 == 1) {
-            MarkMobySpawned(obj);
+        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+            moby_mark_spawned(obj);
             break;
         }
         buffer.seq = D_L06_001B0000;
         for (i = 0; i < 10; i++) {
-            for (j = 0; j < RandomIntBelow(9); j++) {
+            for (j = 0; j < math_random_int_below(9); j++) {
                 u8 tmp = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
                 buffer.seq.x[j] = tmp;
@@ -192,22 +192,22 @@ void func_L06_004005F8(char *obj) {
         sphere[2] += halfHeight;
         sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
-            if ((float)FastMathHelperA(sphere, 80.0f) >= 0.0f)
-                AddDrawCallbackToList3(DrawRippleGrid, obj);
+            if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
+                gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);
         }
-        if (!IsVoicePlayingForOwner(obj, data->effect))
+        if (!snd_is_voice_playing_for_owner(obj, data->effect))
             data->effect = PlayMobySound(0, 4, obj);
         break;
     }
     case 2: {
         int i;
         float sphereRadius, halfHeight;
-        FastFloatHelperD(&data->timer);
+        math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *soundEffect = (Effect *)(gSoundState + i * 0x70);
+            Effect *soundEffect = (Effect *)(g_sound_state + i * 0x70);
             if (soundEffect->owner == obj && soundEffect->active)
-                StopSoundVoice(i);
+                snd_stop_voice(i);
         }
         data->effect = -1;
         sphereRadius = data->radius * 0.5f;
@@ -216,8 +216,8 @@ void func_L06_004005F8(char *obj) {
         buffer.f[2] += halfHeight;
         buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
-            (float)FastMathHelperA(&buffer, 80.0f) >= 0.0f)
-            AddDrawCallbackToList3(DrawRippleGrid, obj);
+            (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
+            gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);
         break;
     }
     }

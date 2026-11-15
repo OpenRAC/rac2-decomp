@@ -48,9 +48,9 @@ extern float D_L30_001B16E8 __attribute__((sda));
 extern float D_L30_001B16E4 __attribute__((sda));
 extern float D_L30_001B16C0 __attribute__((sda));
 typedef struct { float x,y,z,w; } MoveVec __attribute__((aligned(16)));
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned int D_00138320 NOT_SDA;
-extern void *D_0018C0B0 NOT_SDA;
+extern void *g_hero_moby NOT_SDA;
 typedef struct {
     MoveVec velocity;
     char gap10[0x10];
@@ -80,34 +80,34 @@ typedef struct {
     MoveVec point, normal, surface;
 } MoveCollision;
 extern MoveCollision D_L30_001C0200;
-extern void func_L30_0040B4E0(float *,float *,float *,float *,float *,float *);
-extern void func_L30_0040B6B0(void *,void *,int,float,float,float,float,float,float);
-extern float func_00282DF0(void *);
-extern float func_00282DB0(void *,void *);
-extern float func_00282C48(float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283B98(float,float);
-extern float func_00283BE0(float,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00283098(void *,void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00283698(void *,void *);
-extern void func_0029FCC0(void *,int,void *);
-extern float func_L08_003277C0(int,float);
-extern float func_002A89A8(void *,int,float);
-extern void func_002A8C00(void *,void *,int,void *,float);
-extern void func_002AB6D8(void *,void *);
-extern int func_00278E78(void);
-extern int func_00278870(void *,float);
-extern int func_00277258(void *,int,void *,float);
-extern void func_00277F48(void *,int,void *,void *,float);
+extern void hover_read_inputs_full(float *,float *,float *,float *,float *,float *);
+extern void part_spawn_museum_dust_burst(void *,void *,int,float,float,float,float,float,float);
+extern float FastVecLength(void *);
+extern float FastVecDot(void *,void *);
+extern float math_fabs(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float,float);
+extern float fast_subtract_rotations(float,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern void matrix_from_basis_rows(void *,void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern float IntegerPower(int,float);
+extern float coll_probe_ground_height_below(void *,int,float);
+extern void make_hit_descriptor(void *,void *,int,void *,float);
+extern void mat_get_euler_angles(void *,void *);
+extern int GetCollHitMaterial(void);
+extern int coll_process_triangles(void *,float);
+extern int coll_test_point(void *,int,void *,float);
+extern void coll_process_hit(void *,int,void *,void *,float);
 /* Moves the hover vehicle for one frame from the player's steering, speed, height and what it bumps into. */
-void func_L30_0040C270(MoveObject *object,int input)
+void UpdateHoverVehicleMotion(MoveObject *object,int input)
 {
     struct {
         MoveVec dir, accel, old;
@@ -121,7 +121,7 @@ void func_L30_0040C270(MoveObject *object,int input)
     float speedLimit, steeringDelta, driveRatio, drive, angleDelta, targetAngle, projection, steerRadians, rollSpeed, targetRoll, steeringBoost, strafeDelta, strafeScale, yawHalf;
     int special, apply;
     in.jump=in.strafe=in.brake=in.yaw=in.throttle=in.steer=0.0f;
-    if(input) ReadHoverVehicleInputsFull(&in.steer,&in.throttle,&in.yaw,&in.brake,&in.strafe,&in.jump);
+    if(input) hover_read_inputs_full(&in.steer,&in.throttle,&in.yaw,&in.brake,&in.strafe,&in.jump);
     control=motion->control;
     in.throttle*=control;
     in.brake+=1.0f-motion->control;
@@ -142,12 +142,12 @@ void func_L30_0040C270(MoveObject *object,int input)
     rollSpeed*=motion->control;
     targetRoll=rollSpeed*(D_L30_001B1728*in.throttle+(1.0f-D_L30_001B1728));
     motion->roll+=(targetRoll-object->basis[3].x)*D_L30_001B1718;
-    frame.dir.x=FastSinOrCosA(motion->yaw);
-    frame.dir.y=FastSinOrCosB(motion->yaw); frame.dir.z=0;
+    frame.dir.x=math_fast_sin_or_cos_a(motion->yaw);
+    frame.dir.y=math_fast_sin_or_cos_b(motion->yaw); frame.dir.z=0;
     if(in.throttle<0) in.throttle*=D_L30_001B1720;
     sign=1.0f;
     if(in.throttle<0) sign=-1.0f;
-    amplitude=FloatAbs(in.steer); driveRatio=IntegerPower(2,(turnSpeed-speed)/turnSpeed);
+    amplitude=math_fabs(in.steer); driveRatio=IntegerPower(2,(turnSpeed-speed)/turnSpeed);
     steeringBoost=D_L30_001B1724*amplitude;
     steeringBoost*=sign;
     drive=in.throttle+steeringBoost;
@@ -156,7 +156,7 @@ void func_L30_0040C270(MoveObject *object,int input)
     drive*=D_L30_001B16F0;
     acceleration=drive*driveRatio;
     FastVecAdd(&frame.old,&object->position,motion);
-    height=ProbeGroundHeightBelow(&frame.old,0,0.5f);
+    height=coll_probe_ground_height_below(&frame.old,0,0.5f);
     special=0;
     if(GetCollHitMaterial()==1 || GetCollHitMaterial()==11) special=1;
     if(object->position.z<height+lift+0.3f && special) object->state=5;
@@ -168,7 +168,7 @@ void func_L30_0040C270(MoveObject *object,int input)
         if(desiredHeight<frame.old.z) {
             angleDelta=fast_subtract_rotations(in.yaw,motion->pitch);
             motion->pitch=FastAddRotations(motion->pitch,angleDelta*D_L30_001B1730);
-            if(gCurrentMapIndex==8) apply=0;
+            if(g_current_map_index==8) apply=0;
         } else {
             if(motion->jumpTimer==0 && in.jump>0.2f) motion->jumpTimer=D_L30_001B16C4;
             if(height>frame.old.z+0.1f || special) {
@@ -188,7 +188,7 @@ void func_L30_0040C270(MoveObject *object,int input)
                 FastVecCross(right,up,ahead);
             }
             qzero_nc(&frame.matrix[3]);
-            GetEulerAnglesFromMatrix(&frame.matrix[0],&frame.pos);
+            mat_get_euler_angles(&frame.matrix[0],&frame.pos);
             yawHalf=in.yaw*0.5f;
             targetAngle=FastAddRotations(-frame.pos.y,yawHalf*(D_L30_001B17F8*(motion->control+1.0f)));
             angleDelta=fast_subtract_rotations(targetAngle,motion->pitch);
@@ -210,12 +210,12 @@ void func_L30_0040C270(MoveObject *object,int input)
     }
     make_hit_descriptor(&frame.matrix[0],object,0x10000,motion,D_L30_001B17A0);
     qcopy(&object->position,&frame.old);
-    TransformMobyJointToWorld(object,0,&frame.matrix[3]);
+    moby_transform_joint_to_world(object,0,&frame.matrix[3]);
     frame.matrix[3].z+=D_L30_001B1700-D_L30_001B17F0;
     FastVecSub(&frame.pos,&object->position,&frame.matrix[3]);
-    if(ProcessCollisionTriangles(&frame.matrix[3],D_L30_001B1700) || TestPointAgainstCollision(&frame.matrix[3],2,object,D_L30_001B1700)) {
+    if(coll_process_triangles(&frame.matrix[3],D_L30_001B1700) || coll_test_point(&frame.matrix[3],2,object,D_L30_001B1700)) {
         if(GetCollHitMaterial()==1 || GetCollHitMaterial()==11) object->state=5;
-        if(D_L30_001C0200.object!=gHeroMoby_0018C0B0) {
+        if(D_L30_001C0200.object!=g_hero_moby) {
             D_L30_001C0200.normal.x-=frame.matrix[3].x; D_L30_001C0200.normal.y-=frame.matrix[3].y;
             D_L30_001C0200.normal.x*=motion->control; D_L30_001C0200.normal.y*=motion->control;
             D_L30_001C0200.normal.x+=frame.matrix[3].x; D_L30_001C0200.normal.y+=frame.matrix[3].y;
@@ -230,14 +230,14 @@ void func_L30_0040C270(MoveObject *object,int input)
     }
     if(object->state==3) {
         if(motion->control<0.98f && (D_00138320&4))
-            SpawnMuseumDustBurst(object,&D_L30_001C0200.point,D_L30_001B189C,D_L30_001B1894,D_L30_001B1898,D_L30_001B1890,D_L30_001B1890,D_L30_001B18A0,D_L30_001B18A4);
-        SpawnMuseumDustBurst(object,&D_L30_001C0200.point,D_L30_001B186C,D_L30_001B1864,D_L30_001B1868,D_L30_001B1860,D_L30_001B1870,D_L30_001B1874,1.0f);
+            part_spawn_museum_dust_burst(object,&D_L30_001C0200.point,D_L30_001B189C,D_L30_001B1894,D_L30_001B1898,D_L30_001B1890,D_L30_001B1890,D_L30_001B18A0,D_L30_001B18A4);
+        part_spawn_museum_dust_burst(object,&D_L30_001C0200.point,D_L30_001B186C,D_L30_001B1864,D_L30_001B1868,D_L30_001B1860,D_L30_001B1870,D_L30_001B1874,1.0f);
     }
-    TransformMobyJointToWorld(object,0,&frame.matrix[3]);
+    moby_transform_joint_to_world(object,0,&frame.matrix[3]);
     frame.matrix[3].z+=D_L30_001B17A8;
-    ProcessCollisionHit(&frame.matrix[3],0,object,&frame.matrix[0],D_L30_001B1744);
+    coll_process_hit(&frame.matrix[3],0,object,&frame.matrix[0],D_L30_001B1744);
     if(FastVecLength(motion)>D_L30_001B17AC*0.016666668f) {
-        TransformMobyJointToWorld(object,1,&frame.scratch.contact.delta);
-        ProcessCollisionHit(&frame.scratch.contact.delta,0,object,&frame.matrix[0],D_L30_001B17A4);
+        moby_transform_joint_to_world(object,1,&frame.scratch.contact.delta);
+        coll_process_hit(&frame.scratch.contact.delta,0,object,&frame.matrix[0],D_L30_001B17A4);
     }
 }

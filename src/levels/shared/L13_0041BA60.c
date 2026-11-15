@@ -2,13 +2,13 @@
 #include "names.h"
 typedef unsigned char u8;
 
-extern void func_002B0C28(int, int, int);
+extern void TryClaimNotice(int, int, int);
 
 /* The func_L02_004114A0 message pick for the five level-13 states. Each case calls on
    its own: with one shared body the five labels would collapse into three ranges and
    the switch would become a compare tree. */
 /* Shows the help message that matches the warp ring's current state. */
-void func_L13_0041BA60(u8 *moby) {
+void warp_ring_show_help(u8 *moby) {
     int v = *(int *)(*(void **)(moby + 0x68) + 0x10);
 
     switch (v) {

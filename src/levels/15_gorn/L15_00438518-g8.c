@@ -5,14 +5,14 @@ typedef struct { GornVector position[4]; unsigned int color[4]; float uv[8]; cha
 extern char *D_L15_001B261C;
 extern GornVector D_L15_001B99F0[];
 extern int D_L15_001B1874;
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282F20(float, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern int func_00283CF0(float);
-extern void func_00280B90(void *, void *, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void vec_scale_to_length(float, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern int FloatToInt(float);
+extern void draw_world_quad(void *, void *, int);
 /* Draws four scrolling, fading translucent layers of the backdrop, with alpha depending on the tracked object height. */
-void func_L15_00438518(char *object)
+void backdrop_draw_fade_layers(char *object)
 {
     GornLayer a, b, c, d;
     GornVector center, up, side, corner;
@@ -20,7 +20,7 @@ void func_L15_00438518(char *object)
     char *record = D_L15_001B261C + (*(int *)state << 8);
     int alpha, fade;
     unsigned int color;
-    InitQuadPacketState(&a, 0x48, 0, 0x80);
+    gfx_init_quad_packet_state(&a, 0x48, 0, 0x80);
     qcopy(&center, &D_L15_001B99F0[0]);
     vec_scale_to_length(0.5f, &center, &center);
     FastVecAdd(&center, (char *)D_L15_001B99F0 - 0x230, &center);
@@ -62,7 +62,7 @@ void func_L15_00438518(char *object)
     if (alpha > 90) alpha = 90;
     a.color[0] = a.color[1] = a.color[2] = a.color[3] = ((unsigned int)(128 - alpha) << 24) | 0x808080;
     draw_world_quad(&a, 0, 0);
-    InitQuadPacketState(&b, 0x48, 0, 0x80);
+    gfx_init_quad_packet_state(&b, 0x48, 0, 0x80);
     *(float *)(state + 0x10) -= 0.0015f;
     if (*(float *)(state + 0x10) <= -8.0f) *(float *)(state + 0x10) += 8.0f;
     b.uv[0] = *(float *)(state + 16); b.uv[1] = 0;
@@ -73,7 +73,7 @@ void func_L15_00438518(char *object)
     b.color[0] = b.color[1] = b.color[2] = b.color[3] = color;
     draw_world_quad(&b, 0, 0);
     if (*(float *)(record + 0x18) < 465.0f && D_L15_001B1874) {
-    InitQuadPacketState(&c, 0x48, 0, 0x80);
+    gfx_init_quad_packet_state(&c, 0x48, 0, 0x80);
     *(float *)(state + 0x14) -= 0.0025f;
     if (*(float *)(state + 0x14) <= -8.0f) *(float *)(state + 0x14) += 8.0f;
     c.uv[0] = 0; c.uv[1] = *(float *)(state + 0x14);
@@ -87,7 +87,7 @@ void func_L15_00438518(char *object)
     color = ((unsigned int)alpha << 24) | 0x808080;
     c.color[0] = c.color[1] = c.color[2] = c.color[3] = color;
     draw_world_quad(&c, 0, 0);
-    InitQuadPacketState(&d, 0x48, 0, 0x80);
+    gfx_init_quad_packet_state(&d, 0x48, 0, 0x80);
     *(float *)(state + 0x18) -= 0.0035f;
     if (*(float *)(state + 0x18) <= -8.0f) *(float *)(state + 0x18) += 8.0f;
     d.uv[0] = *(float *)(state + 24); d.uv[1] = 0;

@@ -1,14 +1,14 @@
 #include "common.h"
-extern unsigned long func_0027C878(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern int func_002AAE98(float, float, float, float);
-extern float func_00283CC8(void *, float);
-extern float func_00283198(float);
-extern float func_002A7798(float);
-extern int func_00283CF0(float);
-extern void func_00280B90(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern float SplitFloatFraction(void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_ease_out_quad(float);
+extern int FloatToInt(float);
+extern void draw_world_quad(void *, int, int);
 
 typedef struct {
     float pos[4][4];
@@ -18,7 +18,7 @@ typedef struct {
 } L01_003C97D8_QUAD;
 
 /* Draws the glowing scrolling ribbon strips of the moby in five layers. */
-void func_L01_003C97D8(char *moby)
+void DrawFiveLayerScrollingRibbons(char *moby)
 {
     L01_003C97D8_QUAD quad;
     float origin[4], step[4], center[4], width[4], offset[4];
@@ -50,19 +50,19 @@ void func_L01_003C97D8(char *moby)
             case 0:
                 origin[2] += 0.02f;
                 qcopy(center, origin);
-                quad.color[2] = quad.color[3] = PackColorFloatsToWord(0.25f, 1.0f, 0.5f, 0.0f);
+                quad.color[2] = quad.color[3] = gfx_pack_color_floats(0.25f, 1.0f, 0.5f, 0.0f);
                 phase = SplitFloatFraction(&scratch, *(float *)(vars + 0x74));
                 scrollV = phase;
                 break;
             case 1:
                 qcopy(center, origin);
-                quad.color[2] = quad.color[3] = PackColorFloatsToWord(0.25f, 0.5f, 1.0f, 0.0f);
+                quad.color[2] = quad.color[3] = gfx_pack_color_floats(0.25f, 0.5f, 1.0f, 0.0f);
                 scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) + 0.5f);
                 break;
             case 2:
                 origin[2] += 0.02f;
                 qcopy(center, origin);
-                quad.color[2] = quad.color[3] = PackColorFloatsToWord(1.0f, 0.0f, 0.0f, 0.0f);
+                quad.color[2] = quad.color[3] = gfx_pack_color_floats(1.0f, 0.0f, 0.0f, 0.0f);
                 vec_scale_to_length(width, width, doubleScale * 0.2f);
                 stepScale *= 0.4f;
                 increment *= 0.4f;
@@ -71,7 +71,7 @@ void func_L01_003C97D8(char *moby)
                 break;
             case 3:
                 scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.5f);
-                quad.color[2] = quad.color[3] = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.0f);
+                quad.color[2] = quad.color[3] = gfx_pack_color_floats(1.0f, 1.0f, 1.0f, 0.0f);
                 FastVecAdd(center, origin, offset);
                 break;
             case 4:
@@ -87,7 +87,7 @@ void func_L01_003C97D8(char *moby)
             quad.uv[1][1] = quad.uv[0][1] = scrollV;
             quad.uv[3][1] = quad.uv[2][1] = scrollV + 1.0f;
             while (t < 1.0f) {
-                phase = EaseOutQuad(FastSinOrCosB(t * 3.1415927f));
+                phase = math_ease_out_quad(math_fast_sin_or_cos_b(t * 3.1415927f));
                 quad.color[0] = quad.color[1] = quad.color[2];
                 {
                     int alpha = FloatToInt(phase * (*(float *)(vars + 0x70) * 102.4f));

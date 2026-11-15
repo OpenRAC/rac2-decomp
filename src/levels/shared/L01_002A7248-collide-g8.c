@@ -48,7 +48,7 @@ typedef struct {
     float normal[4];
 } CollideHit;
 
-extern CollideHero D_00189E20;
+extern CollideHero g_hero_state;
 extern CollideHit D_L01_001BF900;
 extern int D_L01_001A9030 MACRO_ADDR;
 
@@ -69,41 +69,41 @@ extern int func_002D71E0(float, void *);
    times, taking each hit's position, normal and point. Returns 1 when the hero did not move
    much further than its radius, else -1; for mode 0xF the excess is clamped to 512 a side
    and put back along the offset. */
-int func_L01_002B5EA0(int arg)
+int Camera_ResolveBlockedView(int arg)
 {
     float old[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     int steep, i, hit;
 
-    if (gHeroState.collision_off)
+    if (g_hero_state.collision_off)
         return 1;
-    qcopy(old, gHeroState.pos);
+    qcopy(old, g_hero_state.pos);
     func_002E3438(offset);
-    if (gHeroState.constrain_pending) {
+    if (g_hero_state.constrain_pending) {
         func_002CA1C0();
-        gHeroState.constrain_pending = 0;
+        g_hero_state.constrain_pending = 0;
     }
     steep = 0;
-    if (func_002E3560(gHeroState.axis, gHeroState.up) > -0.92f)
+    if (func_002E3560(g_hero_state.axis, g_hero_state.up) > -0.92f)
         steep = 1;
-    if (gHeroState.control_mode != 0x11) {
-        if (gHeroState.gravity_mode || gHeroState.mode || steep) {
-            if (gHeroState.state == 2)
+    if (g_hero_state.control_mode != 0x11) {
+        if (g_hero_state.gravity_mode || g_hero_state.mode || steep) {
+            if (g_hero_state.state == 2)
                 func_002C9020(offset, offset, 5.0f);
-            else if (gHeroState.gravity_mode == 1 || gHeroState.mode)
+            else if (g_hero_state.gravity_mode == 1 || g_hero_state.mode)
                 func_002C8E60(offset, 0, 0.0f, 0.0f, 0.6f);
             else if (D_L01_001A9030)
                 func_002C9020(offset, offset, 0.77f);
             else
-                func_002C8E60(offset, 0, 0.0f, 0.0f, gHeroState.capsule_bottom);
+                func_002C8E60(offset, 0, 0.0f, 0.0f, g_hero_state.capsule_bottom);
         } else {
-            offset[2] = gHeroState.capsule_bottom;
+            offset[2] = g_hero_state.capsule_bottom;
         }
     }
-    func_002E3470(gHeroState.pos, gHeroState.pos, offset);
+    func_002E3470(g_hero_state.pos, g_hero_state.pos, offset);
     for (i = 0; i < 8; i++) {
-        CollideHero *p = &gHeroState;
+        CollideHero *p = &g_hero_state;
         float *pos;
 
         if (p->gravity_mode || steep) {
@@ -123,18 +123,18 @@ int func_L01_002B5EA0(int arg)
         }
         if (!hit)
             break;
-        qcopy(gHeroState.pos, D_L01_001BF900.pos);
-        qcopy(gHeroState.wall_normal, D_L01_001BF900.normal);
-        qcopy(gHeroState.wall_point, D_L01_001BF900.point);
+        qcopy(g_hero_state.pos, D_L01_001BF900.pos);
+        qcopy(g_hero_state.wall_normal, D_L01_001BF900.normal);
+        qcopy(g_hero_state.wall_point, D_L01_001BF900.point);
         p->wall_hit = 1;
         p->hit_moby = D_L01_001BF900.moby;
     }
-    func_002E34A0(gHeroState.pos, gHeroState.pos, offset);
-    func_002E34A0(delta, gHeroState.pos, old);
+    func_002E34A0(g_hero_state.pos, g_hero_state.pos, offset);
+    func_002E34A0(delta, g_hero_state.pos, old);
     {
         float length = func_002E35A0(delta);
 
-        if (gHeroState.capsule_radius * 1.5f < length) {
+        if (g_hero_state.capsule_radius * 1.5f < length) {
             if (arg == 0xF) {
                 if (delta[0] > 512.0f)
                     delta[0] = 512.0f;
@@ -148,8 +148,8 @@ int func_L01_002B5EA0(int arg)
                     delta[2] = 512.0f;
                 else if (delta[2] < -512.0f)
                     delta[2] = -512.0f;
-                func_002E3738(delta, delta, gHeroState.capsule_radius);
-                func_002E3470(gHeroState.pos, old, delta);
+                func_002E3738(delta, delta, g_hero_state.capsule_radius);
+                func_002E3470(g_hero_state.pos, old, delta);
             }
             return -1;
         }

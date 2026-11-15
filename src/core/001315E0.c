@@ -3,7 +3,7 @@
 
 extern signed char r1_D_001331D8[];
 
-extern char *func_00131540(void);
+extern char *console_get_rom_version(void);
 
 extern void r1_func_00118CF0(void *);
 
@@ -15,28 +15,28 @@ extern void r1_func_00118DC0(void *, int, int);
 
 extern int r1_func_00118DC0_i(void *, int, int) __asm__("r1_func_00118DC0");
 
-extern int func_00131730(int);
+extern int clock_decimal_to_bcd_byte(int);
 
-extern int func_00131760(int);
+extern int clock_bcd_to_decimal_byte(int);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D340 */
 /* Checks whether this console is the kind that reports itself with a T in the ROM version. */
-int func_001315E0(void) {
+int console_is_tool(void) {
     if (r1_D_001331D8[0] == 0) {
-        GetRomVersion();
+        console_get_rom_version();
     }
     return r1_D_001331D8[4] == 0x54;
 }
 
 extern unsigned char D_00138152 NOT_SDA;
 
-extern void func_0011ACD0(unsigned int *);
+extern void GetOsdConfigParam(unsigned int *);
 
 /* Gets the console region number from stored data or from the hardware. */
-int func_00131620(void) {
+int console_get_region(void) {
     unsigned int local;
 
-    if (IsRomVersionTool() != 0) {
+    if (console_is_tool() != 0) {
         return D_00138152;
     }
     GetOsdConfigParam(&local);
@@ -48,12 +48,12 @@ int func_00131620(void) {
 /* `r` assigned in both arms and returned once: a direct `return
    r1_D_001331D0;` loads straight into $v0 and moves the address to $v1. */
 /* Gets the console model or version number. */
-int func_00131670(void) {
+int console_get_model_id(void) {
     unsigned int local;
     unsigned int bits;
     int r;
 
-    if (IsRomVersionTool() != 0) {
+    if (console_is_tool() != 0) {
         r = r1_D_001331D0;
     } else {
         r1_func_00118CF0(&local);
@@ -71,11 +71,11 @@ int func_00131670(void) {
 /* rac1-decomp src/core/0012CC90.c: func_0012D448 */
 /* One return, and r1_func_00118DC0 returns int. */
 /* Gets a single on/off flag from the console hardware info. */
-int func_001316C8(void) {
+int console_get_info_flag(void) {
     unsigned char buf[16];
     int r;
 
-    if (IsRomVersionTool() != 0) {
+    if (console_is_tool() != 0) {
         r = r1_D_001331D6[0];
     } else {
         r1_func_00118CF0(buf);
@@ -91,7 +91,7 @@ int func_001316C8(void) {
 
 /* rac1-decomp src/core/0012CC90.c: func_0012D4B0 */
 /* Turns a normal number (0-99) into a BCD byte. */
-int func_00131730(int value) {
+int clock_decimal_to_bcd_byte(int value) {
     unsigned int v = value & 0xFF;
     return ((v / 10) * 6 + v) & 0xFF;
 }
@@ -120,7 +120,7 @@ int func_00131730(int value) {
 /* The product goes through an unsigned char local: that gives retail's
    generic mult $0 + mflo instead of the three-operand mult. */
 /* Turns a BCD byte into a normal number. */
-int func_00131760(int bcd) {
+int clock_bcd_to_decimal_byte(int bcd) {
     unsigned char v = bcd;
     unsigned char t = (v >> 4) * 6;
     return (unsigned char)(v - t);

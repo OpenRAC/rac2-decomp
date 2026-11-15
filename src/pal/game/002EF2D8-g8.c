@@ -1,24 +1,25 @@
+#include "names.h"
 /* func_PAL_002EF2D8, the PAL copy of func_002EE3B0: the same C, with the 60 Hz values scaled by 6/5
  * for 50 Hz and both rates multiplied by 1.2f at the end. */
 #include "common.h"
 
-extern char *func_002ED688(unsigned char *);
-extern int func_002EE6A8(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
+extern int follower_get_state(unsigned char *);
 extern float D_001AC248 __attribute__((sda));
 extern float D_001AC240 __attribute__((sda));
 extern float D_001AC244 __attribute__((sda));
 
 void func_PAL_002EF2D8(unsigned char *owner)
 {
-    char *object = func_002ED688(owner);
+    char *object = moby_get_motion_data(owner);
     int state;
 
     if (!object)
         return;
     if (*(unsigned char **)(object + 0x10))
-        state = func_002EE6A8(*(unsigned char **)(object + 0x10));
+        state = follower_get_state(*(unsigned char **)(object + 0x10));
     else
-        state = func_002EE6A8(owner);
+        state = follower_get_state(owner);
     if (state == 3) {
         D_001AC248 = 0.50000006f;
         D_001AC240 = 0.02f;

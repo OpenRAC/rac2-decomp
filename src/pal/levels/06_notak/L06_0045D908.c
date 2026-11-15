@@ -2,9 +2,9 @@
 
 
 #include "common.h"
-extern void *func_0029EFD0(int id);
-extern float func_00283248(float x, float y);
-extern float func_00282E20(char *a);
+extern void *CreateMoby(int id);
+extern float mat_fast_helper_a(float x, float y);
+extern float vec_length_xy(char *a);
 extern int D_L06_001B3760[];
 extern int D_L06_001B3778[];
 
@@ -12,7 +12,7 @@ extern int D_L06_001B3778[];
    in the child's state and clears its handle. */
 char *func_PAL_L06_0045DF30(char *object, char *a1, char *a2, int index, float f12)
 {
-    char *s1 = func_0029EFD0(0xFE5);
+    char *s1 = CreateMoby(0xFE5);
     char *s0;
     float d;
 
@@ -31,9 +31,9 @@ char *func_PAL_L06_0045DF30(char *object, char *a1, char *a2, int index, float f
         *(float *)(s0 + 0x40) = f12;
         *(int *)(s0 + 0x48) = index;
         *(int *)(s0 + 0x4C) = -1;
-        *(float *)(s1 + 0xF8) = func_00283248(*(float *)a1, *(float *)(a1 + 4));
-        d = func_00282E20(a1);
-        *(float *)(s1 + 0xF4) = -func_00283248(d, *(float *)(a1 + 8));
+        *(float *)(s1 + 0xF8) = mat_fast_helper_a(*(float *)a1, *(float *)(a1 + 4));
+        d = vec_length_xy(a1);
+        *(float *)(s1 + 0xF4) = -mat_fast_helper_a(d, *(float *)(a1 + 8));
         D_L06_001B3778[index] = -1;
     }
     return s1;

@@ -16,11 +16,11 @@ typedef struct {
 /* Grid offsets and cell sizes are adjacent members of the ripple parameters. */
 extern float D_001AD5C8[] MACRO_ADDR;
 extern int D_001AD5A4 __attribute__((sda)), D_001AD5AC __attribute__((sda));
-extern float func_00282C10(float);
-extern float func_00282C48(float);
+extern float square_root(float);
+extern float math_fabs(float);
 
 /* Adds a ripple bump to the water surface patches around a point and copies edge values to neighbouring patches. */
-void func_002FD1B8(SurfacePatch *patch, int count, int mode,
+void RippleDisturb(SurfacePatch *patch, int count, int mode,
                   float x, float y, float radius, float strength)
 {
     SurfacePatch *patches = patch;
@@ -53,7 +53,7 @@ void func_002FD1B8(SurfacePatch *patch, int count, int mode,
                 if (distanceSquared < 1.0f) impulse = strength;
                 else impulse = strength / square_root(distanceSquared);
                 if (mode == 0) {
-                    if (FloatAbs(impulse) < FloatAbs(patch->samples[D_001AD5A4].rows[row][column]))
+                    if (math_fabs(impulse) < math_fabs(patch->samples[D_001AD5A4].rows[row][column]))
                         impulse = patch->samples[D_001AD5A4].rows[row][column];
                 } else impulse += patch->samples[D_001AD5AC].rows[row][column];
                 page = D_001AD5A4;

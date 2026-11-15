@@ -2,9 +2,9 @@
 
 /* The level's copies of three boot routines: the texture word of a texture id, a vector
  * scaled into the packet, and the packet's submission. */
-extern u64 func_0027C878(s32 texture);
-extern void func_00282D30(void *dst, void *src, f32 scale);
-extern void func_00280B90(void *packet, s32 a, s32 b);
+extern u64 GetEffectTextureDescriptor(s32 texture);
+extern void FastVecScale(void *dst, void *src, f32 scale);
+extern void draw_world_quad(void *packet, s32 a, s32 b);
 
 /* The quad set's draw settings, all reached through $gp: the four selectors and the fixed
  * value of the packet's blend word, the texture id, the colour and the vertex scale. */
@@ -36,7 +36,7 @@ typedef struct {
 /* Draws a scrolling textured shape made of quads, such as flowing water or goo. */
 /* Flattens the 36 vertices, scrolls the uv offset at state+0x74 and draws the 25 quads
  * through the entity's matrix. */
-void func_L03_003F11A0(u8 *entity) {
+void DrawScrollingQuadMesh(u8 *entity) {
     DrawPacket packet;
     u8 *state = *(u8 **)(entity + 0x68);
     f32 *ubase, *vbase;

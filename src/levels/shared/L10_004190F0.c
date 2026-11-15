@@ -2,16 +2,16 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int s32;
-extern s32 func_002ED688(u8 *);
-extern void func_L05_0037AEC0(char *, int);
-extern void func_002EE7B8(unsigned char *);
+extern s32 moby_get_motion_data(u8 *);
+extern void moby_init_spawned_sub_object(char *, int);
+extern void follower_start_random_push(unsigned char *);
 
 /* Restores the flying object's state and its linked motion record. */
-void func_L10_004190F0(u8 *self) {
+void flying_object_restore_state(u8 *self) {
     char *state = *(char **)(self + 0x68);
-    char *motion = (char *)GetMobyMotionData(self);
+    char *motion = (char *)moby_get_motion_data(self);
     *(s32 *)(motion + 0x148) = 10;
-    InitSpawnedSubObject((char *)self, 1);
+    moby_init_spawned_sub_object((char *)self, 1);
     *(float *)(state + 0x180) = 10.0f;
     self[0x20] = 1;
     self[0x30] = 255;
@@ -20,5 +20,5 @@ void func_L10_004190F0(u8 *self) {
     *(float *)(self + 0x2C) = 0.07999999821186066f;
     *(s32 *)(state + 0x268) = 0;
     *(s32 *)(state + 0x26C) = -1;
-    StartFollowerRandomPush(self);
+    follower_start_random_push(self);
 }

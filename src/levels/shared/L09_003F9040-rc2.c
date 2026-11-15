@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,19 +25,19 @@
 #include "common.h"
 
 extern void ref_L09_003F9040_00(s8 *, s32, s32, s32);
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s32 ref_L09_003F9040_01 __attribute__((sda));
 extern s32 ref_L09_003F9040_02 __attribute__((sda));
 extern s32 ref_L09_003F9040_03 __attribute__((sda));
 extern s32 ref_L09_003F9040_04 __attribute__((sda));
 
 /* On two levels, applies that level's colour tint to the object. */
-void func_L09_003F9040(s8 *moby) {
+void level_apply_colour_tint(s8 *moby) {
     s32 colorWord;
     s32 alphaMask;
     s32 packedValue;
 
-    switch (gCurrentMapIndex) {
+    switch (g_current_map_index) {
     case 8:
         packedValue = ref_L09_003F9040_01;
         alphaMask = 0xFF000000;

@@ -23,20 +23,20 @@ extern int ref_L22_003F45D8_09 __attribute__((sda)); /* gp+1a08 */
 extern int ref_L22_003F45D8_10[]; /* 2557d0 */
 extern u8 ref_L22_003F45D8_11[] __attribute__((sda)); /* 1b1d90 */
 extern u8 *ref_L22_003F45D8_12; /* 1b211c */
-extern int D_001A79F0;
-extern float func_00282E80(void *,void *), func_00282E48(void *,void *);
-extern int func_00283CF0(float), func_00282948(void *);
-extern u8 *func_0029EFD0(int), *func_002A9640(void *,int,int);
-extern void func_0029F338(void *),func_002833F0(void *,void *);
-extern void func_002AFD88(void *,void *,float,float,float);
-extern void func_00282D30(void *,void *,float),func_002A0F48(void *);
-extern void func_L00_00323448(void *,void *,int,int,int,int,int,int);
-extern void func_002B37E8(void *,void *);
-extern float func_002AA2E8(float *,float,float);
-extern void func_L22_003F54B8(void *),func_L22_003F5580(void *),func_L22_003F58F8(void *);
-extern void func_00283738(void *,void *,void *),func_L00_00323958(void *,void *);
-extern void func_L00_0035F5A0(int,int,int),func_L22_003F52D8(void *),func_L22_003F5688(void *,int);
-extern void func_L22_003A3B50(void *,int),ref_L22_003F45D8_13(void *,int);
+extern int g_current_map_index;
+extern float vec_distance_xy(void *,void *), fast_vec_dist(void *,void *);
+extern int FloatToInt(float), math_fast_float_d(void *);
+extern u8 *CreateMoby(int), *part_find_owned_effect_slot(void *,int,int);
+extern void moby_mark_spawned(void *),euler_rotation_basis(void *,void *);
+extern void vec_add_transformed_point(void *,void *,float,float,float);
+extern void FastVecScale(void *,void *,float),func_002A0F48(void *);
+extern void BuildObjectAttachmentTransforms(void *,void *,int,int,int,int,int,int);
+extern void moby_init_child_from_parent(void *,void *);
+extern float ApproachValue(float *,float,float);
+extern void sway_start(void *),sway_update_decaying(void *),moby_toggle_linked_by_distance(void *);
+extern void multiply_matrix3x3(void *,void *,void *),moby_update_attached_transforms(void *,void *);
+extern void snd_start_in_slot(int,int,int),part_spray_height(void *),part_emit_column(void *,int);
+extern void SpawnRandomKindAt(void *,int),ref_L22_003F45D8_13(void *,int);
 
 typedef unsigned int Qword __attribute__((mode(TI)));
 typedef struct {
@@ -47,7 +47,7 @@ typedef struct {
     u8 *converted[14];
 } ControllerPrefix;
 /* Per-frame update for moby class 3389: finds the nearby group of level pieces, spawns layered copies of it, swaps pieces for solid objects when they are hit, and cleans up at the end. */
-void func_L22_003F45D8(u8 *obj) {
+void barrier_pieces_update(u8 *obj) {
     u8 *ctl=P(obj,0x68);
     float matrix[12] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
@@ -80,7 +80,7 @@ void func_L22_003F45D8(u8 *obj) {
                 }
             }
             if(nearest==-1 || best>2.0f) {
-                MarkMobySpawned(obj);
+                moby_mark_spawned(obj);
                 return;
             }
             I(ctl,0x10)=nearest;
@@ -124,7 +124,7 @@ void func_L22_003F45D8(u8 *obj) {
                     *(Qword *)(created+0xc0)=*(Qword *)(obj+0xc0);
                     *(Qword *)(created+0xd0)=*(Qword *)(obj+0xd0);
                     *(Qword *)(created+0xe0)=*(Qword *)(obj+0xe0);
-                    AddTransformedPointToVector(obj,created+0x10,0.0f,0.0f,offset);
+                    vec_add_transformed_point(obj,created+0x10,0.0f,0.0f,offset);
                     offset+=4.0f;
                     FastVecScale(created+0xc0,created+0xc0,scale);
                     FastVecScale(created+0xd0,created+0xd0,scale);
@@ -149,7 +149,7 @@ void func_L22_003F45D8(u8 *obj) {
             hit=0;
             for(i=0;i<H(ctl,0x14);i++) {
                 if(!((ControllerPrefix *)ctl)->children[i]) continue;
-                found=FindOwnedEffectSlot(((ControllerPrefix *)ctl)->children[i],0x80000,0);
+                found=part_find_owned_effect_slot(((ControllerPrefix *)ctl)->children[i],0x80000,0);
                 if(!found) continue;
                 hit=found;
                 if(I(ctl,0xa8) || !(F(hit,0x2c)<F(ctl,0xac))) continue;
@@ -226,7 +226,7 @@ void func_L22_003F45D8(u8 *obj) {
                         if(H(((ControllerPrefix *)ctl)->converted[i],0xaa)!=second) {
                             created=CreateMoby(second);
                             if(!created) break;
-                            MarkMobySpawned(((ControllerPrefix *)ctl)->converted[i]);
+                            moby_mark_spawned(((ControllerPrefix *)ctl)->converted[i]);
                             rec=ctl;
                             do {
                                 if(!B(rec,0x11c) && ((ControllerPrefix *)ctl)->converted[i]==ref_L22_003F45D8_12+H(rec,0x118)*256) H(rec,0x118)=(created-ref_L22_003F45D8_12)>>8;
@@ -245,7 +245,7 @@ void func_L22_003F45D8(u8 *obj) {
                                 break;
                             }
                         }
-                        InitChildObjectFromParent(created,((ControllerPrefix *)ctl)->children[i]);
+                        moby_init_child_from_parent(created,((ControllerPrefix *)ctl)->children[i]);
                         ((ControllerPrefix *)ctl)->converted[i]=created;
                         *(Qword *)(created+0xc0)=*(Qword *)(entity);
                         *(Qword *)(created+0xd0)=*(Qword *)(entity+0x10);
@@ -256,25 +256,25 @@ void func_L22_003F45D8(u8 *obj) {
                     break;
                 }
             }
-            if(FastFloatHelperD(ctl+0xa8) && hit) {
+            if(math_fast_float_d(ctl+0xa8) && hit) {
                 ApproachValue((float *)(ctl+0xac),0.0f,F(hit,0x2c));
                 if(F(ctl,0xac)==0.0f) {
                     B(obj,0x20)=2;
                     break;
                 }
-                StartSwayMotion(obj);
+                sway_start(obj);
                 I(ctl,0xa8)=40;
             }
             for(j=0;j<H(ctl,0x14);j++) B(((ControllerPrefix *)ctl)->children[j],0xa8)=255;
-            UpdateDecayingSway(obj);
+            sway_update_decaying(obj);
             if(I(ctl,0xc8)) {
                 qzero_nc(rotation);
                 rotation[2]=0.008726648055016995f;
                 euler_rotation_basis(matrix,rotation);
                 multiply_matrix3x3(obj+0xc0,obj+0xc0,matrix);
             }
-            ToggleLinkedObjectsByDistance(obj);
-            if(F(ctl,0xbc)!=0.0f || I(ctl,0xc8)) UpdateAttachedObjectTransforms(obj,ctl+0xd0);
+            moby_toggle_linked_by_distance(obj);
+            if(F(ctl,0xbc)!=0.0f || I(ctl,0xc8)) moby_update_attached_transforms(obj,ctl+0xd0);
             break;
         }
         case 2:
@@ -282,13 +282,13 @@ void func_L22_003F45D8(u8 *obj) {
             int i,j;
             u16 *list;
             u8 *inst;
-            StartEffectInSlot(16,0,0);
-            SprayHeightParticles(obj);
-            EmitColumnParticles(obj,1);
-            if(gCurrentMapIndex==22) SpawnRandomKindAt(obj+0x10,0);
-            else if(gCurrentMapIndex==23) ref_L22_003F45D8_13(obj+0x10,0);
-            for(i=0;i<H(ctl,0x14);i++) if(((ControllerPrefix *)ctl)->children[i]) MarkMobySpawned(((ControllerPrefix *)ctl)->children[i]);
-            for(j=0;j<H(ctl,0x14);j++) if(((ControllerPrefix *)ctl)->converted[j]) MarkMobySpawned(((ControllerPrefix *)ctl)->converted[j]);
+            snd_start_in_slot(16,0,0);
+            part_spray_height(obj);
+            part_emit_column(obj,1);
+            if(g_current_map_index==22) SpawnRandomKindAt(obj+0x10,0);
+            else if(g_current_map_index==23) ref_L22_003F45D8_13(obj+0x10,0);
+            for(i=0;i<H(ctl,0x14);i++) if(((ControllerPrefix *)ctl)->children[i]) moby_mark_spawned(((ControllerPrefix *)ctl)->children[i]);
+            for(j=0;j<H(ctl,0x14);j++) if(((ControllerPrefix *)ctl)->converted[j]) moby_mark_spawned(((ControllerPrefix *)ctl)->converted[j]);
             if(I(ctl,0x10)>=0) {
                 for(list=ref_L22_003F45D8_01[I(ctl,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(ctl,0x10)]);list++) {
                     inst=ref_L22_003F45D8_05+(*list&0x7fff)*32;

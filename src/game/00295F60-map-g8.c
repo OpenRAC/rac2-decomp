@@ -105,14 +105,14 @@ typedef struct {
 } MapIconBounds_205E70;
 
 
-extern struct TagPtr_205E70 D_001B22A8 MACRO_ADDR;
-extern struct ScreenOffsets_205E70 D_001A7340 MACRO_ADDR;
-extern MapOverlayState_205E70 D_001C4FA0 NOT_SDA;
-extern MapPlayerState_205E70 D_00189E20 NOT_SDA;
-extern MapTextureTables_205E70 D_001B1870 MACRO_ADDR;
+extern struct TagPtr_205E70 g_dma_packet_cursor MACRO_ADDR;
+extern struct ScreenOffsets_205E70 g_screen_width MACRO_ADDR;
+extern MapOverlayState_205E70 g_map_overlay_state NOT_SDA;
+extern MapPlayerState_205E70 g_hero_state NOT_SDA;
+extern MapTextureTables_205E70 g_hud_state MACRO_ADDR;
 extern MapIdFlags_205E70 D_00139A34[] NOT_SDA;
-extern struct { u8 pad[0x150]; u16 size[2]; } D_001A6480 NOT_SDA;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern struct { u8 pad[0x150]; u16 size[2]; } g_screen_adjust_offsets NOT_SDA;
+extern s32 g_current_map_index MACRO_ADDR;
 extern u8 D_001A95F8[] NOT_SDA;
 extern s32 D_001A95F0 __attribute__((sda));
 extern s32 D_001A960C __attribute__((sda));
@@ -135,27 +135,27 @@ extern f32 D_001A95E0 __attribute__((sda));
 extern f32 D_001A95E4 __attribute__((sda));
 extern f32 D_001A95E8 __attribute__((sda));
 extern f32 D_001A95EC __attribute__((sda));
-extern void func_0027C540(s32);
-extern void func_0027C660(void);
-extern s32 func_0027FAA8(s32,s32,u64,void *,s32);
-extern void func_002FC560(s32,s64);
-extern void func_002FC620(s32,s32,s32,s32);
-extern s32 func_0028E588(s32,s32);
-extern u64 func_0028E640(s32);
-extern void func_0028FC48(s32,s32,s32,s32,u64,s32);
-extern f32 func_00283B98(f32,f32);
-extern void func_0028F410(f32,f32,f32,f32,f32,s32,s32,u64);
-extern void func_0028F078(s32,s32,s32,s32,s32,s32,s32);
-extern void func_00297E00(s32,void *);
-extern void *func_00115484(void *,s32,u32);
-extern void func_00280200(void *,u64,void *,s32);
-extern s32 func_00297218(f32,f32,f32 *,f32 *,s32);
-extern void func_00297FE8(f32,f32,f32 *,f32 *,s32);
-extern s32 func_003005A0(void);
+extern void SetupGifPaging(s32);
+extern void DoGifPaging(void);
+extern s32 text_draw_centered_small(s32,s32,u64,void *,s32);
+extern void VU1_addGSregister(s32,s64);
+extern void gfx_set_scissor_clamped(s32,s32,s32,s32);
+extern s32 GetIconFrame(s32,s32);
+extern u64 GetFrameTexture(s32);
+extern void AppendScreenRectPacket(s32,s32,s32,s32,u64,s32);
+extern f32 FastAddRotations(f32,f32);
+extern void DrawRotatedSprite(f32,f32,f32,f32,f32,s32,s32,u64);
+extern void DrawHudSpriteSubpixel(s32,s32,s32,s32,s32,s32,s32);
+extern void text_format_localized_amount(s32,void *);
+extern void *memset(void *,s32,u32);
+extern void text_draw_window_medium(void *,u64,void *,s32);
+extern s32 GetSpecialMapCoordinates(f32,f32,f32 *,f32 *,s32);
+extern void map_convert_world_to_map_position(f32,f32,f32 *,f32 *,s32);
+extern s32 moby_get_current_variant_index(void);
 
 /* UNK_NoMapAvailable */
 /* Draws the map screen: the map background, the icons with their labels, and the player arrow. Shows a "no map" message when no map is available. */
-void func_00295F60(s32 paging, s32 set_clip) {
+void DrawMapOverlay(s32 paging, s32 set_clip) {
     union {
         u8 b[0x50];
         f32 f[2];
@@ -198,15 +198,15 @@ void func_00295F60(s32 paging, s32 set_clip) {
     s32 tile_limit;
 
     if (D_001A95F0) return;
-    if (gMapOverlayState.enabled == 0 || gMapOverlayState.selected_map >= 21) {
+    if (g_map_overlay_state.enabled == 0 || g_map_overlay_state.selected_map >= 21) {
         u8 *font = D_001A95F8;
 
         if (paging) SetupGifPaging(0);
-        DrawTextCenteredSmallFont(((s16)gScreenAdjustOffsets.size[0] >> 1) + 30, (s16)gScreenAdjustOffsets.size[1] >> 2, 0x80F0F0F0, font, -1);
+        text_draw_centered_small(((s16)g_screen_adjust_offsets.size[0] >> 1) + 30, (s16)g_screen_adjust_offsets.size[1] >> 2, 0x80F0F0F0, font, -1);
         if (paging) DoGifPaging();
         return;
     }
-    if (gMapOverlayState.selected_map < 0) {
+    if (g_map_overlay_state.selected_map < 0) {
         return;
     }
 
@@ -215,10 +215,10 @@ void func_00295F60(s32 paging, s32 set_clip) {
     ry0 = 0x800;
     mirror_sign = 1;
     {
-        s32 selected = gMapOverlayState.selected_map;
-        s32 ox = gMapOverlayState.offset_x[selected] >> 15;
-        s32 oy = gMapOverlayState.offset_y[selected] >> 15;
-        zoom = gMapOverlayState.zoom[selected];
+        s32 selected = g_map_overlay_state.selected_map;
+        s32 ox = g_map_overlay_state.offset_x[selected] >> 15;
+        s32 oy = g_map_overlay_state.offset_y[selected] >> 15;
+        zoom = g_map_overlay_state.zoom[selected];
         pan_x = zoom * (f32)ox;
         tile_size = zoom * 512.0f;
         pan_y = zoom * (f32)oy;
@@ -242,41 +242,41 @@ void func_00295F60(s32 paging, s32 set_clip) {
 
     VU1_addGSregister(8, 0);
     VU1_addGSregister(0x47, 0);
-    if (set_clip) SetGsScissorClamped(D_001A960C, D_001A9614, D_001A9610, D_001A9618);
-    gDmaPacketCursor.p->tag = 0x10000005;
-    gDmaPacketCursor.p->addr = 0;
-    gDmaPacketCursor.p->vif0 = 0;
-    gDmaPacketCursor.p->vif1 = 0x50000005;
-    gDmaPacketCursor.p++;
+    if (set_clip) gfx_set_scissor_clamped(D_001A960C, D_001A9614, D_001A9610, D_001A9618);
+    g_dma_packet_cursor.p->tag = 0x10000005;
+    g_dma_packet_cursor.p->addr = 0;
+    g_dma_packet_cursor.p->vif0 = 0;
+    g_dma_packet_cursor.p->vif1 = 0x50000005;
+    g_dma_packet_cursor.p++;
     background_tex0 =
-        GetFrameTexture(GetIconFrame(0xE999, gMapOverlayState.selected_map));
-    packet_words = (u64 *)gDmaPacketCursor.p;
+        GetFrameTexture(GetIconFrame(0xE999, g_map_overlay_state.selected_map));
+    packet_words = (u64 *)g_dma_packet_cursor.p;
     packet_words[0] = 0x7400000000008001;
     packet_words[1] = 0x5353106;
     packet_words[2] = background_tex0;
     packet_words[3] = 0x156;
     packet_words[4] = 0x80808080;
     packet_words[5] = 0;
-    packet_words[6] = ((x0 + gScreenWidth.x) - 8) | ((u64)((y0 + gScreenWidth.y) - 8) << 16) |
-                      ((u64)gMapOverlayState.z << 32);
+    packet_words[6] = ((x0 + g_screen_width.x) - 8) | ((u64)((y0 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[7] = u | ((u64)v << 16);
-    packet_words[8] = ((x1 + gScreenWidth.x) - 8) | ((u64)((y1 + gScreenWidth.y) - 8) << 16) |
-                      ((u64)gMapOverlayState.z << 32);
+    packet_words[8] = ((x1 + g_screen_width.x) - 8) | ((u64)((y1 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[9] = 0;
-    gDmaPacketCursor.p = (struct DmaTag_205E70 *)((u8 *)gDmaPacketCursor.p + 0x50);
+    g_dma_packet_cursor.p = (struct DmaTag_205E70 *)((u8 *)g_dma_packet_cursor.p + 0x50);
     VU1_addGSregister(8, 5);
     VU1_addGSregister(0x47, 0x60B);
 
     palette_block = (background_tex0 >> 37) & 0x3FFF;
-    gDmaPacketCursor.p->tag = 0x10000005;
-    gDmaPacketCursor.p->addr = 0;
-    gDmaPacketCursor.p->vif0 = 0;
-    gDmaPacketCursor.p->vif1 = 0x50000005;
-    map_tex0 = (u64)((gMapOverlayState.texture_address >> 8) | (8 << 14) | (0x13 << 20) | (9 << 26)) |
+    g_dma_packet_cursor.p->tag = 0x10000005;
+    g_dma_packet_cursor.p->addr = 0;
+    g_dma_packet_cursor.p->vif0 = 0;
+    g_dma_packet_cursor.p->vif1 = 0x50000005;
+    map_tex0 = (u64)((g_map_overlay_state.texture_address >> 8) | (8 << 14) | (0x13 << 20) | (9 << 26)) |
                ((u64)9 << 30) | ((u64)1 << 34) | ((u64)palette_block << 37) |
                ((long)0x8000000000000000ULL);
-    tag = gDmaPacketCursor.p;
-    gDmaPacketCursor.p = tag + 1;
+    tag = g_dma_packet_cursor.p;
+    g_dma_packet_cursor.p = tag + 1;
     packet_words = (u64 *)(tag + 1);
     packet_words[0] = 0x7400000000008001;
     packet_words[1] = 0x5353106;
@@ -284,19 +284,19 @@ void func_00295F60(s32 paging, s32 set_clip) {
     packet_words[3] = 0x156;
     packet_words[4] = 0x80808080;
     packet_words[5] = 0;
-    packet_words[6] = ((rx0 + gScreenWidth.x) - 8) | ((u64)((ry0 + gScreenWidth.y) - 8) << 16) |
-                      ((u64)gMapOverlayState.z << 32);
+    packet_words[6] = ((rx0 + g_screen_width.x) - 8) | ((u64)((ry0 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[7] = 0x20002000;
-    packet_words[8] = ((rx1 + gScreenWidth.x) - 8) | ((u64)((ry1 + gScreenWidth.y) - 8) << 16) |
-                      ((u64)gMapOverlayState.z << 32);
+    packet_words[8] = ((rx1 + g_screen_width.x) - 8) | ((u64)((ry1 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[9] = 0;
-    gDmaPacketCursor.p = (struct DmaTag_205E70 *)((u8 *)gDmaPacketCursor.p + 0x50);
+    g_dma_packet_cursor.p = (struct DmaTag_205E70 *)((u8 *)g_dma_packet_cursor.p + 0x50);
     VU1_addGSregister(0x47, 0x360B);
 
-    if (gMapOverlayState.show_markers != 0 && gMapOverlayState.marks_enabled != 0) {
+    if (g_map_overlay_state.show_markers != 0 && g_map_overlay_state.marks_enabled != 0) {
         dx = rx1 - rx0;
         dy = ry1 - ry0;
-        highlighted_cell = gMapOverlayState.marks;
+        highlighted_cell = g_map_overlay_state.marks;
         for (i = 0; i < 8; i++, highlighted_cell++) {
             cell = highlighted_cell->cell;
             if (cell >= 0) {
@@ -309,10 +309,10 @@ void func_00295F60(s32 paging, s32 set_clip) {
         }
     }
 
-    if (gMapOverlayState.icons != 0) {
+    if (g_map_overlay_state.icons != 0) {
         icon_bounds = ((MapIconBounds_205E70 *)0x70000000);
-        icon_scale = (gMapOverlayState.zoom[gMapOverlayState.selected_map] * 2.0f + 5.0f) / 13.0f;
-        if (!(gMapOverlayState.icons[0].flags & 4)) {
+        icon_scale = (g_map_overlay_state.zoom[g_map_overlay_state.selected_map] * 2.0f + 5.0f) / 13.0f;
+        if (!(g_map_overlay_state.icons[0].flags & 4)) {
             MapIconBounds_205E70 *r;
             s32 i;
             MapIcon_205E70 *icon;
@@ -325,21 +325,21 @@ void func_00295F60(s32 paging, s32 set_clip) {
 
             i = 0;
             do {
-                if (gMapOverlayState.icons[i].active != 0 &&
-                    (texture_id = gMapOverlayState.icons[i].texture_id) != 0 &&
-                    !(gMapOverlayState.icons[i].flags & 1)) {
+                if (g_map_overlay_state.icons[i].active != 0 &&
+                    (texture_id = g_map_overlay_state.icons[i].texture_id) != 0 &&
+                    !(g_map_overlay_state.icons[i].flags & 1)) {
                     icon_size_multiplier = 1.0f;
-                    if (gMapOverlayState.icons[i].flags & 0x80) {
+                    if (g_map_overlay_state.icons[i].flags & 0x80) {
                         icon_size_multiplier = 1.5f;
                     }
                     image_index = GetIconFrame(texture_id,
-                                                                   gMapOverlayState.icons[i].frame_index);
-                    icon_center_x = (f32)rx0 + gMapOverlayState.icons[i].x * (f32)(rx1 - rx0);
-                    icon_center_y = (f32)ry0 + gMapOverlayState.icons[i].y * (f32)(ry1 - ry0);
+                                                                   g_map_overlay_state.icons[i].frame_index);
+                    icon_center_x = (f32)rx0 + g_map_overlay_state.icons[i].x * (f32)(rx1 - rx0);
+                    icon_center_y = (f32)ry0 + g_map_overlay_state.icons[i].y * (f32)(ry1 - ry0);
                     texture_info =
-                        &gHudState.textures[gHudState.references[image_index].image_index];
-                    if (gMapOverlayState.icons[i].flags & 0x200) {
-                        s = gMapOverlayState.zoom[gMapOverlayState.selected_map];
+                        &g_hud_state.textures[g_hud_state.references[image_index].image_index];
+                    if (g_map_overlay_state.icons[i].flags & 0x200) {
+                        s = g_map_overlay_state.zoom[g_map_overlay_state.selected_map];
                     } else {
                         s = icon_scale;
                     }
@@ -358,7 +358,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                         scaled * (f32)(1 << (texture_info->height_exponent + 4));
                 }
                 i++;
-            } while (!(gMapOverlayState.icons[i].flags & 4));
+            } while (!(g_map_overlay_state.icons[i].flags & 4));
         }
 
         {
@@ -372,14 +372,14 @@ void func_00295F60(s32 paging, s32 set_clip) {
                bounds before either icon is drawn, using half of the smallest
                positive edge distance for each pair. */
             i = 0;
-            if (!(gMapOverlayState.icons[1].flags & 4))
+            if (!(g_map_overlay_state.icons[1].flags & 4))
                 do {
-                    if (gMapOverlayState.icons[i].active == 0 || gMapOverlayState.icons[i].texture_id == 0 ||
-                        (gMapOverlayState.icons[i].flags & 3)) {
+                    if (g_map_overlay_state.icons[i].active == 0 || g_map_overlay_state.icons[i].texture_id == 0 ||
+                        (g_map_overlay_state.icons[i].flags & 3)) {
                         goto next_outer_icon;
                     }
                     j = i + 1;
-                    for (; !(gMapOverlayState.icons[j].flags & 4); j++) {
+                    for (; !(g_map_overlay_state.icons[j].flags & 4); j++) {
                         inner_offset = j * sizeof(MapIcon_205E70);
                         pan_x = icon_bounds[j].x1 - icon_bounds[i].x0;
                         if (pan_x <= 0)
@@ -393,7 +393,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                         oy1 = icon_bounds[i].y1 - icon_bounds[j].y0;
                         if (oy1 <= 0)
                             continue;
-                        icon = (MapIcon_205E70 *)(inner_offset + (s32)gMapOverlayState.icons);
+                        icon = (MapIcon_205E70 *)(inner_offset + (s32)g_map_overlay_state.icons);
                         if (icon->active == 0 || icon->texture_id == 0 || (icon->flags & 3)) {
                             continue;
                         }
@@ -425,20 +425,20 @@ void func_00295F60(s32 paging, s32 set_clip) {
                     }
                 next_outer_icon:
                     i++;
-                } while (!(gMapOverlayState.icons[i + 1].flags & 4));
+                } while (!(g_map_overlay_state.icons[i + 1].flags & 4));
         }
 
         {
             s32 i;
 
             i = 0;
-            if (!(gMapOverlayState.icons[0].flags & 4)) {
+            if (!(g_map_overlay_state.icons[0].flags & 4)) {
                 do {
-                    if (gMapOverlayState.icons[i].active != 0 && !(gMapOverlayState.icons[i].flags & 1)) {
-                        id = gMapOverlayState.icons[i].texture_id;
-                        sprite_word = gMapOverlayState.icons[i].frame_index;
+                    if (g_map_overlay_state.icons[i].active != 0 && !(g_map_overlay_state.icons[i].flags & 1)) {
+                        id = g_map_overlay_state.icons[i].texture_id;
+                        sprite_word = g_map_overlay_state.icons[i].frame_index;
                         if (id != 0) {
-                            if (gMapOverlayState.icons[i].flags & 0x40) {
+                            if (g_map_overlay_state.icons[i].flags & 0x40) {
                                 AppendScreenRectPacket(
                                     icon_bounds[i].x0 - 0x20, icon_bounds[i].y0 - 0x20,
                                     icon_bounds[i].x1 + 0x20, icon_bounds[i].y1 + 0x20, 0x80000000, 1);
@@ -449,35 +449,35 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                 icon_bounds[i].x1 = D_001A962C;
                                 icon_bounds[i].y1 = D_001A9630;
                             }
-                            if (gMapOverlayState.icons[i].flags & 0x200) {
-                                s = gMapOverlayState.zoom[gMapOverlayState.selected_map];
+                            if (g_map_overlay_state.icons[i].flags & 0x200) {
+                                s = g_map_overlay_state.zoom[g_map_overlay_state.selected_map];
                             } else {
                                 s = icon_scale;
                             }
-                            if (gMapOverlayState.icons[i].flags & 0x100) {
-                                angle = gMapOverlayState.icons[i].angle;
+                            if (g_map_overlay_state.icons[i].flags & 0x100) {
+                                angle = g_map_overlay_state.icons[i].angle;
                                 texture_width = 0x20;
                                 sprite_height = s * 256.0f;
                                 sprite_width = sprite_height;
-                                if (gMapOverlayState.icons[i].flags & 0x400) {
+                                if (g_map_overlay_state.icons[i].flags & 0x400) {
                                     angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95E0;
                                     sprite_height = s * D_001A95E4;
-                                    if (D_00139A34[gMapOverlayState.icons[i].id].flags & 2) {
+                                    if (D_00139A34[g_map_overlay_state.icons[i].id].flags & 2) {
                                         sprite_word++;
                                     }
                                 }
-                                if (gMapOverlayState.icons[i].flags & 0x800) {
+                                if (g_map_overlay_state.icons[i].flags & 0x800) {
                                     angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95D8;
                                     sprite_height = s * D_001A95DC;
-                                    if (D_00139A34[gMapOverlayState.icons[i].id].flags & 2) {
+                                    if (D_00139A34[g_map_overlay_state.icons[i].id].flags & 2) {
                                         sprite_word++;
                                     }
                                 }
-                                if (gMapOverlayState.icons[i].flags & 0x1000) {
+                                if (g_map_overlay_state.icons[i].flags & 0x1000) {
                                     angle = FastAddRotations(angle, 1.5707964f);
                                     sprite_width = s * D_001A95E8;
                                     sprite_height = s * D_001A95EC;
@@ -490,8 +490,8 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                                         id, sprite_word)));
                             } else {
                                 u32 tint = 0x7f7f7f;
-                                if (gMapOverlayState.icons[i].texture_id == 0xE99A &&
-                                    (u32)((u16)gMapOverlayState.icons[i].frame_index - 11) < 4) {
+                                if (g_map_overlay_state.icons[i].texture_id == 0xE99A &&
+                                    (u32)((u16)g_map_overlay_state.icons[i].frame_index - 11) < 4) {
                                     int k = 0;
                                     s32 *colors = D_001A9638;
                                     /* Entering at the test keeps the loop out of loop.c
@@ -503,7 +503,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                         if (colors[k * 2] == -1) {
                                             goto tint_done;
                                         }
-                                        if (colors[k * 2] == gMapOverlayState.icons[i].frame_index) {
+                                        if (colors[k * 2] == g_map_overlay_state.icons[i].frame_index) {
                                             tint = D_001A963C[k * 2];
                                             goto tint_done;
                                         }
@@ -519,11 +519,11 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                     icon_bounds[i].x1 - icon_bounds[i].x0,
                                     icon_bounds[i].y1 - icon_bounds[i].y0, 0x80, tint);
                             }
-                            if (gMapOverlayState.icons[i].flags & 0x10) {
-                                label_width = gMapOverlayState.icons[i].label_width;
-                                label_offset_x = gMapOverlayState.icons[i].label_offset_x;
-                                label_height = gMapOverlayState.icons[i].label_height;
-                                label_offset_y = gMapOverlayState.icons[i].label_offset_y;
+                            if (g_map_overlay_state.icons[i].flags & 0x10) {
+                                label_width = g_map_overlay_state.icons[i].label_width;
+                                label_offset_x = g_map_overlay_state.icons[i].label_offset_x;
+                                label_height = g_map_overlay_state.icons[i].label_height;
+                                label_offset_y = g_map_overlay_state.icons[i].label_offset_y;
                                 if (label_offset_x == 0) {
                                     label_x = ((icon_bounds[i].x0 + icon_bounds[i].x1) >> 5) -
                                               label_width / 2;
@@ -546,7 +546,7 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                 }
                                 AppendScreenRectPacket(label_x, label_y, label_x + label_width,
                                               label_y + label_height * 2, 0x40000000, 0);
-                                FormatLocalizedAmountText(i, &label_buffer);
+                                text_format_localized_amount(i, &label_buffer);
                                 memset(&text_window, 0, sizeof(text_window));
                                 text_window.s[1] = label_y + label_height;
                                 text_window.s[3] = label_x + label_width;
@@ -556,20 +556,20 @@ void func_00295F60(s32 paging, s32 set_clip) {
                                 text_window.s[9] = 1;
                                 text_window.s[0] = label_y;
                                 text_window.s[2] = label_x;
-                                DrawTextWindowMediumFont(&text_window, 0x80FFA888, &label_buffer, -1);
+                                text_draw_window_medium(&text_window, 0x80FFA888, &label_buffer, -1);
                             }
                         }
                     }
                     i++;
-                } while (!(gMapOverlayState.icons[i].flags & 4));
+                } while (!(g_map_overlay_state.icons[i].flags & 4));
             }
         }
     }
 
     {
-        MapOverlayState_205E70 *m = &gMapOverlayState;
+        MapOverlayState_205E70 *m = &g_map_overlay_state;
 
-        if (gCurrentMapIndex == m->selected_map) {
+        if (g_current_map_index == m->selected_map) {
             s32 image_index;
             f32 s;
             f32 angle;
@@ -577,19 +577,19 @@ void func_00295F60(s32 paging, s32 set_clip) {
 
             image_index = GetIconFrame(0xE99A, 5);
             s = ((m->zoom[m->selected_map] * 4.0f + 10.0f) * 0.75f) / 13.0f;
-            angle = gHeroState.angle;
-            flip = gHeroState.mode == 0xF;
+            angle = g_hero_state.angle;
+            flip = g_hero_state.mode == 0xF;
             if (flip) {
                 angle = FastAddRotations(angle, 1.5707964f);
             }
-            if (gCurrentMapIndex == 20 && D_001C4F40 == 2)
+            if (g_current_map_index == 20 && D_001C4F40 == 2)
                 angle = 3.1415927f;
-            else if (GetCurrentVariantIndex() >= 0 && gCurrentMapIndex == 7)
-                angle = D_001A9660[GetCurrentVariantIndex()];
-            if (!GetSpecialMapCoordinates(gHeroState.x, gHeroState.y,
-                               &label_buffer.f[0], &label_buffer.f[1], gCurrentMapIndex))
-                ConvertWorldToMapPosition(gHeroState.x, gHeroState.y,
-                              &label_buffer.f[0], &label_buffer.f[1], gCurrentMapIndex);
+            else if (moby_get_current_variant_index() >= 0 && g_current_map_index == 7)
+                angle = D_001A9660[moby_get_current_variant_index()];
+            if (!GetSpecialMapCoordinates(g_hero_state.x, g_hero_state.y,
+                               &label_buffer.f[0], &label_buffer.f[1], g_current_map_index))
+                map_convert_world_to_map_position(g_hero_state.x, g_hero_state.y,
+                              &label_buffer.f[0], &label_buffer.f[1], g_current_map_index);
             label_buffer.f[0] = (f32)rx0 + label_buffer.f[0] * (f32)(rx1 - rx0);
             label_buffer.f[1] = (f32)ry0 + label_buffer.f[1] * (f32)(ry1 - ry0);
             {
@@ -600,6 +600,6 @@ void func_00295F60(s32 paging, s32 set_clip) {
             }
         }
     }
-    SetGsScissorClamped(0, gScreenWidth.width - 1, 0, gScreenWidth.height - 1);
+    gfx_set_scissor_clamped(0, g_screen_width.width - 1, 0, g_screen_width.height - 1);
     if (paging) DoGifPaging();
 }

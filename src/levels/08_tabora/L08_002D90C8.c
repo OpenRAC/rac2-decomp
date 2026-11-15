@@ -13,13 +13,13 @@ extern f32 func_2F9FD0(void *, void *);
 
 extern int *D_L08_001FE7C0[];
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
-extern float func_L08_0032EB48(ti_word *, int, float);
+extern float coll_box_max_depth_all(ti_word *, int, float);
 
-extern float func_L08_0032EC38(ti_word *, int, float);
+extern float coll_box_max_depth_faces(ti_word *, int, float);
 
-extern float func_L08_0032ED98(ti_word *, int, float);
+extern float coll_box_max_depth_edges(ti_word *, int, float);
 
 extern char D_L08_002A0D00[];
 
@@ -29,21 +29,21 @@ extern char *D_L08_001B2AD4 __attribute__((sda));
 
 extern char *D_L08_001B2ADC __attribute__((sda));
 
-extern void func_L04_003A21F8(void *, int);
+extern void render_water_grids(void *, int);
 
-extern void func_L04_003A02A0(void *, int);
+extern void water_start_ripple_patch(void *, int);
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
 
 /* Sets the object to ease toward a target height and resets its blend to 0.2. */
-void func_L08_00329EC0(float value, float *object) {
+void moby_set_ease_target_height(float value, float *object) {
     object[29] = 0.2f;
     object[28] = value - object[6];
 }
 
 /* Measures how far a point is from one corner of a box and keeps the larger of that and the running minimum. */
-f32 func_L08_0032EA60(char *point, char *basis, char *origin, f32 minimum, f32 scaleX, f32 scaleY, f32 scaleZ) {
+f32 coll_box_corner_max_dist(char *point, char *basis, char *origin, f32 minimum, f32 scaleX, f32 scaleY, f32 scaleZ) {
     f32 corner[4];
     f32 scaled[4];
     f32 distance;
@@ -60,7 +60,7 @@ f32 func_L08_0032EA60(char *point, char *basis, char *origin, f32 minimum, f32 s
 }
 
 /* Checks a point against all 27 corner, edge and face samples of a box and keeps the largest result. */
-float func_L08_0032EB48(ti_word *object, int index, float minimum) {
+float coll_box_max_depth_all(ti_word *object, int index, float minimum) {
     char *entry;
     float stepX, stepY, stepZ;
 
@@ -69,28 +69,28 @@ float func_L08_0032EB48(ti_word *object, int index, float minimum) {
     for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f)
         for (stepY = -1.0f; stepY <= 1.0f; stepY += 1.0f)
             for (stepX = -1.0f; stepX <= 1.0f; stepX += 1.0f)
-                minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, stepX, stepY, stepZ);
+                minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, stepX, stepY, stepZ);
     return minimum;
 }
 
 /* Checks a point against the six face centres of a box and keeps the largest result. */
-float func_L08_0032EC38(ti_word *object, int index, float minimum) {
+float coll_box_max_depth_faces(ti_word *object, int index, float minimum) {
     char *entry;
     float sign;
 
     if (index == -1) return minimum;
     entry = (char *)D_L08_001B2AD4 + index * 128;
     for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
-        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, 0.0f, sign);
+        minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, 0.0f, 0.0f, sign);
     for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
-        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, sign, 0.0f);
+        minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, 0.0f, sign, 0.0f);
     for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
-        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, sign, 0.0f, 0.0f);
+        minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, sign, 0.0f, 0.0f);
     return minimum;
 }
 
 /* Checks a point against the edge samples of a box and keeps the largest result. */
-float func_L08_0032ED98(ti_word *object, int index, float minimum) {
+float coll_box_max_depth_edges(ti_word *object, int index, float minimum) {
     char *entry;
     float stepX, stepY, stepZ;
 
@@ -98,15 +98,15 @@ float func_L08_0032ED98(ti_word *object, int index, float minimum) {
     entry = (char *)D_L08_001B2ADC + index * 128;
     for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f) {
         for (stepX = -1.0f; stepX <= 1.0f; stepX += 2.0f)
-            minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, stepX, stepZ);
+            minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, 0.0f, stepX, stepZ);
         for (stepY = -1.0f; stepY <= 1.0f; stepY += 2.0f)
-            minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, stepY, 0.0f, stepZ);
+            minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, stepY, 0.0f, stepZ);
     }
     return minimum;
 }
 
 /* Checks a point against a list of planes and keeps the largest result. */
-float func_L08_0032EED8(ti_word *object, int index, float minimum) {
+float coll_plane_list_max_depth(ti_word *object, int index, float minimum) {
     int *planeList;
     int i;
     if (index == -1) return minimum;
@@ -120,13 +120,13 @@ float func_L08_0032EED8(ti_word *object, int index, float minimum) {
 }
 
 /* Works out how deep a point is inside a combination of volumes, using the largest of the four checks. */
-float func_L08_0032EF80(ti_word *point, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex) {
+float coll_point_depth_in_volumes(ti_word *point, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex) {
     ti_word pointCopy = *point;
     float depth;
-    depth = MaxDepthInPlaneList(&pointCopy, planeListIndex, 0.0f);
-    depth = MaxDepthInBoxAllSamples(&pointCopy, cornerBoxIndex, depth);
-    depth = MaxDepthInBoxFaceSamples(&pointCopy, faceBoxIndex, depth);
-    return MaxDepthInBoxEdgeSamples(&pointCopy, edgeBoxIndex, depth);
+    depth = coll_plane_list_max_depth(&pointCopy, planeListIndex, 0.0f);
+    depth = coll_box_max_depth_all(&pointCopy, cornerBoxIndex, depth);
+    depth = coll_box_max_depth_faces(&pointCopy, faceBoxIndex, depth);
+    return coll_box_max_depth_edges(&pointCopy, edgeBoxIndex, depth);
 }
 
 /* func_L08_0032F898 is defined in L08_0032F898.c. */
@@ -140,20 +140,20 @@ float func_L08_0032EF80(ti_word *point, int planeListIndex, int cornerBoxIndex, 
 /* func_L08_003CFE68 is in the sibling file L08_002D90C8-g8.c (it uses $gp addresses). */
 
 /* Starts the shared effect with the level effect table. */
-void func_L08_003CFFE8(void) {
+void water_start_effect(void) {
     render_water_grids(D_L08_002A0D00, 7);
 }
 
 /* Stops the shared effect with the level effect table. */
-void func_L08_003D0010(void) {
-    StartRipplePatch(D_L08_002A0D00, 7);
+void water_stop_effect(void) {
+    water_start_ripple_patch(D_L08_002A0D00, 7);
 }
 
 /* Moves the object's two attached parts to the object. */
-void func_L08_003D0040(void *object) {
+void moby_attach_parts(void *object) {
     void **partList = *(void ***)((char *)object + 0x68);
-    if (partList[0]) TransformMobyJointToWorld(object, 0, (char *)partList[0] + 0x10);
-    if (partList[1]) TransformMobyJointToWorld(object, 1, (char *)partList[1] + 0x10);
+    if (partList[0]) moby_transform_joint_to_world(object, 0, (char *)partList[0] + 0x10);
+    if (partList[1]) moby_transform_joint_to_world(object, 1, (char *)partList[1] + 0x10);
 }
 
 /* func_L08_003D00C8 is defined in L08_003D00C8-g8.c. */
@@ -181,7 +181,7 @@ extern void func_347A38(void *, int, int, f32, f32, int);
    the object's own position added, and the height the driver reads as the
    third component; each point goes to func_347A38 */
 /* Throws out several small sparks from random points around the object. */
-void func_L08_003D7E68(void *object) {
+void part_spawn_sparks_around(void *object) {
     f32 point[4];
     f32 yOffset;
     f32 angle, radius, speedMax, speedMin;

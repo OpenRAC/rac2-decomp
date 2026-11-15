@@ -1,8 +1,8 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int func_00115AC0(char *dst, char *src, int len);
-extern void func_L01_003242C8(char *dst, int x, int idx);
+extern int strncpy(char *dst, char *src, int len);
+extern void text_format_number_separators(char *dst, int x, int idx);
 extern unsigned char D_PAL_001A7C3C MACRO_ADDR;
 
 /* func_PAL_L01_003263E8, the PAL copy of func_L01_00324410: the same C, where the
@@ -22,7 +22,7 @@ void func_PAL_L01_003263E8(char *out, char *src, int *nums)
 
     p = nums;
     i = 0;
-    func_00115AC0((char *)0x70000000, src, 0xFF);
+    strncpy((char *)0x70000000, src, 0xFF);
 
     q = tab;
     for (;;) {
@@ -48,7 +48,7 @@ void func_PAL_L01_003263E8(char *out, char *src, int *nums)
                 v = s[1] - '0';
                 s += 3;
             }
-            func_L01_003242C8((char *)buf, tab[v], D_PAL_001A7C3C);
+            text_format_number_separators((char *)buf, tab[v], D_PAL_001A7C3C);
             n = 0;
             if (*buf != 0) {
                 while (buf[n] != 0 && n < 32) {

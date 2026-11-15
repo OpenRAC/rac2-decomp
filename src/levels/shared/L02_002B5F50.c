@@ -8,11 +8,11 @@ struct RouteNode {
     unsigned short flags;
     unsigned char unused[18];
 };
-extern char *D_L02_001FF1C0[];
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern int func_L02_0032EDD8(void *, struct RouteNode *, int, int *);
-extern float func_L02_0032EC98(void *, void *, void *, float, float);
+extern char *g_route_polygons[];
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern int path_find_route_node_containing_point(void *, struct RouteNode *, int, int *);
+extern float moby_clamp_heading_to_gap(void *, void *, void *, float, float);
 
 
 /* func_L02_002DCEA0 is matched in its own unit, src/levels/shared/L02_002DCEA0.c (-g). */
@@ -29,9 +29,9 @@ ASM_FUNC("asm/levels", func_L02_002F1FB8);
 /* Returns the squared flat distance between two points. */
 ASM_FUNC("asm/levels", func_L02_002F21C0);
 
-float func_L02_0031E918(float scale)
+float math_random_curved_scale(float scale)
 {
-  float r = ((float) (0xFFF & (Rand() >> 16))) * (1.0f / 4096.0f);
+  float r = ((float) (0xFFF & (func_001163B0() >> 16))) * (1.0f / 4096.0f);
   float new_var;
   new_var = r * r;
   new_var = 1.0f - new_var;
@@ -39,45 +39,45 @@ float func_L02_0031E918(float scale)
 }
 
 
-extern float func_L02_0031E918(float scale);
-extern float func_002A7940(void);
-extern float func_00283180(float x);
-extern float func_00283198(float x);
-extern void func_00282C88(void *target);
+extern float math_random_curved_scale(float scale);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float x);
+extern float math_fast_sin_or_cos_b(float x);
+extern void vec_clear_128(void *target);
 
 /* Makes a flat offset of random length that points in a random direction. */
-void func_L02_0031E9E8(float *outVec, float radius) {
-    float angle = RandomAngle();
-    float length = RandomCurvedScale(radius);
+void math_random_planar_offset(float *outVec, float radius) {
+    float angle = math_random_angle();
+    float length = math_random_curved_scale(radius);
 
-    ClearVector128(outVec);
-    outVec[0] = FastSinOrCosA(angle) * length;
-    outVec[1] = FastSinOrCosB(angle) * length;
+    vec_clear_128(outVec);
+    outVec[0] = math_fast_sin_or_cos_a(angle) * length;
+    outVec[1] = math_fast_sin_or_cos_b(angle) * length;
 }
 
-extern unsigned int D_L02_001FC060[];
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
-extern void func_L00_003294F0(unsigned char *entity, int enabled);
+extern unsigned int g_entity_group_lists[];
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
+extern void moby_set_flag_bit(unsigned char *entity, int enabled);
 
 /* Walk the 16-bit stream the table entry points at; a negative word ends it. */
 /* Applies an on or off setting to every object in a group's list. */
-void func_L02_0031F858(int groupId, int enabled) {
+void moby_set_group_enabled(int groupId, int enabled) {
     short *entry;
 
-    if (gEntityGroupLists[groupId] != 0) {
-        entry = (short *)gEntityGroupLists[groupId];
+    if (g_entity_group_lists[groupId] != 0) {
+        entry = (short *)g_entity_group_lists[groupId];
         do {
-            SetObjectFlagBit((unsigned char *)(gMobyPool_L02 + ((*(unsigned short *)entry & 0x7FFF) << 8)), enabled);
+            moby_set_flag_bit((unsigned char *)(g_moby_l02_pool + ((*(unsigned short *)entry & 0x7FFF) << 8)), enabled);
         } while (*entry++ >= 0);
     }
 }
 
 
-extern void func_002A04B8(char *object, int *out0, int *out4, int *out8);
+extern void get_moby_color(char *object, int *out0, int *out4, int *out8);
 
 /* Pack the three words the callee fills in behind a marker bit. */
 /* Packs three numbers describing an object into one handle number. */
-int func_L02_003272D8(char *object) {
+int moby_pack_handle(char *object) {
     int w0;
     int w4;
     int w8;
@@ -89,25 +89,25 @@ int func_L02_003272D8(char *object) {
 }
 
 extern char *D_L02_001B368C __attribute__((section(".sdata")));
-extern void func_L02_00327390(char *arg0, char *arg1, int arg2);
+extern void part_start_record_effect_by_level_kind(char *arg0, char *arg1, int arg2);
 
 /* Index -1 means "no record". */
 /* Starts an effect for a record by its index, and does nothing if the index is empty. */
-void func_L02_00327350(int index, int param) {
+void part_start_record_effect_by_index(int index, int param) {
     char *record;
 
     if (index != -1) {
         record = D_L02_001B368C + (index << 7);
-        StartRecordEffectByLevelKind(record + 0x30, record + 0x70, param);
+        part_start_record_effect_by_level_kind(record + 0x30, record + 0x70, param);
     }
 }
 
 extern unsigned char D_0018C0D4;
-extern void func_L00_002B9D60(int a0, int a1, int a2, int a3);
-extern void func_L00_0042A500(int arg0);
+extern void hero_reset_position_and_direction(int a0, int a1, int a2, int a3);
+extern void cam_reset_entry(int arg0);
 
 /* Starts an effect whose variant depends on the current setting, then runs an optional follow-up. */
-void func_L02_00327390(char *first, char *second, int extra) {
+void part_start_record_effect_by_level_kind(char *first, char *second, int extra) {
     int variant = 0;
 
     switch (D_0018C0D4) {
@@ -118,57 +118,57 @@ void func_L02_00327390(char *first, char *second, int extra) {
         variant = 0x56;
         break;
     }
-    ResetHeroPositionAndDirection((int)first, (int)second, variant, 1);
+    hero_reset_position_and_direction((int)first, (int)second, variant, 1);
     if (extra != -1)
-        ResetCameraEntry(extra);
+        cam_reset_entry(extra);
 }
 
 /* func_L02_00329410 is matched in its own unit, L02_00329410.c. */
 
-extern void func_00282C88(void *target);
-extern void func_00283098(float *out, const float *a, const float *b);
+extern void vec_clear_128(void *target);
+extern void matrix_mul_vec3(float *out, const float *a, const float *b);
 
 /* Makes a vector of the given length that points the way the object faces. */
-void func_L02_003294D8(char *object, float *outVec, float length) {
+void moby_build_forward_vector(char *object, float *outVec, float length) {
     float *out = outVec;
     char *obj = object;
 
-    ClearVector128(out);
+    vec_clear_128(out);
     *out = length;
     matrix_mul_vec3(out, out, (const float *)(obj + 0xC0));
 }
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_002B04E0(char *arg0, float *arg1, char *transform);
-extern float func_00282C48(float t);
+extern float vec_get_heading_angle(char *arg0, float *arg1, char *transform);
+extern float math_fabs(float t);
 
 /* Copy the incoming 16-byte record to a local, hand both to the two calls. */
 /* Checks how far the object would move from the given position and returns a clamped result. */
-float func_L02_00329C48(char *object, TI128 *input, char *transform) {
+float moby_measure_step_angle(char *object, TI128 *input, char *transform) {
     TI128 localCopy = *input;
 
-    return FloatAbs(GetHeadingAngleOfVector(object, (float *)&localCopy, transform));
+    return math_fabs(vec_get_heading_angle(object, (float *)&localCopy, transform));
 }
 
 /* func_L02_0032B468 is defined in L02_0032B468.c. */
 
-extern int func_L02_0032E3B0(void *a0, float *a1, int a2);
+extern int moby_count_group_side_toward_target(void *a0, float *a1, int a2);
 
 /* The shared lookup takes the record index as a third argument; the retail wrapper hands it
    only two, so the call goes through a two-parameter prototype. */
 /* Counts which side of the object its group members are on, looking toward the other object. */
-void func_L02_0032E390(void *object, void *other) {
-    ((int (*)(void *, void *))CountGroupSideTowardTarget)(object, (char *)other + 0x10);
+void moby_count_group_side_from_object(void *object, void *other) {
+    ((int (*)(void *, void *))moby_count_group_side_toward_target)(object, (char *)other + 0x10);
 }
 
-extern void func_00283410(float *matrix, float *quat);
-extern void func_00283698(void *dst, void *src);
-extern void func_00282CF0(float *out, const float *a, const float *b);
-extern float func_00283248(float a, float b);
+extern void euler_to_matrix(float *matrix, float *quat);
+extern void matrix_from_basis_rows(void *dst, void *src);
+extern void FastVecSub(float *out, const float *a, const float *b);
+extern float mat_fast_helper_a(float a, float b);
 
 /* Counts the group members on each side of the line toward the target and returns the difference. */
-int func_L02_0032E3B0(void *object, float *target, int index) {
+int moby_count_group_side_toward_target(void *object, float *target, int index) {
     float quat[4];
     float vec[4];
     float mat[16];
@@ -184,14 +184,14 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
     }
     best = 0.0f;
     count = 0;
-    ClearVector128(quat);
-    quat[2] = FastMatrixHelperA(target[0] - *(float *)((char *)object + 0x10),
+    vec_clear_128(quat);
+    quat[2] = mat_fast_helper_a(target[0] - *(float *)((char *)object + 0x10),
                                    target[1] - *(float *)((char *)object + 0x14));
     euler_to_matrix(mat, quat);
     matrix_from_basis_rows(mat, mat);
-    p = (short *)gEntityGroupLists[index];
+    p = (short *)g_entity_group_lists[index];
     do {
-        entity = gMobyPool_L02 + ((*(unsigned short *)p & 0x7FFF) << 8);
+        entity = g_moby_l02_pool + ((*(unsigned short *)p & 0x7FFF) << 8);
         if (entity[0x20] >= 0 && entity != (char *)object) {
             FastVecSub(vec, (float *)(entity + 0x10), (float *)((char *)object + 0x10));
             matrix_mul_vec3(vec, vec, mat);
@@ -207,18 +207,18 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
 /* func_L02_0032E508 is matched in its own unit, src/levels/shared/L02_0032E508.c (-g). */
 
 /* Finds a route through linked areas to the target and turns the heading toward the next gap. */
-int func_L02_0032E998(float *position, float *target, float *heading, struct RouteNode *nodes, int count, int *sourceNode, int *targetNode, float override, float margin) {
+int ComputeRegionRouteHeading(float *position, float *target, float *heading, struct RouteNode *nodes, int count, int *sourceNode, int *targetNode, float override, float margin) {
     unsigned char visited[256];
     int i, j, found, portal, step, routeDepth;
     int layer;
     char *path;
     float angle;
-    *heading = FastMatrixHelperA(target[0] - position[0], target[1] - position[1]);
+    *heading = mat_fast_helper_a(target[0] - position[0], target[1] - position[1]);
     if (override != 0.0f)
         *heading = FastAddRotations(override, *heading);
-    if (!FindRouteNodeContainingPoint(position, nodes, count, sourceNode))
+    if (!path_find_route_node_containing_point(position, nodes, count, sourceNode))
         return 0;
-    if (!FindRouteNodeContainingPoint(target, nodes, count, targetNode))
+    if (!path_find_route_node_containing_point(target, nodes, count, targetNode))
         return 0;
     if (nodes[*targetNode].flags & 1)
         return 0;
@@ -254,7 +254,7 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
     }
     if (found == -1)
         return 0;
-    path = gRoutePolygons[nodes[found].path];
+    path = g_route_polygons[nodes[found].path];
     angle = *heading;
     routeDepth = visited[found];
     if (routeDepth >= 3) {
@@ -263,29 +263,29 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
         for (edge = 0; edge < 4; edge++) {
             if (visited[nodes[found].neighbors[edge]] == step) {
                 int offset = nodes[found].portals[edge] * 16;
-                angle = ClampHeadingToGap(path + (offset + 0x10), path + (offset + 0x20), position, angle, margin);
+                angle = moby_clamp_heading_to_gap(path + (offset + 0x10), path + (offset + 0x20), position, angle, margin);
                 break;
             }
         }
     }
-    *heading = ClampHeadingToGap(path + (portal * 16 + 0x10), path + (portal * 16 + 0x20), position, angle, margin);
+    *heading = moby_clamp_heading_to_gap(path + (portal * 16 + 0x10), path + (portal * 16 + 0x20), position, angle, margin);
     return 1;
 }
 
-extern void func_00282F20(float *out, const float *in, float s);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
-extern void func_00282CF0(float *out, const float *a, const float *b);
-extern float func_00283248(float a, float b);
-extern float func_00282C48(float t);
-extern float func_00283BE0(float a, float b);
-extern float func_00283B98(float a, float b);
+extern void vec_scale_to_length(float *out, const float *in, float s);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
+extern void FastVecSub(float *out, const float *a, const float *b);
+extern float mat_fast_helper_a(float a, float b);
+extern float math_fabs(float t);
+extern float fast_subtract_rotations(float a, float b);
+extern float FastAddRotations(float a, float b);
 
 /* Clamps a heading towards the gap between two points as seen from the position: its
    difference from the middle direction is limited by func_00282C48 of half the gap's angle.
    The heading argument itself holds the clamped difference, so it lives across blocks and is
    allocated globally, after the block-local first direction has taken $f21, as in retail. */
 /* Turns a heading toward a gap between two points without turning too far. */
-float func_L02_0032EC98(void *gapStart, void *gapEnd, void *position, float angle, float margin) {
+float moby_clamp_heading_to_gap(void *gapStart, void *gapEnd, void *position, float angle, float margin) {
     float gapDir[4];
     float leftPoint[4];
     float rightPoint[4];
@@ -299,12 +299,12 @@ float func_L02_0032EC98(void *gapStart, void *gapEnd, void *position, float angl
     FastVecAdd(leftPoint, gapStart, gapDir);
     FastVecSub(rightPoint, (float *)gapEnd, gapDir);
 
-    start = FastMatrixHelperA(leftPoint[0] - *(float *)position, leftPoint[1] - *(float *)((char *)position + 4));
-    half = fast_subtract_rotations(FastMatrixHelperA(rightPoint[0] - *(float *)position,
+    start = mat_fast_helper_a(leftPoint[0] - *(float *)position, leftPoint[1] - *(float *)((char *)position + 4));
+    half = fast_subtract_rotations(mat_fast_helper_a(rightPoint[0] - *(float *)position,
                                        rightPoint[1] - *(float *)((char *)position + 4)), start) * 0.5f;
     mid = FastAddRotations(half, start);
     angle = fast_subtract_rotations(angle, mid);
-    limit = FloatAbs(half);
+    limit = math_fabs(half);
     if (limit < angle)
         angle = limit;
     limit = -limit;
@@ -313,20 +313,20 @@ float func_L02_0032EC98(void *gapStart, void *gapEnd, void *position, float angl
     return FastAddRotations(angle, mid);
 }
 
-extern int func_002A8AF0(float *p, float *v, int n);
-extern float func_00282E80(void *a, void *b);
+extern int point_in_path_xy(float *p, float *v, int n);
+extern float vec_distance_xy(void *a, void *b);
 
 /* Finds the route node whose path polygon holds the point: the cached node *index first, then
    every other node whose position (+0x10) is within its radius (+0x1C) of the point. The
    position's address is a single-use giv, which loop.c never combines with the node's own
    address, so retail walks two pointers; walking them by hand lets them fold into one. */
-int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *index) {
+int path_find_route_node_containing_point(void *point, struct RouteNode *nodes, int count, int *index) {
     int i;
 
     if (*index != -1) {
         char *entry;
         int n;
-        entry = gRoutePolygons[nodes[*index].path];
+        entry = g_route_polygons[nodes[*index].path];
         n = *(int *)entry;
         entry += 0x10;
         if (point_in_path_xy(point, (float *)entry, n) != 0)
@@ -337,7 +337,7 @@ int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *inde
             && vec_distance_xy(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
             char *entry;
             int n;
-            entry = gRoutePolygons[nodes[i].path];
+            entry = g_route_polygons[nodes[i].path];
             n = *(int *)entry;
             entry += 0x10;
             if (point_in_path_xy(point, (float *)entry, n) != 0) {
@@ -353,18 +353,18 @@ int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *inde
 /* func_L02_0032EF10 is defined in L02_0032EF10-helpers.c. */
 
 
-extern void *func_L00_0032C638(char *a0);
-extern int func_002B50E0(void *a0, void *a1, float f12);
+extern void *moby_get_vars_word_18(char *a0);
+extern int moby_step_controller(void *a0, void *a1, float f12);
 
 /* Set the record's fields for the call, then put the old ones back. */
-int func_L02_00331440(void *a0, void *a1, int a2, float f12, float f13, float f14) {
+int moby_move_to_target_temp_limits(void *a0, void *a1, int a2, float f12, float f13, float f14) {
     char *rec;
     int old38;
     float old28;
     float old20;
     int ret;
 
-    rec = (char *)GetObjectVarsWord18((char *)a0);
+    rec = (char *)moby_get_vars_word_18((char *)a0);
     if (rec == 0)
         return 8;
     old38 = *(int *)(rec + 0x38);
@@ -375,42 +375,42 @@ int func_L02_00331440(void *a0, void *a1, int a2, float f12, float f13, float f1
     old20 = *(float *)(rec + 0x20);
     if (0.0f < f14)
         *(float *)(rec + 0x20) = f14;
-    ret = StepMovementController(a0, a1, f12);
+    ret = moby_step_controller(a0, a1, f12);
     *(int *)(rec + 0x38) = old38;
     *(float *)(rec + 0x28) = old28;
     *(float *)(rec + 0x20) = old20;
     return ret;
 }
 
-extern void func_00282CF0(float *out, const float *a, const float *b);
-extern int func_L02_00332668(char *arg0, char *arg1);
+extern void FastVecSub(float *out, const float *a, const float *b);
+extern int moby_check_move_target_reachable(char *arg0, char *arg1);
 
 /* Works out the offset from the object to a point and checks it. */
-int func_L02_00332630(char *object, void *target) {
+int moby_check_target_point_from_offset(char *object, void *target) {
     int offset[4];
 
     FastVecSub((float *)offset, (const float *)target, (const float *)(object + 0x10));
-    return CheckMoveTargetReachable(object, (char *)offset);
+    return moby_check_move_target_reachable(object, (char *)offset);
 }
 
 extern int D_L02_001A8FF0 __attribute__((sda));
-extern float func_00283248(float a, float b);
-extern int func_L01_00322288(char *a0, float f12);
-extern void *func_L00_0032C638(char *a0);
-extern float func_L00_003BFF68(char *a0, void *a1, char *a2, int a3);
+extern float mat_fast_helper_a(float a, float b);
+extern int moby_start_effect_from_entry(char *a0, float f12);
+extern void *moby_get_vars_word_18(char *a0);
+extern float moby_aim_at_target(char *a0, void *a1, char *a2, int a3);
 
 /* Pick a target from the shape, or answer whether its height still fits. */
-int func_L02_00332668(char *arg0, char *arg1) {
+int moby_check_move_target_reachable(char *arg0, char *arg1) {
     void *rec;
     float h;
 
     if (D_L02_001A8FF0 == 0)
-        return StartMobyEffectFromEntry(arg0, FastMatrixHelperA(*(float *)(arg1), *(float *)(arg1 + 4)));
+        return moby_start_effect_from_entry(arg0, mat_fast_helper_a(*(float *)(arg1), *(float *)(arg1 + 4)));
 
-    rec = GetObjectVarsWord18(arg0);
+    rec = moby_get_vars_word_18(arg0);
     if (rec == 0)
         return 0;
-    h = AimMobyAtTarget(arg0, rec, arg1, 0);
+    h = moby_aim_at_target(arg0, rec, arg1, 0);
     if (*(float *)((char *)rec + 0x30) < h)
         return 0;
     return 1;
@@ -418,13 +418,13 @@ int func_L02_00332668(char *arg0, char *arg1) {
 
 
 
-extern void func_00282F20(float *out, const float *in, float s);
-extern void *func_L00_0032C638(char *a0);
-extern float func_L00_0031CDD0(char *a0, char *a1, int a2, float f12, float f13);
+extern void vec_scale_to_length(float *out, const float *in, float s);
+extern void *moby_get_vars_word_18(char *a0);
+extern float weapon_compute_shot_launch_speed(char *a0, char *a1, int a2, float f12, float f13);
 
 /* Aim the record at the shape the caller found. */
-int func_L02_003329C8(char *a0, char *a1, float f12, float f13) {
-    char *rec = GetObjectVarsWord18(a0);
+int moby_aim_move_record_at_target(char *a0, char *a1, float f12, float f13) {
+    char *rec = moby_get_vars_word_18(a0);
 
     if (rec == 0)
         return 0;
@@ -432,7 +432,7 @@ int func_L02_003329C8(char *a0, char *a1, float f12, float f13) {
     FastVecSub((float *)(rec + 0xA0), (const float *)a1, (const float *)(a0 + 0x10));
     *(int *)(rec + 0xA8) = 0;
     vec_scale_to_length((float *)(rec + 0xA0), (const float *)(rec + 0xA0), f12);
-    *(float *)(rec + 0xA8) = ComputeShotLaunchSpeed(a0 + 0x10, a1, 0, f12, -f13);
+    *(float *)(rec + 0xA8) = weapon_compute_shot_launch_speed(a0 + 0x10, a1, 0, f12, -f13);
     return 1;
 }
 
@@ -440,34 +440,34 @@ int func_L02_003329C8(char *a0, char *a1, float f12, float f13) {
 #include "common.h"
 
 typedef union { TI128 q; float f[4]; } MotionVector;
-extern float func_L02_00329C48(char *, TI128 *, char *);
+extern float moby_measure_step_angle(char *, TI128 *, char *);
 
-extern float func_00282E48(void *, void *);
-extern float func_00282C10(float);
-extern void func_L02_003294D8(char *, float *, float);
-extern void func_002AFEB8(char *, char *, char *, float, char *);
-extern float func_00282DB0(void *, void *);
-extern void func_002AC9F8(float *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002AFF08(char *, char *, char *);
-extern float func_002B0360(char *);
+extern float fast_vec_dist(void *, void *);
+extern float square_root(float);
+extern void moby_build_forward_vector(char *, float *, float);
+extern void vec_transform_and_set_height(char *, char *, char *, float, char *);
+extern float FastVecDot(void *, void *);
+extern void vec_clamp_length(float *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float vec_get_horizontal_offset_length(char *, char *, char *);
+extern float gravity_get_center_distance(char *);
 /* This wrapper forwards its live a1/a2/f12 into func_002B00D8. */
-extern void func_L00_003253A0(u8 *, float *, float *, float);
-extern float func_002AFF38(char *, char *, char *);
-extern void func_002AAC80(float *, float, float, float, float);
+extern void moby_mix_on_inner_data(u8 *, float *, float *, float);
+extern float vec_get_vertical_offset(char *, char *, char *);
+extern void math_approach_target_with_braking(float *, float, float, float, float);
 
 /* Moves the object toward its target, speeding up and slowing down smoothly, and keeps it at the right height. */
-void func_L02_00332A80(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
+void moby_l02_steer_toward_target(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;
     float heading, distance, speed, height, drop;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
-        AimMobyAtTarget(object, data, (char *)input, (int)transform);
+        moby_aim_at_target(object, data, (char *)input, (int)transform);
     heading = 0.0f;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
-        heading = MeasureStepAngle(object, input, transform);
+        heading = moby_measure_step_angle(object, input, transform);
     if (*(float *)(data + 0x30) < heading) {
-        ClearVector128(&desired.q);
+        vec_clear_128(&desired.q);
     } else {
         float gap;
         distance = fast_vec_dist(object + 0x10, target);
@@ -480,32 +480,32 @@ void func_L02_00332A80(char *object, char *data, void *target, TI128 *input, voi
             speed = square_root((gap + gap) * *(float *)(data + 0x24));
             if (*(float *)(data + 0x28) < speed)
                 speed = *(float *)(data + 0x28);
-            BuildForwardVector(object, desired.f, speed);
+            moby_build_forward_vector(object, desired.f, speed);
         }
     }
     FastVecSub(change.f, desired.f, (float *)(data + 0xA0));
-    TransformAndSetHeight(object, (char *)&change, (char *)&change, 0.0f, transform);
+    vec_transform_and_set_height(object, (char *)&change, (char *)&change, 0.0f, transform);
     if (FastVecDot(&desired, data + 0xA0) > 0.0f)
-        ClampVectorLength(change.f, *(float *)(data + 0x20));
+        vec_clamp_length(change.f, *(float *)(data + 0x20));
     else
-        ClampVectorLength(change.f, *(float *)(data + 0x24));
+        vec_clamp_length(change.f, *(float *)(data + 0x24));
     FastVecAdd(data + 0xA0, data + 0xA0, &change);
-    *(float *)(data + 0xB0) = GetHorizontalOffsetLength(object, data + 0xA0, transform);
+    *(float *)(data + 0xB0) = vec_get_horizontal_offset_length(object, data + 0xA0, transform);
     if (!(*(unsigned int *)(data + 0x38) & 4)) {
-        height = GetDistanceFromGravityCenter(object + 0x10);
+        height = gravity_get_center_distance(object + 0x10);
         if (*(float *)(data + 0x90) < height) {
-            MixOnInnerData((u8 *)object, (float *)(data + 0xA0), (float *)(data + 0xA0), *(float *)(data + 0x2C));
+            moby_mix_on_inner_data((u8 *)object, (float *)(data + 0xA0), (float *)(data + 0xA0), *(float *)(data + 0x2C));
             if (*(short *)(data + 0xC0) == 0)
                 *(unsigned int *)(data + 0x94) |= 0x20;
         } else {
-            vertical = GetVerticalOffset(object, data + 0xA0, transform);
+            vertical = vec_get_vertical_offset(object, data + 0xA0, transform);
             drop = vertical;
             if (*(float *)(data + 0x90) - height < drop)
                 vertical = *(float *)(data + 0x90) - height;
             else if (vertical < 0.0f)
                 vertical = 0.0f;
-            ApproachTargetWithBraking(&vertical, *(float *)(data + 0x90) - height, 0.011111111380159855f, 0.011111111380159855f, 1.0f);
-            TransformAndSetHeight(object, data + 0xA0, data + 0xA0, vertical, transform);
+            math_approach_target_with_braking(&vertical, *(float *)(data + 0x90) - height, 0.011111111380159855f, 0.011111111380159855f, 1.0f);
+            vec_transform_and_set_height(object, data + 0xA0, data + 0xA0, vertical, transform);
         }
     }
 }
@@ -514,29 +514,29 @@ void func_L02_00332A80(char *object, char *data, void *target, TI128 *input, voi
 
 /* func_L02_00333218 is defined in L02_00333218.c. */
 
-extern void func_002AFFD8(char *a0, char *a1, int a2);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
-extern int func_002761F8(char *a0, char *a1, int mode, char *self, int flag);
-extern float func_002B0360(char *p);
+extern void cam_compute_view_direction(char *a0, char *a1, int a2);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
+extern int CollLine(char *a0, char *a1, int mode, char *self, int flag);
+extern float gravity_get_center_distance(char *p);
 extern char D_L02_001C0960;
 
 /* Scale the shape's two axes, compare them with the record and copy the
    result into the second argument. */
-void func_L02_00333300(char *a0, char *a1) {
+void coll_probe_ground_ahead(char *a0, char *a1) {
     float buf0[4];
     float buf1[4];
     float buf2[4];
     char *obj;
     char *sub;
 
-    ComputeViewDirection(a0 + 0x10, (char *)buf0, 1);
+    cam_compute_view_direction(a0 + 0x10, (char *)buf0, 1);
     vec_scale_to_length(buf1, buf0, *(float *)(a1 + 8) + 0.1f);
     vec_scale_to_length(buf2, buf0, -*(float *)(a1 + 0xC) - 0.1f);
     FastVecAdd((char *)buf1, (char *)buf1, a0 + 0x10);
     FastVecAdd((char *)buf2, (char *)buf2, a0 + 0x10);
     if (CollLine((char *)buf1, (char *)buf2, 0, a0, 0)) {
         obj = &D_L02_001C0960;
-        *(float *)(a1 + 0x90) = GetDistanceFromGravityCenter(obj);
+        *(float *)(a1 + 0x90) = gravity_get_center_distance(obj);
         sub = obj - 0x20;
         *(int *)(a1 + 0x88) = *(int *)(sub + 0x18);
         *(int *)(a1 + 0x8C) = *(int *)(sub + 0x1C);
@@ -545,33 +545,33 @@ void func_L02_00333300(char *a0, char *a1) {
         *(int *)(a1 + 0x90) = 0;
         *(int *)(a1 + 0x88) = 0;
         *(int *)(a1 + 0x8C) = 0;
-        ClearVector128(a1 + 0x50);
+        vec_clear_128(a1 + 0x50);
     }
 }
 
-extern void func_L02_00333480(char *arg0, char *arg1, void *arg2);
+extern void coll_update_controller(char *arg0, char *arg1, void *arg2);
 
 /* Works out the offset from the object to a point and aims at it. */
-void func_L02_00333438(char *object, char *target) {
+void moby_aim_at_target_offset(char *object, char *target) {
     int offset[4];
 
     FastVecSub((float *)offset, (const float *)target, (const float *)(object + 0x10));
-    UpdateObjectController(object, target, offset);
+    coll_update_controller(object, target, offset);
 }
 
 /* func_L02_00333480 is matched in its own unit, L02_00333480.c. */
 
-extern void *func_002B9030(int kind);
-extern int func_00283CF0(float f);
-extern float func_002A7878(float a, float b);
-extern float func_00283CE0(int n);
-extern int func_L00_0031C998(int a0, int a1, float f12);
-extern void func_00282D30(void *a0, void *a1, float f12);
+extern void *part_alloc(int kind);
+extern int FloatToInt(float f);
+extern float math_random_float_range(float a, float b);
+extern float IntToFloat(int n);
+extern int math_lerp_int_fraction(int a0, int a1, float f12);
+extern void FastVecScale(void *a0, void *a1, float f12);
 extern unsigned char *D_L02_002001D8;
 extern int func_001163B0(void);
 
 /* Build one enemy record: pick its kind, place it, and aim it. */
-void *func_L02_003449D8(void *origin, void *direction, void *config, void *flag, int extra) {
+void *enemy_spawn_record(void *origin, void *direction, void *config, void *flag, int extra) {
     float offset[4];
     unsigned char *rec;
     unsigned char *aim;
@@ -581,20 +581,20 @@ void *func_L02_003449D8(void *origin, void *direction, void *config, void *flag,
     float roll;
     float fraction;
 
-    rec = (unsigned char *)AllocParticle(0x56);
+    rec = (unsigned char *)part_alloc(0x56);
     if (rec != 0) {
         rec[9] = (unsigned char)(FloatToInt(0.04f) - 0x60);
         rec[3] = (flag != 0) ? 0x48 : 0x44;
         rec[1] = 0;
         rec[2] = *D_L02_002001D8;
-        rec[8] = (unsigned char)Rand();
-        roll = RandomFloatRange(0.0f, 1.0f);
+        rec[8] = (unsigned char)func_001163B0();
+        roll = math_random_float_range(0.0f, 1.0f);
 
         range = *(short **)((char *)config + 8);
         fraction = roll / IntToFloat(range[1] - range[0]);
 
         pair = *(int **)((char *)config + 0);
-        *(int *)(rec + 4) = LerpIntegerFraction(pair[0], pair[1], fraction);
+        *(int *)(rec + 4) = math_lerp_int_fraction(pair[0], pair[1], fraction);
 
         values = *(short **)((char *)config + 4);
         *(float *)(rec + 0xC) = ((float)values[0] + fraction * (float)(values[1] - values[0])) * 1000.0f;
@@ -630,30 +630,30 @@ typedef struct {
     int f2294;
 } View_00189E20;
 
-extern View_00189E20 D_00189E20;
+extern View_00189E20 g_hero_state;
 /* sda: the bare load `lui $v1 ; lw $v1,%lo($v1)` retail has twice; a plain extern keeps the %hi
    in a saved register across the calls. */
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_L02_001CAA80;
-extern char D_L02_001BA500[];
+extern char g_camera_l02_position[];
 extern int D_L02_001B35B8 __attribute__((sda));
-extern int func_L00_00329520(void *a0, int a1);
-extern void func_002A7750(void *a0, int a1, int a2);
-extern void func_L02_0038BD00(unsigned char *a0, int a1);
-extern void func_L00_002E6CF0(void *a0, void *a1);
-extern void func_L02_0038C998(unsigned char *a0);
-extern void func_L02_0038DA00(void *arg0);
+extern int coll_point_inside_region(void *a0, int a1);
+extern void moby_set_state(void *a0, int a1, int a2);
+extern void InitRailGroupMembers(unsigned char *a0, int a1);
+extern void gfx_add_draw_callback_first(void *a0, void *a1);
+extern void target_update_moving_on_path(unsigned char *a0);
+extern void lamp_draw_all_glows(void *arg0);
 
 /* State machine of the controller object that owns a group id list. On level 13 it retires
    itself (+0x30 = 0xFF, bits 0 and 6 of +0x34 set, bit 12 cleared) once the resident float is
    past 89 or the resident word is 0x74. State 0 runs func_L02_0038BD00; state 1 switches the
    whole group off (+0x31 cleared, bit 0 of +0x34 set) when the record test passes, then runs
    func_L02_0038C998 and queues func_L02_0038DA00; state 2 switches the group back on. */
-void func_L02_0038BA28(unsigned char *controller) {
+void lamp_controller_update(unsigned char *controller) {
     unsigned char *vars = *(unsigned char **)(controller + 0x68);
 
-    if (gCurrentMapIndex == 13) {
-        if (89.0f < gHeroState.f88 || gHeroState.f2294 == 0x74) {
+    if (g_current_map_index == 13) {
+        if (89.0f < g_hero_state.f88 || g_hero_state.f2294 == 0x74) {
             controller[0x30] = 0xFF;
             *(unsigned short *)(controller + 0x34) = (*(unsigned short *)(controller + 0x34) | 0x41) & 0xEFFF;
             *(int *)(controller + 0x98) = 0;
@@ -672,42 +672,42 @@ void func_L02_0038BA28(unsigned char *controller) {
         break;
     case 1:
         /* each walk has its own idPtr and entity: retail gives the two walks different registers */
-        if (*(int *)(vars + 0xC) != -1 && IsPointInsideRegion(gCameraPosition_L02, *(int *)(vars + 0xC)) != 0) {
+        if (*(int *)(vars + 0xC) != -1 && coll_point_inside_region(g_camera_l02_position, *(int *)(vars + 0xC)) != 0) {
             unsigned short *idPtr;
             unsigned char *entity;
 
-            idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+            idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
             while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-                entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+                entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
                 if (entity == 0)
                     break;
                 entity[0x31] = 0;
                 *(unsigned short *)(entity + 0x34) |= 1;
                 idPtr++;
             }
-            SetMobyState(controller, 2, -1);
+            moby_set_state(controller, 2, -1);
         }
-        UpdateMovingTargetsOnPath(controller);
-        if (gCurrentMapIndex != 13 || !(89.0f < gHeroState.f88))
-            AddDrawCallbackToList1(DrawAllLampGlows, controller);
+        target_update_moving_on_path(controller);
+        if (g_current_map_index != 13 || !(89.0f < g_hero_state.f88))
+            gfx_add_draw_callback_first(lamp_draw_all_glows, controller);
         break;
     case 2:
-        if (IsPointInsideRegion(gCameraPosition_L02, *(int *)(vars + 0xC)) == 0) {
+        if (coll_point_inside_region(g_camera_l02_position, *(int *)(vars + 0xC)) == 0) {
             unsigned short *idPtr;
             unsigned char *entity;
 
-            idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+            idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
             while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-                entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+                entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
                 if (entity == 0)
                     break;
                 entity[0x31] = 1;
                 *(unsigned short *)(entity + 0x34) &= 0xFFFE;
                 idPtr++;
             }
-            SetMobyState(controller, 1, -1);
+            moby_set_state(controller, 1, -1);
         }
         break;
     }
@@ -719,11 +719,11 @@ void func_L02_0038BA28(unsigned char *controller) {
 
 /* func_L02_0038CDE8 is defined in L02_002B5F50-lamps.c. */
 
-extern int func_00282978(void *p);
-extern int func_00283D38(int a0, int a1, float f12);
+extern int FastDecTimer(void *p);
+extern int FastTweenColor(int a0, int a1, float f12);
 
 /* Toggle the lamp and hand the new state to the colour routine. */
-void func_L02_0038D978(char *moby) {
+void blinking_lamp_update(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(short *)(moby + 0xAA) != 0x9B0 /* moby class 2480 */)
@@ -737,38 +737,38 @@ void func_L02_0038D978(char *moby) {
 }
 
 
-extern void func_L02_0038DA60(unsigned char *arg0);
-extern void func_L02_0038DC68(unsigned char *arg0);
-extern void func_L02_0038DE58(unsigned char *arg0);
-extern void func_L02_0038E048(unsigned char *arg0);
-extern void func_L02_0038E250(unsigned char *arg0);
-extern void func_L02_0038E430(unsigned char *arg0);
-extern void func_L02_0038E610(unsigned char *arg0);
-extern void func_L02_0038E838(unsigned char *arg0);
+extern void lamp_draw_group_glows_a(unsigned char *arg0);
+extern void scenery_ship_draw_group_glows(unsigned char *arg0);
+extern void lamp_draw_group_glows_b(unsigned char *arg0);
+extern void lamp_draw_group_glows_c(unsigned char *arg0);
+extern void part_draw_group_glows_a(unsigned char *arg0);
+extern void part_draw_group_glows_b(unsigned char *arg0);
+extern void part_draw_group_glows_double(unsigned char *arg0);
+extern void part_draw_group_glows_c(unsigned char *arg0);
 
 /* Draws the glow effects of every kind of lamp in the controller's group. */
-void func_L02_0038DA00(void *controller) {
-    DrawGroupGlowsClass2480(controller);
-    DrawGroupGlowsSceneryShip(controller);
-    DrawGroupGlowsClass2837(controller);
-    DrawGroupGlowsClass4939(controller);
-    DrawGroupGlowsClass4733(controller);
-    DrawGroupGlowsClass4747(controller);
-    DrawGroupGlowsClass4752(controller);
-    DrawGroupGlowsClass4928(controller);
+void lamp_draw_all_glows(void *controller) {
+    lamp_draw_group_glows_a(controller);
+    scenery_ship_draw_group_glows(controller);
+    lamp_draw_group_glows_b(controller);
+    lamp_draw_group_glows_c(controller);
+    part_draw_group_glows_a(controller);
+    part_draw_group_glows_b(controller);
+    part_draw_group_glows_double(controller);
+    part_draw_group_glows_c(controller);
 }
 
-extern void func_00282D60(void *buf, void *value, float scale);
-extern int func_00283DB8(void *buf, float value);
-extern void func_L00_002ECFE8(void *a0, void *a1, int a2, unsigned int a3,
+extern void scale_vector(void *buf, void *value, float scale);
+extern int math_fast_helper_a(void *buf, float value);
+extern void DrawOrientedQuadsAtPoints(void *a0, void *a1, int a2, unsigned int a3,
                               float f12, float f13, float f14, int t0, int t1);
 extern char *D_L02_001FBFC0[];
-extern int func_L02_002F1658(void);
+extern int level_is_resident_flag_clear(void);
 
 /* Walks the object's group id list: every entity of kind 0x9B0 in state 1 that passes the
    visibility test gets its phase at +0x1C advanced (while the flag word is clear) and one effect
    call. */
-void func_L02_0038DA60(unsigned char *controller) {
+void lamp_draw_group_glows_a(unsigned char *controller) {
     unsigned short *idPtr;
     unsigned char *entity;
     char *vars;
@@ -777,18 +777,18 @@ void func_L02_0038DA60(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    animate = IsResidentFlagClear();
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    animate = level_is_resident_flag_clear();
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x9B0 /* moby class 2480 */ &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
@@ -807,7 +807,7 @@ void func_L02_0038DA60(unsigned char *controller) {
 /* Walk the object's group list: every entity of kind 0x9B7 in state 1 that is in view gets one
    effect call. While the resident flag word is clear, its object's phase (+0x1C) first steps
    down by 0.1, and up by 8 once it reaches -8. */
-void func_L02_0038DC68(unsigned char *controller) {
+void scenery_ship_draw_group_glows(unsigned char *controller) {
     float bounds[4];
     unsigned short *idPtr;
     unsigned char *entity;
@@ -816,18 +816,18 @@ void func_L02_0038DC68(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    animate = IsResidentFlagClear();
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    animate = level_is_resident_flag_clear();
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x9B7 /* Scenery Ship */ &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
@@ -844,7 +844,7 @@ void func_L02_0038DC68(unsigned char *controller) {
 }
 
 /* The same walk as func_L02_0038DC68, for the entities of kind 0xB15. */
-void func_L02_0038DE58(unsigned char *controller) {
+void lamp_draw_group_glows_b(unsigned char *controller) {
     float bounds[4];
     unsigned short *idPtr;
     unsigned char *entity;
@@ -853,18 +853,18 @@ void func_L02_0038DE58(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    animate = IsResidentFlagClear();
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    animate = level_is_resident_flag_clear();
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0xB15 /* moby class 2837 */ &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
@@ -882,7 +882,7 @@ void func_L02_0038DE58(unsigned char *controller) {
 
 /* Like func_L02_0038DA60 for kind 0x134B: one effect call, with the scale 2.1000001f
    (0x40066667, one above 2.1f). */
-void func_L02_0038E048(unsigned char *controller) {
+void lamp_draw_group_glows_c(unsigned char *controller) {
     unsigned short *idPtr;
     unsigned char *entity;
     char *vars;
@@ -891,18 +891,18 @@ void func_L02_0038E048(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    animate = IsResidentFlagClear();
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    animate = level_is_resident_flag_clear();
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x134B /* moby class 4939 */ &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
@@ -921,7 +921,7 @@ void func_L02_0038E048(unsigned char *controller) {
 /* Walk the object's group list: every entity of kind 0x127D in state 1 that is in view has its
    object's phase (+0x1C) stepped down by 0.1 (and up by 8 once it reaches -8), and gets one
    effect call. */
-void func_L02_0038E250(unsigned char *controller) {
+void part_draw_group_glows_a(unsigned char *controller) {
     float bounds[4];
     unsigned short *idPtr;
     unsigned char *entity;
@@ -929,17 +929,17 @@ void func_L02_0038E250(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x127D /* moby class 4733 */ &&
                 entity[0x20] == 1) {
                 *(float *)(vars + 0x1C) -= 0.1f;
@@ -955,7 +955,7 @@ void func_L02_0038E250(unsigned char *controller) {
 
 /* The same walk as func_L02_0038E250, for the entities of kind 0x128B (the effect's second
    scale is 3 times the object's +0x78 instead of 4 times). */
-void func_L02_0038E430(unsigned char *controller) {
+void part_draw_group_glows_b(unsigned char *controller) {
     float bounds[4];
     unsigned short *idPtr;
     unsigned char *entity;
@@ -963,17 +963,17 @@ void func_L02_0038E430(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x128B /* moby class 4747 */ &&
                 entity[0x20] == 1) {
                 *(float *)(vars + 0x1C) -= 0.1f;
@@ -989,7 +989,7 @@ void func_L02_0038E430(unsigned char *controller) {
 
 /* Like func_L02_0038DA60 for kind 0x1290, without the flag word: the phase always advances
    and two effect calls follow, the second one at +0xC0 with both scales times 1.5. */
-void func_L02_0038E610(unsigned char *controller) {
+void part_draw_group_glows_double(unsigned char *controller) {
     unsigned short *idPtr;
     unsigned char *entity;
     char *vars;
@@ -999,17 +999,17 @@ void func_L02_0038E610(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x1290 /* moby class 4752 */ &&
                 entity[0x20] == 1) {
                 *(float *)(vars + 0x1C) -= 0.1f;
@@ -1028,7 +1028,7 @@ void func_L02_0038E610(unsigned char *controller) {
 
 /* Like func_L02_0038DA60 for kind 0x1340: one effect call whose first scale is the +0x78
    field itself and the second is seven times it. */
-void func_L02_0038E838(unsigned char *controller) {
+void part_draw_group_glows_c(unsigned char *controller) {
     unsigned short *idPtr;
     unsigned char *entity;
     char *vars;
@@ -1037,18 +1037,18 @@ void func_L02_0038E838(unsigned char *controller) {
 
     if (controller[0x21] == 0xFF)
         return;
-    animate = IsResidentFlagClear();
-    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    animate = level_is_resident_flag_clear();
+    idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
     while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
-           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
-        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
+        entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             break;
         vars = *(char **)(entity + 0x68);
         if (entity[0x31] != 0) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
-            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+            if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
                 (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x1340 /* moby class 4928 */ &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
@@ -1065,23 +1065,23 @@ void func_L02_0038E838(unsigned char *controller) {
 }
 
 /* Raise the byte field to eight when it is below. */
-void func_L02_00392C70(unsigned char *moby) {
+void moby_raise_state_to_eight(unsigned char *moby) {
     if (moby[0x20] < 8) {
         moby[0x20] = 8;
     }
 }
 
 /* Raise the byte field to eight when it is below. */
-void func_L02_003948D0(unsigned char *moby) {
+void moby_raise_state_to_eight_copy(unsigned char *moby) {
     if (moby[0x20] < 8) {
         moby[0x20] = 8;
     }
 }
 
-extern void func_L02_003AA650(char *arg0);
+extern void moby_release_slots_retire(char *arg0);
 
 /* Puts the object into its final state and lets go of the child object it holds. */
-void func_L02_003A6F78(char *moby) {
+void moby_finish_release_child(char *moby) {
     unsigned char *vars;
     unsigned char *child;
 
@@ -1094,7 +1094,7 @@ void func_L02_003A6F78(char *moby) {
     child = *(unsigned char **)(vars + 0xFC);
     if (child != 0) {
         if (*(short *)(child + 0xAA) == 0x326 /* moby class 806 */) {
-            ReleaseSlotsAndRetireObject(child);
+            moby_release_slots_retire(child);
             *(unsigned char **)(vars + 0xFC) = 0;
         } else {
             *(unsigned char **)(vars + 0xFC) = 0;
@@ -1104,10 +1104,10 @@ void func_L02_003A6F78(char *moby) {
 
 /* Raises the object's flag word, copies a context field in and dispatches on the
    two-byte kind code. */
-extern int func_00312E20(void *, int);
+extern int moby_spawn_linked_child(void *, int);
 
 /* Sets up a crate object and attaches the child object for its class. */
-void func_L02_003A6FE8(char *moby) {
+void nanotech_crate_init(char *moby) {
     char *vars;
     short classId;
 
@@ -1118,28 +1118,28 @@ void func_L02_003A6FE8(char *moby) {
     *(unsigned int *)(vars + 0x100) = 0;
     classId = *(short *)(moby + 0xAA);
     if (classId == 0x1F5 /* Nanotech Crate */) {
-        *(unsigned int *)(vars + 0xFC) = SpawnLinkedChildMoby(moby, 0);
+        *(unsigned int *)(vars + 0xFC) = moby_spawn_linked_child(moby, 0);
     } else if (classId == 0x200 /* Purple Nanotech Crate */) {
-        *(unsigned int *)(vars + 0xFC) = SpawnLinkedChildMoby(moby, 1);
+        *(unsigned int *)(vars + 0xFC) = moby_spawn_linked_child(moby, 1);
     }
     moby[0x7F] = 0;
 }
 
 /* func_L02_003A8770 is defined in L02_002B5F50-quad.c. */
 
-extern void func_002B9180(void *p);
-extern void func_0029F338(void *e);
+extern void part_kill(void *p);
+extern void moby_mark_spawned(void *e);
 extern void *D_L02_001B31EC __attribute__((sda));
 
 /* Release the eight slots behind the entity, then retire it. */
-void func_L02_003AA650(char *moby) {
+void moby_release_slots_retire(char *moby) {
     void **slot;
     int i;
 
     slot = (void **)(*(char **)(moby + 0x68) + 0x30);
     for (i = 7; i >= 0; i--) {
         if (slot[0] != 0) {
-            KillParticle(slot[0]);
+            part_kill(slot[0]);
             slot[0] = 0;
         }
         slot++;
@@ -1147,7 +1147,7 @@ void func_L02_003AA650(char *moby) {
     if (D_L02_001B31EC == moby)
         moby[0x20] = 4;
     else
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
 }
 
 

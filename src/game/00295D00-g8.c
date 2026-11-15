@@ -4,11 +4,11 @@
 /* The map screen's pan/zoom update. Its unit is -G8 -g: the two screen-size words
    are $gp reads and the divisions carry the statement-boundary padding. */
 
-extern int func_00295C70(void);
-extern int func_002E5E58(int, unsigned int, void *);
-extern int D_001C4FA0[];
-extern void func_00298170(void);
-extern char D_00138180[];
+extern int map_refresh_ready_flag(void);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern int g_map_overlay_state[];
+extern void map_empty_stub(void);
+extern char g_pad_state[];
 extern int D_001A95C0 __attribute__((sda));
 extern int D_001A95C4 __attribute__((sda));
 
@@ -17,7 +17,7 @@ extern int D_001A95C4 __attribute__((sda));
    (+0x234 < 0). Otherwise scales the slot's zoom (+0xB4) by 1 - speed * 0.02,
    clamps it to [0.65, 4], pans x/y (+0x108 / +0x15C) by the pad velocities times
    3000000 / zoom and clamps them to [lo, 0x10000000 - lo]. */
-int func_00295D00(void)
+int map_update_overlay_pan_zoom(void)
 {
     char *padState;
     char *mapState;
@@ -25,14 +25,14 @@ int func_00295D00(void)
     int *panX;
     int *panY;
 
-    EmptyMapStub();
-    RefreshMapReadyFlag();
-    padState = gPadState;
+    map_empty_stub();
+    map_refresh_ready_flag();
+    padState = g_pad_state;
     if (*(int *)(padState + 0x1C4) & 0x510) {
-        PlaySoundFromGlobalBank(0x13, 0, 0);
+        snd_play_from_global_bank(0x13, 0, 0);
         return 1;
     }
-    mapState = (char *)gMapOverlayState;
+    mapState = (char *)g_map_overlay_state;
     if (*(int *)(mapState + 0x24) == 0)
         return 0;
     if (*(int *)(mapState + 0x234) < 0)

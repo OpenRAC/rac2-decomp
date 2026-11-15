@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct {
@@ -26,12 +27,12 @@ typedef struct {
         float unk1C;
     } motion;
 } Particle_002C2A88;
-extern Particle_002C2A88 *func_002B9030(int);
-extern int func_00283CF0(float);
+extern Particle_002C2A88 *part_alloc(int);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
 extern unsigned char *D_001F2628;
 
 /* Spawns a debris particle at position: modes 0 and 1 sit still for life frames,
@@ -40,7 +41,7 @@ Particle_002C2A88 *func_PAL_002C3798(TI128 *position, unsigned char mode, unsign
                                  unsigned char arg3, unsigned char arg4, unsigned char life1, int arg6,
                                  float arg7, float speed)
 {
-    Particle_002C2A88 *p = func_002B9030(0x3A);
+    Particle_002C2A88 *p = part_alloc(0x3A);
     typeof(p->motion) *m;
     float v;
     float a;
@@ -48,7 +49,7 @@ Particle_002C2A88 *func_PAL_002C3798(TI128 *position, unsigned char mode, unsign
     if (p != 0) {
         p->position = *position;
         m = &p->motion;
-        p->unk09 = func_00283CF0(0.0f) + 0x70;
+        p->unk09 = FloatToInt(0.0f) + 0x70;
         p->unk01 = 0;
         p->unk03 = 0x44;
         p->unk02 = D_001F2628[func_001163B0() & 7];
@@ -69,9 +70,9 @@ Particle_002C2A88 *func_PAL_002C3798(TI128 *position, unsigned char mode, unsign
             m->unk14 = 0;
             break;
         case 2:
-            v = func_002A7878(3.0f, 9.0f) * speed * 0.020000001f;
-            a = func_002A7940();
-            func_002AF000(m, v, a, func_002A7878(1.343903660774231f, 1.7976893186569214f));
+            v = math_random_float_range(3.0f, 9.0f) * speed * 0.020000001f;
+            a = math_random_angle();
+            vec_build_spherical_offset(m, v, a, math_random_float_range(1.343903660774231f, 1.7976893186569214f));
             p->size = 42000.0f;
             m->alpha = (func_001163B0() & 0x1F) + 0x10;
             p->colour = (m->alpha << 24) | 0x808080;

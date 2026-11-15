@@ -13,11 +13,11 @@ union PacketCursor {
     u8 *bytes;
 };
 extern union PacketCursor D_L04_001B2C48 MACRO_ADDR;
-extern void func_002833B8(void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002FC410(void *, int);
-extern void func_00283788(void *, void *, void *);
-extern void func_002FC870(void);
+extern void set_scale_matrix(void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void VU1_addDataRef(void *, int);
+extern void multiply_matrix(void *, void *, void *);
+extern void gfx_append_fixed_dma_block_tags(void);
 extern char D_L04_001B9680[];
 extern int D_L04_001B201C MACRO_ADDR;
 extern unsigned short D_0010ED20 NOT_SDA;
@@ -41,7 +41,7 @@ typedef struct WaterCamera {
 } WaterCamera;
 
 /* Builds the VU1 setup packet used to render the water. */
-void func_L04_003A0FC8(void)
+void BuildWaterRenderSetupPacket(void)
 {
     f32 scaled_translation_matrix[4][4];
     struct DmaTag *base;
@@ -86,7 +86,7 @@ void func_L04_003A0FC8(void)
     packet_write_cursor = (u8 *)(base + 15);
     D_L04_001B2C48.tag->tag |= ((packet_write_cursor - (u8 *)D_L04_001B2C48.tag) >> 4) - 1;
     D_L04_001B2C48.bytes = packet_write_cursor;
-    AppendFixedDmaBlockTags();
+    gfx_append_fixed_dma_block_tags();
     D_L04_001B2C48.tag->tag = 0x30000007;
     D_L04_001B2C48.tag->addr = (u32)D_L04_002A78A0;
     D_L04_001B2C48.tag->vif0 = 0;

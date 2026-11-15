@@ -46,43 +46,43 @@ typedef struct {
     unsigned char pad94[0x4C];
 } ClassRecord;
 
-extern ClassRecord D_00239BA0[];
+extern ClassRecord g_weapon_table[];
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 
-extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char g_item_owned_flags[] __attribute__((sda));
 
 extern unsigned char D_001A7B30[] __attribute__((sda));
 
-extern int D_00139688[];
+extern int g_item_ammo_counts[];
 
 extern int D_001398A8;
 
-extern int func_00287FF8(int, int);
+extern int menu_seek_chain_entry(int, int);
 
-extern int func_00288D58(void);
+extern int flag_is_byte_set(void);
 
-extern void func_002883E8(int);
+extern void help_store_id_in_slot_list(int);
 
-extern void func_00288208(int);
+extern void help_queue_pending_id(int);
 
 /* Marks a help id as unlocked and makes its record ready to be shown. */
-void func_00288308(int helpId)
+void help_unlock_entry(int helpId)
 {
     ClassRecord *record;
 
-    if (gItemOwnedFlags[helpId] != 0)
+    if (g_item_owned_flags[helpId] != 0)
         return;
-    gItemOwnedFlags[helpId] = 1;
+    g_item_owned_flags[helpId] = 1;
     D_001A7B30[helpId] = 1;
-    record = &gWeaponTable_00239BA0[gItemSlotToRecord[helpId]];
-    if (record->half88 != 0 && gItemAmmoCounts[helpId] == 0)
-        gItemAmmoCounts[helpId] = record->half92;
-    StoreHelpIdInSlotList(helpId);
-    QueuePendingHelpId(helpId);
+    record = &g_weapon_table[g_item_slot_to_record[helpId]];
+    if (record->half88 != 0 && g_item_ammo_counts[helpId] == 0)
+        g_item_ammo_counts[helpId] = record->half92;
+    help_store_id_in_slot_list(helpId);
+    help_queue_pending_id(helpId);
     if (helpId == 0x10) {
-        if (IsFlagByteSet() != 0) {
-            SeekChainEntry(0x10, 2);
+        if (flag_is_byte_set() != 0) {
+            menu_seek_chain_entry(0x10, 2);
             D_001398A8 = 0;
         }
     }

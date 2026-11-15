@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_001A8BB0;
-extern int D_001B1870 __attribute__((section(".sdata")));
-extern char D_00255330[];
-extern void func_0028B4D8(char *);
+extern int g_current_game_mode;
+extern int g_hud_state __attribute__((section(".sdata")));
+extern char g_hud_elements[];
+extern void hud_finish_element_setup(char *);
 
 /* The subtitle counters are small data reached through $gp in retail, so this unit is -G8. */
 extern int D_L00_001A9070[2] __attribute__((sda));
@@ -26,44 +26,44 @@ typedef struct {
 
 typedef struct { int unk00; int unk04; int id; int unk0C; } TextEntry;
 
-extern SubtitleState D_00254E78;
-extern TextEntry *D_001B1840;
+extern SubtitleState g_subtitle_state;
+extern TextEntry *g_subtitle_entries;
 extern unsigned short D_001A7B94;
-extern int D_001A7344;
-extern int D_001A7B90;
+extern int g_screen_height;
+extern int g_is_pal_video;
 extern void func_2E5E58(int, int, int);
 extern void func_2802E0(unsigned short *, int, int, int, int, int, int, int, int);
 extern void func_280200(unsigned short *, long long, int, int);
 extern int func_1157AC(int);
 
 /* Seeds the subtitle renderer's state from the current text entry and its font metrics. */
-void func_00289020(void)
+void subtitle_init_state(void)
 {
     unsigned short metrics[12];
     int textId;
     int screenHeight;
 
-    gSubtitleState.active = 1;
-    gSubtitleState.timer = 0;
+    g_subtitle_state.active = 1;
+    g_subtitle_state.timer = 0;
     if (D_001A7B94 != 0)
         func_2E5E58(0, 1, 0);
-    textId = gSubtitleEntries[gSubtitleState.entryIndex].unk00;
+    textId = g_subtitle_entries[g_subtitle_state.entryIndex].unk00;
     func_2802E0(metrics, 0xF0, 0x1E0, 0x2C, 0x1D4, 0x100, 0x168, 0x10, 7);
     func_280200(metrics, 0x80FFA888LL, textId, -1);
-    gSubtitleState.halfWidth = ((short)metrics[6] >> 1) + 10;
-    gSubtitleState.halfHeight = ((short)metrics[7] >> 1) + 5;
-    gSubtitleState.x = 0x100;
-    gSubtitleState.y = D_L00_001A9070[gIsPalVideo];
-    gSubtitleState.boxHalfWidth = 8;
-    gSubtitleState.boxHalfHeight = 8;
-    gSubtitleState.unk48 = 0;
+    g_subtitle_state.halfWidth = ((short)metrics[6] >> 1) + 10;
+    g_subtitle_state.halfHeight = ((short)metrics[7] >> 1) + 5;
+    g_subtitle_state.x = 0x100;
+    g_subtitle_state.y = D_L00_001A9070[g_is_pal_video];
+    g_subtitle_state.boxHalfWidth = 8;
+    g_subtitle_state.boxHalfHeight = 8;
+    g_subtitle_state.unk48 = 0;
     if (textId != 0)
-        gSubtitleState.unk48 = func_1157AC(textId) * 7;
-    screenHeight = gScreenHeight;
-    gSubtitleState.y = screenHeight - 0x3C;
-    if (screenHeight - 0xC < gSubtitleState.y + gSubtitleState.halfHeight) {
-        int boxBottom = gSubtitleState.halfHeight + 0xC;
-        gSubtitleState.y = screenHeight - boxBottom;
+        g_subtitle_state.unk48 = func_1157AC(textId) * 7;
+    screenHeight = g_screen_height;
+    g_subtitle_state.y = screenHeight - 0x3C;
+    if (screenHeight - 0xC < g_subtitle_state.y + g_subtitle_state.halfHeight) {
+        int boxBottom = g_subtitle_state.halfHeight + 0xC;
+        g_subtitle_state.y = screenHeight - boxBottom;
     }
 }
 
@@ -79,7 +79,7 @@ extern int D_001B18E0;
 extern int D_001B18E4;
 
 /* Switches between two saved sets of buffer pointers when the requested index differs from the current one. */
-void func_0028B338(int requested)
+void select_moby_context(int requested)
 {
     int state = D_001A8D44;
     if (requested != state) {
@@ -108,19 +108,19 @@ void func_0028B338(int requested)
 }
 
 /* Sets up a HUD slot with a new item and its parameters. Returns the slot serial number, unchanged if nothing differs. */
-int func_0028B3D0(int slot, int id, int callback, int value1, int value2, int value3, int value4)
+int hud_set_slot_contents(int slot, int id, int callback, int value1, int value2, int value3, int value4)
 {
     int index = slot & 15;
-    char *slotData = gHudElements + index * 0x90;
+    char *slotData = g_hud_elements + index * 0x90;
     int flags = slot & 0xfff0;
     int refresh;
     int serial;
-    if (gCurrentGameMode == 5 && index != 2 && index != 0) return 0;
+    if (g_current_game_mode == 5 && index != 2 && index != 0) return 0;
     if (*(int *)(slotData + 0x2c) == value3 && *(int *)(slotData + 0x28) == value4 &&
         *(int *)(slotData + 0x20) == id && *(int *)(slotData + 0x24) == flags &&
         *(int *)(slotData + 0x30) == callback && *(int *)(slotData + 0x34) == value1 &&
         *(int *)(slotData + 0x38) == value2) return *(int *)(slotData + 0x64);
-    serial = gHudState;
+    serial = g_hud_state;
     *(int *)(slotData + 0x2c) = value3;
     refresh = flags & *(int *)(slotData + 4);
     *(int *)(slotData + 0x64) = serial;
@@ -131,11 +131,11 @@ int func_0028B3D0(int slot, int id, int callback, int value1, int value2, int va
     *(int *)(slotData + 0x30) = callback;
     *(int *)(slotData + 0x34) = value1;
     *(int *)(slotData + 0x38) = value2;
-    gHudState = serial;
+    g_hud_state = serial;
     *(int *)(slotData + 0x68) = 1;
     *(int *)(slotData + 0x24) = flags;
     *(int *)(slotData + 0x7c) = 0;
     *(int *)(slotData + 0x70) = 0;
-    if (refresh) FinishHudElementSetup(slotData);
+    if (refresh) hud_finish_element_setup(slotData);
     return *(int *)(slotData + 0x64);
 }

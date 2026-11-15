@@ -1,7 +1,8 @@
+#include "names.h"
 
 
 /* Copies one counter in a small state block into the one before it. */
-void func_0012FB70(void* state)
+void mpeg_restore_counter(void* state)
 {
   *(int*)(state + 8) = *(int*)(state + 12);
 }

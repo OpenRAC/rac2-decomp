@@ -2,33 +2,33 @@
 
 
 #include "common.h"
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern char D_00189EA0[];
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern char g_hero_position[];
 extern char D_L14_001A8F20[] __attribute__((sda));
 extern char *D_L14_001B259C_gp SDATA(D_L14_001B259C);
 extern char *D_L14_001B259C_direct __asm__("D_L14_001B259C") __attribute__((sda));
-extern int func_002A8508(int, int);
-extern float func_00282E80(void *, void *);
-extern int func_002B38B8(void *);
-extern int func_002ACBC8(void *, int);
+extern int moby_count_group_not_in_state(int, int);
+extern float vec_distance_xy(void *, void *);
+extern int flag_is_third_pending_set(void *);
+extern int IsPointInCuboid(void *, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int func_00277258(void *, float, int, void *);
+extern int coll_test_point(void *, float, int, void *);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
 extern u8 D_0019B2E8[];
-extern unsigned char *D_L14_001B259C __attribute__((sda));
+extern unsigned char *g_moby_l14_pool __attribute__((sda));
 extern u8 D_0019B2E8[];
-extern char D_00189EA0[];
-extern u8 D_00189E20[];
+extern char g_hero_position[];
+extern u8 g_hero_state[];
 extern u8 D_001395E1;
-extern int func_002ACBC8(void *, int);
-extern void func_0029F338(void *);
-extern float func_00283198(float);
-extern unsigned char *D_L14_001FB060[];
+extern int IsPointInCuboid(void *, int);
+extern void moby_mark_spawned(void *);
+extern float math_fast_sin_or_cos_b(float);
+extern unsigned char *g_group_entity_lists[];
 typedef struct {
     int linked[4];
     int f10;
@@ -81,10 +81,10 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
 
     if (self->mode == 0) {
         /* Mark the group's members busy. */
-        if (D_L14_001FB060[group = state->group] && func_002A8508(group, -1) >= 2) {
+        if (g_group_entity_lists[group = state->group] && moby_count_group_not_in_state(group, -1) >= 2) {
             unsigned short *list;
 
-            list = (unsigned short *)D_L14_001FB060[state->group];
+            list = (unsigned short *)g_group_entity_lists[state->group];
             base = D_L14_001B259C_direct;
             do {
                 entry = *list;
@@ -93,9 +93,9 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
             } while ((group = (short)*list++) >= 0);
         }
 
-        if (func_00282E80(&self->pos, D_00189EA0) < 6.0f && func_002B38B8(self) &&
-            !func_002ACBC8(D_00189EA0, state->f14) &&
-            !func_002ACBC8(D_00189EA0, state->f18)) {
+        if (vec_distance_xy(&self->pos, g_hero_position) < 6.0f && flag_is_third_pending_set(self) &&
+            !IsPointInCuboid(g_hero_position, state->f14) &&
+            !IsPointInCuboid(g_hero_position, state->f18)) {
             self->mode = 1;
             self->f78 = 0x24C102;
             if (self->anim != 1)
@@ -103,10 +103,10 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
             self->f98 = 0;
 
             /* Release the group's members. */
-            if (D_L14_001FB060[group = state->group] && func_002A8508(group, -1) >= 2) {
+            if (g_group_entity_lists[group = state->group] && moby_count_group_not_in_state(group, -1) >= 2) {
                 unsigned short *list;
 
-                list = (unsigned short *)D_L14_001FB060[state->group];
+                list = (unsigned short *)g_group_entity_lists[state->group];
                 base = D_L14_001B259C_direct;
                 do {
                     entry = *list;
@@ -114,7 +114,7 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
                     other->flags &= 0xFFBC;
                 } while ((group = (short)*list++) >= 0);
             }
-        } else if (func_002ACBC8(D_00189EA0, state->f14)) {
+        } else if (IsPointInCuboid(g_hero_position, state->f14)) {
             self->mode = 5;
         }
 
@@ -150,34 +150,34 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
     }
 
     if (self->mode == 2) {
-        temp[0] = func_00283180(self->angle - 1.57079649f) * 0.36f;
-        temp[1] = func_00283198(self->angle - 1.57079649f) * 0.36f;
+        temp[0] = math_fast_sin_or_cos_a(self->angle - 1.57079649f) * 0.36f;
+        temp[1] = math_fast_sin_or_cos_b(self->angle - 1.57079649f) * 0.36f;
         temp[2] = 0;
-        func_00282CC0(self->pos, self->pos, temp);
+        FastVecAdd(self->pos, self->pos, temp);
         qcopy(front, self->pos);
         qcopy(left, self->pos);
         qcopy(right, self->pos);
         front[2] += 0.75f;
         left[2] += 0.75f;
         right[2] += 0.75f;
-        temp[0] = func_00283180(self->angle) * 0.8f;
-        temp[1] = func_00283198(self->angle) * 0.8f;
+        temp[0] = math_fast_sin_or_cos_a(self->angle) * 0.8f;
+        temp[1] = math_fast_sin_or_cos_b(self->angle) * 0.8f;
         temp[2] = 0;
-        temp[0] = func_00283180(self->angle + 3.14159298f) * 0.8f;
-        temp[1] = func_00283198(self->angle + 3.14159298f) * 0.8f;
+        temp[0] = math_fast_sin_or_cos_a(self->angle + 3.14159298f) * 0.8f;
+        temp[1] = math_fast_sin_or_cos_b(self->angle + 3.14159298f) * 0.8f;
         temp[2] = 0;
-        func_00282CC0(left, left, offset1);
-        func_00282CC0(right, right, offset2);
-        if (func_00277258(front, 0.6f, 0, self) || func_00277258(left, 0.68f, 0, self) || func_00277258(right, 0.68f, 0, self)) {
+        FastVecAdd(left, left, offset1);
+        FastVecAdd(right, right, offset2);
+        if (coll_test_point(front, 0.6f, 0, self) || coll_test_point(left, 0.68f, 0, self) || coll_test_point(right, 0.68f, 0, self)) {
             prisonStartSound(2, 0, self);
             func_PAL_002AC718(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
                 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
-            func_0029F338(self);
+            moby_mark_spawned(self);
             return;
         }
     }
 
-    if (self->mode == 3 && func_002ACBC8(D_00189EA0, state->f14)) {
+    if (self->mode == 3 && IsPointInCuboid(g_hero_position, state->f14)) {
         self->mode = 4;
         if (self->anim != 3)
             func_PAL_002A7E68(self, 3, 0, 0);

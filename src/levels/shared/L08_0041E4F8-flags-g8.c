@@ -2,13 +2,13 @@
 
 extern char *D_L08_001B29E8;
 extern float D_L08_001AFA18 __attribute__((sda));
-extern float func_00282E80(void *, void *);
-extern int func_00283CF0(float);
+extern float vec_distance_xy(void *, void *);
+extern int FloatToInt(float);
 
 /* Same body as func_L08_003C63F0, with this function's own callees. */
 extern float ref_L08_0041E4F8_00 __attribute__((sda));
 /* Marks nearby objects of four classes as in range of the actor and grows their stored range values. */
-void func_L08_0041E4F8(char *actor)
+void moby_mark_in_range(char *actor)
 {
     char *item = D_L08_001B29E8;
     for (; item != 0; item = *(char **)(item + 0x28)) {

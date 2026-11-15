@@ -17,13 +17,13 @@ extern int D_L03_001B3280 __attribute__((sda));
 extern float D_L03_001B3284 __attribute__((sda));
 extern char D_L03_001B0190[], D_L03_001B0198[];
 extern unsigned char D_001A7A7C[] __attribute__((sda));
-extern int func_00336D50(unsigned char *, int);
-extern void func_00300A00(char *, int, float, float, float, float, float);
-extern unsigned char *func_00288FB8(int);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_00283CF0(float);
-extern int func_0027FB40(int, int, unsigned long, unsigned char *, int);
-extern int func_L00_00443DF8(char *);
+extern int table_find_by_id(unsigned char *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
+extern unsigned char *GetLocalizedString(int);
+extern int sprintf(char *, char *, ...);
+extern int FloatToInt(float);
+extern int text_draw_centered_medium(int, int, unsigned long, unsigned char *, int);
+extern int sub_object_get_value_first(char *);
 extern int ref_PAL_L03_003CB058_00(char *);
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -75,13 +75,13 @@ int func_PAL_L03_003CB058(void)
             float row, x, c, d;
 
             do {
-                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
+                title = (char *)table_find_by_id(D_L03_001A904C + 0x8710, 0xc6);
                 row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
-            func_00300A00(title, 0x60442d00, x, row, c, d, 0.0f);
+            gfx_draw_scaled_object_two_axes(title, 0x60442d00, x, row, c, d, 0.0f);
         }
         {
             char *title;
@@ -89,14 +89,14 @@ int func_PAL_L03_003CB058(void)
 
             do {
             do {
-                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
+                title = (char *)table_find_by_id(D_L03_001A904C + 0x8710, 0xc7);
                 row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
             do {
-                func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+                gfx_draw_scaled_object_two_axes(title, 0x55f0c070, x, row, c, d, 0.0f);
                 i = 0;
             } while (0);
             } while (0);
@@ -110,20 +110,20 @@ int func_PAL_L03_003CB058(void)
             do {
                 int shift = 5;
                 int x;
-                unsigned char *label = func_00288FB8(keys[i]);
+                unsigned char *label = GetLocalizedString(keys[i]);
                 if (i == one) {
-                    func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
+                    sprintf((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
-                    func_00115DA8((char *)buf, D_L03_001B0198, label);
+                    sprintf((char *)buf, D_L03_001B0198, label);
                 }
-                x = func_00283CF0(D_L03_001B0160[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
+                x = FloatToInt(D_L03_001B0160[i].x);
+                text_draw_centered_medium(x, FloatToInt((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }
         if (D_001A7A7C[0]) {
-            func_L00_00443DF8((char *)D_L03_001A904C + 0x36f28);
+            sub_object_get_value_first((char *)D_L03_001A904C + 0x36f28);
             ref_PAL_L03_003CB058_00((char *)D_L03_001A904C + 0x36f28);
         }
     }

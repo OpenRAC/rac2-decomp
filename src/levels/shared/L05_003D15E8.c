@@ -19,30 +19,30 @@ struct Sub_003D15E8 {
 /* The table of live objects, 0x100 bytes each. */
 extern char *D_L05_001B251C MACRO_ADDR;
 /* The sound records, 0x70 bytes each. */
-extern char D_00188660[];
+extern char g_sound_state[];
 
-extern int func_L00_00367720(char *);
-extern struct Sub_003D15E8 *func_002ED688(char *);
-extern void func_L05_003D18E0(char *);
-extern void func_00282C88(void *);
-extern void func_L05_00379E60(char *, void *, int, int);
-extern void func_L00_003E7760(void);
-extern void func_0029F978(char *, int, void *);
-extern void func_L05_0037C160(char *);
-extern void func_L05_0037B538(char *, int, int, int);
-extern void func_L05_0037B948(char *, int, float);
-extern float func_00282E48(void *, void *);
-extern int func_002A77E0(int);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002EE6A8(char *);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_L05_003D19F0(char *);
-extern int func_L05_0037B888(char *);
-extern int func_L05_0037CE08(char *, int);
-extern void func_L05_0037CDD8(char *, int);
-extern void func_L05_0037B6D0(char *);
-extern void func_00282948(void *);
+extern int state_get_stored_pointer_value(char *);
+extern struct Sub_003D15E8 *moby_get_motion_data(char *);
+extern void moby_init_state_and_position(char *);
+extern void vec_clear_128(void *);
+extern void level_append_object(char *, void *, int, int);
+extern void blast_hook_empty(void);
+extern void AttachManipulator(char *, int, void *);
+extern void moby_update_movement_state(char *);
+extern void moby_process_collision_hit(char *, int, int, int);
+extern void moby_check_player_in_view_and_range(char *, int, float);
+extern float fast_vec_dist(void *, void *);
+extern int math_random_int_below(int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int follower_get_state(char *);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void moby_spawn_effect_after_guards(char *);
+extern int moby_can_take_next_step(char *);
+extern int list_count_objects_matching_value(char *, int);
+extern void moby_l05_set_state_value(char *, int);
+extern void moby_start_movement_state(char *);
+extern void math_fast_float_d(void *);
 extern void func_L05_003D1AB8(char *);
 
 /* The object's update: on its first frame it sets itself up; afterwards, while its record is
@@ -58,64 +58,64 @@ void func_L05_003D15E8(char *obj)
 
     if (!*(unsigned char *)(obj + 0x20)) {
         *(unsigned char *)(obj + 0x30) = 0xff;
-        if (!GetStoredPointerValue(obj))
+        if (!state_get_stored_pointer_value(obj))
             return;
-        InitObjectStateAndPosition(obj);
-        ClearVector128(tmp);
+        moby_init_state_and_position(obj);
+        vec_clear_128(tmp);
         if (*(int *)(state + 0x264))
-            AppendLevelObject(obj, NoOpBlastHook, 0, 0);
+            level_append_object(obj, blast_hook_empty, 0, 0);
         AttachManipulator(obj, 2, state + 0x270);
         AttachManipulator(obj, 3, state + 0x2b0);
         return;
     }
-    sub = GetMobyMotionData(obj);
+    sub = moby_get_motion_data(obj);
     if (!sub->mode)
         return;
     one = 1;
-    UpdateObjectMovementState(obj);
-    ProcessObjectCollisionHit(obj, 0, 0, 0);
-    CheckPlayerInViewAndRange(obj, 1, 32.0f);
+    moby_update_movement_state(obj);
+    moby_process_collision_hit(obj, 0, 0, 0);
+    moby_check_player_in_view_and_range(obj, 1, 32.0f);
     mode = sub->mode;
     if (mode == one) {
         if (*(int *)(state + 0x260) != -1) {
             sub->targetMode = mode;
             sub->target = D_L05_001B251C + (*(int *)(state + 0x260) << 8);
             if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
-                char *sound1 = gSoundState + *(int *)(state + 0x2f4) * 0x70;
+                char *sound1 = g_sound_state + *(int *)(state + 0x2f4) * 0x70;
 
                 if ((*(char **)(sound1 + 0x88) != obj || !*(unsigned char *)(sound1 + 0x74))
-                    && !RandomIntBelow(750))
-                    *(int *)(state + 0x2f4) = PlaySoundFromClassBank(14, 0, obj, 0xfbf);
+                    && !math_random_int_below(750))
+                    *(int *)(state + 0x2f4) = snd_play_from_class_bank(14, 0, obj, 0xfbf);
             }
         }
-        ClearVector128(state + 0x280);
-        ClearVector128(state + 0x2c0);
-        if (GetFollowerState(obj) == 8) {
-            *(float *)(state + 0x284) = FastSinOrCosB(0.78539824f);
-            *(float *)(state + 0x28c) = FastSinOrCosA(0.78539824f);
-            *(float *)(state + 0x2c4) = FastSinOrCosB(0.78539824f);
-            *(float *)(state + 0x2cc) = FastSinOrCosA(0.78539824f);
+        vec_clear_128(state + 0x280);
+        vec_clear_128(state + 0x2c0);
+        if (follower_get_state(obj) == 8) {
+            *(float *)(state + 0x284) = math_fast_sin_or_cos_b(0.78539824f);
+            *(float *)(state + 0x28c) = math_fast_sin_or_cos_a(0.78539824f);
+            *(float *)(state + 0x2c4) = math_fast_sin_or_cos_b(0.78539824f);
+            *(float *)(state + 0x2cc) = math_fast_sin_or_cos_a(0.78539824f);
             if (sub->f108)
-                SpawnObjectEffectAfterGuards(obj);
+                moby_spawn_effect_after_guards(obj);
         } else {
             *(float *)(state + 0x2cc) = *(float *)(state + 0x28c) = 1.0f;
             if (sub->f108 && sub->f104)
-                SpawnObjectEffectAfterGuards(obj);
+                moby_spawn_effect_after_guards(obj);
         }
-        if (CanObjectTakeNextStep(obj)) {
-            if (CountListObjectsMatchingValue(obj, 5) <= 0)
-                SetObjectStateValue(obj, 5);
+        if (moby_can_take_next_step(obj)) {
+            if (list_count_objects_matching_value(obj, 5) <= 0)
+                moby_l05_set_state_value(obj, 5);
             else
-                SetObjectStateValue(obj, 1);
-            StartObjectMovementState(obj);
+                moby_l05_set_state_value(obj, 1);
+            moby_start_movement_state(obj);
         }
-        FastFloatHelperD(state + 0x268);
+        math_fast_float_d(state + 0x268);
         func_L05_003D1AB8(obj);
     }
     {
-        char *sound2 = gSoundState + *(int *)(state + 0x2f0) * 0x70;
+        char *sound2 = g_sound_state + *(int *)(state + 0x2f0) * 0x70;
 
         if (*(char **)(sound2 + 0x88) != obj || !*(unsigned char *)(sound2 + 0x74))
-            *(int *)(state + 0x2f0) = PlaySoundFromClassBank(1, 6, obj, 0x97c);
+            *(int *)(state + 0x2f0) = snd_play_from_class_bank(1, 6, obj, 0x97c);
     }
 }

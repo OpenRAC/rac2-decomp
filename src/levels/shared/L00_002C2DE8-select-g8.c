@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_002C40C0 (544 bytes, 25 places), in its own -G8 unit: the list head
  * D_L00_001B1EA8 is read through $gp, and this function's view of D_00189E20 differs
  * from the HeroProbeState declared in L00_002C2DE8-g8.c. The byte and flag tests read
@@ -13,26 +14,26 @@ typedef struct {
     unsigned char pad3[0xB10 - 0x650]; void *selected_b10; int ready_b14;
     unsigned char pad4[0x2294 - 0xB18]; int mode, field_2298, state;
 } HeroSelectionState;
-extern HeroSelectionState D_00189E20;
+extern HeroSelectionState g_hero_state;
 
 extern unsigned char *D_L00_001B1EA8 __attribute__((sda));
-extern int func_002B38B8(void *);
-extern float func_L00_002AE388(char *, float, float, int *, float, float);
-extern float func_00282E80(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
+extern int flag_is_third_pending_set(void *);
+extern float hero_score_target_by_heading(char *, float, float, int *, float, float);
+extern float vec_distance_xy(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
 
 /* Looks through the object list for the best Blue Swingshot Target in front of the hero. It remembers
  * the closest one that is in view, and says if the hero can reach it. */
-int func_L00_002C40C0(void)
+int hero_find_blue_swingshot_target(void)
 {
     unsigned char *node, *best;
     float score, closest;
     float first[4], second[4];
     int blocked;
-    if (gHeroState.state == 0x21) return gHeroState.ready_b14;
+    if (g_hero_state.state == 0x21) return g_hero_state.ready_b14;
     best = 0;
     closest = 100000000.0f;
-    gHeroState.ready_b14 = 0;
+    g_hero_state.ready_b14 = 0;
     node = D_L00_001B1EA8;
     if (node) {
         do {
@@ -41,27 +42,27 @@ int func_L00_002C40C0(void)
             if (*(short *)(node + 0xAA) != 0x99D /* Blue Swingshot Target */) continue;
             flags = *(unsigned short *)(node + 0x34);
             if (flags & 1) continue;
-            if (IsThirdPendingFlagSet(node)) continue;
+            if (flag_is_third_pending_set(node)) continue;
             horizontal = 0.5235988497734069824f;
             vertical = -1.0f;
-            if (gHeroState.mode == 1 || gHeroState.mode == 0x1D)
+            if (g_hero_state.mode == 1 || g_hero_state.mode == 0x1D)
                 horizontal = vertical = 0.087266474962234497f;
-            heading = gHeroState.heading;
-            if (gHeroState.state == 0xF) heading = gHeroState.alternate_heading;
-            score = ScoreTargetByHeading((char *)node, heading, 30.0f, &blocked, horizontal, vertical);
+            heading = g_hero_state.heading;
+            if (g_hero_state.state == 0xF) heading = g_hero_state.alternate_heading;
+            score = hero_score_target_by_heading((char *)node, heading, 30.0f, &blocked, horizontal, vertical);
             if (blocked != 0) continue;
-            if (vec_distance_xy(gHeroState.position, node + 0x10) < 4.0f) continue;
+            if (vec_distance_xy(g_hero_state.position, node + 0x10) < 4.0f) continue;
             active = node[0x31];
             if (active == 0) score += 10.0f;
             if (score < closest) { closest = score; best = node; }
         } while ((node = *(unsigned char **)(node + 0x28)) != 0);
     }
     if (best) {
-        gHeroState.selected_b10 = best;
-        qcopy(first, gHeroState.position);
+        g_hero_state.selected_b10 = best;
+        qcopy(first, g_hero_state.position);
         first[2] += 0.5f;
         qcopy(second, best + 0x10);
-        if (!CollLine(first, second, 2, 0, 0)) gHeroState.ready_b14 = 1;
+        if (!CollLine(first, second, 2, 0, 0)) g_hero_state.ready_b14 = 1;
     }
-    return gHeroState.ready_b14;
+    return g_hero_state.ready_b14;
 }

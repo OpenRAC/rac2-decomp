@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -34,7 +35,7 @@ extern void ref_L18_003F9EF0_07(s32, s32);
 extern void ref_L18_003F9EF0_08(s32, s16);
 
 /* Advances the timed effect sequence by one frame and stops it when its time is up. */
-void func_L18_003F9EF0(void *moby) {
+void part_update_timed_sequence(void *moby) {
     s16 frame;
     s32 entryOffset;
     s32 phaseLength;

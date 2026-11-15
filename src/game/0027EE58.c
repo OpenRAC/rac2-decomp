@@ -1,11 +1,12 @@
+#include "names.h"
 /* Emit sixteen textured annular quads between the two radii and angles. */
 #include "common.h"
-extern unsigned long func_0027C878(int);
-extern float func_00283B98(float,float),func_00283180(float),func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_0027E920(const long *,const int *,const int *,unsigned long,int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern float FastAddRotations(float,float),math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void AppendDisplayListEntry(const long *,const int *,const int *,unsigned long,int);
 /* Draws a ring or pie slice with a picture, made from 16 small curved pieces. */
-void func_0027EE58(int x,int y,int inner,int outer,int *colors,int *uv,int textureId,int segments,float start,float end)
+void DrawTexturedArc(int x,int y,int inner,int outer,int *colors,int *uv,int textureId,int segments,float start,float end)
 {
     long depth=0xFFFFF000000000L;
     unsigned long texture=GetEffectTextureDescriptor(textureId);
@@ -17,11 +18,11 @@ void func_0027EE58(int x,int y,int inner,int outer,int *colors,int *uv,int textu
         for (i = 15; i >= 0; i--) {
             long vertices[4];
             float a[3],b[3];
-            a[0]=FastSinOrCosA(angle);
-            a[1]=FastSinOrCosB(angle);
+            a[0]=math_fast_sin_or_cos_a(angle);
+            a[1]=math_fast_sin_or_cos_b(angle);
             a[2]=0;
-            b[0]=FastSinOrCosA(next);
-            b[1]=FastSinOrCosB(next);
+            b[0]=math_fast_sin_or_cos_a(next);
+            b[1]=math_fast_sin_or_cos_b(next);
             b[2]=0;
             angle=next;
             vertices[0]=vertices[1]=vertices[2]=vertices[3]=0;

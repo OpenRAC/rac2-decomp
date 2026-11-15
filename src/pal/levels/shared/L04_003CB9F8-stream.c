@@ -30,11 +30,11 @@ typedef struct {
     Moby *children[5];           
     float offsets[5];            
 } StreamVars;
-extern Moby *func_0029EFD0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B37E8(void *a0, int a1);
-extern void func_002A0488(void *moby, int r, int g, int b);
+extern Moby *CreateMoby(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_init_child_from_parent(void *a0, int a1);
+extern void set_moby_color(void *moby, int r, int g, int b);
 
 /* Keeps five child mobies (class 0xF10 for an owner of class 0xCEF, 0xF0F otherwise)
    streaming along the owner's forward axis, spawning them on the first call: each call
@@ -85,9 +85,9 @@ void func_PAL_L04_003CB9F8(Moby *moby)
 
     if (moby->state == 0) {
         for (i = 0; i < 5; i++) {
-            child = func_0029EFD0(id);
+            child = CreateMoby(id);
             if (child) {
-                func_002B37E8(child, 0);
+                moby_init_child_from_parent(child, 0);
                 child->rotation = moby->rotation;
                 children[i] = child;
                 offsets[i] = first;
@@ -106,10 +106,10 @@ void func_PAL_L04_003CB9F8(Moby *moby)
             offset = start;
         offsets[i] = offset;
 
-        func_00282D30(&shift, moby->forward, offset);
-        func_00282CC0(children[i]->position, moby->position, &shift);
-        func_00282D30(&shift, moby->up, 0.15f);
-        func_00282CC0(children[i]->position, children[i]->position, &shift);
+        FastVecScale(&shift, moby->forward, offset);
+        FastVecAdd(children[i]->position, moby->position, &shift);
+        FastVecScale(&shift, moby->up, 0.15f);
+        FastVecAdd(children[i]->position, children[i]->position, &shift);
 
         t = (offset - start) / length;
         children[i]->scale = children[i]->mclass->scale * (minScale + (1 - t) * scaleRange);
@@ -124,6 +124,6 @@ void func_PAL_L04_003CB9F8(Moby *moby)
         alpha = 1 - t;              /* now the colour fade g */
         alpha *= alpha;
         alpha *= alpha;
-        func_002A0488(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
+        set_moby_color(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
     }
 }

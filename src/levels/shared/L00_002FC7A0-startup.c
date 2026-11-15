@@ -18,11 +18,11 @@ extern unsigned char D_001A7A40 __attribute__((section(".sdata")));
 extern StartupContext D_L00_001BCAC0;
 extern unsigned char D_L00_0022F600[];
 extern float D_L00_001A8FC8 __attribute__((section(".sdata")));
-extern int D_001A79F0 __attribute__((section(".sdata")));
+extern int g_current_map_index __attribute__((section(".sdata")));
 extern void func_L00_00311238(void *, int, void *);
 
 /* Starts the configured startup animation for eligible objects in the level. */
-void func_L00_002FC980(void)
+void anim_start_startup_animations(void)
 {
     StartupTable table;
     int i;
@@ -51,7 +51,7 @@ void func_L00_002FC980(void)
                 }
             }
         }
-        if (gCurrentMapIndex == 6 && D_L00_001BCAC0.state == 1)
+        if (g_current_map_index == 6 && D_L00_001BCAC0.state == 1)
             D_L00_001A8FC8 = -0.25f;
     }
 }

@@ -1,19 +1,20 @@
+#include "names.h"
 /* func_US2_0033BC20, the USA v2.00 copy of func_0033ABD8: the same C, where rename func_003369A8 becomes func_US2_003377B0; swap locals *record *vel278; swap locals *rec198 *vel280. */
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_US2_003377B0(void *, void *, void *);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern int func_00288FB8(int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern int GetLocalizedString(int);
 extern char *D_001A8CFC[] __attribute__((sda));
 /* Binds the screen to its owner: allocates the 16-byte position block, initialises the four
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
    colours, fonts and labels, marks the "  Exit" label with glyph 0x12 and lays them out.
    The block's four zero stores are written 1, 2, 3, 0 for retail's 0, 4, 8, C order. */
 /* The X bias lives in small data, so this file is built with -G8. */
-extern void func_00335E38(char *, float, float, float, float);
+extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
    shared spawn helper with no rotation. */
@@ -21,8 +22,8 @@ extern void func_00335E38(char *, float, float, float, float);
    pointer through the small-data unit, so this body needs -G8. */
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC88[];
-extern int *func_00335E20(void *);
-extern int func_00288FB8(int);
+extern int *object_get_fourth_field(void *);
+extern int GetLocalizedString(int);
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
 #define ENTRY_0033A6D8 (*(Entry_0033A6D8 **)self)[i]
 
@@ -38,13 +39,13 @@ typedef struct { int first, second, color; float angle; short id; short pad; int
    induction variable and which register the compiler picks. */
 #undef ENTRY_0033A6D8
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_US2_003377B0(void *, void *, void *);
-extern int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern void func_00115484(void *, int, int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern void memset(void *, int, int);
 extern char D_001ADC80[], D_001ADC88[];
 extern int D_001ADD40[2] __attribute__((sda));
 
@@ -62,7 +63,7 @@ void func_US2_0033BC20(char *object, char *owner, short *list)
 
     *(char **)(object + 8) = owner;
     if (owner) {
-        int *allocation = func_00336DA8(16, func_00336E40(owner));
+        int *allocation = ui_return_second_arg(16, pool_alloc_cell(owner));
         *(int **)object = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -81,9 +82,9 @@ void func_US2_0033BC20(char *object, char *owner, short *list)
     p = list;
     for (i = 4; i >= 0; i--) {
         if (*p != 0) {
-            func_003361E0(record, D_001ADC80 + 8, owner);
-            *func_00335E20(record) = *color;
-            func_00336390(record, D_001A8CFC[0] + 0x8710, *p);
+            object_init_derived_arrays(record, D_001ADC80 + 8, owner);
+            *object_get_fourth_field(record) = *color;
+            object_set_helper_result(record, D_001A8CFC[0] + 0x8710, *p);
         }
         *flags = *p;
         color++;
@@ -93,17 +94,17 @@ void func_US2_0033BC20(char *object, char *owner, short *list)
     }
     p = (short *)D_001ADC88;
     func_US2_003377B0(rec198, p, owner);
-    func_00115484(vel278, 0, 8);
-    func_00335E38(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
-    *func_00335E20(rec198) = 0x80F0F0F0;
+    memset(vel278, 0, 8);
+    object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec198) = 0x80F0F0F0;
     func_US2_003377B0(rec228, p, owner);
-    func_00115484(vel288, 0, 8);
-    func_00335E38(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
-    *func_00335E20(rec228) = 0x80F0F0F0;
+    memset(vel288, 0, 8);
+    object_set_first_float4(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec228) = 0x80F0F0F0;
     func_US2_003377B0(rec1E0, p, owner);
-    func_00115484(vel280, 0, 8);
-    func_00335E38(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
-    *func_00335E20(rec1E0) = 0x80F0F0F0;
+    memset(vel280, 0, 8);
+    object_set_first_float4(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(rec1E0) = 0x80F0F0F0;
     *(float *)(object + 0x2a4) = 0.0f;
     *(int *)(object + 0x2c0) = 1;
     *(int *)(object + 0x2c4) = 1;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,36 +24,36 @@
  */
 #include "common.h"
 
-extern s8 *D_001B22A8;
+extern s8 *g_dma_packet_cursor;
 extern s8 *D_001B20E4;
 extern s8 *D_001B20E0;
 extern s32 D_001A72D4;
 extern s32 D_001A72D0;
 extern void func_0029D0E0(s8 *);
-extern s32 func_002FC748(void);
+extern s32 gfx_append_vu1_preset_a(void);
 
 /* Links the render packet buffers together into one chain and restores the buffer mark. */
-void func_002E3820(void) {
+void gfx_link_packet_chain(void) {
     s32 tagWord;
     s8 *firstTag;
 
-    D_001B20E4 = gDmaPacketCursor;
+    D_001B20E4 = g_dma_packet_cursor;
     tagWord = 0x20000000;
-    gDmaPacketCursor = gDmaPacketCursor + 0x10;
+    g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
     (*(s32 *)((s8 *)(D_001B20E0) + (0))) = tagWord;
     firstTag = D_001B20E0;
-    (*(s8 **)((s8 *)(firstTag) + (4))) = gDmaPacketCursor;
+    (*(s8 **)((s8 *)(firstTag) + (4))) = g_dma_packet_cursor;
     (*(s32 *)((s8 *)(D_001B20E0) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E0) + (0xC))) = 0;
     func_0029D0E0(firstTag);
-    (void) AppendVu1DmaChainTable1();
-    (*(s32 *)((s8 *)(gDmaPacketCursor) + (0))) = tagWord;
-    (*(s8 **)((s8 *)(gDmaPacketCursor) + (4))) = D_001B20E0 + 0x10;
-    (*(s32 *)((s8 *)(gDmaPacketCursor) + (8))) = 0;
-    (*(s32 *)((s8 *)(gDmaPacketCursor) + (0xC))) = 0;
-    gDmaPacketCursor = gDmaPacketCursor + 0x10;
+    (void) gfx_append_vu1_preset_a();
+    (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0))) = tagWord;
+    (*(s8 **)((s8 *)(g_dma_packet_cursor) + (4))) = D_001B20E0 + 0x10;
+    (*(s32 *)((s8 *)(g_dma_packet_cursor) + (8))) = 0;
+    (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0xC))) = 0;
+    g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
     (*(s32 *)((s8 *)(D_001B20E4) + (0))) = tagWord;
-    (*(s8 **)((s8 *)(D_001B20E4) + (4))) = gDmaPacketCursor;
+    (*(s8 **)((s8 *)(D_001B20E4) + (4))) = g_dma_packet_cursor;
     (*(s32 *)((s8 *)(D_001B20E4) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E4) + (0xC))) = 0;
     D_001A72D0 = D_001A72D4;

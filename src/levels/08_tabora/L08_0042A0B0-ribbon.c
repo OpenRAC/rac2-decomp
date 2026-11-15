@@ -9,25 +9,25 @@ typedef struct {
     u64 primitive, texture, mode, flags;
 } TaboraQuad;
 
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7AA8(float, float, float, float, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float cubic_hermite_scalar(float, float, float, float, float);
 extern int func_001163B0(void);
-extern int func_L02_002F1658(void);
-extern char *func_L08_0034A078(void *, void *, int, void *);
+extern int level_is_resident_flag_clear(void);
+extern char *part_spawn_short_lived(void *, void *, int, void *);
 extern float D_L08_001B3A20[] MACRO_ADDR;
-extern char *D_L08_001B3A30[] MACRO_ADDR;
+extern char *g_beam_slot_key[] MACRO_ADDR;
 
 extern TaboraVec D_L08_001B3A40[] MACRO_ADDR;
 extern TaboraVec D_L08_002603E0[][4];
@@ -39,7 +39,7 @@ extern char D_L08_001FF680[];
    particles at the requested segment. The two strips have independent textures.
    The named constants and argument copies are read inside the loop: gcse folds them, and
    they bring the RTL count to the 500 insns (251 hash buckets) of retail's spill slots. */
-void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
+void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
                       int alpha0, int alpha1, int slot, int particleSegment)
 {
     TaboraQuad q, glow;
@@ -78,7 +78,7 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
     glow.uv[4] = 0; glow.uv[5] = 0; glow.uv[6] = 0; glow.uv[7] = 1;
     q.uv[0] = u; q.uv[1] = 0; q.uv[2] = u; q.uv[3] = 1;
     q.uv[4] = u + 1; q.uv[5] = 0; q.uv[6] = u + 1; q.uv[7] = 1;
-    if (*(s16 *)(((char **)gBeamSlotKey)[slot] + 0xAA) == 0x1C /* moby class 28 */) width = 0.3f;
+    if (*(s16 *)(((char **)g_beam_slot_key)[slot] + 0xAA) == 0x1C /* moby class 28 */) width = 0.3f;
     baseWidth = width;
     *(TaboraTI *)offsets[0] = 0;
     *(TaboraTI *)offsets[1] = 0;
@@ -146,17 +146,17 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
         }
         qcopy(q.pos[0], q.pos[2]); qcopy(q.pos[1], q.pos[3]);
         qcopy(glow.pos[0], glow.pos[2]); qcopy(glow.pos[1], glow.pos[3]);
-        if (i == segment && IsResidentFlagClear()) {
-            owner = &((char **)gBeamSlotKey)[entry];
-            randomRadius = RandomFloatRange(0.03f, 0.15f);
-            randomAngle = RandomSignedFloatRange(0.3490659f, 0.6981318f);
+        if (i == segment && level_is_resident_flag_clear()) {
+            owner = &((char **)g_beam_slot_key)[entry];
+            randomRadius = math_random_float_range(0.03f, 0.15f);
+            randomAngle = math_random_signed_float_range(0.3490659f, 0.6981318f);
             *(TaboraTI *)particle = 0;
             particle[3] = particle[0] = 1;
-            particle[0] = randomRadius * FastSinOrCosA(randomAngle);
-            particle[1] = randomRadius * FastSinOrCosB(randomAngle);
+            particle[0] = randomRadius * math_fast_sin_or_cos_a(randomAngle);
+            particle[1] = randomRadius * math_fast_sin_or_cos_b(randomAngle);
             matrix_mul_vec3(particle, particle, D_L08_002603E0[row]);
-            corner = Rand() & mask;
-            spark = SpawnShortLivedParticle(q.pos[corner], particle, sparkCount, *owner);
+            corner = func_001163B0() & mask;
+            spark = part_spawn_short_lived(q.pos[corner], particle, sparkCount, *owner);
             if (spark) {
                 base = D_L08_001FF680;
                 visual = spark + 0x20;
@@ -165,8 +165,8 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
                 *(float *)(visual + 0x10) = 1 / IntToFloat(*(s16 *)(spark + 0xA));
                 *(u32 *)(visual + 0x18) = 0x7F207F;
                 *(float *)(spark + 0xC) = 150000;
-                corner2 = Rand() & mask;
-                spark = SpawnShortLivedParticle(q.pos[corner2], particle, flashCount, *owner);
+                corner2 = func_001163B0() & mask;
+                spark = part_spawn_short_lived(q.pos[corner2], particle, flashCount, *owner);
                 if (spark) {
                     visual = spark + 0x20;
                     settings2 = *(char **)(base + 0xD4);

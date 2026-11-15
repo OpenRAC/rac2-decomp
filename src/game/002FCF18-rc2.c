@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,13 +24,13 @@
  */
 #include "common.h"
 
-extern s32 func_0026FEB8();
+extern s32 STUB_printf();
 
 extern s8 D_001AD538[];
 extern s8 D_001AD550[];
 extern s8 D_001AD568[];
 /* Error handler that reads the DMA registers, reports them and then hangs forever. */
-void func_002FCF18(void) {
+void gfx_handle_dma_error_hang(void) {
     s32 tadr;
     s32 chcr;
 

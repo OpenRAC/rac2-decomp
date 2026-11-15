@@ -31,74 +31,74 @@ typedef struct {
     short pad2522;
     unsigned int f2524;               /* 0x2524 */
 } Hero_L00_002A7A50;
-extern Hero_L00_002A7A50 D_00189E20;
+extern Hero_L00_002A7A50 g_hero_state;
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern unsigned char D_001A7A40[] __attribute__((sda));
-extern void func_L00_00325AE8(void *, unsigned int, float, float);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_0027DDC0(int, int, int, int);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern int func_L00_002ADEA0(int);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern float func_002AA2E8(float *, float, float);
+extern void gfx_l00_draw_billboard_quad(void *, unsigned int, float, float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void gfx_set_clear_color_packet(int, int, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern int hero_slot_item_id(int);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern float ApproachValue(float *, float, float);
 
-void func_L00_002A7A50(void)
+void DrawHeroGlowQuads(void)
 {
     int index, alpha;
     float value, divisor, size, step, peak;
     unsigned int color;
 
     if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
-        for (index = 0; index < gHeroState.queueCount; index++)
-            DrawBillboardQuad_L00(gHeroState.queue[index], gHeroState.queueColor[index],
-                              gHeroState.queueSize[index], gHeroState.queueFade[index]);
+        for (index = 0; index < g_hero_state.queueCount; index++)
+            gfx_l00_draw_billboard_quad(g_hero_state.queue[index], g_hero_state.queueColor[index],
+                              g_hero_state.queueSize[index], g_hero_state.queueFade[index]);
         return;
     }
-    if (gHeroState.f21C) {
-        value = IntToFloat(gHeroState.f21C);
+    if (g_hero_state.f21C) {
+        value = IntToFloat(g_hero_state.f21C);
         divisor = IntToFloat(18);
         value = value * 3.1415927f;
-        value = FastSinOrCosB(value / divisor);
+        value = math_fast_sin_or_cos_b(value / divisor);
         alpha = FloatToInt((value * 0.5f + 0.5f) * 80.0f);
-        SetClearColorPacket(0xAA, 0, 0, alpha);
+        gfx_set_clear_color_packet(0xAA, 0, 0, alpha);
         VU1_addGSregister(0x47, 0x5360B);
     }
-    if (gHeroState.mode == 3) {
-        unsigned int tint = gHeroState.f2508;
-        float (*glow)[4] = gHeroState.glow;
+    if (g_hero_state.mode == 3) {
+        unsigned int tint = g_hero_state.f2508;
+        float (*glow)[4] = g_hero_state.glow;
         int remaining = 2;
         while (remaining >= 0) {
-            DrawBillboardQuad_L00(*glow, tint, 0.2f, 0.08f);
+            gfx_l00_draw_billboard_quad(*glow, tint, 0.2f, 0.08f);
             glow++;
             remaining--;
         }
-    } else if (gHeroState.mode == 0) {
-        if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !gHeroState.f24FC) {
-            if (gHeroState.f2500) {
+    } else if (g_hero_state.mode == 0) {
+        if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !g_hero_state.f24FC) {
+            if (g_hero_state.f2500) {
                 peak = 1.0f;
-                if (peak < gHeroState.v2020[0]) peak = gHeroState.v2020[0];
-                if (peak < gHeroState.v2020[1]) peak = gHeroState.v2020[1];
-                if (peak < gHeroState.v2020[2]) peak = gHeroState.v2020[2];
+                if (peak < g_hero_state.v2020[0]) peak = g_hero_state.v2020[0];
+                if (peak < g_hero_state.v2020[1]) peak = g_hero_state.v2020[1];
+                if (peak < g_hero_state.v2020[2]) peak = g_hero_state.v2020[2];
                 FastTweenColor(0xC0000028U, 0x28, peak);
             }
-            DrawBillboardQuad_L00(gHeroState.v2010, 0xC0000028U, 0.05700000002980232f, 0.08f);
+            gfx_l00_draw_billboard_quad(g_hero_state.v2010, 0xC0000028U, 0.05700000002980232f, 0.08f);
         }
-        for (index = 0; index < gHeroState.queueCount; index++)
-            DrawBillboardQuad_L00(gHeroState.queue[index], gHeroState.queueColor[index],
-                              gHeroState.queueSize[index], gHeroState.queueFade[index]);
-    } else if (gHeroState.mode == 2) {
-        DrawBillboardQuad_L00(gHeroState.v2010, 0x300000C0U, 0.25f, 0.08f);
-    } else if (gHeroState.mode == 1) {
-        size = gHeroState.f2520 ? 0.101500004529953f : 0.07f;
+        for (index = 0; index < g_hero_state.queueCount; index++)
+            gfx_l00_draw_billboard_quad(g_hero_state.queue[index], g_hero_state.queueColor[index],
+                              g_hero_state.queueSize[index], g_hero_state.queueFade[index]);
+    } else if (g_hero_state.mode == 2) {
+        gfx_l00_draw_billboard_quad(g_hero_state.v2010, 0x300000C0U, 0.25f, 0.08f);
+    } else if (g_hero_state.mode == 1) {
+        size = g_hero_state.f2520 ? 0.101500004529953f : 0.07f;
         if (D_001A7A40[3]) {
-            gHeroState.v2010[2] -= 0.01f;
+            g_hero_state.v2010[2] -= 0.01f;
             size *= 1.7f;
         } else {
-            gHeroState.v2010[2] -= 0.02f;
+            g_hero_state.v2010[2] -= 0.02f;
         }
-        ApproachValue(&gHeroState.f186C, size, 0.003f);
-        DrawBillboardQuad_L00(gHeroState.v2010, gHeroState.f2524, gHeroState.f186C, 0.08f);
+        ApproachValue(&g_hero_state.f186C, size, 0.003f);
+        gfx_l00_draw_billboard_quad(g_hero_state.v2010, g_hero_state.f2524, g_hero_state.f186C, 0.08f);
     }
 }

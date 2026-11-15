@@ -9,36 +9,36 @@
 
 extern char *D_L00_001B272C[];
 
-extern int func_0034FAE8(char *);
+extern int mpeg_is_audio_primed(char *);
 
-extern void func_0034FAF8(int *);
+extern void mpeg_update_audio_if_active(int *);
 
-extern void func_00350DC8(char *);
+extern void mpeg_save_ipu_dma_state(char *);
 
-extern void func_00350ED8(char *);
+extern void mpeg_restore_ipu_dma_state(char *);
 
 /* Loads the resident pointer word, adds 0xD9100, and calls the update helper with it. */
-int func_L00_00444D18(void)
+int load_call_resident_update(void)
 {
-    return IsMovieAudioPrimed(D_L00_001B272C[0] + 0xD9100);
+    return mpeg_is_audio_primed(D_L00_001B272C[0] + 0xD9100);
 }
 
 /* The release twin of func_L00_00444D18. */
-void func_L00_004450E8(void)
+void load_call_resident_release(void)
 {
-    UpdateMovieAudioIfActive((int *)(D_L00_001B272C[0] + 0xD9100));
+    mpeg_update_audio_if_active((int *)(D_L00_001B272C[0] + 0xD9100));
 }
 
 /* The same thunk with the first sub-object's lookup helper and a constant of 0xD9090. */
-int func_L00_00447678(void)
+int load_call_first_lookup(void)
 {
-    SaveIpuDmaState(D_L00_001B272C[0] + 0xD9090);
+    mpeg_save_ipu_dma_state(D_L00_001B272C[0] + 0xD9090);
     return 1;
 }
 
 /* The twin of func_L00_00447678 with the second sub-object's lookup helper. */
-int func_L00_004476A8(void)
+int load_call_second_lookup(void)
 {
-    RestoreIpuDmaState(D_L00_001B272C[0] + 0xD9090);
+    mpeg_restore_ipu_dma_state(D_L00_001B272C[0] + 0xD9090);
     return 1;
 }

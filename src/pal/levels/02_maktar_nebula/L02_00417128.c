@@ -1,44 +1,45 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed short s16;
 typedef signed int s32;
-extern void func_002A7750();
-extern float func_00283198(float);
+extern void moby_set_state();
+extern float math_fast_sin_or_cos_b(float);
 extern char D_L02_00188660[];
-extern int func_002E59F8(int);
-extern int func_002A77E0(int);
-extern float func_00282E48(void *, void *);
-extern void *func_002A9640(void *, int, int);
-extern char D_L02_001BA500[];
+extern int snd_stop_voice(int);
+extern int math_random_int_below(int);
+extern float fast_vec_dist(void *, void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern char g_camera_l02_position[];
 extern u8 D_001A7BCB __attribute__((sda));
 extern u8 D_L02_001395B8[];
 extern u8 D_L02_001C0700[];
-extern s32 func_00288AA0(u8 *, s32);
-extern s32 func_00288BE8(u8 *);
-extern void func_0029F338(u8 *);
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 req_push_queue(u8 *, s32);
+extern s32 req_launch_queued(u8 *);
+extern void moby_mark_spawned(u8 *);
+extern s32 g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
 extern u16 D_0018CFDC;
-extern int func_002A77E0(int);
-extern float func_002A7940(void);
-extern float func_002AA2E8(float *, float, float);
-extern float func_00282E80(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283B98(float, float);
-extern void *func_002A9640(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_L00_002E6CF0(void *, void *);
+extern int math_random_int_below(int);
+extern float math_random_angle(void);
+extern float ApproachValue(float *, float, float);
+extern float vec_distance_xy(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float FastAddRotations(float, float);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern void gfx_add_draw_callback_first(void *, void *);
 extern void func_PAL_L02_00417490(u8 *);
 extern void func_PAL_L02_004176A8(u8 *);
-extern int func_002A77E0(int);
-extern s32 D_L02_001AEC78 __attribute__((sda));
-extern void func_L00_002E6CF0(void *, void *);
+extern int math_random_int_below(int);
+extern s32 g_hovering_object_count __attribute__((sda));
+extern void gfx_add_draw_callback_first(void *, void *);
 extern u8 D_0019B4A8[];
-extern int D_001A79F0 __attribute__((sda));
-extern int func_002E5CF8(int, int, void *);
+extern int g_current_map_index __attribute__((sda));
+extern int PlayMobySound(int, int, void *);
 
 /* Steps the actor by its kind byte (+0x20). Kind 0 releases it (func_0029F338) when the table byte
    of its owner (D_0019B2E8, indexed by the byte at +0xB0 and D_001A79F0) has bit 7 set; otherwise
@@ -61,19 +62,19 @@ void func_PAL_L02_00417128(u8 *a0) {
 
     switch (a0[0x20]) {
     case 0:
-        if (D_0019B2E8[a0[0xB0] + D_001A79F0 * 16] & 0x80) {
-            func_0029F338(a0);
+        if (D_0019B2E8[a0[0xB0] + g_current_map_index * 16] & 0x80) {
+            moby_mark_spawned(a0);
             return;
         }
         *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.0f;
-        if (func_002A77E0(2))
+        if (math_random_int_below(2))
             *(u16 *)(a0 + 0x34) |= 0x8000;
         else
             *(u16 *)(a0 + 0x34) &= 0x7FFF;
-        func_002A7750(a0, 1, -1);
+        moby_set_state(a0, 1, -1);
         *(float *)(s1 + 8) = *(float *)(a0 + 0x18);
-        *(float *)(s1 + 4) = func_002A7940();
-        *(float *)(s1 + 0x14) = func_002A7940();
+        *(float *)(s1 + 4) = math_random_angle();
+        *(float *)(s1 + 0x14) = math_random_angle();
         break;
     case 1:
         if (a0[0x31] != 0)
@@ -82,22 +83,22 @@ void func_PAL_L02_00417128(u8 *a0) {
             u8 *r = (u8 *)D_L02_00188660 + *(s32 *)(s1 + 0x18) * 0x70;
 
             if (*(u8 **)(r + 0x88) != a0 || r[0x74] == 0)
-                *(s32 *)(s1 + 0x18) = func_002E5CF8(0, 4, a0);
+                *(s32 *)(s1 + 0x18) = PlayMobySound(0, 4, a0);
         }
-        f = func_00282E80(a0 + 0x10, D_L02_001BA500);
+        f = vec_distance_xy(a0 + 0x10, g_camera_l02_position);
         if (f > 64.0f)
-            func_002AA2E8((float *)(s1 + 0xC), 0.0f, 0.020000001f);
+            ApproachValue((float *)(s1 + 0xC), 0.0f, 0.020000001f);
         else
-            func_002AA2E8((float *)(s1 + 0xC), 1.0f, 0.020000001f);
+            ApproachValue((float *)(s1 + 0xC), 1.0f, 0.020000001f);
         if (*(float *)(s1 + 0xC) != 0.0f)
-            func_L00_002E6CF0((void *)func_PAL_L02_004176A8, a0);
-        p = func_002A9640(a0, 0x10000, 0);
+            gfx_add_draw_callback_first((void *)func_PAL_L02_004176A8, a0);
+        p = part_find_owned_effect_slot(a0, 0x10000, 0);
         if (p != 0) {
             q = *(u8 **)(p + 0x20);
             if (q != 0 && *(s16 *)(q + 0xAA) == 0x9C8 &&
-                func_00282E48(a0 + 0x10, q + 0x10) < 5.0f) {
+                fast_vec_dist(a0 + 0x10, q + 0x10) < 5.0f) {
                 D_0018CFDC = 0xFFFF;
-                func_002A7750(a0, 2, -1);
+                moby_set_state(a0, 2, -1);
                 *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
                 *(u32 *)(a0 + 0x98) = 0;
                 slot = *(s32 *)(s1 + 0x18);
@@ -105,7 +106,7 @@ void func_PAL_L02_00417128(u8 *a0) {
                     u8 *rec = (u8 *)D_L02_00188660 + slot * 0x70;
 
                     if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
-                        func_002E59F8(slot);
+                        snd_stop_voice(slot);
                 }
                 *(s32 *)(s1 + 0x18) = -1;
             }
@@ -115,9 +116,9 @@ void func_PAL_L02_00417128(u8 *a0) {
     case 2:
         break;
     }
-    *(float *)(s1 + 4) = func_00283B98(*(float *)(s1 + 4), 0.06981318f);
-    *(float *)(s1 + 0x14) = func_00283B98(*(float *)(s1 + 0x14), -0.12566373f);
-    *(float *)(a0 + 0x18) = func_00283198(*(float *)(s1 + 4)) * 0.5f + *(float *)(s1 + 8);
+    *(float *)(s1 + 4) = FastAddRotations(*(float *)(s1 + 4), 0.06981318f);
+    *(float *)(s1 + 0x14) = FastAddRotations(*(float *)(s1 + 0x14), -0.12566373f);
+    *(float *)(a0 + 0x18) = math_fast_sin_or_cos_b(*(float *)(s1 + 4)) * 0.5f + *(float *)(s1 + 8);
     f = *(float *)(s1 + 0x10) + -0.080000006f;
     *(float *)(s1 + 0x10) = f;
     if (f > 1.0f)

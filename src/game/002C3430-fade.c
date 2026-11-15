@@ -1,17 +1,17 @@
 #include "common.h"
-extern int func_00282978(short *);
-extern void func_002B9180(void *);
-extern int func_00283CF0(float);
-extern void func_0029FCC0(void *,int,void *);
-extern float D_001B5340[];
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
+extern int FastDecTimer(short *);
+extern void part_kill(void *);
+extern int FloatToInt(float);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern float g_camera_eye_state[];
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
 extern unsigned char *D_001F2634;
 /* Follows an animated source joint, easing size and alpha toward their limits.
  * Corresponds to RAC1's update_animated_source_attached_fade_in_out_effect_particle. */
 /* Updates a glow that sticks to a joint of another object, grows and shrinks, and fades. */
-void func_002C3430(char *particle)
+void part_update_joint_following_glow(char *particle)
 {
     char *motion;
     float jointPos[4], offset[4];
@@ -22,7 +22,7 @@ void func_002C3430(char *particle)
     motion = particle + 32;
     if (FastDecTimer((short *)(particle + 10)) || !*(char **)motion ||
         *(signed char *)(*(char **)motion + 32) < 0) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     *(short *)(motion + 12) = (*(unsigned short *)(motion + 12) + 1) & 15;
@@ -51,7 +51,7 @@ void func_002C3430(char *particle)
         }
         if (!(limit < size)) {
             if (size < 0.0f) {
-                KillParticle(particle);
+                part_kill(particle);
                 return;
             }
         } else {
@@ -62,8 +62,8 @@ void func_002C3430(char *particle)
     *(int *)(particle + 4) = (*(int *)(particle + 4) & 0xffffff) +
         (FloatToInt(*(float *)(motion + 4) * 256.0f) << 24);
     *(float *)(motion + 20) += (1.0f - *(float *)(motion + 20)) * 0.175f;
-    TransformMobyJointToWorld(*(void **)motion, *(short *)(motion + 14), jointPos);
-    FastVecSub(offset, gCameraState_001B5340, jointPos);
+    moby_transform_joint_to_world(*(void **)motion, *(short *)(motion + 14), jointPos);
+    FastVecSub(offset, g_camera_eye_state, jointPos);
     vec_scale_to_length(offset, offset, *(float *)(motion + 20));
     FastVecAdd(particle + 16, (char *)jointPos, (char *)offset);
 }

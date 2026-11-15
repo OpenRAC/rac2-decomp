@@ -3,14 +3,14 @@
 
 typedef int BeamQuad __attribute__((mode(TI)));
 struct QuadPacket { BeamQuad vertices[4]; int colors[4]; float uv[4][2]; long state70, state78, state80, state88; };
-extern void func_0029FC20(char *, int, char *);
-extern void func_L02_002EF968(struct QuadPacket *, int, int, float (*)[2], BeamQuad *, int);
-extern void func_00282C88(BeamQuad *);
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern void func_00280B90(void *, void *, int);
+extern void moby_transform_joint_point(char *, int, char *);
+extern void FillQuadPacket(struct QuadPacket *, int, int, float (*)[2], BeamQuad *, int);
+extern void vec_clear_128(BeamQuad *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern void draw_world_quad(void *, void *, int);
 extern int D_L03_001B1108 SDATA(D_L03_001B1108);
 extern int D_L03_001B110C __attribute__((sda));
 extern int D_L03_001B1138 SDATA(D_L03_001B1138);
@@ -24,13 +24,13 @@ extern float D_L03_001B11D0 SDATA(D_L03_001B11D0);
 /* Four complete144-byte draw packets, two48-byte rotation bases, the actual
  *64-byte object basis and one initialized16-byte Euler vector. Both template
  * reads cover64 bytes; UV reads cover32. No adjacent-vector pseudo-matrix. */
-void func_L03_003F6BA8(char *object)
+void gfx_draw_beam_quad_packets(char *object)
 {
     float euler[4], rotation[3][4], squared[3][4], matrix[4][4];
     struct QuadPacket packets[4];
     int i, j;
     float alpha;
-    TransformMobyJointPoint(object, 7, (char *)matrix);
+    moby_transform_joint_point(object, 7, (char *)matrix);
     FillQuadPacket(&packets[0], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
     FillQuadPacket(&packets[1], D_L03_001B1108, D_L03_001B1138, D_L03_001B1118, D_L03_001B1150, 1);
     FillQuadPacket(&packets[2], D_L03_001B110C, D_L03_001B1140, D_L03_001B1118, D_L03_001B1190, 1);
@@ -54,7 +54,7 @@ void func_L03_003F6BA8(char *object)
     packets[2].colors[1] = D_L03_001B1144;
     packets[3].colors[3] = D_L03_001B1144;
     packets[3].colors[1] = D_L03_001B1144;
-    ClearVector128((BeamQuad *)euler);
+    vec_clear_128((BeamQuad *)euler);
     euler[2] = 0.09817477f;
     euler_rotation_basis(rotation, euler);
     {

@@ -3,11 +3,11 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *func_0029EFD0(int);
+extern u8 *CreateMoby(int);
 
 /* The func_L02_003A8770 spawn for a live owner: the child is bound to the owner and
    starts at its position. */
-u8 *func_00312E20(u8 *owner, int type) {
+u8 *moby_spawn_linked_child(u8 *owner, int type) {
     u8 *object;
     u8 *data;
     if ((signed char)owner[0x20] < 0)

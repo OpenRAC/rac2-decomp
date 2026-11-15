@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_002CB038 (1,316 bytes), the USA v2.00 copy of func_002CA070 (src/game/002CA070-pause.c):
  * the same C, plus the 0x30-byte copy into the pause state (+0x200); the view reset and its three
  * calls became one call to func_US2_002CAFD8.
@@ -91,11 +92,11 @@ typedef struct {
     void (*upd)(void);
 } Cutscene;
 
-extern int D_001BAF80[];
-extern Menu D_001F2840;
+extern int g_collision_hit[];
+extern Menu g_pause_menu_state;
 extern View D_001B9040;
 extern Buffers D_001BAEC0;
-extern Snd D_001C4FA0;
+extern Snd g_map_overlay_state;
 extern Cutscene D_00210A40;
 extern int D_0025A190[], D_0025E488[], D_00261238[], D_00259458[], D_00259328[], D_0025A738[], D_00259018[], D_00258D70[];
 extern int D_001A8C8C[] __attribute__((sda));
@@ -106,36 +107,36 @@ extern int D_001B1598[] __attribute__((sda));
 extern int D_001B1598_sda __attribute__((sda));
 extern int D_001A72D4[] __attribute__((sda));
 extern int D_001A72D8[] __attribute__((sda));   /* the two frame buffers */
-extern int D_001A7340[] __attribute__((sda));   /* the screen size pair: [0] width, [1] height */
+extern int g_screen_width[] __attribute__((sda));   /* the screen size pair: [0] width, [1] height */
 extern int D_001A7398[] __attribute__((sda));
 extern u8 D_001AA4B0[16] __attribute__((sda));
 extern u8 D_001AA490[16] __attribute__((sda));
 extern u8 D_001AA4A0[16] __attribute__((sda));
 extern u8 D_001C2AD0[];
-extern u8 D_001B5340[];
+extern u8 g_camera_eye_state[];
 
-extern void func_002C9C60(float);
-extern void func_002D5E98(void *);
-extern void func_002CB648(void);
-extern int func_002CB510(int);
-extern void func_002C9AD8(void *);
-extern void func_00295C50(int);
-extern int func_0029D830(void);
-extern void func_00282D30(void *, void *, float);
-extern void func_0027AB40(void);
-extern void func_002C9C90(void);
-extern void func_00279D18(void);
-extern void func_002FC3C0(int);
-extern int func_001261F0(int);
-extern void func_002DE3A0(int);
-extern void func_002FC1D8(void);
-extern void func_002954C0(void);
-extern void func_0028AFE8(int);
-extern void func_0028ACB0(int);
-extern void func_002FC8D0(int, int, int);
-extern void func_002C9F68(void);
-extern void func_0028B338(int);
-extern void func_00282AB0(void *, void *, int);
+extern void menu_set_pause_scale_inverse(float);
+extern void menu_start_action(void *);
+extern void menu_draw_level_select_list(void);
+extern int RebuildLevelSelectAvailability(int);
+extern void menu_ring_list_step_forward(void *);
+extern void map_set_current_and_refresh(int);
+extern int menu_update_entry_states(void);
+extern void FastVecScale(void *, void *, float);
+extern void UpdateViewContext(void);
+extern void cam_reset_active_position(void);
+extern void gfx_build_view_matrices(void);
+extern void gfx_wait_for_dma_status_bits(int);
+extern int sceGsSyncV(int);
+extern void menu_stream_chunk_table_init(int);
+extern void gfx_reset_packet_buffer(void);
+extern void map_reset_cache_and_reload(void);
+extern void hud_unlink_bank_group(int);
+extern void LoadStashedHudBanks(int);
+extern void gfx_copy_image_to_gs_blocks(int, int, int);
+extern void menu_upload_pause_background_to_gs(void);
+extern void select_moby_context(int);
+extern void mem_copy_aligned(void *, void *, int);
 extern void func_US2_002CAFD8(void);
 
 void func_US2_002CB038(void)
@@ -145,94 +146,94 @@ void func_US2_002CB038(void)
     int *p;
     void (*upd)(void);
 
-    D_001BAF80[4] |= 0x80000000;
-    D_001F2840.unk134 = 0;
-    D_001F2840.unkE0 = 0;
-    switch (D_001F2840.state) {
+    g_collision_hit[4] |= 0x80000000;
+    g_pause_menu_state.unk134 = 0;
+    g_pause_menu_state.unkE0 = 0;
+    switch (g_pause_menu_state.state) {
     case 0:
     case 7:
     case 9:
         break;
     case 2:
         queued = 1;
-        D_001F2840.page = D_0025A190;
-        D_001F2840.next = D_0025A190;
+        g_pause_menu_state.page = D_0025A190;
+        g_pause_menu_state.next = D_0025A190;
         break;
     case 3:
-        D_001F2840.page = 0;
-        D_001F2840.next = 0;
+        g_pause_menu_state.page = 0;
+        g_pause_menu_state.next = 0;
         break;
     case 4:
-        D_001F2840.page = D_0025E488;
-        D_001F2840.next = D_0025E488;
+        g_pause_menu_state.page = D_0025E488;
+        g_pause_menu_state.next = D_0025E488;
         queued = 1;
-        func_002C9C60(6.0f);
+        menu_set_pause_scale_inverse(6.0f);
         break;
     case 11:
-        D_001F2840.next = D_001F2840.page = D_00261238;
-        D_001A8C8C[0] = D_001F2840.unk134 = 1;
-        D_001F2840.state = 5;
-        func_002D5E98(D_001AA4B0);
+        g_pause_menu_state.next = g_pause_menu_state.page = D_00261238;
+        D_001A8C8C[0] = g_pause_menu_state.unk134 = 1;
+        g_pause_menu_state.state = 5;
+        menu_start_action(D_001AA4B0);
         break;
     case 5:
-        D_001F2840.page = D_00261238;
-        D_001F2840.next = D_00261238;
-        D_001F2840.unk134 = 1;
+        g_pause_menu_state.page = D_00261238;
+        g_pause_menu_state.next = D_00261238;
+        g_pause_menu_state.unk134 = 1;
         D_001A8C8C[0] = 1;
         break;
     case 6:
-        D_001F2840.page = D_00259458;
-        D_001F2840.next = D_00259458;
+        g_pause_menu_state.page = D_00259458;
+        g_pause_menu_state.next = D_00259458;
         break;
     case 1:
-        D_001F2840.page = D_00259328;
-        D_001F2840.next = D_00259328;
+        g_pause_menu_state.page = D_00259328;
+        g_pause_menu_state.next = D_00259328;
         break;
     case 10:
-        D_001F2840.page = D_0025A738;
-        D_001F2840.next = D_0025A738;
+        g_pause_menu_state.page = D_0025A738;
+        g_pause_menu_state.next = D_0025A738;
         break;
     case 8:
-        D_001F2840.page = D_00259018;
-        D_001F2840.next = D_00259018;
+        g_pause_menu_state.page = D_00259018;
+        g_pause_menu_state.next = D_00259018;
         D_00210A40.a = 0x18;
         D_00210A40.b = 0x18;
         D_00210A40.c = D_00258D70;
-        D_00210A40.upd = func_002CB648;
-        D_00210A40.init = func_002CB510;
+        D_00210A40.upd = menu_draw_level_select_list;
+        D_00210A40.init = RebuildLevelSelectAvailability;
         D_00210A40.init(0);
-        func_002C9AD8(&D_00210A40);
+        menu_ring_list_step_forward(&D_00210A40);
         break;
     }
 
-    if (D_001F2840.hasQueued != 0) {
-        D_001A7478[0] = D_001F2840.unk140;
-        D_001F2840.page = D_001F2840.queued;
-        D_001F2840.next = D_001F2840.queued;
-        if (D_001F2840.state == 2 || D_001F2840.state == 4) {
-            func_00295C50(D_001F2840.unkF4);
+    if (g_pause_menu_state.hasQueued != 0) {
+        D_001A7478[0] = g_pause_menu_state.unk140;
+        g_pause_menu_state.page = g_pause_menu_state.queued;
+        g_pause_menu_state.next = g_pause_menu_state.queued;
+        if (g_pause_menu_state.state == 2 || g_pause_menu_state.state == 4) {
+            map_set_current_and_refresh(g_pause_menu_state.unkF4);
             queued = 1;
-            func_0029D830();
+            menu_update_entry_states();
         }
-        D_001F2840.queued = 0;
-        D_001F2840.hasQueued = 0;
+        g_pause_menu_state.queued = 0;
+        g_pause_menu_state.hasQueued = 0;
     }
 
     {
         u8 *r = D_001C2AD0;
-        func_00282D30(r, D_001AA490, 1.0f);
+        FastVecScale(r, D_001AA490, 1.0f);
         qcopy(r - 0x10, D_001AA4A0);
         r += 0x20;
         qzero_nc(r);
     }
     qzero_nc(D_001C2AD0 + 0x10);
-    qcopy(D_001F2840.v50, D_001B5340);
-    qcopy(D_001F2840.v60, D_001B5340 + 0x10);
-    func_00282AB0(D_001F2840.v200, D_001B5340 + 0x230, 0x30);
-    D_001F2840.unkF8 = D_001B9040.fB0;
+    qcopy(g_pause_menu_state.v50, g_camera_eye_state);
+    qcopy(g_pause_menu_state.v60, g_camera_eye_state + 0x10);
+    mem_copy_aligned(g_pause_menu_state.v200, g_camera_eye_state + 0x230, 0x30);
+    g_pause_menu_state.unkF8 = D_001B9040.fB0;
     func_US2_002CAFD8();
-    func_002FC3C0(1);
-    func_001261F0(0);
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598_sda = D_001B1598[0] + 1;
 
     if (queued) {
@@ -241,14 +242,14 @@ void func_US2_002CB038(void)
         b = D_001BAEC0.f10 + 0x30000;
         c = a + 0x3C000;
         d = b + 0xE0000;
-        D_001F2840.unk10C = c + 0x11800;
+        g_pause_menu_state.unk10C = c + 0x11800;
         D_001B22B0[0] = 0x30000;
-        D_001F2840.unk114 = a;
-        D_001F2840.unk20 = b;
-        D_001F2840.unk118 = c;
-        D_001F2840.unk11C = d;
-        D_001F2840.unk110 = d;
-        func_002DE3A0(0);
+        g_pause_menu_state.unk114 = a;
+        g_pause_menu_state.unk20 = b;
+        g_pause_menu_state.unk118 = c;
+        g_pause_menu_state.unk11C = d;
+        g_pause_menu_state.unk110 = d;
+        menu_stream_chunk_table_init(0);
     } else {
         int a, b, c, d, e, f;
         a = D_001BAEC0.fC + 0x60000;
@@ -259,56 +260,56 @@ void func_US2_002CB038(void)
         d = b + 0xE0000;
         e = c + 0xC1000;
         f = d + 0x60800;
-        D_001F2840.unk10C = e;
+        g_pause_menu_state.unk10C = e;
         D_001B22B0[0] = 0x60000;
-        D_001F2840.unk114 = a;
-        D_001F2840.unk20 = b;
-        D_001F2840.unk118 = c;
-        D_001F2840.unk11C = d;
-        D_001F2840.unk110 = f;
-        func_002DE3A0(1);
+        g_pause_menu_state.unk114 = a;
+        g_pause_menu_state.unk20 = b;
+        g_pause_menu_state.unk118 = c;
+        g_pause_menu_state.unk11C = d;
+        g_pause_menu_state.unk110 = f;
+        menu_stream_chunk_table_init(1);
     }
     D_001A8BC0 = 0x2000;
-    func_002FC1D8();
+    gfx_reset_packet_buffer();
     if (queued) {
-        func_002954C0();
+        map_reset_cache_and_reload();
     }
-    func_0028AFE8(0);
+    hud_unlink_bank_group(0);
     if (queued) {
-        func_0028ACB0(1);
+        LoadStashedHudBanks(1);
     } else {
-        func_0028ACB0(0);
+        LoadStashedHudBanks(0);
     }
-    if (D_001F2840.unkD0 == 0) {
-        func_002FC8D0(D_001F2840.unk20, D_001A72D8[1], D_001A7340[1] << 11);
+    if (g_pause_menu_state.unkD0 == 0) {
+        gfx_copy_image_to_gs_blocks(g_pause_menu_state.unk20, D_001A72D8[1], g_screen_width[1] << 11);
     } else {
-        func_002C9F68();
+        menu_upload_pause_background_to_gs();
     }
     t = D_001A72D4[0];
-    D_001F2840.unk28 = t;
+    g_pause_menu_state.unk28 = t;
     if (queued) {
-        D_001C4FA0.unk24C = t;
+        g_map_overlay_state.unk24C = t;
         u = t + 0x40000;
-        D_001C4FA0.unk250 = u;
+        g_map_overlay_state.unk250 = u;
         D_001A72D4[0] = u + 0x400;
         for (j = 0; j < 4; j++) {
             int v = D_001A72D4[0];
-            D_001C4FA0.bufs[j] = v;
+            g_map_overlay_state.bufs[j] = v;
             D_001A72D4[0] = v + 0x4000;
         }
     } else {
         int z;
-        D_001C4FA0.unk24C = 0;
-        D_001C4FA0.unk250 = 0;
-        p = &D_001C4FA0.bufs[3];
+        g_map_overlay_state.unk24C = 0;
+        g_map_overlay_state.unk250 = 0;
+        p = &g_map_overlay_state.bufs[3];
         for (z = 0; z < 4; z++) {
             *p = 0;
             p--;
         }
     }
-    func_0028B338(1);
+    select_moby_context(1);
     for (k = 0; k < 4; k++) {
-        D_001F2840.unk40[k] = D_001A7398[k];
-        D_001F2840.unk30[k] = D_001A7398[k];
+        g_pause_menu_state.unk40[k] = D_001A7398[k];
+        g_pause_menu_state.unk30[k] = D_001A7398[k];
     }
 }

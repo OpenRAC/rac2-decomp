@@ -15,9 +15,9 @@ extern JobaPolygonHeaderView *D_L11_001FF580[];
 /* func_L11_00440790 lives in L11_00440238-g8.c (its source unit has the retail small-data view). */
 
 /* Finds the class entry the identifier names and hands it to that class's handler. */
-extern u8 *D_L11_001FC420[];
+extern u8 *g_group_id_lists[];
 
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
 
 /* func_L11_00440970 lives in the sibling small-data unit (L11_0043E1A0-g8.c). */
 
@@ -40,9 +40,9 @@ extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
 /* Walks the state's 0x120 slots in order and renews each live entry through the two shared helpers. */
 /* Clears the state's 0x120 slot table once every live entry has been accepted. */
 /* hands every entry of the class list to its measured handler */
-extern u8 *D_L11_001FC420[];
+extern u8 *g_group_id_lists[];
 
-extern u8 *D_L11_001B359C;
+extern u8 *g_moby_l11_table;
 
 /* The class table base read through an incomplete `sda` array: cc1 emits the one-instruction
    load, which the assembler expands absolute (`lui $r` / `lw $r,%lo($r)`) and which is not

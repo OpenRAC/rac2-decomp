@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned char D_L06_001B23C0[];
 
 /* The nested lookup table is bound independently in each program. */
 /* Finds the visibility data for a grid cell using three nested lookups. Returns 0 if the cell has none. */
-int func_0027A0F8(int a0, int a1, int a2)
+int vis_find_cell_data(int a0, int a1, int a2)
 {
     unsigned char *base = *(unsigned char **)D_L06_001B23C0;
     unsigned char *end = base + *(int *)base;

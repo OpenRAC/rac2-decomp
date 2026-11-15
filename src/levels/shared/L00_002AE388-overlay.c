@@ -48,38 +48,38 @@ typedef struct {
     short selector;
 } AnimationState;
 extern AnimationState D_00189E20_26;
-extern int func_L00_002AEAC0(int);
-extern void func_L00_002AF7D0(void);
+extern int hero_get_item_icon_id(int);
+extern void cancel_hero_item_animation(void);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern void *func_002AB1F0(void *);
-extern int func_L00_002ADEA0(int);
+extern void *moby_get_private_value_0(void *);
+extern int hero_slot_item_id(int);
 extern char *ref_L00_002AEB18_0(int,int);
 extern void ref_L00_002AEB18_1(int,void *);
 extern void ref_L00_002AEB18_2(int,void *,int,int,int,int);
 extern void ref_L00_002AEB18_3(int,void *);
-extern float func_002AA2E8(float *,float,float);
+extern float ApproachValue(float *,float,float);
 extern char D_L00_001B5000[];
 /* Shows or hides a small icon over the hero, picking the picture by what the hero is doing, and fades it. */
-void func_L00_002AEB18(void)
+void hero_update_status_icon_overlay(void)
 {
     int enabled=0,id=0,mode;
     float opacity=1.0f;
     unsigned char *data;
     char *overlay;
     if(D_00189E20_26.object) {
-        data=GetMobyPrivateValue0(D_00189E20_26.object);
+        data=moby_get_private_value_0(D_00189E20_26.object);
         enabled=1;
         id=0x72;
         if(data[0x2c]) {
-            id=GetItemIconIdForSelector((unsigned char)data[0x2c]);
+            id=hero_get_item_icon_id((unsigned char)data[0x2c]);
             if(D_00189E20_26.mode==1) opacity=0.7f;
         }
     }
     if(D_00189E20_26.flag) {
         enabled=1;
-        id=GetItemIconIdForSelector(D_00189E20_26.selector);
+        id=hero_get_item_icon_id(D_00189E20_26.selector);
     }
     if(D_00189E20_26.mode2==1) {
         int anim=((unsigned char *)D_00189E20_26.resource)[0x43];

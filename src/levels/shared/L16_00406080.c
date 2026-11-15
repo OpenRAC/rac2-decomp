@@ -1,16 +1,16 @@
 #include "common.h"
 
 typedef int Vector128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L16_00406550(char *, char *);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void part_l16_spawn_explosion_burst(char *, char *);
 typedef struct Cam_00435CE8 Cam_00435CE8;
 typedef struct CamMgr_00435CE8 {
     u8 pad000[0x140];
@@ -42,7 +42,7 @@ typedef struct SpawnObject {
 } SpawnObject;
 
 /* Creates a flash effect object (moby class 3777) at a position, facing the camera, and shakes the camera if it is close. */
-char *func_L16_00406080(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+char *part_create_flash(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xec1);
@@ -61,7 +61,7 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
         camera = (char *)D_L16_001B99C0.f140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(object + 0x10, (char *)up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
@@ -82,7 +82,7 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
             if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
@@ -94,7 +94,7 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
             if (state->flags != 0) {
                 FastVecSub(difference, object + 0x10, D_L16_001B99C0.f140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = FastAngleHelper(FastVecDot(difference, (char *)&D_L16_001B99C0 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L16_001B99C0 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -104,7 +104,7 @@ char *func_L16_00406080(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        SpawnExplosionBurst_L16(object, (char *)up);
+        part_l16_spawn_explosion_burst(object, (char *)up);
     }
     return object;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L11_00443940: the help-prompt HUD lines (labels 0x49/0x48, then a pulsing colour
  * from func_00283D38, the 0x4b line when the selection is nonzero and the first available
  * 0x4a entry after it). Twin of func_L02_003FDDE8.
@@ -19,18 +20,18 @@ typedef struct {
 extern u8 *D_L11_001A904C;
 extern float D_L11_001B3E04;
 extern int D_L11_001B30C8;
-extern unsigned char D_00138180[];
-extern unsigned char D_00139568[], D_001395B8[];
+extern unsigned char g_pad_state[];
+extern unsigned char g_item_slot_to_record[], D_001395B8[];
 extern unsigned char D_L11_00279BA0[];
 /* The class pointer table is addressed through gp. */
-extern int *D_L11_001B14F8[] SDATA(D_L11_001B14F8);
-extern void func_L00_0037B7B0(void);
-extern int func_00336D50(u8 *, int);
-extern void func_00300A00(char *, float, int, float, float, float, float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern int func_L11_0043E108(unsigned int);
-extern int func_00288D58(void);
-extern void func_002FC560(unsigned int, unsigned long long);
+extern int *g_arena_challenge_table[] SDATA(D_L11_001B14F8);
+extern void gfx_append_draw_list_packet_c(void);
+extern int table_find_by_id(u8 *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, float, int, float, float, float, float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern int arena_get_challenge_flag_index(unsigned int);
+extern int flag_is_byte_set(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern float D_L11_001B161C __attribute__((sda));
 extern int D_L11_001B1620 __attribute__((sda));
 extern int D_L11_001B1624 __attribute__((sda));
@@ -65,55 +66,55 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Draws the help prompts of the Joba menu: the two button labels and the arrows for the previous and next entry. */
-void func_L11_00443940(u8 *moby, int enabled)
+void joba_menu_draw_help_prompts(u8 *moby, int enabled)
 {
     u8 *state;
     int label, phase, i, one, k3, entry;
     unsigned int color, labelColor;
     float confirmX, nextX, labelX, labelY, pulse, half, scale, zero;
     if (D_L11_001A904C == 0) return;
-    AppendDrawListPacketC();
+    gfx_append_draw_list_packet_c();
     entry = 0x8710;
     state = *(u8 **)(moby + 0x68);
     half = 0.5f;
 
-    label = FindTableEntryById(D_L11_001A904C + entry, 0x49);
+    label = table_find_by_id(D_L11_001A904C + entry, 0x49);
     labelX = (float)D_L11_001B1620;
     one = 1;
     labelY = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, one);
     scale = 1.0f;
     zero = 0.0f;
-    DrawScaledObjectTwoAxes((char *)label, labelX, D_L11_001B163C, labelY, D_L11_001B161C, scale, zero);
-    label = FindTableEntryById(D_L11_001A904C + entry, 0x48);
+    gfx_draw_scaled_object_two_axes((char *)label, labelX, D_L11_001B163C, labelY, D_L11_001B161C, scale, zero);
+    label = table_find_by_id(D_L11_001A904C + entry, 0x48);
     labelX = (float)D_L11_001B1620;
     labelY = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, 1);
-    DrawScaledObjectTwoAxes((char *)label, labelX, D_L11_001B1638, labelY, D_L11_001B161C, scale, zero);
+    gfx_draw_scaled_object_two_axes((char *)label, labelX, D_L11_001B1638, labelY, D_L11_001B161C, scale, zero);
     phase = D_L11_001B30C8 % 50;
     if (phase >= 25) pulse = scale - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
     color = FastTweenColor(D_L11_001B1638, D_L11_001B163C, pulse);
     if (enabled) {
         if (*(short *)(state + 0x1e8) != 0) {
-            label = FindTableEntryById(D_L11_001A904C + 0x8710, 0x4b);
+            label = table_find_by_id(D_L11_001A904C + 0x8710, 0x4b);
             k3 = 1;
             confirmX = (float)D_L11_001B1628;
-            labelColor = (((InputView *)gPadState)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
+            labelColor = (((InputView *)g_pad_state)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
             labelY = (float)label_y((void *)label, (float)D_L11_001B162C, D_L11_001B3E04, 0.5f, k3);
-            DrawScaledObjectTwoAxes((char *)label, confirmX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes((char *)label, confirmX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x1e8) + 1; i < 13; i++) {
-            if (!D_001395B8[GetChallengeFlagIndex(gArenaChallengeTable[i][2])]) continue;
-            if (i >= 11 && !IsFlagByteSet()) continue;
+            if (!D_001395B8[arena_get_challenge_flag_index(g_arena_challenge_table[i][2])]) continue;
+            if (i >= 11 && !flag_is_byte_set()) continue;
             if (i == 8) {
-                MenuRecord *choice = (MenuRecord *)(D_L11_00279BA0 + gItemSlotToRecord[0x1e] * 0xe0);
+                MenuRecord *choice = (MenuRecord *)(D_L11_00279BA0 + g_item_slot_to_record[0x1e] * 0xe0);
                 if (!choice->enabled) continue;
             }
-            label = FindTableEntryById(D_L11_001A904C + 0x8710, 0x4a);
+            label = table_find_by_id(D_L11_001A904C + 0x8710, 0x4a);
             one = 1;
-            labelColor = (((InputView *)gPadState)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
+            labelColor = (((InputView *)g_pad_state)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
             nextX = (float)D_L11_001B1630;
             labelY = (float)label_y((void *)label, (float)D_L11_001B1634, D_L11_001B3E04, 0.5f, one);
-            DrawScaledObjectTwoAxes((char *)label, nextX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes((char *)label, nextX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
             break;
         }
     }

@@ -5,14 +5,14 @@
    state (+0x50) either the -1 terminated list of text ids at +0x34, centred by the line
    count at +0x3C, flagging +0x54 when it ends 0x18 above the bottom, or the single text
    id at +0x34 (states 4, 11, 15, 19). */
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C540(long);
-extern void func_002DE810(void *, char *);
-extern char *func_00288FB8(int);
-extern void func_00280190(void *, unsigned long, char *, int);
-extern void func_0027C660(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void SetupGifPaging(long);
+extern void pack_image_descriptor(void *, char *);
+extern char *GetLocalizedString(int);
+extern void text_draw_window_small(void *, unsigned long, char *, int);
+extern void DoGifPaging(void);
 
-int func_002DC720(char *menu_text_box)
+int text_timed_pages_draw(char *menu_text_box)
 {
     short box[12];
     int ypos;
@@ -52,7 +52,7 @@ int func_002DC720(char *menu_text_box)
         for (i = 0; (*(int **)(menu_text_box + 0x34))[i] != -1; i++) {
             box[5] = ypos;
             box[11] = (*(int *)(menu_text_box + 0x3C) >> 4) & 0xF;
-            DrawTextWindowSmallFont(box, 0x80FFA888L, GetLocalizedString((*(int **)(menu_text_box + 0x34))[i]), -1);
+            text_draw_window_small(box, 0x80FFA888L, GetLocalizedString((*(int **)(menu_text_box + 0x34))[i]), -1);
             ypos += box[7];
             ypos += 10;
         }
@@ -64,7 +64,7 @@ int func_002DC720(char *menu_text_box)
     case 15:
     case 19:
         box[5] = *(int *)(menu_text_box + 0x1C) + 0x20;
-        DrawTextWindowSmallFont(box, 0x80FFA888L, GetLocalizedString(*(int *)(menu_text_box + 0x34)), -1);
+        text_draw_window_small(box, 0x80FFA888L, GetLocalizedString(*(int *)(menu_text_box + 0x34)), -1);
         break;
     case 0:
         break;

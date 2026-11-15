@@ -5,14 +5,14 @@ extern int r1_func_0011D960(void);
 
 extern void r1_func_0011D9A8(void);
 
-extern void func_00130AB0(unsigned int);
+extern void ipu_write_out_dma_control(unsigned int);
 
 /* sceIpuStopDMA: request the IPU-in (D4/toIPU) DMA channel to stop
  * (func_00130B18(1)), save its MADR/TADR/QWC/CHCR into env[0..3], wait for
  * the IPU's queued-command count (IPU_CTRL bits 4-7) to drain, stop the
  * IPU-out (D3/fromIPU) channel (func_00130AB0(0)) and save its
  * MADR/QWC/CHCR plus IPU_BP and IPU_CTRL into env[4..8]. */
-extern void func_00130B18(unsigned int);
+extern void ipu_write_in_dma_control(unsigned int);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CC90 */
 /*
@@ -27,7 +27,7 @@ extern void func_00130B18(unsigned int);
  * epilogue, 3 words over (0x70 against 0x64).
  */
 /* Safely writes the control register of the picture output DMA channel. */
-void func_00130AB0(unsigned int chcr) {
+void ipu_write_out_dma_control(unsigned int chcr) {
     r1_func_0011D960();
     D_ENABLEW = D_ENABLER | 0x10000;
     D3_CHCR = chcr;
@@ -37,7 +37,7 @@ void func_00130AB0(unsigned int chcr) {
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CCF8 */
 /* Safely writes the control register of the picture input DMA channel. */
-void func_00130B18(unsigned int chcr) {
+void ipu_write_in_dma_control(unsigned int chcr) {
     r1_func_0011D960();
     D_ENABLEW = D_ENABLER | 0x10000;
     D4_CHCR = chcr;

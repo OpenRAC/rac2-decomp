@@ -14,17 +14,17 @@ extern f32 D_L08_001B1BA4 __attribute__((sda));
 extern u32 D_L08_001B1BA8 __attribute__((sda));
 extern u16 *D_L08_001FB660[];
 extern u8 D_L08_001B9D30[];
-extern s32 func_L08_00300090(void), func_L08_003000C0(void);
-extern void func_L08_00300100(void);
-extern char *func_00336D50(void *, s32);
-extern void func_00300A00(char *, u32, f32, f32, f32, f32, f32);
-extern u64 func_0027C878(s32);
-extern void func_L05_003008C0(f32, f32, f32, f32, s32, s32, s32, s32, u64, u64);
-extern f32 func_00282E48(void *, void *);
-extern void func_002833F0(void *, void *), func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32), func_002836E8(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern s32 func_00283CF0(f32);
+extern s32 hero_begin_saved_float_hold(void), hero_end_saved_float_hold(void);
+extern void hero_set_saved_float_and_update(void);
+extern char *table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object_two_axes(char *, u32, f32, f32, f32, f32, f32);
+extern u64 GetEffectTextureDescriptor(s32);
+extern void AppendSubpixelTexturedScreenQuad(f32, f32, f32, f32, s32, s32, s32, s32, u64, u64);
+extern f32 fast_vec_dist(void *, void *);
+extern void euler_rotation_basis(void *, void *), FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32), mat_fast_helper_c(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern s32 FloatToInt(f32);
 
 extern int D_L08_001B3240;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -63,7 +63,7 @@ static __inline__ int hud_coord(float value, float scale, float half)
 
 /* Draws the radar on screen: three text labels, a centre marker, and a fading dot for every
    nearby object, placed by its direction and distance from the hero's vehicle. */
-void func_L08_004207D0(u8 *vehicle)
+void radar_draw(u8 *vehicle)
 {
     Vector offset, euler;
     f32 rotation[12], inverse[12];
@@ -75,21 +75,21 @@ void func_L08_004207D0(u8 *vehicle)
     s64 dotColor;
     u64 texture;
     f32 half;
-    BeginSavedFloatHold();
-    SetSavedFloatAndUpdate();
+    hero_begin_saved_float_hold();
+    hero_set_saved_float_and_update();
     vars = *(u8 **)(vehicle + 0x68);
-    label1 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBA);
-    label2 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBB);
-    label3 = FindTableEntryById(D_L08_001A904C + 0x8710, 0xBC);
-    DrawScaledObjectTwoAxes(label1, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    label1 = table_find_by_id(D_L08_001A904C + 0x8710, 0xBA);
+    label2 = table_find_by_id(D_L08_001A904C + 0x8710, 0xBB);
+    label3 = table_find_by_id(D_L08_001A904C + 0x8710, 0xBC);
+    gfx_draw_scaled_object_two_axes(label1, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     half = 0.5f;
-    DrawScaledObjectTwoAxes(label2, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
-    DrawScaledObjectTwoAxes(label3, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(label3, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
+    gfx_draw_scaled_object_two_axes(label2, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    gfx_draw_scaled_object_two_axes(label3, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(label3, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
     dotY = (f32)label_y(vehicle, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
     texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
     AppendSubpixelTexturedScreenQuad(D_L08_001B1B84, dotY, D_L08_001B1B8C, D_L08_001B1B90,
                      0, 0, D_L08_001B1B94, D_L08_001B1B98, 0x80808080UL, texture);
-    EndSavedFloatHold();
+    hero_end_saved_float_hold();
     anchorObj = *(u8 **)(vars + 0x1B0);
     if (!anchorObj) return;
     listStart = D_L08_001FB660[anchorObj[0x21]];
@@ -107,7 +107,7 @@ void func_L08_004207D0(u8 *vehicle)
             euler_rotation_basis(rotation, &euler);
             FastVecSub(&offset, blip + 0x10, vehicle + 0x10);
             vec_scale_to_length(&offset, &offset, dotY);
-            FastMatrixHelperC(inverse, D_L08_001B9D30);
+            mat_fast_helper_c(inverse, D_L08_001B9D30);
             matrix_mul_vec3(&offset, &offset, inverse);
             matrix_mul_vec3(&offset, &offset, rotation);
             dotAlpha = FloatToInt((1.0f - distance / D_L08_001B1BA4) * 128.0f);

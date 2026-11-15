@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned long long u64;
 typedef long long ll;
 typedef unsigned int u32;
 typedef unsigned char u8;
 extern int D_001A72DC;
 extern int D_001B23C8;
-extern void func_002B6480(void *, int);
+extern void BuildFrameDmaChain(void *, int);
 
 /* FMV GS packet builder: one 0x40-byte header record, then a 0x60-byte record per
    (row, column), then the closing A_B word pair at the end of the run. */
@@ -60,5 +61,5 @@ void func_PAL_00352000(void *a0, int a1, int a2, int a3, int t0)
     *(u32 *)(p + 0x0C) = 0;
     *(u32 *)(p + 0x08) = 0;
     *(u32 *)(p + 0x04) = addr;
-    func_002B6480((void *)(u32)(D_001B23C8 + off), 1);
+    BuildFrameDmaChain((void *)(u32)(D_001B23C8 + off), 1);
 }

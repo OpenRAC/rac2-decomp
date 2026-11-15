@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern long long func_0027C878(char *p);
+extern long long GetEffectTextureDescriptor(char *p);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_00282E80(char *p, float *v);
+extern float vec_distance_xy(char *p, float *v);
 
-extern void func_00283410(float *matrix, float *quat);
+extern void euler_to_matrix(float *matrix, float *quat);
 
-extern void func_00282CF0(float *off, float *v, char *p);
+extern void FastVecSub(float *off, float *v, char *p);
 
-extern void func_00280B90(char *pkt, float *matrix, int mode);
+extern void draw_world_quad(char *pkt, float *matrix, int mode);
 
 typedef struct { char pad[0x2290]; char *object; } EffectContext;
 
@@ -37,7 +37,7 @@ typedef struct {
     u8 field18[8];
 } NativeObjectSearchRecord32;
 
-extern BootAimVector D_001B5200;
+extern BootAimVector g_active_camera;
 
 extern void F2c74c194_FUN_00282D30(char *dst, char *src, float scale);
 
@@ -57,65 +57,65 @@ extern void F8411efa9_FUN_00328D30(char *pkt, float angle);
 
 extern void F8411efa9_FUN_00280B90(char *pkt, float *matrix, int mode);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
 extern float func_002A7878_1(float a, float b);
 
-extern float func_00283180(float a);
+extern float math_fast_sin_or_cos_a(float a);
 
-extern float func_00283198(float a);
+extern float math_fast_sin_or_cos_b(float a);
 
-extern int func_002A7820(int a, int b);
+extern int math_random_int_range(int a, int b);
 
-extern int func_002A77E0(int a);
+extern int math_random_int_below(int a);
 
-extern void func_002BFB38(char *p, float *q, int a, int b);
+extern void part_spawn_spark_2(char *p, float *q, int a, int b);
 
 extern void Fc936841d_FUN_00282CF0(char *local, char *first, char *second);
 
 extern void Fc936841d_FUN_00282CC0(char *target, char *first, char *local);
 
-extern NativeObjectSearchRecord32 D_L00_002533B0[];
+extern NativeObjectSearchRecord32 g_health_l00_drain_slots[];
 
 extern unsigned char *D_001BAF98[];
 
-extern char D_001A63A8[];
+extern char g_music_state[];
 
 extern char D_001B01F0[];
 
-extern int func_002B6D28(void);
+extern int snd_resume_music_stream(void);
 
-extern void func_002A8598(int, int);
+extern void moby_set_byte_on_group(int, int);
 
-extern void func_0026FEB8(const char *, ...);
+extern void STUB_printf(const char *, ...);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern void func_00282F20(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
-extern char D_0022B0A0[];
+extern char g_spark_records[];
 
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 extern char D_L00_00252C40[][16];
 
 extern char D_L00_00189F00[];
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern void func_002AF000(void *, float, float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern long long func_0027C878(char *p);
+extern long long GetEffectTextureDescriptor(char *p);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_00282E80(char *p, float *v);
+extern float vec_distance_xy(char *p, float *v);
 
-extern void func_00283410(float *matrix, float *quat);
+extern void euler_to_matrix(float *matrix, float *quat);
 
-extern void func_00280B90(char *pkt, float *matrix, int mode);
+extern void draw_world_quad(char *pkt, float *matrix, int mode);
 
 #ifndef RAC2_T_VEC16_FC936841D
 #endif
@@ -142,7 +142,7 @@ extern void func_00280B90(char *pkt, float *matrix, int mode);
 
 
 /* Checks the player and records in the owner whether he can be hurt; if he can, raises his hit counter. */
-void func_00328758(char *self)
+void hero_check_hit_by_object(char *self)
 {
     unsigned char *player = D_001BAF98[0];
     char *vars = *(char **)(self + 0x68);
@@ -158,12 +158,12 @@ void func_00328758(char *self)
             if (playerVars[0x14] != 0) {
                 player[0xBC] += 2;
                 if (player[0xBC] >= 25) {
-                    gameState = gMusicState;
+                    gameState = g_music_state;
                     if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
-                        ResumeMusicStream();
+                        snd_resume_music_stream();
                 }
                 if (player[0x21] != 255)
-                    SetByteOnGroupMobys(player[0x21], player[0xBC]);
+                    moby_set_byte_on_group(player[0x21], player[0xBC]);
             }
             *(int *)(vars + 0x54) = 0;
         } else {
@@ -175,9 +175,9 @@ void func_00328758(char *self)
 }
 
 /* Claims a free spark record for the owner and gives it a random direction. */
-void func_00328848(char *self)
+void part_claim_spark_record(char *self)
 {
-    char *record = gSparkRecords_0022B0A0;
+    char *record = g_spark_records;
     int *vars = *(int **)(self + 0x68);
     int i;
 
@@ -188,9 +188,9 @@ void func_00328848(char *self)
         }
         *(int *)(record + 0x34) = (int)self;
         *(int *)(record + 0x30) = 0;
-        *(float *)(record + 0x0) = RandomFloatRange(-1.0f, 1.0f);
-        *(float *)(record + 0x4) = RandomFloatRange(-1.0f, 1.0f);
-        *(float *)(record + 0x8) = RandomFloatRange(-1.0f, 1.0f);
+        *(float *)(record + 0x0) = math_random_float_range(-1.0f, 1.0f);
+        *(float *)(record + 0x4) = math_random_float_range(-1.0f, 1.0f);
+        *(float *)(record + 0x8) = math_random_float_range(-1.0f, 1.0f);
         vec_scale_to_length((float *)record, (float *)record, 0.1275f);
         vars[0x48 / 4]++;
         break;
@@ -198,9 +198,9 @@ void func_00328848(char *self)
 }
 
 /* Moves the owner's spark records around it and frees each one after it has turned a full circle. */
-void func_00328918(char *owner)
+void part_update_orbiting_sparks(char *owner)
 {
-    int tableAddr = (int)gSparkRecords_0022B0A0;
+    int tableAddr = (int)g_spark_records;
     char *sparkPos = (char *)(tableAddr + 0x10);
     char *sparkAux = (char *)(tableAddr + 0x20);
     int left = 99;
@@ -228,7 +228,7 @@ void func_00328918(char *owner)
 /* func_00328B68 is in 00328A20.c. */
 
 /* Resets a drawing packet to a flat white square with default settings. */
-void func_00328CA8(char *packet)
+void gfx_reset_draw_packet(char *packet)
 {
     *(long long *)(packet + 112) = 0LL;
     *(int *)(packet + 80) = 0;
@@ -259,7 +259,7 @@ void func_00328CA8(char *packet)
 }
 
 /* Scales the four corner vectors of a drawing packet. */
-void func_00328D30(char *packet, float scale)
+void gfx_scale_draw_packet_corners(char *packet, float scale)
 {
     F2c74c194_FUN_00282D30(packet, packet, scale);
     F2c74c194_FUN_00282D30(packet + 16, packet + 16, scale);
@@ -268,7 +268,7 @@ void func_00328D30(char *packet, float scale)
 }
 
 /* Draws a sprite at a position, facing the camera, with a given color, brightness, size and tilt. */
-void func_00328D98(char *pos, int color, int alpha, char *textureId, int blendMode,
+void gfx_draw_facing_sprite(char *pos, int color, int alpha, char *textureId, int blendMode,
                                         char *direction, float size, float roll)
 {
     char packet[144];
@@ -336,19 +336,19 @@ typedef struct {
     int count;
 } F328Owner;
 
-extern F328Particle D_0022C9A0[300];
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(float, int, int);
-extern float func_00283B98(float, float);
-extern float func_002A7878(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00282948(void *);
+extern F328Particle g_object_particles[300];
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(float, int, int);
+extern float FastAddRotations(float, float);
+extern float math_random_float_range(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern int math_fast_float_d(void *);
 
 /* Updates the owner's particles: their color fades, they spin and drift, and each is freed when its time is up. */
-void func_00329328(void *owner) {
-    F328Particle *particles = gObjectParticles;
+void part_update_object_particles(void *owner) {
+    F328Particle *particles = g_object_particles;
     F328Particle *particle;
     F328Owner *vars = *(F328Owner **)((char *)owner + 0x68);
     int i;
@@ -364,10 +364,10 @@ void func_00329328(void *owner) {
         particle->t.f28 = FloatToInt((float)particle->t.f24 * timeRatio);
         particle->t.f20 = FastTweenColor(timeRatio * halfValue, 0, particle->t.f1C);
         particle->t.f14 = FastAddRotations(particle->t.f14, particle->t.f10);
-        particle->t.f18 += RandomFloatRange(0.001f, 0.003f);
+        particle->t.f18 += math_random_float_range(0.001f, 0.003f);
         FastVecAdd(particle, particle, &particle->t);
         FastVecScale(&particle->t, &particle->t, 0.99f);
-        if (FastFloatHelperD(&particle->t.f30)) {
+        if (math_fast_float_d(&particle->t.f30)) {
             particle->t.owner = 0;
             vars->count--;
         }
@@ -379,7 +379,7 @@ void func_00329328(void *owner) {
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B5200 vector from the
  * object's own position through three float helpers, writes the last matrix row from that
  * position, then dispatches the packet. */
-void func_00329630(char *self)
+void part_draw_object_particle(char *self)
 {
     char packet[144];
     float matrix[16];
@@ -401,10 +401,10 @@ void func_00329630(char *self)
     *(int *)(packet + 0x40) = color;
 
     rotation[3] = 0.0f;
-    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(self + 0),
-                            gActiveCamera.y_144 - *(float *)(self + 4));
-    rotation[1] = -FastMatrixHelperA(vec_distance_xy(self, &gActiveCamera.x_140),
-                             gActiveCamera.z_148 - *(float *)(self + 8));
+    rotation[2] = mat_fast_helper_a(g_active_camera.x_140 - *(float *)(self + 0),
+                            g_active_camera.y_144 - *(float *)(self + 4));
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(self, &g_active_camera.x_140),
+                             g_active_camera.z_148 - *(float *)(self + 8));
     rotation[0] = *(float *)(self + 0x24);
 
     euler_to_matrix(matrix, rotation);
@@ -424,7 +424,7 @@ void func_00329630(char *self)
 
 /* Per frame: scales the value one helper returns by the factor another helper returns, stores both scaled samples and a third sample into a three-float record, and hands the record to a setter with two selector results. */
 /* Throws out 48 sparks from the object in random directions. */
-void func_00329E60(char *self)
+void part_emit_spark_burst(char *self)
 {
     float velocity[3];
     float angle;
@@ -434,14 +434,14 @@ void func_00329E60(char *self)
     int sparkType;
 
     for (i = 47; i >= 0; i--) {
-        angle = RandomAngle();
+        angle = math_random_angle();
         speed = func_002A7878_1(0.0f, 0.050000004f);
-        velocity[0] = FastSinOrCosA(angle) * speed;
-        velocity[1] = FastSinOrCosB(angle) * speed;
+        velocity[0] = math_fast_sin_or_cos_a(angle) * speed;
+        velocity[1] = math_fast_sin_or_cos_b(angle) * speed;
         velocity[2] = func_002A7878_1(0.050000004f, 1.0833334177732467651367e-01f);
-        lifetime = RandomIntRange(90, 120);
-        sparkType = RandomIntBelow(2);
-        SpawnSparkParticle_002BFB38(self + 16, velocity, sparkType, lifetime);
+        lifetime = math_random_int_range(90, 120);
+        sparkType = math_random_int_below(2);
+        part_spawn_spark_2(self + 16, velocity, sparkType, lifetime);
     }
 }
 
@@ -450,15 +450,15 @@ extern char D_001B0238[];
 /* Retail reads these two words with the assembler's lui/lw macro (the destination register
    as the address temporary): cc1 emits `lw reg,sym` for an sda symbol, and the assembler,
    with no small-data threshold here, expands it into lui/lw. */
-extern int D_001B22D0[] __attribute__((sda));
+extern int g_surface_height_tiles[] __attribute__((sda));
 extern int D_001B22D8[] __attribute__((sda));
 
-extern int func_002FD828(float *, float *, float, float, float);
-extern void func_002FD1B8(int, int, int, float, float, float, float);
-extern int func_0026F800(void);
+extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
+extern void RippleDisturb(int, int, int, float, float, float, float);
+extern int stub_empty_30(void);
 
 /* Checks whether the player is under the falling object and, if so, hurts him or locks on to him. */
-void func_00329F40(char *self)
+void hero_check_under_falling_object(char *self)
 {
     unsigned char *heroSlot = D_001BAF98[0];
     char *vars = *(char **)(self + 0x68);
@@ -494,16 +494,16 @@ void func_00329F40(char *self)
                     return;
                 }
                 if (playerVars[0x14] == 0) {
-                    RippleDisturb(gSurfaceHeightTiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
-                    if (EmptyStubF800() == 0) {
+                    RippleDisturb(g_surface_height_tiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
+                    if (stub_empty_30() == 0) {
                         player[0xBC] += 1;
                         if (player[0xBC] >= 25) {
-                            gameState = gMusicState;
+                            gameState = g_music_state;
                             if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
-                                ResumeMusicStream();
+                                snd_resume_music_stream();
                         }
                         if (player[0x21] != 255)
-                            SetByteOnGroupMobys(player[0x21], player[0xBC]);
+                            moby_set_byte_on_group(player[0x21], player[0xBC]);
                     }
                 }
                 *(int *)(vars + 0x44) = 0;
@@ -520,20 +520,20 @@ void func_00329F40(char *self)
 }
 
 /* An empty function that does nothing. */
-void func_0032A130(void)
+void moby_do_nothing(void)
 {
 }
 
 /* Fills a table of 50 random direction vectors. */
-void func_0032A978(void)
+void math_init_random_direction_table(void)
 {
     int i;
     char *entry = (char *)D_L00_00252C40;
     for (i = 49; i >= 0; i--) {
-        float length = RandomFloatRange(0.01f, 7.0f);
-        float yaw = RandomAngle();
-        float pitch = RandomFloatRange(0.0f, 3.1415927f);
-        BuildSphericalOffset(entry, length, yaw, pitch);
+        float length = math_random_float_range(0.01f, 7.0f);
+        float yaw = math_random_angle();
+        float pitch = math_random_float_range(0.0f, 3.1415927f);
+        vec_build_spherical_offset(entry, length, yaw, pitch);
         FastVecAdd(entry, entry, D_L00_00189F00);
         entry += 16;
     }
@@ -552,7 +552,7 @@ void func_0032A978(void)
 /* func_0032B190 is defined in 0032B190-dbg.c (-g). */
 
 /* Resets a drawing packet to a flat white square with default settings. */
-void func_0032B2F0(char *packet)
+void gfx_reset_draw_packet_copy(char *packet)
 {
     *(long long *)(packet + 112) = 0LL;
     *(int *)(packet + 80) = 0;
@@ -583,7 +583,7 @@ void func_0032B2F0(char *packet)
 }
 
 /* Scales the four corner vectors of a drawing packet. */
-void func_0032B378(char *packet, float scale)
+void gfx_scale_draw_packet_corners_copy(char *packet, float scale)
 {
     F2c74c194_FUN_00282D30(packet, packet, scale);
     F2c74c194_FUN_00282D30(packet + 16, packet + 16, scale);
@@ -592,7 +592,7 @@ void func_0032B378(char *packet, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B5200 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_0032B3E0(char *pos, int color, int alpha, char *textureId, int blendMode,
+void gfx_draw_facing_sprite_copy(char *pos, int color, int alpha, char *textureId, int blendMode,
                    float size, float roll, float cameraShift)
 {
     char packet[144];
@@ -601,7 +601,7 @@ void func_0032B3E0(char *pos, int color, int alpha, char *textureId, int blendMo
     float offset[4];
     long long textureReg;
 
-    ResetDrawPacketCopy(packet);
+    gfx_reset_draw_packet_copy(packet);
     textureReg = GetEffectTextureDescriptor(textureId);
 
     *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
@@ -614,14 +614,14 @@ void func_0032B3E0(char *pos, int color, int alpha, char *textureId, int blendMo
     *(long long *)(packet + 120) = textureReg;
 
     rotation[3] = 0.0f;
-    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(pos + 0),
-                            gActiveCamera.y_144 - *(float *)(pos + 4));
-    rotation[1] = -FastMatrixHelperA(vec_distance_xy(pos, &gActiveCamera.x_140),
-                             gActiveCamera.z_148 - *(float *)(pos + 8));
+    rotation[2] = mat_fast_helper_a(g_active_camera.x_140 - *(float *)(pos + 0),
+                            g_active_camera.y_144 - *(float *)(pos + 4));
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_active_camera.x_140),
+                             g_active_camera.z_148 - *(float *)(pos + 8));
     rotation[0] = roll;
 
     euler_to_matrix(matrix, rotation);
-    FastVecSub(offset, &gActiveCamera.x_140, pos);
+    FastVecSub(offset, &g_active_camera.x_140, pos);
     vec_scale_to_length(offset, offset, cameraShift);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
@@ -629,12 +629,12 @@ void func_0032B3E0(char *pos, int color, int alpha, char *textureId, int blendMo
     matrix[14] = *(float *)(pos + 8) + offset[2];
     matrix[15] = 1.0f;
 
-    ScaleDrawPacketCornersCopy(packet, size);
+    gfx_scale_draw_packet_corners_copy(packet, size);
     draw_world_quad(packet, matrix, 0);
 }
 
 /* Draws a sprite at a position, nudged toward the camera, with a given color, brightness, size and tilt. */
-void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMode,
+void gfx_draw_facing_sprite_near_cam(char *pos, int color, int alpha, char *textureId, int blendMode,
                    float size, float roll, float cameraShift)
 {
     char packet[144];
@@ -643,7 +643,7 @@ void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMo
     float offset[4];
     long long textureReg;
 
-    ResetDrawPacket(packet);
+    gfx_reset_draw_packet(packet);
     textureReg = GetEffectTextureDescriptor(textureId);
 
     *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
@@ -656,14 +656,14 @@ void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMo
     *(long long *)(packet + 120) = textureReg;
 
     rotation[3] = 0.0f;
-    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(pos + 0),
-                            gActiveCamera.y_144 - *(float *)(pos + 4));
-    rotation[1] = -FastMatrixHelperA(vec_distance_xy(pos, &gActiveCamera.x_140),
-                             gActiveCamera.z_148 - *(float *)(pos + 8));
+    rotation[2] = mat_fast_helper_a(g_active_camera.x_140 - *(float *)(pos + 0),
+                            g_active_camera.y_144 - *(float *)(pos + 4));
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_active_camera.x_140),
+                             g_active_camera.z_148 - *(float *)(pos + 8));
     rotation[0] = roll;
 
     euler_to_matrix(matrix, rotation);
-    FastVecSub(offset, &gActiveCamera.x_140, pos);
+    FastVecSub(offset, &g_active_camera.x_140, pos);
     vec_scale_to_length(offset, offset, cameraShift);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
@@ -671,7 +671,7 @@ void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMo
     matrix[14] = *(float *)(pos + 8) + offset[2];
     matrix[15] = 1.0f;
 
-    ScaleDrawPacketCorners(packet, size);
+    gfx_scale_draw_packet_corners(packet, size);
     draw_world_quad(packet, matrix, 0);
 }
 
@@ -683,7 +683,7 @@ void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMo
 /* func_0032BBF0 is defined in 00316BC8-qcopy.c. */
 
 /* Adds one more point to a line by continuing it from the previous two points. */
-void func_0032BDC8(Vec16_Fc936841d *points, int index)
+void gfx_extend_line_by_one_point(Vec16_Fc936841d *points, int index)
 {
     char step[16];
 
@@ -702,11 +702,11 @@ void func_0032BDC8(Vec16_Fc936841d *points, int index)
 
 
 /* finds the first matching object pointer in thirty resident32-byte records or returns-1 */
-s32 func_0032D700(void *object) {
+s32 part_find_effect_slot_by_object(void *object) {
     s32 result = -1;
     s32 index;
     for (index = 0; index < 30; index++) {
-        if (gHealthDrainSlots_L00[index].field14 == object) {
+        if (g_health_l00_drain_slots[index].field14 == object) {
             result = index;
             break;
         }

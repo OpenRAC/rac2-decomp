@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,12 +25,12 @@
  */
 #include "common.h"
 
-extern s32 func_0011D450(s8 *a0, u32 a1, s32 a2);
+extern s32 sceSifBindRpc(s8 *a0, u32 a1, s32 a2);
 extern s8 D_00140140[];
 extern s32 D_00134744;
 
 /* Connects to an RPC server on the IOP, retrying until the server is ready. Returns 0 on success or -1 on failure. */
-s32 func_0011E740(void) {
+s32 iop_remote_cmd_bind_server(void) {
     s32 delay;
     s32 result;
 
@@ -40,7 +41,7 @@ block_1:
         delay -= 1;
     } while (delay != -1);
 loop_3:
-    if (BindRpcServer(D_00140140, 0x80000003, 0) < 0) {
+    if (sceSifBindRpc(D_00140140, 0x80000003, 0) < 0) {
         result = -1;
     } else {
         if ((*(s32 *)((char *)(D_00140140) + (0x24))) == 0) {

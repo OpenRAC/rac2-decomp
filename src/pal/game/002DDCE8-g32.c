@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_002DDCE8, the PAL copy of func_002DCFE8 (src/game/002DCFE8-g32.c): the same C, where the
    flag D_001B1A3C goes through func_PAL_00299518 and func_PAL_00299520, the field at D_001A8CFC
    moves to 0x3CF50 and the delay is 0xC0E. Compiled at -G32 like v1.01's unit (config/cflags.txt). */
@@ -7,15 +8,15 @@ typedef struct { int status; char p04[0x18]; } SaveSlot;
 typedef struct { char p00[8]; int mode; char p0c[4]; int f10; char p14[4]; short slot; char p1a[0x16]; SaveSlot slots[4]; char p0a0[0xA8]; int f148; char p14c[0x10]; int f15c; char p160[4]; int f164; int f168; int f16c; char p170[0xC]; int f17c; } SaveState;
 typedef struct { char p00[0x30]; int flags; char p34[0xC]; int cursor; } SaveMenu;
 
-extern MenuRoot D_001F2840;
-extern PadState D_00138180;
-extern SaveState D_001393E0;
+extern MenuRoot g_pause_menu_state;
+extern PadState g_pad_state;
+extern SaveState g_memcard_state;
 extern char *D_001A8CFC;
-extern int D_001A7424;
-extern int D_001A7420;
+extern int g_save_menu_flags;
+extern int g_save_menu_screen;
 extern int D_001A8C88;
 extern int D_001A7B98;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_001A7BE8;
 extern int D_001A7C08;
 extern short D_00152C28[];
@@ -24,17 +25,17 @@ extern char D_001F2A40[];
 extern char D_00260DB8[];
 extern char D_0025DB68[];
 extern void func_PAL_0033B6B8(char *, int);
-extern void func_002E4860(void);
+extern void snd_set_default_group_volumes(void);
 extern int func_PAL_002B8898(int);
-extern void func_00132938(int);
-extern void func_002F64A8(void);
+extern void snd_send_cmd11_one_value(int);
+extern void load_data_and_setup_callback(void);
 extern void func_PAL_002D6710(int, char *);
-extern void func_0029ADA0(char *);
-extern void func_002C9A78(void);
-extern int func_002B49E0(int, int, int, int, int);
-extern int func_00287E70(void);
-extern int func_002857B0(void);
-extern int func_002E5E58(int, unsigned int, void *);
+extern void save_build_packet(char *);
+extern void menu_init_block_fields(void);
+extern int request_begin_slot(int, int, int, int, int);
+extern int menu_get_counter(void);
+extern int menu_get_mode(void);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int func_PAL_00299518(void);
 extern int func_PAL_00299520(void);
 
@@ -45,40 +46,40 @@ int func_PAL_002DDCE8(SaveMenu *menu)
 
     if (D_001A8CFC != 0)
         func_PAL_0033B6B8(D_001A8CFC + 0x3CF50, old);
-    if (D_001F2840.busy != 0) {
-        if (D_001393E0.f15c >= 3)
+    if (g_pause_menu_state.busy != 0) {
+        if (g_memcard_state.f15c >= 3)
             return 0;
-        if (D_001393E0.f164 >= 0)
+        if (g_memcard_state.f164 >= 0)
             return 0;
-        if (D_001F2840.ready < 11)
+        if (g_pause_menu_state.ready < 11)
             return 0;
-        D_001F2840.busy = 0;
-        if (D_001393E0.f16c != 0 || D_001393E0.f10 != 0 || func_PAL_00299518() != 0) {
-            D_001393E0.f17c = 0;
-            D_001A7424 |= 0x100;
-            if (func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0) == 0)
+        g_pause_menu_state.busy = 0;
+        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || func_PAL_00299518() != 0) {
+            g_memcard_state.f17c = 0;
+            g_save_menu_flags |= 0x100;
+            if (request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0) == 0)
                 return 0;
         } else {
-            D_001393E0.f17c = 1;
-            func_002E4860();
+            g_memcard_state.f17c = 1;
+            snd_set_default_group_volumes();
             func_PAL_002B8898(1);
-            func_00132938(D_001A7B98 == 0);
-            if (D_001A79F0 <= 0 && D_001A7BE8 == 0)
-                func_002F64A8();
+            snd_send_cmd11_one_value(D_001A7B98 == 0);
+            if (g_current_map_index <= 0 && D_001A7BE8 == 0)
+                load_data_and_setup_callback();
             else
-                func_002B49E0(6, 2, 5, D_001A79F0, 0);
+                request_begin_slot(6, 2, 5, g_current_map_index, 0);
             D_00152C28[0] = 0;
             return 0;
         }
     }
-    if ((D_00138180.flags & 0x900) && D_001F2840.fallback == 0)
+    if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0)
         return 1;
-    if (D_00138180.flags & 0x10) {
-        int value = *(int *)(D_001F2840.owner + 0xE0);
+    if (g_pad_state.flags & 0x10) {
+        int value = *(int *)(g_pause_menu_state.owner + 0xE0);
         int status;
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -86,17 +87,17 @@ int func_PAL_002DDCE8(SaveMenu *menu)
 finish:
         return status;
     }
-    if (D_001A7420 == 9)
+    if (g_save_menu_screen == 9)
         func_PAL_002D6710(5, D_001A8C88 ? D_00260DB8 : D_0025DB68);
-    else if (D_001A7420 != 16 && D_001A7420 != 1) {
-        if (func_00287E70() == 0 && func_002857B0() == 1)
-            func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0);
+    else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
+        if (menu_get_counter() == 0 && menu_get_mode() == 1)
+            request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);
         else {
-            int value = *(int *)(D_001F2840.owner + 0xE0);
+            int value = *(int *)(g_pause_menu_state.owner + 0xE0);
             int status;
             if (value != 0)
-                D_001F2840.value = value;
-            else if (D_001F2840.fallback == 0) {
+                g_pause_menu_state.value = value;
+            else if (g_pause_menu_state.fallback == 0) {
                 status = -1;
                 goto done;
             }
@@ -105,18 +106,18 @@ done:
             return status;
         }
     }
-    if (D_001393E0.f15c >= 3)
+    if (g_memcard_state.f15c >= 3)
         return 0;
-    if (D_001393E0.f164 >= 0)
+    if (g_memcard_state.f164 >= 0)
         return 0;
-    if (D_001F2840.ready < 11)
+    if (g_pause_menu_state.ready < 11)
         return 0;
-    if (D_001393E0.mode != 2)
+    if (g_memcard_state.mode != 2)
         return 0;
     if (menu->flags & 1)
-        buttons = D_00138180.alt;
+        buttons = g_pad_state.alt;
     else
-        buttons = D_00138180.flags;
+        buttons = g_pad_state.flags;
     menu->cursor = D_001A7C08;
     if ((buttons & 0x1000) && D_001A7C08 != 0)
         menu->cursor = D_001A7C08 - 1;
@@ -124,25 +125,25 @@ done:
         menu->cursor = menu->cursor + 1;
     D_001A7C08 = menu->cursor;
     if (buttons & 0x40) {
-        SaveState *save = &D_001393E0;
+        SaveState *save = &g_memcard_state;
         if (save->mode == 2 && save->slots[D_001A7C08].status >= 0) {
-            func_002E5E58(4, 0, 0);
+            snd_play_from_global_bank(4, 0, 0);
             save->f148 = 0;
             save->slot = menu->cursor;
-            func_0029ADA0(D_001F2A40);
-            func_002C9A78();
+            save_build_packet(D_001F2A40);
+            menu_init_block_fields();
             if (save->f164 < 0) {
                 save->f168 = 0;
                 save->f164 = 13;
             }
-            D_001F2840.busy = 1;
+            g_pause_menu_state.busy = 1;
             func_PAL_00299520();
-            D_001F2840.delay = 0xC0E;
+            g_pause_menu_state.delay = 0xC0E;
             D_001C4FB0[0] = 0;
         } else
-            func_002E5E58(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
     }
     if (menu->cursor != old)
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
     return 0;
 }

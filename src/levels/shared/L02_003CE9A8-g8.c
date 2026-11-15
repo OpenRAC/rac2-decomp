@@ -1,8 +1,9 @@
+#include "names.h"
 extern unsigned short *ref_L02_003CE9A8_00[];
 extern char *ref_L02_003CE9A8_01 __attribute__((sda));
 
 /* Goes through every object in this one's group and alerts each Megacorp Chickenbot. */
-void func_L02_003CE9A8(char *self)
+void chickenbot_alert_group(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
         unsigned short *list = ref_L02_003CE9A8_00[*(unsigned char *)(self + 0x21)];
@@ -24,7 +25,7 @@ extern unsigned short *ref_L04_003E5298_00[];
 extern char *ref_L04_003E5298_01 __attribute__((sda));
 
 /* Goes through every object in this one's group and sets the alert flag on each object of one particular kind. */
-void func_L04_003E5298(char *self)
+void moby_l04_set_group_alert_flag(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
         unsigned short *list = ref_L04_003E5298_00[*(unsigned char *)(self + 0x21)];
@@ -46,7 +47,7 @@ extern unsigned short *ref_L17_003E4860_00[];
 extern char *ref_L17_003E4860_01 __attribute__((sda));
 
 /* Goes through every object in this one's group and sets the alert flag on each object of one particular kind. */
-void func_L17_003E4860(char *self)
+void moby_l17_set_group_alert_flag(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
         unsigned short *list = ref_L17_003E4860_00[*(unsigned char *)(self + 0x21)];
@@ -68,7 +69,7 @@ extern unsigned short *ref_L26_003DC128_00[];
 extern char *ref_L26_003DC128_01 __attribute__((sda));
 
 /* Goes through every object in this one's group and sets the alert flag on each object of one particular kind. */
-void func_L26_003DC128(char *self)
+void moby_l26_set_group_alert_flag(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
         unsigned short *list = ref_L26_003DC128_00[*(unsigned char *)(self + 0x21)];

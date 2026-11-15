@@ -23,14 +23,14 @@ extern Moby_L05_00425FE0 *D_L05_001B14FC __attribute__((sda));
 /* The head of the moby list. */
 extern Moby_L05_00425FE0 *D_L05_001B2528;
 
-extern Moby_L05_00425FE0 *func_0029EFD0(int);
-extern void func_00282C88(float *);
-extern float func_002A7940(void);
-extern void func_L05_00426270(Moby_L05_00425FE0 *);
+extern Moby_L05_00425FE0 *CreateMoby(int);
+extern void vec_clear_128(float *);
+extern float math_random_angle(void);
+extern void glow_l05_ring_init_state_3(Moby_L05_00425FE0 *);
 
 /* Spawns a moby of class 0x117C at the caller's position with a random turn, remembers the
    last moby of class 0xFBF in the list the first time, and sets up the new moby's state. */
-Moby_L05_00425FE0 *func_L05_00425FE0(Moby_L05_00425FE0 *object)
+Moby_L05_00425FE0 *moby_spawn_class_a(Moby_L05_00425FE0 *object)
 {
     Moby_L05_00425FE0 *moby;
     Moby_L05_00425FE0 *m;
@@ -41,15 +41,15 @@ Moby_L05_00425FE0 *func_L05_00425FE0(Moby_L05_00425FE0 *object)
         moby->drawDist = 0xFF;
         moby->drawn = 1;
         qcopy(moby->position, object->position);
-        ClearVector128(moby->rot);
-        moby->rot[2] = RandomAngle();
+        vec_clear_128(moby->rot);
+        moby->rot[2] = math_random_angle();
         if (D_L05_001B14FC == 0) {
             for (m = D_L05_001B2528; m != 0; m = m->pChain) {
                 if (m->oClass == 0xFBF)
                     D_L05_001B14FC = m;
             }
         }
-        InitGlowRingState_L05_3(moby);
+        glow_l05_ring_init_state_3(moby);
         moby->scale = *(float *)(moby->pClass + 0x24);
         return moby;
     }

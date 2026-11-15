@@ -13,34 +13,34 @@ typedef struct {
 
 extern Vector D_0018A0E0;
 extern Vector D_L00_001AA310[4];
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C768(int, float *, float *);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_world_to_screen_unit(int, float *, float *);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 
 
-extern void func_00280B90(char *, int, int);
+extern void draw_world_quad(char *, int, int);
 
 typedef int Vector128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L00_00415DE8(char *, char *);
-extern void func_L00_00418A80(char *, char *);
-extern void func_L00_00414540(char *, char *, char *);
-extern int func_002AD330(char *, char *, char *, char *);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void part_l00_spawn_explosion_burst_2(char *, char *);
+extern void SpawnBurstParticles(char *, char *);
+extern void part_spawn_explosion_burst_with_drift(char *, char *, char *);
+extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
 extern char ref_L00_004195C8_00[];
 extern char D_L00_001B8C80[];
 typedef struct SpawnState {
@@ -113,19 +113,19 @@ extern char ref_L00_00415A38_00[];
 
 extern char ref_L00_00414350_00[];
 
-extern float func_00283248(float, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern unsigned char *func_L00_0033FFB8(void *, void *, int);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern unsigned char *part_l00_spawn_spinning(void *, void *, int);
 extern char D_L00_001A8F20[] __attribute__((sda));
 typedef struct { char pad[0x140]; float x, y; } CameraHead;
-extern float func_00283CE0(int);
-extern int func_00282948(void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_00283098(void *, void *, void *);
+extern float IntToFloat(int);
+extern int math_fast_float_d(void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 /* One of the twenty-four 0xB0-byte records at D_L00_0025A920 (claimed by func_L00_00417A40,
    updated by func_L00_00417D70). Measured layout; field roles are inferred from those two. */
@@ -149,33 +149,33 @@ typedef struct {
     int pad;                /* 0xAC */
 } EffectRecord;
 
-extern EffectRecord D_L00_0025A920[24];
+extern EffectRecord g_spark_l00_records[24];
 
-extern char D_00189E20[];
-extern char D_00188660[];
+extern char g_hero_state[];
+extern char g_sound_state[];
 typedef union { unsigned char b[0x2600]; int i[0x980]; float f[0x980]; char *ptr[0x980]; } EffectHero;
 typedef struct { char bytes[0x70]; } EffectReleaseSlot;
-extern int func_00282978(void *);
-extern void func_0029F338(char *);
-extern float *func_002AB1F0(char *);
-extern void func_L00_00413358(char *);
+extern int FastDecTimer(void *);
+extern void moby_mark_spawned(char *);
+extern float *moby_get_private_value_0(char *);
+extern void UpdateWaveLineEffect(char *);
 /* Preserve the object argument passed to the empty callback in retail. */
 extern void func_L00_00414018_1(char *);
-extern void func_002E59F8(int);
+extern void snd_stop_voice(int);
 extern Vector128 D_L00_001BF220;
-extern void func_L00_004173B0(char *);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_L00_00417A40(char *, void *, int);
-extern void func_L00_00417218(char *);
-extern void func_L00_00417700(char *);
-extern void func_L00_00417D70(char *);
+extern void part_emit_spark_burst_at_moby(char *);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern void spark_record_claim(char *, void *, int);
+extern void part_spawn_drifting_particles(char *);
+extern void beam_glow_sprites_update_owned(char *);
+extern void spark_records_update(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
 
 /* Updates the wave line effect (moby class 4501). It follows the hero and its target, and lets go of its sound when it stops. */
-void func_L00_00413128(char *object)
+void wave_line_update(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char local[32];
@@ -183,11 +183,11 @@ void func_L00_00413128(char *object)
     int code, index;
     float *childData;
     if (FastDecTimer(state + 0x1E) != 0) {
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
-    FastVecScale(local, ((EffectHero *)gHeroState)->ptr[2212] + 0xE0, 0.75f);
-    FastVecAdd(object + 0x10, &((EffectHero *)gHeroState)->f[32], local);
+    FastVecScale(local, ((EffectHero *)g_hero_state)->ptr[2212] + 0xE0, 0.75f);
+    FastVecAdd(object + 0x10, &((EffectHero *)g_hero_state)->f[32], local);
     if (*(char **)(state + 0x20) != 0) {
         code = *(unsigned char *)(*(char **)(state + 0x20) + 0x20);
         if (code == 254)
@@ -197,7 +197,7 @@ void func_L00_00413128(char *object)
         child = *(char **)(state + 0x20);
         if (child != 0) {
             qcopy(state + 0x30, child + 0x10);
-            childData = GetMobyPrivateValue0(child);
+            childData = moby_get_private_value_0(child);
             if (childData != 0) {
                 FastVecScale(local + 16, *(char **)(state + 0x20) + 0xE0, childData[4]);
                 FastVecAdd(state + 0x30, state + 0x30, local + 16);
@@ -211,10 +211,10 @@ void func_L00_00413128(char *object)
         index = *(int *)(state + 0x18);
         if (index >= 0) {
             if (index != -1) {
-                EffectReleaseSlot *entry = &((EffectReleaseSlot *)gSoundState)[index];
+                EffectReleaseSlot *entry = &((EffectReleaseSlot *)g_sound_state)[index];
                 if (*(char **)((char *)entry + 0x88) == object &&
                     *(unsigned char *)((char *)entry + 0x74) != 0)
-                    StopSoundVoice(index);
+                    snd_stop_voice(index);
             }
             *(int *)(state + 0x18) = -1;
         }
@@ -223,7 +223,7 @@ void func_L00_00413128(char *object)
 
 /* Clear both entry tables and reset the record state. */
 /* Clears the two point lists of the wave line effect and resets its counters. */
-void func_L00_00413298(char *object)
+void wave_line_reset_effect(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int i;
@@ -250,12 +250,12 @@ void func_L00_00413298(char *object)
 }
 
 /* Empty callback that does nothing. */
-void func_L00_00414018(void)
+void moby_noop_callback(void)
 {
 }
 
 /* Creates an explosion effect (moby class 5020) that can be attached to a parent. It sets up the sizes and timers and shakes the camera when close. */
-char *func_L00_00414020(float size, char *position, int trigger, int kind, int red, int green,
+char *parented_explosion_spawn(float size, char *position, int trigger, int kind, int red, int green,
                         int blue, int enabled, int flags, int extra, int control, int extra2,
                         char *parent)
 {
@@ -273,7 +273,7 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
         *(float *)(object + 0x1c) = 1.0f;
         FastVecSub(direction, D_L00_001B8C80 + 0x140, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(object + 0x10, (char *)up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
@@ -296,10 +296,10 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
         state->parent = parent;
         qzero_nc(attachment);
         if (parent)
-            TransformPointByMobyAttachment(object, parent, object + 0x10, (char *)attachment);
+            moby_transform_point_by_attachment(object, parent, object + 0x10, (char *)attachment);
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
             if (fast_vec_dist(position, D_L00_001B8C80 + 0x140) < 48.0f && trigger != 0) {
@@ -311,7 +311,7 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
             if (state->flags != 0) {
                 FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                if (1.5707964f - FastAngleHelper(FastVecDot(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
                     state->flags = 1;
                 else
                     state->flags = 0;
@@ -320,13 +320,13 @@ char *func_L00_00414020(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        SpawnExplosionBurstWithDrift(object, (char *)up, (char *)attachment);
+        part_spawn_explosion_burst_with_drift(object, (char *)up, (char *)attachment);
     }
     return object;
 }
 
 /* Forwards the cached sub-object into the pair update when it is present, then releases the handle pair or re-arms the module callback. */
-void func_L00_00414350(char *object)
+void parented_explosion_update(char *object)
 {
     char *handle = *(char **)(object + 0x68);
 
@@ -345,7 +345,7 @@ void func_L00_00414350(char *object)
 
 
 /* Draws a flat square sprite that faces the camera, with an optional roll and a random wobble in its texture. */
-void func_L00_00415210(Vector *position, float size, float offset, float roll,
+void gfx_l00_draw_jittered_billboard_quad(Vector *position, float size, float offset, float roll,
                        float unused, float jitter, int texture, int mode)
 {
     RenderPacket packet;
@@ -361,7 +361,7 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    InitQuadPacketState(&packet, texture, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -426,10 +426,10 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
             FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
             FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -440,10 +440,10 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -451,7 +451,7 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    InitQuadPacketState(&packet, -1, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x33001ULL);
     draw_world_quad((char *)&packet, 0, 0);
@@ -460,7 +460,7 @@ void func_L00_00415210(Vector *position, float size, float offset, float roll,
 
 
 /* Creates an explosion effect (moby class 5021). It sets up the sizes and timers and shakes the camera when close. */
-char *func_L00_00415740(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+char *explosion_spawn(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0x139d /* moby class 5021 */);
@@ -479,7 +479,7 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
         camera = D_L00_001B8C80 + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(object + 0x10, (char *)up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
@@ -500,7 +500,7 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
             if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
@@ -512,7 +512,7 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
             if (state->flags != 0) {
                 FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = FastAngleHelper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -522,14 +522,14 @@ char *func_L00_00415740(float size, char *position, int trigger, int kind, int r
             state->delay = 0;
             state->flags = 0;
         }
-        SpawnExplosionBurst_L00_2(object, (char *)up);
+        part_l00_spawn_explosion_burst_2(object, (char *)up);
     }
     return object;
 }
 
 
 /* Releases the object's cached handle pair when free and otherwise re-arms the module's tick callback. */
-void func_L00_00415A38(char *object)
+void explosion_update(char *object)
 {
     char *handle = *(char **)(object + 0x68);
 
@@ -544,7 +544,7 @@ void func_L00_00415A38(char *object)
 
 
 /* Draws a flat square sprite that faces the camera, with an optional roll and a random wobble in its texture. */
-void func_L00_00416A38(Vector *position, float size, float offset, float roll,
+void gfx_draw_jittered_billboard_quad_copy(Vector *position, float size, float offset, float roll,
                        float unused, float jitter, int texture, int mode)
 {
     RenderPacket packet;
@@ -560,7 +560,7 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    InitQuadPacketState(&packet, texture, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -625,10 +625,10 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
             FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
             FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -639,10 +639,10 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -650,7 +650,7 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    InitQuadPacketState(&packet, -1, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x33001ULL);
     draw_world_quad((char *)&packet, 0, 0);
@@ -659,7 +659,7 @@ void func_L00_00416A38(Vector *position, float size, float offset, float roll,
 
 
 /* Creates a spark effect object (moby class 5022) that can be attached to a parent. */
-char *func_L00_00416F68(Vector128 *position, int kind, char *parent)
+char *spark_effect_spawn(Vector128 *position, int kind, char *parent)
 {
     Vector128 direction[1], up[1];
     char *object = CreateMoby(0x139E /* moby class 5022 */);
@@ -677,7 +677,7 @@ char *func_L00_00416F68(Vector128 *position, int kind, char *parent)
         second = object + 0xc0;
         FastVecSub(direction, D_L00_001B8C80 + 0x140, first);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(first, (char *)up, 1);
+        cam_compute_view_direction(first, (char *)up, 1);
         qcopy(second, direction);
         third = object + 0xd0;
         FastVecCross(third, second, up);
@@ -693,7 +693,7 @@ char *func_L00_00416F68(Vector128 *position, int kind, char *parent)
 
 
 /* Spawns 25 particles around the object, each drifting away from the camera at a random angle. */
-void func_L00_00417218(char *object)
+void part_spawn_drifting_particles(char *object)
 {
     float spawn[8];
     float heading, angle, speed;
@@ -701,20 +701,20 @@ void func_L00_00417218(char *object)
     int i;
 
     for (i = 24; i >= 0; i--) {
-        heading = FastMatrixHelperA(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
+        heading = mat_fast_helper_a(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
                                 ((CameraHead *)D_L00_001B8C80)->y - *(float *)(object + 0x14));
-        speed = RandomSignedFloatRange(1.0f, 2.0f);
+        speed = math_random_signed_float_range(1.0f, 2.0f);
         FloatToInt(speed);
-        spawn[0] = *(float *)(object + 0x10) + RandomSignedFloatRange(-0.25f, 0.25f);
-        spawn[1] = *(float *)(object + 0x14) + RandomSignedFloatRange(-0.25f, 0.25f);
-        spawn[2] = *(float *)(object + 0x18) + RandomSignedFloatRange(-0.25f, 0.25f);
+        spawn[0] = *(float *)(object + 0x10) + math_random_signed_float_range(-0.25f, 0.25f);
+        spawn[1] = *(float *)(object + 0x14) + math_random_signed_float_range(-0.25f, 0.25f);
+        spawn[2] = *(float *)(object + 0x18) + math_random_signed_float_range(-0.25f, 0.25f);
         spread = 0.0f;
-        angle = FastAddRotations(heading, RandomSignedFloatRange(spread, -1.5707965f));
+        angle = FastAddRotations(heading, math_random_signed_float_range(spread, -1.5707965f));
         speed = 4.0f;
-        spawn[4] = FastSinOrCosA(angle) * 0.016666668f * speed;
-        spawn[5] = FastSinOrCosB(angle) * 0.016666668f * speed;
+        spawn[4] = math_fast_sin_or_cos_a(angle) * 0.016666668f * speed;
+        spawn[5] = math_fast_sin_or_cos_b(angle) * 0.016666668f * speed;
         spawn[6] = 0.075f;
-        SpawnSpinningParticle_L00_2(spawn, D_L00_001A8F20, 300);
+        part_l00_spawn_spinning(spawn, D_L00_001A8F20, 300);
     }
 }
 
@@ -725,7 +725,7 @@ void func_L00_00417218(char *object)
    object's position or to an offset from its parent, advances the two angle triples (faster
    while the timer runs), blends point between start and end, and releases the record when
    its release timer expires after the main timer. */
-void func_L00_00417D70(char *object)
+void spark_records_update(char *object)
 {
     Vector delta, transformed, offset;
     char *state = *(char **)(object + 0x68);
@@ -735,12 +735,12 @@ void func_L00_00417D70(char *object)
         EffectRecord *record;
         float ratio, blend;
 
-        if (gSparkRecords_L00[i].owner != object)
+        if (g_spark_l00_records[i].owner != object)
             continue;
-        record = &gSparkRecords_L00[i];
-        record->start.v[0] += RandomFloatRange(-0.1f, 0.1f);
-        record->start.v[1] += RandomFloatRange(-0.1f, 0.1f);
-        record->start.v[2] += RandomFloatRange(-0.1f, 0.1f);
+        record = &g_spark_l00_records[i];
+        record->start.v[0] += math_random_float_range(-0.1f, 0.1f);
+        record->start.v[1] += math_random_float_range(-0.1f, 0.1f);
+        record->start.v[2] += math_random_float_range(-0.1f, 0.1f);
         FastVecSub(&delta, &record->end, &record->start);
         if (*(int *)(state + 4) == 0) {
             qcopy(&record->start, object + 0x10);
@@ -769,12 +769,12 @@ void func_L00_00417D70(char *object)
             record->ang1[1] = FastAddRotations(record->ang1[1], record->rate1[1] * 50.0f);
             record->ang1[2] = FastAddRotations(record->ang1[2], record->rate1[2] * 50.0f);
         }
-        record->out0.v[0] = FastSinOrCosA(record->ang0[0]) * record->amp0[0];
-        record->out0.v[1] = FastSinOrCosB(record->ang0[1]) * record->amp0[1];
-        record->out0.v[2] = -FastSinOrCosB(record->ang0[2]) * record->amp0[2];
-        record->out1.v[0] = FastSinOrCosA(record->ang1[0]) * record->amp1[0];
-        record->out1.v[1] = FastSinOrCosB(record->ang1[1]) * record->amp1[1];
-        record->out1.v[2] = -FastSinOrCosB(record->ang1[2]) * record->amp1[2];
+        record->out0.v[0] = math_fast_sin_or_cos_a(record->ang0[0]) * record->amp0[0];
+        record->out0.v[1] = math_fast_sin_or_cos_b(record->ang0[1]) * record->amp0[1];
+        record->out0.v[2] = -math_fast_sin_or_cos_b(record->ang0[2]) * record->amp0[2];
+        record->out1.v[0] = math_fast_sin_or_cos_a(record->ang1[0]) * record->amp1[0];
+        record->out1.v[1] = math_fast_sin_or_cos_b(record->ang1[1]) * record->amp1[1];
+        record->out1.v[2] = -math_fast_sin_or_cos_b(record->ang1[2]) * record->amp1[2];
         ratio = IntToFloat(record->time);
         ratio /= IntToFloat(record->duration);
         blend = 1.0f - ratio;
@@ -782,17 +782,17 @@ void func_L00_00417D70(char *object)
             lerp_vector(&record->point, &record->start, &record->end, blend);
         else
             lerp_vector(&record->point, &record->start, &record->end, 0.75f);
-        if (FastFloatHelperD(&record->time)) {
+        if (math_fast_float_d(&record->time)) {
             if (record->started == 0)
                 record->started = 1;
-            if (FastFloatHelperD(&record->release))
+            if (math_fast_float_d(&record->release))
                 record->owner = 0;
         }
     }
 }
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
-void func_L00_00418140(Vec16_Fc936841d *object, int index)
+void curve_compute_next_neighbour_point(Vec16_Fc936841d *object, int index)
 {
     char local[16];
 
@@ -801,7 +801,7 @@ void func_L00_00418140(Vec16_Fc936841d *object, int index)
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_004181A8(char *record)
+void effect_init_transform_record(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -833,7 +833,7 @@ void func_L00_004181A8(char *record)
 
 
 /* Creates a blue explosion effect (moby class 5023). It sets up the sizes and timers and shakes the camera when close. */
-char *func_L00_00418730(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+char *blue_explosion_spawn(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0x139f /* moby class 5023 */);
@@ -852,7 +852,7 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
         camera = D_L00_001B8C80 + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(object + 0x10, (char *)up, 1);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
@@ -873,7 +873,7 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
             if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
@@ -885,7 +885,7 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
             if (state->flags != 0) {
                 FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = FastAngleHelper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -902,7 +902,7 @@ char *func_L00_00418730(float size, char *position, int trigger, int kind, int r
 
 
 /* Tests the handle cached in the object and, while the handle reports itself already released, drops the next sub-handle, otherwise runs the object's destroy helper. */
-void func_L00_00418A28(char *object)
+void explosion_release_handle(char *object)
 {
     char *handle = *(char **)(object + 104);
 
@@ -916,7 +916,7 @@ void func_L00_00418A28(char *object)
 
 /* Runs the destroy helper once the child's status goes negative; otherwise re-arms the module callback
    when the timer at 0x3C is zero or the sphere test accepts the record at 0x30. */
-void func_L00_004195C8(char *object)
+void effect_with_child_update(char *object)
 {
     char *handle = *(char **)(object + 0x68);
     char *child = *(char **)(handle + 0x44);
@@ -924,7 +924,7 @@ void func_L00_004195C8(char *object)
     if (child != 0 && *(signed char *)(child + 0x20) < 0) {
         func_00310440(object);
     } else if (*(float *)(handle + 0x3C) == 0.0f ||
-               FastMathHelperA(handle + 0x30, (float)*(short *)(object + 0x32)) != 0) {
+               math_fast_helper_a(handle + 0x30, (float)*(short *)(object + 0x32)) != 0) {
         func_002E6EF8(ref_L00_004195C8_00, object);
     }
 }
@@ -933,7 +933,7 @@ void func_L00_004195C8(char *object)
 
 
 /* Marks the object as started and raises the high bit of its flag word, once. */
-void func_L00_00419B58(char *object)
+void effect_moby_start(char *object)
 {
     if (*(unsigned char *)(object + 0x20) == 0) {
         *(unsigned char *)(object + 0x20) = 1;

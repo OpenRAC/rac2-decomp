@@ -43,45 +43,45 @@ typedef struct {
     int hideTimer, hidden, selectionMode, selected, boltMode, alternateBolts;
 } Hud;
 
-extern MenuSlots *D_001B18D4[] __attribute__((sda));
-extern unsigned char D_00139568[];
-extern ItemRecord D_00239BA0[];
-extern int D_00139868[], D_00139688[];
+extern MenuSlots *g_radial_menu_pages[] __attribute__((sda));
+extern unsigned char g_item_slot_to_record[];
+extern ItemRecord g_weapon_table[];
+extern int D_00139868[], g_item_ammo_counts[];
 typedef struct { char pad00[0x22B4]; unsigned char state; char pad22B5[0x217]; int value; } HeroHudState;
-extern HeroHudState D_00189E20;
+extern HeroHudState g_hero_state;
 extern int D_001A7A00[] __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
+extern int g_is_pal_video[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
 extern float D_001AE6EC __attribute__((sda));
 extern char D_001AE6F0[], D_001ADF98[];
-extern int func_002B0D70(void);
-extern void func_00335E68(void *, int);
-extern UIColor *func_00335E20(void *);
-extern void func_00336920(void *, int, int);
-extern void *func_0034E5B8(void *);
-extern void func_00336F20(int, int *, int *, int *);
-extern void func_00336498(void *, int, int);
-extern void func_00336B90(void *, int);
-extern void func_00336B98(void *, int);
-extern int func_0028E260(void);
-extern void func_0034CAE8(void *, int, int);
-extern void func_00349B20(void *);
-extern void func_00349680(void *, int);
-extern void func_0034A4A8(void *, int);
-extern void func_0034A4B0(void *, int);
-extern void func_0034AC10(void *);
-extern void func_00349AE0(void *, int);
-extern void func_00349630(void *, int);
-extern void func_00349678(void *, float);
-extern float *func_00336318(void *);
-extern int func_00115DA8(char *, const char *, ...);
+extern int save_count_items_above_baseline(void);
+extern void object_set_flag_value(void *, int);
+extern UIColor *object_get_fourth_field(void *);
+extern void hud_set_widget_value_pair(void *, int, int);
+extern void *menu_return_object_unchanged(void *);
+extern void shop_choose_item_colors(int, int *, int *, int *);
+extern void object_set_first_pair(void *, int, int);
+extern void meter_set_max(void *, int);
+extern void meter_set_value(void *, int);
+extern int weapon_get_usable_selected(void);
+extern void menu_set_screen_value_restart_fades(void *, int, int);
+extern void anim_step_morph(void *);
+extern void anim_update_keyframe(void *, int);
+extern void menu_set_first_field(void *, int);
+extern void meter_set_value_start_timers(void *, int);
+extern void meter_screen_update(void *);
+extern void fade_start_backward(void *, int);
+extern void fade_start_direction(void *, int);
+extern void fade_set_speed(void *, float);
+extern float *object_get_field_a(void *);
+extern int sprintf(char *, const char *, ...);
 extern int func_001157AC(const char *);
-extern float func_003495A0(void *);
-extern int func_003495C8(void *, int);
+extern float fade_reset_amount(void *);
+extern int fade_swap_field_28(void *, int);
 #define ITEM(n) (&D_00239BA0[D_00139568[n]])
 
 /* Updates the item and bolt HUD every frame: slot icons and colors, the selected weapon and its ammo, fades and the bolt count. */
-void func_0034CEA0(Hud *self)
+void UpdateItemStatusHud(Hud *self)
 {
     int x, y, color, boltValue;
     int selX, selY, selColor;
@@ -95,178 +95,178 @@ void func_0034CEA0(Hud *self)
     Ui94 *ammoWidgetA;
     Ui94 *bolt;
     UIWord slotWord;
-    self->alternateBolts = CountItemsAboveBaseline();
-    if (gRadialMenuPages[0]) {
+    self->alternateBolts = save_count_items_above_baseline();
+    if (g_radial_menu_pages[0]) {
         int i;
         for (i = 0; i < 8; i++) {
-            if (!gRadialMenuPages[0]->slots[i].present)
-            SetFlagValue(&self->slots[i], 0);
+            if (!g_radial_menu_pages[0]->slots[i].present)
+            object_set_flag_value(&self->slots[i], 0);
             else {
-                SetFlagValue(&self->slots[i], 1);
-                SetWidgetValuePair(&self->slots[i], gRadialMenuPages[0]->slots[i].present, 0);
+                object_set_flag_value(&self->slots[i], 1);
+                hud_set_widget_value_pair(&self->slots[i], g_radial_menu_pages[0]->slots[i].present, 0);
             }
-            widget = (Ui48 *)ReturnArgument_0034E5B8(D_001A8CFC[0] + 0x36F28) + i;
-            SetFlagValue(widget, 0);
+            widget = (Ui48 *)menu_return_object_unchanged(D_001A8CFC[0] + 0x36F28) + i;
+            object_set_flag_value(widget, 0);
             /* FAKEMATCH: volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124) */
             *(volatile int *)&x = 0; y = 0; color = 0;
-            ChooseItemColors((*(MenuSlots * volatile *)&gRadialMenuPages[0])->slots[i].item, &x, &y, &color); /* FAKEMATCH: volatile load, see above */
+            shop_choose_item_colors((*(MenuSlots * volatile *)&g_radial_menu_pages[0])->slots[i].item, &x, &y, &color); /* FAKEMATCH: volatile load, see above */
             {
-                UIColor *c = GetFieldC(&self->slots[i]);
+                UIColor *c = object_get_fourth_field(&self->slots[i]);
                 c->word = (c->word & 0xFF000000) | (color & 0xFFFFFF);
             }
-            widget = (Ui48 *)ReturnArgument_0034E5B8(D_001A8CFC[0] + 0x36F28) + i;
-            SetFlagValue(widget, 1);
-            SetFirstPair(widget, x, y);
-            SetMeterMaximum(widget, 100);
-            SetMeterValue(widget, 100);
+            widget = (Ui48 *)menu_return_object_unchanged(D_001A8CFC[0] + 0x36F28) + i;
+            object_set_flag_value(widget, 1);
+            object_set_first_pair(widget, x, y);
+            meter_set_max(widget, 100);
+            meter_set_value(widget, 100);
             {
-                ItemRecord *rec = ITEM(gRadialMenuPages[0]->slots[i].item);
+                ItemRecord *rec = ITEM(g_radial_menu_pages[0]->slots[i].item);
                 if (rec->present) {
                     int enabled = rec->enabled != 0;
                     int capacity = rec->capacity;
                     if (capacity || enabled) {
-                        SetMeterMaximum(widget, capacity);
-                        if (ITEM(gRadialMenuPages[0]->slots[i].item)->capacity > 0)
-                            SetMeterValue(widget, D_00139868[gRadialMenuPages[0]->slots[i].item] >> 5);
+                        meter_set_max(widget, capacity);
+                        if (ITEM(g_radial_menu_pages[0]->slots[i].item)->capacity > 0)
+                            meter_set_value(widget, D_00139868[g_radial_menu_pages[0]->slots[i].item] >> 5);
                     }
                 }
             }
         }
     }
     if (self->selectionMode) selected = self->selected;
-    else selected = GetUsableSelectedWeapon();
+    else selected = weapon_get_usable_selected();
     selX = 0; selY = 0; selColor = 0;
     present = ITEM(selected)->present;
-    ChooseItemColors(selected, &selX, &selY, &selColor);
-    GetFieldC(&self->selectedIcon)->word = selColor;
+    shop_choose_item_colors(selected, &selX, &selY, &selColor);
+    object_get_fourth_field(&self->selectedIcon)->word = selColor;
     if (selected && present) {
-        SetWidgetValuePair(&self->selectedIcon, ITEM(selected)->icon, 0);
+        hud_set_widget_value_pair(&self->selectedIcon, ITEM(selected)->icon, 0);
         if (!self->selectionMode)
-        SetScreenValueAndRestartFades(self, ITEM(selected)->icon, 10);
+        menu_set_screen_value_restart_fades(self, ITEM(selected)->icon, 10);
     }
-    StepMorphAnimation(&self->ammoWidgets[0]);
-    StepMorphAnimation(&self->ammoWidgets[1]);
-    StepMorphAnimation(&self->ammoWidgets[2]);
-    UpdateKeyframeAnimation(&self->middleWidget, 1);
-    StepMorphAnimation(&self->endAmmoWidget);
-    SetFirstField(self->meter, gHeroState.value);
+    anim_step_morph(&self->ammoWidgets[0]);
+    anim_step_morph(&self->ammoWidgets[1]);
+    anim_step_morph(&self->ammoWidgets[2]);
+    anim_update_keyframe(&self->middleWidget, 1);
+    anim_step_morph(&self->endAmmoWidget);
+    menu_set_first_field(self->meter, g_hero_state.value);
     {
-        unsigned char state = gHeroState.state;
+        unsigned char state = g_hero_state.state;
         if (!state) goto heroFallback;
         if (state == 1)
-        SetMeterValueAndStartTimers(self->meter, 4);
+        meter_set_value_start_timers(self->meter, 4);
         else {
 heroFallback:
-            SetMeterValueAndStartTimers(self->meter, D_001A7A00[0]);
+            meter_set_value_start_timers(self->meter, D_001A7A00[0]);
         }
     }
-    UpdateMeterScreen(self->meter);
-    UpdateKeyframeAnimation(&self->hideWidgets[0], 1);
-    UpdateKeyframeAnimation(&self->hideWidgets[1], 1);
-    UpdateKeyframeAnimation(&self->hideWidgets[2], 1);
-    UpdateKeyframeAnimation(&self->hideWidgets[3], 1);
-    UpdateKeyframeAnimation(&self->hideWidgets[4], 1);
+    meter_screen_update(self->meter);
+    anim_update_keyframe(&self->hideWidgets[0], 1);
+    anim_update_keyframe(&self->hideWidgets[1], 1);
+    anim_update_keyframe(&self->hideWidgets[2], 1);
+    anim_update_keyframe(&self->hideWidgets[3], 1);
+    anim_update_keyframe(&self->hideWidgets[4], 1);
     {
-        UIWord w = GetFieldC(&self->slots[0])->word;
+        UIWord w = object_get_fourth_field(&self->slots[0])->word;
         {
             int i;
             for (i = 1; i < 8; i++) {
-                UIColor *c = GetFieldC(&self->slots[i]);
+                UIColor *c = object_get_fourth_field(&self->slots[i]);
                 c->word = (c->word & 0xFFFFFF) | ((w >> 24) << 24);
             }
         }
     }
-    UpdateKeyframeAnimation(&self->hideWidgets[5], 1);
-    slotWord = GetFieldC(&self->slotColors[0])->word;
+    anim_update_keyframe(&self->hideWidgets[5], 1);
+    slotWord = object_get_fourth_field(&self->slotColors[0])->word;
     {
         int i;
         for (i = 0; i < 8; i++) {
             previous = i;
             previous--;
             if (previous < 0) previous = 7;
-            if (gRadialMenuPages[0] && gRadialMenuPages[0]->slots[i].present) {
-                MenuSlot *slot = &gRadialMenuPages[0]->slots[i];
+            if (g_radial_menu_pages[0] && g_radial_menu_pages[0]->slots[i].present) {
+                MenuSlot *slot = &g_radial_menu_pages[0]->slots[i];
                 ItemRecord *rec;
                 item = slot->item;
                 rec = ITEM(item);
-                if (rec->present && !gItemAmmoCounts[item] && rec->flags) {
+                if (rec->present && !g_item_ammo_counts[item] && rec->flags) {
                     Ui4C *w = &self->slotColors[previous];
                     /* FAKEMATCH: do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail */
                     do { UIWord color = 0x70202080;
-                    GetFieldC(w)->word = color; } while (0);
+                    object_get_fourth_field(w)->word = color; } while (0);
                 } else {
                     UIWord color = 0x60442D00;
-                    GetFieldC(&self->slotColors[previous])->word = color;
+                    object_get_fourth_field(&self->slotColors[previous])->word = color;
                 }
             }
             {
-                UIColor *c = GetFieldC(&self->slotColors[previous]);
+                UIColor *c = object_get_fourth_field(&self->slotColors[previous]);
                 c->word = (c->word & 0xFFFFFF) | ((slotWord >> 24) << 24);
             }
         }
     }
     {
-        UIColor *c = GetFieldC(&self->background);
+        UIColor *c = object_get_fourth_field(&self->background);
         c->word = (c->word & 0xFFFFFF) | ((slotWord >> 24) << 24);
     }
     {
-        UIWord promptAlpha = GetFieldC(&self->alphaSource)->word & 0xFF000000;
+        UIWord promptAlpha = object_get_fourth_field(&self->alphaSource)->word & 0xFF000000;
         {
-            UIColor *c = GetFieldC(&self->prompt);
+            UIColor *c = object_get_fourth_field(&self->prompt);
             c->word = (c->word & 0xFFFFFF) | promptAlpha;
         }
     }
     {
         UIWord alpha, alpha2;
-        alpha = GetFieldC(&self->ammoIcon)->word & 0xFF000000;
-        alpha2 = GetFieldC(&self->selectedIcon)->word & 0xFF000000;
-        limit = GetFieldC(self)->word & 0xFF000000;
+        alpha = object_get_fourth_field(&self->ammoIcon)->word & 0xFF000000;
+        alpha2 = object_get_fourth_field(&self->selectedIcon)->word & 0xFF000000;
+        limit = object_get_fourth_field(self)->word & 0xFF000000;
         if (limit < alpha) alpha = limit;
         {
-            UIColor *c = GetFieldC(&self->ammoIcon);
+            UIColor *c = object_get_fourth_field(&self->ammoIcon);
             if (limit < alpha2) alpha2 = limit;
             c->word = (c->word & 0xFFFFFF) | alpha;
         }
         {
-            UIColor *c = GetFieldC(&self->selectedIcon);
+            UIColor *c = object_get_fourth_field(&self->selectedIcon);
             c->word = (c->word & 0xFFFFFF) | alpha2;
         }
     }
     bolt = &self->boltWidgets[0];
-    StepMorphAnimation(bolt);
-    StepMorphAnimation(&self->boltWidgets[1]);
-    StepMorphAnimation(&self->boltWidgets[2]);
-    StepMorphAnimation(&self->boltWidgets[3]);
+    anim_step_morph(bolt);
+    anim_step_morph(&self->boltWidgets[1]);
+    anim_step_morph(&self->boltWidgets[2]);
+    anim_step_morph(&self->boltWidgets[3]);
     if (self->ammoTimer && --self->ammoTimer == 0) { Ui94 *firstAmmoWidget; if (!((firstAmmoWidget = &self->ammoWidgets[0])->state)) {
-        StartFadeBackward(firstAmmoWidget, 0);
-        StartFadeBackward(&self->ammoWidgets[1], 0);
-        StartFadeBackward(&self->ammoWidgets[2], 0);
-        StartFadeDirection(&self->middleWidget, -1);
-        StartFadeBackward(&self->endAmmoWidget, 0);
+        fade_start_backward(firstAmmoWidget, 0);
+        fade_start_backward(&self->ammoWidgets[1], 0);
+        fade_start_backward(&self->ammoWidgets[2], 0);
+        fade_start_direction(&self->middleWidget, -1);
+        fade_start_backward(&self->endAmmoWidget, 0);
         self->ammoHidden = 1;
     } }
     if (self->boltTimer && --self->boltTimer == 0) if (!bolt->state) {
-        StartFadeBackward(bolt, 0);
-        StartFadeBackward(&self->boltWidgets[1], 0);
-        StartFadeBackward(&self->boltWidgets[2], 0);
+        fade_start_backward(bolt, 0);
+        fade_start_backward(&self->boltWidgets[1], 0);
+        fade_start_backward(&self->boltWidgets[2], 0);
         self->boltHidden = 1;
-        StartFadeBackward(&self->boltWidgets[3], 0);
+        fade_start_backward(&self->boltWidgets[3], 0);
     }
     if (self->hideTimer && --self->hideTimer == 0 && self->hidden != 1) {
         self->hidden = 1;
-        SetFlagValue(&self->prompt, 0);
-        StartFadeDirection(&self->hideWidgets[0], -1);
-        StartFadeDirection(&self->hideWidgets[1], -1);
-        StartFadeDirection(&self->hideWidgets[2], -1);
-        StartFadeDirection(&self->hideWidgets[3], -1);
-        StartFadeDirection(&self->hideWidgets[4], -1);
-        StartFadeDirection(&self->hideWidgets[5], -1);
-        SetFadeSpeed(&self->hideWidgets[0], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
-        SetFadeSpeed(&self->hideWidgets[1], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
-        SetFadeSpeed(&self->hideWidgets[2], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
-        SetFadeSpeed(&self->hideWidgets[3], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
-        SetFadeSpeed(&self->hideWidgets[4], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
-        SetFadeSpeed(&self->hideWidgets[5], gIsPalVideo[0] ? 0.14f : 0.11666667461395264f);
+        object_set_flag_value(&self->prompt, 0);
+        fade_start_direction(&self->hideWidgets[0], -1);
+        fade_start_direction(&self->hideWidgets[1], -1);
+        fade_start_direction(&self->hideWidgets[2], -1);
+        fade_start_direction(&self->hideWidgets[3], -1);
+        fade_start_direction(&self->hideWidgets[4], -1);
+        fade_start_direction(&self->hideWidgets[5], -1);
+        fade_set_speed(&self->hideWidgets[0], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
+        fade_set_speed(&self->hideWidgets[1], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
+        fade_set_speed(&self->hideWidgets[2], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
+        fade_set_speed(&self->hideWidgets[3], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
+        fade_set_speed(&self->hideWidgets[4], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
+        fade_set_speed(&self->hideWidgets[5], g_is_pal_video[0] ? 0.14f : 0.11666667461395264f);
     }
     if (selected && present) {
         int count;
@@ -279,35 +279,35 @@ heroFallback:
             width = width < 30.0f ? width : 30.0f;
         } else width = 30.0f;
         width = width > 0.0f ? width : 0.0f;
-        *GetFieldAt38(&self->ammoBar) = width;
+        *object_get_field_a(&self->ammoBar) = width;
         {
-            int ammo = gItemAmmoCounts[selected];
+            int ammo = g_item_ammo_counts[selected];
             int max;
             self->ammo = ammo;
             low = 1;
             max = ITEM(selected)->maxAmmo;
             self->maxAmmo = max;
-            Sprintf(self->ammoText, D_001AE6F0, ammo, max);
+            sprintf(self->ammoText, D_001AE6F0, ammo, max);
         }
-        count = strlen_001157AC(self->ammoText) - 3;
+        count = func_001157AC(self->ammoText) - 3;
         if (count > 5) count = 5;
         if (count < 0) count = 0;
         width = (float)count;
-        *GetFieldAt38(self) = width;
-        *GetFieldAt38(&self->ammoDigits[1]) = width;
+        *object_get_field_a(self) = width;
+        *object_get_field_a(&self->ammoDigits[1]) = width;
         threshold = (int)((float)ITEM(selected)->maxAmmo * 0.1f);
         if (!threshold) threshold = 1;
-        if (threshold < gItemAmmoCounts[selected]) low = 0;
-        if (!gItemAmmoCounts[selected]) {
-            ResetFadeAmount(&self->warningWidgets[0]);
-            ResetFadeAmount(&self->warningWidgets[1]);
+        if (threshold < g_item_ammo_counts[selected]) low = 0;
+        if (!g_item_ammo_counts[selected]) {
+            fade_reset_amount(&self->warningWidgets[0]);
+            fade_reset_amount(&self->warningWidgets[1]);
         }
         if (low) {
-            SwapFadeField0x28(&self->warningWidgets[0], 1);
-            SwapFadeField0x28(&self->warningWidgets[1], 1);
+            fade_swap_field_28(&self->warningWidgets[0], 1);
+            fade_swap_field_28(&self->warningWidgets[1], 1);
         } else {
-            SwapFadeField0x28(&self->warningWidgets[0], 0);
-            SwapFadeField0x28(&self->warningWidgets[1], 0);
+            fade_swap_field_28(&self->warningWidgets[0], 0);
+            fade_swap_field_28(&self->warningWidgets[1], 0);
             ammoWidgetA = &self->ammoWidgets[0];
             if (!ammoWidgetA->state) {
                 Ui94 *ammoWidgetB = &self->ammoWidgets[1];
@@ -315,39 +315,39 @@ heroFallback:
                 ammoWidgetB->value = 1.0f;
                 ammoWidgetA->state = 1;
                 ammoWidgetB->state = 1;
-                StepMorphAnimation(ammoWidgetA);
-                StepMorphAnimation(ammoWidgetB);
+                anim_step_morph(ammoWidgetA);
+                anim_step_morph(ammoWidgetB);
             }
         }
     }
-    UpdateKeyframeAnimation(&self->warningWidgets[0], 1);
-    UpdateKeyframeAnimation(&self->warningWidgets[1], 1);
+    anim_update_keyframe(&self->warningWidgets[0], 1);
+    anim_update_keyframe(&self->warningWidgets[1], 1);
     {Ui94 *ammoWidget0 = &self->ammoWidgets[0];
     if (ammoWidget0->state || !present) {
         UIWord alpha, alpha2;
-        alpha = GetFieldC(self)->word & 0xFF000000;
-        alpha2 = GetFieldC(&self->ammoDigits[1])->word & 0xFF000000;
+        alpha = object_get_fourth_field(self)->word & 0xFF000000;
+        alpha2 = object_get_fourth_field(&self->ammoDigits[1])->word & 0xFF000000;
         if (limit < alpha) alpha = limit;
         {
-            UIColor *c = GetFieldC(self);
+            UIColor *c = object_get_fourth_field(self);
             if (limit < alpha2) alpha2 = limit;
             c->word = (c->word & 0xFFFFFF) | alpha;
         }
         {
-            UIColor *c = GetFieldC(&self->ammoDigits[1]);
+            UIColor *c = object_get_fourth_field(&self->ammoDigits[1]);
             c->word = (c->word & 0xFFFFFF) | alpha2;
         }
     }}
     boltValue = *(self->boltMode ? &self->alternateBolts : self->boltCount);
-    Sprintf(self->boltText, D_001ADF98, boltValue);
+    sprintf(self->boltText, D_001ADF98, boltValue);
     {
         int count;
-        count = strlen_001157AC(self->boltText) - 1;
+        count = func_001157AC(self->boltText) - 1;
         if (count > 6) count = 6;
         if (count < 0) count = 0;
         width = (float)count;
-        *GetFieldAt38(&self->boltDigits[0]) = width;
-        *GetFieldAt38(&self->boltDigits[1]) = width;
+        *object_get_field_a(&self->boltDigits[0]) = width;
+        *object_get_field_a(&self->boltDigits[1]) = width;
     }
-    UpdateMeterScreen(self->meter);
+    meter_screen_update(self->meter);
 }

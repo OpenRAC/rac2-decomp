@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac3-decomp (src/frontbin/397D48.c, func_00399810): the same instructions.
    For each of N 16-byte batch records (pointer, count << 16 | last), stores the last index
    back alone and walks the batch's 64-byte entries in steps of four: each entry's index
@@ -6,10 +7,10 @@
 
 #include "common.h"
 
-extern void func_00292B88();
-extern void func_00292EB0();
+extern void build_indexed_resident_render_packet();
+extern void tex_build_packet_words();
 
-void func_002932B8(s32 *batches, u8 *textureTable, u8 *indexMap, s32 batchCount) {
+void tex_draw_batches(s32 *batches, u8 *textureTable, u8 *indexMap, s32 batchCount) {
     s32 i, j, entryCount, lastIndex, textureIndex;
     s32 *entry, *nextBatch;
     s32 *batch = batches;
@@ -25,7 +26,7 @@ void func_002932B8(s32 *batches, u8 *textureTable, u8 *indexMap, s32 batchCount)
             if (textureTable) {
                 build_indexed_resident_render_packet(entry, textureTable + (textureIndex << 4), entry[0], entry[1], entry[4], entry[5], textureIndex);
             } else {
-                BuildTexturePacketWords((unsigned long *)entry, entry[0], entry[1], entry[4], entry[5], textureIndex);
+                tex_build_packet_words((unsigned long *)entry, entry[0], entry[1], entry[4], entry[5], textureIndex);
             }
             entry += 16;
         }

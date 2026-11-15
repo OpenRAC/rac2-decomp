@@ -86,19 +86,19 @@ typedef struct {
     int x75C;
 } RaceState;
 
-extern int D_L04_001A8FE4 MACRO_ADDR;
-extern int D_L04_001A8FE8 MACRO_ADDR;
+extern int g_current_lap MACRO_ADDR;
+extern int g_race_time_ticks MACRO_ADDR;
 extern int D_L04_001A8ED0[] MACRO_ADDR;
 extern int D_L04_001B08F0 __attribute__((sda));
 extern int D_L04_001B0918 __attribute__((sda));
 extern int D_L04_001B091C __attribute__((sda));
 extern int D_L04_001B0920 __attribute__((sda));
 extern int D_L04_001B08F8 __attribute__((sda));
-extern int D_L04_001B090C __attribute__((sda));
+extern int g_current_race_index __attribute__((sda));
 extern int D_L04_001B093C __attribute__((sda));
 extern float D_L04_001B0928 __attribute__((sda));
-extern int D_001A79F8 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_player_bolts MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u8 D_001A7A0A MACRO_ADDR;
 extern u8 D_001A7A60[] MACRO_ADDR;
 extern int D_001A7368[] __attribute__((sda));
@@ -107,30 +107,30 @@ typedef struct {
     int reward[3];
     u8 pad14[0x40-0x14];
 } RaceReward;
-extern RaceReward D_L04_002C63C0[];
-extern RaceRoute *D_L04_001FE340[];
-extern RaceObject *D_L04_001B24DC;
-extern void func_L04_00410F10(void *);
-extern float func_L04_00410788(void *,void *,int *,int *,int,int);
-extern void func_L04_00412130(void *,int);
-extern int func_00282948(int *);
-extern int func_002ACBC8(void *,int);
-extern int func_002E5CF8(int,int,void *);
-extern void func_002E59F8(int);
-extern int func_L04_00400AB0(void *,void *,int);
-extern float func_00283CE0(int);
-extern void func_002C96F8(float,float,void *,void *,void *,void *);
+extern RaceReward g_race_challenge_table[];
+extern RaceRoute *g_route_path_table[];
+extern RaceObject *g_moby_l04_pool;
+extern void racer_find_zone_slot(void *);
+extern float UpdateNearestRoutePoint(void *,void *,int *,int *,int,int);
+extern void UpdateRacerRanks(void *,int);
+extern int math_fast_float_d(int *);
+extern int IsPointInCuboid(void *,int);
+extern int PlayMobySound(int,int,void *);
+extern void snd_stop_voice(int);
+extern int FindNearestRoutePointIndex(void *,void *,int);
+extern float IntToFloat(int);
+extern void anim_sample_key_track(float,float,void *,void *,void *,void *);
 extern void func_PAL_L04_004155D8(void *);
-extern void func_L04_0040E248(void *,void *);
-extern void func_L04_0040A2B8(int), func_L04_0040A220(int);
-extern int func_L04_0040A1D0(int), func_L04_0040A268(int);
-extern void func_L01_00323310(int,int);
-extern void func_00132AF8(int);
-extern int func_00132028(void);
-extern int func_0029B3E0(int,int);
-extern void func_00282CF0(void *,void *,void *);
+extern void racer_release_sound_handles(void *,void *);
+extern void race_increment_course_finish_count(int), race_increment_course_win_count(int);
+extern int race_get_course_win_count(int), race_get_course_finish_count(int);
+extern void script_queue_keyed_request(int,int);
+extern void snd_send_cmd22(int);
+extern int snd_Pump(void);
+extern int MemcardSave(int,int);
+extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
-extern int func_002A77E0(int),func_002A7820(int,int);
+extern int math_random_int_below(int),math_random_int_range(int,int);
 
 int func_PAL_L04_004169C0(RaceObject *object,RaceState *state)
 {
@@ -141,92 +141,92 @@ int func_PAL_L04_004169C0(RaceObject *object,RaceState *state)
     RaceObject *other;
     RaceRivalState *vars, *loopVars;
     float time, nearest, otherTime, length, distance, start;
-    func_L04_00410F10(object);
+    racer_find_zone_slot(object);
     {
         float previous=state->x310;
-        int lap=D_L04_001A8FE4, mode=D_L04_001B08F0;
+        int lap=g_current_lap, mode=D_L04_001B08F0;
         oldPath=state->x314; oldPoint=state->x318;
         state->x3B8=previous;
-        state->x310=func_L04_00410788(object,state,&state->x314,&state->x318,lap,mode);
+        state->x310=UpdateNearestRoutePoint(object,state,&state->x314,&state->x318,lap,mode);
     }
     if (state->x310<state->x3B8 || (state->x318>=451 && oldPoint<3))
         state->x3A4++;
     else state->x3A4=0;
     if (oldPath!=state->x314) state->x3A8=10;
-    if (state->x3A8>0) func_00282948(&state->x3A8);
-    else func_L04_00412130(object,0);
+    if (state->x3A8>0) math_fast_float_d(&state->x3A8);
+    else UpdateRacerRanks(object,0);
     {
     D_L04_001B0918++;
-    D_L04_001A8FE8++;
-    if (func_002ACBC8(object->position,state->x194)) {
+    g_race_time_ticks++;
+    if (IsPointInCuboid(object->position,state->x194)) {
         if (state->x3A4>0) state->x31C=0;
         else state->x31C=1;
     }
     }
-    if (func_002ACBC8(object->position,state->x190) && state->x31C) {
-        if (D_L04_001A8FE4<2) {
-            D_L04_001A8FE4++;
+    if (IsPointInCuboid(object->position,state->x190) && state->x31C) {
+        if (g_current_lap<2) {
+            g_current_lap++;
             D_L04_001B091C=150;
-            func_002E5CF8(13,0,object);
+            PlayMobySound(13,0,object);
             D_L04_001B0920=D_L04_001B0918;
             D_L04_001B0918=0;
             state->x31C=0;
         } else {
-            state->x6D0=D_L04_001FE340[state->x6E0];
-            length=func_00283CE0(func_L04_00400AB0(object,state->x6D0,0))*state->x6D0->length;
+            state->x6D0=g_route_path_table[state->x6E0];
+            length=IntToFloat(FindNearestRoutePointIndex(object,state->x6D0,0))*state->x6D0->length;
             if (D_L04_001B08F0) start=length+20.0f;
             else start=length+5.0f;
             state->x6D8=start;
             route=state->x6D0;
-            func_002C96F8(start,route->length,route,&state->x654,&state->x6D4,&state->x6A0);
+            anim_sample_key_track(start,route->length,route,&state->x654,&state->x6D4,&state->x6A0);
             state->x65C=-1000; state->x710=200; state->x658=0;
             object->state=3;
             state->x398=50;
             D_L04_001B08F8=0;
-            func_002E5CF8(23,17,object);
-            func_002E59F8(state->x330);
-            state->x330=func_002E5CF8(20,4,object);
-            func_002E59F8(state->x334);
-            state->x334=func_002E5CF8(21,4,object);
-            func_L04_00412130(object,1);
+            PlayMobySound(23,17,object);
+            snd_stop_voice(state->x330);
+            state->x330=PlayMobySound(20,4,object);
+            snd_stop_voice(state->x334);
+            state->x334=PlayMobySound(21,4,object);
+            UpdateRacerRanks(object,1);
             func_PAL_L04_004155D8(object);
-            func_L04_0040E248(object,state);
+            racer_release_sound_handles(object,state);
             if (state->x320!=1) {
-                int difficulty=D_L04_001B090C;
+                int difficulty=g_current_race_index;
                 state->x340++;
-                func_L04_0040A2B8(difficulty);
-                func_L01_00323310(state->x48C,-1);
+                race_increment_course_finish_count(difficulty);
+                script_queue_keyed_request(state->x48C,-1);
             } else {
-                func_L01_00323310(state->x75C,-1);
+                script_queue_keyed_request(state->x75C,-1);
                 {
-                int difficulty=D_L04_001B090C;
+                int difficulty=g_current_race_index;
                 state->x344++;
-                func_L04_0040A220(difficulty);
+                race_increment_course_win_count(difficulty);
                 }
-                n=func_L04_0040A1D0(D_L04_001B090C);
+                n=race_get_course_win_count(g_current_race_index);
                 if (n>3) n=3;
                 if (n>0) {
                     int scale=10;
-                    int reward=D_L04_002C63C0[D_L04_001B090C].reward[n-1];
+                    int reward=g_race_challenge_table[g_current_race_index].reward[n-1];
                     int multiplier=D_001A7A0A;
-                    int money=D_001A79F8;
+                    int money=g_player_bolts;
                     int total;
                     if (multiplier) total=reward*scale+money;
                     else total=money+reward;
-                    D_001A79F8=total;
+                    g_player_bolts=total;
                 }
             }
             if (state->x320!=-1) {
-                int offset=D_L04_001B090C*4;
-                offset=D_001A79F0==4?offset:offset+20;
+                int offset=g_current_race_index*4;
+                offset=g_current_map_index==4?offset:offset+20;
                 bestTime=(int *)((u8 *)D_001A7368+offset);
-                if (D_L04_001A8FE8<*bestTime || !*bestTime) *bestTime=D_L04_001A8FE8;
+                if (g_race_time_ticks<*bestTime || !*bestTime) *bestTime=g_race_time_ticks;
             }
                 D_L04_001A8ED0[5]=1;
-                func_00132AF8(93); func_00132028();
-                level=D_001A79F0;
+                snd_send_cmd22(93); snd_Pump();
+                level=g_current_map_index;
                 limit=level==4?6500:7350;
-                ticks=D_L04_001A8FE8;
+                ticks=g_race_time_ticks;
                 done=0;
                 if (ticks>0) {
                     ticks/=5;
@@ -238,9 +238,9 @@ int func_PAL_L04_004169C0(RaceObject *object,RaceState *state)
                     }
                     }
                 }
-                if (done || D_001A79F0==4 ||
-                    (D_001A79F0==11 && (D_L04_001B090C!=0 || func_L04_0040A1D0(0)>=2)))
-                    func_0029B3E0(0,-1);
+                if (done || g_current_map_index==4 ||
+                    (g_current_map_index==11 && (g_current_race_index!=0 || race_get_course_win_count(0)>=2)))
+                    MemcardSave(0,-1);
             return 1;
         }
     }
@@ -253,13 +253,13 @@ int func_PAL_L04_004169C0(RaceObject *object,RaceState *state)
     slot=state->x1E4;
     for (i=20;i>=0;i--,slot++) {
         if (*slot==empty) continue;
-        other=D_L04_001B24DC+*slot;
+        other=g_moby_l04_pool+*slot;
         if ((unsigned)(other->state-2)>=2) continue;
         loopVars=other->vars;
         otherTime=loopVars->routeDistance;
         if (otherTime>700.0f && !loopVars->checkpointArmed) otherTime-=D_L04_001B0928;
         if (!loopVars->finished) {
-            int otherLap=loopVars->lap, playerLap=D_L04_001A8FE4;
+            int otherLap=loopVars->lap, playerLap=g_current_lap;
             if (playerLap>=otherLap) {
                 if (!(time<=otherTime)) goto skipRank;
                 if (otherLap!=playerLap) goto skipRank;
@@ -268,7 +268,7 @@ int func_PAL_L04_004169C0(RaceObject *object,RaceState *state)
         state->x320++;
 skipRank:
         loopVars->nearestPlayer=0;
-        func_00282CF0(delta,object->position,other->position);
+        FastVecSub(delta,object->position,other->position);
         distance=func_L00_002EE290(delta);
         if (distance<nearest) {state->x3B0=other;nearest=distance;}
     }
@@ -276,13 +276,13 @@ skipRank:
         vars=state->x3B0->vars;
         vars->nearestPlayer=1;
         if (nearest<10.0f) {
-            rank=(int)((4-D_L04_001B090C)*3.75f)+2+(int)(func_L04_0040A268(D_L04_001B090C)*0.3f);
-            if (D_L04_001A8FE8>=51 && vars->boostRequests<4 && vars->boostTimer<=0 &&
+            rank=(int)((4-g_current_race_index)*3.75f)+2+(int)(race_get_course_finish_count(g_current_race_index)*0.3f);
+            if (g_race_time_ticks>=51 && vars->boostRequests<4 && vars->boostTimer<=0 &&
                 !state->x4C4 && state->x3B0->state==2 && state->x314==vars->path &&
-                (D_L04_001A8FE4<=vars->lap || state->x27C<=0.0f) && !func_002A77E0(rank-1)) {
+                (g_current_lap<=vars->lap || state->x27C<=0.0f) && !math_random_int_below(rank-1)) {
                 int delay;
-                rank=(D_L04_001B090C+1)*120;
-                delay=func_002A7820(120,360)+360;
+                rank=(g_current_race_index+1)*120;
+                delay=math_random_int_range(120,360)+360;
                 vars->steeringTimer=0; vars->boostTimer=rank+delay;
                 vars->boostAmount=1.0f; vars->boostScale=1.0f; vars->boostPhase=0.0f;
                 vars->boostRequests=0;

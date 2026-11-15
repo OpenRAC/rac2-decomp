@@ -18,15 +18,15 @@ typedef struct {
     char pad[219];
 } StripState;
 
-extern char D_001395B0[], D_L00_001B8DC0[];
-extern StripState D_L00_00262570[];
+extern char D_001395B0[], g_camera_l00_position[];
+extern StripState g_weapon_l00_table[];
 
-extern void func_L00_004073D8(void *, int, int, int, float, float, float, int);
-extern void func_L00_004079C8(void *), func_L00_00407C18(void *);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void DrawScrollingRibbonWithHalo(void *, int, int, int, float, float, float, int);
+extern void DrawLightningArcSparks(void *), DrawTwoPassCameraQuad(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 typedef struct {
     float x, y, z, w;
@@ -45,7 +45,7 @@ typedef struct {
  * 2 to 11 of a 20-column ring mesh, culling faces turned from the camera; each face is drawn
  * twice with its own scrolling V. Same mesh loop as RAC1's suck_beam_draw_mesh. */
 /* Draws the Sheepinator beam as a twisting tube with glowing edges. */
-void func_L00_00406FB0(char *arg)
+void DrawScrollingRingMesh(char *arg)
 {
     BeamPacket packet;
     float e[4], f[4], g[4], h[4];
@@ -58,7 +58,7 @@ void func_L00_00406FB0(char *arg)
     DrawScrollingRibbonWithHalo(D_L00_00254BE0, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF8);
     DrawLightningArcSparks(arg);
     DrawTwoPassCameraQuad(arg);
-    color = gWeaponTable_L00[(unsigned char)D_001395B0[0]].state ? D_L00_001B0F08 : D_L00_001B0F04;
+    color = g_weapon_l00_table[(unsigned char)D_001395B0[0]].state ? D_L00_001B0F08 : D_L00_001B0F04;
     packet.tags[1] = GetEffectTextureDescriptor(D_L00_001B0F0C);
     packet.tags[2] = 0xff9000000260ULL;
     packet.tags[3] = 0x8000000048ULL;
@@ -85,7 +85,7 @@ void func_L00_00406FB0(char *arg)
                 FastVecSub(e, &packet.q[0], &packet.q[1]);
                 FastVecSub(f, &packet.q[2], &packet.q[1]);
                 FastVecCross(g, f, e);
-                FastVecSub(h, &packet.q[1], gCameraPosition_L00);
+                FastVecSub(h, &packet.q[1], g_camera_l00_position);
                 if (FastVecDot(g, h) >= 0.0f) {
                     y += D_L00_001B0E70;
                     z += D_L00_001B0E70;

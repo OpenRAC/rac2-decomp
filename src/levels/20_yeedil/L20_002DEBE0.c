@@ -11,24 +11,24 @@ typedef struct YeedilEffectState {
 } YeedilEffectState;
 extern YeedilEffectState D_L20_001BDCC0;
 extern int D_L20_001A8F00[] __attribute__((sda));
-extern void func_0032C700(void *, int, int, int, int, int, int, int,
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002A77E0(int);
-extern void func_002BE278(void *, void *, int, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int math_random_int_below(int);
+extern void part_spawn_white_flash(void *, void *, int, float);
 
-extern void *func_0029EFD0(int);
+extern void *CreateMoby(int);
 
-extern float func_002A89A8(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
 /* Updates a spark-spraying effect (moby class 3882) during a Yeedil scene. At a set moment it fires a burst, then it keeps
  * shooting sparks from a scene object while the scene runs. */
-void func_L20_0039AA98(unsigned char *object)
+void spark_l20_burst_update(unsigned char *object)
 {
     float position[4], velocity[4];
     float speed, heading, tilt;
@@ -49,14 +49,14 @@ void func_L20_0039AA98(unsigned char *object)
             SpawnExplosion(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
                           1, 1, 0, 0, 1.5f, 20.0f);
         if ((unsigned int)(state->frame - 171) < 149) {
-            TransformMobyJointToWorld(state->first, 0, position);
+            moby_transform_joint_to_world(state->first, 0, position);
             position[2] += 0.03f;
-            speed = RandomFloatRange(0.028333336114883423f, 0.05000000447034836f);
-            heading = RandomAngle();
-            tilt = RandomFloatRange(0.523598849773407f, 2.6179940700531006f);
-            BuildSphericalOffset(velocity, speed, heading, tilt);
-            if (RandomIntBelow(2))
-                SpawnWhiteFlashParticle(position, velocity, 0, RandomFloatRange(1470.0f, 7350.0f));
+            speed = math_random_float_range(0.028333336114883423f, 0.05000000447034836f);
+            heading = math_random_angle();
+            tilt = math_random_float_range(0.523598849773407f, 2.6179940700531006f);
+            vec_build_spherical_offset(velocity, speed, heading, tilt);
+            if (math_random_int_below(2))
+                part_spawn_white_flash(position, velocity, 0, math_random_float_range(1470.0f, 7350.0f));
         }
         break;
     }
@@ -70,12 +70,12 @@ extern unsigned char D_L20_001DBA60[];
 
 extern void *D_L20_001DB100[];
 
-extern void func_0029F390(void *);
+extern void update_moby_animation_state(void *);
 
 extern void func_002A0F48(void *);
 
 /* Turns a moby into another class: copies the new class settings (animation, size, collision) from the class tables. */
-void func_L20_00330A68(void *moby, int classId)
+void moby_change_class_from_tables(void *moby, int classId)
 {
     unsigned char *typeData;
     unsigned char *typeData2;
@@ -124,9 +124,9 @@ void func_L20_00330A68(void *moby, int classId)
    in the -G8 unit once the row is split. */
 /* func_L20_0036AE68 is defined in L20_0036AE68-g8.c (it reads its list through $gp). */
 
-extern void func_L00_002F3478(void);
+extern void level_clear_first_table_entry(void);
 
-extern void func_002B49E0(int a, int b, int c, int d, int e);
+extern void request_begin_slot(int a, int b, int c, int d, int e);
 
 extern int D_L20_001FFE40[];
 
@@ -135,22 +135,22 @@ extern int D_L20_001A8FDC __attribute__((sda));
 extern int D_L20_00294F98;
 
 /* Sets up a Yeedil scene: runs the common setup, stores a scene table and starts the scene. */
-void func_L20_0036E720(void)
+void cutscene_start_scene(void)
 {
     int *base;
     int *other;
 
-    ClearFirstLevelTableEntry();
+    level_clear_first_table_entry();
     base = D_L20_001FFE40;
     other = &D_L20_00294F98;
     *(int *)(base + 0x40) = (int)other;
     *(int *)(base + 0x41) = 0xB;
     D_L20_001A8FDC = 1;
-    BeginSlotRequest(3, 1, 0xB, 0, 0);
+    request_begin_slot(3, 1, 0xB, 0, 0);
 }
 
 /* Creates the glowing effect object (moby class 4802) on an owner at a given spot and hands back the new object. */
-char *func_L20_0039BDF0(void *owner, void *position, int param1, int param2)
+char *glow_effect_create(void *owner, void *position, int param1, int param2)
 {
     char *effect;
     int posAddr;
@@ -165,7 +165,7 @@ char *func_L20_0039BDF0(void *owner, void *position, int param1, int param2)
         qcopy((void *)posAddr, position);
         *(int *)(owner + 0x98) = 0;
         *(float *)(effect + 0x18) = *(float *)(effect + 0x18) + 2.0f;
-        *(float *)(effect + 0x18) = ProbeGroundHeightBelow((void *)posAddr, 0, 0.5f);
+        *(float *)(effect + 0x18) = coll_probe_ground_height_below((void *)posAddr, 0, 0.5f);
         ownerRef = *(char **)(effect + 0xB8);
         *(int *)(ownerRef + 0x98) = *(int *)(*(int *)(ownerRef + 0x24) + 0x10);
         zeroAddr = (int)effect + 0xF0;

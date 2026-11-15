@@ -75,22 +75,22 @@ typedef struct {
 } PrisonGuardVars;
 
 
-extern float func_002B0178(void *position, void *owner, void *output);
-extern float func_00282E48(void *, void *);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(char *object, char *state, int special);
-extern void func_L14_004286F8(unsigned char *);
-extern int func_002B3BA8(char *self, int index, void *point, int force, float range, float height);
-extern void func_002AFFD8(char *a0, char *a1, int a2);
+extern float coll_get_ground_distance_below(void *position, void *owner, void *output);
+extern float fast_vec_dist(void *, void *);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(char *object, char *state, int special);
+extern void group_marker_alert_guards(unsigned char *);
+extern int weapon_select_aim_target(char *self, int index, void *point, int force, float range, float height);
+extern void cam_compute_view_direction(char *a0, char *a1, int a2);
 
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern int D_L14_001A8FF0;
 extern float D_L14_001B18B0 __attribute__((sda));
 extern char *D_L14_001B2200[] __attribute__((sda));
@@ -98,16 +98,16 @@ extern char D_L14_001B2210[] __attribute__((sda));
 extern char D_L14_001B9500[];
 
 /* Shared guard logic: sets up its stats on the first frame, then checks for the player getting close, damage and the path to the player. */
-void func_L14_004281D0(char *self)
+void guard_update_common(char *self)
 {
     PrisonGuardVars *vars = *(PrisonGuardVars **)(self + 0x68);
     int hit;
 
     if (B(self, 0x20) == 0) {
-        if (gCurrentMapIndex[0] == 2 && F(self, 0x18) > 400.0f) {
+        if (g_current_map_index[0] == 2 && F(self, 0x18) > 400.0f) {
             if (D_L14_001A8FF0 == 0)
                 return;
-            GetGroundDistanceBelowPosition(self + 0x10, self, self + 0x10);
+            coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
             vars->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
@@ -117,7 +117,7 @@ void func_L14_004281D0(char *self)
             vars->f90 = F(self, 0x18) - 1.0f;
         }
         if (vars->i210 == -1) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         {
@@ -128,7 +128,7 @@ void func_L14_004281D0(char *self)
                 vars->i218 = -1;
             }
         }
-        vars->f324 = RandomFloatRange(1.0f, 1.333f);
+        vars->f324 = math_random_float_range(1.0f, 1.333f);
         F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * vars->f324;
         vars->b48 = FloatToInt(15.0f);
         vars->b4A = FloatToInt(6.4f);
@@ -147,44 +147,44 @@ void func_L14_004281D0(char *self)
         vars->f110 = 1.5707964897155762f;
         vars->f130 = 0.523598849773407f;
         vars->i138 |= 0x280;
-        vars->f1DC = RandomSignedFloatRange(18.0f, 22.0f) * 0.01745329424738884f;
+        vars->f1DC = math_random_signed_float_range(18.0f, 22.0f) * 0.01745329424738884f;
         vars->b1E8 = 7;
         vars->b1E9 = 6;
         vars->h1E2 = 120;
         vars->h1E4 = 180;
         vars->f1D4 = 3.0f;
         vars->f1D0 = D_L14_001B18B0 * 0.01666666753590107f;
-        vars->f328 = RandomAngle();
+        vars->f328 = math_random_angle();
         if (vars->i214 != 0) {
             UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
             W(self, 0x98) = 0;
-            SetMobyState(self, 13, 4);
+            moby_set_state(self, 13, 4);
             if (B(self, 0x43) != 10)
-                StartAnimationBlended(self, 10, 0, 0);
+                anim_start_blended(self, 10, 0, 0);
         } else {
-            SetMobyState(self, 1, 0);
+            moby_set_state(self, 1, 0);
             if (B(self, 0x43) != 0)
-                StartAnimationBlended(self, 0, 0, 0);
+                anim_start_blended(self, 0, 0, 0);
         }
         vars->v2E0 = *(PrisonQword *)(self + 0x10);
     }
 
     if (B(self, 0x31) != 0) {
         if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
-            UpdateMobyGroundCheck(self);
+            moby_update_ground_check(self);
             B(self, 0x6F) = 22;
         }
     }
-    hit = ApplyDamageToObject(self, vars->area50, 0);
+    hit = moby_apply_damage_to_object(self, vars->area50, 0);
     if (hit != 0) {
-        AlertGroupGuards((unsigned char *)self);
+        group_marker_alert_guards((unsigned char *)self);
         if (hit >= 4)
-            SetMobyState(self, 12, -1);
+            moby_set_state(self, 12, -1);
     }
     if (B(self, 0x20) != 12 && vars->i1D8 == 1)
-        SetMobyState(self, 12, -1);
+        moby_set_state(self, 12, -1);
     if ((u8)(B(self, 0x95) - 3) >= 2)
-        vars->h314 = SelectAimTarget_002B3BA8(self, vars->i210, 0, 0, 16.0f, 0.0f);
+        vars->h314 = weapon_select_aim_target(self, vars->i210, 0, 0, 16.0f, 0.0f);
     if (vars->h338 != 0)
-        ComputeViewDirection(self + 0x10, vars->area300, 0);
+        cam_compute_view_direction(self + 0x10, vars->area300, 0);
 }

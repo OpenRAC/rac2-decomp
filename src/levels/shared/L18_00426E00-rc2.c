@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,7 +25,7 @@
 #include "common.h"
 
 /* Returns 1 when this object is a live enemy of one of the three shooter classes. */
-s32 func_L18_00426E00(s8 *moby) {
+s32 shooter_is_enemy_alive(s8 *moby) {
     s32 result = 0;
     if (moby != 0) {
         u8 stateId = *(u8 *)(moby + 0x20);

@@ -9,22 +9,22 @@ typedef struct {
     float uv[4][2];
     unsigned long tag[4];
 } WavyLinkStrip;
-extern unsigned long func_0027C878(int);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_00282DF0(void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00283C28(float);
-extern void func_00280B90(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float FastVecLength(void *);
+extern void FastVecCross(void *, void *, void *);
+extern float math_fast_float_g(float);
+extern void draw_world_quad(void *, int, int);
 extern char D_L01_001B94C0[];
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Draws a wavy textured strip from the moby at data + 0x14 to this one, a quad per 0.2 units,
    with its width perpendicular to the view from D_L01_001B94C0. */
-void func_L01_0038EF40(char *moby)
+void DrawWavyLinkStrip(char *moby)
 {
     WavyLinkStrip strip;
     float start[4] __attribute__((aligned(16)));
@@ -51,7 +51,7 @@ void func_L01_0038EF40(char *moby)
     strip.uv[1][0] = 1; strip.uv[1][1] = 0;
     strip.uv[2][0] = 0; strip.uv[2][1] = 1;
     strip.uv[3][0] = 1; strip.uv[3][1] = 1;
-    TransformMobyJointToWorld(moby, 0, origin);
+    moby_transform_joint_to_world(moby, 0, origin);
     qcopy(start, *(char **)(data + 0x14) + 0x10);
     qcopy(current, start);
     FastVecSub(direction, origin, start);
@@ -65,15 +65,15 @@ void func_L01_0038EF40(char *moby)
     qcopy(strip.pos[2], start);
     strip.pos[0][2] -= thickness;
     strip.pos[2][2] += thickness;
-    factor = FastSinOrCosA(FastFloatHelperG(*(float *)(data + 0x18)));
+    factor = math_fast_sin_or_cos_a(math_fast_float_g(*(float *)(data + 0x18)));
     while (progress < distance) {
         step = 0.2f;
         if (distance - progress < step) step = distance - progress;
         progress += step;
-        phase = 3.1415927f; phase = progress * phase; timewave = FastSinOrCosB(phase / distance);
+        phase = 3.1415927f; phase = progress * phase; timewave = math_fast_sin_or_cos_b(phase / distance);
         thickness = phase / *(float *)(data + 0x1C);
-        thickness = FastFloatHelperG(thickness);
-        thickness = FastSinOrCosB(thickness);
+        thickness = math_fast_float_g(thickness);
+        thickness = math_fast_sin_or_cos_b(thickness);
         thickness *= timewave;
         thickness *= factor;
         thickness *= *(float *)(data + 0x20);

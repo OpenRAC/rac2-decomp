@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -21,14 +22,14 @@ extern unsigned int D_001BACC0;
 
 /* Change resident state word from1 to2 only when the mode word equals7 */
 /* Moves the menu state from 1 to 2, but only while the menu mode is 7. */
-void func_00287E18(void) {
+void menu_advance_state_in_mode_seven(void) {
     if (D_L00_001BEF00.mode == 7 && D_L00_001BEF00.state == 1) {
         D_L00_001BEF00.state = 2;
     }
 }
 
 /* Returns true while the saved menu state is 7. */
-int func_00287E48(void)
+int menu_is_state_seven(void)
 {
     return D_001BACC0 == 7;
 }

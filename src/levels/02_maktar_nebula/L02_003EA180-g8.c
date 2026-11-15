@@ -1,14 +1,14 @@
 #include "common.h"
-extern float func_002A7940(void);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_002A7750(char *, int, int);
-extern void func_L00_0033E220(void *, char *, int, float, int, int, float, int, int, int);
-extern int func_002B38B8(char *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_random_angle(void);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void moby_set_state(char *, int, int);
+extern void part_spawn_object_following_effect(void *, char *, int, float, int, int, float, int, int, int);
+extern int flag_is_third_pending_set(char *);
+extern int PlayMobySound(int, int, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern char *D_0018A15C[3] __attribute__((sda));
 typedef struct { unsigned short value; } FlagA180;
 extern FlagA180 D_0018CA54 NOT_SDA;
@@ -21,7 +21,7 @@ typedef int QuadA180 __attribute__((mode(TI)));
 typedef struct { float origin[4]; float position, velocity, angle; } StateA180;
 /* Pulses the part's color, then springs it in and out along its axis until it
    settles. */
-void func_L02_003EA180(char *actor) {
+void tether_anchor_update(char *actor) {
     StateA180 *vars = *(StateA180 **)(actor + 0x68);
     QuadA180 offset;
     int brightness;
@@ -29,26 +29,26 @@ void func_L02_003EA180(char *actor) {
 
     switch (*(u8 *)(actor + 0x20)) {
     case 0:
-        vars->angle = RandomAngle();
+        vars->angle = math_random_angle();
         qcopy(vars, actor + 0x10);
-        SetMobyState(actor, 1, -1);
+        moby_set_state(actor, 1, -1);
         break;
     case 1:
         offset = 0;
         ((float *)&offset)[1] = -1.25f;
         ((float *)&offset)[2] = -2.0f;
         vars->angle = FastAddRotations(vars->angle, 0.05235988646745682f);
-        brightness = FloatToInt((FastSinOrCosB(vars->angle) * 4.0f - 3.0f) * 208.0f);
+        brightness = FloatToInt((math_fast_sin_or_cos_b(vars->angle) * 4.0f - 3.0f) * 208.0f);
         if (brightness > 208) brightness = 208;
         else if (brightness < 80) brightness = 80;
         if (D_0018A15C[0] != 0 && *(short *)(D_0018A15C[0] + 0xAA) == 0xA61 /* moby class 2657 */ && brightness >= 101) {
-            SpawnObjectFollowingEffect(&offset, actor, 0x20000012, 315000.0f, -1, 0, 0.0f, 15, 0, -1);
-            SpawnObjectFollowingEffect(&offset, actor, 0x20000012, 315000.0f, -1, 1, 0.0f, 15, 0, -1);
+            part_spawn_object_following_effect(&offset, actor, 0x20000012, 315000.0f, -1, 0, 0.0f, 15, 0, -1);
+            part_spawn_object_following_effect(&offset, actor, 0x20000012, 315000.0f, -1, 1, 0.0f, 15, 0, -1);
         }
         ((ActorA180 *)actor)->color = brightness | 0x800C0C00;
-        if (IsThirdPendingFlagSet(actor)) {
+        if (flag_is_third_pending_set(actor)) {
             PlayMobySound(0, 0, actor);
-            SetMobyState(actor, 2, -1);
+            moby_set_state(actor, 2, -1);
         }
         break;
     case 2: {
@@ -66,7 +66,7 @@ void func_L02_003EA180(char *actor) {
                 vars->velocity *= D_L02_001B0D4C;
             } else {
                 vars->velocity = 0;
-                SetMobyState(actor, 3, -1);
+                moby_set_state(actor, 3, -1);
             }
         }
         direction = -1.0f;

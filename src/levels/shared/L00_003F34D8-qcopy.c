@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_003F34D8 is a unit of its own: it needs the opt-in quadword-copy profile
    (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which gives retail's grouped
@@ -8,7 +9,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Appends the source's 16-byte block and its colour to the list, up to 70 entries. */
-void func_L00_003F34D8(char *src, int *src4, char *dst16, int *dst4, int *count)
+void gfx_append_point_and_color(char *src, int *src4, char *dst16, int *dst4, int *count)
 {
     int i = *count;
 

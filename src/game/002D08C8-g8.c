@@ -8,7 +8,7 @@ extern int ref_002D08C8_02 __attribute__((sda));
 extern volatile unsigned char D_001A7A0A;
 
 /* Unlocks the entries of the five-entry Extras page that the player has earned. */
-int func_002D08C8(void)
+int menu_unlock_extras_page_entries(void)
 {
     if (D_001A8CFC != 0) {
         D_001F2848[0] = 1;

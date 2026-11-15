@@ -1,10 +1,10 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *func_0029EFD0(s32);
-extern void func_002833F0(void *, void *);
-extern float func_002A7878(float, float);
-extern u8 *func_002C2210(void *, s32, s32, s32, s32, void *, float, float, float, s32);
+extern u8 *CreateMoby(s32);
+extern void euler_rotation_basis(void *, void *);
+extern float math_random_float_range(float, float);
+extern u8 *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
 extern float D_L12_001B15B0 __attribute__((sda));
 extern s32 D_L12_001B1520 __attribute__((sda));
 extern s32 D_L12_001B1524 __attribute__((sda));
@@ -14,7 +14,7 @@ extern u8 D_L12_001A8F20[] MACRO_ADDR;
    velocity, hands it to its owner, and starts two particle bursts on it. The burst table is a
    MACRO_ADDR object, so its lui/addiu pair is emitted again for each call. */
 /* Creates a blast projectile at a position with a velocity and starts its two particle bursts. */
-u8 *func_L12_00408050(u8 *owner, TI128 *velocity, TI128 *position, float speed)
+u8 *blast_projectile_spawn(u8 *owner, TI128 *velocity, TI128 *position, float speed)
 {
     u8 *obj;
     u8 *state;
@@ -41,9 +41,9 @@ u8 *func_L12_00408050(u8 *owner, TI128 *velocity, TI128 *position, float speed)
         *(float *)(obj + 0x2C) = D_L12_001B15B0;
         *(u16 *)(obj + 0x34) |= 0x100;
         *(s32 *)(state + 0x24) = 0;
-        scale = RandomFloatRange(8.0f, 10.0f);
-        SpawnGroundEffectParticle(pos, 15, D_L12_001B1520, 0, 10, D_L12_001A8F20, scale * 0.3f, scale, 0.0f, 0);
-        SpawnGroundEffectParticle(pos, 15, D_L12_001B1524, 1, -10, D_L12_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
+        scale = math_random_float_range(8.0f, 10.0f);
+        part_spawn_ground_effect(pos, 15, D_L12_001B1520, 0, 10, D_L12_001A8F20, scale * 0.3f, scale, 0.0f, 0);
+        part_spawn_ground_effect(pos, 15, D_L12_001B1524, 1, -10, D_L12_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
     }
     return obj;
 }

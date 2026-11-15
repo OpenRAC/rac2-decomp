@@ -23,16 +23,16 @@ extern f32 D_L01_001B08F0 __attribute__((sda));
 extern f32 D_L01_001B08F4 __attribute__((sda));
 extern f32 D_L01_001B08F8 __attribute__((sda));
 extern s32 D_L01_001B08FC __attribute__((sda));
-extern f32 func_00283248(f32, f32);
-extern f32 func_00282E20(void *);
-extern f32 func_002A7878(f32, f32);
-extern f32 func_00283B98(f32, f32);
-extern s32 func_00283CF0(f32);
-extern void func_002AF000(void *, f32, f32, f32);
-extern u8 *func_002BAA28(void *, void *, void *, s32, s32, s32, s32, s32, s32);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 vec_length_xy(void *);
+extern f32 math_random_float_range(f32, f32);
+extern f32 FastAddRotations(f32, f32);
+extern s32 FloatToInt(f32);
+extern void vec_build_spherical_offset(void *, f32, f32, f32);
+extern u8 *part_spawn_trail(void *, void *, void *, s32, s32, s32, s32, s32, s32);
 extern s32 func_001163B0(void);
 /* Sprays two bursts of particles out from the object. */
-void func_L01_003DA740(u8 *obj) {
+void part_spawn_debris_burst(u8 *obj) {
     f32 vel[4] __attribute__((aligned(16)));
     f32 accel[4] __attribute__((aligned(16)));
     f32 pos[4] __attribute__((aligned(16)));
@@ -42,47 +42,47 @@ void func_L01_003DA740(u8 *obj) {
     u8 *particle;
     vel[3]=D_L01_001B08B8;
     accel[3]=D_L01_001B08BC;
-    yaw=FastMatrixHelperA(*(f32 *)state,*(f32 *)(state+4));
-    pitch=-FastMatrixHelperA(vec_length_xy(state),*(f32 *)(state+8));
+    yaw=mat_fast_helper_a(*(f32 *)state,*(f32 *)(state+4));
+    pitch=-mat_fast_helper_a(vec_length_xy(state),*(f32 *)(state+8));
     for(i=0;i<D_L01_001B08C4;i++) {
         qcopy(pos,obj+0x10);
-        pos[0]+=RandomFloatRange(-0.065f,0.065f);
-        pos[1]+=RandomFloatRange(-0.065f,0.065f);
-        pos[2]+=RandomFloatRange(-0.065f,0.065f);
-        BuildSphericalOffset(vel,D_L01_001B08A8*0.01666666753590107f,yaw,pitch);
-        vel[2]=RandomFloatRange(D_L01_001B08AC*0.015000000596046448f,D_L01_001B08AC*0.018333334f);
-        angle=RandomFloatRange(-D_L01_001B08C0,D_L01_001B08C0)*0.01745329424738884f;
+        pos[0]+=math_random_float_range(-0.065f,0.065f);
+        pos[1]+=math_random_float_range(-0.065f,0.065f);
+        pos[2]+=math_random_float_range(-0.065f,0.065f);
+        vec_build_spherical_offset(vel,D_L01_001B08A8*0.01666666753590107f,yaw,pitch);
+        vel[2]=math_random_float_range(D_L01_001B08AC*0.015000000596046448f,D_L01_001B08AC*0.018333334f);
+        angle=math_random_float_range(-D_L01_001B08C0,D_L01_001B08C0)*0.01745329424738884f;
         speed=D_L01_001B08B0;
         speed*=0.01666666753590107f;
         angle=FastAddRotations(yaw,angle);
-        BuildSphericalOffset(accel,speed,angle,pitch);
-        a=FloatToInt(RandomFloatRange(D_L01_001B089C,D_L01_001B089C*2));
-        b=FloatToInt(RandomFloatRange(D_L01_001B08A0,D_L01_001B08A0*1.2f));
-        c=FloatToInt(RandomFloatRange(D_L01_001B08A4,D_L01_001B08A4*1.2f));
-        particle=SpawnTrailParticle_002BAA28(pos,vel,accel,D_L01_001B0894,D_L01_001B0898,a,b,c,-1);
-        if(particle && (Rand()&1)) particle[3]=0x48;
+        vec_build_spherical_offset(accel,speed,angle,pitch);
+        a=FloatToInt(math_random_float_range(D_L01_001B089C,D_L01_001B089C*2));
+        b=FloatToInt(math_random_float_range(D_L01_001B08A0,D_L01_001B08A0*1.2f));
+        c=FloatToInt(math_random_float_range(D_L01_001B08A4,D_L01_001B08A4*1.2f));
+        particle=part_spawn_trail(pos,vel,accel,D_L01_001B0894,D_L01_001B0898,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     vel[3]=D_L01_001B08EC;
     accel[3]=D_L01_001B08F0;
     for(i=0;i<D_L01_001B08FC;i++) {
         qcopy(pos,obj+0x10);
-        pos[0]+=RandomFloatRange(-0.2f,0.2f);
-        pos[1]+=RandomFloatRange(-0.2f,0.2f);
-        pos[2]+=RandomFloatRange(-0.2f,0.2f);
-        angle=RandomFloatRange(-D_L01_001B08F8,D_L01_001B08F8)*0.01745329424738884f;
+        pos[0]+=math_random_float_range(-0.2f,0.2f);
+        pos[1]+=math_random_float_range(-0.2f,0.2f);
+        pos[2]+=math_random_float_range(-0.2f,0.2f);
+        angle=math_random_float_range(-D_L01_001B08F8,D_L01_001B08F8)*0.01745329424738884f;
         speed=D_L01_001B08DC;
         speed*=0.01666666753590107f;
         angle=FastAddRotations(yaw,angle);
-        BuildSphericalOffset(vel,speed,angle,pitch);
-        angle=RandomFloatRange(-D_L01_001B08F4,D_L01_001B08F4)*0.01745329424738884f;
+        vec_build_spherical_offset(vel,speed,angle,pitch);
+        angle=math_random_float_range(-D_L01_001B08F4,D_L01_001B08F4)*0.01745329424738884f;
         speed=D_L01_001B08E4;
         speed*=0.01666666753590107f;
         angle=FastAddRotations(yaw,angle);
-        BuildSphericalOffset(accel,speed,angle,pitch);
-        a=FloatToInt(RandomFloatRange(D_L01_001B08D0,D_L01_001B08D0*2));
-        b=FloatToInt(RandomFloatRange(D_L01_001B08D4,D_L01_001B08D4*1.2f));
-        c=FloatToInt(RandomFloatRange(D_L01_001B08D8,D_L01_001B08D8*1.2f));
-        particle=SpawnTrailParticle_002BAA28(pos,vel,accel,D_L01_001B08C8,D_L01_001B08CC,a,b,c,-1);
-        if(particle && (Rand()&1)) particle[3]=0x48;
+        vec_build_spherical_offset(accel,speed,angle,pitch);
+        a=FloatToInt(math_random_float_range(D_L01_001B08D0,D_L01_001B08D0*2));
+        b=FloatToInt(math_random_float_range(D_L01_001B08D4,D_L01_001B08D4*1.2f));
+        c=FloatToInt(math_random_float_range(D_L01_001B08D8,D_L01_001B08D8*1.2f));
+        particle=part_spawn_trail(pos,vel,accel,D_L01_001B08C8,D_L01_001B08CC,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
 }

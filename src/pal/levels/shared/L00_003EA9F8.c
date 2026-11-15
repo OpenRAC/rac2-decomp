@@ -2,13 +2,13 @@
 
 #include "common.h"
 extern char *D_L00_001B2B54 __attribute__((sda));
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002ACEC0(char *, char *, char *, float);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void math_apply_axis_rotation_to_quat(char *, char *, char *, float);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
 
 /* Allocate an owner-tagged effect record and initialize its mode-specific fields. */
 char *func_PAL_L00_003EA9F8(char *rec, int mode, float amount, char *pos)
@@ -40,66 +40,66 @@ char *func_PAL_L00_003EA9F8(char *rec, int mode, float amount, char *pos)
         *(char **)(p + 124) = rec;
         ++*(int *)(rec + 56);
         {
-            int color = func_002A7820(95, 127);
+            int color = math_random_int_range(95, 127);
             *(int *)(p + 120) = mode;
             *(int *)(p + 96) = color;
             *(int *)(p + 92) = color;
         }
         if (mode == 0) {
             int color;
-            func_002ACEC0(p + 16, rec + 16, rec, func_002A7940());
-            *(float *)(p + 60) = *(float *)(p + 56) = *(float *)(rec + 60) * func_002A7878(zero, 1.25f);
+            math_apply_axis_rotation_to_quat(p + 16, rec + 16, rec, math_random_angle());
+            *(float *)(p + 60) = *(float *)(p + 56) = *(float *)(rec + 60) * math_random_float_range(zero, 1.25f);
             *(float *)(p + 64) = zero;
-            color = func_002A7820(0, 13);
+            color = math_random_int_range(0, 13);
             *(int *)(p + 108) = (color << 16) + (color << 8) + color;
-            *(float *)(p + 72) = *(float *)(p + 68) = func_002A7878(0.25f, 0.35f);
-            *(float *)(p + 76) = func_002A7878(0.75f, 1.0f);
+            *(float *)(p + 72) = *(float *)(p + 68) = math_random_float_range(0.25f, 0.35f);
+            *(float *)(p + 76) = math_random_float_range(0.75f, 1.0f);
             *(float *)(p + 36) = zero;
-            *(int *)(p + 88) = *(int *)(p + 84) = func_002A7820(83, 100);
+            *(int *)(p + 88) = *(int *)(p + 84) = math_random_int_range(83, 100);
             qcopy(p, *(char **)(p + 124) + 32);
-            func_00282F20(v, p + 16, func_002A7878(0.15f, 0.75f));
-            func_00282CC0(p, v, p);
+            vec_scale_to_length(v, p + 16, math_random_float_range(0.15f, 0.75f));
+            FastVecAdd(p, v, p);
             *(int *)(p + 112) = 2;
             goto zero_angle;
         } else if (mode == 1) {
             int color;
-            func_002ACEC0(p + 16, rec + 16, rec, func_002A7940());
+            math_apply_axis_rotation_to_quat(p + 16, rec + 16, rec, math_random_angle());
             *(float *)(p + 56) = zero;
             *(float *)(p + 60) = zero;
             *(float *)(p + 64) = zero;
-            color = func_002A7820(0, 13);
+            color = math_random_int_range(0, 13);
             *(int *)(p + 108) = (color << 16) + (color << 8) + color;
-            *(float *)(p + 72) = *(float *)(p + 68) = func_002A7878(0.25f, 0.5f);
-            *(float *)(p + 76) = func_002A7878(1.0f, 1.5f);
-            *(float *)(p + 36) = func_002A7878(0.080000006f, 0.10000001f);
-            *(int *)(p + 88) = *(int *)(p + 84) = func_002A7820(83, 100);
+            *(float *)(p + 72) = *(float *)(p + 68) = math_random_float_range(0.25f, 0.5f);
+            *(float *)(p + 76) = math_random_float_range(1.0f, 1.5f);
+            *(float *)(p + 36) = math_random_float_range(0.080000006f, 0.10000001f);
+            *(int *)(p + 88) = *(int *)(p + 84) = math_random_int_range(83, 100);
             qcopy(p, pos);
             *(int *)(p + 112) = 2;
 zero_angle:
             *(float *)(p + 48) = zero;
         } else if (mode == 2) {
             int color;
-            func_002ACEC0(p + 16, rec + 16, rec, amount);
+            math_apply_axis_rotation_to_quat(p + 16, rec + 16, rec, amount);
             *(float *)(p + 56) = zero;
             *(float *)(p + 60) = zero;
             *(float *)(p + 64) = zero;
-            color = func_002A7820(1, 10);
+            color = math_random_int_range(1, 10);
             *(int *)(p + 108) = (color << 16) + (color << 8) + color;
-            *(float *)(p + 72) = *(float *)(p + 68) = func_002A7878(0.15f, 0.25f) * 0.5f;
-            *(float *)(p + 76) = func_002A7878(0.5f, 0.8f) * 1.15f;
+            *(float *)(p + 72) = *(float *)(p + 68) = math_random_float_range(0.15f, 0.25f) * 0.5f;
+            *(float *)(p + 76) = math_random_float_range(0.5f, 0.8f) * 1.15f;
             *(float *)(p + 36) = 0.07000001f;
             *(int *)(p + 88) = *(int *)(p + 84) = 75;
-            func_00282F20(v, *(char **)(p + 124), 0.2f);
-            func_00282CC0(p, *(char **)(p + 124) + 32, v);
-            func_00282F20(w, p + 16, 0.75f);
-            func_00282CC0(p, w, p);
-            *(float *)(p + 48) = func_002A78D8(0.062831864f, 0.12566373f);
+            vec_scale_to_length(v, *(char **)(p + 124), 0.2f);
+            FastVecAdd(p, *(char **)(p + 124) + 32, v);
+            vec_scale_to_length(w, p + 16, 0.75f);
+            FastVecAdd(p, w, p);
+            *(float *)(p + 48) = math_random_signed_float_range(0.062831864f, 0.12566373f);
             *(int *)(p + 112) = mode;
         }
         *(float *)(p + 32) = 0.00080000004f;
         *(int *)(p + 104) = *(int *)(p + 100) = 0x103080;
-        *(float *)(p + 44) = *(float *)(p + 40) = func_002A78D8(0.37699118f, 0.42760575f);
-        *(float *)(p + 52) = func_002A7940();
+        *(float *)(p + 44) = *(float *)(p + 40) = math_random_signed_float_range(0.37699118f, 0.42760575f);
+        *(float *)(p + 52) = math_random_angle();
         *(int *)(p + 116) = 0;
         return p;
     }

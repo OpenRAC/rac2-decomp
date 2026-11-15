@@ -1,6 +1,7 @@
+#include "names.h"
 /* func_PAL_002948A8, the PAL copy of func_00293F98: the same C, where rename func_002B7CE0 becomes func_PAL_002B8898. */
 
-extern void func_00291788(int);
+extern void gfx_flush_light_part_indices(int);
 
 extern short func_PAL_002B8898(int);
 /* The disc table of contents: sectors are relative to base. */
@@ -24,7 +25,7 @@ typedef struct {
     int pad3[2];
     DiscFile archive1;        /* 0x52B8 */
 } DiscToc;
-extern DiscToc D_0014B540;
+extern DiscToc g_copy_setup_data;
 /* The callee at 0x00132828 (the catalogue names it func_00132818). */
 /* As in RAC1: the disc wait-frame count, a flag set once the load has
    been stepped back, and a mode word that is 1 until then. */
@@ -96,7 +97,7 @@ extern BatchA_A02_Part ref_L00_002FD338_00[];
    consume them and clears the indices. The index is a 32-bit one: the table
    holds eight entries. The three routines live at another address in every
    program, so they carry no address in their names. */
-void func_00291788(int index);
+void gfx_flush_light_part_indices(int index);
 
 /* func_00291850 is in 00291850.c. */
 
@@ -126,17 +127,17 @@ extern volatile TextureRange D_001F1F40[];
    D_001A72A0. The pack's first part then replaces the buffer's contents.
    The buffer, the count, the VRAM cursors and the flags are words addressed
    absolutely. */
-void func_00292078(int pack);
+void tex_load_pack_to_vram(int pack);
 
-extern void func_00292078(int);
-extern void func_002934B8(u8 *, u8 *);
+extern void tex_load_pack_to_vram(int);
+extern void load_copy_header_relocate_pointers(u8 *, u8 *);
 /* func_00292408 is in 00292408.c. */
 
 typedef struct { int off, size; } UploadPair;
 typedef struct { char p0[0x3e24]; int base; char p1[0x48f0-0x3e28]; UploadPair entries[1]; } UploadTable;
 extern UploadTable upload_table __asm__("D_0014B540");
 typedef struct { char p0[0x30]; int index; char p1[4]; long word; } UploadState;
-extern UploadState D_00152C00;
+extern UploadState g_hero_moby_default;
 /* Reads entry index of the disc table into the free one of the two buffers at
    D_001B22A0, uploads its 16x16 CLUT (at +0x20) and 8-bit image (at +0x420, width
    and height at +8 and +0xC) to VRAM at the addresses in D_001A72F0 and D_001A7300,
@@ -156,7 +157,7 @@ extern UploadState D_00152C00;
    does not move the 0x20 to the end of the chain. */
 /* func_00293000 is in 00293000-g8.c. */
 
-void func_002934B8(u8 *a0, u8 *a1);
+void load_copy_header_relocate_pointers(u8 *a0, u8 *a1);
 
 /* func_00293890 is in 00291758-g8.c. */
 
@@ -189,19 +190,19 @@ typedef struct {
     int parts[0x46];       /* 0x74 */
 } PartsState;
 extern PartsState parts_state __asm__("D_001B8840");
-extern int func_002B7B18(int, int, int);
-extern void func_0027D330(int);
+extern int load_start_disc_read(int, int, int);
+extern void FadeToBlack(int);
 
 void func_PAL_002948A8(int index, int flag)
 {
     PartEntry *r;
     int i;
 
-    func_002B7B18((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
+    load_start_disc_read((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
                   parts_toc.files[index].size);
     if (flag != 0) {
         func_PAL_002B8898(0);
-        func_0027D330(flag);
+        FadeToBlack(flag);
     }
     parts_state.index = index;
     func_PAL_002B8898(1);
@@ -222,9 +223,9 @@ extern struct SegTable ref_00294070_00;
    update run, then store the sum of the two counters there. */
 /* func_00294130 is matched in 00291758-g8.c (-G8 small data). */
 
-void func_00294398(int value, int index);
+void load_class_into_cache_slot(int value, int index);
 
-extern void func_00294398(int a0, int a1);
+extern void load_class_into_cache_slot(int a0, int a1);
 
 /* Loads one cached moby class: an optional texture part (data[2], when
    data[3] is set), decompressed into the decode buffer and, when it is a

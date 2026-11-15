@@ -2,20 +2,20 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vec4;
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern char *func_0029EFD0(int kind);
-extern void func_002833F0(void *, void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_00282DF0(void *);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282D30(void *, void *, float);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern char *CreateMoby(int kind);
+extern void euler_rotation_basis(void *, void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastVecLength(void *);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecScale(void *, void *, float);
 extern void func_002A0F48(void *);
 
 /* Spawns one flying fragment copied from a source object. It sets size, lifetime, speed, spin and bounds, picking random values when the caller passes zeros. */
-char *func_L02_0032B468(char *source, int kind, TI128 *position, void *rotation,
+char *part_spawn_flying_fragment(char *source, int kind, TI128 *position, void *rotation,
                       int lifetime, int flags, TI128 *velocity, TI128 *spin,
                       TI128 *bounds, float speed) {
     Vec4 temporary;
@@ -35,23 +35,23 @@ char *func_L02_0032B468(char *source, int kind, TI128 *position, void *rotation,
     object[0x30] = 0xFF;
     *(short *)(object + 0x32) = 0x80;
     *(int *)(object + 0x98) = 0;
-    if (!lifetime) *(int *)(state + 0x30) = FloatToInt(RandomFloatRange(60.0f, 120.0f));
+    if (!lifetime) *(int *)(state + 0x30) = FloatToInt(math_random_float_range(60.0f, 120.0f));
     else *(int *)(state + 0x30) = lifetime;
     *(int *)(state + 0x34) = flags;
     if (*(float *)(state + 0x38) == 0.0f)
-        *(float *)(state + 0x38) = RandomFloatRange(10.0f, 15.0f) * 0.00027777778f;
+        *(float *)(state + 0x38) = math_random_float_range(10.0f, 15.0f) * 0.00027777778f;
     else *(float *)(state + 0x38) = speed;
     if (FastVecLength(velocity) == 0.0f) {
-        angle = RandomAngle();
-        radial = RandomFloatRange(2.0f, 4.0f) * (1.0f / 60.0f);
-        temporary.f[0] = FastSinOrCosA(angle) * radial;
-        temporary.f[1] = FastSinOrCosB(angle) * radial;
+        angle = math_random_angle();
+        radial = math_random_float_range(2.0f, 4.0f) * (1.0f / 60.0f);
+        temporary.f[0] = math_fast_sin_or_cos_a(angle) * radial;
+        temporary.f[1] = math_fast_sin_or_cos_b(angle) * radial;
         temporary.f[2] = 0.0f;
-        temporary.f[2] = RandomFloatRange(5.0f, 8.0f) * (1.0f / 60.0f);
+        temporary.f[2] = math_random_float_range(5.0f, 8.0f) * (1.0f / 60.0f);
         qcopy(state, &temporary);
     } else qcopy(state, velocity);
     if (FastVecLength(spin) == 0.0f) {
-        RandomDirectionVector(&temporary, 0.052359887f, 0.10471977f);
+        vec_random_direction(&temporary, 0.052359887f, 0.10471977f);
         qcopy(state + 0x10, &temporary);
     } else qcopy(state + 0x10, spin);
     if (FastVecLength(bounds) == 0.0f && ((float *)bounds)[3] == 0.0f) {

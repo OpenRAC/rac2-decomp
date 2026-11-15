@@ -34,23 +34,23 @@ extern RPoint D_L04_002AB6E0[],D_L04_002AB7A0[];
 extern int D_L04_002AB860[][4];
 extern float D_L04_002AB8C0[],D_L04_002AB8C4[],D_L04_002AB920[];
 extern float ref_L04_003C4050_00;
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *,int,int);
-extern u32 func_00282978(s16 *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_002FC560(int,u64);
-extern void func_L04_003C4858(void *,int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,int,int);
+extern u32 FastDecTimer(s16 *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void VU1_addGSregister(int,u64);
+extern void part_init_from_ranges(void *,int);
 
 static inline void TransformVertex(RPoint *v, EVec *m)
 {
-    func_002830C0(v, v, m);
+    transform_vector(v, v, m);
 }
 void func_PAL_L04_003C7600(char *self) {
     EVec position,up,basis[4],other[4];
@@ -69,24 +69,24 @@ void func_PAL_L04_003C7600(char *self) {
     qcopy(&position,self+0x10);
     up.q=0;
     position.f[3]=1.0f; up.f[2]=1.0f;
-    func_00282CF0(&basis[0],D_L04_001B9680,&position);
-    func_00282F20(&basis[0],&basis[0],1.0f);
-    func_00282DD8(&basis[1],&basis[0],&up);
-    func_00282F20(&basis[1],&basis[1],1.0f);
-    func_00282DD8(&basis[2],&basis[1],&basis[0]);
+    FastVecSub(&basis[0],D_L04_001B9680,&position);
+    vec_scale_to_length(&basis[0],&basis[0],1.0f);
+    FastVecCross(&basis[1],&basis[0],&up);
+    vec_scale_to_length(&basis[1],&basis[1],1.0f);
+    FastVecCross(&basis[2],&basis[1],&basis[0]);
     qcopy(&basis[3],&position);
     /* The mirrored basis, for particles flagged in D_L04_0023D090. */
     do {
-        func_00282D30(&other[0],&basis[0],-1.0f);
-        func_00282DD8(&other[1],&other[0],&up);
-        func_00282F20(&other[1],&other[1],1.0f);
-        func_00282DD8(&other[2],&other[1],&other[0]);
+        FastVecScale(&other[0],&basis[0],-1.0f);
+        FastVecCross(&other[1],&other[0],&up);
+        vec_scale_to_length(&other[1],&other[1],1.0f);
+        FastVecCross(&other[2],&other[1],&other[0]);
         qcopy(&other[3],&basis[3]);
     } while (0);
-    packet.giftag[1]=func_0027C878(EI(state,0x54)+0x3F);
+    packet.giftag[1]=GetEffectTextureDescriptor(EI(state,0x54)+0x3F);
     packet.giftag[2]=0xFF9000000260ULL; packet.giftag[3]=0x8000000048ULL;
     packet.giftag[0]=0;
-    func_002FC560(0x4A,0); func_002FC560(0x47,0x51001);
+    VU1_addGSregister(0x4A,0); VU1_addGSregister(0x47,0x51001);
     for(i=EH(state,0);i<end;i++) {
         EVec *transform,*chosen;
         age=D_L04_0023D220[i]-((D_L04_0023D540[i]) * 1.2f);
@@ -94,7 +94,7 @@ void func_PAL_L04_003C7600(char *self) {
         transform=chosen;
         D_L04_0023D220[i]=age;
         if(age<=-8.0f) D_L04_0023D220[i]=age+8.0f;
-        func_002830C0(&transform[3],&D_L04_0023BDD0[i],matrix);
+        transform_vector(&transform[3],&D_L04_0023BDD0[i],matrix);
         speed=D_L04_0023CA50[i]; size=D_L04_0023CD70[i];
         if(D_L04_0023D158[i]) {
             packet.giftag[3]=0x8000000044ULL;
@@ -111,19 +111,19 @@ void func_PAL_L04_003C7600(char *self) {
                     packet.uv[k].v=D_L04_002AB920[index*2];
                     packet.colors[k]=alpha*D_L04_001AF3A8[index]|rgb;
                 }
-                func_00280B90(&packet,0,0);
+                draw_world_quad(&packet,0,0);
             }
         } else {
             if(D_L04_0023D860[i]) {
-                func_00282978(&D_L04_0023D860[i]);
-                opacity=func_00283CF0((1.0f-func_00283CE0(D_L04_0023D860[i])*D_L04_001B2E78)*D_L04_001AF334);
+                FastDecTimer(&D_L04_0023D860[i]);
+                opacity=FloatToInt((1.0f-IntToFloat(D_L04_0023D860[i])*D_L04_001B2E78)*D_L04_001AF334);
             } else if(D_L04_0023D9F0[i]) {
-                if(func_00282978(&D_L04_0023D9F0[i])) {
-                    func_L04_003C4858(self,i); opacity=0;
-                    D_L04_0023D090[i]=func_002A77E0(2);
-                } else opacity=func_00283CF0(func_00283CE0(D_L04_0023D9F0[i])*D_L04_001B2E80*D_L04_001AF334);
+                if(FastDecTimer(&D_L04_0023D9F0[i])) {
+                    part_init_from_ranges(self,i); opacity=0;
+                    D_L04_0023D090[i]=math_random_int_below(2);
+                } else opacity=FloatToInt(IntToFloat(D_L04_0023D9F0[i])*D_L04_001B2E80*D_L04_001AF334);
             } else {
-                if(func_00282978(&D_L04_0023DB80[i])) D_L04_0023D9F0[i]=D_L04_001B2E7C;
+                if(FastDecTimer(&D_L04_0023DB80[i])) D_L04_0023D9F0[i]=D_L04_001B2E7C;
                 opacity=D_L04_001AF330;
             }
             packet.giftag[3]=0x8000000048ULL;
@@ -139,10 +139,10 @@ void func_PAL_L04_003C7600(char *self) {
                 packet.colors[k]=(u32)opacity*D_L04_001AF380[k]|EI(state,0x38);
                 TransformVertex(vertex,transform);
             }
-            func_00280B90(&packet,0,0);
+            draw_world_quad(&packet,0,0);
         }
     }
-    packet.giftag[1]=func_0027C878(EI(state,0x58)+0x3F);
+    packet.giftag[1]=GetEffectTextureDescriptor(EI(state,0x58)+0x3F);
     packet.giftag[3]=0x8000000044ULL;
     qcopy(&basis[3],matrix+0x30);
     basis[3].f[2]-=EF(state,0x50);
@@ -160,7 +160,7 @@ void func_PAL_L04_003C7600(char *self) {
                 packet.uv[k].v=D_L04_002AB8C0[index*2];
                 packet.colors[k]=D_L04_001AF3A8[index]*0xFF000000|rgb;
             }
-            func_00280B90(&packet,0,0);
+            draw_world_quad(&packet,0,0);
         }
     }
 }

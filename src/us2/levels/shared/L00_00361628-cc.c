@@ -7,7 +7,7 @@ typedef struct { unsigned int word[4]; } PanelColors;
 typedef struct { int price; int pad[3]; unsigned char *name; int pad2[2]; } ShopItem;
 extern PanelColors D_L00_001AD768;
 typedef struct { char prefix[0x144]; ShopItem items[0]; } ShopModel;
-extern ShopModel D_L00_0022F7C0;
+extern ShopModel g_purchase_menu_model;
 typedef struct {
     int key;
     int value;
@@ -46,29 +46,29 @@ typedef void (*DrawCallback)(void *);
 extern int D_L00_001A8F00 __attribute__((sda));
 extern char *D_L00_00220DA0[];
 extern short D_L00_001A8F80[2] MACRO_ADDR;
-extern unsigned int D_001A7AF0 __attribute__((sda));
-extern Vector D_L00_001B8DC0;
-extern char D_00189EA0[];
+extern unsigned int g_equipment_bits __attribute__((sda));
+extern Vector g_camera_l00_position;
+extern char g_hero_position[];
 
 extern unsigned int D_00138324;
-extern char D_00152C00[];
+extern char g_hero_moby_default[];
 extern int D_L00_001B1AE0 __attribute__((sda));
 extern void func_US2_002E72D8(void *);
 /* func_L00_002E6EF8 in level 0; its address differs in levels 8, 9, 19 and 30. */
 extern void ref_L00_003603C0_00(DrawCallback, void *);
-extern void func_L00_002E6CF0(DrawCallback, void *);
-extern void func_002ECB70(void *);
-extern void func_002E6B78(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283CE0(int);
-extern float func_00283180(float);
-extern int func_002B0C28(int, int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A89A8(void *, int, float);
-extern float func_00283B98(float, float);
-extern int func_L00_003268E8(int);
+extern void gfx_add_draw_callback_first(DrawCallback, void *);
+extern void render_environment_mapped_object(void *);
+extern void gfx_draw_ground_shadow(void *);
+extern float vec_distance_xy(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_a(float);
+extern int TryClaimNotice(int, int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float FastAddRotations(float, float);
+extern int level_release_matching_resource(int);
 
 /* The hero's current vehicle (+0x2BC) is class 0xD54 and not in state 253 or 254. An inline
    function reading the pointer once compiles differently (964 bytes); retail matches the
@@ -92,32 +92,32 @@ void func_US2_L00_00361628(unsigned char *object) {
     if (!D_L00_001A8F00) func_US2_002E72D8(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
-        key = D_L00_001A8F80[(D_001A7AF0 >> 4) & 1];
+        key = D_L00_001A8F80[(g_equipment_bits >> 4) & 1];
         for (index = 0; D_L00_00220DA0[index]; index++) {
             slot = D_L00_00220DA0 + index;
             if (*(short *)(D_L00_00220DA0[index] + 0xAA) == key) {
-                shade = (int)(func_00283180(func_00283CE0((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
+                shade = (int)(math_fast_sin_or_cos_a(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;
                 break;
             }
         }
-        ref_L00_003603C0_00(func_002ECB70, object);
-        if (func_00282E80(object + 0x10, &D_L00_001B8DC0) < 32.0f)
-            func_L00_002E6CF0(func_002E6B78, object);
+        ref_L00_003603C0_00(render_environment_mapped_object, object);
+        if (vec_distance_xy(object + 0x10, &g_camera_l00_position) < 32.0f)
+            gfx_add_draw_callback_first(gfx_draw_ground_shadow, object);
     }
     if (*(short *)(private + 0xC) != 0) {
-        if (func_00282E48(object + 0x10, &D_00189EA0) > 6.1f && !HERO_RIDING_D54())
+        if (fast_vec_dist(object + 0x10, &g_hero_position) > 6.1f && !HERO_RIDING_D54())
             *(short *)(private + 0xC) = 0;
     } else {
-        if (func_00282E80(object + 0x10, &D_00189EA0) < 8.0f || HERO_RIDING_D54()) {
-            if (func_00282E48(object + 0x10, &D_00189EA0) < 6.0f || HERO_RIDING_D54())
+        if (vec_distance_xy(object + 0x10, &g_hero_position) < 8.0f || HERO_RIDING_D54()) {
+            if (fast_vec_dist(object + 0x10, &g_hero_position) < 6.0f || HERO_RIDING_D54())
                 *(short *)(private + 0xC) = 1;
         }
     }
     if (*(unsigned short *)(object + 0x34) & 1) *(short *)(private + 0xC) = 0;
     if (*(short *)(private + 0xC)) {
-        available = func_002B0C28(2, 0x12ea, 1) != 0;
+        available = TryClaimNotice(2, 0x12ea, 1) != 0;
         if ((D_00138324 & 0x10) && available) {
             offset.q = 0;
             angles.q = 0;
@@ -126,14 +126,14 @@ void func_US2_L00_00361628(unsigned char *object) {
             angles.f[0] = -0.021118486f;
             angles.f[1] = 0.0588176f;
             angles.f[2] = 1.2252212f;
-            func_00283098(&position, &offset, object + 0xC0);
-            func_00282CC0(&position, &position, object + 0x10);
-            position.f[2] = func_002A89A8(&position, 0, 0.5f);
-            angles.f[2] = func_00283B98(angles.f[2], *(float *)(object + 0xF8));
-            spawn = D_00152C00 + 0x70;
+            matrix_mul_vec3(&position, &offset, object + 0xC0);
+            FastVecAdd(&position, &position, object + 0x10);
+            position.f[2] = coll_probe_ground_height_below(&position, 0, 0.5f);
+            angles.f[2] = FastAddRotations(angles.f[2], *(float *)(object + 0xF8));
+            spawn = g_hero_moby_default + 0x70;
             qcopy(spawn, &position);
             qcopy(spawn + 0x10, &angles);
-            func_L00_003268E8(2);
+            level_release_matching_resource(2);
             *(short *)(spawn - 0x4A) = 0;
             D_L00_001B1AE0 = 1;
         }

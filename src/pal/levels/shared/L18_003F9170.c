@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 func_00283CF0(float);
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern void func_002A7750(u8 *, s32, s32);
-extern void func_L18_003F7590(u8 *);
-extern s32 func_L18_0032B768(u8 *, s32, s32);
-extern u8 *D_L18_001B281C MACRO_ADDR;
+extern s32 FloatToInt(float);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern void moby_set_state(u8 *, s32, s32);
+extern void protopet_reset_to_idle(u8 *);
+extern s32 moby_set_table_entry_byte(u8 *, s32, s32);
+extern u8 *g_moby_l18_table MACRO_ADDR;
 typedef struct {
     u8 reserved00[0x20];
     float animation;
@@ -37,8 +37,8 @@ void func_PAL_L18_003F9230(u8 *object)
     s16 mode;
     s32 configuration;
     InitializationFields *settings = (InitializationFields *)state;
-    settings->duration = func_00283CF0(15.0f);
-    settings->speed = func_00283CF0(6.0f);
+    settings->duration = FloatToInt(15.0f);
+    settings->speed = FloatToInt(6.0f);
     configuration = *(s32 *)(state + 0x260);
     settings->type = 17;
     settings->ready = 1;
@@ -61,31 +61,31 @@ void func_PAL_L18_003F9230(u8 *object)
     *(float *)(state + 0x108) = 2.0f;
     *(float *)(state + 0x10C) = 5.0f;
     *(float *)(state + 0x110) = 1.5707964897155762f;
-    func_002B60B0(object, 0.0064000003f, 0.16000001f, 0.005026549f, 0.25132746f);
+    moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f, 0.005026549f, 0.25132746f);
     if (*(s32 *)(state + 0x260) != -1) *(s32 *)(state + 0x13C) = *(s32 *)(state + 0x260);
     *(float *)(state + 0x268) = *(float *)(object + 0x2C);
-    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = D_L18_001B281C + (*(s32 *)(state + 0x280) << 8);
+    if (*(s32 *)(state + 0x280) != -1) *(u8 **)(state + 0x258) = g_moby_l18_table + (*(s32 *)(state + 0x280) << 8);
     *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-    func_002A7750(object, 6, 2);
+    moby_set_state(object, 6, 2);
     mode = *(s16 *)(state + 0x296);
     if (mode == 14) {
-        if (*(s32 *)(state + 0x26C) != -1) func_002A7750(object, 14, 2);
-    } else if (mode == 1) func_L18_003F7590(object);
-    else if (mode == 2) func_002A7750(object, 2, 0);
+        if (*(s32 *)(state + 0x26C) != -1) moby_set_state(object, 14, 2);
+    } else if (mode == 1) protopet_reset_to_idle(object);
+    else if (mode == 2) moby_set_state(object, 2, 0);
     qcopy((state + 0x210), (object + 0x10));
     qcopy((state + 0x220), (object + 0xF0));
-    func_L18_0032B768(object, 0, 3);
+    moby_set_table_entry_byte(object, 0, 3);
 }
 
 
-extern void *func_002A9640(void *, u32, s32);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
-extern void func_L18_003F7AB8(u8 *);
-extern void func_L18_003F74B8(u8 *, s32);
+extern void group_update_members(u8 *);
+extern void protopet_end_action(u8 *, s32);
 extern void func_PAL_002A7650(u8 *, s32, s32);
-extern s32 func_L18_0033B628(s32, s32, s32);
-extern s32 func_002B3BA8(u8 *, s32, void *, s32, float, float);
-extern void func_L18_003F8E30(u8 *);
+extern s32 moby_run_slot_handler(s32, s32, s32);
+extern s32 weapon_select_aim_target(u8 *, s32, void *, s32, float, float);
+extern void protopet_set_ready_flag(u8 *);
 extern s32 D_0018C0B4;
 
 void func_PAL_L18_003F9470(u8 *object)
@@ -94,21 +94,21 @@ void func_PAL_L18_003F9470(u8 *object)
     u8 *contact;
     u8 saved;
     u64 mode;
-    contact = func_002A9640(object, 0x10000, 1);
+    contact = part_find_owned_effect_slot(object, 0x10000, 1);
     if (contact && *(u8 **)(contact + 0x20) && *(s16 *)(*(u8 **)(contact + 0x20) + 0xAA) == 0xF9E) {
         if (object[0x20] < 6 || object[0x20] == 19 || object[0x20] == 18) return;
-        func_002A7750(object, 18, -1);
+        moby_set_state(object, 18, -1);
         return;
     }
     saved = object[0x94];
     if (func_PAL_002B1A50(object, state + 0x50, 0)) {
         if (object[0x94] == 17 || object[0x94] == 8 || object[0x94] == 9 || object[0x94] == 16 || object[0x94] == 10 || object[0x94] == 7) object[0x94] = saved;
-        if (object[0x94] != 14) func_L18_003F7AB8(object);
+        if (object[0x94] != 14) group_update_members(object);
     }
     object[0xA8] = 255;
-    if (*(float *)(object + 0x18) < 90.0f || (*(float *)(state + 0x2A0) != -1.0f && *(float *)(object + 0x18) < *(float *)(state + 0x2A0))) func_L18_003F74B8(object, 0);
+    if (*(float *)(object + 0x18) < 90.0f || (*(float *)(state + 0x2A0) != -1.0f && *(float *)(object + 0x18) < *(float *)(state + 0x2A0))) protopet_end_action(object, 0);
     if (state[0x2E] == 2) {
-        func_L18_003F74B8(object, 1);
+        protopet_end_action(object, 1);
         return;
     }
     contact = *(u8 **)(state + 0x188);
@@ -118,14 +118,14 @@ void func_PAL_L18_003F9470(u8 *object)
     }
     mode = object[0x20];
     if (*(s32 *)(state + 0x180) > 300 && mode != 2) goto stop;
-    if ((u8)mode >= 6 && *(s32 *)(state + 0x260) != -1 && !func_L18_0033B628((s32)(object + 0x10), *(s32 *)(state + 0x260), 0)) {
+    if ((u8)mode >= 6 && *(s32 *)(state + 0x260) != -1 && !moby_run_slot_handler((s32)(object + 0x10), *(s32 *)(state + 0x260), 0)) {
 stop:
-        func_L18_003F74B8(object, 0);
+        protopet_end_action(object, 0);
         return;
     }
-    *(s32 *)(state + 0x248) = func_002B3BA8(object, *(s32 *)(state + 0x240), 0, 0, *(float *)(state + 0x244), 0.0f);
-    if (*(u8 **)(state + 0x258)) func_L18_003F8E30(*(u8 **)(state + 0x258));
-    if (D_0018C0B4 == 0x6F && (u32)(object[0x20] - 9) < 4) func_002A7750(object, 6, -1);
+    *(s32 *)(state + 0x248) = weapon_select_aim_target(object, *(s32 *)(state + 0x240), 0, 0, *(float *)(state + 0x244), 0.0f);
+    if (*(u8 **)(state + 0x258)) protopet_set_ready_flag(*(u8 **)(state + 0x258));
+    if (D_0018C0B4 == 0x6F && (u32)(object[0x20] - 9) < 4) moby_set_state(object, 6, -1);
 }
 
 

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L18_0042BF58, the PAL copy of func_L18_004273F0: unit of its own, -G8 and -frac2-qcopy as the template. */
 
@@ -9,20 +10,20 @@ typedef int s32;
 typedef int TI128 __attribute__((mode(TI)));
 
 extern unsigned int D_L18_001FB320[];
-extern char *D_L18_001B281C;
+extern char *g_moby_l18_table;
 extern char *D_L18_001B281C_sda __attribute__((sda));
 extern int D_L18_001B2838 __attribute__((sda));
 extern int D_L18_001B125C __attribute__((sda));
 extern int D_L18_001B2348;
 extern char D_L18_002C0A90[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char *D_001FE480[];
 
-extern void func_0026FEB8(char *fmt, int a1, int a2);
-extern float func_L18_0035D5A8(void *a0, void *a1, void *a2, int a3, float f12);
-extern void func_002A7750(u8 *a0, int a1, int a2);
+extern void STUB_printf(char *fmt, int a1, int a2);
+extern float path_find_best_point_by_id(void *a0, void *a1, void *a2, int a3, float f12);
+extern void moby_set_state(u8 *a0, int a1, int a2);
 extern void func_PAL_L18_0042BD70(u8 *a0);
-extern float func_00282E80(void *a0, void *a1);
+extern float vec_distance_xy(void *a0, void *a1);
 
 void func_PAL_L18_0042BF58(u8 *obj)
 {
@@ -38,9 +39,9 @@ void func_PAL_L18_0042BF58(u8 *obj)
 
     if (*(int *)(state + 0x378) == -1) {
         if (*(int *)(state + 0x368) == -1) {
-            func_0026FEB8(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
+            STUB_printf(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
         } else {
-            func_L18_0035D5A8(vec, obj + 0x10, D_00189EA0, *(int *)(state + 0x368), 0.0f);
+            path_find_best_point_by_id(vec, obj + 0x10, g_hero_position, *(int *)(state + 0x368), 0.0f);
             found = 1;
         }
     } else {
@@ -50,11 +51,11 @@ void func_PAL_L18_0042BF58(u8 *obj)
     q = (u16 *)D_L18_001FB320[obj[0x21]];
     while (obj[0x21] != 0xFF && obj[0x21] <= D_L18_001B2838 && q != 0 &&
            ((q != 0 && (s16)q[-1] >= 0) || q == (u16 *)D_L18_001FB320[obj[0x21]])) {
-        e = (u8 *)(D_L18_001B281C + ((*q & 0x7FFF) << 8));
+        e = (u8 *)(g_moby_l18_table + ((*q & 0x7FFF) << 8));
         if (e == 0)
             break;
         es = *(u8 **)(e + 0x68);
-        d = func_00282E80(e + 0x10, vec);
+        d = vec_distance_xy(e + 0x10, vec);
         if (es != 0 && (es[0x399] & 1) != 0 && d < best_d) {
             best_d = d;
             best = e;
@@ -81,13 +82,13 @@ void func_PAL_L18_0042BF58(u8 *obj)
         bs[0x399] = 2;
         *(u16 *)(bs + 0x392) = state[0x398];
         if (found) {
-            func_002A7750(best, 0, 4);
+            moby_set_state(best, 0, 4);
         } else if (bs[0x3EA] != 0 && *(int *)(bs + 0x3B4) != -1 &&
                    ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
                    ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
             func_PAL_L18_0042BD70(best);
         } else {
-            func_002A7750(best, 0, 3);
+            moby_set_state(best, 0, 3);
         }
     }
 }

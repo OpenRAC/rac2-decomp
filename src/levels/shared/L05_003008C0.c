@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned int D_001A7AF0 __attribute__((sda));
+extern unsigned int g_equipment_bits __attribute__((sda));
 extern int D_L05_002A1800[];
 
 /* func_L05_003008C0 is defined in L05_003008C0-quad.c. */
@@ -11,13 +11,13 @@ extern int D_L05_002A1800[];
 extern int func_002FEF40(int);
 
 typedef struct L05Glyph L05Glyph;
-extern int func_L05_00302CE8(int, int, int, int, unsigned long long, unsigned char *, int,
+extern int FontPrintWrapped(int, int, int, int, unsigned long long, unsigned char *, int,
                              unsigned long long, L05Glyph *);
 
 extern L05Glyph D_L05_002A2DB0[];
 
 /* Word-wrapped text in a box with a fresh texture and the shared font; returns the height used. */
-int func_L05_00303000(int x, int y, int width, int height, unsigned long long color,
+int text_print_wrapped_default(int x, int y, int width, int height, unsigned long long color,
                       unsigned char *text, int count)
 {
     int step = func_002FEF40(2);
@@ -30,7 +30,7 @@ extern int D_L05_00293D48[];
 
 /* Stores the pair and steps the second half of the counter. */
 /* Stores a pair of numbers in a shared block, adding one to the second. */
-void func_L05_0030C930(int first, int second) {
+void level_store_pair_with_increment(int first, int second) {
     int *pair = D_L05_00293D48;
     pair[0x11] = second + 1;
     pair[0x10] = first;
@@ -56,9 +56,9 @@ void func_L05_0030C930(int first, int second) {
 /* Fills the slot table from the hero's equipment bits (the word func_002E6178 reads).
  * The table holds 15 entries of 0x28 bytes; each bit group sets the +0x00 and +0x18
  * words of a few entries; bits 7-8, 10-11 and 14-15 are read as two-bit fields. */
-void func_L05_00379968(void)
+void InitSlotFlagsFromEquipment(void)
 {
-    if (gEquipmentBits & 0x40) {
+    if (g_equipment_bits & 0x40) {
         D_L05_002A1800[0x158/4] = 1;
         D_L05_002A1800[0x140/4] = 1;
         D_L05_002A1800[0] = 0;
@@ -70,7 +70,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x18/4] = 1;
-        flags = gEquipmentBits;
+        flags = g_equipment_bits;
         if (flags & 0x100) {
             state[0x1D0/4] = 1;
             state[0x90/4] = 1;
@@ -84,7 +84,7 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = gEquipmentBits;
+        int flags = g_equipment_bits;
         state[0x78/4] = 0;
         state[0x1B8/4] = 0;
         if (flags & 0x200) {
@@ -100,7 +100,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x40/4] = 1;
-        flags = gEquipmentBits;
+        flags = g_equipment_bits;
         if (flags & 0x800) {
             state[0x1A8/4] = 1;
             state[0x68/4] = 1;
@@ -114,7 +114,7 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = gEquipmentBits;
+        int flags = g_equipment_bits;
         state[0x50/4] = 0;
         state[0x190/4] = 0;
         if (flags & 0x1000) state[0xB8/4] = 1;
@@ -122,14 +122,14 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = gEquipmentBits;
+        int flags = g_equipment_bits;
         state[0xA0/4] = 0;
         if (flags & 0x2000) state[0xE0/4] = 1;
         else state[0xE0/4] = 0;
     }
     {
         int *state = D_L05_002A1800;
-        int flags = gEquipmentBits;
+        int flags = g_equipment_bits;
         state[0xC8/4] = 0;
         if (flags & 0x8000) {
             state[0x1E0/4] = 0;
@@ -155,7 +155,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x108/4] = 1;
-        flags = gEquipmentBits;
+        flags = g_equipment_bits;
         if (flags & 0x10) {
             state[0x118/4] = 0;
             state[0x220/4] = 1;
@@ -170,11 +170,11 @@ void func_L05_00379968(void)
 
 /* func_L05_00379B60 is defined in L05_00379B60-g8.c. */
 
-extern char *func_002ED688(int, int);
+extern char *moby_get_motion_data(int, int);
 
 /* Finds an object's state and stores a value in it. */
-void func_L05_00379C68(int objectId, int value) {
-    char *state = GetMobyMotionData(objectId, value);
+void level_set_object_state_field(int objectId, int value) {
+    char *state = moby_get_motion_data(objectId, value);
     if (state != 0)
         *(int *)(state + 0x150) = value;
 }
@@ -182,7 +182,7 @@ void func_L05_00379C68(int objectId, int value) {
 extern int D_L05_00225DD0[];
 
 /* Returns the live object list. */
-int *func_L05_00379EB8(void) {
+int *level_get_object_list(void) {
     return D_L05_00225DD0;
 }
 
@@ -191,32 +191,32 @@ int *func_L05_00379EB8(void) {
 extern int D_L05_00221D10[];
 
 /* Stores a value in the shared player state. */
-void func_L05_00379F18(int value) {
+void hero_set_state_value_a(int value) {
     D_L05_00221D10[13] = value;
 }
 
 /* Stores a value in the shared player state. */
-void func_L05_00379F28(int value) {
+void hero_set_state_value_b(int value) {
     D_L05_00221D10[15] = value;
 }
 
 /* Returns a value from the shared player state. */
-int func_L05_00379F38(void) {
+int hero_get_state_value_b(void) {
     return D_L05_00221D10[15];
 }
 
 /* Stores a value in the shared player state. */
-void func_L05_00379F48(int value) {
+void hero_set_state_value_c(int value) {
     D_L05_00221D10[18] = value;
 }
 
 /* Returns a value from the shared player state. */
-int func_L05_00379F58(void) {
+int hero_get_state_value_c(void) {
     return D_L05_00221D10[18];
 }
 
 /* Clears a field in each of 128 records of the shared state. */
-void func_L05_00379F68(void) {
+void level_clear_object_records(void) {
     char *base = (char *)D_L05_00221D10 + 0xC0;
     int *entry = (int *)(base + 0x3FD0);
     int i = 0x7F;
@@ -247,9 +247,9 @@ extern int func_L05_0037AAC8(int index);
 
 
 /* Takes a step off the stored value, never below zero. */
-void func_L05_0037AB18(int index, int step)
+void slot_subtract_value_clamped(int index, int step)
 {
-    int slot = FindActiveSlotInChain(index);
+    int slot = slot_find_active_in_chain(index);
 
     if (slot < 0)
         slot = func_L05_0037AAC8(index);
@@ -259,9 +259,9 @@ void func_L05_0037AB18(int index, int step)
 }
 
 /* Adds a step to the stored value, never above the stored limit. */
-void func_L05_0037AB88(int index, int step)
+void slot_add_value_clamped(int index, int step)
 {
-    int slot = FindActiveSlotInChain(index);
+    int slot = slot_find_active_in_chain(index);
 
     if (slot < 0)
         slot = func_L05_0037AAC8(index);
@@ -279,7 +279,7 @@ void func_L05_0037AB88(int index, int step)
 
 /* Add an argument to the stored value and clamp it into [8, 15]. */
 /* Adds to the stored value and keeps it between 8 and 15. */
-void func_L05_0037ADD8(float amount)
+void hero_add_clamped_stat(float amount)
 {
     float *values = (float *)D_L05_00221D10;
     float total = values[12] + amount;
@@ -296,7 +296,7 @@ void func_L05_0037ADD8(float amount)
 }
 
 /* Returns the stored value that is kept between 8 and 15. */
-float func_L05_0037AE28(void) {
+float hero_get_clamped_stat(void) {
     return ((float *)D_L05_00221D10)[12];
 }
 
@@ -306,7 +306,7 @@ extern char *func_L05_00379CA0(char *);
 extern void func_L05_0037B838(char *);
 
 /* Hand the object over, then clear its action state and step the shared counter. */
-void func_L05_0037AE40(char *moby)
+void moby_reset_action_state(char *moby)
 {
     char *state = func_L05_00379CA0(moby);
 

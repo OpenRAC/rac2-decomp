@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L03_003C4800: visit the object group and emit an effect at each class-specific
    transformed point. Retail reads the id and vector tables $gp-relative, so they are sda
    arrays of their measured sizes (the largest 48 bytes) in a -G64 unit; the 80-byte table and
@@ -11,9 +12,9 @@ extern int D_L03_001B2A38 __attribute__((sda));
 extern unsigned char *D_L03_001B2A1C MACRO_ADDR;
 extern unsigned short *D_L03_001FB5A0[];
 
-extern void func_0029FC20(char *, int, char *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void moby_transform_joint_point(char *, int, char *);
+extern void transform_vector(void *, void *, void *);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 extern int D_L03_001AFF60[6] __attribute__((sda));
 extern int D_L03_001AFF78[4] __attribute__((sda));
@@ -26,7 +27,7 @@ extern TI128 D_L03_0029A880[5];
 
 
 /* Visits the objects in a group and spawns an effect at each of their fixed attachment points. */
-void func_L03_003C4800(unsigned char *object) {
+void part_spawn_at_attachment_points(unsigned char *object) {
     unsigned short *idList;
     unsigned char *entity;
     int *boneIds;
@@ -74,12 +75,12 @@ void func_L03_003C4800(unsigned char *object) {
             break;
         }
         for (j = 0; j < count; j++) {
-            TransformMobyJointPoint((char *)entity, boneIds[j], (char *)matrix);
+            moby_transform_joint_point((char *)entity, boneIds[j], (char *)matrix);
             qcopy(point, &offsets[j]);
             radius = point[3];
             point[3] = 1.0f;
             transform_vector(point, point, matrix);
-            DrawBillboardQuad_L00(point, *(int *)(entity + 0x78), radius, 0.08f);
+            gfx_l00_draw_billboard_quad(point, *(int *)(entity + 0x78), radius, 0.08f);
         }
     }
 }

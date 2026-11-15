@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -27,11 +28,11 @@
 #define NULL 0
 #endif
 
-extern s32 func_00115AC0(void *dst, s8 *src, s32 n);
-extern void func_0011AC40(s32 h);
-extern s32 func_0011AC70(s32 h);
-extern void func_0011CEC8(s32 a, s32 b);
-extern s32 func_0011D620(void *a, s32 b, s32 c, void *d, s32 e, void *f, s32 g, s32 h, s32 i);
+extern s32 strncpy(void *dst, s8 *src, s32 n);
+extern void SignalSema(s32 h);
+extern s32 PollSema(s32 h);
+extern void sif_process_cmd_queue_b(s32 a, s32 b);
+extern s32 sceSifCallRpc(void *a, s32 b, s32 c, void *d, s32 e, void *f, s32 g, s32 h, s32 i);
 
 extern s32 D_00137E6C;
 extern s32 D_00137E68;
@@ -40,7 +41,7 @@ extern s8 D_00141BB0[];
 extern s8 D_001430C0[];
 
 /* Changes the information stored with a file on a memory card. */
-s32 func_00127E40(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s32 bufferAddr) {
+s32 sceMcSetFileInfo(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s32 bufferAddr) {
     s8 *client;
     s8 *request;
     s32 result;
@@ -65,9 +66,9 @@ s32 func_00127E40(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s32 
     strncpy(request + 0x14, fname, 0x3FF);
     request[0x413] = 0;
     if (blockCount >= 0) {
-        ProcessSifCmdQueueB(bufferAddr, blockCount << 6);
+        sif_process_cmd_queue_b(bufferAddr, blockCount << 6);
     }
-    result = CallRpcServer(client, 13, 1, request, 0x414, D_001430C0, 4, 0, 0);
+    result = sceSifCallRpc(client, 13, 1, request, 0x414, D_001430C0, 4, 0, 0);
     if (result == 0) {
         D_00137E68 = 13;
     } else {

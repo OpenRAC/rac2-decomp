@@ -11,57 +11,57 @@ typedef struct {
     char pad88[0xBC];
     struct { int price; int value; int third; } cells[0]; /* Variable-length trailing table. */
 } PurchaseModel;
-extern PurchaseModel D_L00_0022F7C0;
+extern PurchaseModel g_purchase_menu_model;
 typedef struct { char pad[0x1C4]; unsigned int pressed; } PurchaseInput;
-extern PurchaseInput D_00138180;
-extern int D_001A79F8;
+extern PurchaseInput g_pad_state;
+extern int g_player_bolts;
 extern unsigned int D_L00_001B25A4 __attribute__((sda));
 extern int D_L00_001AD500 __attribute__((sda));
 extern int D_L00_001AD4F8 __attribute__((sda));
 extern int D_L00_001AD4FC __attribute__((sda));
-extern int func_002E5CF8(int, int, char *);
-extern int func_00288FB8(int);
-extern void func_002F88D8(void *);
-extern void func_002F9198(void);
-extern void func_002FB1A0(void);
+extern int PlayMobySound(int, int, char *);
+extern int GetLocalizedString(int);
+extern void shop_set_message_text(void *);
+extern void shop_close_sub_menu(void);
+extern void PrepareVendorSelectionPreview(void);
 
 /* Asks the player to confirm buying the selected item, then takes the bolts and gives the item. */
-void func_L00_00373D40(int *answer, int *unused) {
-    PurchaseModel *model = &gPurchaseMenuModel;
+void UpdateSelectedItemPurchaseDialog(int *answer, int *unused) {
+    PurchaseModel *model = &g_purchase_menu_model;
     int index = model->index;
     int price = model->cells[index].price;
-    int state = gPurchaseMenuModel.state;
+    int state = g_purchase_menu_model.state;
     if (state == 1) {
         *answer = 0;
-        if (gPlayerBolts < price) PlayMobySound(2, 17, gPurchaseMenuModel.object);
-        gPurchaseMenuModel.state = 2;
+        if (g_player_bolts < price) PlayMobySound(2, 17, g_purchase_menu_model.object);
+        g_purchase_menu_model.state = 2;
     } else if (state == 2) {
-        if ((gPadState.pressed & 0x10) && !(D_L00_001B25A4 & 0x10)) {
+        if ((g_pad_state.pressed & 0x10) && !(D_L00_001B25A4 & 0x10)) {
             *answer = 0;
-            gPurchaseMenuModel.state = 3;
-        } else if ((gPadState.pressed & 0x40) && !(D_L00_001B25A4 & 0x40)) {
+            g_purchase_menu_model.state = 3;
+        } else if ((g_pad_state.pressed & 0x40) && !(D_L00_001B25A4 & 0x40)) {
             *answer = 1;
-            gPurchaseMenuModel.state = 3;
+            g_purchase_menu_model.state = 3;
         }
     } else if (state == 3) {
         if (*answer) {
-            if (gPlayerBolts >= price && D_L00_001AD500 != 4) {
+            if (g_player_bolts >= price && D_L00_001AD500 != 4) {
                 D_L00_001AD4F8 = 1;
                 D_L00_001AD4FC = model->cells[index].value;
-                PlayMobySound(7, 17, gPurchaseMenuModel.object);
-                gPlayerBolts -= price;
-                SetShopMessageText((void *)GetLocalizedString(0x2DCB));
-                PlayMobySound(7, 17, gPurchaseMenuModel.object);
-                CloseShopSubMenu();
+                PlayMobySound(7, 17, g_purchase_menu_model.object);
+                g_player_bolts -= price;
+                shop_set_message_text((void *)GetLocalizedString(0x2DCB));
+                PlayMobySound(7, 17, g_purchase_menu_model.object);
+                shop_close_sub_menu();
             } else if (D_L00_001AD500 == 4) {
-                SetShopMessageText((void *)GetLocalizedString(0x2DCC));
-                PlayMobySound(0, 17, gPurchaseMenuModel.object);
+                shop_set_message_text((void *)GetLocalizedString(0x2DCC));
+                PlayMobySound(0, 17, g_purchase_menu_model.object);
             } else {
-                SetShopMessageText((void *)GetLocalizedString(0x2DCC));
-                PlayMobySound(0, 17, gPurchaseMenuModel.object);
+                shop_set_message_text((void *)GetLocalizedString(0x2DCC));
+                PlayMobySound(0, 17, g_purchase_menu_model.object);
             }
-        } else PlayMobySound(0, 17, gPurchaseMenuModel.object);
-        gPurchaseMenuModel.state = 0;
+        } else PlayMobySound(0, 17, g_purchase_menu_model.object);
+        g_purchase_menu_model.state = 0;
         PrepareVendorSelectionPreview();
     }
 }

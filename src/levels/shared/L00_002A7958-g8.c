@@ -1,3 +1,4 @@
+#include "names.h"
 /* Walk a two-step fade of one resident float and drop the enable flag once it is finished.
    The float's address is a per-program value, so each of the four uses is a ref_ name whose
    value the build reads from the retail bytes; the word is read with the assembler macro
@@ -13,7 +14,7 @@ extern float ref_L00_002A7958_03[] __attribute__((sda));
 extern float func_0031D8A0(float *dst, float value, float scale);
 
 /* Fades an effect value up to full, waits one frame, then fades it back down to zero and switches the effect off. */
-void func_L00_002A7958(void)
+void gfx_fade_screen_effect(void)
 {
     float target;
 

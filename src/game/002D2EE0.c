@@ -12,13 +12,13 @@
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 /* 
  * Function: func_002D2EE0
@@ -38,15 +38,15 @@ void func_0027C660(void);
  * - All external function addresses come from the assigned externals list.
  */
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
 extern void func_0029C7A0(void);
 
 /* External functions declared with exact aliases from task.externals */
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-unsigned long long func_002D2EE0(void)
+unsigned long long menu_page_draw_3(void)
 {
     SetupGifPaging(0);
     func_0029C7A0();
@@ -61,20 +61,20 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 
 extern void func_0029C7D0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
-int func_002D2F10(void) {
+int menu_page_update_2(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -92,7 +92,7 @@ return_value:
 extern void func_0029C810(void);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D2F98(void) {
+int menu_page_draw_4(void) {
     SetupGifPaging(0);
     func_0029C810();
     DoGifPaging();
@@ -102,14 +102,14 @@ int func_002D2F98(void) {
 extern void func_0029CA00(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
-int func_002D2FC8(void) {
+int menu_page_update_3(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -127,7 +127,7 @@ return_value:
 extern void func_0029CA40(void);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D3050(void) {
+int menu_page_draw_5(void) {
     SetupGifPaging(0);
     func_0029CA40();
     DoGifPaging();
@@ -137,14 +137,14 @@ int func_002D3050(void) {
 extern void func_0029C990(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
-int func_002D3080(void) {
+int menu_page_update_4(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -162,7 +162,7 @@ return_value:
 extern void func_0029C9D0(void);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D3108(void) {
+int menu_page_draw_6(void) {
     SetupGifPaging(0);
     func_0029C9D0();
     DoGifPaging();
@@ -170,17 +170,17 @@ int func_002D3108(void) {
 }
 
 extern int func_0029C840(int);
-extern void func_002D5B58(short, int, int *);
+extern void menu_process_request(short, int, int *);
 
 /* Handles button input for a menu page and, when the page handler says so, sends a menu request message. */
-int func_002D3138(void) {
+int menu_page_update_send_request(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -195,7 +195,7 @@ return_value:
         int request;
         if (func_0029C840(flags)) {
             request = 0;
-            ProcessMenuRequest(13, 0, &request);
+            menu_process_request(13, 0, &request);
         }
     }
     return result;
@@ -206,7 +206,7 @@ return_value:
 extern void func_0029C880(void);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D31D8(void) {
+int menu_page_draw_7(void) {
     SetupGifPaging(0);
     func_0029C880();
     DoGifPaging();
@@ -216,14 +216,14 @@ int func_002D31D8(void) {
 extern void func_0029C8B0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
-int func_002D3208(void) {
+int menu_page_update_5(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }

@@ -40,7 +40,7 @@ extern FeltzinState D_L05_00221D10;
 extern u8 D_L05_001B96C0[];
 extern GatePath *D_L05_001FE380[];
 extern u8 *D_L05_001B251C;
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern u8 D_0019B278[];
 
 extern void func_003404B8(void);
@@ -54,8 +54,8 @@ extern void func_0037B280(u8 *a0, s32 a1);
 extern GateMoby *func_00328508(s32 oclass);
 extern u8 *func_00379ED0(s32 a0);
 extern s32 func_L05_00417748(u8 *a0);
-extern void func_L05_00420788(u8 *actor, s32 mission);
-extern void func_L05_004209D8(u8 *a0, s32 a1);
+extern void UpdateFeltzinMissionReward(u8 *actor, s32 mission);
+extern void feltzin_mission_handle_failure(u8 *a0, s32 a1);
 extern void func_00306660(void *dst, void *a, void *b);
 extern void func_00306748(void *dst, void *a, void *b);
 extern void func_003068F8(void *dst, void *src, f32 scale);
@@ -63,9 +63,9 @@ extern f32 func_00306720(void *a, void *b);
 extern f32 func_003067D8(void *a, void *b);
 extern void func_0037ADD8(f32 a0);
 extern void func_003719A8(s32 a0, s32 a1, void *a2, s32 a3);
-extern void func_L05_00424980(void *moby, s32 a1);
-extern void func_L05_00424970(void *moby, u32 color);
-extern s32 func_L05_0042C928(void *pos, s32 a1, s32 a2, s32 a3);
+extern void effect_set_enabled(void *moby, s32 a1);
+extern void effect_set_color(void *moby, u32 color);
+extern s32 pickup_spawn_if_not_taken(void *pos, s32 a1, s32 a2, s32 a3);
 
 /* Mission 3 of the Feltzin dispatcher: gates (class 0x114A) are spawned along the selected path,
    two at a time, each facing along the path. When the player's or the second tracked position's
@@ -73,7 +73,7 @@ extern s32 func_L05_0042C928(void *pos, s32 a1, s32 a2, s32 a3);
    a pass within 1.25 units of the gate scores, otherwise the miss count rises and the next gate
    takes over. Twelve misses or func_L05_00417748 fail the mission; once no gate is left, the
    reward is paid through func_L05_00420788. */
-void func_L05_00421100(u8 *actor)
+void UpdateFeltzinGateCourse(u8 *actor)
 {
     struct { Vec up, pos, toward, away; } v;
     u8 *state = *(u8 **)(actor + 0x68);
@@ -152,11 +152,11 @@ void func_L05_00421100(u8 *actor)
     }
     if (func_L05_00417748(func_00379ED0(0xF82))) {
         D_L05_001B13E4 = 1;
-        HandleFeltzinMissionFailure(actor, 3);
+        feltzin_mission_handle_failure(actor, 3);
         func_0037B210();
     } else if (D_L05_001B13D0 >= 12) {
         D_L05_001B13E4 = 1;
-        HandleFeltzinMissionFailure(actor, 3);
+        feltzin_mission_handle_failure(actor, 3);
         func_0037B210();
     }
     if (D_L05_001B13E4) {
@@ -217,17 +217,17 @@ void func_L05_00421100(u8 *actor)
     D_L05_001B13C0 = dotPlayer;
     D_L05_001B13C4 = dotOther;
     if (D_L05_001B13B4) {
-        SetEffectEnabled((void *)D_L05_001B13B4, 1);
+        effect_set_enabled((void *)D_L05_001B13B4, 1);
         if (D_L05_001B13B8) {
-            SetEffectColor((void *)D_L05_001B13B4, 0x40008000);
+            effect_set_color((void *)D_L05_001B13B4, 0x40008000);
         } else {
-            SetEffectColor((void *)D_L05_001B13B4, 0x4000C6FF);
+            effect_set_color((void *)D_L05_001B13B4, 0x4000C6FF);
         }
     }
     if (D_L05_001B13B8) {
-        SetEffectEnabled((void *)D_L05_001B13B8, 1);
-        SetEffectColor((void *)D_L05_001B13B8, 0x40808000);
-    } else if (!D_L05_001B13D0 && !D_L05_001B13BC && !D_0019B278[gCurrentMapIndex * 4]) {
-        D_L05_001B13BC = SpawnCollectibleIfNotTaken(&D_L05_001B13B4->position, 0, -1, -1);
+        effect_set_enabled((void *)D_L05_001B13B8, 1);
+        effect_set_color((void *)D_L05_001B13B8, 0x40808000);
+    } else if (!D_L05_001B13D0 && !D_L05_001B13BC && !D_0019B278[g_current_map_index * 4]) {
+        D_L05_001B13BC = pickup_spawn_if_not_taken(&D_L05_001B13B4->position, 0, -1, -1);
     }
 }

@@ -2,14 +2,14 @@
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char * func_0029EFD0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_L00_003FC820(void *);
+extern char * CreateMoby(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern void part_l00_spawn_spark_spray_2(void *);
 
 /* Creates a short-lived trail object and sprays sparks at its position. */
-void *func_L00_003FC108(char *origin, char *direction, TI128 *position, char *owner)
+void *spark_trail_create(char *origin, char *direction, TI128 *position, char *owner)
 {
     char *object = CreateMoby(0xD5E /* moby class 3422 */);
 
@@ -29,7 +29,7 @@ void *func_L00_003FC108(char *origin, char *direction, TI128 *position, char *ow
         *(int *)(vars + 0x38) = 0x14;
         *(float *)(vars + 0x3C) = 1.0f / IntToFloat(0x14);
         *(char **)(vars + 0x34) = owner;
-        SpawnSparkSpray_L00_2(object + 0x10);
+        part_l00_spawn_spark_spray_2(object + 0x10);
     }
     return object;
 }

@@ -47,7 +47,7 @@ do {								\
   (d) = sh_u.value;						\
 } while (0)
 
-extern double func_00117CA0(double);
+extern double __ieee754_log(double);
 
 /* The two54 and zero operands are immediate expressions in this module;
  * only these three coefficients occupy its resident constant storage. */
@@ -57,7 +57,7 @@ log10_2hi = 3.01029995663611771306e-01, /* 3FD34413 509F6000 */
 log10_2lo = 3.69423907715893078616e-13; /* 3D59FEF3 11F12B36 */
 
 /* Works out the base 10 logarithm of a number. */
-double func_001182B8(double x)
+double __ieee754_log10(double x)
 {
 	double y,z;
 	s32 i,k,hx;

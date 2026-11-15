@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,14 +25,14 @@
  */
 #include "common.h"
 
-extern s8 D_00189E20[];
+extern s8 g_hero_state[];
 extern s8 D_0018A070[];
 extern f32 ref_L04_002D9780_00(void *, void *, void *, s32);
 extern void ref_L04_002D9780_01(void *, f32, f32);
 extern void ref_L04_002D9780_02(void *, void *, f32, f32, f32, f32);
 
 /* Sets the hero's turn and tilt speeds for its current state, then eases the camera values toward them. */
-void func_L04_002D9780(void) {
+void hero_update_turn_tilt_speeds(void) {
     s8 *hero;
     s8 *heroA;
     s8 *heroB;
@@ -42,7 +43,7 @@ void func_L04_002D9780(void) {
     s8 *heroBase;
     f32 probeValue;
 
-    hero = gHeroState;
+    hero = g_hero_state;
     if ((*(u8 *)((char *)(hero) + (0x22B4))) == 0) {
         (*(f32 *)((char *)(hero) + (0x258))) = 0.8f;
         (*(f32 *)((char *)(hero) + (0x25C))) = 0.7f;
@@ -50,7 +51,7 @@ void func_L04_002D9780(void) {
     }
     stateB = (*(s32 *)((char *)(hero) + (0x229C)));
     if (stateB == 4) {
-        heroA = gHeroState;
+        heroA = g_hero_state;
         if ((*(s16 *)((char *)(heroA) + (0x4AC))) < (*(s32 *)((char *)(heroA) + (0x1B8))) && (*(u8 *)((char *)(heroA) + (0x49E))) == 0) {
             (*(f32 *)((char *)(heroA) + (0x25C))) = (*(f32 *)((char *)(heroA) + (0x4B8)));
         }
@@ -68,14 +69,14 @@ void func_L04_002D9780(void) {
                 (*(f32 *)((char *)(hero) + (0x258))) = 0.8f;
                 (*(f32 *)((char *)(hero) + (0x25C))) = 0.9f;
             } else {
-                hero = gHeroState;
+                hero = g_hero_state;
                 if ((*(s32 *)((char *)(hero) + (0x2294))) == 0x7C) {
                     (*(f32 *)((char *)(hero) + (0x260))) = 0.8f;
                 }
             }
         }
     }
-    heroB = gHeroState;
+    heroB = g_hero_state;
     if ((*(u8 *)((char *)(heroB) + (0x287))) == 0 || (*(s32 *)((char *)(heroB) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(heroB) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(heroB) + (0x22B4))) == 0 && (*(f32 *)((char *)(heroB) + (0x254))) < 0.53f) || (*(s32 *)((char *)(heroB) + (0x229C))) == 0x11 || (*(u8 *)((char *)(heroB) + (0x1494))) != 0 || ((probeValue = ref_L04_002D9780_00(heroB + 0x240, heroB + 0x80, hero, stateB)), ((*(f32 *)((char *)(heroB) + (0x264))) * 0.5f) < probeValue)) {
         camBlock = D_0018A070;
         heroBase = camBlock - 0x250;

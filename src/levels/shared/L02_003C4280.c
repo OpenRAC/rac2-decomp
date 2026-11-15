@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern void func_00282CF0(float *out, const float *a, const float *b);
-extern void func_00282F20(float *out, const float *in, float s);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
-extern float func_00282E80(void *a, void *b);
+extern void FastVecSub(float *out, const float *a, const float *b);
+extern void vec_scale_to_length(float *out, const float *in, float s);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
+extern float vec_distance_xy(void *a, void *b);
 
 typedef struct {
     char pad00[4];
@@ -13,7 +13,7 @@ typedef struct {
     char *points;
 } Path_003C4280;
 
-void func_L02_003C4280(void *object, int useFixedSpeed) {
+void AdvancePathFollower(void *object, int useFixedSpeed) {
     Path_003C4280 *state = *(Path_003C4280 **)((char *)object + 0x68);
     float buf[4];
 

@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern s32 func_00283CF0(f32 value);
-extern void func_00282F20(void *out, void *in, f32 scale);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_L11_00397A30(void *moby);
-extern void func_002A7750(void *moby, s32 state, s32 arg);
-extern void func_0029F338(void *moby);
-extern void func_L00_002E6EF8(void (*callback)(void *), void *moby);
-extern s32 func_002B3868(void *moby);
-extern s32 func_00283D38(s32 from, s32 to, f32 t);
-extern f32 func_00283CE0(s32 value);
-extern void func_L11_003982F0(void *moby);
-extern void func_L11_00397820(void *moby);
+extern s32 FloatToInt(f32 value);
+extern void vec_scale_to_length(void *out, void *in, f32 scale);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void part_spawn_particle_burst(void *moby);
+extern void moby_set_state(void *moby, s32 state, s32 arg);
+extern void moby_mark_spawned(void *moby);
+extern void gfx_add_draw_callback_third(void (*callback)(void *), void *moby);
+extern s32 flag_set_first_pending(void *moby);
+extern s32 FastTweenColor(s32 from, s32 to, f32 t);
+extern f32 IntToFloat(s32 value);
+extern void gfx_draw_random_ribbon(void *moby);
+extern void gfx_draw_facing_quad(void *moby);
 extern f32 D_L11_001AEC60 __attribute__((sda));
 extern f32 D_L11_001AEC64 __attribute__((sda));
 extern s32 D_L11_001AEC68 __attribute__((sda));
@@ -53,7 +53,7 @@ typedef struct {
    frames, scales back toward 1 before restoring the mode bits and freeing itself. Every
    frame it queues func_L11_003982F0 and func_L11_00397820 with itself. */
 /* Makes a target object swell and glow, then fade back to normal, as a short effect. */
-void func_L11_003974A8(u8 *moby) {
+void part_update_grow_fade_glow(u8 *moby) {
     Grow_003974A8 *vars = *(Grow_003974A8 **)(moby + 0x68);
     f32 progress;
 
@@ -64,11 +64,11 @@ void func_L11_003974A8(u8 *moby) {
         vars->target->modeBits |= 8;
         vars->target->modeBits |= 2;
         vars->curExtent = 0;
-        SpawnParticleBurst_L11(moby);
-        SetMobyState(moby, 1, -1);
+        part_spawn_particle_burst(moby);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (SetFirstPendingFlag(moby)) {
+        if (flag_set_first_pending(moby)) {
             vec_scale_to_length(vars, vars->target->points[vars->point], vars->speed * 0.016666668f);
             {
                 f32 delta = D_L11_001AEC64 - D_L11_001AEC60;
@@ -87,11 +87,11 @@ void func_L11_003974A8(u8 *moby) {
         vars->curExtent = vars->extent * progress;
         vars->color = FastTweenColor(D_L11_001AEC78[0], D_L11_001AEC78[1], progress);
         if (*(u16 *)(moby + 0x96) > D_L11_001AEC68)
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         break;
     case 2: {
         f32 fade;
-        if (SetFirstPendingFlag(moby)) {
+        if (flag_set_first_pending(moby)) {
             vars->scaleStep = (vars->scale - 1.0f) / (f32)D_L11_001AEC6C;
             vars->target->alpha = 0x80;
             vars->target->modeBits &= 0xFFF7;
@@ -106,14 +106,14 @@ void func_L11_003974A8(u8 *moby) {
             vars->target->modeBits &= 0xFFFE;
             vars->target->drawn = 1;
             vec_scale_to_length(vars->target->points[vars->point], vars->target->points[vars->point], 1.0f);
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
     }
-    AddDrawCallbackToList3(DrawRandomRibbon, moby);
-    AddDrawCallbackToList3(DrawFacingQuad, moby);
+    gfx_add_draw_callback_third(gfx_draw_random_ribbon, moby);
+    gfx_add_draw_callback_third(gfx_draw_facing_quad, moby);
     if (*(u16 *)(moby + 0x96) < 0xFFFF)
         ++*(u16 *)(moby + 0x96);
 }

@@ -82,7 +82,7 @@ typedef struct {
     unsigned char pad_22E8[464];
     float transition_progress;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 typedef union {
     struct { u32 held, pressed; } word;
     u64 both;
@@ -91,32 +91,32 @@ typedef struct {
     unsigned char prefix[0x1A0];
     ButtonPair buttons;
 } InputState;
-extern InputState D_00138180;
-extern unsigned char D_00139568[];
+extern InputState g_pad_state;
+extern unsigned char g_item_slot_to_record[];
 extern u8 D_001A7B08[0x40] __attribute__((sda));
 extern unsigned int D_001A7390[] __attribute__((sda));
 extern int D_L00_001A7CC4 __attribute__((sda));
 typedef struct { char pad[12]; int first_frame, trigger_frame; char rest[24]; } AnimationRange;
 extern AnimationRange D_L00_0025D990[];
 typedef struct { char pad[20]; int sound; char rest[200]; } EffectDefinition;
-extern EffectDefinition D_L00_00262570[];
-extern int func_L00_0032EF10(u32, int, int *);
-extern int func_L00_002B3248(unsigned char *);
+extern EffectDefinition g_weapon_l00_table[];
+extern int PadPressedWithin(u32, int, int *);
+extern int moby_is_class_71(unsigned char *);
 extern void func_PAL_L00_002BA480(void);
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 extern void func_PAL_L00_002C4480(int, int);
-extern int func_L00_002D4040(int);
-extern int func_002E5DA0(int, int, char *, int);
-extern char *func_L00_002AE888(void *, int, int, float, float, float, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern void func_L00_002C3BB0(void);
-extern int func_L00_002C3E18(void);
-extern int func_L00_002C40C0(void);
+extern int get_ammo(int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern char *SelectBestEligibleTarget(void *, int, int, float, float, float, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void hero_find_swingshot_node_in_front(void);
+extern int hero_find_active_swingshot_node(void);
+extern int hero_find_blue_swingshot_target(void);
 extern void func_PAL_L00_002AF458(void);
-extern int func_002E5CF8(int, int, char *);
-extern int func_00282948(int *);
+extern int PlayMobySound(int, int, char *);
+extern int math_fast_float_d(int *);
 
 /* Selects context-sensitive hero actions from buffered input and nearby targets.
  * RAC1's process_hero_equipped_item_input is the counterpart. */
@@ -130,20 +130,20 @@ int func_PAL_L00_002C97E0(void)
     u32 mask;
 
 
-    if (D_00189E20.special_control) {
-        if (D_00189E20.action != 10)
+    if (g_hero_state.special_control) {
+        if (g_hero_state.action != 10)
             return 0;
-        if (D_00189E20.special_ready != 1)
+        if (g_hero_state.special_ready != 1)
             return 0;
     }
-    if (D_00189E20.disabled) return 0;
-    if (!D_00189E20.object) return 0;
-    if (D_00189E20.input_locked) return 0;
-    if (D_00189E20.control_mode != 2) return 0;
+    if (g_hero_state.disabled) return 0;
+    if (!g_hero_state.object) return 0;
+    if (g_hero_state.input_locked) return 0;
+    if (g_hero_state.control_mode != 2) return 0;
 
-    previous_frame = D_00189E20.frame;
-    mask = D_00189E20.buttons;
-    state = D_00189E20.action;
+    previous_frame = g_hero_state.frame;
+    mask = g_hero_state.buttons;
+    state = g_hero_state.action;
     switch (state) {
     case 10: {
     int action, difference;
@@ -152,16 +152,16 @@ int func_PAL_L00_002C97E0(void)
     AnimationRange *range;
     float threshold, movement;
     
-    if (D_00189E20.action_locked) break;
-    if (D_00189E20.state < 2 || (D_00189E20.state == 4 && D_00189E20.grounded)) {
-        if (func_L00_0032EF10(mask, 8, &scratch.input_age)) {
-            object = D_00189E20.object;
+    if (g_hero_state.action_locked) break;
+    if (g_hero_state.state < 2 || (g_hero_state.state == 4 && g_hero_state.grounded)) {
+        if (PadPressedWithin(mask, 8, &scratch.input_age)) {
+            object = g_hero_state.object;
             if (!object) goto clear_action;
-            if (!func_L00_002B3248((unsigned char *)object) || *(unsigned char *)(object + 0x20))
+            if (!moby_is_class_71((unsigned char *)object) || *(unsigned char *)(object + 0x20))
                 goto clear_action;
-            if ((D_00138180.buttons.word.held & 8) ||
-                ((D_00189E20.mode == 1 || D_00189E20.mode == 29) && D_00189E20.frame >= 18)) {
-                if ((D_00189E20.mode == 1 || D_00189E20.mode == 29) && D_00189E20.frame >= 18)
+            if ((g_pad_state.buttons.word.held & 8) ||
+                ((g_hero_state.mode == 1 || g_hero_state.mode == 29) && g_hero_state.frame >= 18)) {
+                if ((g_hero_state.mode == 1 || g_hero_state.mode == 29) && g_hero_state.frame >= 18)
                     func_PAL_L00_002BA480();
                 else
                     func_PAL_L00_002C4480(21, 1);
@@ -172,27 +172,27 @@ int func_PAL_L00_002C97E0(void)
         }
         goto clear_action;
     }
-    if (D_00189E20.mode == 7 || D_00189E20.mode == 9 || D_00189E20.mode == 137 ||
-        D_00189E20.mode == 8 || D_00189E20.mode == 6 ||
-        (D_00189E20.mode == 14 && D_00189E20.animation_frame > 32.0f))
+    if (g_hero_state.mode == 7 || g_hero_state.mode == 9 || g_hero_state.mode == 137 ||
+        g_hero_state.mode == 8 || g_hero_state.mode == 6 ||
+        (g_hero_state.mode == 14 && g_hero_state.animation_frame > 32.0f))
         goto buffered_attack;
-    if ((D_00189E20.mode == 11 && D_00189E20.attack_mode != 3 && D_00189E20.animation_frame > 18.0f) ||
-        (D_00189E20.mode == 11 && D_00189E20.attack_mode == 3 && D_00189E20.animation_frame > 20.0f))
+    if ((g_hero_state.mode == 11 && g_hero_state.attack_mode != 3 && g_hero_state.animation_frame > 18.0f) ||
+        (g_hero_state.mode == 11 && g_hero_state.attack_mode == 3 && g_hero_state.animation_frame > 20.0f))
         goto buffered_attack;
-    if (D_00189E20.mode == 44 || D_00189E20.mode == 17)
+    if (g_hero_state.mode == 44 || g_hero_state.mode == 17)
         goto buffered_attack;
     goto ranged_attack;
 
 buffered_attack:
-    if (D_00189E20.frame < 9) goto ranged_attack;
+    if (g_hero_state.frame < 9) goto ranged_attack;
     buffered_window = 12;
-    if (D_00189E20.mode == 11 || D_00189E20.mode == 14)
+    if (g_hero_state.mode == 11 || g_hero_state.mode == 14)
         buffered_window = 15;
-    if (!func_L00_0032EF10(mask, buffered_window, 0)) goto clear_action;
-    if ((!D_00189E20.fast_attack && D_00189E20.movement > 0.1f) ||
-        (D_00189E20.fast_attack && D_00189E20.movement > 0.57f) ||
-        (D_00189E20.mode == 8 && D_00189E20.movement > 0.57f)) {
-        if (D_00189E20.attack_blocked || D_00189E20.attack_pending) goto clear_action;
+    if (!PadPressedWithin(mask, buffered_window, 0)) goto clear_action;
+    if ((!g_hero_state.fast_attack && g_hero_state.movement > 0.1f) ||
+        (g_hero_state.fast_attack && g_hero_state.movement > 0.57f) ||
+        (g_hero_state.mode == 8 && g_hero_state.movement > 0.57f)) {
+        if (g_hero_state.attack_blocked || g_hero_state.attack_pending) goto clear_action;
         func_PAL_L00_002C4480(20, 1);
     } else {
         func_PAL_L00_002C4480(19, 1);
@@ -200,27 +200,27 @@ buffered_attack:
     goto clear_action;
 
 ranged_attack:
-    if (D_00189E20.state == 6) {
-        range = &D_L00_0025D990[D_00189E20.animation_index];
-        if (D_00189E20.mode == 21 && D_00189E20.frame >= 26) {
-            if (D_00189E20.input_locked) goto check_attack_delay;
-            if (D_00189E20.attack_delay) goto clear_action;
-            if ((float)range->trigger_frame <= D_00189E20.animation_frame && (D_00138180.buttons.word.held & 8) &&
-                func_L00_0032EF10(mask, 12, 0)) {
+    if (g_hero_state.state == 6) {
+        range = &D_L00_0025D990[g_hero_state.animation_index];
+        if (g_hero_state.mode == 21 && g_hero_state.frame >= 26) {
+            if (g_hero_state.input_locked) goto check_attack_delay;
+            if (g_hero_state.attack_delay) goto clear_action;
+            if ((float)range->trigger_frame <= g_hero_state.animation_frame && (g_pad_state.buttons.word.held & 8) &&
+                PadPressedWithin(mask, 12, 0)) {
                 func_PAL_L00_002C4480(21, 1);
                 break;
             }
         }
 check_attack_delay:
-        if (!D_00189E20.attack_delay) {
-            if (!D_00189E20.input_locked) {
-                float frame = D_00189E20.animation_frame;
+        if (!g_hero_state.attack_delay) {
+            if (!g_hero_state.input_locked) {
+                float frame = g_hero_state.animation_frame;
                 if (!((float)range->trigger_frame <= frame)) goto clear_action;
-                difference = (func_00283CF0(frame) - range->first_frame) * 2;
+                difference = (FloatToInt(frame) - range->first_frame) * 2;
                 action = difference > 0 ? difference : 1;
                 action = action < 13 ? action : 12;
-                if (func_L00_0032EF10(mask, action, 0)) {
-                    if (D_00138180.buttons.word.held & 8) {
+                if (PadPressedWithin(mask, action, 0)) {
+                    if (g_pad_state.buttons.word.held & 8) {
                         func_PAL_L00_002C4480(21, 1);
                         goto clear_action;
                     }
@@ -230,49 +230,49 @@ check_attack_delay:
         }
     }
 clear_action:
-    D_00189E20.attack_pending = 0;
+    g_hero_state.attack_pending = 0;
     break;
 
     }
     case 22:
     case 65:
-    if (D_00189E20.mode == 1 || D_00189E20.mode == 29) break;
-    if (!(D_00189E20.state < 2 || D_00189E20.state == 12 ||
-          (D_00189E20.state == 4 && D_00189E20.grounded))) break;
-    if (D_00189E20.pending_action && D_00189E20.pending_action != 22 && D_00189E20.pending_action != 65)
+    if (g_hero_state.mode == 1 || g_hero_state.mode == 29) break;
+    if (!(g_hero_state.state < 2 || g_hero_state.state == 12 ||
+          (g_hero_state.state == 4 && g_hero_state.grounded))) break;
+    if (g_hero_state.pending_action && g_hero_state.pending_action != 22 && g_hero_state.pending_action != 65)
         break;
-    if (!(D_00138180.buttons.word.held & 32) || D_00189E20.input_window < 19) break;
-    if (func_L00_002D4040(state)) {
+    if (!(g_pad_state.buttons.word.held & 32) || g_hero_state.input_window < 19) break;
+    if (get_ammo(state)) {
         func_PAL_L00_002C4480(131, 1);
         break;
     }
-    if (D_00138180.buttons.word.pressed & 32) {
-        EffectDefinition *effect = &D_L00_00262570[D_00139568[state]];
-        func_002E5DA0(0, 0, D_00189E20.owner, effect->sound);
+    if (g_pad_state.buttons.word.pressed & 32) {
+        EffectDefinition *effect = &g_weapon_l00_table[g_item_slot_to_record[state]];
+        snd_play_from_class_bank(0, 0, g_hero_state.owner, effect->sound);
     }
     break;
 
     case 46: {
     char *target;
     float direction;
-    if (!(D_00138180.buttons.word.pressed & mask)) break;
-    if (D_00189E20.aim_target) {
-        D_00189E20.aim_target = 0;
+    if (!(g_pad_state.buttons.word.pressed & mask)) break;
+    if (g_hero_state.aim_target) {
+        g_hero_state.aim_target = 0;
         break;
     }
-    target = func_L00_002AE888(&D_00189E20, 21, 0, 20.0f, D_00189E20.heading,
+    target = SelectBestEligibleTarget(&g_hero_state, 21, 0, 20.0f, g_hero_state.heading,
                               0.5235988497734069824f, 0.6981317996978759766f);
-    D_00189E20.aim_target = target;
+    g_hero_state.aim_target = target;
     if (target) {
         qcopy(&scratch.point, target + 16);
         ((float *)&scratch.point)[2] += 0.5f;
-        if (func_002761F8(&scratch.point, (char *)&D_00189E20 + 0xE0, 2, target, 0))
-            D_00189E20.aim_target = 0;
+        if (CollLine(&scratch.point, (char *)&g_hero_state + 0xE0, 2, target, 0))
+            g_hero_state.aim_target = 0;
         else {
-            char *aim_target = D_00189E20.aim_target;
-            direction = func_00283248(D_00189E20.position[0] - *(float *)(aim_target + 16),
-                                     D_00189E20.position[1] - *(float *)(aim_target + 20));
-            D_00189E20.target_angle = func_00283BE0(*(float *)(D_00189E20.aim_target + 0xF8), direction);
+            char *aim_target = g_hero_state.aim_target;
+            direction = mat_fast_helper_a(g_hero_state.position[0] - *(float *)(aim_target + 16),
+                                     g_hero_state.position[1] - *(float *)(aim_target + 20));
+            g_hero_state.target_angle = fast_subtract_rotations(*(float *)(g_hero_state.aim_target + 0xF8), direction);
         }
     }
     break;
@@ -280,39 +280,39 @@ clear_action:
     }
     case 13: {
     int action;
-    func_L00_002C3BB0();
-    func_L00_002C3E18();
-    func_L00_002C40C0();
-    action = D_00189E20.extended_range ? 7 : 4;
-    if (D_00189E20.mode == 40) action = 9;
-    if (D_00189E20.mode == 39 && (D_00189E20.alternate_target_ready || D_00189E20.nearby_ready)) {
-        if (func_L00_0032EF10(mask, action, 0) ||
-            ((D_00138180.buttons.word.held & mask) && D_00189E20.input_window >= 13)) {
+    hero_find_swingshot_node_in_front();
+    hero_find_active_swingshot_node();
+    hero_find_blue_swingshot_target();
+    action = g_hero_state.extended_range ? 7 : 4;
+    if (g_hero_state.mode == 40) action = 9;
+    if (g_hero_state.mode == 39 && (g_hero_state.alternate_target_ready || g_hero_state.nearby_ready)) {
+        if (PadPressedWithin(mask, action, 0) ||
+            ((g_pad_state.buttons.word.held & mask) && g_hero_state.input_window >= 13)) {
             func_PAL_L00_002C4480(40, 1);
             break;
         }
     }
-    if (!(D_00189E20.state < 2 || D_00189E20.state == 12 || D_00189E20.state == 4 ||
-          D_00189E20.state == 2 || D_00189E20.state == 30 || D_00189E20.state == 5 ||
-          (D_00189E20.mode == 40 && D_00189E20.frame >= 5) || D_00189E20.mode == 29))
+    if (!(g_hero_state.state < 2 || g_hero_state.state == 12 || g_hero_state.state == 4 ||
+          g_hero_state.state == 2 || g_hero_state.state == 30 || g_hero_state.state == 5 ||
+          (g_hero_state.mode == 40 && g_hero_state.frame >= 5) || g_hero_state.mode == 29))
         break;
-    if (!func_L00_0032EF10(mask, action, 0) &&
-        (!(D_00138180.buttons.word.held & mask) || D_00189E20.input_window < 13)) break;
-    if (D_00189E20.alternate_target_ready) {
-        if (D_00189E20.nearby_ready) {
-            if (D_00189E20.alternate_distance < D_00189E20.nearby_distance) D_00189E20.nearby_ready = 0;
-            else D_00189E20.alternate_target_ready = 0;
+    if (!PadPressedWithin(mask, action, 0) &&
+        (!(g_pad_state.buttons.word.held & mask) || g_hero_state.input_window < 13)) break;
+    if (g_hero_state.alternate_target_ready) {
+        if (g_hero_state.nearby_ready) {
+            if (g_hero_state.alternate_distance < g_hero_state.nearby_distance) g_hero_state.nearby_ready = 0;
+            else g_hero_state.alternate_target_ready = 0;
         }
-        if (D_00189E20.alternate_target_ready && !D_00189E20.control_lock && D_00189E20.mode != 43) {
+        if (g_hero_state.alternate_target_ready && !g_hero_state.control_lock && g_hero_state.mode != 43) {
             func_PAL_L00_002C4480(43, 1);
             break;
         }
     }
-    if (D_00189E20.nearby_ready && !D_00189E20.control_lock) {
+    if (g_hero_state.nearby_ready && !g_hero_state.control_lock) {
         func_PAL_L00_002C4480(35, 1);
         break;
     }
-    if (D_00189E20.second_target_ready) {
+    if (g_hero_state.second_target_ready) {
         func_PAL_L00_002C4480(138, 1);
         break;
     }
@@ -324,58 +324,58 @@ clear_action:
     case 17:
     case 31: {
     int action, frame_window;
-    if (!((D_00189E20.state == 0 && D_00189E20.mode != 29) || D_00189E20.state == 1 ||
-          D_00189E20.state == 12 || D_00189E20.state == 5 || D_00189E20.state == 15 ||
-          (D_00189E20.state == 4 && D_00189E20.alternate_ready) ||
-          (D_00189E20.mode == 34 && D_00189E20.animation_frame > 55.0f))) break;
-    if (D_00189E20.changing_weapon) break;
+    if (!((g_hero_state.state == 0 && g_hero_state.mode != 29) || g_hero_state.state == 1 ||
+          g_hero_state.state == 12 || g_hero_state.state == 5 || g_hero_state.state == 15 ||
+          (g_hero_state.state == 4 && g_hero_state.alternate_ready) ||
+          (g_hero_state.mode == 34 && g_hero_state.animation_frame > 55.0f))) break;
+    if (g_hero_state.changing_weapon) break;
     
-    frame_window = D_00189E20.input_window;
+    frame_window = g_hero_state.input_window;
     action = 6;
     if (frame_window < action) action = frame_window;
-    if (!func_L00_0032EF10(mask, action, &scratch.action_age) && !(D_00138180.buttons.word.held & 32)) break;
+    if (!PadPressedWithin(mask, action, &scratch.action_age) && !(g_pad_state.buttons.word.held & 32)) break;
     if (frame_window < 19) break;
-    if (func_L00_002D4040(-1)) {
-        if (D_00189E20.state == 12 || D_00189E20.state == 0 || D_00189E20.mode == 3 ||
-            (D_00189E20.state == 1 && D_00189E20.transition_progress < 0.7f)) {
+    if (get_ammo(-1)) {
+        if (g_hero_state.state == 12 || g_hero_state.state == 0 || g_hero_state.mode == 3 ||
+            (g_hero_state.state == 1 && g_hero_state.transition_progress < 0.7f)) {
             func_PAL_L00_002C4480(34, 1);
             break;
         }
         func_PAL_L00_002AF458();
-    } else if (D_00189E20.object && (D_00138180.buttons.word.pressed & 32))
-        func_002E5CF8(0, 0, D_00189E20.object);
+    } else if (g_hero_state.object && (g_pad_state.buttons.word.pressed & 32))
+        PlayMobySound(0, 0, g_hero_state.object);
     break;
 
     }
     case 53: {
     int action, frame_window;
     
-    if (!(D_00189E20.state < 2 || (D_00189E20.state == 4 && D_00189E20.grounded)))
+    if (!(g_hero_state.state < 2 || (g_hero_state.state == 4 && g_hero_state.grounded)))
         break;
-    if (D_00189E20.mode != 1) {
-        frame_window = D_00189E20.input_window;
+    if (g_hero_state.mode != 1) {
+        frame_window = g_hero_state.input_window;
         action = 7;
         action = action < frame_window ? 8 : frame_window;
-        if (!func_L00_0032EF10(mask, action, &scratch.detach_age)) break;
-        if (D_00189E20.object) {
+        if (!PadPressedWithin(mask, action, &scratch.detach_age)) break;
+        if (g_hero_state.object) {
             func_PAL_L00_002C4480(31, 1);
-            if (D_00189E20.object) func_002E5CF8(0, 0, D_00189E20.object);
+            if (g_hero_state.object) PlayMobySound(0, 0, g_hero_state.object);
         }
     }
     break;
     }
     }
 
-    if (D_00189E20.frame == previous_frame && D_001A7B08[0x26] && D_001A7390[3] == 54 &&
-        D_00189E20.mode != 29 && D_00189E20.mode != 1 &&
-        (D_00189E20.motion_flags & 0xffffffff00000000ULL) == 0) {
-        func_00282948(&D_L00_001A7CC4);
+    if (g_hero_state.frame == previous_frame && D_001A7B08[0x26] && D_001A7390[3] == 54 &&
+        g_hero_state.mode != 29 && g_hero_state.mode != 1 &&
+        (g_hero_state.motion_flags & 0xffffffff00000000ULL) == 0) {
+        math_fast_float_d(&D_L00_001A7CC4);
         if (D_L00_001A7CC4 &&
-            (D_00189E20.state < 2 || D_00189E20.state == 12 ||
-             ((D_00189E20.state == 2 || D_00189E20.state == 4) && D_00189E20.action_ready)) &&
-            (D_00138180.buttons.both & 0x800000008ULL) == 0x800000008ULL)
+            (g_hero_state.state < 2 || g_hero_state.state == 12 ||
+             ((g_hero_state.state == 2 || g_hero_state.state == 4) && g_hero_state.action_ready)) &&
+            (g_pad_state.buttons.both & 0x800000008ULL) == 0x800000008ULL)
             func_PAL_L00_002C4480(123, 1);
-        if (D_00138180.buttons.word.pressed & 8) D_L00_001A7CC4 = 25;
+        if (g_pad_state.buttons.word.pressed & 8) D_L00_001A7CC4 = 25;
     }
-    return D_00189E20.frame < previous_frame;
+    return g_hero_state.frame < previous_frame;
 }

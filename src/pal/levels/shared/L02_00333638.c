@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void *func_L00_0032C638(char *a0);
-extern int func_002B50E0(void *a0, void *a1, float f12);
-extern void *func_L00_0032C638(char *a0);
-extern void *func_L00_0032C638(char *a0);
+extern void *moby_get_vars_word_18(char *a0);
+extern int moby_step_controller(void *a0, void *a1, float f12);
+extern void *moby_get_vars_word_18(char *a0);
+extern void *moby_get_vars_word_18(char *a0);
 
 /* Set the record's fields for the call, then put the old ones back. */
 int func_PAL_L02_00333638(void *a0, void *a1, int a2, float f12, float f13, float f14) {
@@ -13,7 +14,7 @@ int func_PAL_L02_00333638(void *a0, void *a1, int a2, float f12, float f13, floa
     float old20;
     int ret;
 
-    rec = (char *)func_L00_0032C638((char *)a0);
+    rec = (char *)moby_get_vars_word_18((char *)a0);
     if (rec == 0)
         return 8;
     old38 = *(int *)(rec + 0x38);
@@ -24,7 +25,7 @@ int func_PAL_L02_00333638(void *a0, void *a1, int a2, float f12, float f13, floa
     old20 = *(float *)(rec + 0x20);
     if (0.0f < f14)
         *(float *)(rec + 0x20) = f14;
-    ret = func_002B50E0(a0, a1, f12);
+    ret = moby_step_controller(a0, a1, f12);
     *(int *)(rec + 0x38) = old38;
     *(float *)(rec + 0x28) = old28;
     *(float *)(rec + 0x20) = old20;

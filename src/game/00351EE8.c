@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_00351E58(unsigned char *);
+extern int voBufIsFull(unsigned char *);
 
 typedef int s32;
 
@@ -10,7 +10,7 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 
 /* Returns the next free video output frame, or 0 if there is none. */
-int func_00351EE8(int *pool)
+int mpeg_vobuf_get_next_frame(int *pool)
 {
     int result;
     long isFull;
@@ -23,4 +23,4 @@ int func_00351EE8(int *pool)
 }
 
 /* Returns true when no video output frame is filled. */
-s32 func_00351F28(u8 *pool) { return *(u32 *)(pool + 0xc) < 1; }
+s32 mpeg_vobuf_is_empty(u8 *pool) { return *(u32 *)(pool + 0xc) < 1; }

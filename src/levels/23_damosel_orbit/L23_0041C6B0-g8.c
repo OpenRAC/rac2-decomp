@@ -6,24 +6,24 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L23_001B1484 __attribute__((sda));
+extern char *g_mothership_boss_moby __attribute__((sda));
 
-extern float func_00282E48(char *, char *);
+extern float fast_vec_dist(char *, char *);
 
-extern int *D_L23_001FF300[];
+extern int *g_path_lists[];
 
-extern int func_L23_00419CA0(int);
+extern int mothership_is_value_not_in_slots(int);
 
 /* copies the entry nearest to arg1 among the objects the measured slots name into arg0 */
-void func_L23_0041C6B0(char *outPoint, char *nearPos, int onlyAllowed) {
-    char *state = *(char **)(gMothershipBossMoby + 0x68);
+void boss_find_nearest_path_point(char *outPoint, char *nearPos, int onlyAllowed) {
+    char *state = *(char **)(g_mothership_boss_moby + 0x68);
     char *slots = state + 0x230;
     float best = 30000.0f;
     int i;
 
     for (i = 0; i < 0x2F; i++) {
-        if (onlyAllowed == 0 || IsValueNotInSlotTable(i) != 0) {
-            int *list = gPathLists[*(int *)(slots + (i << 2))];
+        if (onlyAllowed == 0 || mothership_is_value_not_in_slots(i) != 0) {
+            int *list = g_path_lists[*(int *)(slots + (i << 2))];
             int j;
 
             for (j = 0; j < *list; j++) {

@@ -3,6 +3,7 @@
  * The list-pointer word is reloaded on every search step, as in retail.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *payload; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -15,7 +16,7 @@ extern int * volatile D_L13_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L13_001C9EA0;
 
 /* Fills in the level menu list from the unlocked levels and selects the current one. */
-int func_L13_0035E890(char *obj) {
+int menu_build_level_list(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

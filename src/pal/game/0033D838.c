@@ -1,18 +1,19 @@
 #include "include_asm.h"
+#include "names.h"
 extern unsigned char D_001A7C1E __attribute__((sda));
 
 
 extern void func_PAL_0033CF78(void *, char *, char *, char *);
 extern void func_PAL_0033CD50(void *);
-extern void func_0033B018(void *, float, float);
-extern int func_002E5E58(int, int, int);
+extern void menu_set_anchor_pos(void *, float, float);
+extern int snd_play_from_global_bank(int, int, int);
 extern unsigned char D_001A7BB2 __attribute__((sda));
-extern char *func_00288FB8(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CE70(void *);
-extern void func_00284E40(void);
-extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
-extern void func_00280190(void *, unsigned long, char *, int);
-extern short D_001A6480[];
+extern void gfx_reapply_display_layout(void);
+extern void FontSetWindow(void *, int, int, int, int, int, int, int, int);
+extern void text_draw_window_small(void *, unsigned long, char *, int);
+extern short g_screen_adjust_offsets[];
 
 extern void Ffb202470_FUN_0033AB50(char *p);
 
@@ -33,16 +34,16 @@ int func_PAL_0033DDC0(char *object, int mask)
     int *v;
 
     sub = object + 8;
-    text = func_00288FB8(0x1B73);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(sub, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0x1B73);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(sub, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(sub);
     v = *(int **)(object + 0x2DC);
-    func_0033B018(sub, *(float *)v, *(float *)(v + 1));
+    menu_set_anchor_pos(sub, *(float *)v, *(float *)(v + 1));
     if ((mask & 0x40) != 0 && *(int *)(object + 0x2D8) == 0)
-        func_002E5E58(4, 0, 0);
+        snd_play_from_global_bank(4, 0, 0);
     if ((mask & 0xf000) != 0) {
-        short *p = D_001A6480;
+        short *p = g_screen_adjust_offsets;
         oldx = p[180];
         oldy = p[181];
         if ((mask & 0x1000) != 0) {
@@ -51,29 +52,29 @@ int func_PAL_0033DDC0(char *object, int mask)
                 p[181] = -32;
         }
         if ((mask & 0x4000) != 0) {
-            unsigned short *q = (unsigned short *)D_001A6480;
+            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
             q[181] = q[181] + 1;
             if ((short)q[181] > 32)
                 ((short *)q)[181] = 32;
         }
         if ((mask & 0x8000) != 0) {
-            unsigned short *q = (unsigned short *)D_001A6480;
+            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
             q[180] = q[180] - 1;
             if ((short)q[180] < -40)
                 ((short *)q)[180] = -40;
         }
         if ((mask & 0x2000) != 0) {
-            unsigned short *q = (unsigned short *)D_001A6480;
+            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
             q[180] = q[180] + 1;
             if ((short)q[180] > 40)
                 ((short *)q)[180] = 40;
         }
         {
-            short *q = D_001A6480;
+            short *q = g_screen_adjust_offsets;
             if (oldx != q[180] || oldy != q[181])
-                func_002E5E58(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
         }
-        func_00284E40();
+        gfx_reapply_display_layout();
     }
     return (mask >> 6) & 1;
 }
@@ -84,8 +85,8 @@ void func_PAL_0033DF90(char *object)
     char scratch[32];
 
     func_PAL_0033CE70(object + 8);
-    func_002802E0(scratch, 0x96, 0x167, 44, 468, 254, 180, 20, 3);
-    func_00280190(scratch, 0x80F0F0F0UL, func_00288FB8(0x1B6E), -1);
+    FontSetWindow(scratch, 0x96, 0x167, 44, 468, 254, 180, 20, 3);
+    text_draw_window_small(scratch, 0x80F0F0F0UL, GetLocalizedString(0x1B6E), -1);
 }
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
@@ -168,10 +169,10 @@ extern void func_PAL_0033CA78(int);
 
 char *func_PAL_0033EC50(char *object)
 {
-    extern void func_003363D0(void *);
+    extern void object_construct_derived_b(void *);
     func_PAL_0033CA78((int)(object + 8));
-    func_003363D0(object + 0x2DC);
-    func_003363D0(object + 0x324);
+    object_construct_derived_b(object + 0x2DC);
+    object_construct_derived_b(object + 0x324);
     return object;
 }
 
@@ -181,18 +182,18 @@ char *func_PAL_0033EC50(char *object)
 typedef struct { int ids[2]; } SolTextPair;
 extern SolTextPair D_L00_001AE1A8;
 extern char D_L00_001AE1B0[];
-extern void func_00336548(void *);
-extern void func_0027FA10(int, int, unsigned long, char *, int);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
+extern void hud_draw_progress_bar(void *);
+extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 extern char D_L00_001AE118[];
 extern void func_PAL_0033CE70(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 extern SolTextPair D_L00_001AE110;
 extern char D_L00_001AE118[];
 extern void func_PAL_0033CE70(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
@@ -207,21 +208,21 @@ void func_PAL_0033F190(char *object)
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE1A8;
     format = D_L00_001AE1B0;
-    first = func_00288FB8(0xE34);
-    func_00115DA8(buffer, format, first);
-    func_0027FA10(0x100, 0x91, color, buffer, -1);
-    func_00336548(object + 0x2DC);
+    first = GetLocalizedString(0xE34);
+    sprintf(buffer, format, first);
+    text_draw_right_aligned_medium(0x100, 0x91, color, buffer, -1);
+    hud_draw_progress_bar(object + 0x2DC);
     color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
-    middle = func_00288FB8(0xE35);
-    func_00115DA8(buffer, format, middle);
-    func_0027FA10(0x100, 0xBE, color, buffer, -1);
-    func_00336548(object + 0x324);
+    middle = GetLocalizedString(0xE35);
+    sprintf(buffer, format, middle);
+    text_draw_right_aligned_medium(0x100, 0xBE, color, buffer, -1);
+    hud_draw_progress_bar(object + 0x324);
     color = *(int *)(object + 0x2D8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     format2 = D_L00_001AE118;
-    last = func_00288FB8(0xE36);
-    second = func_00288FB8(pair.ids[*(int *)0x1A7C20 != 0]);
-    func_00115DA8(buffer, format2, last, second);
-    func_0027FB40(0x100, 0xE1, color, buffer, -1);
+    last = GetLocalizedString(0xE36);
+    second = GetLocalizedString(pair.ids[*(int *)0x1A7C20 != 0]);
+    sprintf(buffer, format2, last, second);
+    text_draw_centered_medium(0x100, 0xE1, color, buffer, -1);
 }
 
 
@@ -261,7 +262,7 @@ int func_PAL_0033F470 (char *object, int flags)
 }
 
 
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern void text_draw_centered_small(int, int, unsigned long, char *, int);
 
 void func_PAL_0033F508(char *object)
 {
@@ -275,10 +276,10 @@ void func_PAL_0033F508(char *object)
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     pair = D_L00_001AE110;
     format = D_L00_001AE118;
-    first = func_00288FB8(0xBAA);
-    second = func_00288FB8(pair.ids[*(unsigned char *)0x1A7C1E != 0]);
-    func_00115DA8(buffer, format, first, second);
-    func_0027FAA8(0x100, 0xAA, color, buffer, -1);
+    first = GetLocalizedString(0xBAA);
+    second = GetLocalizedString(pair.ids[*(unsigned char *)0x1A7C1E != 0]);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_small(0x100, 0xAA, color, buffer, -1);
 }
 
 
@@ -316,15 +317,15 @@ int func_PAL_0033FB00(char *object, int flags)
     char *text, *second;
 
     child = object + 8;
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_0033B018(child, vec[0], vec[1]);
+    menu_set_anchor_pos(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -352,15 +353,15 @@ int func_PAL_0033FDF8(char *object, int flags)
     char *text, *second;
 
     child = object + 8;
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_0033B018(child, vec[0], vec[1]);
+    menu_set_anchor_pos(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -387,15 +388,15 @@ int func_PAL_00340038(char *object, int flags)
     char *text, *second;
 
     child = object + 8;
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_0033B018(child, vec[0], vec[1]);
+    menu_set_anchor_pos(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -428,13 +429,13 @@ int func_PAL_00340348(char *object, int flags)
     float *position;
     char *text, *label;
 
-    text = func_00288FB8(0xBB1);
-    label = func_00288FB8(0xB86);
-    func_PAL_0033CF78(first, text, label, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xBB1);
+    label = GetLocalizedString(0xB86);
+    func_PAL_0033CF78(first, text, label, GetLocalizedString(0xB60));
     func_PAL_0033CD50(first);
     second = object + 0x2E0;
     position = *(float **)(object + 0x3BC);
-    func_0033B018(first, position[0], position[1]);
+    menu_set_anchor_pos(first, position[0], position[1]);
     func_PAL_0034A148(second, flags);
     func_PAL_0034A2B8(second, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
     return (flags >> 6) & 1;
@@ -444,32 +445,32 @@ int func_PAL_00340348(char *object, int flags)
 
 
 
-void func_0033AF48(int);
+void prompt_bar_draw(int);
 
 void func_PAL_00340610(int param_1) {
-  func_0033AF48(param_1 + 8);
+  prompt_bar_draw(param_1 + 8);
 }
 
 extern void func_0033AB50_1(void *);
-extern void func_L00_0042BFF8(void *);
-extern void func_L00_0042C290(void *);
-extern void func_L00_0042BAD0(void *);
+extern void cam_init_object_table_c(void *);
+extern void cam_init_object_table_d(void *);
+extern void cam_init_object_table_a(void *);
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
 char *func_PAL_00340630(char *object)
 {
     func_0033AB50_1(object + 8);
-    func_L00_0042BFF8(object + 732);
-    func_L00_0042C290(object + 792);
-    func_L00_0042C290(object + 880);
-    func_L00_0042C290(object + 968);
-    func_L00_0042BAD0(object + 1056);
-    func_L00_0042C290(object + 1136);
-    func_L00_0042C290(object + 1224);
-    func_L00_0042C290(object + 1312);
-    func_L00_0042C290(object + 1400);
-    func_L00_0042C290(object + 1488);
-    func_L00_0042C290(object + 1576);
+    cam_init_object_table_c(object + 732);
+    cam_init_object_table_d(object + 792);
+    cam_init_object_table_d(object + 880);
+    cam_init_object_table_d(object + 968);
+    cam_init_object_table_a(object + 1056);
+    cam_init_object_table_d(object + 1136);
+    cam_init_object_table_d(object + 1224);
+    cam_init_object_table_d(object + 1312);
+    cam_init_object_table_d(object + 1400);
+    cam_init_object_table_d(object + 1488);
+    cam_init_object_table_d(object + 1576);
     return object;
 }
 

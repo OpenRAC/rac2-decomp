@@ -1,5 +1,5 @@
 #include "common.h"
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 /* Adapted from RAC1 pad.c, GPL-3.0, func_002181F0. */
 struct PadState {
     u8 pad_0[0x100] __attribute__((aligned(16)));
@@ -45,12 +45,12 @@ struct PadState {
 typedef struct PadState PadState;
 
 extern struct { s32 word; u8 mirror; u8 rest[7]; } D_001A7A40 MACRO_ADDR;
-extern float func_00282E20(float *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
+extern float vec_length_xy(float *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
 
 /* Turns one raw controller reading into held, pressed and released buttons, stick values, a stick flick check and key repeat. */
-void func_002B88F0(PadState *padState, u8 *buf, s32 len) {
+void pad_decode_reading(PadState *padState, u8 *buf, s32 len) {
     float stick[2];
     s32 i, j, k;
     s32 heldNow;
@@ -159,7 +159,7 @@ void func_002B88F0(PadState *padState, u8 *buf, s32 len) {
     stick[0] = padState->analog[2];
     stick[1] = padState->analog[3];
     mag = vec_length_xy(stick);
-    ang = FastMatrixHelperA(stick[0], stick[1]);
+    ang = mat_fast_helper_a(stick[0], stick[1]);
     padState->hist_mag[padState->hist_idx] = mag;
     padState->hist_ang[padState->hist_idx] = ang;
     if (mag > 0.9f) {

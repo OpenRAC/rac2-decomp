@@ -1,21 +1,22 @@
+#include "names.h"
 /* func_PAL_0028D738, the PAL copy of func_0028CCE0: the same C, where rename func_002A9588 becomes func_PAL_002A9FA0. */
 #include "common.h"
 
-extern void func_00287E60(void);
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
+extern void menu_set_state_word_three(void);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
 extern int func_PAL_002A9FA0(int, int, int, int, int);
-extern int func_002E5E58(int, int, void *);
-extern void func_00287E18(void);
-extern int func_0028B5D0(int);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void menu_advance_state_in_mode_seven(void);
+extern int hud_close_element_by_key(int);
 typedef struct { char pad0[0x148]; float x, y; char pad150[0x70]; int held, pressed, released, mode; } RadialInput;
-extern RadialInput D_00138180;
+extern RadialInput g_pad_state;
 typedef struct { char pad0[0x24E4]; int choice; } RadialState;
-extern RadialState D_00189E20;
+extern RadialState g_hero_state;
 extern short D_001B189C, D_001B18A0, D_001B18A2, D_001B18A4;
-extern int D_001B18D0 __attribute__((sda));
-extern int D_001A8D48;
-extern int **D_001B18D4;
+extern int g_radial_slot_count __attribute__((sda));
+extern int g_radial_menu_page_index;
+extern int **g_radial_menu_pages;
 extern int D_001A8DB0[] __attribute__((sda));
 extern unsigned char D_001A7BB3;
 extern int D_001B18FC, D_001B18F8, D_001B1598;
@@ -27,20 +28,20 @@ void func_PAL_0028D738(Selector *object)
     float x, y, magnitude, angle;
     int old, choice;
     unsigned char *fade = object->fade;
-    func_00287E60();
+    menu_set_state_word_three();
     object->timeout = 150;
     object->timer = 24;
-    D_00138180.mode = 2;
-    x = D_00138180.x;
-    y = D_00138180.y;
-    magnitude = func_00282C10(x * x + y * y);
+    g_pad_state.mode = 2;
+    x = g_pad_state.x;
+    y = g_pad_state.y;
+    magnitude = square_root(x * x + y * y);
     if (magnitude != 0.0f) {
         x /= magnitude;
         y /= magnitude;
     }
-    angle = func_00283248(x, y);
+    angle = mat_fast_helper_a(x, y);
     if ((object->state >> 24) == 0 && D_001B189C) {
-        if (D_00138180.pressed & 0xF000) goto reset_selection;
+        if (g_pad_state.pressed & 0xF000) goto reset_selection;
         if (magnitude < 0.5f) goto reset_selection;
         --object->state;
         if (object->state == -1) {
@@ -54,23 +55,23 @@ reset_selection:
         if (magnitude > 0.0f) {
             if (magnitude > 0.9f) {
                 float a;
-                a = angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)D_001B18D0;
-                a = a * 0.15915494f * (float)D_001B18D0;
-                object->selected = (int)a % D_001B18D0;
+                a = angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
+                a = a * 0.15915494f * (float)g_radial_slot_count;
+                object->selected = (int)a % g_radial_slot_count;
             }
-        } else if (D_00138180.pressed & 0xF000) {
+        } else if (g_pad_state.pressed & 0xF000) {
             choice = old;
-            if (D_00138180.pressed & 0x1000) {
-                choice = choice == -1 ? D_001A8DB0[4] : D_001B18D4[D_001A8D48][choice * 7 + 4];
+            if (g_pad_state.pressed & 0x1000) {
+                choice = choice == -1 ? D_001A8DB0[4] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 4];
             }
-            if (D_00138180.pressed & 0x4000) {
-                choice = choice == -1 ? D_001A8DB0[5] : D_001B18D4[D_001A8D48][choice * 7 + 5];
+            if (g_pad_state.pressed & 0x4000) {
+                choice = choice == -1 ? D_001A8DB0[5] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 5];
             }
-            if (D_00138180.pressed & 0x8000) {
-                choice = choice == -1 ? D_001A8DB0[2] : D_001B18D4[D_001A8D48][choice * 7 + 2];
+            if (g_pad_state.pressed & 0x8000) {
+                choice = choice == -1 ? D_001A8DB0[2] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 2];
             }
-            if (D_00138180.pressed & 0x2000) {
-                choice = choice == -1 ? D_001A8DB0[3] : D_001B18D4[D_001A8D48][choice * 7 + 3];
+            if (g_pad_state.pressed & 0x2000) {
+                choice = choice == -1 ? D_001A8DB0[3] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 3];
             }
             object->selected = choice;
         }
@@ -78,27 +79,27 @@ reset_selection:
     if (object->selected != old) {
         func_PAL_002A9FA0(0, 0, 1, 0, 1);
         fade[1] = 0;
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
     } else if (fade[1] < 8) ++fade[1];
-    if (!(D_00138180.held & 0x10)) {
-        if (D_00138180.released & 0x10) {
+    if (!(g_pad_state.held & 0x10)) {
+        if (g_pad_state.released & 0x10) {
             int current = object->selected;
-            if (current == -1) D_00189E20.choice = 0;
-            else D_00189E20.choice = D_001B18D4[D_001A8D48][current * 7 + 6];
+            if (current == -1) g_hero_state.choice = 0;
+            else g_hero_state.choice = g_radial_menu_pages[g_radial_menu_page_index][current * 7 + 6];
         }
-        if (D_001A7BB3) func_00287E18();
+        if (D_001A7BB3) menu_advance_state_in_mode_seven();
         if (*fade) --*fade;
     } else if (*fade < 8) ++*fade;
-    if (D_00189E20.choice == 6 && !D_001B18A0)
-        D_00189E20.choice = 0;
-    if (D_00189E20.choice == 7 && !D_001B18A4)
-        D_00189E20.choice = 0;
-    if (D_00189E20.choice == 5 && !D_001B18A2)
-        D_00189E20.choice = 0;
+    if (g_hero_state.choice == 6 && !D_001B18A0)
+        g_hero_state.choice = 0;
+    if (g_hero_state.choice == 7 && !D_001B18A4)
+        g_hero_state.choice = 0;
+    if (g_hero_state.choice == 5 && !D_001B18A2)
+        g_hero_state.choice = 0;
     if (!*fade) {
         D_001B1900 = object->selected;
         D_001B18FC = object->state;
-        func_0028B5D0(object->handle);
+        hud_close_element_by_key(object->handle);
         object->timer = -6;
         D_001B18F8 = D_001B1598;
     }

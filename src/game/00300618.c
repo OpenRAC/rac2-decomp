@@ -88,11 +88,11 @@ typedef struct {
     unsigned char pad28[8];
 } MotionEntry;
 
-extern s32 func_00282A18(s32 value);
+extern s32 log2dim(s32 value);
 
-extern void func_00283388 (float *local);
+extern void set_identity_matrix (float *local);
 
-extern void func_00300AA8 (char *object, float a, float b, int flags, float d, float *local);
+extern void DrawNativeQuads (char *object, float a, float b, int flags, float d, float *local);
 
 extern float F213135aa_FUN_002A7878(float a, float b);
 
@@ -124,30 +124,30 @@ extern void F9e2cd219_FUN_00305310(void *owner, void *out);
 
 extern void F9e2cd219_FUN_00307AD0(void *owner, void *out);
 
-    extern void func_0029FCC0(void *, int, void *);
+    extern void moby_transform_joint_to_world(void *, int, void *);
 
-    extern int func_00277258(void *, int, void *, float);
+    extern int coll_test_point(void *, int, void *, float);
 
     extern int D_001BAF9C;
 
-extern void func_00282CF0(void *out, void *a, void *b);
+extern void FastVecSub(void *out, void *a, void *b);
 
-extern void func_00282CC0(void *out, void *a, void *b);
+extern void FastVecAdd(void *out, void *a, void *b);
 
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
 typedef struct { char pad00[0x14]; u32 selector; } SurfaceControlSettings;
 typedef struct { char pad00[0x50]; float x[4], y[4], z; } SurfaceGridControl;
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 extern unsigned short *D_001EE5A0[];
 extern int D_001B1B78 __attribute__((sda));
 extern char *D_001B1B5C __attribute__((sda));
 extern V4_F213135aa ref_00303210_00[];
-extern int func_002A8508(int, int);
+extern int moby_count_group_not_in_state(int, int);
 
 extern char D_00227DA0[];
 
-extern void func_00300330(void *);
+extern void moby_sort_entries_by_distance(void *);
 
 extern char ref_00305798_00[];
 
@@ -157,25 +157,25 @@ extern void ref_00305798_02(void *out, void *a, void *b);
 
 extern void ref_00305798_03(void *owner, void *entry, void *out);
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern void func_00305C10(void *);
+extern void gfx_draw_twin_beam_strips(void *);
 
-extern void func_00305798(void *);
+extern void projectile_move_owner_entries(void *);
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
-extern int func_00277258(void *, int, void *, float);
+extern int coll_test_point(void *, int, void *, float);
 
 extern int D_001BAF9C;
 
 extern char D_00228610[];
 
-extern void func_00300330(void *);
+extern void moby_sort_entries_by_distance(void *);
 
-extern int func_00282948(void *p);
+extern int math_fast_float_d(void *p);
 
-extern void func_00307FC0(void *p);
+extern void gfx_draw_twin_beam_strips_2(void *p);
 
 typedef struct {
     u8 pad00[0x80]; float position[4];
@@ -184,22 +184,22 @@ typedef struct {
     u8 pad1834[0xA5C]; char *field2290; int state;
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
-extern SurfacePlayer D_00189E20;
+extern SurfacePlayer g_hero_state;
 extern char D_001A8BD0[] __attribute__((sda));
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
 } SurfaceCamera;
-extern SurfaceCamera D_001B5200;
+extern SurfaceCamera g_active_camera;
 extern V4_F213135aa ref_00302DA0_04[];
 extern void ref_00302DA0_00(int, int, float);
 extern int ref_00302DA0_01(int, int);
 extern void ref_00302DA0_02(void);
 extern int ref_00302DA0_03(void);
-extern int func_00303E20(char *, void *, int *, int *);
-extern void func_002A7750(u8 *, u8, s32);
-extern float func_002AA140(float, float, float);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int,
+extern int FindSurfaceGridCell(char *, void *, int *, int *);
+extern void moby_set_state(u8 *, u8, s32);
+extern float math_lerp_float(float, float, float);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
     float, float, float, float, int, float, int, int, int, int, int);
 
 /* Relocates serialized header offsets and compacts each row in its original storage. */
@@ -262,13 +262,13 @@ typedef struct {
 } NativeSpawnRow;
 
 /* Builds the pose of every bone in a model from two neighbouring animation frames, blending between them. */
-void func_00300748(NativeSpawnHeader *header, char *base, float f)
+void anim_build_bone_pose(NativeSpawnHeader *header, char *base, float f)
 {
-    extern void func_00283AF0(void *a, void *b);
-    extern float func_00283CB8(float value);
-    extern void func_00283B48(void *a, void *b, void *c, float d);
-    extern void func_00283A58(void *a, void *b, void *c, void *d);
-    extern void func_00283788(void *a, void *b, void *c);
+    extern void vec_fast_to_int_helper(void *a, void *b);
+    extern float FloatFraction(float value);
+    extern void mat_fast_helper_e(void *a, void *b, void *c, float d);
+    extern void mat_fast_helper_d(void *a, void *b, void *c, void *d);
+    extern void multiply_matrix(void *a, void *b, void *c);
 
     int count = (int)f;
     int i;
@@ -280,7 +280,7 @@ void func_00300748(NativeSpawnHeader *header, char *base, float f)
 
     row = (char *)header->field20 + count * header->field0A;
     for (i = 0; i < header->field04; i++)
-        FastVectorToIntHelper(row + i * 0x18, base + i * 0x40);
+        vec_fast_to_int_helper(row + i * 0x18, base + i * 0x40);
 
     value = FloatFraction(f);
     if (value > 0.001f) {
@@ -288,14 +288,14 @@ void func_00300748(NativeSpawnHeader *header, char *base, float f)
         int pick = (index < header->field08) ? index : 0;
         for (row = (char *)header->field20 + pick * header->field0A, i = 0;
                 i < header->field04; i++, row += 0x18) {
-            FastVectorToIntHelper(row, local);
-            FastMatrixHelperE(base + i * 0x40, base + i * 0x40, local, value);
+            vec_fast_to_int_helper(row, local);
+            mat_fast_helper_e(base + i * 0x40, base + i * 0x40, local, value);
         }
     }
 
     for (record = (NativeSpawnRow *)((char *)header->field20 + (int)f * header->field0A),
             j = 0; j < header->field04; j++, record++) {
-        FastMatrixHelperD(base + j * 0x40, base + j * 0x40 + 0x10, base + j * 0x40 + 0x20,
+        mat_fast_helper_d(base + j * 0x40, base + j * 0x40 + 0x10, base + j * 0x40 + 0x20,
                 base + j * 0x40);
         if (record->field16 >= 0)
             multiply_matrix(base + j * 0x40, base + (record->field16 << 6), base + j * 0x40);
@@ -305,7 +305,7 @@ void func_00300748(NativeSpawnHeader *header, char *base, float f)
 
 /* scales a float argument by a field of the object into a stack buffer, then calls a second routine with the object, its flags, the buffer and three float arguments */
 /* Sets up a scaled transform for an object and draws it when its flags say it is visible. */
-void func_00300968 (char *object, int flags, float a, float b, float c, float d)
+void gfx_draw_scaled_object (char *object, int flags, float a, float b, float c, float d)
 {
   float local[16];
 
@@ -320,7 +320,7 @@ void func_00300968 (char *object, int flags, float a, float b, float c, float d)
 }
 
 /* Like the previous draw helper, but scales the two axes by separate amounts. */
-void func_00300A00(char *object, int flags, float a, float b, float c, float d, float e)
+void gfx_draw_scaled_object_two_axes(char *object, int flags, float a, float b, float c, float d, float e)
 {
     float local[16];
     if (flags >> 24) {
@@ -339,7 +339,7 @@ void func_00300A00(char *object, int flags, float a, float b, float c, float d, 
 /* func_00301F18 is defined in 00301F18-qcopy.c. */
 
 /* Starts a pickup flying toward a target object, with a random sideways and upward kick. */
-int func_003022A0(char *obj, char *obj2, float x, float y)
+int pickup_start_fly_to_target(char *obj, char *obj2, float x, float y)
 {
     V4_F213135aa m0, m1, m2;
     char *s1;
@@ -373,11 +373,11 @@ int func_003022A0(char *obj, char *obj2, float x, float y)
 }
 
 /* Starts the pickup flying toward its target, but only if it is in the idle state. */
-int func_00302440(char *obj, char *obj2)
+int pickup_start_fly_if_idle(char *obj, char *obj2)
 {
     if (*(u8 *)(obj + 32) != 3)
         return 3;
-    return StartPickupFlyToTarget(obj, obj2, 0.0f, 0.0f);
+    return pickup_start_fly_to_target(obj, obj2, 0.0f, 0.0f);
 }
 
 
@@ -393,23 +393,23 @@ int func_00302440(char *obj, char *obj2)
 
 
 /* Resolve the player onto the surface grid and blend their height into it. */
-void func_00302DA0(char *object)
+void surface_grid_update(char *object)
 {
     char *state=*(char **)(object+0x68);
     float center, ceiling, blend;
     int index;
     if (*(int *)(state+0x98)==-1) {
-        if (FindSurfaceGridCell(object,gHeroState.position,(int *)(state+0x90),(int *)(state+0x94))) {
+        if (FindSurfaceGridCell(object,g_hero_state.position,(int *)(state+0x90),(int *)(state+0x94))) {
             *(int *)(state+0x98)=0;
-            SetMobyState((u8 *)object,5,-1);
+            moby_set_state((u8 *)object,5,-1);
         }
     }
     if (*(int *)(state+0x98)>=0) {
         center=*(float *)(state+0x70)+*(float *)(state+4);
         ceiling=center+*(float *)(state+0x34)+1.0f;
-        if (gActiveCamera.position[2]<=ceiling && center-*(float *)(state+0x34)-1.0f<=gActiveCamera.position[2])
-            gActiveCamera.heightOffset=ceiling-gActiveCamera.position[2];
-        { SurfacePlayer *player = &gHeroState;
+        if (g_active_camera.position[2]<=ceiling && center-*(float *)(state+0x34)-1.0f<=g_active_camera.position[2])
+            g_active_camera.heightOffset=ceiling-g_active_camera.position[2];
+        { SurfacePlayer *player = &g_hero_state;
         if (player->state!=0x38 && player->state!=0x79 &&
             (player->state!=0x39 || *(int *)(*(char **)(player->field2290+0x24)+0x1f0)) &&
             player->state!=0x7a) {
@@ -429,12 +429,12 @@ void func_00302DA0(char *object)
             else ref_00302DA0_01(0x39,1);
         }
         }
-        if (gHeroState.state==0x31 && *(int *)(state+0x98)>5)
+        if (g_hero_state.state==0x31 && *(int *)(state+0x98)>5)
             ref_00302DA0_03();
         blend=(float)*(int *)(state+0x98)*0.05f;
         if (blend>1.0f) blend=1.0f;
         index=*(int *)(state+0x40)*64+*(int *)(state+0x94)*8+*(int *)(state+0x90);
-        gHeroState.position[2]=LerpFloat_002AA140(gHeroState.position[2],
+        g_hero_state.position[2]=math_lerp_float(g_hero_state.position[2],
             ref_00302DA0_04[index].z-(float)*(int *)(state+0x98)*0.016666668f,blend);
         ++*(int *)(state+0x98);
     }
@@ -462,19 +462,19 @@ typedef struct {
     u64 l88;
 } Pkt_00303070;
 
-extern char D_00189EA0[];
-extern int func_002ACBC8(void *, int);
-extern unsigned long func_0027C878(int);
-extern void func_00303738(void *, void *, int, int, int);
-extern void func_00280B90(void *, void *, int);
+extern char g_hero_position[];
+extern int IsPointInCuboid(void *, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void surface_grid_fill_vertex(void *, void *, int, int, int);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws the 7 by 7 grid of squares that make up a water-like surface. */
-void func_00303070(u8 *obj)
+void surface_grid_draw(u8 *obj)
 {
     u8 *p = *(u8 **)(obj + 0x68);
     int v = *(int *)(p + 0x44);
 
-    if (v != -1 && IsPointInCuboid(gHeroPosition, v) != 0 && (*(u32 *)(p + 0x4C) & 4) == 0) {
+    if (v != -1 && IsPointInCuboid(g_hero_position, v) != 0 && (*(u32 *)(p + 0x4C) & 4) == 0) {
         Pkt_00303070 pk;
         int i = 0;
         int j;
@@ -498,10 +498,10 @@ void func_00303070(u8 *obj)
         do {
             j = 0;
             do {
-                FillSurfaceVertex(obj, &pk, j, i, 0);
-                FillSurfaceVertex(obj, &pk, j + 1, i, 1);
-                FillSurfaceVertex(obj, &pk, j, i + 1, 2);
-                FillSurfaceVertex(obj, &pk, j + 1, i + 1, 3);
+                surface_grid_fill_vertex(obj, &pk, j, i, 0);
+                surface_grid_fill_vertex(obj, &pk, j + 1, i, 1);
+                surface_grid_fill_vertex(obj, &pk, j, i + 1, 2);
+                surface_grid_fill_vertex(obj, &pk, j + 1, i + 1, 3);
                 draw_world_quad(&pk, 0, 0);
                 j = j + 1;
             } while (j < 7);
@@ -511,7 +511,7 @@ void func_00303070(u8 *obj)
 }
 
 /* Regenerate the 8 by 8 mesh from four surface control points. */
-void func_00303210(char *object)
+void surface_grid_build_control(char *object)
 {
     char *state=*(char **)(object+0x68);
     unsigned short *entry;
@@ -520,7 +520,7 @@ void func_00303210(char *object)
     ParticleVector first, second, right, left;
     float columnWeight;
     int column, row, surface;
-    if (CountMobysInGroupNotInState((u8)object[0x21],-1)==5) {
+    if (moby_count_group_not_in_state((u8)object[0x21],-1)==5) {
         entry=D_001EE5A0[(u8)object[0x21]];
         while ((u8)object[0x21]!=255 && (u8)object[0x21]<=D_001B1B78 && entry && ((entry && (short)entry[-1]>=0) || entry==D_001EE5A0[(u8)object[0x21]])) {
             control=D_001B1B5C+(*entry&0x7fff)*256;
@@ -584,7 +584,7 @@ void func_00303210(char *object)
 /* func_00304AD0 uses the profile in 00304AD0-g8-qcopy.c. */
 
 /* Gives a nearby object a small random push each frame, unless a random check says to skip it. */
-void func_00304B68(char *object)
+void projectile_apply_random_push(char *object)
 {
     char local[16];
     float base;
@@ -598,16 +598,16 @@ void func_00304B68(char *object)
 }
 
 /* Checks if a thrown object has hit something and, if so, switches it to its break state. */
-void func_00304C18(void *object) {
+void projectile_check_hit_break(void *object) {
     char local[16];
-    TransformMobyJointToWorld(object, 0, local);
-    if (TestPointAgainstCollision(local, 2, object, 0.2f) && D_001BAF9C > 0)
+    moby_transform_joint_to_world(object, 0, local);
+    if (coll_test_point(local, 2, object, 0.2f) && D_001BAF9C > 0)
         *((unsigned char *)object + 0x20) = 8;
 }
 
 /* Takes the position of the owner's child, and lets the child's motion take it over
    once the motion is of the right kind and is not busy. */
-void func_00304C78(void *object)
+void moby_follow_attached_motion(void *object)
 {
     MotionVector local;
     float tmp[4];
@@ -637,7 +637,7 @@ void func_00304C78(void *object)
 /* func_00305058 is defined in 00305058-qcopy.c. */
 
 /* Advances a growing effect each frame and marks it finished when it reaches full size. */
-void func_00305228(Owner_F9e2cd219 *self)
+void part_advance_grow_effect(Owner_F9e2cd219 *self)
 {
     Worker_F9e2cd219 *child = self->child;
 
@@ -661,15 +661,15 @@ void func_00305228(Owner_F9e2cd219 *self)
 
 
 /* Runs the shared cleanup routine for the thrown-object table. */
-void func_00305418(void) {
-    SortEntriesByDistance(D_00227DA0);
+void projectile_cleanup_table(void) {
+    moby_sort_entries_by_distance(D_00227DA0);
 }
 
 /* The table of hundred objects and the three helpers it uses sit at another
    address in every program, so they have no address of their own. */
 
 /* Walks the table of objects and lets every entry the owner owns move it. */
-void func_00305798(void *owner)
+void projectile_move_owner_entries(void *owner)
 {
     s32 i;
     char *base = ref_00305798_00;
@@ -686,7 +686,7 @@ void func_00305798(void *owner)
 }
 
 /* Fills an effect packet with default corner positions, colours and drawing settings. */
-void func_00305838(char *p)
+void gfx_init_effect_packet(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -717,12 +717,12 @@ void func_00305838(char *p)
 }
 
 /* Draws the thrown object trail effects unless the object is hidden. */
-void func_003058C8(void *owner)
+void projectile_draw_effects(void *owner)
 {
     void *p = *(void **)((char *)owner + 0x68);
-    if (FastFloatHelperD((char *)p + 0x44) == 0)
-        DrawTwinBeamStrips(owner);
-    MoveTableEntriesOfOwner(owner);
+    if (math_fast_float_d((char *)p + 0x44) == 0)
+        gfx_draw_twin_beam_strips(owner);
+    projectile_move_owner_entries(owner);
 }
 
 typedef struct { float x, y, z, w; } EffectVector __attribute__((aligned(16)));
@@ -733,39 +733,39 @@ typedef struct {
     unsigned long primitive, texture, mode, registers;
 } EffectPacket;
 typedef struct { u8 prefix[0x140]; EffectVector position; } EffectCameraView;
-extern unsigned long func_0027C878(int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern void func_00283410(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern void euler_to_matrix(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 extern EffectCameraView ref_00305910_00;
 
 /* Draw three shrinking, independently colored layers facing the camera. */
-void func_00305910(void *owner, float *position)
+void gfx_draw_facing_glow(void *owner, float *position)
 {
     EffectPacket packet;
     EffectVector matrix[4];
     float rotation[4], offset[4];
     u32 color;
     float distance, scale;
-    InitEffectPacket((char *)&packet);
+    gfx_init_effect_packet((char *)&packet);
     packet.texture = GetEffectTextureDescriptor(44);
     packet.mode = 0x0000ff9000000260UL;
     packet.registers = 0x0000008000000048UL;
     packet.primitive = 0;
-    color = ((u32)RandomIntRange(48,64) << 24) + 0x8183f;
+    color = ((u32)math_random_int_range(48,64) << 24) + 0x8183f;
     rotation[3] = 0;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
-    rotation[2] = FastMatrixHelperA(ref_00305910_00.position.x-position[0], ref_00305910_00.position.y-position[1]);
+    rotation[2] = mat_fast_helper_a(ref_00305910_00.position.x-position[0], ref_00305910_00.position.y-position[1]);
     distance = vec_distance_xy(position, &ref_00305910_00.position);
-    rotation[1] = -FastMatrixHelperA(distance, ref_00305910_00.position.z-position[2]);
-    rotation[0] = RandomAngle();
+    rotation[1] = -mat_fast_helper_a(distance, ref_00305910_00.position.z-position[2]);
+    rotation[0] = math_random_angle();
     euler_to_matrix(matrix,rotation);
     FastVecSub(offset,&ref_00305910_00.position,position);
     vec_scale_to_length(offset,offset,0.25f);
@@ -773,7 +773,7 @@ void func_00305910(void *owner, float *position)
     matrix[3].y = position[1] + offset[1];
     matrix[3].z = position[2] + offset[2];
     matrix[3].w = 1.0f;
-    scale = RandomFloatRange(0.3f,0.4f);
+    scale = math_random_float_range(0.3f,0.4f);
     FastVecScale(&packet.position[0],&packet.position[0],scale);
     FastVecScale(&packet.position[1],&packet.position[1],scale);
     FastVecScale(&packet.position[2],&packet.position[2],scale);
@@ -783,14 +783,14 @@ void func_00305910(void *owner, float *position)
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x103080;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x103080;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
     FastVecScale(&packet.position[0],&packet.position[0],0.5f);
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x7f7f7f;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x7f7f7f;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
 }
@@ -803,7 +803,7 @@ extern EffectCameraView ref_00306040_00;
 extern void ref_00306040_01(void *packet);
 
 /* Draw three shrinking, independently colored layers facing the camera. */
-void func_00306040(void *owner, float *position)
+void gfx_draw_facing_glow_small(void *owner, float *position)
 {
     EffectPacket packet;
     EffectVector matrix[4];
@@ -815,13 +815,13 @@ void func_00306040(void *owner, float *position)
     packet.mode = 0x0000ff9000000260UL;
     packet.registers = 0x0000008000000048UL;
     packet.primitive = 0;
-    color = ((u32)RandomIntRange(48,64) << 24) + 0x80;
+    color = ((u32)math_random_int_range(48,64) << 24) + 0x80;
     rotation[3] = 0;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
-    rotation[2] = FastMatrixHelperA(ref_00306040_00.position.x-position[0], ref_00306040_00.position.y-position[1]);
+    rotation[2] = mat_fast_helper_a(ref_00306040_00.position.x-position[0], ref_00306040_00.position.y-position[1]);
     distance = vec_distance_xy(position, &ref_00306040_00.position);
-    rotation[1] = -FastMatrixHelperA(distance, ref_00306040_00.position.z-position[2]);
-    rotation[0] = RandomAngle();
+    rotation[1] = -mat_fast_helper_a(distance, ref_00306040_00.position.z-position[2]);
+    rotation[0] = math_random_angle();
     euler_to_matrix(matrix,rotation);
     FastVecSub(offset,&ref_00306040_00.position,position);
     vec_scale_to_length(offset,offset,0.25f);
@@ -829,7 +829,7 @@ void func_00306040(void *owner, float *position)
     matrix[3].y = position[1];
     matrix[3].z = position[2];
     matrix[3].w = 1.0f;
-    scale = RandomFloatRange(0.03f,0.0625f);
+    scale = math_random_float_range(0.03f,0.0625f);
     FastVecScale(&packet.position[0],&packet.position[0],scale);
     FastVecScale(&packet.position[1],&packet.position[1],scale);
     FastVecScale(&packet.position[2],&packet.position[2],scale);
@@ -839,14 +839,14 @@ void func_00306040(void *owner, float *position)
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x1f1f1f;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x1f1f1f;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
     FastVecScale(&packet.position[0],&packet.position[0],0.5f);
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x7f7f7f;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x7f7f7f;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
 }
@@ -859,7 +859,7 @@ void func_00306040(void *owner, float *position)
 /* func_00307298 uses the profile in 00307298-g8-qcopy.c. */
 
 /* Gives a nearby object a small random push each frame, unless a random check says to skip it. */
-void func_00307330(char *object)
+void projectile_apply_random_push_2(char *object)
 {
     char local[16];
     float base;
@@ -873,16 +873,16 @@ void func_00307330(char *object)
 }
 
 /* Checks if a thrown object has hit something and, if so, switches it to its break state. */
-void func_003073E0(void *owner)
+void projectile_check_hit_break_2(void *owner)
 {
     char local[16];
-    TransformMobyJointToWorld(owner, 0, local);
-    if (TestPointAgainstCollision(local, 2, owner, 0.25f) && D_001BAF9C > 0)
+    moby_transform_joint_to_world(owner, 0, local);
+    if (coll_test_point(local, 2, owner, 0.25f) && D_001BAF9C > 0)
         *((unsigned char *)owner + 0x20) = 8;
 }
 
 /* The same as func_00304C78: the retail holds the two copies byte for byte the same. */
-void func_00307440(void *object)
+void moby_follow_attached_motion_2(void *object)
 {
     MotionVector local;
     float tmp[4];
@@ -911,7 +911,7 @@ void func_00307440(void *object)
 
 
 /* Advances a growing effect each frame and marks it finished when it reaches full size. */
-void func_003079E8(Owner_F9e2cd219 *self)
+void part_advance_grow_effect_2(Owner_F9e2cd219 *self)
 {
     Worker_F9e2cd219 *child = self->child;
 
@@ -934,15 +934,15 @@ void func_003079E8(Owner_F9e2cd219 *self)
 
 
 /* Runs the shared cleanup routine for the thrown-object table. */
-void func_00307BD0(void) {
-    SortEntriesByDistance(D_00228610);
+void projectile_cleanup_table_2(void) {
+    moby_sort_entries_by_distance(D_00228610);
 }
 
 /* Draws the thrown object trail effects unless the object is hidden. */
-void func_00307BF0(void *owner) { void *p = *(void **)((char *)owner + 0x68); if (FastFloatHelperD((char *)p + 0x44) != 0) return; DrawTwinBeamStripsAlt(owner); }
+void projectile_draw_effects_2(void *owner) { void *p = *(void **)((char *)owner + 0x68); if (math_fast_float_d((char *)p + 0x44) != 0) return; gfx_draw_twin_beam_strips_2(owner); }
 
 /* Fills an effect packet with default corner positions, colours and drawing settings. */
-void func_00307C30(char *p)
+void gfx_init_effect_packet_2(char *p)
 {
     *(long long *)(p + 112) = 0LL;
     *(int *)(p + 80) = 0;
@@ -975,25 +975,25 @@ void func_00307C30(char *p)
 extern EffectCameraView ref_00307CC0_00;
 
 /* Draw three shrinking, independently colored layers facing the camera. */
-void func_00307CC0(void *owner, float *position)
+void gfx_draw_facing_glow_2(void *owner, float *position)
 {
     EffectPacket packet;
     EffectVector matrix[4];
     float rotation[4], offset[4];
     u32 color;
     float distance, scale;
-    InitEffectPacketAlt((char *)&packet);
+    gfx_init_effect_packet_2((char *)&packet);
     packet.texture = GetEffectTextureDescriptor(44);
     packet.mode = 0x0000ff9000000260UL;
     packet.registers = 0x0000008000000048UL;
     packet.primitive = 0;
-    color = ((u32)RandomIntRange(48,64) << 24) + 0x8183f;
+    color = ((u32)math_random_int_range(48,64) << 24) + 0x8183f;
     rotation[3] = 0;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
-    rotation[2] = FastMatrixHelperA(ref_00307CC0_00.position.x-position[0], ref_00307CC0_00.position.y-position[1]);
+    rotation[2] = mat_fast_helper_a(ref_00307CC0_00.position.x-position[0], ref_00307CC0_00.position.y-position[1]);
     distance = vec_distance_xy(position, &ref_00307CC0_00.position);
-    rotation[1] = -FastMatrixHelperA(distance, ref_00307CC0_00.position.z-position[2]);
-    rotation[0] = RandomAngle();
+    rotation[1] = -mat_fast_helper_a(distance, ref_00307CC0_00.position.z-position[2]);
+    rotation[0] = math_random_angle();
     euler_to_matrix(matrix,rotation);
     FastVecSub(offset,&ref_00307CC0_00.position,position);
     vec_scale_to_length(offset,offset,0.25f);
@@ -1001,7 +1001,7 @@ void func_00307CC0(void *owner, float *position)
     matrix[3].y = position[1] + offset[1];
     matrix[3].z = position[2] + offset[2];
     matrix[3].w = 1.0f;
-    scale = RandomFloatRange(0.3f,0.4f);
+    scale = math_random_float_range(0.3f,0.4f);
     FastVecScale(&packet.position[0],&packet.position[0],scale);
     FastVecScale(&packet.position[1],&packet.position[1],scale);
     FastVecScale(&packet.position[2],&packet.position[2],scale);
@@ -1011,14 +1011,14 @@ void func_00307CC0(void *owner, float *position)
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x103080;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x103080;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
     FastVecScale(&packet.position[0],&packet.position[0],0.5f);
     FastVecScale(&packet.position[1],&packet.position[1],0.5f);
     FastVecScale(&packet.position[2],&packet.position[2],0.5f);
     FastVecScale(&packet.position[3],&packet.position[3],0.5f);
-    color = ((u32)RandomIntRange(64,127) << 24) + 0x7f7f7f;
+    color = ((u32)math_random_int_range(64,127) << 24) + 0x7f7f7f;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     draw_world_quad(&packet,matrix,0);
 }

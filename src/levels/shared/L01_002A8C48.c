@@ -1,71 +1,72 @@
+#include "names.h"
 /* Per-frame level update: the resident block through a pointer, the tail through fresh
    pointers (retail re-derives them from the kept %hi), the mode word as a macro load. */
 
 #include "common.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_L01_001A8F40 MACRO_ADDR;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern void func_L01_002A84D8(void);
+extern void hero_update_subsystems(void);
 extern void func_2C7CA8(void);
-extern void func_L00_002B36E0(void);
-extern void func_L01_002ADDC8(void);
-extern void func_L01_002AE128(char *a0, char *a1, char *a2);
-extern void func_L01_002C37C8(void);
+extern void UpdateHeroInputAndHistory(void);
+extern void hero_read_input_command_flags(void);
+extern void ProbeLedgeGrab(char *a0, char *a1, char *a2);
+extern void hero_l01_update_state_transitions(void);
 extern void func_2C8628(void);
-extern void func_L00_002D3068(void);
+extern void hero_clear_objects_flag_bit(void);
 extern void func_2AEB80(void);
 extern void func_2B9878(void);
-extern void func_L00_002AC1A0(void);
-extern void func_L00_002AB1D8(void);
-extern void func_L00_002AB420(void);
-extern void func_L00_002ABBA0(void);
-extern void func_L00_002AB948(void);
-extern void func_L00_002A5518(void);
-extern void func_L00_002A5840(void);
-extern void func_L00_002B7718(void);
+extern void UpdateHeroEasingTargetsAndPointEffects(void);
+extern void cam_update_blend_angles(void);
+extern void UpdateHeroPitchAndYawEasingTargets(void);
+extern void UpdateHeroAutoAimAngles(void);
+extern void UpdateHeroIdleRandomRotationTargets(void);
+extern void ClampHeroControlAndUpdateEffects(void);
+extern void UpdateHeroGlowAndExtraManipulators(void);
+extern void UpdateHeroTiltPoseTargets(void);
 extern void func_2A7740(void);
 extern void func_2AB028(void);
-extern void func_L00_002AA178(int a0);
-extern void func_L00_002B2120(void);
-extern void func_L00_002B2318(void);
-extern void func_L00_002B2200(void);
-extern void func_L00_002AFBC0(void);
-extern int func_L00_002D6418(void);
+extern void part_spawn_effect_from_record(int a0);
+extern void hero_update_items_and_flags(void);
+extern void hero_update_lock_on_weapon_fire(void);
+extern void hero_play_voice_line_for_progress(void);
+extern void hero_update_items_frame(void);
+extern int hero_is_action_allowed(void);
 extern void func_2A9520(void);
 extern void func_2A9310(void);
-extern void func_L00_002A67F8(void);
-extern void func_L00_002D5EB8(void);
-extern void func_L00_002A6420(void);
-extern void func_L00_002D5158(void);
-extern int func_L00_002A7000(void);
-extern void func_L00_003080D0(void *a0);
+extern void hero_update_stat_trackers(void);
+extern void hero_update_collection_progress(void);
+extern void hero_check_targeting_triggers(void);
+extern void UpdateHeroAimAndTransitions(void);
+extern int hero_is_in_swing_or_grind_mode(void);
+extern void coll_clear_map_bits_around_pos(void *a0);
 extern void func_30F444(int a0);
-extern void func_L01_002A9298(void);
+extern void weapon_update_equipped_effect(void);
 extern void func_2AB328(void);
 
 /* Runs one frame of the main game update: reads input, moves the hero and camera, and updates effects and menus. A shorter path is used when the game is in a special mode. */
-void func_L01_002A8C48(void) {
+void game_update_frame(void) {
     char *hero;
 
-    hero = gHeroState;
+    hero = g_hero_state;
     *(short *)(hero + 0x2162) = 0;
     *(short *)(hero + 0x2160) = 0;
     if (*(unsigned char *)(hero + 0x22B4) != 0) {
-        UpdateHeroSubsystems();
+        hero_update_subsystems();
         return;
     }
     func_2C7CA8();
     UpdateHeroInputAndHistory();
-    ReadHeroInputCommandFlags();
+    hero_read_input_command_flags();
     ProbeLedgeGrab(hero + 0x80, hero + 0x90, hero + 0x550);
-    UpdateHeroStateTransitions_L01();
+    hero_l01_update_state_transitions();
     if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
         if (*(unsigned char *)(hero + 0x22B5) != 0)
             func_2C8628();
         else
-            ClearHeroObjectsFlagBit();
+            hero_clear_objects_flag_bit();
         return;
     }
     func_2AEB80();
@@ -73,7 +74,7 @@ void func_L01_002A8C48(void) {
         return;
     func_2B9878();
     UpdateHeroEasingTargetsAndPointEffects();
-    UpdateCameraBlendAngles();
+    cam_update_blend_angles();
     UpdateHeroPitchAndYawEasingTargets();
     UpdateHeroAutoAimAngles();
     UpdateHeroIdleRandomRotationTargets();
@@ -82,31 +83,31 @@ void func_L01_002A8C48(void) {
     UpdateHeroTiltPoseTargets();
     func_2A7740();
     func_2AB028();
-    SpawnEffectFromRecord(0);
-    UpdateHeroItemsAndFlags();
-    UpdateHeroLockOnWeaponFire();
-    PlayHeroVoiceLineForProgress();
-    UpdateHeroItemsFrame();
-    if (*(unsigned char *)(hero + 0x22B5) != 0 || IsHeroActionAllowed() != 0)
+    part_spawn_effect_from_record(0);
+    hero_update_items_and_flags();
+    hero_update_lock_on_weapon_fire();
+    hero_play_voice_line_for_progress();
+    hero_update_items_frame();
+    if (*(unsigned char *)(hero + 0x22B5) != 0 || hero_is_action_allowed() != 0)
         func_2C8628();
     else
-        ClearHeroObjectsFlagBit();
+        hero_clear_objects_flag_bit();
     func_2A9520();
     func_2A9310();
-    UpdateHeroStatTrackers();
-    UpdateCollectionProgress();
-    CheckHeroTargetingTriggers();
+    hero_update_stat_trackers();
+    hero_update_collection_progress();
+    hero_check_targeting_triggers();
     UpdateHeroAimAndTransitions();
     {
-        char *heroBlock = gHeroState;
+        char *heroBlock = g_hero_state;
         if ((*(int *)(heroBlock + 0x229C) != 0x16 && *(int *)(heroBlock + 0x229C) != 0x1F
-             && *(int *)(heroBlock + 0x2294) != 0x31) || IsHeroInSwingOrGrindMode() != 0)
-            ClearMapBitsAroundPosition(gHeroPosition);
+             && *(int *)(heroBlock + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
+            coll_clear_map_bits_around_pos(g_hero_position);
     }
     {
-        char *heroBlock = gHeroState;
+        char *heroBlock = g_hero_state;
         func_30F444(*(int *)(heroBlock + 0x2290));
     }
-    UpdateEquippedWeaponEffect();
+    weapon_update_equipped_effect();
     func_2AB328();
 }

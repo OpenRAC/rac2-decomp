@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -11,7 +12,7 @@ extern int * volatile D_L00_001AA830 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L00_001C93A0;
 
 /* Fills the menu entry list from the saved item list and selects the entry that is currently chosen. */
-int func_L00_00354DF8(char *obj) {
+int menu_fill_entries_from_item_list(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

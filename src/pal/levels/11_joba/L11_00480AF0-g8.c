@@ -24,21 +24,21 @@ typedef struct JobaGroupMoby {
     char padB1[0xF];
     float target[4];        
 } JobaGroupMoby;
-extern char *D_L11_001B359C MACRO_ADDR;
-extern short *D_L11_001FC420[];
-extern int D_001A79F0;
+extern char *g_moby_l11_table MACRO_ADDR;
+extern short *g_group_id_lists[];
+extern int g_current_map_index;
 extern unsigned char D_0019B2E8[];
-extern unsigned char D_00188660[];
-extern int func_L00_00324120(void *moby);
-extern int func_002B38B8(void *moby);
-extern int func_002E5CF8(int sound, int mode, void *moby);
-extern void func_002E59F8(int handle);
-extern float *func_002AB1F0(void *moby);
-extern char *func_002A9640(void *moby, int mask, int arg);
-extern void func_00282F20(void *out, void *in, float length);
+extern unsigned char g_sound_state[];
+extern int hero_is_current_selected_id(void *moby);
+extern int flag_is_third_pending_set(void *moby);
+extern int PlayMobySound(int sound, int mode, void *moby);
+extern void snd_stop_voice(int handle);
+extern float *moby_get_private_value_0(void *moby);
+extern char *part_find_owned_effect_slot(void *moby, int mask, int arg);
+extern void vec_scale_to_length(void *out, void *in, float length);
 extern void func_PAL_002B15D8(void *moby, int a1, float f12, float f13, float f14, float f15, void *vec, int a3);
 extern void func_PAL_002AD288(void *moby, float f12, float f13, void *position, int a2);
-extern void func_0029F338(void *moby);
+extern void moby_mark_spawned(void *moby);
 #define GROUP_MEMBER(entry) ((JobaGroupMoby *)(D_L11_001B359C + (((entry) & 0x7FFF) << 8)))
 #define HIDE_MEMBER(m) { (m)->flags = ((m)->flags & 0xEFFF) | 0x43; (m)->update = 0; }
 #define ACTIVATE_MEMBER(m)                         \
@@ -66,14 +66,14 @@ extern void func_0029F338(void *moby);
 static __inline__ void FinishGroupMoby(float *vec, JobaGroupMoby *self) {
     func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
     func_PAL_002AD288(self, 1.0f, 13.0f, self->position, -1);
-    func_0029F338(self);
+    moby_mark_spawned(self);
 }
 
 /* Parent moby in vars[0], two member groups in vars[1] and vars[2], sound handle in vars[5]. */
 void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
     float vec[4];
     int *data = self->vars;
-    JobaGroupMoby *parent = (JobaGroupMoby *)(D_L11_001B359C + (data[0] << 8));
+    JobaGroupMoby *parent = (JobaGroupMoby *)(g_moby_l11_table + (data[0] << 8));
     short *list;
     char *event;
     float health;
@@ -86,24 +86,24 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
         HIDE_GROUP(2, 0xD07, 0xCF6, 0xCF5)
     }
     if (self->state == 1) {
-        if (func_L00_00324120(parent) || func_002B38B8(parent) ||
-            (D_0019B2E8[self->index + (D_001A79F0 << 4)] & 0x80)) {
+        if (hero_is_current_selected_id(parent) || flag_is_third_pending_set(parent) ||
+            (D_0019B2E8[self->index + (g_current_map_index << 4)] & 0x80)) {
             self->timer = 0;
             self->state = 2;
-            func_002E5CF8(1, 0, self);
+            PlayMobySound(1, 0, self);
             {
-                unsigned char *record = D_00188660 + data[5] * 0x70;
+                unsigned char *record = g_sound_state + data[5] * 0x70;
                 if (*(JobaGroupMoby **)(record + 0x88) != self || record[0x74] == 0) {
-                    data[5] = func_002E5CF8(2, 4, self);
+                    data[5] = PlayMobySound(2, 4, self);
                 }
             }
             {
                 short *entries;
-                if (data[1] == 255 || (entries = D_L11_001FC420[data[1]]) == 0) goto done;
+                if (data[1] == 255 || (entries = g_group_id_lists[data[1]]) == 0) goto done;
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
-                    health = *func_002AB1F0(m);
+                    health = *moby_get_private_value_0(m);
                     if (MEMBER_ALIVE(m) && m->type == 0xCF5) { m->active = 1; ACTIVATE_MEMBER(m); }
                     else if (MEMBER_ALIVE(m) && m->type == 0xCF6) { m->active = 1; ACTIVATE_MEMBER(m); }
                     else if (MEMBER_ALIVE(m) && m->type == 0xD07) { m->active = 1; ACTIVATE_MEMBER(m); }
@@ -111,7 +111,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
             }
             {
                 short *entries;
-                if (data[2] == 255 || (entries = D_L11_001FC420[data[2]]) == 0) goto done;
+                if (data[2] == 255 || (entries = g_group_id_lists[data[2]]) == 0) goto done;
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
@@ -123,17 +123,17 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
                 } while (*list++ >= 0);
             }
         }
-        event = func_002A9640(self, 0x10000, 0);
+        event = part_find_owned_effect_slot(self, 0x10000, 0);
         if (event) {
-            func_00282F20(vec, self->target, 0.50000006f);
+            vec_scale_to_length(vec, self->target, 0.50000006f);
             if ((*(JobaGroupMoby **)(event + 0x20))->type == 0xDD9) {
                 short *entries, *list;
-                func_002E5CF8(0, 0, self);
+                PlayMobySound(0, 0, self);
                 self->timer = 0;
                 self->slot = 255;
                 /* Each exit writes its calls out: jump2 shares only the last call between them. */
                 if (data[1] == 255) { FinishGroupMoby(vec, self); return; }
-                entries = D_L11_001FC420[data[1]];
+                entries = g_group_id_lists[data[1]];
                 if (entries == 0) { FinishGroupMoby(vec, self); return; }
                 list = entries;
                 do {
@@ -145,7 +145,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
                     }
                 } while (*list++ >= 0);
                 if (data[2] == 255) { FinishGroupMoby(vec, self); return; }
-                entries = D_L11_001FC420[data[2]];
+                entries = g_group_id_lists[data[2]];
                 if (entries == 0) { FinishGroupMoby(vec, self); return; }
                 list = entries;
                 do {
@@ -158,7 +158,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
                 } while (*list++ >= 0);
                 func_PAL_002AD288(self, 1.0f, 13.0f, self->position, -1);
                 func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
-                func_0029F338(self);
+                moby_mark_spawned(self);
                 return;
             }
             self->slot = 255;
@@ -169,9 +169,9 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
         self->position[2] += 0.18f;
         if (++self->timer > 60) {
             if (data[5] != -1) {
-                unsigned char *record = D_00188660 + data[5] * 0x70;
+                unsigned char *record = g_sound_state + data[5] * 0x70;
                 if (*(JobaGroupMoby **)(record + 0x88) == self && record[0x74]) {
-                    func_002E59F8(data[5]);
+                    snd_stop_voice(data[5]);
                 }
             }
             data[5] = -1;

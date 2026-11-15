@@ -2,7 +2,7 @@
 
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int ref_L04_00418A58_01;
 extern int D_00138320[];
 extern int ref_L04_00418A58_04[];
@@ -20,7 +20,7 @@ extern void ref_L04_00418A58_10(char *);
 extern float ref_L04_00418A58_12(char *, char *, char *, char *, int, int);
 
 /* Retargets the hero's entry state (clears its cached pointer record, scales both position records by a quarter), then refreshes each of the 21 linked object slots. */
-void func_L04_00418A58(char *obj, char *aux) {
+void hoverbike_update_rider_entry_state(char *obj, char *aux) {
     char *rec;
     char *e;
     int *slot;
@@ -35,14 +35,14 @@ void func_L04_00418A58(char *obj, char *aux) {
         }
         ref_L04_00418A58_00 = 0;
     }
-    FLD(gHeroState, int, 0x24A0) = 26;
+    FLD(g_hero_state, int, 0x24A0) = 26;
     ref_L04_00418A58_04[0] = 0;
-    FLD(gHeroState, u8, 0x22B7) = 1;
-    FLD(gHeroState, u8, 0x22B5) = 1;
-    FLD(FLD(gHeroState, char *, 0x2290), int, 0x98) = 0;
-    FLD(gHeroState, u8, 0x22C2) = 1;
+    FLD(g_hero_state, u8, 0x22B7) = 1;
+    FLD(g_hero_state, u8, 0x22B5) = 1;
+    FLD(FLD(g_hero_state, char *, 0x2290), int, 0x98) = 0;
+    FLD(g_hero_state, u8, 0x22C2) = 1;
     FLD(obj, float, 0x2C) = FLD(FLD(obj, char *, 0x24), float, 0x24) * 0.25f;
-    rec = FLD(gHeroState, char *, 0x2290);
+    rec = FLD(g_hero_state, char *, 0x2290);
     FLD(rec, float, 0x2C) = FLD(FLD(rec, char *, 0x24), float, 0x24) * 0.25f;
     ref_L04_00418A58_05(obj, aux);
     ref_L04_00418A58_06(obj, aux);

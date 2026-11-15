@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern void *func_0029EFD0(s32 class_id);
+extern void *CreateMoby(s32 class_id);
 extern void func_002A0F48(void *object);
 
 /* Partial object view; only the constructor's measured fields are described. */
@@ -20,7 +20,7 @@ typedef struct SpawnedObjectPrefix {
 } SpawnedObjectPrefix;
 
 /* Creates a new object of class 2439 at the parent's position and links it back to the parent. */
-void *func_L08_003D3D80(SpawnedObjectPrefix *parent)
+void *puff_spawn_linked_child(SpawnedObjectPrefix *parent)
 {
     SpawnedObjectPrefix *child = CreateMoby(0x987 /* moby class 2439 */);
     if (child != 0) {

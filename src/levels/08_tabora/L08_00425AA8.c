@@ -1,20 +1,20 @@
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
-extern int func_00283CF0(float);
-extern void func_L08_00425398(char *);
-extern float func_L08_0032EF80(void *, int, int, int, int);
-extern void func_L01_003377C8(void *);
-extern float func_L08_00425328(void *, float, float, float);
-extern int func_L08_003D3D80(void *);
-extern void func_0026FEB8(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
+extern int FloatToInt(float);
+extern void moby_update_ground_probe(char *);
+extern float coll_point_depth_in_volumes(void *, int, int, int, int);
+extern void path_l01_compute_segment_lengths(void *);
+extern float coll_find_ground_height_floor(void *, float, float, float);
+extern int puff_spawn_linked_child(void *);
+extern void STUB_printf(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
 extern int *D_L08_001FE7C0[];
 extern char D_L08_001B1BD0[];
 
 /* Fills the 0x68 context with its timing and animation defaults, sets the record's height from
    the sweep below it when the context has none, and updates the shared counters at +0x1F8..+0x200. */
-void func_L08_00425AA8(char *moby) {
+void hover_init_defaults(char *moby) {
     float probe[4];
     char *vars = *(char **)(moby + 0x68);
     float floorHeight;
@@ -23,7 +23,7 @@ void func_L08_00425AA8(char *moby) {
     *(u8 *)(vars + 0x29) = 1;
     qcopy(vars + 0x170, moby + 0x10);
     *(float *)(vars + 0x208) = *(float *)(moby + 0xF8);
-    UpdateGroundHeightProbe(moby);
+    moby_update_ground_probe(moby);
     if (*(u8 *)(moby + 0x21) != 255 && **(int **)(vars + 0x200) != 0x4CB2F) {
         **(int **)(vars + 0x1FC) = 0;
         **(int **)(vars + 0x1F8) = 0;
@@ -31,13 +31,13 @@ void func_L08_00425AA8(char *moby) {
     }
     *(u8 *)(vars + 0x20E) = *(u8 *)(moby + 0x30);
     *(Quad *)probe = *(Quad *)(moby + 0x10);
-    floorHeight = ComputePointDepthInVolumes(probe, *(int *)(vars + 0x1D0), -1, *(int *)(vars + 0x1D4), -1);
+    floorHeight = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D0), -1, *(int *)(vars + 0x1D4), -1);
     if (floorHeight > 0.0f) *(u8 *)(moby + 0x30) = FloatToInt(floorHeight + 2.0f);
     *(u8 *)(vars + 0x20E) = *(u8 *)(vars + 0x20F) = *(u8 *)(moby + 0x30);
     *(Quad *)probe = *(Quad *)(moby + 0x10);
-    floorHeight = ComputePointDepthInVolumes(probe, *(int *)(vars + 0x1D8), *(int *)(vars + 0x1E0), *(int *)(vars + 0x1DC), -1);
+    floorHeight = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D8), *(int *)(vars + 0x1E0), *(int *)(vars + 0x1DC), -1);
     if (floorHeight > 0.0f) *(u8 *)(vars + 0x20E) = FloatToInt(floorHeight + 2.0f);
-    if (*(int *)(vars + 0x1E4) != -1) ComputePathSegmentLengths_L01(D_L08_001FE7C0[*(int *)(vars + 0x1E4)]);
+    if (*(int *)(vars + 0x1E4) != -1) path_l01_compute_segment_lengths(D_L08_001FE7C0[*(int *)(vars + 0x1E4)]);
     *(u8 *)(vars + 0x60) = 5;
     *(int *)(vars + 0x98) = -1;
     *(u8 *)(vars + 0x61) = 8;
@@ -71,12 +71,12 @@ void func_L08_00425AA8(char *moby) {
     qcopy(vars + 0x180, moby + 0x10);
     qzero_nc(vars + 0x1A0);
     if (*(float *)(vars + 0x1C4) == 0.0f) {
-        float height = FindGroundHeightWithFloor(moby + 0x10, *(float *)(moby + 0x18) + 20.0f, *(float *)(vars + 0x90), *(float *)(vars + 0x90));
+        float height = coll_find_ground_height_floor(moby + 0x10, *(float *)(moby + 0x18) + 20.0f, *(float *)(vars + 0x90), *(float *)(vars + 0x90));
         *(float *)(vars + 0x1C4) = height;
         *(float *)(vars + 0x1C8) = height <= *(float *)(vars + 0x178) ? height : *(float *)(vars + 0x178);
     }
     if (*(float *)(vars + 0x1C4) > 0.0f) *(float *)(moby + 0x18) = *(float *)(vars + 0x1C4) - 0.5f;
-    *(int *)(vars + 0x22C) = SpawnLinkedChildMoby2439(moby);
+    *(int *)(vars + 0x22C) = puff_spawn_linked_child(moby);
     *(s16 *)(vars + 0x1BE) = 0;
     if (*(u8 *)(vars + 0x20C) == 1 || *(u8 *)(vars + 0x20C) == 4) {
         STUB_printf(D_L08_001B1BD0, *(s16 *)(moby + 0xB2), *(u8 *)(vars + 0x20C), *(u8 *)(vars + 0x20C) + 1);
@@ -84,8 +84,8 @@ void func_L08_00425AA8(char *moby) {
     }
     qcopy(vars + 0x170, moby + 0x10);
     *(u16 *)(moby + 0x34) &= 0xEFFF;
-    SetMobyState(moby, 1, -1);
-    if (*(u8 *)(moby + 0x43)) StartAnimationBlended(moby, 0, 0, 2);
+    moby_set_state(moby, 1, -1);
+    if (*(u8 *)(moby + 0x43)) anim_start_blended(moby, 0, 0, 2);
     *(int *)(moby + 0x98) = 0;
     *(u8 *)(moby + 0x31) = 0;
     *(u16 *)(moby + 0x34) |= 1;

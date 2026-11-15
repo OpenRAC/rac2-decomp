@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_00138344;
 typedef struct {
@@ -9,7 +10,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void func_L00_0030DA68(int);
+extern void level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_US2_L00_0034D8A0(void)
@@ -31,35 +32,35 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030DA68(flags);
+        level_l00_call_module_handler_with_arg_3(flags);
     return result;
 }
 
-extern void func_0027C540(int a);
-extern void func_0027C660(void);
-extern void func_L00_0030DAA8(void);
+extern void SetupGifPaging(int a);
+extern void DoGifPaging(void);
+extern void level_l00_call_module_handler_4(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_US2_L00_0034D928(void)
 {
-    func_0027C540(0);
-    func_L00_0030DAA8();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_4();
+    DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030D958(void);
+extern void level_l00_call_module_handler(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_US2_L00_0034D9F8(void)
 {
-    func_0027C540(0);
-    func_L00_0030D958();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler();
+    DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030D988(int);
+extern void level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_US2_L00_0034DA28(void)
@@ -81,20 +82,20 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030D988(flags);
+        level_l00_call_module_handler_with_arg(flags);
     return result;
 }
 
 extern void func_0027C540_5(long);
 extern void func_0027C660_5(void);
-extern void func_L00_0030D9C8(void);
+extern void level_l00_call_module_handler_2(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Implementation matching decompiled output */
 long func_US2_L00_0034DAB0(void)
 {
   func_0027C540_5(0);
-  func_L00_0030D9C8();
+  level_l00_call_module_handler_2();
   func_0027C660_5();
   return 0;
 }

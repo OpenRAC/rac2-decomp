@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,11 +26,11 @@
 
 extern s8 D_00222AE0[];
 extern s8 D_002222E0[];
-extern s8 D_00189EA0[];
-extern s32 func_002ACBC8(s32 noisePtr, s32 index);
+extern s8 g_hero_position[];
+extern s32 IsPointInCuboid(s32 noisePtr, s32 index);
 
 /* Sets the height of each surface grid point from its base height plus the wave noise. */
-void func_00303AC8(void *object) {
+void surface_grid_update_heights(void *object) {
     void *state;
     s32 index;
     s32 flags;
@@ -41,7 +42,7 @@ void func_00303AC8(void *object) {
 
     state = (*(void **)((s8 *)(object) + (0x68)));
     index = (*(s32 *)((s8 *)(state) + (0x44)));
-    if (index != -1 && IsPointInCuboid((s32)gHeroPosition, index) != 0 && !((*(u32 *)((s8 *)(state) + (0x4C))) & 4)) {
+    if (index != -1 && IsPointInCuboid((s32)g_hero_position, index) != 0 && !((*(u32 *)((s8 *)(state) + (0x4C))) & 4)) {
         tableOffset = (*(s32 *)((s8 *)(state) + (0x40))) << 10;
         tablePtr = (s8 *)D_00222AE0;
         tablePtr += 8;

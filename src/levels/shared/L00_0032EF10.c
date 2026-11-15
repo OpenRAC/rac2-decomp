@@ -8,19 +8,19 @@ typedef struct {
     s32 ring[30];
 } History;
 
-extern History D_00138180;
+extern History g_pad_state;
 
 /* walks the 30-entry history ring back from its head (at most arg1 entries) and returns the
    first entry's mask bits, storing how far back it was */
-s32 func_L00_0032EF10(u32 mask, s32 arg1, s32 *out)
+s32 PadPressedWithin(u32 mask, s32 arg1, s32 *out)
 {
-    s32 n = gPadState.count;
+    s32 n = g_pad_state.count;
     s32 i;
 
     if (n >= arg1)
         n = arg1;
     for (i = 1; i < n + 1; i++) {
-        s32 *p = &gPadState.ring[(gPadState.head - i + 30) % 30];
+        s32 *p = &g_pad_state.ring[(g_pad_state.head - i + 30) % 30];
 
         if ((*p & mask) != 0) {
             if (out != 0)

@@ -1,3 +1,4 @@
+#include "names.h"
 /* A unit of its own for -frac2-gcse-unsplit-edges (config/cflags.txt): PRE then hoists the high
    half of each re-read address into the block above the first test, as func_0029DDC0 does with
    its bytes. Read both values at every test: the retail rebuilds the low half at each one. */
@@ -20,7 +21,7 @@ extern unsigned short ref_L00_0030EDB0_00;
 #define WORD (((Word_29DD30 *)D_00139768)->value)
 
 /* Checks two status values, sets a sound or text id to match, and returns 0, 1 or 2 for the combination. */
-int func_0029DD30(void)
+int menu_select_status_id_from_values(void)
 {
     if (FLAG == 0 && WORD >= 0) {
         ref_L00_0030EDB0_00 = 0x1F;

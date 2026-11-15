@@ -86,22 +86,22 @@ typedef struct {
 } HopSavedState;
 extern unsigned char D_L03_001B9840[];
 #define HOP_SAVED (*(HopSavedState *)D_L03_001B9840)
-extern void func_L00_002B54F8(float, float);
-extern void func_L00_002B41B8(float, float);
-extern void func_L00_002D3BD8(float, void *, void *);
-extern void func_L00_002D3798(void *, void *, float);
-extern void func_L00_002B3EF8(float, float, float, int);
-extern void func_L01_002B6948(float);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_L00_002D3B58(float, void *, void *);
-extern float func_00283C80(float, float);
-extern float func_002AA898(float *, float *, int, float, float, float, float);
-extern float func_00283BE0(float, float);
-extern void func_L00_002AA0F0(float, float, float);
-extern float func_L00_002D3A58(void *);
+extern void hero_build_move_impulse(float, float);
+extern void hero_approach_speed(float, float);
+extern void cam_set_view_space_vector_length(float, void *, void *);
+extern void cam_offset_point_by_side_direction(void *, void *, float);
+extern void hero_steer_heading(float, float, float, int);
+extern void hero_approach_velocity(float);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void cam_set_view_space_height(float, void *, void *);
+extern float FastDiffRots(float, float);
+extern float math_approach_with_velocity(float *, float *, int, float, float, float, float);
+extern float fast_subtract_rotations(float, float);
+extern void hero_start_pose_offset(float, float, float);
+extern float cam_get_view_space_vector_length(void *);
 
 /* Object (moby) header: its state pointer and class id. */
 typedef struct {
@@ -134,12 +134,12 @@ typedef struct {
 
 /* Particle emitter inputs; the two register banks retain their EE argument order. */
 extern float D_L03_001A8F20[] __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern Particle *func_002BDCE8(void *, float, float, float, int, void *, float, unsigned int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, unsigned int, int);
 
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
@@ -183,7 +183,7 @@ extern float func_2EF670(float, float);
 /* func_L03_002ADC00 is in its dedicated zero-vector profile unit. */
 
 /* Copies a value from the hero into the object the hero is holding, when the hero has one. */
-void func_L03_002ADCA0(void) {
+void hero_copy_value_to_held_object(void) {
     unsigned char *hero = D_L03_00189E20;
 
     if (*(short *)(hero + 0x6BC) != 0 && *(int *)(hero + 0x660) == 0)
@@ -191,12 +191,12 @@ void func_L03_002ADCA0(void) {
 }
 
 
-extern float func_002AA2E8(float *, float, float);
-extern void func_002AA3A8(float *, float *, float, float, float, float);
-extern float func_00282E80(void *, void *);
+extern float ApproachValue(float *, float, float);
+extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float vec_distance_xy(void *, void *);
 
 /* Picks target values for the hero's camera settings from the hero's state, then eases the current values toward them. */
-void func_L03_002B8D10(void) {
+void cam_update_hero_targets(void) {
     switch (D_L03_00189E20[0x22B4]) {
     case 0:
         *(float *)(D_L03_00189E20 + 0x258) = 0.8f;
@@ -231,17 +231,17 @@ void func_L03_002B8D10(void) {
         unsigned char *hero = D_L03_00189E20;
         ApproachValue(values, *(float *)(hero + 0x258), 0.02f);
         ApproachValue(values + 1, *(float *)(hero + 0x25C), 0.02f);
-        SpringFloatToGoal(values + 5, values + 6, *(float *)(hero + 0x260), 0.02f, 0.3f, 0.06666667f);
+        math_spring_float_to_goal(values + 5, values + 6, *(float *)(hero + 0x260), 0.02f, 0.3f, 0.06666667f);
     }
 }
 
 /* Per-state airborne steering of the player: velocity, facing and speed targets. */
-void func_L03_002BC430(void) {
+void HeroUpdateHopVelocity(void) {
     HopVector temp;
     float step, scale;
 
     if (HOP_PLAYER.state == 10) {
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy(&HOP_PLAYER.field_160, &HOP_PLAYER.field_A60);
         HOP_PLAYER.field_1B4 = HOP_PLAYER.field_174;
         return;
@@ -254,16 +254,16 @@ void func_L03_002BC430(void) {
             HOP_PLAYER.field_1B0 = HOP_PLAYER.field_454;
         else
             HOP_PLAYER.field_1B0 = 0.05833333730697632f;
-        ApproachHeroSpeed(0.012222222983837128f, 0.0125f);
-        SetViewSpaceVectorLength(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
-        OffsetPointBySideDirection(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, HOP_PLAYER.field_1B4);
+        hero_approach_speed(0.012222222983837128f, 0.0125f);
+        cam_set_view_space_vector_length(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
+        cam_offset_point_by_side_direction(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, HOP_PLAYER.field_1B4);
         return;
     }
 
     if (HOP_PLAYER.state == 0x1B) {
         if (HOP_PLAYER.state_time > 0x28) {
-            SteerHeroHeading(0.04f, 0.2f, 0.2501639127731323f, 0);
-            ApproachHeroVelocity_L01(0.0055555556900799274f);
+            hero_steer_heading(0.04f, 0.2f, 0.2501639127731323f, 0);
+            hero_approach_velocity(0.0055555556900799274f);
         }
         if (HOP_PLAYER.anim_time >= 13.0f && HOP_PLAYER.anim_time <= 30.0f) {
             if (HOP_PLAYER.anim_time > 27.0f)
@@ -295,7 +295,7 @@ void func_L03_002BC430(void) {
     if (HOP_PLAYER.state == 0xB) {
         HOP_PLAYER.facing_angle = HOP_PLAYER.field_4C4;
         qcopy(&HOP_PLAYER.field_190, &HOP_PLAYER.field_480);
-        SteerHeroHeading(0.04f, 0.2f, 0.116355299949646f, 0);
+        hero_steer_heading(0.04f, 0.2f, 0.116355299949646f, 0);
         if (HOP_PLAYER.field_4D4 != 3)
             HOP_PLAYER.field_1B4 = HOP_PLAYER.field_4D8;
         else
@@ -313,22 +313,22 @@ void func_L03_002BC430(void) {
                 ApproachValue(&HOP_PLAYER.field_4DC, 0.07f, 0.002222222276031971f);
         }
         if (!HOP_PLAYER.field_22C3) {
-            HOP_PLAYER.vel_x = FastSinOrCosA(HOP_PLAYER.field_4C0);
+            HOP_PLAYER.vel_x = math_fast_sin_or_cos_a(HOP_PLAYER.field_4C0);
             HOP_PLAYER.vel_x *= HOP_PLAYER.field_4DC;
-            HOP_PLAYER.vel_y = FastSinOrCosB(HOP_PLAYER.field_4C0);
+            HOP_PLAYER.vel_y = math_fast_sin_or_cos_b(HOP_PLAYER.field_4C0);
             HOP_PLAYER.vel_y *= HOP_PLAYER.field_4DC;
         } else {
-            SetViewSpaceVectorLength(HOP_PLAYER.field_4DC, &temp, &HOP_PLAYER.field_470);
-            SetViewSpaceHeight(0.0f, &temp, &temp);
-            SetViewSpaceVectorLength(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
+            cam_set_view_space_vector_length(HOP_PLAYER.field_4DC, &temp, &HOP_PLAYER.field_470);
+            cam_set_view_space_height(0.0f, &temp, &temp);
+            cam_set_view_space_vector_length(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
             FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
         }
         if (!HOP_PLAYER.field_22C3 && !HOP_PLAYER.field_52D) {
-            scale = HOP_PLAYER.field_4D8 * FastSinOrCosB(FastDiffRots(HOP_PLAYER.field_4C4, HOP_PLAYER.field_4C0));
-            HOP_PLAYER.vel_x += FastSinOrCosA(HOP_PLAYER.field_4C4) * scale;
-            HOP_PLAYER.vel_y += FastSinOrCosB(HOP_PLAYER.field_4C4) * scale;
+            scale = HOP_PLAYER.field_4D8 * math_fast_sin_or_cos_b(FastDiffRots(HOP_PLAYER.field_4C4, HOP_PLAYER.field_4C0));
+            HOP_PLAYER.vel_x += math_fast_sin_or_cos_a(HOP_PLAYER.field_4C4) * scale;
+            HOP_PLAYER.vel_y += math_fast_sin_or_cos_b(HOP_PLAYER.field_4C4) * scale;
         }
-        BuildHeroMoveImpulse(0.7f, 0.0f);
+        hero_build_move_impulse(0.7f, 0.0f);
         qcopy(&HOP_PLAYER.field_160, &HOP_PLAYER.field_A60);
         return;
     }
@@ -337,13 +337,13 @@ void func_L03_002BC430(void) {
         HOP_PLAYER.facing_angle = HOP_PLAYER.field_4F0.f.w;
         qcopy(&HOP_PLAYER.field_190, &HOP_PLAYER.field_4F0);
         if (HOP_PLAYER.state_time > 9)
-            SteerHeroHeading(0.041999999433755875f, 0.2f, 0.1978040188550949f, -1);
+            hero_steer_heading(0.041999999433755875f, 0.2f, 0.1978040188550949f, -1);
         if (HOP_PLAYER.state_time > 8) {
             if (!HOP_PLAYER.field_348) {
-                HOP_PLAYER.vel_x = FastSinOrCosA(HOP_PLAYER.facing_angle) * 0.08166667073965073f;
-                HOP_PLAYER.vel_y = FastSinOrCosB(HOP_PLAYER.facing_angle) * 0.08166667073965073f;
+                HOP_PLAYER.vel_x = math_fast_sin_or_cos_a(HOP_PLAYER.facing_angle) * 0.08166667073965073f;
+                HOP_PLAYER.vel_y = math_fast_sin_or_cos_b(HOP_PLAYER.facing_angle) * 0.08166667073965073f;
             } else {
-                SetViewSpaceVectorLength(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
+                cam_set_view_space_vector_length(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
                 vec_scale_to_length(&temp, &HOP_PLAYER.field_190, 0.08166667073965073f);
                 FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
             }
@@ -353,7 +353,7 @@ void func_L03_002BC430(void) {
     }
 
     if (HOP_PLAYER.state == 0x81 && !D_L03_001A8FF0[0]) {
-        SteerHeroHeading(0.04f, 0.2f, HOP_PLAYER.field_494, 0);
+        hero_steer_heading(0.04f, 0.2f, HOP_PLAYER.field_494, 0);
         HOP_PLAYER.field_1B4 = 0.0f;
         return;
     }
@@ -362,10 +362,10 @@ void func_L03_002BC430(void) {
         float angle = HOP_PLAYER.rot_z;
         float delta;
 
-        HOP_PLAYER.field_1A8 = ApproachWithVelocity(&angle, &HOP_PLAYER.field_1A4, 0, HOP_PLAYER.facing_angle,
+        HOP_PLAYER.field_1A8 = math_approach_with_velocity(&angle, &HOP_PLAYER.field_1A4, 0, HOP_PLAYER.facing_angle,
                                              0.017999999225139618f, 0.2f, 0.12217307090759277f);
         delta = fast_subtract_rotations(angle, HOP_PLAYER.rot_z);
-        StartHeroPoseOffset(0.0f, 0.0f, delta);
+        hero_start_pose_offset(0.0f, 0.0f, delta);
     } else {
         float oldAngle = HOP_PLAYER.facing_angle;
 
@@ -374,7 +374,7 @@ void func_L03_002BC430(void) {
             HOP_PLAYER.facing_angle = HOP_SAVED.angle;
             qcopy(&HOP_PLAYER.field_190, &HOP_SAVED.basis);
         }
-        SteerHeroHeading(0.04f, 0.2f, HOP_PLAYER.field_494, 0);
+        hero_steer_heading(0.04f, 0.2f, HOP_PLAYER.field_494, 0);
         if (HOP_PLAYER.field_1454) {
             HOP_PLAYER.field_1458 = oldAngle;
             qcopy(&HOP_PLAYER.field_1440, &temp);
@@ -383,17 +383,17 @@ void func_L03_002BC430(void) {
         }
     }
 
-    BuildHeroMoveImpulse(0.7f, 0.0f);
+    hero_build_move_impulse(0.7f, 0.0f);
     qcopy(&HOP_PLAYER.field_160, &HOP_PLAYER.field_A60);
 
     step = 0.0055555556900799274f;
     if (HOP_PLAYER.field_1B0 < D_L03_001A7DC0[0] * 0.0033333336468786f) {
         if (HOP_PLAYER.field_229C == 2) {
             float brake = HOP_PLAYER.field_A84;
-            float angle = GetViewSpaceVectorLength(&HOP_PLAYER.vel_x);
+            float angle = cam_get_view_space_vector_length(&HOP_PLAYER.vel_x);
 
             ApproachValue(&angle, 0.0f, brake);
-            SetViewSpaceVectorLength(angle, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
+            cam_set_view_space_vector_length(angle, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
             return;
         }
         if (HOP_PLAYER.field_34A)
@@ -402,7 +402,7 @@ void func_L03_002BC430(void) {
             step = HOP_PLAYER.field_524 ? 0.0005555555690079927f : 0.002222222276031971f;
     }
 
-    ApproachHeroVelocity_L01(step);
+    hero_approach_velocity(step);
 }
 
 #undef HOP_PLAYER
@@ -411,7 +411,7 @@ void func_L03_002BC430(void) {
 /* rac1-decomp src/overlays/shared/camera_001FC308.c: func_L02_001FC308 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay/camera/001fc008.c, FUN_L02_001fc008. */
 /* Remembers an id in a list of up to 16, unless it is already there. */
-void func_L03_002D84F0(int id) {
+void register_camera_update_callback(int id) {
     int i;
 
     if (r1_D_L02_0015F04C < 16) {
@@ -431,7 +431,7 @@ ASM_FUNC("asm/levels", func_L03_002EFB60);
 
 
 /* Emits two particle groups scaled by the object's transformed basis length. */
-void func_L03_00326458(Moby *object)
+void EmitScaledObjectParticles(Moby *object)
 {
     float matrix[16], point[4], velocity[4];
     float weight, radius, energy;
@@ -440,7 +440,7 @@ void func_L03_00326458(Moby *object)
     if ((type != 0x2EE /* moby class 750 */ && type != 0xCE0 /* moby class 3296 */) || object == 0)
         return;
 
-    TransformMobyJointPoint(object, 0, matrix);
+    moby_transform_joint_point(object, 0, matrix);
     weight = FastVecLength(matrix) * 0.9746588468551636f;
     if (weight > 1.0f)
         weight = 1.0f;
@@ -464,8 +464,8 @@ void func_L03_00326458(Moby *object)
             Particle *particle;
             int spin;
 
-            spin = RandomIntBelow(16);
-            if (RandomIntBelow(2))
+            spin = math_random_int_below(16);
+            if (math_random_int_below(2))
                 spin = -spin;
             particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 0.75f, spin, D_L03_001A8F20, energy, 0x503030FF, 0);
             if (particle != 0) {
@@ -506,7 +506,7 @@ void func_L03_00326458(Moby *object)
                     ParticlePayload *payload = &particle->payload;
 
                     particle->life.duration = duration;
-                    particle->variation = RandomIntBelow(255);
+                    particle->variation = math_random_int_below(255);
                     payload->mode = mode;
                     payload->alpha = alpha;
                     payload->alpha_copy = particle->life.duration_lo;
@@ -524,7 +524,7 @@ void func_L03_00326458(Moby *object)
 /* func_L03_00339128 is defined in L03_00339128-qcopy.c. */
 
 /* Starts an effect only when the entry is in use and the check on it passes. */
-void func_L03_00339268(unsigned char *effect) {
+void part_start_effect_if_active(unsigned char *effect) {
     if (*(short *)(effect + 0xA) == -1)
         return;
     if (func_2EEC20(effect + 0xA) == 0)
@@ -539,7 +539,7 @@ void func_L03_00339268(unsigned char *effect) {
 
 
 /* Sets up an effect record with the same value in its first four slots and default scales. */
-void func_L03_0038B390(unsigned char *effect, int paramA, int paramB, int fillValue) {
+void part_l03_init_effect_record(unsigned char *effect, int paramA, int paramB, int fillValue) {
     unsigned char *record = effect;
     int value = fillValue;
 
@@ -559,9 +559,9 @@ void func_L03_0038B390(unsigned char *effect, int paramA, int paramB, int fillVa
     *(long long *)(record + 0x70) = 5;
 }
 
-extern void func_L03_0038B2E8(void *, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void vec_average_list(void *, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern float (*D_L03_001FE700[])[4];
 
 /* Effect state hung off an object: four vertex-table indices, a vertex count and an offset. */
@@ -585,7 +585,7 @@ void func_L03_0038B408(Moby *object)
     for (i = 0; i < 4; i++) {
         vertices = table[state->groups[i]];
         if (vertices != 0) {
-            AverageVectorList(center, vertices, state->count);
+            vec_average_list(center, vertices, state->count);
             for (j = 0; j < state->count; j++) {
                 FastVecSub(vertices + j + 1, vertices + j + 1, center);
                 FastVecAdd(vertices + j + 1, vertices + j + 1, state->offset);
@@ -598,7 +598,7 @@ void func_L03_0038B408(Moby *object)
 
 
 /* Fires a trigger on the object when the hero is standing close to it. */
-void func_L03_00393228(unsigned char *object) {
+void moby_trigger_when_hero_near(unsigned char *object) {
     unsigned char *hero = D_L03_00189E20;
 
     if (*(unsigned char *)(hero + 0x22B4) == 0)
@@ -608,21 +608,21 @@ void func_L03_00393228(unsigned char *object) {
 
 
 /* Returns true when the object is in state 1. */
-int func_L03_003A4978(unsigned char *object) { return object[0x20] == 1; }
+int moby_l03_is_state_one(unsigned char *object) { return object[0x20] == 1; }
 
 
 
-float func_L03_003C5AB8(unsigned char *);
+float bot_compute_speed_from_turn(unsigned char *);
 
 /* Asks where a bot should go next and moves it that way, returning the result of the check. */
-int func_L03_003C41B8(unsigned char *object, int index, int useExtra) {
+int bot_move_toward_waypoint(unsigned char *object, int index, int useExtra) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float extra = 0.0f;
     float out;
     int result;
 
     if (useExtra != 0)
-        extra = ComputeBotSpeedFromTurn(object);
+        extra = bot_compute_speed_from_turn(object);
     result = func_419B10(*(void **)(state + 0x220), object + 0x10, index, &out, state + 0x368, state + 0x36C, extra,
                     *(float *)(state + 0x110));
     func_32D0F0(object, index, out);
@@ -640,15 +640,15 @@ int func_L03_003C41B8(unsigned char *object, int index, int useExtra) {
 
 /* func_L03_003C4A10 is defined in L03_002AB5C8-g8.c (it reads $gp data). */
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern float func_002A78D8(float, float);
+extern float math_random_signed_float_range(float, float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* The level's own copy of the object's tilt routine (func_L03_003C4A10), at another address
    in every level that has it. */
@@ -658,27 +658,27 @@ extern void ref_L03_003C4BD8_00(unsigned char *, void *);
 extern char D_L00_00189F00[];
 
 /* Every so often picks a new random head tilt for the bot, or makes it look toward a fixed point. */
-void func_L03_003C4BD8(unsigned char *object) {
+void bot_update_head_tilt(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float tiltYaw;
     float tiltPitch;
     int lookAtPoint;
 
-    if (FastFloatHelperD(state + 0x384) != 0) {
+    if (math_fast_float_d(state + 0x384) != 0) {
         if (object[0x95] == 2) {
-            *(float *)(state + 0x388) = RandomSignedFloatRange(5.0f, 60.0f) * 0.017453294f;
-            *(float *)(state + 0x38C) = RandomFloatRange(-20.0f, 0.0f) * 0.017453294f;
-            *(int *)(state + 0x384) = RandomIntRange(30, 45);
+            *(float *)(state + 0x388) = math_random_signed_float_range(5.0f, 60.0f) * 0.017453294f;
+            *(float *)(state + 0x38C) = math_random_float_range(-20.0f, 0.0f) * 0.017453294f;
+            *(int *)(state + 0x384) = math_random_int_range(30, 45);
             *(int *)(state + 0x390) = 0;
         } else {
-            *(float *)(state + 0x388) = RandomSignedFloatRange(5.0f, 20.0f) * 0.017453294f;
-            *(float *)(state + 0x38C) = RandomFloatRange(-15.0f, 5.0f) * 0.017453294f;
-            lookAtPoint = (RandomIntBelow(4) == 0);
+            *(float *)(state + 0x388) = math_random_signed_float_range(5.0f, 20.0f) * 0.017453294f;
+            *(float *)(state + 0x38C) = math_random_float_range(-15.0f, 5.0f) * 0.017453294f;
+            lookAtPoint = (math_random_int_below(4) == 0);
             *(int *)(state + 0x390) = lookAtPoint;
             if (lookAtPoint) {
-                *(int *)(state + 0x384) = RandomIntRange(180, 300);
+                *(int *)(state + 0x384) = math_random_int_range(180, 300);
             } else {
-                *(int *)(state + 0x384) = RandomIntRange(60, 120);
+                *(int *)(state + 0x384) = math_random_int_range(60, 120);
             }
         }
     }
@@ -713,18 +713,18 @@ typedef struct {
     unsigned int ref220;
 } L03GroupState;
 
-extern unsigned int func_L03_004197A8(unsigned char *);
+extern unsigned int moby_get_count_in_state_two(unsigned char *);
 
-extern int func_L03_00419BD8(unsigned int, void *, void *);
+extern int route_check_points(unsigned int, void *, void *);
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 /* Returns the entity nearest to the object, within 15.0, among its eight groups, that has bit 12
    of its flags at 0x34 set, a value of 5 at 0x46 of the record at 0x24, a height (at 0x18)
    within 1.5 of the object's and that func_L03_00419BD8 accepts, or 0. */
-unsigned char *func_L03_003C4D40(unsigned char *object) {
+unsigned char *moby_find_nearest_tilt_target(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
     unsigned short *idList;
     unsigned char *entity;
@@ -747,8 +747,8 @@ unsigned char *func_L03_003C4D40(unsigned char *object) {
                 continue;
             if (*(unsigned short *)(entity + 0x34) & 0x1000) {
                 if (*(short *)(*(unsigned char **)(entity + 0x24) + 0x46) == 5) {
-                    if (FloatAbs(*(float *)(object + 0x18) - *(float *)(entity + 0x18)) < 1.5f) {
-                        if (CheckPointsOnRouteGraph(vars->ref220, object + 0x10, entity + 0x10)) {
+                    if (math_fabs(*(float *)(object + 0x18) - *(float *)(entity + 0x18)) < 1.5f) {
+                        if (route_check_points(vars->ref220, object + 0x10, entity + 0x10)) {
                             distance = vec_distance_xy(object + 0x10, entity + 0x10);
                             if (distance < bestDistance) {
                                 bestDistance = distance;
@@ -765,7 +765,7 @@ unsigned char *func_L03_003C4D40(unsigned char *object) {
 
 /* Returns the entity of class 0xEF9 nearest to the object, within 15.0, among its eight groups
    (func_L03_004197A8 and func_L03_00419BD8 must both accept it), or 0. */
-unsigned char *func_L03_003C4F58(unsigned char *object) {
+unsigned char *moby_find_nearest_entity_a(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
     unsigned short *idList;
     unsigned char *entity;
@@ -783,8 +783,8 @@ unsigned char *func_L03_003C4F58(unsigned char *object) {
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0xEF9 /* moby class 3833 */) {
-                if (GetCountInState2(entity)) {
-                    if (CheckPointsOnRouteGraph(vars->ref220, object + 0x10, entity + 0x10)) {
+                if (moby_get_count_in_state_two(entity)) {
+                    if (route_check_points(vars->ref220, object + 0x10, entity + 0x10)) {
                         distance = vec_distance_xy(object + 0x10, entity + 0x10);
                         if (distance < bestDistance) {
                             bestDistance = distance;
@@ -798,14 +798,14 @@ unsigned char *func_L03_003C4F58(unsigned char *object) {
     return best;
 }
 
-extern unsigned int func_L03_003CAAC8(unsigned char *, unsigned char *);
+extern unsigned int moby_check_against_stored_value(unsigned char *, unsigned char *);
 
 /* Returns the first entity of class 0x97A, in the object's eight groups, that
    func_L03_003CAAC8 finds near the object or near the player, or 0. The group table is reached
    through a local pointer: with its address computed once outside the loops, the walk's other
    constants (0x97A, 0xFF, the player's address) all fit loop.c's budget for moving invariants
    out of the walk, as in retail. */
-unsigned char *func_L03_003C5128(unsigned char *object) {
+unsigned char *moby_find_entity_nearby(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
     unsigned short **groupTable = D_L03_001FB5A0;
     unsigned short *idList;
@@ -821,9 +821,9 @@ unsigned char *func_L03_003C5128(unsigned char *object) {
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0x97A /* moby class 2426 */) {
-                if (CheckMobyAgainstStoredValue(entity, object + 0x10))
+                if (moby_check_against_stored_value(entity, object + 0x10))
                     return entity;
-                if (CheckMobyAgainstStoredValue(entity, D_L03_00189E20 + 0x80))
+                if (moby_check_against_stored_value(entity, D_L03_00189E20 + 0x80))
                     return entity;
             }
         }
@@ -831,11 +831,11 @@ unsigned char *func_L03_003C5128(unsigned char *object) {
     return 0;
 }
 
-extern int func_L03_003CA138(unsigned char *);
+extern int moby_is_first_state(unsigned char *);
 
 /* Returns the entity of class 0xE87 or 0xE88 in state 1 nearest to the object, within 14.0,
    among its eight groups, or 0. */
-unsigned char *func_L03_003C52D0(unsigned char *object) {
+unsigned char *moby_find_nearest_entity_b(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
     unsigned short *idList;
     unsigned char *entity;
@@ -853,7 +853,7 @@ unsigned char *func_L03_003C52D0(unsigned char *object) {
             if (entity == 0)
                 break;
             if (*(unsigned short *)(entity + 0xAA) == 0xE87 /* moby class 3719 */ || *(unsigned short *)(entity + 0xAA) == 0xE88 /* moby class 3720 */) {
-                if (IsMobyInState1_L03(entity)) {
+                if (moby_is_first_state(entity)) {
                     distance = vec_distance_xy(object + 0x10, entity + 0x10);
                     if (distance < bestDistance) {
                         bestDistance = distance;
@@ -866,13 +866,13 @@ unsigned char *func_L03_003C52D0(unsigned char *object) {
     return best;
 }
 
-extern int func_L03_003CA280(unsigned char *);
+extern int moby_is_in_state_one(unsigned char *);
 
 /* Returns the entity of class 0xB10, or of class 0xF4D that func_L03_003CA280 accepts (state 1),
    nearest to the object, within 10.0, among its eight groups (entities in state 0xFE or 0xFD are
    skipped), or 0. The group table goes through a local pointer, as in func_L03_003C5128: that is
    what leaves 0xFE out of loop.c's budget for hoisting the walk's constants, as in retail. */
-unsigned char *func_L03_003C5488(unsigned char *object) {
+unsigned char *moby_find_nearest_pickup_target(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
     unsigned short **groupTable = D_L03_001FB5A0;
     unsigned short *idList;
@@ -897,7 +897,7 @@ unsigned char *func_L03_003C5488(unsigned char *object) {
                 continue;
             classId = *(short *)(entity + 0xAA);
             if (classId == 0xB10 /* moby class 2832 */ || classId == 0xF4D /* moby class 3917 */) {
-                if (classId == 0xF4D && IsMobyInFirstState(entity) == 0)
+                if (classId == 0xF4D && moby_is_in_state_one(entity) == 0)
                     continue;
                 distance = vec_distance_xy(object + 0x10, entity + 0x10);
                 if (distance < bestDistance) {
@@ -910,11 +910,11 @@ unsigned char *func_L03_003C5488(unsigned char *object) {
     return best;
 }
 
-extern int func_00277258(void *, int, void *, float);
+extern int coll_test_point(void *, int, void *, float);
 
-extern float func_002A89A8(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
 typedef struct {
     unsigned char pad0[0x200];
@@ -927,7 +927,7 @@ typedef struct {
 /* Picks the object's target or a nearer reachable entity (type 0x972) from its eight groups,
    then copies that entity's position to a1 (height set by func_002A89A8) and its 0xF0 vector
    to a2. */
-void func_L03_003C5668(unsigned char *object, float *outPosition, float *outForward) {
+void ChooseVisibleGroupTarget(unsigned char *object, float *outPosition, float *outForward) {
     L03SeekState *vars = *(L03SeekState **)(object + 0x68);
     unsigned char *chosen;
     unsigned char *reachable;
@@ -941,7 +941,7 @@ void func_L03_003C5668(unsigned char *object, float *outPosition, float *outForw
 
     bestDistance = fast_vec_dist(object + 0x10, vars->target + 0x10);
     chosen = vars->target;
-    if (CheckPointsOnRouteGraph(vars->ref220, object + 0x10, chosen + 0x10))
+    if (route_check_points(vars->ref220, object + 0x10, chosen + 0x10))
         reachable = vars->target;
     else
         reachable = 0;
@@ -958,9 +958,9 @@ void func_L03_003C5668(unsigned char *object, float *outPosition, float *outForw
                 if (distance < bestDistance) {
                     qcopy(lifted, entity + 0x10);
                     lifted[2] += 1.0f;
-                    if (TestPointAgainstCollision(lifted, 0, object, 0.5f) == 0) {
+                    if (coll_test_point(lifted, 0, object, 0.5f) == 0) {
                         chosen = entity;
-                        canReach = CheckPointsOnRouteGraph(vars->ref220, object + 0x10, entity + 0x10);
+                        canReach = route_check_points(vars->ref220, object + 0x10, entity + 0x10);
                         bestDistance = distance;
                         if (canReach)
                             reachable = chosen;
@@ -973,14 +973,14 @@ void func_L03_003C5668(unsigned char *object, float *outPosition, float *outForw
         chosen = reachable;
     qcopy(outForward, chosen + 0xF0);
     qcopy_nc(outPosition, chosen + 0x10);
-    outPosition[2] = ProbeGroundHeightBelow(outPosition, 0, 0.5f);
+    outPosition[2] = coll_probe_ground_height_below(outPosition, 0, 0.5f);
 }
 
 
 /* func_L03_003C58F0 is defined in L03_002AB5C8-g8.c (it reads the group count through $gp). */
 
 /* Works out a speed-like value from the bot's turn amount, capped, times its count. */
-float func_L03_003C5AB8(unsigned char *object) {
+float bot_compute_speed_from_turn(unsigned char *object) {
     unsigned char *vars = *(unsigned char **)(object + 0x68);
     float amount = func_2EF670(*(float *)(vars + 0x1DC), 1.5f);
     float count;

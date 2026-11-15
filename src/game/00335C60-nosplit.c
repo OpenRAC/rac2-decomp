@@ -2,8 +2,8 @@
 #include "names.h"
 
 extern char D_001AD8E8[];
-extern void func_00336ED0(unsigned char *, unsigned char *);
-extern void func_00335870(void *, int);
+extern void pool_free_cell(unsigned char *, unsigned char *);
+extern void object_reset_type_and_free(void *, int);
 
 typedef struct Obj335C60 {
     void *f00;
@@ -14,9 +14,9 @@ typedef struct Obj335C60 {
 } Obj335C60;
 
 /* Sets the object type pointer, releases the attached data and runs the shared base cleanup. */
-void func_00335C60(Obj335C60 *obj, int flags)
+void object_release_data_and_cleanup(Obj335C60 *obj, int flags)
 {
     obj->f04 = D_001AD8E8;
-    FreePoolCell(obj->f2C, obj->f28);
-    ResetObjectTypeAndFree(obj, flags);
+    pool_free_cell(obj->f2C, obj->f28);
+    object_reset_type_and_free(obj, flags);
 }

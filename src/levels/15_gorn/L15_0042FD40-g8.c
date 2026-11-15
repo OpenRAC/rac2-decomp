@@ -18,13 +18,13 @@ extern int D_L15_001B1534 __attribute__((sda));
 extern int D_L15_001B15C4 __attribute__((sda));
 extern StageSetup D_L15_00221E10;
 extern StageRecord D_L15_0029FD80[];
-extern int func_002ED8A0(int);
-extern void func_L05_00379F28(int);
-extern void func_L05_0037D6E8(void);
-extern void func_L05_00379F68(void);
+extern int table_find_last_used_entry(int);
+extern void hero_set_state_value_b(int);
+extern void table_reset_working_values(void);
+extern void level_clear_object_records(void);
 
 /* Resets the Gorn stage counters and restores the selected record's value. */
-void func_L15_0042FD40(void)
+void ResetGornStageCounters(void)
 {
     StageSetup *stage = &D_L15_00221E10;
     int recordIndex;
@@ -35,11 +35,11 @@ void func_L15_0042FD40(void)
     stage->limit = 100;
     D_L15_001B1534 = 0;
     stage->count = 0;
-    recordIndex = FindLastUsedChainEntry(6);
+    recordIndex = table_find_last_used_entry(6);
     stage->scale = 8.0f;
     D_L15_0029FD80[recordIndex].words[5] = D_L15_0029FD80[recordIndex].words[4];
-    SetPlayerStateField15(0);
-    ResetTableWorkingValues();
-    ClearLevelObjectRecords();
+    hero_set_state_value_b(0);
+    table_reset_working_values();
+    level_clear_object_records();
 }
 

@@ -49,25 +49,25 @@ typedef struct {
     float angle;           /* 0x158 */
 } OceanCamera;
 
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern void func_L00_002E6DB8(void (*)(void *), void *);
-extern void func_L06_00402570(void *);
-extern int func_002ACBC8(void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern void gfx_add_draw_callback_second(void (*)(void *), void *);
+extern void DrawOceanWaterSheet(void *);
+extern int IsPointInCuboid(void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
 
-extern OceanHero D_00189E20;
-extern OceanCamera D_L06_001B9700;
+extern OceanHero g_hero_state;
+extern OceanCamera g_camera_state;
 extern int D_L06_001C9DC0;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern float D_001A7928 __attribute__((sda));
 extern int D_L06_001A9010 __attribute__((sda));
 extern int D_L06_001A8A48 __attribute__((sda));
 extern int D_L06_001B2348 __attribute__((sda));
-extern float D_L06_001B3280 __attribute__((sda));
+extern float g_water_surface_height __attribute__((sda));
 extern float D_L06_001B3284 __attribute__((sda));
 extern OceanVector D_L06_001B9A70[];
 extern OceanVector D_L06_001B3290[3] __attribute__((sda));
@@ -79,7 +79,7 @@ extern float D_L06_001B0060[] SDATA(D_L06_001B0060);
 extern OceanUV D_L06_001B0070[] __attribute__((sda));
 extern OceanUV D_L06_001B0070_gp[] SDATA(D_L06_001B0070);
 
-void func_L06_00403130(OceanMoby *moby)
+void UpdateOceanWaterSheet(OceanMoby *moby)
 {
     OceanVector movement, scaled;
     OceanVars *vars = moby->vars;
@@ -88,9 +88,9 @@ void func_L06_00403130(OceanMoby *moby)
 
     if (D_L06_001C9DC0 != vars->f38)
         return;
-    if (gCurrentMapIndex == 13 && gHeroState.position[2] < 88.0f && gHeroState.action != 116)
+    if (g_current_map_index == 13 && g_hero_state.position[2] < 88.0f && g_hero_state.action != 116)
         return;
-    if (gCurrentMapIndex == 11 && D_L06_001A9010 != 0)
+    if (g_current_map_index == 11 && D_L06_001A9010 != 0)
         return;
     D_L06_001B3284 = vars->level;
     if (moby->state == 0) {
@@ -103,33 +103,33 @@ void func_L06_00403130(OceanMoby *moby)
             D_L06_001B3270[i].u = 0.0f;
             D_L06_001B3270[i].v = 0.0f;
         }
-        qcopy(&D_L06_001B3260, &gCameraState_L06.pos);
+        qcopy(&D_L06_001B3260, &g_camera_state.pos);
         D_L06_001B3284 = vars->level;
         return;
     }
-    if (IsPointInCuboid(gHeroState.position, vars->outerArea)) {
-        gHeroState.waterState = 0;
+    if (IsPointInCuboid(g_hero_state.position, vars->outerArea)) {
+        g_hero_state.waterState = 0;
         return;
     }
-    if (IsPointInCuboid(gHeroState.position, vars->innerArea) && gCurrentMapIndex != 13 &&
-        (vars->f38 != 0 || gCameraState_L06.angle > 0.031f || gCameraState_L06.angle < -1.62f ||
-         (unsigned int)(gHeroState.animation - 17) < 2)) {
-        gHeroState.waterState = 0;
+    if (IsPointInCuboid(g_hero_state.position, vars->innerArea) && g_current_map_index != 13 &&
+        (vars->f38 != 0 || g_camera_state.angle > 0.031f || g_camera_state.angle < -1.62f ||
+         (unsigned int)(g_hero_state.animation - 17) < 2)) {
+        g_hero_state.waterState = 0;
         return;
     }
-    if (IsPointInCuboid(gHeroState.position, vars->innerArea)) {
-        gHeroState.waterState = 0;
+    if (IsPointInCuboid(g_hero_state.position, vars->innerArea)) {
+        g_hero_state.waterState = 0;
         return;
     }
     range = vars->scale;
-    if (gHeroState.action == 28 || D_L06_001A8A48 != 0) {
+    if (g_hero_state.action == 28 || D_L06_001A8A48 != 0) {
         if (range > 32.0f)
             range = 32.0f;
     }
-    gHeroState.waterState = 2;
-    FastVecSub(&movement, &gCameraState_L06.pos, &D_L06_001B3260);
-    qcopy(&D_L06_001B3260, &gCameraState_L06.pos);
-    if (!(gCameraState_L06.pos.f[2] > vars->limit))
+    g_hero_state.waterState = 2;
+    FastVecSub(&movement, &g_camera_state.pos, &D_L06_001B3260);
+    qcopy(&D_L06_001B3260, &g_camera_state.pos);
+    if (!(g_camera_state.pos.f[2] > vars->limit))
         return;
     for (i = 0; i < 2; i++) {
         float layer = D_L06_001B0060[i] + D_L06_001B0060[i];
@@ -150,7 +150,7 @@ void func_L06_00403130(OceanMoby *moby)
             D_L06_001B3270[i].v += 1.0f;
     }
     tide = IntToFloat(D_L06_001B2348 % 360) * 0.017444445f - 3.14f;
-    gWaterSurfaceHeight = D_L06_001B3284 + FastSinOrCosB(tide) * vars->amplitude;
+    g_water_surface_height = D_L06_001B3284 + math_fast_sin_or_cos_b(tide) * vars->amplitude;
     for (i = 0; i < 2; i++) {
         D_L06_001B3270[i].u += D_L06_001B0070_gp[i].u * D_001A7928;
         if (D_L06_001B3270[i].u > 1.0f)
@@ -164,7 +164,7 @@ void func_L06_00403130(OceanMoby *moby)
             D_L06_001B3270[i].v += 1.0f;
     }
     if (vars->drawMode < 0)
-        AddDrawCallbackToList2(DrawOceanWaterSheet, moby);
+        gfx_add_draw_callback_second(DrawOceanWaterSheet, moby);
     else
-        AddDrawCallbackToList1(DrawOceanWaterSheet, moby);
+        gfx_add_draw_callback_first(DrawOceanWaterSheet, moby);
 }

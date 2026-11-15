@@ -2,12 +2,12 @@
 #include "names.h"
 
 
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
-extern float func_00282C48(float);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
+extern float math_fabs(float);
 
 /* Turns an angle toward a target with a smooth, speed-limited step and returns the new angle. */
-float func_L01_00310BC0(float *speed, float angle, float target,
+float math_turn_angle_toward_target(float *speed, float angle, float target,
                       float acceleration, float damping, float limit)
 {
     float difference = fast_subtract_rotations(target, angle);
@@ -23,9 +23,9 @@ float func_L01_00310BC0(float *speed, float angle, float target,
         else if (*speed < -limit)
             *speed = -limit;
     }
-    if (FloatAbs(difference) < *speed)
-        *speed = FloatAbs(difference);
-    else if (*speed < -FloatAbs(difference))
-        *speed = -FloatAbs(difference);
+    if (math_fabs(difference) < *speed)
+        *speed = math_fabs(difference);
+    else if (*speed < -math_fabs(difference))
+        *speed = -math_fabs(difference);
     return FastAddRotations(angle, *speed);
 }

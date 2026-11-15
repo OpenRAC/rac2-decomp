@@ -6,7 +6,7 @@ typedef struct {
     float pitch; unsigned char pad328[0x20]; short allowed;
     unsigned char pad34a[0x1f46]; char *object;
 } PlayerView;
-extern PlayerView D_00189E20;
+extern PlayerView g_hero_state;
 extern int D_L26_001A8FF0;
 extern int D_L26_001A8FF4 __attribute__((sda));
 extern float D_L26_001AFDB0 __attribute__((sda)),D_L26_001AFDB4 __attribute__((sda));
@@ -14,26 +14,26 @@ extern char *D_L26_001FAAA0[];
 extern Vec D_L26_001BEFE0;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; } Collision;
 extern Collision D_L26_001BEFC0;
-extern void func_00282D30(void *,void *,float),func_00282CC0(void *,void *,void *),func_00282CF0(void *,void *,void *);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern char *func_002AB1F0(char *);
-extern float func_00283248(float,float),func_00283C80(float,float),func_00282C48(float),func_002831B0(float),func_00283CE0(int);
-extern float func_00282E80(void *,void *),func_00282E48(void *,void *),func_00282DB0(void *,void *),func_00282DF0(void *);
-extern void func_002AF000(void *,float,float,float);
+extern void FastVecScale(void *,void *,float),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
+extern int CollLine(void *,void *,int,void *,void *);
+extern char *moby_get_private_value_0(char *);
+extern float mat_fast_helper_a(float,float),FastDiffRots(float,float),math_fabs(float),math_fast_angle_helper(float),IntToFloat(int);
+extern float vec_distance_xy(void *,void *),fast_vec_dist(void *,void *),FastVecDot(void *,void *),FastVecLength(void *);
+extern void vec_build_spherical_offset(void *,float,float,float);
 
 /* Target selection: the nearest visible candidate in front of the player within the aim cone. */
 /* Also temporarily switches off sheep that block the view while it checks what can be seen. */
-char *func_L26_003BFF58(char *obj,Vec *origin,float *yaw,float *pitch) {
+char *hero_l26_select_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
     Vec *pos; int n,index,accepted,visible,tries,i;
     float best=D_L26_001AFDB4,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
-    FastVecScale(&frame.offset,gHeroState.object+0xE0,0.5f);
+    FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
     selected=0;
-    FastVecAdd(&frame.player,gHeroState.object+0x10,&frame.offset);
-    if(CollLine(&frame.player,start,6,gHeroState.object,0)) {
+    FastVecAdd(&frame.player,g_hero_state.object+0x10,&frame.offset);
+    if(CollLine(&frame.player,start,6,g_hero_state.object,0)) {
         qcopy(start,&D_L26_001BEFE0);
         return 0;
     }
@@ -43,44 +43,44 @@ char *func_L26_003BFF58(char *obj,Vec *origin,float *yaw,float *pitch) {
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
         if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
         { Vec *t=&frame.target; qcopy(t,candidate+0x10); }
-        definition=GetMobyPrivateValue0(candidate);
+        definition=moby_get_private_value_0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;
         FastVecScale(&frame.aim,candidate+0xE0,*(float *)(definition+0x10));
         FastVecAdd(&frame.target,&frame.target,&frame.aim);
         if(!candidate || !*(char **)(candidate+0x24) || *(short *)(*(char **)(candidate+0x24)+0x46)!=5) goto next;
         accepted=0;
-        heading=FastMatrixHelperA(frame.target.f[0]-start->f[0],frame.target.f[1]-start->f[1]);
-        elevation=FastMatrixHelperA(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
+        heading=mat_fast_helper_a(frame.target.f[0]-start->f[0],frame.target.f[1]-start->f[1]);
+        elevation=mat_fast_helper_a(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
         delta=FastDiffRots(*yaw,heading);
         distance=fast_vec_dist(start,&frame.target);
-        if(D_L26_001A8FF0 || gHeroState.allowed || D_L26_001A8FF4) {
+        if(D_L26_001A8FF0 || g_hero_state.allowed || D_L26_001A8FF4) {
             if(distance<2.5f) {
-            FastVecSub(&frame.ray,candidate+0x10,gHeroState.object+0x10);
-            dot=FastVecDot(&frame.ray,gHeroState.object+0xE0);
-            if(FloatAbs(dot)<2.0f) {
-                FastVecScale(&frame.axis,gHeroState.object+0xE0,dot);
+            FastVecSub(&frame.ray,candidate+0x10,g_hero_state.object+0x10);
+            dot=FastVecDot(&frame.ray,g_hero_state.object+0xE0);
+            if(math_fabs(dot)<2.0f) {
+                FastVecScale(&frame.axis,g_hero_state.object+0xE0,dot);
                 FastVecSub(&frame.ray,&frame.ray,&frame.axis);
-                dot=FastVecDot(&frame.ray,gHeroState.object+0xC0);
+                dot=FastVecDot(&frame.ray,g_hero_state.object+0xC0);
                 { float len=FastVecLength(&frame.ray);
-                if(len!=0.0f && 1.5707964f-FastAngleHelper(dot/len)<1.0471977f) accepted=1; }
+                if(len!=0.0f && 1.5707964f-math_fast_angle_helper(dot/len)<1.0471977f) accepted=1; }
             }
             }
         } else {
             if(distance<2.5f) {
-                char *pobj=gHeroState.object;
-                angle=FastMatrixHelperA(*(float *)(candidate+0x10)-gHeroState.position.f[0],*(float *)(candidate+0x14)-gHeroState.position.f[1]);
-                if(FastDiffRots(*(float *)(pobj+0xF8),angle)<1.0471977f && FloatAbs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
+                char *pobj=g_hero_state.object;
+                angle=mat_fast_helper_a(*(float *)(candidate+0x10)-g_hero_state.position.f[0],*(float *)(candidate+0x14)-g_hero_state.position.f[1]);
+                if(FastDiffRots(*(float *)(pobj+0xF8),angle)<1.0471977f && math_fabs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
             }
         }
-        if(accepted && !CollLine(start,&frame.target,6,gHeroState.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
+        if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
         if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>D_L26_001AFDB4) goto next;
-        BuildSphericalOffset(&frame.aim,distance,*yaw,*pitch+gHeroState.pitch*0.5f);
+        vec_build_spherical_offset(&frame.aim,distance,*yaw,*pitch+g_hero_state.pitch*0.5f);
         FastVecAdd(&frame.aim,&frame.aim,start);
         angle=fast_vec_dist(&frame.aim,&frame.target);
-        angle=FastAngleHelper(angle/(distance+distance)); angle+=angle;
-        if(D_L26_001AFDB0*0.017453294f<angle && (definition=GetMobyPrivateValue0(candidate))!=0) {
+        angle=math_fast_angle_helper(angle/(distance+distance)); angle+=angle;
+        if(D_L26_001AFDB0*0.017453294f<angle && (definition=moby_get_private_value_0(candidate))!=0) {
             radius=IntToFloat((unsigned char)definition[10])*0.125f;
-            length=FastAngleHelper(radius/distance);
+            length=math_fast_angle_helper(radius/distance);
             if(radius<distance) { angle-=length; if(angle<0.0f) angle=0.0f; }
         }
         if(angle<D_L26_001AFDB0*0.017453294f) {

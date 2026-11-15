@@ -15,19 +15,19 @@ typedef struct {
 
 extern float D_0018A0E0[4];
 extern float D_L18_001AA250[4][4];
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00281DE8(QuadPacket *, s32, s32, s32);
-extern void func_00280B90(void *, s32, s32);
-extern void func_0027C768(s32, float *, float *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void gfx_init_quad_packet_state(QuadPacket *, s32, s32, s32);
+extern void draw_world_quad(void *, s32, s32);
+extern void gfx_world_to_screen_unit(s32, float *, float *);
 
 /* Draws a quad facing DIRECTION at POSITION, then redraws it textured, with the caller's four
    UV pairs or, without them, the projected corners pushed apart by SPREAD; UVs clamp to [0, 1]. */
 /* Draws a flat shiny quad facing a direction, first plain and then textured, for a lens flare. */
-void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity, float **customUV,
+void gfx_draw_lens_flare_quad(LensVector *position, LensVector *direction, s32 opacity, float **customUV,
                        float size, float spread, float distance)
 {
     QuadPacket packet;
@@ -46,7 +46,7 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
         FastVecScale(&packet.vertex[index], D_L18_001AA250[index], size);
         transform_vector(&packet.vertex[index], &packet.vertex[index], basis);
     }
-    InitQuadPacketState(&packet, 60, 5, 128);
+    gfx_init_quad_packet_state(&packet, 60, 5, 128);
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] =
         ((u32)opacity << 24) | 0x808080;
     packet.uv[0].u = 0.0f;
@@ -58,7 +58,7 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
     packet.uv[3].u = 1.0f;
     packet.uv[3].v = 1.0f;
     draw_world_quad(&packet, 0, 0);
-    InitQuadPacketState(&packet, -1, 6, 128);
+    gfx_init_quad_packet_state(&packet, -1, 6, 128);
     FastVecScale(&offset, &basis[0], distance + 0.01f);
     if (customUV) {
         for (i = 3; i >= 0; i--) {
@@ -76,7 +76,7 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
         }
     } else {
         for (i = 0; i < 4; i++) {
-            ProjectWorldToScreen((s32)&packet.vertex[i], &packet.uv[i].u, &packet.uv[i].v);
+            gfx_world_to_screen_unit((s32)&packet.vertex[i], &packet.uv[i].u, &packet.uv[i].v);
             if (i >> 1)
                 packet.uv[i].u -= spread;
             else

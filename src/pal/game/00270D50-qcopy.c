@@ -1,18 +1,18 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_001B5200[], D_001B5490[], D_00189E20[];
-extern void func_00282F20(float *, float *, float);
-extern void func_00270B58(float *, float *, float *, float *, float *, float *);
-extern void func_002AB600(void *, void *);
-extern void func_00270D50(void);
-extern void func_00270E30(void);
-extern void func_00270EA8(void);
-extern float func_00283CE0(int);
+extern char g_active_camera[], D_001B5490[], g_hero_state[];
+extern void vec_scale_to_length(float *, float *, float);
+extern void cam_compute_aim_angles(float *, float *, float *, float *, float *, float *);
+extern void mat_transform_via_copy(void *, void *);
+extern void cam_rebuild_look_at_from_hero(void);
+extern void moby_save_vectors(void);
+extern void moby_restore_vectors(void);
+extern float IntToFloat(int);
 
 void func_PAL_00270D50(char *from)
 {
-    unsigned char *r = (unsigned char *)D_001B5200 + 0x290;
+    unsigned char *r = (unsigned char *)g_active_camera + 0x290;
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
     float c[4] __attribute__((aligned(16)));
@@ -22,32 +22,32 @@ void func_PAL_00270D50(char *from)
         sub = r[3];
         if (sub == 0) {
             qcopy(r + 0x50, from + 0x30);
-            func_002AB600(r + 0x60, from);
+            mat_transform_via_copy(r + 0x60, from);
         } else if (sub == 2) {
             qcopy(r + 0xC0, from + 0x30);
-            func_002AB600(r + 0xD0, from);
-            func_00270D50();
+            mat_transform_via_copy(r + 0xD0, from);
+            cam_rebuild_look_at_from_hero();
         } else {
-            char *g = D_00189E20;
+            char *g = g_hero_state;
 
-            func_00282F20(a, (float *)(*(char **)(g + 0x2290) + 0xC0), 1.0f);
-            func_00282F20(b, (float *)(*(char **)(g + 0x2290) + 0xD0), 1.0f);
-            func_00282F20(c, (float *)(*(char **)(g + 0x2290) + 0xE0), 1.0f);
-            func_00270B58((float *)(r + 0x70), (float *)(from + 0x30),
+            vec_scale_to_length(a, (float *)(*(char **)(g + 0x2290) + 0xC0), 1.0f);
+            vec_scale_to_length(b, (float *)(*(char **)(g + 0x2290) + 0xD0), 1.0f);
+            vec_scale_to_length(c, (float *)(*(char **)(g + 0x2290) + 0xE0), 1.0f);
+            cam_compute_aim_angles((float *)(r + 0x70), (float *)(from + 0x30),
                           (float *)(*(char **)(r - 0x100) + 0x30), a, b, c);
-            func_002AB600(r + 0xB0, from);
+            mat_transform_via_copy(r + 0xB0, from);
             qcopy(r + 0xD0, r + 0xB0);
         }
     } else {
         sub = r[3];
         if (sub == 2) {
-            func_00270E30();
-            func_00270D50();
+            moby_save_vectors();
+            cam_rebuild_look_at_from_hero();
         } else if (sub == 1) {
-            func_00270E30();
+            moby_save_vectors();
             qcopy(r + 0xB0, r + 0xD0);
         } else if (sub == 0) {
-            func_00270EA8();
+            moby_restore_vectors();
         }
     }
     *(short *)D_001B5490 = 3;
@@ -66,6 +66,6 @@ void func_PAL_00270D50(char *from)
         int n = ((s32)(++*(int *)(o + 0x14)) * 5 + 2) / 6;
 
         *(int *)(o + 0xC) = n;
-        *(float *)(o + 0x10) = 1.0f / func_00283CE0(n);
+        *(float *)(o + 0x10) = 1.0f / IntToFloat(n);
     }
 }

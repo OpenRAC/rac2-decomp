@@ -74,39 +74,39 @@ extern float D_L08_001B9B00[];
 extern TaboraEffectEntry D_L08_00288D10[];
 extern float D_L08_001A9430[4] __attribute__((sda));
 extern float D_L08_001A9450[4][4] __attribute__((sda));
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern int D_L08_001A9420 __attribute__((sda));
 extern int D_L08_001B2508 MACRO_ADDR;
 extern float D_L08_001B2820[4] MACRO_ADDR;
 extern float D_L08_001A9490 __attribute__((sda));
 extern float D_L08_001A9494, D_L08_001A9498, D_L08_001A949C;
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
-extern void func_L00_00326048(void *, void *, int, int, float);
-extern void func_L08_0037E6D8(void);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_002833F0(void *, void *);
-extern float func_00283B98(float, float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern void func_002A7A00(void *, float, float);
-extern void func_002ACB48(void *, float);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
+extern void moby_copy_group_word_to_members(void);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern float FastAddRotations(float, float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void vec_random_direction(void *, float, float);
+extern void vec_add_random_offset(void *, float);
 extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern TaboraParticle *func_PAL_002BE9A8(void *, float, float, float, int, void *, int, float, int);
 extern void func_PAL_L00_00328480(int, void *, int, int, void *, int, int, float, float, float, float);
-extern void func_002C7970(void *, void *, int, int, int, int, int, int, float, float, float);
-extern void func_002C3150(void *, void *, int, int, int, int, float);
-extern void func_002C2FD8(void *, int, int, int, int, int, int, float);
+extern void part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
+extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void part_spawn_fading(void *, int, int, int, int, int, int, float);
 
 void func_PAL_L08_0030A2B8(void) {
     float v[4] __attribute__((aligned(16)));
@@ -118,7 +118,7 @@ void func_PAL_L08_0030A2B8(void) {
     float direction[4] __attribute__((aligned(16)));
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
-    func_L00_002FC980();
+    anim_start_startup_animations();
     {
         int j = 0;
         TaboraObject *p;
@@ -126,20 +126,20 @@ void func_PAL_L08_0030A2B8(void) {
             p = D_L08_001BD800.objects[j];
             if (p && p->classId==0xE29) p->flags |= 0x800;
             if (p->classId==0xD54) func_PAL_002E7270(p);
-            if (p && p->classId==0xFA0 && D_001A79F0!=0x33 && p->vars)
-                func_L00_00326048(p,p->vars+12,0x80AAAAD2,0x80396464,0.07330384f);
+            if (p && p->classId==0xFA0 && g_current_map_index!=0x33 && p->vars)
+                math_store_angle_update_result(p,p->vars+12,0x80AAAAD2,0x80396464,0.07330384f);
         }
     }
-    if (D_001A79F0 != 8) return;
+    if (g_current_map_index != 8) return;
     {
         if (D_L08_001BD800.phase==0) {
             int j;
-            func_L08_0037E6D8();
+            moby_copy_group_word_to_members();
             for (j=0;j<4;++j) {
                 TaboraEffectEntry *entry=&D_L08_00288D10[j];
                 if (D_L08_001BD800.frame==(((int)(entry->frame) * 5 + 2) / 6)) {
                     *(u128 *)v=*(u128 *)entry->position;
-                    func_00282CC0(v,v,D_L08_001A9430);
+                    FastVecAdd(v,v,D_L08_001A9430);
                     func_PAL_L00_003FB330(v,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
                     if (entry->shake>0.0f) {
                         D_L08_001B99C0.duration0=46;
@@ -152,7 +152,7 @@ void func_PAL_L08_0030A2B8(void) {
         }
     }
     {
-        if (D_L08_001BD800.phase==1) func_L08_0037E6D8();
+        if (D_L08_001BD800.phase==1) moby_copy_group_word_to_members();
         if (D_L08_001BD800.phase==2) {
             TaboraObject *p;
             int n;
@@ -161,7 +161,7 @@ void func_PAL_L08_0030A2B8(void) {
             TaboraParticle *r;
             float scale, size, angle, frameStep;
             p=0;
-            func_L08_0037E6D8();
+            moby_copy_group_word_to_members();
             n=0;
             scale=1.0f;
             if (D_L08_001BD800.frame==44) {p=D_L08_001BD800.objects[1];scale=0.7f;n=30;}
@@ -172,27 +172,27 @@ void func_PAL_L08_0030A2B8(void) {
                 v[3]=1.0f;
                 frameStep=0.010000001f;
                 for (i=0;i<n;++i) {
-                    life=func_002A7820(75,97);
+                    life=math_random_int_range(75,97);
                     qzero(w);
-                    func_002ACB48(w,scale*0.7f);
+                    vec_add_random_offset(w,scale*0.7f);
                     w[2]*=0.3f;
-                    func_00282CC0(w,w,p->position);
-                    alpha=func_002A7820(64,112);
-                    colour=func_002A7820(64,127);
-                    packed=(alpha<<24)|(func_00283CF0((float)colour*0.3f)<<16);
+                    FastVecAdd(w,w,p->position);
+                    alpha=math_random_int_range(64,112);
+                    colour=math_random_int_range(64,127);
+                    packed=(alpha<<24)|(FloatToInt((float)colour*0.3f)<<16);
                     packed|=colour<<8;
                     colour|=packed;
-                    angle=func_002A7878(1.0f,1.013f);
-                    spin=func_002A7820(-2,2);
-                    size=func_002A7878(0.1f,0.3f);
-                    v[0]=func_002A78D8(0.0f,0.014f);
-                    v[1]=func_002A78D8(0.0f,0.014f);
-                    v[2]=func_002A7878(frameStep*0.1f,0.010000001f);
-                    func_00282D30(v,v,scale);
+                    angle=math_random_float_range(1.0f,1.013f);
+                    spin=math_random_int_range(-2,2);
+                    size=math_random_float_range(0.1f,0.3f);
+                    v[0]=math_random_signed_float_range(0.0f,0.014f);
+                    v[1]=math_random_signed_float_range(0.0f,0.014f);
+                    v[2]=math_random_float_range(frameStep*0.1f,0.010000001f);
+                    FastVecScale(v,v,scale);
                     r=func_PAL_002BE9A8(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
                     if (r) {
                         TaboraParticleData *particleData=&r->data;
-                        if (func_002A77E0(2)) r->kind=0x44;
+                        if (math_random_int_below(2)) r->kind=0x44;
                         r->lifetime=life;
                         {
                             particleData->kind=2;
@@ -209,8 +209,8 @@ void func_PAL_L08_0030A2B8(void) {
         TaboraObject *second=D_L08_001BD800.objects[2];
         qcopy(v,second->position);
         v[2]+=0.8f;
-        func_00282CF0(w,first->position,second->position);
-        func_00282F20(w,w,0.042f);
+        FastVecSub(w,first->position,second->position);
+        vec_scale_to_length(w,w,0.042f);
         w[2]=0.050000004f;
         func_PAL_L00_00328480(0,v,40,0,w,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
         D_L08_001B99C0.amount2=0.047f;
@@ -238,24 +238,24 @@ void func_PAL_L08_0030A2B8(void) {
         int j;
         int spin;
         float size;
-        D_L08_001B2820[0]=func_00283B98(D_L08_001B2820[0],D_L08_001A9490*0.0003490659f);
-        D_L08_001B2820[1]=func_00283B98(D_L08_001B2820[1],D_L08_001A9494*0.0003490659f);
-        D_L08_001B2820[2]=func_00283B98(D_L08_001B2820[2],D_L08_001A9498*0.0003490659f);
-        D_L08_001B2820[3]=func_00283B98(D_L08_001B2820[3],D_L08_001A949C*0.0003490659f);
-        func_002833F0(matrix,D_L08_001B2820);
+        D_L08_001B2820[0]=FastAddRotations(D_L08_001B2820[0],D_L08_001A9490*0.0003490659f);
+        D_L08_001B2820[1]=FastAddRotations(D_L08_001B2820[1],D_L08_001A9494*0.0003490659f);
+        D_L08_001B2820[2]=FastAddRotations(D_L08_001B2820[2],D_L08_001A9498*0.0003490659f);
+        D_L08_001B2820[3]=FastAddRotations(D_L08_001B2820[3],D_L08_001A949C*0.0003490659f);
+        euler_rotation_basis(matrix,D_L08_001B2820);
         for(j=0;j<4;++j) {
-            func_00282CF0(start,D_L08_001B9B00,v);
-            func_00282F20(start,start,5.0f);
-            func_00282CC0(end,start,v);
+            FastVecSub(start,D_L08_001B9B00,v);
+            vec_scale_to_length(start,start,5.0f);
+            FastVecAdd(end,start,v);
             end[2]+=0.5f;
-            spin=func_00283CF0(func_002A78D8(2.0f,5.0f));
-            func_00283098(direction,D_L08_001A9450[j],matrix);
-            func_00282F20(direction,direction,3.5f);
-            func_00282CC0(direction,direction,end);
-            func_00282CF0(w,end,direction);
-            func_00282F20(w,w,0.07000001f);
-            size=func_002A7878(0.2f,0.32f);
-            func_002C7970(direction,w,50,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
+            spin=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
+            matrix_mul_vec3(direction,D_L08_001A9450[j],matrix);
+            vec_scale_to_length(direction,direction,3.5f);
+            FastVecAdd(direction,direction,end);
+            FastVecSub(w,end,direction);
+            vec_scale_to_length(w,w,0.07000001f);
+            size=math_random_float_range(0.2f,0.32f);
+            part_spawn_fading_drift(direction,w,50,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
         }
     }
     if (D_L08_001BD800.frame<=400) return;
@@ -269,48 +269,48 @@ void func_PAL_L08_0030A2B8(void) {
         int duration, lifeStep;
         *(u128 *)w=*(u128 *)v;
         w[2]+=1.0f;
-        if (func_002A77E0(4)==0) {
-            func_00282CF0(forward,D_L08_001B9B00,w);
+        if (math_random_int_below(4)==0) {
+            FastVecSub(forward,D_L08_001B9B00,w);
             timeScale=0.020000001f;
             frameStep=0.010000001f;
-            func_00282F20(forward,forward,5.0f);
-            func_00282CC0(w,forward,w);
-            func_002A7A00(matrix,rate,rate);
+            vec_scale_to_length(forward,forward,5.0f);
+            FastVecAdd(w,forward,w);
+            vec_random_direction(matrix,rate,rate);
             size=(D_L08_001BD800.frame-480);
             size*=0.080000006f;
-            alpha=func_002A77E0(255)&255;
+            alpha=math_random_int_below(255)&255;
             duration=60;
             lifeStep=0;
-            func_002C3150(w,matrix,0x50804080,duration,alpha,0,size);
+            part_spawn_hero_relative(w,matrix,0x50804080,duration,alpha,0,size);
             for (j=0;j<1;++j) {
                 t=rate*timeScale;
-                func_002A7A00(offset,t,t);
-                func_00282CC0(matrix,matrix,offset);
+                vec_random_direction(offset,t,t);
+                FastVecAdd(matrix,matrix,offset);
                 t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
                 scale=amount*frameStep*(D_L08_001BD800.frame-480);
-                alpha=func_002A77E0(255)&255;
-                func_002C3150(w,matrix,0x40804080,duration,alpha,0,scale);
+                alpha=math_random_int_below(255)&255;
+                part_spawn_hero_relative(w,matrix,0x40804080,duration,alpha,0,scale);
                 duration+=lifeStep;
             }
         }
     }
-    func_00282F20(direction,forward,0.1f);
+    vec_scale_to_length(direction,forward,0.1f);
     {
         int j, alpha, colour, value;
         float size;
         j=0;
         for (;j<=0;++j) {
-            size=func_00283CE0(212-((((D_L08_001B2508+j*20)&255) * 5 + 2) / 6));
-            size=func_00282C48(0.5f-size*0.004716981f);
-            colour=func_00283D38(0x40FF40FF,0x10FF40FF,size);
+            size=IntToFloat(212-((((D_L08_001B2508+j*20)&255) * 5 + 2) / 6));
+            size=math_fabs(0.5f-size*0.004716981f);
+            colour=FastTweenColor(0x40FF40FF,0x10FF40FF,size);
             alpha=(unsigned char)D_L08_001B2508;
             if(j&2) alpha<<=1;
             if(j&1) alpha=255-alpha;
             value=alpha&255;
-            size=(func_00283CE0(j)+5.0f)*0.010000001f;
+            size=(IntToFloat(j)+5.0f)*0.010000001f;
             size*=(D_L08_001BD800.frame-480);
-            func_002C2FD8(forward,colour,value,53,1,2,0,size);
-            func_00282CC0(forward,forward,direction);
+            part_spawn_fading(forward,colour,value,53,1,2,0,size);
+            FastVecAdd(forward,forward,direction);
         }
     }
 }

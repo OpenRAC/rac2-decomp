@@ -8,13 +8,13 @@ extern RowTablePrefix D_L16_001B1710 __attribute__((sda));
 
 extern u32 D_L16_001FE7C0[];
 
-extern float func_L01_00311C18(void *, void *, void *, void *);
+extern float math_closest_point_on_segment(void *, void *, void *, void *);
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 /* Walks the level's table of short rows, keeping the closest match of the handle's
    measured pair in the handle and the winning row in the handle's second half. */
-void func_L16_00410CC0(u8 *moby, u8 *point)
+void snivelak_find_closest_path_point(u8 *moby, u8 *point)
 {
     TI128 bestPoint;
     TI128 work;
@@ -44,7 +44,7 @@ void func_L16_00410CC0(u8 *moby, u8 *point)
         rowPtr = D_L16_001B1710.row[row];
         do {
             if (neighbor >= row) {
-                along = ClosestPointOnSegment(&work, path + (row * 16 + 0x10), path + (neighbor * 16 + 0x10), point);
+                along = math_closest_point_on_segment(&work, path + (row * 16 + 0x10), path + (neighbor * 16 + 0x10), point);
                 dist = vec_distance_xy(point, &work);
                 if (dist < best) {
                     best = dist;
@@ -65,7 +65,7 @@ void func_L16_00410CC0(u8 *moby, u8 *point)
 }
 
 /* Picks which two path points the boss should walk between next when it has moved onto a different part of the path. */
-void func_L16_00410FA8(u8 *moby)
+void snivelak_pick_next_path_segment(u8 *moby)
 {
     s32 *vars;
     s32 mask;

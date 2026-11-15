@@ -15,12 +15,12 @@ extern char D_L02_001B1200[8] __attribute__((sda));
 
 extern int D_L02_001B1210 __attribute__((sda));
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
-extern void func_00335438(char *, char *, int, int, int);
+extern void SetCamera5Pose(char *, char *, int, int, int);
 
 /* Advances a repeating 0 to 1 timer in the actor data each frame. */
-void func_L02_003F56C0(void) {
+void actor_advance_cycle_timer(void) {
     int actorBase = D_L02_001AD410;
     float *timerPtr = (float *)((char *)actorBase + 0x74);
     float newValue;
@@ -37,11 +37,11 @@ extern int D_001A8FF0;
    lui/addiu pair (an array of unknown size is split by cc1 itself). */
 extern char D_L02_001B3210[4];
 
-extern void func_L02_002ED7B0(int, float);
+extern void sky_shift_records_by_period(int, float);
 
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
-extern void func_L01_00323310(int, int);
+extern void script_queue_keyed_request(int, int);
 
 typedef struct {
     char pad0[0x80];
@@ -53,7 +53,7 @@ typedef struct {
     unsigned char b24F0;
 } L02_003F5710_Hero;
 
-extern L02_003F5710_Hero D_00189E20;
+extern L02_003F5710_Hero g_hero_state;
 
 /* Watches the hero block's height (+0x88) against 420.0 and the copy of it the actor kept at
    +0x98. Crossing it downwards clears the byte at +0x24F0 and the global flag; crossing it upwards
@@ -65,50 +65,50 @@ extern L02_003F5710_Hero D_00189E20;
    The flag is a plain extern int: the assembler decides each access at its use, a gp-relative one
    inside a delay slot and the absolute lui/lw pair elsewhere, as retail has them. */
 /* Checks whether the hero is above or below a set height and turns the actor area flags on or off. */
-void func_L02_003F5710(char *moby) {
+void hero_update_height_zone_flags(char *moby) {
     char *state = *(char **)(moby + 0x68);
     float distance;
 
-    if (gHeroState.f88 < 420.0f && *(float *)(state + 0x98) >= 420.0f) {
-        ShiftRecordsByPeriod(0, 420.0f);
-        gHeroState.b24F0 = 0;
+    if (g_hero_state.f88 < 420.0f && *(float *)(state + 0x98) >= 420.0f) {
+        sky_shift_records_by_period(0, 420.0f);
+        g_hero_state.b24F0 = 0;
         D_001A8FF0 = 0;
-    } else if (gHeroState.f88 > 420.0f && *(float *)(state + 0x98) <= 420.0f) {
-        ShiftRecordsByPeriod(1, 420.0f);
-        distance = fast_vec_dist(gHeroState.pos, D_L02_001B3210);
+    } else if (g_hero_state.f88 > 420.0f && *(float *)(state + 0x98) <= 420.0f) {
+        sky_shift_records_by_period(1, 420.0f);
+        distance = fast_vec_dist(g_hero_state.pos, D_L02_001B3210);
         if (D_001A8FF0 == 0 && distance < 150.0f) {
             int on = 1;
 
-            gHeroState.b24F0 = on;
+            g_hero_state.b24F0 = on;
             D_001A8FF0 = on;
         } else if (D_001A8FF0 != 0 && distance > 150.0f) {
-            gHeroState.b24F0 = 0;
+            g_hero_state.b24F0 = 0;
             D_001A8FF0 = 0;
         }
     }
     if (D_001A8FF0 != 0) {
-        gHeroState.b22C2 = 1;
+        g_hero_state.b22C2 = 1;
         if (*(int *)(state + 0xDC) == 0) {
             *(int *)(state + 0xDC) = 1;
-            QueueKeyedRequest(*(int *)(state + 0x1C), *(int *)(state + 0x20));
+            script_queue_keyed_request(*(int *)(state + 0x1C), *(int *)(state + 0x20));
         }
     }
-    *(float *)(state + 0x98) = gHeroState.f88;
+    *(float *)(state + 0x98) = g_hero_state.f88;
 }
 
 /* Sets up the camera for a short scene. */
-void func_L02_003FD770(char *moby) {
+void cutscene_setup_camera(char *moby) {
     char buf[16];
-    ClearVector128(buf);
+    vec_clear_128(buf);
     SetCamera5Pose(D_L02_001B11F0, D_L02_001B1200, 1, 0, 0);
     SetCamera5Mode(2, D_L02_001B1210);
-    CopyVectorToSelectedObject(D_L02_001B11D0);
-    SetCameraStateRotation(D_L02_001B11E0);
+    object_copy_vector_to_selected(D_L02_001B11D0);
+    cam_set_state_rotation(D_L02_001B11E0);
 }
 
-extern char D_L02_001BA500[];
+extern char g_camera_l02_position[];
 extern int D_L02_001B32E8;
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 extern char *D_L02_001B1190[] __attribute__((sda));
 
@@ -123,26 +123,26 @@ typedef int s32;
 typedef float f32;
 
 extern char *D_L02_001B1190[2] __attribute__((sda));
-extern unsigned char *D_L02_001B359C[3] __attribute__((sda));
+extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 extern f32 D_L02_001B1258 __attribute__((sda));
 extern f32 D_L02_001B125C __attribute__((sda));
-extern s32 func_00312B58(char *);
-extern s32 func_L02_00416800(char *);
-extern s32 func_002A77E0(s32);
-extern void func_L02_00416720(char *, char *, f32, f32);
+extern s32 moby_is_state_six(char *);
+extern s32 moby_is_state_one_cleared_vars(char *);
+extern s32 math_random_int_below(s32);
+extern void teleporter_bind_captured_object(char *, char *, f32, f32);
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 /* Leaves the function when the group is 0xFF or empty; the braces it opens close in END_IDS. */
 #define FOR_EACH_ID(p, off) \
     if (GROUP(off) == 0xFF) \
         return; \
-    { u16 *q = (u16 *)gEntityGroupLists[GROUP(off)]; \
+    { u16 *q = (u16 *)D_L02_001FC060[GROUP(off)]; \
     if (q == 0) \
         return; \
     for (p = q; (GROUP(off) & 0xFF) != 0xFF && GROUP(off) <= D_L02_001B35B8[0] && p != 0 && \
-         ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)gEntityGroupLists[GROUP(off)]); \
+         ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L02_001FC060[GROUP(off)]); \
          p++)
 #define END_IDS }
 /* One half: collect the entities of group OFF for which func_00312B58 holds (counting the
@@ -157,10 +157,10 @@ extern void func_L02_00416720(char *, char *, f32, f32);
             for (k = 15; k >= 0; k--) \
                 buf[k] = 0; \
             FOR_EACH_ID(p, off) { \
-                e = (char *)gMobyPool_L02[0] + ((*p & 0x7FFF) << 8); \
+                e = (char *)D_L02_001B359C[0] + ((*p & 0x7FFF) << 8); \
                 if (e == 0) \
                     break; \
-                if (IsMobyInState6(e) == 0) { \
+                if (func_00312B58(e) == 0) { \
                     m++; \
                 } else { \
                     buf[n] = e; \
@@ -170,14 +170,14 @@ extern void func_L02_00416720(char *, char *, f32, f32);
             if (n != 0) { \
                 for (i = 0; i < 1000 && m < *(s16 *)(rec + (limit)); i++) { \
                     FOR_EACH_ID(p, 0xCC) { \
-                        e = (char *)gMobyPool_L02[0] + ((*p & 0x7FFF) << 8); \
+                        e = (char *)D_L02_001B359C[0] + ((*p & 0x7FFF) << 8); \
                         if (e == 0) \
                             break; \
                         if (n <= 0) \
                             break; \
-                        if (IsStateOneWithClearedVars(e) != 0 && RandomIntBelow(6) == 0) { \
+                        if (func_L02_00416800(e) != 0 && func_002A77E0(6) == 0) { \
                             n--; \
-                            BindCapturedObjectToMoby(e, buf[n], D_L02_001B1258 * 0.016666668f, \
+                            func_L02_00416720(e, buf[n], D_L02_001B1258 * 0.016666668f, \
                                               D_L02_001B125C * 2.908882452175021e-4f); \
                             m++; \
                             break; \
@@ -189,7 +189,7 @@ extern void func_L02_00416720(char *, char *, f32, f32);
     }
 
 /* Tells nearby enemies from two groups to attack, a few at a time. */
-void func_L02_003FD228(char *moby) {
+void arena_command_group_attacks(char *moby) {
     char *state = *(char **)(moby + 0x68);
     char *rec = *(char **)(D_L02_001B1190[*(s16 *)(state + 0x120)] + 4)
                 + *(s16 *)(state + 0x122) * 0x14;
@@ -201,13 +201,13 @@ void func_L02_003FD228(char *moby) {
     HALF(0xE, 0xC4)
 }
 
-extern s32 func_L02_003D77B8(char *);
+extern s32 moby_has_free_child_slot_state2(char *);
 
-extern s32 func_L02_003FD000(char *);
+extern s32 arena_is_entity_far_from_hero(char *);
 
-extern f32 func_00282E80(char *, char *);
+extern f32 vec_distance_xy(char *, char *);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 /* Fills the slot of the list at +0xA8 that the counter at +0xD8 names. It goes on when that slot is
    empty, or when func_L02_003D77B8 returns 0 for the entity in it and the counter is below the
@@ -216,7 +216,7 @@ extern char D_00189EA0[];
    func_L02_003D77B8 both return non-zero goes into the slot; if the slot is still empty, the
    first one with func_L02_003D77B8 non-zero that is more than 30.0 away from D_00189EA0. */
 /* Picks a nearby entity for this actor to watch and stores it in a free slot. */
-void func_L02_003FB7E0(char *moby) {
+void actor_pick_watched_entity(char *moby) {
     char *state = *(char **)(moby + 0x68);
     char *rec = *(char **)(D_L02_001B1190[*(s16 *)(state + 0x120)] + 4) + *(s16 *)(state + 0x122) * 0x14;
     char *at = state + GROUP(0xD8) * 4;
@@ -227,7 +227,7 @@ void func_L02_003FB7E0(char *moby) {
     char *entity;
 
     if (slot != 0) {
-        if (HasFreeChildSlotInState2(slot) == 0) {
+        if (moby_has_free_child_slot_state2(slot) == 0) {
             if (GROUP(0xD8) < *(u8 *)(rec + 0x12) - 1) {
                 go = 1;
                 GROUP(0xD8) += 1;
@@ -240,16 +240,16 @@ void func_L02_003FB7E0(char *moby) {
         return;
     if (GROUP(0x44) == 0xFF)
         return;
-    idList = (u16 *)gEntityGroupLists[GROUP(0x44)];
+    idList = (u16 *)g_entity_group_lists[GROUP(0x44)];
     if (idList == 0)
         return;
     for (idPtr = idList; (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= D_L02_001B35B8[0] && idPtr != 0 &&
-                ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)gEntityGroupLists[GROUP(0x44)]);
+                ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)g_entity_group_lists[GROUP(0x44)]);
          idPtr++) {
-        entity = (char *)gMobyPool_L02[0] + ((*idPtr & 0x7FFF) << 8);
+        entity = (char *)g_moby_l02_pool[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (IsEntityFarFromHero(entity) != 0 && HasFreeChildSlotInState2(entity) != 0) {
+        if (arena_is_entity_far_from_hero(entity) != 0 && moby_has_free_child_slot_state2(entity) != 0) {
             char **list = (char **)(state + 0xA8);
             char **cur = list + GROUP(0xD8);
 
@@ -264,14 +264,14 @@ void func_L02_003FB7E0(char *moby) {
         if (*cur != 0)
             return;
     }
-    for (idPtr = (u16 *)gEntityGroupLists[GROUP(0x44)];
+    for (idPtr = (u16 *)g_entity_group_lists[GROUP(0x44)];
          (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= D_L02_001B35B8[0] && idPtr != 0 &&
-         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)gEntityGroupLists[GROUP(0x44)]);
+         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)g_entity_group_lists[GROUP(0x44)]);
          idPtr++) {
-        entity = (char *)gMobyPool_L02[0] + ((*idPtr & 0x7FFF) << 8);
+        entity = (char *)g_moby_l02_pool[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (HasFreeChildSlotInState2(entity) != 0 && vec_distance_xy(entity + 0x10, gHeroPosition) > 30.0f) {
+        if (moby_has_free_child_slot_state2(entity) != 0 && vec_distance_xy(entity + 0x10, g_hero_position) > 30.0f) {
             char **list = (char **)(state + 0xA8);
             char **cur = list + GROUP(0xD8);
 
@@ -288,23 +288,23 @@ extern unsigned char D_001395B8[0x100];
    absolute `lui $at ; sw`. */
 extern int D_001A7A08[2];
 
-extern int D_001A79F8;
+extern int g_player_bolts;
 
-extern int func_L02_003F9B70(int);
+extern int arena_get_challenge_save_index(int);
 
-extern int func_L02_00400650(char *, int);
+extern int arena_start_announcer_message(char *, int);
 
-extern void func_00288308(int);
+extern void help_unlock_entry(int);
 
-extern void func_002AD860(int);
+extern void moby_handle_request_slot_state(int);
 
-extern int func_L02_003FCF08(int);
+extern int moby_compute_scaled_entry_value_shifted(int);
 
-extern int func_L02_003FCDF8(int);
+extern int moby_compute_scaled_entry_value(int);
 
-extern void func_L00_0030C7F8(int);
+extern void module_l00_call_handler_with_arg_4(int);
 
-extern void func_0029B3E0(int, int);
+extern void MemcardSave(int, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the
@@ -313,38 +313,38 @@ extern void func_0029B3E0(int, int);
    D_001395B8 is computed in the entry block, and the switch keeps its `b default` with the
    default body last, as in retail. `+= 1` keeps the counter's address out of the call. */
 /* Starts a scene, adds up the score, and counts how often it was shown. */
-void func_L02_003FCCA0(char *moby, int sceneKind) {
+void scene_start_count_views(char *moby, int sceneKind) {
     char *state = *(char **)(moby + 0x68);
     int savedWord;
     char *hero;
     int score;
 
-    if (sceneKind == 0 && D_001395B8[GetChallengeSaveIndex(0)] == 0) {
-        hero = (char *)&gHeroState;
+    if (sceneKind == 0 && D_001395B8[arena_get_challenge_save_index(0)] == 0) {
+        hero = (char *)&g_hero_state;
         savedWord = *(int *)(hero + 0x22C8);
-        StartAnnouncerMessage(moby, 7);
-        UnlockHelpEntry(0x26);
-        HandleRequestSlotState(0x26);
+        arena_start_announcer_message(moby, 7);
+        help_unlock_entry(0x26);
+        moby_handle_request_slot_state(0x26);
         *(int *)(hero + 0x22C8) = savedWord;
     } else {
         switch (sceneKind) {
         case 6:
-            StartAnnouncerMessage(moby, 8);
+            arena_start_announcer_message(moby, 8);
             break;
         case 0xB:
-            StartAnnouncerMessage(moby, 9);
+            arena_start_announcer_message(moby, 9);
             break;
         default:
-            StartAnnouncerMessage(moby, RandomIntBelow(5) + 2);
+            arena_start_announcer_message(moby, math_random_int_below(5) + 2);
             break;
         }
-        D_001A7A08[1] = D_001A7A08[1] + ComputeScaledEntryValueShifted(sceneKind);
-        score = ComputeScaledEntryValue(sceneKind);
+        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(sceneKind);
+        score = moby_compute_scaled_entry_value(sceneKind);
         *(int *)(state + 0x110) = score;
-        gPlayerBolts = gPlayerBolts + score;
-        CallLoadedModuleHandlerWithArg_0034B000(0x168);
+        g_player_bolts = g_player_bolts + score;
+        module_l00_call_handler_with_arg_4(0x168);
     }
-    D_001395B8[GetChallengeSaveIndex(sceneKind)] += 1;
+    D_001395B8[arena_get_challenge_save_index(sceneKind)] += 1;
     MemcardSave(0, -1);
 }
 
@@ -362,13 +362,13 @@ extern u32 D_L02_001B176C;
 extern u32 D_L02_001B1770 __attribute__((sda));
 extern u32 D_L02_001B1774;
 extern u32 D_L02_001B1778;
-extern s32 D_L02_001B30C8;
+extern s32 g_frame_l02_counter;
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern s32 func_002A7820(s32, s32);
-extern void func_002BAE50(void *, void *, u32, s32, s32, s32, s32, s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern s32 math_random_int_range(s32, s32);
+extern void part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
 
 /* Two passes, over the two 16-byte vectors at D_L02_001B1730 in turn.  Each combines the vector
    with the object's vectors at +0xC0 and +0x10 (func_00283098, func_00282CC0) into v0, builds v1
@@ -376,7 +376,7 @@ extern void func_002BAE50(void *, void *, u32, s32, s32, s32, s32, s32);
    A1, and hands v0 and v1 twice to func_002BAE50 with colour words and a pick of func_002A7820:
    first with one of two sets chosen by bit 0 of D_L02_001B30C8, then with a third set. */
 /* Draws two bursts of sparks around the object. */
-void func_L02_00401D38(char *moby, char *offsetVec) {
+void part_spawn_spark_bursts(char *moby, char *offsetVec) {
     float worldPos[4];
     float sparkVelocity[4];
     float tempVec[4];
@@ -390,22 +390,22 @@ void func_L02_00401D38(char *moby, char *offsetVec) {
         vecPtr += 0x10;
         FastVecAdd(worldPos, worldPos, moby + 0x10);
         *(TI128 *)tempVec = 0;
-        speed = RandomFloatRange(D_L02_001B1750, D_L02_001B1754);
+        speed = math_random_float_range(D_L02_001B1750, D_L02_001B1754);
         tempVec[2] = -(speed * 0.016666668f);
         *(TI128 *)sparkVelocity = *(TI128 *)tempVec;
         FastVecAdd(sparkVelocity, sparkVelocity, offsetVec);
-        if (gFrameCounter_L02 & 1) {
-            SpawnScalingParticle(worldPos, velocityPtr, D_L02_001B1758, D_L02_001B175C, RandomIntRange(0x12, 0x16), D_L02_001B1770, -10, 1);
+        if (g_frame_l02_counter & 1) {
+            part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1758, D_L02_001B175C, math_random_int_range(0x12, 0x16), D_L02_001B1770, -10, 1);
         } else {
-            SpawnScalingParticle(worldPos, velocityPtr, D_L02_001B1760, D_L02_001B1764, RandomIntRange(0x14, 0x18), D_L02_001B1774, -10, 1);
+            part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1760, D_L02_001B1764, math_random_int_range(0x14, 0x18), D_L02_001B1774, -10, 1);
         }
-        SpawnScalingParticle(worldPos, velocityPtr, D_L02_001B1768, D_L02_001B176C, RandomIntRange(0xA, 0xF), D_L02_001B1778, -10, 1);
+        part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1768, D_L02_001B176C, math_random_int_range(0xA, 0xF), D_L02_001B1778, -10, 1);
     }
 }
 
 extern s32 D_0018C2EC __attribute__((nosda));
 extern float D_L02_001B1534 __attribute__((sda));
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 
 /* Picks the message to ask for after the entity the object is attending to (state word 0xD0),
    for its kinds 0x9F8 and 0xA44: while D_0018C2EC is not positive, one of two at random (0x10 or
@@ -414,7 +414,7 @@ extern s32 func_L02_00400650(char *, s32);
    state's half-word at 0x1F4 (0x200) is set, and 0x13 (0x19) when that float is not above zero,
    unless the half-word at 0x1F6 (0x202) is set.  A positive pick is handed to func_L02_00400650. */
 /* Chooses which message the actor says about the entity it is watching (Chainblade or Brawler Legs). */
-void func_L02_00400948(char *moby) {
+void actor_pick_watched_message(char *moby) {
     char *state = *(char **)(moby + 0x68);
     char *target = *(char **)(state + 0xD0);
     char *chainbladeVars;
@@ -429,7 +429,7 @@ void func_L02_00400948(char *moby) {
     case 0x9F8: /* Chainblade */
         chainbladeVars = *(char **)(target + 0x68);
         if ((float)D_0018C2EC <= 0.0f) {
-            msg = RandomIntBelow(2) + 0x10;
+            msg = math_random_int_below(2) + 0x10;
             flagAddr = state + msg * 2;
             if (*(s16 *)(flagAddr + 0x1D0) != 0)
                 msg = -1;
@@ -446,7 +446,7 @@ void func_L02_00400948(char *moby) {
     case 0xA44: /* B2 Brawler Legs */
         brawlerVars = *(char **)(target + 0x68);
         if ((float)D_0018C2EC <= 0.0f) {
-            msg = RandomIntBelow(2) + 0x16;
+            msg = math_random_int_below(2) + 0x16;
             flagAddr = state + msg * 2;
             if (*(s16 *)(flagAddr + 0x1D0) != 0)
                 msg = -1;
@@ -462,12 +462,12 @@ void func_L02_00400948(char *moby) {
         break;
     }
     if (msg > 0)
-        StartAnnouncerMessage(moby, msg);
+        arena_start_announcer_message(moby, msg);
 }
 
 extern s32 D_0018C0B4 __attribute__((nosda));
 extern u8 D_001395B8[];
-extern u8 D_00139568[];
+extern u8 g_item_slot_to_record[];
 
 typedef struct {
     char pad0[4];
@@ -477,13 +477,13 @@ typedef struct {
 
 extern L02_003FF9A0_Rec D_L02_00264A70[];
 
-extern void func_L00_002C42E0(s32, s32);
-extern s32 func_L00_0032EF10(s32, s32, s32 *);
-extern s32 func_L02_003F9B70(s32);
-extern s32 func_00288D58(void);
-extern void func_L02_003FCA80(char *);
-extern void func_L02_003FF6E8(char *);
-extern void func_L00_002E6CF0(void *, void *);
+extern void hero_l00_set_action(s32, s32);
+extern s32 PadPressedWithin(s32, s32, s32 *);
+extern s32 arena_get_challenge_save_index(s32);
+extern s32 flag_is_byte_set(void);
+extern void arena_cancel_challenge_menu(char *);
+extern void arena_draw_info_panel(char *);
+extern void gfx_add_draw_callback_first(void *, void *);
 
 /* Calls func_L00_002C42E0(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test
    func_L00_0032EF10(0x40, 0x3C, 0) holds, the object changes state to 7 and its selection (state
@@ -494,27 +494,27 @@ extern void func_L00_002E6CF0(void *, void *);
    D_001395B8[0x3C].  Otherwise, when func_L00_0032EF10(0x10, 0x3C, 0) holds, func_L02_003FCA80
    runs; if neither test holds the callback func_L02_003FF6E8 is registered for the object. */
 /* Handles the menu input that picks the next usable entry, or hands off to other actions. */
-void func_L02_003FF9A0(char *moby) {
+void menu_select_next_usable(char *moby) {
     char *state = *(char **)(moby + 0x68);
     s32 i;
     L02_003FF9A0_Rec *record;
 
     if (D_0018C0B4 != 0x6F)
-        SetHeroAction_L00(0x6F, 1);
+        hero_l00_set_action(0x6F, 1);
     if (PadPressedWithin(0x40, 0x3C, 0) != 0) {
-        SetMobyState(moby, 7, -1);
+        moby_set_state(moby, 7, -1);
         for (i = *(s16 *)(state + 0x118) + 1; i < 0xE; i++) {
-            if (D_001395B8[GetChallengeSaveIndex(*(s32 *)(D_L02_001B1190[i] + 8))] == 0)
+            if (D_001395B8[arena_get_challenge_save_index(*(s32 *)(D_L02_001B1190[i] + 8))] == 0)
                 continue;
-            if (i >= 0xC && IsFlagByteSet() == 0)
+            if (i >= 0xC && flag_is_byte_set() == 0)
                 continue;
             if (i == 7) {
-                record = &D_L02_00264A70[gItemSlotToRecord[0x1E]];
+                record = &D_L02_00264A70[g_item_slot_to_record[0x1E]];
                 if (record->f4 == 0)
                     continue;
             }
             if (i == 8) {
-                record = &D_L02_00264A70[gItemSlotToRecord[0x2A]];
+                record = &D_L02_00264A70[g_item_slot_to_record[0x2A]];
                 if (record->f4 == 0)
                     continue;
             }
@@ -523,9 +523,9 @@ void func_L02_003FF9A0(char *moby) {
             return;
         }
     } else if (PadPressedWithin(0x10, 0x3C, 0) != 0) {
-        CancelChallengeMenu(moby);
+        arena_cancel_challenge_menu(moby);
     } else {
-        AddDrawCallbackToList1(DrawChallengeInfoPanel, moby);
+        gfx_add_draw_callback_first(arena_draw_info_panel, moby);
     }
 }
 
@@ -535,8 +535,8 @@ extern float D_L02_001B1528 __attribute__((sda));
 extern float D_L02_001B152C __attribute__((sda));
 extern s32 D_L02_001B1530 __attribute__((sda));
 extern s32 D_001A7A00;
-extern char D_001A63A8[];
-extern s32 func_00282948(void *);
+extern char g_music_state[];
+extern s32 math_fast_float_d(void *);
 
 /* Picks an idle message for the object. Nothing happens while the message system at D_001A63A8
    is busy (+0x68 set, +0x24 not -1) or while the countdown at +0xE4 of the state runs. A float
@@ -557,9 +557,9 @@ extern s32 func_00282948(void *);
    the ids 0x23/0x24 each have a variable of their own, as retail rebuilds the address from its
    high half and loads each id next to its store. */
 /* Picks a random idle message for the actor to say, from the ones not yet played. */
-void func_L02_00400720(char *moby, s32 countStep, float floatStep, float threshold) {
+void actor_pick_idle_message(char *moby, s32 countStep, float floatStep, float threshold) {
     char *state = *(char **)(moby + 0x68);
-    char *msgSystem = gMusicState;
+    char *msgSystem = g_music_state;
     char *hero;
     char *hero2;
     s32 id23;
@@ -597,7 +597,7 @@ void func_L02_00400720(char *moby, s32 countStep, float floatStep, float thresho
         *(s32 *)(state + 0xEC) = 0;
         *(s32 *)(state + 0xE8) = 0;
     }
-    if (FastFloatHelperD(state + 0x100) != 0) {
+    if (math_fast_float_d(state + 0x100) != 0) {
         *(s32 *)(state + 0xEC) = 0;
         *(s32 *)(state + 0x100) = 300;
         *(s32 *)(state + 0xE8) = 0;
@@ -611,26 +611,26 @@ void func_L02_00400720(char *moby, s32 countStep, float floatStep, float thresho
                 listPtr[candidateCount++] = id;
         }
     }
-    hero = (char *)&gHeroState;
+    hero = (char *)&g_hero_state;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * D_L02_001B152C) {
         id23 = 0x23;
         if (*(s16 *)(state + 0x216) == 0)
             list[candidateCount++] = id23;
     }
-    hero2 = (char *)&gHeroState;
+    hero2 = (char *)&g_hero_state;
     if (*(s32 *)(hero2 + 0x24CC) <= 0) {
         id24 = 0x24;
         if (*(s16 *)(state + 0x218) == 0)
             list[candidateCount++] = id24;
     }
     if (candidateCount != 0) {
-        StartAnnouncerMessage(moby, list[RandomIntBelow(candidateCount)]);
-        *(s32 *)(state + 0xE4) = D_L02_001B1530 + RandomIntBelow(D_L02_001B1530);
+        arena_start_announcer_message(moby, list[math_random_int_below(candidateCount)]);
+        *(s32 *)(state + 0xE4) = D_L02_001B1530 + math_random_int_below(D_L02_001B1530);
     }
 }
 
-extern void *func_L00_002D70A0(s32);
-extern void func_L00_002D7140(void *);
+extern void *cam_alloc_override_slot(s32);
+extern void cam_end_override(void *);
 extern f32 D_L02_001B1234 __attribute__((sda));
 extern f32 D_L02_001B1238 __attribute__((sda));
 extern f32 D_L02_001B123C __attribute__((sda));
@@ -655,14 +655,14 @@ typedef struct {
    through cross-jumping after reload, which is why z keeps its own register ($f2). The stores
    are struct fields so the sda loads are not ordered behind them. */
 /* Creates or updates the helper object, with settings based on the watched entity, and removes it in other states. */
-void func_L02_003FC9C0(u8 *moby) {
+void actor_update_helper_offsets(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     if (*(u8 *)(moby + 0x20) == 8) {
         L02_003FC9C0_Vec3 *obj = *(L02_003FC9C0_Vec3 **)(vars + 0xC0);
 
         if (obj == 0) {
-            *(L02_003FC9C0_Vec3 **)(vars + 0xC0) = AllocCameraOverrideSlot(5);
+            *(L02_003FC9C0_Vec3 **)(vars + 0xC0) = cam_alloc_override_slot(5);
         } else {
             u8 *attended = *(u8 **)(vars + 0xD0);
 
@@ -683,7 +683,7 @@ void func_L02_003FC9C0(u8 *moby) {
             }
         }
     } else {
-        EndCameraOverride(*(L02_003FC9C0_Vec3 **)(vars + 0xC0));
+        cam_end_override(*(L02_003FC9C0_Vec3 **)(vars + 0xC0));
         *(L02_003FC9C0_Vec3 **)(vars + 0xC0) = 0;
     }
 }

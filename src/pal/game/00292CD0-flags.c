@@ -8,19 +8,19 @@ typedef struct {
     char pad4F08[0x4F98 - 0x4F08];
     PackEntry packs[1];  
 } PackToc;
-extern PackToc D_0014B540;
+extern PackToc g_copy_setup_data;
 extern char *D_001BAF34;
 extern int D_001A72EC[] __attribute__((sda));
 extern int D_001A72FC[] __attribute__((sda));
 extern long D_001A72A0[] __attribute__((sda));
-extern void func_0011AEA0(int);
-extern int func_00282A18(int);
+extern void FlushCache(int);
+extern int log2dim(int);
 extern short func_PAL_002B8898(int);
-extern void func_002FC3C0(int);
+extern void gfx_wait_for_dma_status_bits(int);
 extern void func_PAL_002B8838(void *, int, int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
-extern int func_001265B0(void *, void *);
-extern int func_001244B8(int, unsigned short);
+extern int sceGsExecLoadImage(void *, void *);
+extern int gfx_wait_paths_idle(int, unsigned short);
 
 /* Reads the second part of pack index into the load buffer and uploads the
    one texture record there, as RAC1's LoadPifAsPSMT8H does: its 16x16 CLUT
@@ -39,25 +39,25 @@ void func_PAL_00292D18(int index)
     int width, log;
     char *clut;
 
-    func_002FC3C0(1);
+    gfx_wait_for_dma_status_bits(1);
     base = D_001BAF34;
     func_PAL_002B8898(1);
     hdr = base + 0x10;
     clut = base + 0x30;
-    table = &D_0014B540;
+    table = &g_copy_setup_data;
     func_PAL_002B8838(base, table->packs[index].c + table->base, table->packs[index].d);
     func_00126288(packet, D_001A72EC[0] >> 8, 1, 0, 0, 0, 16, 16);
-    func_0011AEA0(0);
-    func_001265B0(packet, clut);
-    func_001244B8(0, 0);
-    log = func_00282A18(*(int *)(hdr + 8));
+    FlushCache(0);
+    sceGsExecLoadImage(packet, clut);
+    gfx_wait_paths_idle(0, 0);
+    log = log2dim(*(int *)(hdr + 8));
     width = *(int *)(hdr + 8) >> 6;
     if (width < 1)
         width = 1;
     func_00126288(packet, D_001A72FC[0] >> 8, width, 27, 0, 0, *(short *)(hdr + 8), *(short *)(hdr + 12));
-    func_0011AEA0(0);
-    func_001265B0(packet, base + 0x430);
-    func_001244B8(0, 0);
+    FlushCache(0);
+    sceGsExecLoadImage(packet, base + 0x430);
+    gfx_wait_paths_idle(0, 0);
     {
         long image, tex, format, clut_base, word;
 

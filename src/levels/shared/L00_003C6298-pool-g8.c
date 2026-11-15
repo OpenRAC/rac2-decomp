@@ -60,13 +60,13 @@ extern unsigned int D_L00_001B0138 __attribute__((sda));
 extern int D_L00_001B013C __attribute__((sda));
 extern L00PoolParticle *D_L00_001B2AD4 MACRO_ADDR;
 extern L00PoolTrail *D_L00_001B2AD8 MACRO_ADDR;
-extern char D_00189EA0[];
-extern int func_L00_003CBBD0(void);
-extern L00PoolMoby *func_0029EFD0(int);
-extern int func_002FED90(void *, float, float, float, void *);
-extern void func_00282F20(void *, void *, float);
-extern char *func_L00_00329FF0(char *);
-extern void func_L00_003CB538(void *);
+extern char g_hero_position[];
+extern int sheepinator_is_mode_four(void);
+extern L00PoolMoby *CreateMoby(int);
+extern int part_alloc_effect_slot(void *, float, float, float, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern char *mem_round_up_to_16(char *);
+extern void part_spawn_pool_particle(void *);
 
 /* Unless func_L00_003CBBD0 reports the table full, creates a 0xA9B moby at position, takes the
    first free of the five D_L00_002472C0 slots for it and counts it in D_L00_001B0138. Its
@@ -74,7 +74,7 @@ extern void func_L00_003CB538(void *);
    also carves the 64 particle records (D_L00_001B2AD4) and 12 trail records (D_L00_001B2AD8)
    out of the owner's pvars + 8 buffer and clears them; each call then seeds 20 particles
    through func_L00_003CB538. */
-L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, void *direction)
+L00PoolMoby *SpawnParticlePoolMoby(L00PoolMoby *owner, int value, void *position, void *direction)
 {
     char saved[16] __attribute__((aligned(16)));
     L00PoolMoby *object;
@@ -83,7 +83,7 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
     float scale;
     int i;
 
-    if (IsSheepinatorModeFour())
+    if (sheepinator_is_mode_four())
         return 0;
 
     for (i = 0; i < 5 && D_L00_002472C0[i].word_00 != 0; i++)
@@ -97,8 +97,8 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         scale = 1.0f;
 
         *(L00PoolQuad *)saved = *(L00PoolQuad *)object->position;
-        *(L00PoolQuad *)object->position = *(L00PoolQuad *)gHeroPosition;
-        state->effect_slot = AllocEffectSlot_002FED90(object, scale, scale, scale, 0);
+        *(L00PoolQuad *)object->position = *(L00PoolQuad *)g_hero_position;
+        state->effect_slot = part_alloc_effect_slot(object, scale, scale, scale, 0);
         *(L00PoolQuad *)object->position = *(L00PoolQuad *)saved;
         vec_scale_to_length(state, direction, scale);
         state->lifetime = 160;
@@ -117,9 +117,9 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         p = owner->pvars;
         if (!D_L00_001B013C) {
             D_L00_001B2AD4 = *(L00PoolParticle **)(p + 8);
-            p = RoundUpToMultipleOf16_L00((char *)D_L00_001B2AD4 + 0xC00);
+            p = mem_round_up_to_16((char *)D_L00_001B2AD4 + 0xC00);
             D_L00_001B2AD8 = (L00PoolTrail *)p;
-            RoundUpToMultipleOf16_L00(p + 0x780);
+            mem_round_up_to_16(p + 0x780);
             D_L00_001B013C = 1;
             for (i = 63; i >= 0; i--)
                 D_L00_001B2AD4[i].owner = 0;
@@ -128,7 +128,7 @@ L00PoolMoby *func_L00_003CB980(L00PoolMoby *owner, int value, void *position, vo
         }
 
         for (i = 0; i < 20; i++)
-            SpawnPoolParticle(object);
+            part_spawn_pool_particle(object);
     }
     return object;
 }

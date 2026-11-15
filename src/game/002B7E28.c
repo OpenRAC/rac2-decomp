@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern int func_002AAE98(float, float, float, float);
+extern char *part_alloc(int);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern int gfx_pack_color_floats(float, float, float, float);
 extern unsigned char *D_001F2574, *D_001F25A4;
-extern void func_002B9180(char *);
-extern void func_00282CC0(char *, char *, char *);
+extern void part_kill(char *);
+extern void FastVecAdd(char *, char *, char *);
 
 #ifndef RAC2_T_REC_F4EC78016
 #define RAC2_T_REC_F4EC78016
@@ -46,7 +46,7 @@ extern Slot_F4ec78016 D_00188660_1[];
 
 extern Globals_F4ec78016 D_001A63A8_4[];
 
-extern void func_002B6958(int a, int b, int c, int d);
+extern void snd_play_stream_by_id(int a, int b, int c, int d);
 
 extern float Fe617c30b_FUN_00283CE0(int a);
 
@@ -107,7 +107,7 @@ typedef struct {
 
 extern void func_00282CC0_8(void *, void *, void *);
 
-extern s32 func_00282948(void *);
+extern s32 math_fast_float_d(void *);
 
 extern void func_002B9180_4(void *);
 
@@ -119,7 +119,7 @@ extern int Fc10c1216_FUN_00283CF0(float);
 
 extern void Fc10c1216_FUN_00282CC0(char *, char *, char *);
 
-extern void func_002B6D80(s32, s32, s32);
+extern void snd_start_music_stream(s32, s32, s32);
 
 extern short D_001A63D4;
 
@@ -127,7 +127,7 @@ extern short D_001A63D4;
 
 extern short r1_D_001517F0 NOT_SDA;
 
-extern void func_0026FEB8(const char *, ...);
+extern void STUB_printf(const char *, ...);
 extern char D_001AA220[];
 
 typedef struct {
@@ -145,27 +145,27 @@ typedef struct {
     int value;
 } State_2B8518;
 
-extern State_2B8518 D_00138180;
+extern State_2B8518 g_pad_state;
 
 typedef int TI __attribute__((mode(TI)));
 
-extern float func_002B0520(TI *pos);
-extern int D_001A79F0 MACRO_ADDR;
+extern float coll_get_heightmap_height(TI *pos);
+extern int g_current_map_index MACRO_ADDR;
 extern float D_001B1DC0[] MACRO_ADDR;
 
 extern unsigned char *D_001F2544;
 
-extern void func_00300190(char *, char *);
+extern void vec_transform_or_copy(char *, char *);
 
 /* func_002BB838 uses the profile in 002BB838-qcopy.c. */
 
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 extern unsigned char *D_001F2560;
 
 
 /* Stores the incoming handle into the record's first word and, for a non-negative index, into the next slot of a 112-byte-stride table, then either bumps a state short from 1 to 2 or passes three shorts and one word of a global block to a helper. */
 /* Called when a loading request gets its result. It stores the result in the request and moves the request on to its next step. */
-void func_002B7E28(void *result, long requestAddr)
+void request_store_result_and_advance(void *result, long requestAddr)
 {
     Rec_F4ec78016 *request = (Rec_F4ec78016 *)requestAddr;
     Slot_F4ec78016 *slot;
@@ -183,12 +183,12 @@ void func_002B7E28(void *result, long requestAddr)
         if (request->h10 == 1)
             request->h10 = 2;
     } else {
-        PlaySoundStreamById(D_001A63A8_4->h108, D_001A63A8_4->h112, D_001A63A8_4->f132, D_001A63A8_4->h110);
+        snd_play_stream_by_id(D_001A63A8_4->h108, D_001A63A8_4->h112, D_001A63A8_4->f132, D_001A63A8_4->h110);
     }
 }
 
 /* Called when a loading request gets its result. It stores the result and moves the request on to its next step. */
-void func_002B7EA8(s32 result, long requestAddr)
+void request_store_result_and_advance_alt(s32 result, long requestAddr)
 {
     s32 request = (s32)requestAddr;
     if (request == 0)
@@ -199,14 +199,14 @@ void func_002B7EA8(s32 result, long requestAddr)
             *(short *)(request + 10) = 2;
     } else {
         u8 *globals = (u8 *)D_001A63A8_4;
-        StartMusicStream(*(short *)(globals + 0x48),
+        snd_start_music_stream(*(short *)(globals + 0x48),
                       *(short *)(globals + 0x4C),
                       *(short *)(globals + 0x4A));
     }
 }
 
 /* Called when a request gets its result. A good result moves the request to state 4, and a zero result resets it. */
-void func_002B7F08(int result, long requestAddr)
+void request_store_result_move_to_done(int result, long requestAddr)
 {
     short *request = (short *)(int)requestAddr;
     short oldState;
@@ -226,7 +226,7 @@ void func_002B7F08(int result, long requestAddr)
 
 /* rac1-decomp src/game/stream.c: func_00217970 */
 /* Called when a request gets its result. A pending request in state 9 is moved to state 4, and a zero result resets it. */
-void func_002B7F58(int result, long requestAddr) {
+void request_resume_pending_result(int result, long requestAddr) {
     short *request = (short *)(int)requestAddr;
     if (request != 0) {
         if (result < 0) {
@@ -246,7 +246,7 @@ void func_002B7F58(int result, long requestAddr) {
 }
 
 /* Called when a request gets its result. A request in state 1 moves to state 8, and a zero result resets it. */
-void func_002B7FB0(int result, long requestAddr) {
+void request_store_result_move_to_end(int result, long requestAddr) {
     short *request = (short *)(int)requestAddr;
 
     if (request != 0) {
@@ -262,7 +262,7 @@ void func_002B7FB0(int result, long requestAddr) {
 }
 
 /* Stores the result into a request that is still waiting. Prints an error if the request already had a result. */
-void func_002B7FF0(int value, long address)
+void request_store_result_once(int value, long address)
 {
     char *request = (char *)(int)address;
     if (request == 0)
@@ -277,7 +277,7 @@ void func_002B7FF0(int value, long address)
 }
 
 /* Called when a streamed file has loaded. Remembers the result and its quarter value for the file voice state. */
-void func_002B8048(int value, long address)
+void music_remaining_time_callback(int value, long address)
 {
     char *request = (char *)(int)address;
     int result = value;
@@ -301,15 +301,15 @@ void func_002B8048(int value, long address)
 /* func_002B8108 is in 002B7E28-g8.c. */
 
 /* Clears the active flag and value of the first controller port state. */
-void func_002B8518(void) {
-    gPadState.active = 0;
-    gPadState.value = 0;
+void pad_clear_port_state(void) {
+    g_pad_state.active = 0;
+    g_pad_state.value = 0;
 }
 
 /* func_002B85F8 is in 002B7E28-g8.c. */
 
 /* Clears all the saved input values for a controller. */
-void func_002B8888(u8 *pad) {
+void ClearPadInput(u8 *pad) {
  s32 *slots=(s32 *)(pad+0x140);s32 remaining=15;
  *(s32 *)(pad+0x1b0)=0;*(volatile s32 *)(pad+0x1d4)=1;
  *(volatile s32 *)(pad+0x1a0)=0;*(volatile s32 *)(pad+0x1a4)=0;*(volatile s32 *)(pad+0x1a8)=0;
@@ -320,10 +320,10 @@ void func_002B8888(u8 *pad) {
 
 
 /* Updates both controller ports. */
-void func_002B9000(void) {
-    extern void func_002B85F8(void *);
+void pad_poll_ports(void) {
+    extern void poll_pad_device_state(void *);
     extern State_2B8518 D_00138500;
-    poll_pad_device_state(&gPadState);
+    poll_pad_device_state(&g_pad_state);
     poll_pad_device_state(&D_00138500);
 }
 
@@ -357,7 +357,7 @@ ASM_FUNC("asm/game", func_002B9420);
 ASM_FUNC("asm/game", func_002BA048);
 
 /* Moves a falling particle and removes it when it sinks below its floor or leaves the map. */
-void func_002BA6A0(char *particle)
+void part_update_falling(char *particle)
 {
     float *fields = (float *)particle;
     float *motion = fields + 0xC;
@@ -367,13 +367,13 @@ void func_002BA6A0(char *particle)
     int oldX, oldY;
     float groundHeight;
 
-    if (gCurrentMapIndex == 15) {
+    if (g_current_map_index == 15) {
         if (fields[6] < floorHeight) {
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
     } else if (fields[6] < floorHeight || fields[4] < 0.0f || fields[5] < 0.0f || fields[4] > 1024.0f || fields[5] > 1024.0f) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     oldX = (int)fields[8];
@@ -383,15 +383,15 @@ void func_002BA6A0(char *particle)
     FastVecAdd((char *)(fields + 4), (char *)(fields + 4), (char *)step);
     if (*(short *)(particle + 0xA) != 2 && (oldX != (int)fields[8] || oldY != (int)fields[9])) {
         pos1 = *(TI *)(fields + 8);
-        groundHeight = GetHeightmapHeightAtPosition(&pos1);
+        groundHeight = coll_get_heightmap_height(&pos1);
         if (groundHeight >= D_001B1DC0[4]) {
             pos2 = *(TI *)(fields + 8);
-            floorHeight = GetHeightmapHeightAtPosition(&pos2);
+            floorHeight = coll_get_heightmap_height(&pos2);
         } else {
             floorHeight = D_001B1DC0[4];
         }
         if (fields[10] < floorHeight) {
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
     }
@@ -400,7 +400,7 @@ void func_002BA6A0(char *particle)
 }
 
 /* Fades a particle in and out over its short life and steps through its texture frames. */
-void func_002BA978(char *particle)
+void part_update_fading_texture(char *particle)
 {
     int alpha = *(short *)(particle + 0xA) * *(int *)(particle + 0x20) / 27;
     *(unsigned int *)(particle + 4) = (*(unsigned int *)(particle + 4) & 0xFFFFFFu) | (alpha << 24);
@@ -415,13 +415,13 @@ void func_002BA978(char *particle)
    `lui`/`lw` pair, which only a -G8 unit emits). */
 
 /* Does nothing. This particle kind needs no update. */
-void func_002BAE48(void) {
+void part_update_noop_a(void) {
 }
 
 /* func_002BAE50 is matched in its own unit, src/game/002BAE50.c (default flags). */
 
 /* Changes the size of a particle over its life, slows it down, moves it and fades its colour. */
-void func_002BAF68(char *particle)
+void part_update_scaling(char *particle)
 {
     char *motion = particle + 32;
     int totalLife;
@@ -446,19 +446,19 @@ void func_002BAF68(char *particle)
 }
 
 /* Moves a particle upward, grows it and fades it out at the end of its life. */
-void func_002BB050(u8 *particle)
+void part_update_rising_fade(u8 *particle)
 {
     u8 *head = particle;
     u8 *motion = particle + 0x20;
 
-    if (FastFloatHelperD((char *)motion) != 0) {
-        KillParticle((char *)head);
+    if (math_fast_float_d((char *)motion) != 0) {
+        part_kill((char *)head);
         return;
     }
     {
         u8 *position = head + 0x10;
 
-        TransformVectorOrCopy((char *)position, (char *)position);
+        vec_transform_or_copy((char *)position, (char *)position);
     }
     *(f32 *)(head + 0xC) = *(f32 *)(head + 0xC) + *(f32 *)(motion + 4);
     if (*(s32 *)(motion) < 6) {
@@ -469,7 +469,7 @@ void func_002BB050(u8 *particle)
 
 
 /* Grows a particle and fades it out at the end of its life. */
-void func_002BB798(char *particle)
+void part_update_growing_fade(char *particle)
 {
     char *motion = particle + 32;
 
@@ -486,7 +486,7 @@ void func_002BB798(char *particle)
 /* blends a sub-object into a position, adds a float field, stores an interpolated value in the
    word at +4 and scales the frame count into a byte table at +2 */
 /* Moves a particle, blends its colour over its life and steps through its texture frames. */
-void func_002BB928(char *particle)
+void part_update_color_blend(char *particle)
 {
     char *head = particle;
     char *motion = particle + 32;
@@ -511,7 +511,7 @@ void func_002BB928(char *particle)
 
 /* decays a float field by 0.04 with a saturating early-out that consults a helper and returns; otherwise adds 12000 to a second field, nudges a third by 0.0484 while it stays below 0.225, merges two 255-scaled byte lanes into a header word, hands a sub-object to two helpers and decrements a byte counter */
 /* Fades a sparkle particle out, makes it glow brighter for a moment and slows it down. */
-void func_002BBB70(char *particle)
+void part_update_sparkle(char *particle)
 {
     char *motion = particle + 32;
     float fadeLeft;
@@ -543,9 +543,9 @@ void func_002BBB70(char *particle)
 /* func_002BC508 is in 002BC508-g8.c. */
 
 /* Creates a flashing particle near a point. It spins in a random direction and grows each frame. */
-char *func_002BC768(char *pos, int spin, int color, float spread, float low, float high, float accel, float size)
+char *part_spawn_flash(char *pos, int spin, int color, float spread, float low, float high, float accel, float size)
 {
-    char *particle = AllocParticle(13);
+    char *particle = part_alloc(13);
     char *motion;
     if (particle) {
         qcopy(particle + 16, pos);
@@ -557,24 +557,24 @@ char *func_002BC768(char *pos, int spin, int color, float spread, float low, flo
         particle[1] = 0;
         particle[8] = 0;
         particle[2] = D_001F2574[0];
-        *(float *)(particle + 16) += RandomSignedFloatRange(0.0f, spread);
-        *(float *)(particle + 20) += RandomSignedFloatRange(0.0f, spread);
-        *(float *)(particle + 24) += RandomSignedFloatRange(0.0f, spread);
+        *(float *)(particle + 16) += math_random_signed_float_range(0.0f, spread);
+        *(float *)(particle + 20) += math_random_signed_float_range(0.0f, spread);
+        *(float *)(particle + 24) += math_random_signed_float_range(0.0f, spread);
         *(short *)(particle + 10) = 10;
         *(int *)(motion + 4) = 0;
-        if (RandomIntBelow(2))
+        if (math_random_int_below(2))
             *(int *)(motion + 8) = spin;
         else
             *(int *)(motion + 8) = -spin;
         *(int *)(motion + 20) = color & 0xffffff;
-        *(float *)(motion + 12) = RandomFloatRange(low, high);
+        *(float *)(motion + 12) = math_random_float_range(low, high);
         *(float *)(motion + 16) = accel;
     }
     return particle;
 }
 
 /* Spins and grows a flash particle. It flares up, then fades out and is removed. */
-void func_002BC8E8(char *particle)
+void part_update_flash(char *particle)
 {
     char *motion = particle + 32;
     int expired;
@@ -615,11 +615,11 @@ void func_002BC8E8(char *particle)
 /* func_002BD0D0 is in 002BD0D0-g8.c. */
 
 /* Does nothing. This particle kind needs no update. */
-void func_002BD390(void) {
+void part_update_noop_b(void) {
 }
 
 /* Makes a particle pulse in brightness while it drifts, then removes it when it has faded. */
-void func_002BD398(OBJ_F3c007b59 *particle)
+void part_update_pulsing(OBJ_F3c007b59 *particle)
 {
     float *motion = (float *)((char *)particle + 32);
     float pulse;
@@ -649,7 +649,7 @@ void func_002BD398(OBJ_F3c007b59 *particle)
 }
 
 /* Moves two points of a streak particle along a velocity, fades it and removes it when it is invisible. */
-void func_002BD500(char *particle)
+void part_update_streak(char *particle)
 {
     char *posA = particle + 16;
     char *posB = particle + 32;
@@ -658,13 +658,13 @@ void func_002BD500(char *particle)
 
     FastVecAdd(posA, posA, velocity);
     FastVecAdd(posB, posB, velocity);
-    TransformVectorOrCopy(posA, posA);
-    TransformVectorOrCopy(posB, posB);
+    vec_transform_or_copy(posA, posA);
+    vec_transform_or_copy(posB, posB);
     color = *(int *)(particle + 4) - (FloatToInt(*(float *)(velocity + 12)) << 24);
     *(int *)(particle + 4) = color;
     *(int *)(particle + 12) = color;
     if (color < 0)
-        KillParticle(particle);
+        part_kill(particle);
 }
 
 /* func_002BDCE8 uses the qcopy profile in 002BDCE8.c. */
@@ -680,18 +680,18 @@ void func_002BD500(char *particle)
 
 /* calls a three-argument helper on the sub-objects at +16 and +32, then packs ((v[6]*v[4])/v[5])<<24 into the low 24 bits of the word at +4 and conditionally calls a second helper on +48 before a final call. */
 /* Moves a particle and fades its colour in step with its timer. Removes it when it is done. */
-void func_002BE928(s32 *particle) {
+void part_update_color_ramp(s32 *particle) {
     s32 *motion = (s32 *)((char *)particle + 32);
     s32 *position = (s32 *)((char *)particle + 16);
     func_00282CC0_8(position, position, motion);
     particle[1] = (particle[1] & 0x00ffffff) + ((motion[6] * motion[4] / motion[5]) << 24);
-    if (FastFloatHelperD((s32 *)((char *)particle + 48)) != 0) {
+    if (math_fast_float_d((s32 *)((char *)particle + 48)) != 0) {
         func_002B9180_4(particle);
     }
 }
 
 /* Makes a glowing particle pulse and cycle its colour while it drifts, then removes it when it has faded. */
-void func_002BE9B8(char *particle)
+void part_update_glow_pulse(char *particle)
 {
     float *motion = (float *)(particle + 32);
 
@@ -728,7 +728,7 @@ void func_002BE9B8(char *particle)
 /* func_002BEE70 is in 002BEE70-g.c (it needs -g for its line notes' pre-division nops). */
 
 /* Makes a glow particle follow its parent object and pulse. Removes it when the parent is gone. */
-void func_002BF518(char *particle)
+void part_update_following_glow(char *particle)
 {
     float *motion;
     char *owner;
@@ -739,14 +739,14 @@ void func_002BF518(char *particle)
     motion = (float *)(particle + 0x20);
     owner = *(char **)motion;
     if (owner == 0 || (*(unsigned char *)(owner + 0x20) & 0xF0) == 0xF0) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     qcopy(particle + 0x10, owner + 0x10);
     pulse = motion[1] + motion[2];
     motion[1] = pulse;
     if (pulse < 0.0f) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     if (pulse > 0.6f) {
@@ -762,7 +762,7 @@ void func_002BF518(char *particle)
     motion[6] += -0.0015f;
     if (motion[6] < 0.0f)
         motion[6] = 0.0f;
-    *(int *)(particle + 4) = PackColorFloatsToWord(motion[4], motion[5], motion[6], motion[1]);
+    *(int *)(particle + 4) = gfx_pack_color_floats(motion[4], motion[5], motion[6], motion[1]);
     motion[3] += 0.0011f;
     if (motion[3] > 1.0f)
         motion[3] -= 1.0f;

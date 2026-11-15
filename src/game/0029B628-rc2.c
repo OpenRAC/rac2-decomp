@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,13 +27,13 @@
 extern s32 D_001A7908;
 extern s32 D_001A7290 __attribute__((nosda));
 extern s32 D_001A72C0 __attribute__((nosda));
-extern s32 D_00152C00[];
+extern s32 g_hero_moby_default[];
 
 /* Resets a few global slot ids to -1 and clears a flag. */
-void func_0029B628(void) {
+void save_reset_slot_ids(void) {
     s32 *p;
 
-    p = gHeroMoby_00152C00;
+    p = g_hero_moby_default;
     D_001A7290 = -1;
     p[6] = -1;
     D_001A72C0 = -1;

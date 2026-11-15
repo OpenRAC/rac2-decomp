@@ -7,7 +7,7 @@ typedef int UiQuadword __attribute__((mode(TI)));
 extern char *D_L00_001AFF98 __attribute__((sda));
 extern unsigned char D_L00_001DB2BC[];
 extern char *D_L00_001D9F00[];
-extern UiQuadword D_00189EA0[];
+extern UiQuadword g_hero_position[];
 extern int D_L00_001B2940[] MACRO_ADDR;
 extern int D_L00_001B2950[] MACRO_ADDR;
 extern short D_L00_001B2990[] MACRO_ADDR;
@@ -16,16 +16,16 @@ extern UiQuadword D_L00_001B2900 MACRO_ADDR, D_L00_001B2910 MACRO_ADDR, D_L00_00
 extern float D_L00_001AFF4C __attribute__((sda));
 extern float D_L00_001B29D4 __attribute__((sda));
 extern char D_L00_0023FB80[];
-extern int func_L00_002D3F30(int, int);
-extern int func_002E5AD0(void *, int, int, void *, int);
-extern unsigned char *func_0029EFD0(int);
-extern void func_002833F0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_L00_0037E670(int);
-extern float func_L00_0037E668(void);
-extern int func_002E5CF8(int, int, void *);
+extern int weapon_spend_ammo(int, int);
+extern int AllocateSoundVoice(void *, int, int, void *, int);
+extern unsigned char *CreateMoby(int);
+extern void euler_rotation_basis(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void fade_set_level(int);
+extern float fade_get_value(void);
+extern int PlayMobySound(int, int, void *);
 
 /* State block of the created object; only the fields used here. */
 typedef struct {
@@ -57,7 +57,7 @@ typedef struct {
    exists or the gate refuses, builds its basis from its angles, stores the scaled basis
    vectors and their combinations in the shared tables, clears the per-slot tables and resets
    the object's state block. Returns the object, or 0 when nothing was created. */
-unsigned char *func_L00_003C3A70(int mode)
+unsigned char *CreateTrailOwnerMoby(int mode)
 {
     Owner3A *owner;
     OwnerState *state;
@@ -69,12 +69,12 @@ unsigned char *func_L00_003C3A70(int mode)
 
     if (D_L00_001AFF98 != 0) {
         AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28) + 0x80,
-                      0, 0, gHeroPosition, 0x400);
+                      0, 0, g_hero_position, 0x400);
         return 0;
     }
-    if (SpendWeaponAmmo(45, 1) == 0) {
+    if (weapon_spend_ammo(45, 1) == 0) {
         AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28),
-                      0, 0, gHeroPosition, 0x400);
+                      0, 0, g_hero_position, 0x400);
         return 0;
     }
 
@@ -122,9 +122,9 @@ unsigned char *func_L00_003C3A70(int mode)
         }
         D_L00_001B29D4 = 1.0f;
 
-        SetFadeLevel(mode);
-        state->f00 = GetFadeValue();
-        qcopy(position, gHeroPosition);
+        fade_set_level(mode);
+        state->f00 = fade_get_value();
+        qcopy(position, g_hero_position);
         state->f0C = -1;
         state->f10 = 0;
         state->countdown = 30;

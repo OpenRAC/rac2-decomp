@@ -12,16 +12,16 @@ extern s32 D_L16_001B1C7C[] MACRO_ADDR;
 extern s32 D_L16_001B1C84[] MACRO_ADDR;
 extern s32 D_L16_001B1C88[] MACRO_ADDR;
 extern s32 D_L16_001B1C8C[] MACRO_ADDR;
-extern void func_002A7A00(char *, f32, f32);
-extern s32 func_002A7820(s32, s32);
-extern s32 func_002A77E0(s32);
-extern char *func_002C3150(char *, char *, u32, u32, f32, u32, u32);
-extern void func_00282C88(char *);
-extern void func_00282CC0(char *, char *, char *);
-extern f32 func_002A7878(f32, f32);
+extern void vec_random_direction(char *, f32, f32);
+extern s32 math_random_int_range(s32, s32);
+extern s32 math_random_int_below(s32);
+extern char *part_spawn_hero_relative(char *, char *, u32, u32, f32, u32, u32);
+extern void vec_clear_128(char *);
+extern void FastVecAdd(char *, char *, char *);
+extern f32 math_random_float_range(f32, f32);
 
 /* Emits one central particle and the configured ring of falling particles. */
-void func_L16_00419140(char *self) {
+void EmitSnivelakFallingParticles(char *self) {
     char velocity[16];
     char position[16];
     s32 i;
@@ -29,18 +29,18 @@ void func_L16_00419140(char *self) {
     s32 alpha;
     s32 firstKind;
     char *origin = self + 16;
-    RandomDirectionVector(velocity, D_L16_001B1C60 * 0.01666666753590107f,
+    vec_random_direction(velocity, D_L16_001B1C60 * 0.01666666753590107f,
                   D_L16_001B1C64[0] * 0.01666666753590107f);
-    firstKind = RandomIntRange(D_L16_001B1C80, D_L16_001B1C84[0]) & 255;
-    alpha = RandomIntBelow(255);
-    SpawnHeroRelativeParticle(origin, velocity, D_L16_001B1C78, firstKind, D_L16_001B1C70, alpha & 255, 0);
-    ClearVector128(velocity);
+    firstKind = math_random_int_range(D_L16_001B1C80, D_L16_001B1C84[0]) & 255;
+    alpha = math_random_int_below(255);
+    part_spawn_hero_relative(origin, velocity, D_L16_001B1C78, firstKind, D_L16_001B1C70, alpha & 255, 0);
+    vec_clear_128(velocity);
     for (i = 0; i < D_L16_001B1C90; i++) {
-        RandomDirectionVector(position, 0.0f, 0.25f);
+        vec_random_direction(position, 0.0f, 0.25f);
         FastVecAdd(position, position, self + 16);
-        *(f32 *)(velocity + 8) = -(RandomFloatRange(D_L16_001B1C68, D_L16_001B1C6C) * 0.01666666753590107f);
-        kind = RandomIntRange(D_L16_001B1C88[0], D_L16_001B1C8C[0]) & 255;
-        alpha = RandomIntBelow(255);
-        SpawnHeroRelativeParticle(position, velocity, D_L16_001B1C7C[0], kind, D_L16_001B1C74[0], alpha & 255, 0);
+        *(f32 *)(velocity + 8) = -(math_random_float_range(D_L16_001B1C68, D_L16_001B1C6C) * 0.01666666753590107f);
+        kind = math_random_int_range(D_L16_001B1C88[0], D_L16_001B1C8C[0]) & 255;
+        alpha = math_random_int_below(255);
+        part_spawn_hero_relative(position, velocity, D_L16_001B1C7C[0], kind, D_L16_001B1C74[0], alpha & 255, 0);
     }
 }

@@ -4,14 +4,14 @@
 extern int D_L01_001A8F40;
 extern char D_L01_001A90C8 __attribute__((sda));
 extern int D_L01_001A90D0 __attribute__((sda));
-extern int func_00282948(char *);
-extern void func_0029B810(int);
+extern int math_fast_float_d(char *);
+extern void level_clear_table_entry(int);
 
 /* Counts down a timer while the level flag is clear, then returns a stored value. */
-int func_L01_002F1888(void) {
+int level_tick_timer_get_value(void) {
     if (D_L01_001A8F40 == 0) {
-        if (FastFloatHelperD(&D_L01_001A90C8))
-            ClearLevelObjectTableEntry(0);
+        if (math_fast_float_d(&D_L01_001A90C8))
+            level_clear_table_entry(0);
     }
     return D_L01_001A90D0;
 }
@@ -20,7 +20,7 @@ extern int D_001B2088;
 extern int D_001B2458;
 
 /* Looks up a 16-bit value for an entry in a table, or gives -1 when the game is too early to have it. */
-int func_L01_00305E18(int index)
+int level_get_table_entry_short(int index)
 {
     int entryIndex = index;
     int table;
@@ -48,7 +48,7 @@ extern f32 func_002E3618(void *a0, void *a1);
    pair, a closed door, a nonzero key field, the third mode and the $gp flag, then asks
    the helper whether the doubled radius fits, and finally whether the stored count
    covers the caller's index. */
-int func_L01_003245E0(u8 *target, int minCount, f32 radius) {
+int hero_is_reachable_for_count(u8 *target, int minCount, f32 radius) {
     u8 *hero = D_L01_00189E20;
     int limit = minCount;
     f32 radiusCopy = radius;

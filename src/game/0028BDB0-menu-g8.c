@@ -1,26 +1,26 @@
 #include "common.h"
 
 extern int D_001A8FBC SDATA(D_001A8FBC);
-extern unsigned char D_00139568[];
-extern int D_00139688[];
+extern unsigned char g_item_slot_to_record[];
+extern int g_item_ammo_counts[];
 typedef struct { int active; unsigned char pad04[0x38]; unsigned short label; unsigned char pad3E[0x50]; unsigned short value; unsigned char pad90[0x50]; } MapClass;
-extern MapClass D_00239BA0[];
-extern unsigned char D_00189E20[];
+extern MapClass g_weapon_table[];
+extern unsigned char g_hero_state[];
 typedef struct { int active; int selected; int handle; int busy; } MapMenuGlobals;
 extern MapMenuGlobals D_001A8FB0 MACRO_ADDR;
 extern int D_001A8FB0_gp SDATA(D_001A8FB0);
-extern int func_0028FF50(char *);
-extern int func_0028DDD8(char *);
-extern int func_0028E260(void);
-extern int func_0028B3D0(int, int, void *, void *, void *, int, int);
-extern void func_0028B6C8(int, int);
-extern void func_0028DF38(char *);
-extern int func_0028DF68(void);
-extern void func_0028BA50(void *);
-extern void func_0028BA88(void *);
+extern int gauge_update_fade_counters(char *);
+extern int menu_draw_progress_bar_panel(char *);
+extern int weapon_get_usable_selected(void);
+extern int hud_set_slot_contents(int, int, void *, void *, void *, int, int);
+extern void set_animation_parameter(int, int);
+extern void menu_init_small_panel(char *);
+extern int hud_return_zero(void);
+extern void hud_init_counter_element(void *);
+extern void hud_update_counter_element(void *);
 
 /* Opens the weapon menu entry for the selected weapon, or closes the open entry when none is chosen. */
-void func_0028E2A8(void)
+void weapon_menu_update_entry(void)
 {
     int selected;
     unsigned char *state;
@@ -31,27 +31,27 @@ void func_0028E2A8(void)
 
     if (D_001A8FBC != 0) return;
     if (D_001A8FB0_gp != 0) return;
-    selected = GetUsableSelectedWeapon();
-    lookup = gItemSlotToRecord + selected;
-    record = (MapClass *)(*lookup * 0xE0 + (unsigned int)gWeaponTable_00239BA0);
+    selected = weapon_get_usable_selected();
+    lookup = g_item_slot_to_record + selected;
+    record = (MapClass *)(*lookup * 0xE0 + (unsigned int)g_weapon_table);
     label = record->label;
     isActive = record->active;
     if (selected != 0 && isActive != 0) {
         D_001A8FB0.selected = selected;
-        D_001A8FB0.handle = SetHudSlotContents(0x10, label,
-            InitSmallMenuPanel, UpdateGaugeFadeCounters, ReturnZero_0028DF68,
-            (int)&gItemAmmoCounts[selected],
-            ((MapClass *)(*lookup * 0xE0 + (unsigned int)gWeaponTable_00239BA0))->value);
+        D_001A8FB0.handle = hud_set_slot_contents(0x10, label,
+            menu_init_small_panel, gauge_update_fade_counters, hud_return_zero,
+            (int)&g_item_ammo_counts[selected],
+            ((MapClass *)(*lookup * 0xE0 + (unsigned int)g_weapon_table))->value);
         return;
     }
-    state = gHeroState;
+    state = g_hero_state;
     if (state[0x22B4] == 2) {
         if (D_001A8FB0.handle != -1) {
             set_animation_parameter(D_001A8FB0.handle, 0);
             D_001A8FB0.handle = -1;
         }
-        *(unsigned short *)(state + 0x1878) = SetHudSlotContents(0x10, 0xFFFF,
-            InitHudCounterElement, UpdateHudCounterElement, DrawProgressBarPanel, (int)(state + 0x1874), 0xC8);
+        *(unsigned short *)(state + 0x1878) = hud_set_slot_contents(0x10, 0xFFFF,
+            hud_init_counter_element, hud_update_counter_element, menu_draw_progress_bar_panel, (int)(state + 0x1874), 0xC8);
     } else if (D_001A8FB0.handle != -1) {
         set_animation_parameter(D_001A8FB0.handle, 0);
         D_001A8FB0.handle = -1;

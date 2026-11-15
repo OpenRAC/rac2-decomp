@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad_00[0x38];
@@ -23,17 +24,17 @@ typedef struct {
     char pad_30[0x38];
     L00PickupState *state;
 } L00PickupObject;
-extern int func_L00_002D3FB0(int);
-extern int func_L00_002D3FB8(int, int);
-extern int D_00139688[];
-extern unsigned char D_00139568[];
-extern L00PickupSoundEntry D_L00_00262570[];
+extern int math_l00_return_argument_2(int);
+extern int weapon_add_ammo(int, int);
+extern int g_item_ammo_counts[];
+extern unsigned char g_item_slot_to_record[];
+extern L00PickupSoundEntry g_weapon_l00_table[];
 extern void func_US2_L00_00327478(int, int, int);
-extern void func_00282C88(void *);
-extern int func_00282C30(int);
-extern int D_L00_001B19C8[] __attribute__((sda));
+extern void vec_clear_128(void *);
+extern int subtract_integer_with_clamp(int);
+extern int g_frame_l00_counter[] __attribute__((sda));
 extern int ref_L00_003D1B50_00[] __attribute__((sda));
-extern int func_002E5CF8(int index, int value, void *object);
+extern int PlayMobySound(int index, int value, void *object);
 
 /* Defined in L00_003D1258-g8.c. */
 
@@ -53,16 +54,16 @@ int func_US2_L00_003D2FA0(L00PickupObject *object)
     if (object->phase == 2)
         return 0;
 
-    old_count = D_00139688[func_L00_002D3FB0(state->item)];
-    overflow = func_L00_002D3FB8(state->item, state->limit);
-    if (old_count < D_00139688[func_L00_002D3FB0(state->item)]) {
-        delta = D_00139688[func_L00_002D3FB0(state->item)] - old_count;
+    old_count = g_item_ammo_counts[math_l00_return_argument_2(state->item)];
+    overflow = weapon_add_ammo(state->item, state->limit);
+    if (old_count < g_item_ammo_counts[math_l00_return_argument_2(state->item)]) {
+        delta = g_item_ammo_counts[math_l00_return_argument_2(state->item)] - old_count;
         if (delta == 1) {
-            sound = ((L00PickupSoundEntry *)(D_00139568[func_L00_002D3FB0(state->item)] * 224 +
-                                             (unsigned int)D_L00_00262570))->single_sound;
+            sound = ((L00PickupSoundEntry *)(g_item_slot_to_record[math_l00_return_argument_2(state->item)] * 224 +
+                                             (unsigned int)g_weapon_l00_table))->single_sound;
         } else {
-            sound = ((L00PickupSoundEntry *)(D_00139568[func_L00_002D3FB0(state->item)] * 224 +
-                                             (unsigned int)D_L00_00262570))->multiple_sound;
+            sound = ((L00PickupSoundEntry *)(g_item_slot_to_record[math_l00_return_argument_2(state->item)] * 224 +
+                                             (unsigned int)g_weapon_l00_table))->multiple_sound;
         }
         func_US2_L00_00327478(sound, delta, -1);
         if (overflow < state->limit) {
@@ -70,12 +71,12 @@ int func_US2_L00_003D2FA0(L00PickupObject *object)
 
             object->phase = 2;
             object->scale *= 1.2f;
-            func_00282C88(state);
-            elapsed = D_L00_001B19C8[0] - ref_L00_003D1B50_00[0];
+            vec_clear_128(state);
+            elapsed = g_frame_l00_counter[0] - ref_L00_003D1B50_00[0];
             state->fade_rate = 0.13333334f;
-            if (func_00282C30(elapsed) >= 11) {
-                func_002E5CF8(0, 0, object);
-                ref_L00_003D1B50_00[0] = D_L00_001B19C8[0];
+            if (subtract_integer_with_clamp(elapsed) >= 11) {
+                PlayMobySound(0, 0, object);
+                ref_L00_003D1B50_00[0] = g_frame_l00_counter[0];
             }
         }
         result = 1;

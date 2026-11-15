@@ -42,14 +42,14 @@ typedef struct {
 extern u8 D_0019B4A8[];
 extern u8 D_0019B2E8[][16];
 extern ProgressFlags D_L00_0021DDB0;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern PathSlot *D_L00_001FDA80[];
-extern Hero D_00189E20;
-extern float func_002A7940(void);
-extern float func_00283B98(float angle, float delta);
-extern float func_00283198(float angle);
-extern int func_00283CF0(float value);
-extern int func_002E5CF8(int sound, int, void *moby);
+extern Hero g_hero_state;
+extern float math_random_angle(void);
+extern float FastAddRotations(float angle, float delta);
+extern float math_fast_sin_or_cos_b(float angle);
+extern int FloatToInt(float value);
+extern int PlayMobySound(int sound, int, void *moby);
 /* Clears the tag of each point of the button's path that carries the button's tag. */
 static __inline__ void ClearPathTags(ButtonVars *vars)
 {
@@ -90,16 +90,16 @@ void func_PAL_L01_003B55C4(Moby *moby)
     switch (moby->state) {
     case 0:
         /* Settle into the floor; start pressed if it was pressed before or its mission is done. */
-        vars->phase = func_002A7940();
+        vars->phase = math_random_angle();
         id = moby->uid;
         moby->position[2] -= 0.35f;
         if (!D_L00_0021DDB0.byUid[id]) {
-            count = D_0019B4A8[(id >> 1) + D_001A79F0 * 0x400];
+            count = D_0019B4A8[(id >> 1) + g_current_map_index * 0x400];
             if (moby->uid & 1)
                 count = (count >> 4) & 7;
             else
                 count &= 7;
-            if (!count && !(vars->byMission && (D_0019B2E8[D_001A79F0][moby->mission] & 0x80)))
+            if (!count && !(vars->byMission && (D_0019B2E8[g_current_map_index][moby->mission] & 0x80)))
                 goto waiting;
         }
         moby->fBC = 2;
@@ -113,8 +113,8 @@ waiting:
 
     case 1:
         /* Pulse the glow between 32 and 128. */
-        vars->phase = func_00283B98(vars->phase, 0.12566373f);    /* 6 degrees a frame */
-        intensity = func_00283CF0((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
+        vars->phase = FastAddRotations(vars->phase, 0.12566373f);    /* 6 degrees a frame */
+        intensity = FloatToInt((math_fast_sin_or_cos_b(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (intensity > 128)
             intensity = 128;
         else if (intensity < 32)
@@ -125,22 +125,22 @@ waiting:
         moby->color = blue | alphaGreen | grey;
 
         /* Wait for the hero to stand on the button, or for its mission. */
-        if (D_00189E20.groundMoby != moby || D_00189E20.f34E) {
+        if (g_hero_state.groundMoby != moby || g_hero_state.f34E) {
             if (!vars->byMission)
                 return;
-            if (!(D_0019B2E8[D_001A79F0][moby->mission] & 0x80))
+            if (!(D_0019B2E8[g_current_map_index][moby->mission] & 0x80))
                 return;
         }
 
         /* Count the press (up to 7), then unblock the path. */
         uid = moby->uid;
         if (uid & 1) {
-            counter = &D_0019B4A8[((short)uid >> 1) + D_001A79F0 * 0x400];
+            counter = &D_0019B4A8[((short)uid >> 1) + g_current_map_index * 0x400];
             value = *counter;
             if (((value >> 4) & 7) != 7)
                 *counter = value + 0x10;
         } else {
-            counter = &D_0019B4A8[((short)uid >> 1) + D_001A79F0 * 0x400];
+            counter = &D_0019B4A8[((short)uid >> 1) + g_current_map_index * 0x400];
             value = *counter;
             if ((value & 7) != 7)
                 *counter = value + 1;
@@ -148,7 +148,7 @@ waiting:
         moby->state = 2;
         moby->fBC = 1;
         moby->color = 0x80208020;
-        func_002E5CF8(0, 0, moby);
+        PlayMobySound(0, 0, moby);
         ClearPathTags(vars);
     }
 }

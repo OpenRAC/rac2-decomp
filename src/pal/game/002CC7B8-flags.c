@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -40,9 +41,9 @@ extern s32 D_001AA420;
 extern s32 D_001AA428;
 extern s8 D_0025BA90[];
 extern s32 D_PAL_001F2A34[];
-extern void func_0028B338(s32);
+extern void select_moby_context(s32);
 extern void func_PAL_002B5570(s32);
-extern s32 func_002B49E0(s32, s32, s32, s32, s32);
+extern s32 request_begin_slot(s32, s32, s32, s32, s32);
 extern s32 func_PAL_002D6710(s32, s8 *);
 
 s32 func_PAL_002CC7B8(s32 arg0) {
@@ -63,25 +64,25 @@ goto *D_0026CCE0[rc2_selector];
         r = 1;
         D_0018A000.a = 8;
         if (D_001AA420 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA420)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_2:
         r = 1;
         D_0018A000.a = 8;
         if (D_001AA428 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA428)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_3:
         r = func_PAL_002D6710(3, D_0025BA90);
         goto rc2_switch_end;
     rc2_case_4:
-        if (func_002B49E0(4, 2, 8, 4, 0) == 0) {
+        if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
             func_PAL_002B5570(3);
             D_PAL_001F2A34[0] = 1;
             r = 1;

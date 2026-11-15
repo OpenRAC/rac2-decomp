@@ -1,18 +1,19 @@
+#include "names.h"
 /* func_PAL_L11_0039A270, the PAL copy of func_L11_003974A8: the same C, where rename func_L11_00397A30 becomes func_PAL_L11_0039A880; scale (f32)D_L11_001AEC68; scale D_L11_001AEC68; scale (f32)D_L11_001AEC6C; wrap func_00283D38(D_L11_001AEC78[1], D_L11_001AEC78[2], fad; wrap D_L11_001AEC6C (((int)({e}) * 5 + 2) / 6); rewrap (*(u16 *)(obj + 0x96)  becomes  (((int)(D_L11_001AEC6C) * 5 +; rewrap D_L11_001AEC6C; rewrap D_L11_001AEC68. */
 #include "common.h"
 
-extern s32 func_00283CF0(f32 value);
-extern void func_00282F20(void *out, void *in, f32 scale);
-extern void func_00282CC0(void *out, void *a, void *b);
+extern s32 FloatToInt(f32 value);
+extern void vec_scale_to_length(void *out, void *in, f32 scale);
+extern void FastVecAdd(void *out, void *a, void *b);
 extern void func_PAL_L11_0039A880(void *moby);
-extern void func_002A7750(void *moby, s32 state, s32 arg);
-extern void func_0029F338(void *moby);
-extern void func_L00_002E6EF8(void (*callback)(void *), void *moby);
-extern s32 func_002B3868(void *moby);
-extern s32 func_00283D38(s32 from, s32 to, f32 t);
-extern f32 func_00283CE0(s32 value);
-extern void func_L11_003982F0(void *moby);
-extern void func_L11_00397820(void *moby);
+extern void moby_set_state(void *moby, s32 state, s32 arg);
+extern void moby_mark_spawned(void *moby);
+extern void gfx_add_draw_callback_third(void (*callback)(void *), void *moby);
+extern s32 flag_set_first_pending(void *moby);
+extern s32 FastTweenColor(s32 from, s32 to, f32 t);
+extern f32 IntToFloat(s32 value);
+extern void gfx_draw_random_ribbon(void *moby);
+extern void gfx_draw_facing_quad(void *moby);
 extern f32 D_L11_001AEC60 __attribute__((sda));
 extern f32 D_L11_001AEC64 __attribute__((sda));
 extern s32 D_L11_001AEC68 __attribute__((sda));
@@ -65,11 +66,11 @@ void func_PAL_L11_0039A270(u8 *obj) {
         ctx->target->modeBits |= 2;
         ctx->curExtent = 0;
         func_PAL_L11_0039A880(obj);
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj)) {
-            func_00282F20(ctx, ctx->target->points[ctx->point], ctx->speed * 0.020000001f);
+        if (flag_set_first_pending(obj)) {
+            vec_scale_to_length(ctx, ctx->target->points[ctx->point], ctx->speed * 0.020000001f);
             {
                 f32 delta = D_L11_001AEC64 - D_L11_001AEC60;
                 f32 step = delta / (f32)D_L11_001AEC68;
@@ -79,41 +80,41 @@ void func_PAL_L11_0039A270(u8 *obj) {
             ctx->target->modeBits &= 0xFFFE;
             ctx->target->drawn = 1;
         }
-        func_00282CC0(ctx->target->pos, ctx->target->pos, ctx);
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
+        FastVecAdd(ctx->target->pos, ctx->target->pos, ctx);
+        vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        t = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC68) * 5 + 2) / 6);
-        ctx->target->alpha = func_00283CF0(t * 128.0f);
+        t = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC68) * 5 + 2) / 6);
+        ctx->target->alpha = FloatToInt(t * 128.0f);
         ctx->curExtent = ctx->extent * t;
-        ctx->color = func_00283D38(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
+        ctx->color = FastTweenColor(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
         if (*(u16 *)(obj + 0x96) > (((int)(D_L11_001AEC68) * 5 + 2) / 6))
-            func_002A7750(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
         break;
     case 2: {
         f32 fade;
-        if (func_002B3868(obj)) {
+        if (flag_set_first_pending(obj)) {
             ctx->scaleStep = (ctx->scale - 1.0f) / (f32)D_L11_001AEC6C;
             ctx->target->alpha = 0x80;
             ctx->target->modeBits &= 0xFFF7;
         }
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
+        vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        fade = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC6C) * 5 + 2) / 6);
+        fade = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC6C) * 5 + 2) / 6);
         ctx->curExtent = ctx->extent + -ctx->extent * fade;
-        ctx->color = func_00283D38(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
+        ctx->color = FastTweenColor(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
         if (((int)((*(u16 *)(obj + 0x96) > (((int)(D_L11_001AEC6C) * 5 + 2) / 6))) * 5 + 2) / 6) {
             ctx->target->modeBits = ctx->savedModeBits;
             ctx->target->modeBits &= 0xFFFE;
             ctx->target->drawn = 1;
-            func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], 1.0f);
-            func_0029F338(obj);
+            vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], 1.0f);
+            moby_mark_spawned(obj);
             return;
         }
         break;
     }
     }
-    func_L00_002E6EF8(func_L11_003982F0, obj);
-    func_L00_002E6EF8(func_L11_00397820, obj);
+    gfx_add_draw_callback_third(gfx_draw_random_ribbon, obj);
+    gfx_add_draw_callback_third(gfx_draw_facing_quad, obj);
     if (*(u16 *)(obj + 0x96) < 0xFFFF)
         ++*(u16 *)(obj + 0x96);
 }

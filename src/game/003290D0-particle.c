@@ -19,19 +19,19 @@ typedef struct {
     int tail;
 } Particle290;
 
-extern Particle290 D_0022C9A0[300];
-extern int func_002A7820(int, int);
-extern float func_002A78D8(float, float), func_002A7940(void), func_002A7878(float, float);
-extern void func_00282C88(void *), func_00283098(void *, void *, void *), func_00282CC0(void *, void *, void *);
+extern Particle290 g_object_particles[300];
+extern int math_random_int_range(int, int);
+extern float math_random_signed_float_range(float, float), math_random_angle(void), math_random_float_range(float, float);
+extern void vec_clear_128(void *), matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
 
 /* Claims a free particle for self: random life, grey colour, spin and size, at pos or, when
    pos[3] is -1, at a point on self's basis; counts it in self's state (+0x4C, +0x50).
    The EE ABI passes size in $f12 and pos in $a1 in either declaration order (callers
    declare (void *, void *, float)); this order copies pos last, as retail's $s3 shows. */
-void func_003290D0(char *self, float size, float *pos)
+void SpawnObjectParticle(char *self, float size, float *pos)
 {
     float offset[4];
-    Particle290 *base = gObjectParticles;
+    Particle290 *base = g_object_particles;
     char *state = *(char **)(self + 0x68);
     Particle290 *p;
     Particle290 *record;
@@ -41,19 +41,19 @@ void func_003290D0(char *self, float size, float *pos)
         p = &base[i];
         if (p->owner)
             continue;
-        p->timer2 = p->timer = RandomIntRange(80, 200);
+        p->timer2 = p->timer = math_random_int_range(80, 200);
         record = p;
-        grey = RandomIntRange(96, 128);
+        grey = math_random_int_range(96, 128);
         p->color2 = p->color = grey + ((grey << 7) & 0xFF00) + ((grey << 14) & 0xFF0000);
         p->kind = *(int *)(state + 0x50) % 2 + 1;
-        p->life = p->duration = RandomIntRange(50, 60);
+        p->life = p->duration = math_random_int_range(50, 60);
         p->size = size;
-        p->spin = RandomSignedFloatRange(180.0f, 720.0f) * 0.0002908882452175021f;
-        p->angle = RandomAngle();
+        p->spin = math_random_signed_float_range(180.0f, 720.0f) * 0.0002908882452175021f;
+        p->angle = math_random_angle();
         p->owner = self;
         ++*(int *)(state + 0x4C);
         if (pos[3] == -1.0f) {
-            ClearVector128(offset);
+            vec_clear_128(offset);
             offset[3] = 1.0f;
             offset[0] = -0.3f;
             matrix_mul_vec3(offset, offset, self + 0xC0);
@@ -61,11 +61,11 @@ void func_003290D0(char *self, float size, float *pos)
         } else {
             qcopy(record->pos, pos);
         }
-        p->pos[0] += RandomFloatRange(-0.015f, 0.015f);
-        p->pos[1] += RandomFloatRange(-0.015f, 0.015f);
-        p->pos[2] += RandomFloatRange(-0.015f, 0.015f);
-        ClearVector128(p->velocity);
-        p->velocity[2] = RandomFloatRange(0.01f, 0.015f);
+        p->pos[0] += math_random_float_range(-0.015f, 0.015f);
+        p->pos[1] += math_random_float_range(-0.015f, 0.015f);
+        p->pos[2] += math_random_float_range(-0.015f, 0.015f);
+        vec_clear_128(p->velocity);
+        p->velocity[2] = math_random_float_range(0.01f, 0.015f);
         ++*(int *)(state + 0x50);
         break;
     }

@@ -1,22 +1,23 @@
+#include "names.h"
 /* func_PAL_L07_003FB6B0, the PAL copy of func_L07_003F6F00: the same C, where scale func_002A7820(D_L07_001B1000, D_L07_001B1004); scale func_002A7820(D_L07_001B1008, D_L07_001B100C). */
 #include "common.h"
 
-extern int func_002A7820(int min, int max);
+extern int math_random_int_range(int min, int max);
 
-extern int func_002A77E0(int mode);
+extern int math_random_int_below(int mode);
 
 /* It returns the particle it spawns. Declared so, its call sets $v0, which ends the read of the
    random byte there: the argument moves then keep retail's order, and the loop's count comes
    back in $v1. */
-extern void *func_002C3150(void *, void *, int, int, int, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
-extern void func_002A7A00(void *, float, float);
+extern void vec_random_direction(void *, float, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
 /* The burst's tuning words, one declaration per word: a word retail reads through $gp is `sda`
    (its .extern comes before this function); a word it reads bare (`lui`/`lw` in the destination,
@@ -47,15 +48,15 @@ void func_PAL_L07_003FB6B0(u8 *a0)
     f32 pos[4];
     s32 i;
 
-    func_002C3150(a0 + 0x10, vel, D_L07_001B0FF8, (u8)(((int)(func_002A7820(D_L07_001B1000, D_L07_001B1004)) * 5 + 2) / 6),
-                  (u8)func_002A77E0(0xFF), 0, D_L07_001B0FF0);
-    func_00282C88(vel);
+    part_spawn_hero_relative(a0 + 0x10, vel, D_L07_001B0FF8, (u8)(((int)(math_random_int_range(D_L07_001B1000, D_L07_001B1004)) * 5 + 2) / 6),
+                  (u8)math_random_int_below(0xFF), 0, D_L07_001B0FF0);
+    vec_clear_128(vel);
     for (i = 0; i < D_L07_001B1010; i++) {
-        func_002A7A00(pos, 0.0f, 0.5f);
-        func_00282CC0(pos, pos, a0 + 0x10);
-        vel[2] = -(func_002A7878(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.020000001f);
-        func_002C3150(pos, vel, D_L07_001B0FFC, (u8)(((int)(func_002A7820(D_L07_001B1008, D_L07_001B100C)) * 5 + 2) / 6),
-                      (u8)func_002A77E0(0xFF), 0, D_L07_001B0FF4);
+        vec_random_direction(pos, 0.0f, 0.5f);
+        FastVecAdd(pos, pos, a0 + 0x10);
+        vel[2] = -(math_random_float_range(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.020000001f);
+        part_spawn_hero_relative(pos, vel, D_L07_001B0FFC, (u8)(((int)(math_random_int_range(D_L07_001B1008, D_L07_001B100C)) * 5 + 2) / 6),
+                      (u8)math_random_int_below(0xFF), 0, D_L07_001B0FF4);
     }
 }
 

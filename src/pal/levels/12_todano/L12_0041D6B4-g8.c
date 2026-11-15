@@ -45,19 +45,19 @@ extern u32 D_L12_001B1B60 __attribute__((sda));
 extern V D_L12_001C0260;
 extern V D_L12_001B9E00;
 
-extern void func_00283410(void *, void *);
-extern u64 func_0027C878(s32);
-extern void func_00283098(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern f32 func_00282DF0(void *);
+extern void euler_to_matrix(void *, void *);
+extern u64 GetEffectTextureDescriptor(s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern f32 FastVecLength(void *);
 extern f32 func_L00_002EE290(void *);
-extern s32 func_002761F8(void *, void *, s32, s32, s32);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00280B90(void *, s32, s32);
-extern void func_00282D08(void *, void *, void *, f32);
+extern s32 CollLine(void *, void *, s32, s32, s32);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void draw_world_quad(void *, s32, s32);
+extern void lerp_vector(void *, void *, void *, f32);
 
 static __inline__ void CopyVector(V *dst, V *src)
 {
@@ -76,7 +76,7 @@ void func_PAL_L12_0041D6B4(Moby *self)
 
     initial.q = 0;
     initial.f.w = 1.0f;
-    func_00283410(matrix, &initial);
+    euler_to_matrix(matrix, &initial);
     CopyVector(&matrix[3], &D_L12_001B2F8C[0][st->transform].rows[3]);
     for (i = 0; i < 4; i++) {
         quad.color[i] = D_L12_001B1B5C;
@@ -88,7 +88,7 @@ void func_PAL_L12_0041D6B4(Moby *self)
             quad.v[i].f.z = -quad.v[i].f.z;
         quad.v[i].f.z += 0.25f;
     }
-    quad.reg[1] = func_0027C878(D_L12_001B1B20);
+    quad.reg[1] = GetEffectTextureDescriptor(D_L12_001B1B20);
     low.q = 0;
     high.q = 0;
     quad.reg[2] = 0xFF9000000260ULL;
@@ -114,8 +114,8 @@ void func_PAL_L12_0041D6B4(Moby *self)
         axis.q = 0;
         axis.f.z = 1.0f;
         axis.f.w = 1.0f;
-        func_00283098(&axis, &axis, &D_L12_001B2F8C[0][st->transform]);
-        len = func_00282DF0(&axis);
+        matrix_mul_vec3(&axis, &axis, &D_L12_001B2F8C[0][st->transform]);
+        len = FastVecLength(&axis);
         if (st->target != -1) {
             retreat = 2.3f;
             advance = 7.0f;
@@ -140,64 +140,64 @@ void func_PAL_L12_0041D6B4(Moby *self)
         p2.f.z = t;
         p1.f.z = t + 0.01f;
         p3.f.z = t + 0.01f;
-        func_00283098(&p0, &p0, &D_L12_001B2F8C[0][st->transform]);
-        func_00283098(&p1, &p1, &D_L12_001B2F8C[0][st->transform]);
-        func_00283098(&p2, &p2, &D_L12_001B2F8C[0][st->transform]);
-        func_00283098(&p3, &p3, &D_L12_001B2F8C[0][st->transform]);
-        func_002830C0(&p0, &p0, matrix);
-        func_002830C0(&p1, &p1, matrix);
-        func_002830C0(&p2, &p2, matrix);
-        func_002830C0(&p3, &p3, matrix);
+        matrix_mul_vec3(&p0, &p0, &D_L12_001B2F8C[0][st->transform]);
+        matrix_mul_vec3(&p1, &p1, &D_L12_001B2F8C[0][st->transform]);
+        matrix_mul_vec3(&p2, &p2, &D_L12_001B2F8C[0][st->transform]);
+        matrix_mul_vec3(&p3, &p3, &D_L12_001B2F8C[0][st->transform]);
+        transform_vector(&p0, &p0, matrix);
+        transform_vector(&p1, &p1, matrix);
+        transform_vector(&p2, &p2, matrix);
+        transform_vector(&p3, &p3, matrix);
         if (collision) {
             CopyVector(&saved, &p2);
-            if (func_002761F8(&p0, &p2, 2, 0, 0)) {
+            if (CollLine(&p0, &p2, 2, 0, 0)) {
                 CopyVector(&p2, &D_L12_001C0260);
                 CopyVector(&p3, &D_L12_001C0260);
             }
         }
-        func_00282CF0(&delta, &D_L12_001B9E00, &p0);
+        FastVecSub(&delta, &D_L12_001B9E00, &p0);
         oldDistance = 0.0f;
-        func_00282CF0(&view, &p2, &p0);
-        func_00282DD8(&cross, &delta, &view);
-        func_00282F20(&cross, &cross, 1.0f);
-        func_00282F20(&quad.v[0], &cross, D_L12_001B1BBC);
-        func_00282F20(&quad.v[1], &cross, -D_L12_001B1BBC);
-        func_00282F20(&quad.v[2], &cross, D_L12_001B1BBC);
-        func_00282F20(&quad.v[3], &cross, -D_L12_001B1BBC);
-        func_00282CC0(&quad.v[0], &quad.v[0], &p0);
-        func_00282CC0(&quad.v[1], &quad.v[1], &p0);
-        func_00282CC0(&quad.v[2], &quad.v[2], &p2);
-        func_00282CC0(&quad.v[3], &quad.v[3], &p2);
-        func_00280B90(&quad, 0, 1);
+        FastVecSub(&view, &p2, &p0);
+        FastVecCross(&cross, &delta, &view);
+        vec_scale_to_length(&cross, &cross, 1.0f);
+        vec_scale_to_length(&quad.v[0], &cross, D_L12_001B1BBC);
+        vec_scale_to_length(&quad.v[1], &cross, -D_L12_001B1BBC);
+        vec_scale_to_length(&quad.v[2], &cross, D_L12_001B1BBC);
+        vec_scale_to_length(&quad.v[3], &cross, -D_L12_001B1BBC);
+        FastVecAdd(&quad.v[0], &quad.v[0], &p0);
+        FastVecAdd(&quad.v[1], &quad.v[1], &p0);
+        FastVecAdd(&quad.v[2], &quad.v[2], &p2);
+        FastVecAdd(&quad.v[3], &quad.v[3], &p2);
+        draw_world_quad(&quad, 0, 1);
         if (collision) {
-            func_00282CF0(&measure, &quad.v[2], &quad);
+            FastVecSub(&measure, &quad.v[2], &quad);
             oldDistance = func_L00_002EE290(&measure);
             CopyVector(&p2, &saved);
-            func_00282F20(&quad.v[0], &cross, D_L12_001B1BBC);
-            func_00282F20(&quad.v[1], &cross, -D_L12_001B1BBC);
-            func_00282F20(&quad.v[2], &cross, D_L12_001B1BBC);
-            func_00282F20(&quad.v[3], &cross, -D_L12_001B1BBC);
-            func_00282CC0(&quad.v[0], &quad.v[0], &p0);
-            func_00282CC0(&quad.v[1], &quad.v[1], &p0);
-            func_00282CC0(&quad.v[2], &quad.v[2], &p2);
-            func_00282CC0(&quad.v[3], &quad.v[3], &p2);
+            vec_scale_to_length(&quad.v[0], &cross, D_L12_001B1BBC);
+            vec_scale_to_length(&quad.v[1], &cross, -D_L12_001B1BBC);
+            vec_scale_to_length(&quad.v[2], &cross, D_L12_001B1BBC);
+            vec_scale_to_length(&quad.v[3], &cross, -D_L12_001B1BBC);
+            FastVecAdd(&quad.v[0], &quad.v[0], &p0);
+            FastVecAdd(&quad.v[1], &quad.v[1], &p0);
+            FastVecAdd(&quad.v[2], &quad.v[2], &p2);
+            FastVecAdd(&quad.v[3], &quad.v[3], &p2);
         }
         speed = phase + step;
         next = quad;
-        func_00282D08(&next.v[0], &quad.v[0], &quad.v[2], st->phase);
-        func_00282D08(&next.v[2], &quad.v[0], &quad.v[2], st->phase + D_L12_001B1BB8);
-        func_00282D08(&next.v[1], &quad.v[1], &quad.v[3], st->phase);
-        func_00282D08(&next.v[3], &quad.v[1], &quad.v[3], st->phase + D_L12_001B1BB8);
+        lerp_vector(&next.v[0], &quad.v[0], &quad.v[2], st->phase);
+        lerp_vector(&next.v[2], &quad.v[0], &quad.v[2], st->phase + D_L12_001B1BB8);
+        lerp_vector(&next.v[1], &quad.v[1], &quad.v[3], st->phase);
+        lerp_vector(&next.v[3], &quad.v[1], &quad.v[3], st->phase + D_L12_001B1BB8);
         for (j = 3; j >= 0; j--)
             next.color[j] = D_L12_001B1B60;
         phase = speed;
         if (speed > 0.0f)
             phase = speed - 1.0f;
         if (collision) {
-            func_00282CF0(&measure, &next, &quad);
+            FastVecSub(&measure, &next, &quad);
             if (oldDistance <= func_L00_002EE290(&measure))
                 continue;
         }
-        func_00280B90(&next, 0, 1);
+        draw_world_quad(&next, 0, 1);
     }
 }

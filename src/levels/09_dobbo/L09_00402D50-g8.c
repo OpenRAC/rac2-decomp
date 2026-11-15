@@ -1,10 +1,10 @@
 #include "common.h"
-extern float func_002A89A8(void *, int, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
 extern float D_L09_001B13BC __attribute__((sda));
 extern char *D_L09_001FE6C0[];
 typedef struct {
@@ -87,16 +87,16 @@ typedef struct {
 
 /* Runs on the object's first update: fills in its record's defaults, resolves the angles from
    degrees and, when the record names a path node, moves the object to it. */
-void func_L09_00402D50(char *obj) {
+void dobbo_init_enemy_vars(char *obj) {
     DobboInitData *data = *(DobboInitData **)(obj + 0x68);
     float value;
     int one;
-    data->field_288 = ProbeGroundHeightBelow(obj + 0x10, 0, 0.5f);
+    data->field_288 = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
     value = data->field_288 + D_L09_001B13BC;
     data->field_294 = value;
     if (value < data->field_264) data->field_294 = data->field_264;
     data->field_274 = -1;
-    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * RandomSignedFloatRange(25.0f, 100.0f);
+    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * math_random_signed_float_range(25.0f, 100.0f);
     else data->field_260 *= 0.0174532942f;
     data->field_48 = FloatToInt(15.0f);
     data->field_4A = FloatToInt(2.4f);
@@ -128,7 +128,7 @@ void func_L09_00402D50(char *obj) {
     data->field_138 |= 0x10;
     data->field_1DC = data->field_260 * 0.0174532942f;
     data->field_1E2 = 120;
-    SetControllerSpeedLimits(obj, 0.00666666683f, 0.0666666701f, 0.837758183f, 0.837758183f);
+    moby_set_controller_speed_limits(obj, 0.00666666683f, 0.0666666701f, 0.837758183f, 0.837758183f);
     qcopy((char *)data+0x1F0, obj+0x10);
     data->field_200 = 1.0f;
     data->field_20C = 5.0f;
@@ -138,7 +138,7 @@ void func_L09_00402D50(char *obj) {
     data->field_30 = 0;
     if (data->field_250 != -1) {
         qcopy(obj+0x10, D_L09_001FE6C0[data->field_250] + 0x10);
-        SetMobyState(obj, 1, 0);
-    } else SetMobyState(obj, 2, 2);
-    if (*(unsigned char *)(obj+0x43)) StartAnimationBlended(obj, 0, 0, 1);
+        moby_set_state(obj, 1, 0);
+    } else moby_set_state(obj, 2, 2);
+    if (*(unsigned char *)(obj+0x43)) anim_start_blended(obj, 0, 0, 1);
 }

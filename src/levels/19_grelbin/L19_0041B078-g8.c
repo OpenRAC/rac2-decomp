@@ -1,43 +1,43 @@
 #include "common.h"
 
 extern int D_0018C0B4 NOT_SDA;
-extern int D_L19_001B1D20 __attribute__((sda));
-extern int D_L19_001B1D24 __attribute__((sda));
-extern char *D_L19_001B2A1C __attribute__((sda));
+extern int g_active_yeti_count __attribute__((sda));
+extern int g_max_active_yetis __attribute__((sda));
+extern char *g_moby_l19_array __attribute__((sda));
 extern void *D_L19_001FB5A0[];
-extern int func_002ACD38(void *);
-extern int func_L19_0041BFD0(void *);
-extern void func_0029F338(void *);
-extern int func_002A8508(int,int);
-extern void func_002A7750(void *,int,int);
-extern void func_002A7470(void *,int,int,int);
-extern int func_00282948(void *);
-extern int func_002A7820(int,int);
-extern int func_002B3890(void *);
-extern int func_002B3868(void *);
-extern int func_002B1C20(void *,void *);
-extern void func_002A6C58(void *,int,int);
-extern void func_L01_003E9CF8(void *,int,void *);
-extern int func_002A77E0(int);
-extern float func_002A7878(float,float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *,float,float,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_002B60B0(void *,float,float,float,float);
-extern int func_L01_00321178(void *,void *);
-extern float func_00282E80(void *,void *);
-extern float func_00283248(float,float);
-extern int func_L01_00322288(void *,float);
-extern int func_002AEB60(void *,float);
-extern float func_00283C80(float,float);
-extern void func_002B4FF0(void *,void *,float);
-extern float func_0029F530(void *);
-extern int func_002A8D70(float,float,float,void *,int,int,int,int,int);
-extern float func_00283B98(float,float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_L02_00331440(void *,void *,int,float,float,float);
-extern void func_L19_0041C2B8(void *);
+extern int moby_is_in_selected_zone(void *);
+extern int yeti_init_stats(void *);
+extern void moby_mark_spawned(void *);
+extern int moby_count_group_not_in_state(int,int);
+extern void moby_set_state(void *,int,int);
+extern void anim_start_blended(void *,int,int,int);
+extern int math_fast_float_d(void *);
+extern int math_random_int_range(int,int);
+extern int flag_set_second_pending(void *);
+extern int flag_set_first_pending(void *);
+extern int moby_dispatch_action_by_kind(void *,void *);
+extern void SetDeathBits(void *,int,int);
+extern void part_queue_moby_for_glow(void *,int,void *);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float,float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *,float,float,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float);
+extern int moby_l01_turn_toward_target(void *,void *);
+extern float vec_distance_xy(void *,void *);
+extern float mat_fast_helper_a(float,float);
+extern int moby_start_effect_from_entry(void *,float);
+extern int math_is_value_within_step(void *,float);
+extern float FastDiffRots(float,float);
+extern void moby_turn_toward_target_and_step(void *,void *,float);
+extern float moby_get_anim_value(void *);
+extern int coll_test_hit_at_bone(float,float,float,void *,int,int,int,int,int);
+extern float FastAddRotations(float,float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int moby_move_to_target_temp_limits(void *,void *,int,float,float,float);
+extern void moby_update_timers_attachment(void *);
 
 #define I(p,n) (*(int *)((p)+(n)))
 #define F(p,n) (*(float *)((p)+(n)))
@@ -55,70 +55,70 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
     angle=func_002A7940(); \
     func_002AF000(vec,distance,angle,0.0f); \
     func_00282CC0(data+0x290,data+0x290,vec); \
-    { int timer=RandomIntRange(580,600); int active=gActiveYetiCount; \
-      I(data,0x230)=timer; gActiveYetiCount=active-1; } }
+    { int timer=func_002A7820(580,600); int active=D_L19_001B1D20; \
+      I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
 /* Updates a Y.E.T.I. every frame. It waits in hiding, runs toward the player, and attacks up close or with a leap. It runs away to a new spot when it is hurt. */
-void func_L19_0041B078(char *obj)
+void yeti_update(char *obj)
 {
     char *data;
     char *entity;
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
     int aiMode, pathResult;
-    if (!IsObjectInSelectedZone(obj+0x10) || D_0018C0B4==111) return;
+    if (!moby_is_in_selected_zone(obj+0x10) || D_0018C0B4==111) return;
     data=*(char **)(obj+0x68);
-    if (InitYetiStats(obj)) { MarkMobySpawned(obj); return; }
+    if (yeti_init_stats(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
     aiMode=B(obj,0x95);
     switch(aiMode) {
     case 0:
-        if(I(data,0x278)==1 && I(data,0x26C)==0 && gActiveYetiCount<gMaxActiveYetis) {
+        if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
                 if(I(data,0x250)==255 || !D_L19_001FB5A0[I(data,0x250)]) {
-                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
-                } else if(!CountMobysInGroupNotInState(I(data,0x250),-1)) {
-                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
+                    HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
+                } else if(!moby_count_group_not_in_state(I(data,0x250),-1)) {
+                    HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
                 }
             } else {
-                entity=gMobyArray_L19+(I(data,0x264)<<8);
+                entity=g_moby_l19_array+(I(data,0x264)<<8);
                 if(!entity || B(entity,0x20)==254 || B(entity,0x20)==253) {
-                    HIDE(); SetMobyState(obj,10,2); ANIM(0,0,10); gActiveYetiCount++;
+                    HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
                 }
             }
-        } else if(I(data,0x240) && FastFloatHelperD(data+0x238)) {
+        } else if(I(data,0x240) && math_fast_float_d(data+0x238)) {
             I(data,0x240)=0;
-            if(I(data,0x230)<300) I(data,0x230)=RandomIntRange(480,600);
+            if(I(data,0x230)<300) I(data,0x230)=math_random_int_range(480,600);
         }
         break;
     case 1:
-        if ((I(data,0x278)==1 || I(data,0x27C)==1) && gActiveYetiCount<gMaxActiveYetis) {
-            ANIM(3,0,10); SetMobyState(obj,14,2); gActiveYetiCount++;
+        if ((I(data,0x278)==1 || I(data,0x27C)==1) && g_active_yeti_count<g_max_active_yetis) {
+            ANIM(3,0,10); moby_set_state(obj,14,2); g_active_yeti_count++;
         }
         break;
     case 2:
-        if(SetSecondPendingFlag(obj)) {
+        if(flag_set_second_pending(obj)) {
             DISABLE_COLLISION();
         }
         if(I(data,0x278)!=1 && I(data,0x27C)!=1 && B(obj,0x20)!=15 && B(obj,0x20)!=16) {
-            SetMobyState(obj,7,1); ANIM(7,0,10);
-            if(!RandomIntBelow(3)) { ANIM(6,0,10); }
-            else if(RandomIntBelow(2)) {
+            moby_set_state(obj,7,1); ANIM(7,0,10);
+            if(!math_random_int_below(3)) { ANIM(6,0,10); }
+            else if(math_random_int_below(2)) {
                 ANIM(13,0,10);
             }
             PICK_FLEE_TARGET();
         } else { DISABLE_COLLISION(); }
         break;
     case 3:
-        pathResult=DispatchActionByKind(obj,data+0x140);
+        pathResult=moby_dispatch_action_by_kind(obj,data+0x140);
         if(pathResult&1) {
-            SetDeathBits(obj,0,3); QueueMobyForGlowEffect(obj,0,0); gActiveYetiCount--;
+            SetDeathBits(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
         } else if(pathResult&2) {
-            if(I(data,0x204)==1 && gActiveYetiCount<=gMaxActiveYetis) {
-                ANIM(3,0,10); SetMobyState(obj,14,2);
+            if(I(data,0x204)==1 && g_active_yeti_count<=g_max_active_yetis) {
+                ANIM(3,0,10); moby_set_state(obj,14,2);
             } else {
-                SetMobyState(obj,8,1);
+                moby_set_state(obj,8,1);
                 ANIM(2,0,10);
                 PICK_FLEE_TARGET();
             }
@@ -130,97 +130,97 @@ void func_L19_0041B078(char *obj)
     case 2:
         break;
     case 7:
-        if(B(obj,0x60)&2) {SetMobyState(obj,8,-1); ANIM(2,0,13);}
+        if(B(obj,0x60)&2) {moby_set_state(obj,8,-1); ANIM(2,0,13);}
         break;
     case 8:
-        if(SetFirstPendingFlag(obj)) SetControllerSpeedLimits(obj,0.0016666667f,0.050000004f,0.0069813179f,0.8377582f);
-        TurnMobyTowardTarget(obj,data+0x290);
-        if(vec_distance_xy(obj+0x10,data+0x290)<0.5f) {SetMobyState(obj,3,-1); ANIM(1,0,10);}
+        if(flag_set_first_pending(obj)) moby_set_controller_speed_limits(obj,0.0016666667f,0.050000004f,0.0069813179f,0.8377582f);
+        moby_l01_turn_toward_target(obj,data+0x290);
+        if(vec_distance_xy(obj+0x10,data+0x290)<0.5f) {moby_set_state(obj,3,-1); ANIM(1,0,10);}
         break;
     case 3:
         if(B(obj,0x60)&2) {
-            ANIM(12,0,10);SetMobyState(obj,1,0);
+            ANIM(12,0,10);moby_set_state(obj,1,0);
             B(obj,0x31)=0; I(obj,0x98)=0;H(obj)=(H(obj)|1)&0xEFFF;
         }
         break;
     case 10:
         entity=*(char **)(data+0x200);
-        StartMobyEffectFromEntry(obj,FastMatrixHelperA(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(IsValueWithinStepOfThreshold(obj,23.0f)) {
+        moby_start_effect_from_entry(obj,mat_fast_helper_a(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
+        if(math_is_value_within_step(obj,23.0f)) {
             ANIM(7,1,2);
-            if(RandomIntBelow(2)) {ANIM(6,0,2);}
-            SetMobyState(obj,11,-1);
-            if(I(data,0x274) || !RandomIntBelow(2)) { ANIM(3,0,6);SetMobyState(obj,14,-1); }
+            if(math_random_int_below(2)) {ANIM(6,0,2);}
+            moby_set_state(obj,11,-1);
+            if(I(data,0x274) || !math_random_int_below(2)) { ANIM(3,0,6);moby_set_state(obj,14,-1); }
         }
         break;
     case 11:
         entity=*(char **)(data+0x200);
-        StartMobyEffectFromEntry(obj,FastMatrixHelperA(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(B(obj,0x60)&2) { ANIM(3,0,10);SetMobyState(obj,14,-1); }
+        moby_start_effect_from_entry(obj,mat_fast_helper_a(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
+        if(B(obj,0x60)&2) { ANIM(3,0,10);moby_set_state(obj,14,-1); }
         break;
     case 14:
-        if(SetFirstPendingFlag(obj)) {
-            SetControllerSpeedLimits(obj,0.0033333334f,0.10000001f,0.0069813179f,0.8377582f); SOLID();
+        if(flag_set_first_pending(obj)) {
+            moby_set_controller_speed_limits(obj,0.0033333334f,0.10000001f,0.0069813179f,0.8377582f); SOLID();
         }
         if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<7.0f && vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)>4.0f &&
-            FastDiffRots(F(obj,0xF8),FastMatrixHelperA(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
-            SetControllerSpeedLimits(obj,0.02f,0.6f,0.0069813179f,0.8377582f);ANIM(4,0,10);SetMobyState(obj,15,-1);
+            FastDiffRots(F(obj,0xF8),mat_fast_helper_a(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+            moby_set_controller_speed_limits(obj,0.02f,0.6f,0.0069813179f,0.8377582f);ANIM(4,0,10);moby_set_state(obj,15,-1);
         } else if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
-            FastDiffRots(F(obj,0xF8),FastMatrixHelperA(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
-            ANIM(10,0,10);SetMobyState(obj,16,-1);
-        } else TurnTowardTargetAndStepMovement(obj,data+0x1F0,F(data,0x270));
+            FastDiffRots(F(obj,0xF8),mat_fast_helper_a(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
+            ANIM(10,0,10);moby_set_state(obj,16,-1);
+        } else moby_turn_toward_target_and_step(obj,data+0x1F0,F(data,0x270));
         break;
     case 15: {
         float attackDistance;
-        if(SetFirstPendingFlag(obj)) { SOLID(); }
-        attackDistance=GetMobyAnimationValue(obj);
-        if(attackDistance>4.0f && attackDistance<15.0f) TurnMobyTowardTarget(obj,data+0x1F0);
-        if(IsValueWithinStepOfThreshold(obj,30.0f)) {
-            ANIM(7,0,10);SetMobyState(obj,24,-1);
-            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
-            if(RandomIntBelow(5)) { ANIM(5,0,10);SetMobyState(obj,17,-1); }
+        if(flag_set_first_pending(obj)) { SOLID(); }
+        attackDistance=moby_get_anim_value(obj);
+        if(attackDistance>4.0f && attackDistance<15.0f) moby_l01_turn_toward_target(obj,data+0x1F0);
+        if(math_is_value_within_step(obj,30.0f)) {
+            ANIM(7,0,10);moby_set_state(obj,24,-1);
+            if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
+            if(math_random_int_below(5)) { ANIM(5,0,10);moby_set_state(obj,17,-1); }
         }
         if(attackDistance<19.0f) {
-            TestHitAtBone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
+            coll_test_hit_at_bone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;
     }
     case 16:
-        if(SetFirstPendingFlag(obj)) {SOLID();}
-        if(IsValueWithinStepOfThreshold(obj,25.0f)) {
-            ANIM(7,0,10);SetMobyState(obj,24,-1);
-            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
-            if(RandomIntBelow(3)) {ANIM(5,0,10);SetMobyState(obj,17,-1);}
+        if(flag_set_first_pending(obj)) {SOLID();}
+        if(math_is_value_within_step(obj,25.0f)) {
+            ANIM(7,0,10);moby_set_state(obj,24,-1);
+            if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
+            if(math_random_int_below(3)) {ANIM(5,0,10);moby_set_state(obj,17,-1);}
         }
-        if(GetMobyAnimationValue(obj)<14.0f) {
-            TestHitAtBone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
+        if(moby_get_anim_value(obj)<14.0f) {
+            coll_test_hit_at_bone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;
     case 17: {
         char *target;
-        if(SetFirstPendingFlag(obj)) {
-            vec[0]=FastSinOrCosA(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
-            vec[1]=FastSinOrCosB(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
+        if(flag_set_first_pending(obj)) {
+            vec[0]=math_fast_sin_or_cos_a(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
+            vec[1]=math_fast_sin_or_cos_b(FastAddRotations(F(obj,0xF8),3.141593f))*18.0f;
             vec[2]=0.0f;
             FastVecAdd(data+0x280,vec,obj+0x10);
-            SetControllerSpeedLimits(obj,0.023333333f,0.8000001f,0.0069813179f,0.8377582f);
+            moby_set_controller_speed_limits(obj,0.023333333f,0.8000001f,0.0069813179f,0.8377582f);
         }
-        { float range=GetMobyAnimationValue(obj);
+        { float range=moby_get_anim_value(obj);
         if(range>4.0f && range<14.0f) {
             target=data+0x280;
             { float dx=F(data,0x280)-F(obj,0x10); float dy=F(data,0x284)-F(obj,0x14);
-            angle=FastMatrixHelperA(dx,dy); }
-            MoveToTargetWithTempLimits(obj,target,16,angle,-1.0f,-1.0f);
+            angle=mat_fast_helper_a(dx,dy); }
+            moby_move_to_target_temp_limits(obj,target,16,angle,-1.0f,-1.0f);
         }}
-        if(IsValueWithinStepOfThreshold(obj,21.0f)) {
-            ANIM(7,0,10);SetMobyState(obj,24,-1);
-            if(RandomIntBelow(3)) {ANIM(6,0,10);} else if(RandomIntBelow(2)) {ANIM(13,41,10);}
+        if(math_is_value_within_step(obj,21.0f)) {
+            ANIM(7,0,10);moby_set_state(obj,24,-1);
+            if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
         }
         break;
     }
     case 24:
-        if(B(obj,0x60)&2) {ANIM(3,0,10);SetMobyState(obj,14,-1);}
+        if(B(obj,0x60)&2) {ANIM(3,0,10);moby_set_state(obj,14,-1);}
         break;
     }
-    UpdateMobyTimersAndAttachment(obj);
+    moby_update_timers_attachment(obj);
 }

@@ -18,7 +18,7 @@ typedef struct {
     int timer;
 } CallbackState;
 
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 
 /* A 256-byte menu line. */
 typedef struct {
@@ -56,7 +56,7 @@ typedef struct {
     int w3C;
 } Layout_002D4948;
 
-extern unsigned int D_001A7AF0;
+extern unsigned int g_equipment_bits;
 /* Text ids per setting value. */
 extern short D_001A8C28[4];
 extern short D_001A8C30[4];
@@ -69,18 +69,18 @@ extern short D_001A8C58[4];
 extern const OptionPreset_002D4948 D_0026CFD0[21];
 extern Layout_002D4948 D_0025D478;
 extern int D_001ABA74 __attribute__((sda));
-extern char *func_002DE550(int);
-extern void func_0029F0C8(MenuLine_002D4948 *, int);
-extern void func_002A0468(MenuLine_002D4948 *, int, int, int, int);
+extern char *menu_stream_chunk_claim_free(int);
+extern void moby_init_instance(MenuLine_002D4948 *, int);
+extern void gfx_pack_render_command_fields(MenuLine_002D4948 *, int, int, int, int);
 extern void func_002A0F48(MenuLine_002D4948 *);
 
 /* Builds the options menu from the settings word D_001A7AF0, then finds the preset
    matching the settings. */
-int func_002D4948(void)
+int InitModelPreviewMenu(void)
 {
     int kind3 = 3;
     int kind4 = 4;
-    unsigned int settings = gEquipmentBits;
+    unsigned int settings = g_equipment_bits;
     int a = (settings >> 2) & 3;
     int b = (settings >> 4) & 1;
     int c = (settings >> 6) & 1;
@@ -92,67 +92,67 @@ int func_002D4948(void)
     int lineCount;
     int i;
 
-    gPauseMenuState.items = ClaimFreeStreamChunk(1);
-    line = (MenuLine_002D4948 *)gPauseMenuState.items;
-    InitMobyInstance(line, 0xD54);
+    g_pause_menu_state.items = menu_stream_chunk_claim_free(1);
+    line = (MenuLine_002D4948 *)g_pause_menu_state.items;
+    moby_init_instance(line, 0xD54);
     line->kind = 9;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x100);
-    InitMobyInstance(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x100);
+    moby_init_instance(line, D_001A8C28[a]);
     line->kind = 8;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x200);
-    InitMobyInstance(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x200);
+    moby_init_instance(line, D_001A8C28[a]);
     line->kind = 8;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x300);
-    InitMobyInstance(line, D_001A8C30[b]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x300);
+    moby_init_instance(line, D_001A8C30[b]);
     line->kind = 0;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x400);
-    InitMobyInstance(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x400);
+    moby_init_instance(line, D_001A8C38[c]);
     line->kind = 1;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x500);
-    InitMobyInstance(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x500);
+    moby_init_instance(line, D_001A8C38[c]);
     line->kind = 1;
     line->style |= 0x8000;
     lineCount = 6;
     if (D_001A8C40[d] != 0) {
-        line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x600);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x600);
         lineCount = 7;
-        InitMobyInstance(line, D_001A8C40[d]);
+        moby_init_instance(line, D_001A8C40[d]);
         line->kind = 2;
     }
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-    InitMobyInstance(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+    moby_init_instance(line, D_001A8C48[e]);
     line->kind = kind3;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-    InitMobyInstance(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+    moby_init_instance(line, D_001A8C48[e]);
     line->kind = kind3;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-    InitMobyInstance(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+    moby_init_instance(line, D_001A8C50[f]);
     line->kind = kind4;
-    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-    InitMobyInstance(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+    moby_init_instance(line, D_001A8C50[f]);
     line->kind = kind4;
     line->style |= 0x8000;
-    if ((gEquipmentBits >> 12) & 1) {
-        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-        InitMobyInstance(line, 0x10E2);
+    if ((g_equipment_bits >> 12) & 1) {
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+        moby_init_instance(line, 0x10E2);
         line->kind = 5;
     }
-    if ((gEquipmentBits >> 13) & 1) {
-        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-        InitMobyInstance(line, 0x10E4);
+    if ((g_equipment_bits >> 13) & 1) {
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+        moby_init_instance(line, 0x10E4);
         line->kind = 6;
     }
     if (g != 0) {
-        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
-        InitMobyInstance(line, D_001A8C58[g]);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
+        moby_init_instance(line, D_001A8C58[g]);
         line->kind = 7;
     }
     for (i = 0; i < lineCount; i++) {
-        line = (MenuLine_002D4948 *)(gPauseMenuState.items + i * 0x100);
+        line = (MenuLine_002D4948 *)(g_pause_menu_state.items + i * 0x100);
         line->width = 0x1FF;
-        PackRenderCommandFields(line, 0x202020, 14, 14, 0);
+        gfx_pack_render_command_fields(line, 0x202020, 14, 14, 0);
         line->width = 0xFF;
         line->b31 = 1;
         line->b30 = 0xFF;
@@ -167,10 +167,10 @@ int func_002D4948(void)
         line->colour[2] = -2.782353f;
         func_002A0F48(line);
     }
-    gPauseMenuState.count = lineCount;
-    gPauseMenuState.timer = 300;
+    g_pause_menu_state.count = lineCount;
+    g_pause_menu_state.timer = 300;
     for (D_001ABA74 = 0; D_001ABA74 < 21; D_001ABA74++) {
-        if ((gEquipmentBits & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
+        if ((g_equipment_bits & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
             break;
         }
     }

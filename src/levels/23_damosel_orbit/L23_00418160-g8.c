@@ -15,15 +15,15 @@ extern int D_L23_001B37F0;
 
 extern char *D_L23_00259560[];
 
-extern void func_0029FCC0(char *, int, char *);
+extern void moby_transform_joint_to_world(char *, int, char *);
 
-extern void func_0029FC20(char *, int, char *);
+extern void moby_transform_joint_point(char *, int, char *);
 
-extern void func_00282D30(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
-extern void func_00282CF0(char *, char *, char *);
+extern void FastVecSub(char *, char *, char *);
 
 extern int D_L23_001B164C __attribute__((sda));
 
@@ -37,17 +37,17 @@ extern short D_L23_001B15AC __attribute__((sda));
 
 extern short D_L23_001B15B0 __attribute__((sda));
 
-extern void func_L23_00418650(char *, float);
+extern void mothership_project_point_onto_surface(char *, float);
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
-extern void *func_L23_004256F0(char *, float, char *, float, char *, float, unsigned char, float,
+extern void *ribbon_trail_create(char *, float, char *, float, char *, float, unsigned char, float,
                                unsigned char, short, short, int, int, int, int, int);
 
 /* Fires a shot from the gun joint at the next target in the ring, starts the beam effect and plays its sound. */
-void func_L23_00418160(char *moby) {
+void mothership_fire_gun_at_target(char *moby) {
     char *state = *(char **)(moby + 0x68);
     char *obj = D_L23_00259560[D_L23_001B164C];
     char *p16;
@@ -65,12 +65,12 @@ void func_L23_00418160(char *moby) {
         *(int *)(state + 0x598) = D_L23_001B163C;
     *(int *)(state + 0x59C) = (int)obj;
     *(int *)(state + 0x590) = *(int *)(state + 0x590) - 1;
-    TransformMobyJointToWorld(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
+    moby_transform_joint_to_world(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
     D_L23_001B3800 = *(TI128 *)jointPos;
-    TransformMobyJointPoint(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
+    moby_transform_joint_point(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
     FastVecScale((char *)backOffset, (char *)(jointMatrix + 8), -16.0f);
     *(TI128 *)flatPos = *(TI128 *)jointPos;
-    ProjectPointOntoPlanetSurface((char *)flatPos, 0.0f);
+    mothership_project_point_onto_surface((char *)flatPos, 0.0f);
     p16 = obj + 0x10;
     FastVecSub((char *)dirVec, (char *)flatPos, state + 0x3E0);
     FastVecScale((char *)dirVec, (char *)dirVec, 2.2f);
@@ -85,10 +85,10 @@ void func_L23_00418160(char *moby) {
     FastVecScale(D_L23_001B3810, moby + 0xE0, D_L23_001B15B4);
     FastVecAdd(D_L23_001B3810, D_L23_001B3810, p16);
     if (D_L23_001B37F0 == 0)
-        D_L23_001B37F0 = (int)CreateRibbonTrail((char *)&D_L23_001B3800, 1.7f, moby, 1.9f, D_L23_001B3810, 0.5f, 0x32,
+        D_L23_001B37F0 = (int)ribbon_trail_create((char *)&D_L23_001B3800, 1.7f, moby, 1.9f, D_L23_001B3810, 0.5f, 0x32,
                                                 D_L23_001B15A8, 0x46, D_L23_001B15AC, D_L23_001B15B0,
                                                 0xF7F0F, 0x2F00, 1, -1, 1);
-    SetMobyState(obj, 1, 0);
+    moby_set_state(obj, 1, 0);
     PlayMobySound(4, 0, moby);
     D_L23_001B164C = (D_L23_001B164C + 1) % 25;
 }

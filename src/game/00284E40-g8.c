@@ -7,10 +7,10 @@
 
 extern u8 *D_001A742C;
 typedef struct { u8 before[0x158]; short a,b,c; u8 gap[10]; short d,e; } DisplayState;
-extern DisplayState D_001A6480;
-extern void func_00125A20(u8 *,short,short,short,short,short);
+extern DisplayState g_screen_adjust_offsets;
+extern void sceGsSetDefDispEnv(u8 *,short,short,short,short,short);
 
 /* Re-applies the current screen layout settings by passing them to the display setup routine. */
-void func_00284E40(void) {
-    SetupGsDispEnv(D_001A742C,gScreenAdjustOffsets.c,gScreenAdjustOffsets.a,gScreenAdjustOffsets.b,gScreenAdjustOffsets.d,gScreenAdjustOffsets.e);
+void gfx_reapply_display_layout(void) {
+    sceGsSetDefDispEnv(D_001A742C,g_screen_adjust_offsets.c,g_screen_adjust_offsets.a,g_screen_adjust_offsets.b,g_screen_adjust_offsets.d,g_screen_adjust_offsets.e);
 }

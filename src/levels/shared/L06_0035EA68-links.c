@@ -1,20 +1,20 @@
 #include "common.h"
-extern int func_00282948(int *);
-extern void func_0029F338(void *);
-extern void func_00282F20(void *,void *,float);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *);
+extern void vec_scale_to_length(void *,void *,float);
 extern char *D_L06_001B281C[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern int D_001A79F0_gp SDATA(D_001A79F0);
 extern unsigned char D_0019B2E8[], D_0019B4A8[];
 extern char D_L06_001AF320[],D_L06_001AF350[],D_L06_001AF380[];
-extern void func_0026FEB8(char *,...);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_L06_003E11A0(void *,void *);
+extern void STUB_printf(char *,...);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void moby_hit_inside_rectangle(void *,void *);
 #define F14(p,o) (*(float *)((char *)(p)+(o)))
 #define I14(p,o) (*(int *)((char *)(p)+(o)))
 /* Updates moby class 794. It watches up to five linked mobies, and when all are in the right state it changes its target, counts down, then removes itself and the target. */
-void func_L06_003E1498(unsigned char *moby) {
+void link_watcher_update(unsigned char *moby) {
     int count=0,i;
     char *target=0;
     char *vars=*(char **)(moby+0x68);
@@ -29,7 +29,7 @@ void func_L06_003E1498(unsigned char *moby) {
             char *other=D_L06_001B281C[0]+I14(scan,0)*256;
             if(other && *(short *)(other+0xaa)==*(short *)(scan+4) && (unsigned char)other[0x20]!=254 && (unsigned char)other[0x20]!=253) {
                 unsigned short bits=*(unsigned short *)(other+0xb2);
-                int n=D_0019B4A8[((short)bits>>1)+gCurrentMapIndex[0]*1024];
+                int n=D_0019B4A8[((short)bits>>1)+g_current_map_index[0]*1024];
                 if (bits & 1) { if ((n >> 4) & 7) continue; }
                 else if (n & 7) continue;
                 if(((signed char)scan[6]==-1 || (unsigned char)other[0x20]!=(signed char)scan[6])) count++;
@@ -70,7 +70,7 @@ void func_L06_003E1498(unsigned char *moby) {
             I14(vars,0x40)=I14(vars,0xc);
             moby[0x20]=2;
         }
-        HitMobysInsideRectangle(moby,vars);
+        moby_hit_inside_rectangle(moby,vars);
         break;
     case 2:
         if(target && !(I14(vars,8)&2)) {
@@ -79,15 +79,15 @@ void func_L06_003E1498(unsigned char *moby) {
             target[0x23]=FloatToInt(F14(vars,0x44)*remaining/total);
         }
         if(!(I14(vars,8)&4) && target && (signed char)vars[0x17]!=-1 && (unsigned char)target[0x20]==(signed char)vars[0x17]) moby[0x20]=3;
-        if(!(I14(vars,8)&8) && FastFloatHelperD((int *)(vars+0x40))) moby[0x20]=3;
-        HitMobysInsideRectangle(moby,vars);
+        if(!(I14(vars,8)&8) && math_fast_float_d((int *)(vars+0x40))) moby[0x20]=3;
+        moby_hit_inside_rectangle(moby,vars);
         break;
     case 3:
-        if(target && !(I14(vars,8)&1)) MarkMobySpawned(target);
-        MarkMobySpawned(moby);
+        if(target && !(I14(vars,8)&1)) moby_mark_spawned(target);
+        moby_mark_spawned(moby);
         return;
     case 4:
         break;
     }
-    if(gCurrentMapIndex[0]==13) vec_scale_to_length(moby+0xc0,moby+0xc0,0.5f);
+    if(g_current_map_index[0]==13) vec_scale_to_length(moby+0xc0,moby+0xc0,0.5f);
 }

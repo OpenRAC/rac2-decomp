@@ -9,14 +9,14 @@ extern int D_L07_001B1E08 __attribute__((sda));
 extern int D_L07_001B0F30 __attribute__((sda));
 extern int D_L07_001B0F34;
 extern void func_31B828(u8 *, float, u8 *, float, float, int);
-extern void func_L07_003F5B50(u8 *);
+extern void lift_keep_height(u8 *);
 extern float func_2E5460(int);
 extern int func_31C970(int, int, float);
 extern void func_2E4340(void *, void *, void *);
 extern void func_317618(void *, void *, void *, void *);
 
 /* Updates the moving platform: starts it up, moves it along its path and makes it pulse in colour. */
-void func_L07_003F59C0(u8 *moby)
+void platform_update(u8 *moby)
 {
     float pos[4], old[4], delta[4];
     u8 *vars = *(u8 **)(moby + 0x68);
@@ -33,7 +33,7 @@ void func_L07_003F59C0(u8 *moby)
         break;
     case 1:
         func_31B828(moby, D_L07_001B0F38, vars + 0x50, D_L07_001B0F3C, D_L07_001B0F40, *(int *)(vars + 0xE0));
-        KeepAtLiftHeight(moby);
+        lift_keep_height(moby);
         break;
     }
     if (moby[0x31]) {

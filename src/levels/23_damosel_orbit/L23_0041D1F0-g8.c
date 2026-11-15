@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern int D_L23_001B374C __attribute__((sda));
 
@@ -21,7 +21,7 @@ extern char D_L23_001B1F90[];
  * entry word again after the stores to the globals; built with -fno-gcse, as here, this cc1
  * does too (gcse otherwise keeps the earlier load across those stores). The stores through
  * $gp and through $at are retail's two forms of the same globals. */
-int func_L23_0041D1F0(char *obj, int unused, int mode, int flag) {
+int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
     char *state = *(char **)(obj + 0x68);
     char *entry = D_L23_001B1F90 + flag * 16;
     int result = 0;
@@ -29,7 +29,7 @@ int func_L23_0041D1F0(char *obj, int unused, int mode, int flag) {
     switch (mode) {
     case 0:
         if (flag) {
-            char *g = gHeroState;
+            char *g = g_hero_state;
 
             if (*(int *)(g + 0x1874) < *(short *)(state + 0x2F4)) {
                 *(int *)(g + 0x1874) = *(int *)(g + 0x1874) + *(short *)(state + 0x2F0);

@@ -59,28 +59,28 @@ typedef struct {
 extern s32 D_L00_001A8FF4[] __attribute__((sda));
 extern s32 D_L00_001A8FF0[] __attribute__((sda));
 extern u8 D_00139578[];
-extern Weapon403730 D_L00_00262570[];
+extern Weapon403730 g_weapon_l00_table[];
 
-extern void func_00282C88(void *);
-extern void func_00283658(void *, void *);
-extern Moby403730 *func_0029EFD0(int);
-extern void func_0029F338(void *);
+extern void vec_clear_128(void *);
+extern void copy_matrix_rotation(void *, void *);
+extern Moby403730 *CreateMoby(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_002A6C58(void *, int, int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern Link403730 *func_002AB1F0(void *);
-extern void func_002AB6D8(float *, float *);
-extern float func_00283248(float, float);
-extern struct { char pad[0x80]; float x, y; } D_00189E20;
+extern void SetDeathBits(void *, int, int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern Link403730 *moby_get_private_value_0(void *);
+extern void mat_get_euler_angles(float *, float *);
+extern float mat_fast_helper_a(float, float);
+extern struct { char pad[0x80]; float x, y; } g_hero_state;
 extern short D_L00_001B2030[] __attribute__((sda));
-extern void func_002ACA50(void *, short *, short);
+extern void AddMobyToIndexList(void *, short *, short);
 
 /* Spawn class 0xEB0, initialize its timer and weapon-dependent rate,
    transfer the source link state, and add it to the short-index list. */
 /* Turns a thrown object into a Dark Sheep (moby class 3760) at the same spot. */
-Moby403730 *func_L00_00408800(Moby403730 *self) {
+Moby403730 *dark_sheep_spawn_from_object(Moby403730 *self) {
     f32 mtx[16] __attribute__((aligned(16)));
     Moby403730 *m;
     Vars403730 *vars;
@@ -94,25 +94,25 @@ Moby403730 *func_L00_00408800(Moby403730 *self) {
         m->f32 = 0x7F;
         m->f31 = 1;
         vars = m->vars;
-        m->scale = RandomFloatRange(0.85f, 1.15f);
+        m->scale = math_random_float_range(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
         if (D_L00_001A8FF4[0] != 0 || D_L00_001A8FF0[0] != 0) {
             copy_matrix_rotation(mtx, self->mtx);
-            GetEulerAnglesFromMatrix(mtx, m->rot);
+            mat_get_euler_angles(mtx, m->rot);
         } else {
-            ClearVector128(m->rot);
-            m->rot[2] = FastMatrixHelperA(m->pos[0] - gHeroState.x, m->pos[1] - gHeroState.y);
+            vec_clear_128(m->rot);
+            m->rot[2] = mat_fast_helper_a(m->pos[0] - g_hero_state.x, m->pos[1] - g_hero_state.y);
         }
         m->state = 1;
         vars->f56 = 0;
-        vars->delay = RandomIntRange(0x78, 0x12C);
+        vars->delay = math_random_int_range(0x78, 0x12C);
         vars->f70 = 600;
         vars->f74 = 15;
         vars->f5C = 0;
         vars->f78 = 0;
         m->state = 4;
         m->f98 = m->cls->f10;
-        w = &gWeaponTable_L00[D_00139578[0]];
+        w = &g_weapon_l00_table[D_00139578[0]];
         rate = 1.0f;
         if (w->f4 != 0) {
             rate = 4.0f;
@@ -122,11 +122,11 @@ Moby403730 *func_L00_00408800(Moby403730 *self) {
         if (m->flags & 0x1000) {
             SetDeathBits(self, 0, 3);
         }
-        link = GetMobyPrivateValue0(self);
+        link = moby_get_private_value_0(self);
         if (link != 0 && link->mode == 1) {
             link->mode = 2;
         } else {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
         }
         AddMobyToIndexList(m, D_L00_001B2030, 31);
         func_002A0F48(m);

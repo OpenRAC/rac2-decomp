@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_00130288(void *, void *);
+extern void mpeg_report_error(void *, void *);
 
-extern unsigned int func_0012FB80(void *, char *, unsigned int, unsigned int);
+extern unsigned int mpeg_alloc_aligned(void *, char *, unsigned int, unsigned int);
 
 extern char r1_D_00153B38[];
 
-extern void func_0012FAE8(int);
+extern void mpeg_send_event_one(int);
 
 extern int r1_func_00129690(void *, int);
 
@@ -15,7 +15,7 @@ extern int r1_func_00129530(void *);
 
 extern void r1_func_00129600(void *, int, int);
 
-extern int func_0012FD60(void *, int, int);
+extern int mpeg_decode_or_skip_frame(void *, int, int);
 
 extern int r1_func_00129530();
 
@@ -35,7 +35,7 @@ extern void r1_func_00129600();
    needed, 2.9-ee inverts the test and puts the store in a beql slot,
    one instruction short (SIZE 104/108). */
 /* Hands out an aligned chunk of memory from a region and reports an error if it is full. */
-unsigned int func_0012FB80(void *mpeg, char *region, unsigned int size,
+unsigned int mpeg_alloc_aligned(void *mpeg, char *region, unsigned int size,
                            unsigned int align) {
     unsigned int aligned;
     unsigned int end;
@@ -46,11 +46,11 @@ unsigned int func_0012FB80(void *mpeg, char *region, unsigned int size,
         *(unsigned int *)(region + 0x8) = end;
         return aligned;
     }
-    ReportMpegError(mpeg, r1_D_00153B38);
+    mpeg_report_error(mpeg, r1_D_00153B38);
     return 0;
 }
 
-extern int func_0012FBF0(void *);
+extern int mpeg_decode_pictures(void *);
 extern int r1_func_00128C90(void *);
 extern int r1_func_0012C200(void *);
 extern int r1_func_0012C058(void *, int, int);
@@ -76,7 +76,7 @@ extern char r1_D_00153B58[];
  * retail's saved registers and hoist lastResult's 0 into the prologue.
  */
 /* Reads the video stream and starts decoding pictures until one is ready or the stream ends. */
-int func_0012FBF0(void *mpeg) {
+int mpeg_decode_pictures(void *mpeg) {
     int pictureType = 1;
     int lastResult = 0;
     char *wrapper = (char *)mpeg;
@@ -135,7 +135,7 @@ int func_0012FBF0(void *mpeg) {
    (_decodeOrSkipField), for the frame-picture path. Adapted from
    Lombyte (GPL-3.0) for PAL. */
 /* Decodes or skips one full video frame and moves the frame counters forward. */
-int func_0012FD60(void *mpeg, int frameIndex, int frameLimit) {
+int mpeg_decode_or_skip_frame(void *mpeg, int frameIndex, int frameLimit) {
     Wrapper *wrapper = (Wrapper *)mpeg;
     Obj40 *decoder = wrapper->obj;
     int skipped = 0;
@@ -157,7 +157,7 @@ int func_0012FD60(void *mpeg, int frameIndex, int frameLimit) {
     } else {
         skipped = 1;
         result = r1_func_00129690(decoder, 0);
-        SendMpegEventOne((int)wrapper);
+        mpeg_send_event_one((int)wrapper);
     }
     r1_func_00129600(decoder, decoder->unk118, decoder->unk004);
     if (decoder->unk174 != 3 && skipped == 0) {

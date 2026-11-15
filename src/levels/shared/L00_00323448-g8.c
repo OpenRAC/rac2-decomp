@@ -2,15 +2,15 @@
 #include "common.h"
 typedef int V4TI_F36d8a248 __attribute__((mode(TI)));
 typedef union { float f[4]; V4TI_F36d8a248 q; } B1320Vec;
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_0029FC20(void *, int, void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283678(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern int func_L00_00323338(void *, void *, int, void *, void *, void *, void *);
-extern int func_002A7820(int, int);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void copy_matrix3x4(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern int coll_find_closest_joint_record(void *, void *, int, void *, void *, void *, void *);
+extern int math_random_int_range(int, int);
 extern int D_L00_001B1EB8;
 extern short *D_L00_001FA920[];
 extern char *D_L00_001B1E9C;
@@ -28,7 +28,7 @@ typedef struct {
     short index;
     unsigned char end, joint, type, copy_matrix, period, phase;
 } B1320Entry;
-void func_L00_00323448(char *object, B1320Entry *entries, int capacity,
+void BuildObjectAttachmentTransforms(char *object, B1320Entry *entries, int capacity,
                      int moby_group, int tie_group, int shrub_group,
                      int period, char *attachment)
 {
@@ -46,7 +46,7 @@ void func_L00_00323448(char *object, B1320Entry *entries, int capacity,
         char *p = *(char **)(*(char **)(attachment + 0x24) + 0x1C);
         if (p) joint_count = *(int *)p;
         if (!joint_count || joint_count > 40) return;
-        for (i = 0; i < joint_count; ++i) TransformMobyJointPoint(attachment, i, joints[i]);
+        for (i = 0; i < joint_count; ++i) moby_transform_joint_point(attachment, i, joints[i]);
         attachment[0x31] = 0;
         *(unsigned short *)(attachment + 0x34) |= 1;
     }
@@ -71,7 +71,7 @@ void func_L00_00323448(char *object, B1320Entry *entries, int capacity,
                 if (entries[count].joint == 255) {
                     work.vectors[1].q = *(V4TI_F36d8a248 *)(moby_item + 0x10);
                     work.vectors[2].q = *(V4TI_F36d8a248 *)(moby_item + 0xC0);
-                    entries[count].joint = FindClosestJointRecord(attachment, joints, joint_count, &work.vectors[1], &work.vectors[2], work.matrix, inverse);
+                    entries[count].joint = coll_find_closest_joint_record(attachment, joints, joint_count, &work.vectors[1], &work.vectors[2], work.matrix, inverse);
                 }
             }
             FastVecSub(entries[count].position, moby_item + 0x10, work.matrix);
@@ -84,7 +84,7 @@ void func_L00_00323448(char *object, B1320Entry *entries, int capacity,
     }
     if (tie_group != -1) {
         phase = 0;
-        if (period > 0) phase = RandomIntRange(0, period);
+        if (period > 0) phase = math_random_int_range(0, period);
         if (tie_group < D_L00_001A9018 && D_L00_001A9014[tie_group]) {
             char *tie_item;
             short *tie_ids = D_L00_001A9014[tie_group];
@@ -101,7 +101,7 @@ void func_L00_00323448(char *object, B1320Entry *entries, int capacity,
                     if (entries[count].joint == 255) {
                         work.vectors[1].q = *(V4TI_F36d8a248 *)(tie_item + 0x30);
                         work.vectors[2].q = *(V4TI_F36d8a248 *)(tie_item);
-                        entries[count].joint = FindClosestJointRecord(attachment, joints, joint_count, &work.vectors[1], &work.vectors[2], work.matrix, inverse);
+                        entries[count].joint = coll_find_closest_joint_record(attachment, joints, joint_count, &work.vectors[1], &work.vectors[2], work.matrix, inverse);
                     }
                 }
                 if (period <= 0) {

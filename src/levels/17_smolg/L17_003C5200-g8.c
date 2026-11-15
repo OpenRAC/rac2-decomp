@@ -2,23 +2,23 @@
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern u64 func_0027C878(int);
+extern u64 GetEffectTextureDescriptor(int);
 extern int D_L17_001B02D8 __attribute__((sda)), D_L17_001B02DC __attribute__((sda)), D_L17_001B02E0 __attribute__((sda)), D_L17_001B02E4 __attribute__((sda)), D_L17_001B02E8 __attribute__((sda));
 extern int D_L17_001B0310 __attribute__((sda));
 extern float D_L17_001B0290 __attribute__((sda));
-extern char *D_L17_001B2C1C MACRO_ADDR;
+extern char *g_moby_l17_pool MACRO_ADDR;
 extern char D_L17_001B9BC0[];
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CD8(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void add_vectors(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws successive textured ribbon segments from the indexed anchor. */
-void func_L17_003C5200(char *obj)
+void DrawIndexedRibbonSegments(char *obj)
 {
     struct {
         Vec vertices[4];
@@ -57,7 +57,7 @@ void func_L17_003C5200(char *obj)
     {
         unsigned int index = *(int *)(state + 0x10);
         unsigned int address = index << 8;
-        address += (unsigned int)gMobyPool_L17;
+        address += (unsigned int)g_moby_l17_pool;
         start.q = *(Quad *)(address + 0x10);
     }
     qcopy(&current, &start);

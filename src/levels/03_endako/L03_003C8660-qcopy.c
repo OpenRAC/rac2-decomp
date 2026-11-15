@@ -1,9 +1,10 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern void func_31B920(char *moby, int vector, int a2);
 
 /* Clears two fields of the moby's private data, stores a vector there and switches the moby to state 3. */
-void func_L03_003C8660(char *moby, char *vector) {
+void moby_start_fall_state(char *moby, char *vector) {
     char *vars = *(char **)(moby + 0x68);
 
     *(int *)(vars + 0xAC) = 0;

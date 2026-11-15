@@ -12,13 +12,13 @@ typedef struct {
     float payload[8];
 } Particle;
 
-extern Particle *func_002B9030(int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern Particle *part_alloc(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern unsigned char *D_L00_001FEAB0;
 extern float D_001B8DC0[];
 
@@ -26,10 +26,10 @@ extern float D_001B8DC0[];
    a pull of 0.9 towards the 0x1B8DC0 point. The floats lead the parameter list, as in
    func_002C2210: that numbering is what gives the flag a saved register. */
 /* Creates a particle like the basic one, but it is also pulled a little toward a fixed point. */
-Particle *func_L00_0033EC48(float life, float secondLife, Quad *position, int size, int color, int mode, int flag, float *vector,
+Particle *part_spawn_pulled_particle(float life, float secondLife, Quad *position, int size, int color, int mode, int flag, float *vector,
                             int word, int index, short tag, int counter)
 {
-    Particle *p = AllocParticle(0x5C);
+    Particle *p = part_alloc(0x5C);
     if (p) {
         float *out = p->payload;
         float pull[4] __attribute__((aligned(16)));
@@ -44,7 +44,7 @@ Particle *func_L00_0033EC48(float life, float secondLife, Quad *position, int si
         p->life = life * 210000.0f;
         if (mode == 0) p->seed = 0x40;
         else if (mode == 1) p->seed = 0x5A;
-        else if (mode == 2) p->seed = RandomIntBelow(255);
+        else if (mode == 2) p->seed = math_random_int_below(255);
         out[0] = p->life;
         *(short *)((char *)out + 8) = size;
         *((unsigned char *)out + 10) = flag;

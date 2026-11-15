@@ -31,44 +31,44 @@ extern int D_001AEC0C;
 extern float D_001AEC50 __attribute__((sda)), D_001AEC58 __attribute__((sda));
 extern ProjectileObject *D_001AD7EC;
 extern int D_0018C0B4 NOT_SDA;
-extern int D_001B22D0 __attribute__((sda));
+extern int g_surface_height_tiles __attribute__((sda));
 extern int D_001B22D8;
 typedef struct { int owners[64]; int active[64]; int extra[8]; int count, flag, limit; } ProjectileManager;
 extern ProjectileManager ref_00306A40_00;
 extern ProjectileObject *ref_00306A40_01[];
 typedef struct { float x, y, z; } Position3;
 extern Position3 ref_00306A40_02[];
-extern void func_002FE8D8(void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern float func_00282DB0(void *,void *);
-extern float func_00283198(float),func_00283180(float);
-extern void func_00282D30(void *,void *,float);
-extern void func_00283958(void *,void *),func_00283738(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_002FEE70(int,void *,int);
-extern void func_002FE880(void *,void *,float);
-extern void func_00300190(void *,void *);
-extern int func_002FE9D0(Sweep *);
-extern int func_00300540(int);
-extern void func_002FD1B8(int,int,int,float,float,float,float);
-extern ProjectileObject *func_00312D58(void *,float);
-extern int func_00300280(void *,void *);
-extern void func_00307BD0(void);
-extern int func_002E5DA0(int,int,void *,int);
-extern void func_002A75E0(void *,int,int,int,int);
-extern void func_002FEE50(int);
-extern void func_00282CF0(void *,void *,void *),func_00283698(void *,void *),func_002830C0(void *,void *,void *);
-extern float func_0029F530(void *);
-extern void func_00307500(void *),func_003076F0(void *),func_PAL_00308AB0(void *);
-extern int func_002FED90(void *,int,float,float,float),func_002FEC78(void *,int);
+extern void moby_get_facing_direction(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern float FastVecDot(void *,void *);
+extern float math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float);
+extern void FastVecScale(void *,void *,float);
+extern void quaternion_to_rotation_basis(void *,void *),multiply_matrix3x3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void part_steer_effect_direction(int,void *,int);
+extern void vec_add_object_direction_scaled(void *,void *,float);
+extern void vec_transform_or_copy(void *,void *);
+extern int CollideSweptSphere(Sweep *);
+extern int weapon_get_group(int);
+extern void RippleDisturb(int,int,int,float,float,float,float);
+extern ProjectileObject *moby_spawn_scaled_effect(void *,float);
+extern int slot_list_add(void *,void *);
+extern void projectile_cleanup_table_2(void);
+extern int snd_play_from_class_bank(int,int,void *,int);
+extern void anim_start_blended_with_flags(void *,int,int,int,int);
+extern void table_clear_entry_flag(int);
+extern void FastVecSub(void *,void *,void *),matrix_from_basis_rows(void *,void *),transform_vector(void *,void *,void *);
+extern float moby_get_anim_value(void *);
+extern void megaturret_find_target(void *),megaturret_aim_at_target(void *),func_PAL_00308AB0(void *);
+extern int part_alloc_effect_slot(void *,int,float,float,float),slot_alloc_for_object(void *,int);
 extern void func_PAL_00308540(void *),func_PAL_003085D8(void *);
 extern void func_PAL_002AD288(void *,void *,int,float,float);
-extern void func_002FED28(int),func_00300300(void *,int),func_0029F338(void *);
-extern void func_00283098(void *,void *,void *),func_003079E8(void *),func_002829D8(void *);
-extern int func_00282948(void *);
-extern void func_003073E0(void *),func_00307440(void *),func_00307BF0(void *);
-extern void func_0027CFD0(void (*)(void *),void *);
+extern void slot_free(int),slot_list_remove(void *,int),moby_mark_spawned(void *);
+extern void matrix_mul_vec3(void *,void *,void *),part_advance_grow_effect_2(void *),vec_fast_helper_b(void *);
+extern int math_fast_float_d(void *);
+extern void projectile_check_hit_break_2(void *),moby_follow_attached_motion_2(void *),projectile_draw_effects_2(void *);
+extern void gfx_register_overlay_draw_callback(void (*)(void *),void *);
 
 /* The state machine of an object fired at a surface: flies and sweeps for a hit, sticks or
    bursts on what it hit, then follows what it stuck to until it is destroyed. */
@@ -95,19 +95,19 @@ void func_PAL_00307CE8(ProjectileObject *self)
         self->collision = 0;
         /* fall through */
     case 1:
-        func_002FE8D8(&self->position, &direction);
-        func_00282F20(&velocity, &self->transform[8], 1.0f);
-        func_00282DD8(&axis, &velocity, &direction);
-        angle = func_00282DB0(&velocity, &direction) / 2.0f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
-        quaternion.w = func_00283180(angle);
-        func_00283958(&quaternion, matrix);
-        func_00283738(self->transform, matrix, self->transform);
+        moby_get_facing_direction(&self->position, &direction);
+        vec_scale_to_length(&velocity, &self->transform[8], 1.0f);
+        FastVecCross(&axis, &velocity, &direction);
+        angle = FastVecDot(&velocity, &direction) / 2.0f;
+        FastVecScale(&quaternion, &axis, math_fast_sin_or_cos_b(angle));
+        quaternion.w = math_fast_sin_or_cos_a(angle);
+        quaternion_to_rotation_basis(&quaternion, matrix);
+        multiply_matrix3x3(self->transform, matrix, self->transform);
         qcopy(&old, &self->position);
-        func_00282CC0(&self->position, &self->position, child);
-        func_002FEE70(child->flightEffect, child, 0);
-        func_002FE880(&self->position, child, D_001AEC50 * 0.00040000002f);
-        func_00300190(&self->position, &self->position);
+        FastVecAdd(&self->position, &self->position, child);
+        part_steer_effect_direction(child->flightEffect, child, 0);
+        vec_add_object_direction_scaled(&self->position, child, D_001AEC50 * 0.00040000002f);
+        vec_transform_or_copy(&self->position, &self->position);
         filter[0] = 0;
         filter[1] = 0xc5a;
         qcopy(&sweep.from, &old);
@@ -124,7 +124,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         sweep.flag = 1;
         sweep.flag58 = 1;
         sweep.epsilon = 0.0962f;
-        result = func_002FE9D0(&sweep);
+        result = CollideSweptSphere(&sweep);
         qcopy(&self->position, &sweep.to);
         qcopy(child, &sweep.velocity);
         if (result != 2)
@@ -138,35 +138,35 @@ void func_PAL_00307CE8(ProjectileObject *self)
                 child->attachY = hit->position.y;
                 child->attachZ = hit->position.z;
             }
-            result = func_00300540(sweep.surface);
+            result = weapon_get_group(sweep.surface);
             if (result == 2) {
                 child->velocity.z = -0.030000001f;
                 self->state = 7;
                 if (!sweep.surface) {
-                    func_002FD1B8(D_001B22D0, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
-                    hit = func_00312D58(&self->position, 2.0f);
+                    RippleDisturb(g_surface_height_tiles, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
+                    hit = moby_spawn_scaled_effect(&self->position, 2.0f);
                     if (hit)
                         hit->field23 = 0x70;
                 }
             } else if (result == 1) {
                 self->state = 8;
             } else {
-                child->managerIndex = func_00300280(&ref_00306A40_00, self);
-                func_00307BD0();
+                child->managerIndex = slot_list_add(&ref_00306A40_00, self);
+                projectile_cleanup_table_2();
                 if (ref_00306A40_00.active[child->managerIndex]) {
                     self->state = 2;
-                    func_002E5DA0(1, 0, self, 0x1367);
-                    func_002A75E0(self, 1, 0, 0, 0);
+                    snd_play_from_class_bank(1, 0, self, 0x1367);
+                    anim_start_blended_with_flags(self, 1, 0, 0, 0);
                 } else {
                     self->state = 6;
                 }
             }
-            func_002FEE50(child->flightEffect);
+            table_clear_entry_flag(child->flightEffect);
             ref_00306A40_01[child->slot] = D_001AD7EC;
             if (D_001AD7EC) {
-                func_00282CF0(&relative, &self->position, &D_001AD7EC->position);
-                func_00283698(inverse, ref_00306A40_01[child->slot]->transform);
-                func_002830C0(&relative, &relative, inverse);
+                FastVecSub(&relative, &self->position, &D_001AD7EC->position);
+                matrix_from_basis_rows(inverse, ref_00306A40_01[child->slot]->transform);
+                transform_vector(&relative, &relative, inverse);
                 {
                     /* Set twice, so alias analysis keeps the row's stores in order with the stack. */
                     int row = child->slot * 12;
@@ -179,20 +179,20 @@ void func_PAL_00307CE8(ProjectileObject *self)
             }
             self->collision = *(int *)(self->classData + 0x10);
         } else {
-            func_00282D30(child, child, 1.1f);
+            FastVecScale(child, child, 1.1f);
         }
         break;
     case 2:
-        if (func_0029F530(self) >= 6.5f) {
-            func_002A75E0(self, 2, 0, 0, 0);
+        if (moby_get_anim_value(self) >= 6.5f) {
+            anim_start_blended_with_flags(self, 2, 0, 0, 0);
             self->state = 3;
         }
         break;
     case 3:
-        func_00307500(self);
+        megaturret_find_target(self);
         goto attachment;
     case 4:
-        func_003076F0(self);
+        megaturret_aim_at_target(self);
         func_PAL_00308AB0(self);
     attachment: {
         ProjectileObject *attached = child->attachment;
@@ -204,15 +204,15 @@ void func_PAL_00307CE8(ProjectileObject *self)
                 break;
         detached:
             self->collision = 0;
-            child->flightEffect = func_002FED90(self, 0, 1.0f, 1.0f, 1.0f);
+            child->flightEffect = part_alloc_effect_slot(self, 0, 1.0f, 1.0f, 1.0f);
             self->state = 1;
             child->attachment = 0;
         }
     }
         break;
     case 5:
-        if (func_0029F530(self) <= 1.0f) {
-            func_002A75E0(self, 0, 0, 0, 0);
+        if (moby_get_anim_value(self) <= 1.0f) {
+            anim_start_blended_with_flags(self, 0, 0, 0, 0);
             self->playback = 1.0f;
             self->state = 6;
         }
@@ -220,9 +220,9 @@ void func_PAL_00307CE8(ProjectileObject *self)
     case 6:
         if (ref_00306A40_00.active[child->managerIndex]) {
             self->state = 2;
-            func_002E5DA0(1, 0, self, 0x1367);
-            func_002A75E0(self, 1, 0, 0, 0);
-            child->effect48 = func_002FEC78(self, 0);
+            snd_play_from_class_bank(1, 0, self, 0x1367);
+            anim_start_blended_with_flags(self, 1, 0, 0, 0);
+            child->effect48 = slot_alloc_for_object(self, 0);
         }
         break;
     case 7:
@@ -230,7 +230,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         func_PAL_003085D8(self);
         break;
     case 8:
-        func_002E5DA0(3, 0, self, 0x1367);
+        snd_play_from_class_bank(3, 0, self, 0x1367);
         func_PAL_002AD288(self, &self->position, -1, 0.5f, 13.0f);
         self->state = 9;
         self->flags |= 0x41;
@@ -239,10 +239,10 @@ void func_PAL_00307CE8(ProjectileObject *self)
         int invalid = -1;
 
         if (child->effect48 != invalid)
-            func_002FED28(child->effect48);
+            slot_free(child->effect48);
         if (child->managerIndex != invalid)
-            func_00300300(&ref_00306A40_00, child->managerIndex);
-        func_0029F338(self);
+            slot_list_remove(&ref_00306A40_00, child->managerIndex);
+        moby_mark_spawned(self);
         return;
     }
     }
@@ -255,22 +255,22 @@ void func_PAL_00307CE8(ProjectileObject *self)
         direction.y = ((float *)row)[1];
         direction.z = ((float *)row)[2];
         direction.w = 0;
-        func_00283098(&direction, &direction, ref_00306A40_01[child->slot]->transform);
-        func_00282CC0(&self->position, &ref_00306A40_01[child->slot]->position, &direction);
+        matrix_mul_vec3(&direction, &direction, ref_00306A40_01[child->slot]->transform);
+        FastVecAdd(&self->position, &ref_00306A40_01[child->slot]->position, &direction);
     }
     if (self->state == 3 || self->state == 4)
-        func_003079E8(self);
-    func_002829D8(&child->timer5c);
-    if (func_00282948(&child->timer40) || D_0018C0B4 == 0x6f)
+        part_advance_grow_effect_2(self);
+    vec_fast_helper_b(&child->timer5c);
+    if (math_fast_float_d(&child->timer40) || D_0018C0B4 == 0x6f)
         if (self->state != 9)
             self->state = 8;
     if (self->state == 3 || self->state == 4) {
-        func_003073E0(self);
+        projectile_check_hit_break_2(self);
         if (!ref_00306A40_00.active[child->managerIndex]) {
-            func_002A75E0(self, 1, 11, 0, 0);
+            anim_start_blended_with_flags(self, 1, 11, 0, 0);
             self->state = 5;
             self->playback = -1.0f;
-            func_002FED28(child->effect48);
+            slot_free(child->effect48);
             child->effect48 = -1;
             child->field4c = 1;
             child->field50 = 0;
@@ -281,6 +281,6 @@ void func_PAL_00307CE8(ProjectileObject *self)
         }
     }
     if (self->state < 8 && child->attachment)
-        func_00307440(self);
-    func_0027CFD0(func_00307BF0, self);
+        moby_follow_attached_motion_2(self);
+    gfx_register_overlay_draw_callback(projectile_draw_effects_2, self);
 }

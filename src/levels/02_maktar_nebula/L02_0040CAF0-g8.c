@@ -1,26 +1,26 @@
 #include "common.h"
 
-extern s32 func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern void func_002B60B0(u8 *, float, float, float, float);
-extern void func_002A04B8(u8 *, s32 *, s32 *, s32 *);
-extern void func_L02_0040D180(u8 *);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(u8 *);
-extern s32 func_002E59B0(s32, s32);
-extern s32 func_002E5CF8(s32, s32, char *);
-extern void func_002E59F8(s32);
-extern void *func_002A9640(void *, u32, s32);
-extern float func_002A96A0(u8 *, u8 *);
-extern void func_00282F20(float *, float *, float);
-extern void func_002A7A00(float *, float, float);
-extern void func_00282CC0(float *, float *, float *);
-extern float func_00283B98(float, float);
-extern void func_002AB800(s32, char *);
-extern void func_002A7750(u8 *, s32, s32);
-extern void func_L02_0040CF68(u8 *);
-extern u8 D_L02_001BA500[];
-extern u8 D_00188660[];
+extern s32 FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
+extern void get_moby_color(u8 *, s32 *, s32 *, s32 *);
+extern void blade_ball_explode(u8 *);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(u8 *);
+extern s32 snd_is_voice_playing_for_owner(s32, s32);
+extern s32 PlayMobySound(s32, s32, char *);
+extern void snd_stop_voice(s32);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern float moby_update_aim_target_strength(u8 *, u8 *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void vec_random_direction(float *, float, float);
+extern void FastVecAdd(float *, float *, float *);
+extern float FastAddRotations(float, float);
+extern void gfx_start_color_fade(s32, char *);
+extern void moby_set_state(u8 *, s32, s32);
+extern void blade_ball_update_targeting(u8 *);
+extern u8 g_camera_l02_position[];
+extern u8 g_sound_state[];
 extern float D_L02_001B194C __attribute__((sda));
 extern float D_L02_001B1950 __attribute__((sda));
 extern float D_L02_001B1954 __attribute__((sda));
@@ -30,7 +30,7 @@ extern float D_L02_001B1964 __attribute__((sda));
 
 /* Maintain the held effect slot and react to contacts with another actor. */
 /* Common work for the PX6 BladeBall each frame: sets it up on the first frame, keeps its sound going and hurts it when the player hits it. */
-void func_L02_0040CAF0(u8 *object)
+void blade_ball_update_common(u8 *object)
 {
     float velocity[4];
     float random[4];
@@ -46,11 +46,11 @@ void func_L02_0040CAF0(u8 *object)
         *(s32 *)(state + 0x19C) = -1;
         state[0x48] = FloatToInt(15.0f);
         state[0x4A] = FloatToInt(4.0f);
-        *(float *)(state + 0x190) = RandomFloatRange(-*(float *)(state + 0x190), *(float *)(state + 0x190)) * 0.017453294f;
+        *(float *)(state + 0x190) = math_random_float_range(-*(float *)(state + 0x190), *(float *)(state + 0x190)) * 0.017453294f;
         object[0x30] = 0x80;
         *(s32 *)(state + 0x194) = 1;
         *(float *)(state + 0x198) *= 0.016666668f;
-        SetControllerSpeedLimits(object, 0.027777778f, 1.6666667f, 0.001163553f, 0.10471977f);
+        moby_set_controller_speed_limits(object, 0.027777778f, 1.6666667f, 0.001163553f, 0.10471977f);
         get_moby_color(object, (s32 *)(state + 0x1A0), (s32 *)(state + 0x1A4), (s32 *)(state + 0x1A8));
         *(float *)(state + 0x60) = 0.75f;
         *(float *)(state + 0x68) = 0.75f;
@@ -63,25 +63,25 @@ void func_L02_0040CAF0(u8 *object)
         *(float *)(state + 0x8C) = 0.0027777778f;
         *(u32 *)(state + 0x98) |= 0x14;
         state[0x28] = 3;
-        ExplodeBladeBall(object);
+        blade_ball_explode(object);
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, gCameraPosition_L02) < 24.0f) {
-        UpdateMobyGroundCheck(object);
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_camera_l02_position) < 24.0f) {
+        moby_update_ground_check(object);
         object[0x6F] = 0x16;
     }
     if (object[0x95] >= 2) {
-        if (!IsVoicePlayingForOwner((s32)object, *(s32 *)(state + 0x19C)))
+        if (!snd_is_voice_playing_for_owner((s32)object, *(s32 *)(state + 0x19C)))
             *(s32 *)(state + 0x19C) = PlayMobySound(1, 4, (char *)object);
-    } else if (IsVoicePlayingForOwner((s32)object, *(s32 *)(state + 0x19C))) {
+    } else if (snd_is_voice_playing_for_owner((s32)object, *(s32 *)(state + 0x19C))) {
         s32 slot = *(s32 *)(state + 0x19C);
         if (slot != -1) {
-            u8 *record = gSoundState + slot * 0x70;
+            u8 *record = g_sound_state + slot * 0x70;
             if (*(u8 **)(record + 0x88) == object && record[0x74])
-                StopSoundVoice(slot);
+                snd_stop_voice(slot);
         }
         *(s32 *)(state + 0x19C) = -1;
     }
-    contact = FindOwnedEffectSlot(object, 0x10000, 0);
+    contact = part_find_owned_effect_slot(object, 0x10000, 0);
     if (contact && *(u8 **)(contact + 0x20)) {
         s16 kind = *(s16 *)(*(u8 **)(contact + 0x20) + 0xAA);
         if (kind == 0xA03 /* moby class 2563 */)
@@ -89,26 +89,26 @@ void func_L02_0040CAF0(u8 *object)
         else if (object[0x31] == 0 && kind == 0xB89 /* moby class 2953 */)
             *(s32 *)(contact + 0x2C) = 0;
     }
-    amount = UpdateAimTargetStrength(object, contact);
+    amount = moby_update_aim_target_strength(object, contact);
     object[0xA8] = 0xFF;
     if (amount != 0.0f) {
         scale = 0.00027777778f;
         push = D_L02_001B194C * scale;
         *(float *)(state + 0x20) -= amount;
         vec_scale_to_length(velocity, (float *)(contact + 0x10), push);
-        RandomDirectionVector(random, D_L02_001B1950 * scale, D_L02_001B1954 * scale);
+        vec_random_direction(random, D_L02_001B1950 * scale, D_L02_001B1954 * scale);
         FastVecAdd(velocity, velocity, random);
-        velocity[2] = RandomFloatRange(D_L02_001B1958, D_L02_001B1958) * scale;
+        velocity[2] = math_random_float_range(D_L02_001B1958, D_L02_001B1958) * scale;
         velocity[3] = 5627.925f;
         FastVecAdd((float *)(state + 0x100), (float *)(state + 0x100), velocity);
-        RandomDirectionVector(random, D_L02_001B1960 * 0.0000048481375f, D_L02_001B1964 * 0.0000048481375f);
+        vec_random_direction(random, D_L02_001B1960 * 0.0000048481375f, D_L02_001B1964 * 0.0000048481375f);
         *(float *)(state + 0x170) = FastAddRotations(*(float *)(state + 0x170), random[0]);
         *(float *)(state + 0x174) = FastAddRotations(*(float *)(state + 0x174), random[1]);
         *(float *)(state + 0x178) = FastAddRotations(*(float *)(state + 0x178), random[2]);
-        StartColorFade((s32)object, (char *)(state + 0x50));
-        SetMobyState(object, 13, 4);
+        gfx_start_color_fade((s32)object, (char *)(state + 0x50));
+        moby_set_state(object, 13, 4);
     }
     if (object[0x20] >= 2 && state[0x2E] == 2)
-        ExplodeBladeBall(object);
-    UpdateBladeBallTargeting(object);
+        blade_ball_explode(object);
+    blade_ball_update_targeting(object);
 }

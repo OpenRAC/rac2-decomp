@@ -31,36 +31,36 @@ extern char *ref_L06_0047A408_00 MACRO_ADDR;
 extern char *ref_L06_0047A408_01;
 extern char ref_L06_0047A408_02[];
 extern float ref_L06_0047A408_03, ref_L06_0047A408_04;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_0018A0E0[];
 extern s32 D_00138320[];
-extern PadSt D_00138180;
-extern int func_L00_00424978(void *);
-extern void func_L00_00424940(void *);
-extern f32 func_00283C80(f32, f32);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_00282DF0(void *);
-extern f32 func_00283CE0(int);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_L00_00424F00(void *, f32, f32);
-extern void func_L00_00424C60(void);
-extern void func_L00_00424C00(void);
-extern void func_L00_00424C28(void);
-extern void func_L00_00424A08(s32, f32, f32);
-extern void func_L06_00475C10(f32);
-extern void func_L00_00424A50(f32, f32);
-extern void func_L00_00424A88(s32, f32, f32);
-extern void func_L00_00424B20(f32);
-extern void func_L00_00424B48(int);
-extern void func_L00_00424B70(f32, f32);
-extern void func_L00_00424BB8(f32, f32);
+extern PadSt g_pad_state;
+extern int cam_claim_request_slot(void *);
+extern void cam_release_request_slot(void *);
+extern f32 FastDiffRots(f32, f32);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecScale(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 FastVecLength(void *);
+extern f32 IntToFloat(int);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void cam_set_strength_and_steer(void *, f32, f32);
+extern void cam_set_input_flags(void);
+extern void cam_set_snap_flag(void);
+extern void cam_set_lock_flag(void);
+extern void follow_camera_set_distance(s32, f32, f32);
+extern void cam_set_follow_distance(f32);
+extern void follow_camera_set_height(f32, f32);
+extern void cam_set_aim_offset_target(s32, f32, f32);
+extern void cam_set_tuning_value(f32);
+extern void set_follow_camera_orbit_clamp_mode(int);
+extern void cam_set_speeds_if_nonzero(f32, f32);
+extern void cam_set_turn_speeds_if_nonzero(f32, f32);
 
-extern int func_L06_0047A268(void *);
+extern int cam_is_hero_in_volume(void *);
 /* Swings the follow camera while the hero is inside a camera volume, easing its distance, height and sideways settings. */
-void func_L06_0047A408(char *arg) {
+void volume_camera_swing(char *arg) {
     struct UpdateCam *cam = (struct UpdateCam *)arg;
     CameraVec dir;
     SwingCameraParams *params;
@@ -87,10 +87,10 @@ void func_L06_0047A408(char *arg) {
     if (params->type == 6 && FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode != 0) {
         return;
     }
-    if (IsHeroInCameraVolume((void *)cam) == 0) {
+    if (cam_is_hero_in_volume((void *)cam) == 0) {
         goto stop;
     }
-    if (ClaimCameraRequestSlot(cam) <= 0) {
+    if (cam_claim_request_slot(cam) <= 0) {
         if (params->timer != 0) {
             params->done = 1;
         }
@@ -107,7 +107,7 @@ stop:
             params->done = 1;
         }
         params->timer = 0;
-        ReleaseCameraRequestSlot(cam);
+        cam_release_request_slot(cam);
         return;
     }
     if (params->timer == 0) {
@@ -117,7 +117,7 @@ stop:
     }
     if (*(s32 *)&params->type == 5) {
         *(s32 *)&params->swing = 0;
-        hero_pos = gHeroPosition;
+        hero_pos = g_hero_position;
         rec = ((struct UpdateCam *)ref_L06_0047A408_01);
         rig = FOLLOW_CAM_STATE(rec);
         follow = &rig->follow;
@@ -153,11 +153,11 @@ stop:
     total = IntToFloat(200);
     params->timer++;
     if (params->type == 10) {
-        SetCameraInputFlags();
+        cam_set_input_flags();
         FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode = 0x14D;
     }
     if (params->type == 11) {
-        SetCameraInputFlags();
+        cam_set_input_flags();
         FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode = 2;
     }
     if (params->type == 2 || params->type == 4) {
@@ -166,9 +166,9 @@ stop:
             at_end = 1;
             params->timer = 200;
         }
-        SetCameraSnapFlag();
+        cam_set_snap_flag();
     } else if (params->type == 1 || params->type == 7 || params->type == 10 || params->type == 9) {
-        PadSt *pad = &gPadState;
+        PadSt *pad = &g_pad_state;
         if (pad->analog[0] != 0.0f || pad->analog[1] != 0.0f) {
             params->timer = 200;
         }
@@ -194,20 +194,20 @@ stop:
             params->timer = 200;
         }
     }
-    dir[0] = FastSinOrCosA(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
-    dir[1] = FastSinOrCosB(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
+    dir[0] = math_fast_sin_or_cos_a(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
+    dir[1] = math_fast_sin_or_cos_b(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
     *(s32 *)&dir[2] = 0;
     swing = params->swing * ((params->timer / total) * 0.01745329424738884f);
     if ((params->type != 1 && params->type != 7 && params->type != 9) || at_end == 0) {
-        SetCameraStrengthAndSteer(dir, swing, params->pitch * 0.01745329424738884f);
+        cam_set_strength_and_steer(dir, swing, params->pitch * 0.01745329424738884f);
     }
     if (params->distance != 0.0f) {
         if (params->type == 6 || params->type == 8) {
             follow_camera_set_distance(0, params->distance, 0.002f);
-            SetCameraFollowDistance(params->distance + 1.36f);
+            cam_set_follow_distance(params->distance + 1.36f);
         } else {
             follow_camera_set_distance(0, params->distance, 0.003f);
-            SetCameraSnapFlag();
+            cam_set_snap_flag();
         }
     }
     if (params->height != 0.0f) {
@@ -219,13 +219,13 @@ stop:
     }
     if (params->offset_scale != 0.0f) {
         if (params->type == 6 || params->type == 8) {
-            SetCameraAimOffsetTarget(0, params->offset_scale, 0.002f);
+            cam_set_aim_offset_target(0, params->offset_scale, 0.002f);
         } else {
-            SetCameraAimOffsetTarget(0, params->offset_scale, 0.005f);
+            cam_set_aim_offset_target(0, params->offset_scale, 0.005f);
         }
     }
     if (params->unk50 != 0.0f) {
-        SetCameraTuningValue(params->unk50 * 0.01745329424738884f);
+        cam_set_tuning_value(params->unk50 * 0.01745329424738884f);
     }
     if (params->set_flag1 != 0) {
         { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.ctl; ctl->flags |= 2; }
@@ -238,17 +238,17 @@ stop:
     }
     if (params->lateral_stiffness != 0.0f || params->lateral_damping != 0.0f) {
         if (params->timer >= 120) {
-            SetCameraSpeedsIfNonZero(params->lateral_stiffness, params->lateral_damping);
+            cam_set_speeds_if_nonzero(params->lateral_stiffness, params->lateral_damping);
         } else {
             blend = params->timer / IntToFloat(120);
-            SetCameraSpeedsIfNonZero(
+            cam_set_speeds_if_nonzero(
                 params->start_lateral_stiffness + (params->lateral_stiffness - params->start_lateral_stiffness) * blend,
                 params->start_lateral_damping + (params->lateral_damping - params->start_lateral_damping) * blend);
         }
     }
     if (params->type == 1 || params->type == 7 || params->type == 10) {
-        SetCameraSnapFlag();
-        SetCameraLockFlag();
-        SetCameraTurnSpeedsIfNonZero(0.01f, 0.2f);
+        cam_set_snap_flag();
+        cam_set_lock_flag();
+        cam_set_turn_speeds_if_nonzero(0.01f, 0.2f);
     }
 }

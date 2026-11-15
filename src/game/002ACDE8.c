@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002ACDE8: the three quaternions are one frame array; the copy is qcopy(), whose
  * destination pointer is also the call argument, while the w clear goes through the
  * array as a frame slot, as retail does. */
@@ -5,11 +6,11 @@
 
 typedef __attribute__((mode(TI))) int QI_002ACDE8;
 
-extern void func_00282D30(void *, void *, float);
-extern void func_002837D0(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void multiply_quaternions(void *, void *, void *);
 
 /* Rotates a vector by a quaternion and stores the result. */
-void func_002ACDE8(void *result, void *vector, void *quat)
+void vec_rotate_by_quaternion(void *result, void *vector, void *quat)
 {
     QI_002ACDE8 quats[3];
 

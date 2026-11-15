@@ -26,7 +26,7 @@ typedef struct {
     char padf0[0x654];
     int auxiliary;
 } MenuState;
-extern char D_L00_0022F7C0[];
+extern char g_purchase_menu_model[];
 #define menu ((MenuState *)D_L00_0022F7C0)
 typedef struct {
     char pad00[0x370];
@@ -44,8 +44,8 @@ typedef struct {
     int words[2];
 } Pair;
 extern Pair D_L00_001AD858[];
-extern int D_001A7340[] __attribute__((sda));
-extern int D_001A7344[] __attribute__((sda));
+extern int g_screen_width[] __attribute__((sda));
+extern int g_screen_height[] __attribute__((sda));
 extern int D_001A72DC[] __attribute__((sda));
 extern int D_L00_001B25E4[] __attribute__((sda));
 extern int D_L00_001B25E8[] __attribute__((sda));
@@ -62,37 +62,37 @@ extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_L00_001B18D4 MACRO_ADDR;
 extern int D_L00_001B18D8 MACRO_ADDR;
 extern int D_L00_001B2610 __attribute__((sda));
-extern int func_001261F0(int);
-extern void func_L00_002D5000();
-extern int func_00279D18();
-extern void func_0027AB40(void);
-extern void func_0027B858();
+extern int sceGsSyncV(int);
+extern void level_init_record_from_object();
+extern int gfx_build_view_matrices();
+extern void UpdateViewContext(void);
+extern void gfx_write_clear_color_packets();
 extern void func_US2_0027C3D0();
-extern int func_0027C540();
-extern void func_0027C660();
-extern void func_L00_002E73E0();
-extern void func_00282A88();
-extern int func_00283678();
-extern void func_00284F40();
-extern void func_0028E458();
+extern int SetupGifPaging();
+extern void DoGifPaging();
+extern void gfx_draw_item_with_pass();
+extern void mem_fast_helper_b();
+extern int copy_matrix3x4();
+extern void gfx_append_draw_list_buffer_tag();
+extern void hud_update_record_handlers();
 extern void func_US2_0029CD18();
-extern void func_L00_003116A8();
-extern void func_0029FEE0();
-extern void func_002A01C8();
-extern void func_002A01F0();
-extern void func_002A0220();
-extern int func_002A0250();
-extern void func_002A0300();
-extern int func_002A0380();
-extern void func_002A0468();
+extern void mat_transform_array();
+extern void PatchMobyGifs();
+extern void mem_fill_scratch_area();
+extern void mem_save_scratch_area();
+extern void mem_restore_scratch_area();
+extern int DrawMobysSetup();
+extern void tex_upload_object_textures();
+extern int tex_run_upload_and_setup();
+extern void gfx_pack_render_command_fields();
 extern void func_002A0F48();
 extern int func_002A10E8();
-extern int func_002A9588();
-extern void func_L00_00375718();
+extern int math_ping_pong_blend_values();
+extern void text_draw_scrolling_help();
 extern int func_US2_L00_00376D40();
-extern int func_002FA270();
-extern int func_L00_00376600();
-extern int func_L00_003769C0();
+extern int DrawAmmoSelectList();
+extern int shop_draw_item_icon_strip();
+extern int shop_draw_vendor_item_list();
 extern int func_US2_002FB718();
 extern void func_US2_L00_00378678();
 extern int func_US2_L00_003788C8();
@@ -108,14 +108,14 @@ extern void func_US2_L00_0037A2C8();
 extern void func_US2_L00_0037A5D0();
 extern int func_US2_002FC008();
 extern void ref_L00_0037A610_00();
-extern void func_002FC220();
-extern void func_002FC280(void);
-extern void func_002FC3C0();
-extern void func_002FC560(int, unsigned long long);
-extern void func_002FC620();
-extern void func_002FC990();
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern int func_00336D50();
+extern void gfx_swap_packet_buffer();
+extern void SubmitBufferedDmaChain(void);
+extern void gfx_wait_for_dma_status_bits();
+extern void VU1_addGSregister(int, unsigned long long);
+extern void gfx_set_scissor_clamped();
+extern void gfx_upload_image_to_gs_packets();
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern int table_find_by_id();
 
 /* Initialize the selected menu view, draw its layered background, then render its models. */
 void func_US2_L00_0037BA50(void)
@@ -126,9 +126,9 @@ void func_US2_L00_0037BA50(void)
     int r, g, b, color;
     float scale;
     int c;
-    func_00284F40(0);
+    gfx_append_draw_list_buffer_tag(0);
     D_L00_001BD370[0] = 0.62f;
-    func_0027AB40();
+    UpdateViewContext();
 
     switch (menu->state) {
     case 0:
@@ -144,13 +144,13 @@ void func_US2_L00_0037BA50(void)
         {
             menu->state = 1;
             menu->initialize = 0;
-            func_002FC3C0(1);
-            func_001261F0(0);
+            gfx_wait_for_dma_status_bits(1);
+            sceGsSyncV(0);
             D_L00_001B18D8 = D_L00_001B18D8 + 1;
-            func_002FC280();
-            func_002FC220();
+            SubmitBufferedDmaChain();
+            gfx_swap_packet_buffer();
             D_L00_001B2610 = 0x60000;
-            func_L00_002E73E0(menu->capture);
+            gfx_draw_item_with_pass(menu->capture);
             if (menu->use_camera) {
                 qcopy(&menu->saved, D_L00_001B8DD0);
                 /* Save the three camera basis vectors before resetting the view. */
@@ -168,7 +168,7 @@ void func_US2_L00_0037BA50(void)
                 D_L00_001B8C80.y = 1;
                 D_L00_001B8C80.z = 1;
                 D_L00_001B8C80.w = 1;
-                func_00279D18();
+                gfx_build_view_matrices();
             }
             {
                 char * base = menu->buffer;
@@ -176,7 +176,7 @@ void func_US2_L00_0037BA50(void)
                 menu->preview0 = base;
                 menu->models = base + 0x1000;
                 menu->text = base + 0x2400;
-                func_00282A88(base + 0x2400, 0x400);
+                mem_fast_helper_b(base + 0x2400, 0x400);
             }
             menu->field94 = 0;
             menu->field90 = 0;
@@ -185,16 +185,16 @@ void func_US2_L00_0037BA50(void)
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
-        func_002FC990(menu->capture, D_001A72DC[0], D_001A7344[0] << 11);
-        func_0027C540(0);
-        func_00279D18();
-        func_0027B858();
+        gfx_upload_image_to_gs_packets(menu->capture, D_001A72DC[0], g_screen_height[0] << 11);
+        SetupGifPaging(0);
+        gfx_build_view_matrices();
+        gfx_write_clear_color_packets();
         if (D_L00_001AD570 >= 1.0f && menu->draw) {
-            func_002A0250();
-            func_002A01C8();
-            func_002A01F0();
+            DrawMobysSetup();
+            mem_fill_scratch_area();
+            mem_save_scratch_area();
         }
-        func_002FC560(0x42, 0x8000000044ULL);
+        VU1_addGSregister(0x42, 0x8000000044ULL);
         {
             float dr = (float)(D_L00_001B25F0[0] - D_L00_001B25E4[0]);
             float dg = (float)(D_L00_001B25F4[0] - D_L00_001B25E8[0]);
@@ -227,18 +227,18 @@ void func_US2_L00_0037BA50(void)
             ids[1] = 0x7a;
             ids[2] = 0x7b;
         }
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[0]);
-        func_00300A00(c, (r << 24) | 0x442d00, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[1]);
-        func_00300A00(c, (g << 24) | 0x241700, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
-        c = func_00336D50(D_L00_001A904C + 0x8710, ids[2]);
+        c = table_find_by_id(D_L00_001A904C + 0x8710, ids[0]);
+        gfx_draw_scaled_object_two_axes(c, (r << 24) | 0x442d00, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
+        c = table_find_by_id(D_L00_001A904C + 0x8710, ids[1]);
+        gfx_draw_scaled_object_two_axes(c, (g << 24) | 0x241700, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
+        c = table_find_by_id(D_L00_001A904C + 0x8710, ids[2]);
         color = (b << 24) | 0xf0c070;
-        func_00300A00(c, color, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
+        gfx_draw_scaled_object_two_axes(c, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         if (menu->mode != 1) {
-            c = func_00336D50(D_L00_001A904C + 0x8710, ids[3]);
-            func_00300A00(c, color, (float)(D_001A7340[0] >> 1), (float)(D_001A7344[0] >> 1), scale, scale, 0.0f);
+            c = table_find_by_id(D_L00_001A904C + 0x8710, ids[3]);
+            gfx_draw_scaled_object_two_axes(c, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         }
-        func_0028E458();
+        hud_update_record_handlers();
         func_US2_0029CD18();
         if (D_L00_001AD570 >= 1.0f) {
             ref_L00_0037A610_00();
@@ -247,76 +247,76 @@ void func_US2_L00_0037BA50(void)
                 func_US2_L00_00379000();
                 func_US2_L00_00379C50();
                 func_US2_L00_00376D40();
-                func_L00_00375718();
+                text_draw_scrolling_help();
                 if (menu->auxiliary)
                     func_US2_L00_0037A5D0();
                 if (menu->draw) {
-                    func_002FC620(158, 360, 115, 206);
-                    func_002A0300(menu->models, 1);
-                    func_002A0220();
-                    func_002A0380();
+                    gfx_set_scissor_clamped(158, 360, 115, 206);
+                    tex_upload_object_textures(menu->models, 1);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 3) {
                 func_US2_L00_00378678();
                 func_US2_L00_00379560();
                 func_US2_L00_0037A050();
-                func_L00_00376600();
-                func_L00_00375718();
+                shop_draw_item_icon_strip();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
-                    func_L00_002D5000(menu->models, menu->models + 0x100);
+                    gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
+                    level_init_record_from_object(menu->models, menu->models + 0x100);
                     pair = D_L00_001AD858[0];
-                    func_L00_003116A8(menu->models, 2, &pair, matrices);
+                    mat_transform_array(menu->models, 2, &pair, matrices);
                     {
                         char * models = menu->models;
                         qcopy(models + 0x210, matrices + 0x30);
                         qcopy(models + 0x310, matrices + 0x70);
                         func_002A0F48(models + 0x200);
                     }
-                    func_00283678(menu->models + 0x2c0, matrices);
-                    func_00283678(menu->models + 0x3c0, matrices + 0x40);
+                    copy_matrix3x4(menu->models + 0x2c0, matrices);
+                    copy_matrix3x4(menu->models + 0x3c0, matrices + 0x40);
                     func_002A10E8(menu->models + 0x200);
                     func_002A10E8(menu->models + 0x300);
-                    func_002A0300(menu->models, menu->count + 2);
-                    func_002A0220();
-                    func_002A0380();
+                    tex_upload_object_textures(menu->models, menu->count + 2);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 2) {
                 func_US2_L00_00379928();
                 func_US2_L00_0037A2C8();
-                func_L00_003769C0();
-                func_L00_00375718();
+                shop_draw_vendor_item_list();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    func_002FC620(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
-                    c = func_002A9588(0xffffff, 0x606060, 30, 1, 0);
+                    gfx_set_scissor_clamped(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
+                    c = math_ping_pong_blend_values(0xffffff, 0x606060, 30, 1, 0);
                     if (menu->selected0 != -1)
-                        func_002A0468(menu->models + (menu->selected0 << 8), c, 14, 14, 0);
+                        gfx_pack_render_command_fields(menu->models + (menu->selected0 << 8), c, 14, 14, 0);
                     if (menu->selected1 != -1)
-                        func_002A0468(menu->models + (menu->selected1 << 8), c, 14, 14, 0);
-                    func_002A0300(menu->models, menu->count);
-                    func_002A0220();
-                    func_002A0380();
-                    func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
+                        gfx_pack_render_command_fields(menu->models + (menu->selected1 << 8), c, 14, 14, 0);
+                    tex_upload_object_textures(menu->models, menu->count);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
+                    gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
                     func_US2_L00_00378C38();
                 }
             } else if (menu->mode == 1) {
                 func_US2_L00_003788C8();
                 func_US2_L00_00379738();
                 func_US2_L00_0037A218();
-                func_002FA270();
-                func_L00_00375718();
+                DrawAmmoSelectList();
+                text_draw_scrolling_help();
                 if (menu->draw) {
-                    func_002FC620(158, 360, 115, 206);
-                    func_002A0300(menu->models, 1);
-                    func_002A0220();
-                    func_002A0380();
+                    gfx_set_scissor_clamped(158, 360, 115, 206);
+                    tex_upload_object_textures(menu->models, 1);
+                    mem_restore_scratch_area();
+                    tex_run_upload_and_setup();
                 }
             }
-            func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
+            gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
         }
-        func_0027C660();
-        func_002FC3C0(16);
-        func_0029FEE0();
+        DoGifPaging();
+        gfx_wait_for_dma_status_bits(16);
+        PatchMobyGifs();
         break;
     }
 }

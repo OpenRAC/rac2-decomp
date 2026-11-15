@@ -1,10 +1,11 @@
+#include "names.h"
 /* func_PAL_L00_003B1D70, the PAL copy of func_L00_003AE550: the same C, where 120 becomes 100;
    0.0027222224f becomes 0.00392f. */
 #include "include_asm.h"
 #include "common.h"
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 typedef float ArcVector[4] __attribute__((aligned(16)));
 typedef int ArcQuad __attribute__((mode(TI)));
@@ -30,21 +31,21 @@ typedef struct {
     ArcVector unknown30;
     ArcVector normal;
 } ArcCollision;
-extern ArcHero D_00189E20;
+extern ArcHero g_hero_state;
 extern int D_L00_001A8F00 MACRO_ADDR;
-extern ArcCollision D_L00_001BF200;
-extern float D_L00_001B8DC0[];
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002AD0B0(void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
-extern int func_00282948(int *);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L00_003AD7C8(void *);
-extern void func_00282D30(void *, void *, float);
+extern ArcCollision g_collision_result;
+extern float g_camera_l00_position[];
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int moby_get_private_value_2(void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
+extern int math_fast_float_d(int *);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_draw_spinning_quad_pair(void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Steps a thrown object's arc until it lands and records the impact point;
    RAC1's predict_mine_impact (overlays/shared/bolts_and_wrench.c) is the same routine. */
@@ -55,7 +56,7 @@ int func_PAL_L00_003B1D70(char *motion, char *object, int mode)
     ArcVector previous;
     ArcVector probe;
     int timer;
-    ArcHero *hero = &D_00189E20;
+    ArcHero *hero = &g_hero_state;
     int i;
     char *vars;
 
@@ -65,14 +66,14 @@ int func_PAL_L00_003B1D70(char *motion, char *object, int mode)
         return 0;
     qcopy(previous, object + 0x10);
     if (*(unsigned char *)(object + 0x20) == 1) {
-        position[0] = func_00283180(func_00283B98(-0.36196801f, func_00283248(hero->facingX, hero->facingY))) * 0.859039f;
-        position[1] = func_00283198(func_00283B98(-0.36196801f, func_00283248(hero->facingX, hero->facingY))) * 0.859039f;
+        position[0] = math_fast_sin_or_cos_a(FastAddRotations(-0.36196801f, mat_fast_helper_a(hero->facingX, hero->facingY))) * 0.859039f;
+        position[1] = math_fast_sin_or_cos_b(FastAddRotations(-0.36196801f, mat_fast_helper_a(hero->facingX, hero->facingY))) * 0.859039f;
         *(int *)&position[2] = 0;
-        func_00282CC0(position, position, hero->pos);
+        FastVecAdd(position, position, hero->pos);
         position[2] = position[2] + 0.49082f;
         qcopy(velocity, motion);
-        if (hero->ground != 0 && func_002AD0B0(hero->ground) != 0 && mode != 0) {
-            func_00282CC0(velocity, velocity, hero->displacement);
+        if (hero->ground != 0 && moby_get_private_value_2(hero->ground) != 0 && mode != 0) {
+            FastVecAdd(velocity, velocity, hero->displacement);
         }
         timer = 100;
     } else {
@@ -89,51 +90,51 @@ int func_PAL_L00_003B1D70(char *motion, char *object, int mode)
         }
     }
     {
-        ArcHero *player = &D_00189E20;
+        ArcHero *player = &g_hero_state;
         char *moby = player->moby;
 
         *(ArcQuad *)probe = *(ArcQuad *)(moby + 0x10);
         probe[2] = position[2];
-        if (func_002761F8(probe, position, 0x10, moby, 0) != 0) {
-            if (func_00278E78() != 0 && D_L00_001BF200.count > 0) {
-                qcopy(motion + 0x10, D_L00_001BF200.point);
+        if (CollLine(probe, position, 0x10, moby, 0) != 0) {
+            if (GetCollHitMaterial() != 0 && g_collision_result.count > 0) {
+                qcopy(motion + 0x10, g_collision_result.point);
             }
         }
     }
-    while (func_00282948(&timer) == 0) {
+    while (math_fast_float_d(&timer) == 0) {
         qcopy(previous, position);
         i = 9;
         do {
-            func_00282CC0(position, position, velocity);
+            FastVecAdd(position, position, velocity);
             velocity[2] = velocity[2] - 0.00392f;
         } while (--i >= 0);
-        if (func_002761F8(previous, position, 0x12, object, 0) == 0)
+        if (CollLine(previous, position, 0x12, object, 0) == 0)
             continue;
-        if (func_00278E78() == 0 && 0.0f < velocity[2])
+        if (GetCollHitMaterial() == 0 && 0.0f < velocity[2])
             continue;
-        if (D_L00_001BF200.count > 0) {
-            qcopy(motion + 0x10, D_L00_001BF200.point);
+        if (g_collision_result.count > 0) {
+            qcopy(motion + 0x10, g_collision_result.point);
             break;
         }
     }
     if (timer != 0) {
         if (mode == 0) {
-            if (D_L00_001BF200.hit == 0)
+            if (g_collision_result.hit == 0)
                 return 0;
-            if (func_002AD0B0(D_L00_001BF200.hit) == 0)
+            if (moby_get_private_value_2(g_collision_result.hit) == 0)
                 return 0;
         }
-        if (mode != 2 || D_L00_001BF200.hit == 0 || func_002AD0B0(D_L00_001BF200.hit) == 0) {
-            func_L00_002E6CF0(func_L00_003AD7C8, object);
+        if (mode != 2 || g_collision_result.hit == 0 || moby_get_private_value_2(g_collision_result.hit) == 0) {
+            gfx_add_draw_callback_first(gfx_draw_spinning_quad_pair, object);
         }
         {
-            float *camera = D_L00_001B8DC0;
+            float *camera = g_camera_l00_position;
             char *impact = motion + 0x10;
 
-            *(ArcQuad *)(motion + 0x20) = *(ArcQuad *)D_L00_001BF200.normal;
-            func_00282CF0(previous, impact, camera);
-            func_00282D30(previous, previous, 0.95f);
-            func_00282CC0(impact, previous, camera);
+            *(ArcQuad *)(motion + 0x20) = *(ArcQuad *)g_collision_result.normal;
+            FastVecSub(previous, impact, camera);
+            FastVecScale(previous, previous, 0.95f);
+            FastVecAdd(impact, previous, camera);
         }
         return 1;
     }

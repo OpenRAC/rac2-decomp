@@ -17,23 +17,23 @@ typedef struct {
     int f2298;
     int f229C;
 } Hero_L00_002A61C8;
-extern Hero_L00_002A61C8 D_00189E20;
+extern Hero_L00_002A61C8 g_hero_state;
 
-extern int D_001A79F0 MACRO_ADDR;
-extern int func_00283CF0(float);
-extern int func_L00_0035F6D8(int, int, int, int, int, int);
-extern void func_0029FCC0(char *, int, char *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_002A89A8(void *, int, float);
-extern float func_00283B98(float, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern int g_current_map_index MACRO_ADDR;
+extern int FloatToInt(float);
+extern int snd_start_from_weights(int, int, int, int, int, int);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float FastAddRotations(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 typedef struct Obj_L00_0033BA68 Obj_L00_0033BA68;
-extern Obj_L00_0033BA68 *func_L00_0033BA68(char *, int, float);
+extern Obj_L00_0033BA68 *part_spawn_glow_effect(char *, int, float);
 
 /* Plays a footstep sound for one foot and, on some ground, spawns a dust puff at that foot. */
-void func_L00_002A61C8(int kind, int side, int play_sound, int duration) {
+void hero_play_footstep_sound_dust(int kind, int side, int play_sound, int duration) {
     float point[4];
     float offset[4];
     float heading;
@@ -41,35 +41,35 @@ void func_L00_002A61C8(int kind, int side, int play_sound, int duration) {
     int ticks;
     if (play_sound) {
         special = 0;
-        if (gHeroState.f1270) {
-            int mode = gHeroState.f1298;
+        if (g_hero_state.f1270) {
+            int mode = g_hero_state.f1298;
             if ((unsigned int)(mode - 19) < 2 || mode == 54)
                 special = 1;
         }
         ticks = FloatToInt((float)((duration << 10) / 30));
-        StartEffectFromWeights(kind, side, special, 0, (int)gHeroState.f2290, ticks);
+        snd_start_from_weights(kind, side, special, 0, (int)g_hero_state.f2290, ticks);
     }
-    if (gCurrentMapIndex == 7) {
-        if (gHeroState.b149D == 0) goto effect;
+    if (g_current_map_index == 7) {
+        if (g_hero_state.b149D == 0) goto effect;
     }
-    if (gCurrentMapIndex != 19) return;
-    if (gHeroState.b149D != 2) return;
+    if (g_current_map_index != 19) return;
+    if (g_hero_state.b149D != 2) return;
 effect:
-    TransformMobyJointToWorld(gHeroState.f2290, side + 22, (char *)point);
-    point[0] += FastSinOrCosA(gHeroState.f98) * 0.05f;
-    point[1] += FastSinOrCosB(gHeroState.f98) * 0.05f;
-    point[2] = ProbeGroundHeightBelow(point, 0, 0.5f) + 0.057f;
-    heading = gHeroState.f98;
-    if (gHeroState.f2294 == 0 || gHeroState.f229C == 4) {
+    moby_transform_joint_to_world(g_hero_state.f2290, side + 22, (char *)point);
+    point[0] += math_fast_sin_or_cos_a(g_hero_state.f98) * 0.05f;
+    point[1] += math_fast_sin_or_cos_b(g_hero_state.f98) * 0.05f;
+    point[2] = coll_probe_ground_height_below(point, 0, 0.5f) + 0.057f;
+    heading = g_hero_state.f98;
+    if (g_hero_state.f2294 == 0 || g_hero_state.f229C == 4) {
         if (side == 0) {
             heading = FastAddRotations(heading, 0.436332345f);
-            vec_scale_to_length(offset, gHeroState.v10, 0.037f);
+            vec_scale_to_length(offset, g_hero_state.v10, 0.037f);
             FastVecAdd(point, point, offset);
         } else {
             heading = FastAddRotations(heading, -0.436332345f);
-            vec_scale_to_length(offset, gHeroState.v10, -0.037f);
+            vec_scale_to_length(offset, g_hero_state.v10, -0.037f);
             FastVecAdd(point, point, offset);
         }
     }
-    SpawnGlowEffect((char *)point, !side, heading);
+    part_spawn_glow_effect((char *)point, !side, heading);
 }

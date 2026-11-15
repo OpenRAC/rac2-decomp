@@ -1,38 +1,38 @@
 #include "include_asm.h"
 #include "names.h"
-extern void func_0033AF48(char *);
-extern void func_00348120(char *, int);
-extern void func_00348138(char *);
+extern void prompt_bar_draw(char *);
+extern void menu_set_field_bc(char *, int);
+extern void option_list_draw_rows(char *);
 extern unsigned char D_001A7BB4;
 extern int D_001ADED8[2] __attribute__((sda));
 
 /* Draws the list menu page and its list. */
-void func_0033E428(char *object)
+void list_page_draw(char *object)
 {
     char *p;
-    DrawButtonPromptBar(object + 8);
+    prompt_bar_draw(object + 8);
     p = object + 0x2B0;
-    SetMenuField0xBC(p, D_001ADED8[D_001A7BB4]);
-    DrawOptionListRows(p);
+    menu_set_field_bc(p, D_001ADED8[D_001A7BB4]);
+    option_list_draw_rows(p);
 }
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
-extern void func_0033ABD8(void *, void *, void *);
-extern int func_00288FB8(int);
-extern void func_0033B050(void *, int, int, int);
-extern void func_0033B030(void *, float, float, float, float, float, float);
-extern void func_0033E5C0(void *, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
+extern void prompt_bar_init(void *, void *, void *);
+extern int GetLocalizedString(int);
+extern void prompt_bar_set_texts(void *, int, int, int);
+extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
+extern void simple_page_update(void *, int);
 extern int D_001ADEF0[2] __attribute__((sda));
 /* Sets up a simple menu page with a title. */
-void func_0033E4C0(char *object, void *argument)
+void simple_page_init(char *object, void *argument)
 {
     int *allocation;
     char *child;
     int text;
     *(void **)object = argument;
     if (argument) {
-        allocation = ReturnSecondArgument(16, AllocPoolCell(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2A8) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -42,9 +42,9 @@ void func_0033E4C0(char *object, void *argument)
     **(float **)(object + 0x2A8) = 255.0f;
     (*(float **)(object + 0x2A8))[1] = 208.0f;
     child = object + 8;
-    InitButtonPromptBar(child, argument, D_001ADEF0);
+    prompt_bar_init(child, argument, D_001ADEF0);
     text = GetLocalizedString(0x2E21);
-    SetButtonPromptTexts(child, text, 0, GetLocalizedString(0x2D4F));
-    SetButtonPromptTextOffsets(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
-    UpdateSimpleMenuPage(object, 0);
+    prompt_bar_set_texts(child, text, 0, GetLocalizedString(0x2D4F));
+    prompt_bar_set_text_offsets(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
+    simple_page_update(object, 0);
 }

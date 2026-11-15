@@ -1,35 +1,35 @@
 #include "include_asm.h"
 
 #include "common.h"
-void func_002B9180(void *);
-int func_00282978(short *);
+void part_kill(void *);
+int FastDecTimer(short *);
 
 void func_PAL_002C03F0(void *param_1)
 {
   int lVar1;
 
-  lVar1 = func_00282978((short *)((char *)param_1 + 10));
+  lVar1 = FastDecTimer((short *)((char *)param_1 + 10));
   if (lVar1 != 0) {
-    func_002B9180(param_1);
+    part_kill(param_1);
   }
   return;
 }
 
-extern int func_002A77E0(int);
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00282E20(void *);
-extern void func_00282F70(char *, char *, float);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern int math_random_int_below(int);
+extern void FastVecAdd(char *, char *, char *);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(char *, char *, float);
+extern void ApproachValue(float *, float, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern float D_001B5358;
-extern int func_002A77E0(int);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283198(float);
+extern int math_random_int_below(int);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
+extern float math_fast_sin_or_cos_b(float);
 
 /* Advances one object: the halfword at offset 10 is capped at 12 and, when the
    sub-object's float at 0x30 is below the object's float at 0x18, the word at
@@ -49,8 +49,8 @@ void func_PAL_002C05F0(char *self)
     float g;
     unsigned int a;
 
-    if (func_00282978((short *)(self + 0xA)) != 0) {
-        func_002B9180(self);
+    if (FastDecTimer((short *)(self + 0xA)) != 0) {
+        part_kill(self);
         return;
     }
     f1 = *(float *)(self + 0x18);
@@ -61,7 +61,7 @@ void func_PAL_002C05F0(char *self)
         }
     }
     if (*(float *)(s1 + 0x10) < *(float *)(self + 0x18) + 1.04f) {
-        if (func_002A77E0(20) == 0) {
+        if (math_random_int_below(20) == 0) {
             if (*(short *)(self + 0xA) >= 11) {
                 *(short *)(self + 0xA) = 10;
             }
@@ -81,23 +81,23 @@ void func_PAL_002C05F0(char *self)
     vec[0] = *(float *)(s1 + 0);
     vec[1] = *(float *)(s1 + 4);
     vec[2] = *(float *)(s1 + 8);
-    f0 = func_00282E20((void *)vec);
-    func_00282F70((char *)vec, (char *)vec, f0 * 0.96400005f);
-    func_00282CC0(self + 0x10, self + 0x10, (char *)vec);
-    func_002AA2E8(&vec[2], 0.026f, 0.002f);
+    f0 = vec_length_xy((void *)vec);
+    vec_fast_normalize_helper((char *)vec, (char *)vec, f0 * 0.96400005f);
+    FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
+    ApproachValue(&vec[2], 0.026f, 0.002f);
     *(float *)(s1 + 4) = vec[1];
     *(float *)(s1 + 0) = vec[0];
     *(float *)(s1 + 8) = vec[2];
-    f0 = func_00283B98(*(float *)(s1 + 0x14), *(float *)(s1 + 0x18));
+    f0 = FastAddRotations(*(float *)(s1 + 0x14), *(float *)(s1 + 0x18));
     *(float *)(s1 + 0x14) = f0;
-    g = func_00283B98(D_001B5358, 1.5707964897155761718750e+00f);
-    f3 = func_00283198(*(float *)(s1 + 0x14));
+    g = FastAddRotations(D_001B5358, 1.5707964897155761718750e+00f);
+    f3 = math_fast_sin_or_cos_b(*(float *)(s1 + 0x14));
     f2 = f3 * *(float *)(s1 + 0x1C);
-    f0 = func_00283180(g);
+    f0 = math_fast_sin_or_cos_a(g);
     vec[0] = f0 * f2;
-    vec[1] = func_00283198(g) * f2;
+    vec[1] = math_fast_sin_or_cos_b(g) * f2;
     vec[2] = 0.0f;
-    func_00282CC0(self + 0x10, self + 0x10, (char *)vec);
+    FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
 }
 
 typedef struct {
@@ -121,23 +121,23 @@ typedef struct {
     Spark2BFB38 s;
 } Effect2BFB38;
 extern u8 *D_001F25CC[];
-extern Effect2BFB38 *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
+extern Effect2BFB38 *part_alloc(int);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
 
 Effect2BFB38 *func_PAL_002C0838(void *pos, void *dir, s32 kind, s32 life) {
     Effect2BFB38 *e;
     Spark2BFB38 *s;
 
-    e = func_002B9030(0x23);
+    e = part_alloc(0x23);
     if (e != 0) {
         qcopy(e->pos, pos);
         s = &e->s;
         e->color = 0x80808080;
-        e->f9 = func_00283CF0(2.0f) + 0x10;
+        e->f9 = FloatToInt(2.0f) + 0x10;
         e->f1 = 0;
         e->f3 = 0x44;
-        e->fC = func_002A7878(10500.0f, 16800.0f);
+        e->fC = math_random_float_range(10500.0f, 16800.0f);
         e->f2 = *D_001F25CC[0];
         qcopy(s->pos, dir);
         s->life = life;
@@ -146,7 +146,7 @@ Effect2BFB38 *func_PAL_002C0838(void *pos, void *dir, s32 kind, s32 life) {
         if (kind == 2) {
             s->z = 0;
         }
-        s->rate = func_002A7878(0.0042000003f, 0.0072000003f);
+        s->rate = math_random_float_range(0.0042000003f, 0.0072000003f);
     }
     return e;
 }

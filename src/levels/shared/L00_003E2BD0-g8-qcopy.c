@@ -1,27 +1,28 @@
 #include "include_asm.h"
+#include "names.h"
 /* Trail history, the twin of func_L00_0041F570: the same shift-and-redraw over the
    per-bank 16-byte points with its own scroll scalar, a 0.025 step and a blue edge. */
 #include "common.h"
 typedef int Quad128 __attribute__((mode(TI)));
-extern int func_L00_0032A088(int,int);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
-extern void func_00300190(void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_L00_003E2E80(Quad128 *,int,int,int,unsigned int,unsigned int,float,float,float);
+extern int level_get_slot_body(int,int);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
+extern void vec_transform_or_copy(void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void DrawFadingTwoPassRibbon(Quad128 *,int,int,int,unsigned int,unsigned int,float,float,float);
 extern float D_L00_001B05B4 __attribute__((sda));
 /* Updates a glowing trail behind a moving object. It remembers recent positions, draws them fading out and removes the trail when its data is gone. */
-void func_L00_003E2BD0(void *self)
+void glowing_trail_update(void *self)
 {
     char *object=self,*state=*(char **)(object+0x68);
     Quad128 **table,*history;
     int bank=*(int *)state,index,count,n,firstCount,alpha,glow;
     unsigned int color,edge;
     float fraction;
-    table=(Quad128 **)GetSlotBody(*(int *)(state+0x18),*(int *)(state+0x14));
-    if(!table) { ClearEntryFlag(*(int *)(state+0x34)); MarkMobySpawned(object); return; }
-    for(index=0;index<*(int *)(state+0x10);index++) TransformVectorOrCopy(table[bank]+index,table[bank]+index);
+    table=(Quad128 **)level_get_slot_body(*(int *)(state+0x18),*(int *)(state+0x14));
+    if(!table) { table_clear_entry_flag(*(int *)(state+0x34)); moby_mark_spawned(object); return; }
+    for(index=0;index<*(int *)(state+0x10);index++) vec_transform_or_copy(table[bank]+index,table[bank]+index);
     if(*(unsigned char *)(object+0x20)==0) {
         *(int *)(state+0x10)+=1;
         if(*(int *)(state+0x10)>=40) *(int *)(state+0x10)=40;

@@ -5,10 +5,10 @@ extern int D_L09_001B35E0[] MACRO_ADDR;
 extern int D_L09_001B36E0[] MACRO_ADDR;
 extern int D_L09_001B3720[] MACRO_ADDR;
 extern int D_L09_00255E90[];
-extern void func_00291450(int);
+extern void gfx_free_point_light(int);
 
 /* Clears one beam link slot by index and stops its two sounds. */
-void func_L09_003FB860(int index)
+void beam_slot_clear_by_index(int index)
 {
     int handle;
 
@@ -17,11 +17,11 @@ void func_L09_003FB860(int index)
     handle = D_L09_001B36E0[index];
     *(int *)((u8 *)D_L09_00255E90 + index * 8 + 4) = 0;
     if (handle != -1) {
-        FreePointLight(handle);
+        gfx_free_point_light(handle);
         D_L09_001B36E0[index] = -1;
     }
     if (D_L09_001B3720[index] != -1) {
-        FreePointLight(D_L09_001B3720[index]);
+        gfx_free_point_light(D_L09_001B3720[index]);
         D_L09_001B3720[index] = -1;
     }
 }

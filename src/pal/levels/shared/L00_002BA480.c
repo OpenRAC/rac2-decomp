@@ -30,17 +30,17 @@ extern struct {
     u8 pad0[0x150];
     float x, y, z;
 } D_L00_001B8C80_A508;
-extern float func_00283B98(float a, float b);
-extern int func_L00_002B3248(void *obj);
-extern void func_00282C88(void *m);
-extern void func_L00_002D3798(void *dst, void *src, float f);
-extern void func_002AF000(void *m, float a, float b, float c);
-extern void func_002833F0(void *dst, void *v);
-extern void func_00283738(void *dst, void *a, void *b);
-extern void func_00283658(void *dst, void *src);
-extern void func_002AB6D8(void *src, void *dst);
-extern void func_L00_00322A98(void *obj, void *area);
-extern void func_L00_00322AC0(void *area, int a, int b, float f);
+extern float FastAddRotations(float a, float b);
+extern int moby_is_class_71(void *obj);
+extern void vec_clear_128(void *m);
+extern void cam_offset_point_by_side_direction(void *dst, void *src, float f);
+extern void vec_build_spherical_offset(void *m, float a, float b, float c);
+extern void euler_rotation_basis(void *dst, void *v);
+extern void multiply_matrix3x3(void *dst, void *a, void *b);
+extern void copy_matrix_rotation(void *dst, void *src);
+extern void mat_get_euler_angles(void *src, void *dst);
+extern void level_init_pending_slot(void *obj, void *area);
+extern void level_append_record_to_table(void *area, int a, int b, float f);
 extern void func_PAL_002A7E68(void *obj, int a, int b, int c);
 
 /* Once per hero state, set up the object at resident +0x1220 (the special case uses a stored angle
@@ -66,17 +66,17 @@ void func_PAL_L00_002BA480(void)
             special = 1;
     }
 
-    if (special && !func_L00_002BA410()) {
+    if (special && !hero_probe_ground_slope_ahead()) {
         D_00189E20_A508.fC04 = D_L00_001B8C80_A508.z;
-        D_00189E20_A508.fC08 = func_00283B98(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
+        D_00189E20_A508.fC08 = FastAddRotations(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
     }
 
     object = D_00189E20_A508.p1220;
-    if (!func_L00_002B3248(object))
+    if (!moby_is_class_71(object))
         return;
     D_00189E20_A508.b123A = 1;
     if (special)
-        func_L00_002B9B88(17, 0);
+        hero_play_sound(17, 0);
 
     *(u8 *)(object + 0x20) = 10;
     record = *(char **)(object + 0x68);
@@ -85,32 +85,32 @@ void func_PAL_L00_002BA480(void)
         *(short *)(record + 0x76) = 1;
 
     matrix = record + 0x40;
-    func_00282C88(matrix);
+    vec_clear_128(matrix);
     if (!special)
-        func_L00_002D3798(matrix, matrix, 1.0f);
+        cam_offset_point_by_side_direction(matrix, matrix, 1.0f);
     else
-        func_002AF000(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
+        vec_build_spherical_offset(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
 
-    func_00282C88(scratch);
-    func_002833F0(transform, scratch);
+    vec_clear_128(scratch);
+    euler_rotation_basis(transform, scratch);
     if (special) {
         scratch[0] = D_L00_001B8C80_A508.x;
         scratch[1] = D_L00_001B8C80_A508.y;
         scratch[2] = D_L00_001B8C80_A508.z;
-        func_002833F0(level_transform, scratch);
-        func_00283738(transform, level_transform, transform);
+        euler_rotation_basis(level_transform, scratch);
+        multiply_matrix3x3(transform, level_transform, transform);
     } else {
-        func_00283738(transform, D_00189E20_A508.p2290 + 0xC0, transform);
+        multiply_matrix3x3(transform, D_00189E20_A508.p2290 + 0xC0, transform);
     }
-    func_00283658(composed, transform);
-    func_002AB6D8(composed, object + 0xF0);
+    copy_matrix_rotation(composed, transform);
+    mat_get_euler_angles(composed, object + 0xF0);
 
     *(int *)(record + 0x64) = 0;
     *(float *)(record + 0x60) = 0.46000004f;
     if (D_00189E20_A508.f184 < 0.40000004f) {
-        func_L00_00322A98(object, D_00189E20_A508.area1A30);
-        func_L00_00322AC0(D_00189E20_A508.area1A30, 48, 3, 0.0f);
-        func_L00_00322AC0(D_00189E20_A508.area1A30, 23, 5, 0.0f);
+        level_init_pending_slot(object, D_00189E20_A508.area1A30);
+        level_append_record_to_table(D_00189E20_A508.area1A30, 48, 3, 0.0f);
+        level_append_record_to_table(D_00189E20_A508.area1A30, 23, 5, 0.0f);
     }
     func_PAL_002A7E68(object, 6, 0, 4);
 }

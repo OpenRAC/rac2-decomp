@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 extern char D_0025E328[];
 extern int D_001AE304 __attribute__((sda));
 extern int D_001AE308 __attribute__((sda));
@@ -39,7 +40,7 @@ void func_US2_00345F00(char *o)
     f[6] = (int)&D_001AE318;
     f[5] = (int)&D_001AE310;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 extern char D_001AA810[];
@@ -80,10 +81,10 @@ void func_US2_003461D0(char *o)
     f[6] = (int)&D_001AE3A8;
     f[5] = (int)&D_001AE3A0;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
-extern void func_00335E38(char *p, float x, float y, float zero, float zero2);
+extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
 extern float D_L04_001AE1E0 __attribute__((sda));
 extern float D_L04_001AE1E8 __attribute__((sda));
 extern float D_L04_001AE1F0 __attribute__((sda));
@@ -110,13 +111,13 @@ void func_US2_003457A0(char *self)
 {
     float zero = 0.0f;
 
-    func_00335E38(self + 872, D_US2_001AE298 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 872, D_US2_001AE298 + (*(struct pos **)(self + 1184))->x,
             D_US2_001AE29C + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 960, D_US2_001AE2A0 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 960, D_US2_001AE2A0 + (*(struct pos **)(self + 1184))->x,
             D_US2_001AE2A4 + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 1048, D_US2_001AE2A8 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 1048, D_US2_001AE2A8 + (*(struct pos **)(self + 1184))->x,
             D_US2_001AE2AC + (*(struct pos **)(self + 1184))->y, zero, zero);
-    func_00335E38(self + 784, D_US2_001AE2B0 + (*(struct pos **)(self + 1184))->x,
+    object_set_first_float4(self + 784, D_US2_001AE2B0 + (*(struct pos **)(self + 1184))->x,
             D_US2_001AE2B4 + (*(struct pos **)(self + 1184))->y, zero, zero);
 }
 
@@ -160,7 +161,7 @@ void func_US2_00345FF0(char *o)
     f[6] = (int)&D_US2_001AE330;
     f[5] = (int)&D_US2_001AE328;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 
@@ -203,7 +204,7 @@ void func_US2_003460E0(char *o)
     f[6] = (int)&D_US2_001AE360;
     f[5] = (int)&D_US2_001AE358;
     f[22] = 1;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 

@@ -51,33 +51,33 @@ typedef struct {
     int target;
 } DamageState;
 typedef struct { int count; u8 pad[0xC]; float point[1][4]; } EntityPath;
-extern int func_00283CF0(float);
-extern void func_L00_003294F0(void *, int);
-extern void func_0029F338(void *);
-extern int func_L00_002E3B38(int);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_L03_003F66D8(void *);
-extern void *func_002A9640(void *, int, int);
-extern float func_002A96A0(void *, void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002AB800(void *, void *);
-extern void func_002AA2E8(void *, float, float);
-extern void func_00283098(void *, void *, void *);
-extern u8 *func_00273730(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void func_00310C88(void);
-extern void func_002B3BA8(void *, int, int, int, float, float);
-extern void func_L03_003F6E88(void *);
+extern int FloatToInt(float);
+extern void moby_set_flag_bit(void *, int);
+extern void moby_mark_spawned(void *);
+extern int level_get_difficulty_scaled(int);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void endako_boss_process_group(void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern float moby_update_aim_target_strength(void *, void *);
+extern int PlayMobySound(int, int, void *);
+extern void gfx_start_color_fade(void *, void *);
+extern void ApproachValue(void *, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern u8 *cam_moby_create(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void moby_fade_out_update(void);
+extern void weapon_select_aim_target(void *, int, int, int, float, float);
+extern void endako_boss_play_voice_lines(void *);
 /* Incomplete arrays: retail reaches these two with `lui` + `lw`, not through $gp. */
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));
 extern u8 D_0019B2E8[] NOT_SDA;
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern u8 *D_L03_001FE700[] NOT_SDA;
 extern float D_L03_001B1070 __attribute__((sda));
 
 /* Sets up the boss on its first frame, then handles the damage it takes each frame:
  * it hurts, loses armor pieces at set health levels, and dies at zero health. */
-void func_L03_003F5590(u8 *entity) {
+void endako_boss_update_damage(u8 *entity) {
     DamageState *state = *(DamageState **)(entity + 0x68);
     u8 *hit, *effect;
     EntityPath *path;
@@ -89,12 +89,12 @@ void func_L03_003F5590(u8 *entity) {
         state->timer48 = FloatToInt(30);
         state->timer4A = FloatToInt(32);
         state->hitMode = 1;
-        SetObjectFlagBit(D_L03_001B2A1C[0] + (state->startRecord << 8), 1);
-        if (D_0019B2E8[(entity[0xB0] & 0x7F) + (gCurrentMapIndex[0] << 4)] & 0x80) {
-            MarkMobySpawned(entity);
+        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->startRecord << 8), 1);
+        if (D_0019B2E8[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
+            moby_mark_spawned(entity);
             return;
         }
-        state->difficulty = GetDifficultyScaledLevel(entity[0xB0]);
+        state->difficulty = level_get_difficulty_scaled(entity[0xB0]);
         switch (state->difficulty) {
         case 2:
             state->maxHealth = FloatToInt(state->maxHealth * 0.9f);
@@ -114,9 +114,9 @@ void func_L03_003F5590(u8 *entity) {
         qcopy(&state->start, entity + 0x10);
         *(int *)(entity + 0x98) = 0;
         *(u16 *)(entity + 0x34) = (*(u16 *)(entity + 0x34) | 0x41) & 0xEFFF;
-        SetMobyState(entity, 1, 0);
+        moby_set_state(entity, 1, 0);
         if (entity[0x43]) {
-            StartAnimationBlended(entity, 0, 0, 0);
+            anim_start_blended(entity, 0, 0, 0);
         }
         state->flag30B = 1;
         state->active = 1;
@@ -130,20 +130,20 @@ void func_L03_003F5590(u8 *entity) {
                 }
             }
         }
-        SetObjectFlagBit(D_L03_001B2A1C[0] + (state->spawnRecord << 8), 1);
-        ProcessBossGroupObjects(entity);
+        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->spawnRecord << 8), 1);
+        endako_boss_process_group(entity);
     }
     *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * D_L03_001B1070;
 
-    hit = FindOwnedEffectSlot(entity, 0x10000, 0);
+    hit = part_find_owned_effect_slot(entity, 0x10000, 0);
     if (hit && *(u8 **)(hit + 0x20) && *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0x9DF /* moby class 2527 */) {
         hit = 0;
     }
-    amount = UpdateAimTargetStrength(entity, hit);
+    amount = moby_update_aim_target_strength(entity, hit);
     if (amount != 0 || state->hitMode == 2) {
         state->timer77 = 150;
         PlayMobySound(1, 0, entity);
-        StartColorFade(entity, state->hit70);
+        gfx_start_color_fade(entity, state->hit70);
         if (entity[0x95]) {
             if (state->hitMode == 2) {
                 state->health = 0;
@@ -151,7 +151,7 @@ void func_L03_003F5590(u8 *entity) {
                 ApproachValue(&state->health, 0, amount);
             }
             if (state->health == 0 && entity[0x20] != 14 && entity[0x20] != 15) {
-                SetMobyState(entity, 14, 1);
+                moby_set_state(entity, 14, 1);
             } else if (state->threshold > 0 && state->health < state->threshold) {
                 for (part = 0; part < 2; part++) {
                     i = state->stage * 2 + part;
@@ -163,24 +163,24 @@ void func_L03_003F5590(u8 *entity) {
                         local.f[1] = -0.116666675f;
                     }
                     matrix_mul_vec3(&local, &local, entity + 0xC0);
-                    effect = CreateCameraMoby(entity, 1, *(s16 *)(entity + 0xAA), i, entity + 0x10,
+                    effect = cam_moby_create(entity, 1, *(s16 *)(entity + 0xAA), i, entity + 0x10,
                                            entity + 0xF0, &local, 255, 30, 15);
-                    *(void **)(effect + 0x64) = UpdateFadeOutMoby;
+                    *(void **)(effect + 0x64) = moby_fade_out_update;
                     *(u16 *)(entity + 0x7C) &= ~bit;
                 }
                 state->stage++;
-                SetMobyState(entity, 13, 6);
+                moby_set_state(entity, 13, 6);
                 state->threshold = (FloatToInt(state->health * 4 / state->maxHealth) * state->maxHealth) * 0.25f;
             }
         } else if (entity[0x20] == 2) {
-            SetMobyState(entity, 3, -1);
+            moby_set_state(entity, 3, -1);
             state->routeIndex = *state->route - 1;
         }
     }
     if ((unsigned)(entity[0x20] - 6) < 8) {
-        SelectAimTarget_002B3BA8(entity, -1, 0, 0, 16, 8);
+        weapon_select_aim_target(entity, -1, 0, 0, 16, 8);
     }
     state->hitMode = 1;
-    PlayBossVoiceLines(entity);
+    endako_boss_play_voice_lines(entity);
     entity[0xA8] = 255;
 }

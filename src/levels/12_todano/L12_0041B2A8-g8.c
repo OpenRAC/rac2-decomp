@@ -20,41 +20,41 @@ typedef struct {
 } BeamState;
 
 extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 D_0019B4A8[], D_00189EA0[], D_L12_001C0260[], D_00188660[];
+extern u8 D_0019B4A8[], g_hero_position[], D_L12_001C0260[], g_sound_state[];
 extern BeamVolume *D_L12_001B2F8C MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u8 *D_L12_001B090C MACRO_ADDR;
 extern u8 *D_L12_001B1360 MACRO_ADDR;
 extern float D_L12_001B1D00[] MACRO_ADDR;
 extern float D_L12_001B1D00_gp[] SDATA(D_L12_001B1D00);
 extern float D_L12_001B1D10_gp[] SDATA(D_L12_001B1D10);
-extern u8 *D_0018C0B0 NOT_SDA;
+extern u8 *g_hero_moby NOT_SDA;
 extern u8 D_L12_0041BF88[];
 
-extern void func_L12_0041BDA8(u8 *), func_L12_0041BDF8(u8 *), func_L12_0041BED8(u8 *);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float), func_00282DF0(void *), func_00282C48(float);
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern u8 *func_0029EFD0(int);
-extern void func_002B37E8(void *, void *), func_002833F0(void *, void *), func_00283698(void *, void *);
-extern void func_002A0F48(void *), func_00283098(void *, void *, void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern int func_002ACBC8(void *, int), func_L12_003DE4B0(void), func_L00_003DE260(void), func_L12_00404778(void);
-extern void func_002A8C00(void *, void *, int, void *, float), func_002A8E20(void *, void *);
-extern void func_L00_003DF6B0(int, int), func_L00_004028C0(int, int), func_L00_002E6CF0(void *, void *);
+extern void helper_clear_states(u8 *), beam_restore_child_collision(u8 *), helper_push_objects(u8 *);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float), FastVecLength(void *), math_fabs(float);
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern u8 *CreateMoby(int);
+extern void moby_init_child_from_parent(void *, void *), euler_rotation_basis(void *, void *), matrix_from_basis_rows(void *, void *);
+extern void func_002A0F48(void *), matrix_mul_vec3(void *, void *, void *);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern int IsPointInCuboid(void *, int), tracked_object_is_open(void), tracked_moby_is_active(void), second_tracked_object_is_open(void);
+extern void make_hit_descriptor(void *, void *, int, void *, float), QueueMobyImpact(void *, void *);
+extern void tracked_moby_set_state(int, int), global_object_start(int, int), gfx_add_draw_callback_first(void *, void *);
 
 /* Runs a beam that sweeps through its volume. It hurts the hero and the buddy when they stand in it, and plays a humming sound while the way is clear. */
-void func_L12_0041B2A8(u8 *self)
+void sweeping_beam_update(u8 *self)
 {
     float start[4], end[4], delta[4], local[4];
     float matrix[12], inverse[16];
     u8 event[48];
     BeamState *state = *(BeamState **)(self + 0x68);
 
-    ClearHelperObjectStates(self);
+    helper_clear_states(self);
     switch (self[0x20]) {
     case 0: {
         u16 id = *(u16 *)(self + 0xB2);
@@ -63,20 +63,20 @@ void func_L12_0041B2A8(u8 *self)
         if (D_L12_0021EDF0.flags[(s16)id])
             goto Destroy;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
+            int packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
                     goto Destroy;
             } else if (packed & 7) {
 Destroy:
-                MarkMobySpawned(self);
+                moby_mark_spawned(self);
                 return;
             }
         }
         state->sound = -1;
         self[0x20] = 1;
-        state->phase = RandomFloatRange(0.0f, 1.0f);
+        state->phase = math_random_float_range(0.0f, 1.0f);
         state->f30 = -10.0f;
         {
             float length = FastVecLength(D_L12_001B2F8C[state->index].axis1);
@@ -108,7 +108,7 @@ Destroy:
                 continue;
             obj = CreateMoby(0xFDF);
             if (obj) {
-                InitChildObjectFromParent(obj, self);
+                moby_init_child_from_parent(obj, self);
                 qcopy(obj + 0xF0, D_L12_001B2F8C[state->index].rotation);
                 euler_rotation_basis(obj + 0xC0, obj + 0xF0);
                 obj[0x31] = 0;
@@ -160,13 +160,13 @@ Destroy:
                 u16 id = *(u16 *)(self + 0xB2);
 
                 if (id & 1) {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
                     u8 packed = *counter;
 
                     if (((packed >> 4) & 7) != 7)
                         *counter = packed + 16;
                 } else {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
                     u8 packed = *counter;
 
                     if ((packed & 7) != 7)
@@ -180,7 +180,7 @@ Destroy:
             j++;
         } while (j < 3);
         if (clear) {
-            u8 *sound = gSoundState + state->sound * 0x70;
+            u8 *sound = g_sound_state + state->sound * 0x70;
 
             if (*(u8 **)(sound + 0x88) != self || !sound[0x74])
                 state->sound = PlayMobySound(1, 4, self);
@@ -188,16 +188,16 @@ Destroy:
             int id = state->sound;
 
             if (id != -1) {
-                u8 *sound = gSoundState + id * 0x70;
+                u8 *sound = g_sound_state + id * 0x70;
 
                 if (*(u8 **)(sound + 0x88) == self && sound[0x74])
-                    StopSoundVoice(id);
+                    snd_stop_voice(id);
             }
             state->sound = -1;
         }
     }
     {
-        u8 *query = gHeroPosition;
+        u8 *query = g_hero_position;
         float height, t;
         float *pos;
 
@@ -209,10 +209,10 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            FastVecSub(delta, gHeroPosition, D_L12_001B2F8C[state->index].position);
+            FastVecSub(delta, g_hero_position, D_L12_001B2F8C[state->index].position);
             matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height && delta[0] <= D_L12_001B1D10_gp[0]) {
-                RestoreBeamChildCollision(self);
+                beam_restore_child_collision(self);
                 if (delta[0] >= 0.0f) {
                     matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
@@ -225,9 +225,9 @@ Destroy:
                     D_L12_001B1D00[2] = -3.0f;
                 }
                 make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
-                QueueMobyImpact(gHeroMoby_0018C0B0, event);
+                QueueMobyImpact(g_hero_moby, event);
             } else if (delta[1] < height) {
-                RestoreBeamChildCollision(self);
+                beam_restore_child_collision(self);
             }
         } else if (IsPointInCuboid(query + 0x60, state->index)) {
             t = *(float *)(query + 0x68);
@@ -237,10 +237,10 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            FastVecSub(delta, gHeroPosition + 0x60, D_L12_001B2F8C[state->index].position);
+            FastVecSub(delta, g_hero_position + 0x60, D_L12_001B2F8C[state->index].position);
             matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height) {
-                RestoreBeamChildCollision(self);
+                beam_restore_child_collision(self);
                 if (delta[0] >= 0.0f) {
                     matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
@@ -253,28 +253,28 @@ Destroy:
                     D_L12_001B1D00[2] = -3.0f;
                 }
                 make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
-                QueueMobyImpact(gHeroMoby_0018C0B0, event);
+                QueueMobyImpact(g_hero_moby, event);
             }
         }
     }
-    if (IsTrackedObjectOpen() && !IsTrackedObjectActive()) {
+    if (tracked_object_is_open() && !tracked_moby_is_active()) {
         u8 *candidate = D_L12_001B090C;
 
         qcopy(delta, candidate + 0x10);
-        if (FloatAbs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
+        if (math_fabs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
             delta[2] = D_L12_001B2F8C[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
-            SetTrackedObjectState(1, -1);
+            tracked_moby_set_state(1, -1);
     }
-    if (IsSecondTrackedObjectOpen()) {
+    if (second_tracked_object_is_open()) {
         u8 *candidate = D_L12_001B1360;
 
         qcopy(delta, candidate + 0x10);
-        if (FloatAbs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
+        if (math_fabs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
             delta[2] = D_L12_001B2F8C[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
-            StartGlobalObject(1, -1);
+            global_object_start(1, -1);
     }
-    AddDrawCallbackToList1(D_L12_0041BF88, self);
-    PushHelperObjects(self);
+    gfx_add_draw_callback_first(D_L12_0041BF88, self);
+    helper_push_objects(self);
 }

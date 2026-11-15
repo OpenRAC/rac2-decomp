@@ -11,23 +11,23 @@ extern float D_L00_001AFF2C __attribute__((sda));
 extern float D_L00_001AFF30 __attribute__((sda));
 extern float D_L00_001AFF34 __attribute__((sda));
 extern unsigned int D_L00_001AFF38 __attribute__((sda));
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_0018A0E0[];
 extern float D_L00_0023A770[][3];
 extern float D_L00_00292370[][4];
 extern float D_L00_00293590[][2];
 extern float D_L00_00293EB0[][4];
 extern short D_L00_002944B0[][4];
-extern unsigned long func_0027C878(int);
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280328(void);
-extern void func_00281810(int, void *, void *, void *, int);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void font_queue_vu_state(void);
+extern void part_draw_glint_effect(int, void *, void *, void *, int);
+extern void draw_world_quad(void *, void *, int);
 
 /* The quad func_00280B90 draws: four corners, their colours and texture coordinates, then the
    four GS register values it is drawn with. */
@@ -51,7 +51,7 @@ typedef struct {
    colour, then draws 32 quads whose corners are D_L00_00293EB0 points picked by D_L00_002944B0,
    corners 0-1 scaled by D_L00_001AFF30 and corners 2-3 by that times D_L00_001AFF34. */
 /* Draws the glowing sphere effect: a ring of lit points facing the camera, then 32 soft quads around it. */
-void func_L00_003C4B98(char *owner)
+void gfx_draw_glow_sphere(char *owner)
 {
     struct {
         Quad4B98 quad;
@@ -74,7 +74,7 @@ void func_L00_003C4B98(char *owner)
     qcopy(frame.position, ctx->position);
     frame.position[3] = 1.0f;
     basis = frame.basis;
-    FastVecSub(frame.delta, gCameraPosition_L00, frame.position);
+    FastVecSub(frame.delta, g_camera_l00_position, frame.position);
     vec_scale_to_length(basis[0], frame.delta, 1.0f);
     FastVecScale(frame.up, D_0018A0E0, -1.0f);
     FastVecCross(basis[1], basis[0], frame.up);
@@ -101,9 +101,9 @@ void func_L00_003C4B98(char *owner)
         D_L00_0023A770[j][2] = frame.point[2];
         frame.colors[j] = frame.quad.colors[0];
     }
-    DrawGlintEffect(148, D_L00_0023A770[0], &frame.colors[0], D_L00_00293590[0], 1);
-    DrawGlintEffect(109, D_L00_0023A770[146], &frame.colors[146], D_L00_00293590[146], 1);
-    DrawGlintEffect(36, D_L00_0023A770[254], &frame.colors[254], D_L00_00293590[254], 1);
+    part_draw_glint_effect(148, D_L00_0023A770[0], &frame.colors[0], D_L00_00293590[0], 1);
+    part_draw_glint_effect(109, D_L00_0023A770[146], &frame.colors[146], D_L00_00293590[146], 1);
+    part_draw_glint_effect(36, D_L00_0023A770[254], &frame.colors[254], D_L00_00293590[254], 1);
 
     frame.quad.regs[1] = GetEffectTextureDescriptor(11);
     frame.quad.regs[3] = 0x8000000048UL;
@@ -137,13 +137,13 @@ void func_L00_003C4B98(char *owner)
 
 extern char D_L00_0023DDA0[] __attribute__((nosda));
 
-extern void func_L00_003BC228(char *a0, char *a1);
+extern void lightning_draw_curve(char *a0, char *a1);
 
-extern int func_002A7820(int a, int b);
+extern int math_random_int_range(int a, int b);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_00281EB8(char *a, int b, unsigned int c, int d, float e, float f, float g);
+extern void gfx_draw_billboard_quad(char *a, int b, unsigned int c, int d, float e, float f, float g);
 
 /* Walks the level's table of records and draws the two sprites of the record the owner
    holds, when that record is still free. The record's own field is the owner, the one
@@ -151,7 +151,7 @@ extern void func_00281EB8(char *a, int b, unsigned int c, int d, float e, float 
    branches. Each sprite's colour is its own local: one shared variable dies twice, becomes a
    global pseudo, and the shifted alpha no longer ties to its saved register. */
 /* Draws two small sprites for each effect slot that belongs to this owner and is still active. */
-void func_L00_003BBF48(char *owner)
+void effect_draw_slot_sprites(char *owner)
 {
     unsigned int firstRGB = 0x103080;
     unsigned int secondRGB = 0xFFFFFF;
@@ -165,16 +165,16 @@ void func_L00_003BBF48(char *owner)
 
     for (i = 29; i >= 0; p += 0xA0, i--, q += 0xA0) {
         if (*(int *)(p + 0x5C) == (int)owner) {
-            DrawLightningCurve(owner, q);
+            lightning_draw_curve(owner, q);
             if (*(int *)(p + 0x64) == 0) {
-                firstColor = RandomIntRange(0x50, 0x60);
+                firstColor = math_random_int_range(0x50, 0x60);
                 firstColor = (int)(firstColor << 24) | firstRGB;
-                scroll = RandomAngle();
-                DrawBillboardQuad_00281EB8(p, 0x31, firstColor, 1, 0.5f, 0.15f, scroll);
-                secondColor = RandomIntRange(0x50, 0x60);
+                scroll = math_random_angle();
+                gfx_draw_billboard_quad(p, 0x31, firstColor, 1, 0.5f, 0.15f, scroll);
+                secondColor = math_random_int_range(0x50, 0x60);
                 secondColor = (int)(secondColor << 24) | secondRGB;
-                scroll = RandomAngle();
-                DrawBillboardQuad_00281EB8(p, 0x31, secondColor, 1, 0.3f, 0.151f, scroll);
+                scroll = math_random_angle();
+                gfx_draw_billboard_quad(p, 0x31, secondColor, 1, 0.3f, 0.151f, scroll);
             }
         }
     }

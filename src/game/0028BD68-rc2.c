@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,11 +24,11 @@
  */
 #include "common.h"
 
-extern s32 D_001A73B8[];
-extern s32 *D_001B18D4;
+extern s32 g_weapon_menu_slots[];
+extern s32 *g_radial_menu_pages;
 
 /* Copies the eight weapon slot ids from the menu entries back into the weapon list. */
-void func_0028BD68(void) {
+void weapon_menu_sync_slots(void) {
     s32 i;
     s32 *slot;
     s32 offset;
@@ -35,9 +36,9 @@ void func_0028BD68(void) {
     s32 oldValue;
 
     offset = 0;
-    slot = gWeaponMenuSlots;
+    slot = g_weapon_menu_slots;
     for (i = 0; i < 8; i++) {
-        newValue = *(s32 *)((s8 *)(offset + *gRadialMenuPages) + 0x18);
+        newValue = *(s32 *)((s8 *)(offset + *g_radial_menu_pages) + 0x18);
         oldValue = *slot;
         if (oldValue != newValue) {
             *slot = newValue;

@@ -1,24 +1,24 @@
 #include "common.h"
-extern void func_00283130(void *, unsigned long long);
-extern void func_00282D60(void *, void *, float);
-extern void func_00282CA8(void *, void *, void *);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
-extern void func_00282C88(void *);
-extern void func_002E7570(void *, void *, int, float, float, float, unsigned int);
-extern void func_002ED368(void *);
-extern void func_002ED2B8(void *, void *);
+extern void vec_fast_helper_e(void *, unsigned long long);
+extern void scale_vector(void *, void *, float);
+extern void vec_copy_helper_b(void *, void *, void *);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern void vec_clear_128(void *);
+extern void part_draw_sprite_trail(void *, void *, int, float, float, float, unsigned int);
+extern void part_update_effect_records(void *);
+extern void part_add_effect_record(void *, void *);
 extern float D_001AC090 __attribute__((sda));
 extern float D_001B2150[4];
-extern char D_001B8840[];
+extern char g_scene_playback_state[];
 
 typedef struct {
  float pos[4], velocity[4];
@@ -27,7 +27,7 @@ typedef struct {
 } Effect76;
 
 /* Draws one engine flame of the ship and adds a smoky puff behind it. */
-void func_002E76C0(void *object, int index, int alternate)
+void ship_spawn_engine_flame(void *object, int index, int alternate)
 {
  float pos[4], step[4], matrix[12], first[4], second[4], combined[4];
  Effect76 effect;
@@ -46,11 +46,11 @@ void func_002E76C0(void *object, int index, int alternate)
  effect.unknown2 = 0x001C0000;
 #endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- FastVectorHelperE(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
- FastVectorHelperE(second, next);
+ vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ vec_fast_helper_e(second, next);
  scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
  scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
- VectorCopyHelperB(combined, first, second);
+ vec_copy_helper_b(combined, first, second);
  quaternion_to_rotation_basis(combined, matrix);
  multiply_matrix3x3(matrix, o + 0xc0, matrix);
  entry = &D_001AC090 + index * 4;
@@ -70,28 +70,28 @@ void func_002E76C0(void *object, int index, int alternate)
  color1 = FastTweenColor(0x40204080, 0x40205080, strength);
  color2 = FastTweenColor(-1, -1, strength);
  FastVecScale(step, matrix, -radius);
- DrawSpriteTrailAlongLine(pos, step, count1, start, end, width, color1);
+ part_draw_sprite_trail(pos, step, count1, start, end, width, color1);
  if (index == 0) {
   FastVecScale(step, matrix, -small);
-  DrawSpriteTrailAlongLine(pos, step, count2, outer, inner, 0.07499999552965164f, color2);
+  part_draw_sprite_trail(pos, step, count2, outer, inner, 0.07499999552965164f, color2);
  }
- UpdateEffectRecords(object);
- effect.color = FastTweenColor(0x2f7f, 0x7f7f, RandomFloatRange(0.0f, 1.0f));
+ part_update_effect_records(object);
+ effect.color = FastTweenColor(0x2f7f, 0x7f7f, math_random_float_range(0.0f, 1.0f));
  if (alternate) { low = 24; high = 40; }
  else { low = 31; high = 63; }
- effect.life = RandomIntRange(low, high);
- effect.size = RandomFloatRange(1.0f, 2.0f);
+ effect.life = math_random_int_range(low, high);
+ effect.size = math_random_float_range(1.0f, 2.0f);
  qcopy(effect.pos, pos);
- effect.pos[0] += RandomFloatRange(-0.025f, 0.025f);
- effect.pos[1] += RandomFloatRange(-0.025f, 0.025f);
- effect.pos[2] += RandomFloatRange(-0.025f, 0.025f);
- ClearVector128(effect.velocity);
+ effect.pos[0] += math_random_float_range(-0.025f, 0.025f);
+ effect.pos[1] += math_random_float_range(-0.025f, 0.025f);
+ effect.pos[2] += math_random_float_range(-0.025f, 0.025f);
+ vec_clear_128(effect.velocity);
  qcopy(effect.velocity, D_001B2150);
- effect.rotation = RandomAngle();
- effect.angle = RandomFloatRange(90.0f, 180.0f) * 0.0002908882452175021f;
- effect.first = effect.last = RandomIntRange(70, 90);
+ effect.rotation = math_random_angle();
+ effect.angle = math_random_float_range(90.0f, 180.0f) * 0.0002908882452175021f;
+ effect.first = effect.last = math_random_int_range(70, 90);
  effect.type = 5;
  effect.flags = 1;
- if (!alternate) effect.flags = ((*(int *)(gScenePlaybackState + 0x34) % 2 + 1) << 1) | 1;
- AddEffectRecord(object, &effect);
+ if (!alternate) effect.flags = ((*(int *)(g_scene_playback_state + 0x34) % 2 + 1) << 1) | 1;
+ part_add_effect_record(object, &effect);
 }

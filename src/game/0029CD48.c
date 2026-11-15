@@ -5,15 +5,15 @@
    sets $a0 from D_001A7B90 before calling it: the load survives only as an argument of the call. */
 
 extern char D_001BAEC0[];
-extern int D_00138180[];
-extern int D_001A79F0 __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
+extern int g_pad_state[];
+extern int g_current_map_index __attribute__((sda));
+extern int g_is_pal_video[] __attribute__((sda));
 extern char *D_001A8CFC __attribute__((sda));
 
-extern void *func_00115484(void *, int, int); /* memset */
+extern void *memset(void *, int, int); /* memset */
 extern void func_0029CD20(int);
-extern int *func_00336DA8(int, int);
-extern char *func_0034E5C0(int *, int);
+extern int *ui_return_second_arg(int, int);
+extern char *menu_system_init(int *, int);
 extern void func_0029C0D0(void);
 extern void func_0029C108(void);
 extern void func_0029C0D8(void);
@@ -23,28 +23,28 @@ extern void func_0029CD18(void);
 typedef struct { char pad[0x734C]; void *cb1; void *cb2; } SubBf;
 
 /* Sets up the level object: clears its memory block and global table, then picks which pair of callbacks it uses for this level. */
-void func_0029CD48(void)
+void level_init_callbacks(void)
 {
     char *state = D_001BAEC0;
     char *obj;
 
     memset(*(void **)(state + 0x80), 0xCD, 0x40000);
-    gPadState[104] = 0;
-    gPadState[105] = 0;
-    gPadState[106] = 0;
-    gPadState[107] = 0;
-    gPadState[108] = 0;
-    gPadState[109] = 0;
-    gPadState[110] = 0;
-    gPadState[111] = 0;
-    gPadState[112] = 0;
-    gPadState[113] = 0;
-    gPadState[114] = 0;
-    gPadState[115] = 0;
-    func_0029CD20(gIsPalVideo[0]);
-    obj = InitMenuSystem(ReturnSecondArgument(0x3F490, *(int *)(state + 0x80)), 0x40000);
+    g_pad_state[104] = 0;
+    g_pad_state[105] = 0;
+    g_pad_state[106] = 0;
+    g_pad_state[107] = 0;
+    g_pad_state[108] = 0;
+    g_pad_state[109] = 0;
+    g_pad_state[110] = 0;
+    g_pad_state[111] = 0;
+    g_pad_state[112] = 0;
+    g_pad_state[113] = 0;
+    g_pad_state[114] = 0;
+    g_pad_state[115] = 0;
+    func_0029CD20(g_is_pal_video[0]);
+    obj = menu_system_init(ui_return_second_arg(0x3F490, *(int *)(state + 0x80)), 0x40000);
     D_001A8CFC = obj;
-    if (gCurrentMapIndex == 0x1F5) {
+    if (g_current_map_index == 0x1F5) {
         ((SubBf *)(obj + 0x38000))->cb1 = func_0029C0D0;
         ((SubBf *)(obj + 0x38000))->cb2 = func_0029CD18;
     } else {

@@ -18,29 +18,29 @@ extern volatile unsigned int D_001A7100 NOT_SDA;
 extern volatile int D_001A7110 NOT_SDA;
 extern char D_001A713F NOT_SDA;
 
-extern void func_0011B3D0(void *, void *);
-extern int func_001253A8(int, int, void *, unsigned char *);
-extern int func_00133580(int);
-extern void func_00132DF0(int, int, void *, int, long);
+extern void kernel_process_request_b(void *, void *);
+extern int sceCdRead(int, int, void *, unsigned char *);
+extern int snd_CheckLoadInProgress(int);
+extern void snd_queue_command(int, int, void *, int, long);
 
 /* Starts a disc read through the sound server, or reads directly when it is not in use. Returns 0 if a read is already running. */
-int func_001334B8(int lba, int sectors, void *buf, unsigned char *mode) {
+int CdStartRead(int lba, int sectors, void *buf, unsigned char *mode) {
     int payload[4];
 
     if (D_001A748C == 0) {
-        return StartCdSectorRead(lba, sectors, buf, mode);
+        return sceCdRead(lba, sectors, buf, mode);
     }
     if (snd_CheckLoadInProgress(1) == 1) {
         return 0;
     }
     D_001A7100 = 1;
     D_001A7110 = 0;
-    ProcessKernelRequestB((void *)&D_001A7100, &D_001A713F);
+    kernel_process_request_b((void *)&D_001A7100, &D_001A713F);
     payload[0] = lba;
     payload[1] = sectors;
     payload[2] = (int)buf;
     D_001A7494 = 1;
     D_001A7498 = 0;
-    QueueSoundCommand(0x38, 0xC, payload, 0, 0);
+    snd_queue_command(0x38, 0xC, payload, 0, 0);
     return 1;
 }

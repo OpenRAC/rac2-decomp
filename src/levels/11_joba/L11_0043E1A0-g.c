@@ -5,17 +5,17 @@
 #define U16(p,o) (*(unsigned short *)((p)+(o)))
 #define I32(p,o) (*(int *)((p)+(o)))
 #define F32(p,o) (*(float *)((p)+(o)))
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
-extern u8 D_00189E20[];
-extern void func_L11_00445DF8(u8 *, int, float, float);
-extern int func_L00_0035F5A0(int, int, int);
-extern int func_00282978(short *);
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
+extern u8 g_hero_state[];
+extern void joba_boss_start_random_action(u8 *, int, float, float);
+extern int snd_start_in_slot(int, int, int);
+extern int FastDecTimer(short *);
 /* Tallies the group's living members and their health, records the losses in
  * the four-slot history and stores their weighted sum at 0x14C. Built with -g:
  * the debug line layout gives retail's single nop before div.s. */
 /* Counts the fighters still alive and their health, and keeps a short history of how many were lost recently. The arena uses that history to judge how well the player is doing. */
-void func_L11_00440360(u8 *object)
+void arena_update_loss_history(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     short *list;
@@ -34,13 +34,13 @@ void func_L11_00440360(u8 *object)
     u8 *motions;
     u8 *player;
     if (I32(state,0xc0) == 255) return;
-    groupList = (short *)gGroupIdLists[I32(state,0xc0)];
+    groupList = (short *)g_group_id_lists[I32(state,0xc0)];
     if (groupList == 0) return;
     list = groupList;
     if (object[0x20] == 9 && object[0xbc] == 0) return;
     ((struct StateClassCount *)state)->count = 0;
     active=0; total=0.0f;
-    members=gMobyTable_L11;
+    members=g_moby_l11_table;
     do {
         member = members + ((*list & 0x7fff) << 8);
         if (member != 0 && member[0x20] != 254 && member[0x20] != 253 && member[0x20] != 1) {
@@ -85,11 +85,11 @@ void func_L11_00440360(u8 *object)
             }
         }
     } while (*list++ >= 0);
-    player = gHeroState;
-    StartRandomJobaBossAction(object, I32(state,0x140)-active, F32(state,0x144)-total,
+    player = g_hero_state;
+    joba_boss_start_random_action(object, I32(state,0x140)-active, F32(state,0x144)-total,
         F32(state,0x148)-(float)I32(player,0x24cc));
     if (F32(state,0x148)-(float)I32(player,0x24cc) > 0.0f)
-        StartEffectInSlot(0x17,0,0);
+        snd_start_in_slot(0x17,0,0);
     if (active < I32(state,0x140))
         ((struct StateHistory *)state)->history[S16(state,0x1ec)].count += I32(state,0x140)-active;
     if (total < F32(state,0x144))

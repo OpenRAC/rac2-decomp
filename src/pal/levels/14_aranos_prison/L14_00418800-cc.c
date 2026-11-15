@@ -1,27 +1,28 @@
+#include "names.h"
 /* func_PAL_L14_00418800, the PAL copy of func_L14_004137F8: the same C. */
 #include "common.h"
-extern void func_002A7750(void *, int, int);
-extern int func_002A7820(int, int);
-extern int func_002B3868(void *);
-extern void func_002E59F8(int);
-extern char D_00188660[];
-extern void func_L14_00432450(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_range(int, int);
+extern int flag_set_first_pending(void *);
+extern void snd_stop_voice(int);
+extern char g_sound_state[];
+extern void gfx_draw_scrolling_surface_quad(void *);
 extern char D_L14_001B9500[];
-extern float func_00283198(float);
-extern char D_00189EA0[];
+extern float math_fast_sin_or_cos_b(float);
+extern char g_hero_position[];
 /* The same entity-base pointer is read both absolutely and through $gp. */
 extern char *D_L14_001B259C_direct __asm__("D_L14_001B259C") __attribute__((sda));
-extern int func_002ACBC8(void *, int);
-extern void func_0029F338(void *);
+extern int IsPointInCuboid(void *, int);
+extern void moby_mark_spawned(void *);
 
 typedef int PrisonQword __attribute__((mode(TI)));
 typedef struct { PrisonQword v[4]; } PrisonMatrix;
 extern PrisonMatrix D_L14_001B1A00;
 
-extern void func_L14_004308D0(void *, int, int, int, float, float, float);
-extern float func_L14_00430898(float);
+extern void gfx_draw_rotated_billboard(void *, int, int, int, float, float, float);
+extern float math_wrap_angle_full_turn(float);
 extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 /* Help-message (subtitle) history: how often each message was shown, when, and in which levels. */
 typedef struct {
     unsigned short count, pad;
@@ -34,10 +35,10 @@ typedef struct {
     char rest[0xDB];
 } PrisonGadget;
 
-extern SubtitleHistory D_0018C958[];
+extern SubtitleHistory g_subtitle_history[];
 extern u8 D_0019B2E8[];
 extern PrisonGadget D_L14_002686F0[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 /* True once the gadget in slot 10 has been upgraded. */
 
 /* Shows help message MSG unless its history entry IDX says it was shown in the last 18 seconds. */
@@ -83,22 +84,22 @@ extern char D_L14_001B9500[];
 /* The 0x100-byte entity record (PrisonEntity, declared further down), with only the
    fields this function uses. */
 extern u8 D_0019B2E8[];
-extern char D_00189EA0[];
-extern int D_001A79F0 __attribute__((sda));
-extern int func_002ACBC8(void *, int);
-extern int func_002B3868(void *);
+extern char g_hero_position[];
+extern int g_current_map_index __attribute__((sda));
+extern int IsPointInCuboid(void *, int);
+extern int flag_set_first_pending(void *);
  /* the parameter is unused */
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_00282948(void *);
-extern float func_00283198(float);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L14_00426DE8(char *);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_fast_float_d(void *);
+extern float math_fast_sin_or_cos_b(float);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void snd_queue_level_jingle(char *);
 
 /* func_L14_00426D18 lives in the -g8 sibling file (it reads a count through $gp). */
 
 /* Queues the level jingle for the owner with the volume its state block asks for. */
-void func_L14_00426DE8(char *a0);
+void snd_queue_level_jingle(char *a0);
 
 /* func_L14_00426F28 is defined in L14_003F4F98-g8.c (it reaches data through $gp). */
 
@@ -126,10 +127,10 @@ void func_L14_00426DE8(char *a0);
    hands off to the next object when it slides clear. */
 /* func_L14_00430410 is defined in L14_00430410-g8.c. */
 
-float func_L14_00430898(float x);
+float math_wrap_angle_full_turn(float x);
 
 /* Builds a camera-facing quad and rotates its texture coordinates about their center. */
-void func_L14_004308D0(void *position, int texture, int color, int mode, float scale, float distance, float angle);
+void gfx_draw_rotated_billboard(void *position, int texture, int color, int mode, float scale, float distance, float angle);
 
 
 /* func_L14_00430B70 is defined in L14_00430B70-visual.c. */
@@ -137,11 +138,11 @@ void func_L14_004308D0(void *position, int texture, int color, int mode, float s
 /* func_L14_00430E08 is defined in L14_00430B70-visual.c. */
 
 /* Distinct no-op entries: the first is called directly, the second by the moby table. */
-extern void func_002A7750(void *, int, int);
-extern int func_002A7820(int, int);
-extern int func_002B3868(void *);
-extern void func_002E59F8(int);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern char D_00188660[];
-extern void func_L14_00432450(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_range(int, int);
+extern int flag_set_first_pending(void *);
+extern void snd_stop_voice(int);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern char g_sound_state[];
+extern void gfx_draw_scrolling_surface_quad(void *);
 

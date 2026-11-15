@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *func_002ED688(u8 *);
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_002831B0(f32);
-extern f32 func_00282DF0(void *);
+extern u8 *moby_get_motion_data(u8 *);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 FastVecDot(void *, void *);
+extern f32 math_fast_angle_helper(f32);
+extern f32 FastVecLength(void *);
 extern u8 D_L10_001B9680[];
 extern u32 *func_0037BA88(u8 *arg0);
 extern s32 func_003351C0(s32 mode);
@@ -21,32 +21,32 @@ extern s32 func_0037D390(u8 *arg0, s32 a1, s32 a2, s32 a3);
 extern s32 func_00335200(s32 a0, s32 a1);
 extern f32 func_00309138(f32 f12);
 extern f32 func_00309120(f32 f12);
-extern void func_L10_004189D8(u8 *arg0);
-extern s32 func_L05_0037B538(u8 *arg0, s32 a1, s32 a2, s32 a3);
-extern s32 func_002E5DA0(s32 index, s32 value, u8 *object, s32 kind);
+extern void hrugis_init_flying_piece(u8 *arg0);
+extern s32 moby_process_collision_hit(u8 *arg0, s32 a1, s32 a2, s32 a3);
+extern s32 snd_play_from_class_bank(s32 index, s32 value, u8 *object, s32 kind);
 extern s32 func_0037D6E0(u8 *a0);
 extern u8 *D_L10_0020B1E0[];
 extern u8 *D_001B251C;
 extern u8 D_L10_00265BA0[];
 extern u8 D_L10_00188660[];
 extern u8 D_L10_00221CD0[];
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern s32 D_001B0F44 __attribute__((sda));
 extern s32 D_001B0F48 __attribute__((sda));
-extern f32 func_002A7878(f32, f32);
-extern f32 func_002A7940(void);
-extern void func_002AF000(void *, f32, f32, f32);
-extern void func_00282CC0(void *, void *, void *);
+extern f32 math_random_float_range(f32, f32);
+extern f32 math_random_angle(void);
+extern void vec_build_spherical_offset(void *, f32, f32, f32);
+extern void FastVecAdd(void *, void *, void *);
 extern u8 *D_001B2614 __attribute__((sda));
-extern s32 func_L00_0042C818(void);
-extern u8 *func_002ED688(u8 *arg0);
-extern f32 func_002A7940(void);
-extern f32 func_00283180(f32 f12);
-extern s32 func_00283D38(s32 a0, s32 a1, f32 f12);
+extern s32 level_get_pending_value(void);
+extern u8 *moby_get_motion_data(u8 *arg0);
+extern f32 math_random_angle(void);
+extern f32 math_fast_sin_or_cos_a(f32 f12);
+extern s32 FastTweenColor(s32 a0, s32 a1, f32 f12);
 extern f32 func_00309B38(f32 f12, f32 f13);
 extern u8 func_L10_00423780(void);
-extern s32 func_00283D38(s32 a0, s32 a1, f32 f12);
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 FastTweenColor(s32 a0, s32 a1, f32 f12);
+extern s32 g_current_map_index[] __attribute__((sda));
 
 void func_PAL_L10_0041D788(u8 *arg0) {
     u8 *s2 = *(u8 **)(arg0 + 0x68);
@@ -62,9 +62,9 @@ void func_PAL_L10_0041D788(u8 *arg0) {
     *(f32 *)(s2 + 0x180) = 10.0f;
     *(s32 *)(s2 + 0x268) = 0;
     *(f32 *)(arg0 + 0x2C) = 0.04f;
-    a = func_002A7878(0.0f, *(f32 *)table);
-    b = func_002A7940();
-    c = func_002A7940();
-    func_002AF000(arg0 + 0x10, a, b, c);
-    func_00282CC0(arg0 + 0x10, table + 0x30, arg0 + 0x10);
+    a = math_random_float_range(0.0f, *(f32 *)table);
+    b = math_random_angle();
+    c = math_random_angle();
+    vec_build_spherical_offset(arg0 + 0x10, a, b, c);
+    FastVecAdd(arg0 + 0x10, table + 0x30, arg0 + 0x10);
 }

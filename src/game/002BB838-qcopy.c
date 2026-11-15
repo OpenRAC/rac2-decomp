@@ -8,14 +8,14 @@
  * keeps the copy first, in retail's order.  Matches 28/28 in USA v1.01,
  * PAL and USA v2.00.
  */
-extern void *func_002B9030(int kind);
-extern int func_00283CF0(float f);
-extern float func_00283CE0(int n);
+extern void *part_alloc(int kind);
+extern int FloatToInt(float f);
+extern float IntToFloat(int n);
 extern unsigned char *D_001F2560;
 
 typedef int TI128_002BB838 __attribute__((mode(TI)));
 
-void func_002BB838(void *position, void *velocity, int color, int endColor, int life, float f)
+void part_spawn_color_blend(void *position, void *velocity, int color, int endColor, int life, float f)
 {
     void *particle;
     char *motion;
@@ -24,7 +24,7 @@ void func_002BB838(void *position, void *velocity, int color, int endColor, int 
 
     if (life == 0)
         return;
-    particle = AllocParticle(8);
+    particle = part_alloc(8);
     if (particle == 0)
         return;
     *(TI128_002BB838 *)((char *)particle + 0x10) = *(TI128_002BB838 *)position;

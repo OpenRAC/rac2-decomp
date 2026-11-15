@@ -7,15 +7,15 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
-extern char *D_0018C0B0;
+extern char *g_hero_moby;
 
 extern int D_L23_001B1644 __attribute__((sda));
 
@@ -25,50 +25,50 @@ extern int D_L23_001B36AC __attribute__((sda));
 
 extern void *D_L23_002AB170[];
 
-extern void func_L23_00418650(char *, float);
+extern void mothership_project_point_onto_surface(char *, float);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern void func_L23_0041C6B0(char *, char *, int);
+extern void boss_find_nearest_path_point(char *, char *, int);
 
-extern void func_L23_003C00D0(char *);
+extern void enemy_reset_calm(char *);
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
-extern void func_L23_003BFFC0(char *, int, int, int, int, float);
+extern void moby_play_anim_and_link(char *, int, int, int, int, float);
 
 /* Eight ways to place the offset vector v[6] (which of the two vectors at 0xC0 and 0xD0 of the
    target, or the average of two of them), picked by func_002A77E0(8). The dispatch reads the
    level's own jump table (eight code addresses in the level's data at 0x2AB170); `cases` only
    keeps the labels alive. */
 /* Moves the enemy to a random spot near the hero and restarts its attack. The spawn counters go up by one. */
-void func_L23_003C1B58(char *moby) {
+void enemy_relocate_near_hero(char *moby) {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     char *vars = *(char **)(moby + 0x68);
     TI128 vec[7];
     unsigned int choice;
 
-    vec[1] = *(TI128 *)gHeroPosition;
-    ProjectPointOntoPlanetSurface((char *)&vec[1], 0.0f);
-    FastVecScale((char *)&vec[0], *(char **)(gHeroPosition + 0x2210) + 0xE0, -80.0f);
-    choice = RandomIntBelow(8);
+    vec[1] = *(TI128 *)g_hero_position;
+    mothership_project_point_onto_surface((char *)&vec[1], 0.0f);
+    FastVecScale((char *)&vec[0], *(char **)(g_hero_position + 0x2210) + 0xE0, -80.0f);
+    choice = math_random_int_below(8);
     if (choice < 8)
         goto *D_L23_002AB170[choice];
     goto tail;
 c0:
-    FastVecScale((char *)&vec[6], gHeroMoby_0018C0B0 + 0xC0, 50.0f);
+    FastVecScale((char *)&vec[6], g_hero_moby + 0xC0, 50.0f);
     goto tail;
 c1:
-    FastVecScale((char *)&vec[6], gHeroMoby_0018C0B0 + 0xC0, -50.0f);
+    FastVecScale((char *)&vec[6], g_hero_moby + 0xC0, -50.0f);
     goto tail;
 c2:
-    FastVecScale((char *)&vec[6], gHeroMoby_0018C0B0 + 0xD0, 50.0f);
+    FastVecScale((char *)&vec[6], g_hero_moby + 0xD0, 50.0f);
     goto tail;
 c3:
-    FastVecScale((char *)&vec[6], gHeroMoby_0018C0B0 + 0xD0, -50.0f);
+    FastVecScale((char *)&vec[6], g_hero_moby + 0xD0, -50.0f);
     goto tail;
 c4: {
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
 
     FastVecScale((char *)&vec[4], *(char **)(heroBase + 0x2290) + 0xD0, 50.0f);
     FastVecScale((char *)&vec[2], *(char **)(heroBase + 0x2290) + 0xC0, 50.0f);
@@ -77,7 +77,7 @@ c4: {
     goto tail;
 }
 c5: {
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
 
     FastVecScale((char *)&vec[2], *(char **)(heroBase + 0x2290) + 0xC0, 50.0f);
     FastVecScale((char *)&vec[5], *(char **)(heroBase + 0x2290) + 0xD0, -50.0f);
@@ -86,7 +86,7 @@ c5: {
     goto tail;
 }
 c6: {
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
 
     FastVecScale((char *)&vec[5], *(char **)(heroBase + 0x2290) + 0xD0, -50.0f);
     FastVecScale((char *)&vec[3], *(char **)(heroBase + 0x2290) + 0xC0, -50.0f);
@@ -95,7 +95,7 @@ c6: {
     goto tail;
 }
 c7: {
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
 
     FastVecScale((char *)&vec[3], *(char **)(heroBase + 0x2290) + 0xC0, -50.0f);
     FastVecScale((char *)&vec[4], *(char **)(heroBase + 0x2290) + 0xD0, 50.0f);
@@ -105,12 +105,12 @@ c7: {
 tail:
     FastVecAdd((char *)&vec[0], (char *)&vec[0], (char *)&vec[6]);
     FastVecAdd((char *)&vec[0], (char *)&vec[0], (char *)&vec[1]);
-    FindNearestPathPoint(moby + 0x10, (char *)&vec[0], 1);
-    ProjectPointOntoPlanetSurface(moby + 0x10, 0.0f);
+    boss_find_nearest_path_point(moby + 0x10, (char *)&vec[0], 1);
+    mothership_project_point_onto_surface(moby + 0x10, 0.0f);
     *(TI128 *)(vars + 0x290) = *(TI128 *)(moby + 0x10);
-    ResetEnemyToCalmState(moby);
-    SetMobyState(moby, 5, 0);
-    PlayAnimOnObjectAndLink(moby, 3, 0, 0x14, 3, 1.0f);
+    enemy_reset_calm(moby);
+    moby_set_state(moby, 5, 0);
+    moby_play_anim_and_link(moby, 3, 0, 0x14, 3, 1.0f);
     D_L23_001B164C = (D_L23_001B164C + 1) % D_L23_001B1644;
     D_L23_001B36AC = D_L23_001B36AC + 1;
 }

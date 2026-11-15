@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* EE integer and FP banks retain the helper's two pointers and scale. */
-extern void func_00282F20(float, void *, void *);
+extern void vec_scale_to_length(float, void *, void *);
 extern float D_L09_001B11C0 __attribute__((sda));
 extern float D_L09_001B11D0 __attribute__((sda));
 extern s32 D_L09_001B1280 __attribute__((sda));
@@ -9,15 +9,15 @@ extern s32 D_L09_001B11B8 __attribute__((sda));
 extern u8 D_L09_001B11C8 __attribute__((sda));
 extern s32 D_L09_001B11C4 __attribute__((sda));
 extern u16 D_L09_001B11CC __attribute__((sda));
-extern float func_00282E80(char *a0, char *a1);
-extern void func_0029FC20(char *a0, s32 a1, void *a2);
-extern void func_00282CF0(float *a0, char *a1, float *a2);
-extern char *func_L09_003AE8C8(float *a0, char *a1, float *a2, s32 a3, s32 t0, float f12, float f13, float f14, float f15);
-extern s32 func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern s32 func_002829A8(char *a0);
+extern float vec_distance_xy(char *a0, char *a1);
+extern void moby_transform_joint_point(char *a0, s32 a1, void *a2);
+extern void FastVecSub(float *a0, char *a1, float *a2);
+extern char *projectile_l09_spawn(float *a0, char *a1, float *a2, s32 a3, s32 t0, float f12, float f13, float f14, float f15);
+extern s32 PlayMobySound(s32 a0, s32 a1, char *a2);
+extern s32 vec_fast_helper_a(char *a0);
 
 /* Shoots at the hero when he is close: picks a muzzle, fires a shot, plays a sound and then waits to reload. */
-void func_L09_003FEAE8(char *obj) {
+void dobbo_fire_shots_at_hero(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     float matrix[16];
     float va[4];
@@ -26,14 +26,14 @@ void func_L09_003FEAE8(char *obj) {
         if (*(u8 *)(vars + 0x42B) != 0 && vec_distance_xy(vars + 0x390, *(char **)(vars + 0x150) + 0x10) < 3.0f) {
             *(s16 *)(vars + 0x412) = 600;
             if (*(s16 *)(vars + 0x426) == 0 && *(u8 *)(vars + 0x428) == 0) {
-                TransformMobyJointPoint(obj, *(u8 *)(vars + 0x429) + 4, matrix);
+                moby_transform_joint_point(obj, *(u8 *)(vars + 0x429) + 4, matrix);
                 if (*(u8 *)(vars + 0x441) && vec_distance_xy(vars + 0x140, vars + 0x390) < 3.0f) {
                     FastVecSub(va, vars + 0x140, matrix + 12);
                 } else {
                     FastVecSub(va, vars + 0x390, matrix + 12);
                 }
                 vec_scale_to_length(D_L09_001B11C0 * 0.016666668f, va, va);
-                SpawnProjectileMoby_L09(matrix + 12, obj, va, 1, 1, (float)*(u8 *)(vars + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
+                projectile_l09_spawn(matrix + 12, obj, va, 1, 1, (float)*(u8 *)(vars + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
                 if (*(u8 *)(vars + 0x42A) % D_L09_001B1280 == 0)
                     PlayMobySound(D_L09_001B11B8, 0, obj);
                 *(u8 *)(vars + 0x429) ^= 1;
@@ -45,7 +45,7 @@ void func_L09_003FEAE8(char *obj) {
                 }
             }
         } else if (*(u8 *)(vars + 0x428) == 0) {
-            if (FastVectorHelperA(vars + 0x42A) == 0)
+            if (vec_fast_helper_a(vars + 0x42A) == 0)
                 *(u8 *)(vars + 0x428) = D_L09_001B11C8;
         }
     }

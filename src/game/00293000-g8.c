@@ -1,16 +1,16 @@
 #include "common.h"
 extern int D_001A72F4 MACRO_ADDR, D_001A72D4 MACRO_ADDR, D_001A7304 MACRO_ADDR;
 extern int D_001A72D0 MACRO_ADDR;
-extern void func_0011AEA0(int);
+extern void FlushCache(int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
-extern int func_001265B0(void *, void *);
-extern int func_001244B8(int, unsigned short);
+extern int sceGsExecLoadImage(void *, void *);
+extern int gfx_wait_paths_idle(int, unsigned short);
 typedef struct { int type, packed, offset, size; } UploadChunk;
 typedef struct { long w[12]; } UploadImage __attribute__((aligned(16)));
 /* RAC1 loaders.c upload_texture_images provides the first upload loop;
  * RAC2 also uploads the following 32-bit image entries from a separate cursor. */
 /* Uploads a level's texture images, then its palettes, to video memory and tracks the next free spot. */
-void func_00293000(int base, int count, int palettes, UploadChunk *list)
+void UploadTextureImages(int base, int count, int palettes, UploadChunk *list)
 {
     UploadImage image;
     int i, j, cursor;
@@ -37,8 +37,8 @@ void func_00293000(int base, int count, int palettes, UploadChunk *list)
             D_001A72D0 += 0x400;
         }
         FlushCache(0);
-        ExecGsLoadImage(&image, (void *)addr);
-        WaitGsPathsIdle(0,0);
+        sceGsExecLoadImage(&image, (void *)addr);
+        gfx_wait_paths_idle(0,0);
     }
     D_001A72D4 = D_001A72D0;
     cursor = D_001A7304;
@@ -52,8 +52,8 @@ void func_00293000(int base, int count, int palettes, UploadChunk *list)
         func_00126288(&image, cursor >> 8, dbw, 0x1b, 0, 0, w, h);
         cursor += w*h*4;
         FlushCache(0);
-        ExecGsLoadImage(&image,(void *)addr);
-        WaitGsPathsIdle(0,0);
+        sceGsExecLoadImage(&image,(void *)addr);
+        gfx_wait_paths_idle(0,0);
     }
 }
 

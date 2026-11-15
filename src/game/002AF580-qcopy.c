@@ -1,21 +1,21 @@
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int func_002AB1F0(char *);
-extern int func_002ABB78(char *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002A7AA8(float, float, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern float func_002831B0(float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_003004E0(int);
-extern void func_002AFFD8(void *, void *, int);
+extern int moby_get_private_value_0(char *);
+extern int moby_is_in_special_class_range(char *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float FastVecDot(void *, void *);
+extern float cubic_hermite_scalar(float, float, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern float math_fast_angle_helper(float);
+extern int CollLine(void *, void *, int, void *, int);
+extern int game_is_id_in_list(int);
+extern void cam_compute_view_direction(void *, void *, int);
 
 struct SelectionState {
     char pad[0x18];
@@ -24,14 +24,14 @@ struct SelectionState {
 
 extern int D_001A8CA0 __attribute__((sda));
 extern short D_0018A168;
-extern int D_001A79F0 __attribute__((sda));
-extern struct SelectionState D_001BAF80;
+extern int g_current_map_index __attribute__((sda));
+extern struct SelectionState g_collision_hit;
 extern char *ref_002AF460_00[];
 
 /* Walks the object list, rejects entries by type, range and the two angle limits around
    `direction`, and returns the entry with the lowest score. Accepted entries go to `out`
    with the best one moved to the front. */
-char *func_002AF580(float *origin, float *direction, float angle, float vertical, int *count, char **out,
+char *SelectBestTargetInCone(float *origin, float *direction, float angle, float vertical, int *count, char **out,
                     int capacity, char **exclude, float range, float verticalMin, float angleMin,
                     int allowSpecial, int *types)
 {
@@ -56,10 +56,10 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
     while (node) {
         if (!((unsigned char *)node)[0x31])
             goto next;
-        special = IsMobyInSpecialClassRange(node);
+        special = moby_is_in_special_class_range(node);
         if (special && !allowSpecial)
             goto next;
-        info = (float *)GetMobyPrivateValue0(node);
+        info = (float *)moby_get_private_value_0(node);
         if (!info)
             goto next;
         if (*info <= 0.0f && !special)
@@ -95,22 +95,22 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
         elevation = horizontal;
         if (angle < 3.141593f || vertical < 3.141593f) {
             if (!D_001A8CA0) {
-                temp = FastMatrixHelperA(delta[0], delta[1]);
-                horizontal = FastDiffRots(temp, FastMatrixHelperA(direction[0], direction[1]));
+                temp = mat_fast_helper_a(delta[0], delta[1]);
+                horizontal = FastDiffRots(temp, mat_fast_helper_a(direction[0], direction[1]));
                 limit = angle;
                 if (zero < angleMin)
                     limit = angleMin + (angle - angleMin) * fraction;
                 if (limit <= horizontal)
                     goto next;
-                temp = FastMatrixHelperA(vec_length_xy(delta), delta[2]);
-                elevation = FastDiffRots(temp, FastMatrixHelperA(vec_length_xy(direction), direction[2]));
+                temp = mat_fast_helper_a(vec_length_xy(delta), delta[2]);
+                elevation = FastDiffRots(temp, mat_fast_helper_a(vec_length_xy(direction), direction[2]));
                 limit = vertical;
                 if (zero < verticalMin)
                     limit = verticalMin + (vertical - verticalMin) * fraction;
                 if (limit <= elevation)
                     goto next;
             } else {
-                ComputeViewDirection(origin, axis, 1);
+                cam_compute_view_direction(origin, axis, 1);
                 FastVecScale(projection, axis, FastVecDot(axis, delta));
                 FastVecSub(side, delta, projection);
                 temp = FastVecDot(axis, direction);
@@ -125,7 +125,7 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
                 lenOther = FastVecLength(other);
                 if (lenOther == zero)
                     goto next;
-                horizontal = 1.57079637f - FastAngleHelper(dot / (lenSide * lenOther));
+                horizontal = 1.57079637f - math_fast_angle_helper(dot / (lenSide * lenOther));
                 limit = angle;
                 if (zero < angleMin)
                     limit = angleMin + (angle - angleMin) * fraction;
@@ -135,7 +135,7 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
                 FastVecAdd(combined, combined, component);
                 lenCombined = FastVecLength(combined);
                 dot2 = FastVecDot(combined, delta);
-                elevation = 1.57079637f - FastAngleHelper(dot2 / (lenCombined * dist));
+                elevation = 1.57079637f - math_fast_angle_helper(dot2 / (lenCombined * dist));
                 limit = vertical;
                 if (zero < verticalMin)
                     limit = verticalMin + (vertical - verticalMin) * fraction;
@@ -151,18 +151,18 @@ char *func_002AF580(float *origin, float *direction, float angle, float vertical
         if (score < bestScore) {
             if (!CollLine(origin, pos, 18, node, 0))
                 goto found;
-            if (gCurrentMapIndex == 11) {
-                char *target = gCollisionHit.target;
+            if (g_current_map_index == 11) {
+                char *target = g_collision_hit.target;
                 if (!target)
                     goto next;
                 if (*(short *)(target + 0xAA) == 0xC20 /* Turret */)
                     goto found;
             }
             {
-                char *target = gCollisionHit.target;
+                char *target = g_collision_hit.target;
                 if (!target)
                     goto next;
-                if (!IsIdInList(*(short *)(target + 0xAA)))
+                if (!game_is_id_in_list(*(short *)(target + 0xAA)))
                     goto next;
             }
         found:

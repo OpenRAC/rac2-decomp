@@ -16,12 +16,12 @@ typedef struct {
 } BarlowUtilityQueueView;
 
 extern s32 D_L04_001A8F00 __attribute__((sda));
-extern s32 func_00288A00(BarlowUtilityQueueView *, s32 *, s32 *);
-extern s32 func_002B49E0(s32, s32, u32, u32, u8 *);
-extern void func_L00_002F4180(BarlowUtilityQueueView *);
+extern s32 req_pop_queue(BarlowUtilityQueueView *, s32 *, s32 *);
+extern s32 request_begin_slot(s32, s32, u32, u32, u8 *);
+extern void level_init_owner_object(BarlowUtilityQueueView *);
 
 /* launches one queued request using mode-dependent word arguments and resets the queue after a negative submission status */
-s32 func_00288BE8(BarlowUtilityQueueView *queue) {
+s32 req_launch_queued(BarlowUtilityQueueView *queue) {
     if (queue->field38 != 0) {
         s32 request[2];
         s32 status;
@@ -30,16 +30,16 @@ s32 func_00288BE8(BarlowUtilityQueueView *queue) {
         queue->field44 = 1;
         request[0] = 0;
         request[1] = 0;
-        PopRequestQueue(queue, &request[0], &request[1]);
+        req_pop_queue(queue, &request[0], &request[1]);
         status = 0;
         mode = 1;
         if ((u32)(D_L04_001A8F00 - 1) < 2) mode = 2;
         queue->field40 = mode;
         if (request[1] == 0)
-            status = BeginSlotRequest(1, mode, 0, request[0], 0);
+            status = request_begin_slot(1, mode, 0, request[0], 0);
         else if (request[1] == 1)
-            status = BeginSlotRequest(2, mode, request[0], 0, 0);
-        if (status < 0) InitOwnerObject(queue);
+            status = request_begin_slot(2, mode, request[0], 0, 0);
+        if (status < 0) level_init_owner_object(queue);
         return status == 0;
     }
     return 0;
@@ -56,30 +56,30 @@ typedef struct {
     s32 field17C;
 } BootData001393E0;
 
-extern BootData001393E0 D_001393E0;
+extern BootData001393E0 g_memcard_state;
 extern s32 D_001A8B84 __attribute__((sda));
 extern s32 D_001B1680 __attribute__((sda));
-extern s32 D_001A7424;
+extern s32 g_save_menu_flags;
 extern s32 D_001B1680_1;
-extern void func_00288D68(void);
-extern void func_0029B3E0(s32, s32);
+extern void flag_clear_word(void);
+extern void MemcardSave(s32, s32);
 
 /* Stores a new value in the small data words and, when asked, resets the related state. */
-void func_00288CB0(int newValue, int refresh)
+void data_set_small_value_and_refresh(int newValue, int refresh)
 {
     D_001A8B84 = 1;
     D_001B1680 = newValue;
     if (newValue == -1) {
-        if (gMemcardState.field17C != 0) {
-            gMemcardState.field17C = 0;
+        if (g_memcard_state.field17C != 0) {
+            g_memcard_state.field17C = 0;
         }
-        if (gMemcardState.field18 >= 0) {
-            gMemcardState.field18 = (short)newValue;
+        if (g_memcard_state.field18 >= 0) {
+            g_memcard_state.field18 = (short)newValue;
         }
-        gSaveMenuFlags &= ~0x200;
+        g_save_menu_flags &= ~0x200;
     }
     if (refresh != 0) {
-        ClearFlagWord();
+        flag_clear_word();
         MemcardSave(0, D_001B1680_1);
     }
 }

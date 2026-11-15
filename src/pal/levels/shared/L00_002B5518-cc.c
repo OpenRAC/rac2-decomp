@@ -56,19 +56,19 @@ typedef struct {
 extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record, as func_PAL_L00_002B5518 reads it */
 extern int D_L16_001A8FF0 __attribute__((sda));
 
-extern void func_00282C88(void *);
-extern void func_L00_002D49F0(void);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L00_002D38A0(Quad *, Quad *, float);
-extern void func_L00_002D36E0(float *, int, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(float, void *, int, void *);
+extern void vec_clear_128(void *);
+extern void hero_check_timed_condition(void);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void cam_offset_point_in_view_space(Quad *, Quad *, float);
+extern void hero_build_relative_point(float *, int, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(float, void *, int, void *);
 extern int func_L00_002E0200(float, void *, int, void *, float);
-extern int func_00278870(void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern int coll_process_triangles(void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
@@ -115,7 +115,7 @@ typedef struct {
     int health;
 } PlayerInputView;
 
-extern PlayerInputView D_00189E20;
+extern PlayerInputView g_hero_state;
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 
 int func_PAL_L00_002B5518(int mode)
@@ -127,49 +127,49 @@ int func_PAL_L00_002B5518(int mode)
 
     if ((&D_00189E20_view)->collision_off_frames) return 1;
     qcopy(&previous, &(&D_00189E20_view)->position);
-    func_00282C88(&offset);
+    vec_clear_128(&offset);
     if ((&D_00189E20_view)->path_constrain_pending) {
-        func_L00_002D49F0();
+        hero_check_timed_condition();
         (&D_00189E20_view)->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&(&D_00189E20_view)->basis, &(&D_00189E20_view)->up) > -0.92f) facingUp = 1;
+    if (FastVecDot(&(&D_00189E20_view)->basis, &(&D_00189E20_view)->up) > -0.92f) facingUp = 1;
     switch ((&D_00189E20_view)->control_mode) {
     case 17:
         break;
     case 15:
-        func_00282C88(&offset);
+        vec_clear_128(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, (&D_00189E20_view)->moby + 0xc0);
+        matrix_mul_vec3(&offset, &offset, (&D_00189E20_view)->moby + 0xc0);
         break;
     default:
         if ((&D_00189E20_view)->gravity_mode || (&D_00189E20_view)->timer || facingUp) {
             if ((&D_00189E20_view)->state == 2) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 5.0f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if ((&D_00189E20_view)->gravity_mode == 1 || (&D_00189E20_view)->timer) {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 0.77f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, (&D_00189E20_view)->capsule_bottom);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, (&D_00189E20_view)->capsule_bottom);
             }
         } else {
             offset.z = (&D_00189E20_view)->capsule_bottom;
         }
         break;
     }
-    func_00282CC0(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
+    FastVecAdd(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if ((&D_00189E20_view)->control_mode == 17) {
-            if (!func_00277258(0.6f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
+            if (!coll_test_point(0.6f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
         } else if ((&D_00189E20_view)->control_mode == 15) {
-            if (!func_00277258(0.54f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
+            if (!coll_test_point(0.54f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
         } else {
             PlayerView *player = (&D_00189E20_view);
             if (player->gravity_mode || facingUp) {
-                hit = func_00277258(player->capsule_radius, &player->position, 0x24, player->moby);
+                hit = coll_test_point(player->capsule_radius, &player->position, 0x24, player->moby);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -177,7 +177,7 @@ int func_PAL_L00_002B5518(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x24,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }
@@ -187,9 +187,9 @@ int func_PAL_L00_002B5518(int mode)
         (&D_00189E20_view)->wall_hit = 1;
         (&D_00189E20_view)->coll_hit_moby = ((CollisionView *)D_L00_001BF210)->moby;
     }
-    func_00282CF0(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
-    func_00282CF0(&displacement, &(&D_00189E20_view)->position, &previous);
-    if (func_00282DF0(&displacement) > (&D_00189E20_view)->capsule_radius * 1.5f) {
+    FastVecSub(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
+    FastVecSub(&displacement, &(&D_00189E20_view)->position, &previous);
+    if (FastVecLength(&displacement) > (&D_00189E20_view)->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -197,8 +197,8 @@ int func_PAL_L00_002B5518(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, (&D_00189E20_view)->capsule_radius);
-            func_00282CC0(&(&D_00189E20_view)->position, &previous, &displacement);
+            vec_scale_to_length(&displacement, &displacement, (&D_00189E20_view)->capsule_radius);
+            FastVecAdd(&(&D_00189E20_view)->position, &previous, &displacement);
         }
         return -1;
     }

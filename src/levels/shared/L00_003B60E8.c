@@ -6,10 +6,10 @@ typedef struct OBJ4 {
     int fC;
 } OBJ4;
 
-extern void func_L00_00322EC8(void *);
+extern void level_release_slot_list(void *);
 
 /* Cleans up the 25 shot slots of the weapon when it is unloaded. */
-void func_L00_003B60E8(OBJ4 *weapon)
+void weapon_release_shot_slots(OBJ4 *weapon)
 {
     char *base = (char *)weapon + 0x20;
     char *slots = base + weapon->f8;
@@ -18,6 +18,6 @@ void func_L00_003B60E8(OBJ4 *weapon)
 
     for (i = 0; i < 25; i++) {
         if (flags[i] != 0)
-            ReleaseSlotList(slots + i * 0x150);
+            level_release_slot_list(slots + i * 0x150);
     }
 }

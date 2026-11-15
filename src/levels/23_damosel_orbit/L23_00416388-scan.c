@@ -8,14 +8,14 @@
 extern int D_L23_001B166C __attribute__((sda));
 extern int D_L23_001B1658 __attribute__((sda));
 extern int D_L23_001B38C0 MACRO_ADDR;
-extern int *D_L23_001FF300[];
+extern int *g_path_lists[];
 extern void func_0032A1C8(void *, void *, int);
 extern void func_002F3D60(void *, void *, float);
 extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3BB0(void *, void *, void *);
 extern void func_002F3AF0(void *, void *, float);
 extern void func_002F3A80(void *, void *, void *);
-extern int func_L23_00418BC8(void *, void *, void *);
+extern int mothership_check_clear_path(void *, void *, void *);
 
 typedef struct ScanSub_00419970 {
     char pad[0x230];
@@ -33,7 +33,7 @@ static inline int SlotAt(int i) {
  * giving up after a full turn. Two point pairs are built from the first and
  * last points of the slot's record, and the slot is marked spent once
  * func_L23_00418BC8 accepts both pairs. */
-void func_L23_00419970(char *moby) {
+void mothership_advance_scan_slot(char *moby) {
     float startA[4], startB[4], endA[4], endB[4], sideB[4], sideA[4], span[4], startDir[4], endDir[4], scratch[4];
     char *vars;
     int startSlot = D_L23_001B166C;
@@ -42,7 +42,7 @@ void func_L23_00419970(char *moby) {
     while (SlotAt(D_L23_001B166C = (D_L23_001B166C + 1) % D_L23_001B38C0) == -1) {
         if (startSlot == D_L23_001B166C) return;
     }
-    rec = (char *)gPathLists[((ScanSub_00419970 *)vars)->record_ids[(&D_L23_001B1658)[D_L23_001B166C]]];
+    rec = (char *)g_path_lists[((ScanSub_00419970 *)vars)->record_ids[(&D_L23_001B1658)[D_L23_001B166C]]];
     qcopy_nc(startA, rec + 16);
     qcopy_nc(endA, rec + *(int *)rec * 16);
     qcopy_nc(startB, rec + 16);
@@ -67,6 +67,6 @@ void func_L23_00419970(char *moby) {
     func_002F3AF0(scratch, endDir, *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
     func_002F3A80(scratch, scratch, sideB);
     func_002F3A80(endB, endB, scratch);
-    if (CheckClearPathBetweenPoints(moby, startA, endA) && CheckClearPathBetweenPoints(moby, startB, endB))
+    if (mothership_check_clear_path(moby, startA, endA) && mothership_check_clear_path(moby, startB, endB))
         (&D_L23_001B1658)[D_L23_001B166C] = -1;
 }

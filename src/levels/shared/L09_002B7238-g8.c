@@ -7,35 +7,35 @@ extern int D_L09_001B0F54 __attribute__((sda));
 extern int D_L09_001B0F58 __attribute__((sda));
 extern unsigned short D_L09_001B0F4C __attribute__((sda));
 
-extern int func_002A7820(int a0, int a1);
-extern int func_00282978(char *a0);
-extern void func_002B0990(int a0, void *a1, int a2, int a3, f32 f12);
+extern int math_random_int_range(int a0, int a1);
+extern int FastDecTimer(char *a0);
+extern void value_set_and_smooth(int a0, void *a1, int a2, int a3, f32 f12);
 
 /* Small data the run's step needs: the resident mode word (0x001A79F0), the level's
    release word (0x001A9040) and the level's record table (0x001B285C). */
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_L09_001A9040 __attribute__((sda));
 extern char *D_L09_001B285C __attribute__((sda));
 
-extern void func_L09_003EA798(char *object);
-extern float func_00282E48(char *a, char *b);
-extern void func_002A93B0(void *object);
+extern void walker_init(char *object);
+extern float fast_vec_dist(char *a, char *b);
+extern void moby_update_ground_check(void *object);
 extern char D_L09_001B9A00[];
-extern int func_002B0ED8(char *object, char *frame, int flag);
-extern char *func_L09_00326E90(char *entry);
-extern void func_002A7750(char *object, int a1, int a2);
-extern void func_002B3BA8(char *object, int a1, int a2, int a3, f32 f12, f32 f13);
+extern int moby_apply_damage_to_object(char *object, char *frame, int flag);
+extern char *moby_is_hero_or_special(char *entry);
+extern void moby_set_state(char *object, int a1, int a2);
+extern void weapon_select_aim_target(char *object, int a1, int a2, int a3, f32 f12, f32 f13);
 
-extern void func_0029FCC0(char *object, int joint, void *out);
-extern float func_00282E80(void *a, void *b);
-extern void func_00282F20(void *dst, void *src, float scale);
-extern int func_002A8C28(void *owner, void *start, int queryMode, int first, int second, int mode,
+extern void moby_transform_joint_to_world(char *object, int joint, void *out);
+extern float vec_distance_xy(void *a, void *b);
+extern void vec_scale_to_length(void *dst, void *src, float scale);
+extern int coll_sweep_from_object(void *owner, void *start, int queryMode, int first, int second, int mode,
                          f32 radius, f32 distance, f32 scale);
-extern int func_002A77E0(int a0);
-extern float func_002A7878(float lo, float hi);
-extern char *func_002BAE50(void *pos, void *vel, unsigned int color, int a3, int size, int life,
+extern int math_random_int_below(int a0);
+extern float math_random_float_range(float lo, float hi);
+extern char *part_spawn_scaling(void *pos, void *vel, unsigned int color, int a3, int size, int life,
                            int fade, int a7);
-extern char D_00189EA0[];
+extern char g_hero_position[];
 /* Small data: the query range, drop and radius are read $gp-relative; the two level weights
    and the toggle word are plain absolute loads (a weight load the scheduler moves into a delay
    slot comes out $gp-relative). */
@@ -54,78 +54,78 @@ typedef union {
 /* For joints 5 to 7: queries near D_00189EA0 when close enough, then spawns falling particles
    (two colours by the toggle word, then a third). While neither level weight is above 0.95
    and +0x31 is set, joints 3 and 4 also spawn particles along the +0xC0 vector. */
-void func_L09_003E9AA0(char *object) {
+void part_spawn_falling(char *object) {
     char *vars = *(char **)(object + 0x68);
     Quad_L09_003E9AA0 pos, vel, zero;
     int i, j, size, life;
 
     for (i = 5; i < 8; i++) {
-        TransformMobyJointToWorld(object, i, &pos);
-        if (vec_distance_xy(&pos, gHeroPosition) < D_L09_001B0C40) {
+        moby_transform_joint_to_world(object, i, &pos);
+        if (vec_distance_xy(&pos, g_hero_position) < D_L09_001B0C40) {
             qcopy(&vel, &pos);
             vel.f[2] -= D_L09_001B0C44;
-            SweepCollisionFromObject(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
+            coll_sweep_from_object(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
                           (float)*(unsigned char *)(vars + 0x35), 2.0f);
         }
         if ((!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31))
-            || RandomIntBelow(2)) {
+            || math_random_int_below(2)) {
             zero.q = 0;
-            zero.f[2] = -(RandomFloatRange(4.5f, 5.5f) * (1.0f / 60.0f));
+            zero.f[2] = -(math_random_float_range(4.5f, 5.5f) * (1.0f / 60.0f));
             vel.q = zero.q;
             if (D_L09_001B2388 & 1)
-                SpawnScalingParticle(&pos, &vel, 0xCF0000FF, 207, RandomIntRange(18, 22), 180, -10, 1);
+                part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, math_random_int_range(18, 22), 180, -10, 1);
             else
-                SpawnScalingParticle(&pos, &vel, 0x6000FFFF, 128, RandomIntRange(20, 24), 350, -10, 1);
-            life = RandomIntRange(20, 90);
-            size = RandomIntRange(10, 15);
-            SpawnScalingParticle(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
+                part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, math_random_int_range(20, 24), 350, -10, 1);
+            life = math_random_int_range(20, 90);
+            size = math_random_int_range(10, 15);
+            part_spawn_scaling(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
     if (!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31)) {
         for (j = 3; j < 5; j++) {
-            vec_scale_to_length(&vel, object + 0xC0, -(RandomFloatRange(4.5f, 5.5f) * (1.0f / 60.0f)));
-            TransformMobyJointToWorld(object, j, &pos);
+            vec_scale_to_length(&vel, object + 0xC0, -(math_random_float_range(4.5f, 5.5f) * (1.0f / 60.0f)));
+            moby_transform_joint_to_world(object, j, &pos);
             if (D_L09_001B2388 & 1)
-                SpawnScalingParticle(&pos, &vel, 0xCF0000FF, 207, RandomIntRange(18, 22), 50, -10, 1);
+                part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, math_random_int_range(18, 22), 50, -10, 1);
             else
-                SpawnScalingParticle(&pos, &vel, 0x6000FFFF, 128, RandomIntRange(20, 24), 100, -10, 1);
-            life = RandomIntRange(10, 25);
-            size = RandomIntRange(10, 15);
-            SpawnScalingParticle(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
+                part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, math_random_int_range(20, 24), 100, -10, 1);
+            life = math_random_int_range(10, 25);
+            size = math_random_int_range(10, 15);
+            part_spawn_scaling(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
 }
 
 /* Steps the run: refreshes the object's frame, drops the record it still points at when
    the resident mode word says 9, and rebuilds the effect. */
-void func_L09_003EAA18(char *object) {
+void enemy_step_animation(char *object) {
     char *vars = *(char **)(object + 0x68);
     short recordId;
     int animResult;
 
     if (*(unsigned char *)(object + 0x95) == 0)
-        InitWalkingEnemy(object);
+        walker_init(object);
 
     if (*(unsigned char *)(object + 0x31) != 0) {
         if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 32.0f) {
-            UpdateMobyGroundCheck(object);
+            moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 0x1E;
         }
     }
 
-    animResult = ApplyDamageToObject(object, vars + 0x180, 0);
+    animResult = moby_apply_damage_to_object(object, vars + 0x180, 0);
     if (animResult >= 4) {
-        if (gCurrentMapIndex == 9) {
+        if (g_current_map_index == 9) {
             recordId = *(short *)(vars + 0x1F0);
             if (recordId != -1) {
-                if (IsHeroOrSpecialStateMoby(D_L09_001B285C + (recordId << 8)) == 0)
+                if (moby_is_hero_or_special(D_L09_001B285C + (recordId << 8)) == 0)
                     D_L09_001A9040 = 0;
                 *(short *)(vars + 0x1F0) = -1;
             }
         }
-        SetMobyState(object, 6, -1);
+        moby_set_state(object, 6, -1);
     }
-    SelectAimTarget_002B3BA8(object, *(int *)(vars + 0x354), 0, 0, 0.0f, 0.0f);
+    weapon_select_aim_target(object, *(int *)(vars + 0x354), 0, 0, 0.0f, 0.0f);
 }
 
 /* The walks below read the group count through $gp; the group table of id lists is absolute
@@ -139,7 +139,7 @@ extern unsigned short *D_L09_001FB560[];
 
 /* Counts the class-0xD0F entities of the object's group whose private state has bit 0 of its
    byte at +0x302 clear and the word a1 at +0x420; -1 when a1 is 0. */
-int func_L09_003F71C8(unsigned char *object, int wantedValue) {
+int trooper_legs_count_with_value(unsigned char *object, int wantedValue) {
     unsigned short *idPtr;
     unsigned char *entity;
     unsigned char *vars;
@@ -167,7 +167,7 @@ int func_L09_003F71C8(unsigned char *object, int wantedValue) {
 
 /* The largest word at +0x420 (0 at least) in the private states, whose byte at +0x302 is 0, of
    the class-0xD0F entities of the object's group. */
-int func_L09_003F72A8(unsigned char *object) {
+int trooper_legs_find_largest_value(unsigned char *object) {
     unsigned short *idPtr;
     unsigned char *entity;
     unsigned char *vars;
@@ -194,13 +194,13 @@ int func_L09_003F72A8(unsigned char *object) {
 }
 
 /* Re-arms the frame's four spawn slots, bumps the object's counter and re-runs the stage. */
-void func_L09_003F8898(char *object) {
+void trooper_rearm_spawn_timers(char *object) {
     char *vars = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(vars + 0x2EA) != 0) {
         *(unsigned char *)(vars + 0x2EA) = 0;
         if (*(short *)(vars + 0x2E0) < D_L09_001B0F50)
-            *(short *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
+            *(short *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
     }
     if (FastDecTimer(vars + 0x2E0) == 0)
         *(unsigned short *)(vars + 0x2E8) = D_L09_001B0F4C;
@@ -209,7 +209,7 @@ void func_L09_003F8898(char *object) {
     FastDecTimer(vars + 0x2E8);
     if (*(unsigned short *)(object + 0x96) <= 0xFFFE)
         *(unsigned short *)(object + 0x96) = *(unsigned short *)(object + 0x96) + 1;
-    SetValueAndStartSmoothChange(*(int *)(vars + 0x2F8), vars + 0x430, 4, 1, 1.9f);
+    value_set_and_smooth(*(int *)(vars + 0x2F8), vars + 0x430, 4, 1, 1.9f);
 }
 
 /* func_L09_003A01D8: a 16-byte vector with a whole-quadword view, and the 0x28-byte impact
@@ -241,30 +241,30 @@ typedef char Impact_L09_003A01D8_extent[sizeof(Impact_L09_003A01D8) == 0x28 ? 1 
 
 extern u8 *D_L09_001BFE58 NOT_SDA;
 extern float D_L09_001A8F20[] MACRO_ADDR;
-extern float func_00283B98(float angle, float step);
-extern float func_00282DF0(void *v);
-extern float func_002A7940(void);
+extern float FastAddRotations(float angle, float step);
+extern float FastVecLength(void *v);
+extern float math_random_angle(void);
 extern int func_001163B0(void);
-extern int func_00282948(void *a0);
-extern void func_00282CC0(void *dst, void *a, void *b);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00283098(void *dst, void *src, void *matrix);
-extern void func_00282D30(void *dst, void *src, float scale);
-extern void func_002ACEC0(void *dst, void *src, void *matrix, float angle);
-extern void *func_002C16C0(void *position, void *velocity, int a2, int a3, int color, int t1,
+extern int math_fast_float_d(void *a0);
+extern void FastVecAdd(void *dst, void *a, void *b);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void matrix_mul_vec3(void *dst, void *src, void *matrix);
+extern void FastVecScale(void *dst, void *src, float scale);
+extern void math_apply_axis_rotation_to_quat(void *dst, void *src, void *matrix, float angle);
+extern void *part_spawn_burst(void *position, void *velocity, int a2, int a3, int color, int t1,
                            float f12, float f13, float f14, float f15, float f16);
-extern void *func_002BD8B0(void *a0, void *a1, int a2, int a3, int a4, int a5, float f12);
-extern void func_002A8C00(void *impact, int attacker, int flags, float damage, void *direction);
-extern int func_002761F8(void *from, void *to, int a2, void *object, Impact_L09_003A01D8 *impact);
-extern int func_00277258(void *position, int a1, void *object, float radius);
-extern int func_00277F48(void *position, int a1, void *target, Impact_L09_003A01D8 *impact,
+extern void *part_spawn_trailing_spark(void *a0, void *a1, int a2, int a3, int a4, int a5, float f12);
+extern void make_hit_descriptor(void *impact, int attacker, int flags, float damage, void *direction);
+extern int CollLine(void *from, void *to, int a2, void *object, Impact_L09_003A01D8 *impact);
+extern int coll_test_point(void *position, int a1, void *object, float radius);
+extern int coll_process_hit(void *position, int a1, void *target, Impact_L09_003A01D8 *impact,
                          float scale);
-extern void func_002ABBB8(void *owner, void *direction, void *position, float radius, float damage,
+extern void SpawnExplosionEffects(void *owner, void *direction, void *position, float radius, float damage,
                           int sparks, int flashes, int smoke, float glow, float white, float cutoff,
                           float scale, int sound, float blast, int shake, int debris, int quality,
                           int channels, int flags);
-extern int func_002E5CF8(int a0, int a1, void *object);
-extern void func_0029F338(void *object);
+extern int PlayMobySound(int a0, int a1, void *object);
+extern void moby_mark_spawned(void *object);
 
 /* Moves a projectile along its velocity (state = object +0x68, velocity at state +0x00),
    spinning +0xF0. Unless the level is busy on an odd frame it leaves a drifting trail particle
@@ -272,7 +272,7 @@ extern void func_0029F338(void *object);
    (state +0x3C); on a hit against anything but the owner it explodes and deletes itself,
    otherwise it commits the predicted position. The trail vectors and the impact request share
    one stack area. */
-void func_L09_003A01D8(u8 *object)
+void projectile_update_trail_impact(u8 *object)
 {
     struct {
         float predicted[4];
@@ -296,26 +296,26 @@ void func_L09_003A01D8(u8 *object)
     if (!busy || !(D_L09_001B2388 & 1)) {
         length = FastVecLength(state);
         f.payload.effects.axis.q = 0;
-        f.payload.effects.axis.f[0] = RandomFloatRange(-1.0f, 1.0f);
-        f.payload.effects.axis.f[1] = RandomFloatRange(-1.0f, 1.0f);
-        f.payload.effects.axis.f[2] = RandomFloatRange(-1.0f, 1.0f);
+        f.payload.effects.axis.f[0] = math_random_float_range(-1.0f, 1.0f);
+        f.payload.effects.axis.f[1] = math_random_float_range(-1.0f, 1.0f);
+        f.payload.effects.axis.f[2] = math_random_float_range(-1.0f, 1.0f);
         f.payload.effects.velocity.q = f.payload.effects.axis.q;
         vec_scale_to_length(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
-                      RandomFloatRange(0.04f, 0.08f) * 0.016666668f);
-        FastVecScale(f.payload.effects.point.f, state, RandomFloatRange(0.2f, 0.99f));
+                      math_random_float_range(0.04f, 0.08f) * 0.016666668f);
+        FastVecScale(f.payload.effects.point.f, state, math_random_float_range(0.2f, 0.99f));
         FastVecAdd(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
                       f.payload.effects.point.f);
-        vec_scale_to_length(f.payload.effects.point.f, state, RandomFloatRange(0.0f, 1.0f) * length);
+        vec_scale_to_length(f.payload.effects.point.f, state, math_random_float_range(0.0f, 1.0f) * length);
         FastVecAdd(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
-        SpawnBurstParticle_002C16C0(object + 0x10, f.payload.effects.velocity.f, 7, 127, 0xB0B0B0, 3,
+        part_spawn_burst(object + 0x10, f.payload.effects.velocity.f, 7, 127, 0xB0B0B0, 3,
                       40000.0f, 1000.0f, 1.0f, -0.00039999998989515007f, 0.0f);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[2] = 0.01f;
         matrix_mul_vec3(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
-        ApplyAxisRotationToQuaternion(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
-                      RandomAngle());
-        if (Rand() & 1)
-            SpawnTrailingSparkParticle(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
+        math_apply_axis_rotation_to_quat(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
+                      math_random_angle());
+        if (func_001163B0() & 1)
+            part_spawn_trailing_spark(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
                           0x1FFFFFFF, 13, 1, 25000.0f);
     }
     make_hit_descriptor(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
@@ -327,8 +327,8 @@ void func_L09_003A01D8(u8 *object)
     f.payload.impact.enabled |= 1;
     f.payload.impact.kind = 4;
     collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
-    if (collision || TestPointAgainstCollision(object + 0x10, 1, object, 0.3f)
-        || FastFloatHelperD(state + 0x38)) {
+    if (collision || coll_test_point(object + 0x10, 1, object, 0.3f)
+        || math_fast_float_d(state + 0x38)) {
         hit = D_L09_001BFE58;
         if (hit) {
             if (hit == P(state, 0x3C)) {
@@ -336,18 +336,18 @@ void func_L09_003A01D8(u8 *object)
                 return;
             }
             if (*(short *)(hit + 0xAA) != 0x4E)
-                ProcessCollisionHit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
+                coll_process_hit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
             SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
                           0.666f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
         } else {
             SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
                           0.5f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
         }
     } else
         qcopy(object + 0x10, f.predicted);

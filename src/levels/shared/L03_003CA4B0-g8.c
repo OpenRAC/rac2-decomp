@@ -1,9 +1,9 @@
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-extern void func_00282F20(void *,void *,float),func_002830C0(void *,void *,void *),func_00282CF0(void *,void *,void *),func_00282D30(void *,void *,float),func_00283098(void *,void *,void *);
-extern float func_00282C48(float),func_00282DB0(void *,void *),func_00282C10(float);
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *,int,int);
+extern void vec_scale_to_length(void *,void *,float),transform_vector(void *,void *,void *),FastVecSub(void *,void *,void *),FastVecScale(void *,void *,float),matrix_mul_vec3(void *,void *,void *);
+extern float math_fabs(float),FastVecDot(void *,void *),square_root(float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,int,int);
 extern char D_L03_001B9980[];
 typedef float ReflectUV[2];
 extern ReflectUV D_L03_00240B20[57];
@@ -28,7 +28,7 @@ static inline void TransformPoint(float *dst,void *src,void *m)
 }
 
 /* Draws the reflective container moby: 57 vertices, 42 faces (RAC1 draw_gadgebot_spawn_container). */
-void func_L03_003CA4B0(char *moby){
+void DrawGadgebotSpawnContainer(char *moby){
  ReflectPacket packet __attribute__((aligned(16)));
  typedef unsigned int ReflectQ __attribute__((mode(TI)));
  typedef union {float f[4];ReflectQ q;} ReflectVec;
@@ -40,7 +40,7 @@ void func_L03_003CA4B0(char *moby){
  scale=F(moby,0x2c)/F(*(char **)(moby+0x24),0x24);
  vec_scale_to_length(transform.row[0].f,moby+0xc0,scale);vec_scale_to_length(transform.row[1].f,moby+0xd0,scale);vec_scale_to_length(transform.row[2].f,moby+0xe0,scale);
  transform.row[3].f[0]=F(moby,0x10);transform.row[3].f[1]=F(moby,0x14);transform.row[3].f[2]=F(moby,0x18);transform.row[3].f[3]=1;
- if(FloatAbs(D_L03_001B9840.pos[0]-F(moby,0x10))<16&&FloatAbs(D_L03_001B9840.pos[1]-F(moby,0x14))<16)near=1;
+ if(math_fabs(D_L03_001B9840.pos[0]-F(moby,0x10))<16&&math_fabs(D_L03_001B9840.pos[1]-F(moby,0x14))<16)near=1;
  if(near!=0){
  ReflectUV *uv=D_L03_00240B20;
  for(i=0;i<57;i++,uv++){

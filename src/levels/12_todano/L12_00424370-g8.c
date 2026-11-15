@@ -12,8 +12,8 @@ extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0, D_L12_0021E180;
 extern u8 D_0019B4A8[], D_0019B2E8[], D_L12_001B9E00[], D_L12_001C0270[];
 extern u8 D_L12_001B2CE0[] __attribute__((sda));
 typedef struct { u8 pad[0x80]; f32 pos[4]; u8 pad90[0x530]; u8 *target; } PlayerState;
-extern PlayerState D_00189E20;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern PlayerState g_hero_state;
+extern s32 g_current_map_index MACRO_ADDR;
 extern s32 D_001A79F0_gp SDATA(D_001A79F0);
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
@@ -23,57 +23,57 @@ extern s32 D_L12_001B29C8_gp SDATA(D_L12_001B29C8);
 extern f32 D_L12_001B20A0 __attribute__((sda)), D_L12_001B20A4 __attribute__((sda)), D_L12_001B20A8 __attribute__((sda)), D_L12_001B20AC __attribute__((sda));
 extern f32 D_L12_001B20B0 __attribute__((sda)), D_L12_001B20C8 __attribute__((sda));
 extern s32 D_L12_001B20B8[] __attribute__((sda));
-extern void func_0029F338(void *), func_L12_0041BDA8(void *), func_L12_0041BDF8(void *);
-extern s32 func_L12_0041BE60(void *);
-extern f32 func_00282E48(void *, void *), func_00282E80(void *, void *);
-extern void func_002A93B0(void *), func_002A7750(void *,s32,s32);
-extern void func_002A7470(void *,s32,s32,s32);
-extern s32 func_002A77E0(s32), func_002B3868(void *), func_002B38B8(void *);
-extern f32 func_002AA340(s32 *,s32,s32);
-extern void func_002B60B0(void *,f32,f32,f32,f32);
-extern s32 func_L01_00321178(void *,void *), func_L12_00425178(void *,s32), func_L12_00425070(void *);
-extern void func_L12_00425448(void *), func_L12_00425348(void *);
-extern s32 func_002761F8(void *,void *,s32,void *,s32);
-extern f32 func_00282DB0(void *,void *), func_00283248(f32,f32);
-extern s32 func_L01_00322288(void *,f32);
-extern void func_L01_0031AB20(void *,void *,f32,f32,f32,s32);
-extern u8 *func_0029EFD0(s32);
-extern s32 func_L02_003272D8(void *), func_002ACBC8(void *,s32);
-extern void func_00282CC0(void *,void *,void *), func_00282F70(void *,void *,f32);
-extern f32 func_00282E20(void *);
-extern s32 func_00277258(void *,s32,void *,f32);
-extern void func_00282F20(void *,void *,f32), func_00283028(void *,void *,void *), func_00282D30(void *,void *,f32), func_00282C88(void *);
-extern f32 func_00283B98(f32,f32);
-extern s32 func_L01_0031BC68(s32,s32,f32);
-extern void func_002B0990(void *,f32 *,f32,s32,s32);
+extern void moby_mark_spawned(void *), helper_clear_states(void *), beam_restore_child_collision(void *);
+extern s32 helper_has_live_object(void *);
+extern f32 fast_vec_dist(void *, void *), vec_distance_xy(void *, void *);
+extern void moby_update_ground_check(void *), moby_set_state(void *,s32,s32);
+extern void anim_start_blended(void *,s32,s32,s32);
+extern s32 math_random_int_below(s32), flag_set_first_pending(void *), flag_is_third_pending_set(void *);
+extern f32 math_step_int_toward_target(s32 *,s32,s32);
+extern void moby_set_controller_speed_limits(void *,f32,f32,f32,f32);
+extern s32 moby_l01_turn_toward_target(void *,void *), path_pick_random_visible_point(void *,s32), path_find_visible_point(void *);
+extern void spark_timer_restart_sound(void *), path_find_nearby_point_at_hero_height(void *);
+extern s32 CollLine(void *,void *,s32,void *,s32);
+extern f32 FastVecDot(void *,void *), mat_fast_helper_a(f32,f32);
+extern s32 moby_start_effect_from_entry(void *,f32);
+extern void pushable_moby_update(void *,void *,f32,f32,f32,s32);
+extern u8 *CreateMoby(s32);
+extern s32 moby_pack_handle(void *), IsPointInCuboid(void *,s32);
+extern void FastVecAdd(void *,void *,void *), vec_fast_normalize_helper(void *,void *,f32);
+extern f32 vec_length_xy(void *);
+extern s32 coll_test_point(void *,s32,void *,f32);
+extern void vec_scale_to_length(void *,void *,f32), vec_fast_normalize(void *,void *,void *), FastVecScale(void *,void *,f32), vec_clear_128(void *);
+extern f32 FastAddRotations(f32,f32);
+extern s32 PulseColor(s32,s32,f32);
+extern void value_set_and_smooth(void *,f32 *,f32,s32,s32);
 
 /* Updates an enemy that wanders between path points, walks or runs to a new point, and turns to face the hero when it is targeted. */
-void func_L12_00424370(u8 *self)
+void path_wandering_enemy_update(u8 *self)
 {
     f32 oldpos[4], from[4], to[4];
     u8 *st = *(u8 **)(self+0x68);
     s32 *path;
     s32 was0=0, was1=0;
     u16 id=SH(self,0xb2);
-    if (D_L12_0021EDF0.flags[(s16)id]) { MarkMobySpawned(self); return; }
-    { s32 flags=D_0019B4A8[((s16)id>>1)+(gCurrentMapIndex<<10)];
+    if (D_L12_0021EDF0.flags[(s16)id]) { moby_mark_spawned(self); return; }
+    { s32 flags=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
     flags = ((id & 1) ? flags >> 4 : flags) & 7;
-    if(flags) { MarkMobySpawned(self); return; } }
+    if(flags) { moby_mark_spawned(self); return; } }
     path=D_L12_001FEAC0[SI(st,0x298)];
-    if (HasLiveHelperObject(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
-    if (HasLiveHelperObject(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
-    if (SI(st,0x2c4)!=-1) RestoreBeamChildCollision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
-    if (SI(st,0x2c8)!=-1) RestoreBeamChildCollision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
+    if (helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
+    if (helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
+    if (SI(st,0x2c4)!=-1) beam_restore_child_collision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
+    if (SI(st,0x2c8)!=-1) beam_restore_child_collision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
     SF(self,0x2c)=SF(*(u8 **)(self+0x24),0x24)*D_L12_001B20A0;
     qcopy(oldpos,self+0x10);
     if (self[0x31] && fast_vec_dist(self+0x10,D_L12_001B9E00)<24.0f) {
-        UpdateMobyGroundCheck(self); self[0x6f]=22;
+        moby_update_ground_check(self); self[0x6f]=22;
     }
     if (!self[0x95]) {
-        if (self==gHeroState.target) {
-            SetMobyState(self,5,1); qcopy(st+0x150,self+0x10);
+        if (self==g_hero_state.target) {
+            moby_set_state(self,5,1); qcopy(st+0x150,self+0x10);
         } else {
-            if (vec_distance_xy(self+0x10,gHeroState.pos)<SF(st,0x178)) SH(self,0x34)|=0x1000;
+            if (vec_distance_xy(self+0x10,g_hero_state.pos)<SF(st,0x178)) SH(self,0x34)|=0x1000;
             else SH(self,0x34)&=0xefff;
         }
     }
@@ -88,85 +88,85 @@ void func_L12_00424370(u8 *self)
         self[0x20]=1; self[0x30]=128; SH(self,0x34)|=0x1000;
         break;
     case 1:
-        if (SetFirstPendingFlag(self)) {
-            s32 anim=self[0x43]; if(anim!=RandomIntBelow(2)) StartAnimationBlended(self,RandomIntBelow(2),0,10);
+        if (flag_set_first_pending(self)) {
+            s32 anim=self[0x43]; if(anim!=math_random_int_below(2)) anim_start_blended(self,math_random_int_below(2),0,10);
             SI(st,0x2b8)=vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?30:180;
         }
         if (SI(st,0x2b8)<SH(self,0x96)) {
             if (SI(st,0x2b0)<SI(st,0x2b4) && vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>20.0f)
-                SetMobyState(self,4,-1);
-            else SetMobyState(self,2,-1);
+                moby_set_state(self,4,-1);
+            else moby_set_state(self,2,-1);
         }
         break;
     case 4:
-        if(SetFirstPendingFlag(self)) {
-            if(self[0x43]!=5) StartAnimationBlended(self,5,0,20);
-            StepIntTowardTarget((s32 *)(st+0x2b0),SI(st,0x2b4),1);
+        if(flag_set_first_pending(self)) {
+            if(self[0x43]!=5) anim_start_blended(self,5,0,20);
+            math_step_int_toward_target((s32 *)(st+0x2b0),SI(st,0x2b4),1);
             { f32 speed=D_L12_001B20AC;
-              SetControllerSpeedLimits(self,0.0022222223f,speed*0.016666668f,0.0034906589426100254f,0.20943955f); }
+              moby_set_controller_speed_limits(self,0.0022222223f,speed*0.016666668f,0.0034906589426100254f,0.20943955f); }
         }
         if(SI(st,0x2b0)<SI(st,0x2b4)) {
             qcopy(from,self+0x10); from[2]+=0.5f;
             qcopy(to,(SI(st,0x2b0)*16)+(u8 *)path+0x20); to[2]+=0.5f;
             if(!CollLine(from,to,2,self,0)) SI(st,0x2b0)++;
         }
-        TurnMobyTowardTarget(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path);
-        if(vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)<8.0f) SetMobyState(self,1,-1);
+        moby_l01_turn_toward_target(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path);
+        if(vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)<8.0f) moby_set_state(self,1,-1);
         break;
     case 2:
-        if(SetFirstPendingFlag(self)) {
-            if(self[0x43]!=4) StartAnimationBlended(self,4,0,20);
-            { s32 next=PickRandomVisiblePathPoint(self,1);
+        if(flag_set_first_pending(self)) {
+            if(self[0x43]!=4) anim_start_blended(self,4,0,20);
+            { s32 next=path_pick_random_visible_point(self,1);
             f32 rate=D_L12_001B20A8*0.016666668f; SI(st,0x2b0)=next;
-            SetControllerSpeedLimits(self,0.0011111111380159855f,rate,0.0008726647356525064f,0.10471977f); }
+            moby_set_controller_speed_limits(self,0.0011111111380159855f,rate,0.0008726647356525064f,0.10471977f); }
             SI(st,0x2b8)=vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?900:300;
         }
-        if((TurnMobyTowardTarget(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128)||SH(self,0x96)>=300) SetMobyState(self,1,-1);
+        if((moby_l01_turn_toward_target(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128)||SH(self,0x96)>=300) moby_set_state(self,1,-1);
         break;
     case 3:
-        if(SetFirstPendingFlag(self)) {
-            if(self[0x43]!=5) StartAnimationBlended(self,5,0,20);
-            { s32 next=PickRandomVisiblePathPoint(self,0);
+        if(flag_set_first_pending(self)) {
+            if(self[0x43]!=5) anim_start_blended(self,5,0,20);
+            { s32 next=path_pick_random_visible_point(self,0);
             f32 rate=D_L12_001B20AC*0.016666668f; SI(st,0x2b0)=next;
-            SetControllerSpeedLimits(self,0.003888889f,rate,0.0034906589426100254f,0.4188791f); }
+            moby_set_controller_speed_limits(self,0.003888889f,rate,0.0034906589426100254f,0.4188791f); }
         }
-        if(TurnMobyTowardTarget(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128) SI(st,0x2b0)=PickRandomVisiblePathPoint(self,1);
-        if(SH(self,0x96)>=420) SetMobyState(self,1,-1);
+        if(moby_l01_turn_toward_target(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128) SI(st,0x2b0)=path_pick_random_visible_point(self,1);
+        if(SH(self,0x96)>=420) moby_set_state(self,1,-1);
         break;
     case 5: {
         f32 dot;
-        if(SetFirstPendingFlag(self)) {
-            if(self[0x43]!=7) StartAnimationBlended(self,7,0,10);
+        if(flag_set_first_pending(self)) {
+            if(self[0x43]!=7) anim_start_blended(self,7,0,10);
             SI(st,0x2c0)=0;
         }
         dot=FastVecDot(self+0xc0,st+0x140);
-        if(dot< -0.033333335f) { if(self[0x43]!=10) StartAnimationBlended(self,10,0,10); }
-        else if(dot>0.033333335f) { if(self[0x43]!=9) StartAnimationBlended(self,9,0,10); }
-        else { if(self[0x43]!=7) StartAnimationBlended(self,7,0,10); }
-        StartMobyEffectFromEntry(self,FastMatrixHelperA(gHeroState.pos[0]-SF(self,0x10),gHeroState.pos[1]-SF(self,0x14)));
-        if(HasLiveHelperObject(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
-        if(HasLiveHelperObject(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
-        if(SI(st,0x2c4)!=-1) RestoreBeamChildCollision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
-        if(SI(st,0x2c8)!=-1) RestoreBeamChildCollision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
-        UpdatePushableMoby(self,st+0x140,0.7f,0.5f,0.1f,SI(st,0x360));
-        RestartSparkTimerAndSound(self);
-        if(IsThirdPendingFlagSet(self)) SetMobyState(self,6,-1);
-        else if(self!=gHeroState.target) { SetMobyState(self,3,0); goto choose_path; }
+        if(dot< -0.033333335f) { if(self[0x43]!=10) anim_start_blended(self,10,0,10); }
+        else if(dot>0.033333335f) { if(self[0x43]!=9) anim_start_blended(self,9,0,10); }
+        else { if(self[0x43]!=7) anim_start_blended(self,7,0,10); }
+        moby_start_effect_from_entry(self,mat_fast_helper_a(g_hero_state.pos[0]-SF(self,0x10),g_hero_state.pos[1]-SF(self,0x14)));
+        if(helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
+        if(helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
+        if(SI(st,0x2c4)!=-1) beam_restore_child_collision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
+        if(SI(st,0x2c8)!=-1) beam_restore_child_collision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
+        pushable_moby_update(self,st+0x140,0.7f,0.5f,0.1f,SI(st,0x360));
+        spark_timer_restart_sound(self);
+        if(flag_is_third_pending_set(self)) moby_set_state(self,6,-1);
+        else if(self!=g_hero_state.target) { moby_set_state(self,3,0); goto choose_path; }
         break;
     }
     case 6:
-        if(SetFirstPendingFlag(self)) { if(self[0x43]!=10) StartAnimationBlended(self,10,0,10); }
-        StartMobyEffectFromEntry(self,FastMatrixHelperA(gHeroState.pos[0]-SF(self,0x10),gHeroState.pos[1]-SF(self,0x14)));
-        RestartSparkTimerAndSound(self);
+        if(flag_set_first_pending(self)) { if(self[0x43]!=10) anim_start_blended(self,10,0,10); }
+        moby_start_effect_from_entry(self,mat_fast_helper_a(g_hero_state.pos[0]-SF(self,0x10),g_hero_state.pos[1]-SF(self,0x14)));
+        spark_timer_restart_sound(self);
         break;
     case 8:
-        if(SetFirstPendingFlag(self)) {
+        if(flag_set_first_pending(self)) {
             u8 *p=CreateMoby(0x9bb);
             if(p) {
                 u8 *ps;
                 *(u8 **)(p+0xb8)=self; p[0x30]=255; qcopy(p+0x10,self+0x10);
                 ps=*(u8 **)(p+0x68); *(u8 **)(ps+0x10)=self;
-                SI(ps,0x20)=SH(self,0x34); SI(ps,0x30)=PackObjectHandle(self);
+                SI(ps,0x20)=SH(self,0x34); SI(ps,0x30)=moby_pack_handle(self);
                 SI(self,0x98)=0; SH(self,0x34)=(SH(self,0x34)|0x41)&0xefff;
             }
         }
@@ -176,43 +176,43 @@ void func_L12_00424370(u8 *self)
             { s32 saveid=self[0xb0];
             if(saveid==255 || (!(D_L12_001B2CE0[(u8)saveid]&128) && (D_0019B2E8[(u8)saveid+(D_001A79F0_gp<<4)]&128)))
                 D_L12_0021EDF0.flags[*(s16 *)(self+0xb2)]=saveid+2; }
-            MarkMobySpawned(self); return;
+            moby_mark_spawned(self); return;
         }
         break;
     case 7:
         FastVecAdd(self+0x10,self+0x10,st+0x2a0);
         SF(st,0x2a8)-=D_L12_001B20A4*0.00027777778f;
-        RestartSparkTimerAndSound(self);
+        spark_timer_restart_sound(self);
         if(IsPointInCuboid(self+0x10,SI(st,0x29c))) {
             f32 len=vec_length_xy(st+0x2a0);
             if(len>0.016666668f) len=0.016666668f;
-            FastVectorNormalizeHelper(st+0x2a0,st+0x2a0,len);
+            vec_fast_normalize_helper(st+0x2a0,st+0x2a0,len);
         }
         qcopy(from,self+0x10); from[2]+=0.5f;
-        if(TestPointAgainstCollision(from,0,self,0.5f)) {
+        if(coll_test_point(from,0,self,0.5f)) {
             qcopy(self+0x10,D_L12_001C0270); SF(self,0x18)-=0.5f;
             vec_scale_to_length(D_L12_001C0270+0x10,D_L12_001C0270+0x10,1.0f);
             if(FastVecDot(D_L12_001C0270+0x10,st+0x2a0)<0.0f) {
-                FastVectorNormalize(st+0x2a0,st+0x2a0,D_L12_001C0270+0x10);
+                vec_fast_normalize(st+0x2a0,st+0x2a0,D_L12_001C0270+0x10);
                 FastVecScale(st+0x2a0,st+0x2a0,0.5f);
             }
             if(SF(D_L12_001C0270,0x18)>=0.95f) {
-                SH(self,0x34)|=0x1000; SetMobyState(self,1,0);
-                qcopy(st+0x150,self+0x10); ClearVector128(st+0x140);
+                SH(self,0x34)|=0x1000; moby_set_state(self,1,0);
+                qcopy(st+0x150,self+0x10); vec_clear_128(st+0x140);
             choose_path:
-                SI(st,0x2b0)=FindVisiblePathPoint(self);
+                SI(st,0x2b0)=path_find_visible_point(self);
             }
         }
         break;
     }
-    if(SI(st,0x2c4)!=-1 && !was0) ClearHelperObjectStates(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
-    if(SI(st,0x2c8)!=-1 && !was1) ClearHelperObjectStates(D_L12_001B2E9C+(SI(st,0x2c8)<<8));
-    if(!(D_L12_001B29C8&15)) FindNearbyPathPointAtHeroHeight(self);
+    if(SI(st,0x2c4)!=-1 && !was0) helper_clear_states(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
+    if(SI(st,0x2c8)!=-1 && !was1) helper_clear_states(D_L12_001B2E9C+(SI(st,0x2c8)<<8));
+    if(!(D_L12_001B29C8&15)) path_find_nearby_point_at_hero_height(self);
     if(self[0x31]) {
         SF(st,0x2bc)=FastAddRotations(SF(st,0x2bc),D_L12_001B20B0*0.00029088825f);
         SI(self,0x78)=PulseColor(D_L12_001B20B8[0],D_L12_001B20B8[1],SF(st,0x2bc));
     }
     SH(self,0x96)++;
     qcopy(st+0x2d0,self+0x10);
-    SetValueAndStartSmoothChange(self,(f32 *)(st+0x2e0),D_L12_001B20C8,2,1);
+    value_set_and_smooth(self,(f32 *)(st+0x2e0),D_L12_001B20C8,2,1);
 }

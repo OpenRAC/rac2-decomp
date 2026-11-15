@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -33,7 +34,7 @@ extern s32 ref_L17_003C5B68_00 __attribute__((sda));
 /* Tells whether a ride platform can start moving now. Returns 1 for a class 0x920 platform, or
    for a class 0x929 platform that is empty, stopped and whose trigger is finished. Returns 0
    otherwise. */
-s32 func_L17_003C5B68(void *moby) {
+s32 ride_platform_can_start(void *moby) {
     void *vars;
     void *carried;
     s32 classId;

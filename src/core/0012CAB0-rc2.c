@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,15 +24,15 @@
  */
 #include "common.h"
 
-extern void func_0012C9C8(s8 *);
-extern s32 func_0012C878(s8 *, s32);
-extern void func_00130300(s8 *);
-extern void func_0012CBC0(s8 *);
-extern void func_0012D060(s8 *);
-extern void func_0012FA98(s32, void *);
+extern void mpeg_skip_to_start_code(s8 *);
+extern s32 mpeg_read_bits(s8 *, s32);
+extern void mpeg_read_sequence_header(s8 *);
+extern void mpeg_read_picture_header(s8 *);
+extern void mpeg_read_gop_header(s8 *);
+extern void mpeg_dispatch_callback(s32, void *);
 
 /* Reads headers from the video stream until a picture begins, then returns its type. Returns 0 at the end of the stream. */
-s32 func_0012CAB0(s8 *decoderPtr) {
+s32 mpeg_read_headers_until_picture(s8 *decoderPtr) {
     struct {
         s32 a;
         s32 pad;
@@ -41,21 +42,21 @@ s32 func_0012CAB0(s8 *decoderPtr) {
     u32 startCode;
 
     for (;;) {
-        SkipToMpegStartCode(decoderPtr);
-        startCode = ReadMpegBits(decoderPtr, 0x20);
+        mpeg_skip_to_start_code(decoderPtr);
+        startCode = mpeg_read_bits(decoderPtr, 0x20);
         switch (startCode) {
         case 0x1B3:
-            ReadMpegSequenceHeader(decoderPtr);
+            mpeg_read_sequence_header(decoderPtr);
             break;
         case 0x1B8:
-            ReadMpegGroupOfPicturesHeader(decoderPtr);
+            mpeg_read_gop_header(decoderPtr);
             break;
         case 0x100:
-            ReadMpegPictureHeader(decoderPtr);
+            mpeg_read_picture_header(decoderPtr);
             blk.a = 5;
             blk.b = -1;
             blk.c = -1;
-            DispatchMpegCallback(*(s32 *)(decoderPtr + 0x858), &blk);
+            mpeg_dispatch_callback(*(s32 *)(decoderPtr + 0x858), &blk);
             *(s64 *)(decoderPtr + 0x830) = blk.c;
             *(s64 *)(decoderPtr + 0x828) = blk.b;
             return *(s32 *)(decoderPtr + 0x150);

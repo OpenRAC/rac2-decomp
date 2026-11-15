@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_US2_002DB700, the USA v2.00 copy of func_002DA9A8: the same C. */
 
 /* A row of a choice list: its label, the byte it edits and up to four choice labels. */
 /* A menu page: the page the back button opens and the menu taking input. */
 /* The menu system D_001F2840: its current page, the page to open next and the flag that
  * keeps the menu from closing. */
-extern int D_00138180[];
+extern int g_pad_state[];
 
-extern void func_002DF190(int, int);
+extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Qwen draft (branch qwen/autonomy, 385de342), checked by tools/check.py */
 /* func_002D7AC8: owner ABI/declaration review retained. */
@@ -17,7 +18,7 @@ typedef unsigned long long undefined8;
 
 typedef unsigned int undefined4;
 
-extern undefined4 func_002DE618(undefined4);
+extern undefined4 release_menu_stream_buffer(undefined4);
 
 #ifndef RAC2_T_TWO_F73AF1964
 #define RAC2_T_TWO_F73AF1964
@@ -32,10 +33,10 @@ extern undefined4 func_002DE618(undefined4);
 typedef struct { char pad[4]; short mode; } Mode2D6E78;
 typedef struct { char pad[0x29C]; int flags[5]; int selected; } Map2D6E78;
 typedef struct { char pad[0xDB]; unsigned char active; char padDC[0x118 - 0xDC]; char *loaded; unsigned int limit; } State2D6E78;
-extern Mode2D6E78 D_001A63A8;
-extern Map2D6E78 D_001C4FA0;
-extern State2D6E78 D_001F2840;
-extern void func_002B7AD0(void);
+extern Mode2D6E78 g_music_state;
+extern Map2D6E78 g_map_overlay_state;
+extern State2D6E78 g_pause_menu_state;
+extern void load_request_disc_read_break(void);
 
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
 extern Base2D75E8 D_0025A6E0;
@@ -49,18 +50,18 @@ typedef struct {
     int slider0;
     char pad14[0x28 - 0x14];
 } Settings2D7B18;
-extern Settings2D7B18 D_001A7B90 __attribute__((sda));
+extern Settings2D7B18 g_is_pal_video __attribute__((sda));
 /* Sound menu input: back and close, row navigation, volume sliders and the mode toggle. */
 /* func_002D7DB8 is in 002D5E98-audio.c. */
 
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x16B0 - 0x370]; int start; int length; } Stream2D81B0;
 typedef struct { unsigned int key; unsigned int flags; } Slot2D81B0;
-extern Stream2D81B0 D_0014B540;
+extern Stream2D81B0 g_copy_setup_data;
 #define MACRO_ADDR __attribute__((section(".sdata")))
 extern Slot2D81B0 D_001B1F50[] MACRO_ADDR;
 /* Halves the stream length while it marks the slots whose key is older than the clock and
    (outside the mode) asks for the next block; the result picks state 1 or 3. */
-extern void func_002B7AD0(void);
+extern void load_request_disc_read_break(void);
 /* The loader object of func_002D81B0: its flags, the entry table it replaced and its state. */
 /* Advances the loader: starts the read, then unpacks the loaded block and relocates its entries. */
 /* func_002D89D8 is defined in 002D5E98-listbox.c. */
@@ -93,8 +94,8 @@ typedef struct {
     short y;
 } ScreenPos_2DA118;
 
-extern ScreenPos_2DA118 D_001A6480;
-extern void func_0027E018(int, char *, int, int, int, int, int, int, unsigned long long, unsigned long long);
+extern ScreenPos_2DA118 g_screen_adjust_offsets;
+extern void DrawTexturedQuad(int, char *, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
 /* Draws the object at the screen position in D_001A6480, sized by the object's own width
    and height. The draw's colour is a grey 0x808080 whose top byte comes from the object's
@@ -136,7 +137,7 @@ typedef struct { char pad0[0x48]; MenuRow2DA9A8 *rows; } MenuRows2DA9A8;
 typedef struct { char pad0[0xE8]; MenuRows2DA9A8 *rows; } MenuOwner2DA9A8;
 
 typedef struct { char pad0[8]; int state; char padC[0x150]; int stage; char pad160[4]; int status; } Scene2DA9A8;
-extern Scene2DA9A8 D_001393E0;
+extern Scene2DA9A8 g_memcard_state;
 
 /* D_001F2840 seen through the fields this function reads. */
 typedef struct {
@@ -148,14 +149,14 @@ typedef struct {
     int age;
 } Menu2DA9A8;
 
-extern unsigned char D_001A7AF8[];
+extern unsigned char g_item_owned_flags[];
 extern unsigned char D_001395B8[];
-extern int func_002B49C8(int);
-extern unsigned char *func_00288FB8(int);
-extern void func_0027C540(int);
-extern void func_0027C660(void);
-extern void func_00280200(TextWindow2DA9A8 *, long, unsigned char *, int);
-extern unsigned long long func_00294C40(int);
+extern int request_is_current_slot(int);
+extern unsigned char *GetLocalizedString(int);
+extern void SetupGifPaging(int);
+extern void DoGifPaging(void);
+extern void text_draw_window_medium(TextWindow2DA9A8 *, long, unsigned char *, int);
+extern unsigned long long load_texture_file(int);
 
 /* Draws the menu panel. Modes 0 and 1 print message 0x2E00 (or the menu's override) centred
    in the panel, as a black shadow and then in colour one pixel up and left, and return 2
@@ -168,53 +169,53 @@ int func_US2_002DB700(MenuPanel2DA9A8 *menu)
     MenuRow2DA9A8 *row;
     int message;
 
-    if (menu->active < 0 || func_002B49C8(6)) return 0;
+    if (menu->active < 0 || request_is_current_slot(6)) return 0;
     if (menu->mode < 2) {
         if (!(menu->flags & 0x100)) return 1;
-        if (D_001393E0.state == 2
-            && !(D_001393E0.stage < 3 && D_001393E0.status < 0 && (*(Menu2DA9A8 *)&D_001F2840).age > 10)) {
-            func_0027C540(0);
+        if (g_memcard_state.state == 2
+            && !(g_memcard_state.stage < 3 && g_memcard_state.status < 0 && (*(Menu2DA9A8 *)&g_pause_menu_state).age > 10)) {
+            SetupGifPaging(0);
             message = 0x2c96;
-            if ((*(Menu2DA9A8 *)&D_001F2840).message_override) message = (*(Menu2DA9A8 *)&D_001F2840).message;
-            text = func_00288FB8(message);
+            if ((*(Menu2DA9A8 *)&g_pause_menu_state).message_override) message = (*(Menu2DA9A8 *)&g_pause_menu_state).message;
+            text = GetLocalizedString(message);
             {
                 TextWindow2DA9A8 window = {1, menu->height + 1, 1, menu->width + 1,
                                            menu->width >> 1, 5, 0, 0, 16, 5};
-                func_00280200(&window, 0x80000000L, text, -1);
+                text_draw_window_medium(&window, 0x80000000L, text, -1);
                 window.anchor_y = (menu->height - window.rendered_height) >> 1;
                 window.flags ^= 4;
-                func_00280200(&window, 0x80000000L, text, -1);
+                text_draw_window_medium(&window, 0x80000000L, text, -1);
                 window.top--;
                 window.bottom--;
                 window.left--;
                 window.right--;
                 window.anchor_x--;
                 window.anchor_y--;
-                func_00280200(&window, 0x80FFA888L, text, -1);
+                text_draw_window_medium(&window, 0x80FFA888L, text, -1);
             }
-            func_0027C660();
+            DoGifPaging();
         }
         return 2;
     }
     if (menu->flags & 4) {
         unsigned int selection = (menu->mode < 4) ^ 1;
-        row = &(*(Menu2DA9A8 *)&D_001F2840).owner->rows->rows[menu->choice[selection]];
+        row = &(*(Menu2DA9A8 *)&g_pause_menu_state).owner->rows->rows[menu->choice[selection]];
         if (row->type == 0) {
             short id = row->id;
-            if (!D_001A7AF8[id]) return 1;
+            if (!g_item_owned_flags[id]) return 1;
         }
         if (row->type == 1 && !D_001395B8[row->id]) return 1;
     }
-    func_0027C540(0);
-    if (menu->mode < 4) texture = func_00294C40(menu->texture[0]);
-    else texture = func_00294C40(menu->texture[1]);
+    SetupGifPaging(0);
+    if (menu->mode < 4) texture = load_texture_file(menu->texture[0]);
+    else texture = load_texture_file(menu->texture[1]);
     if (menu->placement & 8)
-        func_0027E018(menu->x, (char *)menu->y, menu->width, menu->height, 0, 0,
+        DrawTexturedQuad(menu->x, (char *)menu->y, menu->width, menu->height, 0, 0,
                       menu->u_width, menu->v_height, 0x80808080ULL, texture);
     else
-        func_0027E018(0, 0, D_001A6480.x, D_001A6480.y, 0, 0,
+        DrawTexturedQuad(0, 0, g_screen_adjust_offsets.x, g_screen_adjust_offsets.y, 0, 0,
                       menu->u_width, menu->v_height, 0x80808080ULL, texture);
-    func_0027C660();
+    DoGifPaging();
     return 16;
 }
 
@@ -237,7 +238,7 @@ extern char *D_001F2854;
 
 extern char *D_001F2854;
 
-undefined8 func_002DBB48(int param_1);
+undefined8 menu_convert_object_handle(int param_1);
 
 typedef struct { char reserved00[0x14]; char *object; int value; char reserved1C[0xC8]; int clear; } SceneState;
 extern SceneState ref_L00_002DBB78_00;
@@ -252,13 +253,13 @@ extern int r1_D_0015EE84 MACRO_ADDR;
 /* rac1-decomp src/game/pause.c: func_00222D70 */
 /* `r1_D_001D48A8[(unsigned)r1_D_0015EE84 % 19]`; the older near-miss
    predated MACRO_ADDR. */
-extern int D_00138180[];
+extern int g_pad_state[];
 extern int D_001F2974;
-extern void func_002DF190(int, int);
+extern void snd_play_menu_sound_if_enabled(int, int);
 
-extern int D_00138180[];
+extern int g_pad_state[];
 extern int D_001F2974;
-extern void func_002DF190(int, int);
+extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Two-branch draw set-up: copies a 2-byte record from one of two tables into a 16-byte local, then issues a draw call with five float arguments (scale, per-instance angle, two constants, colour value) plus a 64-bit attribute word, a geometry handle, a fifth integer argument -1 and a local buffer. */
 /* func_002DC720 is matched in its own unit, src/game/002DC720.c (its jump table). */

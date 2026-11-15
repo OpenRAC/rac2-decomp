@@ -18,16 +18,16 @@ extern unsigned int ref_L02_00410F68_6[2] __attribute__((sda));
 extern float ref_L02_00410F68_7[][2] SDATA(ref_L02_00410F68_7);
 extern float ref_L02_00410F68_8 __attribute__((sda));
 extern float ref_L02_00410F68_9 __attribute__((sda));
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern float ref_L02_00410F68_10[][2] MACRO_ADDR;
-extern void func_00283658(void *,void *);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AC9F8(void *,float);
-extern unsigned int func_00283D38(unsigned int,unsigned int,float);
-extern void func_00282C90(void *);
-extern void func_002833F0(void *,void *);
-extern void func_L01_002E1510(void *,int,void *,int,void *);
+extern void copy_matrix_rotation(void *,void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_clamp_length(void *,float);
+extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
+extern void vec_store_helper(void *);
+extern void euler_rotation_basis(void *,void *);
+extern void gfx_transform_and_draw_entries(void *,int,void *,int,void *);
 
 /* GS ALPHA register. */
 static __inline__ u64 GsField(int value,int shift)
@@ -71,7 +71,7 @@ static __inline__ float EffectTime(u8 *effect)
 }
 
 /* Assemble four animated strips in the object's coordinate frame. */
-void func_L02_00410F68(u8 *object)
+void DrawAnimatedEffectQuads(u8 *object)
 {
     EffectPacket packet[4];
     Vector frame[4];
@@ -94,10 +94,10 @@ void func_L02_00410F68(u8 *object)
     if(alpha>1.0f) alpha=1.0f;
     else if(alpha<0.0f) alpha=0.0f;
     if(EffectTime(effect)<1.15f) {
-        FastVecSub(gHeroState+0x100,object+0x10,gHeroState+0x80);
-        resident=gHeroState;
+        FastVecSub(g_hero_state+0x100,object+0x10,g_hero_state+0x80);
+        resident=g_hero_state;
         *(float *)(resident+0x108)=0;
-        ClampVectorLength(gHeroState+0x100,0.016666668f);
+        vec_clamp_length(g_hero_state+0x100,0.016666668f);
         time=EffectTime(effect);
         shrink=1.15f-time;
         if(shrink<0) shrink=0;
@@ -127,7 +127,7 @@ void func_L02_00410F68(u8 *object)
             color=ref_L02_00410F68_6[i!=0];
             packet[i].color[j]=color;
             packet[i].color[j]=FastTweenColor(color&0xFFFFFF,color,alpha);
-            StoreVectorHelper(&packet[i].point[j]);
+            vec_store_helper(&packet[i].point[j]);
             x=*(float *)(effect+0x34);
             if(i!=0) x+=0.01f;
             packet[i].point[j].f[0]=x;
@@ -152,5 +152,5 @@ void func_L02_00410F68(u8 *object)
     }
     angle.q=0; angle.f[2]=0.19634955f;
     euler_rotation_basis(rotation,&angle);
-    TransformAndDrawEntries(packet,4,rotation,32,frame);
+    gfx_transform_and_draw_entries(packet,4,rotation,32,frame);
 }

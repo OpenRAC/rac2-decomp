@@ -9,7 +9,7 @@ extern u8 D_001A7BB4;
 extern char Fd8e166aa_D_001B7F80[];
 
 /* Turns the offsets in a loaded data table into real addresses so the entries can be used directly. */
-void func_00279828(void)
+void load_relocate_data_table_offsets(void)
 {
     char *g = Fd8e166aa_D_001B7F80;
     int i = 0;

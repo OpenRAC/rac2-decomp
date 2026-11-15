@@ -27,19 +27,19 @@ typedef struct {
     u8 pad24[0x2C - 0x24];
     f32 damage;                  
 } MobyHit;
-extern MobyHit *func_002A9640(Moby *moby, u32 flags, s32 clear);
+extern MobyHit *part_find_owned_effect_slot(Moby *moby, u32 flags, s32 clear);
 extern void func_PAL_002AC3C0(Moby *moby, ColorFlash *flash);
 extern void func_PAL_002AC290(Moby *moby, ColorFlash *flash);
-extern s32 func_00282948(s32 *timer);
-extern f32 func_002A7878(f32 min, f32 max);
-extern s32 func_00283CF0(f32 value);
+extern s32 math_fast_float_d(s32 *timer);
+extern f32 math_random_float_range(f32 min, f32 max);
+extern s32 FloatToInt(f32 value);
 extern void func_PAL_L05_0042A240(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                               s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, f32 scale);
-extern void func_L10_00425508(Moby *moby, s32 bonus, s32 a2);
-extern s32 func_L05_0037BBB8(Moby *moby);
-extern void func_L05_0037BE98(Moby *moby);
-extern void func_L05_0037AE40(Moby *moby);
-extern s32 func_002E5DA0(s32 index, s32 value, Moby *moby, s32 kind);
+extern void hrugis_drop_reward(Moby *moby, s32 bonus, s32 a2);
+extern s32 moby_is_in_use(Moby *moby);
+extern void moby_release_from_group(Moby *moby);
+extern void moby_reset_action_state(Moby *moby);
+extern s32 snd_play_from_class_bank(s32 index, s32 value, Moby *moby, s32 kind);
 extern s32 D_L10_001B354C __attribute__((sda));
 
 /* Hit callback of the Hrugis controller: plays the moby's colour flash, takes the damage
@@ -53,7 +53,7 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
     MobyHit *hit;
     s32 destroyed = 0;
 
-    hit = func_002A9640(moby, 0x230000, 0);
+    hit = part_find_owned_effect_slot(moby, 0x230000, 0);
     moby->hitSlot = 0xFF;
     flash = moby->vars->flash;
     health = moby->vars->health;
@@ -73,19 +73,19 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
         }
         *health -= hit->damage;
         if (moby->oClass != 0xB73 && moby->oClass != 0xF8E)
-            func_002E5DA0(0xD, 0, moby, 0xFBF);
-        if (func_00282948(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E) {
-            func_002E5DA0(3, 0, moby, 0xF8E);
-            D_L10_001B354C = ((s32)(func_00283CF0(func_002A7878(10.0f, 20.0f))) * 5 + 2) / 6;
+            snd_play_from_class_bank(0xD, 0, moby, 0xFBF);
+        if (math_fast_float_d(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E) {
+            snd_play_from_class_bank(3, 0, moby, 0xF8E);
+            D_L10_001B354C = ((s32)(FloatToInt(math_random_float_range(10.0f, 20.0f))) * 5 + 2) / 6;
         }
         if (*health <= 0.0f) {
             *health = 0.0f;
             func_PAL_L05_0042A240(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
-            func_L10_00425508(moby, 0, 0xA);
-            if (func_L05_0037BBB8(moby) != 0)
-                func_L05_0037BE98(moby);
+            hrugis_drop_reward(moby, 0, 0xA);
+            if (moby_is_in_use(moby) != 0)
+                moby_release_from_group(moby);
             if (keep == 0)
-                func_L05_0037AE40(moby);
+                moby_reset_action_state(moby);
             destroyed = 1;
         }
     }

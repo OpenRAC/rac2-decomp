@@ -22,21 +22,21 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 
 struct DobboMoby;
-extern void func_L09_003F0330(unsigned char *);
+extern void counter_tick_release_sounds(unsigned char *);
 extern void func_PAL_L09_003F49E8(unsigned char *);
-extern void func_002E5CF8(int, int, void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_0029F338(void *);
-extern void func_002A6C58(void *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void PlayMobySound(int, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_mark_spawned(void *);
+extern void SetDeathBits(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_002A7750_3(unsigned char *, int, int);
-extern void func_002A7470(unsigned char *, int, int, int);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float,
+extern void anim_start_blended(unsigned char *, int, int, int);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float,
                           float, int, float, int, int, int, int, int);
 extern struct DobboMoby *func_PAL_L09_003FB0D8(void *, void *, struct DobboMoby *, struct DobboMoby *,
                                            int, float, float, float);
-extern int func_L09_003FB650(unsigned char *, unsigned char *, int, int);
+extern int ReserveDobboPairSlot(unsigned char *, unsigned char *, int, int);
 
 #define S32(p, o) (*(int *)((p) + (o)))
 #define S16(p, o) (*(short *)((p) + (o)))
@@ -85,7 +85,7 @@ void func_PAL_L09_003F4B40(unsigned char *object)
         if (S32(state, 0x64) != 1 && object[0x20] == 1) {
             S32(state, 0x8C) = S32(state, 0xA8);
             if (object[0x43])
-                func_002A7470(object, 0, 0, 3);
+                anim_start_blended(object, 0, 0, 3);
             func_002A7750_3(object, 0, 1);
         }
         break;
@@ -97,7 +97,7 @@ void func_PAL_L09_003F4B40(unsigned char *object)
     case 1:
         if (!S16(state, 0x92)) {
             if (object[0x43] != 1)
-                func_002A7470(object, 1, 0, 3);
+                anim_start_blended(object, 1, 0, 3);
             func_002A7750_3(object, 2, -1);
         }
         break;
@@ -105,16 +105,16 @@ void func_PAL_L09_003F4B40(unsigned char *object)
         if (object[0x60] & 2) {
             S16(state, 0x92) = ((s32)S16(state, 0x9C) * 5 + 2) / 6;
             if (object[0x43] != 2)
-                func_002A7470(object, 2, 0, 3);
-            func_002E5CF8(2, 0, object);
+                anim_start_blended(object, 2, 0, 3);
+            PlayMobySound(2, 0, object);
             for (i = 0; i < 6; i += 2) {
-                func_00282F20(&direction, object + 0xC0, F32(state, 0x98) * 0.020000001f);
-                func_0029FCC0(object, i, &point);
+                vec_scale_to_length(&direction, object + 0xC0, F32(state, 0x98) * 0.020000001f);
+                moby_transform_joint_to_world(object, i, &point);
                 first = (unsigned char *)func_PAL_L09_003FB0D8(&point, &direction,
                     (struct DobboMoby *)object, 0, (i / 2) * S16(state, 0xA0) + S16(state, 0xA2),
                     F32(state, 0x94), (float)state[0x34], F32(state, 0x80));
                 if (first && S16(first, 0xAA) == 0xD09 && first[0x20] != 254 && first[0x20] != 253) {
-                    func_0029FCC0(object, i + 1, &point);
+                    moby_transform_joint_to_world(object, i + 1, &point);
                     second = (unsigned char *)func_PAL_L09_003FB0D8(&point, &direction,
                         (struct DobboMoby *)object, (struct DobboMoby *)first,
                         (i / 2) * S16(state, 0xA0) + S16(state, 0xA2),
@@ -123,9 +123,9 @@ void func_PAL_L09_003F4B40(unsigned char *object)
                     *(unsigned char **)(*(unsigned char **)(first + 0x68) + 0x24) = second;
                     if (second && S16(second, 0xAA) == 0xD09 && second[0x20] != 254 &&
                         second[0x20] != 253)
-                        func_L09_003FB650(first, second, 1, 0);
+                        ReserveDobboPairSlot(first, second, 1, 0);
                     else
-                        func_0029F338(first);
+                        moby_mark_spawned(first);
                 }
             }
             func_002A7750_3(object, 3, -1);
@@ -135,14 +135,14 @@ void func_PAL_L09_003F4B40(unsigned char *object)
         if (!S16(state, 0x92)) {
             S16(state, 0x92) = ((s32)S16(state, 0x9E) * 5 + 2) / 6;
             if (object[0x43] != 3)
-                func_002A7470(object, 3, 0, 3);
+                anim_start_blended(object, 3, 0, 3);
             func_002A7750_3(object, 4, -1);
         }
         break;
     case 4:
         if (object[0x60] & 2) {
             if (object[0x43])
-                func_002A7470(object, 0, 0, 3);
+                anim_start_blended(object, 0, 0, 3);
             func_002A7750_3(object, 1, -1);
         }
         break;
@@ -151,19 +151,19 @@ void func_PAL_L09_003F4B40(unsigned char *object)
             S32(state, 0x8C) = S32(state, 0xA4);
             S16(state, 0x92) = ((s32)S16(state, 0x9E) * 5 + 2) / 6;
             if (object[0x43] != 3)
-                func_002A7470(object, 3, 0, 1);
+                anim_start_blended(object, 3, 0, 1);
             func_002A7750_3(object, 4, -1);
         }
         break;
     case 6:
-        func_002A6C58(object, 0, 3);
-        func_0029FCC0(object, 6, &direction);
-        func_00282CF0(&point, &direction, object + 0x10);
-        func_002ABBB8(object, &point, &direction, 0, 0, 10, 3, 16, 4, 2, 9, 1, -1, 15, 1, 1, -1, 0,
+        SetDeathBits(object, 0, 3);
+        moby_transform_joint_to_world(object, 6, &direction);
+        FastVecSub(&point, &direction, object + 0x10);
+        SpawnExplosionEffects(object, &point, &direction, 0, 0, 10, 3, 16, 4, 2, 9, 1, -1, 15, 1, 1, -1, 0,
                       0x810001);
-        func_002E5CF8(3, 0, object);
-        func_0029F338(object);
+        PlayMobySound(3, 0, object);
+        moby_mark_spawned(object);
         return;
     }
-    func_L09_003F0330(object);
+    counter_tick_release_sounds(object);
 }

@@ -10,19 +10,19 @@ typedef unsigned short u16;
 typedef short s16;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern u16 *D_L02_001FC060[];
+extern u16 *g_entity_group_lists[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
 extern int D_L02_001B35B8 __attribute__((sda));
 
-extern void func_002833F0(float *, float *);
-extern void func_00283698(float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00283098(float *, float *, float *);
-extern float func_00282C48(float);
+extern void euler_rotation_basis(float *, float *);
+extern void matrix_from_basis_rows(float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern void matrix_mul_vec3(float *, float *, float *);
+extern float math_fabs(float);
 
 /* Checks that no other waiting platform of the group sits farther along its
    swing than this one. */
-int func_L02_003EAE10(char *actor) {
+int swing_platform_is_leading(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float angles[4];
     float rotation[12];
@@ -41,10 +41,10 @@ int func_L02_003EAE10(char *actor) {
     matrix_from_basis_rows(inverse, rotation);
     FastVecSub(offset, (float *)(state + 0x30), (float *)(actor + 0x10));
     matrix_mul_vec3(offset, offset, inverse);
-    limit = FloatAbs(offset[1]);
-    for (listEntry = gEntityGroupLists[*(u8 *)(actor + 0x21)];
+    limit = math_fabs(offset[1]);
+    for (listEntry = g_entity_group_lists[*(u8 *)(actor + 0x21)];
          *(u8 *)(actor + 0x21) != 0xFF && *(u8 *)(actor + 0x21) <= D_L02_001B35B8 && listEntry != 0 &&
-         ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == gEntityGroupLists[*(u8 *)(actor + 0x21)]);
+         ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == g_entity_group_lists[*(u8 *)(actor + 0x21)]);
          listEntry++) {
         entity = D_L02_001B359C_1[0] + ((*listEntry & 0x7FFF) << 8);
         if (entity == 0)
@@ -52,7 +52,7 @@ int func_L02_003EAE10(char *actor) {
         if (entity != (u8 *)actor && *(short *)(entity + 0xAA) == 0xAB0 /* moby class 2736 */ && entity[0x20] == 3) {
             FastVecSub(otherOffset, (float *)(*(char **)(entity + 0x68) + 0x30), (float *)(entity + 0x10));
             matrix_mul_vec3(otherOffset, otherOffset, inverse);
-            if (limit < FloatAbs(otherOffset[1]))
+            if (limit < math_fabs(otherOffset[1]))
                 return 0;
         }
     }

@@ -7,9 +7,9 @@ extern char D_L00_00254960[];
 extern char D_L00_001B2C00[] __attribute__((section(".sdata")));
 extern float D_L00_001B0CB0 __attribute__((sda));
 extern float D_L00_001B0CAC __attribute__((sda));
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Fills the eight-vector table D_L00_00254960 from the object's two axis rows
    (+0xC0, +0xD0): entries 4-7 are row0, -row0, -row1, row1, entries 0-3 the
@@ -18,7 +18,7 @@ extern void func_00282F20(void *, void *, float);
    the table through `base` before the loop and through `out` in it keeps the
    two pointers apart, as retail's allocation needs. */
 /* Works out the eight points around the Turret Spider Bot that are used to test the ground below it. */
-void func_L00_00401168(char *object)
+void spider_bot_build_ground_probe_points(char *object)
 {
     char vectors[4][16] __attribute__((aligned(16)));
     char temp[16] __attribute__((aligned(16)));

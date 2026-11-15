@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -28,12 +29,12 @@
  * label list keeps each C branch available; it is not read by the program. */
 extern void *D_0026DBE0[];
 
-extern void func_002F88D8(s8 *a);
+extern void shop_set_message_text(s8 *a);
 extern s8 D_001AD468[];
 extern s8 D_001AD498[];
 extern s8 D_001AD4C0[];
 extern s8 D_001AD4E8[];
-extern void func_002FADB0(void);
+extern void shop_mark_bought_special_items_owned(void);
 
 struct A { s8 pad[0x38]; s32 st; };
 struct B {
@@ -48,94 +49,94 @@ struct B {
     s32 f168;
 };
 
-extern struct A D_0021F240;
-extern struct B D_001393E0;
+extern struct A g_vendor_menu_state;
+extern struct B g_memcard_state;
 extern s32 D_001A7A20;
 
 /* Steps through the shop's buy and message states: shows the right line of text for the item
    and moves on to the next step. */
-void func_002FAE68(void) {
+void shop_step_message_states(void) {
     {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
-    u32 rc2_selector = (u32)(gVendorMenuState.st);
+    u32 rc2_selector = (u32)(g_vendor_menu_state.st);
     if (rc2_selector > 6U) goto rc2_default;
 goto *D_0026DBE0[rc2_selector];
 
     rc2_case_0:
     rc2_case_2:
-        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0 && gMemcardState.f8 == 2) {
-            if (gMemcardState.f14 != 0) {
-                gMemcardState.f164 = 0x18;
-                gVendorMenuState.st = 3;
-                gMemcardState.f168 = 0;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0 && g_memcard_state.f8 == 2) {
+            if (g_memcard_state.f14 != 0) {
+                g_memcard_state.f164 = 0x18;
+                g_vendor_menu_state.st = 3;
+                g_memcard_state.f168 = 0;
                 goto rc2_switch_end;
             }
         }
-        if (gVendorMenuState.st != 0) {
-            gVendorMenuState.st = 4;
+        if (g_vendor_menu_state.st != 0) {
+            g_vendor_menu_state.st = 4;
         } else {
-            gVendorMenuState.st = 6;
+            g_vendor_menu_state.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_1:
     rc2_case_3:
-        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (gMemcardState.f1C == 1) {
-                    SetShopMessageText(D_001AD468);
-                } else if (gMemcardState.f1C >= 3) {
-                    SetShopMessageText(D_001AD498);
+                if (g_memcard_state.f1C == 1) {
+                    shop_set_message_text(D_001AD468);
+                } else if (g_memcard_state.f1C >= 3) {
+                    shop_set_message_text(D_001AD498);
                 } else {
-                    SetShopMessageText(D_001AD4C0);
+                    shop_set_message_text(D_001AD4C0);
                 }
             } else {
-                SetShopMessageText(D_001AD4E8);
+                shop_set_message_text(D_001AD4E8);
             }
-            MarkBoughtSpecialItemsOwned();
-            if (gVendorMenuState.st != 0) {
-                gVendorMenuState.st = 4;
+            shop_mark_bought_special_items_owned();
+            if (g_vendor_menu_state.st != 0) {
+                g_vendor_menu_state.st = 4;
             } else {
-                gVendorMenuState.st = 6;
+                g_vendor_menu_state.st = 6;
             }
         }
         goto rc2_switch_end;
     rc2_case_4:
-        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0 && gMemcardState.fA8 == 2 && gMemcardState.fB4 != 0) {
-            gMemcardState.f164 = 0x18;
-            gMemcardState.f168 = 1;
-            gVendorMenuState.st = 5;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0 && g_memcard_state.fA8 == 2 && g_memcard_state.fB4 != 0) {
+            g_memcard_state.f164 = 0x18;
+            g_memcard_state.f168 = 1;
+            g_vendor_menu_state.st = 5;
             goto rc2_switch_end;
         }
-        gVendorMenuState.st = 6;
+        g_vendor_menu_state.st = 6;
         goto rc2_switch_end;
     rc2_case_5:
-        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (gMemcardState.fBC == 1) {
-                    SetShopMessageText(D_001AD468);
-                } else if (gMemcardState.fBC >= 3) {
-                    SetShopMessageText(D_001AD498);
+                if (g_memcard_state.fBC == 1) {
+                    shop_set_message_text(D_001AD468);
+                } else if (g_memcard_state.fBC >= 3) {
+                    shop_set_message_text(D_001AD498);
                 } else {
-                    SetShopMessageText(D_001AD4C0);
+                    shop_set_message_text(D_001AD4C0);
                 }
             } else {
-                SetShopMessageText(D_001AD4E8);
+                shop_set_message_text(D_001AD4E8);
             }
-            MarkBoughtSpecialItemsOwned();
-            gVendorMenuState.st = 6;
+            shop_mark_bought_special_items_owned();
+            g_vendor_menu_state.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_6:
-        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
-            if (gMemcardState.f1C == 0) {
-                s32 mode = gMemcardState.f8;
-                if (mode == 2 && gMemcardState.f14 != 0) {
-                    gVendorMenuState.st = mode;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
+            if (g_memcard_state.f1C == 0) {
+                s32 mode = g_memcard_state.f8;
+                if (mode == 2 && g_memcard_state.f14 != 0) {
+                    g_vendor_menu_state.st = mode;
                     goto rc2_switch_end;
                 }
             }
-            if (gMemcardState.fBC == 0 && gMemcardState.fA8 == 2 && gMemcardState.fB4 != 0) {
-                gVendorMenuState.st = 4;
+            if (g_memcard_state.fBC == 0 && g_memcard_state.fA8 == 2 && g_memcard_state.fB4 != 0) {
+                g_vendor_menu_state.st = 4;
             }
         }
         goto rc2_switch_end;

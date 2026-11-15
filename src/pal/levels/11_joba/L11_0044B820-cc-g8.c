@@ -7,15 +7,15 @@ extern float ref_L11_00445DF8_02 __attribute__((sda));
 extern float ref_L11_00445DF8_03 __attribute__((sda));
 extern s32 ref_L11_00445DF8_04 __attribute__((sda));
 extern s32 D_001A7A00;
-extern char D_001A63A8[];
-extern char D_00189E20[];
-extern s32 func_00282948(void *);
-extern s32 func_002A77E0(s32);
-extern int func_L11_00445D28(char *, int);
+extern char g_music_state[];
+extern char g_hero_state[];
+extern s32 math_fast_float_d(void *);
+extern s32 math_random_int_below(s32);
+extern int arena_queue_voice_line(char *, int);
 
 void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
     char *state = *(char **)(a0 + 0x68);
-    char *g = D_001A63A8;
+    char *g = g_music_state;
     char *hero;
     char *hero2;
     s32 id23;
@@ -52,7 +52,7 @@ void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x194) = 0;
     }
-    if (func_00282948(state + 0x1B0) != 0) {
+    if (math_fast_float_d(state + 0x1B0) != 0) {
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x1B0) = 250;
         *(s32 *)(state + 0x194) = 0;
@@ -66,21 +66,21 @@ void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
                 lp[n++] = id;
         }
     }
-    hero = D_00189E20;
+    hero = g_hero_state;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * ref_L11_00445DF8_03) {
         id23 = 0x18;
         if (*(s16 *)(state + 0x2D0) == 0)
             list[n++] = id23;
     }
-    hero2 = D_00189E20;
+    hero2 = g_hero_state;
     if (*(s32 *)(hero2 + 0x24CC) <= 0) {
-        id24 = func_002A77E0(2) + 0x19;
+        id24 = math_random_int_below(2) + 0x19;
         off = id24 * 2;
         if (*(s16 *)(state + off + 0x2A0) == 0)
             list[n++] = id24;
     }
     if (n != 0) {
-        func_L11_00445D28(a0, list[func_002A77E0(n)]);
-        *(s32 *)(state + 0x190) = (((int)(ref_L11_00445DF8_04 + func_002A77E0(ref_L11_00445DF8_04)) * 5 + 2) / 6);
+        arena_queue_voice_line(a0, list[math_random_int_below(n)]);
+        *(s32 *)(state + 0x190) = (((int)(ref_L11_00445DF8_04 + math_random_int_below(ref_L11_00445DF8_04)) * 5 + 2) / 6);
     }
 }

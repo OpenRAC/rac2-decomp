@@ -1,3 +1,4 @@
+#include "names.h"
 /* GPT-6.1 Sol high, task v0887; USA v1.01.
  * Best: 1144/1144 bytes, 0/1 places. Profile: -O2 -G8 -ffunction-sections -g.
  * Frame and saved-register set agree; object is s4 instead of s2, with the
@@ -32,28 +33,28 @@
    burst call. The particle call's last two arguments are declared float-then-int (the same
    $t2/$f14 registers) so the $t2 zero lands in the call's delay slot as in retail. */
 typedef int Quad34580 __attribute__((mode(TI)));
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern float func_00282E80(void *,void *);
-extern void func_002A8C00(void *,void *,int,void *,float);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern int func_002B38B8(void *);
-extern void func_L11_00434F48(float *,int);
-extern void func_L00_003294F0(void *,int);
-extern void func_0029F338(void *);
-extern float func_002A7878(float,float);
-extern int func_002A7820(int,int);
-extern void *func_002C2210(void *,int,float,float,unsigned int,int,int,void *,float,int);
-extern void func_L00_002E6EF8(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern float vec_distance_xy(void *,void *);
+extern void make_hit_descriptor(void *,void *,int,void *,float);
+extern int CollLine(void *,void *,int,void *,void *);
+extern int flag_is_third_pending_set(void *);
+extern void part_l11_spawn_impact_burst(float *,int);
+extern void moby_set_flag_bit(void *,int);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float,float);
+extern int math_random_int_range(int,int);
+extern void *part_spawn_ground_effect(void *,int,float,float,unsigned int,int,int,void *,float,int);
+extern void gfx_add_draw_callback_third(void *,void *);
 extern char D_L11_001C0D20[];
 extern char D_L11_001A8F20[16] MACRO_ADDR;
 extern unsigned int D_L11_001B11E0 __attribute__((sda));
 extern unsigned int D_L11_001B11E8 __attribute__((sda));
 extern unsigned int D_L11_001B11F0 __attribute__((sda));
 extern unsigned int D_L11_001B11F8 __attribute__((sda));
-extern void func_L11_00434AA8(char *);
+extern void projectile_run_trail_steps(char *);
 /* Moves a thrown projectile each frame, spawns its trail, and bursts into pieces when it hits something or runs out of time. */
-void func_L11_00434580(char *obj) {
+void thrown_l11_projectile_update(char *obj) {
     float vel[4]; char collision[48]; float pos[4],pos2[4];
     char *vars=*(char **)(obj+0x68);
     float scale=*(float *)(vars+0x3C);
@@ -70,20 +71,20 @@ void func_L11_00434580(char *obj) {
         if(CollLine(vars,vars+0x10,0,obj,collision)) {
             impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
-            if(!IsThirdPendingFlagSet(obj)) {
-                SpawnImpactParticleBurst_L11(impact,6);
-                SetObjectFlagBit(obj,1);
+            if(!flag_is_third_pending_set(obj)) {
+                part_l11_spawn_impact_burst(impact,6);
+                moby_set_flag_bit(obj,1);
             }
-            MarkMobySpawned(obj); return;
+            moby_mark_spawned(obj); return;
         }
-        size=RandomFloatRange(1,4);
-        sign=RandomIntRange(25,35); if(!sign) sign--;
+        size=math_random_float_range(1,4);
+        sign=math_random_int_range(25,35); if(!sign) sign--;
         qcopy(pos,vars+0x10); pos[2]-=0.1f;
-        SpawnGroundEffectParticle(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
         sign = -sign;
-        SpawnGroundEffectParticle(vars,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
-        SpawnGroundEffectParticle(vars,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
-        AddDrawCallbackToList3(RunProjectileTrailSteps,obj);
+        part_spawn_ground_effect(vars,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(vars,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
+        gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
         return;
     } else if (*(float *)(vars+0x38)>=25 && *(float *)(vars+0x38)<34) {
         if(vec_distance_xy(vars,vars+0x10)>1) {
@@ -97,24 +98,24 @@ void func_L11_00434580(char *obj) {
             if(CollLine(vars,vars+0x10,0,obj,collision)) {
                 impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
-                if(!IsThirdPendingFlagSet(obj)) {
-                    SpawnImpactParticleBurst_L11(impact,3);
-                    SetObjectFlagBit(obj,1);
+                if(!flag_is_third_pending_set(obj)) {
+                    part_l11_spawn_impact_burst(impact,3);
+                    moby_set_flag_bit(obj,1);
                 }
-                MarkMobySpawned(obj); return;
+                moby_mark_spawned(obj); return;
             }
             vec_scale_to_length(pos,vars+0x20,1.66666675f);
             FastVecAdd(vars,vars,pos);
-            size=RandomFloatRange(1,4);
-            sign=RandomIntRange(25,35); if(!sign) sign--;
+            size=math_random_float_range(1,4);
+            sign=math_random_int_range(25,35); if(!sign) sign--;
             qcopy(pos2,vars+0x10); pos2[2]-=0.1f;
-            SpawnGroundEffectParticle(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
-            SpawnGroundEffectParticle(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
-            AddDrawCallbackToList3(RunProjectileTrailSteps,obj);
+            part_spawn_ground_effect(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+            part_spawn_ground_effect(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
+            gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
             return;
 
         }
         return;
     }
-    MarkMobySpawned(obj);
+    moby_mark_spawned(obj);
 }

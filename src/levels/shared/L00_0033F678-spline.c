@@ -3,14 +3,14 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { int count; int reserved[3]; Vector points[0]; } Path;
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
 
 /* rac1-decomp src/overlays/shared/moby_ground_collision.c: Spline_AdvanceByDistance.
  * Moves a distance along the path from segment *index at offset *offset, updates both and
  * writes the point reached to out; returns 1 when an end was passed. */
-int func_L00_00341820(const Path *path, Vector *out, int *index, float *offset, int wrap, float step) {
+int Spline_AdvanceByDistance(const Path *path, Vector *out, int *index, float *offset, int wrap, float step) {
     Vector delta;
     int reached = 0;
     int direction = 1;

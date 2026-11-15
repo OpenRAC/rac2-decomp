@@ -1,13 +1,14 @@
+#include "names.h"
 /* Per-frame counters of an object: bumps +0x96 up to 0x7FFD, counts the frames at +0x1BC
    of its record while +0x31 is clear, hands the record's +0x1B0 to func_00282978, steps
    its +0x1BE counter to 0x78 from stage 3, and from stage 2 sets the follow values. */
 #include "include_asm.h"
 #include "common.h"
 
-extern int func_00282978(short *p);
+extern int FastDecTimer(short *p);
 
 /* Updates the object each frame: counts how long it has been alive and follows a base height. */
-void func_L08_00425568(char *mobyIn)
+void hover_update_follow_counters(char *mobyIn)
 {
     char *moby = mobyIn;
     char *vars = *(char **)(moby + 0x68);

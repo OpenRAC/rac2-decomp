@@ -21,12 +21,12 @@ struct ChainParticle {
 };
 extern Vector D_001BAFB0, D_001BAFC0;
 extern struct { float matrix[4][4]; char unknown40[0x40]; Vector origin; } D_001B52C0;
-extern void func_00282C88(Quad *), func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float), func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float), func_00283028(void *, void *, void *), func_002830C0(void *, void *, void *), func_002B9180(void *);
-extern float func_00282DF0(void *), func_00282C48(float), func_00283248(float, float);
-extern int func_00277258(void *, int, void *, float), func_00283CF0(float);
+extern void vec_clear_128(Quad *), FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float), FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float), vec_fast_normalize(void *, void *, void *), transform_vector(void *, void *, void *), part_kill(void *);
+extern float FastVecLength(void *), math_fabs(float), mat_fast_helper_a(float, float);
+extern int coll_test_point(void *, int, void *, float), FloatToInt(float);
 /* Integrates a linked particle chain with collision response and projected facing. */
-void func_002BEE70(ChainParticle *particle) {
+void UpdateLinkedEffectParticle(ChainParticle *particle) {
     Vector point, delta, force;
     ChainParticle *node, *attachment;
     ChainParticleDynamics *link;
@@ -39,7 +39,7 @@ void func_002BEE70(ChainParticle *particle) {
             node = dynamics->next;
             link = node ? &node->dynamics : 0;
             distance = 2; damping = 0.15f;
-            ClearVector128(&force.quad);
+            vec_clear_128(&force.quad);
             if (!dynamics->collided && node && !link->collided && !(link->flags & 1)) {
                 do {
                     float strength = 0.2f;
@@ -64,17 +64,17 @@ void func_002BEE70(ChainParticle *particle) {
         else qcopy(&point,&particle->position);
         if (dynamics->previous) {
             FastVecSub(&force, &point, &dynamics->previous->position);
-            if (FloatAbs(FastVecLength(&force) - 0.15f) > 0.1f) {
+            if (math_fabs(FastVecLength(&force) - 0.15f) > 0.1f) {
                 vec_scale_to_length(&force, &force, 0.15f);
                 FastVecAdd(&point, &force, &dynamics->previous->position);
             }
-            if (TestPointAgainstCollision(&point, 0, 0, 0.15f)) {
+            if (coll_test_point(&point, 0, 0, 0.15f)) {
                 if (!dynamics->collided) qcopy(&point,&D_001BAFB0);
                 else qcopy(&point,&particle->position);
                 dynamics->collided = 1;
             } else dynamics->collided = 0;
             if (dynamics->collided) {
-                FastVectorNormalize(velocity, velocity, &D_001BAFC0);
+                vec_fast_normalize(velocity, velocity, &D_001BAFC0);
                 FastVecScale(velocity, velocity, 0.95f);
             } else {
                 FastVecSub(&delta, &point, &particle->position);
@@ -91,7 +91,7 @@ void func_002BEE70(ChainParticle *particle) {
             if (alpha > 0) particle->color = (particle->color & 0xFFFFFF) | (alpha << 24);
             else if (!dynamics->next) {
                 if (dynamics->previous) dynamics->previous->dynamics.next = 0;
-                KillParticle(particle); return;
+                part_kill(particle); return;
             }
         }
     }
@@ -106,6 +106,6 @@ void func_002BEE70(ChainParticle *particle) {
         step = 1.0f / delta.f[3];
         FastVecScale(&delta, &delta, step);
         FastVecSub(&point, &point, &delta);
-        particle->rotation = FloatToInt(FastMatrixHelperA(point.f[0], point.f[1]) * 40.743664f) - 32;
+        particle->rotation = FloatToInt(mat_fast_helper_a(point.f[0], point.f[1]) * 40.743664f) - 32;
     }
 }

@@ -29,10 +29,10 @@ typedef struct {
     float m2[4];                /* 0xE0 */
 } SpawnObject003979B0;
 
-extern SpawnObject003979B0 *func_0029EFD0(int);
-extern int func_00283CF0(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern SpawnObject003979B0 *CreateMoby(int);
+extern int FloatToInt(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 extern float D_L05_001AEBC4 __attribute__((sda));
 extern float D_L05_001AEBD0 __attribute__((sda));
 extern int D_L05_001AEBCC __attribute__((sda));

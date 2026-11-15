@@ -1,17 +1,18 @@
+#include "names.h"
 /* func_L00_00420388 in its own unit (flags in config/cflags.txt: -O2 -G8 -ffunction-sections -g). */
 
 #include "include_asm.h"
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
-extern char *func_L00_002DB350(Quad *, float);
+extern char *FindIntersectingGridPrimitive(Quad *, float);
 extern char *D_L00_001B1F94;
 extern char D_L00_001BF230[];
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 /* Checks whether a point is close to a level collision shape and, if so, records two points on the line from its center. */
-int func_L00_00420388(Quad *src, float margin)
+int coll_find_nearby_shape_points(Quad *src, float margin)
 {
     struct { Quad local; float delta[4]; } temp;
     char *hit;

@@ -12,13 +12,13 @@
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 void func_0029C730(void);
 
@@ -40,13 +40,13 @@ void func_0029C730(void);
  * - All external function addresses come from the assigned externals list.
  */
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
 /* External functions declared with exact aliases from task.externals */
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-unsigned long long func_002D2E28(void)
+unsigned long long menu_page_draw_2(void)
 {
     SetupGifPaging(0);
     func_0029C730();
@@ -61,20 +61,20 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 
 extern void func_0029C760(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
-int func_002D2E58(void) {
+int menu_page_update(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }

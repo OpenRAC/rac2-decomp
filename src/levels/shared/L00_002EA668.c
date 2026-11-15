@@ -21,7 +21,7 @@ extern Slot_r002EA668 D_L00_001BCC90[];
 extern int D_L00_001B1998 MACRO_ADDR;
 
 /* Picks a free slot, fills it in and returns its index, or -1 when all are used. */
-int func_L00_002EA668(int slotIndex, unsigned short valueA, unsigned short valueB, unsigned short valueC,
+int part_l00_alloc_effect_slot(int slotIndex, unsigned short valueA, unsigned short valueB, unsigned short valueC,
                       unsigned short valueD, int param14, int param10) {
     Slot_r002EA668 *slot;
     int i;

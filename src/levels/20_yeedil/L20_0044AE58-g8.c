@@ -19,41 +19,41 @@ extern float D_L20_001B2468 __attribute__((sda));
 
 extern int D_L20_001B2460 __attribute__((sda));
 
-extern void func_0029F338(void *object);
+extern void moby_mark_spawned(void *object);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern void func_00282D08(float *out, char *a, char *b, float k);
+extern void lerp_vector(float *out, char *a, char *b, float k);
 
-extern float func_002AA2E8(float *p, float v, float w);
+extern float ApproachValue(float *p, float v, float w);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern int func_00277258(void *, int, void *, float);
+extern int coll_test_point(void *, int, void *, float);
 
-extern void func_002A7750(char *object, int a1, int a2);
+extern void moby_set_state(char *object, int a1, int a2);
 
-extern void func_00282D30(void *dst, void *src, float value);
+extern void FastVecScale(void *dst, void *src, float value);
 
-extern void func_00282C88(void *target);
+extern void vec_clear_128(void *target);
 
-extern float func_002A7878(float lo, float hi);
+extern float math_random_float_range(float lo, float hi);
 
-extern void *func_002C65A0(void *, void *, float, float, float, int, int, int, int, int,
+extern void *part_spawn_gravity_fade(void *, void *, float, float, float, int, int, int, int, int,
                            int);
 
-extern int func_002A8C28(char *, char *, int, int, float, float, float, int, int);
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
 
-extern void func_0032C700(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
+extern void SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
                           int a7, float f12, float f13, int s1, int s2, int s3,
                           int s4);
 
-extern void func_L00_002E6EF8(void (*)(void *), void *);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 
-extern void func_L11_0045FEF8(void *);
+extern void part_spawn_two_glow_effects(void *);
 
 /* Update handler for moby class 4855, a homing shot: it steers and moves each frame, leaves a particle trail, and explodes when it hits something. */
-void func_L20_0044AE58(char *moby) {
+void homing_l20_shot_update(char *moby) {
     char *state = *(char **)(moby + 0x68);
     float newPos[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -62,7 +62,7 @@ void func_L20_0044AE58(char *moby) {
     u8 mode;
 
     if (D_L20_001A8F00 == 2) {
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
     mode = *(u8 *)(moby + 0x20);
@@ -84,32 +84,32 @@ void func_L20_0044AE58(char *moby) {
                       *(float *)(state + 0x30));
         ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
         FastVecAdd(newPos, base, step);
-        if (TestPointAgainstCollision(newPos, 0, moby, D_L20_001B2468) != 0) {
+        if (coll_test_point(newPos, 0, moby, D_L20_001B2468) != 0) {
             int id = D_L20_001C0418;
 
             if (id != 0 && id != *(int *)(moby + 0xB8)) {
-                SetMobyState(moby, 1, -1);
+                moby_set_state(moby, 1, -1);
                 break;
             }
         }
         qcopy(moby + 0x10, newPos);
         FastVecScale(sparkVelocity, state, -0.5f);
-        ClearVector128(sparkScratch);
-        startSize = RandomFloatRange(2.5f, 3.0f) * 210000.0f;
-        endSize = RandomFloatRange(0.2f, 0.4f) * 210000.0f;
-        SpawnGravityFadeParticle(moby + 0x10, sparkVelocity, startSize, endSize, 0.0f, 0xF,
+        vec_clear_128(sparkScratch);
+        startSize = math_random_float_range(2.5f, 3.0f) * 210000.0f;
+        endSize = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+        part_spawn_gravity_fade(moby + 0x10, sparkVelocity, startSize, endSize, 0.0f, 0xF,
                       D_L20_001B2460, 3, 0x50, 0, 0);
     } break;
     case 1: {
         char *base;
         base = moby + 0x10;
-        SweepCollisionFromObject(moby, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
+        coll_sweep_from_object(moby, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
                       1.0f, 1, 0);
         SpawnExplosion(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
                       mode, 0, 0);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
     }
-    AddDrawCallbackToList3(&SpawnTwoGlowEffects, moby);
+    gfx_add_draw_callback_third(&part_spawn_two_glow_effects, moby);
 }

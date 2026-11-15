@@ -59,13 +59,13 @@ extern volatile int D_001A7100[] __attribute__((sda));
 extern volatile int D_001A7110[] __attribute__((sda));
 extern char D_001A7500[], D_001A7528[];
 
-extern void func_0011CF78(int);
-extern int func_0011D450(void *, int, int);
-extern void func_00115D48(const char *, ...);
-extern int func_00132C48(int, int, void *);
+extern void sceSifInitRpc(int);
+extern int sceSifBindRpc(void *, int, int);
+extern void printf(const char *, ...);
+extern int snd_SendCommandSync(int, int, void *);
 
 /* Starts the sound system: connects to the two sound servers on the IOP, resets the sound buffers and sends the first setup request. */
-int func_00131DE8(int options)
+int snd_StartSoundSystem(int options)
 {
     int bind_result;
     int delay;
@@ -88,12 +88,12 @@ int func_00131DE8(int options)
         D_001A74F8[0] = 1;
     else
         D_001A74F8[0] = 0;
-    InitSifRpc(0);
+    sceSifInitRpc(0);
 
     for (;;) {
-        bind_result = BindRpcServer(&D_001A7040, 0x123456, 0);
+        bind_result = sceSifBindRpc(&D_001A7040, 0x123456, 0);
         if (bind_result < 0) {
-            Printf(D_001A7500, D_001A7528, 0xB1);
+            printf(D_001A7500, D_001A7528, 0xB1);
             for (;;) {}
         }
         delay = 9999;
@@ -111,9 +111,9 @@ int func_00131DE8(int options)
     D_001A7180[0] = 0;
 
     do {
-        bind_result = BindRpcServer(&D_001A7140, 0x123457, 0);
+        bind_result = sceSifBindRpc(&D_001A7140, 0x123457, 0);
         if (bind_result < 0) {
-            Printf(D_001A7500, D_001A7528, 0xC6);
+            printf(D_001A7500, D_001A7528, 0xC6);
             for (;;) {}
         }
         delay = 9999;

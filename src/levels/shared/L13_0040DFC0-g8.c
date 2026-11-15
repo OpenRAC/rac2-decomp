@@ -27,17 +27,17 @@ extern int D_L13_001B12E8 __attribute__((sda));
 extern float D_L13_001B12E4 __attribute__((sda));
 extern float D_L13_001B98C0[];
 extern void ref_L13_0040DFC0_00(void *);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, int, int, float, float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
 
 /* Draws layered beam quads with scrolling texture coordinates and an end glow. */
-void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
+void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
                        float ug, float uh, int ud, u8 *object) {
     struct {
         float v[4][4];
@@ -53,7 +53,7 @@ void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
     float random;
 
     ref_L13_0040DFC0_00(&packet);
-    InitQuadPacketState(&packet, ref_L13_0040DFC0_01, 0, 128);
+    gfx_init_quad_packet_state(&packet, ref_L13_0040DFC0_01, 0, 128);
     {
         unsigned alpha = (D_L13_001B1324 << 24);
         unsigned alphaBlue = alpha | (D_L13_001B1320 << 16);
@@ -106,7 +106,7 @@ void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecAdd(packet.v[2], packet.v[2], beamStep);
     FastVecAdd(packet.v[3], packet.v[3], beamStep);
     draw_world_quad(&packet, 0, 0);
-    InitQuadPacketState(&packet, ref_L13_0040DFC0_02, 1, 128);
+    gfx_init_quad_packet_state(&packet, ref_L13_0040DFC0_02, 1, 128);
     {
         unsigned alpha = (D_L13_001B1344 << 24);
         unsigned alphaBlue = alpha | (D_L13_001B1340 << 16);
@@ -200,6 +200,6 @@ void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecAdd(packet.v[2], farPoint, side);
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
-    random = RandomAngle();
-    DrawBillboardQuad_00281EB8(position, D_L13_001B12E0, D_L13_001B12E8, 1, D_L13_001B12E4, 0.08f, random);
+    random = math_random_angle();
+    gfx_draw_billboard_quad(position, D_L13_001B12E0, D_L13_001B12E8, 1, D_L13_001B12E4, 0.08f, random);
 }

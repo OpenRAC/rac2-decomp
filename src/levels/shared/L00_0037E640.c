@@ -2,10 +2,10 @@
 #include "names.h"
 
 extern unsigned char D_L00_001B26B4[];
-extern int func_00282948(void *p);
+extern int math_fast_float_d(void *p);
 
 /* Advances the resident fade timer by one step. */
-void func_L00_0037E640(void)
+void fade_tick_timer(void)
 {
-    FastFloatHelperD(D_L00_001B26B4);
+    math_fast_float_d(D_L00_001B26B4);
 }

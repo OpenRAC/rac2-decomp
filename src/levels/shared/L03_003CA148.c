@@ -1,3 +1,4 @@
+#include "names.h"
 /* Builds the object matrix and its inverse, brings the offset into the object frame and
    applies a step to the second vector whose sign follows the offset's first component. The
    step size is one of two resident floats. Every callee is a ref_ name: the retail keeps
@@ -11,7 +12,7 @@ extern void ref_L03_003CA148_00(char *, float *, float *, int);
 extern void ref_L03_003CA148_04(float *, float *, float);
 extern void ref_L03_003CA148_05(float *, float *, char *);
 
-void func_L03_003CA148(char *moby, float *offset, float *output) {
+void mat_compute_side_step_offset(char *moby, float *offset, float *output) {
     float local[4] __attribute__((aligned(16)));
     float matrix[16] __attribute__((aligned(16)));
     float inverse[16] __attribute__((aligned(16)));

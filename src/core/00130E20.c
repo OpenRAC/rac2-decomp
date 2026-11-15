@@ -17,7 +17,7 @@ extern u128 r1_D_001331A0[];
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CCF8 */
 /* Starts a DMA transfer on channel 4 and waits for the hardware pause bit to be set and cleared. */
-void func_00130E20(unsigned int chcr) {
+void ipu_start_dma_channel4_transfer(unsigned int chcr) {
     r1_func_0011D960();
     D_ENABLEW = D_ENABLER | 0x10000;
     D4_CHCR = chcr;
@@ -28,7 +28,7 @@ void func_00130E20(unsigned int chcr) {
 /* rac1-decomp src/core/0012CC90.c: func_0012D068 */
 /* sceIpuInit: reset the IPU, load its two fixed FIFO command tables, reset again. Adapted from Lombyte (GPL-3.0) for PAL: src/sdk/dma/sce_ipu_init.c, sceIpuInit. */
 /* Resets the image decoder chip (IPU) and loads its start-up tables. */
-void func_00130E88(void) {
+void sceIpuInit(void) {
     r1_func_0012D000(1);
     IPU_CTRL = 0x40000000;
     while ((int)IPU_CTRL < 0) {

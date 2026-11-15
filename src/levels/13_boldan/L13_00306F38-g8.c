@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -22,7 +23,7 @@ extern Node *D_L13_001B2928[1] __attribute__((sda));
 
 /* state 0 starts the effect, state 1 flags every live node of four ids */
 /* Starts an effect, then in state 1 marks every live object of four kinds with a flag while the level is in a special mode. */
-void func_L13_0038C328(u8 *moby) {
+void flag_nodes_effect_update(u8 *moby) {
     Node *node;
 
     switch (moby[0x20]) {

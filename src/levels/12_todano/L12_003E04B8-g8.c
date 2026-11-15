@@ -1,17 +1,17 @@
 #include "common.h"
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
 extern float D_L12_001B09F8 __attribute__((sda));
 extern int D_L12_001B09F4 __attribute__((sda));
 extern u8 *D_L12_001B2F8C[] __attribute__((sda));
 extern u8 D_L12_001B9E00[];
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_00282CF0(void *, void *, void *), func_00283098(void *, void *, void *);
-extern int func_L02_0032E508(void *, int, void *, int);
-extern void func_002A7470(void *, int, int, int), func_002A93B0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_002B0ED8(void *, void *, int), func_L00_002E6EF8(void (*)(u8 *), void *);
-extern void func_L12_003E0B68(u8 *);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
+extern int path_build_route_nodes(void *, int, void *, int);
+extern void anim_start_blended(void *, int, int, int), moby_update_ground_check(void *);
+extern float fast_vec_dist(void *, void *);
+extern void moby_apply_damage_to_object(void *, void *, int), gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern void gfx_add_two_glow_sprites(u8 *);
 
 typedef struct TodanoInitState {
     u8 pad0[0x28];
@@ -87,11 +87,11 @@ typedef struct TodanoInitObject {
 
 /* Sets up a Todano creature on its first frame (health, speeds, animation) and then handles
    its hits and its death each frame. */
-void func_L12_003E04B8(TodanoInitObject *moby) {
+void todano_creature_update(TodanoInitObject *moby) {
     TodanoInitState *vars = moby->f68;
     if (!moby->f20) {
         int kind;
-        moby->f7C = 1 << RandomIntBelow(6);
+        moby->f7C = 1 << math_random_int_below(6);
         kind = 3;
         vars->fCC = kind;
         vars->fCE = kind;
@@ -126,23 +126,23 @@ void func_L12_003E04B8(TodanoInitObject *moby) {
         vars->f58C = -1;
         vars->f560 = 3.14159012f;
         vars->f588 |= 1;
-        SetControllerSpeedLimits(moby, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
+        moby_set_controller_speed_limits(moby, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
         qcopy((u8 *)vars + 0x760, (u8 *)moby + 0x10);
         FastVecSub((u8 *)vars + 0x770, (u8 *)moby + 0x10, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x30);
         matrix_mul_vec3((u8 *)vars + 0x770, (u8 *)vars + 0x770, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x40);
         vars->f598 = (u8 *)vars + 0x6C0;
         vars->f59C = (u8 *)vars + 0x640;
-        vars->f790 = BuildRouteNodes(moby, vars->f510, (u8 *)vars + 0x110, 32);
+        vars->f790 = path_build_route_nodes(moby, vars->f510, (u8 *)vars + 0x110, 32);
         moby->f98 = 0;
         moby->f34 = (moby->f34 | 0x41) & 0xEFFF;
-        SetMobyState(moby, 1, 0);
-        if (moby->f43)StartAnimationBlended(moby, 0, 0, 0);
+        moby_set_state(moby, 1, 0);
+        if (moby->f43)anim_start_blended(moby, 0, 0, 0);
         D_L12_001B09F4 = 0;
     }
     if (moby->f31 && fast_vec_dist((u8 *)moby + 0x10, D_L12_001B9E00) < 24) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby->f6F = 22;
     }
-    ApplyDamageToObject(moby, (u8 *)vars + 0x60, 0);
-    if (moby->f20 != 8 && moby->f20 != 1)AddDrawCallbackToList3(AddTwoGlowSprites, moby);
+    moby_apply_damage_to_object(moby, (u8 *)vars + 0x60, 0);
+    if (moby->f20 != 8 && moby->f20 != 1)gfx_add_draw_callback_third(gfx_add_two_glow_sprites, moby);
 }

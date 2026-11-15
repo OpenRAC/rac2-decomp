@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_00138344;
 extern int D_00138344;
@@ -21,15 +22,15 @@ int func_US2_L00_0034F9F0(void) {
 
 
 #include "common.h"
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 extern void func_US2_L00_0030F228(void);
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
 int func_US2_L00_0034FA18(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_US2_L00_0030F228();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 

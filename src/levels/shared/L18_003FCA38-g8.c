@@ -2,22 +2,22 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 typedef struct { float vertex[4][4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } GlowQuad;
-extern float D_L18_001B97C0[4];
+extern float g_camera_l18_position[4];
 extern float D_L18_001AA250[][4] __attribute__((sda));
 extern float D_L18_001B06C8 __attribute__((sda));
 extern float D_L18_001B06A0 __attribute__((sda));
 extern float D_L18_001B06CC[] __attribute__((sda));
 extern float D_L18_001B06D0[] __attribute__((sda));
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern u64 func_0027C878(s32);
-extern void func_00280B90(void *, void *, s32);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern u64 GetEffectTextureDescriptor(s32);
+extern void draw_world_quad(void *, void *, s32);
 /* Draws a glowing flat square that always faces the camera at the object effect point. */
-void func_L18_003FCA38(u8 *object)
+void gfx_draw_glow_quad(u8 *object)
 {
     float basis[4][4], up[4], offset[4];
     GlowQuad packet;
@@ -29,7 +29,7 @@ void func_L18_003FCA38(u8 *object)
     up[2] = 1.0f;
     up[3] = 1.0f;
     *(VectorBits *)basis[3] = *(VectorBits *)(state + 0x90);
-    FastVecSub(basis[0], gCameraPosition_L18, basis[3]);
+    FastVecSub(basis[0], g_camera_l18_position, basis[3]);
     vec_scale_to_length(basis[0], basis[0], 1.0f);
     FastVecCross(basis[1], basis[0], up);
     vec_scale_to_length(basis[1], basis[1], 1.0f);

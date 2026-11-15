@@ -68,49 +68,49 @@ typedef struct {
     int active;
 } PickupHero;
 
-extern unsigned char D_00139568[];
-extern char D_00239BA0[];
-extern int D_00139688[];
-extern int D_001B1688;
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_table[];
+extern int g_item_ammo_counts[];
+extern int g_game_time;
 extern int D_001B275C;
 extern int D_001A8CA0;
-extern char D_00189E20[];
-extern PickupObject *D_0018C0B0 NOT_SDA;
+extern char g_hero_state[];
+extern PickupObject *g_hero_moby NOT_SDA;
 
 /* The weapon definition of pickup-table slot i, and the hero state. */
 #define WEAPON(i) ((PickupWeapon *)(D_00239BA0 + D_00139568[i] * sizeof(PickupWeapon)))
 #define HERO ((PickupHero *)D_00189E20)
 
-extern void func_00282C90(void *);
-extern void func_00282C88(void *);
-extern int func_00273B70(void *);
-extern float func_00282E48(void *, void *);
-extern int func_00282948(void *);
-extern float func_00282C48(float);
-extern float func_00282E80(void *, void *);
-extern float func_002B0360(void *);
-extern unsigned int func_0026F740(int, int);
-extern void func_002B0A48(int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_00282C30(int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002AA2E8(void *, float, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_0029F338(void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACE78(void *, void *, float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern int func_00282ED8(void *, void *);
+extern void vec_store_helper(void *);
+extern void vec_clear_128(void *);
+extern int cam_moby_update(void *);
+extern float fast_vec_dist(void *, void *);
+extern int math_fast_float_d(void *);
+extern float math_fabs(float);
+extern float vec_distance_xy(void *, void *);
+extern float gravity_get_center_distance(void *);
+extern unsigned int stub_empty_7(int, int);
+extern void value_forward_three_args(int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int subtract_integer_with_clamp(int);
+extern int PlayMobySound(int, int, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void ApproachValue(void *, float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void moby_mark_spawned(void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_set_direction_with_complement(void *, void *, float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern int vec_fast_helper_d(void *, void *);
 
 typedef int PickupVectorBits __attribute__((mode(TI)));
 
 /* Award ammo on collection, then move and rotate the pickup into the hero. */
-void func_0031FC28(PickupObject *object)
+void UpdateWeaponAmmoPickup(PickupObject *object)
 {
     float old[4], move[4], delta[4], angle[4];
     float before[4], after[4], offset[4], pivot[4], rotation[12];
@@ -130,34 +130,34 @@ void func_0031FC28(PickupObject *object)
         }
         break;
     case 1:
-        if (data->f5C == 3 && (gGameTime & 15) == (((int)object >> 8) & 15)) {
+        if (data->f5C == 3 && (g_game_time & 15) == (((int)object >> 8) & 15)) {
             qzero(data);
-            StoreVectorHelper(data->f10);
+            vec_store_helper(data->f10);
             data->f5C = 0;
         }
 
         qcopy(old, data);
-        UpdateCameraMoby(object);
+        cam_moby_update(object);
         changed = 0;
         if (fast_vec_dist(old, data) > data->speedLimit * 2.0f)
             changed = 1;
         allow = 1;
         if (data->f5C || changed) {
-            if (FastFloatHelperD(&data->f7C)) {
-                if (FloatAbs(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
+            if (math_fast_float_d(&data->f7C)) {
+                if (math_fabs(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
                     vec_distance_xy(object->pos, HERO->pos) > HERO->pickupRadius)
                     allow = 0;
             }
         } else {
             allow = 0;
-            if (FloatAbs(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
+            if (math_fabs(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
                 vec_distance_xy(object->pos, HERO->pos) < HERO->pickupRadius)
                 data->f7C = 3;
         }
-        if (gItemAmmoCounts[data->weapon] >= WEAPON(data->weapon)->capacity)
+        if (g_item_ammo_counts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
         if (D_001A8CA0) {
-            if (GetDistanceFromGravityCenter(object->pos) < data->groundZ - 2.0f)
+            if (gravity_get_center_distance(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
             goto permit;
@@ -170,27 +170,27 @@ void func_0031FC28(PickupObject *object)
             allow = 0;
         if (allow) {
             item = data->weapon;
-            previous = gItemAmmoCounts[item];
-            EmptyStubF740(item, data->amount);
-            if (gItemAmmoCounts[item] > previous) {
-                count = gItemAmmoCounts[item] - previous;
-                ForwardThreeArgumentCall(count == 1 ?
+            previous = g_item_ammo_counts[item];
+            stub_empty_7(item, data->amount);
+            if (g_item_ammo_counts[item] > previous) {
+                count = g_item_ammo_counts[item] - previous;
+                value_forward_three_args(count == 1 ?
                     WEAPON(item)->messageOne :
                     WEAPON(item)->messageMany,
                     count, -1);
             }
-            SetMobyState(object, 2, -1);
+            moby_set_state(object, 2, -1);
             data->pull = 1.0f / 7.5f;
-            ClearVector128(data);
-            if (subtract_integer_with_clamp(gGameTime - D_001B275C) >= 11) {
+            vec_clear_128(data);
+            if (subtract_integer_with_clamp(g_game_time - D_001B275C) >= 11) {
                 PlayMobySound(0, 0, object);
-                D_001B275C = gGameTime;
+                D_001B275C = g_game_time;
             }
         }
         break;
     case 2:
         /* The hero's basis vectors lie at fixed offsets around its position. */
-        heroPos = gHeroState + 0x80;
+        heroPos = g_hero_state + 0x80;
         FastVecSub(old, object->pos, heroPos);
         matrix_mul_vec3(old, old, heroPos - 0x40);
         target = 8.0f;
@@ -207,13 +207,13 @@ void func_0031FC28(PickupObject *object)
         if (time < 30.0f)
             ApproachValue(&object->lifetime, 0.0f, object->def->fadeRate * (1.0f / 30.0f));
         if (object->lifetime == 0.0f || time <= 1.0f) {
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
         vec_scale_to_length(data, delta, speed);
         FastVecAdd(object->pos, object->pos, data);
         FastVecCross(angle, heroPos - 0x60, data);
-        SetDirectionWithComplement(angle, angle, 0.087266475f);
+        vec_set_direction_with_complement(angle, angle, 0.087266475f);
         *(PickupVectorBits *)pivot = 0;
         pivot[2] = 0.3f;
         matrix_mul_vec3(before, pivot, object->basis);
@@ -225,7 +225,7 @@ void func_0031FC28(PickupObject *object)
         break;
     }
 
-    if (object->state == 1 && FastVectorHelperD(object, gHeroMoby_0018C0B0)) {
+    if (object->state == 1 && vec_fast_helper_d(object, g_hero_moby)) {
         if (object->alpha > 36)
             object->alpha -= 4;
         else

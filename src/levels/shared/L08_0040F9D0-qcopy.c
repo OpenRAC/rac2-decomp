@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int s32;
@@ -14,7 +15,7 @@ typedef int V4 __attribute__((mode(TI)));
 
 /* Creates a new object (moby class 3704) at a position with a start velocity and a random spin;
    returns it, or 0 if its first setup step fails. */
-s32 func_L08_0040F9D0(void *owner, void *startPos, void *startVel, f32 turnSpeed, f32 moveSpeed)
+s32 moby_spawn_spinning_object(void *owner, void *startPos, void *startVel, f32 turnSpeed, f32 moveSpeed)
 {
     u8 *moby;
     u8 *position;

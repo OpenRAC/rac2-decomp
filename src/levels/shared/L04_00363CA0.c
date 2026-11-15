@@ -28,18 +28,18 @@ typedef struct {
     L04Quad field10;
 } L04Spawned;
 
-extern void *func_002B9030(s32 kind);
+extern void *part_alloc(s32 kind);
 
-extern s32 func_00283CF0(f32 value);
+extern s32 FloatToInt(f32 value);
 
-extern s32 func_002A77E0(s32 limit);
+extern s32 math_random_int_below(s32 limit);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u32 ref_L04_00363CA0_00;
 
 /* Creates a small effect record, fills it with random values and the caller's data, and returns it. */
-void *func_L04_00363CA0(void *quadSrc, void *owner, f32 scale) {
-    L04Spawned *rec = (L04Spawned *)(u32)AllocParticle(0x67);
+void *part_spawn_effect_record(void *quadSrc, void *owner, f32 scale) {
+    L04Spawned *rec = (L04Spawned *)(u32)part_alloc(0x67);
 
     if ((u32)rec != 0) {
         rec->field04 = (u32)owner;
@@ -48,7 +48,7 @@ void *func_L04_00363CA0(void *quadSrc, void *owner, f32 scale) {
         rec->field01 = 0;
         rec->field02 = *(u8 *)ref_L04_00363CA0_00;
         rec->field0C = scale;
-        rec->field08 = (u8)RandomIntBelow(0xFF);
+        rec->field08 = (u8)math_random_int_below(0xFF);
         rec->field0A = 2;
         rec->field10 = *(L04Quad *)quadSrc;
     }

@@ -10,7 +10,7 @@ extern float ref_L00_00338810_02 __attribute__((sda));
 
 extern float ref_L00_00338810_03 __attribute__((sda));
 
-extern int func_0027F288(char *, int, float);
+extern int text_measure_width_small_scaled(char *, int, float);
 
 extern float func_PAL_0033A598(void *, int);
 
@@ -62,7 +62,7 @@ void func_PAL_0033A5F0(void *object)
             *(int *)(obj + 0x1D4) = 0;
             for (i = 0; i < *(int *)(obj + 0x1B0); i++) {
                 float scale = func_PAL_0033A598(obj, *(int *)(obj + 0x1C4));
-                int w = func_0027F288(((char **)(obj + 0x1D8))[i], -1, scale);
+                int w = text_measure_width_small_scaled(((char **)(obj + 0x1D8))[i], -1, scale);
                 *(int *)(obj + 0x1D4) = (*(int *)(obj + 0x1D4) < w) ? w : *(int *)(obj + 0x1D4);
             }
         }

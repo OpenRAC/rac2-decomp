@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 typedef int TI16_2B41A8 __attribute__((mode(TI)));
 typedef struct { float x, y, z; } Vec3_2B41A8;
 extern const Vec3_2B41A8 D_001AA060, D_001AA070, D_001AA080, D_001AA090, D_001AA0A0, D_001AA0B0;
-extern float func_002A7940(void);
-extern void func_00283098(void *, void *, void *);
+extern float math_random_angle(void);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 void func_PAL_002B4D38(char *obj, char *dst, char *p2, char *p3, float *p4, float *p5, float *p6, float *p7,
                    float *p8, float *p9, float *p10)
@@ -23,8 +24,8 @@ void func_PAL_002B4D38(char *obj, char *dst, char *p2, char *p3, float *p4, floa
     *(unsigned short *)(obj + 0x34) |= 0x100;
     v6 = D_001AA0B0;
     if (p2 != 0) {
-        func_00283098(dst, p2, obj + 0xC0);
-        func_00282CC0(dst, dst, obj + 0x10);
+        matrix_mul_vec3(dst, p2, obj + 0xC0);
+        FastVecAdd(dst, dst, obj + 0x10);
         *(TI16_2B41A8 *)(dst + 0x10) = *(TI16_2B41A8 *)p2;
     } else {
         *(TI16_2B41A8 *)dst = *(TI16_2B41A8 *)(obj + 0x10);
@@ -62,7 +63,7 @@ void func_PAL_002B4D38(char *obj, char *dst, char *p2, char *p3, float *p4, floa
         *o2++ = *e++;
         *o3++ = *b++;
         *o4++ = *c++;
-        *o5++ = func_002A7940();
+        *o5++ = math_random_angle();
         *o6++ = *f++;
         *o7++ = *g++ * 0.0003490659f;
     }

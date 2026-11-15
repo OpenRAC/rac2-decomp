@@ -1,3 +1,4 @@
+#include "names.h"
 /* libgcc _eh.o: get_reg_addr, from the L_eh section of GCC's libgcc2.c, carried from
    rac3-decomp's src/boot_elf/core/libgcc/_eh.c (func_00126EB8), the same instructions
    there. frame_state is frame.h's with FIRST_PSEUDO_REGISTER 79, as in 00120390.c;
@@ -6,13 +7,13 @@
    source is used. */
 /* More subroutines needed by GCC output code on some machines.  */
 /* Compile this one with gcc.  */
-/* Copyright (C) 1989, 92-98, 1999 Free Software Foundation, Inc.
+/* Copyright (C) 1989, 92-98, 1999 free Software Foundation, Inc.
 
 This file is part of GNU CC.
 
 GNU CC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
+the free Software Foundation; either version 2, or (at your option)
 any later version.
 
 GNU CC is distributed in the hope that it will be useful,
@@ -22,7 +23,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -61,7 +62,7 @@ static inline int in_reg_window (int reg, frame_state *udata) { return 0; }
 
 /* get_reg_addr */
 /* Finds where a saved register lives for a stack frame. */
-word_type * func_00120A30 (unsigned reg, frame_state *udata, frame_state *sub_udata)
+word_type * eh_get_saved_register_addr (unsigned reg, frame_state *udata, frame_state *sub_udata)
 {
   while (udata->saved[reg] == REG_SAVED_REG)
     {

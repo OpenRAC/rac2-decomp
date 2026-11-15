@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,7 +25,7 @@
 #include "common.h"
 
 /* Returns 1 when the moby is missing, dead, or has been flagged as finished, otherwise 0. */
-s32 func_L14_00427210(s8 *guard) {
+s32 guard_is_defeated(s8 *guard) {
     s32 result;
     s8 *vars;
     u8 state;

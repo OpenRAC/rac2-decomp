@@ -44,7 +44,7 @@ typedef struct {
 
 extern Ring D_L00_0023D960[10];
 /* These vectors are outside small data even in this unit's G64 profile. */
-extern Vector D_L00_001B8DC0 __attribute__((section(".data")));    /* the point the quads face */
+extern Vector g_camera_l00_position __attribute__((section(".data")));    /* the point the quads face */
 extern Vector D_0018A0E0 __attribute__((section(".data")));
 extern float D_L00_001B28AC[] __attribute__((sda));     /* [0]: 1 / ring growth time */
 extern int D_L00_001AF8E0 __attribute__((sda));         /* effect lifetime, frames */
@@ -58,23 +58,23 @@ extern u32 D_L00_001AF98C __attribute__((sda));         /* core alpha bits */
 extern u32 D_L00_001AF990 __attribute__((sda));         /* core colour */
 extern float D_L00_001AF994 __attribute__((sda));       /* core offset toward the viewer */
 
-extern float func_00283CE0(int value);
-extern float func_002A78D8(float min, float max);
-extern int func_00283CF0(float value);
-extern u64 func_0027C878(int texture);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *in, float length);
-extern void func_00282D30(void *out, float scale, void *in);
-extern void func_00282DD8(void *out, void *a, void *b);
-extern void func_002830C0(void *out, void *point, void *matrix);
-extern void func_00280B90(EffectQuad *quad, void *a1, int a2);
-extern void func_L00_003B4560(Moby *moby, float fade);
-extern void func_L00_003B5210(void);
+extern float IntToFloat(int value);
+extern float math_random_signed_float_range(float min, float max);
+extern int FloatToInt(float value);
+extern u64 GetEffectTextureDescriptor(int texture);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *in, float length);
+extern void FastVecScale(void *out, float scale, void *in);
+extern void FastVecCross(void *out, void *a, void *b);
+extern void transform_vector(void *out, void *point, void *matrix);
+extern void draw_world_quad(EffectQuad *quad, void *a1, int a2);
+extern void MeshDrawFourSigns(Moby *moby, float fade);
+extern void jitter_trail_draw(void);
 
 /* Draws the active rings, growing and fading with age, and a flickering core quad, all
    facing D_L00_001B8DC0; the effect fades out over the last 30 frames of its life. */
-void func_L00_003B4198(Moby *moby)
+void DrawTimedQuadEffects(Moby *moby)
 {
     EffectQuad quad;
     Vector billboard[4];
@@ -113,7 +113,7 @@ void func_L00_003B4198(Moby *moby)
         quad.uv[3][1] = 1.0f;
 
         /* A matrix facing D_L00_001B8DC0, placed at the moby. */
-        FastVecSub(&billboard[0], &gCameraPosition_L00, &moby->position);
+        FastVecSub(&billboard[0], &g_camera_l00_position, &moby->position);
         vec_scale_to_length(&billboard[0], &billboard[0], 1.0f);
         billboard[3].q = moby->position.q;
         FastVecScale(&billboard[2], -1.0f, &D_0018A0E0);
@@ -147,7 +147,7 @@ void func_L00_003B4198(Moby *moby)
             = (D_L00_001AF990 & 0xFFFFFF) | D_L00_001AF98C;
         vec_scale_to_length(&billboard[3], &billboard[0], D_L00_001AF994);
         FastVecAdd(&billboard[3], &billboard[3], &moby->position);
-        radius = D_L00_001AF988 + RandomSignedFloatRange(0.0f, 0.1f);
+        radius = D_L00_001AF988 + math_random_signed_float_range(0.0f, 0.1f);
         for (k = 0; k < 4; ++k) {
             FastVecScale(&corner, radius, &D_L00_001AF940[k]);
             transform_vector(&quad.corners[k], &corner, billboard);
@@ -155,5 +155,5 @@ void func_L00_003B4198(Moby *moby)
         draw_world_quad(&quad, 0, 0);
         MeshDrawFourSigns(moby, fade);
     }
-    DrawJitterTrails();
+    jitter_trail_draw();
 }

@@ -14,11 +14,11 @@ extern unsigned char *D_L09_001FE6C0[];
 
 extern int D_L09_001B0F58 __attribute__((sda));
 
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
-extern int func_L09_003F72A8(unsigned char *);
+extern int trooper_legs_find_largest_value(unsigned char *);
 
-extern int func_L09_003F71C8(unsigned char *, int);
+extern int trooper_legs_count_with_value(unsigned char *, int);
 
 void func_PAL_L09_003FCF28(unsigned char *object) {
     unsigned char *source_data = *(unsigned char **)(object + 0x68);
@@ -51,16 +51,16 @@ void func_PAL_L09_003FCF28(unsigned char *object) {
         if (candidate == 0)
             break;
         candidate_data = *(unsigned char **)(candidate + 0x68);
-        distance = func_00282E80(candidate + 0x10, &position);
+        distance = vec_distance_xy(candidate + 0x10, &position);
         if (candidate_data == 0)
             continue;
         if ((candidate_data[0x302] & 1) == 0)
             continue;
         if (*(int *)(source_data + 0x420) != -1) {
-            group = func_L09_003F72A8(object) + 1;
+            group = trooper_legs_find_largest_value(object) + 1;
             if (group != *(int *)(candidate_data + 0x420))
                 continue;
-            if (func_L09_003F71C8(candidate, group) >= *(int *)(candidate_data + 0x42C))
+            if (trooper_legs_count_with_value(candidate, group) >= *(int *)(candidate_data + 0x42C))
                 continue;
         }
         if (*(int *)(source_data + 0x424) != 0 && *(int *)(source_data + 0x424) != *(int *)(candidate_data + 0x424))

@@ -7,13 +7,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 /* Sets the object's state to 4, then copies the 16-byte vector at A1 into its state at +0xB0. */
 /* Makes the platform piece start falling, pushed with the given speed. */
-void func_L02_003D01F0(char *self, char *velocity) {
+void platform_start_fall(char *self, char *velocity) {
     char *state = *(char **)(self + 0x68);
 
-    SetMobyState(self, 4, -1);
+    moby_set_state(self, 4, -1);
     *(TI128 *)(state + 0xB0) = *(TI128 *)velocity;
 }

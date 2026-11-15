@@ -7,21 +7,21 @@ extern float D_001AC240 __attribute__((sda));
 extern float D_001AC244 __attribute__((sda));
 extern float D_001AC248 __attribute__((sda));
 
-extern char *func_002ED688(char *);
-extern void func_002EE3B0(char *);
-extern void func_00282C88(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282C48(float);
-extern float func_00282DF0(void *);
+extern char *moby_get_motion_data(char *);
+extern void follower_load_tuning_for_state(char *);
+extern void vec_clear_128(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_fabs(float);
+extern float FastVecLength(void *);
 
 /* One step of a follower: it is pulled towards its target and kept at its ride
    height, with the speed clamped, then moved. */
 /* Moves a follower toward its target and keeps it at a good height, with a speed limit. */
-void func_002EE238(char *owner)
+void follower_move_toward_target(char *owner)
 {
-    char *vars = GetMobyMotionData(owner);
+    char *vars = moby_get_motion_data(owner);
     char *vel;
     char *pull;
     char *pos;
@@ -30,17 +30,17 @@ void func_002EE238(char *owner)
 
     if (vars == 0)
         return;
-    LoadFollowerTuningForState(owner);
+    follower_load_tuning_for_state(owner);
     vel = vars + 0xC0;
     pull = vars + 0x80;
     pos = vars + 0x90;
-    ClearVector128(vel);
+    vec_clear_128(vel);
     FastVecSub(pull, vars + 0x60, owner + 0x10);
     vec_scale_to_length(temp, pull, D_001AC240);
     FastVecAdd(vel, temp, vel);
     qcopy(temp, pos);
     heightErr = (*(float *)(vars + 0x124) - D_001AC248 * 0.5f) / D_001AC248;
-    scale = FloatAbs(heightErr);
+    scale = math_fabs(heightErr);
     if (scale < D_001AC240)
         scale = D_001AC240;
     if (D_001AC244 < scale)

@@ -2,12 +2,12 @@
 /* func_00329CB8 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 typedef int V4_Fc936841d __attribute__((mode(TI)));
 
-extern char *func_0029EFD0(int);
-extern float func_002A7878(float, float);
+extern char *CreateMoby(int);
+extern float math_random_float_range(float, float);
 extern void func_002A0F48(void *);
 
 /* Creates a small flying object (class 3032) at a given place, with a random spin. */
-char *func_00329CB8(int ownerId, void *position, void *velocity)
+char *part_spawn_flying_chunk_b(int ownerId, void *position, void *velocity)
 {
     char *moby = CreateMoby(0xBD8 /* moby class 3032 */);
     char *vars;
@@ -19,8 +19,8 @@ char *func_00329CB8(int ownerId, void *position, void *velocity)
         *(V4_Fc936841d *)(moby + 0x10) = *(V4_Fc936841d *)position;
         *(V4_Fc936841d *)vars = *(V4_Fc936841d *)velocity;
         *(int *)(vars + 0x10) = 0;
-        *(float *)(vars + 0x14) = RandomFloatRange(180.0f, 360.0f) * 0.00029088825f;
-        *(float *)(vars + 0x18) = RandomFloatRange(180.0f, 360.0f) * 0.00029088825f;
+        *(float *)(vars + 0x14) = math_random_float_range(180.0f, 360.0f) * 0.00029088825f;
+        *(float *)(vars + 0x18) = math_random_float_range(180.0f, 360.0f) * 0.00029088825f;
         *(unsigned char *)(moby + 0x20) = 0;
         fullValue = 0xFF;
         *(unsigned short *)(moby + 0x32) = fullValue;

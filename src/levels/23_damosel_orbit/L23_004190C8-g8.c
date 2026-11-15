@@ -32,39 +32,39 @@ typedef struct {
     u64 miss;
 } PickKeys;
 
-extern PickKeys D_L23_002595C8[];
+extern PickKeys g_path_end_masks[];
 
-extern float (*D_L23_001FF300[])[4];
+extern float (*g_path_lists[])[4];
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern int func_L23_00418F30(PickMoby *, u64, int *, int);
+extern int mothership_collect_masked_path_indices(PickMoby *, u64, int *, int);
 
-extern int func_L23_00418FD0(PickMoby *, int, short);
+extern int mothership_test_path_end_mask(PickMoby *, int, short);
 
-extern void func_L23_00419088();
+extern void mothership_push_path_history();
 
-extern int func_L23_00419CE0(u64);
+extern int mothership_is_single_rejected_bit(u64);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern float func_00282E48(float *, float *);
+extern float fast_vec_dist(float *, float *);
 
-extern float func_00282DB0(float *, float *);
+extern float FastVecDot(float *, float *);
 
-extern void func_00282DD8(float *, float *, float *);
+extern void FastVecCross(float *, float *, float *);
 
-extern void func_L00_00325600(void *, void *, void *);
+extern void vec_negate_and_forward(void *, void *, void *);
 
-extern void func_00282CF0(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
 
-extern void func_00282F20(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 /* Picks one of the targets whose bits are set in the mask: at random, or the one nearest,
    farthest or best aligned, and latches its side and result in the state. */
-void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
+void SelectMaskedEncounterTarget(PickMoby *moby, u64 mask, int mode, int check) {
     PickState *state = moby->state;
     int idx[4];
     float *pts[4];
@@ -85,7 +85,7 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
     int k;
     int best;
 
-    n = CollectMaskedPathIndices(moby, mask, idx, check);
+    n = mothership_collect_masked_path_indices(moby, mask, idx, check);
     if (n == 0) {
         state->dir *= -1;
         return;
@@ -94,28 +94,28 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
         int k;
         int v;
 
-        k = idx[RandomIntBelow(n)];
-        v = TestPathEndMask(moby, k, state->kind);
+        k = idx[math_random_int_below(n)];
+        v = mothership_test_path_end_mask(moby, k, state->kind);
 
         state->dir = v == 0 ? 1 : -1;
         state->res = v;
-        PushPathHistory(moby, k);
+        mothership_push_path_history(moby, k);
         return;
     }
     for (i = 0; i < n; i++) {
         int v;
         float (*e)[4];
         k = idx[i];
-        v = TestPathEndMask(moby, k, state->kind);
+        v = mothership_test_path_end_mask(moby, k, state->kind);
 
         res[i] = v;
-        e = gPathLists[state->group[k]];
+        e = g_path_lists[state->group[k]];
         if (v == 0) {
             pts[i] = e[*(int *)e];
-            keys[i] = &gPathEndMasks[state->group[k]].miss;
+            keys[i] = &g_path_end_masks[state->group[k]].miss;
         } else {
             pts[i] = e[1];
-            keys[i] = &gPathEndMasks[state->group[k]].hit;
+            keys[i] = &g_path_end_masks[state->group[k]].hit;
         }
     }
     best = 0;
@@ -129,7 +129,7 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
             float d;
 
             if (check != 0)
-                ok = IsSingleRejectedBit(*keys[j]);
+                ok = mothership_is_single_rejected_bit(*keys[j]);
             d = fast_vec_dist(pts[j], state->ref);
             if ((d < f && ok == 0) || n == 1) {
                 best = j;
@@ -147,8 +147,8 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
             float d;
 
             if (check != 0)
-                ok = IsSingleRejectedBit(*keys[j]);
-            FastVecSub(d1, (float *)gHeroPosition, moby->pos);
+                ok = mothership_is_single_rejected_bit(*keys[j]);
+            FastVecSub(d1, (float *)g_hero_position, moby->pos);
             FastVecSub(d2, pts[j], moby->pos);
             d = FastVecDot(d1, d2);
             if ((f < d && ok == 0) || n == 1) {
@@ -169,8 +169,8 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
                 float d;
 
                 if (check != 0)
-                    ok = IsSingleRejectedBit(*keys[j]);
-                FastVecSub(d1, (float *)gHeroPosition, moby->pos);
+                    ok = mothership_is_single_rejected_bit(*keys[j]);
+                FastVecSub(d1, (float *)g_hero_position, moby->pos);
                 FastVecSub(d2, pts[j], moby->pos);
                 d = FastVecDot(d1, d2);
                 if ((d < f && ok == 0) || n == 1) {
@@ -188,7 +188,7 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
                 float d;
 
                 if (check != 0)
-                    ok = IsSingleRejectedBit(*keys[j]);
+                    ok = mothership_is_single_rejected_bit(*keys[j]);
                 FastVecSub(d1, state->target, state->origin);
                 FastVecSub(d2, pts[j], state->origin);
                 vec_scale_to_length(n1, d1, 1.0f);
@@ -199,9 +199,9 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
                 qcopy(up2,&moby->up);
                 FastVecCross(c1, up1, a);
                 FastVecCross(c2, up2, b);
-                NegateAndForwardVector(a, state->frame, 0);
-                NegateAndForwardVector(b, state->frame, 0);
-                d = FloatAbs(FastVecDot(a, b) - lim);
+                vec_negate_and_forward(a, state->frame, 0);
+                vec_negate_and_forward(b, state->frame, 0);
+                d = math_fabs(FastVecDot(a, b) - lim);
                 if ((d < f && ok == 0) || n == 1) {
                     best = j;
                     f = d;
@@ -218,5 +218,5 @@ void func_L23_004190C8(PickMoby *moby, u64 mask, int mode, int check) {
         state->dir = -1;
     }
     state->res = res[best];
-    PushPathHistory(moby, k);
+    mothership_push_path_history(moby, k);
 }

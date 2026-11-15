@@ -19,54 +19,54 @@ typedef struct {
  u8 pad190[0x1ac]; u8 *ground; u8 pad340[0x1c70]; f32 stick_x, stick_y;
  u8 pad1FB8[0x2d8]; u8 *moby; s32 state; s32 pad2298, mode;
 } TurretHero;
-extern TurretHero D_00189E20 __attribute__((nosda));
-extern struct { u8 pad0[0x6c]; void *owner; u8 slots[0]; } D_00188660 __attribute__((nosda));
+extern TurretHero g_hero_state __attribute__((nosda));
+extern struct { u8 pad0[0x6c]; void *owner; u8 slots[0]; } g_sound_state __attribute__((nosda));
 extern s32 D_L11_001CAE40 __attribute__((nosda));
 extern s32 D_L11_001A7BA4[] __attribute__((sda));
 extern s32 D_L11_001A8FB4 SDATA(D_L11_001A8FB4);
 extern s32 D_L11_001A8FB4_block[] __asm__("D_L11_001A8FB4") __attribute__((sda));
-extern struct { u8 pad[0x1a0]; s32 held, pressed; } D_00138180 __attribute__((nosda));
+extern struct { u8 pad[0x1a0]; s32 held, pressed; } g_pad_state __attribute__((nosda));
 extern f32 D_L11_001B0C90 __attribute__((sda)), D_L11_001B0C94 __attribute__((sda));
 extern TurretVec D_L11_001B0CA0 SDATA(D_L11_001B0CA0);
 extern TurretBeam D_L11_001C8A40[];
 extern struct { u8 pad[0x160]; f32 unk160; s32 pad164, unk168, unk16C; f32 unk170; s32 pad174, unk178; } D_L11_001BA780;
-extern s32 func_00282978(void *);
-extern void func_0029FCC0(void *, s32, void *);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282A88(void *, s32);
-extern void func_003355A8(s32);
-extern s32 func_L11_002D8EF8(s32, s32);
-extern void func_002A7470(void *, s32, s32, s32);
-extern void func_00335438(void *, void *, s32, s32, s32);
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283BE0(f32, f32);
-extern f32 func_00283248(f32, f32);
-extern void func_00283098(void *, void *, void *);
-extern s32 func_L00_002FCF18(void *, f32, f32, f32, f32, f32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_00291450(s32);
-extern f32 func_00282E20(void *);
-extern void func_00282D90(void *, void *, f32);
-extern void func_002E59F8(s32);
-extern void func_002AEC48(void *, void *, s32, f32, f32);
-extern f32 func_0029F530(void *);
-extern f32 func_00282C48(f32);
-extern void func_002AF000(void *, f32, f32, f32);
-extern void func_L11_00450328(void *, void *, void *, s32, f32);
-extern f32 func_002A7878(f32, f32);
-extern f32 func_00282DF0(void *);
-extern void func_00282F20(void *, void *, f32);
-extern s32 func_002A7820(s32, s32);
-extern void func_L04_00358AE8(void *, void *, s32, s32, f32);
+extern s32 FastDecTimer(void *);
+extern void moby_transform_joint_to_world(void *, s32, void *);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void mem_fast_helper_b(void *, s32);
+extern void cam_set_mode_state(s32);
+extern s32 hero_l11_enter_state(s32, s32);
+extern void anim_start_blended(void *, s32, s32, s32);
+extern void SetCamera5Pose(void *, void *, s32, s32, s32);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 vec_distance_xy(void *, void *);
+extern f32 FastAddRotations(f32, f32);
+extern f32 fast_subtract_rotations(f32, f32);
+extern f32 mat_fast_helper_a(f32, f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern s32 part_l00_alloc_effect_slot_2(void *, f32, f32, f32, f32, f32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void gfx_free_point_light(s32);
+extern f32 vec_length_xy(void *);
+extern void divide_vector_xyz(void *, void *, f32);
+extern void snd_stop_voice(s32);
+extern void moby_update_eased_node(void *, void *, s32, f32, f32);
+extern f32 moby_get_anim_value(void *);
+extern f32 math_fabs(f32);
+extern void vec_build_spherical_offset(void *, f32, f32, f32);
+extern void robot_spawn_debris(void *, void *, void *, s32, f32);
+extern f32 math_random_float_range(f32, f32);
+extern f32 FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern s32 math_random_int_range(s32, s32);
+extern void part_spawn_velocity_particle(void *, void *, s32, s32, f32);
 extern void func_002A0F48(void *);
-extern void func_L11_004885A0(void);
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern void func_00273318(void *, s32, s32, s32, s32, s32, f32, f32, f32);
+extern void overlay_set_shared_flag(void);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern void hud_add_moby_marker(void *, s32, s32, s32, s32, s32, f32, f32, f32);
 
 typedef struct {
  u8 pad0[0x10]; f32 pos[4]; u8 state; u8 pad21[0x13]; u16 flags;
@@ -76,7 +76,7 @@ typedef struct {
 } TurretMoby;
 
 /* Updates a turret the hero can climb into. While mounted it follows the hero's stick to turn and tilt the gun, fires shots with a beam, and lets the hero climb out again. */
-void func_L11_00411D40(TurretMoby *moby) {
+void TurretUpdate(TurretMoby *moby) {
     TurretVec seat;
     TurretVec offset;
     TurretVec tmp;
@@ -96,46 +96,46 @@ void func_L11_00411D40(TurretMoby *moby) {
     vars = (TurretVars *)moby->pvars;
     if (D_L11_001CAE40 || moby->state == 6) return;
     moby->flags &= ~4;
-    TransformMobyJointToWorld(moby, 3, &seat);
+    moby_transform_joint_to_world(moby, 3, &seat);
     seat.f[2] += 0.4f;
     if (moby->state >= 4) {
         if (FastDecTimer(&vars->mount_delay) != 0 && moby->command == 1 &&
-            gHeroState.mode != 0x14 && gHeroState.mode != 7 && gHeroState.state != 0x39 && D_L11_001A8FB4 == 0) {
-            qcopy_nc(&gHeroState.pos, &seat);
-            qcopy_nc(&gHeroState.rot, moby->rot);
-            offset.f[0] = FastSinOrCosA(gHeroState.rot.f[2]) * -0.4f;
-            offset.f[1] = FastSinOrCosB(gHeroState.rot.f[2]) * -0.4f;
+            g_hero_state.mode != 0x14 && g_hero_state.mode != 7 && g_hero_state.state != 0x39 && D_L11_001A8FB4 == 0) {
+            qcopy_nc(&g_hero_state.pos, &seat);
+            qcopy_nc(&g_hero_state.rot, moby->rot);
+            offset.f[0] = math_fast_sin_or_cos_a(g_hero_state.rot.f[2]) * -0.4f;
+            offset.f[1] = math_fast_sin_or_cos_b(g_hero_state.rot.f[2]) * -0.4f;
             offset.f[2] = 0.0f;
-            FastVecAdd(&gHeroState.pos, &gHeroState.pos, &offset);
-            FastMemoryHelperB(&gHeroState.velocity, 0xA0);
-            if (gPadState.pressed & 0x10) {
-                SetCameraModeState(0);
-                EnterHeroState_L11(0, 1);
+            FastVecAdd(&g_hero_state.pos, &g_hero_state.pos, &offset);
+            mem_fast_helper_b(&g_hero_state.velocity, 0xA0);
+            if (g_pad_state.pressed & 0x10) {
+                cam_set_mode_state(0);
+                hero_l11_enter_state(0, 1);
                 moby->command = 2;
                 moby->state = 4;
                 moby->speed = 1.0f;
-                StartAnimationBlended(moby, 0, 0, 1);
+                anim_start_blended(moby, 0, 0, 1);
             } else {
                 if (moby->state != 5) {
                     vars->dismount_delay = 2;
-                    SetCamera5Pose(gHeroState.moby + 0x10, gHeroState.moby + 0xf0, 0, 0, 0);
+                    SetCamera5Pose(g_hero_state.moby + 0x10, g_hero_state.moby + 0xf0, 0, 0, 0);
                     if (moby->prev_seq != 4) {
-                        StartAnimationBlended(moby, 4, 0, 5);
+                        anim_start_blended(moby, 4, 0, 5);
                     }
                 }
                 moby->state = 5;
                 moby->speed = 2.0f;
             }
         } else if (moby->command == 2) {
-            if (fast_vec_dist(&seat, gHeroState.moby + 0x10) > 1.2f || gHeroState.ground != moby) {
+            if (fast_vec_dist(&seat, g_hero_state.moby + 0x10) > 1.2f || g_hero_state.ground != moby) {
                 moby->command = 0;
                 vars->mount_delay = 60;
             }
-        } else if (gHeroState.mode != 0x14 && gHeroState.mode != 7 &&
-                   gHeroState.state != 0x39 && gHeroState.ground == moby &&
-                   fast_vec_dist(&seat, gHeroState.moby + 0x10) < 1.2f && vars->mount_delay == 0 && D_L11_001A8FB4_block[0] == 0) {
+        } else if (g_hero_state.mode != 0x14 && g_hero_state.mode != 7 &&
+                   g_hero_state.state != 0x39 && g_hero_state.ground == moby &&
+                   fast_vec_dist(&seat, g_hero_state.moby + 0x10) < 1.2f && vars->mount_delay == 0 && D_L11_001A8FB4_block[0] == 0) {
             moby->command = 1;
-            EnterHeroState_L11(0x31, 1);
+            hero_l11_enter_state(0x31, 1);
         }
     }
     switch (moby->state) {
@@ -149,15 +149,15 @@ void func_L11_00411D40(TurretMoby *moby) {
         vars->unk48 = 0;
         vars->unk4C = 0;
         vars->unk40 = 0;
-        gSoundState.owner = moby;
+        g_sound_state.owner = moby;
         return;
     case 4:
-        if (vec_distance_xy(moby->pos, &gHeroState.pos) < 4.0f) {
+        if (vec_distance_xy(moby->pos, &g_hero_state.pos) < 4.0f) {
             moby->pos[2] += ((vars->rest_z - 1.0f) - moby->pos[2]) * 0.11f;
-            if (gHeroState.ground != moby) {
+            if (g_hero_state.ground != moby) {
                 yaw = FastAddRotations(vars->yaw_speed,
                 FastAddRotations(fast_subtract_rotations(
-                    FastMatrixHelperA(gHeroState.pos.f[0] - moby->pos[0], gHeroState.pos.f[1] - moby->pos[1]),
+                    mat_fast_helper_a(g_hero_state.pos.f[0] - moby->pos[0], g_hero_state.pos.f[1] - moby->pos[1]),
                     moby->rot[2]), 3.14159298f) * 0.01f) * 0.9f;
                 vars->yaw_speed = yaw;
                 moby->rot[2] = FastAddRotations(moby->rot[2], yaw);
@@ -166,7 +166,7 @@ void func_L11_00411D40(TurretMoby *moby) {
             FastVecAdd(&tmp, &tmp, &seat);
             if (vars->beam == -1) {
                 vars->beam_frames = 0;
-                vars->beam = AllocateEffectSlot_L00_2(&tmp, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
+                vars->beam = part_l00_alloc_effect_slot_2(&tmp, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
                 PlayMobySound(2, 0, moby);
             } else {
                 beam = &D_L11_001C8A40[vars->beam];
@@ -190,24 +190,24 @@ void func_L11_00411D40(TurretMoby *moby) {
             } else {
                 moby->pos[2] = vars->rest_z;
             }
-            if (gHeroState.ground != moby && vars->beam != -1) {
+            if (g_hero_state.ground != moby && vars->beam != -1) {
                 PlayMobySound(0, 0, moby);
-                FreePointLight(vars->beam);
+                gfx_free_point_light(vars->beam);
                 vars->beam = -1;
             }
         }
         break;
     case 5:
-        gSoundState.owner = moby;
+        g_sound_state.owner = moby;
         if (moby->pos[2] < vars->rest_z) {
             moby->pos[2] += 0.016666668f;
         } else {
             moby->pos[2] = vars->rest_z;
         }
-        tmp.f[0] = gHeroState.stick_x;
+        tmp.f[0] = g_hero_state.stick_x;
         invert = -1;
         if (D_L11_001A7BA4[0]) invert = 1;
-        stick_y = -gHeroState.stick_y * invert;
+        stick_y = -g_hero_state.stick_y * invert;
         tmp.f[1] = stick_y;
         len = vec_length_xy(&tmp);
         if (len > 1.0f) {
@@ -216,14 +216,14 @@ void func_L11_00411D40(TurretMoby *moby) {
         vars->yaw_speed += -tmp.f[0] * 0.0008726647356525064f;
         if (tmp.f[0] == 0.0f) vars->yaw_speed = 0.0f;
         if (vars->yaw_speed != 0.0f) {
-            u8 *slot = (u8 *)&gSoundState + vars->sound * 0x70;
+            u8 *slot = (u8 *)&g_sound_state + vars->sound * 0x70;
             if (*(u8 **)(slot + 0x88) != moby || !slot[0x74])
                 vars->sound = PlayMobySound(3, 4, moby);
         } else {
             if (vars->sound != -1) {
-                u8 *slot = (u8 *)&gSoundState + vars->sound * 0x70;
+                u8 *slot = (u8 *)&g_sound_state + vars->sound * 0x70;
                 if (*(u8 **)(slot + 0x88) == moby && slot[0x74])
-                    StopSoundVoice(vars->sound);
+                    snd_stop_voice(vars->sound);
             }
             vars->sound = -1;
         }
@@ -241,15 +241,15 @@ void func_L11_00411D40(TurretMoby *moby) {
         vars->yaw_speed *= 0.97f;
         vars->pitch_speed *= 0.97f;
         vars->aim[1] = -vars->pitch;
-        UpdateEasedNode(moby, vars->matrix, 2, 0.03f, 0.3f);
-        if (gPadState.held & 0x20) {
-            if (gPadState.pressed & 0x20) {
-                StartAnimationBlended(moby, vars->barrel == 0 ? 3 : 2, 0, 1);
+        moby_update_eased_node(moby, vars->matrix, 2, 0.03f, 0.3f);
+        if (g_pad_state.held & 0x20) {
+            if (g_pad_state.pressed & 0x20) {
+                anim_start_blended(moby, vars->barrel == 0 ? 3 : 2, 0, 1);
             } else if (moby->seq == 2) {
-                if (FloatAbs(GetMobyAnimationValue(moby) - 1.0f) <= 0.25f) {
-                    BuildSphericalOffset(&shot, 1.0f, moby->rot[2], vars->pitch);
-                    TransformMobyJointToWorld(moby, 0, &muzzle);
-                    SpawnRobotDebrisMoby(moby, &shot, &muzzle, 0, 6.0f);
+                if (math_fabs(moby_get_anim_value(moby) - 1.0f) <= 0.25f) {
+                    vec_build_spherical_offset(&shot, 1.0f, moby->rot[2], vars->pitch);
+                    moby_transform_joint_to_world(moby, 0, &muzzle);
+                    robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
                     PlayMobySound(1, 0, moby);
                     D_L11_001BA780.unk160 = 0.03f;
                     D_L11_001BA780.unk168 = 10;
@@ -259,25 +259,25 @@ void func_L11_00411D40(TurretMoby *moby) {
                     vars->barrel = 0;
                     for (i = 0; i < 5; i++) {
                         rnd.q = 0;
-                        rnd.f[0] = RandomFloatRange(-1.0f, 1.0f);
-                        rnd.f[1] = RandomFloatRange(-1.0f, 1.0f);
-                        rnd.f[2] = RandomFloatRange(-1.0f, 1.0f);
+                        rnd.f[0] = math_random_float_range(-1.0f, 1.0f);
+                        rnd.f[1] = math_random_float_range(-1.0f, 1.0f);
+                        rnd.f[2] = math_random_float_range(-1.0f, 1.0f);
                         dir.q = rnd.q;
                         vec_scale_to_length(&dir, &dir, FastVecLength(&shot) * 0.65f);
                         FastVecAdd(&dir, &shot, &dir);
-                        vec_scale_to_length(&dir, &dir, RandomFloatRange(0.050000004f, 0.10000001f));
-                        SpawnVelocityParticle(&muzzle, &dir, 0x5F2F4F6F, RandomIntRange(5, 10), 50000.0f);
+                        vec_scale_to_length(&dir, &dir, math_random_float_range(0.050000004f, 0.10000001f));
+                        part_spawn_velocity_particle(&muzzle, &dir, 0x5F2F4F6F, math_random_int_range(5, 10), 50000.0f);
                     }
                     vec_scale_to_length(&shot, &shot, 0.008333334f);
-                    SpawnVelocityParticle(&muzzle, &shot, 0x2F4F7F7F, RandomIntRange(4, 7), 500000.0f);
+                    part_spawn_velocity_particle(&muzzle, &shot, 0x2F4F7F7F, math_random_int_range(4, 7), 500000.0f);
                 } else if (moby->anim_flags & 2) {
-                    StartAnimationBlended(moby, 3, 0, 1);
+                    anim_start_blended(moby, 3, 0, 1);
                 }
             } else if (moby->seq == 3) {
-                if (FloatAbs(GetMobyAnimationValue(moby) - 1.0f) <= 0.25f) {
-                    BuildSphericalOffset(&shot, 1.0f, moby->rot[2], vars->pitch);
-                    TransformMobyJointToWorld(moby, 1, &muzzle);
-                    SpawnRobotDebrisMoby(moby, &shot, &muzzle, 0, 6.0f);
+                if (math_fabs(moby_get_anim_value(moby) - 1.0f) <= 0.25f) {
+                    vec_build_spherical_offset(&shot, 1.0f, moby->rot[2], vars->pitch);
+                    moby_transform_joint_to_world(moby, 1, &muzzle);
+                    robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
                     PlayMobySound(1, 0, moby);
                     D_L11_001BA780.unk160 = 0.03f;
                     D_L11_001BA780.unk168 = 10;
@@ -287,39 +287,39 @@ void func_L11_00411D40(TurretMoby *moby) {
                     vars->barrel = 1;
                     for (i = 0; i < 5; i++) {
                         rnd.q = 0;
-                        rnd.f[0] = RandomFloatRange(-1.0f, 1.0f);
-                        rnd.f[1] = RandomFloatRange(-1.0f, 1.0f);
-                        rnd.f[2] = RandomFloatRange(-1.0f, 1.0f);
+                        rnd.f[0] = math_random_float_range(-1.0f, 1.0f);
+                        rnd.f[1] = math_random_float_range(-1.0f, 1.0f);
+                        rnd.f[2] = math_random_float_range(-1.0f, 1.0f);
                         dir.q = rnd.q;
                         vec_scale_to_length(&dir, &dir, FastVecLength(&shot) * 0.65f);
                         FastVecAdd(&dir, &shot, &dir);
-                        vec_scale_to_length(&dir, &dir, RandomFloatRange(0.050000004f, 0.10000001f));
-                        SpawnVelocityParticle(&muzzle, &dir, 0x5F2F4F6F, RandomIntRange(5, 10), 50000.0f);
+                        vec_scale_to_length(&dir, &dir, math_random_float_range(0.050000004f, 0.10000001f));
+                        part_spawn_velocity_particle(&muzzle, &dir, 0x5F2F4F6F, math_random_int_range(5, 10), 50000.0f);
                     }
                     vec_scale_to_length(&shot, &shot, 0.008333334f);
-                    SpawnVelocityParticle(&muzzle, &shot, 0x2F4F7F7F, RandomIntRange(4, 7), 500000.0f);
+                    part_spawn_velocity_particle(&muzzle, &shot, 0x2F4F7F7F, math_random_int_range(4, 7), 500000.0f);
                 } else if (moby->anim_flags & 2) {
-                    StartAnimationBlended(moby, 2, 0, 1);
+                    anim_start_blended(moby, 2, 0, 1);
                 }
             }
         } else if (moby->prev_seq != 4 && (moby->anim_flags & 2)) {
-            StartAnimationBlended(moby, 4, 0, 1);
+            anim_start_blended(moby, 4, 0, 1);
         }
         if (FastDecTimer(&vars->dismount_delay) != 0) {
             func_002A0F48(moby);
             moby->flags |= 4;
-            SetSharedOverlayFlag();
-            TransformMobyJointToWorld(moby, 2, &tmp);
-            BuildSphericalOffset(&shot, D_L11_001B0C90, moby->rot[2], vars->pitch);
+            overlay_set_shared_flag();
+            moby_transform_joint_to_world(moby, 2, &tmp);
+            vec_build_spherical_offset(&shot, D_L11_001B0C90, moby->rot[2], vars->pitch);
             shot.f[2] += D_L11_001B0C94;
             FastVecAdd(&muzzle, &tmp, &shot);
-            CopyVectorToSelectedObject(&muzzle);
+            object_copy_vector_to_selected(&muzzle);
             dir.f[0] = 0.0f;
             dir.f[1] = -vars->pitch;
             dir.f[2] = moby->rot[2];
-            SetCameraStateRotation(&dir);
+            cam_set_state_rotation(&dir);
         }
-        AddMobyMarker(moby, 0xFF0F0FFF, 0, 0xD, -1, 4, 1.0f, 0.0f, 90.0f);
+        hud_add_moby_marker(moby, 0xFF0F0FFF, 0, 0xD, -1, 4, 1.0f, 0.0f, 90.0f);
         break;
     }
 }

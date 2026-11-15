@@ -7,45 +7,45 @@ typedef int Quad __attribute__((mode(TI)));
 #define S(p, o) (*(short *)((p) + (o)))
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
-extern char D_0018A0E0[], D_00189EA0[];
-extern int D_0018C0B0 __attribute__((nosda));
-extern int D_L02_001B30C8;
+extern char D_0018A0E0[], g_hero_position[];
+extern int g_hero_moby __attribute__((nosda));
+extern int g_frame_l02_counter;
 extern float D_L02_001B00F8 __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
 extern volatile float D_L02_001B00FC MACRO_ADDR;
-extern void func_L02_003CE4D0(void *);
-extern void func_L02_003CEA28(void *);
-extern void func_L02_003CE908(void *);
-extern void func_L02_003CEE40(void *);
-extern void func_L02_003CEC70(void *);
-extern void func_L02_003CF1B8(void *);
-extern int func_002B3890(void *);
-extern int func_002B3868(void *);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern int func_00282978(void *);
-extern int func_002B1C20(void *, void *);
-extern int func_L02_003CE8B0(void *, void *, int);
-extern int func_L02_0032E390(void *, int, int);
+extern void enemy_init(void *);
+extern void moby_l02_explode_and_remove(void *);
+extern void moby_reset_turn_place(void *);
+extern void chickenbot_update_group_pulse_color(void *);
+extern void turret_clamp_aim_yaw_pitch(void *);
+extern void part_spawn_two_puffs(void *);
+extern int flag_set_second_pending(void *);
+extern int flag_set_first_pending(void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern int FastDecTimer(void *);
+extern int moby_dispatch_action_by_kind(void *, void *);
+extern int moby_run_entry_hook_by_mode(void *, void *, int);
+extern int moby_count_group_side_from_object(void *, int, int);
 extern int func_US2_002AF9C8(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L02_0032EF10(void *, void *, void *, int, float);
-extern int func_L01_00322288(void *, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002A8D70(void *, int, int, int, int, int, float, float, float);
-extern int func_L02_00332630(char *, void *);
-extern int func_002A8C28(void *, float, float *, int, float, float, int, int, int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastVecDot(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern int path_clamp_move_to_area(void *, void *, void *, int, float);
+extern int moby_start_effect_from_entry(void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
+extern int moby_check_target_point_from_offset(char *, void *);
+extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 
 void func_US2_L02_003CEEC8(char *o)
 {
@@ -54,73 +54,73 @@ void func_US2_L02_003CEEC8(char *o)
     int r;
     Quad temp;
 
-    func_L02_003CE4D0(o);
+    enemy_init(o);
     switch (U8(o, 0x95)) {
     case 0:
-        if (func_002B3890(o)) {
-            func_002B60B0(o, 0.005f, 0.06666667f, 0.006981317885220051f,
+        if (flag_set_second_pending(o)) {
+            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.006981317885220051f,
                          0.41887909173965454f);
             F(p, 0x1D0) = 0.06666667f;
             F(p, 0x124) = 0.006666666828095913f;
             F(p, 0x134) = 0.5f;
-            S(p, 0x33A) = func_002A7820(0, 30);
+            S(p, 0x33A) = math_random_int_range(0, 30);
         }
         if (S(p, 0x314) == 1) {
-            if (func_00282978(p + 0x33A)) {
-                if (func_002A77E0(3))
-                    func_002A7750(o, 9, 2);
+            if (FastDecTimer(p + 0x33A)) {
+                if (math_random_int_below(3))
+                    moby_set_state(o, 9, 2);
                 else
-                    func_002A7750(o, 8, 2);
+                    moby_set_state(o, 8, 2);
                 break;
             }
         }
         if (S(p, 0x316)) {
-            if (func_002A77E0(2))
-                func_002A7750(o, 7, 1);
+            if (math_random_int_below(2))
+                moby_set_state(o, 7, 1);
             else
-                func_002A7750(o, 6, 1);
+                moby_set_state(o, 6, 1);
             S(p, 0x316) = 0;
             if (S(p, 0x310) < 300)
-                S(p, 0x310) = func_002A7820(480, 600);
+                S(p, 0x310) = math_random_int_range(480, 600);
         }
         break;
     case 1:
-        if (func_002B3890(o)) {
-            func_002B60B0(o, 0.005f, 0.06666667f, 0.01745329424738884f,
+        if (flag_set_second_pending(o)) {
+            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.01745329424738884f,
                          1.047197699546814f);
             F(p, 0x1D0) = 0.06666667f;
             F(p, 0x134) = 0.05f;
         }
         if (S(p, 0x314) == 1) {
-            func_002A7750(o, 9, 2);
+            moby_set_state(o, 9, 2);
         } else if (S(p, 0x310) == 0)
-            func_002A7750(o, 1, 0);
+            moby_set_state(o, 1, 0);
         break;
     case 2:
-        if (func_002B3890(o)) {
-            func_002B60B0(o, 0.005f, 0.06666667f, 0.01745329424738884f,
+        if (flag_set_second_pending(o)) {
+            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.01745329424738884f,
                          1.047197699546814f);
             F(p, 0x1D0) = 0.06666667f;
             F(p, 0x124) = 0.006666666828095913f;
             F(p, 0x134) = 0.05f;
-            S(p, 0x33A) = func_002A7820(0, 30);
+            S(p, 0x33A) = math_random_int_range(0, 30);
         }
-        if (S(p, 0x314) != 1 && func_00282978(p + 0x33A)) {
-            func_002A7750(o, 3, 1);
-            S(p, 0x310) = func_002A7820(580, 600);
+        if (S(p, 0x314) != 1 && FastDecTimer(p + 0x33A)) {
+            moby_set_state(o, 3, 1);
+            S(p, 0x310) = math_random_int_range(580, 600);
         }
         break;
     case 3: {
         unsigned int flags;
-        flags = func_002B1C20(o, p + 0x50);
+        flags = moby_dispatch_action_by_kind(o, p + 0x50);
         if (flags & 1)
-            func_L02_003CEA28(o);
+            moby_l02_explode_and_remove(o);
         else if (flags & 2) {
             if (S(p, 0x314) == 1)
-                func_002A7750(o, 9, 2);
+                moby_set_state(o, 9, 2);
             else {
-                func_002A7750(o, 3, 1);
-                S(p, 0x310) = func_002A7820(580, 600);
+                moby_set_state(o, 3, 1);
+                S(p, 0x310) = math_random_int_range(580, 600);
             }
         }
         break;
@@ -129,160 +129,160 @@ void func_US2_L02_003CEEC8(char *o)
     switch (U8(o, 0x20)) {
     case 1:
         if (U8(o, 0x31)) {
-            if (func_002B3868(o)) {
-                r = !func_002A77E0(4);
+            if (flag_set_first_pending(o)) {
+                r = !math_random_int_below(4);
                 if (U8(o, 0x43) != r)
-                    func_002A7470(o, r, 0, 10);
-                S(p, 0x312) = func_002A7820(60, 120);
+                    anim_start_blended(o, r, 0, 10);
+                S(p, 0x312) = math_random_int_range(60, 120);
             }
             if (U8(o, 0x43) == 1) {
                 if (U8(o, 0x60) & 2)
-                    func_002A7470(o, 0, 0, 20);
+                    anim_start_blended(o, 0, 0, 20);
             } else if (!S(p, 0x312) &&
-                       (!S(p, 0x338) || func_00282DB0(p + 0x300, D_0018A0E0) > 0.8f))
-                func_002A7750(o, 2, -1);
+                       (!S(p, 0x338) || FastVecDot(p + 0x300, D_0018A0E0) > 0.8f))
+                moby_set_state(o, 2, -1);
         }
         break;
     case 2:
-        if (func_002B3868(o)) {
+        if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_002A7470(o, 6, 0, 20);
-            angle = func_002A7940();
-            speed = func_002A7878(2, 5);
-            F(p, 0x2F0) = func_00283180(angle) * speed;
-            F(p, 0x2F4) = func_00283198(angle) * speed;
+                anim_start_blended(o, 6, 0, 20);
+            angle = math_random_angle();
+            speed = math_random_float_range(2, 5);
+            F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
+            F(p, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
             F(p, 0x2F8) = 0;
-            func_00282CC0(p + 0x2F0, p + 0x2F0, p + 0x2E0);
+            FastVecAdd(p + 0x2F0, p + 0x2F0, p + 0x2E0);
             if (I(p, 0x218) != -1) {
                 temp = *(Quad *)(p + 0x2E0);
-                func_L02_0032EF10(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
+                path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
             }
         }
-        func_L02_003CE8B0(o, p + 0x2F0, 0);
+        moby_run_entry_hook_by_mode(o, p + 0x2F0, 0);
         if (U16(o, 0x96) > 30 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 180))
-            func_002A7750(o, 1, -1);
+            moby_set_state(o, 1, -1);
         break;
     case 3:
-        if (func_002B3868(o) && U8(o, 0x43) != func_002A77E0(2) + 4)
-            func_002A7470(o, func_002A77E0(2) + 4, 0, 10);
-        if (func_00282E48(o + 0x10, D_00189EA0) < D_L02_001B00F8_abs)
-            func_002A7750(o, 4, -1);
+        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 4)
+            anim_start_blended(o, math_random_int_below(2) + 4, 0, 10);
+        if (fast_vec_dist(o + 0x10, g_hero_position) < D_L02_001B00F8_abs)
+            moby_set_state(o, 4, -1);
         else if (U8(o, 0x60) & 2) {
-            switch (func_002A77E0(3)) {
+            switch (math_random_int_below(3)) {
             case 0:
-                func_002A7750(o, 6, -1);
+                moby_set_state(o, 6, -1);
                 break;
             case 1:
-                func_002A7750(o, 7, -1);
+                moby_set_state(o, 7, -1);
                 break;
             case 2:
-                func_002A7750(o, 5, -1);
+                moby_set_state(o, 5, -1);
                 break;
             }
         }
         break;
     case 6:
-        if (func_002B3868(o) && U8(o, 0x43) != func_002A77E0(2) + 2)
-            func_002A7470(o, func_002A77E0(2) + 2, 0, 10);
-        func_L02_00332630(o, p + 0x1F0);
+        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
+            anim_start_blended(o, math_random_int_below(2) + 2, 0, 10);
+        moby_check_target_point_from_offset(o, p + 0x1F0);
         if (U8(o, 0x60) & 2)
-            func_002A7750(o, 3, -1);
+            moby_set_state(o, 3, -1);
         break;
     case 7:
-        if (func_002B3868(o) && U8(o, 0x43) != 12)
-            func_002A7470(o, 12, 0, 10);
-        func_L02_00332630(o, p + 0x1F0);
+        if (flag_set_first_pending(o) && U8(o, 0x43) != 12)
+            anim_start_blended(o, 12, 0, 10);
+        moby_check_target_point_from_offset(o, p + 0x1F0);
         if (U8(o, 0x60) & 2)
-            func_002A7750(o, 3, -1);
+            moby_set_state(o, 3, -1);
         break;
     case 4:
-        if (func_002B3868(o)) {
+        if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_002A7470(o, 6, 0, 10);
+                anim_start_blended(o, 6, 0, 10);
             {
                 float upper = D_L02_001B00FC;
-                F(p, 0x334) = func_002A7878(D_L02_001B00F8, upper) + 0.5f;
+                F(p, 0x334) = math_random_float_range(D_L02_001B00F8, upper) + 0.5f;
             }
         }
-        if ((func_L02_003CE8B0(o, p + 0x2E0, 0) & 0x80) ||
-            func_00282E80(o + 0x10, D_00189EA0) > F(p, 0x334)) {
-            if (func_002A77E0(2))
-                func_002A7750(o, 6, -1);
+        if ((moby_run_entry_hook_by_mode(o, p + 0x2E0, 0) & 0x80) ||
+            vec_distance_xy(o + 0x10, g_hero_position) > F(p, 0x334)) {
+            if (math_random_int_below(2))
+                moby_set_state(o, 6, -1);
             else
-                func_002A7750(o, 7, -1);
+                moby_set_state(o, 7, -1);
         }
         break;
     case 5:
-        if (func_002B3868(o)) {
+        if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_002A7470(o, 6, 0, 20);
-            angle = func_002A7940();
-            speed = func_002A7878(2, 5);
-            F(p, 0x2F0) = func_00283180(angle) * speed;
-            F(p, 0x2F4) = func_00283198(angle) * speed;
+                anim_start_blended(o, 6, 0, 20);
+            angle = math_random_angle();
+            speed = math_random_float_range(2, 5);
+            F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
+            F(p, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
             F(p, 0x2F8) = 0;
-            func_00282CC0(p + 0x2F0, p + 0x2F0, p + 0x2E0);
+            FastVecAdd(p + 0x2F0, p + 0x2F0, p + 0x2E0);
             if (I(p, 0x218) != -1) {
                 temp = *(Quad *)(p + 0x2E0);
-                func_L02_0032EF10(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
+                path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
             }
         }
-        func_L02_003CE8B0(o, p + 0x2F0, 0);
+        moby_run_entry_hook_by_mode(o, p + 0x2F0, 0);
         if (U16(o, 0x96) > 30 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 180))
-            func_002A7750(o, 3, -1);
+            moby_set_state(o, 3, -1);
         break;
     case 8:
-        if (func_002B3868(o) && U8(o, 0x43) != func_002A77E0(2) + 2)
-            func_002A7470(o, func_002A77E0(2) + 2, 0, 10);
+        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
+            anim_start_blended(o, math_random_int_below(2) + 2, 0, 10);
         if (U8(o, 0x60) & 2)
-            func_002A7750(o, 9, -1);
+            moby_set_state(o, 9, -1);
         break;
     case 9:
-        if (func_002B3868(o) && U8(o, 0x43) != 6)
-            func_002A7470(o, 6, 0, 5);
+        if (flag_set_first_pending(o) && U8(o, 0x43) != 6)
+            anim_start_blended(o, 6, 0, 5);
         if (!(U16(o, 0x96) & 3))
-            F(p, 0x31C) = func_L02_0032E390(o, D_0018C0B0, -1) * 0.087266475f;
-        func_L02_003CE8B0(o, p + 0x1F0, 1);
-        func_L02_003CEC70(o);
+            F(p, 0x31C) = moby_count_group_side_from_object(o, g_hero_moby, -1) * 0.087266475f;
+        moby_run_entry_hook_by_mode(o, p + 0x1F0, 1);
+        turret_clamp_aim_yaw_pitch(o);
         if (F(p, 0x1CC) <= 1.25f)
-            func_002A7750(o, 10, -1);
+            moby_set_state(o, 10, -1);
         break;
     case 10:
-        if (func_002B3868(o)) {
-            F(p, 0x320) = func_00283248(F(p, 0x1F0) - F(o, 0x10),
+        if (flag_set_first_pending(o)) {
+            F(p, 0x320) = mat_fast_helper_a(F(p, 0x1F0) - F(o, 0x10),
                                        F(p, 0x1F4) - F(o, 0x14));
             if (U8(o, 0x43) != 8)
-                func_002A7470(o, 8, 2, 10);
+                anim_start_blended(o, 8, 2, 10);
         }
-        func_L01_00322288(o, F(p, 0x320));
+        moby_start_effect_from_entry(o, F(p, 0x320));
         if (func_US2_002AF9C8(o, 13))
-            func_002A8D70(o, 1, 0x4000001, 0, 1, 0, 0.75f, U8(p, 0x34), 1);
+            coll_test_hit_at_bone(o, 1, 0x4000001, 0, 1, 0, 0.75f, U8(p, 0x34), 1);
         if (U8(o, 0x60) & 2)
-            func_002A7750(o, 9, -1);
+            moby_set_state(o, 9, -1);
         break;
     case 14:
-        if (func_002B3868(o)) {
+        if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 10)
-                func_002A7470(o, 10, 0, 5);
-            I(p, 0x1BC) = D_L02_001B30C8;
+                anim_start_blended(o, 10, 0, 5);
+            I(p, 0x1BC) = g_frame_l02_counter;
         }
-        func_00282F20(&temp, p + 0x1A0, 1);
-        func_L02_003CE8B0(o, &temp, 0);
-        func_L02_003CF1B8(o);
-        func_002A8C28(o, 0.6f, (float *)(o + 0x10), 0x4000000, 1, 1, 0, 1, 0);
+        vec_scale_to_length(&temp, p + 0x1A0, 1);
+        moby_run_entry_hook_by_mode(o, &temp, 0);
+        part_spawn_two_puffs(o);
+        coll_sweep_from_object(o, 0.6f, (float *)(o + 0x10), 0x4000000, 1, 1, 0, 1, 0);
         if (F(p, 0x190) >= F(o, 0x18)) {
             if (S(p, 0x314) == 1)
-                func_002A7750(o, 8, 2);
+                moby_set_state(o, 8, 2);
             else
-                func_002A7750(o, 2, 0);
+                moby_set_state(o, 2, 0);
             I(p, 0x138) &= -18;
         }
         break;
     case 12:
-        func_L02_003CEA28(o);
+        moby_l02_explode_and_remove(o);
         break;
     }
-    func_L02_003CE908(o);
+    moby_reset_turn_place(o);
     if (U8(o, 0x31))
-        func_L02_003CEE40(o);
+        chickenbot_update_group_pulse_color(o);
 }

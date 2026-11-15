@@ -17,10 +17,10 @@ extern int D_001ADE18 __attribute__((sda));
 extern int D_001ADE1C[] __attribute__((sda));
 extern int D_001A7BA4, D_001A7BA8, D_001A7BAC;
 extern unsigned char D_001A7BB1;
-extern void func_0033AF48(void *);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
+extern void prompt_bar_draw(void *);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 
 
 #ifndef RAC2_T_U8_FF4EB83C9
@@ -55,14 +55,14 @@ extern void func_0033B030_3(u8_Ff4eb83c9 *, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff
 
 extern void func_0033B0A8_2(u8_Ff4eb83c9 *, f32_Ff4eb83c9);
 
-extern int func_0033C590(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
-extern void func_0033AE28(void *);
-extern void func_0033B018(void *, float, float);
-extern int func_002E5E58(int, int, void *);
-extern void func_0027AB40(void);
+extern int UpdateFourOptionMenuInput(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
+extern void prompt_bar_update(void *);
+extern void menu_set_anchor_pos(void *, float, float);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void UpdateViewContext(void);
 
 /* Sets up the four-option menu: its button prompt bar, labels and position. */
-void func_0033C468(u8_Ff4eb83c9 *self, void *arg) {
+void four_option_menu_init(u8_Ff4eb83c9 *self, void *arg) {
     u8_Ff4eb83c9 *prompt;
     void *textA, *textB, *textC;
     *(void **)self = arg;
@@ -88,7 +88,7 @@ void func_0033C468(u8_Ff4eb83c9 *self, void *arg) {
     *(s32_Ff4eb83c9 *)(self + 680) = 0;
     UpdateFourOptionMenuInput(self, 0);
 }
-int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
+int UpdateFourOptionMenuInput(u8_Ff4eb83c9 *a0, int a1)
 {
     u8_Ff4eb83c9 *p = a0 + 8;
     unsigned int *sfx = (unsigned int *)0x1A7BA4;
@@ -98,19 +98,19 @@ int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
     float *q;
     int v;
 
-    UpdateButtonPromptBar(p);
+    prompt_bar_update(p);
     q = *(float **)(a0 + 0x2AC);
-    SetMenuAnchorPosition(p, q[0], q[1]);
+    menu_set_anchor_pos(p, q[0], q[1]);
     if (a1 & 0x1000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         v = *(int *)(a0 + 0x2A8);
         *(int *)(a0 + 0x2A8) = (v + 3) % 4;
     } else if (a1 & 0x4000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         v = *(int *)(a0 + 0x2A8);
         *(int *)(a0 + 0x2A8) = (v + 1) % 4;
     } else if (a1 & 0x40) {
-        PlaySoundFromGlobalBank(4, 0, 0);
+        snd_play_from_global_bank(4, 0, 0);
         switch (*(int *)(a0 + 0x2A8)) {
         case 0:
             *sfx = *sfx < 1;
@@ -131,7 +131,7 @@ int func_0033C590(u8_Ff4eb83c9 *a0, int a1)
 }
 
 /* Draws the four option lines (two on/off options, a three-way option and an on/off option) and highlights the selected one. */
-void func_0033C738(char *object)
+void four_option_menu_draw(char *object)
 {
     char buffer[128];
     OptionPair onOffText;
@@ -140,7 +140,7 @@ void func_0033C738(char *object)
     char *first, *second, *format;
     char *label2, *label3, *label4;
     int color;
-    DrawButtonPromptBar(object + 8);
+    prompt_bar_draw(object + 8);
     onOffText = D_001ADE20;
     modeText = D_001ADE28;
     toggleText = D_001ADDD0;
@@ -148,24 +148,24 @@ void func_0033C738(char *object)
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     first = GetLocalizedString(0x2DE2);
     second = GetLocalizedString(onOffText.ids[D_001A7BA4 != 0]);
-    Sprintf(buffer, format, first, second);
-    DrawTextCenteredMediumFont(D_001ADE00, D_001ADE04[0], color, buffer, -1);
+    sprintf(buffer, format, first, second);
+    text_draw_centered_medium(D_001ADE00, D_001ADE04[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
     label2 = GetLocalizedString(0x2DE1);
     second = GetLocalizedString(onOffText.ids[D_001A7BA8 != 0]);
-    Sprintf(buffer, format, label2, second);
-    DrawTextCenteredMediumFont(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
+    sprintf(buffer, format, label2, second);
+    text_draw_centered_medium(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     {
         int mode = D_001A7BAC;
         label3 = GetLocalizedString(0x2F18);
         second = GetLocalizedString(modeText.ids[mode]);
     }
-    Sprintf(buffer, format, label3, second);
-    DrawTextCenteredMediumFont(D_001ADE10, D_001ADE14[0], color, buffer, -1);
+    sprintf(buffer, format, label3, second);
+    text_draw_centered_medium(D_001ADE10, D_001ADE14[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 3 ? (int)0x80D0D0D0 : 0x70808080;
     label4 = GetLocalizedString(0x31E4);
     second = GetLocalizedString(toggleText.ids[D_001A7BB1 != 0]);
-    Sprintf(buffer, format, label4, second);
-    DrawTextCenteredMediumFont(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
+    sprintf(buffer, format, label4, second);
+    text_draw_centered_medium(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
 }

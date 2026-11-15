@@ -30,17 +30,17 @@ typedef struct {
     s32 mode;
 } SifDma;
 
-extern StreamBank D_0014B540;
+extern StreamBank g_copy_setup_data;
 extern u8 *D_001A7278 MACRO_ADDR;
 
-extern void func_0011AEA0(int);
-extern int func_0011AFE0(SifDma *, int);
-extern int func_0011AFC0(int);
-extern int func_002B7BC0(void *, int, int, void (*)(int *, int), StreamLoad *);
-extern void func_00294130(int *p, int a1);
+extern void FlushCache(int);
+extern int sceSifSetDma(SifDma *, int);
+extern int sceSifDmaStat(int);
+extern int load_start_disc_read_with_callback(void *, int, int, void (*)(int *, int), StreamLoad *);
+extern void load_release_class_cache_slot(int *p, int a1);
 
 /* Continues a streamed disc load. With go set to 0 it marks the load as finished; otherwise it sends the first chunk to the sound processor and starts reading the file. */
-void func_00294180(StreamLoad *load, s32 go) {
+void load_continue_stream(StreamLoad *load, s32 go) {
     SifDma dma;
     u8 *buf;
     s32 *hdr;
@@ -50,11 +50,11 @@ void func_00294180(StreamLoad *load, s32 go) {
     if (go == 0) {
         load->file = -1;
     } else {
-        if (gCopySetupData.files[load->file].sectors != 0) {
+        if (g_copy_setup_data.files[load->file].sectors != 0) {
             slotOffset = load->slot * 0xC800;
             buf = load->buf;
             hdr = (s32 *)(buf + 0x18);
-            dma.size = gCopySetupData.files[load->file].sectors << 11;
+            dma.size = g_copy_setup_data.files[load->file].sectors << 11;
             dma.data = buf;
             dma.mode = 0;
             dma.addr = D_001A7278 + slotOffset;
@@ -66,7 +66,7 @@ void func_00294180(StreamLoad *load, s32 go) {
             while (sceSifDmaStat(dmaId) >= 0) {
             }
         }
-        StartDiscReadWithCallback(load->buf, gCopySetupData.files[load->file].offset + gCopySetupData.base,
-                      gCopySetupData.files[load->file].size, ReleaseClassCacheSlot, load);
+        load_start_disc_read_with_callback(load->buf, g_copy_setup_data.files[load->file].offset + g_copy_setup_data.base,
+                      g_copy_setup_data.files[load->file].size, load_release_class_cache_slot, load);
     }
 }

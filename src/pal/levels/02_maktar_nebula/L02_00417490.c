@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef signed int s32;
@@ -15,14 +16,14 @@ extern SparkRange D_L02_001B1C10;
 extern SparkSizes D_L02_001B1C20;
 extern SparkColours D_L02_001B1C28;
 extern SparkKinds D_L02_001B1C30;
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern void func_002A7A00(void *, float, float);
-extern void *func_002C3150(void *, void *, int, int, int, int, float);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern void vec_random_direction(void *, float, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 
 /* func_PAL_L02_00417490, the PAL copy of func_L02_00412808: the same C, where the per-frame
    0.016666668f becomes 0.020000001f and the spark kind is scaled to 50 Hz. */
@@ -37,19 +38,19 @@ void func_PAL_L02_00417490(u8 *a0) {
 
     *(TI128 *)front = 0;
     front[2] = 1.5f;
-    func_00283098(front, front, a0 + 0xC0);
-    func_00282CC0(front, front, a0 + 0x10);
-    func_002A7A00(vel, range.f[0] * 0.020000001f, range.f[1] * 0.020000001f);
-    func_002C3150(front, vel, colours.i[0],
-                  (u8)(((s32)func_002A7820(kinds.b[0], kinds.b[1]) * 5 + 2) / 6),
-                  (u8)func_002A77E0(0xFF), 0, sizes.f[0]);
-    func_00282C88(vel);
-    func_002A7A00(spot, 0.0f, 1.5f);
-    func_00282CC0(spot, spot, front);
-    vel[2] = -(func_002A7878(range.f[2], range.f[3]) * 0.020000001f);
-    func_002C3150(spot, vel, colours.i[1],
-                  (u8)(((s32)func_002A7820(kinds.b[2], kinds.b[3]) * 5 + 2) / 6),
-                  (u8)func_002A77E0(0xFF), 0, sizes.f[1]);
+    matrix_mul_vec3(front, front, a0 + 0xC0);
+    FastVecAdd(front, front, a0 + 0x10);
+    vec_random_direction(vel, range.f[0] * 0.020000001f, range.f[1] * 0.020000001f);
+    part_spawn_hero_relative(front, vel, colours.i[0],
+                  (u8)(((s32)math_random_int_range(kinds.b[0], kinds.b[1]) * 5 + 2) / 6),
+                  (u8)math_random_int_below(0xFF), 0, sizes.f[0]);
+    vec_clear_128(vel);
+    vec_random_direction(spot, 0.0f, 1.5f);
+    FastVecAdd(spot, spot, front);
+    vel[2] = -(math_random_float_range(range.f[2], range.f[3]) * 0.020000001f);
+    part_spawn_hero_relative(spot, vel, colours.i[1],
+                  (u8)(((s32)math_random_int_range(kinds.b[2], kinds.b[3]) * 5 + 2) / 6),
+                  (u8)math_random_int_below(0xFF), 0, sizes.f[1]);
 }
 
 

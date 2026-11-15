@@ -6,7 +6,7 @@
    neighbouring func_0012D808, so it is built with `sdk -O2 -g2 -gstabs`.
    Lombyte's names map to RAC2 as: _getPtsDtsFlags = func_0012DAC0,
    _isOutSizeOK = func_0012D768, _cpr8 = func_0012D808,
-   _csc_storeRefImage = func_0012E608, FinishMpegReferenceImage = func_0012DA98. */
+   _csc_storeRefImage = func_0012E608, mpeg_finish_reference_image = func_0012DA98. */
 
 struct MpegPictureBuffer {
     u8 pad0[0x10];
@@ -70,15 +70,15 @@ struct MpegFieldTransferState {
     struct MpegPictureTransfer *transfer;
 };
 
-extern void func_0012DAC0(struct MpegFieldTransferState *, struct MpegPictureBuffer *, s64 *,
+extern void mpeg_get_pts_dts_flags(struct MpegFieldTransferState *, struct MpegPictureBuffer *, s64 *,
                           s64 *, s64 *);
-extern s32 func_0012D768(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
-extern void func_0012D808(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
-extern void func_0012E608(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
-extern void func_0012DA98(struct MpegFieldTransferState *);
+extern s32 mpeg_check_picture_fits_heap(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
+extern void mpeg_copy_picture_to_screen(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
+extern void mpeg_store_reference_image(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
+extern void mpeg_finish_reference_image(struct MpegFieldTransferState *);
 
 /* Sends a pair of MPEG field pictures to the video output, with timestamps and flags for each. */
-void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffer *first,
+void mpeg_output_field_pair(struct MpegFieldTransferState *state, struct MpegPictureBuffer *first,
                    struct MpegPictureBuffer *second) {
     s64 first_flags, second_flags;
     s32 timestamp;
@@ -100,13 +100,13 @@ void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffe
         secondary = first;
     }
     transfer = state->transfer;
-    GetMpegPtsDtsFlags(state, primary, &transfer->first_timestamp.value,
+    mpeg_get_pts_dts_flags(state, primary, &transfer->first_timestamp.value,
                   &transfer->first_decode_timestamp, &transfer->first_flags);
     second_transfer = state->transfer;
     timestamp = second_transfer->first_timestamp.words.low;
     state->timestamp_step = 1;
     state->last_timestamp = timestamp;
-    GetMpegPtsDtsFlags(state, secondary, &second_transfer->second_timestamp.value,
+    mpeg_get_pts_dts_flags(state, secondary, &second_transfer->second_timestamp.value,
                   &second_transfer->second_decode_timestamp, &second_transfer->second_flags);
     final_transfer = state->transfer;
     second_timestamp = final_transfer->second_timestamp.words.low;
@@ -124,13 +124,13 @@ void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffe
     state->horizontal_offset1 = secondary->horizontal_offset1;
     state->vertical_offset0 = primary->vertical_offset0;
     state->vertical_offset1 = secondary->vertical_offset1;
-    if (CheckMpegPictureFitsHeap(state, first) && first->status == 1 && second->status == 1) {
+    if (mpeg_check_picture_fits_heap(state, first) && first->status == 1 && second->status == 1) {
         first->macroblock_height *= 2;
         if (state->decoder_initialized)
-            StoreMpegReferenceImage(state, first);
+            mpeg_store_reference_image(state, first);
         else
-            CopyMpegPictureToScreen(state, first);
+            mpeg_copy_picture_to_screen(state, first);
         first->macroblock_height >>= 1;
-        FinishMpegReferenceImage(state);
+        mpeg_finish_reference_image(state);
     }
 }

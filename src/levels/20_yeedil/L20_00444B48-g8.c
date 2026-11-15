@@ -1,11 +1,11 @@
 #include "common.h"
 
 extern float D_L20_001B20A0 __attribute__((sda));
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
 /* The EE ABI gives the integer and float arguments separate register banks. */
 /* Gives a value that slides from one number to another as a level counter moves between a start and an end count. */
-float func_L20_00444B48(int start, float startValue, float endValue, int end)
+float level_interpolate_by_counter(int start, float startValue, float endValue, int end)
 {
     if (D_L20_001B20A0 <= (float)start)
         return startValue;

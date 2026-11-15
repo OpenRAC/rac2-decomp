@@ -31,23 +31,23 @@ typedef struct {
     int row;                    /* +0x578 */
 } ItemMenu;
 
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 extern void *memset(void *, int, unsigned int);
 extern int func_PAL_002A9FA0(int, int, int, int, int);
-extern int *func_00335E20(void *);
-extern void func_00335E38(void *, float, float, float, float);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, char *, ...);
+extern int *object_get_fourth_field(void *);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, char *, ...);
 extern char D_001AE508[], D_001AE510[], D_001AE518[], D_001AE520[];
 extern char D_001AE528[], D_001AE530[], D_001AE538[], D_001ADF98[], D_001AE548[];
 extern char ref_00346C60_00[];
 extern short D_00259F58[][5];
-extern ItemRecord D_00239BA0[];
-extern unsigned char D_00139568[];
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern ItemRecord g_weapon_table[];
+extern unsigned char g_item_slot_to_record[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern unsigned char D_001A7B30[] MACRO_ADDR;
-extern int D_00139688[];
-extern int D_001ADB10 __attribute__((sda));
+extern int g_item_ammo_counts[];
+extern int g_selected_item_material __attribute__((sda));
 extern int D_001F2880[];
 
 int func_PAL_00348DF8(ItemMenu *menu, int buttons)
@@ -70,19 +70,19 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
     char *text;
 
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         n = menu->row - 1;
         menu->row = n < 0 ? 5 : n;
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         n = menu->row + 1;
         menu->row = n <= 5 ? n : 0;
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         n = menu->column - 1;
         menu->column = n < 0 ? 3 : n;
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         n = menu->column + 1;
         menu->column = n <= 3 ? n : 0;
     }
@@ -99,62 +99,62 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
     __builtin_memcpy(pos2C0, D_001AE520, 8);
     if (old != selection)
         func_PAL_002A9FA0(0, 0, 1, 0, 1);
-    color = func_00335E20((char *)menu + 0xE4);
+    color = object_get_fourth_field((char *)menu + 0xE4);
     *color = func_PAL_002A9FA0(0x60442D00, 0x70FFFEED, 20, 0, 0);
 
-    func_00335E38((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0xE4,
+    object_set_first_float4((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0xE4,
                   cursor[0] + menu->origin[0] + (float)menu->column * 53.5f,
                   cursor[1] + menu->origin[1] + (float)menu->row * 47.0f, 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
 
-    D_001ADB10 = -1;
+    g_selected_item_material = -1;
     if (selection >= 0) {
         entry = D_00259F58[selection][3];
-        item = D_00139568[entry];
-        initialRecord = &D_00239BA0[item];
+        item = g_item_slot_to_record[entry];
+        initialRecord = &g_weapon_table[item];
         if (initialRecord->byte04) {
-            D_001A7AF8[entry] = 1;
+            g_item_owned_flags[entry] = 1;
             D_001A7B30[entry] = 1;
         }
-        if (D_001A7AF8[entry]) {
+        if (g_item_owned_flags[entry]) {
             text = menu->detail;
-            D_001ADB10 = D_00239BA0[D_00139568[entry]].material;
-            func_00115DA8(menu->name, func_00288FB8(D_00239BA0[D_00139568[entry]].name));
-            record = &D_00239BA0[D_00139568[entry]];
-            ammo = D_00139688[entry];
+            g_selected_item_material = g_weapon_table[g_item_slot_to_record[entry]].material;
+            sprintf(menu->name, GetLocalizedString(g_weapon_table[g_item_slot_to_record[entry]].name));
+            record = &g_weapon_table[g_item_slot_to_record[entry]];
+            ammo = g_item_ammo_counts[entry];
             maxAmmo = record->maxAmmo;
             if (record->usesAmmo) {
-                text += func_00115DA8(text, D_001AE528, func_00288FB8(0xBDA));
+                text += sprintf(text, D_001AE528, GetLocalizedString(0xBDA));
                 if (ammo < 1000)
-                    text += func_00115DA8(text, D_001AE530, ammo);
+                    text += sprintf(text, D_001AE530, ammo);
                 else
-                    text += func_00115DA8(text, D_001AE538, ammo / 1000, ammo % 1000);
+                    text += sprintf(text, D_001AE538, ammo / 1000, ammo % 1000);
                 if (maxAmmo < 1000)
-                    func_00115DA8(text, D_001ADF98, maxAmmo);
+                    sprintf(text, D_001ADF98, maxAmmo);
                 else
-                    func_00115DA8(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
+                    sprintf(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
             } else {
-                func_00115DA8(text, ref_00346C60_00, func_00288FB8(0xBCA));
+                sprintf(text, ref_00346C60_00, GetLocalizedString(0xBCA));
             }
             if (buttons & 0x40) {
                 result = selection;
-                func_002E5E58(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
                 D_001F2880[0] = entry;
             }
         } else {
             menu->detail[0] = 0;
             menu->name[0] = 0;
             if (buttons & 0x40)
-                func_002E5E58(5, 0, 0);
+                snd_play_from_global_bank(5, 0, 0);
         }
     }
 
-    func_00335E38((char *)menu + 0x268, pos268[0] + menu->origin[0], pos268[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x2C0, pos2C0[0] + menu->origin[0], pos2C0[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x268, pos268[0] + menu->origin[0], pos268[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x2C0, pos2C0[0] + menu->origin[0], pos2C0[1] + menu->origin[1], 0.0f, 0.0f);
     return result;
 }

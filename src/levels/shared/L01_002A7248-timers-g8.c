@@ -75,32 +75,32 @@ typedef struct {
     int no_direction;
 } TimerPadState;
 
-extern TimerPadState D_00138180;
+extern TimerPadState g_pad_state;
 extern unsigned char *D_L01_001FB3E0[];
 extern unsigned char D_L01_0025CF60[];
 extern int D_L01_001A8F40_abs __asm__("D_L01_001A8F40");
 extern float D_L01_001B1FA0, D_L01_001B1FA4;
 extern unsigned char D_L01_001A7AFF;
-extern void func_L00_002B9380(void), func_L00_002A7A10(void), func_L00_002C3838(void), func_L00_002B30E8(void);
-extern int func_00282978(void *), func_00282948(void *);
-extern void func_00282C88(void *);
-extern int func_002ABB78(void *), func_002A77E0(int);
-extern void func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float);
-extern int func_002A8F70(void *, int, int, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_L00_002D3B00(void *), func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D3778(void *, void *, float);
+extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
+extern int FastDecTimer(void *), math_fast_float_d(void *);
+extern void vec_clear_128(void *);
+extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
+extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float cam_get_view_space_height(void *), FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void hero_build_relative_point(void *, int, float, float, float), hero_apply_mode_transform_reversed(void *, void *, float);
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c.
  * Each frame, advances the hero's timers and counters, pushes nearby objects away,
  * tracks whether the hero stands still, and refreshes the reach distance and height. */
-void func_L01_002BE0E0(void) {
+void hero_update_timers_and_reach_state(void) {
     unsigned char *moby, *mobyPos, *heroPos;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!D_L01_00189E20.tilt_disabled) EaseHeroLeanToUpright();
+    if (!D_L01_00189E20.tilt_disabled) hero_ease_lean_to_upright();
     {
         int state = D_L01_00189E20.state_frames+1;
         int control = D_L01_00189E20.control_mode_frames+1;
@@ -117,7 +117,7 @@ void func_L01_002BE0E0(void) {
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E4);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F8);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FE);
-    FastFloatHelperD(((unsigned char *)&D_L01_00189E20)+0x1D4);
+    math_fast_float_d(((unsigned char *)&D_L01_00189E20)+0x1D4);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x210);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1D0);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F4);
@@ -146,11 +146,11 @@ void func_L01_002BE0E0(void) {
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x224);
     FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x226);
 
-    if (!(gPadState.held&4)) D_L01_00189E20.field_20C = 0;
-    if (D_L01_00189E20.field_21C) QueueHeroGlowDrawRoutine();
+    if (!(g_pad_state.held&4)) D_L01_00189E20.field_20C = 0;
+    if (D_L01_00189E20.field_21C) hero_queue_glow_draw_routine();
     if (D_L01_00189E20.item_animation_active) D_L01_00189E20.item_animation_frames++;
     else D_L01_00189E20.item_animation_frames = 0;
-    if (gPadState.no_direction) {
+    if (g_pad_state.no_direction) {
         D_L01_00189E20.stick_held_frames = 0;
         D_L01_00189E20.stick_idle_frames++;
     }
@@ -177,24 +177,24 @@ void func_L01_002BE0E0(void) {
     }
     if (D_L01_00189E20.field_224) {
         for (i = 0;(moby = D_L01_001FB3E0[i]) != 0;i++) {
-            if (IsMobyInSpecialClassRange(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
-                if ((D_001B2088&7) == (((int)moby>>8)&7) || !RandomIntBelow(4)) {
+            if (moby_is_in_special_class_range(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
+                if ((D_001B2088&7) == (((int)moby>>8)&7) || !math_random_int_below(4)) {
                     heroPos = (unsigned char *)&D_L01_00189E20+0x80;
                     mobyPos = moby+0x10;
                     if (fast_vec_dist(heroPos, mobyPos)<15.37f) {
                         FastVecSub(sum, mobyPos, heroPos);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        QueueImpactEffect(moby, D_L01_00189E20.field_2290, 0x4000000, heroPos, sum, 1.0f);
+                        part_queue_impact_effect(moby, D_L01_00189E20.field_2290, 0x4000000, heroPos, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) FastFloatHelperD(D_L01_0025CF60+i*0x70);
+    for (i = 0;i<4;i++) math_fast_float_d(D_L01_0025CF60+i*0x70);
     D_L01_00189E20.current_path_dist = 9999.0f;
-    if (D_L01_00189E20.field_34E && GetViewSpaceHeight(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
+    if (D_L01_00189E20.field_34E && cam_get_view_space_height(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
         if (D_L01_00189E20.pos_history_count != 32) goto history_done;
-        ClearVector128(sum);
+        vec_clear_128(sum);
         count = 8;
         for (i = 0;i<count;) {
             history_index = D_L01_00189E20.pos_history_index-i;
@@ -212,10 +212,10 @@ void func_L01_002BE0E0(void) {
     }
     D_L01_00189E20.still_frames = 0;
 history_done:
-    UpdateHeroLandingSlide();
+    hero_update_landing_slide();
     {
         unsigned char *bodyCenter = (unsigned char *)&D_L01_00189E20+0xE0;
-        BuildHeroRelativePoint(bodyCenter, 1, 0, 0, 0.7f);
+        hero_build_relative_point(bodyCenter, 1, 0, 0, 0.7f);
         if (!(D_001B2088&3)) {
             if (D_L01_001A7AFF) {
                 D_L01_00189E20.reach_distance = 14;
@@ -229,7 +229,7 @@ history_done:
     }
     if (D_L01_00189E20.field_31C<4) {
         qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0x2D0);
-        ApplyHeroModeTransformReversed(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
+        hero_apply_mode_transform_reversed(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
     }
     else qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xE0);
     {
@@ -239,5 +239,5 @@ history_done:
             if (D_L01_00189E20.field_5C0 && D_L01_00189E20.field_1248 != 46) D_L01_00189E20.field_5C0 = 0;
         }
     }
-    if (D_L01_00189E20.field_88<1) RecordHeroPlayCounters();
+    if (D_L01_00189E20.field_88<1) hero_record_play_counters();
 }

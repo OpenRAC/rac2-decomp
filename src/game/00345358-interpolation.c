@@ -5,10 +5,10 @@
  * The measured key-array layout preserves indexed member addressing. */
 typedef unsigned char u8;
 typedef struct {char pad[0x70];float keys[4];} KeyObject;
-extern void func_00349630(u8 *,int);
-extern float func_0034EE78(float, float, float, float, float);
+extern void fade_start_direction(u8 *,int);
+extern float math_eval_cubic_hermite(float, float, float, float, float);
 /* Moves an animation forward or backward, finds the two keyframes around its position and blends between them. At the end it stops, repeats or reverses. */
-void func_00349680(char *anim, int advance)
+void anim_update_keyframe(char *anim, int advance)
 {
  int hiIdx, loIdx, i;
  float blend, *keys;
@@ -39,7 +39,7 @@ void func_00349680(char *anim, int advance)
    if(next>=0 && value<=((KeyObject *)anim)->keys[loIdx]) {hiIdx=loIdx;loIdx=next;} else break;
   }}
  }
- blend=EvaluateCubicHermite((*(float *)(anim+0x18)-((KeyObject *)anim)->keys[loIdx])/(((KeyObject *)anim)->keys[hiIdx]-((KeyObject *)anim)->keys[loIdx]),0.0f,*(float *)anim,*(float *)(anim+12),1.0f);
+ blend=math_eval_cubic_hermite((*(float *)(anim+0x18)-((KeyObject *)anim)->keys[loIdx])/(((KeyObject *)anim)->keys[hiIdx]-((KeyObject *)anim)->keys[loIdx]),0.0f,*(float *)anim,*(float *)(anim+12),1.0f);
  if(*(int *)(anim+0x2c)) {
   char *target=*(char **)(anim+0x80);char *vt=*(char **)target;
   ((void (*)(void *,int,void *,void *,float))*(void **)(vt+20))(target+*(short *)(vt+16),*(int *)(anim+0x2c),anim+(loIdx*16+0x30),anim+(hiIdx*16+0x30),blend);
@@ -47,8 +47,8 @@ void func_00349680(char *anim, int advance)
  if(!*(int *)(anim+0x28)) {
   switch(*(int *)(anim+0x20)) {
    case 0:break;
-   case 1:StartFadeDirection((u8 *)anim,*(int *)(anim+0x1c));break;
-   case 2:*(int *)(anim+0x1c)=*(int *)(anim+0x1c)==1?-1:1;StartFadeDirection((u8 *)anim,*(int *)(anim+0x1c));break;
+   case 1:fade_start_direction((u8 *)anim,*(int *)(anim+0x1c));break;
+   case 2:*(int *)(anim+0x1c)=*(int *)(anim+0x1c)==1?-1:1;fade_start_direction((u8 *)anim,*(int *)(anim+0x1c));break;
   }
  }
 }

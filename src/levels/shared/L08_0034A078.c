@@ -1,15 +1,15 @@
 #include "common.h"
-extern unsigned char *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_00283CE0(int);
+extern unsigned char *part_alloc(int);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float IntToFloat(int);
 extern unsigned char *D_L08_001FF794;
 /* Creates a short-lived particle at a position with a velocity and owner, and returns it (or 0 if none is free). */
-unsigned char *func_L08_0034A078(void *position, void *velocity, int kind, void *owner)
+unsigned char *part_spawn_short_lived(void *position, void *velocity, int kind, void *owner)
 {
-    unsigned char *particle = AllocParticle(0x45);
+    unsigned char *particle = part_alloc(0x45);
     if (particle) {
         unsigned char *data;
         int lifetime;
@@ -21,10 +21,10 @@ unsigned char *func_L08_0034A078(void *position, void *velocity, int kind, void 
         }
         particle[1] = 0;
         particle[3] = 0x48;
-        *(float *)(particle + 0xc) = RandomFloatRange(8000.0f, 50000.0f);
-        particle[8] = RandomIntBelow(256);
+        *(float *)(particle + 0xc) = math_random_float_range(8000.0f, 50000.0f);
+        particle[8] = math_random_int_below(256);
         particle[2] = *D_L08_001FF794;
-        lifetime = RandomIntRange(10, 30);
+        lifetime = math_random_int_range(10, 30);
         *(short *)(particle + 0xa) = lifetime;
         {
             float age = IntToFloat((short)lifetime);

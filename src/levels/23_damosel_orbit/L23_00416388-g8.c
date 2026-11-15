@@ -2,7 +2,7 @@
 #include "names.h"
 
 /* Level 23 globals the retail code reaches through $gp. */
-extern char *D_L23_001B1484 __attribute__((sda));
+extern char *g_mothership_boss_moby __attribute__((sda));
 
 extern int D_L23_001B13EC __attribute__((sda));
 
@@ -22,9 +22,9 @@ extern int D_L23_001B3788;
 
 extern int D_L23_001B38C0;
 
-extern int func_002E5CF8(int index, int a1, char *a2);
+extern int PlayMobySound(int index, int a1, char *a2);
 
-extern void func_0027DDC0(int, int, int, int);
+extern void gfx_set_clear_color_packet(int, int, int, int);
 
 extern int D_L23_001B1694 __attribute__((sda));
 
@@ -34,21 +34,21 @@ extern float D_L23_001B14E4 __attribute__((sda));
 
 extern void func_31A108(int);
 
-extern void func_L23_0041A648(char *);
+extern void mothership_release_effect_handles(char *);
 
-extern void func_L23_0042AC70(void);
+extern void snd_stop_both_looping(void);
 
 /* Reports whether a word of the object reached through the pointer global is set. */
 /* Says whether the boss has its "held" flag set. */
-int func_L23_0041B948(void) {
-    return *(int *)(*(char **)(gMothershipBossMoby + 0x68) + 0x604) != 0;
+int mothership_is_held(void) {
+    return *(int *)(*(char **)(g_mothership_boss_moby + 0x68) + 0x604) != 0;
 }
 
-extern void func_0029F978(char *, int, char *);
+extern void AttachManipulator(char *, int, char *);
 
-extern void func_00283898(void *, int, float);
+extern void build_axis_rotation_quaternion(void *, int, float);
 
-extern float func_00283BE0(float, float);
+extern float fast_subtract_rotations(float, float);
 
 extern float D_L23_001B1570 __attribute__((sda));
 
@@ -56,8 +56,8 @@ extern float D_L23_001B1574 __attribute__((sda));
 
 /* Relatches the two measured pairs at +0x580 and +0x584 from the two float arguments. */
 /* Turns two boss joints a little each frame, starting their effects first if needed. */
-void func_L23_0041BF18(char *moby, float deltaA, float deltaB) {
-    char *vars = *(char **)(gMothershipBossMoby + 0x68);
+void mothership_turn_joints(char *moby, float deltaA, float deltaB) {
+    char *vars = *(char **)(g_mothership_boss_moby + 0x68);
 
     if (*(unsigned char *)(vars + 0x4F1) == 0)
         AttachManipulator(moby, 0x28, vars + 0x4F0);
@@ -71,22 +71,22 @@ void func_L23_0041BF18(char *moby, float deltaA, float deltaB) {
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00283098(char *, char *, char *);
+extern void matrix_mul_vec3(char *, char *, char *);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
-extern void func_0032C700(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 /* Builds the measured vector when the state's first word names the argument, and lays out the call. */
 /* Spawns hit sparks on the thing that was hit (more if it is the hero) and plays a sound unless it is a shield. */
-void func_L23_0041C578(char *hitMoby) {
+void part_l23_spawn_hit_sparks(char *hitMoby) {
     union {
         TI128 q;
         float f[4];
     } hitOffset;
-    char *heroBase = gHeroState;
+    char *heroBase = g_hero_state;
 
     if (*(char **)(heroBase + 0x2290) == hitMoby) {
         hitOffset.q = 0;
@@ -100,12 +100,12 @@ void func_L23_0041C578(char *hitMoby) {
         SpawnExplosion(hitMoby + 0x10, 0, 25, 20, 20, 15, 25, 1, 1.5f, 20.0f, 0, 0, 0, 0);
     }
     if (*(short *)(hitMoby + 0xAA) != 0x118F /* moby class 4495 */)
-        PlayMobySound(3, 0, gMothershipBossMoby);
+        PlayMobySound(3, 0, g_mothership_boss_moby);
 }
 
 /* Zero unless the counter is positive and below the limit. */
 /* Says whether the blast timer is running (above zero and below its limit). */
-int func_L23_0041C0C0(void) {
+int mothership_is_blast_timer_running(void) {
     if (D_L23_001B1694 > 0 && D_L23_001B1694 < D_L23_001B1698)
         return 1;
     return 0;
@@ -113,8 +113,8 @@ int func_L23_0041C0C0(void) {
 
 /* One for the two measured state bytes, zero otherwise. */
 /* Says whether the boss is in one of its two attack states. */
-int func_L23_0041E260(void) {
-    unsigned char mobyState = *(unsigned char *)(gMothershipBossMoby + 0x20);
+int mothership_is_attack_state(void) {
+    unsigned char mobyState = *(unsigned char *)(g_mothership_boss_moby + 0x20);
 
     if (mobyState == 0x10 || mobyState == 0xC)
         return 1;
@@ -125,18 +125,18 @@ int func_L23_0041E260(void) {
 
 /* Stores one in the state at +0x68, after the measured shared call. */
 /* Marks the boss as held and plays its sound the first time. */
-void func_L23_0041B8F8(char *moby) {
+void mothership_mark_held(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
-    if (D_L23_001B13EC == 0 && gMothershipBossMoby != 0)
-        PlayMobySound(0x10, 0, gMothershipBossMoby);
+    if (D_L23_001B13EC == 0 && g_mothership_boss_moby != 0)
+        PlayMobySound(0x10, 0, g_mothership_boss_moby);
     *(int *)(vars + 0x604) = 1;
 }
 
 /* Clears the measured slot of the four state pointers and of the argument state. */
 /* Turns off the extra object flags on all the boss parts so they stop reacting. */
-void func_L23_0041BFF0(char *moby) {
-    char *state = *(char **)(gMothershipBossMoby + 0x68);
+void mothership_disable_part_flags(char *moby) {
+    char *state = *(char **)(g_mothership_boss_moby + 0x68);
     int *slot;
     int i;
 
@@ -165,27 +165,27 @@ extern float D_L23_001B17A8 __attribute__((sda));
 
 extern float D_L23_001B179C __attribute__((sda));
 
-extern void func_00291450(int);
+extern void gfx_free_point_light(int);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
-extern void func_00282D30(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern int func_L00_002FCF18(char *, float, float, float, float, float);
+extern int part_l00_alloc_effect_slot_2(char *, float, float, float, float, float);
 
-extern void func_L23_00418650(char *, float);
+extern void mothership_project_point_onto_surface(char *, float);
 
-extern void func_L23_0041E3C8(void);
+extern void mothership_apply_fade_ratio(void);
 
-extern void func_0027D098(void (*)(void), int);
+extern void gfx_register_final_draw_callback(void (*)(void), int);
 
 /* Releases the held handle, makes a new one from jittered values when the difference has low bits set, then registers the callback. */
 /* Replaces the running beam effect with a new one with slightly random settings and hooks up its per-frame callback. */
-void func_L23_0041E290(char *moby) {
+void mothership_restart_beam_effect(char *moby) {
     char offset[16];
     int frameDiff;
     float jitter;
@@ -195,37 +195,37 @@ void func_L23_0041E290(char *moby) {
 
     frameDiff = D_L23_001B15A4 - D_L23_001B3788;
     if (D_L23_001B150C != -1)
-        FreePointLight(D_L23_001B150C);
+        gfx_free_point_light(D_L23_001B150C);
     if ((frameDiff & 3) != 0) {
-        FastVecAdd(offset, moby + 0x10, gHeroPosition);
+        FastVecAdd(offset, moby + 0x10, g_hero_position);
         FastVecScale(offset, offset, 0.5f);
-        ProjectPointOntoPlanetSurface(offset, 5.0f);
-        jitter = RandomFloatRange(0.0f, D_L23_001B17A0 * 0.33333334f);
+        mothership_project_point_onto_surface(offset, 5.0f);
+        jitter = math_random_float_range(0.0f, D_L23_001B17A0 * 0.33333334f);
         valueA = D_L23_001B17A0 + jitter;
-        jitter = RandomFloatRange(0.0f, D_L23_001B17A4 * 0.33333334f);
+        jitter = math_random_float_range(0.0f, D_L23_001B17A4 * 0.33333334f);
         valueB = D_L23_001B17A4 + jitter;
-        jitter = RandomFloatRange(0.0f, D_L23_001B17A8 * 0.33333334f);
+        jitter = math_random_float_range(0.0f, D_L23_001B17A8 * 0.33333334f);
         valueC = D_L23_001B17A8 + jitter;
-        D_L23_001B150C = AllocateEffectSlot_L00_2(offset, 35.0f, D_L23_001B179C, valueA, valueB, valueC);
+        D_L23_001B150C = part_l00_alloc_effect_slot_2(offset, 35.0f, D_L23_001B179C, valueA, valueB, valueC);
     }
-    RegisterFinalDrawCallback(ApplyBossFadeRatio, (int)moby);
+    gfx_register_final_draw_callback(mothership_apply_fade_ratio, (int)moby);
 }
 
 /* Calls the measured shared helper with the measured ratio expression. */
 /* Passes the current fade amount to the screen effect. */
-void func_L23_0041E3C8(void) {
-    SetClearColorPacket(D_L23_001B1790, D_L23_001B1794, D_L23_001B1798,
+void mothership_apply_fade_ratio(void) {
+    gfx_set_clear_color_packet(D_L23_001B1790, D_L23_001B1794, D_L23_001B1798,
                   (D_L23_001B15A4 - D_L23_001B3788) * D_L23_001B178C / D_L23_001B15A4);
 }
 
 /* Stores the incoming float in the level global reached through $gp. */
 /* Sets the boss timer value used by the attack logic. */
-void func_L23_0041B960(float value) { D_L23_001B14E4 = value; }
+void mothership_set_timer_value(float value) { D_L23_001B14E4 = value; }
 
 /* Copies the measured word of every live slot into the object the argument names. */
 /* Gives all the boss parts their normal object flags back. */
-void func_L23_0041C040(char *moby) {
-    char *state = *(char **)(gMothershipBossMoby + 0x68);
+void mothership_restore_part_flags(char *moby) {
+    char *state = *(char **)(g_mothership_boss_moby + 0x68);
     char *slot;
     char **p;
     int i;
@@ -247,17 +247,17 @@ void func_L23_0041C040(char *moby) {
 
 /* Releases the three measured handles of the level state. */
 /* Frees the boss effect handles when the boss fight ends. */
-void func_L23_0041D930(void) {
+void mothership_free_effect_handles(void) {
     char *state;
 
-    ReleaseBossEffectHandles(gMothershipBossMoby);
-    state = *(char **)(gMothershipBossMoby + 0x68);
+    mothership_release_effect_handles(g_mothership_boss_moby);
+    state = *(char **)(g_mothership_boss_moby + 0x68);
     if (*(char **)(state + 0x620) != 0) {
         func_31A108((int)*(char **)(state + 0x620));
         *(char **)(state + 0x620) = 0;
     }
     if (*(char **)(state + 0x624) != 0) {
-        StopBothLoopingSounds();
+        snd_stop_both_looping();
         func_31A108((int)*(char **)(state + 0x624));
         *(char **)(state + 0x624) = 0;
     }
@@ -269,7 +269,7 @@ void func_L23_0041D930(void) {
 
 /* Zero while the counter is negative. */
 /* Says whether the blast timer is negative (cooling down). */
-int func_L23_0041C0B0(void) {
+int mothership_is_blast_cooling_down(void) {
     if (D_L23_001B1694 < 0)
         return 1;
     return 0;
@@ -277,7 +277,7 @@ int func_L23_0041C0B0(void) {
 
 /* Zero when the value is among the first D_L23_001B38C0 words of the table, else one. */
 /* Says whether a value is not yet in the list of used slots. */
-int func_L23_00419CA0(int value) {
+int mothership_is_value_not_in_slots(int value) {
     int *table = &D_L23_001B1658;
     int i;
 
@@ -293,32 +293,32 @@ extern int D_L23_001B1424 __attribute__((sda));
 extern unsigned char D_001395B8[];
 
 
-extern void func_0029B758(int, int);
+extern void level_store_value_pair(int, int);
 
-extern void func_0029CE80(void);
+extern void level_set_dependent_value(void);
 
 /* Releases the five slot objects and the level object, then raises three flags. The flags are
  * written through a pointer set after the calls, as retail's `lui`/`addiu` base with the 0x88 and
  * 0xA1 displacements; written as D_001395B8[0xA1] and [0x88], the high half is hoisted into a
  * saved register (160 bytes). */
 /* Removes the boss parts and boss object, then marks the fight as finished. */
-void func_L23_0041D9B0(void) {
-    char **p = (char **)(*(char **)(gMothershipBossMoby + 0x68) + 0x358);
+void mothership_destroy_parts(void) {
+    char **p = (char **)(*(char **)(g_mothership_boss_moby + 0x68) + 0x358);
     unsigned char *flags;
     int i;
 
     for (i = 4; i >= 0; i--) {
         if (*p != 0) {
-            MarkMobySpawned(*p);
+            moby_mark_spawned(*p);
             *p = 0;
         }
         p++;
     }
-    if (gMothershipBossMoby != 0) {
-        StoreLevelObjectValuePair(0, 0);
-        SetLevelDependentValue();
-        MarkMobySpawned(gMothershipBossMoby);
-        gMothershipBossMoby = 0;
+    if (g_mothership_boss_moby != 0) {
+        level_store_value_pair(0, 0);
+        level_set_dependent_value();
+        moby_mark_spawned(g_mothership_boss_moby);
+        g_mothership_boss_moby = 0;
     }
     flags = D_001395B8;
     D_L23_001B1424 = 1;
@@ -340,13 +340,13 @@ typedef struct Vars_0041BE70 {
 /* A scalar: declared as an array, its address is scheduled differently in the two calls. */
 extern int D_L23_001B36E0;
 
-extern void func_002A90C8(void *, int, int, void *, float);
+extern void part_start_effect_default_table(void *, int, int, void *, float);
 
 /* Attaches the level object, the indexed slot or the held object, with the argument's two
  * words. The two early returns give retail's arm layout: [no held object][slot][held]. */
 /* Attaches a hit effect to the boss, one of its parts, or the held object. */
-void func_L23_0041BE70(char *source) {
-    char *state = gMothershipBossMoby;
+void mothership_attach_hit_effect(char *source) {
+    char *state = g_mothership_boss_moby;
     Vars_0041BE70 *vars = *(Vars_0041BE70 **)(state + 0x68);
     int index = vars->index;
     char *p;
@@ -354,17 +354,17 @@ void func_L23_0041BE70(char *source) {
     if (index == -1) {
         p = vars->held;
         if (p == 0) {
-            StartEffectWithDefaultTable(state, *(int *)(source + 0x20), 0x10000, state + 0x10,
+            part_start_effect_default_table(state, *(int *)(source + 0x20), 0x10000, state + 0x10,
                           *(float *)(source + 0x2C));
             return;
         }
     } else {
-        StartEffectWithDefaultTable(vars->slot[index], *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
+        part_start_effect_default_table(vars->slot[index], *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
                       *(float *)(source + 0x2C));
         return;
     }
     if ((*(unsigned short *)(p + 0x34) | 0x4000) != 0)
-        StartEffectWithDefaultTable(p, *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
+        part_start_effect_default_table(p, *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
                       *(float *)(source + 0x2C));
 }
 
@@ -376,32 +376,32 @@ extern float D_L23_001B1408 __attribute__((sda));
 
 /* Returns the new value in $f0. Declared void, the call leaves $f0 free and the measure
  * reloaded right after it takes $f0 where retail has $f1. */
-extern float func_002AA548(float *, float *, float, float, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 /* Springs the first measure toward its target at the three scaled global rates, and latches
  * it once it is within a tenth of the target. */
 /* Eases a boss value toward its target, and stops once it is close enough. */
-void func_L23_0041B498(char *moby) {
+void mothership_ease_value_to_target(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(int *)(vars + 0x5DC) != 0)
         return;
-    StepValueTowardTarget((float *)(vars + 0x5C8), (float *)(vars + 0x5CC), *(float *)(vars + 0x5D0),
+    math_step_value_toward_target((float *)(vars + 0x5C8), (float *)(vars + 0x5CC), *(float *)(vars + 0x5D0),
                   D_L23_001B1400 * 0.00027777778f, D_L23_001B1404 * 0.00027777778f,
                   D_L23_001B1408 * 0.016666668f);
-    if (FloatAbs(*(float *)(vars + 0x5C8) - *(float *)(vars + 0x5D0)) < 0.1f) {
+    if (math_fabs(*(float *)(vars + 0x5C8) - *(float *)(vars + 0x5D0)) < 0.1f) {
         *(int *)(vars + 0x5DC) = 1;
         *(int *)(vars + 0x5CC) = 0;
     }
 }
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
-extern void func_002E59F8(int);
+extern void snd_stop_voice(int);
 
-extern void func_00291450(int);
+extern void gfx_free_point_light(int);
 
 extern int D_L23_001B1418 __attribute__((sda));
 
@@ -418,17 +418,17 @@ extern void *D_L23_001B3790[2];
 
 /* Releases the measured handles, then every object handle of the three tables, and clears them. */
 /* Removes all the boss's effect objects and handles, and clears them. */
-void func_L23_0041A648(char *boss) {
+void mothership_release_effect_handles(char *boss) {
     char *vars = *(char **)(boss + 0x68);
     int i;
     int j;
 
     if (D_L23_001B1418 != -1) {
-        StopSoundVoice(D_L23_001B1418);
+        snd_stop_voice(D_L23_001B1418);
         D_L23_001B1418 = -1;
     }
     if (D_L23_001B146C != -1) {
-        FreePointLight(D_L23_001B146C);
+        gfx_free_point_light(D_L23_001B146C);
         D_L23_001B146C = -1;
     }
     if (*(int *)(vars + 0x5B0) != 0) {
@@ -436,21 +436,21 @@ void func_L23_0041A648(char *boss) {
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
                 if (D_L23_00259320[i][j] != 0) {
-                    MarkMobySpawned(D_L23_00259320[i][j]);
+                    moby_mark_spawned(D_L23_00259320[i][j]);
                     D_L23_00259320[i][j] = 0;
                 }
             }
         }
         for (i = 0; i < 4; i++) {
             if (D_L23_001B3790[i] != 0) {
-                MarkMobySpawned(D_L23_001B3790[i]);
+                moby_mark_spawned(D_L23_001B3790[i]);
                 D_L23_001B3790[i] = 0;
             }
         }
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
                 if (D_L23_00259380[i][j] != 0) {
-                    MarkMobySpawned(D_L23_00259380[i][j]);
+                    moby_mark_spawned(D_L23_00259380[i][j]);
                     D_L23_00259380[i][j] = 0;
                 }
             }
@@ -460,24 +460,24 @@ void func_L23_0041A648(char *boss) {
 }
 
 /* boot data: a pointer whose byte at +0x43 selects the draw range; nosda keeps its lui/lw pair */
-extern unsigned char *D_0018C0B0 __attribute__((nosda));
+extern unsigned char *g_hero_moby __attribute__((nosda));
 
-extern int D_L23_00259050[3][60];
+extern int g_effect_pools[3][60];
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern int func_L23_0041C8C0(char *, void *, int, int);
+extern int part_spawn_effect_in_free_slot(char *, void *, int, int);
 
 /* Draws a row (0, 1 or 2, the last one only when the byte at +0x43 is not 6) and hands the
  * position to func_L23_0041C8C0 with that row. The search for a free slot is retail's: its
  * result is never used. The three cases make cc1 build the decision tree rooted on 1 (with two,
  * it emits a comparison chain from 0). */
 /* Picks a random effect row and spawns the effect at the given position. */
-void func_L23_0041C7D8(void *pos, int extra) {
+void part_spawn_random_row_effect(void *pos, int extra) {
     int row = 0;
     int i;
 
-    switch (RandomIntBelow(gHeroMoby_0018C0B0[0x43] == 6 ? 2 : 3)) {
+    switch (math_random_int_below(g_hero_moby[0x43] == 6 ? 2 : 3)) {
     case 0:
         row = 1;
         break;
@@ -489,14 +489,14 @@ void func_L23_0041C7D8(void *pos, int extra) {
         break;
     }
     for (i = 0; i < 50; i++) {
-        if (gEffectPools[row][i] == 0)
+        if (g_effect_pools[row][i] == 0)
             break;
         if (i == 49) {
             i = -1;
             break;
         }
     }
-    SpawnEffectInFreeSlot(gMothershipBossMoby, pos, row, extra);
+    part_spawn_effect_in_free_slot(g_mothership_boss_moby, pos, row, extra);
 }
 /* The fields of the level state, the object and the hero this function reads. */
 typedef struct {
@@ -548,26 +548,26 @@ extern float D_L23_001B36D0[4] __attribute__((sda));
 
 extern int D_L23_001B371C;
 
-extern int func_00282948(int *);
+extern int math_fast_float_d(int *);
 
-extern void func_00282CF0(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
 
-extern void func_00282F20(float *, float *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
-extern void func_L23_0041E5B0(void *, int, int, TI128 *, float *, int);
+extern void cam_play_effect_on_target(void *, int, int, TI128 *, float *, int);
 
-extern int func_L23_00426248(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
+extern int slot_effect_create(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
 
 /* Runs the boss's charged blast: waits for the hero to charge, fires the blast, and pushes the hero back if close. */
-void func_L23_0041C0E8(C0E8Moby *boss) {
-    C0E8State *state = *(C0E8State **)(gMothershipBossMoby + 0x68);
+void mothership_update_charged_blast(C0E8Moby *boss) {
+    C0E8State *state = *(C0E8State **)(g_mothership_boss_moby + 0x68);
     float impulse[4] __attribute__((aligned(16)));
     TI128 spawnPos;
 
-    FastFloatHelperD(&D_L23_001B371C);
+    math_fast_float_d(&D_L23_001B371C);
     if (boss->state == 0x10 && state->dist < D_L23_001B168C && state->level > state->limit &&
-        FloatAbs(state->level - state->limit) < D_L23_001B1690) {
-        C0E8Hero *hero = (C0E8Hero *)gHeroState;
+        math_fabs(state->level - state->limit) < D_L23_001B1690) {
+        C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge >= 11 && D_L23_001B1694 == 0) {
             D_L23_001B16A4 = 1;
@@ -585,26 +585,26 @@ void func_L23_0041C0E8(C0E8Moby *boss) {
             else
                 D_L23_001B1694 += 2;
         } else {
-            C0E8Hero *hero = (C0E8Hero *)gHeroState;
+            C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
             if (hero->heat >= 11)
                 D_L23_001B16A8 = 1;
         }
     }
     if (D_L23_001B16A8 != 0 && D_L23_001B1694 > D_L23_001B1698) {
-        C0E8Hero *hero = (C0E8Hero *)gHeroState;
+        C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge >= 11)
             D_L23_001B1694 = D_L23_001B1698;
     }
     {
-        C0E8Hero *hero = (C0E8Hero *)gHeroState;
+        C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge != 0 && hero->armed == 0)
             D_L23_001B16A8 = 0;
     }
     {
-        C0E8Hero *hero = (C0E8Hero *)gHeroState;
+        C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge >= 11 && D_L23_001B16A4 == 0 && D_L23_001B1694 > 0 && D_L23_001B1694 <= D_L23_001B1698)
             D_L23_001B1694 = D_L23_001B1698 + 5;
@@ -616,34 +616,34 @@ void func_L23_0041C0E8(C0E8Moby *boss) {
     if (D_L23_001B1694 < 0) {
         D_L23_001B1694++;
         if (D_L23_001B371C == 0) {
-            C0E8Hero *hero = (C0E8Hero *)gHeroState;
+            C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
             if (hero->charge != 0 && state->range < 10.0f && state->level > state->limit) {
                 FastVecSub(impulse, hero->pos, (float *)&boss->pos);
                 vec_scale_to_length(impulse, impulse, 3.0f);
                 spawnPos = boss->pos;
                 impulse[3] = 5627.9248046875f;
-                PlayEffectOnTarget((void *)state->handle, 0x10007, 0x46, &spawnPos, impulse, 0);
+                cam_play_effect_on_target((void *)state->handle, 0x10007, 0x46, &spawnPos, impulse, 0);
                 D_L23_001B371C = D_L23_001B141C;
                 SpawnExplosion((char *)D_L23_001B36D0, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
             }
         }
     } else if (D_L23_001B1694 > 0) {
-        FastFloatHelperD(&D_L23_001B1694);
+        math_fast_float_d(&D_L23_001B1694);
         if (D_L23_001B1694 == 0) {
-            state->handle = CreateSlotEffect(&boss->pos, boss, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1.0f, 1, 1, 0, 0, 0x40);
+            state->handle = slot_effect_create(&boss->pos, boss, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1.0f, 1, 1, 0, 0, 0x40);
             D_L23_001B1694 = -D_L23_001B16AC;
             PlayMobySound(7, 0, (char *)boss);
             PlayMobySound(12, 0, (char *)boss);
             if (state->range < 15.0f && state->level > state->limit) {
-                C0E8Hero *hero = (C0E8Hero *)gHeroState;
+                C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
                 if (hero->busy == 0) {
                     FastVecSub(impulse, hero->pos, (float *)&boss->pos);
                     vec_scale_to_length(impulse, impulse, D_L23_001B16B0);
                     spawnPos = boss->pos;
                     impulse[3] = 5627.9248046875f;
-                    PlayEffectOnTarget(boss, 0x10007, 0x46, &spawnPos, impulse, 0);
+                    cam_play_effect_on_target(boss, 0x10007, 0x46, &spawnPos, impulse, 0);
                     SpawnExplosion((char *)D_L23_001B36D0, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
                 }
             }

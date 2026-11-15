@@ -2,12 +2,12 @@
 
 typedef int Quad __attribute__((mode(TI)));
 
-extern char *D_L00_001B144C __attribute__((sda));
-extern void func_002FEE50(int);
-extern int func_002FED90(void *, void *, float, float, float);
+extern char *g_lava_gun_ring_entries __attribute__((sda));
+extern void table_clear_entry_flag(int);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
 
-extern void func_L00_0041AF60(char *packet);
-extern float func_002A7878(float low, float high);
+extern void gfx_init_sprite_packet_large(char *packet);
+extern float math_random_float_range(float low, float high);
 extern int func_001163B0(void);
 
 /* One 0x40-byte entry of the ring at D_L00_001B144C. */
@@ -35,16 +35,16 @@ typedef struct {
 } RingOwner;
 
 /* Append two vectors to the 35-entry ring and replace the entry's effect handle. */
-void func_L00_0041ABB8(char *self, Quad *first, Quad *second, int value)
+void AppendVectorRingEntry(char *self, Quad *first, Quad *second, int value)
 {
     RingState *state = ((RingOwner *)self)->state;
-    RingEntry *slot = (RingEntry *)(state->head * 0x40 + gLavaGunRingEntries);
+    RingEntry *slot = (RingEntry *)(state->head * 0x40 + g_lava_gun_ring_entries);
 
     qcopy(&slot->first, first);
     qcopy(&slot->second, second);
     if (slot->handle >= 0)
-        ClearEntryFlag(slot->handle);
-    slot->handle = AllocEffectSlot_002FED90(self, slot, 1.0f, 1.0f, 1.0f);
+        table_clear_entry_flag(slot->handle);
+    slot->handle = part_alloc_effect_slot(self, slot, 1.0f, 1.0f, 1.0f);
     slot->value = value;
     slot->f34 = 0;
     state->last = state->head;
@@ -90,12 +90,12 @@ typedef struct {
     char pad520[0x10];
 } EffectSlot;
 
-extern char *D_L00_001B1450 __attribute__((sda));
+extern char *g_lava_gun_beam_slots __attribute__((sda));
 
 /* Takes the first free one of the ten effect slots: resets its four packets, scales
    the first two at random, places two points around ORIGIN with random velocities,
    scrolls and phases, marks the slot in use and stores the two quadwords. */
-void func_L00_0041B840(void *unused, float *origin, Quad *first, Quad *second)
+void SpawnRandomTaperedQuadPair(void *unused, float *origin, Quad *first, Quad *second)
 {
     EffectSlot *slot;
     PartView *view;
@@ -104,7 +104,7 @@ void func_L00_0041B840(void *unused, float *origin, Quad *first, Quad *second)
     Quad *point, *quads;
 
     for (index = 0; index < 10; index++) {
-        slot = (EffectSlot *)(index * 0x530 + (int)gLavaGunBeamSlots);
+        slot = (EffectSlot *)(index * 0x530 + (int)g_lava_gun_beam_slots);
         if (slot->inUse != 0)
             continue;
         quads = (Quad *)slot;
@@ -115,28 +115,28 @@ void func_L00_0041B840(void *unused, float *origin, Quad *first, Quad *second)
         point = quads;
         for (; part < 2; part++) {
             view = (PartView *)((char *)slot + part * 0x90);
-            InitSpritePacketLarge((char *)&slot->packet[part]);
-            InitSpritePacketLarge((char *)&slot->matrix[part]);
-            widthScale = RandomFloatRange(0.3f, 0.5f);
+            gfx_init_sprite_packet_large((char *)&slot->packet[part]);
+            gfx_init_sprite_packet_large((char *)&slot->matrix[part]);
+            widthScale = math_random_float_range(0.3f, 0.5f);
             view->m[0][1] *= widthScale;
             view->m[1][1] *= widthScale;
             view->m[2][1] *= widthScale;
             view->m[3][1] *= widthScale;
-            heightScale = RandomFloatRange(0.9f, 1.0f);
+            heightScale = math_random_float_range(0.9f, 1.0f);
             view->m[1][2] *= heightScale;
             view->m[3][2] *= heightScale;
             view->m[1][1] *= 0.4f;
             view->m[3][1] *= 0.4f;
-            ((float *)(point + 2))[0] = origin[0] + RandomFloatRange(-0.1f, 0.1f);
-            ((float *)(point + 2))[1] = origin[1] + RandomFloatRange(-0.1f, 0.1f);
+            ((float *)(point + 2))[0] = origin[0] + math_random_float_range(-0.1f, 0.1f);
+            ((float *)(point + 2))[1] = origin[1] + math_random_float_range(-0.1f, 0.1f);
             ((float *)(point + 2))[2] = origin[2];
             ((float *)(point + 2))[3] = 1.0f;
-            *velocity = RandomFloatRange(-0.02f, -0.01f);
+            *velocity = math_random_float_range(-0.02f, -0.01f);
             point++;
             velocity++;
-            *scroll = RandomFloatRange(-7.99f, 0.0f);
+            *scroll = math_random_float_range(-7.99f, 0.0f);
             scroll++;
-            *phase = Rand() % 2;
+            *phase = func_001163B0() % 2;
             phase++;
         }
         slot->f510 = 0;

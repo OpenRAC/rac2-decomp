@@ -162,7 +162,7 @@ extern float D_L23_001B14C4 __attribute__((sda));
 extern float D_L23_001B1470 __attribute__((sda));
 extern int D_L23_001B14A0 __attribute__((sda));
 extern int D_L23_001B3748 MACRO_ADDR;
-extern L23Moby *D_L23_001B1484 __attribute__((sda));
+extern L23Moby *g_mothership_boss_moby __attribute__((sda));
 extern L23Moby *D_L23_001B14FC __attribute__((sda));
 extern L23Moby *D_L23_001B13D0 __attribute__((sda));
 extern L23Moby *D_L23_001B279C, *D_L23_001B27A0, *D_L23_001B27A8;
@@ -176,34 +176,34 @@ extern int D_L23_00259320[8][3];
 extern L23Moby *D_L23_00259380[8][3];
 extern Quad D_L23_002593E0[8][3];
 extern L23Moby *D_L23_00259560[];
-extern unsigned char D_L23_002595C8[0xFE0];
-extern unsigned char D_00189E20[];
-extern unsigned char D_00138180[];
-extern int func_00282948(int *);
+extern unsigned char g_path_end_masks[0xFE0];
+extern unsigned char g_hero_state[];
+extern unsigned char g_pad_state[];
+extern int math_fast_float_d(int *);
 extern void func_001163A0(unsigned int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_L23_00418650(void *, float);
-extern void func_002B60B0(L23Moby *, float, float, float, float);
-extern void func_002A7750(L23Moby *, int, int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_L23_004196B8(L23Moby *);
-extern void func_L23_0041CA58(L23Moby *);
-extern void func_L23_00419970(L23Moby *);
-extern void func_0029B758(int, int);
-extern int func_L23_0041B478(void);
-extern int func_L23_0041DA48(void);
-extern void func_L00_002AF7D0(void);
-extern void func_L00_00310C88(void *, void *);
-extern int func_L22_002C9898(int, int);
-extern int func_00288FB8(int);
-extern int func_L00_0030DD70(int, int);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_00325600(void *, void *, void *);
-extern void func_L23_0041B9F0(L23Moby *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void mothership_project_point_onto_surface(void *, float);
+extern void moby_set_controller_speed_limits(L23Moby *, float, float, float, float);
+extern void moby_set_state(L23Moby *, int, int);
+extern void *memset(void *, int, unsigned int);
+extern void mothership_link_touching_path_ends(L23Moby *);
+extern void part_spawn_random_path_effects(L23Moby *);
+extern void mothership_advance_scan_slot(L23Moby *);
+extern void level_store_value_pair(int, int);
+extern int mothership_call_helper_return_true(void);
+extern int L23_DrawEncounterHud(void);
+extern void cancel_hero_item_animation(void);
+extern void release_moby_animation_slot(void *, void *);
+extern int hero_l22_set_action(int, int);
+extern int GetLocalizedString(int);
+extern int level_l00_call_module_handler_with_arg_9(int, int);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void vec_negate_and_forward(void *, void *, void *);
+extern void UpdateShieldHitsAndStrength(L23Moby *);
 
 /* Initialize the encounter objects and refresh their shared presentation state. */
-void func_L23_004177F8(L23Moby *moby) {
+void mothership_update(L23Moby *moby) {
     Quad vecs[10];
     L23Boss *state = moby->vars;
     L23Moby *obj;
@@ -211,7 +211,7 @@ void func_L23_004177F8(L23Moby *moby) {
     int i, j, classId, crowdCount, partCount, mode;
     float health;
 
-    FastFloatHelperD(&D_L23_001B3748);
+    math_fast_float_d(&D_L23_001B3748);
     if (moby->mode == 0) {
         D_L23_001B3820[1] = 0;
         D_L23_001B3820[0] = 0;
@@ -228,7 +228,7 @@ void func_L23_004177F8(L23Moby *moby) {
         state->m620 = 0;
         state->m624 = 0;
         D_L23_001B1650 = 1;
-        gMothershipBossMoby = moby;
+        g_mothership_boss_moby = moby;
         state->i60C = 0;
         D_L23_001B36F0 = state->i31C;
         D_L23_001B36F4 = state->f308;
@@ -253,7 +253,7 @@ void func_L23_004177F8(L23Moby *moby) {
         state->i59C = 0;
         D_L23_001B36A8 = state->t230;
         state->b1B7 = 1;
-        Srand(T1_COUNT);
+        func_001163A0(T1_COUNT);
         D_L23_001B374C = -1;
         D_L23_001B3754 = 0;
         state->i408 = 0;
@@ -282,7 +282,7 @@ void func_L23_004177F8(L23Moby *moby) {
                     D_L23_00259560[crowdCount++] = obj;
                 } else if (classId == 0x27D /* moby class 637 */) {
                     qcopy(&vecs[0], &obj->pos);
-                    qcopy(gHeroState + 0x80, &obj->pos);
+                    qcopy(g_hero_state + 0x80, &obj->pos);
                 } else if (classId == 0xF7E /* moby class 3966 */) {
                     state->parts[partCount++] = obj;
                 } else if (classId == 0x120F /* moby class 4623 */) {
@@ -302,22 +302,22 @@ void func_L23_004177F8(L23Moby *moby) {
                 }
         }
         }
-        FastVecSub(&vecs[0], &vecs[0], gHeroState + 0xB0);
+        FastVecSub(&vecs[0], &vecs[0], g_hero_state + 0xB0);
         D_L23_001B36A4 = FastVecLength(&vecs[0]);
         vecs[1] = 0;
         ((float *)&vecs[1])[0] = 500.0f;
         ((float *)&vecs[1])[1] = 500.0f;
         ((float *)&vecs[1])[2] = 430.0f;
-        ProjectPointOntoPlanetSurface(&vecs[1], 0.0f);
+        mothership_project_point_onto_surface(&vecs[1], 0.0f);
         qcopy(&D_L23_001B3760, &vecs[1]);
         vecs[1] = 0;
         ((float *)&vecs[1])[0] = 500.0f;
         ((float *)&vecs[1])[1] = 500.0f;
         ((float *)&vecs[1])[2] = 552.0f;
-        ProjectPointOntoPlanetSurface(&vecs[1], 0.0f);
+        mothership_project_point_onto_surface(&vecs[1], 0.0f);
         qcopy(&D_L23_001B3770, &vecs[1]);
         qcopy(&moby->pos, &D_L23_001B13F0);
-        ProjectPointOntoPlanetSurface(&moby->pos, D_L23_001B14D0);
+        mothership_project_point_onto_surface(&moby->pos, D_L23_001B14D0);
         moby->colour = 255;
         moby->alpha = 255;
         moby->flags |= 0x100;
@@ -344,9 +344,9 @@ void func_L23_004177F8(L23Moby *moby) {
         state->flags88 |= 5;
         state->f60 = 1.57079649f;
         state->f80 = 1.55334318f;
-        SetControllerSpeedLimits(moby, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
-        SetMobyState(moby, 2, 0);
-        memset(gPathEndMasks, 0, 0xFE0);
+        moby_set_controller_speed_limits(moby, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
+        moby_set_state(moby, 2, 0);
+        memset(g_path_end_masks, 0, 0xFE0);
         state->h390 = 0;
         state->h39C = -1;
         state->h39A = -1;
@@ -360,13 +360,13 @@ void func_L23_004177F8(L23Moby *moby) {
             for (left = 4; left != 0; left--) *dst++ = *src++;
         }
         D_L23_001B166C = 0;
-        LinkTouchingPathEnds(moby);
-        SpawnRandomPathEffects(moby);
+        mothership_link_touching_path_ends(moby);
+        part_spawn_random_path_effects(moby);
         state->f588 = D_L23_001B14C4;
         state->flags88 |= 16;
         moby->timer = 15;
     } else {
-        AdvanceScanSlot(moby);
+        mothership_advance_scan_slot(moby);
         mode = moby->mode;
         if (mode != 4 && mode != 10 && mode != 11) {
             int part;
@@ -391,7 +391,7 @@ void func_L23_004177F8(L23Moby *moby) {
             }
         }
     }
-    StoreLevelObjectValuePair((int)CallHelperAndReturnTrue, (int)L23_DrawEncounterHud);
+    level_store_value_pair((int)mothership_call_helper_return_true, (int)L23_DrawEncounterHud);
     moby->scale = moby->cls->scale * D_L23_001B1470;
     {
         int part;
@@ -402,28 +402,28 @@ void func_L23_004177F8(L23Moby *moby) {
     if (state->m610) state->m610->scale = state->m610->cls->scale * D_L23_001B1470;
     if (state->m614) state->m614->scale = state->m614->cls->scale * D_L23_001B1470;
     if (D_L23_001B1424) {
-        L23Game *game = (L23Game *)gHeroState;
-        L23Pad *pad = (L23Pad *)gPadState;
+        L23Game *game = (L23Game *)g_hero_state;
+        L23Pad *pad = (L23Pad *)g_pad_state;
         D_L23_001B1424++;
         game->f1E0 = 10;
         state->h390 = 0;
         if (pad->f1A4 & 0x50) {
             D_L23_001B1424 = 0;
-            SetMobyState(moby, 1, 0);
+            moby_set_state(moby, 1, 0);
             game->f1E0 = 20;
             pad->f1A4 = 0;
             D_L23_001B3748 = D_L23_001B14A0;
-            CallLoadedModuleHandlerWithArg_003387A0_1(GetLocalizedString(0x3157), -1);
+            level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x3157), -1);
         } else if (D_L23_001B1424 < 30) {
             game->f2294 = 0;
             cancel_hero_item_animation();
             release_moby_animation_slot(game->f2290, game->f1870);
             game->f187C = 0;
-            SetHeroAction_L22(0, 1);
+            hero_l22_set_action(0, 1);
         }
     }
-    ComputeViewDirection(&moby->pos, state->m410, 0);
-    NegateAndForwardVector(&moby->rot, state->m410, 0);
-    if (moby->mode != 7) ProjectPointOntoPlanetSurface(&moby->pos, state->f588);
+    cam_compute_view_direction(&moby->pos, state->m410, 0);
+    vec_negate_and_forward(&moby->rot, state->m410, 0);
+    if (moby->mode != 7) mothership_project_point_onto_surface(&moby->pos, state->f588);
     UpdateShieldHitsAndStrength(moby);
 }

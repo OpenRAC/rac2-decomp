@@ -13,7 +13,7 @@ extern unsigned int D_L04_001A8ED0;
 extern unsigned int D_L04_001B0908 __attribute__((sda));
 
 /* Sets two level-04 race state flags. */
-void func_L04_0040AC80(void)
+void race_set_state_flags_a(void)
 {
     D_L04_001A8ED0 = 2;
     D_L04_001B0908 = 1;
@@ -22,7 +22,7 @@ void func_L04_0040AC80(void)
 extern unsigned int D_L04_001B0910 __attribute__((sda));
 
 /* Sets one level-04 race state flag. */
-void func_L04_0040AC98(void)
+void race_set_state_flag_b(void)
 {
     D_L04_001B0910 = 1;
 }
@@ -39,7 +39,7 @@ extern unsigned int D_L04_001A8ED0_1 __attribute__((sda));
 extern unsigned int D_L04_001A8EE4;
 
 /* Sets three level-04 race state flags. */
-void func_L04_0040ACA8(void)
+void race_set_state_flags_c(void)
 {
     D_L04_001A8EE4 = 1;
     D_L04_001A8ED0_1 = 2;
@@ -66,18 +66,18 @@ typedef struct {
     float f2d0;
 } L04_004044B8_Record;
 
-extern int func_002ACBC8(void *, int);
+extern int IsPointInCuboid(void *, int);
 
-extern void func_002A7470(char *, int, int, int);
+extern void anim_start_blended(char *, int, int, int);
 
 /* 0x001A7B90 is the boot's resident data, reached off $gp in the delay slot. */
-extern int D_001A7B90 __attribute__((sda));
+extern int g_is_pal_video __attribute__((sda));
 
-extern int D_L04_001A8FE8;
+extern int g_race_time_ticks;
 
 /* Updates the record's flag from the two point tests, prints the message when the
    record has one and its counter runs, then advances the counter and the value. */
-void func_L04_004044B8(void *racer, L04_004044B8_Record *record)
+void racer_update_checkpoint_progress(void *racer, L04_004044B8_Record *record)
 {
     char *racerPos = (char *)racer + 0x10;
     int counter;
@@ -93,7 +93,7 @@ void func_L04_004044B8(void *racer, L04_004044B8_Record *record)
     }
     counter = record->f160;
     if (record->f8c && counter > 0) {
-        StartAnimationBlended(record->f8c, 9, 0, 0xC);
+        anim_start_blended(record->f8c, 9, 0, 0xC);
         counter = record->f160;
     }
     if (counter < 4) {
@@ -101,7 +101,7 @@ void func_L04_004044B8(void *racer, L04_004044B8_Record *record)
         float seconds;
         float newValue;
 
-        if (gIsPalVideo != 0) {
+        if (g_is_pal_video != 0) {
             seconds = frames * 0.02f;
         } else {
             seconds = frames * 0.016666667f;
@@ -118,7 +118,7 @@ void func_L04_004044B8(void *racer, L04_004044B8_Record *record)
             return;
         }
         if (*(unsigned char *)(record->f164 + 0x20) == 2) {
-            record->f1a0 = gRaceTimeTicks;
+            record->f1a0 = g_race_time_ticks;
         }
     }
 }
@@ -131,7 +131,7 @@ void func_L04_004044B8(void *racer, L04_004044B8_Record *record)
 typedef unsigned int AttackQuad __attribute__((mode(TI)));
 typedef struct { int v[5]; } AttackChoices;
 extern AttackChoices D_L04_001B0A10;
-extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } D_00189E20;
+extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } g_hero_state;
 typedef struct {
  unsigned char pad0[0x260]; int triggerList;
  unsigned char pad264[0x10]; short elevated;
@@ -144,62 +144,62 @@ typedef struct {
  unsigned char pad4e0[0x284]; int cooldown, ready;
 } AttackState;
 typedef struct { int unused, flags; unsigned char pad8[0x38]; } AttackSettings;
-extern AttackSettings D_L04_002C63C0[];
+extern AttackSettings g_race_challenge_table[];
 
 extern unsigned char *D_L04_001C3B40[];
-extern int D_L04_001B090C __attribute__((sda));
+extern int g_current_race_index __attribute__((sda));
 extern int D_00138320 NOT_SDA,D_00138324 NOT_SDA;
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_00277F48(void *,float,int,void *,int);
-extern int func_002ABB78(void *);
-extern void func_002A8F70(void *,void *,int,void *,void *,float);
-extern void func_L04_0040E460(void *);
-extern int func_002A8600(void *,int,int,int);
-extern int func_002A86E8(void *,void *,int,int);
-extern void func_00282CF0(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int coll_process_hit(void *,float,int,void *,int);
+extern int moby_is_in_special_class_range(void *);
+extern void part_queue_impact_effect(void *,void *,int,void *,void *,float);
+extern void racer_update_boost(void *);
+extern int GetFirstMobyInGroup(void *,int,int,int);
+extern int GetNextMobyInGroup(void *,void *,int,int);
+extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
-extern int func_002A7820(int,int);
-extern int func_002E5DA0(int,int,void *,int);
-extern void func_L04_0040C0C0(void *,void *,int,int);
-extern int func_00282948(void *);
-extern void func_0029FCC0(void *,int,void *);
-extern void func_002AF000(void *,float,float,float);
-extern void func_00282CD8(void *,void *,void *);
-extern void func_L04_003F9320(void *,void *,void *,int);
-extern int func_002E5CF8(int,int,void *);
-extern unsigned char *func_L04_0040EC80(void *,void *,void *,void *,void *,void *,float,float);
-extern int func_L00_002D6900(int);
-extern void * func_L04_003FA5A8(void *,void *,void *,float,float,float,float,float);
-extern void * func_L04_003FBD80(void *,void *);
+extern int math_random_int_range(int,int);
+extern int snd_play_from_class_bank(int,int,void *,int);
+extern void part_l04_spawn_burst(void *,void *,int,int);
+extern int math_fast_float_d(void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern void vec_build_spherical_offset(void *,float,float,float);
+extern void add_vectors(void *,void *,void *);
+extern void SpawnHomingShot(void *,void *,void *,int);
+extern int PlayMobySound(int,int,void *);
+extern unsigned char *bike_find_aim_target(void *,void *,void *,void *,void *,void *,float,float);
+extern int queue_copy_record_by_index(int);
+extern void * homing_rocket_spawn(void *,void *,void *,float,float,float,float,float);
+extern void * shield_dome_spawn(void *,void *);
 /* Lets the racer pick up item boxes and fire its chosen weapon: shots, homing rockets or a dome blast. */
-void func_L04_0040EF50(unsigned char *racer)
+void racer_update_item_use(unsigned char *racer)
 {
  AttackChoices choices;
  float origin[4],dir[4],delta[4],probe[4],temp[4];
  unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *racerState=*(AttackState **)(racer+0x68); unsigned char *boxVars; int count,i,state,choice;
  choices=D_L04_001B0A10;
  FastVecScale(probe,racerState->offset,3);
- FastVecAdd(probe,probe,((unsigned char *)&gHeroState + 0xe0));
- count=ProcessCollisionHit(probe,0.7f,0,gHeroState.hero,0);
+ FastVecAdd(probe,probe,((unsigned char *)&g_hero_state + 0xe0));
+ count=coll_process_hit(probe,0.7f,0,g_hero_state.hero,0);
  if(count) {
   FastVecScale(delta,racerState->offset,7);
-  for(i=0;i<count;i++) if(IsMobyInSpecialClassRange(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85 /* moby class 133 */)
-   QueueImpactEffect(D_L04_001C3B40[i],gHeroState.hero,0x10000,gHeroState.position,delta,1);
+  for(i=0;i<count;i++) if(moby_is_in_special_class_range(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85 /* moby class 133 */)
+   part_queue_impact_effect(D_L04_001C3B40[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
  }
- UpdateRacerBoost(racer);
- if((gRaceChallengeTable[gCurrentRaceIndex].flags&1) && racerState->triggerList!=-1) {
+ racer_update_boost(racer);
+ if((g_race_challenge_table[g_current_race_index].flags&1) && racerState->triggerList!=-1) {
   GetFirstMobyInGroup(&target,racerState->triggerList,0,0);
   while(target) {
    if(H(target,0xaa)==0xab8 /* Hoverbike Race Item Box */) {
     boxVars=P(target,0x68);FastVecSub(delta,target+16,racer+16);
     if(!I(boxVars,0) && func_L00_002EE290(delta)<1) {
      choice=racerState->state;state=choice;
-     if(I(boxVars,4)==-1) do {choice=RandomIntRange(1,4);} while(state==choice && I(boxVars,4)==-1);
+     if(I(boxVars,4)==-1) do {choice=math_random_int_range(1,4);} while(state==choice && I(boxVars,4)==-1);
      if(choice==4) {racerState->alternate=1;racerState->alternateTimer=choices.v[4];}
      else {int duration; racerState->state=choice;duration=choices.v[choice];racerState->timer=0;racerState->duration=duration;}
-     if(racer[0x20]!=3)PlaySoundFromClassBank(0,0,racer,0xab8 /* Hoverbike Race Item Box */);
-     SpawnParticleBurst_L04(target+16,racerState->offset,8,0);I(boxVars,0)=300;
+     if(racer[0x20]!=3)snd_play_from_class_bank(0,0,racer,0xab8 /* Hoverbike Race Item Box */);
+     part_l04_spawn_burst(target+16,racerState->offset,8,0);I(boxVars,0)=300;
     }
    }
    GetNextMobyInGroup(&target,target,0,0);
@@ -207,40 +207,40 @@ void func_L04_0040EF50(unsigned char *racer)
  }
  if(racerState->alternate) {
   racerState->ready=0;
-  if(FastFloatHelperD(&racerState->alternateTimer)) {racerState->alternate=0;racerState->ready=1;}
+  if(math_fast_float_d(&racerState->alternateTimer)) {racerState->alternate=0;racerState->ready=1;}
  }
- if(racerState->ready && FastFloatHelperD(&racerState->cooldown)) {racerState->ready=0;racerState->cooldown=40;}
+ if(racerState->ready && math_fast_float_d(&racerState->cooldown)) {racerState->ready=0;racerState->cooldown=40;}
  if(racer[0x20]==3)return;
  switch(racerState->state) {
  case 0: break;
  case 1:
-  if(FastFloatHelperD(&racerState->timer) && (D_00138320&5)) {
-   racerState->timer=3;TransformMobyJointToWorld(racer,((racerState->duration^1)&1),origin);
-   if(racerState->elevated)BuildSphericalOffset(dir,racerState->length+0.5f,F(racer,0xf8),-racerState->tilt);
-   else BuildSphericalOffset(dir,racerState->length+0.5f,F(racer,0xf8),-F(racer,0xf4));
+  if(math_fast_float_d(&racerState->timer) && (D_00138320&5)) {
+   racerState->timer=3;moby_transform_joint_to_world(racer,((racerState->duration^1)&1),origin);
+   if(racerState->elevated)vec_build_spherical_offset(dir,racerState->length+0.5f,F(racer,0xf8),-racerState->tilt);
+   else vec_build_spherical_offset(dir,racerState->length+0.5f,F(racer,0xf8),-F(racer,0xf4));
    add_vectors(temp,origin,dir);SpawnHomingShot(racer,origin,dir,120);PlayMobySound(7,0,racer);
-   if(FastFloatHelperD(&racerState->duration))racerState->state=0;
+   if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }return;
  case 2: {
   unsigned char *target; float tilt;
-  if(FastFloatHelperD(&racerState->timer) && (D_00138324&5)) {
-   yaw=0;extra=0;racerState->timer=30;TransformMobyJointToWorld(racer,((racerState->duration^1)&1),origin);tilt=F(racer,0xf8);
-   if(racerState->elevated)BuildSphericalOffset(dir,racerState->length+0.5f+racerState->height,tilt,yaw);
-   else {BuildSphericalOffset(dir,racerState->length+0.5f+racerState->height,tilt,-F(racer,0xf4));yaw=F(racer,0xf4);}
+  if(math_fast_float_d(&racerState->timer) && (D_00138324&5)) {
+   yaw=0;extra=0;racerState->timer=30;moby_transform_joint_to_world(racer,((racerState->duration^1)&1),origin);tilt=F(racer,0xf8);
+   if(racerState->elevated)vec_build_spherical_offset(dir,racerState->length+0.5f+racerState->height,tilt,yaw);
+   else {vec_build_spherical_offset(dir,racerState->length+0.5f+racerState->height,tilt,-F(racer,0xf4));yaw=F(racer,0xf4);}
    pitch=tilt;yaw-=0.3490659f;
-   target=FindHoverbikeAimTarget(racer,origin,dir,&aimPitch,&aimYaw,&extra,0.78539824f,30);
+   target=bike_find_aim_target(racer,origin,dir,&aimPitch,&aimYaw,&extra,0.78539824f,30);
    if(target) {
     FastVecSub(delta,origin,target+16);
     if(func_L00_002EE290(delta)<25) {pitch=aimPitch;yaw=aimYaw;}
    } else {aimPitch=pitch;aimYaw=yaw;extra=0.2f;}
-   QueueRecordsByIndex(47);add_vectors(temp,origin,dir);
-   SpawnHomingRocket(racer,origin,target,aimPitch,aimYaw,extra,pitch,yaw);PlayMobySound(8,0,racer);
-   if(FastFloatHelperD(&racerState->duration))racerState->state=0;
+   queue_copy_record_by_index(47);add_vectors(temp,origin,dir);
+   homing_rocket_spawn(racer,origin,target,aimPitch,aimYaw,extra,pitch,yaw);PlayMobySound(8,0,racer);
+   if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }return; }
  case 3:
-  if(FastFloatHelperD(&racerState->timer) && (D_00138324&5)) {
-   racerState->timer=30;FastVecAdd(temp,racer+16,racerState->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;SpawnShieldDome(racer,origin);
-   if(FastFloatHelperD(&racerState->duration))racerState->state=0;
+  if(math_fast_float_d(&racerState->timer) && (D_00138324&5)) {
+   racerState->timer=30;FastVecAdd(temp,racer+16,racerState->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;shield_dome_spawn(racer,origin);
+   if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }
   break;
  }

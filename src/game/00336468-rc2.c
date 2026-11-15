@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,11 +25,11 @@
  */
 #include "common.h"
 
-extern s32 func_003360F8();
+extern s32 object_destroy_array();
 extern s8 D_001AD9F8[];
 
 /* Sets the object type pointer and runs the shared base cleanup. */
-void func_00336468(void *obj) {
+void object_reset_type_and_cleanup_b(void *obj) {
     (*(s8 **)((char *)(obj) + (0x30))) = D_001AD9F8;
-    DestroyArrayObject();
+    object_destroy_array();
 }

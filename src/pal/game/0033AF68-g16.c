@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_PAL_0033AF68, the PAL copy of func_00339078: the same C, where the four labels from object + 0x138
    step 0x58 instead of 0x48, the fields after them move up by 0x40, and both label texts are looked up. */
-extern int func_00336E40(void *);
-extern float *func_00336DA8(int, int);
-extern void func_003361E0(void *, void *, void *);
+extern int pool_alloc_cell(void *);
+extern float *ui_return_second_arg(int, int);
+extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
-extern void func_00336A30(void *, int);
-extern unsigned int *func_00335E20(void *);
-extern void func_00336390(void *, void *, int);
-extern void func_00336A38(void *, void *);
-extern void *func_00288FB8(int);
+extern void hud_set_widget_field_a(void *, int);
+extern unsigned int *object_get_fourth_field(void *);
+extern void object_set_helper_result(void *, void *, int);
+extern void hud_set_widget_field_b(void *, void *);
+extern void *GetLocalizedString(int);
 extern int func_PAL_0033B218(void *, int);
 extern char *ref_L00_0042E9A8_00;
 extern char ref_L00_0042E9A8_01[];
@@ -34,7 +35,7 @@ void func_PAL_0033AF68(char *object, void *parent)
     *(void **)object = parent;
     *(int *)(object + 0x2d8) = 1;
     if (parent) {
-        position = func_00336DA8(16, func_00336E40(parent));
+        position = ui_return_second_arg(16, pool_alloc_cell(parent));
         *(float **)(object + 4) = position;
         position[1] = 0.0f;
         position[2] = 0.0f;
@@ -50,28 +51,28 @@ void func_PAL_0033AF68(char *object, void *parent)
     mission = object + 0xec;
     description = object + 0x190;
     details = object + 0x1e8;
-    func_003361E0(title, ref_L00_0042E9A8_01, parent);
-    func_003361E0(city, ref_L00_0042E9A8_02, parent);
-    func_003361E0(planet, ref_L00_0042E9A8_03, parent);
-    func_003361E0(mission, ref_L00_0042E9A8_04, parent);
+    object_init_derived_arrays(title, ref_L00_0042E9A8_01, parent);
+    object_init_derived_arrays(city, ref_L00_0042E9A8_02, parent);
+    object_init_derived_arrays(planet, ref_L00_0042E9A8_03, parent);
+    object_init_derived_arrays(mission, ref_L00_0042E9A8_04, parent);
     func_PAL_00338688(name, ref_L00_0042E9A8_05, parent);
     func_PAL_00338688(description, ref_L00_0042E9A8_06, parent);
     func_PAL_00338688(details, ref_L00_0042E9A8_07, parent);
     func_PAL_00338688(object + 0x240, ref_L00_0042E9A8_08, parent);
-    func_00336A30(details, 1);
-    *func_00335E20(title) = 0x60442d00;
-    *func_00335E20(city) = 0x60241700;
-    *func_00335E20(planet) = 0x55f0c070;
-    *func_00335E20(mission) = 0x55f0c070;
-    *func_00335E20(name) = 0x80f0f0f0;
-    *func_00335E20(description) = 0x80f0f0f0;
-    *func_00335E20(details) = 0x80f0f0f0;
-    func_00336390(title, ref_L00_0042E9A8_00 + 0x8710, 0x6b);
-    func_00336390(city, ref_L00_0042E9A8_00 + 0x8710, 0x6c);
-    func_00336390(planet, ref_L00_0042E9A8_00 + 0x8710, 0x6d);
-    func_00336390(mission, ref_L00_0042E9A8_00 + 0x8710, 0x6e);
-    func_00336A38(name, func_00288FB8(0xbd6));
-    func_00336A38(description, func_00288FB8(0xb60));
-    func_00336A38(details, object + 0x298);
+    hud_set_widget_field_a(details, 1);
+    *object_get_fourth_field(title) = 0x60442d00;
+    *object_get_fourth_field(city) = 0x60241700;
+    *object_get_fourth_field(planet) = 0x55f0c070;
+    *object_get_fourth_field(mission) = 0x55f0c070;
+    *object_get_fourth_field(name) = 0x80f0f0f0;
+    *object_get_fourth_field(description) = 0x80f0f0f0;
+    *object_get_fourth_field(details) = 0x80f0f0f0;
+    object_set_helper_result(title, ref_L00_0042E9A8_00 + 0x8710, 0x6b);
+    object_set_helper_result(city, ref_L00_0042E9A8_00 + 0x8710, 0x6c);
+    object_set_helper_result(planet, ref_L00_0042E9A8_00 + 0x8710, 0x6d);
+    object_set_helper_result(mission, ref_L00_0042E9A8_00 + 0x8710, 0x6e);
+    hud_set_widget_field_b(name, GetLocalizedString(0xbd6));
+    hud_set_widget_field_b(description, GetLocalizedString(0xb60));
+    hud_set_widget_field_b(details, object + 0x298);
     func_PAL_0033B218(object, 0);
 }

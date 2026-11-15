@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_00138344;
 typedef struct {
@@ -9,7 +10,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void func_L00_0030D838(int);
+extern void module_l00_call_handler_with_arg_18(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034E9A0(void)
@@ -31,24 +32,24 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030D838(flags);
+        module_l00_call_handler_with_arg_18(flags);
     return result;
 }
 
 extern void func_0027C540_4(long arg0);
-extern void func_L00_0030D878(void);
+extern void module_l00_call_handler_18(void);
 extern void func_0027C660_4(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 unsigned long long func_PAL_L00_0034EA28(void)
 {
     func_0027C540_4(0);
-    func_L00_0030D878();
+    module_l00_call_handler_18();
     func_0027C660_4();
     return 0;
 }
 
-extern void func_L00_0030D8A8(int);
+extern void module_l00_call_handler_with_arg_19(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EA58(void)
@@ -70,23 +71,23 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030D8A8(flags);
+        module_l00_call_handler_with_arg_19(flags);
     return result;
 }
 
-extern void func_0027C540(int a);
-extern void func_0027C660(void);
-extern void func_L00_0030D8E8(void);
+extern void SetupGifPaging(int a);
+extern void DoGifPaging(void);
+extern void module_l00_call_handler_19(void);
 
 int func_PAL_L00_0034EAE0(void)
 {
-    func_0027C540(0);
-    func_L00_0030D8E8();
-    func_0027C660();
+    SetupGifPaging(0);
+    module_l00_call_handler_19();
+    DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030DAD8(int);
+extern void level_l00_call_module_handler_with_arg_4(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EB10(void)
@@ -108,22 +109,22 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030DAD8(flags);
+        level_l00_call_module_handler_with_arg_4(flags);
     return result;
 }
 
-extern void func_L00_0030DB18(void);
+extern void level_l00_call_module_handler_5(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_PAL_L00_0034EB98(void)
 {
-    func_0027C540(0);
-    func_L00_0030DB18();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_5();
+    DoGifPaging();
     return 0;
 }
 
-extern void func_L00_0030DA68(int);
+extern void level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EBC8(void)
@@ -145,18 +146,18 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_L00_0030DA68(flags);
+        level_l00_call_module_handler_with_arg_3(flags);
     return result;
 }
 
-extern void func_L00_0030DAA8(void);
+extern void level_l00_call_module_handler_4(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 int func_PAL_L00_0034EC50(void)
 {
-    func_0027C540(0);
-    func_L00_0030DAA8();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_4();
+    DoGifPaging();
     return 0;
 }
 

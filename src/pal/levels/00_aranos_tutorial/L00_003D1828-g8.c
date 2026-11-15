@@ -4,25 +4,25 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x80]; Vec position; } LiftHero;
-extern LiftHero D_00189E20;
+extern LiftHero g_hero_state;
 typedef struct { char head[0x10]; Vec position; char tail[0xD0]; Vec rotation; } LiftMoby;
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; char *owner; } LiftSound;
-extern unsigned char D_00188660[];
+extern unsigned char g_sound_state[];
 typedef struct { char pad[0x140]; Vec from, to; char gap[0x30]; char *camera; } LiftCamera;
 extern LiftCamera D_L00_001B8C80;
 extern const int D_001A7908;
-extern float func_00283B98(float, float), func_00283198(float), func_00282C48(float), func_002A7940(void);
-extern float func_00282E80(void *, void *), func_00282E48(void *, void *);
-extern int func_00283CF0(float), func_L00_00324120(int), func_002E59B0(void *, int), func_002E5CF8(int, int, void *);
-extern int func_002ACBC8(void *, int);
-extern void func_002A7750(void *, int, int), func_002E59F8(int), func_0029F338(void *), func_002A0F48(void *);
-extern char *func_0029EFD0(int), *func_PAL_L00_002D7850(int);
-extern void func_L00_002D7140(void *), func_00335438(void *, void *, int, int, int), func_003353C8(void *);
-extern void func_00335370(void *), func_003355A8(int);
-extern void func_00282CF0(void *, void *, void *), func_002AD6F0(void *, void *, void *, void *);
-extern float func_002AA3A8(void *, void *, float, float, float, float);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern int func_002E5DA0(int, int, void *, int);
+extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float), math_fabs(float), math_random_angle(void);
+extern float vec_distance_xy(void *, void *), fast_vec_dist(void *, void *);
+extern int FloatToInt(float), hero_is_current_selected_id(int), snd_is_voice_playing_for_owner(void *, int), PlayMobySound(int, int, void *);
+extern int IsPointInCuboid(void *, int);
+extern void moby_set_state(void *, int, int), snd_stop_voice(int), moby_mark_spawned(void *), func_002A0F48(void *);
+extern char *CreateMoby(int), *func_PAL_L00_002D7850(int);
+extern void cam_end_override(void *), SetCamera5Pose(void *, void *, int, int, int), cam_set_state_rotation(void *);
+extern void object_copy_vector_to_selected(void *), cam_set_mode_state(int);
+extern void FastVecSub(void *, void *, void *), mat_combine_and_store(void *, void *, void *, void *);
+extern float math_spring_float_to_goal(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern int snd_play_from_class_bank(int, int, void *, int);
 typedef struct {
     char head[0x20], transform[0x3C];
     int flags;
@@ -90,10 +90,10 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
         }
         ctx->counter = 0;
         ctx->sound = -1;
-        created = func_0029EFD0(0xC16);
+        created = CreateMoby(0xC16);
         ctx->child = created;
         if (!created) {
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
             return;
         }
         created[0x30] = obj[0x30];
@@ -105,12 +105,12 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
             F(child, 0x18) += 0.25f;
         }
         func_002A0F48(ctx->child);
-        ctx->phase = func_002A7940();
+        ctx->phase = math_random_angle();
         break;
     }
     case 1:
-        ctx->phase = func_00283B98(ctx->phase, 0.12566373f);
-        value = func_00283CF0((func_00283198(ctx->phase) * 4.0f - 3.0f) * 208.0f);
+        ctx->phase = FastAddRotations(ctx->phase, 0.12566373f);
+        value = FloatToInt((math_fast_sin_or_cos_b(ctx->phase) * 4.0f - 3.0f) * 208.0f);
         if (value > 208)
             value = 208;
         else if (value < 80)
@@ -121,22 +121,22 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
             unsigned int color = brightness << 16 | low;
             I(ctx->child, 0x78) = color | brightness;
         }
-        if (func_L00_00324120((int)ctx->child) && ctx->direction) {
-            func_002A7750(obj, 2, -1);
+        if (hero_is_current_selected_id((int)ctx->child) && ctx->direction) {
+            moby_set_state(obj, 2, -1);
             ctx->velocity = 0.0f;
             I(ctx->child, 0x78) = 0x8000DF2A;
             if (!D_001A7908) {
-                func_00335438(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 100, 0);
+                SetCamera5Pose(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 100, 0);
                 frame.camera.f[0] = 246.85f;
                 frame.camera.f[1] = 198.19f;
-                frame.camera.f[2] = D_00189E20.position.f[2] + 1.5f;
+                frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
                 frame.delta.f[2] = 1.5707965f;
                 frame.delta.f[0] = 0;
                 frame.delta.f[1] = 0;
-                func_003353C8(&frame.delta);
-                func_00335370(&frame.camera);
+                cam_set_state_rotation(&frame.delta);
+                object_copy_vector_to_selected(&frame.camera);
             }
-            func_002E5DA0(0, 0, obj, 0x8A1);
+            snd_play_from_class_bank(0, 0, obj, 0x8A1);
             I(ctx->child, 0x98) = 0;
             START_SOUND(0);
             ctx->camera = func_PAL_L00_002D7850(5);
@@ -144,14 +144,14 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
             F(ctx->camera, 4) = 1.5f;
             ctx->release = 1;
         }
-        if (func_00282C48(F(obj, 0x18) - D_00189E20.position.f[2]) > 12.0f && !ctx->direction) {
+        if (math_fabs(F(obj, 0x18) - g_hero_state.position.f[2]) > 12.0f && !ctx->direction) {
             START_SOUND(0);
-            func_002A7750(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
             I(ctx->child, 0x78) = 0x8000DF2A;
             I(ctx->child, 0x98) = 0;
-        } else if (func_00282C48(F(obj, 0x18) - D_00189E20.position.f[2]) > 12.0f && ctx->direction == 1) {
+        } else if (math_fabs(F(obj, 0x18) - g_hero_state.position.f[2]) > 12.0f && ctx->direction == 1) {
             START_SOUND(1);
-            func_002A7750(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
             ctx->velocity = 0.0f;
             I(ctx->child, 0x78) = 0x8000DF2A;
             I(ctx->child, 0x98) = 0;
@@ -160,40 +160,40 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
     case 2:
         qcopy(&frame.delta, &moby->position);
         frame.delta.f[2] = ctx->target;
-        if (func_00282E48(&moby->position, &frame.delta) > 0.14f) {
-            func_002AA548(obj + 0x18, &ctx->velocity, frame.delta.f[2], 0.0028000001f, 0.0024f,
+        if (fast_vec_dist(&moby->position, &frame.delta) > 0.14f) {
+            math_step_value_toward_target(obj + 0x18, &ctx->velocity, frame.delta.f[2], 0.0028000001f, 0.0024f,
                           0.120000005f);
             ++ctx->counter;
-        } else if (func_00282E80(&moby->position, &D_00189E20.position) > 1.2f) {
+        } else if (vec_distance_xy(&moby->position, &g_hero_state.position) > 1.2f) {
             RELEASE();
             ctx->direction = 0;
             STOP_SOUND();
             RESET_CHILD();
         } else {
             if (ctx->counter > 0) {
-                func_002E5CF8(1, 0, obj);
+                PlayMobySound(1, 0, obj);
                 ctx->counter = 0;
             }
             RELEASE();
             STOP_SOUND();
         }
-        if (func_00282C48(F(obj, 0x18) - D_00189E20.position.f[2]) > 3.0f
-            && D_00189E20.position.f[2] < F(obj, 0x18))
-            func_002A7750(obj, 3, -1);
+        if (math_fabs(F(obj, 0x18) - g_hero_state.position.f[2]) > 3.0f
+            && g_hero_state.position.f[2] < F(obj, 0x18))
+            moby_set_state(obj, 3, -1);
         break;
     case 3:
         if (F(obj, 0x18) > ctx->otherTarget) {
-            if (func_002ACBC8(&D_00189E20.position, ctx->trigger)) {
-                if (F(obj, 0x18) - D_00189E20.position.f[2] < 1.8f && D_00189E20.position.f[2] < F(obj, 0x18))
+            if (IsPointInCuboid(&g_hero_state.position, ctx->trigger)) {
+                if (F(obj, 0x18) - g_hero_state.position.f[2] < 1.8f && g_hero_state.position.f[2] < F(obj, 0x18))
                     break;
-                func_002AA3A8(obj + 0x18, &ctx->velocity, ctx->otherTarget, 0.02f, 0.3f, 0.120000005f);
+                math_spring_float_to_goal(obj + 0x18, &ctx->velocity, ctx->otherTarget, 0.02f, 0.3f, 0.120000005f);
                 ++ctx->counter;
             } else {
                 F(obj, 0x18) -= 0.08f;
                 ++ctx->counter;
             }
-        } else if (func_00282E80(&moby->position, &D_00189E20.position) > 1.0f) {
-            func_002E5CF8(1, 0, obj);
+        } else if (vec_distance_xy(&moby->position, &g_hero_state.position) > 1.0f) {
+            PlayMobySound(1, 0, obj);
             RELEASE();
             ctx->direction = 1;
             STOP_SOUND();
@@ -205,8 +205,8 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
         }
         break;
     }
-    func_00282CF0(&frame.delta, &moby->position, &frame.old);
-    func_002AD6F0(ctx->transform, &frame.delta, &frame.rotation, obj + 0xF0);
+    FastVecSub(&frame.delta, &moby->position, &frame.old);
+    mat_combine_and_store(ctx->transform, &frame.delta, &frame.rotation, obj + 0xF0);
     {
         char *child = ctx->child;
         qcopy(child + 0x10, &moby->position);
@@ -215,9 +215,9 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
     if (*(short *)(D_L00_001B8C80.camera + 0x86) == 5) {
         frame.camera.f[0] = 246.85f;
         frame.camera.f[1] = 198.19f;
-        frame.camera.f[2] = D_00189E20.position.f[2] + 1.5f;
-        func_00335370(&frame.camera);
-        if (func_00282E80(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
-            func_003355A8(1);
+        frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
+        object_copy_vector_to_selected(&frame.camera);
+        if (vec_distance_xy(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
+            cam_set_mode_state(1);
     }
 }

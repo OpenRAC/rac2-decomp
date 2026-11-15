@@ -1,19 +1,20 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef signed int s32;
 extern u8 D_L04_001395C7;
 extern u8 D_L04_002CA518;
-extern void func_0029F338(void *a0);
-extern int func_002B38B8(u8 *a0);
-extern void func_002A0430(u32 a0);
-extern s32 func_00288AA0(u8 *a0, s32 a1);
-extern s32 func_00288BE8(void *a0);
-extern void func_002F5CC8(void);
+extern void moby_mark_spawned(void *a0);
+extern int flag_is_third_pending_set(u8 *a0);
+extern void moby_mark_table_entry_flagged(u32 a0);
+extern s32 req_push_queue(u8 *a0, s32 a1);
+extern s32 req_launch_queued(void *a0);
+extern void game_set_slowdown_factor(void);
 extern u8 D_0019B2E8[];
-extern int D_001A79F0 __attribute__((sda));
-extern int D_L04_001B24DC __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
+extern int g_moby_l04_pool __attribute__((sda));
 extern u8 D_L04_001BF880[];
 extern u8 D_L04_001B12B0[] __attribute__((sda));
 extern u8 D_L04_001B12E8[] __attribute__((sda));
@@ -57,19 +58,19 @@ void func_PAL_L04_0045B130(u8 *a0) {
     u32 *a1 = *(u32 **)(a0 + 0x68);
 
     if (a0[0x20] == 0) {
-        if (D_0019B2E8[a0[0xB0] + D_001A79F0 * 16] & 0x80) {
-            func_0029F338(a0);
+        if (D_0019B2E8[a0[0xB0] + g_current_map_index * 16] & 0x80) {
+            moby_mark_spawned(a0);
             return;
         }
         a0[0x20] = 1;
     }
     if (a0[0x20] == 1) {
-        if (func_002B38B8((u8 *)(D_L04_001B24DC + (*a1 << 8)))) {
-            func_002A0430(a0[0xB0]);
-            func_00288AA0(D_L04_001BF880, 0x38);
-            func_00288BE8(D_L04_001BF880);
-            func_002F5CC8();
-            func_0029F338(a0);
+        if (flag_is_third_pending_set((u8 *)(g_moby_l04_pool + (*a1 << 8)))) {
+            moby_mark_table_entry_flagged(a0[0xB0]);
+            req_push_queue(D_L04_001BF880, 0x38);
+            req_launch_queued(D_L04_001BF880);
+            game_set_slowdown_factor();
+            moby_mark_spawned(a0);
         }
     }
 }
@@ -78,11 +79,11 @@ extern u8 D_001A7B00[] __attribute__((sda));
 extern u8 D_001395B8[];
 extern s32 D_L04_001B2008[] __attribute__((sda));
 extern u8 *D_L04_001B25CC[] __attribute__((sda));
-extern u8 D_00189EA0[];
+extern u8 g_hero_position[];
 extern void func_PAL_L00_002B9CD8(void *a0, void *a1, s32 a2, s32 a3);
-extern s32 func_002ACBC8(void *a0, void *a1);
+extern s32 IsPointInCuboid(void *a0, void *a1);
 extern u8 D_L04_001B9680[];
-extern u8 D_00189EA0[];
+extern u8 g_hero_position[];
 extern u8 D_L04_001B1218[];
 extern u8 D_L04_001B1230[];
 
@@ -100,7 +101,7 @@ void func_PAL_L04_0045C268(u8 *a0) {
             p = D_L04_001B25CC[0] + (*(s32 *)(s2 + 4) << 7);
             func_PAL_L00_002B9CD8(p + 0x30, p + 0x70, 0, 1);
         } else if (D_001A7B00[0x1F] != 0 && D_001395B8[0x12] != 0) {
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
             return;
         } else {
             a0[0x20] = 1;
@@ -108,10 +109,10 @@ void func_PAL_L04_0045C268(u8 *a0) {
         a0[0x30] = 0xFF;
     }
     if (a0[0x20] == 1) {
-        if (func_002ACBC8(D_00189EA0, *(void **)s2) != 0) {
+        if (IsPointInCuboid(g_hero_position, *(void **)s2) != 0) {
             if (D_001A7B00[0x1F] != 0) {
                 D_001395B8[0x12] = 1;
-                func_0029F338(a0);
+                moby_mark_spawned(a0);
             }
         }
     }

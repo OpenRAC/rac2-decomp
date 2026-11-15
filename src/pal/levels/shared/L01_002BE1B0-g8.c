@@ -73,22 +73,22 @@ typedef struct {
     unsigned char pad1[0x30];
     int no_direction;
 } TimerPadState;
-extern TimerPadState D_00138180;
+extern TimerPadState g_pad_state;
 extern unsigned char *D_L01_001FB3E0[];
 extern unsigned char D_L01_0025CF60[];
 extern int D_L01_001A8F40_abs __asm__("D_L01_001A8F40");
 extern float D_L01_001B1FA0, D_L01_001B1FA4;
 extern unsigned char D_L01_001A7AFF;
-extern void func_PAL_L00_002B92F0(void), func_L00_002A7A10(void), func_PAL_L00_002C39D8(void), func_PAL_L00_002B3000(void);
-extern int func_00282978(void *), func_00282948(void *);
-extern void func_00282C88(void *);
-extern int func_002ABB78(void *), func_002A77E0(int);
-extern void func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float);
-extern int func_002A8F70(void *, int, int, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_L00_002D3B00(void *), func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D3778(void *, void *, float);
+extern void func_PAL_L00_002B92F0(void), hero_queue_glow_draw_routine(void), func_PAL_L00_002C39D8(void), func_PAL_L00_002B3000(void);
+extern int FastDecTimer(void *), math_fast_float_d(void *);
+extern void vec_clear_128(void *);
+extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
+extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float cam_get_view_space_height(void *), FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void hero_build_relative_point(void *, int, float, float, float), hero_apply_mode_transform_reversed(void *, void *, float);
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
@@ -107,46 +107,46 @@ void func_PAL_L01_002BE1B0(void) {
         D_L01_00189E20.step_frames = step;
         D_L01_00189E20.animation_frames = animation;
     }
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1DC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1D2);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F8);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FE);
-    func_00282948(((unsigned char *)&D_L01_00189E20)+0x1D4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x210);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1D0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F4);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F6);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x204);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x206);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F0);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1EC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1EE);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x208);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x200);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x20E);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x20A);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x214);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x212);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FC);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x216);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1FA);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x218);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1F2);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x21A);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x21C);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1DE);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x1E6);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x222);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x224);
-    func_00282978(((unsigned char *)&D_L01_00189E20)+0x226);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1DC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1D2);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F8);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FE);
+    math_fast_float_d(((unsigned char *)&D_L01_00189E20)+0x1D4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x210);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1D0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F4);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F6);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x204);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x206);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F0);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1EC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1EE);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x208);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x200);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x20E);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x20A);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x214);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x212);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FC);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x216);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1FA);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x218);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1F2);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x21A);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x21C);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1DE);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x1E6);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x222);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x224);
+    FastDecTimer(((unsigned char *)&D_L01_00189E20)+0x226);
 
-    if (!(D_00138180.held&4)) D_L01_00189E20.field_20C = 0;
-    if (D_L01_00189E20.field_21C) func_L00_002A7A10();
+    if (!(g_pad_state.held&4)) D_L01_00189E20.field_20C = 0;
+    if (D_L01_00189E20.field_21C) hero_queue_glow_draw_routine();
     if (D_L01_00189E20.item_animation_active) D_L01_00189E20.item_animation_frames++;
     else D_L01_00189E20.item_animation_frames = 0;
-    if (D_00138180.no_direction) {
+    if (g_pad_state.no_direction) {
         D_L01_00189E20.stick_held_frames = 0;
         D_L01_00189E20.stick_idle_frames++;
     }
@@ -173,35 +173,35 @@ void func_PAL_L01_002BE1B0(void) {
     }
     if (D_L01_00189E20.field_224) {
         for (i = 0;(m = D_L01_001FB3E0[i]) != 0;i++) {
-            if (func_002ABB78(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_001B2088&7) == (((int)m>>8)&7) || !func_002A77E0(4)) {
+            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
+                if ((D_001B2088&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&D_L01_00189E20+0x80;
                     pos = m+0x10;
-                    if (func_00282E48(hero, pos)<15.37f) {
-                        func_00282CF0(sum, pos, hero);
-                        func_00282F20(sum, sum, 1.7f);
-                        func_002A8F70(m, D_L01_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
+                    if (fast_vec_dist(hero, pos)<15.37f) {
+                        FastVecSub(sum, pos, hero);
+                        vec_scale_to_length(sum, sum, 1.7f);
+                        part_queue_impact_effect(m, D_L01_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) func_00282948(D_L01_0025CF60+i*0x70);
+    for (i = 0;i<4;i++) math_fast_float_d(D_L01_0025CF60+i*0x70);
     D_L01_00189E20.current_path_dist = 9999.0f;
-    if (D_L01_00189E20.field_34E && func_L00_002D3B00(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
+    if (D_L01_00189E20.field_34E && cam_get_view_space_height(((unsigned char *)&D_L01_00189E20)+0xF0)<0) {
         if (D_L01_00189E20.pos_history_count != 32) goto history_done;
-        func_00282C88(sum);
+        vec_clear_128(sum);
         count = 8;
         for (i = 0;i<count;) {
             history_index = D_L01_00189E20.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            func_00282CF0(delta, ((unsigned char *)&D_L01_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_L01_00189E20)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&D_L01_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_L01_00189E20)+0x1D90+second_index*16);
             i++;
-            func_00282CC0(sum, sum, delta);
+            FastVecAdd(sum, sum, delta);
         }
-        func_00282D30(sum, sum, 1.0f/(float)count);
-        if (func_00282DF0(sum)<0.020000001f) {
+        FastVecScale(sum, sum, 1.0f/(float)count);
+        if (FastVecLength(sum)<0.020000001f) {
             D_L01_00189E20.still_frames++;
             goto history_done;
         }
@@ -211,7 +211,7 @@ history_done:
     func_PAL_L00_002C39D8();
     {
         unsigned char *bodyCenter = (unsigned char *)&D_L01_00189E20+0xE0;
-        func_L00_002D36E0(bodyCenter, 1, 0, 0, 0.7f);
+        hero_build_relative_point(bodyCenter, 1, 0, 0, 0.7f);
         if (!(D_001B2088&3)) {
             if (D_L01_001A7AFF) {
                 D_L01_00189E20.reach_distance = 14;
@@ -225,7 +225,7 @@ history_done:
     }
     if (D_L01_00189E20.field_31C<4) {
         qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0x2D0);
-        func_L00_002D3778(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
+        hero_apply_mode_transform_reversed(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xD0, 0.5f);
     }
     else qcopy(((unsigned char *)&D_L01_00189E20)+0xD0, ((unsigned char *)&D_L01_00189E20)+0xE0);
     {

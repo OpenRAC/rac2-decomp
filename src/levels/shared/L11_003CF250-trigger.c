@@ -1,23 +1,23 @@
 #include "common.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 /* Read at +0xC0: a symbol-plus-offset address stays one two-instruction macro load, which reorg
  * cannot move into a branch delay slot. */
 extern unsigned char D_001A7A40[] __attribute__((sda));
-extern int func_00283CF0(float);
-extern float func_00283198(float);
-extern void func_002A7750(char *, int, int);
-extern int func_002ACBC8(void *, int);
-extern int func_002B3868(char *);
-extern void func_L00_00429020(int);
-extern int func_002B0CE0(int, int, int);
-extern int func_L11_002D8EF8(int, int);
-extern float func_00283B98(float, float);
+extern int FloatToInt(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void moby_set_state(char *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern int flag_set_first_pending(char *);
+extern void cam_lock_entry(int);
+extern int ForceClaimNotice(int, int, int);
+extern int hero_l11_enter_state(int, int);
+extern float FastAddRotations(float, float);
 
 /* Per-frame update of the Levitator Pad (moby class 2274). */
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
-void func_L11_003CF250(char *obj)
+void levitator_l11_pad_update(char *obj)
 {
     char *rig = *(char **)(obj + 0x68);
     char *hero, *other;
@@ -27,17 +27,17 @@ void func_L11_003CF250(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         *(unsigned short *)(obj + 0x34) |= 0x10;
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (SetFirstPendingFlag(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             word = *(int *)rig;
             if (word != -1) {
-                LockCameraEntry(word);
+                cam_lock_entry(word);
                 *(int *)rig = -1;
             }
         }
-        hero = gHeroState;
+        hero = g_hero_state;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
             if (D_001A7A40[0xC0] != 0) {
                 ForceClaimNotice(0xC, 0x27F7, 1);
@@ -47,11 +47,11 @@ void func_L11_003CF250(char *obj)
                     *(float *)(hero + 0x5B8) = turn;
             }
         } else {
-            other = gHeroState;
+            other = g_hero_state;
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
                 if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
-                    EnterHeroState_L11(6, 1);
+                    hero_l11_enter_state(6, 1);
             }
         }
         break;
@@ -59,7 +59,7 @@ void func_L11_003CF250(char *obj)
     if (*(unsigned char *)(obj + 0x31) != 0) {
         pulse = FastAddRotations(*(float *)(rig + 4), 0.10471977f);
         *(float *)(rig + 4) = pulse;
-        glow = FloatToInt(FastSinOrCosB(pulse) * 128.0f);
+        glow = FloatToInt(math_fast_sin_or_cos_b(pulse) * 128.0f);
         if (glow > 0x80)
             glow = 0x80;
         else if (glow < 0x20)

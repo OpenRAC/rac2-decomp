@@ -5,12 +5,12 @@ extern float D_L00_001B2870 __attribute__((section(".data")));
 extern float ref_L00_003A7AF0_00 __attribute__((sda));
 extern int D_L00_001AF6C4 __attribute__((sda));
 extern int D_L00_001AF6CC __attribute__((sda));
-extern int func_L00_00329E90(char *, int, void *);
-extern char *func_L00_0032A088(int, int);
-extern int func_L00_00329FF0(int);
+extern int AcquireEntitySlot(char *, int, void *);
+extern char *level_get_slot_body(int, int);
+extern int mem_round_up_to_16(int);
 
 /* Sets up a new Lancer-class (or similar) object: clears its state, picks its sound table and sets the turn rates. */
-void func_L00_003A7AF0(char *object)
+void lancer_init(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int local[4];
@@ -38,8 +38,8 @@ void func_L00_003A7AF0(char *object)
     index = AcquireEntitySlot(object, 0, local);
     *(short *)(state + 18) = index;
     if (local[0] == 0) {
-        table = (int *)GetSlotBody(*(short *)(object + 0xAA), (short)index);
-        value = RoundUpToMultipleOf16_L00((int)(table + 16));
+        table = (int *)level_get_slot_body(*(short *)(object + 0xAA), (short)index);
+        value = mem_round_up_to_16((int)(table + 16));
         for (i = 0; i < 16; i++) {
             table[i] = value;
             value += 640;

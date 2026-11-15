@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,11 +25,11 @@
  */
 #include "common.h"
 
-extern f32 func_00282C10(f32);
-extern f32 func_00282C48(f32);
+extern f32 square_root(f32);
+extern f32 math_fabs(f32);
 
 /* Solves a quadratic equation and returns how many real roots it has (0, 1 or 2), larger root first. */
-s32 func_002A88A0(f32 *rootHigh, f32 *rootLow, f32 a, f32 b, f32 c) {
+s32 math_solve_quadratic(f32 *rootHigh, f32 *rootLow, f32 a, f32 b, f32 c) {
     f32 sqrtPart;
     f32 lowRoot;
     f32 fourAc;
@@ -44,7 +45,7 @@ s32 func_002A88A0(f32 *rootHigh, f32 *rootLow, f32 a, f32 b, f32 c) {
         *rootHigh = -b / (2.0f * a);
         return 1;
     }
-    sqrtPart = square_root(FloatAbs(discriminant));
+    sqrtPart = square_root(math_fabs(discriminant));
     negB = -b;
     twoA = 2.0f * a;
     lowRoot = (negB - sqrtPart) / twoA;

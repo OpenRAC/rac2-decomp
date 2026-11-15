@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -22,14 +23,14 @@
  * SOFTWARE.
  */
 #include "common.h"
-extern u8 *func_0029EFD0(int);
-extern float func_002A7940(void);
-extern void func_00283698(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
+extern u8 *CreateMoby(int);
+extern float math_random_angle(void);
+extern void matrix_from_basis_rows(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 /* Copy both complete vectors, retaining the new object's support record. */
 /* Spawns a beam object (moby class 3624) at the owner, running from the first point to the second and optionally attached to a support object. */
-u8 *func_L07_003F4B08(u8 *owner, u8 *support, void *first, void *second, float scale)
+u8 *beam_spawn(u8 *owner, u8 *support, void *first, void *second, float scale)
 {
     float inverse[16] __attribute__((aligned(16)));
     u8 *vars;
@@ -46,7 +47,7 @@ u8 *func_L07_003F4B08(u8 *owner, u8 *support, void *first, void *second, float s
         qcopy(next, second);
         *(u8 **)(vars + 0x20) = support;
         *(u32 *)(vars + 0x24) = 0;
-        *(float *)(vars + 0x28) = RandomAngle();
+        *(float *)(vars + 0x28) = math_random_angle();
         *(float *)(vars + 0x2C) = scale;
         if (support != 0) {
             matrix_from_basis_rows(inverse, support + 0xC0);

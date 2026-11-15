@@ -8,17 +8,17 @@
 
 typedef float f32;
 
-extern void func_00282CF0(f32 *, const f32 *, const f32 *);
+extern void FastVecSub(f32 *, const f32 *, const f32 *);
 
-extern f32 func_00282DB0(const f32 *, const f32 *);
+extern f32 FastVecDot(const f32 *, const f32 *);
 
-extern void func_00282D30(f32 *, const f32 *, f32);
+extern void FastVecScale(f32 *, const f32 *, f32);
 
-extern void func_00282CC0(f32 *, const f32 *, const f32 *);
+extern void FastVecAdd(f32 *, const f32 *, const f32 *);
 
 /* Projects the first vector on the segment the second one draws, clamps the ratio
    between zero and one and moves the result onto the destination vector. */
-f32 func_L00_0031BDC0(f32 *result, const f32 *point, const f32 *segStart, const f32 *segEnd)
+f32 coll_project_point_on_segment(f32 *result, const f32 *point, const f32 *segStart, const f32 *segEnd)
 {
     f32 toStart[4];
     f32 segment[4];

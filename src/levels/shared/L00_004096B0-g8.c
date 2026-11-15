@@ -5,7 +5,7 @@ extern void *func_003100D8(int id);
 extern int D_L00_001B1340 __attribute__((sda));
 
 /* Allocates a record and tags it released-empty; returns it, or zero when the allocation failed. */
-void *func_L00_004115A8(int unused)
+void *shot_alloc_record(int unused)
 {
     char *p = (char *)func_003100D8(0x1136);
 
@@ -40,13 +40,13 @@ extern SettingSlot D_L00_00256620[30];
 extern SettingsBank D_L00_002592C0;
 
 /* Sets up the shot tables at level start: clears 30 slots and fills in default values for two copies of 119 table rows. */
-void func_L00_004115E8(void) {
+void shot_init_tables(void) {
     int i;
 
     for (i = 29; i >= 0; i--)
         D_L00_00256620[i].active = 0;
     D_L00_001B1340 = 0;
-    AllocateShotRecord(0);
+    shot_alloc_record(0);
     for (i = 119; i < 238; i++) {
         D_L00_002592C0.rows[i - 119].multiplier = 1.0f;
         D_L00_002592C0.rows[i].multiplier = 1.0f;
@@ -116,21 +116,21 @@ void func_L00_004115E8(void) {
 typedef int Quadword __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
 
-extern char *func_0029EFD0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern char *func_002AB1F0(void *);
-extern void func_L00_0040B2C0(void *, void *);
+extern char *CreateMoby(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern char *moby_get_private_value_0(void *);
+extern void moby_get_offset_point(void *, void *);
 extern void func_002A0F48(void *);
-extern void func_002ACA50(void *, void *, int);
-extern int func_002FED90(void *, int, float, float, float);
+extern void AddMobyToIndexList(void *, void *, int);
+extern int part_alloc_effect_slot(void *, int, float, float, float);
 
 extern int D_L00_001B0FD8 __attribute__((sda));
 extern unsigned char D_00139583 __attribute__((nosda));
@@ -140,7 +140,7 @@ typedef struct ScaleRecord {
     float value;
     char pad54[0x8c];
 } ScaleRecord;
-extern ScaleRecord D_L00_00262570[];
+extern ScaleRecord g_weapon_l00_table[];
 
 typedef struct ProjectileState {
     /* 0x00 */ float last_target[3];
@@ -191,16 +191,16 @@ typedef struct PlayerState {
     /* 0x2298 */ char pad2298[0x254];
     /* 0x24EC */ short orientation;
 } PlayerState;
-extern PlayerState D_00189E20;
+extern PlayerState g_hero_state;
 
 extern Vector D_L00_001B8FF0[3];   /* camera basis rows */
-extern float D_L00_001B8DC0[4];    /* camera position */
+extern float g_camera_l00_position[4];    /* camera position */
 extern float D_L00_001BF220[4];    /* collision hit point */
 extern char D_L00_00255BA0[];
 extern char D_L00_001B1FB0[] MACRO_ADDR;
 
 /* Spawns a projectile (moby 0xED7) from owner at position, aimed at target or along the view. */
-char *func_L00_00409E48(char *owner, void *position, char *target, void *color, float height)
+char *SpawnAimedProjectile(char *owner, void *position, char *target, void *color, float height)
 {
     Vector aim, offset, tmp1, tmp2, tmp3, tmp4;
     ProjectileObject *m = (ProjectileObject *)CreateMoby(0xed7 /* moby class 3799 */);
@@ -220,7 +220,7 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
             D_L00_001B0FD8 = 0;
         s->index = D_L00_001B0FD8;
         D_L00_001B0FD8 = (D_L00_001B0FD8 + 1) % 32;
-        scale = (gWeaponTable_L00 + D_00139583)->value * (1.0f / 60.0f);
+        scale = (g_weapon_l00_table + D_00139583)->value * (1.0f / 60.0f);
         qcopy(m->position, position);
         if (target) {
             FastVecScale(offset, target + 0xe0, height);
@@ -229,11 +229,11 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
             qzero(aim);
         }
 
-        if (gHeroState.mode == 29) {
+        if (g_hero_state.mode == 29) {
             qcopy(m->forward, D_L00_001B8FF0[0]);
             qcopy(m->right, D_L00_001B8FF0[1]);
             qcopy(m->up, D_L00_001B8FF0[2]);
-            qcopy(m->position, gCameraPosition_L00);
+            qcopy(m->position, g_camera_l00_position);
             FastVecScale(offset, D_L00_001B8FF0[2], -0.2f);
             FastVecAdd(m->position, m->position, offset);
             FastVecScale(tmp1, D_L00_001B8FF0[1], -0.25f);
@@ -243,52 +243,52 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
             if (target) {
                 FastVecSub(m->forward, aim, m->position);
                 vec_scale_to_length(m->forward, m->forward, 1.0f);
-                FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+                FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
                 vec_scale_to_length(m->right, m->right, 1.0f);
                 FastVecCross(m->up, m->right, m->forward);
             } else {
                 FastVecScale(tmp3, D_L00_001B8FF0[0], 30.0f);
-                FastVecAdd(tmp3, gCameraPosition_L00, tmp3);
-                if (CollLine(gCameraPosition_L00, tmp3, 0, gHeroState.object, 0))
+                FastVecAdd(tmp3, g_camera_l00_position, tmp3);
+                if (CollLine(g_camera_l00_position, tmp3, 0, g_hero_state.object, 0))
                     qcopy(tmp3, D_L00_001BF220);
                 FastVecSub(tmp4, tmp3, m->position);
                 vec_scale_to_length(m->forward, tmp4, 1.0f);
-                FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+                FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
                 vec_scale_to_length(m->right, m->right, 1.0f);
                 FastVecCross(m->up, m->right, m->forward);
             }
-        } else if (gHeroState.orientation == 1) {
+        } else if (g_hero_state.orientation == 1) {
             vec_scale_to_length(m->forward, owner + 0xd0, -1.0f);
             FastVecScale(m->right, owner + 0xc0, -1.0f);
             qcopy(m->up, owner + 0xe0);
         } else if (target) {
             FastVecSub(m->forward, aim, m->position);
             vec_scale_to_length(m->forward, m->forward, 1.0f);
-            FastVecCross(m->right, m->forward, gHeroState.object + 0xe0);
+            FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
             vec_scale_to_length(m->right, m->right, 1.0f);
             FastVecCross(m->up, m->right, m->forward);
         } else {
-            qcopy(m->forward, gHeroState.forward);
-            FastVecCross(m->right, m->forward, gHeroState.up);
+            qcopy(m->forward, g_hero_state.forward);
+            FastVecCross(m->right, m->forward, g_hero_state.up);
             vec_scale_to_length(m->right, m->right, 1.0f);
             FastVecCross(m->up, m->right, m->forward);
         }
         m->forward[3] = m->right[3] = m->up[3] = 0;
 
         s->owner = owner;
-        s->yaw = RandomFloatRange(4.0f, 10.0f);
+        s->yaw = math_random_float_range(4.0f, 10.0f);
         if (target)
             s->yaw = 0;
-        s->spin_speed = RandomSignedFloatRange(6.0f, 10.0f);
+        s->spin_speed = math_random_signed_float_range(6.0f, 10.0f);
         s->speed = scale;
-        s->spin = RandomAngle();
+        s->spin = math_random_angle();
         s->target = 0;
         s->age = 1;
         s->homing = 1;
         qcopy(s->forward, m->forward);
         qcopy(s->color, color);
         if (target) {
-            hit = GetMobyPrivateValue0(target);
+            hit = moby_get_private_value_0(target);
             if (hit) {
                 *(unsigned short *)(hit + 0x1e) |= 0x80;
                 if (*(unsigned char *)(hit + 0xb))
@@ -308,21 +308,21 @@ char *func_L00_00409E48(char *owner, void *position, char *target, void *color, 
         /* Trace from the owner (at the spawn height) to the spawn point. */
         *(Quadword *)offset = *(Quadword *)(owner + 0x10);
         offset[2] = ((float *)position)[2];
-        if (CollLine(offset, position, 0, gHeroState.object, 0)) {
+        if (CollLine(offset, position, 0, g_hero_state.object, 0)) {
             m->hit = 1;
             qcopy(m->position, D_L00_001BF220);
         }
-        GetOffsetPointInMobySpace(m, D_L00_00255BA0 + s->index * 64);
+        moby_get_offset_point(m, D_L00_00255BA0 + s->index * 64);
         func_002A0F48(m);
         AddMobyToIndexList(m, D_L00_001B1FB0, 31);
-        s->handle = AllocEffectSlot_002FED90(m, 0, 1.0f, 1.0f, 1.0f);
+        s->handle = part_alloc_effect_slot(m, 0, 1.0f, 1.0f, 1.0f);
         m->radius *= 2.5f;
     }
     return (char *)m;
 }
 
-extern int func_00282978(void *);
-extern void func_L00_0031AA28(void *, void *, void *, void *, void *, float);
+extern int FastDecTimer(void *);
+extern void math_l00_interpolate_cubic_vector(void *, void *, void *, void *, void *, float);
 extern short D_L00_001B2D40[] __attribute__((sda));
 extern short D_L00_001B2D48[] __attribute__((sda));
 extern short D_L00_001B2D50[] __attribute__((sda));
@@ -332,7 +332,7 @@ extern float D_L00_001B1004 __attribute__((sda));
 extern Vector D_L00_002563A0[][10];
 
 /* Updates four jagged lightning strands: when a strand timer ends it makes a new curve, otherwise it jitters the points a little. */
-void func_L00_0040B398(char *object)
+void lightning_strands_update(char *object)
 {
     Vector p, delta, out, diffs[10];
     char *state = *(char **)(object + 0x68);
@@ -343,9 +343,9 @@ void func_L00_0040B398(char *object)
             D_L00_001B2D48[g] = 0;
             D_L00_001B2D40[g] = D_L00_001B2D50[g];
             qcopy(p, state + 0x30);
-            p[0] += RandomFloatRange(-0.5f, 0.5f);
-            p[1] += RandomFloatRange(-0.5f, 0.5f);
-            p[2] += RandomFloatRange(-0.5f, 0.5f);
+            p[0] += math_random_float_range(-0.5f, 0.5f);
+            p[1] += math_random_float_range(-0.5f, 0.5f);
+            p[2] += math_random_float_range(-0.5f, 0.5f);
             FastVecSub(delta, p, D_0018BE30);
             vec_scale_to_length(delta, delta, D_L00_001B100C);
             FastVecAdd(delta, p, delta);
@@ -353,15 +353,15 @@ void func_L00_0040B398(char *object)
                 float t = i * 0.1f;
                 if (i == 9)
                     t = 1.0f;
-                InterpolateCubicVector_L00(out, D_0018BE30, p, state + 0x40, delta, t);
+                math_l00_interpolate_cubic_vector(out, D_0018BE30, p, state + 0x40, delta, t);
                 qcopy(D_L00_002563A0[g][i], out);
             }
         } else {
             for (j = 1; j < 10; j++) {
                 FastVecSub(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
-                diffs[j][0] += RandomSignedFloatRange(0.0f, 0.05f);
-                diffs[j][1] += RandomSignedFloatRange(0.0f, 0.05f);
-                diffs[j][2] += RandomSignedFloatRange(0.0f, 0.05f);
+                diffs[j][0] += math_random_signed_float_range(0.0f, 0.05f);
+                diffs[j][1] += math_random_signed_float_range(0.0f, 0.05f);
+                diffs[j][2] += math_random_signed_float_range(0.0f, 0.05f);
             }
             qcopy(D_L00_002563A0[g][0], D_0018BE30);
             for (k = 1; k < 10; k++)
@@ -369,23 +369,23 @@ void func_L00_0040B398(char *object)
         }
         for (l = 2; l < 9; l++) {
             qcopy(p, D_L00_002563A0[0][l]);
-            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[1][l], p);
         }
         for (n = 2; n < 9; n++) {
             qcopy(p, D_L00_002563A0[0][n]);
-            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[2][n], p);
         }
         for (i = 2; i < 9; i++) {
             qcopy(p, D_L00_002563A0[0][i]);
-            p[0] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[1] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
-            p[2] += RandomSignedFloatRange(0.0f, D_L00_001B1004);
+            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
+            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
             qcopy(D_L00_002563A0[3][i], p);
         }
     }

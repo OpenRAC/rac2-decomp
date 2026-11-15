@@ -1,23 +1,23 @@
 #include "common.h"
-extern void func_002A7750(void *, int, int);
-extern char *func_002A9640(void *, int, int);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float), func_00283198(float);
-extern void func_00302470(void *, void *, void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern char *part_find_owned_effect_slot(void *, int, int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern void moby_spawn_bolt_pickup(void *, void *, void *, int, int, int);
 extern int D_L03_001AEC30 __attribute__((sda));
 extern char D_L03_001AEC10[8] __attribute__((sda)), D_L03_001AEC08[8] __attribute__((sda)), D_L03_001AEC00[8] __attribute__((sda));
-extern void func_L00_0032A258(void *, void *, void *, void *, int, int, int, int, int, int, int);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern void func_0029F338(void *);
-extern int func_002B3868(void *);
-extern void func_L02_002DCEA0(int, float);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern void moby_mark_spawned(void *);
+extern int flag_set_first_pending(void *);
+extern void timer_start_countdown(int, float);
 extern float D_L03_001B2460;
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 extern char D_L03_001B9980[];
 extern int D_L03_001A8FB4, D_L03_001A8FB0;
 /* Updates a hit-reactive object. It waits to be struck, bursts into sparks, and when the Dynamo hits it, it drops a pickup item and shows a message. */
-void func_L03_00383FE8(char *moby)
+void hit_spark_update(char *moby)
 {
     float pos[4], vel[4];
     int i;
@@ -25,16 +25,16 @@ void func_L03_00383FE8(char *moby)
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(unsigned short *)(moby + 0x34) |= 0x1000;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1: {
         char *hit;
-        hit = FindOwnedEffectSlot(moby, 0x4010000, 0);
+        hit = part_find_owned_effect_slot(moby, 0x4010000, 0);
         if (hit) {
             hit = *(char **)(hit + 0x20);
             if (hit && *(short *)(hit + 0xAA) == 0x825 /* Dynamo */)
-                SetMobyState(moby, 3, -1);
-            else SetMobyState(moby, 2, -1);
+                moby_set_state(moby, 3, -1);
+            else moby_set_state(moby, 2, -1);
         }
         *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
@@ -49,22 +49,22 @@ void func_L03_00383FE8(char *moby)
             do {
                 float angle, speed;
                 i--;
-                angle = RandomAngle();
-                speed = RandomFloatRange(0, 1) * (1.0f/60.0f);
-                vel[0] = FastSinOrCosA(angle) * speed;
-                vel[1] = FastSinOrCosB(angle) * speed;
+                angle = math_random_angle();
+                speed = math_random_float_range(0, 1) * (1.0f/60.0f);
+                vel[0] = math_fast_sin_or_cos_a(angle) * speed;
+                vel[1] = math_fast_sin_or_cos_b(angle) * speed;
                 vel[2] = 0;
-                vel[2] = RandomFloatRange(5, 10) * (1.0f/60.0f);
-                SpawnBoltPickup(moby, pos, vel, 0, 100, 0);
+                vel[2] = math_random_float_range(5, 10) * (1.0f/60.0f);
+                moby_spawn_bolt_pickup(moby, pos, vel, 0, 100, 0);
             } while (i >= 0);
         }
-        ExplodeObjectIntoPieces(moby, D_L03_001AEC10, D_L03_001AEC08, D_L03_001AEC00, 65535, 0, -1, 6, 65535, 255, 0);
+        part_explode_object_into_pieces(moby, D_L03_001AEC10, D_L03_001AEC08, D_L03_001AEC00, 65535, 0, -1, 6, 65535, 255, 0);
         SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 0.5f, 20);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         break;
     }
     case 3:
-        if (SetFirstPendingFlag(moby)) StartTimedCountdown(1, 15);
+        if (flag_set_first_pending(moby)) timer_start_countdown(1, 15);
         if (D_L03_001B2460 >= 1) {
             spawned = CreateMoby(0x1335);
             if (spawned) {
@@ -73,12 +73,12 @@ void func_L03_00383FE8(char *moby)
             }
             D_L03_001A8FB4 = 2;
             D_L03_001A8FB0 = 15;
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
         } else {
             unsigned int count = *(unsigned short *)(moby + 0x96);
             unsigned int oldCount = count++;
             *(unsigned short *)(moby + 0x96) = count;
-            if (oldCount >= 61) SetMobyState(moby, 1, -1);
+            if (oldCount >= 61) moby_set_state(moby, 1, -1);
         }
         break;
     }

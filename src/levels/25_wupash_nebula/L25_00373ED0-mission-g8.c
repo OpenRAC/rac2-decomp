@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L25_0040CDA0, the level's mission update (setup, timer, completion).
    The function lives in its own small-data unit; its callees func_L25_003752D8, 00376FE0 and
    00377608 are in L25_00373ED0-g8.c and really return void.
@@ -32,13 +33,13 @@ typedef struct InventoryView {
     unsigned int completed;
 } InventoryView;
 extern MissionContext D_L25_00221850;
-extern InventoryView D_0018C958;
+extern InventoryView g_subtitle_history;
 extern char *D_L25_001B0CE0 __attribute__((sda));
 extern int D_L25_001B0CD0 __attribute__((sda)), D_L25_001B0CD4 __attribute__((sda));
 extern int D_L25_001B0CD8 __attribute__((sda)), D_L25_001B0CDC __attribute__((sda));
 extern int D_L25_001B0CC0 __attribute__((sda)), D_L25_001B0CB0 __attribute__((sda));
 extern int D_L25_001B0CF8 __attribute__((sda));
-extern char *D_0018C0B0 __attribute__((nosda));
+extern char *g_hero_moby __attribute__((nosda));
 
 extern int D_L25_001B3060 MACRO_ADDR, D_L25_001B1BC8 MACRO_ADDR;
 extern int D_L25_001B209C MACRO_ADDR;
@@ -46,29 +47,29 @@ extern int D_00138324 __attribute__((nosda));
 extern char *D_L25_001A904C MACRO_ADDR;
 extern float D_L25_001B2904 MACRO_ADDR;
 extern unsigned char D_001A7C01 MACRO_ADDR;
-extern int D_001A79F0 MACRO_ADDR;
-extern int func_L25_0040DCD0(char *,int);
-extern int func_00288E18(int,int);
-extern int func_00282948(void *);
-extern void func_L05_00379B60(void);
-extern void func_L05_0030C930(int,int);
-extern int func_002E5DA0(int,int,char *,int);
-extern int func_L25_0040D208(void);
-extern void func_0029B758(int,void *);
-extern void func_L05_00442828(void *,void *,int);
-extern void func_L05_00445B58(void *,void *);
-extern void func_L05_0037B210(void);
-extern void func_00288CB0(int,int);
-extern void func_L05_0037B108(void);
-extern int func_L05_00442860(void);
+extern int g_current_map_index MACRO_ADDR;
+extern int moby_tick_death_timer(char *,int);
+extern int subtitle_request_voice_line(int,int);
+extern int math_fast_float_d(void *);
+extern void level_select_random_object(void);
+extern void level_store_pair_with_increment(int,int);
+extern int snd_play_from_class_bank(int,int,char *,int);
+extern int DrawWupashCombatHud(void);
+extern void level_store_value_pair(int,void *);
+extern void ship_start_transition(void *,void *,int);
+extern void ship_point_camera_at_target(void *,void *);
+extern void entry_init_all_registered(void);
+extern void data_set_small_value_and_refresh(int,int);
+extern void effect_remove_family_mobys(void);
+extern int cam_is_mode_active(void);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
 
-extern void func_L25_003752D8(u8 *);
-extern void func_L25_00376FE0(u8 *, f32);
-extern void func_L25_00377608(u8 *, f32);
+extern void level_offer_entries_ptr(u8 *);
+extern void level_offer_entries_float(u8 *, f32);
+extern void level_offer_entries_float_alt(u8 *, f32);
 
 
 extern int D_L25_001B2900;
@@ -94,7 +95,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Updates the mission object: sets up the level, runs the timer and moves on when the mission is done. */
-void func_L25_0040CDA0(char *missionMoby)
+void mission_timer_update(char *missionMoby)
 {
     char *vars = *(char **)(missionMoby+0x68);
     float targetPosA[4] __attribute__((aligned(16)));
@@ -109,7 +110,7 @@ void func_L25_0040CDA0(char *missionMoby)
         ctx = &D_L25_00221850;
         
         ctx->scale=8.0f;
-        ctx->deathCallback=TickDeathTimerAndFinish;
+        ctx->deathCallback=moby_tick_death_timer;
         D_L25_001B0CE0=missionMoby;
         D_L25_001B0CD0=0; D_L25_001B0CD4=0;
         D_L25_001B0CD8=0; D_L25_001B0CDC=0;
@@ -120,20 +121,20 @@ void func_L25_0040CDA0(char *missionMoby)
         ctx->enabled=1;
         D_L25_001B3060=540;
         ctx->owner=missionMoby;
-        if (gHeroMoby_0018C0B0) H(gHeroMoby_0018C0B0,0x34)|=0x41;
+        if (g_hero_moby) H(g_hero_moby,0x34)|=0x41;
     case 1:
         
-        if (!gSubtitleHistory.dialogue) RequestSubtitleVoiceLine(0xa16,0x6d);
+        if (!g_subtitle_history.dialogue) subtitle_request_voice_line(0xa16,0x6d);
         
-        if (FastFloatHelperD(vars+0x34)) D_L25_00221850.timerVisible=0;
+        if (math_fast_float_d(vars+0x34)) D_L25_00221850.timerVisible=0;
         else D_L25_00221850.timerVisible=1;
         active = 1;
-        SelectRandomLevelObject();
-        StorePairWithIncrement(label_y(missionMoby, -224.0f, D_L25_001B2904, 0.5f, 1),2);
+        level_select_random_object();
+        level_store_pair_with_increment(label_y(missionMoby, -224.0f, D_L25_001B2904, 0.5f, 1),2);
         qcopy(missionMoby+0x10,(void *)((I(vars,0x20)<<8) + D_L25_001B209C + 0x10));
-        if (D_00138324&0x10) PlaySoundFromClassBank(0,0,missionMoby,0xeee);
+        if (D_00138324&0x10) snd_play_from_class_bank(0,0,missionMoby,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
-            StoreLevelObjectValuePair(0,DrawWupashCombatHud);
+            level_store_value_pair(0,DrawWupashCombatHud);
             D_L25_001B0CDC=active;
         }
         /* Retail executes this counted wait before reading the mission vars:
@@ -142,29 +143,29 @@ void func_L25_0040CDA0(char *missionMoby)
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
-            if (!FastFloatHelperD(vars+0x2c)) break;
+            if (!math_fast_float_d(vars+0x2c)) break;
             I(vars,0x2c)=540;
-            StartShipTransition(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
+            ship_start_transition(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
             *(Quad *)targetPosA=0; *(Quad *)targetPosB=0;
             B(missionMoby,0x20)=3;
             targetPosA[0]=359.0f; targetPosA[1]=440.0f; targetPosA[2]=524.0f;
             targetPosB[0]=403.0f; targetPosB[1]=456.0f; targetPosB[2]=524.0f;
-            OfferEntriesToHandlerPointer((u8 *)1);
-            OfferEntriesToHandlerFloat((u8 *)targetPosA,10.0f); OfferEntriesToHandlerFloatB((u8 *)targetPosB,10.0f);
+            level_offer_entries_ptr((u8 *)1);
+            level_offer_entries_float((u8 *)targetPosA,10.0f); level_offer_entries_float_alt((u8 *)targetPosB,10.0f);
             *(Quad *)camLookAt = *(Quad *)camPos = 0;
             camPos[0]=417.18f; camPos[1]=454.03f; camPos[2]=532.6f;
             camLookAt[0]=420.93f; camLookAt[1]=413.79f; camLookAt[2]=534.54f;
-            PointShipCameraAtTarget(camPos,camLookAt);
+            ship_point_camera_at_target(camPos,camLookAt);
         } else {
-            if (FastFloatHelperD(vars+0x2c)) {
-                InitAllRegisteredEntries(); StoreLevelObjectValuePair(0,0);
-                D_001A7C01=1; SetSmallDataValueAndRefresh(2,1);
+            if (math_fast_float_d(vars+0x2c)) {
+                entry_init_all_registered(); level_store_value_pair(0,0);
+                D_001A7C01=1; data_set_small_value_and_refresh(2,1);
             } else {
                 if (!D_L25_001B0CF8) {
-                    RemoveEffectFamilyMobys(); D_L25_001B0CF8=1;
+                    effect_remove_family_mobys(); D_L25_001B0CF8=1;
                 }
-                { u32 seen = gSubtitleHistory.completed & (1u << gCurrentMapIndex);
-                if (!seen) RequestSubtitleVoiceLine(0xa36,0x8d); }
+                { u32 seen = g_subtitle_history.completed & (1u << g_current_map_index);
+                if (!seen) subtitle_request_voice_line(0xa36,0x8d); }
             }
         }
         break;
@@ -172,7 +173,7 @@ void func_L25_0040CDA0(char *missionMoby)
         break;
     case 3:
         
-        if (!IsCameraModeActive()) {
+        if (!cam_is_mode_active()) {
             D_L25_00221850.timerVisible=0;
             D_L25_00221850.completed++;
             B(missionMoby,0x20)=active;

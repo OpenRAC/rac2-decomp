@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L01_003D0A08, the PAL copy of func_L01_003CC930: the same C with 50 Hz values.
  * Timers 240, 180, 120, 40, 20 become 200, 150, 100, 33, 17; per-frame rates are scaled by 6/5
  * (0.05f and 0.050000004f both become 0.060000002f, so retail keeps it in a saved register);
@@ -9,12 +10,12 @@
 
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; } Hero;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern s32 D_L01_001B2088;
-extern u8 *D_L01_001B255C;
+extern u8 *g_moby_l01_table;
 extern u8 *D_L01_001B264C;
 extern s32 D_L01_001A8F40;
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern f32 D_L01_001B0390 __attribute__((sda));
 extern s32 D_L01_001B0398 __attribute__((sda));
 extern s32 D_L01_001B039C __attribute__((sda));
@@ -73,11 +74,11 @@ extern void func_0034ECD0(void *, void *);
 extern s32 func_00355780(s32, s32, u8 *);
 extern s32 func_00355828(s32, s32, u8 *, s32);
 extern void func_PAL_L01_003CFDB0(u8 *, s32, s32, s32);
-extern void func_L01_003CBFA8(u8 *);
+extern void swamp_monster_release_attack_slot(u8 *);
 extern void func_PAL_L01_003D00C8(u8 *);
-extern void func_L01_003CC210(u8 *);
+extern void swamp_monster_release_arm_timers(u8 *);
 extern void func_PAL_L01_003D0358(u8 *);
-extern void func_L01_003CC898(u8 *, void *, void *, u8, void *);
+extern void swamp_monster_test_attack_segment_hits_hero(u8 *, void *, void *, u8, void *);
 
 void func_PAL_L01_003D0A08(u8 *self)
 {
@@ -152,7 +153,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         func_PAL_L01_003D00C8(self);
         break;
     case 1:
-        e1 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+        e1 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
         if (*(s32 *)(pv + 0xC8) != 0)
             func_00307390(self, 7, e1 + 0x10);
         else
@@ -168,7 +169,7 @@ void func_PAL_L01_003D0A08(u8 *self)
             }
             if (*(s32 *)(pv + 0xC0) > 0)
                 flag = 1;
-            e0 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+            e0 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
             if (func_00312B68(e0, 0x10001, 0) != 0)
                 flag = 1;
             if (flag) {
@@ -180,7 +181,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         case 1:
             if (*(s32 *)(pv + 0xBC) != 0)
                 break;
-            e2 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+            e2 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
             if (*(s32 *)(pv + 0xC8) != 0) {
                 if (self[0x43] != 10)
                     func_PAL_002A7E68(self, 10, 0, 7);
@@ -199,7 +200,7 @@ void func_PAL_L01_003D0A08(u8 *self)
                 func_PAL_L01_003CFDB0(self, 3, 10, 1);
             if (!(self[0x60] & 2))
                 break;
-            e3 = D_L01_001B255C + (*(s32 *)(pv + 0xB4) << 8);
+            e3 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
             e3[0x95] = 1;
             if (*(s32 *)(pv + 0xEC) == -1)
                 goto done;
@@ -268,9 +269,9 @@ void func_PAL_L01_003D0A08(u8 *self)
             qcopy(pv + 0x90, pv + 0x80);
             tgt5 = pv + 0x90;
         }
-        hero5 = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
+        hero5 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
         if (*(u8 **)(pv + 0x70) == hero5) {
-            func_002E34E0(v10, &((Hero *)D_00189E20)->b[0x110], D_L01_001B0390);
+            func_002E34E0(v10, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
             func_002E3470(v10, v10, *(u8 **)(pv + 0x70) + 0x10);
         } else {
             qcopy(v10, *(u8 **)(pv + 0x70) + 0x10);
@@ -290,7 +291,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         func_00310D28(self, pv + 0xCC, f5, 0.0033510327f, 0.1f, 0.16755164f);
         if (self[0x60] & 2)
             *(f32 *)(self + 0x48) = func_00310580(0.8f, 1.2f);
-        if (D_L01_001A8F40 != 2 && ((Hero *)D_00189E20)->i[0x2294 / 4] != 0x6F && *(s32 *)(pv + 0xC4) == 0 &&
+        if (D_L01_001A8F40 != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(pv + 0xC4) == 0 &&
             (self[0x21] == 0xFF || **(s32 **)(pv + 0xD8) <= 0) && func_002E3650(pos5, pv + 0x60) < 35.0f &&
             (f5 = func_002E3B10(v10[0] - *(f32 *)(self + 0x10), v10[1] - *(f32 *)(self + 0x14)),
              func_002E4548(*(f32 *)(self + 0xF8), f5) < 0.034906588f)) {
@@ -331,8 +332,8 @@ void func_PAL_L01_003D0A08(u8 *self)
                 func_002E3470(v50, v40, v70);
                 func_002E34A0(v20, v20, v60);
                 func_002E34A0(v40, v40, v70);
-                func_L01_003CC898(self, v20, v40, pv[0x34], pv + 0xDE);
-                func_L01_003CC898(self, v30, v50, pv[0x34], pv + 0xDE);
+                swamp_monster_test_attack_segment_hits_hero(self, v20, v40, pv[0x34], pv + 0xDE);
+                swamp_monster_test_attack_segment_hits_hero(self, v30, v50, pv[0x34], pv + 0xDE);
             }
             func_00307390(self, 6, v20);
             qcopy(v30, v20);
@@ -340,8 +341,8 @@ void func_PAL_L01_003D0A08(u8 *self)
             v40[2] += 2.0f;
             v30[2] += 2.0f;
             v50[2] += 0.5f;
-            func_L01_003CC898(self, v20, v40, pv[0x34], pv + 0xDE);
-            func_L01_003CC898(self, v30, v50, pv[0x34], pv + 0xDE);
+            swamp_monster_test_attack_segment_hits_hero(self, v20, v40, pv[0x34], pv + 0xDE);
+            swamp_monster_test_attack_segment_hits_hero(self, v30, v50, pv[0x34], pv + 0xDE);
         }
         if (d >= 56.0f && pv[0xDE] == 0) {
             func_00355780(2, 0, self);
@@ -350,16 +351,16 @@ void func_PAL_L01_003D0A08(u8 *self)
         lv = func_002D9308(self[0xB0]);
         D_L01_001B03D0 = D_L01_001B03D8[lv - 1];
         if (d < (f32)D_L01_001B03D0 &&
-            (d < 20.0f || (((Hero *)D_00189E20)->i[0x340 / 4] != 0 && ((Hero *)D_00189E20)->h[0x34E / 2] == 0 &&
-                           ((Hero *)D_00189E20)->i[0x229C / 4] != 4))) {
+            (d < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
+                           ((Hero *)g_hero_state)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
             if (pv[0xDD] != 0)
                 dir6a = -0.09599312f;
             yaw6a = func_002E4460(*(f32 *)(self + 0xF8), dir6a);
             *(f32 *)(self + 0xF8) = yaw6a;
-            hero6 = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
+            hero6 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
             if (*(u8 **)(pv + 0x70) == hero6) {
-                func_002E34E0(v20, &((Hero *)D_00189E20)->b[0x110], 55.0f - d);
+                func_002E34E0(v20, &((Hero *)g_hero_state)->b[0x110], 55.0f - d);
                 func_002E3470(v20, v20, *(u8 **)(pv + 0x70) + 0x10);
             } else {
                 qcopy(v20, *(u8 **)(pv + 0x70) + 0x10);
@@ -417,7 +418,7 @@ void func_PAL_L01_003D0A08(u8 *self)
             }
         }
         if (self[0x60] & 2) {
-            func_L01_003CBFA8(self);
+            swamp_monster_release_attack_slot(self);
             *(s32 *)(pv + 0xC4) = 150;
             if (self[0x43] != 1)
                 func_PAL_002A7E68(self, 1, 0, func_00310528(10, 15));
@@ -475,7 +476,7 @@ void func_PAL_L01_003D0A08(u8 *self)
             break;
     case 9:
         func_PAL_002A7650(self, 0x200, 3);
-        if (*(s32 *)(pv + 0xE4) != -1 && !(D_0019B2E8[self[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
+        if (*(s32 *)(pv + 0xE4) != -1 && !(D_0019B2E8[self[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             func_00307E70(self[0xB0]);
             e9 = D_L01_001B264C + (*(s32 *)(pv + 0xE4) << 7);
             func_0034ECD0(e9 + 0x30, e9 + 0x70);
@@ -484,5 +485,5 @@ void func_PAL_L01_003D0A08(u8 *self)
         func_00306250(self);
         return;
     }
-    func_L01_003CC210(self);
+    swamp_monster_release_arm_timers(self);
 }

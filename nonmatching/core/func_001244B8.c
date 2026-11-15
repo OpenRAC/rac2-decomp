@@ -1,4 +1,4 @@
-/* from src/core/001232F0.c: WaitGsPathsIdle, the SDK's GIF/VIF1/VU0 path-idle spin
+/* from src/core/001232F0.c: gfx_wait_paths_idle, the SDK's GIF/VIF1/VU0 path-idle spin
    (symbol_addrs/eu: "polls D_xxxxx9000/A000/3C00/3020 MMIO + cfc2 vc13"). Retail reads
    VU0 control register 29 with `cfc2`, a COP2 instruction this cc1 never emits from C,
    so the 136 bytes cannot match; the polling chain around it is a do/while over four

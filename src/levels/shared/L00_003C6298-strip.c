@@ -14,19 +14,19 @@ extern short D_L00_001B2B10[] __attribute__((sda));
 extern char D_L00_00247310[];
 extern char D_L00_00247350[];
 extern char D_0018A580[];
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7878(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_002A7A00(void *, float, float);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float IntToFloat(int);
+extern void lerp_vector(void *, void *, void *, float);
+extern void vec_random_direction(void *, float, float);
 
 /* Resets the strip tables, then aims strips 4 and 5 from position: the D_0018A580 axis scaled
    by 32, turned by a random 10 to 24 degrees about D_0018A580 - 0x20 and by a random 22 to 30
    degrees (mirrored for strip 5) about D_0018A580 - 0x10; the three inner points are
    interpolated between the ends and jittered. */
-void func_L00_003D2C00(void *object, void *position, int unused)
+void InitEffectStrips(void *object, void *position, int unused)
 {
     char delta[16] __attribute__((aligned(16)));
     char end[16] __attribute__((aligned(16)));
@@ -56,19 +56,19 @@ void func_L00_003D2C00(void *object, void *position, int unused)
 
         qcopy(D_L00_00247310 + strip * 80, position);
         FastVecScale(delta, D_0018A580, 32.0f);
-        ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 32, -(RandomFloatRange(10.0f, 24.0f) * 0.017453294f));
-        angle = RandomFloatRange(22.0f, 30.0f) * 0.017453294f;
+        math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 32, -(math_random_float_range(10.0f, 24.0f) * 0.017453294f));
+        angle = math_random_float_range(22.0f, 30.0f) * 0.017453294f;
         if (strip == 5)
-            ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 16, -angle);
+            math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 16, -angle);
         else
-            ApplyAxisRotationToQuaternion(delta, delta, D_0018A580 - 16, angle);
+            math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 16, angle);
 
         FastVecAdd(end, position, delta);
         qcopy(D_L00_00247350 + strip * 80, end);
         for (point = 1; point < 4; point++) {
             fraction = IntToFloat(point) / IntToFloat(4);
             lerp_vector(D_L00_00247310 + strip * 80 + point * 16, position, end, fraction);
-            RandomDirectionVector(jitter, fraction * 2.0f, fraction * 2.0f);
+            vec_random_direction(jitter, fraction * 2.0f, fraction * 2.0f);
             FastVecAdd(D_L00_00247310 + strip * 80 + point * 16, D_L00_00247310 + strip * 80 + point * 16, jitter);
         }
     }

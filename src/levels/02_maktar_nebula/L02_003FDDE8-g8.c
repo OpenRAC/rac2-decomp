@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L02_003FDDE8: the help-prompt HUD lines (labels 0x49/0x48, then a pulsing colour
  * from func_00283D38, the 0x4b line when the selection is nonzero and the first available
  * 0x4a entry after it). Twin of func_L11_00443940.
@@ -19,19 +20,19 @@ typedef struct {
 
 extern u8 *D_L02_001A904C;
 extern float D_L02_001B3E04;
-extern int D_L02_001B30C8;
-extern HelpInput D_00138180;
-extern u8 D_00139568[], D_001395B8[];
+extern int g_frame_l02_counter;
+extern HelpInput g_pad_state;
+extern u8 g_item_slot_to_record[], D_001395B8[];
 extern HelpEntry D_L02_00264A70[];
 extern u8 *D_L02_001B1190[] SDATA(D_L02_001B1190);
 
-extern void func_L00_0037B7B0(void);
-extern int func_00336D50(u8 *, int);
-extern void func_00300A00(char *, float, int, float, float, float, float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern int func_L02_003F9B70(int);
-extern int func_00288D58(void);
-extern void func_002FC560(unsigned int, unsigned long long);
+extern void gfx_append_draw_list_packet_c(void);
+extern int table_find_by_id(u8 *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, float, int, float, float, float, float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern int arena_get_challenge_save_index(int);
+extern int flag_is_byte_set(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
 
 extern float D_L02_001B1260 __attribute__((sda));
 extern int D_L02_001B1264 __attribute__((sda));
@@ -67,7 +68,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Draws the button help lines at the bottom of the challenge menu. */
-void func_L02_003FDDE8(u8 *object, int enabled)
+void arena_draw_menu_help_prompts(u8 *object, int enabled)
 {
     u8 *state;
     char *label;
@@ -77,51 +78,51 @@ void func_L02_003FDDE8(u8 *object, int enabled)
     HelpEntry *entryRecord;
 
     if (D_L02_001A904C == 0) return;
-    AppendDrawListPacketC();
+    gfx_append_draw_list_packet_c();
     entry = 0x8710;
     state = *(u8 **)(object + 0x68);
     half = 0.5f;
-    label = (char *)FindTableEntryById(D_L02_001A904C + entry, 0x49);
+    label = (char *)table_find_by_id(D_L02_001A904C + entry, 0x49);
     x = (float)D_L02_001B1264;
     one = 1;
     fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, one);
     sc = 1.0f;
     z = 0.0f;
-    DrawScaledObjectTwoAxes(label, x, D_L02_001B1280, fy, D_L02_001B1260, sc, z);
-    label = (char *)FindTableEntryById(D_L02_001A904C + entry, 0x48);
+    gfx_draw_scaled_object_two_axes(label, x, D_L02_001B1280, fy, D_L02_001B1260, sc, z);
+    label = (char *)table_find_by_id(D_L02_001A904C + entry, 0x48);
     x = (float)D_L02_001B1264;
     fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, 1);
-    DrawScaledObjectTwoAxes(label, x, D_L02_001B127C, fy, D_L02_001B1260, sc, z);
-    phase = gFrameCounter_L02 % 50;
+    gfx_draw_scaled_object_two_axes(label, x, D_L02_001B127C, fy, D_L02_001B1260, sc, z);
+    phase = g_frame_l02_counter % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
     color = FastTweenColor(D_L02_001B127C, D_L02_001B1280, pulse);
     if (enabled) {
         if (*(short *)(state + 0x118) != 0) {
-            label = (char *)FindTableEntryById(D_L02_001A904C + 0x8710, 0x4b);
+            label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4b);
             k3 = 1;
             x3 = (float)D_L02_001B126C;
-            if (gPadState.buttons & 0x8000) buttonColor = D_L02_001B1288; else buttonColor = color;
+            if (g_pad_state.buttons & 0x8000) buttonColor = D_L02_001B1288; else buttonColor = color;
             fy = (float)label_y(label, (float)D_L02_001B1270, D_L02_001B3E04, 0.5f, k3);
-            DrawScaledObjectTwoAxes(label, x3, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes(label, x3, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
-            if (D_001395B8[GetChallengeSaveIndex(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
-            if (i >= 12 && !IsFlagByteSet()) continue;
+            if (D_001395B8[arena_get_challenge_save_index(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
+            if (i >= 12 && !flag_is_byte_set()) continue;
             if (i == 7) {
-                entryRecord = &D_L02_00264A70[gItemSlotToRecord[0x1e]];
+                entryRecord = &D_L02_00264A70[g_item_slot_to_record[0x1e]];
                 if (entryRecord->available == 0) continue;
             }
             if (i == 8) {
-                entryRecord = &D_L02_00264A70[gItemSlotToRecord[0x2a]];
+                entryRecord = &D_L02_00264A70[g_item_slot_to_record[0x2a]];
                 if (entryRecord->available == 0) continue;
             }
-            label = (char *)FindTableEntryById(D_L02_001A904C + 0x8710, 0x4a);
+            label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4a);
             one = 1;
-            buttonColor = (gPadState.buttons & 0x2000) ? D_L02_001B128C : color;
+            buttonColor = (g_pad_state.buttons & 0x2000) ? D_L02_001B128C : color;
             nextX = (float)D_L02_001B1274;
             fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
-            DrawScaledObjectTwoAxes(label, nextX, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes(label, nextX, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
             break;
         }
     }

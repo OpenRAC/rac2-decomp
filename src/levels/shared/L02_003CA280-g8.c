@@ -28,12 +28,12 @@ extern struct Vertex D_L02_001B0020[] SDATA(D_L02_001B0020);
 extern float D_L02_001AFFF8[] SDATA(D_L02_001AFFF8);
 extern float D_L02_001AFFFC[] __attribute__((sda));
 extern int D_L02_001AFFE8 __attribute__((sda)), D_L02_001AFFEC __attribute__((sda)), D_L02_001AFFF0 __attribute__((sda));
-extern void func_00283410(void *, void *), func_00282D30(void *, void *, float), func_00280B90(void *, void *, int);
-extern int func_00283D38(int, int, float);
-extern U64 func_0027C878(int);
+extern void euler_to_matrix(void *, void *), FastVecScale(void *, void *, float), draw_world_quad(void *, void *, int);
+extern int FastTweenColor(int, int, float);
+extern U64 GetEffectTextureDescriptor(int);
 
 /* Draws the effect's quad twice, scaled by the two timers and faded through three colours. */
-void func_L02_003CA280(char *obj)
+void DrawEffectQuad(char *obj)
 {
     struct Packet packet;
     float matrix[16] __attribute__((aligned(16)));

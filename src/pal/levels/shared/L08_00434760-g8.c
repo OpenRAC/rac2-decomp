@@ -31,22 +31,22 @@ extern float D_L08_001B1EA4 __attribute__((sda));
 extern float D_L08_001B1EA8 __attribute__((sda));
 extern float D_L08_001B1EC4 __attribute__((sda));
 extern u8 *D_L08_001B1EC8 __attribute__((sda));
-extern u8 D_0019B2E8[], D_00189E20[];
-extern int D_001A79F0;
-extern void func_00282A60(void *destination, int value, int size);
-extern unsigned long func_0027C878(int texture);
-extern int func_002B38B8(u8 *object);
-extern int func_L00_0035F5A0(int index, int value, int object);
-extern float func_00283BE0(float angle, float bound);
-extern float func_00283180(float angle);
-extern float func_00283B98(float angle, float velocity);
-extern float func_00283CE0(int value);
-extern float func_002ABB18(float angle);
-extern float func_00283198(float angle);
-extern float func_00283D00(float value, float divisor);
-extern int func_00283DB8(void *position, float radius);
-extern void func_L08_0042E678(void *object);
-extern void func_L00_002E6CF0(void (*callback)(void *), void *object);
+extern u8 D_0019B2E8[], g_hero_state[];
+extern int g_current_map_index;
+extern void mem_clear(void *destination, int value, int size);
+extern unsigned long GetEffectTextureDescriptor(int texture);
+extern int flag_is_third_pending_set(u8 *object);
+extern int snd_start_in_slot(int index, int value, int object);
+extern float fast_subtract_rotations(float angle, float bound);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float FastAddRotations(float angle, float velocity);
+extern float IntToFloat(int value);
+extern float math_wrap_angle_to_pi(float angle);
+extern float math_fast_sin_or_cos_b(float angle);
+extern float fast_fmod(float value, float divisor);
+extern int math_fast_helper_a(void *position, float radius);
+extern void DrawLayeredDoorQuads(void *object);
+extern void gfx_add_draw_callback_first(void (*callback)(void *), void *object);
 typedef struct { float upper, lower, phase, rate; } DoorState;
 typedef struct {
     u8 pad0[0x31];
@@ -76,12 +76,12 @@ void func_PAL_L08_00434760(u8 *object)
     switch (object[0x95]) {
     case 0:
         if (D_L08_001B2508 != D_L08_001B1EC0) {
-            func_00282A60(D_L08_002B2540, 0, 128);
+            mem_clear(D_L08_002B2540, 0, 128);
             D_L08_001B1ECC = 0;
         }
         data->rate *= 0.0003490659f;
         data->phase = 0;
-        texture = func_0027C878(D_L08_001B1EBC);
+        texture = GetEffectTextureDescriptor(D_L08_001B1EBC);
         alpha = (unsigned long)((long)((unsigned long)(
                     (long)((unsigned long)D_L08_001B1E58 |
                            ((unsigned long)D_L08_001B1E5C << 2)) |
@@ -93,7 +93,7 @@ void func_PAL_L08_00434760(u8 *object)
         D_L08_00264F20.tex0 = texture;
         D_L08_00264F20.tag = 0;
         D_L08_00264F20.tex1 = 0xff9000000260UL;
-        texture = func_0027C878(72);
+        texture = GetEffectTextureDescriptor(72);
         second = &D_L08_00264FB0;
         third = &D_L08_00265040;
         /* As in RAC1, each of these packets gets its ALPHA word last. */
@@ -121,7 +121,7 @@ void func_PAL_L08_00434760(u8 *object)
         third->alpha = alpha;
         ((DoorObject *)object)->drawMode = 0;
         ((DoorObject *)object)->flags |= 1;
-        if (D_0019B2E8[object[0xb0] + D_001A79F0 * 16] & 0x80) {
+        if (D_0019B2E8[object[0xb0] + g_current_map_index * 16] & 0x80) {
             data->phase = 3.1415927410125732f;
             object[0x95] = 3;
         } else {
@@ -129,9 +129,9 @@ void func_PAL_L08_00434760(u8 *object)
         }
         break;
     case 1:
-        if ((D_0019B2E8[object[0xb0] + D_001A79F0 * 16] & 0x80) || func_002B38B8(object)) {
-            if (D_001A79F0 == 19)
-                func_L00_0035F5A0(18, 0, (int)object);
+        if ((D_0019B2E8[object[0xb0] + g_current_map_index * 16] & 0x80) || flag_is_third_pending_set(object)) {
+            if (g_current_map_index == 19)
+                snd_start_in_slot(18, 0, (int)object);
             object[0x95] = 2;
         }
         break;
@@ -147,18 +147,18 @@ void func_PAL_L08_00434760(u8 *object)
     if (object[0x95] != 2 || data->phase >= 3.1415927410125732f || data->phase < -3.0f)
         data->rate = 0;
     half = (data->upper - data->lower) * 0.5f;
-    phase = func_00283180(func_00283BE0(data->phase, 3.1415927410125732f));
+    phase = math_fast_sin_or_cos_a(fast_subtract_rotations(data->phase, 3.1415927410125732f));
     *(float *)(object + 0x18) = data->lower + (phase * half + half);
-    if (D_00189E20[0x22b4] == 4 ||
-        (*(int *)(D_00189E20 + 0x229c) != 20 && *(int *)(D_00189E20 + 0x229c) != 25 &&
-         *(int *)(D_00189E20 + 0x2294) != 0x39 && *(int *)(D_00189E20 + 0x2294) != 0x78 &&
-         *(int *)(D_00189E20 + 0x2294) != 0x79))
-        data->phase = func_00283B98(data->phase, data->rate);
+    if (g_hero_state[0x22b4] == 4 ||
+        (*(int *)(g_hero_state + 0x229c) != 20 && *(int *)(g_hero_state + 0x229c) != 25 &&
+         *(int *)(g_hero_state + 0x2294) != 0x39 && *(int *)(g_hero_state + 0x2294) != 0x78 &&
+         *(int *)(g_hero_state + 0x2294) != 0x79))
+        data->phase = FastAddRotations(data->phase, data->rate);
     data->rate = rate;
     if (D_L08_001B2508 != D_L08_001B1EC0) {
-        phase = func_00283198(func_002ABB18(func_00283CE0(D_L08_001B2508) * D_L08_001B1EA4));
+        phase = math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L08_001B2508) * D_L08_001B1EA4));
         D_L08_001B1EC4 = D_L08_001B1EA8 * phase;
-        uv = func_00283D00(func_00283CE0(D_L08_001B2508) * D_L08_001B1EA0, 1.0f);
+        uv = fast_fmod(IntToFloat(D_L08_001B2508) * D_L08_001B1EA0, 1.0f);
         corner = uv + 2.0f;
         D_L08_00264F20.uv[0] = uv;
         D_L08_00264F20.uv[4] = uv;
@@ -174,8 +174,8 @@ void func_PAL_L08_00434760(u8 *object)
     }
     qcopy(position, object + 0x10);
     position[3] = (*(float *)(object + 0x2c) * 11.319999694824219f) / *(float *)(*(u8 **)(object + 0x24) + 0x24);
-    if (func_00283DB8(position, (float)*(short *)(object + 0x32)) != -1) {
-        func_L00_002E6CF0(func_L08_0042E678, object);
+    if (math_fast_helper_a(position, (float)*(short *)(object + 0x32)) != -1) {
+        gfx_add_draw_callback_first(DrawLayeredDoorQuads, object);
         D_L08_001B1EC8 = object;
         D_L08_002B2540[D_L08_001B1ECC++] = object;
         D_L08_002B2540[D_L08_001B1ECC] = 0;

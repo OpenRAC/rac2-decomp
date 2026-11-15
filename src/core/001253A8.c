@@ -74,7 +74,7 @@ extern void r1_func_00120A88();
 
 /* rac1-decomp src/core/00121750.c: func_001253A8 */
 /* Starts reading sectors from the disc into a memory buffer. */
-int func_001253A8(int lba, int sectors, void *buf, unsigned char *mode) {
+int sceCdRead(int lba, int sectors, void *buf, unsigned char *mode) {
     char *req = r1_D_001314C0;
     int byteCount;
     int rpcResult;
@@ -146,7 +146,7 @@ int func_001253A8(int lba, int sectors, void *buf, unsigned char *mode) {
    cross-jumping the two `return -1` tails into one (SIZE 144/152 with
    the success path first, which 2.95.3 needed). */
 /* Asks the CD drive for its last error code. */
-int func_00125588(void) {
+int sceCdGetError(void) {
     int result;
 
     if (r1_func_00121040(3) == 0) {
@@ -172,7 +172,7 @@ int func_00125588(void) {
    As in func_00125588, the RPC failure path comes first: with the success
    path first 2.9-ee merges the two `return 0` tails (SIZE 176/184). */
 /* Stops the CD command that is running and returns the drive reply. */
-int func_00125620(void) {
+int sceCdBreak(void) {
     int result;
 
     if (r1_func_00121040(0x1E) == 0) {
@@ -195,7 +195,7 @@ int func_00125620(void) {
    8-byte clock after the status word is copied out uncached. Failure
    path first, as in func_00125588. */
 /* Reads the clock from the CD drive into a small structure. */
-int func_001256D8(CdClock *clockOut) {
+int sceCdReadClock(CdClock *clockOut) {
     int status;
 
     if (r1_func_00121040(0xF) == 0) {
@@ -222,7 +222,7 @@ int func_001256D8(CdClock *clockOut) {
 
 /* sceGsResetGraph. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Resets the graphics chip and stores the screen mode settings. */
-void func_001257D0(short mode, short inter, short out, short ff) {
+void sceGsResetGraph(short mode, short inter, short out, short ff) {
     sceGsGParam *gParam;
 
     switch (mode) {

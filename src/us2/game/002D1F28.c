@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int D_001A7A00[] __attribute__((sda));
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_001395E9;
 extern unsigned char D_001395B8[];
 extern int D_001AA438 __asm__("D_001AA438__gp") __attribute__((section(".sdata")));
@@ -34,7 +35,7 @@ int func_US2_002D2538(void)
             D_001ABA35[0] = 1;
         if (D_001A7BB0[0x4F] != 0)
             D_001ABA36[0] = 1;
-        if (D_001AA438 != 0 && D_001A79F0 > 0)
+        if (D_001AA438 != 0 && g_current_map_index > 0)
             D_001ABA37[0] = 1;
     }
     return 0;

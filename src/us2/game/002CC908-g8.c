@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -40,10 +41,10 @@ extern s32 D_001AA420;
 extern s32 D_001AA428;
 extern s8 D_0025BA90[];
 extern s32 D_US2_001F29B4[];
-extern void func_0028B338(s32);
-extern void func_002B49C0(s32);
-extern s32 func_002B49E0(s32, s32, s32, s32, s32);
-extern s32 func_002D5B38(s32, s8 *);
+extern void select_moby_context(s32);
+extern void request_set_setting_b(s32);
+extern s32 request_begin_slot(s32, s32, s32, s32, s32);
+extern s32 menu_send_request(s32, s8 *);
 
 s32 func_US2_002CC908(s32 arg0) {
     s32 r;
@@ -63,26 +64,26 @@ goto *D_0026CCE0[rc2_selector];
         r = 1;
         D_0018A000.a = 10;
         if (D_001AA420 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA420)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_2:
         r = 1;
         D_0018A000.a = 10;
         if (D_001AA428 != 0) {
-            func_0028B338(0);
+            select_moby_context(0);
             ((void (*)(s32))D_001AA428)(0);
-            func_0028B338(1);
+            select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_3:
-        r = func_002D5B38(3, D_0025BA90);
+        r = menu_send_request(3, D_0025BA90);
         goto rc2_switch_end;
     rc2_case_4:
-        if (func_002B49E0(4, 2, 8, 4, 0) == 0) {
-            func_002B49C0(3);
+        if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
+            request_set_setting_b(3);
             D_US2_001F29B4[0] = 1;
             r = 1;
         }

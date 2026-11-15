@@ -55,12 +55,12 @@ typedef struct {
     char pad754[0xC];
 } PreviewState;
 typedef struct { int ids[5]; } PreviewClasses;
-extern PreviewState D_0021F240;
+extern PreviewState g_vendor_menu_state;
 extern PreviewClasses D_001AD500;
 extern int D_001A7290[] MACRO_ADDR;
 extern int D_001AD250[] SDATA(D_001AD250);
 extern int D_001A8B00[] MACRO_ADDR;
-extern const int D_001A7AF0[] MACRO_ADDR;
+extern const int g_equipment_bits[] MACRO_ADDR;
 extern short D_001A8C20[] MACRO_ADDR, D_001A8C28[] MACRO_ADDR, D_001A8C30[] MACRO_ADDR, D_001A8C38[] MACRO_ADDR, D_001A8C40[] MACRO_ADDR, D_001A8C48[] MACRO_ADDR, D_001A8C50[] MACRO_ADDR, D_001A8C58[] MACRO_ADDR;
 extern float D_001B1390[] MACRO_ADDR;
 typedef struct { float m[16]; } PreviewTransform;
@@ -69,22 +69,22 @@ extern float D_001A7C94[] MACRO_ADDR;
 extern char D_001AD1D0[] SDATA(D_001AD1D0);
 extern unsigned char D_001A7BB1;
 typedef struct { char pad[0x370]; float x, y; } PreviewCamera;
-extern PreviewCamera D_001B5200;
-extern int D_00152C00[];
-extern unsigned char D_00139568[];
+extern PreviewCamera g_active_camera;
+extern int g_hero_moby_default[];
+extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x46]; short text; char pad48[0x98]; } PreviewInfo;
-extern PreviewInfo D_00239BA0[];
-extern void func_002FB170(void), func_002F88D8(char *);
-extern int func_00288FB8(int);
-extern void func_US2_00292C70(void *), func_002926B8(int);
-extern float func_00283248(float, float), func_00283B98(float, float), func_00283BE0(float, float);
-extern void func_0029F0C8(void *, int), func_002A0468(void *, int, int, int, int);
-extern void func_002A0F48(void *), func_0029F390(void *);
-extern void func_00282A60(void *, int, int), func_0029F978(void *, unsigned int, void *);
+extern PreviewInfo g_weapon_table[];
+extern void shop_clear_preview(void), shop_set_message_text(char *);
+extern int GetLocalizedString(int);
+extern void func_US2_00292C70(void *), LoadDiscTableTexture(int);
+extern float mat_fast_helper_a(float, float), FastAddRotations(float, float), fast_subtract_rotations(float, float);
+extern void moby_init_instance(void *, int), gfx_pack_render_command_fields(void *, int, int, int, int);
+extern void func_002A0F48(void *), update_moby_animation_state(void *);
+extern void mem_clear(void *, int, int), AttachManipulator(void *, unsigned int, void *);
 extern void func_002A1130(void *, unsigned int, long long, unsigned int);
-extern int func_00288870(void *, int, int);
-extern short func_002B7CE0(int);
-extern void func_00294BC8(int, int);
+extern int help_copy_record_at_depth(void *, int, int);
+extern short snd_pump_music_and_disc_read(int);
+extern void load_start_disc_entry_by_id(int, int);
 
 typedef char PreviewMobySize[(sizeof(PreviewMoby) == 0x100) ? 1 : -1];
 typedef char PreviewStateSize[(sizeof(PreviewState) == 0x760) ? 1 : -1];
@@ -99,25 +99,25 @@ void func_US2_002FC008(void)
     PreviewState *state;
     int mode;
     float facing;
-    if (D_0021F240.resourceActive) func_002FB170();
-    mode = D_0021F240.mode;
-    moby = D_0021F240.objects;
-    D_0021F240.objectCount = 1;
+    if (g_vendor_menu_state.resourceActive) shop_clear_preview();
+    mode = g_vendor_menu_state.mode;
+    moby = g_vendor_menu_state.objects;
+    g_vendor_menu_state.objectCount = 1;
     if (mode == 3) {
-        D_0021F240.objectCount = 0;
+        g_vendor_menu_state.objectCount = 0;
         classes = D_001AD500;
-        if (D_0021F240.rows.armor[D_0021F240.selected].value == 0) {
-            func_002F88D8(((char *)func_00288FB8(0x301E)));
+        if (g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value == 0) {
+            shop_set_message_text(((char *)GetLocalizedString(0x301E)));
         } else {
-            if (D_001A7290[0] != D_0021F240.rows.armor[D_0021F240.selected].value)
-                func_US2_00292C70((void *)D_0021F240.rows.armor[D_0021F240.selected].value);
-            func_002F88D8(((char *)func_00288FB8(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value])));
+            if (D_001A7290[0] != g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value)
+                func_US2_00292C70((void *)g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value);
+            shop_set_message_text(((char *)GetLocalizedString(D_001AD250[g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value])));
         }
-        facing = func_00283B98(func_00283248(D_001B5200.x, D_001B5200.y), 1.7453294f);
-        while (classes.ids[D_0021F240.objectCount] >= 0) {
-            moby = &D_0021F240.objects[D_0021F240.objectCount];
-            func_0029F0C8(moby, classes.ids[D_0021F240.objectCount]);
-            func_002A0468(moby, 0x202020, 14, 14, 0);
+        facing = FastAddRotations(mat_fast_helper_a(g_active_camera.x, g_active_camera.y), 1.7453294f);
+        while (classes.ids[g_vendor_menu_state.objectCount] >= 0) {
+            moby = &g_vendor_menu_state.objects[g_vendor_menu_state.objectCount];
+            moby_init_instance(moby, classes.ids[g_vendor_menu_state.objectCount]);
+            gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
             moby->color = 0x80808080;
             moby->drawMask = 64;
             moby->render = 1;
@@ -130,127 +130,127 @@ void func_US2_002FC008(void)
             moby->unk62 = 255;
             func_002A0F48(moby);
             moby->anim = 0; moby->anim2 = 0;
-            func_0029F390(moby);
+            update_moby_animation_state(moby);
             if (D_001A7290[0]) moby->rotZ = facing;
             if (D_001A7290[0] == 4 && moby->classId == 0x50A) moby->flags |= 1;
             if (D_001A7290[0] >= 3 && moby->classId == 0xA73) moby->flags |= 1;
-            D_0021F240.objectCount++;
+            g_vendor_menu_state.objectCount++;
         }
-        func_00282A60(D_001B1390, 0, 0x40);
-        func_0029F978(D_0021F240.objects, 24, D_001B1390);
+        mem_clear(D_001B1390, 0, 0x40);
+        AttachManipulator(g_vendor_menu_state.objects, 24, D_001B1390);
         D_001B1390[10] = D_001A7C94[0];
         D_001B1390[9] = D_001B1390[8] = D_001A7C94[0] * 0.97f;
         if (D_001A7290[0] < 3) {
             int i;
-            func_00282A60(&D_001B2980[0], 0, 0x40);
-            func_00282A60(&D_001B2980[1], 0, 0x40);
+            mem_clear(&D_001B2980[0], 0, 0x40);
+            mem_clear(&D_001B2980[1], 0, 0x40);
             for (i = 0; i < 2; i++) {
                 PreviewTransform *transform = &D_001B2980[i];
-                func_0029F978(D_0021F240.objects, i + 22, transform);
+                AttachManipulator(g_vendor_menu_state.objects, i + 22, transform);
                 transform->m[8] = 0.01f;
                 transform->m[9] = 0.01f;
                 transform->m[10] = 0.01f;
             }
         }
         {
-            PreviewMoby *moby = D_0021F240.objects;
+            PreviewMoby *moby = g_vendor_menu_state.objects;
             PreviewClass *pc = moby->pclass;
             PreviewAnimation *anim = pc->anim[moby->anim];
             if (anim->data[0] & 0xF0000000) {
                 func_002A1130((char *)&anim->data[anim->frames] + anim->triggers * 4,
-                             anim->data[moby->frame], D_0021F240.animBuffers[0], pc->count);
-                moby->animData = D_0021F240.animBuffers[0];
+                             anim->data[moby->frame], g_vendor_menu_state.animBuffers[0], pc->count);
+                moby->animData = g_vendor_menu_state.animBuffers[0];
             }
             {
                 PreviewClass *pc2 = moby->pclass;
                 PreviewAnimation *anim2 = pc2->anim[moby->anim2];
                 if (anim2->data[0] & 0xF0000000) {
                     func_002A1130((char *)&anim2->data[anim2->frames] + anim2->triggers * 4,
-                                 anim2->data[moby->frame2], D_0021F240.animBuffers[1], pc2->count);
-                    moby->animData2 = D_0021F240.animBuffers[1];
+                                 anim2->data[moby->frame2], g_vendor_menu_state.animBuffers[1], pc2->count);
+                    moby->animData2 = g_vendor_menu_state.animBuffers[1];
                 }
             }
         }
         do {
-            D_0021F240.position[0] = -9.0f; D_0021F240.position[1] = 4.5f; D_0021F240.position[2] = -1.0f;
-            D_0021F240.scale = 3.5f; D_0021F240.modelActive = 1;
-            D_0021F240.field9c = 0; D_0021F240.resourceActive = 0; D_0021F240.field90 = 0;
+            g_vendor_menu_state.position[0] = -9.0f; g_vendor_menu_state.position[1] = 4.5f; g_vendor_menu_state.position[2] = -1.0f;
+            g_vendor_menu_state.scale = 3.5f; g_vendor_menu_state.modelActive = 1;
+            g_vendor_menu_state.field9c = 0; g_vendor_menu_state.resourceActive = 0; g_vendor_menu_state.field90 = 0;
         } while (0);
     } else if (mode == 2) {
-        int index = D_0021F240.selected;
+        int index = g_vendor_menu_state.selected;
         int kind;
         int value;
         int armor;
-        D_0021F240.objectCount = 10;
-        D_0021F240.equipment = (D_001A7AF0[0] & ~D_0021F240.rows.equipment[index].value) | D_0021F240.rows.equipment[index].unknown;
-        parts[0] = D_001A8C20[D_0021F240.equipment & 3] << 16;
-        if (D_0021F240.rows.equipment[index].value == 3) parts[0] |= 0x80000000;
-        parts[1] = D_001A8C28[(D_0021F240.equipment & 12) >> 2] << 16;
+        g_vendor_menu_state.objectCount = 10;
+        g_vendor_menu_state.equipment = (g_equipment_bits[0] & ~g_vendor_menu_state.rows.equipment[index].value) | g_vendor_menu_state.rows.equipment[index].unknown;
+        parts[0] = D_001A8C20[g_vendor_menu_state.equipment & 3] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 3) parts[0] |= 0x80000000;
+        parts[1] = D_001A8C28[(g_vendor_menu_state.equipment & 12) >> 2] << 16;
         parts[2] = parts[1] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 12) { parts[1] |= 0x80000000; parts[2] |= 0x80000000; }
-        parts[3] = D_001A8C50[(D_0021F240.equipment & 0xC00) >> 10] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 12) { parts[1] |= 0x80000000; parts[2] |= 0x80000000; }
+        parts[3] = D_001A8C50[(g_vendor_menu_state.equipment & 0xC00) >> 10] << 16;
         parts[4] = parts[3] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0xC00) { parts[3] |= 0x80000000; parts[4] |= 0x80000000; }
-        parts[5] = D_001A8C30[(D_0021F240.equipment & 0x30) >> 4] << 16;
-        if (D_0021F240.rows.equipment[index].value == 0x30) parts[5] |= 0x80000000;
-        parts[6] = D_001A8C38[(D_0021F240.equipment & 0x40) >> 6] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 0xC00) { parts[3] |= 0x80000000; parts[4] |= 0x80000000; }
+        parts[5] = D_001A8C30[(g_vendor_menu_state.equipment & 0x30) >> 4] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 0x30) parts[5] |= 0x80000000;
+        parts[6] = D_001A8C38[(g_vendor_menu_state.equipment & 0x40) >> 6] << 16;
         parts[7] = parts[6] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0x40) { parts[6] |= 0x80000000; parts[7] |= 0x80000000; }
-        parts[8] = D_001A8C48[(D_0021F240.equipment & 0x200) >> 9] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 0x40) { parts[6] |= 0x80000000; parts[7] |= 0x80000000; }
+        parts[8] = D_001A8C48[(g_vendor_menu_state.equipment & 0x200) >> 9] << 16;
         parts[9] = parts[8] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0x200) { parts[8] |= 0x80000000; parts[9] |= 0x80000000; }
-        kind = (D_0021F240.equipment & 0x180) >> 7;
+        if (g_vendor_menu_state.rows.equipment[index].value == 0x200) { parts[8] |= 0x80000000; parts[9] |= 0x80000000; }
+        kind = (g_vendor_menu_state.equipment & 0x180) >> 7;
         if (kind) {
-            int n = D_0021F240.objectCount;
+            int n = g_vendor_menu_state.objectCount;
             parts[n] = parts[n + 1] = D_001A8C40[kind] << 16;
             parts[n + 1] |= 0x8000;
-            if (D_0021F240.rows.equipment[index].value == 0x180) {
+            if (g_vendor_menu_state.rows.equipment[index].value == 0x180) {
                 parts[n] |= 0x80000000;
                 parts[n + 1] |= 0x80000000;
             }
-            D_0021F240.objectCount += 2;
+            g_vendor_menu_state.objectCount += 2;
         }
-        parts[D_0021F240.objectCount] = D_001A8C58[(D_0021F240.equipment & 0xC000) >> 14] << 16;
-        if (D_0021F240.rows.equipment[index].value == 0xC000) parts[D_0021F240.objectCount] |= 0x80000000;
-        D_0021F240.objectCount++;
-        if (D_0021F240.equipment & 0x1000) {
-            parts[D_0021F240.objectCount] = 0x10E20000;
-            if (D_0021F240.rows.equipment[index].value == 0x1000) parts[D_0021F240.objectCount] = 0x90E20000;
-            D_0021F240.objectCount++;
+        parts[g_vendor_menu_state.objectCount] = D_001A8C58[(g_vendor_menu_state.equipment & 0xC000) >> 14] << 16;
+        if (g_vendor_menu_state.rows.equipment[index].value == 0xC000) parts[g_vendor_menu_state.objectCount] |= 0x80000000;
+        g_vendor_menu_state.objectCount++;
+        if (g_vendor_menu_state.equipment & 0x1000) {
+            parts[g_vendor_menu_state.objectCount] = 0x10E20000;
+            if (g_vendor_menu_state.rows.equipment[index].value == 0x1000) parts[g_vendor_menu_state.objectCount] = 0x90E20000;
+            g_vendor_menu_state.objectCount++;
         }
-        if (D_0021F240.equipment & 0x2000) {
-            parts[D_0021F240.objectCount] = 0x10E40000;
-            if (D_0021F240.rows.equipment[index].value == 0x2000) parts[D_0021F240.objectCount] = 0x90E40000;
-            D_0021F240.objectCount++;
+        if (g_vendor_menu_state.equipment & 0x2000) {
+            parts[g_vendor_menu_state.objectCount] = 0x10E40000;
+            if (g_vendor_menu_state.rows.equipment[index].value == 0x2000) parts[g_vendor_menu_state.objectCount] = 0x90E40000;
+            g_vendor_menu_state.objectCount++;
         }
-        parts[D_0021F240.objectCount++] = 0x10E30000;
-        D_0021F240.fielda4 = 0;
-        value = D_0021F240.rows.equipment[index].value;
+        parts[g_vendor_menu_state.objectCount++] = 0x10E30000;
+        g_vendor_menu_state.fielda4 = 0;
+        value = g_vendor_menu_state.rows.equipment[index].value;
         if (value == 0xC00 || value == 0x200 || value == 12 || value == 3 || value == 0x40) {
-            D_0021F240.x = 0.346f; D_0021F240.y = 0.3227f; D_0021F240.z = -0.7141964f;
+            g_vendor_menu_state.x = 0.346f; g_vendor_menu_state.y = 0.3227f; g_vendor_menu_state.z = -0.7141964f;
         } else if (value == 0x30 || value == 0x2000) {
-            D_0021F240.x = 0.0225f; D_0021F240.y = 0.0239f; D_0021F240.z = func_00283BE0(-3.0301f, 1.5707964f);
+            g_vendor_menu_state.x = 0.0225f; g_vendor_menu_state.y = 0.0239f; g_vendor_menu_state.z = fast_subtract_rotations(-3.0301f, 1.5707964f);
         } else if (value == 0x1000 || value == 0x180) {
-            D_0021F240.x = -0.587f; D_0021F240.y = 0.165f; D_0021F240.z = 0.4842037f;
+            g_vendor_menu_state.x = -0.587f; g_vendor_menu_state.y = 0.165f; g_vendor_menu_state.z = 0.4842037f;
         } else if (value == 0x1F0000) {
-            D_0021F240.x = (index & 1) ? 0.533f : 0.566f;
-            D_0021F240.y = (index & 1) ? 0.3203f : 0.165f;
-            D_0021F240.z = (index & 1) ? -0.90089637f : -0.13629639f;
+            g_vendor_menu_state.x = (index & 1) ? 0.533f : 0.566f;
+            g_vendor_menu_state.y = (index & 1) ? 0.3203f : 0.165f;
+            g_vendor_menu_state.z = (index & 1) ? -0.90089637f : -0.13629639f;
         } else if (value == 0xC000) {
-            D_0021F240.x = -0.5f; D_0021F240.y = -0.4f; D_0021F240.z = func_00283BE0(-2.1f, 1.5707964f);
+            g_vendor_menu_state.x = -0.5f; g_vendor_menu_state.y = -0.4f; g_vendor_menu_state.z = fast_subtract_rotations(-2.1f, 1.5707964f);
         } else {
-            D_0021F240.x = 0; D_0021F240.y = 0; D_0021F240.z = -1.5707964f;
+            g_vendor_menu_state.x = 0; g_vendor_menu_state.y = 0; g_vendor_menu_state.z = -1.5707964f;
         }
         {
             int i;
             int n = 0;
-            D_0021F240.selectedPart[1] = D_0021F240.selectedPart[0] = -1;
-            for (i = 0; i < D_0021F240.objectCount; i++) {
-                PreviewState *loopState = &D_0021F240;
+            g_vendor_menu_state.selectedPart[1] = g_vendor_menu_state.selectedPart[0] = -1;
+            for (i = 0; i < g_vendor_menu_state.objectCount; i++) {
+                PreviewState *loopState = &g_vendor_menu_state;
                 PreviewMoby *moby = &loopState->objects[i];
                 float one = 1.0f;
-                func_0029F0C8(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
-                func_002A0468(moby, 0x202020, 14, 14, 0);
+                moby_init_instance(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
+                gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
                 if ((unsigned)parts[i] & 0x80000000) loopState->selectedPart[n++] = i;
                 moby->drawMask = 0x100;
                 moby->render = 1;
@@ -264,57 +264,57 @@ void func_US2_002FC008(void)
                 loopState->scale = one;
                 if (D_001A7BB1) loopState->position[0] = -22.0f;
                 else loopState->position[0] = -19.0f;
-                D_0021F240.position[1] = -2.0f;
-                if (D_001A7BB1) D_0021F240.position[2] = 2.25f;
-                else D_0021F240.position[2] = 3.0f;
+                g_vendor_menu_state.position[1] = -2.0f;
+                if (D_001A7BB1) g_vendor_menu_state.position[2] = 2.25f;
+                else g_vendor_menu_state.position[2] = 3.0f;
                 moby->rotX = 0; moby->rotY = 0; moby->rotZ = -1.5707964f;
                 func_002A0F48(moby);
             }
         }
-        state = &D_0021F240;
+        state = &g_vendor_menu_state;
         state->modelActive = 1; state->field9c = 0; state->resourceActive = 0; state->field90 = 0;
-        func_002F88D8(((char *)func_00288FB8(state->rows.equipment[state->selected].extra)));
+        shop_set_message_text(((char *)GetLocalizedString(state->rows.equipment[state->selected].extra)));
         armor = ((unsigned)state->equipment >> 16) & 0x1F;
-        if (D_00152C00[12] != armor) func_002926B8(armor);
+        if (g_hero_moby_default[12] != armor) LoadDiscTableTexture(armor);
     } else if (mode == 0) {
-        D_0021F240.field750 = 0;
-        if (D_0021F240.rows.item[D_0021F240.selected].kind == 1) {
-            func_0029F0C8(moby, 0xCDB);
-            func_002A0468(moby, 0x202020, 14, 14, 0);
+        g_vendor_menu_state.field750 = 0;
+        if (g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].kind == 1) {
+            moby_init_instance(moby, 0xCDB);
+            gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
             moby->drawMask = 64; moby->color = 0x80808080; moby->flags = 0x2010;
             moby->render = 1; moby->opacity = 0; moby->unk23 = 0; moby->state = 0; moby->unk98 = 0; moby->unk7c = 1;
-            D_0021F240.scale = 3.5f;
-            qcopy(D_0021F240.position, D_001AD1D0);
-            if (D_001A7BB1) D_0021F240.position[2] -= 0.55f;
+            g_vendor_menu_state.scale = 3.5f;
+            qcopy(g_vendor_menu_state.position, D_001AD1D0);
+            if (D_001A7BB1) g_vendor_menu_state.position[2] -= 0.55f;
             moby->rotX = 0; moby->rotY = 0; moby->rotZ = 0;
-            D_0021F240.field9c = 0;
+            g_vendor_menu_state.field9c = 0;
             func_002A0F48(moby);
-            D_0021F240.modelActive = 1; D_0021F240.resourceActive = 0;
-            D_0021F240.field90 = 0;
+            g_vendor_menu_state.modelActive = 1; g_vendor_menu_state.resourceActive = 0;
+            g_vendor_menu_state.field90 = 0;
         } else {
-            if (D_0021F240.rows.item[D_0021F240.selected].owned) {
+            if (g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].owned) {
                 int special = 0;
-                switch (D_0021F240.rows.item[D_0021F240.selected].id) {
+                switch (g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].id) {
                 case 12: case 14: case 17: case 18: case 53: special = 1;
                 }
-                func_00288870(&info, D_0021F240.rows.item[D_0021F240.selected].id, special ? 1 : 2);
-                func_002F88D8(((char *)func_00288FB8(info.text)));
+                help_copy_record_at_depth(&info, g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].id, special ? 1 : 2);
+                shop_set_message_text(((char *)GetLocalizedString(info.text)));
             } else {
-                func_002F88D8(((char *)func_00288FB8((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text)));
+                shop_set_message_text(((char *)GetLocalizedString((g_item_slot_to_record[g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].id] + g_weapon_table)->text)));
             }
-            func_002B7CE0(1);
-            state = &D_0021F240;
-            func_00294BC8(state->rows.item[state->selected].resource, state->buffer);
+            snd_pump_music_and_disc_read(1);
+            state = &g_vendor_menu_state;
+            load_start_disc_entry_by_id(state->rows.item[state->selected].resource, state->buffer);
             state->resourceActive = 1; state->previous = state->selected; state->modelActive = 0;
         }
     } else if (mode == 1) {
-        if (D_0021F240.count) {
-            func_002F88D8(((char *)func_00288FB8(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]])));
-            func_002B7CE0(1);
-            func_00294BC8(D_0021F240.rows.ammo[D_0021F240.selected][3], D_0021F240.buffer);
-            D_0021F240.resourceActive = 1; D_0021F240.previous = D_0021F240.selected; D_0021F240.modelActive = 0;
+        if (g_vendor_menu_state.count) {
+            shop_set_message_text(((char *)GetLocalizedString(D_001A8B00[g_vendor_menu_state.rows.ammo[g_vendor_menu_state.selected][0]])));
+            snd_pump_music_and_disc_read(1);
+            load_start_disc_entry_by_id(g_vendor_menu_state.rows.ammo[g_vendor_menu_state.selected][3], g_vendor_menu_state.buffer);
+            g_vendor_menu_state.resourceActive = 1; g_vendor_menu_state.previous = g_vendor_menu_state.selected; g_vendor_menu_state.modelActive = 0;
         }
     } else {
-        D_0021F240.resourceActive = 0; D_0021F240.modelActive = 0;
+        g_vendor_menu_state.resourceActive = 0; g_vendor_menu_state.modelActive = 0;
     }
 }

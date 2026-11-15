@@ -4,26 +4,26 @@
 /* The threshold lives in small data, so this file is built with -G8. It differs
    from program to program, so it carries no level. */
 extern float ref_L00_00327D08_00 __attribute__((sda));
-extern void func_002FC808(void);
-extern void func_00327D50(char *);
+extern void gfx_append_vu1_preset_c(void);
+extern void gfx_draw_distortion_ring(char *);
 
 /* Runs the shared update, then advances the object's sub-record while its
    stored float is still below the small-data threshold. */
-void func_00327D08(char *a0)
+void ring_update_if_below_threshold(char *a0)
 {
     float value;
 
-    AppendVu1DmaChainTable3();
+    gfx_append_vu1_preset_c();
     value = *(float *)(*(char **)(a0 + 0x68) + 0x24);
     if (value < ref_L00_00327D08_00)
-        DrawDistortionRing(a0);
+        gfx_draw_distortion_ring(a0);
 }
 
-extern int D_001B1688;
+extern int g_game_time;
 extern char *D_001B1B68;
 extern float ref_L00_00327A60_00 __attribute__((sda));
-extern float func_00282E48(void *, void *);
-extern void func_00302440(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void pickup_start_fly_if_idle(void *, void *);
 
 /* The camera block the level keeps, with the fields this body writes. */
 typedef struct {
@@ -43,11 +43,11 @@ extern float D_001B0870 __attribute__((sda));
 extern int D_001B0820 __attribute__((sda));
 extern int D_001B0824 __attribute__((sda));
 extern float ref_L00_0032E4F0_04;
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 /* Scales the resident zoom value by the argument's size, keeps it in the
    camera block and hands the block to the shared update. */
-void func_0032E4F0(float size)
+void cam_set_zoom_effect(float size)
 {
     Ref_L00_0032E4F0_Block *block = &ref_L00_0032E4F0_00;
     float zoom = size * (D_001B0870 * 1024.0f);
@@ -65,10 +65,10 @@ void func_0032E4F0(float size)
 }
 
 /* Looks through the live objects and reacts to each one of a certain kind that is close to this object. */
-void func_00327A60(char *object)
+void moby_notify_nearby_of_kind(char *object)
 {
     char *cursor;
-    if (gGameTime & 1) {
+    if (g_game_time & 1) {
         cursor = D_001B1B68;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
@@ -77,7 +77,7 @@ void func_00327A60(char *object)
             if (cursor && *(char **)(cursor + 0x24) &&
                 *(short *)(*(char **)(cursor + 0x24) + 0x46) == 0x13) {
                 if (fast_vec_dist(cursor + 0x10, object + 0x10) < ref_L00_00327A60_00)
-                    StartPickupFlyIfIdle(cursor, object);
+                    pickup_start_fly_if_idle(cursor, object);
             }
             cursor = *(char **)(cursor + 0x28);
         }

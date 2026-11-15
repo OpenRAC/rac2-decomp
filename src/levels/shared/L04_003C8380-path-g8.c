@@ -4,17 +4,17 @@
 
 typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s32 ref_L04_00400D48_01 __attribute__((sda));
 extern char ref_L04_00400D48_00[];
-extern u8 *D_L04_001FE340[];
-extern struct { s32 pad; s32 flags; u8 rest[56]; } D_L04_002C63C0[];
+extern u8 *g_route_path_table[];
+extern struct { s32 pad; s32 flags; u8 rest[56]; } g_race_challenge_table[];
 extern s32 ref_L04_00400D48_02(u8 *a0, u8 *a1, s32 a2);
-extern f32 func_00283CE0(s32 value);
+extern f32 IntToFloat(s32 value);
 extern void L04_UpdatePath(float, float, u8 *, u8 *, u8 *, u8 *) __asm__("func_002C96F8");
 
 /* Picks a route and the nearest point on it for a racing hoverbike, then points its steering at that spot. */
-void func_L04_00400D48(u8 *racer, u8 *bike, s32 snapToPoint)
+void hoverbike_select_route_point(u8 *racer, u8 *bike, s32 snapToPoint)
 {
     u8 *riderVars = *(u8 **)(*(u8 **)(bike + 0x164) + 0x68);
     s32 pointIndex = -1;
@@ -23,11 +23,11 @@ void func_L04_00400D48(u8 *racer, u8 *bike, s32 snapToPoint)
     f32 routeLength;
     u8 *route;
 
-    if ((s32)ref_L04_00400D48_00 == 0x28 || gCurrentMapIndex == 4) {
+    if ((s32)ref_L04_00400D48_00 == 0x28 || g_current_map_index == 4) {
         if (*(s32 *)(riderVars + 0x314) == -1) {
-            *(u8 **)(bike + 0x110) = gRoutePathTable[*(s32 *)(bike + 0x54)];
-        } else if (gRaceChallengeTable[ref_L04_00400D48_01].flags & 4) {
-            *(u8 **)(bike + 0x110) = gRoutePathTable[*(s32 *)(bike + 0x6C)];
+            *(u8 **)(bike + 0x110) = g_route_path_table[*(s32 *)(bike + 0x54)];
+        } else if (g_race_challenge_table[ref_L04_00400D48_01].flags & 4) {
+            *(u8 **)(bike + 0x110) = g_route_path_table[*(s32 *)(bike + 0x6C)];
             if (*(s32 *)(bike + 0x120) == 1 && *(s32 *)(bike + 0x124) >= 3) {
                 pointIndex = 0x82;
             }
@@ -85,7 +85,7 @@ typedef struct {
     int routes[10];             /* 0x6E0 */
 } RacerVarsBBC;
 
-extern void func_00282CF0(void *out, void *a, void *b);
+extern void FastVecSub(void *out, void *a, void *b);
 extern float func_L00_002EE290(void *v);
 extern char ref_L04_00400AB0_00[];     /* an absolute symbol: 4 in level 04 */
 
@@ -93,7 +93,7 @@ extern char ref_L04_00400AB0_00[];     /* an absolute symbol: 4 in level 04 */
    fifth point, then a pass over the ten points around the best one, wrapping at the ends.
    With clamp set, in Barlow (level 4) and Joba (level 11), an index inside certain
    stretches of the moby's routes is moved to the end of the stretch. */
-int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
+int FindNearestRoutePointIndex(Moby *moby, Route *path, int clamp)
 {
     int best = 0;
     int i;
@@ -129,33 +129,33 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
     }
 
     if (clamp) {
-        if ((int)ref_L04_00400AB0_00 == 40 || gCurrentMapIndex == 4) {
+        if ((int)ref_L04_00400AB0_00 == 40 || g_current_map_index == 4) {
             Route *route6;
 
             if (moby->oClass == 0xBBC /* moby class 3004 */) {
                 RacerVarsBBC *vars = moby->vars;
-                route6 = (Route *)gRoutePathTable[vars->routes[6]];
+                route6 = (Route *)g_route_path_table[vars->routes[6]];
             } else {
                 RacerVars *vars = moby->vars;
-                route6 = (Route *)gRoutePathTable[vars->routes[6]];
+                route6 = (Route *)g_route_path_table[vars->routes[6]];
             }
             if (path == route6 && best >= 105 && best < 124)
                 best = 124;
-        } else if (gCurrentMapIndex == 11) {
+        } else if (g_current_map_index == 11) {
             Route *route0;
             Route *route7;
             Route *route2;
 
             if (moby->oClass == 0xBBC /* moby class 3004 */) {
                 RacerVarsBBC *vars = moby->vars;
-                route7 = (Route *)gRoutePathTable[vars->routes[7]];
-                route0 = (Route *)gRoutePathTable[vars->routes[0]];
-                route2 = (Route *)gRoutePathTable[vars->routes[2]];
+                route7 = (Route *)g_route_path_table[vars->routes[7]];
+                route0 = (Route *)g_route_path_table[vars->routes[0]];
+                route2 = (Route *)g_route_path_table[vars->routes[2]];
             } else {
                 RacerVars *vars = moby->vars;
-                route7 = (Route *)gRoutePathTable[vars->routes[7]];
-                route0 = (Route *)gRoutePathTable[vars->routes[0]];
-                route2 = (Route *)gRoutePathTable[vars->routes[2]];
+                route7 = (Route *)g_route_path_table[vars->routes[7]];
+                route0 = (Route *)g_route_path_table[vars->routes[0]];
+                route2 = (Route *)g_route_path_table[vars->routes[2]];
             }
             if (path == route7) {
                 if (best >= 12 && best < 22)

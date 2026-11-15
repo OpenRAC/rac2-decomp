@@ -1,14 +1,14 @@
 #include "common.h"
 
 typedef int Quad_L02_00332EF0 __attribute__((mode(TI)));
-extern void func_L02_00333300(void *, void *);
-extern float func_00282E48(void *, void *);
+extern void coll_probe_ground_ahead(void *, void *);
+extern float fast_vec_dist(void *, void *);
 extern u8 D_L02_001B3210[] MACRO_ADDR;
-extern float func_L02_00329410(void *, void *, const void *);
-extern float func_002AFF38(void *, void *, void *);
-extern void func_002AFD88(void *, void *, float, float, float);
-extern int func_002B63C0(void *, void *);
-extern void func_002A90C8(void *, int, int, void *, float);
+extern float math_facing_angle_from_vector(void *, void *, const void *);
+extern float vec_get_vertical_offset(void *, void *, void *);
+extern void vec_add_transformed_point(void *, void *, float, float, float);
+extern int coll_is_object_well_above_ground(void *, void *);
+extern void part_start_effect_default_table(void *, int, int, void *, float);
 
 typedef struct {
     char pad0[0x10];
@@ -34,14 +34,14 @@ typedef struct {
 } Ctl_L02_00332EF0;
 
 /* Checks how far an object is from the ground and from its target and sets the contact flags. It counts frames on and off the ground and snaps the object to the ground when asked. */
-void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *target, void *newpos, int adjust)
+void coll_update_ground_contact(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *target, void *newpos, int adjust)
 {
     int changed;
     float *position;
     float dist, near;
 
     changed = 0;
-    ProbeGroundAhead(self, ctl);
+    coll_probe_ground_ahead(self, ctl);
     dist = fast_vec_dist(self->pos, D_L02_001B3210);
     if (dist < ctl->f90 - ctl->f08) {
         changed = 1;
@@ -54,7 +54,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
         }
     }
     if (ctl->hC0 != 0) {
-        if (ctl->f10 < ComputeFacingAngleFromVector(self, ctl->v50, 0)) {
+        if (ctl->f10 < math_facing_angle_from_vector(self, ctl->v50, 0)) {
             changed = 1;
             ctl->flags94 |= 4;
         }
@@ -62,13 +62,13 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
     position = self->pos;
     if (changed) {
         *(Quad_L02_00332EF0 *)position = *(Quad_L02_00332EF0 *)newpos;
-        ProbeGroundAhead(self, ctl);
+        coll_probe_ground_ahead(self, ctl);
         dist = fast_vec_dist(position, D_L02_001B3210);
     }
     if (dist <= ctl->f90 + 0.005f) {
-        GetVerticalOffset(self, ctl->vA0, 0);
+        vec_get_vertical_offset(self, ctl->vA0, 0);
         if (adjust)
-            AddTransformedPointToVector(self, position, 0.0f, 0.0f, ctl->f90 - dist);
+            vec_add_transformed_point(self, position, 0.0f, 0.0f, ctl->f90 - dist);
         ctl->hC2 = 0;
         ctl->hC0++;
     } else if (ctl->f90 + ctl->f0C <= dist) {
@@ -80,7 +80,7 @@ void func_L02_00332EF0(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, void *tar
     if (near <= ctl->f34)
         ctl->flags94 |= 0x80;
     if (ctl->flags38 & 0x200) {
-        if (IsObjectWellAboveGround(self, ctl))
-            StartEffectWithDefaultTable(self, 0, 0x10000, position, 255.0f);
+        if (coll_is_object_well_above_ground(self, ctl))
+            part_start_effect_default_table(self, 0, 0x10000, position, 255.0f);
     }
 }

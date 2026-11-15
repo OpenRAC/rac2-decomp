@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00333048: an explosion's sparks, pushed particles, ring effect and area hit.
  * In the hit loop the packet's vector is normalized before func_002A8C00 fills it, as
  * retail does at +0x36C: nothing writes sp+0x40 before that call (the slot is not shared),
@@ -5,7 +6,7 @@
  * normalize result is dead. Its own -G8 unit (default -O2 -G8 -ffunction-sections).
  */
 #include "common.h"
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 typedef int TI128_333048 __attribute__((mode(TI)));
 
 typedef struct {
@@ -28,38 +29,38 @@ typedef struct {
     char pad24[0xC];
 } HitInfo333048;
 
-extern unsigned char D_00139568[];
-extern ClassRecord333048 D_00239BA0[];
-extern char D_001B5200[];
+extern unsigned char g_item_slot_to_record[];
+extern ClassRecord333048 g_weapon_table[];
+extern char g_active_camera[];
 extern short D_001B1CF0[] __attribute__((sda));
 extern int D_001AD7EC;
 extern char *D_001BF000[];
 extern float D_001B0C30 __attribute__((sda));
 extern float D_001B0C34 __attribute__((sda));
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern int func_002A7820(int, int);
-extern float func_002A78D8(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern void func_002BDBC0(void *, void *, int, int, int, float);
-extern float func_00283248(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern unsigned char *func_002C7E28(void *, void *, int);
-extern void func_002ACAD0(void *, short *);
-extern void *func_0032C700(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
-extern int func_00277F48(void *, int, void *, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_0029F338(void *);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern int math_random_int_range(int, int);
+extern float math_random_signed_float_range(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void part_spawn_growing_puff(void *, void *, int, int, int, float);
+extern float mat_fast_helper_a(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern unsigned char *part_spawn_spinning_spark(void *, void *, int);
+extern void RemoveMobyFromIndexList(void *, short *);
+extern void *SpawnExplosion(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
+extern int coll_process_hit(void *, int, void *, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void moby_mark_spawned(void *);
 
 /* The class slot table: D_00139568 maps a slot to its class record. */
 static inline int func_00333048_kind(int index)
 {
-    ClassRecord333048 *record = &gWeaponTable_00239BA0[gItemSlotToRecord[index]];
+    ClassRecord333048 *record = &g_weapon_table[g_item_slot_to_record[index]];
     return record->model != 0 && record->kind == 3;
 }
 
@@ -67,7 +68,7 @@ static inline int func_00333048_kind(int index)
    point at D_001B5200+0x140, a ring effect, then a hit on every moby in range. The ring prototype is
    interleaved as (pointer, float, float, ints...): the EE passes the two floats in $f12/$f13
    either way, and this order gives retail's argument scheduling. */
-void func_00333048(char *object)
+void moby_explode_and_hurt_nearby(char *object)
 {
     float direction[4] __attribute__((aligned(16)));
     float spark[4] __attribute__((aligned(16)));
@@ -83,35 +84,35 @@ void func_00333048(char *object)
 
     PlayMobySound(3, 0, (int *)object);
     for (i = 0; i < 30; i++) {
-        distance = RandomFloatRange(0.0f, 0.37f);
-        yaw = RandomAngle();
-        BuildSphericalOffset(spark, distance, yaw, RandomAngle());
-        spark[2] += RandomFloatRange(0.35f, 0.6f);
+        distance = math_random_float_range(0.0f, 0.37f);
+        yaw = math_random_angle();
+        vec_build_spherical_offset(spark, distance, yaw, math_random_angle());
+        spark[2] += math_random_float_range(0.35f, 0.6f);
         FastVecAdd(spark, spark, object + 0x10);
-        distance = RandomFloatRange(0.0016666668f, 0.016666668f);
-        yaw = RandomAngle();
-        BuildSphericalOffset(direction, distance, yaw, RandomAngle());
-        SpawnGrowingPuffParticle(spark, direction, 0x4F20507F, 0x102F, RandomIntRange(30, 57), 150000.0f);
+        distance = math_random_float_range(0.0016666668f, 0.016666668f);
+        yaw = math_random_angle();
+        vec_build_spherical_offset(direction, distance, yaw, math_random_angle());
+        part_spawn_growing_puff(spark, direction, 0x4F20507F, 0x102F, math_random_int_range(30, 57), 150000.0f);
     }
-    camera = gActiveCamera;
+    camera = g_active_camera;
     for (j = 0; j < 50; j++) {
-        angle = FastMatrixHelperA(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
+        angle = mat_fast_helper_a(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
                               *(float *)(camera + 0x144) - *(float *)(object + 0x14));
-        FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        direction[0] = *(float *)(object + 0x10) + RandomSignedFloatRange(0.0f, 0.15f);
-        direction[1] = *(float *)(object + 0x14) + RandomSignedFloatRange(0.0f, 0.15f);
-        direction[2] = *(float *)(object + 0x18) + RandomSignedFloatRange(0.0f, 0.15f);
+        FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        direction[0] = *(float *)(object + 0x10) + math_random_signed_float_range(0.0f, 0.15f);
+        direction[1] = *(float *)(object + 0x14) + math_random_signed_float_range(0.0f, 0.15f);
+        direction[2] = *(float *)(object + 0x18) + math_random_signed_float_range(0.0f, 0.15f);
         distance = D_001B0C30;
-        angle = FastAddRotations(angle, RandomSignedFloatRange(0.0f, -1.5707965f));
-        spark[0] = FastSinOrCosA(angle) * 0.016666668f * distance;
-        spark[1] = FastSinOrCosB(angle) * 0.016666668f * distance;
+        angle = FastAddRotations(angle, math_random_signed_float_range(0.0f, -1.5707965f));
+        spark[0] = math_fast_sin_or_cos_a(angle) * 0.016666668f * distance;
+        spark[1] = math_fast_sin_or_cos_b(angle) * 0.016666668f * distance;
         distance = D_001B0C34;
         spark[2] = distance * 0.016666668f;
-        SpawnSpinningSparkParticle_002C7E28(direction, spark, 0x140);
+        part_spawn_spinning_spark(direction, spark, 0x140);
     }
     RemoveMobyFromIndexList(object, D_001B1CF0);
     SpawnExplosion(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
-    count = ProcessCollisionHit(object + 0x10, 0, object, 0, 3.0f);
+    count = coll_process_hit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
         char **mobyList = D_001BF000;
         remaining = count;
@@ -138,5 +139,5 @@ void func_00333048(char *object)
             mobyList++;
         } while (--remaining);
     }
-    MarkMobySpawned(object);
+    moby_mark_spawned(object);
 }

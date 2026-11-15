@@ -12,17 +12,17 @@
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
-unsigned long long func_002CD620(void);
+unsigned long long menu_draw_page_style_a(void);
 
 extern void func_0029C1D8(void);
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 /*
  * Function: func_002D2EE0
@@ -42,13 +42,13 @@ void func_0027C660(void);
  * - All external function addresses come from the assigned externals list.
  */
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
 /* External functions declared with exact aliases from task.externals */
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 /* Draws one menu page: sets up the draw state, draws the page contents, and finishes. */
-unsigned long long func_002CD620(void)
+unsigned long long menu_draw_page_style_a(void)
 {
   SetupGifPaging(0);
   func_0029C1D8();
@@ -57,12 +57,12 @@ unsigned long long func_002CD620(void)
 }
 
 /* Does nothing and returns 0. */
-int func_002CD650(void) {
+int menu_return_zero_callback_a(void) {
     return 0;
 }
 
 /* Does nothing and returns 0. */
-int func_002CD658(void) {
+int menu_return_zero_callback_b(void) {
     return 0;
 }
 
@@ -73,23 +73,23 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 
-extern void func_0028BD68(void);
+extern void weapon_menu_sync_slots(void);
 extern int func_0029CBE0(int);
 
 /* Handles button input for a menu page: confirm picks the item (or fails if nothing is chosen), back closes the page. */
-int func_002CD660(void) {
+int menu_handle_input_with_fallback(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
         int value;
-        SyncWeaponMenuSlots();
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        weapon_menu_sync_slots();
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             result = -1;
             goto done;
         }
@@ -97,7 +97,7 @@ int func_002CD660(void) {
 done:
         ;
     } else if (flags & 0x900) {
-        SyncWeaponMenuSlots();
+        weapon_menu_sync_slots();
         result = 1;
     } else {
         func_0029CBE0(flags);
@@ -108,7 +108,7 @@ done:
 extern void func_0029CC20(void);
 
 /* Draws one menu page in a second style: sets up the draw state, draws the page contents, and finishes. */
-int func_002CD6F0(void) {
+int menu_draw_page_style_b(void) {
     SetupGifPaging(0);
     func_0029CC20();
     DoGifPaging();
@@ -129,7 +129,7 @@ extern char *D_0025E284;
 extern int D_0025E464;
 extern short D_001A63AC;
 extern char *D_001A8CFC[] __attribute__((sda));
-extern int func_00336EF0(void);
+extern int menu_get_setting_value(void);
 extern int func_0029C480(int);
 
 /* The same flag dispatch as func_002CD660 between two reads of func_00336EF0, then, when
@@ -138,20 +138,20 @@ extern int func_0029C480(int);
    otherwise. The unit is built with -frac2-gcse-unsplit-edges (config/cflags.txt): the high
    half of D_0025E2B8 is computed once before the compare, as in retail. */
 /* Handles button input for a menu page like the one above and also keeps the cursor highlight flag and cursor memory up to date. */
-int func_002CD720(void) {
+int menu_handle_input_with_highlight(void) {
     int result = 0;
     int cursorBefore;
     int cursorAfter;
     int flags;
     int value;
 
-    cursorBefore = GetUiSettingValue();
+    cursorBefore = menu_get_setting_value();
     flags = D_00138344;
     if (flags & 0x10) {
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             result = -1;
             goto after_first;
         }
@@ -164,7 +164,7 @@ int func_002CD720(void) {
 after_first:
     if (D_001A8CFC[0] == 0)
         return result;
-    cursorAfter = GetUiSettingValue();
+    cursorAfter = menu_get_setting_value();
     if (cursorBefore == cursorAfter && D_001A63AC == 0 &&
         ((D_0025E2B8.f50 == cursorBefore && D_0025E2B8.f44 == 2) ||
          (D_0025E2B8.f54 == cursorBefore && D_0025E2B8.f44 == 4)))
@@ -173,16 +173,16 @@ after_first:
         *(int *)(D_0025E284 + 0x10) |= 4;
     if (cursorAfter != cursorBefore)
         D_0025E464 = -0x22C;
-    D_0025E2B8.f58 = GetUiSettingValue();
+    D_0025E2B8.f58 = menu_get_setting_value();
     return result;
 }
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void *func_00344378(void *);
+extern void *grid_menu_get_selected_text_id(void *);
 
 /* Points the object at the menu panel data, if a panel exists. */
-int func_002CD878(char *object) {
+int menu_set_object_panel_pointer(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = GetGridMenuSelectedTextId(D_001A8CFC[0] + 0x39F38);
+        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(D_001A8CFC[0] + 0x39F38);
     return 0;
 }

@@ -5,14 +5,14 @@ extern s32 D_L10_001B0F44 __attribute__((sda));
 extern s32 D_L10_001B0F48 __attribute__((sda));
 
 /* Returns the first boss flag and clears it, so each event is seen only once. */
-s32 func_L10_004176A0(void) {
+s32 hrugis_take_boss_flag_a(void) {
     s32 value = D_L10_001B0F44;
     D_L10_001B0F44 = 0;
     return value;
 }
 
 /* Returns the second boss flag and clears it, so each event is seen only once. */
-s32 func_L10_004176B0(void) {
+s32 hrugis_take_boss_flag_b(void) {
     s32 value = D_L10_001B0F48;
     D_L10_001B0F48 = 0;
     return value;
@@ -26,7 +26,7 @@ extern u8 *D_001B251C;
 
 /* Clears the arena's 128 records of 0x60 bytes and then walks the entry's two-byte
    id list, flagging every live object of one class. */
-void func_L10_00417440(u8 *group) {
+void hrugis_init_group_states(u8 *group) {
     s32 *clearPtr;
     s32 i;
     u8 *idList;
@@ -60,7 +60,7 @@ extern void func_0032AF78(s32 a0);
 /* Releases both timed effects the entry's live objects still hold: the id list walks the
    same arena records as func_L10_00417440, one record per id, and tears down the two
    effect slots at +0x2C4 and +0x2C0 of each record. */
-void func_L10_004174C8(u8 *group) {
+void hrugis_release_group_effects(u8 *group) {
     u16 *idPtr;
     u8 *moby;
     u8 *vars;
@@ -115,33 +115,33 @@ typedef struct {
 } RewardSlot;
 
 extern s32 D_L10_001B13A0 __attribute__((sda));  /* the selected kind, -2 for none */
-extern s32 D_L10_001B13A4 __attribute__((sda));
+extern s32 g_mission_initialized __attribute__((sda));
 extern s32 D_L10_001B1438 __attribute__((sda));  /* set while a kind is being chosen */
 extern MissionState D_L10_00221CD0;
 extern RewardSlot D_L10_002A3C70[];
 
-extern s32 func_002ED8A0(s32 kind);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F28(s32 value);
-extern void func_L05_0037D6E8(void);
-extern void func_L05_00379F68(void);
+extern s32 table_find_last_used_entry(s32 kind);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_b(s32 value);
+extern void table_reset_working_values(void);
+extern void level_clear_object_records(void);
 
 /* Resets the mission state and refills the reward slot of kind 6. */
-void func_L10_00423500(void *object) {
+void hrugis_reset_mission_state(void *object) {
     s32 slot;
 
     D_L10_001B13A0 = -2;
     D_L10_001B1438 = 1;
     D_L10_00221CD0.waiting = 1;
     D_L10_00221CD0.f28 = 100;
-    gMissionInitialized = 0;
+    g_mission_initialized = 0;
     D_L10_00221CD0.rounds = 0;
-    slot = FindLastUsedChainEntry(6);
+    slot = table_find_last_used_entry(6);
     D_L10_002A3C70[slot].value = D_L10_002A3C70[slot].limit;
-    InitAllRegisteredEntries();
+    entry_init_all_registered();
     D_L10_00221CD0.f30 = 8.0f;
     D_L10_00221CD0.f10 = 0;
-    SetPlayerStateField15(0);
-    ResetTableWorkingValues();
-    ClearLevelObjectRecords();
+    hero_set_state_value_b(0);
+    table_reset_working_values();
+    level_clear_object_records();
 }

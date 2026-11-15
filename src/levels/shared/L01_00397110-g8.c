@@ -4,17 +4,17 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern float D_L01_001AF628 __attribute__((sda));
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern void func_00283898(char *, int, float);
+extern void build_axis_rotation_quaternion(char *, int, float);
 
-extern void func_0029F978(char *, int, char *);
+extern void AttachManipulator(char *, int, char *);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
 /* grows a moby out of the ground the first time, then spins it down */
 /* Updates the Megacorp Vendor Logo: it spins and turns its inner part the opposite way. */
-void func_L01_00399170(char *moby)
+void megacorp_vendor_logo_update(char *moby)
 {
     char *mobyVars = *(char **)(moby + 0x68);
 
@@ -22,7 +22,7 @@ void func_L01_00399170(char *moby)
     case 0:
         *(unsigned char *)(moby + 0x20) = 1;
         *(unsigned char *)(moby + 0x63) = 0x20;
-        *(float *)(mobyVars + 0x40) = RandomAngle();
+        *(float *)(mobyVars + 0x40) = math_random_angle();
         AttachManipulator(moby, 1, mobyVars);
         break;
     case 1: {
@@ -53,13 +53,13 @@ extern float func_002E3A60(float);
 
 extern int func_003104E8(int);
 
-extern void func_L01_00397A28(char *);
+extern void part_draw_bolt_glow_rings(char *);
 
 
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
 extern void func_002A0F48(void *);
 
@@ -91,7 +91,7 @@ typedef struct Carrier_00398938 {
     float t;
 } Carrier_00398938;
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* The level's per-frame lift and heading: they sit at another address in every level. */
 extern float ref_L01_00398938_00 __attribute__((sda));
@@ -99,7 +99,7 @@ extern float ref_L01_00398938_00 __attribute__((sda));
 extern float ref_L01_00398938_01 __attribute__((sda));
 
 /* Places each of the three carried child objects at the moby's position and tilts them with a swing. */
-void func_L01_00398938(Moby_00398938 *moby)
+void moby_position_carried_objects(Moby_00398938 *moby)
 {
     Carrier_00398938 *mobyVars = moby->vars;
     Moby_00398938 **list = mobyVars->list;
@@ -147,21 +147,21 @@ extern float D_L01_001B1AB8 __attribute__((sda));
 extern float D_L01_001B1ABC __attribute__((sda));
 
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
-extern void func_002A7A00(void *, float, float);
+extern void vec_random_direction(void *, float, float);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern void func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* builds the tilt of a hanging chain over three steps and draws it */
 /* Spawns three small sparkles at the moby, each with a random drift. */
-void func_L01_00417090(char *moby)
+void part_spawn_sparkle_drift(char *moby)
 {
     TI128 sparkPos, driftA, driftB;
     int i;
@@ -170,18 +170,18 @@ void func_L01_00417090(char *moby)
     if (*(unsigned char *)(moby + 0x20) == 1) {
         FastVecScale(&sparkPos, moby, 0.0009765625f);
     } else {
-        TransformMobyJointToWorld(moby, 0, &sparkPos);
+        moby_transform_joint_to_world(moby, 0, &sparkPos);
     }
     i = 2;
-    RandomDirectionVector(&driftA, D_L01_001B1A9C * 0.016666668f, D_L01_001B1AA0 * 0.016666668f);
+    vec_random_direction(&driftA, D_L01_001B1A9C * 0.016666668f, D_L01_001B1AA0 * 0.016666668f);
     alpha = D_L01_001B1AAC;
-    SpawnHeroRelativeParticle(&sparkPos, &driftA, D_L01_001B1AB0, alpha, RandomIntBelow(255), 0, D_L01_001B1AB8);
+    part_spawn_hero_relative(&sparkPos, &driftA, D_L01_001B1AB0, alpha, math_random_int_below(255), 0, D_L01_001B1AB8);
     do {
         i--;
-        RandomDirectionVector(&driftB, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
+        vec_random_direction(&driftB, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
         FastVecAdd(&driftA, &driftA, &driftB);
         alpha = D_L01_001B1AAC;
-        SpawnHeroRelativeParticle(&sparkPos, &driftA, D_L01_001B1AB4, alpha, RandomIntBelow(255), 0, D_L01_001B1ABC);
+        part_spawn_hero_relative(&sparkPos, &driftA, D_L01_001B1AB4, alpha, math_random_int_below(255), 0, D_L01_001B1ABC);
     } while (i >= 0);
 }
 
@@ -198,7 +198,7 @@ extern float ref_L01_00397EB0_06 __attribute__((sda));
 extern int ref_L01_00397EB0_07 __attribute__((sda));
 extern float ref_L01_00397EB0_08 __attribute__((sda));
 /* Spawns three small sparkles at the moby unless it is below the ground height. */
-void func_L01_00397EB0(char *moby)
+void part_spawn_sparkle_trail_above_ground(char *moby)
 {
     TI128 sparkPos, driftA, driftB;
     int i;
@@ -207,19 +207,19 @@ void func_L01_00397EB0(char *moby)
     if (*(unsigned char *)(moby + 0x20) == 1) {
         FastVecScale(&sparkPos, moby, 0.0009765625f);
     } else {
-        TransformMobyJointToWorld(moby, 0, &sparkPos);
+        moby_transform_joint_to_world(moby, 0, &sparkPos);
         if (((float *)&sparkPos)[2] < D_00189F08) return;
     }
     i = 2;
-    RandomDirectionVector(&driftA, ref_L01_00397EB0_00 * 0.016666668f, ref_L01_00397EB0_01 * 0.016666668f);
+    vec_random_direction(&driftA, ref_L01_00397EB0_00 * 0.016666668f, ref_L01_00397EB0_01 * 0.016666668f);
     alpha = ref_L01_00397EB0_02;
-    SpawnHeroRelativeParticle(&sparkPos, &driftA, ref_L01_00397EB0_03, alpha, RandomIntBelow(255), 0, ref_L01_00397EB0_04);
+    part_spawn_hero_relative(&sparkPos, &driftA, ref_L01_00397EB0_03, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_04);
     do {
         i--;
-        RandomDirectionVector(&driftB, ref_L01_00397EB0_05 * 0.016666668f, ref_L01_00397EB0_06 * 0.016666668f);
+        vec_random_direction(&driftB, ref_L01_00397EB0_05 * 0.016666668f, ref_L01_00397EB0_06 * 0.016666668f);
         FastVecAdd(&driftA, &driftA, &driftB);
         alpha = ref_L01_00397EB0_02;
-        SpawnHeroRelativeParticle(&sparkPos, &driftA, ref_L01_00397EB0_07, alpha, RandomIntBelow(255), 0, ref_L01_00397EB0_08);
+        part_spawn_hero_relative(&sparkPos, &driftA, ref_L01_00397EB0_07, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_08);
     } while (i >= 0);
 }
 
@@ -248,9 +248,9 @@ extern char *ref_L01_003E9CF8_00 MACRO_ADDR;
 extern int ref_L01_003E9CF8_01 MACRO_ADDR;
 
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
-extern void func_002A04B8(char *, int *, int *, int *);
+extern void get_moby_color(char *, int *, int *, int *);
 
 /* makes sure a live moby of class 0xC41 exists, then queues this moby in one of its 0x40 slots
    with its colour and a callback; with the queue full it runs the callback or deletes the moby */
@@ -263,9 +263,9 @@ typedef struct {
     int pad[3];
 } Ent_3E9CF8;
 extern Ent_3E9CF8 ref_L01_003E9CF8_02[];
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 /* Queues a moby for the glow effect manager, creating the manager if needed. If the queue is full it runs the callback or deletes the moby. */
-void func_L01_003E9CF8(char *moby, int extra, void (*callback)(char *))
+void part_queue_moby_for_glow(char *moby, int extra, void (*callback)(char *))
 {
     char *manager = ref_L01_003E9CF8_00;
     int red;
@@ -295,18 +295,18 @@ void func_L01_003E9CF8(char *moby, int extra, void (*callback)(char *))
     } else if (callback != 0) {
         callback(moby);
     } else {
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
     }
 }
 
 
-extern void func_L01_003EE8E0(char *);
+extern void moby_release_and_reset_impact_slot(char *);
 
-extern void func_002A7470(char *, int, int, int);
+extern void anim_start_blended(char *, int, int, int);
 
-extern void func_002A7398(char *, int, int);
+extern void anim_start_immediate(char *, int, int);
 
-extern int func_00282948(char *);
+extern int math_fast_float_d(char *);
 
 extern const int D_L01_001B0D10 __attribute__((sda));
 
@@ -314,12 +314,12 @@ extern const int D_L01_001B0D14 __attribute__((sda));
 
 /* brings the ring out of the ground, then lets it spin and hand itself over */
 /* Updates a ring moby: it lifts out of the ground, flashes between two colors while active, then resets. */
-void func_L01_003EE6F0(char *moby)
+void flashing_ring_update(char *moby)
 {
     char *mobyVars;
 
     mobyVars = *(char **)(moby + 0x68);
-    ReleaseMobyAndResetImpactSlot(moby);
+    moby_release_and_reset_impact_slot(moby);
 
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
@@ -327,19 +327,19 @@ void func_L01_003EE6F0(char *moby)
         *(float *)(mobyVars + 0x14) = *(float *)(moby + 0xF0);
         *(unsigned char *)(moby + 0x20) = 1;
         if (*(unsigned char *)(moby + 0x43) != 0)
-            StartAnimationBlended(moby, 0, 0, 0xC);
+            anim_start_blended(moby, 0, 0, 0xC);
         *(int *)(mobyVars + 0x50) = 0;
         *(unsigned short *)(moby + 0x34) |= 0x1000;
         break;
     case 1:
         if ((*(unsigned char *)(moby + 0x60) & 2) != 0) {
             if (*(unsigned char *)(moby + 0x43) != 0)
-                StartAnimationImmediate(moby, 0, 0);
+                anim_start_immediate(moby, 0, 0);
         }
         if (*(unsigned char *)(moby + 0xBC) == 0)
             break;
         *(unsigned short *)(moby + 0x34) &= 0xEFFF;
-        StartAnimationImmediate(moby, 1, 0);
+        anim_start_immediate(moby, 1, 0);
         if (*(int *)(mobyVars + 0x0) != 0) {
             *(int *)(mobyVars + 0x10) = 10;
             *(unsigned char *)(moby + 0x20) = 2;
@@ -352,25 +352,25 @@ void func_L01_003EE6F0(char *moby)
         break;
     case 2:
         if (*(int *)(mobyVars + 0x0) != 0) {
-            if (FastFloatHelperD(mobyVars + 0x10) != 0) {
+            if (math_fast_float_d(mobyVars + 0x10) != 0) {
                 if (*(int *)(moby + 0x78) == D_L01_001B0D10)
                     *(int *)(moby + 0x78) = D_L01_001B0D14;
                 else
                     *(int *)(moby + 0x78) = D_L01_001B0D10;
                 *(int *)(mobyVars + 0x10) = 10;
             }
-            if (FastFloatHelperD(mobyVars + 0xC) != 0)
+            if (math_fast_float_d(mobyVars + 0xC) != 0)
                 *(unsigned char *)(moby + 0xBC) = 0;
         }
         if ((*(unsigned char *)(moby + 0x60) & 2) != 0) {
             if (*(unsigned char *)(moby + 0x43) == 1)
-                StartAnimationImmediate(moby, 2, 0);
+                anim_start_immediate(moby, 2, 0);
         }
         if (*(unsigned char *)(moby + 0xBC) != 0)
             break;
         if ((*(unsigned char *)(moby + 0x60) & 2) != 0) {
             *(unsigned short *)(moby + 0x34) |= 0x1000;
-            StartAnimationImmediate(moby, 3, 0);
+            anim_start_immediate(moby, 3, 0);
             *(unsigned char *)(moby + 0x20) = 1;
             *(int *)(moby + 0x78) = D_L01_001B0D10;
         }
@@ -378,28 +378,28 @@ void func_L01_003EE6F0(char *moby)
     }
 }
 
-extern float func_00283B98(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern char D_00189E20[];
+extern float FastAddRotations(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern char g_hero_state[];
 
 
 
-extern void func_0029FCC0(void *, int, void *);
-extern int func_00282948(char *);
-extern char D_00189E20[];
-extern void func_002FDF40(void *, void *, int, int, float, float, float, float);
-extern int func_002FE5A0(void *, void *, void *, void *, void *, char **, int *, float);
-extern int func_00300540(int);
-extern void func_002FE8D8(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_L00_002D3F30(int, int);
-extern int func_002B0CE0(int, int, int);
-extern void func_L00_002AF568(void);
-extern void func_L00_002AF7D0(void);
-extern void func_002E5CF8(int, int, void *);
-extern char *func_L00_003DE088(void *, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int math_fast_float_d(char *);
+extern char g_hero_state[];
+extern void CalculateAimedLaunchVelocity(void *, void *, int, int, float, float, float, float);
+extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void *, char **, int *, float);
+extern int weapon_get_group(int);
+extern void moby_get_facing_direction(void *, void *);
+extern float FastVecDot(void *, void *);
+extern int weapon_spend_ammo(int, int);
+extern int ForceClaimNotice(int, int, int);
+extern void start_equipped_item_animation(void);
+extern void cancel_hero_item_animation(void);
+extern void PlayMobySound(int, int, void *);
+extern char *spider_bot_spawn(void *, void *);
 extern void ref_L01_003B2598_00(void (*)(void *), void *);
-extern void func_L00_003B8158(void *);
+extern void helper_update_hit_test(void *);
 extern char *D_L01_001AFCE0 __attribute__((sda));
 extern int D_L01_001A8F40 MACRO_ADDR;
 extern int D_L01_001A8F48 MACRO_ADDR;
@@ -407,7 +407,7 @@ extern int D_L01_001A9034 MACRO_ADDR;
 extern int D_00138324 NOT_SDA;
 
 /* Updates the Spiderbot Glove pickup: checks that the hero may use it, lets the hero grab it with the button, and plays its use effect. */
-void func_L01_003B2598(char *moby) {
+void spiderbot_glove_update(char *moby) {
     float pos[4], sweep_storage[4], normal[4];
     float *sweep;
     char *hit;
@@ -417,18 +417,18 @@ void func_L01_003B2598(char *moby) {
     float height;
 
     {
-        char *hero = gHeroState;
+        char *hero = g_hero_state;
 
         if (*(int *)(hero + 0x1244) == 3)
             D_L01_001AFCE0 = 0;
-        TransformMobyJointToWorld(moby, 0, pos);
+        moby_transform_joint_to_world(moby, 0, pos);
         *(int *)(mobyVars + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(hero + 0x2294) == 29) ? 11.0f : 4.5f;
         CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
     }
-    *(int *)(mobyVars + 0x24) = TraceProjectileToImpact(pos, sweep, mobyVars, mobyVars + 0x10, moby, &hit, &aux, 0.003055555745959282f);
-    result = GetWeaponGroup(aux);
+    *(int *)(mobyVars + 0x24) = coll_trace_projectile_to_impact(pos, sweep, mobyVars, mobyVars + 0x10, moby, &hit, &aux, 0.003055555745959282f);
+    result = weapon_get_group(aux);
     if (D_L01_001A8F40 || D_L01_001A8F48 != -2)
         *(int *)(mobyVars + 0x2C) = 1;
     if (D_L01_001A9034 && *(float *)(mobyVars + 8) < 462.42999267578125f)
@@ -436,7 +436,7 @@ void func_L01_003B2598(char *moby) {
     if (result || !*(int *)(mobyVars + 0x24) || !*(int *)(mobyVars + 0x28))
         goto blocked;
     {
-        char *hero = gHeroState;
+        char *hero = g_hero_state;
 
         state = *(int *)(hero + 0x2294);
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
@@ -448,18 +448,18 @@ void func_L01_003B2598(char *moby) {
         if (hit && (*(short *)(hit + 0xAA) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 0xAA) == 0xB5B /* moby class 2907 */))
             goto blocked;
     }
-    GetObjectFacingDirection(mobyVars, normal);
+    moby_get_facing_direction(mobyVars, normal);
     if (!(FastVecDot(mobyVars + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
     *(int *)(mobyVars + 0x2C) = 1;
 timer:
     {
-        char *hero = gHeroState;
+        char *hero = g_hero_state;
 
         ready = 1;
         if (*(int *)(hero + 0x2294) == 29) {
-            if (!FastFloatHelperD(hero + 0x2534))
+            if (!math_fast_float_d(hero + 0x2534))
                 ready = 0;
         } else
             *(int *)(hero + 0x2534) = 40;
@@ -472,11 +472,11 @@ timer:
         *(int *)(mobyVars + 0x24) = 0;
         /* falls through */
     case 1: {
-        char *hero = gHeroState;
+        char *hero = g_hero_state;
 
         if ((D_00138324 & *(int *)(hero + 0x1230)) && !*(unsigned char *)(hero + 0x22BC) &&
             !*(int *)(mobyVars + 0x2C) && ready) {
-            if (SpendWeaponAmmo(-1, 1)) {
+            if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(hero + 0x1E0) = 120;
                 ForceClaimNotice(6, 0, 1);
                 *(short *)(hero + 0x1D2) = 0;
@@ -490,8 +490,8 @@ timer:
         break;
     }
     case 2:
-        if (FastFloatHelperD(mobyVars + 0x20)) {
-            char *effectMoby = SpawnSpiderBotMoby(pos, sweep);
+        if (math_fast_float_d(mobyVars + 0x20)) {
+            char *effectMoby = spider_bot_spawn(pos, sweep);
 
             if (effectMoby)
                 *(char **)(effectMoby + 0xB8) = moby;
@@ -502,9 +502,9 @@ timer:
         }
         break;
     case 3:
-        if (FastFloatHelperD(mobyVars + 0x20))
+        if (math_fast_float_d(mobyVars + 0x20))
             *(unsigned char *)(moby + 0x20) = 1;
         break;
     }
-    ref_L01_003B2598_00(UpdateHelperObjectHitTest, moby);
+    ref_L01_003B2598_00(helper_update_hit_test, moby);
 }

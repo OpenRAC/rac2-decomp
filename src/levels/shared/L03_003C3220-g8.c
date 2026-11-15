@@ -2,7 +2,7 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } StateVector;
 typedef struct { u16 count, padding; u32 tick, flags; } ChallengeProgress;
-extern ChallengeProgress D_0018C958[];
+extern ChallengeProgress g_subtitle_history[];
 typedef struct {
     u8 padding_0[0x20];
     float movement_scale;
@@ -72,14 +72,14 @@ typedef struct {
     StateVector forward;
 } TargetMoby;
 extern u32 D_001A7390 __attribute__((sda));
-extern int D_001A79F0;
+extern int g_current_map_index;
 typedef struct {
     u8 padding_0[0x80];
     float position[4];
     u8 padding_90[0x2454];
     int command;
 } TargetHero;
-extern TargetHero D_00189E20;
+extern TargetHero g_hero_state;
 /* Level statistics block. L03 reads and writes ints at +0, +4 and +8 from other functions, then
    these five halfwords. Every counter sits at a nonzero offset, so its macro access stays two words. */
 typedef struct {
@@ -96,47 +96,47 @@ extern float D_L03_001B9980[];
 extern int D_L03_001B2A38[] __attribute__((sda));
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));
 extern u16 *D_L03_001FB5A0[];
-extern int D_L03_001B2548;
-extern void func_L03_0038A9D0(void *, void *);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_002A89A8(u8 *, int, float);
-extern u8 *func_0029EFD0(int);
-extern void func_002B37E8(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A7750(u8 *, s32, s32);
-extern void func_002A7470(u8 *, int, int, int);
-extern void func_L03_00419A60(u32, u8 *, s32);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_L03_0032AD10(int);
-extern void *func_002A9640(void *, u32, int);
-extern int func_00282C30(int);
-extern u8 *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);
-extern void func_002B0A68(char *, int, float *, float, float, float, float, unsigned char);
-extern float *func_L03_003C5668(u8 *, float *, float *);
-extern void func_L02_002EF388(void *, void *, void *, int, int);
-extern u8 *func_L03_003C5128(u8 *);
-extern u8 *func_L03_003C52D0(u8 *);
-extern u8 *func_L03_003C5488(u8 *);
-extern u8 *func_L03_003C4D40(u8 *);
-extern u8 *func_L03_003C4F58(u8 *);
-extern int func_00288E18(int, int);
-extern void func_L03_004197C8(void *, void *);
-extern int func_L03_00419BD8(u32, void *, void *);
-extern void func_L03_003CAAF0(void *, void *, void *);
-extern void func_L03_003CA148(void *, void *, void *);
-extern void func_L03_003CA230(void *, void *);
-extern void func_L00_003294F0(void *, int);
-extern int func_L03_003C5CE8(void *);
-extern void func_L03_003C5EE8(void *);
+extern int g_frame_l03_counter;
+extern void moby_compute_point_ahead(void *, void *);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float coll_probe_ground_height_below(u8 *, int, float);
+extern u8 *CreateMoby(int);
+extern void moby_init_child_from_parent(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_set_state(u8 *, s32, s32);
+extern void anim_start_blended(u8 *, int, int, int);
+extern void route_set_node_enabled_flag(u32, u8 *, s32);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void moby_add_id_to_frame_list(int);
+extern void *part_find_owned_effect_slot(void *, u32, int);
+extern int subtract_integer_with_clamp(int);
+extern u8 *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);
+extern void part_spawn_masked_debris(char *, int, float *, float, float, float, float, unsigned char);
+extern float *ChooseVisibleGroupTarget(u8 *, float *, float *);
+extern void moby_fuse_linked_objects(void *, void *, void *, int, int);
+extern u8 *moby_find_entity_nearby(u8 *);
+extern u8 *moby_find_nearest_entity_b(u8 *);
+extern u8 *moby_find_nearest_pickup_target(u8 *);
+extern u8 *moby_find_nearest_tilt_target(u8 *);
+extern u8 *moby_find_nearest_entity_a(u8 *);
+extern int subtitle_request_voice_line(int, int);
+extern void moby_compute_point_ahead_unit(void *, void *);
+extern int route_check_points(u32, void *, void *);
+extern void moby_compute_opposite_points(void *, void *, void *);
+extern void mat_compute_side_step_offset(void *, void *, void *);
+extern void moby_compute_point_ahead_scaled(void *, void *);
+extern void moby_set_flag_bit(void *, int);
+extern int group_is_state_word_matching(void *);
+extern void moby_place_held_object(void *);
 #define ANIM_COUNT(p, offset) (*(u8 *)(*(u8 **)(*(u8 **)((p) + 0x24) + (offset)) + 0x10))
 
 
 /* Updates a bot moby (Bridgebot, Gadgebot and similar) that follows the hero's commands: sets it up, counts it for challenges and switches its state. */
-void func_L03_003C3220(u8 *object)
+void UpdateCommandedMoby(u8 *object)
 {
     StateVector point, first, second;
     TargetMoby *mob = (TargetMoby *)object;
@@ -147,22 +147,22 @@ void func_L03_003C3220(u8 *object)
     float distance;
     int permitted;
     if (mob->state == 0) {
-        if (RandomIntBelow(2)) mob->flags |= 0x8000;
+        if (math_random_int_below(2)) mob->flags |= 0x8000;
         else mob->flags &= 0x7FFF;
         mob->flags_7E |= 1;
-        mob->position[2] = ProbeGroundHeightBelow((u8 *)mob->position, 0, 0.5f);
+        mob->position[2] = coll_probe_ground_height_below((u8 *)mob->position, 0, 0.5f);
         vars->initial_height = mob->position[2];
         type = mob->type;
         if (type == 0x964 /* Gadgebot */) {
             vars->child = CreateMoby(0x972);
             if (vars->child) {
-                InitChildObjectFromParent(vars->child, object);
+                moby_init_child_from_parent(vars->child, object);
                 *(u16 *)(vars->child + 0x32) = 0x30;
             }
         } else {
             vars->child = CreateMoby(0xD75);
             if (vars->child) {
-                InitChildObjectFromParent(vars->child, object);
+                moby_init_child_from_parent(vars->child, object);
                 *(u16 *)(vars->child + 0x7C) = D_L03_001AFF00;
                 *(u16 *)(vars->child + 0x32) = 0x30;
                 if (mob->type == 0x93C) {
@@ -202,9 +202,9 @@ void func_L03_003C3220(u8 *object)
         vars->movement_data = state + 0x240;
         vars->path_data = state + 0x2C0;
         vars->turn_step = 0.0055555557f;
-        SetMobyState(object, 1, 0);
+        moby_set_state(object, 1, 0);
         if (mob->animation)
-            StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 0);
+            anim_start_blended(object, 0, math_random_int_below(ANIM_COUNT(object, 0x48)), 0);
         if (mob->type == 0x940 /* Bridgebot */) {
             for (i = 0; i < 8; i++) {
                 u16 *ids;
@@ -216,72 +216,72 @@ void func_L03_003C3220(u8 *object)
                     u8 *member = D_L03_001B2A1C[0] + ((*ids & 0x7FFF) << 8);
                     if (member == 0) break;
                     if (*(s16 *)(member + 0xAA) == 0x97A)
-                        SetRouteNodeEnabledFlag(vars->area_id, member + 0x10, 0);
+                        route_set_node_enabled_flag(vars->area_id, member + 0x10, 0);
                 }
             }
         } else if (mob->type == 0xA59 && mob->animation != 6) {
-            StartAnimationBlended(object, 6, 0, 0);
+            anim_start_blended(object, 6, 0, 0);
         }
     }
     if (mob->active && fast_vec_dist(mob->position, D_L03_001B9980) < 24.0f) {
-        UpdateMobyGroundCheck(object);
+        moby_update_ground_check(object);
         mob->event = 0x16;
     }
-    if (mob->state > 1 && mob->mode != 4) AddIdToFrameList((int)object);
-    if (FindOwnedEffectSlot(object, 1, 0) ||
+    if (mob->state > 1 && mob->mode != 4) moby_add_id_to_frame_list((int)object);
+    if (part_find_owned_effect_slot(object, 1, 0) ||
         (mob->position[2] < vars->initial_height - 10.0f &&
          mob->position[2] - 10.0f < vars->floor_height)) {
-        if (subtract_integer_with_clamp(D_L03_001AFEF8 - gFrameCounter_L03) > D_L03_001AFEFC) {
+        if (subtract_integer_with_clamp(D_L03_001AFEF8 - g_frame_l03_counter) > D_L03_001AFEFC) {
             point.q = 0;
             point.f[2] = 0.5f;
-            D_L03_001AFEF8 = gFrameCounter_L03;
+            D_L03_001AFEF8 = g_frame_l03_counter;
             FastVecAdd(&point, &point, mob->position);
             SpawnExplosion(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
             if (mob->type == 0x964 /* Gadgebot */)
-                SpawnDebrisForMaskedParts((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            SetMobyState(object, 4, 1);
+                part_spawn_masked_debris((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            moby_set_state(object, 4, 1);
             qzero(state + 0x1B0);
             vars->path_index = -1;
             ChooseVisibleGroupTarget(object, first.f, second.f);
-            FuseObjectWithLinkedObjects(object, &first, &second, 0, 0);
+            moby_fuse_linked_objects(object, &first, &second, 0, 0);
         }
         mob->flags_A8 = 255;
     }
     if (mob->mode == 4) D_L03_001B2750.active++;
-    if (gSubtitleHistory[39].count < 65535 && mob->type == 0x940 /* Bridgebot */ && mob->state != 1 && FindClass2426EntityNearby(object)) {
-        if (gSubtitleHistory[39].count != 0) {
-            if (D_001A7390 - gSubtitleHistory[39].tick > 1080 || gSubtitleHistory[39].tick == 0)
-                RequestSubtitleVoiceLine(0x9D0, 0x27);
-            else if (gSubtitleHistory[39].tick < D_001A7390) gSubtitleHistory[39].tick = D_001A7390;
+    if (g_subtitle_history[39].count < 65535 && mob->type == 0x940 /* Bridgebot */ && mob->state != 1 && moby_find_entity_nearby(object)) {
+        if (g_subtitle_history[39].count != 0) {
+            if (D_001A7390 - g_subtitle_history[39].tick > 1080 || g_subtitle_history[39].tick == 0)
+                subtitle_request_voice_line(0x9D0, 0x27);
+            else if (g_subtitle_history[39].tick < D_001A7390) g_subtitle_history[39].tick = D_001A7390;
         } else {
-            gSubtitleHistory[39].count++;
-            if (gSubtitleHistory[39].tick < D_001A7390) gSubtitleHistory[39].tick = D_001A7390;
-            gSubtitleHistory[39].flags = (gSubtitleHistory[39].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
+            g_subtitle_history[39].count++;
+            if (g_subtitle_history[39].tick < D_001A7390) g_subtitle_history[39].tick = D_001A7390;
+            g_subtitle_history[39].flags = (g_subtitle_history[39].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
-    if (gSubtitleHistory[128].count < 65535 && mob->type == 0x93C && mob->state != 1 && FindNearestClass3719Entity(object)) {
-        if (gSubtitleHistory[128].count != 0) {
-            if (D_001A7390 - gSubtitleHistory[128].tick > 1080 || gSubtitleHistory[128].tick == 0)
-                RequestSubtitleVoiceLine(0xA29, 0x80);
-            else if (gSubtitleHistory[128].tick < D_001A7390) gSubtitleHistory[128].tick = D_001A7390;
+    if (g_subtitle_history[128].count < 65535 && mob->type == 0x93C && mob->state != 1 && moby_find_nearest_entity_b(object)) {
+        if (g_subtitle_history[128].count != 0) {
+            if (D_001A7390 - g_subtitle_history[128].tick > 1080 || g_subtitle_history[128].tick == 0)
+                subtitle_request_voice_line(0xA29, 0x80);
+            else if (g_subtitle_history[128].tick < D_001A7390) g_subtitle_history[128].tick = D_001A7390;
         } else {
-            gSubtitleHistory[128].count++;
-            if (gSubtitleHistory[128].tick < D_001A7390) gSubtitleHistory[128].tick = D_001A7390;
-            gSubtitleHistory[128].flags = (gSubtitleHistory[128].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
+            g_subtitle_history[128].count++;
+            if (g_subtitle_history[128].tick < D_001A7390) g_subtitle_history[128].tick = D_001A7390;
+            g_subtitle_history[128].flags = (g_subtitle_history[128].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
-    if (gSubtitleHistory[97].count < 65535 && mob->type == 0xA59 && mob->state != 1 && FindNearestPickupTarget(object)) {
-        if (gSubtitleHistory[97].count != 0) {
-            if (D_001A7390 - gSubtitleHistory[97].tick > 1080 || gSubtitleHistory[97].tick == 0)
-                RequestSubtitleVoiceLine(0xA0A, 0x61);
-            else if (gSubtitleHistory[97].tick < D_001A7390) gSubtitleHistory[97].tick = D_001A7390;
+    if (g_subtitle_history[97].count < 65535 && mob->type == 0xA59 && mob->state != 1 && moby_find_nearest_pickup_target(object)) {
+        if (g_subtitle_history[97].count != 0) {
+            if (D_001A7390 - g_subtitle_history[97].tick > 1080 || g_subtitle_history[97].tick == 0)
+                subtitle_request_voice_line(0xA0A, 0x61);
+            else if (g_subtitle_history[97].tick < D_001A7390) g_subtitle_history[97].tick = D_001A7390;
         } else {
-            gSubtitleHistory[97].count++;
-            if (gSubtitleHistory[97].tick < D_001A7390) gSubtitleHistory[97].tick = D_001A7390;
-            gSubtitleHistory[97].flags = (gSubtitleHistory[97].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
+            g_subtitle_history[97].count++;
+            if (g_subtitle_history[97].tick < D_001A7390) g_subtitle_history[97].tick = D_001A7390;
+            g_subtitle_history[97].flags = (g_subtitle_history[97].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
-    if (mob->state != 1 && vec_distance_xy(mob->position, gHeroState.position) < 16.0f) {
+    if (mob->state != 1 && vec_distance_xy(mob->position, g_hero_state.position) < 16.0f) {
         D_L03_001B2750.near_player++;
         switch (mob->type) {
         case 0x940 /* Bridgebot */: D_L03_001B2750.near_940++; break;
@@ -290,44 +290,44 @@ void func_L03_003C3220(u8 *object)
         }
     }
     permitted = 1;
-    if (gHeroState.command == 0 || mob->state == 1 || mob->state == 13 || mob->mode == 7)
+    if (g_hero_state.command == 0 || mob->state == 1 || mob->state == 13 || mob->mode == 7)
         permitted = 0;
     else if (vars->command_cooldown) permitted = 0;
-    else if (mob->mode == 4 && gHeroState.command != 6) permitted = 0;
-    else if (mob->mode == 5 && gHeroState.command != 5) permitted = 0;
+    else if (mob->mode == 4 && g_hero_state.command != 6) permitted = 0;
+    else if (mob->mode == 5 && g_hero_state.command != 5) permitted = 0;
     if (!permitted) return;
-    switch (gHeroState.command) {
+    switch (g_hero_state.command) {
     case 1:
         if (mob->mode == 1) return;
-        distance = vec_distance_xy(mob->position, gHeroState.position);
+        distance = vec_distance_xy(mob->position, g_hero_state.position);
         if (distance > D_L03_001AFEE4) {
-            SetMobyState(object, 3, 1);
+            moby_set_state(object, 3, 1);
             if (mob->animation == 2) return;
-            StartAnimationBlended(object, 2, RandomIntBelow(ANIM_COUNT(object, 0x50)), 10);
+            anim_start_blended(object, 2, math_random_int_below(ANIM_COUNT(object, 0x50)), 10);
         } else {
-            SetMobyState(object, 4, 1);
+            moby_set_state(object, 4, 1);
             if (mob->animation == 0) return;
-            StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
+            anim_start_blended(object, 0, math_random_int_below(ANIM_COUNT(object, 0x48)), 10);
         }
         break;
     case 3:
         if (mob->mode == 2 || mob->type != 0x964 /* Gadgebot */) return;
-        vars->target = FindNearestTiltTarget(object);
+        vars->target = moby_find_nearest_tilt_target(object);
         if (vars->target) {
-            SetMobyState(object, 9, 2);
+            moby_set_state(object, 9, 2);
             if (mob->animation != 3)
-                StartAnimationBlended(object, 3, RandomIntBelow(ANIM_COUNT(object, 0x54)), 10);
+                anim_start_blended(object, 3, math_random_int_below(ANIM_COUNT(object, 0x54)), 10);
         } else {
-            SetMobyState(object, 11, 2);
+            moby_set_state(object, 11, 2);
             if (mob->animation != 0)
-                StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
+                anim_start_blended(object, 0, math_random_int_below(ANIM_COUNT(object, 0x48)), 10);
         }
         break;
     case 2:
         if (mob->mode != 0) {
-            SetMobyState(object, 2, 0);
-            if (mob->animation) StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
-            vars->tilt_timer = RandomIntRange(60, 120);
+            moby_set_state(object, 2, 0);
+            if (mob->animation) anim_start_blended(object, 0, math_random_int_below(ANIM_COUNT(object, 0x48)), 10);
+            vars->tilt_timer = math_random_int_range(60, 120);
             vars->tilt_pitch = 0;
             vars->tilt_yaw = 0;
         }
@@ -336,77 +336,77 @@ void func_L03_003C3220(u8 *object)
         if (mob->type != 0x964 /* Gadgebot */) return;
         vars->command_cooldown = 30;
         if (mob->mode != 3) {
-            vars->target = FindNearestClass3833Entity(object);
+            vars->target = moby_find_nearest_entity_a(object);
             if (!vars->target) return;
-            ComputePointAheadUnit(vars->target, &point);
-            if (CheckPointsOnRouteGraph(vars->area_id, mob->position, &point)) {
+            moby_compute_point_ahead_unit(vars->target, &point);
+            if (route_check_points(vars->area_id, mob->position, &point)) {
                 qcopy(state + 0x340, &point);
-                SetMobyState(object, 12, 3);
-                if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
+                moby_set_state(object, 12, 3);
+                if (mob->animation != 2) anim_start_blended(object, 2, 0, 10);
             } else vars->target = 0;
         } else if (mob->state != 13) {
-            SetMobyState(object, 4, 1);
-            if (mob->animation != 0) StartAnimationBlended(object, 0, 0, 10);
+            moby_set_state(object, 4, 1);
+            if (mob->animation != 0) anim_start_blended(object, 0, 0, 10);
         }
         break;
     case 6:
         if (mob->type != 0x940 /* Bridgebot */) return;
         vars->command_cooldown = 30;
         if (mob->mode != 4) {
-            vars->target = FindClass2426EntityNearby(object);
+            vars->target = moby_find_entity_nearby(object);
             if (!vars->target) return;
-            SetMobyState(object, 14, 4);
-            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
-            ComputeOppositePoints(vars->target, &point, &first);
-            if (CheckPointsOnRouteGraph(vars->area_id, mob->position, &point))
+            moby_set_state(object, 14, 4);
+            if (mob->animation != 2) anim_start_blended(object, 2, 0, 10);
+            moby_compute_opposite_points(vars->target, &point, &first);
+            if (route_check_points(vars->area_id, mob->position, &point))
                 qcopy(state + 0x340, &point);
             else qcopy(state + 0x340, &first);
         } else if (mob->state == 14) {
-            SetMobyState(object, 4, 1);
-            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
-        } else if (mob->state == 16 && !IsGroupStateWordMatching(object)) PlaceHeldObjectAtSafeSpot(object);
+            moby_set_state(object, 4, 1);
+            if (mob->animation) anim_start_blended(object, 0, 0, 20);
+        } else if (mob->state == 16 && !group_is_state_word_matching(object)) moby_place_held_object(object);
         break;
     case 5:
         if (mob->type != 0x93C) return;
         if (mob->mode != 5) {
-            vars->target = FindNearestClass3719Entity(object);
+            vars->target = moby_find_nearest_entity_b(object);
             if (!vars->target) return;
-            SetMobyState(object, 18, 5);
-            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
+            moby_set_state(object, 18, 5);
+            if (mob->animation != 2) anim_start_blended(object, 2, 0, 10);
             vars->command_cooldown = 30;
-            ComputeSideStepOffset(vars->target, mob->position, state + 0x340);
+            mat_compute_side_step_offset(vars->target, mob->position, state + 0x340);
             return;
         }
         if (mob->state != 19) {
-            SetObjectFlagBit(vars->target, 0);
+            moby_set_flag_bit(vars->target, 0);
             vars->target = 0; vars->command_cooldown = 30;
-            SetMobyState(object, 4, 1);
-            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
+            moby_set_state(object, 4, 1);
+            if (mob->animation) anim_start_blended(object, 0, 0, 20);
         }
         break;
     case 7:
         if (mob->type != 0xA59) return;
         if (mob->mode != 6) {
-            vars->target = FindNearestPickupTarget(object);
+            vars->target = moby_find_nearest_pickup_target(object);
             if (!vars->target) return;
-            SetMobyState(object, 20, 6);
-            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
+            moby_set_state(object, 20, 6);
+            if (mob->animation != 2) anim_start_blended(object, 2, 0, 10);
             target = vars->target; vars->command_cooldown = 30;
             switch (*(s16 *)(target + 0xAA)) {
-            case 0xB10: ComputePointAheadOfObject(target, state + 0x340); break;
-            case 0xF4D: ComputePointAheadScaled(target, state + 0x340); break;
+            case 0xB10: moby_compute_point_ahead(target, state + 0x340); break;
+            case 0xF4D: moby_compute_point_ahead_scaled(target, state + 0x340); break;
             }
         } else if (mob->state != 21) {
-            SetObjectFlagBit(vars->target, 0);
+            moby_set_flag_bit(vars->target, 0);
             vars->target = 0; vars->command_cooldown = 30;
-            SetMobyState(object, 4, 1);
-            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
+            moby_set_state(object, 4, 1);
+            if (mob->animation) anim_start_blended(object, 0, 0, 20);
         }
         break;
     case 8:
         if (mob->type == 0x964 /* Gadgebot */) {
-            if (mob->mode != 1) SetMobyState(object, 4, 1);
-        } else SetMobyState(object, 6, 1);
+            if (mob->mode != 1) moby_set_state(object, 4, 1);
+        } else moby_set_state(object, 6, 1);
         break;
     }
 }

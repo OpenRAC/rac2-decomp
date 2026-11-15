@@ -12,7 +12,7 @@ extern s32 func_00379EC8(void);
 extern void func_0037B280(u8 *a0, s32 a1);
 extern void func_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_0037D608(u8 *a0, u8 *a1, f32 f12);
-extern void func_L05_00420788(u8 *a0, s32 a1);
+extern void UpdateFeltzinMissionReward(u8 *a0, s32 a1);
 
 extern s32 D_L05_001B1364 __attribute__((sda));
 extern s32 D_L05_00221D10[];
@@ -20,7 +20,7 @@ extern s32 D_L05_001B2048;
 extern u8 *D_L05_001B2614;
 
 /* Controls the third Feltzin mission: sets up the scene once, then starts the reward. */
-void func_L05_00420FB0(u8 *moby) {
+void feltzin_mission_three_update(u8 *moby) {
     s32 remaining;
     s32 count;
     u8 **objects;

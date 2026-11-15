@@ -6,11 +6,11 @@ typedef struct {
 } Func002DE550Slot;
 
 extern Func002DE550Slot D_001B1F50[] __attribute__((sda));
-extern int func_002DE6F0(int key);
-extern void func_00282A60(void *data, unsigned int tag, int size);
+extern int menu_stream_chunk_get_size(int key);
+extern void mem_clear(void *data, unsigned int tag, int size);
 
 /* Takes the next free stream chunk of the wanted kind, marks it used and returns its key. Returns 0 if none is free. */
-int func_002DE550(int mode)
+int menu_stream_chunk_claim_free(int mode)
 {
     int i;
     int size;
@@ -23,9 +23,9 @@ int func_002DE550(int mode)
         if (D_001B1F50[i].flags & 2)
             continue;
         D_001B1F50[i].flags |= 2;
-        GetStreamChunkSize(D_001B1F50[i].key);
-        size = GetStreamChunkSize(D_001B1F50[i].key);
-        ClearMemory((void *)D_001B1F50[i].key, 0xDEADBEEF, size);
+        menu_stream_chunk_get_size(D_001B1F50[i].key);
+        size = menu_stream_chunk_get_size(D_001B1F50[i].key);
+        mem_clear((void *)D_001B1F50[i].key, 0xDEADBEEF, size);
         return D_001B1F50[i].key;
     }
     return 0;

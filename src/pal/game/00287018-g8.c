@@ -64,11 +64,11 @@ struct CameraObject {
     char reservedAC[0x54];
 };
 
-extern ModalState D_001BAC80;
-extern ModalInput D_00138180;
+extern ModalState g_modal_state;
+extern ModalInput g_pad_state;
 extern int D_001B170C;
-extern int D_001A7420;
-extern int D_001A7424;
+extern int g_save_menu_screen;
+extern int g_save_menu_flags;
 extern int D_001A8C88;
 extern int D_001A8C8C;
 extern int D_001F29A0 NOT_SDA;
@@ -78,9 +78,9 @@ typedef struct {
     char reserved1C[0xE4];
     int savedSelection;
 } ModalSelection;
-extern ModalSelection D_001F2840;
+extern ModalSelection g_pause_menu_state;
 extern int *D_001F2930 NOT_SDA;
-extern unsigned short D_0018C958[];
+extern unsigned short g_subtitle_history[];
 extern unsigned char D_001B1F10;
 typedef struct {
     char reserved00[8];
@@ -88,7 +88,7 @@ typedef struct {
     char reserved0C[4];
     int result;
 } ModalCardState;
-extern ModalCardState D_001393E0;
+extern ModalCardState g_memcard_state;
 extern int D_0013955C[];
 extern int D_001A8B84 __attribute__((sda));
 extern int D_001B1680[] __attribute__((sda));
@@ -100,10 +100,10 @@ typedef struct {
     char reserved20[0x210];
     float matrix[16];
 } ModalCamera;
-extern ModalCamera D_001B5340;
+extern ModalCamera g_camera_eye_state;
 extern float D_001B17D0[4] __attribute__((sda));
 extern unsigned char D_001A7A44;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern CameraObject *D_001B1B5C;
 extern CameraObject *D_001B1B60;
 extern unsigned char D_0018C0D4 NOT_SDA;
@@ -111,59 +111,59 @@ extern int D_001A8A40 __attribute__((sda));
 extern int ref_00286738_00 __attribute__((sda));
 extern int D_001A8A48 __attribute__((sda));
 extern int D_001A8A60 __attribute__((sda));
-extern int D_001A7BB8;
+extern int g_widescreen_flag;
 
 extern int func_PAL_002E5898(void);
-extern int func_002B49E0(int, int, int, int, unsigned char *);
-extern void func_0027D330(int);
-extern int func_00288D80(void);
-extern void func_00288D68(void);
+extern int request_begin_slot(int, int, int, int, unsigned char *);
+extern void FadeToBlack(int);
+extern int flag_get_word(void);
+extern void flag_clear_word(void);
 extern int func_PAL_00299518(void);
 extern void func_PAL_00299520(void);
-extern void func_00287E80(void);
-extern int func_002DF1D0(void);
-extern int func_002C9A50(void);
-extern void func_00298D28(int *);
-extern void func_00287EA8(void);
-extern int func_002B4B70(int, int);
+extern void menu_clear_counter(void);
+extern int menu_is_known_screen_active(void);
+extern int menu_get_saved_value(void);
+extern void save_load_packet(int *);
+extern void menu_clear_confirm_pending(void);
+extern int request_end_slot(int, int);
 extern void func_PAL_002997A0(void);
-extern void func_002F64A8(void);
+extern void load_data_and_setup_callback(void);
 extern void func_PAL_002DF760(int);
-extern void func_00282CF0(void *, const void *, const void *);
-extern float func_00282DF0(void *);
-extern float func_002AA548(float *, float *, float, float, float, float);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern float FastVecLength(void *);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
 extern void func_PAL_002884F0(char *, int);
-extern void func_00283098(void *, const void *, const void *);
-extern void func_002AC9F8(float *, float);
-extern void func_00282D30(void *, const void *, float);
-extern void func_00287D98(char *);
+extern void matrix_mul_vec3(void *, const void *, const void *);
+extern void vec_clamp_length(float *, float);
+extern void FastVecScale(void *, const void *, float);
+extern void cam_offset_direction(char *);
 extern void func_PAL_00288638(float *);
-extern void func_00283698(void *, const void *);
-extern void func_002AB6D8(float *, float *);
-extern void func_00282D08(void *, const void *, const void *, float);
-extern void func_002A91F0(void *, float *);
-extern void func_00283810(void *, const void *, const void *, float);
-extern void func_00283958(const void *, void *);
+extern void matrix_from_basis_rows(void *, const void *);
+extern void mat_get_euler_angles(float *, float *);
+extern void lerp_vector(void *, const void *, const void *, float);
+extern void mat_build_rotation_from_angles(void *, float *);
+extern void vec_fast_normalize3(void *, const void *, const void *, float);
+extern void quaternion_to_rotation_basis(const void *, void *);
 extern void func_PAL_0026F620(void);
-extern void func_00290670(void);
-extern void func_00287E60(void);
-extern int func_0028B3D0(int, int, void (*)(unsigned char *), void (*)(), void (*)(), int, int);
-extern void func_0028BDB0(unsigned char *);
-extern void func_0028BE00();
-extern void func_0028C6D0();
-extern void func_0028CC98(unsigned char *);
-extern void func_0028CCE0();
-extern void func_0028D1E8();
+extern void hud_request_letterbox_bars(void);
+extern void menu_set_state_word_three(void);
+extern int hud_set_slot_contents(int, int, void (*)(unsigned char *), void (*)(), void (*)(), int, int);
+extern void menu_init_panel_layout(unsigned char *);
+extern void weapon_wheel_update_select();
+extern void weapon_wheel_draw();
+extern void weapon_wheel_init(unsigned char *);
+extern void UpdateRadialMenuSelection();
+extern void DrawRadialSelectorPanel();
 extern void func_PAL_0029D7D0(void);
 extern void func_PAL_0029C0B8(int);
-extern void func_0029B698(int);
-extern void func_00290728(void);
-extern void func_00290720(void);
+extern void level_forward_value(int);
+extern void hud_clear_flag_b(void);
+extern void hud_clear_flag_a(void);
 extern void func_PAL_002B5570(int);
-extern int func_002E5E58(int, int, void *);
-extern void func_002857B8(void);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void gfx_apply_screen_aspect_mode(void);
 
 /* Run the active modal dialog, camera return, or display-confirmation phase. */
 void func_PAL_00287018(void)
@@ -174,157 +174,157 @@ void func_PAL_00287018(void)
     ModalInput *saveInput;
 
     func_PAL_002E5898();
-    D_001B170C = D_001BAC80.gameState;
-    if (D_001BAC80.countdown)
-        --D_001BAC80.countdown;
-    if (D_001BAC80.timer)
-        --D_001BAC80.timer;
-    switch (D_001BAC80.mode) {
+    D_001B170C = g_modal_state.gameState;
+    if (g_modal_state.countdown)
+        --g_modal_state.countdown;
+    if (g_modal_state.timer)
+        --g_modal_state.timer;
+    switch (g_modal_state.mode) {
     case 2:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 75 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (D_001A7420 == 2) {
-            func_002B49E0(4, 2, 1, 0, 0);
+        ++g_modal_state.elapsed;
+        if (g_modal_state.elapsed > 75 && g_modal_state.inputDelay)
+            --g_modal_state.inputDelay;
+        if (g_save_menu_screen == 2) {
+            request_begin_slot(4, 2, 1, 0, 0);
             break;
         }
-        if (D_001BAC80.elapsed >= 101 && (D_00138180.buttons & 0x40)) {
-            if (!D_0018C958[0x84 / 2])
-                D_0018C958[0x84 / 2] = 1;
-            { func_002B4B70(0, 0); break; }
+        if (g_modal_state.elapsed >= 101 && (g_pad_state.buttons & 0x40)) {
+            if (!g_subtitle_history[0x84 / 2])
+                g_subtitle_history[0x84 / 2] = 1;
+            { request_end_slot(0, 0); break; }
         }
         break;
     case 5:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 25 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-            D_001A7424 &= ~0x40;
+        ++g_modal_state.elapsed;
+        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
+            --g_modal_state.inputDelay;
+        if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+            g_save_menu_flags &= ~0x40;
             D_0013955C[0] = 0;
-            { func_PAL_002DF760(-1); func_002F64A8(); break; }
+            { func_PAL_002DF760(-1); load_data_and_setup_callback(); break; }
         }
         break;
     case 4:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 25 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
+        ++g_modal_state.elapsed;
+        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
+            --g_modal_state.inputDelay;
+        if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
             D_0013955C[0] = 0;
-            { func_PAL_002DF760(-1); func_002F64A8(); break; }
+            { func_PAL_002DF760(-1); load_data_and_setup_callback(); break; }
         }
         break;
     case 3:
-        switch (D_001BAC80.phase) {
+        switch (g_modal_state.phase) {
         case 0:
-            if (!D_001BAC80.countdown)
-                D_001BAC80.phase = 1;
+            if (!g_modal_state.countdown)
+                g_modal_state.phase = 1;
             break;
         case 1:
-            if (D_00138180.buttons & 0x10)
-                { func_002B4B70(0, 0); break; }
-            if (D_00138180.buttons & 0x40) {
-                func_0027D330(4);
+            if (g_pad_state.buttons & 0x10)
+                { request_end_slot(0, 0); break; }
+            if (g_pad_state.buttons & 0x40) {
+                FadeToBlack(4);
                 D_001B1F10 = 0;
-                D_001BAC80.phase = 2;
-                D_001BAC80.elapsed = 500;
+                g_modal_state.phase = 2;
+                g_modal_state.elapsed = 500;
             }
             break;
         case 2:
-            if (!D_001BAC80.elapsed || --D_001BAC80.elapsed == 0) {
+            if (!g_modal_state.elapsed || --g_modal_state.elapsed == 0) {
                 D_001B1F10 = 1;
-                D_001BAC80.phase = 3;
+                g_modal_state.phase = 3;
                 break;
             }
-            if (D_00138180.buttons & 0x10) {
-                func_0027D330(4);
+            if (g_pad_state.buttons & 0x10) {
+                FadeToBlack(4);
                 D_001B1F10 = 1;
-                { func_002B4B70(0, 0); break; }
-            } else if (D_00138180.buttons & 0x40) {
+                { request_end_slot(0, 0); break; }
+            } else if (g_pad_state.buttons & 0x40) {
                 D_001B1F10 = 0;
-                { func_002B4B70(0, 0); break; }
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 3:
-            if (!(D_00138180.buttons & 0x40))
+            if (!(g_pad_state.buttons & 0x40))
                 break;
         default:
-            { func_002B4B70(0, 0); break; }
+            { request_end_slot(0, 0); break; }
         }
         break;
     case 1:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 25 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (func_00288D80() || ((D_001A7424 & 0x600) && func_PAL_00299518())) {
-            if (!(D_00138180.buttons & 0x40))
+        ++g_modal_state.elapsed;
+        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
+            --g_modal_state.inputDelay;
+        if (flag_get_word() || ((g_save_menu_flags & 0x600) && func_PAL_00299518())) {
+            if (!(g_pad_state.buttons & 0x40))
                 break;
-            func_00288D68();
-            D_001A7424 &= ~0x640;
+            flag_clear_word();
+            g_save_menu_flags &= ~0x640;
             func_PAL_00299520();
-            func_00287E80();
-            { func_002B4B70(0, 0); break; }
+            menu_clear_counter();
+            { request_end_slot(0, 0); break; }
         }
-        switch (D_001A7420) {
+        switch (g_save_menu_screen) {
         case 2:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-                D_001BAC80.result = 2;
-                D_001A7424 &= ~1;
-                { func_002B4B70(0, 0); break; }
+            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+                g_modal_state.result = 2;
+                g_save_menu_flags &= ~1;
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 6:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x20)) {
-                D_001A7424 |= 8;
-                D_001BAC80.result = 2;
+            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x20)) {
+                g_save_menu_flags |= 8;
+                g_modal_state.result = 2;
                 break;
             }
-            if (D_001BAC80.countdown || !(D_00138180.buttons & 0x10))
+            if (g_modal_state.countdown || !(g_pad_state.buttons & 0x10))
                 break;
             if (D_001A8C8C) {
-                D_001BAC80.result = 2;
-                { func_PAL_002DF760(-1); func_002F64A8(); break; }
+                g_modal_state.result = 2;
+                { func_PAL_002DF760(-1); load_data_and_setup_callback(); break; }
             }
-            D_001A7424 |= 0x20;
-            if (!func_002DF1D0())
-                D_001A7424 &= ~2;
-            D_001A7424 &= ~4;
-            D_001BAC80.result = 1;
+            g_save_menu_flags |= 0x20;
+            if (!menu_is_known_screen_active())
+                g_save_menu_flags &= ~2;
+            g_save_menu_flags &= ~4;
+            g_modal_state.result = 1;
             if (!D_001A8C88) {
-                func_002B4B70(0, 0);
+                request_end_slot(0, 0);
                 break;
             }
             break;
         case 13:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x20)) {
-                D_001A7424 |= 0x10;
-                D_001BAC80.result = 2;
+            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x20)) {
+                g_save_menu_flags |= 0x10;
+                g_modal_state.result = 2;
                 break;
             }
-            if (D_001BAC80.countdown || !(D_00138180.buttons & 0x10))
+            if (g_modal_state.countdown || !(g_pad_state.buttons & 0x10))
                 break;
             if (D_001A8C8C) {
-                D_001BAC80.result = 2;
-                { func_PAL_002DF760(-1); func_002F64A8(); break; }
+                g_modal_state.result = 2;
+                { func_PAL_002DF760(-1); load_data_and_setup_callback(); break; }
             }
-            D_001A7424 |= 0x20;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-            D_001BAC80.result = 1;
+            g_save_menu_flags |= 0x20;
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+            g_modal_state.result = 1;
             if (!D_001A8C88)
-                { func_002B4B70(0, 0); break; }
+                { request_end_slot(0, 0); break; }
             break;
         case 20:
-            if (D_001BAC80.inputDelay || !(D_00138180.buttons & 0x40))
+            if (g_modal_state.inputDelay || !(g_pad_state.buttons & 0x40))
                 break;
-            D_001A7424 &= ~0x40;
-                D_001A7424 &= ~0x400;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-            D_001BAC80.result = 2;
+            g_save_menu_flags &= ~0x40;
+                g_save_menu_flags &= ~0x400;
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+            g_modal_state.result = 2;
             if (!D_001A8C88) {
-                if (func_002C9A50()) {
-                    func_00298D28(D_001F2930);
-                    func_002B4B70(0, 0);
+                if (menu_get_saved_value()) {
+                    save_load_packet(D_001F2930);
+                    request_end_slot(0, 0);
                 } else {
                     D_0013955C[0] = 0;
                     D_001B1680[0] = -1;
@@ -332,65 +332,65 @@ void func_PAL_00287018(void)
                 }
                 break;
             }
-            func_002B4B70(0, 0);
+            request_end_slot(0, 0);
             break;
         case 17:
         case 18:
         case 21:
-            if (D_001BAC80.pending > 0) {
-                if (--D_001BAC80.pending <= 0) {
-                    if (D_001393E0.status == 2) {
-                        if (!D_001393E0.result) {
-                            D_001A7420 = 9;
-                        } else if (D_001393E0.result == -1) {
-                            D_001A7420 = 9;
-                            D_001393E0.result = 0;
-                        } else if (D_001393E0.result == -2) {
-                            D_001A7420 = 5;
+            if (g_modal_state.pending > 0) {
+                if (--g_modal_state.pending <= 0) {
+                    if (g_memcard_state.status == 2) {
+                        if (!g_memcard_state.result) {
+                            g_save_menu_screen = 9;
+                        } else if (g_memcard_state.result == -1) {
+                            g_save_menu_screen = 9;
+                            g_memcard_state.result = 0;
+                        } else if (g_memcard_state.result == -2) {
+                            g_save_menu_screen = 5;
                         } else {
-                            D_001A7420 = 12;
+                            g_save_menu_screen = 12;
                         }
-                        func_002B4B70(0, 0);
+                        request_end_slot(0, 0);
                     } else {
-                        D_001BAC80.result = 2;
-                        func_00287EA8();
+                        g_modal_state.result = 2;
+                        menu_clear_confirm_pending();
                         func_PAL_002DF760(-1);
-                        func_002F64A8();
+                        load_data_and_setup_callback();
                     }
                     break;
                 }
             } else {
-                if (D_001BAC80.inputDelay || !(D_00138180.buttons & 0x40))
+                if (g_modal_state.inputDelay || !(g_pad_state.buttons & 0x40))
                     break;
-                func_00287EA8();
+                menu_clear_confirm_pending();
                 if (D_001A8C8C) {
-                    D_001BAC80.pending = 12;
+                    g_modal_state.pending = 12;
                 } else {
-                    D_001BAC80.result = 2;
-                    D_001A7424 &= ~0x40;
-                    D_001A7424 &= ~0x400;
-                    D_001A7424 &= ~2;
-                    D_001A7424 &= ~4;
-                    func_002B4B70(0, 0);
+                    g_modal_state.result = 2;
+                    g_save_menu_flags &= ~0x40;
+                    g_save_menu_flags &= ~0x400;
+                    g_save_menu_flags &= ~2;
+                    g_save_menu_flags &= ~4;
+                    request_end_slot(0, 0);
                 }
             }
             break;
         case 1:
         case 16:
-            func_002B4B70(0, 0);
-            D_001F2840.selection = D_001BAC80.selection;
-            D_001F2840.savedSelection = D_001BAC80.selection;
+            request_end_slot(0, 0);
+            g_pause_menu_state.selection = g_modal_state.selection;
+            g_pause_menu_state.savedSelection = g_modal_state.selection;
             break;
         case 12:
             if (!D_001F29A0)
                 break;
         case 3:
         case 5:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x10)) {
-                D_001BAC80.result = 1;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                { func_002B4B70(0, 0); break; }
+            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x10)) {
+                g_modal_state.result = 1;
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 19:
@@ -398,195 +398,195 @@ void func_PAL_00287018(void)
                 /* Set once, unlike a shared pointer, so alias analysis knows its
                  * base and the cancel arm's store has no tie to D_001A7424. The
                  * accept body below merges with case 23's copy at jump2. */
-                ModalState *pickDialog = &D_001BAC80;
+                ModalState *pickDialog = &g_modal_state;
                 if (pickDialog->inputDelay)
                     break;
-                if (D_00138180.buttons & 0x40) {
+                if (g_pad_state.buttons & 0x40) {
                     func_PAL_002997A0();
                     pickDialog->result = 2;
-                    D_001A7424 &= ~2;
-                    D_001A7424 &= ~4;
-                    D_001A7424 |= 0x20;
-                    func_002F64A8();
+                    g_save_menu_flags &= ~2;
+                    g_save_menu_flags &= ~4;
+                    g_save_menu_flags |= 0x20;
+                    load_data_and_setup_callback();
                     break;
                 }
-                if (!(D_00138180.buttons & 0x10))
+                if (!(g_pad_state.buttons & 0x10))
                     break;
                 pickDialog->result = 1;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                { func_002B4B70(0, 0); break; }
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+                { request_end_slot(0, 0); break; }
             }
             if (D_001A8C8C)
                 goto acceptReload;
             {
-                if (D_001BAC80.inputDelay)
+                if (g_modal_state.inputDelay)
                     break;
-                if (!(D_00138180.buttons & 0x40) || D_001F29A0) {
-                    if (!(D_00138180.buttons & 0x10) || !D_001F29A0)
+                if (!(g_pad_state.buttons & 0x40) || D_001F29A0) {
+                    if (!(g_pad_state.buttons & 0x10) || !D_001F29A0)
                         break;
                 }
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                D_001BAC80.result = 1;
-                { func_002B4B70(0, 0); break; }
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+                g_modal_state.result = 1;
+                { request_end_slot(0, 0); break; }
             }
         case 23:
         case 24:
-            loadDialog = &D_001BAC80;
+            loadDialog = &g_modal_state;
             if (loadDialog->inputDelay)
                 break;
-            if (D_00138180.buttons & 0x40) {
+            if (g_pad_state.buttons & 0x40) {
                 func_PAL_002997A0();
                 loadDialog->result = 2;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                D_001A7424 |= 0x20;
-                func_002F64A8();
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+                g_save_menu_flags |= 0x20;
+                load_data_and_setup_callback();
                 break;
             }
-            if (D_00138180.buttons & 0x10) {
+            if (g_pad_state.buttons & 0x10) {
                 loadDialog->result = 1;
-                D_001A7424 |= 0x20;
-                { func_002B4B70(0, 0); break; }
+                g_save_menu_flags |= 0x20;
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 4:
             if (D_001A8C88) {
                 if (!D_001F29A0) {
-                    saveDialog = &D_001BAC80;
+                    saveDialog = &g_modal_state;
                     if (saveDialog->inputDelay)
                         break;
-                    saveInput = &D_00138180;
+                    saveInput = &g_pad_state;
                     if (saveInput->buttons & 0x40) {
                         func_PAL_002997A0();
                         saveDialog->result = 2;
-                        D_001A7424 &= ~2;
-                        D_001A7424 &= ~4;
-                        func_002F64A8();
+                        g_save_menu_flags &= ~2;
+                        g_save_menu_flags &= ~4;
+                        load_data_and_setup_callback();
                     }
                     if (!saveDialog->inputDelay && (saveInput->buttons & 0x10)) {
                         saveDialog->result = 1;
-                        D_001A7424 |= 0x20;
-                        D_001A7424 &= ~2;
-                        D_001A7424 &= ~4;
-                        func_002B4B70(0, 0);
+                        g_save_menu_flags |= 0x20;
+                        g_save_menu_flags &= ~2;
+                        g_save_menu_flags &= ~4;
+                        request_end_slot(0, 0);
                     }
                     break;
                 }
             } else if (D_001A8C8C) {
 acceptReload:
-                if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-                    D_001BAC80.result = 2;
+                if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+                    g_modal_state.result = 2;
                     func_PAL_002DF760(-1);
-                    func_002F64A8();
+                    load_data_and_setup_callback();
                 }
                 break;
             }
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x10)) {
-                D_001BAC80.result = 1;
-                D_001A7424 |= 0x20;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                func_002B4B70(0, 0);
+            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x10)) {
+                g_modal_state.result = 1;
+                g_save_menu_flags |= 0x20;
+                g_save_menu_flags &= ~2;
+                g_save_menu_flags &= ~4;
+                request_end_slot(0, 0);
             }
             break;
         case 9:
-            if (!(D_001A7424 & 6))
-                { func_002B4B70(0, 0); break; }
+            if (!(g_save_menu_flags & 6))
+                { request_end_slot(0, 0); break; }
             break;
         }
         break;
     case 6:
-        switch (D_001BAC80.phase) {
+        switch (g_modal_state.phase) {
         case 0:
-            qcopy(D_001BAC80.cameraPosition, D_001B5340.position);
-            qcopy(D_001BAC80.cameraAngles, D_001B5340.angles);
-            D_001BAC80.phase = 1;
+            qcopy(g_modal_state.cameraPosition, g_camera_eye_state.position);
+            qcopy(g_modal_state.cameraAngles, g_camera_eye_state.angles);
+            g_modal_state.phase = 1;
             break;
         case 1:
             D_001B170C = 3;
-            func_00282CF0(delta, D_001B5340.position, D_001B17D0);
-            distance = func_00282DF0(delta);
-            func_002AA548(&distance, &D_001BAC80.fraction, (float)D_001A8A78,
+            FastVecSub(delta, g_camera_eye_state.position, D_001B17D0);
+            distance = FastVecLength(delta);
+            math_step_value_toward_target(&distance, &g_modal_state.fraction, (float)D_001A8A78,
                     0.060000002f, 0.060000002f, 6.0000005f);
-            func_00282F20(delta, delta, distance);
-            func_00282CC0(D_001B5340.position, delta, D_001B17D0);
-            func_PAL_002884F0((char *)&D_001BAC80.angle, 0);
+            vec_scale_to_length(delta, delta, distance);
+            FastVecAdd(g_camera_eye_state.position, delta, D_001B17D0);
+            func_PAL_002884F0((char *)&g_modal_state.angle, 0);
             if ((float)D_001A8A78 <= distance)
-                D_001BAC80.phase = 2;
+                g_modal_state.phase = 2;
             break;
         case 2:
             D_001B170C = 3;
-            if (D_00138180.horizontal != 0.0f || D_00138180.vertical != 0.0f) {
+            if (g_pad_state.horizontal != 0.0f || g_pad_state.vertical != 0.0f) {
                 *(Quadword *)target = 0;
-                target[1] = D_00138180.horizontal;
-                target[2] = D_00138180.vertical;
+                target[1] = g_pad_state.horizontal;
+                target[2] = g_pad_state.vertical;
                 *(Quadword *)delta = *(Quadword *)target;
-                func_00283098(delta, delta, D_001B5340.matrix);
-                func_002AC9F8(delta, 1.0f);
-                func_00282D30(delta, delta,
+                matrix_mul_vec3(delta, delta, g_camera_eye_state.matrix);
+                vec_clamp_length(delta, 1.0f);
+                FastVecScale(delta, delta,
                         (float)-D_001A8A78 * 0.0003490659f * D_001A8A7C);
-                func_00287D98((char *)delta);
+                cam_offset_direction((char *)delta);
             }
-            func_PAL_002884F0((char *)&D_001BAC80.angle, 1);
-            func_PAL_00288638(&D_00138180.roll);
+            func_PAL_002884F0((char *)&g_modal_state.angle, 1);
+            func_PAL_00288638(&g_pad_state.roll);
             break;
         case 3: {
             float speed;
             D_001B170C = 3;
             speed = (float)D_001A8A78 * 0.0003490659f * D_001A8A7C;
-            func_00282CF0(target, D_001BAC80.cameraPosition, D_001B17D0);
-            func_00282F20(target, target, (float)D_001A8A78);
-            func_00282CC0(target, target, D_001B17D0);
-            func_00282CF0(delta, target, D_001B5340.position);
-            func_00283698(transform, D_001B5340.matrix);
-            func_00283098(delta, delta, transform);
+            FastVecSub(target, g_modal_state.cameraPosition, D_001B17D0);
+            vec_scale_to_length(target, target, (float)D_001A8A78);
+            FastVecAdd(target, target, D_001B17D0);
+            FastVecSub(delta, target, g_camera_eye_state.position);
+            matrix_from_basis_rows(transform, g_camera_eye_state.matrix);
+            matrix_mul_vec3(delta, delta, transform);
             delta[0] = 0.0f;
             if (delta[1] == 0.0f && delta[2] == 0.0f)
                 delta[1] = 1.0f;
-            func_002AC9F8(delta, speed);
-            func_00283098(delta, delta, D_001B5340.matrix);
-            func_00287D98((char *)delta);
-            func_PAL_002884F0((char *)&D_001BAC80.angle, 1);
-            if (func_00282DF0(delta) < speed - 0.01f) {
+            vec_clamp_length(delta, speed);
+            matrix_mul_vec3(delta, delta, g_camera_eye_state.matrix);
+            cam_offset_direction((char *)delta);
+            func_PAL_002884F0((char *)&g_modal_state.angle, 1);
+            if (FastVecLength(delta) < speed - 0.01f) {
                 /* The transition publishes its separate state word before capturing the return pose. */
                 { extern int D_001B1710; D_001B1710 = 2; }
-                qcopy(D_001BAC80.returnPosition, D_001B5340.position);
+                qcopy(g_modal_state.returnPosition, g_camera_eye_state.position);
                 if (D_001A7A44) {
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
-                    func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
+                    FastVecScale(g_camera_eye_state.matrix + 4, g_camera_eye_state.matrix + 4, -1.0f);
+                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.returnAngles);
+                    FastVecScale(g_camera_eye_state.matrix + 4, g_camera_eye_state.matrix + 4, -1.0f);
                 } else {
-                    func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
+                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.returnAngles);
                 }
-                D_001BAC80.phase = 4;
+                g_modal_state.phase = 4;
             }
             break;
         }
         case 4:
             D_001B170C = 3;
-            func_002AA548(&D_001BAC80.fraction, &D_001BAC80.angle,
+            math_step_value_toward_target(&g_modal_state.fraction, &g_modal_state.angle,
                     1.0f, 0.00080000004f, 0.00080000004f, 0.030000001f);
-            func_00282D08(D_001B5340.position, D_001BAC80.returnPosition,
-                    D_001BAC80.cameraPosition, D_001BAC80.fraction);
-            func_002A91F0(delta, D_001BAC80.returnAngles);
-            func_002A91F0(target, D_001BAC80.cameraAngles);
-            func_00283810(transform, delta, target, D_001BAC80.fraction);
-            func_00283958(transform, D_001B5340.matrix);
+            lerp_vector(g_camera_eye_state.position, g_modal_state.returnPosition,
+                    g_modal_state.cameraPosition, g_modal_state.fraction);
+            mat_build_rotation_from_angles(delta, g_modal_state.returnAngles);
+            mat_build_rotation_from_angles(target, g_modal_state.cameraAngles);
+            vec_fast_normalize3(transform, delta, target, g_modal_state.fraction);
+            quaternion_to_rotation_basis(transform, g_camera_eye_state.matrix);
             if (D_001A7A44)
-                func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
-            if (D_001BAC80.fraction >= 1.0f)
-                func_002B4B70(0, 0);
+                FastVecScale(g_camera_eye_state.matrix + 4, g_camera_eye_state.matrix + 4, -1.0f);
+            if (g_modal_state.fraction >= 1.0f)
+                request_end_slot(0, 0);
             break;
         }
-        D_001BAC80.cameraActive = 1;
-        if ((D_00138180.buttons & 0x500) && D_001BAC80.phase == 2) {
-            D_001BAC80.fraction = 0.0f;
-            D_001BAC80.phase = 3;
-            D_001BAC80.angle = 0.0f;
+        g_modal_state.cameraActive = 1;
+        if ((g_pad_state.buttons & 0x500) && g_modal_state.phase == 2) {
+            g_modal_state.fraction = 0.0f;
+            g_modal_state.phase = 3;
+            g_modal_state.angle = 0.0f;
         }
-        if ((unsigned)(D_001A79F0 - 22) < 2) {
+        if ((unsigned)(g_current_map_index - 22) < 2) {
             CameraObject *object = D_001B1B5C;
             if (object < D_001B1B60) {
                 do {
@@ -598,28 +598,28 @@ acceptReload:
         }
         break;
     case 7:
-        switch (D_001BAC80.phase) {
+        switch (g_modal_state.phase) {
         case 0:
-            D_001BAC80.cameraActive = 1;
-            D_001BAC80.phase = 1;
+            g_modal_state.cameraActive = 1;
+            g_modal_state.phase = 1;
             if (D_0018C0D4 != 1)
                 func_PAL_0026F620();
             D_001A8A48 = 0;
             D_001A8A40 = ref_00286738_00;
-            func_00290670();
-            func_00287E60();
+            hud_request_letterbox_bars();
+            menu_set_state_word_three();
             break;
         case 1:
             if (D_0018C0D4 != 1) {
                 func_PAL_0026F620();
-                func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
+                hud_set_slot_contents(0x23, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_PAL_0029D7D0();
             func_PAL_0029C0B8(300);
-            func_0029B698(150);
-            func_00290670();
+            level_forward_value(150);
+            hud_request_letterbox_bars();
             {
                 int remaining = D_001A8A40;
                 if (remaining > 0) {
@@ -632,19 +632,19 @@ acceptReload:
             if (D_001A8A60 < 0)
                 D_001A8A60 = 0;
             if (!D_001A8A60)
-                ++D_001BAC80.phase;
+                ++g_modal_state.phase;
             break;
         case 2:
             if (D_0018C0D4 != 1) {
                 func_PAL_0026F620();
-                func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
+                hud_set_slot_contents(0x23, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_PAL_0029D7D0();
             func_PAL_0029C0B8(300);
-            func_0029B698(150);
-            func_00290670();
+            level_forward_value(150);
+            hud_request_letterbox_bars();
             {
                 int remaining = D_001A8A40;
                 if (remaining > 0) {
@@ -655,19 +655,19 @@ acceptReload:
             }
             if (D_001A8A40 <= 0) {
                 D_001A8A40 = 0;
-                ++D_001BAC80.phase;
+                ++g_modal_state.phase;
             }
             break;
         case 3:
             if (D_0018C0D4 != 1)
                 func_PAL_0026F620();
-            func_00290728();
-            func_00290720();
-            { func_002B4B70(0, 0); break; }
+            hud_clear_flag_b();
+            hud_clear_flag_a();
+            { request_end_slot(0, 0); break; }
         }
         break;
     case 8:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &g_modal_state;
         if (phaseDialog->phase != 2) {
             if (phaseDialog->phase >= 3)
                 break;
@@ -676,19 +676,19 @@ acceptReload:
             ++phaseDialog->phase;
             break;
         }
-        func_002B49E0(3, 2, phaseDialog->selection, 0, 0);
+        request_begin_slot(3, 2, phaseDialog->selection, 0, 0);
         func_PAL_002B5570(3);
         goto advanceModalPhase;
     case 9:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &g_modal_state;
         switch (phaseDialog->phase) {
         case 1:
-            if (D_00138180.pressed & phaseDialog->acceptMask) {
+            if (g_pad_state.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
-                func_002B4B70(0, 0);
-            } else if (D_00138180.held & phaseDialog->cancelMask) {
+                request_end_slot(0, 0);
+            } else if (g_pad_state.held & phaseDialog->cancelMask) {
                 phaseDialog->result = 1;
-                func_002B4B70(0, 0);
+                request_end_slot(0, 0);
             }
             break;
         case 0:
@@ -696,19 +696,19 @@ acceptReload:
         }
         break;
     case 10:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &g_modal_state;
         switch (phaseDialog->phase) {
         case 0:
 initializeDialog:
-            func_00287E80();
+            menu_clear_counter();
 advanceModalPhase:
             ++phaseDialog->phase;
             break;
         case 1:
-            if (D_00138180.pressed & phaseDialog->acceptMask) {
+            if (g_pad_state.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
-                func_002E5E58(0x12, 0, 0);
-                func_002B4B70(0, 0);
+                snd_play_from_global_bank(0x12, 0, 0);
+                request_end_slot(0, 0);
             }
             break;
         default:
@@ -716,56 +716,56 @@ advanceModalPhase:
         }
         break;
     case 11:
-        switch (D_001BAC80.phase) {
+        switch (g_modal_state.phase) {
         case 0:
-            func_00287E80();
-            ++D_001BAC80.phase;
-            if (D_001A7BB8) {
-                D_001A7BB8 = !D_001A7BB8;
-                func_002857B8();
-                { func_002B4B70(0, 0); break; }
+            menu_clear_counter();
+            ++g_modal_state.phase;
+            if (g_widescreen_flag) {
+                g_widescreen_flag = !g_widescreen_flag;
+                gfx_apply_screen_aspect_mode();
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 1:
-            if (D_00138180.pressed & 0x40) {
-                D_001BAC80.result = 2;
-                ++D_001BAC80.phase;
-            } else if (D_00138180.held & 0x10) {
-                D_001BAC80.result = 1;
-                { func_002B4B70(0, 0); break; }
+            if (g_pad_state.pressed & 0x40) {
+                g_modal_state.result = 2;
+                ++g_modal_state.phase;
+            } else if (g_pad_state.held & 0x10) {
+                g_modal_state.result = 1;
+                { request_end_slot(0, 0); break; }
             }
             break;
         case 2:
-            D_001BAC80.elapsed = 750;
-            D_001BAC80.inputDelay = 0;
-            ++D_001BAC80.phase;
-            D_001BAC80.result = 0;
-            D_001A7BB8 = !D_001A7BB8;
-            func_002857B8();
+            g_modal_state.elapsed = 750;
+            g_modal_state.inputDelay = 0;
+            ++g_modal_state.phase;
+            g_modal_state.result = 0;
+            g_widescreen_flag = !g_widescreen_flag;
+            gfx_apply_screen_aspect_mode();
             break;
         case 3:
-            if (D_00138180.pressed & 0x40)
-                D_001BAC80.result = 2;
-            else if (D_00138180.pressed & 0x10)
-                D_001BAC80.result = 1;
-            --D_001BAC80.elapsed;
-            if (D_001BAC80.elapsed <= 0)
+            if (g_pad_state.pressed & 0x40)
+                g_modal_state.result = 2;
+            else if (g_pad_state.pressed & 0x10)
+                g_modal_state.result = 1;
+            --g_modal_state.elapsed;
+            if (g_modal_state.elapsed <= 0)
                 goto advanceConfirmation;
-            if (!D_001BAC80.result)
+            if (!g_modal_state.result)
                 break;
             goto advanceConfirmation;
         case 4:
-            if (D_001BAC80.result < 0)
+            if (g_modal_state.result < 0)
                 goto advanceConfirmation;
-            if (D_001BAC80.result < 2) {
-                D_001A7BB8 = !D_001A7BB8;
-                func_002857B8();
+            if (g_modal_state.result < 2) {
+                g_widescreen_flag = !g_widescreen_flag;
+                gfx_apply_screen_aspect_mode();
             }
 advanceConfirmation:
-            ++D_001BAC80.phase;
+            ++g_modal_state.phase;
             break;
         case 5:
-            func_002B4B70(0, 0);
+            request_end_slot(0, 0);
             break;
         }
         break;

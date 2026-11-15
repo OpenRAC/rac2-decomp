@@ -3,17 +3,17 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 word; float values[4]; } Vec4;
 
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
 /* Updates a streak particle that stretches along its movement and fades out. */
-void func_002C7620(char *self) {
+void part_update_stretched_streak(char *self) {
     Vec4 prevPos, offset;
     char *pos;
     char *motion = self + 0x30;
@@ -21,7 +21,7 @@ void func_002C7620(char *self) {
     int color;
 
     if (FastDecTimer(self + 0xA) != 0) {
-        KillParticle(self);
+        part_kill(self);
         return;
     }
     pos = self + 0x10;

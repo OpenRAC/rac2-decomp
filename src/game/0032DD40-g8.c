@@ -10,30 +10,30 @@ typedef struct {
     int duration;
     int flag;
 } BurstCamera;
-extern BurstCamera D_001B5200;
+extern BurstCamera g_active_camera;
 extern char D_0018A0E0[], D_L00_001FE940[];
 extern char D_001A8BD0[] __attribute__((sda));
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern void func_0032E4F0(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283248(float, float), func_002A78D8(float, float);
-extern float func_002A7878(float, float), func_00283B98(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern char *func_002BDCE8(void *, float, float, float, float, int, void *, int, int);
-extern char *func_002C65A0(void *, void *, int, int, int, int, int, int, float, float, float);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern void cam_set_zoom_effect(float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float mat_fast_helper_a(float, float), math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float), FastAddRotations(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern char *SpawnSpinningSparkParticle(void *, float, float, float, float, int, void *, int, int);
+extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, int, float, float, float);
 /* Alternate typed interleavings preserve the EE integer and FP argument banks. */
 extern char *func_002C65A0_layer(void *, void *, int, int, int, int, int,
                                    float, float, float, int) __asm__("func_002C65A0");
 extern char *func_002BDCE8_smoke(void *, float, float, float, int, float,
                                    void *, int, int) __asm__("func_002BDCE8");
-extern int func_002A7820(int, int), func_00283CF0(float);
-extern float func_00283CE0(int), func_00283180(float), func_00283198(float);
+extern int math_random_int_range(int, int), FloatToInt(float);
+extern float IntToFloat(int), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern float D_001B0804 __attribute__((sda));
 extern float D_001B080C __attribute__((sda));
 extern float D_001B0808 __attribute__((sda));
@@ -58,7 +58,7 @@ extern int D_001B0800 __attribute__((sda));
 extern unsigned char D_001B07F8 __attribute__((sda));
 
 /* Emits three particle groups around the object and sets camera shake when visible. */
-void func_0032DD40(char *self)
+void part_emit_blast_and_shake(char *self)
 {
     float sphere[4], delta[4], center[4], position[4], velocity[4], other[4];
     int i, sign;
@@ -67,39 +67,39 @@ void func_0032DD40(char *self)
 
     qcopy(sphere, self + 0x10);
     sphere[3] = 2;
-    if (FastMathHelperA(sphere, 48) == 1) {
-        SetCameraZoomEffect(fast_vec_dist(self + 0x10, gActiveCamera.position));
-        gActiveCamera.flag = 0;
-        gActiveCamera.duration = 40;
-        gActiveCamera.amplitude = 0.1f;
+    if (math_fast_helper_a(sphere, 48) == 1) {
+        cam_set_zoom_effect(fast_vec_dist(self + 0x10, g_active_camera.position));
+        g_active_camera.flag = 0;
+        g_active_camera.duration = 40;
+        g_active_camera.amplitude = 0.1f;
     }
-    eye = gActiveCamera.position;
+    eye = g_active_camera.position;
     SpawnExplosionEffects(self, D_001A8BD0, self + 0x10, 0, 0, 0, 0, 0, 0, 0, 9, 0, -1, 20, 0, 0, -1, 0, 0x810001);
     FastVecSub(delta, eye, self + 0x10);
     vec_scale_to_length(delta, delta, D_001B0804);
     FastVecAdd(center, self + 0x10, delta);
     qcopy(self + 0x10, center);
-    angle = FastMatrixHelperA(gActiveCamera.position[0] - *(float *)(self + 0x10), gActiveCamera.position[1] - *(float *)(self + 0x14));
+    angle = mat_fast_helper_a(g_active_camera.position[0] - *(float *)(self + 0x10), g_active_camera.position[1] - *(float *)(self + 0x14));
     sign = 1;
     for (i = 0; i < 20; i++) {
         float speed, a, b;
         char *particle, *sub;
 
         sign = -sign;
-        position[0] = center[0] + RandomSignedFloatRange(0, D_001B080C);
-        position[1] = center[1] + RandomSignedFloatRange(0, D_001B080C);
-        position[2] = center[2] + RandomSignedFloatRange(0, D_001B080C);
-        speed = RandomFloatRange(0.016666668f, 0.033333335f);
-        a = RandomSignedFloatRange(0, 1.3962636f);
-        b = RandomSignedFloatRange(0, 1.5707964897155762f);
-        BuildSphericalOffset(velocity, speed, FastAddRotations(angle, b), a);
+        position[0] = center[0] + math_random_signed_float_range(0, D_001B080C);
+        position[1] = center[1] + math_random_signed_float_range(0, D_001B080C);
+        position[2] = center[2] + math_random_signed_float_range(0, D_001B080C);
+        speed = math_random_float_range(0.016666668f, 0.033333335f);
+        a = math_random_signed_float_range(0, 1.3962636f);
+        b = math_random_signed_float_range(0, 1.5707964897155762f);
+        vec_build_spherical_offset(velocity, speed, FastAddRotations(angle, b), a);
         particle = SpawnSpinningSparkParticle(position, 0, 1, 1.01f, D_001B0808 * 210000, sign, velocity, D_001B0810, 1);
         if (particle) {
-            *(short *)(particle + 0xA) = RandomIntRange(40, 70);
+            *(short *)(particle + 0xA) = math_random_int_range(40, 70);
             particle[9] = FloatToInt(4) + 64;
             sub = particle + 0x20;
             *(int *)(sub + 4) = 3;
-            *(float *)(sub + 0x1C) = IntToFloat(RandomIntRange(1, 10));
+            *(float *)(sub + 0x1C) = IntToFloat(math_random_int_range(1, 10));
             sub[0xA] = 64;
             sub[0xB] = particle[0xA];
         }
@@ -110,28 +110,28 @@ void func_0032DD40(char *self)
         char *particle;
         int definitions = (int)D_L00_001FE940;
 
-        count = FloatToInt(RandomSignedFloatRange(2, 5));
-        kind = RandomIntRange(D_001B07A0, D_001B07A4);
-        position[0] = center[0] + RandomSignedFloatRange(0, D_001B079C);
-        position[1] = center[1] + RandomSignedFloatRange(0, D_001B079C);
-        position[2] = center[2] + RandomSignedFloatRange(0, D_001B079C);
-        size = RandomFloatRange(D_001B0780, D_001B0784);
-        speed = RandomFloatRange(D_001B0788, D_001B078C);
-        a = FastAddRotations(angle, RandomSignedFloatRange(0, 1.3962636f));
-        velocity[0] = FastSinOrCosA(a) * 0.016666668f * speed;
-        velocity[1] = FastSinOrCosB(a) * 0.016666668f * speed;
+        count = FloatToInt(math_random_signed_float_range(2, 5));
+        kind = math_random_int_range(D_001B07A0, D_001B07A4);
+        position[0] = center[0] + math_random_signed_float_range(0, D_001B079C);
+        position[1] = center[1] + math_random_signed_float_range(0, D_001B079C);
+        position[2] = center[2] + math_random_signed_float_range(0, D_001B079C);
+        size = math_random_float_range(D_001B0780, D_001B0784);
+        speed = math_random_float_range(D_001B0788, D_001B078C);
+        a = FastAddRotations(angle, math_random_signed_float_range(0, 1.3962636f));
+        velocity[0] = math_fast_sin_or_cos_a(a) * 0.016666668f * speed;
+        velocity[1] = math_fast_sin_or_cos_b(a) * 0.016666668f * speed;
         velocity[2] = 0;
-        velocity[2] = RandomFloatRange(D_001B0790, D_001B0794) * 0.016666668f;
+        velocity[2] = math_random_float_range(D_001B0790, D_001B0794) * 0.016666668f;
         energy = size * 210000;
-        SpawnGravityFadeParticle(position, velocity, kind, 0x7F7F7F, count, 127, 127, 1, energy, 2100, D_001B0798 * 0.00027777778f);
-        other[0] = position[0] + RandomSignedFloatRange(0, 0.01f);
-        other[1] = position[1] + RandomSignedFloatRange(0, 0.01f);
-        other[2] = position[2] + RandomSignedFloatRange(0, 0.01f);
+        part_spawn_gravity_fade(position, velocity, kind, 0x7F7F7F, count, 127, 127, 1, energy, 2100, D_001B0798 * 0.00027777778f);
+        other[0] = position[0] + math_random_signed_float_range(0, 0.01f);
+        other[1] = position[1] + math_random_signed_float_range(0, 0.01f);
+        other[2] = position[2] + math_random_signed_float_range(0, 0.01f);
         func_002C65A0_layer(other, velocity, kind, 0x7F7F7F, -count, 127, 127, energy, 2100, D_001B0798 * 0.00027777778f, 1);
-        particle = SpawnGravityFadeParticle(position, velocity, kind, 0x202080, -(count << 1), 48, 48, 1, size * 1260000, 4200, D_001B0798 * 0.00027777778f);
+        particle = part_spawn_gravity_fade(position, velocity, kind, 0x202080, -(count << 1), 48, 48, 1, size * 1260000, 4200, D_001B0798 * 0.00027777778f);
         if (particle) particle[2] = **(char **)(definitions + 0xD4);
     }
-    FastVecSub(position, gActiveCamera.position, center);
+    FastVecSub(position, g_active_camera.position, center);
     vec_scale_to_length(position, position, 1);
     FastVecAdd(center, center, position);
     {
@@ -141,20 +141,20 @@ void func_0032DD40(char *self)
             int kind, count;
             char *particle, *sub;
 
-            FastVecScale(velocity, D_0018A0E0, -(RandomFloatRange(D_001B07F0, D_001B07F4) * 0.016666668f));
-            kind = RandomIntRange(D_001B07FC, D_001B0800);
-            count = FloatToInt(RandomSignedFloatRange(1, 2));
-            energy = RandomFloatRange(D_001B07E4, D_001B07E8) * 210000;
-            other[0] = center[0] + RandomSignedFloatRange(0, D_001B07EC);
-            other[1] = center[1] + RandomSignedFloatRange(0, D_001B07EC);
-            other[2] = center[2] + RandomSignedFloatRange(0, D_001B07EC);
+            FastVecScale(velocity, D_0018A0E0, -(math_random_float_range(D_001B07F0, D_001B07F4) * 0.016666668f));
+            kind = math_random_int_range(D_001B07FC, D_001B0800);
+            count = FloatToInt(math_random_signed_float_range(1, 2));
+            energy = math_random_float_range(D_001B07E4, D_001B07E8) * 210000;
+            other[0] = center[0] + math_random_signed_float_range(0, D_001B07EC);
+            other[1] = center[1] + math_random_signed_float_range(0, D_001B07EC);
+            other[2] = center[2] + math_random_signed_float_range(0, D_001B07EC);
             particle = func_002BDCE8_smoke(other, 0, 1, 1.01f, count, energy, velocity, 0x7F202020, 1);
             if (particle) {
                 *(short *)(particle + 0xA) = kind;
                 particle[3] = 0x44;
                 particle[9] = FloatToInt(4) + 64;
                 sub = particle + 0x20;
-                *(float *)(sub + 0x1C) = IntToFloat(RandomIntRange(7, 15));
+                *(float *)(sub + 0x1C) = IntToFloat(math_random_int_range(7, 15));
                 *(int *)(sub + 4) = 3;
                 sub[0xA] = D_001B07F8;
                 sub[0xB] = particle[0xA];

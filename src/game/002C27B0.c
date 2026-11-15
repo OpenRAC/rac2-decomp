@@ -1,18 +1,19 @@
+#include "names.h"
 /* func_002C27B0: own unit, the two 16-byte copies are qcopy() so the count at state + 4
  * is read after the first copy, as retail does. */
 #include "common.h"
-extern void func_002B9180(void *);
-extern float func_002A7878(float, float);
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_0029FCC0(int, int, void *);
-extern void func_00282CC0(char *, char *, char *);
+extern void part_kill(void *);
+extern float math_random_float_range(float, float);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_transform_joint_to_world(int, int, void *);
+extern void FastVecAdd(char *, char *, char *);
 
 typedef int V4 __attribute__((mode(TI)));
 
 /* Updates a particle that follows another object. It disappears when that object is gone or dying. */
-void func_002C27B0(char *self)
+void part_update_following_moby(char *self)
 {
     V4 prevPos;
     char *state = self + 0x30;
@@ -31,16 +32,16 @@ void func_002C27B0(char *self)
             goto cont;
     }
 kill:
-    KillParticle(self);
+    part_kill(self);
     return;
 cont:
-    randomFactor = RandomFloatRange(0.5f, 1.0f);
+    randomFactor = math_random_float_range(0.5f, 1.0f);
     savedExtra = *(float *)(self + 0x2C);
     newSize = *(float *)(state + 0xC) * randomFactor;
     qcopy(&prevPos, self + 0x10);
     count = *(int *)(state + 4);
     if (count > 0) {
-        TransformMobyJointToWorld(*(int *)(self + 0x30), count, self + 0x10);
+        moby_transform_joint_to_world(*(int *)(self + 0x30), count, self + 0x10);
     } else {
         qcopy(self + 0x10, (char *)*(int *)(self + 0x30) + 0x10);
     }

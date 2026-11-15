@@ -2,10 +2,10 @@
 
 #include "common.h"
 extern s32  func_32AB10(char *a0);
-extern s32  func_002E5CF8(s32 a0, s32 a1, char *a2);
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
-extern f32  func_002A78D8(f32 a0, f32 a1);
-extern f32  func_00283B98(f32 a0, f32 a1);
+extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern f32  math_random_signed_float_range(f32 a0, f32 a1);
+extern f32  FastAddRotations(f32 a0, f32 a1);
 extern char D_L03_00188660[];
 extern s32  func_312898(s32 a0, s32 a1, void *a2);
 extern u8  *D_L03_001B2A1C;
@@ -42,8 +42,8 @@ void func_PAL_L03_003CFE58(char *a0)
 
     switch (*(u8 *)(s0 + 0x20)) {
     case 0:
-        func_002A7750(s0, 1, -1);
-        *(f32 *)(s1 + 4) = func_002A78D8(60.0f, 90.0f) * 0.0003490659f;
+        moby_set_state(s0, 1, -1);
+        *(f32 *)(s1 + 4) = math_random_signed_float_range(60.0f, 90.0f) * 0.0003490659f;
         *(s32 *)(s1 + 8) = -1;
         break;
     case 1: {
@@ -53,9 +53,9 @@ void func_PAL_L03_003CFE58(char *a0)
             char *p = D_L03_00188660 + *(s32 *)(s1 + 8) * 0x70;
 
             if (*(char **)(p + 0x88) != s0 || *(u8 *)(p + 0x74) == 0)
-                *(s32 *)(s1 + 8) = func_002E5CF8(0, 4, s0);
+                *(s32 *)(s1 + 8) = PlayMobySound(0, 4, s0);
         }
-        *(f32 *)(s0 + 0xF8) = func_00283B98(*(f32 *)(s0 + 0xF8),
+        *(f32 *)(s0 + 0xF8) = FastAddRotations(*(f32 *)(s0 + 0xF8),
             *(f32 *)(s1 + 4));
         break;
     }

@@ -7,17 +7,17 @@
    breaks the link. */
 typedef struct { int index; short uid; signed char state; unsigned char pad; } Link;
 extern char *entity_base_abs[] __asm__("D_L17_001B2C1C") __attribute__((sda));
-extern int D_001A79F0 SDATA(D_001A79F0);
+extern int g_current_map_index SDATA(D_001A79F0);
 extern char *entity_base_gp SDATA(D_L17_001B2C1C);
 extern unsigned char D_0019B2E8[],D_0019B4A8[];
 extern char D_L17_001B1FB8[],D_L17_001B1FE8[],D_L17_001B2018[];
-extern int func_002B38B8(void *),func_00282948(void *),func_00283CF0(float);
-extern void func_L00_003294F0(void *,int),func_0029F338(void *),func_L17_0041F180(void *,void *);
-extern float func_00283CE0(int);
-extern void func_0026FEB8(char *,...);
+extern int flag_is_third_pending_set(void *),math_fast_float_d(void *),FloatToInt(float);
+extern void moby_set_flag_bit(void *,int),moby_mark_spawned(void *),coll_hit_mobys_inside_box(void *,void *);
+extern float IntToFloat(int);
+extern void STUB_printf(char *,...);
 /* Tracks up to five linked entities, syncs the target's position/rotation, and steps the
    target's timed state. */
-void func_L17_0041F478(unsigned char *moby)
+void UpdateLinkedMobyController(unsigned char *moby)
 {
     unsigned char *vars=*(unsigned char **)(moby+0x68),*target;
     Link *row=(Link *)(vars+0x18),*link;
@@ -26,7 +26,7 @@ void func_L17_0041F478(unsigned char *moby)
     if(*(int *)(vars+0x54)!=-1) {
         unsigned char *linked=(unsigned char *)entity_base_abs[0]+(*(int *)(vars+0x10)<<8);
         linked[0x20]=2;
-        if(!IsThirdPendingFlagSet(moby)) {
+        if(!flag_is_third_pending_set(moby)) {
             unsigned short flags=*(unsigned short *)(moby+0x34);
             *(int *)(moby+0x98)=0;
             moby[0x31]=0;
@@ -34,24 +34,24 @@ void func_L17_0041F478(unsigned char *moby)
             return;
         }
         *(int *)(vars+0x54)=-1;
-        SetObjectFlagBit(moby,0);
+        moby_set_flag_bit(moby,0);
         linked[0x20]=1;
     }
     active=0;
     target=0;
     if(*(int *)(vars+0x10)!=-1)target=(unsigned char *)entity_base_abs[0]+(*(int *)(vars+0x10)<<8);
-    if((moby[0xb0]==0xff || !(D_0019B2E8[moby[0xb0]+(gCurrentMapIndex<<4)]&0x80)) && moby[0x20]!=0) {
+    if((moby[0xb0]==0xff || !(D_0019B2E8[moby[0xb0]+(g_current_map_index<<4)]&0x80)) && moby[0x20]!=0) {
         int i;
         link=row;
         for(i=0;i<5;++i,++link) {
             if(link->index==-1)goto next_row;
             {
                 unsigned char *linked=(unsigned char *)entity_base_gp+(link->index<<8);
-                if(IsThirdPendingFlagSet(moby))goto next_row;
+                if(flag_is_third_pending_set(moby))goto next_row;
                 if(!linked || *(short *)(linked+0xaa)!=link->uid || linked[0x20]==0xfe || linked[0x20]==0xfd)goto clear_active;
                 id=*(unsigned short *)(linked+0xb2);
                 half=(short)id;
-                bits=D_0019B4A8[(half>>1)+(gCurrentMapIndex<<10)];
+                bits=D_0019B4A8[(half>>1)+(g_current_map_index<<10)];
                 if(id&1)bits=(bits>>4)&7;else bits&=7;
                 if(bits)goto clear_active;
                 ++active;
@@ -95,7 +95,7 @@ next_row:;
             *(int *)(vars+0x40)=*(int *)(vars+0xc);
             moby[0x20]=2;
         }
-        HitMobysInsideBox(moby,vars);
+        coll_hit_mobys_inside_box(moby,vars);
         break;
     case 2:
         if(target && !(*(int *)(vars+8)&2)) {
@@ -104,12 +104,12 @@ next_row:;
             target[0x23]=FloatToInt(factor);
         }
         if(!(*(int *)(vars+8)&4) && target && *(signed char *)(vars+0x17)!=-1 && target[0x20]==*(signed char *)(vars+0x17))moby[0x20]=3;
-        if(!(*(int *)(vars+8)&8) && FastFloatHelperD(vars+0x40))moby[0x20]=3;
-        HitMobysInsideBox(moby,vars);
+        if(!(*(int *)(vars+8)&8) && math_fast_float_d(vars+0x40))moby[0x20]=3;
+        coll_hit_mobys_inside_box(moby,vars);
         break;
     case 3:
-        if(target && !(*(int *)(vars+8)&1))MarkMobySpawned(target);
-        MarkMobySpawned(moby);
+        if(target && !(*(int *)(vars+8)&1))moby_mark_spawned(target);
+        moby_mark_spawned(moby);
         break;
     case 4:
         break;

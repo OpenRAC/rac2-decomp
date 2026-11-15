@@ -1,21 +1,21 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_0012C3B0(void *);
+extern void mpeg_wait_ipu_idle(void *);
 
 extern void r1_func_0012C468(void *, void *);
 
-extern int func_0012C878(void *, int);
+extern int mpeg_read_bits(void *, int);
 
-extern void func_0012C380(char *, unsigned int);
+extern void mpeg_send_ipu_command(char *, unsigned int);
 
-extern void func_0012D100(void *);
+extern void mpeg_read_quant_matrix_extension(void *);
 
 extern char r1_D_001539E8[];
 
 extern char r1_D_00153A10[];
 
-extern void func_0012D1C8(void *);
+extern void mpeg_read_picture_display_extension(void *);
 
 typedef struct {
     char pad_00[0x13C];
@@ -32,9 +32,9 @@ typedef struct {
     int  f2[3];
 } State;
 
-extern void func_0012D2C0(void *);
+extern void mpeg_skip_copyright_extension(void *);
 
-extern int func_0012B678(void *);
+extern int mpeg_decode_picture(void *);
 
 extern char r1_D_00153A40[];
 
@@ -61,38 +61,38 @@ extern void r1_func_0012C468_a(void *, void *) __asm__("r1_func_0012C468");
  * setting either just logs a warning through r1_func_0012C468.
  */
 /* Reads the quantizer matrix flags of an MPEG video header and tells the video chip to load the matrices. */
-void func_0012D100(void *decoder) {
+void mpeg_read_quant_matrix_extension(void *decoder) {
     char *dec = (char *)decoder;
     int loadFlag;
 
-    loadFlag = ReadMpegBits(dec, 1);        /* load_intra_quantizer_matrix */
+    loadFlag = mpeg_read_bits(dec, 1);        /* load_intra_quantizer_matrix */
     *(int *)(dec + 0x840) = loadFlag;
     if (loadFlag != 0) {
-        WaitIpuIdle(dec);
-        SendIpuCommand(dec, 0x50000000);
-        WaitIpuIdle(dec);
+        mpeg_wait_ipu_idle(dec);
+        mpeg_send_ipu_command(dec, 0x50000000);
+        mpeg_wait_ipu_idle(dec);
     }
 
-    loadFlag = ReadMpegBits(dec, 1);        /* load_non_intra_quantizer_matrix */
+    loadFlag = mpeg_read_bits(dec, 1);        /* load_non_intra_quantizer_matrix */
     *(int *)(dec + 0x844) = loadFlag;
     if (loadFlag != 0) {
-        WaitIpuIdle(dec);
-        SendIpuCommand(dec, 0x58000000);
-        WaitIpuIdle(dec);
+        mpeg_wait_ipu_idle(dec);
+        mpeg_send_ipu_command(dec, 0x58000000);
+        mpeg_wait_ipu_idle(dec);
     }
 
-    if (ReadMpegBits(dec, 1) != 0) {    /* load_chroma_intra_quantizer_matrix */
+    if (mpeg_read_bits(dec, 1) != 0) {    /* load_chroma_intra_quantizer_matrix */
         r1_func_0012C468(dec, r1_D_001539E8);
     }
 
-    if (ReadMpegBits(dec, 1) != 0) {    /* load_chroma_non_intra_quantizer_matrix */
+    if (mpeg_read_bits(dec, 1) != 0) {    /* load_chroma_non_intra_quantizer_matrix */
         r1_func_0012C468(dec, r1_D_00153A10);
     }
 }
 
 /* rac1-decomp src/core/00125630.c: func_001293A8 */
 /* Reads the display offsets of an MPEG picture header into the video decoder. */
-void func_0012D1C8(void *decoderArg) {
+void mpeg_read_picture_display_extension(void *decoderArg) {
     State *dec = (State *)decoderArg;
     int offsetCount;
     int i;
@@ -112,10 +112,10 @@ void func_0012D1C8(void *decoderArg) {
     }
 
     for (i = 0; i < offsetCount; i++) {
-        dec->f1[i] = ReadMpegBits(dec, 0x10);
-        ReadMpegBits(dec, 1);
-        dec->f2[i] = ReadMpegBits(dec, 0x10);
-        ReadMpegBits(dec, 1);
+        dec->f1[i] = mpeg_read_bits(dec, 0x10);
+        mpeg_read_bits(dec, 1);
+        dec->f2[i] = mpeg_read_bits(dec, 0x10);
+        mpeg_read_bits(dec, 1);
     }
 }
 
@@ -129,17 +129,17 @@ void func_0012D1C8(void *decoderArg) {
  * one, its value discarded, becomes 2.9-ee's bare tail jump.
  */
 /* Skips over the copyright information in an MPEG video header. */
-void func_0012D2C0(void *decoder) {
-    ReadMpegBits(decoder, 1);   /* copyright_flag */
-    ReadMpegBits(decoder, 8);   /* copyright_identifier */
-    ReadMpegBits(decoder, 1);   /* original_or_copy */
-    ReadMpegBits(decoder, 7);   /* reserved */
-    ReadMpegBits(decoder, 1);   /* marker_bit */
-    ReadMpegBits(decoder, 20);  /* copyright_number_1 */
-    ReadMpegBits(decoder, 1);   /* marker_bit */
-    ReadMpegBits(decoder, 22);  /* copyright_number_2 */
-    ReadMpegBits(decoder, 1);   /* marker_bit */
-    ReadMpegBits(decoder, 22);  /* copyright_number_3 */
+void mpeg_skip_copyright_extension(void *decoder) {
+    mpeg_read_bits(decoder, 1);   /* copyright_flag */
+    mpeg_read_bits(decoder, 8);   /* copyright_identifier */
+    mpeg_read_bits(decoder, 1);   /* original_or_copy */
+    mpeg_read_bits(decoder, 7);   /* reserved */
+    mpeg_read_bits(decoder, 1);   /* marker_bit */
+    mpeg_read_bits(decoder, 20);  /* copyright_number_1 */
+    mpeg_read_bits(decoder, 1);   /* marker_bit */
+    mpeg_read_bits(decoder, 22);  /* copyright_number_2 */
+    mpeg_read_bits(decoder, 1);   /* marker_bit */
+    mpeg_read_bits(decoder, 22);  /* copyright_number_3 */
 }
 
 /* rac1-decomp src/core/00125630.c: func_00129530 */
@@ -161,7 +161,7 @@ void func_0012D2C0(void *decoder) {
  * the memory re-read is exact under 2.9-ee too.
  */
 /* Picks the frame buffer for the current MPEG picture, decodes it and marks it ready. */
-int func_0012D350(void *decoder) {
+int mpeg_decode_picture_data(void *decoder) {
     char *dec = decoder;
     int state = *(int *)(dec + 0x174);
     char *target;
@@ -187,7 +187,7 @@ int func_0012D350(void *decoder) {
         r1_func_0012C468(dec, r1_D_00153A60);
         break;
     }
-    result = DecodeMpegPicture(dec);
+    result = mpeg_decode_picture(dec);
     if (result != 0) {
         *(int *)(target + 0x28) = 1;
     }
@@ -196,7 +196,7 @@ int func_0012D350(void *decoder) {
 
 /* rac1-decomp src/core/00125630.c: func_00129600 */
 /* Decodes the pending MPEG picture into its frame buffer and advances the decoder state. */
-void func_0012D420(void *decoder, int sliceCount, int doDecode) {
+void mpeg_finish_picture_decode(void *decoder, int sliceCount, int doDecode) {
     char *dec = (char *)decoder;
     int bufA, bufB;
 
@@ -230,7 +230,7 @@ void func_0012D420(void *decoder, int sliceCount, int doDecode) {
 
 /* rac1-decomp src/core/00125630.c: func_0012D4B0 */
 /* Picks and prepares the next MPEG frame buffers, then fills in the picture record. Returns 1 when a picture is ready. */
-int func_0012D4B0(void *p, int swapBuffers) {
+int mpeg_prepare_frame_buffers(void *p, int swapBuffers) {
     char *record;
     int ready;
     int fieldCount;
@@ -336,7 +336,7 @@ int func_0012D4B0(void *p, int swapBuffers) {
    against +0xE4. On a refusal, format the two figures into the message
    at r1_D_00153A80 and report it. Returns whether it fits. */
 /* Checks that a picture fits in the decoder memory and reports an error if not. */
-int func_0012D768(void *decoder, void *picture) {
+int mpeg_check_picture_fits_heap(void *decoder, void *picture) {
     char buf[0x100];
     char *dec = (char *)decoder;
     char *pic = (char *)picture;

@@ -7,13 +7,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 /* Sets the object's state to 7, then copies the 16-byte vector at A1 into its state at +0xF0. */
 /* Makes the enemy start falling, pushed with the given speed. */
-void func_L02_003CADA8(char *self, char *velocity) {
+void path_enemy_start_fall(char *self, char *velocity) {
     char *state = *(char **)(self + 0x68);
 
-    SetMobyState(self, 7, -1);
+    moby_set_state(self, 7, -1);
     *(TI128 *)(state + 0xF0) = *(TI128 *)velocity;
 }

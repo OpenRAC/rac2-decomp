@@ -3,15 +3,15 @@ typedef struct { float x, y, z, w; } __attribute__((aligned(16))) RegionPoint;
 typedef struct { int id; unsigned char links[4]; unsigned char edges[4]; int reserved; RegionPoint sphere; } RegionRecord;
 typedef struct { int count; int reserved[3]; RegionPoint points[0]; } RegionGeometry;
 extern float (*D_L03_001FE700[])[4];
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282A88(void *, int);
-extern int func_L02_00349BD8(int, int, int *, int *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282E80(void *, void *);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void mem_fast_helper_b(void *, int);
+extern int path_find_touching_polygon_corners(int, int, int *, int *);
+extern void FastVecScale(void *, void *, float);
+extern float vec_distance_xy(void *, void *);
 
 /* Takes a list of region ids, keeps the ones that connect to each other, links neighbours together and gives each region a bounding sphere. Returns how many regions were kept. */
-int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacity) {
+int path_build_region_link_graph(void *unused, int *ids, RegionRecord *records, int capacity) {
     unsigned char depth[256];
     RegionPoint center;
     unsigned int visited;
@@ -21,7 +21,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     int sourceEdge, targetEdge;
     RegionGeometry *geometry;
     float distance;
-    FastMemoryHelperB(depth, 0x100);
+    mem_fast_helper_b(depth, 0x100);
     depth[0] = pass;
     visited = (unsigned int)depth;
     { int i, j;
@@ -35,7 +35,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
                         continue;
                     if (ids[j] == -1)
                         break;
-                    if (FindTouchingPolygonCorners(ids[i], ids[j], &sourceEdge, &targetEdge)) {
+                    if (path_find_touching_polygon_corners(ids[i], ids[j], &sourceEdge, &targetEdge)) {
                         changed = 1;
                         *(unsigned char *)(visited + j) = pass + 1;
                     }
@@ -60,7 +60,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     { int i, j, k;
     for (i = 0; i < count; i++) {
         for (j = i + 1; j < count; j++) {
-            if (FindTouchingPolygonCorners(records[i].id, records[j].id, &edgeA, &edgeB)) {
+            if (path_find_touching_polygon_corners(records[i].id, records[j].id, &edgeA, &edgeB)) {
                 ((RegionGeometry *)D_L03_001FE700[records[i].id])->points[edgeA].w = 0;
                 ((RegionGeometry *)D_L03_001FE700[records[j].id])->points[edgeB].w = 0;
                 /* Entered at its test: loop.c leaves a loop entered from outside alone. */
@@ -94,7 +94,7 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     { int i, j, k;
     for (i = 0; i < count; i++) {
         geometry = (RegionGeometry *)D_L03_001FE700[records[i].id];
-        ClearVector128(&center);
+        vec_clear_128(&center);
         for (j = 0; j < geometry->count; j++)
             FastVecAdd(&center, &center, &geometry->points[j]);
         FastVecScale(&center, &center, 1.0f / (float)geometry->count);

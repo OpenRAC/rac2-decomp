@@ -1,12 +1,12 @@
 #include "common.h"
-extern void func_00282D30(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282DD8(void *, const void *, const void *);
-extern float func_00282DF0(const void *);
+extern void FastVecScale(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void FastVecCross(void *, const void *, const void *);
+extern float FastVecLength(const void *);
 /* Optional final argument is a 40-byte hit packet; both probes pass null. */
-extern int func_002761F8(const void *, const void *, int, void *, const void *);
-extern float func_00283B98(float, float), func_00283BE0(float, float);
+extern int CollLine(const void *, const void *, int, void *, const void *);
+extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
 extern unsigned char D_L04_001BFAE0[];
 
 typedef struct {
@@ -16,7 +16,7 @@ typedef struct {
 } CollisionSteeringHit;
 
 /* Steers a projectile away from walls by probing ahead and below it, then nudging its turn and climb. */
-void func_L04_003FA350(char *projectile, float *heading, float *pitch)
+void projectile_steer_around_walls(char *projectile, float *heading, float *pitch)
 {
     float probe[4] __attribute__((aligned(16)));
     float vector[4] __attribute__((aligned(16)));

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_004098C0, the PAL copy of func_L00_00404ED8: the same C, with the
    per-frame float rates and the puff's life range at 50 Hz, and the particle's
    life scaled as it is passed. */
@@ -5,21 +6,21 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_002A7878(float lo, float hi);
-extern float func_002A78D8(float a, float b);
-extern int func_002A7820(int lo, int hi);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, float scale);
+extern float math_random_float_range(float lo, float hi);
+extern float math_random_signed_float_range(float a, float b);
+extern int math_random_int_range(int lo, int hi);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, float scale);
 
 typedef union { TI128 q; float f[4]; } Vec;
-extern float func_00282DF0(void *v);
-extern float func_00283CE0(int n);
-extern int func_00283CF0(float f);
+extern float FastVecLength(void *v);
+extern float IntToFloat(int n);
+extern int FloatToInt(float f);
 extern int func_001163B0(void);
-extern int func_002A77E0(int n);
-extern void func_00282D30(void *out, void *v, float scale);
-extern void func_002ACB48(void *v, float f);
+extern int math_random_int_below(int n);
+extern void FastVecScale(void *out, void *v, float scale);
+extern void vec_add_random_offset(void *v, float f);
 extern char *func_PAL_002C23B8(void *pos, void *vel, int life, int alpha, unsigned int colour, int n,
                            float a, float b, float c, float d, float e);
 extern char *func_PAL_002BD790(void *pos, void *vel, unsigned int colour, int a, int life, int b, int c,
@@ -52,22 +53,22 @@ void func_PAL_L00_004098C0(char *obj, Vec *a, Vec *b)
 
     from->q = a->q;
     to->q = b->q;
-    length = func_00282DF0(ctx);
-    count = func_00283CF0(length * 10.0f);
+    length = FastVecLength(ctx);
+    count = FloatToInt(length * 10.0f);
     qcopy(&point, to);
-    func_00282CF0(&step, from, to);
-    scale = func_00283CE0(count);
-    func_00282F20(&step, &step, length / scale);
+    FastVecSub(&step, from, to);
+    scale = IntToFloat(count);
+    vec_scale_to_length(&step, &step, length / scale);
     tbl = D_L00_001FE940;
     if (count > 0) do {
-        n = func_00283CF0(func_002A78D8(1.0f, 3.0f));
-        drift = -(func_002A7878(0.1f, 0.2f) * 0.020000001f);
-        func_00282D30(&vel, &D_0018A0E0, drift);
-        life = func_002A7820(30, 45);
-        speed = -func_002A7878(500.0f, 1000.0f);
+        n = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
+        drift = -(math_random_float_range(0.1f, 0.2f) * 0.020000001f);
+        FastVecScale(&vel, &D_0018A0E0, drift);
+        life = math_random_int_range(30, 45);
+        speed = -math_random_float_range(500.0f, 1000.0f);
         pickSegmentAlpha(&alpha);
         particle = func_PAL_002C23B8(&point, &vel, (life * 5 + 2) / 6, alpha, 0x407fff, n, 42000.0f, speed, 1.0f, 0.0f, 0.0f);
-        func_00282CC0(&point, &point, &step);
+        FastVecAdd(&point, &point, &step);
         if (particle) {
             particle[2] = **(unsigned char **)(tbl + 92);
             if (alpha == 64)
@@ -76,13 +77,13 @@ void func_PAL_L00_004098C0(char *obj, Vec *a, Vec *b)
                 particle[3] = 68;
         }
     } while (--count);
-    if (func_002A77E0(4) == 0) {
+    if (math_random_int_below(4) == 0) {
         char *puff;
 
-        func_00282D30(&extra, ctx, -0.040000003f);
-        func_002ACB48(&extra, 0.020000001f);
+        FastVecScale(&extra, ctx, -0.040000003f);
+        vec_add_random_offset(&extra, 0.020000001f);
         extra.f[2] += 0.030000001f;
-        life = func_002A7820(25, 37);
+        life = math_random_int_range(25, 37);
         puff = func_PAL_002BD790(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
         if (puff) {
             *(float *)(puff + 44) = 0.0024f;

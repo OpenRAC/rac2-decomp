@@ -3,12 +3,12 @@
 #include "common.h"
 typedef struct { int v[5]; } B1202Five;
 extern B1202Five D_L04_001B09B0, D_L04_001B09C8, D_L04_001B09E0, D_L04_001B09F8;
-extern int D_L04_001A8FE8 __attribute__((sda));
+extern int g_race_time_ticks __attribute__((sda));
 extern unsigned char *D_L04_001A904C;
 typedef struct { unsigned char pad[0xb0]; float tan_half; } ProjectionState;
 extern ProjectionState D_L04_001BDB80;
 extern float D_L04_001B2D44;
-extern int D_001A7B90;
+extern int g_is_pal_video;
 extern int D_L04_001B2D40;
 
 /* Upstream's hud_coord (src/game/00326A10-g8.c), unchanged, with this level's display-mode global.
@@ -23,16 +23,16 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
         scaled = 1.0f;
     return result;
 }
-extern int func_00283D38(int,int,float);
-extern float func_00283198(float),func_00283180(float);
-extern void func_0027AB40(void);
-extern int func_00336D50(char *,int);
+extern int FastTweenColor(int,int,float);
+extern float math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float);
+extern void UpdateViewContext(void);
+extern int table_find_by_id(char *,int);
 /* Typed interleaving (docs/build/compiler-notes.md, "Source methods shared with RAC1"): the same two
    integer and five float arguments, in the same order within each register bank. */
-extern void func_00300A00(int,float,int,float,float,float,float);
-extern void func_002FC560(int,unsigned long long);
+extern void gfx_draw_scaled_object_two_axes(int,float,int,float,float,float,float);
+extern void VU1_addGSregister(int,unsigned long long);
 /* Draws the race banner: five fading coloured markers and the icons at the left and right sides of the screen. */
-void func_L04_0040C880(unsigned char *controller)
+void hud_draw_race_banner(unsigned char *controller)
 {
     B1202Five x = D_L04_001B09B0;
     B1202Five y = D_L04_001B09C8;
@@ -45,7 +45,7 @@ void func_L04_0040C880(unsigned char *controller)
     float angle, sine, sign, leftX, innerX;
     int one, top, off;
     if (controller[0xbc]==3 || controller[0xbc]==4 || controller[0xbc]==1 || controller[0xbc]==2) frame=150-*(int *)(vars+0x394);
-    else frame=gRaceTimeTicks+150;
+    else frame=g_race_time_ticks+150;
     if (!D_L04_001A904C) return;
     for(i=0;i<5;i++) {
         if(i==4) { fadeInStart=120;fadeInEnd=149;do{fadeOutStart=156;}while(0);fadeOutEnd=171; }
@@ -59,8 +59,8 @@ void func_L04_0040C880(unsigned char *controller)
     i=0;
     off=0x8710;
     angle=0.56217057f;
-    sine=FastSinOrCosB(angle);
-    sine=sine/FastSinOrCosA(angle);
+    sine=math_fast_sin_or_cos_b(angle);
+    sine=sine/math_fast_sin_or_cos_a(angle);
     D_L04_001BDB80.tan_half=sine;
     UpdateViewContext();
 
@@ -68,17 +68,17 @@ void func_L04_0040C880(unsigned char *controller)
     for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
         leftX=(float)j;
-        bannerSprite=FindTableEntryById((char *)D_L04_001A904C+off,58);
+        bannerSprite=table_find_by_id((char *)D_L04_001A904C+off,58);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        DrawScaledObjectTwoAxes(bannerSprite,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
-        sprite=FindTableEntryById((char *)D_L04_001A904C+off,59);
+        gfx_draw_scaled_object_two_axes(bannerSprite,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
+        sprite=table_find_by_id((char *)D_L04_001A904C+off,59);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        DrawScaledObjectTwoAxes(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
-        sprite=FindTableEntryById((char *)D_L04_001A904C+off,60);
-        DrawScaledObjectTwoAxes(sprite,leftX,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
+        gfx_draw_scaled_object_two_axes(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
+        sprite=table_find_by_id((char *)D_L04_001A904C+off,60);
+        gfx_draw_scaled_object_two_axes(sprite,leftX,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
         innerX=(float)right;
         for(j=0;j<5;j++) {
-            DrawScaledObjectTwoAxes(FindTableEntryById((char *)D_L04_001A904C+0x8710,61),innerX,colors[j],(float)(gIsPalVideo?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
+            gfx_draw_scaled_object_two_axes(table_find_by_id((char *)D_L04_001A904C+0x8710,61),innerX,colors[j],(float)(g_is_pal_video?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
         }
         VU1_addGSregister(71,0x5360b);
     }
@@ -86,8 +86,8 @@ void func_L04_0040C880(unsigned char *controller)
         float turn, ratio;
         turn=*(float *)(vars+0x28c);
         turn*=0.008726647f;
-        ratio=FastSinOrCosB(turn);
-        ratio=ratio/FastSinOrCosA(turn);
+        ratio=math_fast_sin_or_cos_b(turn);
+        ratio=ratio/math_fast_sin_or_cos_a(turn);
         D_L04_001BDB80.tan_half=ratio;
         UpdateViewContext();
     }

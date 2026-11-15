@@ -1,21 +1,21 @@
 #include "common.h"
 
-extern char D_L00_0022F7C0[];
+extern char g_purchase_menu_model[];
 extern float D_L00_001B25E0[] __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
-extern int D_001A7340[] __attribute__((sda)), D_001A7344[] __attribute__((sda));
-extern void func_002FC620(int, int, int, int);
-extern int func_00282C30(int);
-extern void func_00285548(int, int, int, int, int, int, unsigned int);
-extern int func_0028E588(int, int);
-extern double func_001234F0(float);
-extern int func_00123028(double, double);
-extern double func_00122A98(double, double);
-extern int func_00123130(double);
-extern int func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int g_is_pal_video[] __attribute__((sda));
+extern int g_screen_width[] __attribute__((sda)), g_screen_height[] __attribute__((sda));
+extern void gfx_set_scissor_clamped(int, int, int, int);
+extern int subtract_integer_with_clamp(int);
+extern void DrawFramebufferRect(int, int, int, int, int, int, unsigned int);
+extern int GetIconFrame(int, int);
+extern double __extendsfdf2(float);
+extern int __cmpdf2(double, double);
+extern double __subdf3(double, double);
+extern int __fixdfsi(double);
+extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 
 /* Draws the row of item icons with a pulsing highlight box around the selected one, fading them at the edges. */
-void func_L00_00376600(void) {
+void shop_draw_item_icon_strip(void) {
     unsigned int colors[4];
     char *model;
     int top;
@@ -37,39 +37,39 @@ void func_L00_00376600(void) {
     double distance;
     unsigned int tint;
     initial_y = (int)(D_L00_001B25E0[0] * 185.0f + 0.5f);
-    initial_y += gIsPalVideo[0] ? 4 : 0;
-    SetGsScissorClamped(48, 298, (int)(D_L00_001B25E0[0] * 120.0f + 0.5f), initial_y);
-    scroll = gPurchaseMenuModel;
+    initial_y += g_is_pal_video[0] ? 4 : 0;
+    gfx_set_scissor_clamped(48, 298, (int)(D_L00_001B25E0[0] * 120.0f + 0.5f), initial_y);
+    scroll = g_purchase_menu_model;
     if (*(int *)(scroll + 0x6C) < 0) *(int *)(scroll + 0x6C) += 4;
     else if (*(int *)(scroll + 0x6C) > 0) *(int *)(scroll + 0x6C) -= 4;
-    model = gPurchaseMenuModel;
+    model = g_purchase_menu_model;
     pulse = subtract_integer_with_clamp(((*(int *)(model + 4) * 4) & 63) - 32) + 64;
     if (*(int *)(model + 0x144 + *(int *)(model + 0x80) * 12) > 0) {
         shade = pulse * 0x10202;
         outer_top = (int)(D_L00_001B25E0[0] * 123.0f + 0.5f);
         outer_bottom = (int)(D_L00_001B25E0[0] * 179.0f + 0.5f);
-        outer_top += gIsPalVideo[0] ? 4 : 0; outer_bottom += gIsPalVideo[0] ? 4 : 0;
-        DrawFramebufferRect(101, outer_top, 157, outer_bottom, gScreenWidth[0], gScreenHeight[0],
+        outer_top += g_is_pal_video[0] ? 4 : 0; outer_bottom += g_is_pal_video[0] ? 4 : 0;
+        DrawFramebufferRect(101, outer_top, 157, outer_bottom, g_screen_width[0], g_screen_height[0],
                       shade | 0x80000000u);
         inner_top = (int)(D_L00_001B25E0[0] * 125.0f + 0.5f);
         inner_bottom = (int)(D_L00_001B25E0[0] * 177.0f + 0.5f);
-        inner_top += gIsPalVideo[0] ? 4 : 0; inner_bottom += gIsPalVideo[0] ? 4 : 0;
-        DrawFramebufferRect(103, inner_top, 155, inner_bottom, gScreenWidth[0], gScreenHeight[0], 0x80442D00);
+        inner_top += g_is_pal_video[0] ? 4 : 0; inner_bottom += g_is_pal_video[0] ? 4 : 0;
+        DrawFramebufferRect(103, inner_top, 155, inner_bottom, g_screen_width[0], g_screen_height[0], 0x80442D00);
     }
     x = *(int *)(model + 0x6C) - 63;
     for (relative = -3; relative < 5; relative++, x += 56) {
-        loop_model = gPurchaseMenuModel;
+        loop_model = g_purchase_menu_model;
         slot = relative + *(int *)(loop_model + 0x80);
         if (slot < 0) continue;
         if (slot >= *(int *)(loop_model + 0x740)) continue;
         tint = 0xF0F0B0;
-        handle = GetIconFrame(*(int *)(gPurchaseMenuModel + 0x140 + slot * 12), 0);
-        distance = FloatToDouble(150.0f - (float)(x + 2));
-        if (CompareDoubles(distance, 0.0) < 0) distance = SubtractDoubles(0.0, distance);
-        first_alpha = 128 - DoubleToInt(distance);
-        distance = FloatToDouble(150.0f - (float)(x + 40));
-        if (CompareDoubles(distance, 0.0) < 0) distance = SubtractDoubles(0.0, distance);
-        second_alpha = 128 - DoubleToInt(distance);
+        handle = GetIconFrame(*(int *)(g_purchase_menu_model + 0x140 + slot * 12), 0);
+        distance = __extendsfdf2(150.0f - (float)(x + 2));
+        if (__cmpdf2(distance, 0.0) < 0) distance = __subdf3(0.0, distance);
+        first_alpha = 128 - __fixdfsi(distance);
+        distance = __extendsfdf2(150.0f - (float)(x + 40));
+        if (__cmpdf2(distance, 0.0) < 0) distance = __subdf3(0.0, distance);
+        second_alpha = 128 - __fixdfsi(distance);
         if (first_alpha < 0) first_alpha = 0;
         if (second_alpha < 0) second_alpha = 0;
         first_alpha <<= 24;
@@ -79,7 +79,7 @@ void func_L00_00376600(void) {
         colors[3] = second_alpha | tint;
         colors[2] = first_alpha | tint;
         y = (int)(D_L00_001B25E0[0] * 129.0f + 0.5f);
-        y += gIsPalVideo[0] ? 4 : 0;
-        DrawHudSpriteGradient(handle, x + 2, y, 40, (int)(D_L00_001B25E0[0] * 40.0f + 0.5f), colors);
+        y += g_is_pal_video[0] ? 4 : 0;
+        hud_draw_sprite_gradient(handle, x + 2, y, 40, (int)(D_L00_001B25E0[0] * 40.0f + 0.5f), colors);
     }
 }

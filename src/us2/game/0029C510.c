@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_0034B000(void *, int);
+extern void menu_set_flag_restart_fades(void *, int);
 
 void func_US2_0029C510(int value) {
     if (D_001A8CFC[0] != 0)
-        func_0034B000(D_001A8CFC[0] + 0x37ED0, value);
+        menu_set_flag_restart_fades(D_001A8CFC[0] + 0x37ED0, value);
 }
 
 typedef int BatchA_A08_s32;

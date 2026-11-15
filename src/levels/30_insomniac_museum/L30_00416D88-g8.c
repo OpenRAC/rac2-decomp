@@ -12,7 +12,7 @@ extern float D_L30_001B1FAC __attribute__((sda));
 extern int D_L30_001B1F08 __attribute__((sda)), D_L30_001B1F0C __attribute__((sda));
 extern char D_L30_001A8F20[] __attribute__((sda)) NOT_SDA;
 /* Spawns a museum projectile with a given velocity, points it along its flight direction and adds a trail of particles. */
-char *func_L30_00416D88(char *owner, float *velocity, void *position, int type, float scale) {
+char *museum_projectile_spawn(char *owner, float *velocity, void *position, int type, float scale) {
     char *moby = func_316A50(0x11EA /* moby class 4586 */);
     char *vars;
     float angle, size;

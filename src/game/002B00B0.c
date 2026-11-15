@@ -6,7 +6,7 @@ typedef unsigned char QwenRecovery_00beefd949f6_AbiByte15;
 
 typedef unsigned long long QwenRecovery_00beefd949f6_AbiFlag15;
 
-extern void func_002AFFD8(QwenRecovery_00beefd949f6_AbiByte15 *input, float *output, QwenRecovery_00beefd949f6_AbiFlag15 mode);
+extern void cam_compute_view_direction(QwenRecovery_00beefd949f6_AbiByte15 *input, float *output, QwenRecovery_00beefd949f6_AbiFlag15 mode);
 
 extern void func_002AFFD8_1(void *a, void *b, int c);
 
@@ -24,7 +24,7 @@ extern char D_L00_001A9000[] __attribute__((sda));
 
 extern float func_00282E48_1(char *a, char *b);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
 extern void func_00282DD8_2(void *, void *, void *);
 
@@ -32,11 +32,11 @@ extern void func_00282D30_12(void *, void *, float);
 
 extern float func_00282DF0_1(void *);
 
-extern float func_00282C10(float);
+extern float square_root(float);
 
-extern void func_00283958(void *, void *);
+extern void quaternion_to_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 extern void func_00282AB0_1(void *, void *, int);
 
@@ -56,7 +56,7 @@ extern void func_00282CC0_11(float *dst, float *src, float *arg);
 
 extern int D_L00_001A8FF0_1 __attribute__((sda));
 
-extern void func_00273730(char *self, int a1, int a2, int a3, char *p4, char *p5,
+extern void cam_moby_create(char *self, int a1, int a2, int a3, char *p4, char *p5,
                     float *buf, int b3, float fa, float fb);
 
 typedef int s32;
@@ -70,16 +70,16 @@ extern unsigned char D_19B278[];
 extern int F9a90bcc4_FUN_002A77E0(int count);
 
 /* Finds which way gravity pulls at an object's position and stores that direction. */
-void func_002B00B0(QwenRecovery_00beefd949f6_AbiByte15 *object, float *direction, QwenRecovery_00beefd949f6_AbiFlag15 mode)
+void gravity_get_dir_at_object(QwenRecovery_00beefd949f6_AbiByte15 *object, float *direction, QwenRecovery_00beefd949f6_AbiFlag15 mode)
 {
-    ComputeViewDirection(object + 0x10, direction, mode);
+    cam_compute_view_direction(object + 0x10, direction, mode);
     return;
 }
 
 
 /* If the linked global word is zero, stores (second_float_field - f) into the first object's float field; otherwise runs a three-call path over a 16-byte local buffer. */
 /* Moves a position by a distance along the local gravity direction, or straight down when gravity is flat. */
-void func_002B00D8(void *position, float *result, float *base, float distance)
+void gravity_offset_position(void *position, float *result, float *base, float distance)
 {
     float gravityDir[4];
 
@@ -93,8 +93,8 @@ void func_002B00D8(void *position, float *result, float *base, float distance)
 }
 
 /* Same as the position version, but starts from an object's own position. */
-void func_002B0158(char *object, float *result, float *base, float distance) {
-    OffsetPositionAlongGravity(object + 0x10, result, base, distance);
+void gravity_offset_object_position(char *object, float *result, float *base, float distance) {
+    gravity_offset_position(object + 0x10, result, base, distance);
 }
 
 /* func_002B0178 is defined in 002B0178.c. */
@@ -102,7 +102,7 @@ void func_002B0158(char *object, float *result, float *base, float distance) {
 
 /* Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result. */
 /* Gives how far a position is from the gravity centre, flipped around 100 when the other mode is on. */
-float func_002B0360(char *position)
+float gravity_get_center_distance(char *position)
 {
     float height;
 
@@ -114,19 +114,19 @@ float func_002B0360(char *position)
     return height;
 }
 
-extern void func_00282D30(void *, void *, float);
-extern void func_002B0408(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void mat_align_to_dir(void *, void *, void *);
 
 /* Turns a rotation so that it lines up with the opposite of the given direction. */
-void func_002B03B8(void *rotation, void *direction, void *outMatrix) {
+void mat_align_to_down_dir(void *rotation, void *direction, void *outMatrix) {
     float negated[4];
     FastVecScale(negated, direction, -1.0f);
-    AlignRotationToDirection(rotation, negated, outMatrix);
+    mat_align_to_dir(rotation, negated, outMatrix);
 }
 
 /* Builds a 4-float value from a unit seed and a 0.5f-scaled blend against a region 32 bytes into the first argument, squares a scalar returned by a fourth callee, stores the negated complement of that square into a fifth word, converts the value into a 48-byte record and copies that record into the third argument when it is non-null. */
 /* Turns a rotation so that its up axis lines up with the given direction. */
-void func_002B0408(void *rotation, void *direction, void *outMatrix)
+void mat_align_to_dir(void *rotation, void *direction, void *outMatrix)
 {
     float basis[12];
     float axis[4];
@@ -145,19 +145,19 @@ void func_002B0408(void *rotation, void *direction, void *outMatrix)
 }
 
 
-extern void func_002AFDD8(char *a0, char *a1, char *a2, char *a3);
-extern float func_00283248(float a, float b);
+extern void vec_transform_by_object_or_given(char *a0, char *a1, char *a2, char *a3);
+extern float mat_fast_helper_a(float a, float b);
 
 typedef int V4_002B04E0 __attribute__((mode(TI)));
 
 /* Works out the heading angle of a vector as seen from an object. */
-float func_002B04E0(char *object, float *vector, char *extra)
+float vec_get_heading_angle(char *object, float *vector, char *extra)
 {
     float localVec[4];
 
     *(V4_002B04E0 *)localVec = *(V4_002B04E0 *)vector;
-    TransformVectorByObjectOrGiven(object, (char *)localVec, (char *)localVec, extra);
-    return FastMatrixHelperA(localVec[0], localVec[1]);
+    vec_transform_by_object_or_given(object, (char *)localVec, (char *)localVec, extra);
+    return mat_fast_helper_a(localVec[0], localVec[1]);
 }
 
 
@@ -167,7 +167,7 @@ float func_002B04E0(char *object, float *vector, char *extra)
 
 /* Calls one float-conversion helper on (a0 %% a1) and again on a1, then returns 2*pi times the quotient minus pi. */
 /* Turns a step number out of a total into an evenly spaced angle between minus pi and pi. */
-float func_002B08A8(int index, int count)
+float math_get_even_angle(int index, int count)
 {
     float part = func_00283CE0_2(index % count);
     float whole = func_00283CE0_2(count);
@@ -175,26 +175,26 @@ float func_002B08A8(int index, int count)
     return 2.0f * part * 3.1415927f / whole - 3.1415927f;
 }
 
-extern float func_002B08A8(int, int);
-extern float func_00283198(float);
-extern void func_00283D38(int, int, float);
+extern float math_get_even_angle(int, int);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastTweenColor(int, int, float);
 /* Fades between two colours using a smooth wave that follows the step number. */
-void func_002B0910(int index, int count, int colorA, int colorB)
+void gfx_blend_colors_by_cycle(int index, int count, int colorA, int colorB)
 {
-    float phase = GetEvenlySpacedAngle(index, count);
-    phase = FastSinOrCosB(phase);
+    float phase = math_get_even_angle(index, count);
+    phase = math_fast_sin_or_cos_b(phase);
     FastTweenColor(colorA, colorB, phase * 0.5f + 0.5f);
 }
 
 
 extern u8 D_001A7A47 __attribute__((sda));
-extern void func_002AEC48(void *a0, void *a1, int a2, float f12, float f13);
+extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float f13);
 
 /* Stores the third argument (or 1.0f) in the object's float at 0x70, and, when the fifth argument
    is set and that float differs from the one at 0x20, calls func_002AEC48 with the object's two
    first arguments, the fourth argument and the pair 0.03f, 0.3f. */
 /* Sets a value on an object and, if asked, starts a short smooth change when it differs from the old value. */
-void func_002B0990(void *owner, float *state, float value, int param, int startChange)
+void value_set_and_smooth(void *owner, float *state, float value, int param, int startChange)
 {
     if (D_001A7A47 != 0) {
         state[28] = value;
@@ -203,15 +203,15 @@ void func_002B0990(void *owner, float *state, float value, int param, int startC
     }
     if (startChange != 0) {
         if (state[28] != state[8]) {
-            UpdateEasedNode(owner, state, param, 0.03f, 0.3f);
+            moby_update_eased_node(owner, state, param, 0.03f, 0.3f);
         }
     }
 }
 
 /* Looks up an entry by index and passes it on with one more value. */
-void func_002B0A18(int first, int second)
+void value_set_entry_by_index(int first, int second)
 {
-    extern int func_00288FB8(int);
+    extern int GetLocalizedString(int);
     extern void func_0029CC98(int, int);
     func_0029CC98(GetLocalizedString(first), second);
 }
@@ -219,13 +219,13 @@ void func_002B0A18(int first, int second)
 extern void func_0029CC50(int, int, int);
 
 /* Passes three values on to another routine. */
-void func_002B0A48(int first, int second, int third) {
+void value_forward_three_args(int first, int second, int third) {
     func_0029CC50(first, second, third);
 }
 
 /* Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit. */
 /* Throws out small pieces in random directions for each selected part of an object. */
-void func_002B0A68(char *moby, int partMask, float *baseVelocity,
+void part_spawn_masked_debris(char *moby, int partMask, float *baseVelocity,
                                         unsigned char flags,
                                         float speedMinXY, float speedMaxXY, float speedMinZ, float speedMaxZ)
 {
@@ -251,19 +251,19 @@ void func_002B0A68(char *moby, int partMask, float *baseVelocity,
         func_00282CC0_11(velocity, velocity, baseVelocity);
         randomA = func_002A7878_3(90.0f, 270.0f);
         randomB = func_002A7878_3(10.0f, 20.0f);
-        CreateCameraMoby(moby, 2, *(short *)(moby + 170), i, moby + 16, moby + 240,
+        cam_moby_create(moby, 2, *(short *)(moby + 170), i, moby + 16, moby + 240,
                 velocity, flags, randomA, randomB);
     }
 }
 
 
 /* Returns a saved count byte used as a starting value. */
-s32 func_002B0D60(void) { return D_00139648; }
+s32 save_get_baseline_count(void) { return D_00139648; }
 
-extern int func_002B0DB8(void);
+extern int save_count_filled_slots(void);
 
 /* Counts the filled slots in a 28 by 4 table, keeping the result between 0 and 40. */
-int func_002B0DB8(void)
+int save_count_filled_slots(void)
 {
     int filled = 0;
     int i;
@@ -283,19 +283,19 @@ int func_002B0DB8(void)
     return filled;
 }
 
-extern u8 D_00139568[];
-extern u8 D_00239BA0[];
+extern u8 g_item_slot_to_record[];
+extern u8 g_weapon_table[];
 
 /* Counts the entries of a 56-byte table whose scaled entry in a second table is at least 2, and
    clamps the count to 0..20. */
-int func_002B0E28(void)
+int save_count_entries_above_threshold(void)
 {
     int count = 0;
     int i;
 
     for (i = 0; i < 56; i++) {
-        u8 v = gItemSlotToRecord[i];
-        u8 *p = gWeaponTable_00239BA0 + v * 224;
+        u8 v = g_item_slot_to_record[i];
+        u8 *p = g_weapon_table + v * 224;
         int x = p[4];
 
         if (x >= 2) {
@@ -314,7 +314,7 @@ int func_002B0E28(void)
 extern u8 D_001A7A60[] __attribute__((sda));
 
 /* Counts the non-zero bytes of a 32-byte table, and clamps the count to 0..30. */
-int func_002B0E90(void)
+int save_count_nonzero_flags(void)
 {
     int count = 0;
     int i;
@@ -336,7 +336,7 @@ int func_002B0E90(void)
 /* func_002B1350 is defined in 002B00B0-reaction-g8.c. */
 
 /* Picks a random entry of the given kind from an owner's list and gives back its scaled values. */
-int func_002B1A80(u8 *owner, int kind, int *outIndex,
+int moby_pick_random_matching(u8 *owner, int kind, int *outIndex,
                                        float *outA, float *outB, float *outC, float *outD,
                                        float *outE, float *outF, float *outG)
 {

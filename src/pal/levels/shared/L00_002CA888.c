@@ -25,38 +25,38 @@ typedef struct {
     unsigned char pad17[0x24B8 - 0x24A4]; float timer;
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 extern unsigned int D_00138320[];
 extern int ref_L00_002CAB08_00(int, int);
 extern int func_PAL_L00_002C3BE0(void);
-extern int func_L00_0032EFB0(int, int, int, int);
-extern int func_L00_0032EF10(int, int, int *);
-extern int func_L00_002ADEA0(int);
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern int pad_presses_within_frames(int, int, int, int);
+extern int PadPressedWithin(int, int, int *);
+extern int hero_slot_item_id(int);
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
 int func_PAL_L00_002CAEB0(void)
 {
     int offset;
-    if (D_00189E20.mode == 14) return 0;
+    if (g_hero_state.mode == 14) return 0;
     offset = func_PAL_L00_002C3BE0();
-    if ((D_00138320[0] & 8) && offset > 0 && func_L00_0032EFB0(0x40, 0x1F000, offset + 4, offset)) {
+    if ((D_00138320[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 4, offset)) {
         ref_L00_002CAB08_00(11, 1);
         return 1;
     }
-    if (D_00189E20.count_1b8 < 6) goto fail;
-    if (!func_L00_0032EF10(0x40, 7, 0)) goto fail;
-    if (func_L00_002ADEA0(3) == 2 && D_001A7AF8[2] != 0 && D_00189E20.flag_24fc == 0 &&
-        (2.5f < D_00189E20.distance_278 || D_00189E20.angle_280 < 0.785398244857788086f) &&
-        0.7f < D_00189E20.timer && 0.018000001f < D_00189E20.speed_178)
+    if (g_hero_state.count_1b8 < 6) goto fail;
+    if (!PadPressedWithin(0x40, 7, 0)) goto fail;
+    if (hero_slot_item_id(3) == 2 && g_item_owned_flags[2] != 0 && g_hero_state.flag_24fc == 0 &&
+        (2.5f < g_hero_state.distance_278 || g_hero_state.angle_280 < 0.785398244857788086f) &&
+        0.7f < g_hero_state.timer && 0.018000001f < g_hero_state.speed_178)
         ref_L00_002CAB08_00(10, 1);
-    else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0 && 0.7f < D_00189E20.timer &&
-             (2.5f < D_00189E20.distance_278 || D_00189E20.flag_284 != 0) &&
-             0.018000001f < D_00189E20.speed_178) {
-        if (D_00189E20.flag_1e4 != 0) return 1;
+    else if (hero_slot_item_id(3) == 3 && g_hero_state.flag_24fc == 0 && 0.7f < g_hero_state.timer &&
+             (2.5f < g_hero_state.distance_278 || g_hero_state.flag_284 != 0) &&
+             0.018000001f < g_hero_state.speed_178) {
+        if (g_hero_state.flag_1e4 != 0) return 1;
         ref_L00_002CAB08_00(16, 1);
-    } else if (func_L00_002ADEA0(3) == 3 && D_00189E20.flag_24fc == 0)
+    } else if (hero_slot_item_id(3) == 3 && g_hero_state.flag_24fc == 0)
         ref_L00_002CAB08_00(13, 1);
-    else if (func_L00_002ADEA0(3) == 2 && D_00189E20.flag_24fc == 0 && D_001A7AF8[2] != 0)
+    else if (hero_slot_item_id(3) == 2 && g_hero_state.flag_24fc == 0 && g_item_owned_flags[2] != 0)
         ref_L00_002CAB08_00(15, 1);
     else
         ref_L00_002CAB08_00(7, 1);

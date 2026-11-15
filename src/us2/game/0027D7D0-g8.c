@@ -9,8 +9,8 @@ extern float D_001A87A0 __attribute__((sda));
 extern LightRec D_001BA640[];
 extern int D_001B163C;
 extern unsigned long func_US2_0027CED8(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00280B90(void *, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void draw_world_quad(void *, int, int);
 void func_US2_0027D7D0(void) {
     FRow m[4];
     int colors[4];
@@ -37,7 +37,7 @@ void func_US2_0027D7D0(void) {
         int k;
 
         qcopy(&dir, &D_001BA640[i].dir);
-        func_00282F20(&dir, &dir, 1.0f);
+        vec_scale_to_length(&dir, &dir, 1.0f);
         s = D_001BA640[i].pos.v[3];
         for (k = 0; k < 4; k++) {
             float cx = ((FRow *)&D_001A87A0)[k].v[0];
@@ -50,6 +50,6 @@ void func_US2_0027D7D0(void) {
             m[k].v[1] += (cy - dir.v[1] * d) * s;
             m[k].v[2] -= dir.v[2] * d * s;
         }
-        func_00280B90(m, 0, 0);
+        draw_world_quad(m, 0, 0);
     }
 }

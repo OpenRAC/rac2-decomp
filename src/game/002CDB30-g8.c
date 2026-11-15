@@ -28,7 +28,7 @@ typedef struct {
 } MenuSelection;
 
 extern int D_00138344 NOT_SDA;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_001AB9B0 __attribute__((sda));
 extern int D_001AB9B4 __attribute__((sda));
 extern int D_001AB9B8 __attribute__((sda));
@@ -37,20 +37,20 @@ extern unsigned short D_00188510[][2];
 extern TableRow D_00264630[];
 extern MenuCounter D_0025ABC0;
 extern MenuSelection D_0025AC28;
-extern int func_002E5E58(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 /* Handles the left and right buttons on the item list menu and picks the nearest rows that have items. */
-int func_002CDB30(void)
+int menu_handle_item_list_input(void)
 {
     int flags = D_00138344;
     int previousRow = D_001AB9B0;
     int result = 0;
 
     if (flags & 0x10) {
-        int value = *(int *)(gPauseMenuState.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -62,17 +62,17 @@ return_value:
         result = 1;
     } else if (flags & 0x8000) {
         if (previousRow != D_001AB9B4)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         D_001AB9B0 = D_001AB9B4;
         if (D_001AB9B0 <= 0)
             D_001AB9B0 = 1;
     } else if (flags & 0x2000) {
         if (previousRow != D_001AB9B8)
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
         else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         D_001AB9B0 = D_001AB9B8;
         if (D_001AB9B0 >= 64)
             D_001AB9B0 = 63;

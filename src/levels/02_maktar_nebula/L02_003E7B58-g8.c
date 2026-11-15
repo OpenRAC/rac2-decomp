@@ -13,14 +13,14 @@ typedef struct {
 extern StripGeometry D_L02_002A52F0;
 extern int D_L02_002A53B0[3][9];
 extern int D_L02_001B0A00[] MACRO_ADDR;
-extern unsigned long long func_0027C878(int);
-extern int func_00283CF0(float);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_L01_0031A278(void *, void *, float, float, float);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern int FloatToInt(float);
+extern void lerp_vector(void *, void *, void *, float);
+extern void moby_compute_local_point(void *, void *, float, float, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws the three scrolling bands of pictures on the face of the slot machine. */
-void func_L02_003E7B58(char *actor) {
+void DrawScrollingTileBands(char *actor) {
     StripGeometry geometry;
     StripPacket packet;
     char *state;
@@ -73,13 +73,13 @@ void func_L02_003E7B58(char *actor) {
             packet.tex0[1] = packet.tex0[3] = texFirst;
             packet.tex1[1] = packet.tex1[3] = texLast;
             lerp_vector(sample, geometry.point[band][0], geometry.point[band][2], first);
-            ComputeMobyLocalPoint(actor, packet.corner[0], sample[0], sample[1], sample[2]);
+            moby_compute_local_point(actor, packet.corner[0], sample[0], sample[1], sample[2]);
             lerp_vector(sample, geometry.point[band][1], geometry.point[band][3], first);
-            ComputeMobyLocalPoint(actor, packet.corner[1], sample[0], sample[1], sample[2]);
+            moby_compute_local_point(actor, packet.corner[1], sample[0], sample[1], sample[2]);
             lerp_vector(sample, geometry.point[band][0], geometry.point[band][2], last);
-            ComputeMobyLocalPoint(actor, packet.corner[2], sample[0], sample[1], sample[2]);
+            moby_compute_local_point(actor, packet.corner[2], sample[0], sample[1], sample[2]);
             lerp_vector(sample, geometry.point[band][1], geometry.point[band][3], last);
-            ComputeMobyLocalPoint(actor, packet.corner[3], sample[0], sample[1], sample[2]);
+            moby_compute_local_point(actor, packet.corner[3], sample[0], sample[1], sample[2]);
             draw_world_quad(&packet, 0, 0);
         }
     }

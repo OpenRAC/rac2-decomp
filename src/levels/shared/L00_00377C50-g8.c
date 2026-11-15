@@ -3,18 +3,18 @@
 /* Purchase action prompts, selected by item kind, upgrade cap and price. */
 typedef struct { int id, kind; int rest[4]; } ActionItem;
 typedef struct { u8 pad[0x80]; int index, active; u8 gap[0xb8]; ActionItem items[0]; } ActionModel;
-extern ActionModel D_L00_0022F7C0;
+extern ActionModel g_purchase_menu_model;
 #define MODEL ((u8 *)&D_L00_0022F7C0)
-extern u8 D_00139568[];
-extern int D_00139688[];
+extern u8 g_item_slot_to_record[];
+extern int g_item_ammo_counts[];
 typedef struct {u8 pad[0x88]; unsigned short price; u8 pad2[4]; unsigned short limit; u8 rest[80];} ActionClass;
-extern ActionClass D_L00_00262570[];
-extern int D_001A79F8;
-extern int D_001A7B90;
+extern ActionClass g_weapon_l00_table[];
+extern int g_player_bolts;
+extern int g_is_pal_video;
 extern float D_L00_001B25E0;
-extern int func_00288FB8(int id);
-extern int func_002F6510(void);
-extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length);
+extern int GetLocalizedString(int id);
+extern int GetSelectedShopItemPrice(void);
+extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text, int length);
 
 #define SELECTED (MODEL + D_L00_0022F7C0.index * 24)
 #define KIND (*(int *)(SELECTED+0x144))
@@ -29,9 +29,9 @@ extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length
 }
 
 /* Draws the buy and back prompts, showing buy only when the player can afford it and is not at the cap. */
-void func_L00_00377C50(void)
+void DrawPurchaseActionPrompts(void)
 {
-    if (gPurchaseMenuModel.active) {
+    if (g_purchase_menu_model.active) {
         if (KIND == 1 && CAPPED) {
             DRAW(420, 0x1124);
         } else if (KIND == 1) {
@@ -40,7 +40,7 @@ void func_L00_00377C50(void)
             } else {
                 DRAW(420, 0x1124);
             }
-        } else if (gPlayerBolts >= GetSelectedShopItemPrice()) {
+        } else if (g_player_bolts >= GetSelectedShopItemPrice()) {
             DRAW(80, 0x113b);
         } else {
             DRAW(420, 0x1124);
@@ -52,15 +52,15 @@ void func_L00_00377C50(void)
                 return;
             DRAW(420, 0x1124);
         } else {
-            if (gPlayerBolts < GetSelectedShopItemPrice())
+            if (g_player_bolts < GetSelectedShopItemPrice())
                 return;
             DRAW(420, 0x1138);
         }
     } else {
         int stride = 24;
         u8 *kindBase = MODEL + 0x144;
-        if ((*(int *)(kindBase + gPurchaseMenuModel.index * stride) == 0 && gPlayerBolts >= GetSelectedShopItemPrice()) ||
-            (*(int *)(kindBase + gPurchaseMenuModel.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
+        if ((*(int *)(kindBase + g_purchase_menu_model.index * stride) == 0 && g_player_bolts >= GetSelectedShopItemPrice()) ||
+            (*(int *)(kindBase + g_purchase_menu_model.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
             DRAW(80, 0x1125);
         }
         DRAW(420, 0x2d4f);

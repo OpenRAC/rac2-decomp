@@ -27,10 +27,10 @@ extern Config D_001B1640 __attribute__((sda));
 extern Settings D_001B9040;
 extern int D_001B1DA0 __attribute__((sda));
 extern int D_001B1654 __attribute__((sda));
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 /* Loads one of two display settings into the live settings block and applies it. */
-void func_00279FF0(void)
+void gfx_apply_display_config(void)
 {
     if (D_001B5600 != 0) {
         D_001B9040.a = D_001AD584.a;

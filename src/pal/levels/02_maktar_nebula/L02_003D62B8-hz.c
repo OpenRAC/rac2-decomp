@@ -14,7 +14,7 @@ extern void func_316150(char *, int, int, int);
 
 extern void func_316180(char *, int *, int *, int *);
 
-extern void func_L02_003D1E40(char *self);
+extern void armed_enemy_spawn_held_object(char *self);
 void func_PAL_L02_003D62B8(char *arg0, int arg1) {
     char *p = *(char **)(arg0 + 0x68);
 
@@ -31,7 +31,7 @@ void func_PAL_L02_003D62B8(char *arg0, int arg1) {
     *(unsigned char *)(arg0 + 0x7F) = 0;
     *(unsigned char *)(arg0 + 0x31) = 1;
     *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x1000) & 0xFFB8;
-    func_L02_003D1E40(arg0);
+    armed_enemy_spawn_held_object(arg0);
     *(short *)(p + 0x2FC) = arg1;
     *(short *)(p + 0x88) = 0;
     if (*(short *)(p + 0x50) != 0) {

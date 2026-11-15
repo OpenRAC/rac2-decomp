@@ -2,12 +2,12 @@
 
 #include "common.h"
 extern float D_L20_001B2418 __attribute__((sda));
-extern u32 D_00189E20[] __attribute__((nosda));
-extern void func_002A7750(char *, int, int);
-extern void *func_002A9640(char *, int, int);
+extern u32 g_hero_state[] __attribute__((nosda));
+extern void moby_set_state(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern float func_PAL_002AA108(char *, char *);
-extern int func_002B3BA8(char *, int, void *, int, float, float);
-extern float func_002AA2E8(float *, float, float);
+extern int weapon_select_aim_target(char *, int, void *, int, float, float);
+extern float ApproachValue(float *, float, float);
 extern void func_PAL_L20_004507E0(char *);
 
 void func_PAL_L20_004502D0(char *arg0) {
@@ -19,7 +19,7 @@ void func_PAL_L20_004502D0(char *arg0) {
 
     state = *(char **)(arg0 + 0x68);
     if (*(u8 *)(arg0 + 0x20) == 0) {
-        func_002A7750(arg0, 1, -1);
+        moby_set_state(arg0, 1, -1);
         *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
         *(int *)(arg0 + 0x98) = 0;
         qcopy((state + 0x180), (arg0 + 0x10));
@@ -30,7 +30,7 @@ void func_PAL_L20_004502D0(char *arg0) {
     if (*(u8 *)(arg0 + 0x20) == 1) {
         return;
     }
-    p = func_002A9640(arg0, 0x10000, 0);
+    p = part_find_owned_effect_slot(arg0, 0x10000, 0);
     if (p != 0) {
         q = *(u32 **)(p + 0x20);
         if (q != 0) {
@@ -41,12 +41,12 @@ void func_PAL_L20_004502D0(char *arg0) {
         }
     }
     f = func_PAL_002AA108(arg0, p);
-    func_002AA2E8((float *)(state + 0x20), 0.0f, f);
+    ApproachValue((float *)(state + 0x20), 0.0f, f);
     *(u8 *)(arg0 + 0xA8) = 0xFF;
     if (*(float *)(state + 0x20) == 0.0f) {
         func_PAL_L20_004507E0(arg0);
         *(u8 *)(arg0 + 0xA8) = 0xFF;
-        func_002A7750(arg0, 1, -1);
+        moby_set_state(arg0, 1, -1);
         *(int *)(arg0 + 0x98) = 0;
         *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
     }
@@ -62,12 +62,12 @@ void func_PAL_L20_004502D0(char *arg0) {
         return;
     }
     }
-    func_002B3BA8(arg0, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
+    weapon_select_aim_target(arg0, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
     if (*(u32 *)(state + 0x150) != 0) {
         return;
     }
     {
-        u32 *base = (u32 *)D_00189E20;
+        u32 *base = (u32 *)g_hero_state;
         *(u32 *)(state + 0x150) = base[0x8A4];
         qcopy((state + 0x140), ((char *)base + 0xD0));
     }
@@ -76,9 +76,9 @@ void func_PAL_L20_004502D0(char *arg0) {
 extern float D_L20_001B2410 __attribute__((sda));
 extern float D_L20_001B2414 __attribute__((sda));
 extern float D_L20_001B241C __attribute__((sda));
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern void func_002A9288(char *, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void part_queue_ground_shadow(char *, float);
 extern void func_PAL_L20_00450700(char *);
 
 void func_PAL_L20_004504B0(char *arg0) {
@@ -90,13 +90,13 @@ void func_PAL_L20_004504B0(char *arg0) {
     if (*(u8 *)(arg0 + 0x31)) {
         qcopy((arg0 + 0x10), (state + 0x180));
         r = D_L20_001B2414;
-        r = func_00283B98(*(float *)(state + 0x1A0), r * 0.0003490659f);
+        r = FastAddRotations(*(float *)(state + 0x1A0), r * 0.0003490659f);
         *(float *)(state + 0x1A0) = r;
-        r = func_00283198(r);
+        r = math_fast_sin_or_cos_b(r);
         {
             float amount = D_L20_001B241C;
             *(float *)(arg0 + 0x18) = *(float *)(arg0 + 0x18) + D_L20_001B2410 * r;
-            func_002A9288(arg0, amount);
+            part_queue_ground_shadow(arg0, amount);
         }
     }
     if (((*(u16 *)(arg0 + 0x34)) ^ 1) & 1) {
@@ -107,12 +107,12 @@ void func_PAL_L20_004504B0(char *arg0) {
 extern float D_L20_001B2444 __attribute__((sda));
 extern float D_L20_001B2448 __attribute__((sda));
 extern float D_L20_001B244C __attribute__((sda));
-extern float func_00282DF0(void *);
-extern void func_002AAC80(void *, float, float, float, float);
-extern void func_002AFDD8(char *, char *, char *, char *);
-extern int func_L07_00321D68(char *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern float FastVecLength(void *);
+extern void math_approach_target_with_braking(void *, float, float, float, float);
+extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
+extern int hero_set_control_motion_and_step(char *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 float func_PAL_L20_00450568(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
@@ -126,17 +126,17 @@ float func_PAL_L20_00450568(char *arg0) {
     float gain;
     float pitch;
 
-    func_00282CF0(b0, state + 0x190, state + 0x180);
-    speed = func_00282DF0(state + 0xF0);
-    f = func_00282DF0(b0);
-    func_002AAC80(&speed, f, D_L20_001B2444 * 0.00040000002f,
+    FastVecSub(b0, state + 0x190, state + 0x180);
+    speed = FastVecLength(state + 0xF0);
+    f = FastVecLength(b0);
+    math_approach_target_with_braking(&speed, f, D_L20_001B2444 * 0.00040000002f,
                   D_L20_001B2444 * 0.00040000002f,
                   D_L20_001B2448 * 0.020000001f);
-    func_00282F20(state + 0xF0, b0, speed);
+    vec_scale_to_length(state + 0xF0, b0, speed);
     qcopy(src, v);
-    func_L07_00321D68(arg0, state + 0xF0);
+    hero_set_control_motion_and_step(arg0, state + 0xF0);
     qcopy(v, src);
-    func_002AFDD8(arg0, b1, state + 0xF0, 0);
+    vec_transform_by_object_or_given(arg0, b1, state + 0xF0, 0);
     gain = D_L20_001B244C;
     a = b1[1] * -gain;
     *(float *)(state + 0x1A8) = a;

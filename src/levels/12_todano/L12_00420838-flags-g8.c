@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 extern double ref_L12_00420838_00 __attribute__((sda));
@@ -14,7 +15,7 @@ extern void func_314008(void *);
 
 /* Hand-adapted from func_L12_00388090. */
 /* Waits until the hero hits it, then plays a flash, a sound and an effect. */
-void func_L12_00420838(unsigned char *self) {
+void hit_l12_flash_update(unsigned char *self) {
     unsigned char *vars = *(unsigned char **)(self + 0x68);
 
     switch (self[0x20]) {

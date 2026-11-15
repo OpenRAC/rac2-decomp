@@ -1,33 +1,33 @@
 #include "include_asm.h"
 #include "common.h"
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C540(int);
-extern void func_0027C660(void);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void SetupGifPaging(int);
+extern void DoGifPaging(void);
 
 extern int D_001ABAD8 __attribute__((sda)), D_001ABADC __attribute__((sda)), D_001ABAE8 __attribute__((sda));
 extern int D_001AA43C __attribute__((sda));
 extern int D_001B1598;
-extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char D_001395B8[];
-extern unsigned int func_002884B0(unsigned int);
-extern int func_00282C30(int);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
-extern void func_0028EE98(int, int, int, int, int, int);
+extern unsigned int help_find_record_marker_by_class(unsigned int);
+extern int subtract_integer_with_clamp(int);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
+extern void hud_draw_sprite_subpixel_no_color(int, int, int, int, int, int);
 
 typedef struct { char pad[0x14]; char *owner; char pad18[0x40-0x18]; int slots[65]; int override144; int override148; } GridContext;
-extern GridContext D_001F2840;
-extern unsigned char D_00139568[];
+extern GridContext g_pause_menu_state;
+extern unsigned char g_item_slot_to_record[];
 typedef struct { unsigned char pad[4]; unsigned char purchased; unsigned char pad05[7]; int slot; unsigned char pad10[0x3C-0x10]; unsigned short icon; unsigned char pad3E[224-0x3E]; } GridItem;
-extern GridItem D_00239BA0[];
-extern void func_002D8EC0(char *, short *, int, int, int, int);
-extern int func_0028E588(int, int);
+extern GridItem g_weapon_table[];
+extern void menu_row_icon_draw(char *, short *, int, int, int, int);
+extern int GetIconFrame(int, int);
 
 /* Draws a grid of item icons with a pulsing frame on the highlighted one. */
-int func_002D9008(char *object)
+int DrawMenuItemGrid(char *object)
 {
     int probe[4];
     short *record = *(short **)(object + 0x48);
-    int active = *(char **)(gPauseMenuState.owner + 0xE8) == object;
+    int active = *(char **)(g_pause_menu_state.owner + 0xE8) == object;
     int xStart, xStep, yStart, yStep;
     int width, height, areaWidth, areaHeight, gap;
     int index, column, x, state, bottom, right;
@@ -73,21 +73,21 @@ int func_002D9008(char *object)
             bottom = y + height;
             right = x + width;
             state = 0;
-            if (record[2] == 0 ? *(gItemOwnedFlags + record[3]) : *(D_001395B8 + record[3])) {
+            if (record[2] == 0 ? *(g_item_owned_flags + record[3]) : *(D_001395B8 + record[3])) {
                 if ((unsigned short)record[2] == 0) {
-                    entry = &gWeaponTable_00239BA0[gItemSlotToRecord[record[3]]];
+                    entry = &g_weapon_table[g_item_slot_to_record[record[3]]];
                     state = 0;
-                    if (gPauseMenuState.slots[entry->slot] == record[3])
+                    if (g_pause_menu_state.slots[entry->slot] == record[3])
                         state = ((*(int *)(object + 0x30) ^ 1) & 1) << 2;
                     if (state == 0) {
                         int owned = 3;
                         if (!entry->purchased) owned = 0;
                         state = owned;
                     }
-                    if (gPauseMenuState.override144 && (*(int *)(object + 0x30) & 8)) state = 2;
-                    if (gPauseMenuState.override148 && (*(int *)(object + 0x30) & 4)) state = 2;
-                    if (FindHelpRecordMarkerByClassCode((unsigned short)record[0]))
-                        DrawMenuRowIcon(object, record, column, row, x >> 4, (y >> 4) + 36);
+                    if (g_pause_menu_state.override144 && (*(int *)(object + 0x30) & 8)) state = 2;
+                    if (g_pause_menu_state.override148 && (*(int *)(object + 0x30) & 4)) state = 2;
+                    if (help_find_record_marker_by_class((unsigned short)record[0]))
+                        menu_row_icon_draw(object, record, column, row, x >> 4, (y >> 4) + 36);
                 }
                 if (active && *(int *)(object + 0x3C) == index) {
                     pulse = (unsigned int)(((subtract_integer_with_clamp((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
@@ -97,8 +97,8 @@ int func_002D9008(char *object)
                 }
                 if (state == 4)
                     AppendScreenRectPacket(x - 64, y - 64, right + 64, bottom + 64, 0x80FFFFFFUL, 1);
-                texture = GetIconFrame(gWeaponTable_00239BA0[gItemSlotToRecord[record[3]]].icon, record[1]);
-                DrawHudSpriteSubpixelNoColor(texture, x, y, width, height, 128);
+                texture = GetIconFrame(g_weapon_table[g_item_slot_to_record[record[3]]].icon, record[1]);
+                hud_draw_sprite_subpixel_no_color(texture, x, y, width, height, 128);
                 if (state == 2)
                     AppendScreenRectPacket(x - 64, y - 64, right + 64, bottom + 64, 0x60202020UL, 1);
             } else if (active && *(int *)(object + 0x3C) == index) {

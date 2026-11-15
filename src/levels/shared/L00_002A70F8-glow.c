@@ -24,27 +24,27 @@ typedef struct {
     float scale[3];
 } GlowManipulator;
 typedef struct { u8 pad0[0x1868]; float phase; } GlowResident;
-extern GlowResident D_00189E20;
+extern GlowResident g_hero_state;
 typedef struct { u8 pad0[0x30]; int state; int timer; } SceneGlow;
-extern int D_L00_001B19C8[] __attribute__((sda));
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_frame_l00_counter[] __attribute__((sda));
+extern int g_current_map_index MACRO_ADDR;
 extern SceneGlow D_L00_001BCAC0;
 extern GlowManipulator D_L00_001B1710 MACRO_ADDR;
 extern GlowManipulator D_L00_001B1750 MACRO_ADDR;
 extern unsigned char D_001A7A40[] __attribute__((sda));
 extern float D_L00_001A7CF8 __attribute__((sda));
 extern float D_L00_001A7CF8_gp SDATA(D_L00_001A7CF8);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_0029FCC0(char *, int, char *);
-extern float func_00282C48(float);
-extern void func_L00_002A7DE8(Vector *, unsigned int, float, float);
-extern float func_00283B98(float, float);
-extern void func_0029F978(GlowMoby *, unsigned int, GlowManipulator *);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern float math_fabs(float);
+extern void hero_queue_glow_point(Vector *, unsigned int, float, float);
+extern float FastAddRotations(float, float);
+extern void AttachManipulator(GlowMoby *, unsigned int, GlowManipulator *);
 
 /* Animate the object's glow and bind the appropriate auxiliary joint record. */
-void func_L00_002A70F8(GlowMoby *object) {
+void update_moby_pulsing_glow_effects(GlowMoby *object) {
     Vector position;
     GlowManipulator *record;
     int red, green, blue, alpha;
@@ -55,7 +55,7 @@ void func_L00_002A70F8(GlowMoby *object) {
     float wave, denominator, pulse;
     object->flags |= 0x10;
     denominator = IntToFloat(100);
-    wave = FastSinOrCosB((((float)(gFrameCounter_L00[0] % period) / denominator) * 2.0f) * 3.1415927410125732f + -3.1415927410125732f);
+    wave = math_fast_sin_or_cos_b((((float)(g_frame_l00_counter[0] % period) / denominator) * 2.0f) * 3.1415927410125732f + -3.1415927410125732f);
     red = FloatToInt(wave * 24.0f);
     green = FloatToInt(wave * 52.0f);
     blue = FloatToInt(wave * 24.0f);
@@ -66,30 +66,30 @@ void func_L00_002A70F8(GlowMoby *object) {
     color |= red + 0x44;
     object->color = color;
     if (object->kind == 0x1159 /* moby class 4441 */) {
-        TransformMobyJointToWorld((char *)object, 6, (char *)&position);
-        if (FloatAbs(object->z - position.f[2]) > 2.0f)
-            QueueHeroGlowPoint(&position, 0x200000C0U, 0.25f, 0.15f);
+        moby_transform_joint_to_world((char *)object, 6, (char *)&position);
+        if (math_fabs(object->z - position.f[2]) > 2.0f)
+            hero_queue_glow_point(&position, 0x200000C0U, 0.25f, 0.15f);
     } else if (object->kind == 0x57 /* Clank */) {
         emit = 1;
-        if (gCurrentMapIndex == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)
+        if (g_current_map_index == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)
             emit = 0;
-        else if (gCurrentMapIndex == 3 && D_L00_001BCAC0.state == 0)
+        else if (g_current_map_index == 3 && D_L00_001BCAC0.state == 0)
             emit = 0;
         if (emit) {
-            TransformMobyJointToWorld((char *)object, 7, (char *)&position);
-            gHeroState.phase = FastAddRotations(gHeroState.phase, 0.06690429896116257f);
-            pulse = FastSinOrCosB(gHeroState.phase);
+            moby_transform_joint_to_world((char *)object, 7, (char *)&position);
+            g_hero_state.phase = FastAddRotations(g_hero_state.phase, 0.06690429896116257f);
+            pulse = math_fast_sin_or_cos_b(g_hero_state.phase);
             alpha = (unsigned int)FloatToInt((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
             alpha <<= 24;
-            QueueHeroGlowPoint(&position, alpha | 0xC0U, 0.04f, 0.07f);
+            hero_queue_glow_point(&position, alpha | 0xC0U, 0.04f, 0.07f);
         } else object->color = 0x80505050U;
-    } else if (!(gCurrentMapIndex == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)) {
-        TransformMobyJointToWorld((char *)object, 1, (char *)&position);
-        gHeroState.phase = FastAddRotations(gHeroState.phase, 0.06690429896116257f);
-        pulse = FastSinOrCosB(gHeroState.phase);
+    } else if (!(g_current_map_index == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)) {
+        moby_transform_joint_to_world((char *)object, 1, (char *)&position);
+        g_hero_state.phase = FastAddRotations(g_hero_state.phase, 0.06690429896116257f);
+        pulse = math_fast_sin_or_cos_b(g_hero_state.phase);
         alpha = (unsigned int)FloatToInt((pulse * 0.5f + 0.5f) * 13.0f) + 23U;
         alpha <<= 24;
-        QueueHeroGlowPoint(&position, alpha | 0xC0U, 0.04f, 0.07f);
+        hero_queue_glow_point(&position, alpha | 0xC0U, 0.04f, 0.07f);
     }
     kind = object->kind;
     record = &D_L00_001B1710;

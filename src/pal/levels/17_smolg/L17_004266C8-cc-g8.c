@@ -1,23 +1,24 @@
+#include "names.h"
 /* func_PAL_L17_004266C8, the PAL copy of func_L17_00420E08: the same C. */
 #include "common.h"
 
 /* This unit is built with -G8: every body here reaches a global through $gp. */
 
-extern int func_00283CF0(f32);
+extern int FloatToInt(f32);
 
-extern s32 func_L17_00340DD0(f32, s32, s32, s32);
+extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
 
 extern f32 D_L17_001B04B8 __attribute__((sda));
 
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 
-extern s32 func_002A9640(void *, s32, s32);
+extern s32 part_find_owned_effect_slot(void *, s32, s32);
 
-extern void func_L00_0032A258(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 
-extern void func_0032C700(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 extern s32 D_L17_001B1E00 __attribute__((sda));
 
@@ -29,13 +30,13 @@ extern s32 D_L17_001B1DD0 __attribute__((sda));
 
 /* Counts the record's own timer down once, then hands the sub-object's four packed
    colour bytes and the measured scale to the level's own setter. */
-void func_L17_003CC6A8(s32 a0);
+void effect_l17_spawner_update(s32 a0);
 
 /* Sets the object's stage up: the first stage asks the level's own spawner for a child and
    gives up its handle, the second one only releases the handle. */
-void func_L17_00418D10(s32 a0);
+void hit_l17_burst_update(s32 a0);
 
-extern char *D_L17_001B2C1C __attribute__((sda));
+extern char *g_moby_l17_pool __attribute__((sda));
 
 typedef int Quad __attribute__((mode(TI)));
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
@@ -134,22 +135,22 @@ extern float D_L17_001B0CA8 __attribute__((sda));
 extern u8 D_L17_001B0CB8[4] __attribute__((sda));
 extern u8 D_L17_001B9BC0[];
 extern char D_L17_001B0CC8[]; /* "returned null\n" */
-extern u8 *D_0018C0B0 NOT_SDA;
-extern float func_002A89A8(void *, int, float);
-extern void func_L04_0033CB88(void *);
-extern int func_002A7820(int, int);
-extern void func_002AB650(void *);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_L17_003E4860(void *);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern void func_0026FEB8(void *, ...);
+extern u8 *g_hero_moby NOT_SDA;
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void MoveCtl_Init(void *);
+extern int math_random_int_range(int, int);
+extern void hero_copy_field_to_moby(void *);
+extern void anim_start_blended(void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void moby_l17_set_group_alert_flag(void *);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern void STUB_printf(void *, ...);
 
 /* Sets the state record up on the first update (the tuning block in field order), then
    handles damage and keeps a target, falling back to D_0018C0B0 when the record has none. */
-void func_L17_003E41A8(u8 *obj);
+void grulch_init_state_check_hits(u8 *obj);
 
 /* The player block at D_00189E20, as far as the two updates below use it. */
 typedef struct {
@@ -166,7 +167,7 @@ typedef struct {
     u8 pad5BC[0x1CD8];
     s32 mode;                   /* 0x2294 */
 } L17Player;
-extern L17Player D_00189E20;
+extern L17Player g_hero_state;
 
 /* The level's save record: one collected flag per object id from 0x464. */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } L17SaveState;
@@ -174,25 +175,25 @@ extern L17SaveState D_L17_0021EBB0;
 
 /* The current level, read with the lw macro: absolute in ordinary flow, $gp in a
    delay slot. */
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 /* Per-level save nibbles, 0x400 bytes a level, two object ids a byte. */
 extern u8 D_0019B4A8[];
 /* Per-level object flags, 16 bytes a level. */
 extern u8 D_0019B2E8[];
 
 /* Paths: a count, then 16-byte points from 0x10. */
-extern u8 *D_L17_001FE880[];
+extern u8 *g_path_l17_table[];
 
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern f32 func_002A7940(void);
-extern s32 func_002B3868(void *);
-extern s32 func_002ACBC8(void *, s32);
-extern void func_002B0CE0(s32, s32, s32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_L00_003294F0(void *, s32);
-extern void func_L00_00429020(s32);
-extern void func_L13_002CEF00(s32, s32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_random_angle(void);
+extern s32 flag_set_first_pending(void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern void ForceClaimNotice(s32, s32, s32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void moby_set_flag_bit(void *, s32);
+extern void cam_lock_entry(s32);
+extern void hero_change_action(s32, s32);
 
 /* func_L17_0041EAA8's state record. */
 typedef struct {
@@ -208,7 +209,7 @@ typedef struct {
    not collected, save nibble still zero) it also hands its group to func_L00_00429020,
    counts the id in its save nibble and passes the linked record to func_L00_003294F0.
    With the player inside its cuboid in mode 0x82 it calls func_L13_002CEF00(6, 1). */
-void func_L17_0041EAA8(u8 *obj);
+void target_pad_update(u8 *obj);
 
 /* func_PAL_L17_004266C8's state record. */
 typedef struct {
@@ -235,8 +236,8 @@ void func_PAL_L17_004266C8(u8 *obj)
     case 0: {
         s32 level;
 
-        vars->phase = func_002A7940();
-        level = D_001A79F0;
+        vars->phase = math_random_angle();
+        level = g_current_map_index;
         *(f32 *)(obj + 0x18) -= 0.35f;
         if (D_0019B2E8[obj[0xB0] + level * 16] & 0x80) {
             obj[0xBC] = 2;
@@ -245,9 +246,9 @@ void func_PAL_L17_004266C8(u8 *obj)
             if (vars->path != -1) {
                 s32 i;
 
-                for (i = 0; i < *(s32 *)D_L17_001FE880[vars->path]; i++) {
-                    if (((L17PathPoint *)(D_L17_001FE880[vars->path] + (i << 4)))->w == vars->marker)
-                        ((L17PathPoint *)(D_L17_001FE880[vars->path] + (i << 4)))->w = 0;
+                for (i = 0; i < *(s32 *)g_path_l17_table[vars->path]; i++) {
+                    if (((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w == vars->marker)
+                        ((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w = 0;
                 }
             }
         } else
@@ -255,8 +256,8 @@ void func_PAL_L17_004266C8(u8 *obj)
         break;
     }
     case 1:
-        vars->phase = func_00283B98(vars->phase, 0.12566373f);
-        shade = FloatToInt((func_00283198(vars->phase) * 4.0f - 3.0f) * 128.0f);
+        vars->phase = FastAddRotations(vars->phase, 0.12566373f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(vars->phase) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128)
             shade = 128;
         else if (shade < 32)
@@ -266,8 +267,8 @@ void func_PAL_L17_004266C8(u8 *obj)
 
             *(u32 *)(obj + 0x78) = ((shade << 16) | green) | shade;
         }
-        if ((D_00189E20.target == obj && !D_00189E20.state)
-            || (vars->trigger && (D_0019B2E8[obj[0xB0] + D_001A79F0 * 16] & 0x80))) {
+        if ((g_hero_state.target == obj && !g_hero_state.state)
+            || (vars->trigger && (D_0019B2E8[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
             obj[0x20] = 2;
             obj[0xBC] = 1;
             *(u32 *)(obj + 0x78) = 0x80208020;
@@ -275,9 +276,9 @@ void func_PAL_L17_004266C8(u8 *obj)
             if (vars->path != -1) {
                 s32 i;
 
-                for (i = 0; i < *(s32 *)D_L17_001FE880[vars->path]; i++) {
-                    if (((L17PathPoint *)(D_L17_001FE880[vars->path] + (i << 4)))->w == vars->marker)
-                        ((L17PathPoint *)(D_L17_001FE880[vars->path] + (i << 4)))->w = 0;
+                for (i = 0; i < *(s32 *)g_path_l17_table[vars->path]; i++) {
+                    if (((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w == vars->marker)
+                        ((L17PathPoint *)(g_path_l17_table[vars->path] + (i << 4)))->w = 0;
                 }
             }
         }

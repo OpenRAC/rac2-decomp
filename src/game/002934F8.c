@@ -2,15 +2,15 @@
 /* Relocate a packed asset block and optionally compact its packet headers. */
 typedef unsigned char U8;
 typedef unsigned int Q128 __attribute__((mode(TI)));
-extern void func_0026FEB8(const char *, ...);
-extern void func_00282B50(void *destination, void *source, int bytes);
-extern void func_002932B8(void *entries, void *textures, U8 *map, int count);
+extern void STUB_printf(const char *, ...);
+extern void mem_fast_helper_c(void *destination, void *source, int bytes);
+extern void tex_draw_batches(void *entries, void *textures, U8 *map, int count);
 extern const char ref_002934F8_00[];
 extern U8 ref_002934F8_01[];
 extern int ref_002934F8_02[];
 extern Q128 ref_002934F8_03[];
 
-void func_002934F8(U8 *block, void *textures, U8 *map, int index)
+void tex_relocate_block(U8 *block, void *textures, U8 *map, int index)
 {
     int compressed = block[0xB] != 0;
     int count;
@@ -46,7 +46,7 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
                     ((unsigned short *)data)[j] = ((unsigned short *)data)[j * 2];
                 *(unsigned short *)(data + 0xE) = 0;
                 *(unsigned short *)(data + 0xC) = *(unsigned short *)(data + 0x18) - 16;
-                FastMemoryHelperC((unsigned short *)data + j, data + 32, (entry[0xC] - 2) * 16);
+                mem_fast_helper_c((unsigned short *)data + j, data + 32, (entry[0xC] - 2) * 16);
             }
         }
     }
@@ -101,5 +101,5 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
     }
     if (index >= 0) qcopy(&ref_002934F8_03[ref_002934F8_01[index]], map);
     if (*(void **)block)
-        DrawTextureBatches(*(void **)block, textures, map, count);
+        tex_draw_batches(*(void **)block, textures, map, count);
 }

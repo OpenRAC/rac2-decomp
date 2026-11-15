@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* The unsized macro-address view preserves the absolute flag load at -G8. */
-extern float D_L00_001B8DC0[4];
+extern float g_camera_l00_position[4];
 extern float D_00189ED0[4];
 extern int D_L00_001A8FF0[] MACRO_ADDR;
 extern float D_L00_001AF5F8 __attribute__((sda));
@@ -10,23 +10,23 @@ extern float D_L00_001AF600 __attribute__((sda));
 extern float D_L00_001AF604 __attribute__((sda));
 extern float D_L00_001AF60C __attribute__((sda));
 extern float D_L00_001AF610 __attribute__((sda));
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern void func_002ACEC0(void *, void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 typedef int VectorBits __attribute__((mode(TI)));
-extern void func_00282C88(VectorBits *);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, float, int);
-extern int func_00283CF0(float);
+extern void vec_clear_128(VectorBits *);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, float, int);
+extern int FloatToInt(float);
 
 /* Spray paired particles perpendicular to the viewing direction. */
-void func_L00_003A2C60(void *position, int count, float brightness)
+void part_l00_spawn_spark_spray(void *position, int count, float brightness)
 {
     float velocity[4], lateral[4], axis[4], projected[4];
-    FastVecSub(lateral, gCameraPosition_L00, position);
+    FastVecSub(lateral, g_camera_l00_position, position);
     if (D_L00_001A8FF0[0] == 0) {
         lateral[2] = 0.0f;
         axis[0] = 0.0f;
@@ -42,20 +42,20 @@ void func_L00_003A2C60(void *position, int count, float brightness)
         do {
             char *particle;
             float angle;
-            float size = RandomFloatRange(D_L00_001AF60C, D_L00_001AF610);
-            int spin = RandomIntBelow(2);
+            float size = math_random_float_range(D_L00_001AF60C, D_L00_001AF610);
+            int spin = math_random_int_below(2);
             if (!spin)
                 spin--;
-            angle = RandomFloatRange(-1.0471977f, 1.0471977f);
-            ApplyAxisRotationToQuaternion(velocity, lateral, axis, angle);
-            vec_scale_to_length(velocity, velocity, RandomFloatRange(D_L00_001AF5F8, D_L00_001AF5FC) * (1.0f / 60.0f));
-            velocity[2] = RandomFloatRange(D_L00_001AF600, D_L00_001AF604) * (1.0f / 60.0f);
-            ClearVector128((VectorBits *)velocity);
-            particle = SpawnGroundEffectParticle(position, 60, size * 0.1f, size,
+            angle = math_random_float_range(-1.0471977f, 1.0471977f);
+            math_apply_axis_rotation_to_quat(velocity, lateral, axis, angle);
+            vec_scale_to_length(velocity, velocity, math_random_float_range(D_L00_001AF5F8, D_L00_001AF5FC) * (1.0f / 60.0f));
+            velocity[2] = math_random_float_range(D_L00_001AF600, D_L00_001AF604) * (1.0f / 60.0f);
+            vec_clear_128((VectorBits *)velocity);
+            particle = part_spawn_ground_effect(position, 60, size * 0.1f, size,
                                      0x7F7F2020, 0, spin, velocity, brightness, 1);
             if (particle)
                 *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 0x70;
-            particle = SpawnGroundEffectParticle(position, 60, size * 0.07f, size * 0.7f,
+            particle = part_spawn_ground_effect(position, 60, size * 0.07f, size * 0.7f,
                                      0x7FFF4040, 1, -spin, velocity, brightness, 1);
             if (particle)
                 *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 0x70;

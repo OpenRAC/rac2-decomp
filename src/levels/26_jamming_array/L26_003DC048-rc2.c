@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern f32 ref_L26_003DC048_03(f32, f32);
 extern void ref_L26_003DC048_04(s8 *, s8 *, s32, s8 *, f32);
 
 /* Counts down two timers, eases a turning angle towards its goal and keeps the age counter going up. */
-void func_L26_003DC048(s8 *moby) {
+void creature_tick_timers(s8 *moby) {
     s8 *vars;
     f32 angle;
     u16 age;

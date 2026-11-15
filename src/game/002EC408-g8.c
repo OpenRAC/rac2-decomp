@@ -1,12 +1,12 @@
 #include "common.h"
 extern unsigned char D_001A7BE8[] __attribute__((sda));
 extern char D_00188660[], D_001A63A8_3[], D_00152C00[], D_001393E0[], D_001B9040[], D_001BAF80[], D_001BADC0[], D_001AC1E0[], D_001C5540[], D_00240450[], D_001B8840_raw[] __asm__("D_001B8840");
-extern int D_00214920[];
+extern int g_equipment_pieces[];
 extern int D_001ABEB0 __attribute__((sda)), D_001ABF0C __attribute__((sda));
-extern void func_00282A60(void *, int, int), func_0011AEA0(int), func_002B7CE0(int);
+extern void mem_clear(void *, int, int), FlushCache(int), snd_pump_music_and_disc_read(int);
 extern void *func_001336D0(void (*)(s32));
-extern int func_00132028(void), func_00133580(int), func_001261F0(int), func_0029EFD0(int), func_002E9268(void), func_00293A60(void);
-extern void func_0029FAE0(),
+extern int snd_Pump(void), snd_CheckLoadInProgress(int), sceGsSyncV(int), CreateMoby(int), UpdatePlaybackScene(void), ServiceLevelArchiveLoad(void);
+extern void moby_clear_object_slots(),
     func_00133710(),
     func_00133230(),
     func_002E5FE0(),
@@ -33,15 +33,15 @@ extern void func_0029FAE0(),
     func_002EAB18(),
     func_002EA8E8();
 extern int D_001B1680[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern int D_00139810 __attribute__((nosda));
 extern int D_00139814 __attribute__((nosda));
 extern int D_0013977C __attribute__((nosda));
 extern int D_00139780 __attribute__((nosda));
 extern int D_00139788 __attribute__((nosda));
 extern int D_001A7280[] __attribute__((sda));
-extern int D_001A7424[] __attribute__((sda));
+extern int g_save_menu_flags[] __attribute__((sda));
 extern int D_001B16AC[] __attribute__((sda));
 extern int D_001B2148[] __attribute__((sda));
 extern unsigned char D_001395E3 __attribute__((nosda));
@@ -59,17 +59,17 @@ typedef struct { char pad[0x10]; unsigned flags; } TransitionArchive;
 typedef struct { char pad[0x54]; char *current; } TransitionScene;
 
 /* Runs the whole level transition: shows the transition scene until the next level is loaded. */
-void func_002EC408(void)
+void RunLevelTransition(void)
 {
     int i,ready,done,kind,current;
-    ClearMemory(D_001BADC0,-1,0x80);
-    gCurrentGameMode[0]=6;
-    ((TransitionState *)gHeroMoby_00152C00)->phase=0;
-    ((TransitionState *)gHeroMoby_00152C00)->scene=0;
-    if(D_001B1680[0]==22 || gCurrentMapIndex[0]==22) ((TransitionState *)gHeroMoby_00152C00)->scene=1;
-    else if(D_001B1680[0]==23 || gCurrentMapIndex[0]==23) ((TransitionState *)gHeroMoby_00152C00)->scene=1;
-    else if(D_001B1680[0]==26 || gCurrentMapIndex[0]==26) ((TransitionState *)gHeroMoby_00152C00)->scene=2;
-    if(D_001B1680[0]==14 && !D_001395E3) ((TransitionState *)gHeroMoby_00152C00)->scene=3;
+    mem_clear(D_001BADC0,-1,0x80);
+    g_current_game_mode[0]=6;
+    ((TransitionState *)g_hero_moby_default)->phase=0;
+    ((TransitionState *)g_hero_moby_default)->scene=0;
+    if(D_001B1680[0]==22 || g_current_map_index[0]==22) ((TransitionState *)g_hero_moby_default)->scene=1;
+    else if(D_001B1680[0]==23 || g_current_map_index[0]==23) ((TransitionState *)g_hero_moby_default)->scene=1;
+    else if(D_001B1680[0]==26 || g_current_map_index[0]==26) ((TransitionState *)g_hero_moby_default)->scene=2;
+    if(D_001B1680[0]==14 && !D_001395E3) ((TransitionState *)g_hero_moby_default)->scene=3;
     if(D_001A7BE8[0] && D_001B1680[0] && !(D_00139810&0x200)) D_001ABEB0=0xa9;
     else if(D_001A7BE8[1] && D_001B1680[0]!=1 && !(D_0013977C&0x800000))D_001ABEB0=23;
     else if(D_001A7BE8[5] && D_001B1680[0]!=5 && !(D_00139810&0x800))D_001ABEB0=0xab;
@@ -77,21 +77,21 @@ void func_002EC408(void)
     else if((D_001A7BC8[10] || D_001A7BC8[11]) && !(D_00139780&0x4000000))D_001ABEB0=26;
     else if(D_001B1680[0]==13 && !(D_00139780&0x8000000))D_001ABEB0=27;
     else if(D_001A7BE8[16] && D_001B1680[0]!=16 && !(D_00139814&0x8000))D_001ABEB0=0xaf;
-    ((TransitionArchive *)gCollisionHit)->flags|=0x80000000;
-    ClearObjectSlots();
+    ((TransitionArchive *)g_collision_hit)->flags|=0x80000000;
+    moby_clear_object_slots();
     FlushCache(0);
     func_00133710(2,0,0,0,0);
-    ClearSoundFlagAndUpdate();
+    snd_clear_flag_and_update();
     snd_Pump();
-    ClearAllSoundVoices();
-    WaitForMusicIdle();
+    snd_clear_all_voices();
+    snd_wait_for_music_idle();
     D_001A63A8_3[7]=1;
-    for (i=0; i<6; i++)if(((TransitionEngine *)gSoundState)->handles[i]){
-        SendSoundCommand6(((TransitionEngine *)gSoundState)->handles[i]);
+    for (i=0; i<6; i++)if(((TransitionEngine *)g_sound_state)->handles[i]){
+        snd_send_cmd6(((TransitionEngine *)g_sound_state)->handles[i]);
         func_00132828();
-        STUB_printf(D_001AC1E0,((TransitionEngine *)gSoundState)->handles[i]);
+        STUB_printf(D_001AC1E0,((TransitionEngine *)g_sound_state)->handles[i]);
         D_001B16AC[0]=0;
-        ((TransitionEngine *)gSoundState)->handles[i]=0;
+        ((TransitionEngine *)g_sound_state)->handles[i]=0;
     }
     ((TransitionFog *)D_001B9040)->red=0;
     ((TransitionFog *)D_001B9040)->green=0;
@@ -109,37 +109,37 @@ void func_002EC408(void)
     D_001B1640.w=((TransitionFog *)D_001B9040)->far_intensity;
     SetBackgroundColor(0,0,0);
     if(D_001B1680[0]<0) {
-        while(((TransitionAudio *)gMemcardState)->state>=3 || ((TransitionAudio *)gMemcardState)->request>=0){
-            UpdateMemoryCardState();
-            UpdateMapStateMachine();
+        while(((TransitionAudio *)g_memcard_state)->state>=3 || ((TransitionAudio *)g_memcard_state)->request>=0){
+            mc_update_state();
+            map_update_state_machine();
         }
-        if(((TransitionAudio *)gMemcardState)->playing)((TransitionAudio *)gMemcardState)->playing=0;
-        if(((TransitionAudio *)gMemcardState)->requested>=0)((TransitionAudio *)gMemcardState)->requested=-1;
-        gSaveMenuFlags[0]=gSaveMenuFlags[0]&~0x200;
+        if(((TransitionAudio *)g_memcard_state)->playing)((TransitionAudio *)g_memcard_state)->playing=0;
+        if(((TransitionAudio *)g_memcard_state)->requested>=0)((TransitionAudio *)g_memcard_state)->requested=-1;
+        g_save_menu_flags[0]=g_save_menu_flags[0]&~0x200;
         func_001336D0(0);
         D_001A63A8_3[7]=0;
-        PumpMusicAndDiscRead(1);
+        snd_pump_music_and_disc_read(1);
         while(snd_Pump()){
         }
         D_001A63A8_3[7]=1;
         FadeToBlack(6);
-        gCurrentMapIndex[0]=D_001B1680[0];
+        g_current_map_index[0]=D_001B1680[0];
         LoadLevelChunkFromDisc();
         snd_CheckLoadInProgress(0);
         D_001A63A8_3[7]=0;
-        RemoveDmaHandlers();
+        gfx_remove_dma_handlers();
         return;
     }
-    current=gCurrentMapIndex[0];
+    current=g_current_map_index[0];
     if((unsigned)current<19 && (current || (D_00139788&2)) && current<28)D_001A7BE8[current]=2;
-    gCurrentMapIndex[0]=D_001B1680[0];
+    g_current_map_index[0]=D_001B1680[0];
     D_001A7280[0]=0;
     D_001A7280[1]=1;
-    ((TransitionArchive *)gCollisionHit)->flags|=0x80000000;
+    ((TransitionArchive *)g_collision_hit)->flags|=0x80000000;
     ready=0;
     InitializeLevelRuntime();
-    LoadCopySetupEntry(gCurrentMapIndex[0],D_001C5540);
-    kind=((TransitionState *)gHeroMoby_00152C00)->scene;
+    load_copy_setup_entry(g_current_map_index[0],D_001C5540);
+    kind=((TransitionState *)g_hero_moby_default)->scene;
     if(kind==3){
         D_001B2148[0]=CreateMoby(0x1342 /* moby class 4930 */);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
@@ -154,23 +154,23 @@ void func_002EC408(void)
     }
     else{
         int i;
-        for(i=0;gEquipmentPieces[i];i++)gEquipmentPieces[i]=0;
+        for(i=0;g_equipment_pieces[i];i++)g_equipment_pieces[i]=0;
         SpawnEquipmentPieces(((TransitionScene *)D_001B8840_raw)->current);
     }
-    InitEffectRecordTable(D_00240450);
+    part_init_effect_table(D_00240450);
     do {
         SubmitBufferedDmaChain();
-        SwapPacketBuffer();
+        gfx_swap_packet_buffer();
         PutDrawBufferSmall();
-        QueueSecondStripPacket();
-        AppendDrawListHeader();
-        PollPadPorts();
+        gfx_queue_second_strip_packet();
+        gfx_append_draw_list_header();
+        pad_poll_ports();
         done=UpdatePlaybackScene();
-        DrawTransitionBackground();
-        UpdateMemoryCardState();
-        UpdateMapStateMachine();
-        WaitForDmaStatusBits(1);
-        GetGsCurrentField(0);
+        transition_draw_background();
+        mc_update_state();
+        map_update_state_machine();
+        gfx_wait_for_dma_status_bits(1);
+        sceGsSyncV(0);
         D_001B1598[0]=D_001B1598[0]+1;
         if(!D_001ABEB0 && !ready)ready=ServiceLevelArchiveLoad();
     }
@@ -179,20 +179,20 @@ void func_002EC408(void)
     if(!ready){
         do{
             FlushCache(0);
-            GetGsCurrentField(0);
-            UpdateMemoryCardState();
-            UpdateMapStateMachine();
+            sceGsSyncV(0);
+            mc_update_state();
+            map_update_state_machine();
         }
         while(!ServiceLevelArchiveLoad());
     }
-    while(((TransitionAudio *)gMemcardState)->state!=2 || ((TransitionAudio *)gMemcardState)->request>=0){
+    while(((TransitionAudio *)g_memcard_state)->state!=2 || ((TransitionAudio *)g_memcard_state)->request>=0){
         FlushCache(0);
-        GetGsCurrentField(0);
-        UpdateMemoryCardState();
-        UpdateMapStateMachine();
+        sceGsSyncV(0);
+        mc_update_state();
+        map_update_state_machine();
     }
-    if(D_001B2130[2])SendSoundCommand6(D_001B2130[2]);
-    if(D_001B2130[4])SendSoundCommand6(D_001B2130[4]);
+    if(D_001B2130[2])snd_send_cmd6(D_001B2130[2]);
+    if(D_001B2130[4])snd_send_cmd6(D_001B2130[4]);
     while(snd_Pump()){
     }
     func_00132828();
@@ -200,5 +200,5 @@ void func_002EC408(void)
     snd_CheckLoadInProgress(0);
     snd_CheckLoadInProgress(0);
     D_001A63A8_3[7]=0;
-    RemoveDmaHandlers();
+    gfx_remove_dma_handlers();
 }

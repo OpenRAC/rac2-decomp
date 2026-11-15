@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int D_001A9A54 __attribute__((sda));
 extern char D_001A9A60 __attribute__((sda));
 extern char D_001A9AB8 __attribute__((sda));
-extern char D_00256418[];
-extern int func_0026F7D8(void), func_0026F7D8(void);
+extern char g_mission_menu_items[];
+extern int stub_empty_25(void), stub_empty_25(void);
 extern void func_US2_0029CA88(void), func_US2_0029C700(void);
-extern void func_00349490(void *, int);
+extern void menu_set_field_144(void *, int);
 extern void func_US2_0033BA48(void *,void *,void *);
 extern void func_US2_0033BA10(void *,float);
 extern void func_US2_0033BA28(void *,int);
-extern int func_0026F7D0(void), func_0026F7D0(void);
+extern int stub_empty_24(void), stub_empty_24(void);
 
 extern int ref_US2_0029C818_00(void), ref_US2_0029C818_00(void);
 extern int ref_US2_0029C818_01(void), ref_US2_0029C818_01(void);
@@ -25,8 +26,8 @@ void func_US2_0029C818(void) {
    func_US2_0029CA88();
    D_001A9A54=enabled;
    if(enabled==1) {
-    func_00349490(D_001A8CFC[0]+0x3CD48,(int)&D_001A9A60);
-    func_US2_0033BA48(D_001A8CFC[0]+0x3F7B0,&D_001A9AB8,D_00256418);
+    menu_set_field_144(D_001A8CFC[0]+0x3CD48,(int)&D_001A9A60);
+    func_US2_0033BA48(D_001A8CFC[0]+0x3F7B0,&D_001A9AB8,g_mission_menu_items);
     func_US2_0033BA10(D_001A8CFC[0]+0x3F7B0,36.0f);
     func_US2_0033BA28(D_001A8CFC[0]+0x3F7B0,-1);
     func_US2_0029C700();
@@ -36,9 +37,9 @@ void func_US2_0029C818(void) {
 }
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern void func_US2_0029C8F0(void);
-extern unsigned int func_00285840(void);
+extern unsigned int menu_get_saved_state(void);
 extern void func_US2_0029C648(void);
 typedef int (*Fn)(void);
 typedef struct { void *cb; int pad; } Slot;
@@ -87,9 +88,9 @@ void func_US2_0029CA98(void)
     if (result != 0)
         return;
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_00285840() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (menu_get_saved_state() != 7)
                 return;
         }
     }
@@ -105,20 +106,20 @@ states:
 /* func_US2_0029CCB8, the v2.00 copy of func_0029BEB8: the same C with one more test and the menu's new offset. */
 extern int D_001A9A50 __attribute__((sda));
 extern short D_0018A000[];
-extern int D_001A8C64;
+extern int g_notice_owner;
 extern void func_US2_0033B720(void *);
 
 void func_US2_0029CCB8(void) {
-    if (D_001A9A50 != 0 && D_0018A000[0] == 0 && D_001A8C64 == 0 && D_001A9A54 != 0 && D_001A8CFC[0] != 0)
+    if (D_001A9A50 != 0 && D_0018A000[0] == 0 && g_notice_owner == 0 && D_001A9A54 != 0 && D_001A8CFC[0] != 0)
         func_US2_0033B720(D_001A8CFC[0] + 0x3F7B0);
 }
 
 /* func_US2_0029CD18, the v2.00 copy of func_0029BF08: the callback tables at their new offsets,
    a menu test before them and the camera scale moved out to func_US2_0029CC48. */
-extern int D_001A79F0[] __attribute__((sda));
-extern void func_00290680(void);
+extern int g_current_map_index[] __attribute__((sda));
+extern void hud_update_letterbox_bars(void);
 extern void func_US2_0029CC48(void);
-extern int func_002857B0(void);
+extern int menu_get_mode(void);
 extern int ref_US2_0029CD18_00(int);
 
 typedef unsigned int (*CbCd)(void);
@@ -150,12 +151,12 @@ void func_US2_0029CD18(void)
     if (D_001A8CFC[0] == 0)
         goto states;
 
-    if (D_001A8BB0[0] == 4) {
-        if (func_002857B0() == 8)
+    if (g_current_game_mode[0] == 4) {
+        if (menu_get_mode() == 8)
             return;
     }
 
-    func_00290680();
+    hud_update_letterbox_bars();
     result = 0;
     func_US2_0029CCB8();
 
@@ -176,7 +177,7 @@ void func_US2_0029CD18(void)
     }
 
     if (result != 0) {
-        if (D_001A79F0[0] == 8 || D_001A79F0[0] == 0x13) {
+        if (g_current_map_index[0] == 8 || g_current_map_index[0] == 0x13) {
             if (ref_US2_0029CD18_00(2))
                 func_US2_0029CC48();
         }
@@ -186,9 +187,9 @@ void func_US2_0029CD18(void)
         return;
 
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_00285840() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (menu_get_saved_state() != 7)
                 return;
         }
     }

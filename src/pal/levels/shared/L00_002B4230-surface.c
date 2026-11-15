@@ -24,19 +24,19 @@ typedef struct {
     u8 pad20[0x40 - 0x20];
     Vec4458 normal;      
 } Hit4458;
-extern Hero4458 D_00189E20;
-extern Hit4458 D_L00_001BF200;
-extern float func_L00_002D3A58(Vec4458 *);
-extern void func_L00_002D36E0(Vec4458 *, float, float, float, int);
-extern float func_00282E20(Vec4458 *);
-extern void func_00282F20(Vec4458 *, Vec4458 *, float);
-extern void func_L00_002D3B58(Vec4458 *, Vec4458 *, float);
-extern void func_00282D30(Vec4458 *, Vec4458 *, float);
-extern void func_00282CC0(Vec4458 *, Vec4458 *, Vec4458 *);
-extern int func_002761F8(Vec4458 *, Vec4458 *, int, s32, int);
-extern int func_00278E78(void);
-extern float func_L00_002D3EA8(Vec4458 *);
-extern float func_00282DB0(Vec4458 *, Vec4458 *);
+extern Hero4458 g_hero_state;
+extern Hit4458 g_collision_result;
+extern float cam_get_view_space_vector_length(Vec4458 *);
+extern void hero_build_relative_point(Vec4458 *, float, float, float, int);
+extern float vec_length_xy(Vec4458 *);
+extern void vec_scale_to_length(Vec4458 *, Vec4458 *, float);
+extern void cam_set_view_space_height(Vec4458 *, Vec4458 *, float);
+extern void FastVecScale(Vec4458 *, Vec4458 *, float);
+extern void FastVecAdd(Vec4458 *, Vec4458 *, Vec4458 *);
+extern int CollLine(Vec4458 *, Vec4458 *, int, s32, int);
+extern int GetCollHitMaterial(void);
+extern float cam_get_view_space_angle(Vec4458 *);
+extern float FastVecDot(Vec4458 *, Vec4458 *);
 
 /* While the hero moves, casts two short rays ahead of it (along its velocity, or along
  * the direction at +0x0 when nearly still or when forced): one from a point at the mode's
@@ -56,43 +56,43 @@ void func_PAL_L00_002B4380(int force)
     float dot;
     int type;
 
-    if (func_L00_002D3A58(&D_00189E20.velocity) < 0.002f)
+    if (cam_get_view_space_vector_length(&g_hero_state.velocity) < 0.002f)
         return;
     height = 0.37f;
     reach = 0.5f;
-    if ((unsigned int)(D_00189E20.x229C - 17) < 2) {
+    if ((unsigned int)(g_hero_state.x229C - 17) < 2) {
         height = 0.0f;
         reach = 0.7f;
-    } else if (D_00189E20.mode == 1) {
+    } else if (g_hero_state.mode == 1) {
         height = 0.35f;
         reach = 0.27f;
     }
-    func_L00_002D36E0(&upper, 0.0f, 0.0f, height, 1);
-    func_L00_002D36E0(&lower, 0.0f, 0.0f, height * 0.3f, 1);
-    if (force || func_00282E20(&D_00189E20.velocity) < 0.01f) {
-        func_00282F20(&upperEnd, &D_00189E20.dir0, reach);
-        func_00282F20(&lowerEnd, &D_00189E20.dir0, reach * 1.4f);
+    hero_build_relative_point(&upper, 0.0f, 0.0f, height, 1);
+    hero_build_relative_point(&lower, 0.0f, 0.0f, height * 0.3f, 1);
+    if (force || vec_length_xy(&g_hero_state.velocity) < 0.01f) {
+        vec_scale_to_length(&upperEnd, &g_hero_state.dir0, reach);
+        vec_scale_to_length(&lowerEnd, &g_hero_state.dir0, reach * 1.4f);
     } else {
-        func_L00_002D3B58(&upperEnd, &D_00189E20.velocity, 0.0f);
-        func_00282F20(&upperEnd, &upperEnd, reach);
-        func_00282D30(&lowerEnd, &upperEnd, 1.4f);
+        cam_set_view_space_height(&upperEnd, &g_hero_state.velocity, 0.0f);
+        vec_scale_to_length(&upperEnd, &upperEnd, reach);
+        FastVecScale(&lowerEnd, &upperEnd, 1.4f);
     }
     type = -1;
-    func_00282CC0(&upperEnd, &upperEnd, &upper);
-    func_00282CC0(&lowerEnd, &lowerEnd, &lower);
-    if (func_002761F8(&lower, &lowerEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
-        type = func_00278E78();
+    FastVecAdd(&upperEnd, &upperEnd, &upper);
+    FastVecAdd(&lowerEnd, &lowerEnd, &lower);
+    if (CollLine(&lower, &lowerEnd, 2, g_hero_state.moby, 0) && g_collision_result.hits > 0)
+        type = GetCollHitMaterial();
     slope = 0.0f;
-    if (func_002761F8(&upper, &upperEnd, 2, D_00189E20.moby, 0) && D_L00_001BF200.hits > 0)
-        slope = func_L00_002D3EA8(&D_L00_001BF200.normal);
+    if (CollLine(&upper, &upperEnd, 2, g_hero_state.moby, 0) && g_collision_result.hits > 0)
+        slope = cam_get_view_space_angle(&g_collision_result.normal);
     if (slope >= 0.87266469f || type == 8 || type == 12) {
-        D_00189E20.x270 = D_L00_001BF200.x18;
-        func_L00_002D3B58(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 0.0f);
-        func_00282F20(&D_L00_001BF200.normal, &D_L00_001BF200.normal, 1.0f);
-        dot = func_00282DB0(&D_L00_001BF200.normal, &D_00189E20.velocity);
+        g_hero_state.x270 = g_collision_result.x18;
+        cam_set_view_space_height(&g_collision_result.normal, &g_collision_result.normal, 0.0f);
+        vec_scale_to_length(&g_collision_result.normal, &g_collision_result.normal, 1.0f);
+        dot = FastVecDot(&g_collision_result.normal, &g_hero_state.velocity);
         if (dot < 0.0f) {
-            func_00282D30(&D_L00_001BF200.normal, &D_L00_001BF200.normal, -dot);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &D_L00_001BF200.normal);
+            FastVecScale(&g_collision_result.normal, &g_collision_result.normal, -dot);
+            FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &g_collision_result.normal);
         }
     }
 }

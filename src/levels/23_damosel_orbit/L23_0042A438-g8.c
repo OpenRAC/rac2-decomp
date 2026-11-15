@@ -80,45 +80,45 @@ extern TI16 D_L23_002A75F0[];
 
 extern TI16 D_L23_002A7170[];
 
-extern TI16 D_L23_001BA640[];
+extern TI16 g_camera_l23_position[];
 
-extern void func_00291450(s32);
+extern void gfx_free_point_light(s32);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00282DD8(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern float func_00282DF0(void *);
+extern float FastVecLength(void *);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern s32 func_L00_002FCF18(void *, float, float, float, float, float);
+extern s32 part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 
-extern long long func_0027C878(s32);
+extern long long GetEffectTextureDescriptor(s32);
 
-extern void func_002FC560(u32, u64);
+extern void VU1_addGSregister(u32, u64);
 
 extern void func_L03_002EFB60(void *, void *, float);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 
-extern void func_00280B90(void *, void *, s32);
+extern void draw_world_quad(void *, void *, s32);
 
 /* releases the held handle, spawns a new one from jittered values, updates the globals, then
    draws one quad for every live entry of the 72-entry table, tilted by the spin state */
-void func_L23_0042A438(u8 *moby) {
+void hero_draw_trail_ribbons(u8 *moby) {
     L23Spin3 *vars;
     L23Quad pkt;
     struct { TI16 rows[4]; } matrix;
@@ -147,17 +147,17 @@ void func_L23_0042A438(u8 *moby) {
 
     if (D_L23_001B1484_2 != 0) {
         if (D_L23_001B1B94 != -1) {
-            FreePointLight(D_L23_001B1B94);
+            gfx_free_point_light(D_L23_001B1B94);
         }
         FastVecScale(w, D_L23_001B1484_2 + 0xE0, 10.0f);
         FastVecAdd(w, w, D_L23_001B1484_2 + 0x10);
-        f = RandomFloatRange(0.0f, D_L23_001B1C28);
+        f = math_random_float_range(0.0f, D_L23_001B1C28);
         fa = D_L23_001B1C28 + f;
-        f = RandomFloatRange(0.0f, D_L23_001B1C2C);
+        f = math_random_float_range(0.0f, D_L23_001B1C2C);
         fb = D_L23_001B1C2C + f;
-        f = RandomFloatRange(0.0f, D_L23_001B1C30 * 0.5f);
+        f = math_random_float_range(0.0f, D_L23_001B1C30 * 0.5f);
         fc = D_L23_001B1C30 + f;
-        D_L23_001B1B94 = AllocateEffectSlot_L00_2(w, 20.0f, 0.0f, fa, fb, fc);
+        D_L23_001B1B94 = part_l00_alloc_effect_slot_2(w, 20.0f, 0.0f, fa, fb, fc);
         D_L23_001B1C00 = D_L23_001B1C00 - D_L23_001B1C04;
         D_L23_001B39D0 = D_L23_001B1470 * 0.94f;
         vars = ((L23Obj *)moby)->vars;
@@ -198,7 +198,7 @@ void func_L23_0042A438(u8 *moby) {
                 alphaScale = D_L23_001B1C18;
                 transform_vector(v120, &D_L23_002A75F0[i], &matrix);
                 matrix_mul_vec3(v140, &D_L23_002A7170[i], mp);
-                FastVecSub(v150, v120, gCameraPosition_L23);
+                FastVecSub(v150, v120, g_camera_l23_position);
                 FastVecCross(v160, v140, v150);
                 vec_scale_to_length(v160, v160, alphaScale);
                 f = FastVecLength(v150);

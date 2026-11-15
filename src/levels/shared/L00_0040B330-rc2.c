@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern s32 ref_L00_0040B330_03 __attribute__((sda));
 extern s8 ref_L00_0040B330_04[];
 
 /* Starts an animation on the object, picked from a table by a number in its private data. */
-void func_L00_0040B330(void *moby) {
+void moby_start_animation_from_table(void *moby) {
     s8 animBuf[0x10];
     s8 *vars;
 

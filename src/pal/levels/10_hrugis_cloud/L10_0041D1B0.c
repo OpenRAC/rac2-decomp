@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef unsigned char u8;
@@ -16,16 +17,16 @@ extern s32 func_0037D390(u8 *arg0, s32 a1, s32 a2, s32 a3);
 extern s32 func_00335200(s32 a0, s32 a1);
 extern f32 func_00309138(f32 f12);
 extern f32 func_00309120(f32 f12);
-extern void func_L10_004184F0(u8 *arg0);
-extern s32 func_L05_0037B538(u8 *arg0, s32 a1, s32 a2, s32 a3);
-extern s32 func_002E5DA0(s32 index, s32 value, u8 *object, s32 kind);
+extern void cloud_puff_init(u8 *arg0);
+extern s32 moby_process_collision_hit(u8 *arg0, s32 a1, s32 a2, s32 a3);
+extern s32 snd_play_from_class_bank(s32 index, s32 value, u8 *object, s32 kind);
 extern s32 func_0037D6E0(u8 *a0);
 extern u8 *D_L10_0020B1E0[];
 extern u8 *D_001B251C;
 extern u8 D_L10_00265BA0[];
 extern u8 D_L10_00188660[];
 extern u8 D_L10_00221CD0[];
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern s32 D_001B0F44 __attribute__((sda));
 extern s32 D_001B0F48 __attribute__((sda));
 

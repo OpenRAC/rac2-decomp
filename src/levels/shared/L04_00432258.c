@@ -12,7 +12,7 @@ extern void ref_L04_00432258_06(float *);
 extern void ref_L04_00432258_07(float *, float, char *, int, float, int, int, int, int, int);
 
 /* Pulsing glow marker: spins a phase stored in its record, derives a pulsing alpha from it and, while the distance test passes, spawns a 0xC0-tick light effect with that colour. */
-void func_L04_00432258(char *obj) {
+void pulsing_glow_update(char *obj) {
     float lightData[8];
     float *vars = FLD(obj, float *, 0x68);
     float intensity;

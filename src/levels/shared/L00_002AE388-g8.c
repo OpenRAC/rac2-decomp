@@ -28,17 +28,17 @@ typedef struct {
     char second[0x600];
 } BufferAF3D8;
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern StateAF3D8 D_00189E20_26;
 extern int D_L00_001A7D00[2] __attribute__((sda));
 extern BufferAF3D8 D_L00_001B7400[];
-extern char D_L00_00262570[];
-extern int func_L00_002ADEA0(int);
+extern char g_weapon_l00_table[];
+extern int hero_slot_item_id(int);
 extern char *ref_L00_002AF3D8_0(int, int);
 extern void ref_L00_002AF3D8_1(int, void *, int, int, int, int);
 
 /* Creates the objects for the two item slots if they are missing, using the current item. */
-void func_L00_002AF3D8(int inhibit, int request)
+void hero_create_item_slot_objects(int inhibit, int request)
 {
     int id, i;
 
@@ -46,7 +46,7 @@ void func_L00_002AF3D8(int inhibit, int request)
         !D_00189E20_26.active || inhibit || !request)
         return;
 
-    id = ((EntryAF3D8 *)gWeaponTable_L00)[gItemSlotToRecord[hero_slot_item_id(0)]].id;
+    id = ((EntryAF3D8 *)g_weapon_l00_table)[g_item_slot_to_record[hero_slot_item_id(0)]].id;
     if (id == -1)
         return;
 

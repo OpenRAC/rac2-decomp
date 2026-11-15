@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -27,7 +28,7 @@ extern s8 ref_L00_003BCDC0_00[];
 extern void ref_L00_003BCDC0_01(s32, void *);
 
 /* Finds every sprite record owned by this moby and passes it to a helper. */
-void func_L00_003BCDC0(s32 owner) {
+void spark_process_owned_records(s32 owner) {
     s8 *record;
     s8 *tableEnd;
 

@@ -1,7 +1,8 @@
+#include "names.h"
 /* func_PAL_002FA330, the PAL copy of func_002F93B0: the same C, where rename func_002F9198 becomes func_PAL_002FA118. */
 #include "common.h"
 
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 #ifndef RAC2_T_F32_F2144BF3D
 #define RAC2_T_F32_F2144BF3D
@@ -18,7 +19,7 @@ typedef int s32_F2144bf3d;
 #define RAC2_T_RESIDENT138180_F2144BF3D
 #endif
 
-extern char D_00138180[];
+extern char g_pad_state[];
 
 extern s32_F2144bf3d D_0018D198[];
 
@@ -26,7 +27,7 @@ extern s32_F2144bf3d D_L06_001AD3A0 __attribute__((sda));
 
 extern s32_F2144bf3d D_001A7390;
 
-extern s32_F2144bf3d D_001A79F0;
+extern s32_F2144bf3d g_current_map_index;
 
 extern s32_F2144bf3d D_L06_001B2348;
 
@@ -53,10 +54,10 @@ typedef struct {
     f32 row2[3];
 } Cam_2F5AF8;
 
-extern CamList_2F5AF8 D_001B8840;
+extern CamList_2F5AF8 g_scene_playback_state;
 extern CamView_2F5AF8 D_001B9040;
-extern Cam_2F5AF8 D_001B5200;
-extern void func_0027AB40(void);
+extern Cam_2F5AF8 g_active_camera;
+extern void UpdateViewContext(void);
 /* Publishes the slow-down factor and, while the frame rate is below one, asks
    for the six-frame path. */
 
@@ -70,16 +71,16 @@ typedef union {
 } F6510Record;
 typedef struct { int type; char pad[12]; int locked; int active; } F6510Row;
 typedef struct { char pad[0x80]; int selected; char pad84[0xBC]; F6510Row rows[1]; } F6510State;
-extern F6510State D_L00_0022F7C0;
-extern unsigned char D_00139568[];
-extern F6510Record D_L00_00262570[];
-int func_002F6510(void);
+extern F6510State g_purchase_menu_model;
+extern unsigned char g_item_slot_to_record[];
+extern F6510Record g_weapon_l00_table[];
+int GetSelectedShopItemPrice(void);
 
 extern unsigned char D_001A7AB8[] MACRO_ADDR;
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern unsigned char D_001A7A80[] MACRO_ADDR;
 typedef struct { int active; char pad4[0x10]; int info; char pad18[0x80]; int channels[3]; char padA4[0x3C]; } F73Record;
-extern F73Record D_00239BA0[];
+extern F73Record g_weapon_table[];
 typedef struct { char pad[0x140]; int rows[96][4]; int count; } F73StateType;
 extern F73StateType D_0021F240_rows __asm__("D_0021F240");
 typedef struct { unsigned char pad0[0x3C]; char *destination; unsigned char pad1[0x24]; int clear; } Func_002F88D8State;
@@ -89,23 +90,23 @@ typedef struct { Quad_002F9198 a, b, c; } Three_002F9198;
 typedef struct { int words[5]; } Five_002F9198;
 typedef struct { int state; char pad4[0x24]; char *moby; char pad2C[0x24]; int mode; char pad54[0xC]; int restore; char pad64[0x7C]; Quad_002F9198 saved; } Shop_002F9198;
 typedef struct { char *moby; char pad4[0x14]; int a; char pad1C[0x14]; int b; } HeroMenu_002F9198;
-extern Shop_002F9198 D_0021F240;
+extern Shop_002F9198 g_vendor_menu_state;
 /* Its address is one `la` (assembler lui/addiu pair), not a split %hi/%lo: retail
    schedules the pair as one insn ahead of dst + 0x220. */
 extern Three_002F9198 D_001B2250 MACRO_ADDR;
 /* 0x40-byte block that func_002DE990 saves and restores whole. */
 typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
-extern Settings_002F9198 D_001A79F8 MACRO_ADDR;
+extern Settings_002F9198 g_player_bolts MACRO_ADDR;
 extern Five_002F9198 D_001AD308;
-extern HeroMenu_002F9198 D_00152C00;
-extern int func_002E5CF8(int, int, void *);
+extern HeroMenu_002F9198 g_hero_moby_default;
+extern int PlayMobySound(int, int, void *);
 void func_PAL_002FA118(void);
 
 extern int D_001B2240, D_001B223C;
 extern int D_001B2244 __attribute__((sda));
-extern int D_00139688[];
-extern void func_0028B6C8(int, unsigned int);
-extern int func_002F6510(void);
+extern int g_item_ammo_counts[];
+extern void set_animation_parameter(int, unsigned int);
+extern int GetSelectedShopItemPrice(void);
 extern void func_PAL_002FA118(void);
 
 typedef struct { int id, kind; int fields[4]; } ShopRow_93;
@@ -125,7 +126,7 @@ void func_PAL_002FA330(void)
     char *record;
     if (state->busy) return;
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)g_pad_state;
         if ((input->buttons & 0x2000) ||
                 (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
             if (state->scroll < 57) {
@@ -141,10 +142,10 @@ void func_PAL_002FA330(void)
                         state->animation = animation;
                     }
                     state->scroll += 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -152,7 +153,7 @@ void func_PAL_002FA330(void)
         }
     }
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
         if ((input->buttons & 0x8000) ||
                 (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
@@ -170,10 +171,10 @@ void func_PAL_002FA330(void)
                         state->animation = animation;
                     }
                     state->scroll -= 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -181,7 +182,7 @@ void func_PAL_002FA330(void)
         }
     }
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
         if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
             ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
@@ -191,32 +192,32 @@ void func_PAL_002FA330(void)
                     int stride = sizeof(ShopRow_93);
                     int *kinds = &state->rows[0].kind;
                     if (*(int *)((char *)kinds + state->selected * stride) == 0) {
-                        cost = func_002F6510();
-                        if ((*(int *)&D_001A79F8) >= cost) goto activate;
+                        cost = GetSelectedShopItemPrice();
+                        if ((*(int *)&g_player_bolts) >= cost) goto activate;
                     }
                     if (*(int *)((char *)kinds + state->selected * stride) != 1) goto rejected;
                     {
                         int id = state->rows[state->selected].id;
-                        int owned = D_00139688[id];
-                        record = (char *)D_00239BA0 + D_00139568[id] * 224;
+                        int owned = g_item_ammo_counts[id];
+                        record = (char *)g_weapon_table + g_item_slot_to_record[id] * 224;
                         if (owned >= *(unsigned short *)(record + 0x8E)) goto rejected;
                     }
-                    if ((*(int *)&D_001A79F8) < *(unsigned short *)(record + 0x88)) goto rejected;
+                    if ((*(int *)&g_player_bolts) < *(unsigned short *)(record + 0x88)) goto rejected;
                 }
 activate:
                 {
                     ShopInput_93 *active = &F93State;
                     if (active->animated) active->animation = 1;
                     active->busy = 1;
-                    func_002E5CF8(0, 17, active->moby);
+                    PlayMobySound(0, 17, active->moby);
                     goto finish;
                 }
 rejected:
-                func_002E5CF8(2, 17, F93State.moby);
+                PlayMobySound(2, 17, F93State.moby);
         }
     }
 finish:
-    if (((Input_93 *)D_00138180)->buttons & 0x10) func_PAL_002FA118();
+    if (((Input_93 *)g_pad_state)->buttons & 0x10) func_PAL_002FA118();
 }
 
 extern void func_PAL_002FA330(void);

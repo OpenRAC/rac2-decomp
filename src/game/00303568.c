@@ -1,14 +1,14 @@
 #include "common.h"
 extern float D_00222AE0[][4];
-extern float func_002A7878(float, float);
-extern float func_00283CB8(float);
+extern float math_random_float_range(float, float);
+extern float FloatFraction(float);
 /* Picks a random point on the surface grid and returns its position. */
-void func_00303568(char *obj, float *out)
+void surface_grid_random_point(char *obj, float *out)
 {
     char *rec = *(char **)(obj + 0x68);
-    float x = RandomFloatRange(0.0f, 6.99f);
+    float x = math_random_float_range(0.0f, 6.99f);
     int ix = (int)x;
-    float y = RandomFloatRange(0.0f, 6.99f);
+    float y = math_random_float_range(0.0f, 6.99f);
     int iy = (int)y;
     int base = *(int *)(rec + 0x40) * 64;
     int index = base + iy * 8 + ix;

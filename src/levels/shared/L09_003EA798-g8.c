@@ -3,13 +3,13 @@
 
 /* Its caller func_L09_003EAA18 is in L09_002B7238-g8.c; this unit of its own keeps that
    call external, since PAL has func_L09_003EAA18 in C but not this function. */
-extern void func_002A7750(char *object, int a1, int a2);
+extern void moby_set_state(char *object, int a1, int a2);
 
 /* func_L09_003EA798: the four scaled inputs differ per level (ref_). */
-extern int func_00283CF0(float);
-extern void func_002B60B0(char *, float, float, float, float);
-extern float func_L09_0033E7A0(int);
-extern int func_L09_003EA2D0(char *, int, int);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern float path_get_entry_length(int);
+extern int path_start_moby_on_entry(char *, int, int);
 extern unsigned int D_L09_001FE6C0[];
 extern float ref_L09_003EA798_00 __attribute__((sda));
 extern float ref_L09_003EA798_01 __attribute__((sda));
@@ -82,7 +82,7 @@ typedef struct {
    (stores with more dependants first, 0x50 being the 34th memory reference) turn into
    retail's sequence. */
 /* Sets up the starting values of a new walking enemy and moves it to its first path point. */
-void func_L09_003EA798(char *object) {
+void walker_init(char *object) {
     DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
     char *pos = object + 0x10;
     int entry;
@@ -123,18 +123,18 @@ void func_L09_003EA798(char *object) {
     state->f50 = 3.5f;
     state->f60 = 3.141593f;
     state->f80 = 0.52359885f;
-    SetControllerSpeedLimits(object, ref_L09_003EA798_00 * 0.00027777778f, ref_L09_003EA798_01 * 0.016666668f,
+    moby_set_controller_speed_limits(object, ref_L09_003EA798_00 * 0.00027777778f, ref_L09_003EA798_01 * 0.016666668f,
                   ref_L09_003EA798_02 * 4.8481374e-06f, ref_L09_003EA798_03 * 0.00029088825f);
     state->f354 = state->f374;
-    GetPathTableEntryLength(state->f36C);
-    GetPathTableEntryLength(state->f350);
+    path_get_entry_length(state->f36C);
+    path_get_entry_length(state->f350);
     entry = state->f36C;
     if (entry != -1) {
         qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
-        StartMobyOnPathEntry(object, entry, -1);
+        path_start_moby_on_entry(object, entry, -1);
         state->f380 = 0;
     } else {
         state->f380 = 1;
     }
-    SetMobyState(object, 1, 1);
+    moby_set_state(object, 1, 1);
 }

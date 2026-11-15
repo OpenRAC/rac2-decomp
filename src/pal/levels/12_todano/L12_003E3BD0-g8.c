@@ -1,19 +1,19 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
 extern float D_L12_001B09F8 __attribute__((sda));
 extern int D_L12_001B09F4 __attribute__((sda));
 extern u8 *D_L12_001B2F8C[] __attribute__((sda));
 extern u8 D_L12_001B9E00[];
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_00282CF0(void *, void *, void *), func_00283098(void *, void *, void *);
-extern int func_L02_0032E508(void *, int, void *, int);
-extern void func_PAL_002A7E68(void *, int, int, int), func_002A93B0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_PAL_002B1A50(void *, void *, int), func_L00_002E6EF8(void (*)(u8 *), void *);
-extern void func_L12_003E0B68(u8 *);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
+extern int path_build_route_nodes(void *, int, void *, int);
+extern void func_PAL_002A7E68(void *, int, int, int), moby_update_ground_check(void *);
+extern float fast_vec_dist(void *, void *);
+extern void func_PAL_002B1A50(void *, void *, int), gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern void gfx_add_two_glow_sprites(u8 *);
 typedef struct TodanoInitState {
     u8 pad0[0x28];
     u8 f28;
@@ -89,7 +89,7 @@ void func_PAL_L12_003E4728(TodanoInitObject *o) {
     TodanoInitState *d = o->f68;
     if (!o->f20) {
         int kind;
-        o->f7C = 1 << func_002A77E0(6);
+        o->f7C = 1 << math_random_int_below(6);
         kind = 3;
         d->fCC = kind;
         d->fCE = kind;
@@ -124,23 +124,23 @@ void func_PAL_L12_003E4728(TodanoInitObject *o) {
         d->f58C = -1;
         d->f560 = 3.14159012f;
         d->f588 |= 1;
-        func_002B60B0(o, 0.0048f, 0.120000005f, 0.005026549f, 0.25132746f);
+        moby_set_controller_speed_limits(o, 0.0048f, 0.120000005f, 0.005026549f, 0.25132746f);
         qcopy((u8 *)d + 0x760, (u8 *)o + 0x10);
-        func_00282CF0((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
-        func_00283098((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
+        FastVecSub((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
         d->f598 = (u8 *)d + 0x6C0;
         d->f59C = (u8 *)d + 0x640;
-        d->f790 = func_L02_0032E508(o, d->f510, (u8 *)d + 0x110, 32);
+        d->f790 = path_build_route_nodes(o, d->f510, (u8 *)d + 0x110, 32);
         o->f98 = 0;
         o->f34 = (o->f34 | 0x41) & 0xEFFF;
-        func_002A7750(o, 1, 0);
+        moby_set_state(o, 1, 0);
         if (o->f43)func_PAL_002A7E68(o, 0, 0, 0);
         D_L12_001B09F4 = 0;
     }
-    if (o->f31 && func_00282E48((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
-        func_002A93B0(o);
+    if (o->f31 && fast_vec_dist((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
+        moby_update_ground_check(o);
         o->f6F = 22;
     }
     func_PAL_002B1A50(o, (u8 *)d + 0x60, 0);
-    if (o->f20 != 8 && o->f20 != 1)func_L00_002E6EF8(func_L12_003E0B68, o);
+    if (o->f20 != 8 && o->f20 != 1)gfx_add_draw_callback_third(gfx_add_two_glow_sprites, o);
 }

@@ -1,16 +1,16 @@
 #include "common.h"
-extern char D_00188660[];
+extern char g_sound_state[];
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
 extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
-extern void func_002E59F8(int);
-extern void func_002A7750(char *,int,int);
-extern void func_L00_002E6EF8(void *,void *);
-extern float func_L14_00430898(float);
-extern void func_L14_00430B70(char *);
-extern float func_002A7878(float, float);
-extern int func_002B38B8(void *);
-extern int func_002B3868(void *);
-extern float func_00283198(float);
+extern void snd_stop_voice(int);
+extern void moby_set_state(char *,int,int);
+extern void gfx_add_draw_callback_third(void *,void *);
+extern float math_wrap_angle_full_turn(float);
+extern void DrawAnimatedPrisonQuads(char *);
+extern float math_random_float_range(float, float);
+extern int flag_is_third_pending_set(void *);
+extern int flag_set_first_pending(void *);
+extern float math_fast_sin_or_cos_b(float);
 extern int D_L14_001B20C8;
 extern int D_L14_001B20C8_1 __attribute__((sda));
 extern float D_L14_00260270[32], D_L14_002602F0[32];
@@ -66,7 +66,7 @@ typedef struct {
     int sound;
 } PrisonEffectState;
 /* Initializes the pulse effect, maintains its sound and draw callback, and fades its scale. */
-void func_L14_00430410(char *self)
+void UpdatePrisonPulseEffect(char *self)
 {
     PrisonEffectState *s = *(PrisonEffectState **)(self+0x68);
     int i;
@@ -91,39 +91,39 @@ void func_L14_00430410(char *self)
         s->wa8=20; s->wac=s->w14=0.8f;
         s->wb0=70; s->wb4=s->w9c=2.0f;
         for(i=0;i<32;i++) {
-            D_L14_00260270[i]=RandomFloatRange(-3.1415927f,3.1415927f);
+            D_L14_00260270[i]=math_random_float_range(-3.1415927f,3.1415927f);
             D_L14_002602F0[i]=(float)i*0.03125f;
         }
         s->wb8=71; s->wbc=1.0f;
         s->wc0=0x80800000;
         self[0x31]=0; *(unsigned short *)(self+0x34)|=1;
         s->sound=-1;
-        SetMobyState(self,1,-1);
+        moby_set_state(self,1,-1);
         break;
     case 1:
-        if (((PrisonSoundAnchor *)(gSoundState+s->sound*112))->owner!=self ||
-            !((PrisonSoundAnchor *)(gSoundState+s->sound*112))->active)
+        if (((PrisonSoundAnchor *)(g_sound_state+s->sound*112))->owner!=self ||
+            !((PrisonSoundAnchor *)(g_sound_state+s->sound*112))->active)
             s->sound=prisonStartSound(0,4,self);
-        AddDrawCallbackToList3(DrawAnimatedPrisonQuads,self);
-        if(IsThirdPendingFlagSet(self)) {
+        gfx_add_draw_callback_third(DrawAnimatedPrisonQuads,self);
+        if(flag_is_third_pending_set(self)) {
             if(D_L14_001B20C8_1<50) s->baseScale=0;
-            SetMobyState(self,2,-1);
+            moby_set_state(self,2,-1);
         }
         break;
     case 2: {
         int sound=s->sound;
-        if(sound!=-1 && ((PrisonSoundAnchor *)(gSoundState+sound*112))->owner==self &&
-            ((PrisonSoundAnchor *)(gSoundState+sound*112))->active) StopSoundVoice(sound);
+        if(sound!=-1 && ((PrisonSoundAnchor *)(g_sound_state+sound*112))->owner==self &&
+            ((PrisonSoundAnchor *)(g_sound_state+sound*112))->active) snd_stop_voice(sound);
         s->sound=-1;
-        if(SetFirstPendingFlag(self)) *(int *)(self+0x98)=0;
+        if(flag_set_first_pending(self)) *(int *)(self+0x98)=0;
         if(s->baseScale>0.5f) {
-            AddDrawCallbackToList3(DrawAnimatedPrisonQuads,self);
+            gfx_add_draw_callback_third(DrawAnimatedPrisonQuads,self);
             s->baseScale-=0.05f;
         }
         break;
     }
     }
     s->currentScale=s->baseScale+s->pulseScale*
-        FastSinOrCosB(WrapAngleFullTurn((float)D_L14_001B20C8*6.2831855f/(float)s->pulseFrames));
+        math_fast_sin_or_cos_b(math_wrap_angle_full_turn((float)D_L14_001B20C8*6.2831855f/(float)s->pulseFrames));
 }
 

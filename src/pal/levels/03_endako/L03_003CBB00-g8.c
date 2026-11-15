@@ -9,22 +9,22 @@ extern float D_L03_001B9998 NOT_SDA, D_L03_001BFDE8 NOT_SDA;
 typedef struct { float vec[4]; char pad[0x2d4]; int mode; } PlayerState;
 extern PlayerState D_0018BDD0;
 typedef struct { char pad[0x74]; u8 active; char pad75[0x13]; char *owner; } L03ControlEntry;
-extern u8 D_00188660[];
-extern float func_00283B98(float,float);
-extern void func_002833F0(void *,void *);
-extern float func_00282DF0(void *);
-extern int func_002E5CF8(int,int,void *);
-extern void func_002E59F8(int);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282C88(void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AC9F8(void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_002C9218(int,void *,void *,float);
-extern void func_0029FCC0(void *,int,void *);
-extern int func_002761F8(void *,void *,int,void *,int);
-extern void func_002A93B0(void *);
+extern u8 g_sound_state[];
+extern float FastAddRotations(float,float);
+extern void euler_rotation_basis(void *,void *);
+extern float FastVecLength(void *);
+extern int PlayMobySound(int,int,void *);
+extern void snd_stop_voice(int);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void vec_clear_128(void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_clamp_length(void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void path_push_point_away(int,void *,void *,float);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern int CollLine(void *,void *,int,void *,int);
+extern void moby_update_ground_check(void *);
 void func_PAL_L03_003CBB00(char *obj)
 {
     float a[4],b[4],c[4];
@@ -34,56 +34,56 @@ void func_PAL_L03_003CBB00(char *obj)
     int id;
     if(*(u8 *)(obj+0x20)==2) {
         *(TI128 *)c=0;
-        c[2]=func_00283B98(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
+        c[2]=FastAddRotations(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
         *(TI128 *)(b)=*(TI128 *)(c);
-        func_002833F0(scratch.m,b);
+        euler_rotation_basis(scratch.m,b);
         qcopy(a,D_0018BDD0.vec);
-        if(func_00282DF0(a)>0.0f && D_0018BDD0.mode==0x31) {
-            L03ControlEntry *entry=(L03ControlEntry *)(D_00188660+*(int *)(state+0x108)*0x70);
+        if(FastVecLength(a)>0.0f && D_0018BDD0.mode==0x31) {
+            L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+*(int *)(state+0x108)*0x70);
             if(entry->owner!=obj || !entry->active)
-                *(int *)(state+0x108)=func_002E5CF8(0,4,obj);
+                *(int *)(state+0x108)=PlayMobySound(0,4,obj);
         } else {
             id=*(int *)(state+0x108);
             if(id!=-1) {
-                L03ControlEntry *entry=(L03ControlEntry *)(D_00188660+id*0x70);
-                if(entry->owner==obj && entry->active) func_002E59F8(id);
+                L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+id*0x70);
+                if(entry->owner==obj && entry->active) snd_stop_voice(id);
             }
             *(int *)(state+0x108)=-1;
         }
         a[0]=-a[0];
-        func_00283098(a,a,scratch.m);
+        matrix_mul_vec3(a,a,scratch.m);
         other=*(char **)(state+0xf0);
         if(other) {
-            if(*(short *)(other+0xaa)==0xb85) func_00282D30(a,a,D_L03_001B01AC*(0.020000001f));
-            else func_00282D30(a,a,D_L03_001B01B4*(0.020000001f));
-        } else func_00282D30(a,a,D_L03_001B01A4*(0.020000001f));
+            if(*(short *)(other+0xaa)==0xb85) FastVecScale(a,a,D_L03_001B01AC*(0.020000001f));
+            else FastVecScale(a,a,D_L03_001B01B4*(0.020000001f));
+        } else FastVecScale(a,a,D_L03_001B01A4*(0.020000001f));
     } else {
         id=*(int *)(state+0x108);
         if(id!=-1) {
-            L03ControlEntry *entry=(L03ControlEntry *)(D_00188660+id*0x70);
-            if(entry->owner==obj && entry->active) func_002E59F8(id);
+            L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+id*0x70);
+            if(entry->owner==obj && entry->active) snd_stop_voice(id);
         }
         *(int *)(state+0x108)=-1;
-        func_00282C88(a);
+        vec_clear_128(a);
     }
-    func_00282CF0(b,a,state+0xe0);
+    FastVecSub(b,a,state+0xe0);
     b[2]=0;
     other=*(char **)(state+0xf0);
     if(other) {
-        if(*(short *)(other+0xaa)==0xb85) func_002AC9F8(b,D_L03_001B01B0*0.00040000002f);
-        else func_002AC9F8(b,D_L03_001B01B8*0.00040000002f);
+        if(*(short *)(other+0xaa)==0xb85) vec_clamp_length(b,D_L03_001B01B0*0.00040000002f);
+        else vec_clamp_length(b,D_L03_001B01B8*0.00040000002f);
     } else {
-        func_002AC9F8(b,D_L03_001B01A8*0.00040000002f);
+        vec_clamp_length(b,D_L03_001B01A8*0.00040000002f);
     }
-    func_00282CC0(state+0xe0,state+0xe0,b);
-    func_00282CC0(obj+0x10,obj+0x10,state+0xe0);
-    func_002C9218(*(int *)state,obj+0x10,obj+0x10,1.25f);
-    func_0029FCC0(obj,2,c);
+    FastVecAdd(state+0xe0,state+0xe0,b);
+    FastVecAdd(obj+0x10,obj+0x10,state+0xe0);
+    path_push_point_away(*(int *)state,obj+0x10,obj+0x10,1.25f);
+    moby_transform_joint_to_world(obj,2,c);
     qcopy(scratch.m,c);
     scratch.m[2]+=20.0f;
     qcopy(scratch.v.d,c);
     scratch.v.d[2]+=0.5f;
-    if(func_002761F8(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=D_L03_001BFDE8;
-    func_002A93B0(obj);
+    if(CollLine(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=D_L03_001BFDE8;
+    moby_update_ground_check(obj);
     *(u8 *)(obj+0xbd)=D_L03_001B01D4;
 }

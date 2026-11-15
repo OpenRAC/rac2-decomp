@@ -1,15 +1,15 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern char *D_L02_001FF1C0[];
-extern void func_00282A88(void *, int);
+extern char *g_route_polygons[];
+extern void mem_fast_helper_b(void *, int);
 extern int D_L02_001B36A4 __attribute__((sda));
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern int func_L02_00349BD8(int, int, int *, int *);
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int path_find_touching_polygon_corners(int, int, int *, int *);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 /* One route node, as struct RouteNode in L02_002B5F50.c: polygon index, four neighbour
    slots (0xFF = free), the portal edge of each, and the polygon's centre and radius. */
@@ -29,7 +29,7 @@ typedef struct L02RegionLink {
    address unhoisted and its loop-start alignment nop, which a for loop does not give.
    The neighbour reset indexes the node array as flat bytes, which gives retail's
    address grouping. */
-int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capacity) {
+int path_build_route_nodes(void *unused, int start, L02RegionLink *regions, int capacity) {
     unsigned char visited[256];
     struct {
         TI128 center;
@@ -39,7 +39,7 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
     char *polygon;
     float distance;
     unsigned char *vis;
-    FastMemoryHelperB(visited, 256);
+    mem_fast_helper_b(visited, 256);
     visited[start] = depth;
     vis = visited;
     for (;;) {
@@ -49,9 +49,9 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
                 regions[count++].index = i;
                 for (j = 0; j < D_L02_001B36A4; ++j) {
                     if (i != j && vis[j] == 0) {
-                        char *candidate = gRoutePolygons[j];
+                        char *candidate = g_route_polygons[j];
                         if (*(int *)candidate <= 64 && !(0.2f < fast_vec_dist(candidate + 0x10, candidate + (*(int *)candidate << 4)))) {
-                            if (FindTouchingPolygonCorners(i, j, &scratch.edgeA, &scratch.edgeB)) {
+                            if (path_find_touching_polygon_corners(i, j, &scratch.edgeA, &scratch.edgeB)) {
                                 vis[j] = depth + 1;
                                 changed = 1;
                             }
@@ -78,9 +78,9 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
         int nodeA, nodeB;
         for (nodeA = 0; nodeA < count; ++nodeA) {
             for (nodeB = nodeA + 1; nodeB < count; ++nodeB) {
-                if (FindTouchingPolygonCorners(regions[nodeA].index, regions[nodeB].index, &scratch.connectionA, &scratch.connectionB)) {
-                    *(int *)(gRoutePolygons[regions[nodeA].index] + (scratch.connectionA << 4) + 0x1C) = 0;
-                    *(int *)(gRoutePolygons[regions[nodeB].index] + (scratch.connectionB << 4) + 0x1C) = 0;
+                if (path_find_touching_polygon_corners(regions[nodeA].index, regions[nodeB].index, &scratch.connectionA, &scratch.connectionB)) {
+                    *(int *)(g_route_polygons[regions[nodeA].index] + (scratch.connectionA << 4) + 0x1C) = 0;
+                    *(int *)(g_route_polygons[regions[nodeB].index] + (scratch.connectionB << 4) + 0x1C) = 0;
                     {
                         int slotA = 0;
                         do {
@@ -115,8 +115,8 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
     {
         int node;
         for (node = 0; node < count; ++node) {
-            polygon = gRoutePolygons[regions[node].index];
-            ClearVector128(&scratch.center);
+            polygon = g_route_polygons[regions[node].index];
+            vec_clear_128(&scratch.center);
             {
                 int sumVertex;
                 for (sumVertex = 0; sumVertex < *(int *)polygon; ++sumVertex)

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_002F96D8, the PAL copy of func_002F8768: the same C, except that the pose call is
    func_0026F780 and its last argument, 0 in USA, comes from func_PAL_00299538(). */
@@ -8,26 +9,26 @@
 typedef struct { char pad[0x28]; char *obj; char pad2[0x60 - 0x2C]; int f60; char pad3[0x78 - 0x64]; int f78; int f7C; char pad4[0x8C - 0x80]; int f8C; } Reset2F8768;
 typedef struct { float v[4]; } Vec4_2F8768 __attribute__((aligned(16)));
 typedef struct { char pad[0x72]; unsigned short mode; } Mode2F8768;
-extern Reset2F8768 D_0021F240;
-extern Mode2F8768 D_001A63A8;
-extern char D_00189E20[];
-extern int D_001A8BB0 __attribute__((sda));
+extern Reset2F8768 g_vendor_menu_state;
+extern Mode2F8768 g_music_state;
+extern char g_hero_state[];
+extern int g_current_game_mode __attribute__((sda));
 extern Vec4_2F8768 D_001AD200 __attribute__((sda));
-extern void func_0028B6C8(int, int);
-extern void func_0028E440(void);
+extern void set_animation_parameter(int, int);
+extern void hud_tick_countdown(void);
 extern unsigned int func_PAL_0026F5B8(int, int);
 extern void func_PAL_0026F598(void);
 extern int func_PAL_00299538(void);
-extern void func_0026F780(char *, void *, int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283B98(float, float);
-extern void func_003355A8(int);
-extern void func_002FB170(void);
-extern void func_0029F338(void *);
-extern void func_00132B28(int);
-extern void func_002B7320(void);
-extern void func_00132028(void);
+extern void stub_empty_15(char *, void *, int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastAddRotations(float, float);
+extern void cam_set_mode_state(int);
+extern void shop_clear_preview(void);
+extern void moby_mark_spawned(void *);
+extern void snd_send_cmd23(int);
+extern void music_Unpause(void);
+extern void snd_Pump(void);
 
 void func_PAL_002F96D8(void)
 {
@@ -36,36 +37,36 @@ void func_PAL_002F96D8(void)
     Vec4_2F8768 in;
     int arg;
 
-    if (D_0021F240.f7C != -1)
-        func_0028B6C8(D_0021F240.f7C, 0);
-    if (D_0021F240.f78 != -1)
-        func_0028B6C8(D_0021F240.f78, 0);
-    D_0021F240.f7C = -1;
-    D_0021F240.f78 = -1;
-    func_0028E440();
-    D_001A8BB0 = 0;
+    if (g_vendor_menu_state.f7C != -1)
+        set_animation_parameter(g_vendor_menu_state.f7C, 0);
+    if (g_vendor_menu_state.f78 != -1)
+        set_animation_parameter(g_vendor_menu_state.f78, 0);
+    g_vendor_menu_state.f7C = -1;
+    g_vendor_menu_state.f78 = -1;
+    hud_tick_countdown();
+    g_current_game_mode = 0;
     func_PAL_0026F5B8(0, 1);
-    D_00189E20[0x22B5] = 0;
+    g_hero_state[0x22B5] = 0;
     func_PAL_0026F598();
-    if (D_0021F240.f60 == 0) {
+    if (g_vendor_menu_state.f60 == 0) {
         arg = func_PAL_00299538();
         qcopy(&in, &D_001AD200);
-        func_00283098(&out, &in, D_0021F240.obj + 0xC0);
-        func_00282CC0(&out, &out, D_0021F240.obj + 0x10);
+        matrix_mul_vec3(&out, &in, g_vendor_menu_state.obj + 0xC0);
+        FastVecAdd(&out, &out, g_vendor_menu_state.obj + 0x10);
         dir[0] = 0;
         dir[1] = 0;
-        dir[2] = func_00283B98(*(float *)(D_0021F240.obj + 0xF8), 3.1415927f);
-        func_0026F780((char *)&out, dir, 0, arg);
-        func_003355A8(2);
+        dir[2] = FastAddRotations(*(float *)(g_vendor_menu_state.obj + 0xF8), 3.1415927f);
+        stub_empty_15((char *)&out, dir, 0, arg);
+        cam_set_mode_state(2);
     }
-    D_0021F240.obj[0x20] = 1;
-    if ((unsigned short)(D_001A63A8.mode - 6) >= 2)
-        D_001A63A8.mode = 5;
-    if (D_0021F240.f8C != 0)
-        func_002FB170();
-    if (D_0021F240.f60 != 0)
-        func_0029F338(D_0021F240.obj);
-    func_00132B28(0x5D);
-    func_002B7320();
-    func_00132028();
+    g_vendor_menu_state.obj[0x20] = 1;
+    if ((unsigned short)(g_music_state.mode - 6) >= 2)
+        g_music_state.mode = 5;
+    if (g_vendor_menu_state.f8C != 0)
+        shop_clear_preview();
+    if (g_vendor_menu_state.f60 != 0)
+        moby_mark_spawned(g_vendor_menu_state.obj);
+    snd_send_cmd23(0x5D);
+    music_Unpause();
+    snd_Pump();
 }

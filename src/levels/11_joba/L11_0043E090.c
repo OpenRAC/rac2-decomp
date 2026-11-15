@@ -1,5 +1,6 @@
+#include "names.h"
 /* Turns a challenge number into the id of its matching entry, or -1 when it has none. */
-int func_L11_0043E090(unsigned int index)
+int arena_get_challenge_display_id(unsigned int index)
 {
     switch (index) {
     case 0: return 10;

@@ -34,31 +34,31 @@ typedef struct Vars_L02_003CD758 {
     Moby_L02_003CD758 *link;
 } Vars_L02_003CD758;
 
-extern int func_00282948(void *);
-extern Moby_L02_003CD758 *func_0029EFD0(int);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_002B37E8(void *, void *);
+extern int math_fast_float_d(void *);
+extern Moby_L02_003CD758 *CreateMoby(int);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern void moby_init_child_from_parent(void *, void *);
 
 /* Keep the linked effect moby alive while the timer runs; delete both when it ends. */
-void func_L02_003CD758(Moby_L02_003CD758 *m)
+void linked_effect_update(Moby_L02_003CD758 *m)
 {
     Vars_L02_003CD758 *v = m->vars;
 
     if (v->timer == 0) {
-        if (v->link != 0 && (v->link->type == 0xA20 /* moby class 2592 */ || v->link->type == 0xA21 /* moby class 2593 */)) MarkMobySpawned(v->link);
-        MarkMobySpawned(m);
+        if (v->link != 0 && (v->link->type == 0xA20 /* moby class 2592 */ || v->link->type == 0xA21 /* moby class 2593 */)) moby_mark_spawned(v->link);
+        moby_mark_spawned(m);
         return;
     }
-    FastFloatHelperD(&v->timer);
+    math_fast_float_d(&v->timer);
     if (v->link != 0 && !(v->link->type == 0xA20 /* moby class 2592 */ || v->link->type == 0xA21 /* moby class 2593 */)) {
         if (v->h310 == 0) v->link = CreateMoby(0xA20 /* moby class 2592 */);
         else v->link = CreateMoby(0xA21 /* moby class 2593 */);
         if (v->link == 0) {
-            MarkMobySpawned(m);
+            moby_mark_spawned(m);
             return;
         }
-        InitChildObjectFromParent(v->link, m);
+        moby_init_child_from_parent(v->link, m);
         v->link->flags |= 0x100;
     }
     v->link->flags |= 0x41;
@@ -71,5 +71,5 @@ void func_L02_003CD758(Moby_L02_003CD758 *m)
     m->flags = (m->flags | 0x41) & 0xEFFF;
     v->h88 = 0;
     v->b2E = 1;
-    SetMobyState(m, 0x17, 4);
+    moby_set_state(m, 0x17, 4);
 }

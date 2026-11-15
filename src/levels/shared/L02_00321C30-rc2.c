@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -35,7 +36,7 @@ extern f32 ref_L02_00321C30_02(void *);
 extern void ref_L02_00321C30_03(void *, void *, f32);
 
 /* Moves a position toward a target, but by no more than a given limit. Returns how much of the distance was left over. */
-f32 func_L02_00321C30(void *position, void *target, f32 maxStep) {
+f32 vec_step_toward_target_limited(void *position, void *target, f32 maxStep) {
     Scratch scratch;
     f32 distance;
     f32 stepLength;

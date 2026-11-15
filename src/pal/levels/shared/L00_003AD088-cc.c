@@ -44,23 +44,23 @@ typedef struct {
     ProjectileVector normal;
 } ProjectileCollision;
 
-extern char *func_0029EFD0(int);
-extern float func_002A7940(void);
-extern float func_002A78D8(float, float);
-extern void func_00282F20(void *, void *, float);
+extern char *CreateMoby(int);
+extern float math_random_angle(void);
+extern float math_random_signed_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
 extern void func_002A0F48(void *);
-extern char *D_0018C0B0;
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00283028(void *, void *, void *);
+extern char *g_hero_moby;
+extern int CollLine(void *, void *, int, void *, int);
+extern void vec_fast_normalize(void *, void *, void *);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float,
                           float, int, float, int, int, int, int, int);
 extern void func_PAL_L00_003ACF38(void *, void *, void *, int);
-extern void func_0029F338(void *);
-extern int func_002FED90(void *, void *, float, float, float);
-extern void func_002AFFD8(void *, void *, int);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
+extern void moby_mark_spawned(void *);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
 extern ProjectileCollision ref_L00_003A98E8_0;
 extern int ref_L00_003A98E8_1 MACRO_ADDR;
 
@@ -77,7 +77,7 @@ char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float s
     ProjectilePoint step;
     ProjectilePoint forward;
     ProjectilePoint projected;
-    char *moby = func_0029EFD0(0x5D8);
+    char *moby = CreateMoby(0x5D8);
     char *hit;
     ProjectileVars *vars;
     float along;
@@ -88,12 +88,12 @@ char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float s
         *(short *)(moby + 0x32) = 255;
         *(unsigned char *)(moby + 0x31) = 1;
         vars = *(ProjectileVars **)(moby + 0x68);
-        *(float *)(moby + 0xF8) = func_002A7940();
-        *(float *)(moby + 0xF4) = func_002A7940();
-        *(float *)(moby + 0xF0) = func_002A7940();
+        *(float *)(moby + 0xF8) = math_random_angle();
+        *(float *)(moby + 0xF4) = math_random_angle();
+        *(float *)(moby + 0xF0) = math_random_angle();
         *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.5f;
         qcopy(moby + 0x10, position);
-        func_00282F20(vars, velocity, speed);
+        vec_scale_to_length(vars, velocity, speed);
         qcopy(&vars->backup, vars);
 
         vars->owner = owner;
@@ -106,37 +106,37 @@ char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float s
         vars->counter24 = 0;
         vars->counter28 = 0;
         vars->counter2C = 10;
-        vars->spinX = func_002A78D8(0.00087266473565f, 0.00436332356185f);
-        vars->spinY = func_002A78D8(0.00174532947131f, 0.00872664712369f);
-        vars->spinZ = func_002A78D8(0.00698131788522f, 0.0349065884948f);
+        vars->spinX = math_random_signed_float_range(0.00087266473565f, 0.00436332356185f);
+        vars->spinY = math_random_signed_float_range(0.00174532947131f, 0.00872664712369f);
+        vars->spinZ = math_random_signed_float_range(0.00698131788522f, 0.0349065884948f);
         vars->target = -1;
         func_002A0F48(moby);
 
         *(ProjectileQuad *)step = 0;
         step[2] = 0.16000001f;
-        *(ProjectileQuad *)near = *(ProjectileQuad *)(D_0018C0B0 + 0x10);
+        *(ProjectileQuad *)near = *(ProjectileQuad *)(g_hero_moby + 0x10);
         near[2] = *(float *)((char *)position + 8);
-        if (func_002761F8(near, position, 0, D_0018C0B0, 0)) {
+        if (CollLine(near, position, 0, g_hero_moby, 0)) {
             hit = ref_L00_003A98E8_0.moby;
             if (hit == 0
                 || (*(short *)(hit + 0xAA) != 0xC87 && *(short *)(hit + 0xAA) != 0xECC)) {
                 qcopy(moby + 0x10, &ref_L00_003A98E8_0.point);
-                func_00283028(step, from, &ref_L00_003A98E8_0.normal);
-                func_00282F20(step, step, 0.040000003f);
+                vec_fast_normalize(step, from, &ref_L00_003A98E8_0.normal);
+                vec_scale_to_length(step, step, 0.040000003f);
                 func_PAL_002AC718(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
                               0x810001);
                 func_PAL_L00_003ACF38(moby, vars, moby + 0x10, 0);
-                func_0029F338(moby);
+                moby_mark_spawned(moby);
                 return 0;
             }
         }
 
-        vars->effect = func_002FED90(moby, 0, 1, 1, 1);
+        vars->effect = part_alloc_effect_slot(moby, 0, 1, 1, 1);
         if (ref_L00_003A98E8_1) {
-            func_002AFFD8(moby + 0x10, forward, 1);
-            along = func_00282DB0(forward, vars);
-            func_00282D30(projected, forward, along);
-            func_00282CF0(vars, vars, projected);
+            cam_compute_view_direction(moby + 0x10, forward, 1);
+            along = FastVecDot(forward, vars);
+            FastVecScale(projected, forward, along);
+            FastVecSub(vars, vars, projected);
             qcopy(&vars->backup, vars);
         }
     }
@@ -164,9 +164,9 @@ char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float s
 /* Per-row lists of linked mobys (eight entries and a null terminator), filled by func_L00_003ADEA0. */
 /* The quad's four (u, v) pairs. With sda cc1 costs each address as one instruction, so the u and v
    streams keep separate bases (the assembler still expands each to lui/addiu at -G0). */
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 /* Draws an effect quad (texture 14) from this moby to every active moby of its class linked in its row. */
 /* func_L00_003ADEA0 is defined in L00_003A8E28-g8.c. */
 
@@ -193,13 +193,13 @@ typedef struct {
     ArcVector unknown30;
     ArcVector normal;
 } ArcCollision;
-extern ArcHero D_00189E20;
+extern ArcHero g_hero_state;
 extern int D_L00_001A8F00 MACRO_ADDR;
-extern ArcCollision D_L00_001BF200;
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern ArcCollision g_collision_result;
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Steps a thrown object's arc until it lands and records the impact point;
    RAC1's predict_mine_impact (overlays/shared/bolts_and_wrench.c) is the same routine. */

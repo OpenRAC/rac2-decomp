@@ -2,25 +2,25 @@
 /* Model-specific lamp glow rendering; calls retain all eight GPR inputs. */
 typedef unsigned char u8;
 typedef unsigned int u32;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern float D_00189EA8;
-extern u8 D_00188660[];
-extern float D_L02_001BA500[4];
-extern int func_002E5CF8(int, int, char *);
-extern int func_00282978(void *);
-extern u32 func_00283D38(u32, u32, float);
-extern float func_00282E48(void *, void *);
+extern u8 g_sound_state[];
+extern float g_camera_l02_position[4];
+extern int PlayMobySound(int, int, char *);
+extern int FastDecTimer(void *);
+extern u32 FastTweenColor(u32, u32, float);
+extern float fast_vec_dist(void *, void *);
 /* Retail consumes all eight GPR inputs, including the culling range in t3. */
-extern void *func_L00_0033E220(void *, void *, u32, int, int, float, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, u32, int, int, float, float, int, int, int);
 
 /* Draws the glow of lamp-style mobys and plays their hum sound. */
-void func_L02_0038CDE8(char *object) {
+void UpdateLampGlowEffects(char *object) {
     char *data = *(char **)(object + 0x68);
     short kind = *(short *)(object + 0xAA);
     float distance;
     if (kind == 0x9B7 /* Scenery Ship */ || kind == 0x9B0 /* moby class 2480 */ || kind == 0xD2C /* moby class 3372 */ || kind == 0xD5C /* Train with Rail */) {
-        if (gCurrentMapIndex != 13) {
-            char *event = (char *)gSoundState + *(int *)(data + 0x18) * 0x70;
+        if (g_current_map_index != 13) {
+            char *event = (char *)g_sound_state + *(int *)(data + 0x18) * 0x70;
             if (*(char **)(event + 0x88) != object || !((u8 *)event)[0x74])
                 *(int *)(data + 0x18) = PlayMobySound(0, 4, object);
         }
@@ -32,100 +32,100 @@ void func_L02_0038CDE8(char *object) {
         }
         *(u32 *)(object + 0x78) = FastTweenColor(*(u32 *)(object + 0x78), 0x50000046, 0.15f);
     }
-    if (gCurrentMapIndex == 13 && D_00189EA8 > 89.0f)
+    if (g_current_map_index == 13 && D_00189EA8 > 89.0f)
         return;
     kind = *(short *)(object + 0xAA);
     switch (kind) {
     case 0x9B0 /* moby class 2480 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x50, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x50, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x50, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x50, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0x9B7 /* Scenery Ship */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0xB15 /* moby class 2837 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0x134B /* moby class 4939 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 340200.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 340200.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 340200.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 340200.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 194250.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 194250.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 194250.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 194250.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0xB13 /* moby class 2835 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0xD5C /* Train with Rail */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0x127D /* moby class 4733 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40202080, -1, 0, *(float *)(data + 0x78) * 294000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40202080, -1, 0, *(float *)(data + 0x78) * 294000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40202080, -1, 0, *(float *)(data + 0x78) * 294000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40202080, -1, 0, *(float *)(data + 0x78) * 294000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 231000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 231000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 231000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x205696FF, -1, 1, *(float *)(data + 0x78) * 231000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     case 0x1290 /* moby class 4752 */:
-        distance = fast_vec_dist(gCameraPosition_L02, object + 0x10);
+        distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
-            SpawnObjectFollowingEffect(data + 0x50, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x30, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x40, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
+            part_spawn_object_following_effect(data + 0x50, object, 0x40804020, -1, 0, *(float *)(data + 0x78) * 210000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
         }
         if (distance < (float)*(int *)(data + 0x94)) {
-            SpawnObjectFollowingEffect(data + 0x30, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x40, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
-            SpawnObjectFollowingEffect(data + 0x50, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x30, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x40, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
+            part_spawn_object_following_effect(data + 0x50, object, 0x20905010, -1, 1, *(float *)(data + 0x78) * 210000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
     }

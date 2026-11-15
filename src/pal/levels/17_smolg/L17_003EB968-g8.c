@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "common.h"
-extern s32 func_L17_00340DD0(f32, s32, s32, s32);
+extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
 extern f32 D_L17_001B04B8 __attribute__((sda));
-extern void func_002A7750(void *, s32, s32);
-extern s32 func_002A9640(void *, s32, s32);
-extern void func_L00_0032A258(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
-extern void func_0032C700(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
-extern void func_0029F338(void *);
+extern void moby_set_state(void *, s32, s32);
+extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern void moby_mark_spawned(void *);
 extern s32 D_L17_001B1E00 __attribute__((sda));
 extern s32 D_L17_001B1DE0 __attribute__((sda));
 extern s32 D_L17_001B1DD8 __attribute__((sda));
@@ -20,20 +20,20 @@ void func_PAL_L17_0041E460(s32 a0)
 
     switch (v) {
     case 0:
-        func_002A7750(a0, 1, -1);
+        moby_set_state(a0, 1, -1);
         break;
     case 1:
-        if (func_002A9640(a0, 0x4010001, 0) != 0) {
-            func_002A7750(a0, 2, -1);
+        if (part_find_owned_effect_slot(a0, 0x4010001, 0) != 0) {
+            moby_set_state(a0, 2, -1);
             *(u8 *)(a0 + 0xA8) = 0xFF;
         }
         break;
     case 2:
-        func_L00_0032A258(a0, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
+        part_explode_object_into_pieces(a0, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
                           0xFFFF, 0, D_L17_001B1E00, 0, 0xFFFF, 0xFF, 0);
-        func_0032C700(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
+        SpawnExplosion(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
                       *(f32 *)(a0 + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
-        func_0029F338(a0);
+        moby_mark_spawned(a0);
         break;
     }
 }
@@ -49,18 +49,18 @@ typedef struct {
     char pad75[0x13];
     void *owner;
 } SoundAnchor;
-extern unsigned char D_00188660[];
-extern char *D_L17_001B2C1C;
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282C48(float);
-extern int func_002AD0B0(void *);
-extern void func_002AD0E0(void *, void *, void *, void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
+extern unsigned char g_sound_state[];
+extern char *g_moby_l17_pool;
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fabs(float);
+extern int moby_get_private_value_2(void *);
+extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
 
 /* Steers toward the linked object and maintains its movement sound. */
 void func_PAL_L17_0041E1B8(char *obj)
@@ -77,41 +77,41 @@ void func_PAL_L17_0041E1B8(char *obj)
     }
     I(state, 0x8C) |= 4;
     H(state, 0x3E) |= 8;
-    v[0] = func_00283180(F(obj, 0xF8)) * (0.080000006f);
-    v[1] = func_00283198(F(obj, 0xF8)) * (0.080000006f);
+    v[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * (0.080000006f);
+    v[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * (0.080000006f);
     v[2] = 0;
-    func_002AD6F0(state + 0x50, v, obj + 0xF0, obj + 0xF0);
+    mat_combine_and_store(state + 0x50, v, obj + 0xF0, obj + 0xF0);
 
     if (I(state, 0x90) == -1 ||
-        !func_002AD0B0(D_L17_001B2C1C + (I(state, 0x90) << 8))) {
+        !moby_get_private_value_2(g_moby_l17_pool + (I(state, 0x90) << 8))) {
         F(state, 0x9C) = F(state, 0x98) * (0.020000001f);
     } else {
-        func_002AD0E0(obj, D_L17_001B2C1C + (I(state, 0x90) << 8),
+        moby_transform_point_and_rotation_by_parent(obj, g_moby_l17_pool + (I(state, 0x90) << 8),
                       obj + 0x10, obj + 0xF0, target, dir);
         target[2] = 0;
-        func_00282CF0(delta, target, obj + 0x10);
+        FastVecSub(delta, target, obj + 0x10);
         *(Quad *)target = *(Quad *)delta;
-        dir[0] = func_00283180(F(obj, 0xF8));
-        dir[1] = func_00283198(F(obj, 0xF8));
+        dir[0] = math_fast_sin_or_cos_a(F(obj, 0xF8));
+        dir[1] = math_fast_sin_or_cos_b(F(obj, 0xF8));
         dir[2] = 0;
-        F(state, 0x9C) = func_00282DB0(target, dir);
+        F(state, 0x9C) = FastVecDot(target, dir);
     }
-    v[0] = func_00283180(F(obj, 0xF8)) * F(state, 0x9C);
-    v[1] = func_00283198(F(obj, 0xF8)) * F(state, 0x9C);
+    v[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * F(state, 0x9C);
+    v[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * F(state, 0x9C);
     v[2] = 0;
-    func_002AD6F0(state + 0x50, v, obj + 0xF0, obj + 0xF0);
+    mat_combine_and_store(state + 0x50, v, obj + 0xF0, obj + 0xF0);
     F(obj, 0x48) = F(state, 0x9C) * 12.499999f;
 
-    if (func_00282C48(F(obj, 0x48)) < 0.1f) {
+    if (math_fabs(F(obj, 0x48)) < 0.1f) {
         if (I(state, 0xA0) != -1) {
-            SoundAnchor *effect = (SoundAnchor *)(D_00188660 + I(state, 0xA0) * 0x70);
+            SoundAnchor *effect = (SoundAnchor *)(g_sound_state + I(state, 0xA0) * 0x70);
             if (effect->owner == obj && effect->active)
-                func_002E59F8(I(state, 0xA0));
+                snd_stop_voice(I(state, 0xA0));
         }
         I(state, 0xA0) = -1;
     } else {
-        SoundAnchor *effect = (SoundAnchor *)(D_00188660 + I(state, 0xA0) * 0x70);
+        SoundAnchor *effect = (SoundAnchor *)(g_sound_state + I(state, 0xA0) * 0x70);
         if (effect->owner != obj || !effect->active)
-            I(state, 0xA0) = func_002E5CF8(0, 4, obj);
+            I(state, 0xA0) = PlayMobySound(0, 4, obj);
     }
 }

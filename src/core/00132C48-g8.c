@@ -11,16 +11,16 @@ extern int D_001A74F8 __attribute__((sda));
 extern int D_001A74C0 __attribute__((sda));
 extern int D_001A74C4 __attribute__((sda));
 extern int *D_001A74A0[2] __attribute__((sda));
-extern int func_00132028(void);
-extern void func_0011AEA0(int);
-extern void func_001322B8(void *, int);
-extern int func_0011D810(void *);
-extern void func_00115D48(char *, ...);
-extern int func_0011D620(void *, int, int, void *, int, void *, int, int, int);
-extern int func_00132220(void);
-extern void func_00133108(void);
+extern int snd_Pump(void);
+extern void FlushCache(int);
+extern void snd_prepare_reply_buffer(void *, int);
+extern int sif_rpc_is_handle_valid(void *);
+extern void printf(char *, ...);
+extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
+extern int snd_poll_rpc_done(void);
+extern void snd_submit_dma_buffer(void);
 /* Sends a sound command to the sound server and waits for the answer. Returns the reply value. */
-int func_00132C48(int command, int size, void *argData) {
+int snd_SendCommandSync(int command, int size, void *argData) {
     unsigned char *bytes = argData;
     int i;
     int result;
@@ -31,18 +31,18 @@ int func_00132C48(int command, int size, void *argData) {
         FlushCache(0);
 check:;
     } while (D_001A7480 != 0);
-    PrepareSoundReplyBuffer(D_001A7080, 1);
-    while (IsRpcHandleValid(D_001A7040) != 0) {
-        if (D_001A74F8 == 0) Printf(D_001A7578);
+    snd_prepare_reply_buffer(D_001A7080, 1);
+    while (sif_rpc_is_handle_valid(D_001A7040) != 0) {
+        if (D_001A74F8 == 0) printf(D_001A7578);
         snd_Pump();
         FlushCache(0);
     }
     if (size != 0)
-        CallRpcServer(D_001A7040, command, 1, D_001A70C0, size, D_001A7080, 12, 0, 0);
+        sceSifCallRpc(D_001A7040, command, 1, D_001A70C0, size, D_001A7080, 12, 0, 0);
     else
-        CallRpcServer(D_001A7040, command, 1, 0, 0, D_001A7080, 12, 0, 0);
-    while (PollSoundRpcDone() == 0) {}
+        sceSifCallRpc(D_001A7040, command, 1, 0, 0, D_001A7080, 12, 0, 0);
+    while (snd_poll_rpc_done() == 0) {}
     result = D_001A7080[1];
-    if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0) SubmitSoundDmaBuffer();
+    if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0) snd_submit_dma_buffer();
     return result;
 }

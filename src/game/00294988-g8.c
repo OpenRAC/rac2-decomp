@@ -1,30 +1,30 @@
 #include "common.h"
 typedef struct { int id, sector, a, b, sound; } Slot;
 typedef struct { char pad[0x4b40]; Slot slots[48]; } Disc;
-extern Disc D_0014B540;
+extern Disc g_copy_setup_data;
 typedef struct { char pad[20]; short current, active; char pad24[24]; int sound; int slots[3]; } Cache;
 extern Cache D_00152CD0 NOT_SDA;
 /* The object table steps 0x70 a row; each row's state pointer lies 0x78 past the
    row's address. */
 typedef struct { char pad[0x17b0]; int sound; } SoundGlobals;
-extern SoundGlobals D_00188660 NOT_SDA;
+extern SoundGlobals g_sound_state NOT_SDA;
 extern char D_001A9370[];
 extern int D_001A93B0[8] __attribute__((sda));
 extern char *D_001A7278[] __attribute__((sda));
 extern int D_001B22A0 NOT_SDA;
 extern int D_001B22B0[] __attribute__((sda));
-extern void func_002FC3C0(int),func_002945E8(int,int),func_0029CFB0(void *,void *,int),func_00132858(int),func_00132828(void);
-extern int func_00132028(void),func_001326D8(char *);
-extern void func_0026FEB8(char *,int),func_002946C0(int,int,void *);
+extern void gfx_wait_for_dma_status_bits(int),load_class_into_cache_slot_synced(int,int),func_0029CFB0(void *,void *,int),snd_send_cmd6(int),func_00132828(void);
+extern int snd_Pump(void),snd_BankLoadFromIOP(char *);
+extern void STUB_printf(char *,int),load_cached_moby_class(int,int,void *);
 /* Makes sure the disc asset with this id is in a cache slot, loading it if needed, and switches to it. */
-void func_00294988(int id)
+void SwitchCachedDiscAsset(int id)
 {
     int index=0,slot;
     char *data;
     int i;
-    if(gCopySetupData.slots[0].id==id) goto found;
+    if(g_copy_setup_data.slots[0].id==id) goto found;
     while(++index<48) {
-        if(gCopySetupData.slots[index].id==id) break;
+        if(g_copy_setup_data.slots[index].id==id) break;
     }
 found:
     if(index==48)return;
@@ -36,11 +36,11 @@ found:
         if(D_00152CD0.slots[slot]==index)break;
     }
 slotfound:
-    WaitForDmaStatusBits(1);
+    gfx_wait_for_dma_status_bits(1);
     if(slot==3) {
         STUB_printf(D_001A9370,id);
         slot=0;
-        LoadClassIntoCacheSlotSynced(id,0);
+        load_class_into_cache_slot_synced(id,0);
     }
     D_00152CD0.active=slot;
     data=(char *)((int)&D_00152CD0+slot*0xc800)+64;
@@ -50,18 +50,18 @@ slotfound:
         data=dst;
     }
     for(i=0;i<52;i++) {
-        char *objectRow=(char *)&gSoundState+i*0x70;
+        char *objectRow=(char *)&g_sound_state+i*0x70;
         int *statePtr=*(int **)(objectRow+0x78);
         if(statePtr && statePtr[7]==4) *(int **)(objectRow+0x78)=D_001A93B0;
     }
     if(D_00152CD0.sound) {
-        SendSoundCommand6(D_00152CD0.sound);
+        snd_send_cmd6(D_00152CD0.sound);
         while(snd_Pump()) {}
     }
-    if(gCopySetupData.slots[index].sound) {
+    if(g_copy_setup_data.slots[index].sound) {
         D_00152CD0.sound=snd_BankLoadFromIOP(D_001A7278[0]+slot*0xc800);
-        gSoundState.sound=D_00152CD0.sound;
+        g_sound_state.sound=D_00152CD0.sound;
     } else D_00152CD0.sound=0;
     func_00132828();
-    LoadCachedMobyClass(id,index,data);
+    load_cached_moby_class(id,index,data);
 }

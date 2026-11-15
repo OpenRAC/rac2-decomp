@@ -26,7 +26,7 @@ extern int r1_func_00118C40(int);
 
 extern int r1_func_0011A690(const char *, ...);
 
-extern void func_0011B728(void *);
+extern void kernel_service_thread_run(void *);
 
 ASM_FUNC("asm/core", func_0011B588);
 
@@ -39,7 +39,7 @@ ASM_FUNC("asm/core", func_0011B6C0);
 /* rac1-decomp src/core/00119328.c: func_001194C8 */
 /* topThread: kernel service dispatcher. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Runs forever as the kernel service thread. It waits for a request, then runs the matching handler. */
-void func_0011B728(void *threadArg) {
+void kernel_service_thread_run(void *threadArg) {
     TopThreadContext *ctx = (TopThreadContext *)threadArg;
     int i;
     unsigned char type;

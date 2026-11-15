@@ -64,8 +64,8 @@ typedef struct {
     Moby *owner;                /* 0x88 */
 } SoundVoice;
 
-extern HazardPath *D_L17_001FE880[];
-extern Moby *D_L17_001B2C1C;
+extern HazardPath *g_path_l17_table[];
+extern Moby *g_moby_l17_pool;
 extern Moby *D_L17_001B2C1C_1[] __attribute__((sda));
 extern int D_L17_001B2748 MACRO_ADDR;
 extern float D_L17_001AFCD0 __attribute__((sda)), D_L17_001AFCD4 __attribute__((sda));
@@ -73,33 +73,33 @@ extern float D_L17_001AFCD8 __attribute__((sda)), D_L17_001AFCDC __attribute__((
 extern float D_L17_001AFCE0 __attribute__((sda)), D_L17_001AFCE4 __attribute__((sda));
 extern float D_L17_001AFCE8 __attribute__((sda)), D_L17_001AFCEC __attribute__((sda));
 extern int D_L17_001AFCF0 __attribute__((sda));
-extern char D_00189EA0[];
-extern SoundRecord D_00188660[];
+extern char g_hero_position[];
+extern SoundRecord g_sound_state[];
 extern char D_L17_001A8F20[] MACRO_ADDR;
 extern char D_L17_001AFCF8[], D_L17_001AFD28[];
 
-extern float func_00282E80(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern void func_0026FEB8(const char *, ...);
-extern void func_002A7750(void *, int, int);
-extern int func_L17_003BCC30(void *);
-extern int func_L17_003BCEC0(void *);
-extern int func_002A9640(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern void func_0032C700(void *, float, int, int, int, int, int, int, int, int,
+extern float vec_distance_xy(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern void STUB_printf(const char *, ...);
+extern void moby_set_state(void *, int, int);
+extern int PlacePathFollowerChainAtStart(void *);
+extern int UpdatePathFollowerChain(void *);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern void SpawnExplosion(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
-extern void func_002B0A68(void *, int, void *, float, float, float, float, int);
-extern Moby *func_00273730(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void func_L00_00326110(void *, int, float);
-extern void func_0029F338(void *);
+extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
+extern Moby *cam_moby_create(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void part_spawn_scaled_bolts(void *, int, float);
+extern void moby_mark_spawned(void *);
 
 /* Updates a path-linked hazard, its movement sound and its destruction effects. */
-void func_L17_003BD310(Moby *moby)
+void UpdatePathHazard(Moby *moby)
 {
     HazardVars *vars = moby->vars;
     int flash;
@@ -115,16 +115,16 @@ void func_L17_003BD310(Moby *moby)
     moby->color = color;
 
     if (moby->oClass == 0x8D8 || moby->oClass == 0x8AD) {
-        if (moby->state == 2 && vec_distance_xy(moby->position, gHeroPosition) < 80.0f) {
-            SoundVoice *voice = (SoundVoice *)&gSoundState[vars->sound];
+        if (moby->state == 2 && vec_distance_xy(moby->position, g_hero_position) < 80.0f) {
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
             if (voice->owner != moby || !voice->active)
                 vars->sound = PlayMobySound(0, 4, moby);
         } else {
             int sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
+                SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
                 if (voice->owner == moby && voice->active)
-                    StopSoundVoice(sound);
+                    snd_stop_voice(sound);
             }
             vars->sound = -1;
         }
@@ -134,10 +134,10 @@ void func_L17_003BD310(Moby *moby)
     case 0:
         vars->sound = -1;
         vars->isLinked = 0;
-        if (vars->path == -1 || gPathTable_L17[vars->path]->count < 2) {
+        if (vars->path == -1 || g_path_l17_table[vars->path]->count < 2) {
             STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
             STUB_printf(D_L17_001AFD28);
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             break;
         }
         moby->x32 = 0x180;
@@ -149,7 +149,7 @@ void func_L17_003BD310(Moby *moby)
             } else {
                 int count = 0;
                 do {
-                    index = gMobyPool_L17[index].vars->next;
+                    index = g_moby_l17_pool[index].vars->next;
                     count++;
                 } while (index != -1);
                 vars->chainSpan = IntToFloat(count);
@@ -157,7 +157,7 @@ void func_L17_003BD310(Moby *moby)
         }
         vars->chainTime = vars->chainSpan * 4.0f;
         {
-            HazardPath *path = gPathTable_L17[vars->path];
+            HazardPath *path = g_path_l17_table[vars->path];
             path->length = fast_vec_dist(path->start, path->end);
         }
         vars->x14 = 0;
@@ -165,9 +165,9 @@ void func_L17_003BD310(Moby *moby)
         if (vars->next != -1) {
             D_L17_001B2C1C_1[0][vars->next].vars->parent = moby;
             vars->isLinked = 1;
-            SetMobyState(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
         } else {
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         moby->state = 1;
         break;
@@ -181,25 +181,25 @@ void func_L17_003BD310(Moby *moby)
     case 2:
         if (D_L17_001AFCF0)
             UpdatePathFollowerChain(moby);
-        if (FindOwnedEffectSlot(moby, 0x4010000, 1))
-            SetMobyState(moby, 5, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 1))
+            moby_set_state(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 3:
         if (vars->next != -1) {
-            Moby *other = gMobyPool_L17 + vars->next;
+            Moby *other = g_moby_l17_pool + vars->next;
             if (!other || other->state == 0xFE || other->state == 0xFD)
-                SetMobyState(moby, 4, -1);
+                moby_set_state(moby, 4, -1);
         }
-        if (FindOwnedEffectSlot(moby, 0x4010000, 1))
-            SetMobyState(moby, 5, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 1))
+            moby_set_state(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 4:
-        if (SetFirstPendingFlag(moby))
+        if (flag_set_first_pending(moby))
             vars->timer = 5;
-        if (FastFloatHelperD(&vars->timer))
-            SetMobyState(moby, 5, -1);
+        if (math_fast_float_d(&vars->timer))
+            moby_set_state(moby, 5, -1);
         break;
     case 5:
         if (moby->oClass == 0x8AD) {
@@ -210,20 +210,20 @@ void func_L17_003BD310(Moby *moby)
             moby->updateDist = 1000000.0f;
             SpawnExplosion(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
-            SpawnDebrisForMaskedParts(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            a = RandomFloatRange(-10.0f, 10.0f);
-            b = RandomFloatRange(20.0f, 30.0f);
-            created = CreateCameraMoby(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
+            part_spawn_masked_debris(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            a = math_random_float_range(-10.0f, 10.0f);
+            b = math_random_float_range(20.0f, 30.0f);
+            created = cam_moby_create(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
             if (created)
                 created->vars->sound = 0;
-            SpawnScaledBolts(moby, 1, 0.0f);
-            MarkMobySpawned(moby);
+            part_spawn_scaled_bolts(moby, 1, 0.0f);
+            moby_mark_spawned(moby);
         } else {
             moby->updateDist = 1000000.0f;
             SpawnExplosion(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
-            SpawnDebrisForMaskedParts(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            SpawnScaledBolts(moby, 1, 0.0f);
-            MarkMobySpawned(moby);
+            part_spawn_masked_debris(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_scaled_bolts(moby, 1, 0.0f);
+            moby_mark_spawned(moby);
         }
         break;
     }

@@ -3,17 +3,17 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { Vector vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } RibbonPacket;
 extern char D_L06_001B9840[];
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, void *, int), func_002FC560(int, u64);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
 extern int D_L06_001B1924 __attribute__((sda)), D_L06_001B1928 __attribute__((sda));
 
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI orders the integer and FP banks independently: count is a3,
  * and coreWidth, width and extend are f12, f13 and f14. */
-void func_L06_00459020(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth, float width, float extend, int count) {
+void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth, float width, float extend, int count) {
     RibbonPacket core, halo;
     Vector normal, widthVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
     float length, initialLength, haloLength, firstLength, lastLength;

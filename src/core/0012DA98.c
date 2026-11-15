@@ -16,7 +16,7 @@ typedef struct {
 } Obj40;
 
 /* Marks the MPEG picture decoder as finished with the current picture. */
-s32 func_0012DA98(void *decoder) {
+s32 mpeg_finish_reference_image(void *decoder) {
     Obj40 *dec = (Obj40 *)decoder;
     s32 one = 1;
 
@@ -34,10 +34,10 @@ s32 func_0012DA98(void *decoder) {
    fields. Carried from rac1-decomp's func_00129CA0 (src/core/00125630.c), the
    same library with this image's +0x3E20 core shift; func_00121AB8 is its
    __muldi3. */
-extern s64 func_00121AB8(s64 a, s64 b);
+extern s64 __muldi3(s64 a, s64 b);
 
 /* Works out the timestamp and flags for an MPEG picture and writes them to the output slots. */
-s64 func_0012DAC0(void *decoder, void *picture, void *outPts, void *outDts, void *outFlags) {
+s64 mpeg_get_pts_dts_flags(void *decoder, void *picture, void *outPts, void *outDts, void *outFlags) {
     char *dec = decoder;
     char *pic = picture;
     s64 *pts = outPts;
@@ -51,11 +51,11 @@ s64 func_0012DAC0(void *decoder, void *picture, void *outPts, void *outDts, void
             *pts = v;
         } else {
             s32 n = *(s64 *)(dec + 0x88);
-            s64 r = MultiplyLongLong(n & 1, *(s64 *)(dec + 0x78) & 1);
+            s64 r = __muldi3(n & 1, *(s64 *)(dec + 0x78) & 1);
             s32 cnt = *(s32 *)(dec + 0x90);
-            s32 a = MultiplyLongLong(r, cnt & 1);
-            *pts = base + ((s32)(MultiplyLongLong(*(s64 *)(dec + 0x78), n) >> 1) + a);
-            if (MultiplyLongLong(n & 1, *(s64 *)(dec + 0x78) & 1)) {
+            s32 a = __muldi3(r, cnt & 1);
+            *pts = base + ((s32)(__muldi3(*(s64 *)(dec + 0x78), n) >> 1) + a);
+            if (__muldi3(n & 1, *(s64 *)(dec + 0x78) & 1)) {
                 *(s32 *)(dec + 0x90) = cnt + 1;
             }
         }
@@ -75,14 +75,14 @@ s64 func_0012DAC0(void *decoder, void *picture, void *outPts, void *outDts, void
     return packed;
 }
 
-extern void func_0012DC50();
+extern void mpeg_output_picture();
 extern long r1_func_00129CA0(void *s, void *t, void *o1, void *o3, void *o4);
 extern unsigned int r1_D_00132F98[];
 extern void r1_func_0012A7E8(void *arg0, void *arg1);
 
 /* rac1-decomp src/core/00125630.c: func_0012DC50 */
 /* Hands a decoded MPEG picture over to the video output and starts the copy to the screen. */
-void func_0012DC50(char *dec, char *pic) {
+void mpeg_output_picture(char *dec, char *pic) {
     char *transfer;
     long flags;
 

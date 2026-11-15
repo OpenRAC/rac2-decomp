@@ -9,13 +9,13 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern int D_L02_001B01B0 __attribute__((sda));
 
-extern float func_00282E80(char *, void *);
+extern float vec_distance_xy(char *, void *);
 
 /* (out, source vector, 13.0f, 45.0f, 0.2f, 0.2f): its own draft is nonmatching/levels/func_L02_003D5E40.c. */
-extern void func_L02_003D5E40(char *, float *, float, float, float, float);
+extern void PlacePointWithPolarJitter(char *, float *, float, float, float, float);
 
 /* Moves the Chainblade's wander goal to a random spot near the target, and back to the arena centre if it strays too far. */
-void func_L02_003D4E00(char *self) {
+void chainblade_pick_wander_goal(char *self) {
     char *state = *(char **)(self + 0x68);
     float vec[4];
 

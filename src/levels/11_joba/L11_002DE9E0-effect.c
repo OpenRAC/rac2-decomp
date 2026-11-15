@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern void func_002A7750(u8 *a0, u8 a1, s32 a2);
+extern void moby_set_state(u8 *a0, u8 a1, s32 a2);
 
-extern int func_002E5E58(int a0, unsigned int a1, void *a2);
+extern int snd_play_from_global_bank(int a0, unsigned int a1, void *a2);
 
-extern void func_002B0A18(int a0, int a1);
+extern void value_set_entry_by_index(int a0, int a1);
 
 extern s32 D_L11_001B30C8;
 
@@ -22,7 +22,7 @@ extern u8 D_001A7A74 NOT_SDA;
 
 /* Watches a few level counters and, once they pass their limits, switches on two one-time
    flags. */
-void func_L11_003983F0(u8 *moby) {
+void level_update_progress_flags(u8 *moby) {
     u8 *self = moby;
     int state = self[0x20];
     int enabled;
@@ -32,7 +32,7 @@ void func_L11_003983F0(u8 *moby) {
             if (state == 0) {
                 self[0x30] = 0xFF;
                 D_L11_001AED08 = 0;
-                SetMobyState(self, 1, -1);
+                moby_set_state(self, 1, -1);
             }
         }
         return;
@@ -41,8 +41,8 @@ void func_L11_003983F0(u8 *moby) {
     if (D_L11_001B30C8 >= 6 && D_L11_001AED04 == 0 &&
         enabled != 0 && D_001A7A72 == 0) {
         D_001A7A72 = 1;
-        PlaySoundFromGlobalBank(1, 0, 0);
-        SetEntryValueByIndex(0x1233, -1);
+        snd_play_from_global_bank(1, 0, 0);
+        value_set_entry_by_index(0x1233, -1);
         D_L11_001A903C = 1;
     }
     if (D_L11_001AED08 < 12)
@@ -50,7 +50,7 @@ void func_L11_003983F0(u8 *moby) {
     if (D_001A7A74 != 0)
         return;
     D_001A7A74 = 1;
-    PlaySoundFromGlobalBank(1, 0, 0);
-    SetEntryValueByIndex(0x1233, -1);
+    snd_play_from_global_bank(1, 0, 0);
+    value_set_entry_by_index(0x1233, -1);
     D_L11_001A903C = 1;
 }

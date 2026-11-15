@@ -1,14 +1,14 @@
 #include "common.h"
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern char *func_002B9030(int);
-extern int func_002A7820(int, int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern char *part_alloc(int);
+extern int math_random_int_range(int, int);
 extern unsigned char *D_001F26C8;
-void func_002C7D58(char *);
+void part_update_size_changing(char *);
 /* Creates a particle that fades and changes size over its life, pulled down by gravity. Returns the new particle, or null if none are free. */
-char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int alpha, int endAlpha, float size, float endSize, float gravity, int kind)
+char *part_spawn_size_changing(char *pos, char *vel, int life, int color, int speed, int alpha, int endAlpha, float size, float endSize, float gravity, int kind)
 {
-    char *particle = AllocParticle(0x62);
+    char *particle = part_alloc(0x62);
     char *motion;
     if (particle) {
         qcopy(particle + 16, pos);
@@ -18,7 +18,7 @@ char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int al
         particle[1] = 0;
         *(float *)(particle+12) = size;
         particle[3] = 72;
-        particle[8] = RandomIntRange(0, speed*100)%255;
+        particle[8] = math_random_int_range(0, speed*100)%255;
         particle[2] = D_001F26C8[kind];
         *(short *)(particle+10) = life;
         *(float *)(particle+32) = *(float *)vel;
@@ -29,7 +29,7 @@ char *func_002C7BB8(char *pos, char *vel, int life, int color, int speed, int al
         *(float *)(motion+16) = (endSize-size)/IntToFloat(life);
         { int delta = (endAlpha-alpha)/life;
         motion[20] = delta; }
-        *(void (**)(char *))(motion+28) = UpdateSizeChangingParticle;
+        *(void (**)(char *))(motion+28) = part_update_size_changing;
         *(int *)(motion+24) = 60;
     }
     return particle;

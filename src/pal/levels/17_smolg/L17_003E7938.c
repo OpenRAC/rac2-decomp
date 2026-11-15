@@ -1,21 +1,21 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_L17_001FE880[];
+extern s32 g_path_l17_table[];
 extern s32 func_31B160(s32);
 extern f32 func_2EF0B0(s32, s32);
 extern s32 D_L17_001B2748 __attribute__((sda));
 extern s32 func_2F0108(u32, u32, f32);
-extern f32 func_00283198(f32);
-extern s32 D_L17_001B2C1C __attribute__((sda));
+extern f32 math_fast_sin_or_cos_b(f32);
+extern s32 g_moby_l17_pool __attribute__((sda));
 extern s32 D_L17_001C0018;
 extern s32 func_2DF570(s32, s32, s32, s32, s32);
-extern f32 func_00282C48(f32);
+extern f32 math_fabs(f32);
 extern f32 D_L17_001B04BC SDATA(D_L17_001B04BC);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283C80(f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_002AA2E8(void *, f32, f32);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 ApproachValue(void *, f32, f32);
 extern u16 *D_L17_001FB720[];
 extern u8 *D_L17_001B2C1C_base[] __asm__("D_L17_001B2C1C") __attribute__((sda));
 extern s32 D_L17_001B2C38[] __attribute__((sda));

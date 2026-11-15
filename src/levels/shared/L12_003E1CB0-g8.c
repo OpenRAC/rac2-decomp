@@ -9,22 +9,22 @@ typedef signed short s16;
 extern u16 D_L12_001B0B0C __attribute__((sda));
 
 /* Sets the object's byte at +0x95 to 9 and copies a level-wide halfword into its private data. */
-void func_L12_003E2448(u8 *moby) {
+void moby_init_state_byte(u8 *moby) {
     *(u8 *)(moby + 0x95) = 9;
     *(u16 *)(*(u32 *)(moby + 0x68) + 0x29E) = D_L12_001B0B0C;
 }
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern int func_00283D38(int, int, float);
+extern int FastTweenColor(int, int, float);
 
-extern void func_0029FC20(char *, int, void *);
+extern void moby_transform_joint_point(char *, int, void *);
 
-extern void func_L00_002E6CF0(void *, void *);
+extern void gfx_add_draw_callback_first(void *, void *);
 
-extern void func_L12_004281D8(u8 *);
+extern void group_draw_entity_glows(u8 *);
 
 /* The entity base and the frame counter are read bare (`lui`/`lw` in one register: `sda` sized
    over 8 bytes in a -G8 unit); the group count is a $gp scalar and the group table an ordinary
@@ -77,7 +77,7 @@ struct L12Kind348Object {
 /* Turns the object's angle and its mirrored scale into its word at +0x78; when the frame
    counter D_L12_001B29C8 differs from the object's word at +0x350, walks the object's group
    and refreshes every live entity of kind 0x11EB, then registers func_L12_004281D8. */
-void func_L12_00428040(struct L12Kind348Object *moby) {
+void pulsing_group_update(struct L12Kind348Object *moby) {
     struct L12Kind348 *vars = moby->obj;
     struct L12PairWord colorPair = D_L12_001B21D0;
     float wave;
@@ -87,7 +87,7 @@ void func_L12_00428040(struct L12Kind348Object *moby) {
 
     wave = FastAddRotations(vars->f348, 0.2094395458f);
     vars->f348 = wave;
-    wave = FastSinOrCosB(wave);
+    wave = math_fast_sin_or_cos_b(wave);
     vars->f34C = wave * 0.5f + 0.5f;
     moby->f78 = FastTweenColor(colorPair.a, colorPair.b, vars->f34C);
     if (vars->f350 != D_L12_001B29C8_s) {
@@ -100,19 +100,19 @@ void func_L12_00428040(struct L12Kind348Object *moby) {
                 break;
             if (entity->f31 != 0 && entity->type == 0x11EB && entity->state != 0xFE && entity->state != 0xFD) {
                 entityVars = entity->obj;
-                TransformMobyJointPoint((char *)entity, 0, (char *)entityVars + 0x240);
+                moby_transform_joint_point((char *)entity, 0, (char *)entityVars + 0x240);
                 entityVars->f350 = D_L12_001B29C8[0];
             }
         }
-        AddDrawCallbackToList1((void *)DrawGroupEntityGlows, moby);
+        gfx_add_draw_callback_first((void *)group_draw_entity_glows, moby);
     }
 }
 
-extern void func_00282D30(void *dst, void *src, float value);
+extern void FastVecScale(void *dst, void *src, float value);
 
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
-extern void func_L00_00325AE8(void *, int, float, float);
+extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 /* Here the group count is read bare, so it takes a second name sized over 8 bytes (its .extern
    re-sizes the symbol after func_L12_00428040's $gp reads). The vector's address is $gp-relative.
@@ -131,7 +131,7 @@ extern struct L12PairWord D_L12_001B21F0;
    set, state byte at +0x20 not 0xFE or 0xFD): the vector at D_L12_001B21E0 is turned by the
    angle at +0x344 of the entity's private block and then by its matrix at +0x240, the colour
    pair at D_L12_001B21F0 is mixed by the fraction at +0x34C, and both go to func_L00_00325AE8. */
-void func_L12_004281D8(u8 *moby) {
+void group_draw_entity_glows(u8 *moby) {
     u16 *q;
     u16 *p;
     u8 *e;
@@ -155,13 +155,13 @@ void func_L12_004281D8(u8 *moby) {
             FastVecScale(buf, D_L12_001B21E0, *(float *)(priv + 0x344));
             transform_vector(buf, buf, priv + 0x240);
             r = FastTweenColor(D_L12_001B21F0.a, D_L12_001B21F0.b, *(float *)(priv + 0x34C));
-            DrawBillboardQuad_L00(buf, r, *(float *)(priv + 0x344) * 0.2f, 0.08f);
+            gfx_l00_draw_billboard_quad(buf, r, *(float *)(priv + 0x344) * 0.2f, 0.08f);
         }
     }
 }
 
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
 extern void ref_L12_00429D60_00(void *, int, float, int, float, float, int, int, void *);
 extern float D_L12_001B2328 __attribute__((sda));
 extern float D_L12_001B232C __attribute__((sda));
@@ -171,7 +171,7 @@ extern int D_L12_001B22E4 __attribute__((sda));
 extern int D_L12_001B22E8 __attribute__((sda));
 
 /* Draws two glow effects at the object's position, each with a random brightness and its own scale and colour. */
-void func_L12_00429D60(char *object) {
+void part_spawn_two_flare_effects(char *object) {
     int flareAlpha;
     int flareAlpha2;
     float scale;
@@ -179,13 +179,13 @@ void func_L12_00429D60(char *object) {
     float random;
     scale = D_L12_001B2328;
     scale *= *(float *)(object + 0x2C);
-    flareAlpha = RandomIntRange(95, 111);
-    random = RandomAngle();
+    flareAlpha = math_random_int_range(95, 111);
+    random = math_random_angle();
     ref_L12_00429D60_00(object + 0x10, D_L12_001B22E4, scale, flareAlpha, random, 1.0f, D_L12_001B2320, 2, object);
     scale2 = D_L12_001B2328;
     scale2 *= *(float *)(object + 0x2C);
     scale2 *= D_L12_001B232C;
-    flareAlpha2 = RandomIntRange(111, 127);
-    random = RandomAngle();
+    flareAlpha2 = math_random_int_range(111, 127);
+    random = math_random_angle();
     ref_L12_00429D60_00(object + 0x10, D_L12_001B22E8, scale2, flareAlpha2, random, 1.0f, D_L12_001B2324, 2, object);
 }

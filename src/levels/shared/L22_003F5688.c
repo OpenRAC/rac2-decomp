@@ -16,22 +16,22 @@ extern int D_L22_001B0A44_gp[] SDATA(D_L22_001B0A44);
 extern int D_L22_001B0A48_gp[] SDATA(D_L22_001B0A48);
 extern int D_L22_001B0A4C[] __attribute__((sda));
 
-extern float func_00283CE0(int);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283D38(int, int, float);
-extern int func_002A77E0(int);
-extern void func_00282C88(void *);
-extern int func_002A7820(int, int);
+extern float IntToFloat(int);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastTweenColor(int, int, float);
+extern int math_random_int_below(int);
+extern void vec_clear_128(void *);
+extern int math_random_int_range(int, int);
 /* The EE passes three vectors and five ints in registers, the ninth int on the stack. */
-extern void *func_002BAA28(void *, float *, float *, int, int, int, int, int, int);
+extern void *part_spawn_trail(void *, float *, float *, int, int, int, int, int, int);
 
 /* Spawn func_002BAA28 entries along the object's height: the count scales with the
  * height and the level's density (a fifth of it unless fullDensity), each at a
  * random spread transformed into the object's frame, with random colours and size. */
-void func_L22_003F5688(u8 *object, int fullDensity)
+void part_emit_column(u8 *object, int fullDensity)
 {
     EmissionVector position, scratch, to;
     u8 *state = *(u8 **)(object + 0x68);
@@ -55,24 +55,24 @@ void func_L22_003F5688(u8 *object, int fullDensity)
             float size;
 
             scratch.q = 0;
-            scratch.f[0] = RandomSignedFloatRange(zero, spread);
-            scratch.f[1] = RandomSignedFloatRange(zero, spread);
+            scratch.f[0] = math_random_signed_float_range(zero, spread);
+            scratch.f[1] = math_random_signed_float_range(zero, spread);
             scratch.f[2] = progress;
             position.q = scratch.q;
             matrix_mul_vec3(position.f, position.f, object + 0xC0);
             FastVecAdd(position.f, position.f, object + 0x10);
             firstColor = FastTweenColor(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
-                                       RandomFloatRange(zero, 1.0f));
+                                       math_random_float_range(zero, 1.0f));
             secondColor = FastTweenColor(D_L22_001B0A28[2], D_L22_001B0A28[3],
-                                        RandomFloatRange(zero, 1.0f));
-            size = D_L22_001B0A38_gp[RandomIntBelow(2)];
-            ClearVector128(scratch.f);
+                                        math_random_float_range(zero, 1.0f));
+            size = D_L22_001B0A38_gp[math_random_int_below(2)];
+            vec_clear_128(scratch.f);
             scratch.f[3] = size;
-            ClearVector128(to.f);
+            vec_clear_128(to.f);
             to.f[3] = size;
-            kind = RandomIntRange(1, D_L22_001B0A48_gp[0]);
-            duration = RandomIntRange(D_L22_001B0A4C[0], D_L22_001B0A4C[1]);
-            SpawnTrailParticle_002BAA28(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
+            kind = math_random_int_range(1, D_L22_001B0A48_gp[0]);
+            duration = math_random_int_range(D_L22_001B0A4C[0], D_L22_001B0A4C[1]);
+            part_spawn_trail(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
                           60, D_L22_001B0A44_gp[0]);
             ++i;
         } while ((float)i < count);

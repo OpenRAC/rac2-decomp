@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0033AB50(char *p);
+extern void prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_PAL_L00_00436E20(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
@@ -112,11 +113,11 @@ char *func_PAL_L00_00438B60(char *object)
 }
 
 
-extern int func_00288FB8(int);
+extern int GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CD50(void *);
-extern void func_L00_00430948(void *, float, float);
-extern int func_002E5E58(int a, int b, int c);
+extern void mem_store_two_floats_through_cell(void *, float, float);
+extern int snd_play_from_global_bank(int a, int b, int c);
 extern unsigned char D_001A7BB2 __attribute__((sda));
 
 /* func_PAL_L00_00438CC0, the PAL copy of func_L00_00433560: the same C, with the child's three
@@ -127,15 +128,15 @@ int func_PAL_L00_00438CC0(char *object, int flags)
     char *child = object + 8;
     int text, second;
 
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_L00_00430948(child, vec[0], vec[1]);
+    mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -163,15 +164,15 @@ int func_PAL_L00_00438FB8(char *object, int flags)
     char *child = object + 8;
     int text, second;
 
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_L00_00430948(child, vec[0], vec[1]);
+    mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -197,15 +198,15 @@ int func_PAL_L00_004391F8(char *object, int flags)
     char *child = object + 8;
     int text, second;
 
-    text = func_00288FB8(0xB72);
-    second = func_00288FB8(0xB5F);
-    func_PAL_0033CF78(child, text, second, func_00288FB8(0xB60));
+    text = GetLocalizedString(0xB72);
+    second = GetLocalizedString(0xB5F);
+    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
     func_PAL_0033CD50(child);
     vec = *(float **)(object + 0x2DC);
-    func_L00_00430948(child, vec[0], vec[1]);
+    mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
-        int discarded = func_002E5E58(4, 0, 0);
+        int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
         D_001A7BB2 = (D_001A7BB2 < 1);
     }
@@ -214,28 +215,28 @@ int func_PAL_L00_004391F8(char *object, int flags)
 }
 
 extern void *func_PAL_0033CA78(void *);
-extern void *func_00347EA0(void *);
+extern void *menu_pass_through_handle(void *);
 
 void *func_PAL_L00_004392D8(char *object) {
     func_PAL_0033CA78(object + 0x8);
-    func_00347EA0(object + 0x2E0);
+    menu_pass_through_handle(object + 0x2E0);
     return object;
 }
 
 
-extern void *func_L00_0042C290(void *);
+extern void *cam_init_object_table_d(void *);
 
 void *func_PAL_L00_00439630(char *object) {
     func_PAL_0033CA78(object + 0x8);
-    func_L00_0042C290(object + 0x2E0);
+    cam_init_object_table_d(object + 0x2E0);
     return object;
 }
 
 
-extern int func_0033AF48(char *p);
+extern int prompt_bar_draw(char *p);
 
 int func_PAL_L00_004397D0(char *p)
 {
-    return func_0033AF48(p + 8);
+    return prompt_bar_draw(p + 8);
 }
 

@@ -4,11 +4,11 @@
 /* func_PAL_L09_003FB0D8, the PAL copy of func_L09_003F6820: the same C, where the duration is scaled
    to 50 Hz before both of its uses and func_002A7470 becomes the release's own func_PAL_002A7E68. */
 
-extern unsigned char *func_0029EFD0(int);
-extern float func_00283CE0(int);
-extern void func_002A7750(unsigned char *, int, int);
+extern unsigned char *CreateMoby(int);
+extern float IntToFloat(int);
+extern void moby_set_state(unsigned char *, int, int);
 extern void func_PAL_002A7E68(unsigned char *, int, int, int);
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
 typedef struct DobboMoby DobboMoby;
 
@@ -67,7 +67,7 @@ struct DobboMoby {
 DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *owner, DobboMoby *partner,
                                  int duration, float radius, float f2c, float max_distance)
 {
-    DobboMoby *moby = (DobboMoby *)func_0029EFD0(0xD09);
+    DobboMoby *moby = (DobboMoby *)CreateMoby(0xD09);
     DobboLinkState *state;
 
     if (moby) {
@@ -75,9 +75,9 @@ DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *own
         moby->f32 = 255;
         moby->f31 = 1;
         state = moby->data;
-        moby->rotation[2] = func_002A7940();
-        moby->rotation[1] = func_002A7940();
-        moby->rotation[0] = func_002A7940();
+        moby->rotation[2] = math_random_angle();
+        moby->rotation[1] = math_random_angle();
+        moby->rotation[0] = math_random_angle();
         moby->scale = moby->cls->scale;
         state->owner = owner;
         moby->flags |= 0x2200;
@@ -89,7 +89,7 @@ DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *own
         state->partner = partner;
         duration = ((s32)(duration) * 5 + 2) / 6;
         state->timer = duration;
-        state->duration_f = func_00283CE0(duration);
+        state->duration_f = IntToFloat(duration);
         state->max_distance = max_distance;
         moby->alpha = 0;
         /* stored as !partner: a plain 1 here is not what retail emits */
@@ -100,7 +100,7 @@ DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *own
         moby->f31 = 0;
         moby->f48 = 0.5f;
         moby->flags |= 1;
-        func_002A7750((unsigned char *)moby, 0, -1);
+        moby_set_state((unsigned char *)moby, 0, -1);
     }
     return moby;
 }

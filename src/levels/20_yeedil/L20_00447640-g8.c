@@ -4,8 +4,8 @@ extern u16 *D_L20_001FBB20[];
 extern u8 *D_L20_001B2F9C[] __attribute__((sda));
 extern int D_L20_001B2FB8 __attribute__((sda));
 
-extern void func_002A6C58(void *, int, int);
-extern void func_L18_003F74B8(u8 *, int);
+extern void SetDeathBits(void *, int, int);
+extern void protopet_end_action(u8 *, int);
 
 /* For every entity of the object's group (the id list D_L20_001FBB20[self[0x21]], ids masked
    with 0x7FFF, 0x100-byte records at D_L20_001B2F9C) of class 0xB69 whose state byte is neither
@@ -15,7 +15,7 @@ extern void func_L18_003F74B8(u8 *, int);
    %hi copy in its delay slot come out (see func_L02_003EB138).  The entity bank is an `sda`
    array of unknown size, which gives retail's absolute lui/lw load in this -G8 unit. */
 /* Destroys every Protopet that belongs to this object group. */
-void func_L20_00447640(u8 *self) {
+void yeedil_destroy_group_protopets(u8 *self) {
     u16 *p;
     u8 *e;
 
@@ -30,7 +30,7 @@ void func_L20_00447640(u8 *self) {
             break;
         if (*(s16 *)(e + 0xAA) == 0xB69 /* Protopet */ && e[0x20] != 0xFE && e[0x20] != 0xFD) {
             SetDeathBits(e, 0, 1);
-            EndCurrentAction(e, 0);
+            protopet_end_action(e, 0);
         }
     }
 }

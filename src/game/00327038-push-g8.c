@@ -8,18 +8,18 @@ extern int ref_L00_00327B40_00 __attribute__((sda));
 extern float ref_L00_00327B40_01 __attribute__((sda));
 extern int D_001BF000[];
 typedef struct { unsigned char pad[0x20]; unsigned char selection; } SettingsB40;
-extern SettingsB40 D_00139568;
+extern SettingsB40 g_item_slot_to_record;
 typedef struct { char pad[0x70]; float damage; char tail[0x6C]; } B40Class;
-extern B40Class D_00239BA0[];
+extern B40Class g_weapon_table[];
 typedef struct { char pad[0x2290]; char *object; } ContextB40;
-extern ContextB40 D_00189E20;
-extern int func_00277F48(void *, int, void *, int, float);
-extern int func_002AB1F0(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_0032D758(void *, int, int);
+extern ContextB40 g_hero_state;
+extern int coll_process_hit(void *, int, void *, int, float);
+extern int moby_get_private_value_0(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void StartAttachedEffect(void *, int, int);
 
 typedef struct {
     char pad0[0x10];
@@ -33,7 +33,7 @@ typedef struct {
 /* Pushes every object within range (the smaller of the state's radius and a global one) away
    from this object, unless it is the hero's current object or neither pushable nor flagged
    0x4000. */
-void func_00327B40(ObjectB40 *self)
+void DamageNearbyMobys(ObjectB40 *self)
 {
     float direction[4];
     struct {
@@ -54,19 +54,19 @@ void func_00327B40(ObjectB40 *self)
     if (*(int *)(state + 0x20) < ref_L00_00327B40_00 - 20)
         return;
     radius = *(float *)(state + 0x24) < ref_L00_00327B40_01 ? *(float *)(state + 0x24) : ref_L00_00327B40_01;
-    count = ProcessCollisionHit(self->pos, 0, self, 0, radius);
+    count = coll_process_hit(self->pos, 0, self, 0, radius);
     if (count > 0) {
         list = D_001BF000;
         remaining = count;
         do {
             obj = (char *)*list;
-            if ((GetMobyPrivateValue0(obj) || (*(unsigned short *)(obj + 0x34) & 0x4000))
-                && obj != gHeroState.object) {
+            if ((moby_get_private_value_0(obj) || (*(unsigned short *)(obj + 0x34) & 0x4000))
+                && obj != g_hero_state.object) {
                 FastVecSub(direction, obj + 0x10, self->pos);
                 vec_scale_to_length(direction, direction, 1.0f);
                 vec_scale_to_length(&hit, &hit, 1.0f);
                 make_hit_descriptor(&hit, self, 0x830000, direction,
-                              ((B40Class *)((int)gWeaponTable_00239BA0 + gItemSlotToRecord.selection * sizeof(B40Class)))->damage);
+                              ((B40Class *)((int)g_weapon_table + g_item_slot_to_record.selection * sizeof(B40Class)))->damage);
                 *(B40Quad *)hit.direction = *(B40Quad *)direction;
                 hit.enabled = 1;
                 hit.direction[3] = 5627.925f;

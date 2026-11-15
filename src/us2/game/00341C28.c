@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);
 
 u8 *func_US2_00341C28(u8 *self)
 {
-    func_003361A8(self);
-    func_003361A8(self + 76);
-    func_00336968((char *)self + 152);
-    func_003361A8(self + 240);
-    func_003363D0(self + 316);
-    func_003366D0(self + 388);
+    object_construct_derived_a(self);
+    object_construct_derived_a(self + 76);
+    hud_construct_widget_base((char *)self + 152);
+    object_construct_derived_a(self + 240);
+    object_construct_derived_b(self + 316);
+    object_construct_derived_c(self + 388);
     return self;
 }
 
@@ -28,9 +29,9 @@ typedef struct {
     char reserved08[2];
 } MenuEntry;
 extern MenuEntry D_001FCE0[];
-extern int func_002E5E58(int, unsigned int, void *);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_00335E38(void *, float, float, float, float);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void *memset(void *, int, unsigned int);
+extern void object_set_first_float4(void *, float, float, float, float);
 
 /* func_00340D68 is in 0033F030-grid-g8.c. */
 
@@ -41,34 +42,34 @@ extern void func_00335E38(void *, float, float, float, float);
 int func_US2_00341F40(char *self, unsigned int buttons, MenuEntry *table)
 {
     float offset[2];
-    func_00115484(offset, 0, 8);
+    memset(offset, 0, 8);
     if (table) {
         float *position;
         *(int *)(self + 0x224) = 0;
         position = *(float **)(self + 0x1C0);
-        func_00335E38(self, offset[0] + position[0], offset[1] + position[1], 0.0f, 0.0f);
+        object_set_first_float4(self, offset[0] + position[0], offset[1] + position[1], 0.0f, 0.0f);
         if (buttons & 0x1000) {
             int n;
-            func_002E5E58(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             *(int *)(self + 0x218) -= 1;
             n = *(int *)(self + 0x218);
             if (n < 0) n = *(int *)(self + 0x220) - 1;
             *(int *)(self + 0x218) = n;
         } else if (buttons & 0x4000) {
             int n;
-            func_002E5E58(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             n = *(int *)(self + 0x218) + 1;
             *(int *)(self + 0x218) = n < *(int *)(self + 0x220) ? n : 0;
         } else if (buttons & 0x8000) {
             int n;
-            func_002E5E58(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             *(int *)(self + 0x214) -= 1;
             n = *(int *)(self + 0x214);
             if (n < 0) n = *(int *)(self + 0x21C) - 1;
             *(int *)(self + 0x214) = n;
         } else if (buttons & 0x2000) {
             int n;
-            func_002E5E58(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             n = *(int *)(self + 0x214) + 1;
             *(int *)(self + 0x214) = n < *(int *)(self + 0x21C) ? n : 0;
         }

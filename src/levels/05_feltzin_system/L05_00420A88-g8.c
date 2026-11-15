@@ -11,27 +11,27 @@ extern int D_L05_001B2048;
 extern char *D_L05_001B251C;
 extern char D_L05_001B1380[] SDATA(D_L05_001B1380);
 extern char D_L05_001B1370[] SDATA(D_L05_001B1370);
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(int);
-extern char **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
-extern void func_L05_0037B280(char *, int);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(int);
+extern char **level_get_object_list(void);
+extern int level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(char *, int);
 extern void func_L05_0037CEE0(char *, void *, float);
 extern void func_L05_0037D608(char *, void *, float);
-extern int func_00282948(void *);
-extern void func_L05_00442828(void *, void *, int);
-extern void func_L05_00445B58(void *, void *);
-extern void func_L05_004222D8(void);
-extern int func_0029B3E0(int, int);
-extern void func_L00_003294F0(char *, int);
-extern void func_L05_00379F48(int);
-extern void func_002AD7B8(int);
-extern void func_L05_00420788(char *, int);
+extern int math_fast_float_d(void *);
+extern void ship_start_transition(void *, void *, int);
+extern void ship_point_camera_at_target(void *, void *);
+extern void feltzin_mission_clamp_save_counts(void);
+extern int MemcardSave(int, int);
+extern void moby_set_flag_bit(char *, int);
+extern void hero_set_state_value_c(int);
+extern void moby_mark_flag_and_append_to_list(int);
+extern void UpdateFeltzinMissionReward(char *, int);
 
 /* Controls the first Feltzin mission: on the first frame it sets up the scene and points the
    nearby objects at a target, later it moves the camera and hands over to the reward code. */
-void func_L05_00420A88(char *actor)
+void feltzin_mission_one_update(char *actor)
 {
     Vector a;
     Vector b;
@@ -45,10 +45,10 @@ void func_L05_00420A88(char *actor)
         D_L05_00221D10[11] = 0;
         D_L05_001B1364 = 1;
         music_Unpause();
-        InitAllRegisteredEntries();
-        SetPlayerStateField13(0);
-        objects = GetLevelObjectList();
-        count = GetLevelSavedValue();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        objects = level_get_object_list();
+        count = level_get_saved_value();
         a.q = 0;
         a.f[0] = 487.0f;
         a.f[1] = 526.0f;
@@ -60,7 +60,7 @@ void func_L05_00420A88(char *actor)
                 case 0x957 /* moby class 2391 */:
                 case 0x97C /* moby class 2428 */:
                 case 0xF76 /* moby class 3958 */:
-                    SpawnEntryListObjectsWithFlag(*objects, 1);
+                    entry_spawn_list_objects_with_flag(*objects, 1);
                     func_L05_0037CEE0(*objects, &a, 64.0f);
                     func_L05_0037D608(*objects, &a, 64.0f);
                     break;
@@ -72,10 +72,10 @@ void func_L05_00420A88(char *actor)
     if (D_L05_00221D10[4] != 0 || D_L05_001B2048 < 6)
         return;
     if (D_L05_00221D10[5] <= 0) {
-        if (FastFloatHelperD(state + 0x58) == 0)
+        if (math_fast_float_d(state + 0x58) == 0)
             return;
         *(int *)(state + 0x58) = 120;
-        StartShipTransition(D_L05_001B1380, D_L05_001B1370, 200);
+        ship_start_transition(D_L05_001B1380, D_L05_001B1370, 200);
         a.q = 0;
         b.q = 0;
         c.q = 0;
@@ -89,9 +89,9 @@ void func_L05_00420A88(char *actor)
         c.f[0] = 438.0f;
         c.f[1] = 487.0f;
         c.f[2] = 535.0f;
-        PointShipCameraAtTarget(&a, &c);
-        objects = GetLevelObjectList();
-        secondCount = GetLevelSavedValue();
+        ship_point_camera_at_target(&a, &c);
+        objects = level_get_object_list();
+        secondCount = level_get_saved_value();
         if (secondCount > 0) {
             int remaining = secondCount;
             do {
@@ -99,7 +99,7 @@ void func_L05_00420A88(char *actor)
                 case 0x957 /* moby class 2391 */:
                 case 0x97C /* moby class 2428 */:
                 case 0xF76 /* moby class 3958 */:
-                    SpawnEntryListObjectsWithFlag(*objects, 1);
+                    entry_spawn_list_objects_with_flag(*objects, 1);
                     func_L05_0037CEE0(*objects, &a, 10.0f);
                     func_L05_0037D608(*objects, &b, 20.0f);
                     break;
@@ -108,19 +108,19 @@ void func_L05_00420A88(char *actor)
             } while (--remaining != 0);
         }
     } else if (D_L05_001B13F4 != 0) {
-        if (FastFloatHelperD(state + 0x58) != 0) {
+        if (math_fast_float_d(state + 0x58) != 0) {
             *(int *)(state + 0x58) = 25;
             D_L05_001B1350++;
-            ClampAndSaveFeltzinMissionCounts();
+            feltzin_mission_clamp_save_counts();
             MemcardSave(0, -1);
             D_L05_001B1350--;
-            SetObjectFlagBit(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
+            moby_set_flag_bit(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
             D_L05_001B13D8 = 0;
             D_L05_001B13F4 = 0;
-            SetPlayerStateField18(1);
-            MarkFlagAndAppendToList(6);
+            hero_set_state_value_c(1);
+            moby_mark_flag_and_append_to_list(6);
         }
-    } else if (FastFloatHelperD(state + 0x58) != 0) {
+    } else if (math_fast_float_d(state + 0x58) != 0) {
         UpdateFeltzinMissionReward(actor, 0);
     }
 }

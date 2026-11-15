@@ -6,24 +6,24 @@
 extern float D_002625B0[][4], D_002620A0[][4], D_00214A30[][4];
 extern float D_00214CE0[][2], D_00214E38[][2];
 extern short D_00262350[][8];
-extern int D_001A8BB0;
-extern float D_001B5200[];
+extern int g_current_game_mode;
+extern float g_active_camera[];
 extern int D_001ABF00 __attribute__((sda));
 extern int D_001ABF04 __attribute__((sda));
 extern int D_001ABF08 __attribute__((sda));
 extern short D_00152C20 NOT_SDA;
-extern unsigned long long func_0027C878(int);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00282C48(float);
-extern void func_00282948(int *);
-extern float func_00283CE0(int);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282C10(float);
-extern void func_00280B90(void *, int, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float math_fabs(float);
+extern void math_fast_float_d(int *);
+extern float IntToFloat(int);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float square_root(float);
+extern void draw_world_quad(void *, int, int);
 void func_PAL_002EDA88(void *object)
 {
  struct {
@@ -42,40 +42,40 @@ void func_PAL_002EDA88(void *object)
  float (*points)[4] = D_002620A0;
  float (*normals)[4] = D_002625B0;
  short (*quads)[8] = D_00262350;
- quad.packet[1] = func_0027C878(21);
+ quad.packet[1] = GetEffectTextureDescriptor(21);
  quad.packet[0] = 0;
- color = D_001A8BB0 == 2 ? 0x28a5a281 : 0x3ca5a281;
+ color = g_current_game_mode == 2 ? 0x28a5a281 : 0x3ca5a281;
  active = 0;
  quad.packet[2] = 0xff9000000260ULL;
  quad.packet[3] = 0x8000000044ULL;
  quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
- func_0029FC20(object, 0, matrix);
+ moby_transform_joint_point(object, 0, matrix);
  transform = matrix;
- if (D_001A8BB0 == 0 || D_001A8BB0 == 2) {
-  if (func_00282C48(D_001B5200[0x50] - *(float *)(o + 0x10)) < 16.0f &&
-      func_00282C48(D_001B5200[0x51] - *(float *)(o + 0x14)) < 16.0f) active = 1;
+ if (g_current_game_mode == 0 || g_current_game_mode == 2) {
+  if (math_fabs(g_active_camera[0x50] - *(float *)(o + 0x10)) < 16.0f &&
+      math_fabs(g_active_camera[0x51] - *(float *)(o + 0x14)) < 16.0f) active = 1;
  } else active = 1;
- if (D_001A8BB0 == 6 && D_00152C20 == 2) active = 0;
+ if (g_current_game_mode == 6 && D_00152C20 == 2) active = 0;
  if (active || D_001ABF00 == 1) {
   D_001ABF04 = 1;
-  func_00282948(&D_001ABF08);
-  fraction = func_00283CE0(D_001ABF08) / func_00283CE0(50);
+  math_fast_float_d(&D_001ABF08);
+  fraction = IntToFloat(D_001ABF08) / IntToFloat(50);
   {
   float *t = transform;
   float (*n)[4] = normals;
   float (*p)[4] = points;
   for (i = 0; i < 43; i++) {
    float divisor, x;
-   func_002830C0(D_00214A30[i], p[i], t);
-   func_00282CF0(ray, D_00214A30[i], &D_001B5200[0x50]);
-   func_00282F20(ray, ray, 1.0f);
-   func_002830C0(normal, n[i], t);
-   func_00282F20(normal, normal, 0.1f);
-   func_00282D30(reflected, normal, 2.0f * func_00282DB0(normal, ray));
-   func_00282CF0(reflected, ray, reflected);
-   func_00282F20(reflected, reflected, 1.0f);
+   transform_vector(D_00214A30[i], p[i], t);
+   FastVecSub(ray, D_00214A30[i], &g_active_camera[0x50]);
+   vec_scale_to_length(ray, ray, 1.0f);
+   transform_vector(normal, n[i], t);
+   vec_scale_to_length(normal, normal, 0.1f);
+   FastVecScale(reflected, normal, 2.0f * FastVecDot(normal, ray));
+   FastVecSub(reflected, ray, reflected);
+   vec_scale_to_length(reflected, reflected, 1.0f);
    reflected[2] += 1.0f;
-   divisor = func_00282C10(reflected[2] * 2.0f) * 2.0f;
+   divisor = square_root(reflected[2] * 2.0f) * 2.0f;
    if (D_001ABF00 == 1 || D_001ABF08 == 0) {
     D_00214CE0[i][0] = reflected[0] / divisor + 0.5f;
     D_00214CE0[i][1] = reflected[1] / divisor + 0.5f;
@@ -93,13 +93,13 @@ void func_PAL_002EDA88(void *object)
   for (i = 0; i < 43; i++) {
    D_00214E38[i][0] = D_00214CE0[i][0];
    D_00214E38[i][1] = D_00214CE0[i][1];
-   func_002830C0(D_00214A30[i], points[i], transform);
+   transform_vector(D_00214A30[i], points[i], transform);
   }
   D_001ABF08 = 50;
  } else {
   float (*dest)[4] = D_00214A30;
   float (*p)[4] = points;
-  for (i = 0; i < 43; i++) func_002830C0(dest[i], p[i], transform);
+  for (i = 0; i < 43; i++) transform_vector(dest[i], p[i], transform);
   D_001ABF08 = 50;
  }
  for (i = 0; i < 38; i = next) {
@@ -116,6 +116,6 @@ void func_PAL_002EDA88(void *object)
     quad_v[j*2] = y;
    }
   }
-  func_00280B90(&quad, 0, 0);
+  draw_world_quad(&quad, 0, 0);
  }
 }

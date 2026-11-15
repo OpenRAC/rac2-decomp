@@ -7,22 +7,22 @@
    copy on their own side of it. */
 
 typedef int V4 __attribute__((mode(TI)));
-extern int func_002ED688(unsigned char *owner);
-extern unsigned int func_002ED870(void);
-extern void func_00282CF0(void *a0, void *a1, void *a2);
-extern float func_00282DF0(char *a0);
-extern void func_00282D30(char *a0, char *a1, float f);
+extern int moby_get_motion_data(unsigned char *owner);
+extern unsigned int scene_get_state_word(void);
+extern void FastVecSub(void *a0, void *a1, void *a2);
+extern float FastVecLength(char *a0);
+extern void FastVecScale(char *a0, char *a1, float f);
 extern void func_00282F20_10(V4 *, char *, float);
 extern void func_00282CC0_26(char *, V4 *, char *);
-extern int func_002761F8(char *a0, char *a1, int mode, char *self, int flag);
-extern int func_00277258(char *a0, int mode, char *self, float scale);
+extern int CollLine(char *a0, char *a1, int mode, char *self, int flag);
+extern int coll_test_point(char *a0, int mode, char *self, float scale);
 extern V4 D_001BAFA0;
 extern V4 D_001BAFB0;
 extern char *D_001B1C54 __attribute__((sda));
 extern int D_00214F90[];
 
 /* Keeps the follower's push vector inside its allowed range and stops it from going into walls or the ground. */
-void func_002EE988(char *owner)
+void follower_clamp_push_vector(char *owner)
 {
     float offset[4];
     float pushDir[4];
@@ -34,9 +34,9 @@ void func_002EE988(char *owner)
     char *table;
     float dist;
 
-    if (GetSceneStateWord() != 0)
+    if (scene_get_state_word() != 0)
         return;
-    object = (char *)GetMobyMotionData((unsigned char *)owner);
+    object = (char *)moby_get_motion_data((unsigned char *)owner);
     if (object == 0)
         return;
     pos = object + 0x60;
@@ -57,7 +57,7 @@ void func_002EE988(char *owner)
         func_00282CC0_26((char *)pe, pd, (char *)pushVec);
         *(V4 *)pos = *pe;
     }
-    if (TestPointAgainstCollision(pos, 2, owner, 5.0f)) {
+    if (coll_test_point(pos, 2, owner, 5.0f)) {
         *(V4 *)pos = D_001BAFB0;
     }
 }

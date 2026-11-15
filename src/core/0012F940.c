@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 struct IndirectWord
 {
@@ -7,7 +8,7 @@ struct IndirectWord
 };
 
 /* Returns the constant integer 1. Matches func_0012F940 disassembly and decompilation. */
-int func_0012F940(void) {
+int mpeg_return_one(void) {
     return 1;
 }
 
@@ -16,7 +17,7 @@ extern int r1_func_0012BDD0(void *);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012F948 */
 /* Gives the movie decoder the address and size of its output buffer. */
-int func_0012F948(char *mpeg, unsigned int addr, int size) {
+int mpeg_set_output_buffer(char *mpeg, unsigned int addr, int size) {
     char *decoder = *(char **)(mpeg + 0x40);
 
     *(int *)(decoder + 0xB0) = 1;
@@ -28,7 +29,7 @@ int func_0012F948(char *mpeg, unsigned int addr, int size) {
 }
 
 /* Reads the value that a resource points to. */
-unsigned int func_0012F9A8(struct IndirectWord *resource)
+unsigned int mpeg_read_indirect_word(struct IndirectWord *resource)
 {
     return *resource->value;
 }

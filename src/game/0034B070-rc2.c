@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,18 +24,18 @@
  */
 #include "common.h"
 
-extern s32 func_00335AC8();
-extern s32 func_003361A8();
-extern s32 func_003366D0();
-extern s32 func_00336968();
-extern s32 func_00349498();
-extern s32 func_00349918();
-extern s32 func_00349CB8();
+extern s32 object_init_type_pointer();
+extern s32 object_construct_derived_a();
+extern s32 object_construct_derived_c();
+extern s32 hud_construct_widget_base();
+extern s32 menu_clear_sixteen_words();
+extern s32 effect_clear_row_groups();
+extern s32 meter_screen_init_parts();
 
 extern s8 D_001AD928[];
 extern s8 D_001AD908[];
 /* Builds the empty HUD object: starts every text, sprite, meter and animation part so the HUD can be filled in later. */
-s32 func_0034B070(s32 hud) {
+s32 hud_construct(s32 hud) {
     s32 anim14D4;
     s32 fade1160;
     s32 fade1288;
@@ -57,24 +58,24 @@ s32 func_0034B070(s32 hud) {
 
     slotLeft = 7;
     slotPtr = hud + 0x358;
-    ConstructDerivedObjectA(hud);
-    ConstructDerivedObjectA(hud + 0x4C);
-    ConstructDerivedObjectA(hud + 0x98);
-    ConstructWidgetBase(hud + 0x100);
-    ConstructDerivedObjectC(hud + 0x148);
-    ConstructDerivedObjectA(hud + 0x184);
-    ConstructDerivedObjectA(hud + 0x1D0);
-    ConstructWidgetBase(hud + 0x238);
-    ConstructDerivedObjectC(hud + 0x280);
-    ConstructDerivedObjectA(hud + 0x2C0);
-    ConstructDerivedObjectA(hud + 0x30C);
+    object_construct_derived_a(hud);
+    object_construct_derived_a(hud + 0x4C);
+    object_construct_derived_a(hud + 0x98);
+    hud_construct_widget_base(hud + 0x100);
+    object_construct_derived_c(hud + 0x148);
+    object_construct_derived_a(hud + 0x184);
+    object_construct_derived_a(hud + 0x1D0);
+    hud_construct_widget_base(hud + 0x238);
+    object_construct_derived_c(hud + 0x280);
+    object_construct_derived_a(hud + 0x2C0);
+    object_construct_derived_a(hud + 0x30C);
     do {
         slotLeft -= 1;
-        ConstructDerivedObjectA(slotPtr);
+        object_construct_derived_a(slotPtr);
         slotPtr += 0x4C;
     } while (slotLeft != -1);
     iconPtr = hud + 0x604;
-    ConstructDerivedObjectA(hud + 0x5B8);
+    object_construct_derived_a(hud + 0x5B8);
     iconLeft = 7;
     animE0C = hud + 0xE0C;
     animE94 = hud + 0xE94;
@@ -93,30 +94,30 @@ s32 func_0034B070(s32 hud) {
     anim14D4 = hud + 0x14D4;
     do {
         iconLeft -= 1;
-        ConstructDerivedObjectC(iconPtr);
+        object_construct_derived_c(iconPtr);
         iconPtr += 0x3C;
     } while (iconLeft != -1);
-    InitMeterScreenParts(hud + 0x7E8);
-    ClearSixteenWords(hud + 0xBEC);
-    ClearSixteenWords(hud + 0xC74);
-    ClearSixteenWords(hud + 0xCFC);
-    ClearSixteenWords(hud + 0xD84);
-    ClearSixteenWords(animE0C);
-    ClearSixteenWords(animE94);
-    ClearEffectRowGroups(fadeF1C);
-    ClearEffectRowGroups(fadeFB0);
-    ClearEffectRowGroups(fade1044);
-    ClearSixteenWords(anim10D8);
-    ClearEffectRowGroups(fade1160);
-    ClearEffectRowGroups(fade11F4);
-    ClearEffectRowGroups(fade1288);
-    ClearEffectRowGroups(fade131C);
-    ClearEffectRowGroups(fade13B0);
-    InitObjectTypePointer(link1444);
+    meter_screen_init_parts(hud + 0x7E8);
+    menu_clear_sixteen_words(hud + 0xBEC);
+    menu_clear_sixteen_words(hud + 0xC74);
+    menu_clear_sixteen_words(hud + 0xCFC);
+    menu_clear_sixteen_words(hud + 0xD84);
+    menu_clear_sixteen_words(animE0C);
+    menu_clear_sixteen_words(animE94);
+    effect_clear_row_groups(fadeF1C);
+    effect_clear_row_groups(fadeFB0);
+    effect_clear_row_groups(fade1044);
+    menu_clear_sixteen_words(anim10D8);
+    effect_clear_row_groups(fade1160);
+    effect_clear_row_groups(fade11F4);
+    effect_clear_row_groups(fade1288);
+    effect_clear_row_groups(fade131C);
+    effect_clear_row_groups(fade13B0);
+    object_init_type_pointer(link1444);
     (*(s32 *)((s8 *)(hud) + (0x1444))) = ((s32)D_001AD928);
-    InitObjectTypePointer(link1448);
+    object_init_type_pointer(link1448);
     (*(s32 *)((s8 *)(hud) + (0x1448))) = ((s32)D_001AD908);
-    ClearSixteenWords(anim144C);
-    ClearSixteenWords(anim14D4);
+    menu_clear_sixteen_words(anim144C);
+    menu_clear_sixteen_words(anim14D4);
     return hud;
 }

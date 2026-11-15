@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,17 +25,17 @@
 #include "common.h"
 
 extern s8 D_0026C550[];
-extern s8 func_00274C90(void *, s8 *, s32);
-extern void func_0029F840(void *, s8 *, s8 *, s16);
-extern s32 func_00273D10(void *);
-extern s32 func_00273E98(void *);
-extern s32 func_00274118(void *);
-extern s32 func_00274120(void *);
-extern s32 func_00282978(void *);
-extern s32 D_001B1688;
+extern s8 coll_convert_packed_points_to_vectors(void *, s8 *, s32);
+extern void moby_get_joint_matrix(void *, s8 *, s8 *, s16);
+extern s32 target_seeker_update(void *);
+extern s32 cam_moby_update_colliding(void *);
+extern s32 stub_return_one_a(void *);
+extern s32 stub_return_one_b(void *);
+extern s32 FastDecTimer(void *);
+extern s32 g_game_time;
 
 /* Updates one camera object each frame; returns 1 when it should be removed (for example when it leaves the world). */
-s32 func_00273B70(void *arg0) {
+s32 cam_moby_update(void *arg0) {
     s8 buffer[0x210];
     s8 *vars;
     s32 result;
@@ -57,28 +58,28 @@ s32 func_00273B70(void *arg0) {
 
 case02:
     if ((*(u8 *)((s8 *)(vars) + (0x5D))) == 0) {
-        (*(s8 *)((s8 *)(vars) + (0x58))) = ConvertPackedPointsToVectors(arg0, buffer, 0x20);
+        (*(s8 *)((s8 *)(vars) + (0x58))) = coll_convert_packed_points_to_vectors(arg0, buffer, 0x20);
     } else {
-        GetMobyJointMatrix(arg0, buffer + 0x200, buffer, (*(s16 *)((s8 *)(vars) + (0x36))));
+        moby_get_joint_matrix(arg0, buffer + 0x200, buffer, (*(s16 *)((s8 *)(vars) + (0x36))));
     }
     (*(s8 **)((s8 *)(vars) + (0x30))) = buffer;
-    result = UpdateTargetSeekingMoby(arg0);
-    if (!((*(u8 *)((s8 *)(vars) + (0x5C))) == 0 && (gGameTime & 3) != 0)) {
+    result = target_seeker_update(arg0);
+    if (!((*(u8 *)((s8 *)(vars) + (0x5C))) == 0 && (g_game_time & 3) != 0)) {
         result = (FastDecTimer(vars + 0x34) != 0) ? 1 : result;
     }
     (*(s8 **)((s8 *)(vars) + (0x30))) = 0;
     goto done;
 
 case4:
-    result = ReturnOneStubA(arg0);
+    result = stub_return_one_a(arg0);
     goto done;
 
 case5:
-    result = ReturnOneStubB(arg0);
+    result = stub_return_one_b(arg0);
     goto done;
 
 case13:
-    result = UpdateCollidingCameraMoby(arg0);
+    result = cam_moby_update_colliding(arg0);
     result = (FastDecTimer(vars + 0x34) != 0) ? 1 : result;
     goto done;
 

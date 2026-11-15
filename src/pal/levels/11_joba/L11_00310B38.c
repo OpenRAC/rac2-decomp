@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad00[0x34];
@@ -19,12 +20,12 @@ typedef struct {
 } MobList_L11_0030F060;
 
 extern MobList_L11_0030F060 ref_L11_0030F060_00;
-extern int D_001A79F0 __attribute__((sda));
-extern void func_L00_002FC980(void);
+extern int g_current_map_index __attribute__((sda));
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
-extern void func_L00_00326048(void *, void *, int, int, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L11_0030ED58(void *);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void level_start_progress_cue(void *);
 
 /* func_PAL_L11_00310B38, the PAL copy of func_L11_0030F060: the same C, where the 0xFA0 mob's call
    is skipped in game state 0x33 and its float argument 0.0610865355f becomes 0.07330384f (6/5 for 50 Hz).
@@ -33,7 +34,7 @@ extern void func_L11_0030ED58(void *);
 void func_PAL_L11_00310B38(void) {
     int i;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < ref_L11_0030F060_00.count; i++) {
         Mob_L11_0030F060 *mob = ref_L11_0030F060_00.mobs[i];
 
@@ -44,10 +45,10 @@ void func_PAL_L11_00310B38(void) {
         if (mob != 0) {
             int kind = 0xFA0;
 
-            if (mob->type == kind && D_001A79F0 != 0x33 && mob->p68 != 0)
-                func_L00_00326048(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+            if (mob->type == kind && g_current_map_index != 0x33 && mob->p68 != 0)
+                math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
-    if (D_001A79F0 == 0xB && ref_L11_0030F060_00.mode == 2)
-        func_L00_002E6CF0(func_L11_0030ED58, 0);
+    if (g_current_map_index == 0xB && ref_L11_0030F060_00.mode == 2)
+        gfx_add_draw_callback_first(level_start_progress_cue, 0);
 }

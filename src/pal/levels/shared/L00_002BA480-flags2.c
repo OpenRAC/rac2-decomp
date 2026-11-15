@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_L00_002C3A78(void);
+extern int hero_classify_input_direction(void);
 
 /* The offset that goes with the state func_L00_002C3A78 reports: none in state 2, 12 otherwise.
  * The zeroing block sits out of line, which -frac2-keep-block-order preserves; the delay-slot
@@ -8,7 +9,7 @@ extern int func_L00_002C3A78(void);
 int func_PAL_L00_002C3BE0(void)
 {
     int r = 10;
-    int x = func_L00_002C3A78();
+    int x = hero_classify_input_direction();
 
     goto test;
 zero:

@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern float func_002A7878(float, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
-extern char D_L00_001B8DC0[];
+extern float math_random_float_range(float, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
+extern char g_camera_l00_position[];
 typedef struct {
     float corner[4][4];
     int color[4];
@@ -23,7 +23,7 @@ extern void func_802EE3D0_1(float *, float *, float);
 extern void func_002EE178_1(char *, char *, float);
 extern void func_802EAC30_1(char *, float *, int);
 /* Draws two colored, scrolling ribbons along the supplied polyline. */
-void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count)
+void gfx_draw_two_color_ribbon(int unused, int width, Vec16_Fc936841d *points, int count)
 {
     RibbonPacket a, b;
     float matrix[4][4] __attribute__((aligned(16)));
@@ -47,8 +47,8 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
     *(Rac2TI128 *)outer = 0;
     inner[3] = 1.0f;
     outer[3] = 1.0f;
-    inner[2] = RandomFloatRange(0.005f, 0.085f) * 2.0f;
-    outer[2] = RandomFloatRange(0.1f, 0.25f) * 2.0f;
+    inner[2] = math_random_float_range(0.005f, 0.085f) * 2.0f;
+    outer[2] = math_random_float_range(0.1f, 0.25f) * 2.0f;
     ref_L00_003BC468_00(points, count);
     ref_L00_003BC468_01((char *)&a);
     ref_L00_003BC468_01((char *)&b);
@@ -58,7 +58,7 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
     b.uv[4] = 0.33f; b.uv[5] = 0; b.uv[6] = 0.33f; b.uv[7] = 1;
     func_802EE138_1(matrix[0], (float *)&points[1], (char *)points);
     func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-    func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)points);
+    func_802EE138_1(matrix[1], (float *)g_camera_l00_position, (char *)points);
     FastVecCross(matrix[2], matrix[1], matrix[0]);
     func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
     FastVecCross(matrix[1], matrix[0], matrix[2]);
@@ -78,7 +78,7 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
         func_002EE178_1((char *)b.corner[3], (char *)b.corner[2], -1.0f);
         func_802EE138_1(matrix[0], (float *)&points[i + 1], (char *)&points[i]);
         func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-        func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)&points[i]);
+        func_802EE138_1(matrix[1], (float *)g_camera_l00_position, (char *)&points[i]);
         FastVecCross(matrix[2], matrix[1], matrix[0]);
         func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
         FastVecCross(matrix[1], matrix[0], matrix[2]);
@@ -109,13 +109,13 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
     }
 }
 
-extern void func_00282D08(void *, void *, void *, float);
+extern void lerp_vector(void *, void *, void *, float);
 extern void ref_L00_003BCF88_00(Vec16_Fc936841d *, int);
 extern void ref_L00_003BCF88_01(char *);
 /* The same two ribbons as func_L00_003BC468, an eighth as wide, with the
    last segment's edges drawn together at their midpoint. */
 /* Draws a thinner copy of the two-color ribbon, with the far end pinched to a point. */
-void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count)
+void DrawTaperedTwoLayerRibbon(int unused, int width, Vec16_Fc936841d *points, int count)
 {
     RibbonPacket a, b;
     float matrix[4][4] __attribute__((aligned(16)));
@@ -139,8 +139,8 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
     *(Rac2TI128 *)outer = 0;
     inner[3] = 1.0f;
     outer[3] = 1.0f;
-    inner[2] = RandomFloatRange(0.005f, 0.085f) * 0.25f;
-    outer[2] = RandomFloatRange(0.1f, 0.25f) * 0.25f;
+    inner[2] = math_random_float_range(0.005f, 0.085f) * 0.25f;
+    outer[2] = math_random_float_range(0.1f, 0.25f) * 0.25f;
     ref_L00_003BCF88_00(points, count);
     ref_L00_003BCF88_01((char *)&a);
     ref_L00_003BCF88_01((char *)&b);
@@ -150,7 +150,7 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
     b.uv[4] = 0.33f; b.uv[5] = 0; b.uv[6] = 0.33f; b.uv[7] = 1;
     func_802EE138_1(matrix[0], (float *)&points[1], (char *)points);
     func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-    func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)points);
+    func_802EE138_1(matrix[1], (float *)g_camera_l00_position, (char *)points);
     FastVecCross(matrix[2], matrix[1], matrix[0]);
     func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
     FastVecCross(matrix[1], matrix[0], matrix[2]);
@@ -170,7 +170,7 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
         func_002EE178_1((char *)b.corner[3], (char *)b.corner[2], -1.0f);
         func_802EE138_1(matrix[0], (float *)&points[i + 1], (char *)&points[i]);
         func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-        func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)&points[i]);
+        func_802EE138_1(matrix[1], (float *)g_camera_l00_position, (char *)&points[i]);
         FastVecCross(matrix[2], matrix[1], matrix[0]);
         func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
         FastVecCross(matrix[1], matrix[0], matrix[2]);

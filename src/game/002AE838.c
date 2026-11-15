@@ -6,12 +6,12 @@
  * its address is rebuilt at the call instead of being held in a saved register. */
 typedef __attribute__((mode(TI))) int TI;
 
-extern void func_002830F0(void *dst, float *src);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00282D30(void *dst, void *src, float scale);
+extern void FastVectorFromPackedChars(void *dst, float *src);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void FastVecScale(void *dst, void *src, float scale);
 
 /* Turns a packed colour value into a small vector centred on zero and scaled down. */
-void func_002AE838(void *result, void *source)
+void vec_decode_byte_color(void *result, void *source)
 {
     struct { float x, y, z, w; } color;
     union { TI q; float f[4]; } bias;

@@ -1,15 +1,15 @@
 #include "common.h"
 
 extern char D_00189E20_8[];
-extern void func_00282D30(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_L00_0031EC88(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern float func_L00_002D3EA8(void *);
-extern float func_L00_002D3B00(void *);
-extern int func_002A88A0(float *, float *, float, float, float);
+extern void FastVecScale(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void coll_push_vector_from_negative_axes(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern float cam_get_view_space_angle(void *);
+extern float cam_get_view_space_height(void *);
+extern int math_solve_quadratic(float *, float *, float, float, float);
 extern char D_L00_001BF240[];
 
 extern char D_L00_001BF220[];
@@ -17,7 +17,7 @@ typedef int MotionQuad __attribute__((mode(TI)));
 
 /* Solve the forward collision time for each of the resident movement modes. */
 /* Works out how long the hero can keep moving before it hits the ground or a wall, for each way of moving. */
-float func_L00_002D2A10(float time, float acceleration, float height)
+float hero_find_collision_time(float time, float acceleration, float height)
 {
     float end[4], direction[4], curve[4], start[4];
     float root0a, root0b, root1a, root1b, root2a, root2b;
@@ -32,17 +32,17 @@ float func_L00_002D2A10(float time, float acceleration, float height)
             end[2] -= (time * time + time) * (acceleration * 0.5f);
             FastVecAdd(end, end, pos);
             *(MotionQuad *)direction = *(MotionQuad *)(state + 0x80);
-            PushVectorFromNegativeAxes(direction, end);
+            coll_push_vector_from_negative_axes(direction, end);
             qcopy(direction, pos);
             if (CollLine(direction, end, 0x22, 0, 0)) {
-                if (GetViewSpaceAngle(D_L00_001BF240) <= 0.8726647f)
+                if (cam_get_view_space_angle(D_L00_001BF240) <= 0.8726647f)
                     height = *(float *)(D_L00_001BF240 - 0x18);
             }
         }
         if (height > 0.0f) {
             char *root = D_00189E20_8;
             half = acceleration * -0.5f;
-            if (SolveQuadratic(&root0a, &root0b, half,
+            if (math_solve_quadratic(&root0a, &root0b, half,
                     *(float *)(root + 0xF8) - half,
                     *(float *)(root + 0x88) - height) > 0
                     && root0a > 0.0f)
@@ -63,13 +63,13 @@ float func_L00_002D2A10(float time, float acceleration, float height)
         FastVecAdd(end, curve, end);
         FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
-        PushVectorFromNegativeAxes(start, end);
+        coll_push_vector_from_negative_axes(start, end);
         if (CollLine(pos, end, 0x22, 0, 0)) {
             half = acceleration * -0.5f;
-            speed = GetViewSpaceHeight(velocity) - half;
-            position = GetViewSpaceHeight(pos);
-            position -= GetViewSpaceHeight(D_L00_001BF220);
-            if (SolveQuadratic(&root1a, &root1b, half, speed, position) > 0
+            speed = cam_get_view_space_height(velocity) - half;
+            position = cam_get_view_space_height(pos);
+            position -= cam_get_view_space_height(D_L00_001BF220);
+            if (math_solve_quadratic(&root1a, &root1b, half, speed, position) > 0
                     && root1a > 0.0f)
                 return root1a;
         }
@@ -89,13 +89,13 @@ float func_L00_002D2A10(float time, float acceleration, float height)
         FastVecAdd(end, curve, end);
         FastVecAdd(end, pos, end);
         *(MotionQuad *)start = *(MotionQuad *)(pos);
-        PushVectorFromNegativeAxes(start, end);
+        coll_push_vector_from_negative_axes(start, end);
         if (CollLine(pos, end, 0x22, 0, 0)) {
             half = acceleration * -0.5f;
-            speed = GetViewSpaceHeight(velocity) - half;
-            position = GetViewSpaceHeight(pos);
-            position -= GetViewSpaceHeight(D_L00_001BF220);
-            if (SolveQuadratic(&root2a, &root2b, half, speed, position) > 0
+            speed = cam_get_view_space_height(velocity) - half;
+            position = cam_get_view_space_height(pos);
+            position -= cam_get_view_space_height(D_L00_001BF220);
+            if (math_solve_quadratic(&root2a, &root2b, half, speed, position) > 0
                     && root2a > 0.0f)
                 return root2a;
         }

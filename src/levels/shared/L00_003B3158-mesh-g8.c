@@ -13,23 +13,23 @@ extern int D_L00_001AF9D8 __attribute__((sda)), D_L00_001AF998 __attribute__((sd
 extern u32 D_L00_001AF9E8 __attribute__((sda));
 extern int D_L00_001AF998_1[] __attribute__((sda)), D_L00_001AF9D0_1[] __attribute__((sda));
 extern signed char D_L00_001AF9E8_1[] __attribute__((sda));
-extern MeshVector D_L00_001B8DC0 NOT_SDA, D_0018A0E0 NOT_SDA;
+extern MeshVector g_camera_l00_position NOT_SDA, D_0018A0E0 NOT_SDA;
 extern float D_L00_00294CA0[][3], D_L00_00295390[][3];
 extern float D_L00_00295660[][2], D_L00_00295B00[][2];
 extern u32 D_L00_00295CE0[], D_L00_00295F30[];
-extern u64 func_0027C878(int);
-extern void func_002FC560(int,u64), func_00280328(void);
-extern void func_00282CF0(void *,void *,void *), func_00282F20(void *,void *,float), func_00282DD8(void *,void *,void *), func_002830C0(void *,void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00281810(int,void *,int,void *,int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(int,u64), font_queue_vu_state(void);
+extern void FastVecSub(void *,void *,void *), vec_scale_to_length(void *,void *,float), FastVecCross(void *,void *,void *), transform_vector(void *,void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void part_draw_glint_effect(int,void *,int,void *,int);
 static inline void MeshStorePoint(MeshPoint *point, MeshVector *value)
 {
     point->x = value->v[0];
     point->y = value->v[1];
     point->z = value->v[2];
 }
-void func_L00_003B4560(unsigned char *object, float opacity)
+void MeshDrawFourSigns(unsigned char *object, float opacity)
 {
     MeshVector transform[4];
     MeshPoint positions[148];
@@ -46,7 +46,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
     VU1_addGSregister(8,0);
     VU1_addGSregister(0x14,0xFF9000000260ULL);
     font_queue_vu_state();
-    FastVecSub(&transform[0],&gCameraPosition_L00,origin);
+    FastVecSub(&transform[0],&g_camera_l00_position,origin);
     vec_scale_to_length(&transform[0],&transform[0],1.0f);
     FastVecCross(&transform[1],&transform[0],&D_0018A0E0);
     vec_scale_to_length(&transform[1],&transform[1],-1.0f);
@@ -71,7 +71,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
             D_L00_00295CE0[i] = alpha;
         } else D_L00_00295CE0[i] = D_L00_001AF9E8;
     }
-    DrawGlintEffect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
+    part_draw_glint_effect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
     }
     {
     int i;
@@ -92,7 +92,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
             D_L00_00295F30[i] = alpha;
         } else D_L00_00295F30[i] = D_L00_001AF9E8;
     }
-    DrawGlintEffect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
+    part_draw_glint_effect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
     }
     {
     int i;
@@ -106,7 +106,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295660[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295660[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
+    part_draw_glint_effect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
     }
     {
     int i;
@@ -120,7 +120,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295B00[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295B00[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
+    part_draw_glint_effect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
     }
     {
     int i;
@@ -134,7 +134,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295660[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295660[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
+    part_draw_glint_effect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
     }
     {
     int i;
@@ -148,7 +148,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295B00[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295B00[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
+    part_draw_glint_effect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
     }
     {
     int i;
@@ -162,7 +162,7 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295660[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295660[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
+    part_draw_glint_effect(D_L00_001AF998,positions,D_L00_001AF9D0,uv,1);
     }
     {
     int i;
@@ -176,6 +176,6 @@ void func_L00_003B4560(unsigned char *object, float opacity)
         uv[i][0] = D_L00_00295B00[i][1] + D_L00_001AF9DC;
         uv[i][1] = D_L00_00295B00[i][0];
     }
-    DrawGlintEffect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
+    part_draw_glint_effect(D_L00_001AF998_1[1],positions,D_L00_001AF9D0_1[1],uv,1);
     }
 }

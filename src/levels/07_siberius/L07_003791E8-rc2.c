@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -27,6 +28,6 @@
 extern void ref_L07_003791E8_00();
 
 /* Per-frame update for moby class 4853; it just calls the level's own update code. */
-void func_L07_003791E8(void) {
+void level_hook_update(void) {
     ref_L07_003791E8_00();
 }

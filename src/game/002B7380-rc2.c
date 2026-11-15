@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,18 +25,18 @@
 #include "common.h"
 
 extern void func_00132A70();
-extern void func_00132B58();
+extern void snd_send_cmd25_with_settings();
 extern void func_001333D0();
-extern void func_00133400();
-extern void func_00133430();
-extern void func_00133460();
-extern s32 func_00282978();
+extern void snd_send_cmd46();
+extern void snd_send_cmd50_with_settings();
+extern void snd_send_cmd79_with_settings();
+extern s32 FastDecTimer();
 
 extern s8 D_002B7DF8[];
 extern s8 D_002B7FF0[];
 extern s8 D_002B8048[];
 /* Updates one music stream channel each frame: starts, pauses, fades out or clears it depending on its state. */
-void func_002B7380(s32 channel) {
+void snd_update_music_channel(s32 channel) {
     s16 state;
     s16 stateNow;
     u16 stateBits;
@@ -97,7 +98,7 @@ block_15:
     if (!((*(s16 *)((s8 *)(channel) + (0xA))) & 0x8000)) {
         goto block_18;
     }
-    SendSoundCommand46((*(s32 *)((s8 *)(channel) + (0))));
+    snd_send_cmd46((*(s32 *)((s8 *)(channel) + (0))));
     (*(s16 *)((s8 *)(channel) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(channel) + (0xA))) ^ 0x8000);
 block_17:
     if ((*(s16 *)((s8 *)(channel) + (0xA))) & 0x8000) {
@@ -125,8 +126,8 @@ block_23:
     handleCopy = oldHandle;
     (*(u32 *)((s8 *)(channel) + (0))) = 0xFFFFFFFF;
     channelAddr = (u64) ((s64) channel << 0x20) >> 0x20;
-    SendSoundCommand50_00133430(handleCopy, ((s32)D_002B8048), channelAddr);
-    SendSoundCommand25(oldHandle, ((s32)D_002B7FF0), channelAddr);
+    snd_send_cmd50_with_settings(handleCopy, ((s32)D_002B8048), channelAddr);
+    snd_send_cmd25_with_settings(oldHandle, ((s32)D_002B7FF0), channelAddr);
     goto block_32;
 block_25:
     if (handleNow == 0xFFFFFFFF) {
@@ -135,7 +136,7 @@ block_25:
     if (stateNow != 2) {
         goto block_32;
     }
-    SendSoundCommand79(handleNow, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
+    snd_send_cmd79_with_settings(handleNow, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
     goto block_32;
 block_28:
 block_29:

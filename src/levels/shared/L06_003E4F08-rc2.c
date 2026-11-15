@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -32,7 +33,7 @@ extern void ref_L06_003E4F08_05(void *, void *, void *, f32, f32, f32);
 extern void ref_L06_003E4F08_06(void *, void *, void *, f32, f32, f32);
 
 /* Turns the two moving parts of the object toward their targets, except while it is in states 5 or 7. */
-void func_L06_003E4F08(void *moby) {
+void moby_turn_parts_toward_targets(void *moby) {
     u8 state;
     s8 *vars;
 

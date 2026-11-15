@@ -10,20 +10,20 @@ extern char *D_L10_001B2B9C MACRO_ADDR;
 extern char D_L10_001B9680[];
 extern CloudVec D_L10_0026CEA0[];
 extern short D_L10_002273C0[];
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L02_002F1FB8(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_002831B0(float);
-extern float func_L04_004554F8(float);
-extern void func_L04_00363CA0(void *, int, float);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_subtract_vec4(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_angle_helper(float);
+extern float math_smooth_step(float);
+extern void part_spawn_effect_record(void *, int, float);
 
 /* Two-state update. State 0 builds three z rotations (0, 2pi/3, -2pi/3), eighteen local
    points, and for each entry of the object's D_L10_001A9014 list transforms six of them
@@ -51,7 +51,7 @@ void func_PAL_L10_004312B0(char *p) {
         int i = 0;
         int index = *(int *)st;
         if (index >= D_L10_001A9018[0] || !D_L10_001A9014[index] || index == -1) {
-            func_0029F338(p);
+            moby_mark_spawned(p);
             return;
         }
         {
@@ -69,23 +69,23 @@ void func_PAL_L10_004312B0(char *p) {
         scratch.init.rotations[2].v.z=angle2;
         p[0x30] = alpha;
         }
-        func_002833F0(scratch.init.m[0],scratch.init.rotations);
-        func_002833F0(scratch.init.m[1],scratch.init.rotations+1);
-        func_002833F0(scratch.init.m[2],scratch.init.rotations+2);
+        euler_rotation_basis(scratch.init.m[0],scratch.init.rotations);
+        euler_rotation_basis(scratch.init.m[1],scratch.init.rotations+1);
+        euler_rotation_basis(scratch.init.m[2],scratch.init.rotations+2);
         { int j; for(j=17;j>=0;j--) points[j].v.w=0; }
         n=0;
         points[0].v.x=0; points[0].v.y=10; points[0].v.z=-4;
-        func_00283098(points+1,points,scratch.init.m[1]);
-        func_00283098(points+2,points,scratch.init.m[2]);
+        matrix_mul_vec3(points+1,points,scratch.init.m[1]);
+        matrix_mul_vec3(points+2,points,scratch.init.m[2]);
         points[3].v.x=0; points[3].v.y=30; points[3].v.z=-3.5f;
-        func_00283098(points+4,points+3,scratch.init.m[1]);
-        func_00283098(points+5,points+3,scratch.init.m[2]);
+        matrix_mul_vec3(points+4,points+3,scratch.init.m[1]);
+        matrix_mul_vec3(points+5,points+3,scratch.init.m[2]);
         points[6].v.x=3.5f; points[6].v.y=0; points[6].v.z=-2;
-        func_00283098(points+7,points+6,scratch.init.m[1]);
-        func_00283098(points+8,points+6,scratch.init.m[2]);
-        func_00283098(points+9,points+6,scratch.init.m[0]);
-        func_00283098(points+10,points+9,scratch.init.m[1]);
-        func_00283098(points+11,points+9,scratch.init.m[2]);
+        matrix_mul_vec3(points+7,points+6,scratch.init.m[1]);
+        matrix_mul_vec3(points+8,points+6,scratch.init.m[2]);
+        matrix_mul_vec3(points+9,points+6,scratch.init.m[0]);
+        matrix_mul_vec3(points+10,points+9,scratch.init.m[1]);
+        matrix_mul_vec3(points+11,points+9,scratch.init.m[2]);
         points[12].v.x=15; points[12].v.y=30; points[12].v.z=2;
         points[13].v.x=15; points[13].v.y=15; points[13].v.z=2;
         points[14].v.x=15; points[14].v.y=0; points[14].v.z=2;
@@ -103,8 +103,8 @@ void func_PAL_L10_004312B0(char *p) {
             for(i=0;i<6;i++) {
                 k=D_L10_002273C0[(unsigned char)prim[0x1d]];
                 k=k==0xdf6 ? 0 : k==0xdf7 ? 6 : 12;
-                func_00283098(&temp,points+(i+k),transform);
-                func_00282CC0(D_L10_0026CEA0+n,transform+0x30,&temp);
+                matrix_mul_vec3(&temp,points+(i+k),transform);
+                FastVecAdd(D_L10_0026CEA0+n,transform+0x30,&temp);
                 n++;
             }
             entry = next;
@@ -118,37 +118,37 @@ void func_PAL_L10_004312B0(char *p) {
         *(float *)(st+4)+=*(float *)(st+8);
         for(i=0;i<1056;i++) {
             qcopy(&scratch.update.temp,D_L10_0026CEA0+i);
-            func_L02_002F1FB8(&scratch.update.visible,&scratch.update.temp,D_L10_001B9680);
-            if(func_00282DB0(D_L10_001B9680+0x230,&scratch.update.visible)<=0.0f) continue;
+            vec_subtract_vec4(&scratch.update.visible,&scratch.update.temp,D_L10_001B9680);
+            if(FastVecDot(D_L10_001B9680+0x230,&scratch.update.visible)<=0.0f) continue;
             {
             float one=1.0f, lower=1.396263599395752f, lowEnd, highStart, upper;
             weight=0.0f;
             lowEnd=1.466076731681824f;
-            a=func_002ABB18(*(float *)(st+4)*0.392699122f);
+            a=math_wrap_angle_to_pi(*(float *)(st+4)*0.392699122f);
             highStart=1.65806293f;
             upper=2.26892829f;
-            b=func_002ABB18(*(float *)(st+4)*0.581194639f);
-            c=func_00283198(b);
-            scratch.update.direction.v.x=c*func_00283180(a);
-            scratch.update.direction.v.y=c*func_00283198(a);
-            scratch.update.direction.v.z=func_00283180(b);
-            func_L02_002F1FB8(&scratch.update.position,&scratch.update.temp,p+0x10);
-            func_00282F20(&scratch.update.position,&scratch.update.position,one);
-            t=1.57079637f-func_002831B0(func_00282DB0(&scratch.update.position,&scratch.update.direction));
+            b=math_wrap_angle_to_pi(*(float *)(st+4)*0.581194639f);
+            c=math_fast_sin_or_cos_b(b);
+            scratch.update.direction.v.x=c*math_fast_sin_or_cos_a(a);
+            scratch.update.direction.v.y=c*math_fast_sin_or_cos_b(a);
+            scratch.update.direction.v.z=math_fast_sin_or_cos_a(b);
+            vec_subtract_vec4(&scratch.update.position,&scratch.update.temp,p+0x10);
+            vec_scale_to_length(&scratch.update.position,&scratch.update.position,one);
+            t=1.57079637f-math_fast_angle_helper(FastVecDot(&scratch.update.position,&scratch.update.direction));
             if(t>lower) {
-                if(t<=lowEnd) weight=func_L04_004554F8((t-lower)/0.0698131323f);
+                if(t<=lowEnd) weight=math_smooth_step((t-lower)/0.0698131323f);
                 else if(t<=highStart) weight=one;
-                else if(t<=upper) weight=one-func_L04_004554F8((t-highStart)/0.610865355f);
+                else if(t<=upper) weight=one-math_smooth_step((t-highStart)/0.610865355f);
             }
             color=32;
             if(weight!=0) {
                 if(weight!=1) color=(int)(weight*color);
                 color <<= 24;
                 color |= 0x33aa00;
-                func_00282CF0(&scratch.update.offset,D_L10_001B9680,&scratch.update.temp);
-                func_00282F20(&scratch.update.offset,&scratch.update.offset,4.0f);
-                func_00282CC0(&scratch.update.temp,&scratch.update.temp,&scratch.update.offset);
-                func_L04_00363CA0(&scratch.update.temp,color,2100000.0f);
+                FastVecSub(&scratch.update.offset,D_L10_001B9680,&scratch.update.temp);
+                vec_scale_to_length(&scratch.update.offset,&scratch.update.offset,4.0f);
+                FastVecAdd(&scratch.update.temp,&scratch.update.temp,&scratch.update.offset);
+                part_spawn_effect_record(&scratch.update.temp,color,2100000.0f);
             }
             }
         }

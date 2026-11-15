@@ -13,16 +13,16 @@ extern s32 D_L11_001B1844 __attribute__((sda));
 extern s32 D_L11_001B1858 __attribute__((sda));
 extern s32 D_L11_001B185C __attribute__((sda));
 extern s32 D_L11_001B1860 __attribute__((sda));
-extern short D_001A6480[];
-extern float func_00283CE0(short);
-extern void func_002FC560(int, long long);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
-extern long long func_0027C878(int);
-extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
+extern short g_screen_adjust_offsets[];
+extern float IntToFloat(short);
+extern void VU1_addGSregister(int, long long);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
+extern long long GetEffectTextureDescriptor(int);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
 /* Same body as func_L02_004002E0, with this function's own callees. */
 /* Draws a full-screen fade and a sweeping bar that follow a countdown timer. */
-void func_L11_00445B30(char *moby) {
+void hud_draw_fade_bar(char *moby) {
     char *state = *(char **)(moby + 0x68);
     s32 color;
     float fadeAmount;
@@ -37,7 +37,7 @@ void func_L11_00445B30(char *moby) {
     color = D_L11_001B1848;
     *(u16 *)(state + 0x1F4) -= D_L11_001B1850;
     fadeAmount = IntToFloat(*(u16 *)(state + 0x1F4));
-    screenHeight = (float)gScreenAdjustOffsets[0xA9];
+    screenHeight = (float)g_screen_adjust_offsets[0xA9];
     fadeAmount = fadeAmount / screenHeight;
     fadeAmount = fadeAmount * fadeAmount;
     {
@@ -48,9 +48,9 @@ void func_L11_00445B30(char *moby) {
     }
     VU1_addGSregister(0x42, 0x8000000049LL);
     for (i = 0; i < D_L11_001B184C; i++)
-        AppendScreenRectPacket(0, 0, gScreenAdjustOffsets[0xA8], gScreenAdjustOffsets[0xA9], color, 0);
+        AppendScreenRectPacket(0, 0, g_screen_adjust_offsets[0xA8], g_screen_adjust_offsets[0xA9], color, 0);
     VU1_addGSregister(0x42, 0x8000000044LL);
-    screen = gScreenAdjustOffsets;
+    screen = g_screen_adjust_offsets;
     AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x1F4), D_L11_001B1844, 0);
     texId = GetEffectTextureDescriptor(0x10);
     color = D_L11_001B185C;

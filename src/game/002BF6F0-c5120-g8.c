@@ -16,16 +16,16 @@ typedef struct {
     float f[4];
 } Vec16_C5120;
 
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00282978(short *);
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00300190(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DF0(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastDecTimer(short *);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecLength(void *);
 extern char D_0018A0E0[];
 extern float D_001AA3C0 __attribute__((sda));
 
@@ -34,7 +34,7 @@ extern float D_001AA3C0 __attribute__((sda));
    the cross product of that offset with D_0018A0E0, and its velocity is set
    along the offset (length 0.03 when within 0.5, else its current speed) and
    raised by 0.02 on z. */
-void func_002C5120(char *particle)
+void UpdateOwnerOrbitingParticle(char *particle)
 {
     char *state = particle + 32;
     Vec16_C5120 velocity;
@@ -63,7 +63,7 @@ void func_002C5120(char *particle)
     *(int *)(particle + 4) = (alpha << 24) | (*(int *)(particle + 4) & 0xffffff);
     particle_copy_xyz(velocity.f, (float *)(state + 12));
     FastVecAdd(particle + 16, particle + 16, (char *)&velocity);
-    TransformVectorOrCopy(particle + 16, particle + 16);
+    vec_transform_or_copy(particle + 16, particle + 16);
     if (*(char **)(state + 24) != 0) {
         FastVecSub(delta, *(char **)(state + 24) + 16, particle + 16);
         if (delta[0] <= 2.0f && delta[1] <= 2.0f) {
@@ -82,5 +82,5 @@ void func_002C5120(char *particle)
         }
     }
     if (FastDecTimer((short *)(particle + 10)))
-        KillParticle(particle);
+        part_kill(particle);
 }

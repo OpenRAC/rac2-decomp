@@ -37,19 +37,19 @@ typedef struct {
     float offsets[5];           /* 0x18: each child's distance along the forward axis */
 } StreamVars;
 
-extern Moby *func_0029EFD0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern Moby *CreateMoby(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
-extern void func_002B37E8(void *a0, int a1);
-extern void func_002A0488(void *moby, int r, int g, int b);
+extern void moby_init_child_from_parent(void *a0, int a1);
+extern void set_moby_color(void *moby, int r, int g, int b);
 
 /* Keeps five child mobies (class 0xF10 for an owner of class 0xCEF, 0xF0F otherwise)
    streaming along the owner's forward axis, spawning them on the first call: each call
    moves every child 1/12 unit on, wrapping from the end back to the start, and as a child
    travels it shrinks, fades in over the first quarter of the way and out over the last,
    and turns from yellow (252 + 2g, 224g, 6g with g = (1 - t)^4) to red. */
-void func_L04_003C8380(Moby *moby)
+void UpdateChildMobyStream(Moby *moby)
 {
     StreamVars *vars = moby->vars;
     Moby **children;
@@ -95,7 +95,7 @@ void func_L04_003C8380(Moby *moby)
         for (i = 0; i < 5; i++) {
             child = CreateMoby(id);
             if (child) {
-                InitChildObjectFromParent(child, 0);
+                moby_init_child_from_parent(child, 0);
                 child->rotation = moby->rotation;
                 children[i] = child;
                 offsets[i] = first;

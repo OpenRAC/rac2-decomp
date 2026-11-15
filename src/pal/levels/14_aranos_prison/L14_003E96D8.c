@@ -37,11 +37,11 @@ void func_PAL_L14_003E96D8(char *self) {
     }
 }
 
-extern void func_L00_002E54E0(float);
-extern int func_002B38B8(char *);
-extern void func_L00_002E6EF8(void (*f)(char *), char *arg);
-extern float func_002A7878(float, float);
-extern void func_L14_003F0E68(char *);
+extern void gfx_set_clamped_view_distance(float);
+extern int flag_is_third_pending_set(char *);
+extern void gfx_add_draw_callback_third(void (*f)(char *), char *arg);
+extern float math_random_float_range(float, float);
+extern void moby_bind_small_data_words(char *);
 
 
 /* func_PAL_L14_003F53E4, the PAL copy of func_L14_003F0D50: the same C, where both scroll
@@ -52,7 +52,7 @@ void func_PAL_L14_003F53E4(char *arg0) {
 
     if (*(unsigned char *)(arg0 + 0x20) == 0) {
         *(int *)(s1 + 0x10) = 1;
-        func_L00_002E54E0(2048.0f);
+        gfx_set_clamped_view_distance(2048.0f);
         *(unsigned char *)(arg0 + 0x20) = 1;
     }
     *(float *)(s1 + 0x0) = *(float *)(s1 + 0x0) + *(float *)(s1 + 0x4) * 1.2f;
@@ -63,12 +63,12 @@ void func_PAL_L14_003F53E4(char *arg0) {
     if (*(float *)(s1 + 0x8) >= 8.0f) {
         *(float *)(s1 + 0x8) = *(float *)(s1 + 0x8) - 8.0f;
     }
-    if (func_002B38B8(s2) != 0) {
+    if (flag_is_third_pending_set(s2) != 0) {
         *(int *)(s1 + 0x10) = 0;
     }
     if (*(int *)(s1 + 0x10) != 0) {
-        func_L00_002E6EF8(func_L14_003F0E68, s2);
+        gfx_add_draw_callback_third(moby_bind_small_data_words, s2);
     }
-    *(float *)(s1 + 0x4) = func_002A7878(0.003f, 0.005f);
-    *(float *)(s1 + 0xC) = func_002A7878(0.001f, 0.0025f);
+    *(float *)(s1 + 0x4) = math_random_float_range(0.003f, 0.005f);
+    *(float *)(s1 + 0xC) = math_random_float_range(0.001f, 0.0025f);
 }

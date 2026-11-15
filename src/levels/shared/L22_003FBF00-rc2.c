@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -31,7 +32,7 @@ extern void ref_L22_003FBF00_04(void *a, void *b, f32 c);
 extern void ref_L22_003FBF00_05(void *a, void *b, void *c);
 
 /* Works out the world position of one of the object's eight particle anchors, scaled while the object is in its first state. */
-void func_L22_003FBF00(void *obj, void *outPos, s32 index) {
+void part_get_anchor_position(void *obj, void *outPos, s32 index) {
     s32 slot ;
     void *vars ;
     s32 offset[4];

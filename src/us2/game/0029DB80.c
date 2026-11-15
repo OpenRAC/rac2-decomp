@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char D_001BAEC0[];
-extern int D_00138180[];
-extern int D_001A79F0 __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
+extern int g_pad_state[];
+extern int g_current_map_index __attribute__((sda));
+extern int g_is_pal_video[] __attribute__((sda));
 extern char *D_001A8CFC __attribute__((sda));
-extern void *func_00115484(void *, int, int);
+extern void *memset(void *, int, int);
 extern void func_0029CD20(int);
-extern int *func_00336DA8(int, int);
+extern int *ui_return_second_arg(int, int);
 extern char *func_US2_0034F308(int *, int);
 extern void func_US2_0029CF08(void);
 extern void func_US2_0029CF40(void);
@@ -20,23 +21,23 @@ void func_US2_0029DB80(void)
     char *state = D_001BAEC0;
     char *obj;
 
-    func_00115484(*(void **)(state + 0x80), 0xCD, 0x40000);
-    D_00138180[104] = 0;
-    D_00138180[105] = 0;
-    D_00138180[106] = 0;
-    D_00138180[107] = 0;
-    D_00138180[108] = 0;
-    D_00138180[109] = 0;
-    D_00138180[110] = 0;
-    D_00138180[111] = 0;
-    D_00138180[112] = 0;
-    D_00138180[113] = 0;
-    D_00138180[114] = 0;
-    D_00138180[115] = 0;
-    func_0029CD20(D_001A7B90[0]);
-    obj = func_US2_0034F308(func_00336DA8(0x3FB20, *(int *)(state + 0x80)), 0x40000);
+    memset(*(void **)(state + 0x80), 0xCD, 0x40000);
+    g_pad_state[104] = 0;
+    g_pad_state[105] = 0;
+    g_pad_state[106] = 0;
+    g_pad_state[107] = 0;
+    g_pad_state[108] = 0;
+    g_pad_state[109] = 0;
+    g_pad_state[110] = 0;
+    g_pad_state[111] = 0;
+    g_pad_state[112] = 0;
+    g_pad_state[113] = 0;
+    g_pad_state[114] = 0;
+    g_pad_state[115] = 0;
+    func_0029CD20(g_is_pal_video[0]);
+    obj = func_US2_0034F308(ui_return_second_arg(0x3FB20, *(int *)(state + 0x80)), 0x40000);
     D_001A8CFC = obj;
-    if (D_001A79F0 == 0x1F5) {
+    if (g_current_map_index == 0x1F5) {
         ((SubBf *)(obj + 0x38000))->cb1 = func_US2_0029CF08;
         ((SubBf *)(obj + 0x38000))->cb2 = func_0029CD18;
     } else {

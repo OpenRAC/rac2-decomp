@@ -4,19 +4,19 @@
  * Adapted from RAC1 draw.c, font_queue_vu_state (GPL-3.0). Build the VU1 setup packet; the DMA
  * tag's qword count is patched in at the end. The casted cursor stores are what make each one
  * reload the cursor, and the packet stores stay ordered ahead of its final read. */
-extern void func_002833B8(float *, float);
-extern void func_00282D30(void *, void *, float);
+extern void set_scale_matrix(float *, float);
+extern void FastVecScale(void *, void *, float);
 extern int D_001B169C;
 extern unsigned short D_0010ED20 __attribute__((section(".data")));
-extern char D_0010ED30[], D_001B5340[], D_001B9040[];
-extern int *D_001B22A8;
+extern char D_0010ED30[], g_camera_eye_state[], D_001B9040[];
+extern int *g_dma_packet_cursor;
 extern float D_001A86F0 __attribute__((sda));
-extern void func_002FC410(void *, int);
-extern void func_00283788(void *, void *, void *);
-extern void func_002FC870(void);
+extern void VU1_addDataRef(void *, int);
+extern void multiply_matrix(void *, void *, void *);
+extern void gfx_append_fixed_dma_block_tags(void);
 
 /* Builds the setup packet that gets the graphics chip ready to draw text. */
-void func_00280328(void) {
+void font_queue_vu_state(void) {
     float m[16];
     char *cam;
     char *g;
@@ -24,18 +24,18 @@ void func_00280328(void) {
     int *p;
 
     set_scale_matrix(m, 1024.0f);
-    cam = gCameraState_001B5340;
+    cam = g_camera_eye_state;
     FastVecScale(&m[12], cam, -1024.0f);
     m[15] = 1.0f;
     if (D_001B169C != 8) {
         VU1_addDataRef(D_0010ED30, D_0010ED20);
         D_001B169C = 8;
     }
-    *(int *)((char *)gDmaPacketCursor + 0) = 0x10000000;
-    *(int *)((char *)gDmaPacketCursor + 4) = 0;
-    *(int *)((char *)gDmaPacketCursor + 8) = 0x11000000;
-    *(int *)((char *)gDmaPacketCursor + 12) = 0x01000404;
-    base = (char *)gDmaPacketCursor;
+    *(int *)((char *)g_dma_packet_cursor + 0) = 0x10000000;
+    *(int *)((char *)g_dma_packet_cursor + 4) = 0;
+    *(int *)((char *)g_dma_packet_cursor + 8) = 0x11000000;
+    *(int *)((char *)g_dma_packet_cursor + 12) = 0x01000404;
+    base = (char *)g_dma_packet_cursor;
     *(int *)(base + 0x10) = 0;
     *(int *)(base + 0x14) = 0;
     *(int *)(base + 0x18) = 0;
@@ -64,7 +64,7 @@ void func_00280328(void) {
     *(int *)(base + 0xE8) = 0x15000000;
     *(int *)(base + 0xEC) = 0;
     p = (int *)(base + 0xF0);
-    gDmaPacketCursor[0] |= ((char *)p - (char *)gDmaPacketCursor >> 4) - 1;
-    gDmaPacketCursor = p;
-    AppendFixedDmaBlockTags();
+    g_dma_packet_cursor[0] |= ((char *)p - (char *)g_dma_packet_cursor >> 4) - 1;
+    g_dma_packet_cursor = p;
+    gfx_append_fixed_dma_block_tags();
 }

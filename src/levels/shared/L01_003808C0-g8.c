@@ -19,39 +19,39 @@ typedef struct {
     unsigned char locked;
 } PlayerInteractionView;
 
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 #define PLAYER ((PlayerInteractionView *)D_00189E20)
 
 extern int D_001B2088;
 /* The same resident word has absolute and GP reads in the transition block. */
-extern int D_001A79F0 __attribute__((section(".sdata")));
+extern int g_current_map_index __attribute__((section(".sdata")));
 extern unsigned char D_00138324[];
 extern float D_L01_001AEF30 __attribute__((sda));
 extern float D_L01_001AEF28 __attribute__((sda));
 extern float D_L01_001AEF2C __attribute__((sda));
 
-extern float func_00283198(float);
-extern float func_00282C48(float);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00283B98(float, float);
-extern void func_0029F338(void *);
-extern void func_0029F978(void *, int, void *);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fabs(float);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float FastAddRotations(float, float);
+extern void moby_mark_spawned(void *);
+extern void AttachManipulator(void *, int, void *);
 extern void func_002A0F48(void *);
-extern int func_00288D58(void);
-extern unsigned char *func_0029EFD0(int);
-extern void func_L01_00367F78(void);
-extern void func_L01_00371228(int, int);
+extern int flag_is_byte_set(void);
+extern unsigned char *CreateMoby(int);
+extern void save_mark_matching_level_slots(void);
+extern void level_set_bit_in_flag_table(int, int);
 /* The callback dispatcher differs in Tabora, Dobbo and Grelbin. */
 extern void ref_L01_003808C0_00(void *, void *);
-extern void func_00283898(void *, int, float);
-extern void func_L01_003801B8(void);
-extern int func_002B0C28(int, int, int);
-extern int func_002B49E0(int, int, void *, int, char *);
+extern void build_axis_rotation_quaternion(void *, int, float);
+extern void DrawVendorEffects(void);
+extern int TryClaimNotice(int, int, int);
+extern int request_begin_slot(int, int, void *, int, char *);
 
 /* Updates the Megacorp Vendor: pulses its glow, and when the hero stands close and presses the button, starts the vendor menu. */
-void func_L01_003808C0(unsigned char *moby) {
+void megacorp_vendor_update(unsigned char *moby) {
     unsigned char *vars=BP(moby,0x68);
     unsigned char *hero, *nearHero, *child;
     int glowColor,logoColor;
@@ -62,7 +62,7 @@ void func_L01_003808C0(unsigned char *moby) {
     if(D_L01_001AEF30>3.14f) D_L01_001AEF30=-3.14f;
     glowColor=0x20100;logoColor=0x80F0F0B0;
     if(BI(vars,0x94)==2) {glowColor=0x101;logoColor=0x8080;}
-    BI(moby,0x78)=glowColor*((int)(FastSinOrCosB(D_L01_001AEF30)*24.0f)+96)|0x80000000;
+    BI(moby,0x78)=glowColor*((int)(math_fast_sin_or_cos_b(D_L01_001AEF30)*24.0f)+96)|0x80000000;
     if(BP(vars,0xC)) BI(BP(vars,0xC),0x78)=logoColor|0x80000000;
     if(BI(vars,0x94)==3) {
         BU(moby,0x34)|=1;moby[0x31]=0;BI(moby,0x98)=0;
@@ -70,7 +70,7 @@ void func_L01_003808C0(unsigned char *moby) {
     }
     switch(moby[0x20]) {
 case 0:
-        if(BI(vars,0x98) && !IsFlagByteSet()) {MarkMobySpawned(moby);return;}
+        if(BI(vars,0x98) && !flag_is_byte_set()) {moby_mark_spawned(moby);return;}
         moby[0x20]=1;BI(vars,0)=0;BI(vars,4)=0;
         BP(vars,0xC)=CreateMoby(0x477 /* Megacorp Vendor Logo */);
         BU(BP(vars,0xC),0x34)|=2;
@@ -88,10 +88,10 @@ case 1:
         if(BF(vars,0x90)<=0) BU(BP(vars,0xC),0x34)|=1;
         if(!(D_001B2088&7)) {
             hero=(unsigned char *)&PLAYER->x;
-            if(vec_distance_xy(moby+0x10,hero)<=16.0f && FloatAbs(BF(moby,0x18)-BF(hero,8))<=8.0f) {
+            if(vec_distance_xy(moby+0x10,hero)<=16.0f && math_fabs(BF(moby,0x18)-BF(hero,8))<=8.0f) {
                 moby[0x20]=2;BU(BP(vars,0xC),0x34)&=0xFFFE;
-                if(BI(vars,0x94)==2) MarkMatchingLevelSlots();
-                SetBitInFlagTable(gCurrentMapIndex,BI(vars,0x94));
+                if(BI(vars,0x94)==2) save_mark_matching_level_slots();
+                level_set_bit_in_flag_table(g_current_map_index,BI(vars,0x94));
             }
         }
         if(BI(vars,0x94)==3) break;
@@ -110,7 +110,7 @@ case 2:
         if(BF(vars,0x90)<1) BF(vars,0x90)+=0.1f;
         nearHero=(unsigned char *)&PLAYER->x;
         distance=vec_distance_xy(moby+0x10,nearHero);
-        height=FloatAbs(BF(moby,0x18)-BF(nearHero,8));
+        height=math_fabs(BF(moby,0x18)-BF(nearHero,8));
         if(!(D_001B2088&7) && (distance>18.0f || height>10.0f)) {moby[0x20]=1;return;}
         if(BI(vars,0x94)!=3) {
             ref_L01_003808C0_00(DrawVendorEffects,moby);
@@ -129,7 +129,7 @@ case 2:
         if(PLAYER->state==28 || PLAYER->state==49) {canUse=0;show=0;}
         if(PLAYER->locked) {canUse=0;show=0;}
         if(distance>4.0f || height>2.0f) {canUse=0;show=0;}
-        if(FastDiffRots(PLAYER->angle,FastMatrixHelperA(BF(moby,0x10)-PLAYER->x,BF(moby,0x14)-PLAYER->y))>1.5707964f) {canUse=0;show=0;}
+        if(FastDiffRots(PLAYER->angle,mat_fast_helper_a(BF(moby,0x10)-PLAYER->x,BF(moby,0x14)-PLAYER->y))>1.5707964f) {canUse=0;show=0;}
         accepted=0;
         if(show) {
             int text=0x2799;
@@ -144,7 +144,7 @@ case 3:
 case 4:
         if(BF(vars,0x90)>0) BF(vars,0x90)-=0.1f;
         if(BF(vars,0x90)<=0) {
-            BU(BP(vars,0xC),0x34)|=1;BeginSlotRequest(5,1,moby,0,0);moby[0x20]=3;break;
+            BU(BP(vars,0xC),0x34)|=1;request_begin_slot(5,1,moby,0,0);moby[0x20]=3;break;
         }
         if(BI(vars,0x94)==3) break;
         ref_L01_003808C0_00(DrawVendorEffects,moby);

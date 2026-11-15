@@ -19,13 +19,13 @@ extern char *D_L00_001B1B00_sda __attribute__((sda));
 extern char *D_001FDA80[];
 
 extern int func_L00_002EE340(void *a, void *b);
-extern int func_002ACBC8(void *a, int b);
-extern int func_002ACCA8(void *a, int b);
-extern int func_L00_003206B8(void *a, int b);
-extern int func_002A8AF0(void *a, void *b, int c);
+extern int IsPointInCuboid(void *a, int b);
+extern int coll_is_point_inside_unit_sphere(void *a, int b);
+extern int coll_point_inside_record_volume(void *a, int b);
+extern int point_in_path_xy(void *a, void *b, int c);
 
 /* Tells whether a point is inside the region with the given index, by testing its bounds and then each of its shapes. */
-int func_L00_00329520(void *pos, int index)
+int coll_point_inside_region(void *pos, int index)
 {
     char *base;
     Rec_00329520 *rec;
@@ -47,11 +47,11 @@ int func_L00_00329520(void *pos, int index)
             return 1;
     }
     for (i = 0; i < rec->n14; i++) {
-        if (IsPointInsideUnitSphereOfRecord(pos, rec->list24[i]) != 0)
+        if (coll_is_point_inside_unit_sphere(pos, rec->list24[i]) != 0)
             return 1;
     }
     for (i = 0; i < rec->n16; i++) {
-        if (IsPointInsideRecordVolume(pos, rec->list28[i]) != 0)
+        if (coll_point_inside_record_volume(pos, rec->list28[i]) != 0)
             return 1;
     }
     for (i = 0; i < rec->n10; i++) {

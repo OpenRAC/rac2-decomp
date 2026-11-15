@@ -8,7 +8,7 @@ typedef int s32;
 typedef short s16;
 
 extern u32 D_L15_001FB320[];
-extern s32 func_002ED688(void *);
+extern s32 moby_get_motion_data(void *);
 extern char *D_L15_001B261C_base[] __asm__("D_L15_001B261C") __attribute__((sda));
 
 /* func_L15_00315428 is defined in L15_00315428-effects-g8.c. */
@@ -16,7 +16,7 @@ extern char *D_L15_001B261C_base[] __asm__("D_L15_001B261C") __attribute__((sda)
 extern void *func_803804E8(int a0);
 
 /* Stores the second argument into the record the lookup returned. */
-void func_L15_003804B8(int id, void *value)
+void moby_set_record_callback(int id, void *value)
 {
     void *record = func_803804E8(id);
 
@@ -26,7 +26,7 @@ void func_L15_003804B8(int id, void *value)
 }
 
 /* Counts list entries with an active object, a linked cursor and positive value. */
-s32 func_L15_00381CF0(char *list) {
+s32 CountActiveLinkedListObjects(char *list) {
     u16 *cursor;
     char *objectBase;
     char *entry;
@@ -46,7 +46,7 @@ s32 func_L15_00381CF0(char *list) {
         entry = (char *)(((*cursor & 0x7FFF) << 8) + (u32)objectBase);
         if ((*(u16 *)(entry + 0x34) & 0x20) != 0) {
             vars = *(char **)(entry + 0x68);
-            info = GetMobyMotionData(entry);
+            info = moby_get_motion_data(entry);
             if (*(s32 *)vars != 0 && *(s32 *)(info + 0x110) != 0 &&
                 threshold < *(float *)(*(s32 *)vars))
                 count++;
@@ -90,13 +90,13 @@ s32 func_L15_00381CF0(char *list) {
 
 extern unsigned char D_L15_004328E8[];
 
-extern void func_L15_00432210(void *id);
+extern void RebuildExpiredChannelCurves(void *id);
 extern void func_802FFC98(void *id, void *value);
 extern int func_803068A0(void *id);
 extern void func_80329048(void *id);
 
 /* Per-frame update of this moby (class 4522): runs the level update once it is armed. */
-void func_L15_004321A8(char *moby)
+void gorn_armed_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 

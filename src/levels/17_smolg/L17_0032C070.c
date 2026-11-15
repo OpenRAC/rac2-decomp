@@ -1,43 +1,43 @@
 #include "common.h"
 
 extern unsigned char D_00139574;
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_L00_0038F3D8(void *);
-extern void func_L00_0038E880(void *, void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, float);
+extern void part_spawn_spark_puff(void *);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139568[];
-extern char *D_0018C0B0 NOT_SDA;
+extern unsigned char g_item_slot_to_record[];
+extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern int D_L17_001AC790 __attribute__((sda));
 extern int D_L17_001B33B0 __attribute__((sda)), D_L17_001B33B8 __attribute__((sda));
 extern Collision D_L17_001C0000;
 extern Material D_L17_00263470[];
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_L00_0038F178(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00278E78(void);
-extern void func_002FD1B8(int, int, int, float, float, float, float);
-extern void func_00282C88(void *);
-extern char *func_00312D58(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002BFB38(void *, void *, int, int);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void part_emit_sparkle(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern void RippleDisturb(int, int, int, float, float, float, float);
+extern void vec_clear_128(void *);
+extern char *moby_spawn_scaled_effect(void *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void part_spawn_spark_2(void *, void *, int, int);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
 
 /* Read once as a GP macro load in a delay slot and otherwise as lui/lw, as at -G0 in retail. */
 extern int D_L17_001A8F00 __attribute__((sda));
@@ -48,28 +48,28 @@ typedef struct EffectMoby {
     char pad2[0x62]; int unknown; char pad3[0xE]; short classId;
 } EffectMoby;
 extern EffectMoby *D_L17_001B2C28 __attribute__((sda));
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 typedef struct { char pad0[4]; int state; char pad1[2]; unsigned char opacity, age; } EffectTail;
 typedef struct { char pad0[8]; unsigned char color, size; short life; char pad1[0x14]; EffectTail tail; } CutsceneParticle;
 /* Each register bank keeps the callee's order (a0-t0: position, spin, axis, colour, count;
    f12-f15: jitter, lo, hi, size); the interleaving gives retail's argument setup order. */
-extern CutsceneParticle *func_002BDCE8(void *, int, float, float, void *, float, unsigned int, float, int);
-extern int func_00283CF0(float);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
+extern CutsceneParticle *SpawnSpinningSparkParticle(void *, int, float, float, void *, float, unsigned int, float, int);
+extern int FloatToInt(float);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
-extern char D_L17_001FE880[];
+extern char g_path_l17_table[];
 
 extern char D_L17_00296F80[];
 
 extern char D_L17_00296FF0[];
 
-extern void func_00283098(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 extern void func_2EEEB8(void *, void *, void *);
 
@@ -79,66 +79,66 @@ extern int func_2F00C0(float);
 
 extern float func_2EF4E0(float);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 extern float func_2F00B0(int);
 
 extern void func_332E48(char *);
 
-extern void func_002A7398();
+extern void anim_start_immediate();
 
-extern void func_L17_003C71B0();
+extern void falling_object_wake_up();
 
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00282E80(void *, void *);
-extern void func_L02_0032EF10(void *, void *, void *, void *, float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float vec_distance_xy(void *, void *);
+extern void path_clamp_move_to_area(void *, void *, void *, void *, float);
 /* Picks a random open spot to the side of a start point. It tries left and right first, then
    wider diagonal spots, and stops each try at walls. Returns 1 if the first tries worked. */
-int func_L17_0032C070(float *origin, float *target, void *out, void *object, float radius, float height)
+int coll_find_clear_side_point(float *origin, float *target, void *out, void *object, float radius, float height)
 {
     Vec left, right, farLeft, farRight, start;
     float heading, angle, dleft, dright, finalDistance;
-    heading = FastMatrixHelperA(target[0] - origin[0], target[1] - origin[1]);
+    heading = mat_fast_helper_a(target[0] - origin[0], target[1] - origin[1]);
     angle = FastAddRotations(heading, 1.5707965f);
-    left.f[0] = FastSinOrCosA(angle) * radius;
-    left.f[1] = FastSinOrCosB(angle) * radius;
+    left.f[0] = math_fast_sin_or_cos_a(angle) * radius;
+    left.f[1] = math_fast_sin_or_cos_b(angle) * radius;
     left.f[2] = 0;
     FastVecAdd((char *)&left, (char *)&left, (char *)origin);
     angle = fast_subtract_rotations(heading, 1.5707965f);
-    right.f[0] = FastSinOrCosA(angle) * radius;
-    right.f[1] = FastSinOrCosB(angle) * radius;
+    right.f[0] = math_fast_sin_or_cos_a(angle) * radius;
+    right.f[1] = math_fast_sin_or_cos_b(angle) * radius;
     right.f[2] = 0;
     FastVecAdd((char *)&right, (char *)&right, (char *)origin);
     start.q = *(Quad *)origin;
-    ClampMoveToPathArea(&start, &left, &left, object, height);
+    path_clamp_move_to_area(&start, &left, &left, object, height);
     start.q = *(Quad *)origin;
-    ClampMoveToPathArea(&start, &right, &right, object, height);
+    path_clamp_move_to_area(&start, &right, &right, object, height);
     dleft = vec_distance_xy(origin, &left);
     dright = vec_distance_xy(origin, &right);
     if (radius < dleft + dright) {
-        if (RandomFloatRange(0, dleft + dright) < dleft) qcopy(out, &left);
+        if (math_random_float_range(0, dleft + dright) < dleft) qcopy(out, &left);
         else qcopy(out, &right);
         return 1;
     }
     angle = FastAddRotations(heading, 0.78539824f);
-    farLeft.f[0] = FastSinOrCosA(angle) * 12.0f;
-    farLeft.f[1] = FastSinOrCosB(angle) * 12.0f;
+    farLeft.f[0] = math_fast_sin_or_cos_a(angle) * 12.0f;
+    farLeft.f[1] = math_fast_sin_or_cos_b(angle) * 12.0f;
     farLeft.f[2] = 0;
     FastVecAdd((char *)&farLeft, (char *)&farLeft, (char *)origin);
     angle = fast_subtract_rotations(heading, 0.78539824f);
-    farRight.f[0] = FastSinOrCosA(angle) * 12.0f;
-    farRight.f[1] = FastSinOrCosB(angle) * 12.0f;
+    farRight.f[0] = math_fast_sin_or_cos_a(angle) * 12.0f;
+    farRight.f[1] = math_fast_sin_or_cos_b(angle) * 12.0f;
     farRight.f[2] = 0;
     FastVecAdd((char *)&farRight, (char *)&farRight, (char *)origin);
     start.q = *(Quad *)origin;
-    ClampMoveToPathArea(&start, &farLeft, &farLeft, object, height);
+    path_clamp_move_to_area(&start, &farLeft, &farLeft, object, height);
     start.q = *(Quad *)origin;
-    ClampMoveToPathArea(&start, &farRight, &farRight, object, height);
+    path_clamp_move_to_area(&start, &farRight, &farRight, object, height);
     finalDistance = vec_distance_xy(origin, &farLeft);
     dright = vec_distance_xy(origin, &farRight);
-    if (RandomFloatRange(0, finalDistance + dright) < finalDistance) qcopy(out, &farLeft);
+    if (math_random_float_range(0, finalDistance + dright) < finalDistance) qcopy(out, &farLeft);
     else qcopy(out, &farRight);
     return 0;
 }
@@ -150,7 +150,7 @@ int func_L17_0032C070(float *origin, float *target, void *out, void *object, flo
    2*pi-scale constant, folds the result through two helpers and packs a colour byte into the object's
    high word */
 /* Fades a particle's colour over its lifetime and removes the particle when its time is up. */
-void func_L17_00340EA0(char *particle)
+void part_update_fading(char *particle)
 {
     float lifeRatio;
     float wave;
@@ -166,14 +166,14 @@ void func_L17_00340EA0(char *particle)
     lifeRatio = func_2F00B0(*(short *)(extra + 4)) / func_2F00B0(*(short *)(extra + 6));
     wave = func_2EF4E0(lifeRatio * 6.283186f);
     *(int *)(particle + 4) = (*(int *)(particle + 4) & 0x00FFFFFF)
-                       + (func_2F00C0(FloatAbs(func_2F00B0(*(int *)(extra + 0xC)) * wave)) << 24);
+                       + (func_2F00C0(math_fabs(func_2F00B0(*(int *)(extra + 0xC)) * wave)) << 24);
 }
 
 
 
 /* Activates the scene's effect mobys during phase 6 and emits paired sparks from the
    scene actor during two frame windows of phases 4 and 5. */
-void func_L17_00385DE8(unsigned char *self) {
+void cutscene_update_spark_effects(unsigned char *self) {
     Vec velocity, point;
     char *obj;
     CutsceneParticle *first, *second;
@@ -203,10 +203,10 @@ void func_L17_00385DE8(unsigned char *self) {
         if (D_L17_001BD8C0.phase == 4 && (unsigned)(D_L17_001BD8C0.frame - 301) < 59) {
             obj = D_L17_001BD8C0.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
-                TransformMobyJointToWorld(obj, 0, &point);
+                moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
-                amount = RandomIntBelow(16);
-                if (RandomIntBelow(2))
+                amount = math_random_int_below(16);
+                if (math_random_int_below(2))
                     amount = -amount;
                 first = SpawnSpinningSparkParticle(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
@@ -224,7 +224,7 @@ void func_L17_00385DE8(unsigned char *self) {
                     detail = &second->tail;
                     second->size = FloatToInt(4.0f) + 64;
                     second->life = amount;
-                    second->color = RandomIntBelow(255);
+                    second->color = math_random_int_below(255);
                     detail->state = state;
                     detail->opacity = 127;
                     detail->age = (unsigned char)first->life;
@@ -237,10 +237,10 @@ void func_L17_00385DE8(unsigned char *self) {
         if (D_L17_001BD8C0.phase == 5 && D_L17_001BD8C0.frame >= 531) {
             obj = D_L17_001BD8C0.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
-                TransformMobyJointToWorld(obj, 0, &point);
+                moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
-                amount = RandomIntBelow(16);
-                if (RandomIntBelow(2))
+                amount = math_random_int_below(16);
+                if (math_random_int_below(2))
                     amount = -amount;
                 first = SpawnSpinningSparkParticle(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
@@ -257,7 +257,7 @@ void func_L17_00385DE8(unsigned char *self) {
                     detail = &second->tail;
                     second->size = FloatToInt(4.0f) + 64;
                     second->life = amount;
-                    second->color = RandomIntBelow(255);
+                    second->color = math_random_int_below(255);
                     detail->state = state;
                     detail->opacity = 127;
                     detail->age = (unsigned char)first->life;
@@ -270,7 +270,7 @@ void func_L17_00385DE8(unsigned char *self) {
 
 /* Moves a flying projectile one step. When it hits something it either makes a splash of small
    drops or marks itself finished and sets off its hit effect. */
-void func_L17_00390CE0(unsigned char *obj) {
+void splash_projectile_update(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -294,20 +294,20 @@ void func_L17_00390CE0(unsigned char *obj) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, vars, position);
-    SteerEffectDirection(*(int *)(vars + 0x1C), vars, 0);
-    TransformVectorOrCopy(position, position);
-    TriggerCurrentStateEffect(vars, vars);
-    AddObjectDirectionScaled(position, vars, 0.0030555557f);
-    EmitSparkleParticles(obj);
+    part_steer_effect_direction(*(int *)(vars + 0x1C), vars, 0);
+    vec_transform_or_copy(position, position);
+    shop_trigger_current_state_effect(vars, vars);
+    vec_add_object_direction_scaled(position, vars, 0.0030555557f);
+    part_emit_sparkle(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L17_00263470 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+        ((Material *)((u32)D_L17_00263470 + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
@@ -320,25 +320,25 @@ void func_L17_00390CE0(unsigned char *obj) {
             RippleDisturb(D_L17_001B33B0, D_L17_001B33B8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
-            ClearVector128(vars);
+            vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
             frame.position.f[2] = D_L17_001C0000.point.f[2];
-            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
+            effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = RandomAngle();
-                speed = RandomFloatRange(0.0f, 0.050000004f);
-                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
-                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
-                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
-                lifetime = RandomIntRange(90, 120);
-                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
+                angle = math_random_angle();
+                speed = math_random_float_range(0.0f, 0.050000004f);
+                frame.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
+                frame.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
+                frame.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
+                lifetime = math_random_int_range(90, 120);
+                part_spawn_spark_2(&frame.position, spread, math_random_int_below(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -349,7 +349,7 @@ void func_L17_00390CE0(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L17_001C0000;
                 model = reread->hit;
@@ -357,7 +357,7 @@ void func_L17_00390CE0(unsigned char *obj) {
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
-                FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+                vec_fast_normalize(&frame.velocity, vars, &reread->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
@@ -365,19 +365,19 @@ void func_L17_00390CE0(unsigned char *obj) {
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
-                FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+                vec_fast_normalize(&frame.velocity, vars, &collision->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         obj[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
     if (obj[0xBC]) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
-        SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
+        part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -385,7 +385,7 @@ finish:
 
 /* Moves a projectile one step and counts its age. When it hits something it sets off a small
    hit effect if it is young, or a bigger one if it is older. */
-void func_L17_003910F8(char *obj) {
+void aging_projectile_update(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -409,9 +409,9 @@ void func_L17_003910F8(char *obj) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, position, vars);
-    ComputeViewDirection(position, &frame.surface, 0);
+    cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
-    SpawnSparkPuff(obj);
+    part_spawn_spark_puff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
@@ -419,7 +419,7 @@ void func_L17_003910F8(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L17_00263470)->material;
     qcopy(&frame.packet.vector, vars);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
@@ -432,7 +432,7 @@ void func_L17_003910F8(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L17_001C0000;
             model = reread->hit;
@@ -444,7 +444,7 @@ void func_L17_003910F8(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+            vec_fast_normalize(&frame.velocity, vars, &reread->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
@@ -453,21 +453,21 @@ void func_L17_003910F8(char *obj) {
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+            vec_fast_normalize(&frame.velocity, vars, &collision->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         obj[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
         if (*(int *)(vars + 0x14) < 20)
-            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(obj, &frame.velocity, &frame.normal);
         else
-            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -490,7 +490,7 @@ finish:
    aborts, and the last id is echoed into the shared resident word */
 /* Moves a seven-point path so it follows the platform (turned and shifted to match it) and
    remembers that path in the player data. */
-void func_L17_003C3250(char *moby)
+void platform_attach_path_to_lift(char *moby)
 {
     char *vars;
     char *point;
@@ -505,7 +505,7 @@ void func_L17_003C3250(char *moby)
     pathRef = *(int *)(vars + 0xD0);
     if (pathRef == -1)
         return;
-    pathRef = *(int *)(gPathTable_L17 + pathRef * 4);
+    pathRef = *(int *)(g_path_l17_table + pathRef * 4);
     if (*(int *)pathRef != 7)
         return;
     matrix = moby + 0xC0;
@@ -518,7 +518,7 @@ void func_L17_003C3250(char *moby)
         func_2EEEB8(point, point, position);
         point += 0x10;
     }
-    hero = gHeroState;
+    hero = g_hero_state;
     *(unsigned short *)(hero + 0x24FE) = *(unsigned short *)(vars + 0xD0);
 }
 
@@ -539,18 +539,18 @@ void func_L17_003C3250(char *moby)
    re-runs the 0x71B0 activation if the object is still unmarked */
 /* Starts a ride platform: a class 0x920 one in its first state moves on to state 1, and a class
    0x929 one in its first state runs its own set-up. */
-void func_L17_003C5AF8(int moby)
+void ride_platform_start(int moby)
 {
     if (*(short *)(moby + 0xAA) == 0x920) {
         if (*(unsigned char *)(moby + 0x20) == 0) {
             *(unsigned char *)(moby + 0x20) = 1;
-            StartAnimationImmediate(moby, 1, 0);
+            anim_start_immediate(moby, 1, 0);
             return;
         }
     }
     if (*(short *)(moby + 0xAA) == 0x929) {
         if (*(unsigned char *)(moby + 0x20) == 0)
-            WakeUpIdleMoby(moby);
+            falling_object_wake_up(moby);
     }
 }
 
@@ -559,7 +559,7 @@ void func_L17_003C5AF8(int moby)
 /* true for the sub-state 0x922 when the object's stage byte sits in the 2..6 window */
 /* Returns 1 while a class 0x922 platform is in one of its states 2 to 6, which is while it is
    carrying the player along. */
-int func_L17_003C5DF0(int moby)
+int ride_platform_is_carrying(int moby)
 {
     if (*(short *)(moby + 0xAA) != 0x922)
         return 0;
@@ -569,9 +569,9 @@ int func_L17_003C5DF0(int moby)
 /* true when the level's shared record names the given sub-state; the shared word at
    0x34E closes the answer when the record is not the level's own */
 /* Returns 1 when the given object is the one the player is standing on or attached to. */
-int func_L17_003C5E20(int moby)
+int platform_is_object_under_player(int moby)
 {
-    char *hero = gHeroState;
+    char *hero = g_hero_state;
 
     if (*(int *)(hero + 0x229C) == 3 || *(int *)(hero + 0x2294) == 0x1B) {
         if (*(int *)(hero + 0x588) != moby)
@@ -588,7 +588,7 @@ zero:
 
 /* twin of func_L17_003C3250 on the 0x128 sub-object id and its own table */
 /* Same as func_L17_003C3250, but for the second path of the platform. */
-void func_L17_003C5E78(char *moby)
+void platform_attach_path_to_transform(char *moby)
 {
     char *vars;
     char *point;
@@ -603,7 +603,7 @@ void func_L17_003C5E78(char *moby)
     pathRef = *(int *)(vars + 0x128);
     if (pathRef == -1)
         return;
-    pathRef = *(int *)(gPathTable_L17 + pathRef * 4);
+    pathRef = *(int *)(g_path_l17_table + pathRef * 4);
     if (*(int *)pathRef != 7)
         return;
     matrix = moby + 0xC0;
@@ -616,7 +616,7 @@ void func_L17_003C5E78(char *moby)
         func_2EEEB8(point, point, position);
         point += 0x10;
     }
-    hero = gHeroState;
+    hero = g_hero_state;
     *(unsigned short *)(hero + 0x24FE) = *(unsigned short *)(vars + 0x128);
 }
 
@@ -630,7 +630,7 @@ void func_L17_003C5E78(char *moby)
 /* func_L17_003C71B0 is matched in L17_003C71B0.c (built with -mno-split-addresses). */
 
 /* Stores the second argument in the object's sub-record at 0xA4. */
-void func_L17_003C7250(char *moby, int pathIndex)
+void platform_set_path_index(char *moby, int pathIndex)
 {
     *(int *)(*(char **)(moby + 0x68) + 0xA4) = pathIndex;
 }
@@ -641,7 +641,7 @@ void func_L17_003C7250(char *moby, int pathIndex)
 
 /* true when the sub-object word at 0xBC holds the value two */
 /* Returns 1 when the platform's second path is in its waiting stage (stage 2). */
-int func_L17_003C7C58(int moby)
+int platform_is_waiting(int moby)
 {
     return *(int *)(*(int *)(moby + 0x68) + 0xBC) == 2;
 }

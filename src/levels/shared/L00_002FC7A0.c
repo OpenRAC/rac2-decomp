@@ -85,11 +85,11 @@ extern s32 D_L00_001B23F0 __attribute__((sda));
 /* Keep the absolute allocation-base loads in their measured form in this G0 unit. */
 extern s32 D_001A72F4 __attribute__((sda));
 extern u64 D_L00_001C91C0[0x30];
-extern s32 func_00283CF0(f32);
-extern s32 func_00282A18(s32);
+extern s32 FloatToInt(f32);
+extern s32 log2dim(s32);
 extern char D_L00_001A95A0[];
-extern double func_001234F0(float);
-extern void func_0026FEB8(const char *, ...);
+extern double __extendsfdf2(float);
+extern void STUB_printf(const char *, ...);
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
 
@@ -130,15 +130,15 @@ typedef struct LvlSlotCtx {
     LvlSlotNode  *head;          /* +0x50 */
 } LvlSlotCtx;
 
-extern void func_002B7B18(int value, char *target);
+extern void load_start_disc_read(int value, char *target);
 
-extern void func_002B7CE0(int value);
+extern void snd_pump_music_and_disc_read(int value);
 
 extern int D_L00_001BCAC0[];
 
-extern int D_0014B540[];
+extern int g_copy_setup_data[];
 
-extern Rac2Native_3e18d05650488ad4_FallbackU32 D_001A7424;
+extern Rac2Native_3e18d05650488ad4_FallbackU32 g_save_menu_flags;
 
 extern int D_001A7420_1;
 
@@ -156,25 +156,25 @@ extern int D_001A7420_4;
 
 extern int D_L00_001A904C_1 __attribute__((sda));
 
-extern void func_0034CE28(int value, int argument);
+extern void menu_set_screen_value_restart_four_fades(int value, int argument);
 
-extern void func_L00_004427C8(int value, int argument);
+extern void object_set_field_first(int value, int argument);
 
-extern void func_L00_004427D0(int value, int argument);
+extern void object_set_field_next(int value, int argument);
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
-extern void func_L00_00443DF8(int);
+extern void sub_object_get_value_first(int);
 
-extern void func_L00_00443E18(int);
+extern void sub_object_get_value_second(int);
 
-extern void func_0034E478(int);
+extern void hud_update_subsystems(int);
 
-extern void func_0034E4F8(int);
+extern void hud_item_bolt_draw(int);
 
-extern int func_003418C0(int a, int b);
+extern int tab_menu_update(int a, int b);
 
-extern void func_0034CE98(int value, int argument);
+extern void menu_set_screen_field_2bc(int value, int argument);
 
 extern int D_L00_001A904C_7 __attribute__((sda));
 
@@ -182,7 +182,7 @@ extern int func_003387A0_1(int a, int b, int c);
 
 extern int func_00338040_1(int a, int b, int c);
 
-extern void func_L00_0042D9D0(int);
+extern void level_clear_pending_pointer(int);
 
 extern unsigned char *D_L05_001B2520 __attribute__((sda));
 
@@ -206,9 +206,9 @@ extern void func_00282D30_21(char *a, char *b, float c);
 
 extern void func_00282CC0_24(char *a, char *b, char *c);
 
-extern void func_00291788(unsigned long long);
+extern void gfx_flush_light_part_indices(unsigned long long);
 
-extern void func_00291640(unsigned long long);
+extern void CreatePointLight(unsigned long long);
 
 extern void func_002F0D00(void *, void *, int);
 
@@ -220,79 +220,79 @@ extern int r1_D_L00_001C47B8[];
 
 extern int r1_D_L00_001792B8[];
 
-extern void func_00348EC0(int);
+extern void list_menu_draw_centered_rows(int);
 
-extern void func_003478F0(int);
+extern void item_grid_menu_draw(int);
 
-extern void func_003465D0(int);
+extern void menu_screen_large_draw_parts(int);
 
-extern void func_00339590(int);
+extern void mission_screen_draw_parts(int);
 
-extern void func_0033A3E0(int);
+extern void list_screen_draw(int);
 
-extern void func_0033B910(int);
+extern void map_screen_draw(int);
 
-extern void func_0033F030(int);
+extern void radial_menu_destroy(int);
 
-extern void func_00345358(int);
+extern void menu_screen_draw_parts(int);
 
-extern void func_00341C20(int);
+extern void tab_menu_draw(int);
 
-extern void func_003438E8(int);
+extern void item_menu_draw(int);
 
-extern void func_L00_00433F50(int);
+extern void menu_get_sub_object_value(int);
 
-extern void func_0033D970(int);
+extern void two_toggle_b_draw(int);
 
-extern void func_0033C738(int);
+extern void four_option_menu_draw(int);
 
-extern void func_0033CC20(int);
+extern void two_toggle_a_draw(int);
 
-extern void func_0033D638(int);
+extern void single_toggle_a_draw(int);
 
-extern void func_0033C028(int);
+extern void onoff_menu_draw_with_help(int);
 
-extern void func_0033C378(int);
+extern void onoff_menu_draw(int);
 
-extern int func_0033C590(int, int);
+extern int UpdateFourOptionMenuInput(int, int);
 
-extern int func_L00_00432448(int, int);
+extern int menu_handle_page_input_a(int, int);
 
-extern int func_L00_00432ED0(int, int);
+extern int menu_handle_page_input_b(int, int);
 
-extern int func_0033BE98(int, int);
+extern int screen_adjust_menu_update(int, int);
 
-extern int func_0033C2D8(int, int);
+extern int onoff_menu_update(int, int);
 
-extern int func_0033E3A0(int, int);
+extern int list_page_update(int, int);
 
-extern int func_0033D028(int, int);
+extern int audio_menu_update(int, int);
 
-extern int func_L00_00433560(int, int);
+extern int menu_update_two_part_flags_a(int, int);
 
-extern int func_003424C0(int, int);
+extern int list_menu_update(int, int);
 
-extern int func_00341EE8(int, int);
+extern int list_menu_set_selection(int, int);
 
 extern int func_0033FB98(int, int);
 
-extern int func_003398A8(int, int);
+extern int popup_update_position(int, int);
 
-extern int func_00339F28(int, int);
+extern int list_screen_layout(int, int);
 
-extern int func_0033B540(int, int);
+extern int map_screen_update_layout(int, int);
 
-extern int func_0033EA60(int, int);
+extern int info_panel_update(int, int);
 
-extern int func_00344478(int, int);
+extern int grid_menu_update(int, int);
 
-extern int func_00343798(int, int);
+extern int item_menu_update(int, int);
 
-extern int func_0033E5C0(int, int);
+extern int simple_page_update(int, int);
 
-extern int func_L00_00433198(int, int);
+extern int menu_handle_page_input_c(int, int);
 
-extern void func_00282A60(char *, int, int);
+extern void mem_clear(char *, int, int);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 
@@ -304,7 +304,7 @@ extern void func_00282A60(char *, int, int);
                     /* 64 bytes */
 
 /* Does nothing. Empty placeholder. */
-void func_L00_002FC7A0(void)
+void level_do_nothing_stub(void)
 {
 }
 
@@ -313,16 +313,16 @@ void func_L00_002FC7A0(void)
 
 
 /* Sends the same 64-bit value to two sound or graphics helpers one after the other. */
-void func_L00_002FD308(unsigned long long argument)
+void level_send_value_to_two_helpers(unsigned long long argument)
 {
-    FlushLightPartIndices(argument);
+    gfx_flush_light_part_indices(argument);
     CreatePointLight(argument);
 }
 
 /* walks the eight thirty-two-byte entries: for the ones with both flags set it
    hands the two halfword offsets of the entry to the shared routine and clears
    them */
-void func_L00_002FD400(void)
+void level_flush_table_entry_offsets(void)
 {
     unsigned char *entry = D_L00_001C7040;
     int i;
@@ -399,7 +399,7 @@ extern MaterialMap_04340 D_L00_0022DE00[];
  * Adapted from RAC1 src/game/loaders.c, register_object_render_class; RAC2 adds the LOD
  * distance defaults and relocates one more pointer (unk34).
  */
-void func_L00_002FF6A8(ObjectRenderClass_FF6A8 *render_class, ResidentRenderTextureDefinition_04340 *textures,
+void RegisterObjectRenderClass(ObjectRenderClass_FF6A8 *render_class, ResidentRenderTextureDefinition_04340 *textures,
                        u128_04340 *material_map, s32 class_id)
 {
     s32 lod, j;
@@ -491,7 +491,7 @@ void func_L00_002FF6A8(ObjectRenderClass_FF6A8 *render_class, ResidentRenderText
  * credits Lombyte's GPL-3.0 src/rendering/register_shrub_render_class.c
  * (RAC1 US 0x203B08).
  */
-void func_L00_002FFAB8(ShrubRenderClass_04340 *render_class, ResidentRenderTextureDefinition_04340 *textures,
+void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRenderTextureDefinition_04340 *textures,
                    u128_04340 *material_map, ShrubMipTextureDefinition_04340 *mip_texture, s32 class_id) {
     s32 group_index;
     s32 index;
@@ -683,7 +683,7 @@ void func_L00_002FFAB8(ShrubRenderClass_04340 *render_class, ResidentRenderTextu
    data offset as (class id, offset) pairs, turns each offset into the kilobytes up to
    the next one (the last up to end), sorts them largest first and prints each with
    "moby %d:      %.1fK\n". */
-void func_L00_00300438(int *records, int count, int end)
+void PrintMobyClassSizes(int *records, int count, int end)
 {
     struct { float id, weight; } values[512];
     int n = 0;
@@ -720,12 +720,12 @@ void func_L00_00300438(int *records, int count, int end)
     {
         int j;
         for (j = 0; j < n; j++)
-            STUB_printf(D_L00_001A95A0, FloatToInt(values[j].id), FloatToDouble(values[j].weight));
+            STUB_printf(D_L00_001A95A0, FloatToInt(values[j].id), __extendsfdf2(values[j].weight));
     }
 }
 
 /* Does nothing. Empty placeholder. */
-void func_L00_00300610(void)
+void level_do_nothing_stub_b(void)
 {
 }
 
@@ -735,11 +735,11 @@ void func_L00_00300610(void)
 
 extern unsigned char D_L00_001C9340[];
 
-extern int func_00283D80(void *, void *, void *);
+extern int vec_fast_helper_f(void *, void *, void *);
 
 /* Walks the level's sixteen-byte table entries downwards and returns the one-based
    index of the first entry the shared test accepts, zero when none does. */
-int func_L00_00303388(unsigned char *object)
+int level_find_first_accepted_entry(unsigned char *object)
 {
     unsigned char *data = D_L00_001C9340;
     int i = *(int *)(data + 0xC) - 1;
@@ -750,7 +750,7 @@ int func_L00_00303388(unsigned char *object)
         unsigned char *q = table + ((i << 4) + 0x20);
 
         do {
-            if (FastVectorHelperF(object, p, q) != 0)
+            if (vec_fast_helper_f(object, p, q) != 0)
                 return i + 1;
             q -= 0x10;
             p -= 0x10;
@@ -767,11 +767,11 @@ int func_L00_00303388(unsigned char *object)
 /* func_L00_00303990 is defined in its own unit. */
 
 /* Reads a record count from a per-level data root, indexes a fixed 332-byte-stride table with it, and when the int after position index is greater than the one at position index calls two helpers with the entry value added to a per-level base; returns 1. */
-int func_L00_003046D0(int index)
+int load_queue_level_data_chunk(int index)
 {
     int j = index + 1;
     int *d = D_L00_001BCAC0;
-    int *b = gCopySetupData;
+    int *b = g_copy_setup_data;
     int *t = (int *)((char *)b + 25416);
     int n = d[12] * 332;
     int hold = d[28];
@@ -781,8 +781,8 @@ int func_L00_003046D0(int index)
 
     n = next - cur;
     if (n > 0) {
-        StartDiscRead(hold, (char *)(cur + b[6341]));
-        PumpMusicAndDiscRead(0);
+        load_start_disc_read(hold, (char *)(cur + b[6341]));
+        snd_pump_music_and_disc_read(0);
     }
     return 1;
 }
@@ -799,7 +799,7 @@ extern struct { int a, b, c; char *p; } r1_D_L07_001842F0;
 
 /* rac1-decomp src/overlays/l07_umbris/menu_cache_entry.c: func_L00_00308408 */
 /* Clears each set bit in a rectangle of a per-row bit grid, notifying for each. */
-void func_L00_00308408(int x, int y0, int w, int h) {
+void level_clear_grid_bits_in_rect(int x, int y0, int w, int h) {
     int y = y0;
     for (; y < y0 + h; y++) {
         int rowbase = (y >> 5) << 4;
@@ -842,10 +842,10 @@ typedef struct {
 
 extern Cache_308700 D_L00_001C93A0;
 extern int D_L00_001B18D8[] __attribute__((sda));
-extern void func_00297550(unsigned char *, int, unsigned char *, short *);
+extern void decode_map_rle_row(unsigned char *, int, unsigned char *, short *);
 
 /* Looks for a key in a small cache of eight entries. If it is missing, it loads it over the oldest entry. Then it moves the entry to the front and returns 1 if it had to load it. */
-int func_L00_00308700(int key)
+int level_lookup_cache_entry(int key)
 {
     int found;
     int best;
@@ -892,7 +892,7 @@ int func_L00_00308700(int key)
 
 /* rac1-decomp src/overlays/shared/menu_00249720.c: func_L00_0024B1B0 */
 /* stores a value into a table slot chosen by the current index */
-void func_L00_00309140(int value, int slotIndex) {
+void level_store_value_in_table_slot(int value, int slotIndex) {
     int i = r1_D_0015EE84_m;
     if (i < 19) {
         slotIndex += r1_D_L00_001C47B8[i];
@@ -901,7 +901,7 @@ void func_L00_00309140(int value, int slotIndex) {
 }
 
 /* Does nothing. Empty placeholder. */
-void func_L00_00309368(void)
+void level_do_nothing_stub_c(void)
 {
 }
 
@@ -911,65 +911,65 @@ void func_L00_0030C710(int argument)
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetScreenValueAndRestartFourFades(value + 0x376C8, argument);
+        menu_set_screen_value_restart_four_fades(value + 0x376C8, argument);
 }
 
 /* Passes both arguments to a handler in the loaded module, if a module is loaded. */
-void func_L00_0030C748(int first, int second)
+void module_l00_call_handler_with_arg(int first, int second)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetScreenValueAndRestartFades(value + 0x376C8, first, second);
+        menu_set_screen_value_restart_fades(value + 0x376C8, first, second);
 }
 
 /* Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero. */
-void func_L00_0030C788(int argument)
+void module_l00_call_handler_with_arg_2(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetObjectField157C(value + 0x376C8, argument);
+        object_set_field_first(value + 0x376C8, argument);
 }
 
 /* Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero. */
-void func_L00_0030C7C0(int argument)
+void module_l00_call_handler_with_arg_3(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetObjectField1580(value + 0x376C8, argument);
+        object_set_field_next(value + 0x376C8, argument);
 }
 
 /* Passes its argument to a handler in the loaded module, if a module is loaded. */
-void func_L00_0030C7F8(int argument)
+void module_l00_call_handler_with_arg_4(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetMenuFlagAndRestartFades(value + 0x37EB0, argument);
+        menu_set_flag_restart_fades(value + 0x37EB0, argument);
 }
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
-void func_L00_0030C930(void)
+void module_l00_call_handler(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        GetSubObjectValue1D6C(value + 0x36F28);
+        sub_object_get_value_first(value + 0x36F28);
 }
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
-void func_L00_0030CF60(void)
+void module_l00_call_handler_2(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        GetSubObjectValue1D6CB(value + 0x36F28);
+        sub_object_get_value_second(value + 0x36F28);
 }
 
 /* Does nothing. Empty placeholder. */
-void func_L00_0030D1A8(void)
+void level_do_nothing_stub_d(void)
 {
 }
 
@@ -979,16 +979,16 @@ void func_L00_0030D1B0(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        UpdateHudSubsystems(value + 0x36F28);
+        hud_update_subsystems(value + 0x36F28);
 }
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
-void func_L00_0030D1E0(void)
+void module_l00_call_handler_3(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawItemBoltHud(value + 0x36F28);
+        hud_item_bolt_draw(value + 0x36F28);
 }
 
 /* The wrappers below dispatch to a handler the object table names: the object's base word lives
@@ -1000,16 +1000,16 @@ void func_L00_0030D1E0(void)
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D210(void)
+void module_l00_call_handler_4(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawListMenuRows_00348EC0(value + 0x39140);
+        list_menu_draw_centered_rows(value + 0x39140);
 }
 
 /* Passes its argument to a handler in the loaded module and returns the result. Returns 0 if no module is loaded. */
-int func_L00_0030D240(int argument)
+int module_l00_call_handler_with_arg_5(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -1020,26 +1020,26 @@ int func_L00_0030D240(int argument)
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D280(void)
+void module_l00_call_handler_5(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawItemGridMenu(value + 0x39590);
+        item_grid_menu_draw(value + 0x39590);
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D2B0(void)
+void module_l00_call_handler_6(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawLargeMenuScreenParts(value + 0x39A98);
+        menu_screen_large_draw_parts(value + 0x39A98);
 }
 
 /* Passes its argument to a handler in the loaded module and returns the result. Returns 0 if no module is loaded. */
-int func_L00_0030D2E0(int argument)
+int module_l00_call_handler_with_arg_6(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -1049,210 +1049,210 @@ int func_L00_0030D2E0(int argument)
 }
 
 /* Passes its argument to a handler in the loaded module and returns the result. Returns 0 if no module is loaded. */
-int func_L00_0030D368(int argument)
+int module_l00_call_handler_with_arg_7(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return PlaceMissionScreenPartsAndUpdateStats(value + 0x3B1F0, argument);
+        return mission_screen_place_parts(value + 0x3B1F0, argument);
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D3A8(void)
+void module_l00_call_handler_7(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawMissionScreenParts(value + 0x3B1F0);
+        mission_screen_draw_parts(value + 0x3B1F0);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D3D8(int argument)
+int module_l00_call_handler_with_arg_8(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return LayoutListScreen(value + 0x3ADE8, argument);
+        return list_screen_layout(value + 0x3ADE8, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D418(void)
+void module_l00_call_handler_8(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawListScreen(value + 0x3ADE8);
+        list_screen_draw(value + 0x3ADE8);
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D448(void)
+void module_l00_call_handler_9(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawMapScreen_0033B910(value + 0x3B490);
+        map_screen_draw(value + 0x3B490);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D478(int argument)
+int module_l00_call_handler_with_arg_9(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateMapScreenLayout(value + 0x3B490, argument);
+        return map_screen_update_layout(value + 0x3B490, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D4B8(void)
+void module_l00_call_handler_10(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DestroyRadialMenuParts(value + 0x3B7C0);
+        radial_menu_destroy(value + 0x3B7C0);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D4E8(int argument)
+int module_l00_call_handler_with_arg_10(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateInfoPanelMenu(value + 0x3B7C0, argument);
+        return info_panel_update(value + 0x3B7C0, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D528(void)
+void module_l00_call_handler_11(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawMenuScreenParts(value + 0x39F38);
+        menu_screen_draw_parts(value + 0x39F38);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D558(int argument)
+int module_l00_call_handler_with_arg_11(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateGridMenu(value + 0x39F38, argument);
+        return grid_menu_update(value + 0x39F38, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D598(void)
+void module_l00_call_handler_12(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawTabbedMenu(value + 0x3BE08);
+        tab_menu_draw(value + 0x3BE08);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D5C8(int argument)
+int module_l00_call_handler_with_arg_12(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateTabbedMenu(value + 0x3BE08, argument);
+        return tab_menu_update(value + 0x3BE08, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D608(void)
+void module_l00_call_handler_13(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawTabbedMenu(value + 0x3BE08);
+        tab_menu_draw(value + 0x3BE08);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D638(int argument)
+int module_l00_call_handler_with_arg_13(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateTabbedMenu(value + 0x3BE08, argument);
+        return tab_menu_update(value + 0x3BE08, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D678(void)
+void module_l00_call_handler_14(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawItemSelectMenu(value + 0x3C108);
+        item_menu_draw(value + 0x3C108);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D6A8(int argument)
+int module_l00_call_handler_with_arg_14(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateItemSelectMenu(value + 0x3C108, argument);
+        return item_menu_update(value + 0x3C108, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D6E8(void)
+void module_l00_call_handler_15(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        GetSubObjectValue(value + 0x3C440);
+        menu_get_sub_object_value(value + 0x3C440);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D718(int argument)
+int module_l00_call_handler_with_arg_15(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return UpdateSimpleMenuPage(value + 0x3C440, argument);
+        return simple_page_update(value + 0x3C440, argument);
     }
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D758(void)
+void module_l00_call_handler_16(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawTwoToggleOptionMenuB(value + 0x3CDB0);
+        two_toggle_b_draw(value + 0x3CDB0);
 }
 
 /* Reads a bound global word; when it is non-zero it calls a helper with that value plus a fixed base offset as the first argument and the function's own argument as the second, otherwise returns 0. */
-int func_L00_0030D788(int argument)
+int module_l00_call_handler_with_arg_16(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0) {
-        return HandleMenuPageInputC(value + 0x3CDB0, argument);
+        return menu_handle_page_input_c(value + 0x3CDB0, argument);
     }
     return 0;
 }
@@ -1260,7 +1260,7 @@ int func_L00_0030D788(int argument)
 /* Reads a bound global word; when it is non-zero it calls the object's handler with that value
  * plus a fixed base offset as the first argument and the function's own argument as the second,
  * returning the handler's result, otherwise returns 0. */
-int func_L00_0030D7C8(int argument)
+int module_l00_call_handler_with_arg_17(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -1271,200 +1271,200 @@ int func_L00_0030D7C8(int argument)
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D808(void)
+void module_l00_call_handler_17(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawFourOptionMenu(value + 0x3D060);
+        four_option_menu_draw(value + 0x3D060);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030D838(int argument)
+int module_l00_call_handler_with_arg_18(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return HandleMenuPageInputA_L00(value + 0x3D310, argument);
+        return menu_handle_page_input_a(value + 0x3D310, argument);
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D878(void)
+void module_l00_call_handler_18(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawTwoToggleOptionMenuA(value + 0x3D310);
+        two_toggle_a_draw(value + 0x3D310);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030D8A8(int argument)
+int module_l00_call_handler_with_arg_19(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return HandleMenuPageInputB_L00(value + 0x3D900, argument);
+        return menu_handle_page_input_b(value + 0x3D900, argument);
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D8E8(void)
+void module_l00_call_handler_19(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawSingleToggleOptionMenuA(value + 0x3D900);
+        single_toggle_a_draw(value + 0x3D900);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030D918(int argument)
+int module_l00_call_handler_with_arg_20(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateScreenAdjustMenu(value + 0x3DBB0, argument);
+        return screen_adjust_menu_update(value + 0x3DBB0, argument);
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D958(void)
+void level_l00_call_module_handler(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawOnOffOptionWithHelp(value + 0x3DBB0);
+        onoff_menu_draw_with_help(value + 0x3DBB0);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030D988(int argument)
+int level_l00_call_module_handler_with_arg(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateOnOffOptionMenu(value + 0x3DE60, argument);
+        return onoff_menu_update(value + 0x3DE60, argument);
     return 0;
 }
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_L00_0030D9C8(void)
+void level_l00_call_module_handler_2(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawOnOffOptionMenu(value + 0x3DE60);
+        onoff_menu_draw(value + 0x3DE60);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030D9F8(int argument)
+int level_l00_call_module_handler_with_arg_2(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateListMenuPage(value + 0x3EDB8, argument);
+        return list_page_update(value + 0x3EDB8, argument);
     return 0;
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DA38(void)
+void level_l00_call_module_handler_3(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawListMenuPage(value + 0x3EDB8);
+        list_page_draw(value + 0x3EDB8);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030DA68(int argument)
+int level_l00_call_module_handler_with_arg_3(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateAudioOptionsMenu(value + 0x3D5C0, argument);
+        return audio_menu_update(value + 0x3D5C0, argument);
     return 0;
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DAA8(void)
+void level_l00_call_module_handler_4(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawAudioOptionsMenu(value + 0x3D5C0);
+        audio_menu_draw(value + 0x3D5C0);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030DAD8(int argument)
+int level_l00_call_module_handler_with_arg_4(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateTwoPartObjectFlags(value + 0x3E5A8, argument);
+        return menu_update_two_part_flags_a(value + 0x3E5A8, argument);
     return 0;
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DB18(void)
+void level_l00_call_module_handler_5(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawSingleToggleOptionMenuC(value + 0x3E5A8);
+        single_toggle_c_draw(value + 0x3E5A8);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030DB48(int argument)
+int level_l00_call_module_handler_with_arg_5(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdateListMenu(value + 0x3E1D8, argument);
+        return list_menu_update(value + 0x3E1D8, argument);
     return 0;
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DB88(void)
+void level_l00_call_module_handler_6(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawMenuIfActive(value + 0x3E1D8);
+        menu_draw_if_active(value + 0x3E1D8);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030DBB8(int argument)
+int level_l00_call_module_handler_with_arg_6(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return SetListMenuSelection(value + 0x3E430, argument);
+        return list_menu_set_selection(value + 0x3E430, argument);
     return 0;
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DBF8(void)
+void level_l00_call_module_handler_7(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawListMenuRows_00341F38(value + 0x3E430);
+        small_list_menu_draw_rows(value + 0x3E430);
 }
 
 /* Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero. */
-void func_L00_0030DC80(int argument)
+void level_l00_call_module_handler_with_arg_7(int argument)
 {
     int value = D_L00_001A904C_1;
 
     if (value != 0)
-        SetScreenField0x2BC(value + 0x376C8, argument);
+        menu_set_screen_field_2bc(value + 0x376C8, argument);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030DCB8(int argument)
+int level_l00_call_module_handler_with_arg_8(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -1474,16 +1474,16 @@ int func_L00_0030DCB8(int argument)
 }
 
 /* Calls a handler in the currently loaded module, if a module is loaded. */
-void func_L00_0030DCF8(void)
+void level_l00_call_module_handler_8(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawRadialMenu(value + 0x3A388);
+        radial_menu_draw(value + 0x3A388);
 }
 
 /* Reads a bound global word; when it is zero it returns its first argument, otherwise it calls a helper with that value plus a fixed base offset and both of its arguments. */
-int func_L00_0030DD70(int fallback, int extra)
+int level_l00_call_module_handler_with_arg_9(int fallback, int extra)
 {
     int value = D_L00_001A904C_7;
 
@@ -1492,7 +1492,7 @@ int func_L00_0030DD70(int fallback, int extra)
 }
 
 /* Reads a bound global word; when it is zero it returns its first argument, otherwise it calls a helper with that value plus a fixed base offset and both of its arguments. */
-int func_L00_0030DDB0(int fallback, int extra)
+int level_l00_call_module_handler_with_arg_10(int fallback, int extra)
 {
     int value = D_L00_001A904C_7;
 
@@ -1501,16 +1501,16 @@ int func_L00_0030DDB0(int fallback, int extra)
 }
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */
-void func_L00_0030DDF0(void)
+void level_l00_call_module_handler_9(void)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        ClearPendingPointer(value + 0x36F28);
+        level_clear_pending_pointer(value + 0x36F28);
 }
 
 /* Does nothing. Empty placeholder. */
-void func_L00_0030DE20(void)
+void nop_l00_stub(void)
 {
 }
 
@@ -1521,22 +1521,22 @@ void func_L00_0030DFE0(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        DrawMenuWithButtonPrompts(value + 0x3CAA8);
+        menu_draw_with_prompts(value + 0x3CAA8);
 }
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_L00_0030E010(int argument)
+int level_l00_call_module_handler_with_arg_11(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return UpdatePopupPosition(value + 0x3CAA8, argument);
+        return popup_update_position(value + 0x3CAA8, argument);
     return 0;
 }
 
 /* shared native body of family e7046bc951256c7e */
 /* Counts the entries in a list of 256-byte records that are active up to the current limit, and stores the count. */
-void func_L00_00310048(void)
+void level_count_active_records(void)
 {
     unsigned char *p;
     int seen = 0;
@@ -1554,7 +1554,7 @@ void func_L00_00310048(void)
 
 /* rac1-decomp src/overlays/shared/mobyfunc_0024FD50.c: func_L00_0024FFE8 */
 /* Shifts every point in a set of coordinate lists by the given x and y amounts. */
-void func_L00_00310838(unsigned char *object, int dx, int dy) {
+void offset_moby_class_point_pairs(unsigned char *object, int dx, int dy) {
     int i;
     int listCount = object[4] + object[5];
     int *entries = *(int **)object;
@@ -1566,7 +1566,7 @@ void func_L00_00310838(unsigned char *object, int dx, int dy) {
 
 /* shared native body of family 0820eb1123250c0b */
 /* Takes the first free slot out of six, fills it in for the given index and links it into the list. */
-Slot0820eb11 *func_L00_00310BC8(Ctx *ctx, int index)
+Slot0820eb11 *allocate_moby_animation_slot(Ctx *ctx, int index)
 {
     int i;
     Slot0820eb11 *slot;
@@ -1593,7 +1593,7 @@ Slot0820eb11 *func_L00_00310BC8(Ctx *ctx, int index)
 /* The free half of the allocator above: unlinks the slot the caller's handle points at from
  * the context's slot list, wipes the sixty-four bytes and nulls the handle. The handle is
  * re-read at every mention (no local copy) - that is what keeps the retail allocation. */
-void func_L00_00310C88(LvlSlotCtx *ctx, LvlSlotNode **handle)
+void release_moby_animation_slot(LvlSlotCtx *ctx, LvlSlotNode **handle)
 {
     LvlSlotNode *cur;
 
@@ -1609,17 +1609,17 @@ void func_L00_00310C88(LvlSlotCtx *ctx, LvlSlotNode **handle)
         if (cur->next == *handle)
             cur->next = (*handle)->next;
     }
-    ClearMemory((char *)*handle, 0, 0x40);
+    mem_clear((char *)*handle, 0, 0x40);
     *handle = 0;
 }
 
 /* func_L00_00310D30 is defined in its own unit. */
 
-extern void func_00282A88(void *buf, int size);
+extern void mem_fast_helper_b(void *buf, int size);
 
-extern void func_00282AB0(void *target, void *base, int len);
+extern void mem_copy_aligned(void *target, void *base, int len);
 
-extern int func_0011AEA0(int code);
+extern int FlushCache(int code);
 
 /* The record the table entry points at: three shorts and an array of 64-bit slots. */
 typedef struct L110E8Rec {
@@ -1653,7 +1653,7 @@ typedef struct L110E8Src {
 
 
 /* Builds a new data block from two tables: copies the entry data and rewrites the sizes and offsets in its header. */
-void func_L00_003110E8(L110E8Src *source, int listIndex, int entryIndex, L110E8Out *outBuffer)
+void level_build_data_block(L110E8Src *source, int listIndex, int entryIndex, L110E8Out *outBuffer)
 {
     char *tableB = source->f18;
     char *tableA = source->f14;
@@ -1676,7 +1676,7 @@ void func_L00_003110E8(L110E8Src *source, int listIndex, int entryIndex, L110E8O
     entryList += entryIndex;
     rec = ((L110E8Rec **)entryList)[7];
     uf = (unsigned short *)rec;
-    FastMemoryHelperB(out, ((countA + 3) * 8) & 0xFF0);
+    mem_fast_helper_b(out, ((countA + 3) * 8) & 0xFF0);
 
     destinationOffset = countA * 8;
     {
@@ -1697,7 +1697,7 @@ void func_L00_003110E8(L110E8Src *source, int listIndex, int entryIndex, L110E8O
 
         len = rec->f06 * 16 - countB * 8;
         if (len != 0)
-            CopyMemoryAligned((char *)out + (destinationOffset + 0x10), msrc, len);
+            mem_copy_aligned((char *)out + (destinationOffset + 0x10), msrc, len);
     }
 
     {
@@ -1726,7 +1726,7 @@ void func_L00_003110E8(L110E8Src *source, int listIndex, int entryIndex, L110E8O
 }
 
 /* scales a float field by 1/1024, fills a 64-byte stack buffer from the object, then applies three per-element helper calls over n 64-byte records. */
-void func_L00_003116A8(char *object, int count, int extraArg, char *matrices)
+void mat_transform_array(char *object, int count, int extraArg, char *matrices)
 {
     char buf[64];
     float scale;

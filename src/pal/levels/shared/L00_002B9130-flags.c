@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int TI_F41eb487e __attribute__((mode(TI)));
 extern char D_00189E20_5[];
 extern void func_PAL_L00_002B9130(void);
-extern void func_L00_002B3DC0(float, float, float);
-extern float func_002AA898(float *position, float target, float *velocity,
+extern void hero_rotate_matrix(float, float, float);
+extern float math_approach_with_velocity(float *position, float target, float *velocity,
                           float acceleration, float damping, float limit, int direction);
 
 void func_PAL_L00_002B92F0(void)
@@ -30,9 +31,9 @@ void func_PAL_L00_002B92F0(void)
         if (x == 0x74 || x == 0x30 || x == 0x2C || x == 0x2B)
             return;
         v = *(TI_F41eb487e *)(base + 0x90);
-        func_002AA898((float *)&v, 0.0f, (float *)(base + 0xA0), 0.0216f, 0.43200004f, 0.10471977f, 0);
-        func_002AA898((float *)&v + 1, 0.0f, (float *)(base + 0xA4), 0.0216f, 0.43200004f, 0.10471977f, 0);
-        func_L00_002B3DC0(*(float *)(base + 0xA0), *(float *)(base + 0xA4), 0.0f);
+        math_approach_with_velocity((float *)&v, 0.0f, (float *)(base + 0xA0), 0.0216f, 0.43200004f, 0.10471977f, 0);
+        math_approach_with_velocity((float *)&v + 1, 0.0f, (float *)(base + 0xA4), 0.0216f, 0.43200004f, 0.10471977f, 0);
+        hero_rotate_matrix(*(float *)(base + 0xA0), *(float *)(base + 0xA4), 0.0f);
         return;
     }
     if (mode < 0)

@@ -16,16 +16,16 @@ typedef struct {
 
 extern Vector D_0018A0E0;
 extern Vector D_L00_001AA310[4];
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C768(int, float *, float *);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void gfx_world_to_screen_unit(int, float *, float *);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 
 /* The 0x50-stride record table both walkers below scan; the retail reaches it through $gp in
    ordinary flow, which the assembler only selects from a bare symbol operand. */
@@ -39,9 +39,9 @@ extern void func_00282D30_3(char *a, char *b, float value);
 
 extern float func_00283B98_3(float value, float scale);
 
-extern int func_002ABB78(char *object);
+extern int moby_is_in_special_class_range(char *object);
 
-extern float *func_002AB1F0(char *object);
+extern float *moby_get_private_value_0(char *object);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner {
@@ -77,25 +77,25 @@ typedef struct {
 
 extern void func_00282F20_1(char *, char *, float);
 
-extern void func_00282DD8(char *, char *, char *);
+extern void FastVecCross(char *, char *, char *);
 
-extern int func_002B4038(int, int);
+extern int save_is_record_value(int, int);
 
 extern void func_0029F338_1(char *);
 
-extern void func_L00_003F5B10(char *);
+extern void RenderTwoLayerEffectStrip(char *);
 
-extern void func_L00_003F6308(char *);
+extern void vaporizer_bolt_draw_beam_rings(char *);
 
-extern void func_L00_003F6B10(char *);
+extern void vaporizer_bolt_draw_sparks(char *);
 
-extern char *func_L00_0032A088(int a0, int a1);
+extern char *level_get_slot_body(int a0, int a1);
 
-extern char *func_L00_0032A0B8(int a0, int a1);
+extern char *level_get_slot_header(int a0, int a1);
 
-extern int func_00282978(char *a0);
+extern int FastDecTimer(char *a0);
 
-extern float func_00283B98(float a0, float a1);
+extern float FastAddRotations(float a0, float a1);
 
 #ifndef RAC2_T_NODE16_FE48725C6
 #define RAC2_T_NODE16_FE48725C6
@@ -153,7 +153,7 @@ extern void func_002A0488_1(Node24_Fe48725c6 *a, unsigned char b, unsigned char 
 
 /* Family 40487154aa250cc8: fixed-field addend writes into one resource record. */
 /* Makes the object pulse: it scales its three axes by wobbling amounts and eases the wobble values back. */
-void func_L00_003EE100(char *object)
+void moby_pulse_axis_scale(char *object)
 {
     char *data;
     float x;
@@ -175,13 +175,13 @@ void func_L00_003EE100(char *object)
 
 /* calls two guards and returns 1 only when both succeed and the object's float field is not positive */
 /* Says whether the object can be used as a target, which needs both checks to pass and its health to be zero or less. */
-int func_L00_003EE228(char *object)
+int weapon_can_target_object(char *object)
 {
     float *info;
 
-    if (IsMobyInSpecialClassRange(object) != 0)
+    if (moby_is_in_special_class_range(object) != 0)
         return 0;
-    info = GetMobyPrivateValue0(object);
+    info = moby_get_private_value_0(object);
     if (info == 0)
         return 0;
     if (0.0f < *info)
@@ -192,7 +192,7 @@ int func_L00_003EE228(char *object)
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
 /* Draws the aiming effect of a weapon object while its active flag is set. */
-void func_L00_003EE8E8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void weapon_draw_aim_effect(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -210,7 +210,7 @@ void func_L00_003EE8E8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 extern int D_L00_001B0838 __attribute__((sda));
 
 /* Clears an effect flag. */
-void func_L00_003EF548(void)
+void effect_clear_flag(void)
 {
     D_L00_001B0838 = 0;
 }
@@ -220,14 +220,14 @@ extern int D_L00_001B0838 __attribute__((sda));
 extern int D_L00_001B2BB4 __attribute__((sda));
 
 /* Clears the effect record table pointer and an effect flag. */
-void func_L00_003EF550(void)
+void effect_clear_records_and_flag(void)
 {
     D_L00_001B2BB4 = 0;
     D_L00_001B0838 = 0;
 }
 
 
-extern int func_00283DB8(char *local, float value);
+extern int math_fast_helper_a(char *local, float value);
 
 /* func_L00_003EFA00 is in L00_003EFA00-qcopy.c (its own file: the quadword-copy profile). */
 
@@ -240,7 +240,7 @@ extern EffectRecord_FF58 *D_L00_001B2BB4_2[] __attribute__((sda));
 extern void func_00282F20_2(char *, char *, float);
 extern void func_00282CC0_2(char *, char *, char *);
 extern void func_00282DD8_2(char *, char *, char *);
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 extern void func_L00_003F0198_2(char *, int, float, float, int);
 extern float func_00283B98_4(float, float);
 
@@ -248,7 +248,7 @@ extern float func_00283B98_4(float, float);
    shape for the position/velocity block and the second): that is what reproduces retail's
    saved-register assignment. */
 /* Starts a new trail effect in a free record slot, then steps it 100 times to fill in its shape. */
-void func_L00_003EFF58(char *owner, int value, char *direction, char *position, float scale)
+void part_spawn_trail_record(char *owner, int value, char *direction, char *position, float scale)
 {
     TI128_FF58 local;
     EffectRecord_FF58 *base = D_L00_001B2BB4_2[0];
@@ -280,7 +280,7 @@ void func_L00_003EFF58(char *owner, int value, char *direction, char *position, 
         func_00282F20_2((char *)&local, position, 2.0f);
         func_00282CC0_2((char *)&local, (char *)&local, velocity);
         func_00282DD8_2(normal, velocity, (char *)&local);
-        angle = RandomAngle();
+        angle = math_random_angle();
         for (step = 99; step >= 0; step--) {
             func_L00_003F0198_2((char *)entry, 2, angle, 0.0f, 0);
             func_L00_003F0198_2((char *)shape, 0, angle, 0.0f, 0);
@@ -292,12 +292,12 @@ void func_L00_003EFF58(char *owner, int value, char *direction, char *position, 
     }
 }
 
-extern int func_00282948(char *p);
+extern int math_fast_float_d(char *p);
 
-extern void func_L00_003F0680(char *rec);
+extern void blast_update_pool_records(char *rec);
 
 /* Updates every effect record that belongs to the given object and frees those whose timer has run out. */
-void func_L00_003F00A0(char *ownerMoby)
+void effect_update_owner_records(char *ownerMoby)
 {
     char *rec;
     int i;
@@ -309,18 +309,18 @@ void func_L00_003F00A0(char *ownerMoby)
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
         if (*(int *)(rec + 0x30) == (int)ownerMoby) {
-            if (FastFloatHelperD(rec + 0x34) != 0 && *(int *)(rec + 0x38) == 0)
+            if (math_fast_float_d(rec + 0x34) != 0 && *(int *)(rec + 0x38) == 0)
                 *(int *)(rec + 0x30) = 0;
-            UpdateBlastPoolRecords(rec);
+            blast_update_pool_records(rec);
         }
         offset += 0x50;
     } while (i >= 0);
 }
 
-extern void func_L00_003F09A0(char *rec);
+extern void part_respawn_owner_particles(char *rec);
 
 /* Goes through the effect records of the given object and draws each one. */
-void func_L00_003F0130(char *ownerMoby)
+void effect_draw_owner_records(char *ownerMoby)
 {
     char *rec;
     int i;
@@ -332,7 +332,7 @@ void func_L00_003F0130(char *ownerMoby)
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
         if (*(int *)(rec + 0x30) == (int)ownerMoby)
-            RespawnOwnerParticles(rec);
+            part_respawn_owner_particles(rec);
         offset += 0x50;
     } while (i >= 0);
 }
@@ -345,7 +345,7 @@ extern void ref_L00_003F09A0_00(char *rec, float f1, int a1, int a2, int a3,
                                 float f2, int a4, float f3);
 
 /* Finds all particles that belong to the given object and respawns them. */
-void func_L00_003F09A0(char *ownerMoby)
+void part_respawn_owner_particles(char *ownerMoby)
 {
     char *rec;
     int i;
@@ -361,7 +361,7 @@ void func_L00_003F09A0(char *ownerMoby)
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
 /* Sets a block of four quad corner vectors and packet fields to their starting values. */
-void func_L00_003F0A20(char *entry)
+void gfx_init_quad_packet_block(char *entry)
 {
     *(long long *)(entry + 112) = 0LL;
     *(int *)(entry + 80) = 0;
@@ -393,7 +393,7 @@ void func_L00_003F0A20(char *entry)
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
 /* Scales four vectors in a row by the same amount. */
-void func_L00_003F0AA8(char *vectors, float scale)
+void vec_scale_four_c(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -405,19 +405,19 @@ extern void ref_L00_003F0B10_00(char *pkt);
 
 extern void ref_L00_003F0B10_01(char *, float);
 
-extern long long func_0027C878(char *p);
+extern long long GetEffectTextureDescriptor(char *p);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_00282E80(char *p, float *v);
+extern float vec_distance_xy(char *p, float *v);
 
-extern void func_00283410(float *matrix, float *quat);
+extern void euler_to_matrix(float *matrix, float *quat);
 
-extern void func_00282CF0(char *off, char *v, char *pos);
+extern void FastVecSub(char *off, char *v, char *pos);
 
-extern void func_00282F20(char *dst, char *src, float angle);
+extern void vec_scale_to_length(char *dst, char *src, float angle);
 
-extern void func_00280B90(char *pkt, float *matrix, int mode);
+extern void draw_world_quad(char *pkt, float *matrix, int mode);
 
 /* The vector the aim helpers read, at 0x001B8C80; per level at its own copy. */
 #ifndef RAC2_T_AIMVEC_F0B10
@@ -434,7 +434,7 @@ extern Aimvec_F0b10 D_L00_001B8C80;
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
 /* Draws a flat sprite at a position that turns to face the camera. */
-void func_L00_003F0B10(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+void gfx_draw_camera_facing_sprite_d(char *pos, int colorBase, int alpha, char *texture, int flagBits,
                        float size, float roll, float pull)
 {
     char packet[144];
@@ -456,9 +456,9 @@ void func_L00_003F0B10(char *pos, int colorBase, int alpha, char *texture, int f
     *(long long *)(packet + 120) = textureKey;
 
     quat[3] = 0.0f;
-    quat[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
+    quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
@@ -481,14 +481,14 @@ void func_L00_003F0B10(char *pos, int colorBase, int alpha, char *texture, int f
 extern int D_L00_001B08D0 __attribute__((sda));
 
 /* Clears the flag that says the lightning burst exists. */
-void func_L00_003F1448(void)
+void lightning_burst_clear_active_flag(void)
 {
     D_L00_001B08D0 = 0;
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
 /* Sets a block of four quad corner vectors and packet fields to their starting values. */
-void func_L00_003F1DC8(char *entry)
+void gfx_init_quad_packet_block_copy(char *entry)
 {
     *(long long *)(entry + 112) = 0LL;
     *(int *)(entry + 80) = 0;
@@ -520,7 +520,7 @@ void func_L00_003F1DC8(char *entry)
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
 /* Scales four vectors in a row by the same amount. */
-void func_L00_003F1E50(char *vectors, float scale)
+void vec_scale_four_copy(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -536,7 +536,7 @@ extern void ref_L00_003F1EB8_01(char *, float);
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
 /* Draws a flat sprite at a position that turns to face the camera. */
-void func_L00_003F1EB8(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+void gfx_draw_camera_facing_sprite_copy(char *pos, int colorBase, int alpha, char *texture, int flagBits,
                        float size, float roll, float pull)
 {
     char packet[144];
@@ -558,9 +558,9 @@ void func_L00_003F1EB8(char *pos, int colorBase, int alpha, char *texture, int f
     *(long long *)(packet + 120) = textureKey;
 
     quat[3] = 0.0f;
-    quat[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
+    quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
@@ -581,7 +581,7 @@ void func_L00_003F1EB8(char *pos, int colorBase, int alpha, char *texture, int f
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
 /* Computes the next point of a chain from the two points before it. */
-void func_L00_003F28A0(Vec16_Fc936841d *object, int index)
+void vec_compute_next_chain_point(Vec16_Fc936841d *object, int index)
 {
     char local[16];
 
@@ -589,10 +589,10 @@ void func_L00_003F28A0(Vec16_Fc936841d *object, int index)
     func_00282CC0_15((char *)&object[index - 1], (char *)&object[index - 2], local);
 }
 
-extern void func_0029F338(char *);
-extern int func_002ACBC8(void *, int);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
+extern void moby_mark_spawned(char *);
+extern int IsPointInCuboid(void *, int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
 extern void func_L00_0036EF68(char *, int, int, int);
 
 /* The binder both state paths hand the handler to: func_L00_002E6EF8 in eleven of the twelve
@@ -600,7 +600,7 @@ extern void func_L00_0036EF68(char *, int, int, int);
    the call carries a name without an address. */
 extern void ref_L00_003F3160_00(void *, void *);
 
-extern void func_L00_003F3518(char *);
+extern void gfx_draw_lit_group_points(char *);
 
 extern int D_L00_001A9018 __attribute__((sda));
 
@@ -619,7 +619,7 @@ extern unsigned char *D_L00_001B2514 __attribute__((sda));
    re-binds the handler. The two stores of the byte at +0x30 sit in the arms of the select: the
    record's word at +0x68 either supplies its low byte or the object gets 0xFF. */
 /* Fades a group of lights or objects between two colors over time, and passes the new color to every object in the group. */
-void func_L00_003F3160(char *moby)
+void color_l00_fade_update(char *moby)
 {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int group;
@@ -636,7 +636,7 @@ void func_L00_003F3160(char *moby)
     case 0:
         group = *(int *)vars;
         if (group >= D_L00_001A9018 || D_L00_001A9014[group] == 0 || group == -1) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
         *(float *)(vars + 8) = *(float *)(vars + 8) * 0.017453294f;
@@ -665,7 +665,7 @@ void func_L00_003F3160(char *moby)
         if (*(float *)(vars + 0x40) == 0.0f && *(float *)(vars + 0x44) == 0.0f &&
             *(float *)(vars + 0x48) == 0.0f)
             *(int *)(vars + 0x6C) = 1;
-        ref_L00_003F3160_00((void *)DrawLitGroupPoints, moby);
+        ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, moby);
         moby[0x20] = 2;
         return;
     case 1:
@@ -683,7 +683,7 @@ void func_L00_003F3160(char *moby)
             *(int *)(vars + 0x10) = FastTweenColor(prev, target, 0.1f);
         } else {
             *(int *)(vars + 0x10) = FastTweenColor(*(int *)(vars + 0x14), *(int *)(vars + 0x18),
-                                                FastSinOrCosB(angle) * 0.5f + 0.5f);
+                                                math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f);
         }
         if (*(int *)(vars + 0x10) == prev)
             return;
@@ -699,7 +699,7 @@ void func_L00_003F3160(char *moby)
     case 2:
         if (*(int *)(vars + 0x64) == -1 ||
             IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(vars + 0x64)) != 0)
-            ref_L00_003F3160_00((void *)DrawLitGroupPoints, moby);
+            ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, moby);
         return;
     }
 }
@@ -710,7 +710,7 @@ void func_L00_003F3160(char *moby)
 
 extern void ref_L00_003F37A0_00(void *p, char *obj);
 
-extern void func_L00_003F37E8(char *object);
+extern void shape_a_draw_fifty_quads(char *object);
 
 typedef struct Obj_L00_003F37A0 {
     unsigned char pad0[0x20];
@@ -724,7 +724,7 @@ typedef struct Obj_L00_003F37A0 {
 } Obj_L00_003F37A0;
 
 /* Starts a drawn shape object, setting its scale to one, and keeps its draw function running. */
-void func_L00_003F37A0(Obj_L00_003F37A0 *moby)
+void shape_a_update(Obj_L00_003F37A0 *moby)
 {
     if (moby->f20 == 0) {
         moby->f20 = 1;
@@ -732,11 +732,11 @@ void func_L00_003F37A0(Obj_L00_003F37A0 *moby)
         moby->fD4 = 1.0f;
         moby->fE8 = 1.0f;
     }
-    ref_L00_003F37A0_00((void *)DrawFiftyQuadShapeA, (char *)moby);
+    ref_L00_003F37A0_00((void *)shape_a_draw_fifty_quads, (char *)moby);
 }
 
-extern void func_00283098(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float FastVecDot(void *, void *);
 extern Vector D_L00_0029DAE0[];
 extern Vector D_L00_0029D7C0[];
 extern Vector D_L00_0029CB30[];
@@ -749,7 +749,7 @@ extern float D_L00_0029D490[][2];
    the four corners then take their vertices and UVs from tables, and a corner at
    z = -0.002112 gets a transparent colour. */
 /* Draws the 50 quads of the first shape, fading with the object alpha. */
-void func_L00_003F37E8(char *object)
+void shape_a_draw_fifty_quads(char *object)
 {
     RenderPacket packet;
     struct {
@@ -800,7 +800,7 @@ void func_L00_003F37E8(char *object)
     }
 }
 
-extern void func_L00_003F3AD0(char *);
+extern void shape_b_draw_fifty_quads(char *);
 
 typedef struct Obj_L00_003F3A88 {
     unsigned char pad0[0x20];
@@ -814,7 +814,7 @@ typedef struct Obj_L00_003F3A88 {
 } Obj_L00_003F3A88;
 
 /* Starts a second drawn shape object, setting its scale to one, and keeps its draw function running. */
-void func_L00_003F3A88(Obj_L00_003F3A88 *moby)
+void shape_b_update(Obj_L00_003F3A88 *moby)
 {
     if (moby->f20 == 0) {
         moby->f20 = 1;
@@ -822,7 +822,7 @@ void func_L00_003F3A88(Obj_L00_003F3A88 *moby)
         moby->fD4 = 1.0f;
         moby->fE8 = 1.0f;
     }
-    ref_L00_003F3A88_00((void *)DrawFiftyQuadShapeB, (char *)moby);
+    ref_L00_003F3A88_00((void *)shape_b_draw_fifty_quads, (char *)moby);
 }
 
 extern Vector D_L00_0029EDB0[];
@@ -832,7 +832,7 @@ extern short D_L00_0029E440[][4][2];
 extern float D_L00_0029E760[][2];
 
 /* Draws the 50 quads of the second shape, fading with the object alpha. */
-void func_L00_003F3AD0(char *object)
+void shape_b_draw_fifty_quads(char *object)
 {
     RenderPacket packet;
     struct {
@@ -892,7 +892,7 @@ void func_L00_003F3AD0(char *object)
 
 /* Computes two sub-record addresses of a 192-byte block and hands three of its sub-records to four helpers, threading a second argument through two of them. */
 /* Builds three axis vectors for the object from its direction and a reference vector. */
-void func_L00_003F51A0(char *moby, char *reference)
+void moby_build_axes(char *moby, char *reference)
 {
     char *base = moby + 192;
     char *other = moby + 208;
@@ -909,45 +909,45 @@ void func_L00_003F51A0(char *moby, char *reference)
 /* func_L00_003F5390 is in L00_003F5390-g8.c. */
 
 /* Does nothing. */
-void func_L00_003F5658(void)
+void moby_handler_empty(void)
 {
 }
 
-extern int func_L00_003F59F0(char *);
-extern int func_L00_003F6168(char *);
-extern int func_L00_003F6A58(int *);
-extern void func_L00_003F56F0(char *);
+extern int vaporizer_update_joint_chain(char *);
+extern int vaporizer_bolt_update_trail_sample(char *);
+extern int vaporizer_update_timed_records(int *);
+extern void vaporizer_draw_effects(char *);
 extern void ref_L00_003F5660_00(void (*handler)(char *), char *object);
 
 /* Runs the three per-frame passes; when any of them reports work the record is handed to the
    binder with the shared follow-up pass as its handler, otherwise a record in state 2 is
    advanced by the shared state call. */
 /* Updates the Vaporizer by running its three passes; it keeps running while any pass has work and ends when all are done. */
-void func_L00_003F5660(char *moby)
+void vaporizer_update_passes(char *moby)
 {
-    int chainActive = UpdateVaporizerJointChain(moby);
-    int passB = UpdateBoltTrailSample(moby);
-    int recordCount = UpdateVaporizerTimedRecords((int *)moby);
+    int chainActive = vaporizer_update_joint_chain(moby);
+    int passB = vaporizer_bolt_update_trail_sample(moby);
+    int recordCount = vaporizer_update_timed_records((int *)moby);
 
     if (chainActive == 0 && passB == 0 && recordCount == 0) {
         if (*(unsigned char *)(moby + 0x20) == 2) {
             func_0029F338_1(moby);
         }
     } else {
-        ref_L00_003F5660_00(DrawVaporizerEffects, moby);
+        ref_L00_003F5660_00(vaporizer_draw_effects, moby);
     }
 }
 
 /* Reads the short at +26 of the object held at +104, calls a callee with (3076, that short), then calls one callee with this when the result is zero or three callees with this when it is non-zero. */
 /* Draws the Vaporizer effects, or removes the object if its table entry is gone. */
-void func_L00_003F56F0(char *moby)
+void vaporizer_draw_effects(char *moby)
 {
-    if (IsSavedRecordValue(3076 /* Vaporizer */, *(short *)(*(int *)(moby + 104) + 26)) == 0)
+    if (save_is_record_value(3076 /* Vaporizer */, *(short *)(*(int *)(moby + 104) + 26)) == 0)
         func_0029F338_1(moby);
     else {
         RenderTwoLayerEffectStrip(moby);
-        DrawBoltBeamRings(moby);
-        DrawBoltSparks(moby);
+        vaporizer_bolt_draw_beam_rings(moby);
+        vaporizer_bolt_draw_sparks(moby);
     }
 }
 
@@ -966,7 +966,7 @@ void func_L00_003F56F0(char *moby)
 
 /* Walks 120 records of 64 bytes from a base resolved through two descriptor lookups; for each live record it calls an update helper and, when that reports zero, counts it and advances a float pair by one step, clearing the record's live flag otherwise. */
 /* Updates up to 120 timed records of the Vaporizer and returns how many are still running. */
-int func_L00_003F6A58(int *moby)
+int vaporizer_update_timed_records(int *moby)
 {
     int i;
     int count = 0;
@@ -975,8 +975,8 @@ int func_L00_003F6A58(int *moby)
     char *timer;
 
     entry = *(char **)((char *)moby + 104);
-    base = GetSlotBody(3076 /* Vaporizer */, *(short *)(entry + 26));
-    base = base + *(int *)(GetSlotHeader(3076 /* Vaporizer */, *(short *)(entry + 26)) + 4);
+    base = level_get_slot_body(3076 /* Vaporizer */, *(short *)(entry + 26));
+    base = base + *(int *)(level_get_slot_header(3076 /* Vaporizer */, *(short *)(entry + 26)) + 4);
     timer = base + 16;
     entry = base;
 
@@ -996,29 +996,29 @@ int func_L00_003F6A58(int *moby)
 }
 
 
-extern void func_002AD0E0(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5);
+extern void moby_transform_point_and_rotation_by_parent(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5);
 
-extern void func_0029F338(char *a0);
+extern void moby_mark_spawned(char *a0);
 
-extern int func_00282978(char *a0);
+extern int FastDecTimer(char *a0);
 
 extern void ref_L00_003F71E8_01(void *p, char *obj);
 
 extern void ref_L00_003F71E8_00(void);
 
 /* Moves an object along with its target and removes it when its timer has run out. */
-void func_L00_003F71E8(char *moby)
+void follow_target_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
     if (*(char **)(vars + 0x3C) != 0) {
-        TransformPointAndRotationByParent(moby, *(char **)(vars + 0x3C), moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
+        moby_transform_point_and_rotation_by_parent(moby, *(char **)(vars + 0x3C), moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
     }
     if (FastDecTimer(vars) == 0) {
         FastDecTimer(vars + 4);
         ref_L00_003F71E8_01((void *)ref_L00_003F71E8_00, moby);
     } else {
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
     }
 }
 
@@ -1027,7 +1027,7 @@ void func_L00_003F71E8(char *moby)
    moved along the camera direction, then redraws it with texture -1 and UVs projected to the
    screen (from points pulled 20% towards the quad's centre when mode is set), jittered and
    clamped to [0, 1]. */
-void func_L00_003F8280(Vector *position, float size, float offset, float roll,
+void gfx_draw_flash_quad(Vector *position, float size, float offset, float roll,
                        float unused, float jitter, int texture, int mode)
 {
     RenderPacket packet;
@@ -1043,7 +1043,7 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    InitQuadPacketState(&packet, texture, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -1108,10 +1108,10 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
             FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
             FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -1122,10 +1122,10 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (RandomIntBelow(1) == 0) {
-                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
-                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
+            gfx_world_to_screen_unit((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (math_random_int_below(1) == 0) {
+                packet.uv[i][0] += math_random_float_range(-jitter, jitter);
+                packet.uv[i][1] += math_random_float_range(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -1133,7 +1133,7 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    InitQuadPacketState(&packet, -1, 1, 0x80);
+    gfx_init_quad_packet_state(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
     VU1_addGSregister(0x47, 0x33001ULL);
     draw_world_quad((char *)&packet, 0, 0);
@@ -1144,7 +1144,7 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
 
 /* Same body as 23626ad829daa908 with the node field 4 bytes earlier: calls a helper with a referenced node and three identity bytes, then copies them into a linked record guarded by a flag bit and a non-zero leading short. */
 /* Copies three color bytes of the object into the record linked to it, if that record is in use. */
-void func_L00_003F89F8(Obj_Fe48725c6 *link)
+void part_copy_color_to_linked_record(Obj_Fe48725c6 *link)
 {
     Node24_Fe48725c6 *node;
     Node16_Fe48725c6 *entry;

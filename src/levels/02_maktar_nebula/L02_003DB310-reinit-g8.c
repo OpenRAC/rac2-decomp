@@ -2,27 +2,27 @@
 typedef int Quad __attribute__((mode(TI)));
 /* Position window; complete surrounding storage extent is unknown. */
 extern char D_L02_001B03F0[] SDATA(D_L02_001B03F0);
-extern char *D_L02_001B359C;
+extern char *g_moby_l02_pool;
 typedef struct { char pad[0x80]; float x, y; } HeroPosition;
-extern HeroPosition D_00189E20;
-extern char *func_0029EFD0(int);
+extern HeroPosition g_hero_state;
+extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00283248(float, float);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float mat_fast_helper_a(float, float);
 extern void func_002A05A8(void *);
 extern void func_002A10E8(void *);
-extern void func_00282A60(void *, int, int);
-extern void func_0029F978(void *, int, void *);
-extern void func_002A7750(void *, int, int);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern void func_002A0488(void *, int, int, int);
+extern void mem_clear(void *, int, int);
+extern void AttachManipulator(void *, int, void *);
+extern void moby_set_state(void *, int, int);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern void set_moby_color(void *, int, int, int);
 #define PRIVATE (*(char **)(actor + 0x68))
 #define ATTACHMENT (*(char **)(PRIVATE + 0x260))
 #define CHILD (D_L02_001B359C + *(int *)(PRIVATE + 0x244) * 0x100)
 typedef struct { char pad[0x34]; unsigned short flags; char pad36[0xC2]; float heading; } ActorFlags;
 /* Reinitializes an actor and its child, attaching the three active effect slots. */
-void func_L02_003DB310(char *actor, int useAltState) {
+void ReinitializeActorAndChild(char *actor, int useAltState) {
     char *state = PRIVATE;
     Quad jointMatrix[4];
     int hitPoints;
@@ -48,10 +48,10 @@ void func_L02_003DB310(char *actor, int useAltState) {
         ((ActorFlags *)ATTACHMENT)->flags &= 0xFFFE;
         *(unsigned char *)(ATTACHMENT + 0x31) = 1;
     }
-    TransformMobyJointPoint(actor, 0, jointMatrix);
+    moby_transform_joint_point(actor, 0, jointMatrix);
     qcopy(CHILD + 0x10, &jointMatrix[3]);
-    *(float *)(actor + 0xF8) = FastMatrixHelperA(gHeroState.x - *(float *)(actor + 0x10), gHeroState.y - *(float *)(actor + 0x14));
-    ((ActorFlags *)CHILD)->heading = FastMatrixHelperA(gHeroState.x - *(float *)(actor + 0x10), gHeroState.y - *(float *)(actor + 0x14));
+    *(float *)(actor + 0xF8) = mat_fast_helper_a(g_hero_state.x - *(float *)(actor + 0x10), g_hero_state.y - *(float *)(actor + 0x14));
+    ((ActorFlags *)CHILD)->heading = mat_fast_helper_a(g_hero_state.x - *(float *)(actor + 0x10), g_hero_state.y - *(float *)(actor + 0x14));
     func_002A05A8(CHILD);
     func_002A0F48(CHILD);
     func_002A10E8(CHILD);
@@ -59,22 +59,22 @@ void func_L02_003DB310(char *actor, int useAltState) {
     *(unsigned char *)(CHILD + 0x31) = 1;
     *(int *)(CHILD + 0x98) = *(int *)(*(char **)(CHILD + 0x24) + 0x10);
     if (*(unsigned char *)(state + 0x171) == 0) {
-        ClearMemory(state + 0x170, 0, 0x40);
+        mem_clear(state + 0x170, 0, 0x40);
         AttachManipulator(CHILD, 2, state + 0x170);
     }
     if (*(unsigned char *)(state + 0x1B1) == 0) {
-        ClearMemory(state + 0x1B0, 0, 0x40);
+        mem_clear(state + 0x1B0, 0, 0x40);
         AttachManipulator(CHILD, 3, state + 0x1B0);
     }
     if (*(unsigned char *)(state + 0x1F1) == 0) {
-        ClearMemory(state + 0x1F0, 0, 0x40);
+        mem_clear(state + 0x1F0, 0, 0x40);
         AttachManipulator(CHILD, 4, state + 0x1F0);
     }
     if (useAltState == 0) {
-        SetMobyState(actor, 2, 0);
+        moby_set_state(actor, 2, 0);
         *(int *)(state + 0x264) = 0;
-    } else SetMobyState(actor, 4, 0);
-    *(short *)(state + 0x288) = FloatToInt(RandomFloatRange(600.0f, 1200.0f));
+    } else moby_set_state(actor, 4, 0);
+    *(short *)(state + 0x288) = FloatToInt(math_random_float_range(600.0f, 1200.0f));
     *(short *)(state + 0x280) = 0;
     *(short *)(state + 0x282) = 0;
     if (*(short *)(state + 0x140) != 0) {

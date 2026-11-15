@@ -5,7 +5,7 @@
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 #define H(p, o) (*(u16 *)((char *)(p) + (o)))
-extern char *D_L06_001FE500[];
+extern char *g_path_list[];
 typedef struct {
     char pad[0x1F0];
     u16 moveFlags;
@@ -18,30 +18,30 @@ typedef struct {
     char pad22A0[0x15];
     u8 flag;
 } HeroState;
-extern HeroState D_00189E20;
-extern s32 D_001A79F0;
+extern HeroState g_hero_state;
+extern s32 g_current_map_index;
 extern float D_L06_001B0090 __attribute__((sda));
 extern float D_L06_001B9858 NOT_SDA;
-extern s32 func_00283CF0(float);
-extern void func_0029F338(void *);
-extern s32 func_002A77E0(s32);
+extern s32 FloatToInt(float);
+extern void moby_mark_spawned(void *);
+extern s32 math_random_int_below(s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
-extern float func_00283248(float, float);
-extern float func_002AAA00(float *, float, float, float, float, float *, s32);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern s32 func_00282948(s32 *);
-extern float func_00282C48(float);
-extern s32 func_002ACBC8(void *, s32);
-extern float func_00283B98(float,float);
-extern void func_002833F0(void *,void *);
-extern s32 func_002E5CF8(s32,s32,void *);
+extern float mat_fast_helper_a(float, float);
+extern float math_approach_target_with_direction_mode(float *, float, float, float, float, float *, s32);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern s32 math_fast_float_d(s32 *);
+extern float math_fabs(float);
+extern s32 IsPointInCuboid(void *, s32);
+extern float FastAddRotations(float,float);
+extern void euler_rotation_basis(void *,void *);
+extern s32 PlayMobySound(s32,s32,void *);
 extern void func_PAL_L06_00407B38(void *,void *);
 extern void func_PAL_L00_002B9CD8(void *,void *,s32,s32);
-extern s32 func_002A8AF0(void *,void *,s32);
-extern s32 func_002B3868(void *);
+extern s32 point_in_path_xy(void *,void *,s32);
+extern s32 flag_set_first_pending(void *);
 extern void func_PAL_L00_002B3000(void);
 typedef struct {
     char p0[0x48];
@@ -74,8 +74,8 @@ void func_PAL_L09_003C4454(char *obj)
     switch (state) {
     case 0:
         if (data->active) {
-            data->timerA = func_00283CF0(15.0f);
-            data->timerB = func_00283CF0(12.0f);
+            data->timerA = FloatToInt(15.0f);
+            data->timerB = FloatToInt(12.0f);
             B(obj,0x20) = 2;
             {
                 float height = F(obj,0x18);
@@ -86,63 +86,63 @@ void func_PAL_L09_003C4454(char *obj)
             }
         } else {
             if (data->path == -1) {
-                func_0029F338(obj);
+                moby_mark_spawned(obj);
                 return;
             }
-            data->point = func_002A77E0(I(D_L06_001FE500[data->path],0));
+            data->point = math_random_int_below(I(g_path_list[data->path],0));
             data->timeout = 500;
             if (B(obj,0x43) != 1) func_PAL_002A7E68(obj,1,0,8);
-            F(obj,0x18) = F(D_L06_001FE500[data->path],0x18) - D_L06_001B0090;
+            F(obj,0x18) = F(g_path_list[data->path],0x18) - D_L06_001B0090;
             data->pathZ = F(obj,0x18);
             B(obj,0x20) = 1;
         }
         break;
     case 1:
-        qcopy(pos,D_L06_001FE500[data->path] + 0x10 + data->point*16);
-        func_002AAA00((float *)(obj+0xF8),func_00283248(pos[0]-F(obj,0x10),pos[1]-F(obj,0x14)),0.0012566373f,0.0012566373f,0.062831864f,&data->turn,0);
-        func_00282F20(step,obj+0xC0,0.060000002f);
-        func_00282CC0(obj+0x10,obj+0x10,step);
-        if (func_00282E48(obj+0x10,pos)<3.0f || func_00282948(&data->timeout)) {
-            data->point = (data->point+func_002A77E0(I(D_L06_001FE500[data->path],0))) % I(D_L06_001FE500[data->path],0);
+        qcopy(pos,g_path_list[data->path] + 0x10 + data->point*16);
+        math_approach_target_with_direction_mode((float *)(obj+0xF8),mat_fast_helper_a(pos[0]-F(obj,0x10),pos[1]-F(obj,0x14)),0.0012566373f,0.0012566373f,0.062831864f,&data->turn,0);
+        vec_scale_to_length(step,obj+0xC0,0.060000002f);
+        FastVecAdd(obj+0x10,obj+0x10,step);
+        if (fast_vec_dist(obj+0x10,pos)<3.0f || math_fast_float_d(&data->timeout)) {
+            data->point = (data->point+math_random_int_below(I(g_path_list[data->path],0))) % I(g_path_list[data->path],0);
             data->timeout = 500;
         }
         break;
     case 2:
-        func_00282948(&data->wait);
-        if (func_00282C48(D_00189E20.height-data->homeZ)<0.8f && D_00189E20.action==18 && !func_002ACBC8((char *)&D_00189E20+0x80,data->range)) {
+        math_fast_float_d(&data->wait);
+        if (math_fabs(g_hero_state.height-data->homeZ)<0.8f && g_hero_state.action==18 && !IsPointInCuboid((char *)&g_hero_state+0x80,data->range)) {
             if (data->wait == 0) {
                 F(obj,0xF4) = -1.5533431768417358f;
-                F(obj,0xF8) = func_00283B98(D_L06_001B9858,1.5707964897155762f);
-                func_002833F0(obj+0xC0,obj+0xF0);
-                qcopy(obj+0x10,(char *)&D_00189E20+0x80);
-                func_00282F20(pos,obj+0xE0,D_L06_001B0090);
-                func_00282CF0(obj+0x10,obj+0x10,pos);
+                F(obj,0xF8) = FastAddRotations(D_L06_001B9858,1.5707964897155762f);
+                euler_rotation_basis(obj+0xC0,obj+0xF0);
+                qcopy(obj+0x10,(char *)&g_hero_state+0x80);
+                vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+                FastVecSub(obj+0x10,obj+0x10,pos);
                 data->speed = 0.16000001f;
                 H(obj,0x34) &= 0xFFFE;
-                func_002E5CF8(1,0,obj);
+                PlayMobySound(1,0,obj);
                 if (B(obj,0x43) != 2) func_PAL_002A7E68(obj,2,10,4);
                 B(obj,0x20) = 3;
-                qcopy(step,(char *)&D_00189E20+0x80);
-                step[2] = D_00189E20.height;
+                qcopy(step,(char *)&g_hero_state+0x80);
+                step[2] = g_hero_state.height;
                 func_PAL_L06_00407B38(obj,step);
-                func_PAL_L00_002B9CD8((char *)&D_00189E20+0x80,(char *)&D_00189E20+0x90,111,0);
-                D_00189E20.flag = 1;
+                func_PAL_L00_002B9CD8((char *)&g_hero_state+0x80,(char *)&g_hero_state+0x90,111,0);
+                g_hero_state.flag = 1;
             }
-        } else if (D_00189E20.mode!=18) {
-            if (func_002A8AF0((char *)&D_00189E20+0x80,D_L06_001FE500[data->path]+0x10,I(D_L06_001FE500[data->path],0))) data->wait=((s32)(data->insideWait) * 5 + 2) / 6;
+        } else if (g_hero_state.mode!=18) {
+            if (point_in_path_xy((char *)&g_hero_state+0x80,g_path_list[data->path]+0x10,I(g_path_list[data->path],0))) data->wait=((s32)(data->insideWait) * 5 + 2) / 6;
             else data->wait=((s32)(data->outsideWait) * 5 + 2) / 6;
         }
         break;
     case 3:
-        if (func_002B3868(obj)) func_002E5CF8(1,0,obj);
-        qzero_nc((char *)&D_00189E20+0xF0);
-        qzero_nc((char *)&D_00189E20+0x110);
-        qzero_nc((char *)&D_00189E20+0x120);
-        qzero_nc((char *)&D_00189E20+0x130);
-        D_00189E20.moveFlags = 3;
-        D_00189E20.flag = 1;
+        if (flag_set_first_pending(obj)) PlayMobySound(1,0,obj);
+        qzero_nc((char *)&g_hero_state+0xF0);
+        qzero_nc((char *)&g_hero_state+0x110);
+        qzero_nc((char *)&g_hero_state+0x120);
+        qzero_nc((char *)&g_hero_state+0x130);
+        g_hero_state.moveFlags = 3;
+        g_hero_state.flag = 1;
         {
-            s32 level = D_001A79F0;
+            s32 level = g_current_map_index;
             F(obj,0x18) += data->speed;
             if (level != 9)
                 data->speed -= 0.004f;
@@ -150,16 +150,16 @@ void func_PAL_L09_003C4454(char *obj)
                 data->speed -= 0.008f;
         }
         if (data->speed<0.040000003f) {
-            func_00282F20(pos,obj+0xE0,D_L06_001B0090);
-            func_002AAA00((float *)(obj+0xF4),1.5533431768417358f,0.005026549f,0.005026549f,0.5026549f,&data->turn,0);
-            func_002833F0(obj+0xC0,obj+0xF0);
-            func_00282F20(step,obj+0xE0,D_L06_001B0090);
-            func_00282CF0(delta,step,pos);
-            func_00282CF0(obj+0x10,obj+0x10,delta);
+            vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+            math_approach_target_with_direction_mode((float *)(obj+0xF4),1.5533431768417358f,0.005026549f,0.005026549f,0.5026549f,&data->turn,0);
+            euler_rotation_basis(obj+0xC0,obj+0xF0);
+            vec_scale_to_length(step,obj+0xE0,D_L06_001B0090);
+            FastVecSub(delta,step,pos);
+            FastVecSub(obj+0x10,obj+0x10,delta);
         }
-        if (data->speed<0.0f && F(obj,0x18)<D_00189E20.height) {
-            qcopy_nc(pos,(char *)&D_00189E20+0x80);
-            pos[2]=D_00189E20.height;
+        if (data->speed<0.0f && F(obj,0x18)<g_hero_state.height) {
+            qcopy_nc(pos,(char *)&g_hero_state+0x80);
+            pos[2]=g_hero_state.height;
             func_PAL_L06_00407B38(obj,pos);
         }
         if (data->speed<0.0f && F(obj,0x18)<data->homeZ) func_PAL_L00_002B3000();

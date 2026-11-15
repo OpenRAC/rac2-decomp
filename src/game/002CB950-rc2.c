@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -36,13 +37,13 @@ extern struct S18A000 D_0018A000;
 extern s32 D_001AA420;
 extern s32 D_001AA428;
 extern s8 D_0025BA90[];
-extern void func_0028B338(s32);
-extern void func_002B49C0(s32);
-extern s32 func_002B49E0(s32, s32, s32, s32, s32);
-extern s32 func_002D5B38(s32, s8 *);
+extern void select_moby_context(s32);
+extern void request_set_setting_b(s32);
+extern s32 request_begin_slot(s32, s32, s32, s32, s32);
+extern s32 menu_send_request(s32, s8 *);
 
 /* Handles one of five menu commands by number. Some call an optional callback, others open a sub screen. */
-s32 func_002CB950(s32 command) {
+s32 menu_handle_command(s32 command) {
     s32 result;
 
     result = 0;
@@ -75,11 +76,11 @@ goto *D_0026CCE0[rc2_selector];
         }
         goto rc2_switch_end;
     rc2_case_3:
-        result = SendMenuRequest(3, D_0025BA90);
+        result = menu_send_request(3, D_0025BA90);
         goto rc2_switch_end;
     rc2_case_4:
-        if (BeginSlotRequest(4, 2, 8, 4, 0) == 0) {
-            SetRequestSettingB(3);
+        if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
+            request_set_setting_b(3);
             result = 1;
         }
         goto rc2_switch_end;

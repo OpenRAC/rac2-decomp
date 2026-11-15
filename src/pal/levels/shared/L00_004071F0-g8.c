@@ -1,24 +1,25 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int *D_L00_001B0DB0 __attribute__((sda));
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_00138324 __attribute__((nosda));
 extern int D_L00_001A8F00;
 extern int D_L00_001A8F08;
 extern int D_L00_001A8FF4;
-extern void func_0029FCC0(void *obj, int a, void *out);
-extern void func_002FDF40(void *out, void *pos, int a, int b, float c, float d, float e, float f);
+extern void moby_transform_joint_to_world(void *obj, int a, void *out);
+extern void CalculateAimedLaunchVelocity(void *out, void *pos, int a, int b, float c, float d, float e, float f);
 extern int func_PAL_002FF5F8(void *a, void *b, void *c, void *d, void *e, void *f, void *g, float h);
-extern int func_00300540(int surface);
-extern void func_002FE8D8(void *a, void *b);
-extern float func_00282DB0(void *a, void *b);
-extern int func_00282948(void *timer);
-extern int func_L00_002D3F30(int a, int b);
-extern int func_002B0CE0(int a, int b, int c);
+extern int weapon_get_group(int surface);
+extern void moby_get_facing_direction(void *a, void *b);
+extern float FastVecDot(void *a, void *b);
+extern int math_fast_float_d(void *timer);
+extern int weapon_spend_ammo(int a, int b);
+extern int ForceClaimNotice(int a, int b, int c);
 extern void func_PAL_L00_002AF458(void);
-extern int func_002E5CF8(int a, int b, void *obj);
+extern int PlayMobySound(int a, int b, void *obj);
 extern void func_PAL_L00_002AF6C0(void);
-extern char *func_L00_004005B0(void *pos, void *offset);
+extern char *spider_bot_create(void *pos, void *offset);
 extern void ref_L00_004029E8_00(void (*f)(char *), char *arg);
 extern void func_PAL_L00_00407728(char *arg);
 
@@ -35,17 +36,17 @@ void func_PAL_L00_00407338(char *obj)
     char *ctx = *(char **)(obj + 104);
 
     {
-        char *player = D_00189E20;
+        char *player = g_hero_state;
 
         if (*(int *)(player + 0x1244) == 3)
             D_L00_001B0DB0 = 0;
-        func_0029FCC0(obj, 0, pos);
+        moby_transform_joint_to_world(obj, 0, pos);
         *(int *)(ctx + 44) = 0;
-        func_002FDF40(offset, pos, 0, 0, 1.6f, *(int *)(player + 0x2294) == 29 ? 11.0f : 4.5f,
+        CalculateAimedLaunchVelocity(offset, pos, 0, 0, 1.6f, *(int *)(player + 0x2294) == 29 ? 11.0f : 4.5f,
                       0.16000001f, 0.0044f);
     }
     *(int *)(ctx + 36) = func_PAL_002FF5F8(pos, offset, ctx, ctx + 16, obj, &hit, &surface, 0.0044f);
-    blocked = func_00300540(surface);
+    blocked = weapon_get_group(surface);
     if (D_L00_001A8F00 != 0 || D_L00_001A8F08 != -2)
         *(int *)(ctx + 44) = 1;
     if (D_L00_001A8FF4 != 0 && *(float *)(ctx + 8) < 462.43f)
@@ -53,7 +54,7 @@ void func_PAL_L00_00407338(char *obj)
     if (blocked || *(int *)(ctx + 36) == 0 || *(int *)(ctx + 40) == 0) {
         *(int *)(ctx + 44) = 1;
     } else {
-        char *player = D_00189E20;
+        char *player = g_hero_state;
         int state = *(int *)(player + 0x2294);
         char *attached;
 
@@ -65,17 +66,17 @@ void func_PAL_L00_00407338(char *obj)
                    || (hit != 0 && (*(short *)(hit + 170) == 0xB21 || *(short *)(hit + 170) == 0xB5B))) {
             *(int *)(ctx + 44) = 1;
         } else {
-            func_002FE8D8(ctx, normal);
-            if (func_00282DB0(ctx + 16, normal) < 0.75f)
+            moby_get_facing_direction(ctx, normal);
+            if (FastVecDot(ctx + 16, normal) < 0.75f)
                 *(int *)(ctx + 44) = 1;
         }
     }
     {
-        char *player = D_00189E20;
+        char *player = g_hero_state;
 
         ready = 1;
         if (*(int *)(player + 0x2294) == 29) {
-            if (!func_00282948(player + 0x2534))
+            if (!math_fast_float_d(player + 0x2534))
                 ready = 0;
         } else {
             *(int *)(player + 0x2534) = 33;
@@ -88,26 +89,26 @@ void func_PAL_L00_00407338(char *obj)
         *(int *)(ctx + 40) = 1;
         *(int *)(ctx + 36) = 0;
     case 1: {
-        char *player = D_00189E20;
+        char *player = g_hero_state;
 
         if ((D_00138324 & *(int *)(player + 0x1230)) && ready && !*(unsigned char *)(player + 0x22BC)
             && !*(int *)(ctx + 44)) {
-            if (func_L00_002D3F30(-1, 1)) {
+            if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(player + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
+                ForceClaimNotice(6, 0, 1);
                 func_PAL_L00_002AF458();
                 obj[32] = 2;
                 *(int *)(ctx + 32) = 10;
                 *(int *)(ctx + 40) = 0;
             } else {
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
             }
         }
         break;
     }
     case 2:
-        if (func_00282948(ctx + 32)) {
-            char *spawn = func_L00_004005B0(pos, offset);
+        if (math_fast_float_d(ctx + 32)) {
+            char *spawn = spider_bot_create(pos, offset);
 
             *(char **)(spawn + 184) = obj;
             func_PAL_L00_002AF6C0();
@@ -116,7 +117,7 @@ void func_PAL_L00_00407338(char *obj)
         }
         break;
     case 3:
-        if (func_00282948(ctx + 32))
+        if (math_fast_float_d(ctx + 32))
             obj[32] = 1;
         break;
     }
@@ -124,8 +125,8 @@ void func_PAL_L00_00407338(char *obj)
 }
 
 #include "common.h"
-extern int D_L00_001B043C __attribute__((sda));
-extern void func_L00_00402DB8(void);
+extern int g_spider_bot_moby __attribute__((sda));
+extern void linked_object_activate_data(void);
 extern int D_PAL_001B0CD0 __attribute__((sda));
 
 /* Writes the object's state byte (7 when arg0 is zero, 5 otherwise), lets the shared
@@ -143,7 +144,7 @@ void func_PAL_L00_004071F0(int arg0, int arg1)
         p[0x20] = 5;
     else
         p[0x20] = 7;
-    func_L00_00402DB8();
+    linked_object_activate_data();
     if (a != -1)
         *(int *)(q + 0x60) = ((s32)(a) * 5 + 2) / 6;
     else

@@ -24,9 +24,9 @@ extern MobListStruct ref_L04_0031D630_00;
 
 extern int D_PAL_001A7A78 MACRO_ADDR;
 
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *mob);
-extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
+extern void math_store_angle_update_result(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 /* Walks the list of mobs: the ones of type 0xE29 get the 0x800 flag, the ones of type
    0xD54 are handed to func_PAL_002E7270, and the ones of type 0xFA0 with a 0x68 pointer
@@ -34,7 +34,7 @@ extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 void func_PAL_L04_0031F198(void) {
     s32 i;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < ref_L04_0031D630_00.count; i++) {
         MobListStruct *list = &ref_L04_0031D630_00;
         MobStruct *mob = (MobStruct *)*(list->mobs + i);
@@ -46,7 +46,7 @@ void func_PAL_L04_0031F198(void) {
             func_PAL_002E7270(mob);
         }
         if (mob != 0 && mob->type == 0xFA0 && D_PAL_001A7A78 != 0x33 && mob->p68 != 0) {
-            func_L00_00326048(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.07330384f);
+            math_store_angle_update_result(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
 }

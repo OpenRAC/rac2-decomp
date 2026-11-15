@@ -3,6 +3,7 @@
  * 16-byte tail (FUNCTION_ENTRY_OFFSETS); the word at 05:0029D4F0 points there.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -15,7 +16,7 @@ extern int * volatile D_L05_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L05_001C9CA0;
 
 /* Fills the level's menu list from the global item list and sets the highlighted row to the currently selected item. */
-int func_L05_00367340(char *obj) {
+int menu_fill_item_list(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

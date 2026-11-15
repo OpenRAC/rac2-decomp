@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern float func_00283B98(float, float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern float FastAddRotations(float, float);
 
 /* The record's state byte is a small switch, not an if/else chain: the retail
    compares it against 0 and 1 in turn and falls straight out for anything else.
@@ -13,18 +13,18 @@ extern float func_00283B98(float, float);
 void func_PAL_L09_003E75E8(unsigned char *a0) {
     switch (a0[0x20]) {
     case 0:
-        a0[0xBC] = func_002A7820(0x96, 0xC8);
-        if (func_002A77E0(2) != 0) {
+        a0[0xBC] = math_random_int_range(0x96, 0xC8);
+        if (math_random_int_below(2) != 0) {
             a0[0x95] = 1;
         }
         a0[0x20] = 1;
         break;
     case 1:
         if (a0[0x95] != 0) {
-            *(float *)(a0 + 0xF4) = func_00283B98(
+            *(float *)(a0 + 0xF4) = FastAddRotations(
                 *(float *)(a0 + 0xF4), -((float)a0[0xBC] * 0.0003490659f));
         } else {
-            *(float *)(a0 + 0xF4) = func_00283B98(
+            *(float *)(a0 + 0xF4) = FastAddRotations(
                 *(float *)(a0 + 0xF4), (float)a0[0xBC] * 0.0003490659f);
         }
         break;

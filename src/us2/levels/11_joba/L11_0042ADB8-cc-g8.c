@@ -1,51 +1,52 @@
+#include "names.h"
 /* func_US2_L11_0042ADB8, the USA v2.00 copy of func_L11_004295A0: the same C, where the first pass counts
    the object only while D_US2_001A9050 is clear, attacker class 0xED8 also leaves D_L11_001AED00 alone, and
    the loop pointer `ids` is declared in its own block; func_002A6C58 becomes func_US2_002A7AA8. */
 #include "common.h"
 
-extern void *D_L11_001FC420[];
+extern void *g_group_id_lists[];
 
 /* Reached with `lw $a2,0x462C($gp)`, so this unit is built -G8. */
-extern u8 *D_L11_001B359C;
+extern u8 *g_moby_l11_table;
 
 extern s32 D_L11_001AED04;
 extern s32 D_US2_001A9050;
-extern f32 func_002A89A8(void *, s32, f32);
-extern s32 func_00283CF0(f32);
-extern s32 func_L02_0032E508(void *, s32, void *, s32);
-extern void func_0026FEB8(void *, ...);
+extern f32 coll_probe_ground_height_below(void *, s32, f32);
+extern s32 FloatToInt(f32);
+extern s32 path_build_route_nodes(void *, s32, void *, s32);
+extern void STUB_printf(void *, ...);
 extern char D_L11_001B1008[];
-extern f32 func_002A78D8(f32, f32);
-extern s32 func_002A77E0(s32);
-extern void func_L00_003294F0(void *, s32);
+extern f32 math_random_signed_float_range(f32, f32);
+extern s32 math_random_int_below(s32);
+extern void moby_set_flag_bit(void *, s32);
 /* Void: no direct call reads $v0, and a void definition matches every place. */
-extern void func_002B60B0(void *, f32, f32, f32, f32);
+extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 
 extern char D_L11_002BADF8[];
 extern char D_L11_001BA8C0[];
 extern s32 D_L11_001AED00, D_L11_001B35B8, D_L11_001B30C8;
-extern u8 *func_0029EFD0(s32);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, s32, s32);
-extern void func_002A7470(void *, s32, s32, s32);
+extern u8 *CreateMoby(s32);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, s32, s32);
+extern void anim_start_blended(void *, s32, s32, s32);
 extern void func_002A0F48(void *);
-extern void func_002AF1D0(void *, void *, s32, s32);
-extern f32 func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_0029FC20(void *, s32, void *);
-extern void func_0029FCC0(void *, s32, void *);
+extern void moby_copy_joint_transform_to_object(void *, void *, s32, s32);
+extern f32 fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void moby_transform_joint_point(void *, s32, void *);
+extern void moby_transform_joint_to_world(void *, s32, void *);
 extern void func_002A05A8(void *);
-extern void func_00283678(void *, void *);
-extern void func_002ACEC0(void *, void *, void *, f32);
-extern void func_002AB028(void *);
+extern void copy_matrix3x4(void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, f32);
+extern void mat_normalize_columns(void *);
 extern void func_002A10E8(void *);
-extern void func_002AC728(void *, void *, f32, f32, s32);
-extern s32 func_002B0ED8(void *, void *, s32);
-extern void func_L11_0042A5B0(void *, s32);
-extern void func_002AB800(void *, void *);
-extern void func_L11_0042A4C8(void *);
-extern s32 func_002A8508(s32, s32);
-extern s32 func_002B3670(void *, void *, s32, s32, f32, f32, s32);
+extern void part_spawn_explosion_with_sparks(void *, void *, f32, f32, s32);
+extern s32 moby_apply_damage_to_object(void *, void *, s32);
+extern void part_l11_spawn_paired_sparks(void *, s32);
+extern void gfx_start_color_fade(void *, void *);
+extern void MarkGroupClassCF5CF6Members(void *);
+extern s32 moby_count_group_not_in_state(s32, s32);
+extern s32 hero_check_distance_zones(void *, void *, s32, s32, f32, f32, s32);
 extern void func_US2_002A7AA8(void *, s32, s32);
 
 /* Initializes linked objects, updates damage, and releases children on removal. */
@@ -58,23 +59,23 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
         if (D_US2_001A9050 == 0) D_L11_001AED04++;
         *(s32 *)(data + 0x5B0) = 0;
         *(void **)(data + 0x18) = data + 0x140;
-        *(f32 *)(object + 0x18) = func_002A89A8(object + 0x10, 0, 0.5f);
+        *(f32 *)(object + 0x18) = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         *(s32 *)(data + 0x554) = 0;
         *(s32 *)(data + 0x560) = 0;
         *(s32 *)(data + 0x568) = 0;
-        data[0x48] = func_00283CF0(20.0f);
-        data[0x4A] = func_00283CF0(14.0f);
+        data[0x48] = FloatToInt(20.0f);
+        data[0x4A] = FloatToInt(14.0f);
         if (*(s32 *)(data + 0x528)) {
-            *(s32 *)(data + 0x520) = func_L02_0032E508(object, *(s32 *)(data + 0x524), data + 0x320, 16);
-            func_0026FEB8(D_L11_001B1008, *(s32 *)(data + 0x520));
+            *(s32 *)(data + 0x520) = path_build_route_nodes(object, *(s32 *)(data + 0x524), data + 0x320, 16);
+            STUB_printf(D_L11_001B1008, *(s32 *)(data + 0x520));
         }
         if (*(f32 *)(data + 0x298) == 0.0f)
-            *(f32 *)(data + 0x298) = func_002A78D8(15.0f, 25.0f) * 0.01745329424738884f;
+            *(f32 *)(data + 0x298) = math_random_signed_float_range(15.0f, 25.0f) * 0.01745329424738884f;
         else
             *(f32 *)(data + 0x298) *= 0.01745329424738884f;
-        if (func_002A77E0(2) == 1) {
+        if (math_random_int_below(2) == 1) {
             *(u16 *)(object + 0x34) |= 0x8000;
-            func_L00_003294F0(object, 1);
+            moby_set_flag_bit(object, 1);
         }
         data[0x70] = 31;
         *(s32 *)(data + 0xA8) = 4;
@@ -111,63 +112,63 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
         *(f32 *)(data + 0x16C) = 0.00138888892f;
         *(f32 *)(data + 0x170) = 1.483530044555664f;
         *(f32 *)(data + 0x174) = 1.5f;
-        func_002B60B0(object, 0.00152777787f, 0.0458333343f, 0.00116355298f, 0.104719773f);
+        moby_set_controller_speed_limits(object, 0.00152777787f, 0.0458333343f, 0.00116355298f, 0.104719773f);
         data[0x28] = 3;
         data[0x29] = 1;
         *(f32 *)(data + 0x30) = 0.75f;
         *(f32 *)(data + 0x28C) = data[0x34];
         data[0x2E] = 1;
         if (*(s32 *)(data + 0x26C)) {
-            func_002A7750(object, 1, 5);
+            moby_set_state(object, 1, 5);
             if (*(s32 *)(data + 0x270) != -1) {
-                *(u8 **)(data + 0x274) = D_L11_001B359C + (*(s32 *)(data + 0x270) << 8);
+                *(u8 **)(data + 0x274) = g_moby_l11_table + (*(s32 *)(data + 0x270) << 8);
                 qcopy_nc(object + 0x10, *(u8 **)(data + 0x274) + 0x10);
                 qcopy_nc(object + 0xF0, *(u8 **)(data + 0x274) + 0xF0);
                 *(s32 *)(object + 0x98) = 0;
                 *(u16 *)(object + 0x34) &= 0xAFFF;
                 *(u8 **)(*(u8 **)(*(u8 **)(data + 0x274) + 0x68) + 0x27C) = object;
-                *(u8 **)(data + 0x280) = func_0029EFD0(0x911);
+                *(u8 **)(data + 0x280) = CreateMoby(0x911);
                 if (!*(u8 **)(data + 0x280)) return 1;
                 (*(u8 **)(data + 0x280))[0x30] = object[0x30];
                 (*(u8 **)(data + 0x280))[0x31] = 0;
                 func_002A0F48(*(u8 **)(data + 0x280));
                 qcopy_nc(*(u8 **)(data + 0x280) + 0x10, object + 0x10);
                 *(f32 *)(*(u8 **)(data + 0x280) + 0x18) += 0.75f;
-                *(u8 **)(data + 0x278) = func_0029EFD0(0xFF9);
+                *(u8 **)(data + 0x278) = CreateMoby(0xFF9);
                 if (!*(u8 **)(data + 0x278)) return 1;
                 (*(u8 **)(data + 0x278))[0x30] = object[0x30];
                 *(u16 *)(*(u8 **)(data + 0x278) + 0x32) = *(u16 *)(object + 0x32);
                 (*(u8 **)(data + 0x278))[0x31] = 1;
                 *(u64 *)(*(u8 **)(data + 0x278) + 0x38) = *(u64 *)(object + 0x38);
                 func_002A0F48(*(u8 **)(data + 0x278));
-                func_002AF1D0(object, *(u8 **)(data + 0x278), 1, 0);
+                moby_copy_joint_transform_to_object(object, *(u8 **)(data + 0x278), 1, 0);
                 *(s32 *)(data + 0x290) = 0;
             } else {
-                func_0026FEB8(D_L11_002BADF8);
+                STUB_printf(D_L11_002BADF8);
                 *(s32 *)(data + 0x26C) = 0;
-                func_002A7750(object, 4, 0);
+                moby_set_state(object, 4, 0);
                 return 1;
             }
         } else {
-            func_002A7750(object, 4, 0);
-            if (object[0x43]) func_002A7470(object, 0, 0, 0);
+            moby_set_state(object, 4, 0);
+            if (object[0x43]) anim_start_blended(object, 0, 0, 0);
             if (*(s32 *)(data + 0x540) == 1) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 13) func_002A7470(object, 13, 0, 0);
+                *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
+                moby_set_state(object, 5, 0);
+                if (object[0x43] != 13) anim_start_blended(object, 13, 0, 0);
             } else if (*(s32 *)(data + 0x540) == 2) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 15) func_002A7470(object, 15, 5, 0);
+                *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
+                moby_set_state(object, 5, 0);
+                if (object[0x43] != 15) anim_start_blended(object, 15, 5, 0);
             } else if (*(s32 *)(data + 0x540) == 3) {
-                *(u8 **)(data + 0x55C) = D_L11_001B359C + (*(s32 *)(data + 0x544) << 8);
-                func_002A7750(object, 5, 0);
-                if (object[0x43] != 15) func_002A7470(object, 15, 0, 0);
+                *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
+                moby_set_state(object, 5, 0);
+                if (object[0x43] != 15) anim_start_blended(object, 15, 0, 0);
             } else if (*(s32 *)(data + 0x54C) != -1) {
-                func_002A7750(object, 11, 0);
-                if (object[0x43] != 4) func_002A7470(object, 4, 0, 0);
+                moby_set_state(object, 11, 0);
+                if (object[0x43] != 4) anim_start_blended(object, 4, 0, 0);
             }
-            *(u8 **)(data + 0x29C) = func_0029EFD0(0x9AC);
+            *(u8 **)(data + 0x29C) = CreateMoby(0x9AC);
             if (!*(u8 **)(data + 0x29C)) return 1;
             (*(u8 **)(data + 0x29C))[0x30] = object[0x30];
             *(u16 *)(*(u8 **)(data + 0x29C) + 0x32) = *(u16 *)(object + 0x32);
@@ -175,62 +176,62 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
             *(u64 *)(*(u8 **)(data + 0x29C) + 0x38) = *(u64 *)(object + 0x38);
             func_002A0F48(*(u8 **)(data + 0x29C));
             *(s32 *)(*(u8 **)(data + 0x29C) + 0x98) = 0;
-            func_002AF1D0(object, *(u8 **)(data + 0x29C), 3, 0);
-            *(u8 **)(data + 0x278) = func_0029EFD0(0xFF9);
+            moby_copy_joint_transform_to_object(object, *(u8 **)(data + 0x29C), 3, 0);
+            *(u8 **)(data + 0x278) = CreateMoby(0xFF9);
             if (!*(u8 **)(data + 0x278)) return 1;
             (*(u8 **)(data + 0x278))[0x30] = object[0x30];
             *(u16 *)(*(u8 **)(data + 0x278) + 0x32) = *(u16 *)(object + 0x32);
             (*(u8 **)(data + 0x278))[0x31] = 1;
             *(u64 *)(*(u8 **)(data + 0x278) + 0x38) = *(u64 *)(object + 0x38);
             func_002A0F48(*(u8 **)(data + 0x278));
-            func_002AF1D0(object, *(u8 **)(data + 0x278), 2, 0);
+            moby_copy_joint_transform_to_object(object, *(u8 **)(data + 0x278), 2, 0);
         }
         qcopy_nc(data + 0x110, object + 0x10);
         *(f32 *)(data + 0x120) = 1.0f;
         *(f32 *)(data + 0x12C) = 8.0f;
         *(f32 *)(data + 0x130) = 10.0f;
     }
-    if (object[0x31] && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
-        func_002A93B0(object);
+    if (object[0x31] && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        moby_update_ground_check(object);
         object[0x6F] = 22;
     }
     if (data[0x2E] == 2) {
         if (*(void **)(data + 0x29C)) {
-            func_0029F338(*(void **)(data + 0x29C));
+            moby_mark_spawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         if (*(void **)(data + 0x278)) {
-            func_0029F338(*(void **)(data + 0x278));
+            moby_mark_spawned(*(void **)(data + 0x278));
             *(void **)(data + 0x278) = 0;
         }
         if (*(void **)(data + 0x280)) {
-            func_0029F338(*(void **)(data + 0x280));
+            moby_mark_spawned(*(void **)(data + 0x280));
             *(void **)(data + 0x280) = 0;
         }
         return 1;
     }
-    if (*(void **)(data + 0x29C)) func_002AF1D0(object, *(void **)(data + 0x29C), 3, 0);
+    if (*(void **)(data + 0x29C)) moby_copy_joint_transform_to_object(object, *(void **)(data + 0x29C), 3, 0);
     if (*(u8 **)(data + 0x278)) {
-        func_0029FC20(object, 2, vectors);
+        moby_transform_joint_point(object, 2, vectors);
         qcopy_nc(*(u8 **)(data + 0x278) + 0x10, vectors + 12);
         func_002A05A8(*(void **)(data + 0x278));
         func_002A0F48(*(void **)(data + 0x278));
-        func_00283678(*(u8 **)(data + 0x278) + 0xC0, vectors);
-        func_002ACEC0(*(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xE0, 3.14159298f);
-        func_002AB028(*(u8 **)(data + 0x278) + 0xC0);
+        copy_matrix3x4(*(u8 **)(data + 0x278) + 0xC0, vectors);
+        math_apply_axis_rotation_to_quat(*(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xD0, *(u8 **)(data + 0x278) + 0xE0, 3.14159298f);
+        mat_normalize_columns(*(u8 **)(data + 0x278) + 0xC0);
         func_002A10E8(*(void **)(data + 0x278));
         *(u16 *)(*(u8 **)(data + 0x278) + 0x34) |= 6;
     }
     if (*(f32 *)(data + 0x20) <= 1.0f) {
         if (*(u8 **)(data + 0x29C)) {
-            func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-            func_0029F338(*(void **)(data + 0x29C));
+            part_spawn_explosion_with_sparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+            moby_mark_spawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         *(s32 *)(data + 0x290) = 0;
     }
     *(s32 *)(data + 0x290) = 0;
-    damage = func_002B0ED8(object, data + 0x60, 0);
+    damage = moby_apply_damage_to_object(object, data + 0x60, 0);
     if (damage) {
         u8 *attacker = *(u8 **)(data + 0x38);
         if (attacker) {
@@ -239,29 +240,29 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
                 D_L11_001AED00 = 0;
         }
         if (object[0xBC] == 1)
-            (D_L11_001B359C + (*(s32 *)(data + 0x548) << 8))[0x20] = 4;
+            (g_moby_l11_table + (*(s32 *)(data + 0x548) << 8))[0x20] = 4;
         if (*(f32 *)(object + 0x48) != 1.0f) *(f32 *)(object + 0x48) = 1.0f;
         if (*(s32 *)(data + 0x290)) {
-            func_0029FCC0(object, 3, vectors);
-            func_L11_0042A5B0(vectors, 8);
+            moby_transform_joint_to_world(object, 3, vectors);
+            part_l11_spawn_paired_sparks(vectors, 8);
         }
         if (damage == 5) {
             *(f32 *)(data + 0xF4) = 0.837758183f;
             *(s32 *)(data + 0xF0) = 0;
             if (*(u8 **)(data + 0x29C)) {
-                func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-                func_0029F338(*(void **)(data + 0x29C));
+                part_spawn_explosion_with_sparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+                moby_mark_spawned(*(void **)(data + 0x29C));
                 *(void **)(data + 0x29C) = 0;
             }
         }
         *(s32 *)(data + 0x290) = 0;
         data[0x57] = 0xD2;
-        func_002AB800(object, data + 0x50);
-        if (object[0x95] != 2) func_L11_0042A4C8(object);
-        if ((u32)(damage - 4) < 2 && D_L11_001B35B8 >= object[0x21] && func_002A8508(object[0x21], -1) >= 2) {
-            u16 *ids = D_L11_001FC420[object[0x21]];
+        gfx_start_color_fade(object, data + 0x50);
+        if (object[0x95] != 2) MarkGroupClassCF5CF6Members(object);
+        if ((u32)(damage - 4) < 2 && D_L11_001B35B8 >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
+            u16 *ids = g_group_id_lists[object[0x21]];
             do {
-                u8 *entry = D_L11_001B359C + ((*ids & 0x7FFF) << 8);
+                u8 *entry = g_moby_l11_table + ((*ids & 0x7FFF) << 8);
                 if (*(s16 *)(entry + 0xAA) == 0xCF6 && !*(s32 *)(*(u8 **)(entry + 0x68) + 0x294)) {
                     *(s32 *)(*(u8 **)(entry + 0x68) + 0x294) = 1;
                     break;
@@ -269,19 +270,19 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
             } while (*(s16 *)ids++ >= 0);
         }
     }
-    *(s16 *)(data + 0x264) = func_002B3670(object, data + 0x268, *(s32 *)(data + 0x250), *(s32 *)(data + 0x254), *(f32 *)(data + 0x258), *(f32 *)(data + 0x25C), 0);
+    *(s16 *)(data + 0x264) = hero_check_distance_zones(object, data + 0x268, *(s32 *)(data + 0x250), *(s32 *)(data + 0x254), *(f32 *)(data + 0x258), *(f32 *)(data + 0x25C), 0);
     if (object[0x95] != 4) {
-        f32 floor = func_002A89A8(object + 0x10, 0, 0.5f);
+        f32 floor = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         *(f32 *)(object + 0x18) -= 0.313333333f;
         if (*(f32 *)(object + 0x18) < floor) *(f32 *)(object + 0x18) = floor;
     }
     if (*(f32 *)(object + 0x18) < 61.0f && D_L11_001B30C8 >= 6) {
-        func_0029F338(*(void **)(data + 0x278));
+        moby_mark_spawned(*(void **)(data + 0x278));
         func_US2_002A7AA8(object, 0, 3);
-        if (D_L11_001B35B8 >= object[0x21] && func_002A8508(object[0x21], -1) >= 2) {
-            u16 *deathIds = D_L11_001FC420[object[0x21]];
+        if (D_L11_001B35B8 >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
+            u16 *deathIds = g_group_id_lists[object[0x21]];
             do {
-                u8 *entry = D_L11_001B359C + ((*deathIds & 0x7FFF) << 8);
+                u8 *entry = g_moby_l11_table + ((*deathIds & 0x7FFF) << 8);
                 if (!*(s32 *)(*(u8 **)(entry + 0x68) + 0x294)) {
                     *(s32 *)(*(u8 **)(entry + 0x68) + 0x294) = 1;
                     break;
@@ -289,8 +290,8 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
             } while (*(s16 *)deathIds++ >= 0);
         }
         if (*(u8 **)(data + 0x29C)) {
-            func_002AC728(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
-            func_0029F338(*(void **)(data + 0x29C));
+            part_spawn_explosion_with_sparks(object, *(u8 **)(data + 0x29C) + 0x10, 0.5f, 3.0f, -1);
+            moby_mark_spawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
         D_L11_001AED04--;

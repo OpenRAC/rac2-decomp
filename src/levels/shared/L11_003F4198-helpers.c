@@ -4,16 +4,16 @@
  * extrapolates its final point. The retail contract requires count >= 3,
  * count aligned 16-byte output vectors and four aligned control vectors. */
 typedef int Vec128_00414660 __attribute__((mode(TI)));
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
 /* The five-pointer/one-FP interpolation leaf differs between programs. */
 extern void ref_L11_003F4198_00(void *, void *, void *, void *, void *, float);
 
 /* Builds a wobbly curve: fills in points along a smooth curve and nudges the middle ones at random. */
-void func_L11_003F4198(float (*points)[4], int count, float (*control)[4], float displacement)
+void curve_build_jittered_points_alt(float (*points)[4], int count, float (*control)[4], float displacement)
 {
     float before[4] __attribute__((aligned(16)));
     float after[4] __attribute__((aligned(16)));
@@ -29,9 +29,9 @@ void func_L11_003F4198(float (*points)[4], int count, float (*control)[4], float
         ref_L11_003F4198_00(points[i], control[0], control[1], before, after, IntToFloat(i) * step);
         if (i > 0 && i < count - 2) {
             offset[3] = 0.0f;
-            offset[0] = RandomFloatRange(-1.0f, 1.0f);
-            offset[1] = RandomFloatRange(-1.0f, 1.0f);
-            offset[2] = RandomFloatRange(-1.0f, 1.0f);
+            offset[0] = math_random_float_range(-1.0f, 1.0f);
+            offset[1] = math_random_float_range(-1.0f, 1.0f);
+            offset[2] = math_random_float_range(-1.0f, 1.0f);
             vec_scale_to_length(offset, offset, displacement);
             FastVecAdd(points[i], points[i], offset);
         }

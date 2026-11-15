@@ -21,7 +21,7 @@ extern char r1_D_0015A000[];
 
 extern int r1_func_0011AD70(void *, int);
 
-extern void func_001277F8(void *);
+extern void mc_copy_read_edge_bytes(void *);
 
 extern void r1_func_00118D80(int);
 
@@ -54,11 +54,11 @@ extern int r1_func_00118C00(void);
 
 extern void r1_func_00123EC0(int, unsigned short, void *);
 
-extern void func_00127B40(int);
+extern void mc_delay_thread(int);
 
 /* rac1-decomp src/core/001236F0.c: func_00123C30 */
 /* Starts reading bytes from an open memory card file into a buffer. */
-int func_00127888(int fd, void *buf, int nbyte) {
+int sceMcRead(int fd, void *buf, int nbyte) {
     char *client = r1_D_00159B00;
     int *request;
     char *next;
@@ -76,7 +76,7 @@ int func_00127888(int fd, void *buf, int nbyte) {
     request[7] = (int)next;
     r1_func_0011AD70((void *)(request[6] = (int)buf), request[3] = nbyte);
     r1_func_0011AD70(next, 0xC0);
-    result = r1_func_0011B4C8(client, 5, 1, request, 0x30, r1_D_0015B0C0, 4, CopyMcReadEdgeBytes, next);
+    result = r1_func_0011B4C8(client, 5, 1, request, 0x30, r1_D_0015B0C0, 4, mc_copy_read_edge_bytes, next);
     if (result == 0) {
         r1_D_00132EA8 = 5;
     } else {
@@ -88,7 +88,7 @@ int func_00127888(int fd, void *buf, int nbyte) {
 /* rac1-decomp src/core/001236F0.c: func_00123D48 */
 /* sceMcWrite: copies the unaligned lead of the buffer into the request, sends RPC 6. Adapted from Lombyte (GPL-3.0) for PAL: src/sdk/storage/memory_card/sce_mc_write.c, sceMcWrite. */
 /* Starts writing bytes from a buffer to an open memory card file. */
-int func_001279A0(int fd, unsigned char *buffer, int size) {
+int sceMcWrite(int fd, unsigned char *buffer, int size) {
     int rpc_result;
     unsigned int i;
     int root_off;
@@ -132,7 +132,7 @@ ASM_FUNC("asm/core", func_00127B18);
    h-lines wakes it: SetAlarm (r1_func_00118B20) with mcHearAlarm
    (r1_func_00123EC0) on GetThreadId(), then SleepThread(). */
 /* Makes the current thread sleep for a short time while it waits for the memory card. */
-void func_00127B40(int time) {
+void mc_delay_thread(int time) {
     r1_func_00118B20((unsigned short)time, r1_func_00123EC0, r1_func_00118BE0());
     r1_func_00118C00();
 }

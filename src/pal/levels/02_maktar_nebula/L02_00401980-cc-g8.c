@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L02_00401980, the PAL copy of func_L02_003FD228: the same C. */
 
 /* Four bytes: cc1 then emits the address as a single `la`, which gas expands to an adjacent
@@ -12,7 +13,7 @@ typedef struct {
     unsigned char b24F0;
 } L02_003F5710_Hero;
 
-extern L02_003F5710_Hero D_00189E20;
+extern L02_003F5710_Hero g_hero_state;
 
 /* Watches the hero block's height (+0x88) against 420.0 and the copy of it the actor kept at
    +0x98. Crossing it downwards clears the byte at +0x24F0 and the global flag; crossing it upwards
@@ -36,15 +37,15 @@ typedef int s32;
 typedef float f32;
 
 extern char *D_L02_001B1190[2] __attribute__((sda));
-extern unsigned char *D_L02_001B359C[3] __attribute__((sda));
+extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 extern f32 D_L02_001B1258 __attribute__((sda));
 extern f32 D_L02_001B125C __attribute__((sda));
-extern s32 func_00312B58(char *);
-extern s32 func_L02_00416800(char *);
-extern s32 func_002A77E0(s32);
-extern void func_L02_00416720(char *, char *, f32, f32);
+extern s32 moby_is_state_six(char *);
+extern s32 moby_is_state_one_cleared_vars(char *);
+extern s32 math_random_int_below(s32);
+extern void teleporter_bind_captured_object(char *, char *, f32, f32);
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 /* Leaves the function when the group is 0xFF or empty; the braces it opens close in END_IDS. */
@@ -124,9 +125,9 @@ extern unsigned char D_001395B8[0x100];
 /* D_001A7A0C, written as the second word of an 8-byte object: cc1 then counts the store as two
    instructions and keeps it out of func_L02_003FCDF8's delay slot, and the assembler gives the
    absolute `lui $at ; sw`. */
-extern int func_L02_003F9B70(int);
+extern int arena_get_challenge_save_index(int);
 
-extern int func_L02_00400650(char *, int);
+extern int arena_start_announcer_message(char *, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the
@@ -139,7 +140,7 @@ extern int func_L02_00400650(char *, int);
    as a vector whose z is -func_002A7878(D_L02_001B1750, D_L02_001B1754) / 60, combines it with
    A1, and hands v0 and v1 twice to func_002BAE50 with colour words and a pick of func_002A7820:
    first with one of two sets chosen by bit 0 of D_L02_001B30C8, then with a third set. */
-extern s32 func_L02_00400650(char *, s32);
+extern s32 arena_start_announcer_message(char *, s32);
 
 /* Picks the message to ask for after the entity the object is attending to (state word 0xD0),
    for its kinds 0x9F8 and 0xA44: while D_0018C2EC is not positive, one of two at random (0x10 or
@@ -156,7 +157,7 @@ typedef struct {
 
 extern L02_003FF9A0_Rec D_L02_00264A70[];
 
-extern s32 func_L02_003F9B70(s32);
+extern s32 arena_get_challenge_save_index(s32);
 /* Calls func_L00_002C42E0(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test
    func_L00_0032EF10(0x40, 0x3C, 0) holds, the object changes state to 7 and its selection (state
    half-word 0x118) moves to the next entry of the table at D_L02_001B1190 that is usable: the flag

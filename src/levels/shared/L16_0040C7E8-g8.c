@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 
@@ -10,7 +11,7 @@ typedef struct { char prefix[0x30]; Quad position; char rest[0x40]; } PointPoolR
 extern PointPoolRecord128 *D_L16_001B2C0C __attribute__((nosda));
 typedef struct { int pointIndex; int objectIndex; } PositionChoice;
 /* Looks up the position of the launch target, either a point or an object, and copies it out. */
-void func_L16_0040C7E8(char *object, Vector *destination) {
+void moby_get_launch_target_pos(char *object, Vector *destination) {
     PositionChoice *choice=*(PositionChoice **)(object+0x68);
     int index=choice->objectIndex;
     if (index==-1)

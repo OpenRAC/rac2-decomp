@@ -9,22 +9,22 @@ typedef struct {
     char tail[0x68];
 } WeaponDamageClass;
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern WeaponDamageClass ref_L00_003AB388_0[];
 extern char *ref_L00_003AB388_1;
 extern char *ref_L00_003AB388_2[];
 extern void *D_L00_001ADB2C MACRO_ADDR;
-extern void func_002A8E20(void *,void *);
-extern void func_00334160(void *,int,void *);
-extern int func_00277F48(void *,int,void *,void *,float);
-extern void func_002E5CF8(int,int,void *);
-extern void func_0032C700(void *, float, float, int, int, int, int, int, int, int, int, int, int, void *);
+extern void QueueMobyImpact(void *,void *);
+extern void weapon_start_health_drain(void *,int,void *);
+extern int coll_process_hit(void *,int,void *,void *,float);
+extern void PlayMobySound(int,int,void *);
+extern void SpawnExplosion(void *, float, float, int, int, int, int, int, int, int, int, int, int, void *);
 extern void func_3251D0();
 extern void func_2EE178(void *,void *,float);
 extern void func_2EE3D0(void *,void *,float);
 
 /* Applies direct and area hits, then emits the weapon impact effects. */
-void func_L00_003AB388(char *moby, void *direction, void *position)
+void seeker_apply_projectile_hit(char *moby, void *direction, void *position)
 {
     struct {
         HitVector dir;
@@ -43,7 +43,7 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     hit.active = 1;
     hit.owner = moby;
     hit.damage = ((WeaponDamageClass *)(
-        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].damage;
+        g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].damage;
     qcopy(hit.dir, direction);
     func_2EE3D0(hit.dir, hit.dir, 1.0f);
     target = ref_L00_003AB388_1;
@@ -54,21 +54,21 @@ void func_L00_003AB388(char *moby, void *direction, void *position)
     if (target) {
         QueueMobyImpact(target, &hit);
         if (((WeaponDamageClass *)(
-        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
-            StartHealthDrainOnTarget(target, 0x43, *(char **)(moby + 0xB8));
+        g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
+            weapon_start_health_drain(target, 0x43, *(char **)(moby + 0xB8));
         else
-            StartHealthDrainOnTarget(target, 0x18, *(char **)(moby + 0xB8));
+            weapon_start_health_drain(target, 0x18, *(char **)(moby + 0xB8));
     }
     hit.damage = ((WeaponDamageClass *)(
-        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].area;
-    count = ProcessCollisionHit(position, 1, target, &hit, 2.0f);
+        g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].area;
+    count = coll_process_hit(position, 1, target, &hit, 2.0f);
     if (((WeaponDamageClass *)(
-        gItemSlotToRecord[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode) {
+        g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode) {
         for (i = 0; i < count; i++)
-            StartHealthDrainOnTarget(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
+            weapon_start_health_drain(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
     } else {
         for (i = 0; i < count; i++)
-            StartHealthDrainOnTarget(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
+            weapon_start_health_drain(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
     }
     func_3251D0(moby + 0x10, forward, 1);
     func_2EE178(forward, forward, -1.0f);

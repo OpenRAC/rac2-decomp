@@ -32,6 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import levels  # noqa: E402
+import srcnames  # noqa: E402
 
 KINDS = {"boot", "shared", "level"}
 PLACE = re.compile(r"^(\d\d):([0-9A-F]{8})$")
@@ -105,7 +106,7 @@ def check_sources(known: dict, errors: list) -> set:
     defined = {}
     still_asm = set()
     for path in sorted((ROOT / "src").rglob("*.c")):
-        text = path.read_text(encoding="utf-8", errors="replace")
+        text = srcnames.canon(path.read_text(encoding="utf-8", errors="replace"))
         relative = path.relative_to(ROOT).as_posix()
         for n, line in enumerate(text.splitlines(), 1):
             m = DEFINITION.match(line)
@@ -217,7 +218,7 @@ LEVEL_DATA = re.compile(r"\bD_L(\d\d)_[0-9A-Fa-f]{8}\b")
 def check_level_data_names(errors: list) -> None:
     for path in sorted((ROOT / "src/levels").glob("[0-9][0-9]_*/**/*.c")):
         level = path.relative_to(ROOT / "src/levels").parts[0][:2]
-        for name in sorted({m.group(0) for m in LEVEL_DATA.finditer(path.read_text(errors="replace"))
+        for name in sorted({m.group(0) for m in LEVEL_DATA.finditer(srcnames.canon(path.read_text(errors="replace")))
                             if m.group(1) != level}):
             errors.append(f"{path.relative_to(ROOT)}: {name} is another level's name; use level {level}'s "
                           f"D_L{level}_<its address in level {level}>")

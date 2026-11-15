@@ -43,19 +43,19 @@ extern u32 D_L12_001B1B60 __attribute__((sda));
 extern V D_L12_001C0260;
 extern V D_L12_001B9E00;
 
-extern void func_00283410(void *, void *);
-extern u64 func_0027C878(s32);
-extern void func_00283098(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern f32 func_00282DF0(void *);
+extern void euler_to_matrix(void *, void *);
+extern u64 GetEffectTextureDescriptor(s32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern f32 FastVecLength(void *);
 extern f32 func_L00_002EE290(void *);
-extern s32 func_002761F8(void *, void *, s32, s32, s32);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00280B90(void *, s32, s32);
-extern void func_00282D08(void *, void *, void *, f32);
+extern s32 CollLine(void *, void *, s32, s32, s32);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void draw_world_quad(void *, s32, s32);
+extern void lerp_vector(void *, void *, void *, f32);
 
 static __inline__ void CopyVector(V *dst, V *src)
 {
@@ -63,7 +63,7 @@ static __inline__ void CopyVector(V *dst, V *src)
 }
 
 /* Draws the barrier field as a row of glowing strips. Strips near the hero are cut short or skipped. */
-void func_L12_00418418(Moby *self)
+void gfx_draw_barrier_field_strips(Moby *self)
 {
     Packet quad;
     V matrix[4], initial, low, high, axis;

@@ -14,26 +14,26 @@ typedef struct {
     char *object;
 } Context;
 
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern Context D_L09_001BD700;
 extern char D_L09_00281210[];
 extern Vec D_L09_001B9A00 __attribute__((nosda));
 extern float D_L09_001A93E0 __attribute__((sda));
 extern Vec D_L09_001A93F0[4] __attribute__((sda));
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* While the level is in state 9, places four glow corners around the object, spun about Z and nudged by the camera. */
-void func_L09_002F89F8(void) {
+void glow_place_state_nine_corners(void) {
     char matrix[0x30] __attribute__((aligned(16)));
     Vec rotation, temp;
     int minimum, index, i;
     int maximum = 9999;
     char *object;
-    if (gCurrentMapIndex[0] != 9)
+    if (g_current_map_index[0] != 9)
         return;
     minimum = -1;
     index = 0;

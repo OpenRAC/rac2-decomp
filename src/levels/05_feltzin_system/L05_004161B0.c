@@ -7,28 +7,28 @@ extern Entry05 D_L05_002659E0[];
 extern Camera05 D_L05_001B9580;
 extern struct { char pad[0x18]; char *hit; } D_L05_001BFB00;
 extern int D_L05_00221D10[];
-extern char *func_002ED688(char *object);
-extern void func_0029FCC0(char *object, int a1, char *out);
-extern void func_00282CC0(void *dst, void *src, char *src2);
-extern void func_00282D30(void *dst, void *src, float value);
-extern void func_00282CF0(void *dst, void *src, char *src2);
-extern void func_00282D08(char *, char *, char *, float);
-extern float func_00282E48(char *, char *);
-extern int func_002761F8(void *a0, void *a1, int a2, char *a3, int a4);
-extern void func_L05_0037AC80(float value);
+extern char *moby_get_motion_data(char *object);
+extern void moby_transform_joint_to_world(char *object, int a1, char *out);
+extern void FastVecAdd(void *dst, void *src, char *src2);
+extern void FastVecScale(void *dst, void *src, float value);
+extern void FastVecSub(void *dst, void *src, char *src2);
+extern void lerp_vector(char *, char *, char *, float);
+extern float fast_vec_dist(char *, char *);
+extern int CollLine(void *a0, void *a1, int a2, char *a3, int a4);
+extern void hero_apply_damage(float value);
 extern char D_L05_001B1308[8];
-extern void func_00282F20(void *, void *, float);
-extern int func_002A7820(int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_random_int_range(int, int);
 /* The particle spawner (position, kind, velocity, color, count; four floats): the floats are
    declared first, each register bank keeps its order (a0-t0, f12-f15). */
-extern char *func_002BDCE8(char *, float, float, float, float, int, char *, int, int);
-extern float func_002A7878(float a, float b);
+extern char *SpawnSpinningSparkParticle(char *, float, float, float, float, int, char *, int, int);
+extern float math_random_float_range(float a, float b);
 extern int func_001163B0(void);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
 
 /* Moves every beam record this object owns toward the hero, releases finished ones, and shakes the camera the first time a beam hits the hero. */
-void func_L05_004161B0(char *obj)
+void beam_update_records(char *obj)
 {
     char aimPoint[16] __attribute__((aligned(16)));
     char lift[16] __attribute__((aligned(16)));
@@ -39,12 +39,12 @@ void func_L05_004161B0(char *obj)
         char *state;
         if (record->owner != obj) continue;
         position = (char *)&record->position;
-        state = GetMobyMotionData(obj);
+        state = moby_get_motion_data(obj);
         if (D_L05_00221D10[11] == 1 || *(int *)(state + 0x110) == 0) {
             record->owner = 0;
             continue;
         }
-        TransformMobyJointToWorld(obj, 0, (char *)&record->origin);
+        moby_transform_joint_to_world(obj, 0, (char *)&record->origin);
         qcopy(aimPoint, *(char **)(state + 0x120) + 0x10);
         FastVecAdd(aimPoint, (char *)&record->offset, aimPoint);
         FastVecScale(lift, *(char **)(state + 0x120) + 0xC0, 0.5f);
@@ -77,7 +77,7 @@ void func_L05_004161B0(char *obj)
                 D_L05_001B9580.timer = 30;
                 D_L05_001B9580.strength = 0.05f;
                 D_L05_001B9580.mode = 0;
-                ApplyDamageToHero(1.0f);
+                hero_apply_damage(1.0f);
                 record->hit = 1;
             }
         }
@@ -87,7 +87,7 @@ void func_L05_004161B0(char *obj)
 /* Once the record has a target and the state+0x268 countdown is clear: casts a ray over five
    times the offset to the target (shaking the camera on a 0xFBF hit), emits three random particles from
    the object's origin and restarts the countdown at 4. */
-void func_L05_0041CB68(char *object)
+void beam_fire_burst(char *object)
 {
     char delta[16] __attribute__((aligned(16)));
     char pos[16] __attribute__((aligned(16)));
@@ -96,7 +96,7 @@ void func_L05_0041CB68(char *object)
     char origin[16] __attribute__((aligned(16)));
     char colors[8];
     char *state = *(char **)(object + 0x68);
-    char *targetInfo = GetMobyMotionData(object);
+    char *targetInfo = moby_get_motion_data(object);
     int i;
     char *position;
     if (!targetInfo || !*(char **)(targetInfo + 0x120) || *(int *)(state + 0x268)) return;
@@ -116,21 +116,21 @@ void func_L05_0041CB68(char *object)
             D_L05_001B9580.strength = 0.05f;
             D_L05_001B9580.timer = 30;
             D_L05_001B9580.mode = 0;
-            ApplyDamageToHero(1.0f);
+            hero_apply_damage(1.0f);
         }
     }
-    TransformMobyJointToWorld(object, 0, origin);
+    moby_transform_joint_to_world(object, 0, origin);
     {
         float scale = 1.0f, size = 210000.0f;
         for (i = 0; i < 3; i++) {
-            int kind = RandomIntRange(1, 5);
-            char *particle = SpawnSpinningSparkParticle(origin, 0.0f, scale, 1.01f, RandomFloatRange(0.25f, scale) * size,
+            int kind = math_random_int_range(1, 5);
+            char *particle = SpawnSpinningSparkParticle(origin, 0.0f, scale, 1.01f, math_random_float_range(0.25f, scale) * size,
                                            kind, velocity, 0x5A182, 1);
             __builtin_memcpy(colors, D_L05_001B1308, 8);
             if (particle) {
                 char *data = particle + 0x20;
                 {
-                    int index = Rand() % 2;
+                    int index = func_001163B0() % 2;
                     particle[3] = colors[index * 4];
                 }
                 *(short *)(particle + 0xA) = 0x23;
@@ -140,7 +140,7 @@ void func_L05_0041CB68(char *object)
                     *(int *)(data + 4) = 3;
                     *(float *)(data + 0x1C) = value;
                 }
-                data[0xA] = RandomIntRange(0x40, 0x80);
+                data[0xA] = math_random_int_range(0x40, 0x80);
                 data[0xB] = particle[0xA];
             }
         }

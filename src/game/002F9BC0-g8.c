@@ -11,7 +11,7 @@ extern int ref_L00_002FC190_00 __attribute__((sda));
 
 /* Rebuilds the viewport position from the indexed table and the two resident
    offsets, then publishes it and one lowered copy. */
-void func_002FC190(void)
+void gfx_rebuild_packet_buffer_pointers(void)
 {
     int value = D_001B22A0[D_001B22B4] + D_001B22B0 - D_001A8BC0;
 
@@ -20,35 +20,35 @@ void func_002FC190(void)
 }
 
 extern char D_001BAEC0[];
-extern int D_001B22A8;
+extern int g_dma_packet_cursor;
 extern int ref_L00_002FC1D8_00 __attribute__((sda));
 
 /* Seeds the viewport from the resident pair, clears the index and rebuilds. */
-void func_002FC1D8(void)
+void gfx_reset_packet_buffer(void)
 {
     char *base = D_001BAEC0;
     int value = *(int *)(base + 0xC);
 
     D_001B22A0[0] = value;
     D_001B22A0[1] = *(int *)(base + 0x10);
-    gDmaPacketCursor = value;
+    g_dma_packet_cursor = value;
     ref_L00_002FC1D8_00 = 0;
-    RebuildPacketBufferPointers();
+    gfx_rebuild_packet_buffer_pointers();
 }
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern int D_00262D70[];
 extern int D_00262DD8[];
 extern int ref_L00_002FC138_00 __attribute__((sda));
 
 /* Clamps the resident index, publishes the two selected values and rebuilds. */
-void func_002FC138(void)
+void gfx_select_packet_buffer_setup(void)
 {
-    int index = gCurrentMapIndex;
+    int index = g_current_map_index;
 
     if ((unsigned int)index >= 0x19)
         index = 0;
     D_001A8BC0 = D_00262DD8[index];
     ref_L00_002FC138_00 = D_00262D70[index];
-    RebuildPacketBufferPointers();
+    gfx_rebuild_packet_buffer_pointers();
 }

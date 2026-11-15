@@ -22,13 +22,13 @@ extern MappingEntry D_002403C0[];
 
 extern Blob D_L00_001A8E60;
 
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 
-extern MappedClassEntry D_L00_00262570[];
+extern MappedClassEntry g_weapon_l00_table[];
 
-extern s32 func_00115484(u8 *, s32, s32);
+extern s32 memset(u8 *, s32, s32);
 
-extern void func_002889B8(unsigned char *);
+extern void req_reset_queue(unsigned char *);
 
 typedef struct {
     int word00;
@@ -56,13 +56,13 @@ typedef struct {
     short pad2;
 } PendingEntry;
 
-extern ClassRecord D_00239BA0[];
+extern ClassRecord g_weapon_table[];
 
-extern int D_001A73B8[] __attribute__((section(".sdata")));
+extern int g_weapon_menu_slots[] __attribute__((section(".sdata")));
 
 extern PendingEntry D_0025E328[];
 
-extern int func_00288188(int);
+extern int help_is_id_in_either_table(int);
 
 /* Find a mapped record by its unsigned halfword class and return its opaque word. */
 
@@ -70,7 +70,7 @@ extern int func_00288188(int);
 
 /* 48-byte `ldl/ldr` → `sdl/sdr` stack copy of an absolute global, then a */
 /* Checks whether a help id is in a fixed list of ids. Returns 1 if found, otherwise 0. */
-int func_002880E0(int helpId)
+int help_is_id_in_fixed_list(int helpId)
 {
     Blob table;
     int i;
@@ -83,13 +83,13 @@ int func_002880E0(int helpId)
 
 
 /* Adds a help id to the small list of waiting help ids, unless it is already handled or blocked. */
-void func_00288208(int helpId)
+void help_queue_pending_id(int helpId)
 {
     ClassRecord *record;
     short *idPtr;
     int i;
 
-    if (IsHelpIdInEitherTable(helpId) == 0)
+    if (help_is_id_in_either_table(helpId) == 0)
         return;
     if (D_0025E328[0].value != -1) {
         idPtr = &D_0025E328[0].value;
@@ -99,17 +99,17 @@ void func_00288208(int helpId)
             idPtr += 5;
         } while (*idPtr != -1);
     }
-    record = &gWeaponTable_00239BA0[gItemSlotToRecord[helpId]];
+    record = &g_weapon_table[g_item_slot_to_record[helpId]];
     if (record->word0C != 0)
         return;
-    if (IsHelpIdInFixedList(helpId) != 0)
+    if (help_is_id_in_fixed_list(helpId) != 0)
         return;
     for (i = 0; i < 8; i++) {
-        if (gWeaponMenuSlots[i] == 0 || gWeaponMenuSlots[i] == helpId)
+        if (g_weapon_menu_slots[i] == 0 || g_weapon_menu_slots[i] == helpId)
             break;
     }
     if (i < 8)
-        gWeaponMenuSlots[i] = helpId;
+        g_weapon_menu_slots[i] = helpId;
 }
 
 
@@ -117,11 +117,11 @@ void func_00288208(int helpId)
 
 /* search56 byte-mapped E0 records by U16class3C, return opaque32 marker0 elsezero */
 /* Looks through the 56 help records for one with the given class code and returns its first word, or 0. */
-unsigned int func_002884B0(unsigned int key)
+unsigned int help_find_record_marker_by_class(unsigned int key)
 {
     int i;
     for (i = 0; i < 56; i++) {
-        MappedClassEntry *record = &gWeaponTable_L00[gItemSlotToRecord[i]];
+        MappedClassEntry *record = &g_weapon_l00_table[g_item_slot_to_record[i]];
         if (record->class_code == key)
             return record->marker;
     }
@@ -138,29 +138,29 @@ extern SlotTable ref_L00_00288508_00;
 
 extern unsigned short D_0018C964;
 
-extern int func_00288E18(int, int);
+extern int subtitle_request_voice_line(int, int);
 
-extern void func_002B0A18(int, int);
+extern void value_set_entry_by_index(int, int);
 
 /* Pick the action of the mapped class of PARAM, then hand it to the game. */
-void func_00288508(int helpId)
+void help_show_message_for_id(int helpId)
 {
     SlotTable table;
     int messageId;
     int i;
 
     if (helpId == 10) {
-        RequestSubtitleVoiceLine(0x9F8, 0x4F);
+        subtitle_request_voice_line(0x9F8, 0x4F);
     } else if (helpId == 27) {
-        RequestSubtitleVoiceLine(0x9F7, 0x4E);
+        subtitle_request_voice_line(0x9F7, 0x4E);
     } else if (D_0018C964 == 0) {
-        RequestSubtitleVoiceLine(0x9AA, 1);
+        subtitle_request_voice_line(0x9AA, 1);
     }
 
     messageId = -1;
     table = ref_L00_00288508_00;
     {
-        MappedClassEntry *entry = &gWeaponTable_L00[gItemSlotToRecord[helpId]];
+        MappedClassEntry *entry = &g_weapon_l00_table[g_item_slot_to_record[helpId]];
         int *actionList = 0;
         if (entry->reserved04[0] < 6) {
             actionList = (int *)table.slot[((u8 *)entry)[4]];
@@ -172,7 +172,7 @@ void func_00288508(int helpId)
         }
     }
     if (helpId == 10) {
-        u8 *levelEntry = (u8 *)&gWeaponTable_L00[gItemSlotToRecord[10]];
+        u8 *levelEntry = (u8 *)&g_weapon_l00_table[g_item_slot_to_record[10]];
         int level = levelEntry[4];
         if (level >= 2) messageId = 0x1296;
         if (level >= 3) messageId = 0x1297;
@@ -180,20 +180,20 @@ void func_00288508(int helpId)
         if (level >= 5) messageId = 0x1297;
     }
     if (messageId >= 0)
-        SetEntryValueByIndex(messageId, -1);
+        value_set_entry_by_index(messageId, -1);
     else
-        SetEntryValueByIndex(0, -1);
+        value_set_entry_by_index(0, -1);
 }
 
-extern int func_00288D58(void);
+extern int flag_is_byte_set(void);
 
 /* True when the id is in the mapping table and its value is at or past the
    table's bound while still inside the small id range. */
-int func_002886C8(int id, int value)
+int help_is_id_value_in_mapping_range(int id, int value)
 {
     int i;
 
-    if (id == 9 && IsFlagByteSet() != 0)
+    if (id == 9 && flag_is_byte_set() != 0)
         return 1;
     for (i = 0; D_002403C0[i].id != -2; i++) {
         if (id == D_002403C0[i].id && value >= D_002403C0[i].value && value < 0x15)
@@ -203,7 +203,7 @@ int func_002886C8(int id, int value)
 }
 
 /* Returns 1 when the id is in the mapping table. */
-int func_00288768(int id) {
+int help_is_id_in_mapping_table(int id) {
     int i;
     for (i = 0; D_002403C0[i].id != -2; i++)
         if (id == D_002403C0[i].id) return 1;
@@ -214,7 +214,7 @@ int func_00288768(int id) {
 /* Walks to the root of the chain index is in, then depth links down it, and
    copies that entry to dst when its kind byte equals depth.  Returns 1 when
    copied. */
-int func_00288870(ClassRecord *dst, int index, int depth)
+int help_copy_record_at_depth(ClassRecord *dst, int index, int depth)
 {
     int ret = 0;
     int i;
@@ -222,13 +222,13 @@ int func_00288870(ClassRecord *dst, int index, int depth)
 
     if (depth < 0xFF) {
         i = index;
-        while (gWeaponTable_00239BA0[i].parent != 0)
-            i = gWeaponTable_00239BA0[i].parent;
-        for (n = 0; n < depth && gWeaponTable_00239BA0[i].child != 0; n++)
-            i = gWeaponTable_00239BA0[i].child;
-        if (gWeaponTable_00239BA0[i].byte04 == depth) {
+        while (g_weapon_table[i].parent != 0)
+            i = g_weapon_table[i].parent;
+        for (n = 0; n < depth && g_weapon_table[i].child != 0; n++)
+            i = g_weapon_table[i].child;
+        if (g_weapon_table[i].byte04 == depth) {
             ret = 1;
-            *dst = gWeaponTable_00239BA0[i];
+            *dst = g_weapon_table[i];
         }
     }
     return ret;
@@ -237,7 +237,7 @@ int func_00288870(ClassRecord *dst, int index, int depth)
 
 
 /* Resets a request queue: empties it and fills its slots with the "none" value. */
-void func_002889B8(u8 *queue) {
+void req_reset_queue(u8 *queue) {
     *(s32 *)(queue + 0x30) = 0;
     *(s32 *)(queue + 0x34) = 0;
     *(s32 *)(queue + 0x38) = 0;
@@ -247,7 +247,7 @@ void func_002889B8(u8 *queue) {
 }
 
 /* Takes the oldest request out of the queue and gives back its value and flag. Returns 0 if the queue is empty. */
-s32 func_00288A00(u8 *queue,s32 *outValue,s32 *outFlag) {
+s32 req_pop_queue(u8 *queue,s32 *outValue,s32 *outFlag) {
  s32 *values,*flags; s32 idx;
  if(*(s32 *)(queue+0x38)==0) return 0;
  if(--*(s32 *)(queue+0x38)==0) *(s32 *)(queue+0x44)=0;
@@ -263,7 +263,7 @@ s32 func_00288A00(u8 *queue,s32 *outValue,s32 *outFlag) {
 }
 
 /* Adds a request to the end of the queue. Returns 0 if the queue is full or locked. */
-s32 func_00288AA0(u8 *queue,s32 value) {
+s32 req_push_queue(u8 *queue,s32 value) {
  s32 next;
  if(*(s32 *)(queue+0x38)==5 || *(s32 *)(queue+0x44)!=0) return 0;
  *(s32 *)((u32)queue+(*(s32 *)(queue+0x30)<<3)+8)=value;

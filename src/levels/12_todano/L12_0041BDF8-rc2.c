@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@
 extern void ref_L12_0041BDF8_00(void *);
 
 /* Gives the two beam helper objects back their normal collision. */
-void func_L12_0041BDF8(s8 *object) {
+void beam_restore_child_collision(s8 *object) {
     s8 *vars;
     s8 **slot;
     s32 remaining;

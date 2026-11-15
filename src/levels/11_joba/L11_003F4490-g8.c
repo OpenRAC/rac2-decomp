@@ -7,20 +7,20 @@ typedef struct {
     long state, texture, flags, blend;
 } StripQuad;
 
-extern long func_0027C878(int);
-extern void func_L00_003E0CE8(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_00283CE0(int);
+extern long GetEffectTextureDescriptor(int);
+extern void gfx_init_small_sprite_packet_c(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float IntToFloat(int);
 extern float D_L11_001B05E0 __attribute__((sda));
 extern float D_L11_001BA8C0[];
 
 /* Draws a glowing beam as two overlapping textured strips that follow a list of points. */
-void func_L11_003F4490(float (*points)[4], int count, int blend, int color1, int color2, float width, float scale) {
+void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int color2, float width, float scale) {
     float direction[4] __attribute__((aligned(16)));
     float facing[4] __attribute__((aligned(16)));
     float side[4] __attribute__((aligned(16)));
@@ -40,7 +40,7 @@ void func_L11_003F4490(float (*points)[4], int count, int blend, int color1, int
     first.color[2] = color1;
     first.color[1] = color1;
     first.color[0] = color1;
-    InitSmallSpritePacketC(&first);
+    gfx_init_small_sprite_packet_c(&first);
     first.uv[0][0] = 0;
     first.uv[0][1] = 0;
     first.uv[1][0] = 0;
@@ -57,7 +57,7 @@ void func_L11_003F4490(float (*points)[4], int count, int blend, int color1, int
     second.color[2] = color2;
     second.color[1] = color2;
     second.color[0] = color2;
-    InitSmallSpritePacketC(&second);
+    gfx_init_small_sprite_packet_c(&second);
     *(StripQuadVector *)horizontal = 0;
     *(StripQuadVector *)vertical = 0;
     second.uv[0][0] = 0;

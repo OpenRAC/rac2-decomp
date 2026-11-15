@@ -42,27 +42,27 @@ typedef struct {
     Moby *objects[0];
 } ScenePrefix;
 
-extern void func_L00_002FC980(void);
-extern void func_002E64A0(Moby *);
-extern void func_L00_00326048(void *, void *, int, int, float);
+extern void anim_start_startup_animations(void);
+extern void UpdateEquipmentPieces(Moby *);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern ScenePrefix D_L06_001BD540;
-extern int D_001A79F0 MACRO_ADDR;
-extern void func_0029FCC0(void *, int, void *);
-extern int func_002A77E0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern Particle *func_002BDCE8(void *, float, float, float, int, void *, float, int, int);
-extern int func_00283CF0(float);
+extern int g_current_map_index MACRO_ADDR;
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int math_random_int_below(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, int, int);
+extern int FloatToInt(float);
 
 /* Update special scene objects, then emit the ship's paired exhaust particles. */
-void func_L06_0033BDC0(void)
+void UpdateNotakSceneEffects(void)
 {
     Vector left, right, velocity, position, shift;
     Moby *ship;
     Particle *first, *second, *spark;
     int i, rotation;
 
-    StartStartupAnimations();
+    anim_start_startup_animations();
 
     for (i = 0; i < D_L06_001BD540.count; i++) {
         Moby *obj = D_L06_001BD540.objects[i];
@@ -75,22 +75,22 @@ void func_L06_0033BDC0(void)
             char *state = obj->state;
 
             if (state)
-                StoreAngleUpdateResult(obj, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545f);
+                math_store_angle_update_result(obj, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545f);
         }
     }
 
-    if (gCurrentMapIndex != 6 || D_L06_001BD540.active)
+    if (g_current_map_index != 6 || D_L06_001BD540.active)
         return;
 
     ship = D_L06_001BD540.objects[2];
     if (ship->class_id != 0xE29 /* moby class 3625 */)
         return;
 
-    TransformMobyJointToWorld(ship, 0, left);
-    TransformMobyJointToWorld(ship, 1, right);
-    rotation = RandomIntBelow(16);
+    moby_transform_joint_to_world(ship, 0, left);
+    moby_transform_joint_to_world(ship, 1, right);
+    rotation = math_random_int_below(16);
     vec_scale_to_length(velocity, ship->velocity, 0.7333333492f);
-    if (RandomIntBelow(2))
+    if (math_random_int_below(2))
         rotation = -rotation;
     qcopy(position, left);
 
@@ -119,7 +119,7 @@ void func_L06_0033BDC0(void)
         ParticleTail *tail = &spark->tail;
         spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 7;
-        spark->f08 = RandomIntBelow(255);
+        spark->f08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;
@@ -154,7 +154,7 @@ void func_L06_0033BDC0(void)
         ParticleTail *tail = &spark->tail;
         spark->life = FloatToInt(4.0f) + 0x70;
         spark->f0A.word = 7;
-        spark->f08 = RandomIntBelow(255);
+        spark->f08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
         tail->frame = first->f0A.byte;

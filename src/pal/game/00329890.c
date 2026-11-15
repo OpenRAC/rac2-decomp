@@ -27,14 +27,14 @@ typedef struct {
     u8 pad40[0x28];
     Pvar_3280C8 *pvar;
 } Moby_3280C8;
-extern Moby_3280C8 *func_0029EFD0(int);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
+extern Moby_3280C8 *CreateMoby(int);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
 
 /* Spawn class 0xB7F at a position, owned by a parent, with a random spin. */
 Moby_3280C8 *func_PAL_00329890(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 arg, f32 scale)
 {
-    Moby_3280C8 *m = func_0029EFD0(0xB7F);
+    Moby_3280C8 *m = CreateMoby(0xB7F);
     if (m != 0) {
         Pvar_3280C8 *pv;
         m->f30 = 0xFF;
@@ -47,13 +47,13 @@ Moby_3280C8 *func_PAL_00329890(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unus
         qcopy(pv->rot, rot);
         pv->parent = parent;
         pv->scale = scale;
-        pv->f18 = func_002A7940();
-        pv->f1C = func_002A7878(0.25132746f, 0.75398237f);
+        pv->f18 = math_random_angle();
+        pv->f1C = math_random_float_range(0.25132746f, 0.75398237f);
         pv->f20 = 1.0f;
         pv->f24 = arg;
         m->f23 = 0x5D;
         m->f34 |= 0x100;
-        m->f2C = func_002A7878(0.01f, 0.0125f) * pv->f20;
+        m->f2C = math_random_float_range(0.01f, 0.0125f) * pv->f20;
     }
     return m;
 }

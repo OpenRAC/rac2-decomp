@@ -33,13 +33,13 @@ extern struct {
     float position[4];
 } D_00189E20;
 
-extern int func_L20_0039DCF8(void *, const void *, void *);
+extern int trooper_init_spawned(void *, const void *, void *);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
 /* Finds the first object of the group whose state is 6, makes parent its parent and
    sets it up at pos; returns it, or 0 if there is none or the setup fails. */
-YeedilObject *func_L20_0039DBC8(void *parent, int group, const float *pos) {
+YeedilObject *trooper_spawn_from_free_slot(void *parent, int group, const float *pos) {
     YeedilObject *found = 0;
     unsigned short *p = D_L20_001FBB20[group];
     YeedilObject *obj;
@@ -88,9 +88,9 @@ end:
 
         qzero(&buf);
 
-        ((float *)&buf)[2] = FastMatrixHelperA(gHeroState.position[0] - pos[0],
-                                           gHeroState.position[1] - pos[1]);
-        if (InitSpawnedTrooper(found, pos, &buf) == 0) {
+        ((float *)&buf)[2] = mat_fast_helper_a(g_hero_state.position[0] - pos[0],
+                                           g_hero_state.position[1] - pos[1]);
+        if (trooper_init_spawned(found, pos, &buf) == 0) {
             found = 0;
         }
     }

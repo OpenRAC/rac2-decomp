@@ -18,12 +18,12 @@ typedef struct {
     unsigned char pad6[0x22BB - 0x22A8]; unsigned char byte_22bb;
     unsigned char pad7[0x24CC - 0x22BC]; int state;
 } HeroChoiceState;
-extern HeroChoiceState D_00189E20;
-extern int D_001A79F0 __attribute__((sda));
+extern HeroChoiceState g_hero_state;
+extern int g_current_map_index __attribute__((sda));
 extern int D_001A7398 __attribute__((sda));
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 typedef struct { unsigned char pad0[4]; unsigned char active; unsigned char pad1[0xE0 - 5]; } MappedClassEntry;
-extern MappedClassEntry D_L00_00262570[];
+extern MappedClassEntry g_weapon_l00_table[];
 typedef struct {
     unsigned char pad0[0x50]; int selector;
     unsigned char pad1[4]; float weight;
@@ -32,9 +32,9 @@ typedef struct {
 } ChoiceRecord;
 extern ChoiceRecord D_L00_0025BC00[4];
 extern int D_L00_0025BDB0;
-extern int func_L00_002ADEA0(int);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern float func_002A7878(float, float);
+extern int hero_slot_item_id(int);
+extern int CollLine(void *, void *, int, void *, int);
+extern float math_random_float_range(float, float);
 
 int func_PAL_L00_002CA888(int *selected)
 {
@@ -42,29 +42,29 @@ int func_PAL_L00_002CA888(int *selected)
     ChoiceRecord *entry;
     ChoiceVector raised, origin;
     float sum, draw, value;
-    if (D_00189E20.gate != 0) return 0;
-    if (D_00189E20.state == 1) {
+    if (g_hero_state.gate != 0) return 0;
+    if (g_hero_state.state == 1) {
         *selected = 3;
         if (D_L00_0025BDB0 != 0) return 0;
-        if ((D_00189E20.flags & 2) == 0) return 0;
-        return func_002A7878(0.0f, 1.0f) < 0.33f;
+        if ((g_hero_state.flags & 2) == 0) return 0;
+        return math_random_float_range(0.0f, 1.0f) < 0.33f;
     }
     entry = D_L00_0025BC00;
     for (index = 0; index < 4; index++, entry++) {
         float zero = 0.0f;
         int area;
         if (entry->inactive != 0 || entry->weight == zero) continue;
-        area = func_L00_002ADEA0(0);
+        area = hero_slot_item_id(0);
         if (entry->selector != -1 && entry->selector != area) continue;
         if (index == 2) {
-            if (D_001A79F0 != 7 && D_001A79F0 != 0x13) continue;
-            if (D_00189E20.byte_22bb == 2) continue;
-            qcopy(&origin, D_00189E20.origin);
+            if (g_current_map_index != 7 && g_current_map_index != 0x13) continue;
+            if (g_hero_state.byte_22bb == 2) continue;
+            qcopy(&origin, g_hero_state.origin);
             qcopy(&raised, &origin);
             raised.f[2] += 8.0f;
-            if (func_002761F8(&origin, &raised, 2, D_00189E20.object, 0)) continue;
+            if (CollLine(&origin, &raised, 2, g_hero_state.object, 0)) continue;
         }
-        if (index == 3 && (D_00189E20.mode != 1 || D_00189E20.count > 42 || D_00189E20.state > 1)) continue;
+        if (index == 3 && (g_hero_state.mode != 1 || g_hero_state.count > 42 || g_hero_state.state > 1)) continue;
         choices[count++] = index;
     }
     if (!count) return 0;
@@ -79,7 +79,7 @@ int func_PAL_L00_002CA888(int *selected)
             p++;
         } while (--index != 0);
     }
-    value = func_002A7878(0.0f, 1.0f);
+    value = math_random_float_range(0.0f, 1.0f);
     do { draw = value; } while (0);
     if (draw < sum) {
         float one, rate;
@@ -97,7 +97,7 @@ int func_PAL_L00_002CA888(int *selected)
             sum -= one / (float)(int)(*(float *)((char *)table + choice * size + 0x58) * rate);
             if (sum < draw) break;
         }
-        if (D_001A7398 == 30 && (D_L00_00262570 + D_00139568[30])->active == 0) {
+        if (D_001A7398 == 30 && (g_weapon_l00_table + g_item_slot_to_record[30])->active == 0) {
             if (*selected == 1) *selected = 0x91;
             else if (*selected == 2) *selected = 0x92;
         }

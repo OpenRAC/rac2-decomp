@@ -14,13 +14,13 @@ typedef struct {
 /* An array element, not a scalar: retail's read conflicts with the packet stores in the
    scheduler, which alias analysis rules out for a scalar at a fixed address. */
 extern FsAaBuffer *D_001A742C[] __attribute__((sda));
-extern int D_001A7BB8 __attribute__((sda));
+extern int g_widescreen_flag __attribute__((sda));
 extern char D_001A6AF0[];
 extern u8 D_001A7BB1 __attribute__((sda));
 
 /* Rebuilds the 16-strip resample packet of RAC1's framebuf.c, squeezing the height by
    115/160 unless flagged. The four-term OR is split because fold rebalances a chain of four. */
-void func_00284088(int useGivenFlag, int fullHeight)
+void BuildAspectBlitStrips(int useGivenFlag, int fullHeight)
 {
     unsigned long *q;
     int height;
@@ -43,7 +43,7 @@ void func_00284088(int useGivenFlag, int fullHeight)
         unsigned long *p = q + 10;
         int i;
         for (i = 0; i < 16; i++) {
-            if (gWidescreenFlag) {
+            if (g_widescreen_flag) {
                 *p++ = i * D_001A742C[0]->display_width;
                 *p++ = (i * 640 + 0x6BF8) | ((long)(0x7FF8 - height * 8) << 16);
                 *p++ = (i + 1) * D_001A742C[0]->display_width | 0x1A000000;

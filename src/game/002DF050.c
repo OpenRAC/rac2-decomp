@@ -7,15 +7,15 @@ typedef struct {
 extern Slot D_0025EBD0[];
 extern int D_001AB29C[4] MACRO_ADDR;
 extern int D_001A7318 MACRO_ADDR;
-extern int func_002B0E90(void);
-extern int func_002B0E28(void);
+extern int save_count_nonzero_flags(void);
+extern int save_count_entries_above_threshold(void);
 
 /* Unlock levels for the counts the player has collected. */
-void func_002DF050(void)
+void menu_update_unlock_entries(void)
 {
-    int reachedFirst = CountNonZeroFlags() >= 15;
-    int reachedSecond = CountNonZeroFlags() >= 30;
-    int reachedThird = CountEntriesAboveThreshold() >= 10;
+    int reachedFirst = save_count_nonzero_flags() >= 15;
+    int reachedSecond = save_count_nonzero_flags() >= 30;
+    int reachedThird = save_count_entries_above_threshold() >= 10;
     D_0025EBD0[5].f2 = reachedFirst ? 3 : 2;
     D_0025EBD0[6].f2 = reachedSecond ? 3 : 2;
     D_0025EBD0[7].f2 = reachedThird ? 10 : 2;

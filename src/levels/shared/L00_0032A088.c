@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -13,7 +14,7 @@ typedef struct {
 extern Slot D_L00_00268E20[];
 
 /* Returns the main data of a slot if the slot belongs to this key, otherwise nothing. */
-u8 *func_L00_0032A088(int key, int index)
+u8 *level_get_slot_body(int key, int index)
 {
     if (D_L00_00268E20[index].key != key)
         return 0;
@@ -21,7 +22,7 @@ u8 *func_L00_0032A088(int key, int index)
 }
 
 /* Returns the header data of a slot if the slot belongs to this key, otherwise nothing. */
-u8 *func_L00_0032A0B8(int key, int index)
+u8 *level_get_slot_header(int key, int index)
 {
     if (D_L00_00268E20[index].key != key)
         return 0;

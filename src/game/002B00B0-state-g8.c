@@ -4,24 +4,24 @@
  * A global that is both read and written here is reached under two names (the `_1` alias for the
  * write), as retail keeps a separate absolute address for each access. D_001A8C60 is stored both
  * $gp-relative and absolutely, so its `_1` name is the $gp view. */
-extern int D_001A8C64 MACRO_ADDR;
+extern int g_notice_owner MACRO_ADDR;
 extern int D_001A8C64_1 MACRO_ADDR;
 extern int D_001A8C60 MACRO_ADDR;
 extern int D_001A8C60_1 __attribute__((sda));
-extern int D_001B1D48 MACRO_ADDR;
+extern int g_notice_text_id MACRO_ADDR;
 extern int D_001B1D48_1 MACRO_ADDR;
-extern int func_00288FB8(int);
+extern int GetLocalizedString(int);
 extern void func_0029CCD8(int, int);
 
 /* Tries to take the notice slot for an owner and show a text. */
-int func_002B0C28(int owner, int textId, int style)
+int TryClaimNotice(int owner, int textId, int style)
 {
-    int current = gNoticeOwner;
+    int current = g_notice_owner;
 
     if (current == owner) {
         if (textId != 0)
             func_0029CCD8(GetLocalizedString(textId), style);
-        gNoticeTextId = textId;
+        g_notice_text_id = textId;
         D_001A8C60_1 = 2;
         return 2;
     }
@@ -37,7 +37,7 @@ int func_002B0C28(int owner, int textId, int style)
 }
 
 /* Like TryClaimNotice but takes over the slot when it is already used. */
-int func_002B0CE0(int owner, int textId, int style)
+int ForceClaimNotice(int owner, int textId, int style)
 {
     int result = TryClaimNotice(owner, textId, style);
 

@@ -28,20 +28,20 @@ typedef struct {
 
 extern float D_001B0954 __attribute__((sda));
 extern char *D_001BF000[];
-extern char D_00189E20[];
-extern unsigned char D_00139568[];
-extern DamageData D_00239BA0[];
+extern char g_hero_state[];
+extern unsigned char g_item_slot_to_record[];
+extern DamageData g_weapon_table[];
 
-extern int func_00277F48(float, void *, int, void *, int);
-extern int func_002AB1F0(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_0032D758(void *, int, int);
+extern int coll_process_hit(float, void *, int, void *, int);
+extern int moby_get_private_value_0(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void StartAttachedEffect(void *, int, int);
 
 /* Hurts every enemy and breakable thing near the object, pushing it away from the blast. It skips the player's own vehicle. */
-void func_00330CA0(char *object)
+void QueueRadialMobyImpacts(char *object)
 {
     DamageVector delta;
     Damage330CA0 damage;
@@ -50,15 +50,15 @@ void func_00330CA0(char *object)
     char *target;
     float radius = *(float *)(*(char **)(object + 0x68) + 0x64);
 
-    count = ProcessCollisionHit(radius < D_001B0954 ? radius : D_001B0954, object + 0x10, 0, object, 0);
+    count = coll_process_hit(radius < D_001B0954 ? radius : D_001B0954, object + 0x10, 0, object, 0);
     for (i = 0; i < count; i++) {
         target = D_001BF000[i];
-        if ((GetMobyPrivateValue0(target) || (*(unsigned short *)(target + 0x34) & 0x4000))
-            && target != ((DamageHero *)gHeroState)->owner) {
+        if ((moby_get_private_value_0(target) || (*(unsigned short *)(target + 0x34) & 0x4000))
+            && target != ((DamageHero *)g_hero_state)->owner) {
             FastVecSub(&delta, target + 0x10, object + 0x10);
             vec_scale_to_length(&delta, &delta, 1.0f);
             vec_scale_to_length(&damage, &damage, 1.0f);
-            make_hit_descriptor(&damage, object, 0x810000, &delta, (gWeaponTable_00239BA0 + gItemSlotToRecord[0x20])->value);
+            make_hit_descriptor(&damage, object, 0x810000, &delta, (g_weapon_table + g_item_slot_to_record[0x20])->value);
             damage.flag = 1;
             damage.vector.quad = delta.quad;
             damage.vector.f[3] = 5627.925f;

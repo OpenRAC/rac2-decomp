@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -31,7 +32,7 @@ extern void ref_L06_004576C8_04(void *, f32, f32, f32);
 extern s32 ref_L06_004576C8_05(void *, void *, s32, void *, s32, s32);
 
 /* Sets up eight effect emitters around the object, each aimed in its own direction. */
-void func_L06_004576C8(void *moby) {
+void part_spawn_radial_emitters(void *moby) {
     f32 *angles;
     f32 pitchDeg;
     f32 yaw;

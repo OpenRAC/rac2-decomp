@@ -4,16 +4,16 @@
 typedef unsigned char u8;
 typedef short s16;
 
-extern u8 *D_L04_001B24DC;
-extern u8 *D_L04_001FE340[];
-extern int D_L04_001A8FE4[] __attribute__((sda));
-extern int D_L04_001A8FE8[] __attribute__((sda));
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
+extern u8 *g_moby_l04_pool;
+extern u8 *g_route_path_table[];
+extern int g_current_lap[] __attribute__((sda));
+extern int g_race_time_ticks[] __attribute__((sda));
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
 
 /* Collects the racers, sorts their recorded times, and records each rank and
    the next racer in the ordered list. */
-void func_L04_00410F80(u8 *object) {
+void race_sort_racers_by_finish_time(u8 *object) {
     u8 *list[24], **out;
     u8 *state = *(u8 **)(object + 0x68), *obj, *otherVars, *route;
     int *slot = (int *)(state + 0x1E4);
@@ -25,23 +25,23 @@ void func_L04_00410F80(u8 *object) {
     list[0] = object;
     for (slotsLeft = 19; slotsLeft >= 0; slotsLeft--, slot++) {
         if (*slot != -1) {
-            obj = gMobyPool_L04 + (*slot << 8);
+            obj = g_moby_l04_pool + (*slot << 8);
             otherVars = *(u8 **)(obj + 0x68);
             *out++ = obj;
             n++;
             if (*(int *)(otherVars + 0x1A0) == 0) {
-                route = gRoutePathTable[*(int *)(state + 0x1A8)];
+                route = g_route_path_table[*(int *)(state + 0x1A8)];
                 length = (float)*(int *)route * *(float *)(route + 0x1C);
                 distance = length - *(float *)(otherVars + 0x11C) +
-                           length * (float)(gCurrentLap[0] - *(int *)(otherVars + 0x160));
+                           length * (float)(g_current_lap[0] - *(int *)(otherVars + 0x160));
                 if (distance <= 0.0f) {
-                    distance = RandomFloatRange(10.0f, 20.0f);
+                    distance = math_random_float_range(10.0f, 20.0f);
                 }
                 *(int *)(otherVars + 0x1A0) = FloatToInt(distance * 3.0f);
                 if (*(int *)(otherVars + 0x1A0) < 6) {
                     *(int *)(otherVars + 0x1A0) = 6;
                 }
-                *(int *)(otherVars + 0x1A0) += gRaceTimeTicks[0];
+                *(int *)(otherVars + 0x1A0) += g_race_time_ticks[0];
             }
         }
     }
@@ -54,7 +54,7 @@ void func_L04_00410F80(u8 *object) {
                 {
                     u8 *obj = list[j];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
-                        keyA = gRaceTimeTicks[0];
+                        keyA = g_race_time_ticks[0];
                     } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
                         keyA = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
@@ -62,7 +62,7 @@ void func_L04_00410F80(u8 *object) {
                 {
                     u8 *obj = list[j + 1];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
-                        keyB = gRaceTimeTicks[0];
+                        keyB = g_race_time_ticks[0];
                     } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
                         keyB = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
@@ -118,19 +118,19 @@ typedef struct Trail416018 {
     char *owner;
     int tail;
 } Trail416018;
-extern Trail416018 D_L04_00254E10[] __attribute__((sda));
-extern unsigned char D_00189E20[];
+extern Trail416018 g_racer_trail_pool[] __attribute__((sda));
+extern unsigned char g_hero_state[];
 extern int D_L04_001B08F0 __attribute__((sda));
 extern void *D_L04_001B0914 __attribute__((sda));
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282D30(float *, float *, float);
-extern void func_00283098(float *, float *, char *);
-extern int func_00282948(int *);
-extern int func_00283D38(int, int, float);
-extern void func_L04_00415E28(void *);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecScale(float *, float *, float);
+extern void matrix_mul_vec3(float *, float *, char *);
+extern int math_fast_float_d(int *);
+extern int FastTweenColor(int, int, float);
+extern void trail_update_active_entries(void *);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 /* Moves the trails left behind by the racers: drops them to the ground, ages them, adds new points and fades finished ones away. */
-void func_L04_00416018(void)
+void racer_update_trails(void)
 {
     float local[4] __attribute__((aligned(16)));
     float floorZ, scale;
@@ -141,14 +141,14 @@ void func_L04_00416018(void)
     int i, j, count;
     char *owner;
     for (i = 0; i < 140; i++) {
-        trail = &gRacerTrailPool[i];
+        trail = &g_racer_trail_pool[i];
         if (!trail->active)
             continue;
         owner = trail->owner;
         count = trail->count;
         if (*(short *)(owner + 0xaa) == 0xbbc /* moby class 3004 */) {
             /* Through a pointer, as retail keeps the hero base in a register. */
-            unsigned char *hero = gHeroState;
+            unsigned char *hero = g_hero_state;
             floorZ = *(float *)(hero + 0x318) + 0.1f;
         } else {
             floorZ = *(float *)(owner + 0x18) - 0.25f;
@@ -188,7 +188,7 @@ void func_L04_00416018(void)
             trail->ages[count] = 0;
             trail->count++;
         } else if (trail->landed[count - 1] == 1) {
-            if (FastFloatHelperD(&trail->lifetime)) {
+            if (math_fast_float_d(&trail->lifetime)) {
                 trail->active = 0;
             } else {
                 trail->colour = FastTweenColor(0x00858585, 0x80858585,
@@ -196,5 +196,5 @@ void func_L04_00416018(void)
             }
         }
     }
-    AddDrawCallbackToList1(UpdateActiveEffectEntries, D_L04_001B0914);
+    gfx_add_draw_callback_first(trail_update_active_entries, D_L04_001B0914);
 }

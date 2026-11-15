@@ -20,10 +20,10 @@ extern int D_L09_001B17E0 __attribute__((sda));
 extern int D_L09_001B17E4 __attribute__((sda));
 extern float D_L09_001B17E8 __attribute__((sda));
 extern int D_L00_001A8FB4 __attribute__((sda));
-extern int D_001A79F0 __attribute__((section(".sdata")));
+extern int g_current_map_index __attribute__((section(".sdata")));
 extern int D_L09_001B25A0[] __attribute__((sda));
 extern int D_00138324 __attribute__((nosda));
-extern char D_00188660[];
+extern char g_sound_state[];
 typedef struct {
     char pad0[0x33C];
     u8 *standing;
@@ -33,26 +33,26 @@ typedef struct {
     u8 help;
 } Player10200;
 
-extern Player10200 D_00189E20;
+extern Player10200 g_hero_state;
 extern u8 D_001395B8[];
 extern char D_L09_001BFC00[];
 
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CD8(void *, void *, void *);
-extern int func_002A7820(int, int);
-extern int func_00283D38(int, int, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void add_vectors(void *, void *, void *);
+extern int math_random_int_range(int, int);
+extern int FastTweenColor(int, int, float);
 extern int func_001163B0(void);
-extern void func_002C2210(void *, int, float, float, int, int, int, void *, int, float);
-extern void func_002A7750(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002B0C28(int, int, int);
-extern int func_00288AA0(void *, int);
-extern void func_00288BE8(void *);
-extern void func_00288CB0(int, int);
-extern int func_002F5D10(void);
+extern void part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
+extern void moby_set_state(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern void TryClaimNotice(int, int, int);
+extern int req_push_queue(void *, int);
+extern void req_launch_queued(void *);
+extern void data_set_small_value_and_refresh(int, int);
+extern int game_is_either_mode_two(void);
 
 /* Throws one dust puff at a random point around the object, then runs its state: 0 arms it,
    1 keeps its sound slot and, while the player stands on it, shows a message on levels 9 and
@@ -74,64 +74,64 @@ void func_US2_L09_004116E0(u8 *obj)
     int dir;
     char *p;
 
-    r = func_002A7878(D_L09_001B17B0, D_L09_001B17B4);
-    pos[0] = func_00283180(func_002A7940()) * r;
-    pos[1] = func_00283198(func_002A7940()) * r;
+    r = math_random_float_range(D_L09_001B17B0, D_L09_001B17B4);
+    pos[0] = math_fast_sin_or_cos_a(math_random_angle()) * r;
+    pos[1] = math_fast_sin_or_cos_b(math_random_angle()) * r;
     pos[2] = 0.0f;
-    func_00282CD8(tmp, pos, obj + 0x10);
+    add_vectors(tmp, pos, obj + 0x10);
     pos[2] -= D_L09_001B17E8;
     qzero_nc(vel);
-    vel[2] = func_002A7878(D_L09_001B17B8, D_L09_001B17BC) * (1.0f / 60.0f);
-    life = func_002A7820(D_L09_001B17A8, D_L09_001B17AC);
-    spin = func_002A7878(D_L09_001B17C8, D_L09_001B17CC);
-    size = func_002A7878(D_L09_001B17D0, D_L09_001B17D4);
-    tex = func_00283D38(D_L09_001B17D8, D_L09_001B17DC, func_002A7878(0.0f, 1.0f));
-    n = func_002A7820(D_L09_001B17E0, D_L09_001B17E4);
+    vel[2] = math_random_float_range(D_L09_001B17B8, D_L09_001B17BC) * (1.0f / 60.0f);
+    life = math_random_int_range(D_L09_001B17A8, D_L09_001B17AC);
+    spin = math_random_float_range(D_L09_001B17C8, D_L09_001B17CC);
+    size = math_random_float_range(D_L09_001B17D0, D_L09_001B17D4);
+    tex = FastTweenColor(D_L09_001B17D8, D_L09_001B17DC, math_random_float_range(0.0f, 1.0f));
+    n = math_random_int_range(D_L09_001B17E0, D_L09_001B17E4);
     dir = (func_001163B0() & 1) ? -n : n;
-    func_002C2210(pos, life, spin, size, tex, 2, dir, vel, 0,
-                  -(func_002A7878(D_L09_001B17C0, D_L09_001B17C4) * (1.0f / 3600.0f)));
+    part_spawn_ground_effect(pos, life, spin, size, tex, 2, dir, vel, 0,
+                  -(math_random_float_range(D_L09_001B17C0, D_L09_001B17C4) * (1.0f / 3600.0f)));
 
     switch (obj[0x20]) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         st[2] = -1;
         break;
     case 1:
-        p = D_00188660 + st[2] * 0x70;
+        p = g_sound_state + st[2] * 0x70;
         if (*(u8 **)(p + 0x88) != obj || *(u8 *)(p + 0x74) == 0)
-            st[2] = func_002E5CF8(0, 4, obj);
-        if (D_00189E20.standing != obj || D_00189E20.busy != 0)
+            st[2] = PlayMobySound(0, 4, obj);
+        if (g_hero_state.standing != obj || g_hero_state.busy != 0)
             break;
-        if (D_00189E20.help == 0) {
-            if (D_001A79F0 == 9)
-                func_002B0C28(4, 0x1318, 1);
-            else if (D_001A79F0 == 18)
-                func_002B0C28(4, 0x133f, 1);
-        } else if (D_00189E20.help == 2) {
-            func_002B0C28(4, 0x1306, 1);
+        if (g_hero_state.help == 0) {
+            if (g_current_map_index == 9)
+                TryClaimNotice(4, 0x1318, 1);
+            else if (g_current_map_index == 18)
+                TryClaimNotice(4, 0x133f, 1);
+        } else if (g_hero_state.help == 2) {
+            TryClaimNotice(4, 0x1306, 1);
         }
         if (!(D_00138324 & 0x10) || D_L00_001A8FB4 != 4)
             break;
-        if (D_001A79F0 == 9 || D_001A79F0 == 18)
-            func_002A7750(obj, 2, -1);
+        if (g_current_map_index == 9 || g_current_map_index == 18)
+            moby_set_state(obj, 2, -1);
         else
-            func_002A7750(obj, 4, -1);
+            moby_set_state(obj, 4, -1);
         break;
     case 2:
-        if (D_001A79F0 == 9) {
-            if (func_00288AA0(D_L09_001BFC00, 100)) {
-                func_00288BE8(D_L09_001BFC00);
-                func_002A7750(obj, 3, -1);
+        if (g_current_map_index == 9) {
+            if (req_push_queue(D_L09_001BFC00, 100)) {
+                req_launch_queued(D_L09_001BFC00);
+                moby_set_state(obj, 3, -1);
             }
-        } else if (D_001A79F0 == 18) {
-            if (func_00288AA0(D_L09_001BFC00, 0x92)) {
-                func_00288BE8(D_L09_001BFC00);
-                func_002A7750(obj, 3, -1);
+        } else if (g_current_map_index == 18) {
+            if (req_push_queue(D_L09_001BFC00, 0x92)) {
+                req_launch_queued(D_L09_001BFC00);
+                moby_set_state(obj, 3, -1);
             }
         }
         break;
     case 3:
-        if (func_002F5D10()) {
+        if (game_is_either_mode_two()) {
             D_L09_001B25A0[2] = 1;
             break;
         }
@@ -140,7 +140,7 @@ void func_US2_L09_004116E0(u8 *obj)
 
         D_L09_001B25A0[2] = 0;
         obj[0x31] = 1;
-        lvl = D_001A79F0;
+        lvl = g_current_map_index;
         *(u16 *)(obj + 0x34) &= ~1;
         if (lvl == 9) {
             D_001395B8[0x1D] = 1;
@@ -149,7 +149,7 @@ void func_US2_L09_004116E0(u8 *obj)
             D_001395B8[0x87] = 1;
             D_001395B8[0x9F] = 1;
         }
-        func_00288CB0(st[0], 1);
+        data_set_small_value_and_refresh(st[0], 1);
         break;
     }
     case 5:

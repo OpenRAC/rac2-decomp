@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L04_004158F0, the PAL copy of func_L04_00411298 (the race HUD: lap panels, record time
  * and the ranking list): the same C with PAL string ids and the 50 Hz timings (times / 50, 3000 and
  * 180000, a % 12 blink, 0.5f steps), where language 2 (D_001A7BB0[4], the byte func_PAL_0034FD60
@@ -13,7 +14,7 @@
 
 extern u8 *D_L04_001B0914 __attribute__((sda));
 extern s32 D_L04_001B08F8 __attribute__((sda));
-extern s32 D_L04_001B090C __attribute__((sda));
+extern s32 g_current_race_index __attribute__((sda));
 extern s32 D_L04_001B093C __attribute__((sda));
 extern s32 D_L04_001B0A24 __attribute__((sda));
 extern s32 D_L04_001B0A28 __attribute__((sda));
@@ -22,36 +23,36 @@ extern s32 D_L04_001B0A38 __attribute__((sda));
 extern f32 D_L04_001B0A30 __attribute__((sda));
 extern f32 D_L04_001B0A34 __attribute__((sda));
 extern f32 D_L04_001B2D44;
-extern s32 D_L04_001A8FE8;
-extern s32 D_001A7340, D_001A7B90;
+extern s32 g_race_time_ticks;
+extern s32 g_screen_width, g_is_pal_video;
 extern u8 D_001A7A0A;
 extern unsigned char D_001A7BB0[] __attribute__((sda));
 extern u8 *D_L04_001A904C;
 typedef struct { u8 pad[0xB0]; f32 tangent; } HudCamera;
 extern HudCamera D_L04_001BDB80;
 typedef struct { s32 pad[2]; s32 times[14]; } RecordRow;
-extern RecordRow D_L04_002C63C0[] NOT_SDA;
+extern RecordRow g_race_challenge_table[] NOT_SDA;
 extern s32 D_L04_002CA1E0[] NOT_SDA;
 extern char D_L04_001B0A40[] NOT_SDA, D_L04_001B0A50[] NOT_SDA;
 extern char D_PAL_L04_001B0B08[] NOT_SDA;
 extern char D_L04_001B0A58[] NOT_SDA, D_L04_001B0A70[] NOT_SDA;
 extern char D_L04_001B0A88[] NOT_SDA, D_L04_001B0A98[] NOT_SDA;
 extern char D_L04_001B0AA8[] NOT_SDA, D_L04_001B0AC0[] NOT_SDA;
-extern f32 func_00283180(f32), func_00283198(f32);
-extern void func_0027AB40(void);
-extern s32 func_L04_0040A1D0(s32);
-extern void *func_00336D50(void *, s32);
-extern void func_00300A00(void *, s32, f32, f32, f32, f32, f32);
-extern char *func_00288FB8(s32);
+extern f32 math_fast_sin_or_cos_a(f32), math_fast_sin_or_cos_b(f32);
+extern void UpdateViewContext(void);
+extern s32 race_get_course_win_count(s32);
+extern void *table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object_two_axes(void *, s32, f32, f32, f32, f32, f32);
+extern char *GetLocalizedString(s32);
 extern s32 func_001157AC(char *);
-extern s32 func_00115DA8(char *, char *, ...);
-extern s32 func_0027FAA8(s32, s32, u64, char *, s32);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
-extern void func_0027FA10(s32, s32, u64, char *, s32);
-extern s32 func_0027FB40(s32, s32, u64, char *, s32);
-extern s32 func_00283D38(s32, s32, f32);
-extern s32 func_002E5CF8(s32, s32, void *);
-extern void func_002FC560(u32, u64);
+extern s32 sprintf(char *, char *, ...);
+extern s32 text_draw_centered_small(s32, s32, u64, char *, s32);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
+extern void text_draw_right_aligned_medium(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_medium(s32, s32, u64, char *, s32);
+extern s32 FastTweenColor(s32, s32, f32);
+extern s32 PlayMobySound(s32, s32, void *);
+extern void VU1_addGSregister(u32, u64);
 
 extern int D_L04_001B2D40;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -130,30 +131,30 @@ tick:
         if (D_L04_001B0A24 >= 4) D_L04_001B0A24 = 0;
     }
     angle = 0.56217057f;
-    D_L04_001BDB80.tangent = func_00283198(angle) / func_00283180(angle);
-    func_0027AB40();
+    D_L04_001BDB80.tangent = math_fast_sin_or_cos_b(angle) / math_fast_sin_or_cos_a(angle);
+    UpdateViewContext();
     flag = *(s32 *)(state + 0x320);
     if (flag == 1) {
-        lap = func_L04_0040A1D0(D_L04_001B090C);
+        lap = race_get_course_win_count(g_current_race_index);
         if (lap > 3) lap = 3;
-        sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x39);
-        func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
-        sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x38);
-        func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
-        { char *str_ = func_00288FB8(0xeb8); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 32.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, len_); }
+        sprite = table_find_by_id(D_L04_001A904C + 0x8710, 0x39);
+        gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, (f32)(g_screen_width / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, g_is_pal_video ? 0.9f : 0.92f, 0.0f);
+        sprite = table_find_by_id(D_L04_001A904C + 0x8710, 0x38);
+        gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (f32)(g_screen_width / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, g_is_pal_video ? 0.9f : 0.92f, 0.0f);
+        { char *str_ = GetLocalizedString(0xeb8); int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 32.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, str_, len_); }
         if (D_L04_001B093C > 0) {
             if (D_001A7BB0[4] == 2) {
-                int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = func_00288FB8(0x1233); func_0027FB40(x_, row_, 0x80F0F0F0ULL, str_, -1);
+                int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = GetLocalizedString(0x1233); text_draw_centered_medium(x_, row_, 0x80F0F0F0ULL, str_, -1);
             } else {
-                int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = func_00288FB8(0x1233); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, -1);
+                int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); char *str_ = GetLocalizedString(0x1233); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, str_, -1);
             }
             D_L04_001B093C--;
-        } else if (D_L04_002C63C0[D_L04_001B090C].times[lap - 1]) {
+        } else if (g_race_challenge_table[g_current_race_index].times[lap - 1]) {
             s32 recordTime;
-            char *recordFormat = func_00288FB8(0xeeb);
-            recordTime = D_L04_002C63C0[D_L04_001B090C].times[lap - 1];
+            char *recordFormat = GetLocalizedString(0xeeb);
+            recordTime = g_race_challenge_table[g_current_race_index].times[lap - 1];
             if (D_001A7A0A) recordTime *= 10;
-            { int n_ = func_00115DA8(text, recordFormat, recordTime); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
+            { int n_ = sprintf(text, recordFormat, recordTime); int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(text); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, text, len_); }
         }
     }
     bottom = 315 - (s32)D_L04_001B0A34;
@@ -162,14 +163,14 @@ tick:
     flag = 1;
     fbottom = (f32)bottom;
     alpha = (1.0f - (315.0f - fbottom) * 0.006329114f) * 0.72f + 0.08f;
-    sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x47);
-    func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
-    sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x46);
-    func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
-    { int x_, row_, len_; func_00115DA8(text, D_L04_001B0A40, func_00288FB8(0xea4),
-        func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0xea5));
-      x_ = D_001A7340 / 2; row_ = label_y((void *)x_, 106.0f, D_L04_001B2D44, 0.5f, 1); len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
-    { int row_ = hud_coord(fbottom, D_L04_001B2D44, 0.5f); char *str_ = func_00288FB8(0xe67); func_0027FA10(390, row_, 0x80F0F0F0ULL, str_, -1); }
+    sprite = table_find_by_id(D_L04_001A904C + 0x8710, 0x47);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, (f32)(g_screen_width / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, g_is_pal_video ? 0.9f : 0.92f, alpha);
+    sprite = table_find_by_id(D_L04_001A904C + 0x8710, 0x46);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (f32)(g_screen_width / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, g_is_pal_video ? 0.9f : 0.92f, alpha);
+    { int x_, row_, len_; sprintf(text, D_L04_001B0A40, GetLocalizedString(0xea4),
+        GetLocalizedString(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), GetLocalizedString(0xea5));
+      x_ = g_screen_width / 2; row_ = label_y((void *)x_, 106.0f, D_L04_001B2D44, 0.5f, 1); len_ = func_001157AC(text); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, text, len_); }
+    { int row_ = hud_coord(fbottom, D_L04_001B2D44, 0.5f); char *str_ = GetLocalizedString(0xe67); text_draw_right_aligned_medium(390, row_, 0x80F0F0F0ULL, str_, -1); }
     y = 138;
     ahead = 0;
     racer = *(u8 **)(state + 0x39C);
@@ -184,7 +185,7 @@ tick:
         if (*(s16 *)(racer + 0xAA) == 0xBBC) {
             if (y <= 138) { y = 138; D_L04_001B0A28 = 1; }
             rank = *(s32 *)(state + 0x320);
-            time = D_L04_001A8FE8;
+            time = g_race_time_ticks;
             playerSeen = 1;
             racer = *(u8 **)(state + 0x3A0);
         } else if (*(s16 *)(racer + 0xAA) == 0xB2D) {
@@ -194,9 +195,9 @@ tick:
             racer = *(u8 **)(rs + 0x1A4);
             if (rank > 10) continue;
             if (*(s32 *)(state + 0x320) < rank) {
-                s32 projected = D_L04_001A8FE8 + D_L04_001B08F8;
+                s32 projected = g_race_time_ticks + D_L04_001B08F8;
                 if (projected < time) { D_L04_001B0A38 = 0; ahead++; }
-                if (time == projected) func_002E5CF8(22, 17, object);
+                if (time == projected) PlayMobySound(22, 17, object);
             }
         }
         if (y < 128) { if (rank <= 10) row++; continue; }
@@ -204,48 +205,48 @@ tick:
         if (rank == *(s32 *)(state + 0x320)) { color2 = 0x8000C0C0; color1 = 0x8000C0C0; }
         else { color2 = 0x80F0F0F0; color1 = 0xF0F0F0; }
         if (y < 138) {
-            color = func_00283D38(color1, color2, ((f32)y - 128.0f) * fade);
+            color = FastTweenColor(color1, color2, ((f32)y - 128.0f) * fade);
         }
         else if (*(s32 *)(state + 0x320) < rank && bottom - y <= 20)
         {
-            color = func_00283D38(color1, color2, (f32)(bottom - y - 10) * fade);
+            color = FastTweenColor(color1, color2, (f32)(bottom - y - 10) * fade);
         }
         else { color = color2; }
         fy = (f32)y;
-        func_00115DA8(text, D_L04_001B0A50, func_00288FB8(D_L04_002CA1E0[rank - 1]));
+        sprintf(text, D_L04_001B0A50, GetLocalizedString(D_L04_002CA1E0[rank - 1]));
         half = 0.5f;
-        func_0027FB40(170, label_y((void *)color, fy, D_L04_001B2D44, half, one), (s64)color, text, -1);
+        text_draw_centered_medium(170, label_y((void *)color, fy, D_L04_001B2D44, half, one), (s64)color, text, -1);
         if (ahead > 0) {
-            if (D_L04_001B0A24 == 3 || ahead >= 2) func_00115DA8(text, D_L04_001B0A58, func_00288FB8(0xed5));
-            else if (D_L04_001B0A24 == 2) func_00115DA8(text, D_L04_001B0A70, func_00288FB8(0xed5));
-            else if (D_L04_001B0A24 == 1) func_00115DA8(text, D_L04_001B0A88, func_00288FB8(0xed5));
-            else func_00115DA8(text, D_L04_001B0A98, func_00288FB8(0xed5));
+            if (D_L04_001B0A24 == 3 || ahead >= 2) sprintf(text, D_L04_001B0A58, GetLocalizedString(0xed5));
+            else if (D_L04_001B0A24 == 2) sprintf(text, D_L04_001B0A70, GetLocalizedString(0xed5));
+            else if (D_L04_001B0A24 == 1) sprintf(text, D_L04_001B0A88, GetLocalizedString(0xed5));
+            else sprintf(text, D_L04_001B0A98, GetLocalizedString(0xed5));
         } else {
             if (time / 50 % 60 < 10)
-                func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0xea8), time / 180000, time / 3000 % 60, time / 50 % 60, time / 5 % 10);
+                sprintf(text, D_L04_001B0AA8, GetLocalizedString(0xea8), time / 180000, time / 3000 % 60, time / 50 % 60, time / 5 % 10);
             else
-                func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0xea8), time / 180000, time / 3000 % 60, time / 50 % 60, time / 5 % 10);
+                sprintf(text, D_L04_001B0AC0, GetLocalizedString(0xea8), time / 180000, time / 3000 % 60, time / 50 % 60, time / 5 % 10);
         }
         half = 0.5f;
-        func_0027F5B8(210, hud_coord(fy, D_L04_001B2D44, half), (s64)color, text, -1); row++;
+        text_draw_medium(210, hud_coord(fy, D_L04_001B2D44, half), (s64)color, text, -1); row++;
         if (row >= 10) break;
     }
     if (*(s32 *)(state + 0x320) > 10 && !D_L04_001B0A28 && !playerSeen) {
-        func_00115DA8(text, D_PAL_L04_001B0B08, func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0xea6));
+        sprintf(text, D_PAL_L04_001B0B08, GetLocalizedString(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), GetLocalizedString(0xea6));
         y += 15;
-        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027FB40(175, row_, 0x8000C0C0ULL, text, -1); }
-        if (D_L04_001A8FE8 / 50 % 60 < 10)
-            func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0xea8), D_L04_001A8FE8 / 180000, D_L04_001A8FE8 / 3000 % 60, D_L04_001A8FE8 / 50 % 60, D_L04_001A8FE8 / 5 % 10);
+        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); text_draw_centered_medium(175, row_, 0x8000C0C0ULL, text, -1); }
+        if (g_race_time_ticks / 50 % 60 < 10)
+            sprintf(text, D_L04_001B0AA8, GetLocalizedString(0xea8), g_race_time_ticks / 180000, g_race_time_ticks / 3000 % 60, g_race_time_ticks / 50 % 60, g_race_time_ticks / 5 % 10);
         else
-            func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0xea8), D_L04_001A8FE8 / 180000, D_L04_001A8FE8 / 3000 % 60, D_L04_001A8FE8 / 50 % 60, D_L04_001A8FE8 / 5 % 10);
-        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027F5B8(220, row_, 0x8000C0C0ULL, text, -1); }
+            sprintf(text, D_L04_001B0AC0, GetLocalizedString(0xea8), g_race_time_ticks / 180000, g_race_time_ticks / 3000 % 60, g_race_time_ticks / 50 % 60, g_race_time_ticks / 5 % 10);
+        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); text_draw_medium(220, row_, 0x8000C0C0ULL, text, -1); }
     }
     if (*(u8 *)(object + 0x20) != 3) {
         f32 angle;
         angle = *(f32 *)(state + 0x28C) * 0.008726647f;
-        D_L04_001BDB80.tangent = func_00283198(angle) / func_00283180(angle);
-        func_0027AB40();
+        D_L04_001BDB80.tangent = math_fast_sin_or_cos_b(angle) / math_fast_sin_or_cos_a(angle);
+        UpdateViewContext();
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
     return 1;
 }

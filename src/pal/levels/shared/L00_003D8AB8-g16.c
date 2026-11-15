@@ -9,12 +9,12 @@
 typedef unsigned int KilonoidQuad __attribute__((mode(TI)));
 
 extern int D_L00_001A8F00 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_L00_001ADB2C __attribute__((sda));
 extern int D_L00_001B0264 __attribute__((sda)), D_L00_001B0270 __attribute__((sda)), D_L00_001B0274 __attribute__((sda)), D_L00_001B0278 __attribute__((sda)), D_L00_001B0288 __attribute__((sda));
 extern float D_L00_001B027C __attribute__((sda)), D_L00_001B0280 __attribute__((sda)), D_L00_001B0284 __attribute__((sda)), D_L00_001B028C __attribute__((sda));
 /* The creator scans four pointer slots (003D3E54: index < 4). */
-extern unsigned char *D_L00_001B02B0[4] __attribute__((sda));
+extern unsigned char *g_kilonoid_slots[4] __attribute__((sda));
 typedef struct {
     unsigned char pad000[0x80];
     float position[4];
@@ -32,8 +32,8 @@ typedef struct {
     unsigned char pad22a0[0x14];
     unsigned char flag;
 } KilonoidHeroView;
-extern KilonoidHeroView D_00189E20 __attribute__((nosda));
-extern unsigned char D_00188660[] __attribute__((nosda));
+extern KilonoidHeroView g_hero_state __attribute__((nosda));
+extern unsigned char g_sound_state[] __attribute__((nosda));
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern int ref_L00_003D4A20_01(int, int, char *);
 extern float ref_L00_003D4A20_02(void);
@@ -66,7 +66,7 @@ static __inline__ void ReleaseSound(int index, unsigned char *object)
 {
     unsigned char *entry;
     if (index != -1) {
-        entry = D_00188660 + index * 0x70;
+        entry = g_sound_state + index * 0x70;
         if (*(unsigned char **)(entry + 0x88) == object && entry[0x74])
             ref_L00_003D4A20_06(index);
     }
@@ -115,11 +115,11 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
         state[0x25] = 0;
         ((int *)state)[0x30/4] = 0;
         *(int *)(state+0x2c) = ((s32)(D_L00_001B0264) * 5 + 2) / 6;
-        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)D_00189E20.position;
+        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)g_hero_state.position;
         {
-            unsigned char *current = D_00188660 + (signed char)state[0x27] * 0x70;
+            unsigned char *current = g_sound_state + (signed char)state[0x27] * 0x70;
             if (*(unsigned char **)(current+0x88) != object || !current[0x74]) {
-                unsigned char *fallback = D_00188660 - 0x70;
+                unsigned char *fallback = g_sound_state - 0x70;
                 state[0x27] = -1;
                 if (*(unsigned char **)(fallback+0x88) != object || !fallback[0x74])
                     state[0x27] = ref_L00_003D4A20_01(1, 4, object);
@@ -135,19 +135,19 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
     case 1:
         if ((object[0x60]&2) && object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 10);
         {
-            unsigned char *current = D_00188660 + (signed char)state[0x27] * 0x70;
+            unsigned char *current = g_sound_state + (signed char)state[0x27] * 0x70;
             if (*(unsigned char **)(current+0x88) != object || !current[0x74]) {
-                unsigned char *fallback = D_00188660 - 0x70;
+                unsigned char *fallback = g_sound_state - 0x70;
                 state[0x27] = -1;
                 if (*(unsigned char **)(fallback+0x88) != object || !fallback[0x74])
                     state[0x27] = ref_L00_003D4A20_01(1, 4, object);
             }
         }
         displaced = 0;
-        if (D_00189E20.state != 129 && ref_L00_003D4A20_03(state+0x60, D_00189E20.position)>400.0f) displaced = 1;
+        if (g_hero_state.state != 129 && ref_L00_003D4A20_03(state+0x60, g_hero_state.position)>400.0f) displaced = 1;
         if (displaced) {
-            if (D_001A79F0 == 7 && D_00189E20.attached && *(short *)(D_00189E20.attached+0xaa) == 0x11d9) {
-                ref_L00_003D4A20_04(temp, D_00189E20.position, state+0x60);
+            if (g_current_map_index == 7 && g_hero_state.attached && *(short *)(g_hero_state.attached+0xaa) == 0x11d9) {
+                ref_L00_003D4A20_04(temp, g_hero_state.position, state+0x60);
                 ref_L00_003D4A20_05(object+0x10, object+0x10, temp);
             } else {
                 ReleaseSound((signed char)state[0x27], object);
@@ -157,12 +157,12 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
                 goto destroy;
             }
         }
-        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)D_00189E20.position;
+        *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)g_hero_state.position;
         if (*(int *)(state+0x20)>17 && (object[0x60]&2)) {
             if (object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, ((s32)(ref_L00_003D4A20_07(7, 12)) * 5 + 2) / 6);
             *(float *)(object+0x48) = ref_L00_003D4A20_08(0.95f, 1.05f);
         }
-        if ((unsigned char)state[0x25]<*(int *)(state+0x40) && D_00189E20.mode != 22 && D_00189E20.mode != 20 && !D_00189E20.flag) {
+        if ((unsigned char)state[0x25]<*(int *)(state+0x40) && g_hero_state.mode != 22 && g_hero_state.mode != 20 && !g_hero_state.flag) {
             ref_L00_003D4A20_09(object, state);
             func_PAL_L00_003D85E0(object, state);
         } else {
@@ -186,7 +186,7 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
 destroy:
             ((KilonoidObjectView *)object)->flags &= 0xfdff;
             if (*(int *)(state+0x38) != -1)
-                D_L00_001B02B0[*(int *)(state+0x38)] = 0;
+                g_kilonoid_slots[*(int *)(state+0x38)] = 0;
             ref_L00_003D4A20_13(object);
             return;
         }
@@ -213,9 +213,9 @@ destroy:
     {
         unsigned char *position = object+0x10;
         if (!D_L00_001ADB2C) {
-            if (D_00189E20.state == 39) ref_L00_003D4A20_05(position, position, D_00189E20.displacement);
+            if (g_hero_state.state == 39) ref_L00_003D4A20_05(position, position, g_hero_state.displacement);
             else {
-                ref_L00_003D4A20_05(temp, position, D_00189E20.velocity);
+                ref_L00_003D4A20_05(temp, position, g_hero_state.velocity);
                 ref_L00_003D4A20_17(position, position, temp, 0.4f);
                 ref_L00_003D4A20_18(position, position, temp, 0.625f);
             }
@@ -225,11 +225,11 @@ destroy:
         func_PAL_L00_003D89F0(object, state);
     }
 basis:
-    heroMoby = D_00189E20.moby;
+    heroMoby = g_hero_state.moby;
     qcopy(object+0xc0, heroMoby+0xc0);
     qcopy(object+0xd0, heroMoby+0xd0);
     qcopy(object+0xe0, heroMoby+0xe0);
-    if (D_00189E20.mode == 15) {
+    if (g_hero_state.mode == 15) {
         qcopy(object+0xc0, heroMoby+0xd0);
         ref_L00_003D4A20_22(object+0xd0, heroMoby+0xc0, -1.0f);
     }

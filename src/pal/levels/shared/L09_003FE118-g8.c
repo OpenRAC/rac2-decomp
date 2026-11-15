@@ -6,14 +6,14 @@
 extern float D_L09_001B0F28 __attribute__((sda));
 extern float D_L09_001B0F2C __attribute__((sda));
 extern int D_L09_001B0F40 __attribute__((sda));
-extern float func_00282E80(void *, void *);
-extern int func_00282978(void *);
-extern int func_L09_003F9568(void *, int, int, int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(float *, float *, float);
-extern int func_002E5CF8(int, int, void *);
-extern char *func_L09_003A06B0(void *, float, void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int FastDecTimer(void *);
+extern int enemy_check_line_of_sight(void *, int, int, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern int PlayMobySound(int, int, void *);
+extern char *moby_spawn_aimed_effect(void *, float, void *, void *);
 
 typedef struct { char gap[0x2F0]; char *parts[2]; } Parts9708;
 
@@ -26,15 +26,15 @@ void func_PAL_L09_003FE118(char *obj)
     char *parent;
     int close = 1;
     int side, shift;
-    if (!(func_00282E80(obj + 0x10, *(char **)(state + 0x200)+0x10) < D_L09_001B0F2C))
+    if (!(vec_distance_xy(obj + 0x10, *(char **)(state + 0x200)+0x10) < D_L09_001B0F2C))
         close = 0;
-    if (!*(int *)(state + 0x2F8) || !func_00282978(state + 0x2E4))
+    if (!*(int *)(state + 0x2F8) || !FastDecTimer(state + 0x2E4))
         return;
     side = (*(unsigned short *)(obj + 0x96) / (((s32)(D_L09_001B0F40) * 5 + 2) / 6)) & 1;
     shift = side ? 5 : 4;
     if (!((*(unsigned short *)(*(char **)(state + 0x2F8)+0x7C) >> shift) & 1))
         goto invalid;
-    if (!func_L09_003F9568(obj, 1, 0, *(u8 *)(state + 0x30D) != 0))
+    if (!enemy_check_line_of_sight(obj, 1, 0, *(u8 *)(state + 0x30D) != 0))
         return;
     parent = ((Parts9708 *)state)->parts[side];
     if (!parent || *(short *)(parent + 0xAA) != 0xD66)
@@ -45,18 +45,18 @@ void func_PAL_L09_003FE118(char *obj)
         return;
     {
         *(short *)(state + 0x2E4) = ((s32)(D_L09_001B0F40) * 5 + 2) / 6;
-        func_0029FCC0(((Parts9708 *)state)->parts[side], 0, pos);
-        func_00282CF0(dir, (float *)(state + 0x1F0), pos);
-        func_00282F20(dir, dir, D_L09_001B0F28 * 0.020000001f);
+        moby_transform_joint_to_world(((Parts9708 *)state)->parts[side], 0, pos);
+        FastVecSub(dir, (float *)(state + 0x1F0), pos);
+        vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.020000001f);
         if (!close && !*(u8 *)(state + 0x30D)) {
             if (dir[2] > 0.040000003f)
                 dir[2] = 0.040000003f;
             else if (dir[2] < -0.040000003f)
                 dir[2] = -0.040000003f;
         }
-        func_00282F20(dir, dir, D_L09_001B0F28 * 0.020000001f);
-        func_002E5CF8(1, 0, *(void **)(state + 0x2F8));
-        func_L09_003A06B0(obj, (float)*(u8 *)(state + 0x34), dir, pos);
+        vec_scale_to_length(dir, dir, D_L09_001B0F28 * 0.020000001f);
+        PlayMobySound(1, 0, *(void **)(state + 0x2F8));
+        moby_spawn_aimed_effect(obj, (float)*(u8 *)(state + 0x34), dir, pos);
     }
     return;
 invalid:

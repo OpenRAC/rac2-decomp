@@ -1,13 +1,14 @@
+#include "names.h"
 /* func_PAL_L22_002B7B08, the PAL copy of func_L22_002B7C70: the same C, where lit 0.024f becomes 0.0288f. */
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
-extern void func_L22_002C9898(int mode, int flag);
+extern void hero_l22_set_action(int mode, int flag);
 
 /* Loads the level's tuning constants and starts the two subsystems. */
 /* func_L22_002A8B98 is defined in L22_002A8B98-init.c. */
 
-extern void func_002AA2E8(float *, float, float);
+extern void ApproachValue(float *, float, float);
 extern int D_00138320;
 /* the two calls whose targets differ between levels 22 and 23 */
 typedef struct {
@@ -70,12 +71,12 @@ typedef float f32;
    so each stretch of the body re-materialises the base instead of keeping it
    live across the calls; the three table entries are the routines the tuning
    table points at, whose places differ from level to level. */
-extern float func_00282E80(void *, void *);
-extern void func_002AA2E8(float *, float, float);
-extern void func_002AA3A8(float *, float *, float, float, float, float);
+extern float vec_distance_xy(void *, void *);
+extern void ApproachValue(float *, float, float);
+extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 void func_PAL_L22_002B7B08(void) {
-    char *g = D_00189E20;
+    char *g = g_hero_state;
     switch (*(u8 *)(g + 0x22B4)) {
     case 0:
         *(float *)(g + 0x258) = 0.8f;
@@ -94,7 +95,7 @@ void func_PAL_L22_002B7B08(void) {
         break;
     }
     {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
         if (*(int *)(g + 0x229C) == 4) {
             if (*(short *)(g + 0x4AC) < *(int *)(g + 0x1B8) && !*(u8 *)(g + 0x49E))
                 *(float *)(g + 0x25C) = *(float *)(g + 0x4B8);
@@ -109,29 +110,29 @@ void func_PAL_L22_002B7B08(void) {
             *(float *)(g + 0x258) = 0.8f;
             *(float *)(g + 0x25C) = 0.9f;
         } else {
-            char *g = D_00189E20;
+            char *g = g_hero_state;
             if (*(int *)(g + 0x2294) == 0x7C)
                 *(float *)(g + 0x260) = 0.8f;
         }
     }
     {
-        char *g = D_00189E20;
+        char *g = g_hero_state;
         if (*(u8 *)(g + 0x287) && *(int *)(g + 0x22A4) != 18 && *(int *)(g + 0x22B0) != 18 &&
             (*(u8 *)(g + 0x22B4) != 0 || !(*(float *)(g + 0x254) < 0.53f)) &&
             *(int *)(g + 0x229C) != 17 && !*(u8 *)(g + 0x1494) &&
-            !(func_00282E80(g + 0x240, g + 0x80) > *(float *)(g + 0x264) * 0.5f))
+            !(vec_distance_xy(g + 0x240, g + 0x80) > *(float *)(g + 0x264) * 0.5f))
             return;
     }
     {
-        float *speeds = (float *)(D_00189E20 + 0x250);
+        float *speeds = (float *)(g_hero_state + 0x250);
         char *g = (char *)speeds - 0x250;
-        func_002AA2E8(speeds, *(float *)(g + 0x258), 0.024f);
-        func_002AA2E8(speeds + 1, *(float *)(g + 0x25C), 0.024f);
-        func_002AA3A8(speeds + 5, speeds + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
+        ApproachValue(speeds, *(float *)(g + 0x258), 0.024f);
+        ApproachValue(speeds + 1, *(float *)(g + 0x25C), 0.024f);
+        math_spring_float_to_goal(speeds + 5, speeds + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }
 
-extern void func_L22_002C9898(int a0, int a1);
+extern void hero_l22_set_action(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */

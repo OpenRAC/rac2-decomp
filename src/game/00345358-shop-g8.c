@@ -29,27 +29,27 @@ typedef struct {
     int row;                    /* +0x500 */
 } ItemMenu;
 
-extern int func_002E5E58(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
 extern void *memset(void *, int, unsigned int);
-extern int func_002A9588(int, int, int, int, int);
-extern int *func_00335E20(void *);
-extern void func_00335E38(void *, float, float, float, float);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, char *, ...);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern int *object_get_fourth_field(void *);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, char *, ...);
 extern char D_001AE508[], D_001AE510[], D_001AE518[], D_001AE520[];
 extern char D_001AE528[], D_001AE530[], D_001AE538[], D_001ADF98[], D_001AE548[];
 extern char ref_00346C60_00[];
 extern short D_00259F58[][5];
-extern ItemRecord D_00239BA0[];
-extern unsigned char D_00139568[];
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern ItemRecord g_weapon_table[];
+extern unsigned char g_item_slot_to_record[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern unsigned char D_001A7B30[] MACRO_ADDR;
-extern int D_00139688[];
-extern int D_001ADB10 __attribute__((sda));
+extern int g_item_ammo_counts[];
+extern int g_selected_item_material __attribute__((sda));
 extern int D_001F2880[];
 
 /* Moves the cursor on the item grid, shows the name and ammo of the item under it and returns the choice when cross is pressed. */
-int func_00346C60(ItemMenu *menu, int buttons)
+int UpdateItemGridMenu(ItemMenu *menu, int buttons)
 {
     float pos0[2] __attribute__((aligned(16)));
     float pos4C[2] __attribute__((aligned(16)));
@@ -69,19 +69,19 @@ int func_00346C60(ItemMenu *menu, int buttons)
     char *text;
 
     if (buttons & 0x1000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = menu->row - 1;
         menu->row = nextValue < 0 ? 5 : nextValue;
     } else if (buttons & 0x4000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = menu->row + 1;
         menu->row = nextValue <= 5 ? nextValue : 0;
     } else if (buttons & 0x8000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = menu->column - 1;
         menu->column = nextValue < 0 ? 3 : nextValue;
     } else if (buttons & 0x2000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         nextValue = menu->column + 1;
         menu->column = nextValue <= 3 ? nextValue : 0;
     }
@@ -97,63 +97,63 @@ int func_00346C60(ItemMenu *menu, int buttons)
     __builtin_memcpy(pos258, D_001AE518, 8);
     __builtin_memcpy(pos2A0, D_001AE520, 8);
     if (oldSelection != selection)
-        PingPongBlendValues(0, 0, 1, 0, 1);
-    color = GetFieldC((char *)menu + 0xE4);
-    *color = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
+        math_ping_pong_blend_values(0, 0, 1, 0, 1);
+    color = object_get_fourth_field((char *)menu + 0xE4);
+    *color = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);
 
-    SetFirstFloat4((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0xE4,
+    object_set_first_float4((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0xE4,
                   cursor[0] + menu->origin[0] + (float)menu->column * 53.5f,
                   cursor[1] + menu->origin[1] + (float)menu->row * 47.0f, 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
 
-    gSelectedItemMaterial = -1;
+    g_selected_item_material = -1;
     if (selection >= 0) {
         entry = D_00259F58[selection][3];
-        item = gItemSlotToRecord[entry];
-        initialRecord = &gWeaponTable_00239BA0[item];
+        item = g_item_slot_to_record[entry];
+        initialRecord = &g_weapon_table[item];
         if (initialRecord->byte04) {
-            gItemOwnedFlags[entry] = 1;
+            g_item_owned_flags[entry] = 1;
             D_001A7B30[entry] = 1;
         }
-        if (gItemOwnedFlags[entry]) {
+        if (g_item_owned_flags[entry]) {
             text = menu->detail;
-            gSelectedItemMaterial = gWeaponTable_00239BA0[gItemSlotToRecord[entry]].material;
-            Sprintf(menu->name, GetLocalizedString(gWeaponTable_00239BA0[gItemSlotToRecord[entry]].name));
-            record = &gWeaponTable_00239BA0[gItemSlotToRecord[entry]];
-            ammo = gItemAmmoCounts[entry];
+            g_selected_item_material = g_weapon_table[g_item_slot_to_record[entry]].material;
+            sprintf(menu->name, GetLocalizedString(g_weapon_table[g_item_slot_to_record[entry]].name));
+            record = &g_weapon_table[g_item_slot_to_record[entry]];
+            ammo = g_item_ammo_counts[entry];
             maxAmmo = record->maxAmmo;
             if (record->usesAmmo) {
-                text += Sprintf(text, D_001AE528, GetLocalizedString(0x2DC9));
+                text += sprintf(text, D_001AE528, GetLocalizedString(0x2DC9));
                 if (ammo < 1000)
-                    text += Sprintf(text, D_001AE530, ammo);
+                    text += sprintf(text, D_001AE530, ammo);
                 else
-                    text += Sprintf(text, D_001AE538, ammo / 1000, ammo % 1000);
+                    text += sprintf(text, D_001AE538, ammo / 1000, ammo % 1000);
                 if (maxAmmo < 1000)
-                    Sprintf(text, D_001ADF98, maxAmmo);
+                    sprintf(text, D_001ADF98, maxAmmo);
                 else
-                    Sprintf(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
+                    sprintf(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
             } else {
-                Sprintf(text, ref_00346C60_00, GetLocalizedString(0x2DB9));
+                sprintf(text, ref_00346C60_00, GetLocalizedString(0x2DB9));
             }
             if (buttons & 0x40) {
                 result = selection;
-                PlaySoundFromGlobalBank(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
                 D_001F2880[0] = entry;
             }
         } else {
             menu->detail[0] = 0;
             menu->name[0] = 0;
             if (buttons & 0x40)
-                PlaySoundFromGlobalBank(5, 0, 0);
+                snd_play_from_global_bank(5, 0, 0);
         }
     }
 
-    SetFirstFloat4((char *)menu + 0x258, pos258[0] + menu->origin[0], pos258[1] + menu->origin[1], 0.0f, 0.0f);
-    SetFirstFloat4((char *)menu + 0x2A0, pos2A0[0] + menu->origin[0], pos2A0[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x258, pos258[0] + menu->origin[0], pos258[1] + menu->origin[1], 0.0f, 0.0f);
+    object_set_first_float4((char *)menu + 0x2A0, pos2A0[0] + menu->origin[0], pos2A0[1] + menu->origin[1], 0.0f, 0.0f);
     return result;
 }

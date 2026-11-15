@@ -43,20 +43,20 @@ extern volatile long D_001A74D8 MACRO_ADDR;
 extern unsigned int D_001A7180 MACRO_ADDR;
 extern int D_001A7080[] MACRO_ADDR;                         /* reply buffer */
 
-extern int func_00132220(void);
-extern void func_0011AEA0(int);
-extern void func_00133108(void);
-extern int func_00133580(int);
+extern int snd_poll_rpc_done(void);
+extern void FlushCache(int);
+extern void snd_submit_dma_buffer(void);
+extern int snd_CheckLoadInProgress(int);
 
 /* Runs the sound system once per call: finishes the pending sound requests, runs their callbacks, sends the next batch and handles disc reads. Returns nonzero while work is still going on. */
-int func_00132028(void)
+int snd_Pump(void)
 {
     int i;
     int idx;
     SndCallback fn;
     long arg;
 
-    if (D_001A7480 != 0 && PollSoundRpcDone() != 0) {
+    if (D_001A7480 != 0 && snd_poll_rpc_done() != 0) {
         if (D_001A749C != 0) {
             if (D_001A74E0 != 0)
                 D_001A74E0(D_001A7080[1], D_001A74E8);
@@ -86,7 +86,7 @@ int func_00132028(void)
     }
     if (D_001A7480 == 0) {
         if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0)
-            SubmitSoundDmaBuffer();
+            snd_submit_dma_buffer();
     }
     if (D_001A7494 != 0) {
         snd_CheckLoadInProgress(1);

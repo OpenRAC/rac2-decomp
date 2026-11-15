@@ -1,58 +1,58 @@
 #include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 #define H ((Hero *)D_00189E20)
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { char prefix[0x50]; float speed; char tail[0x8C]; } WeaponEntry;
-extern WeaponEntry D_L00_00262570[];
-extern unsigned char D_00139568[];
+extern WeaponEntry g_weapon_l00_table[];
+extern unsigned char g_item_slot_to_record[];
 
 extern int D_L00_001ADB2C;
 
-extern char *D_L00_001BF200[];
-extern void func_0029FCC0(char *, int, char *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00291308(void *, float, float, unsigned int);
-extern void func_L00_0037FA90(char *, char *, float, float, float);
-extern void func_L00_0032A1A8(char *, char *, char *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern char *func_L00_003F4C68(void *, void *, int, int);
-extern void func_L00_003F5390(char *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277F48(void *, int, void *, void *, float);
-extern int func_002ABB78(char *);
-extern char *func_002C2210(void *, int, unsigned int, int, int, float, float, void *, float, int);
+extern char *g_collision_result[];
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int gfx_add_point_light(void *, float, float, unsigned int);
+extern void math_compute_aim_direction(char *, char *, float, float, float);
+extern void vec_compute_object_to_target(char *, char *, char *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern char *vaporizer_bolt_spawn(void *, void *, int, int);
+extern void ApplyAreaHitOrEmitParticles(char *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_process_hit(void *, int, void *, void *, float);
+extern int moby_is_in_special_class_range(char *);
+extern char *part_spawn_ground_effect(void *, int, unsigned int, int, int, float, float, void *, float, int);
 
 /* Aim and spawn a beam, then flash four layers around its muzzle. */
-void func_L00_003E4508(char *moby)
+void AimAndSpawnBeamWithMuzzleFlashes(char *moby)
 {
     Vector origin, velocity, targetPosition, delta, unit;
     char *state = *(char **)(moby + 0x68);
 
     char *beam;
-    float speed = (gWeaponTable_L00 + gItemSlotToRecord[0x17])->speed * 0.016666668f;
+    float speed = (g_weapon_l00_table + g_item_slot_to_record[0x17])->speed * 0.016666668f;
     int mode;
     char *model;
     char *collision;
     if (H->h[4726] == 1) {
-        TransformMobyJointToWorld(moby, 0, (char *)origin);
+        moby_transform_joint_to_world(moby, 0, (char *)origin);
         vec_scale_to_length(velocity, moby+0xD0, -speed);
     } else {
-        TransformMobyJointToWorld(moby, 0, (char *)origin);
+        moby_transform_joint_to_world(moby, 0, (char *)origin);
         vec_scale_to_length(velocity, (&H->f[472]), speed);
     }
-    *(int *)(state + 0x10) = AddPointLight(origin, 10.0f, 0.0f, 0xFF0000FF);
+    *(int *)(state + 0x10) = gfx_add_point_light(origin, 10.0f, 0.0f, 0xFF0000FF);
     *(int *)(state + 0x14) = 30;
     mode = 0;
     if (H->i[1344]) {
         mode = 1;
-        ComputeAimDirection((char *)velocity, (char *)origin, speed, 128.0f, 0.34906590f);
+        math_compute_aim_direction((char *)velocity, (char *)origin, speed, 128.0f, 0.34906590f);
     } else if (H->ptr[766]) {
-        ComputeObjectToTargetVector(H->ptr[766], (char *)origin, (char *)velocity, speed);
+        vec_compute_object_to_target(H->ptr[766], (char *)origin, (char *)velocity, speed);
     }
     if (D_L00_001ADB2C) {
         char *target = *(char **)(state + 0x2C);
@@ -72,18 +72,18 @@ void func_L00_003E4508(char *moby)
     FastVecAdd(targetPosition, targetPosition, moby + 0x10);
     FastVecScale(delta, moby + 0xC0, 0.275f);
     FastVecAdd(targetPosition, targetPosition, delta);
-    if (ProcessCollisionHit(targetPosition, 1, H->ptr[2212], 0, 1.0f) &&
-        (((collision = gCollisionResult[6]) && (model = *(char **)(collision + 0x24)) && *(short *)(model + 0x46) == 5) ||
-         IsMobyInSpecialClassRange(gCollisionResult[6]))) {
+    if (coll_process_hit(targetPosition, 1, H->ptr[2212], 0, 1.0f) &&
+        (((collision = g_collision_result[6]) && (model = *(char **)(collision + 0x24)) && *(short *)(model + 0x46) == 5) ||
+         moby_is_in_special_class_range(g_collision_result[6]))) {
         ApplyAreaHitOrEmitParticles(moby, targetPosition);
     } else {
-        beam = SpawnVaporizerBoltMoby(origin, velocity, *(int *)(state + 0x18), mode);
+        beam = vaporizer_bolt_spawn(origin, velocity, *(int *)(state + 0x18), mode);
         if (beam)
             *(char **)(beam + 0xB8) = moby;
     }
     *(VectorBits *)unit = 0;
-    SpawnGroundEffectParticle(origin, 8, 0x401050FF, 2, 1, 7.0f, 0.1f, unit, 0.0f, 1);
-    SpawnGroundEffectParticle(origin, 8, 0x401050FF, 2, -1, 5.0f, 0.1f, unit, 0.0f, 1);
-    SpawnGroundEffectParticle(origin, 8, 0xC0FFFFFF, 2, 1, 3.5f, 0.1f, unit, 0.0f, 1);
-    SpawnGroundEffectParticle(origin, 8, 0xB0FFFFFF, 2, -1, 2.5f, 0.1f, unit, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0x401050FF, 2, 1, 7.0f, 0.1f, unit, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0x401050FF, 2, -1, 5.0f, 0.1f, unit, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0xC0FFFFFF, 2, 1, 3.5f, 0.1f, unit, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0xB0FFFFFF, 2, -1, 2.5f, 0.1f, unit, 0.0f, 1);
 }

@@ -15,7 +15,7 @@ typedef struct {
 
 extern int D_001B1600 __attribute__((sda));
 extern Entry_001B9740 D_001B9740[];
-extern short func_00282A18(int);
+extern short log2dim(int);
 
 void func_00291DE0(int *p, int count) {
     for (D_001B1600 = 0; D_001B1600 < count; D_001B1600++) {
@@ -71,7 +71,7 @@ extern SkyDef *D_001B20C0 __attribute__((section(".sdata")));
    in place as two 1/16 values, two func_00282A18 results and a cleared tag, then
    each shell and the items in it. This unit has no strength reduction, so the
    item pointer retail walks is written out, set up behind the loop's guard. */
-void func_00291EC0(SkyDef *s)
+void RelocateSkyDefinition(SkyDef *s)
 {
     int i;
 

@@ -2,17 +2,17 @@
 
 /* func_PAL_L06_00407B38, the PAL copy of func_L06_00403DA8: the same C, where the two velocity
    ranges are scaled by 6/5 and the func_00283CF0 argument by 5/6 as x * 5 + 2 over 6. */
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void *func_002BFB38(void *, void *, int, int);
-extern void func_002A7A00(float *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void *func_L00_00338AE0(char *, char *, int, float, float);
-extern int func_00283CF0(float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
+extern void vec_random_direction(float *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void *part_spawn_random_tinted_effect(char *, char *, int, float, float);
+extern int FloatToInt(float);
 extern float D_L06_001B2FC8 MACRO_ADDR;
 extern char D_L06_001A8F20[] MACRO_ADDR;
 
@@ -25,21 +25,21 @@ void func_PAL_L06_00407B38(void *unused, void *position)
     int i;
     float *data = &D_L06_001B2FC8;
     for (i = 15; i >= 0; --i) {
-        angle = func_002A7940();
-        radius = func_002A7878(0.0f, 0.060000002f);
-        vector[0] = func_00283180(angle) * radius;
-        vector[1] = func_00283198(angle) * radius;
-        vector[2] = func_002A7878(0.060000002f, 0.13000001f);
-        life = func_002A7820(90, 120);
-        kind = func_002A77E0(2);
-        func_002BFB38(position, vector, kind, life);
+        angle = math_random_angle();
+        radius = math_random_float_range(0.0f, 0.060000002f);
+        vector[0] = math_fast_sin_or_cos_a(angle) * radius;
+        vector[1] = math_fast_sin_or_cos_b(angle) * radius;
+        vector[2] = math_random_float_range(0.060000002f, 0.13000001f);
+        life = math_random_int_range(90, 120);
+        kind = math_random_int_below(2);
+        part_spawn_spark_2(position, vector, kind, life);
     }
     for (i = 0; i < 16; ++i) {
-        func_002A7A00(vector, 1.0f, 1.0f);
-        func_00282CC0(vector, vector, position);
+        vec_random_direction(vector, 1.0f, 1.0f);
+        FastVecAdd(vector, vector, position);
         vector[2] = D_L06_001B2FC8 + 0.05f;
-        effect = func_L00_00338AE0((char *)vector, D_L06_001A8F20, (int)data, func_002A7878(0.7f, 1.0f), i == 0 ? 2.0f : -2.0f);
+        effect = part_spawn_random_tinted_effect((char *)vector, D_L06_001A8F20, (int)data, math_random_float_range(0.7f, 1.0f), i == 0 ? 2.0f : -2.0f);
         if (effect != 0)
-            *(short *)(effect + 10) = func_00283CF0((func_002A7878(30.0f, 60.0f) * 5.0f + 2.0f) * 0.16666667f);
+            *(short *)(effect + 10) = FloatToInt((math_random_float_range(30.0f, 60.0f) * 5.0f + 2.0f) * 0.16666667f);
     }
 }

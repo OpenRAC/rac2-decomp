@@ -6,14 +6,14 @@ extern f32 D_L09_001B13F4 __attribute__((sda));
 extern s32 D_L09_001A79F0 __attribute__((sda));
 extern s32 D_L09_001A9040 __attribute__((sda));
 extern s32 func_323340(char *a0, char *a1, s32 a2);
-extern s32 D_001A79F0;
-extern s32 func_002B0ED8(char *a0, char *a1, s32 a2);
-extern s32 func_002B3BA8(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
+extern s32 g_current_map_index;
+extern s32 moby_apply_damage_to_object(char *a0, char *a1, s32 a2);
+extern s32 weapon_select_aim_target(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 extern s32 D_L09_001B2878;
 extern u8 *D_L09_001B285C_1;
 extern u16 *D_L09_001FB560[];
 extern s32 D_L09_001B1420[2];
-extern s32 func_00283D38(s32, s32, f32);
+extern s32 FastTweenColor(s32, s32, f32);
 typedef struct {
     s32 a, b;
 } ColorPair;
@@ -23,11 +23,11 @@ typedef struct {
 } TintedObject;
 extern ColorPair D_L09_001B1400[2];
 extern s32 D_L09_001B2388;
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern void func_0029FC20(u8 *, s32, u8 *);
-extern void func_L00_002E6CF0(void *, u8 *);
-void func_L09_00405490(u8 *a0);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void moby_transform_joint_point(u8 *, s32, u8 *);
+extern void gfx_add_draw_callback_first(void *, u8 *);
+void dobbo_draw_pulsing_glows(u8 *a0);
 extern u8 D_L09_001B15B0 __attribute__((sda));
 extern u8 D_0019B4A8[];
 extern s32 D_0018C0B4 __attribute__((nosda));
@@ -49,11 +49,11 @@ void func_PAL_L09_0040A268(u8 *a0) {
     f32 angle;
     f32 wave;
 
-    angle = func_00283B98(*(f32 *)(state + 0x348), 0.25132746f);
+    angle = FastAddRotations(*(f32 *)(state + 0x348), 0.25132746f);
     *(f32 *)(state + 0x348) = angle;
-    wave = func_00283198(angle) * 0.5f + 0.5f;
+    wave = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     *(f32 *)(state + 0x34C) = wave;
-    ((TintedObject *)a0)->colour = func_00283D38(color.a, color.b, wave);
+    ((TintedObject *)a0)->colour = FastTweenColor(color.a, color.b, wave);
     if (*(s32 *)(state + 0x350) != D_L09_001B2388) {
         for (p = D_L09_001FB560[a0[0x21]];
              a0[0x21] != 0xFF && a0[0x21] <= D_L09_001B2878 && p != 0 &&
@@ -66,12 +66,12 @@ void func_PAL_L09_0040A268(u8 *a0) {
                 if (e[0x20] != 0xFE) {
                     if (e[0x20] != 0xFD) {
                         sub = *(u8 **)(e + 0x68);
-                        func_0029FC20(e, 0, sub + 0x240);
+                        moby_transform_joint_point(e, 0, sub + 0x240);
                         *(s32 *)(sub + 0x350) = D_L09_001B2388;
                     }
                 }
             }
         }
-        func_L00_002E6CF0((void *)func_L09_00405490, a0);
+        gfx_add_draw_callback_first((void *)dobbo_draw_pulsing_glows, a0);
     }
 }

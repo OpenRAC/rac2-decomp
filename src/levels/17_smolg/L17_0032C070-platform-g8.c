@@ -31,27 +31,27 @@ typedef struct {
 } PlatformVars;
 
 extern int D_L17_001B2748;
-extern char *D_L17_001FE880[];
-extern char *D_L17_001B2C1C;
-extern char D_00189EA0[];
+extern char *g_path_l17_table[];
+extern char *g_moby_l17_pool;
+extern char g_hero_position[];
 extern float D_L17_001B03A0 __attribute__((sda));
 extern float D_L17_001B03A4 __attribute__((sda));
 extern float D_L17_001B03A8 __attribute__((sda));
 extern float D_L17_001B03AC __attribute__((sda));
 extern float D_L17_001C0028 NOT_SDA;
-extern float func_00283198(float);
-extern u32 func_00283D38(u32, u32, float);
-extern void func_L17_003C7498(void *, void *, void *, float);
-extern int func_002ACBC8(void *, int);
-extern int func_002E5DA0(int, int, void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern float math_fast_sin_or_cos_b(float);
+extern u32 FastTweenColor(u32, u32, float);
+extern void platform_move_along_path_by_timer(void *, void *, void *, float);
+extern int IsPointInCuboid(void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
+extern int PlayMobySound(int, int, void *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Pulses the colour, then runs the two controllers: timed travel along each path, and for the
  * second one a hold, a fall and a landing. */
-void func_L17_003C7680(char *object)
+void UpdateTwoTriggerPathPlatform(char *object)
 {
     Vec old, delta, lower, upper;
     PlatformVars *state = (PlatformVars *)P(object, 0x68);
@@ -59,18 +59,18 @@ void func_L17_003C7680(char *object)
 
     if (angle > 3.1415927f)
         angle -= 6.2831855f;
-    I(object, 0x78) = FastTweenColor(0x80464646, 0x80828282, (FastSinOrCosB(angle) + 1.0f) * 0.5f);
+    I(object, 0x78) = FastTweenColor(0x80464646, 0x80828282, (math_fast_sin_or_cos_b(angle) + 1.0f) * 0.5f);
     old.q = *(Q *)(object + 16);
     if (U(object, 0x20) == 0) {
         U(object, 0x20) = 1;
         if (state->path1 != -1)
-            *(Q *)(object + 16) = *(Q *)(gPathTable_L17[state->path1] + 16);
+            *(Q *)(object + 16) = *(Q *)(g_path_l17_table[state->path1] + 16);
         else if (state->path2 != -1)
-            *(Q *)(object + 16) = *(Q *)(gPathTable_L17[state->path2] + 16);
+            *(Q *)(object + 16) = *(Q *)(g_path_l17_table[state->path2] + 16);
     }
     if (state->trigger1 != -1 && state->path1 != -1) {
-        char *trigger = gMobyPool_L17 + state->trigger1 * 256;
-        char *path = gPathTable_L17[state->path1];
+        char *trigger = g_moby_l17_pool + state->trigger1 * 256;
+        char *path = g_path_l17_table[state->path1];
 
         switch (state->state1) {
         case 0:
@@ -84,7 +84,7 @@ void func_L17_003C7680(char *object)
             state->timer += 1.0f;
             if (state->timer >= D_L17_001B03A0 * 60.0f)
                 state->timer = D_L17_001B03A0 * 60.0f;
-            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A0);
+            platform_move_along_path_by_timer(object, path, &old, D_L17_001B03A0);
             if (state->timer >= D_L17_001B03A0 * 60.0f) {
                 state->wait = 0;
                 state->state1 = 2;
@@ -104,15 +104,15 @@ void func_L17_003C7680(char *object)
             state->timer -= 1.0f;
             if (state->timer <= 0.0f)
                 state->timer = 0;
-            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A0);
+            platform_move_along_path_by_timer(object, path, &old, D_L17_001B03A0);
             if (state->timer <= 0.0f)
                 state->state1 = 0;
             break;
         }
     }
     if (state->trigger2 != -1 && state->path2 != -1) {
-        char *path = gPathTable_L17[state->path2];
-        char *trigger = gMobyPool_L17 + state->trigger2 * 256;
+        char *path = g_path_l17_table[state->path2];
+        char *trigger = g_moby_l17_pool + state->trigger2 * 256;
         int allow;
         float height;
 
@@ -124,7 +124,7 @@ void func_L17_003C7680(char *object)
             if (allow) {
                 int index = state->gate;
 
-                if (index != -1 && U(gMobyPool_L17 + index * 256, 0x20) != 3)
+                if (index != -1 && U(g_moby_l17_pool + index * 256, 0x20) != 3)
                     allow = 0;
                 if (allow && (!trigger || U(trigger, 0x20) == 254 || U(trigger, 0x20) == 253 ||
                               U(trigger, 0x20) == state->target)) {
@@ -137,7 +137,7 @@ void func_L17_003C7680(char *object)
             state->timer += 1.0f;
             if (state->timer >= D_L17_001B03A4 * 60.0f)
                 state->timer = D_L17_001B03A4 * 60.0f;
-            MovePlatformAlongPathByTimer(object, path, &old, D_L17_001B03A4);
+            platform_move_along_path_by_timer(object, path, &old, D_L17_001B03A4);
             if (state->timer >= D_L17_001B03A4 * 60.0f) {
                 state->wait = 0;
                 state->state2 = 2;
@@ -146,9 +146,9 @@ void func_L17_003C7680(char *object)
         case 2:
             state->wait += 1.0f;
             if (state->wait >= D_L17_001B03A8 * 60.0f) {
-                if (!IsPointInCuboid(gHeroPosition, state->player)) {
+                if (!IsPointInCuboid(g_hero_position, state->player)) {
                     state->state2 = 3;
-                    PlaySoundFromClassBank(1, 0, object, 0x93b);
+                    snd_play_from_class_bank(1, 0, object, 0x93b);
                     U(trigger, 0xbc) = 0;
                     state->speed = 0;
                 } else {
@@ -178,5 +178,5 @@ void func_L17_003C7680(char *object)
         }
     }
     FastVecSub(&delta, object + 16, &old);
-    CombineTransformsAndStore(&state->bounds, &delta, object + 0xf0, object + 0xf0);
+    mat_combine_and_store(&state->bounds, &delta, object + 0xf0, object + 0xf0);
 }

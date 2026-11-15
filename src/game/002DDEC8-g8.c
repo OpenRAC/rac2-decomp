@@ -4,24 +4,24 @@
 /* The resident flag is small data: this file is built with -G8. Its address
    differs from program to program, so it has no level in its name. */
 extern int ref_L00_002DF190_00 __attribute__((sda));
-extern void func_002E5E58(int, int, int);
+extern void snd_play_from_global_bank(int, int, int);
 
-extern char D_00138180[];
+extern char g_pad_state[];
 extern int D_001ABCA0 __attribute__((sda));
 extern short D_001B2028[] MACRO_ADDR;
 extern u8 D_00261C08[];
 extern u8 D_001A7B30[] MACRO_ADDR;
-extern u8 D_001A7AF8[] MACRO_ADDR;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern u8 D_001395B8[];
 extern u8 D_001A7A60[] MACRO_ADDR;
 extern int D_001A8CEC MACRO_ADDR;
-extern void func_002AD7B8(int);
-extern void func_002B0A18(int, int);
+extern void moby_mark_flag_and_append_to_list(int);
+extern void value_set_entry_by_index(int, int);
 
 /* Corresponds to RAC1 process_unlock_code_input. */
 /* Checks the secret button code the player enters. A full 20-press code is matched against the table and unlocks the matching extra. */
-void func_002DDEC8(void) {
-    char *pad = gPadState;
+void process_unlock_code_input(void) {
+    char *pad = g_pad_state;
     int lim0, lim;
     int index55, index74, index80;
     int pressed, direction, j, code, index, matched;
@@ -60,17 +60,17 @@ void func_002DDEC8(void) {
         index74 = code - 74;
         index80 = code - 80;
         if (code < 56) {
-            gItemOwnedFlags[code] = 1;
+            g_item_owned_flags[code] = 1;
             D_001A7B30[code] = 1;
         } else if ((unsigned)(code - 56) < 18) {
-            MarkFlagAndAppendToList(index55);
+            moby_mark_flag_and_append_to_list(index55);
         } else if ((unsigned)index74 < 6) {
             D_001395B8[index74] = 1;
         } else if ((unsigned)index80 < 30) {
             if (!D_001A7A60[index80]) {
                 D_001A7A60[index80] = 1;
-                PlaySoundFromGlobalBank(1, 0, 0);
-                SetEntryValueByIndex(0x1233, -1);
+                snd_play_from_global_bank(1, 0, 0);
+                value_set_entry_by_index(0x1233, -1);
                 D_001A8CEC = 1;
             }
         }
@@ -80,8 +80,8 @@ void func_002DDEC8(void) {
 }
 
 /* Plays a menu sound, but only when menu sounds are turned on. */
-void func_002DF190(int soundId, int soundParam)
+void snd_play_menu_sound_if_enabled(int soundId, int soundParam)
 {
     if (ref_L00_002DF190_00 != 0)
-        PlaySoundFromGlobalBank(soundId, soundParam, 0);
+        snd_play_from_global_bank(soundId, soundParam, 0);
 }

@@ -21,17 +21,17 @@ typedef union {
 #define VERTEX(p, i) (&(p).fields.vertex[i])
 #define COLORS(p) ((p).fields.color)
 #define UV(p) ((p).fields.uv)
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00283198(float);
-extern void func_00281DE8(QuadPacket *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
-extern char D_L00_001B8DC0[];
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void gfx_init_quad_packet_state(QuadPacket *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
+extern char g_camera_l00_position[];
 
 typedef struct {
     int timer;
@@ -52,7 +52,7 @@ typedef struct {
 
 /* Draw three bands of the emitter's camera-facing ribbon. */
 
-void func_L00_003FD700(char *object) {
+void spark_trail_draw_ribbon_wide(char *object) {
     EffectVector endpoint;
     EffectVector origin;
     EffectPacket packet;
@@ -75,8 +75,8 @@ void func_L00_003FD700(char *object) {
     endpoint.v[3] = 0.0f;
     origin.word = *(EffectVectorWord *)(object + 0x10);
     life = IntToFloat(state->timer) * state->rate;
-    life = FastSinOrCosB(life * 3.1415927f);
-    InitQuadPacketState(&packet.header, 23, 0, 0x80);
+    life = math_fast_sin_or_cos_b(life * 3.1415927f);
+    gfx_init_quad_packet_state(&packet.header, 23, 0, 0x80);
     alpha = life * 128.0f;
     COLORS(packet)[0] = COLORS(packet)[1] = COLORS(packet)[2] = COLORS(packet)[3] =
         state->color0 | ((u32)FloatToInt(alpha) << 24);
@@ -91,7 +91,7 @@ void func_L00_003FD700(char *object) {
     state->scroll -= 0.1f;
     if (state->scroll <= 4.0f) state->scroll += 4.0f;
     position = (char *)&origin;
-    FastVecSub(&camera_delta, position, gCameraPosition_L00);
+    FastVecSub(&camera_delta, position, g_camera_l00_position);
     FastVecSub(&segment, &endpoint, position);
     FastVecScale(&segment, &segment, 0.5f);
     FastVecAdd(&midpoint, position, &segment);
@@ -111,7 +111,7 @@ void func_L00_003FD700(char *object) {
     FastVecAdd(VERTEX(packet,2), VERTEX(packet,2), &segment);
     FastVecAdd(VERTEX(packet,3), VERTEX(packet,3), &segment);
     draw_world_quad(&packet, 0, 0);
-    InitQuadPacketState(&packet.header, 14, 1, 0x80);
+    gfx_init_quad_packet_state(&packet.header, 14, 1, 0x80);
     color = state->color3 | ((u32)FloatToInt(life * 64.0f) << 24);
     COLORS(packet)[0] = COLORS(packet)[1] = COLORS(packet)[2] = COLORS(packet)[3] = color;
     UV(packet)[0] = 0.0f;

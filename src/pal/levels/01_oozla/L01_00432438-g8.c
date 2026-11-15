@@ -7,23 +7,23 @@ typedef struct { char pad0[0x20]; int path; int look; int target; float offset[3
 typedef struct { int segment; float distance; float length; float scale; float travelled; short started; short stop; } PathMotion;
 extern unsigned char *D_L01_001B1F04;
 extern unsigned char *D_L01_001FE180[];
-extern unsigned char *D_L01_001B255C;
+extern unsigned char *g_moby_l01_table;
 extern unsigned char D_L01_001B96F0[];
 extern unsigned char D_0018A0E0[];
 extern int D_L01_001B1FA8;
 extern int D_L01_001B1FA8_gp SDATA(D_L01_001B1FA8);
-extern int func_L00_00341820(void *, void *, void *, void *, int, float);
-extern int func_00282978(void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_0026FF08(int, int, float, float, float, float);
-extern void func_00272198(float);
-extern float func_002A7C00(float, float, float);
+extern int Spline_AdvanceByDistance(void *, void *, void *, void *, int, float);
+extern int FastDecTimer(void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void cam_set_value_target(int, int, float, float, float, float);
+extern void cam_set_transition_frames(float);
+extern float math_cosine_blend(float, float, float);
 extern void func_PAL_L01_002BEC60(int, int);
 
 void func_PAL_L01_00432438(unsigned char *camera)
@@ -45,29 +45,29 @@ void func_PAL_L01_00432438(unsigned char *camera)
         target_index = c->target;
         if (target_index >= 0) {
             float *src = c->offset;
-            unsigned char *entity = D_L01_001B255C + target_index * 256;
+            unsigned char *entity = g_moby_l01_table + target_index * 256;
             up[0] = src[0]; up[1] = src[1]; up[2] = src[2];
             *(int *)&up[3] = 0;
-            func_00283098(up, up, D_L01_001B96F0);
-            func_00282CC0(direction, entity + 0x10, up);
-            func_00282CF0(old, direction, camera + 0x30);
-        } else func_00282CF0(old, look + 0x10, camera + 0x30);
-        func_00282D30(up, D_0018A0E0, -1.0f);
-        func_00282F20(camera, old, 1.0f);
-        func_00282DD8(camera + 0x10, camera, up);
-        func_00282F20(camera + 0x10, camera + 0x10, 1.0f);
-        func_00282DD8(camera + 0x20, camera + 0x10, camera);
+            matrix_mul_vec3(up, up, D_L01_001B96F0);
+            FastVecAdd(direction, entity + 0x10, up);
+            FastVecSub(old, direction, camera + 0x30);
+        } else FastVecSub(old, look + 0x10, camera + 0x30);
+        FastVecScale(up, D_0018A0E0, -1.0f);
+        vec_scale_to_length(camera, old, 1.0f);
+        FastVecCross(camera + 0x10, camera, up);
+        vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
+        FastVecCross(camera + 0x20, camera + 0x10, camera);
         return;
     }
     path = D_L01_001FE180[c->path];
     qcopy(old, camera + 0x30);
-    done = func_L00_00341820(path, camera + 0x30, &motion->segment, v + 0x44, 0, c->speed * 0.020000001f);
-    if (motion->stop && func_00282978(v + 0x56)) done = 1;
+    done = Spline_AdvanceByDistance(path, camera + 0x30, &motion->segment, v + 0x44, 0, c->speed * 0.020000001f);
+    if (motion->stop && FastDecTimer(v + 0x56)) done = 1;
     if (c->finished) done = 1;
     if (done) {
         c->finished = 1;
-        func_0026FF08(0, 3, keys->roll, 0.005f, 0.2f, 0.0f);
-        func_00272198(4.0f);
+        cam_set_value_target(0, 3, keys->roll, 0.005f, 0.2f, 0.0f);
+        cam_set_transition_frames(4.0f);
         *(short *)(camera + 0x7e) = 4;
         if (c->lock) D_L01_001B1FA8_gp = 0;
         func_PAL_L01_002BEC60(0, 1);
@@ -80,29 +80,29 @@ void func_PAL_L01_00432438(unsigned char *camera)
             total = along;
             along += motion->distance;
             for (k = motion->segment; k < keys->idx[i + 1]; ++k) total += *(float *)(path + k * 16 + 0x1c);
-            func_0026FF08(0, 3, func_002A7C00(keys->angle[i],
+            cam_set_value_target(0, 3, math_cosine_blend(keys->angle[i],
                 keys->angle[i + 1], along / total) * 0.017453294f, 0.005f, 0.2f, 0);
         }
     }
-    motion->travelled += func_00282E48(old, camera + 0x30);
+    motion->travelled += fast_vec_dist(old, camera + 0x30);
     target_index = c->target;
     if (target_index >= 0) {
         float *src = c->offset;
-        unsigned char *entity = D_L01_001B255C + target_index * 256;
+        unsigned char *entity = g_moby_l01_table + target_index * 256;
         direction[0] = src[0]; direction[1] = src[1]; direction[2] = src[2];
         *(int *)&direction[3] = 0;
-        func_00283098(direction, direction, D_L01_001B96F0);
-        func_00282CC0(target, entity + 0x10, direction);
-        func_00282CF0(up, target, camera + 0x30);
+        matrix_mul_vec3(direction, direction, D_L01_001B96F0);
+        FastVecAdd(target, entity + 0x10, direction);
+        FastVecSub(up, target, camera + 0x30);
     } else {
         float progress = motion->travelled / motion->length * motion->scale;
         local_segment = 0; local_distance = 0;
-        func_L00_00341820(D_L01_001FE180[c->look], direction, &local_segment, &local_distance, 0, progress);
-        func_00282CF0(up, direction, camera + 0x30);
+        Spline_AdvanceByDistance(D_L01_001FE180[c->look], direction, &local_segment, &local_distance, 0, progress);
+        FastVecSub(up, direction, camera + 0x30);
     }
-    func_00282D30(direction, D_0018A0E0, -1.0f);
-    func_00282F20(camera, up, 1.0f);
-    func_00282DD8(camera + 0x10, camera, direction);
-    func_00282F20(camera + 0x10, camera + 0x10, 1.0f);
-    func_00282DD8(camera + 0x20, camera + 0x10, camera);
+    FastVecScale(direction, D_0018A0E0, -1.0f);
+    vec_scale_to_length(camera, up, 1.0f);
+    FastVecCross(camera + 0x10, camera, direction);
+    vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
+    FastVecCross(camera + 0x20, camera + 0x10, camera);
 }

@@ -31,7 +31,7 @@ typedef struct PlayerDriveView {
     unsigned char pad22A0[0x22C3 - 0x22A0]; unsigned char axisMode;
     unsigned char pad22C4[0x24B8 - 0x22C4]; float animationSpeed;
 } PlayerDriveView;
-extern PlayerDriveView D_00189E20;
+extern PlayerDriveView g_hero_state;
 typedef struct DriveVelocityView {
     DriveVector velocity;
     unsigned char pad10[0xC4 - 0x10]; float targetSpeed;
@@ -44,22 +44,22 @@ typedef struct DriveSettings {
     unsigned char pad15C[0x370 - 0x15C]; DriveVector direction;
 } DriveSettings;
 extern DriveSettings D_L01_001B9380;
-extern void func_L00_002B54F8(float, float);
-extern void func_L00_002B41B8(float, float);
-extern void func_L00_002B3EF8(int, float, float, float);
+extern void hero_build_move_impulse(float, float);
+extern void hero_approach_speed(float, float);
+extern void hero_steer_heading(int, float, float, float);
 extern void func_PAL_L01_002B6870(float);
-extern void func_L00_002D3798(DriveVector *, DriveVector *, float);
-extern void func_L00_002D3B58(DriveVector *, DriveVector *, float);
-extern void func_L00_002D3BD8(void *, const void *, float);
-extern float func_L00_002D3A58(char *);
-extern float func_002AA2E8(float *, float, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283C80(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void cam_offset_point_by_side_direction(DriveVector *, DriveVector *, float);
+extern void cam_set_view_space_height(DriveVector *, DriveVector *, float);
+extern void cam_set_view_space_vector_length(void *, const void *, float);
+extern float cam_get_view_space_vector_length(char *);
+extern float ApproachValue(float *, float, float);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastDiffRots(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Update directional movement for the active player locomotion state. */
 void func_PAL_L01_002B72D0(void)
@@ -67,124 +67,124 @@ void func_PAL_L01_002B72D0(void)
     union { DriveVector q; float f[3]; } local;
     float smoothed;
     float oldHeading;
-    int state = D_00189E20.state;
+    int state = g_hero_state.state;
 
     if (state == 10) {
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(&D_00189E20.pendingResult, &D_00189E20.pending);
-        D_00189E20.targetSpeed = D_00189E20.planarDistance;
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
+        g_hero_state.targetSpeed = g_hero_state.planarDistance;
     } else if (state == 16) {
         float speed;
-        PlayerDriveView *hero = &D_00189E20;
-        if (D_00189E20.frame > 45) {
-            func_002AA2E8((float *)(&D_00189E20.recoveryRate), 0.010000001f, 0.0028000001f);
+        PlayerDriveView *hero = &g_hero_state;
+        if (g_hero_state.frame > 45) {
+            ApproachValue((float *)(&g_hero_state.recoveryRate), 0.010000001f, 0.0028000001f);
         }
-        if (D_00189E20.frame <= 45) speed = D_00189E20.recoverySpeed;
+        if (g_hero_state.frame <= 45) speed = g_hero_state.recoverySpeed;
         else speed = 0.07000001f;
         hero->speed = speed;
-        func_L00_002B41B8(0.0176f, 0.018000001f);
-        func_L00_002D3BD8(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
-        func_L00_002D3798((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
+        hero_approach_speed(0.0176f, 0.018000001f);
+        cam_set_view_space_vector_length(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
+        cam_offset_point_by_side_direction((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
     } else if (state == 27) {
-        if (D_00189E20.frame > 33) {
-            func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.30019668f);
+        if (g_hero_state.frame > 33) {
+            hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.30019668f);
             func_PAL_L01_002B6870(0.008f);
         }
-        if (13.0f <= D_00189E20.plane && D_00189E20.plane <= 3e+01f) {
-            if (27.0f < D_00189E20.plane)
-                func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.0f, 0.0032000002f);
-            else func_002AA2E8((float *)(&D_00189E20.lateralSpeed), 0.040000003f, 0.0032000002f);
+        if (13.0f <= g_hero_state.plane && g_hero_state.plane <= 3e+01f) {
+            if (27.0f < g_hero_state.plane)
+                ApproachValue((float *)(&g_hero_state.lateralSpeed), 0.0f, 0.0032000002f);
+            else ApproachValue((float *)(&g_hero_state.lateralSpeed), 0.040000003f, 0.0032000002f);
         }
-        local.f[0] = D_00189E20.lateralSpeed;
+        local.f[0] = g_hero_state.lateralSpeed;
         local.f[1] = 0.0f;
-        local.f[2] = func_00282DB0(&D_00189E20.velocity, &D_00189E20.basis);
-        func_00283098(&D_00189E20.velocity, &local, &D_00189E20);
+        local.f[2] = FastVecDot(&g_hero_state.velocity, &g_hero_state.basis);
+        matrix_mul_vec3(&g_hero_state.velocity, &local, &g_hero_state);
     } else if (state == 11) {
-        D_00189E20.heading = D_00189E20.targetHeading;
-        qcopy(&D_00189E20.direction, &D_00189E20.targetDirection);
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.13962635f);
-        if (D_00189E20.transition != 3) D_00189E20.targetSpeed = D_00189E20.inputSpeed;
-        else D_00189E20.targetSpeed = 0.0f;
-        if (D_00189E20.useCurrentSpeed != 0) {
-            float rate = D_00189E20.animationSpeed * 0.10000001f;
+        g_hero_state.heading = g_hero_state.targetHeading;
+        qcopy(&g_hero_state.direction, &g_hero_state.targetDirection);
+        hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.13962635f);
+        if (g_hero_state.transition != 3) g_hero_state.targetSpeed = g_hero_state.inputSpeed;
+        else g_hero_state.targetSpeed = 0.0f;
+        if (g_hero_state.useCurrentSpeed != 0) {
+            float rate = g_hero_state.animationSpeed * 0.10000001f;
             if (rate < 0.040000003f) rate = 0.040000003f;
-            func_002AA2E8((float *)(&D_00189E20.strafeSpeed), rate, 0.014800001f);
-            D_00189E20.targetSpeed = D_00189E20.planarDistance;
+            ApproachValue((float *)(&g_hero_state.strafeSpeed), rate, 0.014800001f);
+            g_hero_state.targetSpeed = g_hero_state.planarDistance;
         } else {
-            if (D_00189E20.allowAction != 0 && D_00189E20.actionFrame <= 9)
-                func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.0f, 0.0032000002f);
-            else func_002AA2E8((float *)(&D_00189E20.strafeSpeed), 0.084f, 0.0032000002f);
+            if (g_hero_state.allowAction != 0 && g_hero_state.actionFrame <= 9)
+                ApproachValue((float *)(&g_hero_state.strafeSpeed), 0.0f, 0.0032000002f);
+            else ApproachValue((float *)(&g_hero_state.strafeSpeed), 0.084f, 0.0032000002f);
         }
-        if (D_00189E20.axisMode == 0) {
-            ((float *)&D_00189E20.velocity)[0] = func_00283180(D_00189E20.inputHeading);
-            ((float *)&D_00189E20.velocity)[0] *= D_00189E20.strafeSpeed;
-            ((float *)&D_00189E20.velocity)[1] = func_00283198(D_00189E20.inputHeading);
-            ((float *)&D_00189E20.velocity)[1] *= D_00189E20.strafeSpeed;
+        if (g_hero_state.axisMode == 0) {
+            ((float *)&g_hero_state.velocity)[0] = math_fast_sin_or_cos_a(g_hero_state.inputHeading);
+            ((float *)&g_hero_state.velocity)[0] *= g_hero_state.strafeSpeed;
+            ((float *)&g_hero_state.velocity)[1] = math_fast_sin_or_cos_b(g_hero_state.inputHeading);
+            ((float *)&g_hero_state.velocity)[1] *= g_hero_state.strafeSpeed;
         } else {
-            func_L00_002D3BD8(&local, &D_00189E20.localDirection, D_00189E20.strafeSpeed);
-            func_L00_002D3B58(&local.q, &local.q, 0.0f);
-            func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-            func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+            cam_set_view_space_vector_length(&local, &g_hero_state.localDirection, g_hero_state.strafeSpeed);
+            cam_set_view_space_height(&local.q, &local.q, 0.0f);
+            cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, 0.0f);
+            FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &local);
         }
-        if (D_00189E20.axisMode == 0 && D_00189E20.useCurrentSpeed == 0) {
-            float angle = func_00283C80(D_00189E20.targetHeading, D_00189E20.inputHeading);
-            float cosine = func_00283198(angle);
-            float amount = D_00189E20.inputSpeed * cosine;
-            float component = func_00283180(D_00189E20.targetHeading);
-            ((float *)&D_00189E20.velocity)[0] += component * amount;
-            component = func_00283198(D_00189E20.targetHeading);
-            ((float *)&D_00189E20.velocity)[1] += component * amount;
+        if (g_hero_state.axisMode == 0 && g_hero_state.useCurrentSpeed == 0) {
+            float angle = FastDiffRots(g_hero_state.targetHeading, g_hero_state.inputHeading);
+            float cosine = math_fast_sin_or_cos_b(angle);
+            float amount = g_hero_state.inputSpeed * cosine;
+            float component = math_fast_sin_or_cos_a(g_hero_state.targetHeading);
+            ((float *)&g_hero_state.velocity)[0] += component * amount;
+            component = math_fast_sin_or_cos_b(g_hero_state.targetHeading);
+            ((float *)&g_hero_state.velocity)[1] += component * amount;
         }
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(&D_00189E20.pendingResult, &D_00189E20.pending);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
     } else if (state == 17) {
-        D_00189E20.heading = ((float *)&D_00189E20.jumpDirection)[3];
-        qcopy(&D_00189E20.direction, &D_00189E20.jumpDirection);
-        if (D_00189E20.frame > 7) func_L00_002B3EF8(-1, 0.060480002f, 0.28800002f, 0.23736483f);
-        if (D_00189E20.frame > 6) {
-            if (D_00189E20.request == 0) {
-                ((float *)&D_00189E20.velocity)[0] = func_00283180(D_00189E20.heading);
-                ((float *)&D_00189E20.velocity)[0] *= 0.09800001f;
-                ((float *)&D_00189E20.velocity)[1] = func_00283198(D_00189E20.heading);
-                ((float *)&D_00189E20.velocity)[1] *= 0.09800001f;
+        g_hero_state.heading = ((float *)&g_hero_state.jumpDirection)[3];
+        qcopy(&g_hero_state.direction, &g_hero_state.jumpDirection);
+        if (g_hero_state.frame > 7) hero_steer_heading(-1, 0.060480002f, 0.28800002f, 0.23736483f);
+        if (g_hero_state.frame > 6) {
+            if (g_hero_state.request == 0) {
+                ((float *)&g_hero_state.velocity)[0] = math_fast_sin_or_cos_a(g_hero_state.heading);
+                ((float *)&g_hero_state.velocity)[0] *= 0.09800001f;
+                ((float *)&g_hero_state.velocity)[1] = math_fast_sin_or_cos_b(g_hero_state.heading);
+                ((float *)&g_hero_state.velocity)[1] *= 0.09800001f;
             } else {
-                func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, 0.0f);
-                func_00282F20(&local, &D_00189E20.direction, 0.09800001f);
-                func_00282CC0(&D_00189E20.velocity, &D_00189E20.velocity, &local);
+                cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, 0.0f);
+                vec_scale_to_length(&local, &g_hero_state.direction, 0.09800001f);
+                FastVecAdd(&g_hero_state.velocity, &g_hero_state.velocity, &local);
             }
         }
-        D_00189E20.targetSpeed = D_00189E20.planarDistance;
+        g_hero_state.targetSpeed = g_hero_state.planarDistance;
     } else if (state == 129 && D_L01_001A9030 == 0) {
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, D_00189E20.acceleration);
-        D_00189E20.targetSpeed = 0.0f;
+        hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
+        g_hero_state.targetSpeed = 0.0f;
     } else {
-        oldHeading = D_00189E20.heading;
-        qcopy(&local, &D_00189E20.direction);
-        if (D_00189E20.overrideDirection != 0) {
-            D_00189E20.heading = D_L01_001B9380.heading;
-            qcopy(&D_00189E20.direction, &D_L01_001B9380.direction);
+        oldHeading = g_hero_state.heading;
+        qcopy(&local, &g_hero_state.direction);
+        if (g_hero_state.overrideDirection != 0) {
+            g_hero_state.heading = D_L01_001B9380.heading;
+            qcopy(&g_hero_state.direction, &D_L01_001B9380.direction);
         }
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, D_00189E20.acceleration);
-        if (D_00189E20.overrideDirection != 0) {
-            D_00189E20.savedHeading = oldHeading;
-            qcopy(&D_00189E20.savedDirection, &local);
-            D_00189E20.heading = oldHeading;
-            qcopy(&D_00189E20.direction, &D_00189E20.savedDirection);
+        hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
+        if (g_hero_state.overrideDirection != 0) {
+            g_hero_state.savedHeading = oldHeading;
+            qcopy(&g_hero_state.savedDirection, &local);
+            g_hero_state.heading = oldHeading;
+            qcopy(&g_hero_state.direction, &g_hero_state.savedDirection);
         }
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(&D_00189E20.pendingResult, &D_00189E20.pending);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
         {
             float damping = 0.008f;
-            if (D_00189E20.speed < D_L01_001A7DC0 * 0.004f) {
-                if (D_00189E20.mode == 2) {
-                    float rate = D_00189E20.pendingDamping;
-                    smoothed = func_L00_002D3A58((char *)&D_00189E20.velocity);
-                    func_002AA2E8(&smoothed, 0.0f, rate);
-                    func_L00_002D3BD8(&D_00189E20.velocity, &D_00189E20.velocity, smoothed);
+            if (g_hero_state.speed < D_L01_001A7DC0 * 0.004f) {
+                if (g_hero_state.mode == 2) {
+                    float rate = g_hero_state.pendingDamping;
+                    smoothed = cam_get_view_space_vector_length((char *)&g_hero_state.velocity);
+                    ApproachValue(&smoothed, 0.0f, rate);
+                    cam_set_view_space_vector_length(&g_hero_state.velocity, &g_hero_state.velocity, smoothed);
                     return;
                 }
-                if (D_00189E20.contact != 0) damping = 0.0044f;
-                else if (D_00189E20.special != 0) damping = 0.00080000004f;
+                if (g_hero_state.contact != 0) damping = 0.0044f;
+                else if (g_hero_state.special != 0) damping = 0.00080000004f;
                 else damping = 0.0032000002f;
             }
             func_PAL_L01_002B6870(damping);

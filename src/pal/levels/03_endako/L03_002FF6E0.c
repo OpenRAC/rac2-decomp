@@ -20,16 +20,16 @@ typedef struct {
 } EndakoState;
 
 extern EndakoState D_L03_001BD680;
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 extern f32 D_L03_001A9420 SDATA(D_L03_001A9420);
 extern s32 D_L03_001A9424 SDATA(D_L03_001A9424);
 /* Four rows of three quadwords, filled from twelve joints of one object. */
 extern Quad D_L03_001C64A0[][3];
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
-extern void func_L00_00326048(void *, void *, u32, u32, f32);
+extern void math_store_angle_update_result(void *, void *, u32, u32, f32);
 extern void func_PAL_L03_00328558(void *);
-extern void func_0029FCC0(void *, s32, void *);
+extern void moby_transform_joint_to_world(void *, s32, void *);
 
 void func_PAL_L03_002FFA00(void)
 {
@@ -38,7 +38,7 @@ void func_PAL_L03_002FFA00(void)
     s32 i;
     Quad a, b;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < D_L03_001BD680.count; i++) {
         u8 *base = (u8 *)&D_L03_001BD680;
         object = *(u8 **)(base + i * 4 + 0x18C);
@@ -46,13 +46,13 @@ void func_PAL_L03_002FFA00(void)
             *(u16 *)(object + 0x34) |= 0x800;
         if (*(s16 *)(object + 0xAA) == 0xD54)
             func_PAL_002E7270(object);
-        if (object != 0 && *(s16 *)(object + 0xAA) == 0xFA0 && D_001A79F0 != 0x33) {
+        if (object != 0 && *(s16 *)(object + 0xAA) == 0xFA0 && g_current_map_index != 0x33) {
             u8 *vars = *(u8 **)(object + 0x68);
             if (vars != 0)
-                func_L00_00326048(object, vars + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+                math_store_angle_update_result(object, vars + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
-    if (D_001A79F0 != 3)
+    if (g_current_map_index != 3)
         return;
     state = &D_L03_001BD680;
     if (state->mode < 3) {
@@ -71,7 +71,7 @@ void func_PAL_L03_002FFA00(void)
         target = state->objects[2];
         for (row = 0; row < 4; row++)
             for (col = 0; col < 3; col++)
-                func_0029FCC0(target, row * 3 + col, &D_L03_001C64A0[row][col]);
+                moby_transform_joint_to_world(target, row * 3 + col, &D_L03_001C64A0[row][col]);
         for (k = 0; k < 4; k++) {
             Quad (*rows)[3] = D_L03_001C64A0;
             qcopy(&a, &rows[k][0]);

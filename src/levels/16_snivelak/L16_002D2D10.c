@@ -1,3 +1,4 @@
+#include "names.h"
 /* Arms the shared transition once: stores the two reciprocal steps. Retail is built with -g
    (the nops before each div.s). */
 typedef unsigned char u8;
@@ -15,7 +16,7 @@ typedef struct {
 extern T_001B99C0 D_L16_001B99C0;
 
 /* Starts the shared transition once, storing how fast it should step. */
-void func_L16_002D2D10(s32 mode, f32 firstDuration, f32 secondDuration) {
+void transition_arm_shared(s32 mode, f32 firstDuration, f32 secondDuration) {
     if (D_L16_001B99C0.f27C == 0.0f) {
         D_L16_001B99C0.i280 = mode;
         D_L16_001B99C0.f27C = 1.0f;

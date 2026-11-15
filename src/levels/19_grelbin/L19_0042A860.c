@@ -20,32 +20,32 @@ extern u8 D_001A7A40[] __attribute__((sda));
 extern u8 D_L19_001B22E0[] __attribute__((sda));
 extern f32 D_L19_001B2300[] __attribute__((sda));
 
-extern void func_0029F978(u8 *, u32, u8 *);
-extern int func_L19_0042A860(void);
-extern int func_002F5D10(void);
-extern void func_002A7750(void *, int, int);
-extern void func_L01_003128C0(void *);
-extern int func_L01_003245E0(void *, int, float);
-extern void func_L01_00324550(int, ...);
-extern void func_L01_003246D0(void *);
-extern int func_00288AA0(void *, int);
-extern int func_00288BE8(void *);
-extern void func_002A8598(int, int);
-extern void func_0029F338(void *);
-extern int func_0029B3E0(int, int);
-extern void func_002B0A18(int, int);
-extern int func_00288E18(int, int);
-extern int func_00288D58(void);
+extern void AttachManipulator(u8 *, u32, u8 *);
+extern int text_sum_subtitle_lengths(void);
+extern int game_is_either_mode_two(void);
+extern void moby_set_state(void *, int, int);
+extern void moby_reset_vars_defaults(void *);
+extern int hero_is_reachable_for_count(void *, int, float);
+extern void text_print_localized_formatted(int, ...);
+extern void level_apply_index_for_key(void *);
+extern int req_push_queue(void *, int);
+extern int req_launch_queued(void *);
+extern void moby_set_byte_on_group(int, int);
+extern void moby_mark_spawned(void *);
+extern int MemcardSave(int, int);
+extern void value_set_entry_by_index(int, int);
+extern int subtitle_request_voice_line(int, int);
+extern int flag_is_byte_set(void);
 extern void func_L00_0030C710(int);
-extern int func_002A7820(int, int);
-extern int func_002E5DA0(int, int, char *, int);
-extern void func_002AEC48(void *, void *, void *, float, float);
+extern int math_random_int_range(int, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern void moby_update_eased_node(void *, void *, void *, float, float);
 
-extern int D_L19_001B2508[] __attribute__((sda));
+extern int g_frame_l19_counter[] __attribute__((sda));
 extern int D_L19_001B2724[] __attribute__((sda));
-extern u8 *D_L19_001B2A1C __attribute__((sda));
+extern u8 *g_moby_l19_array __attribute__((sda));
 extern int D_L19_001B1FB8[] __attribute__((sda));
-extern int D_001A79F8[] __attribute__((sda));
+extern int g_player_bolts[] __attribute__((sda));
 extern u8 D_L19_001A7C80[] __attribute__((sda));
 extern u8 D_001395B8[];
 extern u32 D_00139800, D_00138324;
@@ -53,7 +53,7 @@ extern int D_L19_0028E950[];
 extern u8 D_L19_001BFC40[];
 
 /* While the glow effect is on, finds every Mystic in the level and makes it glow brightly. */
-void func_L19_0042A8B8(void)
+void mystic_glow_all(void)
 {
     L19Thing *mystic;
     s32 i;
@@ -78,7 +78,7 @@ void func_L19_0042A8B8(void)
 /* func_L19_0042A9A0 is in L19_0042A9A0.c. */
 
 /* Makes every object of the same kind as the given one glow brightly while the glow effect is on. */
-void func_L19_0042AF70(L19Thing *refMoby)
+void moby_glow_all_same_class(L19Thing *refMoby)
 {
     L19Thing *other;
     s32 i;
@@ -111,41 +111,41 @@ void func_L19_0042AF70(L19Thing *refMoby)
    purchases for the quantity at D_001A79F8[9] (states 1-2 and 4-5, each followed by a movie in
    state 3 or 6), then buys the remaining quantity back at 30000 or 3000 each (states 7-8). */
 /* Runs a trader's talk. It offers two purchases, plays a short movie after each, then buys the player's leftover items for bolts. */
-void func_L19_0042B058(u8 *moby)
+void UpdateTwoItemTraderNpc(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *companion;
     int remaining;
 
-    GlowAllMobysOfSameClass((L19Thing *)moby);
-    if (gFrameCounter_L19[0] == 5)
-        SumThreeCounts();
+    moby_glow_all_same_class((L19Thing *)moby);
+    if (g_frame_l19_counter[0] == 5)
+        text_sum_subtitle_lengths();
     switch (moby[0x20]) {
     case 0:
-        if (IsEitherModeTwo())
+        if (game_is_either_mode_two())
             break;
         if (D_00139800 & 0x4000000) {
             H(moby, 0x34) = (H(moby, 0x34) & 0xFFBE) | 0x1000;
             I(moby, 0x98) = I(*(u8 **)(moby + 0x24), 0x10);
             if (D_001395B8[0x89]) {
-                SumThreeCounts();
+                text_sum_subtitle_lengths();
                 if (QUANTITY < 1)
-                    SetMobyState(moby, 7, -1);
+                    moby_set_state(moby, 7, -1);
                 else
-                    SetMobyState(moby, 8, -1);
+                    moby_set_state(moby, 8, -1);
             } else if (QUANTITY < PRICE_B)
-                SetMobyState(moby, 4, -1);
+                moby_set_state(moby, 4, -1);
             else
-                SetMobyState(moby, 5, -1);
-            ResetMobyVarsDefaults(moby);
+                moby_set_state(moby, 5, -1);
+            moby_reset_vars_defaults(moby);
         } else if (D_00139800 & 0x1000000) {
-            SumThreeCounts();
+            text_sum_subtitle_lengths();
             H(moby, 0x34) = (H(moby, 0x34) & 0xFFBE) | 0x1000;
             I(moby, 0x98) = I(*(u8 **)(moby + 0x24), 0x10);
             if (QUANTITY < PRICE_A)
-                SetMobyState(moby, 1, -1);
+                moby_set_state(moby, 1, -1);
             else
-                SetMobyState(moby, 2, -1);
+                moby_set_state(moby, 2, -1);
         } else {
             I(moby, 0x98) = 0;
             H(moby, 0x34) = (H(moby, 0x34) | 0x41) & 0xEFFF;
@@ -153,23 +153,23 @@ void func_L19_0042B058(u8 *moby)
         break;
     case 1:
         if (QUANTITY >= PRICE_A)
-            SetMobyState(moby, 2, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27DC, PRICE_A, -1);
-            ApplyIndexForKey(moby);
+            moby_set_state(moby, 2, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
+            text_print_localized_formatted(0x27DC, PRICE_A, -1);
+            level_apply_index_for_key(moby);
         }
         break;
     case 2:
         if (QUANTITY < PRICE_A)
-            SetMobyState(moby, 1, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27DD, PRICE_A, -1);
-            ApplyIndexForKey(moby);
+            moby_set_state(moby, 1, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
+            text_print_localized_formatted(0x27DD, PRICE_A, -1);
+            level_apply_index_for_key(moby);
             if (D_00138324 & 0x10) {
-                PushRequestQueue(D_L19_001BFC40, 0x9A);
+                req_push_queue(D_L19_001BFC40, 0x9A);
                 QUANTITY -= PRICE_A;
-                LaunchQueuedRequest(D_L19_001BFC40);
-                SetMobyState(moby, 3, -1);
+                req_launch_queued(D_L19_001BFC40);
+                moby_set_state(moby, 3, -1);
             }
         }
         break;
@@ -180,46 +180,46 @@ void func_L19_0042B058(u8 *moby)
             H(moby, 0x34) |= 1;
         }
         if (I(vars, 0x80) != -1 && D_L19_001A8F00[0] == 2) {
-            companion = gMobyArray_L19;
+            companion = g_moby_l19_array;
             H(companion + I(vars, 0x80) * 0x100, 0x34) |= 1;
             (companion + I(vars, 0x80) * 0x100)[0x31] = 0;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             D_L19_001B2724[1] = 0;
             moby[0x31] = 1;
             H(moby, 0x34) &= 0xFFFE;
             if (moby[0x21] != 0xFF)
-                SetByteOnGroupMobys(moby[0x21], 1);
+                moby_set_byte_on_group(moby[0x21], 1);
             if (I(vars, 0x80) != -1) {
-                MarkMobySpawned(gMobyArray_L19 + I(vars, 0x80) * 0x100);
+                moby_mark_spawned(g_moby_l19_array + I(vars, 0x80) * 0x100);
                 I(vars, 0x80) = -1;
             }
             MemcardSave(0, -1);
             if ((u32)QUANTITY <= PRICE_B)
-                SetMobyState(moby, 4, -1);
+                moby_set_state(moby, 4, -1);
             else
-                SetMobyState(moby, 5, -1);
+                moby_set_state(moby, 5, -1);
         }
         break;
     case 4:
         if (QUANTITY >= PRICE_B)
-            SetMobyState(moby, 5, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27DE, PRICE_B, -1);
-            ApplyIndexForKey(moby);
+            moby_set_state(moby, 5, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
+            text_print_localized_formatted(0x27DE, PRICE_B, -1);
+            level_apply_index_for_key(moby);
         }
         break;
     case 5:
         if (QUANTITY < PRICE_B)
-            SetMobyState(moby, 4, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
-            PrintLocalizedFormatted(0x27DF, PRICE_B, -1);
-            ApplyIndexForKey(moby);
+            moby_set_state(moby, 4, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
+            text_print_localized_formatted(0x27DF, PRICE_B, -1);
+            level_apply_index_for_key(moby);
             if (D_00138324 & 0x10) {
-                PushRequestQueue(D_L19_001BFC40, 0x99);
+                req_push_queue(D_L19_001BFC40, 0x99);
                 QUANTITY -= PRICE_B;
-                LaunchQueuedRequest(D_L19_001BFC40);
-                SetMobyState(moby, 6, -1);
+                req_launch_queued(D_L19_001BFC40);
+                moby_set_state(moby, 6, -1);
             }
         }
         break;
@@ -229,65 +229,65 @@ void func_L19_0042B058(u8 *moby)
             moby[0x31] = 0;
             H(moby, 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             D_L19_001B2724[1] = 0;
             moby[0x31] = 1;
             H(moby, 0x34) &= 0xFFFE;
             if (moby[0x21] != 0xFF)
-                SetByteOnGroupMobys(moby[0x21], 1);
+                moby_set_byte_on_group(moby[0x21], 1);
             D_001395B8[0x89] = 1;
-            SetEntryValueByIndex(0x1294, -1);
+            value_set_entry_by_index(0x1294, -1);
             remaining = 2;
             if (D_001395B8[0x84])
                 remaining--;
             if (D_001395B8[0x86])
                 remaining--;
             if (remaining > 0)
-                RequestSubtitleVoiceLine(0xA0F, 0x66);
+                subtitle_request_voice_line(0xA0F, 0x66);
             else
-                RequestSubtitleVoiceLine(0xA10, 0x67);
+                subtitle_request_voice_line(0xA10, 0x67);
             MemcardSave(0, -1);
             if (QUANTITY < 1)
-                SetMobyState(moby, 7, -1);
+                moby_set_state(moby, 7, -1);
             else
-                SetMobyState(moby, 8, -1);
+                moby_set_state(moby, 8, -1);
         }
         break;
     case 7:
         if (QUANTITY > 0)
-            SetMobyState(moby, 8, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
+            moby_set_state(moby, 8, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
             if (!D_L19_001B1FB8[0])
-                PrintLocalizedFormatted(0x27E2, 0, -1);
+                text_print_localized_formatted(0x27E2, 0, -1);
             else
-                PrintLocalizedFormatted(0x27E0, -1);
-            ApplyIndexForKey(moby);
+                text_print_localized_formatted(0x27E0, -1);
+            level_apply_index_for_key(moby);
         }
         break;
     case 8:
         if (QUANTITY < 1)
-            SetMobyState(moby, 7, -1);
-        else if (IsHeroReachableForCount(moby, 10, 2.5f)) {
-            if (IsFlagByteSet()) {
-                PrintLocalizedFormatted(0x27E1, QUANTITY, QUANTITY * 30000, -1);
-                ApplyIndexForKey(moby);
+            moby_set_state(moby, 7, -1);
+        else if (hero_is_reachable_for_count(moby, 10, 2.5f)) {
+            if (flag_is_byte_set()) {
+                text_print_localized_formatted(0x27E1, QUANTITY, QUANTITY * 30000, -1);
+                level_apply_index_for_key(moby);
                 if (D_00138324 & 0x10) {
-                    SumThreeCounts();
-                    gPlayerBolts[0] += QUANTITY * 30000;
+                    text_sum_subtitle_lengths();
+                    g_player_bolts[0] += QUANTITY * 30000;
                     QUANTITY = 0;
                     func_L00_0030C710(180);
-                    PlaySoundFromClassBank(0, 0, (char *)moby, RandomIntRange(13, 17));
-                    SetMobyState(moby, 9, -1);
+                    snd_play_from_class_bank(0, 0, (char *)moby, math_random_int_range(13, 17));
+                    moby_set_state(moby, 9, -1);
                 }
             } else {
-                PrintLocalizedFormatted(0x27E1, QUANTITY, QUANTITY * 3000, -1);
-                ApplyIndexForKey(moby);
+                text_print_localized_formatted(0x27E1, QUANTITY, QUANTITY * 3000, -1);
+                level_apply_index_for_key(moby);
                 if (D_00138324 & 0x10) {
-                    SumThreeCounts();
-                    gPlayerBolts[0] += QUANTITY * 3000;
+                    text_sum_subtitle_lengths();
+                    g_player_bolts[0] += QUANTITY * 3000;
                     QUANTITY = 0;
                     func_L00_0030C710(180);
-                    SetMobyState(moby, 9, -1);
+                    moby_set_state(moby, 9, -1);
                 }
             }
         }
@@ -297,14 +297,14 @@ void func_L19_0042B058(u8 *moby)
         if (H(moby, 0x96) > 0x7FF8)
             H(moby, 0x96) = 0x7FF8;
         if (H(moby, 0x96) > 40 && H(moby, 0x96) < 90 && H(moby, 0x96) % 4 == 0)
-            PlaySoundFromClassBank(0, 0, (char *)moby, RandomIntRange(13, 17));
-        if (IsHeroReachableForCount(moby, 10, 2.5f))
-            PrintLocalizedFormatted(0x27E2, D_L19_001B1FB8[0], -1);
+            snd_play_from_class_bank(0, 0, (char *)moby, math_random_int_range(13, 17));
+        if (hero_is_reachable_for_count(moby, 10, 2.5f))
+            text_print_localized_formatted(0x27E2, D_L19_001B1FB8[0], -1);
         else
-            SetMobyState(moby, 7, -1);
+            moby_set_state(moby, 7, -1);
         break;
     }
     if (D_001A7A40[0])
         *(float *)(vars + 0x70) = 2.75f;
-    UpdateEasedNode(moby, vars, 0, 0.02f, 0.3f);
+    moby_update_eased_node(moby, vars, 0, 0.02f, 0.3f);
 }

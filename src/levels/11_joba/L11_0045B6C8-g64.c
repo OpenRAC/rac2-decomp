@@ -17,21 +17,21 @@ extern int D_L11_001B2098[] __attribute__((sda));
 extern float D_L11_001B2070[4][2] __attribute__((sda));
 extern L11RenderQuad D_L11_001B20A0[4] __attribute__((sda));
 extern L11RenderQuad D_L11_001B20E0[4] __attribute__((sda));
-extern float func_00283CE0(int);
-extern void func_00283410(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern void func_00283788(void *, void *, void *);
-extern void func_L02_002EF968(void *, int, int, void *, void *, int);
-extern void func_00282C88(void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern float IntToFloat(int);
+extern void euler_to_matrix(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern void multiply_matrix(void *, void *, void *);
+extern void FillQuadPacket(void *, int, int, void *, void *, int);
+extern void vec_clear_128(void *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
 /* Rotate alternating packet edges and submit the pair sixteen times. */
 /* Draws a spinning star-shaped glow made of two layered sprites. */
-void func_L11_0045B6C8(char *moby)
+void gfx_draw_spinning_glow_sprites(char *moby)
 {
     float matrix[16], rotation[16], spin[12];
     float vector[4];
@@ -53,7 +53,7 @@ void func_L11_0045B6C8(char *moby)
     matrix[15] = 1.0f;
     transform_vector(temp, vector, matrix);
     temp[3] = 30.0f;
-    if (FastMathHelperA(temp, 512.0f) != -1)
+    if (math_fast_helper_a(temp, 512.0f) != -1)
         multiply_matrix(matrix, matrix, rotation);
     FillQuadPacket(&packets[0], D_L11_001B2060, D_L11_001B2090,
                       D_L11_001B2070, D_L11_001B20A0, 1);
@@ -63,7 +63,7 @@ void func_L11_0045B6C8(char *moby)
         packets[0].color[i] += *(int *)vars;
         packets[1].color[i] += *(int *)vars;
     }
-    ClearVector128(angles);
+    vec_clear_128(angles);
     angles[0] = 0.52359879f;
     euler_rotation_basis(spin, angles);
     multiply_matrix3x3(transform, spin, spin);

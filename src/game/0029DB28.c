@@ -13,7 +13,7 @@ typedef struct {
 extern Entry_29DB28 *D_001B1A58[] __attribute__((sda));
 
 /* List the live entries: their ids (or display names), a mask of the kind-2 ones and their values. */
-int func_0029DB28(int *ids, unsigned int *mask, int *values, int names)
+int menu_list_active_entries(int *ids, unsigned int *mask, int *values, int names)
 {
     Entry_29DB28 *e = D_001B1A58[0];
     int n = 0;

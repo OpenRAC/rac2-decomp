@@ -1,16 +1,16 @@
 #include "common.h"
-extern char D_001B5200[], D_001B5490[], D_00189E20[];
-extern void func_00282F20(float *, float *, float);
-extern void func_00270B58(float *, float *, float *, float *, float *, float *);
-extern void func_002AB600(void *, void *);
-extern void func_00270D50(void);
-extern void func_00270E30(void);
-extern void func_00270EA8(void);
-extern float func_00283CE0(int);
+extern char g_active_camera[], D_001B5490[], g_hero_state[];
+extern void vec_scale_to_length(float *, float *, float);
+extern void cam_compute_aim_angles(float *, float *, float *, float *, float *, float *);
+extern void mat_transform_via_copy(void *, void *);
+extern void cam_rebuild_look_at_from_hero(void);
+extern void moby_save_vectors(void);
+extern void moby_restore_vectors(void);
+extern float IntToFloat(int);
 /* Starts a camera mode change: stores the new camera data, picks the transition setup and resets its timers. */
-void func_00270EE0(char *from)
+void cam_begin_mode_change(char *from)
 {
-    unsigned char *cam = (unsigned char *)gActiveCamera + 0x290;
+    unsigned char *cam = (unsigned char *)g_active_camera + 0x290;
     float rowA[4] __attribute__((aligned(16)));
     float rowB[4] __attribute__((aligned(16)));
     float rowC[4] __attribute__((aligned(16)));
@@ -20,32 +20,32 @@ void func_00270EE0(char *from)
         subMode = cam[3];
         if (subMode == 0) {
             qcopy(cam + 0x50, from + 0x30);
-            TransformMatrixViaCopy(cam + 0x60, from);
+            mat_transform_via_copy(cam + 0x60, from);
         } else if (subMode == 2) {
             qcopy(cam + 0xC0, from + 0x30);
-            TransformMatrixViaCopy(cam + 0xD0, from);
-            RebuildCameraLookAtFromHero();
+            mat_transform_via_copy(cam + 0xD0, from);
+            cam_rebuild_look_at_from_hero();
         } else {
-            char *hero = gHeroState;
+            char *hero = g_hero_state;
 
             vec_scale_to_length(rowA, (float *)(*(char **)(hero + 0x2290) + 0xC0), 1.0f);
             vec_scale_to_length(rowB, (float *)(*(char **)(hero + 0x2290) + 0xD0), 1.0f);
             vec_scale_to_length(rowC, (float *)(*(char **)(hero + 0x2290) + 0xE0), 1.0f);
-            ComputeAimAngles((float *)(cam + 0x70), (float *)(from + 0x30),
+            cam_compute_aim_angles((float *)(cam + 0x70), (float *)(from + 0x30),
                           (float *)(*(char **)(cam - 0x100) + 0x30), rowA, rowB, rowC);
-            TransformMatrixViaCopy(cam + 0xB0, from);
+            mat_transform_via_copy(cam + 0xB0, from);
             qcopy(cam + 0xD0, cam + 0xB0);
         }
     } else {
         subMode = cam[3];
         if (subMode == 2) {
-            SaveObjectVectors();
-            RebuildCameraLookAtFromHero();
+            moby_save_vectors();
+            cam_rebuild_look_at_from_hero();
         } else if (subMode == 1) {
-            SaveObjectVectors();
+            moby_save_vectors();
             qcopy(cam + 0xB0, cam + 0xD0);
         } else if (subMode == 0) {
-            RestoreObjectVectors();
+            moby_restore_vectors();
         }
     }
     *(short *)D_001B5490 = 3;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -44,7 +45,7 @@ extern void ref_L04_0040BED0_08(s32, void *, s32, f32, f32, s32);
 extern void *ref_L04_0040BED0_09(s32, void *, s32, s32, s32);
 
 /* Throws a burst of sparks and puffs of smoke from a point. A higher intensity makes more of them. */
-void func_L04_0040BED0(s32 owner, rc2_qword *position, s32 quiet, s32 offset, f32 intensity) {
+void part_spawn_spark_and_smoke_burst(s32 owner, rc2_qword *position, s32 quiet, s32 offset, f32 intensity) {
     Stack_0040BED0 sp;
     TI copyValue  = *(TI *)position;
     s32 sparkIndex = 0;

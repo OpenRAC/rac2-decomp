@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -28,7 +29,7 @@ void func_PAL_0034A2E0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x60) = a1; }
 /* Measured target: byte-identical across all 27 levels. */
 void func_PAL_0034A2E8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0xCC) = a1; }
 
-extern int func_00348128(unsigned char *);
+extern int menu_get_selected_index(unsigned char *);
 
 /* Measured target: byte-identical across all 27 levels. */
 s32 func_PAL_0034A2F0(u8 *a0) { return *(s32 *)(a0 + 0x60); }

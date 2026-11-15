@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L16_003C6A00, the PAL copy of func_L16_003C2C08: the same C, where rename func_L14_004272D8 becomes func_PAL_L14_0042C988; rename func_00288E18 becomes func_PAL_00289730; rename func_0032DA58 becomes func_PAL_0032F3B8; rename func_002B0A68 becomes func_PAL_002B15D8; rename func_L00_0030DD70 becomes func_PAL_L00_0030FBC0. */
 #include "common.h"
 typedef struct {
@@ -8,8 +9,8 @@ typedef struct {
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 extern u8 D_0019B2E8[];
-extern u8 D_00188660[];
-extern int D_001A79F0 MACRO_ADDR;
+extern u8 g_sound_state[];
+extern int g_current_map_index MACRO_ADDR;
 extern u16 D_0018CC7C NOT_SDA;
 extern int D_L16_001A8FF0 MACRO_ADDR;
 extern u8 *D_L16_001B2B1C __attribute__((sda));
@@ -30,31 +31,31 @@ typedef struct {
 extern EffectControls D_L16_001B99C0;
 extern u8 D_L16_001A8F20[] MACRO_ADDR;
 extern float D_L16_001B9B00[4];
-extern void func_002A7750(u8 *,s32,s32);
-extern float func_L16_003960E8(const u8 *);
+extern void moby_set_state(u8 *,s32,s32);
+extern float moby_get_linked_float(const u8 *);
 extern void func_PAL_L14_0042C988(void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_002A8C28(u8 *,void *,int,int,int,int,float,float,float);
-extern int func_002E5CF8(int,int,char *);
-extern void func_002E59F8(s32);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void coll_sweep_from_object(u8 *,void *,int,int,int,int,float,float,float);
+extern int PlayMobySound(int,int,char *);
+extern void snd_stop_voice(s32);
 extern int func_PAL_00289730(int,int);
-extern void func_L00_002E6CF0(void (*)(void *),void *);
-extern void func_L16_003C32F8(void *);
-extern void *func_002A9640(void *,u32,s32);
-extern void func_00282CF0(void *,void *,void *);
+extern void gfx_add_draw_callback_first(void (*)(void *),void *);
+extern void DrawRotatingGroupInstances(void *);
+extern void *part_find_owned_effect_slot(void *,u32,s32);
+extern void FastVecSub(void *,void *,void *);
 extern void func_PAL_0032F3B8(void *,void *,void *,float);
-extern void func_002AB6D8(float *,float *);
+extern void mat_get_euler_angles(float *,float *);
 extern void func_PAL_002B15D8(char *,int,float *,u8,float,float,float,float);
-extern int func_002A8508(int,int);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *,char *,...);
+extern int moby_count_group_not_in_state(int,int);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *,char *,...);
 extern void func_PAL_L00_0030FBC0(char *,int);
-extern int func_00282948(int *);
-extern void func_002A0430(unsigned int);
-extern void func_0029F338(void *);
-extern float func_00283B98(float,float);
-extern int func_L01_0031BC68(int,int,float);
+extern int math_fast_float_d(int *);
+extern void moby_mark_table_entry_flagged(unsigned int);
+extern void moby_mark_spawned(void *);
+extern float FastAddRotations(float,float);
+extern int PulseColor(int,int,float);
 
 /* Object state machine: it moves along its direction as the level value from
  * func_L16_003960E8 rises, bursts once that value reaches 1 (effects, shake, a
@@ -72,7 +73,7 @@ void func_PAL_L16_003C6A00(u8 *object)
     switch (object[0x20]) {
     case 0: {
         float speed;
-        if (D_0019B2E8[object[0xB0]+D_001A79F0*16]&0x80) goto remove;
+        if (D_0019B2E8[object[0xB0]+g_current_map_index*16]&0x80) goto remove;
         object[0x30]=255;
         *(u16 *)(object+0x32)=0x113;
         *(u16 *)(object+0x34)|=0x4000;
@@ -81,26 +82,26 @@ void func_PAL_L16_003C6A00(u8 *object)
         state->amount=0.0f;
         state->sound=-1;
         state->angularSpeed=speed;
-        func_002A7750(object,1,-1);
+        moby_set_state(object,1,-1);
         break;
     }
     case 1:
         if (!D_L16_001A8FF0) break;
-        amount=func_L16_003960E8(D_L16_001B2B1C+(state->tableIndex<<8));
+        amount=moby_get_linked_float(D_L16_001B2B1C+(state->tableIndex<<8));
         if (amount!=0.0f || state->amount!=0.0f) {
             func_PAL_L14_0042C988(object);
-            func_00282F20(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
-            func_00282CC0(object+0x10,state->origin,point);
-            if (amount<state->amount) func_002A8C28(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
+            vec_scale_to_length(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
+            FastVecAdd(object+0x10,state->origin,point);
+            if (amount<state->amount) coll_sweep_from_object(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
         }
         if (amount!=state->amount && amount!=1.0f && amount!=0.0f) {
-            u8 *playingSound=D_00188660+state->sound*0x70;
-            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=func_002E5CF8(2,4,(char *)object);
+            u8 *playingSound=g_sound_state+state->sound*0x70;
+            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=PlayMobySound(2,4,(char *)object);
         } else {
             int sound=state->sound;
             if (sound!=-1) {
-                u8 *stoppingSound=D_00188660+sound*0x70;
-                if (*(u8 **)(stoppingSound+0x88)==object && stoppingSound[0x74]) func_002E59F8(sound);
+                u8 *stoppingSound=g_sound_state+sound*0x70;
+                if (*(u8 **)(stoppingSound+0x88)==object && stoppingSound[0x74]) snd_stop_voice(sound);
             }
             state->sound=-1;
         }
@@ -108,13 +109,13 @@ void func_PAL_L16_003C6A00(u8 *object)
         state->amount=amount;
         if (D_L16_001B3814!=D_L16_001B2648) {
             D_L16_001B3814=D_L16_001B2648;
-            func_L00_002E6CF0(func_L16_003C32F8,object);
+            gfx_add_draw_callback_first(DrawRotatingGroupInstances,object);
         }
         if (amount>=1.0f) {
-            if (func_002A9640(object,0x10000,0)) {
-                func_002E5CF8(0,0,(char *)object);
+            if (part_find_owned_effect_slot(object,0x10000,0)) {
+                PlayMobySound(0,0,(char *)object);
                 object[0xA8]=255;
-                func_002A7750(object,2,-1);
+                moby_set_state(object,2,-1);
                 D_0018CC7C=65535;
             }
         } else object[0xA8]=255;
@@ -124,71 +125,71 @@ void func_PAL_L16_003C6A00(u8 *object)
         oldTimer=timer++;
         *(u16 *)(object+0x96)=timer;
         if (oldTimer>=50) {
-            func_00282F20(point,object+0xE0,-2.0f);
-            func_00282F20(step,object+0xE0,5.0f);
-            func_00282CC0(point,point,object+0x10);
-            func_002A8C28(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
-            func_002E5CF8(1,0,(char *)object);
+            vec_scale_to_length(point,object+0xE0,-2.0f);
+            vec_scale_to_length(step,object+0xE0,5.0f);
+            FastVecAdd(point,point,object+0x10);
+            coll_sweep_from_object(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
+            PlayMobySound(1,0,(char *)object);
             for (i=0;i<2;i++) {
-                func_00282CF0(normal,D_L16_001B9B00,point);
-                func_00282F20(normal,normal,1.0f);
+                FastVecSub(normal,D_L16_001B9B00,point);
+                vec_scale_to_length(normal,normal,1.0f);
                 func_PAL_0032F3B8(object,point,normal,0.0f);
-                func_00282CC0(point,point,step);
+                FastVecAdd(point,point,step);
             }
             D_L16_001B99C0.damping=0.1f;
             D_L16_001B99C0.lifetime=75;
             D_L16_001B99C0.strength=0.2f;
             D_L16_001B99C0.duration=50;
             D_L16_001B99C0.timer=0;
-            func_002AB6D8((float *)(object+0xC0),(float *)(object+0xF0));
+            mat_get_euler_angles((float *)(object+0xC0),(float *)(object+0xF0));
             func_PAL_002B15D8((char *)object,0xFFF,(float *)D_L16_001A8F20,255,2.0f,4.0f,10.0f,20.0f);
             state->counter=0;
             state->timer=150;
             state->flags=0;
             I(object,0x98)=0;
             *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)|0x41)&0xEFFF;
-            count=func_002A8508(object[0x21],-1)-1;
+            count=moby_count_group_not_in_state(object[0x21],-1)-1;
             if (count!=0) {
                 char *format=D_L16_001B02D0;
                 char *text=message;
-                string=func_00288FB8(0xe5f);
-                func_00115DA8(text,format,string,count);
+                string=GetLocalizedString(0xe5f);
+                sprintf(text,format,string,count);
                 string=text;
-                func_002A7750(object,4,-1);
+                moby_set_state(object,4,-1);
                 func_PAL_L00_0030FBC0(string,150);
             } else {
-                string=func_00288FB8(0xe60);
+                string=GetLocalizedString(0xe60);
                 func_PAL_L00_0030FBC0(string,150);
-                func_002A7750(object,5,-1);
+                moby_set_state(object,5,-1);
             }
         } else {
-            if (*(u16 *)(object+0x96)%17==8) func_002E5CF8(3,0,(char *)object);
+            if (*(u16 *)(object+0x96)%17==8) PlayMobySound(3,0,(char *)object);
         }
         break;
     case 4:
-        if (func_00282948(&state->timer)) {
+        if (math_fast_float_d(&state->timer)) {
 remove:
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return;
         }
         break;
     case 5:
-        if (func_00282948(&state->timer)) {
-            if (object[0xB0]!=255) func_002A0430(object[0xB0]);
-            func_0029F338(object);
+        if (math_fast_float_d(&state->timer)) {
+            if (object[0xB0]!=255) moby_mark_table_entry_flagged(object[0xB0]);
+            moby_mark_spawned(object);
             return;
         }
         break;
     }
     if (object[0x31]) {
         if (object[0x20]==2) {
-            rate=func_00283B98(state->angle,D_L16_001B02BC*0.0003490659f);
+            rate=FastAddRotations(state->angle,D_L16_001B02BC*0.0003490659f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
+            *(u32 *)(object+0x78)=PulseColor(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
         } else {
-            rate=func_00283B98(state->angle,D_L16_001B02B8*0.0003490659f);
+            rate=FastAddRotations(state->angle,D_L16_001B02B8*0.0003490659f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=func_L01_0031BC68(colorFirst[0],D_L16_001B02C0[1],rate);
+            *(u32 *)(object+0x78)=PulseColor(colorFirst[0],D_L16_001B02C0[1],rate);
         }
     }
 }

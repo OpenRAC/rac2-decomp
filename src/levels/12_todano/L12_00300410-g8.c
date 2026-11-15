@@ -54,29 +54,29 @@ extern int D_L12_001A93FC[] __attribute__((sda));
 extern int D_L12_001A9408[] __attribute__((sda));
 extern int D_L12_001A9404[] __attribute__((sda));
 
-extern void func_L00_002FC980(void);
-extern void func_002E64A0(void *);
-extern void func_L00_00326048(void *, void *, unsigned int, unsigned int, float);
-extern void func_L00_002E6CF0(void (*)(void), void *);
-extern void func_L12_00300138(void);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern void func_002BAE50(void *, void *, unsigned int, int, int, int, int, int);
-extern void func_0029F338(void *);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_0032DA58(void *, void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_002ACB48(void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_L00_0033FFB8(void *, void *, int);
+extern void anim_start_startup_animations(void);
+extern void UpdateEquipmentPieces(void *);
+extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
+extern void gfx_add_draw_callback_first(void (*)(void), void *);
+extern void todano_refresh_scene_tuning(void);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern void part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
+extern void moby_mark_spawned(void *);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_blast_effect_moby(void *, void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_add_random_offset(void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void part_l00_spawn_spinning(void *, void *, int);
 
 /* Todano cutscene scene update (runs every frame). It marks and refreshes the scene objects,
    and in mode 5 it sprays effects from the two emitters and runs the current story event. */
-void func_L12_00300410(void)
+void todano_scene_update_events(void)
 {
     V posA, posB, velBuf, zeroVec;
     V *velPtr;
@@ -85,7 +85,7 @@ void func_L12_00300410(void)
     State *scene;
     char **emitterList;
 
-    StartStartupAnimations();
+    anim_start_startup_animations();
     for (objIndex = 0; objIndex < D_L12_001BDB00.count; objIndex++) {
         obj = D_L12_001BDB00.objects[objIndex];
         if (obj && *(short *)(obj + 0xAA) == 0xE29) {
@@ -97,11 +97,11 @@ void func_L12_00300410(void)
         if (obj && *(short *)(obj + 0xAA) == 0xFA0 /* TV Screens */) {
             char *p = *(char **)(obj + 0x68);
             if (p) {
-                StoreAngleUpdateResult(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
+                math_store_angle_update_result(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
             }
         }
     }
-    AddDrawCallbackToList1(RefreshSceneTuningFactors, 0);
+    gfx_add_draw_callback_first(todano_refresh_scene_tuning, 0);
 
     scene = &D_L12_001BDB00;
     if (scene->mode != 5) {
@@ -112,21 +112,21 @@ void func_L12_00300410(void)
     for (emitterIndex = 1; emitterIndex >= 0; emitterIndex--) {
         char *emitter = *emitterList;
 
-        TransformMobyJointToWorld(emitter, 3, &posA);
-        TransformMobyJointToWorld(emitter, 5, &posB);
+        moby_transform_joint_to_world(emitter, 3, &posA);
+        moby_transform_joint_to_world(emitter, 5, &posB);
         lerp_vector(&posA, &posA, &posB, 0.5f);
         zeroVec.q = 0;
-        zeroVec.f[2] = -(RandomFloatRange(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
+        zeroVec.f[2] = -(math_random_float_range(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
         velBuf.q = zeroVec.q;
         if (D_L12_001B29C8[0] & 1) {
-            SpawnScalingParticle(&posA, velPtr, D_L12_001A93E8, D_L12_001A93EC[0], RandomIntRange(18, 22),
+            part_spawn_scaling(&posA, velPtr, D_L12_001A93E8, D_L12_001A93EC[0], math_random_int_range(18, 22),
                           D_L12_001A9400, -10, 1);
         } else {
-            SpawnScalingParticle(&posA, velPtr, D_L12_001A93F0[0], D_L12_001A93F4[0], RandomIntRange(20, 24),
+            part_spawn_scaling(&posA, velPtr, D_L12_001A93F0[0], D_L12_001A93F4[0], math_random_int_range(20, 24),
                           D_L12_001A9404[0], -10, 1);
         }
         emitterList++;
-        SpawnScalingParticle(&posA, velPtr, D_L12_001A93F8[0], D_L12_001A93FC[0], RandomIntRange(10, 15),
+        part_spawn_scaling(&posA, velPtr, D_L12_001A93F8[0], D_L12_001A93FC[0], math_random_int_range(10, 15),
                       D_L12_001A9408[0], -10, 1);
     }
 
@@ -135,7 +135,7 @@ void func_L12_00300410(void)
         for (obj = D_L12_001B2E9C[0]; obj < D_L12_001B2EA4[0]; obj += 0x100) {
             int cls = *(short *)(obj + 0xAA);
             if (cls == 0x11EB || cls == 0x1F5 /* Nanotech Crate */ || cls == 0x326) {
-                MarkMobySpawned(obj);
+                moby_mark_spawned(obj);
             }
         }
         break;
@@ -143,7 +143,7 @@ void func_L12_00300410(void)
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        TransformMobyJointToWorld(D_L12_001BDB00.objects[4], 0, &posA);
+        moby_transform_joint_to_world(D_L12_001BDB00.objects[4], 0, &posA);
         SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
@@ -153,7 +153,7 @@ void func_L12_00300410(void)
         vec_scale_to_length(&posA, &D_L12_001B9CC0.rot, 4.0f);
         FastVecAdd(&posA, &posA, &D_L12_001B9CC0.pos);
         vec_scale_to_length(&posB, &D_L12_001B9CC0.rot, -1.0f);
-        SpawnBlastEffectMoby(D_L12_001BDB00.objects[2], &posA, &posB, 0.0f);
+        part_spawn_blast_effect_moby(D_L12_001BDB00.objects[2], &posA, &posB, 0.0f);
         break;
     case 0x8D2:
         D_L12_001B9CC0.fade = 0.5f;
@@ -168,10 +168,10 @@ void func_L12_00300410(void)
         SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         for (sparkIndex = 24; sparkIndex >= 0; sparkIndex--) {
             qcopy(&posB, &posA);
-            AddRandomOffsetToVector(&posB, 0.3f);
+            vec_add_random_offset(&posB, 0.3f);
             FastVecSub(velPtr, &posB, &posA);
-            vec_scale_to_length(velPtr, velPtr, RandomFloatRange(0.0f, 1.0f) * 0.016666668f);
-            SpawnSpinningParticle_L00_2(&posB, velPtr, 300);
+            vec_scale_to_length(velPtr, velPtr, math_random_float_range(0.0f, 1.0f) * 0.016666668f);
+            part_l00_spawn_spinning(&posB, velPtr, 300);
         }
         break;
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -36,16 +37,16 @@ extern s32 ref_L08_00398A90_04 __attribute__((sda));
 extern s32 ref_L08_00398A90_05 __attribute__((sda));
 extern void ref_L08_00398A90_06(s32, s32, s32);
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 /* Picks a per-level table from the level number and uses the moby's setting to choose the entry to apply. */
-void func_L01_00398A90(s8 *moby) {
+void level_apply_table_entry(s8 *moby) {
     s8 *vars;
     s32 *tab;
     s32 idx;
     s32 k;
 
     vars = *(s8 **)(0x68 + moby);
-    idx = gCurrentMapIndex;
+    idx = g_current_map_index;
     idx -= 1;
     {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_7, &&rc2_case_8, &&rc2_default, &&rc2_default, &&rc2_case_11, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_16, &&rc2_default, &&rc2_default, &&rc2_case_19};

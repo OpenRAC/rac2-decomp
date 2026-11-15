@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_00336A40(void *);
+extern int hud_draw_widget_text(void *);
 
 extern int func_0027C878_2(int);
 
-extern void func_0027F640(float, float, float, int, int, int, int, int);
+extern void FontPrintScaled(float, float, float, int, int, int, int, int);
 
 typedef int s32;
 
@@ -28,13 +29,13 @@ extern char D_L00_001ADE20[];
 
 extern void D_00115E38_1(char *a0, int a1, char *a2);
 
-extern int func_L00_002E9100(char *, int);
+extern int text_measure_width_first_set(char *, int);
 
 extern void func_00115AC0_1(void *, int, int);
 
 extern void func_00337E98_1(void *, int, int, float, float);
 
-extern int func_0027F178(unsigned char *text, int length); /* text width */
+extern int text_measure_width_small(unsigned char *text, int length); /* text width */
 
 /* Text box laid out by func_00337C10/func_00337E30: text at +0xA8, its line table at +0x1D8. */
 typedef struct {
@@ -52,35 +53,35 @@ typedef struct {
     unsigned char *lines[30];
 } TextBox;
 
-extern int func_00115DA8(char *, char *, ...); /* formats into a buffer */
+extern int sprintf(char *, char *, ...); /* formats into a buffer */
 extern char D_001ADB58[], D_001ADB68[], D_001ADB78[], D_001ADB90[];
 extern char D_001ADBB0[], D_001ADBB8[], D_001ADBC8[];
-extern int D_001A7340[] __attribute__((sda)); /* screen size: [1] = height */
-extern void func_00280190(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_00280200(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_00280270(unsigned short *layout, unsigned long style, unsigned char *text, int length);
-extern void func_0027EB88(int top, int bottom, int left, int right, int alpha, int color);
-extern void func_003384C0(char *, unsigned int, unsigned int, float, float, float, float);
+extern int g_screen_width[] __attribute__((sda)); /* screen size: [1] = height */
+extern void text_draw_window_small(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void text_draw_window_medium(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void text_draw_window_large(unsigned short *layout, unsigned long style, unsigned char *text, int length);
+extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int alpha, int color);
+extern void text_box_draw_frame(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
 void func_PAL_003388E8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x40) = a1; }
 
 extern void func_00300618(void *);
 
-extern int D_001ADB10 __attribute__((sda));
+extern int g_selected_item_material __attribute__((sda));
 
 
 
 
 
-extern void *func_003361A8(void *);
+extern void *object_construct_derived_a(void *);
 
-extern int *func_00335E20(void *);
-extern void func_00335E68(void *, int);
-extern void func_003361E0(void *, void *, void *);
-extern void func_00336390(void *, int, int);
-extern void func_003363C0(void *, float);
-extern void *func_00115484(void *, int, unsigned int); /* memset */
+extern int *object_get_fourth_field(void *);
+extern void object_set_flag_value(void *, int);
+extern void object_init_derived_arrays(void *, void *, void *);
+extern void object_set_helper_result(void *, int, int);
+extern void object_set_value_float(void *, float);
+extern void *memset(void *, int, unsigned int); /* memset */
 extern char D_001ADB40[]; /* "aTxBrack" */
 extern char D_001ADB50[]; /* "aTxTop" */
 extern char *D_001A8CFC[] __attribute__((sda));
@@ -93,10 +94,10 @@ typedef struct {
     float fB0;
 } ViewState;
 extern ViewState D_001B9040;
-extern void func_0027AB40(void);
-extern int func_00335E08(void);
-extern void func_00300A00(int, float, float, unsigned int, float, float, float);
+extern void UpdateViewContext(void);
+extern int object_get_stored_counter(void);
+extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, float, float, float);
 
-extern char *func_00288FB8(int);
+extern char *GetLocalizedString(int);
 
-extern int func_00115DA8(char *, char *, ...);
+extern int sprintf(char *, char *, ...);

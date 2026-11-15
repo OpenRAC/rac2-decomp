@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,19 +25,19 @@
  */
 #include "common.h"
 
-extern void func_003360F8(void *, s32);
-extern void func_00336ED0(s32, s32);
+extern void object_destroy_array(void *, s32);
+extern void pool_free_cell(s32, s32);
 
 extern s8 D_001ADA38[];
 
 /* Sets the object type pointer, releases the attached data when it is not in use and runs the shared base cleanup. */
-void func_003367C0(void *obj, s32 flags) {
+void object_release_unused_data_cleanup(void *obj, s32 flags) {
     s32 attached;
 
     (*(s32 *)((char *)(obj) + (0x30))) = (s32)D_001ADA38;
     attached = (*(s32 *)((char *)(obj) + (0x2C)));
     if ((attached != 0) && ((*(s32 *)((char *)(obj) + (0x38))) == 0)) {
-        FreePoolCell(attached, (*(s32 *)((char *)(obj) + (0x34))));
+        pool_free_cell(attached, (*(s32 *)((char *)(obj) + (0x34))));
     }
-    DestroyArrayObject(obj, flags);
+    object_destroy_array(obj, flags);
 }

@@ -4,27 +4,27 @@
 extern char *D_L20_001B2F9C;
 extern char *D_L20_001B308C;
 extern float D_L20_001B29E0 MACRO_ADDR;
-extern void func_L20_004095D0(char *);
+extern void moby_set_scaled_speed_capped(char *);
 extern u32 D_L20_001CA540 __attribute__((nosda));
 extern float D_L20_001B2BE8;
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u8 D_0019B2E8[];
-extern float D_00189EA0[];
+extern float g_hero_position[];
 extern int D_L20_001A8F08;
 extern int D_L20_001A8F00;
-extern int func_0029B3E0(int, int);
-extern void func_L01_00323310(int, int);
+extern int MemcardSave(int, int);
+extern void script_queue_keyed_request(int, int);
 extern void func_PAL_L00_00305110(int, int);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_002A0430(unsigned int);
-extern void func_L00_003294F0(unsigned char *, int);
-extern void func_L20_00409480(s32);
-extern void func_002A7750(u8 *, s32, s32);
-extern s32 func_002B3868(u8 *);
-extern int func_00282948(int *);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L20_002DC390(int);
+extern int IsPointInCuboid(void *, int);
+extern void moby_mark_table_entry_flagged(unsigned int);
+extern void moby_set_flag_bit(unsigned char *, int);
+extern void trooper_legs_destroy_group(s32);
+extern void moby_set_state(u8 *, s32, s32);
+extern s32 flag_set_first_pending(u8 *);
+extern int math_fast_float_d(int *);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void hero_load_state_by_game_mode(int);
 
 /* The platform controller records switch edges and raises its linked platform. */
 void func_PAL_L20_0040D400(u8 *object) {
@@ -35,7 +35,7 @@ void func_PAL_L20_0040D400(u8 *object) {
     switch (object[0x20]) {
     case 0: {
         char *record;
-        frame_offset = D_001A79F0 * 16;
+        frame_offset = g_current_map_index * 16;
         state[8] = D_L20_001CA540;
         state[5] = 0;
         state[4] = 0;
@@ -46,37 +46,37 @@ void func_PAL_L20_0040D400(u8 *object) {
             *(float *)(state + 0x1D) = *(float *)(record + 0x18);
             *(float *)(record + 0x18) += 20.0f;
         } else state[0x1F] = 1;
-        func_002A7750(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     }
     case 1: {
         char *record;
         if (state[0x23] == 0 &&
-            (D_0019B2E8[state[2] + D_001A79F0 * 16] & 0x80) != 0 &&
-            func_002ACBC8(D_00189EA0, state[10]) != 0) {
+            (D_0019B2E8[state[2] + g_current_map_index * 16] & 0x80) != 0 &&
+            IsPointInCuboid(g_hero_position, state[10]) != 0) {
             state[0x23] = 1;
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         }
         if (D_L20_001CA540 == 2) {
             if (state[4] == 0) {
-                if (func_002ACBC8(D_00189EA0, state[0x18])) {
+                if (IsPointInCuboid(g_hero_position, state[0x18])) {
                     state[4] = 1;
-                    func_L01_00323310(state[0x20], -1);
+                    script_queue_keyed_request(state[0x20], -1);
                 }
             }
         }
-        if (func_002ACBC8(D_00189EA0, state[11]) != 0) {
-            if (D_0019B2E8[state[1] + D_001A79F0 * 16] & 0x80) return;
-            func_002A0430(state[1]);
+        if (IsPointInCuboid(g_hero_position, state[11]) != 0) {
+            if (D_0019B2E8[state[1] + g_current_map_index * 16] & 0x80) return;
+            moby_mark_table_entry_flagged(state[1]);
             if (state[0x13] >= 0)
-                func_L00_003294F0((u8 *)D_L20_001B2F9C + state[0x13] * 0x100, 1);
-            func_L20_00409480(state[0x14]);
-            func_L20_00409480(state[0x15]);
+                moby_set_flag_bit((u8 *)D_L20_001B2F9C + state[0x13] * 0x100, 1);
+            trooper_legs_destroy_group(state[0x14]);
+            trooper_legs_destroy_group(state[0x15]);
             state[8] = 2;
             state[15] = 3;
-            func_002A7750(object, 5, -1);
+            moby_set_state(object, 5, -1);
         }
-        if (D_0019B2E8[state[1] + D_001A79F0 * 16] & 0x80) return;
+        if (D_0019B2E8[state[1] + g_current_map_index * 16] & 0x80) return;
         if (*(u8 *)(D_L20_001B2F9C + state[0x1B] * 0x100 + 0xBC) == 1) return;
         if (state[0x1F] != 0) return;
         record = D_L20_001B2F9C + state[0x19] * 0x100;
@@ -87,42 +87,42 @@ void func_PAL_L20_0040D400(u8 *object) {
             int status = *(u8 *)(record + 0x20);
             if (status != 0xFE && *(u8 *)(record + 0x20) != 0xFD) return;
         }
-        func_002A7750(object, 7, -1);
+        moby_set_state(object, 7, -1);
         break;
     }
     case 2:
     case 3:
-        if (func_002B3868(object)) state[5] = 104;
-        if (func_00282948(state + 5)) goto movement_done;
+        if (flag_set_first_pending(object)) state[5] = 104;
+        if (math_fast_float_d(state + 5)) goto movement_done;
         if (object[0x20] == 2) *(float *)(state + 3) = 1.0f - (float)state[5] * 0.008f;
         else *(float *)(state + 3) = (float)state[5] * 0.008f;
         goto movement_callback;
 movement_done:
-        func_002A7750(object, state[7], -1);
+        moby_set_state(object, state[7], -1);
 movement_callback:
-        func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+        gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, object);
         break;
     case 4: {
         char *record;
         s32 *entry = (s32 *)((u32)state + (state[15] * 4));
         record = D_L20_001B308C + entry[9] * 0x80;
         func_PAL_L00_00305110(state[8], state[0x21]);
-        func_002A0430(state[0]);
+        moby_mark_table_entry_flagged(state[0]);
         func_PAL_L00_002B9CD8(record + 0x30, record + 0x70, 0x6F, 1);
-        func_L20_002DC390(0);
+        hero_load_state_by_game_mode(0);
         state[7] = 1;
         D_L20_001B29E0 = 1.0f;
         *(float *)(state + 3) = 1.0f;
-        func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
-        func_002A7750(object, 6, -1);
+        gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, object);
+        moby_set_state(object, 6, -1);
         break;
     }
     case 5:
         if (D_L20_001A8F08 == -2 && D_L20_001A8F00 != 2) {
             *(float *)(state + 3) = 1.0f;
-            func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+            gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, object);
             if (*(u8 *)(D_L20_001B2F9C + state[0x13] * 0x100 + 0x20) > 0x80)
-                func_002A7750(object, 4, -1);
+                moby_set_state(object, 4, -1);
         }
         state[6]++;
         break;
@@ -130,7 +130,7 @@ movement_callback:
         if (D_L20_001A8F00 != 2) {
             D_L20_001B29E0 = 1.0f;
             *(float *)(state + 3) = 1.0f;
-            func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+            gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, object);
         } else D_L20_001B29E0 = 0.0f;
         if (D_L20_001A8F00 != 2) {
             char *mobys = D_L20_001B2F9C;
@@ -150,7 +150,7 @@ movement_callback:
                     *(int *)(second + 0x98) = *(int *)(*(char **)(second + 0x24) + 0x10);
                 }
                 D_L20_001B29E0 = 0.0f;
-                func_002A7750(object, 3, -1);
+                moby_set_state(object, 3, -1);
             }
         }
         state[6]++;
@@ -158,7 +158,7 @@ movement_callback:
     }
     case 7: {
         char *record;
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             record = D_L20_001B2F9C + state[0x1B] * 0x100;
             record[0xBC] = 1;
             {
@@ -170,7 +170,7 @@ movement_callback:
         }
         *(float *)(D_L20_001B2F9C + state[0x1C] * 0x100 + 0x18) =
             *(float *)(state + 0x1D) + ((float)state[6] * 20.0f) / (float)state[0x1E];
-        if (func_00282948(state + 6)) func_002A7750(object, 1, -1);
+        if (math_fast_float_d(state + 6)) moby_set_state(object, 1, -1);
         break;
     }
     }

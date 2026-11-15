@@ -58,19 +58,19 @@ extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record,
 #define PLAYER (&D_00189E20_view)
 extern int D_L16_001A8FF0 __attribute__((sda));
 
-extern void func_00282C88(void *);
-extern void func_L00_002D49F0(void);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L00_002D38A0(Quad *, Quad *, float);
-extern void func_L00_002D36E0(float *, int, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(float, void *, int, void *);
+extern void vec_clear_128(void *);
+extern void hero_check_timed_condition(void);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void cam_offset_point_in_view_space(Quad *, Quad *, float);
+extern void hero_build_relative_point(float *, int, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(float, void *, int, void *);
 extern int func_L00_002E0200(float, void *, int, void *, float);
-extern int func_00278870(void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern int coll_process_triangles(void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
@@ -117,72 +117,72 @@ typedef struct {
     int health;
 } PlayerInputView;
 
-extern PlayerInputView D_00189E20;
-extern int D_001A79F0 __attribute__((sda));
+extern PlayerInputView g_hero_state;
+extern int g_current_map_index __attribute__((sda));
 extern int D_L16_001A9010 __attribute__((sda));
 extern u8 D_001A7B0B __attribute__((sda));
-extern void func_00282A88(void *, int);
-extern float func_00282C48(float);
-extern int func_L16_002C0BC8(int, int);
+extern void mem_fast_helper_b(void *, int);
+extern float math_fabs(float);
+extern int hero_l16_enter_state(int, int);
 
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 /* Reads the controller command for the player and starts the attack, jump or hover state it asks for. */
-void func_L16_002AD320(void)
+void hero_read_command_start_action(void)
 {
-    short command = gHeroState.command;
-    u8 saved = gHeroState.saved;
+    short command = g_hero_state.command;
+    u8 saved = g_hero_state.saved;
     int active;
 
-    FastMemoryHelperB(&gHeroState.command, 16);
-    gHeroState.command = command;
-    gHeroState.saved = saved;
-    gHeroState.request = 0;
-    gHeroState.pendingJump = 0;
-    if (gHeroState.disabled) return;
+    mem_fast_helper_b(&g_hero_state.command, 16);
+    g_hero_state.command = command;
+    g_hero_state.saved = saved;
+    g_hero_state.request = 0;
+    g_hero_state.pendingJump = 0;
+    if (g_hero_state.disabled) return;
     active = 0;
-    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
+    if (g_hero_state.busy || (g_hero_state.state == 0x7b && g_hero_state.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !gHeroState.inputLock &&
-        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
-        gHeroState.jumpPressed = 1;
-        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
+    if (command == 2 && !g_hero_state.inputLock &&
+        (!g_hero_state.jumpCount || g_hero_state.elapsed < 2.5f)) {
+        g_hero_state.jumpPressed = 1;
+        if (!g_hero_state.mode && D_001A7B0B) g_hero_state.pendingJump = 1;
     }
-    if (command == 3) gHeroState.jump = 1;
-    if (command == 11) gHeroState.cancel = 1;
-    if (command == 1) gHeroState.attack = 1;
-    if (command == 8) gHeroState.hover = 1;
-    if (command == 12) gHeroState.hover = 1;
-    if (gHeroState.attack) {
-        if (gHeroState.attack && active &&
-            (gHeroState.state != 0x38 || gHeroState.animationDone)) {
-            if (gHeroState.health) { EnterPlayerState(0x38,1); return; }
-            if (gCurrentMapIndex == 2 && D_L16_001A9010) { EnterPlayerState(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(gHeroState.object + 0x24) + 0x1f0)) { EnterPlayerState(0x79,1); return; }
-            EnterPlayerState(0x39,1); return;
+    if (command == 3) g_hero_state.jump = 1;
+    if (command == 11) g_hero_state.cancel = 1;
+    if (command == 1) g_hero_state.attack = 1;
+    if (command == 8) g_hero_state.hover = 1;
+    if (command == 12) g_hero_state.hover = 1;
+    if (g_hero_state.attack) {
+        if (g_hero_state.attack && active &&
+            (g_hero_state.state != 0x38 || g_hero_state.animationDone)) {
+            if (g_hero_state.health) { hero_l16_enter_state(0x38,1); return; }
+            if (g_current_map_index == 2 && D_L16_001A9010) { hero_l16_enter_state(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l16_enter_state(0x79,1); return; }
+            hero_l16_enter_state(0x39,1); return;
         }
     }
-    if (gHeroState.jump && gHeroState.state != 0x65 && gHeroState.state != 0x78 &&
-        FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
-        gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f &&
-        (gHeroState.state != 0x66 || gHeroState.animationDone) &&
-        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
-        if (!gHeroState.health) { EnterPlayerState(0x78,1); return; }
-        EnterPlayerState(0x65,1); return;
+    if (g_hero_state.jump && g_hero_state.state != 0x65 && g_hero_state.state != 0x78 &&
+        math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f &&
+        g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f &&
+        (g_hero_state.state != 0x66 || g_hero_state.animationDone) &&
+        (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
+        if (!g_hero_state.health) { hero_l16_enter_state(0x78,1); return; }
+        hero_l16_enter_state(0x65,1); return;
     }
-    if (!gHeroState.cancel || gHeroState.state == 0x78 || gHeroState.state == 0x74) return;
-    if (!(FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f)) return;
-    if (!(gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f)) return;
-    if (!(gHeroState.motion.f[2] < 0.0f) && gHeroState.state != 0x7b) return;
-    if (gCurrentMapIndex == 13) {
-        EnterPlayerState(0x74, 1);
+    if (!g_hero_state.cancel || g_hero_state.state == 0x78 || g_hero_state.state == 0x74) return;
+    if (!(math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f)) return;
+    if (!(g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f)) return;
+    if (!(g_hero_state.motion.f[2] < 0.0f) && g_hero_state.state != 0x7b) return;
+    if (g_current_map_index == 13) {
+        hero_l16_enter_state(0x74, 1);
         return;
     }
-    EnterPlayerState(0x78, 1);
+    hero_l16_enter_state(0x78, 1);
 }
 
 
 /* Moves the player out of walls and floors after a step; returns -1 if it was pushed far, 1 otherwise. */
-int func_L16_002B59A0(int mode)
+int hero_l16_push_out_of_collision(int mode)
 {
     Vec previous;
     Vec offset, displacement;
@@ -191,9 +191,9 @@ int func_L16_002B59A0(int mode)
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
-    ClearVector128(&offset);
+    vec_clear_128(&offset);
     if (PLAYER->path_constrain_pending) {
-        CheckHeroTimedCondition();
+        hero_check_timed_condition();
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
@@ -202,20 +202,20 @@ int func_L16_002B59A0(int mode)
     case 17:
         break;
     case 15:
-        ClearVector128(&offset);
+        vec_clear_128(&offset);
         offset.z = 0.8f;
         matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
             if (PLAYER->state == 2) {
-                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 5.0f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
-                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 0.77f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
             }
         } else {
             offset.z = PLAYER->capsule_bottom;
@@ -225,13 +225,13 @@ int func_L16_002B59A0(int mode)
     FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 15) {
-            if (!TestPointAgainstCollision(0.45f, &PLAYER->position, 0x324, PLAYER->moby)) break;
+            if (!coll_test_point(0.45f, &PLAYER->position, 0x324, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
             if (player->gravity_mode || facingUp) {
-                hit = TestPointAgainstCollision(player->capsule_radius, &player->position, 0x324, player->moby);
+                hit = coll_test_point(player->capsule_radius, &player->position, 0x324, player->moby);
                 if (!player->locked)
-                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -239,7 +239,7 @@ int func_L16_002B59A0(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x324,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }

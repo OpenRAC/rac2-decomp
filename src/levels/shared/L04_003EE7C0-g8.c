@@ -17,35 +17,35 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
 extern AimQueryConfig D_L04_001B01B0;
 extern AimTuning D_L04_0027B470[];
 extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L04_002BA6C0[];
-extern unsigned char D_00189E20[];
-extern unsigned char D_00138180[];
+extern unsigned char g_hero_state[];
+extern unsigned char g_pad_state[];
 extern unsigned char D_00139592[];
 extern float D_L04_001B01A0 __attribute__((sda));
 extern float D_L04_001B01A4 __attribute__((sda));
 extern float D_L04_001B01A8 __attribute__((sda));
 extern float D_L04_001B01AC __attribute__((sda));
 extern int D_L04_001B2F38;
-extern void func_0029FCC0(char *, int, char *);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_002AB1F0(unsigned char *);
-extern int func_00282948(void *);
-extern unsigned char *func_002AF580(void *, void *, void *, float, float, int, int, int, float, float, float, int, AimQueryConfig *);
-extern void func_002FDF40(void *, void *, void *, int, float, float, float, float);
-extern int func_002FE5A0(void *, void *, void *, void *, void *, int, int, float);
-extern void func_L00_002AF7D0(void);
-extern int func_L00_002D3F30(int, int);
-extern void func_L00_002AF568(void);
-extern int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern int func_002E5CF8(int, int, char *);
-extern char *func_L00_003E7650(int, char *, char *);
-extern int func_L00_002D4040(int);
-extern void func_L00_002D6B70(int);
-extern int func_002829D8(void *);
-extern void func_L00_003C33E0(void *);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int moby_get_private_value_0(unsigned char *);
+extern int math_fast_float_d(void *);
+extern unsigned char *SelectBestTargetInCone(void *, void *, void *, float, float, int, int, int, float, float, float, int, AimQueryConfig *);
+extern void CalculateAimedLaunchVelocity(void *, void *, void *, int, float, float, float, float);
+extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void *, int, int, float);
+extern void cancel_hero_item_animation(void);
+extern int weapon_spend_ammo(int, int);
+extern void start_equipped_item_animation(void);
+extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern int PlayMobySound(int, int, char *);
+extern char *mini_nuke_projectile_spawn(int, char *, char *);
+extern int get_ammo(int);
+extern void slot_reset_active(int);
+extern int vec_fast_helper_b(void *);
+extern void moby_apply_active_effect(void *);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 
 /* Updates the player's Mini-Nuke: finds an aim target and, when the fire button is pressed, launches the shot and starts its sound. */
-void func_L04_003EE7C0(unsigned char *moby) {
+void mini_l04_nuke_update(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     unsigned char *aimTarget;
     char *targetInfo;
@@ -53,18 +53,18 @@ void func_L04_003EE7C0(unsigned char *moby) {
     AimQueryConfig config;
     AimVector scratch;
     int allowed;
-    TransformMobyJointToWorld((char *)moby, 0, (char *)&position);
+    moby_transform_joint_to_world((char *)moby, 0, (char *)&position);
     if (moby[0x42] == moby[0x43] && (moby[0x60] & 2))
-        StartAnimationBlendedWithFlags(moby, 1, 0, 2, 0);
+        anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     aimTarget = 0;
     if (H->ptr[0x1450 / 4] && H->ptr[0x1450 / 4][0x20] != 0xFE && H->ptr[0x1450 / 4][0x20] != 0xFD) {
-        targetInfo = (char *)GetMobyPrivateValue0(H->ptr[0x1450 / 4]);
+        targetInfo = (char *)moby_get_private_value_0(H->ptr[0x1450 / 4]);
         if (targetInfo && *(float *)targetInfo > 0.0f)
             aimTarget = H->ptr[0x1450 / 4];
     }
     allowed = 1;
     if (H->i[0x2294 / 4] == 0x1D || H->i[0x2294 / 4] == 1) {
-        if (FastFloatHelperD(&H->i[0x2534 / 4]) == 0)
+        if (math_fast_float_d(&H->i[0x2534 / 4]) == 0)
             allowed = 0;
     } else {
         H->i[0x2534 / 4] = 0x28;
@@ -76,7 +76,7 @@ void func_L04_003EE7C0(unsigned char *moby) {
     }
     CalculateAimedLaunchVelocity(&config, &position, aimTarget, 0, D_L04_001B01A4, D_L04_001B01A0,
                    D_L04_001B01AC * 0.016666668f, D_L04_001B01A8 * 0.00027777778f);
-    *(int *)(vars + 0x24) = TraceProjectileToImpact(&position, &config, vars, vars + 0x10, moby, 0, 0,
+    *(int *)(vars + 0x24) = coll_trace_projectile_to_impact(&position, &config, vars, vars + 0x10, moby, 0, 0,
                                           D_L04_001B01A8 * 0.00027777778f);
     switch (moby[0x20]) {
     case 0:
@@ -88,12 +88,12 @@ void func_L04_003EE7C0(unsigned char *moby) {
         if (H->i[0x1D8 / 4] >= 21)
             cancel_hero_item_animation();
         if (allowed && *(float *)(vars + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] >= 23) {
-            if (SpendWeaponAmmo(-1, 1)) {
+            if (weapon_spend_ammo(-1, 1)) {
                 D_L04_001B2F38 = 1;
                 start_equipped_item_animation();
-                *(int *)(vars + 0x2C) = CopyRecordsToFreeSlots(D_L04_002BA6C0);
-                StartAnimationBlendedWithFlags(moby, 2, 0, 2, 0);
-                SpawnMiniNukeProjectile((int)moby, (char *)&position, (char *)&config);
+                *(int *)(vars + 0x2C) = slot_copy_records_to_free(D_L04_002BA6C0);
+                anim_start_blended_with_flags(moby, 2, 0, 2, 0);
+                mini_nuke_projectile_spawn((int)moby, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)moby);
                 {
                 AimTuning *tuning = &D_L04_0027B470[D_00139592[0]];
@@ -105,12 +105,12 @@ void func_L04_003EE7C0(unsigned char *moby) {
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(vars + 0x2C) >= 0) {
-                    ResetActiveSlots(*(int *)(vars + 0x2C));
+                    slot_reset_active(*(int *)(vars + 0x2C));
                     *(int *)(vars + 0x2C) = -1;
                 }
             }
         }
     }
-    FastVectorHelperB(vars + 0x20);
-    AddDrawCallbackToList3(ApplyActiveEffect, moby);
+    vec_fast_helper_b(vars + 0x20);
+    gfx_add_draw_callback_third(moby_apply_active_effect, moby);
 }

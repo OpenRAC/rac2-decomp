@@ -343,6 +343,6 @@ static inline UDItype __udivmoddi4(UDItype n, UDItype d, UDItype *rp) {
 /* --- libgcc2.c, the L_udivdi3 part (renamed: __udivdi3 is func_00121B20) ---------- */
 
 /* Divides one unsigned 64-bit number by another and gives the quotient. */
-UDItype func_00121B20(UDItype n, UDItype d) {
+UDItype __udivdi3(UDItype n, UDItype d) {
     return __udivmoddi4(n, d, (UDItype *)0);
 }

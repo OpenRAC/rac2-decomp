@@ -2,29 +2,29 @@
 
 
 #include "common.h"
-extern float func_00283198(float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
-extern f32 func_002A7878(f32 a, f32 b);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);
+extern f32 math_random_float_range(f32 a, f32 b);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
 extern int D_L15_001A9018[] __attribute__((sda));
 extern unsigned short **D_L15_001A9014[] __attribute__((sda));
 extern unsigned char *D_L15_001B2C9C[] __attribute__((sda));
 extern unsigned char *D_L15_001B2C94[] __attribute__((sda));
 extern short D_L15_00227500[];
-extern float func_00282E80(void *, void *);
-extern float func_002A7940(void);
-extern float func_00283198(float);
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_L00_00323448(void *, void *, int, int, int, int, int, int);
-extern void func_L00_00323E48(void *, int, int, void *);
-extern void func_L00_00323958(void *, void *);
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_b(float);
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void BuildObjectAttachmentTransforms(void *, void *, int, int, int, int, int, int);
+extern void level_set_record_payload_by_key(void *, int, int, void *);
+extern void moby_update_attached_transforms(void *, void *);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);
 
 /* State 0 looks for the group of the level's id lists that holds the 64-byte record closest to
    the object (first walk, distances below 9999.0; the group index goes to the state's first word
@@ -65,7 +65,7 @@ void func_PAL_L15_0043EDE0(unsigned char *a0)
                 e = D_L15_001B2C9C[0] + ((*p & 0x7FFF) << 6);
                 if (e == 0)
                     break;
-                d = func_00282E80(e + 0x30, a0 + 0x10);
+                d = vec_distance_xy(e + 0x30, a0 + 0x10);
                 if (d < bestd) {
                     bestd = d;
                     best = i;
@@ -76,16 +76,16 @@ void func_PAL_L15_0043EDE0(unsigned char *a0)
         if (best == -1)
             return;
         *(float *)(state + 0x28) = 12.0f;
-        *(float *)(state + 0x2C) = func_002A7878(30.0f, 37.0f);
-        *(float *)(state + 0x1C) = func_002A7940();
-        *(float *)(state + 0xC) = func_00283198(*(float *)(state + 0x1C)) * *(float *)(state + 0x28);
-        func_002AEE70(a0, state + 0x1C, state + 0xC, *(float *)(state + 0x28),
+        *(float *)(state + 0x2C) = math_random_float_range(30.0f, 37.0f);
+        *(float *)(state + 0x1C) = math_random_angle();
+        *(float *)(state + 0xC) = math_fast_sin_or_cos_b(*(float *)(state + 0x1C)) * *(float *)(state + 0x28);
+        math_update_wrapped_angle_offset(a0, state + 0x1C, state + 0xC, *(float *)(state + 0x28),
                       *(float *)(state + 0x2C) * 0.0003490659f, -1.0f);
         a0[0x30] = 0xFF;
-        func_L00_00323448(a0, state + 0x40, 20, *(int *)(state + 4), *(int *)state,
+        BuildObjectAttachmentTransforms(a0, state + 0x40, 20, *(int *)(state + 4), *(int *)state,
                           *(int *)(state + 8), 7, 0);
         if (state[0x8A] == 0) {
-            func_0029F338(a0);
+            moby_mark_spawned(a0);
             return;
         }
         for (q = D_L15_001A9014[0][*(int *)state];
@@ -96,26 +96,26 @@ void func_PAL_L15_0043EDE0(unsigned char *a0)
                 break;
             cls = D_L15_00227500[e[0x1D]];
             if (cls == 0xD34)
-                func_L00_00323E48(state + 0x40, 1, (short)*q, state + 0x680);
+                level_set_record_payload_by_key(state + 0x40, 1, (short)*q, state + 0x680);
             if (cls == 0xD33)
-                func_L00_00323E48(state + 0x40, 1, (short)*q, state + 0x6A0);
+                level_set_record_payload_by_key(state + 0x40, 1, (short)*q, state + 0x6A0);
         }
         state[0x8D] = 1;
         *(unsigned short *)(a0 + 0x34) |= 0x104;
-        func_002833F0(a0 + 0xC0, a0 + 0xF0);
-        *(float *)(state + 0x38) = func_002A78D8(27.0f, 52.0f) * 0.0003490659f;
-        f2 = func_002A78D8(25.0f, 37.0f) * 0.0003490659f;
+        euler_rotation_basis(a0 + 0xC0, a0 + 0xF0);
+        *(float *)(state + 0x38) = math_random_signed_float_range(27.0f, 52.0f) * 0.0003490659f;
+        f2 = math_random_signed_float_range(25.0f, 37.0f) * 0.0003490659f;
         *(float *)(state + 0x3C) = f2;
         if (0.0f <= *(float *)(state + 0x38) * f2)
             *(float *)(state + 0x3C) = -f2;
         a0[0x20] = 1;
         break;
     case 1:
-        func_002AEE70(a0, state + 0x1C, state + 0xC, *(float *)(state + 0x28),
+        math_update_wrapped_angle_offset(a0, state + 0x1C, state + 0xC, *(float *)(state + 0x28),
                       *(float *)(state + 0x2C) * 0.0003490659f, -1.0f);
-        *(float *)(state + 0x688) = func_00283B98(*(float *)(state + 0x688), *(float *)(state + 0x38));
-        *(float *)(state + 0x6A8) = func_00283B98(*(float *)(state + 0x6A8), *(float *)(state + 0x3C));
-        func_L00_00323958(a0, state + 0x40);
+        *(float *)(state + 0x688) = FastAddRotations(*(float *)(state + 0x688), *(float *)(state + 0x38));
+        *(float *)(state + 0x6A8) = FastAddRotations(*(float *)(state + 0x6A8), *(float *)(state + 0x3C));
+        moby_update_attached_transforms(a0, state + 0x40);
         break;
     }
 }

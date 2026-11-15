@@ -16,18 +16,18 @@ extern float D_L05_001B1730 __attribute__((sda));
 extern int D_L05_001B172C __attribute__((sda));
 extern DrawVector D_L05_001AA250[4];
 extern char D_L05_001B96C0[];
-extern void func_002FC560(int, unsigned long);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void VU1_addGSregister(int, unsigned long);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws a flat tiled textured quad facing the camera at the object's position. */
-void func_L05_0042BB10(char *object)
+void gfx_draw_tiled_ground_quad(char *object)
 {
     DrawVector position, offset;
     DrawPacket packet;
@@ -44,7 +44,7 @@ void func_L05_0042BB10(char *object)
     position.v[3] = 1.0f;
     FastVecScale(&offset, object + 0xC0, D_L05_001B1734);
     FastVecAdd(&position, &position, &offset);
-    InitQuadPacketState(&packet, D_L05_001B172C, 2, 0x80);
+    gfx_init_quad_packet_state(&packet, D_L05_001B172C, 2, 0x80);
     packet.extra.q = 0;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;

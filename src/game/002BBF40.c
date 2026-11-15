@@ -1,16 +1,16 @@
 #include "common.h"
-extern void func_00282CC0(void *,void *,void *),func_00282F20(void *,void *,float);
-extern int func_00282978(void *),func_00283CF0(float),func_00283D38(int,int,float);
-extern void func_002B9180(void *);
-extern float func_002A7878(float,float);
-extern char D_001B5340[];
-extern char *func_002BBCB0(void *,void *,int,int,int,int,int,float,int,float);
-extern float func_00282C10(float), func_00282E48(void *,void *), func_00283CE0(int);
-extern void func_00282D30(void *,void *,float), func_002829A8(void *);
-extern int func_002A7820(int,int);
+extern void FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float);
+extern int FastDecTimer(void *),FloatToInt(float),FastTweenColor(int,int,float);
+extern void part_kill(void *);
+extern float math_random_float_range(float,float);
+extern char g_camera_eye_state[];
+extern char *part_spawn_firework_spark(void *,void *,int,int,int,int,int,float,int,float);
+extern float square_root(float), fast_vec_dist(void *,void *), IntToFloat(int);
+extern void FastVecScale(void *,void *,float), vec_fast_helper_a(void *);
+extern int math_random_int_range(int,int);
 extern float D_001B168C MACRO_ADDR;
 /* Updates a firework shell. It rises, splits into sparks near the end of its life, then flares and fades out. */
-void func_002BBF40(char *particle)
+void part_update_firework(char *particle)
 {
     char *motion=particle+32;
     short *remaining;
@@ -29,10 +29,10 @@ void func_002BBF40(char *particle)
                 i=4;
                 do {
                     --i;
-                    life=FloatToInt((unsigned char)motion[0x1b]*RandomFloatRange(0.9f,1.1f));
+                    life=FloatToInt((unsigned char)motion[0x1b]*math_random_float_range(0.9f,1.1f));
                     style=(unsigned char)motion[0x18];
-                    size=RandomFloatRange(0.85f,1.0f);
-                    SpawnFireworkSparkParticle(particle+16,motion,*(int *)(motion+16),*(int *)(motion+20),life,style,(unsigned char)motion[0x1a]+1,*(float *)(motion+28),(unsigned char)motion[0x19],*(float *)(motion+12)*size);
+                    size=math_random_float_range(0.85f,1.0f);
+                    part_spawn_firework_spark(particle+16,motion,*(int *)(motion+16),*(int *)(motion+20),life,style,(unsigned char)motion[0x1a]+1,*(float *)(motion+28),(unsigned char)motion[0x19],*(float *)(motion+12)*size);
                 }while(i>=0);
             }
         }
@@ -54,27 +54,27 @@ quadratic = duration * 3.0f;
                 first = (-linear + root) / (quadratic + quadratic);
 second = (-linear - root) / (quadratic + quadratic);
 *(float *)(particle + 12) = first > second ? first : second;
-                distance=fast_vec_dist(particle+16,gCameraState_001B5340);
+                distance=fast_vec_dist(particle+16,g_camera_eye_state);
                 if(distance<10.0f) *(float *)(particle+12)*=distance*0.075f+0.25f;
             }
         }
         if(motion[0x19]&2) *(int *)(particle+4)=FastTweenColor(*(int *)(motion+16),0x0fffffff,(float)*(short *)(particle+10)/(unsigned char)motion[0x1b]);
         else *(int *)(particle+4)=FastTweenColor(*(int *)(motion+20),*(int *)(motion+16),(float)*(short *)(particle+10)/(unsigned char)motion[0x1b]);
-        FastVectorHelperA(timer);
+        vec_fast_helper_a(timer);
         if(FastDecTimer(remaining)) {
             unsigned int flags = (unsigned char)motion[0x19];
             if(flags&2) {
                 float size;
                 motion[0x1b] = (*(short *)(particle+10) = (unsigned char)motion[0x1b]*3);
                 motion[0x19]=(motion[0x19]&0xfd)|4;
-                size=RandomFloatRange(1.6f,2.0f);
+                size=math_random_float_range(1.6f,2.0f);
                 vec_scale_to_length(motion,motion,*(float *)(motion+12)*size);
             } else {
                 int life;
 *(int *)(motion+16)=*(int *)(motion+20);
 *(int *)(motion+20)=((unsigned char)particle[3]==0x48)?0:0x0f2f3f3f;
 flags|=1; motion[0x19]=flags;
-life=RandomIntRange((unsigned char)motion[0x1b]*2,(unsigned char)motion[0x1b]*3);
+life=math_random_int_range((unsigned char)motion[0x1b]*2,(unsigned char)motion[0x1b]*3);
                 if(motion[0x19]&8) life*=5;
                 motion[0x1b]=life;
                 *(short *)(particle+10)=(unsigned char)life;
@@ -92,7 +92,7 @@ life=RandomIntRange((unsigned char)motion[0x1b]*2,(unsigned char)motion[0x1b]*3)
         else *(int *)(particle+4)=(*(int *)(particle+4)&0xffffff)|((*(short *)(particle+10)*15/i)<<24);
         remaining = (short *)(particle + 10);
         if(D_001B168C>1.0f) FastDecTimer(remaining);
-        if(FastDecTimer(remaining)) KillParticle(particle);
+        if(FastDecTimer(remaining)) part_kill(particle);
     }
 }
 

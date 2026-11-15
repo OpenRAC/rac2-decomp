@@ -23,9 +23,9 @@ extern char D_L00_001AFBD0[],D_L00_001AFBE0[],D_L00_001AFBF0[],D_L00_001AFC00[];
 extern char D_L00_001AFC10[],D_L00_001AFC20[],D_L00_001AFC30[],D_L00_001AFC40[];
 extern char D_L00_001AFC58[],D_L00_001AFC68[],D_L00_001AFC78[],D_L00_001AFC90[];
 extern char D_L00_001AFCA8[],D_L00_001AFCB8[],D_L00_001AFCD0[];
-extern void func_0026FEB8(const char *,...);
+extern void STUB_printf(const char *,...);
 /* Copies every field that has been set in the settings object into the object it controls, and prints a debug message for each one. */
-void func_L00_003B81D0(unsigned char *object)
+void field_override_apply_fields(unsigned char *object)
 {
     UpdateFields *fields=*(UpdateFields **)(object+0x68);
     if(fields->field04!=-1.0f) {fields->destination->values[0]=fields->field04;STUB_printf(D_L00_001AFBD0);}

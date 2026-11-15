@@ -1,80 +1,80 @@
 #include "common.h"
 #define FIELD(p, type, off) (*(type *)((p) + (off)))
 extern int D_L08_001B29DC __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_0019B4A8[];
 extern char D_L08_001B9B00[];
 extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } D_L08_001B99C0;
 extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80;
 extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
-extern int func_002ACD38(void *);
-extern void func_0029F338(void *);
-extern float func_00282E80(void *, void *);
-extern void func_L08_00425AA8(char *);
-extern void func_L08_00425F28(char *);
-extern int func_002A77E0(int);
-extern int func_L08_0032F898(char *, char *, float, float, int, int, int, int);
-extern int func_L04_00343498(char *, float);
-extern int func_L08_004254D0(int);
-extern int func_L08_00425518(int);
-extern void func_002A7470(char *, int, int, int);
-extern void func_002A7750(char *, int, int);
-extern int func_002B3868(char *);
-extern void func_002E5CF8(int, int, char *);
-extern float func_002AA548(void *, float, void *, float, float, float);
-extern void func_L08_00424FF8(char *, void *, int, float, float, float, float, float, float);
-extern void func_L08_004257A0(char *);
+extern int moby_is_in_selected_zone(void *);
+extern void moby_mark_spawned(void *);
+extern float vec_distance_xy(void *, void *);
+extern void hover_init_defaults(char *);
+extern void creature_update_hit_reaction(char *);
+extern int math_random_int_below(int);
+extern int SelectNearestListedMoby(char *, char *, float, float, int, int, int, int);
+extern int vec_apply_scaled_value(char *, float);
+extern int moby_handle_is_gone(int);
+extern int moby_handle_is_past_early_state(int);
+extern void anim_start_blended(char *, int, int, int);
+extern void moby_set_state(char *, int, int);
+extern int flag_set_first_pending(char *);
+extern void PlayMobySound(int, int, char *);
+extern float math_step_value_toward_target(void *, float, void *, float, float, float);
+extern void part_spawn_dust_burst_motion(char *, void *, int, float, float, float, float, float, float);
+extern void creature_pick_random_target(char *);
 extern int func_001163B0(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A7820(int, int);
-extern float func_00283248(float, float);
-extern int func_L08_00425FE8(char *, float, float, int, float, float, float);
-extern void func_L08_004258D0(char *);
-extern int func_00282978(void *);
-extern float func_00282DF0(void *);
-extern int func_L08_00429238(char *, int, int);
-extern float func_00283C80(float, float);
-extern float func_00283B98(float, float);
-extern void func_L08_004262C0(char *);
-extern void func_L08_00424ED0(char *);
-extern int func_L08_00429350(char *);
-extern int func_002B1C20(char *, void *);
-extern char *func_0029EFD0(int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_range(int, int);
+extern float mat_fast_helper_a(float, float);
+extern int moby_move_to_target_braking(char *, float, float, int, float, float, float);
+extern void creature_compute_aim_point(char *);
+extern int FastDecTimer(void *);
+extern float FastVecLength(void *);
+extern int ClaimTaboraSlot(char *, int, int);
+extern float FastDiffRots(float, float);
+extern float FastAddRotations(float, float);
+extern void dune_monster_sweep_attack(char *);
+extern void group_advance_turn(char *);
+extern int slot_release_by_key(char *);
+extern int moby_dispatch_action_by_kind(char *, void *);
+extern char *CreateMoby(int);
 extern void func_002A0F48(char *);
-extern void func_002AB650(char *);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void func_L08_00424F40(char *);
-extern void func_002A6C58(char *, int, int);
-extern void func_L08_00425568(char *);
-extern void func_L08_003D3928(char *, void *);
+extern void hero_copy_field_to_moby(char *);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void group_remove_member(char *);
+extern void SetDeathBits(char *, int, int);
+extern void hover_update_follow_counters(char *);
+extern void UpdateNearestTarget(char *, void *);
 
 /* Per-frame state machine of a level-08 moby: wait for its trigger, rise above and sink
    below the height at +0x1C4, patrol and attack, recover
    from a hit, and on death spawn a replacement moby and clear its saved flag bits.
    Case 0 of the patrol switch repeats case 4's attack check; jump2 cross-jumps them. */
 /* Updates the Desert Dune Monster moby (class 4098) each frame. */
-void func_L08_00426730(char *actor) {
+void dune_monster_update(char *actor) {
     char *vars;
     float local[4] __attribute__((aligned(16)));
     float local2[4] __attribute__((aligned(16)));
     int ready;
     int flags;
     float angle;
-    if (!IsObjectInSelectedZone(actor + 0x10)) return;
+    if (!moby_is_in_selected_zone(actor + 0x10)) return;
     vars = FIELD(actor, char *, 0x68);
     if (FIELD(actor, u8, 0x20) == 0) {
         u16 id = FIELD(actor, u16, 0xB2);
-        int bits = D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+        int bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
         if ((id & 1) ? (((bits >> 4) & 7) != 0) : ((bits & 7) != 0)) {
-            MarkMobySpawned(actor);
+            moby_mark_spawned(actor);
             return;
         }
-        InitHoverMobyDefaults(actor);
+        hover_init_defaults(actor);
     }
     if (vec_distance_xy(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
-    UpdateCreatureHitReaction(actor);
+    creature_update_hit_reaction(actor);
     switch (FIELD(actor, u8, 0x20)) {
     case 0: break;
     case 1: {
@@ -83,11 +83,11 @@ void func_L08_00426730(char *actor) {
         switch (FIELD(vars, u8, 0x20C)) {
         case 0:
         case 1:
-            if (!RandomIntBelow(7)) {
+            if (!math_random_int_below(7)) {
                 SelectNearestListedMoby(actor, vars + 0x120, (float)FIELD(actor, s16, 0x32), 0.0f,
                     FIELD(vars, int, 0x1D0), -1, FIELD(vars, int, 0x1D4), -1);
                 if (FIELD(vars, int, 0x164) != 2)
-                    condition = ~ApplyScaledValueToVector(actor, (float)FIELD(actor, s16, 0x32));
+                    condition = ~vec_apply_scaled_value(actor, (float)FIELD(actor, s16, 0x32));
                 else break;
                 goto ready_nonzero;
             }
@@ -98,9 +98,9 @@ void func_L08_00426730(char *actor) {
                 ready = 1;
             }
             break;
-        case 3: ready = IsMobyHandleGone(FIELD(vars, int, 0x1EC)) != 0; break;
+        case 3: ready = moby_handle_is_gone(FIELD(vars, int, 0x1EC)) != 0; break;
         case 5:
-            condition = IsMobyHandlePastEarlyState(FIELD(vars, int, 0x1E8));
+            condition = moby_handle_is_past_early_state(FIELD(vars, int, 0x1E8));
 ready_nonzero:
             ready = condition != 0;
             break;
@@ -109,13 +109,13 @@ ready_nonzero:
             FIELD(actor, u8, 0xBC) = 0;
             ready = 1;
         }
-        if (ready && ApplyScaledValueToVector(actor, (float)FIELD(actor, s16, 0x32)) != -1) {
+        if (ready && vec_apply_scaled_value(actor, (float)FIELD(actor, s16, 0x32)) != -1) {
             FIELD(actor, u8, 0x30) = FIELD(vars, u8, 0x20E);
             qzero(vars + 0x190);
-            if (FIELD(actor, u8, 0x43) != 1) StartAnimationBlended(actor, 1, 0, 10);
+            if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 10);
             FIELD(actor, u8, 0x31) = 1;
             FIELD(actor, u16, 0x34) &= 0xFFFE;
-            SetMobyState(actor, 2, -1);
+            moby_set_state(actor, 2, -1);
             D_L08_001B99C0.amount = 0.25f;
             D_L08_001B99C0.timer = 38;
             D_L08_001B99C0.phase = 0;
@@ -128,28 +128,28 @@ ready_nonzero:
     }
     case 2: {
         float height;
-        if (SetFirstPendingFlag(actor)) PlayMobySound(0, 0, actor);
-        StepValueTowardTarget(actor + 0x18, FIELD(vars, float, 0x1C8), vars + 0x198,
+        if (flag_set_first_pending(actor)) PlayMobySound(0, 0, actor);
+        math_step_value_toward_target(actor + 0x18, FIELD(vars, float, 0x1C8), vars + 0x198,
             0.0083333338f, 0.0041666669f, 0.53333336f);
         height = FIELD(vars, float, 0x1C4);
         if (FIELD(actor, float, 0x18) < height + 1.5f) {
             qcopy(local, actor + 0x10);
             local[2] = height;
-            SpawnDustBurstWithMotion(actor, local, 8, 10.0f, 4.0f, 4.0f, 0.0f, 0.25f, 3.5f);
+            part_spawn_dust_burst_motion(actor, local, 8, 10.0f, 4.0f, 4.0f, 0.0f, 0.25f, 3.5f);
         }
         if (FIELD(actor, u8, 0x60) & 2) {
             FIELD(actor, int, 0x98) = FIELD(FIELD(actor, char *, 0x24), int, 0x10);
             FIELD(actor, u16, 0x34) |= 0x1000;
-            PickRandomCreatureTarget(actor);
-            if (FIELD(actor, u8, 0x43) != (Rand() & 1) + 4)
-                StartAnimationBlended(actor, (Rand() & 1) | 4, 0, 10);
-            SetMobyState(actor, 4, 0);
+            creature_pick_random_target(actor);
+            if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 4)
+                anim_start_blended(actor, (func_001163B0() & 1) | 4, 0, 10);
+            moby_set_state(actor, 4, 0);
         }
         break;
     }
     case 3: {
         float height;
-        StepValueTowardTarget(actor + 0x18, FIELD(vars, float, 0x1C4) - 1.5f, vars + 0x198,
+        math_step_value_toward_target(actor + 0x18, FIELD(vars, float, 0x1C4) - 1.5f, vars + 0x198,
             0.0083333338f, 0.0041666669f, 0.53333336f);
         FastVecSub(local, vars + 0x170, actor + 0x10);
         FastVecScale(local, local, 0.025f);
@@ -159,21 +159,21 @@ ready_nonzero:
         if (FIELD(actor, float, 0x18) < height + 1.5f) {
             qcopy(local2, actor + 0x10);
             local2[2] = height;
-            SpawnDustBurstWithMotion(actor, local2, 8, 10.0f, 4.0f, 4.0f, 0.0f, 0.25f, 3.5f);
+            part_spawn_dust_burst_motion(actor, local2, 8, 10.0f, 4.0f, 4.0f, 0.0f, 0.25f, 3.5f);
         }
         if (FIELD(actor, float, 0x18) < FIELD(vars, float, 0x1C4) - 1.4f && !FIELD(actor, u8, 0x42)) {
-            SpawnDustBurstWithMotion(actor, actor + 0x10, 8, 10.0f, 4.0f, 2.0f, 0.0f, 0.25f, 3.5f);
+            part_spawn_dust_burst_motion(actor, actor + 0x10, 8, 10.0f, 4.0f, 2.0f, 0.0f, 0.25f, 3.5f);
             FIELD(actor, int, 0x98) = 0;
             FIELD(actor, u16, 0x34) &= 0xEFFF;
             FIELD(actor, float, 0x18) = FIELD(vars, float, 0x1C4);
-            if (FIELD(actor, u8, 0x43)) StartAnimationBlended(actor, 0, 0, 2);
-            SetMobyState(actor, 1, -1);
+            if (FIELD(actor, u8, 0x43)) anim_start_blended(actor, 0, 0, 2);
+            moby_set_state(actor, 1, -1);
             FIELD(actor, u8, 0x30) = FIELD(vars, u8, 0x20F);
         }
         break;
     }
     case 4:
-        if (!RandomIntBelow(7))
+        if (!math_random_int_below(7))
             SelectNearestListedMoby(actor, vars + 0x120, (float)FIELD(actor, s16, 0x32), 60.0f,
                 FIELD(vars, int, 0x1D8), FIELD(vars, int, 0x1E0), FIELD(vars, int, 0x1DC), -1);
         if (vec_distance_xy(actor + 0x10, vars + 0x120) < 8.0f) FIELD(vars, s16, 0x1B8) = 120;
@@ -181,76 +181,76 @@ ready_nonzero:
         case 1:
             if (!FIELD(vars, s16, 0x1B0)) {
                 u16 timer;
-                FIELD(vars, s16, 0x1B0) = RandomIntRange(240, 480);
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(15, 30));
+                FIELD(vars, s16, 0x1B0) = math_random_int_range(240, 480);
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 timer = FIELD(actor, u16, 0x96);
-                SetMobyState(actor, 4, 0);
+                moby_set_state(actor, 4, 0);
                 FIELD(actor, u16, 0x96) = timer;
             }
             if (FIELD(vars, int, 0x164) != 2 && !FIELD(vars, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                SetMobyState(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             break;
         case 0:
-            if (MoveTowardTargetWithBraking(actor, 5.5f, 5.5f, 1,
-                FastMatrixHelperA(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
+            if (moby_move_to_target_braking(actor, 5.5f, 5.5f, 1,
+                mat_fast_helper_a(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(vars, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) FIELD(vars, s16, 0x1B0) = 0;
             if (!FIELD(vars, s16, 0x1B0)) {
                 if (FIELD(actor, u16, 0x96) < 60) {
                     u16 timer;
-                    PickRandomCreatureTarget(actor);
-                    FIELD(vars, s16, 0x1B0) = RandomIntRange(90, 180);
-                    if (FIELD(actor, u8, 0x43) != (Rand() & 1) + 2)
-                        StartAnimationBlended(actor, (Rand() & 1) | 2, 0, 30);
+                    creature_pick_random_target(actor);
+                    FIELD(vars, s16, 0x1B0) = math_random_int_range(90, 180);
+                    if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 2)
+                        anim_start_blended(actor, (func_001163B0() & 1) | 2, 0, 30);
                     timer = FIELD(actor, u16, 0x96);
-                    SetMobyState(actor, 4, 1);
+                    moby_set_state(actor, 4, 1);
                     FIELD(actor, u16, 0x96) = timer;
                 } else {
                     FIELD(vars, s16, 0x1B0) = 32767;
                     qcopy(vars + 0x180, vars + 0x170);
                     FIELD(vars, float, 0x188) = FIELD(actor, float, 0x18);
-                    SetMobyState(actor, 4, 4);
+                    moby_set_state(actor, 4, 4);
                 }
             }
             /* Same check as case 4; jump2 cross-jumps the two, sharing the call above. */
             if (FIELD(vars, int, 0x164) != 2 && !FIELD(vars, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                SetMobyState(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             goto patrol_heading;
         case 4:
-            if (MoveTowardTargetWithBraking(actor, 5.5f, 5.5f, 1,
-                FastMatrixHelperA(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
+            if (moby_move_to_target_braking(actor, 5.5f, 5.5f, 1,
+                mat_fast_helper_a(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(vars, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) {
-                if (FIELD(actor, u8, 0x43)) StartAnimationBlended(actor, 0, 0, 180);
-                SetMobyState(actor, 3, -1);
+                if (FIELD(actor, u8, 0x43)) anim_start_blended(actor, 0, 0, 180);
+                moby_set_state(actor, 3, -1);
             }
             if (FIELD(vars, int, 0x164) != 2 && !FIELD(vars, s16, 0x1BC)) {
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(15, 30));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
                 FIELD(actor, u8, 0x30) = 255;
-                SetMobyState(actor, 4, 2);
+                moby_set_state(actor, 4, 2);
             }
             goto patrol_heading;
         case 2:
-            ComputeCreatureAimPoint(actor);
+            creature_compute_aim_point(actor);
             FIELD(vars, float, 0x188) = FIELD(vars, float, 0x1C8);
             if (FastDecTimer(vars + 0x1B8)) {
-                MoveTowardTargetWithBraking(actor, 5.5f, 5.5f, 1,
-                    FastMatrixHelperA(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
+                moby_move_to_target_braking(actor, 5.5f, 5.5f, 1,
+                    mat_fast_helper_a(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(vars, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             } else {
-                MoveTowardTargetWithBraking(actor, 32.0f, 12.0f, 1,
-                    FastMatrixHelperA(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
+                moby_move_to_target_braking(actor, 32.0f, 12.0f, 1,
+                    mat_fast_helper_a(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(vars, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             }
             if (FIELD(actor, u8, 0x60) & 2) {
                 if (FastVecLength(vars + 0x190) < 0.016666668f) {
-                    if (FIELD(actor, u8, 0x43) != (Rand() & 1) + 4)
-                        StartAnimationBlended(actor, (Rand() & 1) | 4, 0, 10);
-                } else if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, 10);
+                    if (FIELD(actor, u8, 0x43) != (func_001163B0() & 1) + 4)
+                        anim_start_blended(actor, (func_001163B0() & 1) | 4, 0, 10);
+                } else if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, 10);
             }
             if (FIELD(vars, int, 0x164) == 2) {
                 if (!FastDecTimer(vars + 0x1B4)) goto patrol_heading;
@@ -258,10 +258,10 @@ ready_nonzero:
             }
             if (FIELD(vars, s16, 0x1BC) >= 240) {
 resume_patrol:
-            if (FIELD(actor, u8, 0x43) != (Rand() & 2) + 2)
-                StartAnimationBlended(actor, (Rand() & 2) + 2, 0, 10);
+            if (FIELD(actor, u8, 0x43) != (func_001163B0() & 2) + 2)
+                anim_start_blended(actor, (func_001163B0() & 2) + 2, 0, 10);
             FIELD(actor, u8, 0x30) = FIELD(vars, u8, 0x20E);
-            SetMobyState(actor, 4, 0);
+            moby_set_state(actor, 4, 0);
                 goto patrol_heading;
             } else {
                 FIELD(vars, s16, 0x1B4) = 240;
@@ -274,24 +274,24 @@ resume_patrol:
                 FIELD(vars, int, 0x204) = 0;
                 FIELD(vars, int, 0x21C) = 0;
                 FIELD(vars, u8, 0x219) = 0;
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(15, 30));
-                SetMobyState(actor, 4, 3);
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(15, 30));
+                moby_set_state(actor, 4, 3);
                 FIELD(vars, u8, 0x218) = 0;
                 FIELD(actor, u8, 0x30) = 255;
                 goto patrol_heading;
             }
             goto patrol_heading;
         case 3:
-            ComputeCreatureAimPoint(actor);
-            angle = FastMatrixHelperA(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
+            creature_compute_aim_point(actor);
+            angle = mat_fast_helper_a(FIELD(vars, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(vars, float, 0x124) - FIELD(actor, float, 0x14));
             if (FastDecTimer(vars + 0x1B8)) {
-                MoveTowardTargetWithBraking(actor, 5.5f, 5.5f, 1, angle, 0.0f,
-                    -FastMatrixHelperA(vec_distance_xy(actor + 0x10, vars + 0x140),
+                moby_move_to_target_braking(actor, 5.5f, 5.5f, 1, angle, 0.0f,
+                    -mat_fast_helper_a(vec_distance_xy(actor + 0x10, vars + 0x140),
                         FIELD(vars, float, 0x148) - FIELD(actor, float, 0x18)));
             } else {
-                MoveTowardTargetWithBraking(actor, 32.0f, 12.0f, 1, angle, 0.0f,
-                    -FastMatrixHelperA(vec_distance_xy(actor + 0x10, vars + 0x140),
+                moby_move_to_target_braking(actor, 32.0f, 12.0f, 1, angle, 0.0f,
+                    -mat_fast_helper_a(vec_distance_xy(actor + 0x10, vars + 0x140),
                         FIELD(vars, float, 0x148) - FIELD(actor, float, 0x18)));
             }
             switch (FIELD(vars, u8, 0x218)) {
@@ -299,7 +299,7 @@ resume_patrol:
                 if (FastDiffRots(angle, FIELD(vars, float, 0x208)) < 0.6981318f) {
                     FIELD(vars, float, 0x1F4) = -0.78539824f;
                     FIELD(vars, float, 0x1F0) = 1.0f;
-                    if (FIELD(actor, u8, 0x43) != 7) StartAnimationBlended(actor, 7, 0, RandomIntRange(8, 15));
+                    if (FIELD(actor, u8, 0x43) != 7) anim_start_blended(actor, 7, 0, math_random_int_range(8, 15));
                     FIELD(vars, u8, 0x218) = 1;
                 }
                 goto attack_check_cancel;
@@ -339,27 +339,27 @@ sweep_done:
                     FIELD(vars, u8, 0x218) = 5;
                 }
 attack_move:
-                SweepDuneMonsterAttack(actor);
+                dune_monster_sweep_attack(actor);
                 goto attack_check_cancel;
             case 5:
-                AdvanceGroupTurn(actor);
-                ReleaseSlotByKey(actor);
+                group_advance_turn(actor);
+                slot_release_by_key(actor);
                 FIELD(vars, int, 0x204) = 0;
                 FIELD(vars, s16, 0x1B6) = 90;
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(8, 15));
-                SetMobyState(actor, 4, 0);
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(8, 15));
+                moby_set_state(actor, 4, 0);
                 goto attack_check_cancel;
             default: goto attack_check_cancel;
 
             }
 attack_check_cancel:
             if (FIELD(vars, int, 0x164) == 2 || FIELD(vars, s16, 0x1BC) >= 240) {
-                AdvanceGroupTurn(actor);
-                ReleaseSlotByKey(actor);
+                group_advance_turn(actor);
+                slot_release_by_key(actor);
                 FIELD(vars, s16, 0x1B6) = 0;
-                if (FIELD(actor, u8, 0x43) != 6) StartAnimationBlended(actor, 6, 0, RandomIntRange(8, 15));
+                if (FIELD(actor, u8, 0x43) != 6) anim_start_blended(actor, 6, 0, math_random_int_range(8, 15));
                 FIELD(actor, u8, 0x30) = FIELD(vars, u8, 0x20E);
-                SetMobyState(actor, 4, 0);
+                moby_set_state(actor, 4, 0);
             } else FIELD(vars, s16, 0x1B4) = 240;
 patrol_heading:
             FIELD(actor, float, 0xF8) = FIELD(vars, float, 0x208);
@@ -369,28 +369,28 @@ patrol_heading:
     case 5:
         FIELD(actor, u8, 0x30) = 255;
         FIELD(actor, s16, 0x32) = 255;
-        ReleaseSlotByKey(actor);
+        slot_release_by_key(actor);
         FIELD(vars, u16, 0x1BA)++;
-        flags = DispatchActionByKind(actor, vars + 0x50);
+        flags = moby_dispatch_action_by_kind(actor, vars + 0x50);
         FIELD(vars, float, 0x208) = FIELD(actor, float, 0xF8);
-        if (flags & 1) SetMobyState(actor, 6, -1);
+        if (flags & 1) moby_set_state(actor, 6, -1);
         else if ((flags & 2) || FIELD(vars, s16, 0x1BA) >= 115) {
             if (FIELD(vars, float, 0x20) > 0.0f) {
                 qzero(vars + 0x1A0);
                 FIELD(vars, u8, 0x6A) = 2;
-                if (FIELD(actor, u8, 0x43) != 4) StartAnimationBlended(actor, 4, 0, 40);
+                if (FIELD(actor, u8, 0x43) != 4) anim_start_blended(actor, 4, 0, 40);
                 FIELD(vars, s16, 0x1BA) = 0;
                 qzero(vars + 0x190);
                 FIELD(actor, u8, 0x30) = FIELD(vars, u8, 0x20E);
-                SetMobyState(actor, 4, 2);
-                AdvanceGroupTurn(actor);
-            } else SetMobyState(actor, 6, -1);
+                moby_set_state(actor, 4, 2);
+                group_advance_turn(actor);
+            } else moby_set_state(actor, 6, -1);
         }
         if ((flags & 4) || FIELD(actor, float, 0x18) < FIELD(vars, float, 0x1C4) + 1.5f) {
             FIELD(vars, u16, 0x1BA)++;
             qcopy(local, actor + 0x10);
             local[2] = FIELD(vars, float, 0x1C4);
-            SpawnDustBurstWithMotion(actor, local, 10, 14.0f, 6.0f, 5.5f, 0.0f, 0.5f, 4.0f);
+            part_spawn_dust_burst_motion(actor, local, 10, 14.0f, 6.0f, 5.5f, 0.0f, 0.5f, 4.0f);
         }
         break;
     case 6:
@@ -398,7 +398,7 @@ patrol_heading:
         char *child;
         u16 id;
         u8 *bits;
-        ReleaseSlotByKey(actor);
+        slot_release_by_key(actor);
         child = CreateMoby(0x8C4 /* moby class 2244 */);
         if (!child) break;
         FIELD(child, u8, 0x23) = 80;
@@ -412,16 +412,16 @@ patrol_heading:
         if (FIELD(vars, float, 0x1C4) != 0.0f) FIELD(child, float, 0x18) = FIELD(vars, float, 0x1C4);
         FIELD(FIELD(child, char *, 0x68), char *, 4) = actor;
         func_002A0F48(child);
-        CopyHeroField38ToMoby(child);
+        hero_copy_field_to_moby(child);
         if (FIELD(actor, u8, 0x20) == 7)
             SpawnExplosionEffects(actor, vars + 0x190, 0, 0.0f, 0.0f, 20, 6, 32,
                 8.0f, 4.0f, 9.0f, 2.0f, -1, 30.0f, 1, 2, -1, 0, 0x810001);
-        RemoveFromGroup(actor);
+        group_remove_member(actor);
         SetDeathBits(actor, 0, 3);
         D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = 0;
         D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = 0;
         id = FIELD(actor, u16, 0xB2);
-        bits = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
+        bits = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
         {
             u8 value = *bits;
             u8 low = value & 0xF8;
@@ -429,12 +429,12 @@ patrol_heading:
             value = !(id & 1) ? low : high;
             *bits = value;
         }
-        MarkMobySpawned(actor);
+        moby_mark_spawned(actor);
         return;
     }
     case 8: break;
     }
-    UpdateHoverFollowCounters(actor);
+    hover_update_follow_counters(actor);
     if ((unsigned int)(FIELD(actor, u8, 0x20) - 2) < 4 && FIELD(actor, u8, 0x31)) {
         int index = FIELD(vars, int, 0x1E8);
         if (index != -1 && FIELD(FIELD(vars, char *, 0x1FC), int, 0)) {
@@ -447,7 +447,7 @@ patrol_heading:
     if (FIELD(actor, float, 0x10) < 30.0f || FIELD(actor, float, 0x10) > 993.0f ||
         FIELD(actor, float, 0x14) < 30.0f || FIELD(actor, float, 0x14) > 993.0f ||
         FIELD(actor, float, 0x18) < 30.0f || FIELD(actor, float, 0x18) > 993.0f) {
-        RemoveFromGroup(actor);
-        MarkMobySpawned(actor);
+        group_remove_member(actor);
+        moby_mark_spawned(actor);
     }
 }

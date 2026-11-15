@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L03_00421E20, the PAL copy of func_L03_0041CA78: the same C, where 0.20943955f becomes
    0.25132746f; func_002A7470 becomes func_PAL_002A7E68; 0.00027777778f becomes 0.00040000002f;
    0.016666668f becomes 0.020000001f; 0.000004848137343f becomes 6.981318e - 06f; 0.00029088825f
@@ -7,10 +8,10 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern void func_002A7750(void *,int,int);
-extern int func_002E5CF8(int,int,void *);
-extern void func_0029F338(void *);
-extern void func_00283098(void *,void *,void *);
+extern void moby_set_state(void *,int,int);
+extern int PlayMobySound(int,int,void *);
+extern void moby_mark_spawned(void *);
+extern void matrix_mul_vec3(void *,void *,void *);
 extern float D_L03_001B1BA4 __attribute__((sda));
 extern float D_L03_001B1BA0 __attribute__((sda));
 extern float D_L03_001B1B80 __attribute__((sda));
@@ -18,25 +19,25 @@ extern float D_L03_001B1B84 __attribute__((sda));
 extern float D_L03_001B1B88 __attribute__((sda));
 extern float D_L03_001B1B8C __attribute__((sda));
 extern float D_L03_001B1BB0[4] SDATA(D_L03_001B1BB0) __attribute__((sda));
-extern u8 D_00189EA0[], D_L03_001B9980[];
+extern u8 g_hero_position[], D_L03_001B9980[];
 extern u8 D_L03_001A8F20[] MACRO_ADDR;
 extern int D_L03_001A9044, D_L03_001A9040, D_L03_001A903C;
 extern u8 D_001A7A60[] MACRO_ADDR;
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern int func_PAL_002B1A50(void *,void *,int);
-extern void func_00282CC0(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
 extern void func_PAL_002AD288(void *,void *,int,float,float);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
 extern void func_PAL_002B15D8(void *,int,void *,float,float,float,float,u8);
-extern int func_002E5E58(int,unsigned int,void *);
+extern int snd_play_from_global_bank(int,unsigned int,void *);
 extern void func_PAL_002B1588(int,int);
-extern void func_L03_0041D0A8(void *);
+extern void sweeper_bot_mark_stream(void *);
 extern void func_PAL_002A7650(void *,int,int);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *);
-extern int func_002B3BA8(void *,int,void *,int,float,float);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *);
+extern int weapon_select_aim_target(void *,int,void *,int,float,float);
 
 void func_PAL_L03_00421E20(u8 *e) {
     u8 *s=*(u8 **)(e+0x68);
@@ -49,10 +50,10 @@ void func_PAL_L03_00421E20(u8 *e) {
             *(short *)(s+0x24)=1;
         } else scale=D_L03_001B1BA0;
         *(float *)(e+0x2c)=*(float *)(*(u8 **)(e+0x24)+0x24)*scale;
-        s[0x48]=func_00283CF0(20);
-        s[0x4a]=func_00283CF0(6);
+        s[0x48]=FloatToInt(20);
+        s[0x4a]=FloatToInt(6);
         if(*(int *)(s+0x290)==-1) {
-            func_0029F338(e);
+            moby_mark_spawned(e);
             return;
         }
         { s32 initialMode = 3;
@@ -70,11 +71,11 @@ void func_PAL_L03_00421E20(u8 *e) {
         *(int *)(s+0x8c)=*(int *)(s+0x290);
         qcopy(s+0x2b0,e+0x10); }
         if(*(u64 *)(s+0x2a0)!=0xffffffffULL) {
-            func_002A7750(e,8,4);
+            moby_set_state(e,8,4);
             *(int *)(e+0x98)=0;
             *(u16 *)(e+0x34)=(*(u16 *)(e+0x34)|0x41)&0xefff;
         } else {
-            func_002A7750(e,1,0);
+            moby_set_state(e,1,0);
             if(e[0x43]) func_PAL_002A7E68(e,0,0,0);
         }
         {
@@ -93,32 +94,32 @@ void func_PAL_L03_00421E20(u8 *e) {
         }
     }
     if(func_PAL_002B1A50(e,s+0x140,0) && *(float *)(s+0x20)<=0) {
-        func_00283098(&a,D_L03_001B1BB0,e+0xc0);
-        func_00282CC0(&a,&a,e+0x10);
-        func_002E5CF8(2,0,e);
+        matrix_mul_vec3(&a,D_L03_001B1BB0,e+0xc0);
+        FastVecAdd(&a,&a,e+0x10);
+        PlayMobySound(2,0,e);
         func_PAL_002AD288(e,&a,-1,0.333f,0);
-        func_00282CF0(&b,e+0x10,D_00189EA0);
+        FastVecSub(&b,e+0x10,g_hero_position);
         b.f[2]=0;
-        func_00282F20(&b,&b,0.120000005f);
+        vec_scale_to_length(&b,&b,0.120000005f);
         func_PAL_002B15D8(e,31,D_L03_001A8F20,3,6,3,6,255);
-        if(*(int *)(D_00189EA0+0x2214)==49) {
+        if(*(int *)(g_hero_position+0x2214)==49) {
             D_L03_001A9044++;
             if(D_L03_001A9044>=10 && !D_001A7A60[0x1C]) {
                 D_001A7A60[0x1C]=1;
-                func_002E5E58(1,0,0);
+                snd_play_from_global_bank(1,0,0);
                 func_PAL_002B1588(0x1233,-1);
                 D_L03_001A903C=1;
             }
         }
-        func_002E5CF8(2,0,e);
-        func_L03_0041D0A8(e);
+        PlayMobySound(2,0,e);
+        sweeper_bot_mark_stream(e);
         func_PAL_002A7650(e,0,3);
-        func_0029F338(e);
+        moby_mark_spawned(e);
         return;
     }
-    if(e[0x31] && func_00282E48(e+0x10,D_L03_001B9980)<24) {
-        func_002A93B0(e);
+    if(e[0x31] && fast_vec_dist(e+0x10,D_L03_001B9980)<24) {
+        moby_update_ground_check(e);
         e[0x6f]=22;
     }
-    if(e[0x95]<3) func_002B3BA8(e,*(int *)(s+0x294),0,0,16,0);
+    if(e[0x95]<3) weapon_select_aim_target(e,*(int *)(s+0x294),0,0,16,0);
 }

@@ -7,9 +7,9 @@ extern char D_L00_00247800[];
 extern char D_L00_001B2B30[] __attribute__((section(".sdata")));
 extern float D_L00_001B044C __attribute__((sda));
 extern float D_L00_001B0448 __attribute__((sda));
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Fills the eight-vector table D_L00_00247800 from the object's two axis rows
    (+0xC0, +0xD0): entries 4-7 are row0, -row0, -row1, row1, entries 0-3 the
@@ -17,7 +17,7 @@ extern void func_00282F20(void *, void *, float);
    moved to the object's position (+0x10) and offset by D_L00_001B2B30. Writing
    the table through `base` before the loop and through `out` in it keeps the
    two pointers apart, as retail's allocation needs. */
-void func_L00_003DE490(char *object)
+void coll_build_ground_probe_offsets(char *object)
 {
     char vectors[4][16] __attribute__((aligned(16)));
     char temp[16] __attribute__((aligned(16)));

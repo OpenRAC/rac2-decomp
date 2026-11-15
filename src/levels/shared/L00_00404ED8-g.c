@@ -3,24 +3,24 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_002A7878(float lo, float hi);
-extern float func_002A78D8(float a, float b);
-extern int func_002A7820(int lo, int hi);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, float scale);
+extern float math_random_float_range(float lo, float hi);
+extern float math_random_signed_float_range(float a, float b);
+extern int math_random_int_range(int lo, int hi);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, float scale);
 
 typedef union { TI128 q; float f[4]; } Vec;
-extern float func_00282DF0(void *v);
-extern float func_00283CE0(int n);
-extern int func_00283CF0(float f);
+extern float FastVecLength(void *v);
+extern float IntToFloat(int n);
+extern int FloatToInt(float f);
 extern int func_001163B0(void);
-extern int func_002A77E0(int n);
-extern void func_00282D30(void *out, void *v, float scale);
-extern void func_002ACB48(void *v, float f);
-extern char *func_002C16C0(void *pos, void *vel, int life, int alpha, unsigned int colour, int n,
+extern int math_random_int_below(int n);
+extern void FastVecScale(void *out, void *v, float scale);
+extern void vec_add_random_offset(void *v, float f);
+extern char *part_spawn_burst(void *pos, void *vel, int life, int alpha, unsigned int colour, int n,
                            float a, float b, float c, float d, float e);
-extern char *func_002BCB00(void *pos, void *vel, unsigned int colour, int a, int life, int b, int c,
+extern char *part_spawn_spark(void *pos, void *vel, unsigned int colour, int a, int life, int b, int c,
                            int d, int e, float f);
 extern Vec D_0018A0E0;
 extern char D_L00_001FE940[];
@@ -31,7 +31,7 @@ extern char D_L00_001FE940[];
    1.0f is loaded at each use). */
 static inline void pickSegmentAlpha(int *alpha)
 {
-    if (Rand() & 2)
+    if (func_001163B0() & 2)
         *alpha = 64;
     else
         *alpha = 96;
@@ -40,7 +40,7 @@ static inline void pickSegmentAlpha(int *alpha)
 /* Spawns particles at steps of a tenth of a unit along the segment from a to b,
    each with a random size, drift, life and one of two alphas; one time in four
    it also spawns a slow puff at the object. */
-void func_L00_00404ED8(char *obj, Vec *a, Vec *b)
+void part_spawn_spark_trail_between_points(char *obj, Vec *a, Vec *b)
 {
     Vec start, end, vel, point, step, extra;
     Vec *from = &start, *to = &end;
@@ -58,13 +58,13 @@ void func_L00_00404ED8(char *obj, Vec *a, Vec *b)
     vec_scale_to_length(&step, &step, length / scale);
     tbl = D_L00_001FE940;
     if (count > 0) do {
-        n = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
-        drift = -(RandomFloatRange(0.1f, 0.2f) * 0.016666668f);
+        n = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
+        drift = -(math_random_float_range(0.1f, 0.2f) * 0.016666668f);
         FastVecScale(&vel, &D_0018A0E0, drift);
-        life = RandomIntRange(30, 45);
-        speed = -RandomFloatRange(500.0f, 1000.0f);
+        life = math_random_int_range(30, 45);
+        speed = -math_random_float_range(500.0f, 1000.0f);
         pickSegmentAlpha(&alpha);
-        particle = SpawnBurstParticle_002C16C0(&point, &vel, life, alpha, 0x407fff, n, 42000.0f, speed, 1.0f, 0.0f, 0.0f);
+        particle = part_spawn_burst(&point, &vel, life, alpha, 0x407fff, n, 42000.0f, speed, 1.0f, 0.0f, 0.0f);
         FastVecAdd(&point, &point, &step);
         if (particle) {
             particle[2] = **(unsigned char **)(tbl + 92);
@@ -74,14 +74,14 @@ void func_L00_00404ED8(char *obj, Vec *a, Vec *b)
                 particle[3] = 68;
         }
     } while (--count);
-    if (RandomIntBelow(4) == 0) {
+    if (math_random_int_below(4) == 0) {
         char *puff;
 
         FastVecScale(&extra, ctx, -0.033333335f);
-        AddRandomOffsetToVector(&extra, 0.016666668f);
+        vec_add_random_offset(&extra, 0.016666668f);
         extra.f[2] += 0.025000002f;
-        life = RandomIntRange(30, 45);
-        puff = SpawnSparkParticle_002BCB00(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
+        life = math_random_int_range(30, 45);
+        puff = part_spawn_spark(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
         if (puff) {
             *(float *)(puff + 44) = 0.0016666667f;
             puff[2] = **(unsigned char **)(D_L00_001FE940 + 212);

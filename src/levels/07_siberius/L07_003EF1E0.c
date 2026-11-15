@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern float func_002E5460(int);
 
 extern void func_003109C8(char *, int, int);
 
 /* Starts a timer on the object: stores how fast it counts down for the given length, then switches the object to state 1. */
-void func_L07_003EF1E0(char *moby, int length, int param)
+void moby_start_timer_state(char *moby, int length, int param)
 {
     int *vars = *(int **)(moby + 0x68);
     float lengthFloat;

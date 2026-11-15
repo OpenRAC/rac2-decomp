@@ -8,24 +8,24 @@
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 extern char D_L12_001B9E00[];
-extern int func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_002A93B0(void *);
+extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern int func_00282978(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283CE0(int);
-extern int func_L01_0031BC68(int, int, float);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern int FastDecTimer(void *);
+extern float vec_distance_xy(void *, void *);
+extern float IntToFloat(int);
+extern int PulseColor(int, int, float);
 extern void func_PAL_002B14F8(void *, void *, int, int, float);
-extern void func_0026FEB8(const char *, ...);
-extern int func_002B3868(void *);
-extern int func_002B3890(void *);
-extern int func_002B38B8(void *);
-extern int func_002761F8(void *, void *, int, int, int);
+extern void STUB_printf(const char *, ...);
+extern int flag_set_first_pending(void *);
+extern int flag_set_second_pending(void *);
+extern int flag_is_third_pending_set(void *);
+extern int CollLine(void *, void *, int, int, int);
 extern char *D_L12_001FEAC0[];
 extern char D_L12_001B0B70[];
 extern unsigned short D_L12_001B0B00 __attribute__((sda));
@@ -33,7 +33,7 @@ extern float D_L12_001B0B68 __attribute__((sda));
 extern float D_L12_001B0B64 __attribute__((sda));
 extern int D_L12_001B29C8 __attribute__((sda));
 extern char *D_L12_001C0258 NOT_SDA;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 
 void func_PAL_L12_003E7E08(char *obj) {
     char *s = P(obj, 0x68);
@@ -45,8 +45,8 @@ void func_PAL_L12_003E7E08(char *obj) {
         H(P(obj, 0x24), 0x46) = 5;
         U(obj, 0x34) |= 0x1000;
         F(s, 0x30) = 2.25f;
-        B(s, 0x48) = func_00283CF0(20.0f);
-        B(s, 0x4A) = func_00283CF0(24.0f);
+        B(s, 0x48) = FloatToInt(20.0f);
+        B(s, 0x4A) = FloatToInt(24.0f);
         B(s, 0x70) = 17;
         W(s, 0xA8) = 3;
         B(s, 0x71) = 4;
@@ -65,7 +65,7 @@ void func_PAL_L12_003E7E08(char *obj) {
         B(s, 0xD3) = 17;
         B(s, 0xD5) = 1;
         if (W(s, 0x158) == -1) {
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
             return;
         }
         W(s, 0x1A8) |= 0x15;
@@ -77,7 +77,7 @@ void func_PAL_L12_003E7E08(char *obj) {
         F(s, 0x1A0) = 0.523598849773407f;
         F(s, 0x19C) = 0.008f;
         B(s, 0xD6) = 1;
-        func_002A7750(obj, 5, 0);
+        moby_set_state(obj, 5, 0);
         if (B(obj, 0x43))
             func_PAL_002A7E68(obj, 0, 0, 0);
         W(s, 0x154) = W(s, 0x150);
@@ -86,52 +86,52 @@ void func_PAL_L12_003E7E08(char *obj) {
         else
             qcopy(obj + 0x10, D_L12_001FEAC0[W(s, 0x164)] + 0x10);
         if (W(s, 0x164) != -1)
-            func_002A7750(obj, 2, 7);
+            moby_set_state(obj, 2, 7);
         if (P(s, 0x294))
             W(P(s, 0x294), 0) = -1;
     }
-    if (B(obj, 0x31) && func_00282E48(obj + 0x10, D_L12_001B9E00) < 24.0f) {
-        func_002A93B0(obj);
+    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, D_L12_001B9E00) < 24.0f) {
+        moby_update_ground_check(obj);
         B(obj, 0x6F) = 22;
     }
-    if (W(s, 0x2A0) && func_002B38B8(obj))
-        func_002A7750(obj, 24, 4);
+    if (W(s, 0x2A0) && flag_is_third_pending_set(obj))
+        moby_set_state(obj, 24, 4);
     oldstate = B(obj, 0x20);
     oldanim = B(obj, 0x95);
     result = func_PAL_002B1A50(obj, s + 0x60, 0);
     if (result) {
         if (result == 4) {
-            func_0026FEB8(D_L12_001B0B70);
+            STUB_printf(D_L12_001B0B70);
             W(s, 0x278) = 5;
         } else
             W(s, 0x278) = 1;
         B(obj, 0x20) = oldstate;
         B(obj, 0x95) = oldanim;
-        func_002B3868(obj);
-        func_002B3890(obj);
+        flag_set_first_pending(obj);
+        flag_set_second_pending(obj);
         H(s, 0x26) = D_L12_001B0B00;
         H(s, 0x274) = 125;
     }
-    if (func_00282978(s + 0x274)) {
+    if (FastDecTimer(s + 0x274)) {
         if (W(s, 0x278) != 1)
             W(s, 0x278) = 0;
         else
             H(s, 0x274) = 42;
     }
-    H(s, 0x276) = func_002B3BA8(obj, W(s, 0x150), 0, 0, 6.0f, 0.0f);
+    H(s, 0x276) = weapon_select_aim_target(obj, W(s, 0x150), 0, 0, 6.0f, 0.0f);
     W(s, 0x270) = W(s, 0x140);
-    if (P(s, 0x140) && func_00282E80(P(s, 0x140) + 0x10, obj + 0x10) < 16.0f) {
+    if (P(s, 0x140) && vec_distance_xy(P(s, 0x140) + 0x10, obj + 0x10) < 16.0f) {
         qcopy(pos, obj + 0x10);
         pos[2] += D_L12_001B0B68;
-        if (!func_002761F8(pos, s + 0x130, 16, 0, 0) || D_L12_001C0258 == D_0018C0B0) {
+        if (!CollLine(pos, s + 0x130, 16, 0, 0) || D_L12_001C0258 == g_hero_moby) {
             if (H(s, 0x276) != 1)
                 H(s, 0x276) = 1;
         }
     }
     if (B(obj, 0x31)) {
-        angle = func_00283CE0(D_L12_001B29C8 % 50);
-        angle = angle * 6.2831854820251465f / func_00283CE0(50) - 3.1415927410125732f;
-        W(obj, 0x78) = func_L01_0031BC68(0x80808080, 0x80303030, angle);
+        angle = IntToFloat(D_L12_001B29C8 % 50);
+        angle = angle * 6.2831854820251465f / IntToFloat(50) - 3.1415927410125732f;
+        W(obj, 0x78) = PulseColor(0x80808080, 0x80303030, angle);
     }
     func_PAL_002B14F8(obj, s + 0x2B0, 1, 1, D_L12_001B0B64);
 }

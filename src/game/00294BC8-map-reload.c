@@ -3,16 +3,16 @@
  * in 00294BC8.c, so this level-placed body lives in a unit of its own. */
 extern unsigned char D_001A7AFD __attribute__((section(".sdata")));
 extern int D_001A79F0_3 __attribute__((sda));
-extern int D_001C4FA0[];
+extern int g_map_overlay_state[];
 
-extern void func_00298170(void);
-extern int D_001F2840[];
+extern void map_empty_stub(void);
+extern int g_pause_menu_state[];
 extern void func_0029DEA8(int, int);
-extern int func_002B7C80(void *, int, int);
-extern short func_002B7CE0(int);
-extern int func_002EEE50(int, int, int, int);
-extern int func_002EEED0(int, int, int, int, int);
-extern int func_002E5E58(int, unsigned int, void *);
+extern int load_read_disc_with_pause(void *, int, int);
+extern short snd_pump_music_and_disc_read(int);
+extern int gfx_send_buffer_slot_records(int, int, int, int);
+extern int gfx_upload_records_to_buffer_slot(int, int, int, int, int);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 /* resets the map's cache slots and reloads the current level's entry */
 typedef struct { int sector, size; } MapFile;
@@ -23,62 +23,62 @@ typedef struct {
     MapFile files0[28]; /* 0x14F0 */
     MapFile files1[28]; /* 0x15D0 */
 } MapToc;
-extern MapToc D_0014B540;
+extern MapToc g_copy_setup_data;
 
-void func_002954C0(void)
+void map_reset_cache_and_reload(void)
 {
     int *arena;
     int bufA, bufB, packedBuf;
     int bytes;
     int *mapState;
 
-    EmptyMapStub();
-    func_0029DEA8(gMapOverlayState[0x230 / 4], 1);
-    arena = gPauseMenuState;
+    map_empty_stub();
+    func_0029DEA8(g_map_overlay_state[0x230 / 4], 1);
+    arena = g_pause_menu_state;
     bufA = arena[0x10C / 4];
     bufB = arena[0x110 / 4];
-    gMapOverlayState[0x248 / 4] = bufA;
+    g_map_overlay_state[0x248 / 4] = bufA;
     packedBuf = bufA + 0x9A800;
-    gMapOverlayState[0x288 / 4] = 0;
-    gMapOverlayState[0x28C / 4] = packedBuf;
+    g_map_overlay_state[0x288 / 4] = 0;
+    g_map_overlay_state[0x28C / 4] = packedBuf;
     arena[0x10C / 4] = packedBuf + 0x48000;
-    gMapOverlayState[0x290 / 4] = bufB;
+    g_map_overlay_state[0x290 / 4] = bufB;
     arena[0x110 / 4] = bufB + 0x48000;
-    gMapOverlayState[0x294 / 4] = 0;
-    gMapOverlayState[0x298 / 4] = 0;
-    gMapOverlayState[0x29C / 4] = -1;
-    gMapOverlayState[0x2A0 / 4] = -1;
-    gMapOverlayState[0x2A4 / 4] = -1;
-    gMapOverlayState[0x2A8 / 4] = -1;
-    gMapOverlayState[0x2AC / 4] = -1;
-    gMapOverlayState[0x2B0 / 4] = -1;
-    if (gMapOverlayState[0x238 / 4] == -1) goto empty;
-    if (gMapOverlayState[0x23C / 4] == 0 && D_001A7AFD != 0) {
-        MapToc *toc = &gCopySetupData;
-        int size = toc->files1[gMapOverlayState[0x230 / 4]].size;
+    g_map_overlay_state[0x294 / 4] = 0;
+    g_map_overlay_state[0x298 / 4] = 0;
+    g_map_overlay_state[0x29C / 4] = -1;
+    g_map_overlay_state[0x2A0 / 4] = -1;
+    g_map_overlay_state[0x2A4 / 4] = -1;
+    g_map_overlay_state[0x2A8 / 4] = -1;
+    g_map_overlay_state[0x2AC / 4] = -1;
+    g_map_overlay_state[0x2B0 / 4] = -1;
+    if (g_map_overlay_state[0x238 / 4] == -1) goto empty;
+    if (g_map_overlay_state[0x23C / 4] == 0 && D_001A7AFD != 0) {
+        MapToc *toc = &g_copy_setup_data;
+        int size = toc->files1[g_map_overlay_state[0x230 / 4]].size;
         bytes = size << 7;
-        ReadDiscWithPause((void *)packedBuf, toc->files1[gMapOverlayState[0x230 / 4]].sector + toc->base, size);
-        PumpMusicAndDiscRead(1);
-        gMapOverlayState[0x23C / 4] = 1;
-        gMapOverlayState[0x240 / 4] = bytes;
-        SendBufferSlotRecords(gMapOverlayState[0x28C / 4], gMapOverlayState[0x238 / 4], 0, bytes);
-        gMapOverlayState[0x234 / 4] = -2;
-        gMapOverlayState[0x24 / 4] = 1;
-        gMapOverlayState[0x2A0 / 4] = D_001A79F0_3 + 0x100;
+        load_read_disc_with_pause((void *)packedBuf, toc->files1[g_map_overlay_state[0x230 / 4]].sector + toc->base, size);
+        snd_pump_music_and_disc_read(1);
+        g_map_overlay_state[0x23C / 4] = 1;
+        g_map_overlay_state[0x240 / 4] = bytes;
+        gfx_send_buffer_slot_records(g_map_overlay_state[0x28C / 4], g_map_overlay_state[0x238 / 4], 0, bytes);
+        g_map_overlay_state[0x234 / 4] = -2;
+        g_map_overlay_state[0x24 / 4] = 1;
+        g_map_overlay_state[0x2A0 / 4] = D_001A79F0_3 + 0x100;
     } else {
         int size;
-        mapState = gMapOverlayState;
+        mapState = g_map_overlay_state;
         if (mapState[0x238 / 4] == -1) goto empty;
         size = mapState[0x240 / 4];
         mapState[0x2B8 / 4] = size;
-        UploadRecordsToBufferSlot(mapState[0x28C / 4], mapState[0x238 / 4], 0, size, 0);
+        gfx_upload_records_to_buffer_slot(mapState[0x28C / 4], mapState[0x238 / 4], 0, size, 0);
         mapState[0x24 / 4] = 1;
         mapState[0x2A0 / 4] = D_001A79F0_3 + (D_001A7AFD ? 0x100 : 0);
         mapState[0x234 / 4] = -2;
     }
     goto done;
 empty:
-    gMapOverlayState[0x24 / 4] = 0;
+    g_map_overlay_state[0x24 / 4] = 0;
 done:
-    PlaySoundFromGlobalBank(0x11, 0, 0);
+    snd_play_from_global_bank(0x11, 0, 0);
 }

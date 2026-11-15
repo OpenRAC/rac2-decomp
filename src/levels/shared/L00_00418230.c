@@ -5,14 +5,14 @@ typedef union { Q q; float f[4]; } V;
 typedef struct { V vertex[4]; unsigned color[4]; union { float uv[4][2]; unsigned uvBits[4][2]; } tex; unsigned long long flags,texture,mode,prim; } Packet;
 extern char D_L00_001B8C80[];
 extern int D_L00_0025A9B8;
-extern unsigned long long func_0027C878(int);
+extern unsigned long long GetEffectTextureDescriptor(int);
 extern void ref_L00_00418230_00(void *,int), ref_L00_00418230_01(void *);
-extern void func_00282CF0(void *,void *,void *),func_00282DD8(void *,void *,void *),func_002830C0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float),func_00282D30(void *,void *,float);
-extern void func_00280B90(void *,int,int);
-extern float func_00283CE0(int);
+extern void FastVecSub(void *,void *,void *),FastVecCross(void *,void *,void *),transform_vector(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float);
+extern void draw_world_quad(void *,int,int);
+extern float IntToFloat(int);
 /* Draws a glowing trail as two ribbons through a list of points. The second one is wider and fainter. */
-void func_L00_00418230(char *object,int alpha,V *points,int count)
+void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
 {
     /* As in the resident trail renderer, retail never initializes wide.color[1].
        The assembly consumer transfers that packet word unchanged. The caller

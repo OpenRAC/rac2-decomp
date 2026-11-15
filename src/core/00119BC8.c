@@ -2,9 +2,9 @@
 
 /* The body saves $ra in a TImode slot (`sq $ra,0($sp)`), which is the
    -mastra-quad-saves profile these units were built with. */
-extern int func_00119BF8(void *arg0, void *arg1, int arg2, int arg3);
+extern int VfprintfInteger(void *arg0, void *arg1, int arg2, int arg3);
 
 /* Prints text to a stream using the integer-only print routine. */
-int func_00119BC8(void *stream, int format, int args) {
+int vfprintf_stream(void *stream, int format, int args) {
     return VfprintfInteger(*(int *)((char *)stream + 0x54), stream, format, args);
 }

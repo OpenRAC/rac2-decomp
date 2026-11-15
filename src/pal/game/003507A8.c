@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00336DB0(void *);
-extern void func_00336CE8(void *);
-extern void func_00336DB8(void *, int, void *, int);
+extern void ui_return_self(void *);
+extern void table_relocate_entries(void *);
+extern void pool_init_cells(void *, int, void *, int);
 extern void func_PAL_002B8838(void *, void *, int);
-extern void func_00115484(void *, int, int);
+extern void memset(void *, int, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x1348]; char *data; int size; } InitData;
-extern InitData D_0014B540;
+extern InitData g_copy_setup_data;
 extern void func_PAL_0034A690(void *);
 extern void func_PAL_003487C8(void *);
 extern void func_PAL_003474E0(void *);
@@ -21,7 +22,7 @@ extern void func_PAL_00343240(void *);
 extern void func_PAL_00345268(void *);
 extern void func_PAL_00340470(void *);
 extern void func_PAL_00342D98(void *);
-extern void func_00349148(void *);
+extern void menu_return_object(void *);
 extern void func_PAL_0033B520(void *);
 extern void func_PAL_0033F5D8(void *);
 extern void func_PAL_0033E300(void *);
@@ -30,15 +31,15 @@ extern void func_PAL_0033EC50(void *);
 extern void func_PAL_0033F310(void *);
 extern void func_PAL_0033DC60(void *);
 extern void func_PAL_0033E000(void *);
-extern void func_00347EA0(void *);
-extern void func_003420C8(void *);
+extern void menu_pass_through_handle(void *);
+extern void list_menu_construct_parts(void *);
 extern void func_PAL_00343CF8(void *);
 extern void func_PAL_0033F9A0(void *);
 extern void func_PAL_0033FC98(void *);
 extern void func_PAL_0033FED8(void *);
 extern void func_PAL_00340118(void *);
-extern void func_0033A4A0(void *);
-extern void func_0034E070(void *, void *, void *);
+extern void title_screen_destroy(void *);
+extern void records_screen_init(void *, void *, void *);
 extern void func_PAL_0034A870(void *, void *);
 extern void func_PAL_00348868(void *, void *);
 extern void func_PAL_00347570(void *, void *);
@@ -52,8 +53,8 @@ extern void func_PAL_003452C8(void *, void *);
 extern void func_PAL_0033D098(void *, void *);
 extern void func_PAL_003406C0(void *, void *);
 extern void func_PAL_003404B0(void *, void *);
-extern void func_00349150(void *);
-extern void func_0033A520(void *, void *);
+extern void menu_clear_entries(void *);
+extern void title_screen_init_labels(void *, void *);
 extern void func_PAL_0033F610(void *, void *);
 extern void func_PAL_0033E338(void *, void *);
 extern void func_PAL_0033B558(void *, void *);
@@ -113,7 +114,7 @@ char *func_PAL_003507A8(char *object)
         clear += 4;
     }
     root = object + 0x36F10;
-    func_00336DB0(root);
+    ui_return_self(root);
     part0 = object + 0x36F28;
     func_PAL_003501C8(part0);
     part1 = object + 0x39160;
@@ -143,7 +144,7 @@ char *func_PAL_003507A8(char *object)
     part13 = object + 0x3CBD0;
     func_PAL_00342D98(part13);
     part14 = object + 0x3CDF8;
-    func_00349148(part14);
+    menu_return_object(part14);
     part15 = object + 0x3CF50;
     func_PAL_0033B520(part15);
     part16 = object + 0x3D288;
@@ -161,9 +162,9 @@ char *func_PAL_003507A8(char *object)
     part22 = object + 0x3E458;
     func_PAL_0033E000(part22);
     part23 = object + 0x3E738;
-    func_00347EA0(part23);
+    menu_pass_through_handle(part23);
     part24 = object + 0x3E810;
-    func_003420C8(part24);
+    list_menu_construct_parts(part24);
     part25 = object + 0x3EA78;
     func_PAL_00343CF8(part25);
     part26 = object + 0x3EC00;
@@ -175,16 +176,16 @@ char *func_PAL_003507A8(char *object)
     part29 = object + 0x3F4A0;
     func_PAL_00340118(part29);
     part30 = object + 0x3F860;
-    func_0033A4A0(part30);
+    title_screen_destroy(part30);
     size = 0x3FBD0;
     end = object + size;
     D_001A8CFC[0] = object;
     *(char **)object = (char *)(((int)end + 3) & -4);
     *(int *)(object + 0x3FA80) = size;
-    func_PAL_002B8838(object + 0x8710, D_0014B540.data + D_0014B540.offset, D_0014B540.size);
-    func_00336CE8(object + 0x8710);
-    func_00336DB8(root, 16, object + 4, 0x8700);
-    func_0034E070(part0, object, root);
+    func_PAL_002B8838(object + 0x8710, g_copy_setup_data.data + g_copy_setup_data.offset, g_copy_setup_data.size);
+    table_relocate_entries(object + 0x8710);
+    pool_init_cells(root, 16, object + 4, 0x8700);
+    records_screen_init(part0, object, root);
     *(int *)(object + 0x3FA84) = 0;
     *(int *)(object + 0x3FA88) = 0;
     *(int *)(object + 0x3FA8C) = 0;
@@ -202,8 +203,8 @@ char *func_PAL_003507A8(char *object)
     func_PAL_0033D098(part8, root);
     func_PAL_003406C0(part9, root);
     func_PAL_003404B0(part12, root);
-    func_00349150(part14);
-    func_0033A520(part30, root);
+    menu_clear_entries(part14);
+    title_screen_init_labels(part30, root);
     func_PAL_0033F610(part16, root);
     func_PAL_0033E338(part17, root);
     func_PAL_0033B558(part15, root);
@@ -224,8 +225,8 @@ char *func_PAL_003507A8(char *object)
     *(int *)(object + 0x3FA9C) = 0;
     *(int *)(object + 0x3FAA0) = 0;
     *(int *)(object + 0x3FAA4) = 0;
-    func_00115484(object + 0x3FAA8, 0, 32);
-    func_00115484(object + 0x3FAC8, 0, 256);
+    memset(object + 0x3FAA8, 0, 32);
+    memset(object + 0x3FAC8, 0, 256);
     return object;
 }
 

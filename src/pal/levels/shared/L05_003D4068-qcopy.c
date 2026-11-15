@@ -7,11 +7,11 @@ extern int D_L00_001A8F00;
 extern s32 D_L05_001AFBF8 __attribute__((sda));
 extern s32 D_L05_001AFC08 __attribute__((sda));
 extern s32 D_L05_001AFC18 __attribute__((sda));
-extern void func_00283098(void *, void *, char *);
-extern void func_00282CC0(void *, void *, char *);
-extern void func_002ACB48(void *, float);
-extern float func_002A7878(float, float);
-extern void func_L00_0033C0D0(char *, void *, void *, void *, s32);
+extern void matrix_mul_vec3(void *, void *, char *);
+extern void FastVecAdd(void *, void *, char *);
+extern void vec_add_random_offset(void *, float);
+extern float math_random_float_range(float, float);
+extern void part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
 
 /* Spawns three trail marks at the object's tail unless the game is in state 2. */
 void func_PAL_L05_003D4280(char *obj)
@@ -24,21 +24,21 @@ void func_PAL_L05_003D4280(char *obj)
     dir.f[0] = -0.3f;
     dir.f[3] = 1.0f;
     drift.q = 0;
-    func_00283098(&tail, &dir, obj + 0xC0);
-    func_00282CC0(&tail, &tail, obj + 0x10);
+    matrix_mul_vec3(&tail, &dir, obj + 0xC0);
+    FastVecAdd(&tail, &tail, obj + 0x10);
     k = 0.4f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
     qcopy(&mark3, &tail);
-    func_002ACB48(&tail, 0.1f);
-    func_002ACB48(&mark1, 0.1f);
-    func_002ACB48(&mark2, 0.1f);
-    func_002ACB48(&mark3, 0.1f);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.020000001f) * k;
-    func_L00_0033C0D0(obj, &mark1, &drift, &D_L05_001AFBF8, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.020000001f) * k;
-    func_L00_0033C0D0(obj, &mark2, &drift, &D_L05_001AFC08, 1);
-    drift.f[0] = -(func_002A7878(30.0f, 40.0f) * 0.020000001f) * k;
-    func_L00_0033C0D0(obj, &mark3, &drift, &D_L05_001AFC18, 1);
+    vec_add_random_offset(&tail, 0.1f);
+    vec_add_random_offset(&mark1, 0.1f);
+    vec_add_random_offset(&mark2, 0.1f);
+    vec_add_random_offset(&mark3, 0.1f);
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    part_spawn_object_relative_particle(obj, &mark1, &drift, &D_L05_001AFBF8, 1);
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    part_spawn_object_relative_particle(obj, &mark2, &drift, &D_L05_001AFC08, 1);
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    part_spawn_object_relative_particle(obj, &mark3, &drift, &D_L05_001AFC18, 1);
 }

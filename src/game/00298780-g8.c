@@ -15,7 +15,7 @@ extern int D_001A7420_5;
 
 /* When mode at data offset 0x15C equals 2 and the signed selection at offset 0x164 is negative, write selection 9, clear the word at offset 0x168 and write absolute state value 15. */
 /* When the memory card is idle with no request waiting, chooses entry 9 and moves the save menu to screen 15. */
-void func_00298780(void)
+void save_menu_select_entry_b(void)
 {
     if (D_001393E0_1.mode_15c == 2 &&
         D_001393E0_1.selected_164 < 0) {
@@ -25,16 +25,16 @@ void func_00298780(void)
     }
 }
 
-extern int D_001A7424 __attribute__((sda));
+extern int g_save_menu_flags __attribute__((sda));
 extern int D_001A7424_1[] __attribute__((sda));
 
 /* When the memory card is idle, moves the save menu to screen 18 if an error is waiting, or otherwise resets the choice and moves to screen 22. */
-void func_002987C0(void)
+void save_menu_choose_screen_on_pending_error(void)
 {
     if (D_001393E0_1.mode_15c == 2 && D_001393E0_1.selected_164 < 0) {
         if (*(int *)((char *)&D_001393E0_1 + 0x16C) != 0) {
             D_001A7420_5 = 18;
-            gSaveMenuFlags = D_001A7424_1[0] | 0x40;
+            g_save_menu_flags = D_001A7424_1[0] | 0x40;
         } else {
             D_001393E0_1.selected_164 = 7;
             *(int *)((char *)&D_001393E0_1 + 0x148) = 0;

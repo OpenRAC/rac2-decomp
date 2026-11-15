@@ -28,16 +28,16 @@ extern f32_F7036ef03 D_L04_001AE4CC;
 
 extern void func_00335E38_2(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
 
-extern void func_L00_00438970(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2);
+extern void stub_store_two_floats(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2);
 
-extern void func_00343638(void *a0);
+extern void menu_update_title_text(void *a0);
 
-extern void func_003435C8(void *a0);
+extern void menu_update_empty_label(void *a0);
 
-extern int func_00342978(void *a0, int a1);
+extern int UpdateListSelection(void *a0, int a1);
 
 /* Moves every part of the item menu to its place, refreshes the labels and updates the list. */
-void func_00343798(char *self, int buttons)
+void item_menu_update(char *self, int buttons)
 {
     f32_F7036ef03 *position;
     char *list = self + 664;
@@ -51,38 +51,38 @@ void func_00343798(char *self, int buttons)
     position = *(f32_F7036ef03 **)(self + 648);
     func_00335E38_2(self + 576, D_L04_001AE4C0 + position[0], D_L04_001AE4C4 + position[1], 0.0f, 0.0f);
     position = *(f32_F7036ef03 **)(self + 648);
-    StoreTwoFloats(list, D_L04_001AE4C8 + position[0], D_L04_001AE4CC + position[1]);
-    UpdateMenuTitleText(self);
-    UpdateMenuEmptyLabel(self);
+    stub_store_two_floats(list, D_L04_001AE4C8 + position[0], D_L04_001AE4CC + position[1]);
+    menu_update_title_text(self);
+    menu_update_empty_label(self);
     *(int *)(self + 416) = UpdateListSelection(list, buttons);
 }
 
 
-extern void func_00336320(void *a0);
-extern void func_00336A78(void *a0);
-extern void func_00342BE8(void *a0);
-extern int func_00342BC0(void *a0);
-extern int func_00288FB8(int);
-extern void func_00336A38(void *a0, int a1);
-extern unsigned char D_00139568[];
-extern char D_00239BA0[];
+extern void gfx_draw_screen_element_stored(void *a0);
+extern void text_label_draw(void *a0);
+extern void menu_list_draw_entries(void *a0);
+extern int menu_list_get_selected_id(void *a0);
+extern int GetLocalizedString(int);
+extern void hud_set_widget_field_b(void *a0, int a1);
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_table[];
 
 /* Draws the item menu: its frame, list, and the description of the selected item. */
-void func_003438E8(char *self)
+void item_menu_draw(char *self)
 {
     int itemId;
     char *itemRecord;
 
     if (*(int *)(self + 0x290) != 0) {
-        DrawScreenElementAtStoredPosition(self);
-        DrawScreenElementAtStoredPosition(self + 0x4C);
-        DrawScreenElementAtStoredPosition(self + 0x98);
-        DrawAlignedTextLabel(self + 0x1B0);
-        DrawMenuListEntries(self + 0x298);
-        itemId = GetSelectedMenuListId(self + 0x298);
-        itemRecord = gWeaponTable_00239BA0 + gItemSlotToRecord[itemId] * 224;
-        SetWidgetField40(self + 0x1F8, GetLocalizedString(*(int *)(itemRecord + 8)));
-        DrawAlignedTextLabel(self + 0x1F8);
-        DrawAlignedTextLabel(self + 0x240);
+        gfx_draw_screen_element_stored(self);
+        gfx_draw_screen_element_stored(self + 0x4C);
+        gfx_draw_screen_element_stored(self + 0x98);
+        text_label_draw(self + 0x1B0);
+        menu_list_draw_entries(self + 0x298);
+        itemId = menu_list_get_selected_id(self + 0x298);
+        itemRecord = g_weapon_table + g_item_slot_to_record[itemId] * 224;
+        hud_set_widget_field_b(self + 0x1F8, GetLocalizedString(*(int *)(itemRecord + 8)));
+        text_label_draw(self + 0x1F8);
+        text_label_draw(self + 0x240);
     }
 }

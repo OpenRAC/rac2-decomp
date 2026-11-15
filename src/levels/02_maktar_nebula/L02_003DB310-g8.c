@@ -3,9 +3,9 @@
 
 extern int D_L02_001B04DC __attribute__((sda));
 
-extern void func_L02_003DBA70();
+extern void part_spawn_rising();
 
-extern void func_0029FCC0(char *arg0, int arg1, char *arg2);
+extern void moby_transform_joint_to_world(char *arg0, int arg1, char *arg2);
 
 extern char D_L02_001B0F60[4] __attribute__((sda));
 
@@ -16,7 +16,7 @@ extern int D_L02_001B0FA4;
 extern void func_2EEFB0(char *, int, char *, char *, int, int, int, int, float);
 
 /* Hands the actor's four widget slots to the effect scheduler. */
-void func_L02_003F16A8(char *moby) {
+void widget_submit_effects(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     func_2EEFB0(D_L02_001B0F60, 4, vars + 0x2A0, vars + 0x3A0,
@@ -25,39 +25,39 @@ void func_L02_003F16A8(char *moby) {
 }
 
 /* Rebuild the four widget descriptions from the resident template. */
-void func_L02_003DB9E0(char *moby) {
+void boss_rebuild_joint_widgets(char *moby) {
     char buffer[16];
 
-    TransformMobyJointToWorld(moby, 2, buffer);
-    SpawnRisingParticles(buffer, D_L02_001B04DC);
-    TransformMobyJointToWorld(moby, 4, buffer);
-    SpawnRisingParticles(buffer, D_L02_001B04DC);
-    TransformMobyJointToWorld(moby, 8, buffer);
-    SpawnRisingParticles(buffer, D_L02_001B04DC);
-    TransformMobyJointToWorld(moby, 6, buffer);
-    SpawnRisingParticles(buffer, D_L02_001B04DC);
+    moby_transform_joint_to_world(moby, 2, buffer);
+    part_spawn_rising(buffer, D_L02_001B04DC);
+    moby_transform_joint_to_world(moby, 4, buffer);
+    part_spawn_rising(buffer, D_L02_001B04DC);
+    moby_transform_joint_to_world(moby, 8, buffer);
+    part_spawn_rising(buffer, D_L02_001B04DC);
+    moby_transform_joint_to_world(moby, 6, buffer);
+    part_spawn_rising(buffer, D_L02_001B04DC);
 }
 
 /* The entity array's base: `sda` with a size over 8 bytes gives the bare-symbol load, which the
    assembler expands to retail's one-register `lui`/`lw` pair instead of a $gp access. */
-extern unsigned char *D_L02_001B359C[3] __attribute__((sda));
+extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 
 extern int D_L02_001B35B8 __attribute__((sda));
 
-extern unsigned short *D_L02_001FC060[];
+extern unsigned short *g_entity_group_lists[];
 
 /* For each entity of the object's group that has class 0xAB0, sets its state byte (+0x20) from
    the first word of its private data: 1 gives 6, 2 gives 7, anything else 3. */
-void func_L02_003EAD38(unsigned char *moby) {
+void group_set_moby_states_from_mode(unsigned char *moby) {
     unsigned short *groupEntry;
     unsigned char *entity;
 
     if (moby[0x21] == 0xFF)
         return;
-    groupEntry = gEntityGroupLists[moby[0x21]];
+    groupEntry = g_entity_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
-           ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == gEntityGroupLists[moby[0x21]])) {
-        entity = gMobyPool_L02[0] + ((*groupEntry & 0x7FFF) << 8);
+           ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]])) {
+        entity = g_moby_l02_pool[0] + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (*(short *)(entity + 0xAA) == 0xAB0 /* moby class 2736 */) {
@@ -71,16 +71,16 @@ void func_L02_003EAD38(unsigned char *moby) {
 
 /* 0 when an entity of the object's group has class 0xAB0 and a state byte (+0x20) other than
    6 or 7, else 1. */
-int func_L02_003EAFC8(unsigned char *moby) {
+int group_are_mobys_settled(unsigned char *moby) {
     unsigned short *groupEntry;
     unsigned char *entity;
 
     if (moby[0x21] == 0xFF)
         return 1;
-    groupEntry = gEntityGroupLists[moby[0x21]];
+    groupEntry = g_entity_group_lists[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
-           ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == gEntityGroupLists[moby[0x21]])) {
-        entity = gMobyPool_L02[0] + ((*groupEntry & 0x7FFF) << 8);
+           ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]])) {
+        entity = g_moby_l02_pool[0] + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
             break;
         groupEntry++;
@@ -95,23 +95,23 @@ extern int D_L02_001B35B8 __attribute__((sda));
 /* The word D_L02_001B359C, read here through $gp; the walks above reach it as a bare symbol. */
 extern char *D_L02_001B359C_gp;
 
-extern unsigned short *D_L02_001FC060[];
+extern unsigned short *g_entity_group_lists[];
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
-extern int func_002AD0B0(char *);
+extern int moby_get_private_value_2(char *);
 
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* For every entity of the object's group, copies the word at +0x10 of its +0x24 record into
    its word at +0x98. */
-void func_L02_003EB098(unsigned char *moby) {
+void group_reset_moby_hit_points(unsigned char *moby) {
     unsigned short *groupEntry;
     char *entity;
 
-    for (groupEntry = gEntityGroupLists[moby[0x21]];
+    for (groupEntry = g_entity_group_lists[moby[0x21]];
          moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
-         ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == gEntityGroupLists[moby[0x21]]);
+         ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]]);
          groupEntry++) {
         entity = D_L02_001B359C_gp + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
@@ -133,29 +133,29 @@ void func_L02_003EB098(unsigned char *moby) {
    scheduler leave the copy last (the delay slot of `b test`); the loop depth puts that copy in
    $s3 and a1 in $s4. CSE removes the repeated test afterwards. Without it the test is copied in
    front of the loop and the function grows to 364 bytes. */
-int func_L02_003EB138(unsigned char *moby, void *effectArg) {
+int group_update_effect_mobys(unsigned char *moby, void *effectArg) {
     int result = 0;
     unsigned short *groupEntry;
     char *entity;
 
-    for (groupEntry = gEntityGroupLists[moby[0x21]];
+    for (groupEntry = g_entity_group_lists[moby[0x21]];
          moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
-         ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == gEntityGroupLists[moby[0x21]]);
+         ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]]);
          groupEntry++) {
         entity = D_L02_001B359C_gp + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (*(short *)(entity + 0xAA) == 0xAAF /* moby class 2735 */) {
-            char *heroBlock = gHeroState;
+            char *heroBlock = g_hero_state;
             void *effect;
 
             if (entity == *(char **)(heroBlock + 0x33C)) {
                 if (*(int *)(heroBlock + 0x340) != 0)
                     result = 1;
             }
-            effect = (void *)GetMobyPrivateValue2(entity);
+            effect = (void *)moby_get_private_value_2(entity);
             if (effect != 0)
-                CombineTransformsAndStore(effect, effectArg, moby + 0xF0, moby + 0xF0);
+                mat_combine_and_store(effect, effectArg, moby + 0xF0, moby + 0xF0);
         }
     }
     return result;
@@ -174,11 +174,11 @@ extern char D_L02_001B09E0[];
 
 extern char D_L02_001B09F0[];
 
-extern void func_0026FEB8(const char *, ...);
+extern void STUB_printf(const char *, ...);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
 /* Rolls the state's mode (+0x5C) against the six weights, turns mode 4 into 1 when the two
    reference words agree and mode 5 into 1 while the counter at D_001395B8[0x8F] is under 4,
@@ -186,13 +186,13 @@ extern int func_002A7820(int, int);
    they are not all the same. The jump pass peels the loop's first test in front of it; the unit
    is built with -frac2-gcse-unsplit-edges (config/cflags.txt), so the two high halves gcse hoists
    sit above that copy as in retail. */
-void func_L02_003E79F8(char *moby) {
+void slot_machine_roll_result(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     int roll;
     int i;
     int mode;
 
-    roll = RandomIntBelow(1000);
+    roll = math_random_int_below(1000);
     STUB_printf(D_L02_001B09E0, roll);
     *(int *)(vars + 0x5C) = 0;
     for (i = 0; i < 6; i++) {
@@ -216,10 +216,10 @@ void func_L02_003E79F8(char *moby) {
     if (*(int *)(vars + 0x5C) == 0) {
         int thirdRoll;
 
-        *(int *)(vars + 0x90) = RandomIntRange(1, 5);
-        *(int *)(vars + 0x94) = RandomIntRange(1, 5);
+        *(int *)(vars + 0x90) = math_random_int_range(1, 5);
+        *(int *)(vars + 0x94) = math_random_int_range(1, 5);
         do {
-            thirdRoll = RandomIntRange(1, 5);
+            thirdRoll = math_random_int_range(1, 5);
             *(int *)(vars + 0x98) = thirdRoll;
         } while (*(int *)(vars + 0x90) == *(int *)(vars + 0x94) &&
                  *(int *)(vars + 0x90) == thirdRoll);
@@ -227,14 +227,14 @@ void func_L02_003E79F8(char *moby) {
 }
 
 extern unsigned char D_001A7AFA;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern unsigned short D_0018C31C[];
-extern int func_002ACBC8(void *, int);
-extern void func_L02_003DBFD8(void);
-extern void func_002A7750(char *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void hero_trigger_spawn_effect(void);
+extern void moby_set_state(char *, int, int);
 
 /* Per-frame update for moby class 2647. It sets itself up once, then keeps checking the hero for a special trigger. */
-void func_L02_003DBF40(char *moby) {
+void trigger_l02_update(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     switch (*(unsigned char *)(moby + 0x20)) {
@@ -242,12 +242,12 @@ void func_L02_003DBF40(char *moby) {
         *(unsigned char *)(moby + 0x30) = 0xFF;
         if (D_001A7AFA == 0)
             D_0018C31C[0] = 1;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        CheckHeroTriggerAndSpawnEffect();
-        if (IsPointInCuboid(gHeroPosition, *(int *)vars))
-            *(unsigned short *)(gHeroPosition + 0x19A) = 5;
+        hero_trigger_spawn_effect();
+        if (IsPointInCuboid(g_hero_position, *(int *)vars))
+            *(unsigned short *)(g_hero_position + 0x19A) = 5;
         break;
     }
 }
@@ -257,11 +257,11 @@ void func_L02_003DBF40(char *moby) {
    symbol that gas expands in one. */
 extern int D_L02_001CAA80[3];
 
-extern int D_L02_001AEC78;
+extern int g_hovering_object_count;
 
 extern int D_L02_001B41DC;
 
-extern int D_L02_001B30C8;
+extern int g_frame_l02_counter;
 
 extern int D_L02_001B0A60 __attribute__((sda));
 
@@ -271,19 +271,19 @@ extern float D_L02_001B0A28 __attribute__((sda));
 
 extern float D_L02_001B0A30 __attribute__((sda));
 
-extern void func_002A7750();
+extern void moby_set_state();
 
-extern void *func_002A9640(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 
-extern void func_L00_002E6CF0(void *, void *);
+extern void gfx_add_draw_callback_first(void *, void *);
 
-extern void func_L02_003E80F8();
+extern void DrawRotatingObjectGroupEffects();
 
-extern void func_L00_0032A258(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
 
-extern void func_L00_00326110(void *, int, float);
+extern void part_spawn_scaled_bolts(void *, int, float);
 
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Per-frame update for moby class 2724. One step of an actor, by its state byte (+0x20). State 0 marks the actor (+0x30), moves it to
    state 1 and lowers the counter D_L02_001AEC78 when its private word is set. Unless
@@ -291,36 +291,36 @@ extern void func_0032C700(void *, int, int, int, int, int, int, int, float, floa
    D_L02_001B30C8 and, when func_002A9640 finds something and the private word is clear, lowers
    the counter and moves to state 2; it always ends by setting the byte at +0xA8. State 2 starts
    the effects and moves to state 3, which sets the half-word at +0x7C. */
-void func_L02_003E7F28(unsigned char *moby) {
+void effect_l02_spawner_update(unsigned char *moby) {
     int stateByte = moby[0x20];
     int *vars = *(int **)(moby + 0x68);
 
     switch (stateByte) {
     case 0:
         moby[0x30] = 0xFF;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         if (*vars != 0)
-            gHoveringObjectCount--;
+            g_hovering_object_count--;
         break;
     case 1:
         if (D_L02_001CAA80[0] != 1) {
-            if (D_L02_001B41DC != gFrameCounter_L02) {
-                D_L02_001B41DC = gFrameCounter_L02;
-                AddDrawCallbackToList1(DrawRotatingObjectGroupEffects, moby);
+            if (D_L02_001B41DC != g_frame_l02_counter) {
+                D_L02_001B41DC = g_frame_l02_counter;
+                gfx_add_draw_callback_first(DrawRotatingObjectGroupEffects, moby);
             }
-            if (FindOwnedEffectSlot(moby, 0x4010000, 0) != 0 && *vars == 0) {
-                gHoveringObjectCount--;
-                SetMobyState(moby, 2, -1);
+            if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *vars == 0) {
+                g_hovering_object_count--;
+                moby_set_state(moby, 2, -1);
             }
             moby[0xA8] = 0xFF;
         }
         break;
     case 2:
-        ExplodeObjectIntoPieces(moby, &D_L02_001B0A30, &D_L02_001B0A28, &D_L02_001B0A20, 0xFFFF, 0,
+        part_explode_object_into_pieces(moby, &D_L02_001B0A30, &D_L02_001B0A28, &D_L02_001B0A20, 0xFFFF, 0,
                           D_L02_001B0A60, 1, 0xFFFF, 0xFF, 0);
-        SpawnScaledBolts(moby, 5, 0.5f);
+        part_spawn_scaled_bolts(moby, 5, 0.5f);
         SpawnExplosion(moby + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-        SetMobyState(moby, 3, -1);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
         *(unsigned short *)(moby + 0x7C) = 0x8020;
@@ -328,17 +328,17 @@ void func_L02_003E7F28(unsigned char *moby) {
     }
 }
 
-extern int func_L00_002B3998(float);
+extern int math_is_below_plane_within_depth(float);
 
-extern float func_00283180(float);
+extern float math_fast_sin_or_cos_a(float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern float func_002A89A8(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern void func_002C3D80(void *, int, float, float);
+extern void part_spawn_puff(void *, int, float, float);
 
 extern float D_L02_001B0530 __attribute__((sda));
 
@@ -351,7 +351,7 @@ extern float D_L02_001B0534;
    places a point on the object's joint (selector + 0x16), moved by the hero's heading (+0x98)
    and raised, and hands it to func_002C3D80. The block's address is taken three times, once for
    each of the tests, the kind switch and the effect, as three separate pointers. */
-void func_L02_003DBFD8(void) {
+void hero_trigger_spawn_effect(void) {
     int found = 0;
     int sel = 0;
     float v[4];
@@ -359,21 +359,21 @@ void func_L02_003DBFD8(void) {
     char *h;
     char *k;
 
-    g = gHeroState;
+    g = g_hero_state;
     if (*(short *)(g + 0x1490) == 10 && *(int *)(g + 0x340) != 0) {
         if (*(int *)(g + 0x1B8) == 1 && *(int *)(g + 0x2294) == 2) {
-            sel = RandomIntBelow(2);
+            sel = math_random_int_below(2);
             found = 1;
         } else {
-            h = gHeroState;
+            h = g_hero_state;
             switch (*(unsigned char *)(*(char **)(h + 0x2290) + 0x43)) {
             case 3:
                 if (*(int *)(h + 0xC2C) == 0) {
-                    if (IsBelowPlaneWithinDepth(49.5f) != 0) {
+                    if (math_is_below_plane_within_depth(49.5f) != 0) {
                         found = 1;
                         sel = 0;
                     }
-                    if (IsBelowPlaneWithinDepth(17.0f) != 0) {
+                    if (math_is_below_plane_within_depth(17.0f) != 0) {
                         found = 1;
                         sel = 1;
                     }
@@ -381,11 +381,11 @@ void func_L02_003DBFD8(void) {
                 break;
             case 4:
                 if (*(int *)(h + 0xC2C) == 0) {
-                    if (IsBelowPlaneWithinDepth(12.5f) != 0) {
+                    if (math_is_below_plane_within_depth(12.5f) != 0) {
                         found = 1;
                         sel = 0;
                     }
-                    if (IsBelowPlaneWithinDepth(1.0f) != 0) {
+                    if (math_is_below_plane_within_depth(1.0f) != 0) {
                         found = 1;
                         sel = 1;
                     }
@@ -395,11 +395,11 @@ void func_L02_003DBFD8(void) {
         }
     }
     if (found) {
-        k = gHeroState;
-        TransformMobyJointToWorld(*(char **)(k + 0x2290), sel + 0x16, (char *)v);
-        v[0] += FastSinOrCosA(*(float *)(k + 0x98)) * 0.15f;
-        v[1] += FastSinOrCosB(*(float *)(k + 0x98)) * 0.15f;
-        v[2] = ProbeGroundHeightBelow(v, 0, 0.5f) + 0.04f;
-        SpawnPuffParticle_002C3D80(v, -1, RandomFloatRange(D_L02_001B0530, D_L02_001B0534), 5250.0f);
+        k = g_hero_state;
+        moby_transform_joint_to_world(*(char **)(k + 0x2290), sel + 0x16, (char *)v);
+        v[0] += math_fast_sin_or_cos_a(*(float *)(k + 0x98)) * 0.15f;
+        v[1] += math_fast_sin_or_cos_b(*(float *)(k + 0x98)) * 0.15f;
+        v[2] = coll_probe_ground_height_below(v, 0, 0.5f) + 0.04f;
+        part_spawn_puff(v, -1, math_random_float_range(D_L02_001B0530, D_L02_001B0534), 5250.0f);
     }
 }

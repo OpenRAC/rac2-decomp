@@ -2,20 +2,20 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { Vector row[3]; } Matrix3;
-extern unsigned char D_00189E20[];
-extern void func_00283360(Matrix3 *);
-extern void func_00282F20(Vector *, Vector *, float);
-extern void func_00283738(Matrix3 *, Matrix3 *, Matrix3 *);
-extern void func_00282CF0(Vector *, Vector *, Vector *);
-extern void func_00283098(Vector *, Vector *, Matrix3 *);
-extern void func_00282CC0(Vector *, Vector *, Vector *);
+extern unsigned char g_hero_state[];
+extern void set_identity_rotation_rows(Matrix3 *);
+extern void vec_scale_to_length(Vector *, Vector *, float);
+extern void multiply_matrix3x3(Matrix3 *, Matrix3 *, Matrix3 *);
+extern void FastVecSub(Vector *, Vector *, Vector *);
+extern void matrix_mul_vec3(Vector *, Vector *, Matrix3 *);
+extern void FastVecAdd(Vector *, Vector *, Vector *);
 
 /* Apply the pending axis scales to the player and its attached objects. */
-void func_L00_002A7748(void) {
+void ApplyHeroAxisScales(void) {
     Matrix3 scale;
     Matrix3 transformed;
     Vector delta;
-    unsigned char *player = gHeroState;
+    unsigned char *player = g_hero_state;
     int row, column;
     if (*(short *)(player + 0x2500) == 0) return;
     set_identity_rotation_rows(&scale);
@@ -31,7 +31,7 @@ void func_L00_002A7748(void) {
     if (player[0x22B4] == 0) {
         for (row = 0; row < 7; ++row) {
             for (column = 0; column < 3; ++column) {
-                unsigned char *player = gHeroState;
+                unsigned char *player = g_hero_state;
                 unsigned char *object = *(unsigned char **)(player + row * 0x50 + 0x1220);
                 if (column == 1) object = *(unsigned char **)(player + row * 0x50 + 0x1224);
                 else if (column == 2) object = *(unsigned char **)(player + row * 0x50 + 0x1228);
@@ -45,13 +45,13 @@ void func_L00_002A7748(void) {
         }
     }
     {
-        unsigned char *tail = gHeroState;
-        if (*(float *)(gHeroState + 0x2020) == 1.0f &&
-            *(float *)(gHeroState + 0x2024) == 1.0f &&
-            *(float *)(gHeroState + 0x2028) == 1.0f)
+        unsigned char *tail = g_hero_state;
+        if (*(float *)(g_hero_state + 0x2020) == 1.0f &&
+            *(float *)(g_hero_state + 0x2024) == 1.0f &&
+            *(float *)(g_hero_state + 0x2028) == 1.0f)
             *(short *)(tail + 0x2500) = 0;
         {
-            unsigned char *tail = gHeroState;
+            unsigned char *tail = g_hero_state;
             *(float *)(tail + 0x2020) = 1.0f;
             *(float *)(tail + 0x2024) = 1.0f;
             *(float *)(tail + 0x2028) = 1.0f;

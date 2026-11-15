@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
@@ -7,7 +8,7 @@ void func_US2_L00_0030EF40(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_00340250(value + 0x3A4C0);
+        radial_menu_draw(value + 0x3A4C0);
 }
 
 extern int D_L00_001A904C_7 __attribute__((sda));

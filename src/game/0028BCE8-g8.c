@@ -12,28 +12,28 @@ typedef struct {
     u8 pad3E[0xA2];
 } Rec_0028BCE8;
 
-extern u32 D_001B18D0;
-extern u32 D_001B18D4;
+extern u32 g_radial_slot_count;
+extern u32 g_radial_menu_pages;
 extern u32 D_001A8DD0 __attribute__((sda));
-extern u32 D_001A8D48 __attribute__((sda));
-extern u32 D_001A73B8[] MACRO_ADDR;
-extern u8 D_00139568[];
-extern Rec_0028BCE8 D_00239BA0[];
+extern u32 g_radial_menu_page_index __attribute__((sda));
+extern u32 g_weapon_menu_slots[] MACRO_ADDR;
+extern u8 g_item_slot_to_record[];
+extern Rec_0028BCE8 g_weapon_table[];
 extern Entry_0028BCE8 D_00255170[];
 
 /* Sets up the eight weapon menu slots from the current weapon list. */
-void func_0028BCE8(void)
+void weapon_menu_init_slots(void)
 {
     int i;
     u32 weaponId;
     Rec_0028BCE8 *rec;
 
-    gRadialSlotCount = 8;
-    gRadialMenuPages = (u32)&D_001A8DD0;
-    gRadialMenuPageIndex = 0;
+    g_radial_slot_count = 8;
+    g_radial_menu_pages = (u32)&D_001A8DD0;
+    g_radial_menu_page_index = 0;
     for (i = 0; i < 8; i++) {
-        weaponId = gWeaponMenuSlots[i];
-        rec = &gWeaponTable_00239BA0[gItemSlotToRecord[weaponId]];
+        weaponId = g_weapon_menu_slots[i];
+        rec = &g_weapon_table[g_item_slot_to_record[weaponId]];
         D_00255170[i].id = weaponId;
         D_00255170[i].value = rec->value;
     }

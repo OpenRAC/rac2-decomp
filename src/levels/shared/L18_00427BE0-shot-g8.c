@@ -15,20 +15,20 @@ extern unsigned char ref_L18_00428428_00[] MACRO_ADDR;
 extern void func_002C27F0(void *, int);
 extern void func_0032C5E0(void *, int, void *);
 extern int func_00336F00(void *, void *, int, int, int, int, float, float, float);
-extern int func_L18_004283F0(void *);
+extern int enemy_get_kind_index(void *);
 /* Argument layout of RAC1's spawn_explosion, with one more integer. */
 extern void func_0033A400(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                           int, float, int, int, int, int, int);
 extern void func_002FB998(void *, int, void *, void *, float);
 extern void func_00308BD8(void *, void *, float);
 extern float func_00308AD0(void *, void *);
-extern int func_L18_0043FFF8(void *, void *, void *, int, int, float, float, float);
+extern int receiver_bot_spawn_streak_projectile(void *, void *, void *, int, int, float, float, float);
 
 /* Fires from joint side + 2. When the sphere test at that point reports contact, it
    spawns an explosion there and sends a hit record to nearby objects; otherwise it
    launches a projectile along the facing, aimed at the target's height unless the
    byte at 0xBC is set. */
-int func_L18_00428428(unsigned char *obj, int side) {
+int shooter_fire_shot(unsigned char *obj, int side) {
     unsigned char *state = *(unsigned char **)(obj + 0x68);
     float range = D_L18_001B1280;
     float speed = D_L18_001B1288;
@@ -57,7 +57,7 @@ int func_L18_00428428(unsigned char *obj, int side) {
         hit.a = 2;
         hit.b = 3;
         hit.kind = *(unsigned short *)(obj + 0xAA);
-        func_0033A400(obj, ref_L18_00428428_00, pos, 0.0f, 0.0f, 5, 2, 9, 0.0f, 0.0f, 9.0f, 1.1f, GetEnemyKindIndex(obj), 0.0f, 0, 1, -2, 0, 0x810001);
+        func_0033A400(obj, ref_L18_00428428_00, pos, 0.0f, 0.0f, 5, 2, 9, 0.0f, 0.0f, 9.0f, 1.1f, enemy_get_kind_index(obj), 0.0f, 0, 1, -2, 0, 0x810001);
         func_002FB998(pos, 16, obj, &hit, 1.0f);
     } else {
         speed *= 0.016666668f;
@@ -66,7 +66,7 @@ int func_L18_00428428(unsigned char *obj, int side) {
             float t = func_00308AD0(pos, state + 0x220) / speed;
             hit.vec[2] = (*(float *)(state + 0x228) - pos[2]) / t;
         }
-        return SpawnStreakProjectile(pos, obj, hit.vec, 1, 3, (float)state[0x34], range, D_L18_001B12C0);
+        return receiver_bot_spawn_streak_projectile(pos, obj, hit.vec, 1, 3, (float)state[0x34], range, D_L18_001B12C0);
     }
     return 0;
 }

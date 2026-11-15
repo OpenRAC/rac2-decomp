@@ -3,7 +3,7 @@
 
 
 #include "common.h"
-extern float func_002A7878(float a, float b);
+extern float math_random_float_range(float a, float b);
 extern float D_L05_0023F920[][4][137][4];
 extern float D_L05_0024A460[][4][137];
 extern float D_L05_0024D020[][4][4];
@@ -13,7 +13,7 @@ extern float D_L05_001B2FB8[] __attribute__((sda)), D_L05_001B2FD0[] __attribute
 extern int D_L05_001B2F70[] __attribute__((sda)), D_L05_001B2FE8[] __attribute__((sda));
 extern int D_L05_001B2FA0[] __attribute__((sda));
 extern int func_001163B0(void);
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
 /* Clears the four emitters' 137 vectors of the object's slot, gives each a random speed, and
    starts the emitters around the object's position with random fades and lifetimes. */
@@ -26,9 +26,9 @@ void func_PAL_L05_003D7130(char *obj)
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 137; j++) {
-            float speed = func_002A7878(0.5f, 4.0f);
+            float speed = math_random_float_range(0.5f, 4.0f);
 
-            func_00282C88(D_L05_0023F920[*st][i][j]);
+            vec_clear_128(D_L05_0023F920[*st][i][j]);
             D_L05_0024A460[*st][i][j] = speed;
         }
         /* This slot and the actor position do not contain the private index. */
@@ -37,21 +37,21 @@ void func_PAL_L05_003D7130(char *obj)
         D_L05_0024CF30[*st][i] = func_001163B0() % 128 + 128;
         D_L05_0024CF80[*st][i] = func_001163B0() % 2 + 6;
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[0] += jitter;
         }
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[1] += jitter;
         }
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);

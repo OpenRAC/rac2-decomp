@@ -13,25 +13,25 @@ extern char D_L00_001BD2C0[];
 extern char D_L00_001B8FF0[];
 extern char D_0018A0E0[];
 extern void func_L00_002D99A0(float);
-extern int func_00283CF0(float);
-void func_00283098(void *,void *,void *);
-void func_00282CC0(void *,void *,void *);
-void func_00282CF0(void *,void *,void *);
-void func_00282D30(void *,void *,float);
-void func_00282F20(void *,void *,float);
-void func_00282DD8(void *,void *,void *);
-float func_00283198(float);
-float func_00283180(float);
-void func_0027AB40(void);
-void func_L00_002C42E0(int,int);
-int func_L00_00341820(void *,void *,int *,float *,float,int);
-int func_00282978(void *);
-float func_002A7C00(float,float,float);
-float func_00282E48(void *,void *);
+extern int FloatToInt(float);
+void matrix_mul_vec3(void *,void *,void *);
+void FastVecAdd(void *,void *,void *);
+void FastVecSub(void *,void *,void *);
+void FastVecScale(void *,void *,float);
+void vec_scale_to_length(void *,void *,float);
+void FastVecCross(void *,void *,void *);
+float math_fast_sin_or_cos_b(float);
+float math_fast_sin_or_cos_a(float);
+void UpdateViewContext(void);
+void hero_l00_set_action(int,int);
+int Spline_AdvanceByDistance(void *,void *,int *,float *,float,int);
+int FastDecTimer(void *);
+float math_cosine_blend(float,float,float);
+float fast_vec_dist(void *,void *);
 
 /* Adapted from RAC1 Camera19_Update, rocket_and_path_camera.c. */
 /* Runs a cinematic camera that moves along a path, fades in and out and changes zoom. When the path ends it hands the camera back. */
-void func_L00_00429568(char *moby) {
+void cam_path_update_cinematic(char *moby) {
     float va[4];
     float v1[4];
     float v2[4];
@@ -99,15 +99,15 @@ void func_L00_00429568(char *moby) {
             *(short *)(f + 0x14) = 3;
             D_L00_001B18E0 = 1.0f;
             x = k->vals[8] * 0.5f;
-            aa = FastSinOrCosB(x);
-            bb = FastSinOrCosA(x); D_L00_001BD370 = aa / bb;
+            aa = math_fast_sin_or_cos_b(x);
+            bb = math_fast_sin_or_cos_a(x); D_L00_001BD370 = aa / bb;
             UpdateViewContext();
             *(unsigned char *)(desc + 0x39) = 1;
             func_L00_002D99A0(15.0f);
             *(short *)(moby + 0x7E) = 4;
             D_L00_001B18E8 = 0;
             if (*(int *)(desc + 0x4C) == 0) {
-                SetHeroAction_L00(0, 1);
+                hero_l00_set_action(0, 1);
             }
         }
         if (*(int *)(desc + 0x40) == 0) {
@@ -173,10 +173,10 @@ void func_L00_00429568(char *moby) {
                 for (j2 = *(int *)f; j2 < keys->ids[i + 1]; j2++) {
                     total = total + *(float *)(pathData + j2 * 16 + 0x1C);
                 }
-                r = CosineBlend(keys->vals[i], keys->vals[i + 1], sum / total);
+                r = math_cosine_blend(keys->vals[i], keys->vals[i + 1], sum / total);
                 m = r * 0.00872664712369442f;
-                aa = FastSinOrCosB(m);
-                bb = FastSinOrCosA(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
+                aa = math_fast_sin_or_cos_b(m);
+                bb = math_fast_sin_or_cos_a(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
                 UpdateViewContext();
             }
             i++;

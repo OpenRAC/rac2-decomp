@@ -16,16 +16,16 @@ typedef struct {
 
 extern u16 *D_L10_001FB1E0[];
 extern char *D_L10_001B251C[] __attribute__((sda));
-extern void func_00281EB8(void *, s32, u32, s32, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283180(float);
-extern int func_00283CF0(float);
-extern float func_002A7940(void);
-extern char *func_002ED688(void *);
+extern void gfx_draw_billboard_quad(void *, s32, u32, s32, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern int FloatToInt(float);
+extern float math_random_angle(void);
+extern char *moby_get_motion_data(void *);
 
 /* Draw a pulsing glow at every live moby of this moby's group. */
-void func_L10_0041EE00(u8 *moby)
+void pulsing_light_draw_group_glows(u8 *moby)
 {
     f32 glowPos[4] __attribute__((aligned(16)));
     u16 *first = D_L10_001FB1E0[moby[0x21]];
@@ -38,12 +38,12 @@ void func_L10_0041EE00(u8 *moby)
         list = first;
         do {
             target = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
-            if (*(s32 *)(GetMobyMotionData(target) + 0x110) != 0) {
+            if (*(s32 *)(moby_get_motion_data(target) + 0x110) != 0) {
                 vars = target->vars;
                 FastVecScale(glowPos, target->axis, 0.25f);
                 FastVecAdd(glowPos, target->pos, glowPos);
-                color = (FloatToInt((FastSinOrCosA(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
-                DrawBillboardQuad_00281EB8(glowPos, 0x31, color, 1, 7.5f, 2.0f, RandomAngle());
+                color = (FloatToInt((math_fast_sin_or_cos_a(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
+                gfx_draw_billboard_quad(glowPos, 0x31, color, 1, 7.5f, 2.0f, math_random_angle());
             }
         } while ((s16)*list++ >= 0);
     }

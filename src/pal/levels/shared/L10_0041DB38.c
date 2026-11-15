@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int s32;
-extern s32 func_002ED688(u8 *);
+extern s32 moby_get_motion_data(u8 *);
 extern void func_PAL_L05_0037D610(char *, int);
 extern void func_PAL_002EF708(unsigned char *);
 
 /* Restores the flying object's state and its linked motion record. */
 void func_PAL_L10_0041DEA0(u8 *self) {
     char *state = *(char **)(self + 0x68);
-    char *motion = (char *)func_002ED688(self);
+    char *motion = (char *)moby_get_motion_data(self);
     *(s32 *)(motion + 0x148) = 10;
     func_PAL_L05_0037D610((char *)self, 1);
     *(float *)(state + 0x180) = 10.0f;

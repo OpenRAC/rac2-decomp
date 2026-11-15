@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_002ED688(unsigned char *owner);
-extern int func_002ACCA8(unsigned char *a, int b);
-extern void func_002ED9C0(unsigned char *owner);
-extern void func_002EE8B0(char *a0);
+extern int moby_get_motion_data(unsigned char *owner);
+extern int coll_is_point_inside_unit_sphere(unsigned char *a, int b);
+extern void moby_release_motion_slot(unsigned char *owner);
+extern void follower_start_push_from_target(char *a0);
 extern int D_00214F90[];
 
 void func_PAL_002EF630(unsigned char *owner)
@@ -13,18 +14,18 @@ void func_PAL_002EF630(unsigned char *owner)
 
     if (D_00214F90[36] == 0)
         return;
-    if (func_002ED688(owner) == 0)
+    if (moby_get_motion_data(owner) == 0)
         return;
-    state = func_002EE6A8(owner);
+    state = follower_get_state(owner);
     if (state == 0xB)
         return;
     if (state == 0xD)
-        func_002EE678(owner, 1);
+        follower_set_state(owner, 1);
     for (i = 0; i < D_00214F90[36]; i++) {
-        if (func_002ACCA8(owner + 0x10, D_00214F90[39 + i])) {
-            func_002ED9C0(owner);
-            func_002EE678(owner, 0xD);
-            func_002EE8B0((char *)owner);
+        if (coll_is_point_inside_unit_sphere(owner + 0x10, D_00214F90[39 + i])) {
+            moby_release_motion_slot(owner);
+            follower_set_state(owner, 0xD);
+            follower_start_push_from_target((char *)owner);
             break;
         }
     }
@@ -32,11 +33,11 @@ void func_PAL_002EF630(unsigned char *owner)
 
 typedef int V4_Fb6552688 __attribute__((mode(TI)));
 extern void func_00282CC0_26(char *, V4_Fb6552688 *, char *);
-extern void func_002EE988(char *);
-extern float func_002A7940(void);
-extern float func_00283180(float a0);
-extern float func_00283198(float a0);
-extern float func_002A7878(float a0, float a1);
+extern void follower_clamp_push_vector(char *);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float a0);
+extern float math_fast_sin_or_cos_b(float a0);
+extern float math_random_float_range(float a0, float a1);
 extern char *D_001B1C54 __attribute__((sda));
 
 void func_PAL_002EF708(unsigned char *owner)
@@ -46,18 +47,18 @@ void func_PAL_002EF708(unsigned char *owner)
     float a;
     float b;
 
-    object = (char *)func_002ED688(owner);
+    object = (char *)moby_get_motion_data(owner);
     if (object == 0)
         return;
     table = D_001B1C54 + D_00214F90[0] * 128;
-    a = func_00283180(func_002A7940()) * func_002A7878(0.0f, *(float *)table);
+    a = math_fast_sin_or_cos_a(math_random_angle()) * math_random_float_range(0.0f, *(float *)table);
     *(float *)(object + 0x60) = a;
-    b = func_00283198(func_002A7940()) * func_002A7878(0.0f, *(float *)table);
+    b = math_fast_sin_or_cos_b(math_random_angle()) * math_random_float_range(0.0f, *(float *)table);
     *(float *)(object + 0x68) = 0.0f;
     *(float *)(object + 0x64) = b;
     func_00282CC0_26(object + 0x60, (V4_Fb6552688 *)(table + 0x30), object + 0x60);
-    *(float *)(object + 0x68) = func_002A7878(-64.0f, 64.0f) + *(float *)((char *)owner + 0x18);
-    func_002EE988((char *)owner);
+    *(float *)(object + 0x68) = math_random_float_range(-64.0f, 64.0f) + *(float *)((char *)owner + 0x18);
+    follower_clamp_push_vector((char *)owner);
     *(int *)(object + 0x130) = 250;
 }
 
@@ -75,7 +76,7 @@ void func_PAL_002EF800(char *a0)
         return;
     func_00282F20_10(&buf, a0 + 192, 8.0f);
     func_00282CC0_26(p + 96, &buf, a0 + 16);
-    func_002EE988(a0);
+    follower_clamp_push_vector(a0);
     *(int *)(p + 304) = 250;
 }
 

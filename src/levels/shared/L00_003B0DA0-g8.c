@@ -8,7 +8,7 @@
 
 extern unsigned char D_L00_001AF810 __attribute__((sda));
 extern unsigned char D_L00_001AF811 __attribute__((sda));
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 /* The hero record: its position at 0x80, the pad buttons word at 0x1230 and the hero moby at 0x2290. */
 typedef struct {
     char pad0[0x80];
@@ -18,8 +18,8 @@ typedef struct {
     char pad1234[0x105C];
     char *moby;
 } HeroL00;
-extern HeroL00 D_00189E20;
-extern void func_L00_003B0CE8(int);
+extern HeroL00 g_hero_state;
+extern void node_free_slot(int);
 typedef struct { float xyz[3]; int used; int particle; u8 links[8]; } TrailNode;
 extern TrailNode D_L00_0023BB78[];
 extern u8 D_L00_0023BA78[];
@@ -28,12 +28,12 @@ extern float D_L00_001AF81C __attribute__((sda));
 extern float D_L00_001AF820 __attribute__((sda));
 extern int D_L00_001AF824 __attribute__((sda));
 extern float D_L00_001AF828 __attribute__((sda));
-extern float func_00282E48(void *, void *);
-extern void func_L00_003B0AB0(int);
-extern int func_L00_003B0B20(unsigned char, unsigned char, unsigned char *);
-extern void func_L00_003B14D0(float, float, float);
+extern float fast_vec_dist(void *, void *);
+extern void node_free_effect_object(int);
+extern int path_find_between_nodes(unsigned char, unsigned char, unsigned char *);
+extern void trail_spawn_group_burst(float, float, float);
 /* Adds a trail point at the hero's position when the hero has moved far enough, links nearby points and merges close groups. */
-char *func_L00_003B0DA0(void *unused)
+char *RecordHeroTrailNode(void *unused)
 {
     u8 joined[32];
     float previous[4];
@@ -49,14 +49,14 @@ char *func_L00_003B0DA0(void *unused)
         previous[0] = last->xyz[0];
         previous[1] = last->xyz[1];
         previous[2] = last->xyz[2];
-        gap = fast_vec_dist(gHeroState.position, previous);
+        gap = fast_vec_dist(g_hero_state.position, previous);
         if (gap < D_L00_001AF81C) return 0;
     }
     node = &D_L00_0023BB78[D_L00_001AF810];
-    node->used = gFrameCounter_L00;
-    node->xyz[0] = gHeroState.position[0];
-    node->xyz[1] = gHeroState.position[1];
-    node->xyz[2] = gHeroState.position[2];
+    node->used = g_frame_l00_counter;
+    node->xyz[0] = g_hero_state.position[0];
+    node->xyz[1] = g_hero_state.position[1];
+    node->xyz[2] = g_hero_state.position[2];
     {
         int l;
         u8 *link = &node->links[7];
@@ -79,8 +79,8 @@ char *func_L00_003B0DA0(void *unused)
                     if (D_L00_0023BB78[entry].links[b] == cursor)
                         D_L00_0023BB78[entry].links[b] = D_L00_001AF810;
             }
-            FreeNodeEffectObject(cursor);
-            FreeNodeSlot(cursor);
+            node_free_effect_object(cursor);
+            node_free_slot(cursor);
         } else {
             float limit;
             /* cse1 ends its block at this group's loop-end note, so row's multiply below
@@ -112,23 +112,23 @@ char *func_L00_003B0DA0(void *unused)
             }
         }
     }
-    if (++D_L00_001AF810 == D_L00_001AF811) FreeNodeSlot(D_L00_001AF811);
+    if (++D_L00_001AF810 == D_L00_001AF811) node_free_slot(D_L00_001AF811);
     for (i = 0; i < count; ++i) {
         for (j = i + 1; j < count; ++j) {
-            n = FindNodePathBetweenNodes(joined[j], joined[i], D_L00_0023BA78);
+            n = path_find_between_nodes(joined[j], joined[i], D_L00_0023BA78);
             D_L00_0023BA78[n++] = D_L00_001AF810 - 1;
             if (n > D_L00_001AF824) {
                 D_L00_001AF818 = n;
                 z = x = y = 0.0f;
                 divisor = n;
                 for (k = 0; k < n; ++k) {
-                    FreeNodeEffectObject(D_L00_0023BA78[k]);
+                    node_free_effect_object(D_L00_0023BA78[k]);
                     x += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[0];
                     y += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[1];
                     z += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[2];
-                    FreeNodeSlot(D_L00_0023BA78[k]);
+                    node_free_slot(D_L00_0023BA78[k]);
                 }
-                SpawnTrailGroupBurst(x / divisor, y / divisor, z / divisor);
+                trail_spawn_group_burst(x / divisor, y / divisor, z / divisor);
             }
         }
     }

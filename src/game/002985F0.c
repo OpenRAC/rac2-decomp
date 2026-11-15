@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -11,8 +12,8 @@ typedef struct Rac2Native_170b399a2496b87e_LeafSelect7State11Layout {
     int value_168;
 } Rac2Native_170b399a2496b87e_LeafSelect7State11Layout;
 
-extern Rac2Native_170b399a2496b87e_LeafSelect7State11Layout D_001393E0;
+extern Rac2Native_170b399a2496b87e_LeafSelect7State11Layout g_memcard_state;
 
-extern int D_001A7420;
-extern void func_002985F0(void);
+extern int g_save_menu_screen;
+extern void save_menu_select_entry_a(void);
 

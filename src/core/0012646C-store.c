@@ -40,7 +40,7 @@ typedef struct {
 } SdStoreImage __attribute__((aligned(16)));
 
 /* Builds the command packet that reads an image back from graphics memory. */
-int func_0012646C(SdStoreImage *packet, short sbp, short sbw, short spsm, short x, short y, short w, short h)
+int sceGsSetDefStoreImage(SdStoreImage *packet, short sbp, short sbw, short spsm, short x, short y, short w, short h)
 {
     packet->vifcode[0] = 0;
     *(unsigned long *)&packet->finish = 0;

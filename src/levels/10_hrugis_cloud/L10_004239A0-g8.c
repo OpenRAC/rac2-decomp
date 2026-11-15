@@ -10,26 +10,26 @@
    screen_coord mode test reads. The box text goes to func_L05_00303000, which returns the height
    used. */
 
-extern s32 D_001A7340 MACRO_ADDR;
+extern s32 g_screen_width MACRO_ADDR;
 extern u8 D_001A7A0A MACRO_ADDR;
 extern u8 *D_L10_001A904C MACRO_ADDR;
 extern f32 D_L10_001B2D84;
 extern s32 D_L10_001B2D80 MACRO_ADDR;
 extern s32 D_L10_001B355C MACRO_ADDR;
-extern s32 D_L10_001B143C __attribute__((sda));
-extern s32 D_L10_001B1390[] SDATA(D_L10_001B1390);
+extern s32 g_selected_mission_index __attribute__((sda));
+extern s32 g_mission_completion_counts[] SDATA(D_L10_001B1390);
 extern s32 D_L10_001B1448[][3] SDATA(D_L10_001B1448);
 
-extern f32 func_00283CE0(s32);
-extern s32 func_00283CF0(f32);
-extern void *func_00336D50(void *, s32);
-extern void func_00300968(void *, f32, f32, s32, f32, f32);
-extern char *func_00288FB8(s32);
-extern s32 func_00115DA8(char *, char *, ...);
+extern f32 IntToFloat(s32);
+extern s32 FloatToInt(f32);
+extern void *table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object(void *, f32, f32, s32, f32, f32);
+extern char *GetLocalizedString(s32);
+extern s32 sprintf(char *, char *, ...);
 extern s32 func_001157AC(char *);
-extern s32 func_0027FB40(s32, s32, u64, char *, s32);
-extern s32 func_L05_00303000(s32, s32, s32, s32, u64, u8 *, s32);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_medium(s32, s32, u64, char *, s32);
+extern s32 text_print_wrapped_default(s32, s32, s32, s32, u64, u8 *, s32);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -63,29 +63,29 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Draws the reward panel shown after a mission, with the number of coins earned. */
-s32 func_L10_004239A0(void) {
+s32 menu_draw_reward_panel(void) {
     char buf[128];
-    f32 center = IntToFloat(gScreenWidth) * 0.5f;
+    f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;
     char *text;
     s32 x, y, count, index;
 
     if (D_L10_001A904C != 0) {
-        sprite = FindTableEntryById(D_L10_001A904C + 0x8710, 0x45);
-        DrawScaledObjectUniform(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
-        sprite = FindTableEntryById(D_L10_001A904C + 0x8710, 0x44);
-        DrawScaledObjectUniform(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
-        Sprintf(buf, GetLocalizedString(0x2F72), gSelectedMissionIndex + 1);
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x45);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
+        sprite = table_find_by_id(D_L10_001A904C + 0x8710, 0x44);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L10_001B2D84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
+        sprintf(buf, GetLocalizedString(0x2F72), g_selected_mission_index + 1);
         text = GetLocalizedString(0x2F93);
         x = FloatToInt(center);
         y = screen_coord(D_L10_001B2D80, 46.0f, -2.0f);
-        DrawTextCenteredMediumFont(x, y, 0x80F0F0F0, text, strlen_001157AC(text));
+        text_draw_centered_medium(x, y, 0x80F0F0F0, text, func_001157AC(text));
         text = GetLocalizedString(0x31CB);
         {
             s32 ty = label_y(text, 131.0f, D_L10_001B2D84, 0.5f, 1);
-            FontPrintWrappedDefault(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, strlen_001157AC(text));
+            text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
         }
-        index = gMissionCompletionCounts[D_L10_001B355C] - 1;
+        index = g_mission_completion_counts[D_L10_001B355C] - 1;
         if (index >= 3)
             index = 2;
         count = D_L10_001B1448[D_L10_001B355C][index];
@@ -93,17 +93,17 @@ s32 func_L10_004239A0(void) {
             count *= 10;
         text = buf;
         if (count == 0)
-            Sprintf(buf, GetLocalizedString(0x11FB));
+            sprintf(buf, GetLocalizedString(0x11FB));
         else
-            Sprintf(buf, GetLocalizedString(0x2FC6), count);
+            sprintf(buf, GetLocalizedString(0x2FC6), count);
         {
             s32 ty = label_y(text, 210.0f, D_L10_001B2D84, 0.5f, 1);
-            FontPrintWrappedDefault(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, strlen_001157AC(text));
+            text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
         }
         y = screen_coord(D_L10_001B2D80, 294.0f, 3.0f);
-        DrawTextMediumFont(117, y, 0x80F0F0F0, GetLocalizedString(0x31CC), -1);
+        text_draw_medium(117, y, 0x80F0F0F0, GetLocalizedString(0x31CC), -1);
         y = screen_coord(D_L10_001B2D80, 294.0f, 3.0f);
-        DrawTextMediumFont(274, y, 0x80F0F0F0, GetLocalizedString(0x31CD), -1);
+        text_draw_medium(274, y, 0x80F0F0F0, GetLocalizedString(0x31CD), -1);
     }
     return 1;
 }

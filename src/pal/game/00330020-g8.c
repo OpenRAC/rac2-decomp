@@ -19,7 +19,7 @@ extern float D_001B0870 __attribute__((sda));
 extern int D_001B0820 __attribute__((sda));
 extern int D_001B0824 __attribute__((sda));
 extern float ref_L00_0032E4F0_04;
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 void func_PAL_00330020(float size)
 {
@@ -37,5 +37,5 @@ void func_PAL_00330020(float size)
     block->field_21C = zoom;
     ref_L00_0032E4F0_04 = size;
     block->field_228 = 255.0f;
-    func_0027AB40();
+    UpdateViewContext();
 }

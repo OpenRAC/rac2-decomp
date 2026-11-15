@@ -8,20 +8,20 @@
 
 typedef int Quad __attribute__((mode(TI)));
 typedef unsigned long long Mask;
-extern int *D_L23_001FF300[];
-extern Mask D_L23_002595C8[][2];
+extern int *g_path_lists[];
+extern Mask g_path_end_masks[][2];
 extern float D_L23_001B1410 __attribute__((sda));
-extern void func_L23_00418650(char *, float);
-extern int func_L23_00418BC8(char *, char *, char *);
-extern void func_L23_00418DC0(char *, int);
-extern float func_00282E48(char *, char *);
-extern float func_L00_0031BDC0(float *, const float *, const float *, const float *);
-extern void func_L23_004190C8(char *, Mask, int, int);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
-extern void func_L23_0041BFF0(char *);
-extern int func_L22_003300E8(char *, Quad *);
-extern void func_L23_0041C040(char *);
+extern void mothership_project_point_onto_surface(char *, float);
+extern int mothership_check_clear_path(char *, char *, char *);
+extern void mothership_pick_nearest_path_point(char *, int);
+extern float fast_vec_dist(char *, char *);
+extern float coll_project_point_on_segment(float *, const float *, const float *, const float *);
+extern void SelectMaskedEncounterTarget(char *, Mask, int, int);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void mothership_disable_part_flags(char *);
+extern int moby_copy_vector_to_child(char *, Quad *);
+extern void mothership_restore_part_flags(char *);
 /* Path follower state: phase at 0x390, direction (+1/-1) at 0x392, path slot index at 0x394,
    point index at 0x396, per-slot path numbers at 0x230. */
 typedef struct { char pad[0x392]; short direction; } PathState;
@@ -31,7 +31,7 @@ typedef struct { char pad[0x230]; int slot[16]; } SlotState;
 #define H(off) (*(short *)(state + (off)))
 
 /* Advance the selected path segment and send its displacement to the object. */
-void func_L23_004186D0(char *object, float height) {
+void FollowWaypointPath(char *object, float height) {
     struct { Quad target, raised, secondary, point; float before, after; } local;
     char *state = *(char **)(object + 0x68);
     char *point;
@@ -42,21 +42,21 @@ void func_L23_004186D0(char *object, float height) {
     char *source = *(char **)(state + 0x400);
     qcopy(&local.target, source);
     qcopy(&local.raised, source);
-    ProjectPointOntoPlanetSurface((char *)&local.raised, 0.0f);
+    mothership_project_point_onto_surface((char *)&local.raised, 0.0f);
     qcopy(&local.secondary, *(char **)(state + 0x400));
-    ProjectPointOntoPlanetSurface((char *)&local.secondary, height);
-    CheckClearPathBetweenPoints(object, object+16, *(char **)(state + 0x400));
+    mothership_project_point_onto_surface((char *)&local.secondary, height);
+    mothership_check_clear_path(object, object+16, *(char **)(state + 0x400));
     if (H(0x390) != 0)
-        ProjectPointOntoPlanetSurface(state + 0x3A0, *(float *)(state + 0x588));
+        mothership_project_point_onto_surface(state + 0x3A0, *(float *)(state + 0x588));
     if (H(0x390) == 0) H(0x390) = 1;
     mode = H(0x390);
     H(0x406) = 0;
     if (mode) {
         switch (mode) {
         case 1:
-            PickNearestPathPoint(object, 1);
+            mothership_pick_nearest_path_point(object, 1);
             index = H(0x396);
-            list = gPathLists[((SlotState *)state)->slot[H(0x394)]];
+            list = g_path_lists[((SlotState *)state)->slot[H(0x394)]];
             point = (char *)(index * 16 + (int)list + 16);
             qcopy(&local.point, point);
             H(0x390) = 2;
@@ -64,7 +64,7 @@ void func_L23_004186D0(char *object, float height) {
             if (H(0x396) == 0) {
                 if (fast_vec_dist((char *)list + 32, (char *)&local.raised) < distance) {
                     DIR = 1;
-                    ProjectPointOnSegment((float *)(state + 0x3A0), (float *)&local.point,
+                    coll_project_point_on_segment((float *)(state + 0x3A0), (float *)&local.point,
                         (float *)((char *)list + (H(0x396) * 16 + 32)), (float *)(object + 16));
                 } else {
                     *(Quad *)(state + 0x3A0) = local.point;
@@ -73,7 +73,7 @@ void func_L23_004186D0(char *object, float height) {
             } else if (H(0x396) == *list - 1) {
                 if (fast_vec_dist((char *)list + (*list * 16 - 16), (char *)&local.raised) < distance) {
                     DIR = -1;
-                    ProjectPointOnSegment((float *)(state + 0x3A0), (float *)&local.point,
+                    coll_project_point_on_segment((float *)(state + 0x3A0), (float *)&local.point,
                         (float *)((char *)list + (H(0x396) * 16)), (float *)(object + 16));
                 } else {
                     *(Quad *)(state + 0x3A0) = local.point;
@@ -84,10 +84,10 @@ void func_L23_004186D0(char *object, float height) {
                 local.after = fast_vec_dist((char *)list + (H(0x396) * 16 + 32), (char *)&local.raised);
                 if (local.before < local.after) DIR = -1;
                 else DIR = 1;
-                ProjectPointOnSegment((float *)(state + 0x3A0), (float *)&local.point,
+                coll_project_point_on_segment((float *)(state + 0x3A0), (float *)&local.point,
                     (float *)((char *)list + (DIR * 16 + 16)), (float *)(object + 16));
             }
-            ProjectPointOntoPlanetSurface(state + 0x3A0, height);
+            mothership_project_point_onto_surface(state + 0x3A0, height);
             break;
         case 2:
             if (fast_vec_dist(object + 16, state + 0x3A0) < 2.0f) H(0x390) = 3;
@@ -99,21 +99,21 @@ void func_L23_004186D0(char *object, float height) {
                 if (next < 0) {
                     PathSlots *slots = (PathSlots *)(state + 0x230);
                     int slot = slots->id[H(0x394)];
-                    SelectMaskedEncounterTarget(object, gPathEndMasks[slot][0], 1, 1);
+                    SelectMaskedEncounterTarget(object, g_path_end_masks[slot][0], 1, 1);
                 } else {
                     PathSlots *slots = (PathSlots *)(state + 0x230);
                     int slot = slots->id[H(0x394)];
-                    if (next >= *gPathLists[slot])
-                        SelectMaskedEncounterTarget(object, gPathEndMasks[slot][1], 1, 1);
+                    if (next >= *g_path_lists[slot])
+                        SelectMaskedEncounterTarget(object, g_path_end_masks[slot][1], 1, 1);
                     else H(0x396) = next;
                 }
                 {
                     PathSlots *slots = (PathSlots *)(state + 0x230);
                     int slot = slots->id[H(0x394)];
-                    char *target = (char *)(H(0x396) * 16 + (int)gPathLists[slot] + 16);
+                    char *target = (char *)(H(0x396) * 16 + (int)g_path_lists[slot] + 16);
                     qcopy(state + 0x3A0, target);
                 }
-                ProjectPointOntoPlanetSurface(state + 0x3A0, height);
+                mothership_project_point_onto_surface(state + 0x3A0, height);
             }
             qcopy(&local.target, state + 0x3A0);
             break;
@@ -124,8 +124,8 @@ void func_L23_004186D0(char *object, float height) {
     }
     FastVecSub((char *)&local.point, (char *)&local.target, object + 16);
     vec_scale_to_length((char *)&local.point, (char *)&local.point, *(float *)(state + 0x5C8) * 0.016666668f);
-    DisableBossPartFlags(object);
-    CopyVectorToChildMoby(object, &local.point);
-    RestoreBossPartFlags(object);
+    mothership_disable_part_flags(object);
+    moby_copy_vector_to_child(object, &local.point);
+    mothership_restore_part_flags(object);
     D_L23_001B1410 = 1.0f;
 }

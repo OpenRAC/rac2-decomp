@@ -9,11 +9,11 @@ extern char D_L00_001AD3D0[];
 
 extern void func_002F00A8(void);
 extern int func_002F0218(int);
-extern void func_002FC748(void);
-extern void func_0026FEB8(const char *, ...);
+extern void gfx_append_vu1_preset_a(void);
+extern void STUB_printf(const char *, ...);
 
 /* Adds an empty marker to the render list, runs the main render passes, records how big the list got, and links the markers together. */
-void func_002EF1E8(void)
+void gfx_build_render_list_markers(void)
 {
     char *oldHead;
     char *oldTail;
@@ -28,7 +28,7 @@ void func_002EF1E8(void)
     *(int *)(D_L00_001B24FC + 12) = 0;
     func_002F00A8();
     chainSize = func_002F0218(D_001A72D0);
-    AppendVu1DmaChainTable1();
+    gfx_append_vu1_preset_a();
     if (0x400000 < chainSize) {
         STUB_printf(D_L00_001AD3D0);
     }

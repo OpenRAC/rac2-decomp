@@ -37,25 +37,25 @@ extern float D_L00_001AEE00 __attribute__((sda));
 extern float D_L00_001AEE04 __attribute__((sda));
 extern float D_L00_001AED60 __attribute__((sda));
 extern float D_L00_001AEDB8 __attribute__((sda));
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
-extern float func_002AA2E8(float *, float, float);
-extern int func_002E5CF8(int, int, char *);
-extern int func_00282948(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void *func_002A9640(void *, s32, s32);
-extern int func_002A77E0(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_L00_003851A0(char *, void *);
+extern float ApproachValue(float *, float, float);
+extern int PlayMobySound(int, int, char *);
+extern int math_fast_float_d(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
+extern int math_random_int_below(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void part_spawn_goal_score(char *, void *);
 extern void func_002A05A8(char *);
 extern void func_002A0F48(char *);
-extern s32 func_L00_0031D620(s32, s32, f32);
-extern char *func_L00_00384D40(char *, void *, void *);
+extern s32 math_lerp_int(s32, s32, f32);
+extern char *hoverbomb_create_projectile(char *, void *, void *);
 
 /* Runs the board of 24 sheep: sways the grid, lifts hit sheep up and, when some are still standing, launches a Hoverbomb Projectile. */
-void func_L00_00384678(char *owner)
+void sheep_board_update(char *owner)
 {
     Board_384678 *board;
     float base[4] __attribute__((aligned(16)));
@@ -90,7 +90,7 @@ void func_L00_00384678(char *owner)
     }
     if (board->timer != 0 && board->timer % 5 == 0)
         PlayMobySound(0, 0, D_L00_00232A60[0]);
-    FastFloatHelperD(&board->timer);
+    math_fast_float_d(&board->timer);
     *(TI128 *)base = *(TI128 *)D_L00_001AED40;
     base[1] += board->x - board->drop;
     base[2] += board->y;
@@ -108,13 +108,13 @@ void func_L00_00384678(char *owner)
         FastVecScale(vb, D_L00_001AEDE0, (float)(i % 8));
         FastVecAdd(va.f, va.f, vb);
         FastVecAdd(va.f, va.f, base);
-        matrix_mul_vec3(D_L00_00232A60[i] + 0x10, va.f, gCameraPosition_L00 + 0x230);
-        FastVecAdd(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, gCameraPosition_L00);
+        matrix_mul_vec3(D_L00_00232A60[i] + 0x10, va.f, g_camera_l00_position + 0x230);
+        FastVecAdd(D_L00_00232A60[i] + 0x10, D_L00_00232A60[i] + 0x10, g_camera_l00_position);
         *(float *)(D_L00_00232A60[i] + 0x2C) = *(float *)(((Tile_384678 *)D_L00_00232A60[i])->cls + 0x24) * D_L00_001AED60;
         if ((((Tile_384678 *)D_L00_00232A60[i])->flags ^ 1) & 1) {
             hit++;
-            if (FindOwnedEffectSlot(D_L00_00232A60[i], -1, 0)) {
-                if (!RandomIntBelow(3))
+            if (part_find_owned_effect_slot(D_L00_00232A60[i], -1, 0)) {
+                if (!math_random_int_below(3))
                     PlayMobySound(0, 0, D_L00_00232A60[i]);
                 ((Tile_384678 *)D_L00_00232A60[i])->flags |= 0x41;
                 ((Tile_384678 *)D_L00_00232A60[i])->flags &= 0xEFFF;
@@ -122,14 +122,14 @@ void func_L00_00384678(char *owner)
                 *(u8 *)(D_L00_00232A60[i] + 0xA8) = 0xFF;
                 vec_scale_to_length(vc, D_L00_00232A60[i] + 0xE0, 0.05f);
                 FastVecAdd(vc, vc, D_L00_00232A60[i] + 0x10);
-                SpawnGoalScoreParticles(D_L00_00232A60[i], vc);
+                part_spawn_goal_score(D_L00_00232A60[i], vc);
             }
             func_002A05A8(D_L00_00232A60[i]);
             func_002A0F48(D_L00_00232A60[i]);
         }
     }
-    chosen = RandomIntBelow(hit);
-    if (hit != 0 && FastFloatHelperD(&board->liftTimer)) {
+    chosen = math_random_int_below(hit);
+    if (hit != 0 && math_fast_float_d(&board->liftTimer)) {
         for (count = 0; count < 24; count++) {
             if (!((((Tile_384678 *)D_L00_00232A60[count])->flags ^ 1) & 1))
                 continue;
@@ -142,13 +142,13 @@ void func_L00_00384678(char *owner)
                 liftRate = 1.0f;
             else if (liftRate < 0.0f)
                 liftRate = 0.0f;
-            board->liftTimer = LerpInt(1, 0xF0, liftRate);
+            board->liftTimer = math_lerp_int(1, 0xF0, liftRate);
             va.q = 0;
             va.f[2] = 0.05f;
             matrix_mul_vec3(va.f, va.f, D_L00_00232A60[count] + 0xC0);
             FastVecAdd(va.f, va.f, D_L00_00232A60[count] + 0x10);
             vec_scale_to_length(vb, D_L00_00232A60[count] + 0xC0, D_L00_001AEDB8 * 0.016666668f);
-            CreateHoverbombProjectile(D_L00_00232A60[count], va.f, vb);
+            hoverbomb_create_projectile(D_L00_00232A60[count], va.f, vb);
         }
     }
 }

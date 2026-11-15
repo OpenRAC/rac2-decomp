@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,14 +24,14 @@
  */
 #include "common.h"
 
-extern s32 func_0027C878(s32);
-extern void func_0027E4A8(f32, f32, s32, s32, s32, s32, s32, f32, f32, s32, s32, f32, f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 func_00283B98(f32, f32);
+extern s32 GetEffectTextureDescriptor(s32);
+extern void AppendRotatedSpriteQuad(f32, f32, s32, s32, s32, s32, s32, f32, f32, s32, s32, f32, f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 FastAddRotations(f32, f32);
 
 /* Draws a sprite on screen at the given position, as one image, a spread of copies, or a 2x2 tile set. */
-void func_002729A0(s8 *sprite, f32 screenX, f32 screenY)
+void gfx_draw_screen_sprite(s8 *sprite, f32 screenX, f32 screenY)
 {
     f32 offsets[2][4];
     s32 texture;
@@ -57,10 +58,10 @@ void func_002729A0(s8 *sprite, f32 screenX, f32 screenY)
         }
         break;
     case 1:
-        offsets[0][0] = FastSinOrCosB(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
-        offsets[0][1] = FastSinOrCosA(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
-        offsets[1][0] = FastSinOrCosA(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
-        offsets[1][1] = FastSinOrCosB(angle) * -baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
+        offsets[0][0] = math_fast_sin_or_cos_b(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
+        offsets[0][1] = math_fast_sin_or_cos_a(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
+        offsets[1][0] = math_fast_sin_or_cos_a(angle) * baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
+        offsets[1][1] = math_fast_sin_or_cos_b(angle) * -baseSize * (*(f32 *)((s8 *)(sprite) + (0x10)));
         ((void (*)(f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, s32, s32, f32, f32))AppendRotatedSpriteQuad)(
             screenX, screenY, (*(f32 *)((s8 *)(sprite) + (0x10))) * baseSize, (*(f32 *)((s8 *)(sprite) + (0x10))) * baseSize, angle,
             63, 63, texture, 0xFFFFF3, (*(s32 *)((s8 *)(sprite) + (0x14))), 0, 0, 0.0f, 0.0f);

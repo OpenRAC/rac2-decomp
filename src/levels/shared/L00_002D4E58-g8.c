@@ -16,16 +16,16 @@ extern float D_L00_001A7CF8 __attribute__((sda));
 extern Manipulator4E58 D_L00_001B16D0 __attribute__((sda));
 extern Manipulator4E58 D_L00_001B2D80[];
 extern int D_0018B090[];
-extern void func_0029F978(char *, int, Manipulator4E58 *);
-extern void func_L00_002D4D98(char *);
-extern void func_L00_002D4C28(char *);
+extern void AttachManipulator(char *, int, Manipulator4E58 *);
+extern void level_spawn_glow_object(char *);
+extern void level_update_glow_objects(char *);
 
 /* Sets the two option-dependent scales, attaches manipulator 24 to the object (scaled 0.92, or
    0.97 of the first scale and the first scale itself) unless object kind 0xF6B, then either
    runs the one-shot spawn or attaches manipulators 22 and 23 at scale 0.01 and runs
    func_L00_002D4C28. */
 /* Sets up the glow effects on a level object, either spawning the glow object or attaching the glow records and running the level update. */
-void func_L00_002D4E58(char *object, int spawn)
+void level_setup_glow_effects(char *object, int spawn)
 {
     Manipulator4E58 *glowRecord;
     int i;
@@ -53,7 +53,7 @@ void func_L00_002D4E58(char *object, int spawn)
     if (*(short *)(object + 0xAA) == 0xF6B /* moby class 3947 */)
         return;
     if (spawn) {
-        SpawnLevelGlowObject(object);
+        level_spawn_glow_object(object);
         return;
     }
     if (D_0018B090[0]) {
@@ -67,5 +67,5 @@ void func_L00_002D4E58(char *object, int spawn)
             }
         }
     }
-    UpdateLevelGlowObjects(object);
+    level_update_glow_objects(object);
 }

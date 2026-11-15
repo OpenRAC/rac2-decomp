@@ -30,10 +30,10 @@ typedef struct {
 } L00FadeRecord;
 extern L00FadeRecord D_L00_001BD2C0;
 
-extern void func_00282948(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_0027AB40(void);
+extern void math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void UpdateViewContext(void);
 
 void func_PAL_L00_004007B0(void)
 {
@@ -42,18 +42,18 @@ void func_PAL_L00_004007B0(void)
     if (D_L00_001B0B64 <= 0) {
         return;
     }
-    func_00282948(&D_L00_001B0B64);
-    ratio = func_00283CE0(D_L00_001B0B64) / func_00283CE0(((D_L00_001B0B60 * 5 + 2) / 6));
+    math_fast_float_d(&D_L00_001B0B64);
+    ratio = IntToFloat(D_L00_001B0B64) / IntToFloat(((D_L00_001B0B60 * 5 + 2) / 6));
     D_L00_001BD2C0.i230 =
-        func_00283CF0(func_00283CE0(D_L00_001B1980[0]) + (255.0f - func_00283CE0(D_L00_001B1980[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1980[0]) + (255.0f - IntToFloat(D_L00_001B1980[0])) * ratio);
     D_L00_001BD2C0.i234 =
-        func_00283CF0(func_00283CE0(D_L00_001B1981[0]) + (255.0f - func_00283CE0(D_L00_001B1981[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1981[0]) + (255.0f - IntToFloat(D_L00_001B1981[0])) * ratio);
     D_L00_001BD2C0.i238 =
-        func_00283CF0(func_00283CE0(D_L00_001B1982[0]) + (255.0f - func_00283CE0(D_L00_001B1982[0])) * ratio);
+        FloatToInt(IntToFloat(D_L00_001B1982[0]) + (255.0f - IntToFloat(D_L00_001B1982[0])) * ratio);
     D_L00_001BD2C0.f218 = D_L00_001B1984[0] + -D_L00_001B1984[0] * ratio;
     D_L00_001BD2C0.f21C =
         D_L00_001B1988[0] + (D_L00_001B2BE0[0] * (D_L00_001B0BB0 * 1024.0f) - D_L00_001B1988[0]) * ratio;
     D_L00_001BD2C0.f228 = D_L00_001B198C[0] + (255.0f - D_L00_001B198C[0]) * ratio;
     D_L00_001BD2C0.f22C = D_L00_001B1990[0] + (100.0f - D_L00_001B1990[0]) * ratio;
-    func_0027AB40();
+    UpdateViewContext();
 }

@@ -13,9 +13,9 @@ typedef struct {
     char pad3[0x23D];
     short count;                 /* 0x24F2 */
 } StateDF3F8;
-extern StateDF3F8 D_00189E20;
+extern StateDF3F8 g_hero_state;
 extern unsigned char D_00211A10[], D_00210DA0[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern unsigned char D_0019B2E8[], D_0019B4A8[];
 typedef struct {
     int active;
@@ -32,24 +32,24 @@ typedef struct {
     int other_count, other_word;  /* 0xC64 */
 } SnapshotDF3F8;
 extern SnapshotDF3F8 D_002119B0;
-extern struct { char pad[0x64]; int word; unsigned char bytes[3]; } D_00188660;
-extern struct { char pad[0x48]; short count; } D_001A63A8;
+extern struct { char pad[0x64]; int word; unsigned char bytes[3]; } g_sound_state;
+extern struct { char pad[0x48]; short count; } g_music_state;
 extern int D_001C4F40;
 extern unsigned char D_001B1640 MACRO_ADDR, D_001B1641 MACRO_ADDR, D_001B1642 MACRO_ADDR;
 extern float D_001B1644 MACRO_ADDR, D_001B1648 MACRO_ADDR, D_001B164C MACRO_ADDR, D_001B1650 MACRO_ADDR;
-extern void func_00282AB0(void *, void *, int);
+extern void mem_copy_aligned(void *, void *, int);
 
 /* Takes a snapshot of the map progress, two positions and several game values so they can be restored later. */
-void func_002DF3F8(void *vecA, void *vecB) {
+void level_capture_checkpoint_state(void *vecA, void *vecB) {
     unsigned char *dst;
     unsigned char *src;
     int i;
     int level;
     int offset;
-    if (gHeroState.mode == 4)
+    if (g_hero_state.mode == 4)
         return;
-    CopyMemoryAligned(D_00211A10, D_00210DA0, 0x404);
-    level = gCurrentMapIndex;
+    mem_copy_aligned(D_00211A10, D_00210DA0, 0x404);
+    level = g_current_map_index;
     offset = level * 16 - 2;
     dst = D_00211A10 + 0x404;
     src = D_00210DA0 + 0x404;
@@ -76,17 +76,17 @@ void func_002DF3F8(void *vecA, void *vecB) {
     qcopy_nc(D_002119B0.a, vecA);
     qcopy_nc(D_002119B0.b, vecB);
     {
-        ObjectDF3F8 *obj = gHeroState.object;
+        ObjectDF3F8 *obj = g_hero_state.object;
         D_002119B0.obj_a = obj->a;
         D_002119B0.obj_b = obj->b;
-        D_002119B0.mode = gHeroState.mode;
+        D_002119B0.mode = g_hero_state.mode;
         D_002119B0.object = obj;
-        D_002119B0.count = gHeroState.count;
-        D_002119B0.word = gSoundState.word;
-        D_002119B0.bytes[0] = gSoundState.bytes[0];
-        D_002119B0.bytes[1] = gSoundState.bytes[1];
-        D_002119B0.bytes[2] = gSoundState.bytes[2];
-        D_002119B0.other_count = gMusicState.count;
+        D_002119B0.count = g_hero_state.count;
+        D_002119B0.word = g_sound_state.word;
+        D_002119B0.bytes[0] = g_sound_state.bytes[0];
+        D_002119B0.bytes[1] = g_sound_state.bytes[1];
+        D_002119B0.bytes[2] = g_sound_state.bytes[2];
+        D_002119B0.other_count = g_music_state.count;
         D_002119B0.other_word = D_001C4F40;
         D_002119B0.bytes[3] = D_001B1640;
         D_002119B0.bytes[4] = D_001B1641;

@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* DrawSpinningLayeredQuads: the RAC1 counterpart is draw_blarg_heavy_interceptor_spinning_beam
+/* gfx_draw_spinning_layered_quads: the RAC1 counterpart is draw_blarg_heavy_interceptor_spinning_beam
    (rac1-decomp, src/overlays/l14_oltanis/heavy_interceptor_and_turrets.c). Its corner table is a
    complete four-vector, 64-byte object read through $gp, hence this unit's -G64 -Wa,-G64. */
 
@@ -14,18 +14,18 @@ typedef struct {
 extern float D_L09_001B1200[4][4] __attribute__((sda)); /* quad corners */
 extern char D_L09_001B9A00[];                            /* camera position */
 
-extern u64 func_0027C878(int);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_00283180(float), func_00283198(float);
-extern float func_00283248(float, float), func_00282E20(void *), func_00283B98(float, float);
-extern void func_00282CF0(void *, void *, void *), func_002833F0(void *, void *);
-extern void func_00282D30(void *, void *, float), func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *), func_00280B90(void *, void *, int);
-extern void func_002FC560(int, u64);
+extern u64 GetEffectTextureDescriptor(int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern float mat_fast_helper_a(float, float), vec_length_xy(void *), FastAddRotations(float, float);
+extern void FastVecSub(void *, void *, void *), euler_rotation_basis(void *, void *);
+extern void FastVecScale(void *, void *, float), transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *), draw_world_quad(void *, void *, int);
+extern void VU1_addGSregister(int, u64);
 
 /* Draws sixteen pairs of camera-facing quads offset along the object's spin direction, each pair
    larger and more transparent than the last, then advances the spin angle. */
-void func_L09_003FD460(char *moby) {
+void gfx_draw_spinning_layered_quads(char *moby) {
     char *d = *(char **)(moby + 0x68);
     float src[4][4];    /* as in RAC1, only rows 0 and 3 are used: the frame keeps rows 1 and 2 */
     DobboBeamQuad pk;
@@ -42,11 +42,11 @@ void func_L09_003FD460(char *moby) {
     u32 col;
     int i, j;
 
-    TransformMobyJointToWorld(moby, 8, src[3]);
+    moby_transform_joint_to_world(moby, 8, src[3]);
     src[3][3] = 1.0f;
     angle = *(float *)(d + 0x380);
-    src[0][0] = FastSinOrCosA(angle);
-    src[0][1] = FastSinOrCosB(angle);
+    src[0][0] = math_fast_sin_or_cos_a(angle);
+    src[0][1] = math_fast_sin_or_cos_b(angle);
     src[0][2] = 0.0f;
     pk.b = GetEffectTex(0xB);
     pk.c = 0x0000FF9000000260ULL;
@@ -56,8 +56,8 @@ void func_L09_003FD460(char *moby) {
     qcopy(mat[3], src[3]);
     mat[3][3] = 1.0f;
     FastVecSub(v, D_L09_001B9A00, mat[3]);
-    rot[2] = FastMatrixHelperA(v[0], v[1]);
-    rot[1] = -FastMatrixHelperA(vec_length_xy(v), v[2]);
+    rot[2] = mat_fast_helper_a(v[0], v[1]);
+    rot[1] = -mat_fast_helper_a(vec_length_xy(v), v[2]);
     rot[0] = 0.0f;
     euler_rotation_basis(rm, rot);
     qcopy(mat[0], rm[0]);
@@ -127,7 +127,7 @@ typedef struct {
 
 /* Draws the camera-facing glow quad at the beam's tip, tinted red while the emitter is damaged
    (the RAC1 counterpart is draw_blarg_heavy_interceptor_camera_facing_glow). */
-void func_L09_003FCF68(char *moby)
+void beam_draw_tip_glow(char *moby)
 {
     float mat[3][4];
     float pos[4];
@@ -148,8 +148,8 @@ void func_L09_003FCF68(char *moby)
     quad.a = 0;
     VU1_addGSregister(0x47, 0x51001);
     FastVecSub(to_camera, D_L09_001B9A00, pos);
-    rot[2] = FastMatrixHelperA(to_camera[0], to_camera[1]);
-    rot[1] = -FastMatrixHelperA(vec_length_xy(to_camera), to_camera[2]);
+    rot[2] = mat_fast_helper_a(to_camera[0], to_camera[1]);
+    rot[1] = -mat_fast_helper_a(vec_length_xy(to_camera), to_camera[2]);
     rot[0] = 0.0f;
     euler_rotation_basis(mat, rot);
     quad.uv[0] = 1.0f;

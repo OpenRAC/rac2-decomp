@@ -9,7 +9,7 @@ extern void *D_00133E74;
 /* The exit thunk (src/core/00131780.c): a tail call to exit that drops the
    status it is given. Retail calls it with the status in $a0, and it never
    returns, so the function has no epilogue. */
-extern void func_00131CA8(int arg0) __attribute__((noreturn));
+extern void exit_ignoring_status(int arg0) __attribute__((noreturn));
 
 /* One node of the exit-procedure list: the next node, how many handlers the
    node holds, and the handlers behind it. They are called back to front. */
@@ -29,7 +29,7 @@ struct ExitReent {
 };
 
 /* Runs every function registered to run at exit, then ends the program. */
-void func_00115E90(int status) {
+void exit_run_atexit(int status) {
     struct ExitReent *reent;
     struct ExitProc *proc;
     int count;
@@ -48,5 +48,5 @@ void func_00115E90(int status) {
         reent->unk3C(reent);
     }
 
-    ExitIgnoringStatus(status);
+    exit_ignoring_status(status);
 }

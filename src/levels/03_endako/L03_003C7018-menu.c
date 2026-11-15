@@ -20,14 +20,14 @@ extern int D_L03_001B3280 __attribute__((sda));
 extern float D_L03_001B3284 __attribute__((sda));
 extern char D_L03_001B0190[], D_L03_001B0198[];
 extern unsigned char D_001A7A7C[] __attribute__((sda));
-extern int func_00336D50(unsigned char *, int);
-extern void func_00300A00(char *, int, float, float, float, float, float);
-extern unsigned char *func_00288FB8(int);
-extern int func_00115DA8(char *, char *, ...);
-extern int func_00283CF0(float);
-extern int func_0027FB40(int, int, unsigned long, unsigned char *, int);
-extern int func_L00_00443DF8(char *);
-extern int func_L00_00443E18(char *);
+extern int table_find_by_id(unsigned char *, int);
+extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
+extern unsigned char *GetLocalizedString(int);
+extern int sprintf(char *, char *, ...);
+extern int FloatToInt(float);
+extern int text_draw_centered_medium(int, int, unsigned long, unsigned char *, int);
+extern int sub_object_get_value_first(char *);
+extern int sub_object_get_value_second(char *);
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
@@ -68,7 +68,7 @@ static __inline__ int screen_coord(int mode, float value, float offset, int one)
 }
 
 /* Draws the two-line menu panel: a title line, four option labels and, when needed, the extra panel. */
-int func_L03_003C7018(void)
+int menu_draw_two_line_panel(void)
 {
     if (D_L03_001A904C) {
         int one;
@@ -79,13 +79,13 @@ int func_L03_003C7018(void)
             float row, x, c, d;
 
             do {
-                title = (char *)FindTableEntryById(D_L03_001A904C + 0x8710, 0xc6);
+                title = (char *)table_find_by_id(D_L03_001A904C + 0x8710, 0xc6);
                 row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
-            DrawScaledObjectTwoAxes(title, 0x60442d00, x, row, c, d, 0.0f);
+            gfx_draw_scaled_object_two_axes(title, 0x60442d00, x, row, c, d, 0.0f);
         }
         {
             char *title;
@@ -93,14 +93,14 @@ int func_L03_003C7018(void)
 
             do {
             do {
-                title = (char *)FindTableEntryById(D_L03_001A904C + 0x8710, 0xc7);
+                title = (char *)table_find_by_id(D_L03_001A904C + 0x8710, 0xc7);
                 row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
             do {
-                DrawScaledObjectTwoAxes(title, 0x55f0c070, x, row, c, d, 0.0f);
+                gfx_draw_scaled_object_two_axes(title, 0x55f0c070, x, row, c, d, 0.0f);
                 i = 0;
             } while (0);
             } while (0);
@@ -116,19 +116,19 @@ int func_L03_003C7018(void)
                 int x;
                 unsigned char *label = GetLocalizedString(keys[i]);
                 if (i == one) {
-                    Sprintf((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
+                    sprintf((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
-                    Sprintf((char *)buf, D_L03_001B0198, label);
+                    sprintf((char *)buf, D_L03_001B0198, label);
                 }
                 x = FloatToInt(D_L03_001B0160[i].x);
-                DrawTextCenteredMediumFont(x, FloatToInt((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
+                text_draw_centered_medium(x, FloatToInt((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }
         if (D_001A7A7C[0]) {
-            GetSubObjectValue1D6C((char *)D_L03_001A904C + 0x36f28);
-            GetSubObjectValue1D6CB((char *)D_L03_001A904C + 0x36f28);
+            sub_object_get_value_first((char *)D_L03_001A904C + 0x36f28);
+            sub_object_get_value_second((char *)D_L03_001A904C + 0x36f28);
         }
     }
     return 1;

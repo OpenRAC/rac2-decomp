@@ -10,15 +10,15 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned char u8;
 typedef int s32;
 
-extern char D_00188660[];
-extern int func_002E5CF8(int, int, char *);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
+extern char g_sound_state[];
+extern int PlayMobySound(int, int, char *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
 
 /* Makes the object wobble and sway a little each frame, and keeps its looping sound playing. */
-void func_L02_00401BF8(char *moby) {
+void sway_apply_wobble(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    char *soundRecord = gSoundState + *(s32 *)(vars + 0x16C) * 0x70;
+    char *soundRecord = g_sound_state + *(s32 *)(vars + 0x16C) * 0x70;
     float phase;
 
     if (*(char **)(soundRecord + 0x88) != moby || *(u8 *)(soundRecord + 0x74) == 0)
@@ -27,11 +27,11 @@ void func_L02_00401BF8(char *moby) {
     *(TI128 *)(moby + 0xF0) = *(TI128 *)(vars + 0x130);
     phase = FastAddRotations(*(float *)(vars + 0x148), 0.008726648f);
     *(float *)(vars + 0x148) = phase;
-    *(float *)(moby + 0xF0) += FastSinOrCosB(phase) * 0.05f;
+    *(float *)(moby + 0xF0) += math_fast_sin_or_cos_b(phase) * 0.05f;
     phase = FastAddRotations(*(float *)(vars + 0x144), 0.0145444125f);
     *(float *)(vars + 0x144) = phase;
-    *(float *)(moby + 0xF4) += FastSinOrCosB(phase) * 0.05f;
+    *(float *)(moby + 0xF4) += math_fast_sin_or_cos_b(phase) * 0.05f;
     phase = FastAddRotations(*(float *)(vars + 0x140), 0.020362178f);
     *(float *)(vars + 0x140) = phase;
-    *(float *)(moby + 0x18) += FastSinOrCosB(phase) * 0.25f;
+    *(float *)(moby + 0x18) += math_fast_sin_or_cos_b(phase) * 0.25f;
 }

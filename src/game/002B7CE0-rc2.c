@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,37 +24,37 @@
  */
 #include "common.h"
 
-extern s16 D_001A63A8[];
-extern void func_002B7578(void);
-extern void func_00133230(void);
-extern void func_00132028(void);
-extern void func_00133220(void);
-extern void func_00282A38(s32);
+extern s16 g_music_state[];
+extern void snd_update_music_system(void);
+extern void snd_clear_flag_and_update(void);
+extern void snd_Pump(void);
+extern void snd_set_current_buffer_flag(void);
+extern void mem_fast_helper_a(s32);
 
 /* Runs the music and disc read steps once, or repeatedly until the disc read is idle when asked. Returns the read state. */
-s16 func_002B7CE0(s32 waitUntilIdle) {
+s16 snd_pump_music_and_disc_read(s32 waitUntilIdle) {
     s16 *state;
 
     if (waitUntilIdle != 0) {
         while (1) {
-            UpdateMusicSystem();
-            ClearSoundFlagAndUpdate();
+            snd_update_music_system();
+            snd_clear_flag_and_update();
             snd_Pump();
-            SetSoundCurrentBufferFlag();
-            if (gMusicState[2] == 0) {
+            snd_set_current_buffer_flag();
+            if (g_music_state[2] == 0) {
                 break;
             }
-            FastMemoryHelperA(10000);
-            if (gMusicState[2] == 0) {
+            mem_fast_helper_a(10000);
+            if (g_music_state[2] == 0) {
                 break;
             }
         }
     } else {
-        UpdateMusicSystem();
-        ClearSoundFlagAndUpdate();
+        snd_update_music_system();
+        snd_clear_flag_and_update();
         snd_Pump();
-        SetSoundCurrentBufferFlag();
+        snd_set_current_buffer_flag();
     }
-    state = gMusicState;
+    state = g_music_state;
     return state[2];
 }

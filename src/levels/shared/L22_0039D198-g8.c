@@ -73,7 +73,7 @@ extern struct { u8 pad[0x18]; void *object; s32 count; Quad position; } ref_L22_
  * swept path. A collision starts its impact effects; expiry or negative world
  * coordinates remove the projectile.
  */
-void func_L22_0039D198(ProjectileObject *obj)
+void homing_l22_projectile_update(ProjectileObject *obj)
 {
     struct {
         Quad offset, velocity, matrix[3], rotation, turn, previous, position;

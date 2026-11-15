@@ -9,37 +9,37 @@
 
 typedef unsigned int PathQuad __attribute__((mode(TI)));
 
-extern int D_001A7B90 MACRO_ADDR;
-extern int D_L04_001A8FE4 __attribute__((sda));
+extern int g_is_pal_video MACRO_ADDR;
+extern int g_current_lap __attribute__((sda));
 
-extern void func_L04_00402D90(void *);
-extern float func_00283CE0(int);
-extern int func_00278E78(void);
-extern float func_00282C48(float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_00283248(float, float);
-extern float func_00283BE0(float, float);
-extern void func_002A7470(void *, int, int, int);
-extern int func_L02_00348420(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_L04_00365300(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282E80(void *, void *);
-extern void func_002C96F8(float, float, void *, void *, void *, void *);
-extern float func_00283C80(float, float);
-extern int func_L04_00400AB0(void *, void *, int);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CD8(void *, void *, void *);
+extern void UpdateRacerRouteChoice(void *);
+extern float IntToFloat(int);
+extern int GetCollHitMaterial(void);
+extern float math_fabs(float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float mat_fast_helper_a(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void anim_start_blended(void *, int, int, int);
+extern int vec_find_nearest_point_index(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float math_distance_to_line(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern void anim_sample_key_track(float, float, void *, void *, void *, void *);
+extern float FastDiffRots(float, float);
+extern int FindNearestRoutePointIndex(void *, void *, int);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void add_vectors(void *, void *, void *);
 
 /* Paces a route follower: derives its speed from the time left and from a peer at +0x164,
    steers its lateral offset (+0x16C) and advances its point on the route at +0x110. */
-void func_L04_00403530(unsigned char *moby, unsigned char *vars)
+void UpdateRouteFollowerPace(unsigned char *moby, unsigned char *vars)
 {
     float toNext[4], toPeer[4], cross[4], tmp[4];
     unsigned char *peerVars;
@@ -53,7 +53,7 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
     {
         float extra = FLOAT_AT(vars, 0x2D0);
 
-        if (gIsPalVideo)
+        if (g_is_pal_video)
             speed = (FLOAT_AT(vars, 0x1B4) - FLOAT_AT(vars, 0x11C))
                     / ((FLOAT_AT(vars, 0x1B0) + extra) - (float)INT_AT(vars, 0x1B8) * 0.02f);
         else
@@ -87,7 +87,7 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
         /* Re-reading the peer's state here lets jump threading skip the identical test below. */
         if (FLOAT_AT(vars, 0x11C) + 12.0f < FLOAT_AT(peerVars, 0x310)
             && FLOAT_AT(vars, 0x11C) > FLOAT_AT(peerVars, 0x310) - 150.0f
-            && gCurrentLap >= INT_AT(vars, 0x160)
+            && g_current_lap >= INT_AT(vars, 0x160)
             && PTR_AT(peerVars, 0x730) != moby
             && PTR_AT(vars, 0x164)[0xBC] == 5)
             FLOAT_AT(vars, 0x134) += (delta - 12.0f) * 0.0016666668234393f;
@@ -95,8 +95,8 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
             PTR_AT(peerVars, 0x734) = moby;
             INT_AT(peerVars, 0x720) = 1;
         }
-        if (INT_AT(vars, 0x168) && vars[0xA2] != 1 && FloatAbs(delta) < 10.0f
-            && INT_AT(vars, 0x160) >= gCurrentLap) {
+        if (INT_AT(vars, 0x168) && vars[0xA2] != 1 && math_fabs(delta) < 10.0f
+            && INT_AT(vars, 0x160) >= g_current_lap) {
             int closest;
 
             FLOAT_AT(vars, 0x134) += (delta * 0.016666668f) + (delta * 0.016666668f);
@@ -104,33 +104,33 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
                 && !SHORT_AT(vars, 0x17E) && PTR_AT(vars, 0x8C)) {
                 float lead = FLOAT_AT(vars, 0x11C) - FLOAT_AT(peerVars, 0x310);
 
-                if (lead < 10.0f && lead > 2.0f && !RandomIntBelow(1)) {
+                if (lead < 10.0f && lead > 2.0f && !math_random_int_below(1)) {
                     unsigned char *target = PTR_AT(vars, 0x164);
                     float angle = fast_subtract_rotations(FLOAT_AT(moby, 0xF8),
-                                                FastMatrixHelperA(FLOAT_AT(target, 0x10) - FLOAT_AT(moby, 0x10),
+                                                mat_fast_helper_a(FLOAT_AT(target, 0x10) - FLOAT_AT(moby, 0x10),
                                                               FLOAT_AT(target, 0x14) - FLOAT_AT(moby, 0x14)));
 
                     if (angle > 0.0f)
-                        StartAnimationBlended(PTR_AT(vars, 0x8C), 8, 0, 12);
+                        anim_start_blended(PTR_AT(vars, 0x8C), 8, 0, 12);
                     else
-                        StartAnimationBlended(PTR_AT(vars, 0x8C), 7, 0, 12);
-                    INT_AT(vars, 0x180) = RandomIntRange(120, 180);
-                } else if (FLOAT_AT(vars, 0x11C) - FLOAT_AT(peerVars, 0x310) > -5.0f && !RandomIntBelow(3)) {
+                        anim_start_blended(PTR_AT(vars, 0x8C), 7, 0, 12);
+                    INT_AT(vars, 0x180) = math_random_int_range(120, 180);
+                } else if (FLOAT_AT(vars, 0x11C) - FLOAT_AT(peerVars, 0x310) > -5.0f && !math_random_int_below(3)) {
                     unsigned char *target = PTR_AT(vars, 0x164);
                     float angle = fast_subtract_rotations(FLOAT_AT(moby, 0xF8),
-                                                FastMatrixHelperA(FLOAT_AT(target, 0x10) - FLOAT_AT(moby, 0x10),
+                                                mat_fast_helper_a(FLOAT_AT(target, 0x10) - FLOAT_AT(moby, 0x10),
                                                               FLOAT_AT(target, 0x14) - FLOAT_AT(moby, 0x14)));
 
                     if (angle > 0.0f)
-                        StartAnimationBlended(PTR_AT(vars, 0x8C), 5, 0, 12);
+                        anim_start_blended(PTR_AT(vars, 0x8C), 5, 0, 12);
                     else
-                        StartAnimationBlended(PTR_AT(vars, 0x8C), 6, 0, 12);
-                    INT_AT(vars, 0x180) = RandomIntRange(120, 300);
+                        anim_start_blended(PTR_AT(vars, 0x8C), 6, 0, 12);
+                    INT_AT(vars, 0x180) = math_random_int_range(120, 300);
                 } else
                     INT_AT(vars, 0x180) = 60;
             }
             *(PathQuad *)toNext = *(PathQuad *)(PTR_AT(vars, 0x164) + 0x10);
-            closest = FindNearestPointIndex(toNext, PTR_AT(vars, 0x110));
+            closest = vec_find_nearest_point_index(toNext, PTR_AT(vars, 0x110));
             if (closest == 0 || closest == INT_AT(PTR_AT(vars, 0x110), 0) - 1)
                 FLOAT_AT(vars, 0x16C) = 0;
             else {
@@ -144,7 +144,7 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
                 neighbor = prev;
                 if (nextDist < prevDist)
                     neighbor = next;
-                FLOAT_AT(vars, 0x16C) = DistanceToLine(PTR_AT(vars, 0x110) + 16 + closest * 16,
+                FLOAT_AT(vars, 0x16C) = math_distance_to_line(PTR_AT(vars, 0x110) + 16 + closest * 16,
                                                           PTR_AT(vars, 0x110) + 16 + neighbor * 16,
                                                           PTR_AT(vars, 0x164) + 16);
                 FastVecSub(tmp, PTR_AT(vars, 0x110) + 16 + next * 16, PTR_AT(vars, 0x110) + 16 + closest * 16);
@@ -174,15 +174,15 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
         FLOAT_AT(vars, 0xA8) += (INT_AT(vars, 0x244) ? 15.0f : 5.0f) - distance;
         if (FLOAT_AT(PTR_AT(vars, 0x110), 0x1C) * IntToFloat(INT_AT(PTR_AT(vars, 0x110), 0)) < FLOAT_AT(vars, 0xA8))
             FLOAT_AT(vars, 0xA8) -= FLOAT_AT(PTR_AT(vars, 0x110), 0x1C) * IntToFloat(INT_AT(PTR_AT(vars, 0x110), 0));
-        SampleKeyTrack(FLOAT_AT(vars, 0xA8), FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
+        anim_sample_key_track(FLOAT_AT(vars, 0xA8), FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
                       vars + 0x114, vars + 0x118, vars + 0xF0);
     } else {
-        SampleKeyTrack(FLOAT_AT(vars, 0xA8), FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
+        anim_sample_key_track(FLOAT_AT(vars, 0xA8), FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
                       vars + 0x114, vars + 0x118, vars + 0xF0);
     }
     {
         float f = FastDiffRots(FLOAT_AT(moby, 0xF8),
-                                FastMatrixHelperA(FLOAT_AT(vars, 0xF0) - FLOAT_AT(moby, 0x10),
+                                mat_fast_helper_a(FLOAT_AT(vars, 0xF0) - FLOAT_AT(moby, 0x10),
                                               FLOAT_AT(vars, 0xF4) - FLOAT_AT(moby, 0x14)));
 
         if (f > 1.047197699546814f) {
@@ -193,7 +193,7 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
                 f = along + (INT_AT(vars, 0x244) ? 15.0f : 5.0f);
             }
             FLOAT_AT(vars, 0xA8) = f;
-            SampleKeyTrack(f, FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
+            anim_sample_key_track(f, FLOAT_AT(PTR_AT(vars, 0x110), 0x1C), PTR_AT(vars, 0x110),
                           vars + 0x114, vars + 0x118, vars + 0xF0);
         }
     }
@@ -202,12 +202,12 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
         float f = FLOAT_AT(point, 0x1C);
 
         if (f >= 1000.0f) {
-            FLOAT_AT(vars, 0x16C) += RandomFloatRange(-0.25f, 0.25f);
+            FLOAT_AT(vars, 0x16C) += math_random_float_range(-0.25f, 0.25f);
             if (FLOAT_AT(vars, 0x16C) > 1.5f)
                 FLOAT_AT(vars, 0x16C) = 1.5f;
             if (FLOAT_AT(vars, 0x16C) < -1.5f)
                 FLOAT_AT(vars, 0x16C) = -1.5f;
-            INT_AT(vars, 0x174) = FloatToInt(RandomFloatRange(3.0f, 6.0f) * 60.0f);
+            INT_AT(vars, 0x174) = FloatToInt(math_random_float_range(3.0f, 6.0f) * 60.0f);
         } else if (f <= -1000.0f) {
             FLOAT_AT(vars, 0x16C) = 0.0f;
             INT_AT(vars, 0x174) = -1000;
@@ -216,17 +216,17 @@ void func_L04_00403530(unsigned char *moby, unsigned char *vars)
     if (INT_AT(vars, 0x174) > 0) {
         INT_AT(vars, 0x174)--;
         if (INT_AT(vars, 0x174) == -1) {
-            FLOAT_AT(vars, 0x16C) += RandomFloatRange(-0.25f, 0.25f);
+            FLOAT_AT(vars, 0x16C) += math_random_float_range(-0.25f, 0.25f);
             if (FLOAT_AT(vars, 0x16C) > 1.5f)
                 FLOAT_AT(vars, 0x16C) = 1.5f;
             if (FLOAT_AT(vars, 0x16C) < -1.5f)
                 FLOAT_AT(vars, 0x16C) = -1.5f;
-            INT_AT(vars, 0x174) = FloatToInt(RandomFloatRange(3.0f, 6.0f) * 60.0f);
+            INT_AT(vars, 0x174) = FloatToInt(math_random_float_range(3.0f, 6.0f) * 60.0f);
         }
     }
     distance = FLOAT_AT(vars, 0x170) + FLOAT_AT(vars, 0x16C);
-    toNext[0] = FastSinOrCosA(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
-    toNext[1] = FastSinOrCosB(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
+    toNext[0] = math_fast_sin_or_cos_a(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
+    toNext[1] = math_fast_sin_or_cos_b(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
     toNext[2] = 0.0f;
     add_vectors(toPeer, vars + 0xF0, toNext);
 }

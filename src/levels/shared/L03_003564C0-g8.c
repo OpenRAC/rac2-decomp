@@ -1,6 +1,7 @@
 /* Initialization-table relative of func_L00_00354DF8. The measured entry
  * correction leaves the preceding function's tail in assembly. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -13,7 +14,7 @@ extern int * volatile D_L03_001AA7B0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L03_001CA020;
 
 /* Fills the menu choice table from the list of unlocked entries and puts the cursor on the one currently selected. */
-int func_L03_003564C0(char *menu) {
+int menu_fill_choice_table(char *menu) {
     int i, value;
     int *idList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

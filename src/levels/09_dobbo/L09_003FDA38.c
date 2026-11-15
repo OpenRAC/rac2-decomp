@@ -1,3 +1,4 @@
+#include "names.h"
 /* Measures the two path lists' segment lengths and restarts both followers on the first list when the speed is set. */
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -8,7 +9,7 @@ extern u32 D_L09_001FE6C0[];
 extern f32 func_002EA630(u8 *a0, u8 *a1);
 extern void func_0033EB48(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, f32 f12);
 
-void func_L09_003FDA38(u8 *moby) {
+void path_measure_start_followers(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *list;
     s32 i;

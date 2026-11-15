@@ -123,6 +123,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import build  # noqa: E402
 import elf  # noqa: E402
 import levels  # noqa: E402
+import srcnames  # noqa: E402
 
 OPENRAC = Path(os.environ.get("OPENRAC_ROOT", str(Path.home() / "Projects/RAC/OpenRAC")))
 BOOT = OPENRAC / "build/interpreter/openrac-boot"
@@ -401,7 +402,7 @@ def sources() -> dict[str, tuple[Path, str]]:
     dirs += sorted(d for d in (ROOT / "src/levels").iterdir() if d.is_dir() and d.name[:2].isdigit())
     for d in dirs:
         for path in sorted(d.rglob("*.c")):
-            text = path.read_text(errors="replace")
+            text = srcnames.canon(path.read_text(errors="replace"))
             for m in re.finditer(r'^(?:INCLUDE_ASM|ASM_FUNC|LINKER_REMNANT)\("[^"]*",\s*(\w+)\);', text, re.M):
                 if m.group(1) in names:
                     out.setdefault(m.group(1), (path, "asm"))

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -25,9 +26,9 @@
 
 typedef int TI __attribute__((mode(TI)));
 
-extern TI D_00189EA0;
+extern TI g_hero_position;
 
 /* Copies a fixed vector from the hero data into the output. */
-TI func_00334710(s32 moby, TI *out) {
-    return *out = gHeroPosition;
+TI hero_copy_vector_to_out(s32 moby, TI *out) {
+    return *out = g_hero_position;
 }

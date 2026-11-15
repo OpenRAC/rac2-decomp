@@ -2,7 +2,7 @@
 extern char *D_L02_001B1190[] SDATA(D_L02_001B1190);
 
 /* Checks whether the current wave is finished so the next one can begin. */
-int func_L02_003FCBF0(char *actor) {
+int arena_l02_is_wave_complete(char *actor) {
     char *state = *(char **)(actor + 0x68);
     char *challengeRow = D_L02_001B1190[*(short *)(state + 0x120)];
     char *waveEntry = *(char **)(challengeRow + 0x4) + *(short *)(state + 0x122) * 0x14;

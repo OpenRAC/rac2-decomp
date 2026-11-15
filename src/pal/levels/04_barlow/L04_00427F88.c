@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
@@ -11,19 +12,19 @@ extern u8 D_001A7B00[] __attribute__((sda));
 extern u8 D_001395B8[];
 extern s32 D_L04_001B2008[] __attribute__((sda));
 extern u8 *D_L04_001B25CC[] __attribute__((sda));
-extern u8 D_00189EA0[];
+extern u8 g_hero_position[];
 extern s32 func_342228(void *a0, void *a1);
-extern s32 func_00288AA0(u8 *a0, s32 a1);
-extern s32 func_00288BE8(void *a0);
-extern float func_002AA3A8(float *a0, float *a1, float f12, float f13, float f14, float f15);
-extern void func_002E5CF8(s32 a0, s32 a1, char *a2);
+extern s32 req_push_queue(u8 *a0, s32 a1);
+extern s32 req_launch_queued(void *a0);
+extern float math_spring_float_to_goal(float *a0, float *a1, float f12, float f13, float f14, float f15);
+extern void PlayMobySound(s32 a0, s32 a1, char *a2);
 extern u8 D_0019B2E8[];
 extern u8 D_L04_001BF880[];
 extern u8 D_L04_001B9680[];
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283CE0(int);
-extern f32 func_00282C48(f32);
-extern u8 D_00189EA0[];
+extern f32 fast_vec_dist(void *, void *);
+extern f32 IntToFloat(int);
+extern f32 math_fabs(f32);
+extern u8 g_hero_position[];
 extern u8 D_L04_001B1218[];
 extern u8 D_L04_001B1230[];
 extern u8 D_L04_001B12B0[] __attribute__((sda));
@@ -64,8 +65,8 @@ extern u8 D_L04_002CA438[];
 extern f32 func_30F468(f32 a, f32 b);
 extern f32 func_30FE88(f32 a, f32 b);
 extern f32 func_30FE40(f32 a, f32 b);
-extern f32 func_00283C80(f32, f32);
-extern f32 func_002AA2E8(f32 *, f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern f32 ApproachValue(f32 *, f32, f32);
 
 /* func_L04_00423258 is in L04_00423258-g8.c. */
 /* Counts the object's state up, easing its timer down while it is over the
@@ -83,11 +84,11 @@ void func_PAL_L04_00430DB0(u8 *a0) {
             a0[0x20] = 4;
     }
     if (a0[0x20] == 3) {
-        func_002AA3A8((f32 *)(a0 + 0x18), (f32 *)s1, 55.0f,
+        math_spring_float_to_goal((f32 *)(a0 + 0x18), (f32 *)s1, 55.0f,
                       0.012f, 0.020000001f,
                       0.54f);
         if (55.0f <= *(f32 *)(a0 + 0x18)) {
-            func_002E5CF8(0, 0, (char *)a0);
+            PlayMobySound(0, 0, (char *)a0);
             s1[1] = 0;
             a0[0x20] = 1;
         }

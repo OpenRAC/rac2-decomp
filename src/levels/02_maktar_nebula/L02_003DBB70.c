@@ -7,21 +7,21 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L02_001B359C[] __attribute__((sda));
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002ACB48(float *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern int func_00283CF0(float);
-extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern char *g_moby_l02_pool[] __attribute__((sda));
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_add_random_offset(float *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern int FloatToInt(float);
+extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Throws bursts of green glitter particles out from a part of the actor,
    drifting outward and upward. */
-void func_L02_003DBB70(char *actor, char *baseVel) {
+void part_spawn_green_glitter(char *actor, char *baseVel) {
     float startPos[4];
     float vel[4];
     float endVel[4];
@@ -34,28 +34,28 @@ void func_L02_003DBB70(char *actor, char *baseVel) {
     int colorB;
 
     for (burst = 0; burst < 30; burst++) {
-        TransformMobyJointToWorld(gMobyPool_L02[0] + (*(int *)(*(char **)(actor + 0x68) + 0x244) << 8), 4, startPos);
-        AddRandomOffsetToVector(startPos, 0.5f);
+        moby_transform_joint_to_world(g_moby_l02_pool[0] + (*(int *)(*(char **)(actor + 0x68) + 0x244) << 8), 4, startPos);
+        vec_add_random_offset(startPos, 0.5f);
         startPos[2] += 0.25f;
-        angle = RandomAngle();
-        radius = RandomFloatRange(3.0f, 16.0f);
-        lift = RandomFloatRange(3.0f, 12.0f);
-        FastVecScale(vel, baseVel, RandomFloatRange(0.0f, 0.0f) * 0.016666668f);
-        vel[0] += FastSinOrCosA(angle) * 0.016666668f * radius;
-        vel[1] += FastSinOrCosB(angle) * 0.016666668f * radius;
+        angle = math_random_angle();
+        radius = math_random_float_range(3.0f, 16.0f);
+        lift = math_random_float_range(3.0f, 12.0f);
+        FastVecScale(vel, baseVel, math_random_float_range(0.0f, 0.0f) * 0.016666668f);
+        vel[0] += math_fast_sin_or_cos_a(angle) * 0.016666668f * radius;
+        vel[1] += math_fast_sin_or_cos_b(angle) * 0.016666668f * radius;
         vel[2] += lift * 0.016666668f;
         *(TI128 *)endVel = *(TI128 *)vel;
         endVel[2] -= 0.33333334f;
         for (i = 0; i < 20; i++) {
-            float scale = RandomFloatRange(0.5f, 1.5f);
+            float scale = math_random_float_range(0.5f, 1.5f);
 
             vel[3] = scale * 0.25f;
             endVel[3] = scale * 0.125f;
-            AddRandomOffsetToVector(startPos, 0.25f);
-            AddRandomOffsetToVector(endVel, 0.016666668f);
-            colorA = FastTweenColor(0x80FF00EA, 0x80FF00EA, RandomFloatRange(0.0f, 1.0f));
-            colorB = FastTweenColor(0x00FF0020, 0x00FF00AA, RandomFloatRange(0.0f, 1.0f));
-            SpawnTrailParticle_002BAA28(startPos, vel, endVel, colorA, colorB, 20, 60, FloatToInt(RandomFloatRange(10.0f, 50.0f)), -1);
+            vec_add_random_offset(startPos, 0.25f);
+            vec_add_random_offset(endVel, 0.016666668f);
+            colorA = FastTweenColor(0x80FF00EA, 0x80FF00EA, math_random_float_range(0.0f, 1.0f));
+            colorB = FastTweenColor(0x00FF0020, 0x00FF00AA, math_random_float_range(0.0f, 1.0f));
+            part_spawn_trail(startPos, vel, endVel, colorA, colorB, 20, 60, FloatToInt(math_random_float_range(10.0f, 50.0f)), -1);
         }
     }
 }

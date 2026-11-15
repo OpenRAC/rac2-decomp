@@ -1,18 +1,18 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_00282CC0(void *a, void *b, void *c);
+extern void FastVecAdd(void *a, void *b, void *c);
 
-extern float func_00282E48(char *a, char *b);
+extern float fast_vec_dist(char *a, char *b);
 
 extern char D_L05_001B3510[];
 
-extern char D_L05_001B34F0[];
+extern char g_light_spot_sum[];
 
-extern float D_L05_001B3500;
+extern float g_light_spot_count;
 
 /* Adds this object's position to the shared light spot when the object it belongs to is of a certain kind and is close enough. */
-void func_L05_00418440(char *object)
+void light_spot_add_nearby_object(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *owner = *(char **)(state + 4);
@@ -23,6 +23,6 @@ void func_L05_00418440(char *object)
     position = object + 0x10;
     if (fast_vec_dist(position, D_L05_001B3510) > 15.0f)
         return;
-    FastVecAdd(gLightSpotSum, gLightSpotSum, position);
-    gLightSpotCount = gLightSpotCount + 1.0f;
+    FastVecAdd(g_light_spot_sum, g_light_spot_sum, position);
+    g_light_spot_count = g_light_spot_count + 1.0f;
 }

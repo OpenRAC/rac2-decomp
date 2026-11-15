@@ -9,24 +9,24 @@
    have no effect on the result. Each do-while(0) group holds real statements (allowed,
    docs/build/compiler-notes.md); it ends the scheduling block after the reward row's y. */
 
-extern f32 func_00283CE0(s32);
-extern s32 func_00283CF0(f32);
-extern s32 func_00283D38(s32, s32, f32);
-extern s32 func_00336D50(u8 *, s32);
-extern void func_00300968(void *, f32, f32, s32, f32, f32);
-extern void func_00300A00(char *, s32, f32, f32, f32, f32, f32);
-extern char *func_00288FB8(s32);
-extern s32 func_00115DA8(char *, char *, ...);
+extern f32 IntToFloat(s32);
+extern s32 FloatToInt(f32);
+extern s32 FastTweenColor(s32, s32, f32);
+extern s32 table_find_by_id(u8 *, s32);
+extern void gfx_draw_scaled_object(void *, f32, f32, s32, f32, f32);
+extern void gfx_draw_scaled_object_two_axes(char *, s32, f32, f32, f32, f32, f32);
+extern char *GetLocalizedString(s32);
+extern s32 sprintf(char *, char *, ...);
 extern s32 func_001157AC(char *);
-extern s32 func_0027FBD8(s32, s32, u64, char *, s32);
-extern s32 func_0027FAA8(s32, s32, u64, char *, s32);
-extern void func_0027F5B8(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_large(s32, s32, u64, char *, s32);
+extern s32 text_draw_centered_small(s32, s32, u64, char *, s32);
+extern void text_draw_medium(s32, s32, u64, char *, s32);
 /* Retail builds the colour with the 64-bit ori/dsll/ori form, so the caller passes a u64, as
    func_L05_00302CE8 (which the wrapper forwards to) takes it; the wrapper's matched C still says int. */
-extern s32 func_L05_00303000(s32, s32, s32, s32, u64, u8 *, s32);
-extern s32 D_001A7340;
+extern s32 text_print_wrapped_default(s32, s32, s32, s32, u64, u8 *, s32);
+extern s32 g_screen_width;
 typedef struct { u8 pad[0x1A0]; s32 buttons; } MenuInput;
-extern MenuInput D_00138180;
+extern MenuInput g_pad_state;
 extern u8 D_001A7A0A;
 extern s32 D_L15_001A8F00;
 extern u8 *D_L15_001A904C;
@@ -99,52 +99,52 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
 }
 
 /* Draws the Gorn challenge menu panel: title, description, reward text and the option labels. */
-s32 func_L15_0042EFE0(void) {
+s32 gorn_challenge_menu_draw(void) {
     char buf[128];
     f32 center, pulse, imageY;
     s32 sprite, remainder, color, blink, centerX, headerX, reward;
     char *text;
 
-    center = IntToFloat(gScreenWidth) * 0.5f;
+    center = IntToFloat(g_screen_width) * 0.5f;
     if (D_L15_001A8F00) return 1;
     if (D_L15_001A904C) {
     D_L15_001B2064 = 0;
-    sprite = FindTableEntryById(D_L15_001A904C + 0x8710, 0x45);
-    DrawScaledObjectUniform((void *)sprite, center, (f32)label_y((void *)sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
-    sprite = FindTableEntryById(D_L15_001A904C + 0x8710, 0x44);
-    DrawScaledObjectUniform((void *)sprite, center, (f32)label_y((void *)sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
+    sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x45);
+    gfx_draw_scaled_object((void *)sprite, center, (f32)label_y((void *)sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
+    sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x44);
+    gfx_draw_scaled_object((void *)sprite, center, (f32)label_y((void *)sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
     remainder = D_L15_001B2148 % 50;
     if (remainder >= 25) pulse = 1.0f - (remainder - 25) * 0.04f;
     else pulse = remainder * 0.04f;
     blink = FastTweenColor(0x80FFDE8D, 0x60442D00, pulse);
-    color = (gPadState.buttons & 0x2000) ? 0x80007FFF : blink;
-    sprite = FindTableEntryById(D_L15_001A904C + 0x8710, 0x4A);
+    color = (g_pad_state.buttons & 0x2000) ? 0x80007FFF : blink;
+    sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x4A);
     imageY = (f32)MenuSpriteY((void *)sprite, 291.0f, 2.0f);
-    DrawScaledObjectTwoAxes((char *)sprite, color, 259.0f, imageY, 1.0f, 1.0f, 0.0f);
-    color = (gPadState.buttons & 0x8000) ? 0x80007FFF : blink;
-    sprite = FindTableEntryById(D_L15_001A904C + 0x8710, 0x4B);
+    gfx_draw_scaled_object_two_axes((char *)sprite, color, 259.0f, imageY, 1.0f, 1.0f, 0.0f);
+    color = (g_pad_state.buttons & 0x8000) ? 0x80007FFF : blink;
+    sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x4B);
     imageY = (f32)MenuSpriteY((void *)sprite, 291.0f, 2.0f);
-    DrawScaledObjectTwoAxes((char *)sprite, color, 251.0f, imageY, 1.0f, 1.0f, 0.0f);
-    Sprintf(buf, GetLocalizedString(0x2F72), D_L15_001B15C8 + 1);
+    gfx_draw_scaled_object_two_axes((char *)sprite, color, 251.0f, imageY, 1.0f, 1.0f, 0.0f);
+    sprintf(buf, GetLocalizedString(0x2F72), D_L15_001B15C8 + 1);
     headerX = FloatToInt(center);
     { s32 len;
-    len = strlen_001157AC(buf);
-    DrawTextCenteredLargeFont(headerX, 46, 0x80F0F0F0ULL, buf, len); }
+    len = func_001157AC(buf);
+    text_draw_centered_large(headerX, 46, 0x80F0F0F0ULL, buf, len); }
     centerX = FloatToInt(center);
     switch (D_L15_001B15C8) {
     case 0:
         text = GetLocalizedString(0x2FF4);
         {
             s32 row = MenuY(101.0f, -2.0f);
-            DrawTextCenteredSmallFont(centerX, row, 0x80F0F0F0ULL, text, strlen_001157AC(text));
+            text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
         }
         text = GetLocalizedString(0x2FEF);
         {
             s32 len;
             s32 row;
             row = label_y(text, 131.0f, D_L15_001B2E84, 0.5f, 1);
-            len = strlen_001157AC(text);
-            FontPrintWrappedDefault(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
+            len = func_001157AC(text);
+            text_print_wrapped_default(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
         }
         {
             s32 index = D_L15_001B1520_gp[0];
@@ -157,21 +157,21 @@ s32 func_L15_0042EFE0(void) {
             s32 len;
             s32 row;
             do {
-                Sprintf(buf, GetLocalizedString(0x2FE0), reward);
+                sprintf(buf, GetLocalizedString(0x2FE0), reward);
                 row = label_y(buf, 242.0f, D_L15_001B2E84, 0.5f, 1);
             } while (0);
-            len = strlen_001157AC(buf);
-            FontPrintWrappedDefault(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
+            len = func_001157AC(buf);
+            text_print_wrapped_default(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
         }
         }
-        DrawTextMediumFont(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
+        text_draw_medium(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
         break;
     case 1:
         if (D_L15_001B1520_gp[0]) {
             text = GetLocalizedString(0x2FF5);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                DrawTextCenteredSmallFont(centerX, row, 0x80F0F0F0ULL, text, strlen_001157AC(text));
+                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             {
                 s32 len;
@@ -180,29 +180,29 @@ s32 func_L15_0042EFE0(void) {
                 text = GetLocalizedString(0x2FF0);
                 row1 = label_y(text, 131.0f, D_L15_001B2E84, 0.5f, 1);
                 do {
-                    len1 = strlen_001157AC(text);
-                    FontPrintWrappedDefault(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
+                    len1 = func_001157AC(text);
+                    text_print_wrapped_default(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
                     {
                         s32 index = D_L15_001B1520[1];
                         if (index >= 3) index = 2;
                         reward = D_L15_001B15E4[index];
                     }
                     if (D_001A7A0A) reward *= 10;
-                    Sprintf(buf, GetLocalizedString(0x2FE0), reward);
+                    sprintf(buf, GetLocalizedString(0x2FE0), reward);
                     row = label_y3(buf, 242.0f, D_L15_001B2E84, 0.5f, 1);
                 } while (0);
-                len = strlen_001157AC(buf);
-                FontPrintWrappedDefault(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
+                len = func_001157AC(buf);
+                text_print_wrapped_default(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
-            DrawTextMediumFont(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
+            text_draw_medium(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
         } else {
             text = GetLocalizedString(0x2F73);
             {
                 s32 len;
                 s32 row;
                 row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
-                len = strlen_001157AC(text);
-                DrawTextCenteredLargeFont(centerX, row, 0x80F0F0F0ULL, text, len);
+                len = func_001157AC(text);
+                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
@@ -211,7 +211,7 @@ s32 func_L15_0042EFE0(void) {
             text = GetLocalizedString(0x2FF6);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                DrawTextCenteredSmallFont(centerX, row, 0x80F0F0F0ULL, text, strlen_001157AC(text));
+                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             {
                 s32 len;
@@ -220,29 +220,29 @@ s32 func_L15_0042EFE0(void) {
                 text = GetLocalizedString(0x2FF1);
                 row1 = label_y(text, 131.0f, D_L15_001B2E84, 0.5f, 1);
                 do {
-                    len1 = strlen_001157AC(text);
-                    FontPrintWrappedDefault(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
+                    len1 = func_001157AC(text);
+                    text_print_wrapped_default(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
                     {
                         s32 index = D_L15_001B1520[2];
                         if (index >= 3) index = 2;
                         reward = D_L15_001B15F0[index];
                     }
                     if (D_001A7A0A) reward *= 10;
-                    Sprintf(buf, GetLocalizedString(0x2FE0), reward);
+                    sprintf(buf, GetLocalizedString(0x2FE0), reward);
                     row = label_y3(buf, 242.0f, D_L15_001B2E84, 0.5f, 1);
                 } while (0);
-                len = strlen_001157AC(buf);
-                FontPrintWrappedDefault(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
+                len = func_001157AC(buf);
+                text_print_wrapped_default(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
-            DrawTextMediumFont(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
+            text_draw_medium(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
         } else {
             text = GetLocalizedString(0x2F73);
             {
                 s32 len;
                 s32 row;
                 row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
-                len = strlen_001157AC(text);
-                DrawTextCenteredLargeFont(centerX, row, 0x80F0F0F0ULL, text, len);
+                len = func_001157AC(text);
+                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
@@ -251,7 +251,7 @@ s32 func_L15_0042EFE0(void) {
             text = GetLocalizedString(0x2FF7);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                DrawTextCenteredSmallFont(centerX, row, 0x80F0F0F0ULL, text, strlen_001157AC(text));
+                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             text = GetLocalizedString(0x2FF2);
             {
@@ -260,36 +260,36 @@ s32 func_L15_0042EFE0(void) {
                 s32 len1, row1;
                 row1 = label_y(text, 131.0f, D_L15_001B2E84, 0.5f, 1);
                 do {
-                    len1 = strlen_001157AC(text);
-                    FontPrintWrappedDefault(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
+                    len1 = func_001157AC(text);
+                    text_print_wrapped_default(117, row1, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len1);
                     {
                         s32 index = D_L15_001B1520[3];
                         if (index >= 3) index = 2;
                         reward = D_L15_001B15FC[index];
                     }
                     if (D_001A7A0A) reward *= 10;
-                    Sprintf(buf, GetLocalizedString(0x2FE0), reward);
+                    sprintf(buf, GetLocalizedString(0x2FE0), reward);
                     row = label_y3(buf, 242.0f, D_L15_001B2E84, 0.5f, 1);
                 } while (0);
-                len = strlen_001157AC(buf);
-                FontPrintWrappedDefault(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
+                len = func_001157AC(buf);
+                text_print_wrapped_default(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
-            DrawTextMediumFont(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
+            text_draw_medium(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F3F), -1);
         } else {
             text = GetLocalizedString(0x2F73);
             {
                 s32 len;
                 s32 row;
                 row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
-                len = strlen_001157AC(text);
-                DrawTextCenteredLargeFont(centerX, row, 0x80F0F0F0ULL, text, len);
+                len = func_001157AC(text);
+                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
     }
-    DrawTextMediumFont(119, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F40), -1);
-    DrawTextMediumFont(356, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F41), -1);
-    DrawTextMediumFont(279, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F42), -1);
+    text_draw_medium(119, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F40), -1);
+    text_draw_medium(356, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F41), -1);
+    text_draw_medium(279, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, GetLocalizedString(0x2F42), -1);
     }
     return 1;
 }

@@ -12,14 +12,14 @@ typedef struct {
     int state;
 } SelectState;
 
-extern SelectState D_00189E20;
+extern SelectState g_hero_state;
 /* A moby index list (count in element 0) and the moby array base: retail reads both
    through the absolute macro form, and the count through $gp in one delay slot. */
 extern short D_L08_001B2B30[] __attribute__((sda));
 extern char *D_L08_001B29DC[] __attribute__((sda));
 
 extern int func_L08_0032E920(void *, int, int, int, int);
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 
 /* Picks the listed moby of class 0xCB, 0x76C or 0xEB0 in state 3 nearest to input+0x10
    and closer than `minimum`; one at or beyond `limit` must also pass func_L08_0032E920.
@@ -29,17 +29,17 @@ extern float func_00282E80(void *, void *);
    vector and two more vectors to `out` (or clears them) and returns 0 (none), 1 (a
    listed moby) or 2 (the starting candidate dropped). */
 /* Finds the closest decoy or sheep target near a point so the hero can lock on to it, and fills in the target data. Returns 0 for no target, 1 for a new target, 2 for dropping the current one. */
-int func_L08_0032F898(char *center, char *outData, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex, float minimum, float limit)
+int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex, float minimum, float limit)
 {
-    char *selected = gHeroState.selected;
+    char *selected = g_hero_state.selected;
     int result = 0;
     int i;
 
-    if (gHeroState.state == 0x18 || gHeroState.mode == 0x6F) {
+    if (g_hero_state.state == 0x18 || g_hero_state.mode == 0x6F) {
         selected = 0;
         result = 2;
-    } else if (!func_L08_0032E920((char *)&gHeroState + 0x80, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex)) {
-        if (limit < vec_distance_xy(center + 0x10, (char *)&gHeroState + 0x80)) {
+    } else if (!func_L08_0032E920((char *)&g_hero_state + 0x80, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex)) {
+        if (limit < vec_distance_xy(center + 0x10, (char *)&g_hero_state + 0x80)) {
             selected = 0;
             result = 2;
         }
@@ -69,9 +69,9 @@ int func_L08_0032F898(char *center, char *outData, int planeListIndex, int corne
         *(char **)(outData + 0x40) = selected;
         qcopy(outData, selected + 0x10);
         qcopy(outData + 0x10, selected + 0xF0);
-        if (selected == gHeroState.selected) {
-            qcopy(outData + 0x20, (char *)&gHeroState + 0xD0);
-            qcopy(outData + 0x30, (char *)&gHeroState + 0xE0);
+        if (selected == g_hero_state.selected) {
+            qcopy(outData + 0x20, (char *)&g_hero_state + 0xD0);
+            qcopy(outData + 0x30, (char *)&g_hero_state + 0xE0);
         } else {
             qcopy(outData + 0x30, outData);
             *(float *)(outData + 0x38) += 0.6f;

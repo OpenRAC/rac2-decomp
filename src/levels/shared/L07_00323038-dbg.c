@@ -1,32 +1,33 @@
+#include "names.h"
 /* func_L07_00323038 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -g). */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern unsigned int func_L00_0032C638(unsigned int);
-extern float func_00283248(float, float);
-extern int func_L01_00322288(int, float);
-extern void func_002B5BC0(void *, void *, float);
-extern float func_0029F530(char *);
-extern int func_L07_00321D68(char *, void *);
-extern int func_002A88A0(float *, float *, float, float, float);
+extern unsigned int moby_get_vars_word_18(unsigned int);
+extern float mat_fast_helper_a(float, float);
+extern int moby_start_effect_from_entry(int, float);
+extern void coll_find_ground_below_object(void *, void *, float);
+extern float moby_get_anim_value(char *);
+extern int hero_set_control_motion_and_step(char *, void *);
+extern int math_solve_quadratic(float *, float *, float, float, float);
 extern int D_L07_001B1E08 __attribute__((sda));
 
 /* Tunes the speed of an object's jump so it lands at the right place. Returns 1 once the jump has ended. */
-int func_L07_00323038(unsigned char *object, float lower, float target, float upper)
+int hero_adjust_jump_speed_to_target(unsigned char *object, float lower, float target, float upper)
 {
     float roots[2];
-    char *control = (char *)GetObjectVarsWord18((unsigned int)object);
+    char *control = (char *)moby_get_vars_word_18((unsigned int)object);
     float current;
     if (!control)
         return 0;
     *(int *)(control + 0xbc) = D_L07_001B1E08;
     if (!(*(int *)(control + 0x38) & 0x10))
-        StartMobyEffectFromEntry((int)object, FastMatrixHelperA(*(float *)(control + 0xa0), *(float *)(control + 0xa4)));
-    FindGroundBelowObject(object, control, 64.0f);
-    current = GetMobyAnimationValue((char *)object);
+        moby_start_effect_from_entry((int)object, mat_fast_helper_a(*(float *)(control + 0xa0), *(float *)(control + 0xa4)));
+    coll_find_ground_below_object(object, control, 64.0f);
+    current = moby_get_anim_value((char *)object);
     if (object[0x42] == object[0x43] && lower <= current && current <= upper) {
         float remaining;
         *(float *)(control + 0xa8) -= *(float *)(control + 0x2c);
-        SetControlMotionAndStep((char *)object, control + 0xa0);
+        hero_set_control_motion_and_step((char *)object, control + 0xa0);
         remaining = *(float *)(control + 0xa8);
         if (remaining > 0.0f) {
             float frames = remaining / *(float *)(control + 0x2c);
@@ -36,7 +37,7 @@ int func_L07_00323038(unsigned char *object, float lower, float target, float up
             *(float *)(object + 0x48) = change;
         } else if (*(float *)(object + 0x18) > *(float *)(control + 0x90)) {
             float gravity = *(float *)(control + 0x2c) * -0.5f;
-            int count = SolveQuadratic(roots, roots + 1, gravity,
+            int count = math_solve_quadratic(roots, roots + 1, gravity,
                         remaining - gravity,
                         *(float *)(object + 0x18) - *(float *)(control + 0x90));
             float change;

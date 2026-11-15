@@ -64,46 +64,46 @@ typedef struct {
     float mtx[12];
     float rot[4];
 } ShipObject;
-extern void func_L07_0040F8F8(void *);
-extern void func_L07_0040FC50(void *);
+extern void path_compute_centers_and_radii(void *);
+extern void flag_block_clear(void *);
 extern void func_PAL_L07_004138B8(void *);
 extern void func_PAL_L07_00415638(void *, int);
 extern void func_PAL_L07_00413B40(void *);
 extern void func_PAL_L07_00414BC0(void *);
 extern void func_PAL_L07_00414008(void *);
 extern void func_PAL_L07_00415868(void *);
-extern void func_L07_004106B8(void *);
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002B3868(void *);
-extern float func_002AAA00(void *, void *, float, float, float, float, int);
-extern void func_L02_002DCEA0(int, float);
+extern void moby_build_matrix(void *);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern void moby_set_state(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern int flag_set_first_pending(void *);
+extern float math_approach_target_with_direction_mode(void *, void *, float, float, float, float, int);
+extern void timer_start_countdown(int, float);
 extern void func_PAL_L00_00305110(int, int);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
-extern void func_002B6D28(void);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern float func_002AA140(float, float, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00282C48(float);
-extern void func_002833F0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_002AA2E8(void *, float, float);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern float func_00283B98(float, float);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void snd_resume_music_stream(void);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_lerp_float(float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fabs(float);
+extern void euler_rotation_basis(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float ApproachValue(void *, float, float);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern float FastAddRotations(float, float);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 extern int D_L07_001B1740 __attribute__((sda));
 extern int D_L07_001C9780 NOT_SDA;
 extern int D_L07_001B19F8;
 extern u8 D_0018C0E2 NOT_SDA;
 extern u8 D_001A7BD0;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0019B2E8[][16];
 extern void *D_0018A15C[3] NOT_SDA;
 extern float D_L07_001B1D20;
-extern GameStatus D_001A63A8;
+extern GameStatus g_music_state;
 extern int D_L07_001B9330 NOT_SDA;
 extern CameraObject D_L07_001B90C0;
 extern float D_L07_001B9200[4];
@@ -134,18 +134,18 @@ void func_PAL_L07_004130D0(ShipObject *o)
     case 0:
         o->flags |= 1;
         o->f31 = 0;
-        func_L07_0040F8F8(o);
+        path_compute_centers_and_radii(o);
         s->f1AC = -1;
         if (s->f90 == -1) {
             if (o->classId == 0x11D9)
-                func_002A7750(o, 3, -1);
+                moby_set_state(o, 3, -1);
             else
-                func_002A7750(o, 4, -1);
+                moby_set_state(o, 4, -1);
         } else {
             o->f30 = 255;
-            func_L07_0040FC50(o);
+            flag_block_clear(o);
             func_PAL_L07_004138B8(o);
-            func_002A7750(o, 2, -1);
+            moby_set_state(o, 2, -1);
         }
         break;
     case 2:
@@ -154,8 +154,8 @@ void func_PAL_L07_004130D0(ShipObject *o)
             func_PAL_L07_00415638(s->f100, s->fD0);
         }
         if (D_L07_001C9780) {
-            func_002A7750(o, 1, -1);
-            s->f16CC = func_002E5CF8(2, 4, o);
+            moby_set_state(o, 1, -1);
+            s->f16CC = PlayMobySound(2, 4, o);
             s->f16C8 = 6.0f;
         }
         break;
@@ -166,21 +166,21 @@ void func_PAL_L07_004130D0(ShipObject *o)
         func_PAL_L07_00414BC0(o);
         break;
     case 3:
-        if (func_002B3868(o))
-            func_002E5CF8(1, 0, o);
+        if (flag_set_first_pending(o))
+            PlayMobySound(1, 0, o);
         func_PAL_L07_00414008(o);
-        if (D_001A7BD0 || (D_0019B2E8[D_001A79F0][o->fB0] & 0x80)) {
+        if (D_001A7BD0 || (D_0019B2E8[g_current_map_index][o->fB0] & 0x80)) {
             func_PAL_L07_00414008(o);
             o->flags |= 2;
             break;
         }
         if (D_0018A15C[0] == o) {
             if (s->f110 >= 0.5f)
-                func_002E5CF8(1, 0, o);
-            func_002AAA00(&s->f110, &s->f118, -1.0f, 0.0025132746f,
+                PlayMobySound(1, 0, o);
+            math_approach_target_with_direction_mode(&s->f110, &s->f118, -1.0f, 0.0025132746f,
                           0.0025132746f, 0.12566373f, 0);
             if (s->f110 <= -1.0f) {
-                func_L02_002DCEA0(1, 8.0f);
+                timer_start_countdown(1, 8.0f);
                 if (D_L07_001B1D20 >= 1.0f) {
                     p.q = 0;
                     r.q = 0;
@@ -193,35 +193,35 @@ void func_PAL_L07_004130D0(ShipObject *o)
                 }
             }
         } else {
-            func_002AAA00(&s->f110, &s->f118, 0.5f, 0.0025132746f,
+            math_approach_target_with_direction_mode(&s->f110, &s->f118, 0.5f, 0.0025132746f,
                           0.0025132746f, 0.12566373f, 0);
         }
         break;
     case 5:
         if (s->f16B8 >= 1.0f && D_L07_001B1D20 >= 1.0f) {
-            if (D_001A63A8.f72 != 3 || D_001A63A8.f6C >= 6000)
+            if (g_music_state.f72 != 3 || g_music_state.f6C >= 6000)
                 break;
             D_L07_001B9330 = 0;
-            func_002B6D28();
+            snd_resume_music_stream();
         }
         p.q = *(TI128 *)o->pos;
         r.q = *(TI128 *)o->rot;
         if (s->f16B8 > 0.0f) {
-            func_002AA548(o->pos, &s->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00040000002f,
+            math_step_value_toward_target(o->pos, &s->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00040000002f,
                           D_L07_001B1744 * 0.020000001f);
             s->f16B8 = (o->pos[0] - 400.0f) * 0.014285714f;
-            o->rot[2] = func_002AA140(D_L07_001B1750, 0.0f, s->f16B8);
-            o->rot[0] = func_002AA140(0.7853975296020508f, 0.0f, s->f16B8);
+            o->rot[2] = math_lerp_float(D_L07_001B1750, 0.0f, s->f16B8);
+            o->rot[0] = math_lerp_float(0.7853975296020508f, 0.0f, s->f16B8);
             o->pos[2] = 213.0f - s->f16B8 * 3.0f;
         } else if ((m = D_L07_001B1D20) == 0.0f) {
-            func_00283098(&v, D_L07_001B1760, o->mtx);
+            matrix_mul_vec3(&v, D_L07_001B1760, o->mtx);
             s->f16B4 += o->rot[0] * 0.00010471977f + 0.00010471977f;
             o->rot[0] += s->f16B4;
             if (o->rot[0] > 1.5707964f) {
                 o->rot[0] = 1.5707964f;
-                t = func_00282C48(s->f16B4);
+                t = math_fabs(s->f16B4);
                 if (t < 0.0006981318f)
-                    func_L02_002DCEA0(1, 12.0f);
+                    timer_start_countdown(1, 12.0f);
                 else
                     s->f16B4 *= -0.333f;
                 if (!s->f16BC) {
@@ -231,41 +231,41 @@ void func_PAL_L07_004130D0(ShipObject *o)
                     s->f16BC = 1;
                 }
             }
-            func_002833F0(o->mtx, o->rot);
-            func_00283098(&w, D_L07_001B1760, o->mtx);
-            func_00282CF0(&v, &w, &v);
-            func_00282CF0(o->pos, o->pos, &v);
+            euler_rotation_basis(o->mtx, o->rot);
+            matrix_mul_vec3(&w, D_L07_001B1760, o->mtx);
+            FastVecSub(&v, &w, &v);
+            FastVecSub(o->pos, o->pos, &v);
         } else if (m >= 1.0f) {
             func_PAL_L07_00415868(o);
             break;
         }
 
         D_L07_001B2024.f4 = 1;
-        func_002AA2E8(&s->f16B0, 1.0f, D_L07_001B174C * 0.00040000002f);
+        ApproachValue(&s->f16B0, 1.0f, D_L07_001B174C * 0.00040000002f);
         k = s->f11C + s->f16B0;
         if (k > 0.0f)
             k = 0.0f;
         v.q = *(TI128 *)D_L07_001B9200;
         v.f[0] += k;
         v.f[2] += D_L07_001B175C * 0.020000001f;
-        func_00335370(&v);
+        object_copy_vector_to_selected(&v);
 
         qzero_nc(&w);
         x.q = *(TI128 *)o->pos;
         x.f[2] += 6.0f;
-        w.f[2] = func_00283248(o->pos[0] - D_L07_001B90C0.pos[0], o->pos[1] - D_L07_001B90C0.pos[1]);
-        w.f[1] = func_00283248(func_00282E80(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
+        w.f[2] = mat_fast_helper_a(o->pos[0] - D_L07_001B90C0.pos[0], o->pos[1] - D_L07_001B90C0.pos[1]);
+        w.f[1] = mat_fast_helper_a(vec_distance_xy(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
         w.f[0] = D_L07_001B1758 * 0.017453294f;
-        func_003353C8(&w);
+        cam_set_state_rotation(&w);
 
-        func_L07_004106B8(o);
+        moby_build_matrix(o);
 
         z = s->f16B8 * 0.052359886f + 0.010471977f;
         for (i = 0; i < 8; i++)
-            *(float *)((u8 *)s + 0x15B4 + i * 0x20) = func_00283B98(*(float *)((u8 *)s + 0x15B4 + i * 0x20), z);
+            *(float *)((u8 *)s + 0x15B4 + i * 0x20) = FastAddRotations(*(float *)((u8 *)s + 0x15B4 + i * 0x20), z);
 
-        func_00282CF0(&y, o->pos, &p);
-        func_002AD6F0((u8 *)s + 0x20, &y, &r, o->rot);
+        FastVecSub(&y, o->pos, &p);
+        mat_combine_and_store((u8 *)s + 0x20, &y, &r, o->rot);
         break;
     }
 }

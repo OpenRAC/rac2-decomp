@@ -30,39 +30,39 @@ extern float D_001A7CF8 __attribute__((sda));
 
 /* 0x1AEFF0 - 0x7660 : the word the retail reads absolutely (plain extern, see
    the note on D_001A7390_1 above). */
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 
 /* 0x140000 - 0x69A2 : the byte the retail reads absolutely. */
 extern u8 D_0013965E __attribute__((nosda));
 
-extern char D_00189E20[];
-extern char D_00189EA0[];
-extern char D_0018C958[];
+extern char g_hero_state[];
+extern char g_hero_position[];
+extern char g_subtitle_history[];
 extern float D_002683EC __attribute__((nosda));
 
 /* The calls func_L20_002B93E0 makes. */
-extern void func_L00_002D24E8(void);
-extern void func_L18_002D0C00(void);
-extern void func_L00_002ACA08(void);
-extern void func_L00_002ACF88(char *, char *, char *);
-extern void func_L00_002B8930(void);
-extern s32 func_00282978(s32);
-extern void func_L20_002D7730(s32, s32);
-extern s32 func_00288E18(s32, s32);
-extern void func_L20_002DEBE0(void);
-extern void func_L00_002AE0C8(void);
-extern void func_L00_002B9CA8(void);
-extern void func_L00_002A5368(void);
-extern void func_L00_002A9600(void);
-extern void func_L00_002A7958(void);
-extern void func_L00_002A7748(void);
-extern void func_L00_002A5840(void);
-extern void func_L00_002A5CB0(void);
-extern void func_L00_002A6008(void);
-extern void func_002E5CF8(void *, void *, void *);
-extern void func_L00_003080D0(void *);
-extern void func_L18_00428100(s32);
-extern void func_L00_002A9760(void);
+extern void AdvanceHeroAnimation(void);
+extern void hero_update_frame_input(void);
+extern void hero_process_action_command(void);
+extern void hero_find_ledge_grab(char *, char *, char *);
+extern void UpdateHeroMotionResponseParameters(void);
+extern s32 FastDecTimer(s32);
+extern void hero_l20_set_state(s32, s32);
+extern s32 subtitle_request_voice_line(s32, s32);
+extern void hero_l20_decide_state_transition(void);
+extern void RebuildRegionObjectMembership(void);
+extern void UpdateDelayedSounds(void);
+extern void attachment_update_all(void);
+extern void hero_update_moby_from_hero(void);
+extern void gfx_fade_screen_effect(void);
+extern void ApplyHeroAxisScales(void);
+extern void UpdateHeroGlowAndExtraManipulators(void);
+extern void UpdateHeroJointEffect(void);
+extern void hero_update_held_object(void);
+extern void PlayMobySound(void *, void *, void *);
+extern void coll_clear_map_bits_around_pos(void *);
+extern void receiver_bot_start_sequence(s32);
+extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_002A677C(s32);
 
 /* The hero's per-frame update: the state-1 fixups, then in state 4 (outside cutscenes, not
@@ -70,7 +70,7 @@ extern void func_002A677C(s32);
    gated twice more by the state byte, and the hand-off of the hero's record. Same game code as
    func_L18_002C41F0. */
 /* Runs the hero once per frame: checks for damage, updates timers and hands the hero over to the game. */
-void func_L20_002B93E0(void)
+void hero_l20_update_frame(void)
 {
     char *base;
     char *blk;
@@ -79,12 +79,12 @@ void func_L20_002B93E0(void)
     unsigned int then;
 
     AdvanceHeroAnimation();
-    UpdateHeroFrameInput();
-    ProcessHeroActionCommand();
+    hero_update_frame_input();
+    hero_process_action_command();
 
-    base = gHeroState;
+    base = g_hero_state;
     if (*(u8 *)(base + 0x22B4) == 1) {
-        FindHeroLedgeGrab(base + 0x80, base + 0x90, base + 0x550);
+        hero_find_ledge_grab(base + 0x80, base + 0x90, base + 0x550);
         UpdateHeroMotionResponseParameters();
     }
     if (*(u8 *)(base + 0x22B4) == 4) {
@@ -93,13 +93,13 @@ void func_L20_002B93E0(void)
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
                         *(int *)(base + 0x24CC) = 0;
-                        YeedilEnterHeroAction(0x91, 1);
+                        hero_l20_set_state(0x91, 1);
                     }
-                    if (gCurrentMapIndex == 0x14) {
+                    if (g_current_map_index == 0x14) {
                         if (D_0013965E == 0) {
-                            blk = gSubtitleHistory;
+                            blk = g_subtitle_history;
                             if (D_001A7390_1 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
-                                if (RequestSubtitleVoiceLine(0xA15, 0x6C) != 0) {
+                                if (subtitle_request_voice_line(0xA15, 0x6C) != 0) {
                                     now = D_001A7390;
                                     then = *(unsigned int *)(blk + 0x7900);
                                     if (then < now) {
@@ -114,24 +114,24 @@ void func_L20_002B93E0(void)
         }
     }
 
-    base = gHeroState;
-    YeedilUpdateHeroActionDecider();
+    base = g_hero_state;
+    hero_l20_decide_state_transition();
     RebuildRegionObjectMembership();
 
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
     UpdateDelayedSounds();
-    UpdateAllAttachmentRecords();
+    attachment_update_all();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    UpdateHeroMobyFromHero();
-    FadeScreenEffect();
+    hero_update_moby_from_hero();
+    gfx_fade_screen_effect();
     ApplyHeroAxisScales();
     if (*(u8 *)(base + 0x22B4) == 1) {
         D_002683EC = D_001A7CF8;
         UpdateHeroGlowAndExtraManipulators();
         UpdateHeroJointEffect();
-        UpdateHeroHeldObject_L00();
+        hero_update_held_object();
         if (*(u32 *)(base + 0x24E4) != 0) {
             PlayMobySound((void *)(*(u32 *)(base + 0x24E4) + 0x10), 0,
                           (void *)(*(u32 *)(base + 0x2290)));
@@ -141,16 +141,16 @@ void func_L20_002B93E0(void)
         *(s32 *)(base + 0x24E4) = 0;
     }
     {
-        char *pos = gHeroPosition;
+        char *pos = g_hero_position;
         char *g;
 
-        ClearMapBitsAroundPosition(pos);
+        coll_clear_map_bits_around_pos(pos);
         g = pos - 0x80;
         if (*(u8 *)(g + 0x22B4) == 4 && D_L20_001AFF00 == 0 && *(s16 *)(g + 0x1E0) == 0 &&
             *(int *)(g + 0x2294) != 0x6F)
-            StartReceiverBotSequence(*(int *)(g + 0x2290));
+            receiver_bot_start_sequence(*(int *)(g + 0x2290));
     }
     UpdateHeroMobyProbedHeightBounds();
-    hero = gHeroState;
+    hero = g_hero_state;
     func_002A677C(*(int *)(hero + 0x2290));
 }

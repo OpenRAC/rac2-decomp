@@ -1,20 +1,20 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern char *part_alloc(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 extern unsigned char *D_001F259C;
 
 /* Spawns a spinning spark near position (jittered by up to jitter on each axis)
    turning about axis at a random speed between lo and hi, in either direction. */
-char *func_002BDCE8(TI128 *position, int spin, TI128 *axis, int colour, int count,
+char *SpawnSpinningSparkParticle(TI128 *position, int spin, TI128 *axis, int colour, int count,
                      float jitter, float lo, float hi, float size)
 {
-    char *p = AllocParticle(0x17);
+    char *p = part_alloc(0x17);
     char *m;
     if (p != 0) {
         *(TI128 *)(p + 0x10) = *position;
@@ -26,15 +26,15 @@ char *func_002BDCE8(TI128 *position, int spin, TI128 *axis, int colour, int coun
         p[1] = 0;
         p[8] = 0;
         p[2] = *D_001F259C;
-        *(float *)(p + 0x10) += RandomSignedFloatRange(0.0f, jitter);
-        *(float *)(p + 0x14) += RandomSignedFloatRange(0.0f, jitter);
-        *(float *)(p + 0x18) += RandomSignedFloatRange(0.0f, jitter);
+        *(float *)(p + 0x10) += math_random_signed_float_range(0.0f, jitter);
+        *(float *)(p + 0x14) += math_random_signed_float_range(0.0f, jitter);
+        *(float *)(p + 0x18) += math_random_signed_float_range(0.0f, jitter);
         *(float *)(p + 0x1C) = IntToFloat(count);
         *(short *)(p + 0xA) = 10;
         *(int *)(m + 4) = 0;
         *(int *)(p + 0x20) = colour;
-        *(short *)(m + 8) = FloatToInt(RandomIntBelow(2) ? (float)spin : (float)-spin);
-        *(float *)(m + 0xC) = RandomFloatRange(lo, hi);
+        *(short *)(m + 8) = FloatToInt(math_random_int_below(2) ? (float)spin : (float)-spin);
+        *(float *)(m + 0xC) = math_random_float_range(lo, hi);
         *(TI128 *)(m + 0x10) = *axis;
         *(float *)(m + 0x1C) = IntToFloat(0x1E);
     }

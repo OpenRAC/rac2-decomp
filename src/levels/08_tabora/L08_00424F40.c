@@ -4,12 +4,12 @@ typedef int s32;
 
 extern char *func_00328C40(int *a, s32 b, s32 c, s32 d);
 extern char *func_00328D28(int *a, s32 b, s32 c, s32 d);
-extern void func_L08_00424ED0(char *a);
+extern void group_advance_turn(char *a);
 
 /* Walks the 0x21 slot's entry list: one record per step, each clamps its byte 0x20D down
    against the context's, and the walk ends when the helper reports the list empty. */
 /* Removes this creature from its group: the others behind it move up one place and the group gets one smaller. */
-void func_L08_00424F40(char *object)
+void group_remove_member(char *object)
 {
     char *state;
     s32 cursor;
@@ -26,5 +26,5 @@ void func_L08_00424F40(char *object)
         func_00328D28(&cursor, cursor, 0, 0);
     }
     *(s32 *)(*(char **)(state + 0x1FC)) = *(s32 *)(*(char **)(state + 0x1FC)) - 1;
-    AdvanceGroupTurn(object);
+    group_advance_turn(object);
 }

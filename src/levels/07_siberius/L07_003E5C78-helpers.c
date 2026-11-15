@@ -1,16 +1,16 @@
 #include "common.h"
 
-extern void func_002A7750(unsigned char *, int, int);
+extern void moby_set_state(unsigned char *, int, int);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_002AFDD8(char *, char *, char *, char *);
+extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Sends an idle entity to a new spot and shrinks it to a tenth of its size, ready to be
    launched. */
-void func_L07_003E5C78(char *entity, char *newPos, char *homePos, char *platform)
+void entity_send_and_shrink(char *entity, char *newPos, char *homePos, char *platform)
 {
     char *ptr;
     unsigned short flags;
@@ -22,7 +22,7 @@ void func_L07_003E5C78(char *entity, char *newPos, char *homePos, char *platform
     ptr = *(char **)(entity + 0x68);
     *(unsigned short *)(entity + 0x34) = (*(unsigned short *)(entity + 0x34) & 0xFFBE) | 0x1000;
     *(int *)(entity + 0x98) = 0;
-    SetMobyState((unsigned char *)entity, 9, 4);
+    moby_set_state((unsigned char *)entity, 9, 4);
 
     qcopy(entity + 0x10, newPos);
     qcopy(ptr + 0x230, homePos);
@@ -31,7 +31,7 @@ void func_L07_003E5C78(char *entity, char *newPos, char *homePos, char *platform
 
     if (platform != 0) {
         FastVecSub(ptr + 0x220, homePos, platform + 0x10);
-        TransformVectorByObjectOrGiven(platform, ptr + 0x220, ptr + 0x220, 0);
+        vec_transform_by_object_or_given(platform, ptr + 0x220, ptr + 0x220, 0);
     }
     flags = *(unsigned short *)(entity + 0x34);
     ptr = entity + 0xC0;

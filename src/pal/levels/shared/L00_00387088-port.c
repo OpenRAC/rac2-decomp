@@ -5,24 +5,24 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword bits; float f[4]; } Vector4;
 
-extern char *func_0029EFD0(int);
-extern void func_0029F338(void *);
+extern char *CreateMoby(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_002833F0(void *, void *);
-extern void func_002FE8D8(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00282C88(void *);
-extern int func_002FEC78(unsigned char *, unsigned int);
-extern int func_002FED90(void *, void *, float, float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_get_facing_direction(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern int slot_alloc_for_object(unsigned char *, unsigned int);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
 
-extern char *D_0018C0B0[];
+extern char *g_hero_moby[];
 extern unsigned char D_00139591[];
 extern int D_L00_001AEFA8 __attribute__((sda));
 extern int D_L00_001AEF48 __attribute__((sda));
@@ -32,7 +32,7 @@ typedef struct {
     int f58;
     char pad5C[224 - 0x5C];
 } TrailEntry;
-extern TrailEntry D_L00_00262570[];
+extern TrailEntry g_weapon_l00_table[];
 
 typedef struct {
     Quadword velocity;
@@ -68,18 +68,18 @@ typedef struct {
 /* Fields of objects whose layouts are not identified yet. */
 #define FIELD(type, p, off) (*(type *)((char *)(p) + (off)))
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AEC18(void *, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_set_light_color(void *, int);
 extern void func_PAL_002A0F68(char *);
-extern float func_002AA2E8(float *, float, float);
-extern int func_00282948(int *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void *func_L00_00384CA8(void *, void *, void *, unsigned int);
-extern int func_002E5CF8(int, int, char *);
+extern float ApproachValue(float *, float, float);
+extern int math_fast_float_d(int *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void *sheep_board_create_child(void *, void *, void *, unsigned int);
+extern int PlayMobySound(int, int, char *);
 
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern float D_L00_001AEDA0[2] __attribute__((sda));
 extern int D_L00_001AEDA8[2] __attribute__((sda));
 extern float D_L00_001AEDB0 __attribute__((sda));
@@ -87,7 +87,7 @@ extern float D_L00_001AEDB4 __attribute__((sda));
 extern float D_L00_001AEDBC __attribute__((sda));
 extern int D_L00_001AEDD0[2] __attribute__((sda));
 extern Vector4 D_L00_001AEDC0 SDATA(D_L00_001AEDC0);
-extern int D_L00_001B19C8;
+extern int g_frame_l00_counter;
 
 /* Measured input fields; other fields are not yet identified. */
 typedef struct {
@@ -98,7 +98,7 @@ typedef struct {
     char pad120[0x80];
     int buttons;
 } PlayerControl;
-extern PlayerControl D_00138500, D_00138180;
+extern PlayerControl D_00138500, g_pad_state;
 
 typedef struct {
     Vector4 basis[2];
@@ -111,7 +111,7 @@ typedef struct {
 static inline int pad_buttons(int i)
 {
     if (i)
-        return D_00138180.buttons;
+        return g_pad_state.buttons;
     return D_00138500.buttons;
 }
 
@@ -131,11 +131,11 @@ void func_PAL_L00_00387088(char *owner)
     Vector4 *source;
 
     for (i = 0; i < 2; ++i) {
-        func_00283098(work->objects[i] + 0x10, &work->basis[i], D_L00_001B8DC0 + 0x230);
-        func_00282CC0(work->objects[i] + 0x10, work->objects[i] + 0x10, D_L00_001B8DC0);
+        matrix_mul_vec3(work->objects[i] + 0x10, &work->basis[i], g_camera_l00_position + 0x230);
+        FastVecAdd(work->objects[i] + 0x10, work->objects[i] + 0x10, g_camera_l00_position);
         FIELD(float, work->objects[i], 0x2C) =
             FIELD(float, FIELD(char *, work->objects[i], 0x24), 0x24) * D_L00_001AEDA0[i];
-        func_002AEC18(work->objects[i], D_L00_001AEDA8[i]);
+        moby_set_light_color(work->objects[i], D_L00_001AEDA8[i]);
         func_PAL_002A0F68(work->objects[i]);
         func_002A0F48(work->objects[i]);
     }
@@ -144,20 +144,20 @@ void func_PAL_L00_00387088(char *owner)
     source = &D_L00_001AEDC0;
     for (i = 0; i < 2; ++i) {
         if (i)
-            input = D_00138180.axis;
+            input = g_pad_state.axis;
         else
             input = D_00138500.axis;
         if (input == 0.0f) {
             if (i)
-                input = D_00138180.positive - D_00138180.negative;
+                input = g_pad_state.positive - g_pad_state.negative;
             else
                 input = D_00138500.positive - D_00138500.negative;
         }
         target = -input * scale;
         if (target != 0.0f)
-            func_002AA2E8(&work->motion[i].f[2], target, step);
+            ApproachValue(&work->motion[i].f[2], target, step);
         else
-            func_002AA2E8(&work->motion[i].f[2], 0.0f, step + step);
+            ApproachValue(&work->motion[i].f[2], 0.0f, step + step);
         work->basis[i].f[2] += work->motion[i].f[2];
         if (work->basis[i].f[2] > 0.35f) {
             work->basis[i].f[2] = 0.35f;
@@ -168,28 +168,28 @@ void func_PAL_L00_00387088(char *owner)
             if (work->motion[i].f[2] < 0.0f)
                 work->motion[i].f[2] = 0.0f;
         }
-        if (func_00282948(&D_L00_001AEDD0[i])) {
+        if (math_fast_float_d(&D_L00_001AEDD0[i])) {
             FIELD(unsigned char, work->objects[i], 0x23) = 128;
         } else {
-            phase = func_00283CE0(D_L00_001B19C8 % 50);
-            period = func_00283CE0(50);
+            phase = IntToFloat(g_frame_l00_counter % 50);
+            period = IntToFloat(50);
             phase *= 6.2831855f;
             phase /= period;
-            alpha = func_00283CF0(func_00283198(phase - 3.1415927f) * 10.0f) + 20;
+            alpha = FloatToInt(math_fast_sin_or_cos_b(phase - 3.1415927f) * 10.0f) + 20;
             FIELD(unsigned char, work->objects[i], 0x23) = alpha;
         }
-        if (func_00282948(&work->timers[i])
+        if (math_fast_float_d(&work->timers[i])
             && FIELD(unsigned char, work->objects[i], 0x23) == 128
             && (pad_buttons(i) & 0xE0)) {
             work->timers[i] = 37;
             position.bits = source->bits;
             if (!i)
                 position.f[1] -= 0.05f;
-            func_00283098(&position, &position, work->objects[i] + 0xC0);
-            func_00282CC0(&position, &position, work->objects[i] + 0x10);
-            func_00282F20(&velocity, work->objects[i] + 0xC0, D_L00_001AEDB4 * 0.020000001f);
-            func_L00_00384CA8(work->objects[i], &position, &velocity, i);
-            func_002E5CF8(0, 0, work->objects[i]);
+            matrix_mul_vec3(&position, &position, work->objects[i] + 0xC0);
+            FastVecAdd(&position, &position, work->objects[i] + 0x10);
+            vec_scale_to_length(&velocity, work->objects[i] + 0xC0, D_L00_001AEDB4 * 0.020000001f);
+            sheep_board_create_child(work->objects[i], &position, &velocity, i);
+            PlayMobySound(0, 0, work->objects[i]);
         }
     }
 }

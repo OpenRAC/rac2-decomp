@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L01_002F3E90, the PAL copy of func_L01_002F2570: the same C, where the frame limits take the
    50 Hz scale, the step and angle constants change, and the third actor test also requires D_001A79F0 != 0x33. */
 typedef int Quadword __attribute__((mode(TI)));
@@ -17,8 +18,8 @@ typedef struct HeroView {
     char gap5C4[0x16C];
     float transform[16];
 } HeroView;
-extern HeroView D_00189E20;
-extern int D_001A79F0;
+extern HeroView g_hero_state;
+extern int g_current_map_index;
 extern int D_L01_001A9460 __attribute__((sda));
 extern int D_L01_001A9464 __attribute__((sda));
 extern int D_L01_001AF240;
@@ -34,21 +35,21 @@ typedef struct SceneManager {
 extern SceneManager D_L01_001BD1C0;
 extern TrailCamera D_L01_001C5F90;
 
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(char *);
-extern void func_L00_00326048(char *, float *, int, int, float);
-extern void func_00282A60(void *, unsigned int, int);
-extern void func_002833F0(void *, void *);
-extern void func_0029FCC0(char *, int, char *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void math_store_angle_update_result(char *, float *, int, int, float);
+extern void mem_clear(void *, unsigned int, int);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_0030DEC0(char *);
 extern void func_PAL_0030E0E0(char *);
 extern void func_PAL_0030E850(void *);
-extern void func_L01_002F21F0(void *);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern char *func_L01_002F1FD0(float, float, float);
+extern void ship_build_trail_mesh(void *);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern char *tv_screen_find_nearest(float, float, float);
 
 void func_PAL_L01_002F3E90(void)
 {
@@ -57,7 +58,7 @@ void func_PAL_L01_002F3E90(void)
     char *trail;
     Quadword angle;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < D_L01_001BD1C0.count; ++i) {
         actor = D_L01_001BD1C0.entries[i];
         if (actor && *(short *)(actor + 0xAA) == 0xE29) {
@@ -67,19 +68,19 @@ void func_PAL_L01_002F3E90(void)
             func_PAL_002E7270(actor);
         if (actor) {
             int kind = 0xFA0;
-            if (*(short *)(actor + 0xAA) == kind && D_001A79F0 != 0x33 && *(char **)(actor + 0x68))
-                func_L00_00326048(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
+            if (*(short *)(actor + 0xAA) == kind && g_current_map_index != 0x33 && *(char **)(actor + 0x68))
+                math_store_angle_update_result(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
                                  0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
 
-    if (D_001A79F0 == 1) {
+    if (g_current_map_index == 1) {
         if (D_L01_001BD1C0.mode == 1) {
             TrailCamera *camera = &D_L01_001C5F90;
-            D_00189E20.camera = D_L01_001BD1C0.entries[2];
+            g_hero_state.camera = D_L01_001BD1C0.entries[2];
             trail = D_L01_001BD1C0.entries[3];
             if (D_L01_001BD1C0.frame == (((int)(D_L01_001A9460) * 5 + 2) / 6)) {
-                func_00282A60(camera, 0, sizeof(TrailCamera));
+                mem_clear(camera, 0, sizeof(TrailCamera));
                 D_L01_001AF240 = 1;
                 camera->distance = 0.8f;
             }
@@ -87,23 +88,23 @@ void func_PAL_L01_002F3E90(void)
                 D_L01_001BD1C0.frame < (((int)(D_L01_001A9464) * 5 + 2) / 6)) {
                 angle = 0;
                 ((float *)&angle)[2] = -0.13f;
-                func_002833F0(D_00189E20.transform, &angle);
+                euler_rotation_basis(g_hero_state.transform, &angle);
                 camera->distance += (12.0f - camera->distance) * 0.08400001f;
-                func_0029FCC0(trail, 0, (char *)camera);
-                func_00282F20(camera->position, D_00189E20.transform,
+                moby_transform_joint_to_world(trail, 0, (char *)camera);
+                vec_scale_to_length(camera->position, g_hero_state.transform,
                              camera->distance);
-                func_00282CC0(camera->position, camera->target,
+                FastVecAdd(camera->position, camera->target,
                              camera->position);
                 func_PAL_0030DEC0(trail);
                 func_PAL_0030E0E0(trail);
-                func_L00_002E6EF8(func_PAL_0030E850, trail);
+                gfx_add_draw_callback_third(func_PAL_0030E850, trail);
             } else {
-                D_00189E20.camera = 0;
+                g_hero_state.camera = 0;
             }
         }
         if (D_L01_001BD1C0.mode == 3) {
-            trail = func_L01_002F1FD0(0.0f, 0.0f, 0.0f);
-            func_L00_002E6CF0(func_L01_002F21F0, trail);
+            trail = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
+            gfx_add_draw_callback_first(ship_build_trail_mesh, trail);
         }
     }
 }

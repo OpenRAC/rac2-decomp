@@ -2,14 +2,14 @@
 
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
 extern void func_PAL_L00_00412C28(char *, char *);
 extern char D_L00_001B8C80[];
 typedef struct SpawnState {
@@ -33,7 +33,7 @@ typedef struct SpawnObject {
     char pad6c[0x54];
     float forward[4], right[4], up[4];
 } SpawnObject;
-extern void func_002AFFD8(char *a0, void *a1, int a2);
+extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
 /* func_L00_0040BA30 is defined in L00_0040BA30-g8.c. */
 
@@ -46,7 +46,7 @@ extern void func_002AFFD8(char *a0, void *a1, int a2);
 char *func_PAL_L00_004128E0(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
-    char *object = func_0029EFD0(0xf6d);
+    char *object = CreateMoby(0xf6d);
     SpawnState *state;
     SpawnObject *m;
     char *camera;
@@ -60,13 +60,13 @@ char *func_PAL_L00_004128E0(float size, char *position, int trigger, int kind, i
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         camera = D_L00_001B8C80 + 0x140;
-        func_00282CF0(direction, camera, object + 0x10);
-        func_00282F20(direction, direction, 1.0f);
-        func_002AFFD8(object + 0x10, (char *)up, 1);
+        FastVecSub(direction, camera, object + 0x10);
+        vec_scale_to_length(direction, direction, 1.0f);
+        cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
-        func_00282DD8(object + 0xd0, object + 0xc0, up);
-        func_00282F20(object + 0xd0, object + 0xd0, 1.0f);
-        func_00282DD8(object + 0xe0, object + 0xd0, object + 0xc0);
+        FastVecCross(object + 0xd0, object + 0xc0, up);
+        vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
+        FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         m->forward[3] = m->right[3] = m->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 50;
@@ -83,19 +83,19 @@ char *func_PAL_L00_004128E0(float size, char *position, int trigger, int kind, i
         state->size = size;
         qcopy(sphere, object + 0x10);
         ((float *)sphere)[3] = size*3.0f;
-        if (func_00283DB8(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 8;
             state->fade = 0.125f;
-            if (func_00282E48(position, camera) < 48.0f && trigger != 0) {
+            if (fast_vec_dist(position, camera) < 48.0f && trigger != 0) {
                 char *manager = camera - 0x140;
                 *(int *)(manager + 0x16c) = 0;
                 *(volatile float *)(manager + 0x160) = 0.075f;
                 *(volatile int *)(manager + 0x168) = 33;
             }
             if (state->flags != 0) {
-                func_00282CF0(difference, object + 0x10, D_L00_001B8C80 + 0x140);
-                func_00282F20(difference, difference, 1.0f);
-                angle = func_002831B0(func_00282DB0(difference, D_L00_001B8C80 + 0x370));
+                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                vec_scale_to_length(difference, difference, 1.0f);
+                angle = math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

@@ -4,17 +4,17 @@ extern char ref_L00_002FE8D8_00[];
 extern int ref_L00_002FE8D8_01 __attribute__((sda));
 extern float ref_L00_002FE8D8_02[];
 extern int ref_L00_002FE8D8_03 __attribute__((sda));
-extern void func_00282F20(float *, float *, float);
-extern void func_00282C98(float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void vec_copy_helper_a(float *);
 
 /* lot10: privately byte-gated bodies. */
 extern s32 func_00126470(u8 *, s32, s32, s32, s32, s32, s32, s32);
 
-extern s32 func_0011AEA0(s32);
+extern s32 FlushCache(s32);
 
 extern s32 func_00126730(u8 *, u8 *);
 
-extern s32 func_001244B8(s32, s32);
+extern s32 gfx_wait_paths_idle(s32, s32);
 
 /* Family d50cdefed4015bae — 364 bytes, a 16384-byte block loop that builds two
    four-word GS packets per iteration and calls the measured SDK helper at
@@ -53,9 +53,9 @@ extern int D_L03_001B31A0 __attribute__((sda));
 
 extern int D_L03_001B31A4 __attribute__((sda));
 
-extern void func_0011A950(int, int);
+extern void RemoveDmacHandler(int, int);
 
-extern void func_0011B658(int);
+extern void kernel_process_queue_entry_c(int);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_74a5d71aacb394c6_u32;
@@ -71,7 +71,7 @@ typedef struct {
 extern int D_L03_002325D0[];
 
 /* Copies a block of image data from the console memory to the graphics chip in 16 KB pieces. */
-void func_002FC8D0(u8 *dest, s32 vramAddr, s32 size) {
+void gfx_copy_image_to_gs_blocks(u8 *dest, s32 vramAddr, s32 size) {
     u8 image[112];
     s32 remaining = (size + 0x3fff) & ~0x3fff;
     s32 srcOffset = 0, dstOffset = 0;
@@ -81,12 +81,12 @@ void func_002FC8D0(u8 *dest, s32 vramAddr, s32 size) {
         FlushCache(0);
         func_00126730(image,dest+dstOffset);
         dstOffset += 0x3000;
-        WaitGsPathsIdle(0,0);
+        gfx_wait_paths_idle(0,0);
     }
 }
 /* shared native body of family d50cdefed4015bae (default profile) */
 /* Uploads image data to the graphics chip in 16 KB pieces by writing DMA packets. */
-void func_002FC990(int data, int vramAddr, int size)
+void gfx_upload_image_to_gs_packets(int data, int vramAddr, int size)
 {
     int remaining = (size + 16383) & -16384;
     int vramOffset = 0;
@@ -118,10 +118,10 @@ void func_002FC990(int data, int vramAddr, int size)
     }
 }
 
-extern int func_00282A18(int);
+extern int log2dim(int);
 
 /* Uploads a texture to the graphics chip in blocks and returns the texture setup value for it. */
-long long func_002FCB00(int data, int destination, int width, int height)
+long long tex_upload_blocks_return_setup(int data, int destination, int width, int height)
 {
     int block = width << 7;
     int offset = 0;
@@ -189,16 +189,16 @@ extern int D_001B22C0 __attribute__((sda));
 
 extern int D_001B22C4 __attribute__((sda));
 
-extern void func_002FCE18(void);
+extern void gfx_handle_vif1_dma_interrupt(void);
 
-extern void func_002FCF18(void);
+extern void gfx_handle_dma_error_hang(void);
 
-extern int func_0011A930(int, void (*)(void), int);
+extern int AddDmacHandler(int, void (*)(void), int);
 
-extern void func_0011B6C0(int);
+extern void kernel_process_queue_entry_d(int);
 
 /* Installs the two DMA interrupt handlers, once. */
-void func_002FCD18(void)
+void gfx_install_dma_handlers(void)
 {
     if (D_001B22C0 != 0) {
         return;
@@ -209,21 +209,21 @@ void func_002FCD18(void)
     if ((D_STAT & 0x20000) == 0) {
         *(unsigned int *)0x1000E010 = 0x20000;
     }
-    D_001B22C0 = AddDmacHandler(1, HandleVif1DmaInterrupt, 0);
-    D_001B22C4 = AddDmacHandler(15, HandleDmaErrorHang, 0);
-    ProcessKernelQueueEntryD(1);
+    D_001B22C0 = AddDmacHandler(1, gfx_handle_vif1_dma_interrupt, 0);
+    D_001B22C4 = AddDmacHandler(15, gfx_handle_dma_error_hang, 0);
+    kernel_process_queue_entry_d(1);
 }
 
 /* shared native body of family 349daa693c44d158 */
 /* Removes the two DMA interrupt handlers and clears their ids. */
-void func_002FCDA8(void)
+void gfx_remove_dma_handlers(void)
 {
     if ((D_STAT & 0x20000) != 0) {
         D_STAT = 0x20000;
     }
     RemoveDmacHandler(1, D_L03_001B31A0);
     RemoveDmacHandler(15, D_L03_001B31A4);
-    ProcessKernelQueueEntryC(1);
+    kernel_process_queue_entry_c(1);
     D_L03_001B31A0 = 0;
     D_L03_001B31A4 = 0;
 }
@@ -257,7 +257,7 @@ extern Qword_r002FCF90 *r1_D_00161000_q __asm__("r1_D_00161000") MACRO_ADDR;
 
 /* rac1-decomp src/game/vuchain.c: func_00235290 */
 /* Appends a packet header word (tag) to the vector unit packet list. */
-void func_002FCF90(int tag) {
+void append_dma_tag(int tag) {
     Qword_r002FCF90 *p = r1_D_00161000_q++;
     p->w[0] = tag + 0x90000000;
     p->w[1] = 0;
@@ -278,21 +278,21 @@ void func_002FCF90(int tag) {
 
 /* func_002FE5A0 is in its own G8 unit. */
 
-extern void func_002FE8D8(void *, float *);
-extern void func_00282D30(float *, float *, float);
-extern void func_00282CF0(float *, float *, float *);
+extern void moby_get_facing_direction(void *, float *);
+extern void FastVecScale(float *, float *, float);
+extern void FastVecSub(float *, float *, float *);
 
 /* Adds a scaled copy of the direction vector for an object onto another vector. */
-void func_002FE880(void *object, float *destination, float scale)
+void vec_add_object_direction_scaled(void *object, float *destination, float scale)
 {
     float vector[4];
-    GetObjectFacingDirection(object, vector);
+    moby_get_facing_direction(object, vector);
     FastVecScale(vector, vector, scale);
     FastVecSub(destination, destination, vector);
 }
 
 /* Works out the up or facing direction for an object, depending on the player's state. */
-void func_002FE8D8(void *object, float *destination)
+void moby_get_facing_direction(void *object, float *destination)
 {
     char *state = ref_L00_002FE8D8_00;
     if (*(short *)(state + 0x348)) {
@@ -311,7 +311,7 @@ void func_002FE8D8(void *object, float *destination)
         FastVecSub(destination, (float *)(state + 0xB0), object);
         vec_scale_to_length(destination, destination, sign);
     } else {
-        VectorCopyHelperA(destination);
+        vec_copy_helper_a(destination);
     }
 }
 
@@ -349,23 +349,23 @@ typedef struct {
 } CollisionOutput;
 
 extern CollisionOutput ref_L00_002FE9D0_00;
-extern void func_002FE8D8(void *, float *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00282D30(float *, float *, float);
-extern void func_00282CF0(float *, float *, float *);
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00283028(float *, float *, float *);
-extern float func_00282DB0(float *, float *);
-extern int func_00277258(float, float *, int, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_00278E78(void);
+extern void moby_get_facing_direction(void *, float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void FastVecScale(float *, float *, float);
+extern void FastVecSub(float *, float *, float *);
+extern void FastVecAdd(float *, float *, float *);
+extern void vec_fast_normalize(float *, float *, float *);
+extern float FastVecDot(float *, float *);
+extern int coll_test_point(float, float *, int, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern int GetCollHitMaterial(void);
 
 /* One collision step: tests the sphere (or a point offset from it) and,
    on a hit that is not ignored, moves it to the contact and either bounces
    its velocity off the surface, scaling the normal part by `bounce`
    (returns 1), or stops it at the contact point (returns 2); 0 otherwise. The query pointer and the
    separate dot product statement give retail's register use. */
-int func_002FE9D0(SweptSphere *sphere)
+int CollideSweptSphere(SweptSphere *sphere)
 {
     float facing[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
@@ -378,7 +378,7 @@ int func_002FE9D0(SweptSphere *sphere)
     int result = 0, hit, i;
     char *moby;
 
-    GetObjectFacingDirection(sphere->moby + 0x10, facing);
+    moby_get_facing_direction(sphere->moby + 0x10, facing);
     if (sphere->useOffset) {
         vec_scale_to_length(point, (float *)(sphere->moby + 0xE0), sphere->offset);
         FastVecAdd(point, sphere->position, point);
@@ -389,7 +389,7 @@ int func_002FE9D0(SweptSphere *sphere)
         query = point;
         position = sphere->position;
     }
-    hit = TestPointAgainstCollision(sphere->radius, query, sphere->collisionFlags, sphere->moby);
+    hit = coll_test_point(sphere->radius, query, sphere->collisionFlags, sphere->moby);
     if (hit) {
         hit = 1;
     } else {
@@ -414,7 +414,7 @@ int func_002FE9D0(SweptSphere *sphere)
             (sphere->moby && *(short *)(*(char **)(sphere->moby + 0x24) + 0x46) == 5 &&
              sphere->slideOnCreatures)) {
             velocity = sphere->velocity;
-            FastVectorNormalize(velocity, velocity, sphere->normal);
+            vec_fast_normalize(velocity, velocity, sphere->normal);
             result++;
             dot = FastVecDot(velocity, sphere->normal);
             FastVecScale(along, sphere->normal, dot);
@@ -432,17 +432,17 @@ int func_002FE9D0(SweptSphere *sphere)
 extern char D_0021F9C0[];
 
 /* Returns slot number index of the 64-slot table, or nothing if out of range. */
-void *func_002FEC50(int index) {
+void *slot_get_by_index(int index) {
     void *result = 0;
     if ((unsigned int)index < 64u)
         result = D_0021F9C0 + index * 0x50;
     return result;
 }
 
-extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
+extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 
 /* Finds a free slot in the 64-slot table, sets it up for an object and returns its number. */
-int func_002FEC78(unsigned char *object, unsigned int flags)
+int slot_alloc_for_object(unsigned char *object, unsigned int flags)
 {
     char *p = D_0021F9C0;
     int i = 0;
@@ -479,9 +479,9 @@ int func_002FEC78(unsigned char *object, unsigned int flags)
     return i;
 }
 
-extern void func_0029F9F0(char *, char *);
+extern void moby_detach_manipulator(char *, char *);
 /* Releases a slot of the 64-slot table. */
-void func_002FED28(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0 + index * 0x50; DetachManipulator(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
+void slot_free(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0 + index * 0x50; moby_detach_manipulator(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
 
 
 /* func_002FED90 is matched in its own unit, src/game/002FED90-qcopy.c (-frac2-qcopy). */
@@ -489,7 +489,7 @@ void func_002FED28(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0
 extern char D_002212E0[];
 
 /* Clears the flag word of one entry in a table of small records. */
-void func_002FEE50(int index) {
+void table_clear_entry_flag(int index) {
     int *p;
     if (index < 0) return;
     p = (int *)((unsigned int)D_002212E0 + (index << 5));
@@ -500,23 +500,23 @@ void func_002FEE50(int index) {
 
 
 /* Does nothing. */
-void func_002FF288(void)
+void game_noop(void)
 {
 }
 
-extern void func_0029F0C8(void *, int);
-extern void func_00282A60(unsigned int *, unsigned int, int);
+extern void moby_init_instance(void *, int);
+extern void mem_clear(unsigned int *, unsigned int, int);
 extern void func_002A0F48(void *);
 extern char *ref_L00_002FF290_00 __attribute__((sda));
 extern char *ref_L00_002FF290_01 __attribute__((sda));
 /* Sets up an object of the given kind and gives it a cleared 128-byte block of private data. */
-void func_002FF290(char *object, int kind)
+void moby_init_with_private_data(char *object, int kind)
 {
     char *data;
-    InitMobyInstance(object, kind);
+    moby_init_instance(object, kind);
     data = ref_L00_002FF290_01 + (((int)object - (int)ref_L00_002FF290_00) >> 8) * 128;
     *(char **)(object + 0x68) = data;
-    ClearMemory((unsigned int *)data, 0, 128);
+    mem_clear((unsigned int *)data, 0, 128);
     if ((*(unsigned short *)(object + 0x34) & 4) == 0)
         func_002A0F48(object);
 }
@@ -524,13 +524,13 @@ void func_002FF290(char *object, int kind)
 /* func_002FF300 is matched in its own unit, src/game/002FF300.c (default flags). */
 
 extern char *D_001B2348 __attribute__((sda));
-extern void func_002FF290(char *, int);
+extern void moby_init_with_private_data(char *, int);
 
 /* Sets up the preview object so it is small, hidden at first and ready to show. */
-void func_002FF3F8(void)
+void shop_setup_preview_object(void)
 {
     char *object;
-    InitObjectWithPrivateData(D_001B2348, 0x3EF);
+    moby_init_with_private_data(D_001B2348, 0x3EF);
     object = D_001B2348;
     *(unsigned char *)(object + 0x30) = 255;
     *(unsigned short *)(object + 0x34) |= 0x43;
@@ -572,8 +572,8 @@ typedef struct {
     float rotation[4];
 } PreviewObjectPrefix;
 
-extern PreviewCameraPrefix D_001B5200;
-extern PreviewState D_001B2310 __attribute__((sda));
+extern PreviewCameraPrefix g_active_camera;
+extern PreviewState g_object_preview_state __attribute__((sda));
 /* Distances along the preview's basis rows, separate small-data floats
    (retail loads D_001AD814 in a branch delay slot, so it is not an offset
    from a common base). */
@@ -582,15 +582,15 @@ extern float D_001AD80C SDATA(D_001AD80C) __attribute__((sda));
 extern float D_001AD810 SDATA(D_001AD810) __attribute__((sda));
 extern float D_001AD814 SDATA(D_001AD814) __attribute__((sda));
 extern float D_001AD818 SDATA(D_001AD818) __attribute__((sda));
-extern float func_00283B98(float, float);
-extern void func_002833F0(float *, float *);
-extern void func_00300048(void *);
+extern float FastAddRotations(float, float);
+extern void euler_rotation_basis(float *, float *);
+extern void shop_spawn_preview_light_burst(void *);
 
 /* Places the previewed object in front of the camera, turns it a little
    (about x when spinning, else about z) and offsets it along its own basis.
    The two spinning branches end in the same scale-and-add, which cc1's
    cross-jumping merges into one tail as in retail. */
-void func_002FF968(PreviewObjectPrefix *object)
+void PlaceObjectBeforeCamera(PreviewObjectPrefix *object)
 {
     float offset[4] __attribute__((aligned(16)));
     float basis[12] __attribute__((aligned(16)));
@@ -601,19 +601,19 @@ void func_002FF968(PreviewObjectPrefix *object)
         object->classId == 0x907 /* Spiderbot Glove */ || object->classId == 0xE7A /* Tankbot Glove */ || special)
         compact = 1;
     if (special) {
-        FastVecScale(offset, gActiveCamera.forward, 2.5f);
+        FastVecScale(offset, g_active_camera.forward, 2.5f);
     } else if (compact) {
-        FastVecScale(offset, gActiveCamera.forward, 2.0f);
+        FastVecScale(offset, g_active_camera.forward, 2.0f);
     } else {
-        FastVecScale(offset, gActiveCamera.forward, 3.0f);
+        FastVecScale(offset, g_active_camera.forward, 3.0f);
     }
-    FastVecAdd(object->position, gActiveCamera.position, offset);
-    if (gObjectPreviewState.spin)
+    FastVecAdd(object->position, g_active_camera.position, offset);
+    if (g_object_preview_state.spin)
         object->rotation[0] = FastAddRotations(object->rotation[0], 0.03490659f);
     else
         object->rotation[2] = FastAddRotations(object->rotation[2], 0.03490659f);
     euler_rotation_basis(basis, object->rotation);
-    if (gObjectPreviewState.spin) {
+    if (g_object_preview_state.spin) {
         if (compact) {
             FastVecScale(temporary, basis + 4, D_001AD818);
             FastVecAdd(object->position, object->position, temporary);
@@ -630,7 +630,7 @@ void func_002FF968(PreviewObjectPrefix *object)
         FastVecAdd(object->position, object->position, temporary);
     }
     func_002A0F48(object);
-    SpawnPreviewLightBurst(object);
+    shop_spawn_preview_light_burst(object);
 }
 
 /* func_002FFCF8 is in 002FC8D0-fade.c. */
@@ -653,76 +653,76 @@ typedef struct {
 extern float D_001AD81C SDATA(D_001AD81C) __attribute__((sda));
 extern float D_001A8BD0[] MACRO_ADDR;
 extern unsigned char *D_001F2614;
-extern float func_00283CE0(int);
-extern void func_00282D08(float *, float *, float *, float);
-extern int func_00283CF0(float);
+extern float IntToFloat(int);
+extern void lerp_vector(float *, float *, float *, float);
+extern int FloatToInt(float);
 /* The particle constructor of 002BF6F0-c65a0.c, declared with its three
    float parameters after the first five integers (as 0032DD40-g8.c does):
    each register bank keeps its order, and retail sets up the arguments in
    this order. */
-extern Particle_C65A0 *func_002C65A0(const float *, const float *, int, unsigned int, int, int, int,
+extern Particle_C65A0 *part_spawn_gravity_fade(const float *, const float *, int, unsigned int, int, int, int,
                                    float, float, float, int);
 
 /* Emits three particles between 0.1 and 9 units in front of the camera,
    at the point the preview timer has reached; their phase advances once
    per call. */
-void func_002FFD78(void)
+void EmitParticlesBeforeCamera(void)
 {
     float offset[4] __attribute__((aligned(16)));
     float farPoint[4] __attribute__((aligned(16)));
     float nearPoint[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    int phase = gObjectPreviewState.phase;
+    int phase = g_object_preview_state.phase;
     int secondPhase;
     float size, interpolation;
     Particle_C65A0 *particle;
-    FastVecScale(offset, gActiveCamera.forward, 9.0f);
-    FastVecAdd(farPoint, gActiveCamera.position, offset);
-    FastVecScale(offset, gActiveCamera.forward, 0.1f);
-    FastVecAdd(nearPoint, gActiveCamera.position, offset);
-    interpolation = IntToFloat(gObjectPreviewState.frames) * gObjectPreviewState.rate;
+    FastVecScale(offset, g_active_camera.forward, 9.0f);
+    FastVecAdd(farPoint, g_active_camera.position, offset);
+    FastVecScale(offset, g_active_camera.forward, 0.1f);
+    FastVecAdd(nearPoint, g_active_camera.position, offset);
+    interpolation = IntToFloat(g_object_preview_state.frames) * g_object_preview_state.rate;
     lerp_vector(position, nearPoint, farPoint, interpolation);
     size = D_001AD81C * 210000.0f;
-    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
+    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     secondPhase = (phase + 128) % 255;
-    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     size *= 0.5f;
-    particle = SpawnGravityFadeParticle(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
         particle->shade = *D_001F2614;
         particle->variation = FloatToInt(0.4f) + 64;
     }
-    gObjectPreviewState.phase++;
+    g_object_preview_state.phase++;
 }
 
 extern short D_001B2346;
 
 extern short ref_L00_002FFFE0_00 __attribute__((sda));
 
-extern short D_001A6480[];
+extern short g_screen_adjust_offsets[];
 
-extern void func_002FC560(int, long long);
+extern void VU1_addGSregister(int, long long);
 
-extern void func_0027DE50(int, int, int, int, int);
+extern void gfx_draw_colored_rectangle(int, int, int, int, int);
 
 /* Draws a dark overlay on the screen whose strength comes from the preview fade value. */
-void func_002FFFE0(void)
+void shop_draw_preview_dim_overlay(void)
 {
     short alpha;
     VU1_addGSregister(0x42, ((long long)ref_L00_002FFFE0_00 << 32) | 0x44);
     alpha = ref_L00_002FFFE0_00;
-    DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (alpha << 24) | 0xFFFFFF);
+    gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (alpha << 24) | 0xFFFFFF);
 }
 
 
@@ -731,7 +731,7 @@ void func_002FFFE0(void)
 
 
 /* Puts a value in the first free place of a 64-entry list and returns the place, or -1 if full. */
-s32 func_00300280(s32 *list,s32 value) {
+s32 slot_list_add(s32 *list,s32 value) {
  s32 placeIndex=-1,i=0,flagValue=1; s32 *p=list;
  for(;i<64;i++,p++) {
   if(*p==0) {
@@ -748,7 +748,7 @@ s32 func_00300280(s32 *list,s32 value) {
 
 /* Clear corresponding indexed words and decrement a record count */
 /* Removes one entry from the 64-entry list and resets it when it becomes empty. */
-void func_00300300(Rac2Native_74a5d71aacb394c6_ExtraIndexState48 *state, int index) {
+void slot_list_remove(Rac2Native_74a5d71aacb394c6_ExtraIndexState48 *state, int index) {
     state->first[index] = 0;
     state->second[index] = 0;
     if (--state->count == 0) {
@@ -768,7 +768,7 @@ typedef struct {
     int limit;
 } State00300330;
 
-extern float func_00282EB0(char *origin, char *point);
+extern float vec_fast_helper_c(char *origin, char *point);
 
 /* The origin the distance helper is given.  The retail materialises it as
    `lui $s5,0x19` + `addiu $a0,$s5,-0x6160`, so it is the word at 0x190000 taken 0x6160
@@ -776,7 +776,7 @@ extern float func_00282EB0(char *origin, char *point);
 extern char D_00190000[];
 
 /* Sorts the listed objects by distance from the player and keeps the nearest ones. */
-void func_00300330(void *tablePtr) {
+void moby_sort_entries_by_distance(void *tablePtr) {
     State00300330 *state = (State00300330 *)tablePtr;
     float distances[64];
     int i;
@@ -793,7 +793,7 @@ void func_00300330(void *tablePtr) {
     for (i = 0; i < 64; i++) {
         if (state->row0[i] != 0) {
             state->row1[i] = 0;
-            distances[i] = FastVectorHelperC((char *)D_00190000 - 0x6160, (char *)(state->row0[i] + 0x10));
+            distances[i] = vec_fast_helper_c((char *)D_00190000 - 0x6160, (char *)(state->row0[i] + 0x10));
             calls++;
         }
         if (calls == state->count) {
@@ -844,7 +844,7 @@ typedef struct {
 extern State003004B0 D_00220DC0;
 
 /* Returns the saved value for the current entry if enabled, otherwise the value given. */
-float func_003004B0(float value) {
+float game_get_override_value(float value) {
     float result = value;
     if (D_00220DC0.enabled != 0)
         result = D_00220DC0.records[D_00220DC0.index].value;
@@ -853,7 +853,7 @@ float func_003004B0(float value) {
 
 /* shared native body of family 8a42bc68419c7402 */
 /* Tells whether a value is in the list of ids (1 if found, else 0). */
-int func_003004E0(int value)
+int game_is_id_in_list(int value)
 {
     int i;
     int found = 0;
@@ -871,7 +871,7 @@ int func_003004E0(int value)
 
 /* func_00300540 : dispatch: weapon category selected by the identifier */
 /* Sorts a weapon id into a group: 2, 1, or 0 for all others. */
-s32 func_00300540(s32 weaponId) {
+s32 weapon_get_group(s32 weaponId) {
     s32 group = 0;
     if (weaponId == 0 || weaponId == 14 || weaponId == 13) group = 2;
     else if (weaponId == 1 || weaponId == 3 || weaponId == 11 || weaponId == 12) group = 1;

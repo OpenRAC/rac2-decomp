@@ -1,22 +1,22 @@
 #include "common.h"
 typedef unsigned int QW __attribute__((mode(TI)));
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_0027DE50(int, int,int, int, unsigned long);
-extern void func_00281DE8(void *, int, int,int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern void func_00281EB8(void *, int, unsigned int, int, float, float,float);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void gfx_draw_colored_rectangle(int, int,int, int, unsigned long);
+extern void gfx_init_quad_packet_state(void *, int, int,int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float,float);
 typedef struct { char pad[0x150]; short width, height; } Screen;
-extern Screen D_001A6480;
+extern Screen g_screen_adjust_offsets;
 extern char D_L05_001B96C0[];
 extern char D_0018A0E0[];
 extern float D_L05_001B3580[] __attribute__((sda));
@@ -25,7 +25,7 @@ extern char D_L05_001AA250[];
 extern float D_L05_001B1580 __attribute__((sda));
 /* Draws the slot effect, with an optional screen fade and flash quad, then
    expands its billboards while reducing the slot alpha. */
-void func_L05_00428518(char *obj)
+void DrawExpandingBillboardEffect(char *obj)
 {
     struct { float vertex[4][4]; unsigned int color[4]; float uv[4][2]; long tail[4]; } p;
     struct { float a[4], b[4], c[4], d[4], e[4], f[4], g[4], matrix[12]; } v __attribute__((aligned(16)));
@@ -38,14 +38,14 @@ void func_L05_00428518(char *obj)
             color |= intensity << 8;
             color |= intensity;
             VU1_addGSregister(0x42,0x48);
-            DrawColoredRectangle(0,gScreenAdjustOffsets.height,0,gScreenAdjustOffsets.width,color);
+            gfx_draw_colored_rectangle(0,g_screen_adjust_offsets.height,0,g_screen_adjust_offsets.width,color);
         }
         if (*(short *)(s+4) && *(int *)(s+0x38)) {
             float alpha;
             unsigned int color;
             qcopy_nc(v.a,obj+0xe0);
             alpha=IntToFloat(*(short *)(s+4)) * *(float *)(s+0x10);
-            InitQuadPacketState(&p,11,4,128);
+            gfx_init_quad_packet_state(&p,11,4,128);
             color=(FloatToInt(alpha*255.0f)<<24)|0xffffff;
             p.color[0]=p.color[1]=p.color[2]=p.color[3]=color;
             p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
@@ -65,10 +65,10 @@ void func_L05_00428518(char *obj)
     {
         float size = *(float *)(s + 0x40) * 4.0f;
 
-        DrawBillboardQuad_00281EB8(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0x804040,1,D_L05_001B3580[*(int *)(s+0x3c)]*size,0.08f,0);
+        gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0x804040,1,D_L05_001B3580[*(int *)(s+0x3c)]*size,0.08f,0);
     }
-    DrawBillboardQuad_00281EB8(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0xc84064,1,D_L05_001B3580[*(int *)(s+0x3c)]*(*(float *)(s+0x40)*8.0f),0.08f,0);
-    InitQuadPacketState(&p,*(int *)(s+0x48),1,128);
+    gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0xc84064,1,D_L05_001B3580[*(int *)(s+0x3c)]*(*(float *)(s+0x40)*8.0f),0.08f,0);
+    gfx_init_quad_packet_state(&p,*(int *)(s+0x48),1,128);
     p.color[0]=p.color[1]=p.color[2]=p.color[3]=0x7f0000ff;
     p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
     p.uv[2][0]=1; p.uv[2][1]=0; p.uv[3][0]=1; p.uv[3][1]=1;

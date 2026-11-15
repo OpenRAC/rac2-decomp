@@ -1,31 +1,31 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 extern char D_L05_001B96C0[];
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L05_00425058(void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void part_spawn_large_explosion(void *, void *);
 
 /* Glow ring: four pulsing sprites along the actor's facing, each faded in. */
 typedef int GlowRingVector __attribute__((mode(TI)));
 extern unsigned char ref_L05_00426348_00[];
 extern unsigned char ref_L05_004268E8_00[];
-extern void func_00282CF0(float *, void *, float *);
-extern void func_00282F20(float *, float *, float);
+extern void FastVecSub(float *, void *, float *);
+extern void vec_scale_to_length(float *, float *, float);
 
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern u32 func_00283D38(u32, u32, float);
-extern int func_00283CF0(float);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern u32 FastTweenColor(u32, u32, float);
+extern int FloatToInt(float);
 
 typedef struct { unsigned char pad[9]; unsigned char fade; } GlowRingSprite;
-extern GlowRingSprite *func_002C2FD8(void *, u32, int, int, int, int, int, float);
+extern GlowRingSprite *part_spawn_fading(void *, u32, int, int, int, int, int, float);
 
 typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowRingState;
 
@@ -35,27 +35,27 @@ extern char *D_L05_001B2614 __attribute__((sda));
 
 extern int D_L05_00221D10[];
 
-extern char *func_002ED688(char *object);
+extern char *moby_get_motion_data(char *object);
 
-extern void func_L05_0037AEC0(char *object, int flag);
+extern void moby_init_spawned_sub_object(char *object, int flag);
 
-extern float func_002A7878(float a, float b);
+extern float math_random_float_range(float a, float b);
 
-extern float func_002A7940(void);
+extern float math_random_angle(void);
 
-extern void func_002AF000(char *dst, float a, float b, float c);
+extern void vec_build_spherical_offset(char *dst, float a, float b, float c);
 
-extern void func_00282CC0(char *dst, char *src, char *src2);
+extern void FastVecAdd(char *dst, char *src, char *src2);
 
 extern int func_332AB8(int kind);
 
-extern void func_L00_002E6EF8(void *, void *);
+extern void gfx_add_draw_callback_third(void *, void *);
 
 extern int ref_L05_00424780_00;
 
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 
-extern int func_00282978(char *);
+extern int FastDecTimer(char *);
 
 extern int ref_L05_00424C88_00;
 
@@ -70,11 +70,11 @@ extern float D_L05_001B2FB8[] __attribute__((sda)), D_L05_001B2FD0[] __attribute
 extern int D_L05_001B2F70[] __attribute__((sda)), D_L05_001B2FE8[] __attribute__((sda));
 extern int D_L05_001B2FA0[] __attribute__((sda));
 extern int func_001163B0(void);
-extern void func_00282C88(void *);
+extern void vec_clear_128(void *);
 
 /* Clears the four emitters' 137 vectors of the object's slot, gives each a random speed, and
    starts the emitters around the object's position with random fades and lifetimes. */
-void func_L05_003D33E8(char *obj)
+void part_reset_emitter_slot_effect(char *obj)
 {
     int *st = *(int **)(obj + 0x68);
     char *position = obj + 0x10;
@@ -83,32 +83,32 @@ void func_L05_003D33E8(char *obj)
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 137; j++) {
-            float speed = RandomFloatRange(0.5f, 4.0f);
+            float speed = math_random_float_range(0.5f, 4.0f);
 
-            ClearVector128(D_L05_0023F920[*st][i][j]);
+            vec_clear_128(D_L05_0023F920[*st][i][j]);
             D_L05_0024A460[*st][i][j] = speed;
         }
         /* This slot and the actor position do not contain the private index. */
         qcopy_nc(D_L05_0024D020[*st][i], position);
         D_L05_0024CFD0[*st][i] = 6;
-        D_L05_0024CF30[*st][i] = Rand() % 128 + 128;
-        D_L05_0024CF80[*st][i] = Rand() % 2 + 6;
+        D_L05_0024CF30[*st][i] = func_001163B0() % 128 + 128;
+        D_L05_0024CF80[*st][i] = func_001163B0() % 2 + 6;
         {
-            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[0] += jitter;
         }
         {
-            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[1] += jitter;
         }
         {
-            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
+            float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
@@ -127,7 +127,7 @@ void func_L05_003D33E8(char *obj)
 
 /* shared native body of family 5a97ab89858c */
 /* Fills a four-corner sprite packet with default corners, colours and draw settings. */
-void func_L05_00416630(char *packet)
+void gfx_init_beam_packet(char *packet)
 {
     *(long long *)(packet + 112) = 0;
     *(float *)(packet + 8) = -1.0f;
@@ -152,7 +152,7 @@ void func_L05_00416630(char *packet)
 
 /* Spawns the object's effect: marks the object, takes one record of the shared
    128-byte table by the global index and gives it a random position. */
-void func_L05_00417448(char *object)
+void moby_init_effect_from_table(char *object)
 {
     char *sub = *(char **)(object + 0x68);
     char *table;
@@ -160,17 +160,17 @@ void func_L05_00417448(char *object)
 
     *(unsigned char *)(object + 0x20) = 1;
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
-    *(int *)(GetMobyMotionData(object) + 0x148) = 1;
-    InitSpawnedSubObject(object, 1);
+    *(int *)(moby_get_motion_data(object) + 0x148) = 1;
+    moby_init_spawned_sub_object(object, 1);
     table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
     *(int *)(sub + 0x1C8) = 0x78;
     *(int *)(sub + 0x1C0) = -1;
     *(int *)(sub + 0x1C4) = -1;
     *(float *)(sub + 0x180) = 1.0f;
-    distance = RandomFloatRange(0.0f, *(float *)table);
-    angleA = RandomAngle();
-    angleB = RandomAngle();
-    BuildSphericalOffset(object + 0x10, distance, angleA, angleB);
+    distance = math_random_float_range(0.0f, *(float *)table);
+    angleA = math_random_angle();
+    angleB = math_random_angle();
+    vec_build_spherical_offset(object + 0x10, distance, angleA, angleB);
     FastVecAdd(object + 0x10, table + 0x30, object + 0x10);
     *(int *)(sub + 0x1B8) = 0;
     *(float *)(object + 0x2C) = 0.02f;
@@ -181,78 +181,78 @@ void func_L05_00417448(char *object)
 
 /* func_L05_00418440 is matched in L05_00418440.c (built with -mno-split-addresses). */
 
-extern void func_L05_0041C7E8(char *, int);
+extern void equipment_copy_owner_transform(char *, int);
 
-extern void func_L05_00432158(char *, int);
+extern void moby_copy_transform(char *, int);
 
 extern void func_002A10E8(int);
 
 /* Walks the state's fifteen id fields: a live one is handed to the level's own
     helper together with the object, then to the shared one. */
 /* Keeps the equipment parts that are alive in step with the main object, one by one. */
-void func_L05_00418508(char *object)
+void moby_sync_equipment_parts(char *object)
 {
     char *vars;
 
     vars = *(char **)(object + 0x68);
     if (*(int *)(vars + 0x40) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x40));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x40));
         func_002A10E8(*(int *)(vars + 0x40));
     }
     if (*(int *)(vars + 0x44) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x44));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x44));
         func_002A10E8(*(int *)(vars + 0x44));
     }
     if (*(int *)(vars + 0x48) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x48));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x48));
         func_002A10E8(*(int *)(vars + 0x48));
     }
     if (*(int *)(vars + 0x4C) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x4C));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x4C));
         func_002A10E8(*(int *)(vars + 0x4C));
     }
     if (*(int *)(vars + 0x50) != 0) {
-        CopyObjectTransform(object, *(int *)(vars + 0x50));
+        moby_copy_transform(object, *(int *)(vars + 0x50));
         func_002A10E8(*(int *)(vars + 0x50));
     }
     if (*(int *)(vars + 0xAC) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0xAC));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0xAC));
         func_002A10E8(*(int *)(vars + 0xAC));
     }
     if (*(int *)(vars + 0x1F0) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F0));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x1F0));
         func_002A10E8(*(int *)(vars + 0x1F0));
     }
     if (*(int *)(vars + 0x1F4) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F4));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x1F4));
         func_002A10E8(*(int *)(vars + 0x1F4));
     }
     if (*(int *)(vars + 0x1F8) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F8));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x1F8));
         func_002A10E8(*(int *)(vars + 0x1F8));
     }
     if (*(int *)(vars + 0x1FC) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1FC));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x1FC));
         func_002A10E8(*(int *)(vars + 0x1FC));
     }
     if (*(int *)(vars + 0x200) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x200));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x200));
         func_002A10E8(*(int *)(vars + 0x200));
     }
     if (*(int *)(vars + 0x204) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x204));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x204));
         func_002A10E8(*(int *)(vars + 0x204));
     }
     if (*(int *)(vars + 0x208) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x208));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x208));
         func_002A10E8(*(int *)(vars + 0x208));
     }
     if (*(int *)(vars + 0x274) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x274));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x274));
         func_002A10E8(*(int *)(vars + 0x274));
     }
     if (*(int *)(vars + 0x278) != 0) {
-        CopyOwnerTransformToPart(object, *(int *)(vars + 0x278));
+        equipment_copy_owner_transform(object, *(int *)(vars + 0x278));
         func_002A10E8(*(int *)(vars + 0x278));
     }
 }
@@ -269,7 +269,7 @@ void func_L05_00418508(char *object)
 /* func_L05_00419F10 is defined in L05_00419F10-g8.c. */
 
 /* An empty function that does nothing. */
-void func_L05_0041A218(void)
+void stub_l05_empty(void)
 {
     char buf[0x20];
 }
@@ -280,7 +280,7 @@ void func_L05_0041A218(void)
 /* func_L05_0041C1F0 is defined in L05_0041C1F0-g8.c. */
 
 /* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
-void func_L05_0041C410(char *object)
+void glow_l05_ring_init_state(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
@@ -316,7 +316,7 @@ void func_L05_0041C410(char *object)
 /* func_L05_0041D570 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1348 through $gp). */
 
 /* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
-void func_L05_0041D728(char *object)
+void glow_l05_ring_init_state_2(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
@@ -352,12 +352,12 @@ void func_L05_0041D728(char *object)
 /* func_L05_00421908 is in L05_003D33E8-reward-g8.c: -G8, with its own jump table. */
 
 /* Registers the object for drawing when its flag is set, and marks it as visible. */
-void func_L05_00424780(char *object)
+void part_register_draw_if_enabled(char *object)
 {
     char *vars = *(char **)(object + 0x68);
 
     if (*(int *)(vars + 0xC) != 0)
-        AddDrawCallbackToList3(&ref_L05_00424780_00, object);
+        gfx_add_draw_callback_third(&ref_L05_00424780_00, object);
     *(unsigned short *)(object + 0x34) |= 0x41;
 }
 
@@ -375,7 +375,7 @@ extern float ref_L05_004247C8_09(float, float);
 extern float ref_L05_004247C8_10(float);
 
 /* Scatters 30 sparkle sprites around the object in a ring, each drawn twice. */
-void func_L05_004247C8(char *object) {
+void part_spawn_ring_sparkles(char *object) {
     float point[4];
     char *state;
     int color;
@@ -410,7 +410,7 @@ void func_L05_004247C8(char *object) {
 }
 
 /* Sets the colour value of the effect. */
-void func_L05_00424970(char *object, int value)
+void effect_set_color(char *object, int value)
 {
     char *vars = *(char **)(object + 0x68);
 
@@ -418,7 +418,7 @@ void func_L05_00424970(char *object, int value)
 }
 
 /* Turns the effect on or off with the given value. */
-void func_L05_00424980(char *object, int value)
+void effect_set_enabled(char *object, int value)
 {
     char *vars = *(char **)(object + 0x68);
 
@@ -427,7 +427,7 @@ void func_L05_00424980(char *object, int value)
 
 /* Creates a camera-facing burst, sets its lifetime and colors, and shakes
    the camera when a visible burst is nearby. */
-char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
+char *part_spawn_shockwave_burst(void *pos, int shake, int c20, int c24, int c28,
                          int c2c, int c30, int unused, int c34, int mode,
                          int c38, float scale)
 {
@@ -444,7 +444,7 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
         *(float *)(obj + 0x1C) = 1.0f;
         FastVecSub(toward, D_L05_001B96C0, (float *)(obj + 0x10));
         vec_scale_to_length(toward, toward, 1.0f);
-        ComputeViewDirection(obj + 0x10, up, 1);
+        cam_compute_view_direction(obj + 0x10, up, 1);
         qcopy(obj + 0xC0, toward);
         FastVecCross(obj + 0xD0, obj + 0xC0, up);
         vec_scale_to_length((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
@@ -466,7 +466,7 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
         *(int *)(st + 0x18) = 0;
         qcopy(sphere, obj + 0x10);
         sphere[3] = scale * 3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             *(short *)(st + 4) = 10;
             *(float *)(st + 0x10) = 0.1f;
             if (fast_vec_dist(pos, D_L05_001B96C0) < 48.0f && shake) {
@@ -479,7 +479,7 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
             if (*(int *)(st + 0x18)) {
                 FastVecSub(cameraDir, obj + 0x10, (float *)D_L05_001B96C0);
                 vec_scale_to_length(cameraDir, cameraDir, 1.0f);
-                if (1.5707964f - FastAngleHelper(FastVecDot(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
                     *(int *)(st + 0x18) = 1;
                 else
                     *(int *)(st + 0x18) = 0;
@@ -488,13 +488,13 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
             *(short *)(st + 4) = 0;
             *(int *)(st + 0x18) = 0;
         }
-        SpawnLargeExplosionEffect(obj, up);
+        part_spawn_large_explosion(obj, up);
     }
     return obj;
 }
 
 /* Counts down two timers; when the first one has run out the object is deleted. */
-void func_L05_00424C88(char *object)
+void timed_effect_update(char *object)
 {
     char *vars = *(char **)(object + 0x68);
 
@@ -502,7 +502,7 @@ void func_L05_00424C88(char *object)
         FastDecTimer(vars + 4);
         ref_L05_00424C88_01(&ref_L05_00424C88_00, object);
     } else {
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
     }
 }
 
@@ -513,7 +513,7 @@ void func_L05_00424C88(char *object)
 /* func_L05_004260B8 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B14FC through $gp). */
 
 /* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
-void func_L05_00426270(char *object)
+void glow_l05_ring_init_state_3(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
@@ -543,7 +543,7 @@ void func_L05_00426270(char *object)
 }
 
 /* Draws four pulsing glow sprites in a short line in front of the object, each fading in. */
-void func_L05_00426348(unsigned char *object)
+void glow_ring_draw_sprites(unsigned char *object)
 {
     GlowRingState *glow = *(GlowRingState **)(object + 0x68);
     float m[4];
@@ -567,11 +567,11 @@ void func_L05_00426348(unsigned char *object)
             glow->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
             glow->phase[i] = v + 255.0f;
-        if (FastFloatHelperD(&glow->alpha[i]))
+        if (math_fast_float_d(&glow->alpha[i]))
             glow->alpha[i] = 0xFF;
-        v = FloatAbs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
+        v = math_fabs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
         color = FastTweenColor(0x502020FF, 0x102020FF, v);
-        s = SpawnFadingParticle_002C2FD8(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
+        s = part_spawn_fading(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
         if (s)
             s->fade = FloatToInt(1.0f) + 0x60;
         FastVecAdd((char *)m, (char *)m, (char *)q);
@@ -584,7 +584,7 @@ void func_L05_00426348(unsigned char *object)
 /* func_L05_00426658 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1500 through $gp). */
 
 /* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
-void func_L05_00426810(char *object)
+void glow_l05_ring_init(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
@@ -614,7 +614,7 @@ void func_L05_00426810(char *object)
 }
 
 /* Draws four pulsing glow sprites in a short line in front of the object, each fading in. */
-void func_L05_004268E8(unsigned char *object)
+void glow_l05_ring_draw(unsigned char *object)
 {
     GlowRingState *glow = *(GlowRingState **)(object + 0x68);
     float m[4];
@@ -638,11 +638,11 @@ void func_L05_004268E8(unsigned char *object)
             glow->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
             glow->phase[i] = v + 255.0f;
-        if (FastFloatHelperD(&glow->alpha[i]))
+        if (math_fast_float_d(&glow->alpha[i]))
             glow->alpha[i] = 0xFF;
-        v = FloatAbs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
+        v = math_fabs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
         color = FastTweenColor(0x50207FFF, 0x10207FFF, v);
-        s = SpawnFadingParticle_002C2FD8(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
+        s = part_spawn_fading(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
         if (s)
             s->fade = FloatToInt(1.0f) + 0x60;
         FastVecAdd((char *)m, (char *)m, (char *)q);
@@ -654,7 +654,7 @@ void func_L05_004268E8(unsigned char *object)
 /* func_L05_00426BE0 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1504 through $gp). */
 
 /* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
-void func_L05_00426D98(char *object)
+void glow_l05_ring_init_2(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;

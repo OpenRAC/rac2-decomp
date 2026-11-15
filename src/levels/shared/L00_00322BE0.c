@@ -33,17 +33,17 @@ typedef struct {
     HistoryMoby *source;
     int followersUsed, active;
 } TransformHistory;
-extern void func_L00_00322EC8(void *);
-extern void func_0029F390(unsigned char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void level_release_slot_list(void *);
+extern void update_moby_animation_state(unsigned char *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_002A0F48(void *);
 
 /* 322AC0 independently bounds followersUsed to four; each persistent history
  * record has stride 0x150 and each ring contains eight complete 16-byte samples. */
 /* Records the source object's position each frame and makes the follower objects trail behind it with a delay, fading them out when asked. */
-void func_L00_00322BE0(TransformHistory *history, int fade)
+void moby_update_transform_history_followers(TransformHistory *history, int fade)
 {
     HistoryMoby *source, *follower;
     int head, i, sample, done;
@@ -51,7 +51,7 @@ void func_L00_00322BE0(TransformHistory *history, int fade)
         return;
     source = history->source;
     if (!source || source->state == 0xFE || source->state == 0xFD) {
-        ReleaseSlotList(history);
+        level_release_slot_list(history);
         return;
     }
     head = history->head;
@@ -111,6 +111,6 @@ void func_L00_00322BE0(TransformHistory *history, int fade)
             }
         }
         if (done)
-            ReleaseSlotList(history);
+            level_release_slot_list(history);
     }
 }

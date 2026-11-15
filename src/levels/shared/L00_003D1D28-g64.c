@@ -40,17 +40,17 @@ typedef struct {
 
 typedef struct { u8 pad0[0x28]; int id; u8 pad2C[0x28]; float rate; u8 pad58[0x18]; float damage; u8 pad74[0x6C]; } WeaponEntry;
 
-extern u8 D_00189E20[];
-extern u8 D_00138180[];
-extern u8 D_00139568[];
+extern u8 g_hero_state[];
+extern u8 g_pad_state[];
+extern u8 g_item_slot_to_record[];
 extern u8 D_001395AC NOT_SDA;
 extern float D_0018A580[4] NOT_SDA;
-extern WeaponEntry D_L00_00262570[];
+extern WeaponEntry g_weapon_l00_table[];
 extern u8 D_L00_00296120[];
 extern u8 D_L00_001A8F20[] MACRO_ADDR;
 typedef struct { u8 pad[0x160]; float f160; int pad164; int i168; int i16C; float f170; int pad174; int i178; } Shake;
 extern Shake D_L00_001B8C80;
-extern u8 *D_L00_001C3280[];
+extern u8 *g_area_hit_targets[];
 extern float D_L00_001B0190[16] __attribute__((sda));
 extern u16 D_L00_001B01E8 __attribute__((sda));
 extern u16 D_L00_001B01EC __attribute__((sda));
@@ -62,41 +62,41 @@ extern float D_L00_001B0224 __attribute__((sda));
 extern float D_L00_001B0228 __attribute__((sda));
 extern int D_L00_001B0238 __attribute__((sda));
 
-extern s32 func_00282978(s16 *);
-extern int func_00282948(void *);
-extern void func_002829D8(void *);
+extern s32 FastDecTimer(s16 *);
+extern int math_fast_float_d(void *);
+extern void vec_fast_helper_b(void *);
 extern void ref_L00_003D1D28_00(int, int);
-extern int func_L00_002D4040(int);
-extern int func_L00_002D3F30(int, int);
-extern void func_00273318(void *, float, u32, void *, int, float, int, float, int);
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002AF568(void);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_L00_002D6998(void *);
-extern void func_L00_002D6B70(int);
-extern float func_002A7940(void);
-extern float func_00283CE0(int);
-extern int func_002E5CF8(int, int, void *);
+extern int get_ammo(int);
+extern int weapon_spend_ammo(int, int);
+extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
+extern void cancel_hero_item_animation(void);
+extern void start_equipped_item_animation(void);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int slot_copy_records_to_free(void *);
+extern void slot_reset_active(int);
+extern float math_random_angle(void);
+extern float IntToFloat(int);
+extern int PlayMobySound(int, int, void *);
 extern void ref_L00_003D1D28_01(void *, void *);
-extern void func_L00_003D2ED0(u8 *);
-extern void func_L00_003D3388(u8 *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern u8 *func_L00_0033EC48(void *, int, float, float, u32, int, int, void *, int, int, int, int);
-extern void func_L00_003D2C00(u8 *, void *, int);
-extern s32 func_00277F48(f32, void *, s32, void *, s32);
-extern void func_002A8E20(u8 *, Hit *);
-extern void func_0032D758(u8 *, int, u8 *);
-extern void func_00283410(void *, void *);
-extern void func_00283678(void *, void *);
-extern void func_0029FCC0(u8 *, int, void *);
-extern void func_00283738(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern float func_00283B98(float, float);
-extern int func_L00_003D2A00(u8 *, void *, void *, Hit *);
+extern void RenderRadialRingAndQuad(u8 *);
+extern void lightning_update_arcs(u8 *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern u8 *part_spawn_pulled_particle(void *, int, float, float, u32, int, int, void *, int, int, int, int);
+extern void InitEffectStrips(u8 *, void *, int);
+extern s32 coll_process_hit(f32, void *, s32, void *, s32);
+extern void QueueMobyImpact(u8 *, Hit *);
+extern void StartAttachedEffect(u8 *, int, u8 *);
+extern void euler_to_matrix(void *, void *);
+extern void copy_matrix3x4(void *, void *);
+extern void moby_transform_joint_to_world(u8 *, int, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern float FastAddRotations(float, float);
+extern int weapon_fire_damage_ray(u8 *, void *, void *, Hit *);
 
 
 static inline void SetShake(float amount)
@@ -109,7 +109,7 @@ static inline void SetShake(float amount)
 }
 
 /* Per-frame update of the Blitz Cannon weapon (moby class 2801). It charges while fire is held, flashes and shakes the screen on firing, then hits nearby enemies and sends out 20 random damage bolts. */
-void func_L00_003D1D28(u8 *self)
+void UpdateSpreadWeapon(u8 *self)
 {
     Vec4 localPos;
     Vec4 worldPos;
@@ -130,21 +130,21 @@ void func_L00_003D1D28(u8 *self)
         if (FastDecTimer(&st->t4))
             self[0x20] = 1;
     }
-    if (((Hero *)gHeroState)->i[0x2294 / 4] == 1)
+    if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
         ref_L00_003D1D28_00(0x1D, 1);
-    FastVectorHelperB(st);
-    if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x1D) {
+    vec_fast_helper_b(st);
+    if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         u32 color;
         if (st->timer > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
-        AddMobyMarker(self, 1.3f, color, 0, 0x21, 0.0f, -1, 90.0f, 4);
+        hud_add_moby_marker(self, 1.3f, color, 0, 0x21, 0.0f, -1, 90.0f, 4);
     }
-    if (st->t4C != 0 && FastFloatHelperD(&st->t4C))
+    if (st->t4C != 0 && math_fast_float_d(&st->t4C))
         cancel_hero_item_animation();
     if (self[0x42] == self[0x43] && (self[0x60] & 2))
-        StartAnimationBlendedWithFlags(self, 1, 0, 2, 0);
+        anim_start_blended_with_flags(self, 1, 0, 2, 0);
     /* moby/state and turret/shot are copies, and large..none are named constants, that gcse's cprop folds back:
      * they keep the insn count and the PRE expression numbers that give retail's spill slots at 0x23C-0x270. */
     {
@@ -156,15 +156,15 @@ void func_L00_003D1D28(u8 *self)
         int variant = 3;
         int none = 0;
         ready = 1;
-        if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x1D) {
-            if (FastFloatHelperD(&((Hero *)gHeroState)->i[0x2534 / 4]) == 0)
+        if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
+            if (math_fast_float_d(&((Hero *)g_hero_state)->i[0x2534 / 4]) == 0)
                 ready = 0;
         } else {
-            ((Hero *)gHeroState)->i[0x2534 / 4] = 0x28;
+            ((Hero *)g_hero_state)->i[0x2534 / 4] = 0x28;
         }
-        if (self[0x20] == 1 && ((Hero *)gHeroState)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)gHeroState)->i[0x1240 / 4] >= 0x17 && ready) {
-            if ((((Hero *)gPadState)->i[0x1A0 / 4] & ((Hero *)gHeroState)->i[0x1230 / 4]) && SpendWeaponAmmo(-1, 1)) {
-                if (((Hero *)gHeroState)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)gWeaponTable_L00 + D_001395AC * 0xE0))->id || ((Hero *)gHeroState)->i[0x229C / 4] != 0 || ((Hero *)gHeroState)->h[0x24EC / 2] != 0) {
+        if (self[0x20] == 1 && ((Hero *)g_hero_state)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 0x17 && ready) {
+            if ((((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && weapon_spend_ammo(-1, 1)) {
+                if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + D_001395AC * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
                     st->t40 = 1;
                     st->t6 = D_L00_001B01E8;
                 } else {
@@ -172,11 +172,11 @@ void func_L00_003D1D28(u8 *self)
                     st->t6 = 2;
                 }
                 start_equipped_item_animation();
-                st->handle = CopyRecordsToFreeSlots(D_L00_00296120);
-                StartAnimationBlendedWithFlags(self, 2, 0, 2, 0);
+                st->handle = slot_copy_records_to_free(D_L00_00296120);
+                anim_start_blended_with_flags(self, 2, 0, 2, 0);
                 st->t4C = D_L00_001B0238;
                 self[0x20] = 2;
-                st->fC = RandomAngle();
+                st->fC = math_random_angle();
                 st->t8 = D_L00_001B01EC;
                 st->f20 = 1.0f / IntToFloat(st->t8);
                 st->tA = D_L00_001B0214;
@@ -187,12 +187,12 @@ void func_L00_003D1D28(u8 *self)
                 st->t44 = D_L00_001B021C;
                 st->f48 = 1.0f / IntToFloat(st->t44);
                 st->t44 += 2;
-            } else if (((Hero *)gPadState)->i[0x1A4 / 4] & ((Hero *)gHeroState)->i[0x1230 / 4]) {
+            } else if (((Hero *)g_pad_state)->i[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) {
                 PlayMobySound(5, 0, self);
             }
-            if (!(((Hero *)gPadState)->i[0x1A0 / 4] & ((Hero *)gHeroState)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)gHeroState)->b[0x22B8] == 0) {
+            if (!(((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
                 if (st->handle >= 0) {
-                    ResetActiveSlots(st->handle);
+                    slot_reset_active(st->handle);
                     st->handle = -1;
                 }
             }
@@ -200,11 +200,11 @@ void func_L00_003D1D28(u8 *self)
         if (st->t6 == 0) {
             FastDecTimer(&st->tA);
             FastDecTimer(&st->t8);
-            FastFloatHelperD(&st->t28);
-            FastFloatHelperD(&st->t44);
+            math_fast_float_d(&st->t28);
+            math_fast_float_d(&st->t44);
             if (st->t8 != 0 || st->tA != 0 || st->t28 != 0 || st->t44 != 0)
                 ref_L00_003D1D28_01(RenderRadialRingAndQuad, self);
-            UpdateLightningArcs_L00(self);
+            lightning_update_arcs(self);
         }
         if (self[0x20] == 2 || self[0x20] == 3) {
             u8 *cannon = moby;
@@ -220,17 +220,17 @@ void func_L00_003D1D28(u8 *self)
                     matrix_mul_vec3(worldPos, localPos, cannon + 0xC0);
                     FastVecAdd(worldPos, worldPos, cannon + 0x10);
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
@@ -238,17 +238,17 @@ void func_L00_003D1D28(u8 *self)
                     matrix_mul_vec3(worldPos, localPos, cannon + 0xC0);
                     FastVecAdd(worldPos, worldPos, cannon + 0x10);
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
                     {
-                        u8 *flash = SpawnPulledParticle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
                     }
@@ -289,34 +289,34 @@ void func_L00_003D1D28(u8 *self)
                     hit.b18 = 3;
                     hit.b19 = 2;
                     hit.oclass = *(u16 *)(cannon + 0xAA);
-                    hit.damage = ((WeaponEntry *)((u8 *)gWeaponTable_L00 + gItemSlotToRecord[0x1A] * 0xE0))->damage;
+                    hit.damage = ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_item_slot_to_record[0x1A] * 0xE0))->damage;
                     hit.source = cannon;
                     FastVecScale(localPos, cannon + 0xD0, -1.35f);
                     FastVecAdd(localPos, localPos, cannon + 0x10);
                     FastVecScale(worldPos, cannon + 0xC0, 0.275f);
                     FastVecAdd(localPos, localPos, worldPos);
-                    nearbyCount = ProcessCollisionHit(1.5f, localPos, 1, ((Hero *)gHeroState)->ptr[0x2290 / 4], 0);
+                    nearbyCount = coll_process_hit(1.5f, localPos, 1, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0);
                     for (nearbyIndex = 0; nearbyIndex < nearbyCount; nearbyIndex++) {
-                        if (gAreaHitTargets[nearbyIndex] != ((Hero *)gHeroState)->ptr[0x2290 / 4]) {
+                        if (g_area_hit_targets[nearbyIndex] != ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                             FastVecScale(hit.pos, cannon + 0xD0, -1.5f);
                             hit.pos[3] = 5627.925f;
-                            QueueMobyImpact(gAreaHitTargets[nearbyIndex], &hit);
-                            StartAttachedEffect(gAreaHitTargets[nearbyIndex], 0x44, cannon);
+                            QueueMobyImpact(g_area_hit_targets[nearbyIndex], &hit);
+                            StartAttachedEffect(g_area_hit_targets[nearbyIndex], 0x44, cannon);
                         }
                     }
                     euler_to_matrix(mtx, D_L00_001B0190);
                     copy_matrix3x4(inv, mtx);
-                    TransformMobyJointToWorld(cannon, 0, origin);
-                    if (((Hero *)gHeroState)->h[0x24EC / 2] == 1) {
+                    moby_transform_joint_to_world(cannon, 0, origin);
+                    if (((Hero *)g_hero_state)->h[0x24EC / 2] == 1) {
                         FastVecScale(up, cannon + 0xD0, -1.0f);
                         FastVecScale(side, cannon + 0xC0, -1.0f);
                         FastVecScale(fwd, cannon + 0xE0, 0.1f);
                         multiply_matrix3x3(basis, cannon + 0xC0, inv);
                     } else {
-                        qcopy(up, ((Hero *)gHeroState)->b + 0x730);
-                        qcopy(side, ((Hero *)gHeroState)->b + 0x740);
-                        FastVecScale(fwd, ((Hero *)gHeroState)->b + 0x750, -0.1f);
-                        multiply_matrix3x3(basis, ((Hero *)gHeroState)->b + 0x730, inv);
+                        qcopy(up, ((Hero *)g_hero_state)->b + 0x730);
+                        qcopy(side, ((Hero *)g_hero_state)->b + 0x740);
+                        FastVecScale(fwd, ((Hero *)g_hero_state)->b + 0x750, -0.1f);
+                        multiply_matrix3x3(basis, ((Hero *)g_hero_state)->b + 0x730, inv);
                     }
                     qcopy(shotState->q30, up);
                     spread = 1.0471977f;
@@ -327,17 +327,17 @@ void func_L00_003D1D28(u8 *self)
                         saved[clearIndex] = 0;
                     }
                     for (i = 0; i < 20; i++) {
-                        BuildAxisAngleQuaternion(rot, side, RandomFloatRange(0.01f, 0.52359885f));
-                        RotateVectorByQuaternion(dir, up, rot);
-                        RotateVectorByQuaternion(offs, fwd, rot);
-                        angle = FastAddRotations(RandomFloatRange(spread * 0.5f, spread * 1.5f), angle);
-                        BuildAxisAngleQuaternion(rot, up, angle);
-                        RotateVectorByQuaternion(dir, dir, rot);
-                        RotateVectorByQuaternion(offs, offs, rot);
+                        math_build_axis_angle_quat(rot, side, math_random_float_range(0.01f, 0.52359885f));
+                        vec_rotate_by_quaternion(dir, up, rot);
+                        vec_rotate_by_quaternion(offs, fwd, rot);
+                        angle = FastAddRotations(math_random_float_range(spread * 0.5f, spread * 1.5f), angle);
+                        math_build_axis_angle_quat(rot, up, angle);
+                        vec_rotate_by_quaternion(dir, dir, rot);
+                        vec_rotate_by_quaternion(offs, offs, rot);
                         FastVecScale(dir, dir, 38.0f);
                         FastVecAdd(from, origin, offs);
                         FastVecAdd(to, from, dir);
-                        hitObject = ((u8 *)FireDamageRayAtTarget(cannon, from, to, &hit));
+                        hitObject = ((u8 *)weapon_fire_damage_ray(cannon, from, to, &hit));
                         if (hitObject) {
                             saved[count] = *(int *)(hitObject + 0x98);
                             list[count] = hitObject;
@@ -348,7 +348,7 @@ void func_L00_003D1D28(u8 *self)
                     for (restoreIndex = 0; restoreIndex < count; restoreIndex++)
                         *(int *)(list[restoreIndex] + 0x98) = saved[restoreIndex];
                     {
-                        WeaponEntry *w = (WeaponEntry *)((u8 *)gWeaponTable_L00 + gItemSlotToRecord[0x1A] * 0xE0);
+                        WeaponEntry *w = (WeaponEntry *)((u8 *)g_weapon_l00_table + g_item_slot_to_record[0x1A] * 0xE0);
                         shotState->timer = 1.0f / w->rate;
                     }
                 }

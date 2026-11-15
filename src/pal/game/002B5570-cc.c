@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_002B5570, the PAL copy of func_002B49C0: the same C. */
 
 typedef int s32;
@@ -29,9 +30,9 @@ void func_PAL_002B5570(int value) {
 
 /* func_002B4C18 is matched in 002B3868-g8.c (small data through $gp). */
 
-extern int func_002B50E0(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
 
 /* func_002B50E0 is matched in 002B50E0.c. */
 
-extern int func_002B50E0(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
 

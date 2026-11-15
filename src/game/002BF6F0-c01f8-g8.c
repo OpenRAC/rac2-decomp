@@ -1,9 +1,9 @@
 #include "names.h"
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern int func_00283CF0(float);
-extern void func_002B9180(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern int FloatToInt(float);
+extern void part_kill(void *);
 
 typedef struct {
     int opaque;
@@ -30,7 +30,7 @@ extern float ref_L00_00337058_04[];
 extern unsigned char *ref_L00_00337058_05[];
 
 /* Keeps a shimmering particle next to its source object and cycles its brightness. It disappears when its timer ends. */
-void func_002C01F8(Particle_C01F8 *self) {
+void part_update_source_shimmer(Particle_C01F8 *self) {
     float offset[4];
     ParticleContext_C01F8 *context = &self->context;
     int shadeIndex;
@@ -45,5 +45,5 @@ void func_002C01F8(Particle_C01F8 *self) {
     self->shade = ref_L00_00337058_05[0][shadeIndex];
     context->frame++;
     if (context->frame >= 31) context->frame = 0;
-    if (self->timer == 0) KillParticle(self);
+    if (self->timer == 0) part_kill(self);
 }

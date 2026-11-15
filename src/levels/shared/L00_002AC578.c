@@ -43,7 +43,7 @@ typedef struct {
     unsigned char f24DA;
     unsigned char f24DB;
 } WallContactHero;
-extern WallContactHero D_00189E20;
+extern WallContactHero g_hero_state;
 typedef struct {
     unsigned char pad0[0x18];
     unsigned char *object;
@@ -52,27 +52,27 @@ typedef struct {
     unsigned char pad30[0x10];
     Vector normal;
 } WallContactHit;
-extern WallContactHit D_L00_001BF200;
-extern float func_L00_002D3B00(char *);
-extern void func_L00_002D3B58(Quadword *, Quadword *, float);
-extern void func_L00_002D3BD8(char *, int, float);
-extern void func_L00_002D3778(ContactVector3 *, ContactVector3 *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_002ACF88(void *, void *, void *);
-extern int func_L00_002AB108(float *, float, float);
-extern int func_002AD0B0(unsigned char *);
+extern WallContactHit g_collision_result;
+extern float cam_get_view_space_height(char *);
+extern void cam_set_view_space_height(Quadword *, Quadword *, float);
+extern void cam_set_view_space_vector_length(char *, int, float);
+extern void hero_apply_mode_transform_reversed(ContactVector3 *, ContactVector3 *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int hero_find_ledge_grab(void *, void *, void *);
+extern int hero_test_reach_blend(float *, float, float);
+extern int moby_get_private_value_2(unsigned char *);
 /* EE argument banks: a0 = output, a1 = flag, f12/f13/f14 = scale/angle/height.
  * The floating arguments retain their order independently of the integer bank. */
-extern void func_L00_002D3638(float *output, float scale, float angle, float height, int flag);
-extern int func_002761F8(void *, void *, unsigned int, void *, void *);
-extern int func_00278E78(void);
-extern float func_L00_002D3EA8(void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00282E80(void *, void *);
+extern void hero_build_relative_offset(float *output, float scale, float angle, float height, int flag);
+extern int CollLine(void *, void *, unsigned int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern float cam_get_view_space_angle(void *);
+extern void transform_vector(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float vec_distance_xy(void *, void *);
 /* Predict the next ledge contact, then validate the two obstruction probes. */
-void func_L00_002AC578(void)
+void ProbeHeroAirborneWallContact(void)
 {
     Vector predicted, probeEnd, localNormal;
     unsigned char *state;
@@ -81,61 +81,61 @@ void func_L00_002AC578(void)
     float steps;
     float height, distance, angle, limit;
 
-    if (gHeroState.f31C < 0.4f) return;
-    if (GetViewSpaceHeight((char *)&gHeroState + 0xF0) < -0.3333333432674408f || gHeroState.f22C3) return;
-    if (gHeroState.f578) {
-        gHeroState.f1D4 = 0;
+    if (g_hero_state.f31C < 0.4f) return;
+    if (cam_get_view_space_height((char *)&g_hero_state + 0xF0) < -0.3333333432674408f || g_hero_state.f22C3) return;
+    if (g_hero_state.f578) {
+        g_hero_state.f1D4 = 0;
         return;
     }
-    qcopy(&predicted, (unsigned char *)&gHeroState + 0x80);
+    qcopy(&predicted, (unsigned char *)&g_hero_state + 0x80);
     ticks = 20;
-    qcopy(&probeEnd, (unsigned char *)&gHeroState + 0x110);
+    qcopy(&probeEnd, (unsigned char *)&g_hero_state + 0x110);
     steps = (float)ticks;
-    SetViewSpaceHeight(&probeEnd.q, &probeEnd.q, 0.0f);
-    SetViewSpaceVectorLength((char *)&probeEnd, (int)&probeEnd, steps);
+    cam_set_view_space_height(&probeEnd.q, &probeEnd.q, 0.0f);
+    cam_set_view_space_vector_length((char *)&probeEnd, (int)&probeEnd, steps);
     FastVecAdd(&predicted, &predicted, &probeEnd);
-    distance = GetViewSpaceHeight((char *)&gHeroState + 0xF0);
-    distance = distance * steps - gHeroState.f520 * steps * steps * 0.5f;
-    ApplyHeroModeTransformReversed((ContactVector3 *)&predicted,
+    distance = cam_get_view_space_height((char *)&g_hero_state + 0xF0);
+    distance = distance * steps - g_hero_state.f520 * steps * steps * 0.5f;
+    hero_apply_mode_transform_reversed((ContactVector3 *)&predicted,
                      (ContactVector3 *)&predicted, distance);
-    if (FindHeroLedgeGrab(&predicted, (unsigned char *)&gHeroState + 0x90, 0)) {
-        gHeroState.f1D4 = 0;
-        gHeroState.f210 = 0x16;
+    if (hero_find_ledge_grab(&predicted, (unsigned char *)&g_hero_state + 0x90, 0)) {
+        g_hero_state.f1D4 = 0;
+        g_hero_state.f210 = 0x16;
         return;
     }
-    if (!TestHeroReachBlend(0, 0.3f, 1.0f)) return;
+    if (!hero_test_reach_blend(0, 0.3f, 1.0f)) return;
     state = 0;
-    if (gCollisionResult.object) state = (unsigned char *)GetMobyPrivateValue2(gCollisionResult.object);
+    if (g_collision_result.object) state = (unsigned char *)moby_get_private_value_2(g_collision_result.object);
     height = 1.7f;
     if (state && (*(unsigned int *)(state + 0x3C) & 0x20)) height = 0.5f;
-    else if (gHeroState.f2294 != 0x11 && (!gHeroState.f285 || gHeroState.f284)) height = 3.0f;
-    BuildHeroRelativeOffset(predicted.f, 0.0f, 0.0f, height, 1);
-    BuildHeroRelativeOffset(probeEnd.f, gHeroState.f264 + 1.4f, 0.0f, height, 1);
+    else if (g_hero_state.f2294 != 0x11 && (!g_hero_state.f285 || g_hero_state.f284)) height = 3.0f;
+    hero_build_relative_offset(predicted.f, 0.0f, 0.0f, height, 1);
+    hero_build_relative_offset(probeEnd.f, g_hero_state.f264 + 1.4f, 0.0f, height, 1);
     if (!CollLine(&predicted, &probeEnd, 2, 0, 0)) return;
     contact = GetCollHitMaterial();
     if (contact == 10 || contact == 12) return;
-    gHeroState.f294 = gCollisionResult.object;
-    angle = GetViewSpaceAngle(&gCollisionResult.normal);
+    g_hero_state.f294 = g_collision_result.object;
+    angle = cam_get_view_space_angle(&g_collision_result.normal);
     if (angle < 1.3089970350265503f) return;
-    transform_vector(&localNormal, &gCollisionResult.normal, (unsigned char *)&gHeroState + 0x40);
-    angle = FastMatrixHelperA(localNormal.f[0], localNormal.f[1]);
+    transform_vector(&localNormal, &g_collision_result.normal, (unsigned char *)&g_hero_state + 0x40);
+    angle = mat_fast_helper_a(localNormal.f[0], localNormal.f[1]);
     angle = FastDiffRots(angle, 3.1415927410125732f);
     if (0.8726646900177002f < angle) return;
-    limit = gHeroState.f2294 == 0x11 ? 0.95f : 0.72f;
-    BuildHeroRelativeOffset(predicted.f, 0.0f, 0.0f, 0.2f, 1);
-    BuildHeroRelativeOffset(probeEnd.f, gHeroState.f264 + 1.4f, 0.0f, 0.2f, 1);
+    limit = g_hero_state.f2294 == 0x11 ? 0.95f : 0.72f;
+    hero_build_relative_offset(predicted.f, 0.0f, 0.0f, 0.2f, 1);
+    hero_build_relative_offset(probeEnd.f, g_hero_state.f264 + 1.4f, 0.0f, 0.2f, 1);
     if (!CollLine(&predicted, &probeEnd, 2, 0, 0)) return;
-    distance = vec_distance_xy(&gCollisionResult.point, &predicted);
+    distance = vec_distance_xy(&g_collision_result.point, &predicted);
     if (limit < distance) return;
-    *(Quadword *)((unsigned char *)&gHeroState + 0x4E0) = gCollisionResult.normal.q;
-    gHeroState.f4EC = FastMatrixHelperA(gCollisionResult.normal.f[0], gCollisionResult.normal.f[1]);
-    if (gHeroState.f229C != 4 && gHeroState.f22A4 != 4 && gHeroState.f22B0 != 4) return;
-    if (gHeroState.f24D8 && FastDiffRots(gHeroState.f4FC, gHeroState.f4EC) < 2.967060089111328f) return;
-    gHeroState.f24DA = 0;
-    if (contact == 15) gHeroState.f24DA = 1;
-    else if (gHeroState.f24DB) return;
-    if (gHeroState.f2294 == 0x11)
-        gHeroState.f1D4 = 7;
+    *(Quadword *)((unsigned char *)&g_hero_state + 0x4E0) = g_collision_result.normal.q;
+    g_hero_state.f4EC = mat_fast_helper_a(g_collision_result.normal.f[0], g_collision_result.normal.f[1]);
+    if (g_hero_state.f229C != 4 && g_hero_state.f22A4 != 4 && g_hero_state.f22B0 != 4) return;
+    if (g_hero_state.f24D8 && FastDiffRots(g_hero_state.f4FC, g_hero_state.f4EC) < 2.967060089111328f) return;
+    g_hero_state.f24DA = 0;
+    if (contact == 15) g_hero_state.f24DA = 1;
+    else if (g_hero_state.f24DB) return;
+    if (g_hero_state.f2294 == 0x11)
+        g_hero_state.f1D4 = 7;
     else
-        gHeroState.f1D4 = 6;
+        g_hero_state.f1D4 = 6;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,19 +24,19 @@
  */
 #include "common.h"
 
-extern s8 D_00189EA0[];
+extern s8 g_hero_position[];
 extern s32 ref_L09_00406BF8_00(s8 *, s32);
 extern void ref_L09_00406BF8_01(s32, s32);
 
 /* Checks whether the hero has hit the given trigger, records the result for a slot, and returns 1 if it was hit. */
-s32 func_L09_00406BF8(s32 triggerId, s32 slot) {
+s32 dobbo_check_hero_trigger(s32 triggerId, s32 slot) {
     s32 resultCode;
     s32 triggered;
 
     resultCode = 0;
     triggered = 0;
     if (triggerId != -1) {
-        if (ref_L09_00406BF8_00(gHeroPosition, triggerId) != 0) {
+        if (ref_L09_00406BF8_00(g_hero_position, triggerId) != 0) {
             resultCode = triggered;
             triggered = 1;
         } else {

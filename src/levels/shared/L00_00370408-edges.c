@@ -4,43 +4,43 @@ typedef struct { char prefix[0x3C]; int abort; } SequencePlayback;
 extern SequencePlayback D_L00_001BEFC0;
 extern float D_L00_001B18E0 __attribute__((sda));
 extern int D_001A7A00[] __attribute__((sda));
-extern int D_001A7478 __attribute__((sda)), D_001A79F0 __attribute__((sda)), D_001A7B90 __attribute__((sda));
+extern int D_001A7478 __attribute__((sda)), g_current_map_index __attribute__((sda)), g_is_pal_video __attribute__((sda));
 typedef struct { char prefix[0x1A0]; union { unsigned long long all; struct { unsigned int low, high; } word; } buttons; } SequenceInput;
-extern SequenceInput D_00138180;
+extern SequenceInput g_pad_state;
 extern short D_001A63AC;
-extern void func_00288BB8(void *);
-extern int func_002B4B70(int, int);
-extern void func_L00_002FC7A8(void);
-extern void func_002B6658(void);
-extern void func_002E5F60(void);
-extern void func_L00_002A6DD0(void);
-extern float func_002AA2E8(float *, float, float);
-extern int func_002B6D28(void);
-extern int func_00288BE8(void *);
+extern void req_flush_queue(void *);
+extern int request_end_slot(int, int);
+extern void tutorial_probe_points_update(void);
+extern void moby_update_visible_objects(void);
+extern void snd_run_callbacks(void);
+extern void hero_l00_update_frame_2(void);
+extern float ApproachValue(float *, float, float);
+extern int snd_resume_music_stream(void);
+extern int req_launch_queued(void *);
 
-extern void func_00293D30(void);
-extern int func_002F5AF8(void);
-extern void func_0029F390(unsigned char *);
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void load_relocate_world_object_parts(void);
+extern int cutscene_apply_camera_key(void);
+extern void update_moby_animation_state(unsigned char *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_002A0F48(unsigned char *);
-extern void func_0027CFD0(void (*)(void *), void *);
-extern void func_002ECB70(void *);
-extern void func_002A93B0(void *);
-extern void func_L00_002D4E58(void *, int);
-extern void func_L00_002A70F8(void *);
-extern void func_L00_002FCBE8(void);
-extern void func_002914B8(void);
-extern void func_0029FFB8(void);
+extern void gfx_register_overlay_draw_callback(void (*)(void *), void *);
+extern void render_environment_mapped_object(void *);
+extern void moby_update_ground_check(void *);
+extern void level_setup_glow_effects(void *, int);
+extern void update_moby_pulsing_glow_effects(void *);
+extern void tutorial_scene_objects_update(void);
+extern void UpdateLightingEnvironment(void);
+extern void gfx_compute_light_direction(void);
 
 extern int D_L00_001BCAC0[];
-extern void func_002B7CE0(int);
-extern void func_002F5220(void);
-extern void func_002B9390(void);
-extern int func_L00_003046D0(int);
-extern void func_002E4AC8(void);
-extern void func_002F52B8(void);
+extern void snd_pump_music_and_disc_read(int);
+extern void game_reset_frame_counters(void);
+extern void part_update_all(void);
+extern int load_queue_level_data_chunk(int);
+extern void UpdateSoundVoices(void);
+extern void game_update_idle_frame_counters(void);
 
 typedef struct {
     char prefix[0x34];
@@ -53,7 +53,7 @@ typedef struct {
 } SequenceState;
 
 /* Plays one frame of a cutscene: moves the actors along their paths, fades in, and ends it on time or when the player skips. */
-void func_L00_00370408(void) {
+void cutscene_update_frame(void) {
     float first[4];
     float second[4];
     int ended;
@@ -66,47 +66,47 @@ void func_L00_00370408(void) {
     short id;
     if (((SequenceState *)D_L00_001BCAC0)->done) return;
     if (((SequenceState *)D_L00_001BCAC0)->end_time == 0) {
-        FlushRequestQueue(&D_L00_001BEFC0);
+        req_flush_queue(&D_L00_001BEFC0);
         ((SequenceState *)D_L00_001BCAC0)->done = 1;
-        EndSlotRequest(0, 0);
+        request_end_slot(0, 0);
         return;
     }
-    ResetFrameCounters();
-    UpdateProbePoints();
-    UpdateVisibleObjects();
-    RunSoundCallbacks();
-    UpdateHeroFrame_L00_2();
-    UpdateParticles();
+    game_reset_frame_counters();
+    tutorial_probe_points_update();
+    moby_update_visible_objects();
+    snd_run_callbacks();
+    hero_l00_update_frame_2();
+    part_update_all();
     { int t; ++((SequenceState *)D_L00_001BCAC0)->frame; t = ++((SequenceState *)D_L00_001BCAC0)->time; if (t < 18) {
         ApproachValue(&D_L00_001B18E0, 0.0f, 0.16666667f);
         if (D_L00_001B18E0 > 1.0f) D_L00_001B18E0 = 1.0f;
     }
     }
-    if (((SequenceState *)D_L00_001BCAC0)->fade_time <= ((SequenceState *)D_L00_001BCAC0)->time) ResumeMusicStream();
+    if (((SequenceState *)D_L00_001BCAC0)->fade_time <= ((SequenceState *)D_L00_001BCAC0)->time) snd_resume_music_stream();
     ended = ((SequenceState *)D_L00_001BCAC0)->time >= ((SequenceState *)D_L00_001BCAC0)->end_time;
     abort = 0;
     if (((SequenceState *)D_L00_001BCAC0)->time > 17 && D_L00_001B18E0 == 0.0f) {
-        if (!(((D_001A7A00[2] & 0xFFFF0000) == 0) && D_001A7478 == 0 && gCurrentMapIndex > 0) && (gPadState.buttons.word.high & 0x800)) abort = 1;
-        else { unsigned long long v = (gPadState.buttons.all & 0x8000000000FULL) ^ 0x8000000000FULL; abort = 1; if (v) abort = 0; }
+        if (!(((D_001A7A00[2] & 0xFFFF0000) == 0) && D_001A7478 == 0 && g_current_map_index > 0) && (g_pad_state.buttons.word.high & 0x800)) abort = 1;
+        else { unsigned long long v = (g_pad_state.buttons.all & 0x8000000000FULL) ^ 0x8000000000FULL; abort = 1; if (v) abort = 0; }
     }
     if (abort) {
         D_L00_001BEFC0.abort = 1;
-        FlushRequestQueue(&D_L00_001BEFC0);
+        req_flush_queue(&D_L00_001BEFC0);
         ((SequenceState *)D_L00_001BCAC0)->done = 1;
-        EndSlotRequest(0, 0);
+        request_end_slot(0, 0);
     } else {
         if (ended) {
             ((SequenceState *)D_L00_001BCAC0)->done = 1;
-            if (!LaunchQueuedRequest(&D_L00_001BEFC0)) EndSlotRequest(0, 0);
+            if (!req_launch_queued(&D_L00_001BEFC0)) request_end_slot(0, 0);
         } else {
-            threshold = gIsPalVideo ? 80 : 96;
+            threshold = g_is_pal_video ? 80 : 96;
             if (((SequenceState *)D_L00_001BCAC0)->frame >= threshold) {
                 ++((SequenceState *)D_L00_001BCAC0)->chunk;
-                if (D_001A63AC) PumpMusicAndDiscRead(1);
-                RelocateWorldObjectParts();
-                QueueLevelDataChunk(((SequenceState *)D_L00_001BCAC0)->chunk + 1);
+                if (D_001A63AC) snd_pump_music_and_disc_read(1);
+                load_relocate_world_object_parts();
+                load_queue_level_data_chunk(((SequenceState *)D_L00_001BCAC0)->chunk + 1);
             }
-            complete = ApplyCutsceneCameraKey();
+            complete = cutscene_apply_camera_key();
             for (i = 0; i < ((SequenceState *)D_L00_001BCAC0)->count; i++) {
                 object = ((SequenceState *)D_L00_001BCAC0)->actors[i];
                 { int frame = ((SequenceState *)D_L00_001BCAC0)->frame >> 1;
@@ -121,18 +121,18 @@ void func_L00_00370408(void) {
                 FastVecAdd(object + 0x10, first, second);
                 object[0x61] = 0xFF;
                 func_002A0F48(object);
-                if (*(short *)(object + 0xAA) == 0xD54 /* moby class 3412 */) RegisterOverlayDrawCallback(render_environment_mapped_object, object);
-                if (object[0x6F]) UpdateMobyGroundCheck(object);
+                if (*(short *)(object + 0xAA) == 0xD54 /* moby class 3412 */) gfx_register_overlay_draw_callback(render_environment_mapped_object, object);
+                if (object[0x6F]) moby_update_ground_check(object);
                 id = *(short *)(object + 0xAA);
-                if (id == 0 || id == 0xF6B /* moby class 3947 */) SetupLevelGlowEffects(object, 0);
+                if (id == 0 || id == 0xF6B /* moby class 3947 */) level_setup_glow_effects(object, 0);
                 id = *(short *)(object + 0xAA);
                 if (id == 10 || id == 0x1159 /* moby class 4441 */ || id == 0x57 /* Clank */ || id == 0xD6B /* moby class 3435 */) update_moby_pulsing_glow_effects(object);
             }
         }
     }
-    UpdateTutorialSceneObjects();
+    tutorial_scene_objects_update();
     UpdateSoundVoices();
     UpdateLightingEnvironment();
-    ComputeLightDirection();
-    UpdateIdleFrameCounters();
+    gfx_compute_light_direction();
+    game_update_idle_frame_counters();
 }

@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* func_PAL_L05_0042C200, the PAL copy of func_L05_00426810: the same C, where the alpha steps take PAL's 50 Hz scale. */
 void func_PAL_L05_0042C200(unsigned char *a0) {
@@ -13,7 +14,7 @@ void func_PAL_L05_0042C200(unsigned char *a0) {
 
     p = (float *)obj;
     for (i = 3; i >= 0; i--) {
-        *p++ = (float)func_002A77E0(0xFF);
+        *p++ = (float)math_random_int_below(0xFF);
     }
     *(float *)(obj + 0x10) = -1.0f;
     *(float *)(obj + 0x14) = -2.25f;

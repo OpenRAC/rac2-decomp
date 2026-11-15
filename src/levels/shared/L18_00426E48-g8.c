@@ -8,12 +8,12 @@ extern f32 D_L18_001B12B0 __attribute__((sda));
 extern f32 D_L18_001B12B4 __attribute__((sda));
 extern f32 D_L18_001B12B8 __attribute__((sda));
 extern f32 D_L18_001B12BC __attribute__((sda));
-extern f32 func_00282E80(char *, char *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283C80(f32, f32);
+extern f32 vec_distance_xy(char *, char *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastDiffRots(f32, f32);
 
 /* Tests whether the target is close enough and inside this object's sight angle. */
-s32 func_L18_00426E48(char *self, char *target) {
+s32 moby_is_target_in_sight(char *self, char *target) {
     f32 range = D_L18_001B12A8;
     f32 arc = D_L18_001B12AC;
     f32 distance, angle;
@@ -31,7 +31,7 @@ alternate_range:
     arc = D_L18_001B12BC;
 test_target:
     distance = vec_distance_xy(self + 0x10, target + 0x10);
-    angle = FastMatrixHelperA(*(f32 *)(target + 0x10) - *(f32 *)(self + 0x10),
+    angle = mat_fast_helper_a(*(f32 *)(target + 0x10) - *(f32 *)(self + 0x10),
                          *(f32 *)(target + 0x14) - *(f32 *)(self + 0x14));
     angle = FastDiffRots(*(f32 *)(self + 0xF8), angle);
     return distance < range && angle < arc;

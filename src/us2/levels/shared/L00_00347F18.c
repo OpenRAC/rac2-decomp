@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0027C540(int a);
-extern void func_0027C660(void);
-extern void func_L00_0030DCF8(void);
+extern void SetupGifPaging(int a);
+extern void DoGifPaging(void);
+extern void level_l00_call_module_handler_8(void);
 
 int func_US2_L00_00347F18(void)
 {
-    func_0027C540(0);
-    func_L00_0030DCF8();
-    func_0027C660();
+    SetupGifPaging(0);
+    level_l00_call_module_handler_8();
+    DoGifPaging();
     return 0;
 }
 

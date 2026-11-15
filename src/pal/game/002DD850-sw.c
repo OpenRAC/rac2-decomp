@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef struct {
@@ -25,10 +26,10 @@ extern u8 D_001CEC85;
 extern AnimationClass *D_001CDB80[];
 extern u8 D_001A7A0A[] __attribute__((sda));
 typedef struct { u8 pad[0x6c]; short count; u8 pad6e[4]; short phase; } Dialogue;
-extern Dialogue D_001A63A8;
+extern Dialogue g_music_state;
 extern void func_PAL_0029DE68(void *, void *);
-extern void func_00293260(AnimationClass *, int);
-extern int func_002B6D28(void);
+extern void relocate_asset_entry_pointers(AnimationClass *, int);
+extern int snd_resume_music_stream(void);
 extern void func_PAL_002A7E68(AnimationMoby *, int, int, int);
 
 /* Corresponds to RAC1 update_streamed_moby_animation. */
@@ -54,7 +55,7 @@ int func_PAL_002DEEA8(AnimationStream *stream)
         for (i = 0; i < 3; i++) {
             table = stream->buffer + *(int *)(header + (i << 3));
             (*resource)->tables[i + 1] = table;
-            func_00293260(*resource, i + 1);
+            relocate_asset_entry_pointers(*resource, i + 1);
         }
         stream->state = 2;
         if (D_001A7A0A[0] == 0) stream->moby->state = 0;
@@ -69,7 +70,7 @@ int func_PAL_002DEEA8(AnimationStream *stream)
             moby->counter++;
             if (moby->counter > 100) moby->counter = 100;
             if (moby->counter < 100) return 0;
-            dialogue = &D_001A63A8;
+            dialogue = &g_music_state;
             if (dialogue->phase != 3) return 0;
             if (dialogue->count >= 6000) return 0;
             moby->counter = 0;
@@ -78,7 +79,7 @@ int func_PAL_002DEEA8(AnimationStream *stream)
             break;
         case 1: case 3: case 5:
             if (moby->counter == 0 && moby->primary == moby->secondary) {
-                func_002B6D28();
+                snd_resume_music_stream();
                 moby->counter = 1;
             }
             if (moby->flags & 2) {

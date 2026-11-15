@@ -13,22 +13,22 @@ extern float D_L00_001BD370;
 extern char D_L00_001BD2C0[];
 extern char D_L00_001B8FF0[];
 extern char D_0018A0E0[];
-extern void func_00272198(float);
-extern int func_00283CF0(float);
-void func_00283098(void *,void *,void *);
-void func_00282CC0(void *,void *,void *);
-void func_00282CF0(void *,void *,void *);
-void func_00282D30(void *,void *,float);
-void func_00282F20(void *,void *,float);
-void func_00282DD8(void *,void *,void *);
-float func_00283198(float);
-float func_00283180(float);
-void func_0027AB40(void);
+extern void cam_set_transition_frames(float);
+extern int FloatToInt(float);
+void matrix_mul_vec3(void *,void *,void *);
+void FastVecAdd(void *,void *,void *);
+void FastVecSub(void *,void *,void *);
+void FastVecScale(void *,void *,float);
+void vec_scale_to_length(void *,void *,float);
+void FastVecCross(void *,void *,void *);
+float math_fast_sin_or_cos_b(float);
+float math_fast_sin_or_cos_a(float);
+void UpdateViewContext(void);
 void func_PAL_L00_002C4480(int,int);
-int func_L00_00341820(void *,void *,int *,float *,float,int);
-int func_00282978(void *);
-float func_002A7C00(float,float,float);
-float func_00282E48(void *,void *);
+int Spline_AdvanceByDistance(void *,void *,int *,float *,float,int);
+int FastDecTimer(void *);
+float math_cosine_blend(float,float,float);
+float fast_vec_dist(void *,void *);
 
 /* Adapted from RAC1 Camera19_Update, rocket_and_path_camera.c. */
 void func_PAL_L00_0042EA98(char *moby) {
@@ -76,17 +76,17 @@ void func_PAL_L00_0042EA98(char *moby) {
                 v1[1] = c3[1];
                 v1[2] = c3[2];
                 v1[3] = 0.0f;
-                func_00283098(v1, v1, D_L00_001B8FF0);
-                func_00282CC0(v2, gb + 0x10, v1);
-                func_00282CF0(va, v2, pm);
+                matrix_mul_vec3(v1, v1, D_L00_001B8FF0);
+                FastVecAdd(v2, gb + 0x10, v1);
+                FastVecSub(va, v2, pm);
             } else {
-                func_00282CF0(va, b + 0x10, pm);
+                FastVecSub(va, b + 0x10, pm);
             }
-            func_00282D30(v1, D_0018A0E0, -1.0f);
-            func_00282F20(moby, va, 1.0f);
-            func_00282DD8(moby + 0x10, moby, v1);
-            func_00282F20(moby + 0x10, moby + 0x10, 1.0f);
-            func_00282DD8(moby + 0x20, moby + 0x10, moby);
+            FastVecScale(v1, D_0018A0E0, -1.0f);
+            vec_scale_to_length(moby, va, 1.0f);
+            FastVecCross(moby + 0x10, moby, v1);
+            vec_scale_to_length(moby + 0x10, moby + 0x10, 1.0f);
+            FastVecCross(moby + 0x20, moby + 0x10, moby);
         }
         return;
     }
@@ -99,11 +99,11 @@ void func_PAL_L00_0042EA98(char *moby) {
             *(short *)(f + 0x14) = 3;
             D_L00_001B18E0 = 1.0f;
             x = k->vals[8] * 0.5f;
-            aa = func_00283198(x);
-            bb = func_00283180(x); D_L00_001BD370 = aa / bb;
-            func_0027AB40();
+            aa = math_fast_sin_or_cos_b(x);
+            bb = math_fast_sin_or_cos_a(x); D_L00_001BD370 = aa / bb;
+            UpdateViewContext();
             *(unsigned char *)(e + 0x39) = 1;
-            func_00272198(12.0f);
+            cam_set_transition_frames(12.0f);
             *(short *)(moby + 0x7E) = 4;
             D_L00_001B18E8 = 0;
             if (*(int *)(e + 0x4C) == 0) {
@@ -131,13 +131,13 @@ void func_PAL_L00_0042EA98(char *moby) {
 
         g = D_L00_001FDA80[*(int *)(e + 0x20)];
         qcopy(va, (moby + 0x30));
-        rr = func_L00_00341820(g, (moby + 0x30), (int *)f, (float *)(f + 4), *(float *)(e + 0x3C) * 0.020000001f, 0);
+        rr = Spline_AdvanceByDistance(g, (moby + 0x30), (int *)f, (float *)(f + 4), *(float *)(e + 0x3C) * 0.020000001f, 0);
         if (*(short *)(f + 0x16) != 0) {
-            if (func_00282978(f + 0x16) != 0) {
+            if (FastDecTimer(f + 0x16) != 0) {
                 rr = 1;
             } else if (*(int *)(e + 0x40) != 0) {
                 short s16 = *(short *)(f + 0x16);
-                if (s16 < (((int)(func_00283CF0(20.0f)) * 5 + 2) / 6)) {
+                if (s16 < (((int)(FloatToInt(20.0f)) * 5 + 2) / 6)) {
                     rr = 1;
                 }
             }
@@ -173,15 +173,15 @@ void func_PAL_L00_0042EA98(char *moby) {
                 for (j2 = *(int *)f; j2 < keys->ids[i + 1]; j2++) {
                     total = total + *(float *)(g + j2 * 16 + 0x1C);
                 }
-                r = func_002A7C00(keys->vals[i], keys->vals[i + 1], sum / total);
+                r = math_cosine_blend(keys->vals[i], keys->vals[i + 1], sum / total);
                 m = r * 0.00872664712369442f;
-                aa = func_00283198(m);
-                bb = func_00283180(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
-                func_0027AB40();
+                aa = math_fast_sin_or_cos_b(m);
+                bb = math_fast_sin_or_cos_a(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
+                UpdateViewContext();
             }
             i++;
         }
-        d = func_00282E48(va, (moby + 0x30));
+        d = fast_vec_dist(va, (moby + 0x30));
         nv = *(float *)(f + 0x10) + d;
         *(float *)(f + 0x10) = nv;
         if (*(int *)(e + 0x28) >= 0) {
@@ -191,22 +191,22 @@ void func_PAL_L00_0042EA98(char *moby) {
             v2[1] = c3[1];
             v2[2] = c3[2];
             v2[3] = 0.0f;
-            func_00283098(v2, v2, D_L00_001B8FF0);
-            func_00282CC0(v3, b17 + 0x10, v2);
-            func_00282CF0(v1, v3, (moby + 0x30));
+            matrix_mul_vec3(v2, v2, D_L00_001B8FF0);
+            FastVecAdd(v3, b17 + 0x10, v2);
+            FastVecSub(v1, v3, (moby + 0x30));
         } else {
             char *h;
             d = (nv / *(float *)(f + 8)) * *(float *)(f + 0xC);
             h = D_L00_001FDA80[*(int *)(e + 0x24)];
             ia = 0;
             ib = 0.0f;
-            func_L00_00341820(h, v2, &ia, &ib, d, 0);
-            func_00282CF0(v1, v2, (moby + 0x30));
+            Spline_AdvanceByDistance(h, v2, &ia, &ib, d, 0);
+            FastVecSub(v1, v2, (moby + 0x30));
         }
-        func_00282D30(v2, D_0018A0E0, -1.0f);
-        func_00282F20(moby, v1, 1.0f);
-        func_00282DD8(moby + 0x10, moby, v2);
-        func_00282F20(moby + 0x10, moby + 0x10, 1.0f);
-        func_00282DD8(moby + 0x20, moby + 0x10, moby);
+        FastVecScale(v2, D_0018A0E0, -1.0f);
+        vec_scale_to_length(moby, v1, 1.0f);
+        FastVecCross(moby + 0x10, moby, v2);
+        vec_scale_to_length(moby + 0x10, moby + 0x10, 1.0f);
+        FastVecCross(moby + 0x20, moby + 0x10, moby);
     }
 }

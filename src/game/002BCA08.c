@@ -8,27 +8,27 @@ typedef struct {
     float position[4];
     float payload[8];
 } Particle;
-extern char D_001B5340[];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern int func_00283CF0(float);
+extern char g_camera_eye_state[];
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern int FloatToInt(float);
 
 /* Particle tick: drift the position along its anchor, or fade out. */
-void func_002BCA08(Particle *p)
+void part_update_anchored_fade(Particle *p)
 {
     float *motion = p->payload;
     p->seed += *(unsigned char *)motion;
     if (((int *)motion)[1] == 0) {
         float v[4] __attribute__((aligned(16)));
         qcopy(p->position, ((Particle *)((void **)motion)[2])->position);
-        FastVecSub(v, gCameraState_001B5340, p->position);
+        FastVecSub(v, g_camera_eye_state, p->position);
         vec_scale_to_length(v, v, 0.01f);
         FastVecAdd(p->position, p->position, v);
     } else if (FastDecTimer(&p->size)) {
-        KillParticle(p);
+        part_kill(p);
     } else {
         p->color = (FloatToInt(p->size * 21.166668f) << 24) | 0xFFFFFF;
     }

@@ -13,15 +13,15 @@ typedef unsigned char u8;
 
 typedef float f32;
 
-extern void func_002B00D8(char *a, char *b, char *c, f32 d);
+extern void gravity_offset_position(char *a, char *b, char *c, f32 d);
 
 extern void func_00282CC0_5(char *a, char *b, char *c);
 
 extern void func_00283098_1(char *a, char *b, char *c);
 
-extern void func_00283958(char *a, char *b);
+extern void quaternion_to_rotation_basis(char *a, char *b);
 
-extern void func_00283738(char *a, char *b, char *c);
+extern void multiply_matrix3x3(char *a, char *b, char *c);
 
 extern void func_00282CF0_4(char *a, char *b, char *c);
 
@@ -55,16 +55,16 @@ typedef struct {
 
 /* clear five object fields; independently qualified in this overlay */
 /* Sets five whole-number fields of an object to zero. */
-void func_L00_002D7940(s32 *object) {
+void moby_zero_five_words(s32 *object) {
     object[0]=0; object[1]=0; object[2]=0; object[3]=0; object[4]=0;
 }
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
 /* blends the first component of the source through the helper, then copies the four
    remaining components straight across */
 /* Copies five numbers, passing the first one through a helper first. */
-void func_L00_002D7958(f32 *dst, f32 *src, f32 x) {
+void vec_copy5_blend_first(f32 *dst, f32 *src, f32 x) {
  dst[0]=FastAddRotations(src[0],x);
  dst[1]=src[1];
  dst[2]=src[2];
@@ -84,7 +84,7 @@ extern L00_DispatchRecord D_002A3A00[];
 
 /* Calls the object's class entry 2 for the type index in its +0x8C halfword. */
 /* Runs the object's type-specific update step, if its type has one. */
-void func_L00_002D7D58(char *object) {
+void moby_call_class_update(char *object) {
     L00_Dispatch callback = D_002A3A00[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
         callback(object);
@@ -92,7 +92,7 @@ void func_L00_002D7D58(char *object) {
 
 /* Calls the object's class entry 4 for the type index in its +0x8C halfword. */
 /* Runs the object's type-specific cleanup step, if its type has one. */
-void func_L00_002D8208(char *object) {
+void moby_call_class_cleanup(char *object) {
     L00_Dispatch callback = D_002A3A00[*(short *)(object + 0x8C)].entries[4];
     if (callback != 0)
         callback(object);
@@ -108,7 +108,7 @@ extern E_r002D9D48 r1_D_L00_001EAC00[];
 /* rac1-decomp src/overlays/shared/camera_001EB508.c: func_L00_001ED5B0 */
 /* Returns the index of the entry with the given key, or of the -1 terminator. */
 /* Looks up a camera entry by its id number and returns its position in the list. */
-int func_L00_002D9D48(int key) {
+int cam_find_entry_index(int key) {
     int i = 0;
     while (r1_D_L00_001EAC00[i].key != -1 && r1_D_L00_001EAC00[i].key != key) {
         i++;
@@ -122,7 +122,7 @@ int func_L00_002D9D48(int key) {
 
 /* Builds a 3-component vector from a spherical radius/elevation/azimuth triple using two unary float helpers, clears the 4th component, then forwards the destination twice plus a third argument to a final helper. */
 /* Turns an angle-and-distance description into a direction vector, then rotates it with a matrix. */
-void func_L00_002DA0B8(float *out, float *p, void *q)
+void vec_spherical_to_vector(float *out, float *p, void *q)
 {
     float t;
 
@@ -145,25 +145,25 @@ void func_L00_002DA0B8(float *out, float *p, void *q)
 /* Return the constant signed integer one. */
 /* Returns the constant integer 1. Matches FUN_0012F940 disassembly and decompilation. */
 /* Always answers yes (1). */
-int func_L00_002DC3D0(void) {
+int math_return_one(void) {
     return 1;
 }
 
 /* Return the constant signed integer one. */
 /* Returns the constant integer 1. Matches FUN_0012F940 disassembly and decompilation. */
 /* Always answers yes (1). */
-int func_L00_002DC3D8(void) {
+int math_return_one_alt(void) {
     return 1;
 }
 
 /* Drives eight calls over a parameter object: loads the pointer at +104, builds four 16-byte stack scratch records at sp+0/+16/+32/+48, and passes the object's +16 and +192 regions to the callees. */
 /* Moves an object's position and orientation toward those of its parent object. */
-void func_L00_002DC3E0(Obj_F4778f810 *obj)
+void moby_follow_parent_transform(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
     Sub_F4778f810 *p = (Sub_F4778f810 *)obj->p068;
 
-    OffsetPositionAlongGravity((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
+    gravity_offset_position((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
     func_00282CC0_5((char *)obj + 0x10, (char *)obj + 0x10, (char *)p);
     func_00283098_1((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
     quaternion_to_rotation_basis((char *)p + 0x10, (char *)&tmp[3]);
@@ -175,12 +175,12 @@ void func_L00_002DC3E0(Obj_F4778f810 *obj)
 
 /* Drives eight calls over a parameter object: loads the pointer at +104, builds four 16-byte stack scratch records at sp+0/+16/+32/+48, and passes the object's +16 and +192 regions to the callees. */
 /* Moves an object's position and orientation toward those of its parent object. */
-void func_L00_002DC4C0(Obj_F4778f810 *obj)
+void moby_follow_parent_transform_alt(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
     Sub_F4778f810 *p = (Sub_F4778f810 *)obj->p068;
 
-    OffsetPositionAlongGravity((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
+    gravity_offset_position((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
     func_00282CC0_5((char *)obj + 0x10, (char *)obj + 0x10, (char *)p);
     func_00283098_1((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
     quaternion_to_rotation_basis((char *)p + 0x10, (char *)&tmp[3]);
@@ -223,16 +223,16 @@ typedef struct {
 
 extern TextGroup D_L00_001BC588[];
 extern char D_L00_001BC200[];
-extern int D_001A7340 MACRO_ADDR;
-extern int func_002798A0(int, int *, int *);
-extern int func_L00_002E36F8(int);
-extern void func_0027DE50(int, int, int, int, unsigned long long);
-extern void func_002802E0(unsigned short *, int, int, int, int, int, int, int, int);
-extern void func_00280190(unsigned short *, unsigned long, unsigned char *, int);
+extern int g_screen_width MACRO_ADDR;
+extern int AdvanceGroupedTableOffset(int, int *, int *);
+extern int text_find_level_by_key(int);
+extern void gfx_draw_colored_rectangle(int, int, int, int, unsigned long long);
+extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, int);
+extern void text_draw_window_small(unsigned short *, unsigned long, unsigned char *, int);
 
 /* The layout constructor initializes all twelve halfwords consumed by FontPrint. */
 /* Draws one line of caption text with a dark bar and a shadow behind it. */
-void func_L00_002E3340(int row, float alpha)
+void text_draw_caption_line(int row, float alpha)
 {
     unsigned short layout[12];
     int group, index;
@@ -240,45 +240,45 @@ void func_L00_002E3340(int row, float alpha)
     TextContextPrefix *context;
     int origin;
     if (!AdvanceGroupedTableOffset(row, &group, &index)) return;
-    text = (unsigned char *)FindLevelTextByKey(D_L00_001BC588[group].firstKey + index);
+    text = (unsigned char *)text_find_level_by_key(D_L00_001BC588[group].firstKey + index);
     if (!text) return;
     context = (TextContextPrefix *)D_L00_001BC200;
     origin = D_L00_001BC588[context->group].origin + row * D_L00_001BC588[context->group].step;
-    DrawColoredRectangle(origin + 2, origin + D_L00_001BC588[context->group].step - 2,
-        0, gScreenWidth, (unsigned long long)((int)(alpha * 96.0f) << 24));
+    gfx_draw_colored_rectangle(origin + 2, origin + D_L00_001BC588[context->group].step - 2,
+        0, g_screen_width, (unsigned long long)((int)(alpha * 96.0f) << 24));
     FontSetWindow(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
-        gScreenWidth, gScreenWidth / 2 + 2,
+        g_screen_width, g_screen_width / 2 + 2,
         origin + D_L00_001BC588[context->group].step / 2 + 1, context->anchor, 3);
-    DrawTextWindowSmallFont(layout, 0x80000000UL, text, -1);
+    text_draw_window_small(layout, 0x80000000UL, text, -1);
     FontSetWindow(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
-        gScreenWidth, gScreenWidth / 2,
+        g_screen_width, g_screen_width / 2,
         origin + D_L00_001BC588[context->group].step / 2, context->anchor, 3);
-    DrawTextWindowSmallFont(layout, 0xFFFFFFFFUL, text, -1);
+    text_draw_window_small(layout, 0xFFFFFFFFUL, text, -1);
 }
 
 /* Draw the current caption over six successively shaded bars. */
 /* Draws the current caption text with a shaded bar fading out above it. */
-void func_L00_002E3520(void)
+void text_draw_caption_bars(void)
 {
-    int text = FindLevelTextByKey(D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].key);
+    int text = text_find_level_by_key(D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].key);
     unsigned short layout[12];
     int i, y, bottom;
 
     if (text) {
         FontSetWindow(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
-            gScreenWidth, gScreenWidth / 2,
+            g_screen_width, g_screen_width / 2,
             D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
-        DrawTextWindowSmallFont(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
+        text_draw_window_small(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
         bottom = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 2;
         y = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 4;
         for (i = 0; i < 6; i++) {
-            DrawColoredRectangle(bottom - y, bottom, -gScreenWidth, gScreenWidth * 2, 0x18000000);
+            gfx_draw_colored_rectangle(bottom - y, bottom, -g_screen_width, g_screen_width * 2, 0x18000000);
             y = y * 5 / 6;
         }
         FontSetWindow(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
-            gScreenWidth, gScreenWidth / 2,
+            g_screen_width, g_screen_width / 2,
             D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
-        DrawTextWindowSmallFont(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
+        text_draw_window_small(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
     }
 }
 
@@ -297,7 +297,7 @@ extern s32 ref_L00_001BC200_00[];
  * holds the list pointer and its fifth the count; the record's second word is the key, and a
  * match returns its first word. Zero when the count is not positive or nothing matches. */
 /* Finds the text for a key in the level's text list and returns it, or 0 if missing. */
-s32 func_L00_002E36F8(s32 key)
+s32 text_find_level_by_key(s32 key)
 {
     Rec_2e36f8 *entry;
     s32 count = ref_L00_001BC200_00[4];
@@ -321,13 +321,13 @@ extern char ref_L00_001BC228_00[];
 
 /* Thin forwarder: hands one global to the shared handler. */
 /* Passes a global object to a shared handler. */
-void func_L00_002E3898(void) {
+void level_forward_to_shared_handler(void) {
     func_2EDD48(ref_L00_001BC228_00);
 }
 
 /* evaluates (b-a)*(t*t)+a*t and converts the measured float result to a signed word */
 /* Blends smoothly from a toward b over t (0 to 1), then rounds to a whole number. */
-s32 func_L00_002E3A68(f32 a,f32 b,f32 t) {
+s32 math_blend_quadratic_to_int(f32 a,f32 b,f32 t) {
  f32 difference=b-a;
  f32 squared=t*t;
  a=a*t;
@@ -348,7 +348,7 @@ extern WeightTap D_L00_0025EDE0[][16][10];
 extern int D_L00_001A24A8[][16];
 
 /* Adds up ten weighted values from a table for a pair of indices, or returns 0 if out of range. */
-int func_L00_002E3A90(int a, int b)
+int math_sum_weighted_table_taps(int a, int b)
 {
     WeightTap *tap;
     int sum;

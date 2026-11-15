@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_00282CC0(char *first, char *second, char *third);
-extern void func_00282F20(char *dst, char *src, float x);
-extern void func_002AB668(void *a, void *b, float f);
-extern void func_00282D30(char *a, char *b, float f);
-extern void func_002ACDE8(char *a, char *b, char *c);
-extern float func_00283BE0(float a, float b);
-extern void func_L00_002E6CF0(char *table, char *object);
+extern void FastVecAdd(char *first, char *second, char *third);
+extern void vec_scale_to_length(char *dst, char *src, float x);
+extern void math_build_axis_angle_quat(void *a, void *b, float f);
+extern void FastVecScale(char *a, char *b, float f);
+extern void vec_rotate_by_quaternion(char *a, char *b, char *c);
+extern float fast_subtract_rotations(float a, float b);
+extern void gfx_add_draw_callback_first(char *table, char *object);
 extern char D_L09_003AEF78[];
 
 /* rebuilds the object's orientation matrix from its stored angles and hands it to the stage */
@@ -17,16 +18,16 @@ void func_PAL_L09_003B26B8(char *object)
     char *q = object + 0x10;
     char *r = p + 0x10;
 
-    func_00282F20((char *)m, p + 0x30, 1.0f);
-    func_002AB668(m, m, *(float *)(p + 0x5C));
-    func_00282D30(r, p, *(float *)(p + 0x50));
-    func_002ACDE8(r, r, (char *)m);
+    vec_scale_to_length((char *)m, p + 0x30, 1.0f);
+    math_build_axis_angle_quat(m, m, *(float *)(p + 0x5C));
+    FastVecScale(r, p, *(float *)(p + 0x50));
+    vec_rotate_by_quaternion(r, r, (char *)m);
     *(float *)(p + 0x20) = -*(float *)(p + 0x10);
     *(float *)(p + 0x24) = -*(float *)(p + 0x14);
     *(float *)(p + 0x28) = -*(float *)(p + 0x18);
-    func_00282CC0(r, q, r);
-    func_00282CC0(p + 0x20, q, p + 0x20);
-    *(float *)(p + 0x5C) = func_00283BE0(*(float *)(p + 0x5C), 0.37699118f);
-    func_L00_002E6CF0(D_L09_003AEF78, object);
+    FastVecAdd(r, q, r);
+    FastVecAdd(p + 0x20, q, p + 0x20);
+    *(float *)(p + 0x5C) = fast_subtract_rotations(*(float *)(p + 0x5C), 0.37699118f);
+    gfx_add_draw_callback_first(D_L09_003AEF78, object);
 }
 

@@ -2,19 +2,19 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { Vector vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } RibbonPacket;
-extern char D_001B5340[];
-extern u64 func_0027C878(int);
-extern void func_00280B90(void *, void *, int), func_002FC560(int, u64);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
+extern char g_camera_eye_state[];
+extern u64 GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
 extern float D_001AEFFC __attribute__((sda)), D_001AF018 __attribute__((sda));
 extern int D_001AF054 __attribute__((sda)), D_001AF058 __attribute__((sda));
 extern s32 D_001AF004 __attribute__((sda)), D_001AF008 __attribute__((sda));
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI independently orders integer and FP arguments: count is a3,
  * unused is f12, width is f13, and extend is f14. */
-void func_0030D5B8(Vector *points, u32 color, u32 outerColor, float unused, float width, float extend, int count) {
+void beam_draw_ribbon_with_halo(Vector *points, u32 color, u32 outerColor, float unused, float width, float extend, int count) {
     RibbonPacket core, halo;
     Vector normal, widthVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
     float length, initialLength, haloLength, firstLength, lastLength;
@@ -36,7 +36,7 @@ void func_0030D5B8(Vector *points, u32 color, u32 outerColor, float unused, floa
     halo.uv[4] = 1; halo.uv[5] = 0; halo.uv[6] = 1; halo.uv[7] = 1;
     core.uv[0] = D_001AEFFC; core.uv[1] = 0; core.uv[2] = D_001AEFFC; core.uv[3] = 1;
     core.uv[4] = D_001AEFFC + 1.0f; core.uv[5] = 0; core.uv[6] = D_001AEFFC + 1.0f; core.uv[7] = 1;
-    FastVecSub(&eye, points, gCameraState_001B5340);
+    FastVecSub(&eye, points, g_camera_eye_state);
     FastVecSub(&tangent, points + 1, points);
     FastVecCross(&normal, &tangent, &eye);
     initialLength = FastVecLength(&normal);
@@ -45,7 +45,7 @@ void func_0030D5B8(Vector *points, u32 color, u32 outerColor, float unused, floa
     FastVecAdd(&core.vertex[0], points, &normal);
     FastVecSub(&core.vertex[1], points, &normal);
     for (i = 1; i < count - 1; i++) {
-        FastVecSub(&eye, points + i, gCameraState_001B5340);
+        FastVecSub(&eye, points + i, g_camera_eye_state);
         FastVecSub(&tangent, points + i + 1, points + i);
         FastVecCross(&normal, &tangent, &eye);
         length = FastVecLength(&normal);
@@ -60,8 +60,8 @@ void func_0030D5B8(Vector *points, u32 color, u32 outerColor, float unused, floa
         qcopy(&core.vertex[0], &core.vertex[2]); qcopy(&core.vertex[1], &core.vertex[3]);
     }
     for (i = 0; i < count - 1; i++) {
-        FastVecSub(&firstRay, points + i, gCameraState_001B5340);
-        FastVecSub(&lastRay, points + i + 1, gCameraState_001B5340);
+        FastVecSub(&firstRay, points + i, g_camera_eye_state);
+        FastVecSub(&lastRay, points + i + 1, g_camera_eye_state);
         firstLength = FastVecLength(&firstRay);
         lastLength = FastVecLength(&lastRay);
         if (lastLength < firstLength) {
@@ -69,13 +69,13 @@ void func_0030D5B8(Vector *points, u32 color, u32 outerColor, float unused, floa
             else FastVecScale(&lastRay, &lastRay, firstLength / lastLength);
         } else if (firstLength == 0) { qcopy(&firstRay, &lastRay); }
         else FastVecScale(&firstRay, &firstRay, lastLength / firstLength);
-        FastVecAdd(&first, gCameraState_001B5340, &firstRay);
-        FastVecAdd(&last, gCameraState_001B5340, &lastRay);
+        FastVecAdd(&first, g_camera_eye_state, &firstRay);
+        FastVecAdd(&last, g_camera_eye_state, &lastRay);
         FastVecSub(&tangent, &last, &first);
         FastVecScale(&extension, &tangent, extend);
         FastVecSub(&first, &first, &extension);
         FastVecAdd(&last, &last, &extension);
-        FastVecSub(&toEye, gCameraState_001B5340, &first);
+        FastVecSub(&toEye, g_camera_eye_state, &first);
         FastVecCross(&normal, &toEye, &tangent);
         haloLength = FastVecLength(&normal);
         if (haloLength != 0) haloLength = 1.0f / haloLength;

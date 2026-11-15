@@ -4,6 +4,7 @@
  * (FUNCTION_ENTRY_OFFSETS); the words at 04:0029FE90 and 10:0029F960 point there.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -16,7 +17,7 @@ extern int * volatile D_L04_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L04_001C9C60;
 
 /* Fills the menu entry list from the level tables and selects the entry that is current. */
-int func_L04_00378838(char *menu) {
+int menu_l04_build_entry_list(char *menu) {
     int i, entry;
     int *idList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

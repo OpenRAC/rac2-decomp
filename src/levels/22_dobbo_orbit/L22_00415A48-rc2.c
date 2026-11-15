@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -28,7 +29,7 @@ extern s32 ref_L22_00415A48_01(s32 a, s32 b);
 extern struct { s32 w0; s32 w1; s32 w2; } D_0018B6A8;
 
 /* Sets up a timer on first run, then resets it to 0x708 (1800 frames) and calls a helper when a condition is met. */
-void func_L22_00415A48(void *moby) {
+void timer_trigger_update(void *moby) {
     s32 *vars;
     void *hudState;
 

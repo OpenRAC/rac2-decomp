@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -52,7 +53,7 @@ extern int ref_L00_00309900_03;
 extern int ref_L00_00309900_01;
 
 /* Save menu screen step: when the memory card is idle, picks screen 12, 3, 19 or 16 depending on the error word, the selection and the saved size. */
-void func_00298630(void)
+void save_menu_choose_screen_by_size(void)
 {
     short phase;
     if (ref_L00_00309828_00.mode_15c != 2 || ref_L00_00309828_00.selected_164 >= 0)
@@ -78,7 +79,7 @@ void func_00298630(void)
 }
 
 /* Save menu screen step: goes to screen 3 when something is selected, or to screen 13 when a flag is set. */
-void func_002986D0(void)
+void save_menu_choose_screen_on_confirm(void)
 {
     if (ref_L00_003098C8_01.selector_10 != 0) {
         ref_L00_003098C8_02 = 3;
@@ -89,7 +90,7 @@ void func_002986D0(void)
 }
 
 /* Save menu screen step: goes to screen 3, or reacts to two flags by moving to screen 24, 12 or 14. */
-void func_00298708(void)
+void save_menu_choose_screen_on_confirm_flags(void)
 {
     if (ref_L00_00309900_02.selector_10 != 0) {
         ref_L00_00309900_03 = 3;

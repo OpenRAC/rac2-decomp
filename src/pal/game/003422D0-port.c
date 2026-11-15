@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_0033AF48_2();
 
@@ -6,11 +7,11 @@ extern void func_002DAF68_1();
 
 extern void func_00336A78_5();
 
-extern void func_00336828();
+extern void hud_draw_colored_quad_widget();
 
 extern void func_00336320_4();
 
-extern void func_0033ED88();
+extern void info_panel_draw_counters();
 
 typedef unsigned char u8;
 
@@ -39,15 +40,15 @@ typedef struct {
     char reserved3E[0xA2];
 } ItemDefinition;
 
-extern unsigned char D_001A7AF8[] __attribute__((sda));
-extern unsigned char D_00139568[];
-extern ItemDefinition D_00239BA0[];
-extern RecentSlot **D_001B18D4[] __attribute__((sda));
+extern unsigned char g_item_owned_flags[] __attribute__((sda));
+extern unsigned char g_item_slot_to_record[];
+extern ItemDefinition g_weapon_table[];
+extern RecentSlot **g_radial_menu_pages[] __attribute__((sda));
 
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);
 
 /* func_0033F218 is in 0033F030-radial-g8.c. */
 
@@ -62,8 +63,8 @@ extern const Word2_340498 D_001AE088;
 extern const Word2_340498 D_001AE090;
 extern char D_00259F58[];
 extern char *D_001A8CFC __attribute__((sda));
-extern void func_00336390(void *, void *, int);
-extern void func_00337210(int *);
+extern void object_set_helper_result(void *, void *, int);
+extern void DrawItemGrid(int *);
 
 static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
 
@@ -91,7 +92,7 @@ void func_PAL_00342518(char *o)
     f[13] = (int)(o + 0x260);
     f[14] = 0;
     child = o + 0x17C;
-    func_00336390(child, D_001A8CFC + 0x8710, 0x23);
+    object_set_helper_result(child, D_001A8CFC + 0x8710, 0x23);
     f[10] = (int)child;
     f[12] = (int)(o + 0x214);
     f[11] = (int)(o + 0x98);
@@ -102,7 +103,7 @@ void func_PAL_00342518(char *o)
     f[6] = (int)&q1;
     f[5] = (int)&q0;
     f[22] = 0;
-    func_00337210(f);
+    DrawItemGrid(f);
 }
 
 
@@ -130,12 +131,12 @@ typedef struct {
 /* the table, in the memory a program replaces from 0x1A7C80 on: every program has
    its own copy of it at that address */
 extern MenuEntry D_001FCE0[];
-extern int func_002E5E58(int, unsigned int, void *);
-extern void func_003407F8(MenuState *, MenuEntry *, int);
-extern void *func_00115484(void *, int, unsigned int);
-extern void func_00335E38(void *, float, float, float, float);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void AddMenuItemToRing(MenuState *, MenuEntry *, int);
+extern void *memset(void *, int, unsigned int);
+extern void object_set_first_float4(void *, float, float, float, float);
 
-extern void *func_003361A8(void *);
-extern char *func_00336968(char *);
-extern void *func_003363D0(void *);
-extern void *func_003366D0(void *);
+extern void *object_construct_derived_a(void *);
+extern char *hud_construct_widget_base(char *);
+extern void *object_construct_derived_b(void *);
+extern void *object_construct_derived_c(void *);

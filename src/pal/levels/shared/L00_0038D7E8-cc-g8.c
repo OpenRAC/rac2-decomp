@@ -6,31 +6,31 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword bits; float f[4]; } Vector4;
 
-extern char *func_0029EFD0(int);
-extern void func_0029F338(void *);
+extern char *CreateMoby(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_002833F0(void *, void *);
-extern void func_002FE8D8(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00282C88(void *);
-extern int func_002FEC78(unsigned char *, unsigned int);
-extern int func_002FED90(void *, void *, float, float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_get_facing_direction(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern int slot_alloc_for_object(unsigned char *, unsigned int);
+extern int part_alloc_effect_slot(void *, void *, float, float, float);
 
-extern char *D_0018C0B0[];
+extern char *g_hero_moby[];
 extern int D_L00_001AEFA8 __attribute__((sda));
 typedef struct {
     char pad00[0x58];
     int f58;
     char pad5C[224 - 0x5C];
 } TrailEntry;
-extern TrailEntry D_L00_00262570[];
+extern TrailEntry g_weapon_l00_table[];
 
 typedef struct {
     Quadword velocity;
@@ -67,7 +67,7 @@ char *func_PAL_L00_0038D7E8(void *owner, Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = func_0029EFD0(0x1367);
+    char *object = CreateMoby(0x1367);
     TrailWork *work;
     float angle;
     if (object) {
@@ -79,33 +79,33 @@ char *func_PAL_L00_0038D7E8(void *owner, Vector4 *position, Vector4 *velocity)
         ((TrailMoby *)object)->alpha = initialState;
         qcopy(&((TrailMoby *)object)->position, position);
         qcopy(&work->velocity, velocity);
-        func_002833F0(object + 0xC0, D_0018C0B0[0] + 0xF0);
-        func_002FE8D8(object + 0x10, &direction);
-        func_00282F20(&forward, object + 0xE0, 1);
-        func_00282DD8(&axis, &forward, &direction);
-        angle = func_00282DB0(&forward, &direction) * 0.5f;
-        func_00282D30(&quaternion, &axis, func_00283198(angle));
-        quaternion.f[3] = func_00283180(angle);
-        func_00283958(&quaternion, rotation);
-        func_00283738(object + 0xC0, rotation, object + 0xC0);
+        euler_rotation_basis(object + 0xC0, g_hero_moby[0] + 0xF0);
+        moby_get_facing_direction(object + 0x10, &direction);
+        vec_scale_to_length(&forward, object + 0xE0, 1);
+        FastVecCross(&axis, &forward, &direction);
+        angle = FastVecDot(&forward, &direction) * 0.5f;
+        FastVecScale(&quaternion, &axis, math_fast_sin_or_cos_b(angle));
+        quaternion.f[3] = math_fast_sin_or_cos_a(angle);
+        quaternion_to_rotation_basis(&quaternion, rotation);
+        multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         work->f64 = 0;
         work->f50 = 0;
         work->f44 = 0;
         work->f60 = 10;
         work->f4C = 1;
         work->f40 = (((int)(D_L00_001AEFA8) * 5 + 2) / 6);
-        func_00282C88(&work->basis[0]);
+        vec_clear_128(&work->basis[0]);
         *(float *)&work->basis[0] = 1;
         work->basis[2] = work->basis[0];
         work->basis[1] = work->basis[0];
         work->f58 = 0.031415932f;
         work->owner = owner;
-        work->handle = func_002FEC78((unsigned char *)object, 0);
+        work->handle = slot_alloc_for_object((unsigned char *)object, 0);
         if (work->handle == -1) {
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return 0;
         }
-        work->f4F = func_002FED90(object, 0, 1, 1, 1);
+        work->f4F = part_alloc_effect_slot(object, 0, 1, 1, 1);
         work->f4E = -1;
         work->f70 = 0;
         func_002A0F48(object);
@@ -124,7 +124,7 @@ typedef struct {
     char pad120[0x80];
     int buttons;
 } PlayerControl;
-extern PlayerControl D_00138500, D_00138180;
+extern PlayerControl D_00138500, g_pad_state;
 
 /* The two returns give per-arm loads that jump2 cross-jumps into one lw. */
 

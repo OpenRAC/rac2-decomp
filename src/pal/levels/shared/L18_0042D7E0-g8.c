@@ -1,20 +1,20 @@
 #include "common.h"
-extern u8 *D_L18_001B281C MACRO_ADDR;
+extern u8 *g_moby_l18_table MACRO_ADDR;
 extern int ref_L18_00428AE8_00 __attribute__((sda));
 typedef union { u8 b[0x100]; s16 h[0x80]; int i[0x40]; float f[0x40]; } Obj;
 extern int D_L18_001B1240 __attribute__((sda));
 extern int D_L18_001B1264 __attribute__((sda));
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CD8(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void add_vectors(void *, void *, void *);
 extern void func_PAL_L01_00323068(void *, void *);
 extern void func_PAL_002B5BA8(void *, void *, float);
 extern void func_PAL_L01_0031A4D0(void *, void *, void *);
-extern float func_00282E80(void *, void *);
+extern float vec_distance_xy(void *, void *);
 extern int ref_L18_00428AE8_01(void *, int);
-extern int func_L18_00427130(void *, int, int);
-extern int func_L18_004271C0(void *);
+extern int moby_set_anim(void *, int, int);
+extern int moby_toggle_anim_helper(void *);
 extern void func_PAL_L18_0042BA90(void *, int, int, float);
-extern void func_002A7750(void *, int, int);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_L18_0042CD70(void *);
 extern int func_001163B0(void);
 extern void func_PAL_002A7650(void *, int, int);
@@ -32,8 +32,8 @@ void func_PAL_L18_0042D7E0(u8 *o) {
             ((Obj *)m)->i[0x98/4] = 0;
     }
     if (o[0x95] == 13) {
-        func_00282F20(a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0xC0, 5.0f);
-        func_00282CD8(b, a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0x10);
+        vec_scale_to_length(a, g_moby_l18_table + (*(int *)(s+0x3B4)<<8) + 0xC0, 5.0f);
+        add_vectors(b, a, g_moby_l18_table + (*(int *)(s+0x3B4)<<8) + 0x10);
         a[2] = *(float *)(o+0x18);
         *(float *)(s+0x128) *= 10.0f;
         *(float *)(s+0x120) *= 10.0f;
@@ -53,32 +53,32 @@ void func_PAL_L18_0042D7E0(u8 *o) {
                 switch (o[0x95]) {
                 case 5:
                     if (s[0x399] & 2) s[0x399] = 0;
-                    func_L18_00427130(o, *(int *)(s+0x374), -1);
+                    moby_set_anim(o, *(int *)(s+0x374), -1);
                     *(u16 *)(s+0x392) = (D_L18_001B1240 * 5 + 2) / 6;
                     func_PAL_L18_0042BA90(o,2,0,10.0f);
-                    func_002A7750(o,4,6);
+                    moby_set_state(o,4,6);
                     break;
                 case 6:
-                    if (func_L18_004271C0(o)) {
+                    if (moby_toggle_anim_helper(o)) {
                         *(u16 *)(s+0x392) = (D_L18_001B1240 * 5 + 2) / 6;
                         func_PAL_L18_0042BA90(o,2,0,10.0f);
-                        func_002A7750(o,4,6);
+                        moby_set_state(o,4,6);
                     }
                     if (*(s16 *)(o+0xAA) != 0xEC0) func_PAL_L18_0042CD70(o);
                     break;
                 case 2:
-                    func_L18_004271C0(o);
+                    moby_toggle_anim_helper(o);
                     if (o[0x60] & 2) {
                         func_PAL_L18_0042BA90(o,func_001163B0() & 1,0,10.0f);
-                        func_002A7750(o,2,-1);
+                        moby_set_state(o,2,-1);
                     }
                     break;
                 }
             }
                 if (*(s16 *)(o+0xAA) == 0xEC0 && (unsigned)(o[0x95]-5) < 2) {
-                    if (func_00282E80(o+0x10, *(u8 **)(s+0x230)+0x10) < *(float *)(s+0x3A0)) {
+                    if (vec_distance_xy(o+0x10, *(u8 **)(s+0x230)+0x10) < *(float *)(s+0x3A0)) {
                         *(int *)(s+0x38C) = -1;
-                        func_002A7750(o,4,6);
+                        moby_set_state(o,4,6);
                     }
                 }
                 goto restore;
@@ -95,12 +95,12 @@ wander:
             if (*(s16 *)(s+0x392) == 0) {
                 *(u16 *)(s+0x392) = (D_L18_001B1264 * 5 + 2) / 6;
                 func_PAL_L18_0042BA90(o,func_001163B0() & 1,0,10.0f);
-                func_002A7750(o,2,-1);
+                moby_set_state(o,2,-1);
             }
         }
         if (*(float *)(o+0x18) < *(float *)(s+0x90)) {
             func_PAL_002A7650(o,0,3);
-            func_002A7750(o,12,10);
+            moby_set_state(o,12,10);
         }
 restore:
         { int k = *(int *)(s+0x3B4);

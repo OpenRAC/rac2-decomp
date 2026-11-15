@@ -1,12 +1,12 @@
 #include "common.h"
 typedef int SpawnQuad __attribute__((mode(TI)));
-extern int func_002A8600(u8 **out, int index, int activate, int reset);
-extern float func_00283248(float x, float y);
-extern int func_002AB220(u8 *object);
-extern int func_002AB1F0(u8 *object);
-extern void func_0026FEB8(const char *format, ...);
-extern void func_0029F390(u8 *object);
-extern void func_002AB650(u8 *object);
+extern int GetFirstMobyInGroup(u8 **out, int index, int activate, int reset);
+extern float mat_fast_helper_a(float x, float y);
+extern int moby_get_private_value_4(u8 *object);
+extern int moby_get_private_value_0(u8 *object);
+extern void STUB_printf(const char *format, ...);
+extern void update_moby_animation_state(u8 *object);
+extern void hero_copy_field_to_moby(u8 *object);
 extern void func_002A0F48(u8 *object);
 extern char D_L08_001B0B68[];
 extern char D_L08_001B0BA8[];
@@ -23,7 +23,7 @@ typedef struct {
 
 /* Takes a free object from the owner's two pool slots, sets it up at the given position facing
    the given direction, and returns it (or 0 if none is free). */
-u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
+u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
 {
     u8 *child;
     PoolSlotsPrefix *vars;
@@ -70,8 +70,8 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         child[0x7f] = 0;
         *(int *)(child + 0xf0) = 0;
         *(int *)(child + 0xf4) = 0;
-        *(float *)(child + 0xf8) = FastMatrixHelperA(direction[0], direction[1]);
-        headPart = (u8 *)GetMobyPrivateValue4(child);
+        *(float *)(child + 0xf8) = mat_fast_helper_a(direction[0], direction[1]);
+        headPart = (u8 *)moby_get_private_value_4(child);
         if (headPart != 0)
             *(SpawnQuad *)(headPart + 0x80) = *(SpawnQuad *)direction;
         else
@@ -89,10 +89,10 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         child[0x6d] = 255;
         update_moby_animation_state(child);
         *(int *)(child + 0x98) = *(int *)(*(u8 **)(child + 0x24) + 0x10);
-        CopyHeroField38ToMoby(child);
+        hero_copy_field_to_moby(child);
         func_002A0F48(child);
         result = child;
-        part = (u8 *)GetMobyPrivateValue0(result);
+        part = (u8 *)moby_get_private_value_0(result);
         if (part != 0) {
             *(int *)(part + 0x24) = 0;
             *(int *)(part + 0x20) = 0;

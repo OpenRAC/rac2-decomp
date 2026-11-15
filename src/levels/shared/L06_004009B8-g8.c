@@ -24,17 +24,17 @@ extern float D_L06_001AF71C;
 extern s32 D_L06_001B31B4;
 extern s32 D_L06_001B31B0;
 extern float D_L06_001AFF20 __attribute__((sda));
-extern float func_00282E48(void *,void *);
-extern void func_002833B8(void *,float);
-extern void func_00283410(void *,void *);
-extern void func_00283788(void *,void *,void *);
-extern float func_00283CE0(s32);
-extern s32 func_00283CF0(float);
-extern u64 func_0027C878(s32);
-extern u32 func_00283D38(u32,u32,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00280B90(void *,void *,s32);
-void func_L06_004009B8(char *obj)
+extern float fast_vec_dist(void *,void *);
+extern void set_scale_matrix(void *,float);
+extern void euler_to_matrix(void *,void *);
+extern void multiply_matrix(void *,void *,void *);
+extern float IntToFloat(s32);
+extern s32 FloatToInt(float);
+extern u64 GetEffectTextureDescriptor(s32);
+extern u32 FastTweenColor(u32,u32,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void draw_world_quad(void *,void *,s32);
+void gfx_draw_ripple_grid(char *obj)
 {
     RenderQuad quad[2];
     RenderVec rotation[4];

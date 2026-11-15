@@ -27,20 +27,20 @@ typedef struct {
     f32 rotZ;
 } L11Moby;
 
-extern void func_002A7750(u8 *arg0, s32 arg1, s32 arg2);
-extern void func_002A0488(void *, int, int, int);
-extern int func_002B3380(char *, char *, char *);
-extern f32 func_00283180(f32 a0);
-extern f32 func_00283198(f32 a0);
-extern f32 func_00283B98(f32 a0, f32 a1);
-extern void func_002833F0(void *a0, void *a1);
-extern f32 *func_L11_004417E8(s32 a0);
+extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
+extern void set_moby_color(void *, int, int, int);
+extern int part_spawn_damage_debris(char *, char *, char *);
+extern f32 math_fast_sin_or_cos_a(f32 a0);
+extern f32 math_fast_sin_or_cos_b(f32 a0);
+extern f32 FastAddRotations(f32 a0, f32 a1);
+extern void euler_rotation_basis(void *a0, void *a1);
+extern f32 *arena_get_center_point(s32 a0);
 
 extern f32 D_L11_001B0558 __attribute__((sda));
 extern f32 D_L11_001B0540 __attribute__((sda));
 
 /* Puts the Joba rail object back on its rail at angle zero and resets its state. */
-void func_L11_003F2F38(u8 *mobyBytes) {
+void joba_rail_reset(u8 *mobyBytes) {
     L11Moby *moby = (L11Moby *)mobyBytes;
     u8 *vars = *(u8 **)(mobyBytes + 0x68);
     f32 *railPoint;
@@ -57,20 +57,20 @@ void func_L11_003F2F38(u8 *mobyBytes) {
     moby->b7F = 0;
     moby->flags = (moby->flags & 0xFFB9) | 0x1000;
     *(s32 *)(vars + 0x60) = 0;
-    SpawnDamageDebrisOnHealthLoss((char *)moby, (char *)(vars + 0x50), (char *)(vars + 0x20));
+    part_spawn_damage_debris((char *)moby, (char *)(vars + 0x50), (char *)(vars + 0x20));
     if (*(s16 *)(vars + 0x70) != 0) {
         *(s16 *)(vars + 0x70) = 0;
         set_moby_color(moby, *(u32 *)(vars + 0x280), *(u32 *)(vars + 0x284),
                       *(u32 *)(vars + 0x288));
         *(s16 *)(vars + 0x72) = 1;
     }
-    SetMobyState(mobyBytes, 2, 2);
+    moby_set_state(mobyBytes, 2, 2);
     *(s32 *)(vars + 0x250) = 0;
-    trig = FastSinOrCosA(*(f32 *)(vars + 0x250));
-    railPoint = GetArenaCenterPoint(moby->slot);
+    trig = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x250));
+    railPoint = arena_get_center_point(moby->slot);
     moby->x = D_L11_001B0558 * trig + railPoint[0];
-    trig = FastSinOrCosB(*(f32 *)(vars + 0x250));
-    railPoint = GetArenaCenterPoint(moby->slot);
+    trig = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x250));
+    railPoint = arena_get_center_point(moby->slot);
     newY = D_L11_001B0558 * trig + railPoint[1];
     moby->z = D_L11_001B0540;
     moby->rotX = -1.5707965f;

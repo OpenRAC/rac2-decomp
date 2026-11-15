@@ -12,31 +12,31 @@ extern float D_L00_001AF750 __attribute__((sda));
 extern int D_L00_001AF74C __attribute__((sda));
 extern int D_L00_001AF748 __attribute__((sda));
 extern float D_L00_001AF720 __attribute__((sda));
-extern float D_L00_001B8DC0[];
+extern float g_camera_l00_position[];
 extern int D_L00_001A8FF0[] MACRO_ADDR;
 extern float D_L00_001A8F20[] MACRO_ADDR;
 extern short D_L00_001AF6D8[][4][2] SDATA(D_L00_001AF6D8);
 extern short D_L00_001AF6DA[][4][2] MACRO_ADDR;
 extern float D_L00_00294A80[][4];
 extern float D_L00_00294B10[][2];
-extern char *func_L00_0032A088(int, int);
-extern void func_00281DE8(void *, int, int, int);
-extern int func_00283CF0(float);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00283180(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern char *level_get_slot_body(int, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern int FloatToInt(float);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Builds and submits the two quads for each active effect record. */
-void func_L00_003A8940(char *object)
+void DrawEffectRecordQuads(char *object)
 {
     DrawBatch first, second __attribute__((aligned(16)));
     Vector forward, right, up;
@@ -49,9 +49,9 @@ void func_L00_003A8940(char *object)
     *(Quadword *)normal = 0;
     normal[2] = 1.0f;
     normal[3] = 1.0f;
-    base = GetSlotBody(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
-    InitQuadPacketState(&first, 54, 0, 128);
-    InitQuadPacketState(&second, 54, 1, 128);
+    base = level_get_slot_body(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
+    gfx_init_quad_packet_state(&first, 54, 0, 128);
+    gfx_init_quad_packet_state(&second, 54, 1, 128);
     if (D_0018C0B4[0] == 29)
         alphaScale = 32.0f;
     {
@@ -71,8 +71,8 @@ void func_L00_003A8940(char *object)
                 scale = alphaScale * age;
                 color = (unsigned int)FloatToInt(scale) << 24;
                 angle = age * 3.1415927f * D_L00_001AF750;
-                wave = FastSinOrCosB(WrapAngleToPi(angle));
-                blend = FloatAbs(wave);
+                wave = math_fast_sin_or_cos_b(math_wrap_angle_to_pi(angle));
+                blend = math_fabs(wave);
                 color |= FastTweenColor(D_L00_001AF74C, D_L00_001AF748, blend);
                 first.color[3] = color;
                 first.color[2] = color;
@@ -86,17 +86,17 @@ void func_L00_003A8940(char *object)
                 growth = D_L00_001AF720 - distance;
                 radius = distance + growth * age;
                 qcopy(position, record);
-                FastVecSub(forward, gCameraPosition_L00, position);
+                FastVecSub(forward, g_camera_l00_position, position);
                 vec_scale_to_length(forward, forward, 1.0f);
                 if (D_L00_001A8FF0[0])
-                    ComputeViewDirection(position, normal, 1);
+                    cam_compute_view_direction(position, normal, 1);
                 FastVecCross(right, forward, normal);
                 vec_scale_to_length(right, right, 1.0f);
                 FastVecCross(up, right, forward);
                 forward[3] = right[3] = up[3] = 0.0f;
                 position[3] = 1.0f;
-                sine = FastSinOrCosA(*(float *)(record + 20));
-                cosine = FastSinOrCosB(*(float *)(record + 20));
+                sine = math_fast_sin_or_cos_a(*(float *)(record + 20));
+                cosine = math_fast_sin_or_cos_b(*(float *)(record + 20));
                 {
                     float *weights = (float *)(record + 40);
                     for (side = 0; side < 4; ++side) {

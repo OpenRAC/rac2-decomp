@@ -1,21 +1,21 @@
 #include "common.h"
 
 typedef int Quad0792 __attribute__((mode(TI)));
-extern int func_002A77E0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
+extern int math_random_int_below(int);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_L22_002F3B38(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
+extern float FastVecDot(void *, void *);
 extern Quad0792 D_L22_001C0100;
 extern char D_00189ED0[];
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
 extern float D_L22_001B2AA4 __attribute__((sda));
 
 /* Sends a short test line ahead of the ship. If it hits a surface, it works out a safe point to steer toward and returns 1. */
-int func_L22_003A1ED8(char *obj) {
+int space_ship_trace_safe_point_ahead(char *obj) {
     struct { Quad0792 start, end, axis, direction, projection, epsilon, offset, blended; } v;
     char *st = *(char **)(obj + 0x68);
     v.end = 0;
@@ -23,7 +23,7 @@ int func_L22_003A1ED8(char *obj) {
     v.axis = 0;
     *(float *)&v.axis = 4.0f;
     v.start = v.end;
-    *(float *)((char *)&v.axis + 4) = (float)RandomIntBelow(8) * 0.4285714626312256f + -1.5f;
+    *(float *)((char *)&v.axis + 4) = (float)math_random_int_below(8) * 0.4285714626312256f + -1.5f;
     *(float *)((char *)&v.axis + 8) = *(float *)(st + 0x114) + *(float *)(st + 0x110);
     v.end = v.axis;
     FastVecScale(&v.start, obj + 0xE0, *(float *)((char *)&v.start + 8));

@@ -1,25 +1,25 @@
 #include "names.h"
 typedef unsigned char u8;
-extern int func_00351CD8(void *, int *);
-extern int func_00351D00(void);
-extern int func_00351D38(void);
-extern int func_00351D68(void);
-extern int func_00351D98(void *, void *);
-extern void func_00351888(u8 *);
-extern void func_0012F738(void *);
-extern void func_0012FA70(void *, int, void *, int);
-extern void func_003508A0(void *, int, int, int, int, int);
+extern int mpeg_dec_print_message(void *, int *);
+extern int mpeg_dec_callback_add_dma(void);
+extern int mpeg_dec_callback_save_state(void);
+extern int mpeg_dec_callback_restore_state(void);
+extern int mpeg_dec_callback_get_timestamp(void *, void *);
+extern void mpeg_dec_reset_state(u8 *);
+extern void sceMpegCreate(void *);
+extern void sceMpegAddCallback(void *, int, void *, int);
+extern void mpeg_vibuf_init(void *, int, int, int, int, int);
 
 /* Sets up the video decoder, registers its callbacks and initialises its input buffer. */
-int func_00351720(char *decoder, int unused1, int unused2, int a, int b, int c, int d, int e)
+int mpeg_dec_init(char *decoder, int unused1, int unused2, int a, int b, int c, int d, int e)
 {
-    CreateMpegDecoder(decoder);
-    SetMpegCallback(decoder, 0, VideoDecPrintMessage, 0);
-    SetMpegCallback(decoder, 1, VideoDecCallbackAddDma, 0);
-    SetMpegCallback(decoder, 2, VideoDecCallbackSaveState, 0);
-    SetMpegCallback(decoder, 3, VideoDecCallbackRestoreState, 0);
-    SetMpegCallback(decoder, 5, VideoDecCallbackGetTimestamp, 0);
-    VideoDecResetState((u8 *)decoder);
-    ViBufInit(decoder + 0x48, a, b, c, d, e);
+    sceMpegCreate(decoder);
+    sceMpegAddCallback(decoder, 0, mpeg_dec_print_message, 0);
+    sceMpegAddCallback(decoder, 1, mpeg_dec_callback_add_dma, 0);
+    sceMpegAddCallback(decoder, 2, mpeg_dec_callback_save_state, 0);
+    sceMpegAddCallback(decoder, 3, mpeg_dec_callback_restore_state, 0);
+    sceMpegAddCallback(decoder, 5, mpeg_dec_callback_get_timestamp, 0);
+    mpeg_dec_reset_state((u8 *)decoder);
+    mpeg_vibuf_init(decoder + 0x48, a, b, c, d, e);
     return 1;
 }

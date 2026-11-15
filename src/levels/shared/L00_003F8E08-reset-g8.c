@@ -9,7 +9,7 @@ typedef struct {
     char remainder[8];
 } EffectTuning;
 
-extern Slot D_L00_002533B0[30];
+extern Slot g_health_l00_drain_slots[30];
 extern EffectTuning D_L00_00253770[];
 extern unsigned char *D_L00_001B0A20 __attribute__((sda));
 extern char D_L00_001B0A28[8] __attribute__((sda));
@@ -21,20 +21,20 @@ extern char *D_L00_001B2BD0;
 extern short D_L00_001B2BD4;
 extern int D_L00_001B2BD8;
 extern float D_L00_001B2BDC;
-extern unsigned char *func_L00_003F8DC8(int unused);
+extern unsigned char *health_drain_slots_create(int unused);
 
 /* Empties the effect slots, calls func_L00_003F8DC8 and installs the two banks of per-kind tuning,
    the kinds grouped alike in both banks. entry's initializer is overwritten before it is read. */
-void func_L00_003F8E08(void)
+void InitHealthDrainSlots(void)
 {
     int i;
     EffectTuning *entry = D_L00_00253770;
     EffectTuning *table;
 
     for (i = 0; i < 30; i++)
-        gHealthDrainSlots_L00[i].object = 0;
+        g_health_l00_drain_slots[i].object = 0;
     D_L00_001B0A20 = 0;
-    CreateHealthDrainSlotsMoby(0);
+    health_drain_slots_create(0);
     D_L00_001B2BD4 = 3;
     D_L00_001B2BD8 = 30;
     D_L00_001B2BDC = 0.96f;

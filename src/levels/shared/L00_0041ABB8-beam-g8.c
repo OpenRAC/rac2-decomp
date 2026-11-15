@@ -29,17 +29,17 @@ typedef struct {
     char pad51C[0x14];
 } EffectSlot;
 
-extern char *D_L00_001B1450 __attribute__((sda));
-extern char D_L00_001B8DC0[];
-extern int func_00283CF0(float);
-extern void func_L00_0041C160(void *, Quad128 *, EffectSlot *, int, float);
-extern long long func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern char *g_lava_gun_beam_slots __attribute__((sda));
+extern char g_camera_l00_position[];
+extern int FloatToInt(float);
+extern void gfx_draw_directional_glow_sprite(void *, Quad128 *, EffectSlot *, int, float);
+extern long long GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* The slot's alpha: 64, or an integer from func_00283CF0 of 128 times its scale while fading. */
 static inline int BeamAlpha(EffectSlot *slot)
@@ -58,7 +58,7 @@ static inline int BeamAlpha(EffectSlot *slot)
 /* For each of the 10 slots in use: two func_L00_0041C160 calls with colours built from its alpha,
  * then for both parts fills the packet's header, colours and UVs, builds a basis matrix from the
  * point and passes the scaled packet and the matrix to func_00280B90. */
-void func_L00_0041BCC8(void *unused)
+void DrawEffectSlots(void *unused)
 {
     Quad128 matrix[4], eye, normal;
     EffectSlot *slot;
@@ -71,12 +71,12 @@ void func_L00_0041BCC8(void *unused)
     int index;
 
     for (index = 0; index < 10; index++) {
-        slot = (EffectSlot *)(index * 0x530 + (int)gLavaGunBeamSlots);
+        slot = (EffectSlot *)(index * 0x530 + (int)g_lava_gun_beam_slots);
         if (slot->inUse != 1)
             continue;
         alpha = BeamAlpha(slot);
-        DrawDirectionalGlowSprite(unused, slot->point, slot, (alpha << 24) | 0x103080, 0.35f);
-        DrawDirectionalGlowSprite(unused, slot->point, slot, (alpha << 24) | 0xFFFFFF, 0.075f);
+        gfx_draw_directional_glow_sprite(unused, slot->point, slot, (alpha << 24) | 0x103080, 0.35f);
+        gfx_draw_directional_glow_sprite(unused, slot->point, slot, (alpha << 24) | 0xFFFFFF, 0.075f);
         for (part = 0; part < 2; part++) {
             slot->packet[part].header[1] = GetEffectTextureDescriptor(23);
             tag = 0xFF9000000260LL;
@@ -110,8 +110,8 @@ void func_L00_0041BCC8(void *unused)
                 slot->packet[part].uv[3][1] = 0.0f;
             }
             point = &slot->point[part];
-            FastVecSub(&eye, gCameraPosition_L00, point);
-            ComputeViewDirection(point, &normal, 1);
+            FastVecSub(&eye, g_camera_l00_position, point);
+            cam_compute_view_direction(point, &normal, 1);
             vec_scale_to_length(&matrix[0], &eye, 1.0f);
             FastVecCross(&matrix[1], &matrix[0], &normal);
             vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);

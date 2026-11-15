@@ -30,13 +30,13 @@ typedef struct {
     Pvar_32E588 *pvar;
 } Moby_32E588;
 
-extern Moby_32E588 *func_0029EFD0(int);
-extern float func_00283CE0(int);
-extern void func_0027CFD0(void (*)(Moby_32E588 *), Moby_32E588 *);
+extern Moby_32E588 *CreateMoby(int);
+extern float IntToFloat(int);
+extern void gfx_register_overlay_draw_callback(void (*)(Moby_32E588 *), Moby_32E588 *);
 extern void func_0032E708(Moby_32E588 *);
 
 /* Spawn class 0xDC1 at a position with its timed parameters and start its update. */
-Moby_32E588 *func_0032E588(f32 *pos, f32 *vec, s32 frames, f32 x, f32 y, f32 z, f32 w, s32 a, s32 b, s32 c, s32 d, s32 e)
+Moby_32E588 *part_spawn_ribbon_effect_moby(f32 *pos, f32 *vec, s32 frames, f32 x, f32 y, f32 z, f32 w, s32 a, s32 b, s32 c, s32 d, s32 e)
 {
     Moby_32E588 *m = CreateMoby(0xDC1 /* moby class 3521 */);
     if (m != 0) {
@@ -66,7 +66,7 @@ Moby_32E588 *func_0032E588(f32 *pos, f32 *vec, s32 frames, f32 x, f32 y, f32 z, 
         pv->f14 = y;
         pv->f18 = z;
         pv->f08 = 0;
-        RegisterOverlayDrawCallback(func_0032E708, m);
+        gfx_register_overlay_draw_callback(func_0032E708, m);
     }
     return m;
 }

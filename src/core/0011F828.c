@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_0011F640(void);
+extern void boot_init_timer_records(void);
 
-extern void func_0011F718(void);
+extern void kernel_init_syscall_table(void);
 
 extern void r1_func_0011DE38(void);
 
@@ -19,9 +19,9 @@ extern void r1_func_0011D3C8(void);
    the last (InitTLBFunctions, r1_func_0011D3C8) is a tail call since this is
    void and it is the final statement. */
 /* Runs the start-up steps of the low-level system code, one after another. */
-void func_0011F828(void) {
-    InitSystemTimerRecords();
-    InitSystemCallTable();
+void kernel_init_system(void) {
+    boot_init_timer_records();
+    kernel_init_syscall_table();
     r1_func_0011DE38();
     r1_func_001195A0();
     r1_func_0011DCB8();

@@ -31,11 +31,11 @@ extern u8 *D_L02_001AD410;
 
 extern float D_L02_001B2434 __attribute__((sda));
 
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 /* Sets up a linked group of parts once, then turns them a little every frame and advances a shared 0 to 1 timer. */
-void func_L02_0042EDD0(u8 *object) {
+void spinning_parts_group_update(u8 *object) {
     int *vars = *(int **)(object + 0x68);
 
     switch (object[0x20]) {

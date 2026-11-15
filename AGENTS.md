@@ -55,7 +55,16 @@ program's `placed.json`, not merely that the complete image prints `OK`.
 ## Naming in C
 
 - Functions: their catalogue name (`func_XXXXXXXX` for the boot, `func_LNN_XXXXXXXX` for level
-  functions). Readable names go in `include/names.h` as `#define`s, never by renaming the function.
+  functions) is the linker symbol and never changes. Readable names sit on top as macros, as in
+  rac1-decomp ([docs/contributing/names.md](docs/contributing/names.md)): add a row to
+  `config/names_local.tsv`, then `python3 tools/names.py local`, `header`, `apply-defs` and
+  `apply`. `include/names.h` and `include/names/*.h` are generated; never edit them by hand.
+  Definitions, bodies, `extern` lines and prototypes use the readable name; `INCLUDE_ASM` and
+  `ASM_FUNC` lines, `__asm__` labels and `SDATA()` keep the address name. Tools that look for a
+  definition by its address read source through `tools/srcnames.py`.
+  Style ([docs/contributing/style.md](docs/contributing/style.md)): functions `snake_case`, system
+  first (`yeti_update`); globals `g_` + `snake_case`; locals `snake_case`; moby class ids by their
+  `MOBY_CLASS_*` name (`include/moby_classes.h`).
 - Data: `D_XXXXXXXX` for the boot's resident data (below `0x1A7C80`, the same in every program),
   `D_LNN_XXXXXXXX` for a level's data (its address in level NN).
   A level's own file (`src/levels/NN_*/`) uses only level NN's names, even when the C was matched

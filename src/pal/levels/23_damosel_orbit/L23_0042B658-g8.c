@@ -2,17 +2,17 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L23_001B19FC __attribute__((sda));
-extern s32 D_L23_001B3918[5] MACRO_ADDR;
+extern float g_active_slot_effect_count __attribute__((sda));
+extern s32 g_slot_effect_in_use[5] MACRO_ADDR;
 extern u8 D_L23_001BA500[];
-extern void *func_0029EFD0(s32);
-extern float func_002A78D8(float, float);
-extern s32 func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
+extern void *CreateMoby(s32);
+extern float math_random_signed_float_range(float, float);
+extern s32 math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
 extern void func_PAL_L05_0042E518(void *);
 
 /* spawns object 0x11DF at pos with parent's orientation, when one of the five slots is free:
@@ -27,23 +27,23 @@ void *func_PAL_L23_0042B658(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, 
     u8 *vars;
     float angle;
 
-    if (D_L23_001B19FC == -1.0f) {
+    if (g_active_slot_effect_count == -1.0f) {
         for (i = 0; i < 5; i++) {
-            D_L23_001B3918[i] = 0;
+            g_slot_effect_in_use[i] = 0;
         }
-        D_L23_001B19FC = 0.0f;
+        g_active_slot_effect_count = 0.0f;
     }
-    if (D_L23_001B19FC >= 5.0f) {
+    if (g_active_slot_effect_count >= 5.0f) {
         return 0;
     }
     for (i = 0; i < 5; i++) {
-        if (D_L23_001B3918[i] == 0) {
+        if (g_slot_effect_in_use[i] == 0) {
             break;
         }
     }
-    D_L23_001B19FC += 1.0f;
-    D_L23_001B3918[i] = 1;
-    obj = func_0029EFD0(0x11DF);
+    g_active_slot_effect_count += 1.0f;
+    g_slot_effect_in_use[i] = 1;
+    obj = CreateMoby(0x11DF);
     if (obj != 0) {
         vars = *(u8 **)(obj + 0x68);
         obj[0x30] = 0xFF;
@@ -71,22 +71,22 @@ void *func_PAL_L23_0042B658(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, 
         *(s32 *)(vars + 0x1C) = a10;
         *(s32 *)(vars + 0x38) = a11;
         *(s32 *)(vars + 0x18) = a8;
-        *(float *)(vars + 0x44) = func_002A78D8(65.0f, 80.0f);
+        *(float *)(vars + 0x44) = math_random_signed_float_range(65.0f, 80.0f);
         qcopy(&sphere, obj + 0x10);
         ((float *)&sphere)[3] = scale * 3.0f;
-        if (func_00283DB8(&sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x15;
             *(float *)(vars + 0x10) = 0.04761905f;
-            if (func_00282E48(pos, D_L23_001BA500 + 0x140) < 48.0f && flag != 0) {
+            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && flag != 0) {
                 u8 *ref = D_L23_001BA500;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x21;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                func_00282CF0(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
-                func_00282F20(&dir, &dir, 1.0f);
-                angle = func_002831B0(func_00282DB0(&dir, D_L23_001BA500 + 0x370));
+                FastVecSub(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
+                vec_scale_to_length(&dir, &dir, 1.0f);
+                angle = math_fast_angle_helper(FastVecDot(&dir, D_L23_001BA500 + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {

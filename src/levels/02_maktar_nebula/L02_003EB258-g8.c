@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L02_003EB258 is a unit of its own: it needs the quadword-copy profile with its barrier,
    -mno-split-addresses for the unsplit lui+lw and la pairs, and -g, which places the nops around
    the div.s (config/cflags.txt).
@@ -24,18 +25,18 @@ extern float D_L02_001B0D6C[][2] __attribute__((sda));
 extern unsigned int D_L02_001B0DA8 __attribute__((sda));
 extern unsigned int D_L02_001B0DAC[] __attribute__((sda));
 extern char *D_L02_001B368C;
-extern void func_00281DE8(void *, int, int, int);
-extern float func_00283198(float);
-extern float func_00283B98(float, float);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_00283658(void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastAddRotations(float, float);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void copy_matrix_rotation(void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws a glowing energy sheet made of thin slices, with its colors blending
    between two tints. */
-void func_L02_003EB258(char *actor) {
+void gfx_draw_energy_sheet(char *actor) {
     SurfacePacket packet[2];
     typedef struct { float weights[2]; } BlendWeights;
     BlendWeights blend;
@@ -51,10 +52,10 @@ void func_L02_003EB258(char *actor) {
     float (*uv)[2] = packet[0].uv;
     {
         int layer;
-        for (layer = 0; layer < 2; layer++) InitQuadPacketState(packet + layer, D_L02_001B0D60[layer], 0, 0x80);
+        for (layer = 0; layer < 2; layer++) gfx_init_quad_packet_state(packet + layer, D_L02_001B0D60[layer], 0, 0x80);
     }
-    calculated.weights[0] = FastSinOrCosB(*(float *)(state + 0x14)) * 0.5f + 0.5f;
-    calculated.weights[1] = FastSinOrCosB(FastAddRotations(*(float *)(state + 0x14), 3.1415927f)) * 0.5f + 0.5f;
+    calculated.weights[0] = math_fast_sin_or_cos_b(*(float *)(state + 0x14)) * 0.5f + 0.5f;
+    calculated.weights[1] = math_fast_sin_or_cos_b(FastAddRotations(*(float *)(state + 0x14), 3.1415927f)) * 0.5f + 0.5f;
     blend = calculated;
     count = FloatToInt(FastVecLength(D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x10));
     *(Quad *)normal = 0;

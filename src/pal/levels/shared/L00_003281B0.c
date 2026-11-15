@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 D_00189EA0[];
-extern u32 D_001A79F0 MACRO_ADDR;
+extern u8 g_hero_position[];
+extern u32 g_current_map_index MACRO_ADDR;
 extern s32 D_002A0D50[];
-extern f32 func_00282E48(u8 *, u8 *);
+extern f32 fast_vec_dist(u8 *, u8 *);
 extern void func_PAL_L00_00323918(u8 *, s32, s32, s32, s32, s32, f32);
 
 void func_PAL_L00_003281C0(u8 *a0, s32 a1, f32 f12) {
@@ -12,9 +12,9 @@ void func_PAL_L00_003281C0(u8 *a0, s32 a1, f32 f12) {
     u32 i;
     s32 v;
 
-    if (func_00282E48(a0 + 0x10, D_00189EA0) < 7.0f)
+    if (fast_vec_dist(a0 + 0x10, g_hero_position) < 7.0f)
         mode = 3;
-    i = D_001A79F0;
+    i = g_current_map_index;
     if (i > 25)
         i = 25;
     v = D_002A0D50[i] * a1 - 1;
@@ -31,14 +31,14 @@ void func_PAL_L00_003282B0(void)
 
 typedef int TI __attribute__((mode(TI)));
 typedef union { TI q; float f[4]; } Vector;
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7940(void);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_angle(void);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
 extern char *func_PAL_002735D0(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
 extern void func_PAL_L00_0039E608(char *);
-extern void func_002A0488(char *, unsigned long, unsigned long, unsigned long);
+extern void set_moby_color(char *, unsigned long, unsigned long, unsigned long);
 
 /* Spawn count effects around origin, tinted by color (0xAABBGGRR). */
 void func_PAL_L00_00328480(char *owner, void *origin, int count, int mode,
@@ -53,19 +53,19 @@ void func_PAL_L00_00328480(char *owner, void *origin, int count, int mode,
     int i;
     float life;
     for (i = 0; i < count; i++) {
-        func_002A7A00(&velocity, 0.0f, speed * 0.020000001f);
-        func_00282CC0(&velocity, &velocity, velocity_origin);
-        func_002A7A00(&position, 0.0f, radius);
-        func_00282CC0(&position, &position, origin);
+        vec_random_direction(&velocity, 0.0f, speed * 0.020000001f);
+        FastVecAdd(&velocity, &velocity, velocity_origin);
+        vec_random_direction(&position, 0.0f, radius);
+        FastVecAdd(&position, &position, origin);
         random_rotation.q = 0;
-        random_rotation.f[0] = func_002A7940();
-        random_rotation.f[2] = func_002A7940();
+        random_rotation.f[0] = math_random_angle();
+        random_rotation.f[2] = math_random_angle();
         rotation.q = random_rotation.q;
         if (fixed_rotation != 0)
             qcopy(&rotation, fixed_rotation);
         kind = mode ? 2 : 1;
-        variant = func_002A77E0(4);
-        life = func_002A7878(10.0f, 20.0f);
+        variant = math_random_int_below(4);
+        life = math_random_float_range(10.0f, 20.0f);
         effect = func_PAL_002735D0(owner, kind, 0x43e, variant, &position, &rotation, &velocity,
                                0xff, 180.0f, life);
         if (effect != 0) {
@@ -73,11 +73,11 @@ void func_PAL_L00_00328480(char *owner, void *origin, int count, int mode,
             r = color & 0xff;
             t = (unsigned int)color >> 24;
             *(float *)(effect + 0x2c) = *(float *)(*(char **)(effect + 0x24) + 0x24)
-                                        * func_002A7878(low_scale, high_scale);
+                                        * math_random_float_range(low_scale, high_scale);
             b = (color >> 16) & 0xff;
             g = (color >> 8) & 0xff;
             payload = *(char **)(effect + 0x68);
-            func_002A0488(effect, r, g, b);
+            set_moby_color(effect, r, g, b);
             ((unsigned char *)effect)[0x23] = t;
             if (r != g || r != b)
                 t = 1;

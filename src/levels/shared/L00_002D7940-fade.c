@@ -19,11 +19,11 @@ typedef struct UIFadeEntry {
     int tail;
 } UIFadeEntry;
 extern UIFadeEntry D_L00_001BC588[];
-extern int func_002798A0(int, int *, int *);
-extern int func_L00_002E36F8(int);
-extern void func_L00_002E30B8(char *text, float t, int mode, int color, int y, int pass);
+extern int AdvanceGroupedTableOffset(int, int *, int *);
+extern int text_find_level_by_key(int);
+extern void DrawSlidingTextLine(char *text, float t, int mode, int color, int y, int pass);
 /* Fades one line of text in or out as progress runs from 0 to 1, with a soft outline. */
-void func_L00_002E2C30(float progress, int item)
+void text_draw_fading_line(float progress, int item)
 {
     int bank, index, text, position, i;
     int colour;
@@ -32,7 +32,7 @@ void func_L00_002E2C30(float progress, int item)
     float alpha;
     if (!AdvanceGroupedTableOffset(item, &bank, &index))
         return;
-    text = FindLevelTextByKey(D_L00_001BC588[bank].textBase + index);
+    text = text_find_level_by_key(D_L00_001BC588[bank].textBase + index);
     if (!text)
         return;
     position = D_L00_001BC588[D_L00_001BC200.selected].position + item * D_L00_001BC588[D_L00_001BC200.selected].stride;

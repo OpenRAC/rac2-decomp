@@ -9,13 +9,13 @@ extern float D_L01_001B2090 __attribute__((sda));
 extern float D_L01_001B208C __attribute__((sda));
 extern s32 D_L01_001B15E0 __attribute__((sda));
 extern char D_L01_001A8F60[] NOT_SDA;
-extern s32 func_00282948(char *);
-extern void func_0029F338(char *);
-extern void func_002A7750(char *, s32, s32);
-extern s32 func_002A9640(char *, s32, s32);
+extern s32 math_fast_float_d(char *);
+extern void moby_mark_spawned(char *);
+extern void moby_set_state(char *, s32, s32);
+extern s32 part_find_owned_effect_slot(char *, s32, s32);
 extern void func_PAL_002B15D8(char *, s32, char *, float, float, float, float, s32);
-extern s32 func_002B3868(char *);
-extern void func_002E5CF8(s32, s32, char *);
+extern s32 flag_set_first_pending(char *);
+extern void PlayMobySound(s32, s32, char *);
 extern void func_PAL_L00_003281C0(char *, s32, float);
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
 
@@ -27,12 +27,12 @@ void func_PAL_L01_00414398(char *obj)
     case 0:
         D_L01_001B3468_1 = 0;
         D_L01_001AEC38 = D_L01_001AEC38 + 1;
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         return;
     case 1:
-        if (func_002A9640(obj, 0x04010000, 0) != 0 && *(s32 *)rec == 0) {
+        if (part_find_owned_effect_slot(obj, 0x04010000, 0) != 0 && *(s32 *)rec == 0) {
             D_L01_001AEC38 = D_L01_001AEC38_1 - 1;
-            func_002A7750(obj, 2, -1);
+            moby_set_state(obj, 2, -1);
         }
         *(u8 *)(obj + 0xA8) = 0xFF;
         return;
@@ -42,11 +42,11 @@ void func_PAL_L01_00414398(char *obj)
         else
             func_PAL_002B15D8(obj, 0xD, D_L01_001A8F60, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         func_PAL_L00_003281C0(obj, 4, 0.0f);
-        func_002E5CF8(0, 0, obj);
-        func_002A7750(obj, 3, -1);
+        PlayMobySound(0, 0, obj);
+        moby_set_state(obj, 3, -1);
         return;
     case 3:
-        if (func_002B3868(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             RetiringObject *retiring = (RetiringObject *)obj;
             unsigned int flags = retiring->flags;
             int count;
@@ -57,9 +57,9 @@ void func_PAL_L01_00414398(char *obj)
             *(int *)(rec + 4) = 0x64;
             D_L01_001B3468_1 = count + 1;
         }
-        if (func_00282948(rec + 4) != 0) {
+        if (math_fast_float_d(rec + 4) != 0) {
             D_L01_001B3468 = D_L01_001B3468 - 1;
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
         }
         return;
     }

@@ -14,22 +14,22 @@ typedef struct {
     float scale[16];
 } MarkerStateView;
 extern MarkerStateView D_001B5640;
-extern MarkerVector D_001B5340;
+extern MarkerVector g_camera_eye_state;
 extern int D_001A7348[] __attribute__((sda));
-extern float func_00282E48(MarkerVector *, MarkerVector *);
-extern float func_00283CE0(int);
-extern void func_00279BD8(MarkerVector *, MarkerVector *);
-extern long func_0027C878(int);
-extern float func_00282C48(float);
-extern int func_00283CF0(float);
-extern void func_0027E018(int x, int y, int width, int height,
+extern float fast_vec_dist(MarkerVector *, MarkerVector *);
+extern float IntToFloat(int);
+extern void gfx_project_world_point_to_screen(MarkerVector *, MarkerVector *);
+extern long GetEffectTextureDescriptor(int);
+extern float math_fabs(float);
+extern int FloatToInt(float);
+extern void DrawTexturedQuad(int x, int y, int width, int height,
                         int u, int v, int uw, int vh, long colour, long texture);
 
 
-extern void func_00270598(char *);
-extern int func_00270838(char *, char *);
+extern void cam_switch_active(char *);
+extern int Camera_ActivationCheckPriority(char *, char *);
 extern int func_002A6640(void *, float *, int *);
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* Family 34e74db3063e7a24 — 108 bytes, 2 placements (18_damosel, 6_notak).
    Same shape as be569dc253cd5555: walk the resident function-pointer table at
@@ -40,13 +40,13 @@ extern int D_L06_001B21C0 __attribute__((sda));
 
 extern void (*D_L06_001B2180[])(void);
 
-extern float func_00282C48(float t);
+extern float math_fabs(float t);
 
 extern float func_00283BE0_3(float, float);
 
 extern float func_00282C48_5(float);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
 typedef unsigned char u8;
 
@@ -92,57 +92,57 @@ extern char Fdb046c5d_D_001BAFC0[];
 
 extern char D_001BAEC0[];
 extern int D_001A72DC[] __attribute__((sda));
-extern void func_0029D4D0(int, void *);
-extern int func_0011AEA0(int);
-extern void func_002FC1D8(void);
-extern void func_002FCB00(void *, int, int, int);
-extern void func_0027B858(void);
-extern void func_00284FC0(void);
-extern void func_00285338(void);
-extern void func_002FC280(void);
-extern void func_002FC3C0(int);
-extern int func_001244B8(int, int);
-extern int func_001261F0(int);
+extern void fast_decompress(int, void *);
+extern int FlushCache(int);
+extern void gfx_reset_packet_buffer(void);
+extern void tex_upload_blocks_return_setup(void *, int, int, int);
+extern void gfx_write_clear_color_packets(void);
+extern void PutDrawBufferSmall(void);
+extern void gfx_queue_second_strip_packet(void);
+extern void SubmitBufferedDmaChain(void);
+extern void gfx_wait_for_dma_status_bits(int);
+extern int gfx_wait_paths_idle(int, int);
+extern int sceGsSyncV(int);
 
 /* func_0026EA00 is in 0026EA00-splash.c. */
 
-extern void func_002FCD18(void);
-extern void func_00284E18(int, int, int);
-extern void func_00284EA8(void);
-extern void func_00284F40(int);
-extern void func_002FCDA8(void);
+extern void gfx_install_dma_handlers(void);
+extern void SetBackgroundColor(int, int, int);
+extern void gfx_append_draw_list_header(void);
+extern void gfx_append_draw_list_buffer_tag(int);
+extern void gfx_remove_dma_handlers(void);
 
 /* Draws one loading or splash screen frame by decompressing the image and sending it to the screen. */
-void func_0026EAC8(int arg)
+void gfx_draw_splash_screen_frame(int arg)
 {
     char *state = D_001BAEC0;
     int *data;
     fast_decompress(arg, *(void **)(state + 20));
     FlushCache(0);
-    ResetPacketBuffer();
-    InstallDmaHandlers();
+    gfx_reset_packet_buffer();
+    gfx_install_dma_handlers();
     SetBackgroundColor(0, 0, 0);
-    AppendDrawListHeader();
-    AppendDrawListBufferTag(0);
+    gfx_append_draw_list_header();
+    gfx_append_draw_list_buffer_tag(0);
     data = *(int **)(state + 20);
-    UploadTextureBlocksReturnTex0(data + 4, D_001A72DC[0], data[0], data[1]);
-    WriteClearColorPackets();
+    tex_upload_blocks_return_setup(data + 4, D_001A72DC[0], data[0], data[1]);
+    gfx_write_clear_color_packets();
     PutDrawBufferSmall();
-    QueueSecondStripPacket();
+    gfx_queue_second_strip_packet();
     FlushCache(0);
     SubmitBufferedDmaChain();
-    WaitForDmaStatusBits(1);
-    WaitGsPathsIdle(0, 0);
-    GetGsCurrentField(0);
-    RemoveDmaHandlers();
+    gfx_wait_for_dma_status_bits(1);
+    gfx_wait_paths_idle(0, 0);
+    sceGsSyncV(0);
+    gfx_remove_dma_handlers();
 }
 
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
 /* Picks a random order of the numbers 0, 1 and 2 and stores it in the three outputs. */
-void func_0026EB98(int *first, int *second, int *third) {
-    switch (RandomIntBelow(3)) {
+void math_shuffle_three_indices(int *first, int *second, int *third) {
+    switch (math_random_int_below(3)) {
     case 0:
         *first = 0;
         *second = 1;
@@ -159,7 +159,7 @@ void func_0026EB98(int *first, int *second, int *third) {
         *third = 0;
         break;
     }
-    if (RandomIntBelow(2) != 0) {
+    if (math_random_int_below(2) != 0) {
         int value = *second;
         *second = *third;
         *third = value;
@@ -167,34 +167,34 @@ void func_0026EB98(int *first, int *second, int *third) {
 }
 
 typedef struct { char b[8]; } CdClock;
-extern int func_001256D8(CdClock *);
+extern int sceCdReadClock(CdClock *);
 extern void func_001163A0(unsigned int);
 /* Seeds the random generator from the disc clock, then fills a table of 24 tile numbers with shuffled values. */
-void func_0026EC58(unsigned short *out)
+void menu_fill_shuffled_tile_table(unsigned short *out)
 {
     CdClock clock;
     int first, second, third;
     int low, high;
     int seed;
-    ReadCdClock(&clock);
+    sceCdReadClock(&clock);
     seed = (unsigned char)clock.b[1] + 1;
     seed *= (unsigned char)clock.b[3] + 1;
     seed *= (unsigned char)clock.b[2] + 1;
     seed *= (unsigned char)clock.b[5] + 1;
     seed *= (unsigned char)clock.b[6] + 1;
-    Srand(seed);
-    ShuffleThreeIndices(&first, &second, &third);
+    func_001163A0(seed);
+    math_shuffle_three_indices(&first, &second, &third);
     out[0x20/2] = out[0x08/2] = (unsigned short)first + 0xb9;
     out[0x28/2] = out[0x10/2] = (unsigned short)second + 0xb9;
     out[0x30/2] = out[0x18/2] = (unsigned short)third + 0xb9;
-    if (RandomIntBelow(2)) {
+    if (math_random_int_below(2)) {
         low = 0xb3;
         high = 0xb6;
     } else {
         low = 0xb6;
         high = 0xb3;
     }
-    ShuffleThreeIndices(&first, &second, &third);
+    math_shuffle_three_indices(&first, &second, &third);
     out[0x02/2] = (unsigned short)first + low;
     out[0x06/2] = (unsigned short)second + low;
     out[0x0c/2] = (unsigned short)third + low;
@@ -204,7 +204,7 @@ void func_0026EC58(unsigned short *out)
     out[0x22/2] = out[0x02/2];
     out[0x26/2] = out[0x06/2];
     out[0x2c/2] = out[0x0c/2];
-    ShuffleThreeIndices(&first, &second, &third);
+    math_shuffle_three_indices(&first, &second, &third);
     out[0x04/2] = (unsigned short)first + high;
     out[0x0a/2] = (unsigned short)second + high;
     out[0x0e/2] = (unsigned short)third + high;
@@ -219,151 +219,151 @@ void func_0026EC58(unsigned short *out)
 /* func_0026EDE8 is in 0026EA00-loader.c. */
 
 /* Empty stub that returns zero. */
-unsigned int func_0026F710(void)
+unsigned int stub_empty(void)
 {
     return 0;
 }
 
-void func_0026F718(void)
+void stub_empty_2(void)
 {
 }
 
-void func_0026F720(void)
+void stub_empty_3(void)
 {
 }
 
-void func_0026F728(void)
+void stub_empty_4(void)
 {
 }
 
-unsigned int func_0026F730(void)
-{
-    return 0;
-}
-
-unsigned int func_0026F738(void)
+unsigned int stub_empty_5(void)
 {
     return 0;
 }
 
-unsigned int func_0026F740(void)
+unsigned int stub_empty_6(void)
 {
     return 0;
 }
 
-unsigned int func_0026F748(int unused0, int unused1)
+unsigned int stub_empty_7(void)
 {
     return 0;
 }
 
-void func_0026F750(void)
-{
-}
-
-void func_0026F758(void)
-{
-}
-
-void func_0026F760(void)
-{
-}
-
-void func_0026F768(void)
-{
-}
-
-void func_0026F770(void)
-{
-}
-
-void func_0026F778(void)
-{
-}
-
-void func_0026F780(void)
-{
-}
-
-void func_0026F788(void)
-{
-}
-
-void func_0026F790(void)
-{
-}
-
-void func_0026F798(void)
-{
-}
-
-unsigned int func_0026F7A0(void)
+unsigned int stub_empty_8(int unused0, int unused1)
 {
     return 0;
 }
 
-void func_0026F7B0(void)
+void stub_empty_9(void)
 {
 }
 
-unsigned int func_0026F7B8(void)
+void stub_empty_10(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7C0(void)
+void stub_empty_11(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7C8(void)
+void stub_empty_12(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7D0(void)
+void stub_empty_13(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7D8(void)
+void stub_empty_14(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7E0(void)
+void stub_empty_15(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7E8(void)
+void stub_empty_16(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7F0(void)
+void stub_empty_17(void)
 {
-    return 0;
 }
 
-unsigned int func_0026F7F8(void)
+void stub_empty_18(void)
+{
+}
+
+unsigned int stub_empty_19(void)
 {
     return 0;
 }
 
-unsigned int func_0026F800(void)
+void stub_empty_20(void)
+{
+}
+
+unsigned int stub_empty_21(void)
 {
     return 0;
 }
 
-void func_0026F808(void)
+unsigned int stub_empty_22(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_23(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_24(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_25(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_26(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_27(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_28(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_29(void)
+{
+    return 0;
+}
+
+unsigned int stub_empty_30(void)
+{
+    return 0;
+}
+
+void stub_empty_31(void)
 {
 }
 
 /* func_0026F810 is in 0026EA00-actuator.c (jump table and float pool). */
 
 
-extern int func_0011AEA0(int);
-extern int func_001244B8(int, int);
+extern int FlushCache(int);
+extern int gfx_wait_paths_idle(int, int);
 
 /* Uploads a PIF image (header arg0, CLUT at +0x20 of 0x200 bytes when +0x14 is set, else
    0x400, then w * h pixels) to GS memory: the 16x16 CLUT to block cbp >> 8 and the pixels
@@ -396,19 +396,19 @@ typedef struct {
     int psm;
 } PifHeader26FC78;
 
-extern void func_00282A60(void *, int, int);
-extern int func_00282A18(int);
+extern void mem_clear(void *, int, int);
+extern int log2dim(int);
 extern int func_00126288(GsLoadImage26FC78 *, short, short, short, short, short, short, short);
-extern int func_001265B0(GsLoadImage26FC78 *, void *);
+extern int sceGsExecLoadImage(GsLoadImage26FC78 *, void *);
 
-void func_0026FC78(char *pifData, unsigned long long *out, int tbp, int cbp)
+void LoadPifAsPSMT8H(char *pifData, unsigned long long *out, int tbp, int cbp)
 {
     PifTex26FC78 d;
     GsLoadImage26FC78 li;
     PifHeader26FC78 *pif = (PifHeader26FC78 *)pifData;
     int clutBlock;
 
-    ClearMemory(&d, 0, sizeof(d));
+    mem_clear(&d, 0, sizeof(d));
     d.clut = (char *)pif + 0x20;
     if (pif->psm == 0) {
         d.clutSize = 0x400;
@@ -422,8 +422,8 @@ void func_0026FC78(char *pifData, unsigned long long *out, int tbp, int cbp)
     d.imageSize = pif->w * pif->h;
     func_00126288(&li, clutBlock, 1, pif->psm, 0, 0, 16, 16);
     FlushCache(0);
-    ExecGsLoadImage(&li, d.clut);
-    WaitGsPathsIdle(0, 0);
+    sceGsExecLoadImage(&li, d.clut);
+    gfx_wait_paths_idle(0, 0);
     d.tbw = pif->w >> 6;
     if (d.tbw <= 0) {
         d.tbw = 1;
@@ -431,8 +431,8 @@ void func_0026FC78(char *pifData, unsigned long long *out, int tbp, int cbp)
     d.tbp = tbp >> 8;
     func_00126288(&li, d.tbp, d.tbw, 0x1B, 0, 0, pif->w, pif->h);
     FlushCache(0);
-    ExecGsLoadImage(&li, d.image);
-    WaitGsPathsIdle(0, 0);
+    sceGsExecLoadImage(&li, d.image);
+    gfx_wait_paths_idle(0, 0);
     /* The TEX0 layout, with no zero fields. Retail's groups are this flat chain's without
        fold's flattening of four or more operands of one type, which the changes of
        signedness keep it from doing. */
@@ -445,25 +445,25 @@ void func_0026FC78(char *pifData, unsigned long long *out, int tbp, int cbp)
 }
 
 typedef struct { char pad[0x32C]; int base; int offset; int count; } Table26FE48;
-extern Table26FE48 D_0014B540;
+extern Table26FE48 g_copy_setup_data;
 extern char D_001C5540[];
 extern int D_001A730C __attribute__((sda));
 extern unsigned long long D_001A7468 __attribute__((sda));
-extern int func_002B7C80(char *, int, int);
-extern void func_0026FC78(char *, unsigned long long *, int, int);
+extern int load_read_disc_with_pause(char *, int, int);
+extern void LoadPifAsPSMT8H(char *, unsigned long long *, int, int);
 
 /* Loads the PIF image from the disc table and saves its texture setting for later use. */
-void func_0026FE48(void)
+void tex_load_pif_from_disc_table(void)
 {
     unsigned long long local[4];
     char *data = D_001C5540;
-    ReadDiscWithPause(data, gCopySetupData.offset + gCopySetupData.base, gCopySetupData.count);
+    load_read_disc_with_pause(data, g_copy_setup_data.offset + g_copy_setup_data.base, g_copy_setup_data.count);
     LoadPifAsPSMT8H(data, local, D_001A730C, 0x3FFC00);
     *(volatile unsigned long long *)&D_001A7468 = local[0];
 }
 
 /* Empty replacement for printf. */
-void func_0026FEB8(const char *format,...) {
+void STUB_printf(const char *format,...) {
 }
 
 
@@ -482,67 +482,67 @@ typedef struct {
     float f3F0;
 } F270018Aim;
 
-extern F270018Aim D_001B5200;
+extern F270018Aim g_active_camera;
 extern float D_001B90F0[];
-extern float func_002703B0(char *, float, float, float, float, float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_002A7C00(float, float, float);
-extern float func_00283CE0(int);
-extern int func_00282978(void *);
-extern void func_0027AB40(void);
+extern float math_step_spring_damper_stored(char *, float, float, float, float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_cosine_blend(float, float, float);
+extern float IntToFloat(int);
+extern int FastDecTimer(void *);
+extern void UpdateViewContext(void);
 
 /* Updates the camera field of view change each frame and recomputes the zoom value. */
-void func_00270018(void) {
+void cam_update_fov_transition(void) {
     float half;
     float t;
 
-    if (gActiveCamera.active == 1) {
-        switch (gActiveCamera.mode) {
+    if (g_active_camera.active == 1) {
+        switch (g_active_camera.mode) {
         case 0:
-            gActiveCamera.f3D8 = gActiveCamera.f3D4;
-            gActiveCamera.active = 0;
+            g_active_camera.f3D8 = g_active_camera.f3D4;
+            g_active_camera.active = 0;
             break;
         case 3:
-            gActiveCamera.f3D8 = StepSpringDamperStored((char *)&gActiveCamera.f3D0, gActiveCamera.f3D8, gActiveCamera.f3D4, gActiveCamera.f3DC, gActiveCamera.f3E0, gActiveCamera.f3E4);
-            if (FloatAbs(gActiveCamera.f3D0) < 0.0001f)
-                gActiveCamera.active = 0;
+            g_active_camera.f3D8 = math_step_spring_damper_stored((char *)&g_active_camera.f3D0, g_active_camera.f3D8, g_active_camera.f3D4, g_active_camera.f3DC, g_active_camera.f3E0, g_active_camera.f3E4);
+            if (math_fabs(g_active_camera.f3D0) < 0.0001f)
+                g_active_camera.active = 0;
             break;
         case 1:
-            if (FastDecTimer(&gActiveCamera.s3EA))
-                gActiveCamera.active = 0;
-            t = IntToFloat(gActiveCamera.s3EA) * gActiveCamera.f3EC;
-            gActiveCamera.f3D8 = gActiveCamera.f3D4 + (gActiveCamera.f3F0 - gActiveCamera.f3D4) * t;
+            if (FastDecTimer(&g_active_camera.s3EA))
+                g_active_camera.active = 0;
+            t = IntToFloat(g_active_camera.s3EA) * g_active_camera.f3EC;
+            g_active_camera.f3D8 = g_active_camera.f3D4 + (g_active_camera.f3F0 - g_active_camera.f3D4) * t;
             break;
         case 2:
-            if (FastDecTimer(&gActiveCamera.s3EA))
-                gActiveCamera.active = 0;
-            gActiveCamera.f3D8 = CosineBlend(gActiveCamera.f3D4, gActiveCamera.f3F0, IntToFloat(gActiveCamera.s3EA) * gActiveCamera.f3EC);
+            if (FastDecTimer(&g_active_camera.s3EA))
+                g_active_camera.active = 0;
+            g_active_camera.f3D8 = math_cosine_blend(g_active_camera.f3D4, g_active_camera.f3F0, IntToFloat(g_active_camera.s3EA) * g_active_camera.f3EC);
             break;
         }
-        half = gActiveCamera.f3D8 * 0.5f;
-        D_001B90F0[0] = FastSinOrCosB(half) / FastSinOrCosA(half);
+        half = g_active_camera.f3D8 * 0.5f;
+        D_001B90F0[0] = math_fast_sin_or_cos_b(half) / math_fast_sin_or_cos_a(half);
         UpdateViewContext();
     }
 }
 
 
-extern void func_00282B50(void *, void *, int);
+extern void mem_fast_helper_c(void *, void *, int);
 extern char *D_001B5390;
 extern char D_001B7550[];
 extern char D_001B7C30[];
 
 /* Copies the current camera data into the working copy and links the second block to it. */
-void func_002701B0(void)
+void cam_copy_working_data(void)
 {
-    FastMemoryHelperC(D_001B7550, D_001B5390, 0xA0);
-    FastMemoryHelperC(D_001B7C30, D_001B7C30 - 0x500, 0x280);
+    mem_fast_helper_c(D_001B7550, D_001B5390, 0xA0);
+    mem_fast_helper_c(D_001B7C30, D_001B7C30 - 0x500, 0x280);
     *(char **)(D_001B7550 + 0x70) = D_001B7C30;
 }
 
 /* shared native body of family 34e74db3063e7a24 */
 /* Calls every function waiting in the delayed call list, then empties the list. */
-void func_00270210(void)
+void script_run_delayed_call_list(void)
 {
     int i;
 
@@ -559,7 +559,7 @@ extern char D_001B5750[];
    0xA0-byte records that starts at 0x1B5750, and returns it; returns 0 once
    the table is exhausted.  The end of the table is held in an int so that the
    comparison is the signed one the retail does (slt, not sltu). */
-char *func_00270280(int recordId)
+char *moby_find_record_by_handle_id(int recordId)
 {
     char *record = D_001B5750;
     int limit = (int)record + 0x1E00;
@@ -577,7 +577,7 @@ char *func_00270280(int recordId)
 }
 
 /* Integrates one float field with a spring-damper step, clamps it to a symmetric limit, then lets a helper raise or lower it, returning a bias plus the field. */
-float func_002702C8(float *value, float current, float target, float spring, float damping, float limit)
+float math_step_spring_damper_clamped(float *value, float current, float target, float spring, float damping, float limit)
 {
     float diff = target - current;
     float newValue = *value;
@@ -589,20 +589,20 @@ float func_002702C8(float *value, float current, float target, float spring, flo
         if (newValue > limit) *value = limit;
         else if (newValue < -limit) *value = -limit;
     }
-    maxStep = FloatAbs(diff);
+    maxStep = math_fabs(diff);
     if (maxStep < *value) {
-        *value = FloatAbs(diff);
+        *value = math_fabs(diff);
     } else {
-        float negStep = -FloatAbs(diff);
+        float negStep = -math_fabs(diff);
         if (*value < negStep) {
-            *value = -FloatAbs(diff);
+            *value = -math_fabs(diff);
         }
     }
     return current + *value;
 }
 
 /* Advances a stored float by a scaled helper result, then clamps it against a positive limit, then clamps it again with a second helper and finally rescales it through a third helper. */
-float func_002703B0(char *obj, float current, float target, float spring, float damping, float limit)
+float math_step_spring_damper_stored(char *obj, float current, float target, float spring, float damping, float limit)
 {
     float diff;
     float newValue;
@@ -636,25 +636,25 @@ float func_002703B0(char *obj, float current, float target, float spring, float 
 
 /* sets the referenced object halfword at 0x7e and clears its byte at 0x7d */
 /* Marks the current object as hidden by setting one flag and clearing another. */
-void func_002704D0(void) {
+void moby_clear_visible_flags(void) {
  *(u16 *)(D_L24_001B8580.object+0x7e)=1;
  D_L24_001B8580.object[0x7d]=0;
 }
 
 extern char D_001B53A0[];
-extern void *func_00302A20(void *);
-extern void func_0029F338(void *);
+extern void *moby_place_fixed_id_object(void *);
+extern void moby_mark_spawned(void *);
 
 /* Starts or stops an effect on an object depending on whether a value in the object is zero. */
-void func_002704F0(char *p)
+void moby_toggle_effect(char *p)
 {
     char *base = D_001B53A0;
     if (*(short *)(p + 0x86) == 0) {
         if (*(void **)(base + 0xC4) == 0)
-            *(void **)(base + 0xC4) = SpawnClass1007Object(base - 0x60);
+            *(void **)(base + 0xC4) = moby_place_fixed_id_object(base - 0x60);
     } else {
         if (*(void **)(base + 0xC4) != 0) {
-            MarkMobySpawned(*(void **)(base + 0xC4));
+            moby_mark_spawned(*(void **)(base + 0xC4));
             *(void **)(base + 0xC4) = 0;
         }
     }
@@ -665,7 +665,7 @@ typedef struct { ObjectDispatch entries[5]; } ObjectDispatchRecord;
 extern ObjectDispatchRecord D_0026E900[];
 
 /* Calls the second handler for an object, based on its type. */
-void func_00270550(char *object) {
+void moby_call_handler_second(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
         callback(object);
@@ -676,25 +676,25 @@ void func_00270550(char *object) {
 /* func_00270838 is in 00270838-g8.c. */
 
 /* Calls the fourth handler for an object, based on its type. */
-void func_00270A00(char *object) {
+void moby_call_handler_fourth(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[4];
     if (callback != 0)
         callback(object);
 }
 
 
-extern void func_00282CF0(float *dst, float *a, float *b);
-extern float func_00282DB0(float *a, float *b);
-extern float func_00282DF0(float *a);
-extern void func_00282F20(float *dst, float *a, float len);
-extern float func_002831B0(float x);
-extern void func_002ACEC0(float *dst, float *vec, float *axis, float angle);
+extern void FastVecSub(float *dst, float *a, float *b);
+extern float FastVecDot(float *a, float *b);
+extern float FastVecLength(float *a);
+extern void vec_scale_to_length(float *dst, float *a, float len);
+extern float math_fast_angle_helper(float x);
+extern void math_apply_axis_rotation_to_quat(float *dst, float *vec, float *axis, float angle);
 
 /* The angles of a target seen from a camera: the difference of the two points is
    split along the axis and across it, the yaw of the first direction around the
    axis and the pitch of the difference after it, with the length of the
    difference beside them. A zero length becomes 0.0001 before the arcsine. */
-void func_00270B58(float *out, float *p0, float *p1, float *dir0, float *dir1, float *axis)
+void cam_compute_aim_angles(float *out, float *p0, float *p1, float *dir0, float *dir1, float *axis)
 {
     float diff[4];
     float proj[4];
@@ -716,7 +716,7 @@ void func_00270B58(float *out, float *p0, float *p1, float *dir0, float *dir1, f
     if (lenPerp == 0.0f) {
         lenPerp = 0.0001f;
     }
-    angle1 = FastAngleHelper(dirDot / lenPerp);
+    angle1 = math_fast_angle_helper(dirDot / lenPerp);
     yaw = 1.57079637f - angle1;
 
     vec_scale_to_length(unit, perp, 1.0f);
@@ -726,13 +726,13 @@ void func_00270B58(float *out, float *p0, float *p1, float *dir0, float *dir1, f
     }
     out[0] = yaw;
 
-    ApplyAxisRotationToQuaternion(rotated, dir0, axis, yaw);
+    math_apply_axis_rotation_to_quat(rotated, dir0, axis, yaw);
     rotDot = FastVecDot(rotated, diff);
     lenDiff = FastVecLength(diff);
     if (lenDiff == 0.0f) {
         lenDiff = 0.0001f;
     }
-    angle2 = FastAngleHelper(rotDot / lenDiff);
+    angle2 = math_fast_angle_helper(rotDot / lenDiff);
     pitch = -(1.57079637f - angle2);
 
     vec_scale_to_length(unit, diff, 1.0f);
@@ -777,10 +777,10 @@ typedef struct {
 } ScalarTransitionView;
 extern ScalarTransitionView D_L00_001B8C80;
 extern float D_L00_001B18E0 __attribute__((sda));
-extern float func_002AA2E8(float *, float, float);
-extern int func_00282948(void *);
+extern float ApproachValue(float *, float, float);
+extern int math_fast_float_d(void *);
 
-void func_002721C8(void)
+void cam_update_scalar_transition(void)
 {
     ScalarTransitionView *state = &D_L00_001B8C80;
 
@@ -788,7 +788,7 @@ void func_002721C8(void)
         ApproachValue(&D_L00_001B18E0,
                      state->target, state->step);
         if (D_L00_001B18E0 == state->target) {
-            if (FastFloatHelperD(&state->timer) == 1)
+            if (math_fast_float_d(&state->timer) == 1)
                 state->target = 0.0f;
         }
         if (D_L00_001B8C80.target <= 0.0f && D_L00_001B18E0 <= 0.0f)
@@ -799,7 +799,7 @@ void func_002721C8(void)
 /* Advances the second shared scalar towards its stored target and updates its timer. */
 extern float D_L00_001B18E4 __attribute__((sda));
 
-void func_00272280(void)
+void cam_update_second_scalar_transition(void)
 {
     if (D_L00_001B8C80.step2 != 0.0f) {
         if (D_L00_001B8C80.target2 != 0.0f)
@@ -807,7 +807,7 @@ void func_00272280(void)
         else
             ApproachValue(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.rate2);
         if (D_L00_001B18E4 == D_L00_001B8C80.target2) {
-            if (FastFloatHelperD(&D_L00_001B8C80.timer2) == 1)
+            if (math_fast_float_d(&D_L00_001B8C80.timer2) == 1)
                 D_L00_001B8C80.target2 = 0.0f;
         }
         if (D_L00_001B8C80.target2 <= 0.0f && D_L00_001B18E4 <= 0.0f)
@@ -818,7 +818,7 @@ void func_00272280(void)
 /* func_00272CB0 is in 0026EA00-target.c (-g for its nop pair before div.s). */
 
 /* Fills a three-float local through two setup calls, stores a two-argument float helper result into a field, then stores a second helper result into two more fields and returns zero. */
-int func_00272550(float *out)
+int cam_compute_direction_angles(float *out)
 {
     float local[3];
     float angle;
@@ -838,7 +838,7 @@ int func_00272550(float *out)
 /* Draw sixteen lens-flare elements with distance and screen-edge fades.
  * Corresponds to RAC1 draw_lens_flare, src/game/effects.c (GPL-3.0). */
 
-void func_002725E0(void)
+void DrawLensFlare(void)
 {
     MarkerVector projected;
     float centre[2], delta[2], scaled[2], point[2];
@@ -850,10 +850,10 @@ void func_002725E0(void)
         return;
     }
     if (D_001B5640.timer <= 0.0f) return;
-    distance = fast_vec_dist(&gCameraState_001B5340, (MarkerVector *)(D_001B5640.target + 0x10));
+    distance = fast_vec_dist(&g_camera_eye_state, (MarkerVector *)(D_001B5640.target + 0x10));
     centre[0] = IntToFloat(D_001A7348[0]);
     centre[1] = IntToFloat(D_001A7348[1]);
-    ProjectWorldPointToScreen(&projected, (MarkerVector *)(D_001B5640.target + 0x10));
+    gfx_project_world_point_to_screen(&projected, (MarkerVector *)(D_001B5640.target + 0x10));
     projected.x = (projected.x - IntToFloat(D_001A7348[2])) * 0.0625f;
     projected.y = (projected.y - IntToFloat(D_001A7348[3])) * 0.0625f;
     delta[0] = centre[0] - projected.x;
@@ -871,10 +871,10 @@ void func_002725E0(void)
         point[1] = centre[1] + scaled[1];
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
-        fade_x = FloatAbs(delta[0]) / centre[0] * -5.0f + 5.5f;
+        fade_x = math_fabs(delta[0]) / centre[0] * -5.0f + 5.5f;
         if (fade_x > 1.0f) fade_x = 1.0f;
         else if (fade_x < 0.0f) fade_x = 0.0f;
-        fade_y = FloatAbs(delta[1]) / centre[1] * -5.0f + 5.5f;
+        fade_y = math_fabs(delta[1]) / centre[1] * -5.0f + 5.5f;
         if (fade_y > 1.0f) fade_y = 1.0f;
         else if (fade_y < 0.0f) fade_y = 0.0f;
         fade *= fade_x * fade_y;
@@ -923,12 +923,12 @@ extern CameraEnvironmentRegion D_001C1740[];
 #endif
 extern FogPresetView D_001B1640 MACRO_ADDR;
 extern int func_002A6640(void *, float *, int *);
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* Arithmetic follows RAC1's update_camera_environment_from_regions,
    src/game/effects.c (Lombyte/OpenRAC, GPL-3.0). */
 /* Mixes the fog colour and distances from the camera region the position is in. */
-void func_002735A0(void *position)
+void gfx_blend_fog_from_cam_region(void *position)
 {
     float blend;
     int region_index;
@@ -974,7 +974,7 @@ void func_002735A0(void *position)
 
 
 /* Updates a moby that moves toward a target and starts a sound or effect when it hits something. */
-int func_00273D10(char *obj)
+int target_seeker_update(char *obj)
 {
     float buf[4];
     float out[4];

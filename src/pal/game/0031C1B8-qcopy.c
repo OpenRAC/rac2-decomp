@@ -66,41 +66,41 @@ typedef struct {
     Object *target;     /* 0x249C */
 } HeroView;
 
-extern HeroView D_00189E20;
+extern HeroView g_hero_state;
 extern char D_001AFAE0[];
 
-extern void func_0026FEB8(const char *, ...);
-extern void func_0027CDC8(void (*)(Object *), Object *);
-extern void func_0027CFD0(void (*)(Object *), Object *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern void func_002833F0(void *, void *);
-extern float func_00283C80(float, float);
-extern void func_0029F338(void *);
-extern float func_0029F530(Object *);
+extern void STUB_printf(const char *, ...);
+extern void gfx_register_world_draw_callback(void (*)(Object *), Object *);
+extern void gfx_register_overlay_draw_callback(void (*)(Object *), Object *);
+extern void FastVecSub(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern float FastDiffRots(float, float);
+extern void moby_mark_spawned(void *);
+extern float moby_get_anim_value(Object *);
 extern void func_PAL_002A7E68(Object *, int, int, int);
-extern void func_002A7750(Object *, int, int);
-extern int func_002A7820(int, int);
-extern float func_002A7E08(Object *, void *, void *, float, float, float);
-extern float func_002A89A8(void *, int, float);
-extern int func_002A8D70(Object *, int, float, float, int, float, int, int, int);
-extern float func_002AA3A8(s32, float, s32, float, float, float);
-extern float func_002AA458(s32, s32, s32, float, float, float);
-extern float func_002AA548(float *, void *, float, float, float, float);
-extern void func_002AEF28(Object *, void *, void *, float, float, float);
+extern void moby_set_state(Object *, int, int);
+extern int math_random_int_range(int, int);
+extern float moby_turn_toward_position(Object *, void *, void *, float, float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int coll_test_hit_at_bone(Object *, int, float, float, int, float, int, int, int);
+extern float math_spring_float_to_goal(s32, float, s32, float, float, float);
+extern float vec_spring_to_target(s32, s32, s32, float, float, float);
+extern float math_step_value_toward_target(float *, void *, float, float, float, float);
+extern void moby_scale_owner_words_by_angles(Object *, void *, void *, float, float, float);
 extern int func_PAL_002B27B8(Object *, void *);
-extern s32 func_002B3890(Object *);
+extern s32 flag_set_second_pending(Object *);
 extern int func_PAL_002B5BA8(Object *, float *, float);
 extern int func_PAL_002B5C98(Object *, void *, float);
-extern void func_002B60B0(Object *, float, float, float, float);
+extern void moby_set_controller_speed_limits(Object *, float, float, float, float);
 extern void func_PAL_0031D2E8(Object *);
 extern void func_PAL_0031DAB8(Object *);
-extern void func_0031C7A0(Object *);
-extern void func_0031D268(Object *);
-extern void func_0031D308(Object *);
+extern void three_part_turret_draw_effects(Object *);
+extern void gfx_record_trail_point(Object *);
+extern void gfx_draw_trail_ribbon(Object *);
 
 void func_PAL_0031C1B8(Object *self)
 {
@@ -112,53 +112,53 @@ void func_PAL_0031C1B8(Object *self)
     func_PAL_0031D2E8(self);
     switch (self->mode) {
     case 0:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 11, 4);
+            moby_set_state(self, 11, 4);
             if (self->animNext != 1) func_PAL_002A7E68(self, 1, 0, 3);
             if (vars->path != -1) {
-                func_002A7750(self, 10, 1);
+                moby_set_state(self, 10, 1);
                 if (self->animNext != 26) func_PAL_002A7E68(self, 26, 0, 3);
             }
         } else if (vars->alerted) {
-            func_002A7750(self, 9, 3);
+            moby_set_state(self, 9, 3);
             vars->alerted = 0;
-            if (vars->timer < 250) vars->timer = ((s32)(func_002A7820(480, 600)) * 5 + 2) / 6;
+            if (vars->timer < 250) vars->timer = ((s32)(math_random_int_range(480, 600)) * 5 + 2) / 6;
         }
         break;
     case 2:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 5, 4);
+            moby_set_state(self, 5, 4);
             if (self->animNext != 25) func_PAL_002A7E68(self, 25, 0, 3);
         } else if (vars->alerted && vars->active) {
             vars->alerted = 0;
-            func_002A7750(self, 5, 4);
+            moby_set_state(self, 5, 4);
             if (self->animNext != 25) func_PAL_002A7E68(self, 25, 0, 3);
         }
         break;
     case 3:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 11, 4);
+            moby_set_state(self, 11, 4);
             if (self->animNext != 1) func_PAL_002A7E68(self, 1, 0, 3);
         } else if (vars->timer == 0) {
-            func_002A7750(self, 2, 0);
+            moby_set_state(self, 2, 0);
             if (self->animNext != 4) func_PAL_002A7E68(self, 4, 0, 8);
         }
         break;
     case 4:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
         if (vars->mode != 1 && vars->mode != 2) {
             if (self->state != 5) {
                 if (self->state != 4) {
-                    func_002A7750(self, 9, 3);
+                    moby_set_state(self, 9, 3);
                     if (self->animNext != 7) func_PAL_002A7E68(self, 7, 0, 8);
-                    vars->timer = ((s32)(func_002A7820(580, 600)) * 5 + 2) / 6;
+                    vars->timer = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
                 }
             }
         }
@@ -166,20 +166,20 @@ void func_PAL_0031C1B8(Object *self)
     case 5:
         result = func_PAL_002B27B8(self, vars->dispatch);
         if (result & 1) {
-            func_0029F338(vars->parts[0]);
-            func_0029F338(vars->parts[1]);
-            func_0029F338(vars->parts[2]);
-            func_0029F338(self);
+            moby_mark_spawned(vars->parts[0]);
+            moby_mark_spawned(vars->parts[1]);
+            moby_mark_spawned(vars->parts[2]);
+            moby_mark_spawned(self);
             return;
         }
         if (result & 2) {
             if (vars->mode == 1 || vars->mode == 2) {
-                func_002A7750(self, 12, 4);
+                moby_set_state(self, 12, 4);
                 if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
             } else {
-                func_002A7750(self, 9, 3);
+                moby_set_state(self, 9, 3);
                 if (self->animNext != 7) func_PAL_002A7E68(self, 7, 0, 8);
-                vars->timer = ((s32)(func_002A7820(580, 600)) * 5 + 2) / 6;
+                vars->timer = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
             }
             if (vars->active != 1) vars->active = 1;
         }
@@ -190,147 +190,147 @@ void func_PAL_0031C1B8(Object *self)
     case 2:
         break;
     case 3:
-        func_002AEF28(self, vars->sway, vars->tilt, 0.06981318f, 0.062831864f, 0.015707966f);
+        moby_scale_owner_words_by_angles(self, vars->sway, vars->tilt, 0.06981318f, 0.062831864f, 0.015707966f);
         break;
     case 5:
         vars->ticks++;
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
-        func_002AA3A8((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
+        math_spring_float_to_goal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
         {
-        float level = func_002A89A8(self->pos, 0, 0.5f);
+        float level = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         if (self->pos[2] - level > 0.05f) {
             self->pos[2] = self->pos[2] - level * 0.00025f;
         } else {
-            func_002A7750(self, 8, -1);
+            moby_set_state(self, 8, -1);
             if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
         }
         }
         if (self->flags & 2) {
-            func_002A7750(self, 4, -1);
+            moby_set_state(self, 4, -1);
             if (self->animNext != 26) func_PAL_002A7E68(self, 26, 0, 12);
         }
         break;
     case 4:
         vars->ticks++;
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
-        func_002AA3A8((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
-        ground = func_002A89A8(self->pos, 0, 0.5f);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
+        math_spring_float_to_goal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
+        ground = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            func_002AA548(&self->pos[2], vars->height, drop, 0.020000001f, 0.19600002f, 0.20000002f);
+            math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.020000001f, 0.19600002f, 0.20000002f);
         } else {
-            func_0026FEB8(D_001AFAE0, vars->ticks);
-            func_002A7750(self, 8, -1);
+            STUB_printf(D_001AFAE0, vars->ticks);
+            moby_set_state(self, 8, -1);
             if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
         }
         break;
     case 6:
         if (self->flags & 2) {
-            func_002A7750(self, 7, -1);
+            moby_set_state(self, 7, -1);
             if (self->animNext != 14) func_PAL_002A7E68(self, 14, 0, 12);
         }
         break;
     case 7:
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
-        func_002833F0(self->basis, self->rot);
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        ground = func_002A89A8(self->pos, 0, 0.5f);
+        math_spring_float_to_goal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.020000001f, 0.0f, 0.080000006f);
+        euler_rotation_basis(self->basis, self->rot);
+        moby_turn_toward_position(self, g_hero_state.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        ground = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            func_002AA548(&self->pos[2], vars->height, drop, 0.030000001f, 0.19600002f, 0.3f);
+            math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.030000001f, 0.19600002f, 0.3f);
         } else {
-            func_002A7750(self, 8, -1);
+            moby_set_state(self, 8, -1);
             if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
         }
         break;
     case 8:
         if (self->flags & 2) {
-            func_002A7750(self, 12, 4);
+            moby_set_state(self, 12, 4);
             if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 12);
-            self->pos[2] = func_002A89A8(self->pos, 0, 0.5f);
+            self->pos[2] = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         }
         break;
     case 10:
         target.q = vars->home.q;
         target.v[2] -= 3.0f;
-        func_00282CF0(&delta, &target, self->pos);
-        self->rot[2] = func_00283248(delta.v[0], delta.v[1]);
-        self->rot[1] = func_00283248(func_00282E20(&delta), delta.v[2]);
-        func_002833F0(self->basis, self->rot);
-        func_002AA458((s32)self->pos, (s32)&target, (s32)vars->height, 0.020000001f, 0.0f, 0.40000004f);
-        if (func_00282E48(self->pos, &target) < 0.4f) {
+        FastVecSub(&delta, &target, self->pos);
+        self->rot[2] = mat_fast_helper_a(delta.v[0], delta.v[1]);
+        self->rot[1] = mat_fast_helper_a(vec_length_xy(&delta), delta.v[2]);
+        euler_rotation_basis(self->basis, self->rot);
+        vec_spring_to_target((s32)self->pos, (s32)&target, (s32)vars->height, 0.020000001f, 0.0f, 0.40000004f);
+        if (fast_vec_dist(self->pos, &target) < 0.4f) {
             if (self->animNext != 14) func_PAL_002A7E68(self, 14, 0, 8);
-            func_002A7750(self, 7, -1);
+            moby_set_state(self, 7, -1);
         }
         break;
     case 11:
         if (self->flags & 2) {
-            func_002B60B0(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
-            func_002A7750(self, 12, -1);
+            moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
+            moby_set_state(self, 12, -1);
             if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 12);
         }
         break;
     case 12:
-        if (func_00282E80(self->pos, D_00189E20.pos) < 2.8f
-            && func_00283C80(self->rot[2], func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1])) < 0.38397247f) {
-            func_002A7750(self, 13, -1);
+        if (vec_distance_xy(self->pos, g_hero_state.pos) < 2.8f
+            && FastDiffRots(self->rot[2], mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1])) < 0.38397247f) {
+            moby_set_state(self, 13, -1);
             if (self->animNext != 16) func_PAL_002A7E68(self, 16, 4, 2);
             vars->hold = 0;
-        } else if (func_00282E80(self->pos, D_00189E20.pos) > 2.8f) {
-            func_PAL_002B5BA8(self, D_00189E20.pos, vars->range);
+        } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 2.8f) {
+            func_PAL_002B5BA8(self, g_hero_state.pos, vars->range);
         } else {
-            func_PAL_002B5C98(self, self->pos, func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1]));
+            func_PAL_002B5C98(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         }
-        if (func_00282E80(self->pos, D_00189E20.pos) > 5.0f && self->anim == 8) {
+        if (vec_distance_xy(self->pos, g_hero_state.pos) > 5.0f && self->anim == 8) {
             if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 3);
-            func_002B60B0(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
+            moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
         }
         break;
     case 13:
         if (self->flags & 2) {
-            if (D_00189E20.target == self) {
-                func_002A7750(self, 14, -1);
+            if (g_hero_state.target == self) {
+                moby_set_state(self, 14, -1);
                 if (self->animNext != 17) func_PAL_002A7E68(self, 17, 0, 6);
-            } else if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
-                func_002B60B0(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
-                func_002A7750(self, 12, -1);
+            } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
+                moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
+                moby_set_state(self, 12, -1);
                 if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
             } else {
-                func_002B60B0(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
-                func_002A7750(self, 12, -1);
+                moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+                moby_set_state(self, 12, -1);
                 if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 8);
             }
         }
-        frame = func_0029F530(self);
+        frame = moby_get_anim_value(self);
         if (self->anim == 16) {
             if (frame >= 19.0f && frame <= 25.0f) {
-                func_002A8D70(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
-                func_002A8D70(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
-                func_002A8D70(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                coll_test_hit_at_bone(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
             }
             if (self->anim == 16 && frame >= 17.0f && frame <= 25.0f) {
-                func_0027CDC8(func_0031D308, self);
-                func_0031D268(self);
+                gfx_register_world_draw_callback(gfx_draw_trail_ribbon, self);
+                gfx_record_trail_point(self);
             }
         }
-        func_PAL_002B5C98(self, self->pos, func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1]));
+        func_PAL_002B5C98(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         break;
     case 14:
         if (self->flags & 2) {
-            if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
-                func_002B60B0(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
-                func_002A7750(self, 12, -1);
+            if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
+                moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
+                moby_set_state(self, 12, -1);
                 if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
             } else {
-                func_002B60B0(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
-                func_002A7750(self, 12, -1);
+                moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
+                moby_set_state(self, 12, -1);
                 if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 8);
             }
         }
         {
-            float at = func_0029F530(self);
+            float at = moby_get_anim_value(self);
             if (self->anim == 17 && (at <= 5.0f || (at >= 12.0f && at <= 15.0f)))
                 vars->open = 1;
             else
@@ -339,5 +339,5 @@ void func_PAL_0031C1B8(Object *self)
         break;
     }
     func_PAL_0031DAB8(self);
-    func_0027CFD0(func_0031C7A0, self);
+    gfx_register_overlay_draw_callback(three_part_turret_draw_effects, self);
 }

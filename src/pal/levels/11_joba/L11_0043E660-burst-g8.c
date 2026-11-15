@@ -15,14 +15,14 @@ typedef struct {
     float scale[3];
 } BurstSphere;
 extern BurstSphere D_L11_002B6BC0;
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern char *func_002BBCB0(void *, void *, int, int, float, int, int, int, int, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
 extern char *func_PAL_003096D0(char *, char *, char *, int, float, u8, u8, u8, u8);
-extern int func_00283DB8(void *, float);
-extern void func_00312B70(void *, void *, int, int);
-extern void func_002E5DA0(int, int, char *, int);
+extern int math_fast_helper_a(void *, float);
+extern void moby_spawn_template_effect(void *, void *, int, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 /* Called with a constant radius: each ring loads it afresh instead of sharing one register. */
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)
@@ -46,13 +46,13 @@ void func_PAL_L11_0043EBD0(char *obj, char *pos)
     size = 5.0f;
     scale = 2.0f;
     for (i = 11; i >= 0; i--) {
-        speed = func_002A7878(8.0f, 10.0f) * (0.020000001f);
-        index = func_002A77E0(6);
+        speed = math_random_float_range(8.0f, 10.0f) * (0.020000001f);
+        index = math_random_int_below(6);
         first = D_L11_001B12D0[index];
         last = D_L11_001B12E0[index];
-        life = func_002A7820(12, 17);
-        spark = func_002BBCB0(pos, velocity, first, last, scale * 400000.0f, life,
-                              func_002A7820(25, 37), 0, 0, speed * scale);
+        life = math_random_int_range(12, 17);
+        spark = part_spawn_firework_spark(pos, velocity, first, last, scale * 400000.0f, life,
+                              math_random_int_range(25, 37), 0, 0, speed * scale);
         if (spark)
             spark[3] = 0x44;
     }
@@ -67,13 +67,13 @@ void func_PAL_L11_0043EBD0(char *obj, char *pos)
     if (size != 0.0f) {
         qcopy(sphere, pos);
         sphere[3] = size;
-        if (func_00283DB8(sphere, 100.0f) != -1) {
+        if (math_fast_helper_a(sphere, 100.0f) != -1) {
             if (size > 0.0f)
                 D_L11_002B6BC0.scale[0] = D_L11_002B6BC0.scale[2] = D_L11_002B6BC0.scale[1] = size;
             else
                 D_L11_002B6BC0.scale[0] = D_L11_002B6BC0.scale[2] = D_L11_002B6BC0.scale[1] = 15;
-            func_00312B70(&D_L11_002B6BC0, pos, 0, 0);
+            moby_spawn_template_effect(&D_L11_002B6BC0, pos, 0, 0);
         }
     }
-    func_002E5DA0(0, 0, obj, 0xDF7);
+    snd_play_from_class_bank(0, 0, obj, 0xDF7);
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s8 D_0025B9C0[];
 extern s8 D_0025BA80[];
 
 /* Sets the given menu item to show the current choice and starts it sliding in from the side when the choice changed, then moves on to the next choice. */
-s32 func_002D4FF0(s32 display) {
+s32 menu_choice_slide_init(s32 display) {
     s32 choiceNumber;
     s32 byteOffset;
 

@@ -48,8 +48,8 @@ typedef struct {
     float comboInverse;
 } RollState;
 
-extern ShipPad D_00138180;
-extern int D_001A79F0;
+extern ShipPad g_pad_state;
+extern int g_current_map_index;
 extern unsigned char D_001A7A44;
 extern float D_L05_001B1A68 __attribute__((sda));
 extern float D_L05_001B1A40 __attribute__((sda));
@@ -62,17 +62,17 @@ extern int D_L05_001B1AE8 __attribute__((sda));
 extern int D_L05_001B1AEC __attribute__((sda));
 extern int D_L05_001B1AF0 __attribute__((sda));
 extern int D_L05_001B1AF4 __attribute__((sda));
-extern int D_L05_001B1B20 __attribute__((sda));
+extern int g_ship_state __attribute__((sda));
 extern int D_L05_002A18E0 __attribute__((nosda));
-extern void func_L05_00442880(char *);
-extern float func_00282C48(float);
-extern int func_L05_00379F38(void);
-extern int func_L05_004459B0(char *);
-extern float func_00282DB0(void *, char *);
+extern void cam_load_parameter_set(char *);
+extern float math_fabs(float);
+extern int hero_get_state_value_b(void);
+extern int path_is_touching_linked_point(char *);
+extern float FastVecDot(void *, char *);
 extern int func_PAL_L05_00449258(char *);
-extern float func_002702C8(float *, float, float, float, float, float);
-extern int func_00282978(short *);
-extern float func_00283CE0(int);
+extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
+extern int FastDecTimer(short *);
+extern float IntToFloat(int);
 
 void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
 {
@@ -81,16 +81,16 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
     float vertical, horizontal;
     RollState *roll;
 
-    func_L05_00442880(obj);
-    horizontal = -D_00138180.stickX;
-    vertical = D_00138180.stickY;
-    if (func_00282C48(vertical) < D_L05_001B1A68) {
+    cam_load_parameter_set(obj);
+    horizontal = -g_pad_state.stickX;
+    vertical = g_pad_state.stickY;
+    if (math_fabs(vertical) < D_L05_001B1A68) {
         if (vertical == 0.0f) {
-            if (D_00138180.input.words.held & 0x1000) {
+            if (g_pad_state.input.words.held & 0x1000) {
                 vertical = -D_L05_001B1B78;
                 D_L05_001B1B78 += D_L05_001B1B7C;
                 if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
-            } else if (D_00138180.input.words.held & 0x4000) {
+            } else if (g_pad_state.input.words.held & 0x4000) {
                 vertical = D_L05_001B1B78;
                 D_L05_001B1B78 += D_L05_001B1B7C;
                 if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
@@ -109,11 +109,11 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
             vertical = (vertical + D_L05_001B1A68) / (1.0f - D_L05_001B1A68);
     }
     if (horizontal == 0.0f) {
-        if (D_00138180.input.words.held & 0x8000) {
+        if (g_pad_state.input.words.held & 0x8000) {
             horizontal = D_L05_001B1B74;
             D_L05_001B1B74 += D_L05_001B1B7C;
             if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
-        } else if (D_00138180.input.words.held & 0x2000) {
+        } else if (g_pad_state.input.words.held & 0x2000) {
             horizontal = -D_L05_001B1B74;
             D_L05_001B1B74 += D_L05_001B1B7C;
             if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
@@ -123,7 +123,7 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
     } else {
         D_L05_001B1B74 = 0.0f;
     }
-    if ((D_001A79F0 != 5 && D_001A79F0 != 10) || !func_L05_00379F38()) {
+    if ((g_current_map_index != 5 && g_current_map_index != 10) || !hero_get_state_value_b()) {
         if (horizontal < 0.0f) horizontal = -(horizontal * horizontal);
         else horizontal = horizontal * horizontal;
         if (vertical < 0.0f) vertical = -(vertical * vertical);
@@ -137,8 +137,8 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
     }
     *(Quad *)axis = 0;
     axis[3] = axis[2] = 1.0f;
-    if (state->mode < 2 && ((D_00138180.input.words.pressed & 3) || func_L05_004459B0(obj))) {
-        if (func_00282C48(func_00282DB0(axis, obj)) < 0.7f)
+    if (state->mode < 2 && ((g_pad_state.input.words.pressed & 3) || path_is_touching_linked_point(obj))) {
+        if (math_fabs(FastVecDot(axis, obj)) < 0.7f)
             state->mode = 2;
     }
     if (func_PAL_L05_00449258(obj)) {
@@ -146,38 +146,38 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
     }
     *pitchRate = (-vertical * 0.017453294f) * state->pitchLimit;
     *yawRate = (horizontal * 0.017453294f) * state->yawLimit;
-    state->pitch = func_002702C8(&state->pitchVelocity, state->pitch, *pitchRate,
+    state->pitch = math_step_spring_damper_clamped(&state->pitchVelocity, state->pitch, *pitchRate,
                                  state->pitchParams[0], state->pitchParams[1], state->pitchParams[2]);
-    state->yaw = func_002702C8(&state->yawVelocity, state->yaw, *yawRate,
+    state->yaw = math_step_spring_damper_clamped(&state->yawVelocity, state->yaw, *yawRate,
                                state->yawParams[0], state->yawParams[1], state->yawParams[2]);
     {
         SteeringRecord *record = *(SteeringRecord **)(obj + 0x70);
-        record->value = func_002702C8(&record->velocity, record->value, vertical,
+        record->value = math_step_spring_damper_clamped(&record->velocity, record->value, vertical,
                                       D_L05_001B1A40, D_L05_001B1A44, D_L05_001B1A48);
     }
     *pitchRate = state->pitch;
     *yawRate = state->yaw;
     roll = (RollState *)(*(char **)(obj + 0x70) + 0xD4);
-    if (roll->rollTimer && func_00282978(&roll->rollTimer))
+    if (roll->rollTimer && FastDecTimer(&roll->rollTimer))
         roll->rollDirection = 0;
     if (roll->rollDelay == 0) {
-        if (D_00138180.input.buttons & 0xC) {
+        if (g_pad_state.input.buttons & 0xC) {
             roll->rollTimer = ((s32)(D_L05_001B1AE8) * 5 + 2) / 6;
-            roll->rollInverse = 1.0f / func_00283CE0(roll->rollTimer);
+            roll->rollInverse = 1.0f / IntToFloat(roll->rollTimer);
             roll->rollDelay = roll->rollTimer + ((s32)(D_L05_001B1AEC) * 5 + 2) / 6;
-            if (D_00138180.input.words.held & 4) roll->rollDirection = -1;
+            if (g_pad_state.input.words.held & 4) roll->rollDirection = -1;
             else roll->rollDirection = 1;
             if (D_001A7A44) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
         }
     } else {
-        func_00282978(&roll->rollDelay);
+        FastDecTimer(&roll->rollDelay);
     }
-    if (func_00282978(&roll->comboDelay) && D_L05_002A18E0 && D_001A79F0 != 20) {
-        if ((D_00138180.input.words.held & 3) == 3 || (D_00138180.input.words.held & 0xC) == 0xC) {
+    if (FastDecTimer(&roll->comboDelay) && D_L05_002A18E0 && g_current_map_index != 20) {
+        if ((g_pad_state.input.words.held & 3) == 3 || (g_pad_state.input.words.held & 0xC) == 0xC) {
             roll->comboDelay = ((s32)(D_L05_001B1AF4) * 5 + 2) / 6;
-            D_L05_001B1B20 = 7;
+            g_ship_state = 7;
             roll->comboTimer = ((s32)(D_L05_001B1AF0) * 5 + 2) / 6;
-            roll->comboInverse = 1.0f / func_00283CE0(roll->comboTimer);
+            roll->comboInverse = 1.0f / IntToFloat(roll->comboTimer);
         }
     }
 }

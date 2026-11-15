@@ -4,14 +4,14 @@
 
 typedef unsigned char u8;
 typedef float f32;
-extern void func_00282CC0(u8 *, u8 *, u8 *);
+extern void FastVecAdd(u8 *, u8 *, u8 *);
 extern f32 D_L03_001B1FC4 __attribute__((sda));
-extern f32 func_00283B98(f32, f32);
-extern void func_0029F338(u8 *);
+extern f32 FastAddRotations(f32, f32);
+extern void moby_mark_spawned(u8 *);
 
 /* Same body as func_L03_0042B930, with this function's own callees. */
 /* Moves and turns a falling piece of debris (moby class 1086), makes it fall faster each frame, and removes it when its time runs out. */
-void func_L00_00419A80(u8 *object) {
+void falling_l00_debris_update(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     u8 *config = *(u8 **)(object + 0x24);
 
@@ -24,5 +24,5 @@ void func_L00_00419A80(u8 *object) {
     *(f32 *)(object + 0xF8) = FastAddRotations(*(f32 *)(object + 0xF8), *(f32 *)(vars + 0x18));
     object[0xBC] = object[0xBC] - 1;
     if (object[0xBC] == 0)
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
 }

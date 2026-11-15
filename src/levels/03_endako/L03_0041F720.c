@@ -12,11 +12,11 @@ extern s32 D_L03_001B2A38[] __attribute__((sda));
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));
 extern u16 *D_L03_001FB5A0[];
 
-extern void func_0029F338(void *);
-extern float func_00283C28(float);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern s32 func_00283D38(s32, s32, float);
+extern void moby_mark_spawned(void *);
+extern float math_fast_float_g(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern s32 FastTweenColor(s32, s32, float);
 
 #define GROUP (*(s32 *)state)
 
@@ -30,7 +30,7 @@ extern s32 func_00283D38(s32, s32, float);
    0.05235988f encodes one ulp less, and the stores of the fresh state block and of the entity's
    flags go in the order below, which is the order retail has them in. */
 /* Fades a group of objects between two colours in a pulsing wave. */
-void func_L03_00425310(u8 *moby)
+void object_group_pulse_colors(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u16 *p;
@@ -40,7 +40,7 @@ void func_L03_00425310(u8 *moby)
     switch (moby[0x20]) {
     case 0:
         if (GROUP >= D_L03_001B2A38[0] || D_L03_001FB5A0[GROUP] == 0 || GROUP == -1) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
         } else {
             *(f32 *)(state + 4) = -0.052359886f;
             *(f32 *)(state + 8) = *(f32 *)(state + 8) * 0.017453294f;
@@ -56,7 +56,7 @@ void func_L03_00425310(u8 *moby)
                 memberVars = *(u8 **)(member + 0x68);
                 *(s32 *)(memberVars + 4) = 0x80A0A0A0;
                 *(s32 *)(memberVars + 8) = 0x80000000;
-                *(f32 *)(memberVars + 0xC) = FastFloatHelperG((f32)(*(s32 *)memberVars * 30) * 0.017453294f);
+                *(f32 *)(memberVars + 0xC) = math_fast_float_g((f32)(*(s32 *)memberVars * 30) * 0.017453294f);
                 *(u16 *)(member + 0x32) = 0x1FF;
                 member[0x30] = 0xFF;
             }
@@ -75,7 +75,7 @@ void func_L03_00425310(u8 *moby)
             *(f32 *)(memberVars + 0xC) = FastAddRotations(*(f32 *)(memberVars + 0xC), *(f32 *)(state + 4));
             *(s32 *)(member + 0x78) =
                 FastTweenColor(*(s32 *)(memberVars + 4), *(s32 *)(memberVars + 8),
-                              FastSinOrCosB(*(f32 *)(memberVars + 0xC)) * 0.5f + 0.5f);
+                              math_fast_sin_or_cos_b(*(f32 *)(memberVars + 0xC)) * 0.5f + 0.5f);
         }
         break;
     }
@@ -83,6 +83,6 @@ void func_L03_00425310(u8 *moby)
 
 /* Return the constant signed integer one. */
 /* Returns the constant integer 1. Matches FUN_0012F940 disassembly and decompilation. */
-int func_L03_00456F58(void) {
+int return_one(void) {
     return 1;
 }

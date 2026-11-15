@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,10 +24,10 @@
  */
 #include "common.h"
 
-extern void func_0029F390(s8 *);
+extern void update_moby_animation_state(s8 *);
 
 /* Starts an animation on an object right away, with no blending. */
-void func_002A7398(s8 *moby, s32 animation, s32 frame) {
+void anim_start_immediate(s8 *moby, s32 animation, s32 frame) {
     s32 animOffset;
     s8 *animEntry;
     s8 *animPtr;

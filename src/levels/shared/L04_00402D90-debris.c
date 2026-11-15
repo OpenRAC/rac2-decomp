@@ -1,18 +1,18 @@
 #include "common.h"
-extern unsigned char *func_0029EFD0(int);
-extern void func_002833F0(void *, void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_002A7A00(void *, float, float);
+extern unsigned char *CreateMoby(int);
+extern void euler_rotation_basis(void *, void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_random_direction(void *, float, float);
 extern void func_002A0F48(void *);
 
 /* Spawns a piece of flying debris from a parent moby with random speed, spin and lifetime. */
-unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position, void *rotation, int lifetime, int flags, void *velocity, void *spin, void *scale, float gravity, float width)
+unsigned char *debris_spawn(unsigned char *parent, int kind, void *position, void *rotation, int lifetime, int flags, void *velocity, void *spin, void *scale, float gravity, float width)
 {
     float scratch[4];
     unsigned char *debris = CreateMoby(kind);
@@ -31,28 +31,28 @@ unsigned char *func_L04_00407078(unsigned char *parent, int kind, void *position
         debris[0x30] = 255;
         *(short *)(debris + 0x32) = 128;
         *(int *)(debris + 0x98) = 0;
-        if (lifetime == 0) *(short *)(debrisVars + 0x30) = FloatToInt(RandomFloatRange(60.0f, 120.0f));
+        if (lifetime == 0) *(short *)(debrisVars + 0x30) = FloatToInt(math_random_float_range(60.0f, 120.0f));
         else *(short *)(debrisVars + 0x30) = lifetime;
         *(int *)(debrisVars + 0x34) = flags;
         *(short *)(debrisVars + 0x32) = 0;
-        if (*(float *)(debrisVars + 0x38) == 0.0f) *(float *)(debrisVars + 0x38) = RandomFloatRange(10.0f, 15.0f) * 0.00027777778f;
+        if (*(float *)(debrisVars + 0x38) == 0.0f) *(float *)(debrisVars + 0x38) = math_random_float_range(10.0f, 15.0f) * 0.00027777778f;
         else *(float *)(debrisVars + 0x38) = gravity;
         if (width != 0.0f) {
             *(float *)(debrisVars + 0x3c) = width;
             *(int *)(debrisVars + 0x34) |= 4;
         }
         if (FastVecLength(velocity) == 0.0f) {
-            angle = RandomAngle();
+            angle = math_random_angle();
             unit = 0.016666668f;
-            speed = RandomFloatRange(2.0f, 4.0f) * unit;
-            scratch[0] = FastSinOrCosA(angle) * speed;
-            scratch[1] = FastSinOrCosB(angle) * speed;
+            speed = math_random_float_range(2.0f, 4.0f) * unit;
+            scratch[0] = math_fast_sin_or_cos_a(angle) * speed;
+            scratch[1] = math_fast_sin_or_cos_b(angle) * speed;
             scratch[2] = 0.0f;
-            scratch[2] = RandomFloatRange(5.0f, 8.0f) * unit;
+            scratch[2] = math_random_float_range(5.0f, 8.0f) * unit;
             qcopy(debrisVars, scratch);
         } else qcopy(debrisVars, velocity);
         if (FastVecLength(spin) == 0.0f) {
-            RandomDirectionVector(scratch, 0.052359886f, 0.10471977f);
+            vec_random_direction(scratch, 0.052359886f, 0.10471977f);
             qcopy((debrisVars + 0x10), scratch);
         } else qcopy((debrisVars + 0x10), spin);
         if (FastVecLength(scale) == 0.0f && ((float *)scale)[3] == 0.0f) {

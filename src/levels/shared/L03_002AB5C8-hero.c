@@ -2,10 +2,10 @@
 #include "names.h"
 typedef unsigned char u8;
 typedef short s16;
-extern char D_00189E20[];
-extern u8 D_00139568[];
+extern char g_hero_state[];
+extern u8 g_item_slot_to_record[];
 extern char D_L03_00266DA0[];
-extern int func_L00_002ADEA0(int);
+extern int hero_slot_item_id(int);
 typedef struct {
     u8 pad[0x28];
     int v;
@@ -13,18 +13,18 @@ typedef struct {
 
 /* func_L00_002A4E48 without the 0x1492 fallback: 0x51 or 0. */
 /* Looks up a number tied to the hero's current gadget, or gives 0x51 in one special mode and 0 otherwise. */
-int func_L03_002AB5C8(char *object)
+int hero_get_gadget_value(char *object)
 {
-    char *hero = gHeroState;
+    char *hero = g_hero_state;
 
     if (*(u8 *)(hero + 0x22B4) == 1)
         return 0;
     if (object != 0 && *(u8 *)(hero + 0x22BA) != 0 && *(s16 *)(hero + 0x24EC) == 0) {
         int idx = hero_slot_item_id(0);
-        return ((WeaponEntry *)(D_L03_00266DA0 + gItemSlotToRecord[idx] * 224))->v;
+        return ((WeaponEntry *)(D_L03_00266DA0 + g_item_slot_to_record[idx] * 224))->v;
     }
     {
-        char *heroBlock = gHeroState;
+        char *heroBlock = g_hero_state;
         if (*(int *)(heroBlock + 0x24CC) != 1)
             return 0;
     }

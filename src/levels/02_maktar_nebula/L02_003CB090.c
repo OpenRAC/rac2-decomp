@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int u32;
 typedef short s16;
@@ -11,7 +12,7 @@ extern s16 func_0031E7B0(int, unsigned int);
 extern void func_00366B30(int, int, void *);
 
 /* When a timer on the enemy runs out, picks a new timer value and sends a notice. */
-void func_L02_003CB090(char *self) {
+void path_enemy_refresh_timer(char *self) {
     char *state = *(char **)(self + 0x68);
 
     if (func_002F1BE0(state + 0x3B4) != 0) {

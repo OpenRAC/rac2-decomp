@@ -10,18 +10,18 @@ typedef struct {
 } RenderPacket;
 extern char D_L00_001A8F20[] MACRO_ADDR;
 extern char D_L00_001B9000[];
-extern int func_00283CF0(float);
-extern void func_00281DE8(void *, int, int, int);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(char *, int, int);
+extern int FloatToInt(float);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(char *, int, int);
 
 /* Debug line labels reproduce the measured assembler division padding. */
 /* Draws a stretched square many times along a line, with each copy fainter than the one before. */
-void func_L00_00419668(char *object)
+void gfx_draw_fading_stretched_quads(char *object)
 {
     RenderPacket packet;
     Vector step, a, b, c, d, center, temp;
@@ -41,7 +41,7 @@ void func_L00_00419668(char *object)
     *(int *)&packet.uv[2][1] = 0;
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
-    InitQuadPacketState(&packet, *(int *)(state + 0x48), 1, 0x80);
+    gfx_init_quad_packet_state(&packet, *(int *)(state + 0x48), 1, 0x80);
     packet.f70 = 0;
     VU1_addGSregister(0x42, 0x8000000048ULL);
     VU1_addGSregister(8, 0);

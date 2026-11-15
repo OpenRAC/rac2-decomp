@@ -2,19 +2,19 @@
 
 typedef int V4_325AE8 __attribute__((mode(TI)));
 
-extern int func_0027C878(int);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(float, char *, char *);
-extern void func_00282DD8(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_002830C0(char *, char *, char *);
-extern void func_00280B90(char *, char *, int);
+extern int GetEffectTextureDescriptor(int);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(float, char *, char *);
+extern void FastVecCross(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern void transform_vector(char *, char *, char *);
+extern void draw_world_quad(char *, char *, int);
 extern char D_001B8DC0[];
 extern float D_001AA310[16] SDATA(D_001AA310);
 
 /* Draws a single camera-facing quad of the given color near a position. */
-void func_L00_00325AE8(char *source, int color, float alpha, float distance)
+void gfx_l00_draw_billboard_quad(char *source, int color, float alpha, float distance)
 {
     char work[0x90];
     float up[4];

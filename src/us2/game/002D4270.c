@@ -1,19 +1,20 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_00138180[];
-extern char D_001F2840[];
+extern int g_pad_state[];
+extern char g_pause_menu_state[];
 extern int D_001A8CFC __attribute__((sda));
 extern int func_0029C920(int);
-extern int func_0033E310(int);
-extern void func_002D5E98(int);
+extern int list_page_get_selected_record(int);
+extern void menu_start_action(int);
 
 int func_US2_002D4270(void)
 {
     int result = 0;
-    int *state = D_00138180;
+    int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = g_pause_menu_state;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -36,39 +37,39 @@ finish:
     else {
         func_0029C920(flags);
         if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC) {
-            char *entry = (char *)func_0033E310(D_001A8CFC + 0x3F3F0);
+            char *entry = (char *)list_page_get_selected_record(D_001A8CFC + 0x3F3F0);
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            func_002D5E98((int)&request);
+            menu_start_action((int)&request);
         }
     }
     return result;
 }
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
 extern void func_0029C960(void);
 
 /* Candidate function: FUN_002d3390 */
 unsigned long long func_US2_002D4340(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C960();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 extern void func_0029C5A0(void);
 
 int func_US2_002D4438(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C5A0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 

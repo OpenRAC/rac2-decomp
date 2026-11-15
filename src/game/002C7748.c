@@ -1,23 +1,23 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern float func_002A7790(float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern void func_00300190(char *, char *);
-extern int func_00282978(char *);
-extern void func_002B9180(char *);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282F20(float *, float *, float);
+extern float math_square(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern void vec_transform_or_copy(char *, char *);
+extern int FastDecTimer(char *);
+extern void part_kill(char *);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void vec_scale_to_length(float *, float *, float);
 
 typedef struct { char pad[0x20]; int buffer; char pad24[0xAC]; int saved; } CaptureState;
 extern int D_001B1598 MACRO_ADDR __attribute__((sda));
-extern int D_001A7344 MACRO_ADDR __attribute__((sda));
+extern int g_screen_height MACRO_ADDR __attribute__((sda));
 extern int D_001A72D4 __attribute__((sda));
-extern void func_002FC3C0(int);
-extern void func_0011AEA0(int);
+extern void gfx_wait_for_dma_status_bits(int);
+extern void FlushCache(int);
 
 extern int F250fbfa4_FUN_00282978(char *p);
 
@@ -65,9 +65,9 @@ extern BatchA_A10_u8 D_L03_001FFAC0[];
 
 extern int func_00288FB8_1 ();
 
-extern void func_0027F5B8 (int v, int p7, long k, int r, int m1);
+extern void text_draw_medium (int v, int p7, long k, int r, int m1);
 
-extern void func_0027FA10 (int v, int p7, long k, int r, int m1);
+extern void text_draw_right_aligned_medium (int v, int p7, long k, int r, int m1);
 
 typedef int BatchA_A12_s32;
 
@@ -86,10 +86,10 @@ extern BatchA_A12_BatchA24 D_L08_001FF980;
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 extern void func_0029C138(void);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
 
 /*
@@ -117,11 +117,11 @@ extern void func_0027C660(void);
 
 /* func_002C7F78 is defined in 002C7F78.c. */
 
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283C80(float, float);
-extern float func_00282C48(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float FastDiffRots(float, float);
+extern float math_fabs(float);
 
 extern float Fbdd4a4aa_FUN_002A89A8(char *a, int b, float f);
 
@@ -135,41 +135,41 @@ extern float Fbdd4a4aa_FUN_00283CE0(int a);
 
 extern int Fbdd4a4aa_FUN_00283CF0(float a);
 
-extern int D_001B1688 __attribute__((sda));
+extern int g_game_time __attribute__((sda));
 
-extern char D_001B5200[];
+extern char g_active_camera[];
 
-extern float func_002A7878(float a, float b);
-extern void func_00300248(char *a, char *b);
+extern float math_random_float_range(float a, float b);
+extern void shop_trigger_current_state_effect(char *a, char *b);
 
-extern void func_00282D08(float *out, float *a, float *b, float t);
-extern void func_00282CF0(float *out, float *a, float *b);
-extern float func_00282E20(float *v);
-extern float func_00283248(float y, float x);
+extern void lerp_vector(float *out, float *a, float *b, float t);
+extern void FastVecSub(float *out, float *a, float *b);
+extern float vec_length_xy(float *v);
+extern float mat_fast_helper_a(float y, float x);
 
 extern int D_001F2A30;
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_00339770(void *, int);
+extern void popup_set_box_value(void *, int);
 
-extern char D_001F2840[];
+extern char g_pause_menu_state[];
 
 /* func_002C9C60 is matched in 002C9C60.c (built with -g). */
 
-extern int D_001A8BB0 __attribute__((sda));
+extern int g_current_game_mode __attribute__((sda));
 extern int D_001A7A08 __attribute__((sda));
 extern char D_00259918[];
 extern char D_00259AF8[];
 extern char D_00259AA8[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_0025B5F8;
-extern void func_00132AF8(int);
-extern void func_002B72E8(int);
-extern int func_00132028(void);
-extern void func_002CAF18(void);
-extern void func_00295C50(int);
-extern int func_0029D830(void);
-extern void func_002DF050(void);
+extern void snd_send_cmd22(int);
+extern void music_Pause(int);
+extern int snd_Pump(void);
+extern void ConfigureMenuChoiceList(void);
+extern void map_set_current_and_refresh(int);
+extern int menu_update_entry_states(void);
+extern void menu_update_unlock_entries(void);
 
 typedef struct {
     char pad[0x38];
@@ -201,26 +201,26 @@ typedef struct {
    0x3FB000, after setting the restore mode (2 with a0, else 1) and bumping the frame
    counter. */
 typedef struct { long q[12]; } GsLoadImage2C9E60 __attribute__((aligned(16)));
-extern int func_001261F0(int);
+extern int sceGsSyncV(int);
 extern int func_00126288(GsLoadImage2C9E60 *, short, short, short, short, short, short, short);
-extern int func_001265B0(GsLoadImage2C9E60 *, void *);
-extern int func_001244B8(int, int);
+extern int sceGsExecLoadImage(GsLoadImage2C9E60 *, void *);
+extern int gfx_wait_paths_idle(int, int);
 
-extern void func_002CA070(void);
+extern void menu_enter_pause_state(void);
 extern unsigned int D_L00_001FEC40[2];
 
-extern void func_0027DDC0(int, int, int, int);
+extern void gfx_set_clear_color_packet(int, int, int, int);
 
 /* func_002CAB00 is defined in 002CAB00-g8.c. */
 
 extern short D_001A63AC;
 extern int D_001C51D0;
-extern int D_00239BA0[];
-extern unsigned char D_00139568[];
-extern int func_002B4B70(int, int);
-extern int func_002B49E0(int, int, int, int, void *);
-extern void func_002B7CE0(int);
-extern void func_00294420(int);
+extern int g_weapon_table[];
+extern unsigned char g_item_slot_to_record[];
+extern int request_end_slot(int, int);
+extern int request_begin_slot(int, int, int, int, void *);
+extern void snd_pump_music_and_disc_read(int);
+extern void LoadClassIntoFreeCacheSlot(int);
 
 typedef struct {
     char pad00[0x1C];
@@ -235,11 +235,11 @@ typedef struct {
     int fieldF4;
 } GameState_1F2840;
 
-extern int func_002D5B38(int, char *);
+extern int menu_send_request(int, char *);
 extern char D_0025BA90[];
 
 extern short D_0018A000[];
-extern void func_0029CE80(void);
+extern void level_set_dependent_value(void);
 
 typedef struct {
     char reserved00[0x14];
@@ -254,7 +254,7 @@ typedef struct {
     int flags;
 } GameState_2CC490;
 
-extern char D_00138180[];
+extern char g_pad_state[];
 
 /* The menu entries are 0x50 apart; D_001B1680 holds the selection and D_001A8B84
  * whether it is enabled. Both scalars and the enable flags are small data: the
@@ -262,7 +262,7 @@ extern char D_00138180[];
 typedef struct { char pad[0x1C4]; int flags; } InputState_2CCF68;
 typedef struct { short x, kind; int a, b; } MenuEntry_2CCF68;
 extern char D_00259148[], D_00259198[], D_002591E8[], D_00259238[], D_00259288[], D_002592D8[];
-extern int func_002D5EC0(char *);
+extern int UpdateMenuListActions(char *);
 extern int D_001A8B84 __attribute__((sda));
 extern int D_001B1680 __attribute__((sda));
 typedef struct { unsigned char value; } ResidentFlag_2CCF68;
@@ -276,27 +276,27 @@ extern int D_00138344;
 
 extern int func_0029C168(int);
 
-extern unsigned int func_0026F7C8(void);
+extern unsigned int stub_empty_23(void);
 
-extern unsigned int func_0026F7D0(void);
+extern unsigned int stub_empty_24(void);
 
-extern unsigned int func_0026F7D8(void);
+extern unsigned int stub_empty_25(void);
 
-extern unsigned int func_0026F7E0(void);
+extern unsigned int stub_empty_26(void);
 
-extern unsigned int func_0026F7E8(void);
+extern unsigned int stub_empty_27(void);
 
-extern unsigned int func_0026F7F0(void);
+extern unsigned int stub_empty_28(void);
 
-extern int func_002CB7D0(int);
+extern int menu_handle_step_simple(int);
 
-extern int func_002CB820(int);
+extern int menu_handle_mode_action(int);
 
-extern int func_002CB8A0(int);
+extern int menu_run_action_by_index(int);
 
-extern int func_002CB950(int);
+extern int menu_handle_command(int);
 
-extern void func_002E5E58(int, unsigned int, void *);
+extern void snd_play_from_global_bank(int, unsigned int, void *);
 
 typedef struct {
     char reserved00[0x44];
@@ -315,12 +315,12 @@ typedef struct {
 extern MenuObject_2CD4E0 D_00259C78;
 extern ToggleState_2CD4E0 *D_00259C44;
 extern int func_0029C248(int first, void *second);
-extern int func_00336EF0(void);
+extern int menu_get_setting_value(void);
 
 /* func_002C7748 is defined in 002C7748-create-g8.c. */
 
 /* Updates a particle that fades in or out while it drifts and falls. It is removed when its life runs out. */
-void func_002C7AE8(char *particle)
+void part_update_fading_drift_alt(char *particle)
 {
     char velocity[16];
     char *self = particle;
@@ -351,7 +351,7 @@ void func_002C7AE8(char *particle)
 /* func_002C7BB8 is defined in 002C7BB8.c. */
 
 /* Updates a particle that fades while it drifts, falls and changes size. It is removed when its life runs out. */
-void func_002C7D58(char *particle)
+void part_update_size_changing(char *particle)
 {
     char *motion = particle + 32;
     float velocity[4];
@@ -376,7 +376,7 @@ void func_002C7D58(char *particle)
 }
 
 /* Spins a particle around a centre point and removes it when it has gone round far enough. */
-void func_002C8348(char *particle)
+void part_update_orbiting(char *particle)
 {
     char *self = particle;
     char *motion = self + 0x20;
@@ -386,16 +386,16 @@ void func_002C8348(char *particle)
     *(float *)(motion + 8) = FastAddRotations(*(float *)(motion + 8), *(float *)(motion + 0xC));
     *(float *)(self + 0xC) = *(float *)(self + 0xC) + *(float *)(motion + 0x10);
     *(float *)(self + 0x10) = *(float *)(*(char **)(self + 0x20)) +
-                            *(float *)(motion + 4) * FastSinOrCosA(*(float *)(motion + 8));
+                            *(float *)(motion + 4) * math_fast_sin_or_cos_a(*(float *)(motion + 8));
     *(float *)(self + 0x18) = *(float *)(*(char **)(self + 0x20) + 8) +
-                            *(float *)(motion + 4) * FastSinOrCosB(*(float *)(motion + 8));
+                            *(float *)(motion + 4) * math_fast_sin_or_cos_b(*(float *)(motion + 8));
     angleDiff = FastDiffRots(*(float *)(motion + 8), *(float *)(*(char **)(self + 0x20) + 0x10));
-    if (angleDiff < FloatAbs(*(float *)(motion + 0xC) + *(float *)(motion + 0xC)))
-        KillParticle(self);
+    if (angleDiff < math_fabs(*(float *)(motion + 0xC) + *(float *)(motion + 0xC)))
+        part_kill(self);
 }
 
 /* Updates a smoke-like particle that falls, drifts sideways and fades, and is removed when its life ends. */
-void func_002C8428(char *particle)
+void part_update_falling_smoke(char *particle)
 {
     char *self = particle;
     char *motion = particle + 0x20;
@@ -413,11 +413,11 @@ void func_002C8428(char *particle)
         *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(motion + 22);
     }
     Fbdd4a4aa_FUN_00282CC0(position, position, motion);
-    if (gGameTime % 10 == 0) {
+    if (g_game_time % 10 == 0) {
         if (groundHeight < *(float *)(self + 0x18)) {
             *(float *)(motion + 0x1C) = Fbdd4a4aa_FUN_00283B98(*(float *)(motion + 0x1C), 1.0f);
             lifeTotal = Fbdd4a4aa_FUN_00283198(*(float *)(motion + 0x1C));
-            Fbdd4a4aa_FUN_00282F20(drift, gActiveCamera, lifeTotal * 0.0075f);
+            Fbdd4a4aa_FUN_00282F20(drift, g_active_camera, lifeTotal * 0.0075f);
             Fbdd4a4aa_FUN_00282CC0(motion, motion, drift);
         }
     }
@@ -434,7 +434,7 @@ void func_002C8428(char *particle)
 }
 
 /* Removes a particle once its life runs out. */
-void func_002C85D8(char *particle)
+void part_remove_expired(char *particle)
 {
     if (Fc40b1162_FUN_00282978(particle + 10)) {
         Fc40b1162_FUN_002B9180(particle);
@@ -444,7 +444,7 @@ void func_002C85D8(char *particle)
 /* func_002C8610 is in 002C8610.c. */
 
 /* Updates a particle that fades while it drifts and falls. It is removed when its life runs out. */
-void func_002C87B0(char *particle)
+void part_update_fading_falling(char *particle)
 {
     char velocity[16];
     char *self = particle;
@@ -478,7 +478,7 @@ void func_002C87B0(char *particle)
  * address e is an integer: retail loads that vector's last two words only after
  * the first vector is stored, the order alias analysis gives an untraced base. */
 /* Updates a particle that changes colour, size and speed over its life, and may restart for a short time before it goes away. */
-void func_002C8CA0(char *particle)
+void part_update_color_changing(char *particle)
 {
     char *motion = particle + 32;
     int extraAddr = (int)particle + 48;
@@ -498,18 +498,18 @@ void func_002C8CA0(char *particle)
     speed0 = IntToFloat(*(unsigned char *)(motion + 28)) * (1.0f / 128);
     speed1 = IntToFloat(*(unsigned char *)(motion + 29)) * (1.0f / 128);
     scale = IntToFloat(*(unsigned char *)(motion + 15)) * (1.0f / 128);
-    TransformVectorOrCopy(particle + 16, particle + 16);
+    vec_transform_or_copy(particle + 16, particle + 16);
     t = IntToFloat(*(short *)(particle + 10));
     t /= IntToFloat(*(unsigned char *)(motion + 14)); inverse = 1.0f - t;
     if (!fading) {
         *(int *)(particle + 4) = FastTweenColor(0x103080, color, inverse) | (alpha << 24);
         *(float *)(particle + 12) = size0 + (size1 - size0) * inverse;
         speed0 += (speed1 - speed0) * inverse;
-        FastVecScale((char *)scaled, (char *)w, scale * Square(inverse));
+        FastVecScale((char *)scaled, (char *)w, scale * math_square(inverse));
     } else {
         speed0 = speed1;
         lifeNow = IntToFloat(alpha); lifeTotal = IntToFloat(alpha);
-        lifeTotal *= Square(inverse);
+        lifeTotal *= math_square(inverse);
         *(int *)(particle + 4) = color | (FloatToInt(lifeNow - lifeTotal) << 24);
         FastVecScale((char *)scaled, (char *)w, scale);
     }
@@ -522,12 +522,12 @@ void func_002C8CA0(char *particle)
             *(unsigned char *)(motion + 14) = 20;
             *(unsigned char *)(motion + 13) |= 1;
             *(short *)(particle + 10) = 20;
-        } else KillParticle(particle);
+        } else part_kill(particle);
     }
 }
 
 /* Updates a swirling particle that slows down, slowly fades out and is removed when it is fully faded. */
-void func_002C8F40(int *particle)
+void part_update_swirling(int *particle)
 {
     char *position = (char *)particle + 16;
     char *motion = (char *)particle + 32;
@@ -556,7 +556,7 @@ void func_002C8F40(int *particle)
 }
 
 /* Updates a particle that grows, drifts and slows down while it fades out, and is removed when its life ends. */
-void func_002C9098(char *particle)
+void part_update_growing_fading(char *particle)
 {
     char *motion = particle + 32;
     char *position = particle + 16;
@@ -570,15 +570,15 @@ void func_002C9098(char *particle)
     alphaByte = FloatToInt(fadeAmount * progress);
     colorWord = FastTweenColor(0, *(int *)(motion + 20), progress * 0.5f);
     *(char *)(particle + 8) = *(unsigned char *)(particle + 8) + 1;
-    growth = RandomFloatRange(0.004f, 0.012f);
+    growth = math_random_float_range(0.004f, 0.012f);
     *(float *)(particle + 12) = *(float *)(particle + 12) + growth * 210000.0f;
     FastVecAdd(position, position, motion);
     FastVecScale(motion, motion, 0.99f);
-    TransformVectorOrCopy(position, position);
-    TriggerCurrentStateEffect(motion, motion);
+    vec_transform_or_copy(position, position);
+    shop_trigger_current_state_effect(motion, motion);
     *(int *)(particle + 4) = colorWord | (alphaByte << 24);
     if (FastDecTimer(particle + 10) != 0) {
-        KillParticle(particle);
+        part_kill(particle);
     }
 }
 
@@ -587,7 +587,7 @@ void func_002C9098(char *particle)
 /* func_002C94C8 is defined in 002C94C8.c. */
 
 /* Finds a point along a looping path at position t. It can also give the direction the path is facing there. */
-void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, float t)
+void path_sample_position(char *path, int clamp, float *out, float *angles, int flags, float t)
 {
     float point0[4] __attribute__((aligned(16)));
     float point1[4] __attribute__((aligned(16)));
@@ -635,19 +635,19 @@ void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, 
         FastVecSub(dir12, point2, point1);
         lerp_vector(direction, dir01, dir12, t);
     }
-    angles[1] = -FastMatrixHelperA(vec_length_xy(direction), direction[2]);
-    angles[2] = FastMatrixHelperA(direction[0], direction[1]);
+    angles[1] = -mat_fast_helper_a(vec_length_xy(direction), direction[2]);
+    angles[2] = mat_fast_helper_a(direction[0], direction[1]);
     angles[3] = point0[3] * (1.0f - t) + point1[3] * t;
 }
 
 /* Returns a saved value that other menu code reads. */
-int func_002C9A50(void) {
+int menu_get_saved_value(void) {
     return D_001F2A30;
 }
 
 /* A15-struct-pad-20 freshly exact-verified under family reservation */
 /* Clears two fields in a fixed data block. */
-void func_002C9A60(void) {
+void menu_clear_block_fields(void) {
     BatchA_A15_u8 *p = D_L15_001FF640;
     *(BatchA_A15_u32 *)(p + 0xF0) = 0;
     *(BatchA_A15_u32 *)(p + 0x1F0) = 0;
@@ -655,14 +655,14 @@ void func_002C9A60(void) {
 
 /* A10-twin-base-32 freshly exact-verified under family reservation */
 /* Sets two fields in a fixed data block. */
-void func_002C9A78(void) {
+void menu_init_block_fields(void) {
     BatchA_A10_u8 *p = D_L03_001FF8C0;
     *(BatchA_A10_u32 *)(p + 0xF0) = (BatchA_A10_u32)D_L03_001FFAC0;
     *(BatchA_A10_u32 *)(p + 0x1F0) = 1;
 }
 
 /* Steps a ring-shaped list back to the previous filled entry. */
-void func_002C9A98(s32 *ring) {
+void menu_ring_list_step_backward(s32 *ring) {
  s32 *entries=ring+3; s32 index;
  do {
   index=--ring[1];
@@ -672,7 +672,7 @@ void func_002C9A98(s32 *ring) {
 }
 
 /* Steps a ring-shaped list forward to the next filled entry. */
-void func_002C9AD8(s32 *ring) {
+void menu_ring_list_step_forward(s32 *ring) {
  s32 lastIndex=ring[0]; s32 *entries=ring+3; s32 index;
  do {
   index=ring[1]+1;
@@ -682,22 +682,22 @@ void func_002C9AD8(s32 *ring) {
 }
 
 /* Tells the sound or menu system to turn off, then returns 0. */
-int func_002C9B18(void) {
+int menu_disable_subsystem(void) {
     if (D_001A8CFC[0] != 0)
-        SetPopupBoxValue(D_001A8CFC[0] + 0x3CAA8, 0);
+        popup_set_box_value(D_001A8CFC[0] + 0x3CAA8, 0);
     return 0;
 }
 
 /* Tells the sound or menu system to turn on, then returns 0. */
-int func_002C9B50(void) {
+int menu_enable_subsystem(void) {
     if (D_001A8CFC[0] != 0)
-        SetPopupBoxValue(D_001A8CFC[0] + 0x3CAA8, 1);
+        popup_set_box_value(D_001A8CFC[0] + 0x3CAA8, 1);
     return 0;
 }
 
 /* reads two object fields, forms centre plus and minus half of a third, and issues two five-argument draw calls taking an id-derived value and a fixed 64-bit attribute */
 /* Draws two small icons on either side of a menu item. Returns 0. */
-int func_002C9B88 (int *item)
+int menu_draw_item_side_icons (int *item)
 {
   int center = item[6];
   int halfWidth = item[8] >> 1;
@@ -706,16 +706,16 @@ int func_002C9B88 (int *item)
   int icon;
 
   icon = func_00288FB8_1 (4412);
-  DrawTextMediumFont (leftX, item[7], (long) 0x80f0f0f0, icon, -1);
+  text_draw_medium (leftX, item[7], (long) 0x80f0f0f0, icon, -1);
   icon = func_00288FB8_1 (4408);
-  DrawTextRightAlignedMediumFont (rightX, item[7], (long) 0x80f0f0f0, icon, -1);
+  text_draw_right_aligned_medium (rightX, item[7], (long) 0x80f0f0f0, icon, -1);
   return 0;
 }
 
 /* Resets the 20 saved menu slots to -1. */
-void func_002C9C20(void)
+void menu_reset_slots(void)
 {
-    char *menuState = gPauseMenuState;
+    char *menuState = g_pause_menu_state;
     int emptyValue = -1;
     int *slot = (int *)(menuState + 0x1BC);
     int i;
@@ -725,50 +725,50 @@ void func_002C9C20(void)
 }
 
 /* Sets up the pause menu state when the menu opens, including its screen links and starting values. */
-void func_002C9CF8(int mode)
+void menu_init_pause_state(int mode)
 {
-    SendSoundCommand22(0x5D);
+    snd_send_cmd22(0x5D);
     music_Pause(0);
-    ((State_2C9CF8 *)gPauseMenuState)->byteDB = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->byteDB = 0;
     snd_Pump();
-    ((State_2C9CF8 *)gPauseMenuState)->f0 = 1;
-    if (!gCurrentGameMode) ConfigureMenuChoiceList();
-    ((State_2C9CF8 *)gPauseMenuState)->f144 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f148 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)gPauseMenuState)->f108 ? 1 : 0;
-    ((Links_2C9CF8 *)D_00259918)->next = ((State_2C9CF8 *)gPauseMenuState)->fE8 ? D_00259AF8 : D_00259AA8;
-    ((Links_2C9CF8 *)D_00259AA8)->previous = ((State_2C9CF8 *)gPauseMenuState)->fE8 ? D_00259AF8 : D_00259918;
-    ((State_2C9CF8 *)gPauseMenuState)->f8 = ((State_2C9CF8 *)gPauseMenuState)->f104 ? (int)((State_2C9CF8 *)gPauseMenuState)->f104 : mode;
-    ((State_2C9CF8 *)gPauseMenuState)->f1C = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f20 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f120 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f1C0 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f1C4 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f1C8 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f0 = 1;
+    if (!g_current_game_mode) ConfigureMenuChoiceList();
+    ((State_2C9CF8 *)g_pause_menu_state)->f144 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f148 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)g_pause_menu_state)->f108 ? 1 : 0;
+    ((Links_2C9CF8 *)D_00259918)->next = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? D_00259AF8 : D_00259AA8;
+    ((Links_2C9CF8 *)D_00259AA8)->previous = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? D_00259AF8 : D_00259918;
+    ((State_2C9CF8 *)g_pause_menu_state)->f8 = ((State_2C9CF8 *)g_pause_menu_state)->f104 ? (int)((State_2C9CF8 *)g_pause_menu_state)->f104 : mode;
+    ((State_2C9CF8 *)g_pause_menu_state)->f1C = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f20 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f120 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f1C0 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f1C4 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f1C8 = 0;
     if (mode != 6) {
-        SetCurrentMapAndRefresh(gCurrentMapIndex);
-        UpdateEntryStates();
+        map_set_current_and_refresh(g_current_map_index);
+        menu_update_entry_states();
         D_0025B5F8 = 0;
-        UpdateUnlockMenuEntries();
+        menu_update_unlock_entries();
     }
-    ((State_2C9CF8 *)gPauseMenuState)->f150 = 0;
-    ((State_2C9CF8 *)gPauseMenuState)->f14C = 1;
+    ((State_2C9CF8 *)g_pause_menu_state)->f150 = 0;
+    ((State_2C9CF8 *)g_pause_menu_state)->f14C = 1;
 }
 
 /* Puts the saved screen picture back into video memory in strips. */
-void func_002C9E60(int fromEnd)
+void menu_restore_saved_screen_image(int fromEnd)
 {
     GsLoadImage2C9E60 image;
     int remaining;
     int destAddr;
     char *srcPtr;
-    char *state = gPauseMenuState;
+    char *state = g_pause_menu_state;
 
     *(int *)(state + 0xD0) = fromEnd != 0 ? 2 : 1;
-    WaitForDmaStatusBits(1);
-    GetGsCurrentField(0);
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598++;
-    remaining = gScreenHeight * 0x600;
+    remaining = g_screen_height * 0x600;
     srcPtr = *(char **)(state + 0x20);
     destAddr = D_001A72D4;
     if (fromEnd != 0)
@@ -777,9 +777,9 @@ void func_002C9E60(int fromEnd)
         func_00126288(&image, destAddr >> 8, 1, 0, 0, 0, 64, 64);
         destAddr += 0x4000;
         FlushCache(0);
-        ExecGsLoadImage(&image, srcPtr);
+        sceGsExecLoadImage(&image, srcPtr);
         srcPtr += 0x4000;
-        WaitGsPathsIdle(0, 0);
+        gfx_wait_paths_idle(0, 0);
     }
 }
 
@@ -813,73 +813,73 @@ typedef struct {
     int err;
 } PauseCardState;
 #define PAUSE ((PauseState *)D_001F2840)
-extern PauseCardState D_001393E0;
-extern int D_001A7424 __attribute__((sda));
+extern PauseCardState g_memcard_state;
+extern int g_save_menu_flags __attribute__((sda));
 extern int D_001B1684 __attribute__((sda));
 extern s32 D_001B18A4[] __attribute__((sda));
-extern void func_002DDEC8(void);
-extern void func_002CAA58(void);
-extern void func_002CAA88(void);
-extern void func_002CAAA0(void);
-extern void func_002CAB00(void);
-extern void func_002CADB0(void);
-extern int func_002E4AC8(void);
-extern void func_002B6658(void);
-extern void func_002CA5D0(void);
+extern void process_unlock_code_input(void);
+extern void menu_enter_pause_mode_two(void);
+extern void menu_enter_pause_mode_three(void);
+extern void menu_enter_pause_mode_four(void);
+extern void menu_update_pause_widgets(void);
+extern void menu_handle_pause_fade_timer(void);
+extern int UpdateSoundVoices(void);
+extern void moby_update_visible_objects(void);
+extern void menu_close_and_save_choices(void);
 
 /* Runs one frame of the pause menu and calls the handler for the current menu mode. */
-void func_002CA8A8(void)
+void menu_update_pause(void)
 {
     PAUSE->update_count = PAUSE->update_count > 31999 ? 32000 : PAUSE->update_count + 1;
     PAUSE->clear = 0;
     if (PAUSE->timer) --PAUSE->timer;
-    if (gMemcardState.state < 3 && gMemcardState.err < 0) ++PAUSE->card_error_frames;
+    if (g_memcard_state.state < 3 && g_memcard_state.err < 0) ++PAUSE->card_error_frames;
     else PAUSE->card_error_frames = 0;
     process_unlock_code_input();
-    if ((gSaveMenuFlags & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
-        if (!BeginSlotRequest(4, 1, 1, PAUSE->arg, 0)) return;
+    if ((g_save_menu_flags & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
+        if (!request_begin_slot(4, 1, 1, PAUSE->arg, 0)) return;
     }
     switch (PAUSE->mode) {
-    case 1: EnterPauseMenuMode2(); break;
-    case 2: EnterPauseMenuMode3(); break;
-    case 3: EnterPauseMenuMode4(); break;
-    case 4: UpdatePauseMenuWidgets(); break;
+    case 1: menu_enter_pause_mode_two(); break;
+    case 2: menu_enter_pause_mode_three(); break;
+    case 3: menu_enter_pause_mode_four(); break;
+    case 4: menu_update_pause_widgets(); break;
     case 5:
-        HandlePauseMenuFadeTimer();
+        menu_handle_pause_fade_timer();
         UpdateSoundVoices();
         D_0018A000[0] = 10;
         D_001B18A4[1] = 0;
         return;
     }
-    UpdateVisibleObjects();
+    moby_update_visible_objects();
     UpdateSoundVoices();
-    if (PAUSE->pending) CloseMenuAndSaveChoices();
+    if (PAUSE->pending) menu_close_and_save_choices();
 }
 #undef PAUSE
 
 /* Switches the pause menu to its second mode after a setup call. */
-void func_002CAA58(void)
+void menu_enter_pause_mode_two(void)
 {
-    EnterPauseMenuState();
+    menu_enter_pause_state();
     D_L00_001FEC40[0] = 2;
     D_L00_001FEC40[1] = 0;
 }
 
 /* A12-struct-2field-24 freshly exact-verified under family reservation */
 /* Switches the menu to mode 3. */
-void func_002CAA88(void) {
+void menu_enter_pause_mode_three(void) {
     BatchA_A12_BatchA24 *p = &D_L08_001FF980;
     p->a = 3;
     p->b = 0;
 }
 
 /* Switches the pause menu to mode 4 and remembers the previous choice. */
-void func_002CAAA0(void)
+void menu_enter_pause_mode_four(void)
 {
     int *menu;
 
-    SetClearColorPacket(0, 0, 0, 0x38);
-    menu = (int *)gPauseMenuState;
+    gfx_set_clear_color_packet(0, 0, 0, 0x38);
+    menu = (int *)g_pause_menu_state;
     if (menu[1] == 0)
         menu[1] = 1;
     menu[0] = 4;
@@ -889,47 +889,47 @@ void func_002CAAA0(void)
 }
 
 /* Counts down a menu timer and, when it ends, starts the screen change for the current menu mode. */
-void func_002CADB0(void)
+void menu_handle_pause_fade_timer(void)
 {
-    int framesLeft = ((GameState_1F2840 *)gPauseMenuState)->count;
+    int framesLeft = ((GameState_1F2840 *)g_pause_menu_state)->count;
 
     if (framesLeft != 0)
-        ((GameState_1F2840 *)gPauseMenuState)->count = framesLeft - 1;
-    if (((GameState_1F2840 *)gPauseMenuState)->count != 0)
+        ((GameState_1F2840 *)g_pause_menu_state)->count = framesLeft - 1;
+    if (((GameState_1F2840 *)g_pause_menu_state)->count != 0)
         return;
     if (D_001A63AC != 0)
         return;
-    if (((GameState_1F2840 *)gPauseMenuState)->mode == 2) {
-        EndSlotRequest(0, D_001C51D0);
-    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 3) {
-        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 4) {
-        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 6) {
-        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 5) {
-        BeginSlotRequest(2, 1, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0, 0);
+    if (((GameState_1F2840 *)g_pause_menu_state)->mode == 2) {
+        request_end_slot(0, D_001C51D0);
+    } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 3) {
+        request_begin_slot(1, 1, 0, ((GameState_1F2840 *)g_pause_menu_state)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 4) {
+        request_begin_slot(1, 1, 0, ((GameState_1F2840 *)g_pause_menu_state)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 6) {
+        request_begin_slot(1, 1, 0, ((GameState_1F2840 *)g_pause_menu_state)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 5) {
+        request_begin_slot(2, 1, ((GameState_1F2840 *)g_pause_menu_state)->fieldF4, 0, 0);
     } else {
-        EndSlotRequest(0, 0);
+        request_end_slot(0, 0);
     }
-    if (((GameState_1F2840 *)gPauseMenuState)->field40 != 0 &&
-        ((GameState_1F2840 *)gPauseMenuState)->field30 != ((GameState_1F2840 *)gPauseMenuState)->field40) {
+    if (((GameState_1F2840 *)g_pause_menu_state)->field40 != 0 &&
+        ((GameState_1F2840 *)g_pause_menu_state)->field30 != ((GameState_1F2840 *)g_pause_menu_state)->field40) {
         int entryId;
         int *rec;
-        PumpMusicAndDiscRead(1);
-        entryId = ((GameState_1F2840 *)gPauseMenuState)->field40;
-        rec = (int *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[entryId] * 0xE0);
+        snd_pump_music_and_disc_read(1);
+        entryId = ((GameState_1F2840 *)g_pause_menu_state)->field40;
+        rec = (int *)((char *)g_weapon_table + g_item_slot_to_record[entryId] * 0xE0);
         LoadClassIntoFreeCacheSlot(rec[5]);
-        PumpMusicAndDiscRead(1);
+        snd_pump_music_and_disc_read(1);
     }
-    PumpMusicAndDiscRead(1);
+    snd_pump_music_and_disc_read(1);
 }
 
 /* func_002CB820 reads $gp slots: it is defined in 002C7748-g8.c. */
 
 
 /* Says whether a menu item number is in the allowed range. Returns 1 if so, else 0. */
-s32 func_002CB4E8(s32 index) {
+s32 menu_is_index_allowed(s32 index) {
  s32 result=0;
  if(index<0x15 || index==0x18) result=1;
  return result;
@@ -940,24 +940,24 @@ s32 func_002CB4E8(s32 index) {
 /* func_002CB648 is defined in 002CB648-g8.c. */
 
 /* Handles one menu step: step 0 accepts, step 1 asks another menu function. */
-int func_002CB7D0(int mode)
+int menu_handle_step_simple(int mode)
 {
     int result = 0;
     switch (mode) {
     case 0: result = 1; break;
-    case 1: result = SendMenuRequest(3, D_0025BA90); break;
+    case 1: result = menu_send_request(3, D_0025BA90); break;
     }
     return result;
 }
 
 /* Handles one menu step with three cases: accept, ask another function, or run a reset. */
-int func_002CBA58(int mode)
+int menu_handle_step_with_reset(int mode)
 {
     int result = 0;
     switch (mode) {
     case 0: D_0018A000[0] = 10; result = 1; break;
-    case 1: result = SendMenuRequest(3, D_0025BA90); break;
-    case 2: SetLevelDependentValue(); result = 1; break;
+    case 1: result = menu_send_request(3, D_0025BA90); break;
+    case 2: level_set_dependent_value(); result = 1; break;
     }
     return result;
 }
@@ -967,19 +967,19 @@ int func_002CBA58(int mode)
 /* func_002CBC58 is in 002C7748-panels-g8.c. */
 
 /* Checks whether a button press belongs to this menu item and says if it was accepted. */
-int func_002CC490(int itemId)
+int menu_check_item_input(int itemId)
 {
-    if (*(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE8) != itemId)
+    if (*(int *)(((CallbackState_2CC490 *)g_pause_menu_state)->source + 0xE8) != itemId)
         return 0;
-    if ((((GameState_2CC490 *)gPadState)->flags & 0x900) != 0 &&
-        ((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0)
+    if ((((GameState_2CC490 *)g_pad_state)->flags & 0x900) != 0 &&
+        ((CallbackState_2CC490 *)g_pause_menu_state)->fallback == 0)
         return 1;
-    if ((((GameState_2CC490 *)gPadState)->flags & 0x10) != 0) {
-        int value = *(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE0);
+    if ((((GameState_2CC490 *)g_pad_state)->flags & 0x10) != 0) {
+        int value = *(int *)(((CallbackState_2CC490 *)g_pause_menu_state)->source + 0xE0);
         int result;
         if (value != 0)
-            ((CallbackState_2CC490 *)gPauseMenuState)->value = value;
-        else if (((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0) {
+            ((CallbackState_2CC490 *)g_pause_menu_state)->value = value;
+        else if (((CallbackState_2CC490 *)g_pause_menu_state)->fallback == 0) {
             result = -1;
             goto done;
         }
@@ -996,29 +996,29 @@ done:
    materialisations in the loop preheader keep a separate %hi temporary). */
 
 /* Does nothing and returns 0. */
-int func_002CC690(void) {
+int menu_return_zero_a(void) {
     return 0;
 }
 
 /* Does nothing and returns 0. */
-int func_002CC698(void) {
+int menu_return_zero_b(void) {
     return 0;
 }
 
 /* Sets a field in an object to -1 and returns 0. */
-s32 func_002CC6A0(u8 *obj) { *(s32 *)(obj + 0x44) = -1; return 0; }
+s32 menu_clear_object_handle(u8 *obj) { *(s32 *)(obj + 0x44) = -1; return 0; }
 
 /* func_002CC6B0 is defined in 002CC6B0-hud-g8.c. */
 
 /* Handles a button press on a menu entry, switching the selected entry and its enabled flag. */
-int func_002CCF68(char *obj)
+int menu_handle_entry_input(char *obj)
 {
     int oldSelection;
     int kind;
     MenuEntry_2CCF68 *entry;
 
-    if (*(char **)(*(char **)(gPauseMenuState + 0x14) + 0xE8) != obj) goto fallback;
-    if ((((InputState_2CCF68 *)gPadState)->flags & ~0x40) != 0 && obj == D_00259148) return 0;
+    if (*(char **)(*(char **)(g_pause_menu_state + 0x14) + 0xE8) != obj) goto fallback;
+    if ((((InputState_2CCF68 *)g_pad_state)->flags & ~0x40) != 0 && obj == D_00259148) return 0;
     oldSelection = D_001B1680;
     if (D_001A8B84) goto fallback;
     entry = (MenuEntry_2CCF68 *)(*(int *)(obj + 0x40) * 12 + *(int *)(obj + 0x34));
@@ -1029,7 +1029,7 @@ int func_002CCF68(char *obj)
         D_001B1680 = 1;
         return 0;
     }
-    if (((InputState_2CCF68 *)gPadState)->flags & 0x40) {
+    if (((InputState_2CCF68 *)g_pad_state)->flags & 0x40) {
         if (obj == D_00259198) {
             D_001A8B84 = D_001A7BC9.value != 0;
             D_001B1680 = 1;
@@ -1055,7 +1055,7 @@ fallback:
 }
 
 /* Handles menu button input and picks the right handler for the current screen. Plays a sound if input was used. */
-int func_002CD0E8(void)
+int menu_handle_button_input(void)
 {
     unsigned int flags = D_00138344;
     int handled = 0;
@@ -1064,33 +1064,33 @@ int func_002CD0E8(void)
         handled = 1;
     } else if (flags & 0x40) {
         handled = func_0029C168(flags);
-        if (EmptyStubF7C8() && EmptyStubF7D0()) {
-            handled = HandleMenuCommand(handled);
-        } else if (EmptyStubF7E0()) {
-            handled = HandleMenuModeAction(handled);
-        } else if (EmptyStubF7D8()) {
-            handled = HandleMenuStepWithReset(handled);
-        } else if (EmptyStubF7F0() == 0x31) {
-            handled = HandleMenuStepSimple(handled);
-        } else if (EmptyStubF7E8()) {
-            handled = HandleMenuStepSimple(handled);
-        } else if (EmptyStubF7F0() == 0x1C) {
-            handled = HandleMenuStepSimple(handled);
+        if (stub_empty_23() && stub_empty_24()) {
+            handled = menu_handle_command(handled);
+        } else if (stub_empty_26()) {
+            handled = menu_handle_mode_action(handled);
+        } else if (stub_empty_25()) {
+            handled = menu_handle_step_with_reset(handled);
+        } else if (stub_empty_28() == 0x31) {
+            handled = menu_handle_step_simple(handled);
+        } else if (stub_empty_27()) {
+            handled = menu_handle_step_simple(handled);
+        } else if (stub_empty_28() == 0x1C) {
+            handled = menu_handle_step_simple(handled);
         } else {
-            handled = RunMenuActionByIndex(handled);
+            handled = menu_run_action_by_index(handled);
         }
     } else {
         func_0029C168(flags);
     }
 
     if (handled) {
-        PlaySoundFromGlobalBank(0x12, 0, 0);
+        snd_play_from_global_bank(0x12, 0, 0);
     }
     return handled;
 }
 
 /* Runs three setup calls and returns 0. */
-int func_002CD220(void)
+int menu_run_setup_calls(void)
 {
   SetupGifPaging(0);
   func_0029C138();
@@ -1101,18 +1101,18 @@ int func_002CD220(void)
 /* func_002CD3C0 is defined in 002CD3C0.c. */
 
 /* Handles menu input and keeps the menu flags in step with the current selection. */
-int func_002CD4E0(void)
+int menu_update_input_flags(void)
 {
     int scratch[4];
-    int first = GetUiSettingValue();
+    int first = menu_get_setting_value();
     int result = 0;
     int flags = D_00138344;
 
     if (flags & 0x10) {
-        int value = *(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE0);
+        int value = *(int *)(((CallbackState_2CC490 *)g_pause_menu_state)->source + 0xE0);
         if (value != 0)
-            ((CallbackState_2CC490 *)gPauseMenuState)->value = value;
-        else if (((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0) {
+            ((CallbackState_2CC490 *)g_pause_menu_state)->value = value;
+        else if (((CallbackState_2CC490 *)g_pause_menu_state)->fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -1128,7 +1128,7 @@ return_value:
     }
 
     if (D_001A8CFC[0] != 0) {
-        int second = GetUiSettingValue();
+        int second = menu_get_setting_value();
         if (first == second && D_001A63AC == 0 &&
             ((D_00259C78.handle == second && D_00259C78.state == 2) ||
              (D_00259C78.last == second && D_00259C78.state == 4))) {

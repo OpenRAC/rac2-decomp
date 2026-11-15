@@ -12,15 +12,15 @@ typedef struct {
     u64 mode;
 } Packet;
 
-extern void func_00283658(void *, void *);
+extern void copy_matrix_rotation(void *, void *);
 extern void func_L03_002EFB60(void *, void *, float);
-extern float func_00283198(float);
-extern u64 func_0027C878(int);
-extern int func_00283D38(int, int, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern float math_fast_sin_or_cos_b(float);
+extern u64 GetEffectTextureDescriptor(int);
+extern int FastTweenColor(int, int, float);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 extern int D_L03_001B0070 __attribute__((sda));
 extern int D_L03_001B0074 __attribute__((sda));
 extern int D_L03_001B0078 __attribute__((sda));
@@ -39,7 +39,7 @@ extern int D_L03_001B0108[] SDATA(D_L03_001B0108);
 extern TI128 D_L03_001B0120[] SDATA(D_L03_001B0120);
 
 /* Draws the spinning rotor obj as stacked flat rings, using its spin, wobble and fade values. */
-void func_L03_003C6208(char *obj)
+void rotor_draw(char *obj)
 {
     Packet quad;
     float rotation[12];
@@ -53,8 +53,8 @@ void func_L03_003C6208(char *obj)
         func_L03_002EFB60(worldMatrix, worldMatrix, state[0]);
     qcopy(&worldMatrix[12], obj + 0x10);
     worldMatrix[15] = 1.0f;
-    blend = FastSinOrCosB(state[1]) * 0.5f + 0.5f;
-    intensity = FastSinOrCosB(state[4]) * 0.5f + 0.5f;
+    blend = math_fast_sin_or_cos_b(state[1]) * 0.5f + 0.5f;
+    intensity = math_fast_sin_or_cos_b(state[4]) * 0.5f + 0.5f;
     quad.tex = GetEffectTextureDescriptor(D_L03_001B0070);
     quad.mode = ((u64)D_L03_001B007C << 2) |
         ((u64)D_L03_001B0080 << 6) | ((u64)0x8000 << 24);

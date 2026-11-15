@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,13 +24,13 @@
  */
 #include "common.h"
 
-extern s32 func_00115F28(s32);
-extern s32 *func_001236C8(void *, s32);
-extern s32 func_00123930(s32);
-extern void func_00123978(s32, void *, void *, void *);
+extern s32 malloc(s32);
+extern s32 *eh_sort_fde_vector(void *, s32);
+extern s32 eh_count_fde_records(s32);
+extern void eh_collect_fde_records(s32, void *, void *, void *);
 
 /* Gathers and sorts the frame records of a code module the first time they are needed. */
-void func_00123A00(void *module) {
+void eh_init_object(void *module) {
     u32 builder[6];
     s32 *listCursor;
     s32 *fdeLists;
@@ -43,17 +44,17 @@ void func_00123A00(void *module) {
         total = 0;
         if (*listCursor != 0) {
             do {
-                total += CountUsableFdeRecords(*listCursor);
+                total += eh_count_fde_records(*listCursor);
                 listCursor++;
             } while (*listCursor != 0);
         }
     } else {
-        total = CountUsableFdeRecords((*(s32 *)((s8 *)(module) + (8))));
+        total = eh_count_fde_records((*(s32 *)((s8 *)(module) + (8))));
     }
     byteCount = total * 4;
     (*(s32 *)((s8 *)(module) + (0x10))) = total;
-    builder[0] = Malloc(byteCount);
-    builder[2] = Malloc(byteCount);
+    builder[0] = malloc(byteCount);
+    builder[2] = malloc(byteCount);
     builder[4] = 0xFFFFFFFF;
     builder[1] = 0;
     builder[3] = 0;
@@ -63,14 +64,14 @@ void func_00123A00(void *module) {
         listCursor = fdeLists2;
         if (*listCursor != 0) {
             do {
-                CollectFdeRecords(*listCursor, builder, &builder[4], &builder[5]);
+                eh_collect_fde_records(*listCursor, builder, &builder[4], &builder[5]);
                 listCursor++;
             } while (*listCursor != 0);
         }
     } else {
-        CollectFdeRecords((*(s32 *)((s8 *)(module) + (8))), builder, &builder[4], &builder[5]);
+        eh_collect_fde_records((*(s32 *)((s8 *)(module) + (8))), builder, &builder[4], &builder[5]);
     }
-    (*(s32 **)((s8 *)(module) + (0xC))) = SortFdeVector(builder, total);
+    (*(s32 **)((s8 *)(module) + (0xC))) = eh_sort_fde_vector(builder, total);
     (*(s32 *)((s8 *)(module) + (0))) = builder[4];
     (*(s32 *)((s8 *)(module) + (4))) = builder[5];
 }

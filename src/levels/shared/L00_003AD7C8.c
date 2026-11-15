@@ -18,23 +18,23 @@ typedef struct {
     RotorVector position, direction;
 } RotorStatePrefix;
 extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 /* Four measured Euler lanes; both externally owned views remain unbounded.
  * Retail writes X and passes the full vector through GP, Y/Z/W absolutely. */
 extern RotorVector D_L00_001AF7C0[] MACRO_ADDR;
 extern RotorVector D_L00_001AF7C0_gp[] SDATA(D_L00_001AF7C0) __attribute__((sda));
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283CE0(int);
-extern float func_00283C28(float);
-extern void func_00283410(void *, void *);
-extern void func_00283788(void *, void *, void *);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float IntToFloat(int);
+extern float math_fast_float_g(float);
+extern void euler_to_matrix(void *, void *);
+extern void multiply_matrix(void *, void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws two flat spinning pictures at the object, one for each side. */
-void func_L00_003AD7C8(unsigned char *object)
+void gfx_draw_spinning_quad_pair(unsigned char *object)
 {
     RotorQuad quad;
     RotorMatrix model, phaseMatrix;
@@ -52,12 +52,12 @@ void func_L00_003AD7C8(unsigned char *object)
         unsigned long texture;
         float radius = square_root(state->direction.x * state->direction.x +
                                     state->direction.z * state->direction.z);
-        angles.x = FastAddRotations(-FastMatrixHelperA(radius, state->direction.y), 1.5707963705062866f);
-        angles.y = FastMatrixHelperA(state->direction.z, state->direction.x);
+        angles.x = FastAddRotations(-mat_fast_helper_a(radius, state->direction.y), 1.5707963705062866f);
+        angles.y = mat_fast_helper_a(state->direction.z, state->direction.x);
         angles.z = 0.0f;
         angles.w = 0.0f;
         D_L00_001AF7C0_gp[0].x = 0.0f;
-        phase = FastFloatHelperG(IntToFloat(gFrameCounter_L00 % 180) * 0.03490659f);
+        phase = math_fast_float_g(IntToFloat(g_frame_l00_counter % 180) * 0.03490659f);
         if (side)
             phase = -phase;
         D_L00_001AF7C0[0].y = phase;

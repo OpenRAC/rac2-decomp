@@ -8,15 +8,15 @@ extern char r1_D_0015B108[];
 extern int r1_D_0015B180;
 
  /* exit */
-extern void func_00128898(void *, ...);
+extern void debug_print_stub(void *, ...);
 
-extern int func_00128440(int);
+extern int dbc_set_dma_buffer(int);
 
 extern char r1_D_00153658[];
 
 extern char r1_D_00153678[];
 
-extern int func_001284B0(void *, int, int);
+extern int sceDbcCreateSocket(void *, int, int);
 
 extern int r1_func_0011D960(void);
 
@@ -37,7 +37,7 @@ extern void *memcpy(void *, const void *, unsigned int);
 
 extern char r1_D_001536B8[];
 
-extern int func_00128578(int);
+extern int sceDbcGetDepNumber(int);
 
 extern void r1_func_00119288(void *a, void *b);
 
@@ -57,7 +57,7 @@ extern char r1_D_001537A0[];
    success path is the branch target, letting the result load sit in the
    bgez delay slot. */
 /* Gives the controller server the shared buffer to use. */
-int func_00128440(int bufferAddr) {
+int dbc_set_dma_buffer(int bufferAddr) {
     int *request = &r1_D_0015B180;
 
     request[1] = bufferAddr;
@@ -65,7 +65,7 @@ int func_00128440(int bufferAddr) {
                       request, 0x400, 0, 0) >= 0) {
         return r1_D_0015B180;
     } else {
-        DebugPrintStub(r1_D_00153658);
+        debug_print_stub(r1_D_00153658);
         return 0;
     }
 }
@@ -84,7 +84,7 @@ int func_00128440(int bufferAddr) {
    precomputed so each byte address is one base+index add, and the call
    re-takes &r1_D_0015B180 for its buffer arguments. */
 /* Asks the controller server to create a socket for a controller port. Returns 0 on failure. */
-int func_001284B0(void *socketRecord, int port, int mode) {
+int sceDbcCreateSocket(void *socketRecord, int port, int mode) {
     int *request = &r1_D_0015B180;
     char *namesrc = (char *)socketRecord + 0x14;
     char *namedst = (char *)request + 0x14;
@@ -102,7 +102,7 @@ int func_001284B0(void *socketRecord, int port, int mode) {
     }
     if (r1_func_0011B4C8(r1_D_0015B108, 0x80000901, 0, &r1_D_0015B180, 0x400,
                        &r1_D_0015B180, 0x400, 0, 0) < 0) {
-        DebugPrintStub(r1_D_00153678);
+        debug_print_stub(r1_D_00153678);
         return 0;
     }
     return request[9];
@@ -122,7 +122,7 @@ int func_001284B0(void *socketRecord, int port, int mode) {
  * buffer share retail's saved register.
  */
 /* Finds out which device is plugged into a controller port. Returns a negative number if nothing is linked. */
-int func_00128578(int port) {
+int sceDbcGetDepNumber(int port) {
     int *request;
 
     r1_func_00119288(r1_D_0015B580, r1_D_0015B580 + 0x80);
@@ -136,7 +136,7 @@ int func_00128578(int port) {
     request[0] = port;
     if (r1_func_0011B4C8(r1_D_0015B108, 0x80000903, 0, &r1_D_0015B180, 0x400,
                        &r1_D_0015B180, 0x400, 0, 0) < 0) {
-        DebugPrintStub(r1_D_001536B8);
+        debug_print_stub(r1_D_001536B8);
         return 0;
     }
     return request[1];
@@ -149,7 +149,7 @@ int func_00128578(int port) {
    arms of the copy guard with one return; two returns would be
    cross-jumped into one. */
 /* Sends a command to the controller server and copies the reply bytes to the caller. */
-int func_001287A8(int port, int command, int *countPtr, char *dst) {
+int dbc_send_command(int port, int command, int *countPtr, char *dst) {
     int *request = &r1_D_0015B180;
     unsigned char *src;
     int i;
@@ -159,7 +159,7 @@ int func_001287A8(int port, int command, int *countPtr, char *dst) {
     request[1] = command;
     request[2] = *countPtr;
     if (r1_func_0011B4C8(r1_D_0015B108, 0x8000091A, 0, request, 0x400, request, 0x400, 0, 0) < 0) {
-        DebugPrintStub(r1_D_001537A0);
+        debug_print_stub(r1_D_001537A0);
         return 0;
     }
     result = request[0x23];

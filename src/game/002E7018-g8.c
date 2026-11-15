@@ -8,21 +8,21 @@ extern unsigned int ref_L00_00361F20_00 __attribute__((sda));
 extern unsigned int ref_L00_00361F20_01 __attribute__((sda));
 extern unsigned int ref_L00_00361F20_02 __attribute__((sda));
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned long long D_001B2160;
 extern float D_00261EC0[];
 
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_00282B50(unsigned char *, unsigned char *, int);
-extern void func_00282D30(unsigned char *, unsigned char *, float);
-extern void func_00282CC0(unsigned char *, unsigned char *, unsigned char *);
-extern void func_00280B90(unsigned char *, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void mem_fast_helper_c(unsigned char *, unsigned char *, int);
+extern void FastVecScale(unsigned char *, unsigned char *, float);
+extern void FastVecAdd(unsigned char *, unsigned char *, unsigned char *);
+extern void draw_world_quad(unsigned char *, int, int);
 
 /* Builds the four quads of one draw call: the scale comes from the resident
    mode word indexing a float table, every quad carries the grey 0x80808080,
    and the block copied out of small data also carries the four render packet
    words. */
-void func_002E8190(void)
+void gfx_draw_overlay_quads(void)
 {
     unsigned char verts[4][16];
     int colors[4];
@@ -40,9 +40,9 @@ void func_002E8190(void)
     *(unsigned long long *)(buf + 0x28) = packet;
     *(unsigned long long *)(buf + 0x30) = 0xFF9000000260ULL;
     *(unsigned long long *)(buf + 0x38) = 0x8000000044ULL;
-    FastMemoryHelperC(buf, (unsigned char *)&ref_L00_00361F20_00, 0x20);
+    mem_fast_helper_c(buf, (unsigned char *)&ref_L00_00361F20_00, 0x20);
 
-    mode = gCurrentMapIndex;
+    mode = g_current_map_index;
     if (mode < 0x13) {
         scale = D_00261EC0[mode];
     }
@@ -76,15 +76,15 @@ typedef struct {
 
 extern SelectionFlags D_00139768;
 extern char D_001A63A8_3[];
-extern int func_002EBC70(int);
-extern int func_002EBDF0(int);
+extern int PlayBonusReelWithGameLoop(int);
+extern int mpeg_play_movie_by_id(int);
 
 /* Acts on the state the program names: raises the flag bits that belong to
    that state in the resident state block, then has the two state machines
    take it (each one stops the rest when it answers that it is busy). The
    selector's pending byte is cleared on the way in and set on the way out,
    and the program is told the selection ended in state 6. */
-void func_002EC1C0(void)
+void scene_start_sequence_for_state(void)
 {
     int stateId = ref_L00_00365F50_00;
 
@@ -94,33 +94,33 @@ void func_002EC1C0(void)
         D_00139768.f00 |= 2;
         D_00139768.fa8 |= 0x600;
         if (PlayBonusReelWithGameLoop(0xA9)) goto done;
-        if (PlayMovieById(1)) goto done;
+        if (mpeg_play_movie_by_id(1)) goto done;
         PlayBonusReelWithGameLoop(0xAA);
     } else if (stateId == 0x17) {
-        PlayMovieById(0x17);
+        mpeg_play_movie_by_id(0x17);
     } else if (stateId == 0xAB) {
         D_00139768.fa8 |= 0x800;
         D_00139768.f18 = (D_00139768.f18 & 0xFEFFFFFF) | 0x1000000;
         D_00139768.fac |= 0x1000;
         if (PlayBonusReelWithGameLoop(0xAB)) goto done;
-        if (PlayMovieById(0x18)) goto done;
+        if (mpeg_play_movie_by_id(0x18)) goto done;
         PlayBonusReelWithGameLoop(0xAC);
     } else if (stateId == 0xAD) {
         D_00139768.f18 = (D_00139768.f18 & 0xFDFFFFFF) | 0x2000000;
         D_00139768.fac |= 0x6000;
         if (PlayBonusReelWithGameLoop(0xAD)) goto done;
-        if (PlayMovieById(0x19)) goto done;
+        if (mpeg_play_movie_by_id(0x19)) goto done;
         PlayBonusReelWithGameLoop(0xAE);
     } else if (stateId == 0x1A) {
-        PlayMovieById(0x1A);
+        mpeg_play_movie_by_id(0x1A);
     } else if (stateId == 0x1B) {
-        PlayMovieById(0x1B);
+        mpeg_play_movie_by_id(0x1B);
     } else if (stateId == 0xAF) {
         D_00139768.fac |= 0x8000;
         D_00139768.f1c = (D_00139768.f1c & 0xEFFFFFFF) | 0x10000000;
         D_00139768.fb0 = (D_00139768.fb0 & 0xFFFEFFFF) | 0x10000;
         if (PlayBonusReelWithGameLoop(0xAF)) goto done;
-        if (PlayMovieById(0x1C)) goto done;
+        if (mpeg_play_movie_by_id(0x1C)) goto done;
         PlayBonusReelWithGameLoop(0xB0);
     }
 done:
@@ -197,16 +197,16 @@ struct State2EB598 {
     struct Moby2EB598 *slots[1];
 };
 
-extern struct State2EB598 D_001B8840;
+extern struct State2EB598 g_scene_playback_state;
 extern struct Moby2EB598 *ref_L00_002EB598_00 __attribute__((sda));
 
-extern void func_0011AEA0(int);
-extern void func_0029D4D0(int, int);
-extern struct Moby2EB598 *func_0029EFD0(int);
-extern void func_0029F0C8(struct Moby2EB598 *, int);
+extern void FlushCache(int);
+extern void fast_decompress(int, int);
+extern struct Moby2EB598 *CreateMoby(int);
+extern void moby_init_instance(struct Moby2EB598 *, int);
 
 /* Creates a moby for every part of a model record and links the parts to the model data. */
-void func_002EB598(void)
+void moby_spawn_model_parts(void)
 {
     struct ModelRec2EB598 *rec;
     struct Moby2EB598 *mob;
@@ -221,24 +221,24 @@ void func_002EB598(void)
     int tableOffset;
 
     FlushCache(0);
-    fast_decompress(gScenePlaybackState.unk70, (int)gScenePlaybackState.rec);
+    fast_decompress(g_scene_playback_state.unk70, (int)g_scene_playback_state.rec);
     FlushCache(0);
 
-    rec = gScenePlaybackState.rec;
-    gScenePlaybackState.unk38 = 0;
+    rec = g_scene_playback_state.rec;
+    g_scene_playback_state.unk38 = 0;
     partOffsets = rec->part_off;
-    gScenePlaybackState.unk40 = rec->flags;
+    g_scene_playback_state.unk40 = rec->flags;
     tableOffset = rec->part_count;
-    gScenePlaybackState.unk48 = rec->pad08;
-    gScenePlaybackState.num_parts = rec->num_parts;
-    gScenePlaybackState.unk68 = (u32)rec + rec->end_off;
+    g_scene_playback_state.unk48 = rec->pad08;
+    g_scene_playback_state.num_parts = rec->num_parts;
+    g_scene_playback_state.unk68 = (u32)rec + rec->end_off;
     if (tableOffset < 0x400) {
-        gScenePlaybackState.unk4C = 0;
+        g_scene_playback_state.unk4C = 0;
     } else {
-        gScenePlaybackState.unk4C = (u32)rec + tableOffset;
+        g_scene_playback_state.unk4C = (u32)rec + tableOffset;
     }
 
-    for (i = 0; i < gScenePlaybackState.num_parts; i++) {
+    for (i = 0; i < g_scene_playback_state.num_parts; i++) {
         off = *partOffsets++;
         partData = (int *)((u8 *)rec + off);
         id = partData[0];
@@ -248,11 +248,11 @@ void func_002EB598(void)
         if (id == 0x215 /* moby class 533 */) {
             id = 0xD54 /* moby class 3412 */;
         }
-        mob = gScenePlaybackState.slots[i];
+        mob = g_scene_playback_state.slots[i];
         if (mob == 0) {
             if (id == 0) {
                 mob = ref_L00_002EB598_00;
-                InitMobyInstance(mob, 0);
+                moby_init_instance(mob, 0);
             } else {
                 mob = CreateMoby(id);
             }
@@ -272,9 +272,9 @@ void func_002EB598(void)
             mob->parts->used = idx + 1;
             mob->idx = idx;
             mob->slot = idx;
-            gScenePlaybackState.slots[i] = mob;
+            g_scene_playback_state.slots[i] = mob;
             if (mob->class_id == 0xD54 /* moby class 3412 */) {
-                gScenePlaybackState.unk54 = (u32)mob;
+                g_scene_playback_state.unk54 = (u32)mob;
             }
         }
         mob->model = endp;

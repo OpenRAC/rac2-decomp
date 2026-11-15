@@ -13,12 +13,12 @@ extern int D_L00_001B2D30[] MACRO_ADDR;
 extern Q128 D_L00_001B2CC0[] MACRO_ADDR;
 extern Q128 D_L00_00254A60[];
 extern Q128 D_L00_00254A50[];
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Resets the Sheepinator beam: sets up the start points of its twelve segments and clears its sparks. */
-void func_L00_00406040(char *owner)
+void sheepinator_reset_beam(char *owner)
 {
     char local[16] __attribute__((aligned(16)));
     char *inner;

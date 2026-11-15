@@ -9,10 +9,10 @@ extern struct {
 } D_001F2840;
 
 /* Stores 1.0 and the inverse of the given value in the pause state block and clears its mode. */
-void func_002C9C60(float value)
+void menu_set_pause_scale_inverse(float value)
 {
     float inverse = 1.0f / value;
-    gPauseMenuState.one = 1.0f;
-    gPauseMenuState.reciprocal = inverse;
-    gPauseMenuState.mode = 0;
+    g_pause_menu_state.one = 1.0f;
+    g_pause_menu_state.reciprocal = inverse;
+    g_pause_menu_state.mode = 0;
 }

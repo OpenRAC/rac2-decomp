@@ -23,46 +23,46 @@ typedef struct {
     char padE0[0x21B0];
     char *targetObject;
 } SiberiusPlayerView;
-extern SiberiusPlayerView D_00189E20;
+extern SiberiusPlayerView g_hero_state;
 extern char *D_L07_001B23CC[] __attribute__((sda));
 extern float D_L07_001A8F20[] __attribute__((sda));
 
 extern void func_PAL_L07_003EF670(void *);
 extern void func_PAL_L07_003EFEA0(void *);
-extern void func_L07_003EB700(void *);
-extern void func_002A7750(void *, int, int);
+extern void entity_tick_timers_ride_platform(void *);
+extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_0029F338(void *);
-extern void func_L00_00424A08(int, float, float);
-extern void func_L00_00424A50(float, float);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002AD330(void *, void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
+extern void moby_mark_spawned(void *);
+extern void follow_camera_set_distance(int, float, float);
+extern void follow_camera_set_height(float, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_transform_point_by_attachment(void *, void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void func_PAL_00329890(void *, void *, void *, int, int, float);
-extern void func_00283098(void *, void *, void *);
-extern void func_L02_003329C8(void *, void *, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void moby_aim_move_record_at_target(void *, void *, float, float);
 extern void func_PAL_L07_00324F58(void *, float, float, float);
 extern int func_PAL_L02_00333638(void *, void *, int, float, float, float);
-extern int func_L01_00322288(void *, float);
+extern int moby_start_effect_from_entry(void *, float);
 extern int func_PAL_L01_00323068(void *, void *);
-extern int func_002A7820(int, int);
-extern int func_002B1C20(void *, void *);
-extern int func_002B3868(void *);
+extern int math_random_int_range(int, int);
+extern int moby_dispatch_action_by_kind(void *, void *);
+extern int flag_set_first_pending(void *);
 extern int func_PAL_002AF6C0(void *, float);
-extern int func_002A77E0(int);
-extern int func_002A8508(int, int);
-extern int func_002ACBC8(void *, int);
-extern float func_00282DB0(void *, void *);
-extern float func_00283180(float);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_002A78D8(float, float);
-extern float func_00283B98(float, float);
-extern float func_002A7878(float, float);
+extern int math_random_int_below(int);
+extern int moby_count_group_not_in_state(int, int);
+extern int IsPointInCuboid(void *, int);
+extern float FastVecDot(void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern float math_random_float_range(float, float);
 
 /* Update the phase and behavior state, then run the common update pass. */
 void func_PAL_L07_003EEC8C(unsigned char *object)
@@ -82,146 +82,146 @@ void func_PAL_L07_003EEC8C(unsigned char *object)
     func_PAL_L07_003EF670(object);
     switch (object[0x95]) {
     case 0:
-        if (INT_AT(state, 0x2DC) == 1) func_002A7750(object, 5, 2);
+        if (INT_AT(state, 0x2DC) == 1) moby_set_state(object, 5, 2);
         else if (INT_AT(state, 0x2D0)) {
-            func_002A7750(object, 2, 1);
+            moby_set_state(object, 2, 1);
             INT_AT(state, 0x2D0) = 0;
-            if (INT_AT(state, 0x2D4) < 250) INT_AT(state, 0x2D4) = ((s32)(func_002A7820(480, 600)) * 5 + 2) / 6;
+            if (INT_AT(state, 0x2D4) < 250) INT_AT(state, 0x2D4) = ((s32)(math_random_int_range(480, 600)) * 5 + 2) / 6;
         }
         break;
     case 1:
-        if (INT_AT(state, 0x2DC) == 1) func_002A7750(object, 5, 2);
-        else if (INT_AT(state, 0x2D4) == 0) func_002A7750(object, 1, 0);
+        if (INT_AT(state, 0x2DC) == 1) moby_set_state(object, 5, 2);
+        else if (INT_AT(state, 0x2D4) == 0) moby_set_state(object, 1, 0);
         break;
     case 2:
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
         if (INT_AT(state, 0x2DC) != 1) {
-            func_002A7750(object, 2, 1);
-            INT_AT(state, 0x2D4) = ((s32)(func_002A7820(580, 600)) * 5 + 2) / 6;
+            moby_set_state(object, 2, 1);
+            INT_AT(state, 0x2D4) = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
         }
         break;
     case 3:
-        hitFlags = func_002B1C20(object, state + 0x140);
+        hitFlags = moby_dispatch_action_by_kind(object, state + 0x140);
         if (hitFlags & 1) {
             func_PAL_L07_003EFEA0(object);
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return;
         }
         if (hitFlags & 2) {
-            if (INT_AT(state, 0x2DC) == 1) func_002A7750(object, 5, 2);
+            if (INT_AT(state, 0x2DC) == 1) moby_set_state(object, 5, 2);
             else {
-                func_002A7750(object, 2, 1);
-                INT_AT(state, 0x2D4) = ((s32)(func_002A7820(580, 600)) * 5 + 2) / 6;
+                moby_set_state(object, 2, 1);
+                INT_AT(state, 0x2D4) = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
             }
         }
     }
     switch (object[0x20]) {
     case 1:
-        if (func_002B3868(object) && object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 17);
+        if (flag_set_first_pending(object) && object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 17);
         break;
     case 2:
-        if (func_002B3868(object) && object[0x43] != 5) func_PAL_002A7E68(object, 5, 0, 17);
+        if (flag_set_first_pending(object) && object[0x43] != 5) func_PAL_002A7E68(object, 5, 0, 17);
         break;
     case 3:
-        if (func_002B3868(object) && object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 17);
+        if (flag_set_first_pending(object) && object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 17);
         if (func_PAL_002AF6C0(object, 17.0f)) {
-            func_0029FCC0(object, 4, origin);
+            moby_transform_joint_to_world(object, 4, origin);
             targetObject = PTR_AT(state, 0x220);
-            if (targetObject == D_00189E20.targetObject) {
-                qcopy(targetPosition, D_00189E20.targetPosition);
+            if (targetObject == g_hero_state.targetObject) {
+                qcopy(targetPosition, g_hero_state.targetPosition);
                 if (PTR_AT(state, 0x314)) {
-                    func_002AD330(object, PTR_AT(state, 0x314), targetPosition, axis);
-                    func_00282CC0(targetPosition, targetPosition, axis);
+                    moby_transform_point_by_attachment(object, PTR_AT(state, 0x314), targetPosition, axis);
+                    FastVecAdd(targetPosition, targetPosition, axis);
                 }
             } else if (targetObject) {
                 qcopy(targetPosition, targetObject + 0x10);
                 targetPosition[2] += FLOAT_AT(targetObject, 0xC) * 0.0009765625f;
             } else qcopy(targetPosition, state + 0x210);
-            func_00282CF0(unitDirection, targetPosition, origin);
-            func_00282F20(unitDirection, unitDirection, 1.0f);
-            angle = func_00282DB0(object + 0xC0, unitDirection);
-            if (angle < func_00283180(0.3490658700466156f)) {
-                func_00282CF0(delta, targetPosition, origin);
+            FastVecSub(unitDirection, targetPosition, origin);
+            vec_scale_to_length(unitDirection, unitDirection, 1.0f);
+            angle = FastVecDot(object + 0xC0, unitDirection);
+            if (angle < math_fast_sin_or_cos_a(0.3490658700466156f)) {
+                FastVecSub(delta, targetPosition, origin);
                 qcopy(direction, object + 0xC0);
-                func_00282DD8(axis, object + 0xC0, delta);
-                func_002ACEC0(direction, direction, axis, -0.3490658700466156f);
-            } else func_00282CF0(direction, targetPosition, origin);
-            func_00282F20(direction, direction, 0.40000004f);
+                FastVecCross(axis, object + 0xC0, delta);
+                math_apply_axis_rotation_to_quat(direction, direction, axis, -0.3490658700466156f);
+            } else FastVecSub(direction, targetPosition, origin);
+            vec_scale_to_length(direction, direction, 0.40000004f);
             func_PAL_00329890(object, direction, origin, 0, INT_AT(state, 0x314), (float)BYTE_AT(state, 0x34));
         } else if (object[0x60] & 2) {
-            if (func_002A77E0(2) ||
-                func_00283C80(FLOAT_AT(object, 0xF8),
-                    func_00283248(D_00189E20.position[0] - FLOAT_AT(object, 0x10),
-                                  D_00189E20.position[1] - FLOAT_AT(object, 0x14))) > 0.3490658700466156f)
-                func_002A7750(object, 5, -1);
-            else func_002A7750(object, 4, -1);
+            if (math_random_int_below(2) ||
+                FastDiffRots(FLOAT_AT(object, 0xF8),
+                    mat_fast_helper_a(g_hero_state.position[0] - FLOAT_AT(object, 0x10),
+                                  g_hero_state.position[1] - FLOAT_AT(object, 0x14))) > 0.3490658700466156f)
+                moby_set_state(object, 5, -1);
+            else moby_set_state(object, 4, -1);
         }
         break;
     case 4:
-        if (func_002B3868(object) && object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 17);
-        if (object[0x60] & 2) func_002A7750(object, 3, -1);
+        if (flag_set_first_pending(object) && object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 17);
+        if (object[0x60] & 2) moby_set_state(object, 3, -1);
         break;
     case 5:
-        if (func_002B3868(object)) {
+        if (flag_set_first_pending(object)) {
             if (object[0x43] != 7) func_PAL_002A7E68(object, 7, 0, 12);
-            angle = func_00283248(D_00189E20.position[0] - FLOAT_AT(object, 0x10),
-                                  D_00189E20.position[1] - FLOAT_AT(object, 0x14));
-            FLOAT_AT(state, 0x324) = func_00283B98(angle, func_002A78D8(45.0f, 100.0f) * 0.01745329424738884f);
+            angle = mat_fast_helper_a(g_hero_state.position[0] - FLOAT_AT(object, 0x10),
+                                  g_hero_state.position[1] - FLOAT_AT(object, 0x14));
+            FLOAT_AT(state, 0x324) = FastAddRotations(angle, math_random_signed_float_range(45.0f, 100.0f) * 0.01745329424738884f);
         }
         func_PAL_L02_00333638(object, D_L07_001A8F20, INT_AT(state, 0x88) | 0x10,
                          FLOAT_AT(state, 0x324), -1.0f, -1.0f);
-        func_L01_00322288(object,
-            func_00283248(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
+        moby_start_effect_from_entry(object,
+            mat_fast_helper_a(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
                           FLOAT_AT(state, 0x214) - FLOAT_AT(object, 0x14)));
-        if (INT_AT(state, 0xD0) >= 26 || *(unsigned short *)(object + 0x96) >= 101) func_002A7750(object, 3, -1);
+        if (INT_AT(state, 0xD0) >= 26 || *(unsigned short *)(object + 0x96) >= 101) moby_set_state(object, 3, -1);
         break;
     case 7:
-        if (!func_002A8508(INT_AT(state, 0x2B8), -1) ||
+        if (!moby_count_group_not_in_state(INT_AT(state, 0x2B8), -1) ||
             FLOAT_AT(state, 0x20) < (float)*(short *)(state + 0x24))
-            func_002A7750(object, 8, -1);
+            moby_set_state(object, 8, -1);
         break;
     case 8:
-        if (func_002B3868(object) && object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 2);
+        if (flag_set_first_pending(object) && object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 2);
         if (object[0x60] & 2) {
-            if (INT_AT(state, 0x2C0) == -1 || INT_AT(state, 0x2C4) == -1) func_002A7750(object, 3, 2);
-            else func_002A7750(object, 9, -1);
+            if (INT_AT(state, 0x2C0) == -1 || INT_AT(state, 0x2C4) == -1) moby_set_state(object, 3, 2);
+            else moby_set_state(object, 9, -1);
         }
         break;
     case 9:
-        if (func_002B3868(object) && object[0x43] != 10) func_PAL_002A7E68(object, 10, 0, 2);
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
-        func_00282CF0(origin, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-        func_00283098(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+        if (flag_set_first_pending(object) && object[0x43] != 10) func_PAL_002A7E68(object, 10, 0, 2);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
+        FastVecSub(origin, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
         origin[0] = 0.5f;
-        func_00283098(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7));
-        func_00282CC0(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7));
+        FastVecAdd(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
         func_PAL_L01_00323068(object, origin);
-        if (func_002ACBC8(object + 0x10, INT_AT(state, 0x2C0))) {
-            func_00282CF0(targetPosition, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-            func_00283098(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
-            targetPosition[0] = func_002A7878(0.0f, 1.0f);
-            func_00283098(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7));
-            func_00282CC0(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
-            func_L02_003329C8(object, targetPosition, 0.120000005f, 0.008f);
-            func_002A7750(object, 10, -1);
+        if (IsPointInCuboid(object + 0x10, INT_AT(state, 0x2C0))) {
+            FastVecSub(targetPosition, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+            targetPosition[0] = math_random_float_range(0.0f, 1.0f);
+            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7));
+            FastVecAdd(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
+            moby_aim_move_record_at_target(object, targetPosition, 0.120000005f, 0.008f);
+            moby_set_state(object, 10, -1);
         }
         break;
     case 10:
-        if (func_002B3868(object) && object[0x43] != 4) func_PAL_002A7E68(object, 4, 0, 2);
+        if (flag_set_first_pending(object) && object[0x43] != 4) func_PAL_002A7E68(object, 4, 0, 2);
         func_PAL_L07_00324F58(object, 1.0f, 8.0f, 12.5f);
-        func_L00_00424A08(0, D_L07_001B0BA0, 0.003000000026077032f);
-        func_L00_00424A50(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
+        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
         FLOAT_AT(state, 0x180) = FLOAT_AT(object, 0x18)-3.0f;
         if (object[0x60] & 2) {
-            angle = func_00283C80(FLOAT_AT(object, 0xF8),
-                func_00283248(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
+            angle = FastDiffRots(FLOAT_AT(object, 0xF8),
+                mat_fast_helper_a(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
                               FLOAT_AT(state, 0x214) - FLOAT_AT(object, 0x14)));
-            if (angle < 0.1745329350233078f) func_002A7750(object, 3, 2);
-            else func_002A7750(object, 5, 2);
+            if (angle < 0.1745329350233078f) moby_set_state(object, 3, 2);
+            else moby_set_state(object, 5, 2);
         }
         break;
     }
-    func_L07_003EB700(object);
+    entity_tick_timers_ride_platform(object);
 }

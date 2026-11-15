@@ -40,26 +40,26 @@ typedef struct {
     float position[4];          /* 0x10 */
 } CrateHit;
 
-extern int D_001B1688;          /* the frame counter */
+extern int g_game_time;          /* the frame counter */
 extern int D_001B24AC, D_001B24B0;
 extern int D_001B1A80;
 extern int D_001AF0F8 __attribute__((sda)), D_001AF0FC __attribute__((sda));
-extern char *D_0018C0B0 NOT_SDA; /* the hero */
+extern char *g_hero_moby NOT_SDA; /* the hero */
 extern char *D_001AD7EC;
 
-extern int func_00282C30(int);
-extern int func_002E5DA0(int index, int value, char *object, int kind);
-extern int func_002E5CF8(int index, int a1, char *a2);
-extern int func_002ABB78(void *);
-extern void func_00282A28(void);
+extern int subtract_integer_with_clamp(int);
+extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
+extern int PlayMobySound(int index, int a1, char *a2);
+extern int moby_is_in_special_class_range(void *);
+extern void math_trap_always(void);
 extern char *func_PAL_002BD400(char *pos, int spin, int color, float spread, float low, float high,
                            float accel, float size);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern float func_002AA340(int *, int, int);
-extern int func_002AD330(char *, char *, char *, char *);
+extern void FastVecSub(void *out, void *a, void *b);
+extern float math_step_int_toward_target(int *, int, int);
+extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
 extern void func_PAL_002B15D8(char *self, int mask, float *arg2, float, float, float, float, unsigned char);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *out, void *a, void *b);
 extern char *func_PAL_0032DF28(void *position, int flash, int n0, int n1, int n2, int n3, int n4,
                            int orient, float size, float distance, int mode, int extra, int flags,
                            char *owner);
@@ -72,23 +72,23 @@ void func_PAL_00313538(CrateMoby *self, int explode, CrateHit *hit)
     CrateMoby *p;
     int i, amount, kind;
 
-    if (func_00282C30(D_001B1688 - D_001B24AC) >= 2) {
+    if (subtract_integer_with_clamp(g_game_time - D_001B24AC) >= 2) {
         switch (self->oClass) {
-        case 0x1FA: func_002E5DA0(0, 0, (char *)self, 0x1F4); break;
-        case 0x1FF: func_002E5DA0(1, 0, (char *)self, 0x1FF); break;
-        default: func_002E5CF8(0, 0, (char *)self); break;
+        case 0x1FA: snd_play_from_class_bank(0, 0, (char *)self, 0x1F4); break;
+        case 0x1FF: snd_play_from_class_bank(1, 0, (char *)self, 0x1FF); break;
+        default: PlayMobySound(0, 0, (char *)self); break;
         }
-        D_001B24AC = D_001B1688;
+        D_001B24AC = g_game_time;
     }
-    if (func_00282C30(D_001B1688 - D_001B24B0) >= 2)
-        D_001B24B0 = D_001B1688;
+    if (subtract_integer_with_clamp(g_game_time - D_001B24B0) >= 2)
+        D_001B24B0 = g_game_time;
     if (vars->above) {
         vars->above->vars->below = vars->below;
         vars->above->vars->flags |= 0x24;
     }
     if (vars->below) {
-        if (!func_002ABB78(vars->below->vars->above))
-            func_00282A28();
+        if (!moby_is_in_special_class_range(vars->below->vars->above))
+            math_trap_always();
         vars->below->vars->above = vars->above;
         vars->below->vars->flags |= 0x24;
     }
@@ -109,13 +109,13 @@ void func_PAL_00313538(CrateMoby *self, int explode, CrateHit *hit)
     if (hit)
         qcopy(direction, hit->position);
     else
-        func_00282CF0(direction, self->position, D_0018C0B0 + 0x10);
-    if (func_00282C30(D_001B1688 - D_001AF0F8) >= 201) {
+        FastVecSub(direction, self->position, g_hero_moby + 0x10);
+    if (subtract_integer_with_clamp(g_game_time - D_001AF0F8) >= 201) {
         D_001AF0FC = 0;
-        D_001AF0F8 = D_001B1688;
-    } else if (D_001B1688 != D_001AF0F8) {
-        func_002AA340(&D_001AF0FC, 0, func_00282C30(D_001B1688 - D_001AF0F8) >> 2);
-        D_001AF0F8 = D_001B1688;
+        D_001AF0F8 = g_game_time;
+    } else if (g_game_time != D_001AF0F8) {
+        math_step_int_toward_target(&D_001AF0FC, 0, subtract_integer_with_clamp(g_game_time - D_001AF0F8) >> 2);
+        D_001AF0F8 = g_game_time;
     }
     if (D_001B1A80 >= 251 && D_001AF0FC < 5)
         amount = 4;
@@ -147,7 +147,7 @@ void func_PAL_00313538(CrateMoby *self, int explode, CrateHit *hit)
         if (kind) {
             qzero_nc(velocity);
             if (vars->attachment && !D_001AD7EC)
-                func_002AD330((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
+                moby_transform_point_by_attachment((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
             func_PAL_002B15D8((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }
     }
@@ -157,8 +157,8 @@ void func_PAL_00313538(CrateMoby *self, int explode, CrateHit *hit)
     self->collision = 0;
     if (explode) {
         vars->burstFrame = 1;
-        func_00282F20(velocity, self->up, 0.5f);
-        func_00282CC0(velocity, velocity, self->position);
+        vec_scale_to_length(velocity, self->up, 0.5f);
+        FastVecAdd(velocity, velocity, self->position);
         func_PAL_0032DF28(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
     }
 }

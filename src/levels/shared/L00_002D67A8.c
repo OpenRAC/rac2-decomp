@@ -20,9 +20,9 @@ typedef struct {
 
 typedef int BatchA_A07_s32;
 
-extern BatchA_A07_s32 D_001A79F0[] __attribute__((sda));
+extern BatchA_A07_s32 g_current_map_index[] __attribute__((sda));
 
-extern int func_L00_002D6788(void);
+extern int level_run_mode_update_three(void);
 
 extern int D_0018C0B4_1;
 
@@ -75,7 +75,7 @@ extern ConditionalResetSlot D_L00_001B8C00[8];
 
 /* Filter primary or fallback object's class identifier by mode and signed selection */
 /* Checks if the tracked object is a certain kind of object, picked by the selection number. */
-s32 func_L00_002D67A8(s32 selection) {
+s32 level_is_tracked_object_of_selected_class(s32 selection) {
     s32 found = 0;
     ClassFilterObject *primary = ((ClassFilterRoot *)D_00189E20_1)->primary;
     ClassFilterObject *fallback = ((ClassFilterRoot *)D_00189E20_1)->fallback;
@@ -95,38 +95,38 @@ s32 func_L00_002D67A8(s32 selection) {
 
 /* A07-sda-multi-eq-44 freshly exact-verified under family reservation */
 /* Tells whether a global value is one of three known numbers (0x16, 0x17 or 0x2CE). */
-BatchA_A07_s32 func_L00_002D6848(void) {
-    BatchA_A07_s32 value = gCurrentMapIndex[0];
+BatchA_A07_s32 level_is_special_global_value(void) {
+    BatchA_A07_s32 value = g_current_map_index[0];
     return (value == 0x16) | (value == 0x2CE) | (value == 0x17);
 }
 
 /* Always answers 0 (a placeholder check that never passes). */
-unsigned int func_L00_002D6878(void)
+unsigned int level_return_zero(void)
 {
     return 0;
 }
 
 /* Reads one global number and returns it. */
 /* returns the resident 32-bit field at core address 0x0018c0b4 */
-u32 func_L00_002D68E8(void) {
+u32 level_get_global_word(void) {
     return D_0018C0B4;
 }
 
 
 extern struct Rac2Native_5f824a0e369ccf7b_src_record *D_L00_0025E120[];
 
-int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *src);
+int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src);
 
 /* Copies the record the INDEX selects, or reports -1 when INDEX is past the 0x62-entry table. */
-int func_L00_002D6900(unsigned int index)
+int queue_copy_record_by_index(unsigned int index)
 {
     if (index < 0x62)
-        return CopyRecordsToFreeSlots(D_L00_0025E120[index]);
+        return slot_copy_records_to_free(D_L00_0025E120[index]);
     return -1;
 }
 
 /* Clears the first byte of the eight 16-byte slots, walking from the last one down. */
-void func_L00_002D6940(void)
+void slot_clear_active_bytes(void)
 {
     s32 i;
     for (i = 7; i >= 0; --i)
@@ -134,12 +134,12 @@ void func_L00_002D6940(void)
 }
 
 /* tests the byte at the indexed 16-byte table entry */
-s32 func_L00_002D6978(s32 index) {
+s32 slot_is_entry_nonzero(s32 index) {
  return D_L24_001B8500[index*16]!=0;
 }
 
 /* Check space among eight destination records, copy bounded input records into inactive slots, adjust copied byte and halfword fields, and return a slot index or -1. */
-int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *src)
+int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src)
 {
     int n = 0;
     int i;
@@ -181,7 +181,7 @@ int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *src)
 }
 
 /* For eight16-byte records, clear active byte1 and halfword6 only when active is nonzero */
-void func_L00_002D6B70(void) {
+void slot_reset_active(void) {
     ConditionalResetSlot *slot = D_L00_001B8C00;
     s32 remaining = 7;
     do {

@@ -4,24 +4,24 @@
 typedef int Quad __attribute__((mode(TI)));
 extern int D_001B01E8 __attribute__((sda));
 typedef struct { char pad[0x34]; int owner; char tail[8]; } ParticleRecord;
-extern ParticleRecord D_0022B0A0[100];
+extern ParticleRecord g_spark_records[100];
 typedef struct { char pad[0x24]; int kind; char *owner; char tail[0x3C]; int active; } OwnerContext;
-extern OwnerContext D_001A63A8;
+extern OwnerContext g_music_state;
 extern char D_001BAFA0[0x30];
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282C88(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283B98(float, float), func_00282E48(void *, void *);
-extern void func_00328848(void *), func_PAL_0032A898(void *, void *, float);
-extern int func_003286D0(void *, void *);
-extern void func_00328758(void *), func_002E5CF8(int, int, void *);
-extern float func_002A7940(void), func_002A7878(float, float);
-extern void func_002AF000(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastAddRotations(float, float), fast_vec_dist(void *, void *);
+extern void part_claim_spark_record(void *), func_PAL_0032A898(void *, void *, float);
+extern int moby_place_at_collision_point(void *, void *);
+extern void hero_check_hit_by_object(void *), PlayMobySound(int, int, void *);
+extern float math_random_angle(void), math_random_float_range(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
 extern void func_PAL_002BEF58(void *, void *, int, float);
-extern int func_00282948(int *);
-extern void func_0029F338(void *), func_PAL_0032A0E0(void *), func_00329328(void *);
-extern void func_L00_002E6EF8(void *, void *);
+extern int math_fast_float_d(int *);
+extern void moby_mark_spawned(void *), func_PAL_0032A0E0(void *), part_update_object_particles(void *);
+extern void gfx_add_draw_callback_third(void *, void *);
 extern void func_PAL_0032A1E8(void);
 extern void ref_PAL_L00_003E4498_00(void *, void *);
 
@@ -40,12 +40,12 @@ void func_PAL_L00_003E4498(char *self)
             *(int *)(state + 0x50) = 0;
             if (!initialized) {
                 int i;
-                for (i = 99; i >= 0; i--) D_0022B0A0[i].owner = 0;
+                for (i = 99; i >= 0; i--) g_spark_records[i].owner = 0;
                 D_001B01E8 = 1;
             }
         }
         {
-            OwnerContext *context = &D_001A63A8;
+            OwnerContext *context = &g_music_state;
             if (!context->active && context->kind == -1) {
                 context->owner = self;
                 context->kind = 0xDB9;
@@ -55,30 +55,30 @@ void func_PAL_L00_003E4498(char *self)
     /* Fall through to move the object on its first update. */
     case 1:
         *(Quad *)previous = *(Quad *)(self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.0044f;
-        *(float *)(self + 0xF4) = func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8) = func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        func_00328848(self);
-        func_PAL_0032A898(self, self + 0x10, func_00282E48(previous, self + 0x10) * 0.5f);
-        if (func_003286D0(self, previous)) {
+        *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        part_claim_spark_record(self);
+        func_PAL_0032A898(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
+        if (moby_place_at_collision_point(self, previous)) {
             *(unsigned char *)(self + 0x20) = 2;
             *(int *)(state + 0x44) = 17;
             *(int *)(state + 0x58) = 128;
             *(unsigned short *)(self + 0x34) |= 8;
-            func_00282C88(state);
-            func_00328758(self);
-            func_002E5CF8(0, 0, self);
-            func_00282D30(state + 0x20, D_001BAFA0 + 0x20, 0.0009765625f);
-            func_00282F20(state + 0x20, state + 0x20, 1.0f);
+            vec_clear_128(state);
+            hero_check_hit_by_object(self);
+            PlayMobySound(0, 0, self);
+            FastVecScale(state + 0x20, D_001BAFA0 + 0x20, 0.0009765625f);
+            vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
             *(Quad *)(state + 0x30) = *(Quad *)D_001BAFA0;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
                 int i;
                 for (i = 7; i >= 0; i--) {
-                    angle = func_002A7940();
-                    elevation = func_002A7878(0.392699093f, 3.14159274f);
-                    func_002AF000(v, 0.16000001f, angle, elevation);
+                    angle = math_random_angle();
+                    elevation = math_random_float_range(0.392699093f, 3.14159274f);
+                    vec_build_spherical_offset(v, 0.16000001f, angle, elevation);
                     func_PAL_002BEF58(self + 0x10, v, 0, -1.0f);
                 }
             }
@@ -86,10 +86,10 @@ void func_PAL_L00_003E4498(char *self)
         break;
     case 2:
         func_PAL_0032A898(self, self + 0x10, 0.1f);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.0022f;
         *(unsigned char *)(self + 0x23) -= 4;
-        func_00282948((int *)(state + 0x44));
+        math_fast_float_d((int *)(state + 0x44));
         if (*(unsigned char *)(self + 0x23) > 4) *(unsigned char *)(self + 0x23) -= 4;
         if (!*(int *)(state + 0x44) && *(unsigned char *)(self + 0x23) < 4) *(unsigned char *)(self + 0x20) = 3;
         break;
@@ -104,13 +104,13 @@ void func_PAL_L00_003E4498(char *self)
         }
         break;
     case 4:
-        if (func_00282948((int *)(state + 0x5C))) {
-            func_0029F338(self);
+        if (math_fast_float_d((int *)(state + 0x5C))) {
+            moby_mark_spawned(self);
             return;
         }
         break;
     }
     func_PAL_0032A0E0(self);
-    func_00329328(self);
+    part_update_object_particles(self);
     ref_PAL_L00_003E4498_00(func_PAL_0032A1E8, self);
 }

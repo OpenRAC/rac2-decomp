@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -32,7 +33,7 @@ extern u8 ref_L00_00410430_04[];
 extern volatile s32 ref_L00_00410430_05;
 
 /* Starts an effect on the object. Mode 0 creates a new one; other modes set up counters and start it differently. */
-void func_L00_00410430(void *moby, s32 param, s32 mode) {
+void charge_shot_start_effect(void *moby, s32 param, s32 mode) {
     u8 *state = *(u8 **)((u8 *)moby + 0x68);
     void *spawned;
     s32 index;

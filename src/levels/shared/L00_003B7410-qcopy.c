@@ -27,14 +27,14 @@ typedef struct NODE {
    addresses in registers and groups the lq/sq pairs, as the retail does. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern NODE *func_0029EFD0(int);
+extern NODE *CreateMoby(int);
 
-extern void func_002A7750(NODE *, unsigned char, int);
+extern void moby_set_state(NODE *, unsigned char, int);
 
 /* Allocates the record, copies the two sixteen-byte blocks into it (the first at
    +0x10, the second in the sub-object its +0x68 field points to), fills its
    three fields and calls the level's helper. */
-void *func_L00_003B7410(char *owner, void *position, void *velocity, void *player)
+void *pair_game_spawn_shot(char *owner, void *position, void *velocity, void *player)
 {
     NODE *record = CreateMoby(0x88D /* moby class 2189 */);
 
@@ -47,7 +47,7 @@ void *func_L00_003B7410(char *owner, void *position, void *velocity, void *playe
         record->fBC = (unsigned char)player;
         *dest = *(TI128 *)position;
         *src = *(TI128 *)velocity;
-        SetMobyState(record, 2, -1);
+        moby_set_state(record, 2, -1);
     }
     return record;
 }

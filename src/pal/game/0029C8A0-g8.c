@@ -3,14 +3,14 @@
 /* func_PAL_0029C8A0, the PAL copy of func_0029BF08: the same C, where the callback tables move
    up by 0x738 and the camera scale moves. */
 extern int ref_L00_0030CFE0_00[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
-extern unsigned int func_00285840(void);
-extern unsigned int func_002857B0(void);
-extern void func_00290680(void);
+extern unsigned int menu_get_saved_state(void);
+extern unsigned int menu_get_mode(void);
+extern void hud_update_letterbox_bars(void);
 extern void func_0029BEB8(void);
 extern void func_0029BE88(void);
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 typedef unsigned int (*Cb)(void);
 
@@ -48,12 +48,12 @@ void func_PAL_0029C8A0(void)
     if (D_001A8CFC[0] == 0)
         goto states;
 
-    if (D_001A8BB0[0] == 4) {
-        if (func_002857B0() == 8)
+    if (g_current_game_mode[0] == 4) {
+        if (menu_get_mode() == 8)
             return;
     }
 
-    func_00290680();
+    hud_update_letterbox_bars();
     result = 0;
     func_0029BEB8();
 
@@ -77,9 +77,9 @@ void func_PAL_0029C8A0(void)
         return;
 
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_00285840() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (menu_get_saved_state() != 7)
                 return;
         }
     }
@@ -91,9 +91,9 @@ states:
         ((Cb)g)();
         saved = ref_L00_0030CFE0_01.scale;
         ref_L00_0030CFE0_01.scale = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         func_0029BE88();
         ref_L00_0030CFE0_01.scale = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }

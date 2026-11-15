@@ -23,25 +23,25 @@ typedef struct {
     Vector points[33];
     union { Query query; struct { Vector point, direction; } particle; } work;
 } Frame;
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A8C00(void *, void *, s32, void *, f32);
-extern s32 func_002761F8(void *, void *, s32, void *, void *);
-extern u32 func_00283D38(u32, u32, f32);
-extern void func_L00_002EBE88(void *, s32, s32, s32, u32, u32, f32, f32, f32);
-extern s32 func_L02_002F1658(void);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_002A78D8(f32, f32);
-extern s32 func_00283CF0(f32);
-extern f32 func_002A7878(f32, f32);
-extern f32 func_002AA2E8(f32 *, f32, f32);
-extern s32 func_002A77E0(s32);
-extern void func_00282D08(void *, void *, void *, f32);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void *func_002C16C0(void *, void *, s32, s32, s32, s32, f32, f32, f32, f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void make_hit_descriptor(void *, void *, s32, void *, f32);
+extern s32 CollLine(void *, void *, s32, void *, void *);
+extern u32 FastTweenColor(u32, u32, f32);
+extern void DrawTwoLayerPolylineRibbon(void *, s32, s32, s32, u32, u32, f32, f32, f32);
+extern s32 level_is_resident_flag_clear(void);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_random_signed_float_range(f32, f32);
+extern s32 FloatToInt(f32);
+extern f32 math_random_float_range(f32, f32);
+extern f32 ApproachValue(f32 *, f32, f32);
+extern s32 math_random_int_below(s32);
+extern void lerp_vector(void *, void *, void *, f32);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void *part_spawn_burst(void *, void *, s32, s32, s32, s32, f32, f32, f32, f32, f32);
 extern u8 D_L07_001A8F20[] MACRO_ADDR;
 extern s32 D_L07_001B0E54 __attribute__((sda));
 extern u32 D_L07_001B0E58 __attribute__((sda));
@@ -58,7 +58,7 @@ extern f32 D_L07_001B0E94;
 
 /* Sample a closed ring, perform its collision passes, then emit its particles. */
 /* Draws a ring-shaped wave around the object, hurts whatever it touches and throws sparks off the ring. */
-void func_L07_003F4578(u8 *object)
+void UpdateCollisionRing(u8 *object)
 {
     Frame frame;
     u8 *state = *(u8 **)(object + 0x68);
@@ -69,8 +69,8 @@ void func_L07_003F4578(u8 *object)
 
     for (i = 0; i < 32; i++) {
         angle = (f32)(i * 2) * 0.09817477f - 3.1415927f;
-        frame.points[i].f[0] = FastSinOrCosA(angle) * *(f32 *)(state + 0x24);
-        frame.points[i].f[1] = FastSinOrCosB(angle) * *(f32 *)(state + 0x24);
+        frame.points[i].f[0] = math_fast_sin_or_cos_a(angle) * *(f32 *)(state + 0x24);
+        frame.points[i].f[1] = math_fast_sin_or_cos_b(angle) * *(f32 *)(state + 0x24);
         frame.points[i].f[2] = 0.0f;
         if (*(u8 **)(state + 0x20) != 0)
             matrix_mul_vec3(&frame.points[i], &frame.points[i], *(u8 **)(state + 0x20) + 0xC0);
@@ -89,25 +89,25 @@ void func_L07_003F4578(u8 *object)
     color1 = FastTweenColor(D_L07_001B0E8C & 0xFFFFFF, D_L07_001B0E8C, *(f32 *)(state + 0x28));
     DrawTwoLayerPolylineRibbon(frame.points, D_L07_001B0E80, D_L07_001B0E84, 33,
                      color0, color1, D_L07_001B0E90, D_L07_001B0E94, *(f32 *)(state + 0x2C));
-    if (!IsResidentFlagClear())
+    if (!level_is_resident_flag_clear())
         return;
     for (k = 0; (f32)k < (f32)D_L07_001B0E54 * *(f32 *)(state + 0x24); k++) {
-        size = RandomIntRange(D_L07_001B0E70[0], D_L07_001B0E70[1]);
-        count = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        life = RandomFloatRange(D_L07_001B0E78, D_L07_001B0E78_4[1]) * 210000.0f;
+        size = math_random_int_range(D_L07_001B0E70[0], D_L07_001B0E70[1]);
+        count = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        life = math_random_float_range(D_L07_001B0E78, D_L07_001B0E78_4[1]) * 210000.0f;
         step = D_L07_001B0E40 * (1.0f / 60.0f);
-        ApproachValue(&step, 0.0f, RandomFloatRange(0.0f, 2.0f) * (1.0f / 60.0f));
-        segment = RandomIntBelow(32);
+        ApproachValue(&step, 0.0f, math_random_float_range(0.0f, 2.0f) * (1.0f / 60.0f));
+        segment = math_random_int_below(32);
         next = (segment + 1) % 32;
         lerp_vector(&frame.work.particle.point, &frame.points[segment],
-                     &frame.points[next], RandomFloatRange(0.0f, 1.0f));
+                     &frame.points[next], math_random_float_range(0.0f, 1.0f));
         FastVecSub(&frame.work.particle.direction, &frame.work.particle.point, position);
         frame.work.particle.direction.f[2] = 0.0f;
         vec_scale_to_length(&frame.work.particle.direction, &frame.work.particle.direction, step);
         frame.work.particle.point.f[3] = 2.0f;
         color = D_L07_001B0E58;
         FastTweenColor(color & 0xFFFFFF, color, *(f32 *)(state + 0x28));
-        SpawnBurstParticle_002C16C0(&frame.work.particle.point, &frame.work.particle.direction,
+        part_spawn_burst(&frame.work.particle.point, &frame.work.particle.direction,
                      size, (s32)color >> 24, color & 0xFFFFFF,
                      count, life, 500.0f, 1.0f, 0.0f, 1.0f);
     }

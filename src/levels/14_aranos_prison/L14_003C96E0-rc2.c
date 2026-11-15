@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -30,7 +31,7 @@ extern void ref_L14_003C96E0_02(s8 *, s8 *, s8 *);
 extern void ref_L14_003C96E0_03(s8 *, s8 *, f32);
 
 /* Starts a launch toward a target: works out the aim direction and the speeds from the heights and ranges, and puts the object into state 0x16. */
-void func_L14_003C96E0(s8 *moby, s8 *target, f32 apexZ, f32 rangeA, f32 rangeB) {
+void entity_start_launch_to_target(s8 *moby, s8 *target, f32 apexZ, f32 rangeA, f32 rangeB) {
     f32 scaledAngle;
     f32 heightDelta;
     f32 totalAngle;

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 extern f32  D_L03_001B0340 __attribute__((sda));
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern s32  func_31BA30(s32 a0, s32 a1);
 extern s32  func_31B9F0(s32 a0);
 extern f32  func_2F0000(f32 a0, f32 a1);
@@ -29,11 +29,11 @@ typedef struct {
 } L03_003D21F8_Obj;
 extern L03_003D21F8_Obj *D_L03_001B0670 __attribute__((sda));
 extern u32 D_L03_001B3458;
-extern void *func_L00_002D70A0(s32 size);
-extern s32  func_002B38B8(char *a0);
-extern s32  func_002E5CF8(s32 a0, s32 a1, char *a2);
+extern void *cam_alloc_override_slot(s32 size);
+extern s32  flag_is_third_pending_set(char *a0);
+extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
 extern u8  *D_L03_001B2A1C;
-extern u8   D_00188660[];
+extern u8   g_sound_state[];
 extern s32  D_L03_001B0438 __attribute__((sda));
 extern f32  D_L03_001B043C __attribute__((sda));
 
@@ -45,8 +45,8 @@ void func_PAL_L03_003D6398(char *a0)
 
     switch (*(u8 *)(s0 + 0x20)) {
     case 0:
-        D_L03_001B0670 = func_L00_002D70A0(4);
-        func_002A7750(s0, 1, -1);
+        D_L03_001B0670 = cam_alloc_override_slot(4);
+        moby_set_state(s0, 1, -1);
         *(u8 *)(s0 + 0x30) = 0xFF;
         break;
     case 1: {

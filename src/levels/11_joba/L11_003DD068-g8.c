@@ -1,17 +1,17 @@
 #include "common.h"
 
 /* Spawns class 0xA77, copies its position and initializes its travel vector. */
-extern u8 *func_0029EFD0(s32 arg0);
+extern u8 *CreateMoby(s32 arg0);
 
-extern void func_002B37E8(void *a0, void *a1);
+extern void moby_init_child_from_parent(void *a0, void *a1);
 
-extern void func_00282CF0(f32 *dst, f32 *a, f32 *b);
+extern void FastVecSub(f32 *dst, f32 *a, f32 *b);
 
-extern f32 func_00282DF0(f32 *a);
+extern f32 FastVecLength(f32 *a);
 
-extern void func_00282F20(f32 *dst, f32 *a, f32 len);
+extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
 
-extern f32 func_L00_0031CDD0(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
+extern f32 weapon_compute_shot_launch_speed(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
 
 extern f32 D_L11_001B016C __attribute__((sda));
 
@@ -20,7 +20,7 @@ extern f32 D_L11_001B0168 __attribute__((sda));
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Creates a Hoverbike Race Bomb and sets its starting position and travel direction. */
-u8 *func_L11_003DD068(u8 *owner, u8 *startPos, u8 *targetPos, f32 gravity) {
+u8 *hoverbike_bomb_spawn(u8 *owner, u8 *startPos, u8 *targetPos, f32 gravity) {
     u8 *ownerOrVars = owner;
     u8 *start = startPos;
     u8 *target = targetPos;
@@ -34,7 +34,7 @@ u8 *func_L11_003DD068(u8 *owner, u8 *startPos, u8 *targetPos, f32 gravity) {
 
         v1 = ownerOrVars;
         ownerOrVars = *(u8 **)(bomb + 0x68);
-        InitChildObjectFromParent(bomb, v1);
+        moby_init_child_from_parent(bomb, v1);
         v1 = *(u8 **)(bomb + 0x24);
         dst = (TI128 *)(bomb + 0x10);
 
@@ -45,7 +45,7 @@ u8 *func_L11_003DD068(u8 *owner, u8 *startPos, u8 *targetPos, f32 gravity) {
         *(s32 *)(ownerOrVars + 0x8) = 0;
         travelTime = FastVecLength((f32 *)ownerOrVars) / D_L11_001B0168;
         vec_scale_to_length((f32 *)ownerOrVars, (f32 *)ownerOrVars, travelTime);
-        *(f32 *)(ownerOrVars + 0x8) = ComputeShotLaunchSpeed((char *)start, (char *)target, 0, travelTime, -fallRate);
+        *(f32 *)(ownerOrVars + 0x8) = weapon_compute_shot_launch_speed((char *)start, (char *)target, 0, travelTime, -fallRate);
         *(f32 *)(ownerOrVars + 0xC) = fallRate;
     }
     return bomb;

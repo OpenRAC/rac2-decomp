@@ -19,16 +19,16 @@ typedef struct {
     int fieldf0;
 } OozlaSpawnState;
 
-extern s32 func_00283CF0(f32);
-extern void func_L01_003377C8(u32);
-extern void func_002A7398(u8 *, s32, s32);
-extern void func_002A7750(u8 *, s32, s32);
+extern s32 FloatToInt(f32);
+extern void path_l01_compute_segment_lengths(u32);
+extern void anim_start_immediate(u8 *, s32, s32);
+extern void moby_set_state(u8 *, s32, s32);
 extern int D_L01_001B2088[] __attribute__((sda));
 extern u32 D_L01_001FE180[];
-extern u8 *D_L01_001B255C MACRO_ADDR;
+extern u8 *g_moby_l01_table MACRO_ADDR;
 
 /* Sets up the swamp monster arm when it appears, then starts its idle or attack animation. */
-void func_L01_003CBFF0(u8 *moby)
+void swamp_monster_arm_init(u8 *moby)
 {
     OozlaSpawnState *vars = *(OozlaSpawnState **)(moby + 0x68);
 
@@ -45,24 +45,24 @@ void func_L01_003CBFF0(u8 *moby)
     vars->field2e = 3;
     vars->fieldbc = 0;
     if (vars->fieldb8 != -1)
-        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->fieldb8]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[vars->fieldb8]);
     vars->fieldf0 = vars->fielde8;
     if (vars->fielddd)
         *(u16 *)(moby + 0x34) |= 0x8000;
     if (vars->fieldb4 != -1) {
         vars->fieldf0 = vars->fielde0;
-        if ((gMobyTable_L01 + (vars->fieldb4 << 8)) &&
-            (gMobyTable_L01 + (vars->fieldb4 << 8))[0x20] != 254 &&
-            (gMobyTable_L01 + (vars->fieldb4 << 8))[0x20] != 253) {
+        if ((g_moby_l01_table + (vars->fieldb4 << 8)) &&
+            (g_moby_l01_table + (vars->fieldb4 << 8))[0x20] != 254 &&
+            (g_moby_l01_table + (vars->fieldb4 << 8))[0x20] != 253) {
             *(u16 *)(moby + 0x32) = 0x3FF;
             moby[0x30] = 255;
             if (vars->fieldd0 > 0.0f)
                 *(float *)(moby + 0x18) = vars->fieldd0;
             if (vars->fieldc8)
-                StartAnimationImmediate(moby, 8, 0);
+                anim_start_immediate(moby, 8, 0);
             else
-                StartAnimationImmediate(moby, 5, 0);
-            SetMobyState(moby, 0, 1);
+                anim_start_immediate(moby, 5, 0);
+            moby_set_state(moby, 0, 1);
         } else {
             vars->fieldb4 = -1;
         }
@@ -71,9 +71,9 @@ void func_L01_003CBFF0(u8 *moby)
         if (vars->fieldd4 > 0.0f)
             *(float *)(moby + 0x18) = vars->fieldd4;
         vars->fieldbc = 120;
-        StartAnimationImmediate(moby, 0, 0);
+        anim_start_immediate(moby, 0, 0);
         *(float *)(moby + 0x48) = 0.0f;
         *(u16 *)(moby + 0x34) &= 0xEFFF;
-        SetMobyState(moby, 0, 4);
+        moby_set_state(moby, 0, 4);
     }
 }

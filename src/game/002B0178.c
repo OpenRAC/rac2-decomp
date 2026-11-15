@@ -5,12 +5,12 @@ extern int D_001A8CA4[] __attribute__((sda));
 extern Vector D_001B17D0;
 extern Vector D_001BAFA0;
 extern float D_001BAFA8;
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_002B00D8(void *, float *, float *, float);
-extern float func_00282E48(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void gravity_offset_position(void *, float *, float *, float);
+extern float fast_vec_dist(void *, void *);
 
 /* Finds the ground below a position and returns the height or distance to it, also giving the spot that was hit. */
-float func_002B0178(Vector *position, void *owner, Vector *output)
+float coll_get_ground_distance_below(Vector *position, void *owner, Vector *output)
 {
     Vector low, high;
     float distance, result;
@@ -31,9 +31,9 @@ float func_002B0178(Vector *position, void *owner, Vector *output)
     qcopy(&low, &D_001B17D0);
     if (D_001A8CA4[0] != 0) {
         qcopy(&low, position);
-        OffsetPositionAlongGravity(&low, low.f, low.f, -10.0f);
+        gravity_offset_position(&low, low.f, low.f, -10.0f);
     }
-    OffsetPositionAlongGravity(position, high.f, position->f, -0.5f);
+    gravity_offset_position(position, high.f, position->f, -0.5f);
     distance = fast_vec_dist(position, &low);
     if (CollLine(&high, &low, 2, owner, 0)) {
         if (output != 0)

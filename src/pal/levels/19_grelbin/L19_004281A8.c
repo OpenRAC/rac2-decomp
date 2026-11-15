@@ -19,18 +19,18 @@ extern u32 D_L19_001B1EF0[] SDATA(D_L19_001B1EF0);
 extern u32 D_L19_001B1EF4[] SDATA(D_L19_001B1EF4);
 extern int D_L19_001B1EFC[] SDATA(D_L19_001B1EFC);
 extern int D_L19_001B1F00[] SDATA(D_L19_001B1F00);
-extern int D_L19_001B2508[] __attribute__((sda));
-extern int func_002A77E0(int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002A7A00(float *, float, float);
-extern void *func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(unsigned int, unsigned int, float);
-extern unsigned char *func_002C2FD8(void *, int, unsigned char, int, int, int, int, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern int g_frame_l19_counter[] __attribute__((sda));
+extern int math_random_int_below(int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_random_direction(float *, float, float);
+extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(unsigned int, unsigned int, float);
+extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 void func_PAL_L19_004289C0(char *obj)
 {
@@ -42,43 +42,43 @@ void func_PAL_L19_004289C0(char *obj)
     int i, color, alpha, spacing;
 
     if (*(short *)(obj + 0xAA) == 0x11C7) {
-        func_00282F20(point, obj + 0xE0, 1.5f);
-        func_00282CC0(origin, obj + 0x10, point);
+        vec_scale_to_length(point, obj + 0xE0, 1.5f);
+        FastVecAdd(origin, obj + 0x10, point);
     } else {
-        func_0029FCC0(obj, 0, origin);
+        moby_transform_joint_to_world(obj, 0, origin);
     }
-    if (!func_002A77E0(4)) {
-        func_002A7A00(velocity, D_L19_001B1ECC[0] * 0.020000001f, D_L19_001B1ED0[0] * 0.020000001f);
+    if (!math_random_int_below(4)) {
+        vec_random_direction(velocity, D_L19_001B1ECC[0] * 0.020000001f, D_L19_001B1ED0[0] * 0.020000001f);
         {
             int glowAlpha = D_L19_001B1EDC[0];
-            func_002C3150(origin, velocity, D_L19_001B1EE0[0], glowAlpha, func_002A77E0(255), 0,
+            part_spawn_hero_relative(origin, velocity, D_L19_001B1EE0[0], glowAlpha, math_random_int_below(255), 0,
                           D_L19_001B1EE8[0]);
         }
         for (i = 2; i >= 0; i--) {
-            func_002A7A00(jitter, D_L19_001B1ED4[0] * 0.020000001f, D_L19_001B1ED8[0] * 0.020000001f);
-            func_00282CC0(velocity, velocity, jitter);
+            vec_random_direction(jitter, D_L19_001B1ED4[0] * 0.020000001f, D_L19_001B1ED8[0] * 0.020000001f);
+            FastVecAdd(velocity, velocity, jitter);
             {
                 int glowAlpha = D_L19_001B1EDC[0];
-                func_002C3150(origin, velocity, D_L19_001B1EE4[0], glowAlpha, func_002A77E0(255), 0,
+                part_spawn_hero_relative(origin, velocity, D_L19_001B1EE4[0], glowAlpha, math_random_int_below(255), 0,
                               D_L19_001B1EEC[0]);
             }
         }
     }
-    func_00282CF0(point, D_L19_001B9A40, origin);
-    func_00282F20(point, point, -0.3f);
-    func_00282F20(step, point, 0.1f);
-    func_00282CC0(point, point, origin);
+    FastVecSub(point, D_L19_001B9A40, origin);
+    vec_scale_to_length(point, point, -0.3f);
+    vec_scale_to_length(step, point, 0.1f);
+    FastVecAdd(point, point, origin);
     spacing = 20;
     for (i = 0; i < 4; i++) {
-        color = func_00283D38(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
-                              func_00282C48(0.5f - func_00283CE0(212 - (((D_L19_001B2508[0] + i * spacing) & 255) * 5 + 2) / 6) * (1.0f / 212.0f)));
-        alpha = *(u8 *)D_L19_001B2508;
+        color = FastTweenColor(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
+                              math_fabs(0.5f - IntToFloat(212 - (((g_frame_l19_counter[0] + i * spacing) & 255) * 5 + 2) / 6) * (1.0f / 212.0f)));
+        alpha = *(u8 *)g_frame_l19_counter;
         if (i & 2)
             alpha *= 2;
         if (i & 1)
             alpha = 255 - alpha;
-        func_002C2FD8(point, color, alpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
-                      (func_00283CE0(i) + 3.0f) * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
-        func_00282CC0(point, point, step);
+        part_spawn_fading(point, color, alpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
+                      (IntToFloat(i) + 3.0f) * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
+        FastVecAdd(point, point, step);
     }
 }

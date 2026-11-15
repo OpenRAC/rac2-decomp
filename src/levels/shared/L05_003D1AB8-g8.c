@@ -2,11 +2,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACB48(void *, float);
-extern float func_002A7878(float, float);
-extern void func_L00_0033C0D0(void *, void *, void *, void *, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_add_random_offset(void *, float);
+extern float math_random_float_range(float, float);
+extern void part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 extern float D_L05_001AFC60[] SDATA(D_L05_001AFC60);
 extern float D_L05_001AFC70[] SDATA(D_L05_001AFC70);
 extern float D_L05_001AFC80[] SDATA(D_L05_001AFC80);
@@ -39,16 +39,16 @@ void func_L05_003D1AB8(char *obj)
     qcopy(p1, p);
     qcopy(p2, p);
     qcopy(p3, p);
-    AddRandomOffsetToVector(p, 0.1f);
-    AddRandomOffsetToVector(p1, 0.1f);
-    AddRandomOffsetToVector(p2, 0.1f);
-    AddRandomOffsetToVector(p3, 0.1f);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p1, speed, D_L05_001AFC60, 1);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p2, speed, D_L05_001AFC70, 1);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p3, speed, D_L05_001AFC80, 1);
+    vec_add_random_offset(p, 0.1f);
+    vec_add_random_offset(p1, 0.1f);
+    vec_add_random_offset(p2, 0.1f);
+    vec_add_random_offset(p3, 0.1f);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
     y = -0.061f;
     *(TI128 *)b = 0;
     b[0] = -0.21f;
@@ -61,14 +61,14 @@ void func_L05_003D1AB8(char *obj)
     qcopy(p1, p);
     qcopy(p2, p);
     qcopy(p3, p);
-    AddRandomOffsetToVector(p, 0.1f);
-    AddRandomOffsetToVector(p1, 0.1f);
-    AddRandomOffsetToVector(p2, 0.1f);
-    AddRandomOffsetToVector(p3, 0.1f);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p1, speed, D_L05_001AFC60, 1);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p2, speed, D_L05_001AFC70, 1);
-    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    SpawnObjectRelativeParticle(obj, p3, speed, D_L05_001AFC80, 1);
+    vec_add_random_offset(p, 0.1f);
+    vec_add_random_offset(p1, 0.1f);
+    vec_add_random_offset(p2, 0.1f);
+    vec_add_random_offset(p3, 0.1f);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
 }

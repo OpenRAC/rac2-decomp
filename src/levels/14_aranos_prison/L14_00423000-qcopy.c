@@ -1,3 +1,4 @@
+#include "names.h"
 /* -frac2-qcopy for the 128-bit position copy into +0x710.
  * The field-store order is the source order sched1 needs: its register-weight
  * tie-break emits the stores that are a constant's last use first, so the
@@ -9,10 +10,10 @@
 
 typedef int L14_TI128 __attribute__((mode(TI)));
 
-extern void func_002B60B0(char *, float, float, float, float);
-extern int func_L02_0032E508(char *, int, void *, int);
-extern int func_002A77E0(int);
-extern void func_002A7750(char *, int, int);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern int path_build_route_nodes(char *, int, void *, int);
+extern int math_random_int_below(int);
+extern void moby_set_state(char *, int, int);
 
 typedef struct {
     unsigned char pad00[0x20];
@@ -82,7 +83,7 @@ typedef struct {
 } L14State_423000;
 
 /* Sets the actor's speeds, sizes and hit settings on its first frame, then starts its first animation state. */
-void func_L14_00423000(char *self)
+void actor_init(char *self)
 {
     L14State_423000 *s = *(L14State_423000 **)(self + 0x68);
     short startState;
@@ -121,7 +122,7 @@ void func_L14_00423000(char *self)
     s->f13C = 0.0055555556900799274f;
     s->i14C = -1;
     s->f120 = 3.141590118408203f;
-    SetControllerSpeedLimits(self, 0.0033333334140479565f, 0.10000000894069672f,
+    moby_set_controller_speed_limits(self, 0.0033333334140479565f, 0.10000000894069672f,
                 0.0034906589426100254f, 0.20943954586982727f);
 
     s->f740 = s->f740 * 0.01745329424738884f;
@@ -129,14 +130,14 @@ void func_L14_00423000(char *self)
     s->p15C = s->area600;
     if (s->i738 != -1)
         s->i14C = s->i738;
-    s->i750 = BuildRouteNodes(self, s->i73C, s->area200, 0x20);
-    s->h77C = RandomIntBelow(2);
+    s->i750 = path_build_route_nodes(self, s->i73C, s->area200, 0x20);
+    s->h77C = math_random_int_below(2);
 
     s->vec710 = *(L14_TI128 *)(self + 0x10);
 
     startState = s->h774;
     if (startState > 0 && (startState != 3 || s->i730 != -1))
-        SetMobyState(self, startState, 1);
+        moby_set_state(self, startState, 1);
     else
-        SetMobyState(self, 1, 1);
+        moby_set_state(self, 1, 1);
 }

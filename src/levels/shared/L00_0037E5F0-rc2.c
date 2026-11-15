@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s32 g_001B26B4 __attribute__((sda));
 extern f32 g_001B26B0 __attribute__((sda));
 
 /* Lowers the fade value by the given amount and returns how far it dropped below zero. */
-f32 func_L00_0037E5F0(f32 amount) {
+f32 fade_reduce_value(f32 amount) {
     f32 remaining;
     f32 overshoot = 0.0f;
 

@@ -30,12 +30,12 @@ typedef struct Actor {
     float rx, ry, rz;
 } Actor;
 
-extern int func_002A77E0(int);
-extern Actor *func_0029EFD0(int);
-extern void func_002A0488(Actor *, int, int, int);
+extern int math_random_int_below(int);
+extern Actor *CreateMoby(int);
+extern void set_moby_color(Actor *, int, int, int);
 extern char D_L10_002BABF0[];
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
 extern Actor *D_L10_001B1780 __attribute__((sda));
 extern Actor *D_L10_001B2528;
 
@@ -43,12 +43,12 @@ extern Actor *D_L10_001B2528;
    from D_L10_002BABF0, jittered by +-5 on each axis, with a random orientation and
    timer. The first call also caches the last class-0xFBF object of the list in
    D_L10_001B1780. Classes 0x1315 and 0x1327 get 1.5 times their class scale. */
-Actor *func_L10_0042DF10(int arg)
+Actor *cloud_spawn_object(int arg)
 {
     Actor *cloud;
     CloudWork *work;
     int index;
-    int kind = RandomIntBelow(5);
+    int kind = math_random_int_below(5);
 
     if (kind == 0) cloud = CreateMoby(0x1315 /* moby class 4885 */);
     else if (kind == 1) cloud = CreateMoby(0x1328 /* moby class 4904 */);
@@ -60,16 +60,16 @@ Actor *func_L10_0042DF10(int arg)
         cloud->active = 1;
         work = cloud->work;
         set_moby_color(cloud, 20, 20, 20);
-        index = RandomIntBelow(5);
+        index = math_random_int_below(5);
         work->index = index;
         qcopy(&cloud->pos, D_L10_002BABF0 + index * 16);
-        cloud->pos[0] += RandomFloatRange(5.0f, -5.0f);
-        cloud->pos[1] += RandomFloatRange(5.0f, -5.0f);
-        cloud->pos[2] += RandomFloatRange(5.0f, -5.0f);
-        cloud->rx = RandomAngle();
-        cloud->ry = RandomAngle();
-        cloud->rz = RandomAngle();
-        work->timer = RandomIntBelow(3600);
+        cloud->pos[0] += math_random_float_range(5.0f, -5.0f);
+        cloud->pos[1] += math_random_float_range(5.0f, -5.0f);
+        cloud->pos[2] += math_random_float_range(5.0f, -5.0f);
+        cloud->rx = math_random_angle();
+        cloud->ry = math_random_angle();
+        cloud->rz = math_random_angle();
+        work->timer = math_random_int_below(3600);
         work->arg = arg;
         if (!D_L10_001B1780) {
             Actor *node = D_L10_001B2528;

@@ -6,13 +6,13 @@ extern char *D_L06_001B281C[] __attribute__((sda));
 extern float func_35A780(void);
 extern void func_458138(char *);
 
-extern int func_00282948(char *);
-extern int func_002A77E0(int);
-extern int func_00283CF0(float);
-extern void func_002AB8C0(char *, char *);
-extern int func_002A7820(int, int);
+extern int math_fast_float_d(char *);
+extern int math_random_int_below(int);
+extern int FloatToInt(float);
+extern void gfx_update_color_fade(char *, char *);
+extern int math_random_int_range(int, int);
 /* EE argument banks preserve position/count/velocity/color/flags and four floats. */
-extern char *func_002BDCE8(char *, float, float, float, int, char *, float, unsigned int, int);
+extern char *SpawnSpinningSparkParticle(char *, float, float, float, int, char *, float, unsigned int, int);
 
 extern char D_L06_002AA500[];
 
@@ -51,7 +51,7 @@ extern void func_3661E0(char *, int, float);
 extern void func_350388(char *);
 extern void func_32D650(char *, char *, float);
 /* Throws out a set of small debris particles around the object, one for each bit set in the mask. */
-extern void func_L06_00457C00(char *, int, void *, int, float, float, float, float);
+extern void part_spawn_debris_mask(char *, int, void *, int, float, float, float, float);
 extern void func_32D5F8(char *, char *, char *);
 extern void func_365030(char *, char *, char *, int);
 extern float func_32DC80(float, float);
@@ -60,7 +60,7 @@ extern void func_32D5C8(char *, char *, char *);
 extern int func_32E728(float);
 extern void func_352000(char *, int, int, int);
 extern void func_32D8A8(char *, char *, float);
-extern void func_00310C88();
+extern void moby_fade_out_update();
 extern int D_L06_001B375C __attribute__((sda));
 extern int D_L06_001B3758 __attribute__((sda));
 extern void func_L06_003DDCA8();
@@ -72,23 +72,23 @@ extern char *func_31B0D0(char *, int, int, int, float, float, char *, char *, ch
                          int);
 extern char D_L06_001A8F20[];
 /* Pushes the moby away and starts its tumbling fall with a burst of effects. */
-extern void func_L06_004579C8(char *);
+extern void object_start_tumble(char *);
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00282DF0(float *);
-extern void func_00282F20(float *, float *, float);
-extern int func_002A7EA0(char *, char *, char *, int, float, float, float, float);
-extern float func_002AA2E8(float *, float, float);
-extern void func_002AA548(float *, char *, float, float, float, float);
-extern void func_002AAA00(char *, float, float, float, float, char *, int);
-extern float func_00283C80(float, float);
-extern int func_L02_0032E998(char *, int, float *, char *, int, char *, char *, float,
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(float *, float *, float *);
+extern float FastVecLength(float *);
+extern void vec_scale_to_length(float *, float *, float);
+extern int moby_move_over_ground(char *, char *, char *, int, float, float, float, float);
+extern float ApproachValue(float *, float, float);
+extern void math_step_value_toward_target(float *, char *, float, float, float, float);
+extern void math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
+extern float FastDiffRots(float, float);
+extern int ComputeRegionRouteHeading(char *, int, float *, char *, int, char *, char *, float,
                              float);
 
 
 /* Picks the actor's next walking or idle animation after it reaches a goal or finishes a turn. */
-void func_L06_0041FAF8(char *moby)
+void actor_choose_idle_anim(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -136,7 +136,7 @@ void func_L06_0041FAF8(char *moby)
     }
 }
 
-void func_L06_004579C8(char *a0)
+void object_start_tumble(char *a0)
 {
     char *s2 = *(char **)(a0 + 0x68);
     int v;
@@ -154,7 +154,7 @@ void func_L06_004579C8(char *a0)
 }
 
 /* Turns the head toward the hero, within a limited left-right and up-down range. */
-void func_L06_00444068(char *moby)
+void actor_aim_head_at_hero(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     float toHero[3];
@@ -176,7 +176,7 @@ void func_L06_00444068(char *moby)
 }
 
 /* A breakable object: waits to be hit, then bursts into particles and disappears. */
-void func_L06_00457AD0(unsigned char *moby)
+void breakable_l06_object_update(unsigned char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -197,7 +197,7 @@ void func_L06_00457AD0(unsigned char *moby)
         char offset[16];
 
         func_32D650(offset, (char *)(moby + 0xD0), -0.033333335f);
-        SpawnDebrisParticles((char *)moby, 7, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_debris_mask((char *)moby, 7, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         func_3A0948(0, 0, (char *)moby);
         func_3661E0((char *)moby, 1, 0.0f);
         func_350388((char *)moby);
@@ -207,7 +207,7 @@ void func_L06_00457AD0(unsigned char *moby)
 }
 
 /* Same breakable object behaviour as func_L06_00457AD0, used by another object type. */
-void func_L06_00457DA0(unsigned char *moby)
+void breakable_object_alt_update(unsigned char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -228,7 +228,7 @@ void func_L06_00457DA0(unsigned char *moby)
         char offset[16];
 
         func_32D650(offset, (char *)(moby + 0xD0), -0.033333335f);
-        SpawnDebrisParticles((char *)moby, 7, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_debris_mask((char *)moby, 7, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         func_3A0948(0, 0, (char *)moby);
         func_3661E0((char *)moby, 1, 0.0f);
         func_350388((char *)moby);
@@ -238,7 +238,7 @@ void func_L06_00457DA0(unsigned char *moby)
 }
 
 /* Switches on the linked object, if this object has one. */
-void func_L06_0041FD60(char *moby)
+void trigger_linked_object(char *moby)
 {
     if (*(unsigned char *)(moby + 0x21) != 0xFF)
         func_35B810(*(unsigned char *)(moby + 0x21), 1);
@@ -248,19 +248,19 @@ void func_L06_0041FD60(char *moby)
 
 extern char D_L06_001B0820[];
 extern char D_L06_001B9840[];
-extern int func_L02_0032E508(void *, int, void *, int);
-extern void func_0026FEB8(const char *, ...);
-extern float func_002A78D8(float, float);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_L06_0041F798(u8 *);
-extern s32 func_002B3BA8(void *, s32, float, float, s32, s32);
-extern void func_002A6C58(void *, int, int);
-extern void func_002AC728(void *, void *, int, float, float);
-extern void func_0029F338(void *);
+extern int path_build_route_nodes(void *, int, void *, int);
+extern void STUB_printf(const char *, ...);
+extern float math_random_signed_float_range(float, float);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void actor_alert_group(u8 *);
+extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
+extern void SetDeathBits(void *, int, int);
+extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
+extern void moby_mark_spawned(void *);
 
 /* A Notak enemy's update, the same shape as func_L06_00443A38: spawn-time setup, then the
    distance, target and ground checks. The fields are indexed through typed pointers (in-struct
@@ -272,13 +272,13 @@ extern void func_0029F338(void *);
 #define I(o) (((int *)v)[(o) / 4])
 #define F(o) (((float *)v)[(o) / 4])
 
-void func_L06_0041EF08(u8 *moby)
+void actor_init_and_check_hits(u8 *moby)
 {
     u8 *v = *(u8 **)(moby + 0x68);
     int hitResult;
 
     if (moby[0x20] == 0) {
-        I(0x480) = BuildRouteNodes(moby, I(0x230), v + 0x260, 16);
+        I(0x480) = path_build_route_nodes(moby, I(0x230), v + 0x260, 16);
         STUB_printf(D_L06_001B0820, I(0x480));
         qcopy(v + 0x460, moby + 0x10);
         F(0x46C) = *(float *)(moby + 0xF8);
@@ -308,29 +308,29 @@ void func_L06_0041EF08(u8 *moby)
         F(0x5AC) = (float)B(0x34);
         B(0x29) = 1;
         F(0x30) = 0.75f;
-        F(0x47C) = RandomSignedFloatRange(10.0f, 25.0f) * 0.0174532942f;
+        F(0x47C) = math_random_signed_float_range(10.0f, 25.0f) * 0.0174532942f;
         I(0x478) = 0;
-        H(0x24C) = RandomIntRange(0, 0x5F);
+        H(0x24C) = math_random_int_range(0, 0x5F);
         I(0x498) = -1;
         I(0x5A0) = H(0x490);
         qzero_nc(v + 0x5B0);
-        SetMobyState(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         if (moby[0x43] != 1)
-            StartAnimationBlended(moby, 1, 0, 0);
+            anim_start_blended(moby, 1, 0, 0);
         B(0x48) = FloatToInt(20.0f);
         B(0x4A) = FloatToInt(8.0f);
         if (H(0x492) != 0) {
             if (moby[0x43] != 3)
-                StartAnimationBlended(moby, 3, 0, 0);
+                anim_start_blended(moby, 3, 0, 0);
             B(0x48) = FloatToInt(20.0f);
             B(0x4A) = FloatToInt(24.0f);
         }
     }
     if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, D_L06_001B9840) < 24.0f) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby[0x6F] = 0x16;
     }
-    hitResult = ApplyDamageToObject(moby, v + 0x60, 0);
+    hitResult = moby_apply_damage_to_object(moby, v + 0x60, 0);
     if (hitResult != 0) {
         if (B(0x37) == 10)
             B(0xD7) = 1;
@@ -338,15 +338,15 @@ void func_L06_0041EF08(u8 *moby)
             I(0xF0) = 0;
             F(0xF4) = 0.837758183f;
         }
-        AlertGroupActors(moby);
+        actor_alert_group(moby);
         moby[0xA8] = 0xFF;
     }
-    I(0x228) = SelectAimTarget_002B3BA8(moby, I(0x220), F(0x240), 10.0f, 0, 0);
-    I(0x22C) = SelectAimTarget_002B3BA8(moby, I(0x224), F(0x244), 10.0f, 0, 0);
+    I(0x228) = weapon_select_aim_target(moby, I(0x220), F(0x240), 10.0f, 0, 0);
+    I(0x22C) = weapon_select_aim_target(moby, I(0x224), F(0x244), 10.0f, 0, 0);
     if (*(float *)(moby + 0x18) < 48.0f) {
         SetDeathBits(moby, 0, 3);
-        SpawnExplosionWithSparks(moby, moby + 0x10, -1, 1.0f, 13.0f);
-        MarkMobySpawned(moby);
+        part_spawn_explosion_with_sparks(moby, moby + 0x10, -1, 1.0f, 13.0f);
+        moby_mark_spawned(moby);
     }
 }
 
@@ -357,7 +357,7 @@ void func_L06_0041EF08(u8 *moby)
 
 /* Turns the actor toward its target and keeps the two angles it stores at +0x470 and
    +0x474 of its state; returns 1 when the actor's state changed. */
-int func_L06_0041F2A0(char *moby, char *goal, float defaultYaw, float speedScale, float slowDistance, float turnRate)
+int actor_steer_toward_goal(char *moby, char *goal, float defaultYaw, float speedScale, float slowDistance, float turnRate)
 {
     char *vars = *(char **)(moby + 0x68);
     float toGoal[4];
@@ -379,15 +379,15 @@ int func_L06_0041F2A0(char *moby, char *goal, float defaultYaw, float speedScale
         desiredYaw = 0.0f;
         ComputeRegionRouteHeading(moby + 0x10, (int)goal, &desiredYaw, vars + 0x260, pathCount, vars + 0x488,
                           vars + 0x48C, turnRate, 0.5f);
-        ApproachTargetWithDirectionMode(moby + 0xF8, desiredYaw, 0.0037815470714122057f,
+        math_approach_target_with_direction_mode(moby + 0xF8, desiredYaw, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, vars + 0x474, 0);
         if (FastDiffRots(*(float *)(moby + 0xF8), desiredYaw) < 1.3089970350265503f) {
-            StepValueTowardTarget(&d, vars + 0x470, distance, accelStep, accelStep, speedScale * 0.01666666753590107f);
+            math_step_value_toward_target(&d, vars + 0x470, distance, accelStep, accelStep, speedScale * 0.01666666753590107f);
         } else {
             *(float *)(vars + 0x470) = 0.0f;
         }
     } else {
-        ApproachTargetWithDirectionMode(moby + 0xF8, defaultYaw, 0.0037815470714122057f,
+        math_approach_target_with_direction_mode(moby + 0xF8, defaultYaw, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, vars + 0x474, 0);
         ApproachValue((float *)(vars + 0x470), 0.0f, accelStep);
         if (*(float *)(vars + 0x470) == 0.0f) {
@@ -399,7 +399,7 @@ int func_L06_0041F2A0(char *moby, char *goal, float defaultYaw, float speedScale
     }
     vec_scale_to_length(step, (float *)(moby + 0xC0), *(float *)(vars + 0x470));
     FastVecAdd(nextPos, step, (float *)(moby + 0x10));
-    if (MoveOverGround(moby, moby + 0x10, (char *)nextPos, 0, 0.8999999761581421f, 1.0f, 0.5f,
+    if (moby_move_over_ground(moby, moby + 0x10, (char *)nextPos, 0, 0.8999999761581421f, 1.0f, 0.5f,
                      0.7853982448577881f) == 0) {
         *(int *)(vars + 0x5A8) = *(int *)(vars + 0x5A8) + 1;
     }
@@ -424,7 +424,7 @@ extern int func_32E728(float);
 extern float func_35A6B8(float, float);
 
 /* Throws a burst of colored particles away from the hero's side of the given position. */
-void func_L06_0041F818(float *pos, int count) {
+void part_spawn_colored_burst(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
@@ -461,29 +461,29 @@ void func_L06_0041F818(float *pos, int count) {
 /* func_L06_0041FC58 is matched in its own unit, src/levels/06_notak/L06_0041FC58-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Counts down the actor's timers and puffs out a few dust particles each frame. */
-void func_L06_0041FD90(unsigned char *moby)
+void actor_tick_timers_spawn_dust(unsigned char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     float velocity[4], position[4];
     int count;
     unsigned char *first, *particle;
-    UpdateColorFade(moby, vars + 0x50);
+    gfx_update_color_fade(moby, vars + 0x50);
     if (moby[0xBC]) {
         moby[0xBC] = 0;
         if (*(int *)(vars + 0x248) < 300)
-            *(int *)(vars + 0x248) = RandomIntRange(480, 600);
+            *(int *)(vars + 0x248) = math_random_int_range(480, 600);
     }
-    if (FastFloatHelperD(vars + 0x24C) && *(int *)(vars + 0x204) != 2)
-        FastFloatHelperD(vars + 0x248);
-    FastFloatHelperD(vars + 0x240);
+    if (math_fast_float_d(vars + 0x24C) && *(int *)(vars + 0x204) != 2)
+        math_fast_float_d(vars + 0x248);
+    math_fast_float_d(vars + 0x240);
     if (*(unsigned short *)(moby + 0x96) < 65534) ++*(unsigned short *)(moby + 0x96);
-    if (FastFloatHelperD(vars + 0x250)) *(float *)(vars + 0x290) = *(float *)(vars + 0x298);
+    if (math_fast_float_d(vars + 0x250)) *(float *)(vars + 0x290) = *(float *)(vars + 0x298);
     velocity[0] = 0;
     velocity[2] = -0.05f;
     velocity[3] = 1;
     velocity[1] = 0;
-    count = RandomIntBelow(16);
-    if (RandomIntBelow(2)) count = -count;
+    count = math_random_int_below(16);
+    if (math_random_int_below(2)) count = -count;
     qcopy(position, moby + 0x10);
     position[2] -= 0.2f;
     first = SpawnSpinningSparkParticle((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
@@ -514,7 +514,7 @@ void func_L06_0041FD90(unsigned char *moby)
         state = particle + 0x20;
         particle[9] = FloatToInt(4) + 0x70;
         *(short *)(particle + 0xA) = 23;
-        particle[8] = RandomIntBelow(255);
+        particle[8] = math_random_int_below(255);
         *(int *)(state + 4) = 2;
         state[0xA] = 0x8F;
         state[0xB] = first[0xA];
@@ -533,7 +533,7 @@ void func_L06_0041FD90(unsigned char *moby)
 /* The object runs through five states. The dispatch reads the level's own jump table (five
    words in the level's data at 0x2E1F00); `cases` only keeps the labels alive. */
 /* Opens and closes a mechanism in five steps, playing an animation for each step. */
-void func_L06_0042B868(char *moby)
+void five_state_mechanism_update(char *moby)
 {
     static void *cases[5] = {&&c0, &&c1, &&c2, &&c3, &&c4};
     char *obj = moby;
@@ -597,7 +597,7 @@ done:
 /* func_L06_00443A38 is defined in L06_0041DED8-g8.c. */
 
 /* Starts or stops the actor's glow effect. */
-void func_L06_00443DE0(char *moby, int unused, int mode)
+void actor_set_glow_effect(char *moby, int unused, int mode)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -609,7 +609,7 @@ void func_L06_00443DE0(char *moby, int unused, int mode)
 }
 
 /* Counts down the actor's timers, ages it by one frame and updates its effects. */
-void func_L06_00443E18(char *moby)
+void actor_tick_timers_effects(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     unsigned int age;
@@ -628,7 +628,7 @@ void func_L06_00443E18(char *moby)
 
 /* The same re-arm, with two probe addresses and two flags. */
 /* When the hero reaches the object's trigger, switches on both gate flags and moves the object to its next state. */
-void func_L06_0044B250(char *moby)
+void gate_trigger_two_flags_update(char *moby)
 {
     int handle;
 
@@ -648,7 +648,7 @@ void func_L06_0044B250(char *moby)
 
 /* Re-arms the object when the shared probe accepts its live handle. */
 /* When the hero reaches the object's trigger, sets the first gate flag and moves the object to its next state. */
-void func_L06_0044B2D8(char *moby)
+void gate_trigger_flag_a_update(char *moby)
 {
     int handle;
 
@@ -666,7 +666,7 @@ void func_L06_0044B2D8(char *moby)
 
 /* The same re-arm, with the level's second probe address. */
 /* When the hero reaches the object's trigger, sets the second gate flag and moves the object to its next state. */
-void func_L06_0044B350(char *moby)
+void gate_trigger_flag_b_update(char *moby)
 {
     int handle;
 
@@ -684,7 +684,7 @@ void func_L06_0044B350(char *moby)
 
 /* The same re-arm, gated on the shared live-object probe. */
 /* When the hero reaches the object's trigger and the level check passes, sets the third gate flag and moves on. */
-void func_L06_004504C8(char *moby)
+void gate_trigger_flag_c_update(char *moby)
 {
     int handle;
 
@@ -707,7 +707,7 @@ void func_L06_004504C8(char *moby)
 
 
 /* Clears the level's pool of small effect objects. */
-void func_L06_00456EE0(void)
+void effect_pool_clear(void)
 {
     func_3BFBB8(D_L06_002AA500, 0x30);
 }
@@ -723,15 +723,15 @@ void func_L06_00456EE0(void)
 
 
 
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern char *func_00273730(char *, int, int, int, char *, char *,
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern char *cam_moby_create(char *, int, int, int, char *, char *,
                            float *, int, float, float);
 
-void func_L06_00457C00(char *object, int mask, void *offset, int color,
+void part_spawn_debris_mask(char *object, int mask, void *offset, int color,
                       float speed_min, float speed_max,
                       float vertical_min, float vertical_max)
 {
@@ -744,16 +744,16 @@ void func_L06_00457C00(char *object, int mask, void *offset, int color,
     for (i = 0; i < 15; i++) {
         if (((mask >> i) ^ 1) & 1)
             continue;
-        angle = RandomAngle();
-        speed = RandomFloatRange(speed_min, speed_max) * (1.0f / 60.0f);
-        velocity[0] = FastSinOrCosA(angle) * speed;
-        velocity[1] = FastSinOrCosB(angle) * speed;
+        angle = math_random_angle();
+        speed = math_random_float_range(speed_min, speed_max) * (1.0f / 60.0f);
+        velocity[0] = math_fast_sin_or_cos_a(angle) * speed;
+        velocity[1] = math_fast_sin_or_cos_b(angle) * speed;
         velocity[2] = 0.0f;
-        velocity[2] = RandomFloatRange(vertical_min, vertical_max) * (1.0f / 60.0f);
+        velocity[2] = math_random_float_range(vertical_min, vertical_max) * (1.0f / 60.0f);
         FastVecAdd(velocity, velocity, offset);
-        life = RandomFloatRange(90.0f, 270.0f);
-        size = RandomFloatRange(10.0f, 20.0f);
-        particle = CreateCameraMoby(object, 2, *(short *)(object + 0xAA), i,
+        life = math_random_float_range(90.0f, 270.0f);
+        size = math_random_float_range(10.0f, 20.0f);
+        particle = cam_moby_create(object, 2, *(short *)(object + 0xAA), i,
                                 object + 0x10, object + 0xF0, velocity, shade,
                                 life, size);
         if (particle)
@@ -762,7 +762,7 @@ void func_L06_00457C00(char *object, int mask, void *offset, int color,
 }
 
 /* When hit, wakes up the actors in its linked groups and then removes itself. */
-void func_L06_00457ED0(unsigned char *moby)
+void wake_actors_trigger_update(unsigned char *moby)
 {
     char *vars;
     char *hitMoby;

@@ -21,14 +21,14 @@ typedef union {
 #define VERTEX(p, i) (&(p).fields.vertex[i])
 #define COLORS(p) ((p).fields.color)
 #define UV(p) ((p).fields.uv)
-extern void func_00281DE8(QuadPacket *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
-extern char D_L00_001B8DC0[];
+extern void gfx_init_quad_packet_state(QuadPacket *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
+extern char g_camera_l00_position[];
 
 typedef struct {
     u8 pad[0x20];
@@ -37,7 +37,7 @@ typedef struct {
 } RibbonState;
 
 /* Draws the glowing streak behind the homing shot. */
-void func_L00_003ED850(char *object) {
+void homing_shot_draw_trail(char *object) {
     EffectPacket packet;
     EffectVector cameraDelta;
     EffectVector segment;
@@ -47,7 +47,7 @@ void func_L00_003ED850(char *object) {
     char *position;
     int i;
 
-    InitQuadPacketState(&packet.header, 23, 0, 0x80);
+    gfx_init_quad_packet_state(&packet.header, 23, 0, 0x80);
     COLORS(packet)[0] = COLORS(packet)[1] = 0x40108080;
     COLORS(packet)[2] = COLORS(packet)[3] = 0x40101080;
     UV(packet)[0] = 0.0f; UV(packet)[1] = 0.0f; UV(packet)[2] = 0.0f; UV(packet)[3] = 1.0f;
@@ -59,7 +59,7 @@ void func_L00_003ED850(char *object) {
     state->scroll += 0.1f;
     if (state->scroll >= 4.0f) state->scroll -= 4.0f;
     position = object + 0x10;
-    FastVecSub(&cameraDelta, position, gCameraPosition_L00);
+    FastVecSub(&cameraDelta, position, g_camera_l00_position);
     vec_scale_to_length(&segment, &state->axis, -2.0f);
     FastVecAdd(&midpoint, position, &segment);
     FastVecCross(&normal, &cameraDelta, &segment);
@@ -77,7 +77,7 @@ void func_L00_003ED850(char *object) {
     FastVecAdd(VERTEX(packet,2), VERTEX(packet,2), &segment);
     FastVecAdd(VERTEX(packet,3), VERTEX(packet,3), &segment);
     draw_world_quad(&packet, 0, 0);
-    InitQuadPacketState(&packet.header, 14, 1, 0x80);
+    gfx_init_quad_packet_state(&packet.header, 14, 1, 0x80);
     COLORS(packet)[0] = COLORS(packet)[1] = 0x40FF0020;
     UV(packet)[0] = 0.0f;
     UV(packet)[1] = 0.0f;

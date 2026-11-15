@@ -14,21 +14,21 @@ typedef struct {
     char *owner;
 } Effect;
 extern Effect *D_L00_001B2B54 MACRO_ADDR;
-extern void func_00282C88(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern float func_002A7790(float);
-extern float func_002A7798(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283B98(float, float);
-extern int func_002A7820(int, int);
-extern int func_00282948(void *);
-extern void func_002AFFD8(void *, void *, int);
+extern void vec_clear_128(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern float math_square(float);
+extern float math_ease_out_quad(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastAddRotations(float, float);
+extern int math_random_int_range(int, int);
+extern int math_fast_float_d(void *);
+extern void cam_compute_view_direction(void *, void *, int);
 
 /* Updates every glow particle owned by one object: it fades the colour and size, moves the particle with the object, and frees it when it has run out. */
-void func_L00_003E6C10(char *owner)
+void part_update_owned_effect(char *owner)
 {
     Vector displacement, axis, velocity;
     Effect *record;
@@ -37,7 +37,7 @@ void func_L00_003E6C10(char *owner)
     int i;
 
     i = 0;
-    ClearVector128(&displacement);
+    vec_clear_128(&displacement);
     for (; i < 320; i++) {
         record = (Effect *)(i * sizeof(Effect) + (unsigned int)D_L00_001B2B54);
         if (record->owner == owner) {
@@ -49,7 +49,7 @@ void func_L00_003E6C10(char *owner)
             if (record->state == 1) {
                 first = IntToFloat(record->initialCount);
                 second = IntToFloat(record->initialCount);
-                curve = Square(fraction);
+                curve = math_square(fraction);
                 record->count = FloatToInt(first - second * curve);
                 if (record->kind != 2) {
 interpolate:
@@ -57,12 +57,12 @@ interpolate:
                     record->spin = record->spinStart + (record->spinEnd - record->spinStart) * fraction;
                     record->offset = record->offsetStart + (record->offsetEnd - record->offsetStart) * fraction;
                     record->size = record->sizeStart + (record->sizeEnd - record->sizeStart) * fraction;
-                    vec_scale_to_length(&displacement, &record->direction, record->scale * EaseOutQuad(fraction));
+                    vec_scale_to_length(&displacement, &record->direction, record->scale * math_ease_out_quad(fraction));
                 } else {
                     vec_scale_to_length(&displacement, &record->direction, record->scale);
                 }
             }
-            ComputeViewDirection(*(char **)(owner + 0x30) + 0x10, &axis, 1);
+            cam_compute_view_direction(*(char **)(owner + 0x30) + 0x10, &axis, 1);
             vec_scale_to_length(&velocity, &axis, record->offset);
             FastVecAdd(record, record, &velocity);
             if (record->kind != 1)
@@ -72,14 +72,14 @@ interpolate:
             record->phase = FastAddRotations(record->phase, record->spin);
             if (*(unsigned char *)(object + 0x20) == 2 && *(int *)(data + 0x14) < 38 && record->kind != 2) {
                 record->state = 1;
-                record->duration = record->remaining = RandomIntRange(30, 45);
+                record->duration = record->remaining = math_random_int_range(30, 45);
                 record->sizeStart = record->size;
                 record->colorStart = record->color;
                 record->offsetStart = record->offset;
                 record->initialCount = record->count;
                 record->spinStart = record->spin;
             }
-            if (FastFloatHelperD(&record->remaining) != 0) {
+            if (math_fast_float_d(&record->remaining) != 0) {
                 if (record->state == 0) {
                     record->state = 1;
                     if (record->kind == 1) {

@@ -8,15 +8,15 @@
    once into s2 before the edges are computed, as retail loads it there. */
 
 extern float D_L04_001B2D44 MACRO_ADDR;
-extern int D_001A7340 MACRO_ADDR;
+extern int g_screen_width MACRO_ADDR;
 extern int D_001B0ACC SDATA(D_001B0ACC);
-extern void func_0027EB88(int top, int bottom, int left, int right, int alpha, int color);
+extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int alpha, int color);
 extern void func_PAL_0029BFF0(int alpha, int color, float top, float bottom, float left, float right);
-extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
-extern char *func_00288FB8(int);
-extern void func_00280200(void *, unsigned long long, char *, int);
-extern int func_0027FB40(int, int, unsigned long long, char *, int);
-extern int func_L00_002E9120(char *, int);
+extern void FontSetWindow(void *, int, int, int, int, int, int, int, int);
+extern char *GetLocalizedString(int);
+extern void text_draw_window_medium(void *, unsigned long long, char *, int);
+extern int text_draw_centered_medium(int, int, unsigned long long, char *, int);
+extern int text_measure_width_second_set(char *, int);
 
 typedef struct {
     u8 pad[0xC];
@@ -64,26 +64,26 @@ void func_PAL_L04_0041B5C0(void) {
     bx = 222.0f;
     on = 1;
     s = D_L04_001B2D44;
-    func_002802E0(&box, menu_coord(bx, s, half, on), menu_coord(479.0f, s, half, on), 44, 468, 256, menu_coord(299.0f, s, half, on), 16, 3);
+    FontSetWindow(&box, menu_coord(bx, s, half, on), menu_coord(479.0f, s, half, on), 44, 468, 256, menu_coord(299.0f, s, half, on), 16, 3);
     kx = 263.0f;
     box.flags |= 4;
-    func_00280200(&box, (int)0x80F0F0F0, func_00288FB8(0xA41), -1);
-    w = func_L00_002E9120(func_00288FB8(0xE51), -1);
+    text_draw_window_medium(&box, (int)0x80F0F0F0, GetLocalizedString(0xA41), -1);
+    w = text_measure_width_second_set(GetLocalizedString(0xE51), -1);
     if (w < box.width)
         w = box.width;
-    center = D_001A7340 >> 1;
+    center = g_screen_width >> 1;
     s2 = D_L04_001B2D44;
     left = center - (w >> 1) - D_001B0ACC;
     right = center + (w >> 1) + D_001B0ACC;
     x1 = menu_coord(kx, s2, half, on);
     ky = 371.0f;
     y1 = menu_coord(ky, s2, half, on);
-    func_0027EB88(x1, y1, left, right, 96, 0x60442D00);
+    gfx_draw_rounded_box(x1, y1, left, right, 96, 0x60442D00);
     s = D_L04_001B2D44;
     func_PAL_0029BFF0(96, 0x55F0C070, (float)menu_coord(kx, s, half, on), (float)menu_coord(ky, s, half, on), (float)left, (float)right);
     box.flags &= ~4;
-    func_00280200(&box, (int)0x80F0F0F0, func_00288FB8(0xA41), -1);
-    x4 = D_001A7340 / 2;
+    text_draw_window_medium(&box, (int)0x80F0F0F0, GetLocalizedString(0xA41), -1);
+    x4 = g_screen_width / 2;
     y4 = label_y((void *)x4, 349.0f, D_L04_001B2D44, half, on);
-    func_0027FB40(x4, y4, (int)0x80F0F0F0, func_00288FB8(0xE51), -1);
+    text_draw_centered_medium(x4, y4, (int)0x80F0F0F0, GetLocalizedString(0xE51), -1);
 }

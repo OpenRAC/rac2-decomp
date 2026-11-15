@@ -14,27 +14,27 @@ struct L12GlobalState {
 };
 extern struct L12GlobalState D_L12_001A63A8;
 extern char *D_L12_001FEAC0[];
-extern void func_L12_0041A2B8(void *);
-extern int func_002B1C20(void *,void *);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *,int,int);
-extern int func_002A77E0(int);
-extern void func_002A7470(void *,int,int,int);
-extern int func_L12_0041A6D0(void *,int);
+extern void path_enemy_init_scale(void *);
+extern int moby_dispatch_action_by_kind(void *,void *);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *,int,int);
+extern int math_random_int_below(int);
+extern void anim_start_blended(void *,int,int,int);
+extern int enemy_claim_attack_turn(void *,int);
 /* The wrapper leaves func_002B50E0's integer status in the return register. */
-extern int func_002B5278(void *,float);
-extern void func_002B6D28(void);
-extern void func_L12_0041A730(int);
-extern int func_L12_0041A578(void *,int);
-extern int func_L12_0041A460(void *);
-extern float func_00283B98(float,float);
-extern int func_00282948(void *);
-extern int func_002B3868(void *);
-extern void func_L02_003CA0A8(void *);
-extern void func_L12_0041A530(void *);
+extern int moby_step_at_own_position_factor(void *,float);
+extern void snd_resume_music_stream(void);
+extern void tourist_increment_counters(int);
+extern int path_find_next_stop_point(void *,int);
+extern int AimAtPathCursorAndAdvance(void *);
+extern float FastAddRotations(float,float);
+extern int math_fast_float_d(void *);
+extern int flag_set_first_pending(void *);
+extern void SpawnEffectParticleRing(void *);
+extern void enemy_tick_timers_age(void *);
 
 /* Updates a path-walking enemy (moby class 4076): it waits, shoots at the hero in bursts, walks its route and comes back to its start spot. */
-void func_L12_00419E40(char *obj) {
+void path_shooter_update(char *obj) {
     char *vars=P(obj,0x68);
     int animIndex;
     if(D_L12_001A79F0==13) {
@@ -47,64 +47,64 @@ void func_L12_00419E40(char *obj) {
         }
         return;
     }
-    InitAndScalePathEnemy(obj);
+    path_enemy_init_scale(obj);
     switch(B(obj,0x95)) {
     case 1:
-        { int flags=DispatchActionByKind(obj,vars+0x60);
-        if(flags&1) {MarkMobySpawned(obj);return;}
-        if(flags&2) SetMobyState(obj,4,0); }
+        { int flags=moby_dispatch_action_by_kind(obj,vars+0x60);
+        if(flags&1) {moby_mark_spawned(obj);return;}
+        if(flags&2) moby_set_state(obj,4,0); }
         break;
     case 0: break;
     }
     switch(B(obj,0x20)) {
     case 2:
-        if((B(obj,0x60)&2) && TryClaimAttackTurn(obj,W(vars,0x11C))) {
-            SetMobyState(obj,8,-1);
-            animIndex=RandomIntBelow(4);
+        if((B(obj,0x60)&2) && enemy_claim_attack_turn(obj,W(vars,0x11C))) {
+            moby_set_state(obj,8,-1);
+            animIndex=math_random_int_below(4);
             if(animIndex==W(vars,0x258)) {if(animIndex!=3) animIndex++; else animIndex=0;}
             goto set_attack_animation;
         }
         break;
     case 8:
-        StepMovementAtOwnPositionWithFactor(obj,F(vars,0x228));
+        moby_step_at_own_position_factor(obj,F(vars,0x228));
         if(D_L12_001A63A8.f72==3 && D_L12_001A63A8.f6C<6000) {
-            ResumeMusicStream(); SetMobyState(obj,5,-1);
+            snd_resume_music_stream(); moby_set_state(obj,5,-1);
         }
         break;
     case 5:
         if(!D_L12_001A63A8.f68 && D_L12_001A63A8.f24==-1) {
-            IncrementSpaceTouristCounters(W(vars,0x114));
-            SetMobyState(obj,6,-1);
-            if(B(obj,0x43)) StartAnimationBlended(obj,0,0,20);
-            W(vars,0x220)=FindNextStopPathPoint(obj,W(vars,0x224));
+            tourist_increment_counters(W(vars,0x114));
+            moby_set_state(obj,6,-1);
+            if(B(obj,0x43)) anim_start_blended(obj,0,0,20);
+            W(vars,0x220)=path_find_next_stop_point(obj,W(vars,0x224));
         } else if(B(obj,0x60)&2) {
-            animIndex=RandomIntBelow(4);
+            animIndex=math_random_int_below(4);
             if(animIndex==W(vars,0x258)) {if(animIndex!=3)animIndex++;else animIndex=0;}
-            if(B(obj,0x43)!=animIndex+1) StartAnimationBlended(obj,animIndex+1,0,20);
+            if(B(obj,0x43)!=animIndex+1) anim_start_blended(obj,animIndex+1,0,20);
             W(vars,0x258)=animIndex;
         }
         break;
     case 6:
         if(AimAtPathCursorAndAdvance(obj)) {
             if(W(vars,0x220)==W(D_L12_001FEAC0[W(vars,0x110)],0)-1) {
-                SetMobyState(obj,3,-1);
-                if(B(obj,0x43)!=9)StartAnimationBlended(obj,9,0,20);
+                moby_set_state(obj,3,-1);
+                if(B(obj,0x43)!=9)anim_start_blended(obj,9,0,20);
             } else {
-                SetMobyState(obj,7,-1);
-                if(B(obj,0x43))StartAnimationBlended(obj,0,0,20);
+                moby_set_state(obj,7,-1);
+                if(B(obj,0x43))anim_start_blended(obj,0,0,20);
                 W(vars,0x22C)=120;
                 F(vars,0x228)=FastAddRotations(F(obj,0xF8),3.141590118408203f);
             }
         }
         break;
     case 7:
-        StepMovementAtOwnPositionWithFactor(obj,F(vars,0x228));
-        if(FastFloatHelperD(vars+0x22C) && TryClaimAttackTurn(obj,W(vars,0x11C))) {
-            SetMobyState(obj,8,-1);
-            animIndex=RandomIntBelow(4);
+        moby_step_at_own_position_factor(obj,F(vars,0x228));
+        if(math_fast_float_d(vars+0x22C) && enemy_claim_attack_turn(obj,W(vars,0x11C))) {
+            moby_set_state(obj,8,-1);
+            animIndex=math_random_int_below(4);
             if(animIndex==W(vars,0x258)){if(animIndex!=3)animIndex++;else animIndex=0;}
 set_attack_animation:
-            if(B(obj,0x43)!=animIndex+1)StartAnimationBlended(obj,animIndex+1,0,20);
+            if(B(obj,0x43)!=animIndex+1)anim_start_blended(obj,animIndex+1,0,20);
             W(vars,0x258)=animIndex;
             W(vars,0x11C)++;
         }
@@ -112,16 +112,16 @@ set_attack_animation:
     case 3:
         if(B(obj,0x60)&2) {
             W(vars,0x220)=0; W(vars,0x224)=0; W(vars,0x11C)=0;
-            SetMobyState(obj,10,-1);
+            moby_set_state(obj,10,-1);
         }
         break;
     case 10:
-        if(SetFirstPendingFlag(obj)) {
+        if(flag_set_first_pending(obj)) {
             W(vars,0x25C)=25; W(obj,0x98)=0;
             U(obj,0x34)=(U(obj,0x34)|0x41)&0xEFFF;
         }
-        if(FastFloatHelperD(vars+0x25C)) {
-            SetMobyState(obj,1,-1);
+        if(math_fast_float_d(vars+0x25C)) {
+            moby_set_state(obj,1,-1);
             qcopy(obj+0x10,vars+0x210);
         }
         SpawnEffectParticleRing(obj);
@@ -130,5 +130,5 @@ set_attack_animation:
         W(obj,0x98)=0; U(obj,0x34)=(U(obj,0x34)|0x41)&0xEFFF;
         break;
     }
-    TickEnemyTimersAndAge(obj);
+    enemy_tick_timers_age(obj);
 }

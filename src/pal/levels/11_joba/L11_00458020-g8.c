@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L11_00458020, the PAL copy of func_L11_00452450: the same C, where 0.0055555557f
    becomes 0.008f; 0.004444444552063942f becomes 0.0064000003f; 0.13333334028720856f becomes
    0.16000001f; 0.0011635529808700085f becomes 0.0016755164f; 0.10471977293491364f becomes
@@ -5,9 +6,9 @@
    func_PAL_002B1A50; 0.8377582f becomes 1.0053098f. */
 #include "common.h"
 
-extern float func_002A7878(float, float);
-extern s32 func_002A77E0(s32);
-extern void func_00282CC0(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern s32 math_random_int_below(s32);
+extern void FastVecAdd(void *, void *, void *);
 
 typedef struct JobObject JobObject;
 
@@ -88,25 +89,25 @@ struct JobObject {
     float rotation[12];     /* +0xC0 */
 };
 
-extern s32 func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void *func_002A9640(void *, s32, s32);
+extern s32 FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
-extern void func_00283698(void *, void *);
-extern void func_002AFFD8(void *, void *, s32);
-extern s32 func_L11_004461C0(s32, void *);
-extern void func_002A7750(void *, s32, s32);
+extern void matrix_from_basis_rows(void *, void *);
+extern void cam_compute_view_direction(void *, void *, s32);
+extern s32 arena_is_point_in_inner_zone(s32, void *);
+extern void moby_set_state(void *, s32, s32);
 extern char D_L11_001BA8C0[];
 extern s32 D_001A8FF4;
 
-extern void func_002B60B0(char *, float, float, float, float);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern void func_PAL_L11_004589C8(void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_0029FC20(void *, int, void *);
-extern void func_00282C88(void *);
-extern void func_002830C0(void *, void *, void *);
-extern s32 func_002B3BA8(void *, s32, s32, s32, float, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void vec_clear_128(void *);
+extern void transform_vector(void *, void *, void *);
+extern s32 weapon_select_aim_target(void *, s32, s32, s32, float, float);
 
 /* Per-frame update of an L11 object: on its first frame it seeds its state block (a random-sign
    turn rate of 15 to 40 degrees, the 0.5/0.4 constant set) and runs its setup; then it sets the
@@ -124,14 +125,14 @@ void func_PAL_L11_00458020(char *object)
 
     if (*(u8 *)(object + 0x20) == 0) {
         *(char **)(state + 0x18) = state + 0x100;
-        turnRate = func_002A7878(15.0f, 40.0f) * 0.017453294f;
-        if (func_002A77E0(2) != 0)
+        turnRate = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
+        if (math_random_int_below(2) != 0)
             turnRate = -turnRate;
         *(f32 *)(state + 0x2C8) = turnRate;
-        if (func_002A77E0(2) == 1)
+        if (math_random_int_below(2) == 1)
             *(u16 *)(object + 0x34) |= 0x8000;
-        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
-        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(state + 0x48) = FloatToInt(15.0f);
+        *(u8 *)(state + 0x4A) = FloatToInt(12.0f);
         *(u8 *)(state + 0x60) = 0xB;
         *(s32 *)(state + 0x98) = 4;
         *(f32 *)(state + 0x100) = 0.8f;
@@ -141,31 +142,31 @@ void func_PAL_L11_00458020(char *object)
         *(f32 *)(state + 0x130) = 0.52359885f;
         *(f32 *)(state + 0x12C) = 0.008f;
         *(f32 *)(state + 0x134) = 2.8f;
-        func_002B60B0(object, 0.0064000003f, 0.16000001f,
+        moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f,
                       0.0016755164f, 0.12566373f);
         *(u8 *)(state + 0x28) = 3;
         func_PAL_L11_004589C8(object);
     }
     if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) != 0 && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(object);
+        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+            moby_update_ground_check(object);
             *(u8 *)(object + 0x6F) = 0x16;
         }
     } else {
         *(u16 *)(object + 0x34) &= 0xFBFF;
     }
     aim = state + 0x290;
-    func_0029FCC0(object, 1, state + 0x270);
-    func_0029FCC0(object, 2, state + 0x280);
-    func_0029FC20(object, 3, matrix);
-    func_00282C88(aim);
+    moby_transform_joint_to_world(object, 1, state + 0x270);
+    moby_transform_joint_to_world(object, 2, state + 0x280);
+    moby_transform_joint_point(object, 3, matrix);
+    vec_clear_128(aim);
     *(s32 *)(state + 0x298) = 0;
     *(f32 *)(state + 0x290) = 0.25f;
-    func_002830C0(aim, aim, matrix);
-    func_00282CC0(aim, aim, matrix + 12);
+    transform_vector(aim, aim, matrix);
+    FastVecAdd(aim, aim, matrix + 12);
     if (*(u8 *)(object + 0x20) >= 3) {
-        hit = (char *)func_002A9640(object, 0x10000, 1);
+        hit = (char *)part_find_owned_effect_slot(object, 0x10000, 1);
         if (hit != 0) {
             source = *(char **)(hit + 0x20);
             if (source != 0 && *(u8 *)(object + 0x31) == 0) {
@@ -180,17 +181,17 @@ void func_PAL_L11_00458020(char *object)
         }
         if (*(s16 *)(state + 0x2D8) != 0) {
             char *pos;
-            func_00283698(state + 0x230, object + 0xC0);
+            matrix_from_basis_rows(state + 0x230, object + 0xC0);
             pos = object + 0x10;
-            func_002AFFD8(pos, state + 0x260, 0);
-            if (func_L11_004461C0(*(s32 *)(object + 0xB8), pos) == 0) {
+            cam_compute_view_direction(pos, state + 0x260, 0);
+            if (arena_is_point_in_inner_zone(*(s32 *)(object + 0xB8), pos) == 0) {
                 *(s32 *)(state + 0x20) = 0;
-                func_002A7750(object, 0xC, 4);
+                moby_set_state(object, 0xC, 4);
             }
         }
         if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
             func_PAL_L11_004589C8(object);
-        *(s16 *)(state + 0x2D0) = func_002B3BA8(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
+        *(s16 *)(state + 0x2D0) = weapon_select_aim_target(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
         *(s32 *)(state + 0x2C4) = *(s32 *)(state + 0x220);
     }
 }

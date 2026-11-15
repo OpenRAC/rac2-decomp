@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 extern double D_L01_001B1950 __attribute__((sda));
@@ -16,7 +17,7 @@ extern int D_L01_001AEBF8 __attribute__((sda));
 extern int D_L01_001AEC38;
 extern int ref_L01_00412E00_00 __attribute__((sda));
 /* Counts itself, waits for the player to trigger it and then flashes an effect. */
-void func_L01_00412E00(unsigned char *moby) {
+void triggered_flash_update(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
 
     switch (moby[0x20]) {

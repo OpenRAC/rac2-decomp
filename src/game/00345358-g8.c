@@ -4,7 +4,7 @@
 /* The 23-word descriptor func_00337210 takes, filled from the object: the defaults
    first, then the object's own fields. The same shape as func_00344F98, in the -G8
    unit where the small data comes out $gp-relative. */
-extern void func_00337210(int *);
+extern void DrawItemGrid(int *);
 
 extern char D_001AA898[];
 
@@ -23,7 +23,7 @@ extern int D_001AE4C0 __attribute__((sda));
 extern int D_001AE4C8 __attribute__((sda));
 
 /* Fills in the draw descriptor for the item grid, in mode 1, and hands it to the grid drawer. */
-void func_003464D0(char *menu)
+void item_grid_build_descriptor_second_mode(char *menu)
 {
     int desc[23];
 
@@ -71,7 +71,7 @@ extern int D_001AE490 __attribute__((sda));
 extern int D_001AE498 __attribute__((sda));
 
 /* Fills in the draw descriptor for the item grid, in mode 3, and hands it to the grid drawer. */
-void func_003463C8(char *menu)
+void item_grid_build_descriptor_fourth_mode(char *menu)
 {
     int desc[23];
 
@@ -109,20 +109,20 @@ typedef struct { short v[5]; } SelectionEntry;
 typedef struct { char pad[0x48C]; int column, row, selected, state; } SelectionOwner;
 typedef struct { char pad[6]; short material; char tail[0xD8]; } SelectionMaterial;
 
-extern int func_002E5E58(int, int, void *);
-extern unsigned char D_001A7AF8[] __attribute__((section(".sdata")));
-extern unsigned char D_00139568[];
-extern char D_00239BA0[];
+extern int snd_play_from_global_bank(int, int, void *);
+extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
+extern unsigned char g_item_slot_to_record[];
+extern char g_weapon_table[];
 extern int D_001F2880[];
-extern int D_001ADB10 __attribute__((sda));
+extern int g_selected_item_material __attribute__((sda));
 extern SelectionEntry D_00259CE0[];
 
 /* Moves the cursor on a small selection grid with the pad and lets the player pick an item they own. */
-void func_003458F8(SelectionOwner *owner, int buttons)
+void selection_grid_handle_input(SelectionOwner *owner, int buttons)
 {
     if (buttons & 0x1000) {
         int row;
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         row = owner->row - 1;
         owner->row = row;
         if (row < 0) {
@@ -130,7 +130,7 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->state = 1;
         }
     } else if (buttons & 0x4000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         if (owner->row == 0) {
             if (owner->column == 0) {
                 owner->column = 1;
@@ -143,14 +143,14 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->column--;
         }
     } else if (buttons & 0x8000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         --owner->column;
         if (owner->row == 0)
             owner->column = owner->column < 0 ? 2 : owner->column;
         else
             owner->column = owner->column < 1 ? 2 : owner->column;
     } else if (buttons & 0x2000) {
-        PlaySoundFromGlobalBank(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         ++owner->column;
         if (owner->row == 0)
             owner->column = owner->column > 2 ? 0 : owner->column;
@@ -158,18 +158,18 @@ void func_003458F8(SelectionOwner *owner, int buttons)
             owner->column = owner->column > 2 ? 1 : owner->column;
     } else if (buttons & 0x40) {
         int id = D_00259CE0[owner->column + owner->row * 3].v[3];
-        if (id && gItemOwnedFlags[id]) {
-            PlaySoundFromGlobalBank(4, 0, 0);
+        if (id && g_item_owned_flags[id]) {
+            snd_play_from_global_bank(4, 0, 0);
             D_001F2880[0] = id;
             owner->selected = id;
         } else
-            PlaySoundFromGlobalBank(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
     }
     {
         int id = D_00259CE0[owner->column + owner->row * 3].v[3];
         owner->selected = id;
-        if (id && gItemOwnedFlags[id])
-            gSelectedItemMaterial = ((SelectionMaterial *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 0xE0))->material;
+        if (id && g_item_owned_flags[id])
+            g_selected_item_material = ((SelectionMaterial *)(g_weapon_table + g_item_slot_to_record[id] * 0xE0))->material;
     }
 }
 
@@ -178,13 +178,13 @@ void func_003458F8(SelectionOwner *owner, int buttons)
    0.5 registers. Standalone declarations, the boot's addresses. */
 #include "common.h"
 
-extern int func_002A9588(int, int, int, int, int);
-extern void func_00336320(char *);
-extern int func_00335E10(char *);
-extern int func_00335E20(char *);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern void gfx_draw_screen_element_stored(char *);
+extern int object_get_first_field(char *);
+extern int object_get_fourth_field(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
-extern int D_001A7344[] MACRO_ADDR;
+extern int g_screen_height[] MACRO_ADDR;
 extern float D_001AE5D0 __attribute__((sda));
 extern float D_001AE5D4[] MACRO_ADDR;
 extern float D_001AE5D8 __attribute__((sda));
@@ -241,24 +241,24 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Draws the list menu rows centred on the screen and highlights the selected row. */
-void func_00348EC0(char *rawMenu)
+void list_menu_draw_centered_rows(char *rawMenu)
 {
-    int color = PingPongBlendValues(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
+    int color = math_ping_pong_blend_values(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
     int startY, i, spacing, halfHeight, rowCount;
     float half, spacingF;
     ListMenu *menu = (ListMenu *)rawMenu;
 
     if (menu->enabled) {
-        DrawScreenElementAtStoredPosition(rawMenu);
-        DrawScreenElementAtStoredPosition(rawMenu + 0x130);
-        DrawScreenElementAtStoredPosition(rawMenu + 0x4C);
-        DrawScreenElementAtStoredPosition(rawMenu + 0x98);
-        DrawScreenElementAtStoredPosition(rawMenu + 0xE4);
+        gfx_draw_screen_element_stored(rawMenu);
+        gfx_draw_screen_element_stored(rawMenu + 0x130);
+        gfx_draw_screen_element_stored(rawMenu + 0x4C);
+        gfx_draw_screen_element_stored(rawMenu + 0x98);
+        gfx_draw_screen_element_stored(rawMenu + 0xE4);
         rowCount = menu->count;
         half = (float)rowCount * 0.5f;
         spacing = label_y(rawMenu, D_001AE5F0, D_001B23A4[0], 0.5f, 1);
         spacingF = (float)spacing;
-        halfHeight = gScreenHeight[0] >> 1;
+        halfHeight = g_screen_height[0] >> 1;
         startY = (int)((float)halfHeight - spacingF * half);
         for (i = 0; i < menu->count; i++) {
             ListRect *rect;
@@ -268,18 +268,18 @@ void func_00348EC0(char *rawMenu)
 
             if (i == 7 && !menu->showSpecial)
                 continue;
-            rect = (ListRect *)((float *)GetFirstField(rawMenu + 0x17C));
+            rect = (ListRect *)((float *)object_get_first_field(rawMenu + 0x17C));
             rect->x = D_001AE5D0 + menu->origin->x;
             rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
             rowColor = i == menu->selected ? color : 0x55F0C070;
-            *((int *)GetFieldC(rawMenu + 0x1C8)) = rowColor;
-            DrawScreenElementAtStoredPosition(rawMenu + 0x17C);
-            rect = (ListRect *)((float *)GetFirstField(rawMenu + 0x1C8));
+            *((int *)object_get_fourth_field(rawMenu + 0x1C8)) = rowColor;
+            gfx_draw_screen_element_stored(rawMenu + 0x17C);
+            rect = (ListRect *)((float *)object_get_first_field(rawMenu + 0x1C8));
             rect->x = D_001AE5D0 + menu->origin->x;
             rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
-            DrawScreenElementAtStoredPosition(rawMenu + 0x1C8);
+            gfx_draw_screen_element_stored(rawMenu + 0x1C8);
             slot = (char *)&((ListSlot *)(rawMenu + 0x218))[i];
-            rect = (ListRect *)((float *)GetFirstField(slot));
+            rect = (ListRect *)((float *)object_get_first_field(slot));
             rect->x = D_001AE5E0 + menu->origin->x;
             rect->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)startY;
             vtable = *(ListVtable **)(rawMenu + i * 72 + 0x248);

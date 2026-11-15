@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from public GCC 2.95.2 gcc/config/fp-bit.c, double configuration:
  * https://github.com/gcc-mirror/gcc/blob/17b916df3d859b72736d537f6c2a98b2d76decf8/gcc/config/fp-bit.c
  * RAC2 adaptation updated on 21 October 2026. This distribution uses the GPLv3
@@ -9,15 +10,15 @@
 /* This is a software floating point library which can be used instead of
    the floating point routines in libgcc1.c for targets without hardware
    floating point.
- Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+ Copyright (C) 1994, 1995, 1996, 1997, 1998 free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any
+free Software Foundation; either version 2, or (at your option) any
 later version.
 
 In addition to the permissions in the GNU General Public License, the
-Free Software Foundation gives you unlimited permission to link the
+free Software Foundation gives you unlimited permission to link the
 compiled version of this file with other programs, and to distribute
 those programs without any restriction coming from the use of this
 file.  (The General Public License restrictions do apply in other
@@ -31,7 +32,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
+the free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, if you link this library with other files,
@@ -97,7 +98,7 @@ static __inline__ int fp_pack_iszero(fp_number_type *number) {
 }
 
 /* Packs the broken-out parts of a double back into a real double, with rounding. */
-FLO_type func_00122630(fp_number_type *src) {
+FLO_type fp_pack_double(fp_number_type *src) {
     FLO_union_type dst;
     fractype fraction = src->fraction.ll;
     int sign = src->sign;

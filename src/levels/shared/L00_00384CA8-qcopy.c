@@ -10,12 +10,12 @@
 
 typedef int L00_00384CA8_TI128 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int id);
-extern void func_002A7750(void *object, unsigned char mode, int value);
+extern void *CreateMoby(int id);
+extern void moby_set_state(void *object, unsigned char mode, int value);
 
 /* Creates the object the level names, fills its fields and its two sixteen-byte
    blocks, then hands it to the shared setup. */
-void *func_L00_00384CA8(void *owner, void *position, void *velocity, unsigned int index)
+void *sheep_board_create_child(void *owner, void *position, void *velocity, unsigned int index)
 {
     char *object = (char *)CreateMoby(0x1335 /* moby class 4917 */);
     char *child;
@@ -27,7 +27,7 @@ void *func_L00_00384CA8(void *owner, void *position, void *velocity, unsigned in
         *(unsigned char *)(object + 0xBC) = index;
         *(L00_00384CA8_TI128 *)(object + 0x10) = *(L00_00384CA8_TI128 *)position;
         *(L00_00384CA8_TI128 *)child = *(L00_00384CA8_TI128 *)velocity;
-        SetMobyState(object, 2, -1);
+        moby_set_state(object, 2, -1);
     }
     return object;
 }

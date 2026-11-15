@@ -17,7 +17,7 @@ extern f32 D_L03_001B0C60 __attribute__((sda));
 
 extern f32 D_L03_001B0C64 NOT_SDA;
 
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 
 /* The shared lookup the record's state selects: its target sits at another
    address in every program, so it is named by its own place. */
@@ -26,7 +26,7 @@ extern int ref_L01_0031BC68_00(int, int, f32);
 /* Eases the record's own rate by the shared factor and hands the state the
    shared lookup asks for. */
 /* Updates the glow colour of the puzzle ball. */
-void func_L03_003E4588(u8 *moby) {
+void path_puzzle_update_glow_color(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u32 colors[2];
     f32 easeStep;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00281A08: trail ribbon draw. Own unit: -G8 for the GP loads of D_001A89D0..D8 and
    the u column, -g for the nop pair in front of div.s.
 
@@ -12,12 +13,12 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 bits; float f[4]; } UiVector;
 typedef struct { UiVector vertices[4]; unsigned int colors[4]; float uv[4][2];
                  u64 primitive, texture, state, flags; } UiDrawPacket;
-extern float func_00283CE0(int);
-extern unsigned int func_00283D38(int, int, float);
-extern u64 func_0027C878(int);
-extern void func_002839D0(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern float IntToFloat(int);
+extern unsigned int FastTweenColor(int, int, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern void mat_from_rotation(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 extern int D_001A89D0 __attribute__((sda));
 extern int D_001A89D4 __attribute__((sda));
 extern int D_001A89D8 __attribute__((sda));
@@ -26,7 +27,7 @@ extern UiTexCoord D_001A89E0[] __attribute__((sda));
 extern UiTexCoord D_001A89E0_gp[] SDATA(D_001A89E0);
 
 /* Draws a fading ribbon trail behind a moving object by joining its past positions. */
-void func_00281A08(UiVector *vertices, int vertex_count, UiVector *positions,
+void part_draw_trail_ribbon(UiVector *vertices, int vertex_count, UiVector *positions,
                    UiVector *rotations, int phase, int steps,
                    int first_color, int last_color, float blend)
 {
@@ -59,7 +60,7 @@ void func_00281A08(UiVector *vertices, int vertex_count, UiVector *positions,
         }
     }
     cur = phase;
-    RotationToMatrix(&rotations[cur], m);
+    mat_from_rotation(&rotations[cur], m);
     tp->bits = positions[cur].bits;
     matrix[3].f[3] = 1.0f;
     for (k = 0; k < vertex_count; k++)
@@ -67,7 +68,7 @@ void func_00281A08(UiVector *vertices, int vertex_count, UiVector *positions,
     for (step = 1; step < steps; step = next) {
         unsigned int next_color;
         cur = (cur + steps - 1) % steps;
-        RotationToMatrix(&rotations[cur], m);
+        mat_from_rotation(&rotations[cur], m);
         tp->bits = positions[cur].bits;
         matrix[3].f[3] = 1.0f;
         next_color = FastTweenColor(first_color, last_color, t);

@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float func_00282E20(char *);
-extern float func_00283248(float, float);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
+extern float vec_length_xy(char *);
+extern float mat_fast_helper_a(float, float);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
 extern void func_001290E0(int *, int *);
 extern unsigned char D_00189E20_1[];
 
@@ -26,8 +26,8 @@ void func_PAL_L00_002B4230(void)
         return;
     if (!(0.0f < *(float *)(p + 0x238)))
         return;
-    distance = func_00282E20(p + 0x230);
-    angle = func_00283248(*(float *)(p + 0x238), distance);
+    distance = vec_length_xy(p + 0x230);
+    angle = mat_fast_helper_a(*(float *)(p + 0x238), distance);
     if (!(angle >= 0.8726646900177002f))
         return;
     qcopy(vector, p + 0x230);
@@ -35,8 +35,8 @@ void func_PAL_L00_002B4230(void)
     func_001290E0((int *)vector, (int *)vector);
     value = -*(float *)(p + 0xF0) * vector[0] - *(float *)(p + 0xF4) * vector[1];
     if (value > 0.0f) {
-        func_00282D30((char *)vector, (char *)vector, value);
-        func_00282CC0(p + 0xF0, p + 0xF0, (char *)vector);
+        FastVecScale((char *)vector, (char *)vector, value);
+        FastVecAdd(p + 0xF0, p + 0xF0, (char *)vector);
         *(float *)(p + 0xF8) -= 0.0432f;
     }
 }

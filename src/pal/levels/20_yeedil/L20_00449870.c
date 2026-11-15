@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_00449870 (1 place), the PAL copy of func_L20_00443DF0 with 50 Hz values: the
    per-frame scale 1/6 becomes 1/5 (0x3E4CCCCE, one ulp above 0.2f, written 0.20000002f), the
    drop -1/30 becomes -1/25, the spread 90/180 becomes 75/150 and the projectile's 180 and 600
@@ -5,17 +6,17 @@
 #include "common.h"
 
 extern void func_PAL_L20_004495C0(char *, char *, char *, float *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A77E0(int);
-extern void func_00282D30(void *, void *, float);
-extern float func_002A7878(float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern char *func_L03_003D09D0(int, int, void *, void *, void *, int, int, int);
-extern char D_00189EA0[];
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_below(int);
+extern void FastVecScale(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern char *part_create_interpolated_emitter(int, int, void *, void *, void *, int, int, int);
+extern char g_hero_position[];
 
 /* Clamps the aim angle's magnitude into [pi/6, pi/4], keeping its sign, then
    launches a projectile along the rotated, flattened offset.  Retail's
@@ -44,18 +45,18 @@ char *func_PAL_L20_00449870(char *arg0)
         else if (t < 0.52359885f)
             t = 0.52359885f;
     }
-    f = func_00283B98(t, *(float *)(arg0 + 0xF8));
-    v[0] = func_00283180(f) * 0.20000002f;
-    v[1] = func_00283198(f) * 0.20000002f;
+    f = FastAddRotations(t, *(float *)(arg0 + 0xF8));
+    v[0] = math_fast_sin_or_cos_a(f) * 0.20000002f;
+    v[1] = math_fast_sin_or_cos_b(f) * 0.20000002f;
     v[2] = -0.04f;
-    if (func_002A77E0(2) != 0) {
-        func_00282D30(w, v, 75.0f);
+    if (math_random_int_below(2) != 0) {
+        FastVecScale(w, v, 75.0f);
     } else {
-        func_00282D30(w, v, func_002A7878(0.4f, 0.6f) * 150.0f);
+        FastVecScale(w, v, math_random_float_range(0.4f, 0.6f) * 150.0f);
     }
-    func_00282CC0(w, w, ang);
-    func_00282CF0(w, D_00189EA0, w);
+    FastVecAdd(w, w, ang);
+    FastVecSub(w, g_hero_position, w);
     w[2] = 0.0f;
-    func_00282F20(w, w, 0.20000002f);
-    return func_L03_003D09D0((int)arg0, 0, ang, v, w, 0x96, 0x1F4, *(unsigned char *)(state + 0x36));
+    vec_scale_to_length(w, w, 0.20000002f);
+    return part_create_interpolated_emitter((int)arg0, 0, ang, v, w, 0x96, 0x1F4, *(unsigned char *)(state + 0x36));
 }

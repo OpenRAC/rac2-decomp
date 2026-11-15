@@ -13,14 +13,14 @@ typedef struct {
     float distance;
     int enabled;
 } CollisionQuery;
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002A8C00(char *, int, int, float, Quad16 *);
-extern int func_002761F8(char *, char *, int, char *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecScale(void *, void *, float);
+extern void make_hit_descriptor(char *, int, int, float, Quad16 *);
+extern int CollLine(char *, char *, int, char *, void *);
 
 /* Casts a collision line from start to end for an object, aimed along the way the object faces, and returns what it hit. */
-int func_L01_003120A8(void *owner, void *start, void *end, s32 queryMode,
+int coll_cast_object_line(void *owner, void *start, void *end, s32 queryMode,
                      f32 distance, f32 scale, s32 first, s32 second, s32 mode) {
     char *object = owner;
     Vector direction;
@@ -28,8 +28,8 @@ int func_L01_003120A8(void *owner, void *start, void *end, s32 queryMode,
     if (*(u16 *)(object + 0x34) & 0x100) {
         qcopy(&direction, object + 0xC0);
     } else {
-        direction.f[0] = FastSinOrCosA(*(float *)(object + 0xF8));
-        direction.f[1] = FastSinOrCosB(*(float *)(object + 0xF8));
+        direction.f[0] = math_fast_sin_or_cos_a(*(float *)(object + 0xF8));
+        direction.f[1] = math_fast_sin_or_cos_b(*(float *)(object + 0xF8));
         direction.f[2] = 0.0f;
     }
     FastVecScale(&direction, &direction, scale);

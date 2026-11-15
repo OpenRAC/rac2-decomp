@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L09_0037FCE8: the water sheet draw callback of Dobbo and Yeedil.
  * Adapted from public OpenRAC/rac1-decomp draw_pokitaru_ocean
  * (src/overlays/shared/homing_missile_and_water_sheet.c, GPL-3.0): RAC2 drops
@@ -6,13 +7,13 @@
  * nops before the strip's div.s. */
 #include "common.h"
 typedef struct { float x,y,z,w; } Vec4f;
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282D30(void *,void *,float);
-extern int func_00283D38(int,int,float);
-extern u64 func_0027C878(int);
-extern float func_00282E20(void *);
-extern void func_00282A28(void);
+extern void FastVecAdd(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecScale(void *,void *,float);
+extern int FastTweenColor(int,int,float);
+extern u64 GetEffectTextureDescriptor(int);
+extern float vec_length_xy(void *);
+extern void math_trap_always(void);
 typedef struct { float u, v; } UV_30BCD8;
 typedef struct { float x, y, z; } Pos_30BCD8;
 typedef struct {
@@ -42,14 +43,14 @@ typedef struct {
 typedef struct { char pad[0x140]; float x, y, z; } Cam_30BCD8;
 typedef struct { char pad[0x228]; float f228, f22C; } Fog_30BCD8;
 
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_00280328(void);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_00281810(int, void *, void *, void *, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void font_queue_vu_state(void);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern void part_draw_glint_effect(int, void *, void *, void *, int);
 extern int D_0018C0B4 __attribute__((nosda));
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern char D_L09_001BDF00[];
 extern int D_L09_001A8A48 MACRO_ADDR;
 extern char D_L09_001B9C30[];
@@ -66,7 +67,7 @@ extern float D_L09_001AEC38[2] __attribute__((sda));
 extern UV_30BCD8 D_L09_001B3110[] MACRO_ADDR;
 
 /* Draws the fading edge strip and two scrolling water grid layers. */
-void func_L09_0037FCE8(char *moby) {
+void water_sheet_draw(char *moby) {
     Vec4f v0;
     Vec4f v1;
     Vec4f a;
@@ -108,9 +109,9 @@ void func_L09_0037FCE8(char *moby) {
     b.z = 0.0f;
     b.w = 1.0f;
     matrix_mul_vec3(&b, &b, D_L09_001B9C30);
-    if (gCurrentMapIndex != 13) a.z = 0.0f;
+    if (g_current_map_index != 13) a.z = 0.0f;
     vec_scale_to_length(&a, &a, 1.0f);
-    if (gCurrentMapIndex != 13) b.z = 0.0f;
+    if (g_current_map_index != 13) b.z = 0.0f;
     vec_scale_to_length(&b, &b, 1.0f);
     vec_scale_to_length(&v0, &a, -75.0f);
     vec_scale_to_length(&v1, &b, -87.0f);
@@ -153,7 +154,7 @@ void func_L09_0037FCE8(char *moby) {
         D_L09_002336A0[i + 1].y = v0.y;
         D_L09_002336A0[i + 1].z = v0.z;
     }
-    DrawGlintEffect(0xC, D_L09_002336A0, D_L09_002339A0, D_L09_00233EA0, 1);
+    part_draw_glint_effect(0xC, D_L09_002336A0, D_L09_002339A0, D_L09_00233EA0, 1);
     q.z78 = GetEffectTextureDescriptor(0x16);
     q.q80 = 0xFF9000000260LL;
     q.q88 = 0x8000000044LL;
@@ -214,10 +215,10 @@ void func_L09_0037FCE8(char *moby) {
                     }
                     n += 4;
                     if (n >= 0x40) {
-                        TrapAlways();
+                        math_trap_always();
                     }
                 }
-                DrawGlintEffect(n, D_L09_00233AA0, D_L09_00233DA0, D_L09_002340A0, 1);
+                part_draw_glint_effect(n, D_L09_00233AA0, D_L09_00233DA0, D_L09_002340A0, 1);
             }
         }
     }

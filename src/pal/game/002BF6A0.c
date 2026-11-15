@@ -41,9 +41,9 @@ void func_PAL_002BF6A0(char *p)
 
 
 
-extern int func_00283CF0(float);
-extern int func_002AAE98(float, float, float, float);
-extern void func_002B9180(char *);
+extern int FloatToInt(float);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern void part_kill(char *);
 
 /* func_002BEBC0 is in 002BEBC0-hazard-labels.c (retail keeps a branch label on its
    mtc1 hazard nop, which only a -frac2-hazard-labels unit reproduces). */
@@ -61,14 +61,14 @@ void func_PAL_002C0218(char *o)
     s = (float *)(o + 0x20);
     parent = *(char **)s;
     if (parent == 0 || (*(unsigned char *)(parent + 0x20) & 0xF0) == 0xF0) {
-        func_002B9180(o);
+        part_kill(o);
         return;
     }
     qcopy(o + 0x10, parent + 0x10);
     t = s[1] + s[2];
     s[1] = t;
     if (t < 0.0f) {
-        func_002B9180(o);
+        part_kill(o);
         return;
     }
     if (t > 0.6f) {
@@ -84,11 +84,11 @@ void func_PAL_002C0218(char *o)
     s[6] += -0.0018000001f;
     if (s[6] < 0.0f)
         s[6] = 0.0f;
-    *(int *)(o + 4) = func_002AAE98(s[4], s[5], s[6], s[1]);
+    *(int *)(o + 4) = gfx_pack_color_floats(s[4], s[5], s[6], s[1]);
     s[3] += 0.00132f;
     if (s[3] > 1.0f)
         s[3] -= 1.0f;
-    *(char *)(o + 8) = func_00283CF0(s[3] * 255.0f);
+    *(char *)(o + 8) = FloatToInt(s[3] * 255.0f);
     *(float *)(o + 0xC) = (*(float **)(o + 0x20))[0xB] * 3e+06f + 50000.0f;
 }
 

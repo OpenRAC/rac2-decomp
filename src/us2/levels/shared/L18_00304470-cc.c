@@ -23,15 +23,15 @@ typedef struct {
     u8 reserved1A4[12];
     s32 pressed;
 } InputRecordPrefix;
-extern InputRecordPrefix D_00138180;
+extern InputRecordPrefix g_pad_state;
 /* func_L18_002D1998 */
 /* Partial probe-collision record: only the hit object, hit count and surface normal are modeled. */
 typedef struct { u8 prefix[0x18]; s32 object; s32 count; u8 gap[0x20]; float normal[4]; } MotionCollision;
 extern MotionCollision D_L18_001BFC00;
 /* func_L00_002D36E0(float *out, s32 flag, float x, float y, float z) elsewhere: this typed
    interleaving keeps both EE argument banks unchanged and gives retail's argument setup order. */
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 /* func_L18_002C4000 is defined in L18_002C4000-hero.c. */
 
 /* func_L18_002C41F0 is defined in L18_002C4000-g8.c (this unit has $gp access for it). */
@@ -46,33 +46,33 @@ extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 
 /* func_L18_002F1098 is matched in its own unit, L18_002F1098-g8.c. */
 
-extern void func_0027F1D8(void *a0, void *a1, const char *a2);
+extern void text_measure_width_scaled(void *a0, void *a1, const char *a2);
 extern char D_L18_00296510[];
 
 void func_US2_L18_00304470(void *a0, void *a1) {
-    func_0027F1D8(a0, a1, D_L18_00296510);
+    text_measure_width_scaled(a0, a1, D_L18_00296510);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
 
 /* func_L18_00307C60 is defined in L18_002C4000-quad.c. */
 
-BatchA_A18_s32 func_L18_0032B768(BatchA_A18_u8 *s, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
+BatchA_A18_s32 moby_set_table_entry_byte(BatchA_A18_u8 *s, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 
-extern BatchA_A18_s32 func_002A8AF0(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
+extern BatchA_A18_s32 point_in_path_xy(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 extern BatchA_A18_s32 D_001FE480[];
 
 /* hands the slot's payload to its handler; the slot table entry holds count then payload */
-BatchA_A18_s32 func_L18_0033B628(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
+BatchA_A18_s32 moby_run_slot_handler(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 
 /* func_L18_0035D238 is defined in L18_0035D238.c. */
 
-extern float func_L18_0035D5F8(void *a0, void *a1, void *a2, char *a3, float f12);
+extern float path_find_best_point(void *a0, void *a1, void *a2, char *a3, float f12);
 extern BatchA_A18_s32 D_001FE480[];
 
 /* GCC 2.9's zero-length trailing array describes the variable point payload. */
 /* Finds the best projected point on the path, breaking near ties by distance. */
-f32 func_L18_0035D5F8(void *out, void *origin, void *direction, char *path, float scale);
+f32 path_find_best_point(void *out, void *origin, void *direction, char *path, float scale);
 
 /* func_L18_003F50D8 is matched in L18_003F50D8.c (built with -mno-split-addresses). */
 
@@ -80,70 +80,70 @@ f32 func_L18_0035D5F8(void *out, void *origin, void *direction, char *path, floa
 
 /* func_L18_003F6CA8 is matched in L18_002C4000-move.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-extern void func_L18_003F74B8(void *a0, void *a1);
+extern void protopet_end_action(void *a0, void *a1);
 /* Advances the object's step counter, refreshes the emitter and asks the particle
    system for the new position; the distance test only runs when the flag is set. */
-extern float func_00283248(float a, float b);
+extern float mat_fast_helper_a(float a, float b);
 
-extern BatchA_A18_s32 func_L18_003F8E40(BatchA_A18_u8 *s);
+extern BatchA_A18_s32 protopet_is_in_either_active_state(BatchA_A18_u8 *s);
 
-BatchA_A18_s32 func_L18_003F7358(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1);
+BatchA_A18_s32 protopet_is_near_pickup_ready(BatchA_A18_u8 *a0, BatchA_A18_u8 *a1);
 
 /* func_L18_003F73B8 */
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 /* The 1.5707964 spelling is load-bearing: this assembler under-rounds by an ulp
    (1.5707964f, 1.57079637f and even 1.5707963705062866f all encode 0x3FC90FDB,
    retail holds 0x3FC90FDC).  Measured by sweeping spellings, COMPILER-NOTES. */
-extern BatchA_A18_s32 func_002A77E0(BatchA_A18_s32 a0);
+extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
 
-extern BatchA_A18_s32 func_L18_003F75E8(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+extern BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 
 /* runs the 0x1E gate and, when it clears, the record query into a local buffer;
    answers whether the query found anything */
-BatchA_A18_s32 func_L18_003F7470(BatchA_A18_u8 *a0);
+BatchA_A18_s32 protopet_find_for_group(BatchA_A18_u8 *a0);
 
-extern void func_L18_003F7590(BatchA_A18_u8 *a0);
+extern void protopet_reset_to_idle(BatchA_A18_u8 *a0);
 
-void func_L18_003F74B8(void *a0, void *a1);
+void protopet_end_action(void *a0, void *a1);
 
-void func_L18_003F7590(BatchA_A18_u8 *a0);
+void protopet_reset_to_idle(BatchA_A18_u8 *a0);
 
 /* The group id lists, the entity bank base and the resident group count. The two scalars are
    `sda` arrays of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui`/`lw`) as retail has it in this -G0 unit. */
 extern unsigned short *D_L18_001FB320[];
-extern char *D_L18_001B281C[] __attribute__((sda));
+extern char *g_moby_l18_table[] __attribute__((sda));
 extern int D_L18_001B2838[] __attribute__((sda));
 
 /* Counts the entities of kind 0xB69 in state 1 that the group's id list names, stores the count
    through a1 and returns the last of them (0 when there is none). Retail compares the state with
    0xFE and 0xFD before testing it for 1. */
-BatchA_A18_s32 func_L18_003F75E8(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 
 /* func_L18_003F76F0 lives in L18_003F76F0-copy.c. */
 
-extern void func_00282F20(void *a0, void *a1, float f12);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
+extern void vec_scale_to_length(void *a0, void *a1, float f12);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
 
 /* the object's state flags and aim angle are set, then the target is handed
    over to the object's controller */
 /* func_L18_003F7988 lives in L18_003F7988-copy.c. */
 
-void func_L18_003F7A08(BatchA_A18_u8 *a0);
+void protopet_choose_anim_by_target(BatchA_A18_u8 *a0);
 
-extern void func_L18_003F7A08(BatchA_A18_u8 *a0);
+extern void protopet_choose_anim_by_target(BatchA_A18_u8 *a0);
 /* func_L18_003F7AB8 is defined in L18_002C4000-g8.c (this unit has $gp access for it). */
 
-extern void func_00282F20(void *a0, void *a1, float f12);
-extern void func_00282CC0(void *a0, void *a1, void *a2);
+extern void vec_scale_to_length(void *a0, void *a1, float f12);
+extern void FastVecAdd(void *a0, void *a1, void *a2);
 /* Moves the object's state word, refreshes the two transform matrices through the
    shared helpers and writes the measured distance back into the object. */
 /* A18-void-store-16 freshly exact-verified under family reservation */
 /* A18-cond-select twin of 003F8E80: two independent state gates */
-BatchA_A18_s32 func_L18_003F8E40(BatchA_A18_u8 *s);
+BatchA_A18_s32 protopet_is_in_either_active_state(BatchA_A18_u8 *s);
 
 /* A09-cond-select-36 freshly exact-verified under family reservation */
-BatchA_A09_s32 func_L18_003F8E80(BatchA_A09_u8 *s);
+BatchA_A09_s32 protopet_is_in_state_substate(BatchA_A09_u8 *s);
 
 /* func_L18_003F8EA8 is defined in L18_003F8EA8-qcopy.c. */
 
@@ -196,7 +196,7 @@ BatchA_A09_s32 func_L18_003F8E80(BatchA_A09_u8 *s);
 /* Walks the id list of each of the object's eight groups like func_L18_003F9FB0 and, for every
    entity in it, clears its word at +0x98 and sets bits 0, 1 and 6 of its flags at +0x34 while
    clearing bit 12. */
-BatchA_A18_s32 func_L18_003FA8E0(BatchA_A18_u8 *s);
+BatchA_A18_s32 protopet_try_use_counter(BatchA_A18_u8 *s);
 
 /* Each scan reads the current slot id again when advancing its group iterator. */
 
@@ -219,21 +219,21 @@ BatchA_A18_s32 func_L18_003FA8E0(BatchA_A18_u8 *s);
 /* store -1 into field 0x74 of the object at s[0x68] */
 /* func_L18_00426E48 lives in L18_00426E48-g8.c. */
 
-extern void func_00282948(void *a0);
+extern void math_fast_float_d(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */
-extern void func_00282948(void *a0);
+extern void math_fast_float_d(void *a0);
 
-extern BatchA_A18_s32 func_L09_0033E690(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, float f12);
-extern BatchA_A18_s32 func_L09_00329178(BatchA_A18_u8 *a0, BatchA_A18_s32 a1,
+extern BatchA_A18_s32 path_measure_moby_against_entry(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, float f12);
+extern BatchA_A18_s32 path_apply_entry_to_moby(BatchA_A18_u8 *a0, BatchA_A18_s32 a1,
                                         BatchA_A18_s32 a2, BatchA_A18_s32 a3);
 
 /* re-seats the object on a new animation; -1 means "leave it to the level" */
-BatchA_A18_s32 func_L18_00427130(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
+BatchA_A18_s32 moby_set_anim(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 
-extern BatchA_A18_s32 func_L09_0033E658(void *a0);
+extern BatchA_A18_s32 path_get_entry_id(void *a0);
 
-BatchA_A18_s32 func_L18_004271C0(BatchA_A18_u8 *a0);
+BatchA_A18_s32 moby_toggle_anim_helper(BatchA_A18_u8 *a0);
 
 /* func_L18_00427208 is defined in L18_00427208-qcopy.c. */
 

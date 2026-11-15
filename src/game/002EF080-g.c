@@ -6,11 +6,11 @@ extern float D_001B2180[3];
 extern int D_001B2190[3];
 extern float D_001B9260[];
 extern float D_002634F0[4][4];
-extern int func_00283CF0(float);
-extern void func_00282A88(void *, int);
+extern int FloatToInt(float);
+extern void mem_fast_helper_b(void *, int);
 
 /* Sets up the distances at which terrain detail changes, and the blending numbers used to fade between the three detail levels. */
-void func_002EF080(void)
+void SetTfragDists(void)
 {
     float scaled_far_range, scaled_middle_range, scaled_near_range, ab, bc;
 
@@ -22,7 +22,7 @@ void func_002EF080(void)
     scaled_near_range = D_001B2180[2] * D_001B9260[0];
     ab = 1.0f / (scaled_far_range - scaled_middle_range);
     bc = 1.0f / (scaled_middle_range - scaled_near_range);
-    FastMemoryHelperB(D_002634F0, 0x40);
+    mem_fast_helper_b(D_002634F0, 0x40);
     D_002634F0[0][0] = ab * 0.5f;
     D_002634F0[0][1] = -ab;
     D_002634F0[1][0] = bc * 0.5f;

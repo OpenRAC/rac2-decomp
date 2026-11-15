@@ -4,14 +4,14 @@
 extern float D_001B5348;
 extern int D_001B1DD4[] __attribute__((sda));
 extern int D_001B1DD4_sda __attribute__((sda));
-extern int D_001B1688[] __attribute__((sda));
+extern int g_game_time[] __attribute__((sda));
 extern char D_001B1DF0[] __attribute__((sda));
 extern char D_001B5580[];
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern float func_00283198(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 void func_PAL_002C9408(char *obj)
 {
@@ -22,11 +22,11 @@ void func_PAL_002C9408(char *obj)
     int top;
 
     if (*(float *)(obj + 0x18) - D_001B5348 < -7.0f ||
-        (*(int *)(p + 0x14) != 0 && func_00282978(obj + 0xA) != 0)) {
+        (*(int *)(p + 0x14) != 0 && FastDecTimer(obj + 0xA) != 0)) {
         n = *(int *)(p + 0x10) - 1;
         *(int *)(p + 0x10) = n;
         if (n <= 0) {
-            func_002B9180(obj);
+            part_kill(obj);
             D_001B1DD4_sda = D_001B1DD4[0] - 1;
             return;
         }
@@ -41,13 +41,13 @@ void func_PAL_002C9408(char *obj)
     else
         *(unsigned char *)(obj + 8) -= 2;
     q = obj + 0x10;
-    func_00282CC0(q, q, p);
-    func_00282CC0(q, q, D_001B1DF0);
+    FastVecAdd(q, q, p);
+    FastVecAdd(q, q, D_001B1DF0);
     if (*(int *)(p + 0x14) == 0) {
         short h = *(short *)(obj + 0xA);
-        float f = func_00283198((float)(D_001B1688[0] & (h - 1)) / (float)h * 6.2831855f);
-        func_00282D30(v, D_001B5580, f * 0.020000001f);
-        func_00282CC0(q, v, q);
+        float f = math_fast_sin_or_cos_b((float)(g_game_time[0] & (h - 1)) / (float)h * 6.2831855f);
+        FastVecScale(v, D_001B5580, f * 0.020000001f);
+        FastVecAdd(q, v, q);
     }
 }
 

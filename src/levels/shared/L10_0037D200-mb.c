@@ -6,7 +6,7 @@ extern unsigned short *D_L10_001FB1E0[];
 extern Moby *D_L10_001B251C MACRO_ADDR;
 
 /* Counts how many mobys in the same group are still alive. */
-int func_L10_0037D200(u8 *self) {
+int group_count_alive(u8 *self) {
     unsigned short *list = D_L10_001FB1E0[self[0x21]];
     unsigned short *entry;
     Moby *object;

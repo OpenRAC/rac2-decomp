@@ -31,60 +31,60 @@ typedef struct TriggerData {
     unsigned char b44, b45, b46, b47, b48, b49;
 } TriggerData;
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern Row *D_L01_001B264C[] __attribute__((sda));
 extern Row *ref_L01_003D4270_00 __attribute__((sda));
 extern char *D_L01_001FE180[];
 extern char D_L01_001B94C0[];
 
-extern int func_002ACBC8(void *, int);
-extern int func_002A8508(int, int);
-extern void func_L00_002D7140(void *);
-extern Pool *func_L00_002D70A0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern void func_00335438(void *, void *, int, int, int);
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern int func_L01_0042A568(void);
-extern void func_L01_0042A6F0(int, int);
-extern void func_003355A8(int);
-extern int func_00283DB8(void *, float);
+extern int IsPointInCuboid(void *, int);
+extern int moby_count_group_not_in_state(int, int);
+extern void cam_end_override(void *);
+extern Pool *cam_alloc_override_slot(int);
+extern void FastVecSub(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern void SetCamera5Pose(void *, void *, int, int, int);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern int ship_get_docking_state(void);
+extern void SetCamera5Mode(int, int);
+extern void cam_set_mode_state(int);
+extern int math_fast_helper_a(void *, float);
 
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define B(p, o) (*(unsigned char *)((char *)(p) + (o)))
 
 /* Watches a trigger area: while the player is inside and its conditions hold, it creates an effect and can take over the camera. */
-void func_L01_003D4270(char *moby)
+void trigger_area_effect_update(char *moby)
 {
     float pos[4] __attribute__((aligned(16)));
     float rot[4];
     int clear = 1;
     TriggerData *trigger = *(TriggerData **)(moby + 0x68);
-    int active = IsPointInCuboid(gHeroPosition, trigger->volume);
+    int active = IsPointInCuboid(g_hero_position, trigger->volume);
     Pool *pool;
 
     if (trigger->conditions[0] == -1 && trigger->conditions[1] == -1 &&
         trigger->conditions[2] == -1 && trigger->conditions[3] == -1)
         clear = 0;
-    if (trigger->conditions[0] != -1 && CountMobysInGroupNotInState(trigger->conditions[0], -1))
+    if (trigger->conditions[0] != -1 && moby_count_group_not_in_state(trigger->conditions[0], -1))
         clear = 0;
-    if (trigger->conditions[1] != -1 && CountMobysInGroupNotInState(trigger->conditions[1], -1))
+    if (trigger->conditions[1] != -1 && moby_count_group_not_in_state(trigger->conditions[1], -1))
         clear = 0;
-    if (trigger->conditions[2] != -1 && CountMobysInGroupNotInState(trigger->conditions[2], -1))
+    if (trigger->conditions[2] != -1 && moby_count_group_not_in_state(trigger->conditions[2], -1))
         clear = 0;
-    if (trigger->conditions[3] != -1 && CountMobysInGroupNotInState(trigger->conditions[3], -1))
+    if (trigger->conditions[3] != -1 && moby_count_group_not_in_state(trigger->conditions[3], -1))
         clear = 0;
 
     if (B(moby, 0x20)) {
         if (trigger->pool && (!active || clear)) {
-            EndCameraOverride(trigger->pool);
+            cam_end_override(trigger->pool);
             trigger->pool = 0;
         } else if (!trigger->pool && active && !clear && trigger->target == -1) {
             Pool *created;
 
-            created = AllocCameraOverrideSlot(trigger->b33);
+            created = cam_alloc_override_slot(trigger->b33);
             trigger->pool = created;
             if (!created)
                 return;
@@ -107,46 +107,46 @@ void func_L01_003D4270(char *moby)
                 if (trigger->b49)
                     created->pos = ref_L01_003D4270_00[trigger->anchor].q0;
                 else {
-                    FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, gHeroPosition);
+                    FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, g_hero_position);
                     created->pos = *(Quad *)(pos);
                 }
             }
         } else if (active && !trigger->state && trigger->target != -1) {
             char *camera = D_L01_001FE180[trigger->target];
 
-            *(Quad *)(pos) = *(Quad *)(gHeroPosition);
+            *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
-            rot[2] = FastMatrixHelperA(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -FastMatrixHelperA(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
+            rot[1] = -mat_fast_helper_a(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
             SetCamera5Pose(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
-            CopyVectorToSelectedObject(camera + 0x10);
-            SetCameraStateRotation(rot);
+            object_copy_vector_to_selected(camera + 0x10);
+            cam_set_state_rotation(rot);
             trigger->state = 1;
         } else if (active && trigger->state) {
             char *camera;
 
-            if (trigger->state == 1 && (GetShipDockingState() & 1)) {
+            if (trigger->state == 1 && (ship_get_docking_state() & 1)) {
                 trigger->state = 2;
                 SetCamera5Mode(1, 0);
             }
             camera = D_L01_001FE180[trigger->target];
-            *(Quad *)(pos) = *(Quad *)(gHeroPosition);
+            *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
-            rot[2] = FastMatrixHelperA(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
-            rot[1] = -FastMatrixHelperA(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
+            rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
+            rot[1] = -mat_fast_helper_a(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            CopyVectorToSelectedObject(camera + 0x10);
-            SetCameraStateRotation(rot);
+            object_copy_vector_to_selected(camera + 0x10);
+            cam_set_state_rotation(rot);
         } else if (!active && trigger->state) {
-            SetCameraModeState(1);
+            cam_set_mode_state(1);
             trigger->state = 0;
         } else if (trigger->pool && trigger->anchor != -1) {
             pool = trigger->pool;
             if (trigger->b49)
                 pool->pos = ref_L01_003D4270_00[trigger->anchor].q0;
             else {
-                FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, gHeroPosition);
+                FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, g_hero_position);
                 pool->pos = *(Quad *)(pos);
             }
         }
@@ -156,7 +156,7 @@ void func_L01_003D4270(char *moby)
             if (!trigger->b47 && trigger->anchor != -1) {
                 qcopy(pos, &ref_L01_003D4270_00[trigger->anchor].centre);
                 pos[3] = 1;
-                if (FastMathHelperA(pos, 255.0f) != -1) {
+                if (math_fast_helper_a(pos, 255.0f) != -1) {
                     trigger->b47 = 1;
                     if (trigger->b45)
                         trigger->pool->f14 = trigger->f28;

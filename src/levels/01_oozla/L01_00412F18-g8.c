@@ -5,19 +5,19 @@ extern s32 D_L01_001B19B0 __attribute__((sda));
 extern u8 D_L01_001B1990[8] __attribute__((sda));
 extern u8 D_L01_001B1988[8] __attribute__((sda));
 extern u8 D_L01_001B1980[8] __attribute__((sda));
-extern void func_L00_0033E220(void *,void *,s32,s32,s32,s32,s32,s32,f32,f32);
-extern void func_002A7750(void *,s32,s32);
-extern s32 func_002A9640(void *,s32,s32);
-extern void func_L00_0032A258(void *,void *,void *,void *,s32,s32,s32,s32,s32,s32,s32);
-extern void func_L00_00326110(void *,s32,f32);
-extern void func_L01_0031A278(void *,void *,f32,f32,f32);
-extern void func_0032C700(void *,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,f32,f32);
-extern void func_002ABBB8(void *,void *,void *,f32,f32,s32,s32,s32,f32,f32,f32,f32,s32,f32,s32,s32,s32,s32,s32);
-extern void func_00283098(void *,void *,void *);
-extern void func_L00_003263D0(void *,void *,f32,s32,s32,void *,f32,u32,s32,f32,f32);
-extern void func_0029F338(void *);
+extern void part_spawn_object_following_effect(void *,void *,s32,s32,s32,s32,s32,s32,f32,f32);
+extern void moby_set_state(void *,s32,s32);
+extern s32 part_find_owned_effect_slot(void *,s32,s32);
+extern void part_explode_object_into_pieces(void *,void *,void *,void *,s32,s32,s32,s32,s32,s32,s32);
+extern void part_spawn_scaled_bolts(void *,s32,f32);
+extern void moby_compute_local_point(void *,void *,f32,f32,f32);
+extern void SpawnExplosion(void *,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,f32,f32);
+extern void SpawnExplosionEffects(void *,void *,void *,f32,f32,s32,s32,s32,f32,f32,f32,f32,s32,f32,s32,s32,s32,s32,s32);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void SpawnTintedEffects(void *,void *,f32,s32,s32,void *,f32,u32,s32,f32,f32);
+extern void moby_mark_spawned(void *);
 /* Waits for a hit, then bursts into sparks and sound and removes itself or stays in a final state. */
-void func_L01_00412F18(void *mobyArg) {
+void spark_l01_burst_update(void *mobyArg) {
     BurstVec offset, tmp, up;
     f32 direction[4] __attribute__((aligned(16)));
     u8 *obj=mobyArg;
@@ -28,19 +28,19 @@ void func_L01_00412F18(void *mobyArg) {
     offset.q=tmp.q;
     switch(obj[0x20]) {
     case 0:
-        SpawnObjectFollowingEffect(&offset,obj,0x28806020,-1,0,-1,0,0x60,409500.0f,0.0f);
-        SpawnObjectFollowingEffect(&offset,obj,0x20806020,-1,1,-1,0,0x60,262500.0f,0.75f);
-        SetMobyState(obj,1,-1);
+        part_spawn_object_following_effect(&offset,obj,0x28806020,-1,0,-1,0,0x60,409500.0f,0.0f);
+        part_spawn_object_following_effect(&offset,obj,0x20806020,-1,1,-1,0,0x60,262500.0f,0.75f);
+        moby_set_state(obj,1,-1);
         break;
     case 1:
-        if(FindOwnedEffectSlot(obj,0x4010000,0) && !*(s32 *)state) SetMobyState(obj,2,-1);
+        if(part_find_owned_effect_slot(obj,0x4010000,0) && !*(s32 *)state) moby_set_state(obj,2,-1);
         obj[0xA8]=255;
         break;
     case 2:
-        ExplodeObjectIntoPieces(obj,D_L01_001B1990,D_L01_001B1988,D_L01_001B1980,65535,0,D_L01_001B19B0,1,0xC7F,255,0);
-        SpawnScaledBolts(obj,3,1.1f);
+        part_explode_object_into_pieces(obj,D_L01_001B1990,D_L01_001B1988,D_L01_001B1980,65535,0,D_L01_001B19B0,1,0xC7F,255,0);
+        part_spawn_scaled_bolts(obj,3,1.1f);
         up.q=0; up.f[2]=1.0f/6.0f;
-        ComputeMobyLocalPoint(obj,&tmp,offset.f[0],offset.f[1],offset.f[2]);
+        moby_compute_local_point(obj,&tmp,offset.f[0],offset.f[1],offset.f[2]);
         SpawnExplosion(&tmp,0,2,2,2,2,2,0,1,0,0,0,*(f32 *)(obj+0x2C),20.0f);
         SpawnExplosionEffects(obj,&up,&tmp,0,0,20,1,1,0,0,9.0f,0.75f,-1,0,0,0,-1,0,0x810001);
         for(i=0;i<4;i++) {
@@ -52,8 +52,8 @@ void func_L01_00412F18(void *mobyArg) {
         }
         if(D_L01_001B19B0>=0) {
             *(u16 *)(obj+0x7C)=(1<<D_L01_001B19B0)|0x8000;
-            SetMobyState(obj,3,-1);
-        } else MarkMobySpawned(obj);
+            moby_set_state(obj,3,-1);
+        } else moby_mark_spawned(obj);
         break;
     }
 }

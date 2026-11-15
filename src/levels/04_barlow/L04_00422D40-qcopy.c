@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 
 extern int D_L04_001B9984 __attribute__((nosda));
 /* Puts the lens flare's light source at a far-away point in the sky. */
-void func_L04_00422D40(char *object) {
+void lens_flare_reset_light_position(char *object) {
     char *state=P(object,0x68);
     Vector point;
     point.q=0;

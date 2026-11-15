@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_0042FA70, the PAL copy of func_L00_0042A520: the same C, where scale D_L00_001B164C. */
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -36,11 +37,11 @@ typedef struct {
     short idx;
 } Self_42A520;
 
-extern float func_00282C48(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
+extern float math_fabs(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
 extern Rec_42A520 *D_L00_001B1844;
 extern float D_L00_001B163C __attribute__((sda));
 extern float D_L00_001B1640 __attribute__((sda));
@@ -58,22 +59,22 @@ void func_PAL_L00_0042FA70(Self_42A520 *self)
     e = D_L00_001B1844[self->idx].ent;
     e->f28 = D_L00_001B163C;
     e->f2C = D_L00_001B1640;
-    e->f30 = func_00282C48(D_L00_001B163C);
+    e->f30 = math_fabs(D_L00_001B163C);
     e->f34 = D_L00_001B1640;
     m = e->model;
     *(TI128 *)e->v60 = *(TI128 *)m->mE0;
-    func_00282F20(m0, m->mC0, e->f28);
-    func_00282F20(m1, e->model->mE0, e->f2C);
-    func_00282CC0(m2, m1, m0);
-    func_00282CC0(self->m30, m2, e->model->m10);
-    func_00282CC0(m2, self->m30, m0);
+    vec_scale_to_length(m0, m->mC0, e->f28);
+    vec_scale_to_length(m1, e->model->mE0, e->f2C);
+    FastVecAdd(m2, m1, m0);
+    FastVecAdd(self->m30, m2, e->model->m10);
+    FastVecAdd(m2, self->m30, m0);
     *(TI128 *)v = 0;
     v[2] = 1.0f;
     v[3] = 1.0f;
-    func_00282CF0(self->m0, self->m30, m2);
-    func_00282F20(self->m0, self->m0, 1.0f);
-    func_00282DD8(self->m10, self->m0, v);
-    func_00282F20(self->m10, self->m10, 1.0f);
-    func_00282DD8(self->m20, self->m10, self->m0);
+    FastVecSub(self->m0, self->m30, m2);
+    vec_scale_to_length(self->m0, self->m0, 1.0f);
+    FastVecCross(self->m10, self->m0, v);
+    vec_scale_to_length(self->m10, self->m10, 1.0f);
+    FastVecCross(self->m20, self->m10, self->m0);
     e->f24 = (((int)(D_L00_001B164C) * 5 + 2) / 6);
 }

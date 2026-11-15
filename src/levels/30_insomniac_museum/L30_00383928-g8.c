@@ -14,19 +14,19 @@ extern int D_L30_001AEBF8 __attribute__((sda));
 extern int D_L30_001AEBFC __attribute__((sda));
 extern int D_L30_001AEC00 __attribute__((sda));
 extern int D_L30_001AEC04 __attribute__((sda));
-extern float D_L30_00233A60[][24][24];
-extern float D_L30_00235560[24][24][2];
-extern float D_L30_00236760[24][24][2];
-extern float D_L30_00237960[24][24][2];
-extern unsigned char D_L30_00238B60[24][24];
-extern unsigned long func_0027C878(int);
-extern void func_L30_00383398(void *);
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_00280B90(void *, int, int);
+extern float g_museum_water_heights[][24][24];
+extern float g_museum_water_grid_points[24][24][2];
+extern float g_museum_water_refract_uv[24][24][2];
+extern float g_museum_water_reflect_uv[24][24][2];
+extern unsigned char g_museum_water_brightness[24][24];
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void UpdateMuseumWaterGridOptics(void *);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void draw_world_quad(void *, int, int);
 
 /* Draw the 24-by-24 grid twice as quads: once with the coordinates in D_L30_00236760 and once,
    raised by D_L30_001AEBF0 and blended by the packed GS ALPHA value, with those in D_L30_00237960. */
-void func_L30_00383928(char *obj)
+void DrawMuseumWaterGrid(char *obj)
 {
     GridQuad q;
     unsigned int rgb;
@@ -49,34 +49,34 @@ void func_L30_00383928(char *obj)
     rgb = 0x808080;
     for (; row < 23; row++) {
         for (col = 0; col < 23; col++) {
-            q.color[0] = (gMuseumWaterBrightness[row][col] << 24) | rgb;
-            q.position[0][0] = gMuseumWaterGridPoints[row][col][0] + *(float *)(obj + 0x10);
-            q.position[0][1] = gMuseumWaterGridPoints[row][col][1] + *(float *)(obj + 0x14);
-            q.position[0][2] = gMuseumWaterHeights[D_L30_001AEBC0][row][col] + *(float *)(obj + 0x18);
+            q.color[0] = (g_museum_water_brightness[row][col] << 24) | rgb;
+            q.position[0][0] = g_museum_water_grid_points[row][col][0] + *(float *)(obj + 0x10);
+            q.position[0][1] = g_museum_water_grid_points[row][col][1] + *(float *)(obj + 0x14);
+            q.position[0][2] = g_museum_water_heights[D_L30_001AEBC0][row][col] + *(float *)(obj + 0x18);
             q.position[0][3] = 1.0f;
-            q.color[1] = (gMuseumWaterBrightness[row + 1][col] << 24) | rgb;
-            q.position[1][0] = gMuseumWaterGridPoints[row + 1][col][0] + *(float *)(obj + 0x10);
-            q.position[1][1] = gMuseumWaterGridPoints[row + 1][col][1] + *(float *)(obj + 0x14);
-            q.position[1][2] = gMuseumWaterHeights[D_L30_001AEBC0][row + 1][col] + *(float *)(obj + 0x18);
+            q.color[1] = (g_museum_water_brightness[row + 1][col] << 24) | rgb;
+            q.position[1][0] = g_museum_water_grid_points[row + 1][col][0] + *(float *)(obj + 0x10);
+            q.position[1][1] = g_museum_water_grid_points[row + 1][col][1] + *(float *)(obj + 0x14);
+            q.position[1][2] = g_museum_water_heights[D_L30_001AEBC0][row + 1][col] + *(float *)(obj + 0x18);
             q.position[1][3] = 1.0f;
-            q.color[2] = (gMuseumWaterBrightness[row][col + 1] << 24) | rgb;
-            q.position[2][0] = gMuseumWaterGridPoints[row][col + 1][0] + *(float *)(obj + 0x10);
-            q.position[2][1] = gMuseumWaterGridPoints[row][col + 1][1] + *(float *)(obj + 0x14);
-            q.position[2][2] = gMuseumWaterHeights[D_L30_001AEBC0][row][col + 1] + *(float *)(obj + 0x18);
+            q.color[2] = (g_museum_water_brightness[row][col + 1] << 24) | rgb;
+            q.position[2][0] = g_museum_water_grid_points[row][col + 1][0] + *(float *)(obj + 0x10);
+            q.position[2][1] = g_museum_water_grid_points[row][col + 1][1] + *(float *)(obj + 0x14);
+            q.position[2][2] = g_museum_water_heights[D_L30_001AEBC0][row][col + 1] + *(float *)(obj + 0x18);
             q.position[2][3] = 1.0f;
-            q.color[3] = (gMuseumWaterBrightness[row + 1][col + 1] << 24) | rgb;
-            q.position[3][0] = gMuseumWaterGridPoints[row + 1][col + 1][0] + *(float *)(obj + 0x10);
-            q.position[3][1] = gMuseumWaterGridPoints[row + 1][col + 1][1] + *(float *)(obj + 0x14);
-            q.position[3][2] = gMuseumWaterHeights[D_L30_001AEBC0][row + 1][col + 1] + *(float *)(obj + 0x18);
+            q.color[3] = (g_museum_water_brightness[row + 1][col + 1] << 24) | rgb;
+            q.position[3][0] = g_museum_water_grid_points[row + 1][col + 1][0] + *(float *)(obj + 0x10);
+            q.position[3][1] = g_museum_water_grid_points[row + 1][col + 1][1] + *(float *)(obj + 0x14);
+            q.position[3][2] = g_museum_water_heights[D_L30_001AEBC0][row + 1][col + 1] + *(float *)(obj + 0x18);
             q.position[3][3] = 1.0f;
-            q.uv[0][0] = gMuseumWaterRefractUv[row][col][0];
-            q.uv[0][1] = gMuseumWaterRefractUv[row][col][1];
-            q.uv[1][0] = gMuseumWaterRefractUv[row + 1][col][0];
-            q.uv[1][1] = gMuseumWaterRefractUv[row + 1][col][1];
-            q.uv[2][0] = gMuseumWaterRefractUv[row][col + 1][0];
-            q.uv[2][1] = gMuseumWaterRefractUv[row][col + 1][1];
-            q.uv[3][0] = gMuseumWaterRefractUv[row + 1][col + 1][0];
-            q.uv[3][1] = gMuseumWaterRefractUv[row + 1][col + 1][1];
+            q.uv[0][0] = g_museum_water_refract_uv[row][col][0];
+            q.uv[0][1] = g_museum_water_refract_uv[row][col][1];
+            q.uv[1][0] = g_museum_water_refract_uv[row + 1][col][0];
+            q.uv[1][1] = g_museum_water_refract_uv[row + 1][col][1];
+            q.uv[2][0] = g_museum_water_refract_uv[row][col + 1][0];
+            q.uv[2][1] = g_museum_water_refract_uv[row][col + 1][1];
+            q.uv[3][0] = g_museum_water_refract_uv[row + 1][col + 1][0];
+            q.uv[3][1] = g_museum_water_refract_uv[row + 1][col + 1][1];
             draw_world_quad(&q, 0, 0);
         }
     }
@@ -85,34 +85,34 @@ void func_L30_00383928(char *obj)
     q.texture = tex0;
     for (row = 0; row < 23; row++) {
         for (col = 0; col < 23; col++) {
-            q.color[0] = (gMuseumWaterBrightness[row][col] << 24) | rgb;
-            q.position[0][0] = gMuseumWaterGridPoints[row][col][0] + *(float *)(obj + 0x10);
-            q.position[0][1] = gMuseumWaterGridPoints[row][col][1] + *(float *)(obj + 0x14);
-            q.position[0][2] = gMuseumWaterHeights[D_L30_001AEBC0][row][col] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
+            q.color[0] = (g_museum_water_brightness[row][col] << 24) | rgb;
+            q.position[0][0] = g_museum_water_grid_points[row][col][0] + *(float *)(obj + 0x10);
+            q.position[0][1] = g_museum_water_grid_points[row][col][1] + *(float *)(obj + 0x14);
+            q.position[0][2] = g_museum_water_heights[D_L30_001AEBC0][row][col] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
             q.position[0][3] = 1.0f;
-            q.color[1] = (gMuseumWaterBrightness[row + 1][col] << 24) | rgb;
-            q.position[1][0] = gMuseumWaterGridPoints[row + 1][col][0] + *(float *)(obj + 0x10);
-            q.position[1][1] = gMuseumWaterGridPoints[row + 1][col][1] + *(float *)(obj + 0x14);
-            q.position[1][2] = gMuseumWaterHeights[D_L30_001AEBC0][row + 1][col] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
+            q.color[1] = (g_museum_water_brightness[row + 1][col] << 24) | rgb;
+            q.position[1][0] = g_museum_water_grid_points[row + 1][col][0] + *(float *)(obj + 0x10);
+            q.position[1][1] = g_museum_water_grid_points[row + 1][col][1] + *(float *)(obj + 0x14);
+            q.position[1][2] = g_museum_water_heights[D_L30_001AEBC0][row + 1][col] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
             q.position[1][3] = 1.0f;
-            q.color[2] = (gMuseumWaterBrightness[row][col + 1] << 24) | rgb;
-            q.position[2][0] = gMuseumWaterGridPoints[row][col + 1][0] + *(float *)(obj + 0x10);
-            q.position[2][1] = gMuseumWaterGridPoints[row][col + 1][1] + *(float *)(obj + 0x14);
-            q.position[2][2] = gMuseumWaterHeights[D_L30_001AEBC0][row][col + 1] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
+            q.color[2] = (g_museum_water_brightness[row][col + 1] << 24) | rgb;
+            q.position[2][0] = g_museum_water_grid_points[row][col + 1][0] + *(float *)(obj + 0x10);
+            q.position[2][1] = g_museum_water_grid_points[row][col + 1][1] + *(float *)(obj + 0x14);
+            q.position[2][2] = g_museum_water_heights[D_L30_001AEBC0][row][col + 1] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
             q.position[2][3] = 1.0f;
-            q.color[3] = (gMuseumWaterBrightness[row + 1][col + 1] << 24) | rgb;
-            q.position[3][0] = gMuseumWaterGridPoints[row + 1][col + 1][0] + *(float *)(obj + 0x10);
-            q.position[3][1] = gMuseumWaterGridPoints[row + 1][col + 1][1] + *(float *)(obj + 0x14);
-            q.position[3][2] = gMuseumWaterHeights[D_L30_001AEBC0][row + 1][col + 1] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
+            q.color[3] = (g_museum_water_brightness[row + 1][col + 1] << 24) | rgb;
+            q.position[3][0] = g_museum_water_grid_points[row + 1][col + 1][0] + *(float *)(obj + 0x10);
+            q.position[3][1] = g_museum_water_grid_points[row + 1][col + 1][1] + *(float *)(obj + 0x14);
+            q.position[3][2] = g_museum_water_heights[D_L30_001AEBC0][row + 1][col + 1] + *(float *)(obj + 0x18) + D_L30_001AEBF0;
             q.position[3][3] = 1.0f;
-            q.uv[0][0] = gMuseumWaterReflectUv[row][col][0];
-            q.uv[0][1] = gMuseumWaterReflectUv[row][col][1];
-            q.uv[1][0] = gMuseumWaterReflectUv[row + 1][col][0];
-            q.uv[1][1] = gMuseumWaterReflectUv[row + 1][col][1];
-            q.uv[2][0] = gMuseumWaterReflectUv[row][col + 1][0];
-            q.uv[2][1] = gMuseumWaterReflectUv[row][col + 1][1];
-            q.uv[3][0] = gMuseumWaterReflectUv[row + 1][col + 1][0];
-            q.uv[3][1] = gMuseumWaterReflectUv[row + 1][col + 1][1];
+            q.uv[0][0] = g_museum_water_reflect_uv[row][col][0];
+            q.uv[0][1] = g_museum_water_reflect_uv[row][col][1];
+            q.uv[1][0] = g_museum_water_reflect_uv[row + 1][col][0];
+            q.uv[1][1] = g_museum_water_reflect_uv[row + 1][col][1];
+            q.uv[2][0] = g_museum_water_reflect_uv[row][col + 1][0];
+            q.uv[2][1] = g_museum_water_reflect_uv[row][col + 1][1];
+            q.uv[3][0] = g_museum_water_reflect_uv[row + 1][col + 1][0];
+            q.uv[3][1] = g_museum_water_reflect_uv[row + 1][col + 1][1];
             draw_world_quad(&q, 0, 0);
         }
     }

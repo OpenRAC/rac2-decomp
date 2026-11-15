@@ -60,39 +60,39 @@ typedef struct {
     int owner;                  /* 0x2290 */
 } Hero5940;
 
-extern Hero5940 D_00189E20;
-extern char D_L00_001B8FF0[], D_L00_001B8DC0[], D_L00_001BF220[];
+extern Hero5940 g_hero_state;
+extern char D_L00_001B8FF0[], g_camera_l00_position[], D_L00_001BF220[];
 extern Quad5940 D_L00_001B8DD0;
 /* Incomplete sda arrays are read with the assembler's lui/load macro, as in retail. */
 extern unsigned char D_001A7A44[] __attribute__((sda));
-extern int D_L00_001B19C8[] __attribute__((sda));
+extern int g_frame_l00_counter[] __attribute__((sda));
 extern float D_L00_001A7FE4[] __attribute__((sda));
 extern const float D_L00_001A7FE0 __attribute__((sda));
 extern float D_L00_001A7CE0 __attribute__((sda)), D_L00_001A7CE4 __attribute__((sda));
 
-extern int func_L00_002ADED8(int);
+extern int hero_is_slot_item_wrench(int);
 extern void func_002A0F48(void *);
-extern char *func_L00_002F3DA8(int);
-extern int func_L00_002D6418(void);
-extern void func_00283658(void *, void *);
-extern void func_002AA2E8(float *, float, float);
-extern float func_002AA548(float *, float *, float, float, float, float);
-extern float func_00283B98(float, float), func_00283198(float);
-extern void func_002830C0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00283410(void *, void *), func_00283738(void *, void *, void *);
-extern void func_002AB6D8(void *, void *), func_002A91F0(void *, void *);
-extern void func_00283098(void *, void *, void *), func_00282D08(void *, void *, void *, float);
-extern void func_00283810(void *, void *, void *, float), func_00283958(void *, void *);
-extern void func_00282D30(void *, void *, float), func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_00283678(void *, void *);
+extern char *level_get_table_entry_address(int);
+extern int hero_is_action_allowed(void);
+extern void copy_matrix_rotation(void *, void *);
+extern void ApproachValue(float *, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float);
+extern void transform_vector(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void euler_to_matrix(void *, void *), multiply_matrix3x3(void *, void *, void *);
+extern void mat_get_euler_angles(void *, void *), mat_build_rotation_from_angles(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *), lerp_vector(void *, void *, void *, float);
+extern void vec_fast_normalize3(void *, void *, void *, float), quaternion_to_rotation_basis(void *, void *);
+extern void FastVecScale(void *, void *, float), vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void copy_matrix3x4(void *, void *);
 
 /* Places the hero's held object (D_00189E20.object): from the weapon's mount offset and
    rotation, a turning bob angle, the blend from the transition pose while blend < 1, and a
    ground probe that limits the vertical offset to [-1.5, 0]. */
-void func_L00_002D5940(void) {
-    Moby5940 *obj = gHeroState.object;
+void UpdateHeroHeldObject(void) {
+    Moby5940 *obj = g_hero_state.object;
     char *mount;
     float m[16], rot[16], offset[4], temp[4], a[4], b[4];
     float turn, height, scale, target;
@@ -101,7 +101,7 @@ void func_L00_002D5940(void) {
     if (!obj)
         return;
     if (obj->oClass == 0x47 /* moby class 71 */) {
-        if (!gHeroState.visible && !obj->state) {
+        if (!g_hero_state.visible && !obj->state) {
             obj->drawn = 0;
             obj->modeBits |= 1;
         } else {
@@ -110,7 +110,7 @@ void func_L00_002D5940(void) {
         }
         return;
     }
-    if (IsHeroSlotItemWrench(0)) {
+    if (hero_is_slot_item_wrench(0)) {
         obj->modeBits |= 1;
         obj->drawn = 0;
         if (obj->update)
@@ -119,41 +119,41 @@ void func_L00_002D5940(void) {
         return;
     }
 
-    mount = GetLevelTableEntryAddress(gHeroState.weapon);
+    mount = level_get_table_entry_address(g_hero_state.weapon);
     copy_matrix_rotation(m, D_L00_001B8FF0);
     qcopy_nc(&m[12], D_L00_001B8FF0 - 0x230);
     m[15] = 1.0f;
     qcopy_nc(offset, mount);
-    offset[0] += gHeroState.offset;
-    if (D_001A7A44[0] && !IsHeroActionAllowed())
+    offset[0] += g_hero_state.offset;
+    if (D_001A7A44[0] && !hero_is_action_allowed())
         offset[1] = -offset[1];
 
     /* Turn rate in degrees per second (FE4 while moving, FE0 otherwise) to radians per frame. */
-    if (gHeroState.speed > 0.02f)
+    if (g_hero_state.speed > 0.02f)
         turn = D_L00_001A7FE4[0] * 0.0002908882452175021f;
     else
         turn = D_L00_001A7FE0 * 0.0002908882452175021f;
-    ApproachValue(&gHeroState.angleVelocity, turn, 0.006981317885220051f);
-    gHeroState.angle = FastAddRotations(gHeroState.angle, gHeroState.angleVelocity);
-    offset[2] += FastSinOrCosB(gHeroState.angle) * 0.02f;
+    ApproachValue(&g_hero_state.angleVelocity, turn, 0.006981317885220051f);
+    g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_hero_state.angleVelocity);
+    offset[2] += math_fast_sin_or_cos_b(g_hero_state.angle) * 0.02f;
 
     transform_vector(obj->position, offset, m);
-    if (!IsHeroActionAllowed())
-        FastVecAdd(obj->position, obj->position, gHeroState.velocity);
+    if (!hero_is_action_allowed())
+        FastVecAdd(obj->position, obj->position, g_hero_state.velocity);
     euler_to_matrix(rot, mount + 0x10);
     multiply_matrix3x3(obj->rotMatrix, m, rot);
-    GetEulerAnglesFromMatrix(obj->rotMatrix, obj->rotation);
-    BuildRotationFromAngles(gHeroState.rotation, obj->rotation);
+    mat_get_euler_angles(obj->rotMatrix, obj->rotation);
+    mat_build_rotation_from_angles(g_hero_state.rotation, obj->rotation);
 
-    if (gHeroState.blend < 1.0f) {
-        StepValueTowardTarget(&gHeroState.blend, &gHeroState.blendVelocity, 1.0f,
+    if (g_hero_state.blend < 1.0f) {
+        math_step_value_toward_target(&g_hero_state.blend, &g_hero_state.blendVelocity, 1.0f,
                       D_L00_001A7CE0 * 0.016666667f, D_L00_001A7CE4 * 0.00027777778f,
                       D_L00_001A7CE0 * 0.016666667f);
-        matrix_mul_vec3(temp, gHeroState.transitionPos, &gHeroState);
-        FastVecAdd(temp, temp, gHeroState.position);
-        lerp_vector(obj->position, temp, obj->position, gHeroState.blend);
-        BuildRotationFromAngles(a, obj->rotation);
-        FastVectorNormalize3(b, gHeroState.transitionRot, a, gHeroState.blend);
+        matrix_mul_vec3(temp, g_hero_state.transitionPos, &g_hero_state);
+        FastVecAdd(temp, temp, g_hero_state.position);
+        lerp_vector(obj->position, temp, obj->position, g_hero_state.blend);
+        mat_build_rotation_from_angles(a, obj->rotation);
+        vec_fast_normalize3(b, g_hero_state.transitionRot, a, g_hero_state.blend);
         quaternion_to_rotation_basis(b, obj->rotMatrix);
     }
 
@@ -161,37 +161,37 @@ void func_L00_002D5940(void) {
     obj->modeBits &= ~1;
     func_002A0F48(obj);
 
-    if ((gFrameCounter_L00[0] ^ 1) & 1) {
+    if ((g_frame_l00_counter[0] ^ 1) & 1) {
         scale = 0.0009765625f;
         height = obj->bounds[3] * scale;
         FastVecScale(temp, obj->bounds, scale);
         vec_scale_to_length(a, obj->rotMatrix[1], height * -1.2f);
         FastVecAdd(a, a, temp);
-        if (CollLine(gCameraPosition_L00, a, 0, gHeroState.owner, 0)) {
-            target = (gHeroState.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
-            gHeroState.offsetTarget = target;
+        if (CollLine(g_camera_l00_position, a, 0, g_hero_state.owner, 0)) {
+            target = (g_hero_state.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
+            g_hero_state.offsetTarget = target;
             if (target > 0.0f)
-                gHeroState.offsetTarget = 0.0f;
+                g_hero_state.offsetTarget = 0.0f;
             else if (target < -1.5f)
-                gHeroState.offsetTarget = -1.5f;
+                g_hero_state.offsetTarget = -1.5f;
         } else {
-            gHeroState.offsetTarget = 0;
+            g_hero_state.offsetTarget = 0;
         }
     }
 
-    StepValueTowardTarget(&gHeroState.offset, &gHeroState.offsetVelocity, gHeroState.offsetTarget,
+    math_step_value_toward_target(&g_hero_state.offset, &g_hero_state.offsetVelocity, g_hero_state.offsetTarget,
                   0.0041666669f, 0.0041666669f, 0.083333336f);
-    copy_matrix3x4(gHeroState.transform, m);
-    qcopy_nc(&gHeroState.vector760, m);
-    qcopy_nc(&gHeroState.vector770, &D_L00_001B8DD0);
+    copy_matrix3x4(g_hero_state.transform, m);
+    qcopy_nc(&g_hero_state.vector760, m);
+    qcopy_nc(&g_hero_state.vector770, &D_L00_001B8DD0);
 
-    state = IsHeroActionAllowed();
+    state = hero_is_action_allowed();
     if (state)
-        gHeroState.flags |= 5;
+        g_hero_state.flags |= 5;
     if (obj->update)
         obj->update(obj);
     if (state)
-        gHeroState.flags &= ~5;
+        g_hero_state.flags &= ~5;
 }
 
 /* func_L00_002D5EB8 */
@@ -199,12 +199,12 @@ extern int D_0018C350[];
 extern unsigned char D_001A7A00[] __attribute__((sda));
 extern int D_0018C2EC[];
 extern unsigned char D_001A7A28[] MACRO_ADDR;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern int D_L00_001A903C;
-extern unsigned short D_0018C958 __attribute__((section(".data")));
+extern unsigned short g_subtitle_history __attribute__((section(".data")));
 extern int D_00139868[];
 extern int D_001A7398[] MACRO_ADDR;
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
 /* One 0xE0-byte entry of D_L00_00262570, indexed through D_00139568. */
 typedef struct {
@@ -219,18 +219,18 @@ typedef struct {
     char pad70[0x70];
 } Entry1269;
 
-extern Entry1269 D_L00_00262570[];
-extern int func_L00_002D5E30(int *, int *, int *);
-extern void func_0028A180(int, int);
-extern void func_L00_003F1300(void);
-extern void func_L00_0030C7F8(int);
-extern void func_002B0A18(int, int);
-extern int func_002E5E58(int, int, void *);
-extern int func_00288D58(void);
-extern int func_00287F60(int);
-extern void func_L00_0037E6A8(int, int);
-extern void func_00287EB0(int);
-extern void func_00288508(int);
+extern Entry1269 g_weapon_l00_table[];
+extern int math_sum_table_entries_under_limit(int *, int *, int *);
+extern void hud_queue_hint_message(int, int);
+extern void effect_controller_spawn(void);
+extern void module_l00_call_handler_with_arg_4(int);
+extern void value_set_entry_by_index(int, int);
+extern int snd_play_from_global_bank(int, int, void *);
+extern int flag_is_byte_set(void);
+extern int menu_count_chain_entries_after_head(int);
+extern void gfx_set_screen_pair_run_effect(int, int);
+extern void menu_advance_chain_entry(int);
+extern void help_show_message_for_id(int);
 extern int ref_L00_002D5EB8_00 __attribute__((sda));
 
 static inline int special(int i)
@@ -258,8 +258,8 @@ static inline int unlocked(Entry1269 *e, int i)
 
 static inline int owned(int i)
 {
-    if (gWeaponTable_L00[gItemSlotToRecord[i]].exists) {
-        int n = CountChainEntriesAfterHead(i);
+    if (g_weapon_l00_table[g_item_slot_to_record[i]].exists) {
+        int n = menu_count_chain_entries_after_head(i);
         if (n >= 2 || (n == 1 && special(i)))
             return 1;
     }
@@ -267,102 +267,102 @@ static inline int owned(int i)
 }
 
 /* Checks the player's weapons and gadgets each frame: updates the item count, plays the unlock effects, and gives the final reward once everything is collected. */
-void func_L00_002D5EB8(void)
+void hero_update_collection_progress(void)
 {
     int count, i, j, ok;
 
-    if ((gFrameCounter_L00[0] & 15) == 1 && gFrameCounter_L00[0] != 1)
+    if ((g_frame_l00_counter[0] & 15) == 1 && g_frame_l00_counter[0] != 1)
         return;
     count = 4;
     {
         int *p = D_0018C350;
-        SumTableEntriesUnderLimit(p, p - 1, &count);
+        math_sum_table_entries_under_limit(p, p - 1, &count);
     }
     for (j = 0; j < 10; j++)
         if (D_001A7A28[j])
             count++;
     if (*(int *)D_001A7A00 != count) {
         if (ref_L00_002D5EB8_00 >= 11 && *(int *)D_001A7A00 < count) {
-            if (!gSubtitleHistory)
-                QueueHintMessage(0x9A9, 0);
-            SpawnEffectControllerMoby();
-            CallLoadedModuleHandlerWithArg_0034B000(0x168);
-            SetEntryValueByIndex(0x1235, -1);
-            PlaySoundFromGlobalBank(6, 0, 0);
+            if (!g_subtitle_history)
+                hud_queue_hint_message(0x9A9, 0);
+            effect_controller_spawn();
+            module_l00_call_handler_with_arg_4(0x168);
+            value_set_entry_by_index(0x1235, -1);
+            snd_play_from_global_bank(6, 0, 0);
         }
         D_0018C2EC[0] = count;
         *(int *)D_001A7A00 = count;
     }
 
     for (i = 0; i < 56; i++) {
-        if ((gWeaponTable_L00 + gItemSlotToRecord[i])->state) {
-            if (!IsFlagByteSet())
+        if ((g_weapon_l00_table + g_item_slot_to_record[i])->state) {
+            if (!flag_is_byte_set())
                 continue;
-            if (CountChainEntriesAfterHead(i) == 1)
+            if (menu_count_chain_entries_after_head(i) == 1)
                 continue;
         }
         {
-            Entry1269 *e = &gWeaponTable_L00[gItemSlotToRecord[i]];
+            Entry1269 *e = &g_weapon_l00_table[g_item_slot_to_record[i]];
             int sel = 0;
             if (e->exists)
                 sel = e->state == 3;
             if (sel)
                 continue;
         }
-        if (CountChainEntriesAfterHead(i) <= 0)
+        if (menu_count_chain_entries_after_head(i) <= 0)
             continue;
         {
-            Entry1269 *e = &gWeaponTable_L00[gItemSlotToRecord[i]];
+            Entry1269 *e = &g_weapon_l00_table[g_item_slot_to_record[i]];
             if ((D_00139868[i] >> 5) < e->limit || e->limit <= 0)
                 continue;
             if (i == 31 || i == 9 || i == 45) {
-                SetScreenPairAndRunEffect(i, gWeaponTable_L00[gItemSlotToRecord[i]].value);
+                gfx_set_screen_pair_run_effect(i, g_weapon_l00_table[g_item_slot_to_record[i]].value);
                 continue;
             }
-            if (gHeroState.weapon == i) {
-                if (!gHeroState.f340)
+            if (g_hero_state.weapon == i) {
+                if (!g_hero_state.f340)
                     continue;
                 if (D_001A7398[e->index] != i)
                     continue;
-                SetScreenPairAndRunEffect(i, e->value);
+                gfx_set_screen_pair_run_effect(i, e->value);
                 continue;
             }
         }
-        if (IsFlagByteSet()) {
-            Entry1269 *e = &gWeaponTable_L00[gItemSlotToRecord[i]];
+        if (flag_is_byte_set()) {
+            Entry1269 *e = &g_weapon_l00_table[g_item_slot_to_record[i]];
             if (!e->exists)
                 continue;
             if (unlocked(e, i)) {
                 if (owned(i)) {
-                    AdvanceChainEntry(i);
-                    ShowHelpMessageForId(i);
+                    menu_advance_chain_entry(i);
+                    help_show_message_for_id(i);
                 }
             }
         } else {
-            AdvanceChainEntry(i);
-            ShowHelpMessageForId(i);
+            menu_advance_chain_entry(i);
+            help_show_message_for_id(i);
         }
     }
 
-    if ((gFrameCounter_L00[0] & 127) || D_001A7A00[0x7A])
+    if ((g_frame_l00_counter[0] & 127) || D_001A7A00[0x7A])
         return;
     ok = 1;
     for (i = 0; i < 56; i++) {
-        int ex = gWeaponTable_L00[gItemSlotToRecord[i]].exists;
+        int ex = g_weapon_l00_table[g_item_slot_to_record[i]].exists;
         if (ex && i == 10)
             continue;
         if (ex && i == 9)
             continue;
         if (ex) {
-            if (!gItemOwnedFlags[i]) {
+            if (!g_item_owned_flags[i]) {
                 ok = 0;
                 break;
             }
             if (i == 14 || i == 12 || i == 17 || i == 18 || i == 53)
                 continue;
-            if (CountChainEntriesAfterHead(i) <= 0)
+            if (menu_count_chain_entries_after_head(i) <= 0)
                 continue;
-            if (!gWeaponTable_L00[gItemSlotToRecord[i]].state) {
+            if (!g_weapon_l00_table[g_item_slot_to_record[i]].state) {
                 ok = 0;
                 break;
             }
@@ -370,8 +370,8 @@ void func_L00_002D5EB8(void)
     }
     if (ok && !D_001A7A00[0x7A]) {
         D_001A7A00[0x7A] = 1;
-        PlaySoundFromGlobalBank(1, 0, 0);
-        SetEntryValueByIndex(0x1233, -1);
+        snd_play_from_global_bank(1, 0, 0);
+        value_set_entry_by_index(0x1233, -1);
         D_L00_001A903C = 1;
     }
 }

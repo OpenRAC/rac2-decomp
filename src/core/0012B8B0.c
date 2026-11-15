@@ -3,21 +3,21 @@
 
 extern void r1_func_0012C468(void *, void *);
 
-extern int func_0012C680(void *, int);
+extern int mpeg_peek_bits(void *, int);
 
-extern int func_0012B8B0(void *, int);
+extern int mpeg_decode_slice_macroblocks(void *, int);
 
-extern int func_0012B1C0(void *);
+extern int mpeg_wait_block_decode_done(void *);
 
 extern int r1_func_001263A8(void *, int);
 
-extern int func_0012B780(void *, int, int *, int *, void *);
+extern int mpeg_read_slice_header(void *, int, int *, int *, void *);
 
-extern int func_0012B568(void *);
+extern int mpeg_read_mb_address_increment(void *);
 
 extern char r1_D_00153948[];
 
-extern int func_0012BB60(void *, int *, int *, int *, void *, void *, void *);
+extern int mpeg_decode_macroblock_modes(void *, int *, int *, int *, void *, void *, void *);
 
 extern int r1_func_00125630(void *, int, int, int, int, void *, void *, void *);
 
@@ -42,7 +42,7 @@ extern char r1_D_00153968[];
  * happens along the way.
  */
 /* Decodes the macroblocks of one picture in order. Returns 0 when done, or a nonzero code if the stream is damaged. */
-int func_0012B8B0(void *decoderPtr, int mbCount) {
+int mpeg_decode_slice_macroblocks(void *decoderPtr, int mbCount) {
     char *dec = (char *)decoderPtr;
     int mbAddr = 0;
     int mbInc = 0;
@@ -52,7 +52,7 @@ int func_0012B8B0(void *decoderPtr, int mbCount) {
     int dmvector[4];
     int r;
 
-    r = ReadMpegSliceHeader(dec, mbCount, &mbAddr, &mbInc, pmv);
+    r = mpeg_read_slice_header(dec, mbCount, &mbAddr, &mbInc, pmv);
     if (r != 0) {
         return r;
     }
@@ -69,13 +69,13 @@ int func_0012B8B0(void *decoderPtr, int mbCount) {
         mbIdx = *(int *)(dec + 0x810);
         entry = dec + mbIdx * 0x140;
         *(int *)(entry + 0x6CC) = 0;
-        r = WaitMpegBlockDecodeDone(dec);
+        r = mpeg_wait_block_decode_done(dec);
         if (r == 0) {
             return 2;
         }
 
         if (mbInc == 0) {
-            int peeked = PeekMpegBits(dec, 0x17);
+            int peeked = mpeg_peek_bits(dec, 0x17);
             if (peeked == 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 3;
@@ -85,7 +85,7 @@ int func_0012B8B0(void *decoderPtr, int mbCount) {
                 return 3;
             }
 
-            mbInc = ReadMpegMbAddressIncrement(dec);
+            mbInc = mpeg_read_mb_address_increment(dec);
             if (*(int *)(dec + 0x11C) != 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 1;
@@ -98,14 +98,14 @@ int func_0012B8B0(void *decoderPtr, int mbCount) {
         }
 
         if (mbInc == 1) {
-            r = DecodeMpegMacroblockModes(dec, &mbType, &motionType, &dctType, pmv,
+            r = mpeg_decode_macroblock_modes(dec, &mbType, &motionType, &dctType, pmv,
                                mvfs, dmvector);
             if (r == 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 1;
             }
         } else {
-            r = HandleMpegSkippedMacroblock(dec, pmv, &motionType, mvfs, &mbType);
+            r = mpeg_handle_skipped_macroblock(dec, pmv, &motionType, mvfs, &mbType);
             if (r == 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 2;
@@ -139,7 +139,7 @@ int func_0012B8B0(void *decoderPtr, int mbCount) {
  * +0x150 == 1. The r1_func_0012C468 call takes arg0 -- the moby struct,
  * still live in $4 -- not a4/s0, which is a common trap here. */
 /* Handles a skipped macroblock by setting default motion data and clearing its intra flag. Returns 0 on a stream error. */
-int func_0012BAA0(void *decoderPtr, int *pmv, int *motionType, int *mvfs, int *mbType) {
+int mpeg_handle_skipped_macroblock(void *decoderPtr, int *pmv, int *motionType, int *mvfs, int *mbType) {
     int idx;
     char *entry;
     int ret = 1;

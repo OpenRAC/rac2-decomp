@@ -39,29 +39,29 @@ extern float D_L00_001A7F48[] SDATA(D_L00_001A7F48);
 extern float D_L00_001A7F58[] SDATA(D_L00_001A7F58);
 extern char D_L00_001BF220[];
 typedef struct { char pad[0x28]; float height; } HitResult;
-extern HitResult D_L00_001BF200;
+extern HitResult g_collision_result;
 extern char D_L00_001B1EE0[];
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00283BE0(float, float);
-extern float func_00283B98(float, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern float FastAddRotations(float, float);
 extern void func_002A04E8(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00282C48(float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282C50(float, float);
-extern float func_L00_002EE050(float, float);
+extern float mat_fast_helper_a(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fabs(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fmin(float, float);
+extern float math_max_float(float, float);
 /* The bounds also have raw-word clear operations in the retail code. */
 #define P D_00189E20_2.f2290
 #define O(t, o) (*(t *)((char *)P + (o)))
 
 /* Works out how tall and wide the hero counts as for collisions. It fires four short rays around the hero and uses what they hit. */
-void func_L00_002A9760(void)
+void UpdateHeroMobyProbedHeightBounds(void)
 {
     float a[4], b[4], c[4];
     float angle, cs, sn, height;
@@ -108,15 +108,15 @@ void func_L00_002A9760(void)
         D_00189E20_2.feb0 = FastAddRotations(D_00189E20_2.feb0, delta);
     }
     func_002A04E8(P, a);
-    angle = FastMatrixHelperA(a[0], a[1]);
-    cs = FastSinOrCosA(angle);
-    sn = FastSinOrCosB(angle);
+    angle = mat_fast_helper_a(a[0], a[1]);
+    cs = math_fast_sin_or_cos_a(angle);
+    sn = math_fast_sin_or_cos_b(angle);
     {
-        float cosine = FastSinOrCosA(D_00189E20_2.feb0);
+        float cosine = math_fast_sin_or_cos_a(D_00189E20_2.feb0);
         a[0] = cs * cosine;
         a[1] = sn * cosine;
     }
-    a[2] = -FastSinOrCosB(D_00189E20_2.feb0);
+    a[2] = -math_fast_sin_or_cos_b(D_00189E20_2.feb0);
     qcopy(D_L00_001B1EE0, a);
     height = D_00189E20_2.f318;
     if (height < 1.0f) {
@@ -133,7 +133,7 @@ void func_L00_002A9760(void)
         }
     }
     near = 0;
-    if (FloatAbs(D_00189E20_2.feb0 - 1.56f) < 0.1f)
+    if (math_fabs(D_00189E20_2.feb0 - 1.56f) < 0.1f)
         near = 1;
     if (!near) {
         float hi = height, lo = height;
@@ -145,17 +145,17 @@ void func_L00_002A9760(void)
             scale = O(float, 0xc) * 0.0009765625f;
             FastVecScale(probeStart, P, 0.0009765625f);
             t = FastAddRotations(angle, *turn);
-            cosine = FastSinOrCosA(t);
+            cosine = math_fast_sin_or_cos_a(t);
             step = scale * 0.35f;
             b[0] += cosine * step;
-            b[1] += FastSinOrCosB(t) * step;
+            b[1] += math_fast_sin_or_cos_b(t) * step;
             b[2] += *offset * scale;
             distance = ((b[2] - height + 0.5f) * 2.0f) / -a[2];
             vec_scale_to_length(probeEnd, a, distance);
             FastVecAdd(probeEnd, probeStart, probeEnd);
             if (CollLine(probeStart, probeEnd, 34, 0, 0)) {
-                lo = FloatMin(lo, gCollisionResult.height);
-                hi = MaxFloat(hi, gCollisionResult.height);
+                lo = math_fmin(lo, g_collision_result.height);
+                hi = math_max_float(hi, g_collision_result.height);
             }
         }
         O(float, 0x70) = (lo + hi) * 0.5f - O(float, 0x18);

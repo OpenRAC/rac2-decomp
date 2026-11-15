@@ -2,13 +2,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern unsigned char *func_0029EFD0(int);
-extern int func_002A0488(void *, int, int, int);
-extern float func_002A7878(float, float);
+extern unsigned char *CreateMoby(int);
+extern int set_moby_color(void *, int, int, int);
+extern float math_random_float_range(float, float);
 extern void func_002A0F48(void *);
 
 /* Creates a small spinning debris effect at a position, moving in the given direction for a given time. */
-unsigned char *func_00308600(char *position, char *vector, int count, int mode, int flag)
+unsigned char *part_spawn_spinning_debris(char *position, char *vector, int count, int mode, int flag)
 {
     unsigned char *moby = CreateMoby(0x7A /* moby class 122 */);
     char *state;
@@ -26,8 +26,8 @@ unsigned char *func_00308600(char *position, char *vector, int count, int mode, 
         *(TI128 *)state = *(TI128 *)vector;
         lo = 0.1047197729f;
         hi = 0.2094395458f;
-        *(float *)(state + 0x10) = RandomFloatRange(lo, hi);
-        *(float *)(state + 0x14) = RandomFloatRange(lo, hi);
+        *(float *)(state + 0x10) = math_random_float_range(lo, hi);
+        *(float *)(state + 0x14) = math_random_float_range(lo, hi);
         *(short *)(state + 0x18) = (short)count;
         *(short *)(state + 0x1A) = (short)count;
         if (mode == 2) {
@@ -35,7 +35,7 @@ unsigned char *func_00308600(char *position, char *vector, int count, int mode, 
             *(int *)(state + 0x20) = mode;
         }
         if (mode == 0)
-            *(float *)(moby + 0x2C) *= RandomFloatRange(0.5f, 0.75f);
+            *(float *)(moby + 0x2C) *= math_random_float_range(0.5f, 0.75f);
         *(float *)(state + 0x1C) = *(float *)(moby + 0x2C);
         moby[0xBC] = (unsigned char)(mode | (flag << 1));
         func_002A0F48(moby);

@@ -16,14 +16,14 @@ struct row224 {
     unsigned char rest[0xD8];
 };
 
-extern int D_001ADB10 __attribute__((sda));
+extern int g_selected_item_material __attribute__((sda));
 /* D_001A7A18 is read as element 4 of the 8-byte object at D_001A7A10: an index past a small-data object
    makes cc1 emit the two-word absolute load (not delay-slot material) that retail has, where a plain short
    comes out $gp-relative in the call's delay slot */
 extern short D_001A7A10[4];
-extern unsigned char D_001A7AF8[];
-extern unsigned char D_00139568[];
-extern struct row224 D_00239BA0[];
+extern unsigned char g_item_owned_flags[];
+extern unsigned char g_item_slot_to_record[];
+extern struct row224 g_weapon_table[];
 /* incomplete arrays and a 16-byte struct are not small data: D_00138344 stays a lui/lw pair on two registers and
    the copy sources D_001AE270/D_001AE2A8 are reached through a lui/addiu address, as in retail */
 extern int D_00138344[];
@@ -43,67 +43,67 @@ extern float D_001AE2B0 __attribute__((sda));
 extern float D_001AE2B4;
 extern float D_001AE2B8 __attribute__((sda));
 extern float D_001AE2BC;
-extern void func_00287FF8(int, int);
-extern void func_00343EE8(char *, unsigned int);
-extern void func_00344298(char *, unsigned int);
-extern void func_00343FF8(char *, unsigned int);
-extern void func_00344160(char *, unsigned int);
-extern void func_00335E38(char *, float, float, float, float);
-extern int func_002A9588(int, int, int, int, int);
-extern int *func_00335E20(char *);
-extern void func_00344848(char *);
+extern void menu_seek_chain_entry(int, int);
+extern void grid_menu_handle_input_first_group(char *, unsigned int);
+extern void grid_menu_handle_input_single_choice(char *, unsigned int);
+extern void grid_menu_handle_input_main_grid(char *, unsigned int);
+extern void grid_menu_handle_input_small_group(char *, unsigned int);
+extern void object_set_first_float4(char *, float, float, float, float);
+extern int math_ping_pong_blend_values(int, int, int, int, int);
+extern int *object_get_fourth_field(char *);
+extern void grid_menu_reposition_widgets(char *);
 
 /* menu update: clears the index at +0x444, dispatches on the mode at +0x448 (0 to 3), stores the id of the
    selected entry in D_001ADB10, then repositions ten widgets from the position pointer at +0x430; returns 0 */
-int func_00344478(char *menu, unsigned int buttons)
+int grid_menu_update(char *menu, unsigned int buttons)
 {
     *(int *)(menu + 0x444) = 0;
-    gSelectedItemMaterial = -1;
-    SeekChainEntry(6, D_001A7A10[4]);
+    g_selected_item_material = -1;
+    menu_seek_chain_entry(6, D_001A7A10[4]);
     switch (*(int *)(menu + 0x448)) {
     case 0:
-        HandleGridMenuInputGroup0(menu, buttons);
+        grid_menu_handle_input_first_group(menu, buttons);
         break;
     case 1:
-        HandleGridMenuInputGroup1(menu, buttons);
+        grid_menu_handle_input_single_choice(menu, buttons);
         break;
     case 2:
-        HandleGridMenuInputGroup2(menu, buttons);
+        grid_menu_handle_input_main_grid(menu, buttons);
         break;
     case 3:
-        HandleGridMenuInputGroup3(menu, buttons);
+        grid_menu_handle_input_small_group(menu, buttons);
         break;
     }
     if (*(int *)(menu + 0x448) == 3) {
         struct quad table = D_001AE270;
         int idx = *(int *)(menu + 0x444);
 
-        gSelectedItemMaterial = table.v[idx];
+        g_selected_item_material = table.v[idx];
     } else {
         int idx = *(int *)(menu + 0x444);
 
-        if (gItemOwnedFlags[idx])
-            gSelectedItemMaterial = (gWeaponTable_00239BA0 + gItemSlotToRecord[idx])->id;
+        if (g_item_owned_flags[idx])
+            g_selected_item_material = (g_weapon_table + g_item_slot_to_record[idx])->id;
     }
     {
         float zero = 0.0f;
         struct vec2 offset = D_001AE2A8[0];
         struct vec2 **pos = (struct vec2 **)(menu + 0x430);
 
-        SetFirstFloat4(menu, D_001AE280 + (*pos)->x, D_001AE284 + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x4C, D_001AE2A0 + (*pos)->x, D_001AE2A4 + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x98, D_001AE288 + (*pos)->x, D_001AE28C + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0xE4, D_001AE290 + (*pos)->x, D_001AE294 + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x130, D_001AE298 + (*pos)->x, D_001AE29C + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x1C8, offset.x + (*pos)->x, offset.y + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x298, D_001AE2B0 + (*pos)->x, D_001AE2B4 + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x210, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x130, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
-        SetFirstFloat4(menu + 0x17C, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        object_set_first_float4(menu, D_001AE280 + (*pos)->x, D_001AE284 + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x4C, D_001AE2A0 + (*pos)->x, D_001AE2A4 + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x98, D_001AE288 + (*pos)->x, D_001AE28C + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0xE4, D_001AE290 + (*pos)->x, D_001AE294 + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x130, D_001AE298 + (*pos)->x, D_001AE29C + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x1C8, offset.x + (*pos)->x, offset.y + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x298, D_001AE2B0 + (*pos)->x, D_001AE2B4 + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x210, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x130, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        object_set_first_float4(menu + 0x17C, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
     }
     if (D_00138344[0] & 0xF000)
-        PingPongBlendValues(0, 0, 1, 0, 1);
-    *GetFieldC(menu + 0x17C) = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    RepositionGridMenuWidgets(menu);
+        math_ping_pong_blend_values(0, 0, 1, 0, 1);
+    *object_get_fourth_field(menu + 0x17C) = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    grid_menu_reposition_widgets(menu);
     return 0;
 }

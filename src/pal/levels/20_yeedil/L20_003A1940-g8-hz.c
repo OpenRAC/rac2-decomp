@@ -9,14 +9,14 @@ extern float D_L20_001AED10 __attribute__((sda));
 extern float D_L20_001AED0C __attribute__((sda));
 extern char *D_L20_001B308C __attribute__((nosda));
 
-extern float func_00283B98(float, float);
-extern float func_00283C80(float, float);
-extern float func_002AAA00(void *, float, float, float, float, void *, int);
-extern float func_002AA548(char *, char *, float, float, float, float);
-extern float func_00282C48(float);
-extern int func_00282C30(int);
-extern void func_00282C90(char *);
-extern void func_002830C0(char *, char *, char *);
+extern float FastAddRotations(float, float);
+extern float FastDiffRots(float, float);
+extern float math_approach_target_with_direction_mode(void *, float, float, float, float, void *, int);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_fabs(float);
+extern int subtract_integer_with_clamp(int);
+extern void vec_store_helper(char *);
+extern void transform_vector(char *, char *, char *);
 
 void func_PAL_L20_003A1940(char *obj) {
     char *state = FLD(obj, char *, 0x68);
@@ -31,24 +31,24 @@ void func_PAL_L20_003A1940(char *obj) {
     spin = D_L20_001AED0C * 0.020000001f;
     target = FLD(entry, float, 0x78);
     if (FLD(state, int, 0x190) < 0) {
-        target = func_00283B98(target, 3.1415927f);
+        target = FastAddRotations(target, 3.1415927f);
     }
-    r = func_00283C80(FLD(obj, float, 0xF8), target);
+    r = FastDiffRots(FLD(obj, float, 0xF8), target);
     if (r > 0.017453294f) {
-        func_002AAA00(obj + 0xF8, target, 0.0012566373f, 0.0012566373f, 0.062831864f,
+        math_approach_target_with_direction_mode(obj + 0xF8, target, 0.0012566373f, 0.0012566373f, 0.062831864f,
                       state + 0x19C, 0);
     } else {
-        func_002AA548(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
+        math_step_value_toward_target(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
                       turn, spin);
         r = FLD(state, float, 0x194) * (float)FLD(state, int, 0x190);
         if (r > 0.0f) {
-            target = func_00282C48(FLD(state, float, 0x194));
-            if ((float)func_00282C30(FLD(state, int, 0x190)) <= target) {
+            target = math_fabs(FLD(state, float, 0x194));
+            if ((float)subtract_integer_with_clamp(FLD(state, int, 0x190)) <= target) {
                 FLD(state, int, 0x190) = -FLD(state, int, 0x190);
             }
         }
     }
-    func_00282C90(obj + 0x10);
+    vec_store_helper(obj + 0x10);
     FLD(obj, float, 0x10) = FLD(state, float, 0x194);
-    func_002830C0(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
+    transform_vector(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
 }

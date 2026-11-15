@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -23,7 +24,7 @@ extern Rec *D_L00_001B24D0[1] __attribute__((sda));
 extern s32 D_L00_001B24D4[1] __attribute__((sda));
 
 /* Resets the tutorial-controlled value in every record to a default, or remaps it through the tutorial table. */
-void func_L00_003032F0(void)
+void tutorial_reset_record_values(void)
 {
     Rec *rec;
     s16 *field;

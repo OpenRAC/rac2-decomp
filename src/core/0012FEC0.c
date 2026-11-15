@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs.h"
 
-extern void func_0012FAE8(int);
+extern void mpeg_send_event_one(int);
 
 extern int r1_func_00128C90(void *);
 
-extern int func_00130020(void *);
+extern int mpeg_stop_decoding(void *);
 
 extern int r1_func_00129690(void *, int);
 
@@ -13,7 +13,7 @@ extern int r1_func_00129530(void *);
 
 extern void r1_func_00129600(void *, int, int);
 
-extern int func_0012FEC0(void *, int, int);
+extern int mpeg_decode_field(void *, int, int);
 
 struct MpegFieldDec
 {
@@ -49,7 +49,7 @@ extern void r1_func_00129600();
 /* rac1-decomp src/core/0012AC80.c: func_0012C0A0 */
 /* _decodeOrSkipField (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Decodes or skips one video field and moves the field counters forward. */
-int func_0012FEC0(void *mpeg, int fieldIndex, int fieldLimit)
+int mpeg_decode_field(void *mpeg, int fieldIndex, int fieldLimit)
 {
   struct MpegHandle *wrapper = mpeg;
   struct MpegFieldDec *decoder;
@@ -80,7 +80,7 @@ int func_0012FEC0(void *mpeg, int fieldIndex, int fieldLimit)
   status = r1_func_00128C90(decoder);
   if (status == 0)
   {
-    StopMpegDecoding(wrapper);
+    mpeg_stop_decoding(wrapper);
     decoder->unk0 = 1;
     return 0;
   }
@@ -121,7 +121,7 @@ int func_0012FEC0(void *mpeg, int fieldIndex, int fieldLimit)
   decoder->unk4 = (unsigned long long) (decoder->unk4 + 1);
   if (shouldDecode == 0)
   {
-    SendMpegEventOne((int)wrapper);
+    mpeg_send_event_one((int)wrapper);
   }
   return result;
 }

@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *func_002B9030(int);
-extern int func_00283CF0(float);
+extern char *part_alloc(int);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
 extern unsigned char **D_001F2550[];
 
 /* Creates a moving particle with its own colour and life, starting at a point with a velocity. */
-char *func_002BAE50(void *position, void *velocity, unsigned int color, int endColor, int life, int scale, int type, int additive)
+char *part_spawn_scaling(void *position, void *velocity, unsigned int color, int endColor, int life, int scale, int type, int additive)
 {
-    char *particle = AllocParticle(4);
+    char *particle = part_alloc(4);
     char *p;
     char *motion;
 
@@ -20,7 +20,7 @@ char *func_002BAE50(void *position, void *velocity, unsigned int color, int endC
         *(char *)(particle + 3) = additive ? 0x48 : 0x44;
         *(char *)(particle + 1) = 0;
         *(char *)(particle + 2) = **(unsigned char **)D_001F2550;
-        *(char *)(particle + 8) = Rand();
+        *(char *)(particle + 8) = func_001163B0();
         *(int *)(particle + 0xC) = 0;
         motion = particle + 0x20;
         qcopy(particle + 0x10, position);

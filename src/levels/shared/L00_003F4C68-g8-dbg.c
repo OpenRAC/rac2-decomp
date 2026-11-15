@@ -1,28 +1,29 @@
+#include "names.h"
 /* Spawns a bolt effect moby (class 0xCF7) from a position and velocity: the state block holds its
    frame count and rate, its fade, and a slot from a three-way counter; mode 1 aims it at the camera,
    mode 2 first steps it once and flags a hit. Needs -g (pre-div.s nop pair). */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern int func_002B4038(int,int);
-extern char *func_0029EFD0(int);
-extern void func_003001E0(void *,void *,void *);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern char *func_L00_0032A088(int,int);
-extern void func_002AFFD8(void *,void *,int);
-extern void func_00282D30(void *,void *,float);
-extern void func_L00_003F51A0(char *,char *);
-extern void func_L00_003F5F90(char *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_L00_003F5238(char *,char *);
+extern int save_is_record_value(int,int);
+extern char *CreateMoby(int);
+extern void vec_add_transformed_or_copy(void *,void *,void *);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern char *level_get_slot_body(int,int);
+extern void cam_compute_view_direction(void *,void *,int);
+extern void FastVecScale(void *,void *,float);
+extern void moby_build_axes(char *,char *);
+extern void vaporizer_bolt_start_trail_sample(char *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int vaporizer_bolt_test_hit(char *,char *);
 extern unsigned char D_0013957F[];
 typedef struct { char prefix[0x50]; float speed; char gap[0x1c]; float distance; char rest[0x6c]; } Tuning;
-extern Tuning D_L00_00262570[];
+extern Tuning g_weapon_l00_table[];
 extern unsigned short D_L00_001B0938 __attribute__((sda));
 extern unsigned int D_L00_001B0934 __attribute__((sda));
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 /* Only the measured header fields are viewed; this is not a whole-object size. */
 typedef struct { char prefix[0x30]; unsigned char stamp,enabled; short tag; } HeaderView;
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
 
 /* Fires a Vaporizer bolt. It creates the bolt moby (class 3319) and sets its speed, lifetime,
    fade and trail slot. Returns the moby, or null if it cannot be made. */
-char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
+char *vaporizer_bolt_spawn(char *position,char *velocity,int id,int mode)
 {
     TI128 direction, previous;
     char *object,*location;
@@ -49,7 +50,7 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
     HeaderView *header;
     unsigned char stamp;
     int next;
-    if (id == -1 || IsSavedRecordValue(0xc04 /* Vaporizer */,id) == 0) return 0;
+    if (id == -1 || save_is_record_value(0xc04 /* Vaporizer */,id) == 0) return 0;
     object=CreateMoby(0xcf7 /* moby class 3319 */);
     if (object != 0) {
         *(unsigned char *)(object + 0x30) = 0xFF;
@@ -59,33 +60,33 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
         state=*(BoltState **)(object+0x68);
         qcopy(location,position);
         object[0x20]=0;
-        AddTransformedVectorOrCopy(state,velocity,position);
-        frames=0.016666668f * (gWeaponTable_L00 + D_0013957F[0])->speed;
+        vec_add_transformed_or_copy(state,velocity,position);
+        frames=0.016666668f * (g_weapon_l00_table + D_0013957F[0])->speed;
         state->frames=FloatToInt(128.0f / frames);
         /* Call and division in one statement: retail has no line label between them,
            so no division padding (docs/build/compiler-notes.md). */
         state->rate=1.0f/IntToFloat(state->frames);
         state->id=id;
-        state->target=GetSlotBody(0xc04 /* Vaporizer */,id);
+        state->target=level_get_slot_body(0xc04 /* Vaporizer */,id);
         state->age=0;
         state->fadeFrames=D_L00_001B0938;
         state->fadeRate=1.0f/IntToFloat(state->fadeFrames);
         state->mode=mode;
-        ComputeViewDirection(location,&direction,1);
+        cam_compute_view_direction(location,&direction,1);
         FastVecScale(&direction,&direction,-1.0f);
-        BuildObjectAxes(object,(char *)&direction);
+        moby_build_axes(object,(char *)&direction);
         if (D_L00_001B0934 > 3) D_L00_001B0934=0;
         state->slot=D_L00_001B0934;
         D_L00_001B0934=((int)(D_L00_001B0934+1))%3;
-        StartBoltTrailSample(object);
+        vaporizer_bolt_start_trail_sample(object);
         if (mode == 1) {
-            qcopy(&state->origin,gCameraPosition_L00);
-            vec_scale_to_length(&state->velocity,gCameraPosition_L00 + 0x230,FastVecLength(velocity));
+            qcopy(&state->origin,g_camera_l00_position);
+            vec_scale_to_length(&state->velocity,g_camera_l00_position + 0x230,FastVecLength(velocity));
         }
         if (mode == 2) {
             qcopy(&previous,position);
             FastVecAdd(location,position,velocity);
-            if (TestBoltHit(object,(char *)&previous) != 0) object[0x20]=2;
+            if (vaporizer_bolt_test_hit(object,(char *)&previous) != 0) object[0x20]=2;
         }
     }
     return object;

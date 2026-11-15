@@ -5,16 +5,16 @@
 
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(void *, int, void *, float);
-extern int func_002AD470(void *, void *, void *, void *, void *, void *);
-extern s32 func_002AD0B0(u8 *);
-extern void func_00282C88(ParticleWord *);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(void *, int, void *, float);
+extern int coll_apply_push_to_object(void *, void *, void *, void *, void *, void *);
+extern s32 moby_get_private_value_2(u8 *);
+extern void vec_clear_128(ParticleWord *);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Update the pickup's anchor, turn it, and compose the visible orientation. */
 /* Keeps a bolt pickup attached to what it sits on, spins it and works out its drawn position and angle. */
@@ -28,7 +28,7 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     int detach;
     u8 *origin; char *slot;
     if (*(char **)(state+0x5c)) {
-        ApplyCollisionPushToObject(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
+        coll_apply_push_to_object(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
     } else {
         qcopy(&position, state);
         qcopy(&angles, state+0x10);
@@ -40,18 +40,18 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
         detach=0;
         if (*(u8 *)(parent+0x20)==254) detach=1;
         else if (*(u8 *)(parent+0x20)==253) detach=1;
-        else if (!TestPointAgainstCollision(object+0x10,0x22,object,0.25f)) detach=1;
+        else if (!coll_test_point(object+0x10,0x22,object,0.25f)) detach=1;
         if (detach) {
             object[0x20]=1;
-            ClearVector128((ParticleWord *)(state+0x30));
+            vec_clear_128((ParticleWord *)(state+0x30));
             *(float *)(state+0x3c)=1.0f;
-            parent=(char *)GetMobyPrivateValue2((u8 *)*(char **)(state+0x5c));
+            parent=(char *)moby_get_private_value_2((u8 *)*(char **)(state+0x5c));
             slot = state+0x5c;
             if (parent) {
                 qcopy(state+0x20, parent+0x10);
                 *(char **)slot=0;
             } else {
-                ClearVector128((ParticleWord *)(state+0x20));
+                vec_clear_128((ParticleWord *)(state+0x20));
                 *(char **)slot=0;
             }
         }

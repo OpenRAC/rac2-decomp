@@ -1,12 +1,12 @@
 #include "common.h"
 
-extern char *func_0029EFD0(int kind);
+extern char *CreateMoby(int kind);
 extern void func_002A0F48(char *a0);
 
 /* Arms the rung the factory returns: stamps the five flag bytes, binds the owner and the handle,
  * copies the owner's position and three matrix rows into the rung, folds the rate, then starts it. */
 /* Creates a part object of the given class next to its owner. It copies the owner's position and turn, and the mirror flag marks the second, flipped copy. */
-char *func_L05_0041C708(char *owner, char *mirror, int kind, f32 sizeScale)
+char *equipment_spawn_part_moby(char *owner, char *mirror, int kind, f32 sizeScale)
 {
     char *part = CreateMoby(kind);
     char *partVars;

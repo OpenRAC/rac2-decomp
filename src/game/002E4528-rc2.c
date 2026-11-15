@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,21 +24,21 @@
  */
 #include "common.h"
 
-extern s32 func_002761F8();
-extern s32 func_00282CC0();
-extern s32 func_00282CF0();
-extern s32 func_00282D30(s32, s32, f32);
-extern s32 func_00282FB8(s32, s32, f32);
+extern s32 CollLine();
+extern s32 FastVecAdd();
+extern s32 FastVecSub();
+extern s32 FastVecScale(s32, s32, f32);
+extern s32 vec_fast_divide_helper(s32, s32, f32);
 
-extern s8 D_001B5340[];
+extern s8 g_camera_eye_state[];
 /* Tests whether something blocks the line between a sound and a listener point. */
-s32 func_002E4528(s32 voice, s32 samplePoint) {
+s32 snd_test_occlusion(s32 voice, s32 samplePoint) {
     s32 hitResult;
     s32 probe[1];
-    FastVecSub(probe, voice + 0x20, ((s32)gCameraState_001B5340));
+    FastVecSub(probe, voice + 0x20, ((s32)g_camera_eye_state));
     FastVecScale(probe, probe, 0.75f);
-    FastVectorDivideHelper(probe, probe, 64.0f);
-    FastVecAdd(probe, probe, ((s32)gCameraState_001B5340));
+    vec_fast_divide_helper(probe, probe, 64.0f);
+    FastVecAdd(probe, probe, ((s32)g_camera_eye_state));
     hitResult = CollLine(samplePoint, probe, 0x82, (*(s32 *)((s8 *)(voice) + (0x18))), 0);
     return hitResult;
 }

@@ -20,17 +20,17 @@ typedef struct {
 
 extern u8 *D_001F26A8[];
 
-extern s32 func_00282978(s16 *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern void func_002B9180(void *);
+extern s32 FastDecTimer(s16 *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern void part_kill(void *);
 
 /* Updates a spark that flies along, leaves a short streak behind it and fades out. */
-void func_002C6EF0(Spark2C6EF0 *e) {
+void part_update_spark_trail(Spark2C6EF0 *e) {
     f32 old[4] __attribute__((aligned(16)));
     f32 step[4] __attribute__((aligned(16)));
     f32 *vel = e->vel;
@@ -39,11 +39,11 @@ void func_002C6EF0(Spark2C6EF0 *e) {
     u32 a;
 
     if (FastDecTimer(&e->age)) {
-        KillParticle(e);
+        part_kill(e);
         return;
     }
     pos = e->pos;
-    e->shade = D_001F26A8[0][RandomIntBelow(2)];
+    e->shade = D_001F26A8[0][math_random_int_below(2)];
     qcopy(old, pos);
     FastVecAdd(pos, pos, vel);
     FastVecSub(step, pos, old);

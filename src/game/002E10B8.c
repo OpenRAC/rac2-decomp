@@ -62,7 +62,7 @@ typedef unsigned char u8;
 
 typedef unsigned int u32;
 
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 
 extern u8 D_00189E20_10[];
 
@@ -81,14 +81,14 @@ extern char F29eece9b_D_00188660[];
 
 typedef struct { u8 before[0x1730]; s32 count; u8 *table; } CallbackGlobals;
 
-extern s32 func_00133230(void);
+extern s32 snd_clear_flag_and_update(void);
 
-extern s32 func_00132028(void);
+extern s32 snd_Pump(void);
 
 extern s32 func_00132AC8(void);
 
 /* Walk a terminated index list and nested records, clearing the low fourteen bits and ORing nonzero replacement values into two selected words. */
-void func_002E10B8(void)
+void patch_shrub_gifs(void)
 {
     int *indexPtr;
     int *shrubClass;
@@ -137,20 +137,20 @@ ASM_FUNC("asm/game", func_002E3360);
 
 extern char *ref_L00_002E3548_00 __attribute__((sda));
 extern float ref_L00_002E3548_01[16] __attribute__((sda));
-extern void func_00283388(float *);
-extern void func_002E3478(int);
+extern void set_identity_matrix(float *);
+extern void cam_update_view_rotation(int);
 /* Handles one table entry, using one of two routines depending on whether its second field is set. */
-extern void func_002E3940(int);
+extern void gfx_process_view_entry(int);
 /* Updates the transform of every view, then processes each view entry. */
-void func_002E3548(void)
+void gfx_update_all_view_transforms(void)
 {
     int i;
     for (i = 0; i < *(short *)(ref_L00_002E3548_00 + 6); i++) {
         if (i >= 10)
             set_identity_matrix(ref_L00_002E3548_01);
         else
-            UpdateViewRotation(i);
-        ProcessViewEntry(i);
+            cam_update_view_rotation(i);
+        gfx_process_view_entry(i);
     }
 }
 
@@ -159,7 +159,7 @@ void func_002E3548(void)
 
 /* shared native body of family 060b9f2017649e67 */
 /* Starts a new buffer block and clears every entry of the resident table. */
-void func_002E37B0(void)
+void gfx_resident_table_reset(void)
 {
     ResidentTable *resident = (ResidentTable *)D_L05_001B2AA0;
     int *current = D_L05_001B2C88;
@@ -189,11 +189,11 @@ typedef struct {
 
 extern Table3940 *D_001B20C0 __attribute__((sda));
 
-extern void func_002E3BD8(void *);
+extern void gfx_sky_gouraud_pieces_draw(void *);
 
-extern void func_002E3998(void *);
+extern void gfx_sky_textured_pieces_draw(void *);
 
-void func_002E3940(int index)
+void gfx_process_view_entry(int index)
 {
     Table3940 *table = D_001B20C0;
 
@@ -201,9 +201,9 @@ void func_002E3940(int index)
         Entry3940 *entry = table->entries[index];
 
         if (entry->field4 != 0)
-            DrawSkyGouraudPieces(entry);
+            gfx_sky_gouraud_pieces_draw(entry);
         else
-            DrawSkyTexturedPieces(entry);
+            gfx_sky_textured_pieces_draw(entry);
     }
 }
 
@@ -219,7 +219,7 @@ ASM_FUNC("asm/game", func_002E425C);
 ASM_FUNC("asm/game", func_002E4388);
 
 /* Finds a spot near the listener by testing the ground and nearby walls, and pulls it back from a wall hit. */
-void func_002E4478(void *object)
+void snd_probe_listener_occlusion_point(void *object)
 {
     Fa2d20de7_FUN_002A7988(object, 0.5f, 6.0f);
     Fa2d20de7_FUN_00282CC0(object, object, Fa2d20de7_D_001B5340);
@@ -233,7 +233,7 @@ void func_002E4478(void *object)
 
 
 /* Works out how loud a sound should be from its distance to the listener. */
-float func_002E46C0(char *voice, char *position)
+float snd_compute_voice_volume_from_distance(char *voice, char *position)
 {
     float distance = F391de845_FUN_00282E48(position, F391de845_D_001B5340);
     float *range = *(float **)(voice + 8);
@@ -241,17 +241,17 @@ float func_002E46C0(char *voice, char *position)
     return F391de845_FUN_002E45C8(range, distance, range[0], range[1]);
 }
 
-extern float D_L00_001B8DC0[];
+extern float g_camera_l00_position[];
 
-extern void func_00282CF0(void *dst, void *src, void *arg);
-extern float func_00283248(float a, float b);
-extern float func_00283B98(float a, float b);
-extern float func_00282E20(void *p);
-extern float func_00283BE0(float a, float b);
-extern int func_00283CF0(float a);
+extern void FastVecSub(void *dst, void *src, void *arg);
+extern float mat_fast_helper_a(float a, float b);
+extern float FastAddRotations(float a, float b);
+extern float vec_length_xy(void *p);
+extern float fast_subtract_rotations(float a, float b);
+extern int FloatToInt(float a);
 
 /* Works out the left-right pan of a sound from its direction, smoothing the angle between frames. */
-void func_002E4708(void *voice, void *position)
+void snd_compute_voice_pan(void *voice, void *position)
 {
     struct AngleState { char reserved[0x40]; float angle; };
     struct AngleState *state = (struct AngleState *)voice;
@@ -259,9 +259,9 @@ void func_002E4708(void *voice, void *position)
     float angleToSource;
     float angleChange;
 
-    FastVecSub(buf, position, gCameraPosition_L00);
-    angleToSource = -FastMatrixHelperA(buf[0], buf[1]);
-    angleToSource = FastAddRotations(angleToSource, gCameraPosition_L00[6]);
+    FastVecSub(buf, position, g_camera_l00_position);
+    angleToSource = -mat_fast_helper_a(buf[0], buf[1]);
+    angleToSource = FastAddRotations(angleToSource, g_camera_l00_position[6]);
     if (angleToSource < 0.0f)
         angleToSource += 6.283185307179586f;
     if (vec_length_xy(buf) < 2.0f) {
@@ -285,34 +285,34 @@ void func_002E4708(void *voice, void *position)
 /* func_002E48E8 is defined in 002E10B8-sound.c. */
 
 extern int D_001507E4;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern char D_001ABE10[];
-extern void func_00133750(int, int);
+extern void snd_send_cmd51(int, int);
 extern int func_001337F0(void);
 extern int func_00133820(void);
-extern void func_0026FEB8(char *, int, int, int);
+extern void STUB_printf(char *, int, int, int);
 
 /* Sets a sound parameter and prints the sound status. */
-void func_002E4A68(void)
+void snd_print_status(void)
 {
-    SendSoundCommand51(2, D_001507E4);
-    STUB_printf(D_001ABE10, gCurrentMapIndex, func_001337F0(), func_00133820());
+    snd_send_cmd51(2, D_001507E4);
+    STUB_printf(D_001ABE10, g_current_map_index, func_001337F0(), func_00133820());
 }
 
 
 /* Tells whether a sound voice belongs to the given owner and is starting or playing. */
-s32 func_002E59B0(s32 owner,s32 voiceIndex) {
+s32 snd_is_voice_playing_for_owner(s32 owner,s32 voiceIndex) {
     if(voiceIndex>=0) {
-        u8 *voice=gSoundState+voiceIndex*0x70;
+        u8 *voice=g_sound_state+voiceIndex*0x70;
         if(*(s32 *)(voice+0x88)==owner && (u32)voice[0x74]-1<2) return 1;
     }
     return 0;
 }
 
 /* Stops one sound voice, or frees it right away if it has not started yet. */
-void func_002E59F8(s32 voiceIndex) {
+void snd_stop_voice(s32 voiceIndex) {
     if(voiceIndex>=0) {
-        u8 *voice=gSoundState+voiceIndex*0x70;
+        u8 *voice=g_sound_state+voiceIndex*0x70;
         s32 state=voice[0x74];
         if(state==7) {
             *(s32 *)(voice+0x88)=0;
@@ -326,7 +326,7 @@ void func_002E59F8(s32 voiceIndex) {
 
 /* shared native body of family 62e6ff2b3d3a */
 /* Finds a free sound voice slot and returns its number, or 52 when none is free. */
-s32 func_002E5A50(s32 id)
+s32 snd_find_free_voice(s32 id)
 {
     u8 *record;
     u8 *cursor;
@@ -356,7 +356,7 @@ s32 func_002E5A50(s32 id)
 /* func_002E5AD0 is defined in 002E5AD0.c. */
 
 /* Plays a numbered sound from the sound list of a moby and links the voice to that moby. */
-int func_002E5CF8(int index, int flags, char *moby)
+int PlayMobySound(int index, int flags, char *moby)
 {
     int classData;
     int definitions;
@@ -385,10 +385,10 @@ int func_002E5CF8(int index, int flags, char *moby)
 
 extern unsigned char D_L00_001DA860[];
 extern char *D_L00_001D9F00[];
-extern int func_002E5AD0(char *, int, char *, int, int);
+extern int AllocateSoundVoice(char *, int, char *, int, int);
 
 /* Plays a numbered sound from the sound list of an object class and links the voice to the object. */
-int func_002E5DA0(int index, int value, char *object, int kind)
+int snd_play_from_class_bank(int index, int value, char *object, int kind)
 {
     char *header = D_L00_001D9F00[D_L00_001DA860[kind]];
     char *entries;
@@ -403,7 +403,7 @@ int func_002E5DA0(int index, int value, char *object, int kind)
         return -1;
     result = AllocateSoundVoice(entries + index * 32, value, object, 0, 0x400);
     if (result >= 0) {
-        row = gSoundState + result * 112;
+        row = g_sound_state + result * 112;
         *(char **)(row + 0x88) = object;
         *(short *)(row + 0x7E) = index;
     }
@@ -415,7 +415,7 @@ extern u8 *D_001B16AC __attribute__((sda));
 extern int D_001A8BBC __attribute__((sda));
 
 /* Plays a numbered sound from the shared sound list and links the voice to the object. */
-int func_002E5E58(int index, int value, void *object)
+int snd_play_from_global_bank(int index, int value, void *object)
 {
     u8 *table = D_001B16AC;
     int result;
@@ -427,7 +427,7 @@ int func_002E5E58(int index, int value, void *object)
         return -1;
     result = AllocateSoundVoice((char *)table + index * 32, value, (char *)object, 0, 0x400);
     if (result >= 0) {
-        row = gSoundState + result * 0x70;
+        row = g_sound_state + result * 0x70;
         *(int *)(row + 0x88) = object;
         *(short *)(row + 0x7E) = index;
     }
@@ -439,34 +439,34 @@ int func_002E5E58(int index, int value, void *object)
 
 
 /* Sets the pitch bend of one sound voice. */
-s32 func_002E5F40(s32 index, s32 pitchBend) {
-    u8 *voice = gSoundState + index * 0x70;
+s32 snd_set_voice_pitch_bend(s32 index, s32 pitchBend) {
+    u8 *voice = g_sound_state + index * 0x70;
     *(s32 *)(voice + 0x84) = pitchBend;
     return 1;
 }
 
 /* Calls the callback of every entry in the sound callback table that has one. */
-void func_002E5F60(void) {
+void snd_run_callbacks(void) {
     s32 i=0;
-    for (i=0;i<((CallbackGlobals *)gSoundState)->count;i++) {
-            u8 *entry=(u8 *)(i*0x90+(s32)((CallbackGlobals *)gSoundState)->table);
+    for (i=0;i<((CallbackGlobals *)g_sound_state)->count;i++) {
+            u8 *entry=(u8 *)(i*0x90+(s32)((CallbackGlobals *)g_sound_state)->table);
             void (*callback)(u8 *)=*(void (**)(u8 *))(entry+4);
             if (callback) callback(entry);
     }
 }
 
 /* Waits for the sound system to go quiet, then clears every sound voice. */
-void func_002E5FE0(void) {
+void snd_clear_all_voices(void) {
     typedef s32 quad __attribute__((mode(__TI__)));
     s32 count;
     u8 *p;
-    ClearSoundFlagAndUpdate(); snd_Pump(); func_00132AC8();
+    snd_clear_flag_and_update(); snd_Pump(); func_00132AC8();
     while (snd_Pump() != 0) {}
-    p=gSoundState; count=3;
+    p=g_sound_state; count=3;
     do { *(volatile quad *)p = 0; count--; p += 16; } while (count >= 0);
 
 
-    p=gSoundState;
+    p=g_sound_state;
     *(s32 *)(p+0x40)=0;
     for(count=0;count<52;count++) {
         *(s32 *)(p+count*0x70+0x70)=0;
@@ -475,14 +475,14 @@ void func_002E5FE0(void) {
 }
 
 /* Stores a value into the place the caller points to, if there is one. */
-void func_002E6088(int value, long target) {
+void snd_store_result(int value, long target) {
     int *destination = (int *)(int)target;
     if (destination != 0)
         *destination = value;
 }
 
 /* Called when a sound starts: records the result and moves the voice from starting to playing, or clears it on failure. */
-void func_002E60A0(int result, long slotAddress) {
+void snd_voice_started_callback(int result, long slotAddress) {
     unsigned char *slot = (unsigned char *)(int)slotAddress;
 
     if (slot != 0) {
@@ -500,7 +500,7 @@ void func_002E60A0(int result, long slotAddress) {
 }
 
 /* Called when a sound ends: records the result and clears the voice when it is done. */
-void func_002E60E8(int result, long slotAddress) {
+void voice_update_callback(int result, long slotAddress) {
     int *slot = (int *)(int)slotAddress;
 
     if (slot != 0) {
@@ -514,18 +514,18 @@ void func_002E60E8(int result, long slotAddress) {
 }
 
 
-extern void *D_00214920[];
-extern void func_0029F338(void *);
+extern void *g_equipment_pieces[];
+extern void moby_mark_spawned(void *);
 
 /* Destroys all the hero equipment pieces and empties the list. */
-void func_002E6120(void)
+void hero_destroy_equipment_pieces(void)
 {
-    void **entry = gEquipmentPieces;
+    void **entry = g_equipment_pieces;
     int count = 19;
     do {
         count--;
         if (*entry != 0)
-            MarkMobySpawned(*entry);
+            moby_mark_spawned(*entry);
         *entry++ = 0;
     } while (count >= 0);
 }

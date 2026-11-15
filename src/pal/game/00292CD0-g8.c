@@ -16,25 +16,25 @@ typedef struct {
         s32 b;
     } e[1];
 } SelectTable;
-extern SelectState D_00152C00;
-extern SelectTable D_0014B540;
+extern SelectState g_hero_moby_default;
+extern SelectTable g_copy_setup_data;
 extern s32 D_001BAF30[];
 extern unsigned long D_001C4DC0[3];
 extern s32 D_001A91E0 __attribute__((sda));
-extern void func_002FC3C0(s32);
+extern void gfx_wait_for_dma_status_bits(s32);
 extern s32 func_PAL_002B8838(s32, s32, s32);
-extern void func_002934F8(s32, s32, void *, s32);
+extern void tex_relocate_block(s32, s32, void *, s32);
 
 void func_PAL_00292F00(s32 n) {
     SelectTable *b;
     s32 h;
-    D_00152C00.f18 = n;
-    func_002FC3C0(1);
-    b = &D_0014B540;
+    g_hero_moby_default.f18 = n;
+    gfx_wait_for_dma_status_bits(1);
+    b = &g_copy_setup_data;
     h = D_001BAF30[0];
     func_PAL_002B8838(h, b->e[n].a + b->base, b->e[n].b);
-    D_001C4DC0[0] = D_00152C00.f38;
+    D_001C4DC0[0] = g_hero_moby_default.f38;
     D_001C4DC0[1] = 0xFFA0000000E0;
     D_001C4DC0[2] = 0x40000400004000;
-    func_002934F8(h, 0, &D_001A91E0, -1);
+    tex_relocate_block(h, 0, &D_001A91E0, -1);
 }

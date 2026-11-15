@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char pad0[0x80];
     char pos[8];
@@ -8,23 +9,23 @@ typedef struct {
     char pad2[0x22D];
     unsigned char b24F0;
 } L02_003F5710_Hero;
-extern L02_003F5710_Hero D_00189E20;
+extern L02_003F5710_Hero g_hero_state;
 typedef int s32;
 extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern s32 func_00312B58(char *);
-extern s32 func_L02_00416800(char *);
-extern s32 func_002A77E0(s32);
+extern s32 moby_is_state_six(char *);
+extern s32 moby_is_state_one_cleared_vars(char *);
+extern s32 math_random_int_below(s32);
 extern unsigned char D_001395B8[0x100];
 extern int D_001A7A08[2];
-extern int D_001A79F8;
-extern int func_L02_003F9B70(int);
-extern int func_L02_00400650(char *, int);
-extern void func_00288308(int);
-extern void func_002AD860(int);
-extern int func_L02_003FCF08(int);
-extern int func_L02_003FCDF8(int);
-extern void func_L00_0030C7F8(int);
-extern void func_0029B3E0(int, int);
+extern int g_player_bolts;
+extern int arena_get_challenge_save_index(int);
+extern int arena_start_announcer_message(char *, int);
+extern void help_unlock_entry(int);
+extern void moby_handle_request_slot_state(int);
+extern int moby_compute_scaled_entry_value_shifted(int);
+extern int moby_compute_scaled_entry_value(int);
+extern void module_l00_call_handler_with_arg_4(int);
+extern void MemcardSave(int, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the
@@ -38,31 +39,31 @@ void func_PAL_L02_004013F8(char *a0, int a1) {
     char *hero;
     int v;
 
-    if (a1 == 0 && D_001395B8[func_L02_003F9B70(0)] == 0) {
-        hero = (char *)&D_00189E20;
+    if (a1 == 0 && D_001395B8[arena_get_challenge_save_index(0)] == 0) {
+        hero = (char *)&g_hero_state;
         saved = *(int *)(hero + 0x22C8);
-        func_L02_00400650(a0, 7);
-        func_00288308(0x26);
-        func_002AD860(0x26);
+        arena_start_announcer_message(a0, 7);
+        help_unlock_entry(0x26);
+        moby_handle_request_slot_state(0x26);
         *(int *)(hero + 0x22C8) = saved;
     } else {
         switch (a1) {
         case 6:
-            func_L02_00400650(a0, 8);
+            arena_start_announcer_message(a0, 8);
             break;
         case 0xB:
-            func_L02_00400650(a0, 9);
+            arena_start_announcer_message(a0, 9);
             break;
         default:
-            func_L02_00400650(a0, func_002A77E0(5) + 2);
+            arena_start_announcer_message(a0, math_random_int_below(5) + 2);
             break;
         }
-        D_001A7A08[1] = D_001A7A08[1] + func_L02_003FCF08(a1);
-        v = func_L02_003FCDF8(a1);
+        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(a1);
+        v = moby_compute_scaled_entry_value(a1);
         *(int *)(state + 0x110) = v;
-        D_001A79F8 = D_001A79F8 + v;
-        func_L00_0030C7F8(0x12C);
+        g_player_bolts = g_player_bolts + v;
+        module_l00_call_handler_with_arg_4(0x12C);
     }
-    D_001395B8[func_L02_003F9B70(a1)] += 1;
-    func_0029B3E0(0, -1);
+    D_001395B8[arena_get_challenge_save_index(a1)] += 1;
+    MemcardSave(0, -1);
 }

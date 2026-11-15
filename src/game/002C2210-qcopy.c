@@ -12,18 +12,18 @@ typedef struct {
     float payload[8];
 } Particle;
 
-extern Particle *func_002B9030(int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
+extern Particle *part_alloc(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
 extern unsigned char *D_001F2614;
 
 /* func_002C2210: initializes an allocated effect record and its payload, as func_L00_0033C638
    does, with a lifted position and a scaled counter in place of the owner lookup. */
 /* Creates a ground effect particle with its life, colour and starting speed. */
-Particle *func_002C2210(float life, float secondLife, float third, Quad *position, int size, int color, int mode, int flag, float *vector, int counter)
+Particle *part_spawn_ground_effect(float life, float secondLife, float third, Quad *position, int size, int color, int mode, int flag, float *vector, int counter)
 {
-    Particle *p = AllocParticle(0x35);
+    Particle *p = part_alloc(0x35);
     if (p) {
         float *out = p->payload;
         p->position.q = *position;
@@ -38,7 +38,7 @@ Particle *func_002C2210(float life, float secondLife, float third, Quad *positio
         p->life = life * 210000.0f;
         if (mode == 0) p->seed = 0;
         else if (mode == 1) p->seed = 32;
-        else p->seed = RandomIntBelow(255);
+        else p->seed = math_random_int_below(255);
         out[0] = p->life;
         *(short *)((char *)out + 8) = size;
         *((unsigned char *)out + 10) = flag;

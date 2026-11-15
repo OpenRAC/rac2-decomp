@@ -9,7 +9,7 @@ typedef struct {
     void *owner;
     int pad28, pad2C;
 } Slot00305438;
-extern void func_0029FCC0(void *a, int b, void *c);
+extern void moby_transform_joint_to_world(void *a, int b, void *c);
 extern Slot00305438 ref_00305438_00[];
 
 /* Takes the first free entry of the table for the object and counts it. */
@@ -19,7 +19,7 @@ void func_PAL_003066B8(void *obj, void *other)
     TI128 local;
     int i;
 
-    func_0029FCC0(obj, 1, &local);
+    moby_transform_joint_to_world(obj, 1, &local);
     for (i = 0; i < 100; i++) {
         if (ref_00305438_00[i].owner == 0) {
             Slot00305438 *e = &ref_00305438_00[i];

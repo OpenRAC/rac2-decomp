@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
 extern u16 D_L02_001B1214 __attribute__((sda));
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 /* Accumulate the active group entries and reset their current report state. */
 /* Starts a fresh enemy tally for the arena: counts the enemies in the group and remembers their health total. */
-void func_L02_003FB000(char *object)
+void arena_start_enemy_tally(char *object)
 {
     char *state = *(char **)(object + 0x68);
     u32 index = *(u32 *)(state + 0x40);
@@ -21,11 +21,11 @@ void func_L02_003FB000(char *object)
     *(float *)(state + 0x64) = 0;
     if (index == 0xFF)
         return;
-    entry = gEntityGroupLists[index];
+    entry = g_entity_group_lists[index];
     if (entry == 0)
         return;
     cursor = (short *)entry;
-    table = gMobyPool_L02;
+    table = g_moby_l02_pool;
     do {
         short type;
         record = table + ((*(u16 *)cursor & 0x7FFF) << 8);
@@ -43,7 +43,7 @@ void func_L02_003FB000(char *object)
             *(float *)(state + 0x64) += *(float *)(*(char **)(record + 0x68) + 0x20);
         }
     } while (*cursor++ >= 0);
-    hero = gHeroState;
+    hero = g_hero_state;
     *(float *)(state + 0x68) = (float)*(int *)(hero + 0x24CC);
     *(short *)(state + 0x11C) = 0;
     do {

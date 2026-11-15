@@ -7,30 +7,30 @@ extern s32 D_L14_001B1830[4] __attribute__((sda));
 extern f32 D_L14_001B1840 __attribute__((sda));
 extern f32 D_L14_001B1850[2][4] __attribute__((sda));
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern void *func_002C3150(void *, void *, int, int, int, int, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float IntToFloat(int);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 
 /* Spawns one spark particle on a random side of the object, drifting along a line. */
-void func_L14_004272D8(u8 *self) {
+void part_spawn_spark_side(u8 *self) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 step[4] __attribute__((aligned(16)));
     s32 side;
     s32 kind;
     s32 n;
 
-    side = RandomIntBelow(2);
+    side = math_random_int_below(2);
     kind = 1;
-    if (!(RandomFloatRange(0.0f, 1.0f) < D_L14_001B1840)) {
+    if (!(math_random_float_range(0.0f, 1.0f) < D_L14_001B1840)) {
         kind = 0;
     }
-    n = RandomIntRange(D_L14_001B1830[kind * 2], D_L14_001B1830[kind * 2 + 1]);
+    n = math_random_int_range(D_L14_001B1830[kind * 2], D_L14_001B1830[kind * 2 + 1]);
     matrix_mul_vec3(pos, D_L14_001B1850[side], self + 0xC0);
     FastVecAdd(pos, pos, self + 0x10);
     FastVecSub(step, D_L14_001B1850[(side + 1) & 1], D_L14_001B1850[side]);
@@ -39,6 +39,6 @@ void func_L14_004272D8(u8 *self) {
     {
         s32 *cp = &D_L14_001B1828[kind];
         f32 *fp = &D_L14_001B1820[kind];
-        SpawnHeroRelativeParticle(pos, step, *cp, n & 0xFF, RandomIntBelow(0xFF) & 0xFF, 0, *fp);
+        part_spawn_hero_relative(pos, step, *cp, n & 0xFF, math_random_int_below(0xFF) & 0xFF, 0, *fp);
     }
 }

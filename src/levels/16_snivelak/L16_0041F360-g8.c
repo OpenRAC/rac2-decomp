@@ -10,17 +10,17 @@ extern f32 D_L16_001B200C[] MACRO_ADDR;
 extern f32 D_L16_001B2010[] MACRO_ADDR;
 extern f32 D_L16_001B2014[] MACRO_ADDR;
 extern RingPoint D_L16_001A8F20 MACRO_ADDR;
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern void func_00282CC0(char *, char *, char *);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern void FastVecAdd(char *, char *, char *);
 /* Integer-bank order: request, owner, flags, vector; independent f12: distance. */
-extern void func_002A8C00(char *, char *, s32, char *, f32);
-extern s32 func_002761F8(char *, char *, s32, char *, char *);
-extern u32 func_00283D38(u32, u32, f32);
-extern void func_L00_002EBE88(char *, s32, s32, s32, u32, u32, f32, f32, f32);
+extern void make_hit_descriptor(char *, char *, s32, char *, f32);
+extern s32 CollLine(char *, char *, s32, char *, char *);
+extern u32 FastTweenColor(u32, u32, f32);
+extern void DrawTwoLayerPolylineRibbon(char *, s32, s32, s32, u32, u32, f32, f32, f32);
 
 /* Constructs and clips the expanding ring, then draws its two surfaces. */
-void func_L16_0041F360(char *self) {
+void SweepAndDrawRibbonRing(char *self) {
     RingPoint points[33];
     RingPoint *point;
     /* The query copies 40 bytes. Retail initializes through +0x23 here;
@@ -32,8 +32,8 @@ void func_L16_0041F360(char *self) {
     s32 i, j, k;
     for (i = 0, point = points; i < 32; i++, point++) {
         angle = (f32)(i << 1) * 0.09817477315664291f - 3.141592741012573f;
-        point->v.x = FastSinOrCosA(angle) * *(f32 *)(st + 0x2C);
-        point->v.y = FastSinOrCosB(angle) * *(f32 *)(st + 0x2C);
+        point->v.x = math_fast_sin_or_cos_a(angle) * *(f32 *)(st + 0x2C);
+        point->v.y = math_fast_sin_or_cos_b(angle) * *(f32 *)(st + 0x2C);
         point->v.z = 0;
         FastVecAdd((char *)point, (char *)point, self + 0x10);
         point->v.w = D_L16_001B2008;

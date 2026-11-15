@@ -4,15 +4,15 @@
    before the colours are stored, its arm comes first, and the grey arm masks `tint` in place. */
 typedef unsigned int Quad_002F9198 __attribute__((mode(TI), aligned(16)));
 typedef struct { int state; char pad4[0x24]; char *moby; char pad2C[0x24]; int mode; char pad54[0xC]; int restore; char pad64[0x7C]; Quad_002F9198 saved; } Shop_002F9198;
-extern Shop_002F9198 D_0021F240;
+extern Shop_002F9198 g_vendor_menu_state;
 
 /* One font glyph: its texture cell, its top offset and its advance. */
 typedef struct { u8 u, v; signed char top, adv; } Glyph_002F97A0;
 
 extern Glyph_002F97A0 D_00263EF0[];
-extern u64 func_0027C878(int);
-extern float func_00283CE0(int);
-extern void func_0027E1A0(float, float, float, float, int, int, int, int, u32 *, u64);
+extern u64 GetEffectTextureDescriptor(int);
+extern float IntToFloat(int);
+extern void EmitTexturedRectangle(float, float, float, float, int, int, int, int, u32 *, u64);
 
 /* Prints up to `limit` characters of `text` from (x, y) at `scale`, in the large font, fading
    each glyph's left and right edges out with their distance from the screen centre (215 on
@@ -23,7 +23,7 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
     u32 colors[4];
     u32 gray[4];
     Glyph_002F97A0 *glyphs;
-    Shop_002F9198 *shop = &D_0021F240;
+    Shop_002F9198 *shop = &g_vendor_menu_state;
     Glyph_002F97A0 *g;
     u64 texture;
     int count = 0;
@@ -40,7 +40,7 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
     u8 *cursor;
     int accented;
 
-    texture = func_0027C878(2);
+    texture = GetEffectTextureDescriptor(2);
     size = scale * 16.0f;
     glyphs = D_00263EF0;
     color &= 0xFFFFFF;
@@ -49,7 +49,7 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
     cursor = text;
     do {
         if (glyphs[*cursor].adv != 0) {
-            top = func_00283CE0(glyphs[*cursor].top) * scale;
+            top = IntToFloat(glyphs[*cursor].top) * scale;
             if (shop->mode == 2) {
                 d = 215.0f - x;
                 if (d < 0)
@@ -83,9 +83,9 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
             colors[3] = right | c;
             if (accented) {
                 g = (Glyph_002F97A0 *)((((u8)*cursor + 0x40) << 2) + (int)glyphs);
-                dx = func_00283CE0(g->adv) * scale;
-                dy = func_00283CE0(g->top) * scale;
-                func_0027E1A0(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
+                dx = IntToFloat(g->adv) * scale;
+                dy = IntToFloat(g->top) * scale;
+                EmitTexturedRectangle(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
             }
             if (*cursor < 0x20) {
                 tint = colors[0];
@@ -100,13 +100,13 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
                 gray[1] = shade;
                 gray[2] = shade;
                 gray[3] = shade;
-                func_0027E1A0(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
+                EmitTexturedRectangle(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
                               glyphs[*cursor].v, 24, 16, gray, texture);
             } else if ((u8)*cursor > 0x20) {
-                func_0027E1A0(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
+                EmitTexturedRectangle(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
                               colors, texture);
             }
-            x += func_00283CE0(glyphs[*cursor].adv) * scale;
+            x += IntToFloat(glyphs[*cursor].adv) * scale;
         }
         count++;
         if (count == limit)

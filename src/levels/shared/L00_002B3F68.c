@@ -7,14 +7,14 @@ typedef struct {
     unsigned char gap2[0x1FF];
     float speed;
 } MovementView;
-extern char D_00189E20[];
-extern int func_L00_002ADEA0(int index);
-extern void func_L00_002B3EF8(int index, float a, float b, float c);
+extern char g_hero_state[];
+extern int hero_slot_item_id(int index);
+extern void hero_steer_heading(int index, float a, float b, float c);
 
 /* Picks how quickly the hero turns, based on how fast the hero moves and the current state, then applies it. */
-void func_L00_002B3F68(void)
+void hero_set_turn_rates(void)
 {
-    float speed = ((MovementView *)gHeroState)->speed;
+    float speed = ((MovementView *)g_hero_state)->speed;
     float first;
     float second;
     float third;
@@ -27,7 +27,7 @@ void func_L00_002B3F68(void)
         if (first < 0.01f)
             first = 0.01f;
     }
-    if (((MovementView *)gHeroState)->speed == 1.0f) {
+    if (((MovementView *)g_hero_state)->speed == 1.0f) {
         third = 0.09308424592018127f;
     } else {
         third = speed * 0.06399541348218918f;
@@ -37,7 +37,7 @@ void func_L00_002B3F68(void)
             third = 0.03199770674109459f;
     }
     second = 0.27f;
-    if (((MovementView *)gHeroState)->alternate) {
+    if (((MovementView *)g_hero_state)->alternate) {
         first = 0.035f;
         third = 0.19489513337612152f;
     }
@@ -48,7 +48,7 @@ void func_L00_002B3F68(void)
     case 30:
     case 39:
     case 46:
-        if (((MovementView *)gHeroState)->special && !((MovementView *)gHeroState)->alternate) {
+        if (((MovementView *)g_hero_state)->special && !((MovementView *)g_hero_state)->alternate) {
             if (speed > 0.95f) {
                 first = 0.017f;
                 second = 0.18f;
@@ -63,5 +63,5 @@ void func_L00_002B3F68(void)
     default:
         break;
     }
-    SteerHeroHeading(0, first, second, third);
+    hero_steer_heading(0, first, second, third);
 }

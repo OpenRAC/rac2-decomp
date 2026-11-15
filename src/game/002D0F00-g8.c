@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002D0F00: a -G8 unit, so a word load of a global gives the base and the value one
  * register as retail does. The loop pointers are set up in the order whose schedule puts
@@ -16,7 +17,7 @@ extern unsigned int D_00139768[];
 extern unsigned char D_001A7A0A;
 
 /* Marks each movie in the list as available if the player has seen it, or all of them when everything is unlocked. */
-int func_002D0F00(void)
+int movie_list_update_availability(void)
 {
     unsigned int *seenMask;
     unsigned char allUnlocked;

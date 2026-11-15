@@ -12,16 +12,16 @@ typedef struct {
     char pad54[0x138];
     char *objects[1];
 } Context;
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern char D_L00_001A93E0[64] SDATA(D_L00_001A93E0);
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern Context D_L00_001BCAC0;
 extern char D_L00_0027E600[];
 extern char D_L00_0027E620[];
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
 
 /* While the timer is in its window, builds four points around the 0xD54 moby and selects an object. */
 void func_PAL_L00_002FE328(void) {
@@ -34,7 +34,7 @@ void func_PAL_L00_002FE328(void) {
     char *found;
     char *out;
 
-    if (D_001A79F0[0] != 0)
+    if (g_current_map_index[0] != 0)
         return;
 
     low = -1;
@@ -67,11 +67,11 @@ void func_PAL_L00_002FE328(void) {
             out = D_L00_0027E620;
             matrix = found + 0xC0;
             for (n = 0; n < 4; n++) {
-                func_00283098(out, D_L00_001A93E0 + n * 16, matrix);
-                func_00282CC0(out, out, found + 0x10);
-                func_00282CF0(temp, D_L00_001B8DC0, out);
-                func_00282F20(temp, temp, 0.15f);
-                func_00282CC0(out, out, temp);
+                matrix_mul_vec3(out, D_L00_001A93E0 + n * 16, matrix);
+                FastVecAdd(out, out, found + 0x10);
+                FastVecSub(temp, g_camera_l00_position, out);
+                vec_scale_to_length(temp, temp, 0.15f);
+                FastVecAdd(out, out, temp);
                 out += 16;
             }
         }

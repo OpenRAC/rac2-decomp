@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-void func_00288B38(int);
+void req_mark_queued_in_flag_table(int);
 
-void func_00288B18(void*);
+void req_reset_owner_queue(void*);
 
 typedef unsigned char u8;
 
@@ -24,17 +24,17 @@ typedef struct {
 
 extern s32 D_L04_001A8F00 __attribute__((sda));
 
-extern s32 func_00288A00(BarlowUtilityQueueView *, s32 *, s32 *);
+extern s32 req_pop_queue(BarlowUtilityQueueView *, s32 *, s32 *);
 
-extern s32 func_002B49E0(s32, s32, u32, u32, u8 *);
+extern s32 request_begin_slot(s32, s32, u32, u32, u8 *);
 
-extern void func_L00_002F4180(BarlowUtilityQueueView *);
+extern void level_init_owner_object(BarlowUtilityQueueView *);
 
 /* Marks every request in the queue as used, clears its first word and resets the queue. */
-void func_00288BB8(void *queue)
+void req_flush_queue(void *queue)
 {
-  MarkQueuedRequestsInFlagTable((int)queue);
+  req_mark_queued_in_flag_table((int)queue);
   *(unsigned int *)queue = 0;
-  ResetOwnerRequestQueue(queue);
+  req_reset_owner_queue(queue);
 }
-extern s32 func_00288BE8(BarlowUtilityQueueView *queue);
+extern s32 req_launch_queued(BarlowUtilityQueueView *queue);

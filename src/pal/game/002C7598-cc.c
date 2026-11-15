@@ -1,30 +1,31 @@
+#include "names.h"
 /* func_PAL_002C7598, the PAL copy of func_002C6868: the same C, where wrap (control- becomes scale - 1.0f) (({e}) * 1.2f); rename func_00282D30_12 becomes func_00282D30; rename func_00282CC0_17 becomes func_00282CC0; rename func_00283CE0_2 becomes func_00283CE0. */
 #include "common.h"
-extern float func_002A78D8(float, float);
+extern float math_random_signed_float_range(float, float);
 /* Copy the xyz components and clear the fourth word. Adapted from RAC1. */
 
-extern int func_00277F48(float, void *, int, int, int);
-extern char D_00189EA0[];
+extern int coll_process_hit(float, void *, int, int, int);
+extern char g_hero_position[];
 
-extern int func_00283D38(int,int,float);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern int FastTweenColor(int,int,float);
+extern int CollLine(void *, void *, int, void *, void *);
 extern unsigned char *D_001F25F4, *D_001F26A8;
-extern int func_002A9568(int, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_002A7940(void);
-extern int func_002AAE98(float, float, float, float);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
+extern int moby_forward_two_values_and_amount(int, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_random_angle(void);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern int func_002A8860(void *, int);
-extern void func_0029FCC0(void *, int, void *);
+extern int moby_decrement_top_byte(void *, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
 /* Qwen draft (branch qwen/autonomy, c8b09022), checked by tools/check.py */
-void func_002B9180(void *);
+void part_kill(void *);
 
-int func_00282978(short *);
+int FastDecTimer(short *);
 
 extern int func_00282978_9(char *p);
 
@@ -66,10 +67,10 @@ struct T {
 
 /* func_002BF728 uses the quadword-copy profile in 002BF728-qcopy.c. */
 
-extern int func_002A77E0(int);
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern int math_random_int_below(int);
+extern void FastVecAdd(char *, char *, char *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 /* Advances one object: the halfword at offset 10 is capped at 12 and, when the
    sub-object's float at 0x30 is below the object's float at 0x18, the word at
    offset 4 is cleared; the packed byte in that word is then rescaled by the
@@ -77,14 +78,14 @@ extern float func_00283198(float);
    sub-object's float at 0x3C, the object's vector is moved by the sub-object's
    motion triple and the last pair of floats is written back from the angle
    kept in the sub-object. */
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void *func_002C19D8(void *, float, void *, float, int);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void *part_spawn_drifting(void *, float, void *, float, int);
 /* func_002BFE80 is defined in 002BFE80-dbg.c. */
 
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float D_001B5340[];
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float g_camera_eye_state[];
 /* func_002C01F8 is in 002BF6F0-c01f8-g8.c. */
 
 /* func_002C02F0 uses the quadword-copy profile in 002C02F0-qcopy.c. */
@@ -94,35 +95,35 @@ extern float D_001B5340[];
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float. */
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
 extern int func_001163B0(void);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *D_001F25F4;
 
-void *func_002C19D8(void *position, float size, void *owner, float spin, int color);
+void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color);
 
 /* func_002C1B38 is in the -G8 sibling. */
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
+extern void FastVecAdd(char *, char *, char *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
 
 /* func_002C1FC0 is defined in 002BF6F0-g8.c. */
 
 /* Tests the halfword at offset 10 through a helper; on zero it stores a scaled int at offset 4 and a 210000.0f-scaled interpolation of two floats at offset 12, otherwise calls a second helper. */
 /* Move a particle while tweening its size and alpha, then apply gravity. */
-extern int func_00277F48(float, void *, int, int, int);
+extern int coll_process_hit(float, void *, int, int, int);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
-extern int func_002AAE98(float, float, float, float);
+extern int gfx_pack_color_floats(float, float, float, float);
 
 #ifndef RAC2_T_VEC16_F5621621C
 #define RAC2_T_VEC16_F5621621C
@@ -137,16 +138,16 @@ extern int func_002AAE98(float, float, float, float);
    never reads them back. The words at offsets 0x20 and 0x34 are 32-bit in the
    object and the helpers take them as pointers, so they are cast on the way
    out. */
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* A drifting spark: moves by its velocity, spins, slows its fall and fades over its last
    64 frames; it frees itself when the count runs out. */
 /* func_002C2A88 uses the quadword-copy profile in 002C2A88-qcopy.c. */
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 /* rac1-decomp src/overlays/shared/alpha_fade_particle_updates.c: func_002C2FD8 */
 /* spawns particle type 0x3B from a position, colour index and flags */
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
 /* Creates a particle at POS moving by VEL; in mode 1 it also keeps its offset from the
    resident view origin. */
@@ -165,8 +166,8 @@ extern void func_00282CC0(char *, char *, char *);
 /* Updates an attached spark and emits children; mode 1 orbits its owner.
  * The interleaved prototype preserves each EE argument register bank. */
 /* Follows a selected attachment, randomizes its rotation, and fades by lifetime. */
-extern float func_002A78D8(float, float);
-extern float func_00283CE0(int);
+extern float math_random_signed_float_range(float, float);
+extern float IntToFloat(int);
 
 /* decrements a signed short counter and, at zero, rotates a 24-bit identifier beside it and reloads the counter; calls a helper when the identifier's top byte is clear */
 /* Pulls toward a target, blends colour by distance, then advances through
@@ -193,8 +194,8 @@ extern void func_002B9180_13(char *self);
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* func_002C6360 is in the -G8 sibling (its two globals are read through $gp). */
 
-extern float func_00283198(float);
-extern int func_00283CF0(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
 
 /* func_002C65A0 is in 002BF6F0-c65a0.c. */
 
@@ -209,7 +210,7 @@ typedef struct {
     short reserved12;
     float scale;
 } ParticleKeyframes;
-extern int func_002A9568(int, int, float);
+extern int moby_forward_two_values_and_amount(int, int, float);
 
 void func_PAL_002C7598(char *self)
 {
@@ -228,14 +229,14 @@ void func_PAL_002C7598(char *self)
         control->times[*(short *)(motion + 0x14)]);
     factor = (float)(elapsed -
         control->times[*(short *)(motion + 0x14)]) / duration;
-    *(int *)(self + 4) = func_002A9568(
+    *(int *)(self + 4) = moby_forward_two_values_and_amount(
         control->colors[*(short *)(motion + 0x14)],
         control->colors[*(short *)(motion + 0x14) + 1], factor);
     *(float *)(self + 0xC) =
         ((float)control->sizes[*(short *)(motion + 0x14)] +
          factor * (float)(control->sizes[*(short *)(motion + 0x14) + 1] - control->sizes[*(short *)(motion + 0x14)])) * 1000.0f;
-    if (func_00282978((short *)(self + 0xA)))
-        func_002B9180(self);
+    if (FastDecTimer((short *)(self + 0xA)))
+        part_kill(self);
 }
 
 /* Follows a sound emitter's moby: fades its volume byte (the top byte of +4) up by 4
@@ -243,11 +244,11 @@ void func_PAL_002C7598(char *self)
    then places the emitter at the moby (or at its joint, pulled 0.4 of the way toward
    the camera). A dead or dying moby (state 0xFE/0xFD) or none lets the emitter finish
    and frees it. */
-extern float D_001B5340[];
-extern int func_002A8860(void *, int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern float g_camera_eye_state[];
+extern int moby_decrement_top_byte(void *, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Follows the particle's target (or one of its joints): the alpha fades towards the limit
    while the target is shown and out otherwise; a missing or dying target fades the particle

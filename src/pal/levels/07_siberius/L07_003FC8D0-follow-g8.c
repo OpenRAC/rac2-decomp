@@ -21,7 +21,7 @@ extern void func_2E45F0(void *,void *,f32);
 extern f32 func_2E4418(void *,void *);
 extern f32 func_314038(f32 *,f32 *,f32,f32,f32,f32);
 typedef struct {u8 pad[0x80];f32 pos[4];} Player;
-extern Player D_00189E20;
+extern Player g_hero_state;
 extern f32 D_L07_001B1070 __attribute__((sda));
 extern f32 D_L07_001B1074 __attribute__((sda));
 extern f32 D_L07_001B1078 __attribute__((sda));
@@ -51,7 +51,7 @@ void func_PAL_L07_003FC8D0(u8 *obj,f32 limit)
  } else {
   qcopy(target,p+0x3e0);
   yaw=(f32 *)(obj+0xf8);
-  angle=func_2E49C8(D_00189E20.pos[0]-*(f32 *)(obj+0x10),D_00189E20.pos[1]-*(f32 *)(obj+0x14));
+  angle=func_2E49C8(g_hero_state.pos[0]-*(f32 *)(obj+0x10),g_hero_state.pos[1]-*(f32 *)(obj+0x14));
   func_3144F0(yaw,p+0x424,angle,0.005026549f,0.005026549f,0.25132746f,0);
  }
  func_2E4340(delta,target,obj+0x10);

@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed short s16;
-extern void func_002A7750();
-extern void func_002A0488(void *, void *, void *, void *);
-extern void func_002B60B0(u8 *, float, float, float, float);
+extern void moby_set_state();
+extern void set_moby_color(void *, void *, void *, void *);
+extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern u8 D_001A7BCB __attribute__((sda));
@@ -24,9 +25,9 @@ void func_PAL_L02_00410480(u8 *a0, int a1) {
 
     *(float *)(s0 + 0x20) = (float)*(s16 *)(s0 + 0x24);
     *(u16 *)(s0 + 0x2E2) = one;
-    func_002B60B0(a0, 0.0064000003f, 0.16000001f,
+    moby_set_controller_speed_limits(a0, 0.0064000003f, 0.16000001f,
                   0.0016755164f, 0.12566373f);
-    func_002A7750(a0, 3, 1);
+    moby_set_state(a0, 3, 1);
     if (*(u8 *)(a0 + 0x43) != 2)
         func_PAL_002A7E68(a0, 2, 0, 0);
     *(u32 *)(a0 + 0x98) = *(u32 *)(*(u32 *)(a0 + 0x24) + 0x10);
@@ -40,7 +41,7 @@ void func_PAL_L02_00410480(u8 *a0, int a1) {
     *(u16 *)(s0 + 0x88) = 0;
     if (*(s16 *)(s0 + 0x50) != 0) {
         *(u16 *)(s0 + 0x50) = 0;
-        func_002A0488(a0, *(u8 *)(s0 + 0x54), *(u8 *)(s0 + 0x55), *(u8 *)(s0 + 0x56));
+        set_moby_color(a0, *(u8 *)(s0 + 0x54), *(u8 *)(s0 + 0x55), *(u8 *)(s0 + 0x56));
         *(u16 *)(s0 + 0x52) = one;
     }
 }
@@ -48,12 +49,12 @@ void func_PAL_L02_00410480(u8 *a0, int a1) {
 
 extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
-extern void func_002E5DA0(int, int, void *, int);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void snd_play_from_class_bank(int, int, void *, int);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
 extern void func_PAL_002A0F68(void *);
-extern void func_L02_0040B980(u8 *);
+extern void flamethrower_robot_knock_out(u8 *);
 
 /* arms the actor: its two effect tracks, then the shared state resets */
 void func_PAL_L02_00410598(u8 *a0) {
@@ -65,14 +66,14 @@ void func_PAL_L02_00410598(u8 *a0) {
     if (a0[0x31]) {
         func_PAL_L00_003FB330(a0 + 0x10, 0, 5, 5, 0x19, 0x14, 0xA, 1, 0.5f, 0.0f,
                       1, 0, 0, 0);
-        func_002E5DA0(0, 0, a0, 0xC3E);
-        func_002A7A00(buf, 0.10000001f, 0.14000002f);
-        func_00282CC0(buf, buf, s1 + 0xD0);
+        snd_play_from_class_bank(0, 0, a0, 0xC3E);
+        vec_random_direction(buf, 0.10000001f, 0.14000002f);
+        FastVecAdd(buf, buf, s1 + 0xD0);
         func_PAL_002B15D8(a0, 0xFF, buf, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     func_PAL_002A7E68(a0, 0, 0, 3);
     func_PAL_002A0F68(a0);
-    func_002A7750(a0, 1, 0);
+    moby_set_state(a0, 1, 0);
     *(u8 *)(a0 + 0x31) = 0;
     *(u32 *)(a0 + 0x98) = 0;
     *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xEFFF) | 0x47;

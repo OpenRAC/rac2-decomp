@@ -19,85 +19,85 @@ typedef struct {
     int countdown, offset, offsetTimer;
 } SubtitleBoxState;
 
-extern SubtitleBoxState D_00254E78;
-extern SubtitleBoxEntry *D_001B1840[] __attribute__((sda));
+extern SubtitleBoxState g_subtitle_state;
+extern SubtitleBoxEntry *g_subtitle_entries[] __attribute__((sda));
 
 /* The settings block func_00298E08 copies. Retail reads its halfword at +4 and byte at +5 at
  * an offset from the block (lui and a tied %lo load, never moved into a delay slot). */
-extern unsigned char D_001A7B90[] __attribute__((sda));
+extern unsigned char g_is_pal_video[] __attribute__((sda));
 #define SUBTITLE_SETTING (*(unsigned short *)&D_001A7B90[4])
 #define SUBTITLE_BOX_SETTING (D_001A7B90[5])
 
-extern void func_0027EB88(int top, int bottom, int left, int right, int alpha, int color);
-extern void func_0029B658(int alpha, int color, float top, float bottom, float left, float right);
-extern void func_002802E0(unsigned short *, int, int, int, int, int, int, int, int);
-extern void func_00280200(unsigned short *, unsigned long long, unsigned char *, int);
-extern void func_00289AA0(void);
+extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int alpha, int color);
+extern void level_set_rect(int alpha, int color, float top, float bottom, float left, float right);
+extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, int);
+extern void text_draw_window_medium(unsigned short *, unsigned long long, unsigned char *, int);
+extern void subtitle_empty_b(void);
 
 /* Draws the subtitle box and its text, growing, showing and shrinking it by state. */
-void func_00289AA8(void)
+void DrawSubtitleBox(void)
 {
     unsigned short layout[16];
 
-    gSubtitleState.offsetTimer--;
-    if (gSubtitleState.offsetTimer < 0)
-        gSubtitleState.offsetTimer = 0;
-    if (gSubtitleState.offsetTimer == 0)
-        gSubtitleState.offset = 0;
-    if (!gSubtitleState.state || !gSubtitleState.enabled || !SUBTITLE_SETTING)
+    g_subtitle_state.offsetTimer--;
+    if (g_subtitle_state.offsetTimer < 0)
+        g_subtitle_state.offsetTimer = 0;
+    if (g_subtitle_state.offsetTimer == 0)
+        g_subtitle_state.offset = 0;
+    if (!g_subtitle_state.state || !g_subtitle_state.enabled || !SUBTITLE_SETTING)
         return;
 
-    switch (gSubtitleState.state) {
+    switch (g_subtitle_state.state) {
     case 1: {
         int halfW, halfH, posY, posX, offset;
 
         if (SUBTITLE_BOX_SETTING) {
             halfH = 8;
             halfW = 8;
-            gSubtitleState.boxHalfWidth = halfW;
-            gSubtitleState.boxHalfHeight = halfH;
-            posY = gSubtitleState.y;
-            posX = gSubtitleState.x;
-            offset = gSubtitleState.offset;
-            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
-            SetLevelObjectRect(96, 0x55F0C070,
-                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
-                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
+            g_subtitle_state.boxHalfWidth = halfW;
+            g_subtitle_state.boxHalfHeight = halfH;
+            posY = g_subtitle_state.y;
+            posX = g_subtitle_state.x;
+            offset = g_subtitle_state.offset;
+            gfx_draw_rounded_box(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
+            level_set_rect(96, 0x55F0C070,
+                          g_subtitle_state.y - g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.y + g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.x - g_subtitle_state.boxHalfWidth,
+                          g_subtitle_state.x + g_subtitle_state.boxHalfWidth);
         } else {
-            EmptySubtitleStubB();
+            subtitle_empty_b();
         }
         break;
     }
     case 2:
-        EmptySubtitleStubB();
+        subtitle_empty_b();
         break;
     case 3: {
         int progress, halfW, halfH, posY, posX, offset;
 
         if (SUBTITLE_BOX_SETTING) {
             /* The box grows from 32 to its full half extents over 8 frames. */
-            progress = gSubtitleState.timer;
+            progress = g_subtitle_state.timer;
             if (progress > 8)
                 progress = 8;
             if (progress < 0)
                 progress = 0;
-            halfW = 32 + (gSubtitleState.halfWidth - 32) * progress / 8;
-            halfH = 32 + (gSubtitleState.halfHeight - 32) * progress / 8;
-            gSubtitleState.boxHalfWidth = halfW;
-            gSubtitleState.boxHalfHeight = halfH;
-            posY = gSubtitleState.y;
-            posX = gSubtitleState.x;
-            offset = gSubtitleState.offset;
-            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
-            SetLevelObjectRect(96, 0x55F0C070,
-                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
-                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
+            halfW = 32 + (g_subtitle_state.halfWidth - 32) * progress / 8;
+            halfH = 32 + (g_subtitle_state.halfHeight - 32) * progress / 8;
+            g_subtitle_state.boxHalfWidth = halfW;
+            g_subtitle_state.boxHalfHeight = halfH;
+            posY = g_subtitle_state.y;
+            posX = g_subtitle_state.x;
+            offset = g_subtitle_state.offset;
+            gfx_draw_rounded_box(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
+            level_set_rect(96, 0x55F0C070,
+                          g_subtitle_state.y - g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.y + g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.x - g_subtitle_state.boxHalfWidth,
+                          g_subtitle_state.x + g_subtitle_state.boxHalfWidth);
         } else {
-            EmptySubtitleStubB();
+            subtitle_empty_b();
         }
         break;
     }
@@ -109,36 +109,36 @@ void func_00289AA8(void)
         unsigned char *text;
 
         if (SUBTITLE_BOX_SETTING) {
-            halfH = gSubtitleState.halfHeight;
-            halfW = gSubtitleState.halfWidth;
-            gSubtitleState.boxHalfWidth = halfW;
-            gSubtitleState.boxHalfHeight = halfH;
-            posY = gSubtitleState.y;
-            posX = gSubtitleState.x;
-            offset = gSubtitleState.offset;
-            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
+            halfH = g_subtitle_state.halfHeight;
+            halfW = g_subtitle_state.halfWidth;
+            g_subtitle_state.boxHalfWidth = halfW;
+            g_subtitle_state.boxHalfHeight = halfH;
+            posY = g_subtitle_state.y;
+            posX = g_subtitle_state.x;
+            offset = g_subtitle_state.offset;
+            gfx_draw_rounded_box(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
             color = 0x80FFA888;
-            SetLevelObjectRect(96, 0x55F0C070,
-                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
-                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
-                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
+            level_set_rect(96, 0x55F0C070,
+                          g_subtitle_state.y - g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.y + g_subtitle_state.boxHalfHeight + g_subtitle_state.offset,
+                          g_subtitle_state.x - g_subtitle_state.boxHalfWidth,
+                          g_subtitle_state.x + g_subtitle_state.boxHalfWidth);
             /* The text fades in (state 4) and out (state 6) over 4 frames. */
-            progress = gSubtitleState.timer;
+            progress = g_subtitle_state.timer;
             if (progress > 4)
                 progress = 4;
             if (progress < 0)
                 progress = 0;
-            if (gSubtitleState.state == 4)
+            if (g_subtitle_state.state == 4)
                 color = (progress << 29) | 0xFFA888;
-            else if (gSubtitleState.state == 6)
+            else if (g_subtitle_state.state == 6)
                 color = ((4 - progress) << 29) | 0xFFA888;
-            text = gSubtitleEntries[0][gSubtitleState.entry].text;
-            FontSetWindow(layout, gSubtitleState.offset + 240, gSubtitleState.offset + 480, 44, 468, 256,
-                          gSubtitleState.y + gSubtitleState.offset, 16, 3);
-            DrawTextWindowMediumFont(layout, color, text, -1);
+            text = g_subtitle_entries[0][g_subtitle_state.entry].text;
+            FontSetWindow(layout, g_subtitle_state.offset + 240, g_subtitle_state.offset + 480, 44, 468, 256,
+                          g_subtitle_state.y + g_subtitle_state.offset, 16, 3);
+            text_draw_window_medium(layout, color, text, -1);
         } else {
-            EmptySubtitleStubB();
+            subtitle_empty_b();
         }
         break;
     }
@@ -147,26 +147,26 @@ void func_00289AA8(void)
 
         if (SUBTITLE_BOX_SETTING) {
             /* The box shrinks back to 8 and fades out over 8 frames. */
-            progress = gSubtitleState.timer;
+            progress = g_subtitle_state.timer;
             if (progress > 8)
                 progress = 8;
             if (progress < 0)
                 progress = 0;
-            halfH = gSubtitleState.boxHalfHeight;
-            halfW = gSubtitleState.boxHalfWidth;
+            halfH = g_subtitle_state.boxHalfHeight;
+            halfW = g_subtitle_state.boxHalfWidth;
             halfW -= (halfW - 8) * progress / 8;
             halfH -= (halfH - 8) * progress / 8;
             alpha = (8 - progress) * 12;
-            posY = gSubtitleState.y;
-            posX = gSubtitleState.x;
-            offset = gSubtitleState.offset;
-            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, alpha, 0x60442D00);
-            SetLevelObjectRect(alpha, 0x55F0C070,
-                          gSubtitleState.y - halfH + gSubtitleState.offset,
-                          gSubtitleState.y + halfH + gSubtitleState.offset,
-                          gSubtitleState.x - halfW, gSubtitleState.x + halfW);
+            posY = g_subtitle_state.y;
+            posX = g_subtitle_state.x;
+            offset = g_subtitle_state.offset;
+            gfx_draw_rounded_box(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, alpha, 0x60442D00);
+            level_set_rect(alpha, 0x55F0C070,
+                          g_subtitle_state.y - halfH + g_subtitle_state.offset,
+                          g_subtitle_state.y + halfH + g_subtitle_state.offset,
+                          g_subtitle_state.x - halfW, g_subtitle_state.x + halfW);
         } else {
-            EmptySubtitleStubB();
+            subtitle_empty_b();
         }
         break;
     }

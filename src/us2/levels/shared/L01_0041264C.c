@@ -5,10 +5,10 @@
  * test first in case 1. */
 
 extern s32 D_L01_001A8F40 __attribute__((sda));
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 
-extern void func_002A7750(s8 *, s32, s32);
-extern void func_L00_00326048(s8 *, s8 *, f32, s32, s32);
+extern void moby_set_state(s8 *, s32, s32);
+extern void math_store_angle_update_result(s8 *, s8 *, f32, s32, s32);
 
 void func_US2_L01_0041264C(s8 *arg0) {
     s8 *s;
@@ -18,17 +18,17 @@ void func_US2_L01_0041264C(s8 *arg0) {
     s = *(s8 **)(arg0 + 0x68);
     switch (t) {
     case 0:
-        func_002A7750(arg0, 1, -1);
+        moby_set_state(arg0, 1, -1);
         return;
     case 1:
-        if (D_001A79F0 == 0x33) {
+        if (g_current_map_index == 0x33) {
             return;
         }
         if (s != 0) {
             if (D_L01_001A8F40 == 2) {
-                func_L00_00326048(arg0, s + 0xC, 0.055268768f, (s32)0x80AABED2u, (s32)0x80466464u);
+                math_store_angle_update_result(arg0, s + 0xC, 0.055268768f, (s32)0x80AABED2u, (s32)0x80466464u);
             } else {
-                func_L00_00326048(arg0, s + 0xC, 0.037815473f, (s32)0x8096AAAAu, (s32)0x80466464u);
+                math_store_angle_update_result(arg0, s + 0xC, 0.037815473f, (s32)0x8096AAAAu, (s32)0x80466464u);
             }
         }
         break;

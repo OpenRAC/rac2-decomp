@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -24,7 +25,7 @@
 #include "common.h"
 
 extern const s32 D_001A7A00;
-extern s8 D_00189EA0[];
+extern s8 g_hero_position[];
 extern s32 ref_L16_003D6D00_00;
 extern struct { s32 w0; s32 w1; s32 w2; } ref_L16_003D6D00_01;
 extern s32 ref_L16_003D6D00_02(s8 *, s32);
@@ -37,7 +38,7 @@ extern void ref_L16_003D6D00_08(s8 *, s32, s32);
 extern void ref_L16_003D6D00_09(s32, s32);
 
 /* Pulls the hero to this object and hurts him when he is in range. */
-void func_L16_003D6D00(s8 *moby) {
+void hero_pull_and_hurt_on_contact(s8 *moby) {
     s32 *vars;
     s8 *hero;
     s8 *heroBase;
@@ -49,7 +50,7 @@ void func_L16_003D6D00(s8 *moby) {
         (*(u8 *)((s8 *)(moby) + (0x30))) = 0xFF;
         (*(u8 *)((s8 *)(moby) + (0x20))) = 1;
     }
-    hero = gHeroPosition;
+    hero = g_hero_position;
     if (ref_L16_003D6D00_02(hero, *vars) != 0) {
         heroBase = hero - 0x80;
         if ((*(s32 *)((s8 *)(heroBase) + (0x229C))) != 0xF) {

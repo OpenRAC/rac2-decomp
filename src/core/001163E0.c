@@ -5,7 +5,7 @@
    this body only reproduces under the game compiler, which is the one that pads
    short loops (the retail assembler's rule). */
 /* Finds the first place where one text string appears inside another. */
-char *func_001163E0(const char *searchee, const char *lookfor) {
+char *strstr(const char *searchee, const char *lookfor) {
     unsigned int i;
 
     if (*searchee == 0) {

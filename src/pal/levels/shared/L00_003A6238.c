@@ -5,12 +5,12 @@
 
 
 #include "common.h"
-extern void func_002829A8(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
+extern void vec_fast_helper_a(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
 extern char *func_PAL_002BE9A8(float, void *, float, float, int, void *, float, unsigned int, int);
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* func_L00_003A2C60 is defined in L00_003A2C60-g8.c. */
 
@@ -29,26 +29,26 @@ void func_PAL_L00_003A77D8(char *moby)
     float size;
     if (!*(unsigned char *)(moby + 0xBC))
         return;
-    func_002829A8(moby + 0xBC);
+    vec_fast_helper_a(moby + 0xBC);
     firstStyle = 7;
     firstKind = 2;
     firstAlpha = 127;
-    func_00282D30(position, moby + 0xD0, 0.1f);
-    func_00282CC0(position, position, moby + 0x10);
-    func_00282D30(offset, moby + 0xC0, 0.275f);
-    func_00282CC0(position, position, offset);
-    func_00282D30(velocity, moby + 0xD0, 0.120000005f);
+    FastVecScale(position, moby + 0xD0, 0.1f);
+    FastVecAdd(position, position, moby + 0x10);
+    FastVecScale(offset, moby + 0xC0, 0.275f);
+    FastVecAdd(position, position, offset);
+    FastVecScale(velocity, moby + 0xD0, 0.120000005f);
     for (count = 3; count >= 0; count--) {
         char *particle;
-        rotation = func_002A77E0(16);
-        if (func_002A77E0(2))
+        rotation = math_random_int_below(16);
+        if (math_random_int_below(2))
             rotation = -rotation;
         particle = func_PAL_002BE9A8(0.04f, position, 1.0f, 0.9f, rotation, velocity, 52500.0f, 0x7F204080, 0);
         if (particle) {
             char *sub;
             sub = particle + 0x20;
             *(short *)(particle + 10) = firstStyle;
-            *(unsigned char *)(particle + 9) = ((*(short *)(moby + 0x32) >> 5) << 4) + func_00283CF0(4.0f);
+            *(unsigned char *)(particle + 9) = ((*(short *)(moby + 0x32) >> 5) << 4) + FloatToInt(4.0f);
             *(int *)(sub + 4) = firstKind;
             *(unsigned char *)(sub + 10) = firstAlpha;
             *(unsigned char *)(sub + 11) = *(unsigned char *)(particle + 10);
@@ -65,10 +65,10 @@ void func_PAL_L00_003A77D8(char *moby)
             char *sub;
             int brightness;
             sub = particle + 0x20;
-            brightness = ((*(short *)(moby + 0x32) >> 5) << 4) + func_00283CF0(4.0f);
+            brightness = ((*(short *)(moby + 0x32) >> 5) << 4) + FloatToInt(4.0f);
             *(short *)(particle + 10) = style;
             *(unsigned char *)(particle + 9) = brightness;
-            *(unsigned char *)(particle + 8) = func_002A77E0(255);
+            *(unsigned char *)(particle + 8) = math_random_int_below(255);
             *(int *)(sub + 4) = secondKind;
             *(unsigned char *)(sub + 10) = secondAlpha;
             *(unsigned char *)(sub + 11) = *(unsigned char *)(particle + 10);
@@ -84,7 +84,7 @@ void func_PAL_L00_003A77D8(char *moby)
 
 extern char D_L00_001A8F20[] __attribute__((sda));
 extern void func_0029FCC0_1(int a, int b, void *c);
-extern int func_L00_003AB9C0(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern int projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 
 /* Runs one helper over the object and a stack buffer, then builds a second call from the object's field 104 sub-object - its field 24 as a float, the constants 2.0f/5.0f/0.6f and a bound data address - and stores the object into field 184 of the returned pointer when it is non-null. */
 void func_PAL_L00_003A8978(int a0)
@@ -95,7 +95,7 @@ void func_PAL_L00_003A8978(int a0)
 
     s0 = *(int *)(a0 + 104);
     func_0029FCC0_1(a0, 0, buf);
-    v = func_L00_003AB9C0(a0, buf, *(int *)(s0 + 16), D_L00_001A8F20, *(float *)(s0 + 24), 2.0f, 5.0f, 0.6f);
+    v = projectile_spawn_targeted(a0, buf, *(int *)(s0 + 16), D_L00_001A8F20, *(float *)(s0 + 24), 2.0f, 5.0f, 0.6f);
     if (v != 0) {
         *(int *)(v + 184) = a0;
     }
@@ -113,17 +113,17 @@ typedef struct {
     float value_70;
     unsigned char pad_074[0x6C];
 } L00AimEntry;
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern float func_00282E48(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *,void *,int,void *,void *);
+extern float fast_vec_dist(void *, void *);
 extern char *func_PAL_L00_00400968(char *, char *, char *, int);
-extern void func_002A8E20(int, void *);
+extern void QueueMobyImpact(int, void *);
 extern void func_PAL_0032F0B8(int, int, char *);
-extern int D_0018C0B0;
+extern int g_hero_moby;
 extern unsigned char D_00139582;
-extern L00AimState D_L00_001BF200;
-extern L00AimEntry D_L00_00262570[];
+extern L00AimState g_collision_result;
+extern L00AimEntry g_weapon_l00_table[];
 
 int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
 {
@@ -132,17 +132,17 @@ int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
     float saved;
     int ret;
 
-    func_00282CF0(a3, a2, a1);
-    func_00282F20(a3, a3, 1.5f);
+    FastVecSub(a3, a2, a1);
+    vec_scale_to_length(a3, a3, 1.5f);
     *(float *)(a3 + 0xC) = 5627.9248046875f;
-    if (func_002761F8(a1, a2, 0x10, D_0018C0B0, 0) != 0) {
-        func_00282CF0(local, a2, a1);
-        func_00282F20(local, local, 1.0f);
-        func_00282CF0(local, (char *)D_L00_001BF200.vector_20, a1);
-        func_PAL_L00_00400968(a1, local, (char *)D_L00_001BF200.vector_20, 1);
-        if (D_L00_001BF200.object_18 != 0) {
-            saved = (D_L00_00262570 + D_00139582)->value_70;
-            distance = func_00282E48((char *)D_L00_001BF200.vector_20, a1);
+    if (CollLine(a1, a2, 0x10, g_hero_moby, 0) != 0) {
+        FastVecSub(local, a2, a1);
+        vec_scale_to_length(local, local, 1.0f);
+        FastVecSub(local, (char *)g_collision_result.vector_20, a1);
+        func_PAL_L00_00400968(a1, local, (char *)g_collision_result.vector_20, 1);
+        if (g_collision_result.object_18 != 0) {
+            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            distance = fast_vec_dist((char *)g_collision_result.vector_20, a1);
             if (distance < 10.0f) {
                 *(float *)(a3 + 0x1C) = saved;
             } else if (distance < 14.0f) {
@@ -152,12 +152,12 @@ int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
             } else {
                 *(float *)(a3 + 0x1C) = saved * 0.125f;
             }
-            func_002A8E20(D_L00_001BF200.object_18, a3);
-            func_PAL_0032F0B8(D_L00_001BF200.object_18, 26, a0);
+            QueueMobyImpact(g_collision_result.object_18, a3);
+            func_PAL_0032F0B8(g_collision_result.object_18, 26, a0);
         }
-        ret = D_L00_001BF200.object_18;
+        ret = g_collision_result.object_18;
     } else {
-    func_00282CF0(local, a2, a1);
+    FastVecSub(local, a2, a1);
     func_PAL_L00_00400968(a1, local, a2, 0);
     ret = 0;
     }

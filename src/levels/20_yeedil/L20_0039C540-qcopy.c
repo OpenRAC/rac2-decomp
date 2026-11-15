@@ -2,11 +2,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 /* Spawns an object of type 0x12F2 and fills its position and its sub-record vector. */
 /* Creates a Yeedil shot at a position with a direction and a size, owned by another object. */
-char *func_L20_0039C540(char *owner, char *position, char *direction, float radius) {
+char *projectile_l20_spawn(char *owner, char *position, char *direction, float radius) {
     char *vars;
     char *moby = CreateMoby(0x12F2 /* moby class 4850 */);
 

@@ -4,19 +4,19 @@ typedef struct { short fields[12]; } MenuTextRectangle;
 extern char *D_001F2854;
 extern char D_00263B50[], D_00264290[], D_00263EF0[];
 extern unsigned char D_001A7A60[] MACRO_ADDR, D_001A7BB4 MACRO_ADDR;
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027C540(int);
-extern void *func_00115484(void *, int, int);
-extern unsigned long func_0027C878(int);
-extern int func_00288FB8(int);
-extern void func_0027F120(void), func_0027F110(void), func_0027C660(void);
-extern void func_0027FC70(short *, unsigned long, int, int, unsigned long, char *);
-extern void func_002D9CF8(int, int, int);
-extern void func_0028FAB8(int, int, int, int, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void SetupGifPaging(int);
+extern void *memset(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern int GetLocalizedString(int);
+extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void), DoGifPaging(void);
+extern void FontPrintWindow(short *, unsigned long, int, int, unsigned long, char *);
+extern void DrawMenuCheckBox(int, int, int);
+extern void gfx_draw_screen_line(int, int, int, int, int, int);
 
 
 /* Draws a list of menu rows with the highlighted row in a different color. */
-int func_002D89D8(char *object)
+int menu_text_list_draw_highlight(char *object)
 {
     MenuTextRectangle rectangle, initial;
     short *row;
@@ -68,9 +68,9 @@ int func_002D89D8(char *object)
             rectangle.fields[9] = 1;
             rectangle.fields[4] = *(int *)(object + 0x20) >> 1;
         }
-        if (selected) DisableScreenFlag();
+        if (selected) gfx_disable_screen_flag();
         FontPrintWindow(rectangle.fields, colour, text, -1, textureWord, font);
-        if (selected) EnableScreenFlag();
+        if (selected) gfx_enable_screen_flag();
         if (*(int *)(object + 0x30) & 0x200)
             DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7A60[index] != 0);
         if (*(int *)(object + 0x30) & 0x800)

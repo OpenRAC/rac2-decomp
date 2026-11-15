@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
-extern float func_00283CE0(int);
-extern float func_00283B98(float, float);
-extern int func_00282978(short *);
-extern void func_0029F338(void *);
+extern float IntToFloat(int);
+extern float FastAddRotations(float, float);
+extern int FastDecTimer(short *);
+extern void moby_mark_spawned(void *);
 
 
 /* Shrinks, spins and fades the object over its life, then removes it. */
-void func_L00_0038D368(char *object)
+void debris_update_shrinking_spinning(char *object)
 {
     char *data = *(char **)(object + 0x68);
     float step = 0.05235988646745682f;
@@ -17,7 +17,7 @@ void func_L00_0038D368(char *object)
     *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), step);
     *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), step);
     *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), step);
-    if (FastDecTimer((short *)(data + 0x1C))) MarkMobySpawned(object);
+    if (FastDecTimer((short *)(data + 0x1C))) moby_mark_spawned(object);
     else {
         int half = *(int *)(data + 0x14) / 2;
         if (*(short *)(data + 0x1C) < half)

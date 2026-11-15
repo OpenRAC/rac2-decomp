@@ -2,7 +2,7 @@
 #include "names.h"
 
 /* Select one of three measured pointer slots for the requested kind. */
-extern void *D_0018C0B0;
+extern void *g_hero_moby;
 
 extern void *D_0018B134;
 
@@ -20,7 +20,7 @@ typedef struct {
     u8 pad01[0x24CC - 0x22B5];
     s32 health;
 } PlayerHealthState;
-extern PlayerHealthState D_00189E20;
+extern PlayerHealthState g_hero_state;
 /* The scaling index is a signed halfword at player-stats offset 0x18. */
 extern s32 D_001A7A00[] __attribute__((sda));
 /* Five damage multipliers copied into a local lookup table. */
@@ -29,22 +29,22 @@ typedef struct {
 } PlayerDamageScale;
 extern PlayerDamageScale D_L00_001A7F30;
 
-extern f32 func_00283CE0(int value);
-extern int func_00283CF0(f32 value);
-extern void func_L00_0030C7F8(int argument);
+extern f32 IntToFloat(int value);
+extern int FloatToInt(f32 value);
+extern void module_l00_call_handler_with_arg_4(int argument);
 
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */
 /* Target: FUN_003427B0 — identity function returning its first argument */
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_L00_002A4EF0(unsigned long value)
+unsigned long math_l00_return_argument(unsigned long value)
 {
   return value;
 }
 
 /* Subtract scaled damage, clamp health to zero, and notify the registered handler. */
-void func_L00_002A4EF8(int amount)
+void AdjustPlayerHealth(int amount)
 {
     u8 mode;
     int level;
@@ -54,7 +54,7 @@ void func_L00_002A4EF8(int amount)
     if (amount == 0)
         return;
     damage = amount;
-    mode = gHeroState.mode;
+    mode = g_hero_state.mode;
     if (mode == 0 && amount > 0) {
         level = *(s16 *)((u8 *)D_001A7A00 + 0x18);
         level = level < 5 ? level : 4;
@@ -63,17 +63,17 @@ void func_L00_002A4EF8(int amount)
         damage = FloatToInt(IntToFloat(amount) * scale.scale[level] + 0.5f);
         damage = damage > mode ? damage : 1;
     }
-    gHeroState.health -= damage;
-    if (gHeroState.health < 0)
-        gHeroState.health = 0;
-    CallLoadedModuleHandlerWithArg_0034B000(360);
+    g_hero_state.health -= damage;
+    if (g_hero_state.health < 0)
+        g_hero_state.health = 0;
+    module_l00_call_handler_with_arg_4(360);
 }
 
 /* select primary pointer forkind0/2/3/4/5, secondary for1,tertiary for6; otherwiseNULL */
-void *func_L00_002A4FE8(int kind)
+void *attachment_get_owner_by_kind(int kind)
 {
     if (kind == 0 || kind == 2 || kind == 3 || kind == 4 || kind == 5)
-        return gHeroMoby_0018C0B0;
+        return g_hero_moby;
     if (kind == 1)
         return D_0018B134;
     if (kind == 6)

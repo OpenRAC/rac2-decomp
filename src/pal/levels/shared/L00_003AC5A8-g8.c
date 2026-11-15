@@ -28,17 +28,17 @@ typedef struct {
 extern float D_L00_001AF760 __attribute__((sda));
 extern float D_L00_001AF798 __attribute__((sda));
 extern float D_L00_001AF774 __attribute__((sda));
-extern char *func_L00_0032A088(int, int);
-extern int *func_L00_0032A0B8(int, int);
+extern char *level_get_slot_body(int, int);
+extern int *level_get_slot_header(int, int);
 extern int ref_L00_003A9000_00(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 int func_PAL_L00_003AC7A0(TrailActor *self)
 {
     TrailSource *source = self->source;
-    char *base = func_L00_0032A088(0x5CB, source->id);
-    char *data = base + *func_L00_0032A0B8(0x5CB, source->id);
+    char *base = level_get_slot_body(0x5CB, source->id);
+    char *data = base + *level_get_slot_header(0x5CB, source->id);
     TrailSlot *slots = (TrailSlot *)data;
     Qword rot[1];
 
@@ -55,8 +55,8 @@ int func_PAL_L00_003AC7A0(TrailActor *self)
     slots[source->index].u += D_L00_001AF798;
     if (slots[source->index].u >= 4.0f)
         slots[source->index].u -= 4.0f;
-    func_00282F20(rot, source, D_L00_001AF774 * 0.020000001f);
-    func_00282CC0(&slots[source->index], &slots[source->index], rot);
-    func_00282CC0(&slots[source->index].a, &slots[source->index].a, rot);
+    vec_scale_to_length(rot, source, D_L00_001AF774 * 0.020000001f);
+    FastVecAdd(&slots[source->index], &slots[source->index], rot);
+    FastVecAdd(&slots[source->index].a, &slots[source->index].a, rot);
     return 1;
 }

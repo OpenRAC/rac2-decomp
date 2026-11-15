@@ -108,18 +108,18 @@ typedef struct {
 } MapIconBounds_205E70;
 
 
-extern struct TagPtr_205E70 D_001B22A8 MACRO_ADDR;
-extern struct ScreenOffsets_205E70 D_001A7340 MACRO_ADDR;
-extern MapOverlayState_205E70 D_001C4FA0 NOT_SDA;
-extern MapPlayerState_205E70 D_00189E20 NOT_SDA;
-extern MapTextureTables_205E70 D_001B1870 MACRO_ADDR;
+extern struct TagPtr_205E70 g_dma_packet_cursor MACRO_ADDR;
+extern struct ScreenOffsets_205E70 g_screen_width MACRO_ADDR;
+extern MapOverlayState_205E70 g_map_overlay_state NOT_SDA;
+extern MapPlayerState_205E70 g_hero_state NOT_SDA;
+extern MapTextureTables_205E70 g_hud_state MACRO_ADDR;
 extern MapIdFlags_205E70 D_00139A34[] NOT_SDA;
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 extern s16 D_US2_001A95F8 __attribute__((sda));
 extern s16 D_US2_001A95FC MACRO_ADDR;
 extern s16 D_US2_001A9600 __attribute__((sda));
 extern s16 D_US2_001A9604 __attribute__((sda));
-extern u8 D_001A7AF8[] MACRO_ADDR;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern s32 D_001A95F0 __attribute__((sda));
 extern s32 D_001A960C __attribute__((sda));
 extern s32 D_001A9614 __attribute__((sda));
@@ -141,25 +141,25 @@ extern f32 D_001A95E0 __attribute__((sda));
 extern f32 D_001A95E4 __attribute__((sda));
 extern f32 D_001A95E8 __attribute__((sda));
 extern f32 D_001A95EC __attribute__((sda));
-extern void func_0027C540(s32);
-extern void func_0027C660(void);
-extern void func_002FC560(s32,s64);
-extern void func_002FC620(s32,s32,s32,s32);
-extern s32 func_0028E588(s32,s32);
-extern u64 func_0028E640(s32);
-extern void func_0028FC48(s32,s32,s32,s32,u64,s32);
-extern f32 func_00283B98(f32,f32);
-extern void func_0028F410(f32,f32,f32,f32,f32,s32,s32,u64);
-extern void func_0028F078(s32,s32,s32,s32,s32,s32,s32);
-extern void func_00297E00(s32,void *);
-extern void *func_00115484(void *,s32,u32);
-extern void func_00280200(void *,u64,void *,s32);
-extern void func_00280190(FontWindow_205E70 *,u64,char *,s32);
-extern char *func_00288FB8(s32);
+extern void SetupGifPaging(s32);
+extern void DoGifPaging(void);
+extern void VU1_addGSregister(s32,s64);
+extern void gfx_set_scissor_clamped(s32,s32,s32,s32);
+extern s32 GetIconFrame(s32,s32);
+extern u64 GetFrameTexture(s32);
+extern void AppendScreenRectPacket(s32,s32,s32,s32,u64,s32);
+extern f32 FastAddRotations(f32,f32);
+extern void DrawRotatedSprite(f32,f32,f32,f32,f32,s32,s32,u64);
+extern void DrawHudSpriteSubpixel(s32,s32,s32,s32,s32,s32,s32);
+extern void text_format_localized_amount(s32,void *);
+extern void *memset(void *,s32,u32);
+extern void text_draw_window_medium(void *,u64,void *,s32);
+extern void text_draw_window_small(FontWindow_205E70 *,u64,char *,s32);
+extern char *GetLocalizedString(s32);
 extern void func_US2_00298AA8(f32,f32,f32,f32,f32);
-extern s32 func_00297218(f32,f32,f32 *,f32 *,s32);
-extern void func_00297FE8(f32,f32,f32 *,f32 *,s32);
-extern s32 func_003005A0(void);
+extern s32 GetSpecialMapCoordinates(f32,f32,f32 *,f32 *,s32);
+extern void map_convert_world_to_map_position(f32,f32,f32 *,f32 *,s32);
+extern s32 moby_get_current_variant_index(void);
 
 /* UNK_NoMapAvailable */
 void func_US2_00296810(s32 paging, s32 set_clip) {
@@ -200,14 +200,14 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
     s32 tile_limit;
 
     if (D_001A95F0) return;
-    if (D_001C4FA0.enabled == 0 || D_001C4FA0.selected_map >= 21) {
+    if (g_map_overlay_state.enabled == 0 || g_map_overlay_state.selected_map >= 21) {
         {
             FontWindow_205E70 text_window;
             s16 window_fields[12];
-            char *text = func_00288FB8(0x3163);
+            char *text = GetLocalizedString(0x3163);
 
-            if (paging) func_0027C540(0);
-            func_00115484(window_fields, 0, sizeof(window_fields));
+            if (paging) SetupGifPaging(0);
+            memset(window_fields, 0, sizeof(window_fields));
             window_fields[1] = 400;
             window_fields[2] = D_US2_001A9600;
             window_fields[3] = D_US2_001A9604;
@@ -215,24 +215,24 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
             window_fields[5] = D_US2_001A95FC;
             window_fields[8] = 16;
             text_window = *(FontWindow_205E70 *)window_fields;
-            func_00280190(&text_window, 0x80F0F0F0, text, -1);
-            if (paging) func_0027C660();
+            text_draw_window_small(&text_window, 0x80F0F0F0, text, -1);
+            if (paging) DoGifPaging();
         }
         return;
     }
-    if (D_001C4FA0.selected_map < 0) {
+    if (g_map_overlay_state.selected_map < 0) {
         return;
     }
 
-    if (paging) func_0027C540(0);
+    if (paging) SetupGifPaging(0);
     rx0 = 0x1000;
     ry0 = 0x800;
     mirror_sign = 1;
     {
-        s32 selected = D_001C4FA0.selected_map;
-        s32 ox = D_001C4FA0.offset_x[selected] >> 15;
-        s32 oy = D_001C4FA0.offset_y[selected] >> 15;
-        zoom = D_001C4FA0.zoom[selected];
+        s32 selected = g_map_overlay_state.selected_map;
+        s32 ox = g_map_overlay_state.offset_x[selected] >> 15;
+        s32 oy = g_map_overlay_state.offset_y[selected] >> 15;
+        zoom = g_map_overlay_state.zoom[selected];
         pan_x = zoom * (f32)ox;
         tile_size = zoom * 512.0f;
         pan_y = zoom * (f32)oy;
@@ -254,43 +254,43 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
     u = ((left_tile_count + right_tile_count) << 9) + 0x2000;
     v = ((top_tile_count + bottom_tile_count) << 9) + 0x2000;
 
-    func_002FC560(8, 0);
-    func_002FC560(0x47, 0);
-    if (set_clip) func_002FC620(D_001A960C, D_001A9614, D_001A9610, D_001A9618);
-    D_001B22A8.p->tag = 0x10000005;
-    D_001B22A8.p->addr = 0;
-    D_001B22A8.p->vif0 = 0;
-    D_001B22A8.p->vif1 = 0x50000005;
-    D_001B22A8.p++;
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x47, 0);
+    if (set_clip) gfx_set_scissor_clamped(D_001A960C, D_001A9614, D_001A9610, D_001A9618);
+    g_dma_packet_cursor.p->tag = 0x10000005;
+    g_dma_packet_cursor.p->addr = 0;
+    g_dma_packet_cursor.p->vif0 = 0;
+    g_dma_packet_cursor.p->vif1 = 0x50000005;
+    g_dma_packet_cursor.p++;
     background_tex0 =
-        func_0028E640(func_0028E588(0xE999, D_001C4FA0.selected_map));
-    packet_words = (u64 *)D_001B22A8.p;
+        GetFrameTexture(GetIconFrame(0xE999, g_map_overlay_state.selected_map));
+    packet_words = (u64 *)g_dma_packet_cursor.p;
     packet_words[0] = 0x7400000000008001;
     packet_words[1] = 0x5353106;
     packet_words[2] = background_tex0;
     packet_words[3] = 0x156;
     packet_words[4] = 0x80808080;
     packet_words[5] = 0;
-    packet_words[6] = ((x0 + D_001A7340.x) - 8) | ((u64)((y0 + D_001A7340.y) - 8) << 16) |
-                      ((u64)D_001C4FA0.z << 32);
+    packet_words[6] = ((x0 + g_screen_width.x) - 8) | ((u64)((y0 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[7] = u | ((u64)v << 16);
-    packet_words[8] = ((x1 + D_001A7340.x) - 8) | ((u64)((y1 + D_001A7340.y) - 8) << 16) |
-                      ((u64)D_001C4FA0.z << 32);
+    packet_words[8] = ((x1 + g_screen_width.x) - 8) | ((u64)((y1 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[9] = 0;
-    D_001B22A8.p = (struct DmaTag_205E70 *)((u8 *)D_001B22A8.p + 0x50);
-    func_002FC560(8, 5);
-    func_002FC560(0x47, 0x60B);
+    g_dma_packet_cursor.p = (struct DmaTag_205E70 *)((u8 *)g_dma_packet_cursor.p + 0x50);
+    VU1_addGSregister(8, 5);
+    VU1_addGSregister(0x47, 0x60B);
 
     palette_block = (background_tex0 >> 37) & 0x3FFF;
-    D_001B22A8.p->tag = 0x10000005;
-    D_001B22A8.p->addr = 0;
-    D_001B22A8.p->vif0 = 0;
-    D_001B22A8.p->vif1 = 0x50000005;
-    map_tex0 = (u64)((D_001C4FA0.texture_address >> 8) | (8 << 14) | (0x13 << 20) | (9 << 26)) |
+    g_dma_packet_cursor.p->tag = 0x10000005;
+    g_dma_packet_cursor.p->addr = 0;
+    g_dma_packet_cursor.p->vif0 = 0;
+    g_dma_packet_cursor.p->vif1 = 0x50000005;
+    map_tex0 = (u64)((g_map_overlay_state.texture_address >> 8) | (8 << 14) | (0x13 << 20) | (9 << 26)) |
                ((u64)9 << 30) | ((u64)1 << 34) | ((u64)palette_block << 37) |
                ((long)0x8000000000000000ULL);
-    tag = D_001B22A8.p;
-    D_001B22A8.p = tag + 1;
+    tag = g_dma_packet_cursor.p;
+    g_dma_packet_cursor.p = tag + 1;
     packet_words = (u64 *)(tag + 1);
     packet_words[0] = 0x7400000000008001;
     packet_words[1] = 0x5353106;
@@ -298,35 +298,35 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
     packet_words[3] = 0x156;
     packet_words[4] = 0x80808080;
     packet_words[5] = 0;
-    packet_words[6] = ((rx0 + D_001A7340.x) - 8) | ((u64)((ry0 + D_001A7340.y) - 8) << 16) |
-                      ((u64)D_001C4FA0.z << 32);
+    packet_words[6] = ((rx0 + g_screen_width.x) - 8) | ((u64)((ry0 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[7] = 0x20002000;
-    packet_words[8] = ((rx1 + D_001A7340.x) - 8) | ((u64)((ry1 + D_001A7340.y) - 8) << 16) |
-                      ((u64)D_001C4FA0.z << 32);
+    packet_words[8] = ((rx1 + g_screen_width.x) - 8) | ((u64)((ry1 + g_screen_width.y) - 8) << 16) |
+                      ((u64)g_map_overlay_state.z << 32);
     packet_words[9] = 0;
-    D_001B22A8.p = (struct DmaTag_205E70 *)((u8 *)D_001B22A8.p + 0x50);
-    func_002FC560(0x47, 0x360B);
+    g_dma_packet_cursor.p = (struct DmaTag_205E70 *)((u8 *)g_dma_packet_cursor.p + 0x50);
+    VU1_addGSregister(0x47, 0x360B);
 
-    if (D_001C4FA0.show_markers != 0 && D_001C4FA0.marks_enabled != 0) {
+    if (g_map_overlay_state.show_markers != 0 && g_map_overlay_state.marks_enabled != 0) {
         dx = rx1 - rx0;
         dy = ry1 - ry0;
-        highlighted_cell = D_001C4FA0.marks;
+        highlighted_cell = g_map_overlay_state.marks;
         for (i = 0; i < 8; i++, highlighted_cell++) {
             cell = highlighted_cell->cell;
             if (cell >= 0) {
                 cell_x = cell % 16;
                 cell_y = cell / 16;
-                func_0028FC48(rx0 + cell_x * dx / 16, ry0 + cell_y * dy / 16,
+                AppendScreenRectPacket(rx0 + cell_x * dx / 16, ry0 + cell_y * dy / 16,
                                           rx0 + (cell_x + 1) * dx / 16,
                                           ry0 + (cell_y + 1) * dy / 16, 0x20000000, 1);
             }
         }
     }
 
-    if (D_001C4FA0.icons != 0) {
+    if (g_map_overlay_state.icons != 0) {
         icon_bounds = ((MapIconBounds_205E70 *)0x70000000);
-        icon_scale = (D_001C4FA0.zoom[D_001C4FA0.selected_map] * 2.0f + 5.0f) / 13.0f;
-        if (!(D_001C4FA0.icons[0].flags & 4)) {
+        icon_scale = (g_map_overlay_state.zoom[g_map_overlay_state.selected_map] * 2.0f + 5.0f) / 13.0f;
+        if (!(g_map_overlay_state.icons[0].flags & 4)) {
             MapIconBounds_205E70 *r;
             s32 i;
             MapIcon_205E70 *icon;
@@ -339,21 +339,21 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
 
             i = 0;
             do {
-                if (D_001C4FA0.icons[i].active != 0 &&
-                    (texture_id = D_001C4FA0.icons[i].texture_id) != 0 &&
-                    !(D_001C4FA0.icons[i].flags & 1)) {
+                if (g_map_overlay_state.icons[i].active != 0 &&
+                    (texture_id = g_map_overlay_state.icons[i].texture_id) != 0 &&
+                    !(g_map_overlay_state.icons[i].flags & 1)) {
                     icon_size_multiplier = 1.0f;
-                    if (D_001C4FA0.icons[i].flags & 0x80) {
+                    if (g_map_overlay_state.icons[i].flags & 0x80) {
                         icon_size_multiplier = 1.5f;
                     }
-                    image_index = func_0028E588(texture_id,
-                                                                   D_001C4FA0.icons[i].frame_index);
-                    icon_center_x = (f32)rx0 + D_001C4FA0.icons[i].x * (f32)(rx1 - rx0);
-                    icon_center_y = (f32)ry0 + D_001C4FA0.icons[i].y * (f32)(ry1 - ry0);
+                    image_index = GetIconFrame(texture_id,
+                                                                   g_map_overlay_state.icons[i].frame_index);
+                    icon_center_x = (f32)rx0 + g_map_overlay_state.icons[i].x * (f32)(rx1 - rx0);
+                    icon_center_y = (f32)ry0 + g_map_overlay_state.icons[i].y * (f32)(ry1 - ry0);
                     texture_info =
-                        &D_001B1870.textures[D_001B1870.references[image_index].image_index];
-                    if (D_001C4FA0.icons[i].flags & 0x200) {
-                        s = D_001C4FA0.zoom[D_001C4FA0.selected_map];
+                        &g_hud_state.textures[g_hud_state.references[image_index].image_index];
+                    if (g_map_overlay_state.icons[i].flags & 0x200) {
+                        s = g_map_overlay_state.zoom[g_map_overlay_state.selected_map];
                     } else {
                         s = icon_scale;
                     }
@@ -372,7 +372,7 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                         scaled * (f32)(1 << (texture_info->height_exponent + 4));
                 }
                 i++;
-            } while (!(D_001C4FA0.icons[i].flags & 4));
+            } while (!(g_map_overlay_state.icons[i].flags & 4));
         }
 
         {
@@ -386,14 +386,14 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                bounds before either icon is drawn, using half of the smallest
                positive edge distance for each pair. */
             i = 0;
-            if (!(D_001C4FA0.icons[1].flags & 4))
+            if (!(g_map_overlay_state.icons[1].flags & 4))
                 do {
-                    if (D_001C4FA0.icons[i].active == 0 || D_001C4FA0.icons[i].texture_id == 0 ||
-                        (D_001C4FA0.icons[i].flags & 3)) {
+                    if (g_map_overlay_state.icons[i].active == 0 || g_map_overlay_state.icons[i].texture_id == 0 ||
+                        (g_map_overlay_state.icons[i].flags & 3)) {
                         goto next_outer_icon;
                     }
                     j = i + 1;
-                    for (; !(D_001C4FA0.icons[j].flags & 4); j++) {
+                    for (; !(g_map_overlay_state.icons[j].flags & 4); j++) {
                         inner_offset = j * sizeof(MapIcon_205E70);
                         pan_x = icon_bounds[j].x1 - icon_bounds[i].x0;
                         if (pan_x <= 0)
@@ -407,7 +407,7 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                         oy1 = icon_bounds[i].y1 - icon_bounds[j].y0;
                         if (oy1 <= 0)
                             continue;
-                        icon = (MapIcon_205E70 *)(inner_offset + (s32)D_001C4FA0.icons);
+                        icon = (MapIcon_205E70 *)(inner_offset + (s32)g_map_overlay_state.icons);
                         if (icon->active == 0 || icon->texture_id == 0 || (icon->flags & 3)) {
                             continue;
                         }
@@ -439,21 +439,21 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                     }
                 next_outer_icon:
                     i++;
-                } while (!(D_001C4FA0.icons[i + 1].flags & 4));
+                } while (!(g_map_overlay_state.icons[i + 1].flags & 4));
         }
 
         {
             s32 i;
 
             i = 0;
-            if (!(D_001C4FA0.icons[0].flags & 4)) {
+            if (!(g_map_overlay_state.icons[0].flags & 4)) {
                 do {
-                    if (D_001C4FA0.icons[i].active != 0 && !(D_001C4FA0.icons[i].flags & 1)) {
-                        id = D_001C4FA0.icons[i].texture_id;
-                        sprite_word = D_001C4FA0.icons[i].frame_index;
+                    if (g_map_overlay_state.icons[i].active != 0 && !(g_map_overlay_state.icons[i].flags & 1)) {
+                        id = g_map_overlay_state.icons[i].texture_id;
+                        sprite_word = g_map_overlay_state.icons[i].frame_index;
                         if (id != 0) {
-                            if (D_001C4FA0.icons[i].flags & 0x40) {
-                                func_0028FC48(
+                            if (g_map_overlay_state.icons[i].flags & 0x40) {
+                                AppendScreenRectPacket(
                                     icon_bounds[i].x0 - 0x20, icon_bounds[i].y0 - 0x20,
                                     icon_bounds[i].x1 + 0x20, icon_bounds[i].y1 + 0x20, 0x80000000, 1);
                             }
@@ -463,49 +463,49 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                                 icon_bounds[i].x1 = D_001A962C;
                                 icon_bounds[i].y1 = D_001A9630;
                             }
-                            if (D_001C4FA0.icons[i].flags & 0x200) {
-                                s = D_001C4FA0.zoom[D_001C4FA0.selected_map];
+                            if (g_map_overlay_state.icons[i].flags & 0x200) {
+                                s = g_map_overlay_state.zoom[g_map_overlay_state.selected_map];
                             } else {
                                 s = icon_scale;
                             }
-                            if (D_001C4FA0.icons[i].flags & 0x100) {
-                                angle = D_001C4FA0.icons[i].angle;
+                            if (g_map_overlay_state.icons[i].flags & 0x100) {
+                                angle = g_map_overlay_state.icons[i].angle;
                                 texture_width = 0x20;
                                 sprite_height = s * 256.0f;
                                 sprite_width = sprite_height;
-                                if (D_001C4FA0.icons[i].flags & 0x400) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                if (g_map_overlay_state.icons[i].flags & 0x400) {
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95E0;
                                     sprite_height = s * D_001A95E4;
-                                    if (D_00139A34[D_001C4FA0.icons[i].id].flags & 2) {
+                                    if (D_00139A34[g_map_overlay_state.icons[i].id].flags & 2) {
                                         sprite_word++;
                                     }
                                 }
-                                if (D_001C4FA0.icons[i].flags & 0x800) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                if (g_map_overlay_state.icons[i].flags & 0x800) {
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     texture_width = 0x40;
                                     sprite_width = s * D_001A95D8;
                                     sprite_height = s * D_001A95DC;
-                                    if (D_00139A34[D_001C4FA0.icons[i].id].flags & 2) {
+                                    if (D_00139A34[g_map_overlay_state.icons[i].id].flags & 2) {
                                         sprite_word++;
                                     }
                                 }
-                                if (D_001C4FA0.icons[i].flags & 0x1000) {
-                                    angle = func_00283B98(angle, 1.5707964f);
+                                if (g_map_overlay_state.icons[i].flags & 0x1000) {
+                                    angle = FastAddRotations(angle, 1.5707964f);
                                     sprite_width = s * D_001A95E8;
                                     sprite_height = s * D_001A95EC;
                                 }
                                 center_x = (f32)(icon_bounds[i].x0 + icon_bounds[i].x1) * 0.5f;
                                 center_y = (f32)(icon_bounds[i].y0 + icon_bounds[i].y1) * 0.5f;
-                                func_0028F410(center_x, center_y, sprite_width, sprite_height,
+                                DrawRotatedSprite(center_x, center_y, sprite_width, sprite_height,
                                                     angle, texture_width, 0x20,
-                                                    func_0028E640(func_0028E588(
+                                                    GetFrameTexture(GetIconFrame(
                                                         id, sprite_word)));
                             } else {
                                 u32 tint = 0x7f7f7f;
-                                if (D_001C4FA0.icons[i].texture_id == 0xE99A &&
-                                    (u32)((u16)D_001C4FA0.icons[i].frame_index - 11) < 4) {
+                                if (g_map_overlay_state.icons[i].texture_id == 0xE99A &&
+                                    (u32)((u16)g_map_overlay_state.icons[i].frame_index - 11) < 4) {
                                     int k = 0;
                                     s32 *colors = D_001A9638;
                                     /* Entering at the test keeps the loop out of loop.c
@@ -517,30 +517,30 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                                         if (colors[k * 2] == -1) {
                                             goto tint_done;
                                         }
-                                        if (colors[k * 2] == D_001C4FA0.icons[i].frame_index) {
+                                        if (colors[k * 2] == g_map_overlay_state.icons[i].frame_index) {
                                             tint = D_001A963C[k * 2];
                                             goto tint_done;
                                         }
                                     }
                                 tint_done:
-                                    func_0028F078(func_0028E588(id, sprite_word),
+                                    DrawHudSpriteSubpixel(GetIconFrame(id, sprite_word),
                                         icon_bounds[i].x0 - 8, icon_bounds[i].y0 - 8,
                                         icon_bounds[i].x1 - icon_bounds[i].x0 + 8,
                                         icon_bounds[i].y1 - icon_bounds[i].y0 + 8, 0x80, 0);
                                 }
-                                func_0028F078(func_0028E588(id, sprite_word),
+                                DrawHudSpriteSubpixel(GetIconFrame(id, sprite_word),
                                     icon_bounds[i].x0, icon_bounds[i].y0,
                                     icon_bounds[i].x1 - icon_bounds[i].x0,
                                     icon_bounds[i].y1 - icon_bounds[i].y0, 0x80, tint);
                             }
-                            if (D_001C4FA0.icons[i].flags & 0x10) {
+                            if (g_map_overlay_state.icons[i].flags & 0x10) {
                                 u8 label_buffer[0x50];
                                 FontWindow_205E70 text_window;
 
-                                label_width = D_001C4FA0.icons[i].label_width;
-                                label_offset_x = D_001C4FA0.icons[i].label_offset_x;
-                                label_height = D_001C4FA0.icons[i].label_height;
-                                label_offset_y = D_001C4FA0.icons[i].label_offset_y;
+                                label_width = g_map_overlay_state.icons[i].label_width;
+                                label_offset_x = g_map_overlay_state.icons[i].label_offset_x;
+                                label_height = g_map_overlay_state.icons[i].label_height;
+                                label_offset_y = g_map_overlay_state.icons[i].label_offset_y;
                                 if (label_offset_x == 0) {
                                     label_x = ((icon_bounds[i].x0 + icon_bounds[i].x1) >> 5) -
                                               label_width / 2;
@@ -561,10 +561,10 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                                         label_y = (icon_bounds[i].y0 >> 4) - label_height / 2 + label_offset_y;
                                     }
                                 }
-                                func_0028FC48(label_x - 2, label_y, label_x + label_width + 2,
+                                AppendScreenRectPacket(label_x - 2, label_y, label_x + label_width + 2,
                                               label_y + label_height + 8, 0x40000000, 0);
-                                func_00297E00(i, &label_buffer);
-                                func_00115484(&text_window, 0, sizeof(text_window));
+                                text_format_localized_amount(i, &label_buffer);
+                                memset(&text_window, 0, sizeof(text_window));
                                 text_window.s[1] = label_y + label_height;
                                 text_window.s[3] = label_x + label_width;
                                 text_window.s[4] = label_x + label_width / 2;
@@ -573,54 +573,54 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                                 text_window.s[9] = 0x11;
                                 text_window.s[0] = label_y;
                                 text_window.s[2] = label_x;
-                                func_00280200(&text_window, 0x80FFA888, &label_buffer, -1);
+                                text_draw_window_medium(&text_window, 0x80FFA888, &label_buffer, -1);
                             }
                         }
                     }
                     i++;
-                } while (!(D_001C4FA0.icons[i].flags & 4));
+                } while (!(g_map_overlay_state.icons[i].flags & 4));
             }
         }
     }
 
     {
-        MapOverlayState_205E70 *m = &D_001C4FA0;
+        MapOverlayState_205E70 *m = &g_map_overlay_state;
 
-        if (D_001A79F0 == m->selected_map) {
+        if (g_current_map_index == m->selected_map) {
             s32 image_index;
             f32 s;
             f32 angle;
             s32 flip;
             f32 pos[2];
 
-            image_index = func_0028E588(0xE99A, 5);
+            image_index = GetIconFrame(0xE99A, 5);
             s = ((m->zoom[m->selected_map] * 4.0f + 10.0f) * 0.75f) / 13.0f;
-            angle = D_00189E20.angle;
-            flip = D_00189E20.mode == 0xF;
+            angle = g_hero_state.angle;
+            flip = g_hero_state.mode == 0xF;
             if (flip) {
-                angle = func_00283B98(angle, 1.5707964f);
+                angle = FastAddRotations(angle, 1.5707964f);
             }
-            if (D_001A79F0 == 20 && D_001C4F40 == 2)
+            if (g_current_map_index == 20 && D_001C4F40 == 2)
                 angle = 3.1415927f;
-            else if (func_003005A0() >= 0 && D_001A79F0 == 7)
-                angle = D_001A9660[func_003005A0()];
-            if (!func_00297218(D_00189E20.x, D_00189E20.y,
-                               &pos[0], &pos[1], D_001A79F0))
-                func_00297FE8(D_00189E20.x, D_00189E20.y,
-                              &pos[0], &pos[1], D_001A79F0);
+            else if (moby_get_current_variant_index() >= 0 && g_current_map_index == 7)
+                angle = D_001A9660[moby_get_current_variant_index()];
+            if (!GetSpecialMapCoordinates(g_hero_state.x, g_hero_state.y,
+                               &pos[0], &pos[1], g_current_map_index))
+                map_convert_world_to_map_position(g_hero_state.x, g_hero_state.y,
+                              &pos[0], &pos[1], g_current_map_index);
             pos[0] = (f32)rx0 + pos[0] * (f32)(rx1 - rx0);
             pos[1] = (f32)ry0 + pos[1] * (f32)(ry1 - ry0);
             {
                 f32 sz = s * 256.0f;
 
-                func_0028F410(pos[0], pos[1], sz, sz, angle, 0x40, 0x40,
-                                    func_0028E640(image_index));
+                DrawRotatedSprite(pos[0], pos[1], sz, sz, angle, 0x40, 0x40,
+                                    GetFrameTexture(image_index));
             }
-            if (D_001A7AF8[5]) {
+            if (g_item_owned_flags[5]) {
                 func_US2_00298AA8((f32)rx0, (f32)rx1, (f32)ry0, (f32)ry1, s);
             }
         }
     }
-    func_002FC620(0, D_001A7340.width - 1, 0, D_001A7340.height - 1);
-    if (paging) func_0027C660();
+    gfx_set_scissor_clamped(0, g_screen_width.width - 1, 0, g_screen_width.height - 1);
+    if (paging) DoGifPaging();
 }

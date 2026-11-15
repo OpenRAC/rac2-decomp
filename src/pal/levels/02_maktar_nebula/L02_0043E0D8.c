@@ -4,13 +4,13 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct { u8 reserved_00[0x34]; int timer; } L02_State;
 extern L02_State D_L02_001BE200;
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 extern unsigned short **D_L02_001A9014 __attribute__((sda));
 extern u8 *D_L02_001B3C1C __attribute__((sda));
 extern float D_L02_001B2640[] MACRO_ADDR;
-extern float func_00282E80(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L01_002E2608(void *, int, int, int, int);
+extern float vec_distance_xy(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 
 void func_PAL_L02_0043E0D8(u8 *a0) {
     u8 *st = *(u8 **)(a0 + 0x68);
@@ -60,7 +60,7 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
                  q != 0 && ((short)q[-1] >= 0 || q == D_L02_001A9014[*(int *)st]) &&
                  (e = D_L02_001B3C1C + ((*q & 0x7FFF) << 6)) != 0;
                  q++) {
-                d = func_00282E80(e + 0x30, pt);
+                d = vec_distance_xy(e + 0x30, pt);
                 if (d < best) {
                     best = d;
                     bestid = *q & 0x7FFF;
@@ -69,10 +69,10 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
             if (bestid != -1) {
                 rec = D_L02_001B3C1C + (bestid << 6);
                 for (k = 0; k < 4; k++) {
-                    func_00283098(m + k * 4, D_L02_001B2640 + k * 4, rec);
-                    func_00282CC0(m + k * 4, m + k * 4, rec + 0x30);
+                    matrix_mul_vec3(m + k * 4, D_L02_001B2640 + k * 4, rec);
+                    FastVecAdd(m + k * 4, m + k * 4, rec + 0x30);
                 }
-                func_L01_002E2608(m, idx, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(m, idx, 2, 0xFF808080, 0);
             }
         }
     }

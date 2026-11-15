@@ -1,104 +1,104 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_0033E348(int);
+extern int list_menu_get_selected_index(int);
 
-extern int func_00348128(unsigned char *);
+extern int menu_get_selected_index(unsigned char *);
 
 /* Qwen draft (branch qwen/autonomy, 4419d477), checked by tools/check.py */
-void func_0033AF48(int);
+void prompt_bar_draw(int);
 
 extern void func_0033AB50_1(void *);
 
-extern void func_L00_0042BFF8(void *);
+extern void cam_init_object_table_c(void *);
 
-extern void func_L00_0042C290(void *);
+extern void cam_init_object_table_d(void *);
 
-extern void func_L00_0042BAD0(void *);
+extern void cam_init_object_table_a(void *);
 
 /* Returns the index of the selected entry in the menu list. */
-int func_0033E348(int owner)
+int list_menu_get_selected_index(int owner)
 {
-    return GetMenuSelectedIndex((unsigned char *)(owner + 0x2b0));
+    return menu_get_selected_index((unsigned char *)(owner + 0x2b0));
 }
 
 /* Gives the menu list its entries and remembers where they are. */
-void func_0033E368(unsigned char *owner, float *records)
+void list_page_set_records(unsigned char *owner, float *records)
 {
-    extern void func_00348068(unsigned char *, float *);
-    SetMenuEntryTable(owner + 0x2B0, records);
+    extern void menu_set_entry_table(unsigned char *, float *);
+    menu_set_entry_table(owner + 0x2B0, records);
     *(float **)(owner + 0x378) = records;
 }
 
-extern void func_0033AE28(char *);
-extern void func_0033B018(char *, float, float);
-extern char *func_00347F80(char *, int);
-extern void func_003480F0(char *, float, float);
+extern void prompt_bar_update(char *);
+extern void menu_set_anchor_pos(char *, float, float);
+extern char *UpdateMenuListSelection(char *, int);
+extern void menu_set_position(char *, float, float);
 
 /* Handles input for the list menu page and keeps the list in place. */
-int func_0033E3A0(char *object, int flags)
+int list_page_update(char *object, int flags)
 {
     char *first = object + 8;
     char *second;
     float *position;
-    UpdateButtonPromptBar(first);
+    prompt_bar_update(first);
     second = object + 0x2B0;
     position = *(float **)(object + 0x37C);
-    SetMenuAnchorPosition(first, position[0], position[1]);
+    menu_set_anchor_pos(first, position[0], position[1]);
     UpdateMenuListSelection(second, flags);
-    SetMenuPosition(second, (*(float **)(object + 0x37C))[0], (*(float **)(object + 0x37C))[1]);
+    menu_set_position(second, (*(float **)(object + 0x37C))[0], (*(float **)(object + 0x37C))[1]);
     return (flags >> 6) & 1;
 }
 
 
 
-extern void func_0033AB50(void *);
-extern void *func_00336968(void *);
+extern void prompt_bar_destroy(void *);
+extern void *hud_construct_widget_base(void *);
 
 /* Cleans up a menu page that has a list. */
-char *func_0033E480(char *object) {
-    DestroyButtonPromptBar(object + 8);
-    ConstructWidgetBase(object + 0x2B0);
+char *simple_list_page_destroy(char *object) {
+    prompt_bar_destroy(object + 8);
+    hud_construct_widget_base(object + 0x2B0);
     return object;
 }
 
 
 
 
-extern void func_0033AE28(char *p);
-extern void func_0033B018(char *p, float x, float y);
+extern void prompt_bar_update(char *p);
+extern void menu_set_anchor_pos(char *p, float x, float y);
 
 /* Keeps the simple menu page in place and reports if confirm was pressed. */
-int func_0033E5C0(char *object, int flags)
+int simple_page_update(char *object, int flags)
 {
     char *p = object + 8;
     float *v;
-    UpdateButtonPromptBar(p);
+    prompt_bar_update(p);
     v = *(float **)(object + 0x2A8);
-    SetMenuAnchorPosition(p, v[0], v[1]);
+    menu_set_anchor_pos(p, v[0], v[1]);
     return (flags >> 6) & 1;
 }
 
 /* Draws the frame of a menu page. */
-void func_0033E620(int object) {
-  DrawButtonPromptBar(object + 8);
+void menu_draw_frame(int object) {
+  prompt_bar_draw(object + 8);
 }
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
 /* Cleans up a menu page made of a frame and eleven text parts. */
-char *func_0033E640(char *object)
+char *frame_text_page_destroy(char *object)
 {
     func_0033AB50_1(object + 8);
-    InitCameraObjectTableC(object + 684);
-    InitCameraObjectTableD(object + 744);
-    InitCameraObjectTableD(object + 816);
-    InitCameraObjectTableD(object + 888);
-    InitCameraObjectTableA(object + 960);
-    InitCameraObjectTableD(object + 1040);
-    InitCameraObjectTableD(object + 1112);
-    InitCameraObjectTableD(object + 1184);
-    InitCameraObjectTableD(object + 1256);
-    InitCameraObjectTableD(object + 1328);
-    InitCameraObjectTableD(object + 1400);
+    cam_init_object_table_c(object + 684);
+    cam_init_object_table_d(object + 744);
+    cam_init_object_table_d(object + 816);
+    cam_init_object_table_d(object + 888);
+    cam_init_object_table_a(object + 960);
+    cam_init_object_table_d(object + 1040);
+    cam_init_object_table_d(object + 1112);
+    cam_init_object_table_d(object + 1184);
+    cam_init_object_table_d(object + 1256);
+    cam_init_object_table_d(object + 1328);
+    cam_init_object_table_d(object + 1400);
     return object;
 }

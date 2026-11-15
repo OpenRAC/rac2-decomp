@@ -2,16 +2,16 @@
 
 #include "common.h"
 typedef u64 TI128 __attribute__((mode(TI)));
-extern u8 *D_0018C0B0;
-extern int func_0027F288(u8 *, int, float);
-extern u64 func_0027C878(int);
+extern u8 *g_hero_moby;
+extern int text_measure_width_small_scaled(u8 *, int, float);
+extern u64 GetEffectTextureDescriptor(int);
 extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
 extern u8 D_L08_00296CD0[];
 extern u8 D_L08_001DB5E7;
 extern u8 *D_L08_001B29DC __attribute__((sda));
 extern u8 *D_L08_001B29E0 __attribute__((sda));
 extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_0018C0B0;
+extern u8 *g_hero_moby;
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
  * the text is drawn with font texture 1. func_PAL_0027FB48 is declared with its
@@ -21,9 +21,9 @@ void func_PAL_00280218(int x, int y, u64 color, u8 *text, int length, float scal
     float fx, fy;
     u64 texture;
 
-    fx = x - (func_0027F288(text, length, scale) >> 1);
+    fx = x - (text_measure_width_small_scaled(text, length, scale) >> 1);
     fy = y;
-    texture = func_0027C878(1);
+    texture = GetEffectTextureDescriptor(1);
     func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
 }
 
@@ -35,7 +35,7 @@ float func_PAL_00280358(u8 *text, int length, int maxWidth, float minScale) {
 
     scale = 1.0f;
     if (text != 0) {
-        width = func_0027F288(text, length, scale);
+        width = text_measure_width_small_scaled(text, length, scale);
     } else {
         width = 0;
     }
@@ -61,7 +61,7 @@ void func_PAL_002803E8(int x, int y, u64 color, u8 *text, int length, float scal
 
     fx = x - (func_PAL_0027F790(text, length, scale) >> 1);
     fy = y;
-    texture = func_0027C878(2);
+    texture = GetEffectTextureDescriptor(2);
     func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, D_PAL_00263C70);
 }
 

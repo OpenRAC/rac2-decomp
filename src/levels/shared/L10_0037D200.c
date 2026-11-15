@@ -2,17 +2,17 @@
 
 #include "common.h"
 
-extern void *func_0029EFD0(s32);
+extern void *CreateMoby(s32);
 extern short D_L10_001B2DB8[4];
 extern short D_L10_001B2DC0[4];
 extern char D_L10_00234600[];
-extern int func_00282978(short *);
-extern f32 func_002A7878(f32, f32);
-extern f32 func_002A78D8(f32, f32);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_0031AA28(void *, void *, void *, void *, void *, f32);
+extern int FastDecTimer(short *);
+extern f32 math_random_float_range(f32, f32);
+extern f32 math_random_signed_float_range(f32, f32);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern void math_l00_interpolate_cubic_vector(void *, void *, void *, void *, void *, f32);
 
 typedef struct { int status; u8 reserved[36]; } GornStatusRecord156;
 
@@ -20,7 +20,7 @@ extern GornStatusRecord156 D_L10_002A3C70[];
 
 
 /* Report whether any configured status in the selected eleven records is nonzero */
-int func_L10_0037F510(void)
+int status_any_record_nonzero(void)
 {
     if (D_L10_002A3C70[2].status != 0 ||
         D_L10_002A3C70[3].status != 0 ||
@@ -38,7 +38,7 @@ int func_L10_0037F510(void)
 }
 
 /* Creates a strip-effect object with its supplied vectors and rendering parameters. */
-void *func_L10_0039D5E0(void *position, void *direction, s32 duration, s32 kind,
+void *CreateEnergyStrip(void *position, void *direction, s32 duration, s32 kind,
                        s32 first, s32 second, float jitter, s32 third, s32 texture,
                        float width, float height, float fade) {
     u8 *object = CreateMoby(0x133E /* moby class 4926 */);
@@ -67,18 +67,18 @@ void *func_L10_0039D5E0(void *position, void *direction, s32 duration, s32 kind,
     return object;
 }
 
-extern void func_L10_0039D760(void *);
-extern void func_L00_002E6EF8(void *, void *);
+extern void RebuildTimedLightningStripPoints(void *);
+extern void gfx_add_draw_callback_third(void *, void *);
 extern u8 D_L10_0039D9C0[];
 
 /* Refreshes and then hands the constructor at 0x0039D9C0 to the callback list. */
-void func_L10_0039D728(void *moby) {
+void lightning_strip_refresh_call_ctor(void *moby) {
     RebuildTimedLightningStripPoints(moby);
-    AddDrawCallbackToList3(D_L10_0039D9C0, moby);
+    gfx_add_draw_callback_third(D_L10_0039D9C0, moby);
 }
 
 /* Rebuilds each expired lightning strip and jitters its interior control points. */
-void func_L10_0039D760(void *object) {
+void RebuildTimedLightningStripPoints(void *object) {
     f32 point[4];
     f32 direction[4];
     f32 result[4];
@@ -91,23 +91,23 @@ void func_L10_0039D760(void *object) {
             D_L10_001B2DB8[strip] = 2;
             D_L10_001B2DC0[strip] = 0;
             qcopy(point, state);
-            point[0] += RandomFloatRange(0.0f, 0.0f);
-            point[1] += RandomFloatRange(0.0f, 0.0f);
-            point[2] += RandomFloatRange(0.0f, 0.0f);
+            point[0] += math_random_float_range(0.0f, 0.0f);
+            point[1] += math_random_float_range(0.0f, 0.0f);
+            point[2] += math_random_float_range(0.0f, 0.0f);
             FastVecSub(direction, point, self + 0x10);
             vec_scale_to_length(direction, direction, 0.5f);
             FastVecAdd(direction, point, direction);
             for (i = 0; i < 8; i++) {
                 t = (f32)i * 0.1f;
                 if (i == 7) t = 1.0f;
-                InterpolateCubicVector_L00(result, self + 0x10, point, direction, direction, t);
+                math_l00_interpolate_cubic_vector(result, self + 0x10, point, direction, direction, t);
                 qcopy(((f32 (*)[8][4])D_L10_00234600)[strip][i], result);
             }
             for (j = 1; j < 7; j++) {
                 qcopy(result, ((f32 (*)[8][4])D_L10_00234600)[0][j]);
-                result[0] += RandomSignedFloatRange(0.0f, *(f32 *)(state + 0x34));
-                result[1] += RandomSignedFloatRange(0.0f, *(f32 *)(state + 0x34));
-                result[2] += RandomSignedFloatRange(0.0f, *(f32 *)(state + 0x34));
+                result[0] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
+                result[1] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
+                result[2] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
                 qcopy(((f32 (*)[8][4])D_L10_00234600)[0][j], result);
             }
         }
@@ -116,20 +116,20 @@ void func_L10_0039D760(void *object) {
 
 extern int D_L10_001AEEC0 __attribute__((sda));
 
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 extern char D_L10_00234600[];
 
-extern void func_L10_0039DA48(void *, int, int, int, float, float, float, int, int);
+extern void DrawHrugisRibbon(void *, int, int, int, float, float, float, int, int);
 
 /* Ticks the level's spawn counter down to zero, else spends the record through the effect
    constructor at 0x0039DA48 with the record's own vectors. */
-void func_L10_0039D9C0(void *moby) {
+void lightning_build_strip_from_records(void *moby) {
     char *vars = *(char **)((char *)moby + 0x68);
 
-    if (FastFloatHelperD(vars + 0x10) == 0) {
+    if (math_fast_float_d(vars + 0x10) == 0) {
         DrawHrugisRibbon(D_L10_00234600, *(int *)(vars + 0x1C), *(int *)(vars + 0x30), 8,
                           *(float *)(vars + 0x24), *(float *)(vars + 0x28),
                           *(float *)(vars + 0x20), *(int *)(vars + 0x14), *(int *)(vars + 0x18));
@@ -137,7 +137,7 @@ void func_L10_0039D9C0(void *moby) {
         D_L10_001AEEC0 = D_L10_001AEEC0 - 1;
         if (D_L10_001AEEC0 < 0)
             D_L10_001AEEC0 = 0;
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
     }
 }
 
@@ -146,24 +146,24 @@ void func_L10_0039D9C0(void *moby) {
 
 /* func_L10_004190F0 lives in L10_004190F0.c. */
 
-extern int func_002ED688(void *);
+extern int moby_get_motion_data(void *);
 
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 /* The engine's effect call: four floats in $f12-$f15, the object in $a0 and seven
    words in $a1-$a3, $t0-$t2. The fourth float sits after the object arguments
    because the retail code sets the registers up in that order. */
-extern void func_L05_00379FA0(float, float, float, void *, int, int, int, float, int, int, int);
+extern void SpawnSpaceProjectile(float, float, float, void *, int, int, int, float, int, int, int);
 
 /* Kills the object: the type at 0x20 picks the effect, and the hit state at 0x268
    ends up at 0x19. */
-void func_L10_004191E8(void *self)
+void lightning_object_update_state(void *self)
 {
     void *moby = self;
     void *state = *(void **)((char *)moby + 0x68);
-    void *motion = GetMobyMotionData(moby);
+    void *motion = moby_get_motion_data(moby);
 
     if (motion == 0)
         return;
@@ -174,12 +174,12 @@ void func_L10_004191E8(void *self)
     if (*(unsigned char *)((char *)moby + 0x20) == 2) {
         SpawnSpaceProjectile(0.9f, 13.0f, 4.5f, moby, 0x60000080, 0, 1, 1.0f, 0, -1, 0);
     } else if (*(unsigned char *)((char *)moby + 0x20) == 1) {
-        if (RandomIntBelow(2) != 0)
+        if (math_random_int_below(2) != 0)
             SpawnSpaceProjectile(0.6f, 5.0f, 1.0f, moby, 0x60800000, 1, 0, 1.0f, 0, -1, 0);
         else
             SpawnSpaceProjectile(0.6f, 5.0f, 1.0f, moby, 0x60800080, 1, 0, 1.0f, 0, -1, 0);
     }
-    if (RandomIntBelow(3) == 0)
+    if (math_random_int_below(3) == 0)
         PlayMobySound(0, 0, moby);
     *(int *)((char *)state + 0x268) = 0x19;
 }

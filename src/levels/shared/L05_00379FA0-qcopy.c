@@ -14,18 +14,18 @@ typedef struct {
 
 extern L05Projectile D_L05_00221DD0[];
 extern u8 *func_L05_00379CA0(u8 *);
-extern void func_0029FCC0(u8 *, int, float *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_L05_0037DA58(void *, int, int, int);
+extern void moby_transform_joint_to_world(u8 *, int, float *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void EmitParticlePairBurst(void *, int, int, int);
 
 /* Takes the first free pool entry for OBJECT: its target is joint JOINT of OTHER (or of
  * OBJECT), or the object's position when JOINT is -1; it starts from the state's bone
  * position pushed SPEED along the bone's axis and moves at twice the start-to-target
  * vector. EMIT, when set, spawns an effect of that kind on the way.
  * The integer and float parameters keep their EE register order (a0..t2, f12..f15). */
-void func_L05_00379FA0(u8 *object, int color, int mode, float rate, int effect, float speed,
+void SpawnSpaceProjectile(u8 *object, int color, int mode, float rate, int effect, float speed,
                        float spin, float life, int emit, int joint, u8 *other)
 {
     float direction[4], point[4];
@@ -43,9 +43,9 @@ void func_L05_00379FA0(u8 *object, int color, int mode, float rate, int effect, 
         state = func_L05_00379CA0(object);
         if (joint != -1) {
             if (other)
-                TransformMobyJointToWorld(other, joint, p->target);
+                moby_transform_joint_to_world(other, joint, p->target);
             else
-                TransformMobyJointToWorld(object, joint, p->target);
+                moby_transform_joint_to_world(object, joint, p->target);
         } else {
             *(Quad *)p->target = *(Quad *)position;
         }

@@ -1,5 +1,6 @@
+#include "names.h"
 /* Turns a challenge number into the index of its saved "done" flag, or -1 when it has none. */
-int func_L11_0043E108(unsigned int index)
+int arena_get_challenge_flag_index(unsigned int index)
 {
     switch (index) {
     case 0: return 61;

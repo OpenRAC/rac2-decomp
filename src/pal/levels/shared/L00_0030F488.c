@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_1 __attribute__((sda));
 extern int D_L00_001A904C_2 __attribute__((sda));
-extern void func_003438E8(int);
+extern void item_menu_draw(int);
 extern int func_PAL_00343928(int, int);
 extern int func_PAL_003457F0(int, int);
 
@@ -25,7 +26,7 @@ void func_PAL_L00_0030F4C8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_003438E8(value + 0x3C530);
+        item_menu_draw(value + 0x3C530);
 }
 
 /* func_PAL_L00_0030F4F8, the PAL copy of func_L00_0030D6A8: the same C, where the field offset

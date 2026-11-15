@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_0033AB50(char *p);
+extern void prompt_bar_destroy(char *p);
 
 extern void func_0033AE28_2(char *p);
 extern void func_L00_00430948_3(char *p, float a, float b);
 extern void func_002E5E58_3(int a, int b, int c);
 
 extern void func_US2_0033BE70 (char *object);
-extern void func_L00_00430948 (char *object, float x, float y);
-extern int func_002E5E58 (int a, int b, int c);
+extern void mem_store_two_floats_through_cell (char *object, float x, float y);
+extern int snd_play_from_global_bank (int a, int b, int c);
 
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
@@ -57,10 +58,10 @@ extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 
 extern void *func_US2_0033BB98(void *);
-extern void *func_00347EA0(void *);
+extern void *menu_pass_through_handle(void *);
 
 
-extern void *func_L00_0042C290(void *);
+extern void *cam_init_object_table_d(void *);
 
 
-extern int func_0033AF48(char *p);
+extern int prompt_bar_draw(char *p);

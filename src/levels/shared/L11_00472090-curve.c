@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
-void func_L11_00472090(float *out, float *b, float *c, float *a, float *d, float t)
+void vec_interpolate_cubic_b(float *out, float *b, float *c, float *a, float *d, float t)
 {
     float t2, t3, p, q, r;
 

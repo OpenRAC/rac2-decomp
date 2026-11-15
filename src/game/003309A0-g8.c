@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_003309A0: -G8 unit. The two globals are read both absolutely and through $gp, so
  * each has an sda name (_1) for the $gp form. The aim vector d is a float[4] copied with
  * qcopy(), which gives retail's frame (a, b, c, d, e, then the 0x30-byte matrix); one float
@@ -12,22 +13,22 @@ extern s32 D_001B2850;
 extern s32 D_001B2850_1 __attribute__((sda));
 extern char D_001B5570[];
 
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, char *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, char *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_002831B0(float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, char *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, char *);
+extern void FastVecCross(void *, void *, void *);
+extern float math_fast_angle_helper(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 /* Steers the object's heading toward the vector stored in its record: builds the aim vector, measures the angle to the current heading and turns the heading by a tenth of the remainder. */
-void func_003309A0(char *obj)
+void moby_steer_heading_to_aim(char *obj)
 {
     float aim[4] __attribute__((aligned(16)));
     float projection[4] __attribute__((aligned(16)));
@@ -63,10 +64,10 @@ void func_003309A0(char *obj)
         D_001B2854_1 = 1.0f - angleCos;
         if (angleCos > 0.75f)
             D_001B2850 = 1;
-        angleCos = 1.5707964f - FastAngleHelper(angleCos);
+        angleCos = 1.5707964f - math_fast_angle_helper(angleCos);
         angleCos = angleCos * 0.1f;
-        FastVecScale(turnQuat, turnAxis, FastSinOrCosB(angleCos));
-        turnQuat[3] = FastSinOrCosA(angleCos);
+        FastVecScale(turnQuat, turnAxis, math_fast_sin_or_cos_b(angleCos));
+        turnQuat[3] = math_fast_sin_or_cos_a(angleCos);
         quaternion_to_rotation_basis(turnQuat, turnMatrix);
         multiply_matrix3x3(facing, turnMatrix, facing);
     }

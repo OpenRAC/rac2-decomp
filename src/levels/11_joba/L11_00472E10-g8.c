@@ -11,24 +11,24 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 extern u8 D_001A7B2B;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0019B4A8[];
 typedef struct { u8 prefix[0x464]; u8 flags[1]; } LevelFlags;
 extern LevelFlags D_L11_0021F8B0;
-extern u8 D_00189EA0[];
-extern u8 D_00188660[];
-extern u8 *D_L11_001B359C __attribute__((sda));
-extern int func_002ACD38(void *);
-extern void func_L00_003672F8(void);
-extern void func_L00_002B9D60(float *, float *, int, int);
-extern float func_00282E80(void *, void *);
-extern int func_L00_0035F5A0(int, int, int);
-extern void func_002E59F8(int);
-extern int func_002B38B8(u8 *);
-extern void func_0029F338(void *);
+extern u8 g_hero_position[];
+extern u8 g_sound_state[];
+extern u8 *g_moby_l11_table __attribute__((sda));
+extern int moby_is_in_selected_zone(void *);
+extern void state_set_flag_one(void);
+extern void hero_reset_position_and_direction(float *, float *, int, int);
+extern float vec_distance_xy(void *, void *);
+extern int snd_start_in_slot(int, int, int);
+extern void snd_stop_voice(int);
+extern int flag_is_third_pending_set(u8 *);
+extern void moby_mark_spawned(void *);
 
 /* Updates a collectible spot (moby class 4478): when it is taken it frees its child mobys, counts it in the save data and removes itself. */
-void func_L11_00472E10(u8 *moby) {
+void collectible_spot_update(u8 *moby) {
     float position[4];
     float rotation[4];
     int *childIds = *(int **)(moby + 0x68);
@@ -40,42 +40,42 @@ void func_L11_00472E10(u8 *moby) {
             u16 id = *(u16 *)(moby + 0xB2);
             int bits;
             if (D_L11_0021F8B0.flags[(short)id] == 0) {
-                bits = D_0019B4A8[((short)id >> 1) + gCurrentMapIndex * 0x400];
+                bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
                 if (*(u16 *)(moby + 0xB2) & 1) bits = (bits >> 4) & 7;
                 else bits &= 7;
-                if (bits == 0 && IsObjectInSelectedZone(moby + 0x10)) {
-                    SetFlagToOne();
+                if (bits == 0 && moby_is_in_selected_zone(moby + 0x10)) {
+                    state_set_flag_one();
                     position[0] = 363.18f;
                     position[1] = 680.68f;
                     position[2] = 155.73f;
                     rotation[2] = 2.3561947f;
                     rotation[0] = 0;
                     rotation[1] = 0;
-                    ResetHeroPositionAndDirection(position, rotation, 0, 1);
+                    hero_reset_position_and_direction(position, rotation, 0, 1);
                 }
             }
         }
         moby[0x20] = 1;
     }
-    if (vec_distance_xy(moby + 0x10, gHeroPosition) < 32.0f) {
-        if (gCurrentMapIndex == 11) {
-            record = gSoundState + childIds[8] * 0x70;
-            if (*(int *)(record + 0x88) != *(int *)(gHeroPosition + 0x2210) || record[0x74] == 0)
-                childIds[8] = StartEffectInSlot(27, 6, *(int *)(gHeroPosition + 0x2210));
+    if (vec_distance_xy(moby + 0x10, g_hero_position) < 32.0f) {
+        if (g_current_map_index == 11) {
+            record = g_sound_state + childIds[8] * 0x70;
+            if (*(int *)(record + 0x88) != *(int *)(g_hero_position + 0x2210) || record[0x74] == 0)
+                childIds[8] = snd_start_in_slot(27, 6, *(int *)(g_hero_position + 0x2210));
         }
     } else {
         slot = childIds[8];
         if (slot != -1) {
-            record = gSoundState + slot * 0x70;
-            if (*(int *)(record + 0x88) == *(int *)(gHeroPosition + 0x2210) && record[0x74]) StopSoundVoice(slot);
+            record = g_sound_state + slot * 0x70;
+            if (*(int *)(record + 0x88) == *(int *)(g_hero_position + 0x2210) && record[0x74]) snd_stop_voice(slot);
         }
         childIds[8] = -1;
     }
-    if (!IsThirdPendingFlagSet(moby)) {
+    if (!flag_is_third_pending_set(moby)) {
         u16 id = *(u16 *)(moby + 0xB2);
         int bits;
         if (!D_L11_0021F8B0.flags[(short)id]) {
-            bits = D_0019B4A8[((short)id >> 1) + gCurrentMapIndex * 0x400];
+            bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
             if ((*(u16 *)(moby + 0xB2) & 1)
                 ? ((bits >> 4) & 7) != 0
                 : (bits & 7) != 0) goto cleanup;
@@ -84,25 +84,25 @@ void func_L11_00472E10(u8 *moby) {
     }
 cleanup:
     for (count = 0; count < 8; count++) {
-        if (childIds[count] != -1) MarkMobySpawned(gMobyTable_L11 + childIds[count] * 0x100);
+        if (childIds[count] != -1) moby_mark_spawned(g_moby_l11_table + childIds[count] * 0x100);
     }
     {
         int counter_id = *(u16 *)(moby + 0xB2);
         if (counter_id & 1) {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + gCurrentMapIndex * 0x400];
+            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + gCurrentMapIndex * 0x400];
+            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if ((*counter & 7) != 7) ++*counter;
         }
     }
     {
         int final_slot = childIds[8];
         if (final_slot != -1) {
-            record = gSoundState + final_slot * 0x70;
-            if (*(int *)(record + 0x88) == *(int *)(gHeroPosition + 0x2210) && record[0x74]) StopSoundVoice(final_slot);
+            record = g_sound_state + final_slot * 0x70;
+            if (*(int *)(record + 0x88) == *(int *)(g_hero_position + 0x2210) && record[0x74]) snd_stop_voice(final_slot);
         }
         childIds[8] = -1;
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
     }
 }

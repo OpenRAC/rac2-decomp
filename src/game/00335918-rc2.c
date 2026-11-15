@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,12 +25,12 @@
  */
 #include "common.h"
 
-extern s32 func_00335870();
+extern s32 object_reset_type_and_free();
 
 extern s8 D_001AD988[];
 
 /* Sets the object type pointer and runs the shared base cleanup. */
-void func_00335918(s32 *obj) {
+void object_reset_type_and_cleanup_a(s32 *obj) {
     obj[1] = (s32)D_001AD988;
-    ResetObjectTypeAndFree();
+    object_reset_type_and_free();
 }

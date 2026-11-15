@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern void func_00282CF0(float *out, const float *a, const float *b);
-extern void func_00282F20(float *out, const float *a, float s);
-extern void func_002A8E20(void *obj, void *block);
+extern void FastVecSub(float *out, const float *a, const float *b);
+extern void vec_scale_to_length(float *out, const float *a, float s);
+extern void QueueMobyImpact(void *obj, void *block);
 
 /* Builds a small hit record pointing from a source to an object and delivers it as damage. */
 void func_L05_003CFB90(u8 *owner, float *source)

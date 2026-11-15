@@ -74,10 +74,10 @@ typedef struct {
 } FsAa_FAB40;
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern FsAa_FAB40 D_001A6480;
+extern FsAa_FAB40 g_screen_adjust_offsets;
 extern FsAa_FAB40 *D_001A742C MACRO_ADDR;
 extern int D_001A72D8 MACRO_ADDR, D_001A72DC MACRO_ADDR, D_001A72E0 MACRO_ADDR;
-extern int D_001A7BB8 MACRO_ADDR;
+extern int g_widescreen_flag MACRO_ADDR;
 extern int D_001A7438[] __attribute__((sda)), D_001A743C[] __attribute__((sda));
 extern int D_001A7440[] __attribute__((sda)), D_001A7444[] __attribute__((sda));
 extern int D_001A7448[] __attribute__((sda)), D_001A744C[] __attribute__((sda));
@@ -86,41 +86,41 @@ extern int D_001A7458[] __attribute__((sda)), D_001A745C[] __attribute__((sda));
 extern int D_001A7460[] __attribute__((sda)), D_001A7464[] __attribute__((sda));
 extern char D_001A6860[], D_001A6600[], D_001A6D40[], D_001A6E90[];
 extern char D_00138850[], D_00138990[], D_00138AD0[], D_00138DC0[], D_001390B0[];
-extern void func_00125A20(void *, short, short, short, short, short);
-extern int func_00125F20(void *, short, short, short, short, short);
-extern void func_00284088(int, int);
-extern void func_0011AEA0(int);
-extern void func_00282AB0(void *, void *, int);
+extern void sceGsSetDefDispEnv(void *, short, short, short, short, short);
+extern int sceGsSetDefDrawEnv(void *, short, short, short, short, short);
+extern void BuildAspectBlitStrips(int, int);
+extern void FlushCache(int);
+extern void mem_copy_aligned(void *, void *, int);
 
 static inline void store(unsigned long *d, unsigned long v) {
     *d = v;
 }
 
 /* Sets up the anti-aliased screen mode. It fills in the screen description and builds the packets that blit the picture to the screen in 16 vertical strips. */
-void func_00284268(int display_width, int display_height, int storage_width, int storage_height,
+void SetupFS_AA_buffer(int display_width, int display_height, int storage_width, int storage_height,
                    int display_offset_x, int display_offset_y) {
     unsigned long *q;
     unsigned long *out;
 
-    D_001A742C = &gScreenAdjustOffsets;
-    gScreenAdjustOffsets.display_width = display_width;
-    gScreenAdjustOffsets.display_height = display_height;
-    gScreenAdjustOffsets.reserved170 = 0;
-    gScreenAdjustOffsets.storage_width = storage_width;
-    gScreenAdjustOffsets.storage_height = storage_height;
-    gScreenAdjustOffsets.display_offset_x = display_offset_x;
-    gScreenAdjustOffsets.display_offset_y = display_offset_y;
-    gScreenAdjustOffsets.storage_psm = 1;
-    gScreenAdjustOffsets.psm = 0;
-    gScreenAdjustOffsets.target_psm = 0;
-    gScreenAdjustOffsets.zpsm = 0x31;
-    gScreenAdjustOffsets.fbp1 = D_001A72D8 >> 13;
-    gScreenAdjustOffsets.fbp0 = D_001A72DC >> 13;
-    gScreenAdjustOffsets.zbp = D_001A72E0 >> 13;
-    SetupGsDispEnv(&gScreenAdjustOffsets, 1, storage_width, storage_height, display_offset_x,
+    D_001A742C = &g_screen_adjust_offsets;
+    g_screen_adjust_offsets.display_width = display_width;
+    g_screen_adjust_offsets.display_height = display_height;
+    g_screen_adjust_offsets.reserved170 = 0;
+    g_screen_adjust_offsets.storage_width = storage_width;
+    g_screen_adjust_offsets.storage_height = storage_height;
+    g_screen_adjust_offsets.display_offset_x = display_offset_x;
+    g_screen_adjust_offsets.display_offset_y = display_offset_y;
+    g_screen_adjust_offsets.storage_psm = 1;
+    g_screen_adjust_offsets.psm = 0;
+    g_screen_adjust_offsets.target_psm = 0;
+    g_screen_adjust_offsets.zpsm = 0x31;
+    g_screen_adjust_offsets.fbp1 = D_001A72D8 >> 13;
+    g_screen_adjust_offsets.fbp0 = D_001A72DC >> 13;
+    g_screen_adjust_offsets.zbp = D_001A72E0 >> 13;
+    sceGsSetDefDispEnv(&g_screen_adjust_offsets, 1, storage_width, storage_height, display_offset_x,
                   display_offset_y);
-    D_001A742C->dispfb.FBP = gScreenAdjustOffsets.fbp1;
-    if (gWidescreenFlag) D_001A742C->display = 0x1BF4FF00834140UL;
+    D_001A742C->dispfb.FBP = g_screen_adjust_offsets.fbp1;
+    if (g_widescreen_flag) D_001A742C->display = 0x1BF4FF00834140UL;
     {
         int dx, dy, magh, magv, dw, dh;
         D_001A7438[0] = dx = D_001A742C->display & 0xFFF;
@@ -137,19 +137,19 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         D_001A744C[0] = dh;
         D_001A7464[0] = dh;
     }
-    sceGsSetDefDrawEnv(&D_001A742C->frame0, gScreenAdjustOffsets.psm, gScreenAdjustOffsets.display_width,
-                  gScreenAdjustOffsets.display_height, 3, gScreenAdjustOffsets.zpsm);
-    D_001A742C->frame0.FBP = gScreenAdjustOffsets.fbp0;
+    sceGsSetDefDrawEnv(&D_001A742C->frame0, g_screen_adjust_offsets.psm, g_screen_adjust_offsets.display_width,
+                  g_screen_adjust_offsets.display_height, 3, g_screen_adjust_offsets.zpsm);
+    D_001A742C->frame0.FBP = g_screen_adjust_offsets.fbp0;
     *(long *)&D_001A742C->draw0[1] =
-        (long)gScreenAdjustOffsets.zbp | ((unsigned long)(gScreenAdjustOffsets.zpsm & 0xF) << 24);
+        (long)g_screen_adjust_offsets.zbp | ((unsigned long)(g_screen_adjust_offsets.zpsm & 0xF) << 24);
     *(u128_FAB40 *)&D_001A742C->giftag0 = 0;
     D_001A742C->giftag0.NLOOP = 8;
     D_001A742C->giftag0.EOP = 1;
     D_001A742C->giftag0.NREG = 1;
     D_001A742C->giftag0.REGS0 = 0xE;
-    sceGsSetDefDrawEnv(&D_001A742C->frame1, gScreenAdjustOffsets.storage_psm, gScreenAdjustOffsets.storage_width,
-                  gScreenAdjustOffsets.storage_height, 0, 0);
-    D_001A742C->frame1.FBP = gScreenAdjustOffsets.fbp1;
+    sceGsSetDefDrawEnv(&D_001A742C->frame1, g_screen_adjust_offsets.storage_psm, g_screen_adjust_offsets.storage_width,
+                  g_screen_adjust_offsets.storage_height, 0, 0);
+    D_001A742C->frame1.FBP = g_screen_adjust_offsets.fbp1;
     *(long *)&D_001A742C->draw1[1] = 1UL << 32;
     *(u128_FAB40 *)&D_001A742C->giftag1 = 0;
     D_001A742C->giftag1.NLOOP = 8;
@@ -173,7 +173,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
     *out++ = 6;
     *out++ = 0x4400000000008010UL;
     *out = 0x5353;
-    if (gWidescreenFlag) {
+    if (g_widescreen_flag) {
         int n;
         int i;
         for (i = 0, n = 12; i < 16; i++) {
@@ -269,7 +269,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         }
     }
 
-    CopyMemoryAligned(D_001A6E90, D_001A6D40, 0x150);
+    mem_copy_aligned(D_001A6E90, D_001A6D40, 0x150);
 
     q = (unsigned long *)D_00138850;
     {
@@ -287,7 +287,7 @@ void func_00284268(int display_width, int display_height, int storage_width, int
         unsigned long *p = q + 8;
         int i;
         for (i = 0; i < 16; i++) {
-            if (gWidescreenFlag) {
+            if (g_widescreen_flag) {
                 *p++ = (i * 0x280 + 0x6BF8) |
                        ((long)(0x7FF8 - D_001A742C->storage_height * 8) << 16);
                 *p++ = ((i + 1) * 0x280 + 0x6BF8) |

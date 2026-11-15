@@ -7,30 +7,30 @@ typedef struct {
     int timer[4][30];
     float phase;
 } L06Grid;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern u8 D_0018C0D4[] NOT_SDA;
 extern int D_L06_001B31B0;
 extern int D_L06_001B31B4;
 extern float D_L06_001AF718 __attribute__((sda));
 extern float D_L06_001AF714 __attribute__((sda));
 extern float D_L06_001AF710 __attribute__((sda));
-extern void func_0029F338(void *);
-extern int func_00282948(int *);
-extern void func_00282C88(void *);
-extern void func_002A7A00(void *, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
+extern void moby_mark_spawned(void *);
+extern int math_fast_float_d(int *);
+extern void vec_clear_128(void *);
+extern void vec_random_direction(void *, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
 
 /* Updates the ripple grid moby (class 1073): starts the waves in each column on a timer and moves the grid points. */
-void func_L06_003E5D30(u8 *moby)
+void ripple_grid_update(u8 *moby)
 {
     L06Grid *grid = *(L06Grid **)(moby + 0x68);
     L06GridVector temporary[20][10];
 
     switch (moby[0x20]) {
     case 0:
-        if (gCurrentMapIndex == 10 && D_0018C0D4[0] == 1) {
-            MarkMobySpawned(moby);
+        if (g_current_map_index == 10 && D_0018C0D4[0] == 1) {
+            moby_mark_spawned(moby);
             break;
         }
         D_L06_001B31B4 = 22;
@@ -54,16 +54,16 @@ void func_L06_003E5D30(u8 *moby)
         if (grid->phase > 1.0f) grid->phase -= 1.0f;
         for (group = 0; group < 4; group++) {
             for (col = 0; col < 10; col++) {
-                int hit = FastFloatHelperD(&grid->timer[group][col]);
+                int hit = math_fast_float_d(&grid->timer[group][col]);
                 int base = group * 0x2580;
                 L06GridVector (*points)[20] = (L06GridVector (*)[20])((char *)grid + base);
                 L06GridVector (*velocities)[20] = (L06GridVector (*)[20])((char *)grid + (base + 0x9600));
                 if (hit) {
                     for (row = 0; row < 20; row++) {
-                        ClearVector128(&points[row][col]);
+                        vec_clear_128(&points[row][col]);
                         ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
                         ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
-                        RandomDirectionVector(&temporary[row][col], 0.0f, D_L06_001AF710 * (0.016666668f));
+                        vec_random_direction(&temporary[row][col], 0.0f, D_L06_001AF710 * (0.016666668f));
                     }
                     {
                         int k;

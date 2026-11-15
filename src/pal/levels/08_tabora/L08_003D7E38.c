@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void func_PAL_002B15D8(void *, int, void *, int, float, float, float, float);
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -24,7 +24,7 @@ void func_PAL_L08_003D7E38(unsigned char *a0) {
         qzero(&local);
         local.f[2] = 0.18f;
         func_PAL_002B15D8(a0, 0x7F, &local, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_0029F338(a0);
+        moby_mark_spawned(a0);
         break;
     }
 }

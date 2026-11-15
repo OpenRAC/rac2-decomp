@@ -1,5 +1,5 @@
 #include "common.h"
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char *D_L17_001B2D0C;
 extern float D_L17_001B03B0 __attribute__((sda));
 extern int func_003221C8(void *, int);
@@ -12,14 +12,14 @@ extern void func_002EEF40(void *, void *, float);
 extern void func_002EEEB8(void *, void *, void *);
 /* Puts a platform on its path at the spot that matches its travel timer, easing in and out. If
    the player is blocking it, the timer winds back by one frame instead. */
-void func_L17_003C7498(char *moby, int *path, float duration) {
+void platform_move_along_path_by_timer(char *moby, int *path, float duration) {
     char *vars = *(char **)(moby + 0x68);
     float eased, fraction, phase;
     int index;
     float delta[4];
     if (*(int *)(vars + 0xCC) != -1 && *(int *)(vars + 0xAC) == 1 &&
-        func_003221C8(gHeroPosition, *(int *)(vars + 0xCC)) &&
-        *(float *)(gHeroPosition + 8) <= *(float *)(moby + 0x18) + 0.05f &&
+        func_003221C8(g_hero_position, *(int *)(vars + 0xCC)) &&
+        *(float *)(g_hero_position + 8) <= *(float *)(moby + 0x18) + 0.05f &&
         func_002EF0B0(moby + 0x10, D_L17_001B2D0C + *(int *)(vars + 0xCC) * 128 + 0x30) <= D_L17_001B03B0) {
         *(float *)(vars + 0x9C) -= 1.0f;
         goto done;

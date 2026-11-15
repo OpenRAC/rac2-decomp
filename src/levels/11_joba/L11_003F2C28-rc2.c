@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -34,7 +35,7 @@ extern u8 ref_L11_003F2C28_07[];
 
 /* Runs the enemy's effect and sound helpers each frame, sets them up once, and counts up
    its small frame counters. */
-void func_L11_003F2C28(void *moby) {
+void joba_enemy_update_effects(void *moby) {
     void *vars = *(void **)((s8 *)moby + 0x68);
     s32 *state = (s32 *)((s8 *)vars + 0x28C);
     s8 *counter;

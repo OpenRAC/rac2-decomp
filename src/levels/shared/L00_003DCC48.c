@@ -11,9 +11,9 @@ extern void func_002830C0_7(void *, void *, void *);
 extern float func_00283CE0_7(int);
 extern void func_00280B90_7(void *, void *, int);
 
-extern float D_L00_001B8DC0[];
+extern float g_camera_l00_position[];
 /* Draws a tapering two-layer ribbon along a list of points, with a fading end. */
-void func_L00_003DCC48(float tex, float width, float step, void *start, char *points, int color, int count)
+void gfx_draw_tapered_ribbon(float tex, float width, float step, void *start, char *points, int color, int count)
 {
     char origin[16] __attribute__((aligned(16)));
     char corePacket[144] __attribute__((aligned(16)));
@@ -37,7 +37,7 @@ void func_L00_003DCC48(float tex, float width, float step, void *start, char *po
     offsets[1].f[3]=1;
     offsets[0].f[2]=width;
     offsets[1].f[2]=width+width;
-    if (!(Rand()&1)) {
+    if (!(func_001163B0()&1)) {
         *(float *)(corePacket+80)=tex; *(float *)(corePacket+84)=0; *(float *)(corePacket+88)=tex; *(float *)(corePacket+92)=1;
         *(float *)(corePacket+96)=step+tex; *(float *)(corePacket+100)=0; *(float *)(corePacket+104)=step+tex; *(float *)(corePacket+108)=1;
         *(float *)(outerPacket+80)=tex; *(float *)(outerPacket+84)=0; *(float *)(outerPacket+88)=tex; *(float *)(outerPacket+92)=1;
@@ -49,7 +49,7 @@ void func_L00_003DCC48(float tex, float width, float step, void *start, char *po
         *(float *)(outerPacket+96)=step+tex; *(float *)(outerPacket+100)=1; *(float *)(outerPacket+104)=step+tex; *(float *)(outerPacket+108)=0;
     }
     func_00282CF0_7(matrix,points,basis); func_00282F20_7(matrix,matrix,1);
-    func_00282CF0_7(matrix+4,gCameraPosition_L00,basis);
+    func_00282CF0_7(matrix+4,g_camera_l00_position,basis);
     func_00282DD8_7(matrix+8,matrix+4,matrix); func_00282F20_7(matrix+8,matrix+8,1); func_00282DD8_7(matrix+4,matrix,matrix+8);
     qcopy(matrix+12,basis);
     qcopy(corePacket,offsets); qcopy(outerPacket,offsets+1);
@@ -59,7 +59,7 @@ void func_L00_003DCC48(float tex, float width, float step, void *start, char *po
         coreColor=color|0x7f000000; outerColor=color|0x3f000000;
 basis = (char *)matrix;
         func_00282CF0_7(basis,points+(i*16+16),points+i*16); func_00282F20_7(basis,basis,1);
-        func_00282CF0_7(basis+16,gCameraPosition_L00,points+i*16);
+        func_00282CF0_7(basis+16,g_camera_l00_position,points+i*16);
         func_00282DD8_7(basis+32,basis+16,basis); func_00282F20_7(basis+32,basis+32,1); func_00282DD8_7(basis+16,basis,basis+32);
         qcopy(basis+48,points+i*16);
         offsets[0].f[2]*=.7f; offsets[1].f[2]=offsets[0].f[2]+offsets[0].f[2];

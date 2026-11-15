@@ -1,17 +1,17 @@
 #include "common.h"
 
-extern void func_00282D30(void *, void *, float);
-extern void func_0029FCC0(void *, int, void *);
-extern float func_0029F530(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282948(void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
-extern int func_00283CF0(float);
-extern unsigned char *func_002C2FD8(void *, int, unsigned char, int, int, int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float moby_get_anim_value(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_fast_float_d(void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
+extern int FloatToInt(float);
+extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
 extern char D_L01_001B94C0[];
 extern int ref_L01_00416C08_00 __attribute__((sda));
 extern int ref_L01_00416C08_01 __attribute__((sda));
@@ -19,7 +19,7 @@ extern int ref_L01_00416C08_02 __attribute__((sda));
 extern int ref_L01_00416C08_03 __attribute__((sda));
 /* Draws four pulsing glow rings between the moby and camera, fading with distance.
  * Adapted from RAC1 update_gold_bolt_glow_rings (GPL-3.0). */
-void func_L01_00416C08(char *moby) {
+void gfx_draw_glow_rings(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     float a[4], b[4], c[4];
     float scale = 1.0f;
@@ -29,8 +29,8 @@ void func_L01_00416C08(char *moby) {
     if (*(unsigned char *)(moby + 0x20) == 1)
         FastVecScale(b, moby, 0.0009765625f);
     else {
-        TransformMobyJointToWorld(moby, 0, b);
-        scale = (160.0f - GetMobyAnimationValue(moby)) * 0.1f;
+        moby_transform_joint_to_world(moby, 0, b);
+        scale = (160.0f - moby_get_anim_value(moby)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
     FastVecSub(a, D_L01_001B94C0, b);
@@ -48,11 +48,11 @@ void func_L01_00416C08(char *moby) {
         phase[i] = value;
         if (255.0f <= value) phase[i] = value - 255.0f;
         else if (value <= 0.0f) phase[i] = value + 255.0f;
-        if (FastFloatHelperD((int *)(vars + 0x40) + i)) timer[i] = 255;
+        if (math_fast_float_d((int *)(vars + 0x40) + i)) timer[i] = 255;
         t = IntToFloat(255 - timer[i]) * 0.003921568859368563f;
         color = FastTweenColor(ref_L01_00416C08_00, ref_L01_00416C08_01,
-            FloatAbs(0.5f - t));
-        SpawnFadingParticle_002C2FD8(a, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00416C08_03,
+            math_fabs(0.5f - t));
+        part_spawn_fading(a, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00416C08_03,
             ref_L01_00416C08_02, 2, 0, size[i] * scale);
         FastVecAdd(a, a, c);
     }

@@ -17,14 +17,14 @@ typedef struct {
 
 typedef struct { u8 pad[0x44]; StreamChannel channel[3]; } StreamState;
 
-extern u8 D_001A63A8[];
+extern u8 g_music_state[];
 
-extern int D_0014B540[];
+extern int g_copy_setup_data[];
 
 extern int func_00133350(int, int, int, int, int, int, int, int, int, int,
                          void (*)(int, long), unsigned long);
 
-extern void func_002B7F08(int, long);
+extern void request_store_result_move_to_done(int, long);
 
 /* If the third stream channel is idle (handle 0) and table entry index is present, claim
    it (handle -1, state 1, crossfade 1, track, mode, 10 / 48000, volume) and start the
@@ -33,15 +33,15 @@ extern void func_002B7F08(int, long);
    success path ends in the call, so the call stays at the end of its block and the
    scheduler keeps retail's order. */
 /* Starts a music track on the third stream channel if it is free and returns 1 when it started. */
-int func_002B7088(int track, int index, int mode, int volume)
+int snd_start_music_transition(int track, int index, int mode, int volume)
 {
-    StreamState *s = (StreamState *)gMusicState;
+    StreamState *s = (StreamState *)g_music_state;
     SoundTable *d;
     long first;
     int offset;
 
     if (s->channel[2].handle == 0) {
-        d = (SoundTable *)gCopySetupData;
+        d = (SoundTable *)g_copy_setup_data;
         offset = d->entries[index].offset;
         if (offset) {
             s->channel[2].flags = mode;
@@ -54,7 +54,7 @@ int func_002B7088(int track, int index, int mode, int volume)
             s->channel[2].volume = volume;
             first = offset + d->base;
             func_00133350(first, 0, 0, 0, (short)volume, 0, 1, 0, 0, 32,
-                          StoreRequestResultMoveToState4, (unsigned int)&s->channel[2]);
+                          request_store_result_move_to_done, (unsigned int)&s->channel[2]);
         } else {
             return 0;
         }

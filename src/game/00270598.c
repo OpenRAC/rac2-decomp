@@ -45,16 +45,16 @@ typedef struct {
     char pad318[0xec];
     int timer;
 } CameraSystem;
-extern CameraSystem D_001B5200;
+extern CameraSystem g_active_camera;
 extern char D_001B79B0[];
 extern CameraDefinition *D_001B1504 __attribute__((sda));
-extern int func_00283CF0(float);
-extern void func_00282B50(void *, void *, int);
-extern void func_00270550(char *);
-extern void func_002701B0(void);
+extern int FloatToInt(float);
+extern void mem_fast_helper_c(void *, void *, int);
+extern void moby_call_handler_second(char *);
+extern void cam_copy_working_data(void);
 
 /* Selects the new camera, configures its transition and swaps the state buffers. */
-void func_00270598(char *camera)
+void cam_switch_active(char *camera)
 {
     Camera *next = (Camera *)camera;
     Camera *prev;
@@ -64,7 +64,7 @@ void func_00270598(char *camera)
     CameraVector *pos;
     float *prevpos;
     info = D_001B1504[next->index].info;
-    prev = gActiveCamera.current;
+    prev = g_active_camera.current;
     state = prev->state;
     if (info)
         kind = info->kind;
@@ -73,26 +73,26 @@ void func_00270598(char *camera)
     } else if (state == 2 || kind == 1 || kind == 5) {
         if (kind == 1) {
             float duration = next->duration;
-            gActiveCamera.nextkind = 0;
+            g_active_camera.nextkind = 0;
             if (duration > 0.0f) {
-                gActiveCamera.rotrate = duration;
-                gActiveCamera.posrate = duration;
+                g_active_camera.rotrate = duration;
+                g_active_camera.posrate = duration;
             } else {
-                gActiveCamera.rotrate = 0.018f;
-                gActiveCamera.posrate = 0.018f;
+                g_active_camera.rotrate = 0.018f;
+                g_active_camera.posrate = 0.018f;
             }
         } else if (kind == 5) {
             float duration = next->duration;
-            gActiveCamera.nextkind = 2;
+            g_active_camera.nextkind = 2;
             if (duration > 0.0f)
-                gActiveCamera.frames = FloatToInt(duration);
+                g_active_camera.frames = FloatToInt(duration);
             else
-                gActiveCamera.frames = 40;
+                g_active_camera.frames = 40;
         }
-        if (gActiveCamera.phase == 0)
-            gActiveCamera.phase = 1;
+        if (g_active_camera.phase == 0)
+            g_active_camera.phase = 1;
         else
-            gActiveCamera.phase = 2;
+            g_active_camera.phase = 2;
     } else if (state == 3 || state == 5 || kind == 3 || kind == 6) {
         qcopy(&next->pos, &prev->pos);
         qcopy(&next->rows[0], &prev->rows[0]);
@@ -101,13 +101,13 @@ void func_00270598(char *camera)
         next->handoff = 2;
         if (prev->state == 5 || kind == 6) {
             float duration = next->duration;
-            gActiveCamera.nextkind = 0;
+            g_active_camera.nextkind = 0;
             if (duration > 0.0f) {
-                gActiveCamera.rotrate = duration;
-                gActiveCamera.posrate = duration;
+                g_active_camera.rotrate = duration;
+                g_active_camera.posrate = duration;
             } else {
-                gActiveCamera.rotrate = 0.018f;
-                gActiveCamera.posrate = 0.018f;
+                g_active_camera.rotrate = 0.018f;
+                g_active_camera.posrate = 0.018f;
             }
         }
     } else {
@@ -116,17 +116,17 @@ void func_00270598(char *camera)
     prev->state = 0;
     prev->handoff = 0;
     prev->cut = 0;
-    gActiveCamera.previous = prev;
-    FastMemoryHelperC(D_001B79B0, D_001B79B0 - 0x280, 0x280);
-    gActiveCamera.previous->buffer = D_001B79B0;
-    gActiveCamera.current = next;
+    g_active_camera.previous = prev;
+    mem_fast_helper_c(D_001B79B0, D_001B79B0 - 0x280, 0x280);
+    g_active_camera.previous->buffer = D_001B79B0;
+    g_active_camera.current = next;
     next->buffer = D_001B79B0 - 0x280;
     prev = next;
-    gActiveCamera.timer = 0;
-    CallObjectHandler2((char *)prev);
-    CopyCameraWorkingData();
+    g_active_camera.timer = 0;
+    moby_call_handler_second((char *)prev);
+    cam_copy_working_data();
     pos = &prev->pos;
-    qcopy(&gActiveCamera.pos, pos);
+    qcopy(&g_active_camera.pos, pos);
     prevpos = prev->prevpos;
     prevpos[0] = prev->pos.f[0];
     prevpos[1] = pos->f[1];

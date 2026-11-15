@@ -31,7 +31,7 @@ typedef struct GateObject {
     GateVec forward, right, up;
 } GateObject;
 
-extern int D_L10_001B13A4 __attribute__((sda));
+extern int g_mission_initialized __attribute__((sda));
 extern GateObject *D_L10_001B1400 __attribute__((sda));
 extern GateObject *D_L10_001B1404 __attribute__((sda));
 extern char *D_L10_001B1408 __attribute__((sda));
@@ -52,33 +52,33 @@ extern GateGlobals D_L10_00221CD0;
 extern GatePath *D_L10_001FE340[];
 extern char *D_L10_001B251C[] __attribute__((sda));
 extern char D_L10_001B9680[];
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_0019B278[];
 
-extern void func_002B7320(void), func_L10_00425798(void), func_L05_0037B210(void);
-extern void func_L05_00379F28(int), func_L05_00379F18(int);
-extern GateObject **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
-extern GateObject *func_L05_00379ED0(int);
-extern int func_L00_0042B730(void *);
-extern void func_L05_0037B280(void *, int);
-extern GateObject *func_0029EFD0(int);
-extern void func_0029F338(void *);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *), func_00282E48(void *, void *);
-extern void func_L10_00423DC8(void *, int), func_L10_00423500(void *);
-extern int func_00282948(int *);
-extern char *func_00288FB8(int);
-extern void func_L00_0030DD70(void *, int);
-extern void func_002E5DA0(int, int, void *, int);
-extern void func_L05_0037ADD8(float);
-extern void func_L05_00424980(void *, int), func_L05_00424970(void *, int);
-extern char *func_L05_0042C928(void *, int, int, int);
+extern void music_Unpause(void), cloud_destroy_leftover_objects(void), entry_init_all_registered(void);
+extern void hero_set_state_value_b(int), hero_set_state_value_a(int);
+extern GateObject **level_get_object_list(void);
+extern int level_get_saved_value(void);
+extern GateObject *level_find_object_by_class_id(int);
+extern int level_get_saved_value_b(void *);
+extern void entry_spawn_list_objects_with_flag(void *, int);
+extern GateObject *CreateMoby(int);
+extern void moby_mark_spawned(void *);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *), fast_vec_dist(void *, void *);
+extern void hrugis_finish_mission_reward(void *, int), hrugis_reset_mission_state(void *);
+extern int math_fast_float_d(int *);
+extern char *GetLocalizedString(int);
+extern void level_l00_call_module_handler_with_arg_9(void *, int);
+extern void snd_play_from_class_bank(int, int, void *, int);
+extern void hero_add_clamped_stat(float);
+extern void effect_set_enabled(void *, int), effect_set_color(void *, int);
+extern char *pickup_spawn_if_not_taken(void *, int, int, int);
 
 /* Runs the gate course: keeps the next two gate markers ahead, scores the player when passing
    through one and shows a warning after too many misses. */
-void func_L10_00424528(GateObject *controller)
+void UpdateGateCourse(GateObject *controller)
 {
     GateVec up, viewPos, toPlayer, toView;
     char *vars = controller->state, *player;
@@ -91,10 +91,10 @@ void func_L10_00424528(GateObject *controller)
     up.q = 0;
     up.v.z = 1;
 
-    if (!gMissionInitialized) {
+    if (!g_mission_initialized) {
         D_L10_001B140C = -1;
         D_L10_001B1410 = -1;
-        gMissionInitialized = 1;
+        g_mission_initialized = 1;
         D_L10_001B1400 = 0;
         D_L10_001B1404 = 0;
         D_L10_001B1414 = 0;
@@ -103,19 +103,19 @@ void func_L10_00424528(GateObject *controller)
         D_L10_001B3550 = 0;
         D_L10_00221CD0.field2c = 0;
         music_Unpause();
-        DestroyLeftoverCloudObjects();
+        cloud_destroy_leftover_objects();
         if (D_L10_001B1408)
-            MarkMobySpawned(D_L10_001B1408);
-        InitAllRegisteredEntries();
+            moby_mark_spawned(D_L10_001B1408);
+        entry_init_all_registered();
         D_L10_001B1408 = 0;
-        SetPlayerStateField15(1);
+        hero_set_state_value_b(1);
         D_L10_00221CD0.field38 = *(int *)(vars + 0x20);
-        SetPlayerStateField13(0);
-        mobyList = GetLevelObjectList();
-        count = GetLevelSavedValue();
+        hero_set_state_value_a(0);
+        mobyList = level_get_object_list();
+        count = level_get_saved_value();
         for (i = 0; i < count; i++) {
             if (mobyList[i]->classId == 0xf82 /* moby class 3970 */)
-                SpawnEntryListObjectsWithFlag(mobyList[i], 1);
+                entry_spawn_list_objects_with_flag(mobyList[i], 1);
         }
         path = D_L10_001FE340[*(int *)(vars + 0x20)];
         while ((!D_L10_001B1400 || !D_L10_001B1404) && D_L10_001B1418 != path->count) {
@@ -150,28 +150,28 @@ void func_L10_00424528(GateObject *controller)
     }
 
     if (!D_L10_001B1400 && !D_L10_001B1404 && !D_L10_001B1434) {
-        FinishMissionAndGrantReward(controller, 3);
+        hrugis_finish_mission_reward(controller, 3);
         return;
     }
 
-    if (GetLevelSavedValueB(FindLevelObjectByClassId(0xf82 /* moby class 3970 */))) {
+    if (level_get_saved_value_b(level_find_object_by_class_id(0xf82 /* moby class 3970 */))) {
         D_L10_001B1434 = 1;
-        if (FastFloatHelperD((int *)(vars + 0x50))) {
+        if (math_fast_float_d((int *)(vars + 0x50))) {
             D_L10_001B1434 = 0;
             *(int *)(vars + 0x50) = 240;
-            ResetHrugisMissionState(controller);
-            InitAllRegisteredEntries();
+            hrugis_reset_mission_state(controller);
+            entry_init_all_registered();
         } else
             goto warning;
     } else if (D_L10_001B141C >= 12) {
         D_L10_001B1434 = 1;
-        if (!FastFloatHelperD((int *)(vars + 0x50))) {
+        if (!math_fast_float_d((int *)(vars + 0x50))) {
         warning:
-            CallLoadedModuleHandlerWithArg_003387A0_1(GetLocalizedString(0x31de), -1);
+            level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x31de), -1);
         } else {
             D_L10_001B1434 = 0;
-            ResetHrugisMissionState(controller);
-            InitAllRegisteredEntries();
+            hrugis_reset_mission_state(controller);
+            entry_init_all_registered();
             *(int *)(vars + 0x50) = 240;
         }
     }
@@ -195,13 +195,13 @@ void func_L10_00424528(GateObject *controller)
         path = D_L10_001FE340[*(int *)(vars + 0x20)];
         if (fast_vec_dist(&viewPos, &D_L10_001B1400->position) <= 1.25f
             || fast_vec_dist(player + 0x10, &D_L10_001B1400->position) <= 1.25f) {
-            PlaySoundFromClassBank(15, 0, controller, 0xfbf);
-            AddClampedStatValue(0.5f);
+            snd_play_from_class_bank(15, 0, controller, 0xfbf);
+            hero_add_clamped_stat(0.5f);
         } else {
-            AddClampedStatValue(-0.75f);
+            hero_add_clamped_stat(-0.75f);
             D_L10_001B141C++;
         }
-        MarkMobySpawned(D_L10_001B1400);
+        moby_mark_spawned(D_L10_001B1400);
         D_L10_001B1400 = D_L10_001B1404;
         D_L10_001B1404 = 0;
         while (!D_L10_001B1404 && D_L10_001B1418 != path->count) {
@@ -236,17 +236,17 @@ void func_L10_00424528(GateObject *controller)
     D_L10_001B1410 = viewDot;
 
     if (D_L10_001B1400) {
-        SetEffectEnabled(D_L10_001B1400, 1);
+        effect_set_enabled(D_L10_001B1400, 1);
         if (D_L10_001B1404)
-            SetEffectColor(D_L10_001B1400, 0x40008000);
+            effect_set_color(D_L10_001B1400, 0x40008000);
         else
-            SetEffectColor(D_L10_001B1400, 0x4000c6ff);
+            effect_set_color(D_L10_001B1400, 0x4000c6ff);
     }
 
     if (D_L10_001B1404) {
-        SetEffectEnabled(D_L10_001B1404, 1);
-        SetEffectColor(D_L10_001B1404, 0x40808000);
-    } else if (!D_L10_001B141C && !D_L10_001B1408 && !D_0019B278[gCurrentMapIndex * 4]) {
-        D_L10_001B1408 = SpawnCollectibleIfNotTaken(&D_L10_001B1400->position, 0, -1, -1);
+        effect_set_enabled(D_L10_001B1404, 1);
+        effect_set_color(D_L10_001B1404, 0x40808000);
+    } else if (!D_L10_001B141C && !D_L10_001B1408 && !D_0019B278[g_current_map_index * 4]) {
+        D_L10_001B1408 = pickup_spawn_if_not_taken(&D_L10_001B1400->position, 0, -1, -1);
     }
 }

@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern void *func_0029EFD0(int);
+extern void *CreateMoby(int);
 
 extern void func_002A0F48(void *);
 
 /* Spawns a helper object linked to a parent object and puts it at the given position. Returns the new object, or nothing if it could not be made. */
-void *func_L01_003A6280(u8 *parent, void *position, u32 param, f32 sizeScale, f32 extraValue) {
+void *moby_spawn_linked_helper(u8 *parent, void *position, u32 param, f32 sizeScale, f32 extraValue) {
     u8 *spawned = (u8 *)CreateMoby(0x660 /* moby class 1632 */);
     u8 *vars;
 

@@ -1,18 +1,18 @@
 #include "common.h"
 
-extern void *func_0029EFD0(int);
-extern float func_00283248(float, float);
-extern float func_00282E20(void *);
-extern char *func_L09_003364E0(char *, int, float, unsigned int, float, int);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern int func_002E5CF8(int, int, char *);
+extern void *CreateMoby(int);
+extern float mat_fast_helper_a(float, float);
+extern float vec_length_xy(void *);
+extern char *part_spawn_sized(char *, int, float, unsigned int, float, int);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern int PlayMobySound(int, int, char *);
 extern char D_0018A0E0[];
 
 /* Creates a streaking projectile that flies along a direction with a trail, and tells the Receiver Bot owner that it fired. */
-char *func_L18_0043FFF8(void *position, char *owner, float *direction,
+char *receiver_bot_spawn_streak_projectile(void *position, char *owner, float *direction,
                        int kind, int flags, float x, float y, float z)
 {
     char *object = CreateMoby(0x1263 /* moby class 4707 */);
@@ -32,10 +32,10 @@ char *func_L18_0043FFF8(void *position, char *owner, float *direction,
         object[0x20] = 0;
         qcopy(state, direction);
         qcopy(object + 0x10, position);
-        *(float *)(object + 0xf8) = FastMatrixHelperA(direction[0], direction[1]);
+        *(float *)(object + 0xf8) = mat_fast_helper_a(direction[0], direction[1]);
         angle = vec_length_xy(direction);
-        *(float *)(object + 0xf4) = -FastMatrixHelperA(angle, direction[2]);
-        *(char **)(state + 0x30) = SpawnSizedParticle(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
+        *(float *)(object + 0xf4) = -mat_fast_helper_a(angle, direction[2]);
+        *(char **)(state + 0x30) = part_spawn_sized(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
         *(float *)(state + 0x1c) = y;
         qcopy(object + 0xc0, state);
         FastVecCross(object + 0xd0, object + 0xc0, D_0018A0E0);

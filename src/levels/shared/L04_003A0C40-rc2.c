@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern f32 ref_L04_003A0C40_02;
 extern f32 ref_L04_003A0C40_03;
 
 /* Fills a 17 by 17 grid of points starting at the given position. */
-void func_L04_003A0C40(void *origin) {
+void water_fill_grid_points(void *origin) {
     s32 row;
     s32 col;
     f32 *srcPtr;

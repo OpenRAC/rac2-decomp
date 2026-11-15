@@ -5,14 +5,14 @@ typedef struct { unsigned char prefix[0x2290]; unsigned char *object; } EffectPl
 extern unsigned char *D_L00_001B08D0 __attribute__((sda));
 extern EffectSlot48 D_L00_0024F9C0[12] __attribute__((nosda));
 extern EffectSlot80 D_L00_0024FC00[128] __attribute__((nosda));
-extern unsigned char D_00189E20[] __attribute__((nosda));
-extern unsigned char *func_0029EFD0(int);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
+extern unsigned char g_hero_state[] __attribute__((nosda));
+extern unsigned char *CreateMoby(int);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 
 /* Creates the single effect controller moby (class 3303) and its two helper mobys (classes
    3307 and 3308), and clears the effect slot tables. Does nothing if the controller already
    exists. */
-void func_L00_003F1300(void) {
+void effect_controller_spawn(void) {
     unsigned char *object;
     unsigned char *state;
     int i;
@@ -29,7 +29,7 @@ void func_L00_003F1300(void) {
         D_L00_0024F9C0[i].active = 0;
     for (i = 127; i >= 0; i--)
         D_L00_0024FC00[i].active = 0;
-    *(int *)(state + 0x10) = AllocateEffectSlot_L00_2(((EffectPlayer *)gHeroState)->object + 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+    *(int *)(state + 0x10) = part_l00_alloc_effect_slot_2(((EffectPlayer *)g_hero_state)->object + 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     *(unsigned char **)(state + 8) = CreateMoby(0xCEB);
     *(unsigned char **)(state + 12) = CreateMoby(0xCEC);
     if (*(unsigned char **)(state + 8)) {

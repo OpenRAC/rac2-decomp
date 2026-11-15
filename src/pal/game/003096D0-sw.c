@@ -45,12 +45,12 @@ typedef struct {
     char pad36[0x32];
     V_4198 *v;
 } O_4198;
-extern G_4198 D_00189E20;
+extern G_4198 g_hero_state;
 extern s32 D_00138320;
-extern s32 func_0026F800(s32), func_00282948(void *);
-extern void func_0029F338(void *), func_0027CFD0(void *, void *);
+extern s32 stub_empty_30(s32), math_fast_float_d(void *);
+extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
 extern void func_PAL_00309A30(void), func_PAL_0030A078(void *);
-extern s32 ref_PAL_0030A560_00(s32), func_00282948(void *);
+extern s32 ref_PAL_0030A560_00(s32), math_fast_float_d(void *);
 
 /* Adapted from RAC1 update_beam_effect_lifecycle (OpenRAC, GPL-3.0). */
 void func_PAL_0030A560(void *p) {
@@ -59,28 +59,28 @@ void func_PAL_0030A560(void *p) {
     s32 flag = 0;
     s32 st;
 
-    if ((&D_00189E20)->i1338 == 3 || ref_PAL_0030A560_00(3) == 8) {
+    if ((&g_hero_state)->i1338 == 3 || ref_PAL_0030A560_00(3) == 8) {
         if (o->state == 1 || o->state == 3) {
-            st = (&D_00189E20)->i2294;
+            st = (&g_hero_state)->i2294;
             if ((u32)(st - 0xB) < 4
-                || (st == 0x1B && ((u8 *)(&D_00189E20)->p2290)[0x42] == ((u8 *)(&D_00189E20)->p2290)[0x43]
-                    && (&D_00189E20)->fC38 >= 6.0f && (&D_00189E20)->fC38 <= 16.0f)) {
-                if (!(&D_00189E20)->i49E) flag = 1;
+                || (st == 0x1B && ((u8 *)(&g_hero_state)->p2290)[0x42] == ((u8 *)(&g_hero_state)->p2290)[0x43]
+                    && (&g_hero_state)->fC38 >= 6.0f && (&g_hero_state)->fC38 <= 16.0f)) {
+                if (!(&g_hero_state)->i49E) flag = 1;
             }
-            if ((&D_00189E20)->i2294 == 0x82 && (D_00138320 & 0x40)) flag = 1;
-            if ((&D_00189E20)->i2294 == 0x10) {
-                if ((&D_00189E20)->i1B8 < 37) {
+            if ((&g_hero_state)->i2294 == 0x82 && (D_00138320 & 0x40)) flag = 1;
+            if ((&g_hero_state)->i2294 == 0x10) {
+                if ((&g_hero_state)->i1B8 < 37) {
                     flag = 1;
                 }
             }
-            if ((&D_00189E20)->i2294 == 0x21) {
-                if ((&D_00189E20)->i1B8 < 12
-                    || (27 < (&D_00189E20)->i1B8 && (&D_00189E20)->i34E != 0)) {
+            if ((&g_hero_state)->i2294 == 0x21) {
+                if ((&g_hero_state)->i1B8 < 12
+                    || (27 < (&g_hero_state)->i1B8 && (&g_hero_state)->i34E != 0)) {
                     flag = 1;
                 }
             }
-            if ((&D_00189E20)->i2294 == 8) flag = 1;
-            if ((&D_00189E20)->i2294 == 0x82) flag = 1;
+            if ((&g_hero_state)->i2294 == 8) flag = 1;
+            if ((&g_hero_state)->i2294 == 0x82) flag = 1;
         }
     }
     switch (o->state) {
@@ -91,8 +91,8 @@ void func_PAL_0030A560(void *p) {
         o->u34 |= 1;
         break;
     case 1:
-        if ((ref_PAL_0030A560_00(3) != 3 && ref_PAL_0030A560_00(3) != 8) || !D_00189E20.i1314) {
-            func_0029F338(o);
+        if ((ref_PAL_0030A560_00(3) != 3 && ref_PAL_0030A560_00(3) != 8) || !g_hero_state.i1314) {
+            moby_mark_spawned(o);
         } else if (flag != 0) {
             o->state = 2;
             v->i0 = 2;
@@ -111,9 +111,9 @@ void func_PAL_0030A560(void *p) {
         v->f24 += v->f34;
         v->f28 += v->f38;
         v->f2C += v->f3C;
-        v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_PAL_00309A30, o);
-        if (func_00282948(v) != 0) {
+        v->i8 = (&g_hero_state)->i1310;
+        gfx_register_overlay_draw_callback(func_PAL_00309A30, o);
+        if (math_fast_float_d(v) != 0) {
             o->state = 3;
             v->f20 = 0.0125f;
             v->f24 = 0.2f;
@@ -123,8 +123,8 @@ void func_PAL_0030A560(void *p) {
         }
         break;
     case 3:
-        v->i8 = (&D_00189E20)->i1310;
-        func_0027CFD0(func_PAL_00309A30, o);
+        v->i8 = (&g_hero_state)->i1310;
+        gfx_register_overlay_draw_callback(func_PAL_00309A30, o);
         if (flag == 0) {
             o->state = 4;
             v->i0 = 7;
@@ -138,15 +138,15 @@ void func_PAL_0030A560(void *p) {
         }
         break;
     case 4:
-        if (func_00282948(v) != 0) {
+        if (math_fast_float_d(v) != 0) {
             o->state = 1;
         } else {
             v->f20 -= v->f30;
             v->f24 -= v->f34;
             v->f28 -= v->f38;
             v->f2C -= v->f3C;
-            v->i8 = (&D_00189E20)->i1310;
-            func_0027CFD0(func_PAL_00309A30, o);
+            v->i8 = (&g_hero_state)->i1310;
+            gfx_register_overlay_draw_callback(func_PAL_00309A30, o);
         }
         break;
     }

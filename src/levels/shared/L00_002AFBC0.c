@@ -1,28 +1,28 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002B1F90(void);
+extern void cancel_hero_item_animation(void);
+extern void UpdateHeroSlotCallbacks(void);
 extern void func_L00_002F6BE0(int, int, char *, char *, char *, int, int);
-extern void func_L00_00322EC8(char *);
-extern void func_L00_002D2E68(void);
-extern void func_L00_002A6708(void);
-extern void func_L00_002A53B8(void);
-extern void func_L00_002B32F8(void);
-extern void func_L00_002D24B8(void);
+extern void level_release_slot_list(char *);
+extern void hero_set_objects_flag_bit(void);
+extern void hero_clear_tracked_slots(void);
+extern void attachment_reset_all(void);
+extern void hero_update_collision_capsule(void);
+extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
-extern void func_L00_002C42E0(int, int);
-extern void func_L00_002F6B90(int);
+extern void hero_l00_set_action(int, int);
+extern void level_run_slot_callback(int);
 extern int D_00138320[];
 extern char D_L00_002F8588[];
 extern char D_L00_002F85D0[];
 extern char D_L00_002F8AD8[];
 
-extern void func_L00_002AED68(void);
+extern void update_hero_item_slot_animation_blends(void);
 
-extern void func_L00_002AF860(void);
+extern void update_hero_held_items_and_orientation(void);
 
-extern void func_L00_002AEB18(void);
+extern void hero_update_status_icon_overlay(void);
 
 extern float func_00282C48_2(float d);
 
@@ -44,11 +44,11 @@ extern char D_00189F20[];
 
 extern char D_00189F30[] __attribute__((sda));
 
-extern void func_L00_002B39D8(void);
+extern void hero_clear_speeds(void);
 
 extern void func_00282C88_4(void *p);
 
-extern void func_002B8518(void);
+extern void pad_clear_port_state(void);
 
 extern void func_L00_002D3CF8_1(int, int);
 
@@ -56,7 +56,7 @@ extern void func_L00_002D3C68_1(int, int, float);
 
 extern void func_L00_002D3BD8_1(int, int);
 
-extern void func_L00_002D3B58(int, int, float);
+extern void cam_set_view_space_height(int, int, float);
 
 typedef unsigned char u8;
 
@@ -90,11 +90,11 @@ extern void func_00283788_3(M4_F6b9e759f *, M4_F6b9e759f *, V4_F6b9e759f *);
 
 extern void func_002AB6D8_3(M4_F6b9e759f *, V4_F6b9e759f *);
 
-extern int func_002830C0(float *, char *, char *);
+extern int transform_vector(float *, char *, char *);
 
 extern float func_00283248_1(float, float);
 
-extern float func_002AA898(float *, float, char *, float, float, float, int);
+extern float math_approach_with_velocity(float *, float, char *, float, float, float, int);
 
 extern void func_L00_002B3DC0_1(float, float, float);
 
@@ -111,7 +111,7 @@ extern V4S_F31e44309 D_00189E20_10[];
 
 extern void func_00282D30_6(V4S_F31e44309 *, V4S_F31e44309 *, f32);
 
-extern void func_002A7470(void *, int, int, int);
+extern void anim_start_blended(void *, int, int, int);
 typedef struct {
     char pad0[6];
     unsigned char flag;
@@ -163,11 +163,11 @@ typedef struct {
     short packDisabled;         /* 0x24FC */
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001A7A00[] __attribute__((sda));
 extern int D_001A7398[] __attribute__((sda));
-extern int D_00139688[];
-extern int D_L00_001B18D8[] __attribute__((sda)), D_L00_001B19C8[] __attribute__((sda));
+extern int g_item_ammo_counts[];
+extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
@@ -183,25 +183,25 @@ typedef struct {
     unsigned short ammo;
     char pad2[0x50];
 } HeroItemDefinition;
-extern HeroItemDefinition D_L00_00262570[];
-extern void func_00294988(int);
-extern HeroItemMoby *func_0029EFD0(int);
-extern void func_00282A60(void *, int, int);
-extern void func_L00_00390938(int);
+extern HeroItemDefinition g_weapon_l00_table[];
+extern void SwitchCachedDiscAsset(int);
+extern HeroItemMoby *CreateMoby(int);
+extern void mem_clear(void *, int, int);
+extern void tether_create_holder(int);
 
 /* calls three measured no-argument functions in sequence */
 /* Runs the three per-frame hero item updates one after another. */
-void func_L00_002AFBC0(void) {
+void hero_update_items_frame(void) {
  update_hero_item_slot_animation_blends();
  update_hero_held_items_and_orientation();
- UpdateHeroStatusIconOverlay();
+ hero_update_status_icon_overlay();
 }
 
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
 #define HERO_ITEMS (&D_00189E20_items)
 
 /* Spawns the mobys for the hero's equipped item slots, releasing disabled slots. */
-void func_L00_002AFBF0(void)
+void SpawnHeroItemMobies(void)
 {
     HeroItemMoby *moby;
     int disabled;
@@ -219,7 +219,7 @@ void func_L00_002AFBF0(void)
         }
         SwitchCachedDiscAsset(ITEM_DEF(id)->object);
         for (i = 0; i < 3; i++) {
-            ClearMemory(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
+            mem_clear(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
             D_0018B9A0[i].joint = -1;
         }
         HERO_ITEMS->slots[0].id = id;
@@ -233,12 +233,12 @@ void func_L00_002AFBF0(void)
             HERO_ITEMS->slots[0].state = 2;
             HERO_ITEMS->slots[0].moby = moby;
             HERO_ITEMS->slots[0].ammoFlag = 0;
-            if (ITEM_DEF(id)->ammo && !gItemAmmoCounts[id])
+            if (ITEM_DEF(id)->ammo && !g_item_ammo_counts[id])
                 HERO_ITEMS->slots[0].ammoFlag = 255;
             if (id == 10) {
                 HERO_ITEMS->slots[0].buttonMask = 128;
                 HERO_ITEMS->slots[0].state = 2;
-                StartAnimationBlended(moby, 1, 0, 1);
+                anim_start_blended(moby, 1, 0, 1);
             } else {
                 HERO_ITEMS->slots[0].buttonMask = 32;
             }
@@ -270,8 +270,8 @@ void func_L00_002AFBF0(void)
             if (HERO_ITEMS->packDisabled)
                 moby->flags |= 0x41;
             if (!HERO_ITEMS->packDisabled && (HERO_ITEMS->slots[3].id == 3 || HERO_ITEMS->slots[3].id == 8)) {
-                CreateTetherHolder(0);
-                CreateTetherHolder(1);
+                tether_create_holder(0);
+                tether_create_holder(1);
             }
         }
     }
@@ -336,7 +336,7 @@ void func_L00_002AFBF0(void)
         }
     }
     if (!HERO_ITEMS->slots[1].moby && !disabled) {
-        if (gFrameCounter_L00[0] < 3)
+        if (g_frame_l00_counter[0] < 3)
             HERO_ITEMS->slots[1].id = D_001A7398[1] = (*(short *)(D_001A7A00 + 0x24));
         else
             HERO_ITEMS->slots[1].id = D_001A7398[1];
@@ -415,7 +415,7 @@ void func_L00_002AFBF0(void)
 
 /* Nested 3x3 sweep over two rows-of-four arrays: sums the results of calling the same routine with the difference of each of the nine element pairs, returns the sum. */
 /* Measures how different two sets of rotation numbers are by adding up the gaps between matching entries. */
-float func_L00_002B0480(Row_F3392e4bc *matrixA, Row_F3392e4bc *matrixB)
+float mat_measure_difference(Row_F3392e4bc *matrixA, Row_F3392e4bc *matrixB)
 {
     float sum = 0.0f;
     int i, j;
@@ -432,7 +432,7 @@ float func_L00_002B0480(Row_F3392e4bc *matrixA, Row_F3392e4bc *matrixB)
 
 /* for one fixed 80-byte slot: stores a value, rewrites a state word, dispatches through a function pointer at entry+100 unless the entry is null or carries a 253/254 sentinel, then releases two stored entry pointers, skipping the second when the slot index is 3 */
 /* Frees one hero item slot: lets the item run its last callback, then removes its game objects. */
-void func_L00_002B1230(int slot, int value)
+void hero_release_item_slot(int slot, int value)
 {
     char *entry;
     void (*callback)(char *);
@@ -498,9 +498,9 @@ typedef struct {
     short b;
 } D00189E20_Overlay;
 
-extern D00189E20_Overlay D_00189E20;
+extern D00189E20_Overlay g_hero_state;
 
-extern void func_002AA2E8(float *, float, float);
+extern void ApproachValue(float *, float, float);
 
 /* The level's own dispatch table: 31 absolute code addresses, five of them (the cases
  * 14, 26, 27, 43 and 44) pointing at the arm that writes the two shorts and the rest at
@@ -511,7 +511,7 @@ extern void *D_L00_002A00A0[31];
  * 0x46 at +0x1FC and 3 at +0x24F4 of the resident block, the other twenty-six and every
  * argument out of the range only return. */
 /* For a few special hero modes, sets a short timer and a state value. Other modes do nothing. */
-void func_L00_002B1308(int mode)
+void hero_start_timed_state_for_mode(int mode)
 {
     /* Keeps the two arms alive: the addresses land in the discarded .data. */
     static void *cases[31] = {
@@ -527,13 +527,13 @@ void func_L00_002B1308(int mode)
         goto ret;
     }
 arm:
-    gHeroState.b = 3;
-    gHeroState.a = 0x46;
+    g_hero_state.b = 3;
+    g_hero_state.a = 0x46;
 ret:
     return;
 }
 
-extern void func_L00_002B1350(int);
+extern void ApplyHeroEquipmentRequest(int);
 /* Read through its macro symbol: the copy reorg puts in a branch delay slot assembles
  * $gp-relative, the one in ordinary flow as lui/lw. */
 extern int D_L00_001B18D8[] __attribute__((sda));
@@ -544,7 +544,7 @@ extern int D_L00_001B18D8[] __attribute__((sda));
  * flagged entry) are reinstalled with the shared value plus 2.  The entry's update
  * callback then runs, except for slot 6, a 253/254 sentinel entry, or slot 0 while the
  * block's word at +0x1500 is set and its mode at +0x1248 is not 10. */
-void func_L00_002B1F90(void)
+void UpdateHeroSlotCallbacks(void)
 {
     int i;
 
@@ -561,12 +561,12 @@ void func_L00_002B1F90(void)
                 ApplyHeroEquipmentRequest(i);
                 if ((entry[0x60] & 2) && entry[0x43] == 0
                     && (*(u8 **)(entry + 0x24))[0xC] >= 2)
-                    StartAnimationBlended(entry, 1, 0, 2);
+                    anim_start_blended(entry, 1, 0, 2);
                 break;
             case 3:
                 ++slot[0x123B];
                 if ((entry[0x60] & 2) || i == 1 || i == 0)
-                    ReleaseHeroItemSlot(i, D_L00_001B18D8[0] + 2);
+                    hero_release_item_slot(i, D_L00_001B18D8[0] + 2);
                 break;
             }
             {
@@ -592,7 +592,7 @@ void func_L00_002B1F90(void)
 
 
 /* Reset the hero update state, install the requested mode and object, and update the mode-one counters. */
-void func_L00_002B2A40(int mode, int value, char *object)
+void SetHeroMode(int mode, int value, char *object)
 {
     char *hero;
     char *currentMoby;
@@ -603,14 +603,14 @@ void func_L00_002B2A40(int mode, int value, char *object)
     hero[0x22B6] = 1;
     UpdateHeroSlotCallbacks();
     *(int *)(hero + 0x2290) = *(int *)(hero + 0xC18);
-    ReleaseSlotList(hero + 0x18E0);
-    ReleaseSlotList(hero + 0x1A30);
+    level_release_slot_list(hero + 0x18E0);
+    level_release_slot_list(hero + 0x1A30);
     currentMoby = *(char **)(hero + 0x2290);
     *(int *)(currentMoby + 0x9C) = -1;
     if (mode != 4 || (unsigned char)hero[0x22B4] != mode)
-        SetHeroObjectsFlagBit();
-    ClearTrackedSlots();
-    ResetAllAttachmentRecords();
+        hero_set_objects_flag_bit();
+    hero_clear_tracked_slots();
+    attachment_reset_all();
     {
         char *heroAlias = (char *)D_00189E20_1;
 
@@ -620,17 +620,17 @@ void func_L00_002B2A40(int mode, int value, char *object)
         if ((unsigned char)mode == 1 && (D_00138320[0] & 0x10) != 0) {
             func_L00_002F6BE0(0x23, 0, D_L00_002F8588,
                              D_L00_002F85D0, D_L00_002F8AD8, 0, 0);
-            RunSlotCallback(3);
+            level_run_slot_callback(3);
         }
         {
             char *heroBlock = (char *)D_00189E20_1;
 
-            UpdateHeroCollisionCapsule();
+            hero_update_collision_capsule();
             *(float *)(heroBlock + 0x250) = *(float *)(heroBlock + 0x258);
             *(float *)(heroBlock + 0x254) = *(float *)(heroBlock + 0x25C);
             *(unsigned short *)(*(char **)(heroBlock + 0x2290) + 0x34) |= 6;
             *(float *)(heroBlock + 0xC24) = *(float *)(heroBlock + 0xC20) = 1.0f;
-            ClearHeroQueuedAnimation();
+            hero_clear_queued_anim();
             func_002A677C(*(char **)(heroBlock + 0x2290));
             *(short *)(heroBlock + 0x24F2) = (short)value;
             if (mode == 1) {
@@ -640,19 +640,19 @@ void func_L00_002B2A40(int mode, int value, char *object)
                 if (newHealth >= 5)
                     *(int *)(heroBlock + 0x24CC) = 4;
             }
-            SetHeroAction_L00(value, 2);
+            hero_l00_set_action(value, 2);
         }
     }
 }
 
 /* Zeroes a 16-byte global block, calls a setup helper, runs a per-slot reset helper over seven 16-byte units of a global table, then clears three word fields of a block 256 bytes below the table base. */
 /* Clears the hero speed values and a group of saved vectors. */
-void func_L00_002B2BD0(void)
+void hero_reset_speeds_and_vectors(void)
 {
     char *block;
 
     *(volatile V4_Fa012328c *)D_00189F30 = 0;
-    ClearHeroSpeeds();
+    hero_clear_speeds();
     block = D_00189F20;
     func_00282C88_4(block);
     func_00282C88_4(block - 16);
@@ -665,20 +665,20 @@ void func_L00_002B2BD0(void)
     *(int *)(block + 420) = 0;
     *(int *)(block + 376) = 0;
     *(int *)(block + 368) = 0;
-    ClearPadPortState();
+    pad_clear_port_state();
 }
 
 
 /* dispatch on the second integer argument: each arm runs a pair of sub-calls passing the first argument twice, the second call also forwarding the float argument */
 /* Flattens a push vector in one of two ways and then sets its strength. */
-void func_L00_002B2C58(int vec, int useAlternate, float unusedScale, float scale)
+void hero_flatten_push_vector(int vec, int useAlternate, float unusedScale, float scale)
 {
     if (useAlternate != 0) {
         func_L00_002D3CF8_1(vec, vec);
         func_L00_002D3C68_1(vec, vec, scale);
     } else {
         func_L00_002D3BD8_1(vec, vec);
-        SetViewSpaceHeight(vec, vec, scale);
+        cam_set_view_space_height(vec, vec, scale);
     }
 }
 
@@ -693,36 +693,36 @@ typedef struct {
     u8 slot;
 } HeroSlotState;
 
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern int D_001A73D8[] __attribute__((sda));
 extern int D_001A73E0[] __attribute__((sda));
 extern int D_0013A148[];
 extern unsigned char D_0019B2E8[][16];
 extern int D_001A24A8[][16];
-extern void func_L00_002F45B8(void);
-extern void func_0027D330(int);
+extern void level_clear_entry_top_bits(void);
+extern void FadeToBlack(int);
 
 /* Bumps the current level's counter and a global total, runs a helper, then for a valid slot at 0x22C6 bumps a
  * per-level per-slot counter (only once the counter at D_L00_001B19C8 reaches 900, or 1800 in modes 0x74 and 0x79,
  * and while the slot's 0x80 flag is clear) and a 16-entry counter; always bumps the per-slot counter, calls
  * func_0027D330(0x10) and sets the byte at 0x22C1. */
 /* Adds one to the play counters for the current level and slot, and marks the hero as having visited. */
-void func_L00_002B30E8(void)
+void hero_record_play_counters(void)
 {
     int threshold;
     int mode;
 
-    D_0013A148[gCurrentMapIndex[0]]++;
+    D_0013A148[g_current_map_index[0]]++;
     D_001A73D8[0]++;
-    ClearEntryTopBits();
+    level_clear_entry_top_bits();
     if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
         mode = ((HeroSlotState *)D_00189E20_1)->mode;
         if (mode == 0x74 || mode == 0x79)
             threshold = 0x708;
         else
             threshold = 0x384;
-        if (gFrameCounter_L00[0] >= threshold) {
-            int level = gCurrentMapIndex[0];
+        if (g_frame_l00_counter[0] >= threshold) {
+            int level = g_current_map_index[0];
             int slot = ((HeroSlotState *)D_00189E20_1)->slot;
             if ((D_0019B2E8[level][slot] & 0x80) == 0)
                 D_001A24A8[level][slot & 0xF]++;
@@ -736,7 +736,7 @@ void func_L00_002B30E8(void)
 
 /* tests the signed short identifier at offset 0xaa of a nonnull object against 71 */
 /* Tells whether a game object exists and is of class 71. */
-s32 func_L00_002B3248(u8 *object) {
+s32 moby_is_class_71(u8 *object) {
  if(object==0) return 0;
  return *(short *)(object+0xaa)==71 /* moby class 71 */;
 }
@@ -747,21 +747,21 @@ extern char D_L00_001B8FF0[];
 
 extern float D_L00_001B8DD8;
 
-extern float func_L00_002B9B38(char *, int);
+extern float hero_get_direction_angle_delta(char *, int);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
-extern float func_00283C80(float, float);
+extern float FastDiffRots(float, float);
 
 /* Checks whether the hero is turned far enough away (at least the given angle) while a button is held. */
-int func_L00_002B3268(float minAngle) {
+int hero_is_turned_past_angle(float minAngle) {
     float angle;
 
     if ((D_00138320[0] & 3) != 0) {
-        if (gHeroState.flag != 0)
-            angle = FloatAbs(GetDirectionAngleDelta(D_L00_001B8FF0, 0));
+        if (g_hero_state.flag != 0)
+            angle = math_fabs(hero_get_direction_angle_delta(D_L00_001B8FF0, 0));
         else
-            angle = FastDiffRots(gHeroState.f98, D_L00_001B8DD8);
+            angle = FastDiffRots(g_hero_state.f98, D_L00_001B8DD8);
         if (angle < minAngle)
             return 0;
         return 1;
@@ -777,19 +777,19 @@ int func_L00_002B3268(float minAngle) {
 
 extern char D_0018BDD0[];
 
-extern float func_00282DF0(char *);
+extern float FastVecLength(char *);
 
 /* Works out how hard the player is pushing the stick, from 0 to 1. */
-float func_L00_002B3900(void) {
-    float absX = FloatAbs(gHeroState.f1FB0);
-    float absY = FloatAbs(gHeroState.f1FB4);
+float hero_get_stick_magnitude(void) {
+    float absX = math_fabs(g_hero_state.f1FB0);
+    float absY = math_fabs(g_hero_state.f1FB4);
     float largest;
     float magnitude;
 
     if (absY < absX)
-        largest = FloatAbs(gHeroState.f1FB0);
+        largest = math_fabs(g_hero_state.f1FB0);
     else
-        largest = FloatAbs(gHeroState.f1FB4);
+        largest = math_fabs(g_hero_state.f1FB4);
     magnitude = (largest + FastVecLength(D_0018BDD0)) * 0.5f;
     if (1.0f < magnitude)
         magnitude = 1.0f;
@@ -798,7 +798,7 @@ float func_L00_002B3900(void) {
 
 /* Test whether a scalar lies below a plane within its configured depth, rejecting unordered values */
 /* Tells whether a value is just below a flat limit, no further than the allowed depth. */
-int func_L00_002B3998(f32 value)
+int math_is_below_plane_within_depth(f32 value)
 {
     GornFloatInterval64 *root = (GornFloatInterval64 *)D_00189E20_1;
     if (value < root->plane) {
@@ -811,15 +811,15 @@ int func_L00_002B3998(f32 value)
 /* clears the two floats at the head of the window block; the second store is the one the
    scheduler parks in the jr delay slot, so it is written second */
 /* Sets the hero target speed and current speed to zero. */
-void func_L00_002B39D8(void)
+void hero_clear_speeds(void)
 {
-    gHeroState.f1B0 = 0.0f;
-    gHeroState.f1B4 = 0.0f;
+    g_hero_state.f1B0 = 0.0f;
+    g_hero_state.f1B4 = 0.0f;
 }
 
 /* builds one 64-byte block from a 3-float vector of the incoming scalars and another from a static table record one element in, combines them, then scales the result again from that record */
 /* Turns the hero matrix by a rotation given as three numbers. */
-void func_L00_002B3DC0(f32 x, f32 y, f32 z) {
+void hero_rotate_matrix(f32 x, f32 y, f32 z) {
     V4_F6b9e759f rotation;
     M4_F6b9e759f rotationMatrix;
     M4_F6b9e759f heroMatrix;
@@ -834,7 +834,7 @@ void func_L00_002B3DC0(f32 x, f32 y, f32 z) {
 
 /* Fills a two-float scratch buffer from one region of a fixed global, passes it with three forwarded floats and an out-parameter to another callee, stores the returned float back into the global, then feeds that out value to a final callee. */
 /* Smoothly turns the hero toward a direction in the special movement mode. */
-void func_L00_002B3E40(int index, float first, float second, float third)
+void hero_steer_heading_special(int index, float first, float second, float third)
 {
     float offsetXY[2];
     char *block = D_00189FB0;
@@ -844,36 +844,36 @@ void func_L00_002B3E40(int index, float first, float second, float third)
     transform_vector(offsetXY, block, block - 336);
     angleToTarget = func_00283248_1(offsetXY[0], offsetXY[1]);
     turnOut = 0.0f;
-    *(float *)(block + 24) = ApproachWithVelocity(&turnOut, angleToTarget, block + 20, first, second, third, index);
+    *(float *)(block + 24) = math_approach_with_velocity(&turnOut, angleToTarget, block + 20, first, second, third, index);
     func_L00_002B3DC0_1(0.0f, 0.0f, turnOut);
 }
 
 /* Smoothly turns the hero toward the wanted direction, using the normal or the special method. */
-void func_L00_002B3EF8(int index, float first, float second, float third) {
-    if (gHeroState.flag != 0)
-        SteerHeroHeadingSpecialMode(index, first, second, third);
+void hero_steer_heading(int index, float first, float second, float third) {
+    if (g_hero_state.flag != 0)
+        hero_steer_heading_special(index, first, second, third);
     else
-        gHeroState.f1A8 = ApproachWithVelocity(&gHeroState.f98, gHeroState.f1A0, (char *)&gHeroState.f1A4, first, second, third, index);
+        g_hero_state.f1A8 = math_approach_with_velocity(&g_hero_state.f98, g_hero_state.f1A0, (char *)&g_hero_state.f1A4, first, second, third, index);
 }
 
 
 /* func_L00_002B3F68 is in L00_002B3F68.c. */
 
 /* Moves the hero current speed toward the wanted speed, faster when speeding up than when slowing down. */
-void func_L00_002B41B8(float riseRate, float fallRate) {
-    if (gHeroState.f1B4 < gHeroState.f1B0)
-        ApproachValue(&gHeroState.f1B4, gHeroState.f1B0, riseRate);
+void hero_approach_speed(float riseRate, float fallRate) {
+    if (g_hero_state.f1B4 < g_hero_state.f1B0)
+        ApproachValue(&g_hero_state.f1B4, g_hero_state.f1B0, riseRate);
     else
-        ApproachValue(&gHeroState.f1B4, gHeroState.f1B0, fallRate);
+        ApproachValue(&g_hero_state.f1B4, g_hero_state.f1B0, fallRate);
 }
 
 
 extern char D_00189F10[];
 
-extern void func_00282F20(char *, void *, float);
+extern void vec_scale_to_length(char *, void *, float);
 
 /* Copies a direction into the hero push vector and gives it the stored push length. */
-void func_L00_002B42D8(void *direction) {
+void hero_set_push_direction(void *direction) {
     vec_scale_to_length(D_00189F10, direction, *(float *)(D_00189F10 + 0xC4));
 }
 
@@ -885,22 +885,22 @@ void func_L00_002B42D8(void *direction) {
 
 /* func_L00_002B5250 is in L00_002AFBC0-snap.c. */
 
-extern void func_002AF000(char *, float, float, float);
+extern void vec_build_spherical_offset(char *, float, float, float);
 
-extern void func_00282D30(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
 
-extern void func_00282C88(char *);
+extern void vec_clear_128(char *);
 
 /* Builds the hero movement push from the stick values and shrinks it, or clears it when it is very small. */
-void func_L00_002B54F8(float scale, float deadZone) {
-    char *impulse = (char *)&gHeroState + 0xA60;
+void hero_build_move_impulse(float scale, float deadZone) {
+    char *impulse = (char *)&g_hero_state + 0xA60;
     float length;
 
-    BuildSphericalOffset(impulse, gHeroState.fA70, gHeroState.fA78, gHeroState.fA74);
+    vec_build_spherical_offset(impulse, g_hero_state.fA70, g_hero_state.fA78, g_hero_state.fA74);
     FastVecScale(impulse, impulse, scale);
     length = FastVecLength(impulse);
     if (length <= deadZone)
-        ClearVector128(impulse);
+        vec_clear_128(impulse);
     else
         vec_scale_to_length(impulse, impulse, length - deadZone);
 }
@@ -912,7 +912,7 @@ void func_L00_002B54F8(float scale, float deadZone) {
 
 /* scales four 16-byte records of a static table in place by a scalar, then multiplies one float field of a later record by the same scalar */
 /* Scales a few saved hero vectors by the same amount. */
-void func_L00_002B6118(f32 scale) {
+void hero_scale_saved_vectors(f32 scale) {
     V4S_F31e44309 *vectors = &D_00189E20_10[17];
     func_00282D30_6(vectors, vectors, scale);
     func_00282D30_6(vectors + 1, vectors + 1, scale);

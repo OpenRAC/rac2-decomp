@@ -3,28 +3,28 @@
 /* func_PAL_L00_002B6B38, the PAL copy of func_L00_002B6BC8: the same C, where speeds become x6/5,
    accelerations x36/25 and frame counts x5/6 for 50 Hz. */
 
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(float *, float *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283BE0(float, float);
-extern float func_00283C80(float, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00278E78(void);
-extern float func_002AA2E8(float *, float, float);
-extern void func_L00_002AA0F0(float, float, float);
-extern void func_L00_002B39F0(int, float);
-extern void func_L00_002B3EF8(int, float, float, float);
-extern void func_L00_002B41B8(float, float);
-extern void func_L00_002B47A8(void *, void *, int, float, float);
-extern void func_L00_002B54F8(float, float);
-extern void func_L00_002B6198(float);
-extern void func_L00_002D3798(void *, void *, float);
-extern float func_L00_002D3A58(void *);
-extern void func_L00_002D3B58(void *, void *, float);
-extern void func_L00_002D3BD8(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(float *, float *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float fast_subtract_rotations(float, float);
+extern float FastDiffRots(float, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern float ApproachValue(float *, float, float);
+extern void hero_start_pose_offset(float, float, float);
+extern void hero_resolve_stick_direction(int, float);
+extern void hero_steer_heading(int, float, float, float);
+extern void hero_approach_speed(float, float);
+extern void BuildOffsetVectorPair(void *, void *, int, float, float);
+extern void hero_build_move_impulse(float, float);
+extern void ApproachHeroVelocity(float);
+extern void cam_offset_point_by_side_direction(void *, void *, float);
+extern float cam_get_view_space_vector_length(void *);
+extern void cam_set_view_space_height(void *, void *, float);
+extern void cam_set_view_space_vector_length(void *, void *, float);
 extern int D_001A8FF0 MACRO_ADDR;
 extern float D_001A7DC0 MACRO_ADDR;
 extern unsigned char D_L00_001B8C80[];
@@ -115,185 +115,185 @@ typedef struct {
     HopVector direction;
 } HopSavedState;
 
-extern f32 func_002AA898(f32 *position, f32 target, f32 *velocity,
+extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
-extern int D_00189E20;
+extern int g_hero_state;
 
 /* Per-state airborne steering; shares the hop-velocity state cases with
    rac1-decomp's hero_update_hop_velocity. */
 void func_PAL_L00_002B6B38(void) {
     float probe_start[4], probe_end[4], yaw, speed, rate;
 
-    if ((*(HopPlayer *)&D_00189E20).state == 10) {
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
-        (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
-    } else if ((*(HopPlayer *)&D_00189E20).state == 16) {
-        if ((*(HopPlayer *)&D_00189E20).state_timer >= 46) {
-            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).jump_gravity, 0.010000001f, 0.0028000001f);
+    if ((*(HopPlayer *)&g_hero_state).state == 10) {
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy((*(HopPlayer *)&g_hero_state).momentum.f, (*(HopPlayer *)&g_hero_state).move_impulse.f);
+        (*(HopPlayer *)&g_hero_state).ground_speed = (*(HopPlayer *)&g_hero_state).flat_speed;
+    } else if ((*(HopPlayer *)&g_hero_state).state == 16) {
+        if ((*(HopPlayer *)&g_hero_state).state_timer >= 46) {
+            ApproachValue(&(*(HopPlayer *)&g_hero_state).jump_gravity, 0.010000001f, 0.0028000001f);
         }
-        if ((*(HopPlayer *)&D_00189E20).state_timer < 46) {
-            (*(HopPlayer *)&D_00189E20).target_speed = (*(HopPlayer *)&D_00189E20).field454;
+        if ((*(HopPlayer *)&g_hero_state).state_timer < 46) {
+            (*(HopPlayer *)&g_hero_state).target_speed = (*(HopPlayer *)&g_hero_state).field454;
         } else {
-            (*(HopPlayer *)&D_00189E20).target_speed = 0.07000001f;
+            (*(HopPlayer *)&g_hero_state).target_speed = 0.07000001f;
         }
-        func_L00_002B41B8(0.0176f, 0.018000001f);
-        func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
-        func_L00_002D3798((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).ground_speed);
-    } else if ((*(HopPlayer *)&D_00189E20).state == 27) {
-        if ((*(HopPlayer *)&D_00189E20).state_timer >= 34) {
-            func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.30019668f);
-            func_L00_002B6198(0.008f);
+        hero_approach_speed(0.0176f, 0.018000001f);
+        cam_set_view_space_vector_length((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, 0.0f);
+        cam_offset_point_by_side_direction((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).ground_speed);
+    } else if ((*(HopPlayer *)&g_hero_state).state == 27) {
+        if ((*(HopPlayer *)&g_hero_state).state_timer >= 34) {
+            hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.30019668f);
+            ApproachHeroVelocity(0.008f);
         }
-        if ((*(HopPlayer *)&D_00189E20).anim_frame >= 13.0f && (*(HopPlayer *)&D_00189E20).anim_frame <= 30.0f) {
-            if ((*(HopPlayer *)&D_00189E20).anim_frame > 27.0f) {
-                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.0f, 0.0032000002f);
+        if ((*(HopPlayer *)&g_hero_state).anim_frame >= 13.0f && (*(HopPlayer *)&g_hero_state).anim_frame <= 30.0f) {
+            if ((*(HopPlayer *)&g_hero_state).anim_frame > 27.0f) {
+                ApproachValue(&(*(HopPlayer *)&g_hero_state).ledge_jump_speed, 0.0f, 0.0032000002f);
             } else {
-                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.040000003f, 0.0032000002f);
+                ApproachValue(&(*(HopPlayer *)&g_hero_state).ledge_jump_speed, 0.040000003f, 0.0032000002f);
             }
         }
         probe_start[1] = 0.0f;
-        probe_start[0] = (*(HopPlayer *)&D_00189E20).ledge_jump_speed;
-        probe_start[2] = func_00282DB0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).field20.f);
-        func_00283098((*(HopPlayer *)&D_00189E20).velocity.f, probe_start, &(*(HopPlayer *)&D_00189E20));
-    } else if ((*(HopPlayer *)&D_00189E20).state == 72) {
-        if ((*(HopPlayer *)&D_00189E20).anim_frame >= 5.0f && (*(HopPlayer *)&D_00189E20).anim_frame <= 18.0f) {
-            if ((*(HopPlayer *)&D_00189E20).anim_frame > 15.0f) {
-                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.0f, 0.0032000002f);
+        probe_start[0] = (*(HopPlayer *)&g_hero_state).ledge_jump_speed;
+        probe_start[2] = FastVecDot((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).field20.f);
+        matrix_mul_vec3((*(HopPlayer *)&g_hero_state).velocity.f, probe_start, &(*(HopPlayer *)&g_hero_state));
+    } else if ((*(HopPlayer *)&g_hero_state).state == 72) {
+        if ((*(HopPlayer *)&g_hero_state).anim_frame >= 5.0f && (*(HopPlayer *)&g_hero_state).anim_frame <= 18.0f) {
+            if ((*(HopPlayer *)&g_hero_state).anim_frame > 15.0f) {
+                ApproachValue(&(*(HopPlayer *)&g_hero_state).ledge_jump_speed, 0.0f, 0.0032000002f);
             } else {
-                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.025000002f, 0.0032000002f);
+                ApproachValue(&(*(HopPlayer *)&g_hero_state).ledge_jump_speed, 0.025000002f, 0.0032000002f);
             }
         }
         probe_start[1] = 0.0f;
-        probe_start[0] = (*(HopPlayer *)&D_00189E20).ledge_jump_speed;
-        probe_start[2] = func_00282DB0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).field20.f);
-        func_00283098((*(HopPlayer *)&D_00189E20).velocity.f, probe_start, &(*(HopPlayer *)&D_00189E20));
-    } else if ((*(HopPlayer *)&D_00189E20).state == 11) {
-        (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopPlayer *)&D_00189E20).takeoff_yaw;
-        qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field480.f);
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.13962635f);
-        if ((*(HopPlayer *)&D_00189E20).field4D4 != 3) {
-            (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).air_target_speed;
+        probe_start[0] = (*(HopPlayer *)&g_hero_state).ledge_jump_speed;
+        probe_start[2] = FastVecDot((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).field20.f);
+        matrix_mul_vec3((*(HopPlayer *)&g_hero_state).velocity.f, probe_start, &(*(HopPlayer *)&g_hero_state));
+    } else if ((*(HopPlayer *)&g_hero_state).state == 11) {
+        (*(HopPlayer *)&g_hero_state).move_yaw = (*(HopPlayer *)&g_hero_state).takeoff_yaw;
+        qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopPlayer *)&g_hero_state).field480.f);
+        hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.13962635f);
+        if ((*(HopPlayer *)&g_hero_state).field4D4 != 3) {
+            (*(HopPlayer *)&g_hero_state).ground_speed = (*(HopPlayer *)&g_hero_state).air_target_speed;
         } else {
-            (*(HopPlayer *)&D_00189E20).ground_speed = 0.0f;
+            (*(HopPlayer *)&g_hero_state).ground_speed = 0.0f;
         }
-        if ((*(HopPlayer *)&D_00189E20).field52D) {
-            float drift = (*(HopPlayer *)&D_00189E20).stick_magnitude * 0.10000001f;
+        if ((*(HopPlayer *)&g_hero_state).field52D) {
+            float drift = (*(HopPlayer *)&g_hero_state).stick_magnitude * 0.10000001f;
 
             if (drift < 0.040000003f) drift = 0.040000003f;
-            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, drift, 0.014800001f);
-            (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
-        } else if ((*(HopPlayer *)&D_00189E20).field49E && (*(HopPlayer *)&D_00189E20).field4AE < 10) {
-            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, 0.0f, 0.0032000002f);
+            ApproachValue(&(*(HopPlayer *)&g_hero_state).high_jump_drift_speed, drift, 0.014800001f);
+            (*(HopPlayer *)&g_hero_state).ground_speed = (*(HopPlayer *)&g_hero_state).flat_speed;
+        } else if ((*(HopPlayer *)&g_hero_state).field49E && (*(HopPlayer *)&g_hero_state).field4AE < 10) {
+            ApproachValue(&(*(HopPlayer *)&g_hero_state).high_jump_drift_speed, 0.0f, 0.0032000002f);
         } else {
-            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, 0.084f, 0.0032000002f);
+            ApproachValue(&(*(HopPlayer *)&g_hero_state).high_jump_drift_speed, 0.084f, 0.0032000002f);
         }
-        if (!(*(HopPlayer *)&D_00189E20).field22C3) {
-            (*(HopPlayer *)&D_00189E20).velocity.f[0] = func_00283180((*(HopPlayer *)&D_00189E20).high_jump_drift_yaw) * (*(HopPlayer *)&D_00189E20).high_jump_drift_speed;
-            (*(HopPlayer *)&D_00189E20).velocity.f[1] = func_00283198((*(HopPlayer *)&D_00189E20).high_jump_drift_yaw) * (*(HopPlayer *)&D_00189E20).high_jump_drift_speed;
+        if (!(*(HopPlayer *)&g_hero_state).field22C3) {
+            (*(HopPlayer *)&g_hero_state).velocity.f[0] = math_fast_sin_or_cos_a((*(HopPlayer *)&g_hero_state).high_jump_drift_yaw) * (*(HopPlayer *)&g_hero_state).high_jump_drift_speed;
+            (*(HopPlayer *)&g_hero_state).velocity.f[1] = math_fast_sin_or_cos_b((*(HopPlayer *)&g_hero_state).high_jump_drift_yaw) * (*(HopPlayer *)&g_hero_state).high_jump_drift_speed;
         } else {
-            func_L00_002D3BD8(probe_start, (*(HopPlayer *)&D_00189E20).field470.f, (*(HopPlayer *)&D_00189E20).high_jump_drift_speed);
-            func_L00_002D3B58(probe_start, probe_start, 0.0f);
-            func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
-            func_00282CC0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, probe_start);
+            cam_set_view_space_vector_length(probe_start, (*(HopPlayer *)&g_hero_state).field470.f, (*(HopPlayer *)&g_hero_state).high_jump_drift_speed);
+            cam_set_view_space_height(probe_start, probe_start, 0.0f);
+            cam_set_view_space_vector_length((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, 0.0f);
+            FastVecAdd((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, probe_start);
         }
-        if (!(*(HopPlayer *)&D_00189E20).field22C3 && !(*(HopPlayer *)&D_00189E20).field52D) {
-            float drift = (*(HopPlayer *)&D_00189E20).air_target_speed * func_00283198(func_00283C80((*(HopPlayer *)&D_00189E20).takeoff_yaw, (*(HopPlayer *)&D_00189E20).high_jump_drift_yaw));
+        if (!(*(HopPlayer *)&g_hero_state).field22C3 && !(*(HopPlayer *)&g_hero_state).field52D) {
+            float drift = (*(HopPlayer *)&g_hero_state).air_target_speed * math_fast_sin_or_cos_b(FastDiffRots((*(HopPlayer *)&g_hero_state).takeoff_yaw, (*(HopPlayer *)&g_hero_state).high_jump_drift_yaw));
 
-            (*(HopPlayer *)&D_00189E20).velocity.f[0] += func_00283180((*(HopPlayer *)&D_00189E20).takeoff_yaw) * drift;
-            (*(HopPlayer *)&D_00189E20).velocity.f[1] += func_00283198((*(HopPlayer *)&D_00189E20).takeoff_yaw) * drift;
+            (*(HopPlayer *)&g_hero_state).velocity.f[0] += math_fast_sin_or_cos_a((*(HopPlayer *)&g_hero_state).takeoff_yaw) * drift;
+            (*(HopPlayer *)&g_hero_state).velocity.f[1] += math_fast_sin_or_cos_b((*(HopPlayer *)&g_hero_state).takeoff_yaw) * drift;
         }
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
-    } else if ((*(HopPlayer *)&D_00189E20).state == 17) {
-        (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopPlayer *)&D_00189E20).field4F0.f[3];
-        qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field4F0.f);
-        if ((*(HopPlayer *)&D_00189E20).state_timer >= 8) {
-            func_L00_002B3EF8(-1, 0.060480002f, 0.28800002f, 0.23736483f);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy((*(HopPlayer *)&g_hero_state).momentum.f, (*(HopPlayer *)&g_hero_state).move_impulse.f);
+    } else if ((*(HopPlayer *)&g_hero_state).state == 17) {
+        (*(HopPlayer *)&g_hero_state).move_yaw = (*(HopPlayer *)&g_hero_state).field4F0.f[3];
+        qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopPlayer *)&g_hero_state).field4F0.f);
+        if ((*(HopPlayer *)&g_hero_state).state_timer >= 8) {
+            hero_steer_heading(-1, 0.060480002f, 0.28800002f, 0.23736483f);
         }
-        if ((*(HopPlayer *)&D_00189E20).state_timer >= 7) {
-            if (!(*(HopPlayer *)&D_00189E20).field348) {
-                (*(HopPlayer *)&D_00189E20).velocity.f[0] = func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.09800001f;
-                (*(HopPlayer *)&D_00189E20).velocity.f[1] = func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.09800001f;
+        if ((*(HopPlayer *)&g_hero_state).state_timer >= 7) {
+            if (!(*(HopPlayer *)&g_hero_state).field348) {
+                (*(HopPlayer *)&g_hero_state).velocity.f[0] = math_fast_sin_or_cos_a((*(HopPlayer *)&g_hero_state).move_yaw) * 0.09800001f;
+                (*(HopPlayer *)&g_hero_state).velocity.f[1] = math_fast_sin_or_cos_b((*(HopPlayer *)&g_hero_state).move_yaw) * 0.09800001f;
             } else {
-                func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
-                func_00282F20(probe_start, (*(HopPlayer *)&D_00189E20).move_dir.f, 0.09800001f);
-                func_00282CC0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, probe_start);
+                cam_set_view_space_vector_length((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, 0.0f);
+                vec_scale_to_length(probe_start, (*(HopPlayer *)&g_hero_state).move_dir.f, 0.09800001f);
+                FastVecAdd((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, probe_start);
             }
         }
-        (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
-    } else if ((*(HopPlayer *)&D_00189E20).state == 0x81 && !D_001A8FF0) {
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&D_00189E20).field494);
-        (*(HopPlayer *)&D_00189E20).ground_speed = 0.0f;
+        (*(HopPlayer *)&g_hero_state).ground_speed = (*(HopPlayer *)&g_hero_state).flat_speed;
+    } else if ((*(HopPlayer *)&g_hero_state).state == 0x81 && !D_001A8FF0) {
+        hero_steer_heading(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&g_hero_state).field494);
+        (*(HopPlayer *)&g_hero_state).ground_speed = 0.0f;
     } else {
-        if ((*(HopPlayer *)&D_00189E20).state == 44) {
-            yaw = (*(HopPlayer *)&D_00189E20).yaw;
-            (*(HopPlayer *)&D_00189E20).yaw_error = func_002AA898(&yaw, (*(HopPlayer *)&D_00189E20).move_yaw, &(*(HopPlayer *)&D_00189E20).yaw_rate,
+        if ((*(HopPlayer *)&g_hero_state).state == 44) {
+            yaw = (*(HopPlayer *)&g_hero_state).yaw;
+            (*(HopPlayer *)&g_hero_state).yaw_error = math_approach_with_velocity(&yaw, (*(HopPlayer *)&g_hero_state).move_yaw, &(*(HopPlayer *)&g_hero_state).yaw_rate,
                                       0.02592f, 0.28800002f, 0.14660768f, 0);
             {
-                float delta = func_00283BE0(yaw, (*(HopPlayer *)&D_00189E20).yaw);
+                float delta = fast_subtract_rotations(yaw, (*(HopPlayer *)&g_hero_state).yaw);
 
-                func_L00_002AA0F0(0.0f, 0.0f, delta);
+                hero_start_pose_offset(0.0f, 0.0f, delta);
             }
         } else {
-            float saved = (*(HopPlayer *)&D_00189E20).move_yaw;
+            float saved = (*(HopPlayer *)&g_hero_state).move_yaw;
 
-            qcopy(probe_start, (*(HopPlayer *)&D_00189E20).move_dir.f);
-            if ((*(HopPlayer *)&D_00189E20).field1454) {
-                (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopSavedState *)D_L00_001B8C80).yaw;
-                qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopSavedState *)D_L00_001B8C80).direction.f);
+            qcopy(probe_start, (*(HopPlayer *)&g_hero_state).move_dir.f);
+            if ((*(HopPlayer *)&g_hero_state).field1454) {
+                (*(HopPlayer *)&g_hero_state).move_yaw = (*(HopSavedState *)D_L00_001B8C80).yaw;
+                qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopSavedState *)D_L00_001B8C80).direction.f);
             }
-            func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&D_00189E20).field494);
-            if ((*(HopPlayer *)&D_00189E20).field1454) {
-                (*(HopPlayer *)&D_00189E20).field1458 = saved;
-                qcopy((*(HopPlayer *)&D_00189E20).field1440.f, probe_start);
-                (*(HopPlayer *)&D_00189E20).move_yaw = saved;
-                qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field1440.f);
+            hero_steer_heading(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&g_hero_state).field494);
+            if ((*(HopPlayer *)&g_hero_state).field1454) {
+                (*(HopPlayer *)&g_hero_state).field1458 = saved;
+                qcopy((*(HopPlayer *)&g_hero_state).field1440.f, probe_start);
+                (*(HopPlayer *)&g_hero_state).move_yaw = saved;
+                qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopPlayer *)&g_hero_state).field1440.f);
             }
         }
-        func_L00_002B54F8(0.7f, 0.0f);
-        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
+        hero_build_move_impulse(0.7f, 0.0f);
+        qcopy((*(HopPlayer *)&g_hero_state).momentum.f, (*(HopPlayer *)&g_hero_state).move_impulse.f);
         rate = 0.008f;
-        if ((*(HopPlayer *)&D_00189E20).target_speed < D_001A7DC0 * 0.004f) {
-            if ((*(HopPlayer *)&D_00189E20).control_mode == 2) {
-                float decel = (*(HopPlayer *)&D_00189E20).fieldA84;
+        if ((*(HopPlayer *)&g_hero_state).target_speed < D_001A7DC0 * 0.004f) {
+            if ((*(HopPlayer *)&g_hero_state).control_mode == 2) {
+                float decel = (*(HopPlayer *)&g_hero_state).fieldA84;
 
-                if ((*(HopPlayer *)&D_00189E20).field1492) decel = 6.8e-05f;
-                speed = func_L00_002D3A58((*(HopPlayer *)&D_00189E20).velocity.f);
-                func_002AA2E8(&speed, 0.0f, decel);
-                func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, speed);
+                if ((*(HopPlayer *)&g_hero_state).field1492) decel = 6.8e-05f;
+                speed = cam_get_view_space_vector_length((*(HopPlayer *)&g_hero_state).velocity.f);
+                ApproachValue(&speed, 0.0f, decel);
+                cam_set_view_space_vector_length((*(HopPlayer *)&g_hero_state).velocity.f, (*(HopPlayer *)&g_hero_state).velocity.f, speed);
                 return;
             }
-            if ((*(HopPlayer *)&D_00189E20).field34A) {
+            if ((*(HopPlayer *)&g_hero_state).field34A) {
                 rate = 0.0044f;
-            } else if ((*(HopPlayer *)&D_00189E20).field524) {
+            } else if ((*(HopPlayer *)&g_hero_state).field524) {
                 rate = 0.00080000004f;
             } else {
                 rate = 0.0032000002f;
             }
         }
-        if ((*(HopPlayer *)&D_00189E20).field528 && (*(HopPlayer *)&D_00189E20).field1492) {
+        if ((*(HopPlayer *)&g_hero_state).field528 && (*(HopPlayer *)&g_hero_state).field1492) {
             rate = 0.00020000001f;
-            if ((*(HopPlayer *)&D_00189E20).stick_magnitude > 0.9f) {
-                func_L00_002B47A8(probe_start, probe_end, 0, 0.5f, -1.5f);
-                probe_start[0] += func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
-                probe_start[1] += func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
-                probe_end[0] += func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
-                probe_end[1] += func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
-                if (func_002761F8(probe_start, probe_end, 2, 0, 0) && func_00278E78() != 7) {
-                    (*(HopPlayer *)&D_00189E20).target_speed = 0.10000001f;
+            if ((*(HopPlayer *)&g_hero_state).stick_magnitude > 0.9f) {
+                BuildOffsetVectorPair(probe_start, probe_end, 0, 0.5f, -1.5f);
+                probe_start[0] += math_fast_sin_or_cos_a((*(HopPlayer *)&g_hero_state).move_yaw) * 0.7f;
+                probe_start[1] += math_fast_sin_or_cos_b((*(HopPlayer *)&g_hero_state).move_yaw) * 0.7f;
+                probe_end[0] += math_fast_sin_or_cos_a((*(HopPlayer *)&g_hero_state).move_yaw) * 0.7f;
+                probe_end[1] += math_fast_sin_or_cos_b((*(HopPlayer *)&g_hero_state).move_yaw) * 0.7f;
+                if (CollLine(probe_start, probe_end, 2, 0, 0) && GetCollHitMaterial() != 7) {
+                    (*(HopPlayer *)&g_hero_state).target_speed = 0.10000001f;
                     rate = 0.004f;
                 }
             }
-            if ((*(HopPlayer *)&D_00189E20).state == 15) {
-                func_L00_002B39F0(0, 0.050000004f);
+            if ((*(HopPlayer *)&g_hero_state).state == 15) {
+                hero_resolve_stick_direction(0, 0.050000004f);
                 rate = 0.0012f;
             }
-            if ((*(HopPlayer *)&D_00189E20).field320 > 0.2617994248867035f) {
-                (*(HopPlayer *)&D_00189E20).target_speed = 0.0f;
-                rate = (*(HopPlayer *)&D_00189E20).field320 * 0.004583662f;
+            if ((*(HopPlayer *)&g_hero_state).field320 > 0.2617994248867035f) {
+                (*(HopPlayer *)&g_hero_state).target_speed = 0.0f;
+                rate = (*(HopPlayer *)&g_hero_state).field320 * 0.004583662f;
             }
         }
-        func_L00_002B6198(rate);
+        ApproachHeroVelocity(rate);
     }
 }

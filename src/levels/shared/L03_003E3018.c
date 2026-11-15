@@ -25,18 +25,18 @@ extern Vec4 D_L03_001B9BB0[3];
    pairs), which cc1 emits for an sda symbol. */
 extern Vec4 D_L03_001B36B0 __attribute__((sda));
 extern Vec4 D_L03_001B36C0 __attribute__((sda));
-extern void func_00283098(void *, void *, void *);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282DD8(void *, void *, void *);
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_00282DF0(void *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00283958(void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_002837D0(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecScale(void *, void *, f32);
+extern void FastVecCross(void *, void *, void *);
+extern f32 FastVecDot(void *, void *);
+extern f32 FastVecLength(void *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void quaternion_to_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void multiply_quaternions(void *, void *, void *);
 
 /* Works out the orientation the puzzle turns to: the turn that brings its current node onto
    the negated first row of the basis D_L03_001B9BB0, then the roll about that row that
@@ -44,7 +44,7 @@ extern void func_002837D0(void *, void *, void *);
    furthest along the basis's third row). Both turns are composed onto the orientation
    D_L03_001B36B0 into D_L03_001B36C0; the matrix at +0xC0, turned for the tests, is rebuilt
    from D_L03_001B36B0. */
-void func_L03_003E3018(u8 *moby) {
+void ComputePathPuzzleTurn(u8 *moby) {
     f32 matrix[12];
     Vec4 neg, v, axis, turn, test;
     PuzzlePath *pathState = *(PuzzlePath **)(moby + 0x68);
@@ -57,9 +57,9 @@ void func_L03_003E3018(u8 *moby) {
     best = angle;
     FastVecCross(&axis, &v, &neg);
     axis.w = FastVecDot(&v, &neg);
-    angle = FastMatrixHelperA(axis.w, FastVecLength(&axis)) * 0.5f;
-    vec_scale_to_length(&axis, &axis, FastSinOrCosB(angle));
-    axis.w = FastSinOrCosA(angle);
+    angle = mat_fast_helper_a(axis.w, FastVecLength(&axis)) * 0.5f;
+    vec_scale_to_length(&axis, &axis, math_fast_sin_or_cos_b(angle));
+    axis.w = math_fast_sin_or_cos_a(angle);
     quaternion_to_rotation_basis(&axis, matrix);
     multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
 
@@ -72,7 +72,7 @@ void func_L03_003E3018(u8 *moby) {
                 x = FastVecDot(&test, &D_L03_001B9BB0[2]);
                 y = FastVecDot(&test, &D_L03_001B9BB0[1]);
                 if (x > best) {
-                    FastMatrixHelperA(x, y);
+                    mat_fast_helper_a(x, y);
                     best = x;
                     pathState->facing[pathState->length] = n;
                 }
@@ -83,9 +83,9 @@ void func_L03_003E3018(u8 *moby) {
     matrix_mul_vec3(&test, &D_L03_0029BBF0[pathState->facing[pathState->length]], moby + 0xC0);
     x = FastVecDot(&test, &D_L03_001B9BB0[2]);
     y = FastVecDot(&test, &D_L03_001B9BB0[1]);
-    angle = FastMatrixHelperA(x, y) * 0.5f;
-    vec_scale_to_length(&turn, &neg, FastSinOrCosB(angle));
-    turn.w = FastSinOrCosA(angle);
+    angle = mat_fast_helper_a(x, y) * 0.5f;
+    vec_scale_to_length(&turn, &neg, math_fast_sin_or_cos_b(angle));
+    turn.w = math_fast_sin_or_cos_a(angle);
     multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36B0, &axis);
     multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36C0, &turn);
     quaternion_to_rotation_basis(&D_L03_001B36B0, moby + 0xC0);

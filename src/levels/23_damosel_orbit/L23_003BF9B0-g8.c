@@ -139,34 +139,34 @@ extern s32 D_L23_001B36AC;
 
 extern s32 D_L23_001B36F0;
 
-extern u8 D_L23_001BA640[];
+extern u8 g_camera_l23_position[];
 
-extern Moby_003BF9B0 *func_0029EFD0(s32);
+extern Moby_003BF9B0 *CreateMoby(s32);
 
-extern void func_00283360(void *);
+extern void set_identity_rotation_rows(void *);
 
-extern void func_L23_003C0028(Moby_003BF9B0 *);
+extern void moby_reset_idle_clear_links(Moby_003BF9B0 *);
 
-extern s32 func_00283CF0(f32);
+extern s32 FloatToInt(f32);
 
-extern void func_L23_003C1B58(Moby_003BF9B0 *);
+extern void enemy_relocate_near_hero(Moby_003BF9B0 *);
 
-extern void func_002B60B0(Moby_003BF9B0 *, f32, f32, f32, f32);
+extern void moby_set_controller_speed_limits(Moby_003BF9B0 *, f32, f32, f32, f32);
 
-extern f32 func_00282E48(void *, void *);
+extern f32 fast_vec_dist(void *, void *);
 
-extern void func_002A93B0(Moby_003BF9B0 *);
+extern void moby_update_ground_check(Moby_003BF9B0 *);
 
-extern Found_003BF9B0 *func_002A9640(Moby_003BF9B0 *, s32, s32);
+extern Found_003BF9B0 *part_find_owned_effect_slot(Moby_003BF9B0 *, s32, s32);
 
-extern void func_002B0ED8(Moby_003BF9B0 *, void *, s32);
+extern void moby_apply_damage_to_object(Moby_003BF9B0 *, void *, s32);
 
-extern void func_002AFFD8(void *, void *, s32);
+extern void cam_compute_view_direction(void *, void *, s32);
 
-extern void func_L00_00325600(void *, void *, s32);
+extern void vec_negate_and_forward(void *, void *, s32);
 
 /* Sets up this flying enemy on its first frame (stats, speeds, a helper object), then each frame scales it, keeps its helper object in step and checks if it should die near the boss spot. */
-void func_L23_003BF9B0(Moby_003BF9B0 *moby)
+void flying_enemy_init_and_update(Moby_003BF9B0 *moby)
 {
     State_003BF9B0 *vars = moby->pVars;
     f32 sizeFactor;
@@ -229,18 +229,18 @@ void func_L23_003BF9B0(Moby_003BF9B0 *moby)
         vars->child = CreateMoby(0x7E6 /* moby class 2022 */);
         set_identity_rotation_rows(vars->child->fC0);
         vars->f258 = 0;
-        ResetObjectToIdle(moby);
+        moby_reset_idle_clear_links(moby);
         vars->f48 = FloatToInt(12.0f);
         vars->f4A = FloatToInt(14.4f);
     } else if (ref_L23_003BF9B0_00 != 0 && D_L23_001B1424 == 0) {
         if (D_L23_001B36AC < 10)
-            RelocateEnemyNearHero(moby);
+            enemy_relocate_near_hero(moby);
         else
             D_L23_001B1650 = 0;
     }
     if (moby->state == 13)
         return;
-    SetControllerSpeedLimits(moby, 0.0044444446f, 0.13333334f, 0.0017453295f, 0.20943955f);
+    moby_set_controller_speed_limits(moby, 0.0044444446f, 0.13333334f, 0.0017453295f, 0.20943955f);
     sizeFactor = 1.4f;
     if (moby->state == 2)
         sizeFactor = 0.7f;
@@ -252,24 +252,24 @@ void func_L23_003BF9B0(Moby_003BF9B0 *moby)
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
         vars->child->scale = vars->child->pClass->scale * sizeFactor;
-        if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, gCameraPosition_L23) < 24.0f) {
-            UpdateMobyGroundCheck(vars->child);
+        if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, g_camera_l23_position) < 24.0f) {
+            moby_update_ground_check(vars->child);
             vars->child->f6F = 22;
         }
     }
-    if (moby->f31 != 0 && fast_vec_dist(moby->pos, gCameraPosition_L23) < 24.0f) {
-        UpdateMobyGroundCheck(moby);
+    if (moby->f31 != 0 && fast_vec_dist(moby->pos, g_camera_l23_position) < 24.0f) {
+        moby_update_ground_check(moby);
         moby->f6F = 22;
     }
     {
-        Found_003BF9B0 *found = FindOwnedEffectSlot(moby, 0x30000, 1);
+        Found_003BF9B0 *found = part_find_owned_effect_slot(moby, 0x30000, 1);
 
         if (found != 0 && found->info != 0 && found->info->fAA == 0x1190 /* moby class 4496 */)
             vars->f20 = 0;
     }
     if (moby->state == 2)
         vars->f178 = 0;
-    ApplyDamageToObject(moby, vars->f140, 0);
-    ComputeViewDirection(moby->pos, vars->f280, 0);
-    NegateAndForwardVector(moby->fC0, vars->f280, 0);
+    moby_apply_damage_to_object(moby, vars->f140, 0);
+    cam_compute_view_direction(moby->pos, vars->f280, 0);
+    vec_negate_and_forward(moby->fC0, vars->f280, 0);
 }

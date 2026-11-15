@@ -3,19 +3,19 @@
 #include "common.h"
 typedef int ControllerQuad __attribute__((mode(TI)));
 extern unsigned int ref_L13_004095F8_00(unsigned int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283698(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
 extern void ref_L13_004095F8_01(char *, char *, int);
-extern void func_L13_004095A8(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L13_00409AB8(char *, char *);
-extern void func_L13_00409B08(char *, char *);
+extern void moby_rotate_away_from_dir(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void moby_follow_platform(char *, char *);
+extern void moby_probe_ground(char *, char *);
 extern void func_PAL_L13_0040E5B0(char *, char *, void *, ControllerQuad *, void *, void *, char *);
-extern void func_L13_00409EE8(char *, char *, void *, void *, char *);
-extern void func_L13_0040A0A0(char *, char *, char *, char *, char *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void creature_push_from_walls(char *, char *, void *, void *, char *);
+extern void creature_resolve_ground_coll(char *, char *, char *, char *, char *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 extern int D_L13_001B2448 MACRO_ADDR;
 extern char D_L13_001BFD00[];
 
@@ -36,18 +36,18 @@ int func_PAL_L13_0040DF68(char *object, char *target)
     char *data = (char *)ref_L13_004095F8_00((unsigned int)object);
     if (!data) return 8;
     if (D_L13_001B2448 == *(int *)(data + 0xbc)) return *(int *)(data + 0x94);
-    func_00282CF0(difference, target, object + 0x10);
+    FastVecSub(difference, target, object + 0x10);
     transform = (char *)inverse;
-    func_00283698(transform, object + 0xc0);
+    matrix_from_basis_rows(transform, object + 0xc0);
     ref_L13_004095F8_01(object, (char *)normal, 0);
-    func_L13_004095A8(object + 0xc0, normal, rotation);
-    func_00283098(data + 0xa0, data + 0xa0, rotation);
+    moby_rotate_away_from_dir(object + 0xc0, normal, rotation);
+    matrix_mul_vec3(data + 0xa0, data + 0xa0, rotation);
     *(int *)(data + 0x98) = *(int *)(data + 0x94);
     *(int *)(data + 0x94) = 0;
-    func_L13_00409AB8(object, data);
+    moby_follow_platform(object, data);
     qcopy(previous, object + 0x10);
     if (D_L13_001B2448 - *(int *)(data + 0xbc) >= 2 || !*(int *)(data + 0xbc)) {
-        func_L13_00409B08(object, data);
+        moby_probe_ground(object, data);
         *(int *)(data + 0xb4) = 0;
         *(int *)(data + 0x9c) |= -3;
         ((unsigned char *)data)[0xea] = 255;
@@ -55,13 +55,13 @@ int func_PAL_L13_0040DF68(char *object, char *target)
     }
     *(int *)(data + 0xbc) = D_L13_001B2448;
     func_PAL_L13_0040E5B0(object, data, target, (ControllerQuad *)difference, reserved0, reserved1, transform);
-    func_L13_00409EE8(object, data, previous, reserved1, transform);
-    func_L13_0040A0A0(object, data, target, (char *)previous, transform);
-    func_00282F20(start, object + 0xe0, 0.1f);
-    func_00282F20(end, object + 0xe0, -3.0f);
-    func_00282CC0(start, start, object + 0x10);
-    func_00282CC0(end, end, object + 0x10);
-    if (func_002761F8(start, end, 2, object, 0)) qcopy(object + 0x10, D_L13_001BFD00 + 0x20);
+    creature_push_from_walls(object, data, previous, reserved1, transform);
+    creature_resolve_ground_coll(object, data, target, (char *)previous, transform);
+    vec_scale_to_length(start, object + 0xe0, 0.1f);
+    vec_scale_to_length(end, object + 0xe0, -3.0f);
+    FastVecAdd(start, start, object + 0x10);
+    FastVecAdd(end, end, object + 0x10);
+    if (CollLine(start, end, 2, object, 0)) qcopy(object + 0x10, D_L13_001BFD00 + 0x20);
     return *(int *)(data + 0x94);
 }
 
@@ -73,10 +73,10 @@ typedef struct {
     short goal;
 } Walk_409840;
 extern Walk_409840 *ref_L13_00409840_00(char *);
-extern int func_002B6228(void *, void *, int, int);
-extern float func_00282E80(void *, void *);
+extern int path_set_follower_nodes(void *, void *, int, int);
+extern float vec_distance_xy(void *, void *);
 extern int func_PAL_L13_0040DF68(char *, char *);
-extern int D_001A79F0 __attribute__((section(".sdata")));
+extern int g_current_map_index __attribute__((section(".sdata")));
 
 int func_PAL_L13_0040E1B0(char *obj, char *path)
 {
@@ -85,10 +85,10 @@ int func_PAL_L13_0040E1B0(char *obj, char *path)
     if (w == 0)
         return 0;
     if (path != w->path)
-        func_002B6228(obj, path, -1, 0);
-    if (D_001A79F0 == 0x45) {
+        path_set_follower_nodes(obj, path, -1, 0);
+    if (g_current_map_index == 0x45) {
         func_PAL_L13_0040DF68(obj, path + (w->cur * 16 + 0x10));
-        if (func_00282E80(obj + 0x10, path + (w->cur * 16 + 0x10)) <= 0.5f) {
+        if (vec_distance_xy(obj + 0x10, path + (w->cur * 16 + 0x10)) <= 0.5f) {
             if (w->goal == w->cur)
                 return 1;
             if (w->goal < w->cur)
@@ -98,7 +98,7 @@ int func_PAL_L13_0040E1B0(char *obj, char *path)
         }
     } else {
         func_PAL_L13_0040DF68(obj, path + (w->goal * 16 + 0x10));
-        if (func_00282E80(obj + 0x10, path + (w->goal * 16 + 0x10)) <= 0.5f) {
+        if (vec_distance_xy(obj + 0x10, path + (w->goal * 16 + 0x10)) <= 0.5f) {
             if (w->goal == w->cur)
                 return 1;
             if (w->goal < w->cur)

@@ -13,22 +13,22 @@ typedef struct {
 } TriggerVars;
 
 
-extern void func_0026FEB8(const char *, ...);
-extern int func_00288AA0(void *, int);
-extern int func_00288BE8(void *);  /* its result is tested elsewhere */
-extern void func_00288CB0(int, int);
-extern void func_0029B3E0(int, int);
-extern void func_0029F338(void *);
-extern void func_002A0430(int);
-extern void func_002A7750(void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_002AD7B8(int);
-extern void func_002AF0A8(int);
-extern int func_002B38B8(void *);
-extern void func_002DF3F8(void *, void *);
-extern void func_002F5CC8(void);
-extern int func_002F5D10(void);
-extern void func_L00_002B9D60(void *, void *, int, int);
+extern void STUB_printf(const char *, ...);
+extern int req_push_queue(void *, int);
+extern int req_launch_queued(void *);  /* its result is tested elsewhere */
+extern void data_set_small_value_and_refresh(int, int);
+extern void MemcardSave(int, int);
+extern void moby_mark_spawned(void *);
+extern void moby_mark_table_entry_flagged(int);
+extern void moby_set_state(void *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void moby_mark_flag_and_append_to_list(int);
+extern void snd_play_indexed(int);
+extern int flag_is_third_pending_set(void *);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void game_set_slowdown_factor(void);
+extern int game_is_either_mode_two(void);
+extern void hero_reset_position_and_direction(void *, void *, int, int);
 
 extern unsigned int D_00139768[];
 typedef struct {
@@ -36,10 +36,10 @@ typedef struct {
     int mode; char pad2298[0x24CC - 0x2298];
     int health;
 } HeroView;
-extern HeroView D_00189E20;
-extern char D_00189EA0[];
+extern HeroView g_hero_state;
+extern char g_hero_position[];
 extern unsigned char D_0019B2E8[];
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_001A7BC8[] MACRO_ADDR;
 extern int D_L14_001A8F00;
 extern char D_L14_001B15E0[];
@@ -60,7 +60,7 @@ typedef struct {
 } Thing;
 
 /* Updates a trigger that checks the player has the needed item, then plays the result and removes itself. */
-void func_L14_00421BC0(Thing *trigger)
+void item_check_trigger_update(Thing *trigger)
 {
     TriggerVars *vars = trigger->vars;
     int notify, index, missing, fail;
@@ -69,34 +69,34 @@ void func_L14_00421BC0(Thing *trigger)
     switch (trigger->state) {
     case 0:
         if ((vars->item != -1 && D_001A7BC8[vars->item] != 0)
-            || (trigger->group != 0xFF && (D_0019B2E8[trigger->group + gCurrentMapIndex * 16] & 0x80))) {
-            MarkMobySpawned(trigger);
+            || (trigger->group != 0xFF && (D_0019B2E8[trigger->group + g_current_map_index * 16] & 0x80))) {
+            moby_mark_spawned(trigger);
             break;
         }
-        SetMobyState(trigger, 1, -1);
+        moby_set_state(trigger, 1, -1);
     case 1:
-        if (vars->on == 0 && IsThirdPendingFlagSet(trigger) == 0 && trigger->hit == 0)
+        if (vars->on == 0 && flag_is_third_pending_set(trigger) == 0 && trigger->hit == 0)
             break;
         vars->on = 1;
-        SetMobyState(trigger, 2, -1);
+        moby_set_state(trigger, 2, -1);
     case 2:
         if (vars->on == 0) {
-            SetMobyState(trigger, 1, -1);
+            moby_set_state(trigger, 1, -1);
             break;
         }
-        if (gHeroState.mode == 0x1C)
+        if (g_hero_state.mode == 0x1C)
             break;
-        if (gHeroState.health <= 0)
+        if (g_hero_state.health <= 0)
             break;
         if (D_L14_001A8F00 != 0)
             break;
-        if (vars->msg != -1 && IsPointInCuboid(gHeroState.body, vars->msg) == 0)
+        if (vars->msg != -1 && IsPointInCuboid(g_hero_state.body, vars->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L14_002A71A0[gCurrentMapIndex] != 0 && D_L14_002A71A0[gCurrentMapIndex][vars->idx] != 0) {
-            for (index = 0; D_L14_002A71A0[gCurrentMapIndex][vars->idx][index] != -1; index++) {
-                int itemId = D_L14_002A71A0[gCurrentMapIndex][vars->idx][index];
+        if (D_L14_002A71A0[g_current_map_index] != 0 && D_L14_002A71A0[g_current_map_index][vars->idx] != 0) {
+            for (index = 0; D_L14_002A71A0[g_current_map_index][vars->idx][index] != -1; index++) {
+                int itemId = D_L14_002A71A0[g_current_map_index][vars->idx][index];
 
                 missing = 0;
                 if (vars->tail.b.quiet == 0) {
@@ -104,8 +104,8 @@ void func_L14_00421BC0(Thing *trigger)
                     if (D_00139768[(unsigned int)itemId >> 2] & bit)
                         continue;
                 }
-                if (PushRequestQueue(D_L14_001BF700, itemId) == 0 && index == 0) {
-                    STUB_printf(D_L14_002AA2C0, trigger->id, trigger->oclass, gCurrentMapIndex, vars->idx, itemId);
+                if (req_push_queue(D_L14_001BF700, itemId) == 0 && index == 0) {
+                    STUB_printf(D_L14_002AA2C0, trigger->id, trigger->oclass, g_current_map_index, vars->idx, itemId);
                     return;
                 }
                 fail = 0;
@@ -117,80 +117,80 @@ void func_L14_00421BC0(Thing *trigger)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(D_L14_001B15E0, gCurrentMapIndex, vars->idx);
+                STUB_printf(D_L14_001B15E0, g_current_map_index, vars->idx);
         } while (0);
         if (fail != 0) {
             vars->tail.b.had = 0;
-            SetMobyState(trigger, 4, -1);
+            moby_set_state(trigger, 4, -1);
             break;
         }
         vars->tail.b.had = 1;
-        LaunchQueuedRequest(D_L14_001BF700);
-        if (D_L14_001B20C8 < 5 || (gCurrentMapIndex == 6 && vars->idx == 0))
-            SetSlowdownFactorAndLowFpsFade();
-        SetMobyState(trigger, 3, -1);
+        req_launch_queued(D_L14_001BF700);
+        if (D_L14_001B20C8 < 5 || (g_current_map_index == 6 && vars->idx == 0))
+            game_set_slowdown_factor();
+        moby_set_state(trigger, 3, -1);
         break;
     case 3:
-        if (IsEitherModeTwo() == 0) {
+        if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
                 char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                ResetHeroPositionAndDirection(linkedEntry + 0x30, linkedEntry + 0x70, 0, 1);
+                hero_reset_position_and_direction(linkedEntry + 0x30, linkedEntry + 0x70, 0, 1);
             }
-            SetMobyState(trigger, 4, -1);
+            moby_set_state(trigger, 4, -1);
         }
-        if (gCurrentMapIndex != 0)
+        if (g_current_map_index != 0)
             break;
         if (vars->item == -1)
             break;
-        if (IsEitherModeTwo() != 0)
+        if (game_is_either_mode_two() != 0)
             break;
         notify = 0;
         if (vars->item != -1) {
-            MarkFlagAndAppendToList(vars->item);
+            moby_mark_flag_and_append_to_list(vars->item);
             if (vars->item != 0x18)
-                PlayIndexedSound(vars->item);
+                snd_play_indexed(vars->item);
             notify = 1;
         }
-        if (trigger->group != 0xFF && !(D_0019B2E8[trigger->group + gCurrentMapIndex * 16] & 0x80)) {
-            MarkTableEntryFlagged(trigger->group);
+        if (trigger->group != 0xFF && !(D_0019B2E8[trigger->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(trigger->group);
             notify = 1;
         }
         if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
                 char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                CaptureCheckpointState(linkedEntry + 0x30, linkedEntry + 0x70);
+                level_capture_checkpoint_state(linkedEntry + 0x30, linkedEntry + 0x70);
             } else
-                CaptureCheckpointState(trigger->pos, trigger->dir);
+                level_capture_checkpoint_state(trigger->pos, trigger->dir);
         }
         if (vars->tail.low != -1)
-            SetSmallDataValueAndRefresh(vars->tail.low, 1);
+            data_set_small_value_and_refresh(vars->tail.low, 1);
         else if (notify != 0 || vars->tail.b.had != 0)
             MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
         if (vars->item != -1) {
-            MarkFlagAndAppendToList(vars->item);
+            moby_mark_flag_and_append_to_list(vars->item);
             if (vars->item != 0x18)
-                PlayIndexedSound(vars->item);
+                snd_play_indexed(vars->item);
             played = 1;
         }
-        if (trigger->group != 0xFF && !(D_0019B2E8[trigger->group + gCurrentMapIndex * 16] & 0x80)) {
-            MarkTableEntryFlagged(trigger->group);
+        if (trigger->group != 0xFF && !(D_0019B2E8[trigger->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(trigger->group);
             played = 1;
         }
         if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
                 char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                CaptureCheckpointState(linkedEntry + 0x30, linkedEntry + 0x70);
+                level_capture_checkpoint_state(linkedEntry + 0x30, linkedEntry + 0x70);
             } else
-                CaptureCheckpointState(gHeroPosition, gHeroPosition + 0x10);
+                level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }
         if (vars->tail.low != -1)
-            SetSmallDataValueAndRefresh(vars->tail.low, 1);
+            data_set_small_value_and_refresh(vars->tail.low, 1);
         else if ((played != 0 || vars->tail.b.had != 0) && vars->count != vars->tail.low)
             MemcardSave(0, -1);
-        MarkMobySpawned(trigger);
+        moby_mark_spawned(trigger);
         break;
     }
 }

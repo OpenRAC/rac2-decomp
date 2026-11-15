@@ -1,17 +1,18 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_00292988, the PAL copy of func_00292078: the same C, where the
    absolutely addressed boot words move, the buffer, count and VRAM cursors
    by 0x80 and the pack flags by 0x88. */
-extern int func_00282A18(int);
+extern int log2dim(int);
 typedef struct { long w[12]; } GsLoadImage __attribute__((aligned(16)));
-extern void func_002FC3C0(unsigned long);
+extern void gfx_wait_for_dma_status_bits(unsigned long);
 extern short func_PAL_002B8898(int);
 extern int func_PAL_002B8838(void *, int, int);
 extern int func_00126288(GsLoadImage *, short, short, short, short, short, short, short);
-extern void func_0011AEA0(int);
-extern int func_001265B0(GsLoadImage *, void *);
-extern int func_001244B8(int, unsigned short);
+extern void FlushCache(int);
+extern int sceGsExecLoadImage(GsLoadImage *, void *);
+extern int gfx_wait_paths_idle(int, unsigned short);
 /* The disc table of contents: sectors are relative to base. */
 typedef struct { int sector, size, sector2, size2; } DiscPack;
 typedef struct {
@@ -19,7 +20,7 @@ typedef struct {
     int base;                 /* 0x4F04: of the packs */
     DiscPack packs[9];        /* 0x4F08 */
 } DiscToc;
-extern DiscToc D_0014B540;
+extern DiscToc g_copy_setup_data;
 extern unsigned long long D_001A72A0[] __attribute__((sda));
 
 #define LOAD_BUFFER (*(int **)0x001A7314)
@@ -70,7 +71,7 @@ void func_PAL_00292988(int pack)
     unsigned long long f;
     unsigned long long a;
 
-    func_002FC3C0(1);
+    gfx_wait_for_dma_status_bits(1);
     buffer = LOAD_BUFFER;
     func_PAL_002B8898(1);
 
@@ -84,8 +85,8 @@ void func_PAL_00292988(int pack)
         pack = 5;
 
     cursor = buffer + 1;
-    func_PAL_002B8838(buffer, D_0014B540.packs[pack].sector2 + D_0014B540.base,
-                  D_0014B540.packs[pack].size2);
+    func_PAL_002B8838(buffer, g_copy_setup_data.packs[pack].sector2 + g_copy_setup_data.base,
+                  g_copy_setup_data.packs[pack].size2);
 
     image_vram = IMAGE_VRAM;
     LOAD_COUNT = buffer[0];
@@ -96,19 +97,19 @@ void func_PAL_00292988(int pack)
         clut_page = clut_vram >> 8;
         clut = record->clut;
         func_00126288(&work, clut_page, 1, 0, 0, 0, 16, 16);
-        func_0011AEA0(0);
-        func_001265B0(&work, clut);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        sceGsExecLoadImage(&work, clut);
+        gfx_wait_paths_idle(0, 0);
         clut_vram += 0x400;
-        n = func_00282A18(record->width);
+        n = log2dim(record->width);
         tbw = record->width >> 6;
         if (tbw < 1)
             tbw = 1;
         image_page = image_vram >> 8;
         func_00126288(&work, image_page, tbw, 0x1B, 0, 0, record->width, record->height);
-        func_0011AEA0(0);
-        func_001265B0(&work, record->pixels);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        sceGsExecLoadImage(&work, record->pixels);
+        gfx_wait_paths_idle(0, 0);
         a = ((unsigned long long)n << 26) | 0x1B00000;
         tag = (unsigned long long)image_page | ((unsigned long long)tbw << 14);
         tag |= a;
@@ -120,6 +121,6 @@ void func_PAL_00292988(int pack)
         cursor++;
     }
 
-    func_PAL_002B8838(buffer, D_0014B540.packs[pack].sector + D_0014B540.base,
-                  D_0014B540.packs[pack].size);
+    func_PAL_002B8838(buffer, g_copy_setup_data.packs[pack].sector + g_copy_setup_data.base,
+                  g_copy_setup_data.packs[pack].size);
 }

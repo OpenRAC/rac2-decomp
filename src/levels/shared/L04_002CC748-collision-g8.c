@@ -38,28 +38,28 @@ typedef struct {
 } Hero;
 
 /* -G8 is required for the movement-mode flag at D_001A8FF0. */
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern char D_L04_001BFAF0[];
 extern int D_001A8FF0 MACRO_ADDR;
-extern void func_00282C88(void *);
-extern void func_L00_002D49F0(void);
-extern float func_00282DB0(void *, void *);
-extern void func_L00_002D38A0(void *, void *, float);
-extern void func_L00_002D36E0(void *, int, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void vec_clear_128(void *);
+extern void hero_check_timed_condition(void);
+extern float FastVecDot(void *, void *);
+extern void cam_offset_point_in_view_space(void *, void *, float);
+extern void hero_build_relative_point(void *, int, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
 /* EE argument banks retain radius/height in F12/F13 and position/mask/object
    in A0/A1/A2. */
-extern int func_00277258(float, void *, int, int);
+extern int coll_test_point(float, void *, int, int);
 extern int func_L00_002E0200(float, float, void *, int, int);
-extern int func_00278870(float, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern int coll_process_triangles(float, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Moves the hero by a step derived from its control mode and pushes it out of
    anything it hits, up to eight times; returns 1 when the net move is small, -1
    when it exceeds the hero's radius (clamping it first when reason is 15). */
-int func_L04_002DB970(int reason)
+int ResolveHeroPositionCollisions(int reason)
 {
     float old[4] __attribute__((aligned(16)));
     float move[4] __attribute__((aligned(16)));
@@ -68,56 +68,56 @@ int func_L04_002DB970(int reason)
     int n;
     int hit;
 
-    if (gHeroState.air_frames)
+    if (g_hero_state.air_frames)
         return 1;
 
-    qcopy(old, gHeroState.position);
-    ClearVector128(move);
-    if (gHeroState.f24FE) {
-        CheckHeroTimedCondition();
-        gHeroState.f24FE = 0;
+    qcopy(old, g_hero_state.position);
+    vec_clear_128(move);
+    if (g_hero_state.f24FE) {
+        hero_check_timed_condition();
+        g_hero_state.f24FE = 0;
     }
 
     grounded = 0;
-    if (FastVecDot(gHeroState.axis20, gHeroState.axis2C0) > -0.92f)
+    if (FastVecDot(g_hero_state.axis20, g_hero_state.axis2C0) > -0.92f)
         grounded = 1;
 
-    if (gHeroState.control_mode != 0x11) {
-        if (gHeroState.f22C3 || gHeroState.f218 || grounded) {
-            if (gHeroState.f22B4 == 2) {
-                OffsetPointInViewSpace(move, move, 5.0f);
-            } else if (gHeroState.f22C3 == 1 || gHeroState.f218) {
-                BuildHeroRelativePoint(move, 0, 0.0f, 0.0f, 0.6f);
+    if (g_hero_state.control_mode != 0x11) {
+        if (g_hero_state.f22C3 || g_hero_state.f218 || grounded) {
+            if (g_hero_state.f22B4 == 2) {
+                cam_offset_point_in_view_space(move, move, 5.0f);
+            } else if (g_hero_state.f22C3 == 1 || g_hero_state.f218) {
+                hero_build_relative_point(move, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_001A8FF0) {
-                OffsetPointInViewSpace(move, move, 0.77f);
+                cam_offset_point_in_view_space(move, move, 0.77f);
             } else {
-                BuildHeroRelativePoint(move, 0, 0.0f, 0.0f, gHeroState.f254);
+                hero_build_relative_point(move, 0, 0.0f, 0.0f, g_hero_state.f254);
             }
         } else {
-            move[2] = gHeroState.f254;
+            move[2] = g_hero_state.f254;
         }
     }
-    FastVecAdd(gHeroState.position, gHeroState.position, move);
+    FastVecAdd(g_hero_state.position, g_hero_state.position, move);
 
     for (n = 0; n < 8; n++) {
-        if (gHeroState.control_mode == 0x11) {
-            if (!TestPointAgainstCollision(0.6f, gHeroState.position, 0x24, gHeroState.object))
+        if (g_hero_state.control_mode == 0x11) {
+            if (!coll_test_point(0.6f, g_hero_state.position, 0x24, g_hero_state.object))
                 break;
         } else {
-            if (gHeroState.f22C3 || grounded) {
-                hit = TestPointAgainstCollision(gHeroState.radius, gHeroState.position, 0x24,
-                                    gHeroState.object) |
-                      (gHeroState.f1E6 ? 0 : ProcessCollisionTriangles(gHeroState.radius,
-                                                           gHeroState.position));
+            if (g_hero_state.f22C3 || grounded) {
+                hit = coll_test_point(g_hero_state.radius, g_hero_state.position, 0x24,
+                                    g_hero_state.object) |
+                      (g_hero_state.f1E6 ? 0 : coll_process_triangles(g_hero_state.radius,
+                                                           g_hero_state.position));
             } else {
-                float height = gHeroState.f250 - gHeroState.f254;
+                float height = g_hero_state.f250 - g_hero_state.f254;
 
                 if (height < 0.05f)
                     height = 0.05f;
-                hit = func_L00_002E0200(gHeroState.radius, height, gHeroState.position, 0x24,
-                                        gHeroState.object) |
-                      (gHeroState.f1E6 ? 0 : ProcessCollisionTriangles(gHeroState.radius,
-                                                           gHeroState.position));
+                hit = func_L00_002E0200(g_hero_state.radius, height, g_hero_state.position, 0x24,
+                                        g_hero_state.object) |
+                      (g_hero_state.f1E6 ? 0 : coll_process_triangles(g_hero_state.radius,
+                                                           g_hero_state.position));
             }
             if (!hit)
                 break;
@@ -126,17 +126,17 @@ int func_L04_002DB970(int reason)
         {
             char *collision = D_L04_001BFAF0;
 
-            qcopy(gHeroState.position, collision);
-            qcopy(gHeroState.contact_a, collision + 0x10);
-            qcopy(gHeroState.contact_b, collision - 0x10);
-            gHeroState.collision_flag = 1;
-            gHeroState.collision_id = *(s32 *)(collision - 0x18);
+            qcopy(g_hero_state.position, collision);
+            qcopy(g_hero_state.contact_a, collision + 0x10);
+            qcopy(g_hero_state.contact_b, collision - 0x10);
+            g_hero_state.collision_flag = 1;
+            g_hero_state.collision_id = *(s32 *)(collision - 0x18);
         }
     }
 
-    FastVecSub(gHeroState.position, gHeroState.position, move);
-    FastVecSub(delta, gHeroState.position, old);
-    if (FastVecLength(delta) > gHeroState.radius * 1.5f) {
+    FastVecSub(g_hero_state.position, g_hero_state.position, move);
+    FastVecSub(delta, g_hero_state.position, old);
+    if (FastVecLength(delta) > g_hero_state.radius * 1.5f) {
         if (reason == 15) {
             if (delta[0] > 512.0f)
                 delta[0] = 512.0f;
@@ -150,8 +150,8 @@ int func_L04_002DB970(int reason)
                 delta[2] = 512.0f;
             else if (delta[2] < -512.0f)
                 delta[2] = -512.0f;
-            vec_scale_to_length(delta, delta, gHeroState.radius);
-            FastVecAdd(gHeroState.position, old, delta);
+            vec_scale_to_length(delta, delta, g_hero_state.radius);
+            FastVecAdd(g_hero_state.position, old, delta);
         }
         return -1;
     }

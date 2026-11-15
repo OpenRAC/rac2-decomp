@@ -2,16 +2,16 @@
 
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern unsigned char *func_002AB220(void *);
-extern void func_002B37E8(void *, void *);
-extern void func_002AEC18(void *, unsigned int);
-extern void func_002833F0(void *, void *);
+extern char *CreateMoby(int);
+extern unsigned char *moby_get_private_value_4(void *);
+extern void moby_init_child_from_parent(void *, void *);
+extern void moby_set_light_color(void *, unsigned int);
+extern void euler_rotation_basis(void *, void *);
 extern void func_002A10E8(void *);
-extern float func_00283198(float);
-extern void func_002A7A00(void *, float, float);
-extern float func_00282C10(float);
-extern void func_0029F390(void *);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_random_direction(void *, float, float);
+extern float square_root(float);
+extern void update_moby_animation_state(void *);
 extern void func_PAL_002A0F68(void *);
 extern void func_PAL_00273818(void *, int, int, void *, void *, float, unsigned char);
 extern void func_PAL_003120C0(void);
@@ -25,22 +25,22 @@ char *func_PAL_002735D0(char *parent, int mode, int type, int index,
     char *obj;
     unsigned char *color;
     unsigned int packed = 0;
-    obj = func_0029EFD0(type);
-    color = func_002AB220(parent);
+    obj = CreateMoby(type);
+    color = moby_get_private_value_4(parent);
     if (color) {
         int green = (color[5] << 8) | (-2147483647 - 1);
         int blue = color[6] << 16;
         packed = blue | green | color[4];
     }
     if (obj) {
-        func_002B37E8(obj, parent);
+        moby_init_child_from_parent(obj, parent);
         if (packed)
-            func_002AEC18(obj, packed);
+            moby_set_light_color(obj, packed);
         *(Quad *)(obj + 0x10) = *(Quad *)position;
         {
             void *orientation = obj + 0xf0;
             qcopy(orientation, rotation);
-            func_002833F0(obj + 0xc0, orientation);
+            euler_rotation_basis(obj + 0xc0, orientation);
         }
         if (parent) {
             *(float *)(obj + 0x2c) =
@@ -54,16 +54,16 @@ char *func_PAL_002735D0(char *parent, int mode, int type, int index,
             *(unsigned short *)(obj + 0x34) |= 0x800;
         *(int *)(obj + 0x98) = 0;
         *(char **)(*(char **)(obj + 0x68) + 0x54) = parent;
-        spread = func_00283198(spread * 0.00017453295f);
-        func_002A7A00(vector, spread, spread);
+        spread = math_fast_sin_or_cos_b(spread * 0.00017453295f);
+        vec_random_direction(vector, spread, spread);
         spread = spread * spread;
-        vector[3] = func_00282C10(1.0f - spread);
+        vector[3] = square_root(1.0f - spread);
         if (mode == 1) {
             if (parent) {
                 obj[0x42] = parent[0x43];
                 obj[0x43] = parent[0x43];
             }
-            func_0029F390(obj);
+            update_moby_animation_state(obj);
             *(int *)(obj + 0x48) = 0;
             *(int *)(obj + 0x44) = 0;
             func_PAL_002A0F68(obj);

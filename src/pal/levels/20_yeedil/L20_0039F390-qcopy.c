@@ -2,16 +2,16 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_00282CC0(char *, char *, char *);
-extern void func_002A8C00(char *, int, int, void *, float);
-extern int func_002761F8(void *, void *, int, int, void *);
-extern int func_00282948(void *);
-extern void func_002E5DA0(int, int, void *, int);
-extern void func_L00_002E6EF8(void *, int);
+extern void FastVecAdd(char *, char *, char *);
+extern void make_hit_descriptor(char *, int, int, void *, float);
+extern int CollLine(void *, void *, int, int, void *);
+extern int math_fast_float_d(void *);
+extern void snd_play_from_class_bank(int, int, void *, int);
+extern void gfx_add_draw_callback_third(void *, int);
 extern void func_PAL_L20_0039F518(char *);
 extern void func_PAL_L20_0039F810(char *, int, int);
-extern void func_L20_0039CC10(void);
-extern void func_0029F338(int);
+extern void gfx_draw_projectile_trail(void);
+extern void moby_mark_spawned(int);
 extern char D_L20_001C0420[];
 
 void func_PAL_L20_0039F390(char *arg0) {
@@ -22,25 +22,25 @@ void func_PAL_L20_0039F390(char *arg0) {
 
     *(TI128 *)s3 = *(TI128 *)s0;
     s1 = s3 + 0x10;
-    func_00282CC0(s0, s0, s1);
-    func_002A8C00(buf, (int)arg0, 0x10001, s1, *(float *)(s3 + 0x2C));
-    if (func_002761F8(s3, s0, 0, *(int *)(arg0 + 0xB8), buf) != 0
-        || func_00282948(s3 + 0x20) != 0) {
+    FastVecAdd(s0, s0, s1);
+    make_hit_descriptor(buf, (int)arg0, 0x10001, s1, *(float *)(s3 + 0x2C));
+    if (CollLine(s3, s0, 0, *(int *)(arg0 + 0xB8), buf) != 0
+        || math_fast_float_d(s3 + 0x20) != 0) {
         func_PAL_L20_0039F810(D_L20_001C0420, 0x14, 1);
-        func_002E5DA0(2, 0, arg0, 0x12EF);
-        func_0029F338((int)arg0);
+        snd_play_from_class_bank(2, 0, arg0, 0x12EF);
+        moby_mark_spawned((int)arg0);
     } else {
         func_PAL_L20_0039F518(arg0);
-        func_L00_002E6EF8(func_L20_0039CC10, (int)arg0);
+        gfx_add_draw_callback_third(gfx_draw_projectile_trail, (int)arg0);
     }
 }
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 /* Spawns an object of type 0x12F2 and fills its position and its sub-record vector. */
 char *func_PAL_L20_0039F488(char *arg0, char *arg1, char *arg2, float f12) {
     char *v;
-    char *o = func_0029EFD0(0x12F2);
+    char *o = CreateMoby(0x12F2);
 
     if (o != 0) {
         *(int *)(o + 0xB8) = (int)arg0;

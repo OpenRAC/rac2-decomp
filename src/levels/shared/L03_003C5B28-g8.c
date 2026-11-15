@@ -27,18 +27,18 @@ extern u8 *D_L03_001B2A1C_1[3] __attribute__((sda));
 
 extern unsigned short *D_L03_001FB5A0[];
 
-extern void func_00282CF0(float *, u8 *, u8 *);
+extern void FastVecSub(float *, u8 *, u8 *);
 
-extern void func_002AFDD8(u8 *, float *, float *, int);
+extern void vec_transform_by_object_or_given(u8 *, float *, float *, int);
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
-extern void func_002A7750(u8 *, int, int);
+extern void moby_set_state(u8 *, int, int);
 
 /* Puts into state 5 every entity of the object's group (state byte other than 1, kind byte
    below 2) that lies in front of it, within 1.0 ahead, 0.7 sideways and 0.5 up or down in the
    object's own frame, storing a1 at +0x374 of its state and clearing its halfword at +0x96. */
-void func_L03_003C5B28(u8 *obj, float value) {
+void entity_stun_in_front(u8 *obj, float value) {
     float offset[4];
     unsigned short *idPtr;
     u8 *entity;
@@ -57,11 +57,11 @@ void func_L03_003C5B28(u8 *obj, float value) {
             continue;
         if (entity[0x95] < 2) {
             FastVecSub(offset, entity + 0x10, obj + 0x10);
-            TransformVectorByObjectOrGiven(obj, offset, offset, 0);
-            if (offset[0] > 0.0f && offset[0] < 1.0f && FloatAbs(offset[1]) < 0.7f &&
-                FloatAbs(offset[2]) < 0.5f) {
+            vec_transform_by_object_or_given(obj, offset, offset, 0);
+            if (offset[0] > 0.0f && offset[0] < 1.0f && math_fabs(offset[1]) < 0.7f &&
+                math_fabs(offset[2]) < 0.5f) {
                 entityVars = *(u8 **)(entity + 0x68);
-                SetMobyState(entity, 5, 1);
+                moby_set_state(entity, 5, 1);
                 *(float *)(entityVars + 0x374) = value;
                 *(short *)(entity + 0x96) = 0;
             }
@@ -71,7 +71,7 @@ void func_L03_003C5B28(u8 *obj, float value) {
 
 /* Answers 1 when the resident word at 0x18A15C equals the object's state word at +0x358, or
    when the state of an entity of the object's group holds it at +0x198; 0 otherwise. */
-int func_L03_003C5CE8(u8 *obj) {
+int group_is_state_word_matching(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     unsigned short *idPtr;
     u8 *entity;
@@ -93,11 +93,11 @@ int func_L03_003C5CE8(u8 *obj) {
     return 0;
 }
 
-extern float func_00282E80(u8 *, u8 *);
+extern float vec_distance_xy(u8 *, u8 *);
 
 /* Answers 0 when another entity of the object's group, whose state holds the same word at
    +0x358, is nearer to a1 than the object is; 1 otherwise. */
-int func_L03_003C5DC8(u8 *obj, u8 *target) {
+int group_is_nearest_to_target(u8 *obj, u8 *target) {
     u8 *vars = *(u8 **)(obj + 0x68);
     float ownDist;
     unsigned short *idPtr;
@@ -128,16 +128,16 @@ extern f32 D_L03_001B0CA0 __attribute__((sda));
 
 extern u8 D_L03_001B9BB0[] __attribute__((nosda));
 
-extern void func_00282F20(u8 *, u8 *, f32);
+extern void vec_scale_to_length(u8 *, u8 *, f32);
 
-extern void func_00282D30(u8 *, u8 *, f32);
+extern void FastVecScale(u8 *, u8 *, f32);
 
-extern void func_00282CC0(u8 *, u8 *, u8 *);
+extern void FastVecAdd(u8 *, u8 *, u8 *);
 
 extern void func_002A0F48(u8 *);
 
 /* Computes two points on opposite sides of the object, one along its direction and one against it. */
-void func_L03_003CAAF0(u8 *obj, u8 *outA, u8 *outB) {
+void moby_compute_opposite_points(u8 *obj, u8 *outA, u8 *outB) {
     Local16 dirA;
     Local16 dirB;
 
@@ -148,7 +148,7 @@ void func_L03_003CAAF0(u8 *obj, u8 *outA, u8 *outB) {
 }
 
 /* Moves the attached child object to a fixed spot, runs its callback if it has one, then refreshes it. */
-void func_L03_003E50E0(u8 *obj) {
+void moby_update_attached_child(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     u8 *child = *(u8 **)(vars + 0x58);
 
@@ -160,7 +160,7 @@ void func_L03_003E50E0(u8 *obj) {
 }
 
 /* updates the registered countdown state and clears its original completion flags */
-void func_L03_0043ACD8(void) {
+void timer_tick_countdown(void) {
     NativeCallbackTimer *timer = &D_L04_001B98E0;
     u32 mode = timer->field04;
     timer->field08 = 10000.0f;
@@ -179,27 +179,27 @@ extern f32 D_L03_001B02F0 __attribute__((sda));
 extern f32 D_L03_001B1A90 __attribute__((sda));
 
 /* Places a point at the object's position plus its direction scaled by a fixed amount. */
-void func_L03_003CA230(u8 *obj, u8 *out) {
+void moby_compute_point_ahead_scaled(u8 *obj, u8 *out) {
     FastVecScale(out, obj + 0xC0, D_L03_001B02F0);
     FastVecAdd(out, out, obj + 0x10);
 }
 
 /* The same body with func_00282F20 and 1.0f. */
-void func_L03_004197C8(u8 *obj, u8 *out) {
+void moby_compute_point_ahead_unit(u8 *obj, u8 *out) {
     vec_scale_to_length(out, obj + 0xC0, D_L03_001B1A90);
     FastVecAdd(out, out, obj + 0x10);
 }
 
 extern f32 D_L03_001B1FC4 __attribute__((sda));
 
-extern f32 func_00283B98(f32, f32);
+extern f32 FastAddRotations(f32, f32);
 
-extern void func_0029F338(u8 *);
+extern void moby_mark_spawned(u8 *);
 
 /* Ages one entity: scales the rate the owner record holds by the shared $gp factor, drops
    the entity's own 1/240 timer, blends two matrix columns and then the three angles, and
    releases the entity when its 0xBC countdown runs out. */
-void func_L03_0042B930(u8 *obj) {
+void entity_age_and_blend(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     u8 *owner = *(u8 **)(obj + 0x24);
 
@@ -212,7 +212,7 @@ void func_L03_0042B930(u8 *obj) {
     *(f32 *)(obj + 0xF8) = FastAddRotations(*(f32 *)(obj + 0xF8), *(f32 *)(vars + 0x18));
     obj[0xBC] = obj[0xBC] - 1;
     if (obj[0xBC] == 0)
-        MarkMobySpawned(obj);
+        moby_mark_spawned(obj);
 }
 
 /* One sixteen-byte entry per path step: the step's type and the two nodes chosen for it. */
@@ -233,14 +233,14 @@ extern PathEntry D_L03_0029BCD0[];
 
 extern s32 D_L03_001B0B50 __attribute__((sda));
 
-extern s32 func_L03_003E2D98(u8 *, u32, s32, u32 *, s32);
+extern s32 SelectUnusedTableEntry(u8 *, u32, s32, u32 *, s32);
 
 /* Clears the entries of the first D_L03_001B0B50 path steps and refills them by type, with
    func_L03_003E2D98 (a neighbour of a node that is not on the path): type 1 picks one
    neighbour of the step's path node, type 2 also a neighbour of that pick, type 3 a second
    neighbour of the path node other than the first. */
 /* Fills in the path choices for each step: picks one or two neighbouring nodes depending on the step type. */
-void func_L03_003E2C08(u8 *obj) {
+void SelectPathStepNodes(u8 *obj) {
     PathState *state = *(PathState **)(obj + 0x68);
     s32 i;
     u32 node, prev, prev2;

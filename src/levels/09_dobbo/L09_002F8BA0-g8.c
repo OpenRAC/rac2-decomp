@@ -10,15 +10,15 @@
 /* The level's per-frame step coefficient, reached as 0x1EF8($gp). */
 extern f32 D_L09_001B0EE8 __attribute__((sda));
 
-extern void func_00282CF0(f32 *, const f32 *, const f32 *);
-extern void func_00282D30(char *, char *, f32);
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecSub(f32 *, const f32 *, const f32 *);
+extern void FastVecScale(char *, char *, f32);
+extern void FastVecAdd(char *, char *, char *);
 
 /* Rescales the object's vector: the sub-object's pair of points is differenced
    into a 16-byte frame local, that difference is scaled by the level's step
    coefficient, and the scaled vector is written back through both points. The
    sub-object itself is left alone. */
-void func_L09_003F6AB8(unsigned char *moby) {
+void moby_rescale_vector(unsigned char *moby) {
     unsigned char *self = moby;
     unsigned char *pointA = *(unsigned char **)(self + 0x68);
     unsigned char *pointB = pointA + 0x10;
@@ -33,13 +33,13 @@ void func_L09_003F6AB8(unsigned char *moby) {
 extern int D_L09_001B11D8 __attribute__((sda));
 extern int D_L09_002A2658[];
 extern int D_L09_002A27A0[];
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* Advances the object's pulse timer by half a step (wrapping it to zero at 1.0) and adds its integer
    part (FloatToInt, so one step every other frame) to every live phase in the D_L09_002A27A0 table.
    A phase above 0x90 falls back by 0x80; the phase, folded back above 0x50, becomes the alpha byte of
    the matching D_L09_002A2658 colour. */
-void func_L09_003FE2D8(unsigned char *moby) {
+void gfx_update_color_pulse_table(unsigned char *moby) {
     unsigned char *state = *(unsigned char **)(moby + 0x68);
     float *timer = (float *)(state + 0x384);
     float t = *timer + 0.5f;
@@ -76,7 +76,7 @@ extern unsigned short *D_L09_001FB560[];
    the object's group whose own word at +0x310 equals the object's. Nothing happens when the
    object's group byte (+0x21) or the word at +0x310 of its state is 0xFF. The state pointer is
    loaded ahead of the first test, as retail does. */
-void func_L09_003FE978(unsigned char *moby) {
+void group_flag_peers(unsigned char *moby) {
     unsigned char *state;
     unsigned short *trackEntry;
     unsigned char *peer;
@@ -105,16 +105,16 @@ void func_L09_003FE978(unsigned char *moby) {
 /* The level's other per-frame coefficient, reached as 0x1F14($gp). */
 extern f32 D_L09_001B0F04 __attribute__((sda));
 
-extern void func_00283698(f32 *, f32 *);
-extern void func_002830C0(f32 *, f32 *, f32 *);
-extern void func_00283098(f32 *, f32 *, f32 *);
-extern f32 func_00282C48(f32);
+extern void matrix_from_basis_rows(f32 *, f32 *);
+extern void transform_vector(f32 *, f32 *, f32 *);
+extern void matrix_mul_vec3(f32 *, f32 *, f32 *);
+extern f32 math_fabs(f32);
 
 /* Turns the object's pair of points into a vector, takes the angle of the
    result against the object's own angle and adds the scaled difference to it.
    The frame holds five vectors: the two the body uses and three the retail
    frame leaves unused, which its 0x90 frame size records. */
-void func_L09_003F69A0(unsigned char *moby, f32 blend) {
+void moby_blend_pos_toward_target(unsigned char *moby, f32 blend) {
     unsigned char *self = moby;
     unsigned char *vars = *(unsigned char **)(self + 0x68);
     f32 v[4];
@@ -125,8 +125,8 @@ void func_L09_003F69A0(unsigned char *moby, f32 blend) {
     FastVecSub(v, (f32 *)(self + 0x10), (f32 *)(*(int *)(vars + 0x20) + 0x10));
     matrix_from_basis_rows(w, (f32 *)(*(int *)(vars + 0x20) + 0xC0));
     transform_vector(v, v, w);
-    v[1] = v[1] + (v[1] / FloatAbs(v[1])) *
-        (*(f32 *)(vars + 0x28) - FloatAbs(v[1])) * blend;
+    v[1] = v[1] + (v[1] / math_fabs(v[1])) *
+        (*(f32 *)(vars + 0x28) - math_fabs(v[1])) * blend;
     matrix_mul_vec3(v, v, (f32 *)(*(int *)(vars + 0x20) + 0xC0));
     FastVecAdd((char *)(self + 0x10), (char *)v, (char *)(*(int *)(vars + 0x20) + 0x10));
     *(f32 *)(self + 0x18) = *(f32 *)(self + 0x18) +

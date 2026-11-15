@@ -13,18 +13,18 @@ extern s32 D_L15_00221E10[];
 extern u8 *D_L15_001B2714[] __attribute__((sda));
 extern s32 D_L15_001B2148[] __attribute__((sda));
 
-extern void func_0029F338(void *);
-extern void func_002B7320(void);
-extern s32 func_L00_004272A0(void);
-extern Moby430C80 **func_L05_00379EB8(void);
-extern int func_L05_00379ED0(int arg);
-extern void func_L05_00379F18(int);
-extern void func_L05_0037B210(void);
+extern void moby_mark_spawned(void *);
+extern void music_Unpause(void);
+extern s32 level_get_saved_value(void);
+extern Moby430C80 **level_get_object_list(void);
+extern int level_find_object_by_class_id(int arg);
+extern void hero_set_state_value_a(int);
+extern void entry_init_all_registered(void);
 extern void func_PAL_L05_0037D9D0(void *object, int handler);
 extern void *func_PAL_L05_0037DB90(int, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
-extern int func_L15_00381CF0(int);
+extern int CountActiveLinkedListObjects(int);
 extern void func_PAL_L15_00436118(void *, int);
 extern void func_PAL_L15_0043BB70(void *);
 extern void func_PAL_L15_0043BD80(void *);
@@ -38,11 +38,11 @@ void func_PAL_L15_00436870(void *self) {
     if (D_L15_001B1534 == 0) {
         D_L15_001B1534 = 1;
         D_L15_00221E10[0x2C / 4] = 0;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        list = func_L05_00379EB8();
-        n = func_L00_004272A0();
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        list = level_get_object_list();
+        n = level_get_saved_value();
         for (i = 0; i < n; i++) {
             if (list[i]->uid == 0x957) {
                 func_PAL_L05_0037D9D0(list[i], 1);
@@ -56,15 +56,15 @@ void func_PAL_L15_00436870(void *self) {
             func_PAL_L15_0043BD80(obj);
         }
         if (D_L15_001B1584 != 0) {
-            func_0029F338(D_L15_001B1584);
+            moby_mark_spawned(D_L15_001B1584);
             D_L15_001B1584 = 0;
         }
         if (D_L15_001B1588 != 0) {
-            func_0029F338(D_L15_001B1588);
+            moby_mark_spawned(D_L15_001B1588);
             D_L15_001B1588 = 0;
         }
     }
-    if (func_L15_00381CF0(func_L05_00379ED0(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
+    if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
         func_PAL_L15_00436118(self, 2);
     }
 }

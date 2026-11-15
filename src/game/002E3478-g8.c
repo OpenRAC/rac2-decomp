@@ -9,11 +9,11 @@ typedef unsigned char u8;
 extern float *D_001B1990;
 extern int D_001B20F0[] __attribute__((sda));
 extern float ref_L00_00261DD0_00[];
-extern float func_00283B98(float a, float b);
-extern void func_00283430(int *a, float *b);
+extern float FastAddRotations(float a, float b);
+extern void mat_fast_helper_b(int *a, float *b);
 
 /* Blends the rotation of one view toward its target and passes it on as a transform. */
-void func_002E3478(int viewIndex)
+void cam_update_view_rotation(int viewIndex)
 {
     float buf[3];
 
@@ -26,5 +26,5 @@ void func_002E3478(int viewIndex)
     buf[0] = ((float *)ref_L00_00261DD0_00)[viewIndex * 3];
     buf[1] = ((float *)((char *)ref_L00_00261DD0_00 + 4))[viewIndex * 3];
     buf[2] = ((float *)((char *)ref_L00_00261DD0_00 + 8))[viewIndex * 3];
-    FastMatrixHelperB(D_001B20F0, buf);
+    mat_fast_helper_b(D_001B20F0, buf);
 }

@@ -32,8 +32,8 @@ typedef struct {
 } AimObject;
 
 /* Encoded id lists, the entity pool pointer (read absolutely) and the group count. */
-extern u16 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C[] __attribute__((sda));
+extern u16 *g_group_id_lists[];
+extern u8 *g_moby_l11_table[] __attribute__((sda));
 extern s32 D_L11_001B35B8 __attribute__((sda));
 
 /* the three float tuning words of this variant (range, cone and turn angles in degrees) */
@@ -41,19 +41,19 @@ extern float D_L11_001B1BD0 __attribute__((sda));
 extern float D_L11_001B1BD4 __attribute__((sda));
 extern float D_L11_001B1BD8 __attribute__((sda));
 
-extern int func_00283DB8(void *v, float r);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00283BE0(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern int func_L01_00321178(void *, void *);
-extern int func_L02_003D7300(void *);
+extern int math_fast_helper_a(void *v, float r);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float fast_subtract_rotations(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern int moby_l01_turn_toward_target(void *, void *);
+extern int moby_get_busy_flag(void *);
 
 /* Finds a nearby target in front of the object and aims at it; returns 1 if one was found. */
-s32 func_L11_00449C70(AimObject *obj)
+s32 AimAtGroupEntityInCone(AimObject *obj)
 {
     AimState *state = *(AimState **)((u8 *)obj + 0x68);
     float posCopy[4];
@@ -70,35 +70,35 @@ s32 func_L11_00449C70(AimObject *obj)
     aimPoint[2] = obj->position[2];
     aimPoint[3] = 2.0f;
     *(TI128 *)posCopy = *(TI128 *)aimPoint;
-    if (FastMathHelperA(posCopy, 128.0f) <= 0)
+    if (math_fast_helper_a(posCopy, 128.0f) <= 0)
         return 0;
     if (state->group == -1)
         return 0;
-    for (idPtr = gGroupIdLists[state->group];
+    for (idPtr = g_group_id_lists[state->group];
          (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && idPtr != 0 &&
-         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == gGroupIdLists[state->group]);
+         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_group_id_lists[state->group]);
          idPtr++) {
-        entity = (EntityPositionPrefix *)(gMobyTable_L11[0] + ((*idPtr & 0x7FFF) << 8));
+        entity = (EntityPositionPrefix *)(g_moby_l11_table[0] + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
             return 0;
-        if (!GetMobyBusyFlag(entity))
+        if (!moby_get_busy_flag(entity))
             continue;
         if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1BD0))
             continue;
-        angleToEntity = FastMatrixHelperA(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
+        angleToEntity = mat_fast_helper_a(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
         if (!(FastDiffRots(obj->heading, angleToEntity) < D_L11_001B1BD4 * 0.017453294f))
             continue;
         if (idPtr == 0)
             return 0;
         FastVecSub(aimPoint, obj->position, entity->position);
         turnAngle = D_L11_001B1BD8 * 0.017453294f;
-        angleToEntity = FastMatrixHelperA(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
-        ApplyAxisRotationToQuaternion(aimPoint, aimPoint, obj->orientation,
+        angleToEntity = mat_fast_helper_a(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
+        math_apply_axis_rotation_to_quat(aimPoint, aimPoint, obj->orientation,
                       fast_subtract_rotations(obj->heading, angleToEntity) >= 0.0f ? -turnAngle : turnAngle);
         FastVecAdd(aimPoint, aimPoint, entity->position);
         savedValue = state->f134;
         state->f134 = 0.0001f;
-        TurnMobyTowardTarget(obj, aimPoint);
+        moby_l01_turn_toward_target(obj, aimPoint);
         state->f134 = savedValue;
         return 1;
     }

@@ -29,21 +29,21 @@ typedef struct {
 
 extern float (*D_L03_001FE700[])[4];
 extern RopeVector D_L03_00237F40[];
-extern float D_00189EA0[];
-extern float func_00283B98(float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_00283248(float, float);
+extern float g_hero_position[];
+extern float FastAddRotations(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float mat_fast_helper_a(float, float);
 
 
 /* Updates the four rope strands: it copies or builds their points, then adds wobble and sway for drawing. */
-void func_L03_0038B5D8(u8 *object)
+void rope_update_strand_points(u8 *object)
 {
     RopeVector toward, relative, blended, tangent, radial, jitter;
     RopeState *state = *(RopeState **)(object + 0x68);
@@ -63,7 +63,7 @@ void func_L03_0038B5D8(u8 *object)
                 qcopy_nc(&D_L03_00238040[state->pool + row][column], &source[column + 1]);
             if (state->flags & 8) {
                 float distance, strength;
-                FastVecSub(&toward, gHeroPosition, state->center);
+                FastVecSub(&toward, g_hero_position, state->center);
                 distance = FastVecLength(&toward);
                 vec_scale_to_length(&toward, &toward, 1.1f);
                 if (!(distance > state->radius + 1.1f)) {
@@ -122,16 +122,16 @@ void func_L03_0038B5D8(u8 *object)
         if (!(state->flags & 0x40))
             FastVecScale(&jitter, &D_L03_00237F40[column], state->jitterScale * segmentLength);
         if (!(state->flags & 0x80)) {
-            float firstPhase = WrapAngleToPi(state->phaseA + (float)column * -1.780236005783081f);
-            float first = state->amplitude * FastSinOrCosB(firstPhase);
-            phase = WrapAngleToPi(state->phaseB + (float)column * -1.5184365510940552f);
-            vertical = segmentLength * (first * FastSinOrCosB(phase));
+            float firstPhase = math_wrap_angle_to_pi(state->phaseA + (float)column * -1.780236005783081f);
+            float first = state->amplitude * math_fast_sin_or_cos_b(firstPhase);
+            phase = math_wrap_angle_to_pi(state->phaseB + (float)column * -1.5184365510940552f);
+            vertical = segmentLength * (first * math_fast_sin_or_cos_b(phase));
         }
         if (!(state->flags & 0x100)) {
-            angle = FastAddRotations(FastMatrixHelperA(tangent.f[0], tangent.f[1]), 1.5707964897155762f);
-            magnitude = segmentLength * state->swayScale * FastSinOrCosA(phase);
-            radial.f[0] = FastSinOrCosA(angle) * magnitude;
-            radial.f[1] = FastSinOrCosB(angle) * magnitude;
+            angle = FastAddRotations(mat_fast_helper_a(tangent.f[0], tangent.f[1]), 1.5707964897155762f);
+            magnitude = segmentLength * state->swayScale * math_fast_sin_or_cos_a(phase);
+            radial.f[0] = math_fast_sin_or_cos_a(angle) * magnitude;
+            radial.f[1] = math_fast_sin_or_cos_b(angle) * magnitude;
             radial.f[2] = 0.0f;
         }
         for (row = 0; row < 4; row++) {

@@ -5,8 +5,8 @@
 
 #include "common.h"
 extern u8 D_L11_004465F8[];
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
 typedef struct {
     u8 pad0[0x10];
     float pos[4];
@@ -27,15 +27,15 @@ typedef struct {
 } GroupVars440B28;
 extern char *D_001B359C __attribute__((sda));
 extern unsigned short *D_001FC420[];
-extern float func_00283248(float, float);
-extern void func_002833F0(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_L11_0043BE90(void *, int, int);
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C;
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table;
 extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
 extern u8 *D_L11_001B368C __attribute__((sda));
-extern u8 D_00189E20[];
-extern u8 D_001A63A8[];
+extern u8 g_hero_state[];
+extern u8 g_music_state[];
 
 int func_PAL_L11_00446380(u8 *object, float *target)
 {
@@ -60,9 +60,9 @@ int func_PAL_L11_00446380(u8 *object, float *target)
             qcopy(member->pos, target);
             member->fF0 = 0.0f;
             member->fF4 = -1.5707965f;
-            dx = target[0] - ((float *)func_L11_004417E8(object))[0];
-            member->fF8 = func_00283248(dx, target[1] - ((float *)func_L11_004417E8(object))[1]);
-            func_002833F0(member->rot, &member->fF0);
+            dx = target[0] - ((float *)arena_get_center_point(object))[0];
+            member->fF8 = mat_fast_helper_a(dx, target[1] - ((float *)arena_get_center_point(object))[1]);
+            euler_rotation_basis(member->rot, &member->fF0);
             func_PAL_L11_0043BE90(member, 0, 1);
             return 1;
         }

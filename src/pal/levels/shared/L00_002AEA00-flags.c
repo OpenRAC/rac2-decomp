@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_PAL_L00_002D2668(void *a, void *b, float f);
 typedef int HeldQuad __attribute__((mode(TI)));
@@ -63,17 +64,17 @@ typedef struct {
     unsigned char first[0x600];
     unsigned char second[0x600];
 } HeldMatrixBuffers;
-extern HeldAnimationHero D_00189E20;
-extern unsigned char D_00139568[];
-extern HeldAnimationItem D_L00_00262570[];
+extern HeldAnimationHero g_hero_state;
+extern unsigned char g_item_slot_to_record[];
+extern HeldAnimationItem g_weapon_l00_table[];
 extern HeldMatrixBuffers D_L00_001B7400[];
 extern int D_L00_001A7D00[2] __asm__("D_L00_001A7D00__gp") __attribute__((section(".sdata")));
-extern int func_L00_002ADEA0(int);
-extern void func_L00_002AB3E0(void);
-extern int func_002A7820(int, int);
-extern void func_L00_00310C88(void *, HeldAnimationSlot **);
-extern HeldAnimationSlot *func_L00_00310BC8(void *, int);
-extern void func_L00_00311080(void *, HeldAnimationSlot *, int, int, int, int);
+extern int hero_slot_item_id(int);
+extern void hero_clear_slot_records(void);
+extern int math_random_int_range(int, int);
+extern void release_moby_animation_slot(void *, HeldAnimationSlot **);
+extern HeldAnimationSlot *allocate_moby_animation_slot(void *, int);
+extern void initialize_moby_animation_blend(void *, HeldAnimationSlot *, int, int, int, int);
 
 /* func_L00_002AF3D8 is defined in a sibling unit. */
 
@@ -85,19 +86,19 @@ void func_PAL_L00_002AF458(void)
     HeldAnimationSlot *slot;
     HeldAnimationItem *definition;
 
-    item = func_L00_002ADEA0(0);
+    item = hero_slot_item_id(0);
     if (item == -1 || item == 0)
         return;
-    D_00189E20.item = item;
-    definition = &D_L00_00262570[D_00139568[item]];
+    g_hero_state.item = item;
+    definition = &g_weapon_l00_table[g_item_slot_to_record[item]];
     primary = definition->primaryAnimation;
     held = definition->heldAnimation;
-    if (D_00189E20.controlMode == 12)
+    if (g_hero_state.controlMode == 12)
         held = definition->alternateAnimation;
-    D_00189E20.active = 1;
-    { int flags = definition->flags; D_00189E20.flags = flags; }
+    g_hero_state.active = 1;
+    { int flags = definition->flags; g_hero_state.flags = flags; }
     duration = -1;
-    if (D_L00_00262570[D_00139568[item]].category == 0)
+    if (g_weapon_l00_table[g_item_slot_to_record[item]].category == 0)
         duration = 9;
     else if (primary == 0x36)
         duration = 2;
@@ -108,27 +109,27 @@ void func_PAL_L00_002AF458(void)
     blendDuration = duration;
     if (blendDuration < 0)
         blendDuration = 9;
-    func_L00_002AB3E0();
-    D_00189E20.idleTimer = func_002A7820(75, 100);
-    if (D_00189E20.controlMode == 0 && D_00189E20.suppressed == 0) {
-        D_00189E20.animation = primary;
+    hero_clear_slot_records();
+    g_hero_state.idleTimer = math_random_int_range(75, 100);
+    if (g_hero_state.controlMode == 0 && g_hero_state.suppressed == 0) {
+        g_hero_state.animation = primary;
         func_PAL_L00_002D2668((void *)primary, 0, (float)duration);
         return;
     }
     if (held == -1)
         return;
-    for (i = 0; i < 2 && (i != 1 || D_00189E20.dual == 2); i++) {
-        if (D_00189E20.slots[i])
-            func_L00_00310C88(D_00189E20.moby, &D_00189E20.slots[i]);
-        slot = func_L00_00310BC8(D_00189E20.moby, D_L00_001A7D00[i]);
-        D_00189E20.slots[i] = slot;
+    for (i = 0; i < 2 && (i != 1 || g_hero_state.dual == 2); i++) {
+        if (g_hero_state.slots[i])
+            release_moby_animation_slot(g_hero_state.moby, &g_hero_state.slots[i]);
+        slot = allocate_moby_animation_slot(g_hero_state.moby, D_L00_001A7D00[i]);
+        g_hero_state.slots[i] = slot;
         if (slot) {
-            D_00189E20.animation = held;
-            D_00189E20.cancel = 0;
+            g_hero_state.animation = held;
+            g_hero_state.cancel = 0;
             slot->weight = 1.0f;
             slot->firstMatrices = D_L00_001B7400[i].first;
             slot->secondMatrices = D_L00_001B7400[i].second;
-            func_L00_00311080(D_00189E20.moby, slot, D_00189E20.animation, 0, blendDuration, 1);
+            initialize_moby_animation_blend(g_hero_state.moby, slot, g_hero_state.animation, 0, blendDuration, 1);
         }
     }
 }

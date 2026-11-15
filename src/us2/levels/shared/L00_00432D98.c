@@ -1,34 +1,35 @@
 #include "include_asm.h"
+#include "names.h"
 extern unsigned char D_001A7B9E __attribute__((sda));
 extern unsigned char D_001A7BBA __attribute__((sda));
 
-extern void func_0033AB50(char *p);
+extern void prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_00432D98(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_004331D8(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_00433490(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_00433A18(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
@@ -73,13 +74,13 @@ int func_US2_L00_00433B78(char *a0, int a1)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_004344A0(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 extern void func_US2_0033BE70 (char *object);
-extern void func_L00_00430948 (char *object, float x, float y);
-extern int func_002E5E58 (int a, int b, int c);
+extern void mem_store_two_floats_through_cell (char *object, float x, float y);
+extern int snd_play_from_global_bank (int a, int b, int c);
 
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
 int func_US2_L00_00434600 (char *object, int flags)
@@ -90,11 +91,11 @@ int func_US2_L00_00434600 (char *object, int flags)
 
   func_US2_0033BE70 (object + 8);
   vec = *(float **) (object + 732);
-  func_L00_00430948 (object + 8, vec[0], vec[1]);
+  mem_store_two_floats_through_cell (object + 8, vec[0], vec[1]);
 
   if ((flags & 0x40) && *(int *) (object + 728) == 0)
     {
-      discarded = func_002E5E58 (4, 0, 0);
+      discarded = snd_play_from_global_bank (4, 0, 0);
       (void) discarded;
       *g = (*g < 1);
     }
@@ -106,7 +107,7 @@ int func_US2_L00_00434600 (char *object, int flags)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_00434768(char *object)
 {
-    func_0033AB50(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
@@ -251,28 +252,28 @@ int func_US2_L00_00435140 (char *object, int flags)
 
 
 extern void *func_US2_0033BB98(void *);
-extern void *func_00347EA0(void *);
+extern void *menu_pass_through_handle(void *);
 
 void *func_US2_L00_004351D8(char *object) {
     func_US2_0033BB98(object + 0x8);
-    func_00347EA0(object + 0x2E0);
+    menu_pass_through_handle(object + 0x2E0);
     return object;
 }
 
 
-extern void *func_L00_0042C290(void *);
+extern void *cam_init_object_table_d(void *);
 
 void *func_US2_L00_004354E8(char *object) {
     func_US2_0033BB98(object + 0x8);
-    func_L00_0042C290(object + 0x2E0);
+    cam_init_object_table_d(object + 0x2E0);
     return object;
 }
 
 
-extern int func_0033AF48(char *p);
+extern int prompt_bar_draw(char *p);
 
 int func_US2_L00_00435688(char *p)
 {
-    return func_0033AF48(p + 8);
+    return prompt_bar_draw(p + 8);
 }
 

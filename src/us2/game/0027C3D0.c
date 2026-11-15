@@ -1,39 +1,40 @@
 #include "include_asm.h"
+#include "names.h"
 
 
-extern void func_00284F40(int);
+extern void gfx_append_draw_list_buffer_tag(int);
 extern int D_001B1594 __attribute__((sda));
-extern void func_0027BD70(void);
+extern void RenderFrame(void);
 
 void func_US2_0027CAE0(void) {
-    extern void func_00284F40(int);
-    extern void func_0027BD70(void);
+    extern void gfx_append_draw_list_buffer_tag(int);
+    extern void RenderFrame(void);
     extern int D_001B1594 __attribute__((sda));
-    func_00284F40(0);
+    gfx_append_draw_list_buffer_tag(0);
     D_001B1594 = 0x7F;
-    func_0027BD70();
+    RenderFrame();
 }
 
-void func_002CBC58(int);
-extern unsigned int func_00285850(void);
-extern void func_002CBC58(int);
-extern void func_002859C8(void);
+void menu_draw_pause_panels(int);
+extern unsigned int menu_get_second_value(void);
+extern void menu_draw_pause_panels(int);
+extern void menu_draw_message_panel(void);
 
 void func_US2_0027CB08(void)
 {
-    if (func_00285850() == 1) {
-        func_00284F40(0);
+    if (menu_get_second_value() == 1) {
+        gfx_append_draw_list_buffer_tag(0);
         D_001B1594 = 0x100FF;
-        func_0027BD70();
-    } else if (func_00285850() == 0) {
-        func_002CBC58(1);
+        RenderFrame();
+    } else if (menu_get_second_value() == 0) {
+        menu_draw_pause_panels(1);
     }
-    func_002859C8();
+    menu_draw_message_panel();
 }
 
 void func_US2_0027CB80(void)
 {
-  func_002CBC58(0);
+  menu_draw_pause_panels(0);
   return;
 }
 

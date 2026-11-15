@@ -9,7 +9,7 @@ extern void r1_func_00118B20(int, void *, int);
 
 extern void r1_func_00118C80(int);
 
-extern int func_00124B88(int);
+extern int sceCdSyncS(int);
 
 extern int r1_func_0011D960(void);
 
@@ -109,7 +109,7 @@ extern char r1_D_00152FD8[];
 
 extern char r1_D_00132590[];
 
-extern int func_00124980(int);
+extern int cd_scmd_check_ready(int);
 
 /* rac1-decomp src/core/001208E8.c: func_00120910 */
 /* sceCdDelayThread: sleep on an alarm. Same stack-descriptor idiom as
@@ -125,7 +125,7 @@ extern int func_00124980(int);
    `sd $31` where retail interleaves the descriptor stores between the
    `$16` and `$31` saves. */
 /* Sleeps for a number of ticks by setting an alarm that wakes this thread, then waiting on it. */
-void func_00124568(unsigned short delayTicks) {
+void cd_sleep_with_alarm(unsigned short delayTicks) {
     int semaParam[8];
     int alarmSema;
     semaParam[2] = 0;
@@ -139,10 +139,10 @@ void func_00124568(unsigned short delayTicks) {
 
 /* rac1-decomp src/core/001208E8.c: func_00120978 */
 /* Sets the CD callback handler and returns the previous one. Does nothing if the CD system is busy. */
-void *func_001245D0(void *newHandler) {
+void *sceCdCallback(void *newHandler) {
     void *oldHandler;
     int intrWasOn;
-    if (WaitSCommandDone(1) != 0) {
+    if (sceCdSyncS(1) != 0) {
         return 0;
     }
     intrWasOn = r1_func_0011D960();
@@ -156,7 +156,7 @@ void *func_001245D0(void *newHandler) {
 
 /* rac1-decomp src/core/001208E8.c: func_001209D8 */
 /* Runs when a CD command finishes. Records the status and wakes up the thread waiting for the result. */
-void func_00124630(int *cmdStatus) {
+void cd_command_done_callback(int *cmdStatus) {
     r1_D_00131414_v = *cmdStatus;
     r1_D_00131418_v = r1_D_00131414_v;
     if (r1_D_00131414_v == 0xB) {
@@ -185,7 +185,7 @@ extern void r1_func_001209D8(int *arg0);
 
 /* rac1-decomp src/core/001208E8.c: func_001246D0 */
 /* Copies the two small result buffers from the CD reply packet to their destinations, then finishes the command. */
-void func_001246D0(int bufAddr) {
+void cd_copy_reply_buffers(int bufAddr) {
     CdRecv *recv = (CdRecv *)(bufAddr | 0x20000000);
     int i;
 
@@ -226,7 +226,7 @@ extern s32 r1_func_00118C70_120B28(struct SemaParam_120B28 *) __asm__("r1_func_0
    r1_func_00118C70 (CreateSema), then clear r1_D_001313F0.
    Adapted from Lombyte's project (GPL-3.0): src/sdk/library/cmd_sem_init.c, cmd_sem_init. */
 /* Creates the CD command semaphores if they do not exist yet. */
-void func_00124780(void) {
+void cd_create_semaphores(void) {
     struct SemaParam_120B28 sema;
 
     if ((r1_D_001313E8_120B28[0] != -1) && (r1_D_001313EC_120B28[0] != -1)) {
@@ -260,7 +260,7 @@ void func_00124780(void) {
  * delay slot. Without it the load is hoisted above the store.
  */
 /* Shuts down the CD system: wakes the callback thread, deletes the semaphores and removes the command handler. */
-void func_00124818(void) {
+void cd_shutdown(void) {
     int intrWasOn;
     if (r1_D_001313D4 != 0) {
         do {
@@ -281,7 +281,7 @@ void func_00124818(void) {
 
 /* rac1-decomp src/core/001208E8.c: func_00120CA0 */
 /* Installs the CD command handler with interrupts off and marks the CD system as ready. */
-int func_001248F8(void) {
+int cd_install_command_handler(void) {
     int intrWasOn;
 
     r1_D_001313E4 = 1;
@@ -299,7 +299,7 @@ int func_001248F8(void) {
 /* rac1-decomp src/core/001208E8.c: func_00120D28 */
 /* _sceCd_scmd_prechk (libcdvd.a cdvd000.o) */
 /* Checks that a CD system command can start. Takes the lock and connects to the CD server, retrying until it answers. */
-int func_00124980(int cmdId) {
+int cd_scmd_check_ready(int cmdId) {
     int spin;
     volatile int *sem = &r1_D_001313E8;
 
@@ -312,7 +312,7 @@ int func_00124980(int cmdId) {
     }
     r1_D_001313DC = cmdId;
     r1_func_00118BF0(r1_D_00159850, r1_D_00159858);
-    if (WaitSCommandDone(1) != 0) {
+    if (sceCdSyncS(1) != 0) {
         r1_func_00118C90(*sem);
         return 0;
     }

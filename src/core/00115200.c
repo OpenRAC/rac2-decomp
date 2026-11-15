@@ -6,13 +6,13 @@ extern void *D_00133E74;
 extern void *D_0013A308;
 
 /* Returns the pointer to the record the C library uses to keep its own state. */
-void *func_00115200(void)
+void *libc_get_state_record(void)
 {
     return D_00133E74;
 }
 
 /* Returns the address of a fixed block of C library data. */
-void **func_00115210(void)
+void **libc_get_data_block(void)
 {
     return &D_0013A308;
 }
@@ -49,7 +49,7 @@ ASM_FUNC("asm/core", func_001158F4);
 ASM_FUNC("asm/core", func_00115AC0);
 
 
-extern void func_00131CA8(int status) __attribute__((noreturn));
+extern void exit_ignoring_status(int status) __attribute__((noreturn));
 extern void func_00115CF0(void *stream, const char *format, ...);
 extern char D_0013A370[];
 
@@ -59,15 +59,15 @@ void func_00115E28(void) __attribute__((noreturn));
 /* Stops the program by exiting with an error code. */
 void func_00115E28(void)
 {
-    ExitIgnoringStatus(1);
+    exit_ignoring_status(1);
 }
 
 /* Prints a failed-check message with the file, line and test text, then stops the program. */
-void func_00115E38(const char *file, int line, const char *expression)
+void assert_fail_abort(const char *file, int line, const char *expression)
 {
-    Fprintf(*(void **)((char *)D_00133E74 + 0xC),
+    func_00115CF0(*(void **)((char *)D_00133E74 + 0xC),
                   D_0013A370, expression, file, line);
-    abort_00115E28();
+    func_00115E28();
 }
 
 
@@ -77,12 +77,12 @@ extern int D_001341E4;
 
 extern int D_00134DB8;
 
-extern int func_0011AB10(void);
+extern int GetThreadId(void);
 
-extern void func_0011AC60(int arg0);
+extern void WaitSema(int arg0);
 
 /* Takes the memory lock. If another thread holds it, this waits; the same thread can take it again. */
-int func_00116300(void) {
+int malloc_lock_acquire(void) {
     int id = GetThreadId();
 
     if (D_001341E0 != id) {

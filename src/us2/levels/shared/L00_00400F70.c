@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002A7750(char *arg, int mode, int value);
+extern void moby_set_state(char *arg, int mode, int value);
 extern void func_L00_003FF7B8_1(char *arg);
-extern void func_L00_003FF890(char *arg);
+extern void glow_ring_effect_update(char *arg);
 extern float func_00282E80_3(char *arg, char *table);
 extern float func_00282C48_10(float value);
-extern void func_002B0A18(int arg, int value);
-extern void func_00288308(int arg);
-extern void func_002AD860(int arg);
+extern void value_set_entry_by_index(int arg, int value);
+extern void help_unlock_entry(int arg);
+extern void moby_handle_request_slot_state(int arg);
 extern void func_0029F338_4(char *arg);
 extern char D_00189EA0_2[];
 extern unsigned char D_001A7B2E __attribute__((sda));
@@ -27,17 +27,17 @@ void func_US2_L00_00400F70(char *arg)
             func_0029F338_4(arg);
             return;
         } else {
-            func_002A7750(arg, 1, -1);
+            moby_set_state(arg, 1, -1);
             func_L00_003FF7B8_1(arg);
         }
         break;
     case 1:
-        func_L00_003FF890(arg);
+        glow_ring_effect_update(arg);
         if (func_00282E80_3(arg + 16, D_00189EA0_2) < 2.0f) {
             if (func_00282C48_10(*(float *)(arg + 24) - *(float *)(D_00189EA0_2 + 8)) < 2.0f) {
-                func_002B0A18(4658, -1);
-                func_00288308(54);
-                func_002AD860(54);
+                value_set_entry_by_index(4658, -1);
+                help_unlock_entry(54);
+                moby_handle_request_slot_state(54);
                 if (object[17] != 0) {
                     func_0029F338_4((char *)object[17]);
                     func_0029F338_4(arg);

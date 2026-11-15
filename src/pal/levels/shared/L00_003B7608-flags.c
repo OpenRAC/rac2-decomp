@@ -21,12 +21,12 @@ extern float D_001AF924 __attribute__((sda));
 extern int D_001AF928 __attribute__((sda));
 extern unsigned char D_001AF92C __attribute__((sda));
 extern float D_001AF930 __attribute__((sda));
-extern float D_L00_001B8DC0[];
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002A77E0(int);
+extern float g_camera_l00_position[];
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_random_int_below(int);
 extern u8 *func_PAL_002BE9A8(u8 *p, float fa, float fb, float fc, float fd, int v, void *local, int a3, int t0);
 
 void func_PAL_L00_003B7870(u8 *obj)
@@ -40,15 +40,15 @@ void func_PAL_L00_003B7870(u8 *obj)
 
     axis.bits = 0;
     axis.f[2] = D_001AF908;
-    func_00282CF0(&w, D_L00_001B8DC0, obj + 0x10);
-    step = 6.2831855f / func_00283CE0(D_001AF918);
+    FastVecSub(&w, g_camera_l00_position, obj + 0x10);
+    step = 6.2831855f / IntToFloat(D_001AF918);
     for (i = 0; i < D_001AF918; i++) {
         u8 *e;
         int r;
-        func_002ACEC0(&a, &axis, &w, (float)i * step);
-        func_00282F20(&b, &a, D_001AF920 * 0.020000001f);
-        r = func_002A77E0(16);
-        if (func_002A77E0(2) != 0) {
+        math_apply_axis_rotation_to_quat(&a, &axis, &w, (float)i * step);
+        vec_scale_to_length(&b, &a, D_001AF920 * 0.020000001f);
+        r = math_random_int_below(16);
+        if (math_random_int_below(2) != 0) {
             r = -r;
         }
         e = func_PAL_002BE9A8(obj + 0x10, 0.5f, 1.0f, D_001AF930, D_001AF924 * 210000.0f, r, &b, D_001AF928, 0);

@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
-extern int D_001A8BB0[] __attribute__((sda));
+extern int g_current_game_mode[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void func_PAL_0029C498(void);
-extern unsigned int func_L00_002F0E38(void);
+extern unsigned int level_get_word_a(void);
 extern void func_PAL_L00_0030E780(void);
 typedef int (*Fn)(void);
 typedef struct { void *cb; int pad; } Slot;
@@ -53,9 +54,9 @@ void func_PAL_0029C640(void)
     if (result != 0)
         return;
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_L00_002F0E38() != 7)
+    if (g_current_game_mode[0] != 0 && g_current_game_mode[0] != 5) {
+        if (g_current_game_mode[0] == 4) {
+            if (level_get_word_a() != 7)
                 return;
         }
     }

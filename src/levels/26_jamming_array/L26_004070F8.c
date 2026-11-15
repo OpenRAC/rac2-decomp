@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern void func_002A7750(char *, int, int);
-extern int func_00288E18(int, int);
+extern void moby_set_state(char *, int, int);
+extern int subtitle_request_voice_line(int, int);
 
 extern int D_L26_001A8FF0[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda)) NOT_SDA;
+extern int g_current_map_index[] __attribute__((sda)) NOT_SDA;
 typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
-extern SubtitleHistory D_0018C958[];
+extern SubtitleHistory g_subtitle_history[];
 extern int D_0018C0B4 NOT_SDA;
 extern int D_L26_001B1748[] __attribute__((sda));
 extern unsigned int D_001A7390[] __attribute__((sda));
@@ -27,11 +27,11 @@ typedef struct {
 } D_0018C750_t;
 
 extern D_L26_0027D5C8_t D_L26_0027D5C8;
-extern D_0018C750_t D_0018C750;
+extern D_0018C750_t g_progress_statistics;
 
 /* Per-frame update for the moby of class 4712: it plays a hint voice line (with subtitle) when the
    conditions are met and the line has not already been played in this level. */
-void func_L26_004070F8(char *moby) {
+void UpdateJammingArraySubtitleTriggers(char *moby) {
     char *obj = moby;
     char *vars = *(char **)(obj + 0x68);
     u8 kind = *(u8 *)(obj + 0x20);
@@ -42,26 +42,26 @@ void func_L26_004070F8(char *moby) {
         *(u8 *)(obj + 0x30) = 0xFF;
         *(int *)(vars + 0x4) = 0;
         *(int *)(vars + 0x10) = 0;
-        SetMobyState(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
         if (D_L26_001A8FF0[0] != 0) {
             if (D_L26_0027D5C8.f0 == 0 && D_L26_0027D5C8.f24 == -1) {
-                unsigned int flags = gSubtitleHistory[28].levels;
-                flags &= (unsigned int)kind << gCurrentMapIndex[0];
+                unsigned int flags = g_subtitle_history[28].levels;
+                flags &= (unsigned int)kind << g_current_map_index[0];
                 if (flags == 0) {
-                    RequestSubtitleVoiceLine(0x9C5, 0x1C);
+                    subtitle_request_voice_line(0x9C5, 0x1C);
                 }
             }
         }
-        if (gProgressStatistics.f1a4 == 0 ||
+        if (g_progress_statistics.f1a4 == 0 ||
             0x1A5E0u <
-                (unsigned int)(D_001A7390[0] - gProgressStatistics.f1a8)) {
+                (unsigned int)(D_001A7390[0] - g_progress_statistics.f1a8)) {
             if (D_0018C0B4 == 0 && D_L26_001B1748[0] >= 0x4B1) {
-                unsigned int flags = gSubtitleHistory[12].levels;
-                mask = 1u << gCurrentMapIndex[0];
+                unsigned int flags = g_subtitle_history[12].levels;
+                mask = 1u << g_current_map_index[0];
                 if ((flags & mask) == 0) {
-                    RequestSubtitleVoiceLine(0x9B5, 0xC);
+                    subtitle_request_voice_line(0x9B5, 0xC);
                 }
             }
         }

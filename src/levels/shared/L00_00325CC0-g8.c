@@ -10,19 +10,19 @@ typedef struct {
     unsigned long long tag[4];
 } BillboardBatchPacket;
 
-extern unsigned long long func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 extern BillboardBatchVec D_L00_001AA310[4] __attribute__((sda));
-extern BillboardBatchVec D_L00_001B8DC0 NOT_SDA;
+extern BillboardBatchVec g_camera_l00_position NOT_SDA;
 
 /* Draws offset camera-facing quads, reusing the packet while its color is unchanged. */
-void func_L00_00325CC0(int count, BillboardBatchVec *positions, int *colors,
+void DrawOffsetBillboardBatch(int count, BillboardBatchVec *positions, int *colors,
                      float size, float offset)
 {
     BillboardBatchPacket packet;
@@ -50,7 +50,7 @@ void func_L00_00325CC0(int count, BillboardBatchVec *positions, int *colors,
     packet.color[0] = color;
     for (i = 0; i < count; ++i) {
         qcopy(&matrix[3], &positions[i]);
-        FastVecSub(&matrix[0], &gCameraPosition_L00, &matrix[3]);
+        FastVecSub(&matrix[0], &g_camera_l00_position, &matrix[3]);
         vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
         FastVecCross(&matrix[1], &matrix[0], &up);
         vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);

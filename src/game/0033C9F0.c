@@ -33,10 +33,10 @@ extern void func_0033B030_1(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe
 
 extern void func_0033B0A8_1(u8_Fe9770b1e *, f32_Fe9770b1e);
 
-extern void func_L00_00432448(u8_Fe9770b1e *, s32_Fe9770b1e);
+extern void menu_handle_page_input_a(u8_Fe9770b1e *, s32_Fe9770b1e);
 
 /* Sets up a menu with a button prompt bar, its labels and position, then runs its first update. */
-void func_0033C9F0(u8_Fe9770b1e *self, void *arg) {
+void prompt_menu_init(u8_Fe9770b1e *self, void *arg) {
     u8_Fe9770b1e *prompt;
     void *textA, *textB, *textC;
     *(void **)self = arg;
@@ -60,5 +60,5 @@ void func_0033C9F0(u8_Fe9770b1e *self, void *arg) {
     func_0033B030_1(prompt, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_0033B0A8_1(prompt, 0.2f);
     *(s32_Fe9770b1e *)(self + 680) = 0;
-    HandleMenuPageInputA_L00(self, 0);
+    menu_handle_page_input_a(self, 0);
 }

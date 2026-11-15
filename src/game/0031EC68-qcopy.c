@@ -10,20 +10,20 @@ typedef struct {
     unsigned long tag, tex, alpha, test;
 } Beam;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 extern void ref_0031EC68_00(void *);
-extern Vector4 D_001B5340;
+extern Vector4 g_camera_eye_state;
 
 /* A two-strip beam from start to end (the func_L00_0038ADD0 layout): textures 0x2F and
    0x30, the alpha in the top byte of both colours, the strip's u running from u0 to u0+1,
    half width at the far end. */
-void func_0031EC68(Vector4 *start, Vector4 *end, int unused2, int alpha, int unused4, int mode,
+void gfx_draw_two_strip_beam(Vector4 *start, Vector4 *end, int unused2, int alpha, int unused4, int mode,
                    float width, float unused, float u0)
 {
     Beam first, second;
@@ -54,7 +54,7 @@ void func_0031EC68(Vector4 *start, Vector4 *end, int unused2, int alpha, int unu
     second.uv[0] = u0; second.uv[1] = 0; second.uv[2] = u0; second.uv[3] = 1;
     second.uv[4] = u0 + 1; second.uv[5] = 0; second.uv[6] = u0 + 1; second.uv[7] = 1;
     FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], &gCameraState_001B5340, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], &g_camera_eye_state, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     first.point[0].bits = nearSize.bits; second.point[0].bits = farSize.bits;

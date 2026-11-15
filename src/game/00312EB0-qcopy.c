@@ -1,18 +1,18 @@
 #include "common.h"
-extern int func_002ACD38(void *);
-extern void func_002A7750(unsigned char *, unsigned char, int);
-extern int func_002AD470(void *, void *, void *, void *, void *, void *);
-extern void func_002B00D8(void *, float *, float *, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern int func_002ABB78(void *);
-extern char *func_002AD0B0(char *);
-extern int func_002AD5F8(char *, char *, char *, char *, char *, char *);
+extern int moby_is_in_selected_zone(void *);
+extern void moby_set_state(unsigned char *, unsigned char, int);
+extern int coll_apply_push_to_object(void *, void *, void *, void *, void *, void *);
+extern void gravity_offset_position(void *, float *, float *, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern int moby_is_in_special_class_range(void *);
+extern char *moby_get_private_value_2(char *);
+extern int moby_get_attachment_rotation_angles(char *, char *, char *, char *, char *, char *);
 /* Partial contact view; the external allocation remains incomplete. */
 typedef struct { char prefix[0x18]; char *target; char reserved[0xC]; float height; } ContactView;
 extern char ref_L00_00312EB0_00[];
 
 /* Keeps an object on the floor. It finds the ground below, rides any moving platform, and falls with gravity when in the air. */
-void func_00312EB0(unsigned char *object)
+void moby_ground_snapped_update(unsigned char *object)
 {
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
@@ -22,19 +22,19 @@ void func_00312EB0(unsigned char *object)
     float gravity;
     int hit = 0;
     ContactView *contact;
-    if (!IsObjectInSelectedZone(object + 0x10)) {
-        SetMobyState(object, 5, -1);
+    if (!moby_is_in_selected_zone(object + 0x10)) {
+        moby_set_state(object, 5, -1);
         return;
     }
     if (*(char **)(data + 0xC)) {
         qzero_nc(scratch);
-        ApplyCollisionPushToObject(object, *(char **)(data + 0xC), data + 0x70,
+        coll_apply_push_to_object(object, *(char **)(data + 0xC), data + 0x70,
                        scratch, object + 0x10, scratch);
     }
     qcopy(start, object + 0x10);
-    OffsetPositionAlongGravity(object + 0x10, start, start, -0.5f);
+    gravity_offset_position(object + 0x10, start, start, -0.5f);
     qcopy(end, start);
-    OffsetPositionAlongGravity(object + 0x10, end, end, 1.5f);
+    gravity_offset_position(object + 0x10, end, end, 1.5f);
     if (CollLine(start, end, 2, object, 0)) {
         hit = 1;
         height = *(float *)(ref_L00_00312EB0_00 + 0x28);
@@ -44,7 +44,7 @@ void func_00312EB0(unsigned char *object)
     if (hit) {
         contact = (ContactView *)ref_L00_00312EB0_00;
         if (contact->target) {
-            if (IsMobyInSpecialClassRange(contact->target)) {
+            if (moby_is_in_special_class_range(contact->target)) {
                 float x, y;
                 x = *(float *)(contact->target + 0x10);
                 *(float *)(data + 0x10) = x;
@@ -54,11 +54,11 @@ void func_00312EB0(unsigned char *object)
                 *(float *)(object + 0x14) = y;
                 *(float *)(object + 0x18) = contact->height;
                 qcopy(data + 0x10, object + 0x10);
-                OffsetPositionAlongGravity(object + 0x10, (float *)(data + 0x10), (float *)(data + 0x10), -0.5f);
-            } else if (!*(char **)(data + 0xC) && GetMobyPrivateValue2(contact->target)) {
+                gravity_offset_position(object + 0x10, (float *)(data + 0x10), (float *)(data + 0x10), -0.5f);
+            } else if (!*(char **)(data + 0xC) && moby_get_private_value_2(contact->target)) {
                 char *target = contact->target;
                 *(char **)(data + 0xC) = target;
-                GetAttachmentRotationAngles((char *)object, target, (char *)object + 0x10,
+                moby_get_attachment_rotation_angles((char *)object, target, (char *)object + 0x10,
                                (char *)object + 0xF0, data + 0x70, scratch);
             }
         }

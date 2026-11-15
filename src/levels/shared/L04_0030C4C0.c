@@ -57,15 +57,15 @@ typedef struct {
     L04Quad fieldF0;
 } L04Level;
 
-extern void *func_0029EFD0(s32 size);
-extern void func_002833F0(f32 *dst, f32 *src);
-extern f32 func_00283CE0(s32 value);
-extern void func_002A04B8(void *a, s32 *b, s32 *c, s32 *d);
+extern void *CreateMoby(s32 size);
+extern void euler_rotation_basis(f32 *dst, f32 *src);
+extern f32 IntToFloat(s32 value);
+extern void get_moby_color(void *a, s32 *b, s32 *c, s32 *d);
 
 /* Builds the level's spawn record: the caller's blocks are copied into the
    level's object and into the one the spawner allocated, and the colour and
    the scale are computed from what the engine's helpers return. */
-void *func_L04_0030C4C0(void *levelObj, void *block0, void *block1, void *block2, void *block3, void *block5,
+void *level_build_spawn_record(void *levelObj, void *block0, void *block1, void *block2, void *block3, void *block5,
                        s32 divisor, void *userPtr, u32 userValue) {
     L04Object *newObject = (L04Object *)(u32)CreateMoby(0xE44);
     L04Level *lv = (L04Level *)levelObj;

@@ -17,9 +17,9 @@ typedef struct {
     char pad22BD[0x2534 - 0x22BD];
     int cooldown;
 } AimHero;
-extern AimHero D_00189E20;
+extern AimHero g_hero_state;
 typedef struct { char pad000[0x1A0]; u32 held; u32 pressed; } AimPad;
-extern AimPad D_00138180;
+extern AimPad g_pad_state;
 extern u8 D_00139581;
 extern u8 D_0013958D[];
 extern int D_L00_001A8F00;
@@ -31,43 +31,43 @@ extern u16 D_L00_001B0C04 __attribute__((sda));
 extern u16 D_L00_001B0C08 __attribute__((sda));
 extern int D_L00_001B0C0C __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
-extern AimEntry D_L00_00262570[];
-extern void func_L00_003FE8D0(char *);
-extern void func_L00_002C42E0(int a0, int a1);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_00282978(s16 *);
-extern int func_00282948(int *);
-extern void func_002829D8(float *);
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002AF568(void);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_002D4040(int);
-extern int func_L00_002D3F30(int, int);
+extern AimEntry g_weapon_l00_table[];
+extern void moby_init_private_data(char *);
+extern void hero_l00_set_action(int a0, int a1);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int FastDecTimer(s16 *);
+extern int math_fast_float_d(int *);
+extern void vec_fast_helper_b(float *);
+extern void cancel_hero_item_animation(void);
+extern void start_equipped_item_animation(void);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int get_ammo(int);
+extern int weapon_spend_ammo(int, int);
 /* The caller deliberately supplies a sixth GPR word (4) in the call slot;
  * retail overwrites it before consumption. Original return/unused-formal
  * intent remains unqualified, but the observed call prefix is preserved. */
-extern void func_00273318(float, float, float, void *, u32, void *, int, int, int);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L00_003FE920(char *, void *, int, void *);
-extern void func_L00_003FEAC8(char *, void *, void *, int);
-extern void func_L00_003FE280(char *, char *);
-extern s32 func_002AB1F0(u8 *);
-extern void func_002FDF40(float, float, float, float, void *, void *, void *, void *);
-extern int func_002FE5A0(float, void *, void *, void *, void *, void *, int *, int *);
-extern void func_L00_003FE310(void *, void *, void *);
-extern int func_L00_003FE2D0(int, int, int);
+extern void hud_add_moby_marker(float, float, float, void *, u32, void *, int, int, int);
+extern int PlayMobySound(int, int, char *);
+extern void weapon_compute_spread_shot_velocity(char *, void *, int, void *);
+extern void part_spawn_linked_effect_with_sparks(char *, void *, void *, int);
+extern void moby_compute_offset_point(char *, char *);
+extern s32 moby_get_private_value_0(u8 *);
+extern void CalculateAimedLaunchVelocity(float, float, float, float, void *, void *, void *, void *);
+extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *, void *, int *, int *);
+extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
+extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
 extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
-extern int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *);
-extern void func_L00_002D6B70(int);
+extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
+extern void slot_reset_active(int);
 extern void ref_L00_003FDE48_00(void *, void *);
-extern void func_L00_003FE490(void *);
+extern void moby_draw_attached_effect(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
 /* Per-frame update of the Bouncer weapon (also used by the Heavy Bouncer): aims, fires and runs the reload timer. */
-void func_L00_003FDE48(unsigned char *object) {
+void bouncer_update(unsigned char *object) {
     float origin[4];
     float aim[4];
     AimEntry *entry;
@@ -85,50 +85,50 @@ void func_L00_003FDE48(unsigned char *object) {
         *(int *)(state + 0x2C) = 0;
         D_L00_001B2BE4 = 20;
     }
-    if (gHeroState.level == 1) SetHeroAction_L00(29, 1);
-    if (object[0x42] == object[0x43] && (object[0x60] & 2)) StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
-    ComputeMobyOffsetPoint(object, (char *)origin);
+    if (g_hero_state.level == 1) hero_l00_set_action(29, 1);
+    if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
+    moby_compute_offset_point(object, (char *)origin);
     target = 0;
-    if (gHeroState.target != 0 && (u8)gHeroState.target[0x20] != 0xFE && (u8)gHeroState.target[0x20] != 0xFD) {
-        target_data = GetMobyPrivateValue0((u8 *)gHeroState.target);
-        if (target_data != 0 && *(float *)target_data > 0.0f) target = gHeroState.target;
+    if (g_hero_state.target != 0 && (u8)g_hero_state.target[0x20] != 0xFE && (u8)g_hero_state.target[0x20] != 0xFD) {
+        target_data = moby_get_private_value_0((u8 *)g_hero_state.target);
+        if (target_data != 0 && *(float *)target_data > 0.0f) target = g_hero_state.target;
     }
     allowed = 1;
-    if (gHeroState.level == 29) {
-        if (!FastFloatHelperD(&gHeroState.cooldown)) allowed = 0;
+    if (g_hero_state.level == 29) {
+        if (!math_fast_float_d(&g_hero_state.cooldown)) allowed = 0;
     }
-    else gHeroState.cooldown = 40;
+    else g_hero_state.cooldown = 40;
     CalculateAimedLaunchVelocity(1.6f, 10.0f, 0.25f, 0.004055555909872055f, aim, origin, target, 0);
-    *(int *)(state + 0x24) = TraceProjectileToImpact(0.004055555909872055f, origin, aim, state, state + 0x10, object, 0, 0);
+    *(int *)(state + 0x24) = coll_trace_projectile_to_impact(0.004055555909872055f, origin, aim, state, state + 0x10, object, 0, 0);
     was_running = *(float *)(state + 0x20) > 0.0f;
-    FastVectorHelperB((float *)(state + 0x20));
+    vec_fast_helper_b((float *)(state + 0x20));
     if (was_running && *(float *)(state + 0x20) <= 0.0f && get_ammo(-1)) PlayMobySound(3, 0, object);
-    if (*(int *)(state + 0x2C) != 0 && FastFloatHelperD((int *)(state + 0x2C))) cancel_hero_item_animation();
-    if ((gPadState.pressed & gHeroState.buttons) && !get_ammo(-1)) {
+    if (*(int *)(state + 0x2C) != 0 && math_fast_float_d((int *)(state + 0x2C))) cancel_hero_item_animation();
+    if ((g_pad_state.pressed & g_hero_state.buttons) && !get_ammo(-1)) {
         PlayMobySound(1, 0, object);
         D_L00_001B2BE4 = 20;
     }
-    if (D_L00_001A8F00 == 0 && *(float *)(state + 0x20) == 0.0f && gHeroState.busy == 0 &&
-        (u8)object[0x42] <= 1 && (gPadState.held & gHeroState.buttons) && gHeroState.resource >= 23 && allowed) {
+    if (D_L00_001A8F00 == 0 && *(float *)(state + 0x20) == 0.0f && g_hero_state.busy == 0 &&
+        (u8)object[0x42] <= 1 && (g_pad_state.held & g_hero_state.buttons) && g_hero_state.resource >= 23 && allowed) {
         if (get_ammo(-1)) {
             PlayMobySound(0, 0, object);
-            SpendWeaponAmmo(-1, 1);
-            SpawnMuzzleSparkBurst(object, origin, aim);
-            StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
-            SpawnBouncerDebris((int)object, (int)origin, (int)aim);
+            weapon_spend_ammo(-1, 1);
+            part_spawn_muzzle_spark_burst(object, origin, aim);
+            anim_start_blended_with_flags(object, 2, 0, 2, 0);
+            bouncer_spawn_debris((int)object, (int)origin, (int)aim);
             start_equipped_item_animation();
             *(int *)(state + 0x2C) = 16;
-            *(int *)(state + 0x28) = CopyRecordsToFreeSlots(&D_L00_0029F210);
+            *(int *)(state + 0x28) = slot_copy_records_to_free(&D_L00_0029F210);
         }
-        if (!(gPadState.held & gHeroState.buttons) || !get_ammo(-1) || gHeroState.f22B8 == 0) {
+        if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.f22B8 == 0) {
             handle = *(int *)(state + 0x28);
             if (handle >= 0) {
-                ResetActiveSlots(handle);
+                slot_reset_active(handle);
                 *(int *)(state + 0x28) = -1;
             }
         }
-        entry = gWeaponTable_L00 + D_0013958D[0];
+        entry = g_weapon_l00_table + D_0013958D[0];
         *(float *)(state + 0x20) = 1.0f / entry->rate;
     }
-    ref_L00_003FDE48_00(DrawAttachedEffect, object);
+    ref_L00_003FDE48_00(moby_draw_attached_effect, object);
 }

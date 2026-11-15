@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int TI128 __attribute__((mode(TI)));
@@ -11,8 +12,8 @@ extern Rec32 *D_L02_001B3C14;
 extern u8 *D_L02_001B3C1C;
 extern u8 *D_L02_001AD410;
 extern float D_L02_001B2434 __attribute__((sda));
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 void func_PAL_L02_00434318(u8 *a0) {
     int *s = *(int **)(a0 + 0x68);
@@ -48,8 +49,8 @@ void func_PAL_L02_00434318(u8 *a0) {
              p++) {
             *(TI128 *)v = 0;
             v[2] = 0.00942478f;
-            func_002833F0(m, v);
-            func_00283738(e, e, m);
+            euler_rotation_basis(m, v);
+            multiply_matrix3x3(e, e, m);
         }
         g = D_L02_001AD410;
         x = *(float *)(g + 0x74) + D_L02_001B2434 * 0.020000001f;

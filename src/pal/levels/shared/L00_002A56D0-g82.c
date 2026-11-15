@@ -16,24 +16,24 @@ typedef struct {
     unsigned char pad1190[0x24FC - 0x1190];
     short disabled;
 } Hero5840;
-extern Hero5840 D_00189E20;
+extern Hero5840 g_hero_state;
 extern unsigned char D_001A7A43;
 extern float D_L00_001A7CF8 SDATA(D_L00_001A7CF8);
-extern int D_L00_001B19C8;
+extern int g_frame_l00_counter;
 extern Vector D_L00_001A7E60[4] SDATA(D_L00_001A7E60);
 extern Vector D_L00_001A7EA0[4] SDATA(D_L00_001A7EA0);
 extern Vector D_L00_001A7EE0[4] SDATA(D_L00_001A7EE0);
 extern int D_L00_001A7F20[4] SDATA(D_L00_001A7F20);
 extern float D_L00_0025DEE0[22];
-extern float func_002AA2E8(float *, float, float);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern int func_00282978(short *);
-extern int func_002A7820(int, int);
-extern void func_0029F9F0(char *, char *);
-extern void func_0029F978(unsigned char *, unsigned int, unsigned char *);
-extern void func_00282D30(void *, void *, float);
+extern float ApproachValue(float *, float, float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern int FastDecTimer(short *);
+extern int math_random_int_range(int, int);
+extern void moby_detach_manipulator(char *, char *);
+extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
+extern void FastVecScale(void *, void *, float);
 
 /* Update the hero glow and initialize, fade or detach four extra manipulators.
  * Adapted from RAC1's update_hero_glow_and_extra_manipulators
@@ -45,10 +45,10 @@ void func_PAL_L00_002A56D0(void) {
     int alpha, k, t3, red, blue, green, g_wave, r_wave, b_wave, period;
     float normalized, wave, amplitude;
     if (D_001A7A43)
-        func_002AA2E8(&D_L00_001A7CF8, 1.8f, 0.05f);
+        ApproachValue(&D_L00_001A7CF8, 1.8f, 0.05f);
     else
-        func_002AA2E8(&D_L00_001A7CF8, 1.0f, 0.05f);
-    h0 = (unsigned char *)&D_00189E20;
+        ApproachValue(&D_L00_001A7CF8, 1.0f, 0.05f);
+    h0 = (unsigned char *)&g_hero_state;
     if ((unsigned int)(h0[0x22B4] - 1) < 2)
         object = *(unsigned char **)(h0 + 0x2290);
     else {
@@ -56,24 +56,24 @@ void func_PAL_L00_002A56D0(void) {
         object = *(unsigned char **)(h0 + 0x1314);
     }
     if (object == 0) return;
-    g = (unsigned char *)&D_00189E20;
+    g = (unsigned char *)&g_hero_state;
     *(unsigned short *)(object + 0x34) |= 0x10;
     alpha = 128;
     green = 136;
     blue = 56;
     if (*(int *)(g + 0x24CC) == 1) blue = green;
     period = 92;
-    normalized = func_00283CE0(period);
-    normalized = (float)(D_L00_001B19C8 % period) / normalized;
+    normalized = IntToFloat(period);
+    normalized = (float)(g_frame_l00_counter % period) / normalized;
     normalized = normalized + normalized;
     normalized = normalized * 3.1415927f;
-    wave = func_00283198(normalized + -3.1415927f);
+    wave = math_fast_sin_or_cos_b(normalized + -3.1415927f);
     amplitude = wave * 24.0f;
-    b_wave = func_00283CF0(amplitude) + 12;
+    b_wave = FloatToInt(amplitude) + 12;
     blue += b_wave;
-    k = func_00283CF0(wave * 48.0f);
+    k = FloatToInt(wave * 48.0f);
     g_wave = k + 24;
-    t3 = func_00283CF0(amplitude);
+    t3 = FloatToInt(amplitude);
     green = k + 160;
     r_wave = t3 + 12;
     red = t3 + 76;
@@ -82,14 +82,14 @@ void func_PAL_L00_002A56D0(void) {
         int max = 33;
         int age = *(short *)(g + 0x20E);
         if (max < age)
-            blend = func_00283CE0(37 - *(short *)(g + 0x20E)) / func_00283CE0(4);
+            blend = IntToFloat(37 - *(short *)(g + 0x20E)) / IntToFloat(4);
         if (*(short *)(g + 0x20E) < 17)
-            blend = func_00283CE0(*(short *)(g + 0x20E)) / func_00283CE0(17);
-        blue -= func_00283CF0((float)b_wave * blend);
-        green -= func_00283CF0((float)g_wave * blend);
-        red -= func_00283CF0((float)r_wave * blend);
-        blue += func_00283CF0(blend * 112.0f);
-        green -= func_00283CF0(blend * 72.0f);
+            blend = IntToFloat(*(short *)(g + 0x20E)) / IntToFloat(17);
+        blue -= FloatToInt((float)b_wave * blend);
+        green -= FloatToInt((float)g_wave * blend);
+        red -= FloatToInt((float)r_wave * blend);
+        blue += FloatToInt(blend * 112.0f);
+        green -= FloatToInt(blend * 72.0f);
     }
     {
         int color = (alpha << 24) | (red << 16);
@@ -97,34 +97,34 @@ void func_PAL_L00_002A56D0(void) {
         color |= blue;
         *(int *)(object + 0x78) = color;
     }
-    g2 = (unsigned char *)&D_00189E20;
+    g2 = (unsigned char *)&g_hero_state;
     if (g2[0x22B4] != 0 || *(int *)(g2 + 0x2294) == 124) return;
-    if (func_00282978((short *)(g2 + 0x118C)) && object[0x43] == 1) {
-        *(short *)(g2 + 0x118C) = func_002A7820(42, 167);
+    if (FastDecTimer((short *)(g2 + 0x118C)) && object[0x43] == 1) {
+        *(short *)(g2 + 0x118C) = math_random_int_range(42, 167);
         *(short *)(g2 + 0x118E) = 1;
     }
-    if (D_00189E20.timer == 0) return;
-    D_00189E20.timer++;
-    if (D_00189E20.timer > 21) D_00189E20.timer = 0;
-    if (D_00189E20.timer == 0) {
+    if (g_hero_state.timer == 0) return;
+    g_hero_state.timer++;
+    if (g_hero_state.timer > 21) g_hero_state.timer = 0;
+    if (g_hero_state.timer == 0) {
         int i;
         for (i = 0; i < 4; i++)
-            if (D_00189E20.effects[i].attached)
-                func_0029F9F0((char *)object, (char *)&D_00189E20.effects[i]);
+            if (g_hero_state.effects[i].attached)
+                moby_detach_manipulator((char *)object, (char *)&g_hero_state.effects[i]);
     } else {
         int i, j;
         const Vector *scale = D_L00_001A7EA0;
         for (i = 0; i < 4; scale++, i++) {
-            if (!D_00189E20.effects[i].attached) {
-                func_0029F978(object, D_L00_001A7F20[i], (unsigned char *)&D_00189E20.effects[i]);
-                D_00189E20.effects[i].absolute = 1;
-                qcopy(&D_00189E20.effects[i].quat, &D_L00_001A7E60[i]);
-                qcopy(&D_00189E20.effects[i].scale, scale);
-                qcopy(&D_00189E20.effects[i].translation, &D_L00_001A7EE0[i]);
-                func_00282D30(&D_00189E20.effects[i].translation, &D_00189E20.effects[i].translation, *(float *)(object + 0x2C));
+            if (!g_hero_state.effects[i].attached) {
+                AttachManipulator(object, D_L00_001A7F20[i], (unsigned char *)&g_hero_state.effects[i]);
+                g_hero_state.effects[i].absolute = 1;
+                qcopy(&g_hero_state.effects[i].quat, &D_L00_001A7E60[i]);
+                qcopy(&g_hero_state.effects[i].scale, scale);
+                qcopy(&g_hero_state.effects[i].translation, &D_L00_001A7EE0[i]);
+                FastVecScale(&g_hero_state.effects[i].translation, &g_hero_state.effects[i].translation, *(float *)(object + 0x2C));
             }
         }
         for (j = 0; j < 4; j++)
-            D_00189E20.effects[j].blend = D_L00_0025DEE0[D_00189E20.timer];
+            g_hero_state.effects[j].blend = D_L00_0025DEE0[g_hero_state.timer];
     }
 }

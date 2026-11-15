@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_L16_00435CE8(void);
+extern void cam_update_zone_control(void);
 
 /* runs the level's one-shot start-up; the caller uses this only for its side effects */
 int func_PAL_L16_0043BEF0(void)
 {
-    func_L16_00435CE8();
+    cam_update_zone_control();
     return 0;
 }
 

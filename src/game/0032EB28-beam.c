@@ -13,28 +13,28 @@ extern int D_00138320;
 
 /* The colours are one block: element 0 is the one-instruction load the delay slot
  * can take, while +4/+8/+12 are the backend's two-instruction form. */
-extern int D_001B1688[] __attribute__((sda));
+extern int g_game_time[] __attribute__((sda));
 extern int D_001B0F08[] __attribute__((sda));
 
-extern void func_0029FCC0(void *, int, void *);
-extern float func_003004B0(float);
-extern void func_002FDF40(void *, void *, char *, float, float, float, float, char *);
-extern int func_002FE5A0(float *, float *, float *, float *, void *, void *, int *, float);
-extern void func_00334050(int, int);
-extern float func_00283CE0(int);
-extern void func_0026F758(void);
-extern void func_0026F760(void);
-extern char *func_00329CB8(int, void *, void *);
-extern char *func_003285C0(int, void *, void *);
-extern int func_00282948(void *);
-extern float func_00282DF0(void *);
-extern float func_002A7878(float, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002B0910(int, int, int, int);
-extern void func_00290010(int, int, int, float);
-extern void func_0027CFD0(void *, void *);
-extern void func_003340A8(char *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float game_get_override_value(float);
+extern void CalculateAimedLaunchVelocity(void *, void *, char *, float, float, float, float, char *);
+extern int coll_trace_projectile_to_impact(float *, float *, float *, float *, void *, void *, int *, float);
+extern void moby_set_entry_list_flag_byte(int, int);
+extern float IntToFloat(int);
+extern void stub_empty_10(void);
+extern void stub_empty_11(void);
+extern char *part_spawn_flying_chunk_b(int, void *, void *);
+extern char *part_spawn_flying_chunk_a(int, void *, void *);
+extern int math_fast_float_d(void *);
+extern float FastVecLength(void *);
+extern float math_random_float_range(float, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int gfx_blend_colors_by_cycle(int, int, int, int);
+extern void gauge_popup_show(int, int, int, float);
+extern void gfx_register_overlay_draw_callback(void *, void *);
+extern void moby_update_attached_effect_by_state(char *);
 
 typedef struct TargetClass {
     char pad0[0x46];
@@ -77,7 +77,7 @@ typedef struct BeamVars {
 } BeamVars;
 
 /* Aims a beam from the object, finds what it hits, and fires shots while the button is held. It also fades and smooths the meter that shows how far the target is done. */
-void func_00333AF8(Target *obj)
+void thermanator_update(Target *obj)
 {
     BeamVars *v = obj->vars;
     Target *hit;
@@ -88,22 +88,22 @@ void func_00333AF8(Target *obj)
     int a, b;
 
     pos = v->position;
-    TransformMobyJointToWorld(obj, 0, pos);
-    distance = GetOverrideValue(4.5f);
-    if (gHeroState.planet == 29) {
+    moby_transform_joint_to_world(obj, 0, pos);
+    distance = game_get_override_value(4.5f);
+    if (g_hero_state.planet == 29) {
         distance += 6.5f;
     }
     v->hit = 0;
     v->valid = 0;
     CalculateAimedLaunchVelocity(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
-    TraceProjectileToImpact(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
+    coll_trace_projectile_to_impact(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
     hit = v->hit;
     if (hit != 0) {
         if (hit->class->type == 18) {
             TargetVars *target = hit->vars;
             target->maximum = 25;
             if (v->hit->slot != 255) {
-                SetEntryListFlagByte(v->hit->slot, 25);
+                moby_set_entry_list_flag_byte(v->hit->slot, 25);
             }
             ratio = IntToFloat(v->hit->progress);
             ratio /= IntToFloat(target->maximum);
@@ -130,15 +130,15 @@ void func_00333AF8(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & gHeroState.input) && v->hit && v->valid && !v->disabled) {
-            EmptyStubF758();
+        if ((D_00138320 & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+            stub_empty_10();
             obj->state = 3;
             if (!v->reverse) {
-                SpawnFlyingChunkMoby3032((int)obj, v->position, dir);
+                part_spawn_flying_chunk_b((int)obj, v->position, dir);
             } else {
-                SpawnFlyingChunkMoby3031((int)obj, v->position, dir);
+                part_spawn_flying_chunk_a((int)obj, v->position, dir);
             }
-            PlaySoundFromClassBank(1, 0, (char *)obj, 0xFB0);
+            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 14;
             } else {
@@ -147,22 +147,22 @@ void func_00333AF8(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & gHeroState.input) || !v->hit || !v->valid || v->disabled) {
-            EmptyStubF760();
+        if (!(D_00138320 & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+            stub_empty_11();
             obj->state = 2;
-        } else if (FastFloatHelperD(&v->countdown)) {
+        } else if (math_fast_float_d(&v->countdown)) {
             qcopy(spread, dir);
             length = FastVecLength(spread);
-            spread[0] += RandomFloatRange(-0.005f, 0.005f);
-            spread[1] += RandomFloatRange(-0.005f, 0.005f);
-            spread[2] += RandomFloatRange(-0.005f, 0.005f);
+            spread[0] += math_random_float_range(-0.005f, 0.005f);
+            spread[1] += math_random_float_range(-0.005f, 0.005f);
+            spread[2] += math_random_float_range(-0.005f, 0.005f);
             vec_scale_to_length(spread, spread, length);
             if (!v->reverse) {
-                SpawnFlyingChunkMoby3032((int)obj, v->position, spread);
+                part_spawn_flying_chunk_b((int)obj, v->position, spread);
             } else {
-                SpawnFlyingChunkMoby3031((int)obj, v->position, spread);
+                part_spawn_flying_chunk_a((int)obj, v->position, spread);
             }
-            PlaySoundFromClassBank(1, 0, (char *)obj, 0xFB0);
+            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 14;
             } else {
@@ -174,7 +174,7 @@ void func_00333AF8(Target *obj)
         break;
     }
 
-    if (gHeroState.mode == 3) {
+    if (g_hero_state.mode == 3) {
         obj->state = 4;
         v->fade -= 0.02f;
     } else {
@@ -200,10 +200,10 @@ void func_00333AF8(Target *obj)
         v->smoothed = v->fraction;
     }
 
-    a = BlendColorsByCycleStep(gGameTime[0], 90, D_001B0F08[0], D_001B0F08[1]);
-    b = BlendColorsByCycleStep(gGameTime[0], 90, D_001B0F08[2], D_001B0F08[3]);
+    a = gfx_blend_colors_by_cycle(g_game_time[0], 90, D_001B0F08[0], D_001B0F08[1]);
+    b = gfx_blend_colors_by_cycle(g_game_time[0], 90, D_001B0F08[2], D_001B0F08[3]);
     if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
-        ShowGaugePopup(0, a, b, v->smoothed);
+        gauge_popup_show(0, a, b, v->smoothed);
     }
-    RegisterOverlayDrawCallback(UpdateAttachedEffectByState, obj);
+    gfx_register_overlay_draw_callback(moby_update_attached_effect_by_state, obj);
 }

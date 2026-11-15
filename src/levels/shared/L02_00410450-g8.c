@@ -12,10 +12,10 @@ extern void func_00324C28(void *, void *, void *);
 extern void func_002F1F70(void *, void *, void *);
 extern float func_002F3048(float, float);
 extern void func_002EA180(void *, void *);
-extern void func_L02_00422638(int);
+extern void gfx_draw_beam_effect_passes(int);
 
 /* Rebuilds the record's second frame and folds the resident angle step in. */
-void func_L02_00422538(char *moby) {
+void moby_update_spinning_frame_orientation(char *moby) {
     float buf[4];
     char *vars = *(char **)(moby + 0x68);
     char *mobyPos = moby + 0x10;
@@ -32,5 +32,5 @@ void func_L02_00422538(char *moby) {
     func_002F1F70(vars + 0x20, mobyPos, vars + 0x20);
     *(float *)(vars + 0x30) =
         func_002F3048(*(float *)(vars + 0x30), D_L02_001B1FC4 * 0.000290888245f);
-    func_002EA180(DrawBeamEffectPasses, moby);
+    func_002EA180(gfx_draw_beam_effect_passes, moby);
 }

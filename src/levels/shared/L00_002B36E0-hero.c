@@ -37,47 +37,47 @@ typedef struct {
     int buttons;
 } InputState;
 
-extern HeroFrame D_00189E20;
+extern HeroFrame g_hero_state;
 extern char D_0018BE50[];
-extern InputState D_00138180;
+extern InputState g_pad_state;
 extern void func_L00_002EDD78(void *);
-extern int func_L00_002D3400(void);
+extern int hero_get_movement_mode(void);
 extern float func_L00_002EE268(void *);
-extern void func_L00_002BA7D8(void);
+extern void hero_l00_update_state_machine(void);
 extern void func_L00_002EE970(void *, void *);
 extern void func_L00_002EE8E8(void *);
 extern void func_L00_002EEBF8(void *, void *);
-extern void func_L00_002B32F8(void);
-extern void func_L00_002C2DE8(void);
-extern void func_L00_002C30B0(void);
-extern float func_L00_002B3900(void);
+extern void hero_update_collision_capsule(void);
+extern void hero_probe_ground_and_ledge(void);
+extern void hero_l00_update_timers(void);
+extern float hero_get_stick_magnitude(void);
 
 /* Updates input and history rings, then refreshes the hero's movement matrices. */
-void func_L00_002B36E0(void)
+void UpdateHeroInputAndHistory(void)
 {
     HeroFrame *p;
     int bits;
 
     qcopy(D_0018BE50, D_0018BE50 - 0x1fb0);
-    if (gPadState.flags & 3) {
+    if (g_pad_state.flags & 3) {
         if (((TimerState *)(D_0018BE50 - 0x2030))->timer <= 0)
             ((TimerState *)(D_0018BE50 - 0x2030))->timer = 1;
     } else {
         func_L00_002EDD78(D_0018BE50 - 0xbdc);
     }
-    p = &gHeroState;
+    p = &g_hero_state;
     if (p->state == 16)
         p->timer = 0;
     {
-        int active = GetHeroMovementMode();
-        p->stick_x = gPadState.x;
+        int active = hero_get_movement_mode();
+        p->stick_x = g_pad_state.x;
         p->gravity_mode = active;
-        p->stick_y = gPadState.y;
+        p->stick_y = g_pad_state.y;
     }
     p->field270 = 0;
-    p->raw_speed = GetHeroStickMagnitude();
+    p->raw_speed = hero_get_stick_magnitude();
     if (func_L00_002EE268(&p->stick_x) < 0.25f) {
-        bits = gPadState.buttons;
+        bits = g_pad_state.buttons;
         {
             int right = (bits >> 13) & 1;
             int left = (bits >> 15) & 1;
@@ -89,8 +89,8 @@ void func_L00_002B36E0(void)
             p->stick_y = up;
         }
     }
-    p->speed = GetHeroStickMagnitude();
-    UpdateHeroStateMachine_L00();
+    p->speed = hero_get_stick_magnitude();
+    hero_l00_update_state_machine();
     p->yaws[p->yaw_index] = p->yaw;
     p->yaw_index = (p->yaw_index + 1) % 32;
     if (++p->yaw_count > 32)
@@ -106,7 +106,7 @@ void func_L00_002B36E0(void)
     func_L00_002EE970(p, (char *)p + 0x90);
     func_L00_002EE8E8((char *)p + 0x40);
     func_L00_002EEBF8((char *)p + 0x40, p);
-    UpdateHeroCollisionCapsule();
-    ProbeHeroGroundAndLedge();
-    UpdateHeroTimers();
+    hero_update_collision_capsule();
+    hero_probe_ground_and_ledge();
+    hero_l00_update_timers();
 }

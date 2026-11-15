@@ -13,7 +13,7 @@ extern float ref_L00_00338810_02 __attribute__((sda));
 extern float ref_L00_00338810_03 __attribute__((sda));
 
 /* Fades a text panel in while it should show and out when it should not, and sizes its border pieces to fit the text. */
-void func_00338810(void *object)
+void text_panel_update_fade(void *object)
 {
     char *panel = (char *)object;
     u32 *fillColor;

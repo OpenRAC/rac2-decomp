@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,10 +25,10 @@
  */
 #include "common.h"
 
-extern s32 func_00132C48();
+extern s32 snd_SendCommandSync();
 
 /* Sends sound command 0x3B with six values. */
-void func_00133848(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5) {
+void snd_send_cmd3b(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5) {
     s32 payload[6];
     payload[0] = p0;
     payload[1] = p1;

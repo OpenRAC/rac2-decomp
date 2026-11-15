@@ -23,18 +23,18 @@ extern float D_L00_001B138C __attribute__((sda));
 extern int D_L00_001B13D0 __attribute__((sda));
 extern char D_L00_001B8C80[];
 
-extern long func_0027C878(int id);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00282F20(void *dst, void *src, float length);
-extern void func_00282DD8(void *dst, void *a, void *b);
-extern void func_00282D30(void *dst, void *src, float scale);
-extern void func_002830C0(void *dst, void *src, void *frame);
-extern void func_00280B90(void *packet, int a, int b);
-extern float func_00283CE0(int value);
-extern float func_002A7AA8(float a, float b, float c, float d, float t);
+extern long GetEffectTextureDescriptor(int id);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void vec_scale_to_length(void *dst, void *src, float length);
+extern void FastVecCross(void *dst, void *a, void *b);
+extern void FastVecScale(void *dst, void *src, float scale);
+extern void transform_vector(void *dst, void *src, void *frame);
+extern void draw_world_quad(void *packet, int a, int b);
+extern float IntToFloat(int value);
+extern float cubic_hermite_scalar(float a, float b, float c, float d, float t);
 
 /* Draws a two-layer ribbon through count points, one quad per segment. */
-void func_L00_00413918(char *object, Vec *points, int alpha, int alpha2, int count)
+void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int count)
 {
     QuadPacket outer, inner;
     Vec size, size2, dir;
@@ -209,7 +209,7 @@ typedef struct {
 } BoltState;
 
 extern unsigned char D_00139595[];
-extern HitRecord D_L00_00262570[];
+extern HitRecord g_weapon_l00_table[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
 extern char ref_L00_00413358_00[];
 extern float D_L00_001B1390 __attribute__((sda));
@@ -223,30 +223,30 @@ extern float D_L00_001B13B8 __attribute__((sda));
 extern float D_L00_001B13BC __attribute__((sda));
 extern float D_L00_001B13C0 __attribute__((sda));
 
-extern float func_00282E48(void *a, void *b);
-extern float func_00283198(float angle);
-extern float func_00283180(float angle);
-extern float func_00283B98(float angle, float delta);
-extern float func_00283BE0(float angle, float delta);
-extern float func_002ABB18(float angle);
-extern float func_002A78D8(float centre, float range);
-extern float func_002A7878(float low, float high);
-extern float func_002A7940(void);
-extern int func_00282978(void *timer);
-extern int func_002A7820(int low, int high);
-extern int func_002A77E0(int range);
-extern void func_002AF000(void *dst, float length, float a, float b);
-extern void func_002A8E20(void *target, void *hit);
+extern float fast_vec_dist(void *a, void *b);
+extern float math_fast_sin_or_cos_b(float angle);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float FastAddRotations(float angle, float delta);
+extern float fast_subtract_rotations(float angle, float delta);
+extern float math_wrap_angle_to_pi(float angle);
+extern float math_random_signed_float_range(float centre, float range);
+extern float math_random_float_range(float low, float high);
+extern float math_random_angle(void);
+extern int FastDecTimer(void *timer);
+extern int math_random_int_range(int low, int high);
+extern int math_random_int_below(int range);
+extern void vec_build_spherical_offset(void *dst, float length, float a, float b);
+extern void QueueMobyImpact(void *target, void *hit);
 extern void ref_L00_00413358_01(void *callback, void *object);
 /* The float arguments sit among the others so that the bank order stays that of the callee. */
-extern char *func_002C2210(void *position, int size, int color, int mode, float life, float secondLife,
+extern char *part_spawn_ground_effect(void *position, int size, int color, int mode, float life, float secondLife,
                            int flag, void *vector, float third, int counter);
 
 /* Each frame: sends the hit once the timer runs out, rebuilds the 10-point line and the 19-point
  * wave from their phases, registers the draw callback, and bursts into particles at the end.
  * third and frame stay locals of the burst loop, and size starts at zero there, for the sake of
  * loop.c: frame leaves the loop after third and the colour stays inside it. */
-void func_L00_00413358(char *object)
+void UpdateWaveLineEffect(char *object)
 {
     BoltHit scratch;
     BoltState *state = *(BoltState **)(object + 0x68);
@@ -260,7 +260,7 @@ void func_L00_00413358(char *object)
             scratch.packet.flags = 0x810000;
             scratch.packet.enabled = 1;
             scratch.packet.owner = object;
-            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)gWeaponTable_L00))->scale;
+            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)g_weapon_l00_table))->scale;
             FastVecSub(&scratch, &state->pos, object + 0x10);
             vec_scale_to_length(&scratch, &scratch, 1);
             scratch.vector.f[3] = 5627.925f;
@@ -288,8 +288,8 @@ void func_L00_00413358(char *object)
         if (lineIdx == 0 || lineIdx == 9) {
             amp10 = 0;
         } else {
-            amp10 *= FastSinOrCosB(WrapAngleToPi(state->phase1 + point10 * step));
-            amp10 += RandomSignedFloatRange(0, D_L00_001B1394);
+            amp10 *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase1 + point10 * step));
+            amp10 += math_random_signed_float_range(0, D_L00_001B1394);
         }
         state->line[lineIdx].f[2] = amp10;
         state->line[lineIdx].f[1] = 0.0f;
@@ -301,11 +301,11 @@ void func_L00_00413358(char *object)
         point19 = IntToFloat(waveIdx);
         rate19 = point19 * D_L00_001B13AC;
         state->wave[waveIdx].f[2] = 0.0f;
-        phase19 = WrapAngleToPi(state->phase2 + rate19);
-        wave19 = D_L00_001B13BC * FastSinOrCosB(WrapAngleToPi(state->phase3 + point19 * D_L00_001B13B8));
-        amp19 = wave19 * FastSinOrCosB(phase19) + RandomSignedFloatRange(D_L00_001B1390, D_L00_001B1394);
+        phase19 = math_wrap_angle_to_pi(state->phase2 + rate19);
+        wave19 = D_L00_001B13BC * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * D_L00_001B13B8));
+        amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(D_L00_001B1390, D_L00_001B1394);
         state->wave[waveIdx].f[2] += amp19;
-        state->wave[waveIdx].f[1] = D_L00_001B13C0 * FastSinOrCosA(phase19);
+        state->wave[waveIdx].f[1] = D_L00_001B13C0 * math_fast_sin_or_cos_a(phase19);
         state->wave[waveIdx].f[0] = spacing * point19;
         state->wave[waveIdx].f[3] = 1;
     }
@@ -317,23 +317,23 @@ void func_L00_00413358(char *object)
             float third = 0.0f;
             float frame = 0.016666668f;
             float size = 0.0f;
-            burstSpeed = RandomFloatRange(1, 6) * frame;
-            yaw = RandomAngle();
-            pitch = RandomAngle();
-            BuildSphericalOffset(&scratch, burstSpeed, yaw, pitch);
-            sign = RandomIntRange(1, 4);
-            if (RandomIntBelow(2)) {
+            burstSpeed = math_random_float_range(1, 6) * frame;
+            yaw = math_random_angle();
+            pitch = math_random_angle();
+            vec_build_spherical_offset(&scratch, burstSpeed, yaw, pitch);
+            sign = math_random_int_range(1, 4);
+            if (math_random_int_below(2)) {
                 sign = -sign;
             }
-            size = RandomFloatRange(0.4f, 0.8f);
-            SpawnGroundEffectParticle(&state->pos, 15, state->color | 0x7F000000, 0, size * 0.3f, size, sign, &scratch, third, 0);
-            SpawnGroundEffectParticle(&state->pos, 15, 0x307F7F7F, 0, size * 0.15f, size * 0.5f, -sign, &scratch, third, 0);
+            size = math_random_float_range(0.4f, 0.8f);
+            part_spawn_ground_effect(&state->pos, 15, state->color | 0x7F000000, 0, size * 0.3f, size, sign, &scratch, third, 0);
+            part_spawn_ground_effect(&state->pos, 15, 0x307F7F7F, 0, size * 0.15f, size * 0.5f, -sign, &scratch, third, 0);
         }
-        sign = RandomIntRange(1, 8);
-        if (RandomIntBelow(2)) {
+        sign = math_random_int_range(1, 8);
+        if (math_random_int_below(2)) {
             sign = -sign;
         }
-        burst = RandomFloatRange(0.15f, 3);
-        SpawnGroundEffectParticle(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
+        burst = math_random_float_range(0.15f, 3);
+        part_spawn_ground_effect(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
     }
 }

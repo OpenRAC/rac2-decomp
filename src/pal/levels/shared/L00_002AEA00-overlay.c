@@ -50,16 +50,16 @@ typedef struct {
     short selector;
 } AnimationState;
 extern AnimationState D_00189E20_26;
-extern int func_L00_002AEAC0(int);
+extern int hero_get_item_icon_id(int);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern void *func_002AB1F0(void *);
-extern int func_L00_002ADEA0(int);
+extern void *moby_get_private_value_0(void *);
+extern int hero_slot_item_id(int);
 extern char *ref_L00_002AEB18_0(int,int);
 extern void ref_L00_002AEB18_1(int,void *);
 extern void ref_L00_002AEB18_2(int,void *,int,int,int,int);
 extern void ref_L00_002AEB18_3(int,void *);
-extern float func_002AA2E8(float *,float,float);
+extern float ApproachValue(float *,float,float);
 extern char D_L00_001B5000[];
 
 void func_PAL_L00_002AEA00(void)
@@ -69,17 +69,17 @@ void func_PAL_L00_002AEA00(void)
     unsigned char *data;
     char *overlay;
     if(D_00189E20_26.object) {
-        data=func_002AB1F0(D_00189E20_26.object);
+        data=moby_get_private_value_0(D_00189E20_26.object);
         enabled=1;
         id=0x72;
         if(data[0x2c]) {
-            id=func_L00_002AEAC0((unsigned char)data[0x2c]);
+            id=hero_get_item_icon_id((unsigned char)data[0x2c]);
             if(D_00189E20_26.mode==1) opacity=0.7f;
         }
     }
     if(D_00189E20_26.flag) {
         enabled=1;
-        id=func_L00_002AEAC0(D_00189E20_26.selector);
+        id=hero_get_item_icon_id(D_00189E20_26.selector);
     }
     if(D_00189E20_26.mode2==1) {
         int anim=((unsigned char *)D_00189E20_26.resource)[0x43];
@@ -87,7 +87,7 @@ void func_PAL_L00_002AEA00(void)
         if((anim==0x51 || anim==0x7b || anim==0x57) && !D_00189E20_26.condition) enabled=0;
         opacity=0.8f; id=0x74;
     }
-    mode=func_L00_002ADEA0(0);
+    mode=hero_slot_item_id(0);
     if((mode==30 || mode==28 || mode==29) && D_00189E20_26.enabled) {
         enabled=1; opacity=0.8f; id=0x6f;
     }
@@ -98,14 +98,14 @@ void func_PAL_L00_002AEA00(void)
         }
     } else {
         if(!D_00189E20_26.overlay) return;
-        if(func_002AA2E8((float *)(D_00189E20_26.overlay+8),0.0f,0.060000002f)==0.0f)
+        if(ApproachValue((float *)(D_00189E20_26.overlay+8),0.0f,0.060000002f)==0.0f)
             ref_L00_002AEB18_1(D_00189E20_26.resource,&D_00189E20_26.overlay);
     }
     overlay=D_00189E20_26.overlay;
     if(!overlay) return;
     if(!enabled) return;
     {
-        func_002AA2E8((float *)(overlay+8),opacity,0.060000002f);
+        ApproachValue((float *)(overlay+8),opacity,0.060000002f);
         P(D_00189E20_26.overlay,0x38)=D_L00_001B5000;
         P(D_00189E20_26.overlay,0x3c)=D_L00_001B5000+0x600;
         if((unsigned char)D_00189E20_26.overlay[0x23]!=id)

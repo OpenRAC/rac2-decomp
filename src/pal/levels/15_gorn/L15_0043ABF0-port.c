@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern void func_0029F978(unsigned char *, int, unsigned char *);
-extern void func_L15_003804B8(int, void *);
+extern void AttachManipulator(unsigned char *, int, unsigned char *);
+extern void moby_set_record_callback(int, void *);
 #define GF(offset) (((GornState *)state)->f[(offset) / 4])
 #define GI(offset) (((GornState *)state)->i[(offset) / 4])
 
@@ -11,26 +11,26 @@ typedef union { float f[0x660 / 4]; int i[0x660 / 4]; } GornState;
 typedef union { float f[0x80 / 4]; unsigned short h[0x80 / 2]; unsigned char b[0x80]; } GornOwnerFields;
 
 typedef int GornQuad __attribute__((mode(TI)));
-extern float func_00283198(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00283098(void *, void *, void *);
-extern void func_0029FC20(void *, int, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002831B0(float);
-extern float func_00283180(float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_fast_angle_helper(float);
+extern float math_fast_sin_or_cos_a(float);
 extern char D_L15_001B97C0[];
 
-extern void func_L06_00382608(char *, int, int, int, float, int);
-extern int func_002EEB00(char *);
-extern void func_002EE920(char *, char *);
-extern void func_002EE678(char *, int);
-extern void func_L05_0037C160(char *);
-extern void func_L05_0037B538(char *, int, int, int);
+extern void DrawPath(char *, int, int, int, float, int);
+extern int follower_has_reached_target(char *);
+extern void follower_set_push_vector(char *, char *);
+extern void follower_set_state(char *, int);
+extern void moby_update_movement_state(char *);
+extern void moby_process_collision_hit(char *, int, int, int);
 typedef struct GornPathPoint {
     float position[3];
     float action;
@@ -42,57 +42,57 @@ typedef struct GornPath {
     GornPathPoint points[1];
 } GornPath;
 extern char *D_L15_001FE480[];
-extern void func_L15_00436BA8(char *);
-extern void func_L15_00436C68(void);
+extern void gorn_path_mover_init(char *);
+extern void path_start_following(void);
 
 /* ---- shared declarations ---- */
 
-extern int func_002ED688(unsigned char *owner);
+extern int moby_get_motion_data(unsigned char *owner);
 extern void func_PAL_L05_0037D610(char *object, int flag);
-extern void func_L05_00379C68(int arg0, int value);
-extern void func_L00_002E6DB8(void *, void *);
-extern void func_L00_002E6CF0(void *a0, void *a1);
-extern void func_L00_002E6EF8(void *, int);
-extern void func_L15_00438238(void);
-extern void func_L15_00438260(void);
-extern void func_L15_00438518(void);
+extern void level_set_object_state_field(int arg0, int value);
+extern void gfx_add_draw_callback_second(void *, void *);
+extern void gfx_add_draw_callback_first(void *a0, void *a1);
+extern void gfx_add_draw_callback_third(void *, int);
+extern void gfx_draw_scrolling_grid_if_enabled(void);
+extern void backdrop_update_effects(void);
+extern void backdrop_draw_fade_layers(void);
 
-extern void func_002FC560(int, int);
-extern void func_0027DE50(int, int, int, int, long);
-extern int func_00282948(void *);
-extern void func_L15_00432A60(void *, int, int, float, float, float, int, int, int);
-extern short D_001A6480[];
+extern void VU1_addGSregister(int, int);
+extern void gfx_draw_colored_rectangle(int, int, int, int, long);
+extern int math_fast_float_d(void *);
+extern void DrawGornRibbon(void *, int, int, float, float, float, int, int, int);
+extern short g_screen_adjust_offsets[];
 extern char D_L15_00269FE0[];
 
 /* func_L15_00432A60 is in L15_00432A60-ribbon.c. */
 
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern int func_L00_00367720(void);
-extern void func_L05_00379E60(void *, void *, int, int);
-extern void func_L05_0037AE40(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern int state_get_stored_pointer_value(void);
+extern void level_append_object(void *, void *, int, int);
+extern void moby_reset_action_state(void *);
 extern void func_PAL_L15_0043B0D8(char *);
-extern void func_L15_00434610(void *, int);
-extern void func_L15_00435E80(void);
-extern void func_L15_00434D28(void *);
-extern void func_L05_00424990(void *, int, int, int, int, int, int, int, float, int, int, int);
-extern int func_002A77E0(int);
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
+extern void gorn_ship_update_flight(void *, int);
+extern void ResetGroupToPathStart(void);
+extern void gorn_ship_spawn_damage_effects(void *);
+extern void part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, float, int, int, int);
+extern int math_random_int_below(int);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);
 
 extern s32 D_L15_001AEE20[] __attribute__((sda));
 extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
 extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
 extern u8 D_L15_00188660[];
-extern s32 func_002E5CF8(s32 a, s32 b, void *c);
-extern s32 func_002A77E0(s32 a);
-extern f32 func_002A7878(f32 a, f32 b);
-extern void func_0029FCC0(void *obj, s32 a, void *out);
-extern void func_L10_0039D5E0(void *a, void *b, s32 c, s32 d, f32 e, f32 f, f32 g, f32 h, s32 i, s32 j, s32 k, s32 l);
-extern s32 func_00283CF0(f32 a);
-extern void func_L15_00434F90(char *object, int a1, int joint, float radius);
+extern s32 PlayMobySound(s32 a, s32 b, void *c);
+extern s32 math_random_int_below(s32 a);
+extern f32 math_random_float_range(f32 a, f32 b);
+extern void moby_transform_joint_to_world(void *obj, s32 a, void *out);
+extern void CreateEnergyStrip(void *a, void *b, s32 c, s32 d, f32 e, f32 f, f32 g, f32 h, s32 i, s32 j, s32 k, s32 l);
+extern s32 FloatToInt(f32 a);
+extern void gorn_part_spawn_puff(char *object, int a1, int joint, float radius);
 /* The particle helper has a different catalogue body in PAL. */
 extern void ref_L15_00434D28_00(char *object, int joint, int unused, float radius);
 
@@ -104,17 +104,17 @@ typedef struct GornEffectCamera {
 } GornEffectCamera;
 extern GornEffectCamera D_L15_001B9680;
 extern unsigned char *D_L15_001FF4AC;
-extern void func_0029FCC0(void *, int, void *);
-extern float func_00283248(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern void func_002AF000(void *, float, float, float);
-extern unsigned char *func_002BDCE8(float, float, float, float,
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern unsigned char *SpawnSpinningSparkParticle(float, float, float, float,
                                    void *, int, void *, int, int);
-extern int func_002A7820(int, int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
+extern int math_random_int_range(int, int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
 
 void func_PAL_L15_0043B0D8(char *object)
 {
@@ -128,8 +128,8 @@ void func_PAL_L15_0043B0D8(char *object)
     char *e = state + 0x3B0;
     char *f = state + 0x3F0;
     char *position = object + 0x10;
-    record = (char *)func_002ED688((unsigned char *)object);
-    *(int *)(record + 0x148) = func_00283CF0(150.0f);
+    record = (char *)moby_get_motion_data((unsigned char *)object);
+    *(int *)(record + 0x148) = FloatToInt(150.0f);
     func_PAL_L05_0037D610(object, 1);
     GF(0x180) = 150.0f;
     object[0x20] = 1;
@@ -144,35 +144,35 @@ void func_PAL_L15_0043B0D8(char *object)
     GI(0x27C) = 0;
     GI(0x45C) = 0;
     GI(0x278) = 0;
-    func_0029FC20(object, 14, state + 0x280);
-    func_0029FC20(object, 16, state + 0x2C0);
-    func_0029FC20(object, 18, state + 0x300);
-    func_0029FC20(object, 15, state + 0x340);
-    func_0029FC20(object, 17, state + 0x380);
-    func_0029FC20(object, 19, state + 0x3C0);
-    func_00282CF0(a, a, position);
-    func_00282CF0(d, d, position);
-    func_00282CF0(d, d, a);
-    func_00282D30(a, a, 1.0f / fields->f[0x2C / 4]);
-    func_00282D30(d, d, 1.0f / fields->f[0x2C / 4]);
-    func_00282CF0(b, b, position);
-    func_00282CF0(e, e, position);
-    func_00282CF0(e, e, b);
-    func_00282D30(b, b, 1.0f / fields->f[0x2C / 4]);
-    func_00282D30(e, e, 1.0f / fields->f[0x2C / 4]);
-    func_00282CF0(c, c, position);
-    func_00282CF0(f, f, position);
-    func_00282CF0(f, f, c);
-    func_00282D30(c, c, 1.0f / fields->f[0x2C / 4]);
-    func_00282D30(f, f, 1.0f / fields->f[0x2C / 4]);
-    func_0029F978((unsigned char *)object, 12, (unsigned char *)(state + 0x460));
-    func_0029F978((unsigned char *)object, 13, (unsigned char *)(state + 0x4A0));
-    func_0029F978((unsigned char *)object, 14, (unsigned char *)(state + 0x4E0));
-    func_0029F978((unsigned char *)object, 15, (unsigned char *)(state + 0x520));
-    func_0029F978((unsigned char *)object, 16, (unsigned char *)(state + 0x560));
-    func_0029F978((unsigned char *)object, 17, (unsigned char *)(state + 0x5A0));
-    func_0029F978((unsigned char *)object, 18, (unsigned char *)(state + 0x5E0));
-    func_0029F978((unsigned char *)object, 19, (unsigned char *)(state + 0x620));
+    moby_transform_joint_point(object, 14, state + 0x280);
+    moby_transform_joint_point(object, 16, state + 0x2C0);
+    moby_transform_joint_point(object, 18, state + 0x300);
+    moby_transform_joint_point(object, 15, state + 0x340);
+    moby_transform_joint_point(object, 17, state + 0x380);
+    moby_transform_joint_point(object, 19, state + 0x3C0);
+    FastVecSub(a, a, position);
+    FastVecSub(d, d, position);
+    FastVecSub(d, d, a);
+    FastVecScale(a, a, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(d, d, 1.0f / fields->f[0x2C / 4]);
+    FastVecSub(b, b, position);
+    FastVecSub(e, e, position);
+    FastVecSub(e, e, b);
+    FastVecScale(b, b, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(e, e, 1.0f / fields->f[0x2C / 4]);
+    FastVecSub(c, c, position);
+    FastVecSub(f, f, position);
+    FastVecSub(f, f, c);
+    FastVecScale(c, c, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(f, f, 1.0f / fields->f[0x2C / 4]);
+    AttachManipulator((unsigned char *)object, 12, (unsigned char *)(state + 0x460));
+    AttachManipulator((unsigned char *)object, 13, (unsigned char *)(state + 0x4A0));
+    AttachManipulator((unsigned char *)object, 14, (unsigned char *)(state + 0x4E0));
+    AttachManipulator((unsigned char *)object, 15, (unsigned char *)(state + 0x520));
+    AttachManipulator((unsigned char *)object, 16, (unsigned char *)(state + 0x560));
+    AttachManipulator((unsigned char *)object, 17, (unsigned char *)(state + 0x5A0));
+    AttachManipulator((unsigned char *)object, 18, (unsigned char *)(state + 0x5E0));
+    AttachManipulator((unsigned char *)object, 19, (unsigned char *)(state + 0x620));
     GF(0x510) = GF(0x2B0) * 1024.0f;
     GF(0x514) = GF(0x2B4) * 1024.0f;
     GF(0x518) = GF(0x2B8) * 1024.0f;
@@ -211,14 +211,14 @@ void func_PAL_L15_0043B0D8(char *object)
     GF(0x65C) = 1.0f;
     GI(0x444) = 250;
     GI(0x440) = 0;
-    func_L05_00379C68((int)object, 0xFFFF);
-    func_L15_003804B8((int)object, (void *)1);
+    level_set_object_state_field((int)object, 0xFFFF);
+    moby_set_record_callback((int)object, (void *)1);
 }
 
 /* func_L15_004360D8 is in L15_004360D8.c. */
 
-extern int func_002E5CF8(int, int, void *);
-extern void func_L05_00379FA0(void *, int, int, float, int, float, float, float,
+extern int PlayMobySound(int, int, void *);
+extern void SpawnSpaceProjectile(void *, int, int, float, int, float, float, float,
                               int, int, int);
 
 
@@ -229,10 +229,10 @@ extern void func_L05_00379FA0(void *, int, int, float, int, float, float, float,
 
 extern int D_L15_001A8FF0[] __attribute__((sda));
 extern char D_00189ED0[];
-extern int func_002A77E0(int);
+extern int math_random_int_below(int);
 extern int func_001163B0(void);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern unsigned char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 
 
 /* The level's id lists: the number of groups, the table of the groups' lists (a pointer, read
@@ -245,12 +245,12 @@ extern unsigned char *D_L15_001B2C9C[] __attribute__((sda));
 extern unsigned char *D_L15_001B2C94[] __attribute__((sda));
 extern short D_L15_00227500[];
 
-extern float func_00282E80(void *, void *);
-extern float func_002A7940(void);
-extern float func_00283198(float);
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_L00_00323448(void *, void *, int, int, int, int, int, int);
-extern void func_L00_00323E48(void *, int, int, void *);
-extern void func_L00_00323958(void *, void *);
-extern void func_0029F338(void *);
-extern void func_002833F0(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_b(float);
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void BuildObjectAttachmentTransforms(void *, void *, int, int, int, int, int, int);
+extern void level_set_record_payload_by_key(void *, int, int, void *);
+extern void moby_update_attached_transforms(void *, void *);
+extern void moby_mark_spawned(void *);
+extern void euler_rotation_basis(void *, void *);

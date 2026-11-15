@@ -28,19 +28,19 @@ typedef struct {
     RenderVec pos;
 } HeroPosBlock;
 
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, const void *, float);
-extern void func_00282DD8(void *, const void *, const void *);
-extern void func_00282D30(void *, const void *, float);
-extern void func_002830C0(void *, const void *, const void *);
-extern void func_0027C768(void *, float *, float *);
-extern float func_00283180(float);
-extern float func_00283B98(float, float);
-extern void func_00280B90(void *, void *, int);
-extern void func_002FE8D8(void *, void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, const void *, float);
+extern void FastVecCross(void *, const void *, const void *);
+extern void FastVecScale(void *, const void *, float);
+extern void transform_vector(void *, const void *, const void *);
+extern void gfx_world_to_screen_unit(void *, float *, float *);
+extern float math_fast_sin_or_cos_a(float);
+extern float FastAddRotations(float, float);
+extern void draw_world_quad(void *, void *, int);
+extern void moby_get_facing_direction(void *, void *);
 
-extern RenderVec D_001B5340;
-extern HeroPosBlock D_00189E20;
+extern RenderVec g_camera_eye_state;
+extern HeroPosBlock g_hero_state;
 extern long long D_001B2810;
 extern int D_001B059C __attribute__((sda));
 extern int D_001B05A0 __attribute__((sda));
@@ -68,7 +68,7 @@ static inline void NextFace(int *value)
 }
 
 /* Draws the many debris quads facing the camera, scaled by the object's size, with moving texture coordinates. */
-void func_0032C2E8(char *object)
+void DrawQuadFaces(char *object)
 {
     RenderPacket packet;
     RenderVec up;
@@ -90,16 +90,16 @@ void func_0032C2E8(char *object)
     packet.tag[3] |= (long long)D_001B05AC << 32;
     packet.tag[0] = 0;
 
-    GetObjectFacingDirection(&gHeroState.pos, &up);
-    FastVecSub(&difference, &gCameraState_001B5340, &gHeroState.pos);
+    moby_get_facing_direction(&g_hero_state.pos, &up);
+    FastVecSub(&difference, &g_camera_eye_state, &g_hero_state.pos);
     vec_scale_to_length(&packet.matrix[0], &difference, 1.0f);
     FastVecCross(&packet.matrix[1], &packet.matrix[0], &up);
     vec_scale_to_length(&packet.matrix[1], &packet.matrix[1], 1.0f);
     FastVecCross(&packet.matrix[2], &packet.matrix[1], &packet.matrix[0]);
     vec_scale_to_length(&difference, &difference, 2.0f);
-    packet.matrix[3].x = gHeroState.pos.x + difference.x;
-    packet.matrix[3].y = gHeroState.pos.y + difference.y;
-    packet.matrix[3].z = gHeroState.pos.z + difference.z;
+    packet.matrix[3].x = g_hero_state.pos.x + difference.x;
+    packet.matrix[3].y = g_hero_state.pos.y + difference.y;
+    packet.matrix[3].z = g_hero_state.pos.z + difference.z;
     packet.matrix[3].w = 1.0f;
 
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = D_001B05B0;
@@ -119,9 +119,9 @@ void func_0032C2E8(char *object)
 
                 FastVecScale(&packet.vertex[corner], &D_0026AA00[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
                 transform_vector(&packet.vertex[corner], &packet.vertex[corner], packet.matrix);
-                ProjectWorldToScreen(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
-                *(float *)u += FastSinOrCosA(D_00235D00[index].u) * 0.01f;
-                *(float *)v += FastSinOrCosA(D_00235D00[index].v) * 0.02f;
+                gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
+                *(float *)u += math_fast_sin_or_cos_a(D_00235D00[index].u) * 0.01f;
+                *(float *)v += math_fast_sin_or_cos_a(D_00235D00[index].v) * 0.02f;
                 ClampUnit((float *)u);
                 ClampUnit((float *)v);
                 v += 8;

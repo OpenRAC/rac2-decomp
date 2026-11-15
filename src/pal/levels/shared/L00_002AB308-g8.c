@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad0[0x1E8];
@@ -47,17 +48,17 @@ extern HeroRotationBlends D_L00_0025BE10;
 extern unsigned char D_001A7A43,  D_001A7A41;
 extern float D_L00_001A7CF4 __attribute__((sda));
 extern float D_L00_001A7CF8 __attribute__((sda));
-extern void func_002AA2E8(float *, float, float);
-extern int func_002A7820(int, int);
-extern int func_00282948(int *);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002AA140(float, float, float);
-extern int func_00283CF0(float);
-extern void func_L00_002AB3E0(void);
-extern void func_L00_002AB0F0(float, float);
-extern void func_L00_002AB0C0(float, float);
-extern int func_L00_002ADEA0(int);
+extern void ApproachValue(float *, float, float);
+extern int math_random_int_range(int, int);
+extern int math_fast_float_d(int *);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_lerp_float(float, float, float);
+extern int FloatToInt(float);
+extern void hero_clear_slot_records(void);
+extern void cam_set_limits_fourth(float, float);
+extern void cam_set_limits_second(float, float);
+extern int hero_slot_item_id(int);
 
 void func_PAL_L00_002AB308(void)
 {
@@ -69,23 +70,23 @@ void func_PAL_L00_002AB308(void)
         D_L00_0025BE10.fd0c = D_L00_001A7CF8;
     D_L00_0025BE10.fc5c = D_L00_001A7CF4;
     if (D_001A7A41)
-        func_002AA2E8(&D_L00_001A7CF4, 1.57f, 0.05f);
+        ApproachValue(&D_L00_001A7CF4, 1.57f, 0.05f);
     else
-        func_002AA2E8(&D_L00_001A7CF4, 0.875f, 0.05f);
+        ApproachValue(&D_L00_001A7CF4, 0.875f, 0.05f);
 
     if (D_00189E20_2.f1e8 < 17)
         return;
     if (D_00189E20_2.f22b8 || D_00189E20_2.fbf8) {
-        func_L00_002AB3E0();
-        func_L00_002AB0F0(0.0432f, 0.28800002f);
-        func_L00_002AB0C0(0.0432f, 0.28800002f);
-        D_00189E20_2.f11a0 = func_002A7820(75, 100);
-        D_00189E20_2.f208 = func_002A7820(75, 100);
+        hero_clear_slot_records();
+        cam_set_limits_fourth(0.0432f, 0.28800002f);
+        cam_set_limits_second(0.0432f, 0.28800002f);
+        D_00189E20_2.f11a0 = math_random_int_range(75, 100);
+        D_00189E20_2.f208 = math_random_int_range(75, 100);
         return;
     }
     if (D_00189E20_2.f290 && D_00189E20_2.f288 > 1.4f &&
         D_00189E20_2.f278 > 1.0f) {
-        func_L00_002AB0F0(0.0216f, 0.43200004f);
+        cam_set_limits_fourth(0.0216f, 0.43200004f);
         x = D_00189E20_2.f288 * (1.5f * 0.017453294f) + 0.19198623f;
         if (x > 0.47123894f)
             x = 0.47123894f;
@@ -95,12 +96,12 @@ void func_PAL_L00_002AB308(void)
                 x = r;
         }
         D_L00_0025BE10.f274 = x;
-        func_L00_002AB0C0(0.011520001f, 0.43200004f);
+        cam_set_limits_second(0.011520001f, 0.43200004f);
         D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.7f;
         return;
     }
 
-    status = func_L00_002ADEA0(0);
+    status = hero_slot_item_id(0);
     flag = 1;
     if (status == 30 || status == 24)
         flag = 0;
@@ -112,22 +113,22 @@ void func_PAL_L00_002AB308(void)
     if (D_00189E20_2.f2490)
         return;
     if ((unsigned)(kind - 1) < 2)
-        D_00189E20_2.f11a0 = func_002A7820(33, 58);
-    if (func_00282948(&D_00189E20_2.f11a0)) {
-        D_00189E20_2.f1194 = -func_002A7878((-9.0f * 0.017453294f),
+        D_00189E20_2.f11a0 = math_random_int_range(33, 58);
+    if (math_fast_float_d(&D_00189E20_2.f11a0)) {
+        D_00189E20_2.f1194 = -math_random_float_range((-9.0f * 0.017453294f),
                                          (25.0f * 0.017453294f));
         if (D_00189E20_2.f278 < 1.5f)
-            D_00189E20_2.f1198 = func_002A78D8((50.0f * 0.017453294f),
+            D_00189E20_2.f1198 = math_random_signed_float_range((50.0f * 0.017453294f),
                                              (70.0f * 0.017453294f));
         else
-            D_00189E20_2.f1198 = func_002A78D8((20.0f * 0.017453294f),
+            D_00189E20_2.f1198 = math_random_signed_float_range((20.0f * 0.017453294f),
                                              (57.0f * 0.017453294f));
         {
-            float r = func_002A7878(0.0f, 1.0f);
-            D_00189E20_2.f11a4 = func_002AA140(0.015f, 0.007f, r);
-            D_00189E20_2.f11a8 = func_002AA140(0.29f, 0.3f, r);
-            D_00189E20_2.f11a0 = func_002A7820(75, 167);
-            D_00189E20_2.f11a0 += func_00283CF0(r * 67.0f);
+            float r = math_random_float_range(0.0f, 1.0f);
+            D_00189E20_2.f11a4 = math_lerp_float(0.015f, 0.007f, r);
+            D_00189E20_2.f11a8 = math_lerp_float(0.29f, 0.3f, r);
+            D_00189E20_2.f11a0 = math_random_int_range(75, 167);
+            D_00189E20_2.f11a0 += FloatToInt(r * 67.0f);
         }
     }
     if ((unsigned)(D_00189E20_2.f2290[0x43] - 1) < 2) {
@@ -140,11 +141,11 @@ void func_PAL_L00_002AB308(void)
         if (D_00189E20_2.f1194 < 0.0f)
             D_00189E20_2.f1194 = 0.0f;
     }
-    func_L00_002AB0F0(D_00189E20_2.f11a4, D_00189E20_2.f11a8);
+    cam_set_limits_fourth(D_00189E20_2.f11a4, D_00189E20_2.f11a8);
     D_L00_0025BE10.f278 = D_00189E20_2.f1198;
     D_L00_0025BE10.f274 = D_00189E20_2.f1194;
     if (flag) {
-        func_L00_002AB0C0(0.011520001f, 0.43200004f);
+        cam_set_limits_second(0.011520001f, 0.43200004f);
         D_L00_0025BE10.f118 = D_L00_0025BE10.f278 * 0.52f;
         D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.55f;
     }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_US2_0033BF90(char *);
 extern void func_US2_00348E58(char *, int);
@@ -15,10 +16,10 @@ void func_US2_0033F478(char *object)
     func_US2_00348E70(p);
 }
 
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
 extern void func_US2_0033BC20(void *, void *, void *);
-extern int func_00288FB8(int);
+extern int GetLocalizedString(int);
 extern void func_US2_0033C098(void *, int, int, int);
 extern void func_US2_0033C078(void *, float, float, float, float, float, float);
 extern void func_US2_0033F610(void *, int);
@@ -31,7 +32,7 @@ void func_US2_0033F510(char *object, void *argument)
     int text;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2D8) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -42,8 +43,8 @@ void func_US2_0033F510(char *object, void *argument)
     (*(float **)(object + 0x2D8))[1] = 208.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_001ADEF0);
-    text = func_00288FB8(0x2CB7);
-    func_US2_0033C098(child, text, 0, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2CB7);
+    func_US2_0033C098(child, text, 0, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
     func_US2_0033F610(object, 0);
 }
@@ -62,7 +63,7 @@ void func_US2_0033F200(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x3BC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -74,9 +75,9 @@ void func_US2_0033F200(char *object, void *argument)
     child = object + 8;
     widget = object + 0x2E0;
     func_US2_0033BC20(child, argument, D_001ADEC8);
-    text = func_00288FB8(0x2C36);
-    second = func_00288FB8(0x2C0B);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2C36);
+    second = GetLocalizedString(0x2C0B);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -98,7 +99,7 @@ void func_US2_0033E788(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -109,9 +110,9 @@ void func_US2_0033E788(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001ADE60);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -131,7 +132,7 @@ void func_US2_0033EB58(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -142,9 +143,9 @@ void func_US2_0033EB58(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001ADE70);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.3f);
     *(int *)(object + 0x2D8) = 0;
@@ -164,7 +165,7 @@ void func_US2_0033EE08(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -175,9 +176,9 @@ void func_US2_0033EE08(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001ADE80);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -197,7 +198,7 @@ void func_US2_0033F000(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -208,9 +209,9 @@ void func_US2_0033F000(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001ADE90);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -220,12 +221,12 @@ void func_US2_0033F000(char *object, void *argument)
 
 
 extern void func_US2_0033BE70(void *);
-extern void func_0033B018(void *, float, float);
-extern void func_00335E38(void *, float, float, float, float);
-extern int func_002E5E58(int, int, void *);
-extern void func_00132938(int);
-extern void func_00336B98(void *, int);
-extern void func_002E4860(void);
+extern void menu_set_anchor_pos(void *, float, float);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern int snd_play_from_global_bank(int, int, void *);
+extern void snd_send_cmd11_one_value(int);
+extern void meter_set_value(void *, int);
+extern void snd_set_default_group_volumes(void);
 extern unsigned char D_001A7B94[] __attribute__((sda));
 extern struct { int w0, w1, w2; } D_00138340;
 extern float D_L00_001AE198 __attribute__((sda));
@@ -239,18 +240,18 @@ int func_US2_0033E070(char *object, int flags)
 
     func_US2_0033BE70(p);
     vec = *(float **)(object + 0x36C);
-    func_0033B018(p, vec[0], vec[1]);
+    menu_set_anchor_pos(p, vec[0], vec[1]);
     vec = *(float **)(object + 0x36C);
-    func_00335E38(object + 0x2DC, vec[0] + D_L00_001AE198,
+    object_set_first_float4(object + 0x2DC, vec[0] + D_L00_001AE198,
                  vec[1] + D_L00_001AE19C, 0.0f, 0.0f);
     vec = *(float **)(object + 0x36C);
-    func_00335E38(object + 0x324, vec[0] + D_L00_001AE1A0,
+    object_set_first_float4(object + 0x324, vec[0] + D_L00_001AE1A0,
                  vec[1] + D_L00_001AE1A4, 0.0f, 0.0f);
     if (flags & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 2) % 3;
     } else if (flags & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        snd_play_from_global_bank(3, 0, 0);
         *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 1) % 3;
     } else if (D_00138340.w0 & 0x8000) {
         switch (*(int *)(object + 0x2D8)) {
@@ -281,16 +282,16 @@ int func_US2_0033E070(char *object, int flags)
     } else if (flags & 0x40) {
         if (*(int *)(object + 0x2D8) == 2) {
             int value;
-            func_002E5E58(4, 0, 0);
+            snd_play_from_global_bank(4, 0, 0);
             value = *(int *)(D_001A7B94 + 4) == 0;
             *(int *)(D_001A7B94 + 4) = value;
-            func_00132938(!value);
+            snd_send_cmd11_one_value(!value);
         } else {
-            func_002E5E58(5, 0, 0);
+            snd_play_from_global_bank(5, 0, 0);
         }
     }
-    func_00336B98(object + 0x324, *(int *)(D_001A7B94 + 8));
-    func_00336B98(object + 0x2DC, *(int *)(D_001A7B94 + 12));
-    func_002E4860();
+    meter_set_value(object + 0x324, *(int *)(D_001A7B94 + 8));
+    meter_set_value(object + 0x2DC, *(int *)(D_001A7B94 + 12));
+    snd_set_default_group_volumes();
     return (flags >> 6) & 1;
 }

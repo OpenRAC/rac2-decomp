@@ -23,15 +23,15 @@ extern int ref_L22_003FC048_07 __attribute__((sda));
 extern u8 ref_L22_003FC048_08 __attribute__((sda));
 extern u8 * D_L22_001B1D6C;
 extern u8 D_L22_001B9C80[];
-extern float func_00283198(float), func_00283B98(float, float), func_00282E80(void *, void *);
-extern void func_L22_003FBFD0(void), func_L22_003FBF00(void *, void *, int), func_L22_003FC338(void *);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_00282D30(void *, void *, float), func_00282CC0(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern u8 * func_002C36D0(void *, int, int, int);
+extern float math_fast_sin_or_cos_b(float), FastAddRotations(float, float), vec_distance_xy(void *, void *);
+extern void part_rotate_anchor_table(void), part_get_anchor_position(void *, void *, int), gfx_draw_pulsing_ring(void *);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void FastVecScale(void *, void *, float), FastVecAdd(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern u8 * part_spawn_bluish_fade(void *, int, int, int);
 
 /* Update existing particles and maintain eight persistent effect slots. */
-void func_L22_003FC048(u8 * obj) {
+void part_update_effect_particles(u8 * obj) {
     float p[4], tmp[4], point[4], origin[4], zero[4];
     Controller * ctl = *(Controller **)(obj + 0x68);
     int i, count;
@@ -44,20 +44,20 @@ void func_L22_003FC048(u8 * obj) {
             u8 * v = ctl->particles[j];
             if (v) {
                 u8 * s = v + 0x20;
-                *(float *)(s + 8) = ref_L22_003FC048_01 * FastSinOrCosB(*(float *)(s + 12)) + ref_L22_003FC048_02;
+                *(float *)(s + 8) = ref_L22_003FC048_01 * math_fast_sin_or_cos_b(*(float *)(s + 12)) + ref_L22_003FC048_02;
                 *(float *)(s + 12) = FastAddRotations(*(float *)(s + 12), ref_L22_003FC048_00[j]);
             }
         }
     }
     if (D_L22_001B1D6C == obj)
-        RotateAnchorTable();
+        part_rotate_anchor_table();
     qcopy(p, obj + 0x10);
     FastVecScale(tmp, obj + 0xE0, ref_L22_003FC048_03);
     FastVecAdd(p, p, tmp);
     p[3] = 1.0f;
-    if (FastMathHelperA(p, 64.0f) < 0)
+    if (math_fast_helper_a(p, 64.0f) < 0)
         return;
-    AddDrawCallbackToList1(DrawPulsingRing, obj);
+    gfx_add_draw_callback_first(gfx_draw_pulsing_ring, obj);
     if (obj[0x20])
         return;
     distance = vec_distance_xy(obj + 0x10, D_L22_001B9C80);
@@ -69,8 +69,8 @@ void func_L22_003FC048(u8 * obj) {
         count = 40;
     for (i = 0, slot = ctl->particles; i < 8; i++, slot++) {
         u8 * v, *old;
-        GetParticleAnchorPosition(obj, point, i);
-        v = SpawnBluishFadeParticle(point, count, 2, 0);
+        part_get_anchor_position(obj, point, i);
+        v = part_spawn_bluish_fade(point, count, 2, 0);
         if (v) {
             u8 * s = v + 0x20;
             qcopy(origin, obj + 0x10);
@@ -88,7 +88,7 @@ void func_L22_003FC048(u8 * obj) {
         }
         old = *slot;
         if (!old) {
-            *slot=SpawnBluishFadeParticle(point,0,1,0);
+            *slot=part_spawn_bluish_fade(point,0,1,0);
             v = *slot;
             if (v) {
                 ParticleState * s = (ParticleState *)(v + 0x20);

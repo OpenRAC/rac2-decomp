@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -30,9 +31,9 @@
  * label list keeps each C branch available; it is not read by the program. */
 extern void *D_0026DBE0[];
 
-extern s8 *func_00288FB8(s32 id);
-extern void func_002F88D8(s8 *a);
-extern void func_002FADB0(void);
+extern s8 *GetLocalizedString(s32 id);
+extern void shop_set_message_text(s8 *a);
+extern void shop_mark_bought_special_items_owned(void);
 
 struct A { s8 pad[0x38]; s32 st; };
 struct B {
@@ -47,92 +48,92 @@ struct B {
     s32 f168;
 };
 
-extern struct A D_0021F240;
-extern struct B D_001393E0;
+extern struct A g_vendor_menu_state;
+extern struct B g_memcard_state;
 extern s32 D_001A7A20;
 
 void func_PAL_002FBEB4(void) {
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
-    u32 rc2_selector = (u32)(D_0021F240.st);
+    u32 rc2_selector = (u32)(g_vendor_menu_state.st);
     if (rc2_selector > 6U) goto rc2_default;
 goto *D_0026DBE0[rc2_selector];
 
     rc2_case_0:
     rc2_case_2:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0 && D_001393E0.f8 == 2) {
-            if (D_001393E0.f14 != 0) {
-                D_001393E0.f164 = 0x18;
-                D_0021F240.st = 3;
-                D_001393E0.f168 = 0;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0 && g_memcard_state.f8 == 2) {
+            if (g_memcard_state.f14 != 0) {
+                g_memcard_state.f164 = 0x18;
+                g_vendor_menu_state.st = 3;
+                g_memcard_state.f168 = 0;
                 goto rc2_switch_end;
             }
         }
-        if (D_0021F240.st != 0) {
-            D_0021F240.st = 4;
+        if (g_vendor_menu_state.st != 0) {
+            g_vendor_menu_state.st = 4;
         } else {
-            D_0021F240.st = 6;
+            g_vendor_menu_state.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_1:
     rc2_case_3:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (D_001393E0.f1C == 1) {
-                    func_002F88D8(func_00288FB8(0x1B72));
-                } else if (D_001393E0.f1C >= 3) {
-                    func_002F88D8(func_00288FB8(0x1B70));
+                if (g_memcard_state.f1C == 1) {
+                    shop_set_message_text(GetLocalizedString(0x1B72));
+                } else if (g_memcard_state.f1C >= 3) {
+                    shop_set_message_text(GetLocalizedString(0x1B70));
                 } else {
-                    func_002F88D8(func_00288FB8(0x1B71));
+                    shop_set_message_text(GetLocalizedString(0x1B71));
                 }
             } else {
-                func_002F88D8(func_00288FB8(0x1B6F));
+                shop_set_message_text(GetLocalizedString(0x1B6F));
             }
-            func_002FADB0();
-            if (D_0021F240.st != 0) {
-                D_0021F240.st = 4;
+            shop_mark_bought_special_items_owned();
+            if (g_vendor_menu_state.st != 0) {
+                g_vendor_menu_state.st = 4;
             } else {
-                D_0021F240.st = 6;
+                g_vendor_menu_state.st = 6;
             }
         }
         goto rc2_switch_end;
     rc2_case_4:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0 && D_001393E0.fA8 == 2 && D_001393E0.fB4 != 0) {
-            D_001393E0.f164 = 0x18;
-            D_001393E0.f168 = 1;
-            D_0021F240.st = 5;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0 && g_memcard_state.fA8 == 2 && g_memcard_state.fB4 != 0) {
+            g_memcard_state.f164 = 0x18;
+            g_memcard_state.f168 = 1;
+            g_vendor_menu_state.st = 5;
             goto rc2_switch_end;
         }
-        D_0021F240.st = 6;
+        g_vendor_menu_state.st = 6;
         goto rc2_switch_end;
     rc2_case_5:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (D_001393E0.fBC == 1) {
-                    func_002F88D8(func_00288FB8(0x1B72));
-                } else if (D_001393E0.fBC >= 3) {
-                    func_002F88D8(func_00288FB8(0x1B70));
+                if (g_memcard_state.fBC == 1) {
+                    shop_set_message_text(GetLocalizedString(0x1B72));
+                } else if (g_memcard_state.fBC >= 3) {
+                    shop_set_message_text(GetLocalizedString(0x1B70));
                 } else {
-                    func_002F88D8(func_00288FB8(0x1B71));
+                    shop_set_message_text(GetLocalizedString(0x1B71));
                 }
             } else {
-                func_002F88D8(func_00288FB8(0x1B6F));
+                shop_set_message_text(GetLocalizedString(0x1B6F));
             }
-            func_002FADB0();
-            D_0021F240.st = 6;
+            shop_mark_bought_special_items_owned();
+            g_vendor_menu_state.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_6:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
-            if (D_001393E0.f1C == 0) {
-                s32 a = D_001393E0.f8;
-                if (a == 2 && D_001393E0.f14 != 0) {
-                    D_0021F240.st = a;
+        if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
+            if (g_memcard_state.f1C == 0) {
+                s32 a = g_memcard_state.f8;
+                if (a == 2 && g_memcard_state.f14 != 0) {
+                    g_vendor_menu_state.st = a;
                     goto rc2_switch_end;
                 }
             }
-            if (D_001393E0.fBC == 0 && D_001393E0.fA8 == 2 && D_001393E0.fB4 != 0) {
-                D_0021F240.st = 4;
+            if (g_memcard_state.fBC == 0 && g_memcard_state.fA8 == 2 && g_memcard_state.fB4 != 0) {
+                g_vendor_menu_state.st = 4;
             }
         }
         goto rc2_switch_end;

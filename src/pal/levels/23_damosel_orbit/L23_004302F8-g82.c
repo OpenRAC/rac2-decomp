@@ -67,10 +67,10 @@ typedef struct CamMgr_004402D8 {
 } CamMgr_004402D8;
 extern Entry_004402D8 *D_L23_001B2144;
 extern s32 D_L23_001A8FF0;
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s32 D_0018C0B4 __attribute__((nosda));
-extern Player_004402D8 D_00189E20;
-extern Pad_004402D8 D_00138180;
+extern Player_004402D8 g_hero_state;
+extern Pad_004402D8 g_pad_state;
 extern CamMgr_004402D8 D_L23_001BA500;
 extern s32 D_L23_001B234C;
 extern f32 D_L23_001B1D6C __attribute__((sda));
@@ -87,26 +87,26 @@ extern f32 D_L23_001B1F14 __attribute__((sda));
 extern f32 D_L23_001B1F18 __attribute__((sda));
 extern f32 D_L23_001B1F1C __attribute__((sda));
 extern f32 D_L23_001B1F20 __attribute__((sda));
-extern f32 func_00282E48(void *, void *);
-extern f32 func_002B0360(void *);
-extern s32 func_L00_00424940(void *);
-extern s32 func_L00_00424978(void *);
-extern s32 func_002ACBC8(void *, s32);
-extern f32 func_00282C48(f32);
-extern void func_L00_00424C00(void);
-extern void func_L00_00424B48(s32);
-extern void func_L00_00424C28(void);
-extern void func_L00_00424B70(f32, f32);
-extern s32 func_00282948(void *);
-extern void func_L00_00424F00(void *, f32, f32);
-extern f32 func_L00_002D2A10(f32, f32, f32);
-extern s32 func_00283CF0(f32);
-extern void func_L00_00424BB8(f32, f32);
-extern void func_L16_0042FB10(f32, f32);
-extern void func_L00_00424A88(s32, f32, f32);
-extern void func_L00_00424A08(s32, f32, f32);
-extern void func_L00_00424A50(f32, f32);
-extern void func_L00_00424B20(f32);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 gravity_get_center_distance(void *);
+extern s32 cam_release_request_slot(void *);
+extern s32 cam_claim_request_slot(void *);
+extern s32 IsPointInCuboid(void *, s32);
+extern f32 math_fabs(f32);
+extern void cam_set_snap_flag(void);
+extern void set_follow_camera_orbit_clamp_mode(s32);
+extern void cam_set_lock_flag(void);
+extern void cam_set_speeds_if_nonzero(f32, f32);
+extern s32 math_fast_float_d(void *);
+extern void cam_set_strength_and_steer(void *, f32, f32);
+extern f32 hero_find_collision_time(f32, f32, f32);
+extern s32 FloatToInt(f32);
+extern void cam_set_turn_speeds_if_nonzero(f32, f32);
+extern void moby_push_axis_to_linked_node(f32, f32);
+extern void cam_set_aim_offset_target(s32, f32, f32);
+extern void follow_camera_set_distance(s32, f32, f32);
+extern void follow_camera_set_height(f32, f32);
+extern void cam_set_tuning_value(f32);
 
 void func_PAL_L23_00445E00(Moby_004402D8 *moby)
 {
@@ -115,29 +115,29 @@ void func_PAL_L23_00445E00(Moby_004402D8 *moby)
     s32 i;
 
     if (vars->f20 == 0) {
-        if (D_L23_001A8FF0 != 0 || (D_001A79F0 == 16 && D_0018C0B4 == 0x81)) {
+        if (D_L23_001A8FF0 != 0 || (g_current_map_index == 16 && D_0018C0B4 == 0x81)) {
             f32 tmp[4];
 
             tmp[0] = entry->x;
             tmp[1] = entry->y;
             tmp[2] = entry->z;
             tmp[3] = 0.0f;
-            vars->f24 = func_00282E48(tmp, D_00189E20.fB0);
+            vars->f24 = fast_vec_dist(tmp, g_hero_state.fB0);
             vars->f20 = 1;
         }
         return;
     }
     if (D_L23_001BA500.cam->f86 != 0
-        || (D_L23_001A8FF0 == 0 && (D_001A79F0 != 16 || D_0018C0B4 != 0x81))) {
-        if (D_L23_001B1F20 < func_002B0360(D_L23_001BA500.f140)) {
+        || (D_L23_001A8FF0 == 0 && (g_current_map_index != 16 || D_0018C0B4 != 0x81))) {
+        if (D_L23_001B1F20 < gravity_get_center_distance(D_L23_001BA500.f140)) {
             D_L23_001B234C = 3;
         } else {
             D_L23_001B234C = 0;
         }
-        func_L00_00424940(moby);
+        cam_release_request_slot(moby);
         return;
     }
-    if (func_L00_00424978(moby) <= 0) {
+    if (cam_claim_request_slot(moby) <= 0) {
         return;
     }
     i = 0;
@@ -145,62 +145,62 @@ void func_PAL_L23_00445E00(Moby_004402D8 *moby)
         if (vars->f28[i] < 0) {
             break;
         }
-        if (func_002ACBC8(D_00189E20.f80, vars->f28[i]) != 0) {
-            func_L00_00424BB8(0.04f, 0.2f);
-            func_L00_00424A08(0, vars->f40, 0.003f);
-            func_L00_00424A50(vars->f44, 0.003f);
+        if (IsPointInCuboid(g_hero_state.f80, vars->f28[i]) != 0) {
+            cam_set_turn_speeds_if_nonzero(0.04f, 0.2f);
+            follow_camera_set_distance(0, vars->f40, 0.003f);
+            follow_camera_set_height(vars->f44, 0.003f);
             return;
         }
         i++;
     } while (i < 6);
-    if (D_00189E20.f22B4 == 2) {
-        if (D_00189E20.f1454 != 0 || D_00189E20.f2294 == 0x5B
-            || func_00282C48(D_00138180.f100) >= 0.3f || func_00282C48(D_00138180.f104) >= 0.3f) {
-            func_L00_00424C00();
-            func_L00_00424B48(0);
+    if (g_hero_state.f22B4 == 2) {
+        if (g_hero_state.f1454 != 0 || g_hero_state.f2294 == 0x5B
+            || math_fabs(g_pad_state.f100) >= 0.3f || math_fabs(g_pad_state.f104) >= 0.3f) {
+            cam_set_snap_flag();
+            set_follow_camera_orbit_clamp_mode(0);
         }
     } else {
-        func_L00_00424C00();
-        func_L00_00424B48(0);
+        cam_set_snap_flag();
+        set_follow_camera_orbit_clamp_mode(0);
     }
-    func_L00_00424C28();
-    func_L00_00424B70(D_L23_001B1EF4, 0.2f);
-    if (func_00282948(&vars->f50) != 0 && !(D_00189E20.f170 > 0.005f)) {
-        func_L00_00424F00(D_00189E20.f2290 + 0xC0, 0.0052359886f, 0.0f);
+    cam_set_lock_flag();
+    cam_set_speeds_if_nonzero(D_L23_001B1EF4, 0.2f);
+    if (math_fast_float_d(&vars->f50) != 0 && !(g_hero_state.f170 > 0.005f)) {
+        cam_set_strength_and_steer(g_hero_state.f2290 + 0xC0, 0.0052359886f, 0.0f);
     }
-    if (func_00282C48(D_00138180.f100) >= 0.3f || func_00282C48(D_00138180.f104) >= 0.3f) {
+    if (math_fabs(g_pad_state.f100) >= 0.3f || math_fabs(g_pad_state.f104) >= 0.3f) {
         vars->f50 = 250;
     }
-    if (D_00189E20.f22B4 == 2) {
+    if (g_hero_state.f22B4 == 2) {
         s32 n;
 
         D_L23_001BA500.cam->f70->f250 = 2;
         n = 0;
-        if (D_00189E20.f49E != 0) {
-            n = func_00283CF0(func_L00_002D2A10(90.0f, D_00189E20.f520, -1.0f));
+        if (g_hero_state.f49E != 0) {
+            n = FloatToInt(hero_find_collision_time(90.0f, g_hero_state.f520, -1.0f));
         }
-        if (D_00189E20.f2294 == 0x5B && (D_00189E20.f49E == 0 || n >= 17)) {
-            func_L00_00424B70(0.5f, 1.0f);
-            func_L00_00424BB8(0.05f, 0.2f);
-            func_L16_0042FB10(0.04f, 0.0f);
-            func_L00_00424A88(0, D_L23_001B1F14, 0.005f);
-            func_L00_00424A08(1, D_L23_001B1F08, 0.01f);
-            func_L00_00424A50(D_L23_001B1F0C, 0.01f);
+        if (g_hero_state.f2294 == 0x5B && (g_hero_state.f49E == 0 || n >= 17)) {
+            cam_set_speeds_if_nonzero(0.5f, 1.0f);
+            cam_set_turn_speeds_if_nonzero(0.05f, 0.2f);
+            moby_push_axis_to_linked_node(0.04f, 0.0f);
+            cam_set_aim_offset_target(0, D_L23_001B1F14, 0.005f);
+            follow_camera_set_distance(1, D_L23_001B1F08, 0.01f);
+            follow_camera_set_height(D_L23_001B1F0C, 0.01f);
             D_L23_001B1D6C = D_L23_001B1F1C * 0.017453294f;
-            func_L00_00424B20(D_L23_001B1F18 * 0.017453294f);
+            cam_set_tuning_value(D_L23_001B1F18 * 0.017453294f);
         } else {
             f32 d;
             f32 t;
             f32 a;
             f32 b;
 
-            func_L00_00424A88(0, D_L23_001B1F10, 0.03f);
-            if (D_00189E20.f229C == 2) {
-                func_L00_00424BB8(0.04f, 0.2f);
+            cam_set_aim_offset_target(0, D_L23_001B1F10, 0.03f);
+            if (g_hero_state.f229C == 2) {
+                cam_set_turn_speeds_if_nonzero(0.04f, 0.2f);
             } else {
-                func_L00_00424BB8(0.015f, 0.2f);
+                cam_set_turn_speeds_if_nonzero(0.015f, 0.2f);
             }
-            d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
+            d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
             if (D_L23_001B1EEC < d) {
                 d = D_L23_001B1EEC;
             } else if (d < 0.0f) {
@@ -209,42 +209,42 @@ void func_PAL_L23_00445E00(Moby_004402D8 *moby)
             t = d / D_L23_001B1EEC;
             a = (D_L23_001B1F00 - D_L23_001B1EF8) * t + D_L23_001B1EF8;
             b = (D_L23_001B1F04 - D_L23_001B1EFC) * t + D_L23_001B1EFC;
-            func_L00_00424A08(1, a, 0.005f);
-            func_L00_00424A50(b, 0.005f);
+            follow_camera_set_distance(1, a, 0.005f);
+            follow_camera_set_height(b, 0.005f);
         }
-        if (D_L23_001B1F20 < func_002B0360(D_L23_001BA500.f140)) {
+        if (D_L23_001B1F20 < gravity_get_center_distance(D_L23_001BA500.f140)) {
             D_L23_001B234C = 3;
         } else {
             D_L23_001B234C = 0;
         }
-    } else if (D_00189E20.f2294 == 0x81) {
-        func_L00_00424BB8(0.05f, 0.2f);
-        func_L16_0042FB10(0.04f, 0.0f);
-        if (D_001A79F0 == 16) {
-            func_L00_00424A88(0, 0.5f, 0.04f);
-            func_L00_00424A08(0, 4.0f, 0.002f);
-            func_L00_00424A50(2.0f, 0.04f);
+    } else if (g_hero_state.f2294 == 0x81) {
+        cam_set_turn_speeds_if_nonzero(0.05f, 0.2f);
+        moby_push_axis_to_linked_node(0.04f, 0.0f);
+        if (g_current_map_index == 16) {
+            cam_set_aim_offset_target(0, 0.5f, 0.04f);
+            follow_camera_set_distance(0, 4.0f, 0.002f);
+            follow_camera_set_height(2.0f, 0.04f);
         } else {
-            func_L00_00424A88(0, 1.0f, 0.04f);
-            func_L00_00424A08(0, 2.0f, 0.002f);
-            func_L00_00424A50(7.0f, 0.04f);
+            cam_set_aim_offset_target(0, 1.0f, 0.04f);
+            follow_camera_set_distance(0, 2.0f, 0.002f);
+            follow_camera_set_height(7.0f, 0.04f);
         }
     } else {
-        if (D_00189E20.f229C == 2) {
-            func_L00_00424BB8(0.04f, 0.2f);
+        if (g_hero_state.f229C == 2) {
+            cam_set_turn_speeds_if_nonzero(0.04f, 0.2f);
         } else {
-            func_L00_00424BB8(0.015f, 0.2f);
+            cam_set_turn_speeds_if_nonzero(0.015f, 0.2f);
         }
-        if (D_00189E20.f229C == 5) {
-            func_L00_00424A08(0, 4.0f, 0.003f);
-            func_L00_00424A50(6.0f, 0.003f);
+        if (g_hero_state.f229C == 5) {
+            follow_camera_set_distance(0, 4.0f, 0.003f);
+            follow_camera_set_height(6.0f, 0.003f);
         } else {
             f32 d;
             f32 t;
             f32 a;
             f32 b;
 
-            d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
+            d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
             if (D_L23_001B1EEC < d) {
                 d = D_L23_001B1EEC;
             } else if (d < 0.0f) {
@@ -253,8 +253,8 @@ void func_PAL_L23_00445E00(Moby_004402D8 *moby)
             t = d / D_L23_001B1EEC;
             a = (vars->f48 - vars->f40) * t + vars->f40;
             b = (vars->f4C - vars->f44) * t + vars->f44;
-            func_L00_00424A08(0, a, 0.003f);
-            func_L00_00424A50(b, 0.003f);
+            follow_camera_set_distance(0, a, 0.003f);
+            follow_camera_set_height(b, 0.003f);
         }
     }
 }

@@ -1,25 +1,26 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; int fallback; } SelectionCallback;
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern char *D_001A8CFC;
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
 extern int func_0029C4F0(int);
-extern char *func_003415B8(void *);
-extern void func_002D5E98(int);
+extern char *tab_menu_get_selected_entry(void *);
+extern void menu_start_action(int);
 
 int func_US2_002CE908(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
-    CallbackMenuState *state = &D_00138180;
+    CallbackMenuState *state = &g_pad_state;
     int flags = state->flags;
     int result = 0;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         int status;
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             status = -1;
             goto finish;
         }
@@ -32,10 +33,10 @@ int func_US2_002CE908(void)
     } else {
         func_0029C4F0(flags);
         if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = func_003415B8(D_001A8CFC + 0x3C160);
+            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3C160);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
-            func_002D5E98((int)&message);
+            menu_start_action((int)&message);
         }
     }
     return result;

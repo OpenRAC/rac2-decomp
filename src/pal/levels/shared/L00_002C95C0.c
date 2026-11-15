@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int s32;
 typedef float f32;
 extern u8 D_00189E20_7[];
-extern void func_002AA3A8(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
-extern f32 func_00282C48(f32 v);
-extern void func_002AA2E8(f32 *p, f32 v, f32 w);
+extern void math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
+extern f32 math_fabs(f32 v);
+extern void ApproachValue(f32 *p, f32 v, f32 w);
 typedef struct {
     u8 pad000[0x88];
     f32 f088;
@@ -48,7 +49,7 @@ void func_PAL_L00_002C95C0(void)
         || ((Res_F458c670e *)D_00189E20_7)->i22A4 == 17
         || ((Res_F458c670e *)D_00189E20_7)->i22B0 == 17) {
         if (((Res_F458c670e *)D_00189E20_7)->i2294 == 53) {
-            func_002AA3A8(&((Res_F458c670e *)D_00189E20_7)->f790,
+            math_spring_float_to_goal(&((Res_F458c670e *)D_00189E20_7)->f790,
                     &((Res_F458c670e *)D_00189E20_7)->fA3C,
                     0.0f, 0.0432f, 0.43200004f, 0.030000001f);
             ((Res_F458c670e *)D_00189E20_7)->f794 = 0.0f;
@@ -57,7 +58,7 @@ void func_PAL_L00_002C95C0(void)
             v = ((Res_F458c670e *)D_00189E20_7)->f794;
             ((Res_F458c670e *)D_00189E20_7)->f794 =
                 v - (old * 0.0072000003f + v * 0.054000005f);
-            r = func_00282C48(old);
+            r = math_fabs(old);
             if (r < 0.001f) {
                 if (((Res_F458c670e *)D_00189E20_7)->f794 < 0.0001f)
                     ((Res_F458c670e *)D_00189E20_7)->f794 = 0.0f;
@@ -71,7 +72,7 @@ void func_PAL_L00_002C95C0(void)
         if (sum > 0.0f) {
             if (((Res_F458c670e *)D_00189E20_7)->f794 > 0.0f)
                 ((Res_F458c670e *)D_00189E20_7)->f794 = 0.0f;
-            func_002AA2E8(&((Res_F458c670e *)D_00189E20_7)->f790,
+            ApproachValue(&((Res_F458c670e *)D_00189E20_7)->f790,
                     0.0f, 0.014f);
         }
     }
@@ -79,7 +80,7 @@ void func_PAL_L00_002C95C0(void)
         f32 x = ((Res_F458c670e *)D_00189E20_7)->f330;
         if (((Res_F458c670e *)D_00189E20_7)->i229C == 22)
             x = ((Res_F458c670e *)D_00189E20_7)->f9B0;
-        func_002AA3A8(&((Res_F458c670e *)D_00189E20_7)->f79C,
+        math_spring_float_to_goal(&((Res_F458c670e *)D_00189E20_7)->f79C,
                 &((Res_F458c670e *)D_00189E20_7)->f7A0,
                 x, 0.03888f, 0.43200004f, 0.0f);
     }
@@ -91,10 +92,10 @@ void func_PAL_L00_002C95C0(void)
 
 
 extern char D_00189E20_4[];
-extern void func_L00_002C42E0(int a0, int a1);
-extern int func_L00_0032EF10(int, int, int *);
-extern int func_L00_002C3A40(void);
-extern int func_L00_0032EFB0(int, int, int, int);
+extern void hero_l00_set_action(int a0, int a1);
+extern int PadPressedWithin(int, int, int *);
+extern int hero_get_step_offset_from_direction(void);
+extern int pad_presses_within_frames(int, int, int, int);
 extern int D_00138320[];
 
 /* Looks the object up in the shared table and stops when the lookup fails; otherwise the state
@@ -107,27 +108,27 @@ int func_PAL_L00_002CA360(int arg0, int arg1)
     int r;
     char *p;
 
-    if (func_L00_0032EF10(0x40, arg0, &index) == 0)
+    if (PadPressedWithin(0x40, arg0, &index) == 0)
         return 0;
-    r = func_L00_002C3A40();
+    r = hero_get_step_offset_from_direction();
     if ((D_00138320[0] & 8) && r > 0) {
-        if (func_L00_0032EFB0(0x40, 0x1F000, arg0 + r, r) != 0) {
-            func_L00_002C42E0(0xB, 1);
+        if (pad_presses_within_frames(0x40, 0x1F000, arg0 + r, r) != 0) {
+            hero_l00_set_action(0xB, 1);
             return 1;
         }
     }
     p = D_00189E20_4;
     if (*(short *)(p + 0x1454) != 0) {
         if (0.9f < *(float *)(p + 0x24B8)) {
-            if (func_L00_002C3A78() != 2) {
-                func_L00_002C42E0(0xB, 1);
+            if (hero_classify_input_direction() != 2) {
+                hero_l00_set_action(0xB, 1);
                 return 1;
             }
         }
     }
     if (arg1 != 0)
         return 0;
-    func_L00_002C42E0(7, 1);
+    hero_l00_set_action(7, 1);
     return 1;
 }
 

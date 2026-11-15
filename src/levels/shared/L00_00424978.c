@@ -6,14 +6,14 @@ typedef struct Rac2Native_428d1e2cc4aa1f21_Keyed {
     char *owner_1c;
 } Rac2Native_428d1e2cc4aa1f21_Keyed;
 
-extern char *D_L00_001B8E10;
+extern char *g_follow_camera_object;
 
 extern Rac2Native_428d1e2cc4aa1f21_Keyed *D_L00_001B1844;
 
 /* Tries to claim the camera request slot. A new request wins if the current owner has a lower priority; returns -1 if the camera is not in the normal mode. */
-int func_L00_00424978(char *request)
+int cam_claim_request_slot(char *request)
 {
-    char *camera = gFollowCameraObject;
+    char *camera = g_follow_camera_object;
     char *state;
     char *current;
 

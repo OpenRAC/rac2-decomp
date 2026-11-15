@@ -2,31 +2,31 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct PoolRecord64 PoolRecord64;
-extern Vector D_00189EA0;
-extern unsigned char D_00188660[];
-extern void func_002A7750(unsigned char *, unsigned char, int);
-extern unsigned char *func_0029EFD0(int);
-extern void func_002B37E8(void *, void *);
-extern int func_002B3868(unsigned char *);
-extern int func_00282948(int *);
-extern float func_00283B98(float, float);
-extern int func_002E5CF8(int, int, char *);
-extern void func_002E59F8(int);
-extern int func_L00_00324120(int);
-extern PoolRecord64 *func_L00_002D70A0(int);
-extern void func_L00_002D7140(unsigned char *);
-extern void func_L20_0043D470(char *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_002AD6F0(void *, const void *, const void *, const void *);
-extern void func_L01_003208D0(void *, float *, int);
-extern void func_0029F338(void *);
-extern void func_00282D30(void *, const void *, float);
-extern void func_00282CC0(void *, const void *, const void *);
+extern Vector g_hero_position;
+extern unsigned char g_sound_state[];
+extern void moby_set_state(unsigned char *, unsigned char, int);
+extern unsigned char *CreateMoby(int);
+extern void moby_init_child_from_parent(void *, void *);
+extern int flag_set_first_pending(unsigned char *);
+extern int math_fast_float_d(int *);
+extern float FastAddRotations(float, float);
+extern int PlayMobySound(int, int, char *);
+extern void snd_stop_voice(int);
+extern int hero_is_current_selected_id(int);
+extern PoolRecord64 *cam_alloc_override_slot(int);
+extern void cam_end_override(unsigned char *);
+extern void object_fill_settings_block(char *);
+extern void FastVecSub(void *, const void *, const void *);
+extern void mat_combine_and_store(void *, const void *, const void *, const void *);
+extern void glow_flicker_update(void *, float *, int);
+extern void moby_mark_spawned(void *);
+extern void FastVecScale(void *, const void *, float);
+extern void FastVecAdd(void *, const void *, const void *);
 extern void func_002A0F48(void *);
 extern Vector D_L20_001B9FC0;
 
 /* Updates moby class 4464: a rotating object that turns for a set time, plays a sound while turning, and keeps a copy of itself and any riders moving with it. */
-void func_L20_0043D4D8(unsigned char *moby) {
+void rotating_object_update(unsigned char *moby) {
     Vector oldPosition, oldRotation, delta, offset;
     unsigned char *state = *(unsigned char **)(moby + 0x68);
     unsigned char *child;
@@ -50,7 +50,7 @@ void func_L20_0043D4D8(unsigned char *moby) {
         *(unsigned int *)(state + 0x7C) = savedValue;
         *(float *)(state + 0x64) = one;
         *(float *)(state + 0x6C) = one;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
@@ -60,7 +60,7 @@ void func_L20_0043D4D8(unsigned char *moby) {
                     goto clone_failed;
             }
             {
-                InitChildObjectFromParent(*(unsigned char **)(state + 0x88), 0);
+                moby_init_child_from_parent(*(unsigned char **)(state + 0x88), 0);
                 *(unsigned short *)(*(unsigned char **)(state + 0x88) + 0x34) |= 2;
                 *(int *)(*(unsigned char **)(state + 0x88) + 0x98) = 0;
                 (*(unsigned char **)(state + 0x88))[0x23] = 0;
@@ -68,48 +68,48 @@ void func_L20_0043D4D8(unsigned char *moby) {
 clone_failed:
             {
                 float sign = -1.0f;
-                if (gHeroPosition.f[1] <= *(float *)(moby + 0x14)) sign = 1.0f;
+                if (g_hero_position.f[1] <= *(float *)(moby + 0x14)) sign = 1.0f;
                 *(float *)(state + 0x64) = sign;
             }
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        if (SetFirstPendingFlag(moby)) *(int *)(state + 0x78) = (int)(*(float *)(state + 0x70) / *(float *)(state + 0x74));
-        if (!FastFloatHelperD((int *)(state + 0x78))) {
+        if (flag_set_first_pending(moby)) *(int *)(state + 0x78) = (int)(*(float *)(state + 0x70) / *(float *)(state + 0x74));
+        if (!math_fast_float_d((int *)(state + 0x78))) {
             *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x74));
-            slot = *(int *)(state + 0x90) * 0x70 + gSoundState;
+            slot = *(int *)(state + 0x90) * 0x70 + g_sound_state;
             if (*(unsigned char **)(slot + 0x88) != moby || !slot[0x74])
                 *(int *)(state + 0x90) = PlayMobySound(1, 4, (char *)moby);
         } else {
             moby[0xBC] = *(unsigned char *)(state + 0x7C);
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
             index = *(int *)(state + 0x90);
             if (index != -1) {
-                unsigned char *stoppedSlot = index * 0x70 + gSoundState;
+                unsigned char *stoppedSlot = index * 0x70 + g_sound_state;
                 if (*(unsigned char **)(stoppedSlot + 0x88) == moby && stoppedSlot[0x74])
-                    StopSoundVoice(index);
+                    snd_stop_voice(index);
             }
             *(int *)(state + 0x90) = -1;
         }
         break;
     }
-    if (IsCurrentSelectedId((int)moby) && !*(int *)(state + 0x80)) {
-        *(PoolRecord64 **)(state + 0x84) = AllocCameraOverrideSlot(5);
+    if (hero_is_current_selected_id((int)moby) && !*(int *)(state + 0x80)) {
+        *(PoolRecord64 **)(state + 0x84) = cam_alloc_override_slot(5);
         *(int *)(state + 0x80) = 1;
-        FillObjectSettingsBlock((char *)moby);
-    } else if (!IsCurrentSelectedId((int)moby) && *(int *)(state + 0x80)) {
-        EndCameraOverride(*(unsigned char **)(state + 0x84));
+        object_fill_settings_block((char *)moby);
+    } else if (!hero_is_current_selected_id((int)moby) && *(int *)(state + 0x80)) {
+        cam_end_override(*(unsigned char **)(state + 0x84));
         *(int *)(state + 0x80) = 0;
     }
     FastVecSub(&delta, moby + 0x10, &oldPosition);
-    CombineTransformsAndStore(state + 0x20, &delta, &oldRotation, moby + 0xF0);
+    mat_combine_and_store(state + 0x20, &delta, &oldRotation, moby + 0xF0);
     child = *(unsigned char **)(state + 0x88);
     if (child) {
-        UpdateFlickeringGlow(child, (float *)(state + 0x8C), moby[0x20] == 2);
+        glow_flicker_update(child, (float *)(state + 0x8C), moby[0x20] == 2);
         child = *(unsigned char **)(state + 0x88);
         if (!child[0x23]) {
-            MarkMobySpawned(child);
+            moby_mark_spawned(child);
             *(unsigned char **)(state + 0x88) = 0;
         } else {
             *(Quadword *)(child + 0xF0) = *(Quadword *)(moby + 0xF0);

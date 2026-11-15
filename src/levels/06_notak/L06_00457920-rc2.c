@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s32 ref_L06_00457920_02;
 extern s8 ref_L06_00457920_03[];
 
 /* Breaks the object into fifteen flying pieces, each with its own update callback. */
-void func_L06_00457920(void *moby) {
+void part_spawn_debris_pieces(void *moby) {
     void *piece;
     s32 pieceVars;
     s32 index;

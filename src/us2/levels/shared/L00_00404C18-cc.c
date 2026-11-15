@@ -59,20 +59,20 @@ typedef struct {
 extern s32 D_001A8FF4[] __attribute__((sda));
 extern s32 D_001A8FF0[] __attribute__((sda));
 extern u8 D_00139578[];
-extern Weapon403730 D_L00_00262570[];
+extern Weapon403730 g_weapon_l00_table[];
 
-extern void func_00282C88(void *);
-extern void func_00283658(void *, void *);
-extern Moby403730 *func_0029EFD0(int);
-extern void func_0029F338(void *);
+extern void vec_clear_128(void *);
+extern void copy_matrix_rotation(void *, void *);
+extern Moby403730 *CreateMoby(int);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_002A6C58(void *, int, int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern Link403730 *func_002AB1F0(void *);
-extern void func_002AB6D8(float *, float *);
-extern void func_L00_00403CB8(void *);
+extern void SetDeathBits(void *, int, int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern Link403730 *moby_get_private_value_0(void *);
+extern void mat_get_euler_angles(float *, float *);
+extern void sheep_add_to_active_list(void *);
 
 /* func_US2_L00_00404C18, the USA v2.00 copy of func_L00_00403730: the same C, where the flags test reads self and a link already in mode 2 also takes the mode-2 arm. */
 /* Spawns moby 0xE7D at self's position: random scale, orientation copied from self's matrix or randomised, then starts it in state 4. */
@@ -84,47 +84,47 @@ Moby403730 *func_US2_L00_00404C18(Moby403730 *self) {
     Weapon403730 *w;
     f32 rate;
 
-    m = func_0029EFD0(0xE7D);
+    m = CreateMoby(0xE7D);
     if (m != 0) {
         m->alpha = 0x7F;
         m->f32 = 0x7F;
         m->f31 = 1;
         vars = m->vars;
-        m->scale = func_002A7878(0.85f, 1.15f);
+        m->scale = math_random_float_range(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
         if (D_001A8FF4[0] != 0 || D_001A8FF0[0] != 0) {
-            func_00283658(mtx, self->mtx);
-            func_002AB6D8(mtx, m->rot);
+            copy_matrix_rotation(mtx, self->mtx);
+            mat_get_euler_angles(mtx, m->rot);
         } else {
-            func_00282C88(m->rot);
-            m->rot[2] = func_002A7940();
+            vec_clear_128(m->rot);
+            m->rot[2] = math_random_angle();
         }
         m->state = 0;
         vars->f56 = 0;
-        vars->delay = func_002A7820(0x78, 0x12C);
+        vars->delay = math_random_int_range(0x78, 0x12C);
         vars->f70 = 600;
         vars->f74 = 30;
         vars->f5C = 0;
         vars->f78 = 0;
         m->state = 4;
-        func_L00_00403CB8(m);
+        sheep_add_to_active_list(m);
         m->f98 = m->cls->f10;
-        w = &D_L00_00262570[D_00139578[0]];
+        w = &g_weapon_l00_table[D_00139578[0]];
         rate = 1.0f;
         if (w->f4 != 0) {
             rate = 4.0f;
         }
         vars->rate = rate;
         vars->f60 = -1;
-        link = func_002AB1F0(self);
+        link = moby_get_private_value_0(self);
         link->f17 = 0x10;
         if (self->flags & 0x1000) {
-            func_002A6C58(self, 0, 3);
+            SetDeathBits(self, 0, 3);
         }
         if ((link != 0 && link->mode == 1) || link->mode == 2) {
             link->mode = 2;
         } else {
-            func_0029F338(self);
+            moby_mark_spawned(self);
         }
         func_002A0F48(m);
     }

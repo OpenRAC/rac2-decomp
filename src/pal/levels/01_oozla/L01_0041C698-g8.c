@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 func_0029EFD0(s32 size);
-extern f32 func_002A7940(void);
+extern s32 CreateMoby(s32 size);
+extern f32 math_random_angle(void);
 extern u32 g_pHeroMoby[];
 extern f32 D_L01_001B1A68 __attribute__((sda));
 extern f32 D_L01_001B1A6C __attribute__((sda));
@@ -16,7 +16,7 @@ s32 func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
     u8 *st;
     f32 t, x, y, z;
 
-    m = (u8 *)func_0029EFD0(0x1250);
+    m = (u8 *)CreateMoby(0x1250);
     if (m != 0) {
         st = *(u8 **)(m + 0x68);
         *(u64 *)(m + 0x38) = *(u64 *)((u8 *)g_pHeroMoby[0] + 0x38);
@@ -28,13 +28,13 @@ s32 func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
         qcopy(st + 0x10, m + 0x10);
         t = *(f32 *)(m + 0xF8);
         *(f32 *)(st + 0x1C) = t;
-        t = func_002A7940();
+        t = math_random_angle();
         *(f32 *)(m + 0xF0) = t;
-        t = func_002A7940();
+        t = math_random_angle();
         *(f32 *)(m + 0xF4) = t;
-        t = func_002A7940();
+        t = math_random_angle();
         *(f32 *)(m + 0xF8) = t;
-        t = func_002A7940();
+        t = math_random_angle();
         x = D_L01_001B1A68;
         y = D_L01_001B1A6C;
         z = D_L01_001B1A70;

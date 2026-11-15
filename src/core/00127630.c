@@ -3,7 +3,7 @@
 
 extern int r1_D_00132EA8;
 
-extern int func_00127508(int, int, int, int);
+extern int sceMcOpen(int, int, int, int);
 
 extern void r1_func_00118C90(int);
 
@@ -19,12 +19,12 @@ extern int r1_func_0011B4C8();
 
 extern int r1_func_00118CC0(int);
 
-extern void func_001277F8(void *);
+extern void mc_copy_read_edge_bytes(void *);
 
 /* rac1-decomp src/core/001236F0.c: func_001239D8 */
 /* Makes a new folder on a memory card. It opens with a special mode and marks the command as a folder creation. */
-int func_00127630(int port, int slot, int dirName) {
-    int result = SceMcOpen(port, slot, dirName, 0x40);
+int sceMcMkdir(int port, int slot, int dirName) {
+    int result = sceMcOpen(port, slot, dirName, 0x40);
     if (result == 0) {
         r1_D_00132EA8 = 0xB;
     }
@@ -35,7 +35,7 @@ int func_00127630(int port, int slot, int dirName) {
 /* RPC 3 on the client r1_D_00159B00, in func_00127630's shape: -100 with
    no server bound, -200 when the semaphore wait fails. */
 /* Closes an open memory card file. */
-int func_00127668(int fd) {
+int sceMcClose(int fd) {
     char *client = r1_D_00159B00;
     int result;
 
@@ -59,7 +59,7 @@ int func_00127668(int fd) {
 /* RPC 4, the same shape with three request words. `buf` is assigned
    after the semaphore call, so retail builds its address in a temp. */
 /* Moves the read/write position inside an open memory card file. */
-int func_00127720(int fd, int offset, int origin) {
+int sceMcSeek(int fd, int offset, int origin) {
     char *client = r1_D_00159B00;
     int *request;
     int result;
@@ -103,7 +103,7 @@ int func_00127720(int fd, int offset, int origin) {
  * offset instead of keeping a base pointer costs another 8.)
  */
 /* Copies the leftover bytes at the start and end of a memory card read into the caller's buffer. */
-void func_001277F8(void *descAddr) {
+void mc_copy_read_edge_bytes(void *descAddr) {
     char *desc = (char *)((unsigned int)descAddr | 0x20000000);
     unsigned char *src;
     char *dst;

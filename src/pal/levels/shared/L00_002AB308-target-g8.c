@@ -27,22 +27,22 @@ typedef struct {
     char gap2[0x274 - 0x1cc];
     float pitch274, yaw278;
 } CameraAngles;
-extern TargetState D_00189E20;
+extern TargetState g_hero_state;
 extern int D_001B19C8;
 extern char *D_L00_001FACE0[];
 extern CameraAngles D_L00_0025BE10;
-extern char *func_002AB1F0(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00282C48(float);
-extern void func_L00_002D36E0(float, float, float, void *, int);
-extern void func_L00_002D3778(void *, void *, float);
-extern int func_002761F8(void *, void *, int, int, int);
-extern void func_L00_002AB0D8(float, float);
-extern void func_L00_002AB0C0(float, float);
-extern void func_L00_002AB0F0(float, float);
+extern char *moby_get_private_value_0(void *);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float math_fabs(float);
+extern void hero_build_relative_point(float, float, float, void *, int);
+extern void hero_apply_mode_transform_reversed(void *, void *, float);
+extern int CollLine(void *, void *, int, int, int);
+extern void cam_set_limits_third(float, float);
+extern void cam_set_limits_second(float, float);
+extern void cam_set_limits_fourth(float, float);
 
 /* Select an unobstructed target and update the clamped pitch/yaw aim angles. */
 void func_PAL_L00_002ABA88(void)
@@ -55,16 +55,16 @@ void func_PAL_L00_002ABA88(void)
     float distance, angle, score, priority, bestScore, bestPriority;
     float yaw, pitch;
 
-    if (D_00189E20.special)
-        special = D_00189E20.flag == 0;
-    mode = D_00189E20.mode;
+    if (g_hero_state.special)
+        special = g_hero_state.flag == 0;
+    mode = g_hero_state.mode;
     if (mode != 1 && mode != 4 && mode != 2 && mode != 7 && mode != 0) {
-        D_00189E20.special = 0;
-        D_00189E20.target = 0;
+        g_hero_state.special = 0;
+        g_hero_state.target = 0;
         return;
     }
     if (!special) {
-        if ((unsigned char)(D_00189E20.object)[0x43] == 81)
+        if ((unsigned char)(g_hero_state.object)[0x43] == 81)
             return;
         if (D_001B19C8 % 7 == 0) {
             bestScore = 100000000.0f;
@@ -72,24 +72,24 @@ void func_PAL_L00_002ABA88(void)
             obj = D_L00_001FACE0[0];
             best = 0;
             for (i = 0; obj != 0; obj = D_L00_001FACE0[++i]) {
-                info = func_002AB1F0(obj);
+                info = moby_get_private_value_0(obj);
                 if (!info)
                     continue;
-                distance = func_00282E80(D_00189E20.pos, obj + 0x10);
+                distance = vec_distance_xy(g_hero_state.pos, obj + 0x10);
                 if ((unsigned char)info[0x28] < distance)
                     continue;
-                angle = func_00283248(*(float *)(obj + 0x10) - D_00189E20.pos[0],
-                                     *(float *)(obj + 0x14) - D_00189E20.pos[1]);
-                angle = func_00283C80(angle, D_00189E20.heading);
+                angle = mat_fast_helper_a(*(float *)(obj + 0x10) - g_hero_state.pos[0],
+                                     *(float *)(obj + 0x14) - g_hero_state.pos[1]);
+                angle = FastDiffRots(angle, g_hero_state.heading);
                 if (angle > 1.9198623895645142f)
                     continue;
-                pitch = func_00282E80(obj + 0x10, D_00189E20.pos);
-                pitch = func_00283248(pitch, D_00189E20.pos[2] - *(float *)(obj + 0x18));
-                pitch = func_00282C48(pitch);
+                pitch = vec_distance_xy(obj + 0x10, g_hero_state.pos);
+                pitch = mat_fast_helper_a(pitch, g_hero_state.pos[2] - *(float *)(obj + 0x18));
+                pitch = math_fabs(pitch);
                 if (pitch > 1.047197699546814f)
                     continue;
                 score = angle * distance + distance;
-                if (obj == D_00189E20.target) {
+                if (obj == g_hero_state.target) {
                     score -= 1.5f;
                     if (score < 0.0f)
                         score = 0.0f;
@@ -102,24 +102,24 @@ void func_PAL_L00_002ABA88(void)
                     best = obj;
                 }
             }
-            D_00189E20.target = best;
+            g_hero_state.target = best;
         }
-        if (D_00189E20.target) {
-            func_L00_002D36E0(0, 0, 1.2f, a, 1);
-            qcopy(b, D_00189E20.target + 0x10);
-            func_L00_002D3778(b, b, 0.5f);
-            if (func_002761F8(a, b, 2, 0, 0))
-                D_00189E20.target = 0;
+        if (g_hero_state.target) {
+            hero_build_relative_point(0, 0, 1.2f, a, 1);
+            qcopy(b, g_hero_state.target + 0x10);
+            hero_apply_mode_transform_reversed(b, b, 0.5f);
+            if (CollLine(a, b, 2, 0, 0))
+                g_hero_state.target = 0;
         }
     }
-    if (D_00189E20.target || special) {
+    if (g_hero_state.target || special) {
         char *target, *targetInfo;
 
-        target = D_00189E20.target;
+        target = g_hero_state.target;
         if (special)
-            target = D_00189E20.special;
+            target = g_hero_state.special;
         qcopy(a, target + 0x10);
-        targetInfo = func_002AB1F0(target);
+        targetInfo = moby_get_private_value_0(target);
         if (targetInfo) {
             if (special)
                 a[2] += *(float *)(targetInfo + 0x10);
@@ -127,13 +127,13 @@ void func_PAL_L00_002ABA88(void)
                 a[2] += (unsigned char)targetInfo[0x2a] * 0.125f;
         }
         if (special)
-            func_L00_002D36E0(0.5f, 0, 0.55f, b, 1);
+            hero_build_relative_point(0.5f, 0, 0.55f, b, 1);
         else
-            func_L00_002D36E0(0.3f, 0, 0.85f, b, 1);
-        yaw = func_00283248(a[0] - b[0], a[1] - b[1]);
-        yaw = func_00283BE0(yaw, D_00189E20.heading);
-        pitch = func_00282E80(a, b);
-        pitch = func_00283248(pitch, b[2] - a[2]);
+            hero_build_relative_point(0.3f, 0, 0.85f, b, 1);
+        yaw = mat_fast_helper_a(a[0] - b[0], a[1] - b[1]);
+        yaw = fast_subtract_rotations(yaw, g_hero_state.heading);
+        pitch = vec_distance_xy(a, b);
+        pitch = mat_fast_helper_a(pitch, b[2] - a[2]);
         if (yaw > 1.0297443866729736f)
             yaw = 1.0297443866729736f;
         else if (yaw < -1.0297443866729736f)
@@ -142,7 +142,7 @@ void func_PAL_L00_002ABA88(void)
             pitch = 0.6108652949333191f;
         if (pitch < -0.4363323450088501f)
             pitch = -0.4363323450088501f;
-        if (D_00189E20.count >= 23) {
+        if (g_hero_state.count >= 23) {
             if (yaw > 0.2967059910297394f)
                 yaw = 0.2967059910297394f;
             else if (yaw < -0.2967059910297394f)
@@ -150,17 +150,17 @@ void func_PAL_L00_002ABA88(void)
             pitch = 0;
         }
         if (special) {
-            func_L00_002AB0D8(0.053280003f, 0.43200004f);
+            cam_set_limits_third(0.053280003f, 0.43200004f);
             D_L00_0025BE10.yaw1c8 = yaw;
-            func_L00_002AB0C0(0.053280003f, 0.43200004f);
+            cam_set_limits_second(0.053280003f, 0.43200004f);
             D_L00_0025BE10.pitch114 = pitch;
         } else {
-            func_L00_002AB0F0(0.030240001f, 0.38880002f);
+            cam_set_limits_fourth(0.030240001f, 0.38880002f);
             D_L00_0025BE10.pitch274 = pitch;
             D_L00_0025BE10.yaw278 = yaw * 0.7f;
-            func_L00_002AB0D8(0.02016f, 0.43200004f);
+            cam_set_limits_third(0.02016f, 0.43200004f);
             D_L00_0025BE10.yaw1c8 = D_L00_0025BE10.yaw278 * 0.55f;
         }
     }
-    D_00189E20.special = 0;
+    g_hero_state.special = 0;
 }

@@ -56,8 +56,8 @@ typedef struct {
     u8 pad75[0x88 - 0x75];
     Moby *owner;                 
 } SoundVoice;
-extern HazardPath *D_L17_001FE880[];
-extern Moby *D_L17_001B2C1C;
+extern HazardPath *g_path_l17_table[];
+extern Moby *g_moby_l17_pool;
 extern Moby *D_L17_001B2C1C_1[] __attribute__((sda));
 extern int D_L17_001B2748 MACRO_ADDR;
 extern float D_L17_001AFCD0 __attribute__((sda)), D_L17_001AFCD4 __attribute__((sda));
@@ -65,29 +65,29 @@ extern float D_L17_001AFCD8 __attribute__((sda)), D_L17_001AFCDC __attribute__((
 extern float D_L17_001AFCE0 __attribute__((sda)), D_L17_001AFCE4 __attribute__((sda));
 extern float D_L17_001AFCE8 __attribute__((sda)), D_L17_001AFCEC __attribute__((sda));
 extern int D_L17_001AFCF0 __attribute__((sda));
-extern char D_00189EA0[];
-extern SoundRecord D_00188660[];
+extern char g_hero_position[];
+extern SoundRecord g_sound_state[];
 extern char D_L17_001A8F20[] MACRO_ADDR;
 extern char D_L17_001AFCF8[], D_L17_001AFD28[];
-extern float func_00282E80(void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern void func_0026FEB8(const char *, ...);
-extern void func_002A7750(void *, int, int);
+extern float vec_distance_xy(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern void STUB_printf(const char *, ...);
+extern void moby_set_state(void *, int, int);
 extern int func_PAL_L17_003C07C0(void *);
 extern int func_PAL_L17_003C0A50(void *);
-extern int func_002A9640(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
+extern int part_find_owned_effect_slot(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
 extern void func_PAL_L00_003FB330(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
 extern Moby *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void func_PAL_L00_003281C0(void *, int, float);
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 
 /* Updates a path-linked hazard, its movement sound and its destruction effects. */
 void func_PAL_L17_003C0EA0(Moby *moby)
@@ -106,16 +106,16 @@ void func_PAL_L17_003C0EA0(Moby *moby)
     moby->color = color;
 
     if (moby->oClass == 0x8D8 || moby->oClass == 0x8AD) {
-        if (moby->state == 2 && func_00282E80(moby->position, D_00189EA0) < 80.0f) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+        if (moby->state == 2 && vec_distance_xy(moby->position, g_hero_position) < 80.0f) {
+            SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         } else {
             int sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&g_sound_state[sound];
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    snd_stop_voice(sound);
             }
             vars->sound = -1;
         }
@@ -125,10 +125,10 @@ void func_PAL_L17_003C0EA0(Moby *moby)
     case 0:
         vars->sound = -1;
         vars->isLinked = 0;
-        if (vars->path == -1 || D_L17_001FE880[vars->path]->count < 2) {
-            func_0026FEB8(D_L17_001AFCF8, moby->oClass, moby->uid);
-            func_0026FEB8(D_L17_001AFD28);
-            func_0029F338(moby);
+        if (vars->path == -1 || g_path_l17_table[vars->path]->count < 2) {
+            STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
+            STUB_printf(D_L17_001AFD28);
+            moby_mark_spawned(moby);
             break;
         }
         moby->x32 = 0x180;
@@ -140,25 +140,25 @@ void func_PAL_L17_003C0EA0(Moby *moby)
             } else {
                 int count = 0;
                 do {
-                    index = D_L17_001B2C1C[index].vars->next;
+                    index = g_moby_l17_pool[index].vars->next;
                     count++;
                 } while (index != -1);
-                vars->chainSpan = func_00283CE0(count);
+                vars->chainSpan = IntToFloat(count);
             }
         }
         vars->chainTime = vars->chainSpan * 4.0f;
         {
-            HazardPath *path = D_L17_001FE880[vars->path];
-            path->length = func_00282E48(path->start, path->end);
+            HazardPath *path = g_path_l17_table[vars->path];
+            path->length = fast_vec_dist(path->start, path->end);
         }
         vars->x14 = 0;
         vars->x18 = 0;
         if (vars->next != -1) {
             D_L17_001B2C1C_1[0][vars->next].vars->parent = moby;
             vars->isLinked = 1;
-            func_002A7750(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
         } else {
-            func_002A7750(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         moby->state = 1;
         break;
@@ -172,25 +172,25 @@ void func_PAL_L17_003C0EA0(Moby *moby)
     case 2:
         if (D_L17_001AFCF0)
             func_PAL_L17_003C0A50(moby);
-        if (func_002A9640(moby, 0x4010000, 1))
-            func_002A7750(moby, 5, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 1))
+            moby_set_state(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 3:
         if (vars->next != -1) {
-            Moby *other = D_L17_001B2C1C + vars->next;
+            Moby *other = g_moby_l17_pool + vars->next;
             if (!other || other->state == 0xFE || other->state == 0xFD)
-                func_002A7750(moby, 4, -1);
+                moby_set_state(moby, 4, -1);
         }
-        if (func_002A9640(moby, 0x4010000, 1))
-            func_002A7750(moby, 5, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 1))
+            moby_set_state(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 4:
-        if (func_002B3868(moby))
+        if (flag_set_first_pending(moby))
             vars->timer = 4;
-        if (func_00282948(&vars->timer))
-            func_002A7750(moby, 5, -1);
+        if (math_fast_float_d(&vars->timer))
+            moby_set_state(moby, 5, -1);
         break;
     case 5:
         if (moby->oClass == 0x8AD) {
@@ -202,19 +202,19 @@ void func_PAL_L17_003C0EA0(Moby *moby)
             func_PAL_L00_003FB330(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
             func_PAL_002B15D8(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            a = func_002A7878(-10.0f, 10.0f);
-            b = func_002A7878(20.0f, 30.0f);
+            a = math_random_float_range(-10.0f, 10.0f);
+            b = math_random_float_range(20.0f, 30.0f);
             created = func_PAL_002735D0(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
             if (created)
                 created->vars->sound = 0;
             func_PAL_L00_003281C0(moby, 1, 0.0f);
-            func_0029F338(moby);
+            moby_mark_spawned(moby);
         } else {
             moby->updateDist = 1000000.0f;
             func_PAL_L00_003FB330(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             func_PAL_002B15D8(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_PAL_L00_003281C0(moby, 1, 0.0f);
-            func_0029F338(moby);
+            moby_mark_spawned(moby);
         }
         break;
     }

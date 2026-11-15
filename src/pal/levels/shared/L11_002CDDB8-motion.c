@@ -3,22 +3,22 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern void func_PAL_L00_002D4668(u32, void *, void *);
-extern float func_L00_002D3A58(char *);
-extern void func_L00_002D3BD8(char *, int, float);
-extern float func_L00_002D3B00(char *);
-extern void func_L00_002D3B58(TI128 *, TI128 *, float);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282C88(TI128 *);
-extern void func_L00_002B5A88(void);
-extern void func_L09_002B7238(void);
-extern void func_00282CF0(void *, void *, void *);
+extern float cam_get_view_space_vector_length(char *);
+extern void cam_set_view_space_vector_length(char *, int, float);
+extern float cam_get_view_space_height(char *);
+extern void cam_set_view_space_height(TI128 *, TI128 *, float);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_clear_128(TI128 *);
+extern void hero_resolve_collision_with_rewind(void);
+extern void hero_probe_ground(void);
+extern void FastVecSub(void *, void *, void *);
 extern void func_PAL_L00_002B5178(void);
-extern float func_00282DB0(void *, void *);
-extern void func_L00_002D3960(char *, char *);
-extern float func_L00_002B5590(void *);
-extern void func_00282D30(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void cam_project_vector_onto_view_plane(char *, char *);
+extern float hero_get_speed_along_forward(void *);
+extern void FastVecScale(void *, void *, float);
 typedef union MotionVector {
     TI128 q;
     float f[4];
@@ -49,7 +49,7 @@ typedef struct HeroMotionPrefix {
     u8 unknown2298[4];
     int controlMode;
 } HeroMotionPrefix;
-extern HeroMotionPrefix D_00189E20;
+extern HeroMotionPrefix g_hero_state;
 
 /* Integrate hero motion, resolve contacts, and measure the resulting displacement. */
 void func_PAL_L11_002CDDB8(void)
@@ -59,106 +59,106 @@ void func_PAL_L11_002CDDB8(void)
     float limit, magnitude, component, savedW;
     int state;
 
-    qcopy(initial.f, (char *)&D_00189E20.position);
-    func_PAL_L00_002D4668(D_00189E20.attachment, (char *)&D_00189E20.impulse, (u8 *)&D_00189E20 + 0x90);
-    state = D_00189E20.state;
+    qcopy(initial.f, (char *)&g_hero_state.position);
+    func_PAL_L00_002D4668(g_hero_state.attachment, (char *)&g_hero_state.impulse, (u8 *)&g_hero_state + 0x90);
+    state = g_hero_state.state;
     if (state == 0x14 || state == 0x5B || state == 0x58 || state == 0x81) {
-        if (D_00189E20.collisionOffFrames == 0) {
-            magnitude = func_L00_002D3A58((char *)&D_00189E20.velocity);
-            limit = D_00189E20.radius - 0.02f;
+        if (g_hero_state.collisionOffFrames == 0) {
+            magnitude = cam_get_view_space_vector_length((char *)&g_hero_state.velocity);
+            limit = g_hero_state.radius - 0.02f;
             if (limit < magnitude)
-                func_L00_002D3BD8((char *)&D_00189E20.velocity, (int)(char *)&D_00189E20.velocity, limit);
+                cam_set_view_space_vector_length((char *)&g_hero_state.velocity, (int)(char *)&g_hero_state.velocity, limit);
         }
-        component = func_L00_002D3B00((char *)&D_00189E20.velocity);
-        if (component < -D_00189E20.downLimit) {
-            limit = -D_00189E20.downLimit - 0.02f;
+        component = cam_get_view_space_height((char *)&g_hero_state.velocity);
+        if (component < -g_hero_state.downLimit) {
+            limit = -g_hero_state.downLimit - 0.02f;
             if (limit > 0.0f)
                 limit = 0.0f;
-            func_L00_002D3B58((TI128 *)(char *)&D_00189E20.velocity, (TI128 *)(char *)&D_00189E20.velocity, limit);
+            cam_set_view_space_height((TI128 *)(char *)&g_hero_state.velocity, (TI128 *)(char *)&g_hero_state.velocity, limit);
         }
-    } else if (D_00189E20.controlMode != 13) {
-        if (D_00189E20.controlMode != 14) {
-            if (state != 0x44 && D_00189E20.collisionOffFrames == 0) {
-                magnitude = func_00282DF0((char *)&D_00189E20.velocity);
-                limit = D_00189E20.radius - 0.02f;
+    } else if (g_hero_state.controlMode != 13) {
+        if (g_hero_state.controlMode != 14) {
+            if (state != 0x44 && g_hero_state.collisionOffFrames == 0) {
+                magnitude = FastVecLength((char *)&g_hero_state.velocity);
+                limit = g_hero_state.radius - 0.02f;
                 if (limit < magnitude)
-                    func_00282F20((char *)&D_00189E20.velocity, (char *)&D_00189E20.velocity, limit);
+                    vec_scale_to_length((char *)&g_hero_state.velocity, (char *)&g_hero_state.velocity, limit);
             }
         }
     }
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.velocity);
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, &D_00189E20.extraStep);
-    func_00282C88((TI128 *)&D_00189E20.extraStep);
-    D_00189E20.collHit = 0;
-    D_00189E20.wallHit = 0;
-    if (func_00282DF0((char *)&D_00189E20.impulse) <= 0.0001f) {
-        func_L00_002B5A88();
-        func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
+    FastVecAdd((char *)&g_hero_state.position, (char *)&g_hero_state.position, (char *)&g_hero_state.velocity);
+    FastVecAdd((char *)&g_hero_state.position, (char *)&g_hero_state.position, &g_hero_state.extraStep);
+    vec_clear_128((TI128 *)&g_hero_state.extraStep);
+    g_hero_state.collHit = 0;
+    g_hero_state.wallHit = 0;
+    if (FastVecLength((char *)&g_hero_state.impulse) <= 0.0001f) {
+        hero_resolve_collision_with_rewind();
+        hero_probe_ground();
+        FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);
         func_PAL_L00_002B5178();
     } else {
-        func_L09_002B7238();
+        hero_probe_ground();
     }
 
-    resolved = &D_00189E20.projected;
-    func_00282CF0((char *)resolved, (char *)&D_00189E20.position, initial.f);
-    qcopy((char *)&D_00189E20.flat, (char *)resolved);
-    qcopy((char *)&D_00189E20.up, (char *)resolved);
-    func_00282F20((char *)resolved, (char *)resolved, 1.0f);
-    magnitude = func_00282DB0((char *)resolved, (char *)&D_00189E20.velocity);
+    resolved = &g_hero_state.projected;
+    FastVecSub((char *)resolved, (char *)&g_hero_state.position, initial.f);
+    qcopy((char *)&g_hero_state.flat, (char *)resolved);
+    qcopy((char *)&g_hero_state.up, (char *)resolved);
+    vec_scale_to_length((char *)resolved, (char *)resolved, 1.0f);
+    magnitude = FastVecDot((char *)resolved, (char *)&g_hero_state.velocity);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)resolved, (char *)&D_00189E20.velocity, magnitude);
-    qcopy(planar.f, (char *)&D_00189E20.velocity);
-    func_L00_002D3960((char *)planar.f, (char *)planar.f);
-    func_L00_002D3960((char *)&D_00189E20.flat, (char *)&D_00189E20.flat);
-    func_00282F20((char *)&D_00189E20.flat, (char *)&D_00189E20.flat, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.flat, planar.f);
+    vec_scale_to_length((char *)resolved, (char *)&g_hero_state.velocity, magnitude);
+    qcopy(planar.f, (char *)&g_hero_state.velocity);
+    cam_project_vector_onto_view_plane((char *)planar.f, (char *)planar.f);
+    cam_project_vector_onto_view_plane((char *)&g_hero_state.flat, (char *)&g_hero_state.flat);
+    vec_scale_to_length((char *)&g_hero_state.flat, (char *)&g_hero_state.flat, 1.0f);
+    magnitude = FastVecDot((char *)&g_hero_state.flat, planar.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.flat, planar.f, magnitude);
-    qcopy(vertical.f, (char *)&D_00189E20.velocity);
-    func_L00_002D3BD8((char *)vertical.f, (int)vertical.f, 0.0f);
-    func_L00_002D3BD8((char *)&D_00189E20.up, (int)(char *)&D_00189E20.up, 0.0f);
-    func_00282F20((char *)&D_00189E20.up, (char *)&D_00189E20.up, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.up, vertical.f);
+    vec_scale_to_length((char *)&g_hero_state.flat, planar.f, magnitude);
+    qcopy(vertical.f, (char *)&g_hero_state.velocity);
+    cam_set_view_space_vector_length((char *)vertical.f, (int)vertical.f, 0.0f);
+    cam_set_view_space_vector_length((char *)&g_hero_state.up, (int)(char *)&g_hero_state.up, 0.0f);
+    vec_scale_to_length((char *)&g_hero_state.up, (char *)&g_hero_state.up, 1.0f);
+    magnitude = FastVecDot((char *)&g_hero_state.up, vertical.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.up, vertical.f, magnitude);
-    D_00189E20.speed = func_00282DF0((char *)resolved);
-    magnitude = func_L00_002D3A58((char *)resolved);
+    vec_scale_to_length((char *)&g_hero_state.up, vertical.f, magnitude);
+    g_hero_state.speed = FastVecLength((char *)resolved);
+    magnitude = cam_get_view_space_vector_length((char *)resolved);
     planar.q = resolved->q;
-    D_00189E20.flatSpeed = magnitude;
-    D_00189E20.forwardSpeed = func_L00_002B5590(planar.f);
-    D_00189E20.verticalSpeed = func_L00_002D3B00((char *)resolved);
-    if (D_00189E20.forwardSpeed < 0.0f)
-        D_00189E20.forwardSpeed = 0.0f;
-    qcopy(planar.f, (char *)&D_00189E20.position);
-    if (func_00282DF0((char *)&D_00189E20.impulse) > 0.0001f) {
-        func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.impulse);
-        savedW = D_00189E20.impulse.f[3];
-        func_00282C88((TI128 *)(char *)&D_00189E20.impulse);
-        D_00189E20.impulse.f[3] = savedW;
-        func_L00_002B5A88();
-        func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
+    g_hero_state.flatSpeed = magnitude;
+    g_hero_state.forwardSpeed = hero_get_speed_along_forward(planar.f);
+    g_hero_state.verticalSpeed = cam_get_view_space_height((char *)resolved);
+    if (g_hero_state.forwardSpeed < 0.0f)
+        g_hero_state.forwardSpeed = 0.0f;
+    qcopy(planar.f, (char *)&g_hero_state.position);
+    if (FastVecLength((char *)&g_hero_state.impulse) > 0.0001f) {
+        FastVecAdd((char *)&g_hero_state.position, (char *)&g_hero_state.position, (char *)&g_hero_state.impulse);
+        savedW = g_hero_state.impulse.f[3];
+        vec_clear_128((TI128 *)(char *)&g_hero_state.impulse);
+        g_hero_state.impulse.f[3] = savedW;
+        hero_resolve_collision_with_rewind();
+        hero_probe_ground();
+        FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);
         func_PAL_L00_002B5178();
     }
-    func_00282CF0((char *)&D_00189E20.impulseMove, (char *)&D_00189E20.position, planar.f);
-    D_00189E20.impulseSpeed = func_00282DF0((char *)&D_00189E20.impulseMove);
-    D_00189E20.impulseMove.f[3] = D_00189E20.impulse.f[3];
-    D_00189E20.impulse.f[3] = 0.0f;
-    func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-    D_00189E20.slope = 0.0f;
-    if (D_00189E20.flatSpeed > 0.004f) {
-        D_00189E20.slope = D_00189E20.displacement.f[2] / D_00189E20.flatSpeed;
-        if (D_00189E20.slope > 0.5f)
-            D_00189E20.slope = 0.5f;
-        else if (D_00189E20.slope < -0.5f)
-            D_00189E20.slope = -0.5f;
+    FastVecSub((char *)&g_hero_state.impulseMove, (char *)&g_hero_state.position, planar.f);
+    g_hero_state.impulseSpeed = FastVecLength((char *)&g_hero_state.impulseMove);
+    g_hero_state.impulseMove.f[3] = g_hero_state.impulse.f[3];
+    g_hero_state.impulse.f[3] = 0.0f;
+    FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);
+    g_hero_state.slope = 0.0f;
+    if (g_hero_state.flatSpeed > 0.004f) {
+        g_hero_state.slope = g_hero_state.displacement.f[2] / g_hero_state.flatSpeed;
+        if (g_hero_state.slope > 0.5f)
+            g_hero_state.slope = 0.5f;
+        else if (g_hero_state.slope < -0.5f)
+            g_hero_state.slope = -0.5f;
     }
-    if (D_00189E20.speed > 1.0400001f) {
-        func_00282D30((char *)&D_00189E20.displacement, (char *)&D_00189E20.displacement, 1.0400001f / D_00189E20.speed);
-        D_00189E20.speed = 1.0400001f;
+    if (g_hero_state.speed > 1.0400001f) {
+        FastVecScale((char *)&g_hero_state.displacement, (char *)&g_hero_state.displacement, 1.0400001f / g_hero_state.speed);
+        g_hero_state.speed = 1.0400001f;
     }
 }

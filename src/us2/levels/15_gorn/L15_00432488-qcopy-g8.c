@@ -21,33 +21,33 @@ extern float camera_pos[4] SDATA(D_L15_001B1550);
 extern int D_L15_00221E3C NOT_SDA;
 extern u8 *D_L15_001B1584 __attribute__((sda));
 extern u8 *D_L15_001B1588 __attribute__((sda));
-extern u8 D_00188660[];
+extern u8 g_sound_state[];
 extern int D_L15_001B2148;
 extern u8 *D_L15_001B261C;
 extern Hit D_L15_001BFC00;
 
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(s32 a0);
-extern u8 **func_L05_00379EB8(void);
-extern s32 func_L00_004272A0(void);
-extern void func_L05_0037B280(u8 *a0, s32 a1);
-extern void *func_L05_00379ED0(int);
-extern int func_L10_0037D200(void *);
-extern int func_00282948(void *);
-extern void func_L05_0037B108(void);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern void func_L05_00442828(void *, void *, int);
-extern void func_002E59F8(int);
-extern void func_0029F338(void *);
-extern void func_L00_003294F0(void *, int);
-extern void func_L05_00379F48(int);
-extern void func_002AD7B8(int);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(s32 a0);
+extern u8 **level_get_object_list(void);
+extern s32 level_get_saved_value(void);
+extern void entry_spawn_list_objects_with_flag(u8 *a0, s32 a1);
+extern void *level_find_object_by_class_id(int);
+extern int group_count_alive(void *);
+extern int math_fast_float_d(void *);
+extern void effect_remove_family_mobys(void);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void ship_start_transition(void *, void *, int);
+extern void snd_stop_voice(int);
+extern void moby_mark_spawned(void *);
+extern void moby_set_flag_bit(void *, int);
+extern void hero_set_state_value_c(int);
+extern void moby_mark_flag_and_append_to_list(int);
 extern void func_US2_L15_00432238(void *, int);
 
 void func_US2_L15_00432488(u8 *self)
@@ -66,35 +66,35 @@ void func_US2_L15_00432488(u8 *self)
         int id = *(int *)(data + 0x270);
 
         if (id != -1) {
-            u8 *entry = D_00188660 + id * 0x70;
+            u8 *entry = g_sound_state + id * 0x70;
 
             if (*(u8 **)(entry + 0x88) == owner && entry[0x74] != 0)
-                func_002E59F8(id);
+                snd_stop_voice(id);
         }
         *(int *)(data + 0x270) = -1;
         *(int *)(data + 0x14) = 0;
         D_L15_00221E3C = 0;
         D_L15_001B1534 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
         *(int *)(vars + 0x6C) = 30;
-        list = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        list = level_get_object_list();
+        count = level_get_saved_value();
         for (i = 0; i < count; i++) {
             if (*(short *)(list[i] + 0xAA) == 0x1211)
-                func_L05_0037B280(list[i], 1);
+                entry_spawn_list_objects_with_flag(list[i], 1);
         }
         if (D_L15_001B1584 != 0 && *(unsigned short *)(D_L15_001B1584 + 0x34) != 0) {
-            func_0029F338(D_L15_001B1584);
+            moby_mark_spawned(D_L15_001B1584);
             D_L15_001B1584 = 0;
         }
         if (D_L15_001B1588 != 0 && *(unsigned short *)(D_L15_001B1588 + 0x34) != 0) {
-            func_0029F338(D_L15_001B1588);
+            moby_mark_spawned(D_L15_001B1588);
             D_L15_001B1588 = 0;
         }
     }
-    if (func_L10_0037D200(func_L05_00379ED0(0x1211)) != 0)
+    if (group_count_alive(level_find_object_by_class_id(0x1211)) != 0)
         return;
     if (D_L15_001B2148 < 6)
         return;
@@ -103,50 +103,50 @@ void func_US2_L15_00432488(u8 *self)
         u8 *pos;
         float dist;
 
-        if (func_00282948(vars + 0x6C) == 0)
+        if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 60;
-        func_L05_0037B108();
+        effect_remove_family_mobys();
         obj = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
         pos = obj + 0x10;
         qcopy(camera_pos, pos);
-        func_00282F20(step, obj + 0xC0, 196.0f);
+        vec_scale_to_length(step, obj + 0xC0, 196.0f);
         dist = 25.0f;
-        func_00282CC0(ahead, pos, step);
-        if (func_002761F8(pos, ahead, 0, obj, 0) != 0) {
+        FastVecAdd(ahead, pos, step);
+        if (CollLine(pos, ahead, 0, obj, 0) != 0) {
             Hit *hit = &D_L15_001BFC00;
 
             if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211)
-                dist = func_00282E48(hit->pos, pos);
+                dist = fast_vec_dist(hit->pos, pos);
         }
         if (dist < 16.0f)
             dist = -32.0f;
         else
             dist = dist * 0.5f;
-        func_00282F20(step, obj + 0xC0, dist);
-        func_00282CC0(camera_pos, camera_pos, step);
+        vec_scale_to_length(step, obj + 0xC0, dist);
+        FastVecAdd(camera_pos, camera_pos, step);
         D_L15_001B1550[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
         qcopy(basis[0], obj + 0xC0);
         qcopy(basis[2], up.f);
-        func_00282DD8(basis[1], basis[0], basis[2]);
+        FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
-        func_002AB6D8(basis, D_L15_001B1540);
-        func_L05_00442828(camera_pos, D_L15_001B1540, 300);
+        mat_get_euler_angles(basis, D_L15_001B1540);
+        ship_start_transition(camera_pos, D_L15_001B1540, 300);
         self[0x20] = 3;
         D_L15_001B15BC = 1;
     } else if (D_L15_001B15D0 != 0) {
-        if (func_00282948(vars + 0x6C) == 0)
+        if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 10;
-        func_002AD7B8(0x10);
-        func_L00_003294F0(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
+        moby_mark_flag_and_append_to_list(0x10);
+        moby_set_flag_bit(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
         D_L15_001B15AC = 0;
         D_L15_001B15D0 = 0;
-        func_L05_00379F48(1);
-    } else if (func_00282948(vars + 0x6C) != 0) {
-        func_L05_0037B210();
+        hero_set_state_value_c(1);
+    } else if (math_fast_float_d(vars + 0x6C) != 0) {
+        entry_init_all_registered();
         func_US2_L15_00432238(self, 0);
     }
 }

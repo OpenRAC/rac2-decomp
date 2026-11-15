@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from OpenRAC rac1-decomp, GPL-3.0, heavy_interceptor_and_turrets.c,
  * Revision a23a07114bae7547adffb442b0f23fc295a48238,
  * draw_blarg_heavy_interceptor_light_ring. The four-row frame, 82 XYZ
@@ -5,22 +6,22 @@
  * frame; source tables retain incomplete outer extents.
  */
 #include "common.h"
-extern void func_L09_003FCF68(char *);
+extern void beam_draw_tip_glow(char *);
 extern char D_L09_001B9A00[];
 extern int D_L09_001B11D8 __attribute__((sda));
 extern float D_L09_002A1FF0[][3];
 extern u32 D_L09_002A2658[];
 extern char D_L09_002A23C8[];
-extern u64 func_0027C878(int);
-extern void func_002FC560(int,u64);
-extern void func_00280328(void);
-extern void func_00281810(int,void *,void *,void *,int);
-extern void func_00282CF0(void *,void *,void *), func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float), func_00282D30(void *,void *,float);
-extern void func_002830C0(void *,void *,void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(int,u64);
+extern void font_queue_vu_state(void);
+extern void part_draw_glint_effect(int,void *,void *,void *,int);
+extern void FastVecSub(void *,void *,void *), FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float), FastVecScale(void *,void *,float);
+extern void transform_vector(void *,void *,void *);
 
 /* Draws the object's ring of lights facing the camera, once on each side. */
-void func_L09_003FD128(char *moby) {
+void light_ring_draw(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     struct {
         float mat[4][4]; /* camera-facing frame */
@@ -31,7 +32,7 @@ void func_L09_003FD128(char *moby) {
     int i;
     int j;
 
-    DrawBeamTipGlow(moby);
+    beam_draw_tip_glow(moby);
     qcopy(frame.mat[0], vars + 0x340);
     FastVecSub(frame.mat[2], vars + 0x370, D_L09_001B9A00);
     FastVecCross(frame.mat[1], frame.mat[0], frame.mat[2]);
@@ -62,9 +63,9 @@ void func_L09_003FD128(char *moby) {
         }
     }
     if (*(short *)(vars + 0x422) != 0) {
-        DrawGlintEffect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
+        part_draw_glint_effect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
     } else {
-        DrawGlintEffect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        part_draw_glint_effect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
     }
     FastVecScale(frame.mat[1], frame.mat[1], -1.0f);
     FastVecScale(frame.mat[2], frame.mat[2], -1.0f);
@@ -81,8 +82,8 @@ void func_L09_003FD128(char *moby) {
         out[2] = point[2];
     }
     if (*(short *)(vars + 0x422) != 0) {
-        DrawGlintEffect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
+        part_draw_glint_effect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
     } else {
-        DrawGlintEffect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        part_draw_glint_effect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
     }
 }

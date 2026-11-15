@@ -18,71 +18,71 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern s32 D_L11_001CAE40[];
 extern s32 *D_L11_001FF580[];
-extern u8 *const D_L11_001B359C[] __attribute__((sda));
+extern u8 *const g_moby_l11_table[] __attribute__((sda));
 extern u8 *D_L11_001B368C[] __attribute__((sda));
 extern s32 D_L11_001AED04[] __attribute__((sda));
 extern char D_L11_001A8F20[] __attribute__((sda));
 extern u8 D_L11_001C8A40[];
 extern TI128 D_L11_001C0D20;
 
-extern void func_L11_00431860(u8 *);
-extern void func_L11_00431D50(u8 *);
-extern void func_L11_00431E30(u8 *);
-extern void func_L11_00432628(u8 *, void *);
-extern s32 func_002B3890(u8 *);
-extern void func_002B60B0(u8 *, f32, f32, f32, f32);
-extern void func_002A7750(u8 *, s32, s32);
-extern void func_002A7470(u8 *a0, u32 a1, u32 a2, u32 a3);
-extern s32 func_002A7820(s32, s32);
-extern s32 func_002A77E0(s32);
-extern s32 func_002A8AF0(void *, void *, s32);
-extern s32 func_002B1C20(u8 *, void *);
-extern void func_002A6C58(u8 *, s32, s32);
-extern void func_L01_003E9CF8(u8 *, s32, void *);
-extern void func_0029F338(void *);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_00282948(void *);
-extern f32 func_002AA2E8(f32 *, f32, f32);
-extern void func_002AE8C0(u8 *, void *, f32, f32);
-extern s32 func_002B6120(u8 *, void *);
-extern s32 func_002B6228(u8 *, void *, s32, s32);
-extern f32 func_002A7E08(u8 *, void *, void *, f32, f32, f32);
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283C80(f32, f32);
-extern s32 func_L01_00321178(u8 *, void *);
-extern void func_0029FCC0(u32 a0, s32 a1, f32 *a2);
-extern f32 func_00283180(f32 a0);
-extern f32 func_00283198(f32 a0);
-extern void func_00282D30(void *, void *, f32);
-extern void func_002A8C00(void *, void *, s32, f32, void *);
-extern s32 func_00277F48(void *, f32, s32, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, f32);
-extern s32 func_L02_00331440(u8 *, void *, f32, s32, f32, f32);
-extern f32 func_0029F530(u8 *);
-extern void func_002C2210(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
-extern s32 func_002A8D70(void *, f32, f32, s32, s32, f32, s32, s32, s32);
-extern s32 func_002AEB60(u8 *, f32);
-extern void func_L00_003294F0(u8 *, s32);
-extern s32 func_L00_002FCF18(void *, f32, f32, f32, f32, f32);
-extern s32 func_002761F8(void *, void *, s32, void *, void *);
-extern s32 func_002B38B8(u8 *);
-extern void func_L04_003E5830(void *, s32);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_00291450(s32);
-extern s32 func_002B50E0(u8 *, void *, f32);
-extern void func_L11_0042EF90(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+extern void saur_beast_update_base(u8 *);
+extern void saur_beast_step_timer_clear_flags(u8 *);
+extern void saur_beast_draw_beam(u8 *);
+extern void joba_walk_and_scatter_dust(u8 *, void *);
+extern s32 flag_set_second_pending(u8 *);
+extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
+extern void moby_set_state(u8 *, s32, s32);
+extern void anim_start_blended(u8 *a0, u32 a1, u32 a2, u32 a3);
+extern s32 math_random_int_range(s32, s32);
+extern s32 math_random_int_below(s32);
+extern s32 point_in_path_xy(void *, void *, s32);
+extern s32 moby_dispatch_action_by_kind(u8 *, void *);
+extern void SetDeathBits(u8 *, s32, s32);
+extern void part_queue_moby_for_glow(u8 *, s32, void *);
+extern void moby_mark_spawned(void *);
+extern f32 math_random_float_range(f32, f32);
+extern s32 math_fast_float_d(void *);
+extern f32 ApproachValue(f32 *, f32, f32);
+extern void moby_wander_around_home_point(u8 *, void *, f32, f32);
+extern s32 path_follow_nodes(u8 *, void *);
+extern s32 path_set_follower_nodes(u8 *, void *, s32, s32);
+extern f32 moby_turn_toward_position(u8 *, void *, void *, f32, f32, f32);
+extern f32 vec_distance_xy(void *, void *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastDiffRots(f32, f32);
+extern s32 moby_l01_turn_toward_target(u8 *, void *);
+extern void moby_transform_joint_to_world(u32 a0, s32 a1, f32 *a2);
+extern f32 math_fast_sin_or_cos_a(f32 a0);
+extern f32 math_fast_sin_or_cos_b(f32 a0);
+extern void FastVecScale(void *, void *, f32);
+extern void make_hit_descriptor(void *, void *, s32, f32, void *);
+extern s32 coll_process_hit(void *, f32, s32, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern s32 moby_move_to_target_temp_limits(u8 *, void *, f32, s32, f32, f32);
+extern f32 moby_get_anim_value(u8 *);
+extern void part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
+extern s32 coll_test_hit_at_bone(void *, f32, f32, s32, s32, f32, s32, s32, s32);
+extern s32 math_is_value_within_step(u8 *, f32);
+extern void moby_set_flag_bit(u8 *, s32);
+extern s32 part_l00_alloc_effect_slot_2(void *, f32, f32, f32, f32, f32);
+extern s32 CollLine(void *, void *, s32, void *, void *);
+extern s32 flag_is_third_pending_set(u8 *);
+extern void part_l04_spawn_paired_sparks(void *, s32);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_free_point_light(s32);
+extern s32 moby_step_controller(u8 *, void *, f32);
+extern void anim_play_on_self_and_owner(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 
 /* Updates the Jobian Saur-Beast each frame: picks its next action from its current state, walks toward or attacks the player, and puffs smoke and effects. */
-void func_L11_0042F018(u8 *saur) {
+void saur_beast_update(u8 *saur) {
     u8 *data;
 
-    if (D_L11_001CAE40[0] != 0 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x6F) {
+    if (D_L11_001CAE40[0] != 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
         saur[0xBC] = 1;
         *(s32 *)(saur + 0x98) = 0;
         *(u16 *)(saur + 0x34) = (*(u16 *)(saur + 0x34) | 0x41) & 0xEFFF;
@@ -94,141 +94,141 @@ void func_L11_0042F018(u8 *saur) {
         saur[0xBC] = 0;
     }
     data = *(u8 **)(saur + 0x68);
-    UpdateSaurBeastBase(saur);
+    saur_beast_update_base(saur);
 
     switch (saur[0x95]) {
     case 0:
-        if (SetSecondPendingFlag(saur) != 0) {
-            SetControllerSpeedLimits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(saur) != 0) {
+            moby_set_controller_speed_limits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
             if (*(f32 *)(data + 0x290) < 0.2f)
-                PlayAnimationOnSelfAndOwner(saur, 0, 0, 0, 0xC);
+                anim_play_on_self_and_owner(saur, 0, 0, 0, 0xC);
             if (*(s32 *)(data + 0x29C) != -1) {
-                PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xC);
-                SetMobyState(saur, 5, -1);
+                anim_play_on_self_and_owner(saur, 5, 4, 0, 0xC);
+                moby_set_state(saur, 5, -1);
             }
         }
-        if (*(s16 *)(data + 0x274) == 2 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6F && *(s32 *)(data + 0x2C8) == 0) {
+        if (*(s16 *)(data + 0x274) == 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(data + 0x2C8) == 0) {
             if (*(s32 *)(data + 0x294) != -1) {
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetControllerSpeedLimits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_controller_speed_limits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
                 *(f32 *)(data + 0x164) = 0.0055555557f;
-                SetMobyState(saur, 0x11, 2);
+                moby_set_state(saur, 0x11, 2);
             } else if (*(u8 **)(data + 0x27C) != 0) {
-                SetMobyState(saur, 0xE, 2);
+                moby_set_state(saur, 0xE, 2);
             } else {
-                PlayAnimationOnSelfAndOwner(saur, 2, 2, 0, 0xA);
-                SetMobyState(saur, 0xE, 2);
+                anim_play_on_self_and_owner(saur, 2, 2, 0, 0xA);
+                moby_set_state(saur, 0xE, 2);
             }
         } else if (*(s16 *)(data + 0x276) != 0) {
-            SetMobyState(saur, 0xB, 1);
+            moby_set_state(saur, 0xB, 1);
             *(s16 *)(data + 0x276) = 0;
             if (*(s16 *)(data + 0x270) < 0x12C)
-                *(s16 *)(data + 0x270) = RandomIntRange(0x1E0, 0x258);
+                *(s16 *)(data + 0x270) = math_random_int_range(0x1E0, 0x258);
             if (*(s32 *)(data + 0x29C) != -1) {
-                SetMobyState(saur, 0xB, 0xC);
-                PlayAnimationOnSelfAndOwner(saur, 4, 3, 0, 0xC);
+                moby_set_state(saur, 0xB, 0xC);
+                anim_play_on_self_and_owner(saur, 4, 3, 0, 0xC);
             }
         } else if (*(s32 *)(data + 0x2AC) != -1 &&
-                   point_in_path_xy(&((Hero *)gHeroState)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
+                   point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
                                  *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) != 0) {
-            PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-            SetControllerSpeedLimits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
+            anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+            moby_set_controller_speed_limits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
             *(f32 *)(data + 0x164) = 0.0055555557f;
-            SetMobyState(saur, 0x11, 2);
+            moby_set_state(saur, 0x11, 2);
         }
         break;
     case 1:
-        if (SetSecondPendingFlag(saur) != 0)
-            SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(saur) != 0)
+            moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
         if ((u16)(*(s16 *)(data + 0x274) - 1) < 2) {
             if (*(u8 **)(data + 0x27C) != 0) {
-                SetMobyState(saur, 0xE, 2);
+                moby_set_state(saur, 0xE, 2);
             } else if (*(s32 *)(data + 0x294) != -1) {
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetControllerSpeedLimits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_controller_speed_limits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
                 *(f32 *)(data + 0x164) = 0.0055555557f;
-                SetMobyState(saur, 0x11, 2);
+                moby_set_state(saur, 0x11, 2);
             } else {
-                PlayAnimationOnSelfAndOwner(saur, 2, 2, 0, 0xA);
-                SetMobyState(saur, 0xE, 2);
+                anim_play_on_self_and_owner(saur, 2, 2, 0, 0xA);
+                moby_set_state(saur, 0xE, 2);
             }
         } else if (*(s16 *)(data + 0x270) == 0) {
-            SetMobyState(saur, 1, 0);
-            PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xC);
+            moby_set_state(saur, 1, 0);
+            anim_play_on_self_and_owner(saur, 5, 4, 0, 0xC);
         }
         break;
     case 2:
-        if (SetSecondPendingFlag(saur) != 0)
-            SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+        if (flag_set_second_pending(saur) != 0)
+            moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
         if (*(s32 *)(data + 0x2AC) == -1 ||
-            point_in_path_xy(&((Hero *)gHeroState)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
+            point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
                           *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) == 0) {
             if ((u16)(*(s16 *)(data + 0x274) - 1) >= 2) {
                 if (saur[0x20] == 0x11 || saur[0x20] == 0x14 || saur[0x20] == 0x10) {
                 } else if (saur[0x20] == 0x13) {
-                    PlayAnimationOnSelfAndOwner(saur, 8, 0, 1, 3);
-                    SetMobyState(saur, 0x14, -1);
+                    anim_play_on_self_and_owner(saur, 8, 0, 1, 3);
+                    moby_set_state(saur, 0x14, -1);
                 } else if (*(s32 *)(data + 0x29C) != -1 && *(s32 *)(data + 0x294) == -1) {
-                    PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xC);
-                    SetMobyState(saur, 5, 1);
+                    anim_play_on_self_and_owner(saur, 5, 4, 0, 0xC);
+                    moby_set_state(saur, 5, 1);
                 } else {
                     *(s32 *)(data + 0x2A0) = 0;
-                    PlayAnimationOnSelfAndOwner(saur, 3, 1, 0, 0xC);
-                    SetMobyState(saur, 0xB, 1);
+                    anim_play_on_self_and_owner(saur, 3, 1, 0, 0xC);
+                    moby_set_state(saur, 0xB, 1);
                     if (*(s32 *)(data + 0x2A4) != -1) {
                         qcopy(data + 0x110, D_L11_001B368C[0] + (*(s32 *)(data + 0x2A4) << 7) + 0x30);
                         if (*(f32 *)(data + 0x12C) == 0.0f)
                             *(f32 *)(data + 0x12C) = 4.0f;
                     }
-                    *(s16 *)(data + 0x270) = RandomIntRange(0x4B0, 0x514);
+                    *(s16 *)(data + 0x270) = math_random_int_range(0x4B0, 0x514);
                 }
             }
-            if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x31 && *(s32 *)(data + 0x2C4) != -1) {
+            if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 && *(s32 *)(data + 0x2C4) != -1) {
                 if (saur[0x43] != 6)
-                    StartAnimationBlended(saur, 6, 0, RandomIntRange(5, 0xF));
-                SetMobyState(saur, 0xD, 4);
-                SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.0033936962f, 0.26179942f);
+                    anim_start_blended(saur, 6, 0, math_random_int_range(5, 0xF));
+                moby_set_state(saur, 0xD, 4);
+                moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.0033936962f, 0.26179942f);
             }
             if (*(s32 *)(data + 0x2BC) != -1 && *(s16 *)(data + 0x274) != 2 && *(u8 **)(data + 0x27C) != 0 &&
-                (gMobyTable_L11[0] + (*(s32 *)(data + 0x2BC) << 8))[0x20] != 2) {
-                SetMobyState(saur, 2, 0);
-                PlayAnimationOnSelfAndOwner(saur, 4, 1, 0, 0xF);
-                *(f32 *)(saur + 0x48) = RandomFloatRange(0.5f, 1.25f);
+                (g_moby_l11_table[0] + (*(s32 *)(data + 0x2BC) << 8))[0x20] != 2) {
+                moby_set_state(saur, 2, 0);
+                anim_play_on_self_and_owner(saur, 4, 1, 0, 0xF);
+                *(f32 *)(saur + 0x48) = math_random_float_range(0.5f, 1.25f);
             }
         }
         break;
     case 4:
-        if (((Hero *)gHeroState)->i[0x2294 / 4] != 0x31) {
+        if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x31) {
             if (saur[0x43] != 6)
-                StartAnimationBlended(saur, 6, 0, 0xA);
-            SetMobyState(saur, 0xF, 2);
+                anim_start_blended(saur, 6, 0, 0xA);
+            moby_set_state(saur, 0xF, 2);
         }
         break;
     case 3: {
         s32 r;
 
-        r = DispatchActionByKind(saur, data + 0x60);
+        r = moby_dispatch_action_by_kind(saur, data + 0x60);
         if (r & 1) {
             D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
             SetDeathBits(saur, 0, 3);
-            QueueMobyForGlowEffect(saur, 0, 0);
+            part_queue_moby_for_glow(saur, 0, 0);
             return;
         }
         if (r & 2) {
             if ((u16)(*(s16 *)(data + 0x274) - 1) < 2) {
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetMobyState(saur, 0xF, 2);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_state(saur, 0xF, 2);
                 if (*(s32 *)(data + 0x2BC) != -1) {
-                    SetMobyState(saur, 0x18, -1);
-                    PlayAnimationOnSelfAndOwner(saur, 0xF, 4, 0, 0xA);
+                    moby_set_state(saur, 0x18, -1);
+                    anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
                 }
             } else {
-                SetMobyState(saur, 0xB, 1);
-                PlayAnimationOnSelfAndOwner(saur, 1, 1, 0, 0xA);
-                *(s16 *)(data + 0x270) = RandomIntRange(0x244, 0x258);
+                moby_set_state(saur, 0xB, 1);
+                anim_play_on_self_and_owner(saur, 1, 1, 0, 0xA);
+                *(s16 *)(data + 0x270) = math_random_int_range(0x244, 0x258);
                 if (*(s32 *)(data + 0x29C) != -1) {
-                    SetMobyState(saur, 0xB, 0xC);
-                    PlayAnimationOnSelfAndOwner(saur, 4, 3, 0, 0xC);
+                    moby_set_state(saur, 0xB, 0xC);
+                    anim_play_on_self_and_owner(saur, 4, 3, 0, 0xC);
                 }
             }
         }
@@ -239,30 +239,30 @@ void func_L11_0042F018(u8 *saur) {
     switch (saur[0x20]) {
     case 1:
         if (*(f32 *)(data + 0x290) > 0.2f) {
-            FastFloatHelperD(data + 0x28C);
+            math_fast_float_d(data + 0x28C);
             if (*(s32 *)(data + 0x28C) >= 0x15)
                 *(f32 *)(data + 0x124) = 0.06666667f;
             else
                 ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0011111111f);
             if (saur[0x43] == 5) {
                 if (*(s32 *)(data + 0x28C) == 0) {
-                    PlayAnimationOnSelfAndOwner(saur, 1, 1, 0, 0xC);
-                    if (RandomIntBelow(2) == 1)
-                        PlayAnimationOnSelfAndOwner(saur, 0, 0, 0, 0xC);
+                    anim_play_on_self_and_owner(saur, 1, 1, 0, 0xC);
+                    if (math_random_int_below(2) == 1)
+                        anim_play_on_self_and_owner(saur, 0, 0, 0, 0xC);
                 }
-                WanderAroundHomePoint(saur, data + 0x110, 0.35f, 0.25f);
+                moby_wander_around_home_point(saur, data + 0x110, 0.35f, 0.25f);
             } else if (saur[0x43] < 2 && (saur[0x60] & 2)) {
-                *(s32 *)(data + 0x28C) = RandomIntRange(0x78, 0x2BC);
-                PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xC);
+                *(s32 *)(data + 0x28C) = math_random_int_range(0x78, 0x2BC);
+                anim_play_on_self_and_owner(saur, 5, 4, 0, 0xC);
             }
         } else if (*(u8 **)(data + 0x27C) != 0 && (*(u8 **)(data + 0x27C))[0x43] != 0) {
-            PlayAnimationOnSelfAndOwner(saur, 0, 0, 0, 0xC);
+            anim_play_on_self_and_owner(saur, 0, 0, 0, 0xC);
         }
         break;
     case 2:
-        if ((gMobyTable_L11[0] + (*(s32 *)(data + 0x2BC) << 8))[0x20] == 2 && *(u8 **)(data + 0x27C) != 0) {
-            SetMobyState(saur, 3, -1);
-            StartAnimationBlended(*(u8 **)(data + 0x27C), 0xB, 0, 0xF);
+        if ((g_moby_l11_table[0] + (*(s32 *)(data + 0x2BC) << 8))[0x20] == 2 && *(u8 **)(data + 0x27C) != 0) {
+            moby_set_state(saur, 3, -1);
+            anim_start_blended(*(u8 **)(data + 0x27C), 0xB, 0, 0xF);
         }
         break;
     case 3: {
@@ -270,104 +270,104 @@ void func_L11_0042F018(u8 *saur) {
 
         p = *(u8 **)(data + 0x27C);
         if ((p[0x60] & 2) || p == 0)
-            SetMobyState(saur, 0xE, 2);
+            moby_set_state(saur, 0xE, 2);
         break;
     }
     case 5:
-        if (*(s32 *)(data + 0x29C) != -1 && FollowPathNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
-            SetMobyState(saur, 7, -1);
-            PlayAnimationOnSelfAndOwner(saur, 4, 3, 0, 0xA);
-            SetPathFollowerNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 0, 1);
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+            moby_set_state(saur, 7, -1);
+            anim_play_on_self_and_owner(saur, 4, 3, 0, 0xA);
+            path_set_follower_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 0, 1);
             *(s32 *)(data + 0x2C0) = 1;
         }
         break;
     case 6:
-        if (*(s32 *)(data + 0x29C) != -1 && FollowPathNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
-            SetMobyState(saur, 7, -1);
-            PlayAnimationOnSelfAndOwner(saur, 4, 3, 0, 0xA);
-            SetPathFollowerNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 1, 0);
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+            moby_set_state(saur, 7, -1);
+            anim_play_on_self_and_owner(saur, 4, 3, 0, 0xA);
+            path_set_follower_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 1, 0);
             *(s32 *)(data + 0x2C0) = 0;
         }
         break;
     case 7:
         if (saur[0x60] & 2) {
-            PlayAnimationOnSelfAndOwner(saur, 0xE, 0xA, 0, 7);
-            SetMobyState(saur, 0x19, -1);
+            anim_play_on_self_and_owner(saur, 0xE, 0xA, 0, 7);
+            moby_set_state(saur, 0x19, -1);
         }
         break;
     case 13:
-        FollowPathNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x2C4)]);
+        path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x2C4)]);
         break;
     case 11:
-        FastFloatHelperD(data + 0x28C);
+        math_fast_float_d(data + 0x28C);
         if (*(s32 *)(data + 0x28C) >= 0x15)
             ApproachValue((f32 *)(data + 0x124), 0.06666667f, 0.0019444445f);
         else
             ApproachValue((f32 *)(data + 0x124), 0.0f, 0.0019444445f);
         if (saur[0x43] == 6) {
             if (*(s32 *)(data + 0x28C) == 0) {
-                PlayAnimationOnSelfAndOwner(saur, 3, 2, 0, 0xC);
-                if (RandomIntBelow(2) == 1)
-                    PlayAnimationOnSelfAndOwner(saur, 4, 3, 0, 0xC);
+                anim_play_on_self_and_owner(saur, 3, 2, 0, 0xC);
+                if (math_random_int_below(2) == 1)
+                    anim_play_on_self_and_owner(saur, 4, 3, 0, 0xC);
             }
-            WanderAroundHomePoint(saur, data + 0x110, 0.35f, 0.25f);
+            moby_wander_around_home_point(saur, data + 0x110, 0.35f, 0.25f);
         } else if ((u8)(saur[0x43] - 3) < 2 && (saur[0x60] & 2)) {
-            *(s32 *)(data + 0x28C) = RandomIntRange(0x78, 0x2BC);
-            PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xC);
+            *(s32 *)(data + 0x28C) = math_random_int_range(0x78, 0x2BC);
+            anim_play_on_self_and_owner(saur, 6, 5, 0, 0xC);
         }
         break;
     case 12:
         if (saur[0x60] & 2) {
-            PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xC);
-            SetMobyState(saur, 5, -1);
+            anim_play_on_self_and_owner(saur, 5, 4, 0, 0xC);
+            moby_set_state(saur, 5, -1);
         }
         break;
     case 14:
-        TurnTowardPosition(saur, ((Hero *)gHeroState)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
+        moby_turn_toward_position(saur, ((Hero *)g_hero_state)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
         if (*(u8 **)(data + 0x27C) != 0) {
-            SetMobyState(saur, 0x18, -1);
-            PlayAnimationOnSelfAndOwner(saur, 0xF, 4, 0, 0xA);
+            moby_set_state(saur, 0x18, -1);
+            anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
         } else if (*(s32 *)(data + 0x2A8) != 0) {
-            SetMobyState(saur, 0x13, -1);
-            PlayAnimationOnSelfAndOwner(saur, 7, 5, 0, 0xA);
+            moby_set_state(saur, 0x13, -1);
+            anim_play_on_self_and_owner(saur, 7, 5, 0, 0xA);
         } else {
-            SetMobyState(saur, 0xF, -1);
-            PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
+            moby_set_state(saur, 0xF, -1);
+            anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
         }
         break;
     case 15:
-        WalkAndScatterDust(saur, &((Hero *)gHeroState)->f[0x80 / 4]);
+        joba_walk_and_scatter_dust(saur, &((Hero *)g_hero_state)->f[0x80 / 4]);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (*(u8 **)(data + 0x27C) != 0) {
-            if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) < 20.0f &&
-                FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                                 ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.17453295f) {
-                PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-                SetMobyState(saur, 0x12, -1);
+            if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 20.0f &&
+                FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                                 ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.17453295f) {
+                anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+                moby_set_state(saur, 0x12, -1);
             }
         } else {
-            if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) < 2.7f &&
-                FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                                 ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.3490659f) {
-                PlayAnimationOnSelfAndOwner(saur, 0xC, 0, 0, 5);
-                SetMobyState(saur, 0x15, -1);
+            if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 2.7f &&
+                FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                                 ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.3490659f) {
+                anim_play_on_self_and_owner(saur, 0xC, 0, 0, 5);
+                moby_set_state(saur, 0x15, -1);
             }
-            if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) > 2.7f && (saur[0x42] == 5 || saur[0x42] == 0xF)) {
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 4);
-                SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+            if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) > 2.7f && (saur[0x42] == 5 || saur[0x42] == 0xF)) {
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 4);
+                moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
             }
         }
         break;
     case 19: {
         *(f32 *)(data + 0x164) = 0.0069444445f;
-        SetControllerSpeedLimits(saur, 0.006666667f, 0.20000002f, 0.001163553f, 0.10471977f);
-        TurnMobyTowardTarget(saur, &((Hero *)gHeroState)->f[0x80 / 4]);
-        TurnTowardPosition(saur, ((Hero *)gHeroState)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
+        moby_set_controller_speed_limits(saur, 0.006666667f, 0.20000002f, 0.001163553f, 0.10471977f);
+        moby_l01_turn_toward_target(saur, &((Hero *)g_hero_state)->f[0x80 / 4]);
+        moby_turn_toward_position(saur, ((Hero *)g_hero_state)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
-        if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) < 2.1f) {
-            PlayAnimationOnSelfAndOwner(saur, 8, 0, 1, 3);
+        if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 2.1f) {
+            anim_play_on_self_and_owner(saur, 8, 0, 1, 3);
             *(f32 *)(saur + 0x48) = 1.0f;
-            SetMobyState(saur, 0x14, -1);
+            moby_set_state(saur, 0x14, -1);
         }
         {
         f32 pos[4] __attribute__((aligned(16)));
@@ -375,9 +375,9 @@ void func_L11_0042F018(u8 *saur) {
         f32 dir[4] __attribute__((aligned(16)));
         u8 req[0x30] __attribute__((aligned(16)));
 
-        TransformMobyJointToWorld((u32)saur, 1, pos);
-        dir[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8));
-        dir[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8));
+        moby_transform_joint_to_world((u32)saur, 1, pos);
+        dir[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8));
+        dir[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8));
         dir[2] = 2.0f;
         qcopy(scaled, dir);
         FastVecScale(scaled, scaled, 2.5f);
@@ -386,7 +386,7 @@ void func_L11_0042F018(u8 *saur) {
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(saur + 0xAA);
         req[0x18] = 0;
-        ProcessCollisionHit(pos, 1.3f, 0, saur, req);
+        coll_process_hit(pos, 1.3f, 0, saur, req);
         }
         break;
     }
@@ -396,21 +396,21 @@ void func_L11_0042F018(u8 *saur) {
         p = saur + 0x10;
         {
         f32 off[4] __attribute__((aligned(16)));
-        SetControllerSpeedLimits(saur, 0.004166667f, 0.033333335f, 0.001163553f, 0.10471977f);
-        off[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 4.0f;
-        off[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 4.0f;
+        moby_set_controller_speed_limits(saur, 0.004166667f, 0.033333335f, 0.001163553f, 0.10471977f);
+        off[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 4.0f;
+        off[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 4.0f;
         off[2] = 0.0f;
         FastVecAdd(off, p, off);
-        TurnMobyTowardTarget(saur, &((Hero *)gHeroState)->f[0x80 / 4]);
+        moby_l01_turn_toward_target(saur, &((Hero *)g_hero_state)->f[0x80 / 4]);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (saur[0x60] & 2) {
-            PlayAnimationOnSelfAndOwner(saur, 2, 2, 0, 0xA);
-            SetMobyState(saur, 0x10, -1);
-            if (vec_distance_xy(p, &((Hero *)gHeroState)->f[0x80 / 4]) < 3.0f) {
-                SetControllerSpeedLimits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+            anim_play_on_self_and_owner(saur, 2, 2, 0, 0xA);
+            moby_set_state(saur, 0x10, -1);
+            if (vec_distance_xy(p, &((Hero *)g_hero_state)->f[0x80 / 4]) < 3.0f) {
+                moby_set_controller_speed_limits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
                 if (saur[0x43] != 0x10)
-                    StartAnimationBlended(saur, 0x10, 0, 0xA);
-                SetMobyState(saur, 0x1B, -1);
+                    anim_start_blended(saur, 0x10, 0, 0xA);
+                moby_set_state(saur, 0x1B, -1);
             }
         }
         }
@@ -420,9 +420,9 @@ void func_L11_0042F018(u8 *saur) {
         f32 dir[4] __attribute__((aligned(16)));
         u8 req[0x30] __attribute__((aligned(16)));
 
-        TransformMobyJointToWorld((u32)saur, 1, pos);
-        dir[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8));
-        dir[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8));
+        moby_transform_joint_to_world((u32)saur, 1, pos);
+        dir[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8));
+        dir[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8));
         dir[2] = 2.0f;
         qcopy(scaled, dir);
         FastVecScale(scaled, scaled, 2.5f);
@@ -431,29 +431,29 @@ void func_L11_0042F018(u8 *saur) {
         req[0x19] = 1;
         *(u16 *)(req + 0x1A) = *(u16 *)(saur + 0xAA);
         req[0x18] = 0;
-        ProcessCollisionHit(pos, 1.3f, 0, saur, req);
+        coll_process_hit(pos, 1.3f, 0, saur, req);
         }
         break;
     }
     case 27: {
-        SetControllerSpeedLimits(saur, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
+        moby_set_controller_speed_limits(saur, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
         {
         f32 v[4] __attribute__((aligned(16)));
 
         vec_scale_to_length(v, saur + 0xC0, -5.5f);
         FastVecAdd(v, v, saur + 0x10);
-        MoveToTargetWithTempLimits(saur, v, FastMatrixHelperA(v[0] - *(f32 *)(saur + 0x10), v[1] - *(f32 *)(saur + 0x14)), 0x10, -1.0f, -1.0f);
+        moby_move_to_target_temp_limits(saur, v, mat_fast_helper_a(v[0] - *(f32 *)(saur + 0x10), v[1] - *(f32 *)(saur + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(saur + 0x96) >= 0x79) {
             *(f32 *)(data + 0x164) = 0.00083333335f;
             if (*(u8 **)(data + 0x27C) != 0) {
-                SetControllerSpeedLimits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-                SetMobyState(saur, 0x12, -1);
+                moby_set_controller_speed_limits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+                moby_set_state(saur, 0x12, -1);
             } else {
-                SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetMobyState(saur, 0xF, -1);
+                moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_state(saur, 0xF, -1);
             }
         }
         break;
@@ -462,27 +462,27 @@ void func_L11_0042F018(u8 *saur) {
         if (saur[0x60] & 2) {
             *(f32 *)(data + 0x164) = 0.00083333335f;
             if (*(u8 **)(data + 0x27C) != 0) {
-                SetControllerSpeedLimits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-                SetMobyState(saur, 0x12, -1);
+                moby_set_controller_speed_limits(saur, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+                moby_set_state(saur, 0x12, -1);
             } else {
-                SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetMobyState(saur, 0xF, -1);
+                moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_state(saur, 0xF, -1);
             }
         }
         break;
     case 17:
-        SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
-        if (FollowPathNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x294)]) != 0) {
-            SetMobyState(saur, 0x18, -1);
-            PlayAnimationOnSelfAndOwner(saur, 0xF, 4, 0, 0xA);
-            SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+        moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+        if (path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x294)]) != 0) {
+            moby_set_state(saur, 0x18, -1);
+            anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
+            moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
             *(f32 *)(data + 0x164) = 0.00083333335f;
             *(s32 *)(data + 0x294) = -1;
             *(s32 *)(data + 0x2AC) = -1;
             if (*(u8 **)(data + 0x27C) == 0)
-                SetMobyState(saur, 0xE, 2);
+                moby_set_state(saur, 0xE, 2);
         }
         break;
     case 18: {
@@ -492,43 +492,43 @@ void func_L11_0042F018(u8 *saur) {
         s32 n;
 
         if (*(u8 **)(data + 0x27C) != 0 && saur[0x42] == 9) {
-            TransformMobyJointToWorld(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-            sparkOffset[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 0.1f;
-            sparkOffset[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 0.1f;
+            moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
+            sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+            sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
             sparkOffset[2] = 0.0f;
             FastVecAdd(sparkPos, sparkPos, sparkOffset);
             sparkPos[2] -= 0.05f;
-            g = GetMobyAnimationValue(saur);
-            f = RandomFloatRange(0.2f, 0.9f) * 0.2f * g;
-            n = RandomIntBelow(2);
+            g = moby_get_anim_value(saur);
+            f = math_random_float_range(0.2f, 0.9f) * 0.2f * g;
+            n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            SpawnGroundEffectParticle(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-            SpawnGroundEffectParticle(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
             *(f32 *)(data + 0x288) = g;
         }
         if (saur[0x60] & 2) {
-            PlayAnimationOnSelfAndOwner(saur, 0xA, 7, 0, 0xA);
-            SetMobyState(saur, 0x16, -1);
+            anim_play_on_self_and_owner(saur, 0xA, 7, 0, 0xA);
+            moby_set_state(saur, 0x16, -1);
         }
         break;
     }
     case 21: {
         f32 f;
 
-        f = GetMobyAnimationValue(saur);
+        f = moby_get_anim_value(saur);
         if (saur[0x42] == 0xC && f >= 10.0f && f <= 15.0f)
-            TestHitAtBone(saur, 1.0f, *(f32 *)(data + 0x2B4), 1, 1, 1.0f, 0, 1, 0);
+            coll_test_hit_at_bone(saur, 1.0f, *(f32 *)(data + 0x2B4), 1, 1, 1.0f, 0, 1, 0);
         if (saur[0x60] & 2) {
-            if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) < 2.7f &&
-                FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                                 ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.3490659f) {
-                PlayAnimationOnSelfAndOwner(saur, 0xC, 0, 0, 0xA);
-                SetMobyState(saur, 0x15, -1);
+            if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 2.7f &&
+                FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                                 ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.3490659f) {
+                anim_play_on_self_and_owner(saur, 0xC, 0, 0, 0xA);
+                moby_set_state(saur, 0x15, -1);
             } else {
-                SetMobyState(saur, 0xF, -1);
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
-                SetControllerSpeedLimits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
+                moby_set_state(saur, 0xF, -1);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
+                moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
             }
         }
         break;
@@ -538,56 +538,56 @@ void func_L11_0042F018(u8 *saur) {
         f32 hp;
 
         if (*(u8 **)(data + 0x27C) == 0) {
-            SetMobyState(saur, 0xF, -1);
-            PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
+            moby_set_state(saur, 0xF, -1);
+            anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
         }
         if (saur[0x60] & 2) {
-            if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0 &&
+            if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0 &&
                 *(s32 *)(data + 0x2A0) < 3) {
-                if (FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                                     ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) > 0.087266475f) {
-                    SetMobyState(saur, 0x18, -1);
-                    PlayAnimationOnSelfAndOwner(saur, 0xF, 4, 0, 0xA);
+                if (FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                                     ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) > 0.087266475f) {
+                    moby_set_state(saur, 0x18, -1);
+                    anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
                 } else {
-                    PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-                    SetMobyState(saur, 0x12, -1);
+                    anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+                    moby_set_state(saur, 0x12, -1);
                 }
-            } else if (vec_distance_xy(saur + 0x10, &((Hero *)gHeroState)->f[0x80 / 4]) > 10.0f && *(u8 **)(data + 0x27C) != 0 &&
+            } else if (vec_distance_xy(saur + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) > 10.0f && *(u8 **)(data + 0x27C) != 0 &&
                        *(s32 *)(data + 0x2A0) >= 3 && *(s32 *)(data + 0x2BC) == -1) {
-                PlayAnimationOnSelfAndOwner(saur, 3, 2, 0, 0xA);
-                SetMobyState(saur, 0x17, -1);
+                anim_play_on_self_and_owner(saur, 3, 2, 0, 0xA);
+                moby_set_state(saur, 0x17, -1);
                 *(s32 *)(data + 0x2A0) = 0;
             } else {
-                SetMobyState(saur, 0x18, -1);
-                PlayAnimationOnSelfAndOwner(saur, 0xF, 4, 0, 0xA);
+                moby_set_state(saur, 0x18, -1);
+                anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
             }
             if (*(u8 **)(data + 0x27C) != 0) {
                 *(s32 *)(data + 0x2A0) = *(s32 *)(data + 0x2A0) + 1;
             } else {
-                SetMobyState(saur, 0xF, -1);
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
+                moby_set_state(saur, 0xF, -1);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
                 break;
             }
-        } else if (IsValueWithinStepOfThreshold(saur, 3.0f) != 0 && *(u8 **)(data + 0x27C) != 0) {
+        } else if (math_is_value_within_step(saur, 3.0f) != 0 && *(u8 **)(data + 0x27C) != 0) {
             f32 sparkPos[4] __attribute__((aligned(16)));
             f32 sparkOffset[4] __attribute__((aligned(16)));
 
-            if (FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                                 ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.78539824f) {
+            if (FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                                 ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.78539824f) {
                 s32 k;
                 u8 *l;
 
-                TransformMobyJointToWorld(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 0.1f;
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
+                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
                 sparkOffset[2] = 0.0f;
                 FastVecAdd(sparkPos, sparkPos, sparkOffset);
                 sparkPos[2] -= 0.05f;
                 *(TI128 *)(data + 0x230) = *(TI128 *)sparkPos;
-                FastVecSub(data + 0x250, &((Hero *)gHeroState)->f[0xD0 / 4], sparkPos);
+                FastVecSub(data + 0x250, &((Hero *)g_hero_state)->f[0xD0 / 4], sparkPos);
                 *(f32 *)(data + 0x298) = 0.0f;
-                SetObjectFlagBit(saur, 0);
-                k = AllocateEffectSlot_L00_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+                moby_set_flag_bit(saur, 0);
+                k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
                     l = D_L11_001C8A40 + (k << 5);
@@ -603,21 +603,21 @@ void func_L11_0042F018(u8 *saur) {
                 s32 k;
                 u8 *l;
 
-                TransformMobyJointToWorld(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 0.1f;
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
+                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
                 sparkOffset[2] = 0.0f;
                 FastVecAdd(sparkPos, sparkPos, sparkOffset);
                 sparkPos[2] -= 0.05f;
                 *(TI128 *)(data + 0x230) = *(TI128 *)sparkPos;
-                sparkOffset[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 25.0f;
-                sparkOffset[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 25.0f;
+                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 25.0f;
+                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 25.0f;
                 sparkOffset[2] = 0.0f;
                 FastVecAdd(sparkOffset, sparkOffset, saur + 0x10);
                 FastVecSub(data + 0x250, sparkOffset, sparkPos);
                 *(f32 *)(data + 0x298) = 0.0f;
-                SetObjectFlagBit(saur, 0);
-                k = AllocateEffectSlot_L00_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+                moby_set_flag_bit(saur, 0);
+                k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
                     l = D_L11_001C8A40 + (k << 5);
@@ -631,7 +631,7 @@ void func_L11_0042F018(u8 *saur) {
                 }
             }
         }
-        t = GetMobyAnimationValue(saur);
+        t = moby_get_anim_value(saur);
         if (t < 3.0f || saur[0x42] != 0xA) {
             if (*(u8 **)(data + 0x27C) != 0) {
                 f32 sparkPos[4] __attribute__((aligned(16)));
@@ -639,18 +639,18 @@ void func_L11_0042F018(u8 *saur) {
                 f32 f;
                 s32 n;
 
-                TransformMobyJointToWorld(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = FastSinOrCosA(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = FastSinOrCosB(*(f32 *)(saur + 0xF8)) * 0.1f;
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
+                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
                 sparkOffset[2] = 0.0f;
                 FastVecAdd(sparkPos, sparkPos, sparkOffset);
                 sparkPos[2] -= 0.05f;
-                f = RandomFloatRange(0.2f, 0.9f) * 0.2f * *(f32 *)(data + 0x288);
-                n = RandomIntBelow(2);
+                f = math_random_float_range(0.2f, 0.9f) * 0.2f * *(f32 *)(data + 0x288);
+                n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                SpawnGroundEffectParticle(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-                SpawnGroundEffectParticle(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
                 *(f32 *)(data + 0x288) = *(f32 *)(data + 0x288) + 1.0f;
             }
         }
@@ -671,27 +671,27 @@ void func_L11_0042F018(u8 *saur) {
             FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
             if (CollLine(data + 0x230, data + 0x240, 0, saur, req) != 0) {
                 *(TI128 *)(data + 0x240) = D_L11_001C0D20;
-                if (IsThirdPendingFlagSet(saur) == 0) {
-                    SpawnPairedSparkParticles_L04(&D_L11_001C0D20, 6);
-                    SetObjectFlagBit(saur, 1);
+                if (flag_is_third_pending_set(saur) == 0) {
+                    part_l04_spawn_paired_sparks(&D_L11_001C0D20, 6);
+                    moby_set_flag_bit(saur, 1);
                 }
             }
-            f = RandomFloatRange(1.0f, 6.0f);
-            n = RandomIntRange(0x19, 0x23);
+            f = math_random_float_range(1.0f, 6.0f);
+            n = math_random_int_range(0x19, 0x23);
             if (n == 0)
                 n = n - 1;
             qcopy(v30, data + 0x240);
             v30[2] -= 0.1f;
             f3 = f * 0.3f;
-            SpawnGroundEffectParticle(v30, 0x19, f3, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x19, f3, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
             n = -n;
             f04 = f * 0.04f;
             f4 = f * 0.4f;
-            SpawnGroundEffectParticle(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            SpawnGroundEffectParticle(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            SpawnGroundEffectParticle(data + 0x230, 0xA, f3, f, 0x80CA00CB, 0, n, D_L11_001A8F20, 0.0f, 0);
-            SpawnGroundEffectParticle(data + 0x230, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
-            AddDrawCallbackToList1(DrawBeamAtOwnerFollowPoint, saur);
+            part_spawn_ground_effect(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 0xA, f3, f, 0x80CA00CB, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            gfx_add_draw_callback_first(saur_beast_draw_beam, saur);
             if (*(s32 *)(data + 0x2B0) >= 0) {
                 l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
                 qcopy(l + 0x10, data + 0x240);
@@ -722,25 +722,25 @@ void func_L11_0042F018(u8 *saur) {
                 FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
                 if (CollLine(data + 0x230, data + 0x240, 0, saur, req) != 0) {
                     *(TI128 *)(data + 0x240) = D_L11_001C0D20;
-                    if (IsThirdPendingFlagSet(saur) == 0) {
-                        SpawnPairedSparkParticles_L04(&D_L11_001C0D20, 6);
-                        SetObjectFlagBit(saur, 1);
+                    if (flag_is_third_pending_set(saur) == 0) {
+                        part_l04_spawn_paired_sparks(&D_L11_001C0D20, 6);
+                        moby_set_flag_bit(saur, 1);
                     }
                 }
                 vec_scale_to_length(v30, data + 0x250, 1.6666667f);
                 FastVecAdd(data + 0x230, data + 0x230, v30);
-                f = RandomFloatRange(1.0f, 6.0f);
-                n = RandomIntRange(0x19, 0x23);
+                f = math_random_float_range(1.0f, 6.0f);
+                n = math_random_int_range(0x19, 0x23);
                 if (n == 0)
                     n = n - 1;
                 qcopy(v40, data + 0x240);
                 v40[2] -= 0.1f;
-                SpawnGroundEffectParticle(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
                 n = -n;
                 f4 = f * 0.4f;
-                SpawnGroundEffectParticle(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-                SpawnGroundEffectParticle(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
-                AddDrawCallbackToList1(DrawBeamAtOwnerFollowPoint, saur);
+                part_spawn_ground_effect(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
+                gfx_add_draw_callback_first(saur_beast_draw_beam, saur);
                 if (*(s32 *)(data + 0x2B0) >= 0) {
                     l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
                     qcopy(l + 0x10, data + 0x240);
@@ -752,12 +752,12 @@ void func_L11_0042F018(u8 *saur) {
                     *(f32 *)(l + 0xC) = 0.0f;
                 }
             } else if (*(s32 *)(data + 0x2B0) >= 0) {
-                FreePointLight(*(s32 *)(data + 0x2B0));
+                gfx_free_point_light(*(s32 *)(data + 0x2B0));
                 *(s32 *)(data + 0x2B0) = -1;
             }
         } else if (t > 15.0f && saur[0x42] == 0xA) {
             if (*(s32 *)(data + 0x2B0) >= 0) {
-                FreePointLight(*(s32 *)(data + 0x2B0));
+                gfx_free_point_light(*(s32 *)(data + 0x2B0));
                 *(s32 *)(data + 0x2B0) = -1;
             }
         }
@@ -767,48 +767,48 @@ void func_L11_0042F018(u8 *saur) {
         u8 *p = saur + 0x10;
 
         if (saur[0x60] & 2) {
-            if (vec_distance_xy(p, &((Hero *)gHeroState)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0) {
-                SetMobyState(saur, 0x18, -1);
-                PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0xA);
+            if (vec_distance_xy(p, &((Hero *)g_hero_state)->f[0x80 / 4]) < 25.0f && *(u8 **)(data + 0x27C) != 0) {
+                moby_set_state(saur, 0x18, -1);
+                anim_play_on_self_and_owner(saur, 5, 4, 0, 0xA);
             } else {
-                SetMobyState(saur, 0xF, -1);
-                PlayAnimationOnSelfAndOwner(saur, 6, 5, 0, 0xA);
+                moby_set_state(saur, 0xF, -1);
+                anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
             }
-        } else if (vec_distance_xy(p, &((Hero *)gHeroState)->f[0x80 / 4]) < 6.0f) {
-            PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-            SetMobyState(saur, 0x12, -1);
+        } else if (vec_distance_xy(p, &((Hero *)g_hero_state)->f[0x80 / 4]) < 6.0f) {
+            anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+            moby_set_state(saur, 0x12, -1);
         }
         break;
     }
     case 24:
-        if (FastDiffRots(*(f32 *)(saur + 0xF8), FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                             ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) <= 0.087266475f) {
-            PlayAnimationOnSelfAndOwner(saur, 9, 6, 0, 0xA);
-            SetMobyState(saur, 0x12, -1);
+        if (FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                             ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) <= 0.087266475f) {
+            anim_play_on_self_and_owner(saur, 9, 6, 0, 0xA);
+            moby_set_state(saur, 0x12, -1);
         } else {
-            StepMovementController(saur, saur + 0x10, FastMatrixHelperA(((Hero *)gHeroState)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
-                                                           ((Hero *)gHeroState)->f[0x84 / 4] - *(f32 *)(saur + 0x14)));
+            moby_step_controller(saur, saur + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
+                                                           ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14)));
         }
         break;
     case 25:
         if (saur[0x60] & 2) {
             if (*(s32 *)(data + 0x2C0) == 0) {
-                PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0);
-                SetMobyState(saur, 5, -1);
+                anim_play_on_self_and_owner(saur, 5, 4, 0, 0);
+                moby_set_state(saur, 5, -1);
             } else {
-                PlayAnimationOnSelfAndOwner(saur, 5, 4, 0, 0);
-                SetMobyState(saur, 6, -1);
+                anim_play_on_self_and_owner(saur, 5, 4, 0, 0);
+                moby_set_state(saur, 6, -1);
             }
         } else if (saur[0x43] == 0xE) {
-            SetControllerSpeedLimits(saur, 0.13333334f, 0.06666667f, 0.009696275f, 0.6981318f);
-            FollowPathNodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]);
+            moby_set_controller_speed_limits(saur, 0.13333334f, 0.06666667f, 0.009696275f, 0.6981318f);
+            path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]);
         }
         break;
     }
-    StepObjectTimerAndClearStateFlags(saur);
+    saur_beast_step_timer_clear_flags(saur);
     if (*(f32 *)(saur + 0x18) < 74.0f) {
         SetDeathBits(saur, 0, 3);
         D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
-        MarkMobySpawned(saur);
+        moby_mark_spawned(saur);
     }
 }

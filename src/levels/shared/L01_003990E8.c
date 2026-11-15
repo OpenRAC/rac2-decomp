@@ -1,8 +1,9 @@
+#include "names.h"
 /* Clears the visible flag of an object and of its three linked parts, and copies each
    present part's 64-bit word at 0x38 back into the object. */
 #include "common.h"
 
-void func_L01_003990E8(char *moby)
+void moby_show_with_linked_parts(char *moby)
 {
     int i;
     char **part;

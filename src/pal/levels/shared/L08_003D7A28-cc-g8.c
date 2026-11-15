@@ -44,7 +44,7 @@ typedef struct {
     s32 mode;
 } L08Player;
 
-extern L08Player D_00189E20;
+extern L08Player g_hero_state;
 extern L08Marker *D_L08_001B0318 __attribute__((sda));
 extern s32 D_L08_001B02FC __attribute__((sda));
 extern float D_L08_001B0300 __attribute__((sda));
@@ -55,13 +55,13 @@ extern float D_L08_001B0314 __attribute__((sda));
 extern TI128 D_L08_001B9B00;
 extern s32 D_L08_001B258C MACRO_ADDR;
 
-extern void *func_00115484(void *, int, unsigned int);
-extern int func_002ACBC8(void *, int);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
+extern void *memset(void *, int, unsigned int);
+extern int IsPointInCuboid(void *, int);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern L08Marker *func_PAL_L00_002D7850(int);
-extern void func_L00_002D7140(void *);
+extern void cam_end_override(void *);
 
 static __inline__ void CopyTarget(L08Target *dst, L08Target *src)
 {
@@ -85,9 +85,9 @@ void func_PAL_L08_003D7A28(u8 *object)
 
     switch (object[0x20]) {
     case 0:
-        func_00115484(&D_L08_001B3490[0], 0, 48);
-        func_00115484(&D_L08_001B3490[1], 0, 48);
-        func_00115484(&D_L08_001B3490[2], 0, 48);
+        memset(&D_L08_001B3490[0], 0, 48);
+        memset(&D_L08_001B3490[1], 0, 48);
+        memset(&D_L08_001B3490[2], 0, 48);
         D_L08_001B3490[0].dist = 100000.0f;
         D_L08_001B3490[0].unk18 = 65535;
         D_L08_001B3490[1].dist = 100000.0f;
@@ -102,17 +102,17 @@ void func_PAL_L08_003D7A28(u8 *object)
     default:
         return;
     }
-    if (*data != -1 && func_002ACBC8(&D_L08_001B9B00, *data))
+    if (*data != -1 && IsPointInCuboid(&D_L08_001B9B00, *data))
         D_L08_001B258C = 2;
-    if (D_00189E20.mode == 0x31 && (vehicle = D_00189E20.vehicle) != 0) {
-        func_002AF000(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
-        func_00282CC0(&D_L08_001B3490[0].pos, offset, D_00189E20.vehicle + 0x10);
+    if (g_hero_state.mode == 0x31 && (vehicle = g_hero_state.vehicle) != 0) {
+        vec_build_spherical_offset(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
+        FastVecAdd(&D_L08_001B3490[0].pos, offset, g_hero_state.vehicle + 0x10);
         if (D_L08_001B0318 == 0) {
             D_L08_001B0318 = func_PAL_L00_002D7850(5);
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
-        if (*(s16 *)(D_00189E20.vehicle + 0xAA) == 0x905) {
+        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == 0x905) {
             D_L08_001B0318->x0 = D_L08_001B0304;
             D_L08_001B0318->xC = -1.0f;
             D_L08_001B0318->x8 = -1.0f;
@@ -122,7 +122,7 @@ void func_PAL_L08_003D7A28(u8 *object)
             D_L08_001B0318->x8 = D_L08_001B0314;
         }
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
         goto shift;
     }
     if (D_L08_001B3490[2].owner == D_L08_001B3490[1].owner)
@@ -148,14 +148,14 @@ void func_PAL_L08_003D7A28(u8 *object)
         }
         D_L08_001B0318->x0 = 7.0f;
         D_L08_001B0318->x1F = 1;
-        func_00282CF0(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
     } else if (D_L08_001B0318 != 0) {
-        func_L00_002D7140(D_L08_001B0318);
+        cam_end_override(D_L08_001B0318);
         D_L08_001B0318 = 0;
     }
 shift:
     CopyTarget(&D_L08_001B3490[2], &D_L08_001B3490[1]);
-    func_00115484(&D_L08_001B3490[1], 0, 48);
+    memset(&D_L08_001B3490[1], 0, 48);
     D_L08_001B3490[1].unk18 = 65535;
     D_L08_001B3490[1].dist = 100000.0f;
     D_L08_001B3490[0].valid = 0;

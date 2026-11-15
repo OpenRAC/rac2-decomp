@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -45,7 +46,7 @@ extern f32 ref_L18_00437BA8_11 __attribute__((sda));
 extern s32 ref_L18_00437BA8_12 __attribute__((sda));
 
 /* Spawns a ring of small sparks around a point, each flying outward at its own random speed. */
-void func_L18_00437BA8(void *position, s32 count) {
+void part_l18_spawn_ring_of_sparks(void *position, s32 count) {
     f32 radialSpeed;
     f32 angleStep;
     f32 angle;

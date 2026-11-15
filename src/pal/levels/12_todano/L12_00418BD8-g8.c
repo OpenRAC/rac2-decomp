@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 /* func_PAL_L12_00418BD8, the PAL copy of func_L12_00413CE0: the same C, with the value
@@ -45,7 +46,7 @@ extern s32 D_L12_001B1840 __attribute__((sda));
 
 extern u8 *D_L12_001FEAC0[];
 
-extern f32 func_00282E80(void *a, void *b);
+extern f32 vec_distance_xy(void *a, void *b);
 
 /* Hands the object's path state to the nearest eligible entity of its group. */
 void func_PAL_L12_00418BD8(u8 *a0)
@@ -71,7 +72,7 @@ void func_PAL_L12_00418BD8(u8 *a0)
             if (e == 0)
                 break;
             sub = *(PathState **)(e + 0x68);
-            d = func_00282E80(e + 0x10, vec);
+            d = vec_distance_xy(e + 0x10, vec);
             if (sub != 0 && (sub->f302 & 1)) {
                 if (d < bestd) {
                     bestd = d;

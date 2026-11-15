@@ -14,16 +14,16 @@ extern float D_L00_001B00E4 __attribute__((sda));
 extern float D_L00_001B00E8 __attribute__((sda));
 extern int D_L00_001B00EC __attribute__((sda));
 extern char D_L00_002403C0[];
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_0018A0E0[];
-extern u64 func_0027C878(int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 typedef unsigned int Quad83E0 __attribute__((mode(TI)));
 typedef union { Quad83E0 q; float f[4]; } Vec83E0;
 typedef struct {
@@ -32,7 +32,7 @@ typedef struct {
     float params[8];
     u64 regs[4];
 } DrawPacket83E0;
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 extern unsigned int D_L00_001B003C __attribute__((sda));
 extern int D_L00_001B2AC0[] __attribute__((sda));
 extern float D_L00_001B2A90[] __attribute__((sda));
@@ -42,7 +42,7 @@ extern Vec83E0 D_L00_001B2A50[] __attribute__((sda));
 /* Two passes of a camera-facing quad placed from object + 0xD0 (scaled by D_L00_001B00E8) and
    D_L00_002403C0: first with colour D_L00_001B00EC and corner scale D_L00_001B00E0, then
    white with corner scale D_L00_001B00E4. */
-void func_L00_003C8608(char *object)
+void DrawBeamOriginCameraFacingQuads(char *object)
 {
     DrawPacket8608 packet;
     float basis[4][4];
@@ -58,7 +58,7 @@ void func_L00_003C8608(char *object)
         packet.colours[2] = packet.colours[3] = D_L00_001B00EC;
     vec_scale_to_length(offset, object + 0xD0, D_L00_001B00E8);
     FastVecAdd(basis[3], D_L00_002403C0, offset);
-    FastVecSub(offset, gCameraPosition_L00, basis[3]);
+    FastVecSub(offset, g_camera_l00_position, basis[3]);
     vec_scale_to_length(basis[0], offset, 1.0f);
     FastVecCross(basis[1], basis[0], D_0018A0E0);
     vec_scale_to_length(basis[1], basis[1], -1.0f);
@@ -81,7 +81,7 @@ void func_L00_003C8608(char *object)
    the up vector D_0018A0E0, placed at D_L00_001B2A20[i], corners D_L00_001B00A0 scaled by
    D_L00_001B2AB0[i], alpha from D_L00_001B2A90[i] and colour D_L00_001B003C. The spark tables
    are incomplete sda arrays, which gives retail's unsplit lui/addiu addresses. */
-void func_L00_003C83E0(void)
+void DrawLightningArcSparks2(void)
 {
     DrawPacket83E0 packet;
     Vec83E0 basis[4], vertex;

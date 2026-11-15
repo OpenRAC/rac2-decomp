@@ -10,22 +10,22 @@ typedef struct {
     s32 value;
 } SpawnVars;
 
-extern u8 *func_0029EFD0(s32);
-extern void func_002B37E8(u8 *, u8 *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00282E20(void *);
+extern u8 *CreateMoby(s32);
+extern void moby_init_child_from_parent(u8 *, u8 *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 vec_length_xy(void *);
 extern f32 D_L03_001B08D8 __attribute__((sda));
 
 u8 *func_PAL_L03_003DDB50(u8 *owner, void *position, f32 *velocity, s32 value)
 {
-    u8 *object = func_0029EFD0(0xA72);
+    u8 *object = CreateMoby(0xA72);
     SpawnVars *vars;
     if (object != 0) {
         vars = *(SpawnVars **)(object + 0x68);
-        func_002B37E8(object, owner);
+        moby_init_child_from_parent(object, owner);
         qcopy(object + 0x10, position);
-        *(f32 *)(object + 0xF8) = func_00283248(velocity[0], velocity[1]);
-        *(f32 *)(object + 0xF4) = -func_00283248(func_00282E20(velocity), velocity[2]);
+        *(f32 *)(object + 0xF8) = mat_fast_helper_a(velocity[0], velocity[1]);
+        *(f32 *)(object + 0xF4) = -mat_fast_helper_a(vec_length_xy(velocity), velocity[2]);
         qcopy(vars, velocity);
         vars->value = value;
         vars->timer = 0x4B;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* snd_BankLoadByLoc and snd_BankLoadFromIOP (989snd): synchronous bank loads over RPC.
 
    Both end by waiting for the RPC reply word, which RAC1 writes as a plain
@@ -30,41 +31,41 @@ extern char D_001A7650[];
 extern char D_001A7730[];
 extern char D_001A7760[];
 
-extern void func_00115D48(const void *, ...);
-extern int func_00133580(int);
-extern void func_00132028(void);
-extern void func_0011AEA0(int);
-extern int func_0011D810(const void *);
-extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int, int, int);
+extern void printf(const void *, ...);
+extern int snd_CheckLoadInProgress(int);
+extern void snd_Pump(void);
+extern void FlushCache(int);
+extern int sif_rpc_is_handle_valid(const void *);
+extern int sceSifCallRpc(const void *, int, int, int *, int, unsigned int *, int, int, int);
 
 /* Loads a sound bank from a disc position and waits for the answer. */
-unsigned int func_00132318(int loc, int offset) {
+unsigned int snd_BankLoadByLoc(int loc, int offset) {
     unsigned int reply;
     unsigned int busy;
 
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7600);
+            printf(D_001A7600);
         return 0;
     }
     if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7630);
+            printf(D_001A7630);
         return 0;
     }
     D_001A71C0 = loc;
     D_001A71C4 = offset;
     D_001A7180 = -1u;
-    while (IsRpcHandleValid(&D_001A7140) != 0) {
+    while (sif_rpc_is_handle_valid(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7578);
+            printf(D_001A7578);
         snd_Pump();
         FlushCache(0);
     }
-    if (CallRpcServer(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0) < 0) {
+    if (sceSifCallRpc(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0) < 0) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7650);
+            printf(D_001A7650);
         D_001A7488 = 0x106;
         return 0;
 reread:
@@ -85,7 +86,7 @@ done:
 }
 
 /* Loads a sound bank by id and waits for the answer. */
-unsigned int func_001326D8(int bankId) {
+unsigned int snd_BankLoadFromIOP(int bankId) {
     unsigned int reply;
     unsigned int busy;
 
@@ -93,21 +94,21 @@ unsigned int func_001326D8(int bankId) {
     if (D_001A74C8 != 0) {
         if (D_001A74F8 != 0)
             return 0;
-        Printf(D_001A7730);
+        printf(D_001A7730);
         return 0;
     }
     D_001A71C0 = bankId;
     D_001A7180 = -1u;
-    while (IsRpcHandleValid(&D_001A7140) != 0) {
+    while (sif_rpc_is_handle_valid(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7578);
+            printf(D_001A7578);
         snd_Pump();
         FlushCache(0);
     }
-    if (CallRpcServer(&D_001A7140, 0x59, 1, &D_001A71C0, 4, &D_001A7180, 4, 0,
+    if (sceSifCallRpc(&D_001A7140, 0x59, 1, &D_001A71C0, 4, &D_001A7180, 4, 0,
                       0) < 0) {
         if (D_001A74F8 == 0)
-            Printf(D_001A7760);
+            printf(D_001A7760);
         D_001A7488 = 0x106;
         return 0;
 reread:

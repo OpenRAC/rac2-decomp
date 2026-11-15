@@ -5,7 +5,7 @@ extern int r1_func_0012AAA8(void *, int);
 
 extern int r1_func_0012AB60(void *arg0, int arg1);
 
-extern int func_0012F070();
+extern int mpeg_skip_system_header();
 
 extern void r1_func_0012C468_a(void *, void *) __asm__("func_00130288");
 
@@ -37,7 +37,7 @@ struct PES_TBL {
     unsigned char v[16];
 } __attribute__((packed));
 
-extern void func_00130288(void *, void *);
+extern void mpeg_report_error(void *, void *);
 
 extern int r1_func_0011D960(void);
 
@@ -53,17 +53,17 @@ extern void *r1_func_001153FC_p(void *, int, unsigned int) __asm__("r1_func_0011
 
 extern char r1_D_00153B10[];
 
-extern void func_0012FB48(void *, int, int);
+extern void mpeg_init_counters(void *, int, int);
 
-extern unsigned int func_0012FB80(void *, char *, unsigned int, unsigned int);
+extern unsigned int mpeg_alloc_aligned(void *, char *, unsigned int, unsigned int);
 
-extern void func_00130118(void *);
+extern void mpeg_set_scratchpad_buffers(void *);
 
-extern void func_0012F9C8(void *);
+extern void sceMpegReset(void *);
 
-extern int func_0012FA18(void *);
+extern int mpeg_clear_buffer_flags(void *);
 
-extern void func_0012FB60(void *);
+extern void mpeg_copy_counter(void *);
 
 extern void r1_func_0012CC70(void);
 
@@ -71,7 +71,7 @@ extern void r1_func_0012CC80(void);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012B250 */
 /* Skips the system header of a movie stream. Returns 1. */
-int func_0012F070(void *stream) {
+int mpeg_skip_system_header(void *stream) {
     r1_func_0012AB60(stream, 0x38);
     r1_func_0012AB60(stream, 0x28);
     while (r1_func_0012AAA8(stream, 1) == 1) {
@@ -84,7 +84,7 @@ int func_0012F070(void *stream) {
 /* Parse one MPEG-2 PES packet header from the bit stream into hdr (libmpeg _PES_packet).
    Adapted from Lombyte (GPL-3.0) for PAL: src/sdk/library/_PES_packet.c, _PES_packet. */
 /* Reads one packet header of a movie stream and records its type, length and timestamps. */
-int func_0012F0E0(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr) {
+int mpeg_read_pes_packet_header(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr) {
     struct PES_TBL tbl;
     int mpegCtx;
     int flag1;
@@ -241,7 +241,7 @@ int func_0012F0E0(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr) {
  * tail call into r1_func_0012D068.
  */
 /* Starts up the movie player by resetting its DMA channels. */
-void func_0012F690(void) {
+void sceMpegInit(void) {
     int intrState = r1_func_0011D960();
 
     D_ENABLEW =
@@ -280,7 +280,7 @@ void func_0012F690(void) {
  * order that schedules as retail's.
  */
 /* Sets up a movie player in a work area. Returns 0 if the area is too small. */
-int func_0012F738(void *mpeg, void *workarea, int size) {
+int sceMpegCreate(void *mpeg, void *workarea, int size) {
     char *mpegPtr = (char *)mpeg;
     unsigned int workAddr = (unsigned int)workarea;
     char *decoder;
@@ -294,14 +294,14 @@ int func_0012F738(void *mpeg, void *workarea, int size) {
     availBytes = (unsigned int)size - ((unsigned int)decoder - workAddr);
 
     if (availBytes < 0x10C0) {
-        ReportMpegError(decoder, r1_D_00153B10);
+        mpeg_report_error(decoder, r1_D_00153B10);
         return 0;
     }
 
     heap = decoder + 0x108;
     *(int *)(mpegPtr + 0x40) = (int)decoder;
     availBytes -= 0x10C0;
-    InitMpegCounters(heap, (int)(decoder + 0x10C0), (int)availBytes);
+    mpeg_init_counters(heap, (int)(decoder + 0x10C0), (int)availBytes);
     neg1 = -1;
 
     *(int *)(mpegPtr + 0x0) = 0;
@@ -338,7 +338,7 @@ int func_0012F738(void *mpeg, void *workarea, int size) {
     *(int *)(decoder + 0x1C) = (int)r1_func_0012CC70;
     *(int *)(decoder + 0x24) = (int)r1_func_0012CC80;
 
-    *(int *)(decoder + 0x44) = (int)AllocMpegAligned(decoder, heap, 0x600, 8);
+    *(int *)(decoder + 0x44) = (int)mpeg_alloc_aligned(decoder, heap, 0x600, 8);
 
     *(int *)(decoder + 0x48) = 0;
     *(int *)(decoder + 0xFC) = 0;
@@ -356,9 +356,9 @@ int func_0012F738(void *mpeg, void *workarea, int size) {
     *(int *)(decoder + 0x858) = (int)mpegPtr;
     *(int *)(decoder + 0xB0) = 1;
 
-    SetMpegScratchpadBuffers(decoder);
-    ResetMpegDecoder(mpegPtr);
-    ClearMpegBufferFlags(mpegPtr);
+    mpeg_set_scratchpad_buffers(decoder);
+    sceMpegReset(mpegPtr);
+    mpeg_clear_buffer_flags(mpegPtr);
 
     *(int *)(decoder + 0x1B8) = (int)(decoder + 0x1E8);
     *(int *)(decoder + 0x1BC) = (int)(decoder + 0x250);
@@ -370,7 +370,7 @@ int func_0012F738(void *mpeg, void *workarea, int size) {
     *(int *)(decoder + 0x1DC) = (int)(decoder + 0x4C0);
     *(int *)(decoder + 0x1E4) = (int)(decoder + 0x528);
 
-    CopyMpegCounter(heap);
+    mpeg_copy_counter(heap);
 
     *(int *)(decoder + 0x850) = neg1;
     *(int *)(decoder + 0x84C) = 0;

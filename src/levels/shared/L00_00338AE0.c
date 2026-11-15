@@ -23,16 +23,16 @@ typedef struct {
 /* Known payload fields beginning with the second full vector. */
 typedef struct { V4 vector; f32 random, rate; s32 id; } EffectPayload;
 
-extern void *func_002B9030(s32 kind);
-extern s32 func_002A77E0(s32 limit);
-extern s32 func_00283CF0(f32 value);
-extern f32 func_002A7878(f32 a, f32 b);
+extern void *part_alloc(s32 kind);
+extern s32 math_random_int_below(s32 limit);
+extern s32 FloatToInt(f32 value);
+extern f32 math_random_float_range(f32 a, f32 b);
 extern unsigned char *ref_L00_00338AE0_00;
 
 /* Creates a short-lived visual effect at a position, with a random start color and a size set by the given value. */
-Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f32 value2)
+Obj_L00_00338AE0 *part_spawn_random_tinted_effect(char *src1, char *src2, s32 a2, f32 value, f32 value2)
 {
-    Obj_L00_00338AE0 *o = (Obj_L00_00338AE0 *)AllocParticle(0x2E);
+    Obj_L00_00338AE0 *o = (Obj_L00_00338AE0 *)part_alloc(0x2E);
     f32 r;
     u8 tag;
     EffectPayload *payload;
@@ -40,7 +40,7 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
     if (o != 0) {
         qcopy(&o->v10, src1);
         payload = (EffectPayload *)&o->v20;
-        o->w4 = ((RandomIntBelow(10) + 0x26) << 24) | 0x00808080;
+        o->w4 = ((math_random_int_below(10) + 0x26) << 24) | 0x00808080;
         o->b9 = FloatToInt(1.0f) + 0x20;
         o->b3 = 0x48;
         o->b1 = 1;
@@ -49,7 +49,7 @@ Obj_L00_00338AE0 *func_L00_00338AE0(char *src1, char *src2, s32 a2, f32 value, f
         o->b2 = tag;
         o->f_c = value * 210000.0f;
         qcopy(&payload->vector, src2);
-        r = RandomFloatRange(0.0f, 256.0f);
+        r = math_random_float_range(0.0f, 256.0f);
         payload->random = r;
         o->b8 = FloatToInt(r);
         payload->rate = value2;

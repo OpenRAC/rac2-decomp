@@ -13,7 +13,7 @@ typedef struct LeanHero {
     char pad1318[0x2294 - 0x1318];
     int mode;
 } LeanHero;
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 /* The pose fields updated by this function. */
 typedef struct Rac2Native_002B8CB8_Record {
@@ -34,13 +34,13 @@ extern float D_L00_001A7CF8 __attribute__((sda));
 extern char D_L00_0025BE10[];
 extern float D_L00_0025CB1C[];
 
-extern float func_00282C48(float f);
+extern float math_fabs(float f);
 
 /* Updates mode-2 lean and sway using the hero turn and item moby scale. */
-void func_L00_002B8CB8(void)
+void UpdateHeroLeanAndSwayParameters(void)
 {
     LeanMoby *live;
-    LeanHero *st = (LeanHero *)gHeroState;
+    LeanHero *st = (LeanHero *)g_hero_state;
     float x;
     float y;
     float share;
@@ -72,7 +72,7 @@ void func_L00_002B8CB8(void)
     ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_CC8 = y;
 
     share = 0.1f;
-    len = FloatAbs(x) * share;
+    len = math_fabs(x) * share;
     share = len + share;
     if (0.07f < share)
         share = 0.07f;

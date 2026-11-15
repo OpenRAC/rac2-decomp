@@ -16,31 +16,31 @@ typedef struct {
     short ammoTimer, cooldown, targetReady, secondaryReady, targetTimer, secondaryTimer;
     int sound;
 } DualBeamState;
-extern Hero D_00189E20;
-extern u32 D_00138180[];
-extern u8 D_00188660[];
+extern Hero g_hero_state;
+extern u32 g_pad_state[];
+extern u8 g_sound_state[];
 extern float D_001B323C NOT_SDA;
 extern u8 D_0013957A[];
 typedef struct { u8 pad[4]; u8 flag; u8 rest[0xDB]; } LevelInfo;
-extern LevelInfo D_00239BA0[];
+extern LevelInfo g_weapon_table[];
 typedef struct { float color[3]; float pad; float pos[3]; float radius; } Light;
 extern Light D_001C2B40[];
 extern int D_001AEDF0 __attribute__((sda)), D_001B23E0 __attribute__((sda));
-extern u32 D_001A7390, D_001A79F0;
-extern Statistics D_0018C360[], D_0018C750[];
-extern int func_0026F740(int);
-extern int func_0026F738(int, int);
-extern int func_00282948(int *), func_00282978(short *);
-extern void func_00273318(void *, u32, void *, int, int, int, float, float, float);
-extern s16 func_00291308(void *, int, float, float);
-extern int func_002E5CF8(int, int, char *), func_002E59B0(void *, int);
-extern float func_00283248(float, float), func_00283C80(float, float), func_00282E48(void *, void *), func_00283CE0(int);
-extern void func_002AFFD8(void *, void *, int), func_00282D30(void *, void *, float), func_00282CC0(void *, void *, void *);
-extern char *func_002AB1F0(char *);
-extern void func_0029FCC0(void *, int, void *), func_00283098(void *, void *, void *), func_00282F20(void *, void *, float);
+extern u32 D_001A7390, g_current_map_index;
+extern Statistics D_0018C360[], g_progress_statistics[];
+extern int stub_empty_7(int);
+extern int stub_empty_6(int, int);
+extern int math_fast_float_d(int *), FastDecTimer(short *);
+extern void hud_add_moby_marker(void *, u32, void *, int, int, int, float, float, float);
+extern s16 gfx_add_point_light(void *, int, float, float);
+extern int PlayMobySound(int, int, char *), snd_is_voice_playing_for_owner(void *, int);
+extern float mat_fast_helper_a(float, float), FastDiffRots(float, float), fast_vec_dist(void *, void *), IntToFloat(int);
+extern void cam_compute_view_direction(void *, void *, int), FastVecScale(void *, void *, float), FastVecAdd(void *, void *, void *);
+extern char *moby_get_private_value_0(char *);
+extern void moby_transform_joint_to_world(void *, int, void *), matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
 extern void func_PAL_0030B4E0(char *), func_PAL_0030B6C0(char *), func_PAL_0030CE20(void *);
-extern void func_0027CFD0(void (*)(void *), void *), func_002E59F8(int);
-extern void func_0026F760(void), func_0026F768(void), func_00291450(int);
+extern void gfx_register_overlay_draw_callback(void (*)(void *), void *), snd_stop_voice(int);
+extern void stub_empty_11(void), stub_empty_12(void), gfx_free_point_light(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
 void func_PAL_0030A9D8(char *actor) {
@@ -52,57 +52,57 @@ void func_PAL_0030A9D8(char *actor) {
     int stopping, active, permitted, ammo, limit;
     float fade;
 
-    stopping = D_00189E20.i[0x1244 / 4] == 3;
+    stopping = g_hero_state.i[0x1244 / 4] == 3;
     beam = *(DualBeamState **)(actor + 0x68);
-    if ((D_00138180[0x1A4 / 4] & D_00189E20.u[0x1230 / 4]) && !D_00189E20.b[0x22BC]) beam->length = 0.8f;
+    if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) beam->length = 0.8f;
     D_001B323C = 0.9f;
     active = 0;
     permitted = 1;
-    ammo = func_0026F740(-1);
-    if (D_00189E20.i[0x2294 / 4] == 1) {
-        if (!func_00282948(&D_00189E20.i[0x2534 / 4])) permitted = 0;
-        else func_00273318(actor, !func_0026F740(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
-    } else D_00189E20.i[0x2534 / 4] = 33;
-    if ((D_00138180[0x1A0 / 4] & D_00189E20.u[0x1230 / 4]) && (u8)actor[0x20] != 4 && (u8)actor[0x20] &&
-        !D_00189E20.b[0x22BC] && D_00189E20.i[0x2294 / 4] != 0x6F && D_00189E20.i[0x1240 / 4] >= 19 && permitted) {
+    ammo = stub_empty_7(-1);
+    if (g_hero_state.i[0x2294 / 4] == 1) {
+        if (!math_fast_float_d(&g_hero_state.i[0x2534 / 4])) permitted = 0;
+        else hud_add_moby_marker(actor, !stub_empty_7(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
+    } else g_hero_state.i[0x2534 / 4] = 33;
+    if ((g_pad_state[0x1A0 / 4] & g_hero_state.u[0x1230 / 4]) && (u8)actor[0x20] != 4 && (u8)actor[0x20] &&
+        !g_hero_state.b[0x22BC] && g_hero_state.i[0x2294 / 4] != 0x6F && g_hero_state.i[0x1240 / 4] >= 19 && permitted) {
         if (!beam->timer) {
             if (ammo > 0) {
-            if (func_00282978(&beam->ammoTimer)) {
-                func_00282978(&beam->targetTimer);
-                func_00282978(&beam->secondaryTimer);
-                func_0026F738(-1, 1);
+            if (FastDecTimer(&beam->ammoTimer)) {
+                FastDecTimer(&beam->targetTimer);
+                FastDecTimer(&beam->secondaryTimer);
+                stub_empty_6(-1, 1);
                 beam->ammoTimer = 8;
             }
-            if (beam->light == -1) beam->light = func_00291308(actor + 0x10, 0, 7.5f, 0);
+            if (beam->light == -1) beam->light = gfx_add_point_light(actor + 0x10, 0, 7.5f, 0);
             else if (beam->fade < 8) beam->fade++;
             active = 1;
             if (beam->target) {
-                if (func_00283C80(D_00189E20.f[0x98 / 4],
-                                  func_00283248(*(float *)(beam->target + 0x10) - D_00189E20.f[0x80 / 4],
-                                                *(float *)(beam->target + 0x14) - D_00189E20.f[0x84 / 4])) > 2.0943f ||
-                    !((u8 *)beam->target)[0x31] || func_00282E48(beam->target + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
+                if (FastDiffRots(g_hero_state.f[0x98 / 4],
+                                  mat_fast_helper_a(*(float *)(beam->target + 0x10) - g_hero_state.f[0x80 / 4],
+                                                *(float *)(beam->target + 0x14) - g_hero_state.f[0x84 / 4])) > 2.0943f ||
+                    !((u8 *)beam->target)[0x31] || fast_vec_dist(beam->target + 0x10, &g_hero_state.f[0x80 / 4]) > 20) {
                     beam->target = 0;
                     beam->targetReady = 0;
                 }
             }
             if (beam->secondary) {
-                if (func_00283C80(D_00189E20.f[0x98 / 4],
-                                  func_00283248(*(float *)(beam->secondary + 0x10) - D_00189E20.f[0x80 / 4],
-                                                *(float *)(beam->secondary + 0x14) - D_00189E20.f[0x84 / 4])) > 2.0943f ||
-                    !((u8 *)beam->secondary)[0x31] || func_00282E48(beam->secondary + 0x10, &D_00189E20.f[0x80 / 4]) > 20) {
+                if (FastDiffRots(g_hero_state.f[0x98 / 4],
+                                  mat_fast_helper_a(*(float *)(beam->secondary + 0x10) - g_hero_state.f[0x80 / 4],
+                                                *(float *)(beam->secondary + 0x14) - g_hero_state.f[0x84 / 4])) > 2.0943f ||
+                    !((u8 *)beam->secondary)[0x31] || fast_vec_dist(beam->secondary + 0x10, &g_hero_state.f[0x80 / 4]) > 20) {
                     beam->secondary = 0;
                     beam->secondaryReady = 0;
                 }
             }
-            func_002AFFD8(beam, &direction, 1);
+            cam_compute_view_direction(beam, &direction, 1);
             qcopy(&beam->start, actor + 0x10);
-            func_00282D30(&offset, &direction, 0.7f);
-            func_00282CC0(&beam->start, &beam->start, &offset);
+            FastVecScale(&offset, &direction, 0.7f);
+            FastVecAdd(&beam->start, &beam->start, &offset);
             qcopy(&beam->end, &beam->start);
             if (beam->target && beam->targetReady) {
                 limit = 50;
                 beam->targetAge++;
-                entry = func_002AB1F0(beam->target);
+                entry = moby_get_private_value_0(beam->target);
                 if (entry && *(short *)(entry + 4) == 1) limit = 5;
                 if (beam->targetAge >= ((s32)(limit) * 5 + 2) / 6) {
                     beam->target = 0;
@@ -112,29 +112,29 @@ void func_PAL_0030A9D8(char *actor) {
             if (beam->secondary && beam->secondaryReady) {
                 limit = 50;
                 beam->secondaryAge++;
-                entry = func_002AB1F0(beam->secondary);
+                entry = moby_get_private_value_0(beam->secondary);
                 if (entry && *(short *)(entry + 4) == 1) limit = 5;
                 if (beam->secondaryAge >= ((s32)(limit) * 5 + 2) / 6) {
                     beam->secondary = 0;
                     beam->secondaryReady = 0;
                 }
             } else beam->secondaryAge = 0;
-            beam->length += (((D_00239BA0 + D_0013957A[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.08400001f;
-            if (D_00189E20.h[0x24EC / 2] == 1) {
-                func_0029FCC0(actor, 0, &beam->start);
+            beam->length += (((g_weapon_table + D_0013957A[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.08400001f;
+            if (g_hero_state.h[0x24EC / 2] == 1) {
+                moby_transform_joint_to_world(actor, 0, &beam->start);
                 local[0] = 0;
                 local[1] = -beam->length;
                 local[2] = 0;
-                func_00283098(local, local, actor + 0xC0);
-                func_00282CC0(&beam->end, &beam->start, local);
+                matrix_mul_vec3(local, local, actor + 0xC0);
+                FastVecAdd(&beam->end, &beam->start, local);
             } else {
-                func_0029FCC0(actor, 0, &beam->start);
-                func_00282F20(&beam->end, &D_00189E20.f[0x730 / 4], beam->length);
-                func_00282CC0(&beam->end, &beam->start, &beam->end);
+                moby_transform_joint_to_world(actor, 0, &beam->start);
+                vec_scale_to_length(&beam->end, &g_hero_state.f[0x730 / 4], beam->length);
+                FastVecAdd(&beam->end, &beam->start, &beam->end);
             }
             func_PAL_0030B4E0(actor);
             func_PAL_0030B6C0(actor);
-            func_0027CFD0(func_PAL_0030CE20, actor);
+            gfx_register_overlay_draw_callback(func_PAL_0030CE20, actor);
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
@@ -154,12 +154,12 @@ void func_PAL_0030A9D8(char *actor) {
         D_001AEDF0 = 1;
         if (beam->fade > 0) beam->fade--;
         if (beam->sound != -1) {
-            sound = D_00188660 + beam->sound * 0x70;
-            if (*(char **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(beam->sound);
+            sound = g_sound_state + beam->sound * 0x70;
+            if (*(char **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(beam->sound);
         }
         beam->sound = -1;
     } else {
-        if (!func_002E59B0(actor, beam->sound)) beam->sound = func_002E5CF8(4, 4, actor);
+        if (!snd_is_voice_playing_for_owner(actor, beam->sound)) beam->sound = PlayMobySound(4, 4, actor);
     }
     if (!beam->target || (u8)beam->target[0x20] == 0xFE || (u8)beam->target[0x20] == 0xFD ||
         !(*(u16 *)(beam->target + 0x34) & 0x1000))
@@ -170,7 +170,7 @@ void func_PAL_0030A9D8(char *actor) {
     switch ((u8)actor[0x20]) {
     case 0:
         beam->timer = 13;
-        beam->light = func_00291308(&beam->start, 0, 0, 0);
+        beam->light = gfx_add_point_light(&beam->start, 0, 0, 0);
         D_001AEDF0 = 1;
         actor[0x20] = 1;
         beam->cooldown = 20;
@@ -184,17 +184,17 @@ void func_PAL_0030A9D8(char *actor) {
         D_001B23E0 = 8;
         break;
     case 1:
-        func_00282948(&beam->timer);
+        math_fast_float_d(&beam->timer);
         if (active) {
-            func_0026F760();
+            stub_empty_11();
             actor[0x20] = 3;
         }
-        if ((D_00138180[0x1A4 / 4] & D_00189E20.u[0x1230 / 4]) && !D_00189E20.b[0x22BC]) {
+        if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) {
             if (active) {
                 if (D_0018C360[18].count < 0xFFFF) D_0018C360[18].count++;
                 if (D_0018C360[18].maximum < ((s32)D_001A7390 * 5 + 2) / 6) D_0018C360[18].maximum = ((s32)D_001A7390 * 5 + 2) / 6;
-                D_0018C360[18].levels = (D_0018C360[18].levels | (1u << D_001A79F0)) | 0x80000000u;
-                func_0026F760();
+                D_0018C360[18].levels = (D_0018C360[18].levels | (1u << g_current_map_index)) | 0x80000000u;
+                stub_empty_11();
                 actor[0x20] = 3;
             } else {
                 beam->target = 0;
@@ -202,26 +202,26 @@ void func_PAL_0030A9D8(char *actor) {
                 beam->targetReady = 0;
                 beam->secondaryReady = 0;
                 actor[0x20] = 1;
-                func_002E5CF8(0, 0, actor);
-                func_0026F768();
+                PlayMobySound(0, 0, actor);
+                stub_empty_12();
             }
         }
         break;
     case 3:
-        if (!(D_00138180[0x1A8 / 4] & D_00189E20.u[0x1230 / 4]) && active && !D_00189E20.b[0x22BC]) break;
-        if (D_00189E20.i[0x1D8 / 4] > 58) {
-            if (D_0018C750[26].count < 0xFFFF) D_0018C750[26].count++;
+        if (!(g_pad_state[0x1A8 / 4] & g_hero_state.u[0x1230 / 4]) && active && !g_hero_state.b[0x22BC]) break;
+        if (g_hero_state.i[0x1D8 / 4] > 58) {
+            if (g_progress_statistics[26].count < 0xFFFF) g_progress_statistics[26].count++;
         }
-        if (D_0018C750[26].maximum < ((s32)D_001A7390 * 5 + 2) / 6) D_0018C750[26].maximum = ((s32)D_001A7390 * 5 + 2) / 6;
-        D_0018C750[26].levels = (D_0018C750[26].levels | (1u << D_001A79F0)) | 0x80000000u;
-        if (D_00189E20.i[0x1D8 / 4] < 25) D_00189E20.b[0x22C5]++;
-        else D_00189E20.b[0x22C5] = 0;
+        if (g_progress_statistics[26].maximum < ((s32)D_001A7390 * 5 + 2) / 6) g_progress_statistics[26].maximum = ((s32)D_001A7390 * 5 + 2) / 6;
+        g_progress_statistics[26].levels = (g_progress_statistics[26].levels | (1u << g_current_map_index)) | 0x80000000u;
+        if (g_hero_state.i[0x1D8 / 4] < 25) g_hero_state.b[0x22C5]++;
+        else g_hero_state.b[0x22C5] = 0;
         beam->target = 0;
         beam->secondary = 0;
         beam->targetReady = 0;
         beam->secondaryReady = 0;
         beam->length = 0;
-        func_0026F768();
+        stub_empty_12();
         actor[0x20] = 1;
         break;
     case 2:
@@ -233,17 +233,17 @@ void func_PAL_0030A9D8(char *actor) {
         qzero_nc(&direction);
         direction.f[0] = 2;
         direction.f[2] = 2;
-        func_00283098(&direction, &direction, &D_00189E20.f[0x730 / 4]);
-        (D_001C2B40 + beam->light)->pos[0] = D_00189E20.f[0x80 / 4] + direction.f[0];
-        (D_001C2B40 + beam->light)->pos[1] = D_00189E20.f[0x84 / 4] + direction.f[1];
-        (D_001C2B40 + beam->light)->pos[2] = D_00189E20.f[0x88 / 4] + direction.f[2];
+        matrix_mul_vec3(&direction, &direction, &g_hero_state.f[0x730 / 4]);
+        (D_001C2B40 + beam->light)->pos[0] = g_hero_state.f[0x80 / 4] + direction.f[0];
+        (D_001C2B40 + beam->light)->pos[1] = g_hero_state.f[0x84 / 4] + direction.f[1];
+        (D_001C2B40 + beam->light)->pos[2] = g_hero_state.f[0x88 / 4] + direction.f[2];
         (D_001C2B40 + beam->light)->radius = 7.5f;
-        fade = func_00283CE0(beam->fade) * 0.125f;
+        fade = IntToFloat(beam->fade) * 0.125f;
         (D_001C2B40 + beam->light)->color[2] = fade;
         (D_001C2B40 + beam->light)->color[1] = fade * 0.7f;
         (D_001C2B40 + beam->light)->color[0] = (D_001C2B40 + beam->light)->color[1];
         if (stopping && beam->light != -1) {
-            func_00291450(beam->light);
+            gfx_free_point_light(beam->light);
             beam->light = -1;
         }
     }

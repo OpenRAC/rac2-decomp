@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern int D_L22_001B2AC8 __attribute__((sda));
 
@@ -22,7 +22,7 @@ extern char D_L22_001B1910[];
  * does too (gcse otherwise keeps the earlier load across those stores). The stores through
  * $gp and through $at are retail's two forms of the same globals. */
 /* Gives the ship the effect of a pickup: more health, more ammo for one side, or more of the third value. Returns 1 when something was raised. */
-int func_L22_003A42E8(char *obj, int unused, int mode, int flag) {
+int pickup_apply_to_ship(char *obj, int unused, int mode, int flag) {
     char *state = *(char **)(obj + 0x68);
     char *entry = D_L22_001B1910 + flag * 16;
     int result = 0;
@@ -30,7 +30,7 @@ int func_L22_003A42E8(char *obj, int unused, int mode, int flag) {
     switch (mode) {
     case 0:
         if (flag) {
-            char *g = gHeroState;
+            char *g = g_hero_state;
 
             if (*(int *)(g + 0x1874) < *(short *)(state + 0x324)) {
                 *(int *)(g + 0x1874) = *(int *)(g + 0x1874) + *(short *)(state + 0x320);

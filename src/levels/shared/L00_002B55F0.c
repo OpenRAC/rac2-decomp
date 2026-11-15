@@ -58,19 +58,19 @@ extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record,
 #define PLAYER (&D_00189E20_view)
 extern int D_L16_001A8FF0 __attribute__((sda));
 
-extern void func_00282C88(void *);
-extern void func_L00_002D49F0(void);
-extern float func_00282DB0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L00_002D38A0(Quad *, Quad *, float);
-extern void func_L00_002D36E0(float *, int, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00277258(float, void *, int, void *);
+extern void vec_clear_128(void *);
+extern void hero_check_timed_condition(void);
+extern float FastVecDot(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void cam_offset_point_in_view_space(Quad *, Quad *, float);
+extern void hero_build_relative_point(float *, int, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int coll_test_point(float, void *, int, void *);
 extern int func_L00_002E0200(float, void *, int, void *, float);
-extern int func_00278870(void *, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern int coll_process_triangles(void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
@@ -117,15 +117,15 @@ typedef struct {
     int health;
 } PlayerInputView;
 
-extern PlayerInputView D_00189E20;
-extern int D_001A79F0 __attribute__((sda));
+extern PlayerInputView g_hero_state;
+extern int g_current_map_index __attribute__((sda));
 extern int D_L11_001A9010 __attribute__((sda));
 extern u8 D_001A7B0B __attribute__((sda));
 
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 
 /* Moves the hero out of any walls or objects it overlaps, trying up to eight times. Returns -1 if the hero had to move too far. */
-int func_L00_002B55F0(int mode)
+int hero_push_out_of_collisions(int mode)
 {
     Vec previous;
     Vec offset, displacement;
@@ -134,9 +134,9 @@ int func_L00_002B55F0(int mode)
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
-    ClearVector128(&offset);
+    vec_clear_128(&offset);
     if (PLAYER->path_constrain_pending) {
-        CheckHeroTimedCondition();
+        hero_check_timed_condition();
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
@@ -145,20 +145,20 @@ int func_L00_002B55F0(int mode)
     case 17:
         break;
     case 15:
-        ClearVector128(&offset);
+        vec_clear_128(&offset);
         offset.z = 0.8f;
         matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
             if (PLAYER->state == 2) {
-                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 5.0f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
-                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 0.77f);
+                cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
             }
         } else {
             offset.z = PLAYER->capsule_bottom;
@@ -168,15 +168,15 @@ int func_L00_002B55F0(int mode)
     FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 17) {
-            if (!TestPointAgainstCollision(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
+            if (!coll_test_point(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
         } else if (PLAYER->control_mode == 15) {
-            if (!TestPointAgainstCollision(0.45f, &PLAYER->position, 0x24, PLAYER->moby)) break;
+            if (!coll_test_point(0.45f, &PLAYER->position, 0x24, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
             if (player->gravity_mode || facingUp) {
-                hit = TestPointAgainstCollision(player->capsule_radius, &player->position, 0x24, player->moby);
+                hit = coll_test_point(player->capsule_radius, &player->position, 0x24, player->moby);
                 if (!player->locked)
-                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -184,7 +184,7 @@ int func_L00_002B55F0(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x24,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
+                    hit |= coll_process_triangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }

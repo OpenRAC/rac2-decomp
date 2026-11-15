@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_001A79F0 __attribute__((sda));
-extern void func_L00_00326048(void *, s32, s32, s32, float);
+extern s32 g_current_map_index __attribute__((sda));
+extern void math_store_angle_update_result(void *, s32, s32, s32, float);
 extern s32 D_L08_001A8F00[] __attribute__((sda));
 extern u8 D_001A7A40[] __attribute__((sda));
 extern u8 D_L08_001B22E0[] __attribute__((sda));
-extern s32 func_L08_00435938(void);
+extern s32 level_get_saved_count(void);
 extern u8 D_001A7A00[] __attribute__((sda));
 extern u8 D_L08_001A7C80[] __attribute__((sda));
 extern u8 D_001395B8[];
@@ -20,5 +20,5 @@ void func_PAL_L09_003C693C(u8 *a0)
 
     if (v == 0)
         return;
-    func_L00_00326048(a0, v, 0x80AAAAD2, 0x80396464, 0.07330384f);
+    math_store_angle_update_result(a0, v, 0x80AAAAD2, 0x80396464, 0.07330384f);
 }

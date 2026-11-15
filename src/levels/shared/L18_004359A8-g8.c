@@ -26,12 +26,12 @@ extern f32 D_L18_001B1688[2] __attribute__((sda));
 extern char *D_L18_001B1690[2] __attribute__((sda));
 extern char D_L18_001B3720[] __attribute__((sda));
 
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern char *func_L18_0035B6B8(char *p0, float f0, float f1, float f2, float f3, float f4, s16 p1, char *p2, s32 p3, char *p4);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern char *part_create_orbiting_effect(char *p0, float f0, float f1, float f2, float f3, float f4, s16 p1, char *p2, s32 p3, char *p4);
 
 /* Spawns a burst of small effect objects with random positions, sizes and kinds, picking one of two looks for each. */
-void func_L18_004359A8(Moby4359A8 *self) {
+void part_l18_spawn_random_burst(Moby4359A8 *self) {
     Vars4359A8 *vars = self->vars;
     s32 i;
     s32 variant;
@@ -41,11 +41,11 @@ void func_L18_004359A8(Moby4359A8 *self) {
     f32 w;
 
     for (i = 0; i < D_L18_001B165C; i++) {
-        variant = RandomIntBelow(2);
-        x = D_L18_001B1648 + RandomFloatRange(-D_L18_001B164C, D_L18_001B164C);
-        y = D_L18_001B1650 + RandomFloatRange(-D_L18_001B1654, D_L18_001B1654);
-        z = -((D_L18_001B1640 + RandomFloatRange(-D_L18_001B1644, D_L18_001B1644)) * 0.00029088825f);
-        w = D_L18_001B1678[variant] + RandomFloatRange(-D_L18_001B1688[variant], D_L18_001B1688[variant]);
-        CreateOrbitingEffect(D_L18_001B3720, x, y, z, w, D_L18_001B1680[variant], D_L18_001B1660 + RandomIntBelow(D_L18_001B1664 - D_L18_001B1660), vars->kinds[variant], variant, D_L18_001B1690[variant]);
+        variant = math_random_int_below(2);
+        x = D_L18_001B1648 + math_random_float_range(-D_L18_001B164C, D_L18_001B164C);
+        y = D_L18_001B1650 + math_random_float_range(-D_L18_001B1654, D_L18_001B1654);
+        z = -((D_L18_001B1640 + math_random_float_range(-D_L18_001B1644, D_L18_001B1644)) * 0.00029088825f);
+        w = D_L18_001B1678[variant] + math_random_float_range(-D_L18_001B1688[variant], D_L18_001B1688[variant]);
+        part_create_orbiting_effect(D_L18_001B3720, x, y, z, w, D_L18_001B1680[variant], D_L18_001B1660 + math_random_int_below(D_L18_001B1664 - D_L18_001B1660), vars->kinds[variant], variant, D_L18_001B1690[variant]);
     }
 }

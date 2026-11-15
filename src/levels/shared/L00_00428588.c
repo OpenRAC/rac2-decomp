@@ -1,5 +1,5 @@
 #include "common.h"
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 /* Measured owner prefix; its complete allocation remains unspecified. */
 struct SetupOwnerView {
     unsigned char prefix[0x194];
@@ -19,19 +19,19 @@ struct SetupBlendView {
     unsigned int wordC;
 };
 
-extern void func_00282C88(void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern float func_00283248(float,float);
+extern void vec_clear_128(void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern float mat_fast_helper_a(float,float);
 
 /* Sets up the swingshot camera when it starts. It copies the starting view, sets the follow and turn settings, and picks what to track based on what the hero is doing. */
-void func_L00_00428588(unsigned char *object)
+void cam_swingshot_init(unsigned char *object)
 {
     unsigned char *vars=*(unsigned char **)(object+0x70);
     unsigned char *part=vars+0x40;
-    unsigned char *hero=gHeroState;
+    unsigned char *hero=g_hero_state;
     unsigned char *updated;
     unsigned char *tracking;
     unsigned char *translation;
@@ -56,7 +56,7 @@ void func_L00_00428588(unsigned char *object)
         *(short *)(settings+0x1E)=120;
         *(int *)(settings+0x18)=0;
         *(short *)(settings+0x1C)=0;
-        ClearVector128(settings);
+        vec_clear_128(settings);
     }
     {
         unsigned char *settings=*(unsigned char **)(object+0x70);
@@ -78,8 +78,8 @@ void func_L00_00428588(unsigned char *object)
     qcopy(object+0x40,object);
     *(short *)(object+0x7E)=0;
     if((unsigned int)(*(int *)(hero+0x2294)-0x2B)<2) {
-        *(float *)(part+0x30)=FastSinOrCosA(*(float *)(hero+0xAEC));
-        *(float *)(part+0x34)=FastSinOrCosB(*(float *)(hero+0xAEC));
+        *(float *)(part+0x30)=math_fast_sin_or_cos_a(*(float *)(hero+0xAEC));
+        *(float *)(part+0x34)=math_fast_sin_or_cos_b(*(float *)(hero+0xAEC));
         *(int *)(part+0x38)=0;
         *(float *)(updated+0xB8)=*(float *)(hero+0xAEC);
         *(void **)(tracking+8)=*(void **)(hero+0xAD4);
@@ -89,7 +89,7 @@ void func_L00_00428588(unsigned char *object)
         *(int *)(part+0x38)=0;
         *(int *)(part+0x3C)=0;
         vec_scale_to_length(direction,direction,1.0f);
-        *(float *)(updated+0xB8)=FastMatrixHelperA(*(float *)(part+0x30),*(float *)(part+0x34));
+        *(float *)(updated+0xB8)=mat_fast_helper_a(*(float *)(part+0x30),*(float *)(part+0x34));
         *(void **)(tracking+8)=*(void **)(hero+0xAA4);
     }
     D_L00_001B8C80.value293=2;

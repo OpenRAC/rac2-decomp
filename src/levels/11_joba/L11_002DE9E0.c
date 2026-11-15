@@ -2,47 +2,47 @@
 #include "common.h"
 
 extern unsigned char D_00139574;
-extern void func_00282D30(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_L00_0038F3D8(void *);
-extern void func_L00_0038E880(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void part_spawn_spark_puff(void *);
+extern void part_l00_spawn_impact_burst(void *, void *, void *);
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139568[];
-extern char *D_0018C0B0 NOT_SDA;
+extern unsigned char g_item_slot_to_record[];
+extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
 extern int D_L11_001AC810 __attribute__((sda));
 extern int D_L11_001B3D30 __attribute__((sda)), D_L11_001B3D38 __attribute__((sda));
 extern Collision D_L11_001C0D00;
 extern Material D_L11_00279BA0[];
-extern void func_002FEE70(int, void *, int);
-extern void func_00300190(void *, void *);
-extern void func_00300248(void *, void *);
-extern void func_002FE880(void *, void *, float);
-extern void func_L00_0038F178(void *);
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00278E78(void);
-extern void func_002FD1B8(int, int, int, float, float, float, float);
-extern void func_00282C88(void *);
-extern char *func_00312D58(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern int func_002A7820(int, int);
-extern int func_002A77E0(int);
-extern void func_002BFB38(void *, void *, int, int);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00282948(char *);
-extern void func_002FEE50(int);
-extern void func_L00_0038DE70(void *, void *, void *);
+extern void part_steer_effect_direction(int, void *, int);
+extern void vec_transform_or_copy(void *, void *);
+extern void shop_trigger_current_state_effect(void *, void *);
+extern void vec_add_object_direction_scaled(void *, void *, float);
+extern void part_emit_sparkle(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern void RippleDisturb(int, int, int, float, float, float, float);
+extern void vec_clear_128(void *);
+extern char *moby_spawn_scaled_effect(void *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int math_random_int_range(int, int);
+extern int math_random_int_below(int);
+extern void part_spawn_spark_2(void *, void *, int, int);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_fast_float_d(char *);
+extern void table_clear_entry_flag(int);
+extern void part_spawn_big_explosion(void *, void *, void *);
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
 
 /* func_L11_002DE9E0 is in the sibling file L11_002DE9E0-decider.c (its own profile). */
@@ -68,21 +68,21 @@ typedef struct {
 } MobList_L11_0030F060;
 
 extern MobList_L11_0030F060 ref_L11_0030F060_00;
-extern int D_001A79F0 __attribute__((sda));
-extern void func_L00_002FC980(void);
-extern void func_002E64A0(void *);
-extern void func_L00_00326048(void *, void *, int, int, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L11_0030ED58(void *);
+extern int g_current_map_index __attribute__((sda));
+extern void anim_start_startup_animations(void);
+extern void UpdateEquipmentPieces(void *);
+extern void math_store_angle_update_result(void *, void *, int, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void level_start_progress_cue(void *);
 
 /* Walks the level's list of mobs like func_L02_00300CE8; when the game state is 0xB and the
    list's word at +0x30 is 2 it queues func_L11_0030ED58. */
 /* Goes through all the objects in the level every frame and flags or updates a few special
    kinds, such as the TV screens. */
-void func_L11_0030F060(void) {
+void moby_update_list_flags(void) {
     int i;
 
-    StartStartupAnimations();
+    anim_start_startup_animations();
     for (i = 0; i < ref_L11_0030F060_00.count; i++) {
         Mob_L11_0030F060 *mob = ref_L11_0030F060_00.mobs[i];
 
@@ -91,25 +91,25 @@ void func_L11_0030F060(void) {
         if (mob->type == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(mob);
         if (mob != 0 && mob->type == 0xFA0 /* TV Screens */ && mob->p68 != 0)
-            StoreAngleUpdateResult(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
+            math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
-    if (gCurrentMapIndex == 0xB && ref_L11_0030F060_00.mode == 2)
-        AddDrawCallbackToList1(StartProgressCue, 0);
+    if (g_current_map_index == 0xB && ref_L11_0030F060_00.mode == 2)
+        gfx_add_draw_callback_first(level_start_progress_cue, 0);
 }
 
 
 
-extern void func_00282CF0(void *, void *, void *);
-extern int func_L02_00333480(char *, char *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern int coll_update_controller(char *, char *, void *);
 
 /* Checks a movement from an object toward a point, using the vector between them. */
-int func_L11_00340500(char *moby, void *destination)
+int coll_check_move_to_point(char *moby, void *destination)
 {
     char *position = moby + 0x10;
     float offset[4];
 
     FastVecSub(offset, destination, position);
-    return UpdateObjectController(moby, position, offset);
+    return coll_update_controller(moby, position, offset);
 }
 
 
@@ -126,7 +126,7 @@ int func_L11_00340500(char *moby, void *destination)
 
 /* Moves a shot, checks what it hits, and when it hits something it bounces or explodes
    with sparks. */
-void func_L11_003A2FF0(unsigned char *moby) {
+void shot_update_with_sparks(unsigned char *moby) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -150,20 +150,20 @@ void func_L11_003A2FF0(unsigned char *moby) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, vars, position);
-    SteerEffectDirection(*(int *)(vars + 0x1C), vars, 0);
-    TransformVectorOrCopy(position, position);
-    TriggerCurrentStateEffect(vars, vars);
-    AddObjectDirectionScaled(position, vars, 0.0030555557f);
-    EmitSparkleParticles(moby);
+    part_steer_effect_direction(*(int *)(vars + 0x1C), vars, 0);
+    vec_transform_or_copy(position, position);
+    shop_trigger_current_state_effect(vars, vars);
+    vec_add_object_direction_scaled(position, vars, 0.0030555557f);
+    part_emit_sparkle(moby);
     frame.packet.moby = moby;
     frame.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L11_00279BA0 + gItemSlotToRecord[12] * sizeof(Material)))->material;
+        ((Material *)((u32)D_L11_00279BA0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
@@ -176,25 +176,25 @@ void func_L11_003A2FF0(unsigned char *moby) {
             RippleDisturb(D_L11_001B3D30, D_L11_001B3D38, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
-            ClearVector128(vars);
+            vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(moby + 0x10);
             frame.position.f[1] = *(float *)(moby + 0x14);
             frame.position.f[2] = D_L11_001C0D00.point.f[2];
-            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
+            effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = RandomAngle();
-                speed = RandomFloatRange(0.0f, 0.050000004f);
-                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
-                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
-                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
-                lifetime = RandomIntRange(90, 120);
-                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
+                angle = math_random_angle();
+                speed = math_random_float_range(0.0f, 0.050000004f);
+                frame.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
+                frame.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
+                frame.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
+                lifetime = math_random_int_range(90, 120);
+                part_spawn_spark_2(&frame.position, spread, math_random_int_below(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -205,7 +205,7 @@ void func_L11_003A2FF0(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L11_001C0D00;
                 model = reread->hit;
@@ -213,7 +213,7 @@ void func_L11_003A2FF0(unsigned char *moby) {
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
-                FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+                vec_fast_normalize(&frame.velocity, vars, &reread->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
@@ -221,25 +221,25 @@ void func_L11_003A2FF0(unsigned char *moby) {
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &collision->point);
-                FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+                vec_fast_normalize(&frame.velocity, vars, &collision->normal);
                 vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
                 vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         moby[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
     if (moby[0xBC]) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
-        SpawnBigExplosionEffect(moby, &frame.velocity, &frame.normal);
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
+        part_spawn_big_explosion(moby, &frame.velocity, &frame.normal);
     }
 }
 
 /* Moves a shot and checks what it hits; on a hit it picks a small or big explosion based
    on its age. */
-void func_L11_003A3408(char *moby) {
+void shot_update_explode(char *moby) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -263,9 +263,9 @@ void func_L11_003A3408(char *moby) {
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
     FastVecAdd(position, position, vars);
-    ComputeViewDirection(position, &frame.surface, 0);
+    cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
-    SpawnSparkPuff(moby);
+    part_spawn_spark_puff(moby);
     frame.packet.moby = moby;
     frame.packet.flags = 0x830000;
     if (*(int *)(vars + 0x18) < 0x122)
@@ -273,7 +273,7 @@ void func_L11_003A3408(char *moby) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L11_00279BA0)->material;
     qcopy(&frame.packet.vector, vars);
-    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(moby + 0xAA);
@@ -286,7 +286,7 @@ void func_L11_003A3408(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L11_001C0D00;
             model = reread->hit;
@@ -298,7 +298,7 @@ void func_L11_003A3408(char *moby) {
                 void *dest = moby + 0x10;
                 qcopy(dest, source);
             }
-            FastVectorNormalize(&frame.velocity, vars, &reread->normal);
+            vec_fast_normalize(&frame.velocity, vars, &reread->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
@@ -307,21 +307,21 @@ void func_L11_003A3408(char *moby) {
                 goto finish;
             moby[0xBC] = 1;
             qcopy(position, &collision->point);
-            FastVectorNormalize(&frame.velocity, vars, &collision->normal);
+            vec_fast_normalize(&frame.velocity, vars, &collision->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (FastFloatHelperD(vars + 0x18)) {
+    } else if (math_fast_float_d(vars + 0x18)) {
         moby[0xBC] = 1;
         FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, vars);
     }
 finish:
     if (*(unsigned char *)(moby + 0xBC)) {
-        ClearEntryFlag(*(int *)(vars + 0x1C));
+        table_clear_entry_flag(*(int *)(vars + 0x1C));
         if (*(int *)(vars + 0x14) < 20)
-            SpawnBigExplosionEffect(moby, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion(moby, &frame.velocity, &frame.normal);
         else
-            SpawnImpactBurst(moby, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst(moby, &frame.velocity, &frame.normal);
     }
 }
 

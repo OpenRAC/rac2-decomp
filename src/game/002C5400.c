@@ -8,15 +8,15 @@ typedef struct {
     float position[4];
     float payload[8];
 } Particle;
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
 
 /* Particle tick: drift (around an anchor when it has one) and fade with the remaining life. */
 /* Updates a drifting particle (it can follow an anchor object) and fades it as time runs out. */
-void func_002C5400(Particle *p)
+void part_update_anchored_fading(Particle *p)
 {
     float *payload = p->payload;
     if (((char **)payload)[7] != 0) {
@@ -30,7 +30,7 @@ void func_002C5400(Particle *p)
         p->position[2] += payload[6];
     }
     if (FastDecTimer(&p->size)) {
-        KillParticle(p);
+        part_kill(p);
     } else if (((char **)payload)[7] != 0) {
         p->color = FastTweenColor(p->color & 0xFFFFFF, p->color, IntToFloat(p->size - 1) / IntToFloat(p->size));
     } else {

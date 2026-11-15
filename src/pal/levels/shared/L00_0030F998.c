@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 extern int func_PAL_00344528(char *, int);
@@ -19,6 +20,6 @@ void func_PAL_L00_0030F9D8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_00342758(value + 0x3E810);
+        menu_draw_if_active(value + 0x3E810);
 }
 

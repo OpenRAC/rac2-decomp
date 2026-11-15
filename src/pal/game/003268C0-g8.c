@@ -29,15 +29,15 @@ typedef struct {
     char f5B0[1];
 } TurnData;
 extern void func_PAL_002AC3C0(void *, void *);
-extern int func_00282978(void *);
-extern void func_002AEC48(void *, void *, int, float, float);
+extern int FastDecTimer(void *);
+extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void func_PAL_002B14F8(void *, void *, int, int, float);
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 extern void func_PAL_003273B8(void *, float, void *, int, void *);
 extern char D_001A8BD0[] __attribute__((sda));
-extern void func_00325430(void);
-extern void func_0027CFD0(void (*)(void), void *);
-extern void func_00325DA0(void *, void *);
+extern void gfx_draw_beam_quad_between_points_2(void);
+extern void gfx_register_overlay_draw_callback(void (*)(void), void *);
+extern void group_sync_counter(void *, void *);
 
 /* Steer the object toward its turn target and update its joint chains. */
 void func_PAL_003268C0(TurnObject *object)
@@ -45,21 +45,21 @@ void func_PAL_003268C0(TurnObject *object)
     TurnData *data = (TurnData *)object->data;
 
     if (object->f95 != 0 && object->state != 3 && object->f95 != 5 && data->f2C4 == 0) {
-        data->turnAngle = func_00283B98(data->turnAngle, data->turnRate * 0.017453294f);
+        data->turnAngle = FastAddRotations(data->turnAngle, data->turnRate * 0.017453294f);
         func_PAL_003273B8(object, data->turnAngle, data->f2A0, 1, D_001A8BD0);
     } else {
         func_PAL_003273B8(object, data->turnAngle, data->f2A0, 0, D_001A8BD0);
     }
     func_PAL_002AC3C0(object, data->f50);
-    func_00282978(data->f270);
-    func_00282978(data->f272);
-    func_00282978(data->f26);
-    func_002AEC48(object, data->f530, 7, 0.0432f, 0.43200004f);
-    func_002AEC48(object, data->f5B0, 8, 0.0432f, 0.43200004f);
+    FastDecTimer(data->f270);
+    FastDecTimer(data->f272);
+    FastDecTimer(data->f26);
+    moby_update_eased_node(object, data->f530, 7, 0.0432f, 0.43200004f);
+    moby_update_eased_node(object, data->f5B0, 8, 0.0432f, 0.43200004f);
     if (object->timer < 65535)
         object->timer++;
     if (object->state == 4 || object->state == 5 || object->f95 == 2 || object->state == 10)
-        func_0027CFD0(func_00325430, object);
-    func_00325DA0(object, data->f2FC);
+        gfx_register_overlay_draw_callback(gfx_draw_beam_quad_between_points_2, object);
+    group_sync_counter(object, data->f2FC);
     func_PAL_002B14F8(object, data->f530, 7, 1, 2.5f);
 }

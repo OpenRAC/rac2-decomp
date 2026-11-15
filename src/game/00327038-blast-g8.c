@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_0032A140: a blast object with its own unit for -G8 (the $gp store to D_001B0590) and for its
  * jump table. Mode 2 grows the radius and scatters debris, then hits every object in range once.
  *
@@ -46,27 +47,27 @@ typedef struct {
     Vec4 pos;
 } Light;
 
-extern Context D_00189E20;
+extern Context g_hero_state;
 extern char D_0018A0C0[];
 extern UVPair D_00235D00[];
-extern char D_001BAFA0[], D_001B5340[];
+extern char D_001BAFA0[], g_camera_eye_state[];
 extern Light D_001C2B40[];
 extern int D_001BF000[];
 extern int D_001B0590 __attribute__((sda));
-extern float func_002A7940(void), func_00283CE0(int), func_002A7790(float);
-extern float func_00283180(float), func_00283B98(float,float), func_00283BE0(float,float);
-extern int func_00283CF0(float), func_00282948(void *);
-extern void func_002AF000(void *,float,float,float), func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *), func_00282F20(void *,void *,float);
-extern int func_002761F8(void *,void *,int,void *,int), func_00277F48(void *,int,void *,int,float);
-extern void func_0032B598(void *,void *,int), func_0032ABC0(void *), func_0032A978(void *);
-extern void func_002A8C00(void *,void *,int,void *,float), func_002A8E20(void *,void *);
-extern void func_0032AA30(void *), func_0029F338(void *), func_00291450(int);
-extern void func_002833F0(void *,void *), func_0032ACF0(void *), func_0032AF50(void *);
-extern void func_0032B7D0(void *), func_0032B190(void), func_0027CFD0(void (*)(void),void *);
+extern float math_random_angle(void), IntToFloat(int), math_square(float);
+extern float math_fast_sin_or_cos_a(float), FastAddRotations(float,float), fast_subtract_rotations(float,float);
+extern int FloatToInt(float), math_fast_float_d(void *);
+extern void vec_build_spherical_offset(void *,float,float,float), FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *), vec_scale_to_length(void *,void *,float);
+extern int CollLine(void *,void *,int,void *,int), coll_process_hit(void *,int,void *,int,float);
+extern void part_claim_ring_piece(void *,void *,int), part_claim_debris_piece(void *), math_init_random_direction_table(void *);
+extern void make_hit_descriptor(void *,void *,int,void *,float), QueueMobyImpact(void *,void *);
+extern void part_init_trail_sparkle_pairs(void *), moby_mark_spawned(void *), gfx_free_point_light(int);
+extern void euler_rotation_basis(void *,void *), part_update_debris_pieces(void *), part_update_trail_nodes(void *);
+extern void part_update_ring_pieces(void *), gfx_update_screen_fade(void), gfx_register_overlay_draw_callback(void (*)(void),void *);
 
 /* Updates the big blast: grows a ring of debris, hurts everything in range once, then fades out and removes itself. */
-void func_0032A140(Blast *self)
+void blast_update(Blast *self)
 {
     float v[4] __attribute__((aligned(16)));
     struct {
@@ -86,46 +87,46 @@ void func_0032A140(Blast *self)
     void *info;
     float t, ratio, phase;
 
-    qcopy(&self->pos, gHeroState.object + 0x10);
+    qcopy(&self->pos, g_hero_state.object + 0x10);
     switch (self->mode) {
     case 0:
         self->mode = 1;
         state->timer = 60;
         state->radius = 0;
         for (i = 0; i < 137; i++) {
-            D_00235D00[i].u = RandomAngle();
-            D_00235D00[i].v = RandomAngle();
+            D_00235D00[i].u = math_random_angle();
+            D_00235D00[i].v = math_random_angle();
         }
     case 1:
         self->mode = 2;
     case 2:
         ratio = IntToFloat(state->timer);
         ratio /= IntToFloat(60);
-        state->radius = Square(1.0f - ratio) * 15.0f;
+        state->radius = math_square(1.0f - ratio) * 15.0f;
         if (state->timer % 3 == 0) {
-            float a = RandomAngle();
-            float b = RandomAngle();
-            BuildSphericalOffset(v, state->radius, a, b);
-            FastVecAdd(v, v, &gHeroState.pos);
-            if (CollLine(&gHeroState.pos, v, 0, gHeroState.object, 0))
+            float a = math_random_angle();
+            float b = math_random_angle();
+            vec_build_spherical_offset(v, state->radius, a, b);
+            FastVecAdd(v, v, &g_hero_state.pos);
+            if (CollLine(&g_hero_state.pos, v, 0, g_hero_state.object, 0))
                 qcopy(v, D_001BAFA0);
-            ClaimRingPiece(self, v, 10);
+            part_claim_ring_piece(self, v, 10);
         }
         if (state->timer < 10 && !(state->timer & 7))
-            ClaimDebrisPiece(self);
-        if (FastFloatHelperD(&state->timer)) {
+            part_claim_debris_piece(self);
+        if (math_fast_float_d(&state->timer)) {
             state->timer = 120;
             self->mode = 3;
-            count = ProcessCollisionHit(&gHeroState.pos, 0, self, 0, 15.0f);
+            count = coll_process_hit(&g_hero_state.pos, 0, self, 0, 15.0f);
             i = 0;
             if (i < count) {
                 list = D_001BF000;
                 info = &hit;
                 for (; i < count; i++) {
                     if ((*(unsigned long long *)((char *)list[i] + 0x30) & 0x500000000000ULL) &&
-                        (char *)list[i] != gHeroState.object &&
+                        (char *)list[i] != g_hero_state.object &&
                         *(short *)((char *)list[i] + 0xAA) != 3303 /* moby class 3303 */ && *(short *)((char *)list[i] + 0xAA) != 3000 /* Space Tourist */) {
-                        FastVecSub(v, (char *)list[i] + 0x10, &gHeroState.pos);
+                        FastVecSub(v, (char *)list[i] + 0x10, &g_hero_state.pos);
                         vec_scale_to_length(v, v, 1.0f);
                         vec_scale_to_length(info, info, 1.0f);
                         make_hit_descriptor(info, self, 0x830000, v, 30.0f);
@@ -139,27 +140,27 @@ void func_0032A140(Blast *self)
                     }
                 }
             }
-            InitRandomDirectionTable(self);
+            math_init_random_direction_table(self);
         }
         break;
     case 3:
         if (!(state->timer & 7))
-            ClaimDebrisPiece(self);
-        FastFloatHelperD(&state->timer);
-        InitTrailSparklePairs(self);
+            part_claim_debris_piece(self);
+        math_fast_float_d(&state->timer);
+        part_init_trail_sparkle_pairs(self);
         if (state->timer == 40)
             self->mode = 4;
         break;
     case 4:
-        if (FastFloatHelperD(&state->timer) && !state->done) {
+        if (math_fast_float_d(&state->timer) && !state->done) {
             if (state->first)
-                MarkMobySpawned(state->first);
+                moby_mark_spawned(state->first);
             if (state->second)
-                MarkMobySpawned(state->second);
+                moby_mark_spawned(state->second);
             if (state->light != -1)
-                FreePointLight(state->light);
+                gfx_free_point_light(state->light);
             D_001B0590 = 0;
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         break;
@@ -168,7 +169,7 @@ void func_0032A140(Blast *self)
     phase /= IntToFloat(120);
     phase = 1.0f - phase;
     phase *= 6.2831855f;
-    t = (FastSinOrCosA(phase - 3.1415927f) + 1.0f) * 0.5f;
+    t = (math_fast_sin_or_cos_a(phase - 3.1415927f) + 1.0f) * 0.5f;
     if (state->first) {
         i = FloatToInt(t * 32.0f);
         **(int **)(state->first + 0x68) = i;
@@ -177,7 +178,7 @@ void func_0032A140(Blast *self)
         *(float *)(state->first + 0xC0) *= 0.5f;
         *(float *)(state->first + 0xD4) *= 0.5f;
         *(float *)(state->first + 0xE8) = t * 1.5f;
-        qcopy(state->first + 0x10, gHeroState.object + 0x10);
+        qcopy(state->first + 0x10, g_hero_state.object + 0x10);
     }
     if (state->second) {
         i = FloatToInt(t * 32.0f);
@@ -185,21 +186,21 @@ void func_0032A140(Blast *self)
         *(float *)(state->second + 0xF8) = fast_subtract_rotations(*(float *)(state->second + 0xF8), 0.05235988646745682f);
         euler_rotation_basis(state->second + 0xC0, state->second + 0xF0);
         *(float *)(state->second + 0xE8) = t;
-        qcopy(state->second + 0x10, gHeroState.object + 0x10);
+        qcopy(state->second + 0x10, g_hero_state.object + 0x10);
     }
     if (state->light != -1) {
         light = &D_001C2B40[state->light];
         vec_scale_to_length(v, D_0018A0C0, 0.5f);
         FastVecAdd(&light->pos, *(char **)(D_0018A0C0 + 0x1FF0) + 16, v);
-        FastVecSub(v, gCameraState_001B5340, &light->pos);
+        FastVecSub(v, g_camera_eye_state, &light->pos);
         vec_scale_to_length(v, v, 0.15f);
         FastVecAdd(&light->pos, &light->pos, v);
         light->scale = t;
         light->pos.w = 5.0f;
         light->zero = 0;
     }
-    UpdateDebrisPieces(self);
-    UpdateTrailNodes(self);
-    UpdateRingPieces(self);
-    RegisterOverlayDrawCallback(UpdateScreenFade_0032B190, self);
+    part_update_debris_pieces(self);
+    part_update_trail_nodes(self);
+    part_update_ring_pieces(self);
+    gfx_register_overlay_draw_callback(gfx_update_screen_fade, self);
 }

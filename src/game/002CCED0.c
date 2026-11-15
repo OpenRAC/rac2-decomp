@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned char value; } ResidentFlag;
 extern ResidentFlag D_001A7BC9;
@@ -13,7 +14,7 @@ extern short D_L00_001AA90A;
 extern short D_L00_001AA922;
 
 /* Updates five menu icon values from five unlock flags: each becomes 3 when unlocked and 0 when not. */
-void func_002CCED0(void)
+void menu_refresh_unlock_icon_states(void)
 {
     D_L00_001AA8C2 = D_001A7BC9.value ? 3 : 0;
     D_L00_001AA8DA = D_001A7BCA.value ? 3 : 0;

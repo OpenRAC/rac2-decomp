@@ -2,11 +2,11 @@
 
 #include "common.h"
 extern f32 D_001AC1A0[4] __attribute__((sda));
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern void *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Two puffs at the object's offset point, each with a small random drift and growth. */
 void func_PAL_002E9F58(char *object)
@@ -16,15 +16,15 @@ void func_PAL_002E9F58(char *object)
     f32 to[3] __attribute__((aligned(16)));
     int i;
 
-    func_00283098(position, D_001AC1A0, object + 0xC0);
-    func_00282CC0(position, position, object + 0x10);
+    matrix_mul_vec3(position, D_001AC1A0, object + 0xC0);
+    FastVecAdd(position, position, object + 0x10);
     for (i = 0; i < 2; i++) {
-        from[0] = func_002A7878(-0.010000001f, 0.010000001f);
-        from[1] = func_002A7878(-0.010000001f, 0.010000001f);
-        from[2] = func_002A7878(-0.010000001f, 0.010000001f);
-        from[3] = func_002A7878(0.6f, 0.8f);
+        from[0] = math_random_float_range(-0.010000001f, 0.010000001f);
+        from[1] = math_random_float_range(-0.010000001f, 0.010000001f);
+        from[2] = math_random_float_range(-0.010000001f, 0.010000001f);
+        from[3] = math_random_float_range(0.6f, 0.8f);
         qcopy(to, from);
-        to[3] = from[3] + func_002A7878(0.1f, 0.2f);
-        func_002BAA28(position, from, to, 0x30C0C0C0, 0x20C0C0C0, 3, 0xD, func_002A77E0(0xA) + 7, 0x17);
+        to[3] = from[3] + math_random_float_range(0.1f, 0.2f);
+        part_spawn_trail(position, from, to, 0x30C0C0C0, 0x20C0C0C0, 3, 0xD, math_random_int_below(0xA) + 7, 0x17);
     }
 }

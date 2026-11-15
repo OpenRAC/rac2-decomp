@@ -5,7 +5,7 @@ extern int r1_D_00130BD0[];
 
 extern char r1_D_00130428[];
 
-extern int func_0011F8D0(void);
+extern int boot_test_hw_bit_field(void);
 
 extern void r1_func_0011DBE8(int, int);
 
@@ -27,11 +27,11 @@ typedef struct {
    the loop keeps its base live, so the argument loads keep source
    order. */
 /* Installs the system call entries and copies a block of start-up code into place when the hardware allows it. */
-void func_0011F938(void) {
+void kernel_install_entries(void) {
     SysEnt *t;
     unsigned int i;
 
-    if (TestHardwareBitField() == 0) {
+    if (boot_test_hw_bit_field() == 0) {
         return;
     }
     t = (SysEnt *)r1_D_00130BD0;
@@ -53,7 +53,7 @@ void func_0011F938(void) {
  * sinks `dst++` into the slot, 44 bytes against 48: the old revert.)
  */
 /* Copies bytes from one place to another and returns zero. */
-int func_0011F9E4(char *dst, char *src, unsigned int n) {
+int mem_copy_bytes(char *dst, char *src, unsigned int n) {
     unsigned int i;
     for (i = 0; i < n; i++) {
         *dst++ = *src++;

@@ -55,15 +55,15 @@ typedef struct { char data[0x600]; } LargeBufferAED68;
 typedef struct { char data[0x400]; } SmallBufferAED68;
 extern LargeBufferAED68 D_L00_001B5C00[];
 extern SmallBufferAED68 D_L00_001B3400[];
-extern float func_002AA2E8(float *,float,float);
-extern void func_L00_00310C88(void *,void *);
-extern SlotAED68 *func_L00_00310BC8(void *,int);
-extern void func_L00_00310D30(void *,void *);
-extern int func_L00_002A4EF0(int);
-extern int func_L00_002ADFE8(int,float *);
-extern int func_L00_002ADFD0(void *,int);
+extern float ApproachValue(float *,float,float);
+extern void release_moby_animation_slot(void *,void *);
+extern SlotAED68 *allocate_moby_animation_slot(void *,int);
+extern void AdvanceAndDecodeAnimationFrames(void *,void *);
+extern int math_l00_return_argument(int);
+extern int hero_get_item_aim_adjustment(int,float *);
+extern int hero_get_value_or_default(void *,int);
 /* Fades the two item display slots in and out and blends between old and new item pictures. */
-void func_L00_002AED68(void)
+void update_hero_item_slot_animation_blends(void)
 {
  int i,j,enabled,different,active; struct { short v; } transition; float amount;
  for(i=0;i<2;i++) {
@@ -103,10 +103,10 @@ void func_L00_002AED68(void)
   else if(!slot->destroy) ApproachValue(&slot->opacity,1.0f,0.25f);
   transition.v=0;
   if(different && D_00189E20_26.fc2c &&
-     ReturnArgument_L00(slot->modes[1])!=ReturnArgument_L00(D_00189E20_26.f2290->modes[1]))
+     math_l00_return_argument(slot->modes[1])!=math_l00_return_argument(D_00189E20_26.f2290->modes[1]))
    transition.v=slot->modes[0]!=slot->modes[1];
   slot->transition=transition.v;
-  active=GetHeldItemAimAdjustment(state->f2290->modes[1],&amount);
+  active=hero_get_item_aim_adjustment(state->f2290->modes[1],&amount);
   if(active || slot->active) {
    if(amount!=0.0f) {
     D_L00_0025BE10.f6d4=0.05f; D_L00_0025BE10.f6d8=0.3f;
@@ -120,7 +120,7 @@ void func_L00_002AED68(void)
    }
    if(!active) {
     if(!slot->fading) {
-     slot->modes[1]=GetValueOrObjectDefault(state->f2290,state->f2290->modes[1]);
+     slot->modes[1]=hero_get_value_or_default(state->f2290,state->f2290->modes[1]);
      slot->ids[1]=0; slot->fading=1; slot->progress=0; slot->scale=0;
     } else {
      slot->progress+=0.1f; if(slot->progress>1.0f) slot->progress=1.0f;
@@ -137,7 +137,7 @@ void func_L00_002AED68(void)
   } else {
    if(!slot->transition) for(j=0;j<2;j++) {
     if(different && j!=1) continue;
-    slot->modes[j]=GetValueOrObjectDefault(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
+    slot->modes[j]=hero_get_value_or_default(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
    }
    if(slot->transition) {
     slot->progress+=0.15f;

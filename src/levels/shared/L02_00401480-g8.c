@@ -1,3 +1,4 @@
+#include "names.h"
 /* Builds a 16-byte record (zero with two floats set), walks it through two helpers, then picks one of two
    scalars read through $gp by the owner's id and hands both to the level 0 stepping helper. Same shape as
    func_L00_003CA688. Needs -frac2-zero-ti-por and -G8. */
@@ -11,13 +12,13 @@ typedef union {
 
 extern int ref_L02_00401480_00 __attribute__((sda));
 extern int ref_L02_00401480_01 __attribute__((sda));
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_L00_002EC608(void *, int);
-extern void func_L00_002EC970(void *, char *, int, int, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_draw_glow_quad(void *, int);
+extern void DrawTaperedBeam(void *, char *, int, int, float, float);
 
 /* Starts a trailing effect just behind the object, using one of two settings depending on the kind of object. */
-void func_L02_00401480(char *owner)
+void part_spawn_trail_at_owner(char *owner)
 {
     Quad_401480 local;
     char *inner;
@@ -33,6 +34,6 @@ void func_L02_00401480(char *owner)
         v = ref_L02_00401480_00;
     else
         v = ref_L02_00401480_01;
-    DrawGlowQuad_L00(&local, v);
+    part_draw_glow_quad(&local, v);
     DrawTaperedBeam(&local, inner + 0x20, v, 4, *(float *)(inner + 0x60), 0.25f);
 }

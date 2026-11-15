@@ -2,37 +2,37 @@
 #define H(p,o) (*(short *)((u8 *)(p)+(o)))
 #define U(p,o) (*(u16 *)((u8 *)(p)+(o)))
 #define P(p,o) (*(u8 **)((u8 *)(p)+(o)))
-extern int func_002B3868(void *);
-extern int func_002E5CF8(int,int,void *);
-extern void func_00282CC0(char *,char *,char *);
-extern void func_002A7750(void *,int,int);
-extern int func_00282978(void *);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern float func_002A7878(float,float);
-extern void func_L00_0031D670(void *,void *,void *,float);
+extern int flag_set_first_pending(void *);
+extern int PlayMobySound(int,int,void *);
+extern void FastVecAdd(char *,char *,char *);
+extern void moby_set_state(void *,int,int);
+extern int FastDecTimer(void *);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern float math_random_float_range(float,float);
+extern void LerpVector4(void *,void *,void *,float);
 typedef struct { int pad0; int flags; u8 pad8[2]; u8 alpha; u8 lifetime; } ParticleRender;
 typedef struct { u8 pad0[0xa]; s16 lifetime; u8 padc[0x14]; ParticleRender render; } Particle;
-extern Particle *func_002BDCE8(void *,float,float,float,float,int,void *,int,int);
-extern int func_002761F8(void *,void *,int,void *,int);
-extern int func_00277258(void *,int,void *,float);
-extern void func_00282F20(char *,char *,float);
-extern void func_00283028(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern float func_00282E20(void *);
-extern void func_00282F70(void *,void *,float);
-extern int func_00283CF0(float);
-extern int func_00282948(void *);
-extern void func_L18_00437BA8(void *,int);
-extern void func_002ABBB8(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-extern void func_0029F338(void *);
-extern int func_00277F48(void *,int,void *,int,float);
-extern void func_002A8F70(void *,void *,int,void *,void *,float);
-extern float func_00283B98(float,float);
+extern Particle *SpawnSpinningSparkParticle(void *,float,float,float,float,int,void *,int,int);
+extern int CollLine(void *,void *,int,void *,int);
+extern int coll_test_point(void *,int,void *,float);
+extern void vec_scale_to_length(char *,char *,float);
+extern void vec_fast_normalize(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(void *,void *,float);
+extern int FloatToInt(float);
+extern int math_fast_float_d(void *);
+extern void part_l18_spawn_ring_of_sparks(void *,int);
+extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void moby_mark_spawned(void *);
+extern int coll_process_hit(void *,int,void *,int,float);
+extern void part_queue_impact_effect(void *,void *,int,void *,void *,float);
+extern float FastAddRotations(float,float);
 typedef int TI128 __attribute__((mode(TI)));
 extern TI128 D_001A8F20 MACRO_ADDR;
 extern u8 D_L18_001BFC00[];
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u8 *p[0x980]; TI128 q[0x260]; } HeroView;
 typedef union { u8 b[0x100]; s16 h[0x80]; u16 u[0x80]; s32 i[0x40]; float f[0x40]; u8 *p[0x40]; TI128 q[0x10]; } ObjectView;
 #define OBJ ((ObjectView *)obj)
@@ -40,7 +40,7 @@ typedef union { u8 b[0x100]; s16 h[0x80]; u16 u[0x80]; s32 i[0x40]; float f[0x40
 typedef union { u8 b[0x60]; float f[0x18]; u8 *p[0x18]; TI128 q[6]; } CollisionView;
 #define HERO ((HeroView *)D_00189E20)
 #define COLL ((CollisionView *)D_L18_001BFC00)
-extern u8 *D_L18_001C3C80[];
+extern u8 *g_nearby_hit_targets[];
 extern float D_L18_001B1940[3];
 extern float D_L18_001B18F8 __attribute__((sda));
 extern int D_L18_001B18FC __attribute__((sda));
@@ -68,7 +68,7 @@ static inline float clamp_speed(float speed, float low, float high) {
     return speed;
 }
 /* Updates a bouncing fireball (moby class 3998): it flies and bounces off walls leaving sparks, then slows and fades, and finally explodes and hurts nearby targets. */
-void func_L18_00437190(u8 *obj) {
+void fireball_update(u8 *obj) {
     float delta[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
@@ -78,10 +78,10 @@ void func_L18_00437190(u8 *obj) {
     float fade, radius, minimum;
     switch(mode) {
     case 0: case 1:
-        if(SetFirstPendingFlag(obj)) PlayMobySound(1,0,obj);
+        if(flag_set_first_pending(obj)) PlayMobySound(1,0,obj);
         FastVecAdd((char *)delta,(char *)obj+0x10,(char *)st+0x10);
         STATE->f[0x6]-=STATE->f[0x7];
-        if(obj[0x20]==1 && STATE->f[0x6]<0) SetMobyState(obj,0,-1);
+        if(obj[0x20]==1 && STATE->f[0x6]<0) moby_set_state(obj,0,-1);
         FastDecTimer(st+0x28);
         {s16 life=STATE->h[0x14];
         if(life) {
@@ -92,11 +92,11 @@ void func_L18_00437190(u8 *obj) {
                 fraction=(float)i; fraction*=0.3333f;
                 LerpVector4(pos,temp,delta,fraction);
                 {s16 particleLifetime=120;
-                amount=RandomIntBelow(6);
-                if(RandomIntBelow(2)) amount=-amount;
+                amount=math_random_int_below(6);
+                if(math_random_int_below(2)) amount=-amount;
                 denominator=IntToFloat(D_L18_001B18FC);
                 ratio=(float)STATE->h[0x14]; ratio/=denominator;
-                random=RandomFloatRange(0.9f,1.0f);
+                random=math_random_float_range(0.9f,1.0f);
                 spark=SpawnSpinningSparkParticle(pos,D_L18_001B1910,1,1,random*(D_L18_001B1908+(D_L18_001B190C-D_L18_001B1908)*ratio),amount,&D_001A8F20,D_L18_001B1904,0);
                 if(spark) { ParticleRender *particle; spark->lifetime=particleLifetime; particle=&spark->render; particle->flags=2; particle->alpha=127; particle->lifetime=*(u8 *)&spark->lifetime; }
                 }
@@ -105,27 +105,27 @@ void func_L18_00437190(u8 *obj) {
         }
         if(CollLine(obj+0x10,delta,0,obj,0) && !same_group(st)) qcopy(obj+0x10,&COLL->q[2]);
         else qcopy(obj+0x10,delta);
-        if(TestPointAgainstCollision(obj+0x10,0,obj,D_L18_001B18F8) && (obj[0x20]==0 || OBJ->f[0x6]-COLL->f[10]<0)) {
+        if(coll_test_point(obj+0x10,0,obj,D_L18_001B18F8) && (obj[0x20]==0 || OBJ->f[0x6]-COLL->f[10]<0)) {
             if(!same_group(st)) {
                 vec_scale_to_length((char *)pos,(char *)(u8 *)&COLL->q[4],D_L18_001B18F8);
                 FastVecAdd((char *)obj+0x10,(char *)(u8 *)&COLL->q[2],(char *)pos);
-                FastVectorNormalize(st+0x10,st+0x10,(u8 *)&COLL->q[4]);
+                vec_fast_normalize(st+0x10,st+0x10,(u8 *)&COLL->q[4]);
                 PlayMobySound(1,0,obj);
                 if(obj[0x20]!=0) goto bounce_done;
-                SetMobyState(obj,1,-1);
+                moby_set_state(obj,1,-1);
                 if(++STATE->h[0x15]==1) {
-                    FastVectorNormalizeHelper(st+0x10,st+0x10,D_L18_001B1928*0.016666668f);
+                    vec_fast_normalize_helper(st+0x10,st+0x10,D_L18_001B1928*0.016666668f);
                     STATE->f[0x6]*=D_L18_001B1924;
                 } else {
                     FastVecScale(temp,st+0x10,D_L18_001B1924);
                     if(vec_length_xy(temp)<D_L18_001B1914*0.016666668f) {
-                        FastVectorNormalizeHelper(st+0x10,st+0x10,D_L18_001B1914*0.016666668f);
+                        vec_fast_normalize_helper(st+0x10,st+0x10,D_L18_001B1914*0.016666668f);
                         STATE->f[0x6]*=D_L18_001B1924;
                     } else qcopy(st+0x10,temp);
                 }
 bounce_done:
                 if(STATE->h[0x15]>=4) {
-                    SetMobyState(obj,2,-1); STATE->f[0x6]=0;
+                    moby_set_state(obj,2,-1); STATE->f[0x6]=0;
                     STATE->f[0x7]=vec_length_xy(st+0x10);
                     STATE->f[0x7]*=D_L18_001B1924;
                     minimum=D_L18_001B1914*0.016666668f;
@@ -148,30 +148,30 @@ bounce_done:
         if(speed<minimum) STATE->f[0x7]=minimum;}
         vec_scale_to_length((char *)st+0x10,(char *)st+0x10,STATE->f[0x7]);
         FastVecAdd((char *)obj+0x10,(char *)obj+0x10,(char *)st+0x10);
-        if(FastFloatHelperD(st+0x20)) SetMobyState(obj,3,-1);
+        if(math_fast_float_d(st+0x20)) moby_set_state(obj,3,-1);
         break;
     case 3:
-        if(SetFirstPendingFlag(obj)) {
-            SpawnRingOfSparks_L18(obj+0x10,D_L18_001B1938);
+        if(flag_set_first_pending(obj)) {
+            part_l18_spawn_ring_of_sparks(obj+0x10,D_L18_001B1938);
             SpawnExplosionEffects(obj,st+0x10,obj+0x10,0,0,3,3,5,1,0.2f,9,1,-1,0,1,1,-1,0,0x810001);
             PlayMobySound(0,0,obj);
         }
         else {
-        if(D_L18_001B192C+D_L18_001B1930<OBJ->u[0x4b]) {MarkMobySpawned(obj);return;}
+        if(D_L18_001B192C+D_L18_001B1930<OBJ->u[0x4b]) {moby_mark_spawned(obj);return;}
         radius=D_L18_001B1934;
         if(OBJ->u[0x4b]<D_L18_001B192C) radius=radius*(float)OBJ->u[0x4b]/(float)D_L18_001B192C;
-        hitCount=ProcessCollisionHit(obj+0x10,0,obj,0,radius);
+        hitCount=coll_process_hit(obj+0x10,0,obj,0,radius);
         if(!hitCount) break;
         if(hitCount>0) {
         int remaining;
-        targets=gNearbyHitTargets;
+        targets=g_nearby_hit_targets;
         remaining=hitCount;
         do {
             u8 *other=*targets;
             int valid=0;
             if(other==HERO->p[0x2290/4]) {qcopy(delta,&HERO->q[8]); if(HERO->i[0x340/4]) valid=1;}
             else {qcopy(delta,other+0x10); if(U(other,0x34)&0x20) {u8 *owner=P(P(other,0x68),0x18);if(owner) {if(H(owner,0xc0)) valid=1;}}}
-            if(valid) QueueImpactEffect(other,obj,0x10001,other+0x10,&D_001A8F20,STATE->f[0xc]);
+            if(valid) part_queue_impact_effect(other,obj,0x10001,other+0x10,&D_001A8F20,STATE->f[0xc]);
             targets++;
         } while(--remaining);
         }
@@ -193,5 +193,5 @@ bounce_done:
         angle*=0.017453294f;
         OBJ->f[0x3d]=FastAddRotations(angle,OBJ->f[0x3d]);
     }
-    if(OBJ->f[0x4]<2 || OBJ->f[0x4]>1021 || OBJ->f[0x5]<2 || OBJ->f[0x5]>1021 || OBJ->f[0x6]<2 || OBJ->f[0x6]>1021)MarkMobySpawned(obj);
+    if(OBJ->f[0x4]<2 || OBJ->f[0x4]>1021 || OBJ->f[0x5]<2 || OBJ->f[0x5]>1021 || OBJ->f[0x6]<2 || OBJ->f[0x6]>1021)moby_mark_spawned(obj);
 }

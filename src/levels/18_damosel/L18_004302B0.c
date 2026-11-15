@@ -3,16 +3,16 @@
 /* Built with -g (config/cflags.txt): the line boundary before the ratio
    division supplies retail's two padding nops in front of its div.s. */
 
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern u8 *func_0029EFD0(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern u8 *CreateMoby(int);
 extern void func_002A0F48(u8 *);
-extern void func_0029FCC0(int, int, void *);
-extern void func_0029F338(void *);
-extern void func_002A7A00(void *, float, float);
-extern int func_002A77E0(int);
-extern int func_L02_0032E508(u8 *, int, u8 *, int);
-extern void func_002A7750(u8 *, int, int);
+extern void moby_transform_joint_to_world(int, int, void *);
+extern void moby_mark_spawned(void *);
+extern void vec_random_direction(void *, float, float);
+extern int math_random_int_below(int);
+extern int path_build_route_nodes(u8 *, int, u8 *, int);
+extern void moby_set_state(u8 *, int, int);
 
 /* Sixteen floats copied as a block with unaligned doubleword moves. */
 typedef struct { float value[16]; } __attribute__((packed)) InitValues;
@@ -25,7 +25,7 @@ extern InitValues D_L18_001B1570;
 #define CHILD(o) (*(u8 **)(s + (o)))
 
 /* Sets up an Extermibot when it is created: it fills in the robot's health and speeds, then spawns its torso and arm parts and attaches them. If a part cannot be created, the robot is removed. */
-void func_L18_004302B0(u8 *moby) {
+void extermibot_init_parts(u8 *moby) {
     float pos[4] __attribute__((aligned(16)));
     InitValues values;
     u8 *s = *(u8 **)(moby + 0x68);
@@ -61,7 +61,7 @@ void func_L18_004302B0(u8 *moby) {
     *(u64 *)(CHILD(0x7C0) + 0x38) = *(u64 *)(moby + 0x38);
     func_002A0F48(CHILD(0x7C0));
     W(CHILD(0x7C0), 0x98) = 0;
-    TransformMobyJointToWorld((int)moby, 0, pos);
+    moby_transform_joint_to_world((int)moby, 0, pos);
     qcopy_nc(CHILD(0x7C0) + 0x10, pos);
     qcopy_nc(CHILD(0x7C0) + 0xF0, moby + 0xF0);
     values = D_L18_001B1570;
@@ -97,32 +97,32 @@ void func_L18_004302B0(u8 *moby) {
         p2 = s + 0x660;
         p1 = s + 0x650;
         for (j = 1; j >= 0; j--) {
-            RandomDirectionVector(p1, -3.1415927f, 3.1415927f); p1 += 0xA0;
-            RandomDirectionVector(p2, -3.1415927f, 3.1415927f); p2 += 0xA0;
-            RandomDirectionVector(p3, 0.2327106f, 0.290888249874115f); p3 += 0xA0;
-            RandomDirectionVector(p4, 0.2327106f, 0.290888249874115f); p4 += 0xA0;
-            RandomDirectionVector(p5, 1, 1.7f); p5 += 0xA0;
-            RandomDirectionVector(p6, 1, 1.7f); p6 += 0xA0;
+            vec_random_direction(p1, -3.1415927f, 3.1415927f); p1 += 0xA0;
+            vec_random_direction(p2, -3.1415927f, 3.1415927f); p2 += 0xA0;
+            vec_random_direction(p3, 0.2327106f, 0.290888249874115f); p3 += 0xA0;
+            vec_random_direction(p4, 0.2327106f, 0.290888249874115f); p4 += 0xA0;
+            vec_random_direction(p5, 1, 1.7f); p5 += 0xA0;
+            vec_random_direction(p6, 1, 1.7f); p6 += 0xA0;
         }
     }
     goto spawned;
 
 fail:
     /* One release path for both failed spawns. */
-    MarkMobySpawned(moby);
+    moby_mark_spawned(moby);
     return;
 
 spawned:
-    if (!RandomIntBelow(2)) {
+    if (!math_random_int_below(2)) {
         U(moby, 0x34) |= 0x8000;
         U(CHILD(0x7C0), 0x34) |= 0x8000;
     }
     if (W(s, 0x7D4) != -1)
-        W(s, 0x780) = BuildRouteNodes(moby, W(s, 0x7D4), s + 0x210, 0x20);
-    if (H(s, 0x7FC)) H(s, 0x804) = RandomIntBelow(150);
+        W(s, 0x780) = path_build_route_nodes(moby, W(s, 0x7D4), s + 0x210, 0x20);
+    if (H(s, 0x7FC)) H(s, 0x804) = math_random_int_below(150);
     U(s, 0x7F6) = U(s, 0x7F4);
     if (H(s, 0x7F8)) {
-        SetMobyState(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         W(moby, 0x98) = 0;
         U(moby, 0x34) = (U(moby, 0x34) & 0xEFFF) | 0x43;
         if (CHILD(0x7C0)) {
@@ -145,7 +145,7 @@ spawned:
         }
         F(s, 0x7E8) = 1;
     } else {
-        SetMobyState(moby, 4, 1);
+        moby_set_state(moby, 4, 1);
         F(s, 0x7E8) = 1.5f;
     }
     F(moby, 0x2C) = F(*(u8 **)(moby + 0x24), 0x24) * F(s, 0x7E8);

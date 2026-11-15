@@ -1,3 +1,4 @@
+#include "names.h"
 /* The table is reached twice under two names: through lui/lw for the first loop pair and
    through $gp for the second (-G8 unit). */
 typedef struct {
@@ -11,7 +12,7 @@ extern PhaseEntry *ref_L09_003F65E0_00;
 extern PhaseEntry *ref_L09_003F65E0_01 __attribute__((sda));
 
 /* Update for moby class 3334. Slowly scrolls the texture offsets of its table entry so the surface appears to move. */
-void func_L09_003F65E0(char *object) {
+void scrolling_l09_texture_update(char *object) {
     char *state = *(char **)(object + 0x68);
 
     switch (*(unsigned char *)(object + 0x20)) {

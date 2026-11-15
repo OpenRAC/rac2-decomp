@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_002889B8(unsigned char *);
+extern void req_reset_queue(unsigned char *);
 
-void func_00288B18(void*);
+void req_reset_owner_queue(void*);
 
 typedef unsigned char u8;
 
@@ -26,14 +26,14 @@ typedef struct {
 extern u32 D_00139768[];
 
 /* Resets the request queue of the given owner. */
-void func_00288B18(void *owner)
+void req_reset_owner_queue(void *owner)
 {
-    ResetRequestQueue(owner);
+    req_reset_queue(owner);
 }
 
 /* Walks the ring from its current index to its end index and marks every request below
    0xB1 in the shared table of flags: bit (value & 0x1F) of the word at D_00139768[value >> 2]. */
-void func_00288B38(BarlowUtilityQueueRing *ring)
+void req_mark_queued_in_flag_table(BarlowUtilityQueueRing *ring)
 {
     s32 i = ring->field34;
 

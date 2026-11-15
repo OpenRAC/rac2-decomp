@@ -2,19 +2,19 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *func_0029EFD0(int id);
+extern void *CreateMoby(int id);
 
-extern float func_00283248(float x, float y);
+extern float mat_fast_helper_a(float x, float y);
 
-extern float func_00282E20(char *a);
+extern float vec_length_xy(char *a);
 
 extern void func_002A0F48(char *a);
 
-extern char *func_L09_003364E0(char *object, int a1, u32 a2, int a3, float f12, float f13);
+extern char *part_spawn_sized(char *object, int a1, u32 a2, int a3, float f12, float f13);
 
 
 /* Creates a small moving effect object at a position, aims it along a direction and returns it. */
-char *func_L09_003A06B0(char *object, char *direction, char *position, float speed)
+char *moby_spawn_aimed_effect(char *object, char *direction, char *position, float speed)
 {
     char *spawned = CreateMoby(0x3A6 /* moby class 934 */);
     char *vars;
@@ -32,12 +32,12 @@ char *func_L09_003A06B0(char *object, char *direction, char *position, float spe
         *(char **)(vars + 0x3C) = object;
         *(u32 *)(vars + 0x38) = 0xF0;
         *(float *)(vars + 0x40) = speed;
-        *(float *)(spawned + 0xF8) = FastMatrixHelperA(*(float *)direction, *(float *)(direction + 4));
+        *(float *)(spawned + 0xF8) = mat_fast_helper_a(*(float *)direction, *(float *)(direction + 4));
         length = vec_length_xy(direction);
         *(float *)(spawned + 0xF4) =
-            -FastMatrixHelperA(length, *(float *)(direction + 8));
+            -mat_fast_helper_a(length, *(float *)(direction + 8));
         *(char **)(vars + 0x48) =
-            SpawnSizedParticle(spawned, -1, 0xF0208080, 0x60, 0.1f, 0.01f);
+            part_spawn_sized(spawned, -1, 0xF0208080, 0x60, 0.1f, 0.01f);
         func_002A0F48(spawned);
         *(u8 *)(spawned + 0x31) = 0;
         *(u16 *)(spawned + 0x34) |= 1;

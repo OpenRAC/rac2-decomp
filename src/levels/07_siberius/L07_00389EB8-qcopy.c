@@ -8,27 +8,27 @@
 /* The 16-byte vector the object and the entity keep. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void func_00282948(char *);
+extern void math_fast_float_d(char *);
 
-extern void func_002B0990(char *, char *, int, int, float);
+extern void value_set_and_smooth(char *, char *, int, int, float);
 
 extern int D_L07_001C9780;
 
-extern void func_L07_003E6FE8(char *);
+extern void RideMobyBelow(char *);
 
-extern void func_00325DA0(char *, char *);
+extern void group_sync_counter(char *, char *);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern void func_00325C50(char *, char *, int, void *, float);
+extern void enemy_attach_turn_child_parts(char *, char *, int, void *, float);
 
 /* Clear the two resource slots, step the state counter, refresh the object's
    transform and hand the entity to the shared launcher. */
 /* Finishes the entity's frame: counts up its timer, saves its old position and hands it to the
    shared launcher. */
-void func_L07_003E6E00(char *moby)
+void entity_finish_update(char *moby)
 {
     char *vars;
     char *src;
@@ -38,12 +38,12 @@ void func_L07_003E6E00(char *moby)
     float smoothedAngle;
 
     vars = *(char **)(moby + 0x68);
-    FastFloatHelperD(vars + 0x344);
-    FastFloatHelperD(vars + 0x348);
+    math_fast_float_d(vars + 0x344);
+    math_fast_float_d(vars + 0x348);
     timer = *(unsigned short *)(moby + 0x96);
     if (timer <= 0xFFFE)
         *(unsigned short *)(moby + 0x96) = timer + 1;
-    SyncGroupCounter(moby, vars + 0x340);
+    group_sync_counter(moby, vars + 0x340);
     src = moby + 0x10;
     dst = vars + 0x2E0;
     FastVecSub(&oldPos, src, dst);
@@ -53,11 +53,11 @@ void func_L07_003E6E00(char *moby)
     if (*(unsigned char *)(moby + 0x95) == 2) {
         smoothedAngle = FastAddRotations(*(float *)(vars + 0x2DC), 0.20943954586982727f);
         *(float *)(vars + 0x2DC) = smoothedAngle;
-        AttachAndTurnChildParts(moby, vars + 0x330, 1, &oldPos, smoothedAngle);
+        enemy_attach_turn_child_parts(moby, vars + 0x330, 1, &oldPos, smoothedAngle);
     } else {
         smoothedAngle = FastAddRotations(*(float *)(vars + 0x2DC), 0.011635531f);
         *(float *)(vars + 0x2DC) = smoothedAngle;
-        AttachAndTurnChildParts(moby, vars + 0x330, 0, &oldPos, smoothedAngle);
+        enemy_attach_turn_child_parts(moby, vars + 0x330, 0, &oldPos, smoothedAngle);
     }
-    SetValueAndStartSmoothChange(moby, vars + 0x230, 7, 1, 2.5f);
+    value_set_and_smooth(moby, vars + 0x230, 7, 1, 2.5f);
 }

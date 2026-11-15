@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern int func_L03_003CA138(char *);
-extern unsigned int func_L20_00449AD8(char *);
-extern int func_00312B58(char *);
-extern float func_00282E80(void *, void *);
+extern int moby_is_first_state(char *);
+extern unsigned int moby_get_targeted_flag(char *);
+extern int moby_is_state_six(char *);
+extern float vec_distance_xy(void *, void *);
 extern char *D_L20_001B2F9C;
 extern unsigned short *D_L20_001FBB20[];
 extern int D_L20_001B2FB8 __attribute__((sda));
@@ -13,7 +13,7 @@ extern int D_L20_001B2FB8 __attribute__((sda));
    skipping those func_00312B58 accepts), or 0.  The loop is the group-iteration form used
    by func_00325DA0. */
 /* Chooses a target for the enemy. It keeps its current one if that is still good, otherwise the nearest valid object of its group within 200 units. */
-char *func_L20_004433B0(char *object)
+char *yeedil_boss_find_group_target(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *candidate = D_L20_001B2F9C + (*(int *)(state + 0x238) << 8);
@@ -22,7 +22,7 @@ char *func_L20_004433B0(char *object)
     char *e;
     float closest;
 
-    if (!IsMobyInState1_L03(candidate) && !GetMobyTargetedFlag(candidate)) {
+    if (!moby_is_first_state(candidate) && !moby_get_targeted_flag(candidate)) {
         return candidate;
     }
     best = 0;
@@ -34,7 +34,7 @@ char *func_L20_004433B0(char *object)
         e = D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (!IsMobyInState6(e)) {
+        if (!moby_is_state_six(e)) {
             float distance = vec_distance_xy(e + 0x10, object + 0x10);
             if (distance < closest) {
                 closest = distance;

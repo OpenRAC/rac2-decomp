@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00282D30(void *dst, void *src, float scale);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void FastVecScale(void *dst, void *src, float scale);
 typedef struct {
     char pad0[0x18];
     float height;                  
@@ -52,12 +53,12 @@ typedef struct {
     char pad40[0x30];
     MoveState *state;              
 } MoveObject;
-extern HeroMove D_00189E20;
+extern HeroMove g_hero_state;
 extern int D_L00_001A8FF0[] __attribute__((sda));
 extern CamMove D_L00_001B8E20;
 extern int D_L00_001B9084;
-extern void func_00282CC0(void *dst, void *a, void *b);
-extern float func_00282DB0(void *a, void *b);
+extern void FastVecAdd(void *dst, void *a, void *b);
+extern float FastVecDot(void *a, void *b);
 
 /* Moves the object, its state's vectors and the view by the input step. While the hero
    stands on the same moby (hero +0x33C), a rise of that moby's height (+0x18) since the
@@ -75,18 +76,18 @@ void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
     float height, along;
 
     delta = *input;
-    ground = D_00189E20.ground;
+    ground = g_hero_state.ground;
     if (ground != 0) {
         if (D_L00_001A8FF0[0] == 0) {
-            if (D_00189E20.flag348 == 0) {
+            if (g_hero_state.flag348 == 0) {
                 if (ground == view->ground) {
                     height = ground->height - view->groundHeight;
                     if (height > 0.0f && ((float *)step)[2] < height)
                         ((float *)step)[2] = height;
-                    view->groundHeight = D_00189E20.ground->height;
+                    view->groundHeight = g_hero_state.ground->height;
                 } else {
                     view->ground = ground;
-                    view->groundHeight = D_00189E20.ground->height;
+                    view->groundHeight = g_hero_state.ground->height;
                 }
             } else
                 view->ground = 0;
@@ -95,32 +96,32 @@ void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
     } else
         view->ground = 0;
 
-    func_00282CC0(&object->position, step, &object->position);
-    func_00282CC0(&view->v60, step, &view->v60);
-    func_00282CC0(&view->v00, step, &view->v00);
-    func_00282CC0(&view->v90, step, &view->v90);
-    func_00282CC0(&view->v30, step, &view->v30);
-    func_00282CC0(&state->v00, step, &state->v00);
-    along = func_00282DB0(step, &cam->axis);
-    func_00282D30(&projected, &cam->axis, along);
-    func_00282CC0(&view->v10, &view->v10, &projected);
-    if (D_00189E20.flag348 == 0 &&
-        !(D_00189E20.ground != 0 && D_00189E20.ground->type == 0x22D &&
+    FastVecAdd(&object->position, step, &object->position);
+    FastVecAdd(&view->v60, step, &view->v60);
+    FastVecAdd(&view->v00, step, &view->v00);
+    FastVecAdd(&view->v90, step, &view->v90);
+    FastVecAdd(&view->v30, step, &view->v30);
+    FastVecAdd(&state->v00, step, &state->v00);
+    along = FastVecDot(step, &cam->axis);
+    FastVecScale(&projected, &cam->axis, along);
+    FastVecAdd(&view->v10, &view->v10, &projected);
+    if (g_hero_state.flag348 == 0 &&
+        !(g_hero_state.ground != 0 && g_hero_state.ground->type == 0x22D &&
           D_L00_001B9084 < 26))
         object->state->f1E0 = ((float *)step)[3];
-    if ((unsigned int)(D_00189E20.state - 11) < 2) {
+    if ((unsigned int)(g_hero_state.state - 11) < 2) {
         MoveState *next = object->state;
 
         next->h10 = 0;
-        func_00282D30(&correction, &cam->v80, cam->fA4);
-        along = func_00282DB0(&cam->axis, step);
-        func_00282D30(&remainder, &cam->axis, along);
-        func_00282CF0(&remainder, step, &remainder);
-        func_00282CF0(&correction, &correction, &remainder);
-        func_00282CC0(&object->position, &correction, &object->position);
-        func_00282CC0(&view->v60, &correction, &view->v60);
-        func_00282CC0(&view->v00, &correction, &view->v00);
-        func_00282CC0(&view->v90, &correction, &view->v90);
-        func_00282CC0(&next->v00, &correction, &next->v00);
+        FastVecScale(&correction, &cam->v80, cam->fA4);
+        along = FastVecDot(&cam->axis, step);
+        FastVecScale(&remainder, &cam->axis, along);
+        FastVecSub(&remainder, step, &remainder);
+        FastVecSub(&correction, &correction, &remainder);
+        FastVecAdd(&object->position, &correction, &object->position);
+        FastVecAdd(&view->v60, &correction, &view->v60);
+        FastVecAdd(&view->v00, &correction, &view->v00);
+        FastVecAdd(&view->v90, &correction, &view->v90);
+        FastVecAdd(&next->v00, &correction, &next->v00);
     }
 }

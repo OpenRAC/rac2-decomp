@@ -1,3 +1,4 @@
+#include "names.h"
 /* Carried from rac3-decomp (src/levels/shared/L01_0047DBB0.c, func_L01_0047DCB8): the
    same instructions with rac2's offsets. Uploads D_001A7344 * 1536 bytes from the source
    at +0x20 of D_001F2840 to GS memory in 16 KB blocks (to the top of the 0x3FB000 area when
@@ -15,30 +16,30 @@ typedef struct {
     s32 mode;
 } UploadRequest;
 
-extern UploadRequest D_001F2840;
+extern UploadRequest g_pause_menu_state;
 extern s32 D_001B1598 MACRO_ADDR;
-extern s32 D_001A7344 MACRO_ADDR;
+extern s32 g_screen_height MACRO_ADDR;
 extern s32 D_001A72D4 __attribute__((sda));
-extern void func_002FC3C0(s32);
-extern int func_001261F0(s32);
+extern void gfx_wait_for_dma_status_bits(s32);
+extern int sceGsSyncV(s32);
 extern void func_00126470(void *, s16, s32, s32, s32, s32, s32, s32);
-extern void func_0011AEA0(s32);
+extern void FlushCache(s32);
 extern void func_00126730(void *, s32);
-extern void func_001244B8(s32, s32);
+extern void gfx_wait_paths_idle(s32, s32);
 
-void func_002C9F68(void) {
+void menu_upload_pause_background_to_gs(void) {
     TI128 buf[7];
     s32 size;
     s32 dst;
     s32 src;
 
-    WaitForDmaStatusBits(1);
-    GetGsCurrentField(0);
+    gfx_wait_for_dma_status_bits(1);
+    sceGsSyncV(0);
     D_001B1598++;
-    size = gScreenHeight * 1536;
-    src = gPauseMenuState.src;
+    size = g_screen_height * 1536;
+    src = g_pause_menu_state.src;
     dst = D_001A72D4;
-    if (gPauseMenuState.mode >= 2) {
+    if (g_pause_menu_state.mode >= 2) {
         dst = 0x3FB000 - size;
     }
     for (; size >= 0; size -= 16384) {
@@ -47,7 +48,7 @@ void func_002C9F68(void) {
         FlushCache(0);
         func_00126730(buf, src);
         src += 16384;
-        WaitGsPathsIdle(0, 0);
+        gfx_wait_paths_idle(0, 0);
     }
-    gPauseMenuState.mode = 0;
+    g_pause_menu_state.mode = 0;
 }

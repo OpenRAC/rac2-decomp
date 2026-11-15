@@ -1,15 +1,15 @@
 #include "common.h"
 
-extern s32 func_00283CF0(f32 a0);
-extern u8 *D_L11_001B359C;
+extern s32 FloatToInt(f32 a0);
+extern u8 *g_moby_l11_table;
 extern u8 D_L11_00188660[];
-extern void *D_L11_001FC420[];
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283180(f32);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern s32 func_002E5CF8(s32, s32, u8 *);
-extern void func_002E59F8(s32);
+extern void *g_group_id_lists[];
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern s32 PlayMobySound(s32, s32, u8 *);
+extern void snd_stop_voice(s32);
 extern s32 D_L11_001B0808 __attribute__((sda));
 
 /* Once the linked object is in state 2 and the shared step counter is in phase, moves the object
@@ -18,9 +18,9 @@ extern s32 D_L11_001B0808 __attribute__((sda));
    its own state to 4.
    The two sound lookups are separate values, and the early exits return without stepping the
    shared counter, as retail does. */
-void func_L11_003F7B70(u8 *mobyArg) {
+void pulsing_platform_trigger_update(u8 *mobyArg) {
     f32 offset[4];
-    u8 *mobyTable = gMobyTable_L11;
+    u8 *mobyTable = g_moby_l11_table;
     u8 *self = mobyArg;
     u8 *vars = *(u8 **)(self+0x68);
     u8 *target = mobyTable + *(s32 *)(vars+8)*256;
@@ -59,7 +59,7 @@ void func_L11_003F7B70(u8 *mobyArg) {
                 if (*(s32 *)(vars+0x30) != -1) {
                     u8 *sound = D_L11_00188660 + *(s32 *)(vars+0x30)*0x70;
                     if (*(u8 **)(sound+0x88) == self && *(u8 *)(sound+0x74))
-                        StopSoundVoice(*(s32 *)(vars+0x30));
+                        snd_stop_voice(*(s32 *)(vars+0x30));
                 }
                 *(s32 *)(vars+0x30) = -1;
             }
@@ -67,7 +67,7 @@ void func_L11_003F7B70(u8 *mobyArg) {
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             qcopy(self+0x10,vars+0x20);
         } else {
-            vec_scale_to_length(offset,self+0xD0,-(FastSinOrCosA(*(f32 *)(vars+0xC))+1.0f)*2.2f);
+            vec_scale_to_length(offset,self+0xD0,-(math_fast_sin_or_cos_a(*(f32 *)(vars+0xC))+1.0f)*2.2f);
             FastVecAdd(self+0x10,offset,vars+0x20);
         }
         break;
@@ -77,13 +77,13 @@ void func_L11_003F7B70(u8 *mobyArg) {
         if (*(u8 *)(target+0x20) == 2) {
             if (*(s32 *)(vars+0x1C) == 0) {
                 *(s32 *)(vars+0x1C) = 1;
-                if (*(s32 *)(vars+0x14) == 255 || (groupList = gGroupIdLists[*(s32 *)(vars+0x14)]) == 0) {
+                if (*(s32 *)(vars+0x14) == 255 || (groupList = g_group_id_lists[*(s32 *)(vars+0x14)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
                 victims = groupList;
                 do {
-                    victim = gMobyTable_L11 + ((*victims & 0x7FFF) << 8);
+                    victim = g_moby_l11_table + ((*victims & 0x7FFF) << 8);
                     if (*(s8 *)(victim+0x20) >= 0) {
                         s32 kind = *(s16 *)(victim+0xAA);
                         if (kind == 0xCF5 /* Joba Tribesman */) *(u8 *)(victim+0x95) = 1;
@@ -91,13 +91,13 @@ void func_L11_003F7B70(u8 *mobyArg) {
                         else if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;
                     }
                 } while (*victims++ >= 0);
-                if (*(s32 *)(vars+0x18) == 255 || (groupList = gGroupIdLists[*(s32 *)(vars+0x18)]) == 0) {
+                if (*(s32 *)(vars+0x18) == 255 || (groupList = g_group_id_lists[*(s32 *)(vars+0x18)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
                 victims = groupList;
                 do {
-                    victim = gMobyTable_L11 + ((*victims & 0x7FFF) << 8);
+                    victim = g_moby_l11_table + ((*victims & 0x7FFF) << 8);
                     if (*(s8 *)(victim+0x20) >= 0) {
                         s32 kind = *(s16 *)(victim+0xAA);
                         if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;

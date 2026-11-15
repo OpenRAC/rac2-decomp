@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,12 +24,12 @@
  */
 #include "common.h"
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s32 ref_L01_00367F78_00 __attribute__((sda));
 extern u8 D_001395B8[];
 
 /* Sets a bit in the saved data for each slot from 1 to 4 that matches the current level. */
-void func_L01_00367F78(void) {
+void save_mark_matching_level_slots(void) {
     u8 *saveData;
     s32 levelId;
     s32 *slotIds;
@@ -36,7 +37,7 @@ void func_L01_00367F78(void) {
     u32 one;
 
     saveData = D_001395B8;
-    levelId = gCurrentMapIndex;
+    levelId = g_current_map_index;
     slotIndex = 1;
     one = 1;
     slotIds = &ref_L01_00367F78_00;

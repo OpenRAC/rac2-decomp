@@ -11,18 +11,18 @@ extern f32 D_L09_001B13C4 __attribute__((sda));
 extern f32 D_L09_001B13C8 __attribute__((sda));
 extern f32 D_L09_001B13CC __attribute__((sda));
 extern f32 D_L09_001B13D0 __attribute__((sda));
-extern u8 *D_0018C0B0 NOT_SDA;
+extern u8 *g_hero_moby NOT_SDA;
 
-extern void func_00282CF0(void *, void *, void *);
-extern f32 func_00282DF0(void *);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_002A7790(f32);
-extern void func_002AEE70(u8 *, void *, void *, f32, f32, f32);
-extern void func_002AEF28(u8 *, void *, void *, f32, f32, f32);
+extern void FastVecSub(void *, void *, void *);
+extern f32 FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 math_square(f32);
+extern void math_update_wrapped_angle_offset(u8 *, void *, void *, f32, f32, f32);
+extern void moby_scale_owner_words_by_angles(u8 *, void *, void *, f32, f32, f32);
 
 /* Keeps the object at a smooth height above the ground and pushes it away from others in its group. */
-void func_L09_00403398(u8 *obj)
+void dobbo_update_height_separation(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     f32 origin[4] __attribute__((aligned(16)));
@@ -41,7 +41,7 @@ void func_L09_00403398(u8 *obj)
         qcopy(origin, obj + 0x10);
         origin[2] = height + (D_L09_001B13C4 - D_L09_001B13BC);
         ground = *(u8 **)(state + 0x188);
-        if (ground == 0 || (ground != gHeroMoby_0018C0B0 && *(s16 *)(ground + 0xAA) != 0xD57 /* moby class 3415 */ &&
+        if (ground == 0 || (ground != g_hero_moby && *(s16 *)(ground + 0xAA) != 0xD57 /* moby class 3415 */ &&
                        *(s16 *)(*(u8 **)(ground + 0x24) + 0x46) >= 11)) {
             limit = *(f32 *)(state + 0x288) + D_L09_001B13BC;
             current = *(f32 *)(state + 0x294);
@@ -75,13 +75,13 @@ void func_L09_00403398(u8 *obj)
             else if (len < 0.0f)
                 len = 0.0f;
             weight = 1.0f - len / D_L09_001B13D0;
-            Square(weight);
+            math_square(weight);
             vec_scale_to_length(offset, offset, len * weight);
             FastVecAdd(pushSum, pushSum, offset);
         }
         FastVecAdd(obj + 0x10, obj + 0x10, pushSum);
-        UpdateWrappedAngleOffset(obj, state + 0x278, state + 0x27C, 0.1f, 0.087266475f, *(f32 *)(obj + 0x18));
-        ScaleOwnerWordsByAngles(obj, state + 0x280, state + 0x284, 0.13962635f, 0.026179943f, 0.026179943f);
+        math_update_wrapped_angle_offset(obj, state + 0x278, state + 0x27C, 0.1f, 0.087266475f, *(f32 *)(obj + 0x18));
+        moby_scale_owner_words_by_angles(obj, state + 0x280, state + 0x284, 0.13962635f, 0.026179943f, 0.026179943f);
     } else {
         *(f32 *)(state + 0x294) = *(f32 *)(obj + 0x18);
     }

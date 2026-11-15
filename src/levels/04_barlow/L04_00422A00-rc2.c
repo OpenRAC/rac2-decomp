@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,12 +24,12 @@
  */
 #include "common.h"
 
-extern volatile s32 D_001A7344[] __attribute__((sda));
+extern volatile s32 g_screen_height[] __attribute__((sda));
 extern void ref_L04_00422A00_00(void *dest, s32 *position, void *table);
 extern f32 ref_L04_00422A00_01(void *work, void *table);
 extern void ref_L04_00422A00_02(s32 *position, s32 *x, s32 *y);
 extern s32 ref_L04_00422A00_03(s32 sentinel, u16 x, u16 y, s32 width, s32 rowBytes, s32 flags, f32 *out);
-extern s32 D_001A7340;
+extern s32 g_screen_width;
 extern f32 ref_L04_00422A00_04 __attribute__((sda));
 extern s8 ref_L04_00422A00_05[];
 
@@ -40,7 +41,7 @@ typedef struct {
 } QueryWork;
 
 /* Projects the object's position onto the screen and, if it lands inside the view, looks up a value for that spot; returns -1 when it does not. */
-f32 func_L04_00422A00(void *object) {
+f32 screen_query_point_value(void *object) {
     QueryWork work;
     f32 queryResult;
     s32 positionPtr;
@@ -50,9 +51,9 @@ f32 func_L04_00422A00(void *object) {
     queryResult = ref_L04_00422A00_01(&work, ref_L04_00422A00_05 + 0x230);
     ref_L04_00422A00_02((s32 *)positionPtr, &work.x, &work.y);
     if (work.x < 0 ||
-        work.x >= gScreenWidth - 0x10 ||
+        work.x >= g_screen_width - 0x10 ||
         work.y < 0 ||
-        work.y >= gScreenHeight[0] - 8 ||
+        work.y >= g_screen_height[0] - 8 ||
         !(queryResult > 0.0f) ||
         ref_L04_00422A00_03(-1, (u16)work.x, (u16)work.y, 0x10, 8, 0, &ref_L04_00422A00_04) == -1) {
         ref_L04_00422A00_04 = -1.0f;

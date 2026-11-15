@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L04_0044D0C0: a -G8 unit (D_L04_001B24DC, D_L04_001B1870 and D_L04_001B1880 are
  * read through $gp). The same set-up as func_L17_003E41A8 in
  * L17_003C7C70-g8.c, whose field-order tuning block it follows. */
@@ -8,23 +9,23 @@ typedef int Quad __attribute__((mode(TI)));
 #define H(p,o) (*(short *)((u8 *)(p)+(o)))
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 
-extern u8 *D_L04_001B24DC __attribute__((sda));
+extern u8 *g_moby_l04_pool __attribute__((sda));
 extern float D_L04_001B1870 __attribute__((sda));
 extern u8 D_L04_001B1880[8] __attribute__((sda));
 extern u8 D_L04_001B9680[];
-extern float func_002A89A8(void *, int, float);
-extern int func_00283CF0(float);
-extern void func_L04_0033CB88(void *);
-extern int func_002A7820(int, int);
-extern void func_002AB650(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void *func_002A9640(void *, int, int);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_L04_0044D7E0(void *);
-extern void func_002B3BA8(void *, int, void *, int, float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int FloatToInt(float);
+extern void MoveCtl_Init(void *);
+extern int math_random_int_range(int, int);
+extern void hero_copy_field_to_moby(void *);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void gadgetron_hound_flag_group(void *);
+extern void weapon_select_aim_target(void *, int, void *, int, float, float);
 
 /* The 0x30-byte record func_L04_0033CB88 fills with its defaults. */
 typedef struct {
@@ -112,7 +113,7 @@ typedef struct {
 /* Sets the state record up on the first update (ground height, spawn-point height,
    tuning block, timer, home position), then runs its distance, collision and
    func_002B0ED8 checks on every update. */
-void func_L04_0044D0C0(u8 *obj)
+void barlow_enemy_update_common(u8 *obj)
 {
     D0C0Vars *vars = *(D0C0Vars **)(obj + 0x68);
     u8 *hit;
@@ -120,10 +121,10 @@ void func_L04_0044D0C0(u8 *obj)
 
     obj[0x23] = 128;
     if (obj[0x20] == 0) {
-        F(obj, 0x18) = ProbeGroundHeightBelow(obj + 0x10, 0, 0.5f);
+        F(obj, 0x18) = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
         qzero_nc(obj + 0xF0);
         if (vars->i328 != -1) {
-            F(obj, 0x18) = F(gMobyPool_L04 + vars->i328 * 256, 0x18) + 1.4f;
+            F(obj, 0x18) = F(g_moby_l04_pool + vars->i328 * 256, 0x18) + 1.4f;
             H(obj, 0x34) |= 0x41;
             I(obj, 0x98) = 0;
         }
@@ -164,35 +165,35 @@ void func_L04_0044D0C0(u8 *obj)
         }
         qcopy(&vars->v110, &vars->v2E0);
         vars->f120 = 0.5f;
-        vars->h300 = RandomIntRange(120, 700);
+        vars->h300 = math_random_int_range(120, 700);
         vars->i31C = 0;
-        CopyHeroField38ToMoby(obj);
+        hero_copy_field_to_moby(obj);
         vars->f230 = F(obj, 0x2C);
         vars->f220 = vars->f30;
         vars->b28 = 0;
         vars->i318 = 0;
         vars->p200 = D_L04_001B1880;
         vars->f330 = (float)vars->b34;
-        SetMobyState(obj, 1, 0);
+        moby_set_state(obj, 1, 0);
         if (obj[0x43])
-            StartAnimationBlended(obj, 0, 0, 0);
+            anim_start_blended(obj, 0, 0, 0);
     }
     if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 24.0f) {
-        UpdateMobyGroundCheck(obj);
+        moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }
-    hit = (u8 *)FindOwnedEffectSlot(obj, 0x230000, 0);
+    hit = (u8 *)part_find_owned_effect_slot(obj, 0x230000, 0);
     if (hit && hit[0x28] == 8) {
         obj[0x20] = 8;
         obj[0xBC] = 4;
     }
-    result = ApplyDamageToObject(obj, vars->ai, 0);
+    result = moby_apply_damage_to_object(obj, vars->ai, 0);
     if (result) {
         if (result == 5) {
             vars->iF0 = 0;
             vars->fF4 = 0.8377582f;
         }
-        FlagHoundsInGroup(obj);
+        gadgetron_hound_flag_group(obj);
     }
-    SelectAimTarget_002B3BA8(obj, -1, &vars->v2E0, 0, vars->f2F4, 10.0f);
+    weapon_select_aim_target(obj, -1, &vars->v2E0, 0, vars->f2F4, 10.0f);
 }

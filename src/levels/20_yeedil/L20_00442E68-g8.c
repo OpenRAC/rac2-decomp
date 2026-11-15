@@ -7,7 +7,7 @@ extern u16 *D_L20_001FBB20[];
 extern char *D_L20_001B2F9C[] __attribute__((sda));
 extern int D_L20_001B2FB8 __attribute__((sda));
 
-extern void func_L02_003A6F78(char *);
+extern void moby_finish_release_child(char *);
 
 /* Runs func_L02_003A6F78 on every entity of the object's group (state word 0x218, the id
    list D_L20_001FBB20[group], ids masked with 0x7FFF, 0x100-byte records at D_L20_001B2F9C),
@@ -17,7 +17,7 @@ extern void func_L02_003A6F78(char *);
    The entity bank is an `sda` array of unknown size, which gives retail's absolute
    lui/lw load in this -G8 unit. */
 /* Gets every object in this enemy group ready for the fight by setting a value on it and starting its setup. */
-void func_L20_00442E68(char *moby) {
+void yeedil_boss_init_group(char *moby) {
     char *state = *(char **)(moby + 0x68);
     u16 *p;
     char *e;
@@ -31,6 +31,6 @@ void func_L20_00442E68(char *moby) {
         if (e == 0)
             break;
         *(u16 *)(e + 0x36) = 0x7F80;
-        FinishObjectAndReleaseChild(e);
+        moby_finish_release_child(e);
     }
 }

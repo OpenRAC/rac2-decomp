@@ -2,11 +2,11 @@
 extern int D_L11_001CAE40;
 extern int D_L11_001B46D4[] NOT_SDA __attribute__((sda));
 extern int D_L11_001B30C8[] NOT_SDA __attribute__((sda));
-extern void func_002A7750(void *, int, int);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L11_0045B6C8(char *);
+extern void moby_set_state(void *, int, int);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_draw_spinning_glow_sprites(char *);
 /* Fades the object in and out by pulsing its colour value up and down, and counts its frames. It asks for a refresh whenever the level counter changes. */
-void func_L11_0045B5C8(char *moby)
+void UpdateJobaPulseController(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     unsigned short frameCount;
@@ -18,7 +18,7 @@ void func_L11_0045B5C8(char *moby)
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(unsigned char *)(moby + 0x30) = 0xFF;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         *(int *)(vars + 0x0) = 0x1000000;
         *(int *)(vars + 0x8) = 1;
         *(int *)(vars + 0x4) = 1;
@@ -35,7 +35,7 @@ void func_L11_0045B5C8(char *moby)
         *(int *)(vars + 0x8) = fade;
         if (old != current) {
             D_L11_001B46D4[0] = current;
-            AddDrawCallbackToList1(DrawSpinningGlowSprites, moby);
+            gfx_add_draw_callback_first(gfx_draw_spinning_glow_sprites, moby);
         }
         break;
     }

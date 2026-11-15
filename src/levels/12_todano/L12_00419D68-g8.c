@@ -1,3 +1,4 @@
+#include "names.h"
 /* Transforms the two vectors by the object matrix (the second one also lifted by 2) and reports success when the object is in step 5 with its marker value. The two small-data vectors are 8-byte sda arrays so that their addresses come out as `addiu $gp`. */
 extern float D_L12_001B1C00[2] __attribute__((sda));
 extern float D_L12_001B1C10[2] __attribute__((sda));
@@ -6,7 +7,7 @@ extern void func_002F1928(float *, float *, char *);
 extern float func_0031F718(float, float *, int);
 
 /* Works out two sight points in front of the object for the line-of-sight test. Only works while the object is in its ready state. */
-int func_L12_00419D68(char *obj, float *sightEnd, float *sightStart) {
+int gate_compute_sight_points(char *obj, float *sightEnd, float *sightStart) {
     char *matrix;
     char *position;
     if (*(short *)(obj + 0xAA) != 0xFA5 /* moby class 4005 */ || *(unsigned char *)(obj + 0x20) != 5) {

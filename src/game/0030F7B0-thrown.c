@@ -41,23 +41,23 @@ typedef struct {
     float normal[4];            /* 0x40 */
 } Collision;
 
-extern Hero D_00189E20;
-extern Collision D_001BAF80;
+extern Hero g_hero_state;
+extern Collision g_collision_hit;
 extern Moby *D_001B1B68 __attribute__((sda));   /* the first moby of the moby list */
 
-extern float func_002A7878(float min, float max);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *vector, float scale);
-extern void func_00282D30(void *out, void *vector, float scale);
-extern void func_00283028(void *out, void *vector, void *normal);
-extern char *func_002AD0B0(Moby *moby);
-extern int func_002761F8(void *start, void *end, int, void *moby, int);
+extern float math_random_float_range(float min, float max);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *vector, float scale);
+extern void FastVecScale(void *out, void *vector, float scale);
+extern void vec_fast_normalize(void *out, void *vector, void *normal);
+extern char *moby_get_private_value_2(Moby *moby);
+extern int CollLine(void *start, void *end, int, void *moby, int);
 
 /* Launches self from position with velocity plus a random spread (plus the velocity of the
  * moby the hero stands on) and 120 frames of life, retires the oldest other moby of its class
  * when there are nine, and if the line from the hero hits something, starts at the hit point
  * with its velocity bounced off the surface. */
-void func_003159D0(float *position, Moby *self, float *velocity)
+void thrown_item_launch(float *position, Moby *self, float *velocity)
 {
     /* Quadword unions: the clear and the copies are single 128-bit register moves. */
     typedef unsigned int Quad __attribute__((mode(TI)));
@@ -73,16 +73,16 @@ void func_003159D0(float *position, Moby *self, float *velocity)
     int oldestFrame;
 
     random.q = 0;
-    random.f[0] = RandomFloatRange(-1.0f, 1.0f);
-    random.f[1] = RandomFloatRange(-1.0f, 1.0f);
-    random.f[2] = RandomFloatRange(-1.0f, 1.0f);
+    random.f[0] = math_random_float_range(-1.0f, 1.0f);
+    random.f[1] = math_random_float_range(-1.0f, 1.0f);
+    random.f[2] = math_random_float_range(-1.0f, 1.0f);
     spread.q = random.q;
     self->state = 0;
     self->scale *= 1.5384616f;
-    vec_scale_to_length(&spread, &spread, RandomFloatRange(0.00016666666f, 0.0016666668f));
+    vec_scale_to_length(&spread, &spread, math_random_float_range(0.00016666666f, 0.0016666668f));
     FastVecAdd(vars->velocity, &spread, velocity);
-    if (gHeroState.groundMoby != 0 && GetMobyPrivateValue2(gHeroState.groundMoby) != 0)
-        FastVecAdd(vars->velocity, vars->velocity, gHeroState.velocity);
+    if (g_hero_state.groundMoby != 0 && moby_get_private_value_2(g_hero_state.groundMoby) != 0)
+        FastVecAdd(vars->velocity, vars->velocity, g_hero_state.velocity);
 
     vars->lifetime = 120;
     count = 0;
@@ -104,13 +104,13 @@ void func_003159D0(float *position, Moby *self, float *velocity)
 
     qcopy(self->position, position);
     /* The line test starts at the hero, at the height of position. */
-    random.q = *(Quad *)gHeroState.moby->position;
+    random.q = *(Quad *)g_hero_state.moby->position;
     random.f[2] = position[2];
-    if (CollLine(&random, position, 0, gHeroState.moby, 0) != 0) {
-        qcopy(self->position, gCollisionHit.point);
-        vec_scale_to_length(offset, gCollisionHit.normal, 0.0026944445f);
+    if (CollLine(&random, position, 0, g_hero_state.moby, 0) != 0) {
+        qcopy(self->position, g_collision_hit.point);
+        vec_scale_to_length(offset, g_collision_hit.normal, 0.0026944445f);
         FastVecAdd(self->position, self->position, offset);
-        FastVectorNormalize(vars->velocity, vars->velocity, gCollisionHit.normal);
+        vec_fast_normalize(vars->velocity, vars->velocity, g_collision_hit.normal);
         FastVecScale(vars->velocity, vars->velocity, 0.6f);
     }
 }

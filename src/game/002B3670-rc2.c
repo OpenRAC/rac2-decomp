@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,16 +24,16 @@
  */
 #include "common.h"
 
-extern f32 func_00282E80(void *, s32);
-extern s32 func_002A8AF0(s32, void *, s32);
-extern struct { s32 w0; s32 w1; s32 w2; } D_0018C0B0;
-extern volatile s32 D_001A8BB0;
-extern s32 *D_001F1700[];
+extern f32 vec_distance_xy(void *, s32);
+extern s32 point_in_path_xy(s32, void *, s32);
+extern struct { s32 w0; s32 w1; s32 w2; } g_hero_moby;
+extern volatile s32 g_current_game_mode;
+extern s32 *g_path_table[];
 
 typedef int TI __attribute__((mode(TI)));
 
 /* Checks how close a spot is to the hero and returns 2 for the near zone, 1 for the far zone or 0 for neither. */
-s32 func_002B3670(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void *posOverride, f32 nearDistance, f32 farDistance) {
+s32 hero_check_distance_zones(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void *posOverride, f32 nearDistance, f32 farDistance) {
     TI position;
     f32 distance;
     s32 hero;
@@ -44,14 +45,14 @@ s32 func_002B3670(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void 
     } else {
         position = *(TI *)((s8 *)object + 0x10);
     }
-    hero = gHeroMoby_0018C0B0.w0;
+    hero = g_hero_moby.w0;
     *outHero = hero;
-    if (gCurrentGameMode != 0) {
+    if (g_current_game_mode != 0) {
         return 0;
     }
     distance = vec_distance_xy(&position, hero + 0x10);
     if (nearIndex != -1) {
-        nearZone = gPathTable_001F1700[nearIndex];
+        nearZone = g_path_table[nearIndex];
         if (point_in_path_xy(*outHero + 0x10, (s8 *)nearZone + 0x10, *nearZone) != 0) {
             return 2;
         }
@@ -61,7 +62,7 @@ s32 func_002B3670(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void 
         }
     }
     if (farIndex != -1) {
-        farZone = gPathTable_001F1700[farIndex];
+        farZone = g_path_table[farIndex];
         if (point_in_path_xy(*outHero + 0x10, (s8 *)farZone + 0x10, *farZone) != 0) {
             return 1;
         }

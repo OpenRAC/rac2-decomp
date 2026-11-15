@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_0028E588(int, int);
-extern double func_001234F0(float);
-extern int func_00123028(double, double);
-extern double func_00122A98(double, double);
-extern double func_00122B00(double, double);
-extern int func_00123130(double);
-extern int func_0028EA58(int, int, int, int, int, int *);
+extern int GetIconFrame(int, int);
+extern double __extendsfdf2(float);
+extern int __cmpdf2(double, double);
+extern double __subdf3(double, double);
+extern double __muldf3(double, double);
+extern int __fixdfsi(double);
+extern int hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
@@ -25,15 +26,15 @@ int func_PAL_002D4D00(int index, int x)
     int baseColor = 0xf0f0b0;
     double distance;
 
-    texture = func_0028E588(0xea97, D_0026CFD0[index].icon);
-    distance = func_001234F0(256.0f - (float)left);
-    if (func_00123028(distance, 0.0) < 0)
-        distance = func_00122A98(0.0, distance);
-    leftAlpha = 128 - func_00123130(func_00122B00(distance, 0.75));
-    distance = func_001234F0(256.0f - (float)(x + 40));
-    if (func_00123028(distance, 0.0) < 0)
-        distance = func_00122A98(0.0, distance);
-    rightAlpha = 128 - func_00123130(func_00122B00(distance, 0.75));
+    texture = GetIconFrame(0xea97, D_0026CFD0[index].icon);
+    distance = __extendsfdf2(256.0f - (float)left);
+    if (__cmpdf2(distance, 0.0) < 0)
+        distance = __subdf3(0.0, distance);
+    leftAlpha = 128 - __fixdfsi(__muldf3(distance, 0.75));
+    distance = __extendsfdf2(256.0f - (float)(x + 40));
+    if (__cmpdf2(distance, 0.0) < 0)
+        distance = __subdf3(0.0, distance);
+    rightAlpha = 128 - __fixdfsi(__muldf3(distance, 0.75));
     if (leftAlpha < 0)
         leftAlpha = 0;
     if (rightAlpha < 0)
@@ -44,7 +45,7 @@ int func_PAL_002D4D00(int index, int x)
     right <<= 24;
     colors[2] = colors[0] = leftAlpha | baseColor;
     colors[3] = colors[1] = right | baseColor;
-    return func_0028EA58(texture, left, 334, 40, 40, colors);
+    return hud_draw_sprite_gradient(texture, left, 334, 40, 40, colors);
 }
 
 /* func_PAL_002D4EA0 lives in 002D4EA0-g8.c. */

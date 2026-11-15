@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int s32;
 typedef unsigned char u8;
 extern s32 D_L11_001B1530 __attribute__((sda));
@@ -11,17 +12,17 @@ extern void func_488268(s32, s32);
 extern void func_4881A8(void *);
 extern void func_488200(void *);
 extern u8 D_L11_001BA8C0[];
-extern u8 *D_L11_001B359C[3] __attribute__((sda));
-extern u8 *D_L11_001FC420[];
+extern u8 *g_moby_l11_table[3] __attribute__((sda));
+extern u8 *g_group_id_lists[];
 extern s32 D_L11_001B35B8 __attribute__((sda));
 extern u8 *D_L11_001B359C_abs[3] __attribute__((sda));
-extern s32 func_L11_00442B60(u8 *);
-extern s32 func_L02_003D77B8(u8 *);
-extern u8 *func_L11_004417E8(u8 *);
+extern s32 arena_is_entity_far_in_direction(u8 *);
+extern s32 moby_has_free_child_slot_state2(u8 *);
+extern u8 *arena_get_center_point(u8 *);
 extern s32 D_L11_001B35B8_1[] __attribute__((sda));
-extern s32 func_00312B58(u8 *);
-extern s32 func_L02_00416800(u8 *);
-extern s32 func_002A77E0(s32);
+extern s32 moby_is_state_six(u8 *);
+extern s32 moby_is_state_one_cleared_vars(u8 *);
+extern s32 math_random_int_below(s32);
 
 /* arms the script bridge over the measured buffers and starts it on the shared slot */
 void func_PAL_L11_00448BD8(void) {

@@ -9,35 +9,35 @@ typedef unsigned int u32;
 
 typedef unsigned long u64;
 
-extern void func_002FC560(u32,u64);
+extern void VU1_addGSregister(u32,u64);
 
-extern void func_002FC560(unsigned int reg, unsigned long value);
+extern void VU1_addGSregister(unsigned int reg, unsigned long value);
 
 typedef float f32;
 
 typedef int TI128 __attribute__((mode(TI)));
 
 extern short D_001A65EE;
-extern void func_00285030(int width, int height, int address, int mode);
-extern void func_0027B2F8(int width, int height, float scale, float a, float b, float c, float d);
+extern void gfx_build_screen_sprite_packet(int width, int height, int address, int mode);
+extern void gfx_configure_projection(int width, int height, float scale, float a, float b, float c, float d);
 
 typedef struct { u8 pad[0x10]; float *result; u32 threshold; u8 gap[4]; int flags; short x, y, w, h; u8 tail[8]; } CopyRegion;
 
 extern CopyRegion D_001B8A10[];
 
-extern s32 D_001A7B90;
+extern s32 g_is_pal_video;
 
-extern s32 D_001A7BB8 __attribute__((sda));
+extern s32 g_widescreen_flag __attribute__((sda));
 
 extern s32 func_00124418(void);
 
-extern s32 func_001257D0(s32,s32,s32,s32);
+extern s32 sceGsResetGraph(s32,s32,s32,s32);
 
 typedef struct { u8 before[0x158]; short a,b,c; u8 gap[10]; short d,e; } DisplayState;
 
-extern DisplayState D_001A6480;
+extern DisplayState g_screen_adjust_offsets;
 
-extern void func_00125A20(u8 *,short,short,short,short,short);
+extern void sceGsSetDefDispEnv(u8 *,short,short,short,short,short);
 
 /* Family c1edda5cc3fa91ec — 148 bytes, levels/2_maktar_nebula and levels/11_joba.
 
@@ -61,7 +61,7 @@ extern char D_001A6D40[];
 extern char D_001A6E90[];
 
 /* Adds up the widths of the letters in a piece of text, using a letter-width table. */
-s32 func_0027F128(u8 *text,s32 length,u8 *glyphs) {
+s32 measure_text_width(u8 *text,s32 length,u8 *glyphs) {
  s32 width=0,i=0;
  u8 *p;
  if(length!=0 && text[0]!=0) {
@@ -79,48 +79,48 @@ s32 func_0027F128(u8 *text,s32 length,u8 *glyphs) {
 extern u8 D_00263B50[];
 
 /* Measures how wide text will be in the small font. */
-s32 func_0027F178(u8 *text, s32 length) {
+s32 text_measure_width_small(u8 *text, s32 length) {
     return measure_text_width(text, length, D_00263B50);
 }
 
 extern u8 D_00263EF0[];
 
 /* Measures how wide text will be in the medium font. */
-s32 func_0027F198(u8 *text, s32 length) {
+s32 text_measure_width_medium(u8 *text, s32 length) {
     return measure_text_width(text, length, D_00263EF0);
 }
 
 extern u8 D_00264290[];
 
 /* Measures how wide text will be in the large font. */
-s32 func_0027F1B8(u8 *text, s32 length) {
+s32 text_measure_width_large(u8 *text, s32 length) {
     return measure_text_width(text, length, D_00264290);
 }
 
-extern int func_0027F1D8(u8 *, int, u8 *, float);
+extern int text_measure_width_scaled(u8 *, int, u8 *, float);
 
 /* Measures how wide text will be in the small font at a given size. */
-int func_0027F288(u8 *text, int length, float scale) {
-    return MeasureTextWidthScaled(text, length, D_00263B50, scale);
+int text_measure_width_small_scaled(u8 *text, int length, float scale) {
+    return text_measure_width_scaled(text, length, D_00263B50, scale);
 }
 
 /* func_0027F2A8 is in 0027F128-font-g8.c. */
 
-extern u64 func_0027C878(int);
-extern void func_0027F2A8(int, int, u64, u8 *, int, u64, u8 *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void text_draw_line(int, int, u64, u8 *, int, u64, u8 *);
 
 /* Draws text in the small font at the given screen position. */
-void func_0027F538(int x, int y, u64 style, u8 *text, int length)
+void text_draw_small(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(1);
-    DrawTextLine(x, y, style, text, length, font, D_00263B50);
+    text_draw_line(x, y, style, text, length, font, D_00263B50);
 }
 
 /* Draws text in the medium font at the given screen position. */
-void func_0027F5B8(int x, int y, u64 style, u8 *text, int length)
+void text_draw_medium(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(2);
-    DrawTextLine(x, y, style, text, length, font, D_00263EF0);
+    text_draw_line(x, y, style, text, length, font, D_00263EF0);
 }
 
 
@@ -143,17 +143,17 @@ void func_0027F5B8(int x, int y, u64 style, u8 *text, int length)
 
 /* func_0027FC70 is matched in 0027F128-fpw-g8.c. */
 
-extern void func_0027FC70(unsigned short *, u64, u8 *, int, u64, u8 *);
+extern void FontPrintWindow(unsigned short *, u64, u8 *, int, u64, u8 *);
 
 /* Draws word-wrapped text inside a text box using the small font. */
-void func_00280190(unsigned short *layout, u64 style, u8 *text, int length)
+void text_draw_window_small(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(1);
     FontPrintWindow(layout, style, text, length, font, D_00263B50);
 }
 
 /* Draws word-wrapped text inside a text box using the medium font. */
-void func_00280200(unsigned short *layout, u64 style, u8 *text, int length)
+void text_draw_window_medium(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(2);
     FontPrintWindow(layout, style, text, length, font, D_00263EF0);
@@ -161,14 +161,14 @@ void func_00280200(unsigned short *layout, u64 style, u8 *text, int length)
 
 
 /* Draws word-wrapped text inside a text box using the large font. */
-void func_00280270(unsigned short *layout, u64 style, u8 *text, int length)
+void text_draw_window_large(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(3);
     FontPrintWindow(layout, style, text, length, font, D_00264290);
 }
 
 /* Fills in a text box: its edges, the anchor point, line height and layout flags. */
-void func_002802E0(unsigned short *window,s32 yMin,s32 yMax,s32 xMin,s32 xMax,s32 xAnchor,s32 yStart,s32 lineHeight,s32 flags) {
+void FontSetWindow(unsigned short *window,s32 yMin,s32 yMax,s32 xMin,s32 xMax,s32 xAnchor,s32 yStart,s32 lineHeight,s32 flags) {
  window[0]=yMin;window[1]=yMax;window[2]=xMin;window[3]=xMax;
  window[4]=xAnchor;window[5]=yStart;window[8]=lineHeight;window[9]=flags;
  window[6]=0;window[7]=0;window[10]=0;window[11]=0;
@@ -178,7 +178,7 @@ void func_002802E0(unsigned short *window,s32 yMin,s32 yMax,s32 xMin,s32 xMax,s3
 /* func_00280328 -- see src/game/0027F128-packet-g8.c (built with -G8). */
 
 /* Sets up the screen-copy draw state for a texture of the given size and brightness scale. */
-void func_00280510(int width, int height, int use_saved, float scale) {
+void gfx_setup_screen_copy_draw_state(int width, int height, int use_saved, float scale) {
     int address;
 
     if (use_saved) {
@@ -189,8 +189,8 @@ void func_00280510(int width, int height, int use_saved, float scale) {
         address = 0x3FF000 - (4 << shift);
         address = (address >> 13) << 13;
     }
-    BuildScreenSpritePacket(width, height, address, 0);
-    ConfigureGraphicsProjection(1 << width, 1 << height, scale, 0.0f, 524288.0f, 255.0f, 0.0f);
+    gfx_build_screen_sprite_packet(width, height, address, 0);
+    gfx_configure_projection(1 << width, 1 << height, scale, 0.0f, 524288.0f, 255.0f, 0.0f);
     if (use_saved) {
         VU1_addGSregister(0x47, 0UL);
     } else {
@@ -199,21 +199,21 @@ void func_00280510(int width, int height, int use_saved, float scale) {
     VU1_addGSregister(0x42, 0x8000000044UL);
 }
 
-extern void func_00284EA8(void);
-extern void func_0027A9F0(void);
-extern void func_0027AB40(void);
+extern void gfx_append_draw_list_header(void);
+extern void gfx_init_view_context(void);
+extern void UpdateViewContext(void);
 
 /* Sends the three screen-effect setup steps one after the other. */
-void func_00280600(void) {
-    AppendDrawListHeader();
-    InitViewContext();
+void gfx_run_screen_effect_setup(void) {
+    gfx_append_draw_list_header();
+    gfx_init_view_context();
     UpdateViewContext();
 }
 
 /* func_00280630 -- see src/game/0027F128-g8.c (built with -G8). */
 
 /* The share of a region's pixels whose low 24 bits do not exceed the region's threshold. */
-void func_00280670(u32 *pixels, int index) {
+void ComputeRegionThresholdRatio(u32 *pixels, int index) {
     CopyRegion *region = &D_001B8A10[index];
     s32 total = region->w * region->h;
     s32 count = 0;
@@ -265,7 +265,7 @@ typedef struct {
 } QuadPacket;
 
 /* Sets up the texture and flags of a quad before it is drawn. */
-void func_00281DE8(QuadPacket *q, int fontId, int entryIndex, int typeBits) {
+void gfx_init_quad_packet_state(QuadPacket *q, int fontId, int entryIndex, int typeBits) {
     QuadEntry *e;
     long flags;
     q->f78 = GetEffectTextureDescriptor(fontId);
@@ -286,12 +286,12 @@ void func_00281DE8(QuadPacket *q, int fontId, int entryIndex, int typeBits) {
 
 /* calls the measured callee with constants 0x47 and 0x513f1 */
 /* Writes one fixed value to a graphics register. */
-void func_002820A0(void) {
+void gfx_set_gs_register_constant(void) {
  VU1_addGSregister(0x47,0x513f1UL);
 }
 
 /* Does nothing. */
-void func_002820C8(void)
+void stub_no_op(void)
 {
 }
 
@@ -360,7 +360,7 @@ ASM_FUNC("asm/game", func_00282C30);
 /* 8-BYTE LOT -- bare getters and setters, identical across all 27 levels. */
 /* Measured target: byte-identical across all 27 levels. */
 /* Returns the absolute value of a number. */
-f32 func_00282C48(f32 value) { return __builtin_fabsf(value); }
+f32 math_fabs(f32 value) { return __builtin_fabsf(value); }
 
 /* func_00282C50 (the float minimum) is matched in its own unit, src/game/00282C50.c: it needs
    the -O1 -ffast-math profile. */
@@ -373,7 +373,7 @@ ASM_FUNC("asm/game", func_00282C68);
 ASM_FUNC("asm/game", func_00282C78);
 
 /* Clear one aligned 128-bit object through architectural zero. */
-void func_00282C88(TI128 *vec) { *vec = 0; }
+void vec_clear_128(TI128 *vec) { *vec = 0; }
 
 /* Original assembly: sqc2 (COP2 store) in the return delay slot, which the compiler cannot emit. */
 ASM_FUNC("asm/game", func_00282C90);
@@ -531,7 +531,7 @@ ASM_FUNC("asm/game", func_00283CC8);
 /* SECOND LOT -- 16 to 32 bytes. */
 /* integer-to-float conversion; byte-identical across all 27 levels. */
 /* Turns a whole number into a float. */
-f32 func_00283CE0(s32 value) { return (f32)value; }
+f32 IntToFloat(s32 value) { return (f32)value; }
 
 /* Original assembly: identical to RAC1 game/math/fastfunc.c func_001FA898, which rac1-decomp keeps as handwritten; 16 bytes, so below the identity rule's length. */
 ASM_FUNC("asm/game", func_00283CF0);
@@ -554,12 +554,12 @@ ASM_FUNC("asm/game", func_00283EF0);
 extern long long D_001A6D78;
 
 /* Sets the background color of the screen from red, green and blue values. */
-void func_00284E18(s32 red, s32 green, s32 blue) {
+void SetBackgroundColor(s32 red, s32 green, s32 blue) {
     D_001A6D78 = red | ((long long)green << 8) | ((long long)blue << 16) | 0x80000000ULL;
 }
 
 /* Asks the display system for a result using the current display buffer. */
-int func_00284E80(void)
+int gfx_query_display_buffer(void)
 {
     extern int func_00125D98(void *);
     return func_00125D98((void *)D_001A742C);
@@ -568,7 +568,7 @@ int func_00284E80(void)
 
 /* shared native body of family c1edda5cc3fa91ec */
 /* Adds a small header to the draw list, or restarts the display if there is no list. */
-void func_00284EA8(void)
+void gfx_append_draw_list_header(void)
 {
     if (D_L02_001B3D08_1 != 0) {
         *(int *)D_L02_001B3D08_1 = 0x30000009;
@@ -583,7 +583,7 @@ void func_00284EA8(void)
 
 /* shared native body of family cfd2e0cd2b82a1b7 (default profile) */
 /* Adds a header to the draw list that points at one of two buffers. */
-void func_00284F40(int useAlt)
+void gfx_append_draw_list_buffer_tag(int useAlt)
 {
     int *list = (int *)D_L02_001B3D08_2;
 

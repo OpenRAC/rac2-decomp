@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_001A8CFC;
-extern int func_003418C0(void *, int);
+extern int tab_menu_update(void *, int);
 
 int func_PAL_0029CE88(int value) {
     if (D_001A8CFC != 0)
-        return func_003418C0(D_001A8CFC + 0x3C210, value);
+        return tab_menu_update(D_001A8CFC + 0x3C210, value);
     return 0;
 }

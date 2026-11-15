@@ -3,12 +3,12 @@ typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
 extern float D_L02_001B1A48 __attribute__((sda));
 extern float D_L02_001B1A50 __attribute__((sda));
-extern void func_002833F0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Move the three children from the common orbit and tilt their frames. */
-void func_L02_00410D00(u8 *object)
+void teleporter_update_orbiting_children(u8 *object)
 {
     Quad displacement;
     u8 *state=*(u8 **)(object+0x68);

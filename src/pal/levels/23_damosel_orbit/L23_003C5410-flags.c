@@ -1,20 +1,21 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern char D_00189EA0[];
-extern char D_00189E20[];
-extern char *D_0018C0B0;
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern char g_hero_position[];
+extern char g_hero_state[];
+extern char *g_hero_moby;
 extern int D_L23_001B1644 __attribute__((sda));
 extern int D_L23_001B164C __attribute__((sda));
 extern int D_L23_001B36AC __attribute__((sda));
 extern void *D_L23_002AB170[];
-extern void func_L23_00418650(char *, float);
-extern int func_002A77E0(int);
-extern void func_L23_0041C6B0(char *, char *, int);
-extern void func_L23_003C00D0(char *);
-extern void func_002A7750(char *, int, int);
-extern void func_L23_003BFFC0(char *, int, int, int, int, float);
+extern void mothership_project_point_onto_surface(char *, float);
+extern int math_random_int_below(int);
+extern void boss_find_nearest_path_point(char *, char *, int);
+extern void enemy_reset_calm(char *);
+extern void moby_set_state(char *, int, int);
+extern void moby_play_anim_and_link(char *, int, int, int, int, float);
 
 /* Eight ways to place the offset vector v[6] (which of the two vectors at 0xC0 and 0xD0 of the
    target, or the average of two of them), picked by func_002A77E0(8). The dispatch reads the
@@ -26,69 +27,69 @@ void func_PAL_L23_003C5480(char *arg0) {
     TI128 v[7];
     unsigned int sel;
 
-    v[1] = *(TI128 *)D_00189EA0;
-    func_L23_00418650((char *)&v[1], 0.0f);
-    func_00282D30((char *)&v[0], *(char **)(D_00189EA0 + 0x2210) + 0xE0, -80.0f);
-    sel = func_002A77E0(8);
+    v[1] = *(TI128 *)g_hero_position;
+    mothership_project_point_onto_surface((char *)&v[1], 0.0f);
+    FastVecScale((char *)&v[0], *(char **)(g_hero_position + 0x2210) + 0xE0, -80.0f);
+    sel = math_random_int_below(8);
     if (sel < 8)
         goto *D_L23_002AB170[sel];
     goto tail;
 c0:
-    func_00282D30((char *)&v[6], D_0018C0B0 + 0xC0, 50.0f);
+    FastVecScale((char *)&v[6], g_hero_moby + 0xC0, 50.0f);
     goto tail;
 c1:
-    func_00282D30((char *)&v[6], D_0018C0B0 + 0xC0, -50.0f);
+    FastVecScale((char *)&v[6], g_hero_moby + 0xC0, -50.0f);
     goto tail;
 c2:
-    func_00282D30((char *)&v[6], D_0018C0B0 + 0xD0, 50.0f);
+    FastVecScale((char *)&v[6], g_hero_moby + 0xD0, 50.0f);
     goto tail;
 c3:
-    func_00282D30((char *)&v[6], D_0018C0B0 + 0xD0, -50.0f);
+    FastVecScale((char *)&v[6], g_hero_moby + 0xD0, -50.0f);
     goto tail;
 c4: {
-    char *b = D_00189E20;
+    char *b = g_hero_state;
 
-    func_00282D30((char *)&v[4], *(char **)(b + 0x2290) + 0xD0, 50.0f);
-    func_00282D30((char *)&v[2], *(char **)(b + 0x2290) + 0xC0, 50.0f);
-    func_00282CC0((char *)&v[6], (char *)&v[4], (char *)&v[2]);
-    func_00282D30((char *)&v[6], (char *)&v[6], 0.5f);
+    FastVecScale((char *)&v[4], *(char **)(b + 0x2290) + 0xD0, 50.0f);
+    FastVecScale((char *)&v[2], *(char **)(b + 0x2290) + 0xC0, 50.0f);
+    FastVecAdd((char *)&v[6], (char *)&v[4], (char *)&v[2]);
+    FastVecScale((char *)&v[6], (char *)&v[6], 0.5f);
     goto tail;
 }
 c5: {
-    char *b = D_00189E20;
+    char *b = g_hero_state;
 
-    func_00282D30((char *)&v[2], *(char **)(b + 0x2290) + 0xC0, 50.0f);
-    func_00282D30((char *)&v[5], *(char **)(b + 0x2290) + 0xD0, -50.0f);
-    func_00282CC0((char *)&v[6], (char *)&v[2], (char *)&v[5]);
-    func_00282D30((char *)&v[6], (char *)&v[6], 0.5f);
+    FastVecScale((char *)&v[2], *(char **)(b + 0x2290) + 0xC0, 50.0f);
+    FastVecScale((char *)&v[5], *(char **)(b + 0x2290) + 0xD0, -50.0f);
+    FastVecAdd((char *)&v[6], (char *)&v[2], (char *)&v[5]);
+    FastVecScale((char *)&v[6], (char *)&v[6], 0.5f);
     goto tail;
 }
 c6: {
-    char *b = D_00189E20;
+    char *b = g_hero_state;
 
-    func_00282D30((char *)&v[5], *(char **)(b + 0x2290) + 0xD0, -50.0f);
-    func_00282D30((char *)&v[3], *(char **)(b + 0x2290) + 0xC0, -50.0f);
-    func_00282CC0((char *)&v[6], (char *)&v[5], (char *)&v[3]);
-    func_00282D30((char *)&v[6], (char *)&v[6], 0.5f);
+    FastVecScale((char *)&v[5], *(char **)(b + 0x2290) + 0xD0, -50.0f);
+    FastVecScale((char *)&v[3], *(char **)(b + 0x2290) + 0xC0, -50.0f);
+    FastVecAdd((char *)&v[6], (char *)&v[5], (char *)&v[3]);
+    FastVecScale((char *)&v[6], (char *)&v[6], 0.5f);
     goto tail;
 }
 c7: {
-    char *b = D_00189E20;
+    char *b = g_hero_state;
 
-    func_00282D30((char *)&v[3], *(char **)(b + 0x2290) + 0xC0, -50.0f);
-    func_00282D30((char *)&v[4], *(char **)(b + 0x2290) + 0xD0, 50.0f);
-    func_00282CC0((char *)&v[6], (char *)&v[3], (char *)&v[4]);
-    func_00282D30((char *)&v[6], (char *)&v[6], 0.5f);
+    FastVecScale((char *)&v[3], *(char **)(b + 0x2290) + 0xC0, -50.0f);
+    FastVecScale((char *)&v[4], *(char **)(b + 0x2290) + 0xD0, 50.0f);
+    FastVecAdd((char *)&v[6], (char *)&v[3], (char *)&v[4]);
+    FastVecScale((char *)&v[6], (char *)&v[6], 0.5f);
 }
 tail:
-    func_00282CC0((char *)&v[0], (char *)&v[0], (char *)&v[6]);
-    func_00282CC0((char *)&v[0], (char *)&v[0], (char *)&v[1]);
-    func_L23_0041C6B0(arg0 + 0x10, (char *)&v[0], 1);
-    func_L23_00418650(arg0 + 0x10, 0.0f);
+    FastVecAdd((char *)&v[0], (char *)&v[0], (char *)&v[6]);
+    FastVecAdd((char *)&v[0], (char *)&v[0], (char *)&v[1]);
+    boss_find_nearest_path_point(arg0 + 0x10, (char *)&v[0], 1);
+    mothership_project_point_onto_surface(arg0 + 0x10, 0.0f);
     *(TI128 *)(state + 0x290) = *(TI128 *)(arg0 + 0x10);
-    func_L23_003C00D0(arg0);
-    func_002A7750(arg0, 5, 0);
-    func_L23_003BFFC0(arg0, 3, 0, 0x11, 3, 1.0f);
+    enemy_reset_calm(arg0);
+    moby_set_state(arg0, 5, 0);
+    moby_play_anim_and_link(arg0, 3, 0, 0x11, 3, 1.0f);
     D_L23_001B164C = (D_L23_001B164C + 1) % D_L23_001B1644;
     D_L23_001B36AC = D_L23_001B36AC + 1;
 }

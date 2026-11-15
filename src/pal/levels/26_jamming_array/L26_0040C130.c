@@ -9,16 +9,16 @@ typedef struct {
 } Quad_L26_0040C8A8;
 extern void func_PAL_002B4D38(char *, char *, char *, char *, char *, char *, char *, char *,
                           char *, char *, char *);
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 extern void func_PAL_002B5050(char *, char *, int);
 extern int func_PAL_00289730(int, int);
 extern int D_L26_001A8FF0[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda)) NOT_SDA;
+extern int g_current_map_index[] __attribute__((sda)) NOT_SDA;
 typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
-extern SubtitleHistory D_0018C958[];
+extern SubtitleHistory g_subtitle_history[];
 extern int D_0018C0B4 NOT_SDA;
 extern int D_L26_001B1748[] __attribute__((sda));
 extern unsigned int D_001A7390[] __attribute__((sda));
@@ -36,7 +36,7 @@ typedef struct {
 } D_0018C750_t;
 
 extern D_L26_0027D5C8_t D_L26_0027D5C8;
-extern D_0018C750_t D_0018C750;
+extern D_0018C750_t g_progress_statistics;
 
 void func_PAL_L26_00411C98(char *a0) {
     char *s1 = a0;
@@ -54,7 +54,7 @@ void func_PAL_L26_00411C98(char *a0) {
             *(int *)(s0 + 0x100) = 0;
             *(int *)(s0 + 0xD4) = 0;
         }
-        func_002A7750(s1, 1, -1);
+        moby_set_state(s1, 1, -1);
         break;
     case 1:
         func_PAL_002B5050(s1, s0 + 0x60, 0);
@@ -75,24 +75,24 @@ void func_PAL_L26_0040C130(char *a0) {
         *(u8 *)(m + 0x30) = 0xFF;
         *(int *)(ctl + 0x4) = 0;
         *(int *)(ctl + 0x10) = 0;
-        func_002A7750(m, 1, -1);
+        moby_set_state(m, 1, -1);
         break;
     case 1:
         if (D_L26_001A8FF0[0] != 0) {
             if (D_L26_0027D5C8.f0 == 0 && D_L26_0027D5C8.f24 == -1) {
-                unsigned int flags = D_0018C958[28].levels;
-                flags &= (unsigned int)kind << D_001A79F0[0];
+                unsigned int flags = g_subtitle_history[28].levels;
+                flags &= (unsigned int)kind << g_current_map_index[0];
                 if (flags == 0) {
                     func_PAL_00289730(0x9C5, 0x1C);
                 }
             }
         }
-        if (D_0018C750.f1a4 == 0 ||
+        if (g_progress_statistics.f1a4 == 0 ||
             0x15F90u <
-                (unsigned int)(((s32)(D_001A7390[0]) * 5 + 2) / 6 - D_0018C750.f1a8)) {
+                (unsigned int)(((s32)(D_001A7390[0]) * 5 + 2) / 6 - g_progress_statistics.f1a8)) {
             if (D_0018C0B4 == 0 && D_L26_001B1748[0] >= 0x3E9) {
-                unsigned int flags = D_0018C958[12].levels;
-                mask = 1u << D_001A79F0[0];
+                unsigned int flags = g_subtitle_history[12].levels;
+                mask = 1u << g_current_map_index[0];
                 if ((flags & mask) == 0) {
                     func_PAL_00289730(0x9B5, 0xC);
                 }

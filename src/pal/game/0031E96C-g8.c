@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 extern int D_001B2758;
-extern void func_0031EFC8(char *, char *);
-extern char *func_002A7820(int, int);
-extern float func_002A7940(void);
-extern void func_0031EB00(char *, unsigned int, float, char *, float, int, int);
+extern void gfx_draw_lightning_bolt_ribbon(char *, char *);
+extern char *math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern void gfx_draw_glow_sprite(char *, unsigned int, float, char *, float, int, int);
 
 void func_PAL_0031F8B8(char *p)
 {
@@ -17,14 +18,14 @@ void func_PAL_0031F8B8(char *p)
         count--;
         entry = (char *)(offset + (unsigned int)D_001B2758);
         if (*(int *)(entry + 0x8C) == (int)p) {
-            func_0031EFC8(p, entry);
+            gfx_draw_lightning_bolt_ribbon(p, entry);
             if (*(int *)(entry + 0x94) == 0) {
-                ptr = func_002A7820(0x50, 0x60);
-                f = func_002A7940();
-                func_0031EB00(entry + 0x30, 0x103080, 0.5f, ptr, f, 0x31, 2);
-                ptr = func_002A7820(0x50, 0x60);
-                f = func_002A7940();
-                func_0031EB00(entry + 0x30, 0xFFFFFF, 0.3f, ptr, f, 0x31, 2);
+                ptr = math_random_int_range(0x50, 0x60);
+                f = math_random_angle();
+                gfx_draw_glow_sprite(entry + 0x30, 0x103080, 0.5f, ptr, f, 0x31, 2);
+                ptr = math_random_int_range(0x50, 0x60);
+                f = math_random_angle();
+                gfx_draw_glow_sprite(entry + 0x30, 0xFFFFFF, 0.3f, ptr, f, 0x31, 2);
             }
         }
         offset += 0xA0;

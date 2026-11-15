@@ -1,22 +1,22 @@
 #include "include_asm.h"
 #include "names.h"
-extern void func_002A7750(void *, int, int);
-extern int func_002ACBC8(void *, int);
-extern int func_002B0CE0(int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern int ForceClaimNotice(int, int, int);
 extern long D_00138320 __attribute__((nosda));
-extern char D_00189EA0[];
-extern int func_002B3868(void *);
-extern char *func_L30_00413490(void *);
-extern void func_L30_00413528(void *, void *, char *, int, int, int);
+extern char g_hero_position[];
+extern int flag_set_first_pending(void *);
+extern char *museum_tweak_menu_spawn(void *);
+extern void MuseumTweakMenuAddItem(void *, void *, char *, int, int, int);
 extern unsigned int D_L30_001B1F28;
 extern float D_L30_001B1F04;
-extern int func_002AEB60(void *, float);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_L30_00416D88(void *, void *, void *, int, float);
-extern void func_0029F338(void *);
+extern int math_is_value_within_step(void *, float);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void museum_projectile_spawn(void *, void *, void *, int, float);
+extern void moby_mark_spawned(void *);
 extern char D_L30_001B1C38[];
 extern char D_L30_001B1C48[];
 extern char D_L30_001B1C58[];
@@ -81,7 +81,7 @@ extern int D_L30_001B1F98[] __attribute__((sda));
 extern int D_L30_001B1F9C[] __attribute__((sda));
 
 /* Updates the projectile tester: opens one of two tuning menus on a button press, then fires a test projectile when the camera check passes. */
-void func_L30_004148F0(char *moby) {
+void museum_projectile_tester_update(char *moby) {
     float matrix[16];
     float velocity[4];
     char *vars = *(char **)(moby+0x68);
@@ -94,23 +94,23 @@ void func_L30_004148F0(char *moby) {
         *(int *)(vars+0x18) = (color >> 16) & 0xff;
         *(int *)(vars+0x1c) = (unsigned int)color >> 24;
         D_L30_001B1F04 = 5.0f;
-        SetMobyState(moby,1,-1);
+        moby_set_state(moby,1,-1);
         break;
     case 1:
-        if (*(int *)(vars+4) != -1 && IsPointInCuboid(gHeroPosition,*(int *)(vars+4))) {
+        if (*(int *)(vars+4) != -1 && IsPointInCuboid(g_hero_position,*(int *)(vars+4))) {
             ForceClaimNotice(1,0x27e6,1);
             { long buttons = D_00138320;
-              if ((buttons & 3) == 3) SetMobyState(moby,2,-1); }
+              if ((buttons & 3) == 3) moby_set_state(moby,2,-1); }
         }
-        if (*(int *)(vars+8) != -1 && IsPointInCuboid(gHeroPosition,*(int *)(vars+8))) {
+        if (*(int *)(vars+8) != -1 && IsPointInCuboid(g_hero_position,*(int *)(vars+8))) {
             ForceClaimNotice(1,0x27f1,1);
             { long buttons = D_00138320;
-              if ((buttons & 3) == 3) SetMobyState(moby,3,-1); }
+              if ((buttons & 3) == 3) moby_set_state(moby,3,-1); }
         }
         break;
     case 2:
-        if (SetFirstPendingFlag(moby)) {
-            *(char **)(vars+0xc) = SpawnMuseumTweakMenu(moby);
+        if (flag_set_first_pending(moby)) {
+            *(char **)(vars+0xc) = museum_tweak_menu_spawn(moby);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), D_L30_001B1F10, D_L30_001B1C38, 1, 0, 1000);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), D_L30_001B1F14, D_L30_001B1C48, 1, 0, 1000);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), D_L30_001B1F18, D_L30_001B1C58, 1, 0, 1000);
@@ -125,11 +125,11 @@ void func_L30_004148F0(char *moby) {
         }
         ForceClaimNotice(1,0,1);
         if (!*(char **)(vars+0xc) || *(short *)(*(char **)(vars+0xc)+0xaa) != 0x118a /* moby class 4490 */  || (unsigned char)(*(char **)(vars+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(vars+0xc))[0x20] == 0xfd)
-            SetMobyState(moby,1,-1);
+            moby_set_state(moby,1,-1);
         break;
     case 3:
-        if (SetFirstPendingFlag(moby)) {
-            *(char **)(vars+0xc) = SpawnMuseumTweakMenu(moby);
+        if (flag_set_first_pending(moby)) {
+            *(char **)(vars+0xc) = museum_tweak_menu_spawn(moby);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), vars+0x10, D_L30_001B1CE8, 0, 0, 255);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), vars+0x14, D_L30_001B1CF0, 0, 0, 255);
             MuseumTweakMenuAddItem(*(char **)(vars+0xc), vars+0x18, D_L30_001B1D00, 0, 0, 255);
@@ -155,7 +155,7 @@ void func_L30_004148F0(char *moby) {
         }
         ForceClaimNotice(1,0,1);
         if (!*(char **)(vars+0xc) || *(short *)(*(char **)(vars+0xc)+0xaa) != 0x118a /* moby class 4490 */  || (unsigned char)(*(char **)(vars+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(vars+0xc))[0x20] == 0xfd)
-            SetMobyState(moby,1,-1);
+            moby_set_state(moby,1,-1);
         break;
     }
     {
@@ -166,15 +166,15 @@ void func_L30_004148F0(char *moby) {
         packed |= *(int *)(vars+0x1c);
         D_L30_001B1F28 = packed;
     }
-    if (IsValueWithinStepOfThreshold(moby,1.0f)) {
-        TransformMobyJointPoint(moby,0,matrix);
-        velocity[0] = FastSinOrCosA(*(float *)(moby+0xf8));
-        velocity[1] = FastSinOrCosB(*(float *)(moby+0xf8));
+    if (math_is_value_within_step(moby,1.0f)) {
+        moby_transform_joint_point(moby,0,matrix);
+        velocity[0] = math_fast_sin_or_cos_a(*(float *)(moby+0xf8));
+        velocity[1] = math_fast_sin_or_cos_b(*(float *)(moby+0xf8));
         velocity[2] = 0;
         vec_scale_to_length(velocity,velocity,0.583333373f);
         if (*(int *)vars) {
-            SpawnMuseumProjectile(moby,velocity,matrix+12,1,0.0f);
-            MarkMobySpawned(moby);
-        } else SpawnMuseumProjectile(moby,velocity,matrix+12,0,0.0f);
+            museum_projectile_spawn(moby,velocity,matrix+12,1,0.0f);
+            moby_mark_spawned(moby);
+        } else museum_projectile_spawn(moby,velocity,matrix+12,0,0.0f);
     }
 }

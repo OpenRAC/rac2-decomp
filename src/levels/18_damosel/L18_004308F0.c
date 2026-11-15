@@ -13,28 +13,28 @@ typedef short s16;
 typedef int s32;
 
 extern u16 *D_L18_001FB320[];
-extern u8 *D_L18_001B281C[] __attribute__((sda));
+extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern s32 D_L18_001B2838[] __attribute__((sda));
 
-extern void func_002A7750(u8 *arg0, s32 arg1, s32 arg2);
-extern u8 *func_002A9640(u8 *, s32, s32);
-extern s32 func_002B0ED8(u8 *, u8 *, s32);
-extern void func_002A6C58(u8 *, s32, s32);
-extern s32 func_002A77E0(s32);
-extern void func_002B3380(u8 *, u8 *, u8 *);
-extern u8 *func_0029EFD0(s32);
+extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
+extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
+extern s32 moby_apply_damage_to_object(u8 *, u8 *, s32);
+extern void SetDeathBits(u8 *, s32, s32);
+extern s32 math_random_int_below(s32);
+extern void part_spawn_damage_debris(u8 *, u8 *, u8 *);
+extern u8 *CreateMoby(s32);
 extern void func_002A0F48(u8 *);
-extern void func_002A7470(u8 *, s32, s32, s32);
-extern void func_002A04B8(u8 *, s32 *, s32 *, s32 *);
-extern void func_002A0488(u8 *, s32, s32, s32);
-extern s32 func_002B3BA8(u8 *, s32, s32, s32, float, float);
-extern void func_L18_004329B0(u8 *);
-extern void func_L18_00432D60(u8 *);
-extern void func_L18_00432E78(u8 *, s32, s32, s32);
-extern s32 func_L18_00432E28(u8 *);
+extern void anim_start_blended(u8 *, s32, s32, s32);
+extern void get_moby_color(u8 *, s32 *, s32 *, s32 *);
+extern void set_moby_color(u8 *, s32, s32, s32);
+extern s32 weapon_select_aim_target(u8 *, s32, s32, s32, float, float);
+extern void extermibot_destroy_piece_and_parts(u8 *);
+extern void extermibot_release_all_group_pieces(u8 *);
+extern void extermibot_set_anim_on_parts(u8 *, s32, s32, s32);
+extern s32 extermibot_is_in_attack_state(u8 *);
 
 /* Handles hits on an Extermibot: its damage reactions, its death, the extra part it spawns, and keeping its attached parts sized and placed. */
-void func_L18_004308F0(u8 *object)
+void extermibot_update_hits(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     u8 *hit;
@@ -46,7 +46,7 @@ void func_L18_004308F0(u8 *object)
     s32 b2;
     float health;
 
-    hit = FindOwnedEffectSlot(object, 0x10000, 1);
+    hit = part_find_owned_effect_slot(object, 0x10000, 1);
     if (hit != 0) {
         if (*(u8 **)(hit + 0x20) != 0) {
             if (*(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0xF0A /* Extermibot Legs */ || *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0xF9E /* moby class 3998 */)
@@ -56,7 +56,7 @@ void func_L18_004308F0(u8 *object)
             *(s32 *)(hit + 0x2C) = 0;
     }
     savedAnim = object[0x94];
-    if (ApplyDamageToObject(object, state + 0x50, 0)) {
+    if (moby_apply_damage_to_object(object, state + 0x50, 0)) {
         if (object[0x94] == 0xD || object[0x94] == 9 || object[0x94] == 0xA || object[0x94] == 0xB ||
             object[0x94] == 0xC || object[0x94] == 5)
             object[0x94] = savedAnim;
@@ -64,28 +64,28 @@ void func_L18_004308F0(u8 *object)
         if (*(u8 **)(state + 0x7C0) == 0) {
             if (health <= 0.0f) {
                 SetDeathBits(object, 0, 3);
-                DestroyPieceAndParts(object);
+                extermibot_destroy_piece_and_parts(object);
                 return;
             }
         }
-        if (health <= 0.0f && RandomIntBelow(7) == 0) {
+        if (health <= 0.0f && math_random_int_below(7) == 0) {
             *(float *)(state + 0x20) = 8.0f;
             *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-            SetMobyState(object, 0xE, -1);
+            moby_set_state(object, 0xE, -1);
             *(s16 *)(state + 0x88) = 0;
             state[0x6A] = 0;
         } else {
-            SetAnimOnMobyAndParts(object, object[0x43], 0, 3);
+            extermibot_set_anim_on_parts(object, object[0x43], 0, 3);
         }
-        ReleaseAllGroupPieces(object);
+        extermibot_release_all_group_pieces(object);
     }
     object[0xA8] = 0xFF;
     if (*(u8 **)(state + 0x188) != 0 && *(s16 *)(*(u8 **)(state + 0x188) + 0xAA) == 0xF59 /* moby class 3929 */) {
         SetDeathBits(object, 0, 3);
-        DestroyPieceAndParts(object);
+        extermibot_destroy_piece_and_parts(object);
     }
     if (*(u8 **)(state + 0x7C0) != 0) {
-        SpawnDamageDebrisOnHealthLoss(*(u8 **)(state + 0x7C0), *(u8 **)(*(u8 **)(state + 0x7C0) + 0x68) + 0x20, state + 0x20);
+        part_spawn_damage_debris(*(u8 **)(state + 0x7C0), *(u8 **)(*(u8 **)(state + 0x7C0) + 0x68) + 0x20, state + 0x20);
         if (!(*(u16 *)(*(u8 **)(state + 0x7C0) + 0x7C) & 2) && *(u8 **)(state + 0x7C4) == 0) {
             u8 *newPart = CreateMoby(0xF0C /* moby class 3852 */);
             *(u8 **)(state + 0x7C4) = newPart;
@@ -96,13 +96,13 @@ void func_L18_004308F0(u8 *object)
                 func_002A0F48(*(u8 **)(state + 0x7C4));
                 *(s32 *)(*(u8 **)(state + 0x7C4) + 0x98) = 0;
                 if ((*(u8 **)(state + 0x7C4))[0x43] != 0x14)
-                    StartAnimationBlended(*(u8 **)(state + 0x7C4), 0x14, 0, 3);
+                    anim_start_blended(*(u8 **)(state + 0x7C4), 0x14, 0, 3);
                 *(u16 *)(*(u8 **)(state + 0x7C4) + 0x34) |= 6;
                 *(u16 *)(*(u8 **)(state + 0x7C4) + 0x34) |= *(u16 *)(object + 0x34) & 0x8000;
                 *(float *)(*(u8 **)(state + 0x7C4) + 0x2C) =
                     *(float *)(*(u8 **)(*(u8 **)(state + 0x7C4) + 0x24) + 0x24) * *(float *)(state + 0x7E8);
             } else {
-                DestroyPieceAndParts(object);
+                extermibot_destroy_piece_and_parts(object);
             }
         }
         if (*(u8 **)(state + 0x7C0) != 0) {
@@ -120,10 +120,10 @@ void func_L18_004308F0(u8 *object)
              object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838[0] && idList != 0 &&
              ((idList != 0 && (s16)idList[-1] >= 0) || idList == D_L18_001FB320[object[0x21]]);
              idList++) {
-            otherMoby = gMobyTable_L18[0] + ((*idList & 0x7FFF) << 8);
+            otherMoby = g_moby_l18_table[0] + ((*idList & 0x7FFF) << 8);
             if (otherMoby == 0)
                 break;
-            if (IsInAttackState(otherMoby))
+            if (extermibot_is_in_attack_state(otherMoby))
                 *(u16 *)(state + 0x7F6) = *(u16 *)(state + 0x7F6) + 1;
         }
     } else {
@@ -131,15 +131,15 @@ void func_L18_004308F0(u8 *object)
     }
     if (*(float *)(object + 0x18) < 90.0f ||
         (*(float *)(state + 0x800) != -1.0f && *(float *)(object + 0x18) < *(float *)(state + 0x800)))
-        DestroyPieceAndParts(object);
+        extermibot_destroy_piece_and_parts(object);
     if (state[0x2E] == 2)
-        DestroyPieceAndParts(object);
+        extermibot_destroy_piece_and_parts(object);
     if (*(float *)(state + 0x20) <= 0.0f) {
         if (object[0x20] != 0xD)
-            DestroyPieceAndParts(object);
+            extermibot_destroy_piece_and_parts(object);
     }
     *(s32 *)(state + 0x79C) =
-        SelectAimTarget_002B3BA8(object, *(s32 *)(state + 0x790), 0, 0, *(float *)(state + 0x794), 0.0f);
+        weapon_select_aim_target(object, *(s32 *)(state + 0x790), 0, 0, *(float *)(state + 0x794), 0.0f);
     if (object[0x20] < 4) {
         if (object[0x20] != 3)
             return;

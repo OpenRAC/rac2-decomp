@@ -11,11 +11,11 @@ typedef struct {
 extern SibRecord128 *D_L07_001B23CC __attribute__((sda));
 extern u8 *D_L07_001B2954 __attribute__((sda));
 extern u8 D_L07_00227E7F;
-extern void func_002833F0(void *, void *);
-extern void func_L00_00323448(void *, void *, int, int, int, int, int, int);
+extern void euler_rotation_basis(void *, void *);
+extern void BuildObjectAttachmentTransforms(void *, void *, int, int, int, int, int, int);
 
 /* Briefly moves the object to its saved start position to build its attached joint pointers, then puts its real position back. */
-void func_L07_00410588(u8 *moby)
+void ship_build_joint_pointers(u8 *moby)
 {
     SibQuad saved[2];
     u8 *vars = *(u8 **)(moby + 0x68);

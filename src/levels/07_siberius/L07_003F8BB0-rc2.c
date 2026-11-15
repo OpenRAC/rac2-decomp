@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -31,7 +32,7 @@ extern void ref_L07_003F8BB0_02(s8 *, TI *);
 extern void ref_L07_003F8BB0_03(s8 *, s32, TI *, TI *, f32);
 
 /* Looks up a joint position and direction on the object and passes them, with the target and a power value, to an effect routine. */
-void func_L07_003F8BB0(s8 *moby) {
+void joint_query_pose_effect(s8 *moby) {
     TI jointPos;
     TI jointDir;
     s8 *vars;

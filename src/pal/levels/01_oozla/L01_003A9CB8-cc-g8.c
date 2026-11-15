@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L01_003A9CB8, the PAL copy of func_L01_003A6638: the same C, where rename func_002A7470 becomes func_PAL_002A7E68; rename func_002ABBB8 becomes func_PAL_002AC718; rename func_L01_002BEB90 becomes func_PAL_L01_002BEC60; scale (*(u16 *)(object+0x34) | 0x41); wrap (vertical*maximum-F(state,0x4C)) (({e}) * 1.2f); lit 6 becomes 5; lit 5 becomes 2; rewrap object; rewrap D_L01_001AF878. */
 /* func_PAL_L01_003A9CB8: the update of a moby steered with the stick, by its state byte at +0x20.
  * State 0 copies the yaw at +0x18 to +0x44 and starts animation 1. State 1 turns and moves the
@@ -25,8 +26,8 @@ extern float D_L01_001AF8B0 __attribute__((sda));
 extern float D_L01_001AF8BC __attribute__((sda));
 extern float D_L01_001AF8C0 __attribute__((sda));
 extern float D_L01_001AC580[] MACRO_ADDR;
-extern u8 D_00139568[];
-extern char D_00138180[];
+extern u8 g_item_slot_to_record[];
+extern char g_pad_state[];
 typedef struct { u8 pad[0x1A4]; u32 flags; } OozlaInput;
 typedef struct { u8 pad[0x50]; float speed; u8 gap[0x1C]; float material; u8 tail[0x6C]; } OozlaMaterial;
 extern OozlaMaterial D_L01_002637A0[];
@@ -34,40 +35,40 @@ extern u8 D_L01_001BF900[];
 extern u8 D_L01_001C3980[];
 extern int D_L01_001A8A44;
 extern void func_PAL_002A7E68(void *,int,int,int);
-extern void func_L01_003A6448(float *,float *);
-extern float func_00283B98(float,float);
-extern void func_00282F20(void *,void *,float);
-extern void func_00283098(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_L01_003A65B0(void *);
-extern float func_00282DF0(void *);
-extern void func_L01_003A64F0(void *,void *);
-extern void func_00283410(void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern float func_00282C48(float);
-extern void func_00282D30(void *,void *,float);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern float func_00282DB0(void *,void *);
-extern float func_002831B0(float);
-extern void func_00283658(void *,void *);
-extern void func_00283678(void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00283788(void *,void *,void *);
-extern void func_002AB6D8(void *,void *);
-extern void func_00283698(void *,void *);
-extern void func_002830C0(void *,void *,void *);
+extern void hero_get_clamped_stick_tilt(float *,float *);
+extern float FastAddRotations(float,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void moby_move_with_collision(void *);
+extern float FastVecLength(void *);
+extern void gfx_draw_vehicle_beam(void *,void *);
+extern void euler_to_matrix(void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern float math_fabs(float);
+extern void FastVecScale(void *,void *,float);
+extern int CollLine(void *,void *,int,void *,void *);
+extern float FastVecDot(void *,void *);
+extern float math_fast_angle_helper(float);
+extern void copy_matrix_rotation(void *,void *);
+extern void copy_matrix3x4(void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void multiply_matrix(void *,void *,void *);
+extern void mat_get_euler_angles(void *,void *);
+extern void matrix_from_basis_rows(void *,void *);
+extern void transform_vector(void *,void *,void *);
 extern void func_L00_002EE4D8(void *,void *,float);
 extern void func_PAL_002AC718(char *owner, void *direction, float *position,
     float radius, float damage, int sparks, int flashes, int smoke,
     float glow, float white, float cutoff, float scale, int sound, float blast,
     int shake, int debris, int quality, unsigned char channels, int flags);
-extern int func_00277F48(void *,int,void *,void *,float);
-extern void func_002A9850(void *,void *,void *,int,int,int,int,int,float,float,float);
-extern int func_00282948(void *);
-extern void func_003355A8(int);
+extern int coll_process_hit(void *,int,void *,void *,float);
+extern void moby_queue_knockback_for_nodes(void *,void *,void *,int,int,int,int,int,float,float,float);
+extern int math_fast_float_d(void *);
+extern void cam_set_mode_state(int);
 extern int func_PAL_L01_002BEC60(int,int);
-extern void func_0029F338(void *);
-extern void func_002A9288(void *,float);
+extern void moby_mark_spawned(void *);
+extern void part_queue_ground_shadow(void *,float);
 void func_PAL_L01_003A9CB8(u8 *object)
 {
     float previous[4], velocity[4], position[4];
@@ -103,100 +104,100 @@ void func_PAL_L01_003A9CB8(u8 *object)
             {
                 float start[4], angles[4], finish[4], shift[4], offset[4], hit[4], normal[4], force[4], adjustment[4], edge[4];
 
-                func_L01_003A6448(&horizontal,&vertical);
-                F(state,0x18) = F(state,0x44) = func_00283B98(F(state,0x44),D_L01_001AF870*(horizontal*0.0003490659f));
-                maximum = ((OozlaMaterial *)((u32)D_L01_002637A0 + D_00139568[0x20]*sizeof(OozlaMaterial)))->speed*0.020000001f;
+                hero_get_clamped_stick_tilt(&horizontal,&vertical);
+                F(state,0x18) = F(state,0x44) = FastAddRotations(F(state,0x44),D_L01_001AF870*(horizontal*0.0003490659f));
+                maximum = ((OozlaMaterial *)((u32)D_L01_002637A0 + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->speed*0.020000001f;
                 F(state,0x4C) += (((vertical*maximum-F(state,0x4C))) * 1.2f)*D_L01_001AF880;
                 speed = F(state,0x4C)/maximum;
                 F(object,0x48) = speed+speed+horizontal;
-                func_00282F20(velocity,D_L01_001AC580,F(state,0x4C));
-                func_00283098(velocity,velocity,object+0xC0);
+                vec_scale_to_length(velocity,D_L01_001AC580,F(state,0x4C));
+                matrix_mul_vec3(velocity,velocity,object+0xC0);
                 velocity[2] += F(state,0x54);
-                func_00282CC0(position,object+0x10,velocity);
+                FastVecAdd(position,object+0x10,velocity);
                 qcopy((object+0x10), position);
-                func_L01_003A65B0(object);
-                if (F(state,0x4C) < 0.0f) F(state,0x4C) = -func_00282DF0(velocity);
-                else F(state,0x4C) = func_00282DF0(velocity);
-                func_L01_003A64F0(object,state);
+                moby_move_with_collision(object);
+                if (F(state,0x4C) < 0.0f) F(state,0x4C) = -FastVecLength(velocity);
+                else F(state,0x4C) = FastVecLength(velocity);
+                gfx_draw_vehicle_beam(object,state);
                 *(OozlaQuad *)angles = 0;
                 angles[2] = D_L01_001AF870*(horizontal*0.0003490659f);
                 *(OozlaQuad *)start = *(OozlaQuad *)angles;
                 qzero_nc(rotation);
                 qzero_nc(basis[0]);
                 qzero_nc(matrix);
-                func_00283410(rotation,start);
+                euler_to_matrix(rotation,start);
                 progress = 0.0f;
                 collision = 0;
                 while (progress <= D_L01_001AF8A0 && !collision) {
                     sign = vertical < 0.0f ? -1.0f : 1.0f;
-                    func_00282F20(angles,object+0xE0,D_L01_001AF87C);
-                    func_00282CC0(angles,angles,object+0x10);
-                    func_00282F20(shift,object+0xC0,D_L01_001AF8AC*progress*sign);
-                    func_00282CC0(angles,angles,shift);
-                    func_00282F20(offset,object+0xE0,D_L01_001AF8A8);
-                    func_00282CF0(finish,object+0x10,offset);
-                    func_00282D30(normal,velocity,func_00282C48(vertical));
+                    vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                    FastVecAdd(angles,angles,object+0x10);
+                    vec_scale_to_length(shift,object+0xC0,D_L01_001AF8AC*progress*sign);
+                    FastVecAdd(angles,angles,shift);
+                    vec_scale_to_length(offset,object+0xE0,D_L01_001AF8A8);
+                    FastVecSub(finish,object+0x10,offset);
+                    FastVecScale(normal,velocity,math_fabs(vertical));
                     half = D_L01_001AF8A0*0.5f;
-                    func_00282D30(shift,normal,(D_L01_001AF8BC*(half-progress))/half);
-                    func_00282CC0(finish,finish,shift);
-                    collision = func_002761F8(angles,finish,lineFlags,object,linePacket);
+                    FastVecScale(shift,normal,(D_L01_001AF8BC*(half-progress))/half);
+                    FastVecAdd(finish,finish,shift);
+                    collision = CollLine(angles,finish,lineFlags,object,linePacket);
                     progress += 1.0f;
                 }
                 if (collision) {
                     qcopy(hit, (D_L01_001BF900+0x20));
-                    func_00282F20(normal,object+0xE0,1.0f);
-                    func_00282F20(force,D_L01_001BF900+0x40,1.0f);
-                    angle = 1.5707964f-func_002831B0(func_00282DB0(normal,force));
+                    vec_scale_to_length(normal,object+0xE0,1.0f);
+                    vec_scale_to_length(force,D_L01_001BF900+0x40,1.0f);
+                    angle = 1.5707964f-math_fast_angle_helper(FastVecDot(normal,force));
                     if (D_L01_001AF8C0*0.017453294f < angle) {
                         qcopy((object+0x10), previous);
                     } else {
-                        func_00282F20(adjustment,D_L01_001BF900+0x40,D_L01_001AF894);
-                        func_00282F20(angles,object+0xE0,D_L01_001AF87C);
-                        func_00282CF0(finish,object+0x10,angles);
-                        func_00282CC0(angles,angles,object+0x10);
-                        if (func_002761F8(angles,finish,lineFlags,object,linePacket)) {
-                            func_00282F20(edge,D_L01_001BF900+0x40,D_L01_001AF898);
-                            func_00282CC0(adjustment,adjustment,edge);
+                        vec_scale_to_length(adjustment,D_L01_001BF900+0x40,D_L01_001AF894);
+                        vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                        FastVecSub(finish,object+0x10,angles);
+                        FastVecAdd(angles,angles,object+0x10);
+                        if (CollLine(angles,finish,lineFlags,object,linePacket)) {
+                            vec_scale_to_length(edge,D_L01_001BF900+0x40,D_L01_001AF898);
+                            FastVecAdd(adjustment,adjustment,edge);
                         }
-                        func_00282F20(edge,object+0xE0,D_L01_001AF89C);
-                        func_00282CC0(adjustment,adjustment,edge);
-                        func_00283658(basis[0],object+0xC0);
-                        func_00282F20(basis[2],adjustment,-1.0f);
-                        func_00282DD8(basis[1],basis[2],basis[0]);
-                        func_00282DD8(basis[0],basis[1],basis[2]);
-                        func_00283788(matrix,basis[0],rotation);
-                        func_002AB6D8(matrix,object+0xF0);
-                        func_00282CF0(edge,hit,object+0x10);
-                        func_00282F20(edge,edge,
-                            D_L01_001AF8B0*0.020000001f < func_00282DF0(edge)
-                            ? D_L01_001AF8B0*0.020000001f : func_00282DF0(edge));
-                        func_00282CC0(object+0x10,object+0x10,edge);
+                        vec_scale_to_length(edge,object+0xE0,D_L01_001AF89C);
+                        FastVecAdd(adjustment,adjustment,edge);
+                        copy_matrix_rotation(basis[0],object+0xC0);
+                        vec_scale_to_length(basis[2],adjustment,-1.0f);
+                        FastVecCross(basis[1],basis[2],basis[0]);
+                        FastVecCross(basis[0],basis[1],basis[2]);
+                        multiply_matrix(matrix,basis[0],rotation);
+                        mat_get_euler_angles(matrix,object+0xF0);
+                        FastVecSub(edge,hit,object+0x10);
+                        vec_scale_to_length(edge,edge,
+                            D_L01_001AF8B0*0.020000001f < FastVecLength(edge)
+                            ? D_L01_001AF8B0*0.020000001f : FastVecLength(edge));
+                        FastVecAdd(object+0x10,object+0x10,edge);
                         F(state,0x54) = 0.0f;
                     }
                 } else {
                     qcopy((object+0x10), previous);
-                    func_00283658(basis[0],object+0xC0);
-                    func_00283678(object+0xC0,matrix);
-                    func_00283788(matrix,basis[0],rotation);
-                    func_00283678(object+0xC0,matrix);
+                    copy_matrix_rotation(basis[0],object+0xC0);
+                    copy_matrix3x4(object+0xC0,matrix);
+                    multiply_matrix(matrix,basis[0],rotation);
+                    copy_matrix3x4(object+0xC0,matrix);
                 }
             }
         }
-        func_L01_003A65B0(object);
+        moby_move_with_collision(object);
         {
             float displacement[4], inverse[16], center[4];
 
-            func_00283698(inverse,object+0xC0);
-            func_00282CF0(displacement,object+0x10,previous);
-            func_002830C0(displacement,displacement,inverse);
-            func_L00_002EE4D8(displacement,displacement,func_00282C48(F(state,0x4C)));
-            func_00283098(displacement,displacement,object+0xC0);
-            func_00282CC0(object+0x10,previous,displacement);
-            if (((OozlaInput *)D_00138180)->flags & detonate) {
+            matrix_from_basis_rows(inverse,object+0xC0);
+            FastVecSub(displacement,object+0x10,previous);
+            transform_vector(displacement,displacement,inverse);
+            func_L00_002EE4D8(displacement,displacement,math_fabs(F(state,0x4C)));
+            matrix_mul_vec3(displacement,displacement,object+0xC0);
+            FastVecAdd(object+0x10,previous,displacement);
+            if (((OozlaInput *)g_pad_state)->flags & detonate) {
                 func_PAL_002AC718((char *)object,velocity,explosionAt,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
-                count = func_00277F48(object+0x10,sphereFlags,object,sphereHit,D_L01_001AF874);
+                count = coll_process_hit(object+0x10,sphereFlags,object,sphereHit,D_L01_001AF874);
                 *(OozlaQuad *)center = *(OozlaQuad *)(object+0x10);
-                func_002A9850(object,center,D_L01_001C3980,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)D_L01_002637A0 + D_00139568[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
+                moby_queue_knockback_for_nodes(object,center,D_L01_001C3980,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)D_L01_002637A0 + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
                 I(state,0x40) = (((int)(D_L01_001AF878) * 5 + 2) / 6);
                 I(object,0x98) = 0;
                 *(u16 *)(object+0x34) = (*(u16 *)(object+0x34) | 0x41)&0xEFFF;
@@ -205,18 +206,18 @@ void func_PAL_L01_003A9CB8(u8 *object)
             }
         }
         if (F(object,0x10)<2.0f || F(object,0x10)>1021.0f || F(object,0x14)<2.0f || F(object,0x14)>1021.0f || F(object,0x18)<2.0f || F(object,0x18)>1021.0f) {
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return;
         }
         break;
     case 2:
-        if (func_00282948(state+0x40)) {
-            func_003355A8(0);
+        if (math_fast_float_d(state+0x40)) {
+            cam_set_mode_state(0);
             func_PAL_L01_002BEC60(0,1);
-            func_0029F338(object);
+            moby_mark_spawned(object);
             return;
         }
         break;
     }
-    func_002A9288(object,D_L01_001AF87C);
+    part_queue_ground_shadow(object,D_L01_001AF87C);
 }

@@ -5,7 +5,7 @@ extern char *func_003113F0(int);
 extern void func_002EF818(char *, char *);
 
 /* Creates an interpolated particle emitter (moby class 2527) with its position, speed and fade time. */
-char *func_L03_003D09D0(int owner, int attachment, void *position, void *offset, void *velocity, int duration, int timer, int rayMask)
+char *part_create_interpolated_emitter(int owner, int attachment, void *position, void *offset, void *velocity, int duration, int timer, int rayMask)
 {
     char *moby = func_003113F0(0x9DF /* moby class 2527 */);
     char *vars;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L04_0040F2AC (placed in levels 04 and 11): the PAL race-challenge panel, the copy of
    v1.01's func_L04_0040AD28. Plain C, built with -O2 -G8 -ffunction-sections -g in a unit of its
    own and no compiler switches. label_y and hud_coord are the owner-allowed dead-test helpers that
@@ -11,12 +12,12 @@
    is in 50 Hz frames (/50, /3000, /5); and both time-row texts use func_0027FB40, the first at
    center + 50. */
 #include "common.h"
-extern int D_001A7340, D_001A7B90;
-extern int D_001A79F0;
+extern int g_screen_width, g_is_pal_video;
+extern int g_current_map_index;
 extern int D_001A79F0_1 __attribute__((sda));
-extern unsigned char D_00138180[];
+extern unsigned char g_pad_state[];
 extern unsigned char D_001A7A0A;
-extern int D_L04_001B0904 __attribute__((sda));
+extern int g_selected_race_index __attribute__((sda));
 extern unsigned char *D_L04_001B0914 __attribute__((sda));
 extern unsigned char *D_L04_001A904C;
 extern float D_L04_001B2D44;
@@ -25,23 +26,23 @@ extern float D_L04_001BDB80[];
 extern int D_001A7368[] MACRO_ADDR;
 extern int D_001A737C[];
 typedef struct { int name, flags, rewards[3]; unsigned char reserved[44]; } RaceChallenge;
-extern RaceChallenge D_L04_002C63C0[];
+extern RaceChallenge g_race_challenge_table[];
 extern char D_L04_001B0940[], D_L04_001B0950[], D_L04_001B0958[], D_L04_001B0968[];
-extern float func_00283198(float), func_00283180(float);
-extern void func_0027AB40(void);
-extern void *func_00336D50(void *, int);
-extern void func_00300A00(void *, float, unsigned int, float, float, float, float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern char *func_00288FB8(int);
-extern int func_00115DA8(char *, const char *, ...);
+extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void UpdateViewContext(void);
+extern void *table_find_by_id(void *, int);
+extern void gfx_draw_scaled_object_two_axes(void *, float, unsigned int, float, float, float, float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 extern int func_001157AC(const char *);
-extern int func_0027FAA8(int, int, unsigned long, char *, int);
-extern int func_0027FBD8(int, int, unsigned long, char *, int);
-extern int func_0027FB40(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_large(int, int, unsigned long, char *, int);
+extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 extern void func_PAL_L04_0030B2C8(float, float, unsigned long, char *, int, float);
-extern void func_0027F5B8(int, int, unsigned long, char *, int);
-extern int func_L04_0040A1D0(int);
-extern void func_002FC560(int, unsigned long);
+extern void text_draw_medium(int, int, unsigned long, char *, int);
+extern int race_get_course_win_count(int);
+extern void VU1_addGSregister(int, unsigned long);
 extern int D_L04_001B2D40;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
@@ -112,7 +113,7 @@ int func_PAL_L04_0040F2AC(void)
     char buffer[128];
     unsigned char *m = D_L04_001B0914;
     unsigned char *p = *(unsigned char **)(m + 0x68);
-    int center = (int)((float)D_001A7340 * 0.5f);
+    int center = (int)((float)g_screen_width * 0.5f);
     float angle = 0.56217057f, tangent;
     unsigned int tint;
     unsigned char *input;
@@ -122,95 +123,95 @@ int func_PAL_L04_0040F2AC(void)
     int one;
     char *label;
     float w, v;
-    tangent = func_00283198(angle);
-    tangent /= func_00283180(angle);
+    tangent = math_fast_sin_or_cos_b(angle);
+    tangent /= math_fast_sin_or_cos_a(angle);
     centerf = (float)center;
     D_L04_001BDB80[44] = tangent;
-    func_0027AB40();
-    icon = func_00336D50(D_L04_001A904C + 0x8710,0x45);
+    UpdateViewContext();
+    icon = table_find_by_id(D_L04_001A904C + 0x8710,0x45);
     py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
-    if (D_001A7B90) scale = 0.9f;
+    if (g_is_pal_video) scale = 0.9f;
     w = 1.0f;
-    func_00300A00(icon,centerf,0x60442d00,py,w,scale,(float)0);
-    icon = func_00336D50(D_L04_001A904C + 0x8710,0x44);
+    gfx_draw_scaled_object_two_axes(icon,centerf,0x60442d00,py,w,scale,(float)0);
+    icon = table_find_by_id(D_L04_001A904C + 0x8710,0x44);
     w = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     v = 1.0f;
     scale = 0.92f;
-    if (D_001A7B90) scale = 0.9f;
-    func_00300A00(icon,centerf,0x55f0c070,w,v,scale,0.0f);
+    if (g_is_pal_video) scale = 0.9f;
+    gfx_draw_scaled_object_two_axes(icon,centerf,0x55f0c070,w,v,scale,0.0f);
     x = D_L04_001B2008 % 50;
-    count = func_00283D38(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
+    count = FastTweenColor(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
     one = 1;
-    input = D_00138180;
+    input = g_pad_state;
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x2000)) tint = count;
-    icon = func_00336D50(D_L04_001A904C+0x8710,0x4a);
-    func_00300A00(icon,259.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
+    icon = table_find_by_id(D_L04_001A904C+0x8710,0x4a);
+    gfx_draw_scaled_object_two_axes(icon,259.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = count;
-    icon = func_00336D50(D_L04_001A904C+0x8710,0x4b);
-    func_00300A00(icon,251.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
+    icon = table_find_by_id(D_L04_001A904C+0x8710,0x4b);
+    gfx_draw_scaled_object_two_axes(icon,251.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
     if (m[0x20] != 3) {
         float projection_angle = *(float *)(p+0x28c)*0.008726647f;
-        float sine = func_00283198(projection_angle);
-        D_L04_001BDB80[44] = sine / func_00283180(projection_angle);
-        func_0027AB40();
+        float sine = math_fast_sin_or_cos_b(projection_angle);
+        D_L04_001BDB80[44] = sine / math_fast_sin_or_cos_a(projection_angle);
+        UpdateViewContext();
     }
-    { int n_ = func_00115DA8(buffer,func_00288FB8(0xe97),D_L04_001B0904+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FBD8(center,row_,0x80f0f0f0UL,buffer,len_); }
-    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = func_00288FB8(0xe65); func_0027F5B8(119,row_,0x80f0f0f0UL,str_,-1); }
+    { int n_ = sprintf(buffer,GetLocalizedString(0xe97),g_selected_race_index+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); text_draw_centered_large(center,row_,0x80f0f0f0UL,buffer,len_); }
+    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = GetLocalizedString(0xe65); text_draw_medium(119,row_,0x80f0f0f0UL,str_,-1); }
     ROW(356,0xe66);
     ROWF(181.0f,0xe64);
     ROWF(279.0f,0xe67);
-    { label = func_00288FB8(D_L04_002C63C0[D_L04_001B0904].name); { int row_ = Y(110); int len_ = func_001157AC(label); func_0027FAA8(center,row_,0x80f0f0f0UL,label,len_); } }
-    shift = D_001A79F0 == 11 ? 10 : 5;
-    count = func_L04_0040A1D0(D_L04_001B0904);
+    { label = GetLocalizedString(g_race_challenge_table[g_selected_race_index].name); { int row_ = Y(110); int len_ = func_001157AC(label); text_draw_centered_small(center,row_,0x80f0f0f0UL,label,len_); } }
+    shift = g_current_map_index == 11 ? 10 : 5;
+    count = race_get_course_win_count(g_selected_race_index);
     if(count>=3) count=2;
-    if ((D_L04_002C63C0[D_L04_001B0904].flags & 0x10000000) ||
-        (D_L04_001B0904 > 0 && func_L04_0040A1D0(D_L04_001B0904-1)>0)) {
-        if (D_L04_002C63C0[D_L04_001B0904].flags & 4) label = func_00288FB8(D_001A79F0_1 == 11 ? 0xebf : 0xe9f);
-        else label = func_00288FB8(D_001A79F0_1 == 11 ? 0xebe : 0xe9e);
+    if ((g_race_challenge_table[g_selected_race_index].flags & 0x10000000) ||
+        (g_selected_race_index > 0 && race_get_course_win_count(g_selected_race_index-1)>0)) {
+        if (g_race_challenge_table[g_selected_race_index].flags & 4) label = GetLocalizedString(D_001A79F0_1 == 11 ? 0xebf : 0xe9f);
+        else label = GetLocalizedString(D_001A79F0_1 == 11 ? 0xebe : 0xe9e);
         TEXTY(center,150-shift,label);
-        { if (D_L04_002C63C0[D_L04_001B0904].flags&1) label=func_00288FB8(0xea1);
-        else label=func_00288FB8(0xea0);
+        { if (g_race_challenge_table[g_selected_race_index].flags&1) label=GetLocalizedString(0xea1);
+        else label=GetLocalizedString(0xea0);
         TEXT(center,170-shift,label);
-        if (D_001A79F0==11) {
-            if (D_L04_002C63C0[D_L04_001B0904].flags&16) label=func_00288FB8(0xec0);
-            else label=func_00288FB8(0xec1);
+        if (g_current_map_index==11) {
+            if (g_race_challenge_table[g_selected_race_index].flags&16) label=GetLocalizedString(0xec0);
+            else label=GetLocalizedString(0xec1);
             TEXT(center,190-shift,label);
-            if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0xeea); TEXT(center,210-shift,label) }
-        } else if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0xeea); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(label); func_0027FAA8(center,row_,0x80f0f0f0UL,label,len_); } } }
-        if(D_L04_002C63C0[D_L04_001B0904].rewards[count]) {
+            if(g_race_challenge_table[g_selected_race_index].flags&2) { label=GetLocalizedString(0xeea); TEXT(center,210-shift,label) }
+        } else if(g_race_challenge_table[g_selected_race_index].flags&2) { label=GetLocalizedString(0xeea); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(label); text_draw_centered_small(center,row_,0x80f0f0f0UL,label,len_); } } }
+        if(g_race_challenge_table[g_selected_race_index].rewards[count]) {
             char *fmt = D_L04_001B0940;
-            char *str = func_00288FB8(0xea2);
+            char *str = GetLocalizedString(0xea2);
             { unsigned char boost = D_001A7A0A;
-            reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
+            reward = g_race_challenge_table[g_selected_race_index].rewards[count];
             if(boost) reward*=10; }
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0xe83));
-        } else { char *fmt = D_L04_001B0950; func_00115DA8(buffer,fmt,func_00288FB8(0xea2)); }
+            sprintf(buffer,fmt,str,reward,GetLocalizedString(0xe83));
+        } else { char *fmt = D_L04_001B0950; sprintf(buffer,fmt,GetLocalizedString(0xea2)); }
         TEXT(center,shift+210,buffer);
-        { int *times; if (D_001A79F0==4) { times = D_001A7368; count = times[D_L04_001B0904]; } else { times = D_001A737C; count = times[D_L04_001B0904]; } }
+        { int *times; if (g_current_map_index==4) { times = D_001A7368; count = times[g_selected_race_index]; } else { times = D_001A737C; count = times[g_selected_race_index]; } }
         x = 0;
         if(count) {
             x = 110;
-            if (count / 50 % 60 < 10) func_00115DA8(buffer,D_L04_001B0958,func_00288FB8(0x10e0),count/3000%60,count/50%60,count/5%10);
-            else func_00115DA8(buffer,D_L04_001B0968,func_00288FB8(0x10e0),count/3000%60,count/50%60,count/5%10);
+            if (count / 50 % 60 < 10) sprintf(buffer,D_L04_001B0958,GetLocalizedString(0x10e0),count/3000%60,count/50%60,count/5%10);
+            else sprintf(buffer,D_L04_001B0968,GetLocalizedString(0x10e0),count/3000%60,count/50%60,count/5%10);
             { int col = center+50; TEXTR(col,shift+230,buffer); }
         }
             { int col = center-x;
-            char *fmt = func_00288FB8(0xea3);
-            func_00115DA8(buffer,fmt,func_L04_0040A1D0(D_L04_001B0904));
+            char *fmt = GetLocalizedString(0xea3);
+            sprintf(buffer,fmt,race_get_course_win_count(g_selected_race_index));
             TEXTR(col,shift+230,buffer); }
     } else {
             char *fmt;
-            label = func_00288FB8(0xe98); CENTER(150,label);
+            label = GetLocalizedString(0xe98); CENTER(150,label);
             fmt = D_L04_001B0940;
-            { char *str = func_00288FB8(0xea2);
-            reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
+            { char *str = GetLocalizedString(0xea2);
+            reward = g_race_challenge_table[g_selected_race_index].rewards[count];
             if(D_001A7A0A) reward*=10;
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0xe83)); }
-            { int row_ = label_y((void *)center, (float)(shift+210), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FAA8(center,row_,0x80f0f0f0UL,buffer,len_); }
+            sprintf(buffer,fmt,str,reward,GetLocalizedString(0xe83)); }
+            { int row_ = label_y((void *)center, (float)(shift+210), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); text_draw_centered_small(center,row_,0x80f0f0f0UL,buffer,len_); }
     }
-    func_002FC560(71,0x5360b);
+    VU1_addGSregister(71,0x5360b);
     return 1;
 }

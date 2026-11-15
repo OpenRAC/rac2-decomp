@@ -1,6 +1,7 @@
+#include "names.h"
 /* func_PAL_L00_002B3000, the PAL copy of func_L00_002B30E8: the same C. */
 
-extern void func_L00_002B1F90(void);
+extern void UpdateHeroSlotCallbacks(void);
 extern int D_00138320[];
 #ifndef RAC2_T_ROW_F3392E4BC
 #define RAC2_T_ROW_F3392E4BC
@@ -10,7 +11,7 @@ extern int D_00138320[];
 #define RAC2_T_V4_FA012328C
 #endif
 
-extern void func_L00_002B39D8(void);
+extern void hero_clear_speeds(void);
 
 typedef unsigned char u8;
 
@@ -93,8 +94,8 @@ typedef struct {
     short packDisabled;         /* 0x24FC */
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
-extern unsigned char D_00139568[];
-extern int D_L00_001B18D8[] __attribute__((sda)), D_L00_001B19C8[] __attribute__((sda));
+extern unsigned char g_item_slot_to_record[];
+extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
@@ -110,8 +111,8 @@ typedef struct {
     unsigned short ammo;
     char pad2[0x50];
 } HeroItemDefinition;
-extern HeroItemDefinition D_L00_00262570[];
-extern HeroItemMoby *func_0029EFD0(int);
+extern HeroItemDefinition g_weapon_l00_table[];
+extern HeroItemMoby *CreateMoby(int);
 /* calls three measured no-argument functions in sequence */
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
 #define HERO_ITEMS (&D_00189E20_items)
@@ -149,7 +150,7 @@ typedef struct {
     short b;
 } D00189E20_Overlay;
 
-extern D00189E20_Overlay D_00189E20;
+extern D00189E20_Overlay g_hero_state;
 
 /* The level's own dispatch table: 31 absolute code addresses, five of them (the cases
  * 14, 26, 27, 43 and 44) pointing at the arm that writes the two shorts and the rest at
@@ -167,7 +168,7 @@ extern int D_L00_001B18D8[] __attribute__((sda));
  * flagged entry) are reinstalled with the shared value plus 2.  The entry's update
  * callback then runs, except for slot 6, a 253/254 sentinel entry, or slot 0 while the
  * block's word at +0x1500 is set and its mode at +0x1248 is not 10. */
-void func_L00_002B1F90(void);
+void UpdateHeroSlotCallbacks(void);
 
 /* func_L00_002B2200 is in L00_002B2200-g8.c. */
 
@@ -185,14 +186,14 @@ typedef struct {
     u8 slot;
 } HeroSlotState;
 
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 extern int D_001A73D8[] __attribute__((sda));
 extern int D_001A73E0[] __attribute__((sda));
 extern int D_0013A148[];
 extern unsigned char D_0019B2E8[][16];
 extern int D_001A24A8[][16];
-extern void func_L00_002F45B8(void);
-extern void func_0027D330(int);
+extern void level_clear_entry_top_bits(void);
+extern void FadeToBlack(int);
 
 /* Bumps the current level's counter and a global total, runs a helper, then for a valid slot at 0x22C6 bumps a
  * per-level per-slot counter (only once the counter at D_L00_001B19C8 reaches 900, or 1800 in modes 0x74 and 0x79,
@@ -203,17 +204,17 @@ void func_PAL_L00_002B3000(void)
     int threshold;
     int mode;
 
-    D_0013A148[D_001A79F0[0]]++;
+    D_0013A148[g_current_map_index[0]]++;
     D_001A73D8[0]++;
-    func_L00_002F45B8();
+    level_clear_entry_top_bits();
     if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
         mode = ((HeroSlotState *)D_00189E20_1)->mode;
         if (mode == 0x74 || mode == 0x79)
             threshold = 0x5dc;
         else
             threshold = 0x2ee;
-        if (D_L00_001B19C8[0] >= threshold) {
-            int level = D_001A79F0[0];
+        if (g_frame_l00_counter[0] >= threshold) {
+            int level = g_current_map_index[0];
             int slot = ((HeroSlotState *)D_00189E20_1)->slot;
             if ((D_0019B2E8[level][slot] & 0x80) == 0)
                 D_001A24A8[level][slot & 0xF]++;
@@ -221,7 +222,7 @@ void func_PAL_L00_002B3000(void)
         D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
     }
     D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot]++;
-    func_0027D330(0xd);
+    FadeToBlack(0xd);
     ((HeroSlotState *)D_00189E20_1)->visited = 1;
 }
 
@@ -237,7 +238,7 @@ extern int D_00138320[];
 /* Test whether a scalar lies below a plane within its configured depth, rejecting unordered values */
 /* clears the two floats at the head of the window block; the second store is the one the
    scheduler parks in the jr delay slot, so it is written second */
-void func_L00_002B39D8(void);
+void hero_clear_speeds(void);
 
 /* builds one 64-byte block from a 3-float vector of the incoming scalars and another from a static table record one element in, combines them, then scales the result again from that record */
 /* Fills a two-float scratch buffer from one region of a fixed global, passes it with three forwarded floats and an out-parameter to another callee, stores the returned float back into the global, then feeds that out value to a final callee. */

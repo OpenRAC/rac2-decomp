@@ -37,18 +37,18 @@ typedef struct {
     short idx;
 } Self_42A520;
 
-extern float func_00282C48(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
+extern float math_fabs(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
 extern Rec_42A520 *D_L00_001B1844;
 extern float D_L00_001B163C __attribute__((sda));
 extern float D_L00_001B1640 __attribute__((sda));
 extern int D_L00_001B164C __attribute__((sda));
 
 /* Sets the camera's position and direction from the trigger's model and fixed offsets. */
-void func_L00_0042A520(Self_42A520 *self)
+void cam_set_from_trigger_model(Self_42A520 *self)
 {
     float m0[4];
     float m1[4];
@@ -60,7 +60,7 @@ void func_L00_0042A520(Self_42A520 *self)
     entry = D_L00_001B1844[self->idx].ent;
     entry->f28 = D_L00_001B163C;
     entry->f2C = D_L00_001B1640;
-    entry->f30 = FloatAbs(D_L00_001B163C);
+    entry->f30 = math_fabs(D_L00_001B163C);
     entry->f34 = D_L00_001B1640;
     model = entry->model;
     *(TI128 *)entry->v60 = *(TI128 *)model->mE0;

@@ -9,11 +9,11 @@ typedef float f32;
 
 extern char *D_L16_001B2B1C __attribute__((sda));
 extern char *D_L16_001B2B1C_2;
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern s32 func_00319BE8(char *, s32);
 
 /* runs the object's start-up state once and marks the four sub-objects it carries as alive */
-void func_L16_00418D28(char *moby) {
+void moby_activate_linked(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *entry;
     u8 entryState;
@@ -31,7 +31,7 @@ void func_L16_00418D28(char *moby) {
                 return;
         }
     }
-    if (func_00319BE8(gHeroPosition, *(s32 *)(vars + 4)) == 0)
+    if (func_00319BE8(g_hero_position, *(s32 *)(vars + 4)) == 0)
         return;
     if (*(s32 *)(vars + 0x10) != -1)
         *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x10) << 8) + 0xBC) = 1;
@@ -82,7 +82,7 @@ extern void func_002C4368(s32);
 extern void func_00433698(s32);
 
 /* clears the level state word and reseeds the two engine subsystems */
-void func_L16_00416E88(void) {
+void turret_reset_camera_state(void) {
     D_0018B650 = 0;
     D_L16_001B16C0 = 0;
     func_002C4368(0);
@@ -94,21 +94,21 @@ extern f32 D_L16_001B1E94 __attribute__((sda));
 extern void func_0031C698(char *, char *, char *, f32, f32, f32);
 
 /* submits the sub-object at 0x68 with the level's angle scale */
-void func_L16_0041C948(char *moby) {
+void gfx_submit_subobject_angle_scale(char *moby) {
     char *self = moby;
     char *st = *(char **)(self + 0x68);
 
     func_0031C698(self, st + 4, st, D_L16_001B1E90, D_L16_001B1E94 * 0.000290888245f, -1.0f);
 }
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern s32 D_L16_001B1A80 __attribute__((sda));
 extern void func_002E7968(char *, s32 *, char *);
 extern void func_002E7488(char *, char *, char *);
 
 /* installs the two level matrices on the shared render object */
-void func_L16_00416E30(char *moby) {
-    char *obj = gHeroPosition;
+void turret_set_camera_matrices(char *moby) {
+    char *obj = g_hero_position;
 
     func_002E7968(obj, &D_L16_001B1A80, moby + 0xC0);
     func_002E7488(obj, obj, moby + 0x10);
@@ -121,7 +121,7 @@ extern f32 D_L16_001B1C30 __attribute__((sda));
 extern f32 D_L16_001B1C34 __attribute__((sda));
 
 /* initialises the level object's scale/limit table */
-void func_L16_00418218(char *table) {
+void gfx_init_quad_packet_table(char *table) {
     f32 first = D_L16_001B1C28;
     f32 second = D_L16_001B1C2C;
     f32 third = D_L16_001B1C30;
@@ -163,17 +163,17 @@ extern unsigned char *D_L16_001B2B1C_base[3] __asm__("D_L16_001B2B1C") __attribu
 extern s32 D_L16_001B2B38;
 extern unsigned short *D_L16_001FB660[];
 extern s32 D_L16_001B1FE0 __attribute__((sda));
-extern void func_00283098(char *, char *, char *);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_002AFDD8(char *, char *, char *, s32);
-extern void func_002833F0(char *, char *);
+extern void matrix_mul_vec3(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_transform_by_object_or_given(char *, char *, char *, s32);
+extern void euler_rotation_basis(char *, char *);
 
 /* Builds a transform in buf0 from the object's +0xC0 and +0x10 blocks, then, for every entity of
    the object's group (byte 0x21): derives buf1 from buf0 and the entity's position, has
    func_002AFDD8 fill buf2, stores the argument at +0xF4 (negated for class 0x125D) and rewrites
    the entity's +0x10 block from its +0xC0 frame and the two buffers. */
-void func_L16_0041ECF8(char *self, f32 spin) {
+void moby_spin_group_entities(char *self, f32 spin) {
     char buf0[0x10];
     char buf1[0x10];
     char buf2[0x10];
@@ -192,7 +192,7 @@ void func_L16_0041ECF8(char *self, f32 spin) {
         if (entity == 0)
             break;
         FastVecSub(buf1, buf0, entity + 0x10);
-        TransformVectorByObjectOrGiven(entity, buf2, buf1, 0);
+        vec_transform_by_object_or_given(entity, buf2, buf1, 0);
         spinValue = spin;
         if (*(short *)(entity + 0xAA) == 0x125D)
             spinValue = -spinValue;
@@ -206,12 +206,12 @@ void func_L16_0041ECF8(char *self, f32 spin) {
 
 extern s32 D_001A7A00;
 extern void func_002E7788(char *, char *, f32);
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern void func_00315728(char *, char *, s32, char *, f32);
 extern void func_00315948(char *, char *);
 
 /* next frame: arms the object once the shared render state names it, then hands its box to the collision pass */
-void func_L16_0041C6A0(char *moby) {
+void trigger_box_update(char *moby) {
     char buf[0x30];
     char extent[0x10];
     char *hero;
@@ -224,7 +224,7 @@ void func_L16_0041C6A0(char *moby) {
     }
     if (*(u8 *)(moby + 0x20) != 1)
         return;
-    hero = gHeroState;
+    hero = g_hero_state;
     lockedTarget = *(char **)(hero + 0x33C);
     if (lockedTarget == 0 || lockedTarget != moby)
         return;

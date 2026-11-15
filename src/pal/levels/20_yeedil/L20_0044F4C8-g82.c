@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern float D_L20_001B23E8 __attribute__((sda));
-extern void func_002A7750(char *, int, int);
+extern void moby_set_state(char *, int, int);
 
 void func_PAL_L20_0044F660(char *arg0, char *arg1, char *arg2)
 {
@@ -16,5 +16,5 @@ void func_PAL_L20_0044F660(char *arg0, char *arg1, char *arg2)
     qcopy((arg0 + 0x10), arg2);
     *(f32 *)(arg0 + 0x18) = *(f32 *)(arg0 + 0x18) + 0.5f;
     qzero((state + 0x50));
-    func_002A7750(arg0, 2, -1);
+    moby_set_state(arg0, 2, -1);
 }

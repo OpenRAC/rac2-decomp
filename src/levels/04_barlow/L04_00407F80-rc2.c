@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -33,7 +34,7 @@ extern s32 ref_L04_00407F80_06(s8 *, s32);
 extern void ref_L04_00407F80_07(s8 *, void *);
 
 /* Sets up the object on its first frame, then keeps registering its update routine until the linked trigger fires. */
-void func_L04_00407F80(void *moby) {
+void trigger_wait_update(void *moby) {
     void *vars;
     s32 triggerId;
 

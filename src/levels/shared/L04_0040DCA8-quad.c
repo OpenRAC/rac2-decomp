@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L04_0040DCA8 (740 bytes, 6 places): builds a textured quad packet (corner vertices,
  * UVs and colours). Own unit: -O2 -G0 -ffunction-sections -frac2-sched-clear-holds-store
  * (config/cflags.txt). The corners are stored in plain order, c0.y..c3.w. In retail the
@@ -8,18 +9,18 @@
 #include "common.h"
 typedef unsigned int B781AimQuad __attribute__((mode(TI)));
 typedef union { B781AimQuad bits; float f[4]; } Corner;
-extern void func_00282CF0(void *,void *,void *), func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *), func_00282D30(void *,void *,float), func_00282CC0(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *), vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *), FastVecScale(void *,void *,float), FastVecAdd(void *,void *,void *);
 typedef struct { float u, v; } UVPair;
 typedef struct { float vertices[4][4]; int colors[4]; UVPair uv[4]; long state[4]; } B971Packet;
-extern void func_00281DE8(void *, int, int, int);
-extern float func_00283180(float), func_00283198(float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_002FC560(int, unsigned long long);
-extern void func_00280B90(void *, int, int);
+extern void gfx_init_quad_packet_state(void *, int, int, int);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern void transform_vector(void *, void *, void *);
+extern void VU1_addGSregister(int, unsigned long long);
+extern void draw_world_quad(void *, int, int);
 extern char D_L04_001B9680[], D_0018A0E0[];
 /* Draws a flat glowing sprite that faces the camera at a position. It can be turned by an angle and squashed. */
-void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags, float scale, float size, float angle, float skew)
+void gfx_l04_draw_billboard_sprite(B781AimQuad *position, int texture, int color, int flags, float scale, float size, float angle, float skew)
 {
     B971Packet packet;
     float tmp[2];
@@ -31,13 +32,13 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     float *out;
     u8 *uPtr;
     int i;
-    InitQuadPacketState(&packet, texture, flags, 128);
+    gfx_init_quad_packet_state(&packet, texture, flags, 128);
     packet.state[0] = 5;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = color;
     packet.uv[0].u = 0; packet.uv[0].v = 0; packet.uv[1].u = 0; packet.uv[1].v = 1;
     packet.uv[2].u = 1; packet.uv[2].v = 0; packet.uv[3].u = 1; packet.uv[3].v = 1;
-    cosAngle = FastSinOrCosA(angle);
-    sinAngle = FastSinOrCosB(angle);
+    cosAngle = math_fast_sin_or_cos_a(angle);
+    sinAngle = math_fast_sin_or_cos_b(angle);
     {
         int k;
         u8 *vPtr = (u8 *)&packet + 0x54;

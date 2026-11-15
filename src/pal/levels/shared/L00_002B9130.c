@@ -2,11 +2,11 @@
 
 #include "common.h"
 typedef int TI_F41eb487e __attribute__((mode(TI)));
-extern void func_002830C0(void *a, void *b, void *c);
-extern void func_00282D30(void *a, void *b, float value);
-extern void func_L00_002B8F00(void *a, void *b, int c, float p, float q, float r);
-extern void func_00282CF0(void *a, void *b, void *c);
-extern void func_00282CC0(void *a, void *b, void *c);
+extern void transform_vector(void *a, void *b, void *c);
+extern void FastVecScale(void *a, void *b, float value);
+extern void hero_apply_reference_tilt_rotation(void *a, void *b, int c, float p, float q, float r);
+extern void FastVecSub(void *a, void *b, void *c);
+extern void FastVecAdd(void *a, void *b, void *c);
 typedef struct {
     int a;
     int b;
@@ -45,11 +45,11 @@ void func_PAL_L00_002B9130(void)
     B.c = 0.8f;
     C.c = 0.8f;
 
-    func_002830C0(&B, &B, &D_00189E20_5);
+    transform_vector(&B, &B, &D_00189E20_5);
 
     *(TI_F41eb487e *)&A = *(TI_F41eb487e *)&D_00189E20_5.q2A0;
     if (D_00189E20_5.b22C3 == 2) {
-        func_00282D30(&A, &D_00189E20_5.area2C0, -1.0f);
+        FastVecScale(&A, &D_00189E20_5.area2C0, -1.0f);
     }
 
     if (D_00189E20_5.b22C3 == 1 && (D_00189E20_5.h34E < 8 || D_00189E20_5.f31C < 1.0f))
@@ -60,12 +60,12 @@ void func_PAL_L00_002B9130(void)
         hi = lo;
     }
 
-    func_L00_002B8F00(&A, scratch, 0, hi, lo, 0.0f);
+    hero_apply_reference_tilt_rotation(&A, scratch, 0, hi, lo, 0.0f);
 
     if (D_00189E20_5.b22C3 == 1 && D_00189E20_5.h34E != 0) {
-        func_002830C0(&C, &C, scratch);
-        func_00282CF0(&D_00189E20_5.area080, &D_00189E20_5.area080, &C);
-        func_00282CC0(&D_00189E20_5.area080, &D_00189E20_5.area080, &B);
+        transform_vector(&C, &C, scratch);
+        FastVecSub(&D_00189E20_5.area080, &D_00189E20_5.area080, &C);
+        FastVecAdd(&D_00189E20_5.area080, &D_00189E20_5.area080, &B);
     }
 }
 

@@ -1,13 +1,13 @@
 #include "names.h"
 
 
-extern void func_00335E38(void *, float, float, float, float);
+extern void object_set_first_float4(void *, float, float, float, float);
 
-extern void func_00336920(void *, int, int);
+extern void hud_set_widget_value_pair(void *, int, int);
 
-extern int *func_00335E20(void *);
+extern int *object_get_fourth_field(void *);
 
-extern void func_00336828(void *);
+extern void hud_draw_colored_quad_widget(void *);
 
 extern float D_L01_001AE420 __attribute__((sda));
 
@@ -30,37 +30,37 @@ struct Obj {
 };
 
 /* Draws the row of icons of the tabbed menu, highlighting the selected one. */
-void func_00341A88(struct Obj *o)
+void tab_menu_draw_icons(struct Obj *o)
 {
     int i;
 
     for (i = 0; i < o->count460; i++) {
-        SetFirstFloat4(&o->h380, o->fp536[0] + D_L01_001AE420,
+        object_set_first_float4(&o->h380, o->fp536[0] + D_L01_001AE420,
                 o->fp536[1] + D_L01_001AE424 + D_L01_001AE428 * (float)i, 0.0f, 0.0f);
         if (o->mode764 == 2) {
             int v = o->p456[i];
 
             if (v == 5)
-                SetWidgetValuePair(&o->h380, 60062, 5);
+                hud_set_widget_value_pair(&o->h380, 60062, 5);
             else
-                SetWidgetValuePair(&o->h380, v, 0);
+                hud_set_widget_value_pair(&o->h380, v, 0);
         } else if (o->mode764 == 0) {
             int w = o->p456[i];
 
             if (w == 6)
-                SetWidgetValuePair(&o->h380, 60055, 0);
+                hud_set_widget_value_pair(&o->h380, 60055, 0);
             else
-                SetWidgetValuePair(&o->h380, o->a452, w);
+                hud_set_widget_value_pair(&o->h380, o->a452, w);
         } else {
-            SetWidgetValuePair(&o->h380, o->a452, o->p456[i]);
+            hud_set_widget_value_pair(&o->h380, o->a452, o->p456[i]);
         }
         {
-            int *r = GetFieldC(&o->h380);
+            int *r = object_get_fourth_field(&o->h380);
             int t = o->tbl440[o->mode764] ^ i;
             int alt = 0x70FFFEED;
 
             *r = t ? 0x60F0F0B0 : alt;
         }
-        DrawColoredQuadWidget(&o->h380);
+        hud_draw_colored_quad_widget(&o->h380);
     }
 }

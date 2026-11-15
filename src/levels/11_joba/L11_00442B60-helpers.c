@@ -4,20 +4,20 @@ typedef union { TI128 q; float f[4]; } Vector;
 
 extern TI128 D_L11_001BAAF0;
 
-extern f32 D_00189EA0[];
+extern f32 g_hero_position[];
 
-extern void func_00282CF0(void *out, const void *in, const void *matrix);
+extern void FastVecSub(void *out, const void *in, const void *matrix);
 
-extern f32 func_00282DB0(const void *a, const void *b);
+extern f32 FastVecDot(const void *a, const void *b);
 
-extern f32 func_00282E80(void *obj, const void *matrix);
+extern f32 vec_distance_xy(void *obj, const void *matrix);
 
-extern void func_00282F20(void *out, const void *in, f32 scale);
+extern void vec_scale_to_length(void *out, const void *in, f32 scale);
 
 /* Measures the actor's distance to the level's helper and reports whether it is
    past the level's threshold. */
 /* Tells whether a character is far enough away and on the right side of the arena. */
-s32 func_L11_00442B60(u8 *moby) {
+s32 arena_is_entity_far_in_direction(u8 *moby) {
     Vector referenceDir;
     Vector unusedDir;
     Vector heroDir;
@@ -27,14 +27,14 @@ s32 func_L11_00442B60(u8 *moby) {
     referenceDir.f[2] = 0;
     vec_scale_to_length(&referenceDir, &referenceDir, 1.0f);
     result = 0;
-    FastVecSub(&unusedDir, moby + 0x10, gHeroPosition);
+    FastVecSub(&unusedDir, moby + 0x10, g_hero_position);
     unusedDir.f[2] = 0;
     vec_scale_to_length(&unusedDir, &unusedDir, 1.0f);
-    FastVecSub(&heroDir, moby + 0x10, gHeroPosition);
+    FastVecSub(&heroDir, moby + 0x10, g_hero_position);
     heroDir.f[2] = 0;
     vec_scale_to_length(&heroDir, &heroDir, 1.0f);
     if (FastVecDot(&referenceDir,&heroDir) > 0.81915f) {
-        if (vec_distance_xy(moby + 0x10, gHeroPosition) > 30.0f) {
+        if (vec_distance_xy(moby + 0x10, g_hero_position) > 30.0f) {
             result = 1;
         }
     }

@@ -22,14 +22,14 @@ extern s32 D_L18_001B1CB8[2] __attribute__((sda));
 extern s32 D_L18_001B1CE0 __attribute__((sda));
 extern s32 D_L18_001B1CE4 __attribute__((sda));
 extern s32 D_L18_001B1CE8 __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern float func_002A7878(float, float);
-extern void *func_002A9640(void *, u32, s32);
-extern int func_002E5DA0(int, int, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern float math_random_float_range(float, float);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
 
 void func_PAL_L18_00444F60(Moby43FB08 *self) {
@@ -40,21 +40,21 @@ void func_PAL_L18_00444F60(Moby43FB08 *self) {
 
     switch (self->state) {
     case 0:
-        func_002A7750(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
-        if (func_002A9640(self, 0x4010000, 0) != 0 && vars->busy == 0) {
+        if (part_find_owned_effect_slot(self, 0x4010000, 0) != 0 && vars->busy == 0) {
             *(TI *)ext = 0;
             ext[0] = 3.0f;
             ext[1] = 3.0f;
-            func_00282D30(lo, self->dir, -func_002A7878(6.0f, 8.0f));
+            FastVecScale(lo, self->dir, -math_random_float_range(6.0f, 8.0f));
             qcopy(hi, lo);
-            func_00282CF0(lo, lo, ext);
-            func_00282CC0(hi, hi, ext);
+            FastVecSub(lo, lo, ext);
+            FastVecAdd(hi, hi, ext);
             func_PAL_L00_0032C328(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
                               D_L18_001B1CE0, 9, D_L18_001B1CE8, 0xFF, 0);
-            func_002E5DA0(0, 0, self, self->uid);
-            func_0029F338(self);
+            snd_play_from_class_bank(0, 0, self, self->uid);
+            moby_mark_spawned(self);
         } else {
             self->alpha = 0xFF;
         }

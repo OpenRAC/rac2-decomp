@@ -94,7 +94,7 @@ typedef struct {
     int savedValue;
 } MenuState;
 
-extern MenuState D_001BAC80;
+extern MenuState g_modal_state;
 extern MenuBox D_001A8A88;
 extern MenuBox D_001A8AB8;
 extern char D_001A8AA0[];
@@ -110,39 +110,39 @@ extern int D_001A8A74 __attribute__((sda));
 extern int D_001A8C88;
 extern int D_001A8C8C;
 extern int D_001F29A0[];
-extern int D_001A7420;
-extern unsigned short D_001A7344;
+extern int g_save_menu_screen;
+extern unsigned short g_screen_height;
 extern int D_001B1598;
 extern float D_001B23A4;
 
-extern void func_0027DDC0(int, int, int, int);
-extern void func_0027C540(int);
-extern void func_002FC560(unsigned int, unsigned long);
-extern char *func_00288FB8(int);
-extern char *func_00115AC0(unsigned char *, char *, int);
-extern void func_00280190(MenuBox *, unsigned long, unsigned char *, int);
+extern void gfx_set_clear_color_packet(int, int, int, int);
+extern void SetupGifPaging(int);
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern char *GetLocalizedString(int);
+extern char *strncpy(unsigned char *, char *, int);
+extern void text_draw_window_small(MenuBox *, unsigned long, unsigned char *, int);
 extern int func_001157AC(unsigned char *);
-extern void func_0029B888(MenuBox *, int, void *, int, int, int, int, char *, char *, char *);
-extern int func_0028E588(int, int);
-extern void func_0028E868(int, int, int, int, int, int);
-extern int func_0028E640(int);
-extern void func_0028F410(float, float, float, float, float, int, int, long long);
-extern void *func_00115484(void *, int, int);
-extern int func_00288D80(void);
-extern int func_00287E90(void);
-extern int func_00115DA8(char *, const char *, ...);
-extern void func_0027EB88(int, int, int, int, int, int);
-extern int func_00283D38(int, int, float);
-extern int func_0027FAA8(int, int, unsigned long, char *, int);
-extern int func_0027C878(int);
-extern void func_0027FC70(MenuBox *, unsigned long, char *, int, int, void *);
-extern void func_002802E0(MenuBox *, int, int, int, int, int, int, int, int);
-extern void func_0027C660(void);
+extern void level_forward_draw_args(MenuBox *, int, void *, int, int, int, int, char *, char *, char *);
+extern int GetIconFrame(int, int);
+extern void hud_draw_sprite(int, int, int, int, int, int);
+extern int GetFrameTexture(int);
+extern void DrawRotatedSprite(float, float, float, float, float, int, int, long long);
+extern void *memset(void *, int, int);
+extern int flag_get_word(void);
+extern int menu_is_confirm_pending(void);
+extern int sprintf(char *, const char *, ...);
+extern void gfx_draw_rounded_box(int, int, int, int, int, int);
+extern int FastTweenColor(int, int, float);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int GetEffectTextureDescriptor(int);
+extern void FontPrintWindow(MenuBox *, unsigned long, char *, int, int, void *);
+extern void FontSetWindow(MenuBox *, int, int, int, int, int, int, int, int);
+extern void DoGifPaging(void);
 
 #define SPR ((unsigned char *)0x70000000)
 
 /* Draws the pop-up message panel for the current menu mode: save and load prompts, retry messages, the fade-in confirmation box and the countdown box, with the right button icons. */
-void func_002859C8(void)
+void menu_draw_message_panel(void)
 {
     char buf[0x300];
     MenuBox box;
@@ -150,14 +150,14 @@ void func_002859C8(void)
     MenuBox tmp2;
     char buf2[0x100];
 
-    if (gModalState.cameraActive == 0)
-        SetClearColorPacket(0, 0, 0, 0x30);
-    if (gModalState.timer != 0)
+    if (g_modal_state.cameraActive == 0)
+        gfx_set_clear_color_packet(0, 0, 0, 0x30);
+    if (g_modal_state.timer != 0)
         return;
     SetupGifPaging(0);
     VU1_addGSregister(0x42, 0x8000000044UL);
     VU1_addGSregister(0x47, 0x5360B);
-    switch (gModalState.mode) {
+    switch (g_modal_state.mode) {
     case 2: {
         unsigned char *spr;
         unsigned char *p;
@@ -174,25 +174,25 @@ void func_002859C8(void)
             p++;
         }
         box.flags |= 4;
-        DrawTextWindowSmallFont(&box, 0x80000000UL, spr, -1);
+        text_draw_window_small(&box, 0x80000000UL, spr, -1);
         box.flags ^= 4;
         h = box.h;
-        len = strlen_001157AC(spr);
+        len = func_001157AC(spr);
         for (i = 4; i >= 0; i--)
             spr[len + i] = 1;
         spr[len + 5] = 0;
-        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, spr, 1, 1, -1, 1, GetLocalizedString(0x1137), 0, 0);
+        level_forward_draw_args(&box, 0x80F0F0F0, spr, 1, 1, -1, 1, GetLocalizedString(0x1137), 0, 0);
         x = box.x + h;
         VU1_addGSregister(0x47, 0x3004B);
         y = x + 8;
-        DrawHudSprite(GetIconFrame(0x755D, 0), 0xE0, y, 0x40, 0x40, 0x80);
+        hud_draw_sprite(GetIconFrame(0x755D, 0), 0xE0, y, 0x40, 0x40, 0x80);
         DrawRotatedSprite(4096.0f, (x + 40) * 16, 272.0f, 272.0f,
                       (D_001B1598 % 55) * -0.11423973f, 0x40, 0x40,
                       GetFrameTexture(GetIconFrame(0x755D, 1)));
         break;
     }
     case 4:
-        if (gModalState.elapsed > 0) {
+        if (g_modal_state.elapsed > 0) {
             unsigned char *p;
             int id;
 
@@ -204,9 +204,9 @@ void func_002859C8(void)
                 *p = 0;
                 p++;
             }
-            id = gModalState.countdown ? 0 : 0x1137;
+            id = g_modal_state.countdown ? 0 : 0x1137;
             memset(&tmp, 0, sizeof(tmp));
-            tmp.f02 = gScreenHeight;
+            tmp.f02 = g_screen_height;
             tmp.f04 = 0x60;
             tmp.f06 = 0x1A0;
             tmp.f08 = 0x100;
@@ -214,18 +214,18 @@ void func_002859C8(void)
             tmp.f10 = 0x10;
             tmp.flags = 1;
             box = tmp;
-            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, p, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
+            level_forward_draw_args(&box, 0x80F0F0F0, p, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
     case 5:
-        if (gModalState.elapsed > 0) {
+        if (g_modal_state.elapsed > 0) {
             char *text;
             int id;
 
-            text = GetLocalizedString(gModalState.savedValue ? 0x2E04 : 0x2E03);
-            id = gModalState.countdown ? 0 : 0x1137;
+            text = GetLocalizedString(g_modal_state.savedValue ? 0x2E04 : 0x2E03);
+            id = g_modal_state.countdown ? 0 : 0x1137;
             memset(&tmp2, 0, sizeof(tmp2));
-            tmp2.f02 = gScreenHeight;
+            tmp2.f02 = g_screen_height;
             tmp2.f04 = 0x60;
             tmp2.f06 = 0x1A0;
             tmp2.f08 = 0x100;
@@ -233,7 +233,7 @@ void func_002859C8(void)
             tmp2.f10 = 0x10;
             tmp2.flags = 1;
             box = tmp2;
-            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, text, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
+            level_forward_draw_args(&box, 0x80F0F0F0, text, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
     case 1: {
@@ -241,15 +241,15 @@ void func_002859C8(void)
         char *text;
 
         show = 1;
-        if (gModalState.elapsed > 0) {
+        if (g_modal_state.elapsed > 0) {
             text = D_001A8AA0;
             id1 = 0;
             id2 = 0;
-            if (GetFlagWord()) {
+            if (flag_get_word()) {
                 id1 = 0x1137;
                 text = GetLocalizedString(0x2E04);
             } else {
-                switch (gSaveMenuScreen) {
+                switch (g_save_menu_screen) {
                 case 6:
                     id1 = 0x113C;
                     id2 = 0x1138;
@@ -288,7 +288,7 @@ void func_002859C8(void)
                     break;
                 case 2:
                     text = GetLocalizedString(0x2DE5);
-                    id1 = gModalState.countdown ? 0 : 0x1137;
+                    id1 = g_modal_state.countdown ? 0 : 0x1137;
                     break;
                 case 19:
                     if (D_001F29A0[0]) {
@@ -297,12 +297,12 @@ void func_002859C8(void)
                     } else if (D_001A8C88) {
                         id1 = 0x113B;
                         id2 = 0x1138;
-                        Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                        sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
                                       GetLocalizedString(0x2DEB));
                         text = buf;
                     } else {
                         id1 = 0x113B;
-                        Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                        sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
                                       GetLocalizedString(0x2DEB));
                         text = buf;
                         if (D_001A8C8C)
@@ -310,7 +310,7 @@ void func_002859C8(void)
                     }
                     break;
                 case 21:
-                    text = GetLocalizedString((!D_001A8C88 && IsConfirmPending()) ? 0x2E04 : 0x2E03);
+                    text = GetLocalizedString((!D_001A8C88 && menu_is_confirm_pending()) ? 0x2E04 : 0x2E03);
                     id1 = 0x1137;
                     break;
                 case 20:
@@ -320,7 +320,7 @@ void func_002859C8(void)
                 case 24:
                     id1 = 0x113B;
                     id2 = 0x1138;
-                    Sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DF2), 1, 1,
+                    sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DF2), 1, 1,
                                   GetLocalizedString(0x2DEB));
                     text = buf;
                     break;
@@ -357,7 +357,7 @@ void func_002859C8(void)
             }
             if (show) {
                 memset(&tmp, 0, sizeof(tmp));
-                tmp.f02 = gScreenHeight;
+                tmp.f02 = g_screen_height;
                 tmp.f04 = 0x60;
                 tmp.f06 = 0x1A0;
                 tmp.f08 = 0x100;
@@ -365,7 +365,7 @@ void func_002859C8(void)
                 tmp.f10 = 0x10;
                 tmp.flags = 1;
                 box = tmp;
-                ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, text, 1, 1, -1, 0,
+                level_forward_draw_args(&box, 0x80F0F0F0, text, 1, 1, -1, 0,
                               id1 ? GetLocalizedString(id1) : 0, id2 ? GetLocalizedString(id2) : 0, 0);
             }
         }
@@ -375,25 +375,25 @@ void func_002859C8(void)
         float fade;
         int textColor, promptColor, id;
 
-        fade = 1.0f - gModalState.countdown * 0.033333335f;
+        fade = 1.0f - g_modal_state.countdown * 0.033333335f;
         box = D_001A8AB8;
-        DrawRoundedBox(0x64, 0x12C, 0x60, 0x1A0, (int)(fade * 80.0f), 0x40404);
+        gfx_draw_rounded_box(0x64, 0x12C, 0x60, 0x1A0, (int)(fade * 80.0f), 0x40404);
         textColor = FastTweenColor(D_001A8A70, D_001A8A74, fade);
         promptColor = FastTweenColor(0x20FFFF, 0x8020FFFF, fade);
-        switch (gModalState.phase) {
+        switch (g_modal_state.phase) {
         case 0:
         case 1:
-            DrawTextCenteredSmallFont(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
-            DrawTextCenteredSmallFont(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
+            text_draw_centered_small(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
+            text_draw_centered_small(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
             id = 0x2F28;
             break;
         case 2:
-            DrawTextCenteredSmallFont(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
-            DrawTextCenteredSmallFont(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
+            text_draw_centered_small(0xCA, 0x118, promptColor, GetLocalizedString(0x113B), -1);
+            text_draw_centered_small(0x135, 0x118, promptColor, GetLocalizedString(0x1138), -1);
             id = 0x2F29;
             break;
         case 3:
-            DrawTextCenteredSmallFont(0x100, 0x118, promptColor, GetLocalizedString(0x1137), -1);
+            text_draw_centered_small(0x100, 0x118, promptColor, GetLocalizedString(0x1137), -1);
             id = 0x2F2A;
             break;
         default:
@@ -418,7 +418,7 @@ void func_002859C8(void)
         message = D_001A8A54;
         if (!message)
             message = GetLocalizedString(0x2DCD);
-        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, icon2, D_001A8A58);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, icon2, D_001A8A58);
         break;
     }
     case 10: {
@@ -432,7 +432,7 @@ void func_002859C8(void)
         message = D_001A8A54;
         if (!message)
             message = GetLocalizedString(0x2DCD);
-        ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, 0, D_001A8A58);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, 0, D_001A8A58);
         break;
     }
     case 11: {
@@ -448,7 +448,7 @@ void func_002859C8(void)
         enabled = 1;
         FontSetWindow(pb, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(sc * k + h), 0x10, n);
-        switch (gModalState.phase) {
+        switch (g_modal_state.phase) {
         case 0:
             break;
         case 1: {
@@ -456,18 +456,18 @@ void func_002859C8(void)
 
             icon1 = GetLocalizedString(0x1137);
             icon2 = GetLocalizedString(0x2805);
-            Sprintf(buf2, GetLocalizedString(0x31E6), 15);
-            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1, icon2, 0);
+            sprintf(buf2, GetLocalizedString(0x31E6), 15);
+            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1, icon2, 0);
             break;
         }
         case 2:
             break;
         case 3:
-            gModalState.inputDelay = gModalState.elapsed / 60 + 1;
-            Sprintf(buf2, D_001A8AD0, GetLocalizedString(0x31ED), GetLocalizedString(0x31EE),
-                          gModalState.inputDelay, GetLocalizedString(0x31EF));
+            g_modal_state.inputDelay = g_modal_state.elapsed / 60 + 1;
+            sprintf(buf2, D_001A8AD0, GetLocalizedString(0x31ED), GetLocalizedString(0x31EE),
+                          g_modal_state.inputDelay, GetLocalizedString(0x31EF));
             icon1 = GetLocalizedString(0x113B);
-            ForwardArgsToLevelObjectDraw(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1,
+            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1,
                           GetLocalizedString(0x1138), 0);
             break;
         }

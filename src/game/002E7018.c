@@ -8,11 +8,11 @@ extern short D_00152C2A;
 
 extern void func_002B72E8_1();
 
-extern void func_002E4AC8();
+extern void UpdateSoundVoices();
 
-extern void func_00288EA0();
+extern void subtitle_clear_state();
 
-extern void func_002E6D88();
+extern void level_transition_scene_start();
 
 
 typedef struct {
@@ -25,7 +25,7 @@ extern u8 D_L24_0028AAC0[];
 
 /* One-shot init: raises an int flag, forces a state word outside {6,7} to 5, runs three calls, then clears a 16-bit global. */
 /* Resets the scene state when a scene starts. */
-void func_002E7018(void)
+void scene_reset_state_on_start(void)
 {
     char *gameData = D_00189E20_9;
     char *transitionData;
@@ -42,8 +42,8 @@ void func_002E7018(void)
         *(unsigned short *)(transitionData + 114) = 5;
     }
     UpdateSoundVoices();
-    ClearSubtitleState();
-    StartTransitionScene(0);
+    subtitle_clear_state();
+    level_transition_scene_start(0);
     D_00152C2A = 0;
 }
 
@@ -53,44 +53,44 @@ typedef struct { char pad[0x20]; short active; short slot; } Menu2E7090;
 typedef struct { char pad[0xC]; int start; int end; } Range2E7090;
 typedef struct { char pad[0x30]; int selected; int base; int page; int row; char pad40[0x6C - 0x40]; int start; int destination; } List2E7090;
 
-extern float D_001B15A0 MACRO_ADDR;
+extern float g_screen_fade MACRO_ADDR;
 extern int D_001B15A4 MACRO_ADDR;
-extern Menu2E7090 D_00152C00;
+extern Menu2E7090 g_hero_moby_default;
 extern int D_001B22B0 MACRO_ADDR;
 extern Range2E7090 D_001BAEC0;
-extern List2E7090 D_001B8840;
-extern int D_001A79F0 MACRO_ADDR;
-extern int D_001A7B90 MACRO_ADDR;
+extern List2E7090 g_scene_playback_state;
+extern int g_current_map_index MACRO_ADDR;
+extern int g_is_pal_video MACRO_ADDR;
 extern int D_001B1680 MACRO_ADDR;
-extern void func_002FC138(void);
-extern void func_00294070(int);
-extern int func_0029B3E0(int, int);
+extern void gfx_select_packet_buffer_setup(void);
+extern void load_select_segment_update_world(int);
+extern int MemcardSave(int, int);
 
 /* Opens the list: rebases its range on the loaded block and, for the current program, lays
    out the first page (80 or 96 rows a page). */
 /* Starts the scene list: sets up its memory block and loads the first page of data. */
-void func_002E7090(int level)
+void scene_init_list(int level)
 {
-    Menu2E7090 *menu = &gHeroMoby_00152C00;
+    Menu2E7090 *menu = &g_hero_moby_default;
     short none = -1;
     int base;
 
-    gScreenFade = 1.0f;
+    g_screen_fade = 1.0f;
     D_001B15A4 = 0;
     menu->active = 0;
     menu->slot = none;
-    SelectPacketBufferSetup();
+    gfx_select_packet_buffer_setup();
     base = D_001B22B0 - 0x60000;
-    gScenePlaybackState.start = D_001BAEC0.start + base;
-    gScenePlaybackState.destination = D_001BAEC0.end + base;
+    g_scene_playback_state.start = D_001BAEC0.start + base;
+    g_scene_playback_state.destination = D_001BAEC0.end + base;
     D_001B22B0 = base;
-    if (gCurrentMapIndex == level) {
-        StartTransitionScene(3);
-        level = gIsPalVideo ? 0x50 : 0x60;
-        gScenePlaybackState.base = 0;
-        gScenePlaybackState.row = gScenePlaybackState.base / level;
-        SelectSegmentAndUpdateWorld(gScenePlaybackState.row);
-        gScenePlaybackState.page = gScenePlaybackState.base % level;
+    if (g_current_map_index == level) {
+        level_transition_scene_start(3);
+        level = g_is_pal_video ? 0x50 : 0x60;
+        g_scene_playback_state.base = 0;
+        g_scene_playback_state.row = g_scene_playback_state.base / level;
+        load_select_segment_update_world(g_scene_playback_state.row);
+        g_scene_playback_state.page = g_scene_playback_state.base % level;
     } else {
         MemcardSave(0, level);
         D_001B1680 = level;
@@ -107,16 +107,16 @@ void func_002E7090(int level)
 
 /* func_002E76C0 is in 002E76C0-g8.c. */
 
-extern unsigned int D_001A7AF0 __attribute__((sda));
-extern void func_002E76C0(void *, int, int);
+extern unsigned int g_equipment_bits __attribute__((sda));
+extern void ship_spawn_engine_flame(void *, int, int);
 
 /* Draws the ship engine flames, three of them or just one depending on a game setting. */
-void func_002E7B48(void *object)
+void ship_draw_engine_flames(void *object)
 {
-    int count = ((gEquipmentBits >> 4) & 1) ? 3 : 1;
+    int count = ((g_equipment_bits >> 4) & 1) ? 3 : 1;
     int index;
     for (index = 0; index < count; index++)
-        SpawnShipEngineFlame(object, index, 0);
+        ship_spawn_engine_flame(object, index, 0);
 }
 
 
@@ -125,13 +125,13 @@ void func_002E7B48(void *object)
 
 /* func_002E8190 is matched in 002E7018-g8.c (-G8 small data). */
 
-extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027E018(int, char *, int, int, int, int, int, int, unsigned long long, unsigned long long);
-extern char *D_001A7344 __attribute__((sda));
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern void DrawTexturedQuad(int, char *, int, int, int, int, int, int, unsigned long long, unsigned long long);
+extern char *g_screen_height __attribute__((sda));
 extern unsigned long long D_001B2168 __attribute__((sda));
 
 /* Draws a fading overlay strip across the screen with the given see-through amount. */
-void func_002E82C8(int alpha)
+void gfx_draw_fade_strip(int alpha)
 {
     unsigned long long color;
     unsigned long long packet;
@@ -141,7 +141,7 @@ void func_002E82C8(int alpha)
     VU1_addGSregister(0x42, 0x8000000044ULL);
     color = (alpha << 24) | 0x00808080;
     packet = D_001B2168;
-    dst = gScreenHeight;
+    dst = g_screen_height;
     DrawTexturedQuad(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
     VU1_addGSregister(0x47, 0x5360BULL);
 }
@@ -157,44 +157,44 @@ void func_002E82C8(int alpha)
 
 extern short D_00152C20;
 extern int D_001B1594 __attribute__((sda));
-extern void func_0027C480(void);
-extern void func_0027BD70(void);
-extern void func_002E8BA8(void);
+extern void gfx_render_frame_all_layers(void);
+extern void RenderFrame(void);
+extern void transition_render_scene(void);
 
 /* Draws the background of the transition screen for the current transition type. */
-void func_002EA8E8(void)
+void transition_draw_background(void)
 {
     switch (D_00152C20) {
     case 0:
     case 3:
-        RenderFrameAllLayers();
+        gfx_render_frame_all_layers();
         break;
     case 1:
         D_001B1594 = 127;
         RenderFrame();
         break;
     case 2:
-        RenderTransitionScene();
+        transition_render_scene();
         break;
     }
 }
 
 
 extern void func_001325E8(void *, void (*)(int, long), long long);
-extern void func_0011AEA0(int);
-extern int func_001261F0(int);
-extern int func_00132028(void);
-extern void func_002E6088(int, long);
+extern void FlushCache(int);
+extern int sceGsSyncV(int);
+extern int snd_Pump(void);
+extern void snd_store_result(int, long);
 
 /* Starts a background load and waits until it reports back. */
-void func_002EAAA8(void *arg, int *status) {
+void load_run_async_and_wait(void *arg, int *status) {
     *status = -1;
-    func_001325E8(arg, StoreSoundResult, (unsigned long long)(unsigned int)status);
+    func_001325E8(arg, snd_store_result, (unsigned long long)(unsigned int)status);
     {
         int sentinel = -1;
         do {
             FlushCache(0);
-            GetGsCurrentField(0);
+            sceGsSyncV(0);
             snd_Pump();
         } while (*status == sentinel);
     }
@@ -204,22 +204,22 @@ void func_002EAAA8(void *arg, int *status) {
 
 
 /* D_001B8840 is declared above func_002E7090 (List2E7090). */
-extern char D_0014B540[];
-extern int func_002B7B18(int, int, int);
-extern void func_002B7CE0(int);
+extern char g_copy_setup_data[];
+extern int load_start_disc_read(int, int, int);
+extern void snd_pump_music_and_disc_read(int);
 
 /* Loads the data for one chunk of the current scene. */
-int func_002EB158(int index)
+int scene_load_chunk_data(int index)
 {
-    char *table = gCopySetupData;
-    int row = gScenePlaybackState.selected * 0x14C;
-    int destination = gScenePlaybackState.destination;
+    char *table = g_copy_setup_data;
+    int row = g_scene_playback_state.selected * 0x14C;
+    int destination = g_scene_playback_state.destination;
     int base = (int)(table + 0x3EA8);
     int first = *(int *)((index << 2) + row + base);
     int count = *(int *)(((index + 1) << 2) + row + base) - first;
     if (count > 0) {
-        StartDiscRead(destination, first + *(int *)(table + 0x3E24), count);
-        PumpMusicAndDiscRead(0);
+        load_start_disc_read(destination, first + *(int *)(table + 0x3E24), count);
+        snd_pump_music_and_disc_read(0);
     }
     return 1;
 }
@@ -244,7 +244,7 @@ int func_002EB158(int index)
 
 
 /* selects the level data bank when the resident context is in state 9 */
-void func_002ED058(void) {
+void level_select_data_bank(void) {
  s32 index=-1;
  if(D_L24_001BC3C0.state==9) index=1;
  if(index!=-1) {

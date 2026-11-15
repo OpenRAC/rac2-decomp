@@ -1,22 +1,22 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
-extern char D_00188660[];
+extern char g_sound_state[];
 typedef struct { unsigned char prefix[0x80]; Vector position; } PlayerPosition;
-extern PlayerPosition D_00189E20;
+extern PlayerPosition g_hero_state;
 extern char *D_L06_001BFC98;
 extern int D_L06_001B2348 MACRO_ADDR;
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_L00_00324120(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_00277258(void *, int, void *, float);
-extern void func_002AA548(void *, void *, float, float, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
+extern int hero_is_current_selected_id(void *);
+extern void moby_set_state(void *, int, int);
+extern int coll_test_point(void *, int, void *, float);
+extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Raise and lower a platform while maintaining its motion sound. */
-void func_L06_003FB050(char *moby)
+void rising_l06_platform_update(char *moby)
 {
     Vector oldPosition, oldRotation, delta;
     char *state = *(char **)(moby + 0x68);
@@ -41,67 +41,67 @@ void func_L06_003FB050(char *moby)
     case 1:
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = gSoundState + handle * 0x70;
+        char *sound = g_sound_state + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            StopSoundVoice(handle);
+            snd_stop_voice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-    if (IsCurrentSelectedId(moby)) {
+    if (hero_is_current_selected_id(moby)) {
         if (*(float *)(moby + 0x18) == *(float *)(state + 0x98))
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         else
-            SetMobyState(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
     }
-    if (*(float *)(moby + 0x18) - gHeroState.position[2] > 3.0f &&
+    if (*(float *)(moby + 0x18) - g_hero_state.position[2] > 3.0f &&
         *(float *)(moby + 0x18) == *(float *)(state + 0x98))
-        SetMobyState(moby, 2, -1);
-    else if (*(float *)(moby + 0x18) - gHeroState.position[2] < -3.0f &&
+        moby_set_state(moby, 2, -1);
+    else if (*(float *)(moby + 0x18) - g_hero_state.position[2] < -3.0f &&
              *(float *)(moby + 0x18) == *(float *)(state + 0x88))
-        SetMobyState(moby, 3, -1);
+        moby_set_state(moby, 3, -1);
     goto done;
     case 2:
     if (*(float *)(moby + 0x18) <= *(float *)(state + 0x88)) {
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = gSoundState + handle * 0x70;
+        char *sound = g_sound_state + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            StopSoundVoice(handle);
+            snd_stop_voice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-        if (!IsCurrentSelectedId(moby))
+        if (!hero_is_current_selected_id(moby))
             *(unsigned char *)(moby + 0x20) = 1;
         goto done;
     }
-    if (TestPointAgainstCollision(moby + 0x10, 1, moby, 2.1f) &&
-        !(*(float *)(moby + 0x18) <= gHeroState.position[2]) &&
+    if (coll_test_point(moby + 0x10, 1, moby, 2.1f) &&
+        !(*(float *)(moby + 0x18) <= g_hero_state.position[2]) &&
         (!D_L06_001BFC98 || *(short *)(D_L06_001BFC98 + 0xAA) != 0xEA3 /* moby class 3747 */))
         goto stop;
     {
-        char *sound = gSoundState + *(int *)(state + 0xB0) * 0x70;
+        char *sound = g_sound_state + *(int *)(state + 0xB0) * 0x70;
     if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
         *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
-    StepValueTowardTarget(moby + 0x18, state + 0x64, *(float *)(state + 0x88),
+    math_step_value_toward_target(moby + 0x18, state + 0x64, *(float *)(state + 0x88),
                   0.001944444492f, 0.001666666707f, 0.1000000089f);
     goto done;
     case 3:
-    StepValueTowardTarget(moby + 0x18, state + 0x64, *(float *)(state + 0x98),
+    math_step_value_toward_target(moby + 0x18, state + 0x64, *(float *)(state + 0x98),
                   0.001944444492f, 0.001666666707f, 0.1000000089f);
     if (*(float *)(moby + 0x18) >= *(float *)(state + 0x98)) {
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = gSoundState + handle * 0x70;
+        char *sound = g_sound_state + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            StopSoundVoice(handle);
+            snd_stop_voice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-        if (!IsCurrentSelectedId(moby)) {
+        if (!hero_is_current_selected_id(moby)) {
             *(int *)(state + 0x60) = *(int *)(state + 0x74);
             (*(int *)(state + 0x78))--;
             *(unsigned char *)(moby + 0x20) = 1;
         }
     } else {
-        char *sound = gSoundState + *(int *)(state + 0xB0) * 0x70;
+        char *sound = g_sound_state + *(int *)(state + 0xB0) * 0x70;
         if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
             *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
@@ -110,9 +110,9 @@ stop:
     case 4:
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = gSoundState + handle * 0x70;
+        char *sound = g_sound_state + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            StopSoundVoice(handle);
+            snd_stop_voice(handle);
     }
     *(int *)(state + 0xB0) = -1;
     }
@@ -129,5 +129,5 @@ done:
         *(int *)(moby + 0x78) = mid | brightness;
     }
     FastVecSub(delta, moby + 0x10, oldPosition);
-    CombineTransformsAndStore(state + 0x20, delta, oldRotation, moby + 0xF0);
+    mat_combine_and_store(state + 0x20, delta, oldRotation, moby + 0xF0);
 }

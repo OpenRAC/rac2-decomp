@@ -2,7 +2,7 @@
  * class of animation mode 1 whose first sequence has two or more frames and whose
  * moby has no update routine starts at animation speed 5/6, the 50 Hz scale.
  * Adapted from OpenRAC/rac1-decomp src/game/mobyfunc.c,
- * InitMobyInstance, GPL-3.0, revision
+ * moby_init_instance, GPL-3.0, revision
  * 8bbc6b38d1136b66391241e660043c9136ebb518.
  * RAC2 has different animation/default-field offsets, a packed slot id, and
  * a fallback dispatch table when a class id is not the resident slot owner.
@@ -81,8 +81,8 @@ extern MobyUpdate D_001CDF40[];
 extern MobyUpdate D_001D04E0[];
 extern InitialClass *D_001CDB80[];
 extern u8 *D_001B1B5C __attribute__((sda));
-extern void func_00282A60(void *, int, int);
-extern void func_0029F390(u8 *);
+extern void mem_clear(void *, int, int);
+extern void update_moby_animation_state(u8 *);
 
 void func_PAL_0029FA60(void *object, int classId)
 {
@@ -91,7 +91,7 @@ void func_PAL_0029FA60(void *object, int classId)
     int index;
     InitialClass *resource;
 
-    func_00282A60(m, 0, 0x100);
+    mem_clear(m, 0, 0x100);
     slot = D_001CE4E0[classId];
     m->unknown23 = 0x80;
     m->classSlot = slot;
@@ -146,7 +146,7 @@ void func_PAL_0029FA60(void *object, int classId)
         m->unknown63 = 0x18;
     if (m->pClass->sequences[0] == 0)
         return;
-    func_0029F390((u8 *)m);
+    update_moby_animation_state((u8 *)m);
     if (m->pClass->sequences[0]->frameCount >= 2)
         m->flags &= 0xFFFD;
     {

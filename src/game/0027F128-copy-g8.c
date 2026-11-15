@@ -9,12 +9,12 @@ extern CopyRegion D_001B8A10[];
 extern int D_001B1658;
 extern int D_001B22B4;
 extern u8 *D_001B22A0[];
-extern void func_00285708(int, int, int, int, void *);
-extern void func_001244B8(int, int);
-extern void func_00280670(void *, int);
+extern void gfx_capture_screen_rect(int, int, int, int, void *);
+extern void gfx_wait_paths_idle(int, int);
+extern void ComputeRegionThresholdRatio(void *, int);
 
 /* Copies the marked screen regions into spare buffers, one at a time, and clears each mark when done. */
-void func_00280710(void) {
+void gfx_process_screen_copy_regions(void) {
     u8 *buffers[2];
     int current, next, i, index;
 
@@ -27,9 +27,9 @@ void func_00280710(void) {
     for (i = 31; i >= 0; i--) {
         if (D_001B8A10[i].flags & 4) {
             next = i;
-            CaptureScreenRect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+            gfx_capture_screen_rect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
                           buffers[current]);
-            WaitGsPathsIdle(0, 0);
+            gfx_wait_paths_idle(0, 0);
         }
     }
     if (next == -1) return;
@@ -40,7 +40,7 @@ void func_00280710(void) {
         for (i = index - 1; i >= 0; i--) {
             if (D_001B8A10[i].flags & 4) {
                 next = i;
-                CaptureScreenRect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+                gfx_capture_screen_rect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
                               buffers[current]);
             }
         }
@@ -49,7 +49,7 @@ void func_00280710(void) {
             (D_001B8A10 + index)->flags &= ~5;
             D_001B1658--;
         }
-        if (next >= 0) WaitGsPathsIdle(0, 0);
+        if (next >= 0) gfx_wait_paths_idle(0, 0);
         index = next;
     }
 }

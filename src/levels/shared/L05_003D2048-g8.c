@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int BurstQuad __attribute__((mode(TI)));
 typedef union { BurstQuad q; float f[4]; } BurstVector;
-extern void func_L05_003D33E8(char *);
+extern void part_reset_emitter_slot_effect(char *);
 extern float func_003067D8(void *,void *);
 extern void func_003719A8(int,int,void *,int);
 extern int func_003062A0(void *);
@@ -13,7 +13,7 @@ extern char *func_00346748(void *,void *);
 extern void func_0033B330(void *,float,float,float);
 extern int func_00336380(int,int);
 extern char *func_00345D48(void *,void *,int,int,int,int,int,int,int,float);
-extern void func_002FF698(void *,void *),func_L05_003D2618(void);
+extern void func_002FF698(void *,void *),DrawAnimatedMeshAndGlowEffect(void);
 extern int D_L05_001B3000[] __attribute__((sda));
 extern char D_L05_001B96C0[],D_L05_001B98F0[],D_L05_0024D020[];
 extern float D_L05_001AFC94 __attribute__((sda));
@@ -26,7 +26,7 @@ void func_L05_003D2048(char *obj)
  int color1,color2,duration;
  float scale,a,b;
  if (*(unsigned char *)(obj+0x20)==0) {
-  ResetEmitterSlotEffect(obj);*(unsigned char *)(obj+0x20)=1;
+  part_reset_emitter_slot_effect(obj);*(unsigned char *)(obj+0x20)=1;
   timers[*(int *)s]=5;
   if(func_003067D8(obj+0x10,D_L05_001B96C0)>200.0f) *(float *)(s+4)=4;
   else if(func_003067D8(obj+0x10,D_L05_001B96C0)>100.0f) *(float *)(s+4)=2;

@@ -4,7 +4,7 @@
 typedef unsigned int u32;
 typedef int RecordTi16 __attribute__((mode(TI)));
 
-extern u32 D_L04_001AC18C __attribute__((sda));
+extern u32 g_effect_record_table __attribute__((sda));
 
 /* Claims the first free 80-byte record of the table (the one whose owner word at +0x48 is 0): copies the fields
    and the two 16-byte vectors of `source` into it and stores the owner. `tail` starts from the loaded pointer
@@ -12,7 +12,7 @@ extern u32 D_L04_001AC18C __attribute__((sda));
    its register, where retail keeps both counting by 80. The order of the four initialisations and of the three
    increments is retail's. */
 /* Adds a new particle to the table by copying it into the first free slot. */
-void func_002ED2B8(u32 owner, u32 source)
+void part_add_effect_record(u32 owner, u32 source)
 {
     u32 base;
     u32 cursor;
@@ -20,7 +20,7 @@ void func_002ED2B8(u32 owner, u32 source)
     u32 source_tail;
     int i;
 
-    base = gEffectRecordTable;
+    base = g_effect_record_table;
     if (base == 0) {
         return;
     }

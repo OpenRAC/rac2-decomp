@@ -24,16 +24,16 @@ typedef struct {
     float mtx[4];
 } Obj_410508;
 
-extern int func_L00_002D4040(int);
-extern void func_L00_002D3F30(int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_L00_003AB9C0(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern int get_ammo(int);
+extern void weapon_spend_ammo(int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 extern float D_L00_001B12C0[4][4] __attribute__((sda));
 extern int D_L00_001B2D58 __attribute__((nosda));
 
 /* Spawns the next piece of a timed sequence at a spot picked from a table, then counts the sequence down. Ends the sequence when nothing more can be spawned. */
-void func_L00_00410508(Obj_410508 *self)
+void sequenced_child_spawn(Obj_410508 *self)
 {
     Node_410508 *vars = self->node;
     float offset[4];
@@ -59,10 +59,10 @@ void func_L00_00410508(Obj_410508 *self)
             offset[0] = 0.0f;
         }
     }
-    child = (Obj_410508 *)SpawnTargetedProjectile((int)self, spawnPos, vars->count0, (char *)offset, vars->f8, 4.0f, 8.0f, 0.5f);
+    child = (Obj_410508 *)projectile_spawn_targeted((int)self, spawnPos, vars->count0, (char *)offset, vars->f8, 4.0f, 8.0f, 0.5f);
     if (child != 0) {
         Sub_410508 *childVars;
-        SpendWeaponAmmo(-1, 1);
+        weapon_spend_ammo(-1, 1);
         D_L00_001B2D58 = 1;
         child->owner = self;
         childVars = child->node;

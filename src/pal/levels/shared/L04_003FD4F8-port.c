@@ -1,27 +1,27 @@
 #include "common.h"
 
-extern float func_00283CE0(int);
-extern char *D_L04_001FE340[];
-extern void func_002C96F8(void *, void *, void *, void *, float, float);
+extern float IntToFloat(int);
+extern char *g_route_path_table[];
+extern void anim_sample_key_track(void *, void *, void *, void *, float, float);
 extern void func_002A05A8(void *);
 
 #include "include_asm.h"
 
-extern int func_002A9640(unsigned char *a0, int a1, int a2);
+extern int part_find_owned_effect_slot(unsigned char *a0, int a1, int a2);
 
-extern void func_002AB800(unsigned char *a0, unsigned char *a1);
+extern void gfx_start_color_fade(unsigned char *a0, unsigned char *a1);
 
-extern void func_002AB8C0(unsigned char *a0, unsigned char *a1);
+extern void gfx_update_color_fade(unsigned char *a0, unsigned char *a1);
 
-extern void *func_0029EFD0(void *a0);
+extern void *CreateMoby(void *a0);
 
 extern void func_002A0F48(void *a0);
 
-extern int func_002A8508(void *a0, int a1);
+extern int moby_count_group_not_in_state(void *a0, int a1);
 
-extern int func_002A77E0(int a0);
+extern int math_random_int_below(int a0);
 
-extern void func_L04_003F9078(unsigned char *a0);
+extern void glow_ring_update_variant(unsigned char *a0);
 
 #ifndef RAC2_T_Q16_B0E5D8F83
 #define RAC2_T_Q16_B0E5D8F83
@@ -31,14 +31,14 @@ typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 /* func_L04_003C8380 is in L04_003C8380-stream.c. */
 
 extern char D_L04_001B9680[];
-extern void func_00282F20(char *, char *, float);
+extern void vec_scale_to_length(char *, char *, float);
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
-extern float func_002A78D8(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
-extern int func_00283CF0(float);
-extern void func_00282CF0(void *, void *, void *);
+extern float math_random_signed_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern int FloatToInt(float);
+extern void FastVecSub(void *, void *, void *);
 
 typedef union {
     Q16_B0e5d8f83 q;
@@ -179,18 +179,18 @@ typedef struct {
     Moby *ignored;              /* 0x20: the moby its probes pass through */
 } ProjectileVars;
 
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
 /* The radius comes first: the EE ABI keeps the order within each register bank. */
-extern int func_00277F48(float, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
+extern int coll_process_hit(float, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
 extern void func_001290E0(void *, void *);
-extern void func_00282CD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
+extern void add_vectors(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
 extern void func_PAL_L04_00410678(void *, void *, int, int);
 extern Collision D_L04_001BFAC0;
 extern CollisionHit D_L04_001BFAE0;
@@ -203,18 +203,18 @@ extern void ref_L04_003FA5A8_03(void *, void *, void *, void *, void *, void *, 
 /* func_L04_003FA7E0 is defined in L04_003FA7E0.c. */
 
 
-extern int func_002E5CF8(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern unsigned char *D_L04_001C3B40[];
-extern float func_00283C80(float, float);
-extern float func_00282E80(void *, void *);
-extern float func_00282E48(char *, char *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283C28(float);
-extern float func_00283B98(float, float);
-extern void func_002A8E20(void *, void *);
-extern void func_002AF000(void *, float, float, float);
+extern float FastDiffRots(float, float);
+extern float vec_distance_xy(void *, void *);
+extern float fast_vec_dist(char *, char *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_float_g(float);
+extern float FastAddRotations(float, float);
+extern void QueueMobyImpact(void *, void *);
+extern void vec_build_spherical_offset(void *, float, float, float);
 
 /* The impact record func_002A8E20 queues: the layout of Rac2Impact32 in engine.h,
    rounded up to whole quadwords as its stack slot is. */
@@ -245,18 +245,18 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
     void *rayResult = 0;
     int sparkKind = 8, sparkArg = 0;
     if (radius < 0.75f) radius = 0.75f;
-    n = func_00277F48(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
+    n = coll_process_hit(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
     for (count = 0; count < n; count++) {
         if (D_L04_001C3B40[count] == *(unsigned char **)(v + 0x74)) continue;
         if (*(float *)(v + 0x7C) > 0) {
-            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
-            if (func_00283C80(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = func_00283248(func_00282E80(m + 0x10, D_L04_001C3B40[count] + 0x10),
+            if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
+            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, D_L04_001C3B40[count] + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
-            if (func_00283C80(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
+            if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (func_00282E48((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
             impact.source = *(void **)(v + 0x74);
             impact.flags = 0x230000;
@@ -265,14 +265,14 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
             impact.objectClass = *(unsigned short *)(m + 0xAA);
             impact.strength = 1.0f;
             impact.unk20 = 0x230000;
-            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
                                   *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
-            impact.vector[0] = func_00283180(angle);
-            impact.vector[1] = func_00283198(angle);
+            impact.vector[0] = math_fast_sin_or_cos_a(angle);
+            impact.vector[1] = math_fast_sin_or_cos_b(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
-            func_002A8E20(D_L04_001C3B40[count], &impact);
-            func_002E5CF8(soundId, soundArg, *(void **)(v + 0x74));
+            QueueMobyImpact(D_L04_001C3B40[count], &impact);
+            PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
         }
     }
     {
@@ -281,14 +281,14 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
     for (side = 0; side < 2; side++) {
         sign = (side & 1) ? 1.0f : -1.0f;
         for (i = 0; i < 5; i++) {
-            angle0 = func_00283C28(func_00283CE0(i) * sign * 0.1396263688802719f);
-            angle1 = func_00283C28(func_00283CE0(i + 1) * sign * 0.1396263688802719f);
-            func_002AF000(ray[0], range, func_00283B98(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_002AF000(ray[1], range, func_00283B98(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            func_00282CD8(ray[2], ray[0], m + 0x10);
-            func_00282CD8(ray[2], ray[1], m + 0x10);
-            if (func_002761F8(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
-                func_002AF000(ray[2], 0.40000004f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
+            angle0 = math_fast_float_g(IntToFloat(i) * sign * 0.1396263688802719f);
+            angle1 = math_fast_float_g(IntToFloat(i + 1) * sign * 0.1396263688802719f);
+            vec_build_spherical_offset(ray[0], range, FastAddRotations(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            vec_build_spherical_offset(ray[1], range, FastAddRotations(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            add_vectors(ray[2], ray[0], m + 0x10);
+            add_vectors(ray[2], ray[1], m + 0x10);
+            if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
+                vec_build_spherical_offset(ray[2], 0.40000004f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
                 func_PAL_L04_00410678(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
             }
         }
@@ -315,33 +315,33 @@ typedef struct {
     float age;
 } L04_C678Vars;
 
-extern int func_00282948(void *);
-extern int func_00283CF0(float);
-extern void func_0029F338(void *);
-extern float func_002AA800(void *, int, float, float);
-extern void func_002E59F8(int);
-extern void func_L00_002E6DB8(void *, void *);
+extern int math_fast_float_d(void *);
+extern int FloatToInt(float);
+extern void moby_mark_spawned(void *);
+extern float StepAngleTowardTarget(void *, int, float, float);
+extern void snd_stop_voice(int);
+extern void gfx_add_draw_callback_second(void *, void *);
 extern void func_PAL_L04_003FFB98(unsigned char *, void *);
-extern void func_L04_003FBEF8(void);
-extern unsigned char D_00188660[];
+extern void DrawDomeEffect(void);
+extern unsigned char g_sound_state[];
 extern int D_L04_001B0488 __attribute__((sda));
 
 /* func_L04_00400AB0 and func_L04_00400D48 are in L04_003C8380-path-g8.c. */
 
 typedef union { Q16_B0e5d8f83 q; float f[4]; } EffectVector;
 typedef struct { EffectVector row[4]; } EffectMatrix4;
-extern int func_002A8600(unsigned char **, int, int, int);
-extern int func_002A86E8(unsigned char **, unsigned char *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00283388(void *);
-extern void func_00283698(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_00282C48(float);
-extern int func_002E5CF8(int, int, char *);
-extern float func_002AA2E8(float *, float, float);
-extern int func_00282978(short *);
+extern int GetFirstMobyInGroup(unsigned char **, int, int, int);
+extern int GetNextMobyInGroup(unsigned char **, unsigned char *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void set_identity_matrix(void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_fabs(float);
+extern int PlayMobySound(int, int, char *);
+extern float ApproachValue(float *, float, float);
+extern int FastDecTimer(short *);
 
-extern float func_00282E48(char *arg0, char *arg1);
+extern float fast_vec_dist(char *arg0, char *arg1);
 
 extern char *D_001FE340[];

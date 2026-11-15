@@ -5,15 +5,15 @@ extern int D_L00_001A8FB4;
 extern char *D_L00_001A904C;
 extern int D_L00_001AEA7C __attribute__((sda));
 extern int D_L00_001AEA80 __attribute__((sda));
-extern void func_0027AB40(void);
-extern unsigned int func_0034CA68(void *);
-extern void func_0034E2E0(void *, int, int, int);
-extern void func_0034E218(void *);
-extern void func_0034DB98(void *);
-extern void func_00338F58(void *);
+extern void UpdateViewContext(void);
+extern unsigned int menu_get_label_color_alpha(void *);
+extern void radial_menu_layout_items(void *, int, int, int);
+extern void menu_noop_hook(void *);
+extern void DrawBoltCounterPanel(void *);
+extern void text_panel_draw_scaled(void *);
 extern void func_0029CB80(void);
 /* Draws the item and bolt HUD once, using a temporary setting that is put back afterwards. */
-void func_0034E4F8(char *object)
+void hud_item_bolt_draw(char *object)
 {
     float saved;
     char *camera;
@@ -22,76 +22,76 @@ void func_0034E4F8(char *object)
     *(float *)(state + 0xB0) = 0.62f;
     UpdateViewContext();
     if (D_L00_001A8FB4 == 0)
-        LayoutRadialMenuItems(object, D_L00_001AEA7C, D_L00_001AEA80, GetLabelColorAlpha(object + 0x7A0) >> 24);
-    NopHook(object);
+        radial_menu_layout_items(object, D_L00_001AEA7C, D_L00_001AEA80, menu_get_label_color_alpha(object + 0x7A0) >> 24);
+    menu_noop_hook(object);
     DrawBoltCounterPanel(object + 0x7A0);
     camera = D_L00_001A904C + 0x38000;
     *(int *)(camera + 0x7354) = 0;
     *(int *)(camera + 0x7358) = 0;
-    DrawTextPanelScaled(object + 0x1FBC);
+    text_panel_draw_scaled(object + 0x1FBC);
     func_0029CB80();
     *(float *)(state + 0xB0) = saved;
     UpdateViewContext();
 }
 
-extern char *D_001B23CC[] __attribute__((sda));
+extern char *g_movie_player_state[] __attribute__((sda));
 extern int ref_L00_0034F690_00 __attribute__((sda));
 typedef int (*CleanupCallback)(void);
-extern int func_001339B0(void);
-extern void func_00124B88(int);
-extern void func_003505A8(void *);
-extern void func_00351E40(void *);
-extern void func_0011AA70(int);
-extern void func_0011AA30(int);
-extern void func_0011B658(int);
-extern void func_0011A950(int, int);
+extern int timer_update_vsync_counters(void);
+extern void sceCdSyncS(int);
+extern void mpeg_noop_read_buffer_hook(void *);
+extern void mpeg_noop(void *);
+extern void TerminateThread(int);
+extern void DeleteThread(int);
+extern void kernel_process_queue_entry_c(int);
+extern void RemoveDmacHandler(int, int);
 extern CleanupCallback func_00126DC0(CleanupCallback);
-extern int func_00351890(void *);
-extern int func_0034F898(void *);
-extern int func_003506A8(void *);
+extern int mpeg_dec_shutdown(void *);
+extern int mpeg_reset_audio_dma(void *);
+extern int mpeg_return_true(void *);
 
 /* Shuts down the movie player: stops the decoder, removes its handlers and turns the DMA channel off. */
-void func_0034F690(void)
+void mpeg_shutdown_player(void)
 {
-    WaitSCommandDone(0);
-    NopReadBufferHook(gMoviePlayerState[0]);
-    NoOp_00351E40(gMoviePlayerState[0] + 0xd9168);
+    sceCdSyncS(0);
+    mpeg_noop_read_buffer_hook(g_movie_player_state[0]);
+    mpeg_noop(g_movie_player_state[0] + 0xd9168);
     TerminateThread(ref_L00_0034F690_00);
     DeleteThread(ref_L00_0034F690_00);
-    ProcessKernelQueueEntryC(2);
-    RemoveDmacHandler(2, *(int *)(gMoviePlayerState[0] + 0xd8000 + 0x10f8));
-    func_00126DC0(UpdateVsyncTimerCounters);
-    VideoDecShutdown(gMoviePlayerState[0] + 0xd9048);
-    ResetMovieAudioDma(gMoviePlayerState[0] + 0xd9100);
-    ReturnTrue(gMoviePlayerState[0] + 0xd9040);
-    WaitSCommandDone(0);
+    kernel_process_queue_entry_c(2);
+    RemoveDmacHandler(2, *(int *)(g_movie_player_state[0] + 0xd8000 + 0x10f8));
+    func_00126DC0(timer_update_vsync_counters);
+    mpeg_dec_shutdown(g_movie_player_state[0] + 0xd9048);
+    mpeg_reset_audio_dma(g_movie_player_state[0] + 0xd9100);
+    mpeg_return_true(g_movie_player_state[0] + 0xd9040);
+    sceCdSyncS(0);
     D_CTRL &= ~2u;
 }
 
 extern char *ref_L00_0034EF58_01[] __attribute__((sda));
 extern char ref_L00_0034EF58_00[];
-extern void func_0026FEB8(void *, ...);
-extern void func_00284088(int, int);
-extern int func_0011AB10(void);
-extern void func_0011AAB0(int, int);
-extern int func_0034F408(void *, void *, int);
-extern int func_0034F048(void *, void *, void *);
+extern void STUB_printf(void *, ...);
+extern void BuildAspectBlitStrips(int, int);
+extern int GetThreadId(void);
+extern void ChangeThreadPriority(int, int);
+extern int mpeg_start_player(void *, void *, int);
+extern int read_mpeg(void *, void *, void *);
 
 /* Plays a full-motion video: sets up the player, plays the stream until it ends or is skipped, then cleans up. Returns 1 if the player skipped it. */
-int func_0034EF58(void *streamSource, void *sourceMode, char *pool, char *state, int mode, int volume)
+int mpeg_play_movie_2(void *streamSource, void *sourceMode, char *pool, char *state, int mode, int volume)
 {
     int result = 0;
     ref_L00_0034EF58_01[0] = pool;
-    gMoviePlayerState[0] = state;
+    g_movie_player_state[0] = state;
     STUB_printf(ref_L00_0034EF58_00, 0x38cac0);
     BuildAspectBlitStrips(volume, volume);
     ChangeThreadPriority(GetThreadId(), 1);
-    if (StartMoviePlayer(streamSource, sourceMode, mode)) {
-        result = read_mpeg(gMoviePlayerState[0] + 0xd9048, gMoviePlayerState[0], gMoviePlayerState[0] + 0xd9040);
+    if (mpeg_start_player(streamSource, sourceMode, mode)) {
+        result = read_mpeg(g_movie_player_state[0] + 0xd9048, g_movie_player_state[0], g_movie_player_state[0] + 0xd9040);
     }
-    ShutdownMoviePlayer();
+    mpeg_shutdown_player();
     ref_L00_0034EF58_01[0] = 0;
-    gMoviePlayerState[0] = 0;
+    g_movie_player_state[0] = 0;
     return result;
 }
 
@@ -102,11 +102,11 @@ typedef unsigned char u8;
 
 extern int D_001A72DC;
 extern int D_001B23C8;
-extern void func_002B6480(void *, int);
+extern void BuildFrameDmaChain(void *, int);
 
 /* FMV GS packet builder: one 0x40-byte header record, then a 0x60-byte record per
    (row, column), then the closing A_B word pair at the end of the run. */
-void func_0034FE18(void *packet, int textureAddress, int height, int width, int bufferIndex)
+void mpeg_build_frame_packet(void *packet, int textureAddress, int height, int width, int bufferIndex)
 {
     u8 *cursor = (u8 *)packet;
     int rows = height >> 4;
@@ -161,14 +161,14 @@ void func_0034FE18(void *packet, int textureAddress, int height, int width, int 
 }
 
 extern char D_001AE830[];
-extern void func_00351848(unsigned char *, int *, int *, int *, int *);
-extern int func_003518F0(char *, unsigned long long, unsigned long long, int, int);
-extern void func_00351868(char *, int);
-extern void func_0034F780(int);
-extern int func_00350460(u32, int, u32, int, u32, int, int, int);
+extern void mpeg_dec_get_free_regions(unsigned char *, int *, int *, int *, int *);
+extern int mpeg_dec_add_timestamp(char *, unsigned long long, unsigned long long, int, int);
+extern void mpeg_dec_add_pending_bytes(char *, int);
+extern void mpeg_set_debug_value(int);
+extern int mpeg_copy_split_buffer(u32, int, u32, int, u32, int, int, int);
 
 /* Callback that hands the next piece of movie data to the decoder and reports whether any data was taken. */
-int func_00350240(u8 *unused, char *src, char *dst)
+int mpeg_feed_decoder_callback(u8 *unused, char *src, char *dst)
 {
     int first_address, first_count, second_address, second_count;
     int used = *(int *)(src + 8);
@@ -182,37 +182,37 @@ int func_00350240(u8 *unused, char *src, char *dst)
     if (remain < size)
         size = remain;
     second = remain - size;
-    VideoDecGetFreeRegions((unsigned char *)(gMoviePlayerState[0] + 0xD9048),
+    mpeg_dec_get_free_regions((unsigned char *)(g_movie_player_state[0] + 0xD9048),
                   &first_address, &first_count, &second_address, &second_count);
-    result = CopySplitBuffer((first_address & 0x0FFFFFFF) | 0x20000000, first_count,
+    result = mpeg_copy_split_buffer((first_address & 0x0FFFFFFF) | 0x20000000, first_count,
                            (second_address & 0x0FFFFFFF) | 0x20000000, second_count,
                            used, size, (int)dst, second);
     if (result > 0) {
-        if (VideoDecAddTimestamp(gMoviePlayerState[0] + 0xD9048,
+        if (mpeg_dec_add_timestamp(g_movie_player_state[0] + 0xD9048,
                           *(unsigned long long *)(src + 0x10),
                           *(unsigned long long *)(src + 0x18),
                           first_address, result) == 0)
-            SetMovieDebugValue((int)D_001AE830);
+            mpeg_set_debug_value((int)D_001AE830);
     }
-    VideoDecAddPendingBytes(gMoviePlayerState[0] + 0xD9048, result);
+    mpeg_dec_add_pending_bytes(g_movie_player_state[0] + 0xD9048, result);
     return result > 0;
 }
 
-extern void func_00336320(void *);
-extern void func_00336828(void *);
-extern void func_00336A78(void *);
-extern float *func_00335E18(void *);
-extern float *func_00335E10(void *);
-extern unsigned int *func_00335E20(void *);
-extern void func_0034AD10(void *);
-extern unsigned long func_0027C878(int);
-extern void func_0027F640(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
-extern int func_0027FBD8(int, int, unsigned long, char *, int);
-extern int func_00115DA8(char *, char *, ...);
-extern int D_001A8C64[] __attribute__((sda));
-extern int D_001A79F8[] __attribute__((sda)); /* the player's bolts */
+extern void gfx_draw_screen_element_stored(void *);
+extern void hud_draw_colored_quad_widget(void *);
+extern void text_label_draw(void *);
+extern float *object_get_second_field(void *);
+extern float *object_get_first_field(void *);
+extern unsigned int *object_get_fourth_field(void *);
+extern void DrawSegmentedRingMeter(void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void FontPrintScaled(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
+extern int text_draw_centered_large(int, int, unsigned long, char *, int);
+extern int sprintf(char *, char *, ...);
+extern int g_notice_owner[] __attribute__((sda));
+extern int g_player_bolts[] __attribute__((sda)); /* the player's bolts */
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern unsigned char D_001A7A32[] __attribute__((sda)); /* bolt multiplier */
+extern unsigned char g_bolt_multiplier[] __attribute__((sda)); /* bolt multiplier */
 extern char D_001AE6F8[], D_001AE700[], D_001AE708[]; /* "'", ".", "x%d" */
 extern int D_001ADAE8 __attribute__((sda));
 extern int D_001ADAEC __attribute__((sda));
@@ -265,7 +265,7 @@ typedef struct HudOwner {
  * bolt counter) and the "x%d" multiplier. The vtable pointers are read through
  * &a[i] + 0x30 so that every induction value is object-relative, and each
  * loop keeps its own vtable local, as in RAC2's DRAW idiom (00337210.c). */
-void func_0034DB98(void *arg)
+void DrawBoltCounterPanel(void *arg)
 {
     HudOwner *object = arg;
     char separator[32];
@@ -276,22 +276,22 @@ void func_0034DB98(void *arg)
     int foreground, shadow;
     int i, j, digits, n, apostrophe, yoffset, xoffset;
 
-    DrawScreenElementAtStoredPosition(&object->top[0]);
-    DrawScreenElementAtStoredPosition(&object->top[1]);
-    DrawScreenElementAtStoredPosition(&object->top[2]);
-    DrawColoredQuadWidget(object->panel148);
-    DrawAlignedTextLabel(object->panel100);
-    if (!gNoticeOwner[0]) {
+    gfx_draw_screen_element_stored(&object->top[0]);
+    gfx_draw_screen_element_stored(&object->top[1]);
+    gfx_draw_screen_element_stored(&object->top[2]);
+    hud_draw_colored_quad_widget(object->panel148);
+    text_label_draw(object->panel100);
+    if (!g_notice_owner[0]) {
         HudElem4C *left = &object->side[0];
         HudElem4C *right = &object->side[1];
-        DrawScreenElementAtStoredPosition(left);
-        DrawScreenElementAtStoredPosition(right);
-        { float *value = GetSecondField(left); *value = -*value; }
-        { float *value = GetSecondField(right); *value = -*value; }
-        DrawScreenElementAtStoredPosition(left);
-        DrawScreenElementAtStoredPosition(right);
-        { float *value = GetSecondField(left); *value = -*value; }
-        { float *value = GetSecondField(right); *value = -*value; }
+        gfx_draw_screen_element_stored(left);
+        gfx_draw_screen_element_stored(right);
+        { float *value = object_get_second_field(left); *value = -*value; }
+        { float *value = object_get_second_field(right); *value = -*value; }
+        gfx_draw_screen_element_stored(left);
+        gfx_draw_screen_element_stored(right);
+        { float *value = object_get_second_field(left); *value = -*value; }
+        { float *value = object_get_second_field(right); *value = -*value; }
         for (i = 0; i < 8; i++) {
             HudVEntry *vt = *(HudVEntry **)((char *)&object->a[i] + 0x30);
             vt[1].fn((char *)&object->a[i] + vt[1].delta);
@@ -300,23 +300,23 @@ void func_0034DB98(void *arg)
             HudVEntry *vt = *(HudVEntry **)((char *)&object->c[j] + 0x30);
             vt[1].fn((char *)&object->c[j] + vt[1].delta);
         }
-        DrawScreenElementAtStoredPosition(&object->b);
-        *GetFieldC(&object->b) = 0x70FFFEED;
+        gfx_draw_screen_element_stored(&object->b);
+        *object_get_fourth_field(&object->b) = 0x70FFFEED;
     }
-    DrawScreenElementAtStoredPosition(&object->mid[0]);
-    DrawScreenElementAtStoredPosition(&object->mid[1]);
-    DrawAlignedTextLabel(&object->text);
-    DrawColoredQuadWidget(object->panel280);
-    x = GetFirstField(&object->text)[0];
-    y = GetFirstField(&object->text)[1];
+    gfx_draw_screen_element_stored(&object->mid[0]);
+    gfx_draw_screen_element_stored(&object->mid[1]);
+    text_label_draw(&object->text);
+    hud_draw_colored_quad_widget(object->panel280);
+    x = object_get_first_field(&object->text)[0];
+    y = object_get_first_field(&object->text)[1];
     x += 32.0f;
     y += -10.0f;
-    color = *GetFieldC(&object->text);
+    color = *object_get_fourth_field(&object->text);
     digits = 1;
-    n = gPlayerBolts[0];
+    n = g_player_bolts[0];
     while (n >= 10) { n /= 10; digits++; }
     apostrophe = D_001A7BB0[4] != 3 && D_001A7BB0[4] != 5;
-    Sprintf(separator, apostrophe ? D_001AE6F8 : D_001AE700);
+    sprintf(separator, apostrophe ? D_001AE6F8 : D_001AE700);
     yoffset = apostrophe ? 21 : 10;
     xoffset = apostrophe ? -34 : -29;
     step = 3.0f;
@@ -328,20 +328,20 @@ void func_0034DB98(void *arg)
             long long style;
             unsigned long texture;
             step += 3.0f;
-            scale = GetSecondField(t);
+            scale = object_get_second_field(t);
             style = t->style;
             texture = GetEffectTextureDescriptor((int)style);
             FontPrintScaled(drawX, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
         } while (step < (float)digits);
     }
-    if (gBoltMultiplier[0] >= 2) {
-        Sprintf(multiplierText, D_001AE708, gBoltMultiplier[0]);
+    if (g_bolt_multiplier[0] >= 2) {
+        sprintf(multiplierText, D_001AE708, g_bolt_multiplier[0]);
         foreground = (D_001ADAF0 & 0xFFFFFF) | (color & 0xFF000000);
         shadow = color & 0xFF000000;
-        DrawTextCenteredLargeFont(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
-        DrawTextCenteredLargeFont(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
-        DrawTextCenteredLargeFont(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
-        DrawTextCenteredLargeFont(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
     }
     DrawSegmentedRingMeter(object->final);
 }

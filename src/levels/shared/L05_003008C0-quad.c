@@ -1,16 +1,16 @@
 #include "common.h"
-extern int func_00283CF0(float);
-extern int D_001A7350[] __attribute__((sda)), D_001A7354[] __attribute__((sda));
+extern int FloatToInt(float);
+extern int g_screen_offset_x[] __attribute__((sda)), g_screen_offset_y[] __attribute__((sda));
 typedef union { int *p; int address; } PacketCursor;
 extern PacketCursor D_L05_001B2C88[] __attribute__((sda));
 extern char D_L05_001ACA80[];
 /* RAC1 counterpart: append_subpixel_textured_screen_quad (src/game/draw.c). */
-void func_L05_003008C0(float x, float y, float w, float h, int u, int v, int uw, int vh,
+void AppendSubpixelTexturedScreenQuad(float x, float y, float w, float h, int u, int v, int uw, int vh,
                    unsigned long rgba, unsigned long tex) {
-    int x0 = FloatToInt(x * 16.0f) + gScreenOffsetX[0] - 8;
-    int x1 = FloatToInt((x + w) * 16.0f) + gScreenOffsetX[0] - 8;
-    int y0 = FloatToInt(y * 16.0f) + gScreenOffsetY[0] - 8;
-    int y1 = FloatToInt((y + h) * 16.0f) + gScreenOffsetY[0] - 8;
+    int x0 = FloatToInt(x * 16.0f) + g_screen_offset_x[0] - 8;
+    int x1 = FloatToInt((x + w) * 16.0f) + g_screen_offset_x[0] - 8;
+    int y0 = FloatToInt(y * 16.0f) + g_screen_offset_y[0] - 8;
+    int y1 = FloatToInt((y + h) * 16.0f) + g_screen_offset_y[0] - 8;
     int s1 = (u + uw) * 16;
     int s0 = u * 16;
     int vb = v + vh;

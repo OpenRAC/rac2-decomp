@@ -3,6 +3,7 @@
  * The list-pointer word is reloaded on every search step, as in retail.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *payload; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -16,7 +17,7 @@ extern struct { char pad[0x230]; int selected; } D_L11_001CAEA0;
 
 /* Fills in the menu rows for the entries the player has, then selects the entry that is
    currently chosen. */
-int func_L11_00369700(char *menu) {
+int menu_init_owned_item_rows(char *menu) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

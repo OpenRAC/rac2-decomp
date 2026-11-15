@@ -95,39 +95,39 @@ typedef struct {
     u8 pixels[1];
 } StreamImage;
 
-extern MenuSystem D_001F2840;
-extern LevelMap D_001C4FA0;
-extern MemoryCardState D_001393E0;
+extern MenuSystem g_pause_menu_state;
+extern LevelMap g_map_overlay_state;
+extern MemoryCardState g_memcard_state;
 extern int D_0014B8AC, D_0014D11C;
 extern s16 D_001A63AC;
-extern int func_002DE6F0(int), func_002DE750(int), func_002DE7A0(int);
-extern int func_002B7B18(int, int, int), func_00282A18(int);
-extern void func_0029D4D0(void *, void *), func_0029D0E0(void);
-extern u64 func_00294D80(int, int, void *, void *, int, int);
+extern int menu_stream_chunk_get_size(int), menu_stream_chunk_set_latch(int), menu_stream_chunk_clear_latch(int);
+extern int load_start_disc_read(int, int, int), log2dim(int);
+extern void fast_decompress(void *, void *), func_0029D0E0(void);
+extern u64 register_8bit_texture(int, int, void *, void *, int, int);
 
 /* Starts reading entry index into buffer (at its end when the entry is to be unpacked in
  * place); returns nonzero when the read started. */
 static inline int startRead(MenuStream *stream, int index, int buffer)
 {
     if (stream->flags & 0x20) {
-        int offset = GetStreamChunkSize(buffer) - stream->entries[index].count * 2048;
+        int offset = menu_stream_chunk_get_size(buffer) - stream->entries[index].count * 2048;
 
         stream->offset = offset;
         buffer += offset;
     }
     if (stream->flags & 0x10000)
-        return StartDiscRead(buffer, stream->entries[index].sector + D_0014D11C,
+        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014D11C,
                              stream->entries[index].count);
     /* Flag 0x10 reads from the same base as the default. */
     if (stream->flags & 0x10)
-        return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
+        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
                              stream->entries[index].count);
-    return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
+    return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
                          stream->entries[index].count);
 }
 
 /* Selects a preview, starts its disc read, and uploads the completed image. */
-int func_002D9DA0(MenuStream *stream)
+int UpdateMenuPreviewTexture(MenuStream *stream)
 {
     int index;
     int flags = stream->flags;
@@ -137,24 +137,24 @@ int func_002D9DA0(MenuStream *stream)
         if (index == -1)
             return 0;
     } else if (flags & 2) {
-        index = gMapOverlayState.page;
+        index = g_map_overlay_state.page;
     } else if (flags & 4) {
-        index = gPauseMenuState.current->focus->data.grid.cell;
+        index = g_pause_menu_state.current->focus->data.grid.cell;
     } else if (flags & 0x100) {
-        index = gPauseMenuState.current->focus->data.save.slot;
+        index = g_pause_menu_state.current->focus->data.save.slot;
         if (index < 0)
             index = 0;
         if (index > 4)
             index = 4;
-        if (gMemcardState.state < 3 && gMemcardState.pendingState < 0 && gPauseMenuState.age > 10) {
+        if (g_memcard_state.state < 3 && g_memcard_state.pendingState < 0 && g_pause_menu_state.age > 10) {
             if (stream->state == -1)
                 stream->state = 0;
-            index = gMemcardState.slots[index].resource;
+            index = g_memcard_state.slots[index].resource;
         } else {
             stream->state = -1;
         }
     } else {
-        index = gPauseMenuState.current->focus->data.list.selected;
+        index = g_pause_menu_state.current->focus->data.list.selected;
         if (index < 0)
             index = 0;
     }
@@ -167,7 +167,7 @@ int func_002D9DA0(MenuStream *stream)
         if (stream->entries[index].count == 0)
             break;
         if (startRead(stream, index, stream->buffer[0])) {
-            SetStreamChunkLatchFlag(stream->buffer[0]);
+            menu_stream_chunk_set_latch(stream->buffer[0]);
             stream->loaded[0] = index;
             stream->state++;
         } else {
@@ -184,7 +184,7 @@ int func_002D9DA0(MenuStream *stream)
             int logWidth;
             int logHeight;
 
-            ClearStreamChunkLatchFlag(stream->buffer[0]);
+            menu_stream_chunk_clear_latch(stream->buffer[0]);
             if (stream->flags & 0x20) {
                 fast_decompress((u8 *)stream->buffer[0] + stream->offset, (u8 *)stream->buffer[0]);
                 stream->offset = 0;
@@ -194,8 +194,8 @@ int func_002D9DA0(MenuStream *stream)
             pixels = image->pixels;
             logWidth = log2dim(image->width);
             logHeight = log2dim(image->height);
-            gMapOverlayState.tex0 = register_8bit_texture(logWidth, logHeight, clut, pixels,
-                                            gMapOverlayState.clutVram, gMapOverlayState.imageVram);
+            g_map_overlay_state.tex0 = register_8bit_texture(logWidth, logHeight, clut, pixels,
+                                            g_map_overlay_state.clutVram, g_map_overlay_state.imageVram);
             func_0029D0E0();
             stream->frames = 0;
             stream->state = 2;

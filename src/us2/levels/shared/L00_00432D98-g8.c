@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_US2_0033C0F0(void *, float);
-extern int func_00336E40(void *);
-extern int *func_00336DA8(int, int);
+extern int pool_alloc_cell(void *);
+extern int *ui_return_second_arg(int, int);
 extern void func_US2_0033BC20(void *, void *, void *);
-extern int func_00288FB8(int);
+extern int GetLocalizedString(int);
 extern void func_US2_0033C098(void *, int, int, int);
 extern void func_US2_0033C078(void *, float, float, float, float, float, float);
 extern void func_US2_L00_004348C8(void *, int);
@@ -19,7 +20,7 @@ void func_US2_L00_004347A0(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -30,9 +31,9 @@ void func_US2_L00_004347A0(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001AE1A0);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -52,7 +53,7 @@ void func_US2_L00_00434E20(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -63,9 +64,9 @@ void func_US2_L00_00434E20(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001AE1C0);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
@@ -85,7 +86,7 @@ void func_US2_L00_00435018(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
         *(int **)(object + 0x2DC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -96,9 +97,9 @@ void func_US2_L00_00435018(char *object, void *argument)
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
     func_US2_0033BC20(child, argument, D_US2_001AE1D0);
-    text = func_00288FB8(0x2BF7);
-    second = func_00288FB8(0x2BE4);
-    func_US2_0033C098(child, text, second, func_00288FB8(0x2BE5));
+    text = GetLocalizedString(0x2BF7);
+    second = GetLocalizedString(0x2BE4);
+    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
     func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     func_US2_0033C0F0(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;

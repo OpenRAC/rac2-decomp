@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L03_003E3750 (172 bytes, 8 levels): whether a1 is one of the targets the
    controller's current entry names: kinds 1 and 2 keep one target per step, kind 3 two
    fixed ones (only at step 0). */
@@ -7,7 +8,7 @@ extern s32 D_L03_001B0B50 __attribute__((sda));
 extern s32 D_L03_0029BCD0[];
 
 /* Says whether the given object is one of the targets the current puzzle step asks for. */
-s32 func_L03_003E3750(char *moby, s32 candidate)
+s32 path_puzzle_is_step_target(char *moby, s32 candidate)
 {
     char *vars = *(char **)(moby + 0x68);
     s32 entryOffset;

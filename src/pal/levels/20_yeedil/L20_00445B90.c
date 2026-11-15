@@ -6,14 +6,14 @@ extern int D_L20_001B2FB8 __attribute__((sda));
 typedef u8 ActorSlot[0x100];
 extern ActorSlot *D_L20_001B2F9C __attribute__((sda));
 typedef struct { u8 prefix[0x80]; float position[4]; } ResidentPoseView;
-extern ResidentPoseView D_00189E20;
-extern float func_00283248(float, float);
-extern void func_002A7398(s8 *, int, int);
-extern void func_002A7750(void *, int, int);
+extern ResidentPoseView g_hero_state;
+extern float mat_fast_helper_a(float, float);
+extern void anim_start_immediate(s8 *, int, int);
+extern void moby_set_state(void *, int, int);
 extern void func_002A0F48(void *);
-extern void func_00282C98(void *);
-extern void func_00282DD8(void *, const void *, const void *);
-extern void func_002ACE78(float *, float *, float);
+extern void vec_copy_helper_a(void *);
+extern void FastVecCross(void *, const void *, const void *);
+extern void vec_set_direction_with_complement(float *, float *, float);
 extern void func_PAL_00273818(void *, int, int, const void *, const void *, unsigned char, float);
 
 u8 *func_PAL_L20_00445B90(int group, const float position[4], const float velocity[4], float lifetime)
@@ -34,20 +34,20 @@ u8 *func_PAL_L20_00445B90(int group, const float position[4], const float veloci
             break;
         if (actor[0x20] == 6) {
             qcopy(actor + 0x10, position);
-            *(float *)(actor + 0xF8) = func_00283248(
-                D_00189E20.position[0] - *(float *)(actor + 0x10),
-                D_00189E20.position[1] - *(float *)(actor + 0x14));
+            *(float *)(actor + 0xF8) = mat_fast_helper_a(
+                g_hero_state.position[0] - *(float *)(actor + 0x10),
+                g_hero_state.position[1] - *(float *)(actor + 0x14));
             flags = *(u16 *)(actor + 0x34);
             flags = (flags & 0xFFBE) | 0x1000;
             *(u16 *)(actor + 0x34) = flags;
             *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
             *(u16 *)(actor + 0x34) = flags & 0xEFFF;
-            func_002A7398((s8 *)actor, 7, 0);
-            func_002A7750(actor, 7, 3);
+            anim_start_immediate((s8 *)actor, 7, 0);
+            moby_set_state(actor, 7, 3);
             func_002A0F48(actor);
-            func_00282C98(origin);
-            func_00282DD8(delta, origin, velocity);
-            func_002ACE78(delta, delta, 0.12566373f);
+            vec_copy_helper_a(origin);
+            FastVecCross(delta, origin, velocity);
+            vec_set_direction_with_complement(delta, delta, 0.12566373f);
             state = *(u8 **)(actor + 0x68);
             *(u8 **)(actor + 0x68) = state + 0x210;
             func_PAL_00273818(actor, 3, 0, velocity, delta, 0xFF, 15.0f);

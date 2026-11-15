@@ -21,7 +21,7 @@ extern float func_00324B10(void);
 extern void ref_L13_0040DE50_00(void *, int, float, int, float, float, int, int, void *);
 
 /* draws the two halves of the sign band, each from its own colour pair */
-void func_L13_0040DE50(char *object) {
+void part_draw_sign_band_sparkles(char *object) {
     int value;
     int value2;
     float scale;

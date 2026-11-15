@@ -2,12 +2,12 @@
 
 /* func_PAL_L09_0041FC4C, the PAL copy of func_L09_0041A700: the same C, where 0.10472f becomes 0.12566373f. */
 
-extern int func_002E5CF8(int, int, void *);
-extern float func_00282E80(void *, void *);
-extern float func_002A7940(void);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
+extern int PlayMobySound(int, int, void *);
+extern float vec_distance_xy(void *, void *);
+extern float math_random_angle(void);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
 
 typedef struct {
     char pad0[0x33C];
@@ -15,8 +15,8 @@ typedef struct {
     char pad340[0x34E - 0x340];
     short busy;
 } TriggerPlayer;
-extern TriggerPlayer D_00189E20;
-extern int D_001A79F0 __attribute__((sda));
+extern TriggerPlayer g_hero_state;
+extern int g_current_map_index __attribute__((sda));
 /* Flag bytes indexed by level * 16 + owner; 3-bit counters indexed by level * 1024, two per byte. */
 extern u8 D_0019B2E8[];
 extern u8 D_0019B4A8[];
@@ -52,22 +52,22 @@ void func_PAL_L09_0041FC4C(TriggerObject *obj)
 
     switch (obj->status) {
     case 0:
-        s->angle = func_002A7940();
+        s->angle = math_random_angle();
         obj->status = 1;
         obj->position[2] -= 0.35f;
         break;
     case 1:
         /* Pulse the colour: the angle advances 6 degrees per update. */
-        s->angle = func_00283B98(s->angle, 0.12566373f);
-        shade = func_00283CF0((func_00283198(s->angle) * 4.0f - 3.0f) * 128.0f);
+        s->angle = FastAddRotations(s->angle, 0.12566373f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(s->angle) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         green = (shade << 8) | (int)0x80000000;
         red = shade << 16;
         obj->color = (red | green) | shade;
-        if (D_00189E20.standing != (char *)obj || D_00189E20.busy) {
+        if (g_hero_state.standing != (char *)obj || g_hero_state.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
-            level = D_001A79F0;
+            level = g_current_map_index;
             if (!(D_0019B2E8[obj->owner + level * 16] & 0x80) || s->enabled) {
                 int id;
                 if (!s->enabled) return;
@@ -87,13 +87,13 @@ activate:
             obj->status = 2;
             obj->activated = 1;
             obj->color = 0x80208020;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
             } else {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                 if ((*counts & 7) != 7) ++*counts;
             }
         }
@@ -107,19 +107,19 @@ proximity:
             /* Retail fills this raised copy but measures from the position itself. */
             qcopy(pos, obj->position);
             pos[2] += 0.35f;
-            if (func_00282E80(obj->position, player + 0x10) < 0.5f) {
+            if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
                 } else {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
                 obj->status = 2;
                 obj->activated = 1;
                 obj->color = 0x80208020;
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
             }
         }
         break;

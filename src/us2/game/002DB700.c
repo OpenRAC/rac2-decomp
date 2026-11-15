@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 /* func_US2_002DBA70, the USA v2.00 copy of func_002DAD18: the same C, where the D_001A7BB4 % 5 index
@@ -20,8 +21,8 @@ typedef struct {
 } StreamReads2DAD18;
 extern short D_001A63AC;
 extern int D_0025E0B0;
-extern StreamReads2DAD18 D_0014B540;
-extern int func_002B7B18(int, int, int);
+extern StreamReads2DAD18 g_copy_setup_data;
+extern int load_start_disc_read(int, int, int);
 
 int func_US2_002DBA70(Handles_2DCB28 *object)
 {
@@ -31,10 +32,10 @@ int func_US2_002DBA70(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = &D_0014B540;
+                StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->first,
+                if (load_start_disc_read(object->first,
                                   reads->first[D_0025E0B0].start + offset,
                                   reads->first[D_0025E0B0].length) != 0)
                     object->state++;
@@ -53,10 +54,10 @@ int func_US2_002DBA70(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = &D_0014B540;
+                StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->second,
+                if (load_start_disc_read(object->second,
                                   reads->second[D_0025E0B0].start + offset,
                                   reads->second[D_0025E0B0].length) != 0)
                     object->state++;

@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
 
@@ -16,23 +16,23 @@ extern float D_L00_001AF648 __attribute__((sda));
 extern float D_L00_001AF64C __attribute__((sda));
 extern float D_L00_001AF650 __attribute__((sda));
 extern float D_L00_001AF654 __attribute__((sda));
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern float func_002A7878(float, float);
-extern float func_00283B98(float, float);
-extern void func_00282D30(void *, void *, float);
-extern char *func_L00_00333F90(void *, void *);
-extern float func_00282C48(float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern void func_00282CF0(void *, void *, void *);
-extern char *func_002C16C0(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern float FastAddRotations(float, float);
+extern void FastVecScale(void *, void *, float);
+extern char *part_spawn_streak_effect(void *, void *);
+extern float math_fabs(float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern void FastVecSub(void *, void *, void *);
+extern char *part_spawn_burst(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
 
 /* Emit a rotating fan of fragments followed by smoke particles. */
-void func_L00_003A4480(char *moby)
+void part_spawn_fragment_fan_and_smoke(char *moby)
 {
     Vector rotation, direction, base, origin, velocity, jitter, drift;
     float angle = 0.0f;
@@ -44,13 +44,13 @@ void func_L00_003A4480(char *moby)
     matrix_mul_vec3(base, base, moby + 0xC0);
     FastVecAdd(origin, moby + 0x10, base);
     *(unsigned char *)(moby + 0xBC) = 6;
-    ApplyAxisRotationToQuaternion(base, &gHeroState.f[460], &gHeroState.f[464], 0.34906590f);
+    math_apply_axis_rotation_to_quat(base, &g_hero_state.f[460], &g_hero_state.f[464], 0.34906590f);
     qcopy(direction, base);
     for (count = 0; count < 20; count++) {
         char *fragment;
-        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186078f));
-        FastVecScale(velocity, direction, RandomFloatRange(0.1000000089f, 0.3f));
-        fragment = SpawnStreakEffect_L00(origin, velocity);
+        angle = FastAddRotations(angle, math_random_float_range(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, math_random_float_range(0.1000000089f, 0.3f));
+        fragment = part_spawn_streak_effect(origin, velocity);
         if (fragment) {
             char *tail = fragment + 0x30;
             float duration = 2.0f;
@@ -65,37 +65,37 @@ void func_L00_003A4480(char *moby)
             *(int *)(fragment + 4) = 0x307F7F7F;
             *(int *)(fragment + 0xC) = 0x307F7F7F;
         }
-        if (FloatAbs(angle) > 0.00001f) {
-            BuildAxisAngleQuaternion(rotation, &gHeroState.f[460], angle);
-            RotateVectorByQuaternion(direction, base, rotation);
+        if (math_fabs(angle) > 0.00001f) {
+            math_build_axis_angle_quat(rotation, &g_hero_state.f[460], angle);
+            vec_rotate_by_quaternion(direction, base, rotation);
         }
     }
     angle = 0.0f;
-    ApplyAxisRotationToQuaternion(base, &gHeroState.f[460], &gHeroState.f[464], D_L00_001AF62C * 0.017453294f);
+    math_apply_axis_rotation_to_quat(base, &g_hero_state.f[460], &g_hero_state.f[464], D_L00_001AF62C * 0.017453294f);
     qcopy(direction, base);
     qzero_nc(drift);
-    if (gHeroState.i[208])
-        FastVecScale(drift, &gHeroState.f[68], 1.7f);
+    if (g_hero_state.i[208])
+        FastVecScale(drift, &g_hero_state.f[68], 1.7f);
     for (count = 0; count < 20; count++) {
         unsigned int color;
         int spin;
         float size;
-        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186078f));
-        FastVecScale(velocity, direction, RandomFloatRange(D_L00_001AF644 * (1.0f / 60.0f),
+        angle = FastAddRotations(angle, math_random_float_range(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, math_random_float_range(D_L00_001AF644 * (1.0f / 60.0f),
                                                        D_L00_001AF648 * (1.0f / 60.0f)));
         FastVecAdd(velocity, velocity, drift);
         color = D_L00_001AF63C;
-        spin = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        jitter[0] = origin[0] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
-        jitter[1] = origin[1] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
-        jitter[2] = origin[2] + RandomSignedFloatRange(0.0f, D_L00_001AF630);
-        size = RandomFloatRange(D_L00_001AF64C, D_L00_001AF650) * 210000.0f;
+        spin = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        jitter[0] = origin[0] + math_random_signed_float_range(0.0f, D_L00_001AF630);
+        jitter[1] = origin[1] + math_random_signed_float_range(0.0f, D_L00_001AF630);
+        jitter[2] = origin[2] + math_random_signed_float_range(0.0f, D_L00_001AF630);
+        size = math_random_float_range(D_L00_001AF64C, D_L00_001AF650) * 210000.0f;
         FastVecSub(jitter, jitter, velocity);
-        SpawnBurstParticle_002C16C0(jitter, velocity, color, D_L00_001AF634, D_L00_001AF638, spin,
+        part_spawn_burst(jitter, velocity, color, D_L00_001AF634, D_L00_001AF638, spin,
                       size, D_L00_001AF654, D_L00_001AF640, 0.0f, 0.0f);
-        if (FloatAbs(angle) > 0.00001f) {
-            BuildAxisAngleQuaternion(rotation, &gHeroState.f[460], angle);
-            RotateVectorByQuaternion(direction, base, rotation);
+        if (math_fabs(angle) > 0.00001f) {
+            math_build_axis_angle_quat(rotation, &g_hero_state.f[460], angle);
+            vec_rotate_by_quaternion(direction, base, rotation);
         }
     }
 }

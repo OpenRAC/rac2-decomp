@@ -7,16 +7,16 @@ typedef int TI128 __attribute__((mode(TI)));
 /* Known prefix only; no complete game-object extent is inferred. */
 typedef struct { u8 reserved_00[0x34]; int timer; } L02_State;
 extern L02_State D_L02_001BE200;
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 extern unsigned short **D_L02_001A9014 __attribute__((sda));
 extern u8 *D_L02_001B3C1C __attribute__((sda));
 extern float D_L02_001B2640[] MACRO_ADDR;
-extern float func_00282E80(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L01_002E2608(void *, int, int, int, int);
+extern float vec_distance_xy(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 /* Draws a glowing quad on the nearest path record while two timed windows are active, using a fixed target point for each window. */
-void func_L02_004388A0(u8 *moby) {
+void path_draw_nearest_record_quad(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     float targetPos[4] __attribute__((aligned(16)));
     float tempVec[4] __attribute__((aligned(16)));

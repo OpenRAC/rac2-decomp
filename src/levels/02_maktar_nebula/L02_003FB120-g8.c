@@ -8,11 +8,11 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 
-extern unsigned char *D_L02_001B359C[3] __attribute__((sda));
+extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 
-extern u32 D_L02_001FC060[];
+extern u32 g_entity_group_lists[];
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 extern f32 D_L02_001B1218 __attribute__((sda));
 
@@ -22,11 +22,11 @@ extern f32 D_L02_001B1220 __attribute__((sda));
 
 extern u16 D_L02_001B1214 __attribute__((sda));
 
-extern void func_L02_00400720(char *, s32, f32, f32);
+extern void actor_pick_idle_message(char *, s32, f32, f32);
 
-extern void func_L00_0035F5A0(s32, s32, s32);
+extern void snd_start_in_slot(s32, s32, s32);
 
-extern s32 func_00282978(char *);
+extern s32 FastDecTimer(char *);
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 
@@ -46,12 +46,12 @@ extern s32 func_00282978(char *);
    the division is a statement of its own, and by one when the statement shares its source line
    with the two before it, as written here. */
 /* Keeps score of the arena's enemies and how much they and the hero have lost recently. */
-void func_L02_003FB120(char *actor) {
+void arena_update_enemy_tally(char *actor) {
     char *state = *(char **)(actor + 0x68);
     u16 *idList;
 
     if (GROUP(0x40) != 0xFF) {
-        idList = (u16 *)gEntityGroupLists[GROUP(0x40)];
+        idList = (u16 *)g_entity_group_lists[GROUP(0x40)];
         if (idList != 0) {
             u16 *idCursor = idList;
             char *entity;
@@ -61,7 +61,7 @@ void func_L02_003FB120(char *actor) {
             f32 value;
 
             do {
-                entity = (char *)gMobyPool_L02[0] + ((*idCursor & 0x7FFF) << 8);
+                entity = (char *)g_moby_l02_pool[0] + ((*idCursor & 0x7FFF) << 8);
                 if (entity != 0 && *(u8 *)(entity + 0x20) != 0xFE && *(u8 *)(entity + 0x20) != 0xFD &&
                     *(u8 *)(entity + 0x20) != 1) {
                     kind = *(s16 *)(entity + 0xAA);
@@ -77,7 +77,7 @@ void func_L02_003FB120(char *actor) {
                 }
             } while ((s16)*idCursor++ >= 0);
             {
-                char *hero = gHeroState;
+                char *hero = g_hero_state;
                 s32 ageIndex;
                 s32 ringIndex;
                 s32 rawIndex;
@@ -86,10 +86,10 @@ void func_L02_003FB120(char *actor) {
                 f32 weightedSum;
                 f32 weightedHero;
 
-                PickRandomIdleMessage(actor, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
+                actor_pick_idle_message(actor, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
                                   *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC));
                 if (*(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC) > 0.0f)
-                    StartEffectInSlot(0x17, 0, 0);
+                    snd_start_in_slot(0x17, 0, 0);
                 if (count < *(s32 *)(state + 0x60))
                     *(s32 *)(state + ((s16) * (s16 *)(state + 0x11C) << 4)) +=
                         *(s32 *)(state + 0x60) - count;

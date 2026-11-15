@@ -3,17 +3,17 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *func_002B9030(int);
+extern void *part_alloc(int);
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 extern int func_001163B0(void);
 
@@ -61,7 +61,7 @@ extern void func_2E3470(void *, void *, void *);
 extern void func_2E2608(void *, int, int, unsigned int, int);
 
 /* Builds the four-slice trail mesh for the ship's current colour. */
-void func_L01_002F21F0(char *trailSource) {
+void ship_build_trail_mesh(char *trailSource) {
     char buffer[0x40];
     char end[0x10];
     int kind;
@@ -97,7 +97,7 @@ void func_L01_002F21F0(char *trailSource) {
 ASM_FUNC("asm/levels", func_L01_003042AC);
 
 /* Spawns a small effect object tied to a parent object and places it at the parent or at one of its joints. */
-void *func_L01_00333FA8(L01_00333FA8_PARENT *parent, void *owner, int jointIndex, float size)
+void *CreateAttachedType57Effect(L01_00333FA8_PARENT *parent, void *owner, int jointIndex, float size)
 {
     L01_00333FA8_OBJ *obj;
     char buf0[16];
@@ -106,7 +106,7 @@ void *func_L01_00333FA8(L01_00333FA8_PARENT *parent, void *owner, int jointIndex
     int randomValue;
     int groupBits;
 
-    obj = AllocParticle(0x57);
+    obj = part_alloc(0x57);
     if (obj != 0) {
         tailPart = &obj->tail;
         tailPart->f20 = parent;
@@ -115,12 +115,12 @@ void *func_L01_00333FA8(L01_00333FA8_PARENT *parent, void *owner, int jointIndex
         if ((short)jointIndex == -1) {
             qcopy(&obj->f10, (char *)parent + 0x10);
         } else {
-            TransformMobyJointToWorld(obj->tail.f20, (short)jointIndex, buf0);
+            moby_transform_joint_to_world(obj->tail.f20, (short)jointIndex, buf0);
             FastVecSub(buf1, D_L01_001B94C0, buf0);
             vec_scale_to_length(buf1, buf1, 0.4f);
             FastVecAdd(&obj->f10, buf0, buf1);
         }
-        obj->f08 = (char)Rand();
+        obj->f08 = (char)func_001163B0();
         obj->f04 = (int)owner;
         randomValue = FloatToInt(4.0f);
         groupBits = ((short)parent->group >> 5) * 16;

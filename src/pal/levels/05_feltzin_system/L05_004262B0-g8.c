@@ -11,22 +11,22 @@ extern int D_L05_001B2048;
 extern char *D_L05_001B251C;
 extern char D_L05_001B1380[] SDATA(D_L05_001B1380);
 extern char D_L05_001B1370[] SDATA(D_L05_001B1370);
-extern void func_002B7320(void);
-extern void func_L05_0037B210(void);
-extern void func_L05_00379F18(int);
-extern char **func_L05_00379EB8(void);
-extern int func_L00_004272A0(void);
+extern void music_Unpause(void);
+extern void entry_init_all_registered(void);
+extern void hero_set_state_value_a(int);
+extern char **level_get_object_list(void);
+extern int level_get_saved_value(void);
 extern void func_PAL_L05_0037D9D0(char *, int);
 extern void func_L05_0037CEE0(char *, void *, float);
 extern void func_L05_0037D608(char *, void *, float);
-extern int func_00282948(void *);
+extern int math_fast_float_d(void *);
 extern void func_PAL_L05_00448A58(void *, void *, int);
-extern void func_L05_00445B58(void *, void *);
-extern void func_L05_004222D8(void);
-extern int func_0029B3E0(int, int);
-extern void func_L00_003294F0(char *, int);
-extern void func_L05_00379F48(int);
-extern void func_002AD7B8(int);
+extern void ship_point_camera_at_target(void *, void *);
+extern void feltzin_mission_clamp_save_counts(void);
+extern int MemcardSave(int, int);
+extern void moby_set_flag_bit(char *, int);
+extern void hero_set_state_value_c(int);
+extern void moby_mark_flag_and_append_to_list(int);
 extern void func_PAL_L05_00425FB0(char *, int);
 
 /* func_PAL_L05_004262B0, the PAL copy of func_L05_00420A88: the same C, where the 25 frame timer
@@ -44,11 +44,11 @@ void func_PAL_L05_004262B0(char *actor)
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
         D_L05_001B1364 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        item = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        music_Unpause();
+        entry_init_all_registered();
+        hero_set_state_value_a(0);
+        item = level_get_object_list();
+        count = level_get_saved_value();
         a.q = 0;
         a.f[0] = 487.0f;
         a.f[1] = 526.0f;
@@ -72,7 +72,7 @@ void func_PAL_L05_004262B0(char *actor)
     if (D_L05_00221D10[4] != 0 || D_L05_001B2048 < 6)
         return;
     if (D_L05_00221D10[5] <= 0) {
-        if (func_00282948(state + 0x58) == 0)
+        if (math_fast_float_d(state + 0x58) == 0)
             return;
         *(int *)(state + 0x58) = 100;
         func_PAL_L05_00448A58(D_L05_001B1380, D_L05_001B1370, 200);
@@ -89,9 +89,9 @@ void func_PAL_L05_004262B0(char *actor)
         c.f[0] = 438.0f;
         c.f[1] = 487.0f;
         c.f[2] = 535.0f;
-        func_L05_00445B58(&a, &c);
-        item = func_L05_00379EB8();
-        count2 = func_L00_004272A0();
+        ship_point_camera_at_target(&a, &c);
+        item = level_get_object_list();
+        count2 = level_get_saved_value();
         if (count2 > 0) {
             int n = count2;
             do {
@@ -108,20 +108,20 @@ void func_PAL_L05_004262B0(char *actor)
             } while (--n != 0);
         }
     } else if (D_L05_001B13F4 != 0) {
-        if (func_00282948(state + 0x58) != 0) {
+        if (math_fast_float_d(state + 0x58) != 0) {
             *(int *)(state + 0x58) = 21;
-            func_002AD7B8(6);
+            moby_mark_flag_and_append_to_list(6);
             D_L05_001B1350++;
-            func_L05_004222D8();
-            func_0029B3E0(0, -1);
+            feltzin_mission_clamp_save_counts();
+            MemcardSave(0, -1);
             D_L05_001B1350--;
-            func_L00_003294F0(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
+            moby_set_flag_bit(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
             D_L05_001B13D8 = 0;
             D_L05_001B13F4 = 0;
-            func_L05_00379F48(1);
-            func_002AD7B8(6);
+            hero_set_state_value_c(1);
+            moby_mark_flag_and_append_to_list(6);
         }
-    } else if (func_00282948(state + 0x58) != 0) {
+    } else if (math_fast_float_d(state + 0x58) != 0) {
         func_PAL_L05_00425FB0(actor, 0);
     }
 }

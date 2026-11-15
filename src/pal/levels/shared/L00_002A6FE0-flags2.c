@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern void func_002AEF28(void *a0, void *a1, void *a2, float f12, float f13, float f14);
+extern void moby_scale_owner_words_by_angles(void *a0, void *a1, void *a2, float f12, float f13, float f14);
 extern char D_00189E20_2[];
 
 /* func_L00_002A70F8 is defined in L00_002A70F8-glow.c. */
@@ -15,7 +16,7 @@ void func_PAL_L00_002A75A0(void)
     char *base = D_00189E20_2;
 
     if (*(int *)(base + 0x2294) == 124)
-        func_002AEF28(*(void **)(base + 0x2290), base + 0x7B0, base + 0x7B4,
+        moby_scale_owner_words_by_angles(*(void **)(base + 0x2290), base + 0x7B0, base + 0x7B4,
                       0.174532949924469f, 0.031415932f, 0.04188791f);
     if (*(short *)(base + 0x6BC) == 0)
         return;

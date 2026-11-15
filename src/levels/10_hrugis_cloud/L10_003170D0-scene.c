@@ -1,10 +1,10 @@
 #include "common.h"
-extern void func_L00_002FC980(void);
-extern s32 D_001A79F0 MACRO_ADDR;
-extern s32 func_002A77E0(s32);
-extern void func_00283958(f32 *,f32 *);
-extern void func_00282CF0(u8 *,u8 *,u8 *);
-extern void func_00282F20(void *,void *,f32);
+extern void anim_start_startup_animations(void);
+extern s32 g_current_map_index MACRO_ADDR;
+extern s32 math_random_int_below(s32);
+extern void quaternion_to_rotation_basis(f32 *,f32 *);
+extern void FastVecSub(u8 *,u8 *,u8 *);
+extern void vec_scale_to_length(void *,void *,f32);
 typedef struct SceneState {
     u8 pad00[0x30];
     s32 active, frame;
@@ -14,55 +14,55 @@ typedef struct SceneState {
     u8 *objects[0];
 } SceneState;
 extern SceneState D_L10_001BD380;
-extern void func_002E64A0(u8 *);
-extern void func_L00_00326048(u8 *,void *,u32,u32,f32);
-extern void func_00283AF0(void *,void *);
-extern void func_L01_0031A278(u8 *,void *,f32,f32,f32);
+extern void UpdateEquipmentPieces(u8 *);
+extern void math_store_angle_update_result(u8 *,void *,u32,u32,f32);
+extern void vec_fast_to_int_helper(void *,void *);
+extern void moby_compute_local_point(u8 *,void *,f32,f32,f32);
 extern void func_L10_00425930(void *,s32,f32,s32,s32,s32,s32,s32,s32,s32,s32,s32);
-extern f32 func_002A78D8(f32,f32);
-extern void func_L05_00419CC8(u8 *,void *,void *,s32,s32,s32,s32,s32,f32);
+extern f32 math_random_signed_float_range(f32,f32);
+extern void moby_spawn_shot_effect(u8 *,void *,void *,s32,s32,s32,s32,s32,f32);
 extern u8 D_L10_00296F00[];
 
 /* Per-frame effects for the level 10 story scene: marks some objects as always drawn,
    and in the boss scene sets off explosions and random sparks on the boss. */
-void func_L10_00317528(void) {
+void hrugis_update_scene_effects(void) {
     f32 pos[4] __attribute__((aligned(16)));
     union { f32 matrix[12]; struct { f32 v[4]; f32 d[4]; } vectors; } scratch __attribute__((aligned(16)));
     u8 *boss, *state, *spark;
     s32 i;
     f32 side;
-    StartStartupAnimations();
+    anim_start_startup_animations();
     for(i=0;i<D_L10_001BD380.count;i++) {
         u8 *object=D_L10_001BD380.objects[i];
         if(object && *(s16 *)(object+0xAA)==0xE29 /* moby class 3625 */) *(u16 *)(object+0x34)|=0x800;
         if(*(s16 *)(object+0xAA)==0xD54 /* moby class 3412 */) UpdateEquipmentPieces(object);
         if(object && *(s16 *)(object+0xAA)==0xFA0 /* TV Screens */) {
             state=*(u8 **)(object+0x68);
-            if(state) StoreAngleUpdateResult(object,state+0xC,0x80AAAAD2,0x80396464,0.061086535f);
+            if(state) math_store_angle_update_result(object,state+0xC,0x80AAAAD2,0x80396464,0.061086535f);
         }
     }
-    if(gCurrentMapIndex!=10 || D_L10_001BD380.active) return;
+    if(g_current_map_index!=10 || D_L10_001BD380.active) return;
     boss=D_L10_001BD380.objects[2];
     if(D_L10_001BD380.frame==0x195) {
-        FastVectorToIntHelper(*(u8 **)(boss+0x58)+0x10,scratch.matrix);
+        vec_fast_to_int_helper(*(u8 **)(boss+0x58)+0x10,scratch.matrix);
         quaternion_to_rotation_basis(scratch.matrix,(f32 *)(boss+0xC0));
-        ComputeMobyLocalPoint(boss,pos,4.0f,3.0f,5.0f);
+        moby_compute_local_point(boss,pos,4.0f,3.0f,5.0f);
         func_L10_00425930(pos,1,1.5f,25,20,20,20,45,1,1,1,0);
-        ComputeMobyLocalPoint(boss,pos,9.0f,4.0f,4.0f);
+        moby_compute_local_point(boss,pos,9.0f,4.0f,4.0f);
         func_L10_00425930(pos,35,1.0f,50,30,30,30,50,1,1,1,1);
     }
     if(!((u32)(D_L10_001BD380.frame-0x187)<0x79 || D_L10_001BD380.frame>=0x327)) return;
-    if(RandomIntBelow(4)) return;
+    if(math_random_int_below(4)) return;
     side=1.0f;
-    if(RandomIntBelow(2)) side=-1.0f;
-    spark=D_L10_00296F00+RandomIntBelow(3)*32;
-    ComputeMobyLocalPoint(boss,pos,*(f32 *)spark,*(f32 *)(spark+4),*(f32 *)(spark+8));
-    ComputeMobyLocalPoint(boss,scratch.vectors.v,*(f32 *)(spark+0x10),*(f32 *)(spark+0x14),*(f32 *)(spark+0x18));
-    scratch.vectors.v[0]+=RandomSignedFloatRange(0.5f,1.5f);
-    scratch.vectors.v[1]+=RandomSignedFloatRange(0.5f,1.5f);
-    scratch.vectors.v[2]+=RandomSignedFloatRange(0.5f,1.5f);
+    if(math_random_int_below(2)) side=-1.0f;
+    spark=D_L10_00296F00+math_random_int_below(3)*32;
+    moby_compute_local_point(boss,pos,*(f32 *)spark,*(f32 *)(spark+4),*(f32 *)(spark+8));
+    moby_compute_local_point(boss,scratch.vectors.v,*(f32 *)(spark+0x10),*(f32 *)(spark+0x14),*(f32 *)(spark+0x18));
+    scratch.vectors.v[0]+=math_random_signed_float_range(0.5f,1.5f);
+    scratch.vectors.v[1]+=math_random_signed_float_range(0.5f,1.5f);
+    scratch.vectors.v[2]+=math_random_signed_float_range(0.5f,1.5f);
     FastVecSub((u8 *)scratch.vectors.d,(u8 *)scratch.vectors.v,(u8 *)pos);
     vec_scale_to_length(scratch.vectors.d,scratch.vectors.d,1.16666675f);
     /* The two packed RGB colours become the effect's start/end colours. */
-    SpawnShotEffectMoby(boss,pos,scratch.vectors.d,0x46BE20,0x327814,1,0,1,side);
+    moby_spawn_shot_effect(boss,pos,scratch.vectors.d,0x46BE20,0x327814,1,0,1,side);
 }

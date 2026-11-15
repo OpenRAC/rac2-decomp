@@ -35,20 +35,20 @@ typedef struct {
     char pad3[0xc];
     int buttons;
 } InputState;
-extern HeroFrame D_00189E20;
+extern HeroFrame g_hero_state;
 extern char D_0018BE50[];
-extern InputState D_00138180;
-extern void func_00282978(void *);
+extern InputState g_pad_state;
+extern void FastDecTimer(void *);
 extern int func_PAL_L00_002D3928(void);
-extern float func_00282E20(void *);
+extern float vec_length_xy(void *);
 extern void func_PAL_L00_002BA750(void);
-extern void func_00283410(void *, void *);
-extern void func_00283388(void *);
-extern void func_00283698(void *, void *);
+extern void euler_to_matrix(void *, void *);
+extern void set_identity_matrix(void *);
+extern void matrix_from_basis_rows(void *, void *);
 extern void func_PAL_L00_002B3210(void);
 extern void func_PAL_L00_002C2F88(void);
 extern void func_PAL_L00_002C3250(void);
-extern float func_L00_002B3900(void);
+extern float hero_get_stick_magnitude(void);
 
 /* Updates input and history rings, then refreshes the hero's movement matrices. */
 void func_PAL_L00_002B3608(void)
@@ -57,25 +57,25 @@ void func_PAL_L00_002B3608(void)
     int bits;
 
     qcopy(D_0018BE50, D_0018BE50 - 0x1fb0);
-    if (D_00138180.flags & 3) {
+    if (g_pad_state.flags & 3) {
         if (((TimerState *)(D_0018BE50 - 0x2030))->timer <= 0)
             ((TimerState *)(D_0018BE50 - 0x2030))->timer = 1;
     } else {
-        func_00282978(D_0018BE50 - 0xbdc);
+        FastDecTimer(D_0018BE50 - 0xbdc);
     }
-    p = &D_00189E20;
+    p = &g_hero_state;
     if (p->state == 16)
         p->timer = 0;
     {
         int active = func_PAL_L00_002D3928();
-        p->stick_x = D_00138180.x;
+        p->stick_x = g_pad_state.x;
         p->gravity_mode = active;
-        p->stick_y = D_00138180.y;
+        p->stick_y = g_pad_state.y;
     }
     p->field270 = 0;
-    p->raw_speed = func_L00_002B3900();
-    if (func_00282E20(&p->stick_x) < 0.25f) {
-        bits = D_00138180.buttons;
+    p->raw_speed = hero_get_stick_magnitude();
+    if (vec_length_xy(&p->stick_x) < 0.25f) {
+        bits = g_pad_state.buttons;
         {
             int right = (bits >> 13) & 1;
             int left = (bits >> 15) & 1;
@@ -87,7 +87,7 @@ void func_PAL_L00_002B3608(void)
             p->stick_y = up;
         }
     }
-    p->speed = func_L00_002B3900();
+    p->speed = hero_get_stick_magnitude();
     func_PAL_L00_002BA750();
     p->yaws[p->yaw_index] = p->yaw;
     p->yaw_index = (p->yaw_index + 1) % 32;
@@ -101,9 +101,9 @@ void func_PAL_L00_002B3608(void)
     p->position_index = (p->position_index + 1) % 32;
     if (++p->position_count > 32)
         p->position_count = 32;
-    func_00283410(p, (char *)p + 0x90);
-    func_00283388((char *)p + 0x40);
-    func_00283698((char *)p + 0x40, p);
+    euler_to_matrix(p, (char *)p + 0x90);
+    set_identity_matrix((char *)p + 0x40);
+    matrix_from_basis_rows((char *)p + 0x40, p);
     func_PAL_L00_002B3210();
     func_PAL_L00_002C2F88();
     func_PAL_L00_002C3250();

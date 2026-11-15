@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern float func_00282E80(char *, char *);
-extern float func_00282C10(float);
+extern float vec_distance_xy(char *, char *);
+extern float square_root(float);
 
 /* Works out how far a point is from a line between two other points. */
-float func_L04_00365300(char *object, char *a1, char *a2) {
+float math_distance_to_line(char *object, char *a1, char *a2) {
     float baseLen = vec_distance_xy(object, a1);
     float cross;
 

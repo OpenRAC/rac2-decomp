@@ -12,10 +12,10 @@ extern char D_0025E680[];
 extern MenuEntry D_00210AF0[];
 /* Retail rereads the list pointer at each search step. */
 extern int * volatile D_001AA4F0 __attribute__((sda));
-extern struct { char unknown00[0x230]; int selected; } D_001C4FA0;
+extern struct { char unknown00[0x230]; int selected; } g_map_overlay_state;
 
 /* Builds the menu entries from a table and puts the cursor on the entry matching the current selection. */
-int func_002DB988(char *object)
+int menu_entries_init_from_table(char *object)
 {
     int i, entry;
     int *list;
@@ -30,7 +30,7 @@ int func_002DB988(char *object)
     *(int *)(object + 0x40) = 0;
     *(unsigned int *)(object + 0x30) |= 0x8000;
     for (i = 0, entry = list[0]; entry; entry = D_001AA4F0[++i]) {
-        if (gMapOverlayState.selected == entry) {
+        if (g_map_overlay_state.selected == entry) {
             *(int *)(object + 0x40) = i;
             break;
         }

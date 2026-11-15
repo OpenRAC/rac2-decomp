@@ -13,40 +13,40 @@ extern f32 D_L12_001B1FB4 __attribute__((nosda));
 extern f32 D_L12_001B1FB8 __attribute__((nosda));
 extern char D_L12_001B1F80[];
 
-extern void func_002A7750(void *, int, int);
-extern void *func_002A9640(void *, int, int);
-extern s32 func_002E5CF8(s32, s32, s32);
-extern void func_0029F338(void *);
-extern void func_L00_0032A258(void *, void *, void *, void *, int, int, int, int, int, unsigned char, int);
-extern void func_L00_00324F18(void *, void *, float, float, float);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern s32 PlayMobySound(s32, s32, s32);
+extern void moby_mark_spawned(void *);
+extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, unsigned char, int);
+extern void vec_local_offset_to_world(void *, void *, float, float, float);
+extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Waits until the hero hits it, then shows a flash, a burst of sparks and a sound before removing itself. */
-void func_L12_00421110(u8 *self)
+void hit_l12_burst_update(u8 *self)
 {
     s32 *vars = *(s32 **)(self + 0x68);
     f32 pos[4];
 
     switch (self[0x20]) {
     case 0:
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
-        if (FindOwnedEffectSlot(self, 0x4010000, 0) != 0 && *vars == 0) {
-            SetMobyState(self, 2, -1);
+        if (part_find_owned_effect_slot(self, 0x4010000, 0) != 0 && *vars == 0) {
+            moby_set_state(self, 2, -1);
             PlayMobySound(0, 0, (s32)self);
         }
         self[0xA8] = 0xFF;
         break;
     case 2:
-        ExplodeObjectIntoPieces(self, D_L12_001B1F60, D_L12_001B1F58, D_L12_001B1F50, 0xFFFF, 0,
+        part_explode_object_into_pieces(self, D_L12_001B1F60, D_L12_001B1F58, D_L12_001B1F50, 0xFFFF, 0,
                           D_L12_001B1FA0, 0, 1, 0xFF, 0);
-        ExplodeObjectIntoPieces(self, D_L12_001B1F80, D_L12_001B1F58, D_L12_001B1F50, 0xFFFF, 0,
+        part_explode_object_into_pieces(self, D_L12_001B1F80, D_L12_001B1F58, D_L12_001B1F50, 0xFFFF, 0,
                           D_L12_001B1FA0, 1, 0x1FE, 0xFF, 0);
-        LocalOffsetToWorld(self, pos, D_L12_001B1FB0, D_L12_001B1FB4, D_L12_001B1FB8);
+        vec_local_offset_to_world(self, pos, D_L12_001B1FB0, D_L12_001B1FB4, D_L12_001B1FB8);
         SpawnExplosion(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(f32 *)(self + 0x2C) * 20.0f, 20.0f,
                       1, 0, 1, 0);
-        MarkMobySpawned(self);
+        moby_mark_spawned(self);
         break;
     }
 }
@@ -55,14 +55,14 @@ extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern s32 D_L12_001B29C8 __attribute__((sda));
 extern u8 *D_L12_001B090C __attribute__((nosda));
 extern u8 *D_L12_001B1360 __attribute__((nosda));
-extern float func_00283CE0(int);
-extern int func_L01_0031BC68(int, int, float);
-extern int func_002ACBC8(void *, int);
-extern void func_L00_003294F0(u8 *, s32);
-extern int func_L12_00404778(void);
+extern float IntToFloat(int);
+extern int PulseColor(int, int, float);
+extern int IsPointInCuboid(void *, int);
+extern void moby_set_flag_bit(u8 *, s32);
+extern int second_tracked_object_is_open(void);
 
 /* Pulses the colour of a linked moby. When the hero walks into its zone, it turns the linked moby off and wakes up a third one. */
-void func_L12_00420660(u8 *self)
+void zone_color_pulse_update(u8 *self)
 {
     s32 *vars = *(s32 **)(self + 0x68);
     u8 *rec;
@@ -71,7 +71,7 @@ void func_L12_00420660(u8 *self)
 
     switch (self[0x20]) {
     case 0:
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
         rec = D_L12_001B2E9C + (vars[1] << 8);
@@ -88,16 +88,16 @@ void func_L12_00420660(u8 *self)
         if (obj != 0) {
             if (IsPointInCuboid(obj + 0x10, vars[0])) {
                 *(s32 *)(rec + 0x78) = 0x80A02020;
-                SetMobyState(self, 2, -1);
+                moby_set_state(self, 2, -1);
                 if (vars[2] != -1)
-                    SetObjectFlagBit(D_L12_001B2E9C + (vars[2] << 8), 1);
+                    moby_set_flag_bit(D_L12_001B2E9C + (vars[2] << 8), 1);
             }
-        } else if (IsSecondTrackedObjectOpen()) {
+        } else if (second_tracked_object_is_open()) {
             if (IsPointInCuboid(D_L12_001B1360 + 0x10, vars[0])) {
                 *(s32 *)(rec + 0x78) = 0x80A02020;
-                SetMobyState(self, 2, -1);
+                moby_set_state(self, 2, -1);
                 if (vars[2] != -1)
-                    SetObjectFlagBit(D_L12_001B2E9C + (vars[2] << 8), 1);
+                    moby_set_flag_bit(D_L12_001B2E9C + (vars[2] << 8), 1);
             }
         }
         break;
@@ -109,16 +109,16 @@ extern s32 D_L12_001B22D0 __attribute__((sda));
 extern f32 D_L12_001B2280[] SDATA(D_L12_001B2280);
 extern f32 D_L12_001B2288[] SDATA(D_L12_001B2288);
 extern f32 D_L12_001B22B0[] SDATA(D_L12_001B22B0);
-extern int func_002A7820(int, int);
-extern int func_00273B70(unsigned char *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002E5DA0(int, int, void *, int);
-extern u8 *func_0029EFD0(int);
-extern void func_00282AB0(void *, void *, int);
+extern int math_random_int_range(int, int);
+extern int cam_moby_update(unsigned char *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void snd_play_from_class_bank(int, int, void *, int);
+extern u8 *CreateMoby(int);
+extern void mem_copy_aligned(void *, void *, int);
 
 /* Counts down a short timer, then blows up with an explosion and sound and drops a smaller piece of debris. */
-void func_L12_00429868(u8 *self)
+void timed_explosion_debris_update(u8 *self)
 {
     s32 *vars = *(s32 **)(self + 0x68);
     s32 life;
@@ -130,17 +130,17 @@ void func_L12_00429868(u8 *self)
 
     switch (state) {
     case 0:
-        *(s16 *)((u8 *)vars + 0x34) = RandomIntRange(20, 50);
-        SetMobyState(self, 1, -1);
+        *(s16 *)((u8 *)vars + 0x34) = math_random_int_range(20, 50);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
         life = *(s16 *)((u8 *)vars + 0x34);
-        if (life < 0 || UpdateCameraMoby(self)) {
+        if (life < 0 || cam_moby_update(self)) {
             matrix_mul_vec3(vec, (u8 *)vars + 0x20, self + 0xC0);
             obj = 0;
             FastVecAdd(vec, self + 0x10, vec);
             SpawnExplosion(vec, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, state, state, 0, 0);
-            PlaySoundFromClassBank(2, 0, self, 0x12B1);
+            snd_play_from_class_bank(2, 0, self, 0x12B1);
             flags = *(u16 *)(self + 0x7C);
             if (flags & 1)
                 obj = CreateMoby(0x12E0);
@@ -152,12 +152,12 @@ void func_L12_00429868(u8 *self)
                 qcopy(obj + 0x10, vec);
                 *(f32 *)(obj + 0x2C) = *(f32 *)(*(u8 **)(obj + 0x24) + 0x24) *
                                        (*(f32 *)(self + 0x2C) / *(f32 *)(*(u8 **)(self + 0x24) + 0x24));
-                CopyMemoryAligned(obj + 0xC0, self + 0xC0, 0x18);
-                ExplodeObjectIntoPieces(obj, D_L12_001B22B0, D_L12_001B2288, D_L12_001B2280, 0xFF, -1,
+                mem_copy_aligned(obj + 0xC0, self + 0xC0, 0x18);
+                part_explode_object_into_pieces(obj, D_L12_001B22B0, D_L12_001B2288, D_L12_001B2280, 0xFF, -1,
                                   D_L12_001B22D0, 0xF, 0xFF, 0xFF, 0);
-                MarkMobySpawned(obj);
+                moby_mark_spawned(obj);
             }
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
         } else {
             *(s16 *)((u8 *)vars + 0x34) = life - 1;
         }

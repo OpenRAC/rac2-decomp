@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
@@ -9,12 +10,12 @@ extern u8 D_L22_001A7A78 __attribute__((sda));
 extern s32 D_L22_001A903C __attribute__((sda));
 extern s32 D_L22_0018B6A8 __attribute__((sda));
 extern s32 func_2F36F0(s32);
-extern void func_L22_003FA1D0(s32, s32, s32);
+extern void text_show_message_with_sound(s32, s32, s32);
 
 void func_PAL_L22_003FEA38(s32 a0) {
     s32 x = *(u32 *)(a0 + 0x68);
 
-    func_L22_003FA1D0(a0, x, x);
+    text_show_message_with_sound(a0, x, x);
     *(u8 *)(a0 + 0x30) = 0xFF;
 }
 

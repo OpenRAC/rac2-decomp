@@ -16,19 +16,19 @@ typedef struct {
 
 extern int D_0013BF10;
 extern char D_0013BF28[];
-extern double func_001310C0(double);
-extern int func_001313C8(double) __attribute__((const));
-extern int func_00131400(SqrtException *);
-extern int *func_00115200(void);
+extern double math_sqrt_double(double);
+extern int math_is_finite_double(double) __attribute__((const));
+extern int math_handle_sqrt_error(SqrtException *);
+extern int *libc_get_state_record(void);
 
-/* Square root that also sets the error code when given a negative number. */
-double func_00131424(double x)
+/* math_square root that also sets the error code when given a negative number. */
+double math_sqrt_with_errno(double x)
 {
     SqrtException exc;
     double z;
 
-    z = SqrtDouble(x);
-    if (D_0013BF10 == -1 || IsFiniteDouble(x))
+    z = math_sqrt_double(x);
+    if (D_0013BF10 == -1 || math_is_finite_double(x))
         return z;
     if (x < 0.0) {
         exc.type = 1;
@@ -40,11 +40,11 @@ double func_00131424(double x)
         else
             exc.retval = 0.0 / 0.0;
         if (D_0013BF10 == 2)
-            *GetLibraryStateRecord() = 33;
-        else if (!HandleSqrtError(&exc))
-            *GetLibraryStateRecord() = 33;
+            *libc_get_state_record() = 33;
+        else if (!math_handle_sqrt_error(&exc))
+            *libc_get_state_record() = 33;
         if (exc.err != 0)
-            *GetLibraryStateRecord() = exc.err;
+            *libc_get_state_record() = exc.err;
         return exc.retval;
     }
     return z;

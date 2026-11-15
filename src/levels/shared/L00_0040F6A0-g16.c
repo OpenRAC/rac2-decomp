@@ -54,59 +54,59 @@ typedef struct { u8 pad00[4]; u8 active; u8 pad05[0x13]; Moby *owner; u8 pad1C[0
 typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry;
 typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
 
-extern u8 D_00189E20[], D_00139568[];
-extern u32 D_00138180[];
-extern int D_00139688[];
-extern u16 D_0018C958[];
-extern SoundSlot D_00188660[];
+extern u8 g_hero_state[], g_item_slot_to_record[];
+extern u32 g_pad_state[];
+extern int g_item_ammo_counts[];
+extern u16 g_subtitle_history[];
+extern SoundSlot g_sound_state[];
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern Vector D_L00_001B1270 __attribute__((sda));
-extern float D_L00_001B8DC0[];
-extern Moby *D_L00_001C3280[];
-extern CollisionResult D_L00_001BF200;
+extern float g_camera_l00_position[];
+extern Moby *g_area_hit_targets[];
+extern CollisionResult g_collision_result;
 extern WeaponEntry D_00262570[];
 extern u8 D_0029FCC8[];
 
-extern void func_L00_002C42E0(int, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_002829D8(void *);
-extern void func_002A75E0(void *, int, int, int, int);
-extern int func_L00_002D4040(int);
-extern void func_00273318(void *, float, unsigned int, void *, int, float, int, float, int);
-extern Moby *func_L00_00324D18(void *, void *, float, float, float, float, float, int);
-extern float *func_002AB1F0(Moby *);
-extern int func_002ABB78(Moby *);
-extern float func_00282E48(void *, void *);
-extern float func_00282C48(float);
-extern int func_00282948(int *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
+extern void hero_l00_set_action(int, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_fast_helper_b(void *);
+extern void anim_start_blended_with_flags(void *, int, int, int, int);
+extern int get_ammo(int);
+extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);
+extern Moby *moby_get_or_find_target(void *, void *, float, float, float, float, float, int);
+extern float *moby_get_private_value_0(Moby *);
+extern int moby_is_in_special_class_range(Moby *);
+extern float fast_vec_dist(void *, void *);
+extern float math_fabs(float);
+extern int math_fast_float_d(int *);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
 extern void ref_L00_0040F6A0_00(void (*)(Moby *), Moby *);
-extern void func_L00_00410690(Moby *);
-extern float func_002A7940(void);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern void *func_002C16C0(void *, void *, int, int, unsigned int, int, float, float, float, float, float);
-extern int func_L00_00410840(Moby *);
-extern int func_00277F48(float, void *, int, void *, void *);
-extern void func_L00_00410888(Moby *, int);
-extern void func_L00_00410430(Moby *, Vector *, int);
-extern void func_L00_002AF568(void);
-extern int func_L00_002D6998(void *);
-extern int func_00288E18(int, int);
-extern void func_L00_002D6B70(int);
-extern void func_L00_00410508(Moby *, Vector *);
-extern void func_L00_00410178(Moby *, Vector *);
+extern void charge_draw_glow_sprites(Moby *);
+extern float math_random_angle(void);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern void *part_spawn_burst(void *, void *, int, int, unsigned int, int, float, float, float, float, float);
+extern int weapon_get_charge_grade(Moby *);
+extern int coll_process_hit(float, void *, int, void *, void *);
+extern void SpawnOrientedParticleBursts(Moby *, int);
+extern void charge_shot_start_effect(Moby *, Vector *, int);
+extern void start_equipped_item_animation(void);
+extern int slot_copy_records_to_free(void *);
+extern int subtitle_request_voice_line(int, int);
+extern void slot_reset_active(int);
+extern void sequenced_child_spawn(Moby *, Vector *);
+extern void light_flash_update(Moby *, Vector *);
 
 #define HERO ((Hero *)D_00189E20)
 
 /* Charges and fires the blaster: target acquisition, charge sparks and release. */
 /* Per-frame update for the Megarocket Cannon (moby class 4100, Megarocket Cannon). It picks a target, builds up charge while the button is held, and fires when it is let go. */
-void func_L00_0040F6A0(Moby *moby)
+void megarocket_cannon_update(Moby *moby)
 {
     BlasterVars *vars = moby->vars;
     Vector nozzle, direction, origin, aim, work, spark;
@@ -130,7 +130,7 @@ void func_L00_0040F6A0(Moby *moby)
         vars->chargeSound = -1;
     }
     if (HERO->i[0x2294 / 4] == 1)
-        SetHeroAction_L00(0x1D, 1);
+        hero_l00_set_action(0x1D, 1);
     matrix_mul_vec3(&nozzle, &D_L00_001B1270, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
@@ -148,7 +148,7 @@ void func_L00_0040F6A0(Moby *moby)
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
-        AddMobyMarker(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
+        hud_add_moby_marker(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
         qcopy(&direction, &HERO->q[0x760 / 16]);
         FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
         FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
@@ -163,37 +163,37 @@ void func_L00_0040F6A0(Moby *moby)
         FastVecScale(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
         FastVecAdd(&origin, &HERO->q[0x80 / 16], &origin);
     }
-    FastVectorHelperB(&vars->cooldown);
+    vec_fast_helper_b(&vars->cooldown);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
-        StartAnimationBlendedWithFlags(moby, 1, 0, 2, 0);
-    candidate = GetOrFindTargetMoby(&origin, &direction, spread, spread, 75.0f, spread, spread, 1);
+        anim_start_blended_with_flags(moby, 1, 0, 2, 0);
+    candidate = moby_get_or_find_target(&origin, &direction, spread, spread, 75.0f, spread, spread, 1);
 
     if (vars->target != 0) {
-        float *hp = GetMobyPrivateValue0(vars->target);
+        float *hp = moby_get_private_value_0(vars->target);
         if (vars->target == 0 || vars->target->state == 0xFE || vars->target->state == 0xFD ||
             (hp != 0 && *hp <= 0.0f) || vars->target->alive == 0 || HERO->h[0x24EC / 2] != 0) {
             vars->target = 0;
             vars->candidateTimer = 5;
         } else if (candidate != vars->target) {
-            if (FastFloatHelperD(&vars->lockTimer)) {
+            if (math_fast_float_d(&vars->lockTimer)) {
                 vars->target = 0;
                 vars->candidateTimer = 5;
             }
         } else {
             float distance;
             vars->lockTimer = 5;
-            distance = fast_vec_dist(gCameraPosition_L00, &candidate->position) * 0.006666667f;
+            distance = fast_vec_dist(g_camera_l00_position, &candidate->position) * 0.006666667f;
             FastVecScale(&aim, &candidate->up, vars->lockHeight);
             FastVecAdd(&aim, &candidate->position, &aim);
-            AddMobyMarker(moby, FloatAbs(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
+            hud_add_moby_marker(moby, math_fabs(0.9f - distance * 0.65f), 0xFF0FFF0F, &aim, 0x26, 0.0f, -1, 90.0f, 4);
             HERO->ptr[0xBF8 / 4] = (char *)candidate;
         }
     } else if (candidate == vars->candidate) {
-        if (FastFloatHelperD(&vars->candidateTimer)) {
+        if (math_fast_float_d(&vars->candidateTimer)) {
             float *health;
             vars->target = candidate;
             vars->lockTimer = 5;
-            health = GetMobyPrivateValue0(candidate);
+            health = moby_get_private_value_0(candidate);
             if (health == 0)
                 vars->lockHeight = 0.1f;
             else
@@ -207,7 +207,7 @@ void func_L00_0040F6A0(Moby *moby)
 
     ready = 1;
     if (HERO->i[0x2294 / 4] == 0x1D) {
-        if (!FastFloatHelperD(&HERO->i[0x2534 / 4]))
+        if (!math_fast_float_d(&HERO->i[0x2534 / 4]))
             ready = 0;
     } else {
         HERO->i[0x2534 / 4] = 0x28;
@@ -215,40 +215,40 @@ void func_L00_0040F6A0(Moby *moby)
 
     released = 0;
     charged = 0;
-    if ((gPadState[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1)) {
-        SoundSlot *slot = &gSoundState[vars->chargeSound];
+    if ((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1)) {
+        SoundSlot *slot = &g_sound_state[vars->chargeSound];
         int level;
         vars->charge++;
         if (slot[1].owner != moby || !slot[1].active)
             vars->chargeSound = PlayMobySound(6, 4, moby);
-        ref_L00_0040F6A0_00(DrawChargeGlowSprites, moby);
-        level = gItemAmmoCounts[HERO->i[0x1248 / 4]];
+        ref_L00_0040F6A0_00(charge_draw_glow_sprites, moby);
+        level = g_item_ammo_counts[HERO->i[0x1248 / 4]];
         if (level >= 5)
             level = 4;
         if (level * 22 < vars->charge) {
             float size;
             int life;
-            ApplyAxisRotationToQuaternion(&work, &moby->up, &moby->forward, RandomAngle());
-            FastVecScale(&work, &work, RandomFloatRange(1.5f, 2.0f) * 0.016666668f);
-            life = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
-            size = RandomFloatRange(0.45f, 0.75f) * 210000.0f;
-            spark.f[0] = nozzle.f[0] + RandomSignedFloatRange(0.0f, 0.1f);
-            spark.f[1] = nozzle.f[1] + RandomSignedFloatRange(0.0f, 0.1f);
-            spark.f[2] = nozzle.f[2] + RandomSignedFloatRange(0.0f, 0.1f);
-            SpawnBurstParticle_002C16C0(&spark, &work, 15, 0x7F, 0x7F7F7F, life, size, 500.0f, 1.0f, 0.0f, 0.0f);
+            math_apply_axis_rotation_to_quat(&work, &moby->up, &moby->forward, math_random_angle());
+            FastVecScale(&work, &work, math_random_float_range(1.5f, 2.0f) * 0.016666668f);
+            life = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
+            size = math_random_float_range(0.45f, 0.75f) * 210000.0f;
+            spark.f[0] = nozzle.f[0] + math_random_signed_float_range(0.0f, 0.1f);
+            spark.f[1] = nozzle.f[1] + math_random_signed_float_range(0.0f, 0.1f);
+            spark.f[2] = nozzle.f[2] + math_random_signed_float_range(0.0f, 0.1f);
+            part_spawn_burst(&spark, &work, 15, 0x7F, 0x7F7F7F, life, size, 500.0f, 1.0f, 0.0f, 0.0f);
         }
     } else {
         if (vars->chargeSound != -1) {
-            SoundSlot *slot = &gSoundState[vars->chargeSound];
+            SoundSlot *slot = &g_sound_state[vars->chargeSound];
             if (slot[1].owner == moby && slot[1].active)
-                StopSoundVoice(vars->chargeSound);
+                snd_stop_voice(vars->chargeSound);
         }
         vars->chargeSound = -1;
-        if ((gPadState[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !get_ammo(-1))
+        if ((g_pad_state[0x1A4 / 4] & HERO->u[0x1230 / 4]) && !get_ammo(-1))
             PlayMobySound(1, 0, moby);
         if (vars->charge != 0) {
             released = 1;
-            charged = GetChargeGrade(moby);
+            charged = weapon_get_charge_grade(moby);
         }
         vars->charge = 0;
         vars->unknown20 = 0;
@@ -263,11 +263,11 @@ void func_L00_0040F6A0(Moby *moby)
                 FastVecAdd(&work, &work, &moby->position);
                 FastVecScale(&spark, &moby->right, 0.275f);
                 FastVecAdd(&work, &work, &spark);
-                count = ProcessCollisionHit(1.0f, &work, 1, HERO->ptr[0x2290 / 4], 0);
+                count = coll_process_hit(1.0f, &work, 1, HERO->ptr[0x2290 / 4], 0);
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
-                        Moby *hit = gAreaHitTargets[i];
-                        float *hp = GetMobyPrivateValue0(hit);
+                        Moby *hit = g_area_hit_targets[i];
+                        float *hp = moby_get_private_value_0(hit);
                         if (hit->alive == 0)
                             continue;
                         if (hit->health <= 0)
@@ -284,10 +284,10 @@ void func_L00_0040F6A0(Moby *moby)
                             continue;
                         if (hp == 0)
                             continue;
-                        if (!(*hp > 0.0f) && !IsMobyInSpecialClassRange(hit))
+                        if (!(*hp > 0.0f) && !moby_is_in_special_class_range(hit))
                             continue;
                         if (hit->model == 0 || hit->model->kind != 5) {
-                            candidate = gCollisionResult.hit;
+                            candidate = g_collision_result.hit;
                             vars->target = candidate;
                             break;
                         }
@@ -296,27 +296,27 @@ void func_L00_0040F6A0(Moby *moby)
             }
             vars->flash = 15;
             SpawnOrientedParticleBursts(moby, charged);
-            StartChargeShotEffect(moby, &nozzle, charged);
-            StartAnimationBlendedWithFlags(moby, 2, 0, 2, 0);
+            charge_shot_start_effect(moby, &nozzle, charged);
+            anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             start_equipped_item_animation();
-            vars->sound = CopyRecordsToFreeSlots(D_0029FCC8);
+            vars->sound = slot_copy_records_to_free(D_0029FCC8);
             if (charged)
-                gSubtitleHistory[0x3A8 / 2] = 0xFFFF;
-            else if (gSubtitleHistory[0x3A8 / 2] < 40 && ++gSubtitleHistory[0x3A8 / 2] == 40)
-                RequestSubtitleVoiceLine(0x9F7, 0x4E);
+                g_subtitle_history[0x3A8 / 2] = 0xFFFF;
+            else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
+                subtitle_request_voice_line(0x9F7, 0x4E);
         }
-        if (!((gPadState[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
+        if (!((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
             vars->sound >= 0) {
-            ResetActiveSlots(vars->sound);
+            slot_reset_active(vars->sound);
             vars->sound = -1;
         }
         {
-            WeaponEntry *weapon = D_00262570 + gItemSlotToRecord[0x1B];
+            WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
             vars->cooldown = 1.0f / weapon->rate;
         }
     }
 
-    if (vars->beam >= 0 && FastFloatHelperD(&vars->beamTimer))
-        SpawnSequencedChildMoby(moby, &nozzle);
-    UpdateLightFlash(moby, &nozzle);
+    if (vars->beam >= 0 && math_fast_float_d(&vars->beamTimer))
+        sequenced_child_spawn(moby, &nozzle);
+    light_flash_update(moby, &nozzle);
 }

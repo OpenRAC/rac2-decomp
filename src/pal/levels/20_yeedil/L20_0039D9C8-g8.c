@@ -7,20 +7,20 @@ typedef union {
     float f[4];
 } L20_0039BB18_V4;
 extern float D_L20_001AEC68 __attribute__((sda));
-extern int func_00282948(int *);
-extern float func_00282E80(void *, void *);
-extern float func_002AA2E8(float *, float, float);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern void *func_002C3150(void *, void *, int, u8, u8, int, float);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern void func_L20_0039BEC8(void *);
+extern int math_fast_float_d(int *);
+extern float vec_distance_xy(void *, void *);
+extern float ApproachValue(float *, float, float);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern void *part_spawn_hero_relative(void *, void *, int, u8, u8, int, float);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern void part_draw_glow_trail(void *);
 
 void func_PAL_L20_0039EA48(void *arg0)
 {
@@ -41,7 +41,7 @@ void func_PAL_L20_0039EA48(void *arg0)
     float rr2;
 
     s0 = *(u32 *)((u32)arg0 + 0x68);
-    if (func_00282948((int *)(s0 + 4)) != 0)
+    if (math_fast_float_d((int *)(s0 + 4)) != 0)
         goto pathA;
     old = *(u16 *)((u32)arg0 + 0x96);
     c64 = old++;
@@ -51,17 +51,17 @@ void func_PAL_L20_0039EA48(void *arg0)
     if (*(u16 *)(*(u32 *)((u32)arg0 + 0xB8) + 0x34) & 1)
         goto pathA;
 check:
-    if (func_00282E80((void *)((u32)arg0 + 0x10),
+    if (vec_distance_xy((void *)((u32)arg0 + 0x10),
                       (void *)(*(u32 *)((u32)arg0 + 0xB8) + 0x10)) > 0.1f) {
 pathA:
         zero_arg = 0.0f;
-        func_002AA2E8((float *)s0, zero_arg, 0.020000001f);
+        ApproachValue((float *)s0, zero_arg, 0.020000001f);
         if (*(float *)s0 == 0.0f) {
-            func_0029F338(arg0);
+            moby_mark_spawned(arg0);
             goto end;
         }
     } else {
-        func_002AA2E8((float *)s0, 1.0f, 0.020000001f);
+        ApproachValue((float *)s0, 1.0f, 0.020000001f);
     }
 
     g = D_L20_001AEC68;
@@ -77,32 +77,32 @@ pathA:
         }
     }
 skip:
-    rnd = func_002A7878(0.1f, 0.3f);
-    m = ((s32)(func_002A7820(30, 60)) * 5 + 2) / 6;
+    rnd = math_random_float_range(0.1f, 0.3f);
+    m = ((s32)(math_random_int_range(30, 60)) * 5 + 2) / 6;
     vel.q = 0;
-    r2 = func_002A7878(0.5f, 2.0f);
+    r2 = math_random_float_range(0.5f, 2.0f);
     vel.f[2] = -r2 * 0.020000001f;
     pos.q = vel.q;
-    rnd01 = func_002A7878(0.0f, 1.0f);
-    angle = func_002A7940();
-    vel.f[0] = func_00283180(angle) * rnd01;
-    vel.f[1] = func_00283198(angle) * rnd01;
+    rnd01 = math_random_float_range(0.0f, 1.0f);
+    angle = math_random_angle();
+    vel.f[0] = math_fast_sin_or_cos_a(angle) * rnd01;
+    vel.f[1] = math_fast_sin_or_cos_b(angle) * rnd01;
     vel.f[2] = 0.0f;
-    rr = func_002A7878(1.0f, 10.0f);
+    rr = math_random_float_range(1.0f, 10.0f);
     vel.f[2] = rr;
-    rr2 = func_002A7878(1.0f, 10.0f);
+    rr2 = math_random_float_range(1.0f, 10.0f);
     if (!(vel.f[2] > rr2)) {
         ;
     } else {
         vel.f[2] = rr2;
     }
-    func_00282CC0(&vel, &vel, arg0 + 0x10);
+    FastVecAdd(&vel, &vel, arg0 + 0x10);
     {
         u8 particle_count = m;
-        r = func_002A77E0(255);
-        func_002C3150(&vel, &pos, 0x60107080, particle_count, r & 0xFF, 0, rnd);
+        r = math_random_int_below(255);
+        part_spawn_hero_relative(&vel, &pos, 0x60107080, particle_count, r & 0xFF, 0, rnd);
     }
-    func_L00_002E6CF0(func_L20_0039BEC8, arg0);
+    gfx_add_draw_callback_first(part_draw_glow_trail, arg0);
 end:
     return;
 }

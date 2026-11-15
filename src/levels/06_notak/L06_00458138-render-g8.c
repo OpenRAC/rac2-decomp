@@ -9,22 +9,22 @@ typedef struct {
     u64 primitive, texture, mode, flags;
 } NotakPacket;
 
-extern u64 func_0027C878(int);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, int, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, int, int);
 extern NotakVec D_L06_001B9840;
 extern char D_L06_001B1930 __attribute__((sda));
 
 /* Draws a small glowing sprite that always faces the camera at the object's position. */
-void func_L06_00459620(char *obj) {
+void gfx_l06_draw_facing_glow_sprite(char *obj) {
     NotakPacket packet;
     NotakVec matrix[4], corner, up, dir;
     u32 color;
@@ -38,7 +38,7 @@ void func_L06_00459620(char *obj) {
     packet.primitive = 0;
     packet.uv[0] = 0; packet.uv[1] = 0; packet.uv[2] = 0; packet.uv[3] = 1;
     packet.uv[4] = 1; packet.uv[5] = 0; packet.uv[6] = 1; packet.uv[7] = 1;
-    if (!RandomIntBelow(4)) color = 0x7F7F4040;
+    if (!math_random_int_below(4)) color = 0x7F7F4040;
     color = (color & 0xFFFFFF) | ((u32)FloatToInt(IntToFloat(color >> 24)) << 24);
     *(NotakTI *)up = 0; up[2] = 1; up[3] = 1;
     packet.color[3] = color; packet.color[2] = color; packet.color[1] = color; packet.color[0] = color;

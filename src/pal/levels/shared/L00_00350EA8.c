@@ -1,15 +1,15 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 extern void func_PAL_L00_0030FA48(void);
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
 int func_PAL_L00_00350EA8(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_PAL_L00_0030FA48();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
@@ -19,15 +19,15 @@ extern void func_PAL_L00_0030F9D8(void);
 
 int func_PAL_L00_00351000(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_PAL_L00_0030F9D8();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
 
 extern int D_00138344;
-extern void func_L00_0030E010(int a);
+extern void level_l00_call_module_handler_with_arg_11(int a);
 
 extern void func_PAL_L00_0030F2C8(int a);
 extern void ref_PAL_L00_00351088_00(int a);

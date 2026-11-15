@@ -16,7 +16,7 @@ extern char *ref_L00_003DBF50_05;
 extern char *ref_L00_003DBF50_06;
 extern char *ref_L00_003DBF50_07(char *);
 extern void ref_L00_003DBF50_08(void);
-extern struct BFPlayer { char pad[0xbf8]; char *target; } D_00189E20 NOT_SDA;
+extern struct BFPlayer { char pad[0xbf8]; char *target; } g_hero_state NOT_SDA;
 extern float ref_L00_003DBF50_10(char *);
 extern void ref_L00_003DBF50_11(char *, char *, char *, float);
 extern void ref_L00_003DBF50_12(char *, char *);
@@ -65,11 +65,11 @@ char *func_PAL_L00_003E0120(char *parent, int arg, char *pos, char *dir)
                 ref_L00_003DBF50_03 = 1;
             }
         }
-        if (D_00189E20.target) {
+        if (g_hero_state.target) {
             length = ref_L00_003DBF50_10(dir);
             if (length == 0.0f)
                 length = 1.0f;
-            ref_L00_003DBF50_11(D_00189E20.target, pos, dir, length);
+            ref_L00_003DBF50_11(g_hero_state.target, pos, dir, length);
             qcopy(state, dir);
         } else {
             ref_L00_003DBF50_12(object, state);

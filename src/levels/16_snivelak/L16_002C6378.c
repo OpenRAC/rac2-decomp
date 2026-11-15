@@ -17,7 +17,7 @@ typedef struct {
 
 extern T_001B99C0 D_L16_001B99C0;
 
-extern void func_002A7470(void *, s32, s32, s32);
+extern void anim_start_blended(void *, s32, s32, s32);
 
 /* func_L16_002C6378 is in the sibling file L16_002C6378-decider.c (its own profile). */
 
@@ -33,9 +33,9 @@ extern void func_002A7470(void *, s32, s32, s32);
 
 /* runs the readiness helper once when the handle is in state 1 with flag 2 set */
 /* Restarts the object's animation once it is in state 1 and its ready flag is set. */
-void func_L16_003AA0C8(u8 *object) {
+void moby_restart_anim_when_ready(u8 *object) {
     if (object[0x43] == 1 && (object[0x60] & 2) != 0) {
-        StartAnimationBlended(object, 0, 0, 1);
+        anim_start_blended(object, 0, 0, 1);
     }
 }
 
@@ -56,36 +56,36 @@ void func_L16_003AA0C8(u8 *object) {
 
 /* func_L16_003F4FA8 is defined in L16_003F4FA8.c (vector-copy profile). */
 
-extern void func_002A7750(char *, s32, s32);
+extern void moby_set_state(char *, s32, s32);
 
-extern s32 func_002A9640(char *, s32, s32);
+extern s32 part_find_owned_effect_slot(char *, s32, s32);
 
-extern void func_L16_003F55A0(char *);
+extern void part_spawn_random_bursts_outside_box(char *);
 
-extern void func_L16_003F5708(char *);
+extern void EmitParticlesOutsideCentralBox(char *);
 
-extern void func_002E5CF8(s32, s32, char *);
+extern void PlayMobySound(s32, s32, char *);
 
-extern void func_0029F338(char *);
+extern void moby_mark_spawned(char *);
 
 /* Tears the resident down (state 0) or starts it once the readiness test passes
    (state 1), chosen by the record's own state byte. */
 /* Shuts the object down in state 0, or fires off its effects once it is ready in state 1. */
-void func_L16_003F54F8(char *object) {
+void spawner_l16_update(char *object) {
     char *self = object;
 
     switch (*(u8 *)(self + 0x20)) {
     case 0:
         *(u16 *)(self + 0x32) = 0x200;
         *(u16 *)(self + 0x34) |= 0x4000;
-        SetMobyState(self, 1, -1);
+        moby_set_state(self, 1, -1);
         break;
     case 1:
-        if (FindOwnedEffectSlot(self, 0x80000, 0) != 0) {
-            SpawnRandomBurstsOutsideBox(self);
+        if (part_find_owned_effect_slot(self, 0x80000, 0) != 0) {
+            part_spawn_random_bursts_outside_box(self);
             EmitParticlesOutsideCentralBox(self);
             PlayMobySound(0, 0, self);
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
         }
         break;
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -33,7 +34,7 @@ extern s32 ref_L10_004176C0_03(s32, s32);
 
 /* When the target is close enough, plays a sound and a green flash on both carried
    objects, then waits a random time before it can happen again. */
-void func_L10_004176C0(s8 *moby) {
+void hrugis_play_carried_flash(s8 *moby) {
     s8 *vars;
     s8 *target;
 

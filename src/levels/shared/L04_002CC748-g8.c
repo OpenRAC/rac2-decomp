@@ -24,10 +24,10 @@ extern f32 func_30EF70(f32 *vec, void *mat);
 extern f32 func_30FF88(s32 value);
 extern void func_3076D0(u32 a0, u32 a1);
 extern void func_3074C8(u8 *a0, u32 a1);
-extern void func_L04_003A0008(u8 *a0, u32 a1);
+extern void water_advance_ripple_step(u8 *a0, u32 a1);
 
 /* advances every ripple patch of the record the object at +0x28 points to */
-void func_L04_003A1FE0(u8 *moby) {
+void water_update_ripple_patches(u8 *moby) {
     u8 *vars = *(u8 **)(*(u32 *)(moby + 0x28) + 0x68);
     u8 *table;
     f32 pos[4];
@@ -65,7 +65,7 @@ void func_L04_003A1FE0(u8 *moby) {
             *(u16 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x1E) = 0;
         *(u32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x48) = *(u8 *)(vars + 0x14);
         if (i == 0) {
-            AdvanceWaterRippleStep(*(u8 **)(moby + 0x8), *(u32 *)(moby + 0x0));
+            water_advance_ripple_step(*(u8 **)(moby + 0x8), *(u32 *)(moby + 0x0));
             if (*(u32 *)(table + 0x400) != 0)
                 func_3076D0(*(u32 *)(moby + 0x2C), *(u32 *)(moby + 0x28));
             else

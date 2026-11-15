@@ -10,22 +10,22 @@ typedef struct {
     unsigned long tag, tex, alpha, test;
 } Beam;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern float func_002A7878(float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
-extern void func_L00_003C1D30(void *);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
+extern void sprite_reset_large_record(void *);
 extern Vector4 D_L09_001B9A00;
 
 /* A spark: the func_L00_0038ADD0 twin strips from the start to a random point within
    0.25..0.65 of it, sized by the owner's scale at +0x50, with a random texture page. */
-void func_L09_003AF9E8(char *object, Vector4 *start)
+void part_spawn_spark_strips(char *object, Vector4 *start)
 {
     Beam first, second;
     Vector4 basis[4], end, nearSize, farSize;
@@ -33,15 +33,15 @@ void func_L09_003AF9E8(char *object, Vector4 *start)
     float width;
     unsigned long test;
 
-    end.f[0] = RandomFloatRange(-1, 1);
-    end.f[1] = RandomFloatRange(-1, 1);
-    end.f[2] = RandomFloatRange(-1, 1);
-    vec_scale_to_length(&end, &end, RandomFloatRange(0.25f, 0.65f));
+    end.f[0] = math_random_float_range(-1, 1);
+    end.f[1] = math_random_float_range(-1, 1);
+    end.f[2] = math_random_float_range(-1, 1);
+    vec_scale_to_length(&end, &end, math_random_float_range(0.25f, 0.65f));
     FastVecAdd(&end, start, &end);
     first.tex = GetEffectTextureDescriptor(23);
     first.alpha = 0xFF9000000260UL;
     first.tag = 0;
-    test = ((unsigned long)(Rand() % 2 + 1) << 2) | 0x8000000040UL;
+    test = ((unsigned long)(func_001163B0() % 2 + 1) << 2) | 0x8000000040UL;
     first.color[0] = first.color[1] = 0x7F7F7F7F;
     first.color[2] = first.color[3] = 0x103080;
     first.test = test;
@@ -55,14 +55,14 @@ void func_L09_003AF9E8(char *object, Vector4 *start)
     second.color[2] = second.color[3] = 0x30B1F;
     nearSize.f[3] = 1;
     farSize.f[3] = 1;
-    width = RandomFloatRange(0.1f, 0.2f);
+    width = math_random_float_range(0.1f, 0.2f);
     nearSize.f[2] = width;
     farSize.f[2] = width + width;
     nearSize.f[2] *= *(float *)(work + 0x50);
     farSize.f[2] *= *(float *)(work + 0x50);
-    ResetLargeSpriteRecord(&first);
-    ResetLargeSpriteRecord(&second);
-    if (Rand() & 1) {
+    sprite_reset_large_record(&first);
+    sprite_reset_large_record(&second);
+    if (func_001163B0() & 1) {
         first.uv[0] = 0; first.uv[1] = 0; first.uv[2] = 0; first.uv[3] = 1;
         first.uv[4] = 1; first.uv[5] = 0; first.uv[6] = 1; first.uv[7] = 1;
         second.uv[0] = 0; second.uv[1] = 0; second.uv[2] = 0; second.uv[3] = 1;

@@ -37,30 +37,30 @@ typedef struct GrelbinMoby {
 } GrelbinMoby;
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
-extern int D_001A79F0 __attribute__((sda));
-extern u8 D_00189EA0[];
+extern int g_current_map_index __attribute__((sda));
+extern u8 g_hero_position[];
 typedef struct { u8 pad0[0x464]; u8 active[0]; } GrelbinEntityFlags;
 extern GrelbinEntityFlags D_L19_0021EA30;
-extern GrelbinMoby *D_L19_001B2A1C __attribute__((sda));
-extern void func_002A7750(GrelbinMoby *,int,int);
-extern void func_0029F338(GrelbinMoby *);
-extern void *func_002A9640(GrelbinMoby *,int,int);
-extern GrelbinMoby *func_0029EFD0(int);
-extern void func_002B37E8(void *,void *);
-extern int func_002761F8(void *,void *,int,void *,int);
+extern GrelbinMoby *g_moby_l19_array __attribute__((sda));
+extern void moby_set_state(GrelbinMoby *,int,int);
+extern void moby_mark_spawned(GrelbinMoby *);
+extern void *part_find_owned_effect_slot(GrelbinMoby *,int,int);
+extern GrelbinMoby *CreateMoby(int);
+extern void moby_init_child_from_parent(void *,void *);
+extern int CollLine(void *,void *,int,void *,int);
 extern u8 D_L19_001BFEC0[];
-extern void func_002B0408(void *,void *,int);
-extern void func_002B60B0(void *,float,float,float,float);
+extern void mat_align_to_dir(void *,void *,int);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float);
 extern u8 D_0019B4A8[];
 extern void func_PAL_002A7650(void *,int,int);
 extern void func_002A0F48(void *);
-extern void func_002AB650(void *);
+extern void hero_copy_field_to_moby(void *);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern void func_PAL_002AC3C0(void *,void *);
-extern int func_00282978(void *);
+extern int FastDecTimer(void *);
 extern float func_PAL_002AA108(void *,void *);
 extern void func_PAL_002AC290(void *,void *);
-extern int D_L19_001B1D20 MACRO_ADDR;
+extern int g_active_yeti_count MACRO_ADDR;
 typedef struct {
     u8 pad0[0x80];
     float position[4];
@@ -70,10 +70,10 @@ typedef struct {
     GrelbinMoby *object;
     int mode;
 } GrelbinPlayer;
-extern GrelbinPlayer D_00189E20;
+extern GrelbinPlayer g_hero_state;
 extern GrelbinMoby *D_L19_001B2A28 MACRO_ADDR;
-extern int func_002B3BA8(void *,int,float,int,float,int);
-extern float func_00282E80(void *,void *);
+extern int weapon_select_aim_target(void *,int,float,int,float,int);
+extern float vec_distance_xy(void *,void *);
 typedef struct {
     u8 pad0[0x20];
     float health;
@@ -150,21 +150,21 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         obj->w98=0;
         obj->flags=(obj->flags|1)&0xEFFF;
         state->w304=0;
-        if (state->sourceIndex!=-1) state->source=D_L19_001B2A1C+state->sourceIndex;
+        if (state->sourceIndex!=-1) state->source=g_moby_l19_array+state->sourceIndex;
         else {
-            state->source=func_0029EFD0(0x1178);
+            state->source=CreateMoby(0x1178);
             if (!state->source) {
         success:
             return 1;
             }
-            func_002B37E8(state->source,obj);
+            moby_init_child_from_parent(state->source,obj);
             state->source->group=obj->group;
             state->source->drawDistance=obj->drawDistance;
             state->source->flags|=0x100;
             qcopy(top,obj->position); qcopy(bottom,obj->position);
             top[2]+=1.f; bottom[2]-=10.f;
-            func_002761F8(top,bottom,2,obj,0);
-            func_002B0408(state->source->transform,D_L19_001BFEC0,0);
+            CollLine(top,bottom,2,obj,0);
+            mat_align_to_dir(state->source->transform,D_L19_001BFEC0,0);
         }
         {
         float half=0.5f;
@@ -179,26 +179,26 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         }
         state->w50=0;state->f84=0.5f;state->f54=0.2f;state->f5C=state->f58=0.75f;
         state->f60=1.5707965f;state->f80=0.52359885f;
-        func_002B60B0(obj,0.0048f,0.120000005f,0.010053098f,1.0053098f);
+        moby_set_controller_speed_limits(obj,0.0048f,0.120000005f,0.010053098f,1.0053098f);
         state->flags|=2;
-        func_002A7750(obj,1,0);
+        moby_set_state(obj,1,0);
         if(obj->animation!=7) func_PAL_002A7E68(obj,7,0,0);
     {
         u16 id=obj->uid;
         int value;
         if (D_L19_0021EA30.active[(s16)id]) goto replace;
-        value=D_0019B4A8[((s16)id>>1)+(D_001A79F0<<10)];
+        value=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
         if ((id&1) ? ((value>>4)&7) : (value&7)) {
         replace:
         {
             GrelbinMoby *replacement;
-            replacement=func_0029EFD0(0x1208);
+            replacement=CreateMoby(0x1208);
             if (!replacement) goto success;
-            func_002B37E8(replacement,state->source);
+            moby_init_child_from_parent(replacement,state->source);
             replacement->group=obj->group;replacement->drawDistance=obj->drawDistance;
             { float (*src)[4]=state->source->transform;
             for(i=0;i<4;i++) qcopy(replacement->transform[i],src[i]); }
-            func_0029F338(state->source);
+            moby_mark_spawned(state->source);
             state->source=replacement;
             goto success;
         }
@@ -209,15 +209,15 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         u16 id;
         u8 *count;
         func_PAL_002A7650(obj,0,3);
-        spawn=func_0029EFD0(0x1266);
+        spawn=CreateMoby(0x1266);
         if(!spawn) goto success;
         id=obj->uid;
-        if(id&1) { count=((s16)id>>1)+(D_001A79F0<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
-        else { count=((s16)id>>1)+(D_001A79F0<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
+        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
+        else { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
         spawn->opacity=80;spawn->flags|=0x800;spawn->drawDistance=255;spawn->group=255;
         spawn->state=0;spawn->bBC=0;spawn->b31=1;
         qcopy(spawn->position,state->source->position);
-        spawn->position[2]+=1.f;func_002A0F48(spawn);func_002AB650(spawn);
+        spawn->position[2]+=1.f;func_002A0F48(spawn);hero_copy_field_to_moby(spawn);
         data=spawn->pvars;F(data,0)=0.1f;
         func_PAL_002A7E68(spawn,1,0,20);
         { float duration=F(data,0); spawn->state=2;spawn->f48=duration+duration; }
@@ -225,8 +225,8 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     }
     func_PAL_002AC3C0(obj,&state->damageState);
     {
-    other=func_002A9640(obj,0x10000,0);
-    if(!func_00282978((u8 *)state+0x26)) other=0;
+    other=part_find_owned_effect_slot(obj,0x10000,0);
+    if(!FastDecTimer((u8 *)state+0x26)) other=0;
     if(other) {
         float damage=F(other,0x2C);
         if(state->damageScale!=0.f) {
@@ -242,33 +242,33 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         if(state->health<=0.f) {
             GrelbinMoby *target;
             if(obj->animation!=5) func_PAL_002A7E68(obj,5,0,17);
-            func_002A7750(obj,12,3);
+            moby_set_state(obj,12,3);
             target=state->target;
             if(target && target->classId==0x10D0) {
-                D_L19_001B1D20=D_L19_001B1D20-1;
-                func_0029F338(target);
-                state->target=D_00189E20.object;
-                state->targetSet=1;qcopy(state->targetPosition,D_00189E20.previousPosition);
+                g_active_yeti_count=g_active_yeti_count-1;
+                moby_mark_spawned(target);
+                state->target=g_hero_state.object;
+                state->targetSet=1;qcopy(state->targetPosition,g_hero_state.previousPosition);
             }
         }
         obj->bA8=255;
     }
     }
     if(obj->state!=11) {
-    state->w2FC=func_002B3BA8(obj,state->w210,36.f,0,10.f,0);
+    state->w2FC=weapon_select_aim_target(obj,state->w210,36.f,0,10.f,0);
     if(obj->b95) {
-        state->w2F8=func_002B3BA8(obj,state->w2F4,state->f214*1.5f,0,0.f,0);
+        state->w2F8=weapon_select_aim_target(obj,state->w2F4,state->f214*1.5f,0,0.f,0);
         if(state->w2F4==-1) {
-            if(func_00282E80(obj->position,D_00189EA0)<32.f) state->w2F8=1;
+            if(vec_distance_xy(obj->position,g_hero_position)<32.f) state->w2F8=1;
             else state->w2F8=0;
         }
     }
-    if(D_00189E20.mode==49) qcopy(state->targetPosition,D_00189E20.position);
+    if(g_hero_state.mode==49) qcopy(state->targetPosition,g_hero_state.position);
     other=D_L19_001B2A28;
     while(other) {
         if(((GrelbinMoby *)other)->classId==0x10D0 && obj->state!=4 && obj->state!=9 && obj->state!=8 && state->health>0.f) {
             if(obj->state==7 && obj->timer>=16) break;
-            if(func_00282E80(obj->position,((GrelbinMoby *)other)->position)<16.f && func_00282E80(obj->position,((GrelbinMoby *)other)->position)>15.f && ((GrelbinMoby *)other)->b95 && I(((GrelbinMoby *)other)->pvars,0x254)) {
+            if(vec_distance_xy(obj->position,((GrelbinMoby *)other)->position)<16.f && vec_distance_xy(obj->position,((GrelbinMoby *)other)->position)>15.f && ((GrelbinMoby *)other)->b95 && I(((GrelbinMoby *)other)->pvars,0x254)) {
                 state->target=other;state->targetSet=1;qcopy(state->targetPosition,((GrelbinMoby *)other)->position);break;
             }
         }
@@ -277,10 +277,10 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     }
     {
     GrelbinMoby *target=state->target;
-    if(target && target->classId==0x10D0 && func_00282E80(obj->position,target->position)<16.f && func_00282E80(obj->position,state->target->position)>15.f && obj->state!=11 && obj->b95) {
+    if(target && target->classId==0x10D0 && vec_distance_xy(obj->position,target->position)<16.f && vec_distance_xy(obj->position,state->target->position)>15.f && obj->state!=11 && obj->b95) {
         state->height=state->previousHeight;
         if(obj->animation!=6) func_PAL_002A7E68(obj,6,0,16);
-        func_002A7750(obj,11,-1);
+        moby_set_state(obj,11,-1);
         state->target->state=23;state->target->b95=4;
         func_PAL_002A7E68(state->target,6,0,12);
     }

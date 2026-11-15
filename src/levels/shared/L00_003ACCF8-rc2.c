@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -30,7 +31,7 @@ extern s32 ref_L00_003ACCF8_03 __attribute__((sda));
 extern s8 ref_L00_003ACCF8_04[];
 
 /* Saves the shot's current position and direction into its slot of the trail table. */
-void func_L00_003ACCF8(void *moby) {
+void shot_save_trail_transform(void *moby) {
     s8 transform[0x10];
     s8 *vars;
 

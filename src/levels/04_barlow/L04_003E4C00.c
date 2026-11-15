@@ -7,29 +7,29 @@ typedef struct {
     char tail[0x40];
 } PositionRecord;
 
-extern float func_002A89A8(void *, int, float);
-extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern int func_002A7820(int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern char *func_002A9640(void *, int, int);
-extern int func_002B0ED8(void *, void *, int);
-extern void func_00291450(int);
-extern int func_002B3BA8(void *, int, float, float, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_L04_003E22B0(unsigned char *, int, int, int, int);
-extern void func_L04_00412AF8(void *, void *);
-extern void func_L04_003E5250(unsigned char *);
-extern void func_L04_003E5298(void *);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern int math_random_int_range(int, int);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern char *part_find_owned_effect_slot(void *, int, int);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern void gfx_free_point_light(int);
+extern int weapon_select_aim_target(void *, int, float, float, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void object_set_linked_states(unsigned char *, int, int, int, int);
+extern void find_point_across_line(void *, void *);
+extern void object_release_linked(unsigned char *);
+extern void moby_l04_set_group_alert_flag(void *);
 extern char *D_L04_001B25CC __attribute__((sda));
 extern char D_L04_001B9680[];
 
 /* Updates a walking enemy: sets up its stats on the first frame, then handles damage, hits on the player and switching between its states. */
-int func_L04_003E4C00(unsigned char *moby)
+int barlow_enemy_update_core(unsigned char *moby)
 {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     char *target;
@@ -37,7 +37,7 @@ int func_L04_003E4C00(unsigned char *moby)
     float scale;
 
     if (*(unsigned char *)(moby + 0x20) == 0) {
-        float ground = ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f);
+        float ground = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
 
         *(unsigned char **)(vars + 0x18) = vars + 0x140;
         *(float *)(moby + 0x18) = ground;
@@ -73,13 +73,13 @@ int func_L04_003E4C00(unsigned char *moby)
         *(float *)(vars + 0x150) = 1.483530f;
         *(float *)(vars + 0x170) = 0.52359885f;
         *(float *)(vars + 0x16C) = 0.00555555569008f;
-        SetControllerSpeedLimits(moby, 0.0022222223f, 0.06666667f, 0.00116355298087f, 0.10471977f);
+        moby_set_controller_speed_limits(moby, 0.0022222223f, 0.06666667f, 0.00116355298087f, 0.10471977f);
         qcopy(vars + 0x110, moby + 0x10);
         scale = 1.25f;
         *(float *)(vars + 0x120) = scale;
         *(float *)(vars + 0x12C) = *(float *)(vars + 0x2C0);
         *(float *)(vars + 0x130) = 10.0f;
-        result = RandomIntRange(120, 700);
+        result = math_random_int_range(120, 700);
         vars[0x28] = 3;
         vars[0x29] = 1;
         vars[0x2E] = 1;
@@ -87,50 +87,50 @@ int func_L04_003E4C00(unsigned char *moby)
         *(float *)(vars + 0x2E4) = vars[0x34];
         *(float *)(vars + 0x2E8) = vars[0x34];
         *(float *)(vars + 0x30) = 0.75f;
-        SetMobyState(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         if (*(int *)(vars + 0x2F0) != -1) {
             *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.4f;
             vars[0x306] = 0;
             *(TI128 *)(vars + 0x280) = *(TI128 *)(moby + 0x10) =
                 ((PositionRecord *)D_L04_001B25CC)[*(int *)(vars + 0x2F0)].position;
-            SetObjectAndLinkedStates(moby, 1, 1,
-                RandomIntBelow(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x4C) + 0x10)), 10);
-            *(short *)(vars + 0x300) = RandomIntRange(1200, 3000);
-            SetMobyState(moby, 5, 0);
+            object_set_linked_states(moby, 1, 1,
+                math_random_int_below(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x4C) + 0x10)), 10);
+            *(short *)(vars + 0x300) = math_random_int_range(1200, 3000);
+            moby_set_state(moby, 5, 0);
             *(float *)(vars + 0x140) *= 0.4f;
             vars[0x307] = 0;
             *(float *)(vars + 0x144) = *(float *)(vars + 0x140) + 0.01f;
         } else {
-            SetObjectAndLinkedStates(moby, 4, 1,
-                RandomIntBelow(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x58) + 0x10)), 0);
-            *(float *)(moby + 0x48) = RandomFloatRange(0.5f, scale);
+            object_set_linked_states(moby, 4, 1,
+                math_random_int_below(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x58) + 0x10)), 0);
+            *(float *)(moby + 0x48) = math_random_float_range(0.5f, scale);
         }
     }
     if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
     if (vars[0x2E] == 2) {
-        ReleaseLinkedObject(moby);
+        object_release_linked(moby);
         return 1;
     }
     if (*(int *)(vars + 0x2F0) != -1) {
-        target = FindOwnedEffectSlot(moby, 0x10000, 1);
+        target = part_find_owned_effect_slot(moby, 0x10000, 1);
         if (moby[0x20] == 22 || vars[0x307]) {
             moby[0xA8] = 255;
         } else if (target) {
-            FindPointAcrossFixedLine(moby, vars + 0x280);
+            find_point_across_line(moby, vars + 0x280);
             *(float *)(target + 0x2C) = *(short *)(vars + 0x24) * 0.3f;
         }
         if (vars[0x307]) {
             vars[0x307]--;
         }
     }
-    result = ApplyDamageToObject(moby, vars + 0x60, 0);
+    result = moby_apply_damage_to_object(moby, vars + 0x60, 0);
     if (result) {
         *(int *)(vars + 0x2D0) = 0;
         if (*(int *)(vars + 0x2E0) >= 0) {
-            FreePointLight(*(int *)(vars + 0x2E0));
+            gfx_free_point_light(*(int *)(vars + 0x2E0));
             *(int *)(vars + 0x2E0) = -1;
         }
         if (result == 5) {
@@ -141,11 +141,11 @@ int func_L04_003E4C00(unsigned char *moby)
             switch (result) {
             case 2:
             case 3:
-                StartAnimationBlended(*(char **)(vars + 0x2AC), 8, 0, 3);
+                anim_start_blended(*(char **)(vars + 0x2AC), 8, 0, 3);
                 break;
             case 4:
             case 5:
-                StartAnimationBlended(*(char **)(vars + 0x2AC), 9, 0, 3);
+                anim_start_blended(*(char **)(vars + 0x2AC), 9, 0, 3);
                 *(int *)(*(char **)(*(char **)(vars + 0x2AC) + 0x68) + 0x27C) = 0;
                 break;
             case 1:
@@ -153,22 +153,22 @@ int func_L04_003E4C00(unsigned char *moby)
                 break;
             }
         }
-        SetGroupMobyAlertFlagL04(moby);
+        moby_l04_set_group_alert_flag(moby);
         if (!moby[0x95]) {
             if (*(int *)(vars + 0x2CC) != -1) {
-                SetMobyState(moby, 9, 1);
-                SetObjectAndLinkedStates(moby, 4, 3, 0, 12);
+                moby_set_state(moby, 9, 1);
+                object_set_linked_states(moby, 4, 3, 0, 12);
             } else {
-                SetMobyState(moby, 8, 1);
-                *(short *)(vars + 0x2A0) = RandomIntRange(580, 600);
-                SetObjectAndLinkedStates(moby, 6, 5, 0, 10);
+                moby_set_state(moby, 8, 1);
+                *(short *)(vars + 0x2A0) = math_random_int_range(580, 600);
+                object_set_linked_states(moby, 6, 5, 0, 10);
             }
         }
     }
     if (*(int *)(vars + 0x2F0) != -1) {
         *(float *)(vars + 0x20) = *(short *)(vars + 0x24);
     }
-    *(int *)(vars + 0x258) = SelectAimTarget_002B3BA8(moby, *(int *)(vars + 0x250), *(float *)(vars + 0x298), 10.0f, 0, 0);
-    *(int *)(vars + 0x25C) = SelectAimTarget_002B3BA8(moby, *(int *)(vars + 0x254), *(float *)(vars + 0x29C), 10.0f, 0, 0);
+    *(int *)(vars + 0x258) = weapon_select_aim_target(moby, *(int *)(vars + 0x250), *(float *)(vars + 0x298), 10.0f, 0, 0);
+    *(int *)(vars + 0x25C) = weapon_select_aim_target(moby, *(int *)(vars + 0x254), *(float *)(vars + 0x29C), 10.0f, 0, 0);
     return 0;
 }

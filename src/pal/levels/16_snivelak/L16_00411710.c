@@ -2,24 +2,24 @@
 
 #include "common.h"
 extern s32 func_313EA0(s32);
-extern void func_002A7750(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 extern u8 *D_L16_001B2C0C[] __attribute__((sda));
 extern u8 D_0013963B;
-extern s32 func_00282948(void *);
+extern s32 math_fast_float_d(void *);
 extern u8 *D_L16_001FE7C0[];
-extern void func_002B60B0(void *, float, float, float, float);
-extern s32 func_00283CF0(float);
-extern void func_002A93B0(void *);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern s32 FloatToInt(float);
+extern void moby_update_ground_check(void *);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
-extern void func_L16_0040D188(u8 *);
-extern s32 func_002B3BA8(void *, s32, float, float, s32, s32);
+extern void group_wake_members(u8 *);
+extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern float D_L16_001B9B00[];
 extern u8 *D_L16_001B2B1C[] __attribute__((sda));
 extern s32 D_L16_001B2B38[] __attribute__((sda));
-extern s32 func_002A9640(void *, s32, s32);
-extern s32 func_00277258(void *, s32, void *, float);
+extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern s32 coll_test_point(void *, s32, void *, float);
 
 /* Object update: on the first frame (+0x20 still zero) sets the state's defaults and
    rates; then, with +0x31 set and the object within 32 units of D_L16_001B9B00, runs
@@ -43,26 +43,26 @@ void func_PAL_L16_00411C78(u8 *arg)
         *(float *)(state + 0x5C) = 0.5f;
         *(float *)(state + 0x60) = 3.141593f;
         *(float *)(state + 0x80) = 0.52359885f;
-        func_002B60B0(arg, 0.0032000002f, 0.080000006f, 0.00062831864f, 0.04188791f);
+        moby_set_controller_speed_limits(arg, 0.0032000002f, 0.080000006f, 0.00062831864f, 0.04188791f);
         *(s32 *)(state + 0x88) |= 2;
         if (*(s16 *)(state + 0x24) == 0) {
             *(s16 *)(state + 0x24) = 1;
             *(float *)(state + 0x20) = 1.0f;
         }
-        func_002A7750(arg, 1, 0);
+        moby_set_state(arg, 1, 0);
         if (arg[0x43])
             func_PAL_002A7E68(arg, 0, 0, 0);
-        state[0x48] = func_00283CF0(18.0f);
-        state[0x4A] = func_00283CF0(16.0f);
+        state[0x48] = FloatToInt(18.0f);
+        state[0x4A] = FloatToInt(16.0f);
         *(float *)(state + 0x358) = *(float *)(arg + 0x18);
     }
-    if (arg[0x31] && func_00282E48(arg + 0x10, D_L16_001B9B00) < 32.0f) {
-        func_002A93B0(arg);
+    if (arg[0x31] && fast_vec_dist(arg + 0x10, D_L16_001B9B00) < 32.0f) {
+        moby_update_ground_check(arg);
         arg[0x6F] = 30;
     }
     if (func_PAL_002B1A50(arg, state + 0x140, 0))
-        func_L16_0040D188(arg);
-    *(s32 *)(state + 0x240) = func_002B3BA8(arg, *(s32 *)(state + 0x230), *(float *)(state + 0x234), 0.0f, 0, 0);
-    *(s32 *)(state + 0x354) = func_002B3BA8(arg, *(s32 *)(state + 0x350), 0.0f, 0.0f, 0, 0);
+        group_wake_members(arg);
+    *(s32 *)(state + 0x240) = weapon_select_aim_target(arg, *(s32 *)(state + 0x230), *(float *)(state + 0x234), 0.0f, 0, 0);
+    *(s32 *)(state + 0x354) = weapon_select_aim_target(arg, *(s32 *)(state + 0x350), 0.0f, 0.0f, 0, 0);
     *(float *)(arg + 0x18) = *(float *)(state + 0x358);
 }

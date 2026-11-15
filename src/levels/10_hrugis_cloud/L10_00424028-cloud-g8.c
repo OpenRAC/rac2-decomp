@@ -33,7 +33,7 @@ extern void func_003546B0(void *, int, float);
    would hoist D_L10_0026CEA0's high half out of the list loop, which retail recomputes.
    The initial values of k, entry, prim, transform and case 0's i only size gcse's
    expression table (185 buckets), which orders the matrix pointers' registers as retail. */
-void func_L10_0042B500(char *moby) {
+void cloud_sparkle_field_update(char *moby) {
     union {
         struct { float m[3][12]; CloudVec rotations[3]; } init;
         struct { CloudVec temp, visible, direction, position, offset; } update;

@@ -28,7 +28,7 @@ extern s32 D_001B1B00[16];
 extern void func_002A05A8();
 
 /* Checks the 16 watched objects each frame, drops the ones that are gone, and acts on those that have been still for 20 frames. */
-void func_0029FB20(void) {
+void moby_update_watched_objects(void) {
     s32 i = 0;
     WatchObject *watched;
     do {

@@ -22,27 +22,27 @@ extern int D_L08_001B036C __attribute__((sda));
 extern int D_L08_001B2508 MACRO_ADDR;
 extern char D_L08_001B9B00[];
 
-extern void func_0029FCC0(void *, int, void *);
-extern int func_002A77E0(int);
-extern void func_002A7A00(void *, float, float);
-extern void func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
-extern unsigned char *func_002C2FD8(void *, int, unsigned char, int, int, int, int, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int math_random_int_below(int);
+extern void vec_random_direction(void *, float, float);
+extern void part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
+extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
 
 /* Returns the height of the object with the given index, or 0 when there is none. */
-float func_L08_003CCD58(int mobyIndex) {
+float moby_get_height(int mobyIndex) {
     if (mobyIndex != -1)
         return *(float *)(D_L08_001B29DC + ((unsigned int)mobyIndex << 8) + 0x18);
     return 0.0f;
 }
 
 /* Tells whether the linked object is switched on. */
-int func_L08_003CCD28(int mobyIndex) {
+int moby_is_linked_switched_on(int mobyIndex) {
     if (mobyIndex != -1) {
         if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
                                                   + ((unsigned int)mobyIndex << 8) + 0x68)
@@ -69,7 +69,7 @@ typedef struct {
     void *callback2;
 } L08SpawnBlock;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char D_L08_002A0D00[];
 extern char D_L08_0023EC80[];
 extern char D_L08_0023ECF0[];
@@ -79,23 +79,23 @@ extern int D_L08_001B01B8[2] __attribute__((sda));
 extern u16 D_L08_001B01C8[] SDATA(D_L08_001B01C8);
 extern int D_L08_001B01D8 __attribute__((sda));
 extern int D_L08_001B01DC __attribute__((sda));
-extern void func_L08_003CFFE8(void);
-extern void func_L00_002E6CF0(void);
-extern void func_L04_003A1A78(L08SpawnBlock *);
-extern void func_L04_003A5C08(void *, float);
-extern void func_L04_003A1C98(L08SpawnBlock *);
-extern void func_L04_003A1FA0(L08SpawnBlock *);
-extern void func_L04_003A1FE0(L08SpawnBlock *);
+extern void water_start_effect(void);
+extern void gfx_add_draw_callback_first(void);
+extern void water_init_object(L08SpawnBlock *);
+extern void water_add_splash_entry(void *, float);
+extern void water_update_controller(L08SpawnBlock *);
+extern void water_advance_controller_state(L08SpawnBlock *);
+extern void water_update_ripple_patches(L08SpawnBlock *);
 
 /* Runs the shared spawn routines for the object, unless the level's player (the entity at
    D_00189E20+0x1830, kind 0x45) is alive while the mode word at +0x2294 is 0x31. The count
    is the state's +0x10 plus an entry of D_L08_001B01B8 picked by +0x18 (1 when -1); state
    0 sets the object up first and then shares state 1's step, state 2 has its own. */
 /* Water object: runs the shared spawn routines that make the water splash and ripple effects. */
-void func_L08_003CFE68(char *owner)
+void water_update(char *owner)
 {
     L08SpawnBlock spawnBlock;
-    char *world = gHeroState;
+    char *world = g_hero_state;
     char *hero = *(char **)(world + 0x1830);
     char *vars;
     int spawnCount;
@@ -122,24 +122,24 @@ void func_L08_003CFE68(char *owner)
     spawnBlock.table2 = D_L08_0023ECF0;
     spawnBlock.table3 = D_L08_002A87F0;
     spawnBlock.owner = owner;
-    spawnBlock.callback = StartSharedWaterEffect;
-    spawnBlock.callback2 = AddDrawCallbackToList1;
+    spawnBlock.callback = water_start_effect;
+    spawnBlock.callback2 = gfx_add_draw_callback_first;
     switch (*(unsigned char *)(owner + 0x20)) {
     case 0:
-        InitWaterObject(&spawnBlock);
-        AddWaterSplashEntry(owner, *(float *)(vars + 0x28));
+        water_init_object(&spawnBlock);
+        water_add_splash_entry(owner, *(float *)(vars + 0x28));
     case 1:
-        UpdateWaterController(&spawnBlock);
+        water_update_controller(&spawnBlock);
         break;
     case 2:
-        AdvanceWaterControllerState(&spawnBlock);
+        water_advance_controller_state(&spawnBlock);
         break;
     }
-    UpdateWaterRipplePatches_L04(&spawnBlock);
+    water_update_ripple_patches(&spawnBlock);
 }
 
 /* Tells whether the linked object is switched on. */
-int func_L08_003D0098(int mobyIndex) {
+int seesaw_is_linked_switched_on(int mobyIndex) {
     if (mobyIndex != -1) {
         if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
                                                   + ((unsigned int)mobyIndex << 8) + 0x68)
@@ -155,7 +155,7 @@ int func_L08_003D0098(int mobyIndex) {
    ring's colour follows the frame counter, and its byte argument (the ring angle in RAC1)
    is the counter's low byte, doubled and/or inverted by the ring index. */
 /* Spawns sparks and draws four glowing rings around the object that pulse with the frame counter. */
-void func_L08_003D3EF8(char *moby)
+void SpawnParticlesAndDrawGlowRings(char *moby)
 {
     TI128 jointPos, sparkVelocity, velocityStep, ringPos, ringStep;
     int sparkIndex;
@@ -165,16 +165,16 @@ void func_L08_003D3EF8(char *moby)
     float reciprocal, half, size;
     int ringColor;
 
-    TransformMobyJointToWorld(moby, 0, &jointPos);
-    if (RandomIntBelow(4) == 0) {
-        RandomDirectionVector(&sparkVelocity, D_L08_001B0338 * 0.016666668f, D_L08_001B033C * 0.016666668f);
+    moby_transform_joint_to_world(moby, 0, &jointPos);
+    if (math_random_int_below(4) == 0) {
+        vec_random_direction(&sparkVelocity, D_L08_001B0338 * 0.016666668f, D_L08_001B033C * 0.016666668f);
         angleByte = D_L08_001B0348;
-        SpawnHeroRelativeParticle(&jointPos, &sparkVelocity, D_L08_001B034C, angleByte, RandomIntBelow(255), 0, D_L08_001B0354);
+        part_spawn_hero_relative(&jointPos, &sparkVelocity, D_L08_001B034C, angleByte, math_random_int_below(255), 0, D_L08_001B0354);
         for (sparkIndex = 2; sparkIndex >= 0; sparkIndex--) {
-            RandomDirectionVector(&velocityStep, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
+            vec_random_direction(&velocityStep, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
             FastVecAdd(&sparkVelocity, &sparkVelocity, &velocityStep);
             angleByte = D_L08_001B0348;
-            SpawnHeroRelativeParticle(&jointPos, &sparkVelocity, D_L08_001B0350, angleByte, RandomIntBelow(255), 0, D_L08_001B0358);
+            part_spawn_hero_relative(&jointPos, &sparkVelocity, D_L08_001B0350, angleByte, math_random_int_below(255), 0, D_L08_001B0358);
         }
     }
     FastVecSub(&ringPos, D_L08_001B9B00, &jointPos);
@@ -186,13 +186,13 @@ void func_L08_003D3EF8(char *moby)
     size = 3.0f;
     for (ringIndex = 0; ringIndex < 4; ringIndex++) {
         phase = IntToFloat(0xFF - ((D_L08_001B2508 + ringIndex * 20) & 0xFF));
-        ringColor = FastTweenColor(D_L08_001B035C, D_L08_001B0360, FloatAbs(half - phase * reciprocal));
+        ringColor = FastTweenColor(D_L08_001B035C, D_L08_001B0360, math_fabs(half - phase * reciprocal));
         angleByte = D_L08_001B2508 & 0xFF;
         if (ringIndex & 2)
             angleByte = angleByte * 2;
         if (ringIndex & 1)
             angleByte = 0xFF - angleByte;
-        SpawnFadingParticle_002C2FD8(&ringPos, ringColor, angleByte, D_L08_001B036C, D_L08_001B0368, 2, 0,
+        part_spawn_fading(&ringPos, ringColor, angleByte, D_L08_001B036C, D_L08_001B0368, 2, 0,
                       (IntToFloat(ringIndex) + size)
                           * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(&ringPos, &ringPos, &ringStep);

@@ -1,10 +1,10 @@
 #include "common.h"
 /* Adapted from RAC1 walloper_and_beam_effects.c (OpenRAC, GPL-3.0). */
-extern int func_0027C878(int);
-extern void func_00282CF0(void*,void*,void*), func_00282DD8(void*,void*,void*), func_00282CC0(void*,void*,void*);
-extern float func_00282DF0(void*);
-extern void func_00282D30(void*,void*,float), func_00280B90(void*,void*,int), func_002FC560(int,long);
-extern float D_001B5340[];
+extern int GetEffectTextureDescriptor(int);
+extern void FastVecSub(void*,void*,void*), FastVecCross(void*,void*,void*), FastVecAdd(void*,void*,void*);
+extern float FastVecLength(void*);
+extern void FastVecScale(void*,void*,float), draw_world_quad(void*,void*,int), VU1_addGSregister(int,long);
+extern float g_camera_eye_state[];
 extern int D_001AEE98 __attribute__((sda));
 extern int D_001AEE54 __attribute__((sda));
 extern int D_001AEE9C __attribute__((sda));
@@ -22,7 +22,7 @@ typedef struct {
 /* The EE ABI independently orders integer and floating-point arguments.
  * This interleaving preserves a0-a3 and f12-f14. */
 // Draws a ribbon of quads along a polyline, in two passes with edge colouring and a scrolled texture (colours from globals).
-void func_0030BBA0(void *points, int alphaA, int alphaB, float sx, float width, int count, float extend) {
+void DrawBeamAndArcTwoPassQuads(void *points, int alphaA, int alphaB, float sx, float width, int count, float extend) {
     RW_2BBDE8 coreQuad[4];
     RT_2BBDE8 corePacket;
     RW_2BBDE8 q2[4];
@@ -57,7 +57,7 @@ void func_0030BBA0(void *points, int alphaA, int alphaB, float sx, float width, 
     corePacket.f[5] = 0;
     corePacket.f[6] = 1.0f + D_001AEE4C;
     corePacket.f[7] = 1.0f;
-    FastVecSub(eyeRay, points, gCameraState_001B5340);
+    FastVecSub(eyeRay, points, g_camera_eye_state);
     FastVecSub(tangent, &((P_2BBDE8 *)points)[1], points);
     FastVecCross(normal, tangent, eyeRay);
     initialLength = FastVecLength(normal);
@@ -66,7 +66,7 @@ void func_0030BBA0(void *points, int alphaA, int alphaB, float sx, float width, 
     FastVecAdd(coreQuad[0], points, normal);
     FastVecSub(coreQuad[1], points, normal);
     for (i = 1; i < count - 1; i++) {
-        FastVecSub(eyeRay, &((P_2BBDE8 *)points)[i], gCameraState_001B5340);
+        FastVecSub(eyeRay, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
         FastVecSub(tangent, &((P_2BBDE8 *)points)[i + 1], &((P_2BBDE8 *)points)[i]);
         FastVecCross(normal, tangent, eyeRay);
         length = FastVecLength(normal);
@@ -89,8 +89,8 @@ void func_0030BBA0(void *points, int alphaA, int alphaB, float sx, float width, 
         qcopy(coreQuad[1], coreQuad[3]);
     }
     for (i = 0; i < count - 1; i++) {
-        FastVecSub(firstRay, &((P_2BBDE8 *)points)[i], gCameraState_001B5340);
-        FastVecSub(lastRay, &((P_2BBDE8 *)points)[i + 1], gCameraState_001B5340);
+        FastVecSub(firstRay, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
+        FastVecSub(lastRay, &((P_2BBDE8 *)points)[i + 1], g_camera_eye_state);
         firstLength = FastVecLength(firstRay);
         lastLength = FastVecLength(lastRay);
         if (lastLength < firstLength) {
@@ -100,13 +100,13 @@ void func_0030BBA0(void *points, int alphaA, int alphaB, float sx, float width, 
             if (firstLength == 0) qcopy(firstRay, lastRay);
             else FastVecScale(firstRay, firstRay, lastLength / firstLength);
         }
-        FastVecAdd(firstPoint, gCameraState_001B5340, firstRay);
-        FastVecAdd(lastPoint, gCameraState_001B5340, lastRay);
+        FastVecAdd(firstPoint, g_camera_eye_state, firstRay);
+        FastVecAdd(lastPoint, g_camera_eye_state, lastRay);
         FastVecSub(tangent, lastPoint, firstPoint);
         FastVecScale(extension, tangent, extend);
         FastVecSub(firstPoint, firstPoint, extension);
         FastVecAdd(lastPoint, lastPoint, extension);
-        FastVecSub(toEye, gCameraState_001B5340, firstPoint);
+        FastVecSub(toEye, g_camera_eye_state, firstPoint);
         FastVecCross(normal, toEye, tangent);
         haloLength = FastVecLength(normal);
         if (haloLength != 0) haloLength = 1.0f / haloLength;

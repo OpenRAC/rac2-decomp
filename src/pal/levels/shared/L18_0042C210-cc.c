@@ -1,27 +1,28 @@
+#include "names.h"
 /* func_PAL_L18_0042C210, the PAL copy of func_L18_00427688: the same C, where rename func_L18_00426F78 becomes func_PAL_L18_0042BAE0; rename func_L18_00426F28 becomes func_PAL_L18_0042BA90. */
 #include "common.h"
 typedef struct { float f0,f4,f8,fC,f10,f14,f18; } MotionDefaults;
 extern MotionDefaults D_L18_001B1218 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern unsigned char D_0019B2E8[];
 extern unsigned char D_L18_0021E7B0[][0x464];
-extern float func_002A7878(float,float);
-extern void func_002B60B0(unsigned char *,float,float,float,float);
-extern int func_002A7820(int,int);
-extern float func_L09_0033E7A0(int);
-extern int func_L18_00427130(unsigned char *,int,int);
+extern float math_random_float_range(float,float);
+extern void moby_set_controller_speed_limits(unsigned char *,float,float,float,float);
+extern int math_random_int_range(int,int);
+extern float path_get_entry_length(int);
+extern int moby_set_anim(unsigned char *,int,int);
 extern void func_PAL_L18_0042BAE0(unsigned char *);
-extern void func_L18_00427010(unsigned char *);
+extern void moby_release_shared_resource(unsigned char *);
 extern int func_001163B0(void);
 extern void func_PAL_L18_0042BA90(unsigned char *,int,int,float);
-extern void func_002A7750(unsigned char *,int,int);
+extern void moby_set_state(unsigned char *,int,int);
 int func_PAL_L18_0042C210(unsigned char *object)
 {
     unsigned char *state;
     float randomAngle;
     unsigned int ownerClass;
     if(object[0xb0]!=0xff) {
-        if((D_0019B2E8[object[0xb0]+D_001A79F0*16]&0x80)!=0) {
+        if((D_0019B2E8[object[0xb0]+g_current_map_index*16]&0x80)!=0) {
             if(D_L18_0021E7B0[1][*(short *)(object+0xb2)]!=0) return 1;
         }
     }
@@ -54,7 +55,7 @@ int func_PAL_L18_0042C210(unsigned char *object)
     *(float *)(state+0x108)=0.5f;
     *(float *)(state+0x10c)=0.5f;
     *(float *)(state+0x110)=1.22173059f;
-    randomAngle=func_002A7878(20.0f,25.0f);
+    randomAngle=math_random_float_range(20.0f,25.0f);
     { float speed=D_L18_001B1218.f18;
     *(float *)(state+0x134)=0.5f;
     state[0x1e8]=0; state[0x1e9]=0;
@@ -75,8 +76,8 @@ int func_PAL_L18_0042C210(unsigned char *object)
         *(float *)(state+0x3dc)=e;
         *(float *)(state+0x3d8)=f;
     }
-    func_002B60B0(object,*(float *)(state+0x3c4)*0.00040000002f,*(float *)(state+0x3c0)*0.020000001f,*(float *)(state+0x3d4)*6.981318e-06f,*(float *)(state+0x3d0)*0.0003490659f);
-    randomAngle=func_002A7878(20.0f,40.0f);
+    moby_set_controller_speed_limits(object,*(float *)(state+0x3c4)*0.00040000002f,*(float *)(state+0x3c0)*0.020000001f,*(float *)(state+0x3d4)*6.981318e-06f,*(float *)(state+0x3d0)*0.0003490659f);
+    randomAngle=math_random_float_range(20.0f,40.0f);
     *(short *)(state+0x1e4)=120; *(short *)(state+0x1e2)=180;
     *(float *)(state+0x1dc)=randomAngle*0.017453294f;
     {
@@ -88,17 +89,17 @@ int func_PAL_L18_0042C210(unsigned char *object)
     *(float *)(state+0x20c)=5.0f;
     *(float *)(state+0x210)=5.0f;
     *(int *)(state+0x37c)=*(int *)(state+0x360);
-    *(short *)(state+0x392)=func_002A7820(0,45);
-    func_L09_0033E7A0(*(int *)(state+0x368));
-    func_L09_0033E7A0(*(int *)(state+0x13c));
-    func_L09_0033E7A0(*(int *)(state+0xcc));
-    func_L09_0033E7A0(*(int *)(state+0x380));
-    func_L09_0033E7A0(*(int *)(state+0x384));
+    *(short *)(state+0x392)=math_random_int_range(0,45);
+    path_get_entry_length(*(int *)(state+0x368));
+    path_get_entry_length(*(int *)(state+0x13c));
+    path_get_entry_length(*(int *)(state+0xcc));
+    path_get_entry_length(*(int *)(state+0x380));
+    path_get_entry_length(*(int *)(state+0x384));
     *(int *)(state+0x13c)=*(int *)(state+0x380);
-    func_L18_00427130(object,*(int *)(state+0x36c),-1);
+    moby_set_anim(object,*(int *)(state+0x36c),-1);
     if(state[0x399]!=0) state[0x399]=1;
     func_PAL_L18_0042BAE0(object);
-    func_L18_00427010(object);
+    moby_release_shared_resource(object);
     switch(*(short *)(object+0xaa)) {
     case 0xec0: state[0x39b]=0; *(int *)(state+0x1c)=0; break;
     case 0xed4:
@@ -106,12 +107,12 @@ int func_PAL_L18_0042C210(unsigned char *object)
     }
     func_PAL_L18_0042BA90(object,func_001163B0()&1,0,1.0f);
     if(state[0x3e8]!=0) {
-        func_002A7750(object,0,1);
+        moby_set_state(object,0,1);
         *(int *)(object+0x48)=0;
     } else if(state[0x39c]!=0) {
         object[0x31]=0;
         *(unsigned short *)(object+0x34)|=1;
-        func_002A7750(object,0,2);
-    } else func_002A7750(object,2,2);
+        moby_set_state(object,0,2);
+    } else moby_set_state(object,2,2);
     return 0;
 }

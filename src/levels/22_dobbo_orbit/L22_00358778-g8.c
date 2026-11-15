@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -14,7 +15,7 @@ extern s32 D_L22_001AF314 __attribute__((sda));
 extern u8 D_L22_0018B694[];
 
 /* Tells whether a stored counter is below a limit read from the owner object. */
-s32 func_L22_003A6620(void) {
+s32 moby_is_counter_below_limit(void) {
     s32 owner = D_L22_001AF314;
     s32 limit = *(s32 *)D_L22_0018B694;
 

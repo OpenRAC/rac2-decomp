@@ -7,7 +7,7 @@ typedef struct {
     float uv[4][2];
     u64 primitive, texture, tag, blend;
 } SpritePacket;
-extern int D_001A79F0;
+extern int g_current_map_index;
 extern unsigned char D_L05_001B96C0[];
 extern float D_L05_002B8850[][4];
 extern float D_L05_002B88E0[][2];
@@ -21,24 +21,24 @@ extern int D_L05_001B1C8C SDATA(D_L05_001B1C8C);
 extern int D_L05_001B1C90 SDATA(D_L05_001B1C90);
 extern u32 D_L05_001B1C94 SDATA(D_L05_001B1C94);
 extern float D_L05_001B1C98 SDATA(D_L05_001B1C98);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00280B90(void *, void *, int);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws the object's four textured quads, each with four corners taken from the index table,
    in a basis facing the camera. */
 /* Draws the ship's aiming mark as four small sprites facing the camera. */
-void func_L05_00445D60(unsigned char *object)
+void ship_draw_aim_crosshair(unsigned char *object)
 {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     SpritePacket packet;
     float matrix[4][4];
     int i, j;
     u64 blend;
-    if (gCurrentMapIndex == 20)
+    if (g_current_map_index == 20)
         packet.texture = GetEffectTextureDescriptor(65);
     else
         packet.texture = GetEffectTextureDescriptor(63);

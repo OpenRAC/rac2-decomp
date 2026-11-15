@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,8 +27,8 @@
 #define NULL 0
 #endif
 
-extern void *func_002A9640(void *, s32, s32);
-extern void func_002A7750(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
+extern void moby_set_state(void *, s32, s32);
 extern s32 ref_L01_003D9830_02 __attribute__((sda));
 
 void func_PAL_L01_003DDD18(void *arg0) {
@@ -39,7 +40,7 @@ void func_PAL_L01_003DDD18(void *arg0) {
     void *temp_v0_3;
 
     temp_s1 = (*(void **)((s8 *)(arg0) + (0x68)));
-    temp_v0 = func_002A9640(arg0, 1, 0);
+    temp_v0 = part_find_owned_effect_slot(arg0, 1, 0);
     if ((temp_v0 != NULL) && (temp_v0_2 = (*(void **)((s8 *)(temp_v0) + (0x20))), (temp_v0_2 != NULL))) {
         temp_v1 = (*(s16 *)((s8 *)(temp_v0_2) + (0xAA)));
         if ((temp_v1 == 0xB24) || (temp_v1 == 0xA54)) {
@@ -48,7 +49,7 @@ void func_PAL_L01_003DDD18(void *arg0) {
                 temp_v1_2 = (*(u8 *)((s8 *)(temp_v0_3) + (0x20)));
                 if ((temp_v1_2 != 1) && (temp_v1_2 != 4) && (temp_v1_2 != 5)) {
                     (*(s32 *)((s8 *)(temp_s1) + (0xC4))) = (((s32)(ref_L01_003D9830_02) * 5 + 2) / 6);
-                    func_002A7750(arg0, 2, -1);
+                    moby_set_state(arg0, 2, -1);
                 }
             }
         }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef float f32;
@@ -15,28 +16,28 @@ extern int D_L22_001AFF18_gp[] __asm__("D_L22_001AFF18__gp") __attribute__((sect
 extern float D_L22_001AFF20[] __attribute__((sda));
 extern float D_L22_001A7CD8[] __attribute__((sda));
 extern unsigned int D_001A7390[] __attribute__((sda));
-extern int D_001A79F0[] __attribute__((sda));
+extern int g_current_map_index[] __attribute__((sda));
 
 /* The per-subtitle history src/game/00289178.c updates (12-byte rows). */
 typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
-extern SubtitleHistory D_0018C958[];
+extern SubtitleHistory g_subtitle_history[];
 
-extern void func_002A7750(void *, int, int);
-extern f32 func_002A7878(f32 low, f32 high);
-extern int func_002E5CF8(int index, int a1, char *a2);
-extern void func_00288E18(int, int);
-extern f32 func_00282DB0(void *, void *);
+extern void moby_set_state(void *, int, int);
+extern f32 math_random_float_range(f32 low, f32 high);
+extern int PlayMobySound(int index, int a1, char *a2);
+extern void subtitle_request_voice_line(int, int);
+extern f32 FastVecDot(void *, void *);
 extern void func_PAL_L22_003CD898(char *);
-extern void func_L22_003C9D48(u8 *);
-extern void func_L00_002E6CF0(void (*)(u8 *), void *);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283198(f32);
-extern int func_00283D38(int, int, f32);
-extern u8 D_00189E20[];
-extern f32 func_00282E48(void *a0, void *a1);
+extern void spark_lane_draw(u8 *);
+extern void gfx_add_draw_callback_first(void (*)(u8 *), void *);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern int FastTweenColor(int, int, f32);
+extern u8 g_hero_state[];
+extern f32 fast_vec_dist(void *a0, void *a1);
 
 void func_PAL_L22_003CD550(u8 *obj)
 {
@@ -46,7 +47,7 @@ void func_PAL_L22_003CD550(u8 *obj)
 
     switch (state) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         *(short *)(obj + 0x32) = 255;
         {
             float *offset, *rate, *radius;
@@ -56,8 +57,8 @@ void func_PAL_L22_003CD550(u8 *obj)
             offset = (float *)(ctl + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
-                *rate++ = func_002A7878(D_L22_001AFF08[0], D_L22_001AFF08[1]) * 0.020000001f;
-                *radius++ = func_002A7878(D_L22_001AFF10[0], D_L22_001AFF10[1]);
+                *rate++ = math_random_float_range(D_L22_001AFF08[0], D_L22_001AFF08[1]) * 0.020000001f;
+                *radius++ = math_random_float_range(D_L22_001AFF10[0], D_L22_001AFF10[1]);
             }
         }
         break;
@@ -65,18 +66,18 @@ void func_PAL_L22_003CD550(u8 *obj)
         u8 *player;
         SubtitleHistory *history;
 
-        if (func_00282E48(D_00189E20 + 0x80, obj + 0x10) < 3.0f)
+        if (fast_vec_dist(g_hero_state + 0x80, obj + 0x10) < 3.0f)
             D_L22_001A7CD8[0] = *(float *)ctl;
-        player = D_00189E20;
+        player = g_hero_state;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
-            func_002E5CF8(0, 0, (char *)obj);
-        history = D_0018C958;
+            PlayMobySound(0, 0, (char *)obj);
+        history = g_subtitle_history;
         {
             /* unsigned int snapshot: retail tests the u16 with an andi and
              * increments the unmasked value */
             unsigned int count = history[31].count;
             if ((unsigned short)count <= 65534) {
-                u8 *player2 = D_00189E20;
+                u8 *player2 = g_hero_state;
                 if (*(int *)(player2 + 0x2294) == 0x81)
                     history[31].count = 65535;
                 else if (*(u8 **)(player2 + 0x33C) == obj) {
@@ -84,7 +85,7 @@ void func_PAL_L22_003CD550(u8 *obj)
                      * reads into the branch's delay slot */
                     if ((unsigned short)count != 0) {
                         if (((s32)D_001A7390[0] * 5 + 2) / 6 - history[31].time > 900 || history[31].time == 0)
-                            func_00288E18(2504, 31);
+                            subtitle_request_voice_line(2504, 31);
                         else if (history[31].time < ((s32)D_001A7390[0] * 5 + 2) / 6)
                             history[31].time = ((s32)D_001A7390[0] * 5 + 2) / 6;
                     } else {
@@ -92,26 +93,26 @@ void func_PAL_L22_003CD550(u8 *obj)
                         if (history[31].time < ((s32)D_001A7390[0] * 5 + 2) / 6)
                             history[31].time = ((s32)D_001A7390[0] * 5 + 2) / 6;
                         history[31].levels =
-                            (history[31].levels | (1 << D_001A79F0[0])) | 0x80000000;
+                            (history[31].levels | (1 << g_current_map_index[0])) | 0x80000000;
                     }
                 }
             }
         }
-        if (func_00282DB0(obj + 0xE0, D_00189E20 + 0x2C0) < -0.6f) {
+        if (FastVecDot(obj + 0xE0, g_hero_state + 0x2C0) < -0.6f) {
             func_PAL_L22_003CD898((char *)obj);
-            func_L00_002E6CF0(func_L22_003C9D48, obj);
+            gfx_add_draw_callback_first(spark_lane_draw, obj);
         }
         break;
     }
     }
     if (obj[0x31]) {
         float f;
-        *(float *)(ctl + 4) = func_00283B98(*(float *)(ctl + 4),
+        *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
                                             D_L22_001AFF20[0] * 0.0003490659f);
-        f = func_00283198(*(float *)(ctl + 4));
+        f = math_fast_sin_or_cos_b(*(float *)(ctl + 4));
         f = f * f;
         f = f * f;
-        *(int *)(obj + 0x78) = func_00283D38(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
+        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
     }
 }
 

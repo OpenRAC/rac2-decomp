@@ -32,15 +32,15 @@ typedef struct {
 extern int D_0018C0B4 __attribute__((nosda));
 extern int D_L00_001A8FF0 MACRO_ADDR;
 extern short D_L00_001AF770 __attribute__((sda));
-extern char *func_L00_0032A088(int, int);
-extern int *func_L00_0032A0B8(int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern char *level_get_slot_body(int, int);
+extern int *level_get_slot_header(int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Stores a new position sample for a trail in the slot that belongs to its source. */
-void func_L00_003A8E28(Actor *self)
+void trail_store_sample(Actor *self)
 {
     Slot *slots;
     Source *source;
@@ -49,13 +49,13 @@ void func_L00_003A8E28(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = GetSlotBody(0x5CB, source->id);
-    slots = (Slot *)(base + *GetSlotHeader(0x5CB, source->id));
+    base = level_get_slot_body(0x5CB, source->id);
+    slots = (Slot *)(base + *level_get_slot_header(0x5CB, source->id));
     vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) ComputeViewDirection(&self->pos, &dir, 1);
+    if (D_L00_001A8FF0) cam_compute_view_direction(&self->pos, &dir, 1);
     FastVecCross(&tmp, &m, &dir);
     vec_scale_to_length(&tmp, &tmp, 1.0f);
     FastVecCross(&slots[source->index].d, &tmp, &m);
@@ -79,30 +79,30 @@ typedef struct { unsigned char pad[0x23]; unsigned char index; } EffectSelector;
 typedef struct { unsigned int tag; unsigned char enabled; unsigned char tail[0xDB]; } EffectMaterial;
 typedef struct { int v[6]; } EffectSix;
 
-extern EffectContext D_00189E20 __attribute__((nosda));
-extern EffectSelector D_00139568 __attribute__((nosda));
-extern EffectMaterial D_L00_00262570[] __attribute__((nosda));
-extern char D_L00_001C3280[] __attribute__((nosda));
-extern char D_L00_001B8DC0[] __attribute__((nosda));
+extern EffectContext g_hero_state __attribute__((nosda));
+extern EffectSelector g_item_slot_to_record __attribute__((nosda));
+extern EffectMaterial g_weapon_l00_table[] __attribute__((nosda));
+extern char g_area_hit_targets[] __attribute__((nosda));
+extern char g_camera_l00_position[] __attribute__((nosda));
 extern EffectSix D_L00_001AF858 __attribute__((nosda));
 extern EffectSix D_L00_001AF870 __attribute__((nosda));
 
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern int func_00283CF0(float);
-extern int func_00277F48(void *, int, int, int, float);
-extern void func_002A9850(int, void *, void *, int, int, int, int, int, float, float, float);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern int func_002AAFA0(unsigned int, int);
-extern void func_002AAF40(int *, int *, int *, int);
-extern char *func_002BBCB0(void *, void *, int, int, float, int, int, float, int, int);
-extern char *func_L00_003A0DA0(int, void *, void *, int, unsigned char, unsigned char,
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern int FloatToInt(float);
+extern int coll_process_hit(void *, int, int, int, float);
+extern void moby_queue_knockback_for_nodes(int, void *, void *, int, int, int, int, int, float, float, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern int gfx_swap_packed_color_channels(unsigned int, int);
+extern void swap_color_channel_words(int *, int *, int *, int);
+extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, float, int, int);
+extern char *part_create_explosion(int, void *, void *, int, unsigned char, unsigned char,
                                unsigned char, unsigned char, float);
 
 /* Makes a burst of sparks and glows where a group of trail points is used up. */
-void func_L00_003B14D0(float x, float y, float z)
+void trail_spawn_group_burst(float x, float y, float z)
 {
     Vec16_Fc936841d p, v;
     Vec16_Fc936841d delta;
@@ -117,12 +117,12 @@ void func_L00_003B14D0(float x, float y, float z)
     p.x = x;
     p.y = y;
     p.z = z;
-    n = ProcessCollisionHit(&p, 16, gHeroState.owner, 0, 3.0f);
+    n = coll_process_hit(&p, 16, g_hero_state.owner, 0, 3.0f);
     one = 1.0f;
-    QueueKnockbackForNodes(gHeroState.owner, &p, gAreaHitTargets, n, 0, 0x830000, 2, 1, 8.0f, one, one);
+    moby_queue_knockback_for_nodes(g_hero_state.owner, &p, g_area_hit_targets, n, 0, 0x830000, 2, 1, 8.0f, one, one);
     *(EffectQuad *)&v = 0;
     v.z = 1.0f / 30.0f;
-    FastVecSub(&delta, gCameraPosition_L00, &p);
+    FastVecSub(&delta, g_camera_l00_position, &p);
     distance = FastVecLength(&delta);
     n = distance < 6.0f ? FloatToInt(distance) + 1 : 4;
     fade = 0.0f;
@@ -131,44 +131,44 @@ void func_L00_003B14D0(float x, float y, float z)
     {
         int count;
         for (count = 0; count < n; count++) {
-            speed = RandomFloatRange(8.0f, 10.0f) * (1.0f / 60.0f);
+            speed = math_random_float_range(8.0f, 10.0f) * (1.0f / 60.0f);
             speed -= fade * (1.0f / 60.0f);
             a = D_L00_001AF858;
             b = D_L00_001AF870;
             {
-                int choice = RandomIntBelow(6);
-                EffectMaterial *entry = gWeaponTable_L00 + gItemSlotToRecord.index;
-                ca = SwapPackedColorChannels(a.v[choice], entry->enabled != 0);
-                choice = RandomIntBelow(6);
-                entry = gWeaponTable_L00 + gItemSlotToRecord.index;
-                cb = SwapPackedColorChannels(b.v[choice], entry->enabled != 0);
+                int choice = math_random_int_below(6);
+                EffectMaterial *entry = g_weapon_l00_table + g_item_slot_to_record.index;
+                ca = gfx_swap_packed_color_channels(a.v[choice], entry->enabled != 0);
+                choice = math_random_int_below(6);
+                entry = g_weapon_l00_table + g_item_slot_to_record.index;
+                cb = gfx_swap_packed_color_channels(b.v[choice], entry->enabled != 0);
             }
-            t0 = RandomIntRange(15, 20);
-            t1 = RandomIntRange(25, 30);
-            SpawnFireworkSparkParticle(&p, &v, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
+            t0 = math_random_int_range(15, 20);
+            t1 = math_random_int_range(25, 30);
+            part_spawn_firework_spark(&p, &v, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
         }
     }
     if (distance > 9.0f) {
-        CreateExplosionEffect(gHeroState.owner, &p, &v, 15, 127, 127, 127, 32, one * 4.0f);
+        part_create_explosion(g_hero_state.owner, &p, &v, 15, 127, 127, 127, 32, one * 4.0f);
         r = 127;
         g = 32;
         blue = 0;
-        swap_color_channel_words(&r, &g, &blue, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
-        CreateExplosionEffect(gHeroState.owner, &p, &v, 24, r, g, blue, 32, one * 4.0f);
+        swap_color_channel_words(&r, &g, &blue, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
+        part_create_explosion(g_hero_state.owner, &p, &v, 24, r, g, blue, 32, one * 4.0f);
     }
     c0 = 127;
     c1 = 63;
     c2 = 0;
-    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
-    CreateExplosionEffect(gHeroState.owner, &p, &v, 20, c0, c1, c2, 48, one * 4.0f);
+    swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
+    part_create_explosion(g_hero_state.owner, &p, &v, 20, c0, c1, c2, 48, one * 4.0f);
     c0 = 96;
     c1 = 16;
     c2 = 0;
-    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
-    CreateExplosionEffect(gHeroState.owner, &p, &v, 27, c0, c1, c2, 64, one * 3.5f);
+    swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
+    part_create_explosion(g_hero_state.owner, &p, &v, 27, c0, c1, c2, 64, one * 3.5f);
     c0 = 32;
     c1 = 0;
     c2 = 0;
-    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
-    CreateExplosionEffect(gHeroState.owner, &p, &v, 29, c0, c1, c2, 32, one * 3.0f);
+    swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
+    part_create_explosion(g_hero_state.owner, &p, &v, 29, c0, c1, c2, 32, one * 3.0f);
 }

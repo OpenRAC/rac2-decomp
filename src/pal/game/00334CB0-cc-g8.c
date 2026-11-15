@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_00334CB0, the PAL copy of func_00333048: the same C, where rename func_002BDBC0 becomes func_PAL_002BE880; rename func_002C7E28 becomes func_PAL_002C8BD0; rename func_0032C700 becomes func_PAL_0032DF28. */
 /* func_PAL_00334CB0: an explosion's sparks, pushed particles, ring effect and area hit.
  * In the hit loop the packet's vector is normalized before func_002A8C00 fills it, as
@@ -6,7 +7,7 @@
  * normalize result is dead. Its own -G8 unit (default -O2 -G8 -ffunction-sections).
  */
 #include "common.h"
-extern void func_00282F20(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
 typedef int TI128_333048 __attribute__((mode(TI)));
 
 typedef struct {
@@ -29,38 +30,38 @@ typedef struct {
     char pad24[0xC];
 } HitInfo333048;
 
-extern unsigned char D_00139568[];
-extern ClassRecord333048 D_00239BA0[];
-extern char D_001B5200[];
+extern unsigned char g_item_slot_to_record[];
+extern ClassRecord333048 g_weapon_table[];
+extern char g_active_camera[];
 extern short D_001B1CF0[] __attribute__((sda));
 extern int D_001AD7EC;
 extern char *D_001BF000[];
 extern float D_001B0C30 __attribute__((sda));
 extern float D_001B0C34 __attribute__((sda));
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern int func_002A7820(int, int);
-extern float func_002A78D8(float, float);
-extern void func_002AF000(void *, float, float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern int math_random_int_range(int, int);
+extern float math_random_signed_float_range(float, float);
+extern void vec_build_spherical_offset(void *, float, float, float);
 extern void func_PAL_002BE880(void *, void *, int, int, int, float);
-extern float func_00283248(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float mat_fast_helper_a(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *func_PAL_002C8BD0(void *, void *, int);
-extern void func_002ACAD0(void *, short *);
+extern void RemoveMobyFromIndexList(void *, short *);
 extern void *func_PAL_0032DF28(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
-extern int func_00277F48(void *, int, void *, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
-extern void func_0029F338(void *);
+extern int coll_process_hit(void *, int, void *, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
+extern void moby_mark_spawned(void *);
 
 /* The class slot table: D_00139568 maps a slot to its class record. */
 static inline int func_00333048_kind(int index)
 {
-    ClassRecord333048 *record = &D_00239BA0[D_00139568[index]];
+    ClassRecord333048 *record = &g_weapon_table[g_item_slot_to_record[index]];
     return record->model != 0 && record->kind == 3;
 }
 
@@ -82,37 +83,37 @@ void func_PAL_00334CB0(char *object)
     int count;
     char *camera;
 
-    func_002E5CF8(3, 0, (int *)object);
+    PlayMobySound(3, 0, (int *)object);
     for (i = 0; i < 30; i++) {
-        distance = func_002A7878(0.0f, 0.37f);
-        yaw = func_002A7940();
-        func_002AF000(spark, distance, yaw, func_002A7940());
-        spark[2] += func_002A7878(0.35f, 0.6f);
-        func_00282CC0(spark, spark, object + 0x10);
-        distance = func_002A7878(0.002f, 0.020000001f);
-        yaw = func_002A7940();
-        func_002AF000(direction, distance, yaw, func_002A7940());
-        func_PAL_002BE880(spark, direction, 0x4F20507F, 0x102F, func_002A7820(25, 47), 150000.0f);
+        distance = math_random_float_range(0.0f, 0.37f);
+        yaw = math_random_angle();
+        vec_build_spherical_offset(spark, distance, yaw, math_random_angle());
+        spark[2] += math_random_float_range(0.35f, 0.6f);
+        FastVecAdd(spark, spark, object + 0x10);
+        distance = math_random_float_range(0.002f, 0.020000001f);
+        yaw = math_random_angle();
+        vec_build_spherical_offset(direction, distance, yaw, math_random_angle());
+        func_PAL_002BE880(spark, direction, 0x4F20507F, 0x102F, math_random_int_range(25, 47), 150000.0f);
     }
-    camera = D_001B5200;
+    camera = g_active_camera;
     for (j = 0; j < 50; j++) {
-        angle = func_00283248(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
+        angle = mat_fast_helper_a(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
                               *(float *)(camera + 0x144) - *(float *)(object + 0x14));
-        func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        direction[0] = *(float *)(object + 0x10) + func_002A78D8(0.0f, 0.15f);
-        direction[1] = *(float *)(object + 0x14) + func_002A78D8(0.0f, 0.15f);
-        direction[2] = *(float *)(object + 0x18) + func_002A78D8(0.0f, 0.15f);
+        FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        direction[0] = *(float *)(object + 0x10) + math_random_signed_float_range(0.0f, 0.15f);
+        direction[1] = *(float *)(object + 0x14) + math_random_signed_float_range(0.0f, 0.15f);
+        direction[2] = *(float *)(object + 0x18) + math_random_signed_float_range(0.0f, 0.15f);
         distance = D_001B0C30;
-        angle = func_00283B98(angle, func_002A78D8(0.0f, -1.5707965f));
-        spark[0] = func_00283180(angle) * 0.020000001f * distance;
-        spark[1] = func_00283198(angle) * 0.020000001f * distance;
+        angle = FastAddRotations(angle, math_random_signed_float_range(0.0f, -1.5707965f));
+        spark[0] = math_fast_sin_or_cos_a(angle) * 0.020000001f * distance;
+        spark[1] = math_fast_sin_or_cos_b(angle) * 0.020000001f * distance;
         distance = D_001B0C34;
         spark[2] = distance * 0.020000001f;
         func_PAL_002C8BD0(direction, spark, 0x10b);
     }
-    func_002ACAD0(object, D_001B1CF0);
+    RemoveMobyFromIndexList(object, D_001B1CF0);
     func_PAL_0032DF28(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
-    count = func_00277F48(object + 0x10, 0, object, 0, 3.0f);
+    count = coll_process_hit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
         char **list = D_001BF000;
         k = count;
@@ -121,23 +122,23 @@ void func_PAL_00334CB0(char *object)
             if (*(short *)(*(char **)(moby + 0x24) + 0x46) == 5
                 || (*(unsigned short *)(moby + 0x34) & 0x4000)) {
                 float radius;
-                func_00282CF0(direction, moby + 0x10, object + 0x10);
-                func_00282F20(direction, direction, 1.0f);
-                func_00282F20(hit.vector, hit.vector, 1.0f);
+                FastVecSub(direction, moby + 0x10, object + 0x10);
+                vec_scale_to_length(direction, direction, 1.0f);
+                vec_scale_to_length(hit.vector, hit.vector, 1.0f);
                 radius = 10.0f;
                 if (func_00333048_kind(0x10))
                     radius = 55.0f;
-                func_002A8C00(hit.vector, object, 0x810000, direction, radius);
+                make_hit_descriptor(hit.vector, object, 0x810000, direction, radius);
                 *(TI128_333048 *)hit.vector = *(TI128_333048 *)direction;
                 hit.vector[3] = 5627.9248f;
                 hit.source = 3;
                 hit.flag = 1;
                 hit.type = 5;
                 hit.oclass = *(short *)(moby + 0xAA);
-                func_002A8E20(moby, &hit);
+                QueueMobyImpact(moby, &hit);
             }
             list++;
         } while (--k);
     }
-    func_0029F338(object);
+    moby_mark_spawned(object);
 }

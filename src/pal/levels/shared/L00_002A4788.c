@@ -43,7 +43,7 @@ typedef struct {
     char padA0[0x10];
 } Record;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_001A79F0_1[] __attribute__((sda));
 extern int D_001A7398[] __attribute__((sda));
 extern int D_001A7A00[] __attribute__((sda));
@@ -56,17 +56,17 @@ extern Quad D_L00_001B1B10[] __attribute__((sda));
 extern char D_00152C70[];
 extern Record D_L00_0025BE10[];
 
-extern void func_00282A60(void *, int, int);
-extern void func_002833F0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282C88(void *);
-extern void func_L00_002B4900(void);
-extern void func_L00_002A9460(void);
-extern void func_L00_002D23C0(int, int);
+extern void mem_clear(void *, int, int);
+extern void euler_rotation_basis(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void vec_clear_128(void *);
+extern void hero_l00_update_ground_contact(void);
+extern void update_hero_moby(void);
+extern void anim_start_object_at_frame(int, int);
 extern void func_PAL_L00_002D6408(void);
-extern int func_002A7820(int, int);
+extern int math_random_int_range(int, int);
 
 
 void func_PAL_L00_002A4788(void)
@@ -77,65 +77,65 @@ void func_PAL_L00_002A4788(void)
     int i;
 
     for (i = 0; i < 7; i++)
-        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
-    func_00282A60(D_00189E20, 0, 0x2540);
+        saved[i] = ((HeroState *)g_hero_state)->i[0x1248 / 4 + i * 0x14];
+    mem_clear(g_hero_state, 0, 0x2540);
     for (i = 0; i < 7; i++)
-        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
+        saved[i] = ((HeroState *)g_hero_state)->i[0x1248 / 4 + i * 0x14];
 
     for (i = 0; &D_L00_001B1E9C[0][i] < D_L00_001B1EA0[0]; i++) {
         actor = &D_L00_001B1E9C[0][i];
         if (actor->oclass == 0) {
-            (((HeroState *)D_00189E20)->m[0x2290 / 4]) = actor;
-            func_002833F0(&actor->basis, &actor->axis);
-            func_00282F20(&far, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, -3.0f);
-            func_00282F20(&near, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, 1.0f);
-            func_00282CC0(&near, &near, &((HeroState *)D_00189E20)->q[8]);
-            func_00282CC0(&far, &far, &((HeroState *)D_00189E20)->q[8]);
-            if (func_002761F8(&near, &far, 2, (((HeroState *)D_00189E20)->m[0x2290 / 4]), 0) != 0)
-                qcopy(&((HeroState *)D_00189E20)->q[8], &D_L00_001BF220);
-            (((HeroState *)D_00189E20)->m[0x2290 / 4])->flags |= 2;
-            ((HeroState *)D_00189E20)->m[0xC18 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4]);
-            ((HeroState *)D_00189E20)->f[0x98 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4])->axis.f[2];
-            qcopy(&((HeroState *)D_00189E20)->q[8], &(((HeroState *)D_00189E20)->m[0x2290 / 4])->pos);
-            func_L00_002B4900();
-            func_L00_002A9460();
-            func_L00_002D23C0(0, 0);
-            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)D_00189E20)->q[8]);
-            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)D_00189E20)->q[9]);
+            (((HeroState *)g_hero_state)->m[0x2290 / 4]) = actor;
+            euler_rotation_basis(&actor->basis, &actor->axis);
+            vec_scale_to_length(&far, &(((HeroState *)g_hero_state)->m[0x2290 / 4])->fwd, -3.0f);
+            vec_scale_to_length(&near, &(((HeroState *)g_hero_state)->m[0x2290 / 4])->fwd, 1.0f);
+            FastVecAdd(&near, &near, &((HeroState *)g_hero_state)->q[8]);
+            FastVecAdd(&far, &far, &((HeroState *)g_hero_state)->q[8]);
+            if (CollLine(&near, &far, 2, (((HeroState *)g_hero_state)->m[0x2290 / 4]), 0) != 0)
+                qcopy(&((HeroState *)g_hero_state)->q[8], &D_L00_001BF220);
+            (((HeroState *)g_hero_state)->m[0x2290 / 4])->flags |= 2;
+            ((HeroState *)g_hero_state)->m[0xC18 / 4] = (((HeroState *)g_hero_state)->m[0x2290 / 4]);
+            ((HeroState *)g_hero_state)->f[0x98 / 4] = (((HeroState *)g_hero_state)->m[0x2290 / 4])->axis.f[2];
+            qcopy(&((HeroState *)g_hero_state)->q[8], &(((HeroState *)g_hero_state)->m[0x2290 / 4])->pos);
+            hero_l00_update_ground_contact();
+            update_hero_moby();
+            anim_start_object_at_frame(0, 0);
+            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)g_hero_state)->q[8]);
+            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)g_hero_state)->q[9]);
             break;
         }
     }
     if (D_001A79F0_1[0] == 1 || D_001A79F0_1[0] == 8)
-        (((HeroState *)D_00189E20)->m[0x2290 / 4])->b7E |= 1;
-    (((HeroState *)D_00189E20)->m[0x2290 / 4])->b62 = 0xFF;
+        (((HeroState *)g_hero_state)->m[0x2290 / 4])->b7E |= 1;
+    (((HeroState *)g_hero_state)->m[0x2290 / 4])->b62 = 0xFF;
     if (D_001A7398[0] == 0)
         D_001A7398[0] = 30;
 
     for (i = 0; i < 40; i++) {
         D_L00_0025BE10[i].attached = 0;
-        func_00282C88(&D_L00_0025BE10[i].rot_target);
-        func_00282C88(&D_L00_0025BE10[i].rot);
-        func_00282C88(&D_L00_0025BE10[i].rot_vel);
-        func_00282C88(&D_L00_0025BE10[i].pos_target);
-        func_00282C88(&D_L00_0025BE10[i].pos);
-        func_00282C88(&D_L00_0025BE10[i].pos_vel);
+        vec_clear_128(&D_L00_0025BE10[i].rot_target);
+        vec_clear_128(&D_L00_0025BE10[i].rot);
+        vec_clear_128(&D_L00_0025BE10[i].rot_vel);
+        vec_clear_128(&D_L00_0025BE10[i].pos_target);
+        vec_clear_128(&D_L00_0025BE10[i].pos);
+        vec_clear_128(&D_L00_0025BE10[i].pos_vel);
     }
     for (i = 0; i < 9; i++)
-        ((HeroState *)D_00189E20)->i[0x242C / 4 + i] = -1;
-    ((HeroState *)D_00189E20)->f[0x24A4 / 4] = 2.125f;
-    ((HeroState *)D_00189E20)->f[0x24A8 / 4] = 1.25f;
+        ((HeroState *)g_hero_state)->i[0x242C / 4 + i] = -1;
+    ((HeroState *)g_hero_state)->f[0x24A4 / 4] = 2.125f;
+    ((HeroState *)g_hero_state)->f[0x24A8 / 4] = 1.25f;
     if (D_001A7A00[0] == 0)
         func_PAL_L00_002D6408();
-    ((HeroState *)D_00189E20)->i[0x24D0 / 4] = 4;
-    ((HeroState *)D_00189E20)->i[0x24CC / 4] = D_001A7A00[0];
-    ((HeroState *)D_00189E20)->h[0x24D4 / 2] = ((HeroState *)D_00189E20)->h[0x24CC / 2];
-    ((HeroState *)D_00189E20)->i[0x11A0 / 4] = func_002A7820(150, 250);
-    ((HeroState *)D_00189E20)->f[0x11A4 / 4] = 0.007f;
-    ((HeroState *)D_00189E20)->f[0x11A8 / 4] = 0.3f;
-    ((HeroState *)D_00189E20)->f[0xEB0 / 4] = 0.97f;
+    ((HeroState *)g_hero_state)->i[0x24D0 / 4] = 4;
+    ((HeroState *)g_hero_state)->i[0x24CC / 4] = D_001A7A00[0];
+    ((HeroState *)g_hero_state)->h[0x24D4 / 2] = ((HeroState *)g_hero_state)->h[0x24CC / 2];
+    ((HeroState *)g_hero_state)->i[0x11A0 / 4] = math_random_int_range(150, 250);
+    ((HeroState *)g_hero_state)->f[0x11A4 / 4] = 0.007f;
+    ((HeroState *)g_hero_state)->f[0x11A8 / 4] = 0.3f;
+    ((HeroState *)g_hero_state)->f[0xEB0 / 4] = 0.97f;
     if (D_L00_001A8FF0[0] != 0)
-        qcopy(&((HeroState *)D_00189E20)->q[0xB0 / 16], D_L00_001B1B10);
-    ((HeroState *)D_00189E20)->i[0x18D4 / 4] = 0;
+        qcopy(&((HeroState *)g_hero_state)->q[0xB0 / 16], D_L00_001B1B10);
+    ((HeroState *)g_hero_state)->i[0x18D4 / 4] = 0;
     if (D_001A7AFA[0] == 0)
-        ((HeroState *)D_00189E20)->h[0x24FC / 2] = 1;
+        ((HeroState *)g_hero_state)->h[0x24FC / 2] = 1;
 }

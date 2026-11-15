@@ -5,7 +5,7 @@ extern int D_L05_001A9CD8;
 extern void func_0029BCC8(void);
 
 /* Returns the saved value and then calls a shared helper. */
-int func_L05_003251A0(void) {
+int level_get_saved_value_and_release(void) {
     int value = D_L05_001A9CD8;
     func_0029BCC8();
     return value;
@@ -14,9 +14,9 @@ int func_L05_003251A0(void) {
 extern int D_L05_001A9D48[1] __attribute__((sda));
 
 /* Replaces the shared step with its table entry, leaving a negative step alone. */
-int func_L05_00324DB8(void)
+int level_lookup_step_table(void)
 {
-    int step = GetSavedValueAndRelease();
+    int step = level_get_saved_value_and_release();
 
     if (step >= 0)
         step = D_L05_001A9D48[step];
@@ -26,7 +26,7 @@ int func_L05_00324DB8(void)
 extern int D_L05_001A9CD0;
 
 /* Stores the given value plus one in a shared counter. */
-void func_L05_003263F8(int value) {
+void level_set_counter_plus_one(int value) {
     D_L05_001A9CD0 = value + 1;
 }
 
@@ -37,7 +37,7 @@ extern int D_L05_00225ED0[];
 extern int D_L05_00225F50[];
 
 /* Adds an object and its callback to the end of the live object list. */
-void func_L05_00379E60(int object, int data, int callback, int extra) {
+void level_append_object(int object, int data, int callback, int extra) {
     int count = D_L05_001AC4D8;
     D_L05_00225DD0[count] = object;
     D_L05_00225E50[count] = data;
@@ -53,7 +53,7 @@ extern int D_L05_001AC4D8 __attribute__((sda));
 extern int D_L05_00225DD0[];
 
 /* Returns the first live object with the given class id, or 0. */
-int func_L05_00379ED0(int classId) {
+int level_find_object_by_class_id(int classId) {
     int i;
 
     for (i = 0; i < D_L05_001AC4D8; i++) {

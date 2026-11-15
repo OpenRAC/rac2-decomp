@@ -3,8 +3,8 @@
 /* func_L20_0039D680 lives in a -G8 unit of its own: it reads D_L20_001B2FB8 through $gp,
    while func_L20_0039E890 in L20_0039C448-g8.c reads the same word absolutely. */
 
-extern float func_00282E80(void *, void *);
-extern char D_00189EA0[];
+extern float vec_distance_xy(void *, void *);
+extern char g_hero_position[];
 extern char *D_L20_001FBB20[];
 extern char *D_L20_001B2F9C;
 /* 0x1AEFF0 + 0x3FC8: read through $gp. */
@@ -16,9 +16,9 @@ extern int D_L20_001B2FB8 __attribute__((sda));
    the group-iteration form of func_00325DA0: its size keeps jump from duplicating the
    exit test, so the test stays at the bottom, entered by a branch, as in retail. */
 /* Checks how many trooper friends are closer to the player than this one and records whether it is among the closest two. */
-void func_L20_0039D680(unsigned char *object) {
+void trooper_count_closer_mates(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
-    float limit = vec_distance_xy(object + 0x10, gHeroPosition);
+    float limit = vec_distance_xy(object + 0x10, g_hero_position);
     unsigned short *p;
     unsigned char *e;
     int count = 0;
@@ -30,7 +30,7 @@ void func_L20_0039D680(unsigned char *object) {
         e = (unsigned char *)D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (e != object && e[0x20] != 6 && vec_distance_xy(e + 0x10, gHeroPosition) < limit)
+        if (e != object && e[0x20] != 6 && vec_distance_xy(e + 0x10, g_hero_position) < limit)
             count++;
     }
     *(int *)(state + 0x27C) = count < 2;

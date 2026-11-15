@@ -67,7 +67,7 @@ do {								\
 static const double huge = 1.0e300;
 
 /* Rounds a decimal number down to the nearest whole number. */
-double func_00117650(double x)
+double floor(double x)
 {
 	s32 i0,i1,j0;
 	u32 i,j;

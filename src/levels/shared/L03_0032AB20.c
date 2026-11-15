@@ -4,7 +4,7 @@ extern unsigned char D_L03_00189E20[];
 extern int D_L03_001A8FB4 MACRO_ADDR;
 
 /* Returns 1 when the level mode matches the given one and the hero is in a state that allows it, otherwise 0. */
-int func_L03_0032AB20(int mode)
+int hero_is_allowed_for_mode(int mode)
 {
     unsigned char *hero;
 

@@ -7,8 +7,8 @@ typedef struct {
 } Func002DE550Slot;
 
 extern Func002DE550Slot D_001B1F50[] __attribute__((sda));
-extern int func_002DE6F0(int key);
-extern void func_00282A60(void *data, unsigned int tag, int size);
+extern int menu_stream_chunk_get_size(int key);
+extern void mem_clear(void *data, unsigned int tag, int size);
 
 int func_PAL_002DF328(int mode)
 {
@@ -23,8 +23,8 @@ int func_PAL_002DF328(int mode)
         if (D_001B1F50[i].flags & 2)
             continue;
         D_001B1F50[i].flags |= 2;
-        size = func_002DE6F0(D_001B1F50[i].key);
-        func_00282A60((void *)D_001B1F50[i].key, 0xDEADBEEF, size);
+        size = menu_stream_chunk_get_size(D_001B1F50[i].key);
+        mem_clear((void *)D_001B1F50[i].key, 0xDEADBEEF, size);
         return D_001B1F50[i].key;
     }
     return 0;

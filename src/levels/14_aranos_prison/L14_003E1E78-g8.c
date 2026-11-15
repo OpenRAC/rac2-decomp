@@ -34,20 +34,20 @@ typedef struct {
     int animation;
 } FieldMob;
 
-extern void func_002A04B8(void *, int *, int *, int *);
-extern void func_002A0488(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002B3868(void *);
-extern int func_00282948(int *);
-extern int func_00283D38(int, int, float);
-extern void func_L00_002E6EF8(void (*)(char *), char *);
-extern int func_L00_00324120(void *);
-extern void func_L14_00328E70(void *, void *, void *);
-extern void func_L14_00328E90(void *, void *, void *);
-extern void func_L14_003E2238(void *);
-extern float func_L14_003E22A8(void *);
-extern void func_L14_003E2328(char *self);
-extern void func_L14_003E2980(void *);
+extern void get_moby_color(void *, int *, int *, int *);
+extern void set_moby_color(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int flag_set_first_pending(void *);
+extern int math_fast_float_d(int *);
+extern int FastTweenColor(int, int, float);
+extern void gfx_add_draw_callback_third(void (*)(char *), char *);
+extern int hero_is_current_selected_id(void *);
+extern void moby_copy_pos_rot(void *, void *, void *);
+extern void moby_pass_pos_rot_to_helper(void *, void *, void *);
+extern void moby_rebuild_matrix_scaled(void *);
+extern float moby_get_state_progress(void *);
+extern void DrawFadingField(char *self);
+extern void part_l14_spawn_flash(void *);
 
 /* The level's entity array, read as a bare symbol (lui/lw) as in the level's other units. */
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
@@ -65,7 +65,7 @@ extern int D_L14_001B04D0 __attribute__((sda));
    cross-jumps the copies into one tail, as in retail); the on state can pass a request on to
    the linked entity when that is another field (class 0xAFE). */
 /* Updates the moby of class 2814: an energy field that switches on and off. */
-void func_L14_003E1E78(FieldMob *self) {
+void UpdatePrisonEnergyField(FieldMob *self) {
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
     int r, g, bl, c;
@@ -85,13 +85,13 @@ void func_L14_003E1E78(FieldMob *self) {
         self->color = 0x80008000;
         self->flags |= 0x10;
         if (s->proximity) {
-            SetMobyState(self, 3, -1);
+            moby_set_state(self, 3, -1);
         } else {
-            SetMobyState(self, 1, -1);
+            moby_set_state(self, 1, -1);
         }
         break;
     case 4:
-        if (SetFirstPendingFlag(self)) {
+        if (flag_set_first_pending(self)) {
             self->flags |= 0x100;
             s->requested = 0;
             s->flags = 0;
@@ -100,56 +100,56 @@ void func_L14_003E1E78(FieldMob *self) {
             s->timer = s->closeTime;
             s->requested = 0;
         }
-        if (FastFloatHelperD(&s->timer)) {
-            SetMobyState(self, 1, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 1, -1);
         }
-        if (FastFloatHelperD(&s->emitTimer)) {
-            SpawnFlashParticle_L14(self);
+        if (math_fast_float_d(&s->emitTimer)) {
+            part_l14_spawn_flash(self);
             s->emitTimer = D_L14_001B04D0;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = FastTweenColor(c, s->color, GetStateProgressFraction(self));
+        c = FastTweenColor(c, s->color, moby_get_state_progress(self));
         set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
-        CopyPositionAndRotation(self, a, b);
-        RebuildMobyMatrixScaled(self);
-        PassPositionAndRotationToHelper(self, a, b);
-        AddDrawCallbackToList3(DrawFadingField, (char *)self);
+        moby_copy_pos_rot(self, a, b);
+        moby_rebuild_matrix_scaled(self);
+        moby_pass_pos_rot_to_helper(self, a, b);
+        gfx_add_draw_callback_third(DrawFadingField, (char *)self);
         break;
     case 1:
-        if (SetFirstPendingFlag(self)) {
+        if (flag_set_first_pending(self)) {
             self->active = 0;
             self->animation = 0;
             self->flags |= 1;
         }
         if (s->requested || (s->proximity && self->position[2] > D_00189EA8)) {
-            SetMobyState(self, 2, -1);
+            moby_set_state(self, 2, -1);
         }
         break;
     case 2:
-        if (SetFirstPendingFlag(self)) {
+        if (flag_set_first_pending(self)) {
             self->active = 1;
             self->flags = (self->flags | 0x100) & 0xFFFE;
             self->animation = *(int *)(self->model + 0x10);
             s->emitTimer = D_L14_001B04D0;
             s->timer = s->openTime;
         }
-        if (FastFloatHelperD(&s->timer)) {
-            SetMobyState(self, 3, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 3, -1);
         }
-        if (FastFloatHelperD(&s->emitTimer)) {
-            SpawnFlashParticle_L14(self);
+        if (math_fast_float_d(&s->emitTimer)) {
+            part_l14_spawn_flash(self);
             s->emitTimer = D_L14_001B04D0;
         }
         c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
-        c = FastTweenColor(c, s->color, GetStateProgressFraction(self));
+        c = FastTweenColor(c, s->color, moby_get_state_progress(self));
         set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
-        CopyPositionAndRotation(self, a, b);
-        RebuildMobyMatrixScaled(self);
-        PassPositionAndRotationToHelper(self, a, b);
-        AddDrawCallbackToList3(DrawFadingField, (char *)self);
+        moby_copy_pos_rot(self, a, b);
+        moby_rebuild_matrix_scaled(self);
+        moby_pass_pos_rot_to_helper(self, a, b);
+        gfx_add_draw_callback_third(DrawFadingField, (char *)self);
         break;
     case 3:
-        if (SetFirstPendingFlag(self)) {
+        if (flag_set_first_pending(self)) {
             self->flags &= 0xFEFF;
             if (s->contact) {
                 s->flags |= 0x20;
@@ -159,7 +159,7 @@ void func_L14_003E1E78(FieldMob *self) {
             s->timer = s->activeTime;
             self->color = 0x80008000;
         }
-        if ((IsCurrentSelectedId(self) && !s->contact) || (D_0018A0B4 == self && s->contact)) {
+        if ((hero_is_current_selected_id(self) && !s->contact) || (D_0018A0B4 == self && s->contact)) {
             e = s->linked;
             if (e != 0 && *(short *)(e + 0xAA) == 0xAFE /* moby class 2814 */) {
                 *(int *)(*(char **)(e + 0x68) + 0x80) = 1;
@@ -168,8 +168,8 @@ void func_L14_003E1E78(FieldMob *self) {
         if (s->proximity && self->position[2] > D_00189EA8) {
             s->timer = s->activeTime;
         }
-        if (FastFloatHelperD(&s->timer)) {
-            SetMobyState(self, 4, -1);
+        if (math_fast_float_d(&s->timer)) {
+            moby_set_state(self, 4, -1);
         }
         break;
     }

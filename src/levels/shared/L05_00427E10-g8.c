@@ -14,14 +14,14 @@ typedef struct {
 typedef char ImpactExtentCheck[sizeof(Impact) == 0x28 ? 1 : -1];
 extern unsigned char *D_L05_001FB5E0[];
 extern float D_L05_001B1578 SDATA(D_L05_001B1578);
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8E20(void *, Impact *);
-extern void *func_L05_00427FC8(void *, void *, int, int, int, int, int, int,
+extern void vec_scale_to_length(void *, void *, float);
+extern void QueueMobyImpact(void *, Impact *);
+extern void *part_spawn_limited_blast(void *, void *, int, int, int, int, int, int,
                             int, int, int, int, int, float);
-extern void func_00277F48(void *, int, int, void *, float);
+extern void coll_process_hit(void *, int, int, void *, float);
 
 /* Makes an explosion: hurts every living object in the level except a few excluded ones, then plays the blast effect. */
-void func_L05_00427E10(unsigned char *object)
+void moby_explode_damage_nearby(unsigned char *object)
 {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     int i;
@@ -43,7 +43,7 @@ void func_L05_00427E10(unsigned char *object)
             *(s16 *)(target + 0xAA) != 0x110A)
             QueueMobyImpact(target, &impact);
     }
-    SpawnLimitedBlastEffect(object + 0x10, object, 0, 50, 30, 30, 30, 40,
+    part_spawn_limited_blast(object + 0x10, object, 0, 50, 30, 30, 30, 40,
                       1, 1, 1, 1, 67, 4.0f);
-    ProcessCollisionHit(object + 0x10, 1, *(int *)(state + 0x20), &impact, D_L05_001B1578);
+    coll_process_hit(object + 0x10, 1, *(int *)(state + 0x20), &impact, D_L05_001B1578);
 }

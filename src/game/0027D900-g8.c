@@ -1,8 +1,8 @@
 #include "common.h"
 
 /* Adapted from rac1-decomp src/game/draw.c (GPL-3.0). */
-extern int D_001A7350[] __attribute__((sda));
-extern int D_001A7354[] __attribute__((sda));
+extern int g_screen_offset_x[] __attribute__((sda));
+extern int g_screen_offset_y[] __attribute__((sda));
 extern int D_001A7358[] __attribute__((sda));
 extern int D_001A735C[] __attribute__((sda));
 extern int D_001B15A8, D_001B15AC;
@@ -11,7 +11,7 @@ typedef union { int *words; char *bytes; int address; } PacketCursor;
 extern PacketCursor ref_0027D900_01;
 extern char ref_0027D900_02[], ref_0027D900_03[];
 /* Slides black bars in at the top and bottom of the screen, or back out again. */
-void func_0027D900(void) {
+void DrawLetterboxBars(void) {
     int h;
 
     if (D_001B15A8 != 0) {
@@ -58,14 +58,14 @@ void func_0027D900(void) {
         long *p;
         ref_0027D900_01.words = base + 4;
         p = (long *)ref_0027D900_01.words;
-        p[0] = gScreenOffsetX[0] | ((long)gScreenOffsetY[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[1] = gScreenOffsetX[0] | ((long)(gScreenOffsetY[0] + h) << 16) | ((long)0xFFFFF3 << 32);
-        p[2] = D_001A7358[0] | ((long)gScreenOffsetY[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[3] = D_001A7358[0] | ((long)(gScreenOffsetY[0] + h) << 16) | ((long)0xFFFFF3 << 32);
+        p[0] = g_screen_offset_x[0] | ((long)g_screen_offset_y[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[1] = g_screen_offset_x[0] | ((long)(g_screen_offset_y[0] + h) << 16) | ((long)0xFFFFF3 << 32);
+        p[2] = D_001A7358[0] | ((long)g_screen_offset_y[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[3] = D_001A7358[0] | ((long)(g_screen_offset_y[0] + h) << 16) | ((long)0xFFFFF3 << 32);
         p[4] = D_001A7358[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
         p[5] = D_001A7358[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
-        p[6] = gScreenOffsetX[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
-        p[7] = gScreenOffsetX[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
+        p[6] = g_screen_offset_x[0] | ((long)D_001A735C[0] << 16) | ((long)0xFFFFF3 << 32);
+        p[7] = g_screen_offset_x[0] | ((long)(D_001A735C[0] - h) << 16) | ((long)0xFFFFF3 << 32);
     }
     ref_0027D900_01.words = (int *)((char *)ref_0027D900_01.words + 0x40);
 }

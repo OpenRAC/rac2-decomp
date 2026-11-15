@@ -1,24 +1,25 @@
+#include "names.h"
 /* func_PAL_L00_0042C190, the PAL copy of func_L00_00426C78: the same C, where the count limit
    7 becomes 6, the timer 30 becomes 25, and the time record is scaled to 50 Hz. */
 #include "common.h"
-extern float func_00282DB0(char *, char *);
-extern float func_00282DF0(char *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_002831B0(float);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CF0(char *, char *, char *);
-extern char *func_L00_002DB350(char *, float);
-extern void func_L00_00424F00(char *, float, float);
-extern void func_L00_002D9D98(void);
-extern void func_00282978(char *);
+extern float FastVecDot(char *, char *);
+extern float FastVecLength(char *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_angle_helper(float);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecSub(char *, char *, char *);
+extern char *FindIntersectingGridPrimitive(char *, float);
+extern void cam_set_strength_and_steer(char *, float, float);
+extern void cam_reset_default(void);
+extern void FastDecTimer(char *);
 typedef struct { char *table; } Table_b0898;
 extern Table_b0898 D_L00_001B1844[] __attribute__((section(".sdata")));
 extern int ref_L00_00426C78_00 __attribute__((sda));
-extern char *D_L00_001B8E10 __attribute__((section(".data")));
-extern char D_00189EA0[];
+extern char *g_follow_camera_object __attribute__((section(".data")));
+extern char g_hero_position[];
 extern unsigned int D_001A7390[] __attribute__((section(".sdata")));
-extern int D_001A79F0[] __attribute__((section(".sdata")));
+extern int g_current_map_index[] __attribute__((section(".sdata")));
 typedef struct {
  char pad[0x98]; float angle; char pad9c[0x2290-0x9C]; char *owner;
  char pad2294[0x24A0-0x2294]; int identity;
@@ -47,13 +48,13 @@ int func_PAL_L00_0042C190(char *a, char *b)
     { int identity = *(short *)(a + 0x86);
     ref_L00_00426C78_00 = 0;
     if (type == identity || type == 0x51) {
-        owner = D_L00_001B8E10;
+        owner = g_follow_camera_object;
         otherType = *(short *)(b + 0x86);
         if (!(otherType == 0 || otherType == 10 || otherType == 14 || otherType == 2)) goto clear;
         ownerType = *(short *)(owner + 0x86);
         if (!(ownerType == 0 || ownerType == 10 || ownerType == 14 || ownerType == 2)) goto clear;
-        *(CameraQuad *)temp = *(CameraQuad *)D_00189EA0;
-        hit = func_L00_002DB350((char *)temp, 0.25f);
+        *(CameraQuad *)temp = *(CameraQuad *)g_hero_position;
+        hit = FindIntersectingGridPrimitive((char *)temp, 0.25f);
         if (hit && (*(int *)(hit + 0x18) & 1)) return 0;
         p->timer = 0;
         p->active = 1;
@@ -62,10 +63,10 @@ int func_PAL_L00_0042C190(char *a, char *b)
             if (*(short *)(owner + 0x86) == 0) *(char *)(a + 0x7C) = 5;
             return 1;
         }
-        temp[0] = func_00283180(D_00189E20_6C78.angle);
-        temp[1] = func_00283198(D_00189E20_6C78.angle);
+        temp[0] = math_fast_sin_or_cos_a(D_00189E20_6C78.angle);
+        temp[1] = math_fast_sin_or_cos_b(D_00189E20_6C78.angle);
         temp[2] = 0;
-        func_L00_00424F00((char *)temp, 0.06981317698955536f, temp[2]);
+        cam_set_strength_and_steer((char *)temp, 0.06981317698955536f, temp[2]);
         goto timer;
 clear:
         p->count = 0;
@@ -79,29 +80,29 @@ clear:
     if (*(short *)(D_L00_001B8C80_6C78.owner + 0x86) != 0) goto timer;
     if (D_0018C750_6C78.count < 65535) ++D_0018C750_6C78.count;
     if (((int)D_001A7390[0] * 5 + 2) / 6 > D_0018C750_6C78.time) D_0018C750_6C78.time = ((int)D_001A7390[0] * 5 + 2) / 6;
-    D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << D_001A79F0[0])) | 0x80000000U;
-    dot = func_00282DB0(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
-    func_00282D30((char *)temp, D_L00_001B8C80_6C78.axis, dot);
-    func_00282CF0(v1, D_L00_001B8C80_6C78.owner, (char *)temp);
-    dot = func_00282DB0(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
-    func_00282D30((char *)temp, D_L00_001B8C80_6C78.axis, dot);
-    func_00282CF0(v2, D_00189E20_6C78.owner + 0xC0, (char *)temp);
-    len = func_00282DF0(v2);
+    D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << g_current_map_index[0])) | 0x80000000U;
+    dot = FastVecDot(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
+    FastVecScale((char *)temp, D_L00_001B8C80_6C78.axis, dot);
+    FastVecSub(v1, D_L00_001B8C80_6C78.owner, (char *)temp);
+    dot = FastVecDot(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
+    FastVecScale((char *)temp, D_L00_001B8C80_6C78.axis, dot);
+    FastVecSub(v2, D_00189E20_6C78.owner + 0xC0, (char *)temp);
+    len = FastVecLength(v2);
     if (len != 0.0f) {
-        len *= func_00282DF0(v1);
+        len *= FastVecLength(v1);
     }
     if (len != 0.0f) {
-        dot = func_002831B0(func_00282DB0(v2, v1) / len);
-        if (1.3962636f <= 1.5707964f - dot) { func_L00_002D9D98(); return 0; }
+        dot = math_fast_angle_helper(FastVecDot(v2, v1) / len);
+        if (1.3962636f <= 1.5707964f - dot) { cam_reset_default(); return 0; }
     }
     p->timer = 25;
 timer:
     if (p->timer) {
-        func_00282978((char *)&p->timer);
-        temp[0] = func_00283180(D_00189E20_6C78.angle);
-        temp[1] = func_00283198(D_00189E20_6C78.angle);
+        FastDecTimer((char *)&p->timer);
+        temp[0] = math_fast_sin_or_cos_a(D_00189E20_6C78.angle);
+        temp[1] = math_fast_sin_or_cos_b(D_00189E20_6C78.angle);
         temp[2] = 0;
-        func_L00_00424F00((char *)temp, 0.13962635397911072f, temp[2]);
+        cam_set_strength_and_steer((char *)temp, 0.13962635397911072f, temp[2]);
     }
     return 0;
 }

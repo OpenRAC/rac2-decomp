@@ -11,12 +11,12 @@ typedef int s32;
 
 typedef float f32;
 
-extern f32 func_00283CE0(s32);
+extern f32 IntToFloat(s32);
 
-extern int func_00283CF0(f32);
+extern int FloatToInt(f32);
 
 /* Adjust a non-aligned value through the integer/float conversion helpers. */
-s32 func_L00_00329FF0(s32 value) {
+s32 mem_round_up_to_16(s32 value) {
     s32 divisor = 16;
 
     if (value % divisor != 0) {

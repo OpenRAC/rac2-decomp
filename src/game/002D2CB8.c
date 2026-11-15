@@ -12,15 +12,15 @@
  *   - Restores RA from stack
  *   - Returns 0
  */
-extern void func_0027C540(long);
+extern void SetupGifPaging(long);
 
-extern void func_0027C660(void);
+extern void DoGifPaging(void);
 
 extern void func_0029C680(void);
 
-void func_0027C540(long);
+void SetupGifPaging(long);
 
-void func_0027C660(void);
+void DoGifPaging(void);
 
 /* 
  * Function: func_002D2EE0
@@ -40,13 +40,13 @@ void func_0027C660(void);
  * - All external function addresses come from the assigned externals list.
  */
 
-extern void func_0027C540(long arg0);
+extern void SetupGifPaging(long arg0);
 
 /* External functions declared with exact aliases from task.externals */
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long param_1);
 
 /* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
-int func_002D2CB8(void)
+int menu_page_draw(void)
 {
     SetupGifPaging(0);
     func_0029C680();
@@ -56,8 +56,8 @@ int func_002D2CB8(void)
 
 extern unsigned int D_00138344;
 extern unsigned int D_001A7390 __attribute__((sda));
-extern int D_001A79F0 __attribute__((sda));
-extern char D_001F2840[];
+extern int g_current_map_index __attribute__((sda));
+extern char g_pause_menu_state[];
 typedef struct {
     char pad[0x1d4];
     unsigned short count;
@@ -65,22 +65,22 @@ typedef struct {
     unsigned int maximum;
     unsigned int levels;
 } Statistics_2D2CE8;
-extern Statistics_2D2CE8 D_0018C750;
+extern Statistics_2D2CE8 g_progress_statistics;
 extern int func_0029C6F0(int);
 
 /* Handles button input for a menu page: counts the visit in the statistics and either accepts, cancels or passes the button to the page. */
-int func_002D2CE8(void)
+int menu_page_update_count_stats(void)
 {
     int result = 0;
     unsigned int flags = D_00138344;
     if (flags & 0x10) {
-        Statistics_2D2CE8 *stats = &gProgressStatistics;
+        Statistics_2D2CE8 *stats = &g_progress_statistics;
         char *root;
         int value, status;
         if (stats->count < 0xffff) stats->count++;
         if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
-        stats->levels = (stats->levels | (1u << gCurrentMapIndex)) | 0x80000000u;
-        root = gPauseMenuState;
+        stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
+        root = g_pause_menu_state;
         value = *(int *)(*(char **)(root + 0x14) + 0xe0);
         if (value != 0) *(int *)(root + 0x18) = value;
         else {
@@ -94,10 +94,10 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        Statistics_2D2CE8 *stats = &gProgressStatistics;
+        Statistics_2D2CE8 *stats = &g_progress_statistics;
         if (stats->count < 0xffff) stats->count++;
         if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
-        stats->levels = (stats->levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+        stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         result = 1;
     } else func_0029C6F0(flags);
     return result;

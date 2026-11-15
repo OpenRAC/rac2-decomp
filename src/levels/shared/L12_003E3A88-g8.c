@@ -8,24 +8,24 @@
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 
 extern char D_L12_001B9E00[];
-extern int func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A93B0(void *);
-extern int func_002B0ED8(void *, void *, int);
-extern int func_002B3BA8(void *, int, int, int, float, float);
-extern int func_00282978(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00283CE0(int);
-extern int func_L01_0031BC68(int, int, float);
-extern void func_002B0990(void *, void *, int, int, float);
-extern void func_0026FEB8(const char *, ...);
-extern int func_002B3868(void *);
-extern int func_002B3890(void *);
-extern int func_002B38B8(void *);
-extern int func_002761F8(void *, void *, int, int, int);
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_update_ground_check(void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
+extern int FastDecTimer(void *);
+extern float vec_distance_xy(void *, void *);
+extern float IntToFloat(int);
+extern int PulseColor(int, int, float);
+extern void value_set_and_smooth(void *, void *, int, int, float);
+extern void STUB_printf(const char *, ...);
+extern int flag_set_first_pending(void *);
+extern int flag_set_second_pending(void *);
+extern int flag_is_third_pending_set(void *);
+extern int CollLine(void *, void *, int, int, int);
 extern char *D_L12_001FEAC0[];
 extern char D_L12_001B0B70[];
 extern unsigned short D_L12_001B0B00 __attribute__((sda));
@@ -33,10 +33,10 @@ extern float D_L12_001B0B68 __attribute__((sda));
 extern float D_L12_001B0B64 __attribute__((sda));
 extern int D_L12_001B29C8 __attribute__((sda));
 extern char *D_L12_001C0258 NOT_SDA;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 
 /* Sets up the robot guard on its first frame, then handles its hits, its colour pulse and its awareness of the hero. */
-void func_L12_003E3A88(char *obj) {
+void robot_guard_init_update_state(char *obj) {
     char *vars = P(obj, 0x68);
     unsigned char oldState, oldAnim;
     int hitResult;
@@ -66,7 +66,7 @@ void func_L12_003E3A88(char *obj) {
         B(vars, 0xD3) = 17;
         B(vars, 0xD5) = 1;
         if (W(vars, 0x158) == -1) {
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
             return;
         }
         W(vars, 0x1A8) |= 0x15;
@@ -78,28 +78,28 @@ void func_L12_003E3A88(char *obj) {
         F(vars, 0x1A0) = 0.523598849773407f;
         F(vars, 0x19C) = 0.0055555556900799274f;
         B(vars, 0xD6) = 1;
-        SetMobyState(obj, 5, 0);
+        moby_set_state(obj, 5, 0);
         if (B(obj, 0x43))
-            StartAnimationBlended(obj, 0, 0, 0);
+            anim_start_blended(obj, 0, 0, 0);
         W(vars, 0x154) = W(vars, 0x150);
         if (W(vars, 0x164) == -1)
             qcopy(obj + 0x10, D_L12_001FEAC0[W(vars, 0x158)] + 0x10);
         else
             qcopy(obj + 0x10, D_L12_001FEAC0[W(vars, 0x164)] + 0x10);
         if (W(vars, 0x164) != -1)
-            SetMobyState(obj, 2, 7);
+            moby_set_state(obj, 2, 7);
         if (P(vars, 0x294))
             W(P(vars, 0x294), 0) = -1;
     }
     if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, D_L12_001B9E00) < 24.0f) {
-        UpdateMobyGroundCheck(obj);
+        moby_update_ground_check(obj);
         B(obj, 0x6F) = 22;
     }
-    if (W(vars, 0x2A0) && IsThirdPendingFlagSet(obj))
-        SetMobyState(obj, 24, 4);
+    if (W(vars, 0x2A0) && flag_is_third_pending_set(obj))
+        moby_set_state(obj, 24, 4);
     oldState = B(obj, 0x20);
     oldAnim = B(obj, 0x95);
-    hitResult = ApplyDamageToObject(obj, vars + 0x60, 0);
+    hitResult = moby_apply_damage_to_object(obj, vars + 0x60, 0);
     if (hitResult) {
         if (hitResult == 4) {
             STUB_printf(D_L12_001B0B70);
@@ -108,8 +108,8 @@ void func_L12_003E3A88(char *obj) {
             W(vars, 0x278) = 1;
         B(obj, 0x20) = oldState;
         B(obj, 0x95) = oldAnim;
-        SetFirstPendingFlag(obj);
-        SetSecondPendingFlag(obj);
+        flag_set_first_pending(obj);
+        flag_set_second_pending(obj);
         H(vars, 0x26) = D_L12_001B0B00;
         H(vars, 0x274) = 150;
     }
@@ -119,12 +119,12 @@ void func_L12_003E3A88(char *obj) {
         else
             H(vars, 0x274) = 50;
     }
-    H(vars, 0x276) = SelectAimTarget_002B3BA8(obj, W(vars, 0x150), 0, 0, 6.0f, 0.0f);
+    H(vars, 0x276) = weapon_select_aim_target(obj, W(vars, 0x150), 0, 0, 6.0f, 0.0f);
     W(vars, 0x270) = W(vars, 0x140);
     if (P(vars, 0x140) && vec_distance_xy(P(vars, 0x140) + 0x10, obj + 0x10) < 16.0f) {
         qcopy(pos, obj + 0x10);
         pos[2] += D_L12_001B0B68;
-        if (!CollLine(pos, vars + 0x130, 16, 0, 0) || D_L12_001C0258 == gHeroMoby_0018C0B0) {
+        if (!CollLine(pos, vars + 0x130, 16, 0, 0) || D_L12_001C0258 == g_hero_moby) {
             if (H(vars, 0x276) != 1)
                 H(vars, 0x276) = 1;
         }
@@ -134,5 +134,5 @@ void func_L12_003E3A88(char *obj) {
         angle = angle * 6.2831854820251465f / IntToFloat(60) - 3.1415927410125732f;
         W(obj, 0x78) = PulseColor(0x80808080, 0x80303030, angle);
     }
-    SetValueAndStartSmoothChange(obj, vars + 0x2B0, 1, 1, D_L12_001B0B64);
+    value_set_and_smooth(obj, vars + 0x2B0, 1, 1, D_L12_001B0B64);
 }

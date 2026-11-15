@@ -5,15 +5,15 @@ typedef void *V;
 
 extern int D_001A8FF0;
 
-extern void func_00282C98(V);
+extern void vec_copy_helper_a(V);
 
-extern void func_002AFFD8(V,V,int);
+extern void cam_compute_view_direction(V,V,int);
 
 /* Clears the vector, or computes it from the object when the global switch is set. */
-void func_L00_003252C8(V object,V vector) {
+void vec_clear_or_compute(V object,V vector) {
  if(D_001A8FF0==0) {
-  VectorCopyHelperA(vector);
+  vec_copy_helper_a(vector);
   return;
  }
- ComputeViewDirection(object,vector,1);
+ cam_compute_view_direction(object,vector,1);
 }

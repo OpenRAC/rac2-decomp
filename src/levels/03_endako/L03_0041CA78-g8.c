@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L03_0041CA78 is a unit of its own: it reads level data through $gp (-G8) and its
    0x00000000FFFFFFFF sentinel needs the SN constant seed (addiu -1; dsrl32 0) selected by
    -Wa,--r5900-unsigned32-mask=sn (config/cflags.txt). The initialization stores are written
@@ -5,10 +6,10 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern void func_002A7750(void *,int,int);
-extern int func_002E5CF8(int,int,void *);
-extern void func_0029F338(void *);
-extern void func_00283098(void *,void *,void *);
+extern void moby_set_state(void *,int,int);
+extern int PlayMobySound(int,int,void *);
+extern void moby_mark_spawned(void *);
+extern void matrix_mul_vec3(void *,void *,void *);
 extern float D_L03_001B1BA4 __attribute__((sda));
 extern float D_L03_001B1BA0 __attribute__((sda));
 extern float D_L03_001B1B80 __attribute__((sda));
@@ -16,28 +17,28 @@ extern float D_L03_001B1B84 __attribute__((sda));
 extern float D_L03_001B1B88 __attribute__((sda));
 extern float D_L03_001B1B8C __attribute__((sda));
 extern float D_L03_001B1BB0[4] SDATA(D_L03_001B1BB0) __attribute__((sda));
-extern u8 D_00189EA0[], D_L03_001B9980[];
+extern u8 g_hero_position[], D_L03_001B9980[];
 extern u8 D_L03_001A8F20[] MACRO_ADDR;
 extern int D_L03_001A9044, D_L03_001A9040, D_L03_001A903C;
 extern u8 D_001A7A60[] MACRO_ADDR;
-extern int func_00283CF0(float);
-extern void func_002A7470(void *,int,int,int);
-extern int func_002B0ED8(void *,void *,int);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_002AC728(void *,void *,int,float,float);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_002B0A68(void *,int,void *,float,float,float,float,u8);
-extern int func_002E5E58(int,unsigned int,void *);
-extern void func_002B0A18(int,int);
-extern void func_L03_0041D0A8(void *);
-extern void func_002A6C58(void *,int,int);
-extern float func_00282E48(void *,void *);
-extern void func_002A93B0(void *);
-extern int func_002B3BA8(void *,int,void *,int,float,float);
+extern int FloatToInt(float);
+extern void anim_start_blended(void *,int,int,int);
+extern int moby_apply_damage_to_object(void *,void *,int);
+extern void FastVecAdd(void *,void *,void *);
+extern void part_spawn_explosion_with_sparks(void *,void *,int,float,float);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,u8);
+extern int snd_play_from_global_bank(int,unsigned int,void *);
+extern void value_set_entry_by_index(int,int);
+extern void sweeper_bot_mark_stream(void *);
+extern void SetDeathBits(void *,int,int);
+extern float fast_vec_dist(void *,void *);
+extern void moby_update_ground_check(void *);
+extern int weapon_select_aim_target(void *,int,void *,int,float,float);
 
 /* Sets up the sweeper bot on its first frame and handles its death when it is hit. */
-void func_L03_0041CA78(u8 *moby) {
+void sweeper_bot_update_core(u8 *moby) {
     u8 *vars=*(u8 **)(moby+0x68);
     float scale;
     Vec a,b;
@@ -51,7 +52,7 @@ void func_L03_0041CA78(u8 *moby) {
         vars[0x48]=FloatToInt(20);
         vars[0x4a]=FloatToInt(6);
         if(*(int *)(vars+0x290)==-1) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             return;
         }
         { s32 initialMode = 3;
@@ -69,12 +70,12 @@ void func_L03_0041CA78(u8 *moby) {
         *(int *)(vars+0x8c)=*(int *)(vars+0x290);
         qcopy(vars+0x2b0,moby+0x10); }
         if(*(u64 *)(vars+0x2a0)!=0xffffffffULL) {
-            SetMobyState(moby,8,4);
+            moby_set_state(moby,8,4);
             *(int *)(moby+0x98)=0;
             *(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xefff;
         } else {
-            SetMobyState(moby,1,0);
-            if(moby[0x43]) StartAnimationBlended(moby,0,0,0);
+            moby_set_state(moby,1,0);
+            if(moby[0x43]) anim_start_blended(moby,0,0,0);
         }
         {
             float v0 = scale*0.00027777778f;
@@ -91,33 +92,33 @@ void func_L03_0041CA78(u8 *moby) {
             *(float *)(vars+0x68)=v4;
         }
     }
-    if(ApplyDamageToObject(moby,vars+0x140,0) && *(float *)(vars+0x20)<=0) {
+    if(moby_apply_damage_to_object(moby,vars+0x140,0) && *(float *)(vars+0x20)<=0) {
         matrix_mul_vec3(&a,D_L03_001B1BB0,moby+0xc0);
         FastVecAdd(&a,&a,moby+0x10);
         PlayMobySound(2,0,moby);
-        SpawnExplosionWithSparks(moby,&a,-1,0.333f,0);
-        FastVecSub(&b,moby+0x10,gHeroPosition);
+        part_spawn_explosion_with_sparks(moby,&a,-1,0.333f,0);
+        FastVecSub(&b,moby+0x10,g_hero_position);
         b.f[2]=0;
         vec_scale_to_length(&b,&b,0.10000001f);
-        SpawnDebrisForMaskedParts(moby,31,D_L03_001A8F20,3,6,3,6,255);
-        if(*(int *)(gHeroPosition+0x2214)==49) {
+        part_spawn_masked_debris(moby,31,D_L03_001A8F20,3,6,3,6,255);
+        if(*(int *)(g_hero_position+0x2214)==49) {
             D_L03_001A9044++;
             if(D_L03_001A9044>=10 && !D_001A7A60[0x1C]) {
                 D_001A7A60[0x1C]=1;
-                PlaySoundFromGlobalBank(1,0,0);
-                SetEntryValueByIndex(0x1233,-1);
+                snd_play_from_global_bank(1,0,0);
+                value_set_entry_by_index(0x1233,-1);
                 D_L03_001A903C=1;
             }
         }
         PlayMobySound(2,0,moby);
-        MarkSweeperBotsInStream(moby);
+        sweeper_bot_mark_stream(moby);
         SetDeathBits(moby,0,3);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
         return;
     }
     if(moby[0x31] && fast_vec_dist(moby+0x10,D_L03_001B9980)<24) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby[0x6f]=22;
     }
-    if(moby[0x95]<3) SelectAimTarget_002B3BA8(moby,*(int *)(vars+0x294),0,0,16,0);
+    if(moby[0x95]<3) weapon_select_aim_target(moby,*(int *)(vars+0x294),0,0,16,0);
 }

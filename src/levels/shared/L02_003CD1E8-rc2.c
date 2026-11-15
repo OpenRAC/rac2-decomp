@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -33,7 +34,7 @@ extern f32 ref_L02_003CD1E8_04(void);
 extern s32 ref_L02_003CD1E8_05(void *, void *, void *, s32, f32);
 
 /* Picks a random sideways direction and speed, then turns it to match the object facing and stores it as a velocity. */
-void func_L02_003CD1E8(void *moby, void *outVelocity) {
+void moby_set_random_spread_velocity(void *moby, void *outVelocity) {
     f32 angle;
     f32 velY;
     f32 speed;

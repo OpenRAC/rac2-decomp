@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_00312B70: func_002A0F48 takes the object alone (every caller passes one argument);
  * the three 16-byte copies are qcopy(), and the head stores are in the order whose
  * schedule loads the descriptor pointer after the flag stores, as retail does. */
 #include "common.h"
 
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 extern void func_002A0F48(char *);
-extern void func_002AB650(char *);
+extern void hero_copy_field_to_moby(char *);
 
 /* Spawns object 0x27F at the given position and fills its descriptor from a template record. */
-char *func_00312B70(char *tmpl, void *pos, int value, void *origin)
+char *moby_spawn_template_effect(char *tmpl, void *pos, int value, void *origin)
 {
     char *obj = CreateMoby(0x27F /* moby class 639 */);
     char *d;
@@ -62,7 +63,7 @@ char *func_00312B70(char *tmpl, void *pos, int value, void *origin)
         *(unsigned char *)(d + 0x1C) = *(unsigned char *)(tmpl + 0x49);
         *(int *)(d + 0x64) = -1;
         func_002A0F48(obj);
-        CopyHeroField38ToMoby(obj);
+        hero_copy_field_to_moby(obj);
     }
     return obj;
 }

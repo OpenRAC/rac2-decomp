@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -27,7 +28,7 @@
 extern void ref_L16_00424B48_00(s32, s32, s8 *, s32);
 
 /* After being triggered, slowly sinks the object for a short time and then stops. */
-void func_L16_00424B48(s8 *moby) {
+void sinking_l16_platform_update(s8 *moby) {
     s32 frame;
     s32 frameLow;
     s32 stillRunning;

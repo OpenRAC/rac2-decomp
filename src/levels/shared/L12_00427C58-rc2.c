@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern void ref_L12_00427C58_02();
 extern void ref_L12_00427C58_03(f32);
 
 /* Moves the object one step using one of three shared movement routines, chosen by a level flag and the mode. */
-void func_L12_00427C58(void *moby, s32 a1, s32 mode) {
+void moby_step_shared_movement(void *moby, s32 a1, s32 mode) {
     s8 *vars;
 
     vars = *(s8 **)((s8 *)moby + 0x68);

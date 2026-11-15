@@ -6,12 +6,12 @@ typedef struct __attribute__((packed)) { int values[2]; } Pair;
 /* An incomplete array: retail builds this address with lui + addiu into a register of its own. */
 extern Pair D_L00_001B1458[];
 extern int D_L00_001B1464 __attribute__((sda));
-extern void func_00282F20(void *, void *, float);
-extern float func_002A7878(float, float);
-extern void *func_L00_003411A0(void *, void *, int, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_random_float_range(float, float);
+extern void *CreateType6DObject(void *, void *, int, float);
 
 /* Creates a small flying piece at a position, thrown along the given direction. It alternates between two kinds each time. */
-void func_L00_0041AD40(char *self, void *position, Quad *src)
+void part_spawn_debris_piece(char *self, void *position, Quad *src)
 {
     struct { Quad local; Pair choices; } temp;
     char *state = *(char **)(self + 0x68);
@@ -22,7 +22,7 @@ void func_L00_0041AD40(char *self, void *position, Quad *src)
     vec_scale_to_length(&temp.local, &temp.local, 0.05f);
     temp.choices = D_L00_001B1458[0];
     selected = temp.choices.values;
-    size = RandomFloatRange(0.05f, 0.1f);
+    size = math_random_float_range(0.05f, 0.1f);
     selected += D_L00_001B1464 % 2;
     CreateType6DObject(position, &temp.local, *selected,
                        size * *(float *)(state + 0x50) * 0.1f);

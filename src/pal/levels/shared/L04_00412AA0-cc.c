@@ -1,54 +1,55 @@
+#include "names.h"
 /* func_PAL_L04_00412AA0, the PAL copy of func_L04_0040E460: the same C, where rename func_L04_0040C0C0 becomes func_PAL_L04_00410678. */
 #include "common.h"
 
-extern char D_00189EA0[];
-extern signed char *D_L04_001B24DC __attribute__((sda));
-extern void func_L04_0040E248(int, unsigned char *);
-extern void func_00282D30(void *, void *, float);
+extern char g_hero_position[];
+extern signed char *g_moby_l04_pool __attribute__((sda));
+extern void racer_release_sound_handles(int, unsigned char *);
+extern void FastVecScale(void *, void *, float);
 /* Integer and float arguments keep their order within each EE register bank. */
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 extern int D_L04_001B2008[] __attribute__((sda));
 extern int D_00138320;
 extern float D_L04_001BDC30;
-extern float func_00283198(float);
-extern float func_00283180(float);
-extern float func_002AA2E8(void *, float, float);
-extern int func_00282948(void *);
-extern int func_002829A8(void *);
-extern void func_L00_00322BE0(void *, int);
-extern void func_L00_00322A98(void *, void *);
-extern void func_L00_00322AC0(void *, float, int, int);
-extern void func_L00_00322EC8(void *);
-extern int func_002E5DA0(int, int, void *, int);
-extern int func_002E59B0(void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern int func_L01_00355BA0(int, int);
-extern void func_0027AB40(void);
-extern int func_002A8600(void *, int, int, int);
-extern int func_002A86E8(void *, void *, int, int);
-extern void func_00283388(void *);
-extern void func_00283698(void *, void *);
-extern void func_002830C0(void *, void *, void *);
+extern float math_fast_sin_or_cos_b(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float ApproachValue(void *, float, float);
+extern int math_fast_float_d(void *);
+extern int vec_fast_helper_a(void *);
+extern void moby_update_transform_history_followers(void *, int);
+extern void level_init_pending_slot(void *, void *);
+extern void level_append_record_to_table(void *, float, int, int);
+extern void level_release_slot_list(void *);
+extern int snd_play_from_class_bank(int, int, void *, int);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int PlayMobySound(int, int, void *);
+extern int snd_set_slot_field(int, int);
+extern void UpdateViewContext(void);
+extern int GetFirstMobyInGroup(void *, int, int, int);
+extern int GetNextMobyInGroup(void *, void *, int, int);
+extern void set_identity_matrix(void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void transform_vector(void *, void *, void *);
 /* Frozen Batch A A04-table-select-76; acknowledged claim 8c4d82cfbf43e138ed35e757fdaeee3e7c4651fa684549ba9d5e8ac22c56d111. */
 typedef unsigned char BatchA_A04_u8;
 
 typedef unsigned int BatchA_A04_u32;
 
-extern BatchA_A04_u32 D_001A79F0[] __attribute__((sda));
+extern BatchA_A04_u32 g_current_map_index[] __attribute__((sda));
 
 extern BatchA_A04_u8 D_001395B8[];
 
 /* Steps the record's phase at +0x1FC down by 0.1 (wrapping up by 8 once it reaches -8) and
    draws the effect with it. */
-void func_L04_00404068(void *arg0);
+void bike_animate_boost_flame_streak(void *arg0);
 
-extern float func_00282C48(float);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_L04_00404068(void *);
-extern void func_00282CF0(void *, void *, void *);
+extern float math_fabs(float);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void bike_animate_boost_flame_streak(void *);
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
 /* func_L04_004045E0 is in L04_00402D90-follower.c. */
 
@@ -56,13 +57,13 @@ extern float func_L00_002EE290(void *);
 
 /* func_L04_004073E8 is in L04_00402D90-trail.c. */
 
-extern void func_L00_002E6EF8(void (*)(void *), void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern int func_00283CF0(float);
+extern void gfx_add_draw_callback_third(void (*)(void *), void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern int FloatToInt(float);
 /* A04-table-select-76 freshly exact-verified under family reservation */
-BatchA_A04_u32 func_L04_0040A1D0(BatchA_A04_u8 *a0);
+BatchA_A04_u32 race_get_course_win_count(BatchA_A04_u8 *a0);
 
 /* A04-table-select family, incrementing form: bumps the state-selected byte */
 /* shared native body of family A04-table-select: reads the state-selected byte */
@@ -74,7 +75,7 @@ extern BatchA_A04_u8 *D_001B26F0 __attribute__((sda));
 
 /* func_L04_0040A958 is in L04_00402D90-reset-g8.c. */
 
-extern signed char *D_L04_001B24DC __attribute__((sda));
+extern signed char *g_moby_l04_pool __attribute__((sda));
 
 /* Retail reaches its record base off $gp (a small-data symbol), and the three
    state words at 0x48 of the record and of the indexed record. */
@@ -92,13 +93,13 @@ typedef unsigned int L04Quad __attribute__((mode(TI)));
  * float arguments to f12-f13, independently of their C interleaving. */
 void func_PAL_L04_00410678(L04Quad *position, L04Quad *direction, int count, int mode);
 
-extern void func_L04_0040CE30();
+extern void racer_emit_exhaust_particles();
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_00282CC0(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
 /* The five floats come first and the two ints last: the floats then go to
    f12-f16 and the ints to a1 and a2, and the int argument is set up after
@@ -109,19 +110,19 @@ extern float func_00283CE0(int);
    the shared floor, the three threshold vectors are nudged by the row's share
    and handed to the particle scheduler, and a row that sinks too far is lifted
    back to the floor. */
-void func_L04_0040CE30(char *a0);
+void racer_emit_exhaust_particles(char *a0);
 
-extern BatchA_A04_u8 D_00188660[];
+extern BatchA_A04_u8 g_sound_state[];
 
 /* Releases the callback records this moby still holds: every handle slot that is set
    names a record of the callback table, and the one that belongs to this moby is
    handed to the release helper. Each slot is cleared afterwards. */
-void func_L04_0040E248(int a0, BatchA_A04_u8 *a1);
+void racer_release_sound_handles(int a0, BatchA_A04_u8 *a1);
 
 /* Inlining puts the literal rate straight into $f12, so each call loads it again. */
 static inline void CallL00_00322AC0(void *state, float rate, int level, int slot)
 {
-    func_L00_00322AC0(state, rate, level, slot);
+    level_append_record_to_table(state, rate, level, slot);
 }
 
 void func_PAL_L04_00412AA0(unsigned char *m)
@@ -136,32 +137,32 @@ void func_PAL_L04_00412AA0(unsigned char *m)
     int *data;
     float wave, active, angle, sine, radius;
     unsigned int color;
-    angle = func_00283CE0(period);
+    angle = IntToFloat(period);
     red = D_L04_001B2008[0] % period;
     {
         float phase = (float)red;
-        wave = func_00283198(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
+        wave = math_fast_sin_or_cos_b(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
     }
-    red = func_00283CF0(wave * 48.0f) + 104;
-    green = func_00283CF0(wave * 64.0f) + 208;
-    blue = func_00283CF0(wave * 24.0f) + 60;
+    red = FloatToInt(wave * 48.0f) + 104;
+    green = FloatToInt(wave * 64.0f) + 208;
+    blue = FloatToInt(wave * 24.0f) + 60;
     if (green > 255) green = 255;
     if (*(int *)(p + 0x278)) {
-        func_002AA2E8(p + 0x27c, 0.20000002f, 0.008f);
-        func_002AA2E8(p + 0x28c, 97.0f, 0.96631575f);
-        if (*(int *)(p + 0x278)) func_00282948(p + 0x278);
-        func_L00_00322BE0(p + 0x4e0, 1);
+        ApproachValue(p + 0x27c, 0.20000002f, 0.008f);
+        ApproachValue(p + 0x28c, 97.0f, 0.96631575f);
+        if (*(int *)(p + 0x278)) math_fast_float_d(p + 0x278);
+        moby_update_transform_history_followers(p + 0x4e0, 1);
         state = p + 0x4e0;
     } else {
         if ((m[0x20] == 3 || (D_00138320 & 10)) && *(int *)(p + 0x338) < 25 && *(int *)(p + 0x33c) > 0) {
             *(int *)(p + 0x338) = 200;
             --*(int *)(p + 0x33c);
-            if (m[0x20] != 3) func_002E5DA0(0, 0, m, 0x474);
-            if (!func_002E59B0(m, *(int *)(p + 0x714))) {
-                if (m[0x20] != 3) *(int *)(p + 0x714) = func_002E5CF8(15, 4, m);
+            if (m[0x20] != 3) snd_play_from_class_bank(0, 0, m, 0x474);
+            if (!snd_is_voice_playing_for_owner(m, *(int *)(p + 0x714))) {
+                if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
                 else {
-                    *(int *)(p + 0x714) = func_002E5CF8(24, 5, m);
-                    func_L01_00355BA0(*(int *)(p + 0x714), 0x400);
+                    *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
+                    snd_set_slot_field(*(int *)(p + 0x714), 0x400);
                 }
             }
             if (*(unsigned char **)(p + 0x4c4)) {
@@ -170,7 +171,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
                 if (*(float *)(p + 0x27c) <= 0.020000001f) *(int *)(childState + 0x1c0) = 0;
             }
             if (!*(int *)(p + 0x640)) {
-                func_L00_00322A98(m, p + 0x4e0);
+                level_init_pending_slot(m, p + 0x4e0);
                 CallL00_00322AC0(p + 0x4e0, -0.7f, 64, 1);
                 CallL00_00322AC0(p + 0x4e0, -0.7f, 48, 2);
                 CallL00_00322AC0(p + 0x4e0, -0.7f, 32, 3);
@@ -179,45 +180,45 @@ void func_PAL_L04_00412AA0(unsigned char *m)
             }
         }
         state = p + 0x4e0;
-        if (func_00282948(p + 0x338)) {
+        if (math_fast_float_d(p + 0x338)) {
             active = 0.0f;
-            func_L00_00322EC8(state);
+            level_release_slot_list(state);
             *(int *)(p + 0x640) = 0;
         } else {
             active = 1.0f;
-            func_L00_00322BE0(state, 1);
+            moby_update_transform_history_followers(state, 1);
         }
-        func_002AA2E8(p + 0x27c, active * 0.120000005f, 0.002f);
+        ApproachValue(p + 0x27c, active * 0.120000005f, 0.002f);
         if (*(float *)(p + 0x27c) < 0.0f) *(float *)(p + 0x27c) = 0.0f;
-        if (active > 0.5f) func_002AA2E8(p + 0x28c, 97.0f, 0.96631575f);
-        else func_002AA2E8(p + 0x28c, 80.0f, 0.2439867f);
+        if (active > 0.5f) ApproachValue(p + 0x28c, 97.0f, 0.96631575f);
+        else ApproachValue(p + 0x28c, 80.0f, 0.2439867f);
     }
     if (m[0x20] != 3) {
         float viewAngle = *(float *)(p + 0x28c);
         viewAngle *= 0.008726647f;
-        sine = func_00283198(viewAngle);
-        sine /= func_00283180(viewAngle);
+        sine = math_fast_sin_or_cos_b(viewAngle);
+        sine /= math_fast_sin_or_cos_a(viewAngle);
         D_L04_001BDC30 = sine;
-        func_0027AB40();
+        UpdateViewContext();
     }
     if (*(int *)(p + 0x25c) != -1) {
-        func_002A8600(&item, *(int *)(p + 0x25c), 0, 0);
+        GetFirstMobyInGroup(&item, *(int *)(p + 0x25c), 0, 0);
         if (item) do {
             if (*(short *)(item + 0xaa) == 0xa99) {
                 data = *(int **)(item + 0x68);
-                func_00282CF0(delta, item + 0x10, m + 0x10);
+                FastVecSub(delta, item + 0x10, m + 0x10);
                 if (*data == 0 && *(int *)(p + 0x33c) < 3 && func_L00_002EE290(delta) < 1.0f) {
                     ++*(int *)(p + 0x33c);
-                    if (m[0x20] != 3) func_002E5DA0(0, 0, m, 0xa99);
+                    if (m[0x20] != 3) snd_play_from_class_bank(0, 0, m, 0xa99);
                     func_PAL_L04_00410678((L04Quad *)(item + 0x10), (L04Quad *)(p + 0x290), 8, 0);
                     *data = 250;
                 }
             }
-            func_002A86E8(&item, item, 0, 0);
+            GetNextMobyInGroup(&item, item, 0, 0);
         } while (item);
     }
     if (*(int *)(p + 0x254) != -1) {
-        func_002A8600(&other, *(int *)(p + 0x254), 0, 0);
+        GetFirstMobyInGroup(&other, *(int *)(p + 0x254), 0, 0);
         if (other) {
             /* One four-term OR would be rebalanced by fold, so the terms join in steps. */
             unsigned int high = (alpha << 24) | (blue << 16);
@@ -229,23 +230,23 @@ void func_PAL_L04_00412AA0(unsigned char *m)
                 else goto next;
                 *(unsigned short *)(other + 0x34) |= 16;
                 *(unsigned int *)(other + 0x78) = color;
-                if (!func_002829A8(other + 0xbc)) goto next;
-                func_00282CF0(delta, other + 0x10, D_00189EA0);
-                if (func_00282DB0(delta, delta) > 20.0f) goto next;
-                func_00283388(rotation);
-                func_00283698(rotation, other + 0xc0);
-                func_002830C0(delta, delta, rotation);
-                if (!(func_00282C48(delta[0]) < 2.8f) || !(func_00282C48(delta[1]) < radius) || !(func_00282C48(delta[2]) < 1.5f)) goto next;
+                if (!vec_fast_helper_a(other + 0xbc)) goto next;
+                FastVecSub(delta, other + 0x10, g_hero_position);
+                if (FastVecDot(delta, delta) > 20.0f) goto next;
+                set_identity_matrix(rotation);
+                matrix_from_basis_rows(rotation, other + 0xc0);
+                transform_vector(delta, delta, rotation);
+                if (!(math_fabs(delta[0]) < 2.8f) || !(math_fabs(delta[1]) < radius) || !(math_fabs(delta[2]) < 1.5f)) goto next;
                 data = *(int **)(other + 0x68);
                 *(int *)(p + 0x278) += *data;
-                if (!func_002E59B0(m, *(int *)(p + 0x714))) {
-                    if (m[0x20] != 3) *(int *)(p + 0x714) = func_002E5CF8(15, 4, m);
+                if (!snd_is_voice_playing_for_owner(m, *(int *)(p + 0x714))) {
+                    if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
                     else {
-                        *(int *)(p + 0x714) = func_002E5CF8(24, 5, m);
-                        func_L01_00355BA0(*(int *)(p + 0x714), 0x400);
+                        *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
+                        snd_set_slot_field(*(int *)(p + 0x714), 0x400);
                     }
                 }
-                if (m[0x20] != 3) func_002E5CF8(12, 0, m);
+                if (m[0x20] != 3) PlayMobySound(12, 0, m);
                 *(int *)(p + 0x650) = *data;
                 other[0xbc] = 50;
                 if (*(unsigned char **)(p + 0x4c4)) {
@@ -254,7 +255,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
                     if (*(float *)(p + 0x27c) <= 0.020000001f) *(int *)(childState + 0x1c0) = 0;
                 }
                 if (!*(int *)(p + 0x640)) {
-                    func_L00_00322A98(m, p + 0x4e0);
+                    level_init_pending_slot(m, p + 0x4e0);
                     CallL00_00322AC0(p + 0x4e0, -0.7f, 64, 1);
                     CallL00_00322AC0(p + 0x4e0, -0.7f, 48, 2);
                     CallL00_00322AC0(p + 0x4e0, -0.7f, 32, 3);
@@ -262,7 +263,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
                     *(int *)(p + 0x640) = 1;
                 }
 next:
-                func_002A86E8(&other, other, 0, 0);
+                GetNextMobyInGroup(&other, other, 0, 0);
             } while (other);
         }
     }

@@ -8,30 +8,30 @@ typedef struct __attribute__((packed)) { u64 fields[6]; } AnimationParameters;
 typedef struct { char prefix[0x38]; u8 *owner; char suffix[4]; } TargetSlot;
 extern TargetSlot D_L09_001C40C0[];
 extern char D_L09_001B9A00[];
-extern int D_001A79F0 MACRO_ADDR;
+extern int g_current_map_index MACRO_ADDR;
 extern u8 *D_L09_001B285C __attribute__((sda));
 extern int D_L09_001A9040 __attribute__((sda));
-extern float func_00282E48(void *,void *);
-extern int func_002B0ED8(void *,void *,int),func_002B3380(void *,void *,void *);
-extern int func_002A77E0(int),func_002B3BA8(void *,int,void *,int,float,float);
-extern u8 *func_L09_00326E90(void *);
-extern void func_L09_003F7CE0(void *),func_L09_003F8858(void *);
-extern void func_L09_003F8598(void *),func_L09_003F7370(void *,float),func_L09_003F77D0(void *);
-extern void func_L09_003F8960(void *),func_L09_003F73E8(void *);
-extern void func_002A93B0(void *),func_002A7470(void *,int,int,int),func_002A7750(void *,int,int);
-extern void func_00282D30(void *,void *,float),func_002A6C58(void *,int,int),func_0029F338(void *);
+extern float fast_vec_dist(void *,void *);
+extern int moby_apply_damage_to_object(void *,void *,int),part_spawn_damage_debris(void *,void *,void *);
+extern int math_random_int_below(int),weapon_select_aim_target(void *,int,void *,int,float,float);
+extern u8 *moby_is_hero_or_special(void *);
+extern void trooper_legs_init(void *),enemy_apply_stored_values_helper(void *);
+extern void TransferStateToNearestEligibleObject(void *),part_spawn_small_burst(void *,float),moby_destroy_linked(void *);
+extern void trooper_compute_aim_target(void *),shared_counter_release(void *);
+extern void moby_update_ground_check(void *),anim_start_blended(void *,int,int,int),moby_set_state(void *,int,int);
+extern void FastVecScale(void *,void *,float),SetDeathBits(void *,int,int),moby_mark_spawned(void *);
 
 /* Mirrors the parent's measured 48-byte animation parameter block into its child,
  * releases detached effects and propagates the live target slot.
  */
 /* Main per-frame step for the enemy: runs its animation, passes the state on to the torso and removes everything when it dies. */
-void func_L09_003F8AE0(u8 *object)
+void trooper_legs_update_frame(u8 *object)
 {
     u8 *state = P(object,0x68), *vars, *moved, **effects;
     int before, result, i, remove = 0;
-    if (object[0x95] == 0) InitMegacorpTrooperLegs(object);
+    if (object[0x95] == 0) trooper_legs_init(object);
     if (object[0x31] && fast_vec_dist(object + 0x10, D_L09_001B9A00) < 24.0f) {
-        UpdateMobyGroundCheck(object); object[0x6F] = 22;
+        moby_update_ground_check(object); object[0x6F] = 22;
     }
     if (object[0xA8] == 255) {
         u8 *child = P(state,0x2F8);
@@ -47,14 +47,14 @@ void func_L09_003F8AE0(u8 *object)
         }
     }
     before = object[0x20];
-    result = ApplyDamageToObject(object, state + 0x50, 0);
-    if (gCurrentMapIndex == 9 && S(state,0xC0) != -1) {
-        if (!IsHeroOrSpecialStateMoby(D_L09_001B285C + (S(state,0xC0) << 8))) D_L09_001A9040 = 0;
+    result = moby_apply_damage_to_object(object, state + 0x50, 0);
+    if (g_current_map_index == 9 && S(state,0xC0) != -1) {
+        if (!moby_is_hero_or_special(D_L09_001B285C + (S(state,0xC0) << 8))) D_L09_001A9040 = 0;
         S(state,0xC0) = -1;
     }
     if (result) {
         u8 *child;
-        ApplyStoredValuesViaHelper(object);
+        enemy_apply_stored_values_helper(object);
         child = P(state,0x2F8);
         if (child) {
             if (result == 4) {
@@ -64,13 +64,13 @@ void func_L09_003F8AE0(u8 *object)
                 I(state,0x20) = 0;
                 moved = P(P(state,0x2F8),0x68);
                 *(AnimationParameters *)(moved + 0x20) = *(AnimationParameters *)(state + 0x20);
-                SpawnDamageDebrisOnHealthLoss(P(state,0x2F8), moved + 0x50, moved + 0x20);
+                part_spawn_damage_debris(P(state,0x2F8), moved + 0x50, moved + 0x20);
                 TransferStateToNearestEligibleObject(object);
-                SpawnSmallBurstEffect(object,0.4f);
-                DestroyLinkedMobys(object);
-                if (before >= 4 && !RandomIntBelow(2) && !I(state,0x428) &&
+                part_spawn_small_burst(object,0.4f);
+                moby_destroy_linked(object);
+                if (before >= 4 && !math_random_int_below(2) && !I(state,0x428) &&
                     I(state,0x2DC) != -1 && I(state,0x2DC) == I(state,0x2B0)) {
-                    if (object[0x43] != 17) StartAnimationBlended(object,17,0,5);
+                    if (object[0x43] != 17) anim_start_blended(object,17,0,5);
                     F(state,0xB0) = (float)*(s8 *)(state + 0xBF);
                     F(state,0xA4) = (float)*(s8 *)(state + 0xBE);
                     I(state,0xCC) = -1;
@@ -90,12 +90,12 @@ void func_L09_003F8AE0(u8 *object)
             } else {
                 vars = P(child,0x68);
                 *(AnimationParameters *)(vars + 0x20) = *(AnimationParameters *)(state + 0x20);
-                SpawnDamageDebrisOnHealthLoss(P(state,0x2F8),vars + 0x50,vars + 0x20);
-                StartAnimationBlended(P(state,0x2F8),object[0x43],0,3);
+                part_spawn_damage_debris(P(state,0x2F8),vars + 0x50,vars + 0x20);
+                anim_start_blended(P(state,0x2F8),object[0x43],0,3);
                 F(P(state,0x2F8),0x48) = F(object,0x48);
                 if (!(H(P(state,0x2F8),0x7C) & 0x80)) {
                     state[0x30F] = 1;
-                    if (object[0x95] != 9) SetMobyState(object,13,8);
+                    if (object[0x95] != 9) moby_set_state(object,13,8);
                 }
                 { u8 *target = P(state,0x2F8); if (!(H(target,0x7C) & 0x10)) H(target,0x7C) |= 0x100; }
                 { u8 *target = P(state,0x2F8); if (!(H(target,0x7C) & 0x20)) H(target,0x7C) |= 0x200; }
@@ -109,8 +109,8 @@ void func_L09_003F8AE0(u8 *object)
             }
         }
     }
-    SelectAimTarget_002B3BA8(object,I(state,0x2D8),0,0,0.0f,0.0f);
-    ComputeTrooperAimTarget(object);
+    weapon_select_aim_target(object,I(state,0x2D8),0,0,0.0f,0.0f);
+    trooper_compute_aim_target(object);
     if (state[0x2E] == 2) remove = 1;
     else {
         u8 *child = P(state,0x2F8);
@@ -118,7 +118,7 @@ void func_L09_003F8AE0(u8 *object)
             remove = P(child,0x68)[0x2E] == 2;
     }
     if (remove) {
-        ReleaseSharedCounter(object); DestroyLinkedMobys(object); TransferStateToNearestEligibleObject(object);
-        SetDeathBits(object,0,3); MarkMobySpawned(object);
+        shared_counter_release(object); moby_destroy_linked(object); TransferStateToNearestEligibleObject(object);
+        SetDeathBits(object,0,3); moby_mark_spawned(object);
     }
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L02_003FE768: the boss health bar (shared by Maktar and Joba).
  * Own -G8 unit. Each screen edge is rounded into t and converted in a one-pass group
  * (docs/build/compiler-notes.md, source methods shared with RAC1): the group's loop notes keep
@@ -5,10 +6,10 @@
  * groups the load is hoisted across them (0 of 2 places).
  */
 #include "common.h"
-extern void func_002FC560(unsigned int, unsigned long long);
-extern int func_00283CF0(float);
-extern int func_L00_0031C998(int, int, float);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern int FloatToInt(float);
+extern int math_lerp_int_fraction(int, int, float);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
 extern int D_L02_001B1330 __attribute__((sda));
 extern int D_L02_001B1338[] __attribute__((sda));
 extern int D_L02_001B1334[] __attribute__((sda));
@@ -18,10 +19,10 @@ extern int D_L02_001B1348 __attribute__((sda));
 extern int D_L02_001B134C[] __attribute__((sda));
 extern int D_L02_001B1350[] __attribute__((sda));
 extern float D_L02_001B3E04[] __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
+extern int g_is_pal_video[] __attribute__((sda));
 
 /* Draws the boss health bar. The bar gets shorter as health drops and changes colour from green toward red. */
-void func_L02_003FE768(float fraction)
+void hud_draw_boss_health_bar(float fraction)
 {
     int width;
     int color;
@@ -35,14 +36,14 @@ void func_L02_003FE768(float fraction)
         fraction = 0.0f;
     width = FloatToInt((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
     if (fraction > 0.5f)
-        color = LerpIntegerFraction(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
+        color = math_lerp_int_fraction(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
     else
-        color = LerpIntegerFraction(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
+        color = math_lerp_int_fraction(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
     t = (float)D_L02_001B1334[0] * D_L02_001B3E04[0] + 0.5f;
     do {
         top = t;
     } while (0);
-    if (gIsPalVideo[0])
+    if (g_is_pal_video[0])
         top -= D_L02_001B1340;
     left = D_L02_001B1330;
     right = left + width;
@@ -50,7 +51,7 @@ void func_L02_003FE768(float fraction)
     do {
         bottom = t;
     } while (0);
-    if (gIsPalVideo[0])
+    if (g_is_pal_video[0])
         bottom -= D_L02_001B1340;
     AppendScreenRectPacket(left, top, right, bottom, color, 0);
 }

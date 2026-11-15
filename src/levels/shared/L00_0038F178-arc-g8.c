@@ -6,7 +6,7 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { char pad[0x2290]; char *object; int mode; } WorldState;
-extern WorldState D_00189E20;
+extern WorldState g_hero_state;
 extern float D_L00_0025C64C NOT_SDA;
 extern short D_L00_001B2778[] MACRO_ADDR, D_L00_001B2790[] MACRO_ADDR, D_L00_001B27A8[] MACRO_ADDR, D_L00_001B27C0[] MACRO_ADDR;
 extern int D_L00_001AF278 __attribute__((sda));
@@ -18,30 +18,30 @@ extern Vector D_L00_00239EF0[][5];
 /* The same arcs seen from 16 bytes before them, as in RAC1 (electric_bolt_branch_points_base). */
 typedef struct { Vector hdr; Vector p[4]; } ArcBase;
 extern ArcBase D_L00_00239EE0[];
-extern Vector D_L00_001B8DC0;
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_0029F530(void *);
-extern int func_00282948(int *);
-extern float func_00283CE0(int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A7988(void *, float, float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_L00_003959C0(void);
+extern Vector g_camera_l00_position;
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float moby_get_anim_value(void *);
+extern int math_fast_float_d(int *);
+extern float IntToFloat(int);
+extern void anim_start_blended(void *, int, int, int);
+extern void part_spawn_random_direction_effect(void *, float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void UpdateScaledRecords(void);
 /* func_L00_002E6EF8 in most levels; its address differs per level. */
 extern void ref_L00_00395428_00(void *, void *);
 
 /* Updates the lightning arcs on the side of the hero while the special move is held. */
-void func_L00_00395428(char *object)
+void UpdateLightningArcs(char *object)
 {
     Vector origin, random, difference, offsets[5];
     int emitting = 0;
     int i, j, k, active;
     float distance;
-    if (*(unsigned char *)(gHeroState.object + 0x43) != 0x7B)
+    if (*(unsigned char *)(g_hero_state.object + 0x43) != 0x7B)
         D_L00_0025C64C = 0.1f;
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
@@ -58,16 +58,16 @@ void func_L00_00395428(char *object)
         D_L00_001B27D8 = D_L00_001AF27C;
         break;
     case 2:
-        if (gHeroState.mode == 31) {
-            distance = GetMobyAnimationValue(object);
+        if (g_hero_state.mode == 31) {
+            distance = moby_get_anim_value(object);
             if (distance >= 6.0f) {
                 emitting = 1;
-                if (!FastFloatHelperD(&D_L00_001B27D4)) {
+                if (!math_fast_float_d(&D_L00_001B27D4)) {
                     float elapsed = IntToFloat(D_L00_001B27D4);
                     elapsed /= IntToFloat(D_L00_001AF278);
                     D_L00_001B27DC = 1.0f - elapsed;
                 } else if (distance >= 12.0f) {
-                    if (!FastFloatHelperD(&D_L00_001B27D8)) {
+                    if (!math_fast_float_d(&D_L00_001B27D8)) {
                         float elapsed = IntToFloat(D_L00_001B27D8);
                         elapsed /= IntToFloat(D_L00_001AF27C);
                         D_L00_001B27DC = elapsed;
@@ -81,7 +81,7 @@ void func_L00_00395428(char *object)
         } else {
             D_L00_001B27D4 = D_L00_001AF278;
             D_L00_001B27D8 = D_L00_001AF27C;
-            StartAnimationBlended(object, 1, 0, 12);
+            anim_start_blended(object, 1, 0, 12);
         }
         break;
     }
@@ -103,14 +103,14 @@ void func_L00_00395428(char *object)
             if (emitting) {
                 D_L00_001B2778[i] = 2;
                 D_L00_001B2790[i] = 64;
-                SpawnRandomDirectionEffect(&random, D_L00_001AF274, D_L00_001AF274);
+                part_spawn_random_direction_effect(&random, D_L00_001AF274, D_L00_001AF274);
                 qcopy(&D_L00_00239EF0[i][0], &origin);
                 {
                     float sign = 1.0f;
                     for (j = 1; j < 5; j++) {
-                        FastVecSub(&difference, &D_L00_00239EE0[i].p[j - 1], &gCameraPosition_L00);
-                        ApplyAxisRotationToQuaternion(&random, &random, &difference,
-                                     RandomFloatRange(0.174532949924469f, 0.7853982448577881f) * sign);
+                        FastVecSub(&difference, &D_L00_00239EE0[i].p[j - 1], &g_camera_l00_position);
+                        math_apply_axis_rotation_to_quat(&random, &random, &difference,
+                                     math_random_float_range(0.174532949924469f, 0.7853982448577881f) * sign);
                         sign = -sign;
                         FastVecAdd(&D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1], &random);
                     }
@@ -123,9 +123,9 @@ void func_L00_00395428(char *object)
         } else {
             for (j = 1; j < 5; j++) {
                 FastVecSub(&offsets[j], &D_L00_00239EF0[i][j], &D_L00_00239EE0[i].p[j - 1]);
-                offsets[j].f[0] += RandomSignedFloatRange(0.0f, 0.1f);
-                offsets[j].f[1] += RandomSignedFloatRange(0.0f, 0.1f);
-                offsets[j].f[2] += RandomSignedFloatRange(0.0f, 0.1f);
+                offsets[j].f[0] += math_random_signed_float_range(0.0f, 0.1f);
+                offsets[j].f[1] += math_random_signed_float_range(0.0f, 0.1f);
+                offsets[j].f[2] += math_random_signed_float_range(0.0f, 0.1f);
             }
             qcopy(&D_L00_00239EF0[i][0], &origin);
             for (j = 1; j < 5; j++)

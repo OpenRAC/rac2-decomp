@@ -1,13 +1,13 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern f32 func_00282E48(void *, void *);
+extern f32 fast_vec_dist(void *, void *);
 
 /* Count followed by aligned, variable-length 16-byte points. */
 struct PointListPrefix { int count; };
 
 /* Finds which point in a list is closest to a position. Returns its index, or -1 if the list is empty. */
-int func_L02_00348420(TI128 *position, struct PointListPrefix *list) {
+int vec_find_nearest_point_index(TI128 *position, struct PointListPrefix *list) {
     TI128 point;
     int i, nearest = -1;
     f32 distance, minimum = 9999999.0f;

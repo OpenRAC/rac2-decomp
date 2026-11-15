@@ -26,22 +26,22 @@ int field24b0;
 char pad24b4[128];
 int field2534;
 } HeroView;
-extern HeroView D_00189E20;
+extern HeroView g_hero_state;
 extern unsigned int D_00138320;
 extern unsigned char D_0013957E;
 typedef struct { char pad[0x54]; float rate; char rest[0x88]; } WeaponEntry;
-extern WeaponEntry D_L00_00262570[];
-extern void func_PAL_L00_003B9C00(void *), func_L00_003B60E8(void);
-extern int func_L00_002D4040(int);
-extern void func_00273318(void *,float,unsigned int,void *,int,float,int,float,int);
-extern void *func_L00_00329E90(void *,void (*)(void),int *);
-extern char *func_L00_0032A088(int,void *),*func_L00_00329FF0(void *);
-extern AllocationOffsets *func_L00_0032A0B8(int,void *);
-extern void func_00282A88(void *,int);
-extern int func_00282948(int *),func_002829D8(float *);
-extern int func_L00_002B3998(float);
-extern void func_PAL_L00_002AF458(void),func_L00_00311080(void *,void *,int,int,int,int);
-extern void func_L00_002D3F30(int,int),func_002E5CF8(int,int,void *);
+extern WeaponEntry g_weapon_l00_table[];
+extern void func_PAL_L00_003B9C00(void *), weapon_release_shot_slots(void);
+extern int get_ammo(int);
+extern void hud_add_moby_marker(void *,float,unsigned int,void *,int,float,int,float,int);
+extern void *AcquireEntitySlot(void *,void (*)(void),int *);
+extern char *level_get_slot_body(int,void *),*mem_round_up_to_16(void *);
+extern AllocationOffsets *level_get_slot_header(int,void *);
+extern void mem_fast_helper_b(void *,int);
+extern int math_fast_float_d(int *),vec_fast_helper_b(float *);
+extern int math_is_below_plane_within_depth(float);
+extern void func_PAL_L00_002AF458(void),initialize_moby_animation_blend(void *,void *,int,int,int,int);
+extern void weapon_spend_ammo(int,int),PlayMobySound(int,int,void *);
 extern char *func_PAL_L00_00421578(void *,void *,int,void *,int,int);
 void func_PAL_L00_003B96A0(unsigned char *object)
 {
@@ -53,33 +53,33 @@ void func_PAL_L00_003B96A0(unsigned char *object)
     void **table;
     int triggered,secondary,finished,allowed;
     func_PAL_L00_003B9C00(object);
-    if(D_00189E20.field1500 || D_00189E20.field2294==29 || D_00189E20.field2294==1) {
+    if(g_hero_state.field1500 || g_hero_state.field2294==29 || g_hero_state.field2294==1) {
         unsigned int color;
-        if(F(ctx,0xC)>0.0f && func_L00_002D4040(-1)) color=0x600000FF;
+        if(F(ctx,0xC)>0.0f && get_ammo(-1)) color=0x600000FF;
         else color=0x600FFF0F;
-        func_00273318(object,1.0f,color,0,38,0.0f,-1,90.0f,4);
+        hud_add_moby_marker(object,1.0f,color,0,38,0.0f,-1,90.0f,4);
     }
     switch(object[0x20]) {
     case 0: {
-        other=func_L00_00329E90(object,func_L00_003B60E8,&existing);
+        other=AcquireEntitySlot(object,weapon_release_shot_slots,&existing);
         state->data=other;
         if(!existing) {
-            cursor=func_L00_0032A088(H(object,0xAA),other);
+            cursor=level_get_slot_body(H(object,0xAA),other);
             base=cursor;
-            cursor=func_L00_00329FF0(cursor+0x64);
+            cursor=mem_round_up_to_16(cursor+0x64);
             { int i; for(i=0;i<25;i++) {((void **)base)[i]=cursor;cursor+=0x280;} }
-            cursor=func_L00_00329FF0(cursor);
+            cursor=mem_round_up_to_16(cursor);
             I(ctx,4)=cursor-base;
-            func_00282A88(cursor,0x20D0);
-            cursor=func_L00_00329FF0(cursor+0x20D0);
+            mem_fast_helper_b(cursor,0x20D0);
+            cursor=mem_round_up_to_16(cursor+0x20D0);
             I(ctx,8)=cursor-base;
             { int j; for(j=24;j>=0;j--) ((int *)cursor)[j]=0; }
-            cursor=func_L00_00329FF0(cursor+0x64);
+            cursor=mem_round_up_to_16(cursor+0x64);
             offset=cursor-base;
             table=(void **)cursor;
-            cursor=func_L00_00329FF0(cursor+0x64);
+            cursor=mem_round_up_to_16(cursor+0x64);
             { int k; for(k=0;k<25;k++) {table[k]=cursor;cursor+=0x280;} }
-            { AllocationOffsets *offsets=func_L00_0032A0B8(H(object,0xAA),*(void **)ctx);
+            { AllocationOffsets *offsets=level_get_slot_header(H(object,0xAA),*(void **)ctx);
             offsets->first=I(ctx,4);offsets->second=I(ctx,8);offsets->third=offset; }
         }
         object[0x20]=1;H(ctx,0x1C)=3;
@@ -88,35 +88,35 @@ void func_PAL_L00_003B96A0(unsigned char *object)
     }
     case 1: case 2:
         triggered=0;secondary=0;finished=0;allowed=1;
-        if(D_00189E20.field1500 || D_00189E20.field2294==29) {
-            if(!func_00282948(&D_00189E20.field2534)) allowed=0;
-        } else D_00189E20.field2534=33;
+        if(g_hero_state.field1500 || g_hero_state.field2294==29) {
+            if(!math_fast_float_d(&g_hero_state.field2534)) allowed=0;
+        } else g_hero_state.field2534=33;
         if(object[0x20]==1) {
-            if(func_002829D8((float *)(ctx+0xC)) && allowed &&
-               (D_00138320 & D_00189E20.field1230) && D_00189E20.field1240>=19 &&
-               (D_00189E20.field1500 || D_00189E20.field2294==1 || D_00189E20.field2294==29) && func_L00_002D4040(22)) {
-                { WeaponEntry *w=&D_L00_00262570[D_0013957E];
+            if(vec_fast_helper_b((float *)(ctx+0xC)) && allowed &&
+               (D_00138320 & g_hero_state.field1230) && g_hero_state.field1240>=19 &&
+               (g_hero_state.field1500 || g_hero_state.field2294==1 || g_hero_state.field2294==29) && get_ammo(22)) {
+                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
                 F(ctx,0xC)=1.0f/w->rate; }
                 triggered=1;
             }
             secondary=0;
-            if(D_00189E20.field2294==0x83 && !D_00189E20.fieldc2c && func_L00_002B3998(33.0f)) secondary=func_L00_002D4040(22)!=0;
-            if(D_00189E20.field229c==4 && allowed && !D_00189E20.field49c &&
-               F(ctx,0xC)==0.0f && (D_00138320&0x20) && D_00189E20.field1240>=19 && func_L00_002D4040(22)) {
+            if(g_hero_state.field2294==0x83 && !g_hero_state.fieldc2c && math_is_below_plane_within_depth(33.0f)) secondary=get_ammo(22)!=0;
+            if(g_hero_state.field229c==4 && allowed && !g_hero_state.field49c &&
+               F(ctx,0xC)==0.0f && (D_00138320&0x20) && g_hero_state.field1240>=19 && get_ammo(22)) {
                 func_PAL_L00_002AF458();
-                other=*(char **)((char *)&D_00189E20+0xE98);
+                other=*(char **)((char *)&g_hero_state+0xE98);
                 if(other) {
                     F(other,8)=0.0f;
-                    func_L00_00311080(D_00189E20.field2290,other,D_00189E20.field24b0,1,1,1);
+                    initialize_moby_animation_blend(g_hero_state.field2290,other,g_hero_state.field24b0,1,1,1);
                 }
                 object[0x20]=2;
-                { WeaponEntry *w=&D_L00_00262570[D_0013957E];
+                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
                 F(ctx,0xC)=1.0f/w->rate; }
                 I(ctx,0x10)=7;
             }
-        } else if(func_00282948((int *)(ctx+0x10))) {finished=1;object[0x20]=1;}
+        } else if(math_fast_float_d((int *)(ctx+0x10))) {finished=1;object[0x20]=1;}
         if(triggered || secondary || finished) {
-            func_L00_002D3F30(-1,1);func_002E5CF8(2,0,object);
+            weapon_spend_ammo(-1,1);PlayMobySound(2,0,object);
             result=func_PAL_L00_00421578(object,object+0x10,triggered,*(void **)ctx,I(ctx,0x14),1);
             if(result) *(void **)(result+0xB8)=object;
         }

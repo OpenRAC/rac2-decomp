@@ -50,7 +50,7 @@ static __inline__ int fp_cmp_iszero(fp_number_type *number) {
 }
 
 /* Compares two unpacked doubles and gives -1, 0 or 1. */
-int func_00122F10(fp_number_type *a, fp_number_type *b) {
+int fp_compare_double_parts(fp_number_type *a, fp_number_type *b) {
     if (fp_cmp_isnan(a) || fp_cmp_isnan(b)) {
         return 1;
     }

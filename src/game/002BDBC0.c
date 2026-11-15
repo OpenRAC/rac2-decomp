@@ -28,19 +28,19 @@ typedef struct {
 
 extern u8 *D_001F2598[];
 
-extern Effect2BDBC0 *func_002B9030(int);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
+extern Effect2BDBC0 *part_alloc(int);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
 extern int func_001163B0(void);
 
 /* Creates a puff of smoke that starts small and grows to the given size over its life. */
-void func_002BDBC0(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
+void part_spawn_growing_puff(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
     Puff2BDBC0 *puff;
     Effect2BDBC0 *effect;
     f32 lifeFrames;
     f32 sizeGrowth;
 
-    effect = AllocParticle(0x16);
+    effect = part_alloc(0x16);
     if (effect != 0) {
         puff = &effect->p;
         effect->color = color;
@@ -48,7 +48,7 @@ void func_002BDBC0(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 s
         effect->f1 = 0;
         effect->f3 = 0x44;
         effect->size = size * 0.2f;
-        effect->f8 = Rand();
+        effect->f8 = func_001163B0();
         effect->f2 = *D_001F2598[0];
         effect->frames = frames;
         puff->frames = frames;

@@ -8,18 +8,18 @@
  * the absolute rematerialisation in this G0 unit.
  */
 extern float D_L00_001B25E0[] __attribute__((sda));
-extern int D_001A7B90[] __attribute__((sda));
-extern int D_001A7340[] __attribute__((sda));
-extern int D_001A7344[] __attribute__((sda));
+extern int g_is_pal_video[] __attribute__((sda));
+extern int g_screen_width[] __attribute__((sda));
+extern int g_screen_height[] __attribute__((sda));
 typedef struct { int words[0x744/4]; } Menu705;
-extern Menu705 D_L00_0022F7C0[];
+extern Menu705 g_purchase_menu_model[];
 typedef struct { int key; unsigned int color; } MenuColor;
 extern MenuColor D_L00_0028E9F0[];
-extern void func_002FC620(int, int, int, int);
-extern int func_00282C30(int);
-extern void func_00285548(int,int,int,int,int,int,unsigned int);
-extern char *func_0028E588(int,int);
-extern int func_0028EA58(char *,int,int,int,int,unsigned int *);
+extern void gfx_set_scissor_clamped(int, int, int, int);
+extern int subtract_integer_with_clamp(int);
+extern void DrawFramebufferRect(int,int,int,int,int,int,unsigned int);
+extern char *GetIconFrame(int,int);
+extern int hud_draw_sprite_gradient(char *,int,int,int,int,unsigned int *);
 #define MW(o) (D_L00_0022F7C0[0].words[(o)/4])
 #define MY(y) ((int)(D_L00_001B25E0[0]*(y)+0.5f)+(D_001A7B90[0]?4:0))
 static __inline__ int fade(int v)
@@ -29,7 +29,7 @@ static __inline__ int fade(int v)
     return 128-(int)(d*0.75);
 }
 /* Draws the scrolling list of vendor items with a pulsing highlight, tinting each row by its colour code. */
-void func_L00_003769C0(void)
+void shop_draw_vendor_item_list(void)
 {
     int y;
     int bottom, top;
@@ -39,13 +39,13 @@ void func_L00_003769C0(void)
 
     bottom=MY(382.0f);
     top=(int)(D_L00_001B25E0[0]*320.0f+0.5f);
-    SetGsScissorClamped(58,456,top,bottom);
+    gfx_set_scissor_clamped(58,456,top,bottom);
     if (MW(0x6c)<0) MW(0x6c)+=4;
     else if(MW(0x6c)>0) MW(0x6c)-=4;
     color=0xf0f0b0;
     pulse=(subtract_integer_with_clamp(((MW(4)<<2)&63)-32)+64)*0x10202;
-    DrawFramebufferRect(229,MY(325.0f),285,MY(381.0f),gScreenWidth[0],gScreenHeight[0],0x80000000|pulse);
-    DrawFramebufferRect(231,MY(327.0f),283,MY(379.0f),gScreenWidth[0],gScreenHeight[0],0x80442d00);
+    DrawFramebufferRect(229,MY(325.0f),285,MY(381.0f),g_screen_width[0],g_screen_height[0],0x80000000|pulse);
+    DrawFramebufferRect(231,MY(327.0f),283,MY(379.0f),g_screen_width[0],g_screen_height[0],0x80442d00);
     y=MW(0x6c)-47;
     { int i;
     for(i=-5;i<7;i++,y+=56) {
@@ -54,7 +54,7 @@ void func_L00_003769C0(void)
         char *text, *row;
         idx=i+MW(0x80);
         if(idx<0 || idx>=MW(0x740)) continue;
-        row=(char *)gPurchaseMenuModel+0x140+idx*28;
+        row=(char *)g_purchase_menu_model+0x140+idx*28;
         text=GetIconFrame(0xea97,*(int *)row);
         a=fade(y+2);
         b=fade(y+40);
@@ -77,7 +77,7 @@ void func_L00_003769C0(void)
                 key=*(int *)((char *)D_L00_0028E9F0+off);
                 if(key) {
                     j++;
-                    wanted=(int *)((char *)gPurchaseMenuModel+0x158+idx*28);
+                    wanted=(int *)((char *)g_purchase_menu_model+0x158+idx*28);
                     if(*wanted!=key) goto top;
                     color=*(unsigned int *)((char *)D_L00_0028E9F0+(off+4));
                 }
@@ -85,12 +85,12 @@ void func_L00_003769C0(void)
             label=GetIconFrame(0xea97,one);
             colors[2]=colors[0]=a|color;
             colors[3]=colors[1]=b|color;
-            DrawHudSpriteGradient(label,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
+            hud_draw_sprite_gradient(label,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
             color=0xf0f0b0;
         }
         colors[3]=colors[1]=b|color;
         colors[2]=colors[0]=a|color;
-        DrawHudSpriteGradient(text,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
+        hud_draw_sprite_gradient(text,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
     }
     }
 }

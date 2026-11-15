@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad0[0x2290];
@@ -13,8 +14,8 @@ typedef struct {
     unsigned char pad22BD;
     unsigned char b22BE;
 } Hero_2B2120;
-extern Hero_2B2120 D_00189E20;
-extern int func_L00_002ADF80(void);
+extern Hero_2B2120 g_hero_state;
+extern int hero_is_in_special_kind_or_mode(void);
 extern void func_PAL_L00_002AFAE8(void);
 extern void func_PAL_L00_002B0860(char *);
 extern void func_PAL_L00_002D4F60(void);
@@ -23,19 +24,19 @@ extern void func_PAL_L00_002B1E88(void);
 
 void func_PAL_L00_002B2018(void)
 {
-    int m = D_00189E20.mode;
+    int m = g_hero_state.mode;
 
-    if ((unsigned int)(m - 0x15) < 2 || m == 0x1F || func_L00_002ADF80() != 0) {
-        D_00189E20.b22B7 = 1;
-        D_00189E20.b22BC = 1;
+    if ((unsigned int)(m - 0x15) < 2 || m == 0x1F || hero_is_in_special_kind_or_mode() != 0) {
+        g_hero_state.b22B7 = 1;
+        g_hero_state.b22BC = 1;
     }
-    if (func_L00_002ADF80() != 0 || D_00189E20.state == 0x31 || D_00189E20.mode == 3 ||
-        D_00189E20.state == 0x12 || D_00189E20.state == 0x82)
-        D_00189E20.b22BE = 1;
+    if (hero_is_in_special_kind_or_mode() != 0 || g_hero_state.state == 0x31 || g_hero_state.mode == 3 ||
+        g_hero_state.state == 0x12 || g_hero_state.state == 0x82)
+        g_hero_state.b22BE = 1;
     else
-        D_00189E20.b22BE = 0;
+        g_hero_state.b22BE = 0;
     func_PAL_L00_002AFAE8();
-    func_PAL_L00_002B0860(D_00189E20.moby);
+    func_PAL_L00_002B0860(g_hero_state.moby);
     func_PAL_L00_002D4F60();
     func_PAL_L00_002A7D48();
     func_PAL_L00_002B1E88();

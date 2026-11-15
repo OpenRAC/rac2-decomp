@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_1 __attribute__((sda));
 extern int func_PAL_003405B0(int, int);
@@ -16,7 +17,7 @@ int func_PAL_L00_0030F568(int a0)
 }
 
 extern int D_L00_001A904C_2 __attribute__((sda));
-extern void func_0033D970(int);
+extern void two_toggle_b_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -25,7 +26,7 @@ void func_PAL_L00_0030F5A8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033D970(value + 0x3D288);
+        two_toggle_b_draw(value + 0x3D288);
 }
 
 extern int func_PAL_L00_004388F8(int, int);
@@ -55,7 +56,7 @@ int func_PAL_L00_0030F618(int argument)
     return 0;
 }
 
-extern void func_0033C738(int);
+extern void four_option_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -64,7 +65,7 @@ void func_PAL_L00_0030F658(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033C738(value + 0x3D568);
+        four_option_menu_draw(value + 0x3D568);
 }
 
 extern int func_PAL_L00_00437BA8(int, int);
@@ -80,7 +81,7 @@ int func_PAL_L00_0030F688(int argument)
     return 0;
 }
 
-extern void func_0033CC20(int);
+extern void two_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -89,7 +90,7 @@ void func_PAL_L00_0030F6C8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033CC20(value + 0x3D848);
+        two_toggle_a_draw(value + 0x3D848);
 }
 
 extern int func_PAL_0033F470(int, int);
@@ -105,7 +106,7 @@ int func_PAL_L00_0030F6F8(int argument)
     return 0;
 }
 
-extern void func_0033D638(int);
+extern void single_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -114,7 +115,7 @@ void func_PAL_L00_0030F738(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033D638(value + 0x3DE98);
+        single_toggle_a_draw(value + 0x3DE98);
 }
 
 extern int func_PAL_0033DDC0(int, int);
@@ -130,7 +131,7 @@ int func_PAL_L00_0030F768(int argument)
     return 0;
 }
 
-extern void func_0033C028(int);
+extern void onoff_menu_draw_with_help(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -139,7 +140,7 @@ void func_PAL_L00_0030F7A8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033C028(value + 0x3E178);
+        onoff_menu_draw_with_help(value + 0x3E178);
 }
 
 extern int func_PAL_0033E160(int, int);
@@ -155,7 +156,7 @@ int func_PAL_L00_0030F7D8(int argument)
     return 0;
 }
 
-extern void func_0033C378(int);
+extern void onoff_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
@@ -164,7 +165,7 @@ void func_PAL_L00_0030F818(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033C378(value + 0x3E458);
+        onoff_menu_draw(value + 0x3E458);
 }
 
 extern int func_PAL_00340348(int, int);
@@ -185,7 +186,7 @@ void func_PAL_L00_0030F888(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033E428(value + 0x3F4A0);
+        list_page_draw(value + 0x3F4A0);
 }
 
 extern int func_PAL_0033EEF8(int, int);
@@ -206,7 +207,7 @@ void func_PAL_L00_0030F8F8(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033D2C0(value + 0x3DB28);
+        audio_menu_draw(value + 0x3DB28);
 }
 
 extern int func_PAL_L00_00438CC0(int, int);
@@ -227,6 +228,6 @@ void func_PAL_L00_0030F968(void)
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        func_0033DCC8(value + 0x3EC00);
+        single_toggle_c_draw(value + 0x3EC00);
 }
 

@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned long u64;
 extern int D_001B1668 __attribute__((nosda));
 extern int D_001A89B0[8] __attribute__((sda));
-extern int func_0027F128(u8 *, int, u8 *);
+extern int measure_text_width(u8 *, int, u8 *);
 extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
-extern int D_001A8BB0 __attribute__((section(".sdata")));
+extern int g_current_game_mode __attribute__((section(".sdata")));
 extern int D_001B166C __attribute__((sda));
-extern int D_001A7340 __attribute__((nosda));
-extern int D_001A7344 __attribute__((nosda));
-extern void func_002FC620(int, int, int, int);
+extern int g_screen_width __attribute__((nosda));
+extern int g_screen_height __attribute__((nosda));
+extern void gfx_set_scissor_clamped(int, int, int, int);
 
 struct FontWindow {
     short y_min, y_max, x_min, x_max, x_anchor, y_start;
@@ -31,8 +32,8 @@ void func_PAL_002804A8(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a
     int W, Wsave, line, i, brk, width, colr, n0, last, balanced;
     int k, y, adv;
 
-    if (D_001A8BB0 != 1 && !(win->flags & 0x10))
-        func_002FC620(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
+    if (g_current_game_mode != 1 && !(win->flags & 0x10))
+        gfx_set_scissor_clamped(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
     D_001B166C = 1;
     if ((win->flags ^ 1) & 1) {
         W = win->x_max - win->x_anchor;
@@ -115,7 +116,7 @@ void func_PAL_002804A8(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a
             cnt = endi[k] - start[k] + 1;
             if (len > 0 && cnt > len)
                 cnt = len;
-            w = func_0027F128(text + start[k], cnt, glyphs);
+            w = measure_text_width(text + start[k], cnt, glyphs);
             if (dw->out_w < w)
                 dw->out_w = w;
             if (!(dw->flags & 4)) {
@@ -144,6 +145,6 @@ void func_PAL_002804A8(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a
         }
     }
     D_001B166C = 0;
-    if (D_001A8BB0 != 1 && !(win->flags & 0x10))
-        func_002FC620(0, D_001A7340 - 1, 0, D_001A7344 - 1);
+    if (g_current_game_mode != 1 && !(win->flags & 0x10))
+        gfx_set_scissor_clamped(0, g_screen_width - 1, 0, g_screen_height - 1);
 }

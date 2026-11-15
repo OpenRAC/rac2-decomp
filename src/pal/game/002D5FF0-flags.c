@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 void func_PAL_002D6730(short param_1, int param_2, int *param_3);
 
@@ -14,17 +15,17 @@ void func_PAL_002D6A70(int param_1)
 typedef struct { char pad[4]; short mode; } Mode2D6E78;
 typedef struct { char pad[0x29C]; int flags[5]; int selected; } Map2D6E78;
 typedef struct { char pad[0xDB]; unsigned char active; char padDC[0x118 - 0xDC]; char *loaded; unsigned int limit; } State2D6E78;
-extern Mode2D6E78 D_001A63A8;
-extern Map2D6E78 D_001C4FA0;
-extern State2D6E78 D_001F2840;
+extern Mode2D6E78 g_music_state;
+extern Map2D6E78 g_map_overlay_state;
+extern State2D6E78 g_pause_menu_state;
 extern unsigned char D_001F291B;
-extern void func_002B7AD0(void);
-extern void func_002B7AD0(void);
+extern void load_request_disc_read_break(void);
+extern void load_request_disc_read_break(void);
 
 int func_PAL_002D7AA8(void)
 {
-    if (D_001A63A8.mode == 0) {
-        Map2D6E78 *map = &D_001C4FA0;
+    if (g_music_state.mode == 0) {
+        Map2D6E78 *map = &g_map_overlay_state;
         int index = map->selected;
         if (index != -1) {
             D_001F291B = 0;
@@ -32,13 +33,13 @@ int func_PAL_002D7AA8(void)
             map->selected = -1;
         }
     }
-    if (D_001A63A8.mode != 0) {
-        State2D6E78 *state = &D_001F2840;
+    if (g_music_state.mode != 0) {
+        State2D6E78 *state = &g_pause_menu_state;
         if (state->active != 0) {
             Map2D6E78 *map;
-            func_002B7AD0();
+            load_request_disc_read_break();
             state->active = 0;
-            map = &D_001C4FA0;
+            map = &g_map_overlay_state;
             map->flags[map->selected] = -1;
             map->selected = -1;
         }
@@ -46,8 +47,8 @@ int func_PAL_002D7AA8(void)
     return 0;
 }
 
-extern void func_0029D830(int *);
-extern int func_0029DB28(unsigned int, unsigned int, unsigned int, int);
+extern void menu_update_entry_states(int *);
+extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
 extern int D_001C51D0;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
 extern Base2D75E8 D_0025A6E0;
@@ -55,8 +56,8 @@ extern int D_0025A620[];
 
 int func_PAL_002D8228(int *arg0)
 {
-    func_0029D830(arg0);
-    *(int *)((char *)arg0 + 0xA0) = func_0029DB28(0x70000000, 0, 0x70000100, 1);
+    menu_update_entry_states(arg0);
+    *(int *)((char *)arg0 + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
     {
         char *base = (char *)arg0 + 0x30;
         int index = D_001C51D0;

@@ -18,14 +18,14 @@ typedef struct {
     float transform[3][4];
 } OozlaAppendObject164;
 
-extern void func_00283098(float *, const float *, const float *);
+extern void matrix_mul_vec3(float *, const float *, const float *);
 extern void func_00282F20_16(void *, void *, float);
 extern float func_00282DB0_3(void *, void *);
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282DD8(void *, void *, void *);
+extern void FastVecSub(float *, const float *, const float *);
+extern void FastVecCross(void *, void *, void *);
 
 /* Project point differences perpendicular to direction, then prune the index set. */
-void func_00274810(OozlaAppendObject164 *object, int index, const float *direction)
+void coll_prune_index_set_by_projection(OozlaAppendObject164 *object, int index, const float *direction)
 {
     float point[4], vectors[3][4], projection[4];
     float c0[4], c1[4], c2[4], c3[4];

@@ -6,16 +6,16 @@ extern float ref_L11_00445DF8_02 __attribute__((sda));
 extern float ref_L11_00445DF8_03 __attribute__((sda));
 extern s32 ref_L11_00445DF8_04 __attribute__((sda));
 extern s32 D_001A7A00;
-extern char D_001A63A8[];
-extern char D_00189E20[];
-extern s32 func_00282948(void *);
-extern s32 func_002A77E0(s32);
-extern int func_L11_00445D28(char *, int);
+extern char g_music_state[];
+extern char g_hero_state[];
+extern s32 math_fast_float_d(void *);
+extern s32 math_random_int_below(s32);
+extern int arena_queue_voice_line(char *, int);
 
 /* Collects the actions the Joba boss may use now and starts a random one after a random cooldown. */
-void func_L11_00445DF8(char *moby, s32 countDelta, float accumDelta, float levelValue) {
+void joba_boss_start_random_action(char *moby, s32 countDelta, float accumDelta, float levelValue) {
     char *state = *(char **)(moby + 0x68);
-    char *world = gMusicState;
+    char *world = g_music_state;
     char *hero;
     char *hero2;
     s32 id23;
@@ -52,7 +52,7 @@ void func_L11_00445DF8(char *moby, s32 countDelta, float accumDelta, float level
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x194) = 0;
     }
-    if (FastFloatHelperD(state + 0x1B0) != 0) {
+    if (math_fast_float_d(state + 0x1B0) != 0) {
         *(s32 *)(state + 0x198) = 0;
         *(s32 *)(state + 0x1B0) = 300;
         *(s32 *)(state + 0x194) = 0;
@@ -66,21 +66,21 @@ void func_L11_00445DF8(char *moby, s32 countDelta, float accumDelta, float level
                 listPtr[numCandidates++] = id;
         }
     }
-    hero = gHeroState;
+    hero = g_hero_state;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * ref_L11_00445DF8_03) {
         id23 = 0x18;
         if (*(s16 *)(state + 0x2D0) == 0)
             candidates[numCandidates++] = id23;
     }
-    hero2 = gHeroState;
+    hero2 = g_hero_state;
     if (*(s32 *)(hero2 + 0x24CC) <= 0) {
-        id24 = RandomIntBelow(2) + 0x19;
+        id24 = math_random_int_below(2) + 0x19;
         off = id24 * 2;
         if (*(s16 *)(state + off + 0x2A0) == 0)
             candidates[numCandidates++] = id24;
     }
     if (numCandidates != 0) {
-        QueueArenaVoiceLine(moby, candidates[RandomIntBelow(numCandidates)]);
-        *(s32 *)(state + 0x190) = ref_L11_00445DF8_04 + RandomIntBelow(ref_L11_00445DF8_04);
+        arena_queue_voice_line(moby, candidates[math_random_int_below(numCandidates)]);
+        *(s32 *)(state + 0x190) = ref_L11_00445DF8_04 + math_random_int_below(ref_L11_00445DF8_04);
     }
 }

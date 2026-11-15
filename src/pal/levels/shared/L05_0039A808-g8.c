@@ -30,10 +30,10 @@ typedef struct {
     float m2[4];                /* 0xE0 */
 } SpawnObject003979B0;
 
-extern SpawnObject003979B0 *func_0029EFD0(int);
-extern int func_00283CF0(float);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern SpawnObject003979B0 *CreateMoby(int);
+extern int FloatToInt(float);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 extern float D_L05_001AEBC4 __attribute__((sda));
 extern float D_L05_001AEBD0 __attribute__((sda));
 extern int D_L05_001AEBCC __attribute__((sda));
@@ -43,9 +43,9 @@ SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, Spawn
     SpawnObject003979B0 *obj;
 
     if (flag != 0)
-        obj = func_0029EFD0(0x12D8);
+        obj = CreateMoby(0x12D8);
     else
-        obj = func_0029EFD0(0x1173);
+        obj = CreateMoby(0x1173);
     if (obj != 0) {
         SpawnState003979B0 *st;
         float f20;
@@ -60,7 +60,7 @@ SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, Spawn
         f20 = D_L05_001AEBC4 * (0.020000001f);
         st->flag = flag;
         f21 = 1.0f;
-        count = func_00283CF0(D_L05_001AEBD0);
+        count = FloatToInt(D_L05_001AEBD0);
         st->count = count;
         st->a2 = a2;
         st->a3 = (char *)a3;
@@ -69,11 +69,11 @@ SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, Spawn
         st->value = ((s32)(D_L05_001AEBCC) * 5 + 2) / 6;
         qcopy(obj->pos, pos);
         obj->scale = obj->scale * 0.5f;
-        func_00282F20(st, vec, f20);
-        func_00282F20(obj->m0, st, f21);
-        func_00282DD8(obj->m1, obj->m0, a3->m2);
-        func_00282F20(obj->m1, obj->m1, f21);
-        func_00282DD8(obj->m2, obj->m1, obj->m0);
+        vec_scale_to_length(st, vec, f20);
+        vec_scale_to_length(obj->m0, st, f21);
+        FastVecCross(obj->m1, obj->m0, a3->m2);
+        vec_scale_to_length(obj->m1, obj->m1, f21);
+        FastVecCross(obj->m2, obj->m1, obj->m0);
     }
     return obj;
 }

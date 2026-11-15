@@ -12,7 +12,8 @@ SOURCES = (
     ROOT / "src/us2/game/0029C448-rc2.c",
     ROOT / "src/pal/game/0029BFF0-rc2.c",
 )
-HEADER = "#include <stdint.h>\ntypedef int32_t s32;\n"
+# The sources use readable names (include/names.h, as the real common.h does).
+HEADER = "#include <stdint.h>\ntypedef int32_t s32;\n#include \"names.h\"\n"
 HARNESS = r"""
 #include <stdint.h>
 typedef void (*Forwarder)(int32_t, int32_t, float, float, float, float);
@@ -73,7 +74,7 @@ def compile_and_run(compiler, directory, sources):
     harness.write_text(HARNESS, encoding="utf-8")
     executable = directory / "contract"
     subprocess.run(
-        [compiler, "-m32", "-std=c99", "-O2", "-I", str(directory),
+        [compiler, "-m32", "-std=c99", "-O2", "-I", str(directory), "-I", str(ROOT / "include"),
          *map(str, sources), str(harness), "-o", str(executable)],
         check=True, capture_output=True, text=True, timeout=30,
     )

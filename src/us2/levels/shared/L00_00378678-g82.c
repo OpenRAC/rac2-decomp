@@ -1,34 +1,35 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char D_L00_0022F7C0[];
-extern int D_001A79F8;
+extern char g_purchase_menu_model[];
+extern int g_player_bolts;
 extern float D_L00_001B25E0[] __attribute__((sda));
 extern int D_001AD778 __attribute__((sda));
 extern int D_001AD780 __attribute__((sda));
 extern int D_001AD77C;
-extern unsigned char *func_00288FB8(int);
-extern void func_0027FB40(int, int, unsigned long long, unsigned char *, int);
+extern unsigned char *GetLocalizedString(int);
+extern void text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
 void func_US2_L00_00379738(void)
 {
-    char *model = D_L00_0022F7C0;
+    char *model = g_purchase_menu_model;
 
     if (*(int *)(model + 0x84) != 0) {
         int index = *(int *)(model + 0x80);
 
-        if (D_001A79F8 >= *(int *)(D_L00_0022F7C0 + index * 16 + 0x148)) {
-            func_0027FB40(D_001AD778, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
-                              0x80F0F0F0ULL, func_00288FB8(0x31C7), -1);
-            func_0027FB40(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
-                              0x80F0F0F0ULL, func_00288FB8(0x31C4), -1);
+        if (g_player_bolts >= *(int *)(g_purchase_menu_model + index * 16 + 0x148)) {
+            text_draw_centered_medium(D_001AD778, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
+                              0x80F0F0F0ULL, GetLocalizedString(0x31C7), -1);
+            text_draw_centered_medium(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
+                              0x80F0F0F0ULL, GetLocalizedString(0x31C4), -1);
         } else {
-            func_0027FB40(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
-                              0x80F0F0F0ULL, func_00288FB8(0x31B0), -1);
+            text_draw_centered_medium(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
+                              0x80F0F0F0ULL, GetLocalizedString(0x31B0), -1);
         }
     } else {
-        func_0027FB40(D_001AD778, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
-                          0x80F0F0F0ULL, func_00288FB8(0x31B1), -1);
-        func_0027FB40(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
-                          0x80F0F0F0ULL, func_00288FB8(0x2BE5), -1);
+        text_draw_centered_medium(D_001AD778, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
+                          0x80F0F0F0ULL, GetLocalizedString(0x31B1), -1);
+        text_draw_centered_medium(D_001AD778 + D_001AD780, (int)((float)D_001AD77C * D_L00_001B25E0[0] + 0.5f),
+                          0x80F0F0F0ULL, GetLocalizedString(0x2BE5), -1);
     }
 }

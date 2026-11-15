@@ -29,14 +29,14 @@ typedef struct {
     int cur;
 } CardState29B168;
 
-extern CardState29B168 D_001393E0;
+extern CardState29B168 g_memcard_state;
 extern int D_001A9968 __attribute__((sda));
-extern int func_0029AF58(char *);
-extern int func_0029AE78(int *);
-extern int func_00115340(void *, void *, int);
-extern void func_00282AB0(void *, void *, int);
+extern int save_verify_block_checksum(char *);
+extern int memcard_GetDataSize(int *);
+extern int memcmp(void *, void *, int);
+extern void mem_copy_aligned(void *, void *, int);
 
-int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *restore_entries)
+int MemcardRestoreData(unsigned char *save_packet, int slot, RestoreEntry29B168 *restore_entries)
 {
     RestoreEntry29B168 *matched_entry;
     int errors;
@@ -45,7 +45,7 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
     int copySize;
     unsigned char *slot_destination;
 
-    if (VerifySaveBlockChecksum((char *)save_packet) == 0) {
+    if (save_verify_block_checksum((char *)save_packet) == 0) {
         return 1;
     }
     save_packet += 8;
@@ -86,7 +86,7 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
                 D_001A9968++;
             }
             if (((RestoreEntry29B168 *)(((unsigned int)i << 4) + (unsigned int)restore_entries))->id != 6000) {
-                CopyMemoryAligned(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize);
+                mem_copy_aligned(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize);
                 total += ((copySize + 3) & ~3) + 8;
             } else {
                 total += ((((RestoreBlock29B168 *)save_packet)->size + 3) & ~3) + 8;
@@ -107,6 +107,6 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
             errors++;
         }
     }
-    gMemcardState.slot[gMemcardState.cur].errors = errors;
+    g_memcard_state.slot[g_memcard_state.cur].errors = errors;
     return errors;
 }

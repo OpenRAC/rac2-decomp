@@ -6,30 +6,30 @@ extern int D_L04_001B0710 __attribute__((sda));
 extern int D_L04_001B0714 __attribute__((sda));
 extern int D_L04_001B0718 __attribute__((sda));
 
-extern char func_L04_00406C00[];
+extern char water_draw_ripple_surface[];
 
-extern void func_002A0488(void *, int, int, int);
-extern void func_L00_002E6CF0(void *, void *);
+extern void set_moby_color(void *, int, int, int);
+extern void gfx_add_draw_callback_first(void *, void *);
 
 extern int D_L04_001BFAD8 __attribute__((nosda));
-extern int D_0018C0B0 __attribute__((nosda));
+extern int g_hero_moby __attribute__((nosda));
 extern char D_L04_001A8F20[1];
 extern int D_L04_001B0CF8 __attribute__((sda));
 
-extern void func_002A8C28(void *, void *, int, int, float, float, float, int, int);
-extern int func_00277258(void *, int, float, void *);
-extern void func_002AB250(void *owner, char *offset, void *filter);
-extern int func_00282948(void *);
+extern void coll_sweep_from_object(void *, void *, int, int, float, float, float, int, int);
+extern int coll_test_point(void *, int, float, void *);
+extern void part_spawn_sparks_around_moby(void *owner, char *offset, void *filter);
+extern int math_fast_float_d(void *);
 
 extern int D_L04_001B07B0 __attribute__((sda));
 extern int D_L04_001B07B4 __attribute__((sda));
 extern int D_L04_001B07B8 __attribute__((sda));
 extern char D_L04_001B9680[];
-extern char func_L04_00407B80[];
-extern void func_L00_002E6EF8(void *, void *);
+extern char water_draw_ripple_surface_second[];
+extern void gfx_add_draw_callback_third(void *, void *);
 
 /* Sets up the object on its first frame, then keeps registering its update routine and clearing its flags. */
-void func_L04_00407000(char *mobyArg)
+void barlow_water_register_update(char *mobyArg)
 {
     char *moby = mobyArg;
 
@@ -38,32 +38,32 @@ void func_L04_00407000(char *mobyArg)
         *(unsigned char *)(moby + 0x20) = 1;
     } else {
         set_moby_color(moby, D_L04_001B0710, D_L04_001B0714, D_L04_001B0718);
-        AddDrawCallbackToList1(DrawRippleWaterSurface, moby);
+        gfx_add_draw_callback_first(water_draw_ripple_surface, moby);
         *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & ~1) | 1;
         *(unsigned short *)(moby + 0x32) = 0;
     }
 }
 
-extern int D_L04_001B24DC __attribute__((sda));
-extern char D_L04_001FB1E0[];
+extern int g_moby_l04_pool __attribute__((sda));
+extern char g_moby_l04_group_lists[];
 
 /* Checks if the object is hit and starts a 60 frame countdown, while it runs the countdown it keeps the effect going. */
-void func_L04_00422240(char *mobyArg)
+void barlow_hit_countdown_update(char *mobyArg)
 {
     char *moby = mobyArg;
     char *position = moby + 0x10;
 
-    SweepCollisionFromObject(moby, position, 0x10001, 5, 1.0f, 1.0f, 1.0f, 1, 0);
-    if (TestPointAgainstCollision(position, 1, 1.0f, moby) != 0) {
-        if (D_L04_001BFAD8 != 0 && D_L04_001BFAD8 == gHeroMoby_0018C0B0) {
+    coll_sweep_from_object(moby, position, 0x10001, 5, 1.0f, 1.0f, 1.0f, 1, 0);
+    if (coll_test_point(position, 1, 1.0f, moby) != 0) {
+        if (D_L04_001BFAD8 != 0 && D_L04_001BFAD8 == g_hero_moby) {
             if (D_L04_001B0CF8 <= 0) {
                 D_L04_001B0CF8 = 0x3C;
             }
         }
     }
     if (D_L04_001B0CF8 > 0) {
-        SpawnSparksAroundMoby_002AB250(gHeroMoby_0018C0B0, D_L04_001A8F20, 0xFFFF);
-        FastFloatHelperD(&D_L04_001B0CF8);
+        part_spawn_sparks_around_moby(g_hero_moby, D_L04_001A8F20, 0xFFFF);
+        math_fast_float_d(&D_L04_001B0CF8);
     }
 }
 
@@ -87,12 +87,12 @@ typedef struct {
     TI128 corner;
 } EffectQuadFrame;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *, void *, int);
 extern char D_L04_001B9680[];
 /* The two uv columns: macro-addressed tables, so each base is one la. */
 extern float D_L04_001AFDA0[] __attribute__((sda));
@@ -102,7 +102,7 @@ extern float D_L04_001AFDA4[] __attribute__((sda));
    is pulled a tenth of the way toward the level's anchor, then the four
    corners are crossed out from the span and submitted. */
 /* Draws the red glowing beam strip between the two end points stored in the object. */
-void func_L04_003E53D0(char *obj, void *q)
+void gfx_draw_tether_beam_red(char *obj, void *q)
 {
     EffectQuadFrame frame;
     char *vars;
@@ -146,7 +146,7 @@ extern float D_L04_001AFDA4[] __attribute__((sda));
    is pulled a twentieth of the way toward the level's anchor, then the four
    corners are crossed out from the span and submitted (then drawn again as the overlay). */
 /* Draws the white beam strip between the two end points, then draws it again as an overlay. */
-void func_L04_003E55E0(char *obj, void *q)
+void gfx_draw_tether_beam_white(char *obj, void *q)
 {
     EffectQuadFrame frame;
     char *vars;

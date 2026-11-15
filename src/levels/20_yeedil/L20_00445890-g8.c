@@ -1,14 +1,14 @@
 #include "common.h"
 
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_002A7750(unsigned char *, int, int);
-extern void func_0029FCC0(char *, int, char *);
-extern float func_00282E80(void *, void *);
-extern void func_L00_003294F0(unsigned char *, int);
-extern void func_002A0430(unsigned int);
-extern void func_L20_002C5A48(int);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void moby_set_state(unsigned char *, int, int);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern float vec_distance_xy(void *, void *);
+extern void moby_set_flag_bit(unsigned char *, int);
+extern void moby_mark_table_entry_flagged(unsigned int);
+extern void hero_exit_vehicle_mode(int);
 /* The level's object table: 0x100 bytes per object. */
 typedef struct {
     char reserved00[0xBC];
@@ -36,45 +36,45 @@ typedef struct {
 } YeedilActivation;
 
 /* Runs the glowing floor switch (moby class 4617). When the hero stands on it, it switches on its linked objects and sets off its event. */
-void func_L20_00445890(unsigned char *object)
+void floor_l20_switch_update(unsigned char *object)
 {
     float point[4] __attribute__((aligned(16)));
     YeedilActivation *state = *(YeedilActivation **)(object + 0x68);
     int color;
     if (!state) return;
     state->angle = FastAddRotations(state->angle, 0.10471977f);
-    color = FloatToInt((FastSinOrCosB(state->angle) * 4.0f - 3.0f) * 128.0f);
+    color = FloatToInt((math_fast_sin_or_cos_b(state->angle) * 4.0f - 3.0f) * 128.0f);
     if (color > 128) color = 128;
     else if (color < 32) color = 32;
     if (object[0x20] == 0) {
         *(unsigned short *)(object + 0x34) |= 0x10;
-        SetMobyState(object, 1, -1);
+        moby_set_state(object, 1, -1);
     } else if (object[0x20] == 1) {
         float distance;
-        TransformMobyJointToWorld((char *)object, 0, (char *)point);
-        distance = vec_distance_xy(gHeroState.position, point);
+        moby_transform_joint_to_world((char *)object, 0, (char *)point);
+        distance = vec_distance_xy(g_hero_state.position, point);
         state->activated = 0;
-        if (gHeroState.owner == object && gHeroState.active &&
+        if (g_hero_state.owner == object && g_hero_state.active &&
             distance < *(float *)(object + 0x2C) * 0.5f / *(float *)(*(char **)(object + 0x24) + 0x24)) {
             int missing = -1;
             int enabled;
             int *entry;
             int remaining;
-            SetMobyState(object, 2, missing);
+            moby_set_state(object, 2, missing);
             enabled = 1;
             entry = state->objects;
             for (remaining = 3; remaining >= 0; entry++, remaining--) {
                 int index = *entry;
                 if (index != missing) {
                     if (entry[4]) {
-                        SetObjectFlagBit((unsigned char *)&yeedilObjectsGp[index], enabled);
+                        moby_set_flag_bit((unsigned char *)&yeedilObjectsGp[index], enabled);
                     } else {
                         D_L20_001B2F9C[index].enabled = enabled;
                     }
                 }
             }
-            MarkTableEntryFlagged(state->event);
-            if (state->callback) ExitYeedilHeroVehicleMode(0);
+            moby_mark_table_entry_flagged(state->event);
+            if (state->callback) hero_exit_vehicle_mode(0);
         }
         *(unsigned int *)(object + 0x78) = color | (0x80 << 24);
     } else if (object[0x20] == 2) {

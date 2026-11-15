@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002BEBC0: a particle that follows a joint of its parent object.  It grows or
  * shrinks its size towards 159600, spins, fades in and out between two limits (0.3
  * while at full size or growing, 0.15 while shrinking) and eases towards the camera.
@@ -8,14 +9,14 @@
  * common compare, which keeps the two constant loads in their own arms. */
 #include "common.h"
 
-extern int func_00282978(void *timer);
-extern void func_002B9180(void *particle);
-extern int func_00283CF0(float f);
-extern void func_0029FCC0(void *object, int joint, void *out);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, float scale);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern char D_001B5340[];
+extern int FastDecTimer(void *timer);
+extern void part_kill(void *particle);
+extern int FloatToInt(float f);
+extern void moby_transform_joint_to_world(void *object, int joint, void *out);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, float scale);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern char g_camera_eye_state[];
 extern unsigned char *D_001F25B4;
 
 #define SIZE   (*(float *)(p + 0xC))
@@ -27,7 +28,7 @@ extern unsigned char *D_001F25B4;
 #define EASE   (*(float *)(q + 0x14))
 
 /* Updates a glowing particle that sticks to a joint of its parent object, pulsing in size and brightness until it fades away. */
-void func_002BEBC0(char *p)
+void part_update_joint_glow(char *p)
 {
     char *q;
     float pos[4] __attribute__((aligned(16)));
@@ -37,7 +38,7 @@ void func_002BEBC0(char *p)
         return;
     q = p + 0x20;
     if (FastDecTimer(p + 0xA) || *(char **)q == 0 || *(signed char *)(*(char **)q + 0x20) < 0) {
-        KillParticle(p);
+        part_kill(p);
         return;
     }
     FRAME = (*(unsigned short *)(q + 0xC) + 1) & 15;
@@ -60,7 +61,7 @@ void func_002BEBC0(char *p)
             SPEED = -SPEED;
             ALPHA += SPEED;
         } else if (ALPHA < 0.0f) {
-            KillParticle(p);
+            part_kill(p);
             return;
         }
     } else {
@@ -68,15 +69,15 @@ void func_002BEBC0(char *p)
             SPEED = -SPEED;
             ALPHA += SPEED;
         } else if (ALPHA < 0.0f) {
-            KillParticle(p);
+            part_kill(p);
             return;
         }
     }
     *(int *)(p + 4) = (*(int *)(p + 4) & 0xFFFFFF) + (FloatToInt(ALPHA * 256.0f) << 24);
     EASE += (1.0f - EASE) * 0.175f;
     if (JOINT != -1) {
-        TransformMobyJointToWorld(*(void **)q, JOINT, pos);
-        FastVecSub(delta, gCameraState_001B5340, pos);
+        moby_transform_joint_to_world(*(void **)q, JOINT, pos);
+        FastVecSub(delta, g_camera_eye_state, pos);
         vec_scale_to_length(delta, delta, EASE);
         FastVecAdd(p + 0x10, pos, delta);
     }

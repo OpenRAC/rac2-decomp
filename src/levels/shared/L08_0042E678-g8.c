@@ -27,21 +27,21 @@ extern float D_L08_001AC5E0[4][4] MACRO_ADDR;
 extern float D_L08_001B9B00[4] NOT_SDA;
 extern u8 *D_L08_002B2540[];
 
-extern u64 func_0027C878(int);
-extern float func_00283CE0(int);
-extern float func_002ABB18(float);
-extern float func_00283198(float);
-extern void func_0027C768(void *, float *, float *);
-extern void func_00280B90(void *, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern u64 GetEffectTextureDescriptor(int);
+extern float IntToFloat(int);
+extern float math_wrap_angle_to_pi(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void gfx_world_to_screen_unit(void *, float *, float *);
+extern void draw_world_quad(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Draws the tiled door overlay and the collected doors' layered quads.
  * Keep the diameter live before testing the camera side. The first two passes
  * retain their source position pointer between that test and sign selection.
  */
-void func_L08_0042E678(u8 *moby)
+void DrawLayeredDoorQuads(u8 *moby)
 {
     float v[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -65,8 +65,8 @@ void func_L08_0042E678(u8 *moby)
         D_L08_00265040[0].color[0] = D_L08_00265040[0].color[1] = D_L08_00265040[0].color[2] =
             D_L08_00265040[0].color[3] = *(u32 *)(state + 0x20);
         f = IntToFloat(D_L08_001B2508) * D_L08_001B1EAC;
-        f = WrapAngleToPi(f);
-        f = FastSinOrCosB(f);
+        f = math_wrap_angle_to_pi(f);
+        f = math_fast_sin_or_cos_b(f);
         y = *(float *)(moby + 0x14) - radius + f * D_L08_001B1EB0;
         D_L08_00265040[0].p[0][1] = y;
         D_L08_00265040[0].p[1][1] = y;
@@ -76,8 +76,8 @@ void func_L08_0042E678(u8 *moby)
         x = *(float *)(moby + 0x10) - radius + f * D_L08_001B1EB4;
         D_L08_00265040[0].p[2][0] = D_L08_00265040[0].p[0][0] = x;
         D_L08_00265040[0].p[1][0] = D_L08_00265040[0].p[3][0] = x + D_L08_001B1EB8;
-        ProjectWorldToScreen(D_L08_00265040[0].p[0], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
-        ProjectWorldToScreen(D_L08_00265040[0].p[2], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
+        gfx_world_to_screen_unit(D_L08_00265040[0].p[0], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
+        gfx_world_to_screen_unit(D_L08_00265040[0].p[2], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
         while (row < radius) {
             col = -radius;
             while (col < radius) {
@@ -85,8 +85,8 @@ void func_L08_0042E678(u8 *moby)
                 D_L08_00265040[0].uv[1] = D_L08_00265040[0].uv[3];
                 D_L08_00265040[0].uv[4] = D_L08_00265040[0].uv[6];
                 D_L08_00265040[0].uv[5] = D_L08_00265040[0].uv[7];
-                ProjectWorldToScreen(D_L08_00265040[0].p[1], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
-                ProjectWorldToScreen(D_L08_00265040[0].p[3], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
+                gfx_world_to_screen_unit(D_L08_00265040[0].p[1], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
+                gfx_world_to_screen_unit(D_L08_00265040[0].p[3], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
                 draw_world_quad(D_L08_00265040, 0, 1);
                 qcopy(D_L08_00265040[0].p[0], D_L08_00265040[0].p[1]);
                 qcopy(D_L08_00265040[0].p[2], D_L08_00265040[0].p[3]);
@@ -100,8 +100,8 @@ void func_L08_0042E678(u8 *moby)
                 D_L08_001B1EB8;
             D_L08_00265040[0].p[2][0] = D_L08_00265040[0].p[0][0] = D_L08_00265040[0].p[0][0] - diameter;
             D_L08_00265040[0].p[1][0] = D_L08_00265040[0].p[3][0] = D_L08_00265040[0].p[3][0] - diameter;
-            ProjectWorldToScreen(D_L08_00265040[0].p[0], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
-            ProjectWorldToScreen(D_L08_00265040[0].p[2], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
+            gfx_world_to_screen_unit(D_L08_00265040[0].p[0], D_L08_00265040[0].uv + 2, D_L08_00265040[0].uv + 3);
+            gfx_world_to_screen_unit(D_L08_00265040[0].p[2], D_L08_00265040[0].uv + 6, D_L08_00265040[0].uv + 7);
             row += D_L08_001B1EB8;
         }
     }
@@ -194,7 +194,7 @@ void func_L08_0042E678(u8 *moby)
             D_L08_00264FB0[0].color[3] = *(u32 *)(state + 0x1C);
         for (j = 0; j < 4; j++) {
             FastVecSub(delta, D_L08_00264FB0[0].p[j], D_L08_001B9B00);
-            FastVectorNormalize(v, delta, D_L08_001AC5E0);
+            vec_fast_normalize(v, delta, D_L08_001AC5E0);
             vec_scale_to_length(v, v, 1.0f);
             D_L08_00264FB0[0].uv[j * 2] = v[0];
             D_L08_00264FB0[0].uv[j * 2 + 1] = v[1];

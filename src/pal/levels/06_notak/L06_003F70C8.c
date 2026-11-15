@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *func_0029EFD0(int);
-extern float func_002A7878(float, float);
+extern char *CreateMoby(int);
+extern float math_random_float_range(float, float);
 extern void func_002A0F48(char *);
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -14,16 +14,16 @@ char *func_PAL_L06_003F77D8(char *owner, TI128 *position, TI128 *motion, int fie
     u8 byte1c = (u8)field1c;
     u8 byte1a = (u8)field1a;
 
-    created = (char *)func_0029EFD0(0x75E);
+    created = (char *)CreateMoby(0x75E);
     if (created != 0) {
         record = *(char **)(created + 0x68);
         *(char **)(record + 0x10) = owner;
         qcopy(created + 0x10, position);
         qcopy(record, motion);
         {
-            angle = func_002A7878(-3.1415927f, 3.1415927f);
+            angle = math_random_float_range(-3.1415927f, 3.1415927f);
             *(float *)(created + 0xF0) = angle;
-            angle = func_002A7878(-3.1415927f, 3.1415927f);
+            angle = math_random_float_range(-3.1415927f, 3.1415927f);
             *(float *)(created + 0xF4) = angle;
         }
         *(unsigned short *)(record + 0x18) = 0x1A1;

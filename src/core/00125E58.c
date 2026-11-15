@@ -3,7 +3,7 @@
 
 extern void *r1_func_00121D08(void);
 
-extern short func_00125E58(short psm, short w, short h);
+extern short sceGszbufaddr(short psm, short w, short h);
 
 /* rac1-decomp src/core/00122200.c: func_00122200 */
 /*
@@ -21,7 +21,7 @@ extern short func_00125E58(short psm, short w, short h);
  * the `== 1` arm first; 2.95.3's best is 8/200, a prologue-order residual.
  */
 /* Works out how many memory pages a picture of the given format and size takes. */
-short func_00125E58(short psm, short w, short h) {
+short sceGszbufaddr(short psm, short w, short h) {
     unsigned long *gParam = r1_func_00121D08();
     int fbw, fbh;
 
@@ -62,7 +62,7 @@ typedef struct {
  * prmodecont/colclamp are read-modify-write: only their AC/CLAMP bit is
  * set, whatever else the caller's memory already held is left alone. */
 /* Fills in a default drawing setup for a picture of the given size and format. */
-int func_00125F20(DrawEnv1_125F20 *draw, short psm, short w, short h,
+int sceGsSetDefDrawEnv(DrawEnv1_125F20 *draw, short psm, short w, short h,
                   short ztest, short zpsm) {
     short fbw = ((w + 63) >> 6) & 0x3F;
     short zbp;
@@ -113,7 +113,7 @@ extern char r1_D_00153178[];
 /* Kicks a DMA transfer on the GIF channel (D2 at 0x1000A000), waiting
    for the channel with a timeout. Every register access is volatile. */
 /* Starts a data transfer to the graphics chip and waits if the channel is busy. */
-int func_00126104(void *gifPacket) {
+int gfx_start_gif_dma_transfer(void *gifPacket) {
     int packetAddr = (int)gifPacket;
     unsigned int spin;
 

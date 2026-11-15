@@ -2,30 +2,30 @@
 
 /* Weapon wheel. One scratch int holds the colour and then the name's length: the reassignment is why cprop leaves retail's copy into the colour register. */
 #define F(p,t,o) (*(t *)((char *)(p)+(o)))
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00283B98(float,float);
-extern void func_0034CD70(void *,int,float);
-extern int func_00290748(void);
-extern void func_0028B740(void *,int *,int *);
-extern int func_00115DA8(char *,char *,...);
-extern unsigned int func_00283D38(unsigned int,unsigned int,float);
-extern void func_0027FAA8(int,int,unsigned int,char *,int);
-extern char *func_00288FB8(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float FastAddRotations(float,float);
+extern void menu_show_colored_label(void *,int,float);
+extern int hud_is_open_done(void);
+extern void hud_screen_position(void *,int *,int *);
+extern int sprintf(char *,char *,...);
+extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
+extern void text_draw_centered_small(int,int,unsigned int,char *,int);
+extern char *GetLocalizedString(int);
 extern unsigned int func_001157AC(const char *);
-extern int D_001B18D0;
-extern char **D_001B18D4;
-extern int D_001A8D48 __attribute__((sda));
-extern int D_001A8C64 __attribute__((sda));
+extern int g_radial_slot_count;
+extern char **g_radial_menu_pages;
+extern int g_radial_menu_page_index __attribute__((sda));
+extern int g_notice_owner __attribute__((sda));
 extern char *D_001A8CFC __attribute__((sda));
-extern unsigned char D_00139568[];
-extern int D_001A73B8[] MACRO_ADDR;
-extern int D_00139688[];
+extern unsigned char g_item_slot_to_record[];
+extern int g_weapon_menu_slots[] MACRO_ADDR;
+extern int g_item_ammo_counts[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
-extern WheelWeaponRecord D_L00_00262570[];
+extern WheelWeaponRecord g_weapon_l00_table[];
 extern char D_001A8E28[];
 /* Draws the weapon wheel: highlights the selected slot and prints its ammo count and name. */
-int func_0028C6D0(char *menu)
+int weapon_wheel_draw(char *menu)
 {
     float menuFade,selectionFade;
     int alpha,x,y,i,selected,split,j,len,textY;
@@ -41,41 +41,41 @@ int func_0028C6D0(char *menu)
     i=0;
     x=F(menu,int,0x50); y=F(menu,int,0x54);
     hud_screen_position(menu,&x,&y);
-    for(;i<gRadialSlotCount;i++) {
-        FastAddRotations(((float)i*2.0f*3.1415927f)/(float)gRadialSlotCount-3.1415927f,1.5707964f);
-        if(F(menu,int,0x74)==i && F(gRadialMenuPages[gRadialMenuPageIndex]+i*28,int,0) && D_001A8CFC) {
+    for(;i<g_radial_slot_count;i++) {
+        FastAddRotations(((float)i*2.0f*3.1415927f)/(float)g_radial_slot_count-3.1415927f,1.5707964f);
+        if(F(menu,int,0x74)==i && F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && D_001A8CFC) {
             float f=(float)(i+7);
             if(f>7.0f) f-=8.0f;
-            ShowColoredLabel(D_001A8CFC+0x376c8,1,f);
+            menu_show_colored_label(D_001A8CFC+0x376c8,1,f);
         }
-        if(F(gRadialMenuPages[gRadialMenuPageIndex]+i*28,int,0) && D_001A8CFC) {
+        if(F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && D_001A8CFC) {
             char *p=D_001A8CFC+0x38000;
-            F(p,int,0x7354)=IsHudOpenDone()?FloatToInt((float)alpha*0.5f):0;
+            F(p,int,0x7354)=hud_is_open_done()?FloatToInt((float)alpha*0.5f):0;
         }
     }
     selected=F(menu,int,0x74);
-    if(selected>=0 && F(gRadialMenuPages[gRadialMenuPageIndex]+selected*28,int,0) && !gNoticeOwner) {
-        int n=gWeaponMenuSlots[selected], value;
+    if(selected>=0 && F(g_radial_menu_pages[g_radial_menu_page_index]+selected*28,int,0) && !g_notice_owner) {
+        int n=g_weapon_menu_slots[selected], value;
         float opacity;
-        record=&gWeaponTable_L00[gItemSlotToRecord[n]];
+        record=&g_weapon_l00_table[g_item_slot_to_record[n]];
         opacity=menuFade*selectionFade;
 
         if(record->active && record->sellsAmmo) {
-            value=gItemAmmoCounts[n];
-            Sprintf(buffer,D_001A8E28,value,record->ammoCapacity);
+            value=g_item_ammo_counts[n];
+            sprintf(buffer,D_001A8E28,value,record->ammoCapacity);
             {
                 unsigned int c;
                 if (value) c=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);
                 else c=FastTweenColor(0x004040ff,0x804040ff,opacity);
-                DrawTextCenteredSmallFont(x+105,y+112,c,buffer,-1);
+                text_draw_centered_small(x+105,y+112,c,buffer,-1);
             }
         }
         scratch=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);
         split=0;
-        text=GetLocalizedString(gWeaponTable_L00[gItemSlotToRecord[F(gRadialMenuPages[gRadialMenuPageIndex]+selected*28,int,0x18)]].localizedName);
-        if(text && strlen_001157AC(text)) {
+        text=GetLocalizedString(g_weapon_l00_table[g_item_slot_to_record[F(g_radial_menu_pages[g_radial_menu_page_index]+selected*28,int,0x18)]].localizedName);
+        if(text && func_001157AC(text)) {
             unsigned int color=scratch;
-            scratch=strlen_001157AC(text);
+            scratch=func_001157AC(text);
             len=scratch;
             tail=text;
             for(j=0;j<len;j++) {
@@ -90,12 +90,12 @@ int func_0028C6D0(char *menu)
                 }
             }
             textY=y+100;
-            if(gWeaponTable_L00[gItemSlotToRecord[gWeaponMenuSlots[selected]]].sellsAmmo) textY=y+75;
+            if(g_weapon_l00_table[g_item_slot_to_record[g_weapon_menu_slots[selected]]].sellsAmmo) textY=y+75;
             else { int splitY=y+85; textY=split ? splitY : textY; }
             if(split) {
-                DrawTextCenteredSmallFont(x+105,textY,color,text,split);
-                DrawTextCenteredSmallFont(x+105,textY+16,color,tail,-1);
-            } else DrawTextCenteredSmallFont(x+105,textY,color,text,-1);
+                text_draw_centered_small(x+105,textY,color,text,split);
+                text_draw_centered_small(x+105,textY+16,color,tail,-1);
+            } else text_draw_centered_small(x+105,textY,color,text,-1);
         }
     }
     return F(menu,int,0x58);

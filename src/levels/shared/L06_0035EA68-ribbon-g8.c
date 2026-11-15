@@ -1,18 +1,19 @@
+#include "names.h"
 /* Adapted from RAC1's render_data_processor_linked_effect in
    src/overlays/l10_orxon/platforms_doors_and_bombthrower.c (GPL-3.0). */
 #include "common.h"
 extern char *D_L06_001B281C;
 extern char D_L06_001B9840[];
-extern float func_00282E48(char *,char *);
-extern void func_002833B8(void *,float);
-extern void func_00283410(void *,void *);
-extern void func_00283788(void *,void *,void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern int func_00283D38(int,int,float);
-extern unsigned long func_0027C878(int);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00280B90(void *,void *,int);
+extern float fast_vec_dist(char *,char *);
+extern void set_scale_matrix(void *,float);
+extern void euler_to_matrix(void *,void *);
+extern void multiply_matrix(void *,void *,void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern int FastTweenColor(int,int,float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void FastVecAdd(void *,void *,void *);
+extern void draw_world_quad(void *,void *,int);
 extern int D_L06_001AF550 __attribute__((sda)),D_L06_001AF554 __attribute__((sda)),D_L06_001AF558 __attribute__((sda)),D_L06_001AF55C __attribute__((sda));
 extern int D_L06_001AF570 __attribute__((sda)),D_L06_001AF574 __attribute__((sda));
 extern float D_L06_001AF578[] SDATA(D_L06_001AF578);
@@ -23,7 +24,7 @@ extern float D_L06_001AF71C;
 extern int D_L06_001B31B0,D_L06_001B31B4;
 typedef unsigned int Quad57 __attribute__((mode(TI)));
 /* Draws the flowing ribbon of glowing strips for a ribbon moby. It fades the ribbon out when the player is far away. */
-void func_L06_003E57E8(u8 *moby) {
+void gfx_l06_draw_ribbon_effect(u8 *moby) {
     char *data = (*(char **)(moby + 0x68));
     char *base = *(char **)((*(int *)(data + 0xc) << 8) + (int)D_L06_001B281C + 0x68);
     char scratch[(unsigned int)*(int *)(data + 4) * 0x40];

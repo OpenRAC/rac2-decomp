@@ -1,18 +1,18 @@
 #include "common.h"
 
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern int func_00277F48(void *, int, void *, int, float);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern int coll_process_hit(void *, int, void *, int, float);
 extern void *func_001153D4(void *, const void *, unsigned int);
-extern int func_002A90C8(void *, void *, int, void *, float);
+extern int part_start_effect_default_table(void *, void *, int, void *, float);
 extern char *D_L17_001C4080[];
 
 /* Finds objects touching its box and hits each one (collision test for the box). */
-void func_L17_0041F180(char *object, char *params) {
+void coll_hit_mobys_inside_box(char *object, char *params) {
     float matrix[12] __attribute__((aligned(16)));
     float center[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -35,13 +35,13 @@ void func_L17_0041F180(char *object, char *params) {
     position = object + 0x10;
     matrix_mul_vec3(center, center, matrix);
     FastVecAdd(center, center, position);
-    count = ProcessCollisionHit(center, 0x10, object, 0, radius);
+    count = coll_process_hit(center, 0x10, object, 0, radius);
     if (!count)
         return;
     {
         char *candidates[count];
 
-        memcpy_001153D4(candidates, D_L17_001C4080, count * 4);
+        func_001153D4(candidates, D_L17_001C4080, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
@@ -61,12 +61,12 @@ void func_L17_0041F180(char *object, char *params) {
             point[1] = 0;
             matrix_mul_vec3(point, point, matrix);
             FastVecAdd(point, point, object + 0x10);
-            n = ProcessCollisionHit(point, 0x10, object, 0, *(float *)(params + 0x48));
+            n = coll_process_hit(point, 0x10, object, 0, *(float *)(params + 0x48));
             {
                 int j;
                 for (j = 0; j < n; j++) {
                     if (D_L17_001C4080[j] == candidate)
-                        StartEffectWithDefaultTable(candidate, object, 0x10001, point, *(float *)(params + 0x50));
+                        part_start_effect_default_table(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }
         }
@@ -74,7 +74,7 @@ void func_L17_0041F180(char *object, char *params) {
 }
 
 /* Finds objects touching its box and hits each one (collision test for the box). */
-void func_L17_00420758(char *object, char *params) {
+void coll_hit_mobys_inside_box_copy(char *object, char *params) {
     float matrix[12] __attribute__((aligned(16)));
     float center[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -97,13 +97,13 @@ void func_L17_00420758(char *object, char *params) {
     position = object + 0x10;
     matrix_mul_vec3(center, center, matrix);
     FastVecAdd(center, center, position);
-    count = ProcessCollisionHit(center, 0x10, object, 0, radius);
+    count = coll_process_hit(center, 0x10, object, 0, radius);
     if (!count)
         return;
     {
         char *candidates[count];
 
-        memcpy_001153D4(candidates, D_L17_001C4080, count * 4);
+        func_001153D4(candidates, D_L17_001C4080, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
@@ -123,12 +123,12 @@ void func_L17_00420758(char *object, char *params) {
             point[1] = 0;
             matrix_mul_vec3(point, point, matrix);
             FastVecAdd(point, point, object + 0x10);
-            n = ProcessCollisionHit(point, 0x10, object, 0, *(float *)(params + 0x48));
+            n = coll_process_hit(point, 0x10, object, 0, *(float *)(params + 0x48));
             {
                 int j;
                 for (j = 0; j < n; j++) {
                     if (D_L17_001C4080[j] == candidate)
-                        StartEffectWithDefaultTable(candidate, object, 0x10001, point, *(float *)(params + 0x50));
+                        part_start_effect_default_table(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }
         }

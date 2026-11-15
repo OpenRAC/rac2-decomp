@@ -2,9 +2,9 @@
 #include "names.h"
 extern unsigned char D_001A7B96 __attribute__((sda));
 
-extern void func_0033AE18(unsigned char *owner, int value);
+extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
-extern void func_0033AB50(char *p);
+extern void prompt_bar_destroy(char *p);
 
 extern void func_0033AE28_2(char *p);
 
@@ -16,7 +16,7 @@ extern volatile unsigned char D_001A7B95 __attribute__((sda));
 
 extern volatile unsigned char D_001A7B94 __attribute__((sda));
 
-extern void func_0033AE28 (char *object);
+extern void prompt_bar_update (char *object);
 
 extern void func_L00_00430948_1 (char *object, float x, float y);
 
@@ -33,25 +33,25 @@ extern volatile unsigned char D_001A7BB2_1 __attribute__((sda));
 extern volatile unsigned char D_001A7BB3 __attribute__((sda));
 
 /* Does nothing. */
-void func_L00_0042E138(void)
+void menu_hook_noop_a(void)
 {
 }
 
 /* Does nothing. */
-void func_L00_0042E388(void)
+void menu_hook_noop_b(void)
 {
 }
 
 /* Does nothing. */
-void func_L00_0042E880(void)
+void menu_hook_noop_c(void)
 {
 }
 
 
 /* Forward owner+8 and the supplied signed word to the measured two-argument setter. */
-void func_L00_0042F0A0(unsigned char *owner, int value)
+void menu_forward_value_setter(unsigned char *owner, int value)
 {
-    SetButtonPromptTextsEnabled(owner + 8, value);
+    prompt_bar_set_texts_enabled(owner + 8, value);
 }
 
 
@@ -60,7 +60,7 @@ void func_L00_0042F0A0(unsigned char *owner, int value)
 
 
 /* Store the two scalar floating arguments through the supplied pointer cell; original game role is unknown. */
-void func_L00_00430948(float first, float second, float **cell)
+void mem_store_two_floats_through_cell(float first, float second, float **cell)
 {
     (*cell)[0] = first;
     (*cell)[1] = second;
@@ -69,39 +69,39 @@ void func_L00_00430948(float first, float second, float **cell)
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00431668(char *object)
+char *menu_init_page_record_a(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00431AA8(char *object)
+char *menu_init_page_record_b(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00431D60(char *object)
+char *menu_init_page_record_c(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_004322E8(char *object)
+char *menu_init_page_record_d(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word */
-int func_L00_00432448(char *a0, int a1)
+int menu_handle_page_input_a(char *a0, int a1)
 {
     char *p = a0 + 8;
     float *q;
@@ -134,21 +134,21 @@ int func_L00_00432448(char *a0, int a1)
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00432D70(char *object)
+char *menu_init_page_record_e(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
-int func_L00_00432ED0 (char *object, int flags)
+int menu_handle_page_input_b (char *object, int flags)
 {
   unsigned char *g = &D_001A7B96;
   float *vec;
   int discarded;
 
-  UpdateButtonPromptBar (object + 8);
+  prompt_bar_update (object + 8);
   vec = *(float **) (object + 684);
   func_L00_00430948_1 (object + 8, vec[0], vec[1]);
 
@@ -163,15 +163,15 @@ int func_L00_00432ED0 (char *object, int flags)
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00433038(char *object)
+char *menu_init_page_record_f(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 
 
 /* makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word */
-int func_L00_00433198(char *a0, int a1)
+int menu_handle_page_input_c(char *a0, int a1)
 {
     char *p = a0 + 8;
     float *q;
@@ -203,9 +203,9 @@ int func_L00_00433198(char *a0, int a1)
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_L00_00433400(char *object)
+char *menu_init_page_record_g(char *object)
 {
-    DestroyButtonPromptBar(object + 8);
+    prompt_bar_destroy(object + 8);
     return object;
 }
 

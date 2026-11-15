@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -25,5 +26,5 @@
 #include "common.h"
 
 /* Does nothing. An empty update function. */
-void func_L02_003F0788(void) {
+void moby_noop_update(void) {
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 typedef int s32;
@@ -43,7 +44,7 @@ typedef struct {
 } MpegDec;
 
 /* Works out the two extra dual-prime motion vectors from the main vector and the small offset read from the stream. */
-void func_0012B3E0(MpegDec *d, s32 DMV[][2], s32 *dmvector, s32 mvx, s32 mvy) {
+void mpeg_compute_dual_prime_vectors(MpegDec *d, s32 DMV[][2], s32 *dmvector, s32 mvx, s32 mvy) {
     if (d->pictStruct == 3) {
         if (d->topFieldFirst) {
             DMV[0][0] = ((mvx + (mvx > 0)) >> 1) + dmvector[0];

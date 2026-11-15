@@ -4,7 +4,7 @@
 /* func_PAL_0027B6E0, the PAL copy of func_0027B2F8: the same C, without the stores of 32.0f to fA0
    and 1048576.0f to fA4. */
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 /* Partial view of the shared screen/render state. */
 typedef struct {
     char pad[0xA0];
@@ -20,17 +20,17 @@ typedef struct {
     int color[3];
 } ScreenState;
 extern ScreenState D_001B9040;
-extern void func_0027AB40(void);
+extern void UpdateViewContext(void);
 
 typedef struct {
     int width, height, half_width, half_height;
     int left, top, right, bottom;
 } ScreenExtent;
-extern ScreenExtent D_001A7340 __attribute__((sda));
+extern ScreenExtent g_screen_width __attribute__((sda));
 
 typedef struct { char pad[0x150]; short width, height; } ScreenDimensions;
-extern ScreenDimensions D_001A6480;
-extern void func_00279FF0(void);
+extern ScreenDimensions g_screen_adjust_offsets;
+extern void gfx_apply_display_config(void);
 
 void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, float c, float d)
 {
@@ -38,17 +38,17 @@ void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, flo
     int halfW = width >> 1;
     int halfH = height >> 1;
     float halfHeight;
-    D_001A7340.width = width;
-    D_001A7340.height = height;
-    D_001A7340.half_width = halfW;
-    D_001A7340.half_height = halfH;
-    D_001A7340.left = (2048 - halfW) << 4;
-    D_001A7340.top = (2048 - halfH) << 4;
-    D_001A7340.right = (halfW + 2048) << 4;
-    D_001A7340.bottom = (halfH + 2048) << 4;
+    g_screen_width.width = width;
+    g_screen_width.height = height;
+    g_screen_width.half_width = halfW;
+    g_screen_width.half_height = halfH;
+    g_screen_width.left = (2048 - halfW) << 4;
+    g_screen_width.top = (2048 - halfH) << 4;
+    g_screen_width.right = (halfW + 2048) << 4;
+    g_screen_width.bottom = (halfH + 2048) << 4;
     context->fB0 = scale;
-    context->f200 = func_00283CE0(width) * 0.5f;
-    halfHeight = func_00283CE0(height) * 0.5f;
+    context->f200 = IntToFloat(width) * 0.5f;
+    halfHeight = IntToFloat(height) * 0.5f;
     context->f204 = halfHeight;
     context->f208 = context->f200 * 4.0f;
     context->f20C = halfHeight * 4.0f;
@@ -56,14 +56,14 @@ void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, flo
     context->f21C = b;
     context->f228 = c;
     context->f22C = d;
-    func_0027AB40();
+    UpdateViewContext();
 }
 
 /* func_PAL_0027B810, the PAL copy of func_0027A9F0: the same C, without the stores to fA0, fA4,
    f218, f21C, f228 and f22C, and with a call of func_00279FF0 at the end. */
 void func_PAL_0027B810(void)
 {
-    ScreenDimensions *dimensions = &D_001A6480;
+    ScreenDimensions *dimensions = &g_screen_adjust_offsets;
     ScreenState *view = &D_001B9040;
     short width = dimensions->width;
     short height = dimensions->height;
@@ -71,20 +71,20 @@ void func_PAL_0027B810(void)
     int half_height = height >> 1;
     float half_height_f;
 
-    D_001A7340.width = width;
-    D_001A7340.height = height;
-    D_001A7340.half_width = half_width;
-    D_001A7340.half_height = half_height;
-    D_001A7340.left = (2048 - half_width) << 4;
-    D_001A7340.top = (2048 - half_height) << 4;
-    D_001A7340.right = (half_width + 2048) << 4;
-    D_001A7340.bottom = (half_height + 2048) << 4;
+    g_screen_width.width = width;
+    g_screen_width.height = height;
+    g_screen_width.half_width = half_width;
+    g_screen_width.half_height = half_height;
+    g_screen_width.left = (2048 - half_width) << 4;
+    g_screen_width.top = (2048 - half_height) << 4;
+    g_screen_width.right = (half_width + 2048) << 4;
+    g_screen_width.bottom = (half_height + 2048) << 4;
 
     view->fB0 = 0.62f;
-    view->f200 = func_00283CE0(width) * 0.5f;
-    half_height_f = func_00283CE0(dimensions->height) * 0.5f;
+    view->f200 = IntToFloat(width) * 0.5f;
+    half_height_f = IntToFloat(dimensions->height) * 0.5f;
     view->f204 = half_height_f;
     view->f208 = view->f200 * 4.0f;
     view->f20C = half_height_f * 4.0f;
-    func_00279FF0();
+    gfx_apply_display_config();
 }

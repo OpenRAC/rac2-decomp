@@ -1,19 +1,20 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef float f32;
 typedef int TI128 __attribute__((mode(TI)));
-extern f32 func_00282C48(f32 f);
-extern f32 func_00283198(f32);
-extern f32 func_00283180(f32);
-extern void func_00283098(f32 *, const f32 *, const f32 *);
-extern void func_00282CC0(char *, char *, char *);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_002AA2E8(f32 *, f32, f32);
+extern f32 math_fabs(f32 f);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern void matrix_mul_vec3(f32 *, const f32 *, const f32 *);
+extern void FastVecAdd(char *, char *, char *);
+extern f32 FastAddRotations(f32, f32);
+extern f32 ApproachValue(f32 *, f32, f32);
 extern float ref_L22_003F5580_00 __attribute__((sda));
-extern f32 func_00282DB0(void *, void *);
-extern f32 func_00283CE0(int);
-extern f32 func_002AA140(f32, f32, f32);
+extern f32 FastVecDot(void *, void *);
+extern f32 IntToFloat(int);
+extern f32 math_lerp_float(f32, f32, f32);
 extern u8 D_L22_001B9C80[];
 extern f32 D_L22_001B0A08 __attribute__((sda));
 extern f32 D_L22_001B0A04 __attribute__((sda));
@@ -37,21 +38,21 @@ void func_PAL_L22_003F9A10(u8 *obj) {
         *(f32 *)(ctl + 0xC0) = 0.0f;
         return;
     }
-    a = func_00283198(*(f32 *)(ctl + 0xC4));
+    a = math_fast_sin_or_cos_b(*(f32 *)(ctl + 0xC4));
     b = *(f32 *)(ctl + 0xBC);
-    c = func_00283180(*(f32 *)(ctl + 0xB0));
+    c = math_fast_sin_or_cos_a(*(f32 *)(ctl + 0xB0));
     b = b * a;
     c = c * b;
     buf[0] = c;
-    d = func_00283198(*(f32 *)(ctl + 0xB0));
+    d = math_fast_sin_or_cos_b(*(f32 *)(ctl + 0xB0));
     d = d * b;
     buf[1] = d;
     buf[2] = 0.0f;
-    func_00283098(buf, buf, obj + 0xC0);
+    matrix_mul_vec3(buf, buf, obj + 0xC0);
     buf[3] = 0.0f;
-    func_00282CC0(obj + 0xE0, buf, ctl);
-    r = func_00283B98(*(f32 *)(ctl + 0xC4), *(f32 *)(ctl + 0xC0));
+    FastVecAdd(obj + 0xE0, buf, ctl);
+    r = FastAddRotations(*(f32 *)(ctl + 0xC4), *(f32 *)(ctl + 0xC0));
     g = ref_L22_003F5580_00;
     *(f32 *)(ctl + 0xC4) = r;
-    func_002AA2E8((f32 *)(ctl + 0xBC), 0.0f, g * (0.020000001f));
+    ApproachValue((f32 *)(ctl + 0xBC), 0.0f, g * (0.020000001f));
 }

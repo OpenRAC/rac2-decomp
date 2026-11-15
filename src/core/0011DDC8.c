@@ -16,7 +16,7 @@ extern char r1_D_001580A8[];
 
 extern int r1_D_0012FDA8;
 
-extern s32 func_0011E010(void);
+extern s32 iop_file_buffers_equal(void);
 
 extern void r1_func_001153FC(void *, int, int);
 
@@ -26,7 +26,7 @@ extern int r1_D_0012FD94;
 /* A tail jump with the argument load in its delay slot (`lui / j /
    lw`), as 2.9-ee, which builds this SDK object, emits it. */
 /* Releases the file system lock. */
-void func_0011DDC8(void) {
+void iop_file_unlock(void) {
     r1_func_00118C90(r1_D_0012FD9C);
 }
 
@@ -65,7 +65,7 @@ extern void r1_func_0011B710(void);
 
 /* rac1-decomp src/core/00119D88.c: func_0011DE08 */
 /* Starts up the file system link to the IOP: waits for the file server, clears the file table and sets up the reply buffers. */
-s32 func_0011DE08(void) {
+s32 iop_file_init_client(void) {
     s32 result, i;
     char *slot;
     struct W4 versionWord;
@@ -122,7 +122,7 @@ s32 func_0011DE08(void) {
    the slot's lui comes first and the function is 4/140. Declaration
    order of the locals decides it. */
 /* Compares three small buffers to see whether they all agree. Returns 1 only if they do. */
-int func_0011E010(void) {
+int iop_file_buffers_equal(void) {
     char *buf = r1_D_0012FCEC;
     char *slot = r1_D_001580A8;
     int result = 0;
@@ -136,7 +136,7 @@ int func_0011E010(void) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011BF48 */
 /* Marks the file system as not ready and clears its saved buffer. */
-int func_0011E0A0(void) {
+int iop_file_reset_state(void) {
     r1_D_0012FD94 = 0;
     r1_func_001153FC(r1_D_001580A8, 0, 0x4);
     return 0;

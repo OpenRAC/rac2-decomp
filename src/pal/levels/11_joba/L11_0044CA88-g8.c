@@ -8,13 +8,13 @@ typedef struct {
     s32 pad;
     V4_L11_447018 pos;
 } L11_447018_Spark;
-extern char *func_L11_004417E8(char *);
-extern void func_002ACB48(void *, float);
-extern void func_00282C88(void *);
-extern float func_002A7878(float, float);
-extern s32 func_002A77E0(s32);
-extern s32 func_002A7820(s32, s32);
-extern void func_L02_003449D8(void *, void *, void *, s32, s32);
+extern char *arena_get_center_point(char *);
+extern void vec_add_random_offset(void *, float);
+extern void vec_clear_128(void *);
+extern float math_random_float_range(float, float);
+extern s32 math_random_int_below(s32);
+extern s32 math_random_int_range(s32, s32);
+extern void enemy_spawn_record(void *, void *, void *, s32, s32);
 extern s32 D_L11_001B1950 __attribute__((sda));
 extern s32 D_L11_001B1954 __attribute__((sda));
 extern s32 D_L11_001B1958 __attribute__((sda));
@@ -31,26 +31,26 @@ void func_PAL_L11_0044CA88(char *obj, s32 count)
     s32 i;
 
     for (i = 0; i < count; i++) {
-        qcopy(s.pos, func_L11_004417E8(obj));
-        func_002ACB48(s.pos, D_L11_001B1964);
+        qcopy(s.pos, arena_get_center_point(obj));
+        vec_add_random_offset(s.pos, D_L11_001B1964);
         s.pos[2] += D_L11_001B1968;
-        func_00282C88(&s);
-        func_002ACB48(&s, func_002A7878(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
+        vec_clear_128(&s);
+        vec_add_random_offset(&s, math_random_float_range(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
         s.flag = 0;
-        func_L02_003449D8(s.pos, &s, D_L11_001B1990, func_002A77E0(2), func_002A7820(D_L11_001B1954, D_L11_001B1958));
+        enemy_spawn_record(s.pos, &s, D_L11_001B1990, math_random_int_below(2), math_random_int_range(D_L11_001B1954, D_L11_001B1958));
     }
-    if (func_002A77E0(D_L11_001B1950) == 0) {
-        qcopy(s.pos, func_L11_004417E8(obj));
-        func_002ACB48(s.pos, D_L11_001B1964);
+    if (math_random_int_below(D_L11_001B1950) == 0) {
+        qcopy(s.pos, arena_get_center_point(obj));
+        vec_add_random_offset(s.pos, D_L11_001B1964);
         s.pos[2] += D_L11_001B1968;
-        func_00282C88(&s);
-        func_002ACB48(&s, func_002A7878(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
+        vec_clear_128(&s);
+        vec_add_random_offset(&s, math_random_float_range(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
         s.flag = 0;
-        func_L02_003449D8(s.pos, &s, D_L11_001B1990, func_002A77E0(2), func_002A7820(D_L11_001B1954, D_L11_001B1958));
+        enemy_spawn_record(s.pos, &s, D_L11_001B1990, math_random_int_below(2), math_random_int_range(D_L11_001B1954, D_L11_001B1958));
     }
 }
 
-extern s32 func_00282978(void *);
+extern s32 FastDecTimer(void *);
 extern u16 D_L11_001B19A8 __attribute__((sda));
 extern s32 D_L11_001B19AC __attribute__((sda));
 extern s32 D_L11_005A0000 __attribute__((sda));
@@ -60,8 +60,8 @@ extern s32 func_3006B8(char *a0, s32 a1);
 extern s32 func_338F10(char *a0, char *a1, s32 a2);
 extern s32 func_4461C0(s32 a0, char *a1);
 extern s32 func_448CE0(char *a0);
-extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C __attribute__((sda));
+extern u8 *g_group_id_lists[];
+extern u8 *g_moby_l11_table __attribute__((sda));
 extern s32 D_L11_001B1C50 __attribute__((sda));
 extern u8 D_L11_001B1C10 __attribute__((sda));
 extern s32 D_L11_001B1C54;
@@ -141,20 +141,20 @@ struct JobObject {
     u8 padBC[4];
     float rotation[12];      
 };
-extern s32 func_00283CF0(float);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void *func_002A9640(void *, s32, s32);
+extern s32 FloatToInt(float);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
-extern void func_00283698(void *, void *);
-extern void func_002AFFD8(void *, void *, s32);
-extern s32 func_L11_004461C0(s32, void *);
-extern void func_002A7750(void *, s32, s32);
+extern void matrix_from_basis_rows(void *, void *);
+extern void cam_compute_view_direction(void *, void *, s32);
+extern s32 arena_is_point_in_inner_zone(s32, void *);
+extern void moby_set_state(void *, s32, s32);
 extern char D_L11_001BA8C0[];
 extern s32 D_001A8FF4;
-extern void func_L11_00449878(void *);
-extern void func_L11_00448DF8(void *);
-extern s32 func_L11_00448CE0(void *, void *);
+extern void security_robot_deactivate(void *);
+extern void security_robot_update_pairing(void *);
+extern s32 security_robot_is_holding_item_attacking(void *, void *);
 extern void func_PAL_L02_003D5FF0(void *, s32);
 extern void func_PAL_L11_0044F420(void *, s32, s32);
 
@@ -170,10 +170,10 @@ void func_PAL_L11_0044DF38(JobObject *object)
 
     if (object->stage == 0) {
         state->params = state->paramBlock;
-        state->f48 = func_00283CF0(15.0f);
-        state->f4A = func_00283CF0(16.0f);
-        speed = func_002A7878(10.0f, 30.0f) * 0.01745329424738884f;
-        state->turnRate = func_002A77E0(2) ? -speed : speed;
+        state->f48 = FloatToInt(15.0f);
+        state->f4A = FloatToInt(16.0f);
+        speed = math_random_float_range(10.0f, 30.0f) * 0.01745329424738884f;
+        state->turnRate = math_random_int_below(2) ? -speed : speed;
         state->f80 = 1.3f;
         state->f84 = 1.3f;
         state->f69 = 2;
@@ -196,15 +196,15 @@ void func_PAL_L11_0044DF38(JobObject *object)
         state->f29 = 1;
         state->f30 = 0.75f;
         state->fireTimer = 0;
-        if (!func_002A77E0(2))
+        if (!math_random_int_below(2))
             object->flags |= 0x8000;
         state->turret = 0;
-        func_L11_00449878(object);
+        security_robot_deactivate(object);
     }
     if (state->f36E == 0 && object->stage != 18 && !D_001A8FF4) {
         object->flags |= 0x400;
-        if (object->f31 && func_00282E48(object->position, D_L11_001BA8C0) < 24.0f) {
-            func_002A93B0(object);
+        if (object->f31 && fast_vec_dist(object->position, D_L11_001BA8C0) < 24.0f) {
+            moby_update_ground_check(object);
             object->f6F = 22;
         }
     } else {
@@ -212,10 +212,10 @@ void func_PAL_L11_0044DF38(JobObject *object)
     }
     if (object->stage >= 3) {
         state->fFC = 1.0f;
-        hit = func_002A9640(object, 0x10000, 1);
+        hit = part_find_owned_effect_slot(object, 0x10000, 1);
         if (hit) {
             state->fFC = 1.0f;
-            if (func_L11_00448CE0(object, hit)) {
+            if (security_robot_is_holding_item_attacking(object, hit)) {
                 state->f60 = 15;
                 func_PAL_002B1A50(object, state->hitInfo, 1);
                 state->f60 = 16;
@@ -232,15 +232,15 @@ void func_PAL_L11_0044DF38(JobObject *object)
         if (state->health <= 0.0f && object->f95 != 7 && object->f95 != 8)
             func_PAL_L11_0044F420(object, 1, 0);
         if (state->f36E) {
-            func_00283698(state->basis, object->rotation);
-            func_002AFFD8(object->position, state->anchor, 0);
-            if (!func_L11_004461C0(object->fB8, object->position) && object->f95 != 8) {
+            matrix_from_basis_rows(state->basis, object->rotation);
+            cam_compute_view_direction(object->position, state->anchor, 0);
+            if (!arena_is_point_in_inner_zone(object->fB8, object->position) && object->f95 != 8) {
                 state->health = 0;
-                func_002A7750(object, 18, 8);
+                moby_set_state(object, 18, 8);
             }
         }
         if (object->stage >= 2 && state->f2E == 2)
             func_PAL_L11_0044F420(object, 1, 1);
-        func_L11_00448DF8(object);
+        security_robot_update_pairing(object);
     }
 }

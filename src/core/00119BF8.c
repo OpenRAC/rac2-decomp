@@ -25,8 +25,8 @@ extern char D_0013A750[];
 extern char D_0013A768[];
 extern char D_0013A770[];
 extern char D_0013A788[];
-extern int func_00115FC0(void *, int *, const char *, unsigned int, int *);
-extern int func_00119AC0(int, const char *, unsigned int, int);
+extern int MultibyteToWideCharReentrant(void *, int *, const char *, unsigned int, int *);
+extern int BufferedWrite128Secondary(int, const char *, unsigned int, int);
 extern void *memcpy(void *, const void *, unsigned int) __asm__("func_001153D4");
 extern void *memchr(const void *, int, unsigned int) __asm__("func_00115250");
 extern unsigned int strlen(const char *) __asm__("func_001157AC");
@@ -51,7 +51,7 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
 #define UARG() (flags & 0x20 ? GET(unsigned long long) : flags & 0x10 ? GET(unsigned long) : flags & 0x40 ? (unsigned long)(unsigned short)GET(int) : (unsigned long)GET(unsigned int))
 
 /* Prints text from a format string, handling whole numbers and strings but no decimals. */
-int func_00119BF8(void *data, PrintFile *fp, const char *fmt0, char *ap)
+int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
 {
     register char *fmt;
     register int ch;

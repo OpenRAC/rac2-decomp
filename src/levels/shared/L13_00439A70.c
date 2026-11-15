@@ -29,22 +29,22 @@ typedef struct {
     s16 owner;
 } Object;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern Entry *D_L13_001B22C4 MACRO_ADDR;
 extern Slot *D_L13_001B2140 __attribute__((sda));
 
 /* Switches the object to state 3 unless the player owns it and meets its condition. */
-void func_L13_00439A70(Object *obj) {
+void moby_switch_state_unless_owned(Object *obj) {
     s32 k;
     s32 *data = D_L13_001B22C4[obj->index].data;
 
-    if (((Hero *)gHeroState)->i[0x24A0 / 4] == obj->owner) {
+    if (((Hero *)g_hero_state)->i[0x24A0 / 4] == obj->owner) {
         k = data[0x24 / 4];
         if (k < 0) {
             return;
         }
-        if (((Hero *)gHeroState)->i[0x630 / 4] == D_L13_001B2140[k].value) {
-            if (((Hero *)gHeroState)->i[0x640 / 4] == 0) {
+        if (((Hero *)g_hero_state)->i[0x630 / 4] == D_L13_001B2140[k].value) {
+            if (((Hero *)g_hero_state)->i[0x640 / 4] == 0) {
                 return;
             }
         }

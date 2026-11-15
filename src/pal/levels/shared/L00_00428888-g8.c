@@ -1,10 +1,11 @@
+#include "names.h"
 /* func_PAL_L00_00428888, the PAL copy of func_L00_004233F8 (follow_camera_setup): the same C, with
  * D_L00_001B1514 and D_L00_001B1518 scaled to 50 Hz, 2000 becoming 1667 and the turn rates 0.00041887909.
  * The camera and orientation stores are reordered from the template to reach PAL's schedule.
  */
 #include "common.h"
 typedef unsigned int CameraQuad __attribute__((mode(TI)));
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 extern CameraQuad D_0018A0E0;
 extern int D_L00_001B1580 SDATA(D_L00_001B1580), D_L00_001B1584 SDATA(D_L00_001B1584);
 extern int D_L00_001B1514 SDATA(D_L00_001B1514), D_L00_001B1518 SDATA(D_L00_001B1518);
@@ -15,15 +16,15 @@ extern int D_L00_001B1854;
 typedef struct { unsigned char pad0[0x86]; short mode; } CameraControl;
 extern CameraControl *D_L00_001B8E14[];
 
-extern void func_00282C88(void *);
-extern void func_L00_00423290(unsigned char *);
-extern float func_00283CE0(int);
-extern void func_L00_00420638(char *);
-extern void func_L00_00423038(int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DF0(void *);
+extern void vec_clear_128(void *);
+extern void cam_follow_init_from_hero(unsigned char *);
+extern float IntToFloat(int);
+extern void cam_init_state_vectors(char *);
+extern void cam_follow_update_orientation(int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecLength(void *);
 #define CF(p, o) (*(float *)((p) + (o)))
 #define CI(p, o) (*(int *)((p) + (o)))
 #define CS(p, o) (*(short *)((p) + (o)))
@@ -79,7 +80,7 @@ void func_PAL_L00_00428888(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = D_00189E20 + 0x80;
+    unsigned char *initialPosition = g_hero_state + 0x80;
     unsigned char *hero;
     D_L00_001B1580 = 0;
     D_L00_001B1584 = 0;
@@ -170,29 +171,29 @@ void func_PAL_L00_00428888(CameraOwner *owner)
     tracker->f3C = D_L00_001B14DC;
     tracker->f40 = D_L00_001B14D8;
     tracker->i48 = D_L00_001B1854;
-    func_00282C88(tracker->direction);
+    vec_clear_128(tracker->direction);
     if (owner->handoff == 2) {
-        func_L00_00423290((unsigned char *)owner);
+        cam_follow_init_from_hero((unsigned char *)owner);
         *(CameraQuad *)(owner->previous) = *(CameraQuad *)owner;
         if (D_L00_001B8E14[0]->mode == 7 && CS(hero, 0x34C) == 0)
             orientation->h0 = 0;
         else {
             int t = (D_L00_001B1518 * 5 + 2) / 6;
             orientation->h0 = t;
-            orientation->f24 = 1.0f / func_00283CE0((short)t);
+            orientation->f24 = 1.0f / IntToFloat((short)t);
         }
     } else {
-        func_L00_00420638((char *)owner);
-        func_L00_00423038(1);
+        cam_init_state_vectors((char *)owner);
+        cam_follow_update_orientation(1);
     }
-    func_00282CF0(movement, owner->pos, camera->direction);
+    FastVecSub(movement, owner->pos, camera->direction);
     *(CameraQuad *)(movement->previous) = *(CameraQuad *)movement;
     *(CameraQuad *)root = *(CameraQuad *)(owner->pos);
     *(CameraQuad *)(tracker->previous) = *(CameraQuad *)(owner->pos);
-    distance = func_00282DB0(movement, &D_0018A0E0);
-    func_00282D30(&projected, &D_0018A0E0, distance);
-    func_00282CF0(&difference, movement, &projected);
-    distance = movement->f2C - func_00282DF0(&difference);
+    distance = FastVecDot(movement, &D_0018A0E0);
+    FastVecScale(&projected, &D_0018A0E0, distance);
+    FastVecSub(&difference, movement, &projected);
+    distance = movement->f2C - FastVecLength(&difference);
     tracker->f30 = distance;
     if (distance < -0.1f) tracker->h3A = 1;
     orientation->f8 = movement->f30;

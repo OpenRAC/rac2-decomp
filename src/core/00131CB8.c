@@ -23,7 +23,7 @@ extern int *D_001A7288 MACRO_ADDR;
    than `ee29`, so this file keeps the default profile while the libcdvd
    neighbours in 00131780.c need `sdk`. */
 /* Copies each chunk of the next boot program into memory and returns the id of the program. */
-BinFn func_00131CB8(void) {
+BinFn load_boot_bin_chunks(void) {
     unsigned char *p;
     struct Chunk *c;
     unsigned char *dst;

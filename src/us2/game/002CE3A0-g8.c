@@ -4,59 +4,59 @@
    (437, 367 in the data) comes from a pair of globals, the string becomes 0x2BE5 and the owner
    field moves by 0x688. */
 
-extern void func_0027C540(int);
-extern void func_0027C660(void);
-extern s32 func_00288FB8(s32);
+extern void SetupGifPaging(int);
+extern void DoGifPaging(void);
+extern s32 GetLocalizedString(s32);
 extern int D_US2_001AB9D8 __attribute__((sda));
 extern int D_US2_001AB9DC[] __attribute__((sda));
 extern void func_US2_0029CFE0(void);
 extern char *D_001A8CFC[] __attribute__((sda));
 
-extern int func_0027FAA8(int v, int p7, unsigned long long k, char *r, int m1);
+extern int text_draw_centered_small(int v, int p7, unsigned long long k, char *r, int m1);
 
-extern void func_002A0250(void);
+extern void DrawMobysSetup(void);
 
-extern void func_002A01C8(void);
+extern void mem_fill_scratch_area(void);
 
-extern void func_002A01F0(void);
+extern void mem_save_scratch_area(void);
 
-extern void func_002A0220(void);
+extern void mem_restore_scratch_area(void);
 
-extern int func_002A0380(void);
+extern int tex_run_upload_and_setup(void);
 
-extern void func_0034EBE0(void *);
+extern void hud_init_lighting_colors(void *);
 
-extern void func_0034EC70(void *);
+extern void hud_reset_render_state(void *);
 
 extern void func_US2_0034F9F8(char *);
 
-extern void func_0034EDB0(void *, char *);
+extern void gfx_draw_shadowed_sprite(void *, char *);
 
-extern void func_002FC3C0(u64);
+extern void gfx_wait_for_dma_status_bits(u64);
 
-extern void func_0029FEE0(void);
+extern void PatchMobyGifs(void);
 
 int func_US2_002CE3A0(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_US2_0029CFE0();
-    func_0027FAA8(D_US2_001AB9D8, D_US2_001AB9DC[0], 0x80F0F0F0ULL, (char *)func_00288FB8(0x2BE5), -1);
-    func_0027C660();
+    text_draw_centered_small(D_US2_001AB9D8, D_US2_001AB9DC[0], 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2BE5), -1);
+    DoGifPaging();
     if (D_001A8CFC[0] != 0) {
         if (*(int *)((char *)D_001A8CFC[0] + 0x38000 + 0x79EC) != 0) {
             char *owner;
-            func_002A0250();
-            func_002A01C8();
-            func_002A01F0();
+            DrawMobysSetup();
+            mem_fill_scratch_area();
+            mem_save_scratch_area();
             owner = *(char **)(D_001A8CFC[0] + 0x38000 + 0x79EC);
-            func_0034EBE0(owner);
-            func_0034EC70(owner);
+            hud_init_lighting_colors(owner);
+            hud_reset_render_state(owner);
             func_US2_0034F9F8(owner);
-            func_0034EDB0(owner, owner + 0xC00);
-            func_002A0220();
-            func_002A0380();
-            func_002FC3C0(0x10);
-            func_0029FEE0();
+            gfx_draw_shadowed_sprite(owner, owner + 0xC00);
+            mem_restore_scratch_area();
+            tex_run_upload_and_setup();
+            gfx_wait_for_dma_status_bits(0x10);
+            PatchMobyGifs();
         }
     }
     return 0;

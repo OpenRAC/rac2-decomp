@@ -13,66 +13,66 @@ typedef struct {
     unsigned char pad5[0x2290 - 0x344]; void *object;
     unsigned char pad6[0x22BD - 0x2294]; unsigned char gate;
 } HeroProbeState;
-extern HeroProbeState D_00189E20;
+extern HeroProbeState g_hero_state;
 typedef struct {
     unsigned char pad0[0x18]; void *object;
     unsigned char pad1[4]; float hit_position[4];
     unsigned char pad2[0x10]; float direction[4];
 } SceneProbeState;
-extern SceneProbeState D_L00_001BF200;
+extern SceneProbeState g_collision_result;
 
-extern int D_L00_001B19C8 MACRO_ADDR;
+extern int g_frame_l00_counter MACRO_ADDR;
 extern void ref_L00_002C2DE8_00(void);
-extern int func_L00_002AB108(float *, float, float);
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
-extern int func_002ABB78(void *);
-extern void func_L00_002D36E0(float *, float, float, int, float);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern float func_00282E48(void *, void *);
-extern int func_00277258(void *, int, void *, float);
+extern int hero_test_reach_blend(float *, float, float);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
+extern int moby_is_in_special_class_range(void *);
+extern void hero_build_relative_point(float *, float, float, int, float);
+extern int CollLine(void *, void *, int, void *, int);
+extern float fast_vec_dist(void *, void *);
+extern int coll_test_point(void *, int, void *, float);
 
 /* Every few frames, checks the ground and ledges around the hero and records what it finds,
  * such as a nearby target and whether there is room to step forward. */
-void func_L00_002C2DE8(void)
+void hero_probe_ground_and_ledge(void)
 {
     float first[4], second[4], probe[4];
-    if (gHeroState.gate != 0) return;
+    if (g_hero_state.gate != 0) return;
     ref_L00_002C2DE8_00();
-    if (gFrameCounter_L00 % 3 == 0) {
-        gHeroState.height = 4.0f;
-        gHeroState.first_flag = 0;
-        gHeroState.second_flag = 0;
-        if (TestHeroReachBlend(&gHeroState.height, 0.7f, 4.0f)) {
-            gHeroState.angle = FastMatrixHelperA(gCollisionResult.direction[2], vec_length_xy(gCollisionResult.direction));
-            if (gCollisionResult.object) {
-                gHeroState.second_flag = 1;
-                if (IsMobyInSpecialClassRange(gCollisionResult.object)) gHeroState.first_flag = 1;
+    if (g_frame_l00_counter % 3 == 0) {
+        g_hero_state.height = 4.0f;
+        g_hero_state.first_flag = 0;
+        g_hero_state.second_flag = 0;
+        if (hero_test_reach_blend(&g_hero_state.height, 0.7f, 4.0f)) {
+            g_hero_state.angle = mat_fast_helper_a(g_collision_result.direction[2], vec_length_xy(g_collision_result.direction));
+            if (g_collision_result.object) {
+                g_hero_state.second_flag = 1;
+                if (moby_is_in_special_class_range(g_collision_result.object)) g_hero_state.first_flag = 1;
             }
         }
     }
-    if (gFrameCounter_L00 % 5 == 0) {
+    if (g_frame_l00_counter % 5 == 0) {
         int hit;
         float distance, offset;
-        gHeroState.valid = 0;
-        gHeroState.distance = 0.0f;
-        if (gHeroState.enabled == 0) return;
-        BuildHeroRelativePoint(first, 1.1f, 0.0f, 1, 1.0f);
-        BuildHeroRelativePoint(second, 1.1f, 0.0f, 1, -20.0f);
+        g_hero_state.valid = 0;
+        g_hero_state.distance = 0.0f;
+        if (g_hero_state.enabled == 0) return;
+        hero_build_relative_point(first, 1.1f, 0.0f, 1, 1.0f);
+        hero_build_relative_point(second, 1.1f, 0.0f, 1, -20.0f);
         if (second[2] < 0.5f) second[2] = 0.5f;
         distance = 20.0f;
-        hit = CollLine(first, second, 2, gHeroState.object, 0);
-        if (hit) distance = fast_vec_dist(first, gCollisionResult.hit_position);
+        hit = CollLine(first, second, 2, g_hero_state.object, 0);
+        if (hit) distance = fast_vec_dist(first, g_collision_result.hit_position);
         if (!hit || 3.0f < distance) {
             offset = -0.4f;
             do {
-                BuildHeroRelativePoint(probe, offset + 1.1f, 0.0f, 1, 0.0f);
-                if (!TestPointAgainstCollision(probe, 2, 0, gHeroState.scale)) {
-                    gHeroState.valid = 1;
-                    if (!hit) gHeroState.distance = 20.0f;
-                    else gHeroState.distance = distance;
-                    gHeroState.clearance = gHeroState.scale + offset;
-                    if (gHeroState.clearance < 0.0f) gHeroState.clearance = 0.0f;
+                hero_build_relative_point(probe, offset + 1.1f, 0.0f, 1, 0.0f);
+                if (!coll_test_point(probe, 2, 0, g_hero_state.scale)) {
+                    g_hero_state.valid = 1;
+                    if (!hit) g_hero_state.distance = 20.0f;
+                    else g_hero_state.distance = distance;
+                    g_hero_state.clearance = g_hero_state.scale + offset;
+                    if (g_hero_state.clearance < 0.0f) g_hero_state.clearance = 0.0f;
                     return;
                 }
                 offset += 0.1f;

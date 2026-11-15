@@ -3,18 +3,18 @@
 #include "common.h"
 typedef struct { int id, kind; int rest[4]; } ActionItem;
 typedef struct { u8 pad[0x80]; int index, active; u8 gap[0xb8]; ActionItem items[0]; } ActionModel;
-extern ActionModel D_L00_0022F7C0;
+extern ActionModel g_purchase_menu_model;
 #define MODEL ((u8 *)&D_L00_0022F7C0)
-extern u8 D_00139568[];
-extern int D_00139688[];
+extern u8 g_item_slot_to_record[];
+extern int g_item_ammo_counts[];
 typedef struct {u8 pad[0x88]; unsigned short price; u8 pad2[4]; unsigned short limit; u8 rest[80];} ActionClass;
-extern ActionClass D_L00_00262570[];
-extern int D_001A79F8;
-extern int D_001A7B90;
+extern ActionClass g_weapon_l00_table[];
+extern int g_player_bolts;
+extern int g_is_pal_video;
 extern float D_L00_001B25E0;
-extern int func_00288FB8(int id);
-extern int func_002F6510(void);
-extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length);
+extern int GetLocalizedString(int id);
+extern int GetSelectedShopItemPrice(void);
+extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text, int length);
 #define SELECTED (MODEL + D_L00_0022F7C0.index * 24)
 #define KIND (*(int *)(SELECTED+0x144))
 #define ENTRY (&D_L00_00262570[D_00139568[*(int *)(SELECTED+0x140)]])
@@ -29,7 +29,7 @@ extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length
 
 void func_PAL_L00_0037A878(void)
 {
-    if (D_L00_0022F7C0.active) {
+    if (g_purchase_menu_model.active) {
         if (KIND == 1 && CAPPED) {
             DRAW(420, 0x1124);
         } else if (KIND == 1) {
@@ -38,7 +38,7 @@ void func_PAL_L00_0037A878(void)
             } else {
                 DRAW(420, 0x1124);
             }
-        } else if (D_001A79F8 >= func_002F6510()) {
+        } else if (g_player_bolts >= GetSelectedShopItemPrice()) {
             DRAW(80, 0x113b);
         } else {
             DRAW(420, 0x1124);
@@ -50,15 +50,15 @@ void func_PAL_L00_0037A878(void)
                 return;
             DRAW(420, 0x1124);
         } else {
-            if (D_001A79F8 < func_002F6510())
+            if (g_player_bolts < GetSelectedShopItemPrice())
                 return;
             DRAW(420, 0x1138);
         }
     } else {
         int stride = 24;
         u8 *kindBase = MODEL + 0x144;
-        if ((*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 0 && D_001A79F8 >= func_002F6510()) ||
-            (*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
+        if ((*(int *)(kindBase + g_purchase_menu_model.index * stride) == 0 && g_player_bolts >= GetSelectedShopItemPrice()) ||
+            (*(int *)(kindBase + g_purchase_menu_model.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
             DRAW(80, 0x1125);
         }
         DRAW(420, 0xB60);

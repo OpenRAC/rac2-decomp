@@ -30,41 +30,41 @@ typedef struct {
     unsigned char pad17[0x24B8 - 0x24A4]; float timer;
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 
 extern unsigned int D_00138320[];
 extern int ref_L00_002CAB08_00(int, int);
 
-extern int func_L00_002C3A40(void);
-extern int func_L00_0032EFB0(int, int, int, int);
-extern int func_L00_0032EF10(int, int, int *);
-extern int func_L00_002ADEA0(int);
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern int hero_get_step_offset_from_direction(void);
+extern int pad_presses_within_frames(int, int, int, int);
+extern int PadPressedWithin(int, int, int *);
+extern int hero_slot_item_id(int);
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
 /* Picks which jump or roll move the hero starts from the buttons and speed, or fails if none fits. */
-int func_L00_002CAB08(void)
+int hero_choose_jump_or_roll_move(void)
 {
     int offset;
-    if (gHeroState.mode == 14) return 0;
-    offset = GetStepOffsetFromDirection();
-    if ((D_00138320[0] & 8) && offset > 0 && ArePadPressesWithinFrames(0x40, 0x1F000, offset + 5, offset)) {
+    if (g_hero_state.mode == 14) return 0;
+    offset = hero_get_step_offset_from_direction();
+    if ((D_00138320[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 5, offset)) {
         ref_L00_002CAB08_00(11, 1);
         return 1;
     }
-    if (gHeroState.count_1b8 < 7) goto fail;
+    if (g_hero_state.count_1b8 < 7) goto fail;
     if (!PadPressedWithin(0x40, 9, 0)) goto fail;
-    if (hero_slot_item_id(3) == 2 && gItemOwnedFlags[2] != 0 && gHeroState.flag_24fc == 0 &&
-        (2.5f < gHeroState.distance_278 || gHeroState.angle_280 < 0.785398244857788086f) &&
-        0.7f < gHeroState.timer && 0.015000000596046448f < gHeroState.speed_178)
+    if (hero_slot_item_id(3) == 2 && g_item_owned_flags[2] != 0 && g_hero_state.flag_24fc == 0 &&
+        (2.5f < g_hero_state.distance_278 || g_hero_state.angle_280 < 0.785398244857788086f) &&
+        0.7f < g_hero_state.timer && 0.015000000596046448f < g_hero_state.speed_178)
         ref_L00_002CAB08_00(10, 1);
-    else if (hero_slot_item_id(3) == 3 && gHeroState.flag_24fc == 0 && 0.7f < gHeroState.timer &&
-             (2.5f < gHeroState.distance_278 || gHeroState.flag_284 != 0) &&
-             0.015000000596046448f < gHeroState.speed_178) {
-        if (gHeroState.flag_1e4 != 0) return 1;
+    else if (hero_slot_item_id(3) == 3 && g_hero_state.flag_24fc == 0 && 0.7f < g_hero_state.timer &&
+             (2.5f < g_hero_state.distance_278 || g_hero_state.flag_284 != 0) &&
+             0.015000000596046448f < g_hero_state.speed_178) {
+        if (g_hero_state.flag_1e4 != 0) return 1;
         ref_L00_002CAB08_00(16, 1);
-    } else if (hero_slot_item_id(3) == 3 && gHeroState.flag_24fc == 0)
+    } else if (hero_slot_item_id(3) == 3 && g_hero_state.flag_24fc == 0)
         ref_L00_002CAB08_00(13, 1);
-    else if (hero_slot_item_id(3) == 2 && gHeroState.flag_24fc == 0 && gItemOwnedFlags[2] != 0)
+    else if (hero_slot_item_id(3) == 2 && g_hero_state.flag_24fc == 0 && g_item_owned_flags[2] != 0)
         ref_L00_002CAB08_00(15, 1);
     else
         ref_L00_002CAB08_00(7, 1);

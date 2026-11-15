@@ -59,39 +59,39 @@ typedef struct {
     int owner;                  /* 0x2290 */
 } Hero5940;
 
-extern Hero5940 D_00189E20;
-extern char D_L00_001B8FF0[], D_L00_001B8DC0[], D_L00_001BF220[];
+extern Hero5940 g_hero_state;
+extern char D_L00_001B8FF0[], g_camera_l00_position[], D_L00_001BF220[];
 extern Quad5940 D_L00_001B8DD0;
 /* Incomplete sda arrays are read with the assembler's lui/load macro, as in retail. */
 extern unsigned char D_001A7A44[] __attribute__((sda));
-extern int D_L00_001B19C8[] __attribute__((sda));
+extern int g_frame_l00_counter[] __attribute__((sda));
 extern float D_L00_001A7FE4[] __attribute__((sda));
 extern const float D_L00_001A7FE0 __attribute__((sda));
 extern float D_L00_001A7CE0 __attribute__((sda)), D_L00_001A7CE4 __attribute__((sda));
 
-extern int func_L00_002ADED8(int);
+extern int hero_is_slot_item_wrench(int);
 extern void func_002A0F48(void *);
-extern char *func_L00_002F3DA8(int);
-extern int func_L00_002D6418(void);
-extern void func_00283658(void *, void *);
-extern void func_002AA2E8(float *, float, float);
-extern float func_002AA548(float *, float *, float, float, float, float);
-extern float func_00283B98(float, float), func_00283198(float);
-extern void func_002830C0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00283410(void *, void *), func_00283738(void *, void *, void *);
-extern void func_002AB6D8(void *, void *), func_002A91F0(void *, void *);
-extern void func_00283098(void *, void *, void *), func_00282D08(void *, void *, void *, float);
-extern void func_00283810(void *, void *, void *, float), func_00283958(void *, void *);
-extern void func_00282D30(void *, void *, float), func_00282F20(void *, void *, float);
-extern int func_002761F8(void *, void *, int, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_00283678(void *, void *);
+extern char *level_get_table_entry_address(int);
+extern int hero_is_action_allowed(void);
+extern void copy_matrix_rotation(void *, void *);
+extern void ApproachValue(float *, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float);
+extern void transform_vector(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void euler_to_matrix(void *, void *), multiply_matrix3x3(void *, void *, void *);
+extern void mat_get_euler_angles(void *, void *), mat_build_rotation_from_angles(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *), lerp_vector(void *, void *, void *, float);
+extern void vec_fast_normalize3(void *, void *, void *, float), quaternion_to_rotation_basis(void *, void *);
+extern void FastVecScale(void *, void *, float), vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *, void *, int, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void copy_matrix3x4(void *, void *);
 
 /* Places the hero's held object (D_00189E20.object): from the weapon's mount offset and
    rotation, a turning bob angle, the blend from the transition pose while blend < 1, and a
    ground probe that limits the vertical offset to [-1.5, 0]. */
 void func_PAL_L00_002D5E90(void) {
-    Moby5940 *obj = D_00189E20.object;
+    Moby5940 *obj = g_hero_state.object;
     char *mount;
     float m[16], rot[16], offset[4], temp[4], a[4], b[4];
     float turn, height, scale, target;
@@ -100,7 +100,7 @@ void func_PAL_L00_002D5E90(void) {
     if (!obj)
         return;
     if (obj->oClass == 0x47) {
-        if (!D_00189E20.visible && !obj->state) {
+        if (!g_hero_state.visible && !obj->state) {
             obj->drawn = 0;
             obj->modeBits |= 1;
         } else {
@@ -109,7 +109,7 @@ void func_PAL_L00_002D5E90(void) {
         }
         return;
     }
-    if (func_L00_002ADED8(0)) {
+    if (hero_is_slot_item_wrench(0)) {
         obj->modeBits |= 1;
         obj->drawn = 0;
         if (obj->update)
@@ -118,77 +118,77 @@ void func_PAL_L00_002D5E90(void) {
         return;
     }
 
-    mount = func_L00_002F3DA8(D_00189E20.weapon);
-    func_00283658(m, D_L00_001B8FF0);
+    mount = level_get_table_entry_address(g_hero_state.weapon);
+    copy_matrix_rotation(m, D_L00_001B8FF0);
     qcopy_nc(&m[12], D_L00_001B8FF0 - 0x230);
     m[15] = 1.0f;
     qcopy_nc(offset, mount);
-    offset[0] += D_00189E20.offset;
-    if (D_001A7A44[0] && !func_L00_002D6418())
+    offset[0] += g_hero_state.offset;
+    if (D_001A7A44[0] && !hero_is_action_allowed())
         offset[1] = -offset[1];
 
     /* Turn rate in degrees per second (FE4 while moving, FE0 otherwise) to radians per frame. */
-    if (D_00189E20.speed > 0.02f)
+    if (g_hero_state.speed > 0.02f)
         turn = D_L00_001A7FE4[0] * 0.0003490659f;
     else
         turn = D_L00_001A7FE0 * 0.0003490659f;
-    func_002AA2E8(&D_00189E20.angleVelocity, turn, 0.010053098f);
-    D_00189E20.angle = func_00283B98(D_00189E20.angle, D_00189E20.angleVelocity);
-    offset[2] += func_00283198(D_00189E20.angle) * 0.02f;
+    ApproachValue(&g_hero_state.angleVelocity, turn, 0.010053098f);
+    g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_hero_state.angleVelocity);
+    offset[2] += math_fast_sin_or_cos_b(g_hero_state.angle) * 0.02f;
 
-    func_002830C0(obj->position, offset, m);
-    if (!func_L00_002D6418())
-        func_00282CC0(obj->position, obj->position, D_00189E20.velocity);
-    func_00283410(rot, mount + 0x10);
-    func_00283738(obj->rotMatrix, m, rot);
-    func_002AB6D8(obj->rotMatrix, obj->rotation);
-    func_002A91F0(D_00189E20.rotation, obj->rotation);
+    transform_vector(obj->position, offset, m);
+    if (!hero_is_action_allowed())
+        FastVecAdd(obj->position, obj->position, g_hero_state.velocity);
+    euler_to_matrix(rot, mount + 0x10);
+    multiply_matrix3x3(obj->rotMatrix, m, rot);
+    mat_get_euler_angles(obj->rotMatrix, obj->rotation);
+    mat_build_rotation_from_angles(g_hero_state.rotation, obj->rotation);
 
-    if (D_00189E20.blend < 1.0f) {
-        func_002AA548(&D_00189E20.blend, &D_00189E20.blendVelocity, 1.0f,
+    if (g_hero_state.blend < 1.0f) {
+        math_step_value_toward_target(&g_hero_state.blend, &g_hero_state.blendVelocity, 1.0f,
                       D_L00_001A7CE0 * 0.020000001f, D_L00_001A7CE4 * 0.00040000002f,
                       D_L00_001A7CE0 * 0.020000001f);
-        func_00283098(temp, D_00189E20.transitionPos, &D_00189E20);
-        func_00282CC0(temp, temp, D_00189E20.position);
-        func_00282D08(obj->position, temp, obj->position, D_00189E20.blend);
-        func_002A91F0(a, obj->rotation);
-        func_00283810(b, D_00189E20.transitionRot, a, D_00189E20.blend);
-        func_00283958(b, obj->rotMatrix);
+        matrix_mul_vec3(temp, g_hero_state.transitionPos, &g_hero_state);
+        FastVecAdd(temp, temp, g_hero_state.position);
+        lerp_vector(obj->position, temp, obj->position, g_hero_state.blend);
+        mat_build_rotation_from_angles(a, obj->rotation);
+        vec_fast_normalize3(b, g_hero_state.transitionRot, a, g_hero_state.blend);
+        quaternion_to_rotation_basis(b, obj->rotMatrix);
     }
 
     obj->drawn = 1;
     obj->modeBits &= ~1;
     func_002A0F48(obj);
 
-    if ((D_L00_001B19C8[0] ^ 1) & 1) {
+    if ((g_frame_l00_counter[0] ^ 1) & 1) {
         scale = 0.0009765625f;
         height = obj->bounds[3] * scale;
-        func_00282D30(temp, obj->bounds, scale);
-        func_00282F20(a, obj->rotMatrix[1], height * -1.2f);
-        func_00282CC0(a, a, temp);
-        if (func_002761F8(D_L00_001B8DC0, a, 0, D_00189E20.owner, 0)) {
-            target = (D_00189E20.offset - height) + func_00282E48(D_L00_001BF220, temp);
-            D_00189E20.offsetTarget = target;
+        FastVecScale(temp, obj->bounds, scale);
+        vec_scale_to_length(a, obj->rotMatrix[1], height * -1.2f);
+        FastVecAdd(a, a, temp);
+        if (CollLine(g_camera_l00_position, a, 0, g_hero_state.owner, 0)) {
+            target = (g_hero_state.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
+            g_hero_state.offsetTarget = target;
             if (target > 0.0f)
-                D_00189E20.offsetTarget = 0.0f;
+                g_hero_state.offsetTarget = 0.0f;
             else if (target < -1.5f)
-                D_00189E20.offsetTarget = -1.5f;
+                g_hero_state.offsetTarget = -1.5f;
         } else {
-            D_00189E20.offsetTarget = 0;
+            g_hero_state.offsetTarget = 0;
         }
     }
 
-    func_002AA548(&D_00189E20.offset, &D_00189E20.offsetVelocity, D_00189E20.offsetTarget,
+    math_step_value_toward_target(&g_hero_state.offset, &g_hero_state.offsetVelocity, g_hero_state.offsetTarget,
                   0.006f, 0.006f, 0.10000001f);
-    func_00283678(D_00189E20.transform, m);
-    qcopy_nc(&D_00189E20.vector760, m);
-    qcopy_nc(&D_00189E20.vector770, &D_L00_001B8DD0);
+    copy_matrix3x4(g_hero_state.transform, m);
+    qcopy_nc(&g_hero_state.vector760, m);
+    qcopy_nc(&g_hero_state.vector770, &D_L00_001B8DD0);
 
-    state = func_L00_002D6418();
+    state = hero_is_action_allowed();
     if (state)
-        D_00189E20.flags |= 5;
+        g_hero_state.flags |= 5;
     if (obj->update)
         obj->update(obj);
     if (state)
-        D_00189E20.flags &= ~5;
+        g_hero_state.flags &= ~5;
 }

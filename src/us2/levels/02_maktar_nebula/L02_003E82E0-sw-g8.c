@@ -7,34 +7,34 @@ extern u8 D_001395B8[];
 #define FLAG (((GameFlags *)D_001395B8)->b[0x8F])
 extern int D_L02_001B0938[] __attribute__((sda));
 extern char D_L02_001B0978[], D_L02_001B09A8[];
-extern char D_00188660[];
+extern char g_sound_state[];
 typedef union { u8 b[0x2600]; f32 f[0x980]; } Hero;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern char D_L02_001A8F20[] __attribute__((sda));
-extern int D_L02_001AEC78, D_001A79F8;
-extern void func_L00_002E6CF0(void (*)(char *), void *);
-extern void func_L02_003E7B58(char *);
-extern void func_002A7750(void *, int, int);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int), func_002B3868(void *);
-extern void func_002A7470(void *, int, int, int);
+extern int g_hovering_object_count, g_player_bolts;
+extern void gfx_add_draw_callback_first(void (*)(char *), void *);
+extern void DrawScrollingTileBands(char *);
+extern void moby_set_state(void *, int, int);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int), flag_set_first_pending(void *);
+extern void anim_start_blended(void *, int, int, int);
 extern void func_L00_0030C710(int);
-extern int func_0026FEB8(char *, ...);
+extern int STUB_printf(char *, ...);
 extern int func_US2_002AF9C8(char *, float);
-extern int func_002E5CF8(int, int, void *);
-extern void func_L02_003E75A8(void *), func_US2_L02_003E8D50(void *), func_002E59F8(int);
-extern void func_002A7398(void *, int, int);
-extern void func_L02_003E7370(void *);
-extern void func_L01_0031A278(void *, void *, float, float, float);
-extern void func_002A8BD0(void *, void *, int, float);
-extern int func_00277F48(void *, int, void *, void *, float);
-extern char *func_0032C700(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern char *func_L02_003CEBB8(int);
-extern void func_L02_003CED70(void *, void *, void *);
-extern float func_00283248(float, float);
-extern void func_0029F338(void *);
-extern char *func_002A9640(void *, int, int);
-extern void func_L02_003E79F8(void *);
+extern int PlayMobySound(int, int, void *);
+extern void slot_machine_update_reels(void *), func_US2_L02_003E8D50(void *), snd_stop_voice(int);
+extern void anim_start_immediate(void *, int, int);
+extern void part_spawn_slot_machine_debris(void *);
+extern void moby_compute_local_point(void *, void *, float, float, float);
+extern void part_init_effect_record(void *, void *, int, float);
+extern int coll_process_hit(void *, int, void *, void *, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *moby_find_group_in_state_13(int);
+extern void moby_teleport_to_new_pose(void *, void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern void moby_mark_spawned(void *);
+extern char *part_find_owned_effect_slot(void *, int, int);
+extern void slot_machine_roll_result(void *);
 typedef struct { char pad[0x18]; u8 kind; u8 flags; short sourceClass; char tail[0x14]; } Hit003E6D70;
 typedef struct { char pad[0xAA]; short classId; } SlotActor003E6D70;
 typedef struct {
@@ -58,10 +58,10 @@ void func_US2_L02_003E82E0(char *actor) {
     float *rate;
     float zero;
     SlotState003E6D70 *setup = (SlotState003E6D70 *)state;
-    if (*(unsigned char *)(actor + 0x31)) func_L00_002E6CF0(func_L02_003E7B58, actor);
+    if (*(unsigned char *)(actor + 0x31)) gfx_add_draw_callback_first(DrawScrollingTileBands, actor);
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
-    func_002A7750(actor, 1, -1);
+    moby_set_state(actor, 1, -1);
     setup->health = 3.0f;
     setup->count = 3;
     setup->multiplier = 1.0f;
@@ -71,46 +71,46 @@ void func_US2_L02_003E82E0(char *actor) {
     setup->reel[1] = zero;
     setup->reel[0] = zero;
     rate = (float *)(state + 0x84);
-    for (i = 2; i >= 0; i--) *rate++ = func_002A7878(D_L02_001B0A18[0], D_L02_001B0A18[1]) * 0.016666668f;
-    if (func_002A77E0(2)) *(unsigned short *)(actor + 0x34) |= 0x8000;
+    for (i = 2; i >= 0; i--) *rate++ = math_random_float_range(D_L02_001B0A18[0], D_L02_001B0A18[1]) * 0.016666668f;
+    if (math_random_int_below(2)) *(unsigned short *)(actor + 0x34) |= 0x8000;
     else *(unsigned short *)(actor + 0x34) &= 0x7FFF;
     *(unsigned short *)(actor + 0x34) |= 0x4000;
         break;
     case 2:
-    if (func_002B3868(actor)) {
-        if (*(unsigned char *)(actor + 0x43) != 1) func_002A7470(actor, 1, 0, 1);
+    if (flag_set_first_pending(actor)) {
+        if (*(unsigned char *)(actor + 0x43) != 1) anim_start_blended(actor, 1, 0, 1);
         func_L00_0030C710(0xF0);
         if (FLAG < 0x7F) FLAG++;
         if (FLAG > 0x24 && D_L02_001B0938[5] < 30) {
             D_L02_001B0938[5] += 40;
             D_L02_001B0938[1] -= 40;
-            func_0026FEB8(D_L02_001B0978);
+            STUB_printf(D_L02_001B0978);
         }
-        func_0026FEB8(D_L02_001B09A8, FLAG);
+        STUB_printf(D_L02_001B09A8, FLAG);
     }
     if (*(unsigned char *)(actor + 0x43) == 1) {
         if (*(unsigned char *)(actor + 0x60) & 2) {
             *(unsigned short *)(actor + 0x96) = 0;
-            func_002A7470(actor, 0, 0, 1);
-            func_002A7750(actor, 3, -1);
+            anim_start_blended(actor, 0, 0, 1);
+            moby_set_state(actor, 3, -1);
         } else if (func_US2_002AF9C8(actor, 10.0f)) {
-            char *slot = D_00188660 + *(int *)(state + 0x54) * 0x70;
+            char *slot = g_sound_state + *(int *)(state + 0x54) * 0x70;
             if (*(char **)(slot + 0x88) != actor || *(unsigned char *)(slot + 0x74) == 0)
-                *(int *)(state + 0x54) = func_002E5CF8(1, 4, actor);
+                *(int *)(state + 0x54) = PlayMobySound(1, 4, actor);
         }
     }
         break;
     case 3:
-    func_L02_003E75A8(actor);
+    slot_machine_update_reels(actor);
         break;
     case 4:
-    if (func_002B3868(actor)) {
+    if (flag_set_first_pending(actor)) {
         char *slot;
         index = *(int *)(state + 0x54);
         *(int *)(state + 0x50) = 60;
         if (index != -1) {
-            slot = D_00188660 + index * 0x70;
-            if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74)) func_002E59F8(index);
+            slot = g_sound_state + index * 0x70;
+            if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74)) snd_stop_voice(index);
         }
         *(int *)(state + 0x54) = -1;
     }
@@ -121,49 +121,49 @@ void func_US2_L02_003E82E0(char *actor) {
         char *slot;
         index = *(int *)(state + 0x54);
         if (index != -1) {
-            slot = D_00188660 + index * 0x70;
-            if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74)) func_002E59F8(index);
+            slot = g_sound_state + index * 0x70;
+            if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74)) snd_stop_voice(index);
         }
     }
     *(int *)(state + 0x54) = -1;
-    func_002A7398(actor, 0, 0);
-    func_002E5CF8(0, 0, actor);
-    func_L02_003E7370(actor);
+    anim_start_immediate(actor, 0, 0);
+    PlayMobySound(0, 0, actor);
+    part_spawn_slot_machine_debris(actor);
     *(unsigned short *)(actor + 0x34) = (*(unsigned short *)(actor + 0x34) & 0xBFFF) | 2;
     if (*(int *)(state + 0xA4)) {
-        func_L01_0031A278(actor, point, 0.0f, 0.0f, 1.5f);
-        func_002A8BD0(&hit, actor, 0x810001, 2.0f);
+        moby_compute_local_point(actor, point, 0.0f, 0.0f, 1.5f);
+        part_init_effect_record(&hit, actor, 0x810001, 2.0f);
         hit.kind = 2;
         hit.flags = 1;
         hit.sourceClass = ((SlotActor003E6D70 *)actor)->classId;
-        func_00277F48(point, 16, actor, &hit, 4.0f);
-        func_0032C700(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
+        coll_process_hit(point, 16, actor, &hit, 4.0f);
+        SpawnExplosion(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
         if (*(int *)(state + 0x58)) {
             for (i = 0; i < 2; i++) {
-                char *prize = func_L02_003CEBB8(*(int *)(state + 0x58));
+                char *prize = moby_find_group_in_state_13(*(int *)(state + 0x58));
                 if (prize) {
-                    func_L01_0031A278(actor, prizePoint, 0.5f, (float)i * 0.9f - 0.45f, 0.0f);
-                    func_L02_003CED70(prize, prizePoint, D_L02_001A8F20);
-                    *(float *)(prize + 0xF8) = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - *(float *)(prize + 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - *(float *)(prize + 0x14));
+                    moby_compute_local_point(actor, prizePoint, 0.5f, (float)i * 0.9f - 0.45f, 0.0f);
+                    moby_teleport_to_new_pose(prize, prizePoint, D_L02_001A8F20);
+                    *(float *)(prize + 0xF8) = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(float *)(prize + 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - *(float *)(prize + 0x14));
                 }
             }
         }
     }
-    func_0029F338(actor);
+    moby_mark_spawned(actor);
     return;
     case 1:
         break;
     }
-    contact = func_002A9640(actor, 0x10000, 0);
+    contact = part_find_owned_effect_slot(actor, 0x10000, 0);
     if (!contact) return;
     other = *(char **)(contact + 0x20);
     if (other && *(short *)(other + 0xAA) != 0 && *(short *)(other + 0xAA) != 0x47 && *(float *)(contact + 0x2C) > 2.0f) {
-        D_L02_001AEC78--;
-        func_002A7750(actor, 5, -1);
-    } else if (*(unsigned char *)(actor + 0x20) == 1 && other && *(short *)(other + 0xAA) == 0x47 && D_001A79F8 > 9) {
-        D_001A79F8 -= 10;
-        func_L02_003E79F8(actor);
-        func_002A7750(actor, 2, -1);
+        g_hovering_object_count--;
+        moby_set_state(actor, 5, -1);
+    } else if (*(unsigned char *)(actor + 0x20) == 1 && other && *(short *)(other + 0xAA) == 0x47 && g_player_bolts > 9) {
+        g_player_bolts -= 10;
+        slot_machine_roll_result(actor);
+        moby_set_state(actor, 2, -1);
     }
     *(unsigned char *)(actor + 0xA8) = 0xFF;
 }

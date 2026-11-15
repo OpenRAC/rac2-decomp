@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_002BE150: the colour word at +4 keeps its low 24 bits (retail masks it with
  * 0x00FFFFFF before or-ing the new alpha in; the draft dropped the mask), and the
  * 16-byte copy is qcopy(). */
 #include "common.h"
 
-extern void func_002B9180(void *);
-extern float func_00283CE0(int n);
-extern int func_00283CF0(float f);
+extern void part_kill(void *);
+extern float IntToFloat(int n);
+extern int FloatToInt(float f);
 
 
 /* Makes an effect follow the object it belongs to, copying its position and fading it in or out. It disappears when that object goes away. */
-void func_002BE150(char *effect)
+void part_update_source_following(char *effect)
 {
     char *particle;
     char *state;
@@ -27,7 +28,7 @@ void func_002BE150(char *effect)
     state = particle + 0x20;
     source = *(unsigned char **)(particle + 0x20);
     if (source == 0 || (source[1] & 0x80)) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     qcopy(particle + 0x10, source + 0x10);

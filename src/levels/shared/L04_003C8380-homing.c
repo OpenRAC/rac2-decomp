@@ -1,46 +1,46 @@
 #include "common.h"
 typedef int QuadWord __attribute__((mode(TI)));
-extern void *func_0029EFD0(void *);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(char *, char *, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern int func_00282948(void *);
+extern void *CreateMoby(void *);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern int math_fast_float_d(void *);
 typedef struct { float v[4]; void *owner; int flags; unsigned char mode, enabled; unsigned short kind; float radius; int active; } SweepProbe;
-extern float func_00282E20(void *);
-extern float func_00283248(float, float);
-extern void func_00282F70(void *, void *, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern float vec_length_xy(void *);
+extern float mat_fast_helper_a(float, float);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int CollLine(void *, void *, int, void *, void *);
 extern char D_L04_001BFAE0[];
 extern char D_L04_001BFB00[];
 extern char D_L04_001A8F20[];
-extern void func_00283028(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern int func_002A7820(int, int);
-extern void func_L04_00358AE8(void *, void *, unsigned int, int, float);
-extern void func_L04_00358868(void *, unsigned int, int, int, float);
-extern unsigned char *func_L04_0035F3E0(void *, void *, int, float);
-extern void func_L04_003F9C60(void *, int);
-extern void func_0029F338(void *);
-extern float func_002A7AA8(float, float, float, float, float);
+extern void vec_fast_normalize(void *, void *, void *);
+extern float FastVecLength(void *);
+extern int math_random_int_range(int, int);
+extern void part_spawn_velocity_particle(void *, void *, unsigned int, int, float);
+extern void SpawnJointFollowParticle(void *, unsigned int, int, int, float);
+extern unsigned char *part_spawn_random_effect_record(void *, void *, int, float);
+extern void moby_destroy_effects_with_burst(void *, int);
+extern void moby_mark_spawned(void *);
+extern float cubic_hermite_scalar(float, float, float, float, float);
 extern char D_L04_001B0448[];
 extern char D_L04_001B9680[];
 extern char D_L04_001B98D0[];
-extern float func_00282E80(void *, void *);
-extern int func_00278E78(void);
-extern float func_00283B98(float, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern int GetCollHitMaterial(void);
+extern float FastAddRotations(float, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
 typedef struct __attribute__((packed, aligned(4))) { long a; int b; } TurnRecord;
 
 /* Moves a homing shot with its trail of followers; breaks up on contact, on timeout or out of bounds. */
-void func_L04_003F9718(unsigned char *moby)
+void homing_l04_shot_update(unsigned char *moby)
 {
     float prevPos[4];
     TurnRecord turn = *(TurnRecord *)D_L04_001B0448;
@@ -54,8 +54,8 @@ void func_L04_003F9718(unsigned char *moby)
     FastVecAdd(moby + 0x10, moby + 0x10, vars);
     if (*(float *)(moby + 0x10) < 0 || *(float *)(moby + 0x14) < 0 ||
         *(float *)(moby + 0x18) < 0 || 64.0f < vec_distance_xy(moby + 0x10, D_L04_001B9680)) {
-        DestroyMobyEffectsWithBurst(moby, 0);
-        MarkMobySpawned(moby);
+        moby_destroy_effects_with_burst(moby, 0);
+        moby_mark_spawned(moby);
         return;
     }
     probe.owner = *(void **)(vars + 0x18);
@@ -63,15 +63,15 @@ void func_L04_003F9718(unsigned char *moby)
     probe.radius = 13;
     probe.active = 1;
     *(QuadWord *)probe.v = *(QuadWord *)vars;
-    FastVectorNormalizeHelper(&probe, &probe, 1);
+    vec_fast_normalize_helper(&probe, &probe, 1);
     probe.v[2] = 1;
     probe.v[3] = 5627.9248046875f;
     probe.mode = 1;
     probe.enabled = 1;
     probe.kind = *(unsigned short *)(moby + 0xAA);
-    if (FastFloatHelperD(vars + 0x10)) {
-        DestroyMobyEffectsWithBurst(moby, 0);
-        MarkMobySpawned(moby);
+    if (math_fast_float_d(vars + 0x10)) {
+        moby_destroy_effects_with_burst(moby, 0);
+        moby_mark_spawned(moby);
         return;
     }
     if (CollLine(prevPos, moby + 0x10, 0, *(void **)(vars + 0x18), &probe)) {
@@ -81,18 +81,18 @@ void func_L04_003F9718(unsigned char *moby)
             qcopy((moby + 0x10), D_L04_001BFAE0);
             for (i = 4; i >= 0; i--) {
                 *(QuadWord *)sparkDir = 0;
-                sparkDir[0] = RandomFloatRange(-1, 1);
-                sparkDir[1] = RandomFloatRange(-1, 1);
-                sparkDir[2] = RandomFloatRange(-1, 1);
+                sparkDir[0] = math_random_float_range(-1, 1);
+                sparkDir[1] = math_random_float_range(-1, 1);
+                sparkDir[2] = math_random_float_range(-1, 1);
                 *(QuadWord *)delta = *(QuadWord *)sparkDir;
-                FastVectorNormalize(sparkDir, vars, D_L04_001BFB00);
+                vec_fast_normalize(sparkDir, vars, D_L04_001BFB00);
                 vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(sparkDir) * 0.5f);
                 FastVecAdd(sparkDir, sparkDir, delta);
-                vec_scale_to_length((char *)sparkDir, (char *)sparkDir, RandomFloatRange(0.050000004f, 0.10000001f));
-                SpawnVelocityParticle(moby + 0x10, sparkDir, 0x7F2F4F6F, RandomIntRange(10, 15), 30000);
+                vec_scale_to_length((char *)sparkDir, (char *)sparkDir, math_random_float_range(0.050000004f, 0.10000001f));
+                part_spawn_velocity_particle(moby + 0x10, sparkDir, 0x7F2F4F6F, math_random_int_range(10, 15), 30000);
             }
-            DestroyMobyEffectsWithBurst(moby, 0);
-            MarkMobySpawned(moby);
+            moby_destroy_effects_with_burst(moby, 0);
+            moby_mark_spawned(moby);
             return;
         }
     }
@@ -110,19 +110,19 @@ void func_L04_003F9718(unsigned char *moby)
         if (particle) {
             FastVecAdd(particle + 0x10, sparkDir, delta);
             qcopy(sparkDir, (particle + 0x10));
-            *(float *)(particle + 0x10) += RandomSignedFloatRange(0, 0.075f);
-            *(float *)(particle + 0x14) += RandomSignedFloatRange(0, 0.075f);
-            *(float *)(particle + 0x18) += RandomSignedFloatRange(0, 0.075f);
+            *(float *)(particle + 0x10) += math_random_signed_float_range(0, 0.075f);
+            *(float *)(particle + 0x14) += math_random_signed_float_range(0, 0.075f);
+            *(float *)(particle + 0x18) += math_random_signed_float_range(0, 0.075f);
             FastVecScale(delta, delta, 0.85f);
         }
     }
-    if (RandomIntBelow(5) == 0) {
+    if (math_random_int_below(5) == 0) {
         FastVecCross(spark, delta, D_L04_001B98D0);
-        ApplyAxisRotationToQuaternion(spark, spark, delta, RandomSignedFloatRange(0, 3.1415927f));
+        math_apply_axis_rotation_to_quat(spark, spark, delta, math_random_signed_float_range(0, 3.1415927f));
         length = FastVecLength(spark);
         if (length != 0) {
-            FastVecScale(velocity, spark, RandomFloatRange(0.008333334f, 0.033333335f) / length);
-            SpawnVelocityParticle(moby + 0x10, velocity, 0x7F2F4F6F, RandomIntRange(10, 15), 30000);
+            FastVecScale(velocity, spark, math_random_float_range(0.008333334f, 0.033333335f) / length);
+            part_spawn_velocity_particle(moby + 0x10, velocity, 0x7F2F4F6F, math_random_int_range(10, 15), 30000);
         }
     }
 }

@@ -21,7 +21,7 @@ extern float func_002E35A0(float *);
 
 extern float swing_vector __asm__("D_L01_001B2EF0") MACRO_ADDR;
 /* Picks a new random wind direction and a delay before the next change, and how many particles to spawn. */
-void func_L01_003993C8(int weatherType)
+void part_pick_random_wind_and_count(int weatherType)
 {
     float windSpeed, changeDelayMin, minCount, maxCount;
 

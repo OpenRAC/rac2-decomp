@@ -24,7 +24,7 @@ extern float func_2EBF18(float);
 extern float func_2EBF30(float);
 
 /* Ticks two timers in the object's data and counts up its age, stopping at the maximum. */
-void func_L19_00417A00(char *moby)
+void moby_tick_timers_age(char *moby)
 {
     int varsAddr = *(int *)(moby + 0x68);
 
@@ -54,20 +54,20 @@ typedef struct {
 
 extern char D_L19_001BFEA0[], D_L19_001B9A40[];
 extern UV D_L19_001B1C08[] MACRO_ADDR;
-extern void func_0029FC20(void *, int, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A7988(void *, float, float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
-extern float func_002A7940(void);
-extern void func_00281EB8(void *, int, int, int, float, float, float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern long func_0027C878(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void part_spawn_random_direction_effect(void *, float, float);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern long GetEffectTextureDescriptor(int);
 
 /* Draws the glowing beam: glow sprites at the start, a line check to find where it ends, and two bright strips from the start to the end point. */
-void func_L19_00417F88(char *moby)
+void DrawGrelbinBeamEffect(char *moby)
 {
     V matrix[4], origin, tmp, jitter, end;
     Quad q;
@@ -81,7 +81,7 @@ void func_L19_00417F88(char *moby)
     float inner, outer;
     char *d = *(char **)(moby + 0x68);
 
-    TransformMobyJointPoint(moby, part, matrix);
+    moby_transform_joint_point(moby, part, matrix);
     qcopy(origin, matrix[3]);
     inner = 0.25f;
     outer = 0.45f;
@@ -89,18 +89,18 @@ void func_L19_00417F88(char *moby)
     FastVecAdd(origin, origin, tmp);
     origin[2] += 1;
 
-    SpawnRandomDirectionEffect(jitter, inner, outer);
+    part_spawn_random_direction_effect(jitter, inner, outer);
     FastVecAdd(end, jitter, origin);
-    DrawBillboardQuad_00281EB8(origin, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, RandomAngle());
-    DrawBillboardQuad_00281EB8(origin, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, RandomAngle());
-    SpawnRandomDirectionEffect(jitter, inner, outer);
+    gfx_draw_billboard_quad(origin, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, math_random_angle());
+    gfx_draw_billboard_quad(origin, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, math_random_angle());
+    part_spawn_random_direction_effect(jitter, inner, outer);
     FastVecAdd(end, jitter, origin);
-    DrawBillboardQuad_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, RandomAngle());
-    DrawBillboardQuad_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, RandomAngle());
-    SpawnRandomDirectionEffect(jitter, inner, outer);
+    gfx_draw_billboard_quad(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, math_random_angle());
+    gfx_draw_billboard_quad(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, math_random_angle());
+    part_spawn_random_direction_effect(jitter, inner, outer);
     FastVecAdd(end, jitter, origin);
-    DrawBillboardQuad_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, RandomAngle());
-    DrawBillboardQuad_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, RandomAngle());
+    gfx_draw_billboard_quad(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, math_random_angle());
+    gfx_draw_billboard_quad(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, math_random_angle());
 
     FastVecSub(ray, d + 0x2e0, origin);
     vec_scale_to_length(ray, ray, *(float *)(d + 0x238) * 60);
@@ -160,11 +160,11 @@ void func_L19_00417F88(char *moby)
 /* func_L19_0041BFD0 is defined in L19_0041BFD0-g8.c. */
 
 extern u16 *D_L19_001FB5A0[];
-extern u8 *D_L19_001B2A1C[] __attribute__((sda));
+extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern s32 D_L19_001B2A38[] __attribute__((sda));
 
 /* Mark every entity in this object's group state. */
-void func_L19_0041C328(u8 *object)
+void group_mark_entities(u8 *object)
 {
     u16 *groupPtr;
     u8 *entity;
@@ -174,7 +174,7 @@ void func_L19_0041C328(u8 *object)
     groupPtr = D_L19_001FB5A0[object[0x21]];
     while (object[0x21] != 0xFF && object[0x21] <= D_L19_001B2A38[0] && groupPtr != 0 &&
            ((groupPtr != 0 && (s16)groupPtr[-1] >= 0) || groupPtr == D_L19_001FB5A0[object[0x21]])) {
-        entity = gMobyArray_L19[0] + ((*groupPtr & 0x7FFF) << 8);
+        entity = g_moby_l19_array[0] + ((*groupPtr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         *(s32 *)(*(u8 **)(entity + 0x68) + 0x240) = 1;
@@ -183,7 +183,7 @@ void func_L19_0041C328(u8 *object)
 }
 
 /* A separate no-op moby handler, entered by fifteen class records. */
-void func_L19_0041C3D0(void *object)
+void spaceship_attachment_update(void *object)
 {
 }
 
@@ -194,27 +194,27 @@ void func_L19_0041C3D0(void *object)
 
 /* func_L19_004203F0 is defined in L19_004203F0-g8.c. */
 
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A7750(void *, int, int);
-extern s32 D_001A79F0 __attribute__((sda));
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_set_state(void *, int, int);
+extern s32 g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
-extern u8 *D_L19_001B2A1C[] __attribute__((sda));
-extern char D_00188660[];
+extern u8 *g_moby_l19_array[] __attribute__((sda));
+extern char g_sound_state[];
 extern float D_L19_001A8F20[] MACRO_ADDR;
-extern void func_002AA458(void *, void *, void *, float, float, float);
-extern int func_002E5CF8(int, int, void *);
-extern float func_00282E48(void *, void *);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern void func_L19_00420B48(void *);
-extern void func_002A8C00(float, void *, void *, int, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void vec_spring_to_target(void *, void *, void *, float, float, float);
+extern int PlayMobySound(int, int, void *);
+extern float fast_vec_dist(void *, void *);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern void gfx_draw_beam_along_heading(void *);
+extern void make_hit_descriptor(float, void *, void *, int, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* Moves the object between two points. State 0 records its home position and builds the far
    point (along the axis at 0xC0, raised by the first state word); state 1 waits for its trigger
    flag or for its linked entity to leave state 0; states 2 and 3 move it out and back, keeping
    its looping sound alive, and then cast a collision line along the axis at 0xE0. */
-void func_L19_00420818(char *moby)
+void UpdateGrelbinTriggeredShuttle(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     float offset[4] __attribute__((aligned(16)));
@@ -229,32 +229,32 @@ void func_L19_00420818(char *moby)
         qcopy(vars + 0x20, moby + 0x10);
         *(int *)(vars + 0x40) = -1;
     case 1:
-        if ((*(u8 *)(moby + 0xB0) != 0xFF && (D_0019B2E8[*(u8 *)(moby + 0xB0) + (gCurrentMapIndex << 4)] & 0x80)) ||
+        if ((*(u8 *)(moby + 0xB0) != 0xFF && (D_0019B2E8[*(u8 *)(moby + 0xB0) + (g_current_map_index << 4)] & 0x80)) ||
             (*(int *)(vars + 0x1C) != -1 &&
-             *(u8 *)((char *)((*(int *)(vars + 0x1C) << 8) + (int)gMobyArray_L19[0]) + 0x20) != 0))
-            SetMobyState(moby, 2, -1);
+             *(u8 *)((char *)((*(int *)(vars + 0x1C) << 8) + (int)g_moby_l19_array[0]) + 0x20) != 0))
+            moby_set_state(moby, 2, -1);
         break;
     case 2:
-        SpringVectorToTarget(moby + 0x10, vars + 0x30, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
+        vec_spring_to_target(moby + 0x10, vars + 0x30, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
                       *(float *)(vars + 8) * 0.00027777778f, *(float *)(vars + 8) * 0.016666668f);
-        soundSlot = gSoundState + *(int *)(vars + 0x40) * 0x70;
+        soundSlot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
         if (*(char **)(soundSlot + 0x88) != moby || !*(u8 *)(soundSlot + 0x74))
             *(int *)(vars + 0x40) = PlayMobySound(0, 4, moby);
         if (fast_vec_dist(moby + 0x10, vars + 0x30) < *(float *)(vars + 8) * 0.016666668f)
-            SetMobyState(moby, 3, -1);
+            moby_set_state(moby, 3, -1);
         break;
     case 3:
-        soundSlot = gSoundState + *(int *)(vars + 0x40) * 0x70;
+        soundSlot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
         if (*(char **)(soundSlot + 0x88) != moby || !*(u8 *)(soundSlot + 0x74))
             *(int *)(vars + 0x40) = PlayMobySound(0, 4, moby);
-        SpringVectorToTarget(moby + 0x10, vars + 0x20, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
+        vec_spring_to_target(moby + 0x10, vars + 0x20, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
                       *(float *)(vars + 8) * 0.00027777778f, *(float *)(vars + 8) * 0.016666668f);
         if (fast_vec_dist(moby + 0x10, vars + 0x20) < *(float *)(vars + 8) * 0.016666668f)
-            SetMobyState(moby, 2, -1);
+            moby_set_state(moby, 2, -1);
         break;
     }
     if (*(u8 *)(moby + 0x20) >= 2) {
-        AddDrawCallbackToList1(DrawBeamAlongHeading, moby);
+        gfx_add_draw_callback_first(gfx_draw_beam_along_heading, moby);
         make_hit_descriptor(4.0f, query, moby, 1, D_L19_001A8F20);
         *(u16 *)(query + 0x1A) = *(u16 *)(moby + 0xAA);
         vec_scale_to_length(offset, moby + 0xE0, *(float *)(vars + 0xC));
@@ -265,13 +265,13 @@ void func_L19_00420818(char *moby)
 
 
 extern int D_L19_001C9FC0[];
-extern void func_L00_00323448(char *, char *, int, int, int, int, int, int);
-extern void func_L00_00323958(char *, char *);
-extern void func_002833F0(void *, void *);
-extern void func_00283738(void *, void *, void *);
+extern void BuildObjectAttachmentTransforms(char *, char *, int, int, int, int, int, int);
+extern void moby_update_attached_transforms(char *, char *);
+extern void euler_rotation_basis(void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
 /* Arms the rig object once its data arrives, then, when the level word matches the rig's tag, applies the stored rotations to the object and to every joint record. */
-void func_L19_00420EF0(char *moby)
+void rotated_rig_update(char *moby)
 {
     char *rig = *(char **)(moby + 0x68);
     float turn[4] __attribute__((aligned(16)));
@@ -285,7 +285,7 @@ void func_L19_00420EF0(char *moby)
             { u8 a = 0xFF; *(u8 *)(moby + 0x30) = a; }
             BuildObjectAttachmentTransforms(moby, rig + 0x30, 0x32, *(s32 *)(rig + 4), *(s32 *)rig, *(s32 *)(rig + 8), 7, 0);
             if (*(u8 *)(rig + 0x7A) == 0) {
-                MarkMobySpawned((u8 *)moby);
+                moby_mark_spawned((u8 *)moby);
             } else {
                 *(u8 *)(rig + 0x7D) = 1;
                 *(u16 *)(moby + 0x34) |= 0x104;
@@ -311,7 +311,7 @@ void func_L19_00420EF0(char *moby)
                 tag = *(u8 *)(joint + 0x4A);
                 joint += 0x50;
             } while (tag != 1);
-            UpdateAttachedObjectTransforms(moby, rig + 0x30);
+            moby_update_attached_transforms(moby, rig + 0x30);
         }
         break;
     }
@@ -322,15 +322,15 @@ void func_L19_00420EF0(char *moby)
 /* func_L19_00422238 is defined in L19_00422238.c. */
 
 extern u16 *D_L19_001FB5A0[];
-extern u8 *D_L19_001B2A1C[] __attribute__((sda));
+extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern s32 D_L19_001B2A38[] __attribute__((sda));
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_current_map_index __attribute__((sda));
 extern u8 D_0019B2E8[];
 extern char D_0019B4A8[];
 
-extern s32 func_002B38B8(u8 *);
-extern void func_0029F338(u8 *);
-extern void func_L02_0031F858(s32, s32);
+extern s32 flag_is_third_pending_set(u8 *);
+extern void moby_mark_spawned(u8 *);
+extern void moby_set_group_enabled(s32, s32);
 
 /* The part of the object's state this function reads: the id of its first entity, three group
    words, four mark words (-1 means none). */
@@ -345,7 +345,7 @@ typedef struct {
    is in neither state 0xFE nor 0xFD and the table byte of the object lacks bit 7; otherwise hands
    every entity of the three groups to func_0029F338, releases the four marks, counts one nibble of
    the table byte at 0xB2 up (saturating at 7) and releases the object. */
-void func_L19_00422810(u8 *moby)
+void group_release_linked_when_triggered(u8 *moby)
 {
     GrelbinState *state = *(GrelbinState **)(moby + 0x68);
     u16 *groupPtr;
@@ -356,12 +356,12 @@ void func_L19_00422810(u8 *moby)
     u16 flagWord;
 
     if (moby[0xBC] == 0) {
-        if (IsThirdPendingFlagSet(moby) == 0) {
+        if (flag_is_third_pending_set(moby) == 0) {
             if (state->first != -1) {
-                first = (u8 *)((state->first << 8) + (int)gMobyArray_L19[0]);
+                first = (u8 *)((state->first << 8) + (int)g_moby_l19_array[0]);
                 if (first[0x20] != 0xFE) {
                     if (first[0x20] != 0xFD) {
-                        if ((D_0019B2E8[moby[0xB0] + gCurrentMapIndex * 16] & 0x80) == 0)
+                        if ((D_0019B2E8[moby[0xB0] + g_current_map_index * 16] & 0x80) == 0)
                             return;
                     }
                 }
@@ -375,31 +375,31 @@ void func_L19_00422810(u8 *moby)
              (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= D_L19_001B2A38[0] &&
              groupPtr != 0 && ((s16)groupPtr[-1] >= 0 || groupPtr == D_L19_001FB5A0[state->groups[i]]);
              groupPtr++) {
-            entity = gMobyArray_L19[0] + ((*groupPtr & 0x7FFF) << 8);
+            entity = g_moby_l19_array[0] + ((*groupPtr & 0x7FFF) << 8);
             if (entity == 0)
                 break;
-            MarkMobySpawned(entity);
+            moby_mark_spawned(entity);
         }
     }
     for (k = 0; k < 4; k++) {
         if (state->marks[k] != -1)
-            SetGroupObjectsEnabled(state->marks[k], 1);
+            moby_set_group_enabled(state->marks[k], 1);
     }
     flagWord = *(u16 *)(moby + 0xB2);
     if (flagWord & 1) {
-        u8 *q = (u8 *)(((s16)flagWord >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+        u8 *q = (u8 *)(((s16)flagWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 c = *q;
 
         if (((c >> 4) & 7) != 7)
             *q = c + 0x10;
     } else {
-        u8 *q = (u8 *)(((s16)flagWord >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+        u8 *q = (u8 *)(((s16)flagWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 c = *q;
 
         if ((c & 7) != 7)
             *q = c + 1;
     }
-    MarkMobySpawned(moby);
+    moby_mark_spawned(moby);
 }
 
 /* func_L19_00422A98 is defined in L19_00422A98-g8.c. */
@@ -418,23 +418,23 @@ extern u32 D_L19_001B1EF0[] SDATA(D_L19_001B1EF0);
 extern u32 D_L19_001B1EF4[] SDATA(D_L19_001B1EF4);
 extern int D_L19_001B1EFC[] SDATA(D_L19_001B1EFC);
 extern int D_L19_001B1F00[] SDATA(D_L19_001B1F00);
-extern int D_L19_001B2508[] __attribute__((sda));
-extern int func_002A77E0(int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002A7A00(float *, float, float);
-extern void *func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(unsigned int, unsigned int, float);
-extern unsigned char *func_002C2FD8(void *, int, unsigned char, int, int, int, int, float);
+extern int g_frame_l19_counter[] __attribute__((sda));
+extern int math_random_int_below(int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_random_direction(float *, float, float);
+extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(unsigned int, unsigned int, float);
+extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
 
 /* Emits the glow of this object. Its origin is 1.5 units along the axis at 0xE0 for class
    0x11C7 and joint 0 otherwise. On one call in four it bursts four anchored particles whose
    velocities drift by random steps; every call it spawns four sprites in a line leading from
    the origin away from the point D_L19_001B9A40, coloured and faded by the counter at
    D_L19_001B2508 and scaled by the object's size. */
-void func_L19_00423270(char *moby)
+void EmitGrelbinGlowSprites(char *moby)
 {
     float origin[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
@@ -448,21 +448,21 @@ void func_L19_00423270(char *moby)
         vec_scale_to_length(point, moby + 0xE0, 1.5f);
         FastVecAdd(origin, moby + 0x10, point);
     } else {
-        TransformMobyJointToWorld(moby, 0, origin);
+        moby_transform_joint_to_world(moby, 0, origin);
     }
-    if (!RandomIntBelow(4)) {
-        RandomDirectionVector(velocity, D_L19_001B1ECC[0] * 0.016666668f, D_L19_001B1ED0[0] * 0.016666668f);
+    if (!math_random_int_below(4)) {
+        vec_random_direction(velocity, D_L19_001B1ECC[0] * 0.016666668f, D_L19_001B1ED0[0] * 0.016666668f);
         {
             int glowAlpha = D_L19_001B1EDC[0];
-            SpawnHeroRelativeParticle(origin, velocity, D_L19_001B1EE0[0], glowAlpha, RandomIntBelow(255), 0,
+            part_spawn_hero_relative(origin, velocity, D_L19_001B1EE0[0], glowAlpha, math_random_int_below(255), 0,
                           D_L19_001B1EE8[0]);
         }
         for (i = 2; i >= 0; i--) {
-            RandomDirectionVector(jitter, D_L19_001B1ED4[0] * 0.016666668f, D_L19_001B1ED8[0] * 0.016666668f);
+            vec_random_direction(jitter, D_L19_001B1ED4[0] * 0.016666668f, D_L19_001B1ED8[0] * 0.016666668f);
             FastVecAdd(velocity, velocity, jitter);
             {
                 int glowAlpha = D_L19_001B1EDC[0];
-                SpawnHeroRelativeParticle(origin, velocity, D_L19_001B1EE4[0], glowAlpha, RandomIntBelow(255), 0,
+                part_spawn_hero_relative(origin, velocity, D_L19_001B1EE4[0], glowAlpha, math_random_int_below(255), 0,
                               D_L19_001B1EEC[0]);
             }
         }
@@ -476,14 +476,14 @@ void func_L19_00423270(char *moby)
     FastVecAdd(point, point, origin);
     for (i = 0; i < 4; i++) {
         color = FastTweenColor(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
-                              FloatAbs(half - IntToFloat(255 - ((gFrameCounter_L19[0] + i * 20) & 255)) * inv255));
-        alpha = *(u8 *)gFrameCounter_L19;
+                              math_fabs(half - IntToFloat(255 - ((g_frame_l19_counter[0] + i * 20) & 255)) * inv255));
+        alpha = *(u8 *)g_frame_l19_counter;
         if (i & 2)
             alpha *= 2;
         if (i & 1)
             alpha = 255 - alpha;
         spriteAlpha = (u8)alpha;
-        SpawnFadingParticle_002C2FD8(point, color, spriteAlpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
+        part_spawn_fading(point, color, spriteAlpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
                       (IntToFloat(i) + three) * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(point, point, step);
     }
@@ -496,13 +496,13 @@ void func_L19_00423270(char *moby)
 /* func_L19_00423CC0 is defined in L19_00423CC0.c. */
 
 extern struct { u8 pad[0x464]; u8 flags[1]; } D_L19_0021EA30;
-extern int func_00282948(void *);
-extern float func_00283180(float);
-extern void func_00282D30(void *, void *, float);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern int math_fast_float_d(void *);
+extern float math_fast_sin_or_cos_a(float);
+extern void FastVecScale(void *, void *, float);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves the object down 6 units along a smooth curve once a linked object is done, and signals another object first. */
-void func_L19_00423EC0(u8 *moby)
+void sinking_l19_platform_update(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
     float oldPos[4] __attribute__((aligned(16)));
@@ -520,63 +520,63 @@ void func_L19_00423EC0(u8 *moby)
         *(float *)(vars + 0x74) = 0;
         qcopy(vars + 0x60, moby + 0x10);
         if (*(int *)(vars + 0x7C) == -1) goto alreadyActive;
-        other = (u8 *)((*(int *)(vars + 0x7C) << 8) + (int)gMobyArray_L19[0]);
+        other = (u8 *)((*(int *)(vars + 0x7C) << 8) + (int)g_moby_l19_array[0]);
         if (other[0x20] == 0xFE) goto alreadyActive;
         if (other[0x20] == 0xFD) goto alreadyActive;
         id = *(u16 *)(other + 0xB2);
         if (D_L19_0021EA30.flags[(s16)id]) goto alreadyActive;
-        bits = *((u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8);
+        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8);
         if (id & 1) {
             if ((bits >> 4) & 7) goto alreadyActive;
         } else if (bits & 7) goto alreadyActive;
         goto initialize;
     alreadyActive:
         *(u16 *)(moby + 0x34) |= 2;
-        SetMobyState(moby, 4, -1);
+        moby_set_state(moby, 4, -1);
         break;
     initialize:
         moby[0x30] = 0xFF;
         *(float *)(moby + 0x18) -= 6.0f;
-        SetMobyState(moby, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1: {
         u8 *other;
         u16 id;
-        other = (u8 *)((*(int *)(vars + 0x7C) << 8) + (int)gMobyArray_L19[0]);
+        other = (u8 *)((*(int *)(vars + 0x7C) << 8) + (int)g_moby_l19_array[0]);
         id = *(u16 *)(other + 0xB2);
         if (D_L19_0021EA30.flags[(s16)id]) goto activate;
-        bits = *((u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8);
+        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8);
         if (id & 1) {
             if ((bits >> 4) & 7) goto activate;
         } else if (bits & 7) goto activate;
         break;
     activate:
         if (*(int *)(vars + 0x80) != -1)
-            ((u8 *)((*(int *)(vars + 0x80) << 8) + (int)gMobyArray_L19[0]))[0xBC] = 1;
-        SetMobyState(moby, 2, -1);
+            ((u8 *)((*(int *)(vars + 0x80) << 8) + (int)g_moby_l19_array[0]))[0xBC] = 1;
+        moby_set_state(moby, 2, -1);
         break;
     }
     case 2:
-        if (FastFloatHelperD(vars + 0x78)) SetMobyState(moby, 3, -1);
+        if (math_fast_float_d(vars + 0x78)) moby_set_state(moby, 3, -1);
         break;
     case 3:
         *(float *)(vars + 0x74) += 1.0f / *(float *)(vars + 0x70);
         if (*(float *)(vars + 0x74) > 1.0f) *(float *)(vars + 0x74) = 1.0f;
-        ease = (FastSinOrCosA(*(float *)(vars + 0x74) * 3.1415927f) + 1.0f) * 0.5f;
+        ease = (math_fast_sin_or_cos_a(*(float *)(vars + 0x74) * 3.1415927f) + 1.0f) * 0.5f;
         qzero_nc(delta);
         delta[2] = -6.0f;
         FastVecScale(delta, delta, ease);
         FastVecAdd(moby + 0x10, vars + 0x60, delta);
-        if (*(float *)(vars + 0x74) >= 1.0f) SetMobyState(moby, 4, -1);
+        if (*(float *)(vars + 0x74) >= 1.0f) moby_set_state(moby, 4, -1);
         break;
     case 4:
-        if (*(int *)(vars + 0x80) == -1 || ((u8 *)((*(int *)(vars + 0x80) << 8) + (int)gMobyArray_L19[0]))[0xBC] == 0)
+        if (*(int *)(vars + 0x80) == -1 || ((u8 *)((*(int *)(vars + 0x80) << 8) + (int)g_moby_l19_array[0]))[0xBC] == 0)
             *(u16 *)(moby + 0x34) |= 2;
         break;
     }
     if (moby[0x20] < 4) {
         FastVecSub(delta, moby + 0x10, oldPos);
-        CombineTransformsAndStore(vars + 0x20, delta, oldRot, moby + 0xF0);
+        mat_combine_and_store(vars + 0x20, delta, oldRot, moby + 0xF0);
     }
 }

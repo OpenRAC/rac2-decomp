@@ -24,16 +24,16 @@ extern void func_31D8A0(void *, float, float);
 extern void func_2E6CF0(void *, void *);
 extern int func_2EDD48(void *);
 extern void func_31A658(void *, int, int);
-extern void func_L00_003F9570(void);
+extern void part_emit_colored_burst(void);
 
 /* Update step for an effect object: it keeps ticking a timer, registers its draw routine, and finishes the object when the timer runs out. */
-void func_L00_003F94F8(char *self)
+void thief_weapon_update(char *self)
 {
     char *vars = *(char **)(self + 0x68);
 
     if (*(unsigned char *)(self + 0x20) == 1) {
         func_31D8A0(vars, 1.0f, *(float *)(vars + 4));
-        func_2E6CF0((void *)EmitColoredParticleBurst, self);
+        func_2E6CF0((void *)part_emit_colored_burst, self);
         if (func_2EDD48(vars + 8) != 0) {
             func_31A658(self, 0, -1);
         }
@@ -48,23 +48,23 @@ void func_L00_003F94F8(char *self)
 
 
 /* Does nothing (an empty handler). */
-void func_L00_003FC100(void)
+void moby_l00_update_empty_4(void)
 {
 }
 
 
 
 
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 
-extern void func_00282CF0(char *, char *, char *);
-extern float func_00283248(float, float);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern float func_00283B98(float, float);
-extern void func_002AF000(float *, float, float, float);
-extern void func_002C16C0(float *, float *, int, int, unsigned int, int,
+extern void FastVecSub(char *, char *, char *);
+extern float mat_fast_helper_a(float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern float FastAddRotations(float, float);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 
 /* Fifteen times over: take the angle of the constant vector at D_L00_001B8DC0 and the point,
@@ -72,7 +72,7 @@ extern void func_002C16C0(float *, float *, int, int, unsigned int, int,
    small amount on each axis and hand the result to the spawn helper with 210000.0f, 500.0f,
    1.0f, 0.0f and 0.0f; the original game role is unknown. */
 /* Sprays fifteen small sparks outward from a point. */
-void func_L00_003FC820(float *pos)
+void part_l00_spawn_spark_spray_2(float *pos)
 {
     float v[4];
     float dir[4];
@@ -85,22 +85,22 @@ void func_L00_003FC820(float *pos)
     int id;
     int i;
 
-    FastVecSub((char *)v, gCameraPosition_L00, (char *)pos);
-    ang = FastMatrixHelperA(v[0], v[1]);
+    FastVecSub((char *)v, g_camera_l00_position, (char *)pos);
+    ang = mat_fast_helper_a(v[0], v[1]);
 
     for (i = 14; i >= 0; i--) {
-        scale = RandomFloatRange(0.5f, 1.0f);
-        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        RandomFloatRange(0.05f, 0.2f);
+        scale = math_random_float_range(0.5f, 1.0f);
+        id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        math_random_float_range(0.05f, 0.2f);
         speed = 210000.0f;
-        mag = RandomFloatRange(0.0f, 1.396263599395752f);
-        angle = FastAddRotations(ang, RandomSignedFloatRange(0.0f, 1.396263599395752f));
-        BuildSphericalOffset(dir, scale * 0.01666666753590107f, angle, mag);
-        out[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.1f);
-        out[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.1f);
-        out[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.1f);
-        SpawnBurstParticle_002C16C0(out, dir, 30, 127, 0x007F7F7F, id,
-                      RandomFloatRange(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 0.0f);
+        mag = math_random_float_range(0.0f, 1.396263599395752f);
+        angle = FastAddRotations(ang, math_random_signed_float_range(0.0f, 1.396263599395752f));
+        vec_build_spherical_offset(dir, scale * 0.01666666753590107f, angle, mag);
+        out[0] = pos[0] + math_random_signed_float_range(0.0f, 0.1f);
+        out[1] = pos[1] + math_random_signed_float_range(0.0f, 0.1f);
+        out[2] = pos[2] + math_random_signed_float_range(0.0f, 0.1f);
+        part_spawn_burst(out, dir, 30, 127, 0x007F7F7F, id,
+                      math_random_float_range(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 0.0f);
     }
 }
 
@@ -110,22 +110,22 @@ void func_L00_003FC820(float *pos)
 extern int func_2EDD48(void *);
 extern void func_310440(void *);
 extern void func_2E6EF8(void *, void *);
-extern void func_L00_003FD700(void);
+extern void spark_trail_draw_ribbon_wide(void);
 
 /* Update step: when the timer runs out the object finishes, otherwise it registers its draw routine. */
-void func_L00_003FD6B0(char *self)
+void timed_draw_object_update(char *self)
 {
     if (func_2EDD48(*(void **)(self + 0x68)) != 0) {
         func_310440(self);
     } else {
-        func_2E6EF8((void *)DrawSparkTrailRibbonWide, self);
+        func_2E6EF8((void *)spark_trail_draw_ribbon_wide, self);
     }
 }
 
 
-extern void func_0029F338(void *);
-extern int func_002ACBC8(void *, int);
-extern int func_L00_00329520(void *, int);
+extern void moby_mark_spawned(void *);
+extern int IsPointInCuboid(void *, int);
+extern int coll_point_inside_region(void *, int);
 
 /* The table of id lists (halfwords whose low 15 bits index the 32-byte records at the second
    pointer, the last one with its sign bit set) and the base of those records; both are read
@@ -161,7 +161,7 @@ extern unsigned char *D_L00_001B2514 __attribute__((sda));
    order (clearing loop first, setting loop last), which also keeps the two `sb` of the state from
    being cross-jumped into one. */
 /* Turns a group of linked records on and off depending on whether one of two triggers is active. */
-void func_L00_003FDB20(unsigned char *self)
+void trigger_linked_records_update(unsigned char *self)
 {
     unsigned char *priv = *(unsigned char **)(self + 0x68);
     unsigned short *p;
@@ -172,22 +172,22 @@ void func_L00_003FDB20(unsigned char *self)
     switch (self[0x20]) {
     case 0:
         if (*(int *)(priv + 0x38) == -1 && *(int *)(priv + 0x3C) == -1) {
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         self[0x30] = 0xFF;
         self[0x20] = 1;
         break;
     case 1:
-        if ((*(int *)(priv + 0x38) != -1 && IsPointInCuboid(gCameraPosition_L00, *(int *)(priv + 0x38))) ||
-            (*(int *)(priv + 0x3C) != -1 && IsPointInsideRegion(gCameraPosition_L00, *(int *)(priv + 0x3C)))) {
+        if ((*(int *)(priv + 0x38) != -1 && IsPointInCuboid(g_camera_l00_position, *(int *)(priv + 0x38))) ||
+            (*(int *)(priv + 0x3C) != -1 && coll_point_inside_region(g_camera_l00_position, *(int *)(priv + 0x3C)))) {
             MARK_LISTS(|= 4)
             self[0x20] = 2;
         }
         break;
     case 2:
-        if ((*(int *)(priv + 0x38) == -1 || IsPointInCuboid(gCameraPosition_L00, *(int *)(priv + 0x38)) == 0) &&
-            (*(int *)(priv + 0x3C) == -1 || IsPointInsideRegion(gCameraPosition_L00, *(int *)(priv + 0x3C)) == 0)) {
+        if ((*(int *)(priv + 0x38) == -1 || IsPointInCuboid(g_camera_l00_position, *(int *)(priv + 0x38)) == 0) &&
+            (*(int *)(priv + 0x3C) == -1 || coll_point_inside_region(g_camera_l00_position, *(int *)(priv + 0x3C)) == 0)) {
             MARK_LISTS(&= 0xFB)
             self[0x20] = 1;
         } else {
@@ -199,12 +199,12 @@ void func_L00_003FDB20(unsigned char *self)
 }
 
 
-extern int func_L00_003FED60(int, int, int);
+extern int bouncer_spawn_debris_object(int, int, int);
 
 /* Spawns a piece of debris and remembers which object launched it. */
-int func_L00_003FE2D0(int owner, int position, int velocity)
+int bouncer_spawn_debris(int owner, int position, int velocity)
 {
-    int debris = SpawnBouncerDebrisObject(position, velocity, *(short *)(owner + 0xAA) == 0xE9E /* Heavy Bouncer */);
+    int debris = bouncer_spawn_debris_object(position, velocity, *(short *)(owner + 0xAA) == 0xE9E /* Heavy Bouncer */);
 
     if (debris != 0) {
         *(int *)(debris + 0xB8) = owner;
@@ -212,13 +212,13 @@ int func_L00_003FE2D0(int owner, int position, int velocity)
     return debris;
 }
 
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern void func_002A7A00(char *, float, float);
-extern char *func_002BDCE8(float, float, float, float, char *, int, char *,
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern void vec_random_direction(char *, float, float);
+extern char *SpawnSpinningSparkParticle(float, float, float, float, char *, int, char *,
                      unsigned int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00312B70(void *, void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_spawn_template_effect(void *, void *, void *, void *);
 extern char ref_L00_003FE310_00[];
 
 /* Twenty rounds that spawn a particle at the second argument: each round draws a radius
@@ -227,7 +227,7 @@ extern char ref_L00_003FE310_00[];
    handed to the vector routine with the third argument and a scale of 1.5, and to the
    level-object starter with the second argument. */
 /* Throws out twenty glowing sparks from a point as a muzzle burst. */
-void func_L00_003FE310(void *shooter, void *position, void *direction)
+void part_spawn_muzzle_spark_burst(void *shooter, void *position, void *direction)
 {
     char local[16];
     float radius;
@@ -240,12 +240,12 @@ void func_L00_003FE310(void *shooter, void *position, void *direction)
     for (i = 19; i >= 0; i--) {
         func_002A77E0_3(2);
         func_002A77E0_3(2);
-        radius = RandomFloatRange(70000.0f, 150000.0f);
-        shade = RandomIntRange(10, 127);
+        radius = math_random_float_range(70000.0f, 150000.0f);
+        shade = math_random_int_range(10, 127);
         shadeMid = (shade << 8) | 0x7f000000U;
         shadeHigh = (shade << 16) | shadeMid;
         shade = shadeHigh | shade;
-        RandomDirectionVector(local, 1.6666668670950457453728e-05f,
+        vec_random_direction(local, 1.6666668670950457453728e-05f,
                 6.6666672937572002410889e-03f);
         particle = SpawnSpinningSparkParticle(0.3f, 1.0f, 1.01f, radius, position, 0, local, shade, 1);
         if (particle != 0) {
@@ -258,12 +258,12 @@ void func_L00_003FE310(void *shooter, void *position, void *direction)
         }
     }
     vec_scale_to_length(ref_L00_003FE310_00, direction, 1.5f);
-    SpawnTemplateEffectMoby(ref_L00_003FE310_00, position, 0, 0);
+    moby_spawn_template_effect(ref_L00_003FE310_00, position, 0, 0);
 }
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
 /* Draws the object's attached effect when its flag is set. */
-void func_L00_003FE490(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void moby_draw_attached_effect(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -283,7 +283,7 @@ void func_L00_003FE490(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 /* takes the float array at +104 and writes four values returned by a call with argument 255, then four float constants (-1.0, -2.25, 1.25, 2.5) at +16..+28, a descending count 255/191/127/63 into the ints at +44..+32 and 2.5/3.0 pairs at +48..+60 */
 /* Sets the starting values of a glowing effect: four random phases, fixed sizes and fading brightness steps. */
-void func_L00_003FF7B8(char *self)
+void glow_effect_init_vars(char *self)
 {
     float *vars = *(float **)(self + 104);
     float *writePtr = vars;

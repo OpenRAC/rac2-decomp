@@ -3,13 +3,13 @@ typedef struct BarlowUtilityQueueView BarlowUtilityQueueView;
 extern u8 D_001A7B00, D_001A7A40;
 extern u32 D_001397D0 NOT_SDA;
 extern u32 D_00138324 NOT_SDA;
-extern u8 D_00139568[];
-extern int D_001A79F8 MACRO_ADDR;
+extern u8 g_item_slot_to_record[];
+extern int g_player_bolts MACRO_ADDR;
 typedef struct {
     u8 pad[0x80]; float position[4]; float rotation[4];
     u8 padA0[0x40]; float aim[4]; u8 padF0[0x20]; float velocity[4];
 } JobaPlayerView;
-extern JobaPlayerView D_00189E20;
+extern JobaPlayerView g_hero_state;
 extern u8 D_00189F00[];
 extern u8 D_L11_001C0AC0[];
 typedef struct {
@@ -28,42 +28,42 @@ extern VendorOffer D_L11_00279BA0[];
 /* The dialogue gate is written before each poll and cleared on completion. */
 extern volatile int D_L11_001B32E8[] MACRO_ADDR;
 extern int D_L11_001A8F00[] MACRO_ADDR;
-extern void func_L04_00434AD0(u8 *);
-extern void func_002A7750(u8 *, int, int);
-extern void func_L01_003128C0(char *);
-extern int func_002ACBC8(char *, int);
-extern int func_00288AA0(u8 *, int);
-extern int func_00288BE8(BarlowUtilityQueueView *);
-extern int func_002F5D10(void);
-extern void func_L00_002B9D60(float *, float *, int, int);
-extern int func_L01_003245E0(u8 *, int, float);
+extern void moby_reset_matching_effects_alt(u8 *);
+extern void moby_set_state(u8 *, int, int);
+extern void moby_reset_vars_defaults(char *);
+extern int IsPointInCuboid(char *, int);
+extern int req_push_queue(u8 *, int);
+extern int req_launch_queued(BarlowUtilityQueueView *);
+extern int game_is_either_mode_two(void);
+extern void hero_reset_position_and_direction(float *, float *, int, int);
+extern int hero_is_reachable_for_count(u8 *, int, float);
 extern void func_L00_0030C710(int);
-extern void func_L01_00324550(int, int, int);
-extern void func_L01_003246D0(int);
-extern void func_002A8598(int, int);
-extern void func_00288308(int);
-extern void func_002B0A18(int, int);
-extern int func_0029B3E0(int, int);
-extern void func_0029F338(void *);
-extern int func_00282978(void *);
-extern float func_002A7878(float, float);
-extern int func_00283CF0(float);
-extern void func_002A7470(u8 *, int, int, int);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_00283C80(float, float);
-extern float func_00282DF0(void *);
-extern int func_00282948(void *);
-extern float func_00283B98(float, float);
-extern void func_002AF000(float *, float, float, float);
-extern void func_00282CC0(float *, float *, float *);
-extern void func_00282CF0(float *, float *, float *);
-extern float func_00283BE0(float, float);
-extern float func_00282E20(void *);
-extern void func_002AEC48(char *, u8 *, char *, float, float);
+extern void text_print_localized_formatted(int, int, int);
+extern void level_apply_index_for_key(int);
+extern void moby_set_byte_on_group(int, int);
+extern void help_unlock_entry(int);
+extern void value_set_entry_by_index(int, int);
+extern int MemcardSave(int, int);
+extern void moby_mark_spawned(void *);
+extern int FastDecTimer(void *);
+extern float math_random_float_range(float, float);
+extern int FloatToInt(float);
+extern void anim_start_blended(u8 *, int, int, int);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float);
+extern float FastVecLength(void *);
+extern int math_fast_float_d(void *);
+extern float FastAddRotations(float, float);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void FastVecAdd(float *, float *, float *);
+extern void FastVecSub(float *, float *, float *);
+extern float fast_subtract_rotations(float, float);
+extern float vec_length_xy(void *);
+extern void moby_update_eased_node(char *, u8 *, char *, float, float);
 
 /* Updates the Shady Salesman (moby class 3733): he waits for the hero, offers an item for bolts, takes payment, and turns his head to watch the hero. */
-void func_L11_004618C0(u8 *object) {
+void UpdateJobaPurchaseController(u8 *object) {
     float destination[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));
     float difference[4] __attribute__((aligned(16)));
@@ -71,19 +71,19 @@ void func_L11_004618C0(u8 *object) {
     int index, tracking;
     float rate;
     float yaw, pitch, distance, yawOffset, pitchOffset, heading;
-    ResetMatchingMobyEffectsAlt(object);
+    moby_reset_matching_effects_alt(object);
     switch (object[0x20]) {
     case 0:
-        if (D_001A7B00) { MarkMobySpawned(object); return; }
-        if (D_001397D0 & 0x800) SetMobyState(object, 2, -1);
-        else SetMobyState(object, 1, -1);
-        ResetMobyVarsDefaults((char *)object);
+        if (D_001A7B00) { moby_mark_spawned(object); return; }
+        if (D_001397D0 & 0x800) moby_set_state(object, 2, -1);
+        else moby_set_state(object, 1, -1);
+        moby_reset_vars_defaults((char *)object);
         break;
     case 1:
-        if (IsPointInCuboid((char *)gHeroState.position, *(int *)(vars + 0x120)) && PushRequestQueue(D_L11_001C0AC0, 0x6B)) {
-            ApplyIndexForKey((int)object);
-            LaunchQueuedRequest((BarlowUtilityQueueView *)D_L11_001C0AC0);
-            SetMobyState(object, 2, -1);
+        if (IsPointInCuboid((char *)g_hero_state.position, *(int *)(vars + 0x120)) && req_push_queue(D_L11_001C0AC0, 0x6B)) {
+            level_apply_index_for_key((int)object);
+            req_launch_queued((BarlowUtilityQueueView *)D_L11_001C0AC0);
+            moby_set_state(object, 2, -1);
         }
         break;
     case 2:
@@ -92,37 +92,37 @@ void func_L11_004618C0(u8 *object) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             VendorRecord *record;
             D_L11_001B32E8[0] = 0;
             record = (VendorRecord *)((u32)D_L11_001B368C[0] + *(int *)(vars + 0x120) * sizeof(VendorRecord));
-            ResetHeroPositionAndDirection(record->position, record->rotation, 0, 1);
+            hero_reset_position_and_direction(record->position, record->rotation, 0, 1);
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= 0xFFFE;
-            if (gPlayerBolts < ((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price) SetMobyState(object, 3, -1);
-            else SetMobyState(object, 4, -1);
+            if (g_player_bolts < ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) moby_set_state(object, 3, -1);
+            else moby_set_state(object, 4, -1);
         }
         break;
     case 3:
-        if (((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price < gPlayerBolts) {
-            SetMobyState(object, 4, -1);
-        } else if (IsHeroReachableForCount(object, 10, 2.5f)) {
+        if (((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price < g_player_bolts) {
+            moby_set_state(object, 4, -1);
+        } else if (hero_is_reachable_for_count(object, 10, 2.5f)) {
             func_L00_0030C710(180);
-            PrintLocalizedFormatted(0x27BC, ((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price, -1);
-            ApplyIndexForKey((int)object);
+            text_print_localized_formatted(0x27BC, ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
+            level_apply_index_for_key((int)object);
         }
         break;
     case 4:
-        if (gPlayerBolts < ((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price) {
+        if (g_player_bolts < ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) {
             func_L00_0030C710(180);
-            SetMobyState(object, 3, -1);
-        } else if (IsHeroReachableForCount(object, 10, 2.5f)) {
+            moby_set_state(object, 3, -1);
+        } else if (hero_is_reachable_for_count(object, 10, 2.5f)) {
             func_L00_0030C710(180);
-            PrintLocalizedFormatted(0x27BB, ((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price, -1);
-            ApplyIndexForKey((int)object);
-            if ((D_00138324 & 0x10) && PushRequestQueue(D_L11_001C0AC0, 0x6C)) {
-                LaunchQueuedRequest((BarlowUtilityQueueView *)D_L11_001C0AC0);
-                SetMobyState(object, 5, -1);
+            text_print_localized_formatted(0x27BB, ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
+            level_apply_index_for_key((int)object);
+            if ((D_00138324 & 0x10) && req_push_queue(D_L11_001C0AC0, 0x6C)) {
+                req_launch_queued((BarlowUtilityQueueView *)D_L11_001C0AC0);
+                moby_set_state(object, 5, -1);
             }
         }
         break;
@@ -132,54 +132,54 @@ void func_L11_004618C0(u8 *object) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             D_L11_001B32E8[0] = 0;
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= 0xFFFE;
-            if (object[0x21] != 0xFF) SetByteOnGroupMobys(object[0x21], 1);
+            if (object[0x21] != 0xFF) moby_set_byte_on_group(object[0x21], 1);
             if (!D_001A7B00) {
-                gPlayerBolts = gPlayerBolts - ((VendorOffer *)((u32)D_L11_00279BA0 + gItemSlotToRecord[8] * sizeof(VendorOffer)))->price;
+                g_player_bolts = g_player_bolts - ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price;
                 func_L00_0030C710(180);
-                UnlockHelpEntry(8);
+                help_unlock_entry(8);
             }
             index = *(int *)(vars + 0x124);
             if (index != -1) {
                 VendorRecord *record = (VendorRecord *)((u32)D_L11_001B368C[0] + index * sizeof(VendorRecord));
-                ResetHeroPositionAndDirection(record->position, record->rotation, 0, 1);
+                hero_reset_position_and_direction(record->position, record->rotation, 0, 1);
             }
-            SetEntryValueByIndex(0x1230, -1);
+            value_set_entry_by_index(0x1230, -1);
             MemcardSave(0, -1);
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
             return;
         }
         break;
     }
     if (object[0x20] != 0) {
         if (object[0x43] == 0 && FastDecTimer(vars + 0x11E)) {
-            *(short *)(vars + 0x11E) = FloatToInt(RandomFloatRange(1200.0f, 2400.0f));
-            if (object[0x43] != 1) StartAnimationBlended(object, 1, 0, 10);
+            *(short *)(vars + 0x11E) = FloatToInt(math_random_float_range(1200.0f, 2400.0f));
+            if (object[0x43] != 1) anim_start_blended(object, 1, 0, 10);
         } else if ((object[0x60] & 2) && object[0x43] != 0) {
-            StartAnimationBlended(object, 0, 0, 10);
+            anim_start_blended(object, 0, 0, 10);
         }
     }
     tracking = 0;
     rate = 0.02f;
     if (object[0x43] == 0) {
         tracking = 1;
-        distance = vec_distance_xy(object + 0x10, gHeroState.position);
-        if (distance < 8.0f && FastDiffRots(*(float *)(object + 0xF8), FastMatrixHelperA(gHeroState.aim[0] - *(float *)(object + 0x10), gHeroState.aim[1] - *(float *)(object + 0x14))) < 1.5707965f) {
-            if (FastVecLength(gHeroState.velocity) > 0.01f) *(int *)(vars + 0x114) = 120;
-            else FastFloatHelperD(vars + 0x114);
+        distance = vec_distance_xy(object + 0x10, g_hero_state.position);
+        if (distance < 8.0f && FastDiffRots(*(float *)(object + 0xF8), mat_fast_helper_a(g_hero_state.aim[0] - *(float *)(object + 0x10), g_hero_state.aim[1] - *(float *)(object + 0x14))) < 1.5707965f) {
+            if (FastVecLength(g_hero_state.velocity) > 0.01f) *(int *)(vars + 0x114) = 120;
+            else math_fast_float_d(vars + 0x114);
         } else if (*(int *)(vars + 0x114)) {
             *(int *)(vars + 0x114) = 0;
             qcopy(vars + 0x100, D_00189F00);
         }
-        if (FastFloatHelperD(vars + 0x118)) {
-            *(int *)(vars + 0x118) = FloatToInt(RandomFloatRange(180.0f, 300.0f));
-            yawOffset = RandomFloatRange(-90.0f, 90.0f);
+        if (math_fast_float_d(vars + 0x118)) {
+            *(int *)(vars + 0x118) = FloatToInt(math_random_float_range(180.0f, 300.0f));
+            yawOffset = math_random_float_range(-90.0f, 90.0f);
             heading = FastAddRotations(*(float *)(object + 0xF8), yawOffset * 0.017453294f);
-            pitchOffset = RandomFloatRange(0, 30.0f);
-            BuildSphericalOffset((float *)(vars + 0x100), 6.0f, heading, pitchOffset * 0.017453294f);
+            pitchOffset = math_random_float_range(0, 30.0f);
+            vec_build_spherical_offset((float *)(vars + 0x100), 6.0f, heading, pitchOffset * 0.017453294f);
             FastVecAdd((float *)(vars + 0x100), (float *)(vars + 0x100), (float *)(object + 0x10));
         }
         if (*(int *)(vars + 0x114)) {
@@ -191,8 +191,8 @@ void func_L11_004618C0(u8 *object) {
         qcopy(origin, object + 0x10);
         origin[2] += 2.0f;
         FastVecSub(difference, destination, origin);
-        yaw = fast_subtract_rotations(FastMatrixHelperA(difference[0], difference[1]), *(float *)(object + 0xF8));
-        pitch = -FastMatrixHelperA(vec_length_xy(difference), difference[2]);
+        yaw = fast_subtract_rotations(mat_fast_helper_a(difference[0], difference[1]), *(float *)(object + 0xF8));
+        pitch = -mat_fast_helper_a(vec_length_xy(difference), difference[2]);
         if (yaw > 1.5707965f) yaw = 1.5707965f;
         else if (yaw < -1.5707965f) yaw = -1.5707965f;
         if (pitch > 0.52359885f) pitch = 0.52359885f;
@@ -203,6 +203,6 @@ void func_L11_004618C0(u8 *object) {
     }
     if (D_001A7A40) *(float *)(vars + 0x70) = 2.75f;
     for (index = 0; index < 2; index++)
-        UpdateEasedNode((char *)object, vars + index * 0x80, (char *)index, rate, 0.3f);
+        moby_update_eased_node((char *)object, vars + index * 0x80, (char *)index, rate, 0.3f);
     return;
 }

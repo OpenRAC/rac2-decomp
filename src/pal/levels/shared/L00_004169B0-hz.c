@@ -1,11 +1,12 @@
+#include "names.h"
 /* func_PAL_L00_004169B0, the PAL copy of func_L00_00411B30: the same C, where 0.033333335f becomes
    0.040000003f; func_L00_00412928 becomes func_PAL_L00_004177A8. */
 #include "common.h"
 
 typedef int Vector128 __attribute__((mode(TI)));
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 typedef struct SpawnState {
     short life;
     short timer;
@@ -78,19 +79,19 @@ typedef struct Obj_F23626ad8 {
 } Obj_F23626ad8;
 #endif
 
-extern void func_002AFFD8(char *a0, void *a1, int a2);
+extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
-extern void func_00282D30(void *a0, void *a1, float f12);
+extern void FastVecScale(void *a0, void *a1, float f12);
 
 extern char D_L00_00256BC0[];
-extern char *func_002AB1F0(char *);
-extern float func_00283B98(float, float);
-extern float func_00283180(float), func_00283198(float), func_00283CE0(int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern int func_00282948(void *);
-extern void func_002A8C00(void *, void *, int, void *, float);
-extern void func_002A8E20(void *, void *);
+extern char *moby_get_private_value_0(char *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), IntToFloat(int);
+extern void FastVecAdd(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern int math_fast_float_d(void *);
+extern void make_hit_descriptor(void *, void *, int, void *, float);
+extern void QueueMobyImpact(void *, void *);
 extern void func_PAL_L00_004177A8(void *, int, int);
 void func_PAL_L00_004169B0(char *object)
 {
@@ -105,65 +106,65 @@ void func_PAL_L00_004169B0(char *object)
         first = p + 0x20;
         qcopy(first, p + 0x40);
         if (*(char **)(p + 0xb4)) {
-            node = func_002AB1F0(*(char **)(p + 0xb4));
+            node = moby_get_private_value_0(*(char **)(p + 0xb4));
             if (node) {
-                func_002AFFD8(*(char **)(p + 0xb4) + 0x10, temp, 1);
-                func_00282D30(temp, temp, *(float *)(node + 0x10));
-                func_00282CC0(temp, temp, *(char **)(p + 0xb4) + 0x10);
-                func_00282CC0(first, temp, first);
+                cam_compute_view_direction(*(char **)(p + 0xb4) + 0x10, temp, 1);
+                FastVecScale(temp, temp, *(float *)(node + 0x10));
+                FastVecAdd(temp, temp, *(char **)(p + 0xb4) + 0x10);
+                FastVecAdd(first, temp, first);
             } else qcopy(first, *(char **)(p + 0xb4) + 0x10);
         }
         if (*(int *)(p + 0xb8)) {
-            *(float *)(p + 96) = func_00283B98(*(float *)(p + 96), *(float *)(p + 108) * 100.0f);
-            *(float *)(p + 100) = func_00283B98(*(float *)(p + 100), *(float *)(p + 112) * 100.0f);
-            *(float *)(p + 104) = func_00283B98(*(float *)(p + 104), *(float *)(p + 116) * 100.0f);
-            *(float *)(p + 132) = func_00283B98(*(float *)(p + 132), *(float *)(p + 144) * 100.0f);
-            *(float *)(p + 136) = func_00283B98(*(float *)(p + 136), *(float *)(p + 148) * 100.0f);
-            *(float *)(p + 140) = func_00283B98(*(float *)(p + 140), *(float *)(p + 152) * 100.0f);
+            *(float *)(p + 96) = FastAddRotations(*(float *)(p + 96), *(float *)(p + 108) * 100.0f);
+            *(float *)(p + 100) = FastAddRotations(*(float *)(p + 100), *(float *)(p + 112) * 100.0f);
+            *(float *)(p + 104) = FastAddRotations(*(float *)(p + 104), *(float *)(p + 116) * 100.0f);
+            *(float *)(p + 132) = FastAddRotations(*(float *)(p + 132), *(float *)(p + 144) * 100.0f);
+            *(float *)(p + 136) = FastAddRotations(*(float *)(p + 136), *(float *)(p + 148) * 100.0f);
+            *(float *)(p + 140) = FastAddRotations(*(float *)(p + 140), *(float *)(p + 152) * 100.0f);
         } else {
-            *(float *)(p + 96) = func_00283B98(*(float *)(p + 96), *(float *)(p + 108));
-            *(float *)(p + 100) = func_00283B98(*(float *)(p + 100), *(float *)(p + 112));
-            *(float *)(p + 104) = func_00283B98(*(float *)(p + 104), *(float *)(p + 116));
-            *(float *)(p + 132) = func_00283B98(*(float *)(p + 132), *(float *)(p + 144));
-            *(float *)(p + 136) = func_00283B98(*(float *)(p + 136), *(float *)(p + 148));
-            *(float *)(p + 140) = func_00283B98(*(float *)(p + 140), *(float *)(p + 152));
+            *(float *)(p + 96) = FastAddRotations(*(float *)(p + 96), *(float *)(p + 108));
+            *(float *)(p + 100) = FastAddRotations(*(float *)(p + 100), *(float *)(p + 112));
+            *(float *)(p + 104) = FastAddRotations(*(float *)(p + 104), *(float *)(p + 116));
+            *(float *)(p + 132) = FastAddRotations(*(float *)(p + 132), *(float *)(p + 144));
+            *(float *)(p + 136) = FastAddRotations(*(float *)(p + 136), *(float *)(p + 148));
+            *(float *)(p + 140) = FastAddRotations(*(float *)(p + 140), *(float *)(p + 152));
         }
-        *(float *)(p + 0) = func_00283180(*(float *)(p + 96)) * *(float *)(p + 120);
-        *(float *)(p + 4) = func_00283198(*(float *)(p + 100)) * *(float *)(p + 124);
-        *(float *)(p + 8) = -func_00283198(*(float *)(p + 104)) * *(float *)(p + 128);
-        *(float *)(p + 16) = func_00283180(*(float *)(p + 132)) * *(float *)(p + 156);
-        *(float *)(p + 20) = func_00283198(*(float *)(p + 136)) * *(float *)(p + 160);
-        *(float *)(p + 24) = -func_00283198(*(float *)(p + 140)) * *(float *)(p + 164);
+        *(float *)(p + 0) = math_fast_sin_or_cos_a(*(float *)(p + 96)) * *(float *)(p + 120);
+        *(float *)(p + 4) = math_fast_sin_or_cos_b(*(float *)(p + 100)) * *(float *)(p + 124);
+        *(float *)(p + 8) = -math_fast_sin_or_cos_b(*(float *)(p + 104)) * *(float *)(p + 128);
+        *(float *)(p + 16) = math_fast_sin_or_cos_a(*(float *)(p + 132)) * *(float *)(p + 156);
+        *(float *)(p + 20) = math_fast_sin_or_cos_b(*(float *)(p + 136)) * *(float *)(p + 160);
+        *(float *)(p + 24) = -math_fast_sin_or_cos_b(*(float *)(p + 140)) * *(float *)(p + 164);
         qcopy(p + 0x30, p + 0x50);
         if (*(char **)(p + 0xb0)) {
-            node = func_002AB1F0(*(char **)(p + 0xb0));
+            node = moby_get_private_value_0(*(char **)(p + 0xb0));
             if (node) {
-                func_002AFFD8(*(char **)(p + 0xb0) + 0x10, temp, 1);
-                func_00282D30(temp, temp, *(float *)(node + 0x10));
-                func_00282CC0(temp, temp, *(char **)(p + 0xb0) + 0x10);
-                func_00282CC0(p + 0x30, temp, p + 0x30);
+                cam_compute_view_direction(*(char **)(p + 0xb0) + 0x10, temp, 1);
+                FastVecScale(temp, temp, *(float *)(node + 0x10));
+                FastVecAdd(temp, temp, *(char **)(p + 0xb0) + 0x10);
+                FastVecAdd(p + 0x30, temp, p + 0x30);
             } else qcopy(p + 0x30, *(char **)(p + 0xb0) + 0x10);
         }
         first = p + 0x30;
         q = p;
-        fraction = func_00283CE0(*(int *)(q + 0xb8));
-        fraction /= func_00283CE0(*(int *)(q + 0xbc));
+        fraction = IntToFloat(*(int *)(q + 0xb8));
+        fraction /= IntToFloat(*(int *)(q + 0xbc));
         second = q + 0x20;
-        func_00282D08(first, second, first, 1.0f - fraction);
-        if (!func_00282948(q + 0xb8)) continue;
+        lerp_vector(first, second, first, 1.0f - fraction);
+        if (!math_fast_float_d(q + 0xb8)) continue;
         if (*(int *)(*(char **)(q + 0xb0) + 0x98) && !*(int *)(q + 0xc0) && *(int *)(q + 0xc4)) {
-            func_00282CF0(temp, first, second);
-            func_00282F20(temp, temp, 0.040000003f);
+            FastVecSub(temp, first, second);
+            vec_scale_to_length(temp, temp, 0.040000003f);
             amount = *(float *)(q + 0xc8);
             *(int *)(object + 0xb8) = *(int *)(*(char **)(q + 0xcc) + 0x20);
-            func_002A8C00(event, object, 0x210000, temp, amount);
+            make_hit_descriptor(event, object, 0x210000, temp, amount);
             event[0x18] = 5;
             event[0x19] = 3;
             *(short *)(event + 0x1a) = *(short *)(object + 0xaa);
-            func_002A8E20(*(char **)(q + 0xb0), event);
+            QueueMobyImpact(*(char **)(q + 0xb0), event);
             *(int *)(q + 0xc0) = 1;
             func_PAL_L00_004177A8(first, 10, 1);
         }
-        if (func_00282948(q + 0xa8)) *(int *)(q + 0xac) = 0;
+        if (math_fast_float_d(q + 0xa8)) *(int *)(q + 0xac) = 0;
     }
 }

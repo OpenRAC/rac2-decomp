@@ -12,10 +12,10 @@ extern u64 D_001A72A0[] MACRO_ADDR;
 extern Func00292328Packet D_001C4DC0[];
 extern u64 D_001A91D0 __attribute__((sda));
 extern char *D_001CDB80[];
-extern void func_002933D0(void *, int, void *);
+extern void tex_relocate_render_groups(void *, int, void *);
 
 /* Builds a list of draw packets from the loaded texture words and sends them off to be drawn. */
-void func_00292328(void *param)
+void tex_build_draw_packets(void *param)
 {
     int i;
 
@@ -24,6 +24,6 @@ void func_00292328(void *param)
         D_001C4DC0[i].tag1 = 0x0000FFA0000000E0ULL;
         D_001C4DC0[i].tag2 = 0x0040000400004000ULL;
     }
-    RelocateRenderGroups(D_001A7294, 0, &D_001A91D0);
+    tex_relocate_render_groups(D_001A7294, 0, &D_001A91D0);
     D_001CDB80[0][9] = D_001CDB80[0][8];
 }

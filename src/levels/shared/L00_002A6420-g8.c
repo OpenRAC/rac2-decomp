@@ -7,7 +7,7 @@ typedef unsigned short u16;
 /* The resident state block, and the hero position block the tail works from: both are
    incomplete arrays, so the address stays materialised absolutely. */
 extern char D_00189E20_2[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 /* The float the frame publishes, and its source in the level's literal pool, read through
    $gp. The published one is materialised absolutely in the retail bytes. */
@@ -23,22 +23,22 @@ extern void func_2CB3A8(void);
 extern void func_2AE0C8(void);
 extern void func_2B9CA8(void);
 extern void func_2A5368(void);
-extern void func_L00_002A9600(void);
-extern void func_L00_002A7958(void);
-extern void func_L00_002A7748(void);
+extern void hero_update_moby_from_hero(void);
+extern void gfx_fade_screen_effect(void);
+extern void ApplyHeroAxisScales(void);
 extern void func_2A5840(void);
 extern void func_2A5CB0(void);
 extern void func_2A6008(void);
 extern void func_35F3A8(void *a0, void *a1, void *a2);
 extern void func_3080D0(void *a0);
-extern void func_L00_002A9760(void);
+extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_319684(void *a0);
 
 /* One frame of the level's frame update: three openers, a block that runs while the mode
    byte is 1, then that byte gates the sub-updates twice more and gates the arms block, which
    republishes the ambient float and hands an armed record to a helper before clearing it.
    The closing tail always runs, from the hero position block. */
-void func_L00_002A65D8(void)
+void hero_l00_update_frame(void)
 {
     char *base;
     char *hero;
@@ -63,8 +63,8 @@ void func_L00_002A65D8(void)
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
 
-    UpdateHeroMobyFromHero();
-    FadeScreenEffect();
+    hero_update_moby_from_hero();
+    gfx_fade_screen_effect();
     ApplyHeroAxisScales();
 
     if (*(u8 *)(base + 0x22B4) == 1) {
@@ -83,7 +83,7 @@ void func_L00_002A65D8(void)
         *(int *)(base + 0x24E4) = 0;
     }
 
-    hero = gHeroPosition;
+    hero = g_hero_position;
     func_3080D0(hero);
     UpdateHeroMobyProbedHeightBounds();
     func_319684(*(void **)(hero + 0x2210));

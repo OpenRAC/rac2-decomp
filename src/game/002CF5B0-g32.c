@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002CF5B0 in its own unit: retail reaches D_001AB9EC through $gp, so the file is compiled
    at -G32 (config/cflags.txt), like 002D01D0-g32.c. Menu input handler over the 12-entry table
    D_001ABCD0 (entries with cost 100 are skipped). One pointer variable holds the table base for the
@@ -9,17 +10,17 @@ typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; in
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 typedef struct { unsigned char f0; unsigned char f1; unsigned char item; unsigned char cost; } ShopEntry;
 
-extern SelectionCallback D_001F2840;
-extern CallbackMenuState D_00138180;
+extern SelectionCallback g_pause_menu_state;
+extern CallbackMenuState g_pad_state;
 extern int D_001AB9EC __attribute__((sda));
 extern ShopEntry D_001ABCD0[] MACRO_ADDR;
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern unsigned char D_001A7A40[] MACRO_ADDR;
 typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
-extern Settings_002F9198 D_001A79F8 MACRO_ADDR;
-extern int func_002B0E90(void);
-extern int func_002E5E58(int, unsigned int, void *);
-extern void func_002923C0(void *);
+extern Settings_002F9198 g_player_bolts MACRO_ADDR;
+extern int save_count_nonzero_flags(void);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
+extern void tex_load_level_pack(void *);
 
 static __inline__ ShopEntry *shop_entry(int index)
 {
@@ -37,21 +38,21 @@ static __inline__ int shop_item(int index)
 }
 
 /* Handles input on the unlockable options menu: moves the cursor and toggles an option if the player has enough skill points. */
-int func_002CF5B0(void)
+int menu_handle_unlockable_options_input(void)
 {
     int result = 0;
     int entryCost;
     unsigned char *slot;
-    int available = CountNonZeroFlags();
-    int flags = gPadState.flags;
+    int available = save_count_nonzero_flags();
+    int flags = g_pad_state.flags;
 
     if (flags & 0x10) {
         int value, returnCode;
         D_001AB9EC = 0;
-        value = *(int *)(gPauseMenuState.source + 0xE0);
+        value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            gPauseMenuState.value = value;
-        else if (gPauseMenuState.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             returnCode = -1;
             goto finish;
         }
@@ -64,7 +65,7 @@ finish:
         result = 1;
     } else {
         if (flags & 0x1000) {
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             do {
                 ShopEntry *table;
                 if (--D_001AB9EC < 0)
@@ -76,7 +77,7 @@ finish:
         } else if (flags & 0x4000) {
             int nextIndex;
             ShopEntry *table;
-            PlaySoundFromGlobalBank(3, 0, 0);
+            snd_play_from_global_bank(3, 0, 0);
             nextIndex = D_001AB9EC;
             table = D_001ABCD0;
             do {
@@ -85,12 +86,12 @@ finish:
             } while (table[nextIndex].cost == 100);
             D_001AB9EC = nextIndex;
         }
-        if (gPadState.flags & 0x40) {
+        if (g_pad_state.flags & 0x40) {
             slot = (unsigned char *)D_001ABCD0;
             entryCost = ((ShopEntry *)slot)[D_001AB9EC].cost;
             if ((entryCost != 0x5A && entryCost <= available)
                 || (shop_cost(D_001AB9EC) == 0x5A && D_001A7A60[0] != 0)) {
-                PlaySoundFromGlobalBank(4, 0, 0);
+                snd_play_from_global_bank(4, 0, 0);
                 slot = &D_001A7A40[shop_entry(D_001AB9EC)->item];
                 if (*slot)
                     *slot = 0;
@@ -99,10 +100,10 @@ finish:
                 {
                     flags = shop_item(D_001AB9EC);
                     if (flags == 9 || flags == 10 || (unsigned char)flags == 2 || (unsigned char)flags == 11)
-                        LoadLevelTexturePack((void *)(s32)gPlayerBolts.level);
+                        tex_load_level_pack((void *)(s32)g_player_bolts.level);
                 }
             } else
-                PlaySoundFromGlobalBank(5, 0, 0);
+                snd_play_from_global_bank(5, 0, 0);
         }
     }
     return result;

@@ -2,18 +2,18 @@
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern int func_00282978(unsigned short *);
-extern int func_00282948(char *);
-extern float func_00283CE0(int);
-extern int func_00283DB8(void *, float);
-extern float func_002A7878(float, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(char *, char *, char *);
+extern int FastDecTimer(unsigned short *);
+extern int math_fast_float_d(char *);
+extern float IntToFloat(int);
+extern int math_fast_helper_a(void *, float);
+extern float math_random_float_range(float, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(char *, char *, char *);
 extern unsigned char *D_L09_001B285C MACRO_ADDR;
-extern void func_00291450(int);
-extern void func_0029F338(void *);
-extern void func_00283098(void *, void *, void *);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
+extern void gfx_free_point_light(int);
+extern void moby_mark_spawned(void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 extern unsigned char D_L09_001C7B80[];
 
 #define S(p, o) (*(signed char *)((p) + (o)))
@@ -22,7 +22,7 @@ extern unsigned char D_L09_001C7B80[];
 #define H(p, o) (*(short *)((p) + (o)))
 
 /* Updates a pulsing light with a looping sound: fades its colour and pitch between two settings and plays its sound at the right spot. */
-void func_L09_0039BA18(unsigned char *object)
+void pulsing_l09_light_update(unsigned char *object)
 {
     unsigned char *s, *p, *sound, *m;
     Vec pos, origin, delta;
@@ -36,10 +36,10 @@ void func_L09_0039BA18(unsigned char *object)
         return;
     if (H(s, 0x28) != -1 && FastDecTimer((unsigned short *)(s + 0x28))) {
         if (S(s, 0x2E) != -1) {
-            FreePointLight(S(s, 0x2E));
+            gfx_free_point_light(S(s, 0x2E));
             S(s, 0x2E) = -1;
         }
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         return;
     }
     switch (object[0x20]) {
@@ -55,7 +55,7 @@ void func_L09_0039BA18(unsigned char *object)
         object[0x20] = 1;
         break;
     case 1:
-        if (FastFloatHelperD((char *)(s + 0x30)))
+        if (math_fast_float_d((char *)(s + 0x30)))
             object[0x20] = 2;
         break;
     case 2:
@@ -84,7 +84,7 @@ void func_L09_0039BA18(unsigned char *object)
         pitch2 = pitch + (np - pitch) * t;
         qcopy(&pos, object + 0x10);
         pos.f[3] = pitch2;
-        if (FastMathHelperA(&pos, 255.0f) != -1) {
+        if (math_fast_helper_a(&pos, 255.0f) != -1) {
             m = *(unsigned char **)(s + 0x34);
             if ((I(s, 0x24) & 0x1000000) && m && !((*(unsigned short *)(m + 0x34) ^ 1) & 1))
                 goto stop;
@@ -95,13 +95,13 @@ void func_L09_0039BA18(unsigned char *object)
             if (!(I(s, 0x24) & 0x800000)) {
                 if (I(s, 0x24) & 0x100000) {
                     if (I(s, 0x24) & 0x200000) {
-                        delta.f[0] = RandomFloatRange(-F(s, 0), F(s, 0));
-                        delta.f[1] = RandomFloatRange(-F(s, 4), F(s, 4));
-                        delta.f[2] = RandomFloatRange(-F(s, 8), F(s, 8));
+                        delta.f[0] = math_random_float_range(-F(s, 0), F(s, 0));
+                        delta.f[1] = math_random_float_range(-F(s, 4), F(s, 4));
+                        delta.f[2] = math_random_float_range(-F(s, 8), F(s, 8));
                     } else {
                         int saved = I(s, 0xC);
                         I(s, 0xC) = 0;
-                        FastVecScale(&delta, s, RandomFloatRange(F(s, 0xC), 1.0f));
+                        FastVecScale(&delta, s, math_random_float_range(F(s, 0xC), 1.0f));
                         I(s, 0xC) = saved;
                     }
                 } else {
@@ -117,7 +117,7 @@ void func_L09_0039BA18(unsigned char *object)
                 qcopy(object + 0x10, &origin);
             }
             if (S(s, 0x2E) == -1) {
-                s[0x2E] = AllocateEffectSlot_L00_2(object + 0x10, pitch2, IntToFloat(s[0x2A]) * 0.01f, r2, g2, b2);
+                s[0x2E] = part_l00_alloc_effect_slot_2(object + 0x10, pitch2, IntToFloat(s[0x2A]) * 0.01f, r2, g2, b2);
             } else {
                 sound = D_L09_001C7B80 + (S(s, 0x2E) << 5);
                 qcopy(sound + 0x10, object + 0x10);
@@ -130,7 +130,7 @@ void func_L09_0039BA18(unsigned char *object)
         } else {
         stop:
             if (S(s, 0x2E) != -1) {
-                FreePointLight(S(s, 0x2E));
+                gfx_free_point_light(S(s, 0x2E));
                 S(s, 0x2E) = -1;
             }
         }
@@ -146,9 +146,9 @@ void func_L09_0039BA18(unsigned char *object)
         break;
     case 3:
         if (S(s, 0x2E) != -1) {
-            FreePointLight(S(s, 0x2E));
+            gfx_free_point_light(S(s, 0x2E));
             S(s, 0x2E) = -1;
-            MarkMobySpawned(object);
+            moby_mark_spawned(object);
         }
         break;
     }

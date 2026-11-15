@@ -7,20 +7,20 @@ typedef struct {
     PackedVector initial;
     PackedVector entries[0];
 } PackedTransformPacket;
-extern unsigned char *D_0018C0B0;
+extern unsigned char *g_hero_moby;
 extern void func_L00_00316F60(unsigned char *);
-extern PackedVector func_L00_002EE660(const void *, float);
+extern PackedVector pack_vector_s16(const void *, float);
 
 /* Adapted from RAC1 pack_pose in overlays/shared/hero_idle_and_animation.c
  * (OpenRAC/rac1-decomp, GPL-3.0). */
 /* Pack scratchpad joint transforms relative to the model's default pose. */
 /* Saves the current pose of the hero joints into a compact packet, keeping only what differs from the default pose. */
-void func_L00_002AA200(int *indices, PackedTransformPacket *out, unsigned char *baseline,
+void PackPose(int *indices, PackedTransformPacket *out, unsigned char *baseline,
                        int padding, unsigned char *object) {
     PackedVector *entry;
     PackedVector value;
     int count, scales, positions, i, ordinal, firstBytes;
-    if (!object) object = gHeroMoby_0018C0B0;
+    if (!object) object = g_hero_moby;
     entry = (PackedVector *)(out + 1);
     func_L00_00316F60(object);
     out->initial = 0x7FFF000000000000UL;

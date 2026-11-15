@@ -6,17 +6,17 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_002A7878(float, float);
-extern s32 func_002A77E0(s32);
-extern s32 func_00282978(void *);
-extern float *func_L11_004417E8(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float math_random_float_range(float, float);
+extern s32 math_random_int_below(s32);
+extern s32 FastDecTimer(void *);
+extern float *arena_get_center_point(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern void func_PAL_L11_00465B28(void *, void *, void *, float, float, float, float);
-extern TI128 D_00189EA0;
+extern TI128 g_hero_position;
 extern s32 D_L11_001B19A8 __attribute__((sda));
 extern s32 D_L11_001B19AC __attribute__((sda));
 extern float D_L11_001B19B0 __attribute__((sda));
@@ -49,24 +49,24 @@ void func_PAL_L11_0044CC18(JobObject *object)
     int chance;
     u16 timer;
 
-    if (func_00282978(&state->spawnTimer)) {
+    if (FastDecTimer(&state->spawnTimer)) {
         timer = (D_L11_001B19A8 * 5 + 2) / 6;
         chance = D_L11_001B19AC;
         state->spawnTimer = timer;
-        if (!func_002A77E0(chance)) {
-            qcopy(position, &D_00189EA0);
-            func_00282CF0(velocity, position, func_L11_004417E8(object));
+        if (!math_random_int_below(chance)) {
+            qcopy(position, &g_hero_position);
+            FastVecSub(velocity, position, arena_get_center_point(object));
             velocity[2] = 0;
-            func_00282F20(velocity, velocity, D_L11_001B19B4);
-            func_00282CC0(position, velocity, func_L11_004417E8(object));
+            vec_scale_to_length(velocity, velocity, D_L11_001B19B4);
+            FastVecAdd(position, velocity, arena_get_center_point(object));
             position[2] += 5.0f;
         } else {
-            angle = func_002A7878(-3.1415927410125732f, 3.1415927410125732f);
-            base = func_L11_004417E8(object);
-            position[0] = base[0] + D_L11_001B19B4 * func_00283180(angle);
-            base = func_L11_004417E8(object);
-            position[1] = base[1] + D_L11_001B19B4 * func_00283198(angle);
-            position[2] = func_L11_004417E8(object)[2] + 5.0f;
+            angle = math_random_float_range(-3.1415927410125732f, 3.1415927410125732f);
+            base = arena_get_center_point(object);
+            position[0] = base[0] + D_L11_001B19B4 * math_fast_sin_or_cos_a(angle);
+            base = arena_get_center_point(object);
+            position[1] = base[1] + D_L11_001B19B4 * math_fast_sin_or_cos_b(angle);
+            position[2] = arena_get_center_point(object)[2] + 5.0f;
         }
         *(TI128 *)acceleration = 0;
         acceleration[2] = D_L11_001B19B0 * 0.020000001f;

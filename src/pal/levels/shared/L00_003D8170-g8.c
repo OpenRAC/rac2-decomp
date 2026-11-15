@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern int ref_L00_003D40D8_00(float *);
-extern int D_L00_001B19C8 __attribute__((sda));
+extern int g_frame_l00_counter __attribute__((sda));
 extern float D_L00_001B0250 __attribute__((sda));
 extern float D_L00_001B0254 __attribute__((sda));
 extern float D_L00_001B0258 __attribute__((sda));
@@ -13,9 +13,9 @@ extern float D_L00_001B02A0 __attribute__((sda));
 extern float D_L00_001B02A4 __attribute__((sda));
 extern float D_L00_001B02A8 __attribute__((sda));
 extern char D_L00_001B8FF0[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L00_001A8F20[] __attribute__((sda));
-extern char D_L00_00262570[];
+extern char g_weapon_l00_table[];
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern unsigned char D_00139587 __attribute__((nosda));
 extern unsigned char *D_L00_001FEA14 __attribute__((nosda));
@@ -58,7 +58,7 @@ void func_PAL_L00_003D8170(unsigned char *p, EffectLauncherState *s)
 
     if (!ref_L00_003D40D8_00(&s->cooldown))
         return;
-    if (D_L00_001B19C8 % 4 != s->frame)
+    if (g_frame_l00_counter % 4 != s->frame)
         return;
     ref_L00_003D40D8_01(p, 1, pos);
     s->alternate ^= 1;
@@ -80,7 +80,7 @@ void func_PAL_L00_003D8170(unsigned char *p, EffectLauncherState *s)
         s->target = obj;
         if ((unsigned char)p[0x43] != 2)
             ref_L00_003D40D8_03(p, 2, 0, 4);
-        ref_L00_003D40D8_04(delta, p + 0x10, D_00189EA0);
+        ref_L00_003D40D8_04(delta, p + 0x10, g_hero_position);
         angle = ref_L00_003D40D8_05(delta, p + 0xe0);
         if (D_L00_001A8F00 == 2 || p[0x42] != p[0x43] || (unsigned char)p[0x42] != 2
             || !(angle > 1.1f))
@@ -132,7 +132,7 @@ void func_PAL_L00_003D8170(unsigned char *p, EffectLauncherState *s)
             ref_L00_003D40D8_13(0, 0, p);
         }
         {
-            char *v = D_L00_00262570 + D_00139587 * 0xe0;
+            char *v = g_weapon_l00_table + D_00139587 * 0xe0;
             float f = ref_L00_003D40D8_15(0.0f, 0.17f);
             float delay = 1.0f / *(float *)(v + 0x54);
 

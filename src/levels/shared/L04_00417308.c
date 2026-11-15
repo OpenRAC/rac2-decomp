@@ -38,18 +38,18 @@ typedef float f32;
 
 /* func_L04_0043BC58 is defined in L04_0043BC58-g8.c. */
 
-extern void func_002833F0(char *a, char *b);
+extern void euler_rotation_basis(char *a, char *b);
 
-extern void func_00282D30(char *a, char *b, float f);
+extern void FastVecScale(char *a, char *b, float f);
 
-extern int func_00283D38(int a, int b, float f);
+extern int FastTweenColor(int a, int b, float f);
 
-extern void func_002A0488(void *a, u8 b, u8 c, u8 d);
+extern void set_moby_color(void *a, u8 b, u8 c, u8 d);
 
 extern void func_002A10E8(void *a);
 
 /* Applies the fade size and colour of a linked object to the object it follows. */
-void func_L04_0043BE40(char *moby)
+void moby_apply_fade_color_to_linked(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     char *linked;
@@ -79,18 +79,18 @@ void func_L04_0043BE40(char *moby)
 /* func_L04_0043BEE8 is defined in L04_0043BEE8-g8.c. */
 
 extern char D_L04_001B9680[];
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(char *, char *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern float func_002A78D8(float, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
-extern int func_00283CF0(float);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(char *, char *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern float math_random_signed_float_range(float, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern int FloatToInt(float);
 
 /* Emits paired particles with opposite spin and randomized velocities. */
-void func_L04_00451150(float *pos, int count) {
+void part_l04_spawn_spinning_pairs(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
@@ -104,20 +104,20 @@ void func_L04_00451150(float *pos, int count) {
     axis[2] = 1.0f;
     axis[3] = 1.0f;
     for (i = 0; i < count; i++) {
-        size = RandomFloatRange(0.5f, 2.0f);
-        sign = RandomIntBelow(2);
+        size = math_random_float_range(0.5f, 2.0f);
+        sign = math_random_int_below(2);
         if (!sign) sign--;
-        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
-        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
-        vec_scale_to_length((char *)velocity, (char *)velocity, RandomFloatRange(0.05f, 3.0f) * 0.0166666675f);
-        velocity[2] = RandomFloatRange(1.0f, 5.0f) * 0.0166666675f;
+        angle = math_random_float_range(-1.0471977f, 1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
+        vec_scale_to_length((char *)velocity, (char *)velocity, math_random_float_range(0.05f, 3.0f) * 0.0166666675f);
+        velocity[2] = math_random_float_range(1.0f, 5.0f) * 0.0166666675f;
         FastVecAdd(origin, pos, offset);
-        pos[0] += RandomSignedFloatRange(0, 0.15f);
-        pos[1] += RandomSignedFloatRange(0, 0.15f);
-        pos[2] += RandomSignedFloatRange(0, 0.15f);
-        particle = SpawnGroundEffectParticle(origin, 60, size * 0.1f, size, 0x7F207F7F, 0, sign, velocity, 0, 0.002f);
+        pos[0] += math_random_signed_float_range(0, 0.15f);
+        pos[1] += math_random_signed_float_range(0, 0.15f);
+        pos[2] += math_random_signed_float_range(0, 0.15f);
+        particle = part_spawn_ground_effect(origin, 60, size * 0.1f, size, 0x7F207F7F, 0, sign, velocity, 0, 0.002f);
         if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
-        particle = SpawnGroundEffectParticle(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
+        particle = part_spawn_ground_effect(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
         if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
@@ -128,7 +128,7 @@ void func_L04_00451150(float *pos, int count) {
 
 /* Smooth step: eases a value from 0 to 1 (3x^2 - 2x^3). */
 /* evaluates the ordered scalar cubic value squared times negative two times value plus three */
-f32 func_L04_004554F8(f32 value) {
+f32 math_smooth_step(f32 value) {
     f32 squared = value * value;
     value = value * -2.0f;
     value = value + 3.0f;
@@ -148,7 +148,7 @@ extern void func_345860(char *a0, int a1, float f12, float f13, float f14, float
 extern void func_3317E8(char *a0);
 
 /* Waits for a trigger, then plays a short effect sequence once it has fired. */
-void func_L04_00456748(char *moby)
+void triggered_effect_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
@@ -177,7 +177,7 @@ void func_L04_00456748(char *moby)
 /* rac1-decomp src/game/stub.c: func_001E97C8 */
 /* Takes an argument (callers pass one, e.g. r1_func_001EC210) and ignores
    it -- the unused parameter costs no codegen, still 0/8. */
-int func_L04_0046B740(void *unused) {
+int stub_l04_return_zero(void *unused) {
     return 0;
 }
 
@@ -194,40 +194,40 @@ int func_L04_0046B740(void *unused) {
 
 extern s32 D_L04_001B1E84 __attribute__((sda));
 
-extern s32 D_L04_001B24DC __attribute__((sda));
+extern s32 g_moby_l04_pool __attribute__((sda));
 
 /* Tells whether the object linked to this one is in state 2 or 3. */
-int func_L04_0046D768(u8 *moby)
+int moby_is_linked_in_state_two_or_three(u8 *moby)
 {
     s32 entryAddr = (*(s16 *)(moby + 0x84) << 5) + D_L04_001B1E84;
-    u8 *linked = (u8 *)(gMobyPool_L04 + (*(s32 *)(*(s32 *)(entryAddr + 0x1C) + 0x60) << 8));
+    u8 *linked = (u8 *)(g_moby_l04_pool + (*(s32 *)(*(s32 *)(entryAddr + 0x1C) + 0x60) << 8));
     return (u32)(*(u8 *)(linked + 0x20) - 2) < 2;
 }
 
 /* Empty handler that does nothing. */
-void func_L04_0047A7C8(void)
+void moby_l04_empty_handler(void)
 {
 }
 
 /* Empty handler that does nothing. */
-void func_L04_0047B420(void)
+void moby_l04_empty_handler_2(void)
 {
 }
 
 
 
 /* Empty handler that does nothing. */
-void func_L04_00487228(void)
+void moby_l04_empty_handler_3(void)
 {
 }
 
 /* Empty handler that does nothing. */
-void func_L04_004895B8(void)
+void moby_l04_empty_handler_4(void)
 {
 }
 
 
 /* Empty handler that does nothing. */
-void func_L04_0048AE50(void)
+void moby_l04_empty_handler_5(void)
 {
 }

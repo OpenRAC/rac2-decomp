@@ -18,14 +18,14 @@ extern int D_L23_001B372C;
 
 extern int D_L23_001B3730;
 
-extern void func_0029F978(char *, int, char *);
+extern void AttachManipulator(char *, int, char *);
 
-extern void func_00282D30(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
 
-extern void func_00283898(void *, int, float);
+extern void build_axis_rotation_quaternion(void *, int, float);
 
 /* Advances the three-phase transition and updates its state vectors. */
-void func_L23_00419D60(char *obj) {
+void mothership_update_shield_fade(char *obj) {
     char *state = *(char **)(obj + 0x68);
     float scale;
     float active_fade, inactive_fade, active_duration, inactive_duration;

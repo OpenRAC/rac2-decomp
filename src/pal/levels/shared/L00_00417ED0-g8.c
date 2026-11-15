@@ -10,15 +10,15 @@ extern int D_L00_001B13DC __attribute__((sda));
 extern char D_00189EB0[];
 extern char D_L00_0025A1A0[];
 extern char D_L00_0025A420[];
-extern char *func_0029EFD0(int id);
-extern void func_002833F0(char *dst, char *src);
-extern void func_00282D30(float *dst, char *src, float scale);
-extern void func_00282CC0(char *dst, char *src, float *local);
+extern char *CreateMoby(int id);
+extern void euler_rotation_basis(char *dst, char *src);
+extern void FastVecScale(float *dst, char *src, float scale);
+extern void FastVecAdd(char *dst, char *src, float *local);
 extern void func_PAL_L00_00418190(char *object);
 
 char *func_PAL_L00_00417ED0(char *owner)
 {
-    char *object = func_0029EFD0(0x1195);
+    char *object = CreateMoby(0x1195);
     char *state;
     int timer;
     int counter;
@@ -31,7 +31,7 @@ char *func_PAL_L00_00417ED0(char *owner)
         timer = D_L00_001B13DC;
         *(int *)(state + 0x18) = -1;
         *(unsigned short *)(state + 0x1E) = ((s32)(timer) * 5 + 2) / 6;
-        func_002833F0(object + 0xC0, D_00189EB0);
+        euler_rotation_basis(object + 0xC0, D_00189EB0);
         counter = D_L00_001B1378;
         *(char **)(state + 0) = D_L00_0025A1A0 + counter * 0xA0;
         *(char **)(state + 4) = D_L00_0025A420 + counter * 0x140;
@@ -40,8 +40,8 @@ char *func_PAL_L00_00417ED0(char *owner)
         D_L00_001B1378 = (D_L00_001B1378 + 1) % 4;
         *(int *)(state + 0x24) = D_L00_001B137C;
         *(char **)(state + 0x20) = owner;
-        func_00282D30(local, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
-        func_00282CC0(object + 0x10, D_00189EB0 - 0x10, local);
+        FastVecScale(local, *(char **)(D_00189EB0 + 0x2200) + 0xE0, 0.75f);
+        FastVecAdd(object + 0x10, D_00189EB0 - 0x10, local);
         func_PAL_L00_00418190(object);
     }
     return object;

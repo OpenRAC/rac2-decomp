@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern void ref_L04_003A19E8_00(s32, s32);
 
 /* Runs the same per-patch step on each water patch in turn. */
-void func_L04_003A19E8(s32 patches, s32 rows, s32 count) {
+void water_process_patches(s32 patches, s32 rows, s32 count) {
     s32 remaining;
     s32 patch;
     s32 row;

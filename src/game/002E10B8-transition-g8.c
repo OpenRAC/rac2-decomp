@@ -53,32 +53,32 @@ typedef struct {
     short mode;
 } TransitionGlobals;
 
-extern TransitionContext D_00152C00;
-extern TransitionScene D_001B8840;
+extern TransitionContext g_hero_moby_default;
+extern TransitionScene g_scene_playback_state;
 extern TransitionArchive D_001BAEC0;
-extern TransitionState D_001A63A8;
-extern TransitionGlobals D_00189E20;
+extern TransitionState g_music_state;
+extern TransitionGlobals g_hero_state;
 extern char D_001B1390[] MACRO_ADDR;
 extern char D_001B2980[];
 extern char D_001B13D0[] MACRO_ADDR;
 extern int D_001B22B0;
-extern float D_001B15A0;
+extern float g_screen_fade;
 extern int D_001B15A4 __attribute__((sda));
 extern TransitionMoby *D_001B1B60;
 
-extern void func_00282A60(void *, int, int);
-extern void func_002FC138(void);
-extern unsigned int func_0026F748(int, int);
-extern void func_0026F720(void);
-extern void func_00293F98(int, int);
-extern void func_00294070(int);
-extern int func_002E4AC8(void);
+extern void mem_clear(void *, int, int);
+extern void gfx_select_packet_buffer_setup(void);
+extern unsigned int stub_empty_8(int, int);
+extern void stub_empty_3(void);
+extern void load_parts_set_from_disc(int, int);
+extern void load_select_segment_update_world(int);
+extern int UpdateSoundVoices(void);
 /* The callee ignores a0; retain the caller's explicit zero argument. */
-extern int func_001261F0(int);
-extern int func_002B6D28(void);
+extern int sceGsSyncV(int);
+extern int snd_resume_music_stream(void);
 
 /* Sets up the scene for a screen transition: clears work areas, hides some objects, chooses the music and starting state, then waits until the scene is ready. */
-void func_002E6D88(int mode)
+void level_transition_scene_start(int mode)
 {
     TransitionMoby *p;
     TransitionMoby *object;
@@ -87,28 +87,28 @@ void func_002E6D88(int mode)
     int music;
     int channel;
 
-    gHeroMoby_00152C00.field6C = 0;
-    gHeroMoby_00152C00.mode = mode;
-    gHeroMoby_00152C00.field8 = 0;
-    gHeroMoby_00152C00.slot = -1;
-    ClearMemory(&gScenePlaybackState, 0, 0x1D0);
-    ClearMemory(&D_001B1390, 0, 0x40);
-    ClearMemory(D_001B2980, 0, 0x40);
-    ClearMemory(D_001B2980 + 0x40, 0, 0x40);
-    ClearMemory(&D_001B13D0, 0, 0x40);
-    SelectPacketBufferSetup();
+    g_hero_moby_default.field6C = 0;
+    g_hero_moby_default.mode = mode;
+    g_hero_moby_default.field8 = 0;
+    g_hero_moby_default.slot = -1;
+    mem_clear(&g_scene_playback_state, 0, 0x1D0);
+    mem_clear(&D_001B1390, 0, 0x40);
+    mem_clear(D_001B2980, 0, 0x40);
+    mem_clear(D_001B2980 + 0x40, 0, 0x40);
+    mem_clear(&D_001B13D0, 0, 0x40);
+    gfx_select_packet_buffer_setup();
 
     offset = D_001B22B0 - 0x60000;
-    gScenePlaybackState.start = D_001BAEC0.start + offset;
-    gScenePlaybackState.end = D_001BAEC0.end + offset;
-    gScreenFade = 1.0f;
+    g_scene_playback_state.start = D_001BAEC0.start + offset;
+    g_scene_playback_state.end = D_001BAEC0.end + offset;
+    g_screen_fade = 1.0f;
     D_001B22B0 = offset;
     D_001B15A4 = 0;
-    EmptyStubF748(0x61, 2);
-    gHeroState.flag = 1;
-    EmptyStubF720();
+    stub_empty_8(0x61, 2);
+    g_hero_state.flag = 1;
+    stub_empty_3();
 
-    object = gHeroMoby_00152C00.object;
+    object = g_hero_moby_default.object;
     p = D_001B1B60;
     object->flags |= 1;
     for (; p->status != 255; p++) {
@@ -117,24 +117,24 @@ void func_002E6D88(int mode)
     }
 
     if (mode == 0) {
-        state = gHeroState.mode ? 5 : 2;
-        music = gHeroState.mode ? 3 : 1;
-        LoadPartsSetFromDisc(music, 6);
+        state = g_hero_state.mode ? 5 : 2;
+        music = g_hero_state.mode ? 3 : 1;
+        load_parts_set_from_disc(music, 6);
     } else {
-        state = gHeroState.mode ? 3 : 0;
-        music = gHeroState.mode ? 2 : 0;
-        if (!gHeroMoby_00152C00.active)
+        state = g_hero_state.mode ? 3 : 0;
+        music = g_hero_state.mode ? 2 : 0;
+        if (!g_hero_moby_default.active)
             state++;
-        channel = gHeroMoby_00152C00.active ? 0 : 2;
-        LoadPartsSetFromDisc(music, channel);
+        channel = g_hero_moby_default.active ? 0 : 2;
+        load_parts_set_from_disc(music, channel);
     }
 
-    gMusicState.state = state + 5000;
-    gMusicState.next = 0;
-    SelectSegmentAndUpdateWorld(0);
-    while (gMusicState.phase != 3 || gMusicState.limit >= 6000) {
+    g_music_state.state = state + 5000;
+    g_music_state.next = 0;
+    load_select_segment_update_world(0);
+    while (g_music_state.phase != 3 || g_music_state.limit >= 6000) {
         UpdateSoundVoices();
-        GetGsCurrentField(0);
+        sceGsSyncV(0);
     }
-    ResumeMusicStream();
+    snd_resume_music_stream();
 }

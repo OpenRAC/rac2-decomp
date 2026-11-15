@@ -36,39 +36,39 @@ typedef struct {
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 
 extern int D_L04_001B08F0 __attribute__((sda));
-extern float func_00283248(float,float);
-extern float func_00283B98(float,float);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern float func_00282C48(float);
-extern float func_00283BE0(float,float);
-extern float func_002AA898(void *,float,void *,float,float,float,int);
-extern char *D_L04_001B24DC;
+extern float mat_fast_helper_a(float,float);
+extern float FastAddRotations(float,float);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern float math_fabs(float);
+extern float fast_subtract_rotations(float,float);
+extern float math_approach_with_velocity(void *,float,void *,float,float,float,int);
+extern char *g_moby_l04_pool;
 extern float D_0018C2D8 NOT_SDA;
 extern float D_00138288 NOT_SDA;
 extern float D_0018A138 NOT_SDA;
 /* Read as D_001A7A40[1]: an sda array at a nonzero offset is one unsplit lui+lbu pair. */
 extern unsigned char D_001A7A40[] __attribute__((sda));
 extern unsigned char D_00139605 NOT_SDA;
-extern int D_L04_001A8FE8 __attribute__((sda));
+extern int g_race_time_ticks __attribute__((sda));
 extern Object1006 *D_L04_001B08F4 __attribute__((sda));
 extern void func_002A05A8(void *);
 extern void func_002A0F48(void *);
-extern void func_002A7470(void *,int,int,int);
-extern void func_00282948(void *);
-extern void func_00282CF0(void *,void *,void *);
+extern void anim_start_blended(void *,int,int,int);
+extern void math_fast_float_d(void *);
+extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
-extern void func_002AEC48(void *,void *,int,float,float);
-extern void *func_0029EFD0(int);
-extern void func_002B37E8(void *,void *);
-extern void func_002AF1D0(void *,void *,int,int);
-extern void func_0029FC20(void *,int,void *);
-extern void func_002A91F0(void *,void *);
-extern void func_L04_0040C368(void *);
-extern void func_L04_00416390(char *,void *,void *,float);
+extern void moby_update_eased_node(void *,void *,int,float,float);
+extern void *CreateMoby(int);
+extern void moby_init_child_from_parent(void *,void *);
+extern void moby_copy_joint_transform_to_object(void *,void *,int,int);
+extern void moby_transform_joint_point(void *,int,void *);
+extern void mat_build_rotation_from_angles(void *,void *);
+extern void racer_spawn_exhaust_effects(void *);
+extern void EmitTrailEffects(char *,void *,void *,float);
 
 /* Animates the racer bike and its rider each frame: leans the bike in turns, plays the rider animations, positions the second effect object and updates the trail effects. */
-void func_L04_004167B0(char *moby,char *vars) {
+void racer_update_bike_animation(char *moby,char *vars) {
  float v[4] __attribute__((aligned(16)));
  float matrix[16] __attribute__((aligned(16)));
  float speedSum,leanSquared,speedBlend,target,scale,leanCurve,angle,period=0.5f; Object1006 *obj;
@@ -78,11 +78,11 @@ void func_L04_004167B0(char *moby,char *vars) {
  leanSquared=F(vars,0x308)*13.750985f;
  speedBlend=speedSum*3.0f;
  leanCurve=F(vars,0x308)*22.918308f;
- leanSquared*=FloatAbs(leanSquared);
+ leanSquared*=math_fabs(leanSquared);
  leanCurve=1.0f-(1.0f-leanCurve)*(1.0f-leanCurve);
  if(speedBlend>1.0f) speedBlend=1.0f;
  if(F(vars,0x4c8)!=0.0f) {
-  if(FloatAbs(F(moby,0xf0)-F(vars,0x4c8))<0.003f) F(vars,0x4c8)=0;
+  if(math_fabs(F(moby,0xf0)-F(vars,0x4c8))<0.003f) F(vars,0x4c8)=0;
   scale=5.0f;
   target=F(vars,0x4c8);
  } else {
@@ -93,8 +93,8 @@ void func_L04_004167B0(char *moby,char *vars) {
   target*=-0.52359885f;
   if(B(moby,0x20)!=3 && D_0018C2D8<0.2f) target=0;
  }
- ApproachWithVelocity(moby+0xf0,target,vars+0x300,scale*0.035f,0.45f,scale*0.027634384f,0);
- obj=(Object1006 *)(gMobyPool_L04+(I(vars,0x1dc)<<8));
+ math_approach_with_velocity(moby+0xf0,target,vars+0x300,scale*0.035f,0.45f,scale*0.027634384f,0);
+ obj=(Object1006 *)(g_moby_l04_pool+(I(vars,0x1dc)<<8));
  if(obj) {
   obj->scale=obj->model->scale*0.25f;
   obj->opacity=127; obj->enabled=1;
@@ -102,28 +102,28 @@ void func_L04_004167B0(char *moby,char *vars) {
   obj->state=0;
   func_002A05A8(obj);func_002A0F48(obj);
   obj->flags|=6;
-  if((obj->flags60&2) && (unsigned)(obj->animState-2)<4) StartAnimationBlended(obj,0,0,3);
+  if((obj->flags60&2) && (unsigned)(obj->animState-2)<4) anim_start_blended(obj,0,0,3);
   if(!I(vars,0x36c)) {
-   if(H(vars,0x274) && (obj->anim==0 || obj->anim==2)) StartAnimationBlended(obj,1,0,12);
+   if(H(vars,0x274) && (obj->anim==0 || obj->anim==2)) anim_start_blended(obj,1,0,12);
    if(!H(vars,0x274) && obj->anim==1) {
-    if(H(vars,0x276)>=16) StartAnimationBlended(obj,2,0,3);
-    else StartAnimationBlended(obj,0,0,6);
+    if(H(vars,0x276)>=16) anim_start_blended(obj,2,0,3);
+    else anim_start_blended(obj,0,0,6);
    }
-  } else FastFloatHelperD(vars+0x36c);
+  } else math_fast_float_d(vars+0x36c);
   if(obj->anim<2) {
    obj->animSpeed=F(vars,0x30c)*3.0f/period;
    if(F(vars,0x30c)>0.33333334f) obj->animSpeed*=3.0f;
   }
   if(B(moby,0xbc)==5) {
    F(vars,0x428)=D_00138288*-0.5f;
-   F(vars,0x424)=FloatAbs(F(moby,0xf0))*-0.6f-F(moby,0xf4);
+   F(vars,0x424)=math_fabs(F(moby,0xf0))*-0.6f-F(moby,0xf4);
   } else { F(vars,0x424)=F(vars,0x428)=0; }
-  if(P(vars,0x3b0) && gRaceTimeTicks>=121) {
+  if(P(vars,0x3b0) && g_race_time_ticks>=121) {
    FastVecSub(v,(char *)P(vars,0x3b0)+0x10,moby+0x10);
    if(func_L00_002EE290(v)<9.0f) {
-    angle=FastMatrixHelperA(v[0],v[1]);
+    angle=mat_fast_helper_a(v[0],v[1]);
     angle=fast_subtract_rotations(F(moby,0xf8),angle);
-    if(FloatAbs(angle)<1.5707964f) {
+    if(math_fabs(angle)<1.5707964f) {
      if(I(vars,0x3b4)<180) { I(vars,0x424)=0; F(vars,0x428)=-angle; }
      I(vars,0x3b4)++;
     }
@@ -131,17 +131,17 @@ void func_L04_004167B0(char *moby,char *vars) {
    }
   }
   if(D_001A7A40[1]) F(vars,0x430)=2.5f; else F(vars,0x430)=1.0f;
-  UpdateEasedNode(obj,vars+0x3c0,0,0.08f,0.5f);
+  moby_update_eased_node(obj,vars+0x3c0,0,0.08f,0.5f);
   if(!D_L04_001B08F4) {
    if(D_00139605) D_L04_001B08F4=CreateMoby(0x12df /* moby class 4831 */); else D_L04_001B08F4=CreateMoby(0x50a /* moby class 1290 */);
    if(D_L04_001B08F4) {
-    InitChildObjectFromParent(D_L04_001B08F4,obj);
+    moby_init_child_from_parent(D_L04_001B08F4,obj);
     D_L04_001B08F4->scale=D_L04_001B08F4->model->scale*0.25f;
     D_L04_001B08F4->flags|=0x106;
    }
   } else {
-   CopyJointTransformToObject(obj,D_L04_001B08F4,1,0);
-   TransformMobyJointPoint(obj,1,matrix);
+   moby_copy_joint_transform_to_object(obj,D_L04_001B08F4,1,0);
+   moby_transform_joint_point(obj,1,matrix);
    FastVecScale(v,matrix+8,-0.03f);
    FastVecAdd((char *)D_L04_001B08F4+0x10,(char *)D_L04_001B08F4+0x10,v);
    qcopy_nc((char *)D_L04_001B08F4+0xc0,matrix);
@@ -155,6 +155,6 @@ void func_L04_004167B0(char *moby,char *vars) {
    EmitTrailEffects(moby,matrix,vars+0x290,F(vars,0x30c)+F(vars,0x27c));
   }
   F(vars,0x6c0)=FastAddRotations(F(vars,0x6c0),(F(vars,0x30c)+F(vars,0x27c)*4.0f)*0.2f+0.01f);
-  BuildRotationFromAngles(vars+0x450,vars+0x6c0);
-  SpawnRacerExhaustEffects(moby);
+  mat_build_rotation_from_angles(vars+0x450,vars+0x6c0);
+  racer_spawn_exhaust_effects(moby);
 }

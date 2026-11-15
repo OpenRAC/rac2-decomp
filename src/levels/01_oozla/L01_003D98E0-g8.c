@@ -1,30 +1,30 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef float Vec[4] __attribute__((aligned(16)));
-extern float func_L01_003BAFB0(void);
-extern void func_0026FEB8(const char *, ...);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00282C48(float);
-extern void func_00282FB8(void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern float func_002AA898(float *position, float target, float *velocity, float acceleration, float damping, float limit, int direction);
-extern void func_L01_00316C48(void *, void *, void *, void *, void *);
-extern int func_002A8600(void *, int, int, int);
-extern int func_002A86E8(void *, void *, int, int);
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_002AEF28(void *, void *, void *, float, float, float);
-extern float func_00283B98(float, float);
-extern void func_L01_003D9830(void *);
-extern int func_00282948(void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
-extern u8 *D_L01_001B255C __attribute__((sda));
+extern float level_get_water_height(void);
+extern void STUB_printf(const char *, ...);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float FastVecLength(void *);
+extern float vec_distance_xy(void *, void *);
+extern float math_fabs(float);
+extern void vec_fast_divide_helper(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern float math_approach_with_velocity(float *position, float target, float *velocity, float acceleration, float damping, float limit, int direction);
+extern void mat_transform_offset_two_matrices(void *, void *, void *, void *, void *);
+extern int GetFirstMobyInGroup(void *, int, int, int);
+extern int GetNextMobyInGroup(void *, void *, int, int);
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
+extern float FastAddRotations(float, float);
+extern void platform_sink_when_hit(void *);
+extern int math_fast_float_d(void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
+extern u8 *g_moby_l01_table __attribute__((sda));
 typedef struct {
     u8 pad00[0x30];
     Vec position;
@@ -39,7 +39,7 @@ typedef struct {
     u8 pad340[0x34E - 0x340];
     s16 mode;
 } HeroView;
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern char D_L01_001B0800[];
 extern float D_L01_001B07A8 __attribute__((sda));
 extern float D_L01_001B07AC __attribute__((sda));
@@ -64,7 +64,7 @@ extern float D_L01_001B07F4 __attribute__((sda));
 extern float D_L01_001B07F8 __attribute__((sda));
 
 /* Floating platform. It bobs on the water, tilts under the hero and is pushed away from nearby platforms. */
-void func_L01_003D98E0(u8 *moby)
+void UpdateFloatingPlatform(u8 *moby)
 {
     Vec oldPos,oldRot,anchor,target,delta,prevRot,prevPos,out;
     u8 *vars=*(u8 **)(moby+0x68);
@@ -74,7 +74,7 @@ void func_L01_003D98E0(u8 *moby)
     float *fieldD0,*fieldD4,*fieldD8,*fieldDC;
     qcopy_nc(oldPos,moby+0x10);
     qcopy_nc(oldRot,moby+0xF0);
-    height=GetWaterHeight();
+    height=level_get_water_height();
     if(moby[0x20]!=0 && *(float *)(vars+0xB8)+5.0f<height) return;
     switch(moby[0x20]) {
     case 0:
@@ -82,14 +82,14 @@ void func_L01_003D98E0(u8 *moby)
             if(*(int *)(vars+0xC0)==-1) {
                 STUB_printf(D_L01_001B0800,*(s16 *)(moby+0xAA),*(s16 *)(moby+0xB2));
                 *(int *)(vars+0xC8)=0;
-                MarkMobySpawned(moby);
+                moby_mark_spawned(moby);
                 return;
             }
-            *(u8 **)(vars+0xC8)=gMobyTable_L01+(*(int *)(vars+0xC0)<<8);
+            *(u8 **)(vars+0xC8)=g_moby_l01_table+(*(int *)(vars+0xC0)<<8);
             qcopy(vars+0x90,moby+0xF0);
             qzero(vars+0xA0);
             qcopy(vars+0xB0,moby+0x10);
-            SetMobyState(moby,1,-1);
+            moby_set_state(moby,1,-1);
         }
         break;
     case 1: {
@@ -107,9 +107,9 @@ void func_L01_003D98E0(u8 *moby)
         anchor[2]=*(float *)(moby+0x18);
         vec_scale_to_length(target,*(u8 **)(vars+0xC8)+0xC0,5.0f);
         FastVecAdd(target,target,*(u8 **)(vars+0xC8)+0x10);
-        if(((HeroView *)gHeroState)->mode==0 && ((HeroView *)gHeroState)->platform==moby) {
+        if(((HeroView *)g_hero_state)->mode==0 && ((HeroView *)g_hero_state)->platform==moby) {
             float dotX,dotY,y,x,scale;
-            FastVecSub(delta,((HeroView *)gHeroState)->position,moby+0x10);
+            FastVecSub(delta,((HeroView *)g_hero_state)->position,moby+0x10);
             dotX=FastVecDot(delta,moby+0xC0);
             dotY=FastVecDot(delta,moby+0xD0);
             scale=D_L01_001B07A8;
@@ -117,12 +117,12 @@ void func_L01_003D98E0(u8 *moby)
             x=scale*dotX;
             *(Quad *)prevRot=*(Quad *)(vars+0x90);
             *(Quad *)prevPos=*(Quad *)(moby+0x10);
-            ApproachWithVelocity((float *)(vars+0x90),y,(float *)(vars+0xA0),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
-            ApproachWithVelocity((float *)(vars+0x94),x,(float *)(vars+0xA4),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
-            TransformOffsetByTwoMatrices(((HeroView *)gHeroState)->position,out,moby+0x10,prevRot,vars+0x90);
+            math_approach_with_velocity((float *)(vars+0x90),y,(float *)(vars+0xA0),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x94),x,(float *)(vars+0xA4),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
+            mat_transform_offset_two_matrices(((HeroView *)g_hero_state)->position,out,moby+0x10,prevRot,vars+0x90);
         } else {
-            ApproachWithVelocity((float *)(vars+0x90),0.0f,(float *)(vars+0xA0),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
-            ApproachWithVelocity((float *)(vars+0x94),0.0f,(float *)(vars+0xA4),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x90),0.0f,(float *)(vars+0xA0),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x94),0.0f,(float *)(vars+0xA4),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
             other=*(u8 **)(vars+0xC8);
             if(other!=0 && other[0x20]!=0xFE && other[0x20]!=0xFD && other[0x95]>=2) {
                 float dist,dist2;
@@ -137,11 +137,11 @@ void func_L01_003D98E0(u8 *moby)
                     if(falloff>1.0f) falloff=1.0f;
                     else if(falloff<0.0f) falloff=0.0f;
                     vec_scale_to_length(delta,delta,dist*falloff);
-                    FastVectorDivideHelper(delta,delta,D_L01_001B07D4*(1.0f/60.0f));
+                    vec_fast_divide_helper(delta,delta,D_L01_001B07D4*(1.0f/60.0f));
                     anchorDistance=vec_distance_xy(*(u8 **)(vars+0xC8)+0x10,anchor);
                     FastVecSub(prevRot,moby+0x10,anchor);
                     d=FastVecLength(prevRot)-anchorDistance;
-                    d=d/FloatAbs(d);
+                    d=d/math_fabs(d);
                     d*=1.0f/60.0f;
                     vec_scale_to_length(prevRot,prevRot,(D_L01_001B07D8*d)*falloff);
                     FastVecAdd(moby+0x10,moby+0x10,prevRot);
@@ -153,7 +153,7 @@ void func_L01_003D98E0(u8 *moby)
         fieldD8=(float *)(vars+0xD8);
         FastVecScale(delta,delta,D_L01_001B07CC);
         fieldDC=(float *)(vars+0xDC); fieldD0=(float *)(vars+0xD0);
-        FastVectorDivideHelper(delta,delta,D_L01_001B07D0*(1.0f/60.0f));
+        vec_fast_divide_helper(delta,delta,D_L01_001B07D0*(1.0f/60.0f));
         fieldD4=(float *)(vars+0xD4);
         FastVecAdd(moby+0x10,moby+0x10,delta);
         limit=vec_distance_xy(moby+0x10,*(u8 **)(vars+0xC8)+0x10);
@@ -174,7 +174,7 @@ void func_L01_003D98E0(u8 *moby)
                 if(falloff>1.0f) falloff=1.0f;
                 else if(falloff<0.0f) falloff=0.0f;
                 vec_scale_to_length(delta,delta,dist*falloff);
-                FastVectorDivideHelper(delta,delta,D_L01_001B07E4*(1.0f/60.0f));
+                vec_fast_divide_helper(delta,delta,D_L01_001B07E4*(1.0f/60.0f));
                 if(limit<dist2) {
                     float radius;
                     FastVecSub(cursor+0x10,cursor+0x10,delta);
@@ -204,23 +204,23 @@ void func_L01_003D98E0(u8 *moby)
             }
         }
         *(float *)(moby+0x18)=height;
-        UpdateWrappedAngleOffset(moby,fieldD8,fieldDC,0.08f,0.008726648055016994f,-1.0f);
-        ScaleOwnerWordsByAngles(moby,fieldD0,fieldD4,0.04363323748111725f,0.007272206246852875f,0.00901753549f);
+        math_update_wrapped_angle_offset(moby,fieldD8,fieldDC,0.08f,0.008726648055016994f,-1.0f);
+        moby_scale_owner_words_by_angles(moby,fieldD0,fieldD4,0.04363323748111725f,0.007272206246852875f,0.00901753549f);
         *(float *)(moby+0xF0)=FastAddRotations(*(float *)(vars+0x90),*(float *)(moby+0xF0));
         *(float *)(moby+0xF4)=FastAddRotations(*(float *)(vars+0x94),*(float *)(moby+0xF4));
-        SinkPlatformWhenHit(moby);
+        platform_sink_when_hit(moby);
         break;
     }
     case 2:
         if(height-D_L01_001B07F0<*(float *)(moby+0x18)) *(float *)(moby+0x18)-=D_L01_001B07F4*(1.0f/60.0f);
-        if(FastFloatHelperD(vars+0xC4)) SetMobyState(moby,3,-1);
+        if(math_fast_float_d(vars+0xC4)) moby_set_state(moby,3,-1);
         break;
     case 3:
         if(*(float *)(moby+0x18)<height) {
             *(float *)(moby+0x18)+=D_L01_001B07F8*(1.0f/60.0f);
             if(height<*(float *)(moby+0x18)) {
                 *(float *)(moby+0x18)=height;
-                SetMobyState(moby,1,-1);
+                moby_set_state(moby,1,-1);
             }
         }
         break;
@@ -236,6 +236,6 @@ void func_L01_003D98E0(u8 *moby)
     if(*(float *)(moby+0x18)>1013.0f) *(float *)(moby+0x18)=1013.0f;
     if(moby[0x20]!=2) {
         FastVecSub(anchor,moby+0x10,oldPos);
-        CombineTransformsAndStore(vars+0x50,anchor,oldRot,moby+0xF0);
+        mat_combine_and_store(vars+0x50,anchor,oldRot,moby+0xF0);
     }
 }

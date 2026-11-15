@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "common.h"
-extern float func_002A78D8(float, float);
+extern float math_random_signed_float_range(float, float);
 /* Copy the xyz components and clear the fourth word. Adapted from RAC1. */
 static __inline__ void particle_copy_xyz(float *dst, float *src)
 {
@@ -9,15 +9,15 @@ static __inline__ void particle_copy_xyz(float *dst, float *src)
     dst[2] = src[2];
     *(int *)&dst[3] = 0;
 }
-extern void func_002ACB48(void *, float);
-extern float func_00282E80(void *, void *);
-extern void func_002A8F70(void *, int, int, void *, void *, float);
-extern int func_00277F48(float, void *, int, int, int);
-extern char *func_002C2A88(void *, int, int, int, int, int, int, float, float);
-extern char *func_002C56B0(void *, int, int, int, int, int, int, float, float);
+extern void vec_add_random_offset(void *, float);
+extern float vec_distance_xy(void *, void *);
+extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern int coll_process_hit(float, void *, int, int, int);
+extern char *part_spawn_debris(void *, int, int, int, int, int, int, float, float);
+extern char *part_spawn_debris_two_mode(void *, int, int, int, int, int, int, float, float);
 extern unsigned char *D_001F2628;
 extern char *D_001B1D90[] __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
 typedef struct {
     char pad00[0x88];
@@ -31,19 +31,19 @@ typedef struct {
     void *owner;
 } ParticleHero2C58A8;
 
-extern char *func_002C3F88(int,void *,float,float,int,int,int,void *);
-extern void func_00283410(void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00283098(void *,void *,void *);
-extern int D_001B1688[] __attribute__((sda));
-extern int func_00283D38(int,int,float);
-extern float func_00282E48(void *,void *);
-extern void func_002AE730(float *,int *);
-extern void func_002AE838(void *,void *);
-extern void func_00282D08(void *,void *,void *,float);
+extern char *part_spawn_owned_spark(int,void *,float,float,int,int,int,void *);
+extern void euler_to_matrix(void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern int g_game_time[] __attribute__((sda));
+extern int FastTweenColor(int,int,float);
+extern float fast_vec_dist(void *,void *);
+extern void vec_pack_direction(float *,int *);
+extern void vec_decode_byte_color(void *,void *);
+extern void lerp_vector(void *,void *,void *,float);
 extern char D_00189F00[];
 
-extern char *func_002C5B70(void *, void *, int, int);
+extern char *part_spawn_smoke_alt(void *, void *, int, int);
 typedef unsigned int U128 __attribute__((mode(TI)));
 typedef union { U128 q; f32 f[4]; } SplitVector;
 typedef struct {
@@ -81,30 +81,30 @@ typedef struct { SplitVector v; void *f10; s32 f14; s32 f18; f32 f1C; s32 f20; c
 typedef struct { SplitVector v; f32 x10; s16 h14; s16 h16; u8 b18; u8 pad[3]; s32 x1C; } FadeSplitMotion;
 typedef struct { u8 pad[2]; u8 b2; u8 pad3; u32 x4; u8 b8; u8 pad9; s16 hA; f32 fC; SplitVector pos; FadeSplitMotion e; } FadeSplitParticle;
 typedef struct { SplitVector v; s32 x10; s32 x14; u8 pad[4]; f32 x1C; s32 x20; } FadeSplitCollision;
-extern char *func_002C02F0(void *, void *, int, void *, int, int);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_00283028(void *, void *, void *);
-extern void func_00282C88(void *);
+extern char *part_spawn_scaled_smoke(void *, void *, int, void *, int, int);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void vec_fast_normalize(void *, void *, void *);
+extern void vec_clear_128(void *);
 extern float D_001BAFC0[];
 extern unsigned char *D_001F25F4, *D_001F26A8;
-extern int func_002A9568(int, int, float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_002A7940(void);
-extern int func_002AAE98(float, float, float, float);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
+extern int moby_forward_two_values_and_amount(int, int, float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_random_angle(void);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
 extern unsigned char *D_001F2570;
 extern unsigned char *D_001F2688;
-extern int func_002A8860(void *, int);
-extern void func_0029FCC0(void *, int, void *);
+extern int moby_decrement_top_byte(void *, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
 
 /* Qwen draft (branch qwen/autonomy, c8b09022), checked by tools/check.py */
-void func_002B9180(void *);
+void part_kill(void *);
 
-int func_00282978(short *);
+int FastDecTimer(short *);
 
 extern int func_00282978_9(char *p);
 
@@ -237,27 +237,27 @@ extern int Fc3cb9262_FUN_00282978(char *a);
 extern void Fc3cb9262_FUN_002B9180(char *a);
 
 /* Frees a particle when its lifetime timer runs out. */
-void func_002BF6F0(void *particle)
+void part_free_when_expired(void *particle)
 {
   int expired;
 
   expired = FastDecTimer((short *)((char *)particle + 10));
   if (expired != 0) {
-    KillParticle(particle);
+    part_kill(particle);
   }
   return;
 }
 
 /* func_002BF728 uses the quadword-copy profile in 002BF728-qcopy.c. */
 
-extern int func_002A77E0(int);
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00282E20(void *);
-extern void func_00282F70(char *, char *, float);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00283B98(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern int math_random_int_below(int);
+extern void FastVecAdd(char *, char *, char *);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(char *, char *, float);
+extern void ApproachValue(float *, float, float);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern float D_001B5358;
 
 /* Advances one object: the halfword at offset 10 is capped at 12 and, when the
@@ -267,7 +267,7 @@ extern float D_001B5358;
    sub-object's float at 0x3C, the object's vector is moved by the sub-object's
    motion triple and the last pair of floats is written back from the angle
    kept in the sub-object. */
-void func_002BF8F0(char *self)
+void part_update_smoke_wisp(char *self)
 {
     char *motion = self + 0x20;
     float vec[3];
@@ -279,7 +279,7 @@ void func_002BF8F0(char *self)
     unsigned int packed;
 
     if (FastDecTimer((short *)(self + 0xA)) != 0) {
-        KillParticle(self);
+        part_kill(self);
         return;
     }
     f1 = *(float *)(self + 0x18);
@@ -290,7 +290,7 @@ void func_002BF8F0(char *self)
         }
     }
     if (*(float *)(motion + 0x10) < *(float *)(self + 0x18) + 8.6666667461395263671875e-01f) {
-        if (RandomIntBelow(20) == 0) {
+        if (math_random_int_below(20) == 0) {
             if (*(short *)(self + 0xA) >= 13) {
                 *(short *)(self + 0xA) = 12;
             }
@@ -311,7 +311,7 @@ void func_002BF8F0(char *self)
     vec[1] = *(float *)(motion + 4);
     vec[2] = *(float *)(motion + 8);
     f0 = vec_length_xy((void *)vec);
-    FastVectorNormalizeHelper((char *)vec, (char *)vec, f0 * 9.7000002861022949218750e-01f);
+    vec_fast_normalize_helper((char *)vec, (char *)vec, f0 * 9.7000002861022949218750e-01f);
     FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
     ApproachValue(&vec[2], 2.1666666492819786071777e-02f, 1.3888889225199818611145e-03f);
     *(float *)(motion + 4) = vec[1];
@@ -320,28 +320,28 @@ void func_002BF8F0(char *self)
     f0 = FastAddRotations(*(float *)(motion + 0x14), *(float *)(motion + 0x18));
     *(float *)(motion + 0x14) = f0;
     angle = FastAddRotations(D_001B5358, 1.5707964897155761718750e+00f);
-    f3 = FastSinOrCosB(*(float *)(motion + 0x14));
+    f3 = math_fast_sin_or_cos_b(*(float *)(motion + 0x14));
     f2 = f3 * *(float *)(motion + 0x1C);
-    f0 = FastSinOrCosA(angle);
+    f0 = math_fast_sin_or_cos_a(angle);
     vec[0] = f0 * f2;
-    vec[1] = FastSinOrCosB(angle) * f2;
+    vec[1] = math_fast_sin_or_cos_b(angle) * f2;
     vec[2] = 0.0f;
     FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
 }
 
 
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_00278E78(void);
-extern void *func_002C19D8(void *, float, void *, float, int);
-extern void func_002C3D80(void *, int, float, float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int GetCollHitMaterial(void);
+extern void *part_spawn_drifting(void *, float, void *, float, int);
+extern void part_spawn_puff(void *, int, float, float);
 typedef union { unsigned char b[0x2600]; int i[0x980]; float f[0x980]; } L_BFC50Hero;
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern void *D_001A9E74 __attribute__((section(".sdata")));
-extern float D_001BAF80[];
+extern float g_collision_hit[];
 extern char D_001BAFA0[];
 
 /* Moves a falling spark and checks if it hits something. On a hit it makes a small splash and removes the spark, otherwise it keeps falling and fades. */
-void func_002BFC50(char *self)
+void part_update_falling_spark(char *self)
 {
     char *motion = self + 0x20;
     float vec[4] __attribute__((aligned(16)));
@@ -355,18 +355,18 @@ void func_002BFC50(char *self)
             goto copy;
         }
         if (GetCollHitMaterial() == 0) {
-            SpawnDriftingParticle_002C19D8(D_001BAFA0, 0.2f, D_001A9E74, 5250.0f, -1);
+            part_spawn_drifting(D_001BAFA0, 0.2f, D_001A9E74, 5250.0f, -1);
         }
-        KillParticle(self);
+        part_kill(self);
         return;
     } else if (state == 3) {
         FastVecAdd(self + 0x10, self + 0x10, motion);
-        if (*(float *)(self + 0x18) < ((L_BFC50Hero *)gHeroState)->f[0x330 / 4]) {
+        if (*(float *)(self + 0x18) < ((L_BFC50Hero *)g_hero_state)->f[0x330 / 4]) {
             void *t = D_001A9E74;
 
-            *(float *)(self + 0x18) = ((L_BFC50Hero *)gHeroState)->f[0x330 / 4];
-            SpawnDriftingParticle_002C19D8(self + 0x10, 0.2f, t, 5250.0f, -1);
-            KillParticle(self);
+            *(float *)(self + 0x18) = ((L_BFC50Hero *)g_hero_state)->f[0x330 / 4];
+            part_spawn_drifting(self + 0x10, 0.2f, t, 5250.0f, -1);
+            part_kill(self);
             return;
         }
     } else {
@@ -375,10 +375,10 @@ void func_002BFC50(char *self)
             goto copy;
         }
         if (GetCollHitMaterial() != 0) {
-            gCollisionHit[10] = gCollisionHit[10] + 0.05f;
-            SpawnPuffParticle_002C3D80(&gCollisionHit[8], -1, 0.25f, 3150.0f);
+            g_collision_hit[10] = g_collision_hit[10] + 0.05f;
+            part_spawn_puff(&g_collision_hit[8], -1, 0.25f, 3150.0f);
         }
-        KillParticle(self);
+        part_kill(self);
         return;
 copy:
         qcopy(self + 0x10, vec);
@@ -388,23 +388,23 @@ copy:
     if (--*(int *)(motion + 0x14) <= 0 || *(float *)(self + 0x18) < *(float *)(motion + 0x18)) {
         *(int *)(self + 4) = *(int *)(self + 4) - 0x10000000;
         if (*(int *)(self + 4) < 0) {
-            KillParticle(self);
+            part_kill(self);
         }
     }
 }
 
 /* func_002BFE80 is defined in 002BFE80-dbg.c. */
 
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_L00_0031C998(int, int, float);
-extern float D_001B5340[];
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int math_lerp_int_fraction(int, int, float);
+extern float g_camera_eye_state[];
 extern int abs(int);
 
 /* Slides a particle along a smoothed velocity and blends its color by how much life is left. It is removed when its timer ends. */
-void func_002BFFE8(char *self)
+void part_update_smoothed_drift(char *self)
 {
     char *motion = self + 0x20;
     float vec[4];
@@ -412,10 +412,10 @@ void func_002BFFE8(char *self)
     float ratio;
 
     if (FastDecTimer((short *)(self + 0xA)) != 0) {
-        KillParticle(self);
+        part_kill(self);
         return;
     }
-    FastVecSub(vec, gCameraState_001B5340, motion);
+    FastVecSub(vec, g_camera_eye_state, motion);
     if (FastVecLength(vec) > 5.0f) {
         vec_scale_to_length(vec, vec, 1.25f);
     } else {
@@ -424,7 +424,7 @@ void func_002BFFE8(char *self)
     FastVecAdd((char *)(self + 0x10), motion, (char *)vec);
     delta = abs(*(short *)(self + 0xA) - *(int *)(motion + 0x14));
     ratio = (float)(*(int *)(motion + 0x14) - delta) / (float)*(int *)(motion + 0x14);
-    *(int *)(self + 4) = LerpIntegerFraction(0, *(int *)(motion + 0x10), ratio);
+    *(int *)(self + 4) = math_lerp_int_fraction(0, *(int *)(motion + 0x10), ratio);
 }
 
 
@@ -434,7 +434,7 @@ void func_002BFFE8(char *self)
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates a bouncing spark that can split in two, bounces off walls, shrinks and fades, and is removed when it is used up. */
-void func_002C04C0(SplitParticle *p) {
+void part_update_splitting_spark(SplitParticle *p) {
     SplitVector v0u;
     SplitVector v1u;
     SplitCollision collision;
@@ -458,27 +458,27 @@ void func_002C04C0(SplitParticle *p) {
         sc = 0.2f;
         p->f0C = p->f0C * 0.8f;
         zero = 0.0f;
-        f = RandomFloatRange(lo, hi);
+        f = math_random_float_range(lo, hi);
         nsp = -sp;
         func_00282D30_12((char *)v0u.f, (char *)pv, f);
-        v1u.f[0] = p->posv.f[0] + RandomFloatRange(nsp, sp);
-        v1u.f[1] = p->posv.f[1] + RandomFloatRange(nsp, sp);
-        v1u.f[2] = p->posv.f[2] + RandomFloatRange(nsp, sp);
-        v0u.f[0] = v0u.f[0] + RandomFloatRange(-p->pv.x * sc, p->pv.x * sc);
-        v0u.f[1] = v0u.f[1] + RandomFloatRange(-pv->y * sc, pv->y * sc);
-        v0u.f[2] = v0u.f[2] + RandomFloatRange(-pv->z * sc, zero);
-        child = (SplitParticle *)SpawnScaledSmokeParticle(v1u.f, v0u.f, (pv->f18 & 0x10) | 0x88, pv->f1C, (u8)pv->pad19[0], 128);
+        v1u.f[0] = p->posv.f[0] + math_random_float_range(nsp, sp);
+        v1u.f[1] = p->posv.f[1] + math_random_float_range(nsp, sp);
+        v1u.f[2] = p->posv.f[2] + math_random_float_range(nsp, sp);
+        v0u.f[0] = v0u.f[0] + math_random_float_range(-p->pv.x * sc, p->pv.x * sc);
+        v0u.f[1] = v0u.f[1] + math_random_float_range(-pv->y * sc, pv->y * sc);
+        v0u.f[2] = v0u.f[2] + math_random_float_range(-pv->z * sc, zero);
+        child = (SplitParticle *)part_spawn_scaled_smoke(v1u.f, v0u.f, (pv->f18 & 0x10) | 0x88, pv->f1C, (u8)pv->pad19[0], 128);
         if (child != 0) {
             child->h0A = 2;
             child->f0C = p->f0C;
         }
-        func_00282D30_12((char *)pv, (char *)pv, RandomFloatRange(lo, hi));
-        p->pv.x = p->pv.x + RandomFloatRange(-p->pv.x * sc, p->pv.x * sc);
-        pv->y = pv->y + RandomFloatRange(-pv->y * sc, pv->y * sc);
-        pv->z = pv->z + RandomFloatRange(-pv->z * sc, zero);
-        p->posv.f[0] = p->posv.f[0] + RandomFloatRange(nsp, sp);
-        p->posv.f[1] = p->posv.f[1] + RandomFloatRange(nsp, sp);
-        p->posv.f[2] = p->posv.f[2] + RandomFloatRange(nsp, sp);
+        func_00282D30_12((char *)pv, (char *)pv, math_random_float_range(lo, hi));
+        p->pv.x = p->pv.x + math_random_float_range(-p->pv.x * sc, p->pv.x * sc);
+        pv->y = pv->y + math_random_float_range(-pv->y * sc, pv->y * sc);
+        pv->z = pv->z + math_random_float_range(-pv->z * sc, zero);
+        p->posv.f[0] = p->posv.f[0] + math_random_float_range(nsp, sp);
+        p->posv.f[1] = p->posv.f[1] + math_random_float_range(nsp, sp);
+        p->posv.f[2] = p->posv.f[2] + math_random_float_range(nsp, sp);
     }
     table = D_001F2570;
     { int index = p->b02 - table[0];
@@ -502,13 +502,13 @@ void func_002C04C0(SplitParticle *p) {
         collision.f14 = 0x10001;
         collision.f1C = 1.0f;
         collision.v.q = *(U128 *)pv;
-        if (flags & 0x40) ClearVector128(&collision);
+        if (flags & 0x40) vec_clear_128(&collision);
         collision.f20 = 1;
         if (!(pv->f18 & 0x10)) hit = CollLine(v1u.f, v0u.f, 0, pv->f1C, &collision) != 0;
     }
     if (hit) {
         vec_scale_to_length(v2, D_001BAFC0, 1.0f);
-        FastVectorNormalize(pv, pv, D_001BAFC0);
+        vec_fast_normalize(pv, pv, D_001BAFC0);
         func_00282D30_12((char *)pv, (char *)pv, 0.02f);
         vec_scale_to_length(v2, D_001BAFC0, 0.055f);
         FastVecAdd((char *)p->posv.f, (char *)(D_001BAFC0 - 8), (char *)v2);
@@ -526,7 +526,7 @@ void func_002C04C0(SplitParticle *p) {
         p->f0C = n;
         if (n <= 0.0f) {
         kill:
-            KillParticle(p);
+            part_kill(p);
             return;
         }
     } else {
@@ -567,7 +567,7 @@ void func_002C04C0(SplitParticle *p) {
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates a fading spark that can split in two, bounces off surfaces, and fades out until it is removed. */
-void func_002C0E50(FadeSplitParticle *particle) {
+void part_update_fading_split_spark(FadeSplitParticle *particle) {
     SplitVector newVel, nextPos;
     FadeSplitCollision collision;
     FadeSplitMotion *motion = &particle->e;
@@ -582,25 +582,25 @@ void func_002C0E50(FadeSplitParticle *particle) {
         spread = particle->fC * 0.0000011111111462014378f;
         particle->fC *= 0.8f;
         negSpread = -spread;
-        func_00282D30_12((char *)&newVel, (char *)motion, RandomFloatRange(0.5f, 0.7f));
-        nextPos.f[0] = particle->pos.f[0] + RandomFloatRange(negSpread, spread);
-        nextPos.f[1] = particle->pos.f[1] + RandomFloatRange(negSpread, spread);
-        nextPos.f[2] = particle->pos.f[2] + RandomFloatRange(negSpread, spread);
-        newVel.f[0] += RandomFloatRange(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        newVel.f[1] += RandomFloatRange(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        newVel.f[2] += RandomFloatRange(-motion->v.f[2] * 0.2f, 0.0f);
-        child = (FadeSplitParticle *)SpawnSmokeParticle_002C0CC0((char *)&nextPos, (char *)&newVel, (motion->b18 & 0x10) | 0x88, motion->x1C);
+        func_00282D30_12((char *)&newVel, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        nextPos.f[0] = particle->pos.f[0] + math_random_float_range(negSpread, spread);
+        nextPos.f[1] = particle->pos.f[1] + math_random_float_range(negSpread, spread);
+        nextPos.f[2] = particle->pos.f[2] + math_random_float_range(negSpread, spread);
+        newVel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        newVel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        newVel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        child = (FadeSplitParticle *)part_spawn_smoke((char *)&nextPos, (char *)&newVel, (motion->b18 & 0x10) | 0x88, motion->x1C);
         if (child) {
             child->hA = 2;
             child->fC = particle->fC;
         }
-        func_00282D30_12((char *)motion, (char *)motion, RandomFloatRange(0.5f, 0.7f));
-        motion->v.f[0] += RandomFloatRange(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        motion->v.f[1] += RandomFloatRange(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        motion->v.f[2] += RandomFloatRange(-motion->v.f[2] * 0.2f, 0.0f);
-        particle->pos.f[0] += RandomFloatRange(negSpread, spread);
-        particle->pos.f[1] += RandomFloatRange(negSpread, spread);
-        particle->pos.f[2] += RandomFloatRange(negSpread, spread);
+        func_00282D30_12((char *)motion, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        motion->v.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        motion->v.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        motion->v.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        particle->pos.f[0] += math_random_float_range(negSpread, spread);
+        particle->pos.f[1] += math_random_float_range(negSpread, spread);
+        particle->pos.f[2] += math_random_float_range(negSpread, spread);
     }
     table = D_001F2570;
     { int index = particle->b2 - table[0];
@@ -617,14 +617,14 @@ void func_002C0E50(FadeSplitParticle *particle) {
     if (flags & 8) {
         if (!(particle->x4 & 0xFF000000)) goto kill;
         motion->b18 = flags | 8;
-        if (!RandomIntBelow(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
+        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
     } else {
         collision.x10 = motion->x1C;
         collision.x1C = 1.0f;
         collision.v.q = motion->v.q;
         collision.x14 = 1;
         collision.x20 = 1;
-        if (!RandomIntBelow(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
+        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
     }
     if (hit) motion->b18 |= 8;
     else qcopy(&particle->pos, &newVel);
@@ -633,7 +633,7 @@ void func_002C0E50(FadeSplitParticle *particle) {
         particle->fC -= 18055.5546875f;
         if (particle->fC <= 0.0f) {
         kill:
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
     } else {
@@ -665,7 +665,7 @@ void func_002C0E50(FadeSplitParticle *particle) {
 }
 
 /* Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float. */
-void func_002C1840(char *self)
+void part_update_color_packed(char *self)
 {
     float vec[4];
     float tmp[4];
@@ -726,20 +726,20 @@ typedef struct {
     float position[4];
     L_C19D8Payload payload;
 } L_C19D8Particle;
-extern void *func_002B9030(int);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
+extern void *part_alloc(int);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
 extern int func_001163B0(void);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *D_001F25F4;
 
 /* Creates a small drifting particle at a position with a random direction, a size, and an optional color. */
-void *func_002C19D8(void *position, float size, void *owner, float spin, int color)
+void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color)
 {
-    L_C19D8Particle *p = (L_C19D8Particle *)AllocParticle(0x2D);
+    L_C19D8Particle *p = (L_C19D8Particle *)part_alloc(0x2D);
     L_C19D8Payload *out;
     float angle;
     float speed;
@@ -748,7 +748,7 @@ void *func_002C19D8(void *position, float size, void *owner, float spin, int col
     if (p) {
         qcopy(p->position, position);
         if (color == -1) {
-            c = ((RandomIntBelow(6) + 0x14) << 24) | 0x808080;
+            c = ((math_random_int_below(6) + 0x14) << 24) | 0x808080;
         } else {
             c = color;
         }
@@ -758,13 +758,13 @@ void *func_002C19D8(void *position, float size, void *owner, float spin, int col
         p->b3 = 0x48;
         p->b1 = 1;
         p->b2 = *D_001F25F4;
-        p->seed = Rand();
+        p->seed = func_001163B0();
         p->size = 4;
         p->life = size * 210000.0f;
-        angle = RandomAngle();
-        speed = RandomFloatRange(0.0015f, 0.0025f);
-        p->payload.vx = FastSinOrCosA(angle) * speed;
-        out->vy = FastSinOrCosB(angle) * speed;
+        angle = math_random_angle();
+        speed = math_random_float_range(0.0015f, 0.0025f);
+        p->payload.vx = math_fast_sin_or_cos_a(angle) * speed;
+        out->vy = math_fast_sin_or_cos_b(angle) * speed;
         out->owner = owner;
         out->spin = spin;
         out->f8 = 0;
@@ -774,10 +774,10 @@ void *func_002C19D8(void *position, float size, void *owner, float spin, int col
 
 /* func_002C1B38 is in the -G8 sibling. */
 
-extern float func_00282C48(float);
+extern float math_fabs(float);
 
 /* Moves a spark, spins it slower and slower, and fades it out until its timer ends. */
-void func_002C1C88(char *self)
+void part_update_spinning_spark(char *self)
 {
     char *motion = self + 0x20;
     func_00282CC0_17(self + 0x10, self + 0x10, motion);
@@ -786,7 +786,7 @@ void func_002C1C88(char *self)
     *(float *)(motion + 0x10) += *(float *)(motion + 0x14);
     *(unsigned char *)(self + 8) = func_00283CF0_6(*(float *)(motion + 0x10));
     if (*(float **)(motion + 0x18)) {
-        if (FloatAbs(*(float *)(self + 0x18) - **(float **)(motion + 0x18)) < 0.2f)
+        if (math_fabs(*(float *)(self + 0x18) - **(float **)(motion + 0x18)) < 0.2f)
             *(float *)(self + 0x18) = **(float **)(motion + 0x18) + 0.02f;
     }
     if (--*(short *)(self + 0xA) == 0) {
@@ -794,13 +794,13 @@ void func_002C1C88(char *self)
         *(short *)(self + 0xA) = 1;
     }
     if ((*(unsigned int *)(self + 4) & 0xFF000000) == 0)
-        KillParticle(self);
+        part_kill(self);
 }
 
 extern void func_00282D30_fa(void *, void *, float);
 
 /* Slows a particle a little each frame, grows it, and fades it out until it disappears. */
-void func_002C1DB0(char *particle)
+void part_update_slowing_fade(char *particle)
 {
     char *particleCopy = particle;
     char *motion = particleCopy + 32;
@@ -813,24 +813,24 @@ void func_002C1DB0(char *particle)
     fadeValue = *(int *)(particleCopy + 4) + 0xFE000000;
     *(int *)(particleCopy + 4) = fadeValue;
     if (fadeValue < 0) {
-        KillParticle(particleCopy);
+        part_kill(particleCopy);
     }
 }
 
-extern void func_00282CC0(char *, char *, char *);
-extern float func_00283CE0(int);
-extern float func_00282C48(float);
-extern int func_00283D38(int, int, float);
+extern void FastVecAdd(char *, char *, char *);
+extern float IntToFloat(int);
+extern float math_fabs(float);
+extern int FastTweenColor(int, int, float);
 
 /* Moves a particle and blends its color over its lifetime. It is removed when its timer ends. */
-void func_002C1E50(char *obj) {
+void part_update_color_tween(char *obj) {
     char *tail = obj + 0x20;
     obj[8] += tail[0x1C];
     FastVecAdd(obj + 0x10, obj + 0x10, tail);
     *(int *)(obj + 4) = FastTweenColor(*(int *)(tail + 0x18), *(int *)(tail + 0x14),
-        FloatAbs(IntToFloat(*(short *)(obj + 0x0A)) * *(float *)(tail + 0x10) - 1.0f));
+        math_fabs(IntToFloat(*(short *)(obj + 0x0A)) * *(float *)(tail + 0x10) - 1.0f));
     if (FastDecTimer((short *)(obj + 0x0A)) != 0) {
-        KillParticle(obj);
+        part_kill(obj);
     }
 }
 
@@ -838,7 +838,7 @@ void func_002C1E50(char *obj) {
 /* func_002C1FC0 is defined in 002BF6F0-g8.c. */
 
 /* Slows a particle, lets it drift slowly, and fades it out until it is removed or its timer ends. */
-void func_002C2080(unsigned char *particle)
+void part_update_drifting_fade(unsigned char *particle)
 {
     float tmp[4];
     char *motion;
@@ -867,7 +867,7 @@ void func_002C2080(unsigned char *particle)
 }
 
 /* Tests the halfword at offset 10 through a helper; on zero it stores a scaled int at offset 4 and a 210000.0f-scaled interpolation of two floats at offset 12, otherwise calls a second helper. */
-void func_002C2170(char *particle)
+void part_update_size_tween(char *particle)
 {
     if (func_00282978_12((short *)(particle + 10)) != 0) {
         func_002B9180_19(particle);
@@ -881,7 +881,7 @@ void func_002C2170(char *particle)
 }
 
 /* Move a particle while tweening its size and alpha, then apply gravity. */
-void func_002C23B8(char *particle)
+void part_update_size_alpha_tween(char *particle)
 {
     char *motion = particle + 32;
     Vec16_F9a4b4d8b v;
@@ -917,20 +917,20 @@ void func_002C23B8(char *particle)
     if (*(float *)(particle + 16) < 2 || *(float *)(particle + 16) > 1021 ||
         *(float *)(particle + 20) < 2 || *(float *)(particle + 20) > 1021 ||
         *(float *)(particle + 24) < 2 || *(float *)(particle + 24) > 1021) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     if (FastDecTimer((short *)(particle + 10)))
-        KillParticle(particle);
+        part_kill(particle);
 }
 
-extern void func_002C96F8(float, float, void *, int *, float *, void *);
+extern void anim_sample_key_track(float, float, void *, int *, float *, void *);
 
-extern int func_00277F48(float, void *, int, int, int);
+extern int coll_process_hit(float, void *, int, int, int);
 
-extern float func_00283CE0(int);
+extern float IntToFloat(int);
 
-extern int func_002AAE98(float, float, float, float);
+extern int gfx_pack_color_floats(float, float, float, float);
 
 #ifndef RAC2_T_VEC16_F5621621C
 #define RAC2_T_VEC16_F5621621C
@@ -942,7 +942,7 @@ typedef struct {
 } Vec16_F5621621c;
 #endif
 
-extern void func_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
+extern void moby_queue_knockback_for_nodes(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
 
 extern int D_001BF000[];
 
@@ -955,7 +955,7 @@ extern int D_001BF000[];
    never reads them back. The words at offsets 0x20 and 0x34 are 32-bit in the
    object and the helpers take them as pointers, so they are cast on the way
    out. */
-void func_002C2658(char *obj)
+void part_update_trail_emitter(char *obj)
 {
     char *motion = obj + 0x20;
     char *vec = obj + 0x10;
@@ -966,11 +966,11 @@ void func_002C2658(char *obj)
 
     local[0] = *(V4_Fc3cb9262 *)(obj + 0x10);
     *(float *)(motion + 4) = *(float *)(motion + 4) + *(float *)(motion + 8);
-    SampleKeyTrack(*(float *)(motion + 4), *(float *)(motion + 0xC),
+    anim_sample_key_track(*(float *)(motion + 4), *(float *)(motion + 0xC),
                   (void *)*(int *)(obj + 0x20), &n, &f, vec);
 
     if (FastDecTimer((short *)(obj + 0xA)) != 0) {
-        KillParticle(obj);
+        part_kill(obj);
         return;
     }
 
@@ -978,19 +978,19 @@ void func_002C2658(char *obj)
         int index = *(short *)(obj + 0xA);
 
         if ((float)index < 7.5f)
-            *(int *)(obj + 4) = PackColorFloatsToWord(0.7f, 0.7f, 0.7f,
+            *(int *)(obj + 4) = gfx_pack_color_floats(0.7f, 0.7f, 0.7f,
                                              IntToFloat(index) * 0.0106666666f);
     }
 
-    count = ProcessCollisionHit(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
+    count = coll_process_hit(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
     local[1] = *(V4_Fc3cb9262 *)(obj + 0x10);
-    QueueKnockbackForNodes((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
+    moby_queue_knockback_for_nodes((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
                    D_001BF000, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
 }
 
 
 /* Slows a particle, grows it, and dims its color until it disappears. */
-void func_002C28F8(char *object)
+void part_update_growing_dim(char *object)
 {
     int count;
     int low;
@@ -1009,11 +1009,11 @@ void func_002C28F8(char *object)
     }
 }
 
-extern int func_00283CF0(float);
+extern int FloatToInt(float);
 
 /* A drifting spark: moves by its velocity, spins, slows its fall and fades over its last
    64 frames; it frees itself when the count runs out. */
-void func_002C29A0(char *particle)
+void part_update_drifting_spark(char *particle)
 {
     char *vel = particle + 0x20;
 
@@ -1023,7 +1023,7 @@ void func_002C29A0(char *particle)
     *(float *)(vel + 0x10) += *(float *)(vel + 0x14);
     particle[8] = FloatToInt(*(float *)(vel + 0x10));
     if (--*(short *)(particle + 0xA) <= 0)
-        KillParticle(particle);
+        part_kill(particle);
     if (*(short *)(particle + 0xA) > 0x40)
         *(int *)(particle + 4) = ((0x80 - *(short *)(particle + 0xA)) << 24) | 0x808080;
     else
@@ -1033,33 +1033,33 @@ void func_002C29A0(char *particle)
 /* func_002C2A88 uses the quadword-copy profile in 002C2A88-qcopy.c. */
 
 /* Updates a three-step effect: a color flash, then a burst that makes sparks and pushes the player if close, then a fading ember. */
-void func_002C2C80(char *particle) {
+void part_update_burst_effect(char *particle) {
  char *motion=particle+32; SplitVector v; int i; float progress, total, speed;
  switch(*(unsigned char *)(motion+20)) {
  case 0: {
   float duration=func_00283CE0_2(*(unsigned char *)(motion+17));
   *(int *)(particle+4)=FastTweenColor(0xff4080ff,0,(duration-func_00283CE0_2(*(short *)(particle+10)))/duration);
   if(FastDecTimer((short *)(particle+10))) {
-   if(*(unsigned char *)(motion+16)==1)KillParticle(particle);
+   if(*(unsigned char *)(motion+16)==1)part_kill(particle);
    else {*(unsigned char *)(motion+20)=1;*(short *)(particle+10)=*(unsigned char *)(motion+18);}
   }
   break; }
  case 1:
   for(i=0;i<*(unsigned char *)(motion+19);i++) {
    qcopy(&v,particle+16);
-   AddRandomOffsetToVector(&v,0.05f);
+   vec_add_random_offset(&v,0.05f);
    speed=1.0f;
    if(*(short *)(particle+10)<10)speed=func_00283CE0_2(*(short *)(particle+10))*0.1f;
-   SpawnDebrisParticle(&v,2,*(unsigned char *)(motion+17),*(unsigned char *)(motion+18),*(unsigned char *)(motion+19),*(unsigned char *)(motion+21),*(int *)(motion+24),*(float *)(motion+28),speed);
+   part_spawn_debris(&v,2,*(unsigned char *)(motion+17),*(unsigned char *)(motion+18),*(unsigned char *)(motion+19),*(unsigned char *)(motion+21),*(int *)(motion+24),*(float *)(motion+28),speed);
   }
-  if(FastDecTimer((short *)(particle+10)))KillParticle(particle);
-  { char *pos=gHeroPosition; ParticleHero2C2C80 *hero;
+  if(FastDecTimer((short *)(particle+10)))part_kill(particle);
+  { char *pos=g_hero_position; ParticleHero2C2C80 *hero;
   if(vec_distance_xy(particle+16,pos)<0.3f) {
    hero=(ParticleHero2C2C80 *)(pos-128);
    if(hero->height<*(float *)(particle+24)+1.2f) {
    FastVecSub(&v,pos,particle+16);
    vec_scale_to_length(&v,&v,1.0f);v.f[2]=1.0f;
-   QueueImpactEffect(hero->owner,*(int *)(motion+24),1,particle+16,&v,*(float *)(motion+28));
+   part_queue_impact_effect(hero->owner,*(int *)(motion+24),1,particle+16,&v,*(float *)(motion+28));
   }}
   }
   break;
@@ -1069,9 +1069,9 @@ void func_002C2C80(char *particle) {
   progress=(total-func_00283CE0_2(*(short *)(particle+10)))/total;
   *(int *)(particle+4)=FastTweenColor((*(unsigned char *)(motion+22)<<24)|0x4060,0x8fafff,progress);
   if(progress<0.6f)*(float *)(particle+12)+=9030.0f;else *(float *)(particle+12)-=16800.0f;
-  particle[2]=D_001F2628[Rand()&7];
+  particle[2]=D_001F2628[func_001163B0()&7];
   if((((particle-D_001B1D90[0])>>6)&1))particle[8]++;else particle[8]--;
-  if(FastDecTimer((short *)(particle+10)))KillParticle(particle);
+  if(FastDecTimer((short *)(particle+10)))part_kill(particle);
   break;
  }
 }
@@ -1082,20 +1082,20 @@ void func_002C2C80(char *particle) {
 extern unsigned char *r1_func_00218928(int);
 extern int r1_func_001FA898(float);
 extern void r1_func_001F9BF0(void *, void *, void *);
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern unsigned char *r1_D_L00_001B2400[];
 
 
 /* rac1-decomp src/overlays/shared/alpha_fade_particle_updates.c: func_002C2FD8 */
 /* spawns particle type 0x3B from a position, colour index and flags */
 /* Creates a fading particle at a position with a given size, color and lifetime. It can optionally follow the view. */
-unsigned char *func_002C2FD8(float size, void *pos, int color, unsigned char frame, int colorIndex, int flag, int lifetime, int mode) {
+unsigned char *part_spawn_fading(float size, void *pos, int color, unsigned char frame, int colorIndex, int flag, int lifetime, int mode) {
     unsigned char *particle = r1_func_00218928(0x3B);
     if (particle != 0) {
         char *motion = (char *)particle + 0x20;
         *(int *)(motion + 0x10) = mode;
         if (mode == 1) {
-            r1_func_001F9BF0(motion, pos, gHeroPosition);
+            r1_func_001F9BF0(motion, pos, g_hero_position);
         }
         qcopy(particle + 0x10, pos);
         *(int *)(particle + 4) = color;
@@ -1114,16 +1114,16 @@ unsigned char *func_002C2FD8(float size, void *pos, int color, unsigned char fra
     return particle;
 }
 
-extern void func_00282CC0(char *, char *, char *);
+extern void FastVecAdd(char *, char *, char *);
 
 /* Keeps a particle at the view origin plus its offset in one mode, and removes it when its timer ends. */
-void func_002C30F8(char *self)
+void part_update_view_anchored(char *self)
 {
     char *part = self + 0x20;
     if (*(int *)(part + 0x10) == 1)
-        FastVecAdd(self + 0x10, gHeroPosition, part);
+        FastVecAdd(self + 0x10, g_hero_position, part);
     if (FastDecTimer((short *)(self + 0xA)) != 0)
-        KillParticle(self);
+        part_kill(self);
 }
 
 /* Creates a particle at POS moving by VEL; in mode 1 it also keeps its offset from the
@@ -1131,7 +1131,7 @@ void func_002C30F8(char *self)
 /* func_002C3150 uses the quadword-copy profile in 002C3150-qcopy.c. */
 
 /* advances three floats of a sub-object by a resident offset triple, calls a three-pointer update, subtracts the offsets back out, rejects the result when any coordinate leaves the 2.0..1021.0 band, and otherwise rescales a 24-bit handle by the ratio of two helper lookups over a signed halfword index */
-void func_002C3280(u8 *self)
+void part_update_size_fade(u8 *self)
 {
     char *motion = (char *)self + 32;
     int color;
@@ -1173,7 +1173,7 @@ void func_002C3280(u8 *self)
 
 
 /* Fades a particle by a fixed step each frame, optionally stuck to another object, and removes it when fully faded. */
-void func_002C37E0(char *obj)
+void part_update_step_fade(char *obj)
 {
     char *sub = obj + 32;
     int w;
@@ -1207,26 +1207,26 @@ tail:
 /* func_002C38E0 is in the -G8 sibling. */
 
 /* Advances a spark, stops it on collision, and decays its RGBA channels. */
-void func_002C3B08(char *particle) {
+void UpdateCollidingSpark(char *particle) {
  float nextPos[4];char *motion;
  if(!particle)return;
  motion=particle+32;*(float *)(particle+12)+=-100.0f;
  FastVecAdd((char *)nextPos,particle+16,motion);
  if(*(float *)motion!=0 || *(float *)(motion+4)!=0 || *(float *)(motion+8)!=0){
- if(CollLine(particle+16,nextPos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)D_001BAFA0;ClearVector128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
+ if(CollLine(particle+16,nextPos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)D_001BAFA0;vec_clear_128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
  else {*(U128 *)(particle+16)=*(U128 *)nextPos;if(*(float *)(motion+12)!=0)*(float *)(motion+8)+=*(float *)(motion+12);else *(float *)(motion+8)+=-0.0063f;}}
- if(*(float *)(motion+28)<=0 || FastDecTimer((short *)(particle+10)) || *(float *)(particle+12)<0 || nextPos[0]<0.01f || nextPos[1]<0.01f || nextPos[2]<0.01f){KillParticle(particle);return;}
+ if(*(float *)(motion+28)<=0 || FastDecTimer((short *)(particle+10)) || *(float *)(particle+12)<0 || nextPos[0]<0.01f || nextPos[1]<0.01f || nextPos[2]<0.01f){part_kill(particle);return;}
  *(float *)(motion+16)+=-0.01f;if(*(float *)(motion+16)<0)*(float *)(motion+16)=0;
  *(float *)(motion+20)+=-0.03001f;if(*(float *)(motion+20)<0)*(float *)(motion+20)=0;
  *(float *)(motion+24)+=-0.05f;if(*(float *)(motion+24)<0)*(float *)(motion+24)=0;
  if(*(float *)(motion+28)<0)*(float *)(motion+28)=0;
- *(int *)(particle+4)=PackColorFloatsToWord(*(float *)(motion+16),*(float *)(motion+20),*(float *)(motion+24),*(float *)(motion+28));particle[8]--;
+ *(int *)(particle+4)=gfx_pack_color_floats(*(float *)(motion+16),*(float *)(motion+20),*(float *)(motion+24),*(float *)(motion+28));particle[8]--;
 }
 
 /* func_002C3D80 uses the quadword-copy profile in 002C3D80-qcopy.c. */
 
 /* Moves a particle, grows it, and drops its brightness one step each time its timer ticks. It is removed when fully faded. */
-void func_002C3EE8(char *particle)
+void part_update_growing_step_fade(char *particle)
 {
     char *motion = particle + 32;
 
@@ -1245,10 +1245,10 @@ void func_002C3EE8(char *particle)
 
 /* Updates an attached spark and emits children; mode 1 orbits its owner.
  * The interleaved prototype preserves each EE argument register bank. */
-void func_002C4100(char *particle) {
+void part_update_attached_spark_emitter(char *particle) {
  char *motion=particle+32; float v[4], w[4], rot[4], mat[16]; char *child;
  if(*(short *)(motion+28)==0) {
-  if(DecrementTopByte(particle+4,*(short *)(motion+26))) {KillParticle(particle);return;}
+  if(moby_decrement_top_byte(particle+4,*(short *)(motion+26))) {part_kill(particle);return;}
   if(*(char **)(motion+12)) {
    v[0]=*(float *)(particle+32);v[1]=*(float *)(motion+4);v[2]=*(float *)(motion+8);
    FastVecScale(v,v,func_00283CE0_2(*(short *)(motion+24)));
@@ -1256,22 +1256,22 @@ void func_002C4100(char *particle) {
   }
   return;
  }
- if(FastDecTimer((short *)(particle+10)) || (*(short *)(particle+10)<10 && DecrementTopByte(particle+4,16))) {KillParticle(particle);return;}
- if(*(short *)(motion+28)==1)SpawnOwnedSparkParticle(0,particle+16,0,0,10,0,*(signed char *)(particle+7),0);
+ if(FastDecTimer((short *)(particle+10)) || (*(short *)(particle+10)<10 && moby_decrement_top_byte(particle+4,16))) {part_kill(particle);return;}
+ if(*(short *)(motion+28)==1)part_spawn_owned_spark(0,particle+16,0,0,10,0,*(signed char *)(particle+7),0);
  else {
   v[0]=*(float *)(motion);v[1]=*(float *)(motion+4);v[2]=*(float *)(motion+8);
-  child=SpawnOwnedSparkParticle(*(int *)(motion+12),particle+16,0,0,10,0,*(signed char *)(particle+7),v);
+  child=part_spawn_owned_spark(*(int *)(motion+12),particle+16,0,0,10,0,*(signed char *)(particle+7),v);
   if(child) *(short *)(child+56)=*(short *)(motion+24);
  }
  if(*(short *)(motion+28)==1) {
   qcopy(particle+16,*(char **)(motion+12)+16);
-  v[0]=FastSinOrCosA(*(float *)(motion+16))*2.25f;
-  v[1]=FastSinOrCosB(*(float *)(motion+16))*2.25f;
+  v[0]=math_fast_sin_or_cos_a(*(float *)(motion+16))*2.25f;
+  v[1]=math_fast_sin_or_cos_b(*(float *)(motion+16))*2.25f;
   v[2]=v[0]; v[0]=0;
-  w[0]=FastSinOrCosA(*(float *)(motion+20))*0.28f;
-  w[1]=FastSinOrCosB(*(float *)(motion+20))*0.28f;
+  w[0]=math_fast_sin_or_cos_a(*(float *)(motion+20))*0.28f;
+  w[1]=math_fast_sin_or_cos_b(*(float *)(motion+20))*0.28f;
   w[2]=w[0]; w[0]=0;
-  ClearVector128(rot);rot[1]=*(float *)(motion+16);
+  vec_clear_128(rot);rot[1]=*(float *)(motion+16);
   euler_to_matrix(mat,rot);transform_vector(w,w,mat);
   FastVecAdd((char *)v,(char *)v,(char *)w);
   matrix_mul_vec3(v,v,*(char **)(motion+12)+192);
@@ -1284,10 +1284,10 @@ void func_002C4100(char *particle) {
 
 
 /* Follows a selected attachment, randomizes its rotation, and fades by lifetime. */
-extern float func_002A78D8(float, float);
-extern float func_00283CE0(int);
+extern float math_random_signed_float_range(float, float);
+extern float IntToFloat(int);
 
-void func_002C4500(char *object)
+void part_update_attached_rotating(char *object)
 {
     char *motion = object + 0x20;
     int angle;
@@ -1314,12 +1314,12 @@ void func_002C4500(char *object)
         *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f)
         goto destroy;
     angle = *(unsigned char *)(object + 8);
-    angle += FloatToInt(RandomSignedFloatRange(0.0f, 64.0f));
+    angle += FloatToInt(math_random_signed_float_range(0.0f, 64.0f));
     if (angle > 255) angle -= 255;
     *(unsigned char *)(object + 8) = angle;
     if (FastDecTimer(object + 0xA)) {
 destroy:
-        KillParticle(object);
+        part_kill(object);
         return;
     }
     alpha = IntToFloat(*(short *)(object + 0xA));
@@ -1331,7 +1331,7 @@ destroy:
 }
 
 /* decrements a signed short counter and, at zero, rotates a 24-bit identifier beside it and reloads the counter; calls a helper when the identifier's top byte is clear */
-void func_002C4788(u8 *particle) {
+void part_step_fade_timer(u8 *particle) {
     s16_F570cfb4b *timerPtr = (s16_F570cfb4b *)(particle + 10);
     if (--*timerPtr == 0) {
         *(s32 *)(particle + 4) += 0xff000000;
@@ -1344,14 +1344,14 @@ void func_002C4788(u8 *particle) {
 
 /* Pulls toward a target, blends colour by distance, then advances through
  * three timed movement/fade phases. */
-void func_002C47E8(char *particle) {
+void part_update_attracted(char *particle) {
  char *motion=particle+32; float v[4],a[4],b[4];float distance;
- if(gGameTime[0]&1)particle[8]++;
+ if(g_game_time[0]&1)particle[8]++;
  distance=fast_vec_dist(particle+16,D_00189F00);
  if(distance<5.0f && *(float *)(*(char **)(motion+24)+8)>0.0f) {
   FastVecSub(a,*(void **)(motion+24),particle+16);
   if(FastVecLength(a)>0.5f) {vec_scale_to_length(a,a,0.1f/distance);FastVecAdd(particle+16,particle+16,(char *)a);}
-  else {vec_scale_to_length(a,a,0.005f);PackDirectionVector(a,(int *)(particle+36));}
+  else {vec_scale_to_length(a,a,0.005f);vec_pack_direction(a,(int *)(particle+36));}
  }
  distance=(2.5f-(distance-0.5f))*0.4f;
  if(distance>1.0f)distance=1.0f;else if(distance<0.0f)distance=0.0f;
@@ -1359,33 +1359,33 @@ void func_002C47E8(char *particle) {
  if(*(short *)(motion+16)) {
   /* Retail writes zero to the hardware register at 0x10000000. */
   T0_COUNT=0;
-  DecodeByteColorVector(v,motion);FastVecAdd(particle+16,particle+16,(char *)v);
+  vec_decode_byte_color(v,motion);FastVecAdd(particle+16,particle+16,(char *)v);
   distance=func_00283CE0_2(*(short *)(particle+10))/func_00283CE0_2(*(short *)(motion+16));
   *(int *)(particle+4)=FastTweenColor(*(int *)(particle+4)&0xffffff,*(int *)(particle+4),1.0f-distance);
   if(FastDecTimer((short *)(particle+10))){*(short *)(motion+16)=0;*(short *)(particle+10)=*(short *)(motion+18);}
  } else if(*(short *)(motion+18)) {
-  DecodeByteColorVector(a,motion);DecodeByteColorVector(b,motion+4);
+  vec_decode_byte_color(a,motion);vec_decode_byte_color(b,motion+4);
   lerp_vector(v,b,a,func_00283CE0_2(*(short *)(particle+10))/func_00283CE0_2(*(short *)(motion+18)));
   FastVecAdd(particle+16,particle+16,(char *)v);
   if(FastDecTimer((short *)(particle+10))){*(short *)(motion+18)=0;*(short *)(particle+10)=*(short *)(motion+20);}
  } else {
   int color;
-  DecodeByteColorVector(v,motion+4);FastVecAdd(particle+16,particle+16,(char *)v);
+  vec_decode_byte_color(v,motion+4);FastVecAdd(particle+16,particle+16,(char *)v);
   color=*(int *)(particle+4)&0xffffff;
   *(int *)(particle+4)=FastTweenColor(color,*(int *)(particle+4),func_00283CE0_2(*(short *)(particle+10))/func_00283CE0_2(*(short *)(motion+20)));
-  if(FastDecTimer((short *)(particle+10)))KillParticle(particle);
+  if(FastDecTimer((short *)(particle+10)))part_kill(particle);
  }
 }
 
 
 /* Spins a particle's frame and removes it when its size reaches zero. */
-void func_002C4B10(u8 *particle)
+void part_update_spinning_frame(u8 *particle)
 {
     f32 size = *(f32 *)(particle + 0x0C);
     *(u8 *)(particle + 0x08) = *(u8 *)(particle + 0x08) + *(u8 *)(particle + 0x38);
     if (size <= 0.0f) {
         *(f32 *)(particle + 0x0C) = 0.0f;
-        KillParticle(particle);
+        part_kill(particle);
     }
 }
 
@@ -1394,7 +1394,7 @@ void func_002C4B10(u8 *particle)
 /* func_002C4D18 is in 002BF6F0-c4b50.c. */
 
 /* Moves a particle with gravity and drag, keeps its size above a minimum while alive, and removes it when its timer ends. */
-void func_002C4F08(char *self)
+void part_update_dragged_falling(char *self)
 {
     char *motion = self + 0x20;
     float len;
@@ -1416,9 +1416,9 @@ void func_002C4F08(char *self)
         if (f < 15000.0f)
             *(float *)(self + 0xC) = 15000.0f;
     } else {
-        if (DecrementTopByte(self + 4, *(int *)(motion + 0x1C)) != 0) {
+        if (moby_decrement_top_byte(self + 4, *(int *)(motion + 0x1C)) != 0) {
             *(int *)(self + 0xC) = 0;
-            KillParticle(self);
+            part_kill(self);
         }
     }
 }
@@ -1434,7 +1434,7 @@ extern void func_002B9180_13(char *self);
 /* The particle update: the quad at 0x20 is copied to the stack, the value of
    the helper at 0xA is divided by the copy's fourth float, the two scaled
    results are packed into the word at 4 and the byte at 8. */
-void func_002C5068(char *self)
+void part_update_scaled_color(char *self)
 {
     V4_Fc3cb9262 vec;
     float divisor;
@@ -1459,7 +1459,7 @@ void func_002C5068(char *self)
 
 
 /* Shrinks and fades a particle each frame and removes it when it leaves the world or its timer ends. */
-void func_002C5550(Obj_F7cacd225 *particle)
+void part_update_shrinking_fade(Obj_F7cacd225 *particle)
 {
     int fadeMode;
 
@@ -1483,23 +1483,23 @@ void func_002C5550(Obj_F7cacd225 *particle)
 /* func_002C56B0 uses the quadword-copy profile in 002C56B0-qcopy.c. */
 
 /* Updates a two-step effect: first a burst that makes sparks and hits things nearby, then a fading ember. */
-void func_002C58A8(char *particle) {
+void part_update_burst_ember(char *particle) {
  char *motion=particle+32; SplitVector v; struct { float v[4]; void *owner; int flags; unsigned char mode, enabled; short mask; float scale; int last; } c; int i; float progress,total,speed;
  switch(*(unsigned char *)(motion+20)) {
  case 0:
   for(i=0;i<*(unsigned char *)(motion+19);i++) {
    qcopy(&v,particle+16);
-   AddRandomOffsetToVector(&v,0.05f);
+   vec_add_random_offset(&v,0.05f);
    speed=1.0f;
    if(*(short *)(particle+10)<10)speed=func_00283CE0_2(*(short *)(particle+10))*0.1f;
-   SpawnDebrisParticleTwoMode(&v,0,1,*(short *)(motion+16),*(unsigned char *)(motion+19),*(unsigned char *)(motion+21),*(int *)(motion+24),*(float *)(motion+28),speed);
+   part_spawn_debris_two_mode(&v,0,1,*(short *)(motion+16),*(unsigned char *)(motion+19),*(unsigned char *)(motion+21),*(int *)(motion+24),*(float *)(motion+28),speed);
   }
-  if(FastDecTimer((short *)(particle+10)))KillParticle(particle);
-  ClearVector128(&c);
-  { ParticleHero2C58A8 *hero=(ParticleHero2C58A8 *)gHeroState;
+  if(FastDecTimer((short *)(particle+10)))part_kill(particle);
+  vec_clear_128(&c);
+  { ParticleHero2C58A8 *hero=(ParticleHero2C58A8 *)g_hero_state;
   c.owner=hero->owner;c.flags=0x10000;c.mode=2;c.mask=0x820;c.enabled=1;c.scale=1.0f;c.last=0; }
-  if((gGameTime[0]+*(unsigned char *)(motion+23))%10==0)
-   ProcessCollisionHit(0.2f,particle+16,16,(int)c.owner,(int)&c);
+  if((g_game_time[0]+*(unsigned char *)(motion+23))%10==0)
+   coll_process_hit(0.2f,particle+16,16,(int)c.owner,(int)&c);
   break;
  case 1:
   FastVecAdd(particle+16,particle+16,motion);
@@ -1507,9 +1507,9 @@ void func_002C58A8(char *particle) {
   progress=(total-func_00283CE0_2(*(short *)(particle+10)))/total;
   *(int *)(particle+4)=FastTweenColor((*(unsigned char *)(motion+22)<<24)|0x4060,0x8fafff,progress);
   if(progress<0.6f)*(float *)(particle+12)+=9030.0f;else *(float *)(particle+12)-=16800.0f;
-  particle[2]=D_001F2628[Rand()&7];
+  particle[2]=D_001F2628[func_001163B0()&7];
   if((((particle-D_001B1D90[0])>>6)&1))particle[8]++;else particle[8]--;
-  if(FastDecTimer((short *)(particle+10)))KillParticle(particle);
+  if(FastDecTimer((short *)(particle+10)))part_kill(particle);
   break;
  }
 }
@@ -1519,7 +1519,7 @@ void func_002C58A8(char *particle) {
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates a fading spark like the other splitting sparks but with lighter gravity. It splits, bounces and fades out. */
-void func_002C5D00(FadeSplitParticle *particle) {
+void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
     SplitVector newVel, nextPos;
     FadeSplitCollision collision;
     FadeSplitMotion *motion = &particle->e;
@@ -1534,25 +1534,25 @@ void func_002C5D00(FadeSplitParticle *particle) {
         spread = particle->fC * 0.0000011111111462014378f;
         particle->fC *= 0.8f;
         negSpread = -spread;
-        func_00282D30_12((char *)&newVel, (char *)motion, RandomFloatRange(0.5f, 0.7f));
-        nextPos.f[0] = particle->pos.f[0] + RandomFloatRange(negSpread, spread);
-        nextPos.f[1] = particle->pos.f[1] + RandomFloatRange(negSpread, spread);
-        nextPos.f[2] = particle->pos.f[2] + RandomFloatRange(negSpread, spread);
-        newVel.f[0] += RandomFloatRange(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        newVel.f[1] += RandomFloatRange(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        newVel.f[2] += RandomFloatRange(-motion->v.f[2] * 0.2f, 0.0f);
-        child = (FadeSplitParticle *)SpawnSmokeParticleAlt((char *)&nextPos, (char *)&newVel, 0x88, motion->x1C);
+        func_00282D30_12((char *)&newVel, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        nextPos.f[0] = particle->pos.f[0] + math_random_float_range(negSpread, spread);
+        nextPos.f[1] = particle->pos.f[1] + math_random_float_range(negSpread, spread);
+        nextPos.f[2] = particle->pos.f[2] + math_random_float_range(negSpread, spread);
+        newVel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        newVel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        newVel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        child = (FadeSplitParticle *)part_spawn_smoke_alt((char *)&nextPos, (char *)&newVel, 0x88, motion->x1C);
         if (child) {
             child->hA = 2;
             child->fC = particle->fC;
         }
-        func_00282D30_12((char *)motion, (char *)motion, RandomFloatRange(0.5f, 0.7f));
-        motion->v.f[0] += RandomFloatRange(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        motion->v.f[1] += RandomFloatRange(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        motion->v.f[2] += RandomFloatRange(-motion->v.f[2] * 0.2f, 0.0f);
-        particle->pos.f[0] += RandomFloatRange(negSpread, spread);
-        particle->pos.f[1] += RandomFloatRange(negSpread, spread);
-        particle->pos.f[2] += RandomFloatRange(negSpread, spread);
+        func_00282D30_12((char *)motion, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        motion->v.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        motion->v.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        motion->v.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        particle->pos.f[0] += math_random_float_range(negSpread, spread);
+        particle->pos.f[1] += math_random_float_range(negSpread, spread);
+        particle->pos.f[2] += math_random_float_range(negSpread, spread);
     }
     table = D_001F2688;
     { int index = particle->b2 - table[0];
@@ -1569,14 +1569,14 @@ void func_002C5D00(FadeSplitParticle *particle) {
     if (flags & 8) {
         if (!(particle->x4 & 0xFF000000)) goto kill;
         motion->b18 = flags | 8;
-        if (!RandomIntBelow(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
+        if (!math_random_int_below(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
     } else {
         collision.x10 = motion->x1C;
         collision.x1C = 1.0f;
         collision.v.q = motion->v.q;
         collision.x14 = 1;
         collision.x20 = 1;
-        if (!RandomIntBelow(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
+        if (!math_random_int_below(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
     }
     if (hit) motion->b18 |= 8;
     else qcopy(&particle->pos, &newVel);
@@ -1585,7 +1585,7 @@ void func_002C5D00(FadeSplitParticle *particle) {
         particle->fC -= 18055.5546875f;
         if (particle->fC <= 0.0f) {
         kill:
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
     } else {
@@ -1618,11 +1618,11 @@ void func_002C5D00(FadeSplitParticle *particle) {
 
 /* func_002C6360 is in the -G8 sibling (its two globals are read through $gp). */
 
-extern float func_00283198(float);
-extern int func_00283CF0(float);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
 
 /* Pulses a particle's brightness in a wave over its lifetime and removes it when the timer ends. */
-void func_002C64D8(char *particle)
+void part_update_pulsing_2(char *particle)
 {
     float ratio;
     float wave;
@@ -1632,19 +1632,19 @@ void func_002C64D8(char *particle)
         return;
     motion = particle + 0x20;
     if (FastDecTimer((short *)(particle + 0x24)) != 0) {
-        KillParticle(particle);
+        part_kill(particle);
         return;
     }
     ratio = IntToFloat(*(short *)(motion + 4)) / IntToFloat(*(short *)(motion + 6));
-    wave = FastSinOrCosB(ratio * 6.283186f);
+    wave = math_fast_sin_or_cos_b(ratio * 6.283186f);
     *(int *)(particle + 4) = (*(int *)(particle + 4) & 0x00FFFFFF)
-                       + (FloatToInt(FloatAbs(IntToFloat(*(int *)(motion + 0xC)) * wave)) << 24);
+                       + (FloatToInt(math_fabs(IntToFloat(*(int *)(motion + 0xC)) * wave)) << 24);
 }
 
 /* func_002C65A0 is in 002BF6F0-c65a0.c. */
 
 /* If a probe call on a sub-object returns zero, folds a byte counter into the top byte of a packed word, rebuilds a 16-byte vector from two sub-records for a helper, then clamps a running float against a limit and accumulates two sub-record fields into the object. */
-void func_002C6748(char *obj)
+void part_update_spin_falling(char *obj)
 {
     Vec16_F9a4b4d8b spinVec;
     char *motion;
@@ -1691,10 +1691,10 @@ typedef struct {
     short reserved12;
     float scale;
 } ParticleKeyframes;
-extern int func_002A9568(int, int, float);
+extern int moby_forward_two_values_and_amount(int, int, float);
 
 /* Moves a particle and steps through color and size keyframes over its lifetime. */
-void func_002C6868(char *self)
+void part_update_keyframed(char *self)
 {
     char *motion = self + 0x20;
     ParticleKeyframes *control = *(ParticleKeyframes **)(motion + 0x10);
@@ -1711,14 +1711,14 @@ void func_002C6868(char *self)
         control->times[*(short *)(motion + 0x14)]);
     factor = (float)(elapsed -
         control->times[*(short *)(motion + 0x14)]) / duration;
-    *(int *)(self + 4) = ForwardTwoValuesAndAmount(
+    *(int *)(self + 4) = moby_forward_two_values_and_amount(
         control->colors[*(short *)(motion + 0x14)],
         control->colors[*(short *)(motion + 0x14) + 1], factor);
     *(float *)(self + 0xC) =
         ((float)control->sizes[*(short *)(motion + 0x14)] +
          factor * (float)(control->sizes[*(short *)(motion + 0x14) + 1] - control->sizes[*(short *)(motion + 0x14)])) * 1000.0f;
     if (FastDecTimer((short *)(self + 0xA)))
-        KillParticle(self);
+        part_kill(self);
 }
 
 /* Follows a sound emitter's moby: fades its volume byte (the top byte of +4) up by 4
@@ -1751,16 +1751,16 @@ typedef struct {
     float pos[4];
     EmitterRef2C6A08 ref;
 } Emitter2C6A08;
-extern float D_001B5340[];
-extern int func_002A8860(void *, int);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern float g_camera_eye_state[];
+extern int moby_decrement_top_byte(void *, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 /* Follows the particle's target (or one of its joints): the alpha fades towards the limit
    while the target is shown and out otherwise; a missing or dying target fades the particle
    out and frees it. The second read of the colour word is the retail copy kept by GCSE. */
-void func_002C6A08(Emitter2C6A08 *emitter)
+void part_update_moby_following_emitter(Emitter2C6A08 *emitter)
 {
     float joint[4];
     float toward[4];
@@ -1775,8 +1775,8 @@ void func_002C6A08(Emitter2C6A08 *emitter)
     ref = &emitter->ref;
     moby = ref->moby;
     if (moby == 0 || moby->state == 0xFE || moby->state == 0xFD) {
-        if (DecrementTopByte(&emitter->packed, 4) != 0)
-            KillParticle(emitter);
+        if (moby_decrement_top_byte(&emitter->packed, 4) != 0)
+            part_kill(emitter);
         return;
     }
     level = emitter->packed >> 24;
@@ -1797,22 +1797,22 @@ void func_002C6A08(Emitter2C6A08 *emitter)
         qcopy(emitter->pos, ref->moby->pos);
         return;
     }
-    TransformMobyJointToWorld(ref->moby, ref->joint, joint);
-    FastVecSub(toward, gCameraState_001B5340, joint);
+    moby_transform_joint_to_world(ref->moby, ref->joint, joint);
+    FastVecSub(toward, g_camera_eye_state, joint);
     vec_scale_to_length(toward, toward, 0.4f);
     FastVecAdd((char *)emitter->pos, (char *)joint, (char *)toward);
 }
 
 
 /* Creates a trail particle from a start point and a direction, with a short life and a size value. */
-char *func_002C6DD8(void *origin, void *direction, int lifetime, float scale)
+char *part_spawn_trail_2(void *origin, void *direction, int lifetime, float scale)
 {
     V4_Fc3cb9262 vec;
     Particle6DD8 *particle;
     int fade;
     SplitVector *pos;
 
-    particle = AllocParticle(0x5A);
+    particle = part_alloc(0x5A);
     if (particle != 0) {
         particle->x4 = 0x7FFFFFFF;
         particle->xC = 0x7FFFFFFF;
@@ -1838,9 +1838,9 @@ char *func_002C6DD8(void *origin, void *direction, int lifetime, float scale)
 
 /* func_002C7050 is defined in 002BF6F0-trail-g8.c. */
 
-extern int func_00282948(short *);
+extern int math_fast_float_d(short *);
 /* Delay movement and the size/alpha tween until the secondary timer fires. */
-void func_002C72A0(char *particle)
+void part_update_delayed_size_alpha(char *particle)
 {
     char *motion = particle + 32;
     Vec16_F9a4b4d8b v;
@@ -1848,7 +1848,7 @@ void func_002C72A0(char *particle)
     int elapsed, alpha;
 
     particle[8] += (unsigned char)motion[10];
-    if (FastFloatHelperD((short *)(motion + 24))) {
+    if (math_fast_float_d((short *)(motion + 24))) {
         elapsed = *(short *)(motion + 8) - *(short *)(particle + 10);
         if (elapsed < *(short *)(motion + 30)) {
             progress = (float)elapsed * 0.2f;
@@ -1872,11 +1872,11 @@ void func_002C72A0(char *particle)
         if (*(float *)(particle + 16) < 2 || *(float *)(particle + 16) > 1021 ||
             *(float *)(particle + 20) < 2 || *(float *)(particle + 20) > 1021 ||
             *(float *)(particle + 24) < 2 || *(float *)(particle + 24) > 1021) {
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
         if (FastDecTimer((short *)(particle + 10))) {
-            KillParticle(particle);
+            part_kill(particle);
             return;
         }
     }
@@ -1888,7 +1888,7 @@ void func_002C72A0(char *particle)
 }
 
 /* Grows a particle and lets it fall, fading its color, until its timer ends. */
-void func_002C7538(char *particle)
+void part_update_growing_falling(char *particle)
 {
     V4_Fc3cb9262 buf;
     char *motion = particle + 32;

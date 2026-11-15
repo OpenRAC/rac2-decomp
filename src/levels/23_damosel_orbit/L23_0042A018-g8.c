@@ -84,32 +84,32 @@ extern TI16 D_L23_002A6390[];
 
 extern float D_L23_002A6D50[][2];
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern float func_00283180(float);
+extern float math_fast_sin_or_cos_a(float);
 
-extern float func_00283C28(float);
+extern float math_fast_float_g(float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern long long func_0027C878(s32);
+extern long long GetEffectTextureDescriptor(s32);
 
-extern void func_002FC560(u32, u64);
+extern void VU1_addGSregister(u32, u64);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_00280B90(void *, void *, s32);
+extern void draw_world_quad(void *, void *, s32);
 
 /* updates the spin state at +0x68 and draws 72 quads of four corners each (corner positions from
    one table, uv from another; the colour and two GS words sit in the packet), the packet's matrix
    being the object's rotation rows turned about the spin angle */
-void func_L23_0042A018(u8 *moby) {
+void gfx_draw_spinning_star_quads(u8 *moby) {
     L23Spin *vars;
     L23Quad pkt;
     TI16 m[4];
@@ -133,7 +133,7 @@ void func_L23_0042A018(u8 *moby) {
         vars = *(L23Spin **)(moby + 0x68);
         D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
         vars->turn = FastAddRotations(vars->turn, (float)D_L23_001B1480 * 0.00029088825f);
-        f = FastSinOrCosB((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
+        f = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
         vars->alpha = (s32)(f * D_L23_001B1478);
         vars->alpha += D_L23_001B147C;
         reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
@@ -181,19 +181,19 @@ void func_L23_0042A018(u8 *moby) {
 
                 FastVecScale(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
                 vars->spin = FastAddRotations(vars->spin, D_L23_001B1BCC * 0.00029088825f);
-                FastFloatHelperG(vars->spin);
+                math_fast_float_g(vars->spin);
                 if (D_L23_001B3714 == 0) {
-                    fa = FastSinOrCosA(vars->spin) * D_L23_001B1BD8;
-                    fb = FastSinOrCosB(vars->spin) * D_L23_001B1BDC;
-                    fc = FastSinOrCosA(vars->spin) * D_L23_001B1BE0;
-                    fd = FastSinOrCosB(vars->spin) * D_L23_001B1BE4;
+                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BD8;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BDC;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BE0;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BE4;
                 } else {
-                    fa = FastSinOrCosA(vars->spin) * D_L23_001B1BF0;
-                    fb = FastSinOrCosB(vars->spin) * D_L23_001B1BF4;
-                    fc = FastSinOrCosA(vars->spin) * D_L23_001B1BF8;
-                    fd = FastSinOrCosB(vars->spin) * D_L23_001B1BFC;
+                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF0;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BF4;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF8;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BFC;
                 }
-                f = RandomFloatRange(D_L23_001B1BD0, D_L23_001B1BD4);
+                f = math_random_float_range(D_L23_001B1BD0, D_L23_001B1BD4);
                 *uvx = (D_L23_002A6D50[b][0] * fa + fb) * f;
                 *uvy = D_L23_002A6D50[b][1] * fc + fd;
                 pos++;

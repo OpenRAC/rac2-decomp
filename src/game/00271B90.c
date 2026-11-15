@@ -10,15 +10,15 @@ typedef struct {
 } Follow;
 extern Follow D_001B53A0;
 typedef struct {char prefix[0x80]; Vec pos, rot; char padA0[0x21f4]; int state; char pad2298[0x208]; int mode;} Hero;
-extern char D_00189E20[], D_0018A0E0[];
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_002702C8(float *, float, float, float, float, float);
+extern char g_hero_state[], D_0018A0E0[];
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
 /* Tracks the hero position and up direction smoothly so the camera can follow. */
-void func_00271B90(void)
+void cam_update_follow_hero(void)
 {
     Vec dir, projection;
     Follow *follow = &D_001B53A0;
@@ -33,9 +33,9 @@ void func_00271B90(void)
         dir.f[1] += 0.2f;
         dir.f[2] += 0.2f;
     }
-    follow->up.f[0] = StepSpringDamperClamped(&follow->velocity[0], follow->up.f[0], dir.f[0], 0.015f, 0.2f, 0.0f);
-    follow->up.f[1] = StepSpringDamperClamped(&follow->velocity[1], follow->up.f[1], dir.f[1], 0.015f, 0.2f, 0.0f);
-    follow->up.f[2] = StepSpringDamperClamped(&follow->velocity[2], follow->up.f[2], dir.f[2], 0.015f, 0.2f, 0.0f);
+    follow->up.f[0] = math_step_spring_damper_clamped(&follow->velocity[0], follow->up.f[0], dir.f[0], 0.015f, 0.2f, 0.0f);
+    follow->up.f[1] = math_step_spring_damper_clamped(&follow->velocity[1], follow->up.f[1], dir.f[1], 0.015f, 0.2f, 0.0f);
+    follow->up.f[2] = math_step_spring_damper_clamped(&follow->velocity[2], follow->up.f[2], dir.f[2], 0.015f, 0.2f, 0.0f);
     vec_scale_to_length(&follow->up, &follow->up, 1.0f);
     FastVecSub(&follow->delta, hero - 0x240, &follow->prev_pos);
     follow->distance = FastVecLength(&follow->delta);
@@ -52,7 +52,7 @@ void func_00271B90(void)
     if (heroState->mode != 0x50 || heroState->state == 0x11) {
         follow->pos.f[0] = heroState->pos.f[0];
         follow->pos.f[1] = heroState->pos.f[1];
-        follow->pos.f[2] = StepSpringDamperClamped(&follow->z_vel, follow->pos.f[2], heroState->pos.f[2], 0.0075f, 0.175f, 0.0f);
+        follow->pos.f[2] = math_step_spring_damper_clamped(&follow->z_vel, follow->pos.f[2], heroState->pos.f[2], 0.0075f, 0.175f, 0.0f);
         follow->pos.f[3] = heroState->pos.f[2];
     } else {
         follow->pos.f[0] = heroState->pos.f[0];
@@ -60,5 +60,5 @@ void func_00271B90(void)
     }
     }
     for (i = 0; i < 4; i++) follow->yaw[i] = follow->yaw[i + 1];
-    follow->yaw[i] = ((Hero *)gHeroState)->rot.f[2];
+    follow->yaw[i] = ((Hero *)g_hero_state)->rot.f[2];
 }

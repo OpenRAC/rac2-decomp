@@ -32,7 +32,7 @@ typedef struct {
     char bytes[0x100];
 } CameraRecord;
 extern CameraEntry *D_L04_001B1E84;
-extern CameraRecord *D_L04_001B24DC;
+extern CameraRecord *g_moby_l04_pool;
 extern float D_L04_001B1C8C __attribute__((sda));
 extern float D_L04_001B1C90 __attribute__((sda));
 extern float D_L04_001B1C94 __attribute__((sda));
@@ -40,20 +40,20 @@ extern float D_L04_001B1CAC __attribute__((sda));
 extern int D_L04_001B1CC4 __attribute__((sda));
 extern int D_L04_001B1CCC __attribute__((sda));
 extern float D_L04_001B1CD0 __attribute__((sda));
-extern CameraPlayer D_00189E20;
+extern CameraPlayer g_hero_state;
 extern CameraCollision D_L04_001BFAC0;
-extern void func_00282D30(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D08(void *, void *, void *, float);
-extern void func_002AA2E8(float *, float, float);
-extern float func_00282E20(void *);
-extern void func_00282948(int *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002761F8(void *, void *, int, int, int);
-extern int func_00277258(void *, int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void lerp_vector(void *, void *, void *, float);
+extern void ApproachValue(float *, float, float);
+extern float vec_length_xy(void *);
+extern void math_fast_float_d(int *);
+extern void FastVecAdd(void *, void *, void *);
+extern int CollLine(void *, void *, int, int, int);
+extern int coll_test_point(void *, int, int, float);
 
 /* Smooth a player-relative camera offset, then resolve movement collisions.
  * Debug line labels preserve the horizontal scaling division's padding. */
@@ -64,7 +64,7 @@ void func_PAL_L04_004734D8(CameraObject *obj) {
     float scale;
     float smoothing;
     old.q = obj->position.q;
-    entry = (char *)&D_L04_001B24DC[*(int *)(D_L04_001B1E84[obj->index].definition + 0x60)];
+    entry = (char *)&g_moby_l04_pool[*(int *)(D_L04_001B1E84[obj->index].definition + 0x60)];
     state = *(char **)(entry + 0x68);
     smoothing = D_L04_001B1CAC;
     motion = (CameraVector *)(obj->motion + 0x70);
@@ -81,48 +81,48 @@ void func_PAL_L04_004734D8(CameraObject *obj) {
         if (D_L04_001B1CCC == -1 && (*(int *)(state + 0x278) > 0 || *(int *)(state + 0x338) > 0)) D_L04_001B1CCC = 75;
         if (*(int *)(state + 0x278) <= 0 && *(int *)(state + 0x338) <= 0) D_L04_001B1CCC = -1;
     }
-    func_00282D30(&negative, &D_00189E20, -1.0f);
-    qcopy(&center, &D_00189E20.position);
+    FastVecScale(&negative, &g_hero_state, -1.0f);
+    qcopy(&center, &g_hero_state.position);
     velocity.q = 0;
     velocity.f[2] = 1.0f;
     velocity.f[3] = 1.0f;
     qcopy(&axis, &velocity);
-    func_00282DD8(&projection, &negative, &velocity);
-    func_00282F20(&projection, &projection, 1.0f);
-    func_00282DD8(&negative, &axis, &projection);
-    func_002830C0(&rotated, &offset, &negative);
-    func_00282CF0(&delta, &rotated, &D_00189E20.position);
-    func_00282D08(motion, motion, &delta, smoothing);
+    FastVecCross(&projection, &negative, &velocity);
+    vec_scale_to_length(&projection, &projection, 1.0f);
+    FastVecCross(&negative, &axis, &projection);
+    transform_vector(&rotated, &offset, &negative);
+    FastVecSub(&delta, &rotated, &g_hero_state.position);
+    lerp_vector(motion, motion, &delta, smoothing);
     velocity.q = motion->q;
     if (D_L04_001B1CCC > 0) {
-        if (D_L04_001B1CCC >= 63) func_002AA2E8(&D_L04_001B1CD0, 1.0f, 0.050000004f);
-        else func_002AA2E8(&D_L04_001B1CD0, 0.0f, 0.015000001f);
+        if (D_L04_001B1CCC >= 63) ApproachValue(&D_L04_001B1CD0, 1.0f, 0.050000004f);
+        else ApproachValue(&D_L04_001B1CD0, 0.0f, 0.015000001f);
         if (D_L04_001B1CD0 > 0) {
-            scale = func_00282E20(&velocity);
+            scale = vec_length_xy(&velocity);
             scale = (scale + D_L04_001B1CD0) / scale;
             velocity.f[0] *= scale;
             velocity.f[1] *= scale;
         }
-        func_00282948(&D_L04_001B1CCC);
+        math_fast_float_d(&D_L04_001B1CCC);
     }
-    func_00282CC0(&obj->position, &D_00189E20.position, &velocity);
-    if (func_002761F8(&old, &obj->position, 4, 0, 0)) {
+    FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
+    if (CollLine(&old, &obj->position, 4, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D && *(short *)(hit + 0xAA) != 0xBBC && *(short *)(hit + 0xAA) != 0xA1F)) {
-            func_00282CF0(&rotated, &D_L04_001BFAC0.point, &old);
-            func_00282D30(&velocity, &rotated, 0.95f);
-            func_00282CC0(&obj->position, &old, &velocity);
+            FastVecSub(&rotated, &D_L04_001BFAC0.point, &old);
+            FastVecScale(&velocity, &rotated, 0.95f);
+            FastVecAdd(&obj->position, &old, &velocity);
         }
     }
-    if (func_002761F8(&D_00189E20.position, &obj->position, 2, 0, 0)) {
+    if (CollLine(&g_hero_state.position, &obj->position, 2, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D && *(short *)(hit + 0xAA) != 0xBBC && *(short *)(hit + 0xAA) != 0xA1F)) {
-            func_00282CF0(&rotated, &D_L04_001BFAC0.point, &D_00189E20.position);
-            func_00282D30(&velocity, &rotated, 0.95f);
-            func_00282CC0(&obj->position, &D_00189E20.position, &velocity);
+            FastVecSub(&rotated, &D_L04_001BFAC0.point, &g_hero_state.position);
+            FastVecScale(&velocity, &rotated, 0.95f);
+            FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
         }
     }
-    if (func_00277258(&obj->position, 4, 0, 0.15f)) {
+    if (coll_test_point(&obj->position, 4, 0, 0.15f)) {
         hit = D_L04_001BFAC0.hit;
         if (!hit || (*(short *)(hit + 0xAA) != 0xB2D && *(short *)(hit + 0xAA) != 0xBBC)) obj->position.q = D_L04_001BFAC0.position.q;
     }

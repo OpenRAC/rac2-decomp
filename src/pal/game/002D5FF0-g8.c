@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern char *D_001A8CFC;
 extern int ref_L00_002D5570_00 __attribute__((sda));
@@ -17,10 +18,10 @@ int func_PAL_002D6148(char *a0)
     return 0;
 }
 
-extern int D_001A7424;
-extern int D_001A7420;
-extern int D_00138180[];
-extern char D_001F2840[];
+extern int g_save_menu_flags;
+extern int g_save_menu_screen;
+extern int g_pad_state[];
+extern char g_pause_menu_state[];
 extern char *ref_L00_002D55E0_00 __attribute__((sda));
 extern int func_PAL_0029D478(int);
 extern int func_PAL_00343EC0(char *);
@@ -29,12 +30,12 @@ extern void func_PAL_002D6A70(int);
 int func_PAL_002D61B8(void)
 {
     int result = 0;
-    int *state = D_00138180;
+    int *state = g_pad_state;
     int flags;
-    D_001A7424 = (D_001A7424 | 2) & ~4;
+    g_save_menu_flags = (g_save_menu_flags | 2) & ~4;
     flags = state[0x1c4 / 4];
     if (flags & 0x10) {
-        char *root = D_001F2840;
+        char *root = g_pause_menu_state;
         int value = *(int *)(*(char **)(root + 0x14) + 0xe0);
         int status;
         if (value != 0) {
@@ -57,9 +58,9 @@ finish:
             struct { short unused; short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
-            if ((D_001A7420 == 6 || D_001A7420 == 13) && request.id == 5) {
-                D_001A7420 = 12;
-                D_001A7424 &= ~2;
+            if ((g_save_menu_screen == 6 || g_save_menu_screen == 13) && request.id == 5) {
+                g_save_menu_screen = 12;
+                g_save_menu_flags &= ~2;
             }
             func_PAL_002D6A70((int)&request);
         }
@@ -70,20 +71,20 @@ finish:
 /* func_PAL_002D5FF0, the PAL copy of func_002D53F0: a centred text draw at y = 329 less a word
    reached through $gp (-G8), with text id 0xB60 where USA draws 0x2D4F at a scaled y. */
 extern int D_001ABB8C __attribute__((sda));
-extern void func_0027C540(long);
-extern void func_0027C660(void);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
 extern void func_PAL_0029CEC8(void);
-extern char *func_00288FB8(int);
-extern void func_0027F980(int, int, unsigned long long, unsigned char *, int);
+extern char *GetLocalizedString(int);
+extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
 int func_PAL_002D5FF0(void)
 {
     int y;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_PAL_0029CEC8();
     y = 329 - D_001ABB8C;
-    func_0027F980(0x1C7, y, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0xB60), -1);
-    func_0027C660();
+    text_draw_right_aligned_small(0x1C7, y, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0xB60), -1);
+    DoGifPaging();
     return 0;
 }

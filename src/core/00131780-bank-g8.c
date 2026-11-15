@@ -15,25 +15,25 @@ extern unsigned int D_001A7180 MACRO_ADDR;
 extern long D_001A74D0_1[] __attribute__((sda));
 extern int D_001A7140 MACRO_ADDR;
 extern char D_001A7578[];
-extern void func_00115D48(const void *, ...);
-extern void func_00132028(void);
-extern void func_0011AEA0(int);
-extern int func_0011D810(const void *);
-extern int func_0011D620(const void *, int, int, int *, int, unsigned int *, int, int, int);
+extern void printf(const void *, ...);
+extern void snd_Pump(void);
+extern void FlushCache(int);
+extern int sif_rpc_is_handle_valid(const void *);
+extern int sceSifCallRpc(const void *, int, int, int *, int, unsigned int *, int, int, int);
 extern int D_001A71C4 MACRO_ADDR;
 extern char D_001A7600[], D_001A7630[];
-extern int func_00133580(int);
+extern int snd_CheckLoadInProgress(int);
 /* Starts reading a sound bank from disc and remembers the function to call when it is done. */
-void func_00132498(int bank, int offset, int callback, long callback_data) {
+void snd_start_bank_read(int bank, int offset, int callback, long callback_data) {
     D_001A7488 = 0;
     if (D_001A74C8 != 0) {
         if (D_001A74F8 != 0) return;
-        Printf(D_001A7600);
+        printf(D_001A7600);
         return;
     }
     if (snd_CheckLoadInProgress(1) == 1) {
         if (D_001A74F8 != 0) return;
-        Printf(D_001A7630);
+        printf(D_001A7630);
         return;
     }
     D_001A71C0 = bank;
@@ -41,11 +41,11 @@ void func_00132498(int bank, int offset, int callback, long callback_data) {
     D_001A7180 = -1u;
     D_001A74D0 = callback;
     D_001A74D0_1[1] = callback_data;
-    while (IsRpcHandleValid(&D_001A7140)) {
-        if (D_001A74F8 == 0) Printf(D_001A7578);
+    while (sif_rpc_is_handle_valid(&D_001A7140)) {
+        if (D_001A74F8 == 0) printf(D_001A7578);
         snd_Pump();
         FlushCache(0);
     }
     D_001A74C8 = 1;
-    CallRpcServer(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0);
+    sceSifCallRpc(&D_001A7140, 3, 1, &D_001A71C0, 8, &D_001A7180, 4, 0, 0);
 }

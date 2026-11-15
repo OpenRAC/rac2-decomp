@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float func_00283CE0(int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002B9180(void *);
-extern int func_L00_0031C998(int, int, float);
-extern int func_00282978(short *);
+extern float IntToFloat(int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void part_kill(void *);
+extern int math_lerp_int_fraction(int, int, float);
+extern int FastDecTimer(short *);
 extern int D_001A8F00[] __attribute__((sda));
 #define FI(p,o) (*(int *)((char *)(p)+(o)))
 #define FF(p,o) (*(float *)((char *)(p)+(o)))
@@ -17,7 +17,7 @@ extern int D_001A8F00[] __attribute__((sda));
 /* Damps motion, updates an optional parent-relative position, and tweens the
  * particle's size and color over its remaining lifetime. */
 /* Slows a particle down, keeps it following its parent object, and fades its size and color over its life. It removes the particle when the parent is gone or time runs out. */
-void func_L00_0033C238(char *p)
+void part_update_parent_following_fade(char *p)
 {
     float v[3], local[3], world[3];
     char *q = p + 32;
@@ -51,15 +51,15 @@ void func_L00_0033C238(char *p)
             FastVecAdd(p + 16, *(char **)(q + 12) + 16, world);
         } else {
 kill_parent:
-            KillParticle(p);
+            part_kill(p);
             return;
         }
     } else {
         FastVecAdd(p + 16, p + 16, v);
     }
     FB(p, 8)++;
-    FI(p, 4) = LerpIntegerFraction(FI(desc, 4), FI(desc, 0),
+    FI(p, 4) = math_lerp_int_fraction(FI(desc, 4), FI(desc, 0),
                                 (float)FS(p, 10) / IntToFloat(FI(desc, 12)));
     if (FastDecTimer((short *)(p + 10)))
-        KillParticle(p);
+        part_kill(p);
 }

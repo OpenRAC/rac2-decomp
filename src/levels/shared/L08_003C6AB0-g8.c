@@ -97,59 +97,59 @@ typedef struct {
     RideVector rot;
 } RideMoby;
 
-extern s32 func_002829A8(void *);
-extern void *func_002A9640(void *, u32, s32);
-extern void func_002AB800(void *, void *);
-extern void func_002AB8C0(void *, void *);
+extern s32 vec_fast_helper_a(void *);
+extern void *part_find_owned_effect_slot(void *, u32, s32);
+extern void gfx_start_color_fade(void *, void *);
+extern void gfx_update_color_fade(void *, void *);
 extern f32 func_002A0558(void *, void *);
-extern s32 func_002B0C28(s32, s32, s32);
-extern s32 func_L08_002D2ED8(s32, s32);
-extern void func_L00_002D2168(int, int, f32);
-extern int func_00282978(void *);
-extern int func_00282948(void *);
-extern int func_002A77E0(int);
-extern void func_L08_003C63F0(char *);
-extern void func_L08_003C6528(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
-extern f32 func_00282DF0(void *);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
-extern f32 func_00282C48(f32);
-extern f32 func_L08_003277C0(s32, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern f32 func_002A89A8(void *, int, f32);
-extern int func_00278E78(void);
-extern f32 func_00283BE0(f32, f32);
-extern void func_00282D30(void *, void *, f32);
-extern void func_00282F20(void *, void *, f32);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_002AB6D8(void *, void *);
-extern void func_00283698(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002A8C00(f32, void *, void *, s32, void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern s32 func_00278870(void *, f32);
-extern s32 func_00277258(void *, s32, void *, f32);
-extern f32 func_00282DB0(void *, void *);
-extern void func_L08_003C67B8(void *, void *, s32, f32, f32, f32, f32, f32, f32);
-extern s32 func_00277F48(f32, void *, s32, void *, void *);
-extern void func_0029F338(void *);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern f32 func_00283CE0(s32);
-extern s32 func_00283CF0(f32);
-extern void *func_L08_00435600(void *, void *);
-extern void func_L08_004356A0(void *, void *);
-extern void func_L00_002E6EF8(void *, void *);
-extern f32 func_00282E48(void *, void *);
-extern void func_002A93B0(void *);
-extern void func_L08_003C66F0(void *);
-extern void func_002AEF28(void *, void *, void *, f32, f32, f32);
+extern s32 TryClaimNotice(s32, s32, s32);
+extern s32 hero_l08_enter_state(s32, s32);
+extern void set_hero_animation(int, int, f32);
+extern int FastDecTimer(void *);
+extern int math_fast_float_d(void *);
+extern int math_random_int_below(int);
+extern void moby_mark_nearby_creatures_active(char *);
+extern void hero_read_aim_input_values(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern f32 FastVecLength(void *);
+extern f32 FastAddRotations(f32, f32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
+extern f32 math_fabs(f32);
+extern f32 IntegerPower(s32, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern f32 coll_probe_ground_height_below(void *, int, f32);
+extern int GetCollHitMaterial(void);
+extern f32 fast_subtract_rotations(f32, f32);
+extern void FastVecScale(void *, void *, f32);
+extern void vec_scale_to_length(void *, void *, f32);
+extern void FastVecCross(void *, void *, void *);
+extern void mat_get_euler_angles(void *, void *);
+extern void matrix_from_basis_rows(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void make_hit_descriptor(f32, void *, void *, s32, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void FastVecSub(void *, void *, void *);
+extern s32 coll_process_triangles(void *, f32);
+extern s32 coll_test_point(void *, s32, void *, f32);
+extern f32 FastVecDot(void *, void *);
+extern void part_emit_disk_particles(void *, void *, s32, f32, f32, f32, f32, f32, f32);
+extern s32 coll_process_hit(f32, void *, s32, void *, void *);
+extern void moby_mark_spawned(void *);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern f32 IntToFloat(s32);
+extern s32 FloatToInt(f32);
+extern void *part_spawn_attached_effect(void *, void *);
+extern void moby_store_position_private(void *, void *);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern f32 fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(void *);
+extern void UpdateAttachedChildObjects(void *);
+extern void moby_scale_owner_words_by_angles(void *, void *, void *, f32, f32, f32);
 
-extern u8 D_00138180[];
-extern u8 D_00189E20[];
-extern s32 D_001A79F0 MACRO_ADDR;
+extern u8 g_pad_state[];
+extern u8 g_hero_state[];
+extern s32 g_current_map_index MACRO_ADDR;
 extern s32 D_L08_001A8F00 __attribute__((sda));
 extern f32 D_L08_001AF990 __attribute__((sda));
 extern s32 D_L08_001AF994 __attribute__((sda));
@@ -234,10 +234,10 @@ extern u8 D_L08_001BFF40[];
 extern u8 D_L08_001BFF60[];
 extern u8 D_L08_001BFF80[];
 extern Block400 D_L08_0023E6A0;
-extern void func_L08_003C5940(void);
+extern void hud_draw_health_gauge(void);
 
 /* Updates a rideable moby (class 2140): lets the player get on, steers it while ridden, and handles getting off. */
-void func_L08_003C6AB0(RideMoby *moby)
+void RideableMobyUpdate(RideMoby *moby)
 {
     f32 dir[4] __attribute__((aligned(16)));
     f32 v30[4] __attribute__((aligned(16)));
@@ -259,12 +259,12 @@ void func_L08_003C6AB0(RideMoby *moby)
     u8 *other;
 
     vars = (RideVars *)moby->x68;
-    if (FastVectorHelperA((u8 *)vars + 0x8B) != 0) {
+    if (vec_fast_helper_a((u8 *)vars + 0x8B) != 0) {
         vars->xA0 = 0;
     }
     if (moby->x20 != 0) {
         moby->pos.f[2] = vars->x58;
-        hit = FindOwnedEffectSlot(moby, 1, 0);
+        hit = part_find_owned_effect_slot(moby, 1, 0);
         if (hit != 0 && (other = *(u8 **)(hit + 0x20)) != 0) {
             s16 kind = *(s16 *)(other + 0xAA);
             if (kind != 0x85C && kind != 0x942 && kind != 0xFFF) {
@@ -272,9 +272,9 @@ void func_L08_003C6AB0(RideMoby *moby)
                     vars->x97 = 0xD2;
                     vars->x98 = 0xD2;
                     vars->x99 = 0xD2;
-                    StartColorFade(moby, (u8 *)vars + 0x90);
+                    gfx_start_color_fade(moby, (u8 *)vars + 0x90);
                     vars->x60 -= *(f32 *)(hit + 0x2C);
-                    ((Hero *)gHeroState)->f[0x183C / 4] = vars->x60;
+                    ((Hero *)g_hero_state)->f[0x183C / 4] = vars->x60;
                     if (vars->x60 <= 0.0f) {
                         moby->x20 = 5;
                     }
@@ -287,10 +287,10 @@ void func_L08_003C6AB0(RideMoby *moby)
     } else {
         vars->x58 = moby->pos.f[2];
     }
-    UpdateColorFade(moby, (u8 *)vars + 0x90);
+    gfx_update_color_fade(moby, (u8 *)vars + 0x90);
     moby->x2C = *(f32 *)(moby->x24 + 0x24) * D_L08_001AFA6C;
-    if (((Hero *)gHeroState)->ptr[0x1830 / 4] == (u8 *)moby) {
-        ((Hero *)gHeroState)->i[0x1848 / 4] = ((Hero *)gHeroState)->f[0x183C / 4] / D_L08_001AFA80 * 200.0f;
+    if (((Hero *)g_hero_state)->ptr[0x1830 / 4] == (u8 *)moby) {
+        ((Hero *)g_hero_state)->i[0x1848 / 4] = ((Hero *)g_hero_state)->f[0x183C / 4] / D_L08_001AFA80 * 200.0f;
     }
     fire = 0;
     switch (moby->x20) {
@@ -309,8 +309,8 @@ void func_L08_003C6AB0(RideMoby *moby)
         {
             f32 health = D_L08_001AFA80;
             vars->x60 = health;
-            ((Hero *)gHeroState)->f[0x183C / 4] = health;
-            ((Hero *)gHeroState)->f[0x1840 / 4] = health;
+            ((Hero *)g_hero_state)->f[0x183C / 4] = health;
+            ((Hero *)g_hero_state)->f[0x1840 / 4] = health;
         }
         vars->x74 = 0;
         moby->x20 = 1;
@@ -319,51 +319,51 @@ void func_L08_003C6AB0(RideMoby *moby)
         break;
     }
     case 1:
-        if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x1C || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x16
-            || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x39 || ((Hero *)gHeroState)->i[0x2294 / 4] == 0x6F) {
+        if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1C || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x16
+            || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x39 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             break;
         }
-        if (((Hero *)gHeroState)->i[0x229C / 4] == 2 || ((Hero *)gHeroState)->i[0x229C / 4] == 4
-            || ((Hero *)gHeroState)->i[0x229C / 4] == 3 || ((Hero *)gHeroState)->i[0x229C / 4] >= 0xD
-            || ((Hero *)gHeroState)->i[0x229C / 4] == 7 || ((Hero *)gHeroState)->i[0x229C / 4] == 0xA
-            || ((Hero *)gHeroState)->i[0x229C / 4] == 0x10 || ((Hero *)gHeroState)->i[0x229C / 4] == 5) {
+        if (((Hero *)g_hero_state)->i[0x229C / 4] == 2 || ((Hero *)g_hero_state)->i[0x229C / 4] == 4
+            || ((Hero *)g_hero_state)->i[0x229C / 4] == 3 || ((Hero *)g_hero_state)->i[0x229C / 4] >= 0xD
+            || ((Hero *)g_hero_state)->i[0x229C / 4] == 7 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0xA
+            || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x10 || ((Hero *)g_hero_state)->i[0x229C / 4] == 5) {
             break;
         }
-        if (((Hero *)gHeroState)->i[0x2294 / 4] == 0x62) {
+        if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x62) {
             break;
         }
-        if (((Hero *)gHeroState)->i[0x24CC / 4] <= 0) {
+        if (((Hero *)g_hero_state)->i[0x24CC / 4] <= 0) {
             break;
         }
         if (D_L08_001A8F00 != 0) {
             break;
         }
-        if (((Hero *)gHeroState)->i[0x340 / 4] == 0) {
+        if (((Hero *)g_hero_state)->i[0x340 / 4] == 0) {
             break;
         }
-        if (((Hero *)gHeroState)->ptr[0x33C / 4] != 0) {
-            s16 kind = *(s16 *)(((Hero *)gHeroState)->ptr[0x33C / 4] + 0xAA);
+        if (((Hero *)g_hero_state)->ptr[0x33C / 4] != 0) {
+            s16 kind = *(s16 *)(((Hero *)g_hero_state)->ptr[0x33C / 4] + 0xAA);
             if (kind == 0x13E /* moby class 318 */ || kind == 0x46F /* Teleporter */) {
                 break;
             }
         }
-        if (func_002A0558(moby, ((Hero *)gHeroState)->ptr[0x2290 / 4]) < D_L08_001AF99C
-            && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x31) {
+        if (func_002A0558(moby, ((Hero *)g_hero_state)->ptr[0x2290 / 4]) < D_L08_001AF99C
+            && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x31) {
             s32 t = TryClaimNotice(7, 0x2798, 1) != 0;
-            if (((Pad *)gPadState)->w[0x1A4 / 4] & 0x10) {
+            if (((Pad *)g_pad_state)->w[0x1A4 / 4] & 0x10) {
                 fire = t;
             } else {
                 t = 0;
             }
         }
         if (fire != 0) {
-            EnterHeroState_L08(0x31, 0);
+            hero_l08_enter_state(0x31, 0);
             set_hero_animation(D_L08_001AF9D4, 0, 15.0f);
-            *(TI128 *)(gHeroState + 0x90) = moby->rot.q;
-            *(TI128 *)(gHeroState + 0x80) = moby->pos.q;
-            ((Hero *)gHeroState)->ptr[0x1830 / 4] = (u8 *)moby;
+            *(TI128 *)(g_hero_state + 0x90) = moby->rot.q;
+            *(TI128 *)(g_hero_state + 0x80) = moby->pos.q;
+            ((Hero *)g_hero_state)->ptr[0x1830 / 4] = (u8 *)moby;
             moby->x20 = 3;
-            *(s32 *)(((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x9C) = -1;
+            *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = -1;
         }
         /* fallthrough */
     case 3: {
@@ -378,7 +378,7 @@ void func_L08_003C6AB0(RideMoby *moby)
 
         moby->x98 = 0;
         FastDecTimer((u8 *)vars + 0x7C);
-        FastFloatHelperD((u8 *)vars + 0xAC);
+        math_fast_float_d((u8 *)vars + 0xAC);
         {
             f32 zero = 0.0f;
             turn = zero;
@@ -389,7 +389,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             thrust = zero;
         }
         if (moby->x20 == 3) {
-            if ((((Pad *)gPadState)->w[0x1A0 / 4] & 8) && vars->x7C == 0) {
+            if ((((Pad *)g_pad_state)->w[0x1A0 / 4] & 8) && vars->x7C == 0) {
                 u8 **list = (u8 **)((u8 *)vars + 0x80);
                 u16 wait;
                 list += vars->x7E & 1;
@@ -398,10 +398,10 @@ void func_L08_003C6AB0(RideMoby *moby)
                 vars->x7E ^= 1;
                 vars->x7C = wait;
             }
-            if (((Pad *)gPadState)->w[0x1A0 / 4] & 4) {
+            if (((Pad *)g_pad_state)->w[0x1A0 / 4] & 4) {
                 vars->x78 -= D_L08_001AFAB8;
-                if (RandomIntBelow(9) == 0 || (((Pad *)gPadState)->w[0x1A4 / 4] & 4)) {
-                    MarkNearbyCreaturesActive((char *)moby);
+                if (math_random_int_below(9) == 0 || (((Pad *)g_pad_state)->w[0x1A4 / 4] & 4)) {
+                    moby_mark_nearby_creatures_active((char *)moby);
                 }
             } else {
                 vars->x78 += D_L08_001AFABC;
@@ -409,7 +409,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             if (D_L08_001AF9D8 != D_L08_001AF9D4 && D_L08_001AF9D4 != -1) {
                 set_hero_animation(D_L08_001AF9D4, 0, 15.0f);
             }
-            ReadAimInputValues(&turn, &speed, &pitch, &bank, &lift, &thrust);
+            hero_read_aim_input_values(&turn, &speed, &pitch, &bank, &lift, &thrust);
         } else {
             vars->x78 -= D_L08_001AFAB8;
         }
@@ -445,8 +445,8 @@ void func_L08_003C6AB0(RideMoby *moby)
             rad = turn * 0.017453294f;
             target = D_L08_001AF9EC * rad * vars->x78;
             vars->x20 += (target * gain - moby->rot.f[0]) * D_L08_001AF9E8;
-            dir[0] = FastSinOrCosA(vars->x28);
-            dir[1] = FastSinOrCosB(vars->x28);
+            dir[0] = math_fast_sin_or_cos_a(vars->x28);
+            dir[1] = math_fast_sin_or_cos_b(vars->x28);
             dir[2] = 0.0f;
             {
                 f32 zero = dir[2];
@@ -459,7 +459,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
             landed = 0;
             {
-                f32 s = FloatAbs(turn), k = IntegerPower(2, (cruise - cur) / cruise);
+                f32 s = math_fabs(turn), k = IntegerPower(2, (cruise - cur) / cruise);
                 {
                     f32 t = speed + D_L08_001AF9F4 * s * sign;
                     t *= 0.00027777778f;
@@ -470,7 +470,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
         }
         FastVecAdd(v40, (u8 *)moby + 0x10, vars);
-        ground = ProbeGroundHeightBelow(v40, 0, 0.5f);
+        ground = coll_probe_ground_height_below(v40, 0, 0.5f);
         if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 0xB) {
             landed = 1;
         }
@@ -489,7 +489,7 @@ void func_L08_003C6AB0(RideMoby *moby)
             if (ground + blend < v40[2]) {
                 vars->x24 = FastAddRotations(vars->x24,
                     fast_subtract_rotations(pitch, vars->x24) * D_L08_001AFA00);
-                if (gCurrentMapIndex == 8) {
+                if (g_current_map_index == 8) {
                     steer = 0;
                 }
             } else {
@@ -510,7 +510,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                 FastVecCross(work.basis[1], (u8 *)moby + 0xC0, work.basis[2]);
                 FastVecCross(work.basis[0], work.basis[1], work.basis[2]);
                 qzero_nc(work.basis[3]);
-                GetEulerAnglesFromMatrix(work.basis, v90);
+                mat_get_euler_angles(work.basis, v90);
                 {
                     f32 half = pitch * 0.5f;
                     f32 rise = D_L08_001AFAC8 * (vars->x78 + 1.0f);
@@ -540,14 +540,14 @@ void func_L08_003C6AB0(RideMoby *moby)
         }
         make_hit_descriptor(D_L08_001AFA70, &work.query.request, moby, 0x10000, vars);
         moby->pos.q = *(TI128 *)v40;
-        TransformMobyJointToWorld(moby, 0, work.query.position.f);
+        moby_transform_joint_to_world(moby, 0, work.query.position.f);
         work.query.position.f[2] += D_L08_001AF9D0 - D_L08_001AFAC0;
         FastVecSub(v90, (u8 *)moby + 0x10, work.query.position.f);
         moby->x98 = 0;
         {
-            s32 found = ProcessCollisionTriangles(work.query.position.f, D_L08_001AF9D0);
+            s32 found = coll_process_triangles(work.query.position.f, D_L08_001AF9D0);
             if (found == 0) {
-                found = TestPointAgainstCollision(work.query.position.f, 2, moby, D_L08_001AF9D0);
+                found = coll_test_point(work.query.position.f, 2, moby, D_L08_001AF9D0);
             }
             moby->x98 = *(s32 *)(moby->x24 + 0x10);
             if (found != 0) {
@@ -556,7 +556,7 @@ void func_L08_003C6AB0(RideMoby *moby)
                     moby->x20 = 5;
                 }
                 col = D_L08_001BFF40;
-                if (*(u8 **)(col + 0x18) != ((Hero *)gHeroState)->ptr[0x2290 / 4]) {
+                if (*(u8 **)(col + 0x18) != ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                     f32 vA0[4] __attribute__((aligned(16)));
                     f32 vB0[4] __attribute__((aligned(16)));
 
@@ -576,11 +576,11 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
         }
         if (moby->x20 == 3) {
-            if (vars->x78 < 0.98f && (((Pad *)gPadState)->w[0x1A0 / 4] & 4)) {
+            if (vars->x78 < 0.98f && (((Pad *)g_pad_state)->w[0x1A0 / 4] & 4)) {
                 if (vars->x68 < D_L08_001B031C) {
-                    EmitDiskParticles(moby, D_L08_001BFF60, D_L08_001AFB94, D_L08_001AFB8C, D_L08_001AFB90,
+                    part_emit_disk_particles(moby, D_L08_001BFF60, D_L08_001AFB94, D_L08_001AFB8C, D_L08_001AFB90,
                         D_L08_001AFB88, D_L08_001AFB88, D_L08_001AFB98, D_L08_001AFB9C);
-                    if (RandomIntBelow(9) == 0) {
+                    if (math_random_int_below(9) == 0) {
                         f32 amount = (1.0f - vars->x78) * 0.1f;
                         u8 *shake = D_L08_001B99C0;
                         *(s32 *)(shake + 0x168) = 0x14;
@@ -588,37 +588,37 @@ void func_L08_003C6AB0(RideMoby *moby)
                         *(f32 *)(shake + 0x160) = amount;
                     }
                 } else {
-                    EmitDiskParticles(moby, D_L08_001BFF60, D_L08_001AFBAC, D_L08_001AFBA4, D_L08_001AFBA8,
+                    part_emit_disk_particles(moby, D_L08_001BFF60, D_L08_001AFBAC, D_L08_001AFBA4, D_L08_001AFBA8,
                         D_L08_001AFBA0, D_L08_001AFBA0, D_L08_001AFBB0, D_L08_001AFBB4);
                 }
             }
-            EmitDiskParticles(moby, D_L08_001BFF60, D_L08_001AFB7C, D_L08_001AFB74, D_L08_001AFB78,
+            part_emit_disk_particles(moby, D_L08_001BFF60, D_L08_001AFB7C, D_L08_001AFB74, D_L08_001AFB78,
                 D_L08_001AFB70, D_L08_001AFB80, D_L08_001AFB84, 1.0f);
         }
-        TransformMobyJointToWorld(moby, 0, work.query.position.f);
+        moby_transform_joint_to_world(moby, 0, work.query.position.f);
         work.query.position.f[2] += D_L08_001AFA78;
-        ProcessCollisionHit(D_L08_001AFA14, work.query.position.f, 0, moby, &work.query.request);
+        coll_process_hit(D_L08_001AFA14, work.query.position.f, 0, moby, &work.query.request);
         if (FastVecLength(vars) > D_L08_001AFA7C * 0.016666668f) {
             f32 vA0[4] __attribute__((aligned(16)));
 
-            TransformMobyJointToWorld(moby, 3, vA0);
-            ProcessCollisionHit(D_L08_001AFA74, vA0, 0, moby, &work.query.request);
+            moby_transform_joint_to_world(moby, 3, vA0);
+            coll_process_hit(D_L08_001AFA74, vA0, 0, moby, &work.query.request);
         }
-        if (fire == 0 && ((Hero *)gHeroState)->ptr[0x1830 / 4] == (u8 *)moby && (((Pad *)gPadState)->w[0x1A4 / 4] & 0x10)) {
+        if (fire == 0 && ((Hero *)g_hero_state)->ptr[0x1830 / 4] == (u8 *)moby && (((Pad *)g_pad_state)->w[0x1A4 / 4] & 0x10)) {
             moby->x20 = 4;
         }
         break;
     }
     case 4:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
-        *(s32 *)(((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x9C) = 0;
-        EnterHeroState_L08(0, 1);
-        ((Hero *)gHeroState)->h[0x1834 / 2] = -1;
-        ((Hero *)gHeroState)->f[0x108 / 4] = 0.16666667f;
-        ((Hero *)gHeroState)->ptr[0x1830 / 4] = 0;
-        ((Hero *)gHeroState)->f[0x88 / 4] += 1.0f;
+        *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
+        hero_l08_enter_state(0, 1);
+        ((Hero *)g_hero_state)->h[0x1834 / 2] = -1;
+        ((Hero *)g_hero_state)->f[0x108 / 4] = 0.16666667f;
+        ((Hero *)g_hero_state)->ptr[0x1830 / 4] = 0;
+        ((Hero *)g_hero_state)->f[0x88 / 4] += 1.0f;
         if (vars->x74 != 0) {
-            MarkMobySpawned(vars->x74);
+            moby_mark_spawned(vars->x74);
         }
         vars->x74 = 0;
         vars->x88 = 0;
@@ -627,15 +627,15 @@ void func_L08_003C6AB0(RideMoby *moby)
         break;
     case 5:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
-        *(s32 *)(((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x9C) = 0;
-        EnterHeroState_L08(0, 1);
-        TransformMobyJointToWorld(moby, 0, dir);
+        *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
+        hero_l08_enter_state(0, 1);
+        moby_transform_joint_to_world(moby, 0, dir);
         SpawnExplosionEffects(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         moby->pos.q = vars->x30;
-        ((Hero *)gHeroState)->h[0x1834 / 2] = -1;
-        ((Hero *)gHeroState)->ptr[0x1830 / 4] = 0;
+        ((Hero *)g_hero_state)->h[0x1834 / 2] = -1;
+        ((Hero *)g_hero_state)->ptr[0x1830 / 4] = 0;
         if (vars->x74 != 0) {
-            MarkMobySpawned(vars->x74);
+            moby_mark_spawned(vars->x74);
         }
         vars->x74 = 0;
         vars->x88 = 0;
@@ -652,17 +652,17 @@ void func_L08_003C6AB0(RideMoby *moby)
     }
     {
         f32 t;
-        vars->x4C = FastSinOrCosB(vars->x48) * D_L08_001AF9A0 * vars->x78;
+        vars->x4C = math_fast_sin_or_cos_b(vars->x48) * D_L08_001AF9A0 * vars->x78;
         moby->pos.f[2] += vars->x4C * vars->x78;
         t = vars->x78 * 0.000290888245f;
-        ScaleOwnerWordsByAngles(moby, (u8 *)vars + 0x50, (u8 *)vars + 0x54, D_L08_001AF9A8 * 0.017453294f,
+        moby_scale_owner_words_by_angles(moby, (u8 *)vars + 0x50, (u8 *)vars + 0x54, D_L08_001AF9A8 * 0.017453294f,
             D_L08_001AF9AC * t, D_L08_001AF9B0 * t);
     }
     moby->rot.f[2] = vars->x28;
     moby->rot.f[0] = FastAddRotations(moby->rot.f[0], vars->x20);
     moby->rot.f[1] = FastAddRotations(moby->rot.f[1], vars->x24);
     if (moby->x20 == 3) {
-        if (gCurrentMapIndex == 8) {
+        if (g_current_map_index == 8) {
             switch (vars->x8A) {
             case 0:
                 if (vars->x68 < D_L08_001B031C) {
@@ -706,23 +706,23 @@ void func_L08_003C6AB0(RideMoby *moby)
             }
             if (vars->x6C != 0) {
                 if (vars->x74 == 0) {
-                    vars->x74 = SpawnAttachedEffect(moby, vars->x6C + 0x10);
+                    vars->x74 = part_spawn_attached_effect(moby, vars->x6C + 0x10);
                 } else {
-                    StorePositionInPrivateVars(vars->x74, vars->x6C + 0x10);
+                    moby_store_position_private(vars->x74, vars->x6C + 0x10);
                 }
             } else if (vars->x74 != 0) {
-                MarkMobySpawned(vars->x74);
+                moby_mark_spawned(vars->x74);
                 vars->x74 = 0;
             }
         }
-        TransformMobyJointToWorld(moby, D_L08_001AFA84, gHeroState + 0x80);
-        ((Hero *)gHeroState)->f[0x88 / 4] += D_L08_001AFA88;
-        *(TI128 *)(gHeroState + 0x90) = moby->rot.q;
-        AddDrawCallbackToList3(DrawHealthGauge, moby);
+        moby_transform_joint_to_world(moby, D_L08_001AFA84, g_hero_state + 0x80);
+        ((Hero *)g_hero_state)->f[0x88 / 4] += D_L08_001AFA88;
+        *(TI128 *)(g_hero_state + 0x90) = moby->rot.q;
+        gfx_add_draw_callback_third(hud_draw_health_gauge, moby);
     }
     moby->x98 = *(s32 *)(moby->x24 + 0x10);
     if (moby->x31 != 0 && fast_vec_dist((u8 *)moby + 0x10, D_L08_001B9B00) < 64.0f) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         moby->x6F = 0x3C;
     }
     vars->x6C = 0;

@@ -9,20 +9,20 @@ typedef union {
 
 extern float D_L20_001AEC68 __attribute__((sda));
 
-extern int func_00282948(int *);
-extern float func_00282E80(void *, void *);
-extern float func_002AA2E8(float *, float, float);
-extern void func_0029F338(void *);
-extern float func_002A7878(float, float);
-extern int func_002A7820(int, int);
-extern float func_002A7940(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern void *func_002C3150(void *, void *, int, u8, u8, int, float);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
-extern void func_L20_0039BEC8(void *);
+extern int math_fast_float_d(int *);
+extern float vec_distance_xy(void *, void *);
+extern float ApproachValue(float *, float, float);
+extern void moby_mark_spawned(void *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern float math_random_angle(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern void *part_spawn_hero_relative(void *, void *, int, u8, u8, int, float);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
+extern void part_draw_glow_trail(void *);
 
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
@@ -48,9 +48,9 @@ typedef struct {
     } refs;
 } YeedilStatePrefix;
 extern YeedilStatePrefix D_L20_001BDCC0;
-extern u32 D_001A79F0;
+extern u32 g_current_map_index;
 typedef struct { u8 before_owner[0x5C0]; int owner; } YeedilHeroPrefix;
-extern YeedilHeroPrefix D_00189E20;
+extern YeedilHeroPrefix g_hero_state;
 extern u8 D_0018A550[];
 typedef struct {
     Vector origin, point;
@@ -74,28 +74,28 @@ extern int D_L20_001A943C __attribute__((sda));
 extern int D_L20_001A9440 __attribute__((sda));
 extern Vector D_L20_001A9420 SDATA(D_L20_001A9420);
 extern int D_L20_001AF3B0[] __attribute__((sda));
-extern void func_L00_002FC980(void *);
-extern void func_002E64A0(void *);
-extern void func_L00_00326048(char *,float *,s32,s32,float);
-extern void func_00282A60(void *,int,int);
-extern void func_0029FC20(void *,int,void *);
-extern void func_0029FCC0(void *,int,void *);
-extern void func_00283678(void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00283098(void *,void *,void *);
-extern void func_0030CAD0(void *);
-extern void func_0030CCD0(void *);
-extern void func_L00_002E6EF8(void (*)(void *),void *);
-extern void func_0030D430(void *);
-extern void func_0032DA58(void *,void *,void *,float);
-extern void func_L03_00326458(void *);
-extern void *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern void anim_start_startup_animations(void *);
+extern void UpdateEquipmentPieces(void *);
+extern void math_store_angle_update_result(char *,float *,s32,s32,float);
+extern void mem_clear(void *,int,int);
+extern void moby_transform_joint_point(void *,int,void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern void copy_matrix3x4(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void InitializeBoltPointChain(void *);
+extern void beam_update_chain_points(void *);
+extern void gfx_add_draw_callback_third(void (*)(void *),void *);
+extern void beam_draw_ribbons_level(void *);
+extern void part_spawn_blast_effect_moby(void *,void *,void *,float);
+extern void EmitScaledObjectParticles(void *);
+extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 
 /* Updates the glowing particle effect (moby class 4802). It fades the effect in while its owner is close, spawns drifting sparks
  * every frame, and removes itself once it has faded out. */
-void func_L20_0039BB18(void *moby)
+void UpdateYeedilParticleEmitter(void *moby)
 {
     L20_0039BB18_V4 pos;
     L20_0039BB18_V4 vel;
@@ -114,7 +114,7 @@ void func_L20_0039BB18(void *moby)
     float sizeRand2;
 
     vars = *(u32 *)((u32)moby + 0x68);
-    if (FastFloatHelperD((int *)(vars + 4)) != 0)
+    if (math_fast_float_d((int *)(vars + 4)) != 0)
         goto pathA;
     frameCount = *(u16 *)((u32)moby + 0x96);
     prevCount = frameCount++;
@@ -130,7 +130,7 @@ pathA:
         zeroTarget = 0.0f;
         ApproachValue((float *)vars, zeroTarget, 0.016666667f);
         if (*(float *)vars == 0.0f) {
-            MarkMobySpawned(moby);
+            moby_mark_spawned(moby);
             goto end;
         }
     } else {
@@ -150,20 +150,20 @@ pathA:
         }
     }
 skip:
-    fadeRand = RandomFloatRange(0.1f, 0.3f);
-    lifetime = RandomIntRange(30, 60);
+    fadeRand = math_random_float_range(0.1f, 0.3f);
+    lifetime = math_random_int_range(30, 60);
     vel.q = 0;
-    speedRand = RandomFloatRange(0.5f, 2.0f);
+    speedRand = math_random_float_range(0.5f, 2.0f);
     vel.f[2] = -speedRand * 0.016666667f;
     pos.q = vel.q;
-    radiusRand = RandomFloatRange(0.0f, 1.0f);
-    angle = RandomAngle();
-    vel.f[0] = FastSinOrCosA(angle) * radiusRand;
-    vel.f[1] = FastSinOrCosB(angle) * radiusRand;
+    radiusRand = math_random_float_range(0.0f, 1.0f);
+    angle = math_random_angle();
+    vel.f[0] = math_fast_sin_or_cos_a(angle) * radiusRand;
+    vel.f[1] = math_fast_sin_or_cos_b(angle) * radiusRand;
     vel.f[2] = 0.0f;
-    sizeRand = RandomFloatRange(1.0f, 10.0f);
+    sizeRand = math_random_float_range(1.0f, 10.0f);
     vel.f[2] = sizeRand;
-    sizeRand2 = RandomFloatRange(1.0f, 10.0f);
+    sizeRand2 = math_random_float_range(1.0f, 10.0f);
     if (!(vel.f[2] > sizeRand2)) {
         ;
     } else {
@@ -172,17 +172,17 @@ skip:
     FastVecAdd(&vel, &vel, moby + 0x10);
     {
         u8 particle_count = lifetime;
-        colorSeed = RandomIntBelow(255);
-        SpawnHeroRelativeParticle(&vel, &pos, 0x60107080, particle_count, colorSeed & 0xFF, 0, fadeRand);
+        colorSeed = math_random_int_below(255);
+        part_spawn_hero_relative(&vel, &pos, 0x60107080, particle_count, colorSeed & 0xFF, 0, fadeRand);
     }
-    AddDrawCallbackToList1(DrawGlowEffectTrail, moby);
+    gfx_add_draw_callback_first(part_draw_glow_trail, moby);
 end:
     return;
 }
 
 
 /* Runs the Yeedil level script each frame. It tweaks some objects in the level and moves the camera for the cutscene steps. */
-void func_L20_00310E38(void *incoming)
+void level_script_update(void *incoming)
 {
     int lower, upper;
     void *target;
@@ -191,7 +191,7 @@ void func_L20_00310E38(void *incoming)
     Vector matrix[4], work, offset;
     float value;
 
-    StartStartupAnimations(incoming);
+    anim_start_startup_animations(incoming);
     {
         int i;
         for (i = 0; i < D_L20_001BDCC0.count; ++i) {
@@ -202,16 +202,16 @@ void func_L20_00310E38(void *incoming)
             if (*(s16 *)(object+0xAA) == 0xD54 /* moby class 3412 */)
                 UpdateEquipmentPieces(object);
             if (object && *(s16 *)(object+0xAA) == 0xFA0 /* TV Screens */ && *(void **)(object+0x68))
-                StoreAngleUpdateResult((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
+                math_store_angle_update_result((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                   0x80AAAAD2,0x80396464,0.06108653545f);
 
         }
     }
-    if (gCurrentMapIndex != 20) return;
+    if (g_current_map_index != 20) return;
     {
         if ((u32)(D_L20_001BDCC0.mode-4) < 2) {
             {
-                YeedilHeroPrefix *hero = &gHeroState;
+                YeedilHeroPrefix *hero = &g_hero_state;
                 int owner = D_L20_001BDCC0.refs.named.owner;
                 hero->owner = owner;
                 if (D_L20_001BDCC0.mode == 4) {
@@ -230,22 +230,22 @@ void func_L20_00310E38(void *incoming)
                 {
                     YeedilCameraPrefix *camera = &D_L20_001C6AE0;
                     if (D_L20_001BDCC0.state == lower) {
-                        ClearMemory(camera,0,0x50);
+                        mem_clear(camera,0,0x50);
                         D_L20_001AF3B0[0] = 1;
                         camera->scale = 0.8f;
                     }
                     if (lower < D_L20_001BDCC0.state && D_L20_001BDCC0.state < upper) {
-                        TransformMobyJointPoint(target,0,matrix);
+                        moby_transform_joint_point(target,0,matrix);
                         copy_matrix3x4(D_0018A550,matrix);
                         value = camera->scale;
                         value += (12.0f-value)*0.07f;
                         camera->scale = value;
-                        TransformMobyJointToWorld(target,0,camera);
+                        moby_transform_joint_to_world(target,0,camera);
                         vec_scale_to_length(&camera->point,D_0018A550,camera->scale);
                         FastVecAdd(&camera->point,camera,&camera->point);
                         InitializeBoltPointChain(target);
-                        UpdateBeamChainPoints(target);
-                        AddDrawCallbackToList3(DrawBeamRibbonsLevelVariant,target);
+                        beam_update_chain_points(target);
+                        gfx_add_draw_callback_third(beam_draw_ribbons_level,target);
                         if (D_L20_001BDCC0.mode == 5 && D_L20_001BDCC0.state == upper-1) {
                             offset.q = 0;
                             offset.f[0] = 18.0f; offset.f[1] = -2.5f; offset.f[2] = 1.0f;
@@ -253,9 +253,9 @@ void func_L20_00310E38(void *incoming)
                             FastVecAdd(&offset,&offset,D_L20_001BA1F0-0x230);
                             FastVecSub(&work,D_L20_001BA1F0-0x230,&offset);
                             vec_scale_to_length(&work,&work,1.0f);
-                            SpawnBlastEffectMoby(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
+                            part_spawn_blast_effect_moby(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
                         }
-                    } else gHeroState.owner = 0;
+                    } else g_hero_state.owner = 0;
                 }
             }
         }
@@ -358,22 +358,22 @@ extern u32 D_L20_001AECD8_gp SDATA(D_L20_001AECD8) __attribute__((sda));
 extern u32 D_L20_001AECD8[] __attribute__((sda));
 extern float D_L20_001AECE8 __attribute__((sda)), D_L20_001AECEC;
 extern float D_L20_001B9FC0[4];
-extern void func_00283658(void *,void *);
-extern u64 func_0027C878(int);
-extern int func_00283D38(int, int, float);
-extern void func_00282C90(void *);
-extern void func_002833F0(void *,void *);
-extern void func_L01_002E1510(void *,int,void *,int,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AFDD8(char *,char *,char *,char *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00280B90(void *,void *,int);
-extern void func_00281EB8(void *,int,u32,int,float,float,float);
+extern void copy_matrix_rotation(void *,void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern int FastTweenColor(int, int, float);
+extern void vec_store_helper(void *);
+extern void euler_rotation_basis(void *,void *);
+extern void gfx_transform_and_draw_entries(void *,int,void *,int,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_transform_by_object_or_given(char *,char *,char *,char *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void draw_world_quad(void *,void *,int);
+extern void gfx_draw_billboard_quad(void *,int,u32,int,float,float,float);
 
 
 
 /* Draws the glowing trail for the particle effect: two crossed ribbons and some sparkles, faded by the effect's strength. */
-void func_L20_0039BEC8(void *arg)
+void part_draw_glow_trail(void *arg)
 {
     char *object = arg;
     TrailPacket packet;
@@ -397,7 +397,7 @@ void func_L20_0039BEC8(void *arg)
             color = D_L20_001AEC70[(i & 1) ? 0 : 1];
             packet.color[i] = color;
             packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
-            StoreVectorHelper(&packet.position[i]);
+            vec_store_helper(&packet.position[i]);
             packet.position[i].f[0] = D_L20_001AEC7C;
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
@@ -406,9 +406,9 @@ void func_L20_0039BEC8(void *arg)
     *(Quad *)(rotated + 12) = 0;
     rotated[14] = 0.19634954631328583f;
     euler_rotation_basis(rotated, rotated + 12);
-    TransformAndDrawEntries(&packet, 1, rotated, 32, matrix);
+    gfx_transform_and_draw_entries(&packet, 1, rotated, 32, matrix);
     FastVecSub(&direction, D_L20_001B9FC0, object + 0x10);
-    TransformVectorByObjectOrGiven(object, (char *)&direction, (char *)&direction, 0);
+    vec_transform_by_object_or_given(object, (char *)&direction, (char *)&direction, 0);
     normal.q = 0;
     normal.f[0] = direction.f[1];
     normal.f[1] = -direction.f[0];
@@ -445,13 +445,13 @@ void func_L20_0039BEC8(void *arg)
     draw_world_quad(&packet, matrix, 0);
     qcopy(&normal, object + 0x10);
     normal.f[2] += 0.333f;
-    color = FastTweenColor(D_L20_001AECD8_gp, D_L20_001AECD8[1], RandomFloatRange(0.0f,1.0f));
+    color = FastTweenColor(D_L20_001AECD8_gp, D_L20_001AECD8[1], math_random_float_range(0.0f,1.0f));
     color = FastTweenColor(color & 0xffffff, color, vars[0]);
-    DrawBillboardQuad_00281EB8(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, RandomAngle());
-    color = FastTweenColor(D_L20_001AECD8[2], D_L20_001AECD8[3], RandomFloatRange(0.0f,1.0f));
+    gfx_draw_billboard_quad(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, math_random_angle());
+    color = FastTweenColor(D_L20_001AECD8[2], D_L20_001AECD8[3], math_random_float_range(0.0f,1.0f));
     color = FastTweenColor(color & 0xffffff, color, vars[0]);
-    DrawBillboardQuad_00281EB8(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, RandomAngle());
-    DrawBillboardQuad_00281EB8(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, RandomAngle());
+    gfx_draw_billboard_quad(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, math_random_angle());
+    gfx_draw_billboard_quad(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, math_random_angle());
 }
 
 /* func_L20_002DEBE0 is in the sibling file L20_002DEBE0-decider.c. */

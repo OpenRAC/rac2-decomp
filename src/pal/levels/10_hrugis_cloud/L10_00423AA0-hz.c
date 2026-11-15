@@ -12,10 +12,10 @@ extern f32 func_00309120(f32 f12);
 
 extern f32 func_00309B38(f32 f12, f32 f13);
 extern u8 func_L10_00423780(void);
-extern s32 func_00283D38(s32 a0, s32 a1, f32 f12);
-extern void func_L00_00410D18(void);
-extern void func_L10_0041EE00(u8 *arg0);
-extern s32 D_001A79F0[] __attribute__((sda));
+extern s32 FastTweenColor(s32 a0, s32 a1, f32 f12);
+extern void moby_update_empty_alt(void);
+extern void pulsing_light_draw_group_glows(u8 *arg0);
+extern s32 g_current_map_index[] __attribute__((sda));
 
 extern void func_PAL_L10_00423BE0(u8 *arg0);
 void func_PAL_L10_00423AA0(u8 *arg0) {
@@ -30,14 +30,14 @@ void func_PAL_L10_00423AA0(u8 *arg0) {
         if (func_0037B670() != 0) {
             func_PAL_L10_00423BE0(arg0);
             if (*(s32 *)(s1 + 0x264) != 0) {
-                func_0037BC48(arg0, (s32)func_L00_00410D18, (s32)func_L10_0041EE00, 0);
+                func_0037BC48(arg0, (s32)moby_update_empty_alt, (s32)pulsing_light_draw_group_glows, 0);
             }
             *(f32 *)(s1 + 0x268) = func_00335320();
         }
         break;
     case 1:
         p = func_0037BA88(arg0);
-        mode = D_001A79F0[0];
+        mode = g_current_map_index[0];
         *(s32 *)((u8 *)p + 0x14C) = 0;
         if (mode == 10 && func_L10_00423780() == 2) {
             *(u16 *)(arg0 + 0x34) |= 0x1000;
@@ -47,7 +47,7 @@ void func_PAL_L10_00423AA0(u8 *arg0) {
         func_0037D390(arg0, 0, 0, 0);
         f = func_00309B38(*(f32 *)(s1 + 0x268), 0.12566373f);
         *(f32 *)(s1 + 0x268) = f;
-        *(s32 *)(arg0 + 0x78) = func_00283D38(0x20202020, -1, (func_00309120(f) + 1.0f) * 0.5f);
+        *(s32 *)(arg0 + 0x78) = FastTweenColor(0x20202020, -1, (func_00309120(f) + 1.0f) * 0.5f);
         break;
     }
 }

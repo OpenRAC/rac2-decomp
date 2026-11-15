@@ -31,22 +31,22 @@ typedef struct {
     } motion;
 } Particle_002C2A88;
 
-extern Particle_002C2A88 *func_002B9030(int);
-extern int func_00283CF0(float);
+extern Particle_002C2A88 *part_alloc(int);
+extern int FloatToInt(float);
 extern int func_001163B0(void);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
 extern unsigned char *D_001F2628;
 
 /* Spawns a debris particle at position: modes 0 and 1 sit still for life frames,
    mode 2 flies off at a random speed and direction for life1 frames. */
 /* Creates a piece of debris. It either stays still or flies away in a random direction. */
-Particle_002C2A88 *func_002C2A88(TI128 *position, unsigned char mode, unsigned char life,
+Particle_002C2A88 *part_spawn_debris(TI128 *position, unsigned char mode, unsigned char life,
                                  unsigned char byteA, unsigned char byteB, unsigned char life1, int userData,
                                  float userScale, float speed)
 {
-    Particle_002C2A88 *p = AllocParticle(0x3A);
+    Particle_002C2A88 *p = part_alloc(0x3A);
     typeof(p->motion) *m;
     float launchSpeed;
     float launchAngle;
@@ -57,9 +57,9 @@ Particle_002C2A88 *func_002C2A88(TI128 *position, unsigned char mode, unsigned c
         p->unk09 = FloatToInt(0.0f) + 0x70;
         p->unk01 = 0;
         p->unk03 = 0x44;
-        p->unk02 = D_001F2628[Rand() & 7];
+        p->unk02 = D_001F2628[func_001163B0() & 7];
         p->size = 21000.0f;
-        p->unk08 = Rand();
+        p->unk08 = func_001163B0();
         m->mode = mode;
         m->unk12 = byteA;
         m->unk13 = byteB;
@@ -75,11 +75,11 @@ Particle_002C2A88 *func_002C2A88(TI128 *position, unsigned char mode, unsigned c
             m->unk14 = 0;
             break;
         case 2:
-            launchSpeed = RandomFloatRange(3.0f, 9.0f) * speed * 0.016666668f;
-            launchAngle = RandomAngle();
-            BuildSphericalOffset(m, launchSpeed, launchAngle, RandomFloatRange(1.343903660774231f, 1.7976893186569214f));
+            launchSpeed = math_random_float_range(3.0f, 9.0f) * speed * 0.016666668f;
+            launchAngle = math_random_angle();
+            vec_build_spherical_offset(m, launchSpeed, launchAngle, math_random_float_range(1.343903660774231f, 1.7976893186569214f));
             p->size = 42000.0f;
-            m->alpha = (Rand() & 0x1F) + 0x10;
+            m->alpha = (func_001163B0() & 0x1F) + 0x10;
             p->colour = (m->alpha << 24) | 0x808080;
             p->life = life1;
             m->unk14 = 2;

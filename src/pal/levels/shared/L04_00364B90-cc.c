@@ -1,25 +1,26 @@
+#include "names.h"
 /* func_PAL_L04_00364B90, the PAL copy of func_L04_00362768: the same C, where scale a2. */
 #include "common.h"
-extern void func_00282DD8(void *, void *, void *);
+extern void FastVecCross(void *, void *, void *);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern void func_002830C0(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 extern unsigned char D_001A7A33 MACRO_ADDR;
-extern unsigned char D_001A7A32 MACRO_ADDR;
-extern void func_00282CF0(f32 *,f32 *,f32 *);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern u32 func_00282978(u8 *);
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
+extern unsigned char g_bolt_multiplier MACRO_ADDR;
+extern void FastVecSub(f32 *,f32 *,f32 *);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern u32 FastDecTimer(u8 *);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
 
-extern void func_00282F20(float *, float *, float);
-extern float func_00282DB0(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern void vec_scale_to_length(float *, float *, float);
+extern float FastVecDot(void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 extern int D_001A8FF0 MACRO_ADDR;
 extern float D_001A7DC0 MACRO_ADDR;
 extern unsigned char D_L04_001B9540[];
@@ -122,7 +123,7 @@ typedef struct {
     u32 field2290;
     u32 field2294;
 } D00189E20;
-extern D00189E20 D_00189E20;
+extern D00189E20 g_hero_state;
 /* Check the hero's surface contact and optionally apply its movement impulse. */
 /* func_L04_002DB970 is defined in L04_002CC748-collision-g8.c. */
 
@@ -171,11 +172,11 @@ typedef struct {
 /* the record the level's other spawner builds: the same flag bytes, a word
    and a colour, then a sixteen-byte block and the fields that follow it */
 /* the block at +0x30: a sixteen-byte vector and the float inside its last word */
-extern void *func_002B9030(s32 kind);
-extern s32 func_00283CF0(f32 value);
-extern s32 func_002A77E0(s32 limit);
-extern void func_00282F20(f32 *dst, f32 *a, f32 len);
-extern void func_00282CF0(f32 *dst, f32 *a, f32 *b);
+extern void *part_alloc(s32 kind);
+extern s32 FloatToInt(f32 value);
+extern s32 math_random_int_below(s32 limit);
+extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
+extern void FastVecSub(f32 *dst, f32 *a, f32 *b);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u32 ref_L04_00362768_00;
@@ -205,9 +206,9 @@ extern MobListStruct ref_L04_0031D630_00;
 
 /* func_L04_00344568 is in L04_002CC748-axis.c. */
 
-extern f32 func_00282DB0(void *a, void *b);
-extern void func_00282DD8(void *dst, void *a, void *b);
-extern void func_002830C0(void *a, void *b, void *c);
+extern f32 FastVecDot(void *a, void *b);
+extern void FastVecCross(void *dst, void *a, void *b);
+extern void transform_vector(void *a, void *b, void *c);
 /* Copies the caller's matrix into a local one, takes the two aim angles off
    the target vector, springs one of them, and turns the copy by the three
    angles before handing its axes to the caller. */
@@ -219,7 +220,7 @@ typedef struct {
     f32 history[30];
 } PadHistory;
 
-extern PadHistory D_00138180;
+extern PadHistory g_pad_state;
 
 /* Returns the float steps entries back from the head of a 30-entry history ring (steps capped
    at the ring's count); RAC1's read_pad_float_history. */
@@ -251,42 +252,42 @@ typedef struct {
 /* Builds the record of kind 0x1A that follows TARGET for DURATION frames, with COLOR
    and its alpha byte: it starts at the target, or at its joint JOINT moved 0.4 toward
    D_L04_001B9680 when JOINT is not -1. */
-L04Effect1A *func_L04_00358868(void *target, s32 color, u32 duration, u32 joint, f32 value);
+L04Effect1A *SpawnJointFollowParticle(void *target, s32 color, u32 duration, u32 joint, f32 value);
 
-extern s32 func_00283CF0(f32);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_002A77E0(s32);
+extern s32 FloatToInt(f32);
+extern f32 math_random_float_range(f32, f32);
+extern s32 math_random_int_below(s32);
 /* func_L04_0035F3E0 is defined in L04_0035F3E0-qcopy.c. */
 
 void *func_PAL_L04_00364B90(void *a0, void *a1, u32 a2, f32 f3) {
-    L04Record *p = (L04Record *)(u32)func_002B9030(0x5E);
+    L04Record *p = (L04Record *)(u32)part_alloc(0x5E);
     L04RecordTail *q;
     L04Quad t;
 
     if ((u32)p != 0) {
         p->field10 = *(L04Quad *)a0;
         q = (L04RecordTail *)((u8 *)p + 0x20);
-        p->field09 = (u8)(func_00283CF0(2.0f) + 0x40);
+        p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
         p->field03 = 0x48;
         p->field01 = 0;
         p->field02 = *(u8 *)ref_L04_00362768_00;
         p->field0C = f3 * 105000.0f;
-        p->field08 = (u8)func_002A77E0(0xFF);
+        p->field08 = (u8)math_random_int_below(0xFF);
         p->field0A = (u16)(((int)(a2) * 5 + 2) / 6);
         t = *(L04Quad *)a1;
         p->field20 = t;
         q->field0C = 0;
         q->field10 = 0.5f;
         q->field14 = f3;
-        q->field18 = (u16)(func_002A77E0(2) - 1);
+        q->field18 = (u16)(math_random_int_below(2) - 1);
     }
     return (u32)p;
 }
 
-extern void func_002B9180(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00283CE0(int);
+extern void part_kill(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float IntToFloat(int);
 /* Same body as func_002C7620, with this function's own callees. */
 /* func_L04_00363690 is defined in L04_00363690-qcopy.c. */
 
@@ -316,7 +317,7 @@ extern float func_00283CE0(int);
 /* func_L04_003A1868 is in L04_002CC748-lighting-g8.c. */
 
 /* Toggle the water controller, animate its height, and disturb its ripple tiles. */
-extern u32 func_00282978(u8 *ptr);
+extern u32 FastDecTimer(u8 *ptr);
 /* func_L04_003A1FE0 is matched in L04_002CC748-g8.c (built with -G8). */
 
 /* func_L04_003A21F8 is matched in L04_002CC748-water-g8.c (built with -G8). */
@@ -331,15 +332,15 @@ typedef struct {
     u32 count;
 } Tbl;
 extern Tbl D_L04_00231E00;
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 typedef unsigned int B352Quad __attribute__((mode(TI)));
 typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern char *D_0018C0B0 NOT_SDA;
+extern char *g_hero_moby NOT_SDA;
 extern Collision D_L04_001BFAC0;
 extern Material D_L04_0027B470[];
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern int CollLine(void *, void *, int, void *, void *);
 /* func_L04_003C3BA0 is matched in L04-particle-emitter-g8.c. */
 
 /* Initialises particle i of this emitter: a random unit-cube direction, a random
@@ -367,8 +368,8 @@ extern u16 D_L04_0023DB80[];
 #endif
 extern s32 D_L04_001B2E70 MACRO_ADDR;
 extern u16 D_L04_001B2E74 MACRO_ADDR;
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 
 /* A sixteen-byte record per spawn slot (L04SpawnRecord, above). */
 
@@ -384,7 +385,7 @@ extern u16 D_L04_0023DB80[];
 extern s32 D_L04_001B2E70;
 extern u16 D_L04_001B2E74;
 
-extern f32 func_002A78D8(f32 a0, f32 a1);
-extern f32 func_002A7878(f32 a0, f32 a1);
+extern f32 math_random_signed_float_range(f32 a0, f32 a1);
+extern f32 math_random_float_range(f32 a0, f32 a1);
 
 /* adds VALUE to the running total and returns the total as it was before */

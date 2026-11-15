@@ -5,32 +5,32 @@
 typedef struct { int f0; unsigned char *toggle; int pad8[2]; int flags; } ListEntry;
 typedef struct { char pad0[0x34]; ListEntry *list; int cursor; int timer; } ListMenu;
 
-extern char D_001F2840[];
-extern int D_00138180[];
-extern float D_001B15A0 __attribute__((sda));
+extern char g_pause_menu_state[];
+extern int g_pad_state[];
+extern float g_screen_fade __attribute__((sda));
 extern unsigned char D_001B1F10_sda __attribute__((sda));
 extern unsigned char D_001B1F10;
-extern void func_002DF190(int, int);
-extern void func_002B49E0(int, int, int, int, int);
-extern void func_0027D330(int);
+extern void snd_play_menu_sound_if_enabled(int, int);
+extern void request_begin_slot(int, int, int, int, int);
+extern void FadeToBlack(int);
 
 /* Handles input for a list menu: moves the cursor, toggles the chosen entry, or starts a short fade for special entries. */
-int func_002DB1B0(ListMenu *object)
+int menu_toggle_list_update(ListMenu *object)
 {
-    char *root = gPauseMenuState;
+    char *root = g_pause_menu_state;
     int active = *(ListMenu **)(*(char **)(root + 0x14) + 0xE8) == object;
     int flags;
     int old;
 
     if (object->timer != 0) {
         int t = --object->timer;
-        gScreenFade = (float)(t < 5 ? t : 4) * 0.25f;
+        g_screen_fade = (float)(t < 5 ? t : 4) * 0.25f;
         return 0;
     }
     if (!active)
         return 0;
     {
-        int *state = gPadState;
+        int *state = g_pad_state;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
         if (*(int *)(root + 0x134) == 0)
@@ -38,11 +38,11 @@ int func_002DB1B0(ListMenu *object)
     }
 proceed:
     {
-        int *state = gPadState;
+        int *state = g_pad_state;
         flags = state[0x1C4 / 4];
     }
     if (flags & 0x10) {
-        char *root = gPauseMenuState;
+        char *root = g_pause_menu_state;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -65,18 +65,18 @@ finish:
         if (old != 0)
             object->cursor = old - 1;
     }
-    if (gPadState[0x1C4 / 4] & 0x4000) {
+    if (g_pad_state[0x1C4 / 4] & 0x4000) {
         int cur = object->cursor;
         if (object->list[cur + 1].f0 != 0)
             object->cursor = cur + 1;
     }
-    if (gPadState[0x1C4 / 4] & 0x40) {
-        PlayMenuSoundIfEnabled(0, 0x11);
+    if (g_pad_state[0x1C4 / 4] & 0x40) {
+        snd_play_menu_sound_if_enabled(0, 0x11);
 
         if (object->list[object->cursor].flags & 1) {
             if (D_001B1F10_sda) {
-                char *root = gPauseMenuState;
-                BeginSlotRequest(4, 1, 3, *(int *)(root + 0x14), 0);
+                char *root = g_pause_menu_state;
+                request_begin_slot(4, 1, 3, *(int *)(root + 0x14), 0);
             } else {
                 FadeToBlack(4);
                 object->timer = 0x10;
@@ -87,6 +87,6 @@ finish:
         }
     }
     if (object->cursor != old)
-        PlayMenuSoundIfEnabled(1, 0x11);
+        snd_play_menu_sound_if_enabled(1, 0x11);
     return 0;
 }

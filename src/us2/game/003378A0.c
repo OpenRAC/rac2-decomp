@@ -1,14 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned long u64;
 
-extern int func_00336A40(void *);
+extern int hud_draw_widget_text(void *);
 extern u64 func_US2_0027CED8(int);
 extern void func_US2_0027FCB0(float, float, u64, u8 *, int, float, u64, u8 *);
 extern float func_US2_002804C0(u8 *, int, int, float);
-extern void func_0027F110(void);
-extern void func_0027F120(void);
+extern void gfx_enable_screen_flag(void);
+extern void gfx_disable_screen_flag(void);
 
 /* func_US2_003378A0, the USA v2.00 copy of func_00336A78: the same C with a new start, which sets
    the mode word func_0027F110/func_0027F120 write from +0x54, and with +0x48 set stores the
@@ -24,9 +25,9 @@ void func_US2_003378A0(char *o)
     float *scale;
 
     if (*(int *)(o + 0x54) != 0) {
-        func_0027F110();
+        gfx_enable_screen_flag();
     } else {
-        func_0027F120();
+        gfx_disable_screen_flag();
     }
     offset = 0.0f;
     if (*(int *)(o + 0x48) != 0) {
@@ -39,7 +40,7 @@ void func_US2_003378A0(char *o)
     if (*(int *)(o + 64) == 0) {
         return;
     }
-    width = func_00336A40(o);
+    width = hud_draw_widget_text(o);
     x = *(float *)(*(char **)(o));
     switch (*(int *)(o + 68)) {
     case 0:

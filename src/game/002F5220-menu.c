@@ -20,19 +20,19 @@ typedef struct {
     unsigned short ammo;
     char pad8A[0x56];
 } Menu6608Item;
-extern char D_0021F240[];
+extern char g_vendor_menu_state[];
 #define MENU_STATE ((Menu6608State *)D_0021F240)
-extern Menu6608Item D_00239BA0[];
+extern Menu6608Item g_weapon_table[];
 /* Through a pointer, so the slot index is evaluated before the table's address. */
 #define MENU_ITEMS ((Menu6608Item *)D_00239BA0)
-extern unsigned char D_00139568[];
+extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001A7B68[] MACRO_ADDR;
-extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern int D_00262E40[][5];
-extern int func_00288D58(void);
-extern int func_002883E8(int);
-extern int func_00287F60(int);
-extern void func_002FADB0(void);
+extern int flag_is_byte_set(void);
+extern int help_store_id_in_slot_list(int);
+extern int menu_count_chain_entries_after_head(int);
+extern void shop_mark_bought_special_items_owned(void);
 
 static __inline__ int menu6608Special(int id)
 {
@@ -46,7 +46,7 @@ static __inline__ int menu6608Special(int id)
 #define MENU6608_TYPE_OK(type, id) ((type) >= 2 || ((type) == 1 && menu6608Special(id)))
 static __inline__ int menu6608TypeOk(int id)
 {
-    int n = CountChainEntriesAfterHead(id);
+    int n = menu_count_chain_entries_after_head(id);
     if (MENU6608_TYPE_OK(n, id)) return 1;
     return 0;
 }
@@ -54,7 +54,7 @@ static __inline__ int menu6608CanUpgrade(int id)
 {
     int eligible = 0;
     int result;
-    if (MENU_ITEMS[gItemSlotToRecord[id]].active) {
+    if (MENU_ITEMS[g_item_slot_to_record[id]].active) {
         result = menu6608TypeOk(id);
     } else {
         result = 0;
@@ -64,21 +64,21 @@ static __inline__ int menu6608CanUpgrade(int id)
 }
 static __inline__ int menu6608HasType(int id)
 {
-    Menu6608Item *item = &MENU_ITEMS[gItemSlotToRecord[id]];
+    Menu6608Item *item = &MENU_ITEMS[g_item_slot_to_record[id]];
     if (item->active && MENU6608_TYPE_OK(item->type, id)) return 1;
     return 0;
 }
 
 /* Builds the vendor's weapon and upgrade list: which weapons can be bought, upgraded or refilled with ammo. Removes duplicate entries at the end. */
-void func_002F6608(int hideUnowned)
+void shop_build_vendor_weapon_list(int hideUnowned)
 {
     int listLen, id;
 
-    if (IsFlagByteSet()) {
+    if (flag_is_byte_set()) {
         int i;
         for (i = 0; i < 56; i++) {
-            if (i != 10 && MENU_ITEMS[gItemSlotToRecord[i]].active)
-                StoreHelpIdInSlotList(i);
+            if (i != 10 && MENU_ITEMS[g_item_slot_to_record[i]].active)
+                help_store_id_in_slot_list(i);
         }
     }
     for (listLen = 0; listLen < 32; listLen++) {
@@ -90,8 +90,8 @@ void func_002F6608(int hideUnowned)
         for (i = 0; i < listLen; i++) {
             if (D_001A7B68[i] == 255) continue;
             id = D_001A7B68[i] & 63;
-            if (gItemOwnedFlags[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[gItemSlotToRecord[id]].cost <= 0 && IsFlagByteSet()) {
-                int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
+            if (g_item_owned_flags[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[g_item_slot_to_record[id]].cost <= 0 && flag_is_byte_set()) {
+                int classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -101,10 +101,10 @@ void func_002F6608(int hideUnowned)
                 MENU_STATE->count++;
             }
             if (D_001A7B68[i] & 64) {
-                if (MENU_ITEMS[gItemSlotToRecord[id]].ammo) {
+                if (MENU_ITEMS[g_item_slot_to_record[id]].ammo) {
                     int classId;
                     MENU_STATE->entries[MENU_STATE->count].id = id;
-                    classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
+                    classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                     MENU_STATE->entries[MENU_STATE->count].kind = 1;
                     MENU_STATE->entries[MENU_STATE->count].price = 0xCDB;
                     MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -112,12 +112,12 @@ void func_002F6608(int hideUnowned)
                     MENU_STATE->entries[MENU_STATE->count].upgrade = 0;
                     MENU_STATE->count++;
                 }
-            } else if (!hideUnowned && !gItemOwnedFlags[id]) {
+            } else if (!hideUnowned && !g_item_owned_flags[id]) {
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
                 MENU_STATE->entries[MENU_STATE->count].price = 0xCDB;
-                MENU_STATE->entries[MENU_STATE->count].classId = (id == 9 || id == 73) ? 601 : MENU_ITEMS[gItemSlotToRecord[id]].classId;
+                MENU_STATE->entries[MENU_STATE->count].classId = (id == 9 || id == 73) ? 601 : MENU_ITEMS[g_item_slot_to_record[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].upgrade = 0;
                 MENU_STATE->count++;
             }
@@ -126,18 +126,18 @@ void func_002F6608(int hideUnowned)
             int id;
             for (id = 0; id < 56; id++) {
                 int eligible;
-                if (!MENU_ITEMS[gItemSlotToRecord[id]].active || !gItemOwnedFlags[id]) continue;
+                if (!MENU_ITEMS[g_item_slot_to_record[id]].active || !g_item_owned_flags[id]) continue;
                 eligible = 0;
                 if (menu6608TypeOk(id)) eligible = id != 16;
                 if (eligible) {
                     if (!menu6608HasType(id)) {
-                        if (MENU_ITEMS[gItemSlotToRecord[id]].cost <= 0 && IsFlagByteSet()) {
+                        if (MENU_ITEMS[g_item_slot_to_record[id]].cost <= 0 && flag_is_byte_set()) {
                             int j;
                             for (j = 0; j < MENU_STATE->count; j++)
                                 if (MENU_STATE->entries[j].id == id) break;
                             if (j < MENU_STATE->count && MENU_STATE->entries[j].upgrade) continue;
                             {
-                                int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
+                                int classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                                 MENU_STATE->entries[MENU_STATE->count].id = id;
                                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -149,14 +149,14 @@ void func_002F6608(int hideUnowned)
                         }
                     }
                 }
-                if (gItemOwnedFlags[id] && MENU_ITEMS[gItemSlotToRecord[id]].ammo) {
+                if (g_item_owned_flags[id] && MENU_ITEMS[g_item_slot_to_record[id]].ammo) {
                     int j;
                     for (j = 0; j < MENU_STATE->count; j++)
                         if (MENU_STATE->entries[j].id == id) break;
                     if (j < MENU_STATE->count && !MENU_STATE->entries[j].upgrade) continue;
                     {
                         int price = D_00262E40[id][0];
-                        int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
+                        int classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                         MENU_STATE->entries[MENU_STATE->count].id = id;
                         MENU_STATE->entries[MENU_STATE->count].kind = 1;
                         MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -173,11 +173,11 @@ void func_002F6608(int hideUnowned)
         for (id = 0; id < 56; id++) {
             if (id != 12 && id != 18 && id != 14 && id != 17 && id != 53 && id != 44) continue;
             {
-                int owned = gItemOwnedFlags[id];
+                int owned = g_item_owned_flags[id];
                 int price, classId;
-                if (owned && !MENU_ITEMS[gItemSlotToRecord[id]].ammo) continue;
+                if (owned && !MENU_ITEMS[g_item_slot_to_record[id]].ammo) continue;
                 price = D_00262E40[id][0];
-                classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
+                classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
                 MENU_STATE->entries[MENU_STATE->count].price = price;
@@ -188,7 +188,7 @@ void func_002F6608(int hideUnowned)
                 MENU_STATE->count++;
             }
         }
-        MarkBoughtSpecialItemsOwned();
+        shop_mark_bought_special_items_owned();
     }
     {
         int i, j, k, changed;

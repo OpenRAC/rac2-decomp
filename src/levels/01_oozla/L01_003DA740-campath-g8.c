@@ -20,15 +20,15 @@ extern PathGlobals D_L01_001BD9C0;
 extern PathTransformGlobal D_L01_001B9380;
 extern PathRecord *D_L01_001FE180[];
 extern u8 *D_L01_001B264C __attribute__((sda));
-extern f32 func_00283248(f32,f32);
-extern f32 func_00282E48(void *,void *);
-extern f32 func_00283CE0(s32);
-extern void func_00282C88(void *);
-extern void func_L01_002BEB90(s32,s32);
-extern void func_L00_002B9D60(void *,void *,s32,s32);
+extern f32 mat_fast_helper_a(f32,f32);
+extern f32 fast_vec_dist(void *,void *);
+extern f32 IntToFloat(s32);
+extern void vec_clear_128(void *);
+extern void SetHeroMoveState(s32,s32);
+extern void hero_reset_position_and_direction(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
  * paths' segment lengths, primes both springs and copies the template transform. */
-void func_L01_0042C540(void *arg) {
+void ActivateSplinePathCamera(void *arg) {
     PathVec orientation;
     PathObject *obj=arg;
     PathSettings *settings=D_L01_001B1F04[obj->config].settings;
@@ -54,7 +54,7 @@ void func_L01_0042C540(void *arg) {
     }
     factor=D_L01_001BD9C0.value;
     scale=&obj->transform[3]; pos=&obj->transform[1]; angles=&obj->transform[2];
-    marks->factor=FastMatrixHelperA(1.0f,factor)*2.0f;
+    marks->factor=mat_fast_helper_a(1.0f,factor)*2.0f;
     if(settings->positionPath>=0) {
         s32 i, marked=0; PathRecord *path;
         path=D_L01_001FE180[settings->positionPath];
@@ -82,10 +82,10 @@ void func_L01_0042C540(void *arg) {
     }
     spring=&obj->state->position;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    ClearVector128(&spring->value);
+    vec_clear_128(&spring->value);
     spring=&obj->state->rotation;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    ClearVector128(&spring->value);
+    vec_clear_128(&spring->value);
     { u8 *template=D_L01_001B9380.transform;
     qcopy(scale,template+0x30);
     qcopy(obj,template);
@@ -96,6 +96,6 @@ void func_L01_0042C540(void *arg) {
     else {
         u8 (*cameras)[128]=(void *)D_L01_001B264C;
         orientation.q=0; orientation.f[3]=1;
-        ResetHeroPositionAndDirection(cameras[cameraIndex]+0x30,&orientation,111,0);
+        hero_reset_position_and_direction(cameras[cameraIndex]+0x30,&orientation,111,0);
     } }
 }

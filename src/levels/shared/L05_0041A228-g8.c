@@ -1,22 +1,22 @@
 #include "include_asm.h"
 #include "common.h"
-extern float func_002A7940(void);
-extern void func_00281EB8(void *,int,int,int,float,float,float);
-extern long long func_0027C878(int);
-extern void func_002FC560(int,long long);
-extern void func_00280328(void);
-extern void func_00283658(void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00282DD8(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00281810(int,void *,void *,void *,int);
-extern void func_002ACEC0(void *,void *,void *,float);
-extern float func_00283B98(float,float);
-extern void func_002AB668(void *,void *,float);
-extern void func_002ACDE8(void *,void *,void *);
+extern float math_random_angle(void);
+extern void gfx_draw_billboard_quad(void *,int,int,int,float,float,float);
+extern long long GetEffectTextureDescriptor(int);
+extern void VU1_addGSregister(int,long long);
+extern void font_queue_vu_state(void);
+extern void copy_matrix_rotation(void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern void FastVecCross(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void part_draw_glint_effect(int,void *,void *,void *,int);
+extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
+extern float FastAddRotations(float,float);
+extern void math_build_axis_angle_quat(void *,void *,float);
+extern void vec_rotate_by_quaternion(void *,void *,void *);
 extern float D_L05_002B8330[][4],D_L05_002B8670[][4];
 extern char D_L05_002B8550[],D_L05_001B96C0[];
 extern int D_L05_001B11D0 __attribute__((sda));
@@ -56,7 +56,7 @@ typedef struct {
 } EffectState;
 
 /* Draws the glowing energy blast: shaped outlines that grow, then spinning rings. Before it is switched on it just shows a few flat flashes. */
-void func_L05_0041A228(char *object)
+void gfx_draw_energy_blast(char *object)
 {
     int colors[34];
     EffectPosition vertices[34];
@@ -76,23 +76,23 @@ void func_L05_0041A228(char *object)
         effect->size+=D_L05_001B122C;
         {
             float radius=D_L05_001B121C+effect->size;
-            float angle=RandomAngle();
-            DrawBillboardQuad_00281EB8(object+0x10,0x31,0x40801010,1,radius,0.0f,angle);
+            float angle=math_random_angle();
+            gfx_draw_billboard_quad(object+0x10,0x31,0x40801010,1,radius,0.0f,angle);
         }
         {
             float radius=D_L05_001B1220+effect->size;
-            float angle=RandomAngle();
-            DrawBillboardQuad_00281EB8(object+0x10,0x31,0x707F7F7F,1,radius,0.0f,angle);
+            float angle=math_random_angle();
+            gfx_draw_billboard_quad(object+0x10,0x31,0x707F7F7F,1,radius,0.0f,angle);
         }
         {
             float radius=D_L05_001B1224+effect->size;
-            float angle=RandomAngle();
-            DrawBillboardQuad_00281EB8(object+0x10,0x2F,0x407F7F7F,1,radius,0.0f,angle);
+            float angle=math_random_angle();
+            gfx_draw_billboard_quad(object+0x10,0x2F,0x407F7F7F,1,radius,0.0f,angle);
         }
         {
             float radius=D_L05_001B1228+effect->size;
-            float angle=RandomAngle();
-            DrawBillboardQuad_00281EB8(object+0x10,D_L05_001B1218,0x407F7F7F,1,radius,0.0f,angle);
+            float angle=math_random_angle();
+            gfx_draw_billboard_quad(object+0x10,D_L05_001B1218,0x407F7F7F,1,radius,0.0f,angle);
         }
         return;
     }
@@ -116,7 +116,7 @@ void func_L05_0041A228(char *object)
         colors[i]=D_L05_001B11D4|effect->alpha;
         }
     }
-    DrawGlintEffect(D_L05_001B1078,vertices,colors,D_L05_002B8550,1);
+    part_draw_glint_effect(D_L05_001B1078,vertices,colors,D_L05_002B8550,1);
     FastVecSub(view,D_L05_001B96C0,basis[3]);
     FastVecCross(basis[1],basis[0],view);vec_scale_to_length(basis[1],basis[1],1.0f);
     FastVecCross(basis[2],basis[1],basis[0]);
@@ -131,7 +131,7 @@ void func_L05_0041A228(char *object)
         colors[i]=D_L05_001B11D8|effect->alpha;
         }
     }
-    DrawGlintEffect(8,vertices,colors,D_L05_001B1090,1);
+    part_draw_glint_effect(8,vertices,colors,D_L05_001B1090,1);
     VU1_addGSregister(0x42,0x7F00000048LL);
     {
         int i;
@@ -144,7 +144,7 @@ void func_L05_0041A228(char *object)
         colors[i]=D_L05_001B11DC|effect->alpha;
         }
     }
-    DrawGlintEffect(8,vertices,colors,D_L05_001B1090,1);
+    part_draw_glint_effect(8,vertices,colors,D_L05_001B1090,1);
     VU1_addGSregister(0x42,0x7F00000044LL);
     FastVecScale(&point,basis[0],height);FastVecAdd(basis[3],basis[3],&point);
     {
@@ -156,7 +156,7 @@ void func_L05_0041A228(char *object)
         colors[i]=D_L05_001B11E0|effect->alpha;
         }
     }
-    DrawGlintEffect(4,vertices,colors,D_L05_001B11A0,1);
+    part_draw_glint_effect(4,vertices,colors,D_L05_001B11A0,1);
     VU1_addGSregister(0x42,0x7F00000048LL);
     {
         int i;
@@ -167,15 +167,15 @@ void func_L05_0041A228(char *object)
         colors[i]=D_L05_001B11E4|effect->alpha;
         }
     }
-    DrawGlintEffect(4,vertices,colors,D_L05_001B11A0,1);
+    part_draw_glint_effect(4,vertices,colors,D_L05_001B11A0,1);
     uv.q=0;uv.f[2]=1.0f;uv.f[3]=1.0f;
     VU1_addGSregister(6,GetEffectTextureDescriptor(0x40));
     FastVecSub(basis[0],D_L05_001B96C0,basis[3]);vec_scale_to_length(basis[0],basis[0],1.0f);
     FastVecCross(basis[1],basis[0],uv.f);vec_scale_to_length(basis[1],basis[1],1.0f);FastVecCross(basis[2],basis[1],basis[0]);
     radius=effect->radius;
-    ApplyAxisRotationToQuaternion(basis[1],basis[1],basis[0],radius);ApplyAxisRotationToQuaternion(basis[2],basis[2],basis[0],radius);
+    math_apply_axis_rotation_to_quat(basis[1],basis[1],basis[0],radius);math_apply_axis_rotation_to_quat(basis[2],basis[2],basis[0],radius);
     effect->radius=FastAddRotations(effect->radius,effect->speed*0.017453294f*D_L05_001B11FC);
-    BuildAxisAngleQuaternion(rotation,basis[0],1.5707965f);
+    math_build_axis_angle_quat(rotation,basis[0],1.5707965f);
     for(j=0;j<4;j++) {
         {
             int i;
@@ -186,7 +186,7 @@ void func_L05_0041A228(char *object)
             colors[i]=D_L05_001B11F8|effect->alpha;
             }
         }
-        DrawGlintEffect(4,vertices,colors,D_L05_001B1130,1);
-        if(j!=3) {RotateVectorByQuaternion(basis[1],basis[1],rotation);RotateVectorByQuaternion(basis[2],basis[2],rotation);}
+        part_draw_glint_effect(4,vertices,colors,D_L05_001B1130,1);
+        if(j!=3) {vec_rotate_by_quaternion(basis[1],basis[1],rotation);vec_rotate_by_quaternion(basis[2],basis[2],rotation);}
     }
 }

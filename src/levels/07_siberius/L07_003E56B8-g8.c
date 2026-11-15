@@ -1,23 +1,23 @@
 #include "common.h"
 
-extern int func_00283CF0(float);
-extern void func_002A7750(char *, int, int);
-extern float func_00282E48(void *, void *);
-extern void func_002A93B0(char *);
-extern int func_002E5CF8(int, int, char *);
-extern int func_002B0ED8(char *, void *, int);
-extern void func_L07_003E5AC8(char *);
-extern void func_L07_003E5D80(char *);
-extern void func_L07_003E6148(char *);
+extern int FloatToInt(float);
+extern void moby_set_state(char *, int, int);
+extern float fast_vec_dist(void *, void *);
+extern void moby_update_ground_check(char *);
+extern int PlayMobySound(int, int, char *);
+extern int moby_apply_damage_to_object(char *, void *, int);
+extern void entity_set_group_alert_a(char *);
+extern void entity_handle_death_or_respawn(char *);
+extern void entity_follow_platform(char *);
 /* Returns int (src/game/002B3BA8.c); the call's result register shapes the allocation after it. */
-extern int func_002B3BA8(char *, int, void *, int, float, float);
+extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 
 /* Two tuning values: the first scaled by 1/3600, the second by 1/60. */
 extern float D_L07_001B0AA0 __attribute__((sda));
 extern float D_L07_001B0AA4 __attribute__((sda));
 extern char D_L07_001B9200[];
 /* The sound slots, 0x70 bytes each. */
-extern char D_00188660[];
+extern char g_sound_state[];
 
 /* In state 0, set up the object's state block (offsets in ascending order, with +0x98 first and
    +0x30 last, as retail's store schedule requires). Then: within 24 units of D_L07_001B9200 while
@@ -26,7 +26,7 @@ extern char D_00188660[];
    when +0x2E is 2; and follow the platform at +0x260 unless the state byte is 8. */
 /* Sets up the group entity on its first frame, then keeps its sound, alert checks and platform
    following going. */
-void func_L07_003E56B8(char *moby)
+void group_entity_base_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     char *slot;
@@ -57,27 +57,27 @@ void func_L07_003E56B8(char *moby)
         *(int *)(vars + 0x30) = 0;
         qcopy(vars + 0x220, moby + 0x10);
         if (*(short *)(vars + 0x218))
-            SetMobyState(moby, 1, 0);
+            moby_set_state(moby, 1, 0);
         else {
             *(int *)(moby + 0x98) = 0;
             *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
-            SetMobyState(moby, 8, 4);
+            moby_set_state(moby, 8, 4);
         }
     }
     if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L07_001B9200) < 24.0f) {
-        UpdateMobyGroundCheck(moby);
+        moby_update_ground_check(moby);
         *(unsigned char *)(moby + 0x6F) = 22;
     }
     if (*(unsigned char *)(moby + 0x95) != 4) {
-        slot = gSoundState + *(int *)(vars + 0x264) * 0x70;
+        slot = g_sound_state + *(int *)(vars + 0x264) * 0x70;
         if (*(char **)(slot + 0x88) != moby || !*(unsigned char *)(slot + 0x74))
             *(int *)(vars + 0x264) = PlayMobySound(1, 4, moby);
     }
-    if (ApplyDamageToObject(moby, vars + 0x50, 0) >= 2 || *(unsigned char *)(vars + 0x2E) == 2) {
-        SetGroupMembersAlertFlag244(moby);
-        HandleEntityDeathOrRespawn(moby);
+    if (moby_apply_damage_to_object(moby, vars + 0x50, 0) >= 2 || *(unsigned char *)(vars + 0x2E) == 2) {
+        entity_set_group_alert_a(moby);
+        entity_handle_death_or_respawn(moby);
     }
-    SelectAimTarget_002B3BA8(moby, *(int *)(vars + 0x214), 0, 0, 0.0f, 0.0f);
+    weapon_select_aim_target(moby, *(int *)(vars + 0x214), 0, 0, 0.0f, 0.0f);
     if (*(int *)(vars + 0x260) && *(unsigned char *)(moby + 0x20) != 8)
-        FollowAttachedPlatform(moby);
+        entity_follow_platform(moby);
 }

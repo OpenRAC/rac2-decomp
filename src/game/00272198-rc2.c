@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -24,7 +25,7 @@
  */
 #include "common.h"
 
-extern f32  D_001B15A0[] __attribute__((sda));
+extern f32  g_screen_fade[] __attribute__((sda));
 
 struct S272198 {
     s8 pad[0x268];
@@ -32,11 +33,11 @@ struct S272198 {
     s32 progress;
 };
 
-extern struct S272198 D_001B5200;
+extern struct S272198 g_active_camera;
 
 /* Sets how many frames a camera transition takes and restarts it. */
-void func_00272198(f32 frames) {
-    gScreenFade[0] = 1.0f;
-    gActiveCamera.progress = 0;
-    gActiveCamera.rate = 1.0f / frames;
+void cam_set_transition_frames(f32 frames) {
+    g_screen_fade[0] = 1.0f;
+    g_active_camera.progress = 0;
+    g_active_camera.rate = 1.0f / frames;
 }

@@ -1,18 +1,19 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char D_00189E20[];
-extern void func_L00_002D24B8(void);
-extern void func_L22_002C9898(int mode, int flag);
+extern char g_hero_state[];
+extern void hero_clear_queued_anim(void);
+extern void hero_l22_set_action(int mode, int flag);
 extern int D_00138320;
-extern void func_L00_002AF7D0(void);
-extern void func_L00_002B1F90(void);
-extern void func_L00_00322EC8(void *p);
-extern void func_L00_002D2E68(void);
-extern void func_L00_002A6708(void);
-extern void func_L00_002A53B8(void);
-extern void func_0028B3D0(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
-extern void func_L00_002F6B90(int a0);
-extern void func_L22_002B7C70(void);
+extern void cancel_hero_item_animation(void);
+extern void UpdateHeroSlotCallbacks(void);
+extern void level_release_slot_list(void *p);
+extern void hero_set_objects_flag_bit(void);
+extern void hero_clear_tracked_slots(void);
+extern void attachment_reset_all(void);
+extern void hud_set_slot_contents(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
+extern void level_run_slot_callback(int a0);
+extern void hero_l22_update_speed_targets(void);
 extern void func_002A677C(int a0);
 extern void ref_L22_002B70F8_00(void);
 extern void ref_L22_002B70F8_01(void);
@@ -20,24 +21,24 @@ extern void ref_L22_002B70F8_02(void);
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef float f32;
-extern void func_L22_002C9898(int a0, int a1);
+extern void hero_l22_set_action(int a0, int a1);
 
 /* func_PAL_L22_002AA488, the PAL copy of func_L22_002AA678: the same C, where the fade rates
    0.07f and 0.13f become 0.08400001f and 0.156f, the timer 5 becomes 4, and the three call
    arguments 7, 8 and 9 become 6, 7 and 7. func_00282948 is declared int, as at its other call
    sites: the ignored result keeps $v0 from the base load after the call. */
-extern void func_L00_002D36E0(void *, int, float, float, float);
-extern void func_002AA2E8(float *, float, float);
+extern void hero_build_relative_point(void *, int, float, float, float);
+extern void ApproachValue(float *, float, float);
 extern int D_00138320;
-extern int func_L00_0032EF10(int, int, int);
-extern int func_L22_003B9428(void *);
-extern void func_L00_00310C88(void *, void *);
-extern void *func_L00_00310BC8(void *, int);
-extern void func_L00_00311080(void *, void *, int, int, int, int);
-extern void func_L00_00310D30(void *, void *);
-extern int func_00282948(void *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_002AFD88(void *, void *, float, float, float);
+extern int PadPressedWithin(int, int, int);
+extern int player_slot_has_object(void *);
+extern void release_moby_animation_slot(void *, void *);
+extern void *allocate_moby_animation_slot(void *, int);
+extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
+extern void AdvanceAndDecodeAnimationFrames(void *, void *);
+extern int math_fast_float_d(void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void vec_add_transformed_point(void *, void *, float, float, float);
 /* the two calls whose targets differ between levels 22 and 23 */
 extern void ref_L22_002AA678_00(void *, void *, int);
 extern void ref_L22_002AA678_01(void *, void *, int, int, int);
@@ -87,77 +88,77 @@ void func_PAL_L22_002AA488(void) {
     int available;
     int i;
 
-    if (((Hero_002AA678 *)D_00189E20)->unk1E0)
+    if (((Hero_002AA678 *)g_hero_state)->unk1E0)
         return;
-    if (((Hero_002AA678 *)D_00189E20)->unk2294 == 1 && func_L00_0032EF10(16, 6, 0) && !func_L22_003B9428(((Hero_002AA678 *)D_00189E20)->unk2290) &&
-        ((Hero_002AA678 *)D_00189E20)->counts->unkC) {
-        func_L00_002D36E0(v, 1, 2.0f, -2.1f, 8.7f);
-        ref_L22_002AA678_00(((Hero_002AA678 *)D_00189E20)->unk2290, v, 1);
-        ((Hero_002AA678 *)D_00189E20)->counts->unkC--;
+    if (((Hero_002AA678 *)g_hero_state)->unk2294 == 1 && PadPressedWithin(16, 6, 0) && !player_slot_has_object(((Hero_002AA678 *)g_hero_state)->unk2290) &&
+        ((Hero_002AA678 *)g_hero_state)->counts->unkC) {
+        hero_build_relative_point(v, 1, 2.0f, -2.1f, 8.7f);
+        ref_L22_002AA678_00(((Hero_002AA678 *)g_hero_state)->unk2290, v, 1);
+        ((Hero_002AA678 *)g_hero_state)->counts->unkC--;
     }
     available = 1;
-    if (!((Hero_002AA678 *)D_00189E20)->counts->unk8 || func_L22_003B9428(((Hero_002AA678 *)D_00189E20)->unk2290))
+    if (!((Hero_002AA678 *)g_hero_state)->counts->unk8 || player_slot_has_object(((Hero_002AA678 *)g_hero_state)->unk2290))
         available = 0;
-    if ((unsigned)(((Hero_002AA678 *)D_00189E20)->unk2294 - 0x5D) <= 1)
+    if ((unsigned)(((Hero_002AA678 *)g_hero_state)->unk2294 - 0x5D) <= 1)
         available = 0;
-    if (((Hero_002AA678 *)D_00189E20)->active) {
-        if (!((Hero_002AA678 *)D_00189E20)->counts->unk8) {
-            if (((Hero_002AA678 *)D_00189E20)->effect) {
-                if (((Hero_002AA678 *)D_00189E20)->effect->flags & 2)
-                    ((Hero_002AA678 *)D_00189E20)->fading = 1;
-                if (((Hero_002AA678 *)D_00189E20)->fading) {
-                    if (((Hero_002AA678 *)D_00189E20)->effect->fade == 0) {
-                        func_L00_00310C88(((Hero_002AA678 *)D_00189E20)->unk2290, &((Hero_002AA678 *)D_00189E20)->effect);
-                        ((Hero_002AA678 *)D_00189E20)->active = 0;
+    if (((Hero_002AA678 *)g_hero_state)->active) {
+        if (!((Hero_002AA678 *)g_hero_state)->counts->unk8) {
+            if (((Hero_002AA678 *)g_hero_state)->effect) {
+                if (((Hero_002AA678 *)g_hero_state)->effect->flags & 2)
+                    ((Hero_002AA678 *)g_hero_state)->fading = 1;
+                if (((Hero_002AA678 *)g_hero_state)->fading) {
+                    if (((Hero_002AA678 *)g_hero_state)->effect->fade == 0) {
+                        release_moby_animation_slot(((Hero_002AA678 *)g_hero_state)->unk2290, &((Hero_002AA678 *)g_hero_state)->effect);
+                        ((Hero_002AA678 *)g_hero_state)->active = 0;
                         return;
                     }
-                    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 0, 0.08400001f);
+                    ApproachValue(&((Hero_002AA678 *)g_hero_state)->effect->fade, 0, 0.08400001f);
                 }
             } else
-                ((Hero_002AA678 *)D_00189E20)->active = 0;
+                ((Hero_002AA678 *)g_hero_state)->active = 0;
         }
     }
-    if (((Hero_002AA678 *)D_00189E20)->active) {
+    if (((Hero_002AA678 *)g_hero_state)->active) {
         if (!(D_00138320 & 0x20) || !available) {
-            if (((Hero_002AA678 *)D_00189E20)->effect) {
-                if (((Hero_002AA678 *)D_00189E20)->effect->flags & 2)
-                    ((Hero_002AA678 *)D_00189E20)->fading = 1;
-                if (((Hero_002AA678 *)D_00189E20)->fading) {
-                    if (((Hero_002AA678 *)D_00189E20)->effect->fade == 0) {
-                        func_L00_00310C88(((Hero_002AA678 *)D_00189E20)->unk2290, &((Hero_002AA678 *)D_00189E20)->effect);
-                        ((Hero_002AA678 *)D_00189E20)->active = 0;
+            if (((Hero_002AA678 *)g_hero_state)->effect) {
+                if (((Hero_002AA678 *)g_hero_state)->effect->flags & 2)
+                    ((Hero_002AA678 *)g_hero_state)->fading = 1;
+                if (((Hero_002AA678 *)g_hero_state)->fading) {
+                    if (((Hero_002AA678 *)g_hero_state)->effect->fade == 0) {
+                        release_moby_animation_slot(((Hero_002AA678 *)g_hero_state)->unk2290, &((Hero_002AA678 *)g_hero_state)->effect);
+                        ((Hero_002AA678 *)g_hero_state)->active = 0;
                         return;
                     }
-                    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 0, 0.08400001f);
+                    ApproachValue(&((Hero_002AA678 *)g_hero_state)->effect->fade, 0, 0.08400001f);
                 }
             } else
-                ((Hero_002AA678 *)D_00189E20)->active = 0;
-        } else if (((Hero_002AA678 *)D_00189E20)->counts->unk8)
-            ((Hero_002AA678 *)D_00189E20)->fading = 0;
+                ((Hero_002AA678 *)g_hero_state)->active = 0;
+        } else if (((Hero_002AA678 *)g_hero_state)->counts->unk8)
+            ((Hero_002AA678 *)g_hero_state)->fading = 0;
     }
-    if (!((Hero_002AA678 *)D_00189E20)->active && available && func_L00_0032EF10(32, 7, 0)) {
-        Effect_002AA678 *p = func_L00_00310BC8(((Hero_002AA678 *)D_00189E20)->unk2290, 2);
-        ((Hero_002AA678 *)D_00189E20)->fading = 0;
-        ((Hero_002AA678 *)D_00189E20)->effect = p;
+    if (!((Hero_002AA678 *)g_hero_state)->active && available && PadPressedWithin(32, 7, 0)) {
+        Effect_002AA678 *p = allocate_moby_animation_slot(((Hero_002AA678 *)g_hero_state)->unk2290, 2);
+        ((Hero_002AA678 *)g_hero_state)->fading = 0;
+        ((Hero_002AA678 *)g_hero_state)->effect = p;
         if (p) {
-            ((Hero_002AA678 *)D_00189E20)->active = 1;
-            func_L00_00311080(((Hero_002AA678 *)D_00189E20)->unk2290, p, 13, 0, 7, 1);
+            ((Hero_002AA678 *)g_hero_state)->active = 1;
+            initialize_moby_animation_blend(((Hero_002AA678 *)g_hero_state)->unk2290, p, 13, 0, 7, 1);
         }
     }
-    if (!((Hero_002AA678 *)D_00189E20)->active || !((Hero_002AA678 *)D_00189E20)->effect || ((Hero_002AA678 *)D_00189E20)->fading)
+    if (!((Hero_002AA678 *)g_hero_state)->active || !((Hero_002AA678 *)g_hero_state)->effect || ((Hero_002AA678 *)g_hero_state)->fading)
         return;
-    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 1, 0.156f);
-    ((Hero_002AA678 *)D_00189E20)->effect->unk28 = 2;
-    func_L00_00310D30(((Hero_002AA678 *)D_00189E20)->unk2290, ((Hero_002AA678 *)D_00189E20)->effect);
-    func_00282948(&((Hero_002AA678 *)D_00189E20)->timer);
-    if (((Hero_002AA678 *)D_00189E20)->effect->state == 4 && !((Hero_002AA678 *)D_00189E20)->timer) {
-        ((Hero_002AA678 *)D_00189E20)->timer = 4;
+    ApproachValue(&((Hero_002AA678 *)g_hero_state)->effect->fade, 1, 0.156f);
+    ((Hero_002AA678 *)g_hero_state)->effect->unk28 = 2;
+    AdvanceAndDecodeAnimationFrames(((Hero_002AA678 *)g_hero_state)->unk2290, ((Hero_002AA678 *)g_hero_state)->effect);
+    math_fast_float_d(&((Hero_002AA678 *)g_hero_state)->timer);
+    if (((Hero_002AA678 *)g_hero_state)->effect->state == 4 && !((Hero_002AA678 *)g_hero_state)->timer) {
+        ((Hero_002AA678 *)g_hero_state)->timer = 4;
         for (i = 0; i < 2; i++) {
-            func_0029FCC0(((Hero_002AA678 *)D_00189E20)->unk2290, i + 3, v);
-            func_002AFD88(((Hero_002AA678 *)D_00189E20)->unk2290, v, 1.4f, 0, 0);
-            if (((Hero_002AA678 *)D_00189E20)->counts->unk8) {
-                ref_L22_002AA678_01(((Hero_002AA678 *)D_00189E20)->unk2290, v, 0, 0, ((Hero_002AA678 *)D_00189E20)->counts->unk0 != 0);
-                ((Hero_002AA678 *)D_00189E20)->counts->unk8--;
+            moby_transform_joint_to_world(((Hero_002AA678 *)g_hero_state)->unk2290, i + 3, v);
+            vec_add_transformed_point(((Hero_002AA678 *)g_hero_state)->unk2290, v, 1.4f, 0, 0);
+            if (((Hero_002AA678 *)g_hero_state)->counts->unk8) {
+                ref_L22_002AA678_01(((Hero_002AA678 *)g_hero_state)->unk2290, v, 0, 0, ((Hero_002AA678 *)g_hero_state)->counts->unk0 != 0);
+                ((Hero_002AA678 *)g_hero_state)->counts->unk8--;
             }
         }
     }
@@ -171,21 +172,21 @@ void func_PAL_L22_002AA488(void) {
    live across the calls; the three table entries are the routines the tuning
    table points at, whose places differ from level to level. */
 void func_PAL_L22_002B6F90(int a0, int a1, void *a2) {
-    char *s0 = D_00189E20;
+    char *s0 = g_hero_state;
 
-    func_L00_002AF7D0();
+    cancel_hero_item_animation();
     s0[0x22B6] = 1;
-    func_L00_002B1F90();
+    UpdateHeroSlotCallbacks();
     *(int *)(s0 + 0x2290) = *(int *)(s0 + 0xC18);
-    func_L00_00322EC8(s0 + 0x18E0);
-    func_L00_00322EC8(s0 + 0x1A30);
+    level_release_slot_list(s0 + 0x18E0);
+    level_release_slot_list(s0 + 0x1A30);
     *(int *)(*(int *)(s0 + 0x2290) + 0x9C) = -1;
     if (a0 != 4 || *(u8 *)(s0 + 0x22B4) != a0)
-        func_L00_002D2E68();
-    func_L00_002A6708();
-    func_L00_002A53B8();
+        hero_set_objects_flag_bit();
+    hero_clear_tracked_slots();
+    attachment_reset_all();
     {
-        char *s1 = D_00189E20;
+        char *s1 = g_hero_state;
 
         *(u8 *)(s1 + 0x22B4) = (u8)a0;
         *(int *)(s1 + 0xC14) = (int)a2;
@@ -193,21 +194,21 @@ void func_PAL_L22_002B6F90(int a0, int a1, void *a2) {
     }
     if ((a0 & 0xFF) == 1) {
         if (D_00138320 & 0x10) {
-            func_0028B3D0(0x23, 0, &ref_L22_002B70F8_00, &ref_L22_002B70F8_01,
+            hud_set_slot_contents(0x23, 0, &ref_L22_002B70F8_00, &ref_L22_002B70F8_01,
                           &ref_L22_002B70F8_02, 0, 0);
-            func_L00_002F6B90(3);
+            level_run_slot_callback(3);
         }
     }
-    func_L22_002B7C70();
+    hero_l22_update_speed_targets();
     {
-        char *s2 = D_00189E20;
+        char *s2 = g_hero_state;
 
         *(f32 *)(s2 + 0x250) = *(f32 *)(s2 + 0x258);
         *(f32 *)(s2 + 0x254) = *(f32 *)(s2 + 0x25C);
         *(u16 *)(*(int *)(s2 + 0x2290) + 0x34) |= 6;
         *(f32 *)(s2 + 0xC20) = 1.0f;
         *(f32 *)(s2 + 0xC24) = 1.0f;
-        func_L00_002D24B8();
+        hero_clear_queued_anim();
         func_002A677C(*(int *)(s2 + 0x2290));
         *(u16 *)(s2 + 0x24F2) = (u16)a1;
         switch (a0) {
@@ -222,6 +223,6 @@ void func_PAL_L22_002B6F90(int a0, int a1, void *a2) {
             break;
         }
     }
-    func_L22_002C9898(a1, 2);
+    hero_l22_set_action(a1, 2);
 }
 

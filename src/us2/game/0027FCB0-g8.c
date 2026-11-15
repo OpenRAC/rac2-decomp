@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned long u64;
 typedef int s32;
@@ -7,9 +8,9 @@ struct Glyph_F6668 { u8 u,v; signed char top,adv; };
 extern int D_001B166C;
 extern int D_001B1668 __attribute__((sda));
 extern int D_001A89B0[8] __attribute__((sda));
-extern void func_002FC560(unsigned int,unsigned long);
-extern float func_00283CE0(int);
-extern void func_0027E1A0(float x, float y, float draw_width, float draw_height,
+extern void VU1_addGSregister(unsigned int,unsigned long);
+extern float IntToFloat(int);
+extern void EmitTexturedRectangle(float x, float y, float draw_width, float draw_height,
                          int u, int v, int width, int height,
                          unsigned int *colors, u64 texture);
 
@@ -25,7 +26,7 @@ void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limi
     if (D_001B166C == 0) {
         D_001A89B0[0] = color;
     }
-    func_002FC560(0x47, 0x33001);
+    VU1_addGSregister(0x47, 0x33001);
     character_count = 0;
     height = scale * 16.0f;
     if (character_limit == 0 || *text == 0) {
@@ -40,16 +41,16 @@ void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limi
             }
         } else {
             if (glyphs[*cursor].adv != 0) {
-                offset = func_00283CE0(glyphs[*cursor].top) * scale;
+                offset = IntToFloat(glyphs[*cursor].top) * scale;
                 if ((u8)(*cursor + 0x80) < 0x28) {
                     overlay_glyph = (struct Glyph_F6668 *)(((*cursor + 0x40) << 2) + (s32)glyphs);
-                    dx = func_00283CE0(overlay_glyph->adv) * scale;
-                    dy = func_00283CE0(overlay_glyph->top) * scale;
+                    dx = IntToFloat(overlay_glyph->adv) * scale;
+                    dy = IntToFloat(overlay_glyph->top) * scale;
                     colors[0] = color;
                     colors[1] = color;
                     colors[2] = color;
                     colors[3] = color;
-                    func_0027E1A0(x + dx, y + dy, height, height,
+                    EmitTexturedRectangle(x + dx, y + dy, height, height,
                                   overlay_glyph->u, overlay_glyph->v, 16, 16, colors, texture);
                 }
                 if (*cursor < 0x20) {
@@ -64,17 +65,17 @@ void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limi
                     colors[1] = gray_value;
                     colors[2] = gray_value;
                     colors[3] = gray_value;
-                    func_0027E1A0(x, y + offset, scale * 24.0f, scale * 16.0f,
+                    EmitTexturedRectangle(x, y + offset, scale * 24.0f, scale * 16.0f,
                                   glyphs[*cursor].u, glyphs[*cursor].v, 24, 16, colors, texture);
                 } else if (*cursor > 0x20) {
                     colors[0] = color;
                     colors[1] = color;
                     colors[2] = color;
                     colors[3] = color;
-                    func_0027E1A0(x, y + offset, height, height,
+                    EmitTexturedRectangle(x, y + offset, height, height,
                                   glyphs[*cursor].u, glyphs[*cursor].v, 16, 16, colors, texture);
                 }
-                x += func_00283CE0(glyphs[*cursor].adv) * scale;
+                x += IntToFloat(glyphs[*cursor].adv) * scale;
             }
         }
         character_count++;

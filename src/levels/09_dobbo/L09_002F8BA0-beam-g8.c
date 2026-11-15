@@ -2,35 +2,35 @@
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern float func_00283B98(float, float);
-extern float func_002A7878(float, float);
-extern float func_00283CE0(int);
+extern float FastAddRotations(float, float);
+extern float math_random_float_range(float, float);
+extern float IntToFloat(int);
 extern void func_002A7750_3(unsigned char *, int, int);
-extern void func_002A7470(unsigned char *, int, int, int);
-extern int func_00282948(char *);
-extern void func_002ACB48(void *, float);
-extern int func_002A77E0(int);
-extern void func_00282CF0(float *, const float *, const float *);
-extern void func_00282F20(void *, void *, float);
+extern void anim_start_blended(unsigned char *, int, int, int);
+extern int math_fast_float_d(char *);
+extern void vec_add_random_offset(void *, float);
+extern int math_random_int_below(int);
+extern void FastVecSub(float *, const float *, const float *);
+extern void vec_scale_to_length(void *, void *, float);
 extern float D_L09_001B0EF8 __attribute__((sda)), D_L09_001B0EFC __attribute__((sda));
 extern float D_L09_001B0EE0 __attribute__((sda)), D_L09_001B0EE4 __attribute__((sda));
 extern float D_L09_001B0F00 __attribute__((sda));
 extern int D_L09_001B0EF0 __attribute__((sda)), D_L09_001B0EF4 __attribute__((sda));
 extern unsigned char D_L09_001B0EEC __attribute__((sda));
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L09_001AC5A0[] MACRO_ADDR;
 extern void *D_L09_001BFE58 NOT_SDA;
-extern char *D_0018C0B0 NOT_SDA;
-extern float func_002A7790(float);
-extern void func_0029F338(void *);
-extern int func_L09_003FB788(void *);
-extern void func_L09_003FB908(void *, void *);
-extern void func_L09_003F69A0(unsigned char *, float);
-extern void func_L09_003F6AB8(unsigned char *);
-extern float func_00282E80(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_L01_003120A8(void *, void *, void *, int, int, int, int, float, float);
-extern int func_002A8C28(void *, void *, int, int, int, int, float, float, float);
+extern char *g_hero_moby NOT_SDA;
+extern float math_square(float);
+extern void moby_mark_spawned(void *);
+extern int ReleaseRecordSlot(void *);
+extern void UpdateBeamLinkRecord(void *, void *);
+extern void moby_blend_pos_toward_target(unsigned char *, float);
+extern void moby_rescale_vector(unsigned char *);
+extern float vec_distance_xy(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern int coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
+extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 
 /* Region limits of the level: while `mode` is set, a beam link on the wrong side of `low` (or,
    in mode 2, of `high`) is destroyed. */
@@ -100,7 +100,7 @@ extern DobboLimits D_L09_001C9F80;
 /* Steps a beam link (class 0xD09) once per frame: spins it, runs its state (ramp up, hold, fade
    out and destroy once its owner is gone, too far or past the level limits), damages what the
    beam touches near the player and passes the link's basis to func_L09_003FB908. */
-void func_L09_003F6B28(DobboMoby *moby)
+void UpdateBeamLink(DobboMoby *moby)
 {
     DobboLinkState *state;
     DobboMoby *owner;
@@ -123,11 +123,11 @@ void func_L09_003F6B28(DobboMoby *moby)
     state = moby->data;
     /* each axis draws its own random turn */
     moby->rotation[0] = FastAddRotations(moby->rotation[0],
-        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
     moby->rotation[1] = FastAddRotations(moby->rotation[1],
-        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
     moby->rotation[2] = FastAddRotations(moby->rotation[2],
-        RandomFloatRange(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
     switch (moby->state) {
     case 0:
         func_002A7750_3((unsigned char *)moby, 1, -1);
@@ -135,12 +135,12 @@ void func_L09_003F6B28(DobboMoby *moby)
     case 1:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                StartAnimationBlended((unsigned char *)moby, 1, 0, 10);
+                anim_start_blended((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
-        BlendPositionTowardTarget((unsigned char *)moby,
-            D_L09_001B0EE4 * Square(1.0f - IntToFloat(state->timer) / state->duration_f));
-        if (FastFloatHelperD((char *)&state->timer))
+        moby_blend_pos_toward_target((unsigned char *)moby,
+            D_L09_001B0EE4 * math_square(1.0f - IntToFloat(state->timer) / state->duration_f));
+        if (math_fast_float_d((char *)&state->timer))
             func_002A7750_3((unsigned char *)moby, 2, -1);
         if (!state->owner || state->owner->state == 254 || state->owner->state == 253)
             func_002A7750_3((unsigned char *)moby, 3, -1);
@@ -149,11 +149,11 @@ void func_L09_003F6B28(DobboMoby *moby)
     case 3:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                StartAnimationBlended((unsigned char *)moby, 1, 0, 10);
+                anim_start_blended((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
-        BlendPositionTowardTarget((unsigned char *)moby, D_L09_001B0EE0);
-        RescaleObjectVector((unsigned char *)moby);
+        moby_blend_pos_toward_target((unsigned char *)moby, D_L09_001B0EE0);
+        moby_rescale_vector((unsigned char *)moby);
         owner = state->owner;
         if (state->max_distance < vec_distance_xy(moby->position, owner->position) || !state->owner ||
             state->owner->state == 254 || state->owner->state == 253)
@@ -162,7 +162,7 @@ void func_L09_003F6B28(DobboMoby *moby)
             if (moby->alpha < D_L09_001B0EF0) {
             destroy:
                 ReleaseRecordSlot(moby);
-                MarkMobySpawned(moby);
+                moby_mark_spawned(moby);
                 return;
             }
             moby->scale *= D_L09_001B0F00;
@@ -170,7 +170,7 @@ void func_L09_003F6B28(DobboMoby *moby)
         }
         break;
     }
-    distance = vec_distance_xy(moby->position, gHeroPosition);
+    distance = vec_distance_xy(moby->position, g_hero_position);
     if (distance < state->radius * 2 + 1) {
         owner = state->owner;
         if (owner && owner->type == 0xCEA && owner->state != 254 && owner->state != 253) {
@@ -180,21 +180,21 @@ void func_L09_003F6B28(DobboMoby *moby)
                 if (moby->f_bc == 1 && owner->data) {
                     qcopy(&ray_start, moby->position);
                     qcopy(&ray_end, partner->position);
-                    AddRandomOffsetToVector(&ray_start, 0.1f);
-                    AddRandomOffsetToVector(&ray_end, 0.1f);
-                    if (CastObjectCollisionLine(state->owner, &ray_start, &ray_end, 0x210001, 0, 1, 0,
+                    vec_add_random_offset(&ray_start, 0.1f);
+                    vec_add_random_offset(&ray_end, 0.1f);
+                    if (coll_cast_object_line(state->owner, &ray_start, &ray_end, 0x210001, 0, 1, 0,
                                           state->f2c, 1)) {
-                        if (D_L09_001BFE58 == *(void **)(gHeroPosition + 0x2210))
+                        if (D_L09_001BFE58 == *(void **)(g_hero_position + 0x2210))
                             hit = 1;
                     }
                 }
-                if (!RandomIntBelow(4) && distance < 2 &&
-                    SweepCollisionFromObject(state->owner, moby->position, 0x210001, 0, 1, 0,
+                if (!math_random_int_below(4) && distance < 2 &&
+                    coll_sweep_from_object(state->owner, moby->position, 0x210001, 0, 1, 0,
                                   moby->scale * 0.4f / moby->cls->scale, state->f2c, 1)) {
-                    if (D_L09_001BFE58 == gHeroMoby_0018C0B0)
+                    if (D_L09_001BFE58 == g_hero_moby)
                         hit = 1;
                 }
-                if (FastFloatHelperD((char *)&state->hit_timer) && hit)
+                if (math_fast_float_d((char *)&state->hit_timer) && hit)
                     state->hit_timer = 60;
             }
         }

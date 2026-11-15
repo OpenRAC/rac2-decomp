@@ -1,21 +1,21 @@
 #include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 #define H ((Hero *)D_00189E20)
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 position,angles,delta,step; } RotatingMoverWorkspace;
 extern char *D_L16_001B2B1C MACRO_ADDR;
-extern char D_00188660[];
-extern float func_00283BE0(float,float);
-extern float func_00283B98(float,float);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282CC0(void *,void *,void *);
-extern int func_002E5CF8(int,int,char *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_002AD6F0(void *,void *,void *,void *);
+extern char g_sound_state[];
+extern float fast_subtract_rotations(float,float);
+extern float FastAddRotations(float,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecAdd(void *,void *,void *);
+extern int PlayMobySound(int,int,char *);
+extern void FastVecSub(void *,void *,void *);
+extern void mat_combine_and_store(void *,void *,void *,void *);
 /* Moves and turns a platform when its switch is on, and carries a linked object along with it. */
-void func_L16_004185C0(char *object)
+void rotating_platform_update(char *object)
 {
     RotatingMoverWorkspace local;
     char *state=*(char **)(object+0x68);
@@ -50,7 +50,7 @@ void func_L16_004185C0(char *object)
                 vec_scale_to_length(&local.step,object+0xc0,0.04333333299f);
                 FastVecAdd(object+0x10,&local.step,object+0x10);
                 FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10);
-                sound=gSoundState+0x70**(int *)(state+0x70);
+                sound=g_sound_state+0x70**(int *)(state+0x70);
                 if((*(char **)(sound+0x88))!=object || (*(unsigned char *)(sound+0x74))==0) *(int *)(state+0x70)=PlayMobySound(0,4,object);
             }
         } else {
@@ -76,5 +76,5 @@ void func_L16_004185C0(char *object)
         }
     }
     FastVecSub(&local.delta,object+0x10,&local.position);
-    CombineTransformsAndStore(state+0x20,&local.delta,&local.angles,object+0xf0);
+    mat_combine_and_store(state+0x20,&local.delta,&local.angles,object+0xf0);
 }

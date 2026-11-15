@@ -97,7 +97,7 @@ extern int r1_func_00118EB0(void);
 /* sceSifResetIop: like sceSifRebootIop (func_0011EED8) but with a caller
    -supplied argument string and reboot mode. Adapted from Lombyte (GPL-3.0)
    for PAL. */
-s32 func_0011ED60(const char *arg, s32 mode) {
+s32 sceSifResetIop(const char *arg, s32 mode) {
     SifDmaData dma;
     u32 addr;
     s32 arglen;
@@ -131,7 +131,7 @@ s32 func_0011ED60(const char *arg, s32 mode) {
 
 /* rac1-decomp src/core/0011D0D0.c: func_0011D210 */
 /* Checks whether the IOP has finished resetting and returns 1 if so. */
-int func_0011EEA0(void) {
+int iop_is_reset_done(void) {
     if (r1_func_00118E70(0x4) & 0x40000) {
         r1_func_00118EC0();
         return 1;
@@ -142,7 +142,7 @@ int func_0011EEA0(void) {
 /* rac1-decomp src/core/0011D0D0.c: func_0011D248 */
 /* sceSifRebootIop: reset the IOP with "rom0:UDNL " + img (at most 80
    characters). Adapted from Lombyte (GPL-3.0) for PAL. */
-int func_0011EED8(char *img) {
+int sceSifRebootIop(char *img) {
     char *prefix = r1_D_00152A60;
     char param[80];
     char *p;
@@ -166,7 +166,7 @@ int func_0011EED8(char *img) {
         *d++ = *img++;
     }
     *d = 0;
-    return ResetIop(param, 0);
+    return sceSifResetIop(param, 0);
 }
 
 
@@ -183,7 +183,7 @@ ASM_FUNC("asm/core", func_0011EFF0);
  * bytes against 56, which is what kept this a stub.
  */
 /* Copies a block of memory one word at a time. Returns 0. */
-int func_0011F000(int *dst, int *src, unsigned int nbytes) {
+int mem_copy_words(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
         *dst++ = *src++;
@@ -199,7 +199,7 @@ ASM_FUNC("asm/core", func_0011F048);
 /* r1_func_0011D3B8 returns nothing: declared int, its result register
    pushed the loop test to $v1. */
 /* Sets up the console hardware tables at start-up and copies a small boot block into place. */
-int func_0011F058(void) {
+int boot_init_hardware(void) {
     int *initTable = r1_D_00130138;
     r1_D_00130138_pair *entry;
     unsigned int i;
@@ -234,7 +234,7 @@ ASM_FUNC("asm/core", func_0011F120);
    keeps the frame and calls both, and 2.9-ee turns both arms into tail
    jumps (44 bytes against 64) when it is void. */
 /* Picks the memory map setup that matches the console memory size. */
-int func_0011F130(void) {
+int boot_setup_tlb_for_mem_size(void) {
     if (r1_func_00118EA0() == 0x2000000) {
         return r1_func_0011D4E0();
     } else {

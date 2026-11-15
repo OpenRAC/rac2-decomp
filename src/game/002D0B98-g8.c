@@ -1,42 +1,42 @@
 #include "common.h"
-extern void func_0027C540(int);
-extern void func_0027C660(void);
-extern int func_00336D50(char *, int);
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern char *func_00288FB8(int);
-extern int func_0027FAA8(int,int,u64,char *,int);
-extern int func_0027FB40(int,int,u64,char *,int);
+extern void SetupGifPaging(int);
+extern void DoGifPaging(void);
+extern int table_find_by_id(char *, int);
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern char *GetLocalizedString(int);
+extern int text_draw_centered_small(int,int,u64,char *,int);
+extern int text_draw_centered_medium(int,int,u64,char *,int);
 extern int func_001157AC(char *);
-extern int func_0027F198(char *,int);
-extern void func_002CF0A0(int,int);
-extern void func_002CEBD0(void);
+extern int text_measure_width_medium(char *,int);
+extern void menu_draw_text_highlight_frame(int,int);
+extern void menu_draw_scroll_arrows_and_frame(void);
 extern char *D_001A8CFC;
-extern int D_001A7340;
+extern int g_screen_width;
 extern float D_001B23A8;
 extern int D_001ABA20 __attribute__((sda));
 extern int D_001ABA24 __attribute__((sda));
 extern short D_00261858[][3];
 
 /* Draws the list of movies with five rows around the cursor; locked movies show a placeholder. */
-int func_002D0B98(void) {
+int movie_list_draw(void) {
     int i, y, entryIndex, color;
     int r;
     char *rowText;
     float z;
     SetupGifPaging(0);
     z = 0.0f;
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD7);
-    DrawScaledObjectTwoAxes(r, 0x60442D00, (float)(gScreenWidth / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD8);
-    DrawScaledObjectTwoAxes(r, 0x60241700, (float)(gScreenWidth / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD9);
-    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xDD);
-    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
-    DrawTextCenteredSmallFont(0xB3, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E13), -1);
-    DrawTextCenteredSmallFont(0x161, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
-    DrawTextCenteredSmallFont(0xB5, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D75), -1);
-    DrawMenuScrollArrowsAndFrame();
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD7);
+    gfx_draw_scaled_object_two_axes(r, 0x60442D00, (float)(g_screen_width / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD8);
+    gfx_draw_scaled_object_two_axes(r, 0x60241700, (float)(g_screen_width / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD9);
+    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xDD);
+    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)D_001ABA24, 1.0f, D_001B23A8, z);
+    text_draw_centered_small(0xB3, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E13), -1);
+    text_draw_centered_small(0x161, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
+    text_draw_centered_small(0xB5, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D75), -1);
+    menu_draw_scroll_arrows_and_frame();
     for (i = 0, y = 0x112; i < 5; i++, y += 20) {
         entryIndex = i + D_001ABA20 - 2;
         if (entryIndex < 0) entryIndex += 33;
@@ -46,9 +46,9 @@ int func_002D0B98(void) {
         else if (i == 1 || i == 3) color = 0x50F0F0F0;
         else {
             color = 0x70F0F0F0;
-            DrawMenuTextHighlightFrame(MeasureTextWidthMediumFont(rowText, strlen_001157AC(rowText)), 0x70F0F0F0);
+            menu_draw_text_highlight_frame(text_measure_width_medium(rowText, func_001157AC(rowText)), 0x70F0F0F0);
         }
-        DrawTextCenteredMediumFont(gScreenWidth / 2, y, color, rowText, -1);
+        text_draw_centered_medium(g_screen_width / 2, y, color, rowText, -1);
     }
     DoGifPaging();
     return 0;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Updates a homing projectile: acquires a target, flies its launch, turn and seek phases, rebuilds
    its orientation, and detonates on a hit, on expiry or at the level bounds. */
 #include "common.h"
@@ -9,51 +10,51 @@ typedef struct {
     f32 normal[4];
 } CollResult;
 
-extern char D_00189E20[];
-extern CollResult D_L00_001BF200 __attribute__((aligned(16)));
-extern u8 D_00188660[];
+extern char g_hero_state[];
+extern CollResult g_collision_result __attribute__((aligned(16)));
+extern u8 g_sound_state[];
 
-extern void func_00300190(void *, void *);
-extern void func_00282A88(void *, int);
-extern int func_00282948(void *);
-extern int func_00282978(void *);
-extern char *func_002AF580(void *, void *, int *, float, float, void *, int, int, float, float, float, int, int);
-extern char *func_L00_0037DEF8(char *, char **, int, int *, int);
-extern void func_L00_0037DD18(char *, char *, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_002FEE70(int, void *, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DF0(void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282C48(float);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_002AA3A8(float *, float, float *, float, float, float);
-extern int func_002E59B0(void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002E59F8(int);
-extern void func_L00_003AB388(char *, char *, void *);
-extern void func_L00_003AB618(void *, char *, char *, void *, int, float, float, float);
-extern void func_L00_003AB6F0(char *, void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_002A7C00(float, float, float);
-extern float *func_002AB1F0(char *);
-extern float func_00283B98(float, float);
-extern float func_00283198(float);
-extern void func_002AEF28(char *, char *, char *, float, float, float);
-extern void func_002AB668(void *, void *, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_002A9288(char *, float);
-extern void func_L00_0031BDC0(void *, void *, void *, void *);
-extern int func_00277258(void *, int, void *, float);
-extern void func_002FEE50(int);
-extern void func_0029F338(void *);
+extern void vec_transform_or_copy(void *, void *);
+extern void mem_fast_helper_b(void *, int);
+extern int math_fast_float_d(void *);
+extern int FastDecTimer(void *);
+extern char *SelectBestTargetInCone(void *, void *, int *, float, float, void *, int, int, float, float, float, int, int);
+extern char *pair_choose_owner_for_key(char *, char **, int, int *, int);
+extern void KeyOwnerTableInsert(char *, char *, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void part_steer_effect_direction(int, void *, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecLength(void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float math_fabs(float);
+extern int CollLine(void *, void *, int, void *, void *);
+extern void math_spring_float_to_goal(float *, float, float *, float, float, float);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int PlayMobySound(int, int, void *);
+extern void snd_stop_voice(int);
+extern void seeker_apply_projectile_hit(char *, char *, void *);
+extern void vec_steer_toward_target(void *, char *, char *, void *, int, float, float, float);
+extern void seeker_spawn_impact_sparks(char *, void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_cosine_blend(float, float, float);
+extern float *moby_get_private_value_0(char *);
+extern float FastAddRotations(float, float);
+extern float math_fast_sin_or_cos_b(float);
+extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, float, float);
+extern void math_build_axis_angle_quat(void *, void *, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void part_queue_ground_shadow(char *, float);
+extern void coll_project_point_on_segment(void *, void *, void *, void *);
+extern int coll_test_point(void *, int, void *, float);
+extern void table_clear_entry_flag(int);
+extern void moby_mark_spawned(void *);
 
 #define HERO_PLAYER (*(char **)(D_00189E20 + 0x2290))
 #define F(p, o) (*(float *)((char *)(p) + (o)))
@@ -63,7 +64,7 @@ extern void func_0029F338(void *);
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 
 /* Updates a homing seeker projectile: picks a target, flies toward it and blows up on contact. */
-void func_L00_003AA708(char *moby)
+void UpdateHomingProjectile(char *moby)
 {
     struct {
         float saved[4];
@@ -78,13 +79,13 @@ void func_L00_003AA708(char *moby)
     char *hero;
     float magnitude;
 
-    TransformVectorOrCopy(moby + 0x10, moby + 0x10);
+    vec_transform_or_copy(moby + 0x10, moby + 0x10);
     qcopy(work.saved, moby + 0x10);
     if (!P(state, 0x14)) {
         work.phase.search.count = 0;
-        FastMemoryHelperB(work.phase.search.list, 0x80);
+        mem_fast_helper_b(work.phase.search.list, 0x80);
         if (P(state, 0x74)) {
-            if (FastFloatHelperD(state + 0x78)) {
+            if (math_fast_float_d(state + 0x78)) {
                 P(state, 0x14) = P(state, 0x74);
                 P(state, 0x74) = 0;
             }
@@ -93,8 +94,8 @@ void func_L00_003AA708(char *moby)
             char *hero;
             SelectBestTargetInCone(moby + 0x10, state, &work.phase.search.count, 3.14159298f, 3.14159298f, work.phase.search.list, 0x20, 0, 8.0f, 0.0f, 0.0f, 0, 0);
             work.phase.search.found = 0;
-            hero = gHeroState;
-            target = ChooseOwnerForKey(P(hero, 0x2290), work.phase.search.list, work.phase.search.count, &work.phase.search.found, -1);
+            hero = g_hero_state;
+            target = pair_choose_owner_for_key(P(hero, 0x2290), work.phase.search.list, work.phase.search.count, &work.phase.search.found, -1);
             P(state, 0x14) = target;
             if (!target)
                 goto acquired;
@@ -103,14 +104,14 @@ void func_L00_003AA708(char *moby)
         }
         if (P(state, 0x14)) {
             B(moby, 0x20) = 1;
-            StartAnimationBlended(moby, 0, 0, 10);
+            anim_start_blended(moby, 0, 0, 10);
             qcopy(state + 0x40, state);
             H(state, 0x54) = 20;
         }
     }
 acquired:
-    ComputeViewDirection(moby + 0x10, work.phase.flight.dir, 1);
-    SteerEffectDirection(I(state, 0x70), state, 0);
+    cam_compute_view_direction(moby + 0x10, work.phase.flight.dir, 1);
+    part_steer_effect_direction(I(state, 0x70), state, 0);
     switch (B(moby, 0x20)) {
     case 0: {
         float step;
@@ -120,7 +121,7 @@ acquired:
         FastVecScale(work.phase.flight.b, work.phase.flight.dir, 0.5f);
         FastVecSub(work.phase.flight.c, moby + 0x10, work.phase.flight.b);
         if (CollLine(work.phase.flight.a, work.phase.flight.c, 0x12, HERO_PLAYER, 0)) {
-            FastVecSub(work.phase.flight.d, moby + 0x10, gCollisionResult.pos);
+            FastVecSub(work.phase.flight.d, moby + 0x10, g_collision_result.pos);
             step = 0.5f - FastVecLength(work.phase.flight.d);
             if (step > 0.06666667f)
                 step = 0.06666667f;
@@ -134,17 +135,17 @@ acquired:
         if (!moved && F(state, 0x7C) != 0.0f) {
             FastVecScale(work.phase.flight.d, work.phase.flight.dir, F(state, 0x7C));
             FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.d);
-            SpringFloatToGoal((float *)(state + 0x7C), 0.0f, (float *)(state + 0x58), 0.02f, 0.2f, 0.0f);
+            math_spring_float_to_goal((float *)(state + 0x7C), 0.0f, (float *)(state + 0x58), 0.02f, 0.2f, 0.0f);
             if (F(state, 0x7C) < 0.001f)
                 F(state, 0x7C) = 0.0f;
         }
-        if (!IsVoicePlayingForOwner(moby, I(state, 0x5C)))
+        if (!snd_is_voice_playing_for_owner(moby, I(state, 0x5C)))
             I(state, 0x5C) = PlayMobySound(0, 4, moby);
         if (FastDecTimer(state + 0x18)) {
-            gCollisionResult.moby = 0;
-            ApplySeekerProjectileHit(moby, state, moby + 0x10);
-            ClearEntryFlag(I(state, 0x70));
-            MarkMobySpawned(moby);
+            g_collision_result.moby = 0;
+            seeker_apply_projectile_hit(moby, state, moby + 0x10);
+            table_clear_entry_flag(I(state, 0x70));
+            moby_mark_spawned(moby);
             return;
         }
         break;
@@ -152,17 +153,17 @@ acquired:
     case 3: {
         char *target;
         if (FastDecTimer(state + 0x54)) {
-            gCollisionResult.moby = 0;
-            ApplySeekerProjectileHit(moby, state, moby + 0x10);
-            ClearEntryFlag(I(state, 0x70));
-            MarkMobySpawned(moby);
+            g_collision_result.moby = 0;
+            seeker_apply_projectile_hit(moby, state, moby + 0x10);
+            table_clear_entry_flag(I(state, 0x70));
+            moby_mark_spawned(moby);
             return;
         }
         {
             float now = IntToFloat(H(state, 0x54));
             float total = IntToFloat(10);
             float ratio = now / total;
-            F(state, 0x50) = CosineBlend(0.5f, 1.5f, ratio);
+            F(state, 0x50) = math_cosine_blend(0.5f, 1.5f, ratio);
         }
         target = P(state, 0x14);
         if (target) {
@@ -174,7 +175,7 @@ acquired:
             if (!I(target, 0x98))
                 goto drift;
         }
-        SteerDirectionTowardTarget(moby + 0x10, state, target, state + 0x30, 1, 0.02f, 0.3f, 0.0f);
+        vec_steer_toward_target(moby + 0x10, state, target, state + 0x30, 1, 0.02f, 0.3f, 0.0f);
     drift:
         FastVecAdd(moby + 0x10, moby + 0x10, state);
         break;
@@ -184,14 +185,14 @@ acquired:
             B(moby, 0x20) = 2;
             H(state, 0x56) = 10;
         }
-        SteerDirectionTowardTarget(moby + 0x10, state, P(state, 0x14), state + 0x30, 0, 0.04f, 0.3f, 0.0f);
+        vec_steer_toward_target(moby + 0x10, state, P(state, 0x14), state + 0x30, 0, 0.04f, 0.3f, 0.0f);
         FastVecScale(state + 0x40, state + 0x40, 0.85f);
         FastVecAdd(moby + 0x10, moby + 0x10, state + 0x40);
         {
             float now = IntToFloat(H(state, 0x54));
             float total = IntToFloat(20);
             float ratio = now / total;
-            F(state, 0x50) = CosineBlend(1.5f, 0.5f, ratio);
+            F(state, 0x50) = math_cosine_blend(1.5f, 0.5f, ratio);
         }
         if (P(state, 0x14)) {
             FastVecSub(work.phase.flight.a, moby + 0x10, P(state, 0x14) + 0x10);
@@ -217,8 +218,8 @@ acquired:
             vec_scale_to_length(state, state, 1.0f);
             if (P(state, 0x14)) {
                 float targetScale;
-                ComputeViewDirection(moby + 0x10, work.phase.flight.a, 1);
-                targetScale = GetMobyPrivateValue0(P(state, 0x14))[4];
+                cam_compute_view_direction(moby + 0x10, work.phase.flight.a, 1);
+                targetScale = moby_get_private_value_0(P(state, 0x14))[4];
                 FastVecScale(work.phase.flight.b, work.phase.flight.a, targetScale);
                 FastVecAdd(work.phase.flight.c, P(state, 0x14) + 0x10, work.phase.flight.b);
                 H(state, 0x54) = FloatToInt(fast_vec_dist(work.phase.flight.c, moby + 0x10) + 5.0f);
@@ -226,9 +227,9 @@ acquired:
                 H(state, 0x54) = 10;
             }
             if (I(state, 0x5C) != -1) {
-                u8 *slot = gSoundState + I(state, 0x5C) * 0x70;
+                u8 *slot = g_sound_state + I(state, 0x5C) * 0x70;
                 if (*(char **)(slot + 0x88) == moby && slot[0x74])
-                    StopSoundVoice(I(state, 0x5C));
+                    snd_stop_voice(I(state, 0x5C));
             }
             I(state, 0x5C) = -1;
             PlayMobySound(1, 0, moby);
@@ -238,8 +239,8 @@ acquired:
     }
     if (F(moby, 0x10) < 2.0f || F(moby, 0x10) > 1021.0f || F(moby, 0x14) < 2.0f || F(moby, 0x14) > 1021.0f
         || F(moby, 0x18) < 2.0f || F(moby, 0x18) > 1021.0f) {
-        ClearEntryFlag(I(state, 0x70));
-        MarkMobySpawned(moby);
+        table_clear_entry_flag(I(state, 0x70));
+        moby_mark_spawned(moby);
         return;
     }
     qcopy(work.phase.flight.a, moby + 0x10);
@@ -247,18 +248,18 @@ acquired:
     FastVecAdd(work.phase.flight.b, moby + 0x10, work.phase.flight.b);
     if (CollLine(work.phase.flight.a, work.phase.flight.b, 0x12, moby, 0)) {
         float length, limit;
-        FastVecSub(work.phase.flight.c, work.phase.flight.a, gCollisionResult.pos);
+        FastVecSub(work.phase.flight.c, work.phase.flight.a, g_collision_result.pos);
         length = FastVecLength(work.phase.flight.c);
         if (length < 0.0001f) {
-            gCollisionResult.moby = 0;
-            ApplySeekerProjectileHit(moby, state, moby + 0x10);
-            ClearEntryFlag(I(state, 0x70));
-            MarkMobySpawned(moby);
+            g_collision_result.moby = 0;
+            seeker_apply_projectile_hit(moby, state, moby + 0x10);
+            table_clear_entry_flag(I(state, 0x70));
+            moby_mark_spawned(moby);
             return;
         }
         limit = 0.025000002f;
         FastVecScale(work.phase.flight.c, work.phase.flight.c, 1.0f / length);
-        FastVecAdd(work.phase.flight.d, gCollisionResult.pos, work.phase.flight.c);
+        FastVecAdd(work.phase.flight.d, g_collision_result.pos, work.phase.flight.c);
         FastVecSub(work.phase.flight.e, work.phase.flight.d, moby + 0x10);
         if (FastVecDot(work.phase.flight.e, work.phase.flight.dir) > 0.0f) {
             float distance = FastVecLength(work.phase.flight.e);
@@ -276,52 +277,52 @@ acquired:
     F(state, 0x20) = FastAddRotations(F(state, 0x20), 0.06f);
     FastVecScale(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
     FastVecSub(moby + 0x10, moby + 0x10, work.phase.flight.c);
-    F(state, 0x24) = FastSinOrCosB(F(state, 0x20)) * 0.15f;
+    F(state, 0x24) = math_fast_sin_or_cos_b(F(state, 0x20)) * 0.15f;
     FastVecScale(work.phase.flight.c, work.phase.flight.dir, F(state, 0x24));
     FastVecAdd(moby + 0x10, moby + 0x10, work.phase.flight.c);
-    ScaleOwnerWordsByAngles(moby, state + 0x28, state + 0x2C, 0.5f, 0.1f, 0.025f);
-    if (FloatAbs(F(moby, 0xF0)) > magnitude) {
-        BuildAxisAngleQuaternion(work.phase.flight.c, moby + 0xC0, F(moby, 0xF0));
-        RotateVectorByQuaternion(moby + 0xD0, moby + 0xD0, work.phase.flight.c);
-        RotateVectorByQuaternion(moby + 0xE0, moby + 0xE0, work.phase.flight.c);
+    moby_scale_owner_words_by_angles(moby, state + 0x28, state + 0x2C, 0.5f, 0.1f, 0.025f);
+    if (math_fabs(F(moby, 0xF0)) > magnitude) {
+        math_build_axis_angle_quat(work.phase.flight.c, moby + 0xC0, F(moby, 0xF0));
+        vec_rotate_by_quaternion(moby + 0xD0, moby + 0xD0, work.phase.flight.c);
+        vec_rotate_by_quaternion(moby + 0xE0, moby + 0xE0, work.phase.flight.c);
     }
-    if (FloatAbs(F(moby, 0xF4)) > magnitude) {
-        BuildAxisAngleQuaternion(work.phase.flight.c, moby + 0xD0, F(moby, 0xF4));
-        RotateVectorByQuaternion(moby + 0xC0, moby + 0xC0, work.phase.flight.c);
-        RotateVectorByQuaternion(moby + 0xE0, moby + 0xE0, work.phase.flight.c);
+    if (math_fabs(F(moby, 0xF4)) > magnitude) {
+        math_build_axis_angle_quat(work.phase.flight.c, moby + 0xD0, F(moby, 0xF4));
+        vec_rotate_by_quaternion(moby + 0xC0, moby + 0xC0, work.phase.flight.c);
+        vec_rotate_by_quaternion(moby + 0xE0, moby + 0xE0, work.phase.flight.c);
     }
     work.hitPlayer = 0;
     moved = 0;
-    QueueGroundShadow(moby, 0.2f);
-    hero = gHeroState;
+    part_queue_ground_shadow(moby, 0.2f);
+    hero = g_hero_state;
     if (CollLine(work.saved, moby + 0x10, 0x10, P(hero, 0x2290), 0)) {
         work.hitPlayer = 1;
     } else if (B(moby, 0x20) == 3) {
-        FastVecScale(work.phase.flight.c, work.phase.flight.dir, GetMobyPrivateValue0(P(state, 0x14))[4]);
+        FastVecScale(work.phase.flight.c, work.phase.flight.dir, moby_get_private_value_0(P(state, 0x14))[4]);
         FastVecAdd(work.phase.flight.d, P(state, 0x14) + 0x10, work.phase.flight.c);
-        ProjectPointOnSegment(work.phase.flight.e, work.saved, moby + 0x10, work.phase.flight.d);
+        coll_project_point_on_segment(work.phase.flight.e, work.saved, moby + 0x10, work.phase.flight.d);
         if (fast_vec_dist(work.phase.flight.e, work.phase.flight.d) <= 0.5f) {
             moved = 1;
             qcopy(moby + 0x10, work.phase.flight.e);
-            gCollisionResult.moby = P(state, 0x14);
+            g_collision_result.moby = P(state, 0x14);
         }
-    } else if (TestPointAgainstCollision(moby + 0x10, 0x10, P(hero, 0x2290), 0.2f)) {
+    } else if (coll_test_point(moby + 0x10, 0x10, P(hero, 0x2290), 0.2f)) {
         moved = 1;
-        qcopy(moby + 0x10, gCollisionResult.normal);
+        qcopy(moby + 0x10, g_collision_result.normal);
     }
     if (moved || work.hitPlayer) {
-        ApplySeekerProjectileHit(moby, state, moby + 0x10);
-        ClearEntryFlag(I(state, 0x70));
-        MarkMobySpawned(moby);
+        seeker_apply_projectile_hit(moby, state, moby + 0x10);
+        table_clear_entry_flag(I(state, 0x70));
+        moby_mark_spawned(moby);
         return;
     }
     if (F(moby, 0x10) < 2.0f || F(moby, 0x10) > 1021.0f || F(moby, 0x14) < 2.0f || F(moby, 0x14) > 1021.0f
         || F(moby, 0x18) < 2.0f || F(moby, 0x18) > 1021.0f) {
-        ClearEntryFlag(I(state, 0x70));
-        MarkMobySpawned(moby);
+        table_clear_entry_flag(I(state, 0x70));
+        moby_mark_spawned(moby);
         return;
     }
     FastVecScale(work.phase.flight.c, moby + 0xC0, -0.25f);
     FastVecAdd(work.phase.flight.c, work.phase.flight.c, moby + 0x10);
-    SpawnSeekerImpactSparks(moby, work.phase.flight.c);
+    seeker_spawn_impact_sparks(moby, work.phase.flight.c);
 }

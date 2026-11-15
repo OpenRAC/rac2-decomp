@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -40,7 +41,7 @@ extern void ref_L03_00408068_12(void *, s32);
 extern void ref_L03_00408068_13(s32, s32, void *);
 
 /* Runs a simple trigger object: waits for the player to come close, then plays an effect and settles. */
-void func_L03_00408068(void *moby) {
+void trigger_effect_update(void *moby) {
     u8 state;
 
     state = *(u8 *)((u8 *)moby + 0x20);

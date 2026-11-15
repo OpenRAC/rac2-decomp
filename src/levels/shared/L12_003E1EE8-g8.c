@@ -4,15 +4,15 @@ typedef int qword __attribute__((mode(TI)));
 extern float D_L12_001B0B10 __attribute__((sda));
 extern u8 D_L12_001FEAC0[];
 
-extern void func_00282CF0(float *, const float *, const float *);
-extern float func_00282DF0(float *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282E48(void *, void *);
-extern float func_002A89A8(void *, int, float);
+extern void FastVecSub(float *, const float *, const float *);
+extern float FastVecLength(float *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
 
 /* Moves the enemy along a path toward the next point and says when it has reached the end. */
-int func_L12_003E1EE8(u8 *moby, u8 *route) {
+int AdvanceAlongPath(u8 *moby, u8 *route) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *homePath = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(vars + 0x158) << 2));
     float entry[4];
@@ -54,7 +54,7 @@ int func_L12_003E1EE8(u8 *moby, u8 *route) {
             float groundHeight;
 
             *(s32 *)(vars + 0x168) = -1;
-            groundHeight = ProbeGroundHeightBelow(homePath + 0x10, 0, 0.5f);
+            groundHeight = coll_probe_ground_height_below(homePath + 0x10, 0, 0.5f);
             if (*(float *)(homePath + 0x18) - groundHeight < 10.0f)
                 *(float *)(homePath + 0x18) = groundHeight + 0.5f;
         } else {

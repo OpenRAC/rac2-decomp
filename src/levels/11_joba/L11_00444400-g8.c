@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L11_00444400: draws the level's six HUD text boxes (layout table scaled by D_L11_001B3E04
  * and rounded), then per mode (data + 0x1F0 == 5, 9, 8, 12, else) the titles, the time or count
  * through sprintf (func_00115DA8), and the boss bar (func_L02_003FE768).
@@ -26,7 +27,7 @@ extern char D_L11_001B1800[];
 extern s32 D_L11_001B14B8[] SDATA(D_L11_001B14B8);
 extern s32 D_L11_001B14D0[] SDATA(D_L11_001B14D0);
 extern s32 D_L11_001B14D8[] SDATA(D_L11_001B14D8);
-extern s16 *D_L11_001B14F8[] SDATA(D_L11_001B14F8);
+extern s16 *g_arena_challenge_table[] SDATA(D_L11_001B14F8);
 extern s32 D_L11_001B1718 __attribute__((sda));
 
 extern s32 D_L11_001B1798 __attribute__((sda));
@@ -81,20 +82,20 @@ extern f32 D_L11_001B17DC __attribute__((sda));
 extern s32 D_L11_001B17E0 __attribute__((sda));
 extern s32 D_L11_001B17E4 __attribute__((sda));
 
-extern void func_0027AB40(void);
-extern void func_00280190(Rect *, u64, char *, s32);
-extern void func_00280200(Rect *, u64, char *, s32);
-extern void func_00280270(Rect *, u64, char *, s32);
-extern void func_002802E0(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
-extern f32 func_00283CE0(s32);
-extern int func_00288FB8(s32);
-extern void func_002FC560(u32, u64);
-extern void func_L00_0037B7B0(void);
-extern void func_00300A00(char *, f32, s32, f32, f32, f32, f32);
-extern void func_L02_003FE768(f32);
-extern int func_00336D50(s32, s32);
+extern void UpdateViewContext(void);
+extern void text_draw_window_small(Rect *, u64, char *, s32);
+extern void text_draw_window_medium(Rect *, u64, char *, s32);
+extern void text_draw_window_large(Rect *, u64, char *, s32);
+extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
+extern f32 IntToFloat(s32);
+extern int GetLocalizedString(s32);
+extern void VU1_addGSregister(u32, u64);
+extern void gfx_append_draw_list_packet_c(void);
+extern void gfx_draw_scaled_object_two_axes(char *, f32, s32, f32, f32, f32, f32);
+extern void hud_draw_boss_health_bar(f32);
+extern int table_find_by_id(s32, s32);
 extern s32 func_001157AC(char *);
-extern s32 func_00115DA8(char *, char *, ...);
+extern s32 sprintf(char *, char *, ...);
 
 extern s32 D_L11_001B3E00;
 #define LBL(id, c, xv, yv, a1, a2, a3, A) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y(ls, (yv), D_L11_001B3E04, half, A), a1, a2, a3); }
@@ -116,7 +117,7 @@ extern s32 D_L11_001B3E00;
             str = (s); \
             fn((r), D_L11_001B1718, str, func_001157AC(str))
 #define DRAWBUF(fn, r) \
-            { s32 c = D_L11_001B1718; s32 n = strlen_001157AC(buf); fn((r), c, buf, n); }
+            { s32 c = D_L11_001B1718; s32 n = func_001157AC(buf); fn((r), c, buf, n); }
 #define sprintf_n func_00115DA8
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -169,7 +170,7 @@ static __inline__ int hud_coord(float value, float scale, float half)
 }
 
 /* Draws the Joba challenge HUD: the title boxes, the time or score line, and the boss health bar. */
-void func_L11_00444400(u8 *moby)
+void joba_hud_draw_challenge(u8 *moby)
 {
     char buf[0x40];
     Rect r50;
@@ -200,7 +201,7 @@ void func_L11_00444400(u8 *moby)
     if (D_L11_001A904C[0] == 0) {
         return;
     }
-    AppendDrawListPacketC();
+    gfx_append_draw_list_packet_c();
     half = 0.5f;
     data = *(u8 **)(moby + 0x68);
     x = hud_coord((f32)D_L11_001B17A0, D_L11_001B3E04, half);
@@ -238,59 +239,59 @@ void func_L11_00444400(u8 *moby)
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L11_001B17E8, 0x5A - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(DrawTextWindowLargeFont, &r90);
-        DRAW(DrawTextWindowSmallFont, &rB0, ((char *)GetLocalizedString(0x2F63)));
+        DRAWBUF(text_draw_window_large, &r90);
+        DRAW(text_draw_window_small, &rB0, ((char *)GetLocalizedString(0x2F63)));
         LABEL(k3, one);
         SUM();
         sprintf_n(buf, D_L11_001B17E8, D_L11_001B14B8[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-        DRAWBUF(DrawTextWindowLargeFont, &r50);
-        DRAW(DrawTextWindowSmallFont, &r70, ((char *)GetLocalizedString(0x2F61)));
+        DRAWBUF(text_draw_window_large, &r50);
+        DRAW(text_draw_window_small, &r70, ((char *)GetLocalizedString(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 9) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         tm = *(s32 *)(data + 0x188);
         { s32 hh = 2 - tm / 3600; s32 m = 0x3B - tm / 60 % 60; sprintf_n(buf, D_L11_001B17F0, hh, m); }
-        DRAWBUF(DrawTextWindowMediumFont, &r90);
-        DRAW(DrawTextWindowSmallFont, &rB0, ((char *)GetLocalizedString(0x2F63)));
+        DRAWBUF(text_draw_window_medium, &r90);
+        DRAW(text_draw_window_small, &rB0, ((char *)GetLocalizedString(0x2F63)));
         LABEL(k2, k3);
         LABEL50(1);
         bossVars = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
-        DrawBossHealthBar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
-        DrawScaledObjectTwoAxes(((char *)FindTableEntryById(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+        hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+        gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
     } else if (*(s16 *)(data + 0x1F0) == 8) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L11_001B17E8, 0x3C - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(DrawTextWindowLargeFont, &r90);
-        DRAW(DrawTextWindowSmallFont, &rB0, ((char *)GetLocalizedString(0x2F63)));
+        DRAWBUF(text_draw_window_large, &r90);
+        DRAW(text_draw_window_small, &rB0, ((char *)GetLocalizedString(0x2F63)));
         LABEL(k2, one);
         SUM();
         sprintf_n(buf, D_L11_001B17E8, D_L11_001B14D0[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-        DRAWBUF(DrawTextWindowLargeFont, &r50);
-        DRAW(DrawTextWindowSmallFont, &r70, ((char *)GetLocalizedString(0x2F61)));
+        DRAWBUF(text_draw_window_large, &r50);
+        DRAW(text_draw_window_small, &r70, ((char *)GetLocalizedString(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 0xC) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         n = 100 - *(s32 *)(data + 0x188) / 60;
         sprintf_n(buf, D_L11_001B17E8, n);
         if (n >= 100) {
-            DRAWBUF(DrawTextWindowSmallFont, &r90);
+            DRAWBUF(text_draw_window_small, &r90);
         } else {
-            do { DRAWBUF(DrawTextWindowLargeFont, &r90); } while (0);
+            do { DRAWBUF(text_draw_window_large, &r90); } while (0);
         }
-        DRAW(DrawTextWindowSmallFont, &rB0, ((char *)GetLocalizedString(0x2F63)));
+        DRAW(text_draw_window_small, &rB0, ((char *)GetLocalizedString(0x2F63)));
         if (moby[0xBC] != 0) {
             s32 ofs = 0x8710; f32 half = 0.5f;
             LABEL(k2, one);
             SUM();
             if (moby[0xBC] < 2) {
                 sprintf_n(buf, D_L11_001B17E8, D_L11_001B14D8[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-                DRAWBUF(DrawTextWindowLargeFont, &r50);
+                DRAWBUF(text_draw_window_large, &r50);
             } else {
                 sprintf_n(buf, D_L11_001B17E8, 100);
-                DRAWBUF(DrawTextWindowSmallFont, &r50);
+                DRAWBUF(text_draw_window_small, &r50);
             }
-            DRAW(DrawTextWindowSmallFont, &r70, ((char *)GetLocalizedString(0x2F61)));
+            DRAW(text_draw_window_small, &r70, ((char *)GetLocalizedString(0x2F61)));
         }
     } else {
         if (*(u8 **)(data + 0x180) != 0) {
@@ -302,14 +303,14 @@ void func_L11_00444400(u8 *moby)
             case 0xD4A /* moby class 3402 */:
                 bossVars = *(u8 **)(obj + 0x68);
                 if (*(f32 *)(bossVars + 0x20) > 0.0f) {
-                    DrawBossHealthBar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+                    hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
                 }
-                DrawScaledObjectTwoAxes(((char *)FindTableEntryById(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+                gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
                 break;
             case 0xB3A /* Arachnoid */:
                 bossVars = *(u8 **)(obj + 0x68);
-                DrawBossHealthBar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
-                DrawScaledObjectTwoAxes(((char *)FindTableEntryById(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
+                hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+                gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
                 break;
             }
         }
@@ -321,10 +322,10 @@ void func_L11_00444400(u8 *moby)
         if (*(s16 *)(data + 0x1F0) == 0xA) {
             sprintf_n(buf, D_L11_001B17F8, *(s16 *)(data + 0x1F2) + 1);
         } else {
-            sprintf_n(buf, D_L11_001B1800, *(s16 *)(data + 0x1F2) + 1, *gArenaChallengeTable[*(s16 *)(data + 0x1F0)]);
+            sprintf_n(buf, D_L11_001B1800, *(s16 *)(data + 0x1F2) + 1, *g_arena_challenge_table[*(s16 *)(data + 0x1F0)]);
         }
-        DRAWBUF(DrawTextWindowLargeFont, &rF0);
-        DRAW(DrawTextWindowSmallFont, &rD0, ((char *)GetLocalizedString(0x2F60)));
+        DRAWBUF(text_draw_window_large, &rF0);
+        DRAW(text_draw_window_small, &rD0, ((char *)GetLocalizedString(0x2F60)));
     }
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x47, 0x5360B);

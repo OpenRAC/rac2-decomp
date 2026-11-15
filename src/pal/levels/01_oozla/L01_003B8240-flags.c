@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_L01_003B45D8(void *, void **, int *);
-extern void func_L01_003B46C8(char **, int *);
+extern void swamp_beast_collect_nearby(void *, void **, int *);
+extern void swamp_beast_clear_collected_marks(char **, int *);
 extern void func_PAL_L01_003B8240(void *);
 extern void func_PAL_L01_0031A4D0(void *, void *, void *);
 
@@ -17,7 +17,7 @@ void func_PAL_L01_003B8518(u8 *arg0, void *arg1) {
     f32 f20, f21;
 
     if (s0[0x35D] != 0) {
-        func_L01_003B45D8(arg0, list, &count);
+        swamp_beast_collect_nearby(arg0, list, &count);
     }
     f20 = *(f32 *)(s0 + 0x130);
     f21 = *(f32 *)(s0 + 0x138);
@@ -35,7 +35,7 @@ void func_PAL_L01_003B8518(u8 *arg0, void *arg1) {
     *(f32 *)(s0 + 0x130) = f20;
     *(f32 *)(s0 + 0x138) = f21;
     if (s0[0x35D] != 0) {
-        func_L01_003B46C8(list, &count);
+        swamp_beast_clear_collected_marks(list, &count);
     }
 }
 
@@ -50,7 +50,7 @@ int func_PAL_L01_003B8610(u8 *arg0, void *arg1, f32 *arg2) {
     int r;
 
     if (s0[0x35D] != 0) {
-        func_L01_003B45D8(arg0, list, &count);
+        swamp_beast_collect_nearby(arg0, list, &count);
     }
     f20 = *(f32 *)(s0 + 0x130);
     f21 = *(f32 *)(s0 + 0x138);
@@ -68,7 +68,7 @@ int func_PAL_L01_003B8610(u8 *arg0, void *arg1, f32 *arg2) {
     *(f32 *)(s0 + 0x130) = f20;
     *(f32 *)(s0 + 0x138) = f21;
     if (s0[0x35D] != 0) {
-        func_L01_003B46C8(list, &count);
+        swamp_beast_clear_collected_marks(list, &count);
     }
     return r;
 }

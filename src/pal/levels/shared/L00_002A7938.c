@@ -29,18 +29,18 @@ typedef struct {
     short pad2522;
     unsigned int f2524;                
 } Hero_L00_002A7A50;
-extern Hero_L00_002A7A50 D_00189E20;
+extern Hero_L00_002A7A50 g_hero_state;
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern unsigned char D_001A7A40[] __attribute__((sda));
-extern void func_L00_00325AE8(void *, unsigned int, float, float);
-extern float func_00283CE0(int);
-extern float func_00283198(float);
-extern int func_00283CF0(float);
-extern void func_0027DDC0(int, int, int, int);
-extern void func_002FC560(unsigned int, unsigned long long);
-extern int func_L00_002ADEA0(int);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern float func_002AA2E8(float *, float, float);
+extern void gfx_l00_draw_billboard_quad(void *, unsigned int, float, float);
+extern float IntToFloat(int);
+extern float math_fast_sin_or_cos_b(float);
+extern int FloatToInt(float);
+extern void gfx_set_clear_color_packet(int, int, int, int);
+extern void VU1_addGSregister(unsigned int, unsigned long long);
+extern int hero_slot_item_id(int);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern float ApproachValue(float *, float, float);
 
 void func_PAL_L00_002A7938(void)
 {
@@ -49,55 +49,55 @@ void func_PAL_L00_002A7938(void)
     unsigned int color;
 
     if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
-        for (index = 0; index < D_00189E20.queueCount; index++)
-            func_L00_00325AE8(D_00189E20.queue[index], D_00189E20.queueColor[index],
-                              D_00189E20.queueSize[index], D_00189E20.queueFade[index]);
+        for (index = 0; index < g_hero_state.queueCount; index++)
+            gfx_l00_draw_billboard_quad(g_hero_state.queue[index], g_hero_state.queueColor[index],
+                              g_hero_state.queueSize[index], g_hero_state.queueFade[index]);
         return;
     }
-    if (D_00189E20.f21C) {
-        value = func_00283CE0(D_00189E20.f21C);
-        divisor = func_00283CE0(15);
+    if (g_hero_state.f21C) {
+        value = IntToFloat(g_hero_state.f21C);
+        divisor = IntToFloat(15);
         value = value * 3.1415927f;
-        value = func_00283198(value / divisor);
-        alpha = func_00283CF0((value * 0.5f + 0.5f) * 80.0f);
-        func_0027DDC0(0xAA, 0, 0, alpha);
-        func_002FC560(0x47, 0x5360B);
+        value = math_fast_sin_or_cos_b(value / divisor);
+        alpha = FloatToInt((value * 0.5f + 0.5f) * 80.0f);
+        gfx_set_clear_color_packet(0xAA, 0, 0, alpha);
+        VU1_addGSregister(0x47, 0x5360B);
     }
-    if (D_00189E20.mode == 3) {
-        unsigned int tint = D_00189E20.f2508;
-        float (*glow)[4] = D_00189E20.glow;
+    if (g_hero_state.mode == 3) {
+        unsigned int tint = g_hero_state.f2508;
+        float (*glow)[4] = g_hero_state.glow;
         int remaining = 2;
         while (remaining >= 0) {
-            func_L00_00325AE8(*glow, tint, 0.2f, 0.08f);
+            gfx_l00_draw_billboard_quad(*glow, tint, 0.2f, 0.08f);
             glow++;
             remaining--;
         }
-    } else if (D_00189E20.mode == 0) {
-        if ((func_L00_002ADEA0(3) == 3 || func_L00_002ADEA0(3) == 2) && !D_00189E20.f24FC) {
-            if (D_00189E20.f2500) {
+    } else if (g_hero_state.mode == 0) {
+        if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !g_hero_state.f24FC) {
+            if (g_hero_state.f2500) {
                 peak = 1.0f;
-                if (peak < D_00189E20.v2020[0]) peak = D_00189E20.v2020[0];
-                if (peak < D_00189E20.v2020[1]) peak = D_00189E20.v2020[1];
-                if (peak < D_00189E20.v2020[2]) peak = D_00189E20.v2020[2];
-                func_00283D38(0xC0000028U, 0x28, peak);
+                if (peak < g_hero_state.v2020[0]) peak = g_hero_state.v2020[0];
+                if (peak < g_hero_state.v2020[1]) peak = g_hero_state.v2020[1];
+                if (peak < g_hero_state.v2020[2]) peak = g_hero_state.v2020[2];
+                FastTweenColor(0xC0000028U, 0x28, peak);
             }
-            func_L00_00325AE8(D_00189E20.v2010, 0xC0000028U, 0.05700000002980232f, 0.08f);
+            gfx_l00_draw_billboard_quad(g_hero_state.v2010, 0xC0000028U, 0.05700000002980232f, 0.08f);
         }
-        for (index = 0; index < D_00189E20.queueCount; index++)
-            func_L00_00325AE8(D_00189E20.queue[index], D_00189E20.queueColor[index],
-                              D_00189E20.queueSize[index], D_00189E20.queueFade[index]);
-    } else if (D_00189E20.mode == 2) {
-        func_L00_00325AE8(D_00189E20.v2010, 0x300000C0U, 0.25f, 0.08f);
-    } else if (D_00189E20.mode == 1) {
-        size = D_00189E20.f2520 ? 0.101500004529953f : 0.07f;
+        for (index = 0; index < g_hero_state.queueCount; index++)
+            gfx_l00_draw_billboard_quad(g_hero_state.queue[index], g_hero_state.queueColor[index],
+                              g_hero_state.queueSize[index], g_hero_state.queueFade[index]);
+    } else if (g_hero_state.mode == 2) {
+        gfx_l00_draw_billboard_quad(g_hero_state.v2010, 0x300000C0U, 0.25f, 0.08f);
+    } else if (g_hero_state.mode == 1) {
+        size = g_hero_state.f2520 ? 0.101500004529953f : 0.07f;
         if (D_001A7A40[3]) {
-            D_00189E20.v2010[2] -= 0.01f;
+            g_hero_state.v2010[2] -= 0.01f;
             size *= 1.7f;
         } else {
-            D_00189E20.v2010[2] -= 0.02f;
+            g_hero_state.v2010[2] -= 0.02f;
         }
-        func_002AA2E8(&D_00189E20.f186C, size, 0.0036000002f);
-        func_L00_00325AE8(D_00189E20.v2010, D_00189E20.f2524, D_00189E20.f186C, 0.08f);
+        ApproachValue(&g_hero_state.f186C, size, 0.0036000002f);
+        gfx_l00_draw_billboard_quad(g_hero_state.v2010, g_hero_state.f2524, g_hero_state.f186C, 0.08f);
     }
 }
 

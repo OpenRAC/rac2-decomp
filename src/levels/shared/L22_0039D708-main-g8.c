@@ -27,132 +27,132 @@ typedef union {
 #define M2C_FIELD(expr, type, offset) (*(type)((s8 *)(expr) + (offset)))
 #define NULL ((void *)0)
 
-extern void func_0026FEB8(void *, ...);
-extern void * func_00273730(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void func_0027D330(int);
-extern int func_00282948(void *);
-extern int func_00282978(int);
-extern float func_00282C48(float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282E80(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern float func_00283248(float, float);
-extern void func_002833F0(void *, void *);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283C80(float, float);
-extern void func_0029B758(int, int);
-extern void func_0029CE80(void);
-extern void * func_0029EFD0(int);
-extern void func_0029F338(void *);
-extern float func_0029F530(void *);
-extern void func_0029FCC0(int, int, int);
+extern void STUB_printf(void *, ...);
+extern void * cam_moby_create(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void FadeToBlack(int);
+extern int math_fast_float_d(void *);
+extern int FastDecTimer(int);
+extern float math_fabs(float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern float vec_distance_xy(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern float mat_fast_helper_a(float, float);
+extern void euler_rotation_basis(void *, void *);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float FastDiffRots(float, float);
+extern void level_store_value_pair(int, int);
+extern void level_set_dependent_value(void);
+extern void * CreateMoby(int);
+extern void moby_mark_spawned(void *);
+extern float moby_get_anim_value(void *);
+extern void moby_transform_joint_to_world(int, int, int);
 extern void func_002A05A8(void *);
 extern void func_002A0F48(void *);
-extern void func_002A6C58(void *, int, int);
-extern void func_002A7470(void *, int, int, int);
-extern void func_002A7750(void *, int, int);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern void func_002A7A00(void *, float, float);
-extern float func_002A7CA0(void *, void *, float, float, float, float);
-extern float func_002A7E08(void *, void *, void *, float, float, float);
-extern int func_002A7EA0(void *, void *, void *, float, float, float, float, int);
-extern int func_002A8508(int, int);
-extern float func_002A89A8(void *, int, float);
-extern void func_002A8BD0(void *, int, int, float);
-extern void func_002A8C00(int, int, int, float, int);
-extern int func_002A8C28(int, int, int, float, float, float, int, int, int);
-extern int func_002A8D70(void *, int, float, float, int, float, int, int, int);
-extern void func_002A8E20(void *, void *);
-extern void * func_002A9640(void *, int, int);
-extern float func_002AA3A8(int, int, float, float, float, float);
-extern float func_002AA458(int, int, int, float, float, float);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern void func_002AB6D8(void *, void *);
-extern void func_002AC728(void *, void *, float, float, int);
-extern int func_002AEB60(void *, float);
-extern void func_002AEC48(void *, void *, int, float, float);
-extern void func_002AF000(int, float, float, float);
-extern void func_002AF1D0(void *, void *, int, int);
-extern float func_002B0360(void *);
-extern void func_002B0A18(int, int);
-extern int func_002B1C20(void *, void *);
-extern int func_002B3868(void *);
-extern int func_002B3890(void *);
-extern int func_002B38B8(void *);
-extern int func_002B4FF0(void *, void *, float);
-extern int func_002B50E0(void *, void *, float);
-extern void func_002B60B0(void *, float, float, float, float);
-extern int func_002B6120(void *, int);
-extern int func_002B6228(void *, void *, int, int);
-extern int func_002761F8(void *, void *, int, void *, void *);
-extern int func_002E5CF8(int, int, void *);
-extern int func_002E5E58(int, int, void *);
-extern int func_003004E0(int);
-extern void * func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_00335370(void *);
-extern void func_003353C8(void *);
-extern void func_00335438(void *, void *, int, int, int);
-extern void func_L00_002AF7D0(void);
-extern int func_L00_002D6900(int);
-extern void func_L00_00310C88(void *, void *);
-extern void func_L00_003294F0(void *, int);
-extern int func_L00_0035F5A0(int, int, int);
-extern int func_L01_00321178(void *, void *);
-extern void func_L01_003E9CF8(void *, int, void *);
-extern float func_L02_00329C48(void *, void *, void *);
-extern int func_L02_00332630(void *, void *);
-extern void func_L02_00333438(void *, void *);
-extern int func_L04_0033D4B0(void *);
-extern void func_L08_004356A0(void *, void *);
-extern void func_L11_003404E0(void *);
-extern int func_L11_00420C38(void *);
-extern int func_L11_00425788(void *, void *, float, float, float, float);
-extern void func_L11_00425A50(void *);
-extern int func_L22_002C9898(int, int);
-extern void func_L22_00328220(void *, void *, void *, void *, float, float, float);
-extern void func_L22_003A1E50(void *);
-extern void func_L22_003A2988(void *, float);
-extern void func_L22_003A2A08(void);
-extern void func_L22_003A2A28(void *, int);
-extern void func_L22_003A2B90(void *, void *, void *, int);
-extern void func_L22_003A45F0(void *, int, int, int, int, float);
-extern void func_L22_003A47E8(void *, int, int, int, int);
-extern int func_L22_003A4C68(int, int);
-extern void func_L22_003A4EE8(void *);
-extern int func_L22_003A61A8(void *);
-extern void func_L22_003B9128(void *, void *, int);
-extern void func_L22_003B9358(int);
-extern void * func_L22_003F85A0(void *, void *);
-extern void func_L22_003A15D0(s8 *);
-extern void func_L22_003A2160(s8 *);
-extern s32 func_L22_003A2780(s8 *, s8 *, s128 *);
-extern void func_L22_003A2E50(s8 *, s32, s32, f32);
-extern void func_L22_003A3D50(s8 *);
-extern s32 func_L22_003A4128(s8 *, s128 *);
-extern void func_L22_003A4490(s8 *);
-extern void func_L22_003A4938(s8 *);
-extern void func_L22_003A4CA8(s8 *);
-extern void func_L22_003A5BD8(s8 *, s32, s32);
-extern void func_L22_003A5F90(s8 *);
-extern void func_L22_003A6640(s32, s32, s32, f32);
+extern void SetDeathBits(void *, int, int);
+extern void anim_start_blended(void *, int, int, int);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern void vec_random_direction(void *, float, float);
+extern float MobySpringTurn(void *, void *, float, float, float, float);
+extern float moby_turn_toward_position(void *, void *, void *, float, float, float);
+extern int moby_move_over_ground(void *, void *, void *, float, float, float, float, int);
+extern int moby_count_group_not_in_state(int, int);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern void part_init_effect_record(void *, int, int, float);
+extern void make_hit_descriptor(int, int, int, float, int);
+extern int coll_sweep_from_object(int, int, int, float, float, float, int, int, int);
+extern int coll_test_hit_at_bone(void *, int, float, float, int, float, int, int, int);
+extern void QueueMobyImpact(void *, void *);
+extern void * part_find_owned_effect_slot(void *, int, int);
+extern float math_spring_float_to_goal(int, int, float, float, float, float);
+extern float vec_spring_to_target(int, int, int, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern void mat_get_euler_angles(void *, void *);
+extern void part_spawn_explosion_with_sparks(void *, void *, float, float, int);
+extern int math_is_value_within_step(void *, float);
+extern void moby_update_eased_node(void *, void *, int, float, float);
+extern void vec_build_spherical_offset(int, float, float, float);
+extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
+extern float gravity_get_center_distance(void *);
+extern void value_set_entry_by_index(int, int);
+extern int moby_dispatch_action_by_kind(void *, void *);
+extern int flag_set_first_pending(void *);
+extern int flag_set_second_pending(void *);
+extern int flag_is_third_pending_set(void *);
+extern int moby_turn_toward_target_and_step(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern int path_follow_nodes(void *, int);
+extern int path_set_follower_nodes(void *, void *, int, int);
+extern int CollLine(void *, void *, int, void *, void *);
+extern int PlayMobySound(int, int, void *);
+extern int snd_play_from_global_bank(int, int, void *);
+extern int game_is_id_in_list(int);
+extern void * SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void object_copy_vector_to_selected(void *);
+extern void cam_set_state_rotation(void *);
+extern void SetCamera5Pose(void *, void *, int, int, int);
+extern void cancel_hero_item_animation(void);
+extern int queue_copy_record_by_index(int);
+extern void release_moby_animation_slot(void *, void *);
+extern void moby_set_flag_bit(void *, int);
+extern int snd_start_in_slot(int, int, int);
+extern int moby_l01_turn_toward_target(void *, void *);
+extern void part_queue_moby_for_glow(void *, int, void *);
+extern float moby_measure_step_angle(void *, void *, void *);
+extern int moby_check_target_point_from_offset(void *, void *);
+extern void moby_aim_at_target_offset(void *, void *);
+extern int moby_find_linked_object(void *);
+extern void moby_store_position_private(void *, void *);
+extern void moby_call_helper_with_blocks(void *);
+extern int joba_enemy_apply_source_damage(void *);
+extern int tribesman_turn_toward_point(void *, void *, float, float, float, float);
+extern void tribesman_rearm_guard_nodes(void *);
+extern int hero_l22_set_action(int, int);
+extern void math_steer_along_direction(void *, void *, void *, void *, float, float, float);
+extern void moby_update_timed(void *);
+extern void arena_push_point_out(void *, float);
+extern void table_decrement_timer(void);
+extern void lane_store_nearest_point_as_current(void *, int);
+extern void lane_find_nearest_point(void *, void *, void *, int);
+extern void orbit_update(void *, int, int, int, int, float);
+extern void space_ship_run_attached_part_effect(void *, int, int, int, int);
+extern int list_has_key(int, int);
+extern void lane_find_point_ahead_of_ship(void *);
+extern int space_ship_is_aligned_with_target(void *);
+extern void keyed_object_place(void *, void *, int);
+extern void player_slot_clear_object(int);
+extern void * effect_create_attached(void *, void *);
+extern void space_ship_init_and_update(s8 *);
+extern void WalkPathUpdate(s8 *);
+extern s32 WalkPathIsClear(s8 *, s8 *, s128 *);
+extern void WalkPathPickNext(s8 *, s32, s32, f32);
+extern void pickup_update_spawned(s8 *);
+extern s32 pickup_find_nearest_needed(s8 *, s128 *);
+extern void space_ship_align_parts_at_end(s8 *);
+extern void space_ship_pick_next_lane_to_check(s8 *);
+extern void space_ship_tilt_attached_part(s8 *);
+extern void part_spray_thruster(s8 *, s32, s32);
+extern void stat_restore_random(s8 *);
+extern void part_spawn_scatter(s32, s32, s32, f32);
 extern s32 D_00138324 __attribute__((nosda));
 extern s8 D_001395E6 __attribute__((nosda));
-extern unsigned char D_00189E20[];
+extern unsigned char g_hero_state[];
 extern s16 D_0018A16E __attribute__((nosda));
 extern s32 D_0018B694 __attribute__((nosda));
-extern s32 D_0018C0B0 __attribute__((nosda));
+extern s32 g_hero_moby __attribute__((nosda));
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern s32 D_L22_001A8F00 MACRO_ADDR;
 extern s32 D_L22_001A903C MACRO_ADDR;
@@ -210,7 +210,7 @@ extern s32 D_L22_003A6858 __attribute__((nosda));
 /* The moby vars block (temp_s6): only the 0x448 member is named. */
 typedef struct { u8 pad[0x448]; void *p448; } VarsD708;
 /* Updates the player's ship (moby class 3595) every frame in the space combat level. It handles the intro and end scenes, steering, weapons and the parts attached to the ship. */
-void func_L22_0039D708(s8 *moby) {
+void space_ship_update(s8 *moby) {
     /* The two matrices and the collision record reuse these eight vectors.
      * Component stores must address their vectors, not unrelated scalar locals. */
     union {
@@ -364,8 +364,8 @@ void func_L22_0039D708(s8 *moby) {
                 }
             }
             M2C_FIELD(M2C_FIELD(D_L22_001AF2E0, void **, 0x68), s8 *, 8) = 0;
-            SetObjectFlagBit(D_L22_001AF2E0, 1);
-            SetMobyState(moby, 0x27, 0xB);
+            moby_set_flag_bit(D_L22_001AF2E0, 1);
+            moby_set_state(moby, 0x27, 0xB);
             FadeToBlack(0);
             M2C_FIELD(moby, u16 *, 0x34) = (u16) (M2C_FIELD(moby, u16 *, 0x34) | 0x41);
             return;
@@ -378,21 +378,21 @@ void func_L22_0039D708(s8 *moby) {
             }
             D_L22_001AF2E0 = NULL;
             D_L22_001AF2E4 = 1;
-            SetMobyState(moby, 0, -1);
+            moby_set_state(moby, 0, -1);
             M2C_FIELD(moby, u16 *, 0x34) = (u16) (M2C_FIELD(moby, u16 *, 0x34) & 0xFFBE);
             return;
         }
     }
     {
         vars = M2C_FIELD(moby, void **, 0x68);
-        FastFloatHelperD(&D_L22_001B2AB0);
+        math_fast_float_d(&D_L22_001B2AB0);
         if (D_L22_001B2AB0 != 0) {
             M2C_FIELD(moby, u8 *, 0xA8) = 0xFF;
         }
-        probe = FindOwnedEffectSlot(moby, 0x30000, 1);
-        InitAndUpdateSpaceShip(moby);
+        probe = part_find_owned_effect_slot(moby, 0x30000, 1);
+        space_ship_init_and_update(moby);
         if (D_L22_001AF304 >= 0xC9) {
-            AlignShipPartsAtEnd(moby);
+            space_ship_align_parts_at_end(moby);
         } else {
             if (D_L22_001AF304 == 0) {
                 D_L22_001AF2E8 += 1;
@@ -408,11 +408,11 @@ void func_L22_0039D708(s8 *moby) {
                     D_L22_001B2A9C = z;
                     D_L22_001B2AA0 = w;
                 }
-                PickNextFlightLaneToCheck(moby);
+                space_ship_pick_next_lane_to_check(moby);
                 if (D_L22_001AF318 != 0) {
                     vec_scale_to_length(&scratch[3].q, moby + 0xC0, -10.0f);
                     scratch[3].f[3] = 5627.925f;
-                    make_hit_descriptor((s32) &workspace.pair.first.query_view.query, gHeroMoby_0018C0B0, 0x10000, 20.0f, (s32) &scratch[3].q);
+                    make_hit_descriptor((s32) &workspace.pair.first.query_view.query, g_hero_moby, 0x10000, 20.0f, (s32) &scratch[3].q);
                     QueueMobyImpact(moby, &workspace.pair.first.query_view.query);
                     D_L22_001AF318 = 0;
                 }
@@ -420,15 +420,15 @@ void func_L22_0039D708(s8 *moby) {
             val16 = (s32) M2C_FIELD(vars, f32 *, 0x20);
             D_L22_001AF394 = 0;
             M2C_FIELD(vars, s16 *, 0x41C) = (val16 < ((s32) (D_L22_001B2AA8 * 2) / 3)) && (((s32) D_L22_001B2AA8 / 6) < val16);
-            if ((probe != NULL) && (M2C_FIELD(probe, s32 *, 0x20) != gHeroMoby_0018C0B0)) {
+            if ((probe != NULL) && (M2C_FIELD(probe, s32 *, 0x20) != g_hero_moby)) {
                 M2C_FIELD(vars, s32 *, 0x4EC) = 0;
             }
             if (((u32) (M2C_FIELD(moby, u8 *, 0x95) - 4) < 2U) && (((u32) (M2C_FIELD(moby, u8 *, 0x43) - 0xB) < 2U) == 0)) {
-                val18 = CheckTargetPointFromOffset(moby, (s128 *) (gHeroState + 0x80));
+                val18 = moby_check_target_point_from_offset(moby, (s128 *) (g_hero_state + 0x80));
                 M2C_FIELD(vars, s32 *, 0x3D0) = val18;
             } else {
-                FastVecSub(&scratch[0].q, (s128 *) (gHeroState + 0x80), moby + 0x10);
-                flt5 = MeasureStepAngle(moby, &scratch[0].q, NULL);
+                FastVecSub(&scratch[0].q, (s128 *) (g_hero_state + 0x80), moby + 0x10);
+                flt5 = moby_measure_step_angle(moby, &scratch[0].q, NULL);
                 M2C_FIELD(vars, s32 *, 0x3D4) = 0;
                 M2C_FIELD(vars, s32 *, 0x3D0) = 0;
                 if (flt5 <= 0.7853982f) {
@@ -441,15 +441,15 @@ void func_L22_0039D708(s8 *moby) {
             if ((probe != NULL) && (M2C_FIELD(vars, s32 *, 0x3D0) == 0)) {
                 M2C_FIELD(vars, s16 *, 0x350) = 0;
             }
-            vec2 = (s128 *) (gHeroState + 0x80);
+            vec2 = (s128 *) (g_hero_state + 0x80);
             ptr18 = vars + 0x3F0;
             M2C_FIELD(vars, s128 *, 0x3F0) = (s128) M2C_FIELD(vec2, s128 *, 0);
             ptr15 = vars + 0x400;
-            PushPointOutOfArena(ptr18, 0.0f);
+            arena_push_point_out(ptr18, 0.0f);
             M2C_FIELD(vars, s128 *, 0x400) = *(s128 *)(moby + 0x10);
-            PushPointOutOfArena(ptr15, 0.0f);
-            M2C_FIELD(vars, f32 *, 0x410) = GetDistanceFromGravityCenter((moby + 0x10));
-            M2C_FIELD(vars, f32 *, 0x414) = GetDistanceFromGravityCenter(M2C_FIELD(vec2, s32 *, 0x2210) + 0x10);
+            arena_push_point_out(ptr15, 0.0f);
+            M2C_FIELD(vars, f32 *, 0x410) = gravity_get_center_distance((moby + 0x10));
+            M2C_FIELD(vars, f32 *, 0x414) = gravity_get_center_distance(M2C_FIELD(vec2, s32 *, 0x2210) + 0x10);
             M2C_FIELD(vars, f32 *, 0x3DC) = fast_vec_dist(vec2, (moby + 0x10));
             M2C_FIELD(vars, f32 *, 0x3E0) = fast_vec_dist(ptr18, ptr15);
             if (M2C_FIELD(vars, f32 *, 0x3DC) < 50.0f) {
@@ -458,14 +458,14 @@ void func_L22_0039D708(s8 *moby) {
                 M2C_FIELD(vars, s32 *, 0x3D8) = 0;
             }
             if (M2C_FIELD(vars, s32 *, 0x344) != 0) {
-                game = gHeroState;
+                game = g_hero_state;
                 M2C_FIELD(game, s16 *, 0x1DC) = 0x7D00;
-                SetMobyState(moby, 0x26, 0xA);
+                moby_set_state(moby, 0x26, 0xA);
                 M2C_FIELD(game, s32 *, 0x2294) = 0;
                 cancel_hero_item_animation();
                 release_moby_animation_slot(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
                 M2C_FIELD(game, s32 *, 0x187C) = 0;
-                SetHeroAction_L22(0, 1);
+                hero_l22_set_action(0, 1);
                 M2C_FIELD(vars, s32 *, 0x344) = 0;
             }
             val43 = M2C_FIELD(vars, u16 *, 0x41E);
@@ -486,77 +486,77 @@ void func_L22_0039D708(s8 *moby) {
                 }
             }
             val11 = M2C_FIELD(vars, s32 *, 0x440);
-            SweepCollisionFromObject(val11, val11 + 0x10, 0x04000000, 5.4f, 1.0f, 1.0f, 0, 1, 0);
+            coll_sweep_from_object(val11, val11 + 0x10, 0x04000000, 5.4f, 1.0f, 1.0f, 0, 1, 0);
             val54 = M2C_FIELD(moby, u8 *, 0x95);
             switch (val54) {                    /* switch 1 */
             case 0:                                 /* switch 1 */
                 if ((M2C_FIELD(vars, f32 *, 0x3DC) < 35.0f) && (M2C_FIELD(vars, s32 *, 0x3D4) != 0) && (M2C_FIELD(vars, s32 *, 0x3D8) != 0)) {
                     if ((M2C_FIELD(vars, s32 *, 0x418) != 0) && (M2C_FIELD(moby, u8 *, 0x20) != 0xF)) {
-                        SetMobyState(moby, 6, 4);
+                        moby_set_state(moby, 6, 4);
                     } else if ((M2C_FIELD(vars, s32 *, 0x464) != 0) && (M2C_FIELD(vars, s16 *, 0x41E) == 2)) {
-                        SetMobyState(moby, 0x13, 9);
+                        moby_set_state(moby, 0x13, 9);
                     } else if (M2C_FIELD(vars, s16 *, 0x41C) == 0) {
                         if ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0)) {
-                            SetMobyState(moby, 0x1D, 3);
-                        } else if (RandomIntBelow(2) == 0) {
-                            SetMobyState(moby, 0x12, 9);
+                            moby_set_state(moby, 0x1D, 3);
+                        } else if (math_random_int_below(2) == 0) {
+                            moby_set_state(moby, 0x12, 9);
                         } else if (M2C_FIELD(vars, s16 *, 0x41E) == 0) {
-                            SetMobyState(moby, 0x1C, 3);
+                            moby_set_state(moby, 0x1C, 3);
                         } else {
-                            SetMobyState(moby, 0x12, 9);
+                            moby_set_state(moby, 0x12, 9);
                         }
                     } else if (M2C_FIELD(vars, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6)) {
-                        SetMobyState(moby, 0x12, 9);
+                        moby_set_state(moby, 0x12, 9);
                     } else if ((M2C_FIELD(vars, s16 *, 0x32A) / 2 < M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC)) || (M2C_FIELD(vars, s16 *, 0x32E) / 2 < M2C_FIELD(D_L22_001B2AB4, s32 *, 8))) {
-                        SetMobyState(moby, 0x1D, 3);
-                    } else if ((RandomIntBelow(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))) {
-                        SetMobyState(moby, 0x1D, 3);
-                    } else if ((RandomIntBelow(2) != 0) && (M2C_FIELD(vars, s16 *, 0x41E) == 0)) {
-                        SetMobyState(moby, 0x1C, 3);
+                        moby_set_state(moby, 0x1D, 3);
+                    } else if ((math_random_int_below(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))) {
+                        moby_set_state(moby, 0x1D, 3);
+                    } else if ((math_random_int_below(2) != 0) && (M2C_FIELD(vars, s16 *, 0x41E) == 0)) {
+                        moby_set_state(moby, 0x1C, 3);
                     } else if (M2C_FIELD(vars, f32 *, 0x3DC) < 55.0f) {
-                        SetMobyState(moby, 0x12, 9);
+                        moby_set_state(moby, 0x12, 9);
                     }
                 }
                 break;
             case 9:                                 /* switch 1 */
-                if (((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x2EU) && (IsShipAlignedWithTarget(moby) != 0)) {
+                if (((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x2EU) && (space_ship_is_aligned_with_target(moby) != 0)) {
                     if ((M2C_FIELD(vars, s16 *, 0x41E) != 2) || (M2C_FIELD(vars, s32 *, 0x464) == 0)) {
-                        UpdateOrbitObject(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
-                        SetMobyState(moby, 0x1F, 4);
+                        orbit_update(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
+                        moby_set_state(moby, 0x1F, 4);
                     }
                 }
                 break;
             case 3:                                 /* switch 1 */
                 if (M2C_FIELD(vars, s32 *, 0x418) != 0) {
-                    SetMobyState(moby, 6, 4);
+                    moby_set_state(moby, 6, 4);
                 } else if (M2C_FIELD(vars, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6)) {
-                    SetMobyState(moby, 0x12, 9);
+                    moby_set_state(moby, 0x12, 9);
                 }
                 break;
             case 4:                                 /* switch 1 */
                 if (M2C_FIELD(vars, s32 *, 0x418) != 0) {
-                    SetMobyState(moby, 6, 4);
+                    moby_set_state(moby, 6, 4);
                 } else if (((M2C_FIELD(vars, s32 *, 0x464) != 0) && (M2C_FIELD(vars, s16 *, 0x41E) == 2))
                         || (M2C_FIELD(vars, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))
                         || ((D_0018A16E >= 0x15) && (M2C_FIELD(moby, u8 *, 0x20) == 0x1E))) {
-                    SetMobyState(moby, 0x12, 9);
+                    moby_set_state(moby, 0x12, 9);
                 }
                 break;
             case 6:                                 /* switch 1 */
                 if (M2C_FIELD(vars, s32 *, 0x418) == 0) {
-                    SetMobyState(moby, 0x1E, 4);
+                    moby_set_state(moby, 0x1E, 4);
                 }
                 break;
             case 5:                                 /* switch 1 */
-                SprayThrusterParticles(moby, 2, 1);
-                SprayThrusterParticles(moby, 3, 0);
+                part_spray_thruster(moby, 2, 1);
+                part_spray_thruster(moby, 3, 0);
                 break;
             case 8:                                 /* switch 1 */
                 len8 = FastVecLength(((s128 *) (vars + 0xE0)));
                 if (len8 > 0.0f) {
                     vec7 = 0;
                     if (M2C_FIELD(vars, f32 *, 0x410) < D_L22_001B2AA4) {
-                        PushPointOutOfArena((moby + 0x10), 0.0f);
+                        arena_push_point_out((moby + 0x10), 0.0f);
                         vec7 = 0;
                     }
                     scratch[2].q = vec7;
@@ -567,57 +567,57 @@ void func_L22_0039D708(s8 *moby) {
                     FastVecAdd(&scratch[1].q, &scratch[1].q, (moby + 0x10));
                     vec_scale_to_length(&scratch[0].q, ((s128 *) (vars + 0xE0)), 4.0f);
                     FastVecAdd(&scratch[1].q, &scratch[1].q, &scratch[0].q);
-                    SweepCollisionFromObject((s32) moby, (s32) &scratch[1].q, 0x90000, 5.0f, 100.0f, 0.0f, 0, 1, 0);
+                    coll_sweep_from_object((s32) moby, (s32) &scratch[1].q, 0x90000, 5.0f, 100.0f, 0.0f, 0, 1, 0);
                 }
-                if (SetSecondPendingFlag(moby) != 0) {
+                if (flag_set_second_pending(moby) != 0) {
                     M2C_FIELD(vars, s16 *, 0x26) = 0x1E;
                     if (probe != NULL) {
                         if ((FastVecLength(((s128 *) (vars + 0xE0))) > 0.0f) && ((M2C_FIELD(vars, f32 *, 0x20) - M2C_FIELD(probe, f32 *, 0x2C)) <= 0.0f)) {
                             vec_scale_to_length(((s128 *) (vars + 0xE0)), ((s128 *) (vars + 0xE0)), 0.6f);
                         }
                         if (M2C_FIELD(probe, f32 *, 0x2C) == 50.0f) {
-                            StartEffectInSlot(0x13, 0, 0);
+                            snd_start_in_slot(0x13, 0, 0);
                         }
-                        if ((M2C_FIELD(gHeroMoby_0018C0B0, u8 *, 0x43) == 4) && (M2C_FIELD(probe, s32 *, 0x20) == gHeroMoby_0018C0B0)) {
+                        if ((M2C_FIELD(g_hero_moby, u8 *, 0x43) == 4) && (M2C_FIELD(probe, s32 *, 0x20) == g_hero_moby)) {
                             FastVecSub(&scratch[0].q, vars + 0x400, vars + 0x3F0);
                             vec_scale_to_length(((s128 *) (vars + 0xE0)), &scratch[0].q, D_L22_001AF3F8);
                             SpawnExplosion(M2C_FIELD(vars, s32 *, 0x440) + 0x10, 1, 0xA, 0xA, 0xA, 0x14, 0x32, 0, 1.2f, 20.0f, 0, 1, 0, 0);
                         }
                     }
-                    UpdateOrbitObject(moby, (s32) M2C_FIELD(moby, u8 *, 0x43), 0, 4, 2, 1.0f);
-                    StartAnimationBlended(((VarsD708 *) vars)->p448, 6, 0, 4);
+                    orbit_update(moby, (s32) M2C_FIELD(moby, u8 *, 0x43), 0, 4, 2, 1.0f);
+                    anim_start_blended(((VarsD708 *) vars)->p448, 6, 0, 4);
                     M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), f32 *, 0x48) = 0.9f;
                     M2C_FIELD(moby, f32 *, 0x48) = 0.9f;
                     val51 = M2C_FIELD(moby, u8 *, 0x43);
                     if ((val51 == 4) || (val51 == 8)) {
-                        ClearPlayerSlotObject((s32) moby);
+                        player_slot_clear_object((s32) moby);
                     }
-                } else if ((M2C_FIELD(((VarsD708 *) vars)->p448, u8 *, 0x60) & 2) && (RandomIntBelow(3) == 0)) {
-                    StartAnimationBlended(((VarsD708 *) vars)->p448, 7, 0, 4);
+                } else if ((M2C_FIELD(((VarsD708 *) vars)->p448, u8 *, 0x60) & 2) && (math_random_int_below(3) == 0)) {
+                    anim_start_blended(((VarsD708 *) vars)->p448, 7, 0, 4);
                 }
                 if (M2C_FIELD(vars, s16 *, 0x43A) == 0) {
                     M2C_FIELD(vars, s16 *, 0x350) = 0;
                 }
                 M2C_FIELD(vars, f32 *, 0x3E4) = M2C_FIELD(vars, f32 *, 0x3E8) = 0.0f;
-                val21 = DispatchActionByKind(moby, vars + 0x60);
+                val21 = moby_dispatch_action_by_kind(moby, vars + 0x60);
                 if (val21 & 1) {
                     M2C_FIELD(vars, s32 *, 0x344) = 1;
                 } else if (val21 & 2) {
                     M2C_FIELD(vars, s32 *, 0x37C) = 0xF0;
-                    SetMobyState(moby, 5, 0);
-                    UpdateOrbitObject(moby, 0, 0, 4, 3, 1.0f);
+                    moby_set_state(moby, 5, 0);
+                    orbit_update(moby, 0, 0, 4, 3, 1.0f);
                 }
                 goto block_184;
             case 10:                                /* switch 1 */
-                game10 = gHeroState;
+                game10 = g_hero_state;
                 M2C_FIELD(game10, s16 *, 0x1E0) = 0xA;
                 ptr23 = M2C_FIELD(vars, void **, 0x388);
                 M2C_FIELD(ptr23, u16 *, 0x34) = (u16) (M2C_FIELD(ptr23, u16 *, 0x34) | 0x41);
-                if (SetFirstPendingFlag(moby) != 0) {
+                if (flag_set_first_pending(moby) != 0) {
                     if ((M2C_FIELD(vars, s32 *, 0x4EC) != 0) && (D_001A7A60[8] == 0)) {
                         D_001A7A60[8] = 1;
-                        PlaySoundFromGlobalBank(1, 0, NULL);
-                        SetEntryValueByIndex(0x1233, -1);
+                        snd_play_from_global_bank(1, 0, NULL);
+                        value_set_entry_by_index(0x1233, -1);
                         D_L22_001A903C = 1;
                     }
                     FadeToBlack(D_L22_001AF2F8);
@@ -626,25 +626,25 @@ void func_L22_0039D708(s8 *moby) {
                 val44 = M2C_FIELD(moby, u16 *, 0x96);
                 val22 = (s32) D_L22_001AF2F8 / 2;
                 if (val22 < (s32) val44) {
-                    if ((IsValueWithinStepOfThreshold(moby, 27.0f) != 0) && ((M2C_FIELD(moby, u16 *, 0x34) ^ 1) & 1) && ((((s32) D_L22_001AF2F8 / 2) - 4) < (s32) M2C_FIELD(moby, u16 *, 0x96))) {
-                        SweepCollisionFromObject((s32) moby, (s32) (moby + 0x10), 0x90000, 25.0f, 100.0f, 0.0f, 0, 1, 0);
-                        AimAtTargetOffset(moby, game10 + 0x80);
+                    if ((math_is_value_within_step(moby, 27.0f) != 0) && ((M2C_FIELD(moby, u16 *, 0x34) ^ 1) & 1) && ((((s32) D_L22_001AF2F8 / 2) - 4) < (s32) M2C_FIELD(moby, u16 *, 0x96))) {
+                        coll_sweep_from_object((s32) moby, (s32) (moby + 0x10), 0x90000, 25.0f, 100.0f, 0.0f, 0, 1, 0);
+                        moby_aim_at_target_offset(moby, game10 + 0x80);
 
                         SetDeathBits(moby, 0, 3);
-                        SpawnExplosionWithSparks(moby, (moby + 0x10), 2.0f, 7.0f, -1);
+                        part_spawn_explosion_with_sparks(moby, (moby + 0x10), 2.0f, 7.0f, -1);
                         for (val36 = 0; val36 < 5; val36++) {
-                            RandomDirectionVector(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
-                            scratch[0].f[2] = FloatAbs(scratch[0].f[2]) * D_L22_001AF390;
+                            vec_random_direction(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
+                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * D_L22_001AF390;
                             matrix_mul_vec3(&scratch[0].q, &scratch[0].q, M2C_FIELD(vars, s32 *, 0x440) + 0xC0);
                             val9 = M2C_FIELD(vars, s32 *, 0x440);
-                            ptr1 = CreateCameraMoby((void *) val9, 1, (s32) M2C_FIELD(val9, s16 *, 0xAA), val36, val9 + 0x10, val9 + 0xF0, &scratch[0].q, 0xFF, 30.0f, 15.0f);
+                            ptr1 = cam_moby_create((void *) val9, 1, (s32) M2C_FIELD(val9, s16 *, 0xAA), val36, val9 + 0x10, val9 + 0xF0, &scratch[0].q, 0xFF, 30.0f, 15.0f);
                             *(s32 **)((s8 *)ptr1 + 0x64) = &D_L22_003A6858;
                         }
                         for (val37 = 0; val37 < 2; val37++) {
-                            RandomDirectionVector(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
-                            scratch[0].f[2] = FloatAbs(scratch[0].f[2]) * D_L22_001AF390;
+                            vec_random_direction(&scratch[0].q, D_L22_001AF388 * 0.016666668f, D_L22_001AF38C * 0.016666668f);
+                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * D_L22_001AF390;
                             matrix_mul_vec3(&scratch[0].q, &scratch[0].q, ((void *) (moby + 0xC0)));
-                            ptr2 = CreateCameraMoby(moby, 1, (s32) M2C_FIELD(moby, s16 *, 0xAA), val37, (moby + 0x10), ((void *) (moby + 0xF0)), &scratch[0].q, 0xFF, 30.0f, 15.0f);
+                            ptr2 = cam_moby_create(moby, 1, (s32) M2C_FIELD(moby, s16 *, 0xAA), val37, (moby + 0x10), ((void *) (moby + 0xF0)), &scratch[0].q, 0xFF, 30.0f, 15.0f);
                             *(s32 **)((s8 *)ptr2 + 0x64) = &D_L22_003A6858;
                         }
                         SpawnExplosion(M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0, 0x73, 0x50, 0x46, 0x4E, 0x4B, 1, 7.5f, 20.0f, 1, 1, 0, 0);
@@ -658,36 +658,36 @@ void func_L22_0039D708(s8 *moby) {
                         M2C_FIELD(ptr9, u16 *, 0x34) = (u16) (M2C_FIELD(ptr9, u16 *, 0x34) | 0x41);
                         ptr10 = ((VarsD708 *) vars)->p448;
                         M2C_FIELD(ptr10, s128 *, 0x10) = *(s128 *)(moby + 0x10);
-                        StartAnimationBlended(ptr10, 6, 0, 4);
+                        anim_start_blended(ptr10, 6, 0, 4);
                         {
                             f32 v = D_L22_001AF30C;
                             M2C_FIELD(((VarsD708 *) vars)->p448, f32 *, 0x48) = 3.2f;
                             D_L22_001B2AAC = v;
-                            PushPointOutOfArena(((VarsD708 *) vars)->p448 + 0x10, v);
+                            arena_push_point_out(((VarsD708 *) vars)->p448 + 0x10, v);
                         }
                         goto block_183;
                     }
                     val48 = M2C_FIELD(moby, u16 *, 0x96);
                     if (val48 >= 0x169U) {
-                        MarkMobySpawned(M2C_FIELD(vars, void **, 0x388));
+                        moby_mark_spawned(M2C_FIELD(vars, void **, 0x388));
                         M2C_FIELD(vars, void **, 0x388) = NULL;
-                        MarkMobySpawned((void *) M2C_FIELD(vars, s32 *, 0x440));
+                        moby_mark_spawned((void *) M2C_FIELD(vars, s32 *, 0x440));
                         M2C_FIELD(vars, s32 *, 0x440) = 0;
-                        MarkMobySpawned(M2C_FIELD(vars, void **, 0x444));
+                        moby_mark_spawned(M2C_FIELD(vars, void **, 0x444));
                         M2C_FIELD(vars, void **, 0x444) = NULL;
-                        MarkMobySpawned(((VarsD708 *) vars)->p448);
+                        moby_mark_spawned(((VarsD708 *) vars)->p448);
                         ((VarsD708 *) vars)->p448 = NULL;
-                        StoreLevelObjectValuePair(0, 0);
+                        level_store_value_pair(0, 0);
                         D_001395E6 = 1;
-                        SetLevelDependentValue();
-                        MarkMobySpawned(moby);
+                        level_set_dependent_value();
+                        moby_mark_spawned(moby);
                         return;
                     } else {
                         if ((val48 >= 0x105U) && (M2C_FIELD(moby, u16 *, 0x34) & 1) && (ptr11 = ((VarsD708 *) vars)->p448, (((M2C_FIELD(ptr11, u16 *, 0x34) ^ 1) & 1) != 0))) {
                             flt4 = D_L22_001B2AAC - D_L22_001AF310;
                             D_L22_001B2AAC = flt4;
                             if (flt4 > 0.0f) {
-                                PushPointOutOfArena(ptr11 + 0x10, flt4);
+                                arena_push_point_out(ptr11 + 0x10, flt4);
                                 M2C_FIELD(((VarsD708 *) vars)->p448, f32 *, 0x48) = 3.2f;
                                 func_002A05A8(((VarsD708 *) vars)->p448);
                                 func_002A0F48(((VarsD708 *) vars)->p448);
@@ -695,7 +695,7 @@ void func_L22_0039D708(s8 *moby) {
                                 if ((M2C_FIELD(ptr11, u16 *, 0x34) ^ 1) & 1) {
                                     FastVecScale(&scratch[0].q, ptr11 + 0xC0, 2.2f);
                                     FastVecAdd(&scratch[0].q, &scratch[0].q, ((VarsD708 *) vars)->p448 + 0x10);
-                                    PushPointOutOfArena(&scratch[0].q, 0.5f);
+                                    arena_push_point_out(&scratch[0].q, 0.5f);
                                     SpawnExplosion(&scratch[0].q, 1, 0xA, 0xA, 0xA, 0xA, 0x14, 0, 0.9f, 20.0f, 0, 0, 0, 0);
                                     PlayMobySound(D_L22_001AF2FC, 0, moby);
                                     ptr24 = ((VarsD708 *) vars)->p448;
@@ -704,12 +704,12 @@ void func_L22_0039D708(s8 *moby) {
                             }
                         } else {
                             if (!(M2C_FIELD(moby, u16 *, 0x96) & 7) && ((M2C_FIELD(moby, u16 *, 0x34) ^ 1) & 1)) {
-                                if (RandomIntBelow(2) != 0) {
-                                    TransformMobyJointToWorld((s32) moby, RandomIntBelow(4), (s32) &scratch[0].q);
+                                if (math_random_int_below(2) != 0) {
+                                    moby_transform_joint_to_world((s32) moby, math_random_int_below(4), (s32) &scratch[0].q);
                                 } else {
-                                    TransformMobyJointToWorld(M2C_FIELD(vars, s32 *, 0x440), RandomIntBelow(6), (s32) &scratch[0].q);
+                                    moby_transform_joint_to_world(M2C_FIELD(vars, s32 *, 0x440), math_random_int_below(6), (s32) &scratch[0].q);
                                 }
-                                SpawnExplosion(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, RandomFloatRange(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
+                                SpawnExplosion(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, math_random_float_range(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
                             }
                             if (!(M2C_FIELD(moby, u16 *, 0x96) & 0xF) && ((M2C_FIELD(moby, u16 *, 0x34) ^ 1) & 1)) {
                                 PlayMobySound(D_L22_001AF300, 0, moby);
@@ -721,60 +721,60 @@ void func_L22_0039D708(s8 *moby) {
                     val19 = val22 - 4;
                     if (val44 == val19) {
                         FadeToBlack(1);
-                        PushPointOutOfArena((moby + 0x10), 0.0f);
+                        arena_push_point_out((moby + 0x10), 0.0f);
                         scratch[4].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0);
                         scratch[5].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
                         scratch[6].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         qzero_nc(&scratch[7].q);
-                        GetEulerAnglesFromMatrix(&workspace.pair.second, &scratch[0].q);
+                        mat_get_euler_angles(&workspace.pair.second, &scratch[0].q);
                         posPtr = (moby + 0x10);
                         SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
-                        UpdateOrbitObject(moby, 0xE, 0, 4, 3, 0.6f);
+                        orbit_update(moby, 0xE, 0, 4, 3, 0.6f);
                         M2C_FIELD(vars, f32 *, 0x138) = 0.01f;
                         FastVecSub(&scratch[7].q, vars + 0x3F0, posPtr);
                         vec_scale_to_length(&scratch[6].q, &scratch[7].q, -(D_L22_001AF2F4 * 33.0f));
                         FastVecAdd(&scratch[6].q, &scratch[6].q, posPtr);
-                        PushPointOutOfArena(&scratch[6].q, 2.0f);
+                        arena_push_point_out(&scratch[6].q, 2.0f);
                         vec_scale_to_length(&scratch[5].q, &scratch[7].q, -(D_L22_001AF2F4 * 55.0f));
                         FastVecAdd(&scratch[5].q, &scratch[5].q, posPtr);
-                        PushPointOutOfArena(&scratch[5].q, D_L22_001AF2F4 * 45.0f);
+                        arena_push_point_out(&scratch[5].q, D_L22_001AF2F4 * 45.0f);
                         vec_scale_to_length(&scratch[7].q, &scratch[7].q, 1.0f);
                         scratch[0].q = scratch[7].q;
                         {
-                            u8 *g = gHeroState;
+                            u8 *g = g_hero_state;
                             scratch[1].q = M2C_FIELD(M2C_FIELD(g, void **, 0x2290), s128 *, 0xD0);
                         }
 
                         qzero_nc(&scratch[3].q);
                         FastVecCross(&scratch[2].q, &scratch[0].q, &scratch[1].q);
-                        GetEulerAnglesFromMatrix(&workspace.pair.first.matrix, &scratch[4].q);
-                        SetCameraStateRotation(&scratch[4].q);
-                        CopyVectorToSelectedObject(&scratch[5].q);
+                        mat_get_euler_angles(&workspace.pair.first.matrix, &scratch[4].q);
+                        cam_set_state_rotation(&scratch[4].q);
+                        object_copy_vector_to_selected(&scratch[5].q);
                     } else if (val19 < (s32) val44) {
                         scratch[1].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0);
                         scratch[2].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
                         scratch[3].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         qzero_nc(&scratch[4].q);
-                        GetEulerAnglesFromMatrix(&workspace.shifted.basis, &workspace.shifted.rotation);
+                        mat_get_euler_angles(&workspace.shifted.basis, &workspace.shifted.rotation);
                         SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
                         FastVecSub(&scratch[0].q, (moby + 0x10), D_L22_001B9C80);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         scratch[2].q = M2C_FIELD(moby, s128 *, 0xE0);
                         qzero_nc(&scratch[3].q);
-                        ptr19 = gHeroState;
+                        ptr19 = g_hero_state;
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         vec_scale_to_length(&scratch[2].q, &scratch[2].q, 1.0f);
                         FastVecCross(&scratch[1].q, &scratch[0].q, &scratch[2].q);
                         vec_scale_to_length(&scratch[1].q, &scratch[1].q, 1.0f);
-                        GetEulerAnglesFromMatrix(&workspace.pair.first.matrix, &scratch[4].q);
-                        SetCameraStateRotation(&scratch[4].q);
+                        mat_get_euler_angles(&workspace.pair.first.matrix, &scratch[4].q);
+                        cam_set_state_rotation(&scratch[4].q);
                         FadeToBlack(1);
-                        InitEffectRecord_002A8BD0(&workspace.collision.query, M2C_FIELD(ptr19, s32 *, 0x2290), 0xB0000, 50.0f);
+                        part_init_effect_record(&workspace.collision.query, M2C_FIELD(ptr19, s32 *, 0x2290), 0xB0000, 50.0f);
                         scratch[6].b[8] = 7;
                         scratch[6].b[9] = 1;
 
                         scratch[6].h[5] = M2C_FIELD(M2C_FIELD(ptr19, s32 *, 0x2290), u16 *, 0xAA);
-                        SweepCollisionFromObject((s32) moby, (s32) D_L22_001B9C80, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
+                        coll_sweep_from_object((s32) moby, (s32) D_L22_001B9C80, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
                         ptr20 = D_L22_001B9C80 + 0x240;
                         CollLine(D_L22_001B9C80, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         ptr21 = D_L22_001B9C80 + 0x250;
@@ -800,7 +800,7 @@ void func_L22_0039D708(s8 *moby) {
                     }
 block_183:
                     qzero_nc(((s128 *) (vars + 0xE0)));
-                    CallSharedHelperWithObjectBlocks(moby);
+                    moby_call_helper_with_blocks(moby);
                     goto block_184;
                 }
                 break;
@@ -814,48 +814,48 @@ block_184:
                             FastDecTimer((s32) (vars + 0x380));
                         } else {
                             flt8 = D_L22_001AF3EC;
-                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (gHeroState + 0x80);
+                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                             if ((M2C_FIELD(vars, f32 *, 0x3E0) < flt8) && (M2C_FIELD(vars, s16 *, 0x41E) == 0)) {
-                                SetMobyState(moby, 6, 0);
+                                moby_set_state(moby, 6, 0);
                             } else {
-                                SetMobyState(moby, 7, 0);
+                                moby_set_state(moby, 7, 0);
                             }
                         }
                         M2C_FIELD(vars, s32 *, 0x190) = 0;
-                        UpdateOrbitObject(moby, 0xC, 0, 4, 3, 1.0f);
+                        orbit_update(moby, 0xC, 0, 4, 3, 1.0f);
                     } else {
                     case 18:                        /* switch 2 */
                         if ((M2C_FIELD(moby, u8 *, 0x94) != 0x12) && (M2C_FIELD(moby, u8 *, 0x43) != 0xB)) {
-                            UpdateOrbitObject(moby, 0xB, 0, 4, 3, 1.0f);
+                            orbit_update(moby, 0xB, 0, 4, 3, 1.0f);
                         }
-                        FindLanePointAheadOfShip(moby);
-                        SetMobyState(moby, 0x13, 9);
+                        lane_find_point_ahead_of_ship(moby);
+                        moby_set_state(moby, 0x13, 9);
                     }
                     break;
                 case 19:                            /* switch 2 */
                     val12 = M2C_FIELD(vars, s32 *, 0x440);
                     if (M2C_FIELD(val12, u8 *, 0x43) == 3) {
                         if ((M2C_FIELD(val12, u8 *, 0x60) & 2) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || (M2C_FIELD(vars, f32 *, 0x3DC) > 70.0f))) {
-                            UpdateOrbitObject(moby, 0xB, (s32) GetMobyAnimationValue(moby), 4, 2, 1.0f);
-                        } else if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
-                            RunAttachedPartEffect(moby, 1, gHeroMoby_0018C0B0, 0, 0);
-                        } else if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
-                            RunAttachedPartEffect(moby, 2, gHeroMoby_0018C0B0, 0, 0);
+                            orbit_update(moby, 0xB, (s32) moby_get_anim_value(moby), 4, 2, 1.0f);
+                        } else if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
+                            space_ship_run_attached_part_effect(moby, 1, g_hero_moby, 0, 0);
+                        } else if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
+                            space_ship_run_attached_part_effect(moby, 2, g_hero_moby, 0, 0);
                         }
                     } else if ((M2C_FIELD(vars, f32 *, 0x3DC) < 70.0f) && (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0) && (M2C_FIELD(vars, s32 *, 0x464) == 0)) {
-                        UpdateOrbitObject(moby, 3, 0, 4, 2, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 7, 0, 4);
+                        orbit_update(moby, 3, 0, 4, 2, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 7, 0, 4);
                     }
                     if (fast_vec_dist((moby + 0x10), M2C_FIELD(vars, s128 **, 0x3AC)) < 8.0f) {
-                        SetMobyState(moby, 0x14, 9);
+                        moby_set_state(moby, 0x14, 9);
                         break;
                     }
                     WalkPathUpdate(moby);
                     if (((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x1FU) && (M2C_FIELD(vars, f32 *, 0x43C) <= M2C_FIELD(vars, f32 *, 0x140))) {
-                        FastVecSub(&scratch[0].q, (moby + 0x10), (s128 *) (gHeroState + 0x80));
+                        FastVecSub(&scratch[0].q, (moby + 0x10), (s128 *) (g_hero_state + 0x80));
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         if ((FastVecDot(moby + 0xC0, &scratch[0].q) < -0.5f) && (FastVecLength(&scratch[0].q) < 10.0f)) {
-                            SetMobyState(moby, 0x21, 9);
+                            moby_set_state(moby, 0x21, 9);
                             if (M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) {
                                 M2C_FIELD(vars, s16 *, 0x3A6) = 3;
                             } else if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0) {
@@ -868,36 +868,36 @@ block_184:
                     }
                     break;
                 case 20:                            /* switch 2 */
-                    if ((SetFirstPendingFlag(moby) != 0) && (M2C_FIELD(moby, u8 *, 0x43) == 4)) {
-                        UpdateOrbitObject(moby, 0, 0, 0x14, 3, 1.0f);
+                    if ((flag_set_first_pending(moby) != 0) && (M2C_FIELD(moby, u8 *, 0x43) == 4)) {
+                        orbit_update(moby, 0, 0, 0x14, 3, 1.0f);
                     } else if ((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x1FU) {
-                        if (FindNearestNeededPickup(moby, &scratch[0].q) != 0) {
+                        if (pickup_find_nearest_needed(moby, &scratch[0].q) != 0) {
                             M2C_FIELD(vars, s128 *, 0x3B0) = (s128) scratch[0].q;
                             M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (vars + 0x3B0);
-                            SetMobyState(moby, 0x15, 9);
-                            UpdateOrbitObject(moby, 0xB, 0, 4, 3, 1.0f);
+                            moby_set_state(moby, 0x15, 9);
+                            orbit_update(moby, 0xB, 0, 4, 3, 1.0f);
                         } else {
-                            RestoreRandomStat(moby);
+                            stat_restore_random(moby);
                             if ((((f32) ((s32) (D_L22_001B2AA8 * 2) / 3) <= M2C_FIELD(vars, f32 *, 0x20)) || (M2C_FIELD(vars, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))
-                                    || ((RandomIntBelow(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))))
+                                    || ((math_random_int_below(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))))
                                 && ((M2C_FIELD(vars, s32 *, 0x464) == 0) || (M2C_FIELD(vars, s16 *, 0x41E) != 2))) {
                                 if (((f32) ((s32) D_L22_001B2AA8 / 6) < M2C_FIELD(vars, f32 *, 0x20))
                                         && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))
-                                        && (RandomIntBelow(5) == 0)) {
-                                    SetMobyState(moby, 0x1D, 3);
+                                        && (math_random_int_below(5) == 0)) {
+                                    moby_set_state(moby, 0x1D, 3);
                                 } else {
-                                    SetMobyState(moby, 5, 0);
+                                    moby_set_state(moby, 5, 0);
                                 }
                             } else if (M2C_FIELD(vars, f32 *, 0x3DC) < 55.0f) {
-                                SetMobyState(moby, 0x12, 9);
+                                moby_set_state(moby, 0x12, 9);
                             }
                         }
                     }
                     break;
                 case 21:                            /* switch 2 */
                     if (fast_vec_dist((moby + 0x10), M2C_FIELD(vars, s128 **, 0x3AC)) < 8.0f) {
-                        SetMobyState(moby, 0x16, 9);
-                        UpdateOrbitObject(moby, 0, 0, 0x14, 3, 1.0f);
+                        moby_set_state(moby, 0x16, 9);
+                        orbit_update(moby, 0, 0, 0x14, 3, 1.0f);
                         break;
                     }
                     WalkPathUpdate(moby);
@@ -905,17 +905,17 @@ block_184:
                 case 22:                            /* switch 2 */
                     if ((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x1FU) {
                         if (((f32) ((s32) (D_L22_001B2AA8 * 2) / 3) <= M2C_FIELD(vars, f32 *, 0x20)) || (M2C_FIELD(vars, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))) {
-                            SetMobyState(moby, 5, 0);
+                            moby_set_state(moby, 5, 0);
                         } else if (M2C_FIELD(vars, f32 *, 0x3DC) < 55.0f) {
-                            SetMobyState(moby, 0x12, 9);
+                            moby_set_state(moby, 0x12, 9);
                         } else {
-                            SetMobyState(moby, 0x14, 9);
+                            moby_set_state(moby, 0x14, 9);
                         }
                     }
                     break;
                 case 7:                             /* switch 2 */
                     if (M2C_FIELD(vars, f32 *, 0x3E0) < 33.0f) {
-                        SetMobyState(moby, 0x1E, 4);
+                        moby_set_state(moby, 0x1E, 4);
                     } else {
                         WalkPathUpdate(moby);
                     }
@@ -924,91 +924,91 @@ block_184:
                     flt8 = M2C_FIELD(vars, f32 *, 0x3E0);
                     if (M2C_FIELD(vars, s32 *, 0x418) != 0) {
                         if (flt8 < 20.0f) {
-                            SetMobyState(moby, 0xF, 6);
+                            moby_set_state(moby, 0xF, 6);
                         } else {
                             WalkPathUpdate(moby);
                         }
                     } else if (flt8 < D_L22_001AF3EC) {
-                        SetMobyState(moby, 0x1E, 4);
+                        moby_set_state(moby, 0x1E, 4);
                     } else {
                         WalkPathUpdate(moby);
                     }
                     break;
                 case 28:                            /* switch 2 */
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 0xB, 0, 6, 3, 1.0f);
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 0xB, 0, 6, 3, 1.0f);
                     }
                     if ((M2C_FIELD(vars, f32 *, 0x3E0) < D_L22_001AF3EC) && (M2C_FIELD(vars, s32 *, 0x3D8) != 0)) {
-                        SetMobyState(moby, 0x1E, 4);
+                        moby_set_state(moby, 0x1E, 4);
                     }
-                    M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (gHeroState + 0x80);
+                    M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                     WalkPathUpdate(moby);
                     break;
                 case 29:                            /* switch 2 */
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 0xC, 0, 0x14, 3, 1.0f);
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 0xC, 0, 0x14, 3, 1.0f);
                     }
                     if ((M2C_FIELD(vars, f32 *, 0x3E0) < 29.0f) && (M2C_FIELD(vars, s32 *, 0x3D8) != 0)) {
-                        SetMobyState(moby, 0x1E, 4);
+                        moby_set_state(moby, 0x1E, 4);
                     }
-                    M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (gHeroState + 0x80);
+                    M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                     WalkPathUpdate(moby);
                     break;
                 case 31:                            /* switch 2 */
                     val55 = M2C_FIELD(moby, u8 *, 0x43);
                     switch (val55) {            /* switch 3; irregular */
                     case 9:                         /* switch 3 */
-                        if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) > 7.0f) && (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
+                        if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) > 7.0f) && (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(moby, s32 *, 0x98) = 0;
-                            TestHitAtBone((void *) M2C_FIELD(vars, s32 *, 0x440), 3, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
+                            coll_test_hit_at_bone((void *) M2C_FIELD(vars, s32 *, 0x440), 3, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
                             M2C_FIELD(moby, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(moby, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(moby, u8 *, 0x60) & 2) {
                             WalkPathUpdate(moby);
-                            UpdateOrbitObject(moby, 0xA, 0, 4, 3, D_L22_001AF3E8);
+                            orbit_update(moby, 0xA, 0, 4, 3, D_L22_001AF3E8);
                         }
-                        if ((GetMobyAnimationValue(moby) > 0.0f) && (GetMobyAnimationValue(moby) < 23.0f)) {
-                            AimAtTargetOffset(moby, (s128 *) (gHeroState + 0x80));
+                        if ((moby_get_anim_value(moby) > 0.0f) && (moby_get_anim_value(moby) < 23.0f)) {
+                            moby_aim_at_target_offset(moby, (s128 *) (g_hero_state + 0x80));
                         }
                         break;
                     case 10:                        /* switch 3 */
-                        if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) > 7.0f) && (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
+                        if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) > 7.0f) && (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(moby, s32 *, 0x98) = 0;
-                            TestHitAtBone((void *) M2C_FIELD(vars, s32 *, 0x440), 4, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
+                            coll_test_hit_at_bone((void *) M2C_FIELD(vars, s32 *, 0x440), 4, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
                             M2C_FIELD(moby, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(moby, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(moby, u8 *, 0x60) & 2) {
-                            UpdateOrbitObject(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
+                            orbit_update(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
                         }
-                        AimAtTargetOffset(moby, (s128 *) (gHeroState + 0x80));
+                        moby_aim_at_target_offset(moby, (s128 *) (g_hero_state + 0x80));
                         break;
                     case 13:                        /* switch 3 */
-                        if (SetFirstPendingFlag(moby) != 0) {
+                        if (flag_set_first_pending(moby) != 0) {
                             D_L22_001B2AB0 = 0;
                         }
                         if (M2C_FIELD(moby, u8 *, 0x60) & 2) {
-                            if ((D_L22_001B2AB0 != 0) && ((RandomIntBelow(4) == 0) || ((f32) (D_0018B694 * 7) < M2C_FIELD(vars, f32 *, 0x20)))) {
+                            if ((D_L22_001B2AB0 != 0) && ((math_random_int_below(4) == 0) || ((f32) (D_0018B694 * 7) < M2C_FIELD(vars, f32 *, 0x20)))) {
                                 if ((M2C_FIELD(vars, f32 *, 0x20) == (f32) M2C_FIELD(vars, s16 *, 0x326)) && (D_0018B694 < 0x64)) {
-                                    SetMobyState(moby, 4, 2);
+                                    moby_set_state(moby, 4, 2);
                                 } else {
-                                    SetMobyState(moby, 3, 2);
+                                    moby_set_state(moby, 3, 2);
                                 }
-                            } else if (IsShipAlignedWithTarget(moby) != 0) {
-                                UpdateOrbitObject(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
-                                SetMobyState(moby, 0x1F, 4);
+                            } else if (space_ship_is_aligned_with_target(moby) != 0) {
+                                orbit_update(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
+                                moby_set_state(moby, 0x1F, 4);
                             } else {
-                                SetMobyState(moby, 0x12, 9);
+                                moby_set_state(moby, 0x12, 9);
                             }
-                        } else if (D_L22_001AF3F0 < GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440))) {
-                            if (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < D_L22_001AF3F4) {
-                                TransformMobyJointToWorld(M2C_FIELD(vars, s32 *, 0x440), 4, (s32) &scratch[1].q);
-                                TransformMobyJointToWorld(M2C_FIELD(vars, s32 *, 0x440), 3, (s32) &scratch[0].q);
+                        } else if (D_L22_001AF3F0 < moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440))) {
+                            if (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < D_L22_001AF3F4) {
+                                moby_transform_joint_to_world(M2C_FIELD(vars, s32 *, 0x440), 4, (s32) &scratch[1].q);
+                                moby_transform_joint_to_world(M2C_FIELD(vars, s32 *, 0x440), 3, (s32) &scratch[0].q);
                                 FastVecAdd(&scratch[2].q, &scratch[0].q, &scratch[1].q);
                                 FastVecScale(&scratch[2].q, &scratch[2].q, 0.5f);
                                 M2C_FIELD(moby, s32 *, 0x98) = 0;
-                                SweepCollisionFromObject((s32) moby, (s32) &scratch[2].q, 0x10007, 4.0f, 100.0f, 14.5f, 0, 2, 0);
+                                coll_sweep_from_object((s32) moby, (s32) &scratch[2].q, 0x10007, 4.0f, 100.0f, 14.5f, 0, 2, 0);
                                 {
-                                    u8 *g = gHeroState;
+                                    u8 *g = g_hero_state;
                                     f32 reach = D_L22_001AF358;
                                     M2C_FIELD(moby, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(moby, void **, 0x24), s32 *, 0x10);
                                     FastVecScale(&scratch[3].q, M2C_FIELD(g, void **, 0x2290) + 0xE0, reach);
@@ -1016,113 +1016,113 @@ block_184:
                                 }
 
                                 if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < D_L22_001AF35C) {
-                                    QueueRecordsByIndex(0x2B);
+                                    queue_copy_record_by_index(0x2B);
                                     D_L22_001B2AB0 = D_L22_001AF354;
                                 }
                             }
                         }
-                        SetControllerSpeedLimits(moby, D_L22_001AF3E0 * 0.00027777778f, D_L22_001AF3E4 * 0.016666668f, D_L22_001AF3D8 * 0.0000048481375f, D_L22_001AF3DC * 0.00029088825f);
-                        AimAtTargetOffset(moby, (s128 *) (gHeroState + 0x80));
+                        moby_set_controller_speed_limits(moby, D_L22_001AF3E0 * 0.00027777778f, D_L22_001AF3E4 * 0.016666668f, D_L22_001AF3D8 * 0.0000048481375f, D_L22_001AF3DC * 0.00029088825f);
+                        moby_aim_at_target_offset(moby, (s128 *) (g_hero_state + 0x80));
                         break;
                     }
                     if ((M2C_FIELD(moby, u8 *, 0x95) != 6) && (M2C_FIELD(vars, f32 *, 0x3DC) > D_L22_001AF3EC) && (D_L22_001B2AB0 == 0)) {
-                        SetMobyState(moby, 0x12, 9);
+                        moby_set_state(moby, 0x12, 9);
                     }
                     break;
                 case 15:                            /* switch 2 */
-                    AimAtTargetOffset(moby, (s128 *) (gHeroState + 0x80));
+                    moby_aim_at_target_offset(moby, (s128 *) (g_hero_state + 0x80));
                     FastVecScale(&scratch[0].q, moby + 0xC0, 3.0f);
                     FastVecAdd(&scratch[0].q, &scratch[0].q, (moby + 0x10));
                     if (WalkPathIsClear(moby, (moby + 0x10), &scratch[0].q) == 0) {
-                        UpdateOrbitObject(moby, 9, 0, 4, 3, D_L22_001AF3E8);
-                        SetMobyState(moby, 0x1F, 6);
+                        orbit_update(moby, 9, 0, 4, 3, D_L22_001AF3E8);
+                        moby_set_state(moby, 0x1F, 6);
                         break;
                     }
                     break;
                 case 32:                            /* switch 2 */
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 3, 0, 4, 2, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 1, 0, 4);
-                        M2C_FIELD(vars, s16 *, 0x384) = RandomIntRange(0x78, 0xF0);
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 3, 0, 4, 2, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 1, 0, 4);
+                        M2C_FIELD(vars, s16 *, 0x384) = math_random_int_range(0x78, 0xF0);
                         M2C_FIELD(vars, s16 *, 0x386) = 0;
                     } else if (M2C_FIELD(((VarsD708 *) vars)->p448, u8 *, 0x60) & 2) {
-                        if (RandomIntBelow(4) == 0) {
-                            StartAnimationBlended(((VarsD708 *) vars)->p448, 7, 0, 4);
+                        if (math_random_int_below(4) == 0) {
+                            anim_start_blended(((VarsD708 *) vars)->p448, 7, 0, 4);
                         } else {
-                            StartAnimationBlended(((VarsD708 *) vars)->p448, 1, 0, 4);
+                            anim_start_blended(((VarsD708 *) vars)->p448, 1, 0, 4);
                         }
                     }
                     if ((M2C_FIELD(vars, s16 *, 0x384) <= 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || (M2C_FIELD(vars, s32 *, 0x3D8) == 0)
                         || ((flt9 = M2C_FIELD(vars, f32 *, 0x3DC)) > 60.0f)
                         || ((val13 = M2C_FIELD(vars, s32 *, 0x440), (M2C_FIELD(val13, u8 *, 0x60) & 2)) && (flt9 < D_L22_001AF3EC))) {
-                        SetMobyState(moby, 5, 0);
+                        moby_set_state(moby, 5, 0);
                     } else if (M2C_FIELD(val13, u8 *, 0x60) & 2) {
                         M2C_FIELD(vars, s16 *, 0x386) = 0;
                     } else if (M2C_FIELD(val13, u8 *, 0x43) == 3) {
-                        if ((GetMobyAnimationValue((void *) val13) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
-                            RunAttachedPartEffect(moby, 1, gHeroMoby_0018C0B0, 0, 0);
-                        } else if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
-                            RunAttachedPartEffect(moby, 2, gHeroMoby_0018C0B0, 0, 0);
+                        if ((moby_get_anim_value((void *) val13) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
+                            space_ship_run_attached_part_effect(moby, 1, g_hero_moby, 0, 0);
+                        } else if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
+                            space_ship_run_attached_part_effect(moby, 2, g_hero_moby, 0, 0);
                         }
                     } else {
                         FastDecTimer((s32) (vars + 0x386));
                         if (M2C_FIELD(vars, s16 *, 0x386) <= 0) {
-                            UpdateOrbitObject(moby, 3, 0, 4, 2, 1.0f);
-                            StartAnimationBlended(((VarsD708 *) vars)->p448, 1, 0, 4);
+                            orbit_update(moby, 3, 0, 4, 2, 1.0f);
+                            anim_start_blended(((VarsD708 *) vars)->p448, 1, 0, 4);
                         }
                     }
                     if (M2C_FIELD(vars, f32 *, 0x3E0) < D_L22_001AF3EC) {
-                        UpdateOrbitObject(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
-                        SetMobyState(moby, 0x1F, 4);
+                        orbit_update(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
+                        moby_set_state(moby, 0x1F, 4);
                         break;
                     }
                     val56 = M2C_FIELD(moby, u8 *, 0x43);
                     if (val56 == 0xC) {
                         if (M2C_FIELD(vars, f32 *, 0x3DC) < 37.0f) {
-                            UpdateOrbitObject(moby, 0, 0, 4, 1, 1.0f);
+                            orbit_update(moby, 0, 0, 4, 1, 1.0f);
                         } else {
                             WalkPathUpdate(moby);
                         }
                     } else if (val56 == 0xB) {
                         if ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) >= M2C_FIELD(vars, s16 *, 0x430)) && (M2C_FIELD(vars, f32 *, 0x3DC) > 32.0f)) {
-                            UpdateOrbitObject(moby, 0, 0, 4, 1, 1.0f);
+                            orbit_update(moby, 0, 0, 4, 1, 1.0f);
                         } else {
                             WalkPathUpdate(moby);
                         }
                     } else {
                         if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) < M2C_FIELD(vars, s16 *, 0x430)) {
-                            UpdateOrbitObject(moby, 0xB, 0, 4, 1, 1.0f);
-                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (gHeroState + 0x80);
+                            orbit_update(moby, 0xB, 0, 4, 1, 1.0f);
+                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                             M2C_FIELD(vars, s16 *, 0x430) = 0x3E8;
                         }
                         flt10 = M2C_FIELD(vars, f32 *, 0x3DC);
                         if (flt10 > 42.0f) {
-                            UpdateOrbitObject(moby, 0xC, 0, 4, 1, 1.0f);
-                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (gHeroState + 0x80);
+                            orbit_update(moby, 0xC, 0, 4, 1, 1.0f);
+                            M2C_FIELD(vars, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                         } else if (flt10 < 25.0f) {
-                            UpdateOrbitObject(moby, 0xB, 0, 4, 1, 1.0f);
+                            orbit_update(moby, 0xB, 0, 4, 1, 1.0f);
                             vec1 = vars + 0x3B0;
-                            FastVecSub(&scratch[0].q, (moby + 0x10), (s128 *) (gHeroState + 0x80));
+                            FastVecSub(&scratch[0].q, (moby + 0x10), (s128 *) (g_hero_state + 0x80));
                             FastVecScale(&scratch[0].q, &scratch[0].q, 20.0f);
                             FastVecAdd(&scratch[0].q, (moby + 0x10), &scratch[0].q);
-                            FindNearestLanePoint(moby, vec1, &scratch[0].q, 1);
+                            lane_find_nearest_point(moby, vec1, &scratch[0].q, 1);
                             M2C_FIELD(vars, s128 **, 0x3AC) = vec1;
                         } else {
-                            CallSharedHelperWithObjectBlocks(moby);
+                            moby_call_helper_with_blocks(moby);
                         }
                     }
                     break;
                 case 33:                            /* switch 2 */
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 5, 0, 4, 3, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 0, 0, 4);
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 5, 0, 4, 3, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 0, 0, 4);
                     }
-                    StoreNearestLanePointAsCurrent(moby, 1);
+                    lane_store_nearest_point_as_current(moby, 1);
                     ptr16 = vars + 0x360;
                     M2C_FIELD(vars, s128 *, 0x360) = (s128) M2C_FIELD(((M2C_FIELD(vars, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) vars)->paths[M2C_FIELD(vars, s16 *, 0x354)]]), s128 *, 0x10);
-                    PushPointOutOfArena(ptr16, 8.0f);
+                    arena_push_point_out(ptr16, 8.0f);
                     M2C_FIELD(vars, f32 *, 0x3A0) = fast_vec_dist((moby + 0x10), ptr16);
-                    SetMobyState(moby, 0x22, 5);
+                    moby_set_state(moby, 0x22, 5);
                     M2C_FIELD(vars, u16 *, 0x3A4) = 0U;
                     if (M2C_FIELD(vars, s16 *, 0x3A6) == 3) {
                         if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) {
@@ -1136,20 +1136,20 @@ block_184:
                     ptr17 = vars + 0x360;
                     if (fast_vec_dist((moby + 0x10), ptr17) < 2.0f) {
                         *(s128 *)(moby + 0x10) = M2C_FIELD(vars, s128 *, 0x360);
-                        SetMobyState(moby, 0x23, 5);
-                        UpdateOrbitObject(moby, 6, 0, 0x14, 3, 1.0f);
-                        M2C_FIELD(vars, s16 *, 0x384) = RandomIntRange(0x168, 0x258);
+                        moby_set_state(moby, 0x23, 5);
+                        orbit_update(moby, 6, 0, 0x14, 3, 1.0f);
+                        M2C_FIELD(vars, s16 *, 0x384) = math_random_int_range(0x168, 0x258);
                         M2C_FIELD(vars, s16 *, 0x386) = 0;
                         M2C_FIELD(vars, f32 *, 0x3A8) = 0.0f;
                     } else {
                         FastVecSub(&scratch[0].q, ptr17, (moby + 0x10));
                         workInt0 = 0;
                         flt18 = FastVecLength(&scratch[0].q);
-                        StepValueTowardTarget(&workInt0, vars + 0x3A8, flt18, 0.011111111f, 0.0055555557f, 0.33333334f);
+                        math_step_value_toward_target(&workInt0, vars + 0x3A8, flt18, 0.011111111f, 0.0055555557f, 0.33333334f);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, M2C_FIELD(vars, f32 *, 0x3A8));
                         FastVecAdd((moby + 0x10), (moby + 0x10), &scratch[0].q);
                         if ((M2C_FIELD(moby, u8 *, 0x60) & 2) && (M2C_FIELD(moby, u8 *, 0x43) == 5)) {
-                            UpdateOrbitObject(moby, 6, 0, 0x14, 3, 1.0f);
+                            orbit_update(moby, 6, 0, 0x14, 3, 1.0f);
                         }
                     }
                     break;
@@ -1159,8 +1159,8 @@ block_184:
                         || ((val45 = (u16) M2C_FIELD(vars, s16 *, 0x3A6), (M2C_FIELD(vars, s16 *, 0x3A6) == 1))
                             && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || ((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x79U)))) {
                         ptr6 = moby + 0xE0;
-                        SetMobyState(moby, 0x24, 5);
-                        UpdateOrbitObject(moby, 2, 0, 4, 2, 1.0f);
+                        moby_set_state(moby, 0x24, 5);
+                        orbit_update(moby, 2, 0, 4, 2, 1.0f);
                         M2C_FIELD(vars, f32 *, 0x3A8) = 0.0f;
                     } else {
                                 val14 = M2C_FIELD(vars, s32 *, 0x440);
@@ -1169,22 +1169,22 @@ block_184:
                                     if (mode3A6 == 0) {
                                         if (M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) == 0) {
                                             ptr6 = moby + 0xE0;
-                                            SetMobyState(moby, 0x24, 5);
-                                            UpdateOrbitObject(moby, 6, 0, 4, 3, 1.0f);
+                                            moby_set_state(moby, 0x24, 5);
+                                            orbit_update(moby, 6, 0, 4, 3, 1.0f);
                                             M2C_FIELD(vars, f32 *, 0x3A8) = 0.0f;
                                         } else {
                                         ptr6 = moby + 0xE0;
-                                        DecrementTableTimer();
+                                        table_decrement_timer();
                                         }
                                     } else if (mode3A6 == 1) {
-                                        UpdateOrbitObject(moby, 2, 0, 4, 2, 1.0f);
+                                        orbit_update(moby, 2, 0, 4, 2, 1.0f);
                                         ptr6 = moby + 0xE0;
                                         M2C_FIELD(vars, s16 *, 0x386) = 0;
                                     } else {
                                         ptr6 = moby + 0xE0;
                                         if (mode3A6 == 2) {
                                             if (M2C_FIELD(vars, f32 *, 0x3DC) > 30.0f) {
-                                                SetMobyState(moby, 0x24, 5);
+                                                moby_set_state(moby, 0x24, 5);
                                                 M2C_FIELD(vars, f32 *, 0x3A8) = 0.0f;
                                             }
                                         }
@@ -1192,30 +1192,30 @@ block_184:
                                 } else {
                                     val57 = M2C_FIELD(val14, u8 *, 0x43);
                                     if (val57 == 3) {
-                                        if ((GetMobyAnimationValue((void *) val14) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
-                                            RunAttachedPartEffect(moby, 1, gHeroMoby_0018C0B0, 0, 0);
+                                        if ((moby_get_anim_value((void *) val14) >= 4.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 4.0f)) {
+                                            space_ship_run_attached_part_effect(moby, 1, g_hero_moby, 0, 0);
                                             ptr6 = moby + 0xE0;
                                         } else {
                                             ptr6 = moby + 0xE0;
-                                            if ((GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
-                                                RunAttachedPartEffect(moby, 2, gHeroMoby_0018C0B0, 0, 0);
+                                            if ((moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(vars, f32 *, 0x44C) < 2.0f)) {
+                                                space_ship_run_attached_part_effect(moby, 2, g_hero_moby, 0, 0);
                                             }
                                         }
                                     } else if (val57 == 14) {
-                                        if ((GetMobyAnimationValue((void *) val14) > 22.0f) && (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < 55.0f)) {
+                                        if ((moby_get_anim_value((void *) val14) > 22.0f) && (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < 55.0f)) {
                                             ptr6 = moby + 0xE0;
                                             M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), f32 *, 0x48) = 1.0f;
                                         } else {
                                             ptr6 = moby + 0xE0;
-                                            if (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 10.0f) {
-                                                f32 t = GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440));
+                                            if (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) >= 10.0f) {
+                                                f32 t = moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440));
                                                 s128 *d = &scratch[0].q;
                                                 if (t <= 22.0f) {
                                                 *d = *(s128 *)(moby + 0x10);
                                                 vec_scale_to_length(&scratch[1].q, ptr6, 3.0f);
                                                 FastVecAdd(&scratch[1].q, &scratch[1].q, moby + 0xC0);
                                                 FastVecAdd(d, d, &scratch[1].q);
-                                                PlaceKeyedObject(moby, d, 0);
+                                                keyed_object_place(moby, d, 0);
                                                 M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), f32 *, 0x48) = 0.35f;
                                                 }
                                             }
@@ -1226,15 +1226,15 @@ block_184:
                                         if (M2C_FIELD(vars, s16 *, 0x386) <= 0) {
                                             val3 = M2C_FIELD(vars, s16 *, 0x3A6);
                                             if (val3 == 1) {
-                                                UpdateOrbitObject(moby, 3, 0, 4, 2, 1.0f);
-                                                StartAnimationBlended(((VarsD708 *) vars)->p448, 5, 0, 4);
+                                                orbit_update(moby, 3, 0, 4, 2, 1.0f);
+                                                anim_start_blended(((VarsD708 *) vars)->p448, 5, 0, 4);
                                             } else if (val3 == 0) {
                                                 val20 = M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC);
                                                 if (val20 > 0) {
                                                     M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) = (s32) (val20 - 1);
                                                 }
-                                                UpdateOrbitObject(moby, 0xE, 0, 4, 2, 1.0f);
-                                                StartAnimationBlended(((VarsD708 *) vars)->p448, 5, 0, 4);
+                                                orbit_update(moby, 0xE, 0, 4, 2, 1.0f);
+                                                anim_start_blended(((VarsD708 *) vars)->p448, 5, 0, 4);
                                             }
                                         }
                                     }
@@ -1244,7 +1244,7 @@ block_184:
                         workInt1 = 0;
                         if (M2C_FIELD(vars, f32 *, 0x3DC) > 32.0f) {
                             val34 = 3;
-                            flt16 = FloatAbs(M2C_FIELD(vars, f32 *, 0x3DC) - 35.0f);
+                            flt16 = math_fabs(M2C_FIELD(vars, f32 *, 0x3DC) - 35.0f);
                             if ((u16) M2C_FIELD(vars, u16 *, 0x3A4) >= 2U) {
                                 workInt1 = 1;
                                 M2C_FIELD(vars, u16 *, 0x352) = (u16) -(s32) M2C_FIELD(vars, u16 *, 0x352);
@@ -1252,7 +1252,7 @@ block_184:
                             val49 = 1;
                         } else {
                             val34 = 2;
-                            flt16 = FloatAbs(M2C_FIELD(vars, f32 *, 0x3DC) - 35.0f);
+                            flt16 = math_fabs(M2C_FIELD(vars, f32 *, 0x3DC) - 35.0f);
                             val2 = (s16) M2C_FIELD(vars, u16 *, 0x3A4);
 
                             if ((val2 != 0) && (val2 != 2)) {
@@ -1274,7 +1274,7 @@ block_184:
                                         s128 next = M2C_FIELD(((s8 *) ptr3 + (val40 * 0x10)), s128 *, 0x10);
                                         scratch[0].q = next;
                                     }
-                                    PushPointOutOfArena(&scratch[0].q, 8.0f);
+                                    arena_push_point_out(&scratch[0].q, 8.0f);
                                 }
                                 val39 = M2C_FIELD(vars, s16 *, 0x356) - 1;
                                 if (val39 < 0) {
@@ -1285,16 +1285,16 @@ block_184:
                                         s128 prev = M2C_FIELD(((s8 *) ptr3 + (val39 * 0x10)), s128 *, 0x10);
                                         scratch[1].q = prev;
                                     }
-                                    PushPointOutOfArena(&scratch[1].q, 8.0f);
+                                    arena_push_point_out(&scratch[1].q, 8.0f);
                                 }
                                 if (val40 != -1) {
                                     FastVecSub(&scratch[3].q, &scratch[0].q, (moby + 0x10));
-                                    FastVecSub(&scratch[4].q, (s128 *) (gHeroState + 0x80), (moby + 0x10));
+                                    FastVecSub(&scratch[4].q, (s128 *) (g_hero_state + 0x80), (moby + 0x10));
                                     scratch[2].f[0] = FastVecDot(&scratch[3].q, &scratch[4].q);
                                 }
                                 if (val39 != -1) {
                                     FastVecSub(&scratch[3].q, &scratch[1].q, (moby + 0x10));
-                                    FastVecSub(&scratch[4].q, (s128 *) (gHeroState + 0x80), (moby + 0x10));
+                                    FastVecSub(&scratch[4].q, (s128 *) (g_hero_state + 0x80), (moby + 0x10));
                                     scratch[2].f[1] = FastVecDot(&scratch[3].q, &scratch[4].q);
                                 }
                                 if (val34 == 3) {
@@ -1336,7 +1336,7 @@ block_184:
                                 }
                             }
                             *((s128 *) (vars + 0x360)) = M2C_FIELD(((M2C_FIELD(vars, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) vars)->paths[M2C_FIELD(vars, s16 *, 0x354)]]), s128 *, 0x10);
-                            PushPointOutOfArena(((s128 *) (vars + 0x360)), 8.0f);
+                            arena_push_point_out(((s128 *) (vars + 0x360)), 8.0f);
                         } else {
                             FastVecSub(&scratch[0].q, near, (moby + 0x10));
                             flt16 = flt16 * 0.0625f;
@@ -1345,23 +1345,23 @@ block_184:
                             }
                             vec_scale_to_length(&scratch[0].q, &scratch[0].q, flt16);
                             FastVecAdd((moby + 0x10), (moby + 0x10), &scratch[0].q);
-                            PushPointOutOfArena((moby + 0x10), 8.0f);
+                            arena_push_point_out((moby + 0x10), 8.0f);
                             M2C_FIELD(vars, s32 *, 0x3E8) = 0;
                         }
                     }
-                    SteerAlongDirection(moby, vars + 0x3E4, vars + 0x3E8, ptr6, D_L22_001AF3FC, D_L22_001AF400, -1.0f);
+                    math_steer_along_direction(moby, vars + 0x3E4, vars + 0x3E8, ptr6, D_L22_001AF3FC, D_L22_001AF400, -1.0f);
                     break;
                 case 36:                            /* switch 2 */
-                    if (GetDistanceFromGravityCenter((moby + 0x10)) <= D_L22_001B2AA4) {
-                        SetMobyState(moby, 5, 0);
+                    if (gravity_get_center_distance((moby + 0x10)) <= D_L22_001B2AA4) {
+                        moby_set_state(moby, 5, 0);
                         M2C_FIELD(vars, s16 *, 0x350) = 0;
                         M2C_FIELD(vars, f32 *, 0x3E4) = M2C_FIELD(vars, f32 *, 0x3E8) = 0.0f;
                     } else {
-                        workFloat = GetDistanceFromGravityCenter((moby + 0x10)) - D_L22_001B2AA4;
+                        workFloat = gravity_get_center_distance((moby + 0x10)) - D_L22_001B2AA4;
                         scratch[1].q = *(s128 *)(moby + 0x10);
-                        PushPointOutOfArena(&scratch[1].q, 0.0f);
+                        arena_push_point_out(&scratch[1].q, 0.0f);
                         FastVecSub(&scratch[0].q, &scratch[1].q, (moby + 0x10));
-                        StepValueTowardTarget(&workFloat, vars + 0x3A8, 0.0f, 0.011111111f, 0.011111111f, 0.33333334f);
+                        math_step_value_toward_target(&workFloat, vars + 0x3A8, 0.0f, 0.011111111f, 0.011111111f, 0.33333334f);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, -M2C_FIELD(vars, f32 *, 0x3A8));
                         FastVecAdd((moby + 0x10), (moby + 0x10), &scratch[0].q);
                     }
@@ -1371,12 +1371,12 @@ block_184:
                         if ((M2C_FIELD(vars, s32 *, 0x3D0) != 0) && (M2C_FIELD(vars, s32 *, 0x3D8) != 0)) {
                             flt11 = M2C_FIELD(vars, f32 *, 0x3DC);
                             if (flt11 < D_L22_001AF3EC) {
-                                if ((RandomIntBelow(5) == 0) && (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0)) {
-                                    SetMobyState(moby, 0x21, 5);
+                                if ((math_random_int_below(5) == 0) && (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0)) {
+                                    moby_set_state(moby, 0x21, 5);
                                     M2C_FIELD(vars, s16 *, 0x3A6) = 3;
                                 } else {
-                                    UpdateOrbitObject(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
-                                    SetMobyState(moby, 0x1F, 4);
+                                    orbit_update(moby, 0xD, 0, 4, 3, D_L22_001AF3E8);
+                                    moby_set_state(moby, 0x1F, 4);
                                 }
                             } else if (flt11 < 33.0f) {
                                 val38 = 0;
@@ -1385,7 +1385,7 @@ block_184:
                                     val38 = M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0;
                                 }
                                 if ((val35 != 0) && (val38 != 0)) {
-                                    if (RandomIntBelow(2) != 0) {
+                                    if (math_random_int_below(2) != 0) {
                                         val35 = 0;
                                     } else {
                                         val38 = 0;
@@ -1394,25 +1394,25 @@ block_184:
                                 if (val35 != 0) {
                                     val17 = M2C_FIELD(D_L22_001B2AB4, s32 *, 8);
                                     if (val17 >= 0x32) {
-                                        M2C_FIELD(vars, s16 *, 0x430) = (s16) ((u16) M2C_FIELD(D_L22_001B2AB4, s32 *, 8) - RandomIntBelow(0x23));
+                                        M2C_FIELD(vars, s16 *, 0x430) = (s16) ((u16) M2C_FIELD(D_L22_001B2AB4, s32 *, 8) - math_random_int_below(0x23));
                                     } else {
                                         if (val17 >= 3) {
-                                            M2C_FIELD(vars, s16 *, 0x430) = (s16) RandomIntBelow(val17 / 2);
+                                            M2C_FIELD(vars, s16 *, 0x430) = (s16) math_random_int_below(val17 / 2);
                                         } else {
                                             M2C_FIELD(vars, s16 *, 0x430) = 1;
                                         }
                                     }
-                                    if (RandomIntBelow(4) != 0) {
-                                        SetMobyState(moby, 0x20, 4);
+                                    if (math_random_int_below(4) != 0) {
+                                        moby_set_state(moby, 0x20, 4);
                                     } else {
-                                        SetMobyState(moby, 0x21, 5);
+                                        moby_set_state(moby, 0x21, 5);
                                         M2C_FIELD(vars, s16 *, 0x3A6) = 1;
                                     }
                                 } else if (val38 != 0) {
-                                    SetMobyState(moby, 0x21, 5);
+                                    moby_set_state(moby, 0x21, 5);
                                     M2C_FIELD(vars, s16 *, 0x3A6) = 0;
                                 } else {
-                                    SetMobyState(moby, 0x12, 9);
+                                    moby_set_state(moby, 0x12, 9);
                                 }
                             } else {
                                 WalkPathUpdate(moby);
@@ -1424,61 +1424,61 @@ block_184:
                     break;
                 case 1:                             /* switch 2 */
                     if (D_L22_001AF304 < 0xC8) {
-                        CheckTargetPointFromOffset(moby, (s128 *) (gHeroState + 0x80));
-                        if (SetFirstPendingFlag(moby) != 0) {
-                            UpdateOrbitObject(moby, 0, 0, 0, 3, 1.0f);
-                            StartAnimationBlended(((VarsD708 *) vars)->p448, 7, 0, 0);
+                        moby_check_target_point_from_offset(moby, (s128 *) (g_hero_state + 0x80));
+                        if (flag_set_first_pending(moby) != 0) {
+                            orbit_update(moby, 0, 0, 0, 3, 1.0f);
+                            anim_start_blended(((VarsD708 *) vars)->p448, 7, 0, 0);
                         }
                         if (M2C_FIELD(vars, s16 *, 0x1D0) == 0) {
-                            CallSharedHelperWithObjectBlocks(moby);
+                            moby_call_helper_with_blocks(moby);
                         }
                     }
                     break;
                 case 2:                             /* switch 2 */
-                    CheckTargetPointFromOffset(moby, (s128 *) (gHeroState + 0x80));
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 0, 0, 4, 3, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 4, 0, 4);
+                    moby_check_target_point_from_offset(moby, (s128 *) (g_hero_state + 0x80));
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 0, 0, 4, 3, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 4, 0, 4);
                     } else if (M2C_FIELD(vars, s16 *, 0x384) <= 0) {
-                        UpdateOrbitObject(moby, 0, 0, 0x14, 3, 1.0f);
-                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (RandomIntBelow(7) + 0x1B);
+                        orbit_update(moby, 0, 0, 0x14, 3, 1.0f);
+                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (math_random_int_below(7) + 0x1B);
                     }
                     FastDecTimer((s32) (vars + 0x384));
                     if (M2C_FIELD(vars, s16 *, 0x1D0) == 0) {
-                        CallSharedHelperWithObjectBlocks(moby);
+                        moby_call_helper_with_blocks(moby);
                     }
                     break;
                 case 3:                             /* switch 2 */
-                    CheckTargetPointFromOffset(moby, (s128 *) (gHeroState + 0x80));
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 0, 0, 4, 3, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 4, 0, 4);
+                    moby_check_target_point_from_offset(moby, (s128 *) (g_hero_state + 0x80));
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 0, 0, 4, 3, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 4, 0, 4);
                     }
                     if ((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x8FU) {
-                        SetMobyState(moby, 0x12, 9);
+                        moby_set_state(moby, 0x12, 9);
                     } else if (M2C_FIELD(vars, s16 *, 0x384) <= 0) {
-                        UpdateOrbitObject(moby, 0, 0, 0x14, 3, 1.0f);
-                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (RandomIntBelow(7) + 0x1B);
+                        orbit_update(moby, 0, 0, 0x14, 3, 1.0f);
+                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (math_random_int_below(7) + 0x1B);
                     }
                     FastDecTimer((s32) (vars + 0x384));
                     if (M2C_FIELD(vars, s16 *, 0x1D0) == 0) {
-                        CallSharedHelperWithObjectBlocks(moby);
+                        moby_call_helper_with_blocks(moby);
                     }
                     break;
                 case 4:                             /* switch 2 */
-                    if (SetFirstPendingFlag(moby) != 0) {
-                        UpdateOrbitObject(moby, 0, 0, 4, 3, 1.0f);
-                        StartAnimationBlended(((VarsD708 *) vars)->p448, 4, 0, 4);
+                    if (flag_set_first_pending(moby) != 0) {
+                        orbit_update(moby, 0, 0, 4, 3, 1.0f);
+                        anim_start_blended(((VarsD708 *) vars)->p448, 4, 0, 4);
                     }
                     if ((u16) M2C_FIELD(moby, u16 *, 0x96) >= 0x4B1U) {
-                        SetMobyState(moby, 0x12, 9);
+                        moby_set_state(moby, 0x12, 9);
                     } else if (M2C_FIELD(vars, s16 *, 0x384) <= 0) {
-                        UpdateOrbitObject(moby, 0, 0, 0x14, 3, 1.0f);
-                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (RandomIntBelow(7) + 0x1B);
+                        orbit_update(moby, 0, 0, 0x14, 3, 1.0f);
+                        M2C_FIELD(vars, s16 *, 0x384) = (s16) (math_random_int_below(7) + 0x1B);
                     }
                     FastDecTimer((s32) (vars + 0x384));
                     if (M2C_FIELD(vars, s16 *, 0x1D0) == 0) {
-                        CallSharedHelperWithObjectBlocks(moby);
+                        moby_call_helper_with_blocks(moby);
                     }
                     break;
                 case 37:                            /* switch 2 */
@@ -1487,48 +1487,48 @@ block_184:
                 ptr13 = M2C_FIELD(vars, void **, 0x388);
 
                 if (ptr13 == NULL) {
-                    M2C_FIELD(vars, void **, 0x388) = CreateAttachedEffect(moby, (moby + 0x10));
+                    M2C_FIELD(vars, void **, 0x388) = effect_create_attached(moby, (moby + 0x10));
                 } else {
-                    StorePositionInPrivateVars(ptr13, (moby + 0x10));
+                    moby_store_position_private(ptr13, (moby + 0x10));
                 }
-                M2C_FIELD(vars, f32 *, 0x38C) = GetMobyAnimationValue(moby);
-                M2C_FIELD(vars, f32 *, 0x44C) = GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440));
-                AlignShipPartsAtEnd(moby);
-                UpdateSpawnedPickups(moby);
-                UpdateTimedMoby(moby);
-                TiltShipAttachedPart(moby);
+                M2C_FIELD(vars, f32 *, 0x38C) = moby_get_anim_value(moby);
+                M2C_FIELD(vars, f32 *, 0x44C) = moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440));
+                space_ship_align_parts_at_end(moby);
+                pickup_update_spawned(moby);
+                moby_update_timed(moby);
+                space_ship_tilt_attached_part(moby);
                 if (M2C_FIELD(vars, s16 *, 0x350) == 3) {
-                if ((IsKeyInList((s32) moby, (s32) M2C_FIELD(vars, s16 *, 0x354)) != 0) && ((u32) (M2C_FIELD(moby, u8 *, 0x43) - 0xB) < 2U)) {
+                if ((list_has_key((s32) moby, (s32) M2C_FIELD(vars, s16 *, 0x354)) != 0) && ((u32) (M2C_FIELD(moby, u8 *, 0x43) - 0xB) < 2U)) {
                     val15 = M2C_FIELD(vars, s32 *, 0x440);
                     val58 = M2C_FIELD(val15, u8 *, 0x43);
                     switch (val58) {
                     case 0xA:
-                        if ((GetMobyAnimationValue((void *) val15) > 7.0f) && (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
+                        if ((moby_get_anim_value((void *) val15) > 7.0f) && (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(moby, s32 *, 0x98) = 0;
-                            TestHitAtBone((void *) M2C_FIELD(vars, s32 *, 0x440), 3, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
+                            coll_test_hit_at_bone((void *) M2C_FIELD(vars, s32 *, 0x440), 3, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
                             M2C_FIELD(moby, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(moby, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), u8 *, 0x60) & 2) {
                             M2C_FIELD(vars, s16 *, 0x34C) = 0;
-                            UpdateOrbitObject(moby, 9, 0, 4, 2, 1.0f);
+                            orbit_update(moby, 9, 0, 4, 2, 1.0f);
                             M2C_FIELD(vars, s16 *, 0x34C) = 1;
                         }
                         break;
                     case 9:
-                        if ((GetMobyAnimationValue((void *) val15) > 7.0f) && (GetMobyAnimationValue((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
+                        if ((moby_get_anim_value((void *) val15) > 7.0f) && (moby_get_anim_value((void *) M2C_FIELD(vars, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(moby, s32 *, 0x98) = 0;
-                            TestHitAtBone((void *) M2C_FIELD(vars, s32 *, 0x440), 4, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
+                            coll_test_hit_at_bone((void *) M2C_FIELD(vars, s32 *, 0x440), 4, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
                             M2C_FIELD(moby, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(moby, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), u8 *, 0x60) & 2) {
                             M2C_FIELD(vars, s16 *, 0x34C) = 0;
-                            UpdateOrbitObject(moby, 0xA, 0, 4, 2, 1.0f);
+                            orbit_update(moby, 0xA, 0, 4, 2, 1.0f);
                             M2C_FIELD(vars, s16 *, 0x34C) = 1;
                         }
                         break;
                     default:
                         M2C_FIELD(vars, s16 *, 0x34C) = 0;
-                        UpdateOrbitObject(moby, 9, 0, 4, 2, 1.0f);
+                        orbit_update(moby, 9, 0, 4, 2, 1.0f);
                         M2C_FIELD(vars, s16 *, 0x34C) = 1;
                         break;
                     }
@@ -1536,8 +1536,8 @@ block_184:
                 } else if ((M2C_FIELD(vars, s16 *, 0x43A) != 0) && (M2C_FIELD(M2C_FIELD(vars, s32 *, 0x440), u8 *, 0x60) & 2)) {
                     M2C_FIELD(vars, s16 *, 0x43A) = 0;
                     M2C_FIELD(vars, s16 *, 0x34C) = 0;
-                    frame = GetMobyAnimationValue(moby);
-                    UpdateOrbitObject(moby, (s32) M2C_FIELD(moby, u8 *, 0x43), (s32) frame, 4, 2, 1.0f);
+                    frame = moby_get_anim_value(moby);
+                    orbit_update(moby, (s32) M2C_FIELD(moby, u8 *, 0x43), (s32) frame, 4, 2, 1.0f);
                 }
                 } else {
                     M2C_FIELD(vars, s16 *, 0x43A) = 0;
@@ -1549,15 +1549,15 @@ block_184:
                     if ((u32) (val53 - 4) >= 2U) {
                         val23 = val53 & 0xFF;
                         if ((val23 != 8) && (val23 != 1) && (val23 != 2) && (M2C_FIELD(moby, u8 *, 0x20) != 0x26)) {
-                            if (RandomIntBelow(5) != 0) {
-                                StartAnimationBlended(((VarsD708 *) vars)->p448, 0, 0, 0xA);
+                            if (math_random_int_below(5) != 0) {
+                                anim_start_blended(((VarsD708 *) vars)->p448, 0, 0, 0xA);
                             } else {
-                                StartAnimationBlended(((VarsD708 *) vars)->p448, 7, 0, 0xA);
+                                anim_start_blended(((VarsD708 *) vars)->p448, 7, 0, 0xA);
                             }
                         }
                     }
                 } else if ((M2C_FIELD(ptr7, u8 *, 0x43) == 6) && (M2C_FIELD(moby, u8 *, 0x95) != 8) && (M2C_FIELD(moby, u8 *, 0x20) != 0x26)) {
-                    StartAnimationBlended(ptr7, 7, 0, 0xA);
+                    anim_start_blended(ptr7, 7, 0, 0xA);
                 }
                 if ((u32) (M2C_FIELD(moby, u8 *, 0x43) - 0xB) < 2U) {
                     s128 *d;
@@ -1578,13 +1578,13 @@ block_184:
                                 f32 ratio = flt1 / (f32) ((s16) M2C_FIELD(vars, s16 *, 0x24) / 3);
                                 D_L22_001AF36C = D_L22_001AF368 + (s32) ((f32) (D_L22_001AF364 - D_L22_001AF368) * ratio);
                             }
-                            if (RandomIntBelow(2) != 0) {
-                                SpawnScatterParticle((s32) moby, RandomIntBelow(4), 0, D_L22_001AF370);
+                            if (math_random_int_below(2) != 0) {
+                                part_spawn_scatter((s32) moby, math_random_int_below(4), 0, D_L22_001AF370);
                             } else {
-                                SpawnScatterParticle(M2C_FIELD(vars, s32 *, 0x440), RandomIntBelow(6), 0, D_L22_001AF370);
+                                part_spawn_scatter(M2C_FIELD(vars, s32 *, 0x440), math_random_int_below(6), 0, D_L22_001AF370);
                             }
                         } else {
-                            FastFloatHelperD(&D_L22_001AF36C);
+                            math_fast_float_d(&D_L22_001AF36C);
                         }
                     }
                 }

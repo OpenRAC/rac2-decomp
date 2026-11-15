@@ -1,18 +1,19 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_US2_002E5520, the USA v2.00 copy of func_002E4708: the same C, where adding the yaw at
    D_L00_001B8DC0[6] to the angle becomes rotating buf by func_002836E8 of the matrix at +0x230. */
 
-extern float D_L00_001B8DC0[];
+extern float g_camera_l00_position[];
 
-extern void func_00282CF0(void *dst, void *src, void *arg);
-extern void func_002836E8(void *dst, void *src);
-extern void func_00283098(void *dst, void *src, void *m);
-extern float func_00283248(float a, float b);
-extern float func_00283B98(float a, float b);
-extern float func_00282E20(void *p);
-extern float func_00283BE0(float a, float b);
-extern int func_00283CF0(float a);
+extern void FastVecSub(void *dst, void *src, void *arg);
+extern void mat_fast_helper_c(void *dst, void *src);
+extern void matrix_mul_vec3(void *dst, void *src, void *m);
+extern float mat_fast_helper_a(float a, float b);
+extern float FastAddRotations(float a, float b);
+extern float vec_length_xy(void *p);
+extern float fast_subtract_rotations(float a, float b);
+extern int FloatToInt(float a);
 
 void func_US2_002E5520(void *self, void *other)
 {
@@ -23,19 +24,19 @@ void func_US2_002E5520(void *self, void *other)
     float w;
     float r;
 
-    func_00282CF0(buf, other, D_L00_001B8DC0);
-    func_002836E8(m, (char *)D_L00_001B8DC0 + 0x230);
-    func_00283098(buf, buf, m);
-    w = -func_00283248(buf[0], buf[1]);
+    FastVecSub(buf, other, g_camera_l00_position);
+    mat_fast_helper_c(m, (char *)g_camera_l00_position + 0x230);
+    matrix_mul_vec3(buf, buf, m);
+    w = -mat_fast_helper_a(buf[0], buf[1]);
     if (w < 0.0f)
         w += 6.283185307179586f;
-    if (func_00282E20(buf) < 2.0f) {
+    if (vec_length_xy(buf) < 2.0f) {
         if (state->angle >= 0.0f) {
-            r = func_00283BE0(w, state->angle);
+            r = fast_subtract_rotations(w, state->angle);
             if (r > 0.2f) {
-                w = func_00283B98(state->angle, 0.2f);
+                w = FastAddRotations(state->angle, 0.2f);
             } else if (r < -0.2f) {
-                w = func_00283BE0(state->angle, 0.2f);
+                w = fast_subtract_rotations(state->angle, 0.2f);
             }
             state->angle = w;
         } else {
@@ -44,5 +45,5 @@ void func_US2_002E5520(void *self, void *other)
     } else {
         state->angle = -1.0f;
     }
-    func_00283CF0(w * 57.2957763671875f);
+    FloatToInt(w * 57.2957763671875f);
 }

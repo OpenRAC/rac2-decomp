@@ -3,6 +3,7 @@
  * 16-byte tail (FUNCTION_ENTRY_OFFSETS); the word at 26:00286D80 points there.
  */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -16,7 +17,7 @@ extern struct { char pad[0x230]; int selected; } D_L26_001C9160;
 
 /* Fills the menu entry table from the list of unlocked items, then finds which one is currently
    selected and stores its position in the object. */
-int func_L26_003547D8(char *obj) {
+int menu_fill_entry_table(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

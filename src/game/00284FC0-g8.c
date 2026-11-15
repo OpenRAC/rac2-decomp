@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int *D_001B22A8;
-extern void func_002FC560(unsigned int, unsigned long);
-extern void func_002FC518(int);
+extern int *g_dma_packet_cursor;
+extern void VU1_addGSregister(unsigned int, unsigned long);
+extern void vu1_add_vif_code(int);
 
 /* Adapted from RAC1 framebuf.c, draw_centered_capture_background (GPL-3.0).
  * Append a centered background as 32-pixel sprite strips. */
 /* Draws a background for the centered capture picture, as a row of narrow strips sized to the picture width. */
-void func_00285398(int w, int h) {
+void DrawCenteredCaptureBackground(int w, int h) {
     int *dmaTag;
     long *packet;
     long *stripCursor;
@@ -23,13 +23,13 @@ void func_00285398(int w, int h) {
 
     stripCount = w / 32;
     VU1_addGSregister(0x42, 0x800000004AL);
-    *(int *)((char *)gDmaPacketCursor + 0) = (stripCount + 5) | 0x10000000;
-    *(int *)((char *)gDmaPacketCursor + 4) = 0;
-    *(int *)((char *)gDmaPacketCursor + 8) = 0;
-    *(int *)((char *)gDmaPacketCursor + 12) = (stripCount + 5) | 0x50000000;
-    dmaTag = gDmaPacketCursor;
+    *(int *)((char *)g_dma_packet_cursor + 0) = (stripCount + 5) | 0x10000000;
+    *(int *)((char *)g_dma_packet_cursor + 4) = 0;
+    *(int *)((char *)g_dma_packet_cursor + 8) = 0;
+    *(int *)((char *)g_dma_packet_cursor + 12) = (stripCount + 5) | 0x50000000;
+    dmaTag = g_dma_packet_cursor;
     packet = (long *)(dmaTag + 4);
-    gDmaPacketCursor = dmaTag + 4;
+    g_dma_packet_cursor = dmaTag + 4;
     zero = 0;
     packet[zero] = 0x1000000000000001L;
     packet[1] = 0xE;
@@ -57,32 +57,32 @@ void func_00285398(int w, int h) {
             i++;
         } while (i < stripCount);
     }
-    gDmaPacketCursor = gDmaPacketCursor + (stripCount * 4 + 20);
+    g_dma_packet_cursor = g_dma_packet_cursor + (stripCount * 4 + 20);
 }
 
 
 /* Adapted from RAC1 framebuf.c, draw_framebuffer_rect (GPL-3.0).
  * Append an alpha-blended rectangle in the centered 12.4 coordinate space. */
 /* Draws a see-through colored rectangle on screen at the given corners. */
-void func_00285548(int x0, int y0, int x1, int y1, int w, int h, unsigned int rgba) {
+void DrawFramebufferRect(int x0, int y0, int x1, int y1, int w, int h, unsigned int rgba) {
     long *packet;
     int ax, ay, bx, by;
     int hw, hh;
 
     vu1_add_vif_code(0x13000000);
     VU1_addGSregister(0x42, 0x64);
-    *(int *)((char *)gDmaPacketCursor + 0) = 0x10000006;
-    *(int *)((char *)gDmaPacketCursor + 4) = 0;
-    *(int *)((char *)gDmaPacketCursor + 8) = 0;
-    *(int *)((char *)gDmaPacketCursor + 12) = 0x50000006;
+    *(int *)((char *)g_dma_packet_cursor + 0) = 0x10000006;
+    *(int *)((char *)g_dma_packet_cursor + 4) = 0;
+    *(int *)((char *)g_dma_packet_cursor + 8) = 0;
+    *(int *)((char *)g_dma_packet_cursor + 12) = 0x50000006;
     ax = (x0 << 4) + 0x8000;
     ay = (y0 << 4) + 0x8000;
     bx = (x1 << 4) + 0x8000;
     by = (y1 << 4) + 0x8000;
     hw = w << 3;
     hh = h << 3;
-    gDmaPacketCursor += 4;
-    packet = (long *)gDmaPacketCursor;
+    g_dma_packet_cursor += 4;
+    packet = (long *)g_dma_packet_cursor;
     *(long *)((char *)packet + 0) = 0x1000000000000001L;
     *(long *)((char *)packet + 8) = 0xE;
     *(long *)((char *)packet + 16) = 0x33003;
@@ -102,7 +102,7 @@ void func_00285548(int x0, int y0, int x1, int y1, int w, int h, unsigned int rg
         *(long *)((char *)packet + 80) = X0 | (Y0 << 16);
         *(long *)((char *)packet + 88) = X1 | (Y1 << 16);
     }
-    gDmaPacketCursor += 0x18;
+    g_dma_packet_cursor += 0x18;
     VU1_addGSregister(0x42, 0x8000000044L);
     vu1_add_vif_code(0x13000000);
 }

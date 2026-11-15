@@ -1,45 +1,46 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void *D_0026CBB0[];
 extern void *D_0026CBE0[];
-extern int D_001A8BB0;
-extern int D_001A8BB4;
-extern int D_001A8BB8;
+extern int g_current_game_mode;
+extern int g_previous_game_mode;
+extern int g_requested_game_mode;
 extern int D_0018C2EC __attribute__((nosda));
 extern int D_001AA0F4 __attribute__((sda));
 extern int D_001AA0F8 __attribute__((sda));
 extern int D_001AA0FC __attribute__((sda));
 extern char *D_001AA104 __attribute__((sda));
 extern float D_001A8C7C;
-extern float D_001B15A0;
+extern float g_screen_fade;
 extern int D_001B1694;
 extern float D_001B90F0 __attribute__((nosda));
 extern int D_001ABD80;
 extern void func_PAL_002CB5D0(void);
-extern void func_00285860(void);
-extern void func_002F5EF8(void);
+extern void menu_end(void);
+extern void mpeg_resume_after_movie(void);
 extern void func_PAL_002F66F8(void);
-extern void func_0026FF08(int, int, float, float, float, float);
-extern void func_0027AB40(void);
+extern void cam_set_value_target(int, int, float, float, float, float);
+extern void UpdateViewContext(void);
 extern void func_PAL_002E8030(void);
 extern void func_PAL_002F96D8(void);
-extern void func_002DF380(void);
+extern void moby_show_all(void);
 extern void func_PAL_00300300(void);
 extern void func_PAL_00291A40(void);
-extern void func_00282A28(void);
+extern void math_trap_always(void);
 extern void func_PAL_002B5540(int);
-extern int func_002857B0(void);
+extern int menu_get_mode(void);
 extern void func_PAL_002CAAF0(int);
-extern void func_002858C0(int, int);
-extern void func_002F5D40(int);
-extern float func_002AA2E8(float *, float, float);
+extern void menu_set_mode(int, int);
+extern void mpeg_start_movie_from_toc(int);
+extern float ApproachValue(float *, float, float);
 extern void func_PAL_002F6318(int);
-extern void func_00288CB0(int, int);
-extern void func_002E71B8(void);
-extern void func_002E7090(int);
+extern void data_set_small_value_and_refresh(int, int);
+extern void scene_init_playback_state(void);
+extern void scene_init_list(int);
 extern void func_PAL_002E7E00(void);
 extern void func_PAL_002F90E8(int);
-extern void func_002DF2E0(int, int);
+extern void moby_hide_all(int, int);
 extern void func_PAL_00300130(void);
 extern void func_PAL_00291A20(void);
 
@@ -55,11 +56,11 @@ void func_PAL_002B57D0(void)
 {
     static void *leaving[12] = {&&L1_3, &&L1_4, &&L1_1, &&L1_2, &&L1_6, &&L1_5, &&L1_7, &&L1_8, &&L1_9, &&L1_0, &&L1_def, &&shared};
     static void *entering[11] = {&&L2_3, &&L2_0, &&L2_4, &&L2_1, &&L2_2, &&L2_6, &&L2_5, &&L2_7, &&L2_8, &&L2_9, &&L2_def};
-    int mode = D_001A8BB0;
+    int mode = g_current_game_mode;
     int sel;
     int hold;
-    D_001A8BB4 = mode;
-    if (D_001A8BB8 == -2)
+    g_previous_game_mode = mode;
+    if (g_requested_game_mode == -2)
         return;
     if (D_001AA0F4 > 0) {
         D_001AA0F4--;
@@ -71,21 +72,21 @@ void func_PAL_002B57D0(void)
         goto L1_def;
     goto *D_0026CBB0[mode];
 L1_3:
-    if (D_001A8BB8 != 4 || D_001AA0F8 == 8)
+    if (g_requested_game_mode != 4 || D_001AA0F8 == 8)
         func_PAL_002CB5D0();
     goto E1;
 L1_4:
-    func_00285860();
+    menu_end();
     goto E1;
 L1_1:
-    func_002F5EF8();
+    mpeg_resume_after_movie();
     goto shared;
 L1_2:
     func_PAL_002F66F8();
 shared:
     D_001B90F0 = 0.62f;
-    func_0026FF08(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
-    func_0027AB40();
+    cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
+    UpdateViewContext();
     goto E1;
 L1_6:
     if (D_001AA0F8 != 4)
@@ -95,7 +96,7 @@ L1_5:
     func_PAL_002F96D8();
     goto E1;
 L1_7:
-    func_002DF380();
+    moby_show_all();
     goto E1;
 L1_8:
     func_PAL_00300300();
@@ -104,36 +105,36 @@ L1_9:
     func_PAL_00291A40();
     goto E1;
 L1_def:
-    func_00282A28();
+    math_trap_always();
 L1_0:
 E1:
     func_PAL_002B5540(10);
     hold = 0;
-    sel = D_001A8BB8;
+    sel = g_requested_game_mode;
     if ((unsigned)sel >= 10)
         goto L2_def;
     goto *D_0026CBE0[sel];
 L2_3:
-    if (D_001A8BB4 != 4 || func_002857B0() == 8)
+    if (g_previous_game_mode != 4 || menu_get_mode() == 8)
         func_PAL_002CAAF0(D_001AA0F8);
 L2_0:
     hold = 0;
     goto E2;
 L2_4:
-    func_002858C0(D_001AA0F8, D_001AA0FC);
+    menu_set_mode(D_001AA0F8, D_001AA0FC);
     goto E2;
 L2_1:
-    func_002F5D40(D_001AA0FC);
+    mpeg_start_movie_from_toc(D_001AA0FC);
     hold = 0;
     goto E2;
 L2_2:
-    if ((unsigned)(D_001A8BB0 - 1) >= 2) {
+    if ((unsigned)(g_current_game_mode - 1) >= 2) {
         float f;
-        func_002AA2E8(&D_001A8C7C, 1.4f, 0.120000005f);
+        ApproachValue(&D_001A8C7C, 1.4f, 0.120000005f);
         f = D_001A8C7C;
-        D_001B15A0 = f;
+        g_screen_fade = f;
         if (1.0f < f)
-            D_001B15A0 = 1.0f;
+            g_screen_fade = 1.0f;
         if (1.4f <= f) {
             hold = 0;
             D_001A8C7C = 1.0f;
@@ -147,12 +148,12 @@ L2_2:
     goto E2;
 L2_6:
     if (D_001AA0F8 == 5) {
-        func_00288CB0(D_001AA0FC, 1);
+        data_set_small_value_and_refresh(D_001AA0FC, 1);
     } else if (D_001AA0F8 == 6) {
-        func_002E71B8();
+        scene_init_playback_state();
     } else {
-        if (D_001A8BB4 == 3)
-            func_002E7090(D_001AA0FC);
+        if (g_previous_game_mode == 3)
+            scene_init_list(D_001AA0FC);
         else
             func_PAL_002E7E00();
         D_001B1694 = 1;
@@ -164,7 +165,7 @@ L2_5:
 L2_7:
     {
         int fallback = D_001ABD80;
-        func_002DF2E0(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
+        moby_hide_all(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
     }
     goto E2;
 L2_8:
@@ -174,15 +175,15 @@ L2_9:
     func_PAL_00291A20();
     goto E2;
 L2_def:
-    func_00282A28();
+    math_trap_always();
 E2:
     if (hold == 0) {
         int state;
         if (D_001AA104 != 0)
             *D_001AA104 = 1;
-        state = D_001A8BB8;
-        D_001A8BB8 = -2;
-        D_001A8BB0 = state;
+        state = g_requested_game_mode;
+        g_requested_game_mode = -2;
+        g_current_game_mode = state;
         D_001AA104 = 0;
     }
 }
@@ -216,22 +217,22 @@ typedef struct {
     float fCC;                           
 } Ctl_002B52A0;
 extern float D_001AA108 __attribute__((sda));
-extern float func_002AAA00(void *, float, void *, int, float, float, float);
-extern float func_00283C80(float, float);
-extern void func_00282C88(void *);
-extern float func_00282E80(void *, void *);
-extern float func_00282C10(float);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00283BE0(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_002AC9F8(void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00282E20(void *);
-extern void func_002AAC80(void *, float, float, float, float);
+extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
+extern float FastDiffRots(float, float);
+extern void vec_clear_128(void *);
+extern float vec_distance_xy(void *, void *);
+extern float square_root(float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_clamp_length(void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float vec_length_xy(void *);
+extern void math_approach_target_with_braking(void *, float, float, float, float);
 
 void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x)
 {
@@ -240,46 +241,46 @@ void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, flo
     float h, scale, dist, dot, len, len2, diff, g90;
 
     if (!(ctl->flags38 & 0x10))
-        func_002AAA00(&self->heading, x, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
-    h = func_00283C80(self->heading, x);
+        math_approach_target_with_direction_mode(&self->heading, x, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
+    h = FastDiffRots(self->heading, x);
     if (!(ctl->flags38 & 0x10) && ctl->f30 < h) {
-        func_00282C88(local);
+        vec_clear_128(local);
         if (h - ctl->f30 > ctl->fB4 * 25.0f)
             ctl->flags9C |= 2;
     } else {
         ctl->flags9C &= ~2;
-        dist = func_00282E80(self->pos, target);
+        dist = vec_distance_xy(self->pos, target);
         ctl->fCC = dist;
         if (dist <= ctl->f34) {
-            func_00282C88(local);
+            vec_clear_128(local);
         } else {
-            scale = func_00282C10(2.0f * (dist - ctl->f34) * ctl->f24);
+            scale = square_root(2.0f * (dist - ctl->f34) * ctl->f24);
             if (ctl->f28 < scale)
                 scale = ctl->f28;
             h = x;
             if (ctl->w80 != 0) {
-                x = func_00283B98(func_00283248(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
-                h = func_00283BE0(h, x);
+                x = FastAddRotations(mat_fast_helper_a(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
+                h = fast_subtract_rotations(h, x);
                 if (D_001AA108 < h)
                     h = D_001AA108;
                 else if (h < -D_001AA108)
                     h = -D_001AA108;
-                h = func_00283B98(h, x);
+                h = FastAddRotations(h, x);
             }
-            local[0] = func_00283180(h) * scale;
-            local[1] = func_00283198(h) * scale;
+            local[0] = math_fast_sin_or_cos_a(h) * scale;
+            local[1] = math_fast_sin_or_cos_b(h) * scale;
             local[2] = 0;
         }
     }
-    func_00282CF0(local2, local, ctl->vel);
+    FastVecSub(local2, local, ctl->vel);
     local2[2] = 0;
-    dot = func_00282DB0(local, ctl->vel);
+    dot = FastVecDot(local, ctl->vel);
     if (0.0f < dot)
-        func_002AC9F8(local2, ctl->f20);
+        vec_clamp_length(local2, ctl->f20);
     else
-        func_002AC9F8(local2, ctl->f24);
-    func_00282CC0(ctl->vel, ctl->vel, local2);
-    len = func_00282E20(ctl->vel);
+        vec_clamp_length(local2, ctl->f24);
+    FastVecAdd(ctl->vel, ctl->vel, local2);
+    len = vec_length_xy(ctl->vel);
     ctl->speed = len;
     if (ctl->flags38 & 4)
         return;
@@ -287,10 +288,10 @@ void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, flo
     if (g90 < self->pos[2]) {
         if (ctl->hC2 < 2) {
             if (self->pos[2] - g90 < 0.15f) {
-                len2 = func_00282E20(ctl->v50);
-                if (0.087266475f < func_00283248(ctl->v50[2], len2)) {
-                    if (-func_00282DB0(ctl->vel, ctl->v50) < ctl->vel[2])
-                        ctl->vel[2] = -func_00282DB0(ctl->vel, ctl->v50);
+                len2 = vec_length_xy(ctl->v50);
+                if (0.087266475f < mat_fast_helper_a(ctl->v50[2], len2)) {
+                    if (-FastVecDot(ctl->vel, ctl->v50) < ctl->vel[2])
+                        ctl->vel[2] = -FastVecDot(ctl->vel, ctl->v50);
                 }
             }
         }
@@ -303,6 +304,6 @@ void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, flo
             ctl->vel[2] = diff;
         else if (ctl->vel[2] < 0.0f)
             ctl->vel[2] = 0.0f;
-        func_002AAC80(&ctl->vel[2], ctl->f90 - self->pos[2], 0.016f, 0.016f, 1.0f);
+        math_approach_target_with_braking(&ctl->vel[2], ctl->f90 - self->pos[2], 0.016f, 0.016f, 1.0f);
     }
 }

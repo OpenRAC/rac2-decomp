@@ -10,17 +10,17 @@ extern float D_L20_001AED10 __attribute__((sda));
 extern float D_L20_001AED0C __attribute__((sda));
 extern char *D_L20_001B308C __attribute__((nosda));
 
-extern float func_00283B98(float, float);
-extern float func_00283C80(float, float);
-extern float func_002AAA00(void *, float, float, float, float, void *, int);
-extern float func_002AA548(char *, char *, float, float, float, float);
-extern float func_00282C48(float);
-extern int func_00282C30(int);
-extern void func_00282C90(char *);
-extern void func_002830C0(char *, char *, char *);
+extern float FastAddRotations(float, float);
+extern float FastDiffRots(float, float);
+extern float math_approach_target_with_direction_mode(void *, float, float, float, float, void *, int);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_fabs(float);
+extern int subtract_integer_with_clamp(int);
+extern void vec_store_helper(char *);
+extern void transform_vector(char *, char *, char *);
 
 /* Swings the object back and forth along an arc around its anchor, reversing at each end. */
-void func_L20_0039E9F8(char *obj) {
+void object_swing_along_arc(char *obj) {
     char *state = FLD(obj, char *, 0x68);
     char *entry;
     float turn;
@@ -37,20 +37,20 @@ void func_L20_0039E9F8(char *obj) {
     }
     r = FastDiffRots(FLD(obj, float, 0xF8), target);
     if (r > 0.017453294f) {
-        ApproachTargetWithDirectionMode(obj + 0xF8, target, 0.00087266474f, 0.00087266474f, 0.052359886f,
+        math_approach_target_with_direction_mode(obj + 0xF8, target, 0.00087266474f, 0.00087266474f, 0.052359886f,
                       state + 0x19C, 0);
     } else {
-        StepValueTowardTarget(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
+        math_step_value_toward_target(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
                       turn, spin);
         r = FLD(state, float, 0x194) * (float)FLD(state, int, 0x190);
         if (r > 0.0f) {
-            target = FloatAbs(FLD(state, float, 0x194));
+            target = math_fabs(FLD(state, float, 0x194));
             if ((float)subtract_integer_with_clamp(FLD(state, int, 0x190)) <= target) {
                 FLD(state, int, 0x190) = -FLD(state, int, 0x190);
             }
         }
     }
-    StoreVectorHelper(obj + 0x10);
+    vec_store_helper(obj + 0x10);
     FLD(obj, float, 0x10) = FLD(state, float, 0x194);
     transform_vector(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
 }

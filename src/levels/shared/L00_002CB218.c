@@ -2,13 +2,13 @@
 #include "common.h"
 
 extern char D_0018C318[];
-extern char D_00138180[];
+extern char g_pad_state[];
 extern int D_L00_001A8FB4 __attribute__((section(".sdata")));
-extern s32 func_00282978(s32);
-extern void func_L00_002FC008(void);
+extern s32 FastDecTimer(s32);
+extern void level_set_flag_d_true(void);
 
 /* Counts down the hero's button-hold timers and starts the special action when the button is pressed again in time. */
-void func_L00_002CB218(void)
+void hero_update_button_hold_timers(void)
 {
     char *hero;
     char *pad;
@@ -23,7 +23,7 @@ void func_L00_002CB218(void)
         return;
     if (D_L00_001A8FB4 != 0)
         return;
-    pad = gPadState;
+    pad = g_pad_state;
     if (*(int *)(pad + 0x1A4) & 0x10)
         *(short *)(hero + 0x24F8) = 20;
     timer = *(u32 *)(hero + 0x24F8);
@@ -35,6 +35,6 @@ void func_L00_002CB218(void)
             return;
         }
         *(int *)(hero + 0x2538) = 1;
-        SetLevelFlagDTrue();
+        level_set_flag_d_true();
     }
 }

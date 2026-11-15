@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -49,7 +50,7 @@ struct Fr {
 };
 
 /* Works out a sideways direction for the lightning arcs from two points on a small circle. */
-void func_L00_003E9930(s8 *moby, s8 *center, s8 *outDirection, f32 radius) {
+void vec_compute_arc_side_direction(s8 *moby, s8 *center, s8 *outDirection, f32 radius) {
     struct Fr frame;
     s32 remaining;
     f32 angle;

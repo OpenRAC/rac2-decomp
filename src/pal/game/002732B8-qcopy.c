@@ -15,9 +15,9 @@ extern int D_0018C0B4;
 extern int D_001A7348[] __attribute__((sda));
 extern F273418Marks D_001B7600;
 extern void func_PAL_00272B50(void);
-extern void func_00279BD8(void *, void *);
-extern void func_002729A0(void *, float, float);
-extern float func_00283CE0(int);
+extern void gfx_project_world_point_to_screen(void *, void *);
+extern void gfx_draw_screen_sprite(void *, float, float);
+extern float IntToFloat(int);
 
 void func_PAL_002732B8(void) {
     float base[4] __attribute__((aligned(16)));
@@ -31,19 +31,19 @@ void func_PAL_002732B8(void) {
     }
     func_PAL_00272B50();
     if (D_001B7600.count != 0) {
-        base[0] = func_00283CE0(D_001A7348[0]);
-        base[1] = func_00283CE0(D_001A7348[1]);
+        base[0] = IntToFloat(D_001A7348[0]);
+        base[1] = IntToFloat(D_001A7348[1]);
         for (i = 0; i < D_001B7600.count; i++) {
             m = &D_001B7600.e[i];
             if (m->obj != 0 && m->obj[0x20] != 0xFE && m->obj[0x20] != 0xFD) {
                 if (m->flag != 0) {
-                    func_00279BD8(vec, m);
-                    vec[0] = (vec[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
-                    vec[1] = (vec[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+                    gfx_project_world_point_to_screen(vec, m);
+                    vec[0] = (vec[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
+                    vec[1] = (vec[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
                 } else {
                     qcopy(vec, base);
                 }
-                func_002729A0(m, vec[0], vec[1]);
+                gfx_draw_screen_sprite(m, vec[0], vec[1]);
             }
         }
         D_001B7600.count = 0;

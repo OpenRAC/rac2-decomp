@@ -21,15 +21,15 @@ typedef struct {
     char pad[219];
 } StripState;
 
-extern char D_001395B0[], D_L00_001B8DC0[];
-extern StripState D_L00_00262570[];
+extern char D_001395B0[], g_camera_l00_position[];
+extern StripState g_weapon_l00_table[];
 
-extern void func_L00_004073D8(void *, int, int, int, float, float, float, int);
-extern void func_L00_004079C8(void *), func_L00_00407C18(void *);
-extern u64 func_0027C878(int);
-extern void func_00282CF0(void *, void *, void *), func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void DrawScrollingRibbonWithHalo(void *, int, int, int, float, float, float, int);
+extern void DrawLightningArcSparks(void *), DrawTwoPassCameraQuad(void *);
+extern u64 GetEffectTextureDescriptor(int);
+extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 typedef struct {
     float x, y, z, w;
@@ -56,12 +56,12 @@ void func_PAL_L00_0040BA28(char *arg)
 
     D_L00_001B0EFC -= D_L00_001B0F00 * 1.2f;
     if (D_L00_001B0EFC <= -8.0f) D_L00_001B0EFC += 8.0f;
-    func_L00_004073D8(D_L00_00254B20, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF4);
-    func_L00_004073D8(D_L00_00254BE0, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF8);
-    func_L00_004079C8(arg);
-    func_L00_00407C18(arg);
-    color = D_L00_00262570[(unsigned char)D_001395B0[0]].state ? D_L00_001B0F08 : D_L00_001B0F04;
-    packet.tags[1] = func_0027C878(D_L00_001B0F0C);
+    DrawScrollingRibbonWithHalo(D_L00_00254B20, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF4);
+    DrawScrollingRibbonWithHalo(D_L00_00254BE0, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF8);
+    DrawLightningArcSparks(arg);
+    DrawTwoPassCameraQuad(arg);
+    color = g_weapon_l00_table[(unsigned char)D_001395B0[0]].state ? D_L00_001B0F08 : D_L00_001B0F04;
+    packet.tags[1] = GetEffectTextureDescriptor(D_L00_001B0F0C);
     packet.tags[2] = 0xff9000000260ULL;
     packet.tags[3] = 0x8000000048ULL;
     packet.tags[0] = 0;
@@ -81,11 +81,11 @@ void func_PAL_L00_0040BA28(char *arg)
             qcopy(&packet.q[1], D_L00_00254CA0[i][(j + 1) % 20]);
             qcopy(&packet.q[2], D_L00_00254B60[i][j]);
             qcopy(&packet.q[3], D_L00_00254B60[i][(j + 1) % 20]);
-            func_00282CF0(e, &packet.q[0], &packet.q[1]);
-            func_00282CF0(f, &packet.q[2], &packet.q[1]);
-            func_00282DD8(g, f, e);
-            func_00282CF0(h, &packet.q[1], D_L00_001B8DC0);
-            if (func_00282DB0(g, h) >= 0.0f) {
+            FastVecSub(e, &packet.q[0], &packet.q[1]);
+            FastVecSub(f, &packet.q[2], &packet.q[1]);
+            FastVecCross(g, f, e);
+            FastVecSub(h, &packet.q[1], g_camera_l00_position);
+            if (FastVecDot(g, h) >= 0.0f) {
                 y += D_L00_001B0E70;
                 z += D_L00_001B0E70;
                 continue;
@@ -100,7 +100,7 @@ void func_PAL_L00_0040BA28(char *arg)
             packet.uv.x3 = x - D_L00_001B0E6C;
             packet.uv.y3 = y + D_L00_001B0E70;
             y += D_L00_001B0E70;
-            func_00280B90(&packet.q[0], 0, 0);
+            draw_world_quad(&packet.q[0], 0, 0);
             packet.uv.x1 = packet.uv.x0 = x;
             packet.uv.y0 = packet.uv.y2 = z;
             packet.uv.y1 = z + D_L00_001B0E70;
@@ -108,7 +108,7 @@ void func_PAL_L00_0040BA28(char *arg)
             packet.uv.x3 = x - D_L00_001B0E6C;
             packet.uv.y3 = z + D_L00_001B0E70;
             z += D_L00_001B0E70;
-            func_00280B90(&packet.q[0], 0, 0);
+            draw_world_quad(&packet.q[0], 0, 0);
         }
         x += D_L00_001B0E6C;
     }

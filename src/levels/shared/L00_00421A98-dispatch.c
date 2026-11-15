@@ -2,11 +2,11 @@
 #include "names.h"
 typedef int TI __attribute__((mode(TI)));
 extern void *D_L00_002A2E30[7];
-extern TI func_00334710(int, TI *);
-extern void func_00282CC0(void *, void *, void *);
+extern TI hero_copy_vector_to_out(int, TI *);
+extern void FastVecAdd(void *, void *, void *);
 /* Adds a stored or transformed vector, returning whether the mode accepts it. */
 /* Offsets a point by the camera's stored offset (or its current position) depending on the mode. Returns 0 for the plain modes and 1 otherwise. */
-int func_L00_00421A98(char *self, void *src, void *dst, int mode)
+int cam_offset_point_by_vector(char *self, void *src, void *dst, int mode)
 {
     /* Only the level's existing dispatch table is read at runtime. */
     static void *arms[7] = {&&transformed, &&direct, &&zero, &&zero, &&zero, &&zero, &&zero};
@@ -20,7 +20,7 @@ zero:
     ret = 0;
     goto done;
 transformed:
-    CopyHeroVectorToOut((int)self, &local);
+    hero_copy_vector_to_out((int)self, &local);
     FastVecAdd(dst, src, &local);
     goto done;
 direct:

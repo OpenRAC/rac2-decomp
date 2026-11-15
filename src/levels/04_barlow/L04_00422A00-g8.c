@@ -9,15 +9,15 @@ typedef signed short s16;
 typedef signed int s32;
 typedef float f32;
 
-extern u8 *D_L04_001FB1E0[];
-extern u8 *D_L04_001B24DC __attribute__((sda));
+extern u8 *g_moby_l04_group_lists[];
+extern u8 *g_moby_l04_pool __attribute__((sda));
 
-extern void func_00282CF0(char *a0, char *a1, char *a2);
-extern float func_00282DB0(char *a0, char *a1);
-extern void func_L00_00323F70(void *input, int *out_x, int *out_y);
-extern int func_L00_002EA668(s32 a0, u16 a1, u16 a2, s32 a3, s32 a4, s32 a5, f32 *a6);
-extern s32 D_001A7340 __attribute__((sda));
-extern s32 D_001A7344;
+extern void FastVecSub(char *a0, char *a1, char *a2);
+extern float FastVecDot(char *a0, char *a1);
+extern void coll_world_pos_to_grid_cell(void *input, int *out_x, int *out_y);
+extern int part_l00_alloc_effect_slot(s32 a0, u16 a1, u16 a2, s32 a3, s32 a4, s32 a5, f32 *a6);
+extern s32 g_screen_width __attribute__((sda));
+extern s32 g_screen_height;
 extern f32 D_L04_001B31EC __attribute__((sda));
 extern char D_L04_001B9680[];
 
@@ -27,7 +27,7 @@ extern char D_L04_001B9680[];
 
 /* walks the entry's two-byte id list and flags each live object of one class */
 /* Goes through the objects in this object's group and flags every Gadgetron Hound in it so it reacts. */
-void func_L04_0044D7E0(u8 *object) {
+void gadgetron_hound_flag_group(u8 *object) {
     u8 *mobyPool;
     u8 *idList;
     u16 *idPtr;
@@ -35,11 +35,11 @@ void func_L04_0044D7E0(u8 *object) {
 
     if (object[0x21] == 0xFF)
         return;
-    idList = gMobyGroupLists_L04[object[0x21]];
+    idList = g_moby_l04_group_lists[object[0x21]];
     if (idList == 0)
         return;
     idPtr = (u16 *)idList;
-    mobyPool = gMobyPool_L04;
+    mobyPool = g_moby_l04_pool;
     for (;;) {
         other = (char *)(mobyPool + (*idPtr & 0x7FFF) * 256);
         if ((s8)other[0x20] >= 0) {
@@ -55,7 +55,7 @@ void func_L04_0044D7E0(u8 *object) {
 
 /* same walk, one class flag and a visit counter instead */
 /* Goes through the objects in this object's group and flags every Tribesman in it and counts how many times this was done. */
-void func_L04_004510C8(u8 *object) {
+void tribesman_flag_group(u8 *object) {
     u8 *mobyPool;
     u8 *idList;
     u16 *idPtr;
@@ -63,11 +63,11 @@ void func_L04_004510C8(u8 *object) {
 
     if (object[0x21] == 0xFF)
         return;
-    idList = gMobyGroupLists_L04[object[0x21]];
+    idList = g_moby_l04_group_lists[object[0x21]];
     if (idList == 0)
         return;
     idPtr = (u16 *)idList;
-    mobyPool = gMobyPool_L04;
+    mobyPool = g_moby_l04_pool;
     for (;;) {
         other = (char *)(mobyPool + (*idPtr & 0x7FFF) * 256);
         if ((s8)other[0x20] >= 0) {
@@ -92,18 +92,18 @@ extern u8 D_L04_001B17D8[8] __attribute__((sda));
 extern u8 D_L04_001B17D0[8] __attribute__((sda));
 extern s32 D_L04_001B1800 __attribute__((sda));
 
-extern void func_002A7750(void *a0, s32 a1, s32 a2);
-extern void *func_002A9640(void *a0, s32 a1, s32 a2);
-extern void func_L00_0032A530(void *a0, void *a1, void *a2, void *a3, s32 a4, s32 a5, s32 a6,
+extern void moby_set_state(void *a0, s32 a1, s32 a2);
+extern void *part_find_owned_effect_slot(void *a0, s32 a1, s32 a2);
+extern void ScatterObjectPieces(void *a0, void *a1, void *a2, void *a3, s32 a4, s32 a5, s32 a6,
                               s32 a7, s32 a8, s32 a9, s32 a10);
-extern void func_L00_00326110(void *a0, s32 a1, f32 f12);
-extern void func_L00_00324F18(void *a0, void *a1, f32 f12, f32 f13, f32 f14);
+extern void part_spawn_scaled_bolts(void *a0, s32 a1, f32 f12);
+extern void vec_local_offset_to_world(void *a0, void *a1, f32 f12, f32 f13, f32 f14);
 /* Integer and float arguments take separate registers, so the interleaving below changes no
    register, only the order the caller loads them in; this is the measured order. */
-extern void func_002ABBB8(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
+extern void SpawnExplosionEffects(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
                           f32 f2, f32 f3, f32 f4, f32 f5, s32 i3, f32 f6, s32 i4, s32 i5, s32 i6,
                           s32 i7, s32 i8);
-extern void func_0029F338(void *a0);
+extern void moby_mark_spawned(void *a0);
 
 extern s32 D_L04_001A8F00;
 extern u8 D_001A7A40;
@@ -129,7 +129,7 @@ extern L04Base004 D_L04_001BD380;
 
 /* Walks the level's list of objects and, for the one with the object's own id, asks the
    level's helper to clear it and sets the level's three timers. */
-void func_L04_00439870(u8 *object) {
+void conversation_clear_target_on_talk(u8 *object) {
     u32 *entry;
     s32 i;
 
@@ -153,7 +153,7 @@ void func_L04_00439870(u8 *object) {
 /* State 0 arms the object and moves it to state 1; state 1 moves to state 2 once func_002A9640
    finds a match while the state word is clear; state 2 makes the three func_002ABBB8 calls,
    sets bit 2 of byte +0x1E of every entity of the group at +4 and calls func_0029F338. */
-void func_L04_0044AAC8(u8 *object)
+void barlow_effect_burst_update(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     f32 A[4] __attribute__((aligned(16)));
@@ -165,22 +165,22 @@ void func_L04_0044AAC8(u8 *object)
     case 0:
         object[0x31] = 0;
         *(u16 *)(object + 0x34) |= 1;
-        SetMobyState(object, 1, -1);
+        moby_set_state(object, 1, -1);
         break;
     case 1:
-        if (FindOwnedEffectSlot(object, 0x4010000, 0) != 0) {
+        if (part_find_owned_effect_slot(object, 0x4010000, 0) != 0) {
             if (*(s32 *)state == 0)
-                SetMobyState(object, 2, -1);
+                moby_set_state(object, 2, -1);
         }
         object[0xA8] = 0xFF;
         break;
     case 2:
         ScatterObjectPieces(object, D_L04_001B17E0, D_L04_001B17D8, D_L04_001B17D0, 0x7F, 0,
                           D_L04_001B1800, 1, 0xFFFF, 0xFF, 0);
-        SpawnScaledBolts(object, 5, 0.0f);
+        part_spawn_scaled_bolts(object, 5, 0.0f);
         *(TI128 *)A = 0;
         A[2] = 0.16666667f;
-        LocalOffsetToWorld(object, B, 0.0f, 0.0f, 4.0f);
+        vec_local_offset_to_world(object, B, 0.0f, 0.0f, 4.0f);
         SpawnExplosionEffects(object, A, B, 0.0f, 0.0f, 50, 10, 10, 3.0f, 1.0f, 9.0f, 2.25f, -1, 15.0f, 1, 7,
                       -1, 0, 0x810001);
         SpawnExplosionEffects(object, A, B, 0.0f, 0.0f, 5, 1, 1, 0.0f, 0.0f, 9.0f, 2.25f, -1, 0.0f, 0, 0, -1,
@@ -198,7 +198,7 @@ void func_L04_0044AAC8(u8 *object)
                 entity[0x1E] |= 4;
             }
         }
-        MarkMobySpawned(object);
+        moby_mark_spawned(object);
         break;
     }
 }

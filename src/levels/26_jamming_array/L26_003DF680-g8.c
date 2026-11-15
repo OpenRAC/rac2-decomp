@@ -5,10 +5,10 @@
    frame time, re-rolling the second one whenever the first wraps. */
 typedef unsigned char u8;
 
-extern void func_002A7750(unsigned char *, int, int);
-extern float func_002A7878(float, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L26_003DF7E8(void);
+extern void moby_set_state(unsigned char *, int, int);
+extern float math_random_float_range(float, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void DrawDoubleLayerQuadMesh(void);
 
 extern int D_L26_001A8FF0;
 extern float D_L26_001B0660 __attribute__((sda));
@@ -17,7 +17,7 @@ typedef struct { float f[2]; float g[2]; } Counters;
 
 /* Per-frame update for the moby of class 3217: it advances two pairs of cycling values that drive
    the flicker of the double-layer quad mesh, then asks for that mesh to be drawn. */
-void func_L26_003DF680(char *moby) {
+void quad_flicker_update(char *moby) {
     char *obj = moby;
     char *vars = *(char **)(obj + 0x68);
     int i;
@@ -26,7 +26,7 @@ void func_L26_003DF680(char *moby) {
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
         *(u8 *)(obj + 0x30) = 0xFF;
-        SetMobyState((unsigned char *)obj, 1, -1);
+        moby_set_state((unsigned char *)obj, 1, -1);
         *(int *)vars = 0;
         *(float *)(vars + 4) = 0.5f;
         break;
@@ -41,7 +41,7 @@ void func_L26_003DF680(char *moby) {
                 if (1.0f < value) {
                     value = value - 1.0f;
                     ((Counters *)vars)->f[i] = value;
-                    value = ((Counters *)vars)->g[next & 1] + RandomFloatRange(0.333f, 0.666f);
+                    value = ((Counters *)vars)->g[next & 1] + math_random_float_range(0.333f, 0.666f);
                     ((Counters *)vars)->g[i] = value;
                     if (1.0f < value) {
                         value = value - 1.0f;
@@ -49,7 +49,7 @@ void func_L26_003DF680(char *moby) {
                     }
                 }
             }
-            AddDrawCallbackToList1((void *)DrawDoubleLayerQuadMesh, obj);
+            gfx_add_draw_callback_first((void *)DrawDoubleLayerQuadMesh, obj);
         }
         break;
     }

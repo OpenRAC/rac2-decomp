@@ -22,7 +22,7 @@ typedef struct {
 } Chunk;
 
 extern int D_001B1F50[] __attribute__((sda));
-extern s32 D_001F2840[];
+extern s32 g_pause_menu_state[];
 
 /* Fills the chunk table at D_001B1F50 with (key, flags) pairs: the keys step
    by 0x11800 for the small chunks and by 0x4F000 for the large ones, and the
@@ -30,9 +30,9 @@ extern s32 D_001F2840[];
    one only the first; the rest of the table is cleared. The retail function
    returns nothing, so it is void here (002D5E98.c declares it int and drops
    the result). */
-void func_002DE3A0(s32 param)
+void menu_stream_chunk_table_init(s32 param)
 {
-    s32 *state = gPauseMenuState;
+    s32 *state = g_pause_menu_state;
     u32 key1 = state[0x118 / 4];
     u32 key2 = state[0x11C / 4];
     s32 n1, n2, n3, n4;
@@ -86,7 +86,7 @@ void func_002DE3A0(s32 param)
 }
 
 
-extern void func_002B7AD0(void);
+extern void load_request_disc_read_break(void);
 
 /* The chunk table again, as signed (key, flags) pairs indexed directly: read
    through a Chunk cast of the int array, the loop compiles to another shape. */
@@ -100,7 +100,7 @@ extern ChunkSlot D_001B1F50_slots[] __asm__("D_001B1F50") __attribute__((sda));
 /* Releases the chunk whose key matches. Bit 1 means taken; bit 2 on top of it
    means the chunk also holds the latch at byte 0xDB of D_001F2840, which is
    handed back through func_002B7AD0 first. Always returns 0. */
-int func_002DE618(int key)
+int release_menu_stream_buffer(int key)
 {
     int i;
     unsigned char *state;
@@ -109,10 +109,10 @@ int func_002DE618(int key)
         if (D_001B1F50_slots[i].key == key) {
             if ((D_001B1F50_slots[i].flags & 2) != 0) {
                 if ((D_001B1F50_slots[i].flags & 4) != 0) {
-                    state = (unsigned char *)gPauseMenuState;
+                    state = (unsigned char *)g_pause_menu_state;
                     D_001B1F50_slots[i].flags ^= 4;
                     if (state[0xDB] != 0) {
-                        RequestDiscReadBreak();
+                        load_request_disc_read_break();
                         state[0xDB] = 0;
                     }
                 }
@@ -128,7 +128,7 @@ extern int D_001B1F50[] __attribute__((sda));
 extern int D_001B1F54[] __attribute__((sda));
 
 /* Finds the stream chunk with this key and returns its size (large or small), or -1 if there is none. */
-int func_002DE6F0(int key)
+int menu_stream_chunk_get_size(int key)
 {
     int count = 0;
     unsigned int large = 0x4F000;
@@ -146,7 +146,7 @@ int func_002DE6F0(int key)
 
 /* authored C for independently verified level-native body */
 /* Marks the stream chunk with this key as holding the latch. Returns 0 if found, 1 if not. */
-s32 func_002DE750(s32 key) {
+s32 menu_stream_chunk_set_latch(s32 key) {
  s32 count=0;
  u32 *flags=D_L24_001B1B74;
  s32 *keys=D_L24_001B1B70;
@@ -159,7 +159,7 @@ s32 func_002DE750(s32 key) {
 }
 
 /* Clears the latch mark of the stream chunk with this key. Returns 0 if found, 1 if not. */
-int func_002DE7A0(int key)
+int menu_stream_chunk_clear_latch(int key)
 {
     int count = 0;
     int mask = -5;
@@ -179,7 +179,7 @@ int func_002DE7A0(int key)
 }
 
 /* Sets up a menu text box rectangle that covers the whole menu, with the text centred. */
-void func_002DE810(unsigned short *box,u8 *menu) {
+void pack_image_descriptor(unsigned short *box,u8 *menu) {
  box[0]=0;
  box[1]=*(unsigned short *)(menu+0x24);
  box[2]=0;
@@ -194,26 +194,26 @@ typedef struct {
     char b[8];
 } CdClock;
 
-extern int func_001256D8(CdClock *);
-extern void func_00131A98(unsigned char *);
-extern void func_002980D0(void);
-extern void func_00297670(void *);
-extern void func_0029ADA0(int);
+extern int sceCdReadClock(CdClock *);
+extern void clock_to_local_time(unsigned char *);
+extern void map_copy_band_colours(void);
+extern void map_fill_buffer(void *);
+extern void save_build_packet(int);
 extern unsigned char D_001A7360[8] __attribute__((sda));
 extern unsigned char D_0018D278[];
-extern int D_001A79F0 __attribute__((sda));
-extern unsigned char D_001393E0[];
-extern void func_00298E08(int, int);
+extern int g_current_map_index __attribute__((sda));
+extern unsigned char g_memcard_state[];
+extern void save_load_game_data_reset_menu(int, int);
 
 /* Starts saving the game into a slot: stores the time, queues the save job and remembers which slot is used. */
-void func_002DE858(int saveName, int slotIndex)
+void save_start_to_slot(int saveName, int slotIndex)
 {
-    unsigned char *state = gMemcardState;
-    ReadCdClock((CdClock *)D_001A7360);
-    ClockToLocalTime(D_001A7360);
-    CopyMapBandColours();
-    FillMapBuffer(D_0018D278 + (gCurrentMapIndex << 11));
-    BuildSavePacket(saveName);
+    unsigned char *state = g_memcard_state;
+    sceCdReadClock((CdClock *)D_001A7360);
+    clock_to_local_time(D_001A7360);
+    map_copy_band_colours();
+    map_fill_buffer(D_0018D278 + (g_current_map_index << 11));
+    save_build_packet(saveName);
     *(int *)(state + 0x174) = saveName;
     *(short *)(state + 0x18) = slotIndex;
     *(int *)(state + 0x148) = 0;
@@ -224,14 +224,14 @@ void func_002DE858(int saveName, int slotIndex)
 }
 
 /* Clears the chosen slot, then starts saving the game into it. */
-void func_002DE900(int saveName, int slotIndex)
+void save_clear_slot_and_start(int saveName, int slotIndex)
 {
     unsigned char *state;
-    LoadGameDataAndResetSaveMenu(saveName, slotIndex);
-    ReadCdClock((CdClock *)D_001A7360);
-    ClockToLocalTime(D_001A7360);
-    BuildSavePacket(saveName);
-    state = gMemcardState;
+    save_load_game_data_reset_menu(saveName, slotIndex);
+    sceCdReadClock((CdClock *)D_001A7360);
+    clock_to_local_time(D_001A7360);
+    save_build_packet(saveName);
+    state = g_memcard_state;
     *(int *)(state + 0x148) = 0;
     *(short *)(state + 0x18) = slotIndex;
     *(int *)(state + slotIndex * 0x1C + 0x30) = 0;
@@ -245,13 +245,13 @@ void func_002DE900(int saveName, int slotIndex)
 
 
 /* If scoring is switched on, adds an amount to the running total and passes it on. */
-void func_002DF158(s32 object, s32 amount)
+void hud_add_to_active_total(s32 object, s32 amount)
 {
-    extern s32 D_001F2840[];
-    extern void func_002A0300(s32, s32);
-    if (gPauseMenuState[0x168 / 4] != 0) {
-        gPauseMenuState[0x16C / 4] += amount;
-        UploadObjectTextures(object, amount);
+    extern s32 g_pause_menu_state[];
+    extern void tex_upload_object_textures(s32, s32);
+    if (g_pause_menu_state[0x168 / 4] != 0) {
+        g_pause_menu_state[0x16C / 4] += amount;
+        tex_upload_object_textures(object, amount);
     }
 }
 

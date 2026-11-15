@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -12,12 +13,12 @@ extern s32 D_L02_001B14EC __attribute__((sda));
 extern s32 D_L02_001B1500 __attribute__((sda));
 extern s32 D_L02_001B1504 __attribute__((sda));
 extern s32 D_L02_001B1508 __attribute__((sda));
-extern short D_001A6480[];
-extern float func_00283CE0(short);
-extern void func_002FC560(int, long long);
-extern void func_0028FC48(int, int, int, int, unsigned long, int);
+extern short g_screen_adjust_offsets[];
+extern float IntToFloat(short);
+extern void VU1_addGSregister(int, long long);
+extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
 extern long long func_US2_0027CED8(int);
-extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
 /* func_US2_L02_00401A20, the USA v2.00 copy of func_L02_004002E0: the same C, where the height is
    clamped at 0 after it drops and the first colour is read after that clamp. */
@@ -46,8 +47,8 @@ void func_US2_L02_00401A20(char *a0) {
     if (*(s16 *)(state + 0x124) < 0)
         *(s16 *)(state + 0x124) = 0;
     color = D_L02_001B14F0;
-    f20 = func_00283CE0(*(u16 *)(state + 0x124));
-    height = (float)D_001A6480[0xA9];
+    f20 = IntToFloat(*(u16 *)(state + 0x124));
+    height = (float)g_screen_adjust_offsets[0xA9];
     f20 = f20 / height;
     f20 = f20 * f20;
     {
@@ -56,12 +57,12 @@ void func_US2_L02_00401A20(char *a0) {
         color &= 0xFFFFFF;
         color |= (s32)(f20 * scale) << 24;
     }
-    func_002FC560(0x42, 0x8000000049LL);
+    VU1_addGSregister(0x42, 0x8000000049LL);
     for (i = 0; i < D_L02_001B14F4; i++)
-        func_0028FC48(0, 0, D_001A6480[0xA8], D_001A6480[0xA9], color, 0);
-    func_002FC560(0x42, 0x8000000044LL);
-    screen = D_001A6480;
-    func_0028FC48(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
+        AppendScreenRectPacket(0, 0, g_screen_adjust_offsets[0xA8], g_screen_adjust_offsets[0xA9], color, 0);
+    VU1_addGSregister(0x42, 0x8000000044LL);
+    screen = g_screen_adjust_offsets;
+    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
     id = func_US2_0027CED8(0x10);
     color = D_L02_001B1504;
     {
@@ -70,11 +71,11 @@ void func_US2_L02_00401A20(char *a0) {
         color &= 0xFFFFFF;
         color |= (s32)(f20 * scale) << 24;
     }
-    func_002FC560(0x42, 0x8000000048LL);
+    VU1_addGSregister(0x42, 0x8000000048LL);
     h = *(s16 *)(state + 0x124);
     n = screen[0xA9] - h;
     if (D_L02_001B1500 < n)
         n = D_L02_001B1500;
     m = D_L02_001B1508;
-    func_0027E018(-m, h - (n >> 1), screen[0xA8] + m * 2, n, 0, 0, 0x20, 0x20, color, id);
+    DrawTexturedQuad(-m, h - (n >> 1), screen[0xA8] + m * 2, n, 0, 0, 0x20, 0x20, color, id);
 }

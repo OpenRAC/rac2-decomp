@@ -12,37 +12,37 @@ typedef struct {
 } WaterState;
 
 extern WaterFog D_L06_001BDD40;
-extern WaterHero D_00189E20;
-extern WaterCamera D_L06_001B9700;
+extern WaterHero g_hero_state;
+extern WaterCamera g_camera_state;
 extern int D_L06_001A8A48 MACRO_ADDR;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern float D_L06_001B3290[3][4] __attribute__((sda));
 extern float D_L06_001B9A70[][4];
-extern float D_L06_001B3280 MACRO_ADDR;
+extern float g_water_surface_height MACRO_ADDR;
 extern float D_L06_001B0060[] SDATA(D_L06_001B0060);
 extern float D_L06_001B3270[][2] MACRO_ADDR;
 extern float D_L06_0023E5A0[][3], D_L06_0023E9A0[][3];
 extern int D_L06_0023E8A0[], D_L06_0023ECA0[];
 extern float D_L06_0023EDA0[][2], D_L06_0023EFA0[][2];
 
-extern void func_002FC560(int, unsigned long);
-extern unsigned long func_0027C878(int);
-extern void func_00280328(void);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00283CE0(int);
-extern int func_00283D38(int, int, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00281810(int, void *, void *, void *, int);
-extern float func_00282E20(void *);
-extern void func_00282A28(void);
+extern void VU1_addGSregister(int, unsigned long);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void font_queue_vu_state(void);
+extern void FastVecCross(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float IntToFloat(int);
+extern int FastTweenColor(int, int, float);
+extern void FastVecScale(void *, void *, float);
+extern void part_draw_glint_effect(int, void *, void *, void *, int);
+extern float vec_length_xy(void *);
+extern void math_trap_always(void);
 
 /* Draws the level's water sheet: a fading edge strip and two scrolling layers of grid cells
  * around the camera. RAC1's draw_pokitaru_ocean is its counterpart. */
-void func_L06_00402570(unsigned char *owner)
+void DrawOceanWaterSheet(unsigned char *owner)
 {
     float edgeStart[4], edgeOffset[4], axisX[4], axisY[4], corner[4][4], topEdge[4], bottomEdge[4];
     WaterState *state;
@@ -56,7 +56,7 @@ void func_L06_00402570(unsigned char *owner)
     saved228 = D_L06_001BDD40.f228;
     state = *(WaterState **)(owner + 0x68);
     saved22C = D_L06_001BDD40.f22C;
-    if (gHeroState.currentState != 28 && !D_L06_001A8A48) {
+    if (g_hero_state.currentState != 28 && !D_L06_001A8A48) {
         D_L06_001BDD40.f228 = 255.0f;
         D_L06_001BDD40.f22C = 249.9f;
     }
@@ -69,7 +69,7 @@ void func_L06_00402570(unsigned char *owner)
         VU1_addGSregister(0x47, 0x513F1);
     VU1_addGSregister(6, GetEffectTextureDescriptor(22));
     font_queue_vu_state();
-    if (gCurrentMapIndex == 13 || (gCurrentMapIndex == 16 && gHeroState.f348 == 1)) {
+    if (g_current_map_index == 13 || (g_current_map_index == 16 && g_hero_state.f348 == 1)) {
         qcopy(D_L06_001B3290[1], D_L06_001B9A70[1]);
         D_L06_001B3290[2][0] = 0;
         D_L06_001B3290[2][1] = 0;
@@ -98,12 +98,12 @@ void func_L06_00402570(unsigned char *owner)
         axisY[3] = 1;
         matrix_mul_vec3(axisY, axisY, D_L06_001B9A70);
     }
-    if (gCurrentMapIndex != 16) {
+    if (g_current_map_index != 16) {
         axisX[2] = 0;
         vec_scale_to_length(axisX, axisX, 1);
         axisY[2] = 0;
         vec_scale_to_length(axisY, axisY, 1);
-    } else if (gHeroState.f348 == 1) {
+    } else if (g_hero_state.f348 == 1) {
         axisX[0] = 0;
         axisX[1] = 1;
         axisX[2] = 0;
@@ -113,7 +113,7 @@ void func_L06_00402570(unsigned char *owner)
         axisY[2] = -0.60389f;
         axisY[3] = 1.00405f;
     }
-    if (gCurrentMapIndex != 16) {
+    if (g_current_map_index != 16) {
         vec_scale_to_length(edgeStart, axisX, -75);
         vec_scale_to_length(edgeOffset, axisY, -87);
         FastVecAdd(corner[0], edgeStart, edgeOffset);
@@ -138,8 +138,8 @@ void func_L06_00402570(unsigned char *owner)
     }
     for (i = 0; i < 4; i++) {
         float *cornerPoint = corner[i];
-        FastVecAdd(cornerPoint, cornerPoint, &gCameraState_L06.x);
-        cornerPoint[2] = gWaterSurfaceHeight;
+        FastVecAdd(cornerPoint, cornerPoint, &g_camera_state.x);
+        cornerPoint[2] = g_water_surface_height;
     }
     FastVecSub(topEdge, corner[1], corner[0]);
     FastVecSub(bottomEdge, corner[3], corner[2]);
@@ -164,7 +164,7 @@ void func_L06_00402570(unsigned char *owner)
         D_L06_0023E5A0[i + 1][1] = edgeStart[1];
         D_L06_0023E5A0[i + 1][2] = edgeStart[2];
     }
-    DrawGlintEffect(12, D_L06_0023E5A0, D_L06_0023E8A0, D_L06_0023EDA0, 1);
+    part_draw_glint_effect(12, D_L06_0023E5A0, D_L06_0023E8A0, D_L06_0023EDA0, 1);
     VU1_addGSregister(0x42, 0x8000000048UL);
     VU1_addGSregister(8, 0);
     VU1_addGSregister(0x14, 0xFF9000000260UL);
@@ -172,7 +172,7 @@ void func_L06_00402570(unsigned char *owner)
     nearColor = state->color3;
     farColor = state->color4;
     range = state->range;
-    if (gHeroState.currentState == 28 || D_L06_001A8A48) {
+    if (g_hero_state.currentState == 28 || D_L06_001A8A48) {
         if (range > 32)
             range = 32;
     }
@@ -182,7 +182,7 @@ void func_L06_00402570(unsigned char *owner)
         VU1_addGSregister(6, GetEffectTextureDescriptor(state->texture + textureOffset));
         for (cellY = range * -2; cellY < range * 2; cellY += range) {
             count = 0;
-            heightAboveWater = gCameraState_L06.z - gWaterSurfaceHeight;
+            heightAboveWater = g_camera_state.z - g_water_surface_height;
             if (heightAboveWater < 10)
                 heightAboveWater = 10;
             waveLift = heightAboveWater * range * 0.00002f;
@@ -191,31 +191,31 @@ void func_L06_00402570(unsigned char *owner)
             for (cellX = range * -2; cellX < range * 2; cellX += range) {
                 D_L06_0023EFA0[count][0] = cellX / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
                 D_L06_0023EFA0[count][1] = cellY / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[count][0] = cellX + gCameraState_L06.x + 1;
-                D_L06_0023E9A0[count][1] = cellY + gCameraState_L06.y + 1;
-                D_L06_0023E9A0[count][2] = gWaterSurfaceHeight + waveLift;
+                D_L06_0023E9A0[count][0] = cellX + g_camera_state.x + 1;
+                D_L06_0023E9A0[count][1] = cellY + g_camera_state.y + 1;
+                D_L06_0023E9A0[count][2] = g_water_surface_height + waveLift;
                 i = count + 1;
                 D_L06_0023EFA0[i][0] = cellX / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
                 D_L06_0023EFA0[i][1] = (cellY + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = cellX + gCameraState_L06.x + 1;
-                D_L06_0023E9A0[i][1] = (cellY + range) + gCameraState_L06.y + 1;
-                D_L06_0023E9A0[i][2] = gWaterSurfaceHeight + waveLift;
+                D_L06_0023E9A0[i][0] = cellX + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = (cellY + range) + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
                 i = count + 2;
                 D_L06_0023EFA0[i][0] = (cellX + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
                 D_L06_0023EFA0[i][1] = cellY / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = (cellX + range) + gCameraState_L06.x + 1;
-                D_L06_0023E9A0[i][1] = cellY + gCameraState_L06.y + 1;
-                D_L06_0023E9A0[i][2] = gWaterSurfaceHeight + waveLift;
+                D_L06_0023E9A0[i][0] = (cellX + range) + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = cellY + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
                 i = count + 3;
                 D_L06_0023EFA0[i][0] = (cellX + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
                 D_L06_0023EFA0[i][1] = (cellY + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = (cellX + range) + gCameraState_L06.x + 1;
-                D_L06_0023E9A0[i][1] = (cellY + range) + gCameraState_L06.y + 1;
-                D_L06_0023E9A0[i][2] = gWaterSurfaceHeight + waveLift;
+                D_L06_0023E9A0[i][0] = (cellX + range) + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = (cellY + range) + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
                 for (i = count; i < count + 4; i++) {
-                    edgeStart[0] = D_L06_0023E9A0[i][0] - gCameraState_L06.x;
-                    edgeStart[1] = D_L06_0023E9A0[i][1] - gCameraState_L06.y;
-                    edgeStart[2] = D_L06_0023E9A0[i][2] - gCameraState_L06.z;
+                    edgeStart[0] = D_L06_0023E9A0[i][0] - g_camera_state.x;
+                    edgeStart[1] = D_L06_0023E9A0[i][1] - g_camera_state.y;
+                    edgeStart[2] = D_L06_0023E9A0[i][2] - g_camera_state.z;
                     edgeStart[3] = 1;
                     blend = vec_length_xy(edgeStart) / (range * 2);
                     if (blend > 1)
@@ -224,9 +224,9 @@ void func_L06_00402570(unsigned char *owner)
                 }
                 count += 4;
                 if (count >= 64)
-                    TrapAlways();
+                    math_trap_always();
             }
-            DrawGlintEffect(count, D_L06_0023E9A0, D_L06_0023ECA0, D_L06_0023EFA0, 1);
+            part_draw_glint_effect(count, D_L06_0023E9A0, D_L06_0023ECA0, D_L06_0023EFA0, 1);
         }
     }
     D_L06_001BDD40.f228 = saved228;

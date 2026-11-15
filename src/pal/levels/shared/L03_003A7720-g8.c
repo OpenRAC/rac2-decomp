@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
-extern float func_00282DF0(float *);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
+extern float FastVecLength(float *);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
 extern void ref_L03_003C4240_00(unsigned char *, float);
 extern void ref_L03_003C4240_01(unsigned char *, void *, int, float, float, float);
 extern int ref_L03_003C4240_02(void *, void *, void *);
@@ -20,13 +21,13 @@ void func_PAL_L03_003C8250(unsigned char *a0) {
     float f;
     float g;
 
-    f = func_00282DF0((float *)(s1 + 0x1B0));
+    f = FastVecLength((float *)(s1 + 0x1B0));
     if (f <= 0.0f)
         return;
-    g = func_00282DF0((float *)(s1 + 0x1B0));
+    g = FastVecLength((float *)(s1 + 0x1B0));
     if (g > 0.020000001f) {
-        f = func_00283248(*(float *)(s1 + 0x1B0), *(float *)(s1 + 0x1B4));
-        f = func_00283B98(f, 3.14159274f);
+        f = mat_fast_helper_a(*(float *)(s1 + 0x1B0), *(float *)(s1 + 0x1B4));
+        f = FastAddRotations(f, 3.14159274f);
         ref_L03_003C4240_00(a0, f);
     }
     ref_L03_003C4240_01(a0, a0 + 0x10, 0x10, *(float *)(a0 + 0xF8),
@@ -42,12 +43,12 @@ void func_PAL_L03_003C8250(unsigned char *a0) {
 }
 
 #include "common.h"
-extern int func_002AD0B0(u8 *);
-extern float func_00282C48(float);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002AC9F8(float *, float);
+extern int moby_get_private_value_2(u8 *);
+extern float math_fabs(float);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_clamp_length(float *, float);
 extern float D_L03_001AFF08 __attribute__((sda));
 extern float D_L03_001AFF04 __attribute__((sda));
 
@@ -60,21 +61,21 @@ void func_PAL_L03_003C8378(u8 *object, void *target)
         return;
     state = *(u8 **)(object + 0x68);
     if (*(u8 **)(state + 0x198) != 0) {
-        attachment = (u8 *)func_002AD0B0(*(u8 **)(state + 0x198));
-        if (attachment != 0 && 0.002f < func_00282C48(*(float *)(attachment + 0x18)))
+        attachment = (u8 *)moby_get_private_value_2(*(u8 **)(state + 0x198));
+        if (attachment != 0 && 0.002f < math_fabs(*(float *)(attachment + 0x18)))
             return;
     }
-    func_00282CF0(delta, object + 0x10, target);
+    FastVecSub(delta, object + 0x10, target);
     delta[2] = 0.0f;
-    func_00282F20(delta, delta, (D_L03_001AFF08 + D_L03_001AFF08) * 0.00040000002f);
-    func_00282CC0(state + 0x1B0, state + 0x1B0, delta);
-    func_002AC9F8((float *)(state + 0x1B0), D_L03_001AFF04 * 0.020000001f);
+    vec_scale_to_length(delta, delta, (D_L03_001AFF08 + D_L03_001AFF08) * 0.00040000002f);
+    FastVecAdd(state + 0x1B0, state + 0x1B0, delta);
+    vec_clamp_length((float *)(state + 0x1B0), D_L03_001AFF04 * 0.020000001f);
 }
 
-extern float func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L03_003C4800(unsigned char *);
+extern float math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void part_spawn_at_attachment_points(unsigned char *);
 extern void *ref_L03_003C4578_00[];
 extern int ref_L03_003C4578_01 __attribute__((sda));
 extern int ref_L03_003C4578_02[3] __attribute__((sda));
@@ -180,10 +181,10 @@ c0:
         pair[1] = ref_L03_003C4578_17[0];
         scale = ref_L03_003C4578_18 * 0.0003490659f;
 join:
-        t = func_00283B98(s1->phase, scale);
+        t = FastAddRotations(s1->phase, scale);
         s1->phase = t;
-        r = func_00283198(t);
-        a0->tint = func_00283D38(pair[0], pair[1], r * 0.5f + 0.5f);
+        r = math_fast_sin_or_cos_b(t);
+        a0->tint = FastTweenColor(pair[0], pair[1], r * 0.5f + 0.5f);
         if (s1->stamp != ref_L03_003C4578_19) {
             for (q = ref_L03_003C4578_20[a0->group];
                  a0->group != 0xFF && a0->group <= ref_L03_003C4578_21 && q != 0 &&
@@ -194,7 +195,7 @@ join:
                     break;
                 e->state->stamp = ref_L03_003C4578_19;
             }
-            func_L00_002E6CF0(func_L03_003C4800, a0);
+            gfx_add_draw_callback_first(part_spawn_at_attachment_points, a0);
         }
     }
 }

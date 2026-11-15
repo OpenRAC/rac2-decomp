@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_00282948(void *);
-extern int func_002A7820(int, int);
+extern int math_fast_float_d(void *);
+extern int math_random_int_range(int, int);
 typedef struct L01_003BE4D0_OBJ {
     char pad0[0x20];
     unsigned char f20;
@@ -24,9 +24,9 @@ typedef struct L01_003BE4D0_STATE {
     char pad240[0x290 - 0x240];
     int f290;
 } L01_003BE4D0_STATE;
-extern void func_002A04B8(void *, int *, int *, int *);
-extern void func_002A0488(void *, int, int, int);
-extern int func_00283D38(unsigned int, unsigned int, float);
+extern void get_moby_color(void *, int *, int *, int *);
+extern void set_moby_color(void *, int, int, int);
+extern int FastTweenColor(unsigned int, unsigned int, float);
 
 void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
 {
@@ -38,19 +38,19 @@ void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
     if (obj->fBC != 0) {
         obj->fBC = 0;
         if (s->timer238 < 167) {
-            s->timer238 = ((s32)(func_002A7820(300, 360)) * 5 + 2) / 6;
+            s->timer238 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
         }
     }
     if (s->f114 != 1) {
-        func_00282948(&s->timer238);
+        math_fast_float_d(&s->timer238);
     }
     if (obj->f96 <= 0xFFFD) {
         obj->f96 = obj->f96 + 1;
     }
-    func_00282948(&s->timer230);
-    func_00282948(&s->timer23C);
+    math_fast_float_d(&s->timer230);
+    math_fast_float_d(&s->timer23C);
     /* Pack the current colour as 0x80BBGGRR, then blend it towards the target. */
-    func_002A04B8(obj, &red, &green, &blue);
+    get_moby_color(obj, &red, &green, &blue);
     {
         unsigned int alpha_green = (green << 8) | 0x80000000u;
         unsigned int alpha_blue_green = (blue << 16) | alpha_green;
@@ -58,14 +58,14 @@ void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
     }
     if (s->f290 != 0 && obj->f20 < 9) {
         target = 0x8040E0F0;
-        color = func_00283D38(color, target, 0.060000002f);
+        color = FastTweenColor(color, target, 0.060000002f);
     } else {
         target = 0x00404040;
-        color = func_00283D38(color, target, 0.096f);
+        color = FastTweenColor(color, target, 0.096f);
     }
     red = color & 0xFF;
     green = (color >> 8) & 0xFF;
     blue = (color >> 16) & 0xFF;
-    func_002A0488(obj, red, green, blue);
+    set_moby_color(obj, red, green, blue);
 }
 

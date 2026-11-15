@@ -10,10 +10,10 @@ extern u8 ref_L02_00422270_04 __attribute__((sda));
 extern u8 ref_L02_00422270_05[] MACRO_ADDR;
 extern u8 ref_L02_00422270_06[] MACRO_ADDR;
 extern u8 ref_L02_00422270_07[] MACRO_ADDR;
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_002A7820(int, int);
-extern char *func_002BBCB0(void *, void *, int, int, float, int, int, int, int, float);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int math_random_int_range(int, int);
+extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
 extern char *func_PAL_003096D0(char *, char *, char *, int, float, u8, u8, u8, u8);
 /* Called with a constant radius: each ring loads it afresh instead of sharing one register. */
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
@@ -36,13 +36,13 @@ void func_PAL_L02_00427320(char *obj, char *pos)
     damage = 2.0f;
     scale = 1.0f;
     for (i = 0; i < 6; i++) {
-        speed = func_002A7878(8.0f, 10.0f) * (0.020000001f);
-        index = func_002A77E0(6);
+        speed = math_random_float_range(8.0f, 10.0f) * (0.020000001f);
+        index = math_random_int_below(6);
         first = ref_L02_00422270_00[index];
         last = ref_L02_00422270_01[index];
-        life = func_002A7820(12, 17);
-        spark = func_002BBCB0(pos, velocity, first, last, scale * 400000.0f, life,
-                              func_002A7820(25, 37), 0, 0, speed * scale);
+        life = math_random_int_range(12, 17);
+        spark = part_spawn_firework_spark(pos, velocity, first, last, scale * 400000.0f, life,
+                              math_random_int_range(25, 37), 0, 0, speed * scale);
         if (spark)
             spark[3] = 0x44;
     }

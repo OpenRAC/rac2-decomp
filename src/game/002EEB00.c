@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_002ED688();
+extern int moby_get_motion_data();
 
-extern int func_002EE6A8();
+extern int follower_get_state();
 
 extern float func_00282E48_4();
 
@@ -28,7 +28,7 @@ extern LevelQueue5a29d35d D_001A7240 __attribute__((sda));
 
 extern char D_L03_00226150[];
 
-extern int func_0011AFE0(int *dma, int flag);
+extern int sceSifSetDma(int *dma, int flag);
 
 /* v2: guard reads p->count, loop counter is a second read (CSE -> copy). */
 struct Elem {
@@ -76,18 +76,18 @@ extern ListOverridePair D_L00_0022D600[];
 
 /* Picks a float threshold (1.0 or 8.0) from a callee status code, compares a probed float against it, and returns a boolean that also latches a trailing probe. */
 /* Checks if the follower has reached its target (closer than 1.0, or 8.0 in state 2) and is not dying; returns 1 if so. */
-int func_002EEB00(int *owner)
+int follower_has_reached_target(int *owner)
 {
     int result = 0;
-    int vars = GetMobyMotionData(owner);
+    int vars = moby_get_motion_data(owner);
     float threshold = 1.0f;
 
-    if (GetFollowerState(owner) == 2)
+    if (follower_get_state(owner) == 2)
         threshold = 8.0f;
 
     if (vars != 0) {
         if (func_00282E48_4((char *)owner + 16, (char *)vars + 96) < threshold)
-            result = GetFollowerState(owner) != 8;
+            result = follower_get_state(owner) != 8;
 
         result = func_00282948_1((char *)vars + 304) != 0 ? 1 : result;
     }
@@ -97,7 +97,7 @@ int func_002EEB00(int *owner)
 
 
 /* Empties the table of 64 buffer slots and resets the buffer cursor. */
-void func_002EED08(void)
+void gfx_reset_buffer_slot_table(void)
 {
     int i;
     D_001A7240.cursor = D_001A7240.start;
@@ -110,7 +110,7 @@ void func_002EED08(void)
 
 /* shared native body of family 5a29d35dd7a7809a */
 /* Sends some 16-byte records to the buffer, and stores a new slot that reserves room for the records. Returns the slot number, or a negative error if there is no room. */
-int func_002EED58(int tag, int sendCount, int recordCount, int label)
+int gfx_alloc_buffer_slot(int tag, int sendCount, int recordCount, int label)
 {
     int request[4];
     int slot, index;
@@ -141,7 +141,7 @@ typedef struct { int address, count, reserved[2]; } TransferRow16;
 extern TransferRow16 D_L00_002254D0[];
 
 /* Sends part of an already reserved buffer slot. Returns 0 on success or a negative error code. */
-int func_002EEE50(int tag, unsigned int slot, int firstRecord, int count)
+int gfx_send_buffer_slot_records(int tag, unsigned int slot, int firstRecord, int count)
 {
     int request[4];
     if (slot >= 64 || D_L00_002254D0[slot].count == 0)
@@ -166,11 +166,11 @@ typedef struct StashBlock_r002EEFE0 {
 
 extern StashBlock_r002EEFE0 r1_D_001DD568[];
 
-extern int func_002EEFE0(unsigned int);
+extern int gfx_get_buffer_slot_record_count(unsigned int);
 
 /* rac1-decomp src/game/stash.c: func_00234350 */
 /* Returns how many 16-byte records the given buffer slot holds, or -3 if the slot number is out of range. */
-int func_002EEFE0(unsigned int slot) {
+int gfx_get_buffer_slot_record_count(unsigned int slot) {
     if (slot >= 0x40) {
         return -3;
     }
@@ -182,7 +182,7 @@ int func_002EEFE0(unsigned int slot) {
 
 /* shared native body of family 9328256ba62fe2c4 */
 /* Walks every terrain draw list and patches the drawing settings of each entry with the override values for its type. */
-void func_002EF310(void)
+void PatchTfragGifs(void)
 {
     struct Node *table = &D_L05_00226A00;
 
@@ -222,17 +222,17 @@ ASM_FUNC("asm/game", func_002F0B78);
 ASM_FUNC("asm/game", func_002F0D00);
 
 /* Runs one set of render steps for the level using the current list position. */
-void func_002F0E08(void)
+void gfx_run_level_render_step(void)
 {
     extern int D_001A72D0 __attribute__((sda));
     extern void func_002F3300(int);
-    extern void func_002FC748(void);
+    extern void gfx_append_vu1_preset_a(void);
     func_002F3300(D_001A72D0);
-    AppendVu1DmaChainTable1();
+    gfx_append_vu1_preset_a();
 }
 
 /* apply nonzero signed halfword overrides to selected object rows; observed count0F, rows1C, stride50 and key33 */
-void func_002F0E38(void)
+void gfx_apply_object_row_overrides(void)
 {
     int *selected = D_L00_0022DC00;
     while (*selected >= 0) {

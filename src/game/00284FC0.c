@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_a33fc77309a5e461_u32;
@@ -8,7 +9,7 @@ extern Rac2Native_a33fc77309a5e461_u32 ref_L00_002F05B8_01;
 extern Rac2Native_a33fc77309a5e461_u32 ref_L00_002F05B8_00;
 
 /* Adds a draw-list entry that runs the small screen-buffer packet. */
-void func_00284FC0(void)
+void PutDrawBufferSmall(void)
 {
     *(Rac2Native_a33fc77309a5e461_u32 *)(ref_L00_002F05B8_01 + 0) = 0x30000009u;
     *(Rac2Native_a33fc77309a5e461_u32 *)(ref_L00_002F05B8_01 + 4) =

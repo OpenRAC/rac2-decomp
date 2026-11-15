@@ -1,15 +1,16 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
-extern void func_00282C88(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282F20(void *, void *, float);
-extern int func_00283CF0(float);
-extern int func_00283D38(int, int, float);
-extern float func_002A7878(float, float);
-extern void *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void vec_clear_128(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void vec_scale_to_length(void *, void *, float);
+extern int FloatToInt(float);
+extern int FastTweenColor(int, int, float);
+extern float math_random_float_range(float, float);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern int D_L02_001B2050[2] __attribute__((sda));
 extern int D_L02_001B2058[2] __attribute__((sda));
 
@@ -28,28 +29,28 @@ void func_PAL_L02_004288E8(u8 *a0, float lo, float hi) {
     int c0, c1;
     float k = 0.002f;
 
-    func_00282D30(v10, a0 + 0xE0, 1.75f);
-    func_00282CC0(v20, v10, a0 + 0x10);
-    func_00282D30(v10, a0 + 0xC0, -0.5f);
-    func_00282CC0(v20, v10, v20);
+    FastVecScale(v10, a0 + 0xE0, 1.75f);
+    FastVecAdd(v20, v10, a0 + 0x10);
+    FastVecScale(v10, a0 + 0xC0, -0.5f);
+    FastVecAdd(v20, v10, v20);
     i = 19;
     do {
-        func_00282F20(v40, a0 + 0xD0, func_002A7878(-1.0f, 1.0f));
-        func_00282F20(v30, a0 + 0xE0, func_002A7878(-0.15f, 1.0f));
-        func_00282CC0(v50, a0 + 0xC0, v40);
-        func_00282CC0(v50, v50, v30);
-        func_00282F20(v50, v50, func_002A7878(lo, hi));
-        r = func_002A7878(0.5f, 1.5f);
-        a = func_00283CF0((r * 50.0f + 2.0f) * 0.16666667f);
-        b = func_00283CF0((r * 150.0f + 2.0f) * 0.16666667f);
-        c = func_00283CF0((r * 35.0f + 2.0f) * 0.16666667f);
-        v50[3] = func_002A7878(0.2f, 0.6f);
-        func_00282C88(v60);
+        vec_scale_to_length(v40, a0 + 0xD0, math_random_float_range(-1.0f, 1.0f));
+        vec_scale_to_length(v30, a0 + 0xE0, math_random_float_range(-0.15f, 1.0f));
+        FastVecAdd(v50, a0 + 0xC0, v40);
+        FastVecAdd(v50, v50, v30);
+        vec_scale_to_length(v50, v50, math_random_float_range(lo, hi));
+        r = math_random_float_range(0.5f, 1.5f);
+        a = FloatToInt((r * 50.0f + 2.0f) * 0.16666667f);
+        b = FloatToInt((r * 150.0f + 2.0f) * 0.16666667f);
+        c = FloatToInt((r * 35.0f + 2.0f) * 0.16666667f);
+        v50[3] = math_random_float_range(0.2f, 0.6f);
+        vec_clear_128(v60);
         v60[2] = -k * (float)(a + b + c);
-        func_00282CC0(v60, v60, v50);
+        FastVecAdd(v60, v60, v50);
         v60[3] = 0.01f;
-        c0 = func_00283D38(D_L02_001B2050[0], D_L02_001B2050[1], func_002A7878(0.0f, 1.0f));
-        c1 = func_00283D38(D_L02_001B2058[0], D_L02_001B2058[1], func_002A7878(0.0f, 1.0f));
-        func_002BAA28(v20, v50, v60, c0, c1, a, b, c, 0x1003C);
+        c0 = FastTweenColor(D_L02_001B2050[0], D_L02_001B2050[1], math_random_float_range(0.0f, 1.0f));
+        c1 = FastTweenColor(D_L02_001B2058[0], D_L02_001B2058[1], math_random_float_range(0.0f, 1.0f));
+        part_spawn_trail(v20, v50, v60, c0, c1, a, b, c, 0x1003C);
     } while (--i >= 0);
 }

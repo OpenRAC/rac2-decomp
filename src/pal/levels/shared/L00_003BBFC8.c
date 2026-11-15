@@ -1,24 +1,24 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_00189EA0[];
-extern int func_002ACBC8(char *, int);
-extern int func_002A8508(int, int);
+extern char g_hero_position[];
+extern int IsPointInCuboid(char *, int);
+extern int moby_count_group_not_in_state(int, int);
 extern void *func_PAL_L00_002D7850(int);
-extern void func_L00_002D7140(void *);
-extern void func_L00_003B81D0(char *);
+extern void cam_end_override(void *);
+extern void field_override_apply_fields(char *);
 
 void func_PAL_L00_003BBFC8(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
-    if (func_002ACBC8(D_00189EA0, *(int *)state) != 0 && *(int *)(state + 0x28) == 0 && func_002A8508(*(int *)(state + 0x40), -1) != 0) {
+    if (IsPointInCuboid(g_hero_position, *(int *)state) != 0 && *(int *)(state + 0x28) == 0 && moby_count_group_not_in_state(*(int *)(state + 0x40), -1) != 0) {
         *(int *)(state + 0x2C) = (int)func_PAL_L00_002D7850(5);
         *(int *)(state + 0x28) = 1;
-        func_L00_003B81D0(object);
+        field_override_apply_fields(object);
     } else if (*(int *)(state + 0x28) != 0) {
-        if (!func_002ACBC8(D_00189EA0, *(int *)state) || !func_002A8508(*(int *)(state + 0x40), -1)) {
-            func_L00_002D7140(*(void **)(state + 0x2C));
+        if (!IsPointInCuboid(g_hero_position, *(int *)state) || !moby_count_group_not_in_state(*(int *)(state + 0x40), -1)) {
+            cam_end_override(*(void **)(state + 0x2C));
             *(int *)(state + 0x28) = 0;
         }
     }

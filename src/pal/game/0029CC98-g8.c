@@ -1,23 +1,24 @@
 #include "include_asm.h"
+#include "names.h"
 extern char *D_001A8CFC;
-extern int func_00339F28(void *, int);
+extern int list_screen_layout(void *, int);
 
 int func_PAL_0029CC98(int value) {
     if (D_001A8CFC != 0)
-        return func_00339F28(D_001A8CFC + 0x3B030, value);
+        return list_screen_layout(D_001A8CFC + 0x3B030, value);
     return 0;
 }
 
-extern void func_0033A3E0(void *);
+extern void list_screen_draw(void *);
 
 void func_PAL_0029CCD8(void) {
     if (D_001A8CFC != 0)
-        func_0033A3E0(D_001A8CFC + 0x3B030);
+        list_screen_draw(D_001A8CFC + 0x3B030);
 }
 
-extern void func_0033B910(void *);
+extern void map_screen_draw(void *);
 
 void func_PAL_0029CD08(void) {
     if (D_001A8CFC != 0)
-        func_0033B910(D_001A8CFC + 0x3B7A8);
+        map_screen_draw(D_001A8CFC + 0x3B7A8);
 }

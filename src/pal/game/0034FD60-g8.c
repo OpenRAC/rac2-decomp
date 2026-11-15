@@ -1,24 +1,25 @@
+#include "names.h"
 /* func_PAL_0034FD60, the PAL copy of func_0034DB98: the same C, where panel100 grows by 0x10 and
    the padding after the text element by another 0x10, callee func_00336A78 becomes
    func_PAL_00338770 and func_0027F640 becomes func_PAL_0027FB48. PAL's languages change the
    thousands separator: language 4 also takes the dot, the dot's offsets are 11 and -35, and
    language 2 draws no separator at all. */
 
-extern void func_00336320(void *);
-extern void func_00336828(void *);
+extern void gfx_draw_screen_element_stored(void *);
+extern void hud_draw_colored_quad_widget(void *);
 extern void func_PAL_00338770(void *);
-extern float *func_00335E18(void *);
-extern float *func_00335E10(void *);
-extern unsigned int *func_00335E20(void *);
-extern void func_0034AD10(void *);
-extern unsigned long func_0027C878(int);
+extern float *object_get_second_field(void *);
+extern float *object_get_first_field(void *);
+extern unsigned int *object_get_fourth_field(void *);
+extern void DrawSegmentedRingMeter(void *);
+extern unsigned long GetEffectTextureDescriptor(int);
 extern void func_PAL_0027FB48(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
-extern int func_0027FBD8(int, int, unsigned long, char *, int);
-extern int func_00115DA8(char *, char *, ...);
-extern int D_001A8C64[] __attribute__((sda));
-extern int D_001A79F8[] __attribute__((sda)); /* the player's bolts */
+extern int text_draw_centered_large(int, int, unsigned long, char *, int);
+extern int sprintf(char *, char *, ...);
+extern int g_notice_owner[] __attribute__((sda));
+extern int g_player_bolts[] __attribute__((sda)); /* the player's bolts */
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern unsigned char D_001A7A32[] __attribute__((sda)); /* bolt multiplier */
+extern unsigned char g_bolt_multiplier[] __attribute__((sda)); /* bolt multiplier */
 extern char D_001AE6F8[], D_001AE700[], D_001AE708[]; /* "'", ".", "x%d" */
 extern int D_001ADAE8 __attribute__((sda));
 extern int D_001ADAEC __attribute__((sda));
@@ -82,22 +83,22 @@ void func_PAL_0034FD60(void *arg)
     int foreground, shadow;
     int i, j, digits, n, apostrophe, yoffset, xoffset;
 
-    func_00336320(&object->top[0]);
-    func_00336320(&object->top[1]);
-    func_00336320(&object->top[2]);
-    func_00336828(object->panel148);
+    gfx_draw_screen_element_stored(&object->top[0]);
+    gfx_draw_screen_element_stored(&object->top[1]);
+    gfx_draw_screen_element_stored(&object->top[2]);
+    hud_draw_colored_quad_widget(object->panel148);
     func_PAL_00338770(object->panel100);
-    if (!D_001A8C64[0]) {
+    if (!g_notice_owner[0]) {
         HudElem4C *left = &object->side[0];
         HudElem4C *right = &object->side[1];
-        func_00336320(left);
-        func_00336320(right);
-        { float *value = func_00335E18(left); *value = -*value; }
-        { float *value = func_00335E18(right); *value = -*value; }
-        func_00336320(left);
-        func_00336320(right);
-        { float *value = func_00335E18(left); *value = -*value; }
-        { float *value = func_00335E18(right); *value = -*value; }
+        gfx_draw_screen_element_stored(left);
+        gfx_draw_screen_element_stored(right);
+        { float *value = object_get_second_field(left); *value = -*value; }
+        { float *value = object_get_second_field(right); *value = -*value; }
+        gfx_draw_screen_element_stored(left);
+        gfx_draw_screen_element_stored(right);
+        { float *value = object_get_second_field(left); *value = -*value; }
+        { float *value = object_get_second_field(right); *value = -*value; }
         for (i = 0; i < 8; i++) {
             HudVEntry *vt = *(HudVEntry **)((char *)&object->a[i] + 0x30);
             vt[1].fn((char *)&object->a[i] + vt[1].delta);
@@ -106,23 +107,23 @@ void func_PAL_0034FD60(void *arg)
             HudVEntry *vt = *(HudVEntry **)((char *)&object->c[j] + 0x30);
             vt[1].fn((char *)&object->c[j] + vt[1].delta);
         }
-        func_00336320(&object->b);
-        *func_00335E20(&object->b) = 0x70FFFEED;
+        gfx_draw_screen_element_stored(&object->b);
+        *object_get_fourth_field(&object->b) = 0x70FFFEED;
     }
-    func_00336320(&object->mid[0]);
-    func_00336320(&object->mid[1]);
+    gfx_draw_screen_element_stored(&object->mid[0]);
+    gfx_draw_screen_element_stored(&object->mid[1]);
     func_PAL_00338770(&object->text);
-    func_00336828(object->panel2A0);
-    x = func_00335E10(&object->text)[0];
-    y = func_00335E10(&object->text)[1];
+    hud_draw_colored_quad_widget(object->panel2A0);
+    x = object_get_first_field(&object->text)[0];
+    y = object_get_first_field(&object->text)[1];
     x += 32.0f;
     y += -10.0f;
-    color = *func_00335E20(&object->text);
+    color = *object_get_fourth_field(&object->text);
     digits = 1;
-    n = D_001A79F8[0];
+    n = g_player_bolts[0];
     while (n >= 10) { n /= 10; digits++; }
     apostrophe = D_001A7BB0[4] != 3 && D_001A7BB0[4] != 5 && D_001A7BB0[4] != 4;
-    func_00115DA8(separator, apostrophe ? D_001AE6F8 : D_001AE700);
+    sprintf(separator, apostrophe ? D_001AE6F8 : D_001AE700);
     yoffset = apostrophe ? 21 : 11;
     xoffset = apostrophe ? -34 : -35;
     if (D_001A7BB0[4] != 2) {
@@ -135,21 +136,21 @@ void func_PAL_0034FD60(void *arg)
                 long long style;
                 unsigned long texture;
                 step += 3.0f;
-                scale = func_00335E18(t);
+                scale = object_get_second_field(t);
                 style = t->style;
-                texture = func_0027C878((int)style);
+                texture = GetEffectTextureDescriptor((int)style);
                 func_PAL_0027FB48(drawX, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
             } while (step < (float)digits);
         }
     }
-    if (D_001A7A32[0] >= 2) {
-        func_00115DA8(multiplierText, D_001AE708, D_001A7A32[0]);
+    if (g_bolt_multiplier[0] >= 2) {
+        sprintf(multiplierText, D_001AE708, g_bolt_multiplier[0]);
         foreground = (D_001ADAF0 & 0xFFFFFF) | (color & 0xFF000000);
         shadow = color & 0xFF000000;
-        func_0027FBD8(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
-        func_0027FBD8(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
-        func_0027FBD8(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
-        func_0027FBD8(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
     }
-    func_0034AD10(object->final);
+    DrawSegmentedRingMeter(object->final);
 }

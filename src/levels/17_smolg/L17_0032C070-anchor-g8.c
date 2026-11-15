@@ -20,20 +20,20 @@ typedef struct {
     int direction;
 } MotionState;
 
-extern MotionAnchor *D_L17_001FE880[];
+extern MotionAnchor *g_path_l17_table[];
 /* One macro pointer: a GP load in case 1's delay slots, absolute in case 4. */
-extern char *D_L17_001B2C1C MACRO_ADDR;
+extern char *g_moby_l17_pool MACRO_ADDR;
 extern float D_L17_001B0240 __attribute__((sda)), D_L17_001B0244 __attribute__((sda));
-extern MotionQuad D_00189EA0[];
-extern int func_00282948(void *);
-extern void func_L17_003C3AF0(void *, void *, void *);
-extern int func_L17_003C3A00(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_002AD6F0(void *, void *, void *, void *);
+extern MotionQuad g_hero_position[];
+extern int math_fast_float_d(void *);
+extern void platform_place_on_path_by_timer(void *, void *, void *);
+extern int platform_is_point_below(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves the object between two anchors when their source mobys are cleared, waiting at
    the far anchor, and stops while a forward or backward probe is blocked. */
-void func_L17_003C3C50(unsigned char *obj)
+void UpdateTriggeredAnchorMover(unsigned char *obj)
 {
     struct { MotionVec old, delta, probe1, probe2; } frame;
     MotionState *vars = *(MotionState **)(obj + 0x68);
@@ -41,7 +41,7 @@ void func_L17_003C3C50(unsigned char *obj)
     MotionAnchor *anchor;
 
     frame.old.q = *(MotionQuad *)(obj + 0x10);
-    FastFloatHelperD(&vars->cooldown);
+    math_fast_float_d(&vars->cooldown);
     switch (obj[0x20]) {
     case 0:
         vars->speed = 0;
@@ -50,13 +50,13 @@ void func_L17_003C3C50(unsigned char *obj)
         obj[0x20] = 1;
         vars->flags |= 9;
         if (vars->destination0 != -1)
-            *(MotionQuad *)(obj + 0x10) = gPathTable_L17[vars->destination0]->position.q;
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[vars->destination0]->position.q;
         else if (vars->destination1 != -1)
-            *(MotionQuad *)(obj + 0x10) = gPathTable_L17[vars->destination1]->position.q;
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[vars->destination1]->position.q;
         break;
     case 1:
         if (vars->source0 != -1 && vars->destination0 != -1) {
-            target = gMobyPool_L17 + (vars->source0 << 8);
+            target = g_moby_l17_pool + (vars->source0 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
                 || (unsigned char)target[0x20] == vars->activeState) {
                 vars->timer = 0;
@@ -66,7 +66,7 @@ void func_L17_003C3C50(unsigned char *obj)
             }
         }
         if (vars->destination0 == -1 && vars->source1 != -1 && vars->destination1 != -1) {
-            target = gMobyPool_L17 + (vars->source1 << 8);
+            target = g_moby_l17_pool + (vars->source1 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
                 || (unsigned char)target[0x20] == vars->activeState) {
                 vars->timer = 0;
@@ -81,10 +81,10 @@ void func_L17_003C3C50(unsigned char *obj)
         if (vars->timer >= D_L17_001B0240 * 60.0f)
             vars->timer = D_L17_001B0240 * 60.0f;
         if (vars->direction == 0)
-            anchor = gPathTable_L17[vars->destination0];
+            anchor = g_path_l17_table[vars->destination0];
         else
-            anchor = gPathTable_L17[vars->destination1];
-        PlaceObjectOnPathByTimer(obj, anchor, &frame.old);
+            anchor = g_path_l17_table[vars->destination1];
+        platform_place_on_path_by_timer(obj, anchor, &frame.old);
         if (vars->timer >= D_L17_001B0240 * 60.0f) {
             if (vars->once0 && !vars->direction) {
                 vars->destination0 = -1;
@@ -104,10 +104,10 @@ void func_L17_003C3C50(unsigned char *obj)
         if (vars->timer <= 0.0f)
             vars->timer = 0.0f;
         if (vars->direction == 0)
-            anchor = gPathTable_L17[vars->destination0];
+            anchor = g_path_l17_table[vars->destination0];
         else
-            anchor = gPathTable_L17[vars->destination1];
-        PlaceObjectOnPathByTimer(obj, anchor, &frame.old);
+            anchor = g_path_l17_table[vars->destination1];
+        platform_place_on_path_by_timer(obj, anchor, &frame.old);
         if (vars->timer <= 0.0f)
             obj[0x20] = 1;
         break;
@@ -117,9 +117,9 @@ void func_L17_003C3C50(unsigned char *obj)
             MotionMoby *sourceMoby;
             obj[0x20] = 3;
             if (vars->direction == 0)
-                sourceMoby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)gMobyPool_L17);
+                sourceMoby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)g_moby_l17_pool);
             else if (vars->direction == 1)
-                sourceMoby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)gMobyPool_L17);
+                sourceMoby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)g_moby_l17_pool);
             else
                 break;
             sourceMoby->marked = 0;
@@ -129,8 +129,8 @@ void func_L17_003C3C50(unsigned char *obj)
     if (vars->cooldown) {
         vars->blocked = 1;
     } else if (vars->speed < 0.0f) {
-        frame.probe1.q = gHeroPosition[0];
-        if (IsPointJustBelowObject(obj, &frame.probe1)) {
+        frame.probe1.q = g_hero_position[0];
+        if (platform_is_point_below(obj, &frame.probe1)) {
             if (!vars->cooldown)
                 vars->cooldown = 30;
             vars->blocked = 1;
@@ -138,10 +138,10 @@ void func_L17_003C3C50(unsigned char *obj)
             goto check_clear;
     } else {
 check_clear:
-        frame.probe2.q = gHeroPosition[0];
-        if (!IsPointJustBelowObject(obj, &frame.probe2))
+        frame.probe2.q = g_hero_position[0];
+        if (!platform_is_point_below(obj, &frame.probe2))
             vars->blocked = 0;
     }
     FastVecSub(&frame.delta, obj + 0x10, &frame.old);
-    CombineTransformsAndStore((char *)vars + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
+    mat_combine_and_store((char *)vars + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
 }

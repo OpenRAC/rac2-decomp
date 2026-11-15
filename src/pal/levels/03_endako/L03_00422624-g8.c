@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -8,20 +9,20 @@ typedef float f32;
 extern u8 *D_L03_001B2A1C __attribute__((sda));
 extern s32 D_L03_001B108C __attribute__((sda));
 extern u32 D_L03_001B1058 __attribute__((sda));
-extern int func_002A77E0(int id);
-extern void func_00282948(void *target);
-extern void func_00282978(void *target);
-extern void func_002AEC48(void *entity, void *target, int a, float f0, float f1);
-extern void func_002AFDD8(void *entity, void *out, void *target, int a);
-extern void func_0029FCC0(void *entity, int a, void *out);
+extern int math_random_int_below(int id);
+extern void math_fast_float_d(void *target);
+extern void FastDecTimer(void *target);
+extern void moby_update_eased_node(void *entity, void *target, int a, float f0, float f1);
+extern void vec_transform_by_object_or_given(void *entity, void *out, void *target, int a);
+extern void moby_transform_joint_to_world(void *entity, int a, void *out);
 extern u8 *func_PAL_002BE9A8(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
-extern int func_00283CF0(float f);
+extern int FloatToInt(float f);
 extern void func_PAL_002B14F8(void *entity, float *target, float f, int a, int b);
 extern float D_L03_001B1BF0 __attribute__((sda));
 extern f32 D_L03_001B1C00 __attribute__((sda));
 extern f32 D_L03_001B1C04 __attribute__((sda));
-extern s32 func_002B38B8();
+extern s32 flag_is_third_pending_set();
 typedef struct {
     s32 a;
     s32 b;
@@ -50,15 +51,15 @@ void func_PAL_L03_004233F0(u8 *entity) {
     u8 *data;
     u8 *data2;
 
-    func_00282948(state + 0x34C);
-    func_00282978(state + 0x330);
-    func_00282978(state + 0x332);
-    func_002AEC48(entity, state + 0x220, 0, 0.0432f, 0.43200004f);
-    func_002AEC48(entity, state + 0x2A0, 1, 0.0432f, 0.43200004f);
+    math_fast_float_d(state + 0x34C);
+    FastDecTimer(state + 0x330);
+    FastDecTimer(state + 0x332);
+    moby_update_eased_node(entity, state + 0x220, 0, 0.0432f, 0.43200004f);
+    moby_update_eased_node(entity, state + 0x2A0, 1, 0.0432f, 0.43200004f);
     timer = *(u16 *)(entity + 0x96);
     if (timer <= 0xFFFE)
         *(u16 *)(entity + 0x96) = timer + 1;
-    func_002AFDD8(entity, buf, state + 0x1A0, 0);
+    vec_transform_by_object_or_given(entity, buf, state + 0x1A0, 0);
     f = buf[1] * D_L03_001B1BF0;
     *(float *)(entity + 0xF0) = f;
     /* The four words the engine reads the particle's setup from, in the order the
@@ -67,17 +68,17 @@ void func_PAL_L03_004233F0(u8 *entity) {
     setup.c = -0.02f;
     setup.d = 1.0f;
     setup.b = 0;
-    count = func_002A77E0(16);
-    if (func_002A77E0(2))
+    count = math_random_int_below(16);
+    if (math_random_int_below(2))
         count = -count;
-    func_0029FCC0(entity, 4, vec);
+    moby_transform_joint_to_world(entity, 4, vec);
     vec[2] += 0.1f;
     particle = func_PAL_002BE9A8(vec, 0.1f, 1.0f, 0.9f, count, &setup,
                              105000.0f, 0xDF204080, 0);
     if (particle != 0) {
         data = particle + 0x20;
         *(u16 *)(particle + 0xA) = 4;
-        particle[9] = func_00283CF0(4.0f) + 0x70;
+        particle[9] = FloatToInt(4.0f) + 0x70;
         *(u32 *)(data + 4) = 2;
         data[0xA] = 0xDF;
         data[0xB] = particle[0xA];
@@ -88,7 +89,7 @@ void func_PAL_L03_004233F0(u8 *entity) {
     if (data2 != 0) {
         *(u16 *)(particle + 0xA) = 4;
         data2 += 0x20;
-        particle[9] = func_00283CF0(4.0f) + 0x70;
+        particle[9] = FloatToInt(4.0f) + 0x70;
         *(u32 *)(data2 + 4) = 2;
         data2[0xA] = 0xDF;
         data2[0xB] = particle[0xA];
@@ -97,7 +98,7 @@ void func_PAL_L03_004233F0(u8 *entity) {
         func_PAL_002B14F8(entity, (float *)(state + 0x360), 2.5f, 5, 1);
 }
 
-extern u8 *func_002BDCE8(void *p, float f0, float f1, float f2, int z, void *local,
+extern u8 *SpawnSpinningSparkParticle(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
 
 /* Same walk as func_L03_0041D0A8 after seeding two state halfwords. */

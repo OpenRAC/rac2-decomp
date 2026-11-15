@@ -10,9 +10,9 @@ extern short D_001B2492[] MACRO_ADDR;
 extern short D_001B249A[] MACRO_ADDR;
 extern short D_001B249C[] MACRO_ADDR;
 typedef struct { float f[4]; } __attribute__((aligned(16))) Vec;
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float), func_00282C88(void *);
-extern int D_001A79F0, D_001A8BB0;
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float), vec_clear_128(void *);
+extern int g_current_map_index, g_current_game_mode;
 extern Vec D_001C1490[], D_001C14E0[];
 extern int D_001AEFA0 __attribute__((sda));
 extern float D_001AEFA4 __attribute__((sda));
@@ -33,20 +33,20 @@ void func_PAL_0030DEC0(char *obj) {
     Vec *state = *(Vec **)(obj + 0x68);
     int i;
     Vec *points;
-    if (D_001A79F0 == 1 && D_001A8BB0 == 2) state = D_001C1490;
-    if (D_001A79F0 == 20 && D_001A8BB0 == 2) state = D_001C14E0;
+    if (g_current_map_index == 1 && g_current_game_mode == 2) state = D_001C1490;
+    if (g_current_map_index == 20 && g_current_game_mode == 2) state = D_001C14E0;
     if (D_001AEFA0) {
         D_001AEFA0 = 0;
         D_001B24A4 = 0;
         D_001B24A0 = ((s32)(D_001AF040) * 5 + 2) / 6;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEFA4 * 0.05f);
+        FastVecSub(&delta, state + 1, state);
+        vec_scale_to_length(&step, &delta, D_001AEFA4 * 0.05f);
         points = D_00229710;
         qcopy(points, state);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&points[i], &points[i - 1], &step);
+            FastVecAdd(&points[i], &points[i - 1], &step);
             D_00229990[i] = 0;
-            func_00282C88(&D_002299E0[i]);
+            vec_clear_128(&D_002299E0[i]);
             D_00229B20[i] = 0;
         }
         { short empty = -1; int j; for (j = 3; j >= 0; j--) D_001B2480[j] = empty; }

@@ -3,11 +3,11 @@
 
 
 typedef unsigned char u8;
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern u8 D_001A7B0B __attribute__((sda));
-extern void func_00282A88(void *, int);
-extern float func_00282C48(float);
-extern int func_L07_002BE770(int, int);
+extern void mem_fast_helper_b(void *, int);
+extern float math_fabs(float);
+extern int hero_l07_enter_state(int, int);
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword word; float f[4]; } Vector;
 typedef struct {
@@ -50,62 +50,62 @@ typedef struct {
     u8 pad24a0[0x24cc - 0x24a0];
     int health;
 } PlayerInputView;
-extern PlayerInputView D_00189E20;
+extern PlayerInputView g_hero_state;
 
 /* Hand-adapted from func_L01_002ADDC8. */
 /* Reads the newest button command and starts the matching hero action, such as an attack, a hover or a ledge grab. */
-void func_L07_002AC078(void)
+void hero_queue_action_from_input(void)
 {
-    short command = gHeroState.command;
-    u8 saved = gHeroState.saved;
+    short command = g_hero_state.command;
+    u8 saved = g_hero_state.saved;
     int active;
 
-    FastMemoryHelperB(&gHeroState.command, 16);
-    gHeroState.command = command;
-    gHeroState.saved = saved;
-    gHeroState.request = 0;
-    gHeroState.pendingJump = 0;
-    if (gHeroState.disabled) return;
+    mem_fast_helper_b(&g_hero_state.command, 16);
+    g_hero_state.command = command;
+    g_hero_state.saved = saved;
+    g_hero_state.request = 0;
+    g_hero_state.pendingJump = 0;
+    if (g_hero_state.disabled) return;
     active = 0;
-    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
+    if (g_hero_state.busy || (g_hero_state.state == 0x7b && g_hero_state.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !gHeroState.inputLock &&
-        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
-        gHeroState.jumpPressed = 1;
-        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
+    if (command == 2 && !g_hero_state.inputLock &&
+        (!g_hero_state.jumpCount || g_hero_state.elapsed < 2.5f)) {
+        g_hero_state.jumpPressed = 1;
+        if (!g_hero_state.mode && D_001A7B0B) g_hero_state.pendingJump = 1;
     }
-    if (command == 3) gHeroState.jump = 1;
-    if (command == 11) gHeroState.cancel = 1;
-    if (command == 4) gHeroState.attack = 1;
-    if (command == 13) gHeroState.flag149c = 1;
-    if (command == 8) gHeroState.hover = 1;
-    if (command == 12) gHeroState.hover = 1;
-    if (gHeroState.attack && active && gHeroState.movement != 16 && gHeroState.movement != 20 &&
-        gHeroState.movement != 7) {
-        EnterHeroState_L07(0x30, 1);
+    if (command == 3) g_hero_state.jump = 1;
+    if (command == 11) g_hero_state.cancel = 1;
+    if (command == 4) g_hero_state.attack = 1;
+    if (command == 13) g_hero_state.flag149c = 1;
+    if (command == 8) g_hero_state.hover = 1;
+    if (command == 12) g_hero_state.hover = 1;
+    if (g_hero_state.attack && active && g_hero_state.movement != 16 && g_hero_state.movement != 20 &&
+        g_hero_state.movement != 7) {
+        hero_l07_enter_state(0x30, 1);
         return;
     }
-    if (gHeroState.flag149c && gHeroState.state != 0x7c &&
-        FloatAbs(gHeroState.jumpTime2-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
-        gHeroState.jumpTime2-gHeroState.position.f[2] > 0.0f &&
-        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
-        EnterHeroState_L07(0x7c,1); return;
+    if (g_hero_state.flag149c && g_hero_state.state != 0x7c &&
+        math_fabs(g_hero_state.jumpTime2-(g_hero_state.position.f[2]+0.25f)) < 1.0f &&
+        g_hero_state.jumpTime2-g_hero_state.position.f[2] > 0.0f &&
+        (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
+        hero_l07_enter_state(0x7c,1); return;
     }
-    if (gHeroState.jump && gHeroState.state != 0x65 && gHeroState.state != 0x78 &&
-        FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
-        gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f &&
-        (gHeroState.state != 0x66 || gHeroState.animationDone) &&
-        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
-        if (!gHeroState.health) { EnterHeroState_L07(0x78,1); return; }
-        EnterHeroState_L07(0x65,1); return;
+    if (g_hero_state.jump && g_hero_state.state != 0x65 && g_hero_state.state != 0x78 &&
+        math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f &&
+        g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f &&
+        (g_hero_state.state != 0x66 || g_hero_state.animationDone) &&
+        (g_hero_state.motion.f[2] < 0.0f || g_hero_state.state == 0x7b)) {
+        if (!g_hero_state.health) { hero_l07_enter_state(0x78,1); return; }
+        hero_l07_enter_state(0x65,1); return;
     }
-    if (!gHeroState.cancel || gHeroState.state == 0x78 || gHeroState.state == 0x74) return;
-    if (!(FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f)) return;
-    if (!(gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f)) return;
-    if (!(gHeroState.motion.f[2] < 0.0f) && gHeroState.state != 0x7b) return;
-    if (gCurrentMapIndex == 13) {
-        EnterHeroState_L07(0x74, 1);
+    if (!g_hero_state.cancel || g_hero_state.state == 0x78 || g_hero_state.state == 0x74) return;
+    if (!(math_fabs(g_hero_state.jumpTime-(g_hero_state.position.f[2]+0.25f)) < 1.0f)) return;
+    if (!(g_hero_state.jumpTime-g_hero_state.position.f[2] > 0.0f)) return;
+    if (!(g_hero_state.motion.f[2] < 0.0f) && g_hero_state.state != 0x7b) return;
+    if (g_current_map_index == 13) {
+        hero_l07_enter_state(0x74, 1);
         return;
     }
-    EnterHeroState_L07(0x78, 1);
+    hero_l07_enter_state(0x78, 1);
 }

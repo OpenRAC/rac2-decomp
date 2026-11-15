@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,12 +24,12 @@
  */
 #include "common.h"
 
-extern s32 func_00132028();
+extern s32 snd_Pump();
 extern s32 D_001A74A0 __attribute__((sda));
 extern s32 D_001A74C0 __attribute__((sda));
 
 /* Counts one more queued sound command and then runs the sound update. */
-void func_001330D0(void) {
+void snd_commit_queued_command(void) {
     s32 *countPtr;
 
     countPtr = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));

@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 extern u8 D_00139648;
 extern u8 D_001A7A47 __attribute__((sda));
-extern void func_002AEC48(void *a0, void *a1, int a2, float f12, float f13);
-extern u8 D_00139568[];
-extern u8 D_00239BA0[];
+extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float f13);
+extern u8 g_item_slot_to_record[];
+extern u8 g_weapon_table[];
 extern u8 D_001A7A60[] __attribute__((sda));
 
 /* Stores the third argument (or 1.0f) in the object's float at 0x70, and, when the fifth argument
@@ -20,7 +21,7 @@ void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
     }
     if (a3 != 0) {
         if (a1[28] != a1[8]) {
-            func_002AEC48(a0, a1, a2, 0.0432f, 0.43200004f);
+            moby_update_eased_node(a0, a1, a2, 0.0432f, 0.43200004f);
         }
     }
 }
@@ -28,9 +29,9 @@ void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
 
 void func_PAL_002B1588(int first, int second)
 {
-    extern int func_00288FB8(int);
+    extern int GetLocalizedString(int);
     extern void func_0029CC98(int, int);
-    func_0029CC98(func_00288FB8(first), second);
+    func_0029CC98(GetLocalizedString(first), second);
 }
 
 extern void func_0029CC50(int, int, int);
@@ -39,12 +40,12 @@ void func_PAL_002B15B8(int first, int second, int third) {
     func_0029CC50(first, second, third);
 }
 
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00283098(float *dst, float *src, char *table);
-extern void func_00282CC0(float *dst, float *src, float *arg);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void matrix_mul_vec3(float *dst, float *src, char *table);
+extern void FastVecAdd(float *dst, float *src, float *arg);
 extern int D_L00_001A8FF0_1 __attribute__((sda));
 extern void func_PAL_002735D0(char *self, int a1, int a2, int a3, char *p4, char *p5,
                     float *buf, int b3, float fa, float fb);
@@ -65,17 +66,17 @@ void func_PAL_002B15D8(char *self, int mask, float *arg2,
     for (i = 0; i < 15; i++) {
         if (((mask >> i) ^ 1) & 1)
             continue;
-        v = func_002A7940();
-        k = func_002A7878(f0, f1) * (0.020000001f);
-        buf[0] = func_00283180(v) * k;
-        buf[1] = func_00283198(v) * k;
+        v = math_random_angle();
+        k = math_random_float_range(f0, f1) * (0.020000001f);
+        buf[0] = math_fast_sin_or_cos_a(v) * k;
+        buf[1] = math_fast_sin_or_cos_b(v) * k;
         buf[2] = 0.0f;
-        buf[2] = func_002A7878(f2, f3) * (0.020000001f);
+        buf[2] = math_random_float_range(f2, f3) * (0.020000001f);
         if (D_L00_001A8FF0_1 != 0)
-            func_00283098(buf, buf, self + 192);
-        func_00282CC0(buf, buf, arg2);
-        fa = func_002A7878(90.0f, 270.0f);
-        fb = func_002A7878(10.0f, 20.0f);
+            matrix_mul_vec3(buf, buf, self + 192);
+        FastVecAdd(buf, buf, arg2);
+        fa = math_random_float_range(90.0f, 270.0f);
+        fb = math_random_float_range(10.0f, 20.0f);
         func_PAL_002735D0(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
                 buf, arg3, fa, fb);
     }

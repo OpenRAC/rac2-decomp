@@ -52,7 +52,7 @@ extern void ref_L05_0042B2C0_07(int, void *, void *, void *, int);
 #pragma rac2_sched1_order 1496 1501 1435
 /* FAKEMATCH: the #pragma rac2_sched1_order list above fixes the pre-reload order of this function's insns */
 /* Builds and draws a textured ring-shaped strip around a point, used for the stream effect. */
-void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
+void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned color,
  float advance, float radius, float stepU, float stepV, float startV, float startU)
 {
     /* FAKEMATCH: q and w are unused; they keep the pseudo register numbers, which break allocation ties */

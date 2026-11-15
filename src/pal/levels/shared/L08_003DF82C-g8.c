@@ -21,20 +21,20 @@ extern s32 D_L08_001B047C __attribute__((sda));
 extern s32 D_L08_001B0480 __attribute__((sda));
 extern f32 D_L08_001B3244 MACRO_ADDR;
 extern s32 D_L08_001B3240 MACRO_ADDR;
-extern s32 D_001A7340 MACRO_ADDR;
-extern s32 D_001A7344 MACRO_ADDR;
+extern s32 g_screen_width MACRO_ADDR;
+extern s32 g_screen_height MACRO_ADDR;
 extern Style D_L08_001B0490;
 extern char D_L08_001B04A0[];
 
-extern void func_L00_0037B750(void), func_L08_00300090(void), func_L08_00300100(void);
-extern void func_L08_003000C0(void);
-extern s32 func_00336D50(void *, s32);
-extern void func_00300A00(char *, s32, f32, f32, f32, f32, f32);
-extern s32 func_L08_003DB4E8(void), func_0028E588(s32, s32), func_00283CF0(f32);
-extern int func_0028EA58(s32, s32, s32, s32, s32, void *);
-extern s32 func_00115DA8(char *, char *, ...);
+extern void gfx_append_draw_list_packet_b(void), hero_begin_saved_float_hold(void), hero_set_saved_float_and_update(void);
+extern void hero_end_saved_float_hold(void);
+extern s32 table_find_by_id(void *, s32);
+extern void gfx_draw_scaled_object_two_axes(char *, s32, f32, f32, f32, f32, f32);
+extern s32 mode_get_selector(void), GetIconFrame(s32, s32), FloatToInt(f32);
+extern int hud_draw_sprite_gradient(s32, s32, s32, s32, s32, void *);
+extern s32 sprintf(char *, char *, ...);
 extern u32 func_001157AC(char *);
-extern s32 func_0027FAA8(s32, s32, u64, void *, s32);
+extern s32 text_draw_centered_small(s32, s32, u64, void *, s32);
 
 /* A screen y scaled for the display and rounded, four pixels lower in display mode 1. */
 static __inline__ s32 screen_y(f32 v, f32 scale, f32 half, s32 active)
@@ -63,21 +63,21 @@ s32 func_PAL_L08_003DF82C(void)
     s32 r, texture, x, y, x2, y2, width, height, one, one2, entry;
     char *label;
 
-    func_L00_0037B750();
+    gfx_append_draw_list_packet_b();
     fade = 1.0f;
     size = 32.0f;
     state->fade += D_L08_001B046C * 1.2f;
     if (state->fade > fade) state->fade = fade;
     if (D_L08_001A904C) {
         entry = 0x8710;
-        func_L08_00300090();
-        func_L08_00300100();
+        hero_begin_saved_float_hold();
+        hero_set_saved_float_and_update();
         z = 0.0f;
-        label = (char *)func_00336D50(D_L08_001A904C + entry, 0xAC);
-        func_00300A00(label, 0x60442D00, (f32)(D_001A7340 / 2), (f32)(D_001A7344 / 2), fade, fade, z);
-        label = (char *)func_00336D50(D_L08_001A904C + entry, 0xAD);
-        func_00300A00(label, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)(D_001A7344 / 2), fade, fade, z);
-        func_L08_003000C0();
+        label = (char *)table_find_by_id(D_L08_001A904C + entry, 0xAC);
+        gfx_draw_scaled_object_two_axes(label, 0x60442D00, (f32)(g_screen_width / 2), (f32)(g_screen_height / 2), fade, fade, z);
+        label = (char *)table_find_by_id(D_L08_001A904C + entry, 0xAD);
+        gfx_draw_scaled_object_two_axes(label, 0x55F0C070, (f32)(g_screen_width / 2), (f32)(g_screen_height / 2), fade, fade, z);
+        hero_end_saved_float_hold();
     }
     do {
         half = 0.5f;
@@ -87,19 +87,19 @@ s32 func_PAL_L08_003DF82C(void)
     } while (0);
     one = 1;
     style = D_L08_001B0490;
-    bottom = (f32)(D_001A7344 - r);
-    texture = func_0028E588(0xEAA2, func_L08_003DB4E8());
-    x = func_00283CF0(D_L08_001B0460 + fade);
+    bottom = (f32)(g_screen_height - r);
+    texture = GetIconFrame(0xEAA2, mode_get_selector());
+    x = FloatToInt(D_L08_001B0460 + fade);
     t = D_L08_001B3244;
-    y = func_00283CF0(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
+    y = FloatToInt(bottom + (f32)screen_y(fade - (f32)D_L08_001B0484, t, half, one));
     half2 = 0.5f;
     one2 = 1;
-    width = func_00283CF0(size * state->fade);
-    height = hud_round((f32)func_00283CF0(size * state->fade), D_L08_001B3244, half2, one2);
-    func_0028EA58(texture, x, y, width, height, &style);
-    func_00115DA8(text, D_L08_001B04A0, state->count);
-    x2 = func_00283CF0(D_L08_001B0460 + (f32)D_L08_001B047C);
-    y2 = func_00283CF0(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
-    func_0027FAA8(x2, y2, 0x80F0F0F0UL, text, func_001157AC(text));
+    width = FloatToInt(size * state->fade);
+    height = hud_round((f32)FloatToInt(size * state->fade), D_L08_001B3244, half2, one2);
+    hud_draw_sprite_gradient(texture, x, y, width, height, &style);
+    sprintf(text, D_L08_001B04A0, state->count);
+    x2 = FloatToInt(D_L08_001B0460 + (f32)D_L08_001B047C);
+    y2 = FloatToInt(bottom) + screen_y((f32)D_L08_001B0480, D_L08_001B3244, half2, one2);
+    text_draw_centered_small(x2, y2, 0x80F0F0F0UL, text, func_001157AC(text));
     return 0;
 }

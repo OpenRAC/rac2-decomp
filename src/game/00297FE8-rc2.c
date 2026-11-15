@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,24 +24,24 @@
  */
 #include "common.h"
 
-extern f32 *func_00297F98(s32);
-extern s32 D_001A79F0;
+extern f32 *map_get_coefficients(s32);
+extern s32 g_current_map_index;
 
 /* Turns a world position into a 0-1 position on the map screen for the given map (or the current map when -1 is passed). */
-void func_00297FE8(f32 worldX, f32 worldY, f32 *outMapX, f32 *outMapY, s32 requestedMap) {
+void map_convert_world_to_map_position(f32 worldX, f32 worldY, f32 *outMapX, f32 *outMapY, s32 requestedMap) {
     f32 *xTransform;
     f32 *yTransform;
     s32 mapIndex;
 
-    mapIndex = (~requestedMap != 0) ? requestedMap : gCurrentMapIndex;
+    mapIndex = (~requestedMap != 0) ? requestedMap : g_current_map_index;
     if (mapIndex <= -1) {
         mapIndex = 0;
     }
     if (mapIndex >= 0x15) {
         mapIndex = 0;
     }
-    xTransform = GetMapCoefficients(mapIndex);
-    *outMapX = (xTransform[0] + (GetMapCoefficients(mapIndex)[1] * worldX)) * 0.001953125f;
-    yTransform = GetMapCoefficients(mapIndex);
-    *outMapY = (yTransform[2] + (GetMapCoefficients(mapIndex)[3] * worldY)) * 0.001953125f;
+    xTransform = map_get_coefficients(mapIndex);
+    *outMapX = (xTransform[0] + (map_get_coefficients(mapIndex)[1] * worldX)) * 0.001953125f;
+    yTransform = map_get_coefficients(mapIndex);
+    *outMapY = (yTransform[2] + (map_get_coefficients(mapIndex)[3] * worldY)) * 0.001953125f;
 }

@@ -11,19 +11,19 @@ typedef struct {
     float pos[9];
     float vel[9];
 } Particle;
-extern Particle *func_L00_0032A088(int, int);
-extern int func_00282978(void *);
-extern float func_00283B98(float, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern Particle *level_get_slot_body(int, int);
+extern int FastDecTimer(void *);
+extern float FastAddRotations(float, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 extern int D_L00_001A8FF0[] __attribute__((sda));
 
 /* Moves every active beam particle along its path and counts how many are still alive. */
-int func_L00_003A87D8(char *object)
+int beam_update_particles(char *object)
 {
     float local[2][4] __attribute__((aligned(16)));
-    Particle *base = GetSlotBody(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
+    Particle *base = level_get_slot_body(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
     int i, j, k;
     int active = 0;
     for (i = 0; i < 80; i = j) {
@@ -42,7 +42,7 @@ int func_L00_003A87D8(char *object)
                 local[0][2] = 1.0f;
                 local[0][3] = 1.0f;
                 if (D_L00_001A8FF0[0] != 0)
-                    ComputeViewDirection(&base[i], local[0], 1);
+                    cam_compute_view_direction(&base[i], local[0], 1);
                 FastVecScale(scaled, local[0], base[i].scale);
                 FastVecAdd(&base[i], &base[i], scaled);
             }

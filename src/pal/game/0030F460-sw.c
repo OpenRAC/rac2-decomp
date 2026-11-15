@@ -17,21 +17,21 @@ typedef struct {
 extern int D_001A8CA4 MACRO_ADDR;
 extern Vector D_001BAFC0;
 extern u16 D_001B1CB0[] MACRO_ADDR;
-extern void func_002A7470(char *, int, int, int), func_002FE8D8(void *, float *);
-extern void func_00282F20(void *, void *, float), func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *), func_00283198(float), func_00283180(float);
-extern void func_00282D30(void *, void *, float), func_00283958(void *, void *), func_00283738(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *), func_002FEE70(int, void *, void *), func_002FE880(void *, float *, float);
-extern void func_00300190(void *, void *), func_00300248(int, int);
-extern int func_002FE9D0(CollisionQuery *), func_00300540(int);
-extern void func_002ACB48(float *, float);
+extern void anim_start_blended(char *, int, int, int), moby_get_facing_direction(void *, float *);
+extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
+extern void FastVecScale(void *, void *, float), quaternion_to_rotation_basis(void *, void *), multiply_matrix3x3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *), part_steer_effect_direction(int, void *, void *), vec_add_object_direction_scaled(void *, float *, float);
+extern void vec_transform_or_copy(void *, void *), shop_trigger_current_state_effect(int, int);
+extern int CollideSweptSphere(CollisionQuery *), weapon_get_group(int);
+extern void vec_add_random_offset(float *, float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern float func_002A7878(float, float);
-extern void func_PAL_0030FCE8(char *), func_PAL_0030FB38(char *), func_002FEE50(int), func_002ACAD0(int, u16 *), func_0029F338(void *);
-extern void func_00283658(void *, void *), func_002AB6D8(float *, float *), func_002833F0(void *, void *);
+extern float math_random_float_range(float, float);
+extern void func_PAL_0030FCE8(char *), func_PAL_0030FB38(char *), table_clear_entry_flag(int), RemoveMobyFromIndexList(int, u16 *), moby_mark_spawned(void *);
+extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(float *, float *), euler_rotation_basis(void *, void *);
 /* Retail returns a boolean, despite a legacy caller declaring this helper void. */
-extern int func_002AD0E0(int, int, void *, void *, void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(int, int, void *, void *, void *, void *);
 /* Steers a moving projectile, resolves its collision, then follows a struck actor. */
 void func_PAL_0030F460(char *actor) {
     /* The 96-byte collision query and following attachment transform have
@@ -51,7 +51,7 @@ void func_PAL_0030F460(char *actor) {
     switch (((u8 *)actor)[0x20]) {
     case 0:
         actor[0x20] = 1;
-        if (((u8 *)actor)[0x43]) func_002A7470(actor, 0, 0, 0);
+        if (((u8 *)actor)[0x43]) anim_start_blended(actor, 0, 0, 0);
         *(int *)(actor + 0x98) = 0;
         /* fall through */
     case 1: {
@@ -59,20 +59,20 @@ void func_PAL_0030F460(char *actor) {
         char *hit;
         float halfAngle;
         short type;
-        func_002FE8D8(actor + 0x10, scratch.desired.f);
-        func_00282F20(&scratch.forward, actor + 0xE0, 1.0f);
-        func_00282DD8(&scratch.axis, &scratch.forward, &scratch.desired);
-        halfAngle = func_00282DB0(&scratch.forward, &scratch.desired) * 0.5f;
-        func_00282D30(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
-        scratch.quaternion.f[3] = func_00283180(halfAngle);
-        func_00283958(&scratch.quaternion, scratch.rotation);
-        func_00283738(actor + 0xC0, scratch.rotation, actor + 0xC0);
+        moby_get_facing_direction(actor + 0x10, scratch.desired.f);
+        vec_scale_to_length(&scratch.forward, actor + 0xE0, 1.0f);
+        FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
+        halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+        FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(halfAngle));
+        scratch.quaternion.f[3] = math_fast_sin_or_cos_a(halfAngle);
+        quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
+        multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
         qcopy(&scratch.oldPosition, (actor + 0x10));
-        func_00282CC0(actor + 0x10, actor + 0x10, state + 0x10);
-        func_002FEE70(*(int *)(state + 0x20), state + 0x10, 0);
-        func_002FE880(actor + 0x10, (float *)(state + 0x10), 0.0044f);
-        func_00300190(actor + 0x10, actor + 0x10);
-        func_00300248((int)(state + 0x10), (int)(state + 0x10));
+        FastVecAdd(actor + 0x10, actor + 0x10, state + 0x10);
+        part_steer_effect_direction(*(int *)(state + 0x20), state + 0x10, 0);
+        vec_add_object_direction_scaled(actor + 0x10, (float *)(state + 0x10), 0.0044f);
+        vec_transform_or_copy(actor + 0x10, actor + 0x10);
+        shop_trigger_current_state_effect((int)(state + 0x10), (int)(state + 0x10));
         scratch.ignore[0] = 0; scratch.ignore[1] = 0x232;
         qcopy(&scratch.phase.query.previous, &scratch.oldPosition);
         qcopy(&scratch.phase.query.position, (actor + 0x10));
@@ -80,11 +80,11 @@ void func_PAL_0030F460(char *actor) {
         scratch.phase.query.owner = actor; scratch.phase.query.ignore = scratch.ignore; scratch.phase.query.ignoreCount = 2;
         scratch.phase.query.radius = 0.2f; scratch.phase.query.friction = 0.45f; scratch.phase.query.bounce = 0.5555556f;
         scratch.phase.query.flags = 0; scratch.phase.query.mask = 0; scratch.phase.query.gravity = 1; scratch.phase.query.response = 1; scratch.phase.query.maxTurn = 0.174f;
-        collision = func_002FE9D0(&scratch.phase.query);
+        collision = CollideSweptSphere(&scratch.phase.query);
         qcopy((actor + 0x10), &scratch.phase.query.position);
         qcopy((state + 0x10), &scratch.phase.query.velocity);
         if (D_001A8CA4 && *(float *)(actor + 0x18) < 462.43f) {
-            func_002ACB48(scratch.scatter.f, 0.6f);
+            vec_add_random_offset(scratch.scatter.f, 0.6f);
             func_PAL_002AC718(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
@@ -97,25 +97,25 @@ void func_PAL_0030F460(char *actor) {
             *(char **)(state + 0x38) = hit;
         }
         {
-            func_00282D30(&scratch.desired, &D_001BAFC0, 0.0009765625f);
-            func_00282F20(&scratch.desired, &scratch.desired, 1);
-            func_00282F20(&scratch.forward, actor + 0xE0, 1);
-            func_00282DD8(&scratch.axis, &scratch.forward, &scratch.desired);
-            halfAngle = func_00282DB0(&scratch.forward, &scratch.desired) * 0.5f;
-            func_00282D30(&scratch.quaternion, &scratch.axis, func_00283198(halfAngle));
-            scratch.quaternion.f[3] = func_00283180(halfAngle);
-            func_00283958(&scratch.quaternion, scratch.rotation);
-            func_00283738(actor + 0xC0, scratch.rotation, actor + 0xC0);
+            FastVecScale(&scratch.desired, &D_001BAFC0, 0.0009765625f);
+            vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
+            vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
+            FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
+            halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+            FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(halfAngle));
+            scratch.quaternion.f[3] = math_fast_sin_or_cos_a(halfAngle);
+            quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
+            multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
             actor[0x20] = collision;
-            if (((u8 *)actor)[0x43] != 1) func_002A7470(actor, 1, 0, 8);
+            if (((u8 *)actor)[0x43] != 1) anim_start_blended(actor, 1, 0, 8);
             *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
         }
         goto response_done;
 accelerate:
-        func_00282D30(state + 0x10, state + 0x10, 1.1f);
+        FastVecScale(state + 0x10, state + 0x10, 1.1f);
 response_done:
-        if (func_00300540(scratch.phase.query.surface)) {
-            func_002ACB48(scratch.scatter.f, 0.6f);
+        if (weapon_get_group(scratch.phase.query.surface)) {
+            vec_add_random_offset(scratch.scatter.f, 0.6f);
             func_PAL_002AC718(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
@@ -125,8 +125,8 @@ response_done:
     case 2: actor[0x20] = 3; break;
     case 3:
         if (((u8 *)actor)[0x60] & 2) {
-            if (((u8 *)actor)[0x43] != 2) func_002A7470(actor, 2, 0, 8);
-            *(float *)(actor + 0x48) = func_002A7878(0.7f, 1.05f);
+            if (((u8 *)actor)[0x43] != 2) anim_start_blended(actor, 2, 0, 8);
+            *(float *)(actor + 0x48) = math_random_float_range(0.7f, 1.05f);
         }
         func_PAL_0030FCE8(actor); func_PAL_0030FB38(actor);
         break;
@@ -136,15 +136,15 @@ response_done:
         if (*(float *)(actor + 0x2C) < *(float *)(*(char **)(actor + 0x24) + 0x24) * 0.1f) actor[0x20] = 6;
         break;
     case 6:
-        func_002FEE50(*(int *)(state + 0x20));
-        if (!*(int *)(state + 0x40)) func_002ACAD0((int)actor, D_001B1CB0);
-        func_0029F338(actor);
+        table_clear_entry_flag(*(int *)(state + 0x20));
+        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, D_001B1CB0);
+        moby_mark_spawned(actor);
         return;
     }
     if ((u32)(((u8 *)actor)[0x20] - 2) < 3 && *(char **)(state + 0x38)) {
-        func_00283658(scratch.phase.attachment.transform, actor + 0xC0);
-        func_002AB6D8((float *)scratch.phase.attachment.transform, scratch.phase.attachment.angles.f);
-        if (func_002AD0E0((int)actor, *(int *)(state + 0x38), actor + 0x10, &scratch.phase.attachment.angles, actor + 0x10, &scratch.phase.attachment.adjusted))
-            func_002833F0(actor + 0xC0, &scratch.phase.attachment.adjusted);
+        copy_matrix_rotation(scratch.phase.attachment.transform, actor + 0xC0);
+        mat_get_euler_angles((float *)scratch.phase.attachment.transform, scratch.phase.attachment.angles.f);
+        if (moby_transform_point_and_rotation_by_parent((int)actor, *(int *)(state + 0x38), actor + 0x10, &scratch.phase.attachment.angles, actor + 0x10, &scratch.phase.attachment.adjusted))
+            euler_rotation_basis(actor + 0xC0, &scratch.phase.attachment.adjusted);
     }
 }

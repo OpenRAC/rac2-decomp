@@ -6,7 +6,7 @@ typedef struct { float u, v; } ScrollLayer;
 #define F32(p, o) (*(float *)((p) + (o)))
 #define S16(p, o) (*(short *)((p) + (o)))
 
-extern u8 D_00189E20[], D_00189EA0[];
+extern u8 g_hero_state[], g_hero_position[];
 extern float D_001A7928;
 extern int D_L09_001C9F80[];
 extern Quad D_L09_001B3100 SDATA(D_L09_001B3100);
@@ -20,17 +20,17 @@ extern float D_L09_001B3120 MACRO_ADDR;
 extern float D_L09_001B3124 MACRO_ADDR;
 extern int D_L09_001B2388;
 
-extern int func_002ACBC8(void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int), func_00283198(float);
-extern void func_L09_0037FCE8(void *);
-extern void func_L00_002E6DB8(void (*)(void *), void *);
-extern void func_L00_002E6CF0(void (*)(void *), void *);
+extern int IsPointInCuboid(void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern int FloatToInt(float);
+extern float IntToFloat(int), math_fast_sin_or_cos_b(float);
+extern void water_sheet_draw(void *);
+extern void gfx_add_draw_callback_second(void (*)(void *), void *);
+extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 
 /* Per-frame update of the water sheet object: scrolls the water textures with the hero movement, bobs the water height with a wave, and queues the water draw. */
-void func_L09_003806A0(u8 *object)
+void water_sheet_update(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     float delta[4] __attribute__((aligned(16)));
@@ -58,8 +58,8 @@ void func_L09_003806A0(u8 *object)
     for (i = 0; i < 4; i++) {
         if (I32(state, 0x40 + i * 4) == -1)
             continue;
-        if (IsPointInCuboid(gHeroPosition, I32(state, 0x40 + i * 4))) {
-            { u8 *h = gHeroState; S16(h, 0x1FE) = 0; }
+        if (IsPointInCuboid(g_hero_position, I32(state, 0x40 + i * 4))) {
+            { u8 *h = g_hero_state; S16(h, 0x1FE) = 0; }
             found = 1;
             break;
         }
@@ -71,12 +71,12 @@ void func_L09_003806A0(u8 *object)
     for (i = 0; i < 4; i++) {
         if (scan[i] == -1)
             continue;
-        if (IsPointInCuboid(gHeroPosition, scan[i])) {
+        if (IsPointInCuboid(g_hero_position, scan[i])) {
             D_L09_001B3124 = F32(D_L09_001B294C + scan[i] * 128, 0x38) + 0.15f;
             break;
         }
     }
-    { u8 *h = gHeroState; S16(h, 0x1FE) = 2; }
+    { u8 *h = g_hero_state; S16(h, 0x1FE) = 2; }
     FastVecSub(delta, D_L09_001B9A00, &D_L09_001B3100);
     qcopy(&D_L09_001B3100, D_L09_001B9A00);
     if (!(F32(state, 0x20) < F32(D_L09_001B9A00, 8)))
@@ -104,7 +104,7 @@ void func_L09_003806A0(u8 *object)
             D_L09_001B3110[i].v += 1.0f;
     }
     D_L09_001B3120 = D_L09_001B3124 +
-        FastSinOrCosB(IntToFloat(D_L09_001B2388 % 360) *
+        math_fast_sin_or_cos_b(IntToFloat(D_L09_001B2388 % 360) *
                      0.017444444820284843f - 3.140000104904175f) * F32(state, 0x34);
     for (i = 0; i < 2; i++) {
         D_L09_001B3110[i].u += D_L09_001AEC48[i * 2] * D_001A7928;
@@ -119,7 +119,7 @@ void func_L09_003806A0(u8 *object)
             D_L09_001B3110[i].v += 1.0f;
     }
     if (I32(state, 0x38))
-        AddDrawCallbackToList2(DrawWaterSheet_L09, object);
+        gfx_add_draw_callback_second(water_sheet_draw, object);
     else
-        AddDrawCallbackToList1(DrawWaterSheet_L09, object);
+        gfx_add_draw_callback_first(water_sheet_draw, object);
 }

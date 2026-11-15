@@ -1,28 +1,29 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef short s16;
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern void func_L02_003D2390(char *);
-extern void func_L02_003D4900(char *);
-extern void func_L02_003DB6D8(char *);
-extern void func_L02_003F18E8(char *);
-extern void func_L02_0040B980(char *);
-extern void func_L02_0040D180(char *);
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
-extern void func_L02_003D2390(char *);
-extern void func_L02_003D4900(char *);
-extern void func_L02_003DB6D8(char *);
-extern void func_L02_003F18E8(char *);
-extern void func_L02_0040B980(char *);
-extern void func_L02_0040D180(char *);
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
-extern s16 func_L02_004024A0(char *);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern void enemy_release_effect_record(char *);
+extern void chainblade_reset_to_idle(char *);
+extern void brawler_switch_off_actor(char *);
+extern void actor_tear_down(char *);
+extern void flamethrower_robot_knock_out(char *);
+extern void blade_ball_explode(char *);
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
+extern void enemy_release_effect_record(char *);
+extern void chainblade_reset_to_idle(char *);
+extern void brawler_switch_off_actor(char *);
+extern void actor_tear_down(char *);
+extern void flamethrower_robot_knock_out(char *);
+extern void blade_ball_explode(char *);
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
+extern s16 moby_get_vars_counter(char *);
 
 /* Walks the 16-bit stream the object's table entry points at and calls the handler of the
    entity type each word names; a negative word ends the stream. */
@@ -36,31 +37,31 @@ void func_PAL_L02_004002E8(char *a0) {
 
     if (index == 0xFF)
         return;
-    entry = D_L02_001FC060[index];
+    entry = g_entity_group_lists[index];
     if (entry == 0)
         return;
     p = (short *)entry;
     do {
-        rec = D_L02_001B359C + ((*(u16 *)p & 0x7FFF) << 8);
+        rec = g_moby_l02_pool + ((*(u16 *)p & 0x7FFF) << 8);
         type = *(s16 *)(rec + 0xAA);
         switch (type) {
         case 0x9CA:
-            func_L02_003D2390(rec);
+            enemy_release_effect_record(rec);
             break;
         case 0xB22:
-            func_L02_003F18E8(rec);
+            actor_tear_down(rec);
             break;
         case 0xC3B:
-            func_L02_0040B980(rec);
+            flamethrower_robot_knock_out(rec);
             break;
         case 0xC3E:
-            func_L02_0040D180(rec);
+            blade_ball_explode(rec);
             break;
         case 0x9F8:
-            func_L02_003D4900(rec);
+            chainblade_reset_to_idle(rec);
             break;
         case 0xA44:
-            func_L02_003DB6D8(rec);
+            brawler_switch_off_actor(rec);
             break;
         }
     } while (*p++ >= 0);

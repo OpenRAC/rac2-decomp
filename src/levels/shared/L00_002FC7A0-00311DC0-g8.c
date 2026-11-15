@@ -12,18 +12,18 @@ typedef struct {
     unsigned short reserved;
 } EnvironmentPreset;
 extern EnvironmentPreset *D_L00_001B1F40 __attribute__((section(".sdata")));
-extern unsigned char D_00188660[];
+extern unsigned char g_sound_state[];
 extern unsigned char D_L00_001B1980[] __attribute__((section(".sdata"))), D_L00_001B1981[] __attribute__((section(".sdata"))), D_L00_001B1982[] __attribute__((section(".sdata")));
 extern float D_L00_001B1984 __attribute__((section(".sdata"))), D_L00_001B1988 __attribute__((section(".sdata"))), D_L00_001B198C __attribute__((section(".sdata")));
 extern float D_L00_001B1990 __attribute__((section(".sdata")));
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
 extern void func_L00_00312098(void *, int, int, int, int);
-extern void func_002B6E78(int, int, int);
-extern void func_00279FF0(void);
+extern void snd_start_music_stream_no_loop(int, int, int);
+extern void gfx_apply_display_config(void);
 
 /* Applies the nearest preset within range, including its music and fog settings. */
-void func_L00_00311DC0(unsigned char *object)
+void level_apply_nearest_env_preset(unsigned char *object)
 {
     float position[4], delta[4];
     int i = 0, best = -1;
@@ -54,7 +54,7 @@ void func_L00_00311DC0(unsigned char *object)
     {
         EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
         if (row->audioEnabled) {
-            unsigned char *sound = gSoundState;
+            unsigned char *sound = g_sound_state;
             *(int *)(sound + 0x64) = row->audioMode;
             sound[0x68] = row->audio1;
             sound[0x69] = row->audio2;
@@ -62,7 +62,7 @@ void func_L00_00311DC0(unsigned char *object)
             sound[0x6b] |= 7;
         }
     }
-    StartMusicStreamNoLoop(D_L00_001B1F40[best].musicTrack, 1, 1024);
+    snd_start_music_stream_no_loop(D_L00_001B1F40[best].musicTrack, 1, 1024);
     {
         EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
         if (row->fogNear < row->fogFar) {
@@ -77,7 +77,7 @@ void func_L00_00311DC0(unsigned char *object)
             }
             D_L00_001B198C = row->nearIntensity;
             D_L00_001B1990 = row->farIntensity;
-            ApplyDisplayConfiguration();
+            gfx_apply_display_config();
         }
     }
 }

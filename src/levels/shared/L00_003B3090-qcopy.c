@@ -1,8 +1,8 @@
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float func_00282F70(void *, void *, float);
-extern void func_00277F48(void *, int, int, void *, float);
+extern float vec_fast_normalize_helper(void *, void *, float);
+extern void coll_process_hit(void *, int, int, void *, float);
 extern int D_L00_0018C0B0;
 
 struct S {
@@ -20,7 +20,7 @@ struct S {
 };
 
 /* Hurts everything near a point, using the size and damage kept in a shot's data. */
-void func_L00_003B3090(char *moby, char *vars, char *position) {
+void shot_damage_around(char *moby, char *vars, char *position) {
     struct S hit;
     char *shot = vars;
     char *owner = moby;
@@ -31,11 +31,11 @@ void func_L00_003B3090(char *moby, char *vars, char *position) {
     hit.f20 = 1;
     hit.p10 = owner;
     *(TI128 *)&hit.f0 = *(TI128 *)shot;
-    FastVectorNormalizeHelper(&hit, &hit, 1.0f);
+    vec_fast_normalize_helper(&hit, &hit, 1.0f);
     hit.f8 = 1.0f;
     hit.fC = 5627.925f;
     hit.b18 = 3;
     hit.b19 = 2;
     hit.h1A = *(unsigned short *)(owner + 0xAA);
-    ProcessCollisionHit(center, 1, D_L00_0018C0B0, &hit, *(float *)(shot + 0x30));
+    coll_process_hit(center, 1, D_L00_0018C0B0, &hit, *(float *)(shot + 0x30));
 }

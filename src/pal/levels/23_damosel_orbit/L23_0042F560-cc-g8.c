@@ -85,27 +85,27 @@ extern TI16 D_L23_002A6390[];
 
 extern float D_L23_002A6D50[][2];
 
-extern float func_00283B98(float, float);
+extern float FastAddRotations(float, float);
 
-extern float func_00283198(float);
+extern float math_fast_sin_or_cos_b(float);
 
-extern float func_00283180(float);
+extern float math_fast_sin_or_cos_a(float);
 
-extern float func_00283C28(float);
+extern float math_fast_float_g(float);
 
-extern float func_002A7878(float, float);
+extern float math_random_float_range(float, float);
 
-extern long long func_0027C878(s32);
+extern long long GetEffectTextureDescriptor(s32);
 
-extern void func_002FC560(u32, u64);
+extern void VU1_addGSregister(u32, u64);
 
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
-extern void func_002833F0(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
-extern void func_00283738(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
 
-extern void func_00280B90(void *, void *, s32);
+extern void draw_world_quad(void *, void *, s32);
 
 /* updates the spin state at +0x68 and draws 72 quads of four corners each (corner positions from
    one table, uv from another; the colour and two GS words sit in the packet), the packet's matrix
@@ -133,8 +133,8 @@ void func_PAL_L23_0042F560(u8 *moby) {
     if (D_L23_001B1484_2 != 0) {
         vars = *(L23Spin **)(moby + 0x68);
         D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
-        vars->turn = func_00283B98(vars->turn, (float)D_L23_001B1480 * 0.0003490659f);
-        f = func_00283198((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
+        vars->turn = FastAddRotations(vars->turn, (float)D_L23_001B1480 * 0.0003490659f);
+        f = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
         vars->alpha = (s32)(f * D_L23_001B1478);
         vars->alpha += D_L23_001B147C;
         reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
@@ -142,11 +142,11 @@ void func_PAL_L23_0042F560(u8 *moby) {
         reg |= (s64)D_L23_001B1BB8 << 6;
         reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
-        tex = func_0027C878(D_L23_001B1BC0);
+        tex = GetEffectTextureDescriptor(D_L23_001B1BC0);
         pkt.tail[2] = 0xFF9000000260LL;
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
-        func_002FC560(0x47, 0x53001);
+        VU1_addGSregister(0x47, 0x53001);
         hero = D_L23_001B1484_2;
         qcopy_nc(&m[0], hero + 0xC0);
         qcopy_nc(&m[1], hero + 0xD0);
@@ -155,8 +155,8 @@ void func_PAL_L23_0042F560(u8 *moby) {
         ((float *)&m[3])[3] = 1.0f;
         qzero_nc(axis);
         ((float *)axis)[2] = vars->turn;
-        func_002833F0(rot, axis);
-        func_00283738(m, m, rot);
+        euler_rotation_basis(rot, axis);
+        multiply_matrix3x3(m, m, rot);
         if (D_L23_001B3714 == 0) {
             col = (vars->alpha << 24) + (D_L23_001B1BC4 & 0xFFFFFF);
             pkt.col[3] = col;
@@ -180,21 +180,21 @@ void func_PAL_L23_0042F560(u8 *moby) {
             for (k = 3; k >= 0; k--) {
                 s32 b = e->b;
 
-                func_00282D30(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
-                vars->spin = func_00283B98(vars->spin, D_L23_001B1BCC * 0.0003490659f);
-                func_00283C28(vars->spin);
+                FastVecScale(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
+                vars->spin = FastAddRotations(vars->spin, D_L23_001B1BCC * 0.0003490659f);
+                math_fast_float_g(vars->spin);
                 if (D_L23_001B3714 == 0) {
-                    fa = func_00283180(vars->spin) * D_L23_001B1BD8;
-                    fb = func_00283198(vars->spin) * D_L23_001B1BDC;
-                    fc = func_00283180(vars->spin) * D_L23_001B1BE0;
-                    fd = func_00283198(vars->spin) * D_L23_001B1BE4;
+                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BD8;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BDC;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BE0;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BE4;
                 } else {
-                    fa = func_00283180(vars->spin) * D_L23_001B1BF0;
-                    fb = func_00283198(vars->spin) * D_L23_001B1BF4;
-                    fc = func_00283180(vars->spin) * D_L23_001B1BF8;
-                    fd = func_00283198(vars->spin) * D_L23_001B1BFC;
+                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF0;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BF4;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF8;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BFC;
                 }
-                f = func_002A7878(D_L23_001B1BD0, D_L23_001B1BD4);
+                f = math_random_float_range(D_L23_001B1BD0, D_L23_001B1BD4);
                 *uvx = (D_L23_002A6D50[b][0] * fa + fb) * f;
                 *uvy = D_L23_002A6D50[b][1] * fc + fd;
                 pos++;
@@ -202,7 +202,7 @@ void func_PAL_L23_0042F560(u8 *moby) {
                 uvx += 2;
                 uvy += 2;
             }
-            func_00280B90(&pkt, m, 0);
+            draw_world_quad(&pkt, m, 0);
         }
     }
 }

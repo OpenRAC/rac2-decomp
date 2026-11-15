@@ -19,21 +19,21 @@ typedef struct {
     char pad[0x140];
     float x, y, z;
 } EffectCamera;
-extern EffectCamera D_001B5200;
+extern EffectCamera g_active_camera;
 /* These typed interleavings preserve the EE integer and floating-point argument banks. */
-extern char *func_002C65A0(void *, void *, int, int, int, int, int, float, float, float, int);
-extern char *func_002C7970(void *, void *, int, int, int, int, int, float, float, float, int);
-extern char *func_002C6DD8(void *, void *, int, float);
-extern float func_002A7878(float, float), func_002A78D8(float, float);
-extern int func_002A7820(int, int), func_00283CF0(float);
-extern float func_00283CE0(int), func_00283248(float, float);
-extern float func_00283B98(float, float), func_00283180(float), func_00283198(float);
-extern void func_00282CC0(void *, void *, void *), func_00282D30(void *, void *, float);
-extern void func_002AB668(void *, void *, float), func_002ACDE8(void *, void *, void *);
-extern void func_00308408(void *, void *, void *, int, int, int, int, int, float);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void func_002AF000(void *, float, float, float);
-extern char *func_002BDCE8(void *, float, float, float, float, int, void *, int, int);
+extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
+extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, float, float, float, int);
+extern char *part_spawn_trail_2(void *, void *, int, float);
+extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
+extern int math_random_int_range(int, int), FloatToInt(float);
+extern float IntToFloat(int), mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
+extern void math_build_axis_angle_quat(void *, void *, float), vec_rotate_by_quaternion(void *, void *, void *);
+extern void part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern char *SpawnSpinningSparkParticle(void *, float, float, float, float, int, void *, int, int);
 
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define I(p, o) (*(int *)((char *)(p) + (o)))
@@ -59,22 +59,22 @@ void func_PAL_0032E268(char *object, void *radial, void *attachment, float dista
         angle = D_001B06C4 * F(state, 0x14) * 210000.0f;
         size = D_001B06C8 * F(state, 0x14) * 210000.0f;
         {
-            particle = func_002C65A0(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 100, 0, angle, size, 0.0f, 0);
+            particle = part_spawn_gravity_fade(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 100, 0, angle, size, 0.0f, 0);
             if (particle) particle[2] = D_001F26B0[0];
-            particle = func_002C65A0(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x63F7, 0, 100, 0, angle, size, 0.0f, 0);
+            particle = part_spawn_gravity_fade(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x63F7, 0, 100, 0, angle, size, 0.0f, 0);
             if (particle) particle[2] = D_001F26B0[0];
         }
         {
             int i;
             for (i = 0; i < 2; i++) {
-                particle = func_002C65A0(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 127, 0, angle, size, 0.0f, 0);
+                particle = part_spawn_gravity_fade(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 127, 0, angle, size, 0.0f, 0);
                 if (particle) particle[2] = ((EffectTextures *)D_001F2540)->b[5];
             }
         }
         {
             int i;
             for (i = 0; i < 2; i++) {
-                particle = func_002C65A0(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 127, 0, angle, size, 0.0f, 0);
+                particle = part_spawn_gravity_fade(object + 0x10, attachment, (D_001B06CC * 5 + 2) / 6, 0x388EF7, 0, 127, 0, angle, size, 0.0f, 0);
                 if (particle) particle[2] = ((EffectTextures *)D_001F2540)->b[6];
             }
         }
@@ -85,23 +85,23 @@ void func_PAL_0032E268(char *object, void *radial, void *attachment, float dista
             int spin, life;
             char *particle;
             float facing, size, speed, angle;
-            facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            life = func_002A7820(30, 50);
-            pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
-            speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
-            velocity.x = func_00283180(angle) * 0.020000001f * speed;
-            velocity.y = func_00283198(angle) * 0.020000001f * speed;
+            facing = mat_fast_helper_a(g_active_camera.x - F(object, 0x10), g_active_camera.y - F(object, 0x14));
+            spin = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            life = math_random_int_range(30, 50);
+            pos.x = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.y = F(object, 0x14) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.z = F(object, 0x18) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            size = math_random_float_range(0.6f, 1.0f) * F(state, 0x14);
+            speed = math_random_float_range(9.0f, 12.0f) * F(state, 0x14);
+            angle = FastAddRotations(facing, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity.x = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
+            velocity.y = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
             velocity.z = 0.0f;
-            speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+            speed = math_random_float_range(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.020000001f;
-            func_00282CC0(&velocity, &velocity, attachment);
-            particle = func_002C7970(&pos, &velocity, (life * 5 + 2) / 6, 0x407FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 1);
-            particle = func_002C7970(&pos, &velocity, (life * 5 + 2) / 6, 0x20FF, -(spin * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.00584f, 0);
+            FastVecAdd(&velocity, &velocity, attachment);
+            particle = part_spawn_fading_drift(&pos, &velocity, (life * 5 + 2) / 6, 0x407FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 1);
+            particle = part_spawn_fading_drift(&pos, &velocity, (life * 5 + 2) / 6, 0x20FF, -(spin * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.00584f, 0);
             if (particle) particle[2] = ((EffectTextures *)D_001F2540)->a[0];
         }
     }
@@ -111,22 +111,22 @@ void func_PAL_0032E268(char *object, void *radial, void *attachment, float dista
             int spin, life;
             char *particle;
             float facing, size, speed, angle;
-            facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            life = func_002A7820(30, 50);
-            pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            size = func_002A7878(0.75f, 1.5f) * F(state, 0x14);
-            speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
-            velocity.x = func_00283180(angle) * 0.020000001f * speed;
-            velocity.y = func_00283198(angle) * 0.020000001f * speed;
+            facing = mat_fast_helper_a(g_active_camera.x - F(object, 0x10), g_active_camera.y - F(object, 0x14));
+            spin = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            life = math_random_int_range(30, 50);
+            pos.x = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.y = F(object, 0x14) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.z = F(object, 0x18) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            size = math_random_float_range(0.75f, 1.5f) * F(state, 0x14);
+            speed = math_random_float_range(9.0f, 12.0f) * F(state, 0x14);
+            angle = FastAddRotations(facing, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity.x = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
+            velocity.y = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
             velocity.z = 0.0f;
-            speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+            speed = math_random_float_range(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.020000001f;
-            func_00282CC0(&velocity, &velocity, attachment);
-            particle = func_002C7970(&pos, &velocity, (life * 5 + 2) / 6, 0x8FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 5);
+            FastVecAdd(&velocity, &velocity, attachment);
+            particle = part_spawn_fading_drift(&pos, &velocity, (life * 5 + 2) / 6, 0x8FFF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 5);
         }
     }
     {
@@ -135,22 +135,22 @@ void func_PAL_0032E268(char *object, void *radial, void *attachment, float dista
             int spin, life;
             char *particle;
             float facing, size, speed, angle;
-            facing = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
-            spin = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-            life = func_002A7820(30, 50);
-            pos.x = F(object, 0x10) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.y = F(object, 0x14) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            pos.z = F(object, 0x18) + func_002A78D8(0.0f, 0.1f) * F(state, 0x14);
-            size = func_002A7878(0.6f, 1.0f) * F(state, 0x14);
-            speed = func_002A7878(9.0f, 12.0f) * F(state, 0x14);
-            angle = func_00283B98(facing, func_002A78D8(0.0f, 1.396263599395752f));
-            velocity.x = func_00283180(angle) * 0.020000001f * speed;
-            velocity.y = func_00283198(angle) * 0.020000001f * speed;
+            facing = mat_fast_helper_a(g_active_camera.x - F(object, 0x10), g_active_camera.y - F(object, 0x14));
+            spin = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            life = math_random_int_range(30, 50);
+            pos.x = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.y = F(object, 0x14) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            pos.z = F(object, 0x18) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
+            size = math_random_float_range(0.6f, 1.0f) * F(state, 0x14);
+            speed = math_random_float_range(9.0f, 12.0f) * F(state, 0x14);
+            angle = FastAddRotations(facing, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity.x = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
+            velocity.y = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
             velocity.z = 0.0f;
-            speed = func_002A7878(0.0f, 12.0f) * F(state, 0x14);
+            speed = math_random_float_range(0.0f, 12.0f) * F(state, 0x14);
             velocity.z = speed * 0.020000001f;
-            func_00282CC0(&velocity, &velocity, attachment);
-            particle = func_002C7970(&pos, &velocity, (life * 5 + 2) / 6, 0x3064FF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 3);
+            FastVecAdd(&velocity, &velocity, attachment);
+            particle = part_spawn_fading_drift(&pos, &velocity, (life * 5 + 2) / 6, 0x3064FF, spin, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 3);
         }
     }
     {
@@ -158,50 +158,50 @@ void func_PAL_0032E268(char *object, void *radial, void *attachment, float dista
         for (i = 0; i < I(state, 0x30); i++) {
             float speed, angle, turn;
             int life;
-            speed = func_002A7878(15.0f, 20.0f) * F(state, 0x14);
-            func_00282D30(&pos, object + 0xC0, speed * 0.020000001f);
-            angle = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
-            turn = func_002A78D8(0.2617994248867035f, 1.396263599395752f);
-            func_002AB668(&rotated, object + 0xD0, angle);
-            func_002ACDE8(&velocity, &pos, &rotated);
-            func_002AB668(&rotated, object + 0xC0, turn);
-            func_002ACDE8(&velocity, &velocity, &rotated);
-            func_00282CC0(&velocity, &velocity, attachment);
-            life = func_002A7820(20, 35);
-            func_002C6DD8(object + 0x10, &velocity, (life * 5 + 2) / 6, 0.00584f);
+            speed = math_random_float_range(15.0f, 20.0f) * F(state, 0x14);
+            FastVecScale(&pos, object + 0xC0, speed * 0.020000001f);
+            angle = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
+            turn = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
+            math_build_axis_angle_quat(&rotated, object + 0xD0, angle);
+            vec_rotate_by_quaternion(&velocity, &pos, &rotated);
+            math_build_axis_angle_quat(&rotated, object + 0xC0, turn);
+            vec_rotate_by_quaternion(&velocity, &velocity, &rotated);
+            FastVecAdd(&velocity, &velocity, attachment);
+            life = math_random_int_range(20, 35);
+            part_spawn_trail_2(object + 0x10, &velocity, (life * 5 + 2) / 6, 0.00584f);
         }
     }
     if (I(state, 0x34)) {
         *(EffectQuad *)&velocity = 0;
         velocity.z = F(state, 0x14) * 0.16000001f;
         *(EffectQuad *)&pos = *(EffectQuad *)&velocity;
-        func_00282CC0(&pos, &pos, attachment);
-        func_00308408(object, object + 0x10, &pos, (16 * 5 + 2) / 6, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
+        FastVecAdd(&pos, &pos, attachment);
+        part_spawn_shockwave_ring(object, object + 0x10, &pos, (16 * 5 + 2) / 6, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
     }
-    func_002ABBB8(object, D_001A8BD0, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, distance * F(state, 0x14), 0, 0, -1, 0, 0x810001);
+    SpawnExplosionEffects(object, D_001A8BD0, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, distance * F(state, 0x14), 0, 0, -1, 0, 0x810001);
     {
         float angle;
         sign = 1;
-        angle = func_00283248(D_001B5200.x - F(object, 0x10), D_001B5200.y - F(object, 0x14));
+        angle = mat_fast_helper_a(g_active_camera.x - F(object, 0x10), g_active_camera.y - F(object, 0x14));
         for (i = 0; i < I(state, 0x2C); i++) {
             float size, turn, height;
             char *particle;
             sign = -sign;
-            pos.x = F(object, 0x10) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
-            pos.y = F(object, 0x14) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
-            pos.z = F(object, 0x18) + func_002A78D8(0.0f, 1.0f) * F(state, 0x14);
-            size = func_002A7878(0.020000001f, 0.040000003f) * F(state, 0x14);
-            turn = func_002A78D8(0.0f, 1.396263599395752f);
-            height = func_00283B98(angle, func_002A78D8(0.0f, 1.5707964897155762f));
-            func_002AF000(&velocity, size, height, turn);
-            func_00282CC0(&velocity, &velocity, attachment);
-            particle = func_002BDCE8(&pos, 0.0f, 1.0f, 1.0099999904632568f, F(state, 0x14) * 315000.0f, sign, &velocity, 0x7F60A0FF, 0);
+            pos.x = F(object, 0x10) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);
+            pos.y = F(object, 0x14) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);
+            pos.z = F(object, 0x18) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);
+            size = math_random_float_range(0.020000001f, 0.040000003f) * F(state, 0x14);
+            turn = math_random_signed_float_range(0.0f, 1.396263599395752f);
+            height = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.5707964897155762f));
+            vec_build_spherical_offset(&velocity, size, height, turn);
+            FastVecAdd(&velocity, &velocity, attachment);
+            particle = SpawnSpinningSparkParticle(&pos, 0.0f, 1.0f, 1.0099999904632568f, F(state, 0x14) * 315000.0f, sign, &velocity, 0x7F60A0FF, 0);
             if (particle) {
                 EffectParticleData *data = (EffectParticleData *)(particle + 0x20);
-                *(short *)(particle + 0xA) = (func_002A7820(40, 70) * 5 + 2) / 6;
-                particle[9] = func_00283CF0(4.0f) + 64;
+                *(short *)(particle + 0xA) = (math_random_int_range(40, 70) * 5 + 2) / 6;
+                particle[9] = FloatToInt(4.0f) + 64;
                 data->mode = 3;
-                data->growth = func_00283CE0((func_002A7820(1, 10) * 5 + 2) / 6);
+                data->growth = IntToFloat((math_random_int_range(1, 10) * 5 + 2) / 6);
                 data->alpha = 64;
                 data->life = particle[0xA];
             }

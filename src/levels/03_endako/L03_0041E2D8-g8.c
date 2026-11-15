@@ -8,62 +8,62 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; struct { float x,y,z,w; } v; } VecE2D8;
 extern VecE2D8 D_L03_001B1C30 SDATA(D_L03_001B1C30);
 extern float D_L03_001B1C08 __attribute__((sda));
-extern u8 D_L03_001B9980[], D_00189EA0[];
+extern u8 D_L03_001B9980[], g_hero_position[];
 typedef struct { u8 pad[0x80]; float x,y; u8 gap[0x222C]; u8 flag; } HeroE2D8;
-extern HeroE2D8 D_00189E20;
+extern HeroE2D8 g_hero_state;
 extern u8 D_L03_001A8F20[] __attribute__((sda));
 extern u8 *D_L03_001B2B0C;
 extern u8 *D_L03_001FE700[];
-extern void func_L03_0041EAE0(u8 *);
-extern void func_L03_0041EF90(u8 *);
-extern void func_L03_0041F178(u8 *);
-extern void func_L03_0041F720(u8 *);
-extern int func_002ACBC8(void *, int);
-extern void func_002E59F8(int);
-extern int func_002B1C20(void *,void *);
-extern int func_002B3868(void *);
-extern int func_002B38B8(void *);
-extern void func_L00_003294F0(void *,int);
-extern float func_00282C48(float);
-extern void func_00283098(void *,void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
-extern void func_002B0A68(void *,float,float,int,void *,float,float,int);
-extern int func_002E5CF8(int,int,void *);
-extern void func_002A6C58(void *,int,int);
-extern void func_002A7750(void *,int,int);
-extern void func_002A7470(void *,int,int,int);
-extern void func_002AA2E8(void *,float,float);
-extern float func_00283B98(float,float);
-extern int func_L01_00321178(void *,void *);
-extern void func_L00_002E6CF0(void *,void *);
-extern void func_0029FCC0(int,int,void *);
-extern int func_00277258(void *,float,int,void *);
-extern void func_0029F338(void *);
-extern float func_00283248(float,float);
-extern float func_00283198(float);
+extern void laser_bot_init_check_hit(u8 *);
+extern void robot_update_timers(u8 *);
+extern void laser_bot_trace_beam(u8 *);
+extern void DrawBeamQuadsAndRingTrail(u8 *);
+extern int IsPointInCuboid(void *, int);
+extern void snd_stop_voice(int);
+extern int moby_dispatch_action_by_kind(void *,void *);
+extern int flag_set_first_pending(void *);
+extern int flag_is_third_pending_set(void *);
+extern void moby_set_flag_bit(void *,int);
+extern float math_fabs(float);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecSub(void *,void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern void part_spawn_masked_debris(void *,float,float,int,void *,float,float,int);
+extern int PlayMobySound(int,int,void *);
+extern void SetDeathBits(void *,int,int);
+extern void moby_set_state(void *,int,int);
+extern void anim_start_blended(void *,int,int,int);
+extern void ApproachValue(void *,float,float);
+extern float FastAddRotations(float,float);
+extern int moby_l01_turn_toward_target(void *,void *);
+extern void gfx_add_draw_callback_first(void *,void *);
+extern void moby_transform_joint_to_world(int,int,void *);
+extern int coll_test_point(void *,float,int,void *);
+extern void moby_mark_spawned(void *);
+extern float mat_fast_helper_a(float,float);
+extern float math_fast_sin_or_cos_b(float);
 /* Hands back func_002B50E0's int in v0 (L02_003F0798.c declares it the same way). */
-extern int func_002B5278(void *,float);
-extern int func_002A8C28(void *,void *,int,float,float,float,int,int,int);
-extern int func_L02_002EF388(void *,void *,void *,void *,int);
+extern int moby_step_at_own_position_factor(void *,float);
+extern int coll_sweep_from_object(void *,void *,int,float,float,float,int,int,int);
+extern int moby_fuse_linked_objects(void *,void *,void *,void *,int);
 
 /* Runs the laser bot: it follows its path, fires a laser beam and blows up when hit. */
-void func_L03_0041E2D8(u8 *entity) {
+void laser_bot_update(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     int flags;
     u8 *path;
     VecE2D8 point, delta;
     float angle;
-    InitLaserBotAndCheckHit(entity);
+    laser_bot_init_check_hit(entity);
     switch (entity[0x95]) {
     case 0:
         if (WORD(state,0x294) != -1) {
             if (!IsPointInCuboid(D_L03_001B9980,WORD(state,0x294))) {
                 if (WORD(state,0x340) != -1) {
-                    StopSoundVoice(WORD(state,0x340));
+                    snd_stop_voice(WORD(state,0x340));
                     WORD(state,0x340) = -1;
                 }
                 entity[0x31] = 0;
@@ -75,33 +75,33 @@ void func_L03_0041E2D8(u8 *entity) {
         }
         break;
     case 3:
-        flags = DispatchActionByKind(entity,state+0x60);
-        if (SetFirstPendingFlag(entity)) {
+        flags = moby_dispatch_action_by_kind(entity,state+0x60);
+        if (flag_set_first_pending(entity)) {
             if (WORD(state,0x340) != -1) {
-                StopSoundVoice(WORD(state,0x340));
+                snd_stop_voice(WORD(state,0x340));
                 WORD(state,0x340) = -1;
             }
         }
-        if ((flags & 1) || FloatAbs(FLOAT(entity,0xF4)) > 0.1f) {
+        if ((flags & 1) || math_fabs(FLOAT(entity,0xF4)) > 0.1f) {
             matrix_mul_vec3(&point,&D_L03_001B1C30,entity+0xC0);
             FastVecAdd(&point,&point,entity+0x10);
             SpawnExplosion(&point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-            FastVecSub(&delta,entity+0x10,gHeroPosition);
+            FastVecSub(&delta,entity+0x10,g_hero_position);
             delta.v.z = 0;
             vec_scale_to_length(&delta,&delta,0.10000001f);
-            SpawnDebrisForMaskedParts(entity,3.0f,6.0f,31,&delta,3.0f,6.0f,255);
+            part_spawn_masked_debris(entity,3.0f,6.0f,31,&delta,3.0f,6.0f,255);
             PlayMobySound(3,0,entity);
             SetDeathBits(entity,0,3);
-            MarkMobySpawned(entity);
+            moby_mark_spawned(entity);
             return;
         }
         if (flags & 2) {
             if (WORD(state,0x288)) {
-                SetMobyState(entity,4,1);
-                if (entity[0x43]) StartAnimationBlended(entity,0,0,10);
+                moby_set_state(entity,4,1);
+                if (entity[0x43]) anim_start_blended(entity,0,0,10);
             } else {
-                SetMobyState(entity,3,0);
-                if (entity[0x43]) StartAnimationBlended(entity,0,0,10);
+                moby_set_state(entity,3,0);
+                if (entity[0x43]) anim_start_blended(entity,0,0,10);
             }
         }
         break;
@@ -109,21 +109,21 @@ void func_L03_0041E2D8(u8 *entity) {
     switch (entity[0x20]) {
     case 3:
         path = D_L03_001FE700[WORD(state,0x280)];
-        if (SetFirstPendingFlag(entity)) {
+        if (flag_set_first_pending(entity)) {
             UHALF(state,0x334)=0;
             UHALF(state,0x336)=0;
-        } else if (IsThirdPendingFlagSet(entity)) {
-            SetObjectFlagBit(entity,0);
+        } else if (flag_is_third_pending_set(entity)) {
+            moby_set_flag_bit(entity,0);
             FLOAT(state,0x134)=0.0027777778f;
             FLOAT(state,0x130)=0.0027777778f;
             WORD(state,0x138)=0;
         }
         ApproachValue(state+0x33C,6.0f,0.050000004f);
-        TraceLaserBeam(entity);
+        laser_bot_trace_beam(entity);
         FLOAT(entity,0xF8)=FastAddRotations(FLOAT(entity,0xF8),D_L03_001B1C08*0.0002908882452175021f);
-        if (TurnMobyTowardTarget(entity,path+(HALF(state,0x32C)*16+16))&0x80)
+        if (moby_l01_turn_toward_target(entity,path+(HALF(state,0x32C)*16+16))&0x80)
             HALF(state,0x32C)=(HALF(state,0x32C)+1)%WORD(path,0);
-        if (UHALF(entity,0x96)>=6) AddDrawCallbackToList1(DrawBeamQuadsAndRingTrail,entity);
+        if (UHALF(entity,0x96)>=6) gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
         break;
     case 2:
         if (!WORD(state,0x290)) {
@@ -132,19 +132,19 @@ void func_L03_0041E2D8(u8 *entity) {
         }
         point.q=0; point.v.x=6.0f; point.v.w=1.0f;
         transform_vector(&point,&point,D_L03_001B2B0C+WORD(state,0x284)*128);
-        if (TurnMobyTowardTarget(entity,&point)&0x80) SetMobyState(entity,3,-1);
+        if (moby_l01_turn_toward_target(entity,&point)&0x80) moby_set_state(entity,3,-1);
         break;
     case 6:
         point.q=0;point.v.z=0.5f;
         matrix_mul_vec3(&point,&point,entity+0xC0);
-        TransformMobyJointToWorld(WORD(state,0x338),2,&delta);
+        moby_transform_joint_to_world(WORD(state,0x338),2,&delta);
         qcopy(entity+0x10,&delta);
         FLOAT(entity,0x18)-=0.75f;
         FastVecSub(entity+0x10,entity+0x10,&point);
         ApproachValue(entity+0xF4,1.5707964f,0.10471977f);
         ApproachValue(state+0x33C,10.0f,0.06666667f);
-        TraceLaserBeam(entity);
-        AddDrawCallbackToList1(DrawBeamQuadsAndRingTrail,entity);
+        laser_bot_trace_beam(entity);
+        gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
         break;
     case 7:
         FLOAT(state,0x1B8)-=0.004166667f;
@@ -152,48 +152,48 @@ void func_L03_0041E2D8(u8 *entity) {
         point.q=0;point.v.z=0.5f;
         matrix_mul_vec3(&point,&point,entity+0xC0);
         FastVecAdd(&point,&point,entity+0x10);
-        TraceLaserBeam(entity);
-        AddDrawCallbackToList1(DrawBeamQuadsAndRingTrail,entity);
-        if (TestPointAgainstCollision(&point,0.5f,0,entity)) {
+        laser_bot_trace_beam(entity);
+        gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
+        if (coll_test_point(&point,0.5f,0,entity)) {
             matrix_mul_vec3(&delta,&D_L03_001B1C30,entity+0xC0);
             FastVecAdd(&delta,&delta,entity+0x10);
             SpawnExplosion(&delta,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-            SpawnDebrisForMaskedParts(entity,3.0f,6.0f,31,D_L03_001A8F20,3.0f,6.0f,255);
-            MarkMobySpawned(entity);
+            part_spawn_masked_debris(entity,3.0f,6.0f,31,D_L03_001A8F20,3.0f,6.0f,255);
+            moby_mark_spawned(entity);
             return;
         }
         break;
     case 4:
-        if (gHeroState.flag == 1) SetMobyState(entity,5,-1);
+        if (g_hero_state.flag == 1) moby_set_state(entity,5,-1);
         break;
     case 5:
         FLOAT(state,0x29C)=FastAddRotations(FLOAT(state,0x29C),0.10471977f);
-        angle=FastMatrixHelperA(gHeroState.x-FLOAT(entity,0x10),gHeroState.y-FLOAT(entity,0x14));
-        StepMovementAtOwnPositionWithFactor(entity,FastAddRotations(angle,FastSinOrCosB(FLOAT(state,0x29C))*0.087266475f));
-        TraceLaserBeam(entity);
-        if (UHALF(entity,0x96)>=6) AddDrawCallbackToList1(DrawBeamQuadsAndRingTrail,entity);
-        if (gHeroState.flag!=1) SetMobyState(entity,4,-1);
+        angle=mat_fast_helper_a(g_hero_state.x-FLOAT(entity,0x10),g_hero_state.y-FLOAT(entity,0x14));
+        moby_step_at_own_position_factor(entity,FastAddRotations(angle,math_fast_sin_or_cos_b(FLOAT(state,0x29C))*0.087266475f));
+        laser_bot_trace_beam(entity);
+        if (UHALF(entity,0x96)>=6) gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
+        if (g_hero_state.flag!=1) moby_set_state(entity,4,-1);
         break;
     case 9:
-        if (SetFirstPendingFlag(entity)) {
+        if (flag_set_first_pending(entity)) {
             if (WORD(state,0x340)!=-1) {
-                StopSoundVoice(WORD(state,0x340));
+                snd_stop_voice(WORD(state,0x340));
                 WORD(state,0x340)=-1;
             }
         }
-        if (IsThirdPendingFlagSet(entity)) {
-            SetObjectFlagBit(entity,0);
-            SetMobyState(entity,2,0);
+        if (flag_is_third_pending_set(entity)) {
+            moby_set_flag_bit(entity,0);
+            moby_set_state(entity,2,0);
             UHALF(entity,0x34)=(UHALF(entity,0x34)&0xFFBE)|0x1000;
             WORD(entity,0x98)=WORD(*(u8 **)(entity+0x24),0x10);
-            SweepCollisionFromObject(entity,entity+0x10,0x10001,0.5f,2.0f,1.0f,0,1,0);
+            coll_sweep_from_object(entity,entity+0x10,0x10001,0.5f,2.0f,1.0f,0,1,0);
             { u8 *transform=D_L03_001B2B0C+WORD(state,0x284)*128;
-            FuseObjectWithLinkedObjects(entity,transform+0x30,transform+0x70,0,0); }
+            moby_fuse_linked_objects(entity,transform+0x30,transform+0x70,0,0); }
             entity[0x7F]=0;
         }
         WORD(entity,0x98)=0;
         UHALF(entity,0x34)=(UHALF(entity,0x34)|0x41)&0xEFFF;
         break;
     }
-    UpdateRobotTimers(entity);
+    robot_update_timers(entity);
 }

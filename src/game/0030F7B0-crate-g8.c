@@ -60,30 +60,30 @@ typedef struct {
     float point[4];             /* 0x20 */
 } Collision;
 
-extern int D_001B1688 __attribute__((sda));     /* the frame counter */
-extern Hero D_00189E20;
-extern Collision D_001BAF80;
+extern int g_game_time __attribute__((sda));     /* the frame counter */
+extern Hero g_hero_state;
+extern Collision g_collision_hit;
 
-extern int func_002ABB78(Moby *moby);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00283098(void *out, void *vector, void *matrix);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern float func_00282C48(float value);
-extern float func_002AA2E8(void *value, float target, float step);
-extern float func_00282DF0(void *vector);
-extern void func_003120C8(Moby *moby, int, int);
-extern void func_00311F70(Moby *moby);
-extern void func_002AD470(Moby *moby, void *attachment, void *position, void *rotation,
+extern int moby_is_in_special_class_range(Moby *moby);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void matrix_mul_vec3(void *out, void *vector, void *matrix);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern float math_fabs(float value);
+extern float ApproachValue(void *value, float target, float step);
+extern float FastVecLength(void *vector);
+extern void DestroyCrate(Moby *moby, int, int);
+extern void crate_drop_loot(Moby *moby);
+extern void coll_apply_push_to_object(Moby *moby, void *attachment, void *position, void *rotation,
                           void *outPosition, void *outRotation);
-extern void func_002AD6F0(void *, void *movement, void *previousRotation, void *rotation);
-extern AttachmentInfo *func_002AD0B0(void *attachment);
-extern int func_002761F8(void *start, void *end, int, void *moby, int);
+extern void mat_combine_and_store(void *, void *movement, void *previousRotation, void *rotation);
+extern AttachmentInfo *moby_get_private_value_2(void *attachment);
+extern int CollLine(void *start, void *end, int, void *moby, int);
 
 /* Adapted from RAC1 update_crate_stack_motion (GPL-3.0).
  * Moves a stack of crates once a frame, from the bottom crate up: breaks a crate the hero
  * touches from below, then lets each one ride what it is attached to, or fall until it lands
  * on the ground or on the crate below. */
-void func_00312600(Moby *moby)
+void UpdateCrateStackMotion(Moby *moby)
 {
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
@@ -102,7 +102,7 @@ void func_00312600(Moby *moby)
     if (moby->state == 0)
         return;
     vars = moby->vars;
-    if (vars->frame == gGameTime)
+    if (vars->frame == g_game_time)
         return;
 
     next = moby;
@@ -119,18 +119,18 @@ void func_00312600(Moby *moby)
         if (!(vars->flags & 4))
             vars->flags &= ~0x10;
         vars->flags &= ~4;
-        if (!IsMobyInSpecialClassRange(moby) || (vars->flags & 2))
+        if (!moby_is_in_special_class_range(moby) || (vars->flags & 2))
             return;
-        vars->frame = gGameTime;
+        vars->frame = g_game_time;
         if (moby->state != 0) {
             /* A crate the hero touches from below breaks and drops its loot. */
-            FastVecSub(delta, gHeroState.position, moby->position);
+            FastVecSub(delta, g_hero_state.position, moby->position);
             matrix_mul_vec3(delta, delta, moby->matrix);
-            if (FloatAbs(delta[0]) < 0.55f && FloatAbs(delta[1]) < 0.55f &&
-                delta[2] < 0.0f && delta[2] > -(gHeroState.f250 + gHeroState.f264) &&
+            if (math_fabs(delta[0]) < 0.55f && math_fabs(delta[1]) < 0.55f &&
+                delta[2] < 0.0f && delta[2] > -(g_hero_state.f250 + g_hero_state.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
                 DestroyCrate(moby, moby->oClass == 0x1F9 /* Explosive Crate */, 0);
-                DropCrateLoot(moby);
+                crate_drop_loot(moby);
             }
 
             {
@@ -145,7 +145,7 @@ void func_00312600(Moby *moby)
                 /* Ride the attachment, the lift easing towards its target. */
                 if (vars->below == 0) {
                     vars->velocity[3] -= 0.0027777778f;
-                    if (ApproachValue(&vars->lift, 0.0f, FloatAbs(vars->velocity[3])) == 0.0f)
+                    if (ApproachValue(&vars->lift, 0.0f, math_fabs(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 } else {
                     float target;
@@ -153,7 +153,7 @@ void func_00312600(Moby *moby)
                     vars->velocity[3] -= 0.0027777778f;
                     target = vars->below->vars->lift + 1.0f;
                     if (ApproachValue(&vars->lift, target,
-                                      FloatAbs(vars->velocity[3])) == 0.0f)
+                                      math_fabs(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 }
                 qcopy(attachPosition, vars->attachOffset);
@@ -162,16 +162,16 @@ void func_00312600(Moby *moby)
                     moby->f36 = 0x7F80;
                 qcopy(previousPosition, moby->position);
                 qcopy(previousRotation, moby->rotation);
-                ApplyCollisionPushToObject(moby, vars->attachment, attachPosition, vars->attachRotation,
+                coll_apply_push_to_object(moby, vars->attachment, attachPosition, vars->attachRotation,
                               moby->position, moby->rotation);
-                if (GetMobyPrivateValue2(vars->attachment)->flags & 4) {
+                if (moby_get_private_value_2(vars->attachment)->flags & 4) {
                     qcopy(vars->attachOffset, attachPosition);
                     vars->attachOffset[2] -= vars->lift;
                 }
                 FastVecSub(movement, moby->position, previousPosition);
                 movement[3] = vars->velocity[3];
                 qcopy(vars->velocity, movement);
-                CombineTransformsAndStore(vars->f50, vars->velocity, previousRotation, moby->rotation);
+                mat_combine_and_store(vars->f50, vars->velocity, previousRotation, moby->rotation);
             } else {
                 /* Fall until the line down from the crate hits the ground, or onto the crate
                  * below. */
@@ -181,7 +181,7 @@ void func_00312600(Moby *moby)
                     start[2] += vars->height * 0.75f;
                     end[2] += vars->velocity[2];
                     landed = CollLine(start, end, 2, 0, 0);
-                    qcopy(hit, gCollisionHit.point);
+                    qcopy(hit, g_collision_hit.point);
                 } else {
                     qcopy(hit, vars->below->position);
                     hit[2] += 1.0f;

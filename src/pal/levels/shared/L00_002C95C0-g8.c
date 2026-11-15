@@ -23,7 +23,7 @@ typedef struct {
     unsigned char pad17[0x24B8 - 0x24A4]; float timer;
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
-extern HeroActionState D_00189E20;
+extern HeroActionState g_hero_state;
 typedef struct { float start, end, reserved0, reserved1; } AnimationRange;
 extern float D_L00_001A7DAC[][4] MACRO_ADDR;
 extern AnimationRange animation_ranges[2] SDATA(D_L00_001A7DA8);
@@ -38,60 +38,60 @@ void func_PAL_L00_002CA448(void)
 {
     float limit;
     int old;
-    if (D_00189E20.mode_22b4 == 1) {
-        D_00189E20.animation_scale = D_00189E20.field_170 * 75.0f;
-        if (D_00189E20.animation_scale < 0.5f) D_00189E20.animation_scale = 0.5f;
+    if (g_hero_state.mode_22b4 == 1) {
+        g_hero_state.animation_scale = g_hero_state.field_170 * 75.0f;
+        if (g_hero_state.animation_scale < 0.5f) g_hero_state.animation_scale = 0.5f;
         return;
     }
-    if (D_00189E20.flag_1454 != 0 && D_00189E20.flag_1456 != 0) {
-        if (((unsigned char *)D_00189E20.object)[0x43] != 20)
+    if (g_hero_state.flag_1454 != 0 && g_hero_state.flag_1456 != 0) {
+        if (((unsigned char *)g_hero_state.object)[0x43] != 20)
             func_PAL_L00_002D2668(20, 0, 9.0f);
-        D_00189E20.animation_scale = D_00189E20.animation_time * 20.833334f;
-        if (D_00189E20.animation_scale < 0.7f) D_00189E20.animation_scale = 0.7f;
-        if (2.2f < D_00189E20.animation_scale) D_00189E20.animation_scale = 2.2f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 20.833334f;
+        if (g_hero_state.animation_scale < 0.7f) g_hero_state.animation_scale = 0.7f;
+        if (2.2f < g_hero_state.animation_scale) g_hero_state.animation_scale = 2.2f;
         return;
     }
-    if (((unsigned char *)D_00189E20.object)[0x43] == 20) {
-        func_PAL_L00_002D2668(D_00189E20.frame + 3, 0, 6.0f);
-    } else if (D_00189E20.count_1c0 > 3 && D_00189E20.flag_40e == 0) {
-        float time = D_00189E20.animation_time;
+    if (((unsigned char *)g_hero_state.object)[0x43] == 20) {
+        func_PAL_L00_002D2668(g_hero_state.frame + 3, 0, 6.0f);
+    } else if (g_hero_state.count_1c0 > 3 && g_hero_state.flag_40e == 0) {
+        float time = g_hero_state.animation_time;
         float start;
         int before_range;
-        old = D_00189E20.frame;
+        old = g_hero_state.frame;
         start = animation_ranges[old].start * 0.020000001f;
         before_range = time < start;
         if (before_range || D_L00_001A7DAC[old][0] * 0.020000001f < time) {
             if (before_range) {
                 if (time < start) {
                     do {
-                        --D_00189E20.frame;
-                    } while (time < animation_ranges[D_00189E20.frame].start * 0.020000001f);
+                        --g_hero_state.frame;
+                    } while (time < animation_ranges[g_hero_state.frame].start * 0.020000001f);
                 }
             } else {
-                while (D_L00_001A7DAC[D_00189E20.frame][0] * 0.020000001f < time) D_00189E20.frame++;
+                while (D_L00_001A7DAC[g_hero_state.frame][0] * 0.020000001f < time) g_hero_state.frame++;
             }
-            if (D_00189E20.frame < 0) D_00189E20.frame = 0;
-            if (D_00189E20.frame > 1) D_00189E20.frame = 1;
-            if (old != D_00189E20.frame) {
-                char *object = D_00189E20.object;
+            if (g_hero_state.frame < 0) g_hero_state.frame = 0;
+            if (g_hero_state.frame > 1) g_hero_state.frame = 1;
+            if (old != g_hero_state.frame) {
+                char *object = g_hero_state.object;
                 struct { char pad[0x48]; unsigned char *entry[1]; } *frames = *(void **)(object + 0x24);
                 int before = frames->entry[old + 3][0x10];
-                int after = frames->entry[D_00189E20.frame + 3][0x10];
-                int offset = D_L00_001A7DC8[old][D_00189E20.frame];
-                func_PAL_L00_002D2668(D_00189E20.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 7.0f);
+                int after = frames->entry[g_hero_state.frame + 3][0x10];
+                int offset = D_L00_001A7DC8[old][g_hero_state.frame];
+                func_PAL_L00_002D2668(g_hero_state.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 7.0f);
             }
         }
     }
-    switch (D_00189E20.frame) {
+    switch (g_hero_state.frame) {
     case 0:
-        D_00189E20.animation_scale = D_00189E20.animation_time * 130.83334f;
-        if (D_00189E20.animation_scale < 0.6f) D_00189E20.animation_scale = 0.6f;
-        if (4.0f < D_00189E20.animation_scale) D_00189E20.animation_scale = 4.0f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 130.83334f;
+        if (g_hero_state.animation_scale < 0.6f) g_hero_state.animation_scale = 0.6f;
+        if (4.0f < g_hero_state.animation_scale) g_hero_state.animation_scale = 4.0f;
         break;
     case 1:
-        D_00189E20.animation_scale = D_00189E20.animation_time * 11.666667f;
-        if (D_00189E20.animation_scale < 0.6f) D_00189E20.animation_scale = 0.6f;
-        if (2.2f < D_00189E20.animation_scale) D_00189E20.animation_scale = 2.2f;
+        g_hero_state.animation_scale = g_hero_state.animation_time * 11.666667f;
+        if (g_hero_state.animation_scale < 0.6f) g_hero_state.animation_scale = 0.6f;
+        if (2.2f < g_hero_state.animation_scale) g_hero_state.animation_scale = 2.2f;
         break;
     }
 }

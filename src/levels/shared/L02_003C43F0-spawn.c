@@ -13,12 +13,12 @@ struct SpawnHeader {
     u16 kind;
 };
 
-extern char *func_0029EFD0(int);
+extern char *CreateMoby(int);
 
 extern void func_002A0F48(void *);
 
 /* Spawns a moby of class 2906 at a position and fills in its private values. Returns the new object, or 0 if none could be made. */
-char *func_L02_00401530(TI128 *position, TI128 *dataVec0, TI128 *dataVec10, unsigned char flag75,
+char *part_spawn_trail_effect_moby(TI128 *position, TI128 *dataVec0, TI128 *dataVec10, unsigned char flag75,
                         unsigned char flag76, unsigned char flag77, float value6C, float value68, float value64) {
     char *moby;
     char *vars;

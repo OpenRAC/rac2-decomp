@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 typedef int s32;
@@ -11,7 +12,7 @@ typedef unsigned char u8;
    parameters, so nothing needed re-anchoring. */
 
 /* Stores a value from a received command into the client's result table. */
-s32 func_0011C880(s32 *command, s32 *clientData) {
+s32 sif_cmd_store_value(s32 *command, s32 *clientData) {
     s32 *dst;
     s32 index;
     s32 value;
@@ -23,7 +24,7 @@ s32 func_0011C880(s32 *command, s32 *clientData) {
 }
 
 /* Copies a value from a received command into the client data and returns it. */
-s32 func_0011C8A0(s32 *command, s32 *clientData) {
+s32 sif_cmd_copy_value(s32 *command, s32 *clientData) {
     s32 value;
 
     value = *(s32 *)((u8 *)command + 0x10);

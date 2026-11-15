@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_PAL_L09_003EEDC0, the PAL copy of func_L09_003EA798: the same C. */
 #include "common.h"
 
 /* Its caller func_L09_003EAA18 is in L09_002B7238-g8.c; this unit of its own keeps that
    call external, since PAL has func_L09_003EAA18 in C but not this function. */
-extern void func_002A7750(char *object, int a1, int a2);
+extern void moby_set_state(char *object, int a1, int a2);
 
 /* func_PAL_L09_003EEDC0: the four scaled inputs differ per level (ref_). */
-extern int func_00283CF0(float);
-extern void func_002B60B0(char *, float, float, float, float);
-extern float func_L09_0033E7A0(int);
-extern int func_L09_003EA2D0(char *, int, int);
+extern int FloatToInt(float);
+extern void moby_set_controller_speed_limits(char *, float, float, float, float);
+extern float path_get_entry_length(int);
+extern int path_start_moby_on_entry(char *, int, int);
 extern unsigned int D_L09_001FE6C0[];
 extern float ref_L09_003EA798_00 __attribute__((sda));
 extern float ref_L09_003EA798_01 __attribute__((sda));
@@ -88,8 +89,8 @@ void func_PAL_L09_003EEDC0(char *object) {
 
     qcopy((char *)state + 0x330, pos);
     qcopy((char *)state + 0x340, object + 0xF0);
-    state->f48 = func_00283CF0(25.0f);
-    state->f4A = func_00283CF0(19.2f);
+    state->f48 = FloatToInt(25.0f);
+    state->f4A = FloatToInt(19.2f);
     state->f1EC = 4;
     state->f1EE = 4;
     state->f191 = 2;
@@ -122,18 +123,18 @@ void func_PAL_L09_003EEDC0(char *object) {
     state->f50 = 3.5f;
     state->f60 = 3.141593f;
     state->f80 = 0.52359885f;
-    func_002B60B0(object, ref_L09_003EA798_00 * 0.00040000002f, ref_L09_003EA798_01 * 0.020000001f,
+    moby_set_controller_speed_limits(object, ref_L09_003EA798_00 * 0.00040000002f, ref_L09_003EA798_01 * 0.020000001f,
                   ref_L09_003EA798_02 * 6.981318e-06f, ref_L09_003EA798_03 * 0.0003490659f);
     state->f354 = state->f374;
-    func_L09_0033E7A0(state->f36C);
-    func_L09_0033E7A0(state->f350);
+    path_get_entry_length(state->f36C);
+    path_get_entry_length(state->f350);
     entry = state->f36C;
     if (entry != -1) {
         qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
-        func_L09_003EA2D0(object, entry, -1);
+        path_start_moby_on_entry(object, entry, -1);
         state->f380 = 0;
     } else {
         state->f380 = 1;
     }
-    func_002A7750(object, 1, 1);
+    moby_set_state(object, 1, 1);
 }

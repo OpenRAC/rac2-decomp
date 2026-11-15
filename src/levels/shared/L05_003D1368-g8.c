@@ -2,15 +2,15 @@
 extern float D_L05_001AFC58 __attribute__((sda));
 extern float D_L05_001AFC54 __attribute__((sda));
 extern char D_L05_001BFB00[];
-extern void func_00282F20(void *, void *, float);
-extern void func_002A8E20(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void QueueMobyImpact(void *, void *);
 extern char *func_L05_003D1E60(void *, int, int);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern void func_002AF000(void *, float, float, float);
-extern int func_002A7820(int, int);
-extern char *func_002BDCE8(void *, int, float, float, float, void *, int, int, float);
-extern int func_002A77E0(int);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern int math_random_int_range(int, int);
+extern char *SpawnSpinningSparkParticle(void *, int, float, float, float, void *, int, int, float);
+extern int math_random_int_below(int);
 struct HitRecord {
     float pos[4];
     void *obj;
@@ -53,17 +53,17 @@ void func_L05_003D1368(char *obj, char *input, float *output)
         for (i = 0; (float)i < count; i++) {
             float a, b;
             char *p;
-            output[0] = pos[0] + RandomSignedFloatRange(0.0f, spread);
-            output[1] = pos[1] + RandomSignedFloatRange(0.0f, spread);
-            output[2] = pos[2] + RandomSignedFloatRange(0.0f, spread);
-            a = RandomAngle();
-            b = RandomAngle();
-            BuildSphericalOffset(vel, 0.05000000447034836f, a, b);
-            p = SpawnSpinningSparkParticle(output, RandomIntRange(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
+            output[0] = pos[0] + math_random_signed_float_range(0.0f, spread);
+            output[1] = pos[1] + math_random_signed_float_range(0.0f, spread);
+            output[2] = pos[2] + math_random_signed_float_range(0.0f, spread);
+            a = math_random_angle();
+            b = math_random_angle();
+            vec_build_spherical_offset(vel, 0.05000000447034836f, a, b);
+            p = SpawnSpinningSparkParticle(output, math_random_int_range(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
             if (p) {
                 char *q = p + 0x20;
                 *(short *)(p + 0xA) = 120;
-                *(unsigned char *)(p + 8) = RandomIntBelow(255);
+                *(unsigned char *)(p + 8) = math_random_int_below(255);
                 p[3] = 0x44;
                 *(int *)(q + 4) = 2;
                 q[0xA] = 127;

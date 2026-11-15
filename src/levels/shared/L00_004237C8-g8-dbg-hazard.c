@@ -1,19 +1,19 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 typedef union { unsigned char b[0x2600]; int i[0x980]; } Hero;
 extern float D_00138280 NOT_SDA;
 extern float D_L00_001B14B4 __attribute__((sda));
 extern float D_L00_001B14C8 __attribute__((sda));
-extern float func_00282DF0(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282C48(float);
-extern void func_00282D30(void *, void *, float);
+extern float FastVecLength(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float math_fabs(float);
+extern void FastVecScale(void *, void *, float);
 
 /* Keeps the camera at a good distance from the hero. It stops the camera from getting too close or jumping farther away. */
-int func_L00_004237C8(char *object, void *input, int constrained, int preserve)
+int cam_follow_constrain_distance(char *object, void *input, int constrained, int preserve)
 {
     char *state = *(char **)(object + 0x70);
     char *vector = state + 0x160;
@@ -28,13 +28,13 @@ int func_L00_004237C8(char *object, void *input, int constrained, int preserve)
         return preserve;
     }
     length = FastVecLength(vector);
-    if (((Hero *)gHeroState)->b[0x22B4] != 2) {
-        if (FloatAbs(D_00138280) > 0.05f && preserve) {
+    if (((Hero *)g_hero_state)->b[0x22B4] != 2) {
+        if (math_fabs(D_00138280) > 0.05f && preserve) {
             length -= D_L00_001B14B4;
             *(short *)(controller + 0x34) = 0x884;
         }
     }
-    if (!constrained && ((Hero *)gHeroState)->i[0x229C / 4] != 2) {
+    if (!constrained && ((Hero *)g_hero_state)->i[0x229C / 4] != 2) {
         if (oldLength < length) {
             FastVecScale(vector, vector, oldLength / length);
             *(float *)(controller + 0x30) = *(float *)(vector + 0x2C) - oldLength;

@@ -28,15 +28,15 @@ typedef struct {
     L00PickupState *state;
 } L00PickupObject;
 
-extern int func_L00_002D3FB0(int);
-extern int func_L00_002D3FB8(int, int);
-extern int D_00139688[];
-extern unsigned char D_00139568[];
-extern L00PickupSoundEntry D_L00_00262570[];
-extern void func_L00_00326200(int, int, int);
-extern void func_00282C88(void *);
-extern int func_00282C30(int);
-extern int D_L00_001B19C8[] __attribute__((sda));
+extern int math_l00_return_argument_2(int);
+extern int weapon_add_ammo(int, int);
+extern int g_item_ammo_counts[];
+extern unsigned char g_item_slot_to_record[];
+extern L00PickupSoundEntry g_weapon_l00_table[];
+extern void part_reset_effects(int, int, int);
+extern void vec_clear_128(void *);
+extern int subtract_integer_with_clamp(int);
+extern int g_frame_l00_counter[] __attribute__((sda));
 extern int ref_L00_003D1B50_00[] __attribute__((sda));
 
 #define RAC2_T_VEC16_FC936841D
@@ -86,21 +86,21 @@ extern void func_00282CC0_15(char *target, char *first, char *local);
 
 extern Rac2Native_9cdc323a4d0c2fbd_ClearedRecord D_L00_00241500[];
 
-extern float func_00282E80(void *dst, void *src);
+extern float vec_distance_xy(void *dst, void *src);
 
-extern void func_002A7470(void *object, int kind, int value, int extra);
+extern void anim_start_blended(void *object, int kind, int value, int extra);
 
-extern int func_002E5CF8(int index, int value, void *object);
+extern int PlayMobySound(int index, int value, void *object);
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern int func_0027C878(int);
+extern int GetEffectTextureDescriptor(int);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern void func_00283410(void *, void *);
+extern void euler_to_matrix(void *, void *);
 
-extern void func_00280B90(void *, void *, int);
+extern void draw_world_quad(void *, void *, int);
 
 extern void ref_L00_003CC030_00(char *);
 
@@ -127,7 +127,7 @@ extern void ref_L00_003CC030_00(char *);
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
 /* Draws the owner's effect while it is active. */
-void func_L00_003C8A58(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void owner_effect_draw_active(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -142,7 +142,7 @@ void func_L00_003C8A58(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 
 /* Clears one word of each of three hundred 80-byte records, from the last one down. */
-void func_L00_003CA470(void)
+void part_clear_spark_records(void)
 {
     int i;
 
@@ -157,7 +157,7 @@ void func_L00_003CA470(void)
 /* func_L00_003CB980 is defined in L00_003C6298-pool-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003CBC80(char *record)
+void gfx_reset_render_state(char *record)
 {
     *(long long *)(record + 112) = 0LL;
     *(int *)(record + 80) = 0;
@@ -190,7 +190,7 @@ void func_L00_003CBC80(char *record)
 /* func_L00_003CBD08 is defined in L00_003CBD08-curve.c. */
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003CBE28(char *vectors, float scale)
+void vec_l00_scale_four(char *vectors, float scale)
 {
     func_00282D30_2(vectors, vectors, scale);
     func_00282D30_2(vectors + 16, vectors + 16, scale);
@@ -202,7 +202,7 @@ void func_L00_003CBE28(char *vectors, float scale)
    level's float table, copies the position and the scale into the record and hands it to the
    level's draw helper. The first call goes to a neighbour that has two identical copies in
    some levels, so its target is a per-level name. */
-void func_L00_003CC030(char *position, int color, float scale, char *resource, float alpha, int mode, int flag)
+void gfx_l00_draw_billboard_sprite(char *position, int color, float scale, char *resource, float alpha, int mode, int flag)
 {
     unsigned char work[0xE0];
     unsigned int rgba;
@@ -226,12 +226,12 @@ void func_L00_003CC030(char *position, int color, float scale, char *resource, f
     *(long long *)(work + 0x70) = 0;
 
     *(int *)(work + 0xDC) = 0;
-    first_angle = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(position + 0),
+    first_angle = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(position + 0),
                                 D_L00_001B8C80.y_144 - *(float *)(position + 4));
     *(float *)(work + 0xD8) = first_angle;
 
     distance = vec_distance_xy(position, &D_L00_001B8C80.x_140);
-    second_angle = FastMatrixHelperA(distance, D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    second_angle = mat_fast_helper_a(distance, D_L00_001B8C80.z_148 - *(float *)(position + 8));
     *(float *)(work + 0xD0) = alpha;
     *(float *)(work + 0xD4) = -second_angle;
 
@@ -240,12 +240,12 @@ void func_L00_003CC030(char *position, int color, float scale, char *resource, f
     *(float *)(work + 0xC4) = *(float *)(position + 4);
     *(float *)(work + 0xC8) = *(float *)(position + 8);
     *(float *)(work + 0xCC) = 1.0f;
-    ScaleFourVectors_L00((char *)work, scale);
+    vec_l00_scale_four((char *)work, scale);
     draw_world_quad(work, work + 0x90, 0);
 }
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
-void func_L00_003CC6D8(Vec16_Fc936841d *object, int index)
+void vec_compute_from_neighbours(Vec16_Fc936841d *object, int index)
 {
     char edge[16];
 
@@ -254,21 +254,21 @@ void func_L00_003CC6D8(Vec16_Fc936841d *object, int index)
 }
 
 /* Does nothing. */
-void func_L00_003CD158(void)
+void moby_l00_update_empty_3(void)
 {
 }
 
 /* Per-frame update of a trigger object. It opens with a sound and animation when the player comes close, and plays a second animation once it is activated. */
-void func_L00_003CEC50(char *object)
+void proximity_trigger_update(char *object)
 {
     char *self = object;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
-        if (vec_distance_xy(self + 0x10, gHeroPosition) < 6.0f) {
+        if (vec_distance_xy(self + 0x10, g_hero_position) < 6.0f) {
             *(unsigned char *)(self + 0x20) = 1;
             *(unsigned int *)(self + 0x78) = 0x24C102;
             if (*(unsigned char *)(self + 0x43) != 1) {
-                StartAnimationBlended(self, 1, 0, 0);
+                anim_start_blended(self, 1, 0, 0);
             }
             PlayMobySound(0, 0, self);
             *(unsigned int *)(self + 0x98) = 0;
@@ -279,7 +279,7 @@ void func_L00_003CEC50(char *object)
             *(unsigned char *)(self + 0x20) = 2;
             *(unsigned int *)(self + 0x78) = 0x224C1;
             if (*(unsigned char *)(self + 0x43) != 2) {
-                StartAnimationBlended(self, 2, 0, 0);
+                anim_start_blended(self, 2, 0, 0);
             }
             PlayMobySound(1, 0, self);
         }
@@ -292,7 +292,7 @@ void func_L00_003CEC50(char *object)
 /* Checks whether a pickup object has just added to the stock counter of its item kind: plays the
    single or multiple pickup sound, and when the amount exceeds the limit marks the object as
    used up. Returns 1 if the counter grew. */
-int func_L00_003D1B50(L00PickupObject *object)
+int pickup_check_stock_increase(L00PickupObject *object)
 {
     L00PickupState *state = object->state;
     int old_count;
@@ -304,29 +304,29 @@ int func_L00_003D1B50(L00PickupObject *object)
     if (object->phase == 2)
         return 0;
 
-    old_count = gItemAmmoCounts[ReturnArgument_L00_2(state->item)];
-    overflow = AddWeaponAmmo(state->item, state->limit);
-    if (old_count < gItemAmmoCounts[ReturnArgument_L00_2(state->item)]) {
-        delta = gItemAmmoCounts[ReturnArgument_L00_2(state->item)] - old_count;
+    old_count = g_item_ammo_counts[math_l00_return_argument_2(state->item)];
+    overflow = weapon_add_ammo(state->item, state->limit);
+    if (old_count < g_item_ammo_counts[math_l00_return_argument_2(state->item)]) {
+        delta = g_item_ammo_counts[math_l00_return_argument_2(state->item)] - old_count;
         if (delta == 1) {
-            sound = ((L00PickupSoundEntry *)(gItemSlotToRecord[ReturnArgument_L00_2(state->item)] * 224 +
-                                             (unsigned int)gWeaponTable_L00))->single_sound;
+            sound = ((L00PickupSoundEntry *)(g_item_slot_to_record[math_l00_return_argument_2(state->item)] * 224 +
+                                             (unsigned int)g_weapon_l00_table))->single_sound;
         } else {
-            sound = ((L00PickupSoundEntry *)(gItemSlotToRecord[ReturnArgument_L00_2(state->item)] * 224 +
-                                             (unsigned int)gWeaponTable_L00))->multiple_sound;
+            sound = ((L00PickupSoundEntry *)(g_item_slot_to_record[math_l00_return_argument_2(state->item)] * 224 +
+                                             (unsigned int)g_weapon_l00_table))->multiple_sound;
         }
-        ResetEffects(sound, delta, -1);
+        part_reset_effects(sound, delta, -1);
         if (overflow < state->limit) {
             int elapsed;
 
             object->phase = 2;
             object->scale *= 1.2f;
-            ClearVector128(state);
-            elapsed = gFrameCounter_L00[0] - ref_L00_003D1B50_00[0];
+            vec_clear_128(state);
+            elapsed = g_frame_l00_counter[0] - ref_L00_003D1B50_00[0];
             state->fade_rate = 0.13333334f;
             if (subtract_integer_with_clamp(elapsed) >= 11) {
                 PlayMobySound(0, 0, object);
-                ref_L00_003D1B50_00[0] = gFrameCounter_L00[0];
+                ref_L00_003D1B50_00[0] = g_frame_l00_counter[0];
             }
         }
         result = 1;

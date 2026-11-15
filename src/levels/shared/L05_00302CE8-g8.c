@@ -8,12 +8,12 @@ typedef struct {
 
 extern u32 D_L05_001A8D00[8] SDATA(D_L05_001A8D00);
 extern int D_L05_001B2028 __attribute__((sda));
-extern void func_0027E018(int, int, int, int, int, int, int, int, u64, u64);
+extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, u64, u64);
 
 /* Word-wrapping FontPrint: draws text inside the box (x, y, width, height), moving a word
  * that would cross the right edge to the next 16-pixel line, and returns the height used.
  * Bytes 8..15 select a palette color, as in FontPrint (func_0027F2A8). */
-int func_L05_00302CE8(int x, int y, int width, int height, u64 color, u8 *text, int count,
+int FontPrintWrapped(int x, int y, int width, int height, u64 color, u8 *text, int count,
                       u64 texture, L05Glyph *font)
 {
     int cursorX = x, index = 0, cursorY = y, scan;

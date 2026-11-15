@@ -16,17 +16,17 @@ typedef struct {
     PairVars *vars;             /* 0x68 */
 } Moby;
 
-extern void func_00282CF0(float *out, float *a, float *b);
-extern void func_00282CC0(float *out, float *a, float *b);
-extern void func_00282F20(float *out, float *vector, float scale);
-extern int func_00282978(short *timer);
-extern float func_00283CE0(int value);
-extern float func_00282C48(float value);
-extern int func_00283CF0(float value);
-extern int func_00283D38(unsigned int from, unsigned int to, float amount);
-extern unsigned char *func_002C2FD8(float *position, int color, int angle, int, int, int, int,
+extern void FastVecSub(float *out, float *a, float *b);
+extern void FastVecAdd(float *out, float *a, float *b);
+extern void vec_scale_to_length(float *out, float *vector, float scale);
+extern int FastDecTimer(short *timer);
+extern float IntToFloat(int value);
+extern float math_fabs(float value);
+extern int FloatToInt(float value);
+extern int FastTweenColor(unsigned int from, unsigned int to, float amount);
+extern unsigned char *part_spawn_fading(float *position, int color, int angle, int, int, int, int,
                                     float size);
-extern float D_001B5340[];                              /* the camera position */
+extern float g_camera_eye_state[];                              /* the camera position */
 extern int D_001AF174 __attribute__((sda));             /* the pairs' lifetime */
 extern unsigned int D_001AF1C4 __attribute__((sda));    /* the colour pairs */
 extern unsigned int D_001AF1C8 __attribute__((sda));
@@ -62,7 +62,7 @@ static __inline__ short *PairTimer(PairVars *vars, int offset)
 
 /* Draws the moby's four particle pairs, in a row behind it as seen from the camera, while
  * their timers run: each spins and fades with its timer. Returns 1 while one is above 48. */
-int func_00313210(Moby *self)
+int EmitFourTimedParticlePairs(Moby *self)
 {
     float position[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -81,7 +81,7 @@ int func_00313210(Moby *self)
     int alpha;
     unsigned char *particle;
 
-    FastVecSub(position, gCameraState_001B5340, self->position);
+    FastVecSub(position, g_camera_eye_state, self->position);
     vec_scale_to_length(position, position, -0.3f);
     vec_scale_to_length(step, position, 0.1f);
     count = 3;
@@ -97,7 +97,7 @@ int func_00313210(Moby *self)
             else if (ANGLE(floatOffset) <= 0.0f)
                 ANGLE(floatOffset) += 255.0f;
 
-            mix = FloatAbs(0.5f - IntToFloat(255 - TIMER(timerOffset)) * 0.003921569f);
+            mix = math_fabs(0.5f - IntToFloat(255 - TIMER(timerOffset)) * 0.003921569f);
             if (vars->altColors)
                 color = FastTweenColor(D_001AF1CC, D_001AF1D0, mix);
             else
@@ -109,12 +109,12 @@ int func_00313210(Moby *self)
             color = alpha | (color & 0xFFFFFF);
 
             position[2] = baseZ + ENTRY(D_001AF200, floatOffset);
-            particle = SpawnFadingParticle_002C2FD8(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
+            particle = part_spawn_fading(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
                                      D_001AF1D8, 0, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * remaining);
             if (particle != 0)
                 particle[2] = D_001F2540[62][0];
-            particle = SpawnFadingParticle_002C2FD8(position, alpha | 0xFFFFFF,
+            particle = part_spawn_fading(position, alpha | 0xFFFFFF,
                                      FloatToInt(ANGLE(floatOffset)) & 255, D_001AF1D8,
                                      D_001AF1D4, 2, 1,
                                      ENTRY(D_001AF1F0, floatOffset) * 0.7f * remaining);

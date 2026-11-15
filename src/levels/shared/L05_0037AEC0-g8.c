@@ -20,37 +20,37 @@ extern int D_L05_00221D10[];
 
 extern int D_L05_001FB220[];
 
-extern int func_002ED688(char *object);
+extern int moby_get_motion_data(char *object);
 
-extern int func_L00_004272A0(void);
+extern int level_get_saved_value(void);
 
-extern void func_L05_0037AE40(char *object);
+extern void moby_reset_action_state(char *object);
 
-extern void func_L05_0037AEC0(char *object, int flag);
+extern void moby_init_spawned_sub_object(char *object, int flag);
 
-extern void func_0029F338(void *object);
+extern void moby_mark_spawned(void *object);
 
 extern /* Sets up one effect entry: calls the callbacks of matching registered objects, then spawns each object in its list. */
-void func_L05_0037AFF8(int entry);
+void entry_spawn_list_objects(int entry);
 
-extern void func_L05_0037B108(void);
+extern void effect_remove_family_mobys(void);
 
 /* Runs the constructor over every registered entry, then clears the two shared counters. */
 /* Sets up every registered effect entry, then resets the two shared counters. */
-void func_L05_0037B210(void)
+void entry_init_all_registered(void)
 {
     int i;
 
     for (i = 0; i < D_L05_001AC4D8; i++)
-        SpawnEntryListObjects(D_L05_00225DD0[i]);
+        entry_spawn_list_objects(D_L05_00225DD0[i]);
     D_L05_00221D10[4] = 0;
     D_L05_00221D10[3] = 0;
-    RemoveEffectFamilyMobys();
+    effect_remove_family_mobys();
 }
 
 /* Runs the entry's list: every registered object with the same id gets its callback, then
    every object the list names is looked up and set. */
-void func_L05_0037AFF8(int entry)
+void entry_spawn_list_objects(int entry)
 {
     unsigned char *obj = (unsigned char *)entry;
     int count;
@@ -61,7 +61,7 @@ void func_L05_0037AFF8(int entry)
     if (D_L05_001FB220[obj[0x21]] == 0)
         return;
 
-    count = GetLevelSavedValue();
+    count = level_get_saved_value();
     for (i = 0; i < count; i++) {
         char *e = (char *)D_L05_00225DD0[i];
 
@@ -79,9 +79,9 @@ void func_L05_0037AFF8(int entry)
 
         off = (p[0] & 0x7FFF) << 8;
         base = D_L05_001B251C;
-        if (GetMobyMotionData(base + off) != 0) {
+        if (moby_get_motion_data(base + off) != 0) {
             base = D_L05_001B251C;
-            ResetObjectActionState(base + off);
+            moby_reset_action_state(base + off);
         }
     } while (*(short *)p++ >= 0);
 }
@@ -89,7 +89,7 @@ void func_L05_0037AFF8(int entry)
 /* Offers the entry to every registered object with the same id, then walks the entry's list
    and offers each object it names to the handler. */
 /* Same as the entry setup above, but spawns the listed objects with a given flag. */
-void func_L05_0037B280(char *object, int handler)
+void entry_spawn_list_objects_with_flag(char *object, int handler)
 {
     unsigned char *obj = (unsigned char *)object;
     int count;
@@ -100,7 +100,7 @@ void func_L05_0037B280(char *object, int handler)
     if (D_L05_001FB220[obj[0x21]] == 0)
         return;
 
-    count = GetLevelSavedValue();
+    count = level_get_saved_value();
     for (i = 0; i < count; i++) {
         char *e = (char *)D_L05_00225DD0[i];
 
@@ -118,19 +118,19 @@ void func_L05_0037B280(char *object, int handler)
 
         off = (p[0] & 0x7FFF) << 8;
         base = D_L05_001B251C;
-        if (GetMobyMotionData(base + off) != 0) {
+        if (moby_get_motion_data(base + off) != 0) {
             base = D_L05_001B251C;
-            InitSpawnedSubObject(base + off, handler);
+            moby_init_spawned_sub_object(base + off, handler);
         }
     } while (*(short *)p++ >= 0);
 }
 
 /* Walks the live-object list and hands the objects of the listed ids to the shared handler. */
-extern void func_L05_0037B108(void);
+extern void effect_remove_family_mobys(void);
 
 /* Finds the free entry of the level list that belongs to id and spawns it there. */
 /* Finds the first listed object that is free and spawns it. */
-char *func_L05_0037B440(int id, int flag)
+char *SpawnFreeLevelObjectById(int id, int flag)
 {
     int i;
     char *spawned = 0;
@@ -145,10 +145,10 @@ char *func_L05_0037B440(int id, int flag)
             entry = (short *)list;
             do {
                 unsigned int offset = (*entry & 0x7FFF) << 8;
-                char *v = (char *)GetMobyMotionData(D_L05_001B251C + offset);
+                char *v = (char *)moby_get_motion_data(D_L05_001B251C + offset);
                 if (v != 0 && *(int *)(v + 0x110) == 0) {
                     spawned = D_L05_001B251C + offset;
-                    InitSpawnedSubObject(spawned, flag);
+                    moby_init_spawned_sub_object(spawned, flag);
                     break;
                 }
             } while (*entry++ >= 0);

@@ -6,17 +6,17 @@ typedef struct { char pad[16]; int limit, value; char tail[16]; } RewardSlot;
 extern RewardSlot D_L05_002A1800[];
 /* Spawn counters: [22..27] per kind, [28] the total. */
 extern int D_L05_00221D10[];
-extern int D_001A79F0 __attribute__((sda));
+extern int g_current_map_index __attribute__((sda));
 extern int D_0013A148[];
 extern int func_332AB8(int);
 extern int func_L05_0037AAC8(int);
 /* The spawners return the new object, or 0. */
 extern char *func_L05_003CD1A8(char *);
-extern char *func_L05_00425FE0(char *);
-extern char *func_L05_00426568(char *);
-extern char *func_L05_00426B08(char *);
-extern void func_L05_00421860(char *);
-extern char *func_L05_0041C118(char *);
+extern char *moby_spawn_class_a(char *);
+extern char *moby_spawn_class_b(char *);
+extern char *moby_spawn_class_c(char *);
+extern void moby_spawn_and_count(char *);
+extern char *pickup_spawn_homing(char *);
 
 /* Drops a reward at the object: one roll in four picks a kind (an unavailable
    kind falls back to another drop). A nonzero bonus adds a second roll whose
@@ -41,7 +41,7 @@ void func_L05_00421908(char *object, int bonus)
             slot = func_L05_0037AAC8(2);
             if (slot < 0 || D_L05_002A1800[slot].value == D_L05_002A1800[slot].limit)
                 goto fallback;
-            SpawnMobyClass117C(object);
+            moby_spawn_class_a(object);
             D_L05_00221D10[26]++;
             D_L05_00221D10[28]++;
             break;
@@ -49,7 +49,7 @@ void func_L05_00421908(char *object, int bonus)
             slot = func_L05_0037AAC8(3);
             if (slot < 0 || D_L05_002A1800[slot].value == D_L05_002A1800[slot].limit)
                 goto fallback;
-            SpawnMobyClass117D(object);
+            moby_spawn_class_b(object);
             D_L05_00221D10[22]++;
             D_L05_00221D10[28]++;
             break;
@@ -58,23 +58,23 @@ void func_L05_00421908(char *object, int bonus)
             if (slot < 0 || D_L05_002A1800[slot].value == D_L05_002A1800[slot].limit) {
         case 4:
         fallback:
-                SpawnObjectAndCountIt(object);
+                moby_spawn_and_count(object);
                 break;
             }
-            SpawnMobyClass117F(object);
+            moby_spawn_class_c(object);
             D_L05_00221D10[27]++;
             D_L05_00221D10[28]++;
             break;
         default:
         ordinary:
-            SpawnHomingPickup(object);
+            pickup_spawn_homing(object);
             D_L05_00221D10[23]++;
             D_L05_00221D10[28]++;
             break;
         }
     }
     if (bonus) {
-        chance = D_0013A148[gCurrentMapIndex] * 2;
+        chance = D_0013A148[g_current_map_index] * 2;
         if (chance > 22)
             chance = 22;
         if (chance >= func_332AB8(100)) {

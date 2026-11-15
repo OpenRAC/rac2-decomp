@@ -44,10 +44,10 @@ extern u16 D_L12_001B1840_h __asm__("D_L12_001B1840") __attribute__((sda));
 
 extern u8 *D_L12_001FEAC0[];
 
-extern f32 func_00282E80(void *a, void *b);
+extern f32 vec_distance_xy(void *a, void *b);
 
 /* Hands the object's path state to the nearest eligible entity of its group. */
-void func_L12_00413CE0(u8 *moby)
+void path_hand_state_to_nearest(u8 *moby)
 {
     PathState *state = *(PathState **)(moby + 0x68);
     u8 *bestEntity;

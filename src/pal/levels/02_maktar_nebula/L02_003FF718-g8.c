@@ -1,11 +1,12 @@
+#include "names.h"
 /* func_PAL_L02_003FF718, the PAL copy of func_L02_003FB000: the same C, where the timer reload is
    scaled for 50 Hz and its source is read as a word. */
 #include "common.h"
 
-extern char *D_L02_001B359C __attribute__((sda));
-extern u32 D_L02_001FC060[];
+extern char *g_moby_l02_pool __attribute__((sda));
+extern u32 g_entity_group_lists[];
 extern int D_L02_001B1214 __attribute__((sda));
-extern char D_00189E20[];
+extern char g_hero_state[];
 
 /* Accumulate the active group entries and reset their current report state. */
 void func_PAL_L02_003FF718(char *object)
@@ -22,11 +23,11 @@ void func_PAL_L02_003FF718(char *object)
     *(float *)(state + 0x64) = 0;
     if (index == 0xFF)
         return;
-    entry = D_L02_001FC060[index];
+    entry = g_entity_group_lists[index];
     if (entry == 0)
         return;
     cursor = (short *)entry;
-    table = D_L02_001B359C;
+    table = g_moby_l02_pool;
     do {
         short type;
         record = table + ((*(u16 *)cursor & 0x7FFF) << 8);
@@ -44,7 +45,7 @@ void func_PAL_L02_003FF718(char *object)
             *(float *)(state + 0x64) += *(float *)(*(char **)(record + 0x68) + 0x20);
         }
     } while (*cursor++ >= 0);
-    hero = D_00189E20;
+    hero = g_hero_state;
     *(float *)(state + 0x68) = (float)*(int *)(hero + 0x24CC);
     *(short *)(state + 0x11C) = 0;
     do {

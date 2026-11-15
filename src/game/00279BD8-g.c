@@ -1,5 +1,5 @@
 #include "names.h"
-extern void func_00282D30(void *, void *, float);
+extern void FastVecScale(void *, void *, float);
 
 /* Projects a world point to screen coordinates (rac1's project_to_screen): builds the
    camera matrix from the identity with the negated, scaled camera position, transforms
@@ -31,14 +31,14 @@ typedef struct {
     float v98;
     float v9C;
 } Locals279BD8;
-extern CameraView279BD8 D_001B5200;
+extern CameraView279BD8 g_active_camera;
 extern float D_001B9250[];
-extern void func_00283388(void *);
-extern void func_00283788(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
+extern void set_identity_matrix(void *);
+extern void multiply_matrix(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
 
 /* Converts a point in the world into a screen position and depth. */
-void func_00279BD8(ScreenPoint279BD8 *screen_out, void *world_pos)
+void gfx_project_world_point_to_screen(ScreenPoint279BD8 *screen_out, void *world_pos)
 {
     Locals279BD8 L;
     float scale;
@@ -46,10 +46,10 @@ void func_00279BD8(ScreenPoint279BD8 *screen_out, void *world_pos)
     float x;
 
     set_identity_matrix(&L);
-    L.v30 = -gActiveCamera.unk140 * 1024.0f;
-    L.v34 = -gActiveCamera.unk144 * 1024.0f;
-    L.v38 = -gActiveCamera.unk148 * 1024.0f;
-    multiply_matrix(&L.v40, (char *)&gActiveCamera + 0x40, &L);
+    L.v30 = -g_active_camera.unk140 * 1024.0f;
+    L.v34 = -g_active_camera.unk144 * 1024.0f;
+    L.v38 = -g_active_camera.unk148 * 1024.0f;
+    multiply_matrix(&L.v40, (char *)&g_active_camera + 0x40, &L);
     FastVecScale(&L.blk80, world_pos, 1024.0f);
     L.v8C = 1.0f;
     transform_vector(&L.v90, &L.blk80, &L.v40);

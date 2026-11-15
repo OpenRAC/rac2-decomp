@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -15,7 +16,7 @@ extern u32 D_L20_001B2FA0_abs __attribute__((nosda));
 extern u32 D_L20_001B2F9C_abs __attribute__((nosda));
 
 /* Walks through every object in the level and turns off the ones from four particular classes. */
-void func_L20_00444138(void) {
+void yeedil_boss_disable_hazards(void) {
     u8 *base = (u8 *)D_L20_001B2F9C_abs;
     u32 bound;
 

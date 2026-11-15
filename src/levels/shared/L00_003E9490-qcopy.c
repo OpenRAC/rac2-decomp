@@ -8,12 +8,12 @@ typedef struct {
     float w;
 } Vec16_Fc936841d;
 
-extern void func_00282CF0(char *local, char *first, char *second);
-extern void func_00282D30(char *a, char *b, float value);
-extern void func_00282CC0(char *target, char *first, char *local);
+extern void FastVecSub(char *local, char *first, char *second);
+extern void FastVecScale(char *a, char *b, float value);
+extern void FastVecAdd(char *target, char *first, char *local);
 
 /* Finds the point part-way between two points, at the given amount from 0 to 1. */
-void func_L00_003E9490(float t, Vec16_Fc936841d *result, Vec16_Fc936841d *from, Vec16_Fc936841d *to)
+void vec_interpolate(float t, Vec16_Fc936841d *result, Vec16_Fc936841d *from, Vec16_Fc936841d *to)
 {
     Vec16_Fc936841d offset;
 

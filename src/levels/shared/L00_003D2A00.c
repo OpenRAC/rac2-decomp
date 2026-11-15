@@ -15,20 +15,20 @@ typedef struct {
     unsigned char pad_074[0x6C];
 } L00AimEntry;
 
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_002761F8(void *,void *,int,void *,void *);
-extern float func_00282E48(void *, void *);
-extern char *func_L00_003FCA40(char *, char *, char *, int);
-extern void func_002A8E20(int, void *);
-extern void func_0032D758(int, int, char *);
-extern int D_0018C0B0;
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int CollLine(void *,void *,int,void *,void *);
+extern float fast_vec_dist(void *, void *);
+extern char *large_spark_trail_create(char *, char *, char *, int);
+extern void QueueMobyImpact(int, void *);
+extern void StartAttachedEffect(int, int, char *);
+extern int g_hero_moby;
 extern unsigned char D_00139582;
-extern L00AimState D_L00_001BF200;
-extern L00AimEntry D_L00_00262570[];
+extern L00AimState g_collision_result;
+extern L00AimEntry g_weapon_l00_table[];
 
 /* Fires a shot from the origin toward the target and, if it hits something, damages it. Damage drops with distance. */
-int func_L00_003D2A00(char *source, char *origin, char *target, char *result)
+int weapon_fire_damage_ray(char *source, char *origin, char *target, char *result)
 {
     char offset[16];
     float distance;
@@ -38,14 +38,14 @@ int func_L00_003D2A00(char *source, char *origin, char *target, char *result)
     FastVecSub(result, target, origin);
     vec_scale_to_length(result, result, 1.5f);
     *(float *)(result + 0xC) = 5627.9248046875f;
-    if (CollLine(origin, target, 0x10, gHeroMoby_0018C0B0, 0) != 0) {
+    if (CollLine(origin, target, 0x10, g_hero_moby, 0) != 0) {
         FastVecSub(offset, target, origin);
         vec_scale_to_length(offset, offset, 1.0f);
-        FastVecSub(offset, (char *)gCollisionResult.vector_20, origin);
-        CreateLargeSparkTrailObject(origin, offset, (char *)gCollisionResult.vector_20, 1);
-        if (gCollisionResult.object_18 != 0) {
-            saved = (gWeaponTable_L00 + D_00139582)->value_70;
-            distance = fast_vec_dist((char *)gCollisionResult.vector_20, origin);
+        FastVecSub(offset, (char *)g_collision_result.vector_20, origin);
+        large_spark_trail_create(origin, offset, (char *)g_collision_result.vector_20, 1);
+        if (g_collision_result.object_18 != 0) {
+            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            distance = fast_vec_dist((char *)g_collision_result.vector_20, origin);
             if (distance < 10.0f) {
                 *(float *)(result + 0x1C) = saved;
             } else if (distance < 14.0f) {
@@ -55,13 +55,13 @@ int func_L00_003D2A00(char *source, char *origin, char *target, char *result)
             } else {
                 *(float *)(result + 0x1C) = saved * 0.125f;
             }
-            QueueMobyImpact(gCollisionResult.object_18, result);
-            StartAttachedEffect(gCollisionResult.object_18, 0x44, source);
+            QueueMobyImpact(g_collision_result.object_18, result);
+            StartAttachedEffect(g_collision_result.object_18, 0x44, source);
         }
-        hitObject = gCollisionResult.object_18;
+        hitObject = g_collision_result.object_18;
     } else {
     FastVecSub(offset, target, origin);
-    CreateLargeSparkTrailObject(origin, offset, target, 0);
+    large_spark_trail_create(origin, offset, target, 0);
     hitObject = 0;
     }
     return hitObject;

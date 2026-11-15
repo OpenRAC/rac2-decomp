@@ -17,11 +17,11 @@ extern float D_L17_001B03CC __attribute__((sda));
 extern float D_L17_001B03D0 __attribute__((sda));
 extern float D_L17_001B03D4 __attribute__((sda));
 extern float D_L17_001B03D8 __attribute__((sda));
-extern void func_002AEE70(void *,void *,void *,float,float,float),func_002AEF28(void *,void *,void *,float,float,float);
-extern int func_L00_00324120(void *),func_002B3868(void *),func_00282948(void *),func_00283CF0(float);
-extern void func_002A7750(void *,int,int),func_002E5CF8(int,int,void *);
-extern float func_00283CE0(int),func_002ABB18(float),func_00283198(float),func_00283180(float),func_00283B98(float,float),func_00283C28(float);
-extern void func_00282CF0(void *,void *,void *),func_002AD6F0(void *,void *,void *,void *);
+extern void math_update_wrapped_angle_offset(void *,void *,void *,float,float,float),moby_scale_owner_words_by_angles(void *,void *,void *,float,float,float);
+extern int hero_is_current_selected_id(void *),flag_set_first_pending(void *),math_fast_float_d(void *),FloatToInt(float);
+extern void moby_set_state(void *,int,int),PlayMobySound(int,int,void *);
+extern float IntToFloat(int),math_wrap_angle_to_pi(float),math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float),FastAddRotations(float,float),math_fast_float_g(float);
+extern void FastVecSub(void *,void *,void *),mat_combine_and_store(void *,void *,void *,void *);
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } UpdateVector;
 typedef struct {
@@ -60,31 +60,31 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     s->flags8c|=1;
     s->flags3e|=8;
     o->flags34|=0x20;
-    func_002AEE70(o,&s->a0,&s->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
-    func_002AEF28(o,&s->a8,&s->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
+    math_update_wrapped_angle_offset(o,&s->a0,&s->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
+    moby_scale_owner_words_by_angles(o,&s->a8,&s->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
     switch(o->mode) {
     case 0:
         s->origin.q=*(Quad *)oldpos;
         o->mode=1;
         break;
     case 1:
-        if(func_L00_00324120(o)) {
-            func_002A7750(o,2,-1);
-            s->b0=func_00283CF0((D_L17_001B03C8*300.0f+2.0f)*0.16666667f);
+        if(hero_is_current_selected_id(o)) {
+            moby_set_state(o,2,-1);
+            s->b0=FloatToInt((D_L17_001B03C8*300.0f+2.0f)*0.16666667f);
         }
         break;
     case 2: {
         float t;
-        if(func_002B3868(o))func_002E5CF8(0,0,o);
-        if(s->b0==50)func_002E5CF8(0,0,o);
-        if(func_00282948(&s->b0)) {
-            s->b4=func_00283CF0((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
+        if(flag_set_first_pending(o))PlayMobySound(0,0,o);
+        if(s->b0==50)PlayMobySound(0,0,o);
+        if(math_fast_float_d(&s->b0)) {
+            s->b4=FloatToInt((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
             o->mode=3;
         } else {
-            rot[0]=func_00283198(func_002ABB18(func_00283CE0(s->b0)*0.75f))*0.017453294f;
-            rot[1]=func_00283180(func_002ABB18(func_00283CE0(s->b0)*0.89f))*0.017453294f;
+            rot[0]=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.75f))*0.017453294f;
+            rot[1]=math_fast_sin_or_cos_a(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.89f))*0.017453294f;
             if((float)s->b4>(D_L17_001B03C8*300.0f+2.0f)*0.16666667f-25.0f) {
-                t=func_00283CE0(s->b0)/((D_L17_001B03C8*300.0f+2.0f)*0.16666667f-25.333334f);
+                t=IntToFloat(s->b0)/((D_L17_001B03C8*300.0f+2.0f)*0.16666667f-25.333334f);
                 o->rotation.f[0]=o->rotation.f[0]*t+rot[0]*(1.0f-t);
                 o->rotation.f[1]=o->rotation.f[1]*t+rot[1]*(1.0f-t);
             } else {
@@ -96,61 +96,61 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     }
     case 3: {
         float t,f,b,ax,ay;
-        t=func_00283CE0(s->b4)/((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
+        t=IntToFloat(s->b4)/((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
         f=(1.0f-t)*D_L17_001B03D4;
         o->rotation.f[1]=0;
         o->rotation.f[0]=(1.0f-t)*1.57079649f;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
         ax*=f*b;
         o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,o->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
         ay*=f*b;
         o->position.f[1]=ay;
         o->position.f[2]=0;
         o->position.f[0]+=s->origin.f[0];
         ay+=s->origin.f[1];
         o->position.f[1]=ay;
-        f*=func_00283180(o->rotation.f[0]);
+        f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
         o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=func_00283180(t*1.57079649f)*D_L17_001B03D8;
+        o->position.f[2]-=math_fast_sin_or_cos_a(t*1.57079649f)*D_L17_001B03D8;
         s->flags8c&=~1;
         s->flags3e&=~8;
         o->flags34&=~0x20;
-        if(func_00282948(&s->b4)) {
+        if(math_fast_float_d(&s->b4)) {
             o->mode=4;
-            s->b8=func_00283CF0((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
+            s->b8=FloatToInt((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
         }
         break;
     }
     case 4: {
         float t,f,b,c,ax,ay;
-        t=func_00283CE0(s->b8)/((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
+        t=IntToFloat(s->b8)/((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
         *(Quad *)rot=o->rotation.q;
         c=1.0f-t;
         f=(1.0f-c)*D_L17_001B03D4;
-        o->rotation.f[0]=func_00283C28((rot[0]*c+c*4.71238947f)+1.57079649f);
+        o->rotation.f[0]=math_fast_float_g((rot[0]*c+c*4.71238947f)+1.57079649f);
         o->rotation.f[1]=rot[1]*c;
-        ax=func_00283180(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
         ax*=f*b;
         o->position.f[0]=ax;
-        ay=func_00283198(func_00283B98(1.57079649f,o->rotation.f[2]));
-        b=func_00283198(o->rotation.f[0]);
+        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,o->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
         ay*=f*b;
         o->position.f[1]=ay;
         o->position.f[2]=0;
         o->position.f[0]+=s->origin.f[0];
         ay+=s->origin.f[1];
         o->position.f[1]=ay;
-        f*=func_00283180(o->rotation.f[0]);
+        f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
         o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=func_00283180(c*1.57079649f)*D_L17_001B03D8;
+        o->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*D_L17_001B03D8;
         s->flags8c&=~1;
         s->flags3e&=~8;
         o->flags34&=~0x20;
-        if(func_00282948(&s->b8)) {
+        if(math_fast_float_d(&s->b8)) {
             o->mode=1;
             {
                 Quad home = s->origin.q;
@@ -162,7 +162,7 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     }
     }
     if(o->mode<3) {
-        func_00282CF0(pos,&o->position,oldpos);
-        func_002AD6F0((u8 *)s+0x50,pos,oldrot,&o->rotation);
+        FastVecSub(pos,&o->position,oldpos);
+        mat_combine_and_store((u8 *)s+0x50,pos,oldrot,&o->rotation);
     }
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -28,7 +29,7 @@ extern s32  D_001B22B0[] __attribute__((sda));
 
 extern s8 D_001BAECC[];
 /* Works out a value from a size, or fails with -1 when the size is above 0x40000. */
-s32 func_00288970(u32 size, s32 *outValue) {
+s32 mem_compute_sized_offset(u32 size, s32 *outValue) {
     if (size > 0x40000U) {
         *outValue = 0;
         return -1;

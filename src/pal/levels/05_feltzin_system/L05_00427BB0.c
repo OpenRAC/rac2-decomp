@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef signed int s32;
@@ -17,7 +18,7 @@ extern u32 *func_00379CA0(u8 *a0);
 extern void func_0037AEC0(u8 *a0, s32 a1);
 extern void func_00379C68(u8 *a0, s32 a1);
 extern u8 *func_0037B440(s32 a0);
-extern void func_L05_004224C8(u8 *a0);
+extern void feltzin_target_spawner_init(u8 *a0);
 extern s32 D_001B1364 __attribute__((sda));
 extern s32 D_001B13E4 __attribute__((sda));
 extern u8 D_L05_00221D10[];

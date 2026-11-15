@@ -1,17 +1,17 @@
 #include "common.h"
 typedef unsigned int AimTargetQuad __attribute__((mode(TI)));
-extern unsigned char *D_L04_001FB5A0[];
-extern float func_00283248(float, float);
-extern float func_00282E20(void *);
-extern float func_00282E80(void *, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282DB0(void *, void *);
+extern unsigned char *g_moby_list[];
+extern float mat_fast_helper_a(float, float);
+extern float vec_length_xy(void *);
+extern float vec_distance_xy(void *, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern float FastVecDot(void *, void *);
 
 /* Looks through the moby list for the nearest visible enemy or bomb in front of the shooter and returns it with the angles to aim at it. */
-unsigned char *func_L04_0040EC80(unsigned char *shooter, AimTargetQuad *origin, AimTargetQuad *direction, float *yaw, float *pitch, float *height, float angle, float range)
+unsigned char *bike_find_aim_target(unsigned char *shooter, AimTargetQuad *origin, AimTargetQuad *direction, float *yaw, float *pitch, float *height, float angle, float range)
 {
     float start[4], dir[4], delta[4], unit[4], target[4];
     float *startp=start, *dirp=dir;
@@ -19,10 +19,10 @@ unsigned char *func_L04_0040EC80(unsigned char *shooter, AimTargetQuad *origin, 
     float distance, dot;
     *(AimTargetQuad *)startp=*origin;
     *(AimTargetQuad *)dir=*direction;
-    *yaw=FastMatrixHelperA(dirp[0],dirp[1]);
-    *pitch=-FastMatrixHelperA(vec_length_xy(dirp),dirp[2]);
+    *yaw=mat_fast_helper_a(dirp[0],dirp[1]);
+    *pitch=-mat_fast_helper_a(vec_length_xy(dirp),dirp[2]);
     { int index;
-    for(index=0;(candidate=gMobyList[index])!=0;index++) {
+    for(index=0;(candidate=g_moby_list[index])!=0;index++) {
         int type;
         if((signed char)candidate[0x20]<0)continue;
         type=*(short *)(candidate+0xaa);
@@ -40,8 +40,8 @@ unsigned char *func_L04_0040EC80(unsigned char *shooter, AimTargetQuad *origin, 
             if(CollLine(target,startp,2,shooter,0))continue;
             range=distance;
             bestTarget=candidate;
-            *yaw=FastMatrixHelperA(target[0]-startp[0],target[1]-startp[1]);
-            *pitch=-FastMatrixHelperA(vec_distance_xy(startp,target),target[2]-startp[2]);
+            *yaw=mat_fast_helper_a(target[0]-startp[0],target[1]-startp[1]);
+            *pitch=-mat_fast_helper_a(vec_distance_xy(startp,target),target[2]-startp[2]);
             *height=0.5f;
         }
     }

@@ -9,20 +9,20 @@ extern float D_L02_001B1FB0 __attribute__((sda)),D_L02_001B1FB4 __attribute__((s
 extern float D_L02_001B1FB8 __attribute__((sda));
 extern float D_L02_001B1FBC __attribute__((sda)),D_L02_001B1FC0 __attribute__((sda));
 extern u32 D_L02_001B1FC8 __attribute__((sda)),D_L02_001B1FCC __attribute__((sda));
-extern void func_00282CF0(void *,void *,void *);
-extern float func_002A7878(float,float);
-extern int func_002A77E0(int);
-extern void func_002ACEC0(void *,void *,void *,float);
-extern void func_00282F20(void *,void *,float);
-extern float func_002A78D8(float,float);
+extern void FastVecSub(void *,void *,void *);
+extern float math_random_float_range(float,float);
+extern int math_random_int_below(int);
+extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern float math_random_signed_float_range(float,float);
 extern int func_001163B0(void);
-extern void func_00282D30(void *,void *,float);
-extern u8 *func_002C2210(void *,int,u32,float,float,int,int,void *,int,float);
-extern int func_00283CF0(float);
-extern void func_00282CC0(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern u8 *part_spawn_ground_effect(void *,int,u32,float,float,int,int,void *,int,float);
+extern int FloatToInt(float);
+extern void FastVecAdd(void *,void *,void *);
 
 /* Emit paired particles, choosing an outward or target-directed trajectory. */
-void func_L02_00421DA0(void *origin,int count,int inner)
+void part_spawn_impact_particles(void *origin,int count,int inner)
 {
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -36,45 +36,45 @@ void func_L02_00421DA0(void *origin,int count,int inner)
     base[2]=0;
     axis[0]=0;axis[1]=0;axis[2]=1;axis[3]=1;
     for(i=0;i<count;i++) {
-        size=RandomFloatRange(D_L02_001B1FBC,D_L02_001B1FC0);
-        sign=RandomIntBelow(2);
+        size=math_random_float_range(D_L02_001B1FBC,D_L02_001B1FC0);
+        sign=math_random_int_below(2);
         if (!sign) sign--;
-        angle=RandomFloatRange(-1.0471977f,1.0471977f);
-        ApplyAxisRotationToQuaternion(velocity,base,axis,angle);
-        speed=RandomFloatRange(D_L02_001B1FA8,D_L02_001B1FAC)*0.016666668f;
+        angle=math_random_float_range(-1.0471977f,1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity,base,axis,angle);
+        speed=math_random_float_range(D_L02_001B1FA8,D_L02_001B1FAC)*0.016666668f;
         vec_scale_to_length(velocity,velocity,speed);
-        velocity[2]=RandomFloatRange(D_L02_001B1FB0,D_L02_001B1FB4)*0.016666668f;
+        velocity[2]=math_random_float_range(D_L02_001B1FB0,D_L02_001B1FB4)*0.016666668f;
         qcopy(position,origin);
-        position[0]+=RandomSignedFloatRange(0,0.15f);
-        position[1]+=RandomSignedFloatRange(0,0.15f);
-        position[2]+=RandomSignedFloatRange(0,0.15f);
+        position[0]+=math_random_signed_float_range(0,0.15f);
+        position[1]+=math_random_signed_float_range(0,0.15f);
+        position[2]+=math_random_signed_float_range(0,0.15f);
         if(!inner) {
-            if(!(Rand()&1)) {
+            if(!(func_001163B0()&1)) {
                 FastVecScale(velocity,velocity,1.5f);
-                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8);
                 if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
-                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             } else {
                 FastVecSub(toward,D_L02_001BA3C0.position,position);
                 vec_scale_to_length(toward,toward,speed);
                 FastVecAdd(velocity,velocity,toward);
-                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,40,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8);
                 if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
-                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,40,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             }
         } else {
-            if(!(Rand()&1)) {
+            if(!(func_001163B0()&1)) {
                 FastVecScale(velocity,velocity,1.5f);
-                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,60,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8);
                 if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
-                particle=SpawnGroundEffectParticle(position,60,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,60,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             } else {
                 FastVecSub(toward,D_L02_001BA3C0.position,position);
                 vec_scale_to_length(toward,toward,speed);
                 FastVecAdd(velocity,velocity,toward);
-                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,40,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8);
                 if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
-                particle=SpawnGroundEffectParticle(position,40,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
+                particle=part_spawn_ground_effect(position,40,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8);
             }
         }
         if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);

@@ -20,11 +20,11 @@ typedef struct MovieAdpcmDecoder {
 
 extern void func_L00_0042BCF8_1(void *p);
 
-extern void func_0034B070(void *p);
+extern void hud_construct(void *p);
 
 extern void func_L00_0042BFF8_7(void *p);
 
-extern void func_00337BD8(void *p);
+extern void text_panel_shutdown(void *p);
 
 extern char *F476e86a4_FUN_00335E10(char *p);
 
@@ -35,10 +35,10 @@ extern void F476e86a4_FUN_00336508(char *p, int a, int b);
 extern void F476e86a4_FUN_00336CE0(char *p, int a);
 
 /* Qwen draft (branch qwen/autonomy, 56f9a59b), checked by tools/check.py */
-void func_00338A60(int);
+void text_panel_update_mode(int);
 
 /* Qwen draft (branch qwen/autonomy, 576906e6), checked by tools/check.py */
-void func_00338F58(int);
+void text_panel_draw_scaled(int);
 
 extern char F45821cfb_D_001C2740[];
 
@@ -50,106 +50,106 @@ extern void F0a76d85b_FUN_00283360(char *p);
 
 extern void F0a76d85b_FUN_00279D18(void);
 
-extern void func_0034CEA0(void *);
-extern void func_0034E4B8(int);
+extern void UpdateItemStatusHud(void *);
+extern void hud_update_subobject_primary(int);
 extern void func_0029CB58(void);
 
 typedef int s32;
 
 /* lot15 -- first CALL-BEARING body: the call family is now open. */
-extern void func_0011AAD0(s32);
+extern void RotateThreadReadyQueue(s32);
 
 /* lot15 -- two twins of the first call-bearing body (same form, 32 bytes).
    The matched wrappers use a `nop` delay slot and return 1; the slot alone does not establish the callee parameter list. */
-extern void func_001338C8();
+extern void snd_send_cmd3c();
 
 typedef unsigned char u8;
 
-extern void func_001338F0(s32, s32, s32, s32, s32);
+extern void snd_send_cmd3e(s32, s32, s32, s32, s32);
 
-extern s32 func_00133890(void);
+extern s32 snd_send_cmd3d(void);
 
-extern s32 func_0011AEA0(s32);
+extern s32 FlushCache(s32);
 
-extern s32 func_0011AFE0(s32 *, s32);
+extern s32 sceSifSetDma(s32 *, s32);
 
-extern s32 func_0011AFC0(s32);
+extern s32 sceSifDmaStat(s32);
 
-extern s32 func_00133930(s32, s32);
+extern s32 snd_send_cmd5a(s32, s32);
 
 extern volatile unsigned int D_L00_001AEB10 __attribute__((sda));
 
 typedef struct { int pos; int used; int size; } Ring;
 
-extern void func_00336DB0(void *);
-extern void func_00336CE8(void *);
-extern void func_00336DB8(void *, int, void *, int);
-extern void func_002B7C80(void *, void *, int);
-extern void func_00115484(void *, int, int);
+extern void ui_return_self(void *);
+extern void table_relocate_entries(void *);
+extern void pool_init_cells(void *, int, void *, int);
+extern void load_read_disc_with_pause(void *, void *, int);
+extern void memset(void *, int, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x1348]; char *data; int size; } InitData;
-extern InitData D_0014B540;
-extern void func_003484C8(void *);
-extern void func_00346670(void *);
-extern void func_00345400(void *);
-extern void func_003439A0(void *);
-extern void func_0033F0A0(void *);
-extern void func_00339A38(void *);
-extern void func_00339008(void *);
-extern void func_0033B0B8(void *);
-extern void func_0033E640(void *);
-extern void func_003411C0(void *);
-extern void func_00343200(void *);
-extern void func_0033E480(void *);
-extern void func_00340D18(void *);
-extern void func_00349148(void *);
-extern void func_003395F8(void *);
-extern void func_0033D708(void *);
-extern void func_0033C430(void *);
-extern void func_0033C9B8(void *);
-extern void func_0033CD80(void *);
-extern void func_0033D440(void *);
-extern void func_0033BD38(void *);
-extern void func_0033C178(void *);
-extern void func_00347EA0(void *);
-extern void func_003420C8(void *);
-extern void func_00341C90(void *);
-extern void func_0033DAD0(void *);
-extern void func_0033DD80(void *);
-extern void func_0033DF78(void *);
-extern void func_0033E170(void *);
-extern void func_0033A4A0(void *);
-extern void func_0034E070(void *, void *, void *);
-extern void func_003486A8(void *, void *);
-extern void func_00346710(void *, void *);
-extern void func_00345490(void *, void *);
-extern void func_00343A30(void *, void *);
-extern void func_0033F218(void *, void *);
-extern void func_00339AD0(void *, void *);
-extern void func_00340D68(void *, void *);
-extern void func_00339078(void *, void *);
-extern void func_00341220(void *, void *);
-extern void func_00343260(void *, void *);
-extern void func_0033B170(void *, void *);
-extern void func_0033E6D0(void *, void *);
-extern void func_0033E4C0(void *, void *);
-extern void func_00349150(void *);
-extern void func_0033A520(void *, void *);
-extern void func_0033D740(void *, void *);
-extern void func_0033C468(void *, void *);
-extern void func_00339630(void *, void *);
-extern void func_0033C9F0(void *, void *);
-extern void func_0033CDC8(void *, void *);
-extern void func_0033D478(void *, void *);
-extern void func_0033BD70(void *, void *);
-extern void func_0033C1B0(void *, void *);
-extern void func_00347EC8(void *, void *);
-extern void func_00341CE0(void *, void *);
-extern void func_00342118(void *, void *);
-extern void func_0033DB08(void *, void *);
-extern void func_0033DDB8(void *, void *);
-extern void func_0033DFB0(void *, void *);
-extern void func_0033E1B0(void *, void *);
+extern InitData g_copy_setup_data;
+extern void menu_init_seven_labels(void *);
+extern void menu_screen_large_init_parts(void *);
+extern void menu_screen_init_parts(void *);
+extern void grid_menu_init_widgets(void *);
+extern void radial_menu_construct(void *);
+extern void list_screen_destroy(void *);
+extern void mission_screen_init_parts(void *);
+extern void map_screen_destroy(void *);
+extern void frame_text_page_destroy(void *);
+extern void tab_menu_construct(void *);
+extern void menu_init_widgets(void *);
+extern void simple_list_page_destroy(void *);
+extern void small_menu_construct(void *);
+extern void menu_return_object(void *);
+extern void mission_screen_shutdown(void *);
+extern void single_toggle_b_destroy(void *);
+extern void onoff_menu_destroy(void *);
+extern void four_option_menu_destroy(void *);
+extern void two_toggle_a_destroy(void *);
+extern void single_toggle_a_destroy(void *);
+extern void map_screen_destroy_prompt_bar(void *);
+extern void screen_adjust_menu_destroy(void *);
+extern void menu_pass_through_handle(void *);
+extern void list_menu_construct_parts(void *);
+extern void small_list_menu_construct(void *);
+extern void two_toggle_b_destroy(void *);
+extern void single_toggle_c_destroy(void *);
+extern void single_toggle_d_destroy(void *);
+extern void list_page_destroy(void *);
+extern void title_screen_destroy(void *);
+extern void records_screen_init(void *, void *, void *);
+extern void menu_page_construct_with_rows(void *, void *);
+extern void item_grid_menu_init(void *, void *);
+extern void selection_menu_init(void *, void *);
+extern void grid_menu_construct(void *, void *);
+extern void InitRadialMenu(void *, void *);
+extern void list_screen_init(void *, void *);
+extern void grid_menu_init(void *, void *);
+extern void mission_screen_init(void *, void *);
+extern void tab_menu_init(void *, void *);
+extern void item_menu_construct(void *, void *);
+extern void map_screen_init(void *, void *);
+extern void info_panel_init(void *, void *);
+extern void simple_page_init(void *, void *);
+extern void menu_clear_entries(void *);
+extern void title_screen_init_labels(void *, void *);
+extern void two_toggle_b_init(void *, void *);
+extern void four_option_menu_init(void *, void *);
+extern void popup_init(void *, void *);
+extern void prompt_menu_init(void *, void *);
+extern void audio_menu_init(void *, void *);
+extern void single_toggle_a_init(void *, void *);
+extern void screen_adjust_menu_init(void *, void *);
+extern void onoff_menu_init(void *, void *);
+extern void list_menu_reset_attach_items(void *, void *);
+extern void small_list_menu_init(void *, void *);
+extern void list_menu_init(void *, void *);
+extern void single_toggle_c_init(void *, void *);
+extern void single_toggle_d_init(void *, void *);
+extern void single_toggle_e_init(void *, void *);
+extern void list_page_init(void *, void *);
 
 
 /* func_0034CEA0 is defined in 0034CEA0-menu-g8.c. */
@@ -159,7 +159,7 @@ extern void func_0033E1B0(void *, void *);
 
 /* walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer */
 /* Sets up the menu part objects: 26 item records and four extra pieces. */
-unsigned char *func_0034DFE0(unsigned char *a0)
+unsigned char *menu_init_level_parts(unsigned char *a0)
 {
     unsigned char *p;
     int i;
@@ -169,21 +169,21 @@ unsigned char *func_0034DFE0(unsigned char *a0)
         p += 72;
     }
     func_L00_0042BCF8_1(a0 + 1872);
-    ConstructHudObject(a0 + 1952);
+    hud_construct(a0 + 1952);
     func_L00_0042BFF8_7(a0 + 7472);
-    ShutdownTextPanel(a0 + 7532);
-    ShutdownTextPanel(a0 + 8124);
+    text_panel_shutdown(a0 + 7532);
+    text_panel_shutdown(a0 + 8124);
     return a0;
 }
 
 
 /* Does nothing. */
-void func_0034E218(void)
+void menu_noop_hook(void)
 {
 }
 
 /* Moves one radial menu item to a screen position and draws it. */
-void func_0034E220(char *a0, int a1, int a2, int a3, int t0)
+void radial_menu_place_item(char *a0, int a1, int a2, int a3, int t0)
 {
     char *base = a0 + a1 * 72;
     float *p;
@@ -204,27 +204,27 @@ void func_0034E220(char *a0, int a1, int a2, int a3, int t0)
 
 
 /* Updates a part of the HUD stored inside this object. */
-void func_0034E4B8(int param_1)
+void hud_update_subobject_primary(int param_1)
 {
-  UpdateTextPanelByMode(param_1 + 0x1d6c);
+  text_panel_update_mode(param_1 + 0x1d6c);
 }
 
 /* Updates another part of the HUD stored inside this object. */
-void func_0034E4D8(int param_1)
+void hud_update_subobject_alt(int param_1)
 {
-  DrawTextPanelScaled(param_1 + 0x1d6c);
+  text_panel_draw_scaled(param_1 + 0x1d6c);
   return;
 }
 
 
 
 /* Returns the object it was given, unchanged. */
-void *func_0034E5B8(void *object) {
+void *menu_return_object_unchanged(void *object) {
     return object;
 }
 
 /* Clears the menu memory block and sets up every menu screen inside it. */
-char *func_0034E5C0(char *object)
+char *menu_system_init(char *object)
 {
     int i;
     int size;
@@ -267,114 +267,114 @@ char *func_0034E5C0(char *object)
         clear += 4;
     }
     root = object + 0x36F10;
-    ReturnSelf(root);
+    ui_return_self(root);
     part0 = object + 0x36F28;
-    InitLevelPartsA(part0);
+    menu_init_level_parts(part0);
     part1 = object + 0x39140;
-    InitSevenLabelMenu(part1);
+    menu_init_seven_labels(part1);
     part2 = object + 0x39590;
-    InitLargeMenuScreenParts(part2);
+    menu_screen_large_init_parts(part2);
     part3 = object + 0x39A98;
-    InitMenuScreenParts(part3);
+    menu_screen_init_parts(part3);
     part4 = object + 0x39F38;
-    InitGridMenuWidgets(part4);
+    grid_menu_init_widgets(part4);
     part5 = object + 0x3A388;
-    ConstructRadialMenuParts(part5);
+    radial_menu_construct(part5);
     part6 = object + 0x3ADE8;
-    DestroyListScreenWidgets(part6);
+    list_screen_destroy(part6);
     part7 = object + 0x3B1F0;
-    InitMissionScreenParts(part7);
+    mission_screen_init_parts(part7);
     part8 = object + 0x3B490;
-    DestroyMapScreenWidgets(part8);
+    map_screen_destroy(part8);
     part9 = object + 0x3B7C0;
-    DestroyElevenTextMenuPage(part9);
+    frame_text_page_destroy(part9);
     part10 = object + 0x3BE08;
-    ConstructTabbedMenuParts(part10);
+    tab_menu_construct(part10);
     part11 = object + 0x3C108;
-    InitMenuWidgets(part11);
+    menu_init_widgets(part11);
     part12 = object + 0x3C440;
-    DestroySimpleListMenuPage(part12);
+    simple_list_page_destroy(part12);
     part13 = object + 0x3C738;
-    ConstructSmallMenuParts(part13);
+    small_menu_construct(part13);
     part14 = object + 0x3C950;
-    ReturnObject(part14);
+    menu_return_object(part14);
     part15 = object + 0x3CAA8;
-    ShutdownMissionScreen(part15);
+    mission_screen_shutdown(part15);
     part16 = object + 0x3CDB0;
-    DestroySingleToggleOptionMenuB(part16);
+    single_toggle_b_destroy(part16);
     part17 = object + 0x3D060;
-    DestroyOnOffOptionMenu(part17);
+    onoff_menu_destroy(part17);
     part18 = object + 0x3D310;
-    DestroyFourOptionMenu(part18);
+    four_option_menu_destroy(part18);
     part19 = object + 0x3D5C0;
-    DestroyTwoToggleOptionMenuA(part19);
+    two_toggle_a_destroy(part19);
     part20 = object + 0x3D900;
-    DestroySingleToggleOptionMenuA(part20);
+    single_toggle_a_destroy(part20);
     part21 = object + 0x3DBB0;
-    DestroyMapScreenPromptBar(part21);
+    map_screen_destroy_prompt_bar(part21);
     part22 = object + 0x3DE60;
-    DestroyScreenAdjustMenu(part22);
+    screen_adjust_menu_destroy(part22);
     part23 = object + 0x3E110;
-    PassThroughHandle(part23);
+    menu_pass_through_handle(part23);
     part24 = object + 0x3E1D8;
-    ConstructListMenuParts(part24);
+    list_menu_construct_parts(part24);
     part25 = object + 0x3E430;
-    ConstructSmallListMenuParts(part25);
+    small_list_menu_construct(part25);
     part26 = object + 0x3E5A8;
-    DestroyTwoToggleOptionMenuB(part26);
+    two_toggle_b_destroy(part26);
     part27 = object + 0x3E858;
-    DestroySingleToggleOptionMenuC(part27);
+    single_toggle_c_destroy(part27);
     part28 = object + 0x3EB08;
-    DestroySingleToggleOptionMenuD(part28);
+    single_toggle_d_destroy(part28);
     part29 = object + 0x3EDB8;
-    DestroyListMenuPage(part29);
+    list_page_destroy(part29);
     part30 = object + 0x3F138;
-    DestroyTitleScreenWidgets(part30);
+    title_screen_destroy(part30);
     size = 0x3F490;
     end = object + size;
     D_001A8CFC[0] = object;
     *(char **)object = (char *)(((int)end + 3) & -4);
     *(int *)(object + 0x3F348) = size;
-    ReadDiscWithPause(object + 0x8710, gCopySetupData.data + gCopySetupData.offset, gCopySetupData.size);
-    RelocateTableEntryPointers(object + 0x8710);
-    InitCellPool(root, 16, object + 4, 0x8700);
-    InitRecordsScreen(part0, object, root);
+    load_read_disc_with_pause(object + 0x8710, g_copy_setup_data.data + g_copy_setup_data.offset, g_copy_setup_data.size);
+    table_relocate_entries(object + 0x8710);
+    pool_init_cells(root, 16, object + 4, 0x8700);
+    records_screen_init(part0, object, root);
     *(int *)(object + 0x3F34C) = 0;
     *(int *)(object + 0x3F350) = 0;
     *(int *)(object + 0x3F354) = 0;
     *(int *)(object + 0x3F358) = 0;
-    ConstructMenuPageWithRows(part1, root);
-    InitItemGridMenu(part2, root);
-    InitSelectionMenu(part3, root);
-    ConstructGridMenu(part4, root);
+    menu_page_construct_with_rows(part1, root);
+    item_grid_menu_init(part2, root);
+    selection_menu_init(part3, root);
+    grid_menu_construct(part4, root);
     InitRadialMenu(part5, root);
-    InitListScreen(part6, root);
-    InitMenuGrid(part13, root);
-    InitMissionScreen(part7, root);
-    InitTabbedMenu(part10, root);
-    ConstructItemSelectMenu(part11, root);
-    InitMapScreen(part8, root);
-    InitInfoPanelMenu(part9, root);
-    InitSimpleMenuPage(part12, root);
-    ClearMenuEntries(part14);
-    InitTitleLabelScreen(part30, root);
-    InitTwoToggleOptionMenuB(part16, root);
-    InitFourOptionMenu(part17, root);
-    InitPopupMessageBox(part15, root);
-    InitTwoToggleOptionMenuB(part16, root);
-    InitFourOptionMenu(part17, root);
-    InitPromptBarMenu(part18, root);
-    InitAudioOptionsMenu(part19, root);
-    InitSingleToggleOptionMenuA(part20, root);
-    InitScreenAdjustMenu(part21, root);
-    InitOnOffOptionMenu(part22, root);
-    InitListMenu_00347EC8(part23, root);
-    InitSmallListMenu(part25, root);
-    InitListMenu_00342118(part24, root);
-    InitSingleToggleOptionMenuC(part26, root);
-    InitSingleToggleOptionMenuD(part27, root);
-    InitSingleToggleOptionMenuE(part28, root);
-    InitListMenuPage(part29, root);
+    list_screen_init(part6, root);
+    grid_menu_init(part13, root);
+    mission_screen_init(part7, root);
+    tab_menu_init(part10, root);
+    item_menu_construct(part11, root);
+    map_screen_init(part8, root);
+    info_panel_init(part9, root);
+    simple_page_init(part12, root);
+    menu_clear_entries(part14);
+    title_screen_init_labels(part30, root);
+    two_toggle_b_init(part16, root);
+    four_option_menu_init(part17, root);
+    popup_init(part15, root);
+    two_toggle_b_init(part16, root);
+    four_option_menu_init(part17, root);
+    prompt_menu_init(part18, root);
+    audio_menu_init(part19, root);
+    single_toggle_a_init(part20, root);
+    screen_adjust_menu_init(part21, root);
+    onoff_menu_init(part22, root);
+    list_menu_reset_attach_items(part23, root);
+    small_list_menu_init(part25, root);
+    list_menu_init(part24, root);
+    single_toggle_c_init(part26, root);
+    single_toggle_d_init(part27, root);
+    single_toggle_e_init(part28, root);
+    list_page_init(part29, root);
     *(int *)(object + 0x3F364) = 0;
     *(int *)(object + 0x3F368) = 0;
     *(int *)(object + 0x3F36C) = 0;
@@ -385,7 +385,7 @@ char *func_0034E5C0(char *object)
 
 /* The retail caller passes an owner to both setup helpers; these bodies use resident state. */
 /* Sets the light directions and colors used by the menus. */
-void func_0034EBE0(void *owner)
+void hud_init_lighting_colors(void *owner)
 {
     float *p = (float *)F45821cfb_D_001C2740;
 
@@ -402,7 +402,7 @@ void func_0034EBE0(void *owner)
 }
 
 /* Resets some menu drawing values to zero. */
-void func_0034EC70(void *owner)
+void hud_reset_render_state(void *owner)
 {
     char *p = F0a76d85b_D_001B5200;
 
@@ -447,18 +447,18 @@ typedef struct {
     char *f5c;
 } SlotObject;
 
-extern void func_0026F788(char *, long long);
+extern void stub_empty_16(char *, long long);
 extern void func_002A05A8(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
 
 /* Links two menu slots to their picture data so they can be drawn. */
-void func_0034ECB0(char *obj)
+void menu_attach_slot_packets(char *obj)
 {
     char *sub = obj + 0xC00;
     SlotObject *s = (SlotObject *)sub;
 
-    EmptyStubF788(sub, 0);
+    stub_empty_16(sub, 0);
     func_002A05A8(sub);
     if (s->f42 != 0xFF) {
         EntryTable *table = s->f24;
@@ -477,24 +477,24 @@ void func_0034ECB0(char *obj)
     func_002A0F48(sub);
 }
 
-extern volatile int D_001A7350 __attribute__((sda));
-extern volatile int D_001A7354 __attribute__((sda));
+extern volatile int g_screen_offset_x __attribute__((sda));
+extern volatile int g_screen_offset_y __attribute__((sda));
 extern char D_L00_001AC820[];
 extern char *D_L00_001B2608[] __attribute__((sda));
-extern void func_00282B50(void *, void *, int);
-extern void func_002A0300(void *, int);
+extern void mem_fast_helper_c(void *, void *, int);
+extern void tex_upload_object_textures(void *, int);
 /* Draws a menu sprite twice, first shifted for a shadow, then in place. */
-void func_0034EDB0(void *unused, char *object)
+void gfx_draw_shadowed_sprite(void *unused, char *object)
 {
     char *packet = D_L00_001AC820;
-    *(int *)(packet + 0x20) = gScreenOffsetX + *(short *)(object + 0xB4);
-    *(int *)(packet + 0x24) = gScreenOffsetY + *(short *)(object + 0xB6);
-    FastMemoryHelperC(D_L00_001B2608[0], packet, 48);
+    *(int *)(packet + 0x20) = g_screen_offset_x + *(short *)(object + 0xB4);
+    *(int *)(packet + 0x24) = g_screen_offset_y + *(short *)(object + 0xB6);
+    mem_fast_helper_c(D_L00_001B2608[0], packet, 48);
     D_L00_001B2608[0] += 48;
-    UploadObjectTextures(object, 1);
-    *(int *)(packet + 0x20) = gScreenOffsetX;
-    *(int *)(packet + 0x24) = gScreenOffsetY;
-    FastMemoryHelperC(D_L00_001B2608[0], packet, 48);
+    tex_upload_object_textures(object, 1);
+    *(int *)(packet + 0x20) = g_screen_offset_x;
+    *(int *)(packet + 0x24) = g_screen_offset_y;
+    mem_fast_helper_c(D_L00_001B2608[0], packet, 48);
     D_L00_001B2608[0] += 48;
 }
 
@@ -504,54 +504,54 @@ void func_0034EDB0(void *unused, char *object)
 /* func_0034F048 is in 0034CEA0-read-mpeg.c. */
 
 /* Starts the movie sound transfer. */
-void func_0034F3B8(void) {
+void mpeg_start_decoder_dma(void) {
     RotateThreadReadyQueue(1);
 }
 
-extern char *D_001B23CC[] __attribute__((sda));
-extern int func_0034FAE8(u8 *);
+extern char *g_movie_player_state[] __attribute__((sda));
+extern int mpeg_is_audio_primed(u8 *);
 
 /* Tells whether the movie sound buffer has filled up enough. */
-int func_0034F3D8(void) {
-    return IsMovieAudioPrimed((u8 *)(gMoviePlayerState[0] + 0xD9100));
+int mpeg_is_audio_buffer_full(void) {
+    return mpeg_is_audio_primed((u8 *)(g_movie_player_state[0] + 0xD9100));
 }
 
 /* func_0034F408 is in 0034CEA0-movie-init.c. */
 
 extern char D_001AE820[];
-extern void func_0026FEB8(void *, int);
+extern void STUB_printf(void *, int);
 
 /* Passes a number on to a debug print helper. */
-void func_0034F780(int value) {
+void mpeg_set_debug_value(int value) {
     STUB_printf(D_001AE820, value);
 }
 
-extern char *D_001B23CC[] __attribute__((sda));
-extern void func_0034FAF8(int *);
+extern char *g_movie_player_state[] __attribute__((sda));
+extern void mpeg_update_audio_if_active(int *);
 
 /* Keeps the movie sound playing if it is active. */
-void func_0034F7A8(void) {
-    UpdateMovieAudioIfActive((int *)(gMoviePlayerState[0] + 0xD9100));
+void proceedAudio(void) {
+    mpeg_update_audio_if_active((int *)(g_movie_player_state[0] + 0xD9100));
 }
 
 
 /* Resets the movie sound transfer and reports success. */
-s32 func_0034F898(void) {
-    SendSoundCommand3C();
+s32 mpeg_reset_audio_dma(void) {
+    snd_send_cmd3c();
     return 1;
 }
 
 
 /* Starts playing the movie sound. */
-void func_0034F8C0(u8 *decoder) {
-    SendSoundCommand3E(*(s32 *)(decoder+0x48), *(s32 *)(decoder+0x4c) / 1024 * 1024,
+void mpeg_start_audio_playback(u8 *decoder) {
+    snd_send_cmd3e(*(s32 *)(decoder+0x48), *(s32 *)(decoder+0x4c) / 1024 * 1024,
                 *(s32 *)(decoder+0x5c), *(s32 *)(decoder+0x14), *(s32 *)(decoder+0x18));
     *(s32 *)decoder = 2;
 }
 
 /* Stops the movie sound and clears its counters. */
-void func_0034F918(u8 *decoder) {
-    SendSoundCommand3D();
+void mpeg_stop_audio_playback(u8 *decoder) {
+    snd_send_cmd3d();
     *(volatile s32 *)(decoder + 0x5c) = 0;
     *(volatile s32 *)(decoder + 0x00) = 0;
     *(volatile s32 *)(decoder + 0x30) = 0;
@@ -563,7 +563,7 @@ void func_0034F918(u8 *decoder) {
 }
 
 /* Works out where new movie sound data can be written in the ring buffer. */
-void func_0034F960(s32 *state,s32 *outPtr1,s32 *outLen1,s32 *outPtr2,s32 *outLen2) {
+void mpeg_get_audio_write_pointers(s32 *state,s32 *outPtr1,s32 *outLen1,s32 *outPtr2,s32 *outLen2) {
  s32 offset,wanted;
  if(state[0]==0) {
   if(state[1]!=4) {
@@ -583,7 +583,7 @@ void func_0034F960(s32 *state,s32 *outPtr1,s32 *outLen1,s32 *outPtr2,s32 *outLen
  *outLen2=wanted-(state[16]-state[14]);
 }
 
-int func_0034FA30(s32 *state,s32 amount) {
+int audioDecEndPut(s32 *state,s32 amount) {
     if(state[0]==0) {
         if(state[1]!=4) {
             s32 room=40-state[12];
@@ -602,32 +602,32 @@ int func_0034FA30(s32 *state,s32 amount) {
 }
 
 /* true when the counter has reached 0x1000; byte-identical across all 27 levels. */
-s32 func_0034FAE8(u8 *a0) { return *(s32 *)(a0 + 0x50) >= 0x1000; }
+s32 mpeg_is_audio_primed(u8 *a0) { return *(s32 *)(a0 + 0x50) >= 0x1000; }
 
-extern void func_0034FBC8(void *);
+extern void mpeg_send_audio_blocks(void *);
 
 /* Sends movie sound data if the player is running. */
-void func_0034FAF8(int *object) {
+void mpeg_update_audio_if_active(int *object) {
     if (object[0] != 0)
-        SendMovieAudioBlocks(object);
+        mpeg_send_audio_blocks(object);
 }
 
 /* Sends one block of sound data to the sound chip and waits until it is done. */
-void func_0034FB20(u8 *a0, s32 a1, s32 a2, s32 a3) {
+void mpeg_send_audio_block_to_spu(u8 *a0, s32 a1, s32 a2, s32 a3) {
     s32 dma[4], id;
     ((void (*)(s32))FlushCache)(0);
     dma[0] = a1; dma[1] = *(s32 *)(a0+0x48); dma[2] = a2; dma[3] = 0;
     do { id = sceSifSetDma(dma,1); } while (id == 0);
     while (sceSifDmaStat(id) >= 0) {}
-    SendSoundCommand5A(a2,a3);
+    snd_send_cmd5a(a2,a3);
 }
 
 /* sendADPCM(_AudioDec *) */
 extern s32 D_001B23D4 __attribute__((section(".sdata")));
-extern s32 func_00133960(void);
+extern s32 snd_send_cmd5b(void);
 
 /* Feeds the movie sound data to the sound chip in blocks, one per channel. */
-void func_0034FBC8(void *object) {
+void mpeg_send_audio_blocks(void *object) {
     s32 *o = object;
     s32 t = 0;
     s32 next, i, count;
@@ -641,7 +641,7 @@ void func_0034FBC8(void *object) {
         t = 0x1000 - o[20];
         break;
     case 2:
-        t = (SendSoundCommand5B() - o[24]) & 0xFFF;
+        t = (snd_send_cmd5b() - o[24]) & 0xFFF;
         break;
     case 3:
         return;
@@ -670,7 +670,7 @@ void func_0034FBC8(void *object) {
                 p[1] = 6;
                 p[0x11] = 2;
             }
-            SendAudioBlockToSpu((u8 *)o, D_001B23D4, 0x400, (i << 12) + o[24]);
+            mpeg_send_audio_block_to_spu((u8 *)o, D_001B23D4, 0x400, (i << 12) + o[24]);
         }
         t = next;
         o[15] -= o[6] * 1024;
@@ -685,29 +685,29 @@ void func_0034FBC8(void *object) {
 
 /* func_00350190 is defined in 00350190.c. */
 
-extern int func_001261F0(int);
-extern int D_001A7BB8 __attribute__((sda));
+extern int sceGsSyncV(int);
+extern int g_widescreen_flag __attribute__((sda));
 extern volatile int D_001AE7D0[] __attribute__((sda));
 extern volatile int D_001AE7D4[] __attribute__((sda));
 
 /* Waits for the right screen field, then lets the movie start showing frames. */
-void func_003501E0(int value)
+void mpeg_wait_for_field_start(int value)
 {
-    while (GetGsCurrentField(0) == value && gWidescreenFlag == 0) {}
+    while (sceGsSyncV(0) == value && g_widescreen_flag == 0) {}
     D_001AE7D0[0] = 1;
     D_001AE7D4[0] = 0;
 }
 
 /* A19-sda-scalar-store-16 freshly exact-verified under family reservation */
 /* Clears a movie flag. */
-void func_00350230(void) { D_L00_001AEB10 = 0; }
+void mpeg_clear_flag(void) { D_L00_001AEB10 = 0; }
 
 /* func_00350240 is in 0034CEA0-g8.c. */
 
-extern int func_00350460(char *, int, char *, int, char *, int, char *, int);
+extern int mpeg_copy_split_buffer(char *, int, char *, int, char *, int, char *, int);
 
 /* Copies a chunk of movie sound data into the sound buffer. */
-int func_00350378(void *unused, int *packet, char *buf)
+int mpeg_copy_packet_to_audio_buffer(void *unused, int *packet, char *buf)
 {
     char *first_address;
     int first_count;
@@ -725,15 +725,15 @@ int func_00350378(void *unused, int *packet, char *buf)
     if (len < first)
         first = len;
     second = len - first;
-    GetAudioBufferWritePointers((s32 *)(gMoviePlayerState[0] + 0xD9100), (s32 *)&first_address, &first_count, (s32 *)&second_address, &second_count);
-    result = CopySplitBuffer(first_address, first_count, second_address, second_count, src, first, buf, second);
-    audioDecEndPut((s32 *)(gMoviePlayerState[0] + 0xD9100), result);
+    mpeg_get_audio_write_pointers((s32 *)(g_movie_player_state[0] + 0xD9100), (s32 *)&first_address, &first_count, (s32 *)&second_address, &second_count);
+    result = mpeg_copy_split_buffer(first_address, first_count, second_address, second_count, src, first, buf, second);
+    audioDecEndPut((s32 *)(g_movie_player_state[0] + 0xD9100), result);
     return result > 0;
 }
 
 
 /* Sets up an empty read buffer. */
-void func_00350590(u8 *ring) {
+void readBufCreate(u8 *ring) {
  ring+=0x50000;
  *(s32 *)(ring+8)=0x50000;
  *(s32 *)ring=0;
@@ -741,18 +741,18 @@ void func_00350590(u8 *ring) {
 }
 
 /* Does nothing. */
-void func_003505A8(void)
+void mpeg_noop_read_buffer_hook(void)
 {
 }
 
-s32 func_003505B0(u8 *buf,u8 **outPtr) {
+s32 readBufBeginPut(u8 *buf,u8 **outPtr) {
  s32 *ring=(s32 *)(buf+0x50000);
  s32 freeBytes=ring[2]-ring[1];
  if(freeBytes!=0) *outPtr=buf+ring[0];
  return freeBytes;
 }
 
-void func_003505E0(char *base, int n) {
+void readBufEndPut(char *base, int n) {
     Ring *r = (Ring *)(base + 0x50000);
     int avail = r->size - r->used;
     if (n < avail) avail = n;
@@ -760,7 +760,7 @@ void func_003505E0(char *base, int n) {
     r->used += avail;
 }
 
-s32 func_00350628(u8 *buf,s32 *outPtr) {
+s32 readBufBeginGet(u8 *buf,s32 *outPtr) {
     u8 *ring=buf+0x50000;
     s32 usedBytes=*(s32 *)(ring+4);
     if(usedBytes!=0) {
@@ -770,7 +770,7 @@ s32 func_00350628(u8 *buf,s32 *outPtr) {
     return *(s32 *)(ring+4);
 }
 
-s32 func_00350670(u8 *ring,s32 amount) {
+s32 readBufEndGet(u8 *ring,s32 amount) {
  s32 before,taken;
  ring+=0x50000;
  taken=*(s32 *)(ring+4);before=taken;
@@ -780,4 +780,4 @@ s32 func_00350670(u8 *ring,s32 amount) {
 }
 
 /* stores two words and returns 1; byte-identical across all 27 levels. */
-s32 func_00350698(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0x4) = a1; *(s32 *)a0 = a2; return 1; }
+s32 mpeg_set_read_buffer_range(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0x4) = a1; *(s32 *)a0 = a2; return 1; }

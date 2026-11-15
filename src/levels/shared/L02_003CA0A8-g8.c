@@ -16,16 +16,16 @@ extern int D_L02_001AFFC8 __attribute__((sda));
 extern int D_L02_001AFFD0 __attribute__((sda));
 extern float D_L02_001AFFD8 __attribute__((sda));
 extern struct Pair D_L02_001AFFE0 NOT_SDA;
-extern int func_002A7820(int, int);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
-extern int func_00283D38(int, int, float);
-extern float func_00283180(float), func_00283198(float), func_00283B98(float, float);
-extern void func_002C3150(void *, void *, int, int, int, int, float);
-extern void func_00282D30(void *, void *, float);
+extern int math_random_int_range(int, int);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
+extern int FastTweenColor(int, int, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), FastAddRotations(float, float);
+extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void FastVecScale(void *, void *, float);
 
 /* Spawns the effect's burst: 32 pairs of particles in a ring around the object. */
-void func_L02_003CA0A8(char *obj)
+void SpawnEffectParticleRing(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     struct Pair speed, range;
@@ -43,16 +43,16 @@ void func_L02_003CA0A8(char *obj)
     speed = range;
     range = D_L02_001AFFE0;
     for (i = 0; i < 32; i++) {
-        alpha = RandomIntRange(D_L02_001AFFC8, D_L02_001AFFB8[0].alpha[1]);
-        r = RandomFloatRange(zero, 1.0f);
+        alpha = math_random_int_range(D_L02_001AFFC8, D_L02_001AFFB8[0].alpha[1]);
+        r = math_random_float_range(zero, 1.0f);
         color = FastTweenColor(D_L02_001AFFD0, D_L02_001AFFB8[0].colors[1], r);
-        r = RandomFloatRange(speed.a, speed.b);
-        vel[0] = FastSinOrCosA(angle) * r;
-        vel[1] = FastSinOrCosB(angle) * r;
+        r = math_random_float_range(speed.a, speed.b);
+        vel[0] = math_fast_sin_or_cos_a(angle) * r;
+        vel[1] = math_fast_sin_or_cos_b(angle) * r;
         vel[2] = zero;
-        angle = FastAddRotations(angle, RandomFloatRange(range.a, range.b));
-        SpawnHeroRelativeParticle(pos, vel, color, alpha & 255, RandomIntBelow(255) & 255, 0, D_L02_001AFFD8);
+        angle = FastAddRotations(angle, math_random_float_range(range.a, range.b));
+        part_spawn_hero_relative(pos, vel, color, alpha & 255, math_random_int_below(255) & 255, 0, D_L02_001AFFD8);
         FastVecScale(vel, vel, 0.8f);
-        SpawnHeroRelativeParticle(pos, vel, color, alpha & 255, RandomIntBelow(255) & 255, 0, D_L02_001AFFB8[0].sizes[1]);
+        part_spawn_hero_relative(pos, vel, color, alpha & 255, math_random_int_below(255) & 255, 0, D_L02_001AFFB8[0].sizes[1]);
     }
 }

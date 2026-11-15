@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char reserved00[0x14];
@@ -7,7 +8,7 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackState;
-extern CallbackState D_001F2840;
+extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 extern void func_0029C990(int);
 
@@ -15,10 +16,10 @@ int func_US2_002D4030(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -33,32 +34,32 @@ return_value:
     return result;
 }
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-void func_0027C540(long);
-void func_0027C660(void);
-extern void func_0027C540(long arg0);
-extern void func_0027C540(long param_1);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+void SetupGifPaging(long);
+void DoGifPaging(void);
+extern void SetupGifPaging(long arg0);
+extern void SetupGifPaging(long param_1);
 extern void func_0029C9D0(void);
 
 int func_US2_002D40B8(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C9D0();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
 extern int func_0029C840(int);
-extern void func_002D5B58(short, int, int *);
+extern void menu_process_request(short, int, int *);
 
 int func_US2_002D40E8(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -73,7 +74,7 @@ return_value:
         int request;
         if (func_0029C840(flags)) {
             request = 0;
-            func_002D5B58(13, 0, &request);
+            menu_process_request(13, 0, &request);
         }
     }
     return result;
@@ -82,9 +83,9 @@ return_value:
 extern void func_0029C880(void);
 
 int func_US2_002D4188(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C880();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -94,10 +95,10 @@ int func_US2_002D41B8(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            g_pause_menu_state.value = value;
+        else if (g_pause_menu_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -117,9 +118,9 @@ extern void func_0029C8F0(void);
 /* Implementation matching decompiled output */
 long func_US2_002D4240(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C8F0();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 

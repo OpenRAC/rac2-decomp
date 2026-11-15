@@ -10,7 +10,7 @@ typedef struct {
     char pad344[0x3EC];
     Vector axis, side;
 } ContactHero;
-extern ContactHero D_00189E20;
+extern ContactHero g_hero_state;
 typedef struct {
     unsigned char pad0[3];
     unsigned char flags;
@@ -18,28 +18,28 @@ typedef struct {
     unsigned char tile;
     union { short frames; unsigned char bytes[2]; } life;
 } ContactParticle;
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
-extern float func_002A7940(void);
-extern float func_00283B98(float, float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern char *func_002BDCE8(void *, float, float, float, int, void *, float, unsigned int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern char *func_002C16C0(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
-extern float func_00282C48(float);
-extern void func_002AB668(void *, int, float);
-extern void func_002ACDE8(void *, void *, void *);
-extern void func_002AF000(float *, float, float, float);
-extern int func_002AAFA0(unsigned int, int);
-extern int func_002A7820(int, int);
-extern char *func_002BCB00(void *, void *, int, int, int, int, int, int, int, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_float_range(float, float);
+extern float math_random_signed_float_range(float, float);
+extern float math_random_angle(void);
+extern float FastAddRotations(float, float);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern char *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, unsigned int, int);
+extern void FastVecSub(void *, void *, void *);
+extern char *part_spawn_burst(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
+extern float math_fabs(float);
+extern void math_build_axis_angle_quat(void *, int, float);
+extern void vec_rotate_by_quaternion(void *, void *, void *);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern int gfx_swap_packed_color_channels(unsigned int, int);
+extern int math_random_int_range(int, int);
+extern char *part_spawn_spark(void *, void *, int, int, int, int, int, int, int, float);
 
 /* Spawn layered particles and two falling streaks at the supplied position. */
-void func_L00_003A5FC0(void *owner, void *position)
+void SpawnLayeredParticleBurst(void *owner, void *position)
 {
     Vector rotation, direction, base, origin, velocity, jitter, drift, offset, scatter;
     float angle = 0.0f;
@@ -50,28 +50,28 @@ void func_L00_003A5FC0(void *owner, void *position)
     base[1] = -1.0f;
     base[3] = 1.0f;
     qcopy(origin, position);
-    ApplyAxisRotationToQuaternion(base, gHeroState.axis, gHeroState.side, 0.349065899848938f);
+    math_apply_axis_rotation_to_quat(base, g_hero_state.axis, g_hero_state.side, 0.349065899848938f);
     qcopy(direction, base);
     /* This clear precedes every read of drift; surrounding objects do not alias it. */
     qzero_nc(drift);
-    if (gHeroState.motionActive)
-        FastVecScale(drift, gHeroState.motion, 1.7f);
-    FastVecScale(offset, gHeroState.axis, 0.4f);
+    if (g_hero_state.motionActive)
+        FastVecScale(drift, g_hero_state.motion, 1.7f);
+    FastVecScale(offset, g_hero_state.axis, 0.4f);
     FastVecAdd(origin, origin, offset);
     for (count = 19; count >= 0; count--) {
         char *particle;
         float size;
         int spin;
-        angle = FastAddRotations(angle, RandomFloatRange(0.0f, 0.6283186078f));
-        FastVecScale(velocity, direction, RandomFloatRange(0.2000000179f, 0.2666666806f));
+        angle = FastAddRotations(angle, math_random_float_range(0.0f, 0.6283186078f));
+        FastVecScale(velocity, direction, math_random_float_range(0.2000000179f, 0.2666666806f));
         FastVecAdd(velocity, velocity, drift);
-        jitter[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.3f);
-        jitter[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.3f);
-        jitter[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.3f);
-        spin = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
-        size = RandomFloatRange(0.2f, 0.75f) * 210000.0f;
+        jitter[0] = origin[0] + math_random_signed_float_range(0.0f, 0.3f);
+        jitter[1] = origin[1] + math_random_signed_float_range(0.0f, 0.3f);
+        jitter[2] = origin[2] + math_random_signed_float_range(0.0f, 0.3f);
+        spin = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
+        size = math_random_float_range(0.2f, 0.75f) * 210000.0f;
         particle = SpawnSpinningSparkParticle(jitter, 0.0f, 1.0f, 1.00999999f, spin,
-                                 gHeroState.motion, size, 0x7F202020, 0);
+                                 g_hero_state.motion, size, 0x7F202020, 0);
         if (particle) {
             char *tail = particle + 0x20;
             ((ContactParticle *)particle)->flags = 0x44;
@@ -82,35 +82,35 @@ void func_L00_003A5FC0(void *owner, void *position)
             *(unsigned char *)(tail + 0xA) = 0x30;
             *(unsigned char *)(tail + 0xB) = ((ContactParticle *)particle)->life.bytes[0];
         }
-        jitter[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.6f);
-        jitter[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.6f);
-        jitter[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.6f);
-        size = RandomFloatRange(0.2f, 1.75f) * 210000.0f;
+        jitter[0] = origin[0] + math_random_signed_float_range(0.0f, 0.6f);
+        jitter[1] = origin[1] + math_random_signed_float_range(0.0f, 0.6f);
+        jitter[2] = origin[2] + math_random_signed_float_range(0.0f, 0.6f);
+        size = math_random_float_range(0.2f, 1.75f) * 210000.0f;
         FastVecSub(jitter, jitter, velocity);
-        SpawnBurstParticle_002C16C0(jitter, velocity, 6, 0x7F, 0x404040, spin,
+        part_spawn_burst(jitter, velocity, 6, 0x7F, 0x404040, spin,
                       size, 500.0f, 0.95f, 0.0f, 0.0f);
-        if (FloatAbs(angle) > 0.00001f) {
-            BuildAxisAngleQuaternion(rotation, (int)gHeroState.axis, angle);
-            RotateVectorByQuaternion(direction, base, rotation);
+        if (math_fabs(angle) > 0.00001f) {
+            math_build_axis_angle_quat(rotation, (int)g_hero_state.axis, angle);
+            vec_rotate_by_quaternion(direction, base, rotation);
         }
     }
     {
         int streakCount;
-        float speed = RandomFloatRange(8.0f, 12.0f);
+        float speed = math_random_float_range(8.0f, 12.0f);
         float scale = 0.5f;
-        FastVecScale(base, gHeroState.axis, speed * (1.0f / 60.0f));
+        FastVecScale(base, g_hero_state.axis, speed * (1.0f / 60.0f));
         for (streakCount = 1; streakCount >= 0; streakCount--) {
-            float cone = RandomFloatRange(0.2617994249f, 1.396263599395752f);
-            float heading = RandomAngle();
-            float length = RandomFloatRange(7.0f, 10.5f);
+            float cone = math_random_float_range(0.2617994249f, 1.396263599395752f);
+            float heading = math_random_angle();
+            float length = math_random_float_range(7.0f, 10.5f);
             int firstColor, secondColor, life;
-            BuildSphericalOffset(scatter, scale * (1.0f / 60.0f) * length, heading, cone);
+            vec_build_spherical_offset(scatter, scale * (1.0f / 60.0f) * length, heading, cone);
             FastVecAdd(scatter, scatter, base);
             scatter[2] += 0.05000000447f;
-            firstColor = SwapPackedColorChannels(0x4F007FFF, 0);
-            secondColor = SwapPackedColorChannels(0x1F00007F, 0);
-            life = RandomIntRange(60, 120);
-            SpawnSparkParticle_002BCB00(position, scatter, firstColor, secondColor, life, 1, -1, -1, 0, scale * 40000.0f);
+            firstColor = gfx_swap_packed_color_channels(0x4F007FFF, 0);
+            secondColor = gfx_swap_packed_color_channels(0x1F00007F, 0);
+            life = math_random_int_range(60, 120);
+            part_spawn_spark(position, scatter, firstColor, secondColor, life, 1, -1, -1, 0, scale * 40000.0f);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern char *D_L19_001B1EAC __attribute__((sda));
 extern float D_L19_001B1E94 __attribute__((sda));
 extern float D_L19_001B1E98 __attribute__((sda));
@@ -12,15 +12,15 @@ extern float D_L19_001B1EA8 __attribute__((sda));
 extern int D_L19_001B258C;
 extern char D_L19_001B9A40[];
 
-extern int func_002ACBC8(char *, int);
-extern void func_002AF000(float *, float, float, float);
-extern void func_00282CC0(float *, float *, char *);
-extern char *func_L00_002D70A0(int);
-extern void func_L00_002D7140(char *);
-extern void func_00282CF0(char *, float *, char *);
+extern int IsPointInCuboid(char *, int);
+extern void vec_build_spherical_offset(float *, float, float, float);
+extern void FastVecAdd(float *, float *, char *);
+extern char *cam_alloc_override_slot(int);
+extern void cam_end_override(char *);
+extern void FastVecSub(char *, float *, char *);
 
 /* Per-frame update of the carried-object marker: arms it, tracks markerOffset linked flag, and while the hero is in state 0x31 places and sizes the marker from the grabbed object's bounds. */
-void func_L19_00422A98(char *obj) {
+void carried_marker_update(char *obj) {
     float markerOffset[4];
     float markerPos[4];
     char *heldObject;
@@ -45,16 +45,16 @@ void func_L19_00422A98(char *obj) {
     default:
         return;
     }
-    if (FLD(gHeroState, int, 0x2294) == 0x31 && (heldObject = FLD(gHeroState, char *, 0x1830)) != 0) {
-        BuildSphericalOffset(markerOffset, D_L19_001B1E94, FLD(heldObject, float, 0xF8), -FLD(heldObject, float, 0xF4) * 0.5f);
-        FastVecAdd(markerPos, markerOffset, FLD(gHeroState, char *, 0x1830) + 0x10);
+    if (FLD(g_hero_state, int, 0x2294) == 0x31 && (heldObject = FLD(g_hero_state, char *, 0x1830)) != 0) {
+        vec_build_spherical_offset(markerOffset, D_L19_001B1E94, FLD(heldObject, float, 0xF8), -FLD(heldObject, float, 0xF4) * 0.5f);
+        FastVecAdd(markerPos, markerOffset, FLD(g_hero_state, char *, 0x1830) + 0x10);
         if (D_L19_001B1EAC == 0) {
-            D_L19_001B1EAC = AllocCameraOverrideSlot(5);
+            D_L19_001B1EAC = cam_alloc_override_slot(5);
             if (D_L19_001B1EAC == 0) {
                 return;
             }
         }
-        if (FLD(FLD(gHeroState, char *, 0x1830), s16, 0xAA) == 0x905 /* Glider */) {
+        if (FLD(FLD(g_hero_state, char *, 0x1830), s16, 0xAA) == 0x905 /* Glider */) {
             FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E98;
             FLD(D_L19_001B1EAC, float, 0xC) = -1.0f;
             FLD(D_L19_001B1EAC, float, 8) = -1.0f;
@@ -68,7 +68,7 @@ void func_L19_00422A98(char *obj) {
         return;
     }
     if (D_L19_001B1EAC != 0) {
-        EndCameraOverride(D_L19_001B1EAC);
+        cam_end_override(D_L19_001B1EAC);
         D_L19_001B1EAC = 0;
     }
 }

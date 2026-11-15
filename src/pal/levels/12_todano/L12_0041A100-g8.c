@@ -130,53 +130,53 @@ extern s32 D_L12_001B3D98 MACRO_ADDR;
 extern s32 D_L12_001B3D9C MACRO_ADDR;
 extern s32 D_L12_001B3DA0 MACRO_ADDR;
 extern char *D_L12_001FEAC0[];
-extern char D_00189EA0[];
+extern char g_hero_position[];
 extern char D_L12_001B1880[];
 extern char D_L12_001B1890[];
 extern char D_L12_001B18A8[];
 
-extern void func_0026FEB8(const char *, ...);
-extern int func_L02_002EF388(void *, void *, void *, void *, int);
-extern float func_00282E80(void *, void *);
-extern float func_00283198(float);
-extern float func_00283248(float, float);
-extern float func_00283CE0(int);
-extern void func_002A0488(void *, int, int, int);
-extern void func_002A04B8(void *, s32 *, s32 *, s32 *);
-extern void func_002A6C58(void *, int, int);
-extern int func_002A77E0(int);
-extern float func_002ABB18(float);
-extern void func_002ABBB8(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
+extern void STUB_printf(const char *, ...);
+extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
+extern float vec_distance_xy(void *, void *);
+extern float math_fast_sin_or_cos_b(float);
+extern float mat_fast_helper_a(float, float);
+extern float IntToFloat(int);
+extern void set_moby_color(void *, int, int, int);
+extern void get_moby_color(void *, s32 *, s32 *, s32 *);
+extern void SetDeathBits(void *, int, int);
+extern int math_random_int_below(int);
+extern float math_wrap_angle_to_pi(float);
+extern void SpawnExplosionEffects(void *o, void *a, void *b, f32 f0, f32 f1, s32 i0, s32 i1, s32 i2,
                           f32 f2, f32 f3, f32 f4, f32 f5, s32 i3, f32 f6, s32 i4, s32 i5, s32 i6,
                           s32 i7, s32 i8);
-extern s32 func_002B1C20(void *, void *);
-extern s32 func_002B3380(void *, void *, void *);
-extern int func_002B3890(void *);
-extern int func_L00_00329520(void *, int);
-extern void func_002B5278(void *, float);
+extern s32 moby_dispatch_action_by_kind(void *, void *);
+extern s32 part_spawn_damage_debris(void *, void *, void *);
+extern int flag_set_second_pending(void *);
+extern int coll_point_inside_region(void *, int);
+extern void moby_step_at_own_position_factor(void *, float);
 extern int func_001163B0(void);
-extern s32 func_00282978(s16 *);
-extern float func_00283B98(float, float);
-extern float func_00283C80(float, float);
-extern void func_0029F338(void *);
-extern void func_002A7750(void *, int, int);
-extern int func_002A7820(int, int);
-extern void func_L09_003F73E8(void *);
-extern void func_L09_003F7430(void *);
-extern void func_L09_003F77D0(void *);
-extern int func_L09_003F7B28(void *, int);
-extern void func_L09_003F7C50(void *, int, int);
-extern void func_L12_00412DA0(void *);
-extern void func_L12_00412DE0(void *);
-extern void func_L12_00412E50(void *, int, int, int);
-extern void func_L12_00413CE0(void *);
-extern void func_L12_00413F68(void *);
-extern void func_L12_004141A8(void *);
-extern void func_L12_00414670(void *);
-extern void func_L12_004149B8(void *);
-extern int func_L12_00414AB8(void *, int, int, int);
-extern void func_L12_00414C60(void *);
-extern void func_L12_00414EB8(void *);
+extern s32 FastDecTimer(s16 *);
+extern float FastAddRotations(float, float);
+extern float FastDiffRots(float, float);
+extern void moby_mark_spawned(void *);
+extern void moby_set_state(void *, int, int);
+extern int math_random_int_range(int, int);
+extern void shared_counter_release(void *);
+extern void shared_counter_acquire(void *);
+extern void moby_destroy_linked(void *);
+extern int enemy_walk_to_next_path_point(void *, int);
+extern void enemy_select_path(void *, int, int);
+extern void guard_clear_hit_value(void *);
+extern void guard_restore_hit_value(void *);
+extern void guard_switch_animation(void *, int, int, int);
+extern void path_hand_state_to_nearest(void *);
+extern void slot_timers_update(void *);
+extern void guard_handle_hit_handover(void *);
+extern void guard_aim_partner_hands(void *);
+extern void guard_reattach_helpers(void *);
+extern int guard_is_line_of_sight_blocked(void *, int, int, int);
+extern void guard_aim_hand_helper_at_target(void *);
+extern void guard_update_attack_sequence(void *);
 
 void func_PAL_L12_0041A100(GuardMoby *moby)
 {
@@ -202,13 +202,13 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
 
     vars = moby->vars;
     if (vars->f2E == 2) {
-        func_L12_00413CE0(moby);
-        func_002B3380(moby, (char *)vars + 0x290, (char *)vars + 0x20);
-        func_L09_003F73E8(moby);
-        func_L09_003F77D0(moby);
-        func_002ABBB8(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
+        path_hand_state_to_nearest(moby);
+        part_spawn_damage_debris(moby, (char *)vars + 0x290, (char *)vars + 0x20);
+        shared_counter_release(moby);
+        moby_destroy_linked(moby);
+        SpawnExplosionEffects(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
-        func_0029F338(moby);
+        moby_mark_spawned(moby);
         return;
     }
     if (D_L12_001A8F00 == 2)
@@ -218,7 +218,7 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         moby->f30 = vars->f31E;
 
     if (vars->f314 != -1 && moby->f95 == 0) {
-        if (func_L00_00329520(D_00189EA0, vars->f314) == 0) {
+        if (coll_point_inside_region(g_hero_position, vars->f314) == 0) {
             if (vars->f31D == 0)
                 vars->f31C = -1;
             else
@@ -242,7 +242,7 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             return;
         }
         vars->f31C = 1;
-        func_L12_004141A8(moby);
+        guard_handle_hit_handover(moby);
         *(TI128 *)&moby->x = *(TI128 *)(D_L12_001FEAC0[vars->f2C0] + 0x10);
         n = 0;
         if (vars->f2F8 != 0) {
@@ -253,7 +253,7 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             list[n++] = vars->f2F0[0];
         if (vars->f2F0[1] != 0)
             list[n++] = vars->f2F0[1];
-        func_L02_002EF388(moby, &moby->x, (char *)moby + 0xF0, list, n);
+        moby_fuse_linked_objects(moby, &moby->x, (char *)moby + 0xF0, list, n);
     }
 
     if (vars->f4A0 != 0) {
@@ -261,10 +261,10 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             goto release;
         if (vars->f4A0->state == 0xFD) {
         release:
-            func_002A04B8(moby, &sx, &sy, &sz);
+            get_moby_color(moby, &sx, &sy, &sz);
         if (sx != D_L12_001B3D98 || sy != D_L12_001B3D9C || sz != D_L12_001B3DA0)
-            func_0026FEB8(D_L12_001B1880);
-        func_002A0488(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+            STUB_printf(D_L12_001B1880);
+        set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
         vars->f4A0 = 0;
         }
     }
@@ -301,11 +301,11 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             GuardMoby *head;
             int i;
 
-            func_0026FEB8(D_L12_001B1890, D_L12_001B29C8, moby->fB2, alarm);
+            STUB_printf(D_L12_001B1890, D_L12_001B29C8, moby->fB2, alarm);
             moby->f31 = 1;
             moby->f34 = moby->f34 & 0xFFFE;
             moby->f98 = moby->f24->f10;
-            func_002A0488(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+            set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
             head = vars->f2F8;
             if (head != 0 && head->fAA == 0x114B && head->state != 0xFE && head->state != 0xFD) {
                 head->f34 = head->f34 & 0xFFFE;
@@ -327,125 +327,125 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
     }
     vars->f31C = 0;
 
-    func_L12_00412DA0(moby);
+    guard_clear_hit_value(moby);
     moby->f31 = 1;
     moby->f34 = moby->f34 & 0xFFFE;
-    func_L12_004141A8(moby);
+    guard_handle_hit_handover(moby);
 
     switch (moby->f95) {
     case 0:
-        func_0026FEB8(D_L12_001B18A8, moby->fB2, moby->fAA);
+        STUB_printf(D_L12_001B18A8, moby->fB2, moby->fAA);
         break;
     case 1:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
             vars->f2D8 = vars->f2D4;
             if (!(vars->f302 & 1)) {
-                vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
-                func_002A7750(moby, moby->state, 2);
+                vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+                moby_set_state(moby, moby->state, 2);
             } else {
-                func_L12_00412E50(moby, 0xC, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 8, 5);
+                guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 8, 5);
             }
         }
         break;
     case 2:
-        if (func_002B3890(moby) != 0 && vars->f300 < 4 && !(vars->f302 & 2))
-            vars->f300 = ((s32)func_002A7820(0, 0x78) * 5 + 2) / 6;
-        if (func_00282978(&vars->f300) != 0) {
+        if (flag_set_second_pending(moby) != 0 && vars->f300 < 4 && !(vars->f302 & 2))
+            vars->f300 = ((s32)math_random_int_range(0, 0x78) * 5 + 2) / 6;
+        if (FastDecTimer(&vars->f300) != 0) {
             vars->f2D8 = vars->f2D4;
             if (vars->f2B0 != -1) {
-                func_L09_003F7C50(moby, vars->f2B0, -1);
-                func_002A7750(moby, 2, 3);
+                enemy_select_path(moby, vars->f2B0, -1);
+                moby_set_state(moby, 2, 3);
             } else {
-                func_L09_003F7C50(moby, vars->f2B8, -1);
-                func_L12_00412E50(moby, 2, 0, 0xA);
-                func_002A7750(moby, 4, 3);
+                enemy_select_path(moby, vars->f2B8, -1);
+                guard_switch_animation(moby, 2, 0, 0xA);
+                moby_set_state(moby, 4, 3);
             }
             if (vars->f302 & 2)
-                func_L09_003F7C50(moby, vars->f2C0, -1);
+                enemy_select_path(moby, vars->f2C0, -1);
         }
         /* fall through */
     case 3:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1)
-            vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+            vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
         break;
     case 4:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
-            func_L09_003F7C50(moby, vars->f2B8, -1);
-            vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
-            func_L12_00412E50(moby, 2, 0, 0xA);
-            func_002A7750(moby, 4, 3);
+            enemy_select_path(moby, vars->f2B8, -1);
+            vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+            guard_switch_animation(moby, 2, 0, 0xA);
+            moby_set_state(moby, 4, 3);
         }
         break;
     case 5:
-        vars->f2EC = func_00283248(vars->f200->x - moby->x, vars->f200->y - moby->y);
+        vars->f2EC = mat_fast_helper_a(vars->f200->x - moby->x, vars->f200->y - moby->y);
         if (vars->f302 & 2) {
             int side = func_001163B0() & 1;
-            func_L12_00412E50(moby, side, 0, func_002A7820(0xA, 0x14));
-            func_L09_003F73E8(moby);
-            vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+            guard_switch_animation(moby, side, 0, math_random_int_range(0xA, 0x14));
+            shared_counter_release(moby);
+            vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
             vars->f300 = 1;
-            func_002A7750(moby, moby->state, 2);
+            moby_set_state(moby, moby->state, 2);
         }
         if (vars->f204 != 1 && vars->f2E0 == 0) {
             int side;
-            func_L09_003F73E8(moby);
+            shared_counter_release(moby);
             side = func_001163B0() & 1;
-            func_L12_00412E50(moby, side, 0, func_002A7820(0xA, 0x14));
-            func_002A7750(moby, 5, 6);
+            guard_switch_animation(moby, side, 0, math_random_int_range(0xA, 0x14));
+            moby_set_state(moby, 5, 6);
         }
         break;
     case 6:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
-            func_L09_003F73E8(moby);
-            vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
-            func_L12_00412E50(moby, 3, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 5, 5);
+            shared_counter_release(moby);
+            vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+            guard_switch_animation(moby, 3, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 5, 5);
         } else if (vars->f2E8 == 0) {
             int side;
-            func_L09_003F73E8(moby);
-            func_L09_003F7C50(moby, vars->f2B8, 0);
+            shared_counter_release(moby);
+            enemy_select_path(moby, vars->f2B8, 0);
             side = func_001163B0() & 1;
-            func_L12_00412E50(moby, side, 0, func_002A7820(0xA, 0x14));
-            func_002A7750(moby, 4, 4);
+            guard_switch_animation(moby, side, 0, math_random_int_range(0xA, 0x14));
+            moby_set_state(moby, 4, 4);
         }
         break;
     case 7:
-        vars->f2EC = func_00283248(vars->f200->x - moby->x, vars->f200->y - moby->y);
+        vars->f2EC = mat_fast_helper_a(vars->f200->x - moby->x, vars->f200->y - moby->y);
         break;
     case 8:
-        vars->f2EC = func_00283B98(vars->f2EC,
-            (func_00283198(func_002ABB18(func_00283CE0(D_L12_001B29C8) * 0.02f)) + 2.0f) * 0.027925273f);
+        vars->f2EC = FastAddRotations(vars->f2EC,
+            (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L12_001B29C8) * 0.02f)) + 2.0f) * 0.027925273f);
         break;
     case 9: {
         s32 hit;
 
         vars->f2EC = moby->fF8;
-        hit = func_002B1C20(moby, (char *)vars + 0x50);
+        hit = moby_dispatch_action_by_kind(moby, (char *)vars + 0x50);
         if (vars->f20 <= 0.0f && (moby->f42 == 0xF || moby->f43 == 0xF))
-            func_002A7750(moby, 0xF, -1);
+            moby_set_state(moby, 0xF, -1);
         if (hit & 1) {
             if (vars->f20 > 0.0f)
-                func_L12_00413CE0(moby);
-            func_L09_003F73E8(moby);
-            func_002A7750(moby, 0xF, -1);
+                path_hand_state_to_nearest(moby);
+            shared_counter_release(moby);
+            moby_set_state(moby, 0xF, -1);
         } else if (hit & 2) {
-            func_L09_003F73E8(moby);
-            vars->f2E0 = ((s32)func_002A7820(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
+            shared_counter_release(moby);
+            vars->f2E0 = ((s32)math_random_int_range(D_L12_001B183C, D_L12_001B1840) * 5 + 2) / 6;
             if (moby->f42 == 0xF || moby->f43 == 0xF) {
-                func_L09_003F7C50(moby, vars->f2B0, -1);
-                func_002A7750(moby, 3, 3);
-                func_L12_00412E50(moby, 0xE, 0, func_002A7820(7, 0xC));
+                enemy_select_path(moby, vars->f2B0, -1);
+                moby_set_state(moby, 3, 3);
+                guard_switch_animation(moby, 0xE, 0, math_random_int_range(7, 0xC));
             } else {
-                func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
+                guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
                 if (vars->f30F != 0)
-                    func_002A7750(moby, 0xD, 8);
+                    moby_set_state(moby, 0xD, 8);
                 else
-                    func_002A7750(moby, 6, 5);
+                    moby_set_state(moby, 6, 5);
             }
         }
         break;
@@ -457,64 +457,64 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         break;
     case 1:
         if (moby->f60 & 2)
-            func_L12_00412E50(moby, 0xE, 0, func_002A7820(7, 0xC));
+            guard_switch_animation(moby, 0xE, 0, math_random_int_range(7, 0xC));
         break;
     case 2:
         if (moby->f60 & 2) {
-            func_L12_00412E50(moby, 0xE, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 3, -1);
+            guard_switch_animation(moby, 0xE, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 4:
         if (moby->f60 & 2) {
-            func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 6, -1);
+            guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 6, -1);
         }
         break;
     case 5:
         if (moby->f60 & 2) {
             if (moby->f95 == 5) {
-                func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 6, -1);
+                guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 6, -1);
             } else {
-                func_L12_00412E50(moby, 0xC, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 6, -1);
+                guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 6, -1);
             }
         }
         break;
     case 3:
         if (moby->f60 & 2)
-            func_L12_00412E50(moby, 0xE, 0, func_002A7820(7, 0xC));
-        if (func_L09_003F7B28(moby, vars->f2DC) != 0) {
+            guard_switch_animation(moby, 0xE, 0, math_random_int_range(7, 0xC));
+        if (enemy_walk_to_next_path_point(moby, vars->f2DC) != 0) {
             vars->f138 = vars->f138 & ~4;
-            func_L09_003F7C50(moby, vars->f2BC, -1);
-            func_L12_00412E50(moby, 0x10, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 7, 5);
+            enemy_select_path(moby, vars->f2BC, -1);
+            guard_switch_animation(moby, 0x10, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 7, 5);
         }
         break;
     case 6:
-        func_L12_00414EB8(moby);
+        guard_update_attack_sequence(moby);
         break;
     case 7:
         if (moby->f60 & 2) {
             if (vars->f30E != 0) {
-                func_L12_00412E50(moby, 4, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 4, 5);
+                guard_switch_animation(moby, 4, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 4, 5);
             } else {
-                func_L12_00412E50(moby, 0xC, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 8, 5);
+                guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 8, 5);
             }
         }
         break;
     case 8: {
-        f32 yaw = func_00283248(vars->f1F0 - moby->x, vars->f1F4 - moby->y);
+        f32 yaw = mat_fast_helper_a(vars->f1F0 - moby->x, vars->f1F4 - moby->y);
 
-        func_002B5278(moby, yaw);
-        if (func_00283C80(yaw, moby->fF8) < 0.17453295f) {
-            func_L12_00412E50(moby, 5, 0, func_002A7820(7, 0xC));
+        moby_step_at_own_position_factor(moby, yaw);
+        if (FastDiffRots(yaw, moby->fF8) < 0.17453295f) {
+            guard_switch_animation(moby, 5, 0, math_random_int_range(7, 0xC));
             vars->f30C = 0;
             vars->f30D = 0;
-            func_002A7750(moby, 9, -1);
+            moby_set_state(moby, 9, -1);
         }
         break;
     }
@@ -523,7 +523,7 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         s32 near, close, ahead, picked, tried;
 
         near = 1;
-        d = func_00282E80(&moby->x, &vars->f200->x);
+        d = vec_distance_xy(&moby->x, &vars->f200->x);
         if (!(d <= D_L12_001B1818))
             near = 0;
         close = 1;
@@ -533,31 +533,31 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         if (vars->f303 == 0) {
             picked = 0;
             tried = 0;
-            if (close == 0 && near != 0 && ahead != 0 && func_002A77E0(D_L12_001B181C - 1) == 0
+            if (close == 0 && near != 0 && ahead != 0 && math_random_int_below(D_L12_001B181C - 1) == 0
                 && vars->f2E6 == 0) {
                 tried = 1;
-                picked = func_L12_00414AB8(moby, 0, vars->f30C != 0, 0);
+                picked = guard_is_line_of_sight_blocked(moby, 0, vars->f30C != 0, 0);
             }
             if (vars->f30C != 0 && picked != 0 && close == 0) {
-                func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 6, -1);
+                guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 6, -1);
             } else if (close != 0 || picked != 0) {
-                if (func_L12_00414AB8(moby, 0, (u8)(s8)vars->f30C != 0, 1) != 0)
+                if (guard_is_line_of_sight_blocked(moby, 0, (u8)(s8)vars->f30C != 0, 1) != 0)
                     vars->f30D = 1;
-                func_L09_003F7430(moby);
-                func_L12_00412E50(moby, 8, 0, 7);
-                func_002A7750(moby, 0xA, -1);
+                shared_counter_acquire(moby);
+                guard_switch_animation(moby, 8, 0, 7);
+                moby_set_state(moby, 0xA, -1);
             } else if (moby->f60 & 2) {
-                func_L12_00412E50(moby, 6, 0, func_002A7820(7, 0xC));
+                guard_switch_animation(moby, 6, 0, math_random_int_range(7, 0xC));
             }
             if (tried != 0 && picked == 0)
                 vars->f30C = ~vars->f30C;
         } else {
             if (moby->f60 & 2)
-                func_L12_00412E50(moby, 6, 0, func_002A7820(7, 0xC));
+                guard_switch_animation(moby, 6, 0, math_random_int_range(7, 0xC));
             if (close != 0 || (vars->f2E6 == 0 && near != 0 && ahead != 0)) {
-                func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
-                func_002A7750(moby, 6, -1);
+                guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
+                moby_set_state(moby, 6, -1);
             }
         }
         break;
@@ -565,54 +565,54 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
     case 10:
         if (moby->f60 & 2) {
             if (vars->f30D != 0)
-                func_L12_00412E50(moby, 0xA, 0, 1);
+                guard_switch_animation(moby, 0xA, 0, 1);
             else
-                func_L12_00412E50(moby, 0x13, 0, 1);
+                guard_switch_animation(moby, 0x13, 0, 1);
             vars->f2E4 = ((s32)D_L12_001B1828 * 5 + 2) / 6;
-            func_002A7750(moby, 0xB, -1);
+            moby_set_state(moby, 0xB, -1);
         }
         break;
     case 11:
         if (moby->f96 > ((s32)D_L12_001B1824 * 5 + 2) / 6)
-            func_L12_00414C60(moby);
-        if ((moby->f96 > ((s32)D_L12_001B1820 * 5 + 2) / 6 && D_L12_001B1814 < func_00282E80(&moby->x, &vars->f200->x))
+            guard_aim_hand_helper_at_target(moby);
+        if ((moby->f96 > ((s32)D_L12_001B1820 * 5 + 2) / 6 && D_L12_001B1814 < vec_distance_xy(&moby->x, &vars->f200->x))
             || vars->f2F8 == 0) {
-            vars->f2E6 = ((s32)func_002A7820(D_L12_001B182C, D_L12_001B1830) * 5 + 2) / 6;
-            func_L09_003F73E8(moby);
-            func_L12_00412E50(moby, 0xC, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 8, 5);
+            vars->f2E6 = ((s32)math_random_int_range(D_L12_001B182C, D_L12_001B1830) * 5 + 2) / 6;
+            shared_counter_release(moby);
+            guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 8, 5);
         }
         break;
     case 12:
         if (moby->f60 & 2) {
-            func_L12_00412E50(moby, 0xB, 0, func_002A7820(7, 0xC));
-            func_002A7750(moby, 6, 5);
+            guard_switch_animation(moby, 0xB, 0, math_random_int_range(7, 0xC));
+            moby_set_state(moby, 6, 5);
         }
         break;
     case 13:
         if (moby->f60 & 2) {
             int anim = (func_001163B0() & 1) ? 0xA : 0x13;
-            func_L12_00412E50(moby, anim, 0, func_002A7820(0x19, 0x2D));
+            guard_switch_animation(moby, anim, 0, math_random_int_range(0x19, 0x2D));
         }
         if (moby->f42 == 0xA || moby->f42 == 0x13)
-            func_L12_00414C60(moby);
+            guard_aim_hand_helper_at_target(moby);
         break;
     case 14:
-        func_L09_003F73E8(moby);
+        shared_counter_release(moby);
         break;
     case 15:
         vars->f20 = 0.0f;
-        func_002B3380(moby, (char *)vars + 0x290, (char *)vars + 0x20);
-        func_L09_003F73E8(moby);
-        func_L09_003F77D0(moby);
-        func_002A6C58(moby, 0, 3);
-        func_002ABBB8(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
+        part_spawn_damage_debris(moby, (char *)vars + 0x290, (char *)vars + 0x20);
+        shared_counter_release(moby);
+        moby_destroy_linked(moby);
+        SetDeathBits(moby, 0, 3);
+        SpawnExplosionEffects(moby, (char *)vars + 0xD0, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
-        func_0029F338(moby);
+        moby_mark_spawned(moby);
         return;
     }
-    func_L12_00414670(moby);
-    func_L12_004149B8(moby);
-    func_L12_00413F68(moby);
-    func_L12_00412DE0(moby);
+    guard_aim_partner_hands(moby);
+    guard_reattach_helpers(moby);
+    slot_timers_update(moby);
+    guard_restore_hit_value(moby);
 }

@@ -4,20 +4,20 @@
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_3e18d05650488ad4_FallbackU32;
 
-extern Rac2Native_3e18d05650488ad4_FallbackU32 D_001A7424;
+extern Rac2Native_3e18d05650488ad4_FallbackU32 g_save_menu_flags;
 
 extern int D_001A7420_1;
 
 extern int D_L00_001A904C;
 
-extern void func_0028A2F8(int);
+extern void UpdateBoltCounter(int);
 
 extern int D_L00_001A904C;
 
-extern void func_0028A670(int);
+extern void DrawBoltCounterDeltas(int);
 
 /* Calls the bolt counter update only when the level has the counter enabled. */
-void func_L00_0030DC30(int argument)
+void hud_update_bolt_counter_if_enabled(int argument)
 {
     if (D_L00_001A904C != 0) {
         UpdateBoltCounter(argument);
@@ -25,7 +25,7 @@ void func_L00_0030DC30(int argument)
 }
 
 /* Calls the bolt counter delta drawing only when the level has the counter enabled. */
-void func_L00_0030DC58(int argument)
+void hud_draw_bolt_counter_deltas_if_enabled(int argument)
 {
     if (D_L00_001A904C != 0) {
         DrawBoltCounterDeltas(argument);
@@ -41,7 +41,7 @@ extern struct LoadSlots_L00 D_00152CD0;
 extern int ref_L00_00304AE8_00 __attribute__((sda));
 
 /* The level's copy of the load-slot release: same body as func_00294130 with the slot cursor in the level's small data. */
-void func_L00_00304AE8(int *entry, int doRelease)
+void load_release_slot(int *entry, int doRelease)
 {
     if (doRelease != 0) {
         if (entry[1] >= 0) {
@@ -71,7 +71,7 @@ typedef struct RelocBlock_00300378 {
     RelocItem_00300378 items[1];
 } RelocBlock_00300378;
 
-extern u32 D_L00_001BF200[4];
+extern u32 g_collision_result[4];
 
 /* The same two pointers under two names: the stores of 0 are absolute `lui $at` stores in retail, the others $gp-relative. */
 extern RelocBlock_00300378 *D_L00_001B1AC0 __attribute__((section(".sdata")));
@@ -83,10 +83,10 @@ extern RelocBlock_00300378 *D_L00_001B1AC4 __attribute__((section(".sdata")));
 extern RelocBlock_00300378 *D_L00_001B1AC4_1 __attribute__((sda));
 
 /* Publishes the three blocks a header's offsets select and relocates the second and third. */
-void func_L00_00300378(u8 *header)
+void level_relocate_header_blocks(u8 *header)
 {
     if (*(int *)(header + 0) != 0)
-        gCollisionResult[0] = (u32)(header + *(int *)(header + 0));
+        g_collision_result[0] = (u32)(header + *(int *)(header + 0));
     if (*(int *)(header + 4) != 0) {
         int i;
 
@@ -118,14 +118,14 @@ extern unsigned int D_001A72C0;
 extern void *D_L00_001BF1B4[];
 extern Packet_FE268 D_L00_001C91C0[];
 extern unsigned long long D_L00_001A9510 __attribute__((sda));
-extern void func_002933D0(void *, int, void *);
+extern void tex_relocate_render_groups(void *, int, void *);
 
 /* Writes a GS register packet from the given value and sends it for drawing. */
-void func_L00_002FE268(unsigned int value)
+void gfx_send_gs_register_packet(unsigned int value)
 {
     D_001A72C0 = value;
     D_L00_001C91C0[0].data = D_001A72C8;
     D_L00_001C91C0[0].tag1 = 0x0000FFA0000000E0ULL;
     D_L00_001C91C0[0].tag2 = 0x0040000400004000ULL;
-    RelocateRenderGroups(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
+    tex_relocate_render_groups(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
 }

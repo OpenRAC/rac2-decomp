@@ -23,28 +23,28 @@ typedef struct {
     } motion;
 } Particle_002BE278;
 
-extern Particle_002BE278 *func_002B9030(int);
-extern int func_002AAE98(float, float, float, float);
-extern int func_00283CF0(float);
-extern float func_002A7878(float, float);
+extern Particle_002BE278 *part_alloc(int);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern int FloatToInt(float);
+extern float math_random_float_range(float, float);
 extern unsigned char *D_001F25A4;
 
 /* Spawns a white flash particle at position moving with velocity; growing, or
    shrinking when flag is set; a negative size picks a random one. */
-void func_002BE278(TI128 *position, TI128 *velocity, int flag, float size)
+void part_spawn_white_flash(TI128 *position, TI128 *velocity, int flag, float size)
 {
-    Particle_002BE278 *particle = AllocParticle(0x19);
+    Particle_002BE278 *particle = part_alloc(0x19);
     typeof(particle->motion) *motion = &particle->motion;
 
     if (particle != 0) {
         particle->position = *position;
         if (flag == 0) {
-            particle->colour = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.6f);
+            particle->colour = gfx_pack_color_floats(1.0f, 1.0f, 1.0f, 0.6f);
             motion->scale[0] = 1.0f;
             motion->scale[1] = 1.0f;
             motion->scale[2] = 1.0f;
         } else {
-            particle->colour = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.6f);
+            particle->colour = gfx_pack_color_floats(1.0f, 1.0f, 1.0f, 0.6f);
             motion->scale[0] = -1.0f;
             motion->scale[1] = -1.0f;
             motion->scale[2] = -1.0f;
@@ -53,7 +53,7 @@ void func_002BE278(TI128 *position, TI128 *velocity, int flag, float size)
         particle->unk03 = 0x48;
         particle->unk01 = 0;
         if (size < 0.0f)
-            particle->size = RandomFloatRange(5000.0f, 30000.0f);
+            particle->size = math_random_float_range(5000.0f, 30000.0f);
         else
             particle->size = size;
         particle->unk08 = 0;

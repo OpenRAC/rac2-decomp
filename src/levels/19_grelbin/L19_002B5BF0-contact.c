@@ -55,29 +55,29 @@ typedef struct {
     u8 pad3C[4];
 } Entry_002B5BF0;
 
-extern Player_002B5BF0 D_00189E20;
+extern Player_002B5BF0 g_hero_state;
 extern Entry_002B5BF0 D_L19_001C4100[];
 extern s32 D_L19_001A8F00 __attribute__((sda));
 extern s32 D_L19_001B0040 __attribute__((sda));
-extern u8 D_001A7A32 __attribute__((sda));
+extern u8 g_bolt_multiplier __attribute__((sda));
 extern u8 D_001A7A33 __attribute__((sda));
 
-extern float func_L00_0037E668(void);
-extern float func_L00_0037E5F0(float);
-extern s32 func_00283CF0(float);
-extern void func_L00_002A6708(void);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_L00_002D36E0(void *, s32, float, float, float);
-extern void func_L19_002C44F8(s32, s32);
-extern u8 *func_002A9640(u8 *, s32, s32);
-extern void func_L00_002A4EF8(s32);
-extern void func_L00_002B9B88(s32, s32);
-extern void func_L00_002B2C58(void *, s32, float, float);
-extern void func_L00_002D3C68(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern float fade_get_value(void);
+extern float fade_reduce_value(float);
+extern s32 FloatToInt(float);
+extern void hero_clear_tracked_slots(void);
+extern void FastVecSub(void *, void *, void *);
+extern void hero_build_relative_point(void *, s32, float, float, float);
+extern void hero_l19_set_state(s32, s32);
+extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
+extern void AdjustPlayerHealth(s32);
+extern void hero_play_sound(s32, s32);
+extern void hero_flatten_push_vector(void *, s32, float, float);
+extern void cam_scale_view_space_height(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Checks whether the hero touches a hit object and, if asked, shoves the hero away and changes the hero state. */
-s32 func_L19_002B5BF0(s32 applyPush) {
+s32 hero_l19_apply_contact_push(s32 applyPush) {
     TI16 vec;
     Entry_002B5BF0 *e;
     u8 *moby;
@@ -85,20 +85,20 @@ s32 func_L19_002B5BF0(s32 applyPush) {
     s32 flag;
     s32 bits;
 
-    if (gHeroState.f229C == 20 || gHeroState.f229C == 7) {
+    if (g_hero_state.f229C == 20 || g_hero_state.f229C == 7) {
         return 0;
     }
-    if (gHeroState.f2294 == 0x31) {
+    if (g_hero_state.f2294 == 0x31) {
         return 0;
     }
-    if (gHeroState.f1DC != 0) {
+    if (g_hero_state.f1DC != 0) {
         return 0;
     }
     if (D_L19_001A8F00 != 0) {
         return 0;
     }
-    gHeroState.f249C = 0;
-    moby = gHeroState.f2290;
+    g_hero_state.f249C = 0;
+    moby = g_hero_state.f2290;
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
@@ -106,8 +106,8 @@ s32 func_L19_002B5BF0(s32 applyPush) {
     if (e->f38 != moby) {
         return 0;
     }
-    if (gHeroState.f22B4 == 4) {
-        if (D_L19_001B0040 != 0 || gHeroState.f2294 == 0x6F) {
+    if (g_hero_state.f22B4 == 4) {
+        if (D_L19_001B0040 != 0 || g_hero_state.f2294 == 0x6F) {
             return 0;
         }
     } else if ((e->f24 & 9) == 0) {
@@ -115,17 +115,17 @@ s32 func_L19_002B5BF0(s32 applyPush) {
     }
     if (e->f2C != 0.0f) {
         D_001A7A33 = 0;
-        gBoltMultiplier = 1;
+        g_bolt_multiplier = 1;
     }
-    if (GetFadeValue() != 0.0f && gHeroState.f22B4 == 0) {
-        e->f2C = ReduceFadeValue(e->f2C);
+    if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
+        e->f2C = fade_reduce_value(e->f2C);
         if (e->f2C == 0.0f) {
             return 0;
         }
     }
-    gHeroState.f249C = e->f20;
-    if (gHeroState.f22B4 == 4 && D_L19_001B0040 == 0 && gHeroState.f2294 != 0x6F) {
-        u8 *m = *(u8 **)(gHeroState.f2290 + 0x68);
+    g_hero_state.f249C = e->f20;
+    if (g_hero_state.f22B4 == 4 && D_L19_001B0040 == 0 && g_hero_state.f2294 != 0x6F) {
+        u8 *m = *(u8 **)(g_hero_state.f2290 + 0x68);
         *(s16 *)(m + 0x3BC) -= 0xB4;
         if (*(s16 *)(m + 0x3BC) < 0) {
             *(s16 *)(m + 0x3BC) = 0;
@@ -135,65 +135,65 @@ s32 func_L19_002B5BF0(s32 applyPush) {
         return 1;
     }
     flag = 0;
-    ClearTrackedSlots();
+    hero_clear_tracked_slots();
     if (e->f30 & 1) {
         qcopy(&vec, &e->f10);
         if (e->f1C == 5627.9248046875f) {
             flag = 1;
         }
     } else if (e->f20 != 0) {
-        FastVecSub(&vec, &gHeroState.f80, e->f20 + 0x10);
+        FastVecSub(&vec, &g_hero_state.f80, e->f20 + 0x10);
     } else {
-        BuildHeroRelativePoint(&vec, 0, -1.0f, 0.0f, 0.0f);
+        hero_build_relative_point(&vec, 0, -1.0f, 0.0f, 0.0f);
     }
-    switch (gHeroState.f22B4) {
+    switch (g_hero_state.f22B4) {
     case 0:
-        other = gHeroState.f249C;
+        other = g_hero_state.f249C;
         if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(other + 0xAA) == 0x558 /* moby class 1368 */)) {
-            SetHeroState(0x7D, 1);
+            hero_l19_set_state(0x7D, 1);
             return 1;
         }
-        if ((gHeroState.f2294 == 1 || gHeroState.f2294 == 0x1D || gHeroState.f1500 != 0)
+        if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
             && !(e->f24 & 8)) {
-            u8 *r = FindOwnedEffectSlot(gHeroState.f2290, 1, 0);
+            u8 *r = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
             if (r != 0) {
                 AdjustPlayerHealth(FloatToInt(*(float *)(r + 0x2C)));
             }
-            if (gHeroState.f24CC == 0) {
-                SetHeroState(0x16, 1);
+            if (g_hero_state.f24CC == 0) {
+                hero_l19_set_state(0x16, 1);
             }
-            gHeroState.f1DC = 0x4D;
-            if (gHeroState.f21C == 0) {
-                gHeroState.f21C = 0x12;
+            g_hero_state.f1DC = 0x4D;
+            if (g_hero_state.f21C == 0) {
+                g_hero_state.f21C = 0x12;
             }
-            PlayHeroSound(0x14, 0);
+            hero_play_sound(0x14, 0);
             return 0;
         }
-        if (gHeroState.f229C == 0x12) {
-            SetHeroState(0x72, 1);
-        } else if (gHeroState.f229C == 0x11) {
-            SetHeroState(0x73, 1);
+        if (g_hero_state.f229C == 0x12) {
+            hero_l19_set_state(0x72, 1);
+        } else if (g_hero_state.f229C == 0x11) {
+            hero_l19_set_state(0x73, 1);
         } else if (e->f24 & 8) {
-            SetHeroState(0x8C, 1);
+            hero_l19_set_state(0x8C, 1);
         } else {
-            SetHeroState(0x16, 1);
+            hero_l19_set_state(0x16, 1);
         }
-        if (gHeroState.f2294 == 0x8C) {
+        if (g_hero_state.f2294 == 0x8C) {
             qzero(&vec);
         } else {
-            FlattenPushVectorAndSetStrength(&vec, flag, gHeroState.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
+            hero_flatten_push_vector(&vec, flag, g_hero_state.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
             if (flag != 0 && e->f28 == 4) {
-                ScaleViewSpaceHeight(&vec, &vec, 2.0f);
+                cam_scale_view_space_height(&vec, &vec, 2.0f);
             }
         }
         break;
     case 4:
-        SetHeroState(0x90, 1);
-        FlattenPushVectorAndSetStrength(&vec, flag, 0.083333336f, 0.050000004f);
+        hero_l19_set_state(0x90, 1);
+        hero_flatten_push_vector(&vec, flag, 0.083333336f, 0.050000004f);
         break;
     }
-    FastVecAdd(&gHeroState.fF0, &gHeroState.fF0, &vec);
-    FastVecAdd(&gHeroState.f110, &gHeroState.f110, &vec);
+    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &vec);
+    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &vec);
     return 1;
 }

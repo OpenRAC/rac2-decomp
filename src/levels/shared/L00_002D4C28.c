@@ -1,14 +1,14 @@
 #include "names.h"
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern int D_L00_001A8F00 __attribute__((sda));
 
-extern void func_L00_002AFBF0(void);
+extern void SpawnHeroItemMobies(void);
 
-extern void func_L00_002AA178(char *);
+extern void part_spawn_effect_from_record(char *);
 
-extern void func_L00_002B0968(char *);
+extern void update_hero_item_mobys(char *);
 
-extern void func_L00_002D4A38(void);
+extern void level_fade_glow_colors(void);
 
 #ifndef RAC2_T_BASE_2A
 #define RAC2_T_BASE_2A
@@ -40,7 +40,7 @@ extern Rec_1BCAC0 D_L00_001BCAC0;
 /* Set bit 0x800 on list objects of either supported kind, dispatch the level
    updates, then clear bit 0 on the six resident object slots. */
 /* Marks level glow objects as drawn, runs the level updates, then clears the visible flag on the resident objects. */
-void func_L00_002D4C28(char *object)
+void level_update_glow_objects(char *object)
 {
     int i;
     void *listObject;
@@ -49,7 +49,7 @@ void func_L00_002D4C28(char *object)
     if (D_L00_001A8F00 != 2 && D_L00_001A8F00 != 6)
         return;
 
-    if (((Base_2A *)gHeroState)->f12C0 == 0)
+    if (((Base_2A *)g_hero_state)->f12C0 == 0)
         SpawnHeroItemMobies();
 
     for (i = 0; i < D_L00_001BCAC0.count; i++) {
@@ -61,13 +61,13 @@ void func_L00_002D4C28(char *object)
         }
     }
 
-    SpawnEffectFromRecord(object);
+    part_spawn_effect_from_record(object);
     update_hero_item_mobys(object);
-    FadeLevelGlowColors();
+    level_fade_glow_colors();
 
     {
         void *listObject;
-        Base_2A *hero = (Base_2A *)gHeroState;
+        Base_2A *hero = (Base_2A *)g_hero_state;
 
         listObject = hero->f12C0;
         if (listObject != 0) {

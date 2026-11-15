@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: these bodies reach a global through $gp. */
 
@@ -19,7 +20,7 @@ extern void func_35E728(void);
 extern void func_37CA78(unsigned int, unsigned long);
 
 /* Sets up the Endako sky effect each frame and slowly scrolls a texture offset that wraps around at 1.0. */
-void func_L03_002FDB10(void) {
+void sky_update_scroll(void) {
     float *scroll;
 
     func_35E6B8();

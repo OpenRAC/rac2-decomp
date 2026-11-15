@@ -8,17 +8,17 @@
    incomplete sda arrays: retail reads [0] through $gp and [1] (or the whole
    word) through lui. */
 
-extern void func_L07_003F4C18(void *a, void *start, void *end);
-extern void func_00282CF0(void *out, void *a, void *b);
-extern void func_00282DD8(void *out, void *a, void *b);
-extern void func_00282F20(void *out, void *a, f32 scale);
-extern void func_00282CC0(void *out, void *a, void *b);
-extern f32 func_00282DF0(void *v);
-extern f32 func_00283B98(f32 a, f32 b);
-extern s32 func_00283D38(s32 from, s32 to, f32 t);
-extern void func_00281DE8(void *packet, s32 a, s32 b, s32 c);
-extern void func_00280B90(void *packet, void *a, s32 b);
-extern void func_00281EB8(void *pos, s32 id, s32 color, s32 a, f32 size, f32 b, f32 rotation);
+extern void beam_get_end_points(void *a, void *start, void *end);
+extern void FastVecSub(void *out, void *a, void *b);
+extern void FastVecCross(void *out, void *a, void *b);
+extern void vec_scale_to_length(void *out, void *a, f32 scale);
+extern void FastVecAdd(void *out, void *a, void *b);
+extern f32 FastVecLength(void *v);
+extern f32 FastAddRotations(f32 a, f32 b);
+extern s32 FastTweenColor(s32 from, s32 to, f32 t);
+extern void gfx_init_quad_packet_state(void *packet, s32 a, s32 b, s32 c);
+extern void draw_world_quad(void *packet, void *a, s32 b);
+extern void gfx_draw_billboard_quad(void *pos, s32 id, s32 color, s32 a, f32 size, f32 b, f32 rotation);
 extern u8 D_L07_001B9200[] NOT_SDA;
 extern s32 D_L07_001B0EB0 __attribute__((sda));
 extern s32 D_L07_001B0EA8 __attribute__((sda));
@@ -37,7 +37,7 @@ extern f32 D_L07_001B0EE4[] __attribute__((sda));
 #define F(p, o) (*(f32 *)((p) + (o)))
 
 /* Draws the glowing beam between its two end points: a flat strip along it plus a string of sprites that spin and fade with the beam's strength. */
-void func_L07_003F4CC0(u8 *moby)
+void DrawSegmentedBeam(u8 *moby)
 {
     f32 start[4], end[4], delta[4], side[4], normal[4], base[4];
     struct Vec4 { f32 x, y, z, w; };
@@ -53,7 +53,7 @@ void func_L07_003F4CC0(u8 *moby)
     f32 length, count, alpha, rotation, width;
     f32 uvOffset;
 
-    GetBeamEndPoints(moby, start, end);
+    beam_get_end_points(moby, start, end);
     FastVecSub(delta, end, start);
     FastVecSub(side, D_L07_001B9200, moby + 0x10);
     FastVecCross(normal, side, delta);
@@ -61,7 +61,7 @@ void func_L07_003F4CC0(u8 *moby)
     qzero_nc(side);
     qcopy_nc(base, start);
     base[3] = 1;
-    InitQuadPacketState(&draw, D_L07_001B0EB0, 1, 128);
+    gfx_init_quad_packet_state(&draw, D_L07_001B0EB0, 1, 128);
     uvOffset = 0.0f;
     color = FastTweenColor(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(vars, 0x24));
     {
@@ -125,9 +125,9 @@ void func_L07_003F4CC0(u8 *moby)
             width = D_L07_001B0EC8[1];
         color = FastTweenColor(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
         pos = current;
-        DrawBillboardQuad_00281EB8(pos, 49, color, 1, width, 0, rotation);
+        gfx_draw_billboard_quad(pos, 49, color, 1, width, 0, rotation);
         color = FastTweenColor(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
-        DrawBillboardQuad_00281EB8(pos, 49, color, 1, width, 0, FastAddRotations(rotation, D_L07_001B0ED8));
+        gfx_draw_billboard_quad(pos, 49, color, 1, width, 0, FastAddRotations(rotation, D_L07_001B0ED8));
         rotation = -FastAddRotations(rotation, D_L07_001B0EDC * 0.017453294f);
         if ((f32)i < length - 1)
             FastVecAdd(current, current, step);

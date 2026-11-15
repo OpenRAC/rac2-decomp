@@ -8,7 +8,7 @@ extern int D_001B1B78 MACRO_ADDR;
 extern int D_001EE5A0[];
 
 /* Advances the group cursor to the next moby accepted by the state filter. */
-int func_002A86E8(int *outMoby, unsigned char *moby, int includeInactive, int onlyInactive) {
+int GetNextMobyInGroup(int *outMoby, unsigned char *moby, int includeInactive, int onlyInactive) {
     short *cursor;
     int isInactive;
 

@@ -1,14 +1,14 @@
 #include "common.h"
 #include "structs.h"
 
-extern int func_00131760(int);
+extern int clock_bcd_to_decimal_byte(int);
 
 typedef struct { char b[0xC]; } Cfg12;
 
 extern Cfg12 r1_D_00153D40 NOT_SDA;
 
 /* Qwen draft (branch qwen/autonomy, bb52125e), checked by tools/check.py */
-void func_00132DF0(int, int, int, long, int);
+void snd_queue_command(int, int, int, long, int);
 
    /* current buffer */
 extern short r1_D_0015EDC4;
@@ -19,25 +19,25 @@ extern short r1_D_0015EDC4;
    2.95.3 saved them the other way round (4/104), the prologue-order
    residual that pointed at the SDK compiler in the first place. */
 /* Turns every field of a clock record from BCD into normal numbers. */
-void func_00131780(unsigned char *p) {
-    p[7] = BcdToDecimal(p[7]);
-    p[6] = BcdToDecimal(p[6]);
-    p[5] = BcdToDecimal(p[5]);
-    p[3] = BcdToDecimal(p[3]);
-    p[2] = BcdToDecimal(p[2]);
-    p[1] = BcdToDecimal(p[1]);
+void clock_bcd_to_decimal(unsigned char *p) {
+    p[7] = clock_bcd_to_decimal_byte(p[7]);
+    p[6] = clock_bcd_to_decimal_byte(p[6]);
+    p[5] = clock_bcd_to_decimal_byte(p[5]);
+    p[3] = clock_bcd_to_decimal_byte(p[3]);
+    p[2] = clock_bcd_to_decimal_byte(p[2]);
+    p[1] = clock_bcd_to_decimal_byte(p[1]);
 }
-extern void func_001317E8(unsigned char *p);
-extern int func_00131730(int);
+extern void clock_decimal_to_bcd(unsigned char *p);
+extern int clock_decimal_to_bcd_byte(int);
 
 /* Turns every field of a clock record from normal numbers back into BCD. */
-void func_001317E8(unsigned char *clock) {
-    clock[7] = DecimalToBcd(clock[7]);
-    clock[6] = DecimalToBcd(clock[6]);
-    clock[5] = DecimalToBcd(clock[5]);
-    clock[3] = DecimalToBcd(clock[3]);
-    clock[2] = DecimalToBcd(clock[2]);
-    clock[1] = DecimalToBcd(clock[1]);
+void clock_decimal_to_bcd(unsigned char *clock) {
+    clock[7] = clock_decimal_to_bcd_byte(clock[7]);
+    clock[6] = clock_decimal_to_bcd_byte(clock[6]);
+    clock[5] = clock_decimal_to_bcd_byte(clock[5]);
+    clock[3] = clock_decimal_to_bcd_byte(clock[3]);
+    clock[2] = clock_decimal_to_bcd_byte(clock[2]);
+    clock[1] = clock_decimal_to_bcd_byte(clock[1]);
 }
 
 
@@ -56,7 +56,7 @@ void func_001317E8(unsigned char *clock) {
  * the later byte load stays. (This C is exact under 2.95.3 as well.)
  */
 /* Moves a clock date forward by one day, handling month length, leap years and year wrap. */
-void func_00131850(unsigned char *s) {
+void clock_advance_day(unsigned char *s) {
     Cfg12 days;
     unsigned char m;
     int y = s[7];
@@ -96,7 +96,7 @@ void func_00131850(unsigned char *s) {
  * into retail's single `sb`. Exact under both compilers.
  */
 /* Moves a clock date back by one day, handling month length, leap years and year wrap. */
-void func_00131908(unsigned char *s) {
+void clock_rewind_day(unsigned char *s) {
     Cfg12 days;
     int y = s[7];
 
@@ -127,11 +127,11 @@ void func_00131908(unsigned char *s) {
  * calls, it was 8 bytes over.)
  */
 /* Moves a clock forward by one hour, and by one day when it passes midnight. */
-void func_001319B0(unsigned char *s) {
+void clock_advance_hour(unsigned char *s) {
     s[3] = s[3] + 1;
     if (s[3] == 0x18) {
         s[3] = 0;
-        ClockAdvanceDay(s);
+        clock_advance_day(s);
     }
 }
 
@@ -139,51 +139,51 @@ void func_001319B0(unsigned char *s) {
 /* The backward analog: the hour counts down, and at 0 it becomes 23 and
    the day ticks back, again through a conditional tail call. */
 /* Moves a clock back by one hour, and by one day when it passes midnight. */
-void func_001319E0(unsigned char *s) {
+void clock_rewind_hour(unsigned char *s) {
     unsigned char v = s[3];
     if (v != 0) {
         s[3] = v - 1;
         return;
     }
     s[3] = 0x17;
-    ClockRewindDay(s);
+    clock_rewind_day(s);
 }
 
-extern void func_001319B0(unsigned char *);
-extern void func_001319E0(unsigned char *);
+extern void clock_advance_hour(unsigned char *);
+extern void clock_rewind_hour(unsigned char *);
 
 /* Moves a clock forward or back by a number of minutes. */
-void func_00131A08(unsigned char *clock, int offset) {
+void clock_add_minutes(unsigned char *clock, int offset) {
     int minutes;
-    ClockBcdToDecimal(clock);
+    clock_bcd_to_decimal(clock);
     minutes = clock[2] + offset;
     if (minutes >= 0) {
         while (minutes > 60) {
-            ClockAdvanceHour(clock);
+            clock_advance_hour(clock);
             minutes -= 60;
         }
     } else {
         do {
             minutes += 60;
-            ClockRewindHour(clock);
+            clock_rewind_hour(clock);
         } while (minutes < 0);
     }
     clock[2] = minutes;
-    ClockDecimalToBcd(clock);
+    clock_decimal_to_bcd(clock);
 }
 
-extern int func_00131670(void);
-extern int func_001316C8(void);
-extern void func_00131A08(unsigned char *, int);
+extern int console_get_model_id(void);
+extern int console_get_info_flag(void);
+extern void clock_add_minutes(unsigned char *, int);
 
 /* Converts a clock to local time by adding the console time zone and summer time offset. */
-void func_00131A98(unsigned char *clock) {
+void clock_to_local_time(unsigned char *clock) {
     int offset;
-    int zone = GetConsoleModelId();
-    offset = GetConsoleInfoFlag();
+    int zone = console_get_model_id();
+    offset = console_get_info_flag();
     offset *= 60;
     offset -= 540;
-    ClockAddMinutes(clock, zone + offset);
+    clock_add_minutes(clock, zone + offset);
 }
 
 ASM_FUNC("asm/core", func_00131AE8);
@@ -192,11 +192,11 @@ ASM_FUNC("asm/core", func_00131AE8);
    forced to 0 in the delay slot, so the status the caller passes is discarded
    and the program always exits with 0. The call is a tail call, and the
    compiler puts the argument in the jump's delay slot. */
-extern void func_0011FA20(int);
+extern void exit_program(int);
 
 /* Exits the program and always reports status 0. */
-void func_00131CA8(int ignored_status) {
-    ExitProgram(0);
+void exit_ignoring_status(int ignored_status) {
+    exit_program(0);
 }
 
 /* Original assembly: `addiu $v1,$zero,0x23; syscall`, a thread-exit stub whose address crt0 passes to the thread syscall; the compiler cannot emit syscall. */
@@ -214,24 +214,24 @@ ASM_FUNC("asm/core", func_00131CB0);
 
 
 /* Sends a sound command (id 6) with one value. */
-void func_00132858(int value) {
+void snd_send_cmd6(int value) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(6, 4, (int)payload, 0, 0);
+    snd_queue_command(6, 4, (int)payload, 0, 0);
 }
 
 /* Sends a sound command (id 9) with two values. */
-void func_00132888(int first, int second) {
+void snd_send_cmd9(int first, int second) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
-    QueueSoundCommand(9, 8, (int)payload, 0, 0);
+    snd_queue_command(9, 8, (int)payload, 0, 0);
 }
 
 typedef struct { char bytes[24]; } CommandParameters24;
 
 /* Sends a sound command (id 96) with a value and an optional block of settings. */
-void func_001328C0(int value, const CommandParameters24 *parameters) {
+void snd_send_cmd96_with_settings(int value, const CommandParameters24 *parameters) {
     struct {
         int value;
         CommandParameters24 parameters;
@@ -241,50 +241,50 @@ void func_001328C0(int value, const CommandParameters24 *parameters) {
         payload.parameters = *parameters;
     else
         *(int *)&payload.parameters = -1;
-    QueueSoundCommand(96, 28, (int)&payload, 0, 0);
+    snd_queue_command(96, 28, (int)&payload, 0, 0);
 }
 
 /* Sends a sound command (id 11) with one value. */
-void func_00132938(int value) {
+void snd_send_cmd11_one_value(int value) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(11, 4, (int)payload, 0, 0);
+    snd_queue_command(11, 4, (int)payload, 0, 0);
 }
 
 
 /* Sends a sound command (id 78) with three values. */
-void func_001329B0(int first, int second, int third) {
+void snd_send_cmd78(int first, int second, int third) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
     payload[2] = third;
-    QueueSoundCommand(78, 12, (int)payload, 0, 0);
+    snd_queue_command(78, 12, (int)payload, 0, 0);
 }
 
 
 
 
 /* Sends a sound command (id 22) with one value. */
-void func_00132AF8(int value) {
+void snd_send_cmd22(int value) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(22, 4, (int)payload, 0, 0);
+    snd_queue_command(22, 4, (int)payload, 0, 0);
 }
 
 /* Sends a sound command (id 23) with one value. */
-void func_00132B28(int param_1) {
+void snd_send_cmd23(int param_1) {
   int auStack_20[4];
 
   auStack_20[0] = param_1;
-  QueueSoundCommand(0x17, 4, (int)auStack_20, 0, 0);
+  snd_queue_command(0x17, 4, (int)auStack_20, 0, 0);
   return;
 }
 
 /* Sends a sound command (id 25) with one value and two extra settings. */
-void func_00132B58(int value, long fourth, int fifth) {
+void snd_send_cmd25_with_settings(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(25, 4, (int)payload, fourth, fifth);
+    snd_queue_command(25, 4, (int)payload, fourth, fifth);
 }
 
 
@@ -297,7 +297,7 @@ void func_00132B58(int value, long fourth, int fifth) {
 /* rac1-decomp src/core/989snd.c: func_0012EC30 */
 /* snd_UnkFunction_0012eaf0 */
 /* Sets the sound current buffer flag to 1. */
-void func_00133220(void) {
+void snd_set_current_buffer_flag(void) {
     *(int *)&r1_D_0015EDC4 = 1;
 }
 
@@ -305,22 +305,22 @@ void func_00133220(void) {
 
 
 /* Sends a sound command (id 46) with one value. */
-void func_00133400(int value) {
+void snd_send_cmd46(int value) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(46, 4, (int)payload, 0, 0);
+    snd_queue_command(46, 4, (int)payload, 0, 0);
 }
 
 /* Sends a sound command (id 50) with one value and two extra settings. */
-void func_00133430(int value, long fourth, int fifth) {
+void snd_send_cmd50_with_settings(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(50, 4, (int)payload, fourth, fifth);
+    snd_queue_command(50, 4, (int)payload, fourth, fifth);
 }
 
 /* Sends a sound command (id 79) with one value and two extra settings. */
-void func_00133460(int value, long fourth, int fifth) {
+void snd_send_cmd79_with_settings(int value, long fourth, int fifth) {
     int payload[4];
     payload[0] = value;
-    QueueSoundCommand(79, 4, (int)payload, fourth, fifth);
+    snd_queue_command(79, 4, (int)payload, fourth, fifth);
 }

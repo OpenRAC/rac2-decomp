@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { short s[12]; } FontWindow;
 struct CheatMenuEntry { int text_id; unsigned char *enabled_flag; int enabled_text_id, disabled_text_id, reserved10; };
 struct CheatsMenu { char pad[0x20]; int width,height; char pad28[8]; int flags; struct CheatMenuEntry *entries; int selected_entry; };
-extern void func_002FC560(int, unsigned long);
-extern void func_0027C540(int);
-extern void func_0027C660(void);
-extern void *func_00115484(void *,int,unsigned int);
-extern char *func_00288FB8(int);
-extern void func_00280190(FontWindow *,unsigned long,char *,int);
-extern void func_0027F538(int,int,unsigned long,char *,int);
-extern void func_0027F980(int,int,unsigned long,char *,int);
+extern void VU1_addGSregister(int, unsigned long);
+extern void SetupGifPaging(int);
+extern void DoGifPaging(void);
+extern void *memset(void *,int,unsigned int);
+extern char *GetLocalizedString(int);
+extern void text_draw_window_small(FontWindow *,unsigned long,char *,int);
+extern void text_draw_small(int,int,unsigned long,char *,int);
+extern void text_draw_right_aligned_small(int,int,unsigned long,char *,int);
 
 int func_US2_002DC0F0(struct CheatsMenu *menu) {
     FontWindow text_window;
@@ -24,10 +25,10 @@ int func_US2_002DC0F0(struct CheatsMenu *menu) {
     int color;
     int enabled;
 
-    func_002FC560(0x47, 0x2004B);
-    func_0027C540(0);
+    VU1_addGSregister(0x47, 0x2004B);
+    SetupGifPaging(0);
     if ((menu->flags & 1) && menu->entries->text_id == 0) {
-        func_00115484(window_fields, 0, sizeof(window_fields));
+        memset(window_fields, 0, sizeof(window_fields));
         window_fields[1] = menu->height + 1;
         window_fields[3] = menu->width + 1;
         window_fields[4] = menu->width >> 1;
@@ -38,7 +39,7 @@ int func_US2_002DC0F0(struct CheatsMenu *menu) {
         window_fields[9] = 1;
 
         text_window = *(FontWindow *)window_fields;
-        func_00280190(&text_window, 0x80FFA888, func_00288FB8(0x2CA2), -1);
+        text_draw_window_small(&text_window, 0x80FFA888, GetLocalizedString(0x2CA2), -1);
     }
     /* Entries end at a zero text ID; each retail entry occupies 0x14 bytes. */
     entry_count = 0;
@@ -57,17 +58,17 @@ int func_US2_002DC0F0(struct CheatsMenu *menu) {
             if (entry->enabled_flag != 0) {
                 enabled = *entry->enabled_flag;
             }
-            func_0027F538(0xC, draw_y, color, func_00288FB8(entry->text_id), -1);
-            func_0027F980(
+            text_draw_small(0xC, draw_y, color, GetLocalizedString(entry->text_id), -1);
+            text_draw_right_aligned_small(
                 menu->width - 0xC, draw_y, 0x80FFA888,
-                func_00288FB8(enabled ? entry->enabled_text_id : entry->disabled_text_id),
+                GetLocalizedString(enabled ? entry->enabled_text_id : entry->disabled_text_id),
                 -1);
             draw_y += line_spacing;
             draw_index++;
             entry_index++;
         } while (menu->entries[entry_index].text_id != 0);
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }
 

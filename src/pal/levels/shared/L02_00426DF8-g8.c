@@ -11,17 +11,17 @@ extern float D_L02_001B1FB0 __attribute__((sda)),D_L02_001B1FB4 __attribute__((s
 extern float D_L02_001B1FB8 __attribute__((sda));
 extern float D_L02_001B1FBC __attribute__((sda)),D_L02_001B1FC0 __attribute__((sda));
 extern u32 D_L02_001B1FC8 __attribute__((sda)),D_L02_001B1FCC __attribute__((sda));
-extern void func_00282CF0(void *,void *,void *);
-extern float func_002A7878(float,float);
-extern int func_002A77E0(int);
-extern void func_002ACEC0(void *,void *,void *,float);
-extern void func_00282F20(void *,void *,float);
-extern float func_002A78D8(float,float);
+extern void FastVecSub(void *,void *,void *);
+extern float math_random_float_range(float,float);
+extern int math_random_int_below(int);
+extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
+extern void vec_scale_to_length(void *,void *,float);
+extern float math_random_signed_float_range(float,float);
 extern int func_001163B0(void);
-extern void func_00282D30(void *,void *,float);
-extern u8 *func_002C2210(void *,int,u32,float,float,int,int,void *,int,float);
-extern int func_00283CF0(float);
-extern void func_00282CC0(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern u8 *part_spawn_ground_effect(void *,int,u32,float,float,int,int,void *,int,float);
+extern int FloatToInt(float);
+extern void FastVecAdd(void *,void *,void *);
 
 /* Emit paired particles, choosing an outward or target-directed trajectory. */
 void func_PAL_L02_00426DF8(void *origin,int count,int inner)
@@ -34,51 +34,51 @@ void func_PAL_L02_00426DF8(void *origin,int count,int inner)
     int i,sign;
     float size,angle,speed;
     u8 *particle;
-    func_00282CF0(base,D_L02_001BA3C0.position,origin);
+    FastVecSub(base,D_L02_001BA3C0.position,origin);
     base[2]=0;
     axis[0]=0;axis[1]=0;axis[2]=1;axis[3]=1;
     for(i=0;i<count;i++) {
-        size=func_002A7878(D_L02_001B1FBC,D_L02_001B1FC0);
-        sign=func_002A77E0(2);
+        size=math_random_float_range(D_L02_001B1FBC,D_L02_001B1FC0);
+        sign=math_random_int_below(2);
         if (!sign) sign--;
-        angle=func_002A7878(-1.0471977f,1.0471977f);
-        func_002ACEC0(velocity,base,axis,angle);
-        speed=func_002A7878(D_L02_001B1FA8,D_L02_001B1FAC)*0.020000001f;
-        func_00282F20(velocity,velocity,speed);
-        velocity[2]=func_002A7878(D_L02_001B1FB0,D_L02_001B1FB4)*0.020000001f;
+        angle=math_random_float_range(-1.0471977f,1.0471977f);
+        math_apply_axis_rotation_to_quat(velocity,base,axis,angle);
+        speed=math_random_float_range(D_L02_001B1FA8,D_L02_001B1FAC)*0.020000001f;
+        vec_scale_to_length(velocity,velocity,speed);
+        velocity[2]=math_random_float_range(D_L02_001B1FB0,D_L02_001B1FB4)*0.020000001f;
         qcopy(position,origin);
-        position[0]+=func_002A78D8(0,0.15f);
-        position[1]+=func_002A78D8(0,0.15f);
-        position[2]+=func_002A78D8(0,0.15f);
+        position[0]+=math_random_signed_float_range(0,0.15f);
+        position[1]+=math_random_signed_float_range(0,0.15f);
+        position[2]+=math_random_signed_float_range(0,0.15f);
         if(!inner) {
             if(!(func_001163B0()&1)) {
-                func_00282D30(velocity,velocity,1.5f);
-                particle=func_002C2210(position,50,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,50,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
+                FastVecScale(velocity,velocity,1.5f);
+                particle=part_spawn_ground_effect(position,50,D_L02_001B1FC8,size*0.35f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=part_spawn_ground_effect(position,50,D_L02_001B1FCC,size*0.245f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
             } else {
-                func_00282CF0(toward,D_L02_001BA3C0.position,position);
-                func_00282F20(toward,toward,speed);
-                func_00282CC0(velocity,velocity,toward);
-                particle=func_002C2210(position,33,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,33,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
+                FastVecSub(toward,D_L02_001BA3C0.position,position);
+                vec_scale_to_length(toward,toward,speed);
+                FastVecAdd(velocity,velocity,toward);
+                particle=part_spawn_ground_effect(position,33,D_L02_001B1FC8,size*2.05f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=part_spawn_ground_effect(position,33,D_L02_001B1FCC,size*1.4350001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
             }
         } else {
             if(!(func_001163B0()&1)) {
-                func_00282D30(velocity,velocity,1.5f);
-                particle=func_002C2210(position,50,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,50,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
+                FastVecScale(velocity,velocity,1.5f);
+                particle=part_spawn_ground_effect(position,50,D_L02_001B1FC8,size*0.3f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=part_spawn_ground_effect(position,50,D_L02_001B1FCC,size*0.21000001f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
             } else {
-                func_00282CF0(toward,D_L02_001BA3C0.position,position);
-                func_00282F20(toward,toward,speed);
-                func_00282CC0(velocity,velocity,toward);
-                particle=func_002C2210(position,33,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
-                if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
-                particle=func_002C2210(position,33,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
+                FastVecSub(toward,D_L02_001BA3C0.position,position);
+                vec_scale_to_length(toward,toward,speed);
+                FastVecAdd(velocity,velocity,toward);
+                particle=part_spawn_ground_effect(position,33,D_L02_001B1FC8,size*0.25f,size,0,sign,velocity,0,D_L02_001B1FB8*1.44f);
+                if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
+                particle=part_spawn_ground_effect(position,33,D_L02_001B1FCC,size*0.175f,size*0.7f,1,-sign,velocity,0,D_L02_001B1FB8*1.44f);
             }
         }
-        if(particle) particle[9]=(u8)(func_00283CF0(4.0f)+0x70);
+        if(particle) particle[9]=(u8)(FloatToInt(4.0f)+0x70);
     }
 }

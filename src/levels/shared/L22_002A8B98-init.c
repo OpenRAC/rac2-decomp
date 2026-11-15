@@ -16,19 +16,19 @@ typedef struct {
     u8 special_level;
 } LevelPlayerPrefix;
 
-extern LevelPlayerPrefix D_00189E20;
-extern s32 D_001A79F0[] __attribute__((sda));
+extern LevelPlayerPrefix g_hero_state;
+extern s32 g_current_map_index[] __attribute__((sda));
 extern s32 D_001A73A0[] __attribute__((sda));
 extern char D_L22_001B1920[];
-extern void func_L00_002D24B8(void);
-extern s32 func_L22_002C9898(s32, s32);
-extern void func_L00_003B09F8(void);
+extern void hero_clear_queued_anim(void);
+extern s32 hero_l22_set_action(s32, s32);
+extern void trail_reset_slots(void);
 
 /* Install this level's player parameters and start the shared subsystems. */
-void func_L22_002A8B98(void)
+void level_init_player_params(void)
 {
-    s32 special_level = gCurrentMapIndex[0] == 0x1A;
-    LevelPlayerPrefix *state = &gHeroState;
+    s32 special_level = g_current_map_index[0] == 0x1A;
+    LevelPlayerPrefix *state = &g_hero_state;
 
     state->parameter250 = 0.8f;
     state->parameter254 = 0.7f;
@@ -39,8 +39,8 @@ void func_L22_002A8B98(void)
     state->special_level = special_level;
     D_001A73A0[0] = 0;
     state->state = 0;
-    ClearHeroQueuedAnimation();
-    SetHeroAction_L22(0, 1);
-    ResetTrailSlots();
+    hero_clear_queued_anim();
+    hero_l22_set_action(0, 1);
+    trail_reset_slots();
     state->entry_table = D_L22_001B1920;
 }

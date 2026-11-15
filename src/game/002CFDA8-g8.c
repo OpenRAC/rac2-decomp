@@ -1,57 +1,57 @@
 #include "common.h"
 
-extern void func_0027C540(long);
-extern void func_0027C660(void);
-extern int func_00336D50(char *, int);
-extern void func_00300A00(int, int, float, float, float, float, float);
-extern char *func_00288FB8(int);
-extern int func_0027FAA8(int, int, u64, char *, int);
-extern int func_0027FB40(int, int, u64, char *, int);
+extern void SetupGifPaging(long);
+extern void DoGifPaging(void);
+extern int table_find_by_id(char *, int);
+extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
+extern char *GetLocalizedString(int);
+extern int text_draw_centered_small(int, int, u64, char *, int);
+extern int text_draw_centered_medium(int, int, u64, char *, int);
 extern int func_001157AC(char *);
-extern int func_0027F198(char *, int);
-extern void func_002CF0A0(int, int);
-extern void func_002CEBD0(void);
+extern int text_measure_width_medium(char *, int);
+extern void menu_draw_text_highlight_frame(int, int);
+extern void menu_draw_scroll_arrows_and_frame(void);
 extern char *D_001A8CFC;
-extern int D_001A7340;
+extern int g_screen_width;
 extern float D_001B23A8;
 
-extern void func_0027F120(void);
-extern void func_0027F110(void);
-extern int func_002B0E90(void);
-extern int func_00115DA8(char *, char *, ...);
-extern void func_0028FC48(int, int, int, int, u64, int);
+extern void gfx_disable_screen_flag(void);
+extern void gfx_enable_screen_flag(void);
+extern int save_count_nonzero_flags(void);
+extern int sprintf(char *, char *, ...);
+extern void AppendScreenRectPacket(int, int, int, int, u64, int);
 extern int D_001AB9FC __attribute__((sda));
 extern int D_001ABA00 __attribute__((sda));
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern short D_0026CF18[][3];
 
 /* Draws the skill points list with the player's count out of 30 and five rows around the cursor. */
-int func_002CFDA8(void) {
+int DrawFiveRowProgressMenu(void) {
     char buf[64];
     int r, i, y, entryIndex, color;
     char *formatText;
     float z;
     SetupGifPaging(0);
     z = 0.0f;
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD7);
-    DrawScaledObjectTwoAxes(r, 0x60442D00, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD8);
-    DrawScaledObjectTwoAxes(r, 0x60241700, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xD9);
-    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    r = FindTableEntryById(D_001A8CFC + 0x8710, 0xDA);
-    DrawScaledObjectTwoAxes(r, 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
-    DisableScreenFlag();
-    DrawTextCenteredSmallFont(0xB9, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E10), -1);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD7);
+    gfx_draw_scaled_object_two_axes(r, 0x60442D00, (float)(g_screen_width / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD8);
+    gfx_draw_scaled_object_two_axes(r, 0x60241700, (float)(g_screen_width / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xD9);
+    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    r = table_find_by_id(D_001A8CFC + 0x8710, 0xDA);
+    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
+    gfx_disable_screen_flag();
+    text_draw_centered_small(0xB9, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E10), -1);
     formatText = GetLocalizedString(0x2F2F);
-    Sprintf(buf, formatText, CountNonZeroFlags(), 30);
-    DrawTextCenteredSmallFont(0x92, 0x177, 0x80F0F0F0ULL, buf, -1);
-    EnableScreenFlag();
-    DrawTextCenteredSmallFont(0x1AD, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
+    sprintf(buf, formatText, save_count_nonzero_flags(), 30);
+    text_draw_centered_small(0x92, 0x177, 0x80F0F0F0ULL, buf, -1);
+    gfx_enable_screen_flag();
+    text_draw_centered_small(0x1AD, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
     AppendScreenRectPacket(0x15E, 0xDA, 0x1E6, 0xDC, 0x55F0C070ULL, 0);
     if (D_0026CF18[D_001AB9FC][2] != -1)
-        DrawTextCenteredSmallFont(0x1A0, 0xE0, 0x80F0F0F0ULL, GetLocalizedString(D_0026CF18[D_001AB9FC][2]), -1);
-    DrawMenuScrollArrowsAndFrame();
+        text_draw_centered_small(0x1A0, 0xE0, 0x80F0F0F0ULL, GetLocalizedString(D_0026CF18[D_001AB9FC][2]), -1);
+    menu_draw_scroll_arrows_and_frame();
     for (y = 0x112, i = 0; i < 5; i++, y += 20) {
         char *rowText;
         entryIndex = i + D_001AB9FC - 2;
@@ -65,9 +65,9 @@ int func_002CFDA8(void) {
         else if (i == 1 || i == 3) color |= 0x50000000;
         else {
             color |= 0x70000000;
-            DrawMenuTextHighlightFrame(MeasureTextWidthMediumFont(rowText, strlen_001157AC(rowText)), color);
+            menu_draw_text_highlight_frame(text_measure_width_medium(rowText, func_001157AC(rowText)), color);
         }
-        DrawTextCenteredMediumFont(gScreenWidth / 2, y, color, rowText, -1);
+        text_draw_centered_medium(g_screen_width / 2, y, color, rowText, -1);
     }
     DoGifPaging();
     return 0;

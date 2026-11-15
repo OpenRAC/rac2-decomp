@@ -36,7 +36,7 @@ typedef struct {
    https://github.com/open-goal/jak-project/blob/master/game/graphics/sceGraphicsInterface.h
    (sceGsSyncV(u32 mode)). Only the signature is used, with no HLE code copied. */
 /* Returns which screen field is being drawn when the picture is interlaced, otherwise 1. */
-int func_001261F0(int unusedMode) {
+int sceGsSyncV(int unusedMode) {
     GsGParam *gParam = r1_func_00121D08();
     long csr;
 
@@ -67,7 +67,7 @@ ASM_FUNC("asm/core", func_00126284);
  * each loop, not shared through a goto: the compiler merges the two copies
  * into retail's single call, where a shared label needs an extra branch. */
 /* Copies an image into the graphics chip with two transfers and waits for the channel each time. */
-int func_001265B0(GsLoadImage *src, void *dst) {
+int sceGsExecLoadImage(GsLoadImage *src, void *dst) {
     unsigned int pollCount = 0;
 
     while (D2_CHCR & 0x100) {
@@ -115,7 +115,7 @@ extern void r1_func_00119390(int);
    AddIntcHandler/RemoveIntcHandler syscalls. Returns the previous
    handler. */
 /* Sets or removes the handler that runs on each screen refresh and returns the old one. */
-int func_00126DBC(void *handler) {
+int sceGsSyncVCallback(void *handler) {
     char *gParam = (char *)r1_func_00121D08();
     int intcLine = 2;
     int prevHandler = *(int *)(gParam + 8);

@@ -7,8 +7,8 @@ extern float D_L00_001B24E0[];
 extern int D_L00_001C9358 __attribute__((nosda));
 extern unsigned char *D_L00_001B24D0 __attribute__((section(".sdata")));
 extern int D_001A72F4 __attribute__((section(".sdata")));
-extern void func_002EF080(void);
-extern int func_00282A18(int);
+extern void SetTfragDists(void);
+extern int log2dim(int);
 typedef struct { int x0; int x4; float scale; int extra; } TfragRenderHeader;
 typedef struct {
     char pad0[0x10];
@@ -32,7 +32,7 @@ typedef struct {
 typedef struct { long lo; long hi; } TfragPacketQword;
 typedef struct { short x0; short x2; unsigned short x4; short x6; short x8; short xA; short xC; short xE; } TfragTexture;
 /* Sets up the level's tfrag (terrain) render data and writes the GS texture setup words for each material. */
-void func_L00_00300090(TfragRenderHeader *hdr, char *tbl) {
+void initialize_tfrag_render_data(TfragRenderHeader *hdr, char *tbl) {
     char *base;
     float scale;
     int i;

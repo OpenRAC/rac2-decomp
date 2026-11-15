@@ -5,11 +5,11 @@
 
 #include "common.h"
 extern u8 D_L08_001B9B00[];
-extern f32 func_00282E48(void *, void *);
-extern f32 func_00283CE0(int);
-extern f32 func_00282C48(f32);
-extern float func_00283180(float);
-extern float func_00283198(float);
+extern f32 fast_vec_dist(void *, void *);
+extern f32 IntToFloat(int);
+extern f32 math_fabs(f32);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
 typedef struct {
     u8 pad00[0x20];
     u8 f20;
@@ -94,25 +94,25 @@ extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
 extern f32 D_L08_001BFF68;
 extern f32 D_00189EA8;
-extern f32 func_L08_00422850(Quad *, f32, f32, f32, f32);
-extern void func_L08_00422900(Ent *);
-extern void func_L08_00422AD8(Ent *);
-extern float func_00282C48(float);
+extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
+extern void vehicle_compute_height_limits(Ent *);
+extern void sandfly_release_sounds(Ent *);
+extern float math_fabs(float);
 extern u8 D_001A7B00[] __attribute__((sda));
 extern u8 D_L08_001BFD00[];
 extern s32 D_L08_001A8F00[] __attribute__((sda));
 extern s32 D_L08_001B2700[] __attribute__((sda));
 extern u8 *D_L08_001B2ACC[] __attribute__((sda));
-extern s32 func_002ACBC8(void *, s32);
-extern s32 func_00288AA0(void *, s32);
-extern s32 func_00288BE8(void *);
-extern s32 func_002F5D10(void);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern f32 func_002A7940(void);
-extern s32 func_002A7820(s32, s32);
-extern f32 func_00283180(f32);
-extern f32 func_00283198(f32);
+extern s32 IsPointInCuboid(void *, s32);
+extern s32 req_push_queue(void *, s32);
+extern s32 req_launch_queued(void *);
+extern s32 game_is_either_mode_two(void);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern f32 math_random_angle(void);
+extern s32 math_random_int_range(s32, s32);
+extern f32 math_fast_sin_or_cos_a(f32);
+extern f32 math_fast_sin_or_cos_b(f32);
 
 /* func_L08_00423010 is in its own unit. */
 
@@ -129,7 +129,7 @@ void func_PAL_L08_00428DD8(Ent *a0)
     s32 r;
 
     func_PAL_002B14F8(a0, s0->f1E0, 2, 1, 2.5f);
-    func_L08_00422900(a0);
+    vehicle_compute_height_limits(a0);
     q = a0->f24;
     f0 = q->f24 * 0.5f;
     a0->f2C = f0;
@@ -141,8 +141,8 @@ void func_PAL_L08_00428DD8(Ent *a0)
         } else {
             s0->f1BE = 275;
         }
-        func_L08_00422B60(a0);
-        func_L08_00422AD8(a0);
+        snd_stop_queued(a0);
+        sandfly_release_sounds(a0);
     }
 }
 

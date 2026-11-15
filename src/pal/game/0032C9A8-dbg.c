@@ -1,15 +1,16 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern unsigned long func_0027C878(int);
-extern void func_0027DE50(int, int, int, int, int);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_002A7790(float);
-extern float func_002A7798(float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void gfx_draw_colored_rectangle(int, int, int, int, int);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float math_square(float);
+extern float math_ease_out_quad(float);
 extern void func_PAL_0032DB00(void *);
 extern void func_PAL_0032D2A0(void *);
-extern void func_0032B0A8(void *);
-extern short D_001A6480[];
+extern void part_draw_trail_nodes(void *);
+extern short g_screen_adjust_offsets[];
 extern unsigned long D_001B2810[] __attribute__((sda));
 
 /* Per-frame screen fade of the object: while it is in state 2 (and stays there
@@ -22,23 +23,23 @@ void func_PAL_0032C9A8(unsigned char *object)
     float t;
     int v;
 
-    D_001B2810[0] = func_0027C878(-1);
+    D_001B2810[0] = GetEffectTextureDescriptor(-1);
     state = object[0x20];
     if (state == 2) {
         func_PAL_0032DB00(object);
         if (object[0x20] == state) {
-            t = func_00283CE0(*(int *)(vars + 4)) / func_00283CE0(0x32);
-            v = func_00283CF0(func_002A7790(1.0f - t) * 128.0f);
-            func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
+            t = IntToFloat(*(int *)(vars + 4)) / IntToFloat(0x32);
+            v = FloatToInt(math_square(1.0f - t) * 128.0f);
+            gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (v << 24) | 0xFFFFFF);
             func_PAL_0032D2A0(object);
             goto done;
         }
     }
     if (*(int *)(vars + 4) >= 0x58) {
-        t = func_00283CE0(*(int *)(vars + 4) - 0x57) / func_00283CE0(0xC);
-        v = func_00283CF0(func_002A7798(t) * 128.0f);
-        func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
+        t = IntToFloat(*(int *)(vars + 4) - 0x57) / IntToFloat(0xC);
+        v = FloatToInt(math_ease_out_quad(t) * 128.0f);
+        gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (v << 24) | 0xFFFFFF);
     }
 done:
-    func_0032B0A8(object);
+    part_draw_trail_nodes(object);
 }

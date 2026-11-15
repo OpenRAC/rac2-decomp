@@ -1,45 +1,45 @@
 #include "common.h"
 extern int D_L30_001AEC90 __attribute__((sda));
-extern char D_00189EA0[];
-extern struct { char pad[0x24]; int pending; char gap[0x40]; int busy; short timer; char gap2[4]; unsigned short mode; } D_001A63A8;
+extern char g_hero_position[];
+extern struct { char pad[0x24]; int pending; char gap[0x40]; int busy; short timer; char gap2[4]; unsigned short mode; } g_music_state;
 extern int D_00138324 NOT_SDA;
-extern void func_002A7750(void *,int,int),func_002B0CE0(int,int,int),func_002B6D28(void);
-extern int func_L30_00384768(void *),func_L30_00384980(void *),func_L30_003848B8(void *),func_002ACBC8(void *,int);
-extern void func_L08_002F2D10(void *,void *),func_L30_003847F8(char *);
+extern void moby_set_state(void *,int,int),ForceClaimNotice(int,int,int),snd_resume_music_stream(void);
+extern int museum_find_active_exhibit_entry(void *),museum_start_exhibit_entry_timer(void *),museum_schedule_next_exhibit_entry(void *),IsPointInCuboid(void *,int);
+extern void gfx_queue_draw_callback(void *,void *),museum_draw_selected_exhibit_entry(char *);
 /* Updates the museum exhibit selector (moby class 4878). It finds an active entry, shows it, and steps through the show and wait states. */
-void func_L30_003844C8(unsigned char *obj) {
+void museum_exhibit_selector_update(unsigned char *obj) {
     char *st=*(char **)(obj+0x68);
     switch(obj[0x20]) {
     case 0:
         obj[0x30]=255; D_L30_001AEC90=0;
         *(int *)(st+0x140)=-1; *(int *)(st+0x144)=0;
-        SetMobyState(obj,1,-1); break;
-    case 1: if(FindActiveExhibitEntry(obj)!=-1) SetMobyState(obj,2,-1); break;
+        moby_set_state(obj,1,-1); break;
+    case 1: if(museum_find_active_exhibit_entry(obj)!=-1) moby_set_state(obj,2,-1); break;
     case 2:
-        if(!IsPointInCuboid(gHeroPosition,*(int *)(st+0x140))) SetMobyState(obj,1,-1);
-        else if(D_00138324&0x10) SetMobyState(obj,3,-1);
+        if(!IsPointInCuboid(g_hero_position,*(int *)(st+0x140))) moby_set_state(obj,1,-1);
+        else if(D_00138324&0x10) moby_set_state(obj,3,-1);
         else ForceClaimNotice(12,0x2801,1);
         break;
-    case 3: if(ScheduleNextExhibitEntry(obj)) SetMobyState(obj,4,-1);
-        QueueDrawCallback(DrawSelectedExhibitEntry,obj); break;
+    case 3: if(museum_schedule_next_exhibit_entry(obj)) moby_set_state(obj,4,-1);
+        gfx_queue_draw_callback(museum_draw_selected_exhibit_entry,obj); break;
     case 4:
-        if((short)gMusicState.mode==3 && gMusicState.timer<6000) {ResumeMusicStream();SetMobyState(obj,5,-1);}
-        QueueDrawCallback(DrawSelectedExhibitEntry,obj); break;
+        if((short)g_music_state.mode==3 && g_music_state.timer<6000) {snd_resume_music_stream();moby_set_state(obj,5,-1);}
+        gfx_queue_draw_callback(museum_draw_selected_exhibit_entry,obj); break;
     case 5:
-        if(StartExhibitEntryTimer(obj)) SetMobyState(obj,6,-1);
-        QueueDrawCallback(DrawSelectedExhibitEntry,obj); break;
+        if(museum_start_exhibit_entry_timer(obj)) moby_set_state(obj,6,-1);
+        gfx_queue_draw_callback(museum_draw_selected_exhibit_entry,obj); break;
     case 6:
-        if((short)gMusicState.mode==3 && gMusicState.timer<6000) {ResumeMusicStream();SetMobyState(obj,7,-1);}
-        QueueDrawCallback(DrawSelectedExhibitEntry,obj); break;
+        if((short)g_music_state.mode==3 && g_music_state.timer<6000) {snd_resume_music_stream();moby_set_state(obj,7,-1);}
+        gfx_queue_draw_callback(museum_draw_selected_exhibit_entry,obj); break;
     case 7:
-        if(*(unsigned short *)(obj+0x96)>=10 && gMusicState.busy==0 && gMusicState.pending==-1) SetMobyState(obj,2,-1);
-        QueueDrawCallback(DrawSelectedExhibitEntry,obj); break;
+        if(*(unsigned short *)(obj+0x96)>=10 && g_music_state.busy==0 && g_music_state.pending==-1) moby_set_state(obj,2,-1);
+        gfx_queue_draw_callback(museum_draw_selected_exhibit_entry,obj); break;
     }
     if(obj[0x20]>=3) {
         ForceClaimNotice(1,0,1);
-        if((D_00138324&0x10) && (gMusicState.busy!=0 || gMusicState.pending!=-1)) {
-            if((unsigned)(gMusicState.mode-6)>=2) gMusicState.mode=5;
-            SetMobyState(obj,2,-1);
+        if((D_00138324&0x10) && (g_music_state.busy!=0 || g_music_state.pending!=-1)) {
+            if((unsigned)(g_music_state.mode-6)>=2) g_music_state.mode=5;
+            moby_set_state(obj,2,-1);
         }
     }
     ++*(unsigned short *)(obj+0x96);

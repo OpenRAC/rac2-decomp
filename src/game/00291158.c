@@ -16,7 +16,7 @@ extern Vec3_00291158 D_00255BB8[];
 extern Vec3_00291158 *D_001B1990 __attribute__((sda));
 
 /* the mode word: 2 turns the reference axis from +x to -y */
-extern s32 D_001A8BB0 MACRO_ADDR;
+extern s32 g_current_game_mode MACRO_ADDR;
 
 /* the axis the reference is measured against */
 extern float D_001B5570[];
@@ -26,17 +26,17 @@ extern char *D_001B20C0 MACRO_ADDR;
 
 extern float D_001B20F0[] MACRO_ADDR;
 
-extern float func_00282DB0(void *, void *);
+extern float FastVecDot(void *, void *);
 
-extern void func_00283388(void *);
+extern void set_identity_matrix(void *);
 
-extern void func_002E3478(s32);
+extern void cam_update_view_rotation(s32);
 
-extern void func_002E3940(s32);
+extern void gfx_process_view_entry(s32);
 
 /* scales the ten heights by the negated projection of the reference axis, then runs the
    per-entry pass (entries past the tenth only get the overflow block) */
-void func_00291158(void) {
+void gfx_update_sky_shell_heights(void) {
     union {
         TI128 q;
         float f[4];
@@ -48,7 +48,7 @@ void func_00291158(void) {
     axis.q = 0;
     axis.f[0] = 1.0f;
     D_001B1990 = D_00255BB8;
-    if (gCurrentGameMode == 2) {
+    if (g_current_game_mode == 2) {
         axis.f[0] = 0.0f;
         axis.f[1] = -1.0f;
     }
@@ -60,8 +60,8 @@ void func_00291158(void) {
         if (i >= 10) {
             set_identity_matrix(D_001B20F0);
         } else {
-            UpdateViewRotation(i);
+            cam_update_view_rotation(i);
         }
-        ProcessViewEntry(i);
+        gfx_process_view_entry(i);
     }
 }

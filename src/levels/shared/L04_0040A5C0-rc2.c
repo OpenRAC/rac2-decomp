@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -26,7 +27,7 @@
 extern s8 *ref_L04_0040A5C0_00;
 
 /* Wakes up every racer linked to this one: sets a flag in its variables and puts it in state 2. */
-void func_L04_0040A5C0(s8 *moby) {
+void racer_activate_linked(s8 *moby) {
     s8 *vars;
     s32 *slotPtr;
     s32 racerIndex;

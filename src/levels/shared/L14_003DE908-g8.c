@@ -18,10 +18,10 @@ extern u32 D_L14_001B0928 __attribute__((sda));
    a2, a3, t0) but the declaration's order is what puts retail's `lui $at,0x3F80;
    mtc1 $at,$f12` first and the two `$gp` loads around the `addiu $a1,$a0,0x10`.
    Sixth argument in $t0: the call site passes the raw 0x40000000 pattern. */
-extern void func_L14_003F0F38(char *a, char *b, f32 e, u32 c, u32 d, int f);
+extern void gfx_draw_fading_quads(char *a, char *b, f32 e, u32 c, u32 d, int f);
 
 /* Binds the object and its +0x10 companion to the two small-data words. */
-void func_L14_003F0E68(char *moby)
+void moby_bind_small_data_words(char *moby)
 {
-    DrawFadingQuads(moby, moby + 0x10, 1.0f, D_L14_001B0924, D_L14_001B0928, 0x40000000);
+    gfx_draw_fading_quads(moby, moby + 0x10, 1.0f, D_L14_001B0924, D_L14_001B0928, 0x40000000);
 }

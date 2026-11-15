@@ -28,18 +28,18 @@ typedef struct {
     float fA4;
 } JobaRingState;
 extern JobaObject *D_L11_001C4D80[];
-extern float func_00282E48(void *, void *);
-extern void func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283BE0(float, float);
-extern float func_002A78D8(float, float);
-extern void func_L00_002E6EF8(void *, char *);
-extern float func_00283248(float a, float b);
-extern float func_002A7878(float a, float b);
-extern float func_002A7940(void);
-extern float func_00282E80(void *p, float *v);
-extern void func_00282CF0(float *out, float *a, float *b);
-extern void func_L11_00456EA0(void);
+extern float fast_vec_dist(void *, void *);
+extern void vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float fast_subtract_rotations(float, float);
+extern float math_random_signed_float_range(float, float);
+extern void gfx_add_draw_callback_third(void *, char *);
+extern float mat_fast_helper_a(float a, float b);
+extern float math_random_float_range(float a, float b);
+extern float math_random_angle(void);
+extern float vec_distance_xy(void *p, float *v);
+extern void FastVecSub(float *out, float *a, float *b);
+extern void joba_ring_effect_draw_sprites(void);
 
 /* Keeps the ring's points inside the configured radial and angular limits. */
 void func_PAL_L11_0045C810(JobaObject *obj)
@@ -57,39 +57,39 @@ void func_PAL_L11_0045C810(JobaObject *obj)
         for (i = 0; i < state->count; i++) {
             float newRadius, newAzimuth;
 
-            newRadius = func_002A7878(state->minRadius, state->maxRadius);
-            newAzimuth = func_002A7940();
-            func_002AF000(state->points[i], newRadius, newAzimuth, func_002A7940());
-            func_00282CC0(state->points[i], obj->position, state->points[i]);
+            newRadius = math_random_float_range(state->minRadius, state->maxRadius);
+            newAzimuth = math_random_angle();
+            vec_build_spherical_offset(state->points[i], newRadius, newAzimuth, math_random_angle());
+            FastVecAdd(state->points[i], obj->position, state->points[i]);
         }
     }
 
     if (obj->stage == 1) {
-        func_L00_002E6EF8(func_L11_00456EA0, (char *)obj);
+        gfx_add_draw_callback_third(joba_ring_effect_draw_sprites, (char *)obj);
         for (j = 0; j < state->count; j++) {
             point = state->points[j];
-            func_00282CF0(scratch, obj->position, point);
-            azimuth = func_00283248(point[0] - obj->position[0], point[1] - obj->position[1]);
-            elevation = func_00283248(func_00282E80(obj->position, point),
+            FastVecSub(scratch, obj->position, point);
+            azimuth = mat_fast_helper_a(point[0] - obj->position[0], point[1] - obj->position[1]);
+            elevation = mat_fast_helper_a(vec_distance_xy(obj->position, point),
                                       point[2] - obj->position[2]);
-            azimuth = func_00283BE0(azimuth, state->f9C * 0.017453294f);
-            elevation = func_00283BE0(elevation,
-                                      func_002A78D8(state->fA4, state->fA0) * 0.017453294f);
+            azimuth = fast_subtract_rotations(azimuth, state->f9C * 0.017453294f);
+            elevation = fast_subtract_rotations(elevation,
+                                      math_random_signed_float_range(state->fA4, state->fA0) * 0.017453294f);
             if (state->maxElevation < elevation)
                 elevation = state->maxElevation;
             if (elevation < state->minElevation)
                 elevation = state->minElevation;
 
-            radius = func_00282E48(obj->position, point);
-            step = func_002A78D8(state->f98 * 0.020000001f, state->f94 * 0.020000001f);
+            radius = fast_vec_dist(obj->position, point);
+            step = math_random_signed_float_range(state->f98 * 0.020000001f, state->f94 * 0.020000001f);
             radius += step;
             if (state->maxRadius < radius)
                 radius = state->maxRadius;
             if (radius < state->minRadius)
                 radius = state->minRadius;
 
-            func_002AF000(point, radius, azimuth, elevation);
-            func_00282CC0(point, obj->position, point);
+            vec_build_spherical_offset(point, radius, azimuth, elevation);
+            FastVecAdd(point, obj->position, point);
         }
     }
 }

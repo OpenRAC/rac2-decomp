@@ -20,18 +20,18 @@ extern float D_L01_001B086C __attribute__((sda));
 extern float D_L01_001B0870 __attribute__((sda));
 extern float D_L01_001B0890 __attribute__((sda));
 extern float D_L01_001B083C __attribute__((sda));
-extern void func_002ACB48(void *, float);
-extern float func_002A7940(void);
-extern float func_002A7878(float, float);
-extern void func_00282D30(void *,void *, float);
-extern float func_00283180(float), func_00283198(float);
-extern int func_00283D38(int, int, float);
-extern int func_00283CF0(float);
-extern void *func_002BAA28(void *,void *,void *,int,int,int,int,int,int);
-extern void func_002ABBB8(void *,void *,int,int,int,int,int,int,int,int,int, int, float, float,float, float,float, float,float);
+extern void vec_add_random_offset(void *, float);
+extern float math_random_angle(void);
+extern float math_random_float_range(float, float);
+extern void FastVecScale(void *,void *, float);
+extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
+extern int FastTweenColor(int, int, float);
+extern int FloatToInt(float);
+extern void *part_spawn_trail(void *,void *,void *,int,int,int,int,int,int);
+extern void SpawnExplosionEffects(void *,void *,int,int,int,int,int,int,int,int,int, int, float, float,float, float,float, float,float);
 /* Emits randomized particle trails, then the owner's explosion effect. */
 /* Sprays random trails of particles, then starts the explosion effect. */
-void func_L01_003DA3F0(u8 *moby, void *baseVelocity)
+void part_l01_spawn_explosion_particles(u8 *moby, void *baseVelocity)
 {
     float pos[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
@@ -44,33 +44,33 @@ void func_L01_003DA3F0(u8 *moby, void *baseVelocity)
     for (i = 0; i < D_L01_001B0844; i++) {
         position = moby + 0x10;
         qcopy(pos, position);
-        AddRandomOffsetToVector(pos, D_L01_001B084C);
+        vec_add_random_offset(pos, D_L01_001B084C);
         pos[2] += 0.25f;
-        angle = RandomAngle();
-        speed = RandomFloatRange(D_L01_001B0858, D_L01_001B085C);
-        rise = RandomFloatRange(D_L01_001B0860, D_L01_001B0864);
-        spread = RandomFloatRange(0.0f, D_L01_001B0890);
+        angle = math_random_angle();
+        speed = math_random_float_range(D_L01_001B0858, D_L01_001B085C);
+        rise = math_random_float_range(D_L01_001B0860, D_L01_001B0864);
+        spread = math_random_float_range(0.0f, D_L01_001B0890);
         FastVecScale(vel, baseVelocity, spread * 0.016666668f);
-        vel[0] += FastSinOrCosA(angle) * 0.016666668f * speed;
-        vel[1] += FastSinOrCosB(angle) * 0.016666668f * speed;
+        vel[0] += math_fast_sin_or_cos_a(angle) * 0.016666668f * speed;
+        vel[1] += math_fast_sin_or_cos_b(angle) * 0.016666668f * speed;
         vel[2] += rise * 0.016666668f;
         qcopy(acc, vel);
         acc[2] -= D_L01_001B0868 * ((float)D_L01_001B0888 * 0.00027777778f);
         for (j = 0; j < D_L01_001B0848; j++) {
-            scale = RandomFloatRange(0.5f, 1.5f);
+            scale = math_random_float_range(0.5f, 1.5f);
             vel[3] = scale * D_L01_001B086C;
             acc[3] = scale * D_L01_001B0870;
-            AddRandomOffsetToVector(pos, D_L01_001B0850);
-            AddRandomOffsetToVector(acc, D_L01_001B0854 * 0.016666668f);
+            vec_add_random_offset(pos, D_L01_001B0850);
+            vec_add_random_offset(acc, D_L01_001B0854 * 0.016666668f);
             startColor = FastTweenColor(D_L01_001B0874, D_L01_001B087C,
-                              RandomFloatRange(0.0f, 1.0f));
+                              math_random_float_range(0.0f, 1.0f));
             upperScale = 2.5f;
             endColor = FastTweenColor(D_L01_001B0878, D_L01_001B0880,
-                              RandomFloatRange(0.0f, 1.0f));
+                              math_random_float_range(0.0f, 1.0f));
             lifetime = (float)D_L01_001B088C;
             maximum = lifetime * upperScale;
-            particleLife = FloatToInt(RandomFloatRange(lifetime * 0.5f, maximum));
-            SpawnTrailParticle_002BAA28(pos, vel, acc, startColor, endColor, D_L01_001B0884,
+            particleLife = FloatToInt(math_random_float_range(lifetime * 0.5f, maximum));
+            part_spawn_trail(pos, vel, acc, startColor, endColor, D_L01_001B0884,
                           D_L01_001B0888, particleLife, -1);
         }
     }

@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -28,7 +29,7 @@ extern s32 D_001A7000[];
 extern s32 D_001A0000[];
 
 /* Runs every shutdown function in a list, last one first. */
-void func_0011FB8C(void) {
+void shutdown_run_callbacks(void) {
     s64 count;
     s32 remaining;
     s32 *entry;

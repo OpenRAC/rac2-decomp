@@ -1,12 +1,12 @@
 #include "common.h"
-/* Adapted from RAC1 BuildViewMatrices (GPL-3.0). */
+/* Adapted from RAC1 gfx_build_view_matrices (GPL-3.0). */
 typedef struct { float f[0x50]; } SceneG;
 extern char D_001B5570[],D_001B9100[],D_001B92C0[];
-extern void func_00283788(void *,void *,void *);
-extern void func_00282D60(void *,void *,float);
-extern void func_00282D30(void *,void *,float);
+extern void multiply_matrix(void *,void *,void *);
+extern void scale_vector(void *,void *,float);
+extern void FastVecScale(void *,void *,float);
 /* Builds the camera view matrices and the clip data from the current camera. */
-void func_00279D18(void) {
+void gfx_build_view_matrices(void) {
     float m[4][4];
     SceneG *viewMatrix;
     char *viewState;

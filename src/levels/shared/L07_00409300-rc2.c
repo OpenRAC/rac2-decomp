@@ -1,3 +1,4 @@
+#include "names.h"
 
 /* SPDX-License-Identifier: MIT
  * MIT License
@@ -30,7 +31,7 @@ extern void ref_L07_00409300_01(s8 *, s32, s32);
 extern void ref_L07_00409300_02(s8 *, s8 *, s32, s32, f32);
 
 /* Updates a TV Screens moby: sets it up in state 0, then keeps its screen picture running in state 1. */
-void func_L07_00409300(s8 *moby) {
+void tv_l07_screens_update(s8 *moby) {
     s8 *vars;
     u8 state;
 

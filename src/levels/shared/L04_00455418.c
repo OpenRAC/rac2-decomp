@@ -4,11 +4,11 @@
 typedef float f32;
 typedef int s32;
 
-extern f32 func_L04_004554F8(f32 value);
+extern f32 math_smooth_step(f32 value);
 
 /* Periodic light blend: hold at zero, ease in, hold at one, then ease out.
  * Debug line labels preserve the retail division padding. */
-f32 func_L04_00455418(char *a0, f32 x)
+f32 ComputePeriodicLightBlend(char *a0, f32 x)
 {
     f32 v = x;
     f32 span = *(f32 *)(a0 + 0xE4);
@@ -22,7 +22,7 @@ f32 func_L04_00455418(char *a0, f32 x)
     {
         f32 d = *(f32 *)(a0 + 0x14);
         if (v < d) {
-            return SmoothStep(v / d);
+            return math_smooth_step(v / d);
         }
         v = v - d;
     }
@@ -31,6 +31,6 @@ f32 func_L04_00455418(char *a0, f32 x)
         if (v < e)
             return 1.0f;
         v = v - e;
-        return 1.0f - SmoothStep(v / *(f32 *)(a0 + 0x1C));
+        return 1.0f - math_smooth_step(v / *(f32 *)(a0 + 0x1C));
     }
 }

@@ -5,16 +5,16 @@ extern int ref_L00_0030CAA0_00 __attribute__((sda));
 extern int ref_L00_0030CAA0_01 __attribute__((sda));
 extern int ref_L00_0030CAA0_02 __attribute__((sda));
 
-extern int D_001A79F0;
+extern int g_current_map_index;
 
 /* Picks the beam's glow colour. Level 20 in mode 2 has its own colour, every other case uses the normal one. */
-int func_0030CAA0(void) {
-    return gCurrentMapIndex == 20 && ref_L00_0030CAA0_00 == 2
+int beam_get_glow_color(void) {
+    return g_current_map_index == 20 && ref_L00_0030CAA0_00 == 2
         ? ref_L00_0030CAA0_01 : ref_L00_0030CAA0_02;
 }
 
-extern void func_0030BBA0(void *, int, int, int, float, float, float);
-extern void func_0030C188(void *);
+extern void DrawBeamAndArcTwoPassQuads(void *, int, int, int, float, float, float);
+extern void beam_draw_anchor_glow(void *);
 
 /* The globals below are read through $gp (small data) or absolutely, and each of
    them sits at another address in every program, so the names carry no level. */
@@ -38,7 +38,7 @@ extern short ref_L00_0030BA38_16;
 extern short ref_L00_0030BA38_17;
 
 /* Draws the beam: scrolls its texture, draws its two main ribbons and four small ones, then the glow at its end. */
-void func_0030BA38(void *object) {
+void beam_draw_ribbons(void *object) {
     void *unit = *(void **)((char *)object + 0x68);
     float value = ref_L00_0030BA38_00 - ref_L00_0030BA38_01;
 
@@ -68,5 +68,5 @@ void func_0030BA38(void *object) {
         DrawBeamAndArcTwoPassQuads(second + 0xF0, ref_L00_0030BA38_17, ref_L00_0030BA38_17, 5,
             ref_L00_0030BA38_09, ref_L00_0030BA38_10, 0.2f);
     }
-    DrawBeamAnchorGlow(object);
+    beam_draw_anchor_glow(object);
 }

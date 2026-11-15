@@ -11,20 +11,20 @@ extern int func_PAL_002B2618(void *, int, int *, float *, float *, float *, floa
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002AC290(void *, void *);
 extern int D_001A8CA0;
-extern float func_002AFF38(void *, void *, int);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AE730(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DF0(void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002B1CC8(void *, void *, void *, float, float, float);
-extern float func_00282E20(void *);
-extern void func_00282F70(void *, void *, float);
-extern float func_00283248(float, float);
-extern float func_00283B98(float, float);
+extern float vec_get_vertical_offset(void *, void *, int);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void vec_scale_to_length(void *, void *, float);
+extern void vec_pack_direction(void *, void *);
+extern float FastVecDot(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecLength(void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_steer_toward_nearby(void *, void *, void *, float, float, float);
+extern float vec_length_xy(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern float mat_fast_helper_a(float, float);
+extern float FastAddRotations(float, float);
 
 /* Select a reaction animation and initialize its velocity and timers. */
 int func_PAL_002B1EE8(char *object, char *state, float *vector, int reaction)
@@ -132,32 +132,32 @@ update:
     if (!valid)
         goto done;
     if (D_001A8CA0) {
-        length = func_002AFF38(object, vector, 0);
+        length = vec_get_vertical_offset(object, vector, 0);
         if (length < 1.0f)
             length = 1.0f;
-        func_002AFFD8(object + 0x10, forward, 0);
-        func_00282F20(backward, vector, -1.0f);
-        func_002AE730(backward, state + 0x64);
+        cam_compute_view_direction(object + 0x10, forward, 0);
+        vec_scale_to_length(backward, vector, -1.0f);
+        vec_pack_direction(backward, state + 0x64);
         {
-            float dot = func_00282DB0(forward, vector);
-            func_00282F20(projected, forward, dot);
+            float dot = FastVecDot(forward, vector);
+            vec_scale_to_length(projected, forward, dot);
         }
-        func_00282CF0(vector, vector, projected);
-        if (func_00282DF0(vector) < 1.0f)
-            func_00282F20(vector, vector, 1.0f);
-        func_00282D30(state + 0x80, vector, horizontal);
-        func_00282F20(projected, forward, -vertical * length);
-        func_00282CC0(state + 0x80, state + 0x80, projected);
+        FastVecSub(vector, vector, projected);
+        if (FastVecLength(vector) < 1.0f)
+            vec_scale_to_length(vector, vector, 1.0f);
+        FastVecScale(state + 0x80, vector, horizontal);
+        vec_scale_to_length(projected, forward, -vertical * length);
+        FastVecAdd(state + 0x80, state + 0x80, projected);
     } else {
-        func_002B1CC8(object, vector, vector, 5.0f, 0.7853982448577881f, 4.0f);
-        if (func_00282E20(vector) < 1.0f)
-            func_00282F70(vector, vector, 1.0f);
+        moby_steer_toward_nearby(object, vector, vector, 5.0f, 0.7853982448577881f, 4.0f);
+        if (vec_length_xy(vector) < 1.0f)
+            vec_fast_normalize_helper(vector, vector, 1.0f);
         if (vector[2] < 1.0f)
             vector[2] = 1.0f;
         F(state, 0x80) = vector[0] * horizontal;
         F(state, 0x84) = vector[1] * horizontal;
         F(state, 0x88) = vector[2] * vertical;
-        F(state, 0x64) = func_00283B98(func_00283248(vector[0], vector[1]), 3.14159f);
+        F(state, 0x64) = FastAddRotations(mat_fast_helper_a(vector[0], vector[1]), 3.14159f);
     }
     if (U(state, 0x76) && reaction < 4) {
         F(state, 0x4c) = 0.0f;

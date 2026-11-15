@@ -19,23 +19,23 @@ extern int D_L16_001B02DC[] __attribute__((sda));
 extern int D_L16_001B0310[] __attribute__((sda));
 extern int D_L16_001B030C[] __attribute__((sda));
 extern int D_L16_001B0314[] __attribute__((sda));
-extern float func_00283CE0(int);
-extern void func_00283410(void *, void *);
-extern void func_00283658(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern void func_00283788(void *, void *, void *);
+extern float IntToFloat(int);
+extern void euler_to_matrix(void *, void *);
+extern void copy_matrix_rotation(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern void multiply_matrix(void *, void *, void *);
 extern void func_L03_002EFB60(void *, void *, float);
-extern void func_L02_002EF968(void *, int, int, void *, void *, int);
-extern void func_00282C88(Quad *);
-extern void func_002833F0(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00283738(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void FillQuadPacket(void *, int, int, void *, void *, int);
+extern void vec_clear_128(Quad *);
+extern void euler_rotation_basis(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void multiply_matrix3x3(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws alternating rotated packet pairs for the visible members of the object group. */
 /* Draws alternating rotated packet pairs for the visible members of the object group. */
-void func_L16_003C32F8(u8 *object)
+void DrawRotatingGroupInstances(u8 *object)
 {
     float matrices[32][16], rotation[16], localRotation[12], sphere[4];
     L16DrawPacket packets[2];
@@ -65,7 +65,7 @@ void func_L16_003C32F8(u8 *object)
             matrix[15] = 1.0f;
             transform_vector(projected, sphere, matrix);
             projected[3] = 30.0f;
-            if (FastMathHelperA(projected, 512.0f) != -1) {
+            if (math_fast_helper_a(projected, 512.0f) != -1) {
                 multiply_matrix(matrix, matrix, rotation);
                 {
                     float scale = *(float *)(other + 0x2C) / (*(float **)(other + 0x24))[9];
@@ -84,7 +84,7 @@ void func_L16_003C32F8(u8 *object)
     *(int *)(packets[1].attributes + 12) = D_L16_001B0314[0];
     *(int *)(packets[0].attributes + 4) = D_L16_001B030C[0];
     *(int *)(packets[1].attributes + 4) = D_L16_001B0314[0];
-    ClearVector128((Quad *)angles);
+    vec_clear_128((Quad *)angles);
     angles[2] = 0.3926991f;
     euler_rotation_basis(localRotation, angles);
     for (k = 0; k < 2; k++) {

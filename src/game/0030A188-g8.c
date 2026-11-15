@@ -10,8 +10,8 @@ extern short D_001B2400[] MACRO_ADDR;
 extern short D_001B23FA[] MACRO_ADDR;
 extern short D_001B2402[] MACRO_ADDR;
 extern short D_001B2404[] MACRO_ADDR;
-extern void func_00282CF0(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float), func_00282C88(void *);
+extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float), vec_clear_128(void *);
 extern int D_001AEDF0 __attribute__((sda));
 extern float D_001AEDF4 __attribute__((sda));
 extern int D_001AEE84 __attribute__((sda));
@@ -28,7 +28,7 @@ extern Vec D_00229440[];
 extern int D_002293F0[];
 extern int D_00229580[];
 /* Resets the twenty beam chain points to a straight line when the beam starts. */
-void func_0030A188(char *moby) {
+void InitializeElectricWaterBoltEffect(char *moby) {
     Vec delta, step;
     Vec *vars = *(Vec **)(moby + 0x68);
     int i;
@@ -43,7 +43,7 @@ void func_0030A188(char *moby) {
         for (i = 1; i < 20; i++) {
             FastVecAdd(&D_00229170[i], &D_00229160[i], &step);
             D_002293F0[i] = 0;
-            ClearVector128(&D_00229440[i]);
+            vec_clear_128(&D_00229440[i]);
             D_00229580[i] = 0;
         }
         { int j; for (j = 0; j < 4; j++) D_001B23E8[j] = -1; }

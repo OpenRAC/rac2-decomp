@@ -1,19 +1,19 @@
 #include "common.h"
 
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_002AEF28(void *, void *, void *, float, float, float);
-extern void func_002AA2E8(void *, float, float);
-extern void func_002AA548(void *, void *, float, float, float, float);
-extern float func_00282E80(void *, void *);
-extern float func_00283248(float, float);
-extern float func_002AAA00(void *, void *, float, float, float, float, int);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_00283B98(float, float);
-extern void func_L18_0042F7B8(void *, void *);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L18_0042FAA8(void *);
-extern u8 *D_L18_001B281C;
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
+extern void ApproachValue(void *, float, float);
+extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float vec_distance_xy(void *, void *);
+extern float mat_fast_helper_a(float, float);
+extern float math_approach_target_with_direction_mode(void *, void *, float, float, float, float, int);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern float FastAddRotations(float, float);
+extern void part_l18_spawn_exhaust(void *, void *);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void gfx_draw_beams_both_tables(void *);
+extern u8 *g_moby_l18_table;
 extern float D_L18_001B1430 __attribute__((sda));
 extern float D_L18_001B1434 __attribute__((sda));
 extern float D_L18_001B1438 __attribute__((sda));
@@ -37,49 +37,49 @@ extern u8 D_L18_002A9BE0[];
 
 /* Turns and tilts the leader toward its target spot, moves it there, places its
    attached pieces, and sprays exhaust particles. */
-void func_L18_0042F308(u8 *moby, int turn, int tilt)
+void leader_steer(u8 *moby, int turn, int tilt)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
     int i;
 
     if (turn) {
         if (moby[0x20] == 2)
-            UpdateWrappedAngleOffset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1444,
+            math_update_wrapped_angle_offset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1444,
                           D_L18_001B1434 * 0.00029088824f, -1.0f);
         else
-            UpdateWrappedAngleOffset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1430,
+            math_update_wrapped_angle_offset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1430,
                           D_L18_001B1434 * 0.00029088824f, -1.0f);
     }
     if (tilt) {
         if (moby[0x20] == 2)
-            ScaleOwnerWordsByAngles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1448,
+            moby_scale_owner_words_by_angles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1448,
                           D_L18_001B143C * 0.00029088824f,
                           D_L18_001B1440 * 0.00029088824f);
         else
-            ScaleOwnerWordsByAngles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1438,
+            moby_scale_owner_words_by_angles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1438,
                           D_L18_001B143C * 0.00029088824f,
                           D_L18_001B1440 * 0.00029088824f);
     } else {
         ApproachValue(moby + 0xF0, 0.0f, 0.052359886f);
         ApproachValue(moby + 0xF4, 0.0f, 0.052359886f);
     }
-    StepValueTowardTarget(moby + 0x10, vars + 0x80, F(vars, 0x70),
+    math_step_value_toward_target(moby + 0x10, vars + 0x80, F(vars, 0x70),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    StepValueTowardTarget(moby + 0x14, vars + 0x84, F(vars, 0x74),
+    math_step_value_toward_target(moby + 0x14, vars + 0x84, F(vars, 0x74),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    StepValueTowardTarget(moby + 0x18, vars + 0x88, F(vars, 0x78),
+    math_step_value_toward_target(moby + 0x18, vars + 0x88, F(vars, 0x78),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
     if (vec_distance_xy(moby + 0x10, vars + 0x70) > 1.0f) {
         u8 *heading = moby + 0xF8;
-        float angle = FastMatrixHelperA(F(vars, 0x70) - F(moby, 0x10),
+        float angle = mat_fast_helper_a(F(vars, 0x70) - F(moby, 0x10),
                                     F(vars, 0x74) - F(moby, 0x14));
-        ApproachTargetWithDirectionMode(heading, vars + 0xD8, angle,
+        math_approach_target_with_direction_mode(heading, vars + 0xD8, angle,
                       D_L18_001B144C * 0.0000048481374f,
                       D_L18_001B1450 * 0.0000048481374f,
                       D_L18_001B1454 * 0.00029088824f, 0);
@@ -90,7 +90,7 @@ void func_L18_0042F308(u8 *moby, int turn, int tilt)
 
         for (i = 0; i < 6; i++, offset += 16, ids++) {
             if (*ids != -1) {
-                u8 *piece = gMobyTable_L18 + (*ids << 8);
+                u8 *piece = g_moby_l18_table + (*ids << 8);
                 matrix_mul_vec3(piece + 0x10, offset, moby + 0xC0);
                 FastVecAdd(piece + 0x10, piece + 0x10, moby + 0x10);
                 if (i < 3) {
@@ -105,7 +105,7 @@ void func_L18_0042F308(u8 *moby, int turn, int tilt)
             }
         }
     }
-    SpawnExhaustParticles_L18(moby, D_L18_001B1480);
-    SpawnExhaustParticles_L18(moby, D_L18_001B1490);
-    AddDrawCallbackToList3(DrawBeamsBothTables, moby);
+    part_l18_spawn_exhaust(moby, D_L18_001B1480);
+    part_l18_spawn_exhaust(moby, D_L18_001B1490);
+    gfx_add_draw_callback_third(gfx_draw_beams_both_tables, moby);
 }

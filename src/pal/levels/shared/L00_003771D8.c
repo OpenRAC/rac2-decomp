@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_3747B0(void);
 
@@ -13,16 +14,16 @@ void func_PAL_L00_00377668(void)
 {
     switch (D_0022F810) {
     case 0:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 1:
-        func_L00_00374B78();
+        menu_call_update();
         break;
     case 2:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     case 3:
-        func_002F93B0();
+        UpdateShopMenuInput();
         break;
     }
 }

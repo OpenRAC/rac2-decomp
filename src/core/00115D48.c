@@ -7,14 +7,14 @@
    the va_list go to func_00118CC8. */
 extern void *D_00133E74;
 
-extern int func_00118CC8(void *arg0, int arg1, void *arg2);
+extern int vfprintf_dispatch(void *arg0, int arg1, void *arg2);
 
 /* Prints text to the standard output using a format string and extra values. */
-void func_00115D48(int format, ...) {
+void printf(int format, ...) {
     void *obj = D_00133E74;
     void *ctx = *(void **)((char *)obj + 8);
 
     *(void **)((char *)ctx + 0x54) = obj;
-    VfprintfDispatch(*(void **)((char *)obj + 8), format,
+    vfprintf_dispatch(*(void **)((char *)obj + 8), format,
                   (char *)__builtin_next_arg(format) - 0x38);
 }

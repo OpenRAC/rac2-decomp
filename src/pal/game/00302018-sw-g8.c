@@ -1,21 +1,22 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int u32;
 typedef unsigned char u8;
 typedef int s32;
 typedef float f32;
-extern s32 D_001A79F8;
-extern s32 D_001A79F0 __attribute__((sda));
+extern s32 g_player_bolts;
+extern s32 g_current_map_index __attribute__((sda));
 extern s32 D_001A8C70;
 extern u32 D_001B1B60 __attribute__((sda));
 extern s32 D_0018D208[];
-extern void func_0029B698(s32);
-extern void func_002A7A00(f32 *, f32, f32);
-extern void func_00282D30(f32 *, f32 *, f32);
-extern void func_00282CC0(void *, void *, void *);
-extern s32 func_002A77E0(s32);
-extern f32 func_002A7878(f32, f32);
-extern void func_002C2210(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
+extern void level_forward_value(s32);
+extern void vec_random_direction(f32 *, f32, f32);
+extern void FastVecScale(f32 *, f32 *, f32);
+extern void FastVecAdd(void *, void *, void *);
+extern s32 math_random_int_below(s32);
+extern f32 math_random_float_range(f32, f32);
+extern void part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
 
 /* Adds the score of the kill class a0 + 0xAA (1, 5, 20, 50, 100, 500 or 1000 for classes
    0xD..0x13, 1 for any other) to the running total, and to the player's row of the table when
@@ -52,17 +53,17 @@ void func_PAL_00302E18(u8 *obj) {
         score = 0x3E8;
         break;
     }
-    D_001A79F8 = D_001A79F8 + score;
+    g_player_bolts = g_player_bolts + score;
     if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (D_001A8C70 != 0 && (u32)obj < D_001B1B60))
-        D_0018D208[D_001A79F0] += score;
-    func_0029B698(0x96);
-    func_002A7A00(buf, 0.014f, 0.020000001f);
-    func_00282D30(pos, buf, 10.0f);
-    func_00282CC0(pos, pos, obj + 0x10);
-    sign = func_002A77E0(2);
+        D_0018D208[g_current_map_index] += score;
+    level_forward_value(0x96);
+    vec_random_direction(buf, 0.014f, 0.020000001f);
+    FastVecScale(pos, buf, 10.0f);
+    FastVecAdd(pos, pos, obj + 0x10);
+    sign = math_random_int_below(2);
     if (sign == 0)
         sign = sign - 1;
-    f20 = func_002A7878(0.4f, 0.5f);
-    func_002C2210(pos, 0x15, 0x7F207F7F, 0, sign, (s32)buf, 0, f20 * 0.2f, f20, 0.0f);
-    func_002C2210(pos, 0x15, 0x7F7F7F7F, 1, -sign, (s32)buf, 0, f20 * 0.14f, f20 * 0.7f, 0.0f);
+    f20 = math_random_float_range(0.4f, 0.5f);
+    part_spawn_ground_effect(pos, 0x15, 0x7F207F7F, 0, sign, (s32)buf, 0, f20 * 0.2f, f20, 0.0f);
+    part_spawn_ground_effect(pos, 0x15, 0x7F7F7F7F, 1, -sign, (s32)buf, 0, f20 * 0.14f, f20 * 0.7f, 0.0f);
 }

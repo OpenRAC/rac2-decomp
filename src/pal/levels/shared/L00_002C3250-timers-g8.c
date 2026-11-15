@@ -72,8 +72,8 @@ typedef struct {
     float current_path_dist;
 } HeroTimerState;
 
-extern HeroTimerState D_00189E20;
-extern int D_L00_001B19C8;
+extern HeroTimerState g_hero_state;
+extern int g_frame_l00_counter;
 
 #define BS(p, o) (*(short *)((p)+(o)))
 #define BU(p, o) (*(unsigned short *)((p)+(o)))
@@ -87,22 +87,22 @@ typedef struct {
     int no_direction;
 } TimerPadState;
 
-extern TimerPadState D_00138180;
+extern TimerPadState g_pad_state;
 extern unsigned char *D_L00_001FACE0[];
 extern unsigned char D_L00_0025BC60[];
 extern int D_L00_001A8F00_abs __asm__("D_L00_001A8F00");
 extern float D_L00_001B18E0, D_L00_001B18E4;
 extern unsigned char D_001A7A70[] __attribute__((sda));
-extern void func_PAL_L00_002B92F0(void), func_L00_002A7A10(void), func_PAL_L00_002C39D8(void), func_PAL_L00_002B3000(void);
-extern int func_00282978(void *), func_00282948(void *);
-extern void func_00282C88(void *);
-extern int func_002ABB78(void *), func_002A77E0(int);
-extern void func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float);
-extern int func_002A8F70(void *, int, int, void *, void *, float);
-extern void func_00282CC0(void *, void *, void *), func_00282D30(void *, void *, float);
-extern float func_L00_002D3B00(void *), func_00282DF0(void *);
-extern float func_00282E48(void *, void *);
-extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D3778(void *, void *, float);
+extern void func_PAL_L00_002B92F0(void), hero_queue_glow_draw_routine(void), func_PAL_L00_002C39D8(void), func_PAL_L00_002B3000(void);
+extern int FastDecTimer(void *), math_fast_float_d(void *);
+extern void vec_clear_128(void *);
+extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
+extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
+extern float cam_get_view_space_height(void *), FastVecLength(void *);
+extern float fast_vec_dist(void *, void *);
+extern void hero_build_relative_point(void *, int, float, float, float), hero_apply_mode_transform_reversed(void *, void *, float);
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
@@ -110,146 +110,146 @@ void func_PAL_L00_002C3250(void) {
     unsigned char *m, *pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!D_00189E20.tilt_disabled) func_PAL_L00_002B92F0();
+    if (!g_hero_state.tilt_disabled) func_PAL_L00_002B92F0();
     {
-        int state = D_00189E20.state_frames+1;
-        int control = D_00189E20.control_mode_frames+1;
-        int step = D_00189E20.step_frames+1;
-        int animation = D_00189E20.animation_frames+1;
-        D_00189E20.state_frames = state;
-        D_00189E20.control_mode_frames = control;
-        D_00189E20.step_frames = step;
-        D_00189E20.animation_frames = animation;
+        int state = g_hero_state.state_frames+1;
+        int control = g_hero_state.control_mode_frames+1;
+        int step = g_hero_state.step_frames+1;
+        int animation = g_hero_state.animation_frames+1;
+        g_hero_state.state_frames = state;
+        g_hero_state.control_mode_frames = control;
+        g_hero_state.step_frames = step;
+        g_hero_state.animation_frames = animation;
     }
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F8);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FE);
-    func_00282948(((unsigned char *)&D_00189E20)+0x1D4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x210);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x204);
-    func_00282978(((unsigned char *)&D_00189E20)+0x206);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x208);
-    func_00282978(((unsigned char *)&D_00189E20)+0x200);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20E);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x214);
-    func_00282978(((unsigned char *)&D_00189E20)+0x212);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x216);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FA);
-    func_00282978(((unsigned char *)&D_00189E20)+0x218);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21C);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x222);
-    func_00282978(((unsigned char *)&D_00189E20)+0x224);
-    func_00282978(((unsigned char *)&D_00189E20)+0x226);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1DC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1D2);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F8);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FE);
+    math_fast_float_d(((unsigned char *)&g_hero_state)+0x1D4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x210);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1D0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F4);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F6);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x204);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x206);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F0);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1EC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1EE);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x208);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x200);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x20E);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x20A);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x214);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x212);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FC);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x216);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1FA);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x218);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1F2);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x21A);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x21C);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1DE);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x1E6);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x222);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x224);
+    FastDecTimer(((unsigned char *)&g_hero_state)+0x226);
 
-    if (!(D_00138180.held&4)) D_00189E20.field_20C = 0;
-    if (D_00189E20.field_21C) func_L00_002A7A10();
-    if (D_00189E20.item_animation_active) D_00189E20.item_animation_frames++;
-    else D_00189E20.item_animation_frames = 0;
-    if (D_00138180.no_direction) {
-        D_00189E20.stick_held_frames = 0;
-        D_00189E20.stick_idle_frames++;
+    if (!(g_pad_state.held&4)) g_hero_state.field_20C = 0;
+    if (g_hero_state.field_21C) hero_queue_glow_draw_routine();
+    if (g_hero_state.item_animation_active) g_hero_state.item_animation_frames++;
+    else g_hero_state.item_animation_frames = 0;
+    if (g_pad_state.no_direction) {
+        g_hero_state.stick_held_frames = 0;
+        g_hero_state.stick_idle_frames++;
     }
     else {
-        D_00189E20.stick_idle_frames = 0;
-        D_00189E20.stick_held_frames++;
+        g_hero_state.stick_idle_frames = 0;
+        g_hero_state.stick_held_frames++;
     }
-    if (D_00189E20.field_22C3 && !D_00189E20.field_229C && D_00189E20.field_340 && D_00189E20.field_170<0.002f && D_00189E20.field_184<0.002f) qcopy(((unsigned char *)&D_00189E20)+0x80, ((unsigned char *)&D_00189E20)+0x2030);
-    if (D_00189E20.field_1454) D_00189E20.field_1E8 = 0;
-    else D_00189E20.field_1E8++;
+    if (g_hero_state.field_22C3 && !g_hero_state.field_229C && g_hero_state.field_340 && g_hero_state.field_170<0.002f && g_hero_state.field_184<0.002f) qcopy(((unsigned char *)&g_hero_state)+0x80, ((unsigned char *)&g_hero_state)+0x2030);
+    if (g_hero_state.field_1454) g_hero_state.field_1E8 = 0;
+    else g_hero_state.field_1E8++;
     if (!D_L00_001A8F00_abs) {
-        if (D_L00_001B18E0>0) D_00189E20.field_22A++;
-        else D_00189E20.field_22A = 0;
-        if (D_00189E20.field_22A>100) {
+        if (D_L00_001B18E0>0) g_hero_state.field_22A++;
+        else g_hero_state.field_22A = 0;
+        if (g_hero_state.field_22A>100) {
             D_L00_001B18E0 = 0;
-            D_00189E20.field_22A = 0;
+            g_hero_state.field_22A = 0;
         }
-        if (D_L00_001B18E4>0) D_00189E20.field_228++;
-        else D_00189E20.field_228 = 0;
-        if (D_00189E20.field_228>100) {
-            D_00189E20.field_228 = 0;
+        if (D_L00_001B18E4>0) g_hero_state.field_228++;
+        else g_hero_state.field_228 = 0;
+        if (g_hero_state.field_228>100) {
+            g_hero_state.field_228 = 0;
             D_L00_001B18E4 = 0;
         }
     }
-    if (D_00189E20.field_224) {
+    if (g_hero_state.field_224) {
         for (i = 0;(m = D_L00_001FACE0[i]) != 0;i++) {
-            if (func_002ABB78(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_L00_001B19C8&7) == (((int)m>>8)&7) || !func_002A77E0(4)) {
-                    hero = (unsigned char *)&D_00189E20+0x80;
+            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
+                if ((g_frame_l00_counter&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
+                    hero = (unsigned char *)&g_hero_state+0x80;
                     pos = m+0x10;
-                    if (func_00282E48(hero, pos)<15.37f) {
-                        func_00282CF0(sum, pos, hero);
-                        func_00282F20(sum, sum, 1.7f);
-                        func_002A8F70(m, D_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
+                    if (fast_vec_dist(hero, pos)<15.37f) {
+                        FastVecSub(sum, pos, hero);
+                        vec_scale_to_length(sum, sum, 1.7f);
+                        part_queue_impact_effect(m, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) func_00282948(D_L00_0025BC60+i*0x70);
-    D_00189E20.current_path_dist = 9999.0f;
-    if (D_00189E20.field_34E && func_L00_002D3B00(((unsigned char *)&D_00189E20)+0xF0)<0) {
-        if (D_00189E20.pos_history_count != 32) goto history_done;
-        func_00282C88(sum);
+    for (i = 0;i<4;i++) math_fast_float_d(D_L00_0025BC60+i*0x70);
+    g_hero_state.current_path_dist = 9999.0f;
+    if (g_hero_state.field_34E && cam_get_view_space_height(((unsigned char *)&g_hero_state)+0xF0)<0) {
+        if (g_hero_state.pos_history_count != 32) goto history_done;
+        vec_clear_128(sum);
         count = 8;
         for (i = 0;i<count;) {
-            history_index = D_00189E20.pos_history_index-i;
+            history_index = g_hero_state.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            func_00282CF0(delta, ((unsigned char *)&D_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_00189E20)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&g_hero_state)+0x1D90+first_index*16, ((unsigned char *)&g_hero_state)+0x1D90+second_index*16);
             i++;
-            func_00282CC0(sum, sum, delta);
+            FastVecAdd(sum, sum, delta);
         }
-        func_00282D30(sum, sum, 1.0f/(float)count);
-        if (func_00282DF0(sum)<0.020000001f) {
-            D_00189E20.still_frames++;
+        FastVecScale(sum, sum, 1.0f/(float)count);
+        if (FastVecLength(sum)<0.020000001f) {
+            g_hero_state.still_frames++;
             goto history_done;
         }
     }
-    D_00189E20.still_frames = 0;
+    g_hero_state.still_frames = 0;
 history_done:
     func_PAL_L00_002C39D8();
-    if (D_00189E20.mode == 1) func_L00_002D36E0((unsigned char *)&D_00189E20+0xE0, 1, 0, 0, 0.4f);
-    else func_L00_002D36E0((unsigned char *)&D_00189E20+0xE0, 1, 0, 0, 0.7f);
-    if (!(D_L00_001B19C8&3)) {
-        if (D_00189E20.mode == 1) {
-            D_00189E20.reach_distance = 2.125f;
-            D_00189E20.reach_height = 1.25f;
+    if (g_hero_state.mode == 1) hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.4f);
+    else hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.7f);
+    if (!(g_frame_l00_counter&3)) {
+        if (g_hero_state.mode == 1) {
+            g_hero_state.reach_distance = 2.125f;
+            g_hero_state.reach_height = 1.25f;
         }
         else if (D_001A7A70[0x8F]) {
-            D_00189E20.reach_distance = 14;
-            D_00189E20.reach_height = 4.5f;
+            g_hero_state.reach_distance = 14;
+            g_hero_state.reach_height = 4.5f;
         }
         else {
-            D_00189E20.reach_distance = 4.25f;
-            D_00189E20.reach_height = 2.25f;
+            g_hero_state.reach_distance = 4.25f;
+            g_hero_state.reach_height = 2.25f;
         }
     }
-    if (D_00189E20.field_31C<4) {
-        qcopy(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0x2D0);
-        func_L00_002D3778(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0xD0, 0.5f);
+    if (g_hero_state.field_31C<4) {
+        qcopy(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0x2D0);
+        hero_apply_mode_transform_reversed(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0xD0, 0.5f);
     }
-    else qcopy(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0xE0);
+    else qcopy(((unsigned char *)&g_hero_state)+0xD0, ((unsigned char *)&g_hero_state)+0xE0);
     {
-        unsigned char *heldMoby = D_00189E20.field_5C0;
+        unsigned char *heldMoby = g_hero_state.field_5C0;
         if (heldMoby) {
-            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == D_00189E20.field_33C) D_00189E20.field_5C0 = 0;
-            if (D_00189E20.field_5C0 && D_00189E20.field_1248 != 46) D_00189E20.field_5C0 = 0;
+            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == g_hero_state.field_33C) g_hero_state.field_5C0 = 0;
+            if (g_hero_state.field_5C0 && g_hero_state.field_1248 != 46) g_hero_state.field_5C0 = 0;
         }
     }
-    if (D_00189E20.field_88<1) func_PAL_L00_002B3000();
+    if (g_hero_state.field_88<1) func_PAL_L00_002B3000();
 }

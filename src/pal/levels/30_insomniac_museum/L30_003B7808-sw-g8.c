@@ -6,15 +6,15 @@ typedef struct {
     unsigned int f1A0;
     unsigned int f1A4;
 } D00138180_Flags;
-extern D00138180_Flags D_00138180;
-extern int D_001A79F0;
-extern char D_00189E20[];
+extern D00138180_Flags g_pad_state;
+extern int g_current_map_index;
+extern char g_hero_state[];
 extern char *D_001B2D1C __attribute__((sda));
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_L00_0042A500(int);
-extern void func_002B0C28(int, int, int);
+extern void cam_reset_entry(int);
+extern void TryClaimNotice(int, int, int);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
-extern void func_L30_003BE678(char *);
+extern void museum_info_stand_advance_state(char *);
 
 void func_PAL_L30_003C2230(char *object) {
     char *g;
@@ -41,12 +41,12 @@ void func_PAL_L30_003C2230(char *object) {
             if (*(unsigned char *)(object + 0x43) != 2)
                 func_PAL_002A7E68(object, 2, 0, 5);
             if (*(int *)(state + 0xC) != -1)
-                func_L00_0042A500(*(int *)(state + 0xC));
+                cam_reset_entry(*(int *)(state + 0xC));
         }
         break;
     case 3:
         id = -1;
-        if (D_001A79F0 != 0x15 && D_001A79F0 != 0x1E) {
+        if (g_current_map_index != 0x15 && g_current_map_index != 0x1E) {
             switch (*(int *)(state + 8)) {
             case 0:
                 id = 0x12EE;
@@ -58,13 +58,13 @@ void func_PAL_L30_003C2230(char *object) {
         } else {
             id = 0x133F;
         }
-        g = D_00189E20;
+        g = g_hero_state;
         if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
-            func_002B0C28(8, id, 1);
-            if (D_00138180.f1A4 & 0x10) {
+            TryClaimNotice(8, id, 1);
+            if (g_pad_state.f1A4 & 0x10) {
                 char *s0 = D_001B2D1C + (*(int *)state << 8);
 
-                func_L30_003BE678(s0);
+                museum_info_stand_advance_state(s0);
                 func_PAL_L00_002B9CD8(s0 + 0x10, s0 + 0xF0, 0x6F, 1);
                 *(unsigned char *)(g + 0x22B5) = 1;
             }
@@ -73,7 +73,7 @@ void func_PAL_L30_003C2230(char *object) {
     case 4:
         break;
     case 5: {
-        char *h = D_00189E20;
+        char *h = g_hero_state;
 
         if (*(int *)(h + 0x2294) == 0x6F) {
             *(unsigned char *)(h + 0x22B5) = 0;

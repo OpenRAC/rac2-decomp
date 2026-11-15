@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI16 __attribute__((mode(TI)));
 struct Vecs {
@@ -8,16 +9,16 @@ struct Vecs {
     TI16 c;
     TI16 d;
 };
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern float D_L23_001B370C __attribute__((sda));
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_0029FC20(char *, int, char *);
-extern void func_002830C0(char *, char *, char *);
-extern void func_00282CF0(char *, char *, char *);
-extern void func_00282F20(char *, char *, float);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern void moby_transform_joint_point(char *, int, char *);
+extern void transform_vector(char *, char *, char *);
+extern void FastVecSub(char *, char *, char *);
+extern void vec_scale_to_length(char *, char *, float);
 extern void func_PAL_L23_0042E5E0(char *, char *, char *, int, float);
-extern void func_002E5DA0(int, int, char *, int);
+extern void snd_play_from_class_bank(int, int, char *, int);
 
 /* Fills the stack vectors v.a, v.b, v.c and v.d from the table at D_00189E20, the owner's helper and a
    unit vector (0, 1, 0, 1) whose second float is negated when arg2 is set, scales v.d by
@@ -28,21 +29,21 @@ extern void func_002E5DA0(int, int, char *, int);
 void func_PAL_L23_003C3738(char *arg0, float arg1, int unused1, int arg2) {
     char *state = *(char **)(arg0 + 0x68);
     struct Vecs v;
-    char *base = D_00189E20;
+    char *base = g_hero_state;
     float one;
 
-    func_00282D30((char *)&v.a, *(char **)(base + 0x2290) + 0xE0, 3.0f);
-    func_00282CC0((char *)&v.a, (char *)&v.a, base + 0x80);
+    FastVecScale((char *)&v.a, *(char **)(base + 0x2290) + 0xE0, 3.0f);
+    FastVecAdd((char *)&v.a, (char *)&v.a, base + 0x80);
     one = 1.0f;
     v.c = 0;
     ((float *)&v.c)[1] = one;
     ((float *)&v.c)[3] = one;
     if (arg2 != 0)
         ((float *)&v.c)[1] = -((float *)&v.c)[1];
-    func_0029FC20(*(char **)(state + 0x2A0), arg2, (char *)&v.b);
-    func_002830C0((char *)&v.c, (char *)&v.c, (char *)&v.b);
-    func_00282CF0((char *)&v.d, (char *)&v.a, (char *)&v.c);
-    func_00282F20((char *)&v.d, (char *)&v.d, D_L23_001B370C * 0.020000001f);
+    moby_transform_joint_point(*(char **)(state + 0x2A0), arg2, (char *)&v.b);
+    transform_vector((char *)&v.c, (char *)&v.c, (char *)&v.b);
+    FastVecSub((char *)&v.d, (char *)&v.a, (char *)&v.c);
+    vec_scale_to_length((char *)&v.d, (char *)&v.d, D_L23_001B370C * 0.020000001f);
     func_PAL_L23_0042E5E0(arg0, (char *)&v.d, (char *)&v.c, 0, arg1);
-    func_002E5DA0(3, 0, arg0, 0x7E5);
+    snd_play_from_class_bank(3, 0, arg0, 0x7E5);
 }

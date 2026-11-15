@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s32 ref_L05_0037CE08_02;
 extern u16 *ref_L05_0037CE08_03[];
 
 /* Counts the listed objects that match a value and are also marked as set. */
-s32 func_L05_0037CE08(void *object, s32 value) {
+s32 list_count_objects_matching_value(void *object, s32 value) {
     s32 count;
     s32 offset;
     s32 entryWord;

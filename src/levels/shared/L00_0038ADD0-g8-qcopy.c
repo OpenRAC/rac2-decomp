@@ -1,3 +1,4 @@
+#include "names.h"
 /* Twin beam strips: two 144-byte strip records (four points, colours, UVs and GS words)
    set up around a basis built from the start, end and a fixed up vector. Store order
    follows retail; the record is a struct view. */
@@ -5,52 +6,52 @@
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword bits; float f[4]; } Vector4;
 #define FIELD(type,p,off) (*(type *)((char *)(p)+(off)))
-extern void func_00282CF0(void *,void *,void *);
-extern void func_00282CC0(void *,void *,void *);
-extern void func_00282D30(void *,void *,float);
-extern float func_00282DB0(void *,void *);
-extern float func_00282DF0(void *);
-extern float func_00282C48(float);
-extern float func_00283C80(float,float);
-extern float func_00283C28(float);
-extern float func_00283180(float);
-extern float func_002A7878(float,float);
-extern float func_002A78D8(float,float);
-extern float func_002A7940(void);
-extern int func_002A77E0(int);
-extern void func_002AF000(float *,float,float,float);
-extern char *func_002C2210(void *,int,unsigned int,int,int,void *,int,float,float,float);
-extern char *func_0029EFD0(int);
-extern void func_002B37E8(void *,void *);
-extern void func_002A7398(signed char *,int,int);
-extern void func_002AEC18(void *,int);
-extern void func_002833F0(void *,void *);
-extern void func_002FE8D8(void *,void *);
-extern void func_00282F20(void *,void *,float);
-extern void func_00282DD8(void *,void *,void *);
-extern float func_00283198(float);
-extern void func_00283958(void *,void *);
-extern void func_00283738(void *,void *,void *);
-extern void func_00282C88(void *);
-extern int func_002FEC78(unsigned char *,unsigned int);
-extern int func_002FED90(void *,void *,float,float,float);
-extern void func_0029F338(void *);
+extern void FastVecSub(void *,void *,void *);
+extern void FastVecAdd(void *,void *,void *);
+extern void FastVecScale(void *,void *,float);
+extern float FastVecDot(void *,void *);
+extern float FastVecLength(void *);
+extern float math_fabs(float);
+extern float FastDiffRots(float,float);
+extern float math_fast_float_g(float);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_random_float_range(float,float);
+extern float math_random_signed_float_range(float,float);
+extern float math_random_angle(void);
+extern int math_random_int_below(int);
+extern void vec_build_spherical_offset(float *,float,float,float);
+extern char *part_spawn_ground_effect(void *,int,unsigned int,int,int,void *,int,float,float,float);
+extern char *CreateMoby(int);
+extern void moby_init_child_from_parent(void *,void *);
+extern void anim_start_immediate(signed char *,int,int);
+extern void moby_set_light_color(void *,int);
+extern void euler_rotation_basis(void *,void *);
+extern void moby_get_facing_direction(void *,void *);
+extern void vec_scale_to_length(void *,void *,float);
+extern void FastVecCross(void *,void *,void *);
+extern float math_fast_sin_or_cos_b(float);
+extern void quaternion_to_rotation_basis(void *,void *);
+extern void multiply_matrix3x3(void *,void *,void *);
+extern void vec_clear_128(void *);
+extern int slot_alloc_for_object(unsigned char *,unsigned int);
+extern int part_alloc_effect_slot(void *,void *,float,float,float);
+extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_00283098(void *,void *,void *);
-extern void func_002830C0(void *,void *,void *);
-extern int func_002A7820(int,int);
-extern unsigned long func_0027C878(int);
-extern void func_00280B90(void *,void *,int);
-extern void func_L00_003883B8(char *);
-extern void func_L00_0038AA40(char *);
-extern void func_L00_00388490(void *,Vector4 *);
-extern void func_L00_0038AAD0(void *,Vector4 *);
-extern void func_0029FCC0(char *,int,char *);
+extern void matrix_mul_vec3(void *,void *,void *);
+extern void transform_vector(void *,void *,void *);
+extern int math_random_int_range(int,int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void draw_world_quad(void *,void *,int);
+extern void gfx_l00_init_default_block(char *);
+extern void gfx_l00_init_default_block_2(char *);
+extern void part_l00_draw_camera_facing_flash(void *,Vector4 *);
+extern void part_l00_draw_camera_facing_flash_2(void *,Vector4 *);
+extern void moby_transform_joint_to_world(char *,int,char *);
 extern int func_001163B0(void);
-extern int func_00282948(int *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern float func_00282E48(void *,void *);
+extern int math_fast_float_d(int *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern float fast_vec_dist(void *,void *);
 extern Vector4 D_001B8DC0;
 typedef struct {
     Vector4 point[4];
@@ -59,18 +60,18 @@ typedef struct {
     unsigned long tag, tex, alpha, test;
 } Beam;
 /* Draws two glowing beam ribbons from the object out to a random point in front of it. */
-void func_L00_0038ADD0(char *object)
+void gfx_l00_draw_twin_beam_ribbons_2(char *object)
 {
     Beam first,second;
     Vector4 basis[4],start,end,origin,nearSize,farSize;
     char *work=FIELD(char *,object,0x68);
     float width;
-    TransformMobyJointToWorld(object,1,(char *)&origin);
+    moby_transform_joint_to_world(object,1,(char *)&origin);
     start.bits=origin.bits;
-    vec_scale_to_length(&end,work+0x30,RandomFloatRange(2,4));
+    vec_scale_to_length(&end,work+0x30,math_random_float_range(2,4));
     matrix_mul_vec3(&end,&end,object+0xC0);
     FastVecAdd(&end,&end,&origin);
-    DrawCameraFacingFlash_L00_2(object,&start);
+    part_l00_draw_camera_facing_flash_2(object,&start);
     first.tex=GetEffectTextureDescriptor(23);
     first.tag=0;
     first.alpha=0xFF9000000260UL;
@@ -87,9 +88,9 @@ void func_L00_0038ADD0(char *object)
     nearSize.f[3]=1;
     farSize.f[3]=1;
     second.alpha=0xFF9000000260UL;
-    width=RandomFloatRange(0.1f,0.3f);nearSize.f[2]=width;farSize.f[2]=width+width;
-    InitDefaultBlockCopy((char *)&first);InitDefaultBlockCopy((char *)&second);
-    if(!(Rand()&1)) {
+    width=math_random_float_range(0.1f,0.3f);nearSize.f[2]=width;farSize.f[2]=width+width;
+    gfx_l00_init_default_block_2((char *)&first);gfx_l00_init_default_block_2((char *)&second);
+    if(!(func_001163B0()&1)) {
         first.uv[0]=0;first.uv[1]=0;first.uv[2]=0;first.uv[3]=1;
         first.uv[4]=1;first.uv[5]=0;first.uv[6]=1;first.uv[7]=1;
         second.uv[0]=0;second.uv[1]=0;second.uv[2]=0;second.uv[3]=1;

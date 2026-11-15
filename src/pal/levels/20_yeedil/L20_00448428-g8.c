@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_00448428, the PAL copy of func_L20_004429F0: the same C, where the
  * delay scale 60.0f becomes 50.0f, its base 1200 becomes 1000, and the spawn call
  * is PAL's own. */
@@ -5,15 +6,15 @@
 
 extern int D_L20_001B20EC __attribute__((sda));
 extern char *D_L20_001FEC80[];
-extern int func_L20_0039E0A0(int);
-extern int func_00282948(char *);
-extern float func_L20_00444B48(int, int, float, float);
-extern int func_00283CF0(float);
-extern int func_002A77E0(int);
-extern float func_002A7878(float, float);
-extern void func_00282D08(float *, const void *, const void *, float);
-extern float func_002A89A8(char *, int, float);
-extern int func_00277258(void *, int, void *, float);
+extern int group_count_live_members(int);
+extern int math_fast_float_d(char *);
+extern float level_interpolate_by_counter(int, int, float, float);
+extern int FloatToInt(float);
+extern int math_random_int_below(int);
+extern float math_random_float_range(float, float);
+extern void lerp_vector(float *, const void *, const void *, float);
+extern float coll_probe_ground_height_below(char *, int, float);
+extern int coll_test_point(void *, int, void *, float);
 extern u8 *func_PAL_L20_003A0B10(void *, int, const float *);
 
 void func_PAL_L20_00448428(char *object)
@@ -32,16 +33,16 @@ void func_PAL_L20_00448428(char *object)
         return;
     if (*(u8 *)(object + 0x95) == 5)
         return;
-    if (func_L20_0039E0A0(*(int *)(state + 0x23C)) != 0)
+    if (group_count_live_members(*(int *)(state + 0x23C)) != 0)
         return;
-    if (func_00282948(state + 0x1848) == 0 && D_L20_001B20EC == 0)
+    if (math_fast_float_d(state + 0x1848) == 0 && D_L20_001B20EC == 0)
         return;
     rate = 60.0f;
     requested = 4;
-    interval = func_L20_00444B48(5, 20, 0.0f, rate);
+    interval = level_interpolate_by_counter(5, 20, 0.0f, rate);
     attempts = 0;
     spawned = 0;
-    *(int *)(state + 0x1848) = func_00283CF0((float)(int)(interval * 50.0f)) + 1000;
+    *(int *)(state + 0x1848) = FloatToInt((float)(int)(interval * 50.0f)) + 1000;
     if (*(int *)(state + 0x182C) == 2)
         requested = 6;
     polygon = D_L20_001FEC80[*(int *)(state + 0x234)];
@@ -49,13 +50,13 @@ void func_PAL_L20_00448428(char *object)
         float height = 1.0f;
         float blend;
         sides = 6;
-        first = func_002A77E0(6);
+        first = math_random_int_below(6);
         next = (first + 1) % sides;
-        blend = func_002A7878(0.2f, 0.8f);
-        func_00282D08(point, polygon + (first * 16 + 16),
+        blend = math_random_float_range(0.2f, 0.8f);
+        lerp_vector(point, polygon + (first * 16 + 16),
                      polygon + (next * 16 + 16), blend);
-        point[2] = func_002A89A8((char *)point, 0, 0.5f) + height;
-        if (func_00277258(point, 0, 0, 0.9f) == 0) {
+        point[2] = coll_probe_ground_height_below((char *)point, 0, 0.5f) + height;
+        if (coll_test_point(point, 0, 0, 0.9f) == 0) {
             point[2] -= height;
             if (func_PAL_L20_003A0B10(object, *(int *)(state + 0x23C), point) == 0)
                 break;

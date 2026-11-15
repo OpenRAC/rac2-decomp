@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -23,17 +24,17 @@
  */
 #include "common.h"
 
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern s32 ref_L13_004267B0_00;
 extern u8 D_0019B2E8[];
 extern void ref_L13_004267B0_01();
 
 /* If this object's switch is set for the current level, it runs two setup steps for the object. */
-void func_L13_004267B0(s8 *moby) {
+void switch_setup_update(s8 *moby) {
     s32 *vars;
 
     vars = (*(s32 **)((s8 *)(moby) + (0x68)));
-    if (D_0019B2E8[(*(u8 *)((s8 *)(moby) + (0xB0))) + (gCurrentMapIndex << 4)] & 0x80) {
+    if (D_0019B2E8[(*(u8 *)((s8 *)(moby) + (0xB0))) + (g_current_map_index << 4)] & 0x80) {
         ref_L13_004267B0_01(ref_L13_004267B0_00 + (*vars << 8), vars);
         ref_L13_004267B0_01(moby);
     }

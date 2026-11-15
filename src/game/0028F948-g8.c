@@ -4,21 +4,21 @@
 extern int D_L00_001A8F00;
 extern int D_L00_001A9350 __attribute__((sda));
 extern int D_L00_001A9090 __attribute__((sda));
-extern int func_00282948(void *);
-extern void func_0029B810(int);
+extern int math_fast_float_d(void *);
+extern void level_clear_table_entry(int);
 /* Checks for a button press while the gauge pop-up is shown and, if so, asks the pop-up system to close it. */
-int func_00290628(void)
+int gauge_popup_poll_input(void)
 {
-    if (D_L00_001A8F00 == 0 && FastFloatHelperD(&D_L00_001A9350) != 0)
-        ClearLevelObjectTableEntry(1);
+    if (D_L00_001A8F00 == 0 && math_fast_float_d(&D_L00_001A9350) != 0)
+        level_clear_table_entry(1);
     return D_L00_001A9090;
 }
 
-extern int D_001A9000 __attribute__((sda));
-extern int D_001A9004 __attribute__((sda));
-extern float D_001A9008 __attribute__((sda));
-extern int D_001A900C __attribute__((sda));
-extern int D_001A9010 __attribute__((sda));
-extern int func_002900B8(void);
-extern void func_0029B7C0(int (*)(void), int (*)(void), int);
-extern float func_002AA340(int *, int, int);
+extern int g_gauge_popup_blend __attribute__((sda));
+extern int g_gauge_popup_mode __attribute__((sda));
+extern float g_gauge_popup_amount __attribute__((sda));
+extern int g_gauge_popup_color_a __attribute__((sda));
+extern int g_gauge_popup_color_b __attribute__((sda));
+extern int gauge_popup_draw(void);
+extern void level_set_table_entry(int (*)(void), int (*)(void), int);
+extern float math_step_int_toward_target(int *, int, int);

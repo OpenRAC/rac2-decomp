@@ -12,26 +12,26 @@ typedef struct {
     unsigned long primitive, texture, mode, registers;
 } EffectPacket;
 typedef struct { u8 prefix[0x140]; EffectVector position; } EffectCameraView;
-extern unsigned long func_0027C878(int);
-extern float func_002A7878(float, float);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern void func_0029FCC0(char *, int, char *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, void *, int);
 #define EFFECT_COPY(destination, source) (*(EffectWord *)(destination) = *(EffectWord *)(source))
 
 extern EffectCameraView ref_L00_00388790_00;
-extern void func_L00_003883B8(char *);
-extern void func_L00_00388490(void *, float *);
+extern void gfx_l00_init_default_block(char *);
+extern void part_l00_draw_camera_facing_flash(void *, float *);
 
 /* Construct two camera-facing ribbons with independently sized end caps. */
-void func_L00_00388790(char *owner)
+void gfx_l00_draw_twin_beam_ribbons(char *owner)
 {
     EffectPacket narrow, wide;
     EffectVector basis[4];
@@ -39,12 +39,12 @@ void func_L00_00388790(char *owner)
     EffectVector joint;
     EffectVector thinWidth, wideWidth;
     char *state = *(char **)(owner + 0x68);
-    TransformMobyJointToWorld(owner, 1, (char *)&joint);
+    moby_transform_joint_to_world(owner, 1, (char *)&joint);
     EFFECT_COPY(&startPoint, &joint);
-    vec_scale_to_length(&endPoint, state + 0x30, RandomFloatRange(2.0f, 4.0f));
+    vec_scale_to_length(&endPoint, state + 0x30, math_random_float_range(2.0f, 4.0f));
     matrix_mul_vec3(&endPoint, &endPoint, owner + 0xC0);
     FastVecAdd(&endPoint, &endPoint, &joint);
-    DrawCameraFacingFlash_L00(owner, (float *)&startPoint);
+    part_l00_draw_camera_facing_flash(owner, (float *)&startPoint);
     narrow.texture = GetEffectTextureDescriptor(23);
     narrow.mode = 0x0000ff9000000260UL;
     narrow.primitive = 0;
@@ -61,11 +61,11 @@ void func_L00_00388790(char *owner)
     *(EffectWord *)&wideWidth = 0;
     thinWidth.w = 1.0f;
     wideWidth.w = 1.0f;
-    thinWidth.z = RandomFloatRange(0.1f, 0.3f);
+    thinWidth.z = math_random_float_range(0.1f, 0.3f);
     wideWidth.z = thinWidth.z + thinWidth.z;
-    InitDefaultBlock((char *)&narrow);
-    InitDefaultBlock((char *)&wide);
-    if (!(Rand() & 1)) {
+    gfx_l00_init_default_block((char *)&narrow);
+    gfx_l00_init_default_block((char *)&wide);
+    if (!(func_001163B0() & 1)) {
         narrow.uv[0][0] = 0;
         narrow.uv[0][1] = 0;
         narrow.uv[1][0] = 0;

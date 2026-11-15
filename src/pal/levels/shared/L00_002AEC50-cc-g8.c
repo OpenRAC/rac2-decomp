@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_002AEC50, the PAL copy of func_L00_002AED68: the same C. */
 typedef struct SlotAED68 {
  unsigned char pad0[6];
@@ -54,13 +55,13 @@ typedef struct { char data[0x600]; } LargeBufferAED68;
 typedef struct { char data[0x400]; } SmallBufferAED68;
 extern LargeBufferAED68 D_L00_001B5C00[];
 extern SmallBufferAED68 D_L00_001B3400[];
-extern float func_002AA2E8(float *,float,float);
-extern void func_L00_00310C88(void *,void *);
-extern SlotAED68 *func_L00_00310BC8(void *,int);
-extern void func_L00_00310D30(void *,void *);
-extern int func_L00_002A4EF0(int);
-extern int func_L00_002ADFE8(int,float *);
-extern int func_L00_002ADFD0(void *,int);
+extern float ApproachValue(float *,float,float);
+extern void release_moby_animation_slot(void *,void *);
+extern SlotAED68 *allocate_moby_animation_slot(void *,int);
+extern void AdvanceAndDecodeAnimationFrames(void *,void *);
+extern int math_l00_return_argument(int);
+extern int hero_get_item_aim_adjustment(int,float *);
+extern int hero_get_value_or_default(void *,int);
 void func_PAL_L00_002AEC50(void)
 {
  int i,j,enabled,different,active; struct { short v; } transition; float amount;
@@ -68,8 +69,8 @@ void func_PAL_L00_002AEC50(void)
   StateAED68 *g=&D_00189E20_26;
   SlotAED68 *t0=D_00189E20_26.slots[i];
   if(t0 && t0->destroy) {
-   if(func_002AA2E8(&t0->opacity,0.0f,0.120000005f)==0.0f)
-    func_L00_00310C88(g->f2290,&D_00189E20_26.slots[i]);
+   if(ApproachValue(&t0->opacity,0.0f,0.120000005f)==0.0f)
+    release_moby_animation_slot(g->f2290,&D_00189E20_26.slots[i]);
   } else {
    enabled=0;
    if(g->f22bb && (i==0 || g->f22bb==2)) enabled=1;
@@ -81,15 +82,15 @@ void func_PAL_L00_002AEC50(void)
    if(enabled) {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) {
-     D_00189E20_26.slots[i]=func_L00_00310BC8(h->f2290,D_L00_001A7D00[i]);
+     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,D_L00_001A7D00[i]);
      D_00189E20_26.slots[i]->opacity=0.0f;
      D_00189E20_26.slots[i]->icon=D_L00_001D9F00[D_L00_001DA860[i+1]];
     }
    } else {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) continue;
-    if(func_002AA2E8(&D_00189E20_26.slots[i]->opacity,0.0f,0.18f)==0.0f)
-     func_L00_00310C88(h->f2290,&D_00189E20_26.slots[i]);
+    if(ApproachValue(&D_00189E20_26.slots[i]->opacity,0.0f,0.18f)==0.0f)
+     release_moby_animation_slot(h->f2290,&D_00189E20_26.slots[i]);
    }
   }
   {
@@ -97,14 +98,14 @@ void func_PAL_L00_002AEC50(void)
   SlotAED68 *p=D_00189E20_26.slots[i]; if(!p) continue;
   different=h->f2290->modes[0]!=h->f2290->modes[1];
   if(h->fe98 && !h->fea4)
-   func_002AA2E8(&p->opacity,0.0f,0.18f);
-  else if(!p->destroy) func_002AA2E8(&p->opacity,1.0f,0.3f);
+   ApproachValue(&p->opacity,0.0f,0.18f);
+  else if(!p->destroy) ApproachValue(&p->opacity,1.0f,0.3f);
   transition.v=0;
   if(different && D_00189E20_26.fc2c &&
-     func_L00_002A4EF0(p->modes[1])!=func_L00_002A4EF0(D_00189E20_26.f2290->modes[1]))
+     math_l00_return_argument(p->modes[1])!=math_l00_return_argument(D_00189E20_26.f2290->modes[1]))
    transition.v=p->modes[0]!=p->modes[1];
   p->transition=transition.v;
-  active=func_L00_002ADFE8(g->f2290->modes[1],&amount);
+  active=hero_get_item_aim_adjustment(g->f2290->modes[1],&amount);
   if(active || p->active) {
    if(amount!=0.0f) {
     D_L00_0025BE10.f6d4=0.072000004f; D_L00_0025BE10.f6d8=0.43200004f;
@@ -118,7 +119,7 @@ void func_PAL_L00_002AEC50(void)
    }
    if(!active) {
     if(!p->fading) {
-     p->modes[1]=func_L00_002ADFD0(g->f2290,g->f2290->modes[1]);
+     p->modes[1]=hero_get_value_or_default(g->f2290,g->f2290->modes[1]);
      p->ids[1]=0; p->fading=1; p->progress=0; p->scale=0;
     } else {
      p->progress+=0.120000005f; if(p->progress>1.0f) p->progress=1.0f;
@@ -131,11 +132,11 @@ void func_PAL_L00_002AEC50(void)
     else { p->flags[k]=0; p->buffers[k]=&D_L00_001B5C00[i*2+k]; }
    }
    }
-   func_L00_00310D30(g->f2290,p);
+   AdvanceAndDecodeAnimationFrames(g->f2290,p);
   } else {
    if(!p->transition) for(j=0;j<2;j++) {
     if(different && j!=1) continue;
-    p->modes[j]=func_L00_002ADFD0(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
+    p->modes[j]=hero_get_value_or_default(D_00189E20_26.f2290,D_00189E20_26.f2290->modes[j]);
    }
    if(p->transition) {
     p->progress+=0.18f;
@@ -156,7 +157,7 @@ void func_PAL_L00_002AEC50(void)
     else { p->flags[l]=0; p->buffers[l]=&D_L00_001B5C00[i*2+l]; }
    }
    }
-   func_L00_00310D30(g->f2290,p);
+   AdvanceAndDecodeAnimationFrames(g->f2290,p);
   }
   }
  }

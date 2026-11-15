@@ -1,13 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int V4_Fc936841d __attribute__((mode(TI)));
-extern char *func_0029EFD0(int);
-extern float func_002A78D8(float, float);
+extern char *CreateMoby(int);
+extern float math_random_signed_float_range(float, float);
 extern void func_002A0F48(void *);
 
 char *func_PAL_00329D88(int id, void *data, void *source)
 {
-    char *self = func_0029EFD0(0xBD7);
+    char *self = CreateMoby(0xBD7);
     char *state;
     int flags;
 
@@ -17,8 +18,8 @@ char *func_PAL_00329D88(int id, void *data, void *source)
         *(V4_Fc936841d *)(self + 0x10) = *(V4_Fc936841d *)data;
         *(V4_Fc936841d *)state = *(V4_Fc936841d *)source;
         *(int *)(state + 0x10) = 0;
-        *(float *)(state + 0x14) = func_002A78D8(180.0f, 360.0f) * 0.0003490659f;
-        *(float *)(state + 0x18) = func_002A78D8(180.0f, 360.0f) * 0.0003490659f;
+        *(float *)(state + 0x14) = math_random_signed_float_range(180.0f, 360.0f) * 0.0003490659f;
+        *(float *)(state + 0x18) = math_random_signed_float_range(180.0f, 360.0f) * 0.0003490659f;
         flags = 0xFF;
         *(unsigned short *)(self + 0x32) = flags;
         *(unsigned char *)(self + 0x30) = flags;

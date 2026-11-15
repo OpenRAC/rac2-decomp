@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -29,7 +30,7 @@ extern s32 ref_L04_0039FC28_00(f32);
 extern f32 ref_L04_0039FC28_01 __attribute__((sda));
 
 /* Converts a position and a size into fixed-point numbers for the renderer. */
-void func_L04_0039FC28(void *pos, void *out) {
+void gfx_convert_position_to_fixed(void *pos, void *out) {
     (*(s32 *)((s8 *)(out) + (0))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (0))) + *(f32*)(&ref_L04_0039FC28_literal_0)) * 1024.0f);
     (*(s32 *)((s8 *)(out) + (4))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (4))) + *(f32*)(&ref_L04_0039FC28_literal_1)) * 1024.0f);
     (*(s32 *)((s8 *)(out) + (8))) = ref_L04_0039FC28_00(((*(f32 *)((s8 *)(pos) + (8))) - 1.0f) * 1024.0f);

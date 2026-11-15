@@ -1,3 +1,4 @@
+#include "names.h"
 /* Functions of 00294BC8.c that retail built without the first scheduling pass.
 
    Without it the two halves of the table's address stay ahead of the masked
@@ -18,7 +19,7 @@ typedef struct {
 } TableBlock;
 
 /* Whether the 28-entry slot table selected by flag 0x100 has a positive value at the low byte's index. */
-int func_00295870(int mapId)
+int map_is_entry_available(int mapId)
 {
     if ((mapId & 0x100) == 0) {
         mapId = ((TableBlock *)D_0014B540_1)->clear[mapId & 0xFF].unk4;

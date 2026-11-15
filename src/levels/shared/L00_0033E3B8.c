@@ -1,22 +1,22 @@
 #include "common.h"
 
-extern int func_00282978(void *);
-extern void func_002B9180(void *);
-extern void func_0029FC20(void *, int, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern int func_00283CF0(float);
-extern float func_00283CE0(int);
-extern char D_L00_001B8DC0[];
+extern int FastDecTimer(void *);
+extern void part_kill(void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern int FloatToInt(float);
+extern float IntToFloat(int);
+extern char g_camera_l00_position[];
 
 /* Particle update for a particle attached to an owner moby: kills it when its timer ends or the
    owner is gone, places it on an owner joint (bone matrix) or at an offset from the owner, can
    fade it by the facing angle, then moves it towards the point at D_L00_001B8DC0. */
-void func_L00_0033E3B8(char *p)
+void UpdateOwnerAttachedDriftParticle(char *p)
 {
     union {
         struct { float matrix[16]; float transformed[4]; } m;
@@ -29,19 +29,19 @@ void func_L00_0033E3B8(char *p)
     float dot;
 
     if (*(short *)(p + 0xA) >= 0 && FastDecTimer(p + 0xA)) {
-        KillParticle(p);
+        part_kill(p);
         return;
     }
     owner = *(char **)q;
     if (owner) {
         if (*(signed char *)(owner + 0x20) < 0) {
-            KillParticle(p);
+            part_kill(p);
             return;
         }
         ownerpos = owner + 0x10;
         if (*(int *)(q + 4) >= 0) {
             char *initial = p + 0x10;
-            TransformMobyJointPoint(owner, *(int *)(q + 4), w.m.matrix);
+            moby_transform_joint_point(owner, *(int *)(q + 4), w.m.matrix);
             w.m.matrix[15] = 0;
             transform_vector(w.m.transformed, q + 0x10, w.m.matrix);
             FastVecAdd(initial, &w.m.matrix[12], w.m.transformed);
@@ -55,8 +55,8 @@ void func_L00_0033E3B8(char *p)
             pos = initial;
         }
         if (*(short *)(q + 0xE)) {
-            FastVecSub(w.v[1], pos, gCameraPosition_L00);
-            p[8] = FloatToInt(FastVecDot(w.v[1], gCameraPosition_L00 + 0x230) * 6.0f);
+            FastVecSub(w.v[1], pos, g_camera_l00_position);
+            p[8] = FloatToInt(FastVecDot(w.v[1], g_camera_l00_position + 0x230) * 6.0f);
         }
         if (*(short *)(q + 0xC)) {
             FastVecSub(w.v[2], pos, ownerpos);
@@ -75,7 +75,7 @@ void func_L00_0033E3B8(char *p)
         pos = initial;
     }
 drift:
-    FastVecSub(w.v[0], gCameraPosition_L00, pos);
+    FastVecSub(w.v[0], g_camera_l00_position, pos);
     vec_scale_to_length(w.v[0], w.v[0], *(float *)(q + 8));
     FastVecAdd(pos, pos, w.v[0]);
 }

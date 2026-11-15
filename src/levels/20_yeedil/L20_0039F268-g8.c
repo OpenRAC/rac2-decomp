@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
-extern void func_00282CC0(void *, const void *, const void *);
-extern void func_00282CF0(void *, const void *, const void *);
-extern float func_00283CE0(int);
-extern int func_00283CF0(float);
-extern void func_L00_002EBE88(void *, int, int, int, unsigned int, unsigned int, float, float, float);
+extern void FastVecAdd(void *, const void *, const void *);
+extern void FastVecSub(void *, const void *, const void *);
+extern float IntToFloat(int);
+extern int FloatToInt(float);
+extern void DrawTwoLayerPolylineRibbon(void *, int, int, int, unsigned int, unsigned int, float, float, float);
 extern short D_L20_001B38B0[10] MACRO_ADDR;
 extern short D_L20_001B38C8[10] MACRO_ADDR;
 extern short D_L20_001B38E0[10] MACRO_ADDR;
@@ -17,7 +17,7 @@ extern unsigned int D_L20_001AED18 __attribute__((sda));
 extern unsigned int D_L20_001AED1C __attribute__((sda));
 
 /* Draws the ten fading arms of the electric orb, each one following behind the orb. */
-void func_L20_0039F268(unsigned char *object) {
+void electric_orb_draw_arms(unsigned char *object) {
     Vector offset;
     Vector origin;
     Vector differences[10];

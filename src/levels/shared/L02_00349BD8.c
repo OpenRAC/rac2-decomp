@@ -3,13 +3,13 @@
    and the test's body keeps its own copy. The if/else arms end cse's block, so 0.5f is loaded
    again and j + 1 is not reused. PRE makes its registers in hash order, so j is declared first
    for j + 1 to take the lower stack slot. */
-extern char *D_L02_001FF1C0[];
-extern float func_00282E80(const void *, const void *);
+extern char *g_route_polygons[];
+extern float vec_distance_xy(const void *, const void *);
 
 /* Checks whether two polygons touch by comparing their corners. Returns 1 and the touching corner numbers if they do, otherwise 0. */
-int func_L02_00349BD8(int first, int second, int *firstIndex, int *secondIndex) {
-    char *a = gRoutePolygons[first];
-    char *b = gRoutePolygons[second];
+int path_find_touching_polygon_corners(int first, int second, int *firstIndex, int *secondIndex) {
+    char *a = g_route_polygons[first];
+    char *b = g_route_polygons[second];
     int j, i, previousA, previousB;
     char *nextA, *nextB, *priorA, *priorB;
     for (i = 0; i < *(int *)a - 1; ++i) {

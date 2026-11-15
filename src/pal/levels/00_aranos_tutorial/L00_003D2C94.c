@@ -40,16 +40,16 @@ typedef struct AranosMoby {
     char matrix[0x30];
     Vec rotation;
 } AranosMoby;
-extern AranosMoby *func_00273730(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
-extern char D_00189EA0[];
-extern int func_002ACBC8(char *, unsigned int);
-extern void func_0029F338(void *);
-extern void func_002E5CF8(int, int, void *);
-extern float func_00283180(float);
-extern float func_00283198(float);
-extern void func_00282CC0(void *, void *, void *);
+extern AranosMoby *cam_moby_create(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
+extern char g_hero_position[];
+extern int IsPointInCuboid(char *, unsigned int);
+extern void moby_mark_spawned(void *);
+extern void PlayMobySound(int, int, void *);
+extern float math_fast_sin_or_cos_a(float);
+extern float math_fast_sin_or_cos_b(float);
+extern void FastVecAdd(void *, void *, void *);
 extern AranosMoby *D_L00_00220DA0[];
-extern void func_0029F338(void *);
+extern void moby_mark_spawned(void *);
 typedef struct {
     unsigned int flag;
     int frames;
@@ -64,56 +64,56 @@ void func_PAL_L00_003D3478(AranosMoby *obj) {
 
     ctx = obj->ctx;
     if (obj->state == 0) {
-        result = func_002ACBC8(D_00189EA0, ctx->flag);
+        result = IsPointInCuboid(g_hero_position, ctx->flag);
         if (result != 0) {
             obj->state = 1;
             ctx->frames = 0;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         }
     }
     if (obj->state != 1)
         return;
     angle = obj->rotation.f[2];
-    point[0] = func_00283180(angle) * 0.50000006f;
+    point[0] = math_fast_sin_or_cos_a(angle) * 0.50000006f;
     angle = obj->rotation.f[2];
-    point[1] = func_00283198(angle) * 0.50000006f;
+    point[1] = math_fast_sin_or_cos_b(angle) * 0.50000006f;
     point[2] = 0.0f;
-    func_00282CC0(&obj->position, &obj->position, point);
+    FastVecAdd(&obj->position, &obj->position, point);
     ctx->frames += 1;
     if (ctx->frames < 0x65)
         return;
-    func_0029F338(obj);
+    moby_mark_spawned(obj);
 }
 
 
 
-extern void func_002833F0(void *, void *);
-extern int func_002A7820(int, int);
-extern int func_00282948(void *);
-extern float func_002A78D8(float, float);
-extern void func_002AA3A8(float *, float *, float, float, float, float);
+extern void euler_rotation_basis(void *, void *);
+extern int math_random_int_range(int, int);
+extern int math_fast_float_d(void *);
+extern float math_random_signed_float_range(float, float);
+extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 void func_PAL_L00_003D38F8(char *obj) {
     char *ctx;
     float limit;
     ctx = *(char **)(obj + 0x68);
     if (*(unsigned char *)(obj + 0x20) == 0) {
-        *(float *)(ctx + 8) = func_002A78D8(5.0f, 15.0f);
+        *(float *)(ctx + 8) = math_random_signed_float_range(5.0f, 15.0f);
         *(unsigned char *)(obj + 0x20) = 1;
-        *(int *)(ctx + 0x0C) = func_002A7820(0x3C, 0x78);
+        *(int *)(ctx + 0x0C) = math_random_int_range(0x3C, 0x78);
         limit = *(float *)(ctx + 8) * 0.017453294f;
         if (*(float *)(obj + 0xF0) < limit) {
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
         } else {
-            func_002E5CF8(1, 0, obj);
+            PlayMobySound(1, 0, obj);
         }
     }
     if (*(unsigned char *)(obj + 0x20) != 1) return;
     limit = *(float *)(ctx + 8) * 0.017453294f;
-    func_002AA3A8((float *)(obj + 0xF0), (float *)ctx, limit,
+    math_spring_float_to_goal((float *)(obj + 0xF0), (float *)ctx, limit,
         0.0010471977f, 0.0010471977f, 0.0052359886f);
-    func_002833F0(obj + 0xC0, obj + 0xF0);
-    if (func_00282948(ctx + 0x0C) != 0) {
+    euler_rotation_basis(obj + 0xC0, obj + 0xF0);
+    if (math_fast_float_d(ctx + 0x0C) != 0) {
         *(unsigned char *)(obj + 0x20) = 0;
     } else if (*(float *)(obj + 0xF0) == *(float *)(ctx + 8) * 0.017453294f) {
         *(unsigned char *)(obj + 0x20) = 0;
@@ -129,18 +129,18 @@ typedef struct {
 } AranosChildCtx;
 extern float D_L00_001B19CC __attribute__((sda));
 extern float D_L00_001B19D0 __attribute__((sda));
-extern void *func_002A9640(void *, unsigned int, int);
-extern int func_002B3868(void *);
-extern void func_002A7750(void *, int, int);
-extern void func_002A7A00(void *, float, float);
-extern int func_002A99A0(void *, int, void *, int, float);
-extern int func_002E5DA0(int, int, void *, int);
-extern char *func_L00_00326620(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, unsigned int, int);
+extern int flag_set_first_pending(void *);
+extern void moby_set_state(void *, int, int);
+extern void vec_random_direction(void *, float, float);
+extern int coll_scatter_points_in_shapes(void *, int, void *, int, float);
+extern int snd_play_from_class_bank(int, int, void *, int);
+extern char *moby_l00_spawn_child(void *, int, int);
 extern AranosMoby *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
 extern void func_PAL_L00_0039E608(void *);
-extern void func_002A0488(void *, unsigned char, unsigned char, unsigned char);
-extern float func_002A7878(float, float);
-extern int func_002A77E0(int);
+extern void set_moby_color(void *, unsigned char, unsigned char, unsigned char);
+extern float math_random_float_range(float, float);
+extern int math_random_int_below(int);
 typedef struct {
     AranosMoby *sparks[16];
     float decay[16];
@@ -165,13 +165,13 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
             ctx->sparks[i] = 0;
         if (obj->classId == 0xAC9) {
             obj->rotation.f[1] += 0.78539824f;
-            func_002833F0(obj->matrix, &obj->rotation);
+            euler_rotation_basis(obj->matrix, &obj->rotation);
         }
-        func_002A7750(obj, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (func_002A9640(obj, 0x10000, 0) && ctx->hold == 0)
-            func_002A7750(obj, 2, -1);
+        if (part_find_owned_effect_slot(obj, 0x10000, 0) && ctx->hold == 0)
+            moby_set_state(obj, 2, -1);
         obj->fA8 = 0xFF;
         return;
     case 2: {
@@ -181,49 +181,49 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
         if (D_L00_001B19CC < 0.85f && D_L00_001B19D0 < 0.85f)
             count = 14;
         for (n = 0; n < count; n++) {
-            func_002A7A00(&frame.offset, 0.85f, 1.95f);
-            func_002A99A0(obj, 1, &frame.position, 0xFFFF, 1000.0f);
-            func_00282CC0(&frame.offset, &frame.offset, &frame.position);
-            frame.velocity.f[2] = func_002A7878(0.0f, 5.0f) * 0.020000001f;
-            frame.velocity.f[1] = func_002A7878(-6.0f, 6.0f) * 0.020000001f;
-            if (func_002A77E0(4)) {
+            vec_random_direction(&frame.offset, 0.85f, 1.95f);
+            coll_scatter_points_in_shapes(obj, 1, &frame.position, 0xFFFF, 1000.0f);
+            FastVecAdd(&frame.offset, &frame.offset, &frame.position);
+            frame.velocity.f[2] = math_random_float_range(0.0f, 5.0f) * 0.020000001f;
+            frame.velocity.f[1] = math_random_float_range(-6.0f, 6.0f) * 0.020000001f;
+            if (math_random_int_below(4)) {
                 type = 1;
-                ctx->decay[n] = func_002A7878(20.0f, 40.0f) * 0.00040000002f;
-                frame.velocity.f[0] = func_002A7878(-8.0f, -4.0f) * 0.020000001f;
-                life = func_002A7878(5.0f, 10.0f);
+                ctx->decay[n] = math_random_float_range(20.0f, 40.0f) * 0.00040000002f;
+                frame.velocity.f[0] = math_random_float_range(-8.0f, -4.0f) * 0.020000001f;
+                life = math_random_float_range(5.0f, 10.0f);
             } else {
                 type = 2;
                 ctx->decay[n] = 0.0f;
-                frame.velocity.f[0] = func_002A7878(2.0f, 4.0f) * 0.020000001f;
-                life = func_002A7878(15.0f, 20.0f);
+                frame.velocity.f[0] = math_random_float_range(2.0f, 4.0f) * 0.020000001f;
+                life = math_random_float_range(15.0f, 20.0f);
             }
-            child = func_PAL_002735D0(obj, type, 0x43E, func_002A77E0(4), &frame.offset, &obj->rotation, &frame.velocity,
+            child = func_PAL_002735D0(obj, type, 0x43E, math_random_int_below(4), &frame.offset, &obj->rotation, &frame.velocity,
                                   0xFF, 180.0f, life);
             ctx->sparks[n] = child;
             if (child) {
                 child->hook = func_PAL_L00_0039E608;
-                life = func_002A7878(0.75f, 5.0f);
+                life = math_random_float_range(0.75f, 5.0f);
                 ctx->sparks[n]->f2C = ctx->sparks[n]->model->f24 * life;
                 childctx = ctx->sparks[n]->ctx;
                 alpha = 0x80;
-                func_002A0488(ctx->sparks[n], 0x20, 0x60, alpha);
+                set_moby_color(ctx->sparks[n], 0x20, 0x60, alpha);
                 ctx->sparks[n]->f23 = alpha;
                 childctx->f50 = 0x1806020;
             }
         }
-        func_002E5DA0(func_002A7820(0, 1), 0, obj, 0xC0A);
+        snd_play_from_class_bank(math_random_int_range(0, 1), 0, obj, 0xC0A);
         switch (obj->classId) {
         case 0xC0A:
-            func_L00_00326620(obj, 0xC10, 0);
+            moby_l00_spawn_child(obj, 0xC10, 0);
             break;
         case 0xC0B:
-            func_L00_00326620(obj, 0xC11, 0);
+            moby_l00_spawn_child(obj, 0xC11, 0);
             break;
         case 0xC0C:
-            func_L00_00326620(obj, 0xC12, 0);
+            moby_l00_spawn_child(obj, 0xC12, 0);
             break;
         case 0xC0D:
-            func_L00_00326620(obj, 0xC13, 0);
+            moby_l00_spawn_child(obj, 0xC13, 0);
             break;
         case 0xE01:
             obj->f7C = 0x8001;
@@ -235,11 +235,11 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
             obj->f7C = 0x8001;
             break;
         }
-        func_002A7750(obj, 3, -1);
+        moby_set_state(obj, 3, -1);
         break;
     }
     case 3:
-        if (func_002B3868(obj)) {
+        if (flag_set_first_pending(obj)) {
             if (!(obj->f7C & 0x8000)) {
                 obj->f31 = 0;
                 obj->flags |= 1;
@@ -247,13 +247,13 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
             obj->f98 = 0;
             ctx->timer = 250;
         }
-        if (!func_00282948(&ctx->timer)) {
+        if (!math_fast_float_d(&ctx->timer)) {
             for (i = 0; i < 16; i++) {
                 if (ctx->sparks[i])
                     ((AranosChildCtx *)ctx->sparks[i]->ctx)->f04 -= ctx->decay[i];
             }
         } else if (!(obj->f7C & 0x8000)) {
-            func_0029F338(obj);
+            moby_mark_spawned(obj);
         }
         return;
     default:

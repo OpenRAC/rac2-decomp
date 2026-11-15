@@ -8,23 +8,23 @@ typedef struct {
     float uv[4][2];
     unsigned long long reserved, texture, state, primitive;
 } EffectQuad;
-extern unsigned int D_001A7AF0 MACRO_ADDR;
+extern unsigned int g_equipment_bits MACRO_ADDR;
 extern int D_001AC040[2] __attribute__((sda));
 extern EffectRow *D_001AC048[2] __attribute__((sda));
 extern EffectRow corner_template[4] SDATA(D_001AC050);
 typedef struct { float u, v; } EffectUV;
 extern EffectUV uv_gp[4] SDATA(D_001ABFF0);
 extern EffectUV uv_absolute[] __asm__("D_001ABFF0") MACRO_ADDR;
-extern unsigned long func_0027C878(int);
-extern void func_00282D30(void *, void *, float);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern unsigned long GetEffectTextureDescriptor(int);
+extern void FastVecScale(void *, void *, float);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern void FastVecAdd(void *, void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws glowing quads around an object, fading in with its effect strength. */
-void func_002E7338(unsigned char *object)
+void part_draw_glow_quads(unsigned char *object)
 {
     EffectQuad quad;
     EffectRow position;
@@ -32,7 +32,7 @@ void func_002E7338(unsigned char *object)
     int count;
     int i, j;
     unsigned int baseColor;
-    int variant = (gEquipmentBits >> 4) & 1;
+    int variant = (g_equipment_bits >> 4) & 1;
     table = D_001AC048[variant];
     count = D_001AC040[variant];
     quad.texture = GetEffectTextureDescriptor(5);
@@ -57,7 +57,7 @@ void func_002E7338(unsigned char *object)
         int alpha = object[0xBC];
         unsigned int color;
         float scale;
-        if (*(short *)(object + 0xB2)) alpha += RandomIntBelow(*(short *)(object + 0xB2));
+        if (*(short *)(object + 0xB2)) alpha += math_random_int_below(*(short *)(object + 0xB2));
         baseColor = 0x2058B0;
         scale = IntToFloat(alpha) * 0.025f * table[i].f[3];
         color = ((unsigned int)alpha << 24) | baseColor;

@@ -15,16 +15,16 @@ typedef struct {
 
 extern TI D_001A8BD0 MACRO_ADDR;
 
-extern float func_00282C48(float);
-extern void func_00282CF0(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00283098(void *, void *, void *);
-extern float func_002831B0(float);
+extern float math_fabs(float);
+extern void FastVecSub(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern float math_fast_angle_helper(float);
 extern void ref_L00_003BFC98_00(void *, void *, int);
 
 /* Checks whether the target is turned away from where the object faces by more than the given number of degrees. Returns 1 if there is no target. */
-int func_0031A848(Moby31A848 *self, float limit) {
+int moby_is_target_outside_turn_limit(Moby31A848 *self, float limit) {
     float up[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
     float fwd[4] __attribute__((aligned(16)));
@@ -43,5 +43,5 @@ int func_0031A848(Moby31A848 *self, float limit) {
     vec_scale_to_length(proj, fwd, FastVecDot(fwd, dir));
     FastVecSub(dir, dir, proj);
     vec_scale_to_length(dir, dir, 1.0f);
-    return limit * 0.017453294f < FloatAbs(1.5707964f - FastAngleHelper(FastVecDot(dir, up)));
+    return limit * 0.017453294f < math_fabs(1.5707964f - math_fast_angle_helper(FastVecDot(dir, up)));
 }

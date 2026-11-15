@@ -15,19 +15,19 @@ extern char D_L14_001B2B50[] __attribute__((sda));
 extern float D_L14_001B9730[];
 extern Record D_L14_00284690[];
 extern Record D_L14_00284708[];
-extern float func_00282DB0(void *, void *);
-extern void func_00283388(void *);
-extern void func_002E3478(int);
-extern void func_002E3940(int);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern void func_002830C0(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern void set_identity_matrix(void *);
+extern void cam_update_view_rotation(int);
+extern void gfx_process_view_entry(int);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern void transform_vector(void *, void *, void *);
 
 /* The rotation rows are a 64-byte .lit table, read-only data. */
 typedef struct { TI128 row[4]; } Matrix64 __attribute__((aligned(16)));
 extern const Matrix64 D_L14_001AEE10;
 
 /* Sets up the level's table of ten records from a template and refreshes each active entry. */
-void func_L14_00304190(void) {
+void level_init_record_table(void) {
     Vector axis;
     Record *dst = D_L14_00284708;
     float scale;
@@ -46,13 +46,13 @@ void func_L14_00304190(void) {
         if (i >= 10)
             set_identity_matrix(D_L14_001B2B50);
         else
-            UpdateViewRotation(i);
-        ProcessViewEntry(i);
+            cam_update_view_rotation(i);
+        gfx_process_view_entry(i);
     }
 }
 
 /* Builds four scaled and rotated rows and moves them by the given transform. */
-void func_L14_00390EC0(Vector *output, char *transform, float yScale, float zScale, float angle) {
+void gfx_build_transformed_rows(Vector *output, char *transform, float yScale, float zScale, float angle) {
     Vector axis;
     Matrix64 rows;
     int i;
@@ -68,7 +68,7 @@ void func_L14_00390EC0(Vector *output, char *transform, float yScale, float zSca
         output[i].f[1] *= yScale;
         output[i].f[2] *= zScale;
         if (angle != 0.0f) {
-            ApplyAxisRotationToQuaternion(&output[i], &output[i], &axis, angle);
+            math_apply_axis_rotation_to_quat(&output[i], &output[i], &axis, angle);
             output[i].f[3] = 1.0f;
         }
         transform_vector(&output[i], &output[i], transform);

@@ -1,23 +1,23 @@
 #include "names.h"
 typedef struct { short field[12]; } TextLayout;
-extern char D_L00_0022F7C0[];
+extern char g_purchase_menu_model[];
 extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_001A79FC __attribute__((sda));
-extern void func_002FC620(int, int, int, int);
-extern void *func_00115484(void *, int, unsigned int);
-extern unsigned char *func_00288FB8(int);
+extern void gfx_set_scissor_clamped(int, int, int, int);
+extern void *memset(void *, int, unsigned int);
+extern unsigned char *GetLocalizedString(int);
 /* Retail consumes a 24-byte layout and the complete 64-bit color word. */
-extern void func_00280200(TextLayout *, unsigned long long, unsigned char *, int);
+extern void text_draw_window_medium(TextLayout *, unsigned long long, unsigned char *, int);
 
 /* Draws a text box telling the player whether the selected item is at its limit. */
-void func_L00_00378E90(void) {
+void shop_draw_item_limit_text_box(void) {
     TextLayout copy;
     TextLayout layout;
     char *model;
     int index;
     float scale;
-    SetGsScissorClamped(192, 488, 59, 195);
-    model = gPurchaseMenuModel;
+    gfx_set_scissor_clamped(192, 488, 59, 195);
+    model = g_purchase_menu_model;
     if (*(int *)(model + 0x84) == 0) return;
     index = *(int *)(model + 0x80);
     memset(&layout, 0, 24);
@@ -36,10 +36,10 @@ void func_L00_00378E90(void) {
     if (D_001A79FC >= *(int *)(model + 0x144 + index * 28)) {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 40) * scale + 0.5f);
-        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1129), -1);
+        text_draw_window_medium(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1129), -1);
     } else {
         copy.field[9] = 1;
         copy.field[5] = (short)((float)(copy.field[0] + 60) * scale + 0.5f);
-        DrawTextWindowMediumFont(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1128), -1);
+        text_draw_window_medium(&copy, 0x80F0F0F0ULL, GetLocalizedString(0x1128), -1);
     }
 }

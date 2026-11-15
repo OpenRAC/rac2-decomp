@@ -52,33 +52,33 @@ struct PlayerView {
     unsigned char gap[0x2200];
     char *object;
 };
-extern struct PlayerView D_00189E20;
-extern int func_00282948(int *);
-extern float func_00282C48(float);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L23_0041E290(char *);
-extern void func_00291450(int);
-extern void func_L23_0041A648(char *);
-extern float func_002A7878(float, float);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
-extern void func_L23_00418650(char *, float);
-extern float func_00283B98(float, float);
-extern void func_002833F0(char *, char *);
-extern void func_00283738(char *, char *, char *);
-extern void func_00282D30(char *, char *, float);
-extern void func_00282CC0(char *, char *, char *);
-extern void func_L23_0041AFE8(char *, char *, char *, Quad *, int *);
-extern void func_0029FCC0(char *, int, char *);
-extern void *func_L23_004256F0(unsigned char *, unsigned char *, unsigned char *, unsigned char, unsigned char, short, short, float, float, float, float, int, int, int, int, int);
-extern float func_00282E48(char *, char *);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
-extern void func_L23_0041E5B0(unsigned char *, int, int, Quad *, float *, int);
-extern int func_002E5DA0(int, int, char *, int);
-extern int func_002A7820(int, int);
-extern int func_002761F8(void *, void *, int, void *, void *);
+extern struct PlayerView g_hero_state;
+extern int math_fast_float_d(int *);
+extern float math_fabs(float);
+extern int PlayMobySound(int, int, char *);
+extern void mothership_restart_beam_effect(char *);
+extern void gfx_free_point_light(int);
+extern void mothership_release_effect_handles(char *);
+extern float math_random_float_range(float, float);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
+extern void mothership_project_point_onto_surface(char *, float);
+extern float FastAddRotations(float, float);
+extern void euler_rotation_basis(char *, char *);
+extern void multiply_matrix3x3(char *, char *, char *);
+extern void FastVecScale(char *, char *, float);
+extern void FastVecAdd(char *, char *, char *);
+extern void mothership_spawn_field_beam_segments(char *, char *, char *, Quad *, int *);
+extern void moby_transform_joint_to_world(char *, int, char *);
+extern void *ribbon_trail_create(unsigned char *, unsigned char *, unsigned char *, unsigned char, unsigned char, short, short, float, float, float, float, int, int, int, int, int);
+extern float fast_vec_dist(char *, char *);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
+extern void cam_play_effect_on_target(unsigned char *, int, int, Quad *, float *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
+extern int math_random_int_range(int, int);
+extern int CollLine(void *, void *, int, void *, void *);
 
 /* Update the radial field, its linked effects and player contact response. */
-void func_L23_0041A7A0(char *object) {
+void mothership_update_energy_barrier(char *object) {
     struct {
         Quad vertex[8], scaled[2], axes[3], euler, matrix[3], blast, position;
     } local;
@@ -96,39 +96,39 @@ void func_L23_0041A7A0(char *object) {
     int i, j, contactIndex;
     if (*(int *)(state + 0x5B0) == 0) {
         D_L23_001B378C = D_L23_001B159C;
-        D_L23_001B15A0 = FloatAbs(D_L23_001B15A0);
+        D_L23_001B15A0 = math_fabs(D_L23_001B15A0);
         D_L23_001B3788 = D_L23_001B15A4;
         PlayMobySound(5, 0, object);
     } else {
         if (D_L23_001B3788) {
-            FastFloatHelperD(&D_L23_001B3788);
-            RestartBossBeamEffect(object);
+            math_fast_float_d(&D_L23_001B3788);
+            mothership_restart_beam_effect(object);
         } else {
-            if (D_L23_001B150C != -1) FreePointLight(D_L23_001B150C);
+            if (D_L23_001B150C != -1) gfx_free_point_light(D_L23_001B150C);
         }
         if (D_L23_001B3788 < D_L23_001B15A4 / 2) {
             D_L23_001B378C = D_L23_001B378C + D_L23_001B15A0;
             if (D_L23_001B1598 < D_L23_001B378C) D_L23_001B378C = D_L23_001B1598;
         }
     }
-    if (D_L23_001B1560) ReleaseBossEffectHandles(object);
+    if (D_L23_001B1560) mothership_release_effect_handles(object);
     if (D_L23_001B1418 == -1) D_L23_001B1418 = PlayMobySound(1, 4, object);
     if (D_L23_001B1598 * 0.5f < D_L23_001B378C) {
         char *joint;
-        if (D_L23_001B146C != -1) FreePointLight(D_L23_001B146C);
+        if (D_L23_001B146C != -1) gfx_free_point_light(D_L23_001B146C);
         joint = state + 0x3E0;
-        x = RandomFloatRange(0.0f, 0.5f) + 0.7f;
-        y = RandomFloatRange(0.0f, 0.5f) + 1.0f;
-        z = RandomFloatRange(0.0f, 0.55f) + 1.0f;
-        D_L23_001B146C = AllocateEffectSlot_L00_2(joint, 35.0f, 0.0f, x, y, z);
+        x = math_random_float_range(0.0f, 0.5f) + 0.7f;
+        y = math_random_float_range(0.0f, 0.5f) + 1.0f;
+        z = math_random_float_range(0.0f, 0.55f) + 1.0f;
+        D_L23_001B146C = part_l00_alloc_effect_slot_2(joint, 35.0f, 0.0f, x, y, z);
     }
     *(int *)(state + 0x5B0) = 1;
     qcopy_nc(&D_L23_001B37A0,object+16);
-    ProjectPointOntoPlanetSurface((char *)&D_L23_001B37A0, D_L23_001B157C);
+    mothership_project_point_onto_surface((char *)&D_L23_001B37A0, D_L23_001B157C);
     qcopy_nc(&local.axes[0],(object + 0xC0));
     qcopy_nc(&local.axes[1],(object + 0xD0));
     qcopy_nc(&local.axes[2],(object + 0xE0));
-    random = RandomFloatRange(0.98f, 1.02f);
+    random = math_random_float_range(0.98f, 1.02f);
     *(float *)(state + 0x380) = FastAddRotations(*(float *)(state + 0x380), D_L23_001B1578 * random * 0.00029088825f);
     qzero_nc(&local.euler);
     ((float *)&local.euler)[2] = *(float *)(state + 0x380);
@@ -150,12 +150,12 @@ void func_L23_0041A7A0(char *object) {
     FastVecScale((char *)&local.vertex[7], (char *)&local.vertex[3], -1.0f);
     for (i = 0; i < 8; i++) {
         FastVecAdd((char *)&local.vertex[i], (char *)&local.vertex[i], (char *)&D_L23_001B37A0);
-        ProjectPointOntoPlanetSurface((char *)&local.vertex[i], D_L23_001B157C);
-        SpawnFieldBeamSegments(object, (char *)&D_L23_001B37A0, (char *)&local.vertex[i], D_L23_002593E0[i], D_L23_00259320[i]);
+        mothership_project_point_onto_surface((char *)&local.vertex[i], D_L23_001B157C);
+        mothership_spawn_field_beam_segments(object, (char *)&D_L23_001B37A0, (char *)&local.vertex[i], D_L23_002593E0[i], D_L23_00259320[i]);
     }
     for (i = 0; i < 4; i++) {
-        TransformMobyJointToWorld(object, i + 26, (char *)&D_L23_001B37B0[i]);
-        if (!D_L23_001B3790[i]) D_L23_001B3790[i] = CreateRibbonTrail(
+        moby_transform_joint_to_world(object, i + 26, (char *)&D_L23_001B37B0[i]);
+        if (!D_L23_001B3790[i]) D_L23_001B3790[i] = ribbon_trail_create(
             (unsigned char *)&D_L23_001B37A0, (unsigned char *)object, (unsigned char *)&D_L23_001B37B0[i],
             D_L23_001B1538, D_L23_001B153C, D_L23_001B1550, D_L23_001B1554,
             D_L23_001B1540, D_L23_001B1544, D_L23_001B1548, D_L23_001B154C, D_L23_001B1558, D_L23_001B155C, 0, -1, 0);
@@ -163,11 +163,11 @@ void func_L23_0041A7A0(char *object) {
     for (i = 0; i < 8; i++) {
         for (j = 0; j < 3; j++) {
             if (!D_L23_00259380[i][j]) {
-                if (i == 0) D_L23_00259380[0][j] = CreateRibbonTrail(
+                if (i == 0) D_L23_00259380[0][j] = ribbon_trail_create(
                     (unsigned char *)&D_L23_002593E0[7][j], (unsigned char *)object, (unsigned char *)&D_L23_002593E0[0][j],
                     D_L23_001B1510, D_L23_001B1514, D_L23_001B1528, D_L23_001B152C,
                     D_L23_001B1518, D_L23_001B151C, D_L23_001B1520, D_L23_001B1524, D_L23_001B1530, D_L23_001B1534, 1, -1, 1);
-                else D_L23_00259380[i][j] = CreateRibbonTrail(
+                else D_L23_00259380[i][j] = ribbon_trail_create(
                     (unsigned char *)&D_L23_002593E0[i - 1][j], (unsigned char *)object, (unsigned char *)&D_L23_002593E0[i][j],
                     D_L23_001B1510, D_L23_001B1514, D_L23_001B1528, D_L23_001B152C,
                     D_L23_001B1518, D_L23_001B151C, D_L23_001B1520, D_L23_001B1524, D_L23_001B1530, D_L23_001B1534, 1, -1, 1);
@@ -175,19 +175,19 @@ void func_L23_0041A7A0(char *object) {
         }
     }
     if (D_L23_001B378C != D_L23_001B1598) return;
-    if (fast_vec_dist((char *)&gHeroState.position, (char *)&D_L23_001B3760) < D_L23_001B1500) {
+    if (fast_vec_dist((char *)&g_hero_state.position, (char *)&D_L23_001B3760) < D_L23_001B1500) {
         if ((*(float *)(state + 0x5C0) < D_L23_001B1504) && !*(int *)(state + 0x5C4)) {
-            FastVecScale((char *)&local.blast, gHeroState.object + 0xE0, 3.0f);
-            FastVecAdd((char *)&local.blast, (char *)&local.blast, (char *)&gHeroState.position);
+            FastVecScale((char *)&local.blast, g_hero_state.object + 0xE0, 3.0f);
+            FastVecAdd((char *)&local.blast, (char *)&local.blast, (char *)&g_hero_state.position);
             SpawnExplosion(&local.blast, 1, 35, 20, 20, 15, 25, 1, 2.5f, 20.0f, 0, 1, 0, 0);
             local.position = *(Quad *)(object + 16);
-            PlayEffectOnTarget((unsigned char *)object, 3, (int)D_L23_001B1508, &local.position, 0, 1);
+            cam_play_effect_on_target((unsigned char *)object, 3, (int)D_L23_001B1508, &local.position, 0, 1);
             *(int *)(state + 0x5C4) = 25;
-            PlaySoundFromClassBank(2, 0, gHeroState.object, 0xF7F);
+            snd_play_from_class_bank(2, 0, g_hero_state.object, 0xF7F);
         }
     }
-    if (*(int *)(state + 0x5C4)) FastFloatHelperD((int *)(state+0x5C4));
-    i = RandomIntRange(1, 4);
+    if (*(int *)(state + 0x5C4)) math_fast_float_d((int *)(state+0x5C4));
+    i = math_random_int_range(1, 4);
     if ((*(unsigned short *)(object + 0x96) & ((1U << i) - 1)) == 0) {
         hit.owner = object;
         hit.flags = 0x8B0000;

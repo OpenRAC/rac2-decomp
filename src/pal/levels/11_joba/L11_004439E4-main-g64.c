@@ -137,7 +137,7 @@ typedef struct {
     u8 pad1[0x40 - 0x3C];
 } JobaLight;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern u8 D_001395B8[];
 extern u8 D_00139586[];
 extern s32 D_00139700[];
@@ -146,7 +146,7 @@ extern u16 D_001A65D2[];
 extern s32 D_001A7A00;
 extern s32 D_001A7BC0;
 extern s32 D_001A7390;
-extern u8 D_001A63A8[];
+extern u8 g_music_state[];
 
 extern f32 D_L11_001A7CD8;
 extern s32 D_L11_001A8F00;
@@ -159,7 +159,7 @@ extern u8 D_L11_001B14B0[8] __attribute__((sda));
 extern s32 D_L11_001B14B8[6] __attribute__((sda));
 extern s32 D_L11_001B14D0[2] __attribute__((sda));
 extern s32 D_L11_001B14D8[8] __attribute__((sda));
-extern JobaClass *D_L11_001B14F8[14] __attribute__((sda));
+extern JobaClass *g_arena_challenge_table[14] __attribute__((sda));
 extern f32 D_L11_001B1570[4] __attribute__((sda));
 extern f32 D_L11_001B1580 __attribute__((sda));
 extern f32 D_L11_001B1584 __attribute__((sda));
@@ -169,7 +169,7 @@ extern f32 D_L11_001B1598[2];
 extern char D_L11_001B15A0[];
 extern f32 D_L11_001B2FE0;
 extern s32 D_L11_001B30C8;
-extern JobaMoby *D_L11_001B359C;
+extern JobaMoby *g_moby_l11_table;
 extern s32 D_L11_001B3680;
 extern u8 *D_L11_001B368C;
 extern s32 D_L11_001B3770[2];
@@ -186,79 +186,79 @@ typedef struct {
 
 extern JobaChoice D_L11_00279BA0[];
 
-extern int func_00115DA8(char *, const char *, ...);
-extern void func_00282A60(void *, int, int);
-extern f32 func_00282E80(void *, void *);
-extern f32 func_00283248(f32, f32);
-extern f32 func_00283B98(f32, f32);
-extern f32 func_00283CE0(s32);
-extern s32 func_00288D58(void);
-extern s32 func_00288FB8(s32);
-extern void func_002A7750(u8 *, s32, s32);
-extern s32 func_002A77E0(s32);
-extern f32 func_002A7878(f32, f32);
-extern s32 func_002ACBC8(void *, s32);
-extern void func_002AD860(s32);
-extern void func_002B0C28(s32, s32, s32);
-extern s32 func_002B3868(u8 *);
-extern void func_002DF3F8(void *, void *);
-extern void func_00335438(char *, char *, int, int, int);
-extern void func_003355A8(int);
-extern void func_L00_002B9D60(void *, void *, s32, s32);
-extern void func_L00_002C8BA8(s32);
-extern void func_L00_002D40A0(void *, int, float);
-extern void func_L00_002E6CF0(void *, void *);
-extern void func_L00_002E6EF8(void *, void *);
-extern void func_L00_00303530(int, int);
+extern int sprintf(char *, const char *, ...);
+extern void mem_clear(void *, int, int);
+extern f32 vec_distance_xy(void *, void *);
+extern f32 mat_fast_helper_a(f32, f32);
+extern f32 FastAddRotations(f32, f32);
+extern f32 IntToFloat(s32);
+extern s32 flag_is_byte_set(void);
+extern s32 GetLocalizedString(s32);
+extern void moby_set_state(u8 *, s32, s32);
+extern s32 math_random_int_below(s32);
+extern f32 math_random_float_range(f32, f32);
+extern s32 IsPointInCuboid(void *, s32);
+extern void moby_handle_request_slot_state(s32);
+extern void TryClaimNotice(s32, s32, s32);
+extern s32 flag_set_first_pending(u8 *);
+extern void level_capture_checkpoint_state(void *, void *);
+extern void SetCamera5Pose(char *, char *, int, int, int);
+extern void cam_set_mode_state(int);
+extern void hero_reset_position_and_direction(void *, void *, s32, s32);
+extern void hero_start_loader_state(s32);
+extern void hero_start_target_state(void *, int, float);
+extern void gfx_add_draw_callback_first(void *, void *);
+extern void gfx_add_draw_callback_third(void *, void *);
+extern void load_scene_chunk(int, int);
 /* Defined returning int (L00_002FC7A0.c), but retail compiled this caller as a void call, as
    the registers after the call show: the original header evidently declared it void. */
-extern void func_L00_0030DD70(int, int);
-extern int func_L00_003206B8(void *, int);
-extern void func_L00_003294F0(u8 *, s32);
-extern void func_L00_003672F8(void);
-extern void func_L00_003DF6B0(int, int);
-extern void func_L00_003E4948(void);
-extern void func_L00_004028C0(char *, int);
-extern void func_L01_00323310(s32, s32);
-extern s32 func_L02_003D77B8(u8 *);
-extern void func_L02_003FF698(void *);
-extern s32 func_L11_002D8EF8(s32, s32);
-extern int func_L11_0043E090(unsigned int);
-extern int func_L11_0043E108(unsigned int);
-extern void func_L11_00440160(u8 *);
-extern void func_L11_004401C0(u8 *);
-extern void func_L11_00440238(u8 *);
-extern void func_L11_00440360(u8 *);
-extern s32 func_L11_00440790(u8 *, s32, s32);
-extern s32 func_L11_00440868(u8 *, s32, s32);
-extern void func_L11_00440E18(u8 *);
-extern void func_L11_00441090(u8 *);
-extern void func_L11_00441108(u8 *);
-extern void func_L11_004411C8(u8 *);
-extern void func_L11_00441350(u8 *);
-extern u8 *func_L11_004417E8(u8 *);
-extern void func_L11_00441A58(u8 *, s32);
-extern void func_L11_00441D08(u8 *, s32);
-extern void func_L11_00442170(u8 *);
-extern void func_L11_004423F8(u8 *);
-extern s32 func_L11_00442710(u8 *);
-extern void func_L11_004427B8(char *, int);
-extern void func_L11_00442C80(u8 *);
-extern void func_L11_00442E38(u8 *);
-extern void func_L11_00443380(u8 *);
-extern void func_L11_004433D8(u8 *);
-extern void func_L11_00443498(u8 *);
-extern void func_L11_00444400(u8 *);
-extern void func_L11_00445990(char *);
-extern s32 func_L11_00445D28(u8 *, s32);
-extern void func_L11_00445B30(u8 *);
-extern void func_L11_00446020(u8 *);
-extern void func_L11_004461E8(u8 *);
-extern void func_L11_00446C78(u8 *);
-extern void func_L11_00446EB8(u8 *);
-extern void func_L11_00447018(u8 *, s32);
-extern void func_L11_004471A8(u8 *, void *);
-extern void func_L11_00447360(char *);
+extern void level_l00_call_module_handler_with_arg_9(int, int);
+extern int coll_point_inside_record_volume(void *, int);
+extern void moby_set_flag_bit(u8 *, s32);
+extern void state_set_flag_one(void);
+extern void tracked_moby_set_state(int, int);
+extern void blast_call_helper_no_args(void);
+extern void global_object_start(char *, int);
+extern void script_queue_keyed_request(s32, s32);
+extern s32 moby_has_free_child_slot_state2(u8 *);
+extern void moby_try_alloc_enter_state2(void *);
+extern s32 hero_l11_enter_state(s32, s32);
+extern int arena_get_challenge_display_id(unsigned int);
+extern int arena_get_challenge_flag_index(unsigned int);
+extern void arena_end_frame(u8 *);
+extern void arena_reset_state(u8 *);
+extern void arena_count_fighters(u8 *);
+extern void arena_update_loss_history(u8 *);
+extern s32 arena_activate_fighter_of_class(u8 *, s32, s32);
+extern s32 arena_activate_boss_of_class(u8 *, s32, s32);
+extern void arena_choose_next_squad_member(u8 *);
+extern void arena_refresh_squad_slots(u8 *);
+extern void arena_clear_squad_slots_when_done(u8 *);
+extern void arena_run_member_handlers(u8 *);
+extern void arena_mark_nearest_fighters_to_attack(u8 *);
+extern u8 *arena_get_center_point(u8 *);
+extern void arena_set_group_a_active_count(u8 *, s32);
+extern void arena_set_group_b_active_count(u8 *, s32);
+extern void arena_update_fighters_inside(u8 *);
+extern void arena_update_camera_guide(u8 *);
+extern s32 arena_l11_is_wave_complete(u8 *);
+extern void arena_start_challenge_result_scene(char *, int);
+extern void arena_run_helper_on_spawn_groups(u8 *);
+extern void arena_assign_fighters_to_spawns(u8 *);
+extern void arena_start_intro_script(u8 *);
+extern void arena_update_intro_script(u8 *);
+extern void UpdateJobaClassSelectionMenu(u8 *);
+extern void joba_hud_draw_challenge(u8 *);
+extern void joba_menu_select_next(char *);
+extern s32 arena_queue_voice_line(u8 *, s32);
+extern void hud_draw_fade_bar(u8 *);
+extern void joba_boss_pick_action_by_target(u8 *);
+extern void joba_update_ribbon_scale(u8 *);
+extern void part_emit_robot_laser(u8 *);
+extern void part_spawn_channel_beam_effects(u8 *);
+extern void part_emit_object_sparks(u8 *, s32);
+extern void part_spawn_timed_effect_near_anchor(u8 *, void *);
+extern void moby_update_class_specials(char *);
 
 #define OBJ ((JobaObj *)obj)
 
@@ -324,254 +324,254 @@ void func_PAL_L11_004439E4(u8 *obj) {
     s32 snd3;
 
     st = OBJ->st;
-    func_L00_003E4948();
+    blast_call_helper_no_args();
     D_L11_001A9010 = 1;
     switch (OBJ->state) {
     case 0:
-        func_L11_004401C0(obj);
-        func_L11_00442C80(obj);
+        arena_reset_state(obj);
+        arena_run_helper_on_spawn_groups(obj);
         D_L11_001A8FF0 = 0;
         D_L11_001A8FF4 = 0;
-        D_L11_001B359C[st->door].flags |= 1;
-        D_L11_001B359C[st->door].hidden = 0;
+        g_moby_l11_table[st->door].flags |= 1;
+        g_moby_l11_table[st->door].hidden = 0;
         if (D_001A7904 == 2) {
             D_001A7904 = 0;
-            func_002A7750(obj, 2, -1);
-            func_L00_003672F8();
+            moby_set_state(obj, 2, -1);
+            state_set_flag_one();
             st->fade = D_001A65D2[0];
-            func_L00_002E6CF0(func_L11_00445B30, obj);
+            gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1A;
         }
         break;
     case 1:
-        if (func_L00_003206B8(&((Hero *)D_00189E20)->f[0x80 / 4], st->zone) != 0) {
-            func_002A7750(obj, 4, -1);
-        } else if (func_002ACBC8(&((Hero *)D_00189E20)->f[0x80 / 4], st->trigger1) != 0) {
-            func_002B0C28(4, 0xE61, 1);
-            func_L02_003FF698(obj);
-        } else if (D_001395B8[func_L11_0043E108(1)] != 0) {
-            if (func_002ACBC8(&((Hero *)D_00189E20)->f[0x80 / 4], st->trigger2) != 0) {
-                func_002B0C28(4, 0xE61, 1);
-                func_L02_003FF698(obj);
+        if (coll_point_inside_record_volume(&((Hero *)g_hero_state)->f[0x80 / 4], st->zone) != 0) {
+            moby_set_state(obj, 4, -1);
+        } else if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger1) != 0) {
+            TryClaimNotice(4, 0xE61, 1);
+            moby_try_alloc_enter_state2(obj);
+        } else if (D_001395B8[arena_get_challenge_flag_index(1)] != 0) {
+            if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger2) != 0) {
+                TryClaimNotice(4, 0xE61, 1);
+                moby_try_alloc_enter_state2(obj);
             }
         }
         if (D_001A7904 == 2) {
             D_001A7904 = 0;
-            func_002A7750(obj, 2, -1);
-            func_L00_003672F8();
+            moby_set_state(obj, 2, -1);
+            state_set_flag_one();
             st->fade = D_001A65D2[0];
-            func_L00_002E6CF0(func_L11_00445B30, obj);
+            gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1A;
         }
         D_L11_001A9010 = 0;
         break;
     case 2:
-        if (func_002B3868(obj) != 0) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+        if (flag_set_first_pending(obj) != 0) {
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
             OBJ->phase = 0;
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
+            g_moby_l11_table[st->door].flags |= 1;
+            g_moby_l11_table[st->door].hidden = 0;
             lt3 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            m1 = &D_L11_001B359C[st->lamp];
+            m1 = &g_moby_l11_table[st->lamp];
             lt3->height = 419.766f;
             m1->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1A) {
-                D_L11_001B2FE0 = func_00283CE0(OBJ->timer) * 0.05882353f < 1.0f
-                                     ? func_00283CE0(OBJ->timer) * 0.05882353f
+                D_L11_001B2FE0 = IntToFloat(OBJ->timer) * 0.05882353f < 1.0f
+                                     ? IntToFloat(OBJ->timer) * 0.05882353f
                                      : 1.0f;
             } else {
                 f32 v[4] __attribute__((aligned(16)));
 
                 st->fade = D_001A65D2[0];
-                func_L00_002E6CF0(func_L11_00445B30, obj);
+                gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
                 if (D_L11_001CAE40[0] != 1) {
-                    func_L00_00303530(1, st->music);
+                    load_scene_chunk(1, st->music);
                 }
                 p1 = D_L11_001B368C + (st->camera << 7);
-                func_L00_002B9D60(p1 + 0x30, p1 + 0x70, 0x6F, 1);
-                func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
-                func_L01_00323310(st->music, st->volume);
+                hero_reset_position_and_direction(p1 + 0x30, p1 + 0x70, 0x6F, 1);
+                level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
+                script_queue_keyed_request(st->music, st->volume);
                 *(TI128 *)v = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
                 v[2] += 2.0f;
-                func_00335438((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
+                SetCamera5Pose((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
-            func_L00_002E6EF8(func_L11_00445B30, obj);
+            gfx_add_draw_callback_third(hud_draw_fade_bar, obj);
             D_L11_001B2FE0 = 0.0f;
             if (st->fade <= 0) {
                 OBJ->phase = 3;
-                func_L00_002C8BA8(0);
-                func_L00_002D40A0(func_L11_004417E8(obj), 0, 0.0f);
+                hero_start_loader_state(0);
+                hero_start_target_state(arena_get_center_point(obj), 0, 0.0f);
             }
         } else if (OBJ->phase == 3) {
-            if (func_00282E80(&((Hero *)D_00189E20)->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
+            if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], arena_get_center_point(obj)) < 10.0f) {
                 if (D_001395B8[0x4A] == 0) {
                     D_001395B8[0x4A] = 1;
                     OBJ->phase = 1;
-                    func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate1], 1);
+                    moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate1], 1);
                     OBJ->timer = 0;
-                } else if (D_001395B8[func_L11_0043E108(0)] != 0) {
-                    func_002A7750(obj, 4, -1);
+                } else if (D_001395B8[arena_get_challenge_flag_index(0)] != 0) {
+                    moby_set_state(obj, 4, -1);
                 } else {
-                    func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0, 1);
+                    hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
-                    func_002A7750(obj, 8, -1);
-                    func_003355A8(2);
+                    moby_set_state(obj, 8, -1);
+                    cam_set_mode_state(2);
                 }
             }
         } else if (OBJ->phase == 1) {
             if (OBJ->timer >= 0x33 && D_L11_001A8F00 != 2) {
-                if (D_001395B8[func_L11_0043E108(0)] == 0) {
-                    func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0, 1);
+                if (D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
+                    hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
-                    func_002A7750(obj, 8, -1);
-                    func_003355A8(2);
+                    moby_set_state(obj, 8, -1);
+                    cam_set_mode_state(2);
                 } else {
-                    func_002A7750(obj, 4, -1);
+                    moby_set_state(obj, 4, -1);
                 }
             }
         }
         break;
     case 5:
         if (OBJ->timer < 0x96) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
-            ((Hero *)D_00189E20)->f[0x24A4 / 4] = 300.0f;
-            func_L11_00442170(obj);
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
+            ((Hero *)g_hero_state)->f[0x24A4 / 4] = 300.0f;
+            arena_update_fighters_inside(obj);
             break;
         }
     case 4:
-        if (func_002B3868(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             if (OBJ->state == 5) {
-                func_L11_004427B8((char *)obj, st->cls);
+                arena_start_challenge_result_scene((char *)obj, st->cls);
             }
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
-            func_L11_00442C80(obj);
-            func_L11_004411C8(obj);
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
-            func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
-            func_L11_00443380(obj);
+            g_moby_l11_table[st->door].flags |= 1;
+            g_moby_l11_table[st->door].hidden = 0;
+            arena_run_helper_on_spawn_groups(obj);
+            arena_run_member_handlers(obj);
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
+            hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0x6F, 1);
+            level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
+            arena_start_intro_script(obj);
             st->mode = 5;
-            func_L11_004461E8(obj);
+            joba_update_ribbon_scale(obj);
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
         }
-        func_L11_004433D8(obj);
+        arena_update_intro_script(obj);
         break;
     case 11:
         if (OBJ->timer < 0x12C) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
             if (OBJ->timer >= 0x97) {
-                ((Hero *)D_00189E20)->f[0x24A4 / 4] = 200.0f;
+                ((Hero *)g_hero_state)->f[0x24A4 / 4] = 200.0f;
             }
-            func_L11_00442170(obj);
+            arena_update_fighters_inside(obj);
         } else {
-            func_002A7750(obj, 4, -1);
+            moby_set_state(obj, 4, -1);
         }
         break;
     case 12:
     case 13:
-        if (func_002B3868(obj) != 0) {
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
+        if (flag_set_first_pending(obj) != 0) {
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
             OBJ->phase = 0;
         }
         if (OBJ->phase == 0) {
             if (OBJ->timer < 0x96) {
-                ((Hero *)D_00189E20)->f[0x24A4 / 4] = 200.0f;
-                func_L11_00442170(obj);
+                ((Hero *)g_hero_state)->f[0x24A4 / 4] = 200.0f;
+                arena_update_fighters_inside(obj);
                 break;
             }
             if (OBJ->state == 12) {
-                func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate2], 1);
+                moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate2], 1);
             } else if (OBJ->state == 13) {
-                func_L00_003294F0((u8 *)&D_L11_001B359C[st->gate3], 1);
+                moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate3], 1);
             }
             OBJ->timer = 0;
             OBJ->phase = 1;
-        } else if (((Hero *)D_00189E20)->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xC9) {
-            func_L11_004427B8((char *)obj, st->cls);
+        } else if (((Hero *)g_hero_state)->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xC9) {
+            arena_start_challenge_result_scene((char *)obj, st->cls);
             OBJ->state = 5;
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
-            func_L11_00442C80(obj);
-            func_L11_004411C8(obj);
-            func_L11_00441A58(obj, 0);
-            func_L11_00441D08(obj, 0);
-            func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
-            func_L11_00443380(obj);
+            g_moby_l11_table[st->door].flags |= 1;
+            g_moby_l11_table[st->door].hidden = 0;
+            arena_run_helper_on_spawn_groups(obj);
+            arena_run_member_handlers(obj);
+            arena_set_group_a_active_count(obj, 0);
+            arena_set_group_b_active_count(obj, 0);
+            hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0x6F, 1);
+            level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
+            arena_start_intro_script(obj);
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
         }
         break;
     case 6:
-        func_L11_00445990((char *)obj);
+        joba_menu_select_next((char *)obj);
         break;
     case 7:
-        if (func_002B3868(obj) != 0) {
+        if (flag_set_first_pending(obj) != 0) {
             sel = D_001395B8[0x49];
-            if (sel != 0 && (D_001395B8[func_L11_0043E108(D_L11_001B14F8[sel]->id)] == 0 ||
-                             (sel >= 11 && func_00288D58() == 0) ||
+            if (sel != 0 && (D_001395B8[arena_get_challenge_flag_index(g_arena_challenge_table[sel]->id)] == 0 ||
+                             (sel >= 11 && flag_is_byte_set() == 0) ||
                              (sel == 8 && D_00139586[0][D_L11_00279BA0].enabled == 0))) {
                 sel = 0;
             }
             st->result = sel;
         }
-        func_L11_00443498(obj);
+        UpdateJobaClassSelectionMenu(obj);
         break;
     case 8:
-        func_L11_0043E108(1);
-        if (func_002B3868(obj) != 0) {
+        arena_get_challenge_flag_index(1);
+        if (flag_set_first_pending(obj) != 0) {
             st->wave = 0;
             for (k1 = 0; k1 < 8; k1++) {
                 st->counts[k1] = 0;
             }
             st->frames = 0;
             st->lost = 0;
-            func_L11_00442C80(obj);
-            func_L11_00440238(obj);
-            func_L11_00442E38(obj);
-            rec1 = &D_L11_001B14F8[st->cls]->records[st->wave];
-            func_L11_00441A58(obj, rec1->h[7]);
-            func_L11_00441D08(obj, rec1->h[6]);
+            arena_run_helper_on_spawn_groups(obj);
+            arena_count_fighters(obj);
+            arena_assign_fighters_to_spawns(obj);
+            rec1 = &g_arena_challenge_table[st->cls]->records[st->wave];
+            arena_set_group_a_active_count(obj, rec1->h[7]);
+            arena_set_group_b_active_count(obj, rec1->h[6]);
             for (k3 = 0; k3 < 40; k3++) {
                 st->marks[k3] = 0;
             }
             for (k3 = 0; k3 < 6; k3++) {
                 st->limits[k3] = D_L11_001B14B0[k3];
             }
-            ((Hero *)D_00189E20)->i[0x24CC / 4] = D_001A7A00;
-            func_L11_00447360((char *)obj);
-            D_L11_001B359C[st->door].flags |= 1;
-            D_L11_001B359C[st->door].hidden = 0;
+            ((Hero *)g_hero_state)->i[0x24CC / 4] = D_001A7A00;
+            moby_update_class_specials((char *)obj);
+            g_moby_l11_table[st->door].flags |= 1;
+            g_moby_l11_table[st->door].hidden = 0;
             if (st->cls == 7) {
-                r1 = ((Hero *)D_00189E20)->i[0x18D4 / 4];
-                ((Hero *)D_00189E20)->i[0x18D4 / 4] = 0;
+                r1 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
+                ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
                 D_L11_001B1588 = r1;
             } else if (st->cls == 8) {
-                r2 = ((Hero *)D_00189E20)->i[0x18D4 / 4];
-                ((Hero *)D_00189E20)->i[0x18D4 / 4] = 0;
+                r2 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
+                ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
                 D_00139700[0] = 300;
                 D_L11_001B1588 = r2;
             }
         }
-        rec2 = &D_L11_001B14F8[st->cls]->records[st->wave];
+        rec2 = &g_arena_challenge_table[st->cls]->records[st->wave];
         if (rec2->b[3] != 0) {
-            func_002A7750(obj, 9, -1);
+            moby_set_state(obj, 9, -1);
             return;
         }
-        func_L11_00440360(obj);
-        if (func_L11_00442710(obj) != 0) {
+        arena_update_loss_history(obj);
+        if (arena_l11_is_wave_complete(obj) != 0) {
             st->wave++;
             for (k4 = 0; k4 < 7; k4++) {
                 st->counts[k4] = 0;
@@ -584,27 +584,27 @@ void func_PAL_L11_004439E4(u8 *obj) {
             cls3 = (u16)st->cls;
             st->sound = 0;
             st->owner = 0;
-            if (st->wave >= D_L11_001B14F8[cls1]->count) {
+            if (st->wave >= g_arena_challenge_table[cls1]->count) {
                 if (cls3 - 7U < 2) {
-                    ((Hero *)D_00189E20)->i[0x18D4 / 4] = D_L11_001B1588;
+                    ((Hero *)g_hero_state)->i[0x18D4 / 4] = D_L11_001B1588;
                 }
                 st->result = st->cls;
-                if (st->result == 0 && D_001395B8[func_L11_0043E108(0)] == 0) {
-                    func_002A7750(obj, 12, -1);
+                if (st->result == 0 && D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
+                    moby_set_state(obj, 12, -1);
                     return;
                 }
-                func_002A7750(obj, 5, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                moby_set_state(obj, 5, -1);
+                tracked_moby_set_state(1, -1);
+                global_object_start((char *)1, -1);
                 return;
             }
             if (cls1 >= 13) {
                 st->cls = 0;
             }
-            func_L11_00442E38(obj);
-            rec3 = &D_L11_001B14F8[st->cls]->records[st->wave];
-            func_L11_00441A58(obj, rec3->h[7]);
-            func_L11_00441D08(obj, rec3->h[6]);
+            arena_assign_fighters_to_spawns(obj);
+            rec3 = &g_arena_challenge_table[st->cls]->records[st->wave];
+            arena_set_group_a_active_count(obj, rec3->h[7]);
+            arena_set_group_b_active_count(obj, rec3->h[6]);
         }
         st->frames++;
         if (st->cls == 5) {
@@ -615,21 +615,21 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 for (k5 = 0; k5 < 6; k5++) {
                     sum1 += st->counts[k5];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x1B37), D_L11_001B14B8[st->wave] + sum1 - st->lost,
-                              func_00288FB8(0xE86));
-                func_L00_0030DD70((int)buf, -1);
-                func_002A7750(obj, 11, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x1B37), D_L11_001B14B8[st->wave] + sum1 - st->lost,
+                              GetLocalizedString(0xE86));
+                level_l00_call_module_handler_with_arg_9((int)buf, -1);
+                moby_set_state(obj, 11, -1);
+                tracked_moby_set_state(1, -1);
+                global_object_start((char *)1, -1);
                 return;
             }
         }
         if (st->cls == 9 && st->frames >= 0x2329) {
-            func_L00_0030DD70(func_00288FB8(0x1B37), -1);
-            func_002A7750(obj, 11, -1);
+            level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x1B37), -1);
+            moby_set_state(obj, 11, -1);
             st->sound = 0;
-            func_L00_003DF6B0(1, -1);
-            func_L00_004028C0((char *)1, -1);
+            tracked_moby_set_state(1, -1);
+            global_object_start((char *)1, -1);
             return;
         }
         if (st->cls == 8) {
@@ -640,51 +640,51 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 for (k6 = 0; k6 < 6; k6++) {
                     sum2 += st->counts[k6];
                 }
-                func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x1B37), D_L11_001B14D0[st->wave] + sum2 - st->lost,
-                              func_00288FB8(0xE86));
-                func_L00_0030DD70((int)buf, -1);
-                func_002A7750(obj, 11, -1);
-                func_L00_003DF6B0(1, -1);
-                func_L00_004028C0((char *)1, -1);
+                sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x1B37), D_L11_001B14D0[st->wave] + sum2 - st->lost,
+                              GetLocalizedString(0xE86));
+                level_l00_call_module_handler_with_arg_9((int)buf, -1);
+                moby_set_state(obj, 11, -1);
+                tracked_moby_set_state(1, -1);
+                global_object_start((char *)1, -1);
                 return;
             }
         }
-        if ((st->cls == 3 || st->cls == 11) && ((Hero *)D_00189E20)->i[0x24CC / 4] < D_001A7A00) {
-            func_L00_0030DD70(func_00288FB8(0x1B38), -1);
-            func_002A7750(obj, 11, -1);
+        if ((st->cls == 3 || st->cls == 11) && ((Hero *)g_hero_state)->i[0x24CC / 4] < D_001A7A00) {
+            level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x1B38), -1);
+            moby_set_state(obj, 11, -1);
             st->sound = 0;
-            func_L00_003DF6B0(1, -1);
-            func_L00_004028C0((char *)1, -1);
+            tracked_moby_set_state(1, -1);
+            global_object_start((char *)1, -1);
             return;
         }
-        rec2 = &D_L11_001B14F8[st->cls]->records[st->wave];
+        rec2 = &g_arena_challenge_table[st->cls]->records[st->wave];
         if (OBJ->timer >= 0x33 || rec2->b[0] != 0) {
             ok1 = 0;
-            func_L11_00441108(obj);
-            func_L11_00440E18(obj);
+            arena_clear_squad_slots_when_done(obj);
+            arena_choose_next_squad_member(obj);
             e1 = st->slots[st->slot];
-            if (e1 != 0 && func_L02_003D77B8(e1) != 0) {
+            if (e1 != 0 && moby_has_free_child_slot_state2(e1) != 0) {
                 for (k7 = st->counts[3]; k7 < rec2->h[3]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF7, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF7, 0);
                 }
                 for (k7 = st->counts[1]; k7 < rec2->h[1]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDCF, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
                 }
                 for (k7 = st->counts[2]; k7 < rec2->h[2]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF4, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
                 }
                 for (k7 = st->counts[0]; k7 < rec2->h[0]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xD98, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xD98, 0);
                 }
                 for (k7 = st->counts[4]; k7 < rec2->h[4]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xDF9, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF9, 0);
                 }
                 for (k7 = st->counts[5]; k7 < rec2->h[5]; k7++) {
-                    ok1 |= func_L11_00440790(obj, 0xD37, 0);
+                    ok1 |= arena_activate_fighter_of_class(obj, 0xD37, 0);
                 }
             }
             if (st->counts[6] == 0 && rec2->b[0] != 0) {
-                r3 = func_L11_00440868(obj, 0xD4A, 0);
+                r3 = arena_activate_boss_of_class(obj, 0xD4A, 0);
                 st->sound = r3;
                 st->owner = r3;
                 if (D_L11_001BA780.owner == 0) {
@@ -694,45 +694,45 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 snd1 = st->sound;
                 if (D_L11_001B3770[0] == 0) {
                     D_L11_001B3770[0] = snd1;
-                    func_00282A60(D_L11_001FFA78, 0, 0xE0);
+                    mem_clear(D_L11_001FFA78, 0, 0xE0);
                 }
-                func_L11_00445D28(obj, 10);
-                func_L01_00323310(st->track, st->trackVolume);
+                arena_queue_voice_line(obj, 10);
+                script_queue_keyed_request(st->track, st->trackVolume);
             }
             if (rec2->b[0] == 0) {
-                if (D_001A63A8[0x48] != st->music && D_001A63A8[0x3C] != st->music) {
-                    func_L01_00323310(st->music, st->volume);
+                if (g_music_state[0x48] != st->music && g_music_state[0x3C] != st->music) {
+                    script_queue_keyed_request(st->music, st->volume);
                 }
             }
             if (ok1 != 0) {
-                func_L11_00441090(obj);
+                arena_refresh_squad_slots(obj);
             }
         }
         if (st->cls == 7) {
-            func_002AD860(10);
-            ((Hero *)D_00189E20)->b[0x22B7] = 1;
+            moby_handle_request_slot_state(10);
+            ((Hero *)g_hero_state)->b[0x22B7] = 1;
         }
         if (st->cls == 8) {
-            func_002AD860(30);
+            moby_handle_request_slot_state(30);
         }
-        func_L00_002E6CF0(func_L11_00444400, obj);
-        func_L11_004423F8(obj);
-        func_L11_00446020(obj);
+        gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
+        arena_update_camera_guide(obj);
+        joba_boss_pick_action_by_target(obj);
         if ((D_001A7BC0 & 3) == 0) {
-            func_L11_00441350(obj);
+            arena_mark_nearest_fighters_to_attack(obj);
         }
-        func_L11_00442170(obj);
-        if (func_L11_0043E090(st->cls) != -1) {
-            D_L11_001AA170 = func_L11_0043E090(st->cls);
+        arena_update_fighters_inside(obj);
+        if (arena_get_challenge_display_id(st->cls) != -1) {
+            D_L11_001AA170 = arena_get_challenge_display_id(st->cls);
             D_L11_001B3680 = D_001A7390;
         }
         break;
     case 9:
-        func_L11_0043E108(1);
-        if (func_002B3868(obj) != 0) {
+        arena_get_challenge_flag_index(1);
+        if (flag_set_first_pending(obj) != 0) {
             if (st->counts[7] == 0) {
-                if (D_L11_001B14F8[st->cls]->records[st->wave].b[1] != 0) {
-                    r4 = func_L11_00440868(obj, 0xB3A, 0);
+                if (g_arena_challenge_table[st->cls]->records[st->wave].b[1] != 0) {
+                    r4 = arena_activate_boss_of_class(obj, 0xB3A, 0);
                     st->sound = r4;
                     st->owner = r4;
                     if (D_L11_001BA780.owner == 0) {
@@ -743,147 +743,147 @@ void func_PAL_L11_004439E4(u8 *obj) {
                     if (D_L11_001B3770[1] == 0) {
                         D_L11_001B3770[1] = snd2;
                         buf2 = D_L11_001FFA78;
-                        func_00282A60(buf2 + 0xE0, 0, 0xE0);
+                        mem_clear(buf2 + 0xE0, 0, 0xE0);
                     }
-                    func_L11_00445D28(obj, 4);
-                    func_L01_00323310(st->track, st->trackVolume);
+                    arena_queue_voice_line(obj, 4);
+                    script_queue_keyed_request(st->track, st->trackVolume);
                 }
             }
             st->mode = 1;
             OBJ->phase = 0;
-            func_L11_00445D28(obj, func_002A77E0(2) + 0x1B);
+            arena_queue_voice_line(obj, math_random_int_below(2) + 0x1B);
             for (k8 = 0; k8 < 4; k8++) {
                 st->phase[k8] = (f32)k8 * 0.25f;
-                st->speed[k8] = func_002A7878(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.020000001f;
-                st->delay[k8] = func_002A7878(D_L11_001B1598[0], D_L11_001B1598[1]);
+                st->speed[k8] = math_random_float_range(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.020000001f;
+                st->delay[k8] = math_random_float_range(D_L11_001B1598[0], D_L11_001B1598[1]);
             }
         } else if (OBJ->phase == 0) {
-            func_L11_004461E8(obj);
-            func_L11_00440360(obj);
+            joba_update_ribbon_scale(obj);
+            arena_update_loss_history(obj);
             lt1 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            q1 = (u8 *)&D_L11_001B359C[st->lamp];
+            q1 = (u8 *)&g_moby_l11_table[st->lamp];
             if (lt1->height < 421.266f) {
                 f1 = lt1->height + 0.010000001f;
                 lt1->height = f1;
                 *(f32 *)(q1 + 0x18) = f1;
             }
-            if (((Hero *)D_00189E20)->ptr[0x33C / 4] == (void *)q1 && ((Hero *)D_00189E20)->i[0x340 / 4] != 0 &&
-                (((Hero *)D_00189E20)->i[0x2294 / 4] == 7 || OBJ->timer >= 0xFB)) {
-                ((Hero *)D_00189E20)->i[0xF0 / 4] = 0;
+            if (((Hero *)g_hero_state)->ptr[0x33C / 4] == (void *)q1 && ((Hero *)g_hero_state)->i[0x340 / 4] != 0 &&
+                (((Hero *)g_hero_state)->i[0x2294 / 4] == 7 || OBJ->timer >= 0xFB)) {
+                ((Hero *)g_hero_state)->i[0xF0 / 4] = 0;
                 D_L11_001A7CD8 = 80.0f;
-                ((Hero *)D_00189E20)->i[0xF4 / 4] = 0;
-                if (((Hero *)D_00189E20)->i[0x2294 / 4] != 7) {
-                    if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x81) {
-                        func_L11_002D8EF8(7, 1);
+                ((Hero *)g_hero_state)->i[0xF4 / 4] = 0;
+                if (((Hero *)g_hero_state)->i[0x2294 / 4] != 7) {
+                    if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x81) {
+                        hero_l11_enter_state(7, 1);
                     }
                 } else {
-                    func_L11_002D8EF8(0x81, 1);
+                    hero_l11_enter_state(0x81, 1);
                 }
-                if (func_00282E80(&((Hero *)D_00189E20)->f[0x80 / 4], lt1->pos) < 0.01f) {
-                    ((Hero *)D_00189E20)->f[0x84 / 4] += 0.01f;
+                if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], lt1->pos) < 0.01f) {
+                    ((Hero *)g_hero_state)->f[0x84 / 4] += 0.01f;
                 }
             }
             ok2 = 0;
-            func_L11_00441108(obj);
-            func_L11_00440E18(obj);
+            arena_clear_squad_slots_when_done(obj);
+            arena_choose_next_squad_member(obj);
             e2 = st->slots[st->slot];
-            if (e2 != 0 && func_L02_003D77B8(e2) != 0) {
+            if (e2 != 0 && moby_has_free_child_slot_state2(e2) != 0) {
                 for (k9 = st->counts[1]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xDCF, 0);
+                    ok2 |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
                 }
                 for (k9 = st->counts[2]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xDF4, 0);
+                    ok2 |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
                 }
                 for (k9 = st->counts[0]; k9 < 4; k9++) {
-                    ok2 |= func_L11_00440790(obj, 0xD98, 0);
+                    ok2 |= arena_activate_fighter_of_class(obj, 0xD98, 0);
                 }
             }
-            func_L11_00446C78(obj);
-            func_L00_002E6CF0(func_L11_00446EB8, obj);
+            part_emit_robot_laser(obj);
+            gfx_add_draw_callback_first(part_spawn_channel_beam_effects, obj);
             if (ok2 != 0) {
-                func_L11_00441090(obj);
+                arena_refresh_squad_slots(obj);
             }
             if (D_L11_001A8FF4 == 0) {
-                if (((Hero *)D_00189E20)->f[0x88 / 4] > 480.0f && ((Hero *)D_00189E20)->f[0x180 / 4] < 0.040000003f) {
+                if (((Hero *)g_hero_state)->f[0x88 / 4] > 480.0f && ((Hero *)g_hero_state)->f[0x180 / 4] < 0.040000003f) {
                     D_L11_001A8FF4 = 1;
                     D_L11_001A8FF0 = 1;
-                    func_L11_00447360((char *)obj);
-                    func_L11_00447018(obj, 5);
+                    moby_update_class_specials((char *)obj);
+                    part_emit_object_sparks(obj, 5);
                 }
                 if (D_L11_001A8FF4 == 0) {
-                    if (((Hero *)D_00189E20)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)D_00189E20)->f[0x88 / 4]) {
-                        ((Hero *)D_00189E20)->h[0x1F0 / 2] = 1;
+                    if (((Hero *)g_hero_state)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)g_hero_state)->f[0x88 / 4]) {
+                        ((Hero *)g_hero_state)->h[0x1F0 / 2] = 1;
                     }
                     if (D_L11_001A8FF4 == 0) {
                         goto tail9;
                     }
                 }
             }
-            func_L11_00447018(obj, 0);
+            part_emit_object_sparks(obj, 0);
             if (D_L11_001A8FF4 != 0 && st->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
-                rec6 = &D_L11_001B14F8[st->cls]->records[st->wave];
+                rec6 = &g_arena_challenge_table[st->cls]->records[st->wave];
                 for (c10 = 0; c10 < 6; c10++) {
                     st->counts[c10] = 0;
                 }
-                st->heading = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                           ((Hero *)D_00189E20)->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                st->heading = func_00283B98(st->heading, -1.5707965f);
+                st->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
+                                           ((Hero *)g_hero_state)->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
+                st->heading = FastAddRotations(st->heading, -1.5707965f);
                 for (k10 = st->counts[3]; k10 < rec6->h[3]; k10++) {
-                    func_L11_00440790(obj, 0xDF7, 1);
+                    arena_activate_fighter_of_class(obj, 0xDF7, 1);
                 }
                 for (k10 = st->counts[5]; k10 < rec6->h[5]; k10++) {
-                    func_L11_00440790(obj, 0xD37, 1);
+                    arena_activate_fighter_of_class(obj, 0xD37, 1);
                 }
                 for (k10 = st->counts[1]; k10 < rec6->h[1]; k10++) {
-                    func_L11_00440790(obj, 0xDCF, 1);
+                    arena_activate_fighter_of_class(obj, 0xDCF, 1);
                 }
                 for (k10 = st->counts[2]; k10 < rec6->h[2]; k10++) {
-                    func_L11_00440790(obj, 0xDF4, 1);
+                    arena_activate_fighter_of_class(obj, 0xDF4, 1);
                 }
                 for (k10 = st->counts[0]; k10 < rec6->h[0]; k10++) {
-                    func_L11_00440790(obj, 0xD98, 1);
+                    arena_activate_fighter_of_class(obj, 0xD98, 1);
                 }
             }
         } else if (OBJ->phase == 1) {
-            func_L11_00440360(obj);
-            func_L11_004461E8(obj);
-            if (D_L11_001B14F8[st->cls]->records[st->wave].b[4] != 0) {
-                func_L11_004471A8(obj, &D_L11_001B14F8[st->cls]->records[st->wave]);
+            arena_update_loss_history(obj);
+            joba_update_ribbon_scale(obj);
+            if (g_arena_challenge_table[st->cls]->records[st->wave].b[4] != 0) {
+                part_spawn_timed_effect_near_anchor(obj, &g_arena_challenge_table[st->cls]->records[st->wave]);
             }
-            func_L11_00447018(obj, 0);
-            if (func_L11_00442710(obj) != 0) {
+            part_emit_object_sparks(obj, 0);
+            if (arena_l11_is_wave_complete(obj) != 0) {
                 for (c11 = 0; c11 < 8; c11++) {
                     st->counts[c11] = 0;
                 }
                 st->lost = 0;
-                cl1 = D_L11_001B14F8[st->cls];
+                cl1 = g_arena_challenge_table[st->cls];
                 w1 = st->wave;
                 next1 = &cl1->records[w1 + 1];
                 if (w1 + 1 < cl1->count && next1->b[3] != 0) {
-                    st->heading = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                               ((Hero *)D_00189E20)->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
-                    st->heading = func_00283B98(st->heading, -1.5707965f);
+                    st->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
+                                               ((Hero *)g_hero_state)->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
+                    st->heading = FastAddRotations(st->heading, -1.5707965f);
                     st->wave++;
-                    rec8 = &D_L11_001B14F8[st->cls]->records[st->wave];
+                    rec8 = &g_arena_challenge_table[st->cls]->records[st->wave];
                     for (k11 = st->counts[3]; k11 < rec8->h[3]; k11++) {
-                        func_L11_00440790(obj, 0xDF7, 1);
+                        arena_activate_fighter_of_class(obj, 0xDF7, 1);
                     }
                     for (k11 = st->counts[5]; k11 < rec8->h[5]; k11++) {
-                        func_L11_00440790(obj, 0xD37, 1);
+                        arena_activate_fighter_of_class(obj, 0xD37, 1);
                     }
                     for (k11 = st->counts[1]; k11 < rec8->h[1]; k11++) {
-                        func_L11_00440790(obj, 0xDCF, 1);
+                        arena_activate_fighter_of_class(obj, 0xDCF, 1);
                     }
                     for (k11 = st->counts[2]; k11 < rec8->h[2]; k11++) {
-                        func_L11_00440790(obj, 0xDF4, 1);
+                        arena_activate_fighter_of_class(obj, 0xDF4, 1);
                     }
                     for (k11 = st->counts[0]; k11 < rec8->h[0]; k11++) {
-                        func_L11_00440790(obj, 0xD98, 1);
+                        arena_activate_fighter_of_class(obj, 0xD98, 1);
                     }
                     if (st->counts[7] == 0 && rec8->b[1] != 0) {
-                        r5 = func_L11_00440868(obj, 0xB3A, 0);
+                        r5 = arena_activate_boss_of_class(obj, 0xB3A, 0);
                         st->sound = r5;
                         st->owner = r5;
                         if (D_L11_001BA780.owner == 0) {
@@ -894,17 +894,17 @@ void func_PAL_L11_004439E4(u8 *obj) {
                         if (D_L11_001B3770[1] == 0) {
                             D_L11_001B3770[1] = snd3;
                             buf3 = D_L11_001FFA78;
-                            func_00282A60(buf3 + 0xE0, 0, 0xE0);
+                            mem_clear(buf3 + 0xE0, 0, 0xE0);
                         }
-                        func_L11_00445D28(obj, 4);
+                        arena_queue_voice_line(obj, 4);
                     }
                 } else {
-                    func_L11_002D8EF8(0x6F, 1);
+                    hero_l11_enter_state(0x6F, 1);
                     OBJ->phase = 2;
                     st->mode = 4;
                     OBJ->timer = 0;
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    tracked_moby_set_state(1, -1);
+                    global_object_start((char *)1, -1);
                 }
             }
             st->frames++;
@@ -916,36 +916,36 @@ void func_PAL_L11_004439E4(u8 *obj) {
                     for (k12 = 0; k12 < 6; k12++) {
                         sum3 += st->counts[k12];
                     }
-                    func_00115DA8(buf, D_L11_001B15A0, func_00288FB8(0x1B37), D_L11_001B14D8[st->wave] + sum3 - st->lost,
-                                  func_00288FB8(0xE86));
-                    func_L00_0030DD70((int)buf, -1);
+                    sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x1B37), D_L11_001B14D8[st->wave] + sum3 - st->lost,
+                                  GetLocalizedString(0xE86));
+                    level_l00_call_module_handler_with_arg_9((int)buf, -1);
                     lt4 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-                    m2 = &D_L11_001B359C[st->lamp];
+                    m2 = &g_moby_l11_table[st->lamp];
                     lt4->height = 419.766f;
                     m2->y = 419.766f;
-                    func_002A7750(obj, 11, -1);
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    moby_set_state(obj, 11, -1);
+                    tracked_moby_set_state(1, -1);
+                    global_object_start((char *)1, -1);
                     return;
                 }
             }
         } else if (OBJ->phase == 2) {
-            func_L11_004461E8(obj);
+            joba_update_ribbon_scale(obj);
             if (OBJ->timer >= 0x97) {
-                ((Hero *)D_00189E20)->h[0x348 / 2] = 0;
+                ((Hero *)g_hero_state)->h[0x348 / 2] = 0;
                 D_L11_001A7CD8 = 5.0f;
-                func_L11_002D8EF8(0x81, 1);
+                hero_l11_enter_state(0x81, 1);
                 OBJ->phase = 3;
             }
         } else if (OBJ->phase == 3) {
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
-            if (((Hero *)D_00189E20)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)D_00189E20)->f[0x88 / 4]) {
-                ((Hero *)D_00189E20)->h[0x1F0 / 2] = 1;
+            if (((Hero *)g_hero_state)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)g_hero_state)->f[0x88 / 4]) {
+                ((Hero *)g_hero_state)->h[0x1F0 / 2] = 1;
             }
-            func_L11_004461E8(obj);
+            joba_update_ribbon_scale(obj);
             lt2 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            m3 = &D_L11_001B359C[st->lamp];
+            m3 = &g_moby_l11_table[st->lamp];
             if (lt2->height > 419.766f) {
                 f2 = lt2->height - 0.010000001f;
                 lt2->height = f2;
@@ -963,46 +963,46 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 cls2 = st->cls;
                 st->sound = 0;
                 st->owner = 0;
-                if (st->wave >= D_L11_001B14F8[cls2]->count) {
-                    if (cls2 == 1 && D_001395B8[func_L11_0043E108(1)] == 0) {
-                        func_002A7750(obj, 13, -1);
+                if (st->wave >= g_arena_challenge_table[cls2]->count) {
+                    if (cls2 == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
+                        moby_set_state(obj, 13, -1);
                         OBJ->timer = 0x96;
                     } else {
-                        func_002A7750(obj, 5, -1);
+                        moby_set_state(obj, 5, -1);
                         OBJ->timer = 0x96;
                     }
-                    func_L00_003DF6B0(1, -1);
-                    func_L00_004028C0((char *)1, -1);
+                    tracked_moby_set_state(1, -1);
+                    global_object_start((char *)1, -1);
                     st->result = st->cls;
                     return;
                 }
                 if (cls2 >= 13) {
                     st->cls = 0;
                 }
-                func_L11_00442E38(obj);
-                rec9 = &D_L11_001B14F8[st->cls]->records[st->wave];
-                func_L11_00441A58(obj, rec9->h[7]);
-                func_L11_00441D08(obj, rec9->h[6]);
+                arena_assign_fighters_to_spawns(obj);
+                rec9 = &g_arena_challenge_table[st->cls]->records[st->wave];
+                arena_set_group_a_active_count(obj, rec9->h[7]);
+                arena_set_group_b_active_count(obj, rec9->h[6]);
                 OBJ->state = 8;
             }
         }
     tail9:
         slot1 = (s32)obj >> 8;
-        func_L00_002E6CF0(func_L11_00444400, obj);
-        func_L11_004423F8(obj);
-        func_L11_00446020(obj);
+        gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
+        arena_update_camera_guide(obj);
+        joba_boss_pick_action_by_target(obj);
         if ((D_L11_001B30C8 & 7) == (slot1 & 7)) {
-            func_L11_00442170(obj);
+            arena_update_fighters_inside(obj);
         }
         if ((D_L11_001B30C8 & 0x3F) == (slot1 & 0x3F)) {
-            func_L11_00441350(obj);
+            arena_mark_nearest_fighters_to_attack(obj);
         }
-        if (func_L11_0043E090(st->cls) != -1) {
-            D_L11_001AA170 = func_L11_0043E090(st->cls);
+        if (arena_get_challenge_display_id(st->cls) != -1) {
+            D_L11_001AA170 = arena_get_challenge_display_id(st->cls);
             D_L11_001B3680 = D_001A7390;
         }
         break;
     }
-    func_L11_00440160(obj);
+    arena_end_frame(obj);
 }
 

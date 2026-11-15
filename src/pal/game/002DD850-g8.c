@@ -1,22 +1,22 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_002E5E58(int, int, int);
-extern char D_00138180[];
+extern void snd_play_from_global_bank(int, int, int);
+extern char g_pad_state[];
 extern int D_001ABCA0 __attribute__((sda));
 extern short D_001B2028[] MACRO_ADDR;
 extern u8 D_00261C08[];
 extern u8 D_001A7B30[] MACRO_ADDR;
-extern u8 D_001A7AF8[] MACRO_ADDR;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern u8 D_001395B8[];
 extern u8 D_001A7A60[] MACRO_ADDR;
 extern int D_001A8CEC MACRO_ADDR;
-extern void func_002AD7B8(int);
+extern void moby_mark_flag_and_append_to_list(int);
 extern void func_PAL_002B1588(int, int);
 
 /* Corresponds to RAC1 process_unlock_code_input. */
 void func_PAL_002DECA0(void) {
-    char *pad = D_00138180;
+    char *pad = g_pad_state;
     int lim0, lim;
     int va, vb, vc;
     int pressed, direction, j, code, index, matched;
@@ -55,16 +55,16 @@ void func_PAL_002DECA0(void) {
         vb = code - 74;
         vc = code - 80;
         if (code < 56) {
-            D_001A7AF8[code] = 1;
+            g_item_owned_flags[code] = 1;
             D_001A7B30[code] = 1;
         } else if ((unsigned)(code - 56) < 18) {
-            func_002AD7B8(va);
+            moby_mark_flag_and_append_to_list(va);
         } else if ((unsigned)vb < 6) {
             D_001395B8[vb] = 1;
         } else if ((unsigned)vc < 30) {
             if (!D_001A7A60[vc]) {
                 D_001A7A60[vc] = 1;
-                func_002E5E58(1, 0, 0);
+                snd_play_from_global_bank(1, 0, 0);
                 func_PAL_002B1588(0x1233, -1);
                 D_001A8CEC = 1;
             }

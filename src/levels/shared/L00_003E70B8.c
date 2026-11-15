@@ -17,26 +17,26 @@ extern void ref_L00_003E70B8_00(char *p);
 
 extern void ref_L00_003E70B8_01(char *p, float scale);
 
-extern long long func_0027C878(char *p);
+extern long long GetEffectTextureDescriptor(char *p);
 
-extern float func_00283248(float, float);
+extern float mat_fast_helper_a(float, float);
 
-extern float func_00282E80(char *p, float *v);
+extern float vec_distance_xy(char *p, float *v);
 
-extern void func_00283410(float *matrix, float *quat);
+extern void euler_to_matrix(float *matrix, float *quat);
 
-extern void func_00282CF0(char *dst, char *src, char *arg);
+extern void FastVecSub(char *dst, char *src, char *arg);
 
-extern void func_00282F20(char *dst, char *src, float scale);
+extern void vec_scale_to_length(char *dst, char *src, float scale);
 
-extern void func_00280B90(char *pkt, float *matrix, int mode);
+extern void draw_world_quad(char *pkt, float *matrix, int mode);
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet.
    Its own unit: the two bodies it calls are C in L00_003E3258.c, and a call inside one
    object fixes the distance between the two, which the retail does not keep in every
    level.  From here both calls are global and the linker places them per program. */
 /* Draws one glowing sprite at a position, turned to face the aim point, with the given colour, size and blend. */
-void func_L00_003E70B8(char *position, int colorRgb, int alpha, char *texture, int blendFlags,
+void gfx_draw_aimed_sprite(char *position, int colorRgb, int alpha, char *texture, int blendFlags,
                        float sizeScale, float roll, float offsetScale)
 {
     char drawPacket[144];
@@ -58,9 +58,9 @@ void func_L00_003E70B8(char *position, int colorRgb, int alpha, char *texture, i
     *(long long *)(drawPacket + 120) = textureReg;
 
     aim[3] = 0.0f;
-    aim[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(position + 0),
+    aim[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(position + 0),
                             D_L00_001B8C80.y_144 - *(float *)(position + 4));
-    aim[1] = -FastMatrixHelperA(vec_distance_xy(position, &D_L00_001B8C80.x_140),
+    aim[1] = -mat_fast_helper_a(vec_distance_xy(position, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(position + 8));
     aim[0] = roll;
 

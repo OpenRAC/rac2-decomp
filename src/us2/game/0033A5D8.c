@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_00336320_1(char *a);
 extern void func_00336A78_1(char *a);
@@ -19,10 +20,10 @@ void func_US2_0033A5D8(char *a0)
 
 char *func_US2_0033A640(char *object)
 {
-    extern void func_0033AB50(void *);
-    extern void *func_003361A8(void *);
-    func_0033AB50(object + 8);
-    func_003361A8(object + 0x2D8);
+    extern void prompt_bar_destroy(void *);
+    extern void *object_construct_derived_a(void *);
+    prompt_bar_destroy(object + 8);
+    object_construct_derived_a(object + 0x2D8);
     return object;
 }
 
@@ -31,19 +32,19 @@ typedef unsigned char u8;
 
 void func_US2_0033A7A8(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
 
-extern void func_0033AE18(unsigned char *owner, int value);
+extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
 void func_US2_0033A7B8(unsigned char *owner, int value)
 {
-    func_0033AE18(owner + 8, value);
+    prompt_bar_set_texts_enabled(owner + 8, value);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
 void func_US2_0033A7D8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
 
 extern int func_00288FB8_3(int);
-extern void func_0033B050(char *, int, int, int);
-extern void func_0033B0A8(char *, float);
+extern void prompt_bar_set_texts(char *, int, int, int);
+extern void prompt_bar_set_spacing(char *, float);
 
 /* Calls a one-argument helper three times with three fixed small integers, passes the three results and a pointer plus 8 to a four-argument helper, calls a two-argument helper with the same address and 0.0f, then clears the word at offset 764. */
 void func_US2_0033A7E0(char *p)
@@ -51,12 +52,12 @@ void func_US2_0033A7E0(char *p)
     int first = func_00288FB8_3(11316);
     int second = func_00288FB8_3(11314);
 
-    func_0033B050(p + 8, first, second, func_00288FB8_3(11237));
-    func_0033B0A8(p + 8, 0.0f);
+    prompt_bar_set_texts(p + 8, first, second, func_00288FB8_3(11237));
+    prompt_bar_set_spacing(p + 8, 0.0f);
     *(int *)(p + 812) = 0;
 }
 
-extern void *func_00288FB8(int);
+extern void *GetLocalizedString(int);
 extern void func_US2_0033C098(void *, void *, void *, void *);
 extern void func_US2_0033C0F0(void *, float);
 
@@ -68,9 +69,9 @@ void func_US2_0033A860(int *self)
     void *c;
     void *sub = (void *)(self + 2);
 
-    a = func_00288FB8(11315);
-    b = func_00288FB8(11314);
-    c = func_00288FB8(11237);
+    a = GetLocalizedString(11315);
+    b = GetLocalizedString(11314);
+    c = GetLocalizedString(11237);
 
     func_US2_0033C098(sub, a, b, c);
     func_US2_0033C0F0(sub, 0.0f);
@@ -83,7 +84,7 @@ extern int D_L00_001A8FD8 __attribute__((sda));
 extern int D_L00_001A8FDC __attribute__((sda));
 extern void func_US2_0033BE68(int *p, int flag);
 extern void func_US2_0033BF90(int *p);
-extern void func_00336320(int *p);
+extern void gfx_draw_screen_element_stored(int *p);
 
 /* Lazily initialises a sub-object of the argument behind two global flags and a field, runs one guarded setup step on it, then hands it to two callees. */
 void func_US2_0033A9F8(int *obj)
@@ -93,7 +94,7 @@ void func_US2_0033A9F8(int *obj)
     if (obj[203] == 1)
         func_US2_0033BE68(obj + 2, 1);
     func_US2_0033BF90(obj + 2);
-    func_00336320(obj + 182);
+    gfx_draw_screen_element_stored(obj + 182);
 }
 
 
@@ -126,16 +127,16 @@ typedef struct {
     float x, y;
 } Point2_0033AF70;
 
-extern void *func_00115484(void *, int, int);
-extern void func_00335F88(void *, float, float, float, float);
-extern void func_00335E38(void *, float, float, float, float);
-extern int func_002DF1F8(void *, int);
-extern void func_00336A38(void *, int);
+extern void *memset(void *, int, int);
+extern void object_set_second_float4(void *, float, float, float, float);
+extern void object_set_first_float4(void *, float, float, float, float);
+extern int text_format_location_name(void *, int);
+extern void hud_set_widget_field_b(void *, int);
 extern Point2_0033AF70 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
 extern Point2_0033AF70 D_001ADD00 __attribute__((sda));
 /* Two views of one object: retail reads .x through $gp and .y through its absolute macro form. */
 extern Point2_0033AF70 D_001ADD00_gp __asm__("D_001ADD00__gp") __attribute__((section(".sdata")));
-extern char D_001C4FA0[];
+extern char g_map_overlay_state[];
 extern int D_00258D70[];
 extern char D_001ADC88[];
 
@@ -146,53 +147,53 @@ int func_US2_0033AF70(char *obj, int unused)
     char *base;
     int index;
 
-    func_00115484(&z0, 0, 8);
-    func_00115484(&z1, 0, 8);
-    func_00115484(&z2, 0, 8);
-    func_00115484(&z3, 0, 8);
+    memset(&z0, 0, 8);
+    memset(&z1, 0, 8);
+    memset(&z2, 0, 8);
+    memset(&z3, 0, 8);
     title = D_001ADCE0;
     list = D_001ADCE8;
     prev = D_001ADCF0;
     next = D_001ADCF8;
-    func_00335F88(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335F88(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    func_00335E38(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
+    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    object_set_first_float4(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
                   z0.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
                   z3.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0xA0, z1.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0xA0, z1.x + (*(float **)(obj + 4))[0],
                   z1.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0xEC, z2.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0xEC, z2.x + (*(float **)(obj + 4))[0],
                   z2.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x138, title.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x138, title.x + (*(float **)(obj + 4))[0],
                   title.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x190, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x190, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x1E8, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x1E8, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 18.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x240, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x240, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 36.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x298, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x298, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 54.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x2F0, list.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x2F0, list.x + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 72.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x348, list.x + 8.0f + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x348, list.x + 8.0f + (*(float **)(obj + 4))[0],
                   list.y + (*(float **)(obj + 4))[1] + 90.0f, 0.0f, 0.0f);
-    func_00335E38(obj + 0x3A0, prev.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x3A0, prev.x + (*(float **)(obj + 4))[0],
                   prev.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    func_00335E38(obj + 0x3F8, next.x + (*(float **)(obj + 4))[0],
+    object_set_first_float4(obj + 0x3F8, next.x + (*(float **)(obj + 4))[0],
                   next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
-    base = D_001C4FA0;
-    func_002DF1F8(obj + 0x450, *(int *)(base + 0x230));
+    base = g_map_overlay_state;
+    text_format_location_name(obj + 0x450, *(int *)(base + 0x230));
     index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
     if (index >= 0)
-        func_00336A38(obj + 0x3F8, (int)func_00288FB8(index));
+        hud_set_widget_field_b(obj + 0x3F8, (int)GetLocalizedString(index));
     else
-        func_00336A38(obj + 0x3F8, (int)D_001ADC88);
+        hud_set_widget_field_b(obj + 0x3F8, (int)D_001ADC88);
     return 0;
 }
 

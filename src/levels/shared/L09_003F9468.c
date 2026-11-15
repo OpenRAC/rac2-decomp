@@ -23,9 +23,9 @@ struct DobboPartsObject252 {
     short class_code;
 };
 
-extern void func_002AF1D0(void *, void *, int, int);
+extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
 
-extern void func_L09_003F7788(void *, void *);
+extern void moby_copy_color(void *, void *);
 
 typedef float f32;
 
@@ -49,19 +49,19 @@ typedef struct {
     NativeAngleState *field68;
 } NativeAngleOwner __attribute__((aligned(16)));
 
-extern void func_00282CF0(f32 *output, const f32 *left, const f32 *right);
+extern void FastVecSub(f32 *output, const f32 *left, const f32 *right);
 
-extern void func_002AFDD8(NativeAngleOwner *owner, f32 *output, const f32 *input, s32 mode);
+extern void vec_transform_by_object_or_given(NativeAngleOwner *owner, f32 *output, const f32 *input, s32 mode);
 
-extern f32 func_00283248(f32 x, f32 y);
+extern f32 mat_fast_helper_a(f32 x, f32 y);
 
-extern f32 func_00282E20(const f32 *vector);
+extern f32 vec_length_xy(const f32 *vector);
 
-extern void func_00282CF0(float *, const float *, const float *);
+extern void FastVecSub(float *, const float *, const float *);
 
 /* validate descriptorparent classD0E/status then attach two optionalparts, propagate flag/disabled state and original packed-color helper */
 /* Attaches the two arm parts to the torso and copies the on or off state to them. */
-void func_L09_003F9468(DobboPartsObject252 *object)
+void trooper_attach_arm_parts(DobboPartsObject252 *object)
 {
     DobboPartsDescriptor252 *descriptor = object->descriptor;
     DobboPartsObject252 *parent = descriptor->parent;
@@ -70,7 +70,7 @@ void func_L09_003F9468(DobboPartsObject252 *object)
         return;
     for (i = 0; i < 2; ++i) {
         if (descriptor->parts[i]) {
-            CopyJointTransformToObject(descriptor->parent, descriptor->parts[i], i, i == 1 ? 6 : 0);
+            moby_copy_joint_transform_to_object(descriptor->parent, descriptor->parts[i], i, i == 1 ? 6 : 0);
             if (object->disabled) {
                 descriptor->parts[i]->flags &= ~1U;
                 descriptor->parts[i]->disabled = 1;
@@ -78,7 +78,7 @@ void func_L09_003F9468(DobboPartsObject252 *object)
                 descriptor->parts[i]->flags |= 1;
                 descriptor->parts[i]->disabled = 0;
             }
-            CopyMobyColor(object, descriptor->parts[i]);
+            moby_copy_color(object, descriptor->parts[i]);
         }
     }
 }
@@ -90,7 +90,7 @@ extern s32 func_33E658(s32 moby);
 
 /* Refreshes the cached 16-bit handle of the state's 0x2DC entry. */
 /* Toggles the enemy's cached path handle between empty and the current path. */
-s32 func_L09_003F9928(char *moby)
+s32 path_toggle_handle_cache(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     short cachedHandle = *(short *)(vars + 0x1CA);
@@ -112,18 +112,18 @@ s32 func_L09_003F9928(char *moby)
 
 /* computes a local target direction and stores bounded horizontal and vertical angles through the original math helpers */
 /* Turns the object to face its target, with limits on how far it can turn left, right, up and down. */
-void func_L09_004051F8(NativeAngleOwner *owner) {
+void moby_turn_toward_target_limited(NativeAngleOwner *owner) {
     f32 direction[4] __attribute__((aligned(16)));
     NativeAngleState *state = owner->field68;
     f32 angle, xy_length;
     FastVecSub(direction, state->field1F0, owner->field10);
-    TransformVectorByObjectOrGiven(owner, direction, direction, 0);
-    angle = FastMatrixHelperA(direction[0], direction[1]);
+    vec_transform_by_object_or_given(owner, direction, direction, 0);
+    angle = mat_fast_helper_a(direction[0], direction[1]);
     state->field2E0 = angle;
     if (0.78539824f < angle) state->field2E0 = 0.78539824f;
     else if (angle < -0.78539824f) state->field2E0 = -0.78539824f;
     xy_length = vec_length_xy(direction);
-    angle = -FastMatrixHelperA(xy_length, direction[2]);
+    angle = -mat_fast_helper_a(xy_length, direction[2]);
     state->field2E8 = angle;
     if (0.52359885f < angle) state->field2E8 = 0.52359885f;
     else if (angle < -0.52359885f) state->field2E8 = -0.52359885f;

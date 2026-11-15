@@ -19,6 +19,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import srcnames  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 TABLE = ROOT / "config/fakematch.tsv"
 TAG = "FAKEMATCH:"
@@ -103,12 +106,12 @@ def problems(rows: list, defined: dict = None) -> list:
 
 
 def collect() -> list:
-    return [row for rel in sources() for row in rows_of(rel, (ROOT / rel).read_text(errors="surrogateescape"))]
+    return [row for rel in sources() for row in rows_of(rel, srcnames.canon((ROOT / rel).read_text(errors="surrogateescape")))]
 
 
 def defined_functions(rows: list) -> dict:
     """{file: names of the functions it defines}, for the files that have a site."""
-    return {rel: {name for _, _, name in function_lines((ROOT / rel).read_text(errors="surrogateescape"))}
+    return {rel: {name for _, _, name in function_lines(srcnames.canon((ROOT / rel).read_text(errors="surrogateescape")))}
             for rel in {r[0] for r in rows}}
 
 

@@ -12,17 +12,17 @@ extern int D_L26_001B06A8 __attribute__((sda));
 extern int D_L26_001B06AC[5];
 extern Vector D_L26_0029ABD0[];
 extern short D_L26_0029B3D0[][12];
-extern unsigned long long func_0027C878(int);
-extern int func_00283CF0(float);
-extern float func_00283198(float);
-extern unsigned int func_00283D38(unsigned int, unsigned int, float);
-extern void func_00280B90(void *, void *, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern int FloatToInt(float);
+extern float math_fast_sin_or_cos_b(float);
+extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
+extern void draw_world_quad(void *, void *, int);
 
 /* Builds a four-vertex draw packet with fixed GS state words and submits each of the 64 faces of
    the vertex/face tables twice, with UVs scrolled and colours blended from the object's private
    phase values (+0x0/+0x4 for the blend, +0x8/+0xC for the scroll). The state words are cleared and
    then accumulated field by field; `face` is scoped to the loop block. */
-void func_L26_003DF7E8(char *object) {
+void DrawDoubleLayerQuadMesh(char *object) {
     DrawPacket packet;
     float *private = *(float **)(object + 0x68);
     float blend;
@@ -56,7 +56,7 @@ void func_L26_003DF7E8(char *object) {
                 unsigned int *entry;
                 index = FloatToInt(packet.uv[j][1] + 0.2f);
                 packet.uv[j][0] = D_L26_001B0688[j][0] + private[2];
-                blend = FastSinOrCosB(private[0] * 3.1415927f);
+                blend = math_fast_sin_or_cos_b(private[0] * 3.1415927f);
                 entry = &D_L26_001B0680[index];
                 packet.color[j] = FastTweenColor(*entry & 0xFFFFFF, *entry, blend);
             }
@@ -66,7 +66,7 @@ void func_L26_003DF7E8(char *object) {
                 unsigned int *entry;
                 index = FloatToInt(packet.uv[j][1] + 0.2f);
                 packet.uv[j][0] = D_L26_001B0688[j][0] + private[3];
-                blend = FastSinOrCosB(private[1] * 3.1415927f);
+                blend = math_fast_sin_or_cos_b(private[1] * 3.1415927f);
                 entry = &D_L26_001B0680[index];
                 packet.color[j] = FastTweenColor(*entry & 0xFFFFFF, *entry, blend);
             }

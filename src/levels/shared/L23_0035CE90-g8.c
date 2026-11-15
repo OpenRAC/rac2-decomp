@@ -1,6 +1,7 @@
 /* Initialization-table relative of func_L00_00354DF8. The measured current
  * correction leaves the preceding function's tail in assembly. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
 extern int D_00139948[];
@@ -13,7 +14,7 @@ extern int * volatile D_L23_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L23_001CAC20;
 
 /* Fills the menu entry table from the list of item ids, then finds which entry is currently selected and stores its index in the menu object. */
-int func_L23_0035CE90(char *obj) {
+int menu_init_entry_table(char *obj) {
     int i, current;
     int *selectList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {

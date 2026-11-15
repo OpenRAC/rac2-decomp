@@ -10,24 +10,24 @@ typedef struct {
     char pad[0x80];
     float pos[4];
 } Hero;
-extern Hero D_00189E20;
+extern Hero g_hero_state;
 extern float D_L20_001B1FE4 __attribute__((sda));
 extern float D_L20_001B1FE8 __attribute__((sda));
 extern Vector D_L20_001B2010 SDATA(D_L20_001B2010);
-extern void func_L20_0043FC70(char *), func_0029F338(char *);
-extern void func_L20_00440460(char *), func_002A7750(char *, int, int);
+extern void yeedil_small_enemy_init_damage(char *), moby_mark_spawned(char *);
+extern void moby_enter_state_six(char *), moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
-extern void func_00283098(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern void func_00273B70(char *), func_002833F0(void *, void *);
-extern void func_002AA2E8(void *, float, float), func_00282F70(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern void cam_moby_update(char *), euler_rotation_basis(void *, void *);
+extern void ApproachValue(void *, float, float), vec_fast_normalize_helper(void *, void *, float);
 extern float D_L20_001B2BE8;
-extern float func_002A78D8(float, float);
-extern int func_00283CF0(float);
-extern char *func_002A9640(char *, int, int);
+extern float math_random_signed_float_range(float, float);
+extern int FloatToInt(float);
+extern char *part_find_owned_effect_slot(char *, int, int);
 extern float func_PAL_002AA108(char *, char *);
-extern void func_00282CF0(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
 extern int func_PAL_002B1A50(char *, char *, int);
-extern int func_002B3BA8(char *, int, void *, int, float, float);
+extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 
 void func_PAL_L20_00445668(char *arg0) {
     char *st = *(char **)(arg0 + 0x68);
@@ -48,7 +48,7 @@ void func_PAL_L20_00445668(char *arg0) {
         *(float *)(st + 0x60) = 1.57079649f;
         *(float *)(st + 0x80) = 0.785398245f;
         {
-            float angle = func_002A78D8(18.0f, 22.0f) * 0.0174532942f;
+            float angle = math_random_signed_float_range(18.0f, 22.0f) * 0.0174532942f;
             float speed = D_L20_001B1FE4 * 0.020000001f;
             float accel = D_L20_001B1FE8 * 0.00040000002f;
 
@@ -60,8 +60,8 @@ void func_PAL_L20_00445668(char *arg0) {
             *(float *)(st + 0x74) = accel;
         }
         *(int *)(st + 0x88) |= 0x200;
-        *(unsigned char *)(st + 0x48) = func_00283CF0(8.0f);
-        *(unsigned char *)(st + 0x4A) = func_00283CF0(12.0f);
+        *(unsigned char *)(st + 0x48) = FloatToInt(8.0f);
+        *(unsigned char *)(st + 0x4A) = FloatToInt(12.0f);
         *(unsigned char *)(st + 0x29) = 1;
         if (*(short *)(st + 0x24) == 0) {
             *(short *)(st + 0x24) = 3;
@@ -69,7 +69,7 @@ void func_PAL_L20_00445668(char *arg0) {
         }
         *(int *)(arg0 + 0x98) = 0;
         *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(arg0, 6, 3);
+        moby_set_state(arg0, 6, 3);
         if (*(unsigned char *)(arg0 + 0x43) != 0) {
             func_PAL_002A7E68(arg0, 0, 0, 0);
         }
@@ -82,32 +82,32 @@ void func_PAL_L20_00445668(char *arg0) {
     if (*(unsigned char *)(st + 0x2E) == 2) {
         *(int *)(arg0 + 0x98) = 0;
         *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(arg0, 6, 3);
+        moby_set_state(arg0, 6, 3);
     }
     *(unsigned char *)(st + 0x2E) = 1;
 
     if (*(unsigned char *)(arg0 + 0x20) == 7 && *(float *)(st + 0x20) > 0.0f) {
-        char *hit = func_002A9640(arg0, 0x10000, 0);
+        char *hit = part_find_owned_effect_slot(arg0, 0x10000, 0);
         float damage = func_PAL_002AA108(arg0, hit);
 
-        func_002AA2E8(st + 0x20, 0.0f, damage);
+        ApproachValue(st + 0x20, 0.0f, damage);
         *(unsigned char *)(arg0 + 0xA8) = 0xFF;
         if (*(float *)(st + 0x20) <= 0.0f) {
             *(float *)(arg0 + 0xF4) = 0.0f;
             *(float *)(arg0 + 0xF0) = 0.0f;
-            func_00283098(&a, st + 0x230, arg0 + 0xC0);
-            func_002833F0(arg0 + 0xC0, arg0 + 0xF0);
-            func_00283098(&b, st + 0x230, arg0 + 0xC0);
-            func_00282CF0(&b, &b, &a);
-            func_00282CF0(arg0 + 0x10, arg0 + 0x10, &b);
+            matrix_mul_vec3(&a, st + 0x230, arg0 + 0xC0);
+            euler_rotation_basis(arg0 + 0xC0, arg0 + 0xF0);
+            matrix_mul_vec3(&b, st + 0x230, arg0 + 0xC0);
+            FastVecSub(&b, &b, &a);
+            FastVecSub(arg0 + 0x10, arg0 + 0x10, &b);
         }
     } else {
         func_PAL_002B1A50(arg0, st + 0x140, 0);
     }
-    func_002B3BA8(arg0, *(int *)(st + 0x270), 0, 0, 64.0f, 0.0f);
+    weapon_select_aim_target(arg0, *(int *)(st + 0x270), 0, 0, 64.0f, 0.0f);
 
     if (*(int *)(st + 0x204) == 0) {
-        char *g = (char *)&D_00189E20;
+        char *g = (char *)&g_hero_state;
 
         *(char **)(st + 0x200) = *(char **)(g + 0x2290);
         qcopy(st + 0x1F0, *(char **)(g + 0x2290) + 0x10);

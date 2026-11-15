@@ -12,17 +12,17 @@ extern f32 D_L11_001B016C __attribute__((sda));
 extern f32 D_L11_001B0174 __attribute__((sda));
 extern u8 D_L11_001C0D20[];
 extern u8 D_L11_001A8F20[] __attribute__((sda));
-extern s32 func_002761F8(void *, void *, s32, void *, s32);
-extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void func_002E5CF8(s32, s32, u8 *);
-extern void func_0029F338(u8 *);
-extern void *func_002A9640(void *, int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002A7750(void *, int, int);
+extern s32 CollLine(void *, void *, s32, void *, s32);
+extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void PlayMobySound(s32, s32, u8 *);
+extern void moby_mark_spawned(u8 *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern void FastVecAdd(void *, void *, void *);
+extern void moby_set_state(void *, int, int);
 
 /* Updates the Hoverbike Race Bomb (moby class 2679). It flies along its path, lands on a
    hit, and blows up when something touches it or after a short time. */
-void func_L11_003DCEB0(u8 *moby) {
+void hoverbike_bomb_update(u8 *moby) {
     u8 vec[16] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby + 0x68);
     s32 expired = 0;
@@ -35,7 +35,7 @@ void func_L11_003DCEB0(u8 *moby) {
         if (CollLine(moby + 0x10, vec, 2, 0, 0) != 0) {
             qcopy(moby + 0x10, D_L11_001C0D20);
             *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + D_L11_001B0170 * D_L11_001B016C;
-            SetMobyState(moby, 1, -1);
+            moby_set_state(moby, 1, -1);
         } else {
             qcopy(moby + 0x10, vec);
         }
@@ -45,9 +45,9 @@ void func_L11_003DCEB0(u8 *moby) {
         if (*(u16 *)(moby + 0x96) >= 0x79) expired = state;
         break;
     }
-    if (FindOwnedEffectSlot(moby, -1, 0) != 0 || expired != 0) {
+    if (part_find_owned_effect_slot(moby, -1, 0) != 0 || expired != 0) {
         SpawnExplosionEffects(moby, D_L11_001A8F20, moby + 0x10, D_L11_001B0174, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         PlayMobySound(0, 0, moby);
-        MarkMobySpawned(moby);
+        moby_mark_spawned(moby);
     }
 }

@@ -5,26 +5,26 @@
 extern float D_002625B0[][4], D_002620A0[][4], D_00214A30[][4];
 extern float D_00214CE0[][2], D_00214E38[][2];
 extern short D_00262350[][8];
-extern int D_001A8BB0;
-extern float D_001B5200[];
+extern int g_current_game_mode;
+extern float g_active_camera[];
 extern int D_001ABF00 __attribute__((sda));
 extern int D_001ABF04 __attribute__((sda));
 extern int D_001ABF08 __attribute__((sda));
 extern short D_00152C20 NOT_SDA;
-extern unsigned long long func_0027C878(int);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00282C48(float);
-extern void func_00282948(int *);
-extern float func_00283CE0(int);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282DB0(void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern float func_00282C10(float);
-extern void func_00280B90(void *, int, int);
+extern unsigned long long GetEffectTextureDescriptor(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float math_fabs(float);
+extern void math_fast_float_d(int *);
+extern float IntToFloat(int);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float FastVecDot(void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern float square_root(float);
+extern void draw_world_quad(void *, int, int);
 /* Draws a shiny reflection mesh on an object, with textures that follow the camera. */
-void func_002ECB70(void *object)
+void render_environment_mapped_object(void *object)
 {
  struct {
   float vertex[4][4];
@@ -44,21 +44,21 @@ void func_002ECB70(void *object)
  short (*quads)[8] = D_00262350;
  quad.packet[1] = GetEffectTextureDescriptor(21);
  quad.packet[0] = 0;
- color = gCurrentGameMode == 2 ? 0x28a5a281 : 0x3ca5a281;
+ color = g_current_game_mode == 2 ? 0x28a5a281 : 0x3ca5a281;
  active = 0;
  quad.packet[2] = 0xff9000000260ULL;
  quad.packet[3] = 0x8000000044ULL;
  quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
- TransformMobyJointPoint(object, 0, matrix);
+ moby_transform_joint_point(object, 0, matrix);
  transform = matrix;
- if (gCurrentGameMode == 0 || gCurrentGameMode == 2) {
-  if (FloatAbs(gActiveCamera[0x50] - *(float *)(o + 0x10)) < 16.0f &&
-      FloatAbs(gActiveCamera[0x51] - *(float *)(o + 0x14)) < 16.0f) active = 1;
+ if (g_current_game_mode == 0 || g_current_game_mode == 2) {
+  if (math_fabs(g_active_camera[0x50] - *(float *)(o + 0x10)) < 16.0f &&
+      math_fabs(g_active_camera[0x51] - *(float *)(o + 0x14)) < 16.0f) active = 1;
  } else active = 1;
- if (gCurrentGameMode == 6 && D_00152C20 == 2) active = 0;
+ if (g_current_game_mode == 6 && D_00152C20 == 2) active = 0;
  if (active || D_001ABF00 == 1) {
   D_001ABF04 = 1;
-  FastFloatHelperD(&D_001ABF08);
+  math_fast_float_d(&D_001ABF08);
   fraction = IntToFloat(D_001ABF08) / IntToFloat(60);
   {
   float *t = transform;
@@ -67,7 +67,7 @@ void func_002ECB70(void *object)
   for (i = 0; i < 43; i++) {
    float divisor, x;
    transform_vector(D_00214A30[i], p[i], t);
-   FastVecSub(ray, D_00214A30[i], &gActiveCamera[0x50]);
+   FastVecSub(ray, D_00214A30[i], &g_active_camera[0x50]);
    vec_scale_to_length(ray, ray, 1.0f);
    transform_vector(normal, n[i], t);
    vec_scale_to_length(normal, normal, 0.1f);

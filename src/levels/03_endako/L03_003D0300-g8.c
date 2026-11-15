@@ -4,11 +4,11 @@ extern void func_31B920(char *, int, int);
 extern int func_2E1C70(float, void *, int, void *, int);
 extern float func_2EF190(void *, void *);
 extern void func_311758(void *);
-extern int D_L03_001B2548;
+extern int g_frame_l03_counter;
 extern char *D_L03_001C3E40[];
 extern int D_L03_001B0580 __attribute__((sda));
 /* Per-frame update of moby class 2516, a piece of debris thrown from a trash can: it flies, breaks when it hits a Megacorp bot or the hero, then fades away. */
-void func_L03_003D0300(char *moby)
+void trash_can_debris_update(char *moby)
 {
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
@@ -18,7 +18,7 @@ void func_L03_003D0300(char *moby)
         }
         break;
     case 1:
-        if ((gFrameCounter_L03 & 15) == (((int)moby >> 8) & 15)) {
+        if ((g_frame_l03_counter & 15) == (((int)moby >> 8) & 15)) {
             int count = func_2E1C70(0.2f, moby + 0x10, 0, moby, 0);
             if (count > 0) {
                 int remaining = count;

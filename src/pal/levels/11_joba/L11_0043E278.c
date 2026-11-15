@@ -53,20 +53,20 @@ struct RotorObject {
       struct RotorAxis basis[3];
 };
 extern struct RotorPath *D_L11_001FF580[];
-extern int D_L11_001B359C __attribute__((sda));
-extern void func_00282CF0(void *, const void *, const void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
+extern int g_moby_l11_table __attribute__((sda));
+extern void FastVecSub(void *, const void *, const void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
 #define ROTOR_RECORD(index) ((struct RotorObject *)(D_L11_001B359C + ((index) << 8)))
 #define LISTED_RECORD(obj, i) ROTOR_RECORD((obj)->state->records[i])
-extern int func_00282978(short *);
-extern void func_0029FCC0(void *, int, void *);
-extern void func_0029FC20(void *, int, void *);
-extern char *func_L07_003F6B88(int);
-extern void func_L11_00458A98(char *, void *, int, int, void *, void *, int, float, float);
-extern void func_002A7A00(float *, float, float);
+extern int FastDecTimer(short *);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern void moby_transform_joint_point(void *, int, void *);
+extern char *moby_find_active_in_group(int);
+extern void joba_shot_init(char *, void *, int, int, void *, void *, int, float, float);
+extern void vec_random_direction(float *, float, float);
 extern struct RotorPath *D_L11_001FF580[];
-extern void func_002A7A00(float *out, float a, float b);
+extern void vec_random_direction(float *out, float a, float b);
 
 /* Emits a projectile from the next enabled record, with a fifteen-frame delay. */
 void func_PAL_L11_0043E278(struct RotorObject *obj)
@@ -89,24 +89,24 @@ void func_PAL_L11_0043E278(struct RotorObject *obj)
         state->projectileIndex = -1;
         return;
     }
-    if (!func_00282978(&state->projectileDelay))
+    if (!FastDecTimer(&state->projectileDelay))
         return;
 
-    func_0029FCC0(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
-    func_0029FC20(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
-    func_00282F20(offset, matrix[2], -0.3f);
-    func_00282CC0(pos, pos, offset);
+    moby_transform_joint_to_world(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
+    moby_transform_joint_point(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
+    vec_scale_to_length(offset, matrix[2], -0.3f);
+    FastVecAdd(pos, pos, offset);
 
-    func_002A7A00(jitter, 0.020000001f, 0.060000002f);
+    vec_random_direction(jitter, 0.020000001f, 0.060000002f);
     jitter[2] = -0.10000001f;
     qcopy_nc(velocity, jitter);
-    func_00282CF0(toTarget, state->aim, pos);
-    func_00282F20(toTarget, toTarget, 0.40000004f);
-    func_00282CC0(velocity, velocity, toTarget);
+    FastVecSub(toTarget, state->aim, pos);
+    vec_scale_to_length(toTarget, toTarget, 0.40000004f);
+    FastVecAdd(velocity, velocity, toTarget);
 
-    projectile = func_L07_003F6B88(state->projectileClass);
+    projectile = moby_find_active_in_group(state->projectileClass);
     if (projectile)
-        func_L11_00458A98(projectile, LISTED_RECORD(obj, state->projectileIndex), obj->fB8,
+        joba_shot_init(projectile, LISTED_RECORD(obj, state->projectileIndex), obj->fB8,
                           state->f60, pos, velocity, 120, 0.004f, state->f35);
     ++state->projectileIndex;
     state->projectileDelay = 12;

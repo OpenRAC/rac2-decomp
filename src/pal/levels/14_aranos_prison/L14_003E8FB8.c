@@ -1,20 +1,21 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_PAL_L14_003E8FB8, the PAL copy of func_L14_003E4BA0: the same C, where the reloaded key
    counter is the key word, read whole and scaled to 50 Hz. The walks also pair up differently:
    retail keeps the first in $a2 and the other two in $a1, so the first has its own pointer and
    the other two share one. */
 
-extern unsigned short *D_L14_001FB060[];
-extern unsigned char *D_L14_001B259C __attribute__((sda));
+extern unsigned short *g_group_entity_lists[];
+extern unsigned char *g_moby_l14_pool __attribute__((sda));
 extern int D_L14_001B25B8 __attribute__((sda));
-extern int func_002B3868(char *self);
-extern int func_00282978(char *p);
+extern int flag_set_first_pending(char *self);
+extern int FastDecTimer(char *p);
 extern void func_PAL_L14_003E92D8(char *self);
-extern void func_L14_003E5030(char *self);
+extern void moby_store_pos_lookup_links(char *self);
 extern void func_PAL_L14_003E9570(char *self);
-extern void func_L14_003E5190(char *self);
-extern void func_L14_003E51B0(char *self);
+extern void moby_clear_linked_flag(char *self);
+extern void moby_send_colors_to_linked(char *self);
 extern void func_PAL_L14_003E96D8(char *self);
 
 /* The key state of an object that steers a group (+0x14 the current key, +0x16 the key index,
@@ -35,11 +36,11 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
 
     switch (self[0x20]) {
     case 0:
-        for (p = D_L14_001FB060[self[0x21]];
+        for (p = g_group_entity_lists[self[0x21]];
              self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && p != 0 &&
-             ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[self[0x21]]);
+             ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self[0x21]]);
              p++) {
-            e = D_L14_001B259C + ((*p & 0x7FFF) << 8);
+            e = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
             if (e == 0)
                 break;
             if (*(short *)(e + 0xAA) == 0xB19) {
@@ -53,39 +54,39 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
                 *(unsigned short *)(d + 0x4A) = *(unsigned short *)(state + 0x4A);
             }
         }
-        func_L14_003E5030((char *)self);
+        moby_store_pos_lookup_links((char *)self);
         break;
     case 2:
-        if (func_002B3868((char *)self) != 0) {
+        if (flag_set_first_pending((char *)self) != 0) {
             func_PAL_L14_003E96D8((char *)self);
-            func_L14_003E5190((char *)self);
+            moby_clear_linked_flag((char *)self);
         }
         break;
     case 1:
-        if (func_002B3868((char *)self) != 0)
-            func_L14_003E51B0((char *)self);
+        if (flag_set_first_pending((char *)self) != 0)
+            moby_send_colors_to_linked((char *)self);
         func_PAL_L14_003E92D8((char *)self);
         break;
     }
     if (*(int *)(state + 0x34) != 0) {
-        if (func_00282978((char *)(state + 0x14)) != 0) {
+        if (FastDecTimer((char *)(state + 0x14)) != 0) {
             *(unsigned short *)(state + 0x14) = (*(int *)(state + 0x34) * 5 + 2) / 6;
-            for (q = D_L14_001FB060[self[0x21]];
+            for (q = g_group_entity_lists[self[0x21]];
                  self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && q != 0 &&
-                 ((q != 0 && (short)q[-1] >= 0) || q == D_L14_001FB060[self[0x21]]);
+                 ((q != 0 && (short)q[-1] >= 0) || q == g_group_entity_lists[self[0x21]]);
                  q++) {
-                e = D_L14_001B259C + ((*q & 0x7FFF) << 8);
+                e = g_moby_l14_pool + ((*q & 0x7FFF) << 8);
                 if (e == 0)
                     break;
                 if (*(short *)(e + 0xAA) == 0xB19)
                     *(unsigned short *)(*(unsigned char **)(e + 0x68) + 0x16) = 0;
             }
         }
-        for (q = D_L14_001FB060[self[0x21]];
+        for (q = g_group_entity_lists[self[0x21]];
              self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && q != 0 &&
-             ((q != 0 && (short)q[-1] >= 0) || q == D_L14_001FB060[self[0x21]]);
+             ((q != 0 && (short)q[-1] >= 0) || q == g_group_entity_lists[self[0x21]]);
              q++) {
-            e = D_L14_001B259C + ((*q & 0x7FFF) << 8);
+            e = g_moby_l14_pool + ((*q & 0x7FFF) << 8);
             if (e == 0)
                 break;
             if (*(short *)(e + 0xAA) == 0xB19)

@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern void func_00282D30(char *dst, char *src, float value);
+extern void FastVecScale(char *dst, char *src, float value);
 
 /* Copies the donor record into the object: the header quadword, then the two transform rows that its mode selects, then the last row. */
-void func_L05_00416E08(char *object)
+void donor_transform_copy(char *object)
 {
     char *sub = *(char **)(object + 0x68);
     char *src = *(char **)(sub + 0x50);

@@ -24,17 +24,17 @@ typedef struct {
 /* the list of mobs: level 04 has it at 0x001BD3C0, every level at its own address */
 extern MobListStruct ref_L04_0031D630_00;
 
-extern s32 D_001A79F0 MACRO_ADDR;
+extern s32 g_current_map_index MACRO_ADDR;
 
 /* shared callees, named by their catalogue rows */
-extern void func_L00_002FC980(void);
+extern void anim_start_startup_animations(void);
 extern void func_US2_002E72D8(void *mob);
-extern void func_L00_00326048(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
+extern void math_store_angle_update_result(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 void func_US2_L04_0031E208(void) {
     s32 i;
 
-    func_L00_002FC980();
+    anim_start_startup_animations();
     for (i = 0; i < ref_L04_0031D630_00.count; i++) {
         MobStruct *mob = (MobStruct *)ref_L04_0031D630_00.mobs[i];
 
@@ -47,8 +47,8 @@ void func_US2_L04_0031E208(void) {
         if (mob != 0) {
             s32 type = 0xFA0;
 
-            if (mob->type == type && D_001A79F0 != 0x33 && mob->p68 != 0) {
-                func_L00_00326048(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.0610865355f);
+            if (mob->type == type && g_current_map_index != 0x33 && mob->p68 != 0) {
+                math_store_angle_update_result(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.0610865355f);
             }
         }
     }

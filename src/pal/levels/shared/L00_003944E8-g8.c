@@ -53,32 +53,32 @@ typedef struct {
     Vector position, unknown30, normal, edgeStart, edgeEnd, tail;
 } CollisionResult;
 typedef struct { u8 pad00[0x70]; float power; u8 pad74[0x6C]; } LevelClass;
-extern u32 D_00138180[];
-extern u8 D_00189E20[], D_00188660[], D_00139568[];
+extern u32 g_pad_state[];
+extern u8 g_hero_state[], g_sound_state[], g_item_slot_to_record[];
 extern int D_L00_001B1A4C, D_L00_001B1BE8, D_L00_001ADB2C, D_L00_001A8FF0;
 extern int D_L00_001B1994 __attribute__((sda)), D_001A7428 __attribute__((sda));
 extern float D_L00_001AF0E0 __attribute__((sda)), D_L00_001AF0E4 __attribute__((sda)), D_L00_001AF0E8 __attribute__((sda));
 extern float D_L00_001AF0EC __attribute__((sda)), D_L00_001AF0F0 __attribute__((sda));
-extern CollisionResult D_L00_001BF200;
+extern CollisionResult g_collision_result;
 extern Vector D_L00_001B8FF0;
-extern LevelClass D_L00_00262570[];
-extern int D_L00_001C3280[];
+extern LevelClass g_weapon_l00_table[];
+extern int g_area_hit_targets[];
 extern void func_PAL_L00_002F5D28(void);
-extern int func_002B0CE0(int, void *, int);
-extern void func_L00_00391310(Moby *, TetherState *), func_L00_00390F28(Moby *, int), func_PAL_L00_003944E8(Moby *, TetherState *);
+extern int ForceClaimNotice(int, void *, int);
+extern void tether_release(Moby *, TetherState *), level_restore_lighting(Moby *, int), func_PAL_L00_003944E8(Moby *, TetherState *);
 extern void func_PAL_L00_0042D540(Moby *, Moby *);
-extern int func_00283CF0(float), func_002E5F40(int, int);
-extern float func_00282C48(float), func_00283BE0(float, float), func_002A89A8(void *, int, float), func_002AA2E8(float *, float, float), func_00283248(float, float);
-extern void func_002AB668(void *, void *, float), func_002ACDE8(void *, void *, void *), func_002FEE70(int, void *, void *), func_002A9288(Moby *, float);
-extern void func_00282D30(void *, void *, float), func_002AF000(float *, float, float, float), func_00282CC0(void *, void *, void *), func_00300190(void *, void *);
-extern void func_00283898(void *, int, float), func_00282F70(void *, void *, float);
-extern int func_L00_00380058(Vector *), func_002761F8(void *, void *, int, Moby *, DamageRecord *);
-extern void func_00282CF0(void *, void *, void *), func_00282F20(void *, void *, float), func_00283028(void *, void *, void *), func_002E59F8(int);
+extern int FloatToInt(float), snd_set_voice_pitch_bend(int, int);
+extern float math_fabs(float), fast_subtract_rotations(float, float), coll_probe_ground_height_below(void *, int, float), ApproachValue(float *, float, float), mat_fast_helper_a(float, float);
+extern void math_build_axis_angle_quat(void *, void *, float), vec_rotate_by_quaternion(void *, void *, void *), part_steer_effect_direction(int, void *, void *), part_queue_ground_shadow(Moby *, float);
+extern void FastVecScale(void *, void *, float), vec_build_spherical_offset(float *, float, float, float), FastVecAdd(void *, void *, void *), vec_transform_or_copy(void *, void *);
+extern void build_axis_rotation_quaternion(void *, int, float), vec_fast_normalize_helper(void *, void *, float);
+extern int moby_find_accepting_table_object(Vector *), CollLine(void *, void *, int, Moby *, DamageRecord *);
+extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float), vec_fast_normalize(void *, void *, void *), snd_stop_voice(int);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern int func_00277F48(float, void *, int, Moby *, int);
-extern void func_002A9850(void *, Vector *, int *, int, int, int, int, int, float, float, float);
-extern void func_002ACB48(float *, float), func_PAL_L00_00394630(Moby *, int), func_002AFFD8(Vector *, Vector *, int), func_00282DD8(void *, void *, void *);
+extern int coll_process_hit(float, void *, int, Moby *, int);
+extern void moby_queue_knockback_for_nodes(void *, Vector *, int *, int, int, int, int, int, float, float, float);
+extern void vec_add_random_offset(float *, float), func_PAL_L00_00394630(Moby *, int), cam_compute_view_direction(Vector *, Vector *, int), FastVecCross(void *, void *, void *);
 extern float PH_DF3;
 
 /* Updates the flying tether's steering, sweep collision, impact burst and attached pieces. */
@@ -94,144 +94,144 @@ void func_PAL_L00_00394A18(Moby *actor) {
     blast.quad = 0; blastNormal.quad = 0;
     blast.f[2] = 0.16000001f; blastNormal.f[2] = 1;
     D_L00_001B1A4C = 1; D_L00_001B1994 = 1;
-    func_PAL_L00_002F5D28(); D_L00_001B1BE8 = 1; func_002B0CE0(6, 0, 1);
+    func_PAL_L00_002F5D28(); D_L00_001B1BE8 = 1; ForceClaimNotice(6, 0, 1);
     timer = --state->timer;
-    if (timer < -82 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x16 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x39 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x6F ||
-        ((Hero *)D_00189E20)->i[0x229C / 4] == 2 || ((Hero *)D_00189E20)->i[0x229C / 4] == 4 || ((Hero *)D_00189E20)->i[0x229C / 4] == 3 || ((Hero *)D_00189E20)->i[0x229C / 4] > 12 ||
-        ((Hero *)D_00189E20)->i[0x229C / 4] == 7 || ((Hero *)D_00189E20)->i[0x229C / 4] == 10 || ((Hero *)D_00189E20)->i[0x229C / 4] == 16 || ((Hero *)D_00189E20)->i[0x229C / 4] == 5 ||
-        ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x62 || !((Hero *)D_00189E20)->i[0x340 / 4] ||
-        ((mount = ((Hero *)D_00189E20)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E || mount->objectClass == 0x46F)) || D_001A7428) {
-        func_L00_00391310(actor, state); return;
+    if (timer < -82 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x16 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x39 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F ||
+        ((Hero *)g_hero_state)->i[0x229C / 4] == 2 || ((Hero *)g_hero_state)->i[0x229C / 4] == 4 || ((Hero *)g_hero_state)->i[0x229C / 4] == 3 || ((Hero *)g_hero_state)->i[0x229C / 4] > 12 ||
+        ((Hero *)g_hero_state)->i[0x229C / 4] == 7 || ((Hero *)g_hero_state)->i[0x229C / 4] == 10 || ((Hero *)g_hero_state)->i[0x229C / 4] == 16 || ((Hero *)g_hero_state)->i[0x229C / 4] == 5 ||
+        ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x62 || !((Hero *)g_hero_state)->i[0x340 / 4] ||
+        ((mount = ((Hero *)g_hero_state)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E || mount->objectClass == 0x46F)) || D_001A7428) {
+        tether_release(actor, state); return;
     }
     if (timer < 0) {
-        if (D_L00_001ADB2C) { func_L00_00391310(actor, state); ((Hero *)D_00189E20)->h[0x1E0 / 2] = 10; return; }
+        if (D_L00_001ADB2C) { tether_release(actor, state); ((Hero *)g_hero_state)->h[0x1E0 / 2] = 10; return; }
         if (state->attached) func_PAL_L00_0042D540(state->attached, actor);
-        func_L00_00390F28(actor, 0); func_PAL_L00_003944E8(actor, state); return;
+        level_restore_lighting(actor, 0); func_PAL_L00_003944E8(actor, state); return;
     }
     desiredSpeed = D_L00_001AF0E4 * 0.020000001f;
-    if (D_00138180[0x1A0 / 4] & 0x40) desiredSpeed = D_L00_001AF0E8 * 0.020000001f;
+    if (g_pad_state[0x1A0 / 4] & 0x40) desiredSpeed = D_L00_001AF0E8 * 0.020000001f;
     state->targetSpeed += (desiredSpeed - state->targetSpeed) * D_L00_001AF0EC;
     state->speed += (state->targetSpeed - state->speed) * D_L00_001AF0F0;
     if (state->speed > D_L00_001AF0E8 * 0.020000001f) state->speed = D_L00_001AF0E8 * 0.020000001f;
-    func_002E5F40(state->sound, func_00283CF0((state->targetSpeed - (D_L00_001AF0E4 * 0.020000001f) /
+    snd_set_voice_pitch_bend(state->sound, FloatToInt((state->targetSpeed - (D_L00_001AF0E4 * 0.020000001f) /
                       (D_L00_001AF0E8 * 0.020000001f - D_L00_001AF0E4 * 0.020000001f)) * D_L00_001AF0E0));
     if ((u32)(state->timer - 1) < 0x9BF) {
-        float stickX = ((Hero *)D_00189E20)->f[0x1FB0 / 4], stickY = ((Hero *)D_00189E20)->f[0x1FB4 / 4];
+        float stickX = ((Hero *)g_hero_state)->f[0x1FB0 / 4], stickY = ((Hero *)g_hero_state)->f[0x1FB4 / 4];
         state->inputX += (stickX - state->inputX) * 0.120000005f;
         state->inputY += (stickY - state->inputY) * 0.120000005f;
         if (D_L00_001A8FF0) {
             actor->pitch = (state->inputX - actor->pitch) * 0.072000004f;
             actor->yaw = state->inputY * 0.014726217f;
             actor->roll = state->inputX * 0.014726217f;
-            if (func_00282C48(actor->roll) > 0.00001f) {
-                func_002AB668(&scratch, &actor->forward, -actor->roll);
-                func_002ACDE8(&actor->right, &actor->right, &scratch); func_002ACDE8(&actor->up, &actor->up, &scratch);
+            if (math_fabs(actor->roll) > 0.00001f) {
+                math_build_axis_angle_quat(&scratch, &actor->forward, -actor->roll);
+                vec_rotate_by_quaternion(&actor->right, &actor->right, &scratch); vec_rotate_by_quaternion(&actor->up, &actor->up, &scratch);
             }
-            if (func_00282C48(actor->yaw) > 0.00001f) {
-                func_002AB668(&scratch, &actor->up, -actor->yaw);
-                func_002ACDE8(&actor->right, &actor->right, &scratch); func_002ACDE8(&actor->forward, &actor->forward, &scratch);
+            if (math_fabs(actor->yaw) > 0.00001f) {
+                math_build_axis_angle_quat(&scratch, &actor->up, -actor->yaw);
+                vec_rotate_by_quaternion(&actor->right, &actor->right, &scratch); vec_rotate_by_quaternion(&actor->forward, &actor->forward, &scratch);
             }
-            if (func_00282C48(actor->pitch) > 0.00001f) {
-                func_002AB668(&scratch, &actor->right, actor->pitch);
-                func_002ACDE8(&actor->up, &actor->up, &scratch); func_002ACDE8(&actor->forward, &actor->forward, &scratch);
+            if (math_fabs(actor->pitch) > 0.00001f) {
+                math_build_axis_angle_quat(&scratch, &actor->right, actor->pitch);
+                vec_rotate_by_quaternion(&actor->up, &actor->up, &scratch); vec_rotate_by_quaternion(&actor->forward, &actor->forward, &scratch);
             }
-            func_002FEE70(state->camera, &actor->right, 0);
+            part_steer_effect_direction(state->camera, &actor->right, 0);
         } else {
             actor->pitch += (state->inputX - actor->pitch) * 0.072000004f;
-            angle = func_00283BE0(actor->yaw, state->inputY * 0.014726217f);
+            angle = fast_subtract_rotations(actor->yaw, state->inputY * 0.014726217f);
             actor->yaw = angle;
             if (angle >= 1.5707964f) actor->yaw = 1.5697963f;
             else if (angle <= -1.5707964f) actor->yaw = -1.5697963f;
-            actor->roll = func_00283BE0(actor->roll, state->inputX * 0.014726217f);
-            func_002A9288(actor, 0.2f);
+            actor->roll = fast_subtract_rotations(actor->roll, state->inputX * 0.014726217f);
+            part_queue_ground_shadow(actor, 0.2f);
         }
     }
-    if (D_L00_001A8FF0) func_00282D30(&velocity, &actor->right, state->speed);
-    else func_002AF000(velocity.f, state->speed, actor->roll, -actor->yaw);
+    if (D_L00_001A8FF0) FastVecScale(&velocity, &actor->right, state->speed);
+    else vec_build_spherical_offset(velocity.f, state->speed, actor->roll, -actor->yaw);
     qcopy(&previous, &actor->position);
-    func_00282CC0(&actor->position, &actor->position, velocity.f); func_00300190(&actor->position, &actor->position);
+    FastVecAdd(&actor->position, &actor->position, velocity.f); vec_transform_or_copy(&actor->position, &actor->position);
     if (state->timer >= 0x993) {
-        height = func_002A89A8(&actor->position, 0, 0.5f) + state->hover;
-        if (actor->position.f[2] < height && (!D_L00_001BF200.hit ||
-            (D_L00_001BF200.hit->owner && D_L00_001BF200.hit->owner->kind == 5))) {
-            turn = func_00283248(state->speed, func_002AA2E8(&actor->position.f[2], height, 0.120000005f));
+        height = coll_probe_ground_height_below(&actor->position, 0, 0.5f) + state->hover;
+        if (actor->position.f[2] < height && (!g_collision_result.hit ||
+            (g_collision_result.hit->owner && g_collision_result.hit->owner->kind == 5))) {
+            turn = mat_fast_helper_a(state->speed, ApproachValue(&actor->position.f[2], height, 0.120000005f));
             if (turn > 0.031415932f) turn = 0.031415932f;
             actor->yaw -= turn;
         }
     }
     if (actor->position.f[0] < 4.5f || actor->position.f[0] > 1018.5f || actor->position.f[1] < 4.5f ||
         actor->position.f[1] > 1018.5f || actor->position.f[2] < 4.5f || actor->position.f[2] > 1018.5f) {
-        func_L00_00391310(actor, state); return;
+        tether_release(actor, state); return;
     }
     func_PAL_L00_003944E8(actor, state);
-    func_00283898(&state->leftFin->position, 1,
-                  -(state->inputY * 0.5f + func_00282C48(state->inputX * 0.33333334f) + (state->inputX - actor->pitch) * 1.1f) * 0.7f);
+    build_axis_rotation_quaternion(&state->leftFin->position, 1,
+                  -(state->inputY * 0.5f + math_fabs(state->inputX * 0.33333334f) + (state->inputX - actor->pitch) * 1.1f) * 0.7f);
     fin = &state->rightFin->position;
-    roll = (state->inputY * 0.5f + func_00282C48(state->inputX * 0.33333334f));
-    func_00283898(fin, 1, ((state->inputX - actor->pitch) * 1.1f - roll) * 0.7f);
+    roll = (state->inputY * 0.5f + math_fabs(state->inputX * 0.33333334f));
+    build_axis_rotation_quaternion(fin, 1, ((state->inputX - actor->pitch) * 1.1f - roll) * 0.7f);
     damage.flags = 0x830000; damage.direction.quad = velocity.quad; damage.owner = actor;
-    damage.mode = 1; damage.power = (D_L00_00262570 + D_00139568[0xE])->power;
-    func_00282F70(&damage.direction, &damage.direction, 1);
+    damage.mode = 1; damage.power = (g_weapon_l00_table + g_item_slot_to_record[0xE])->power;
+    vec_fast_normalize_helper(&damage.direction, &damage.direction, 1);
     damage.kind = 3; damage.direction.f[3] = 5627.925f;
     damage.objectClass = actor->objectClass; damage.direction.f[2] = 1; damage.response = 2;
     ignore = actor;
-    if (state->timer > 0x99C) ignore = ((Hero *)D_00189E20)->ptr[0x2290 / 4];
-    if (func_L00_00380058(&actor->position)) {
+    if (state->timer > 0x99C) ignore = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
+    if (moby_find_accepting_table_object(&actor->position)) {
         actor->hit = 2;
         qcopy(&contactEdge, &D_L00_001B8FF0);
         scratch.quad = 0; scratch.f[2] = 1; scratch.f[3] = 1;
-        func_00283028(&blast, &velocity, &scratch); func_00282F20(&blast, &blast, 0.040000003f);
-        func_00282F20(&blastNormal, &scratch, 1);
+        vec_fast_normalize(&blast, &velocity, &scratch); vec_scale_to_length(&blast, &blast, 0.040000003f);
+        vec_scale_to_length(&blastNormal, &scratch, 1);
         if (state->sound != -1) {
-            sound = D_00188660 + state->sound * 0x70;
-            if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
+            sound = g_sound_state + state->sound * 0x70;
+            if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
         }
         state->sound = -1;
-    } else if (func_002761F8(&previous, &actor->position, 0, ignore, &damage)) {
-        CollisionResult *col = &D_L00_001BF200;
+    } else if (CollLine(&previous, &actor->position, 0, ignore, &damage)) {
+        CollisionResult *col = &g_collision_result;
         Moby *hit = col->hit;
         if (hit) {
-            if (hit == ((Hero *)D_00189E20)->ptr[0x2290 / 4]) playerHit = 1;
+            if (hit == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) playerHit = 1;
             actor->hit = 2;
             qcopy(&actor->position, &col->position);
-            func_00282CF0(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            func_00282F20(&contactEdge, &contactEdge, 1);
-            func_00283028(&blast, &velocity, &col->normal); func_00282F20(&blast, &blast, 0.040000003f);
-            func_00282F20(&blastNormal, &col->normal, 1);
+            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            vec_fast_normalize(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.040000003f);
+            vec_scale_to_length(&blastNormal, &col->normal, 1);
             if (state->sound != -1) {
-                sound = D_00188660 + state->sound * 0x70;
-                if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
+                sound = g_sound_state + state->sound * 0x70;
+                if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
             }
             state->sound = -1;
         } else if (col->mesh > 0) {
             actor->hit = 1; qcopy(&actor->position, &col->position);
-            func_00282CF0(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            func_00282F20(&contactEdge, &contactEdge, 1);
-            func_00283028(&blast, &velocity, &col->normal); func_00282F20(&blast, &blast, 0.040000003f);
-            func_00282F20(&blastNormal, &col->normal, 1);
+            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            vec_fast_normalize(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.040000003f);
+            vec_scale_to_length(&blastNormal, &col->normal, 1);
             if (state->sound != -1) {
-                sound = D_00188660 + state->sound * 0x70;
-                if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
+                sound = g_sound_state + state->sound * 0x70;
+                if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
             }
             state->sound = -1;
         }
-    } else if (!state->timer) { func_L00_00391310(actor, state); return; }
+    } else if (!state->timer) { tether_release(actor, state); return; }
 after_rebound:
-    if (state->timer < 0x992 && (D_00138180[0x1A4 / 4] & 0x20)) {
+    if (state->timer < 0x992 && (g_pad_state[0x1A4 / 4] & 0x20)) {
         actor->hit = 1;
         if (state->sound != -1) {
-            sound = D_00188660 + state->sound * 0x70;
-            if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) func_002E59F8(state->sound);
+            sound = g_sound_state + state->sound * 0x70;
+            if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
         }
         state->sound = -1;
     }
     if (actor->hit) {
         if (!playerHit) {
             func_PAL_002AC718(actor, &blast, 0, 0, 0, 10, 3, 16, 4, 2, 0, 1, 1, 20, 1, 1, -1, 0, 0x810001);
-            hits = func_00277F48(4, &actor->position, 16, actor, 0);
+            hits = coll_process_hit(4, &actor->position, 16, actor, 0);
             scratch.quad = actor->position.quad;
-            func_002A9850(actor, &scratch, D_L00_001C3280, hits, 0, 0x830000, 3, 2,
-                          (D_L00_00262570 + D_00139568[0xE])->power, 1, 1);
+            moby_queue_knockback_for_nodes(actor, &scratch, g_area_hit_targets, hits, 0, 0x830000, 3, 2,
+                          (g_weapon_l00_table + g_item_slot_to_record[0xE])->power, 1, 1);
         }
         actor->flags |= 1; state->speed = 0.024f;
         state->inputX *= 0.01f;
@@ -239,15 +239,15 @@ after_rebound:
         else state->timer = -1;
         qcopy(&scratch, &actor->position);
         for (i = 4; i >= 0; --i) {
-            qcopy(&actor->position, &scratch); func_002ACB48(actor->position.f, 1.5f); func_PAL_L00_00394630(actor, 1);
+            qcopy(&actor->position, &scratch); vec_add_random_offset(actor->position.f, 1.5f); func_PAL_L00_00394630(actor, 1);
             qcopy(&actor->position, &scratch);
         }
         velocity.f[0] = 0; actor->hit = 0;
     }
     if (state->attached) func_PAL_L00_0042D540(state->attached, actor);
     if (!D_L00_001A8FF0) return;
-    func_002AFFD8(&actor->position, &actor->forward, 1);
-    func_00282DD8(&scratch, &actor->right, &actor->forward); func_00282F20(&actor->up, &scratch, 1);
-    func_00282DD8(&actor->forward, &actor->up, &actor->right);
+    cam_compute_view_direction(&actor->position, &actor->forward, 1);
+    FastVecCross(&scratch, &actor->right, &actor->forward); vec_scale_to_length(&actor->up, &scratch, 1);
+    FastVecCross(&actor->forward, &actor->up, &actor->right);
     actor->right.f[3] = actor->up.f[3] = actor->forward.f[3] = 0;
 }

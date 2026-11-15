@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern short D_00264630[64][12];
 typedef struct {
@@ -11,7 +12,7 @@ typedef struct {
 extern Global001A7A00 D_001A7A00 __attribute__((section(".sdata")));
 extern int D_001A9E70;
 extern unsigned short D_00188510[][2];
-extern void func_0029B698(int);
+extern void level_forward_value(int);
 
 /* Finds the row of D_00264630 whose first four ids hold the object's id at +0xAA,
    then counts it in column `type` of D_00188510 (capped at 9999). */
@@ -34,7 +35,7 @@ found_it:
     if (D_001A7A00.enabled && D_001A9E70 == -1 && D_001A7A00.limit < 20) {
         D_001A7A00.count++;
         if (D_001A7A00.count * 2 >= D_001A7A00.limit) {
-            func_0029B698(150);
+            level_forward_value(150);
             D_001A7A00.count = 0;
             D_001A7A00.limit++;
         }

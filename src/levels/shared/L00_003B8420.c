@@ -1,29 +1,29 @@
 #include "common.h"
 
-extern char D_00189EA0[];
+extern char g_hero_position[];
 
-extern int func_002ACBC8(char *, int);
+extern int IsPointInCuboid(char *, int);
 
-extern int func_002A8508(int, int);
+extern int moby_count_group_not_in_state(int, int);
 
-extern void *func_L00_002D70A0(int);
+extern void *cam_alloc_override_slot(int);
 
-extern void func_L00_002D7140(void *);
+extern void cam_end_override(void *);
 
-extern void func_L00_003B81D0(char *);
+extern void field_override_apply_fields(char *);
 
 /* Starts the settings override when the player gets close and its condition is met, and undoes it again when the condition stops being true. */
-void func_L00_003B8420(char *object)
+void field_override_update(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
-    if (IsPointInCuboid(gHeroPosition, *(int *)state) != 0 && *(int *)(state + 0x28) == 0 && CountMobysInGroupNotInState(*(int *)(state + 0x40), -1) != 0) {
-        *(int *)(state + 0x2C) = (int)AllocCameraOverrideSlot(5);
+    if (IsPointInCuboid(g_hero_position, *(int *)state) != 0 && *(int *)(state + 0x28) == 0 && moby_count_group_not_in_state(*(int *)(state + 0x40), -1) != 0) {
+        *(int *)(state + 0x2C) = (int)cam_alloc_override_slot(5);
         *(int *)(state + 0x28) = 1;
-        ApplyConfiguredFieldsToDestination(object);
+        field_override_apply_fields(object);
     } else if (*(int *)(state + 0x28) != 0) {
-        if (!IsPointInCuboid(gHeroPosition, *(int *)state) || !CountMobysInGroupNotInState(*(int *)(state + 0x40), -1)) {
-            EndCameraOverride(*(void **)(state + 0x2C));
+        if (!IsPointInCuboid(g_hero_position, *(int *)state) || !moby_count_group_not_in_state(*(int *)(state + 0x40), -1)) {
+            cam_end_override(*(void **)(state + 0x2C));
             *(int *)(state + 0x28) = 0;
         }
     }

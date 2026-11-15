@@ -27,11 +27,11 @@ typedef struct {
     char rotation[0x10];
 } EndakoPlacement;
 
-extern EndakoPlayerState D_00189E20;
+extern EndakoPlayerState g_hero_state;
 extern EndakoFlags D_001395B8;
 extern char D_0019B2E8[];
-extern u8 D_001A7AF8[] MACRO_ADDR;
-extern int D_001A79F0, D_L03_001A8F00;
+extern u8 g_item_owned_flags[] MACRO_ADDR;
+extern int g_current_map_index, D_L03_001A8F00;
 extern char *D_L03_001B2A1C;
 extern EndakoPlacement *D_L03_001B2B0C;
 extern char D_L03_001BFB80[];
@@ -41,7 +41,7 @@ extern void func_31B920(), func_32F140(), func_32AA20(), func_31B568();
 extern void func_313E40(), func_368958(), func_324168(), func_31C988();
 extern void func_2BEE78(), func_2B8510(), func_311758(), func_313378();
 extern void func_2F5158(), func_371D60(), func_371D70();
-extern void func_L03_003D2018(), func_L03_003D20F8(), func_L03_003D1FB0();
+extern void clank_scene_finish(), console_remote_view_cleanup(), object_restore_linked_after_scene();
 extern char *func_3113F0();
 extern int func_321988(), func_2F5010(), func_32AB10();
 extern float func_2F0000(float, float), func_2EF5C0(float);
@@ -54,7 +54,7 @@ extern int func_2F01A0(int, int, float);
 #define F(p, o) (*(float *)((p) + (o)))
 
 /* Per-frame update of moby class 2568: a switch that plays a Clank scene, spawns Clank and tracks which scene stage the hero has seen. */
-void func_L03_003D19C8(char *moby)
+void clank_scene_switch_update(char *moby)
 {
     char *vars = P(moby, 0x68);
     int state = B(moby, 0x20);
@@ -64,8 +64,8 @@ void func_L03_003D19C8(char *moby)
         char *spawned;
 
         B(moby, 0x30) = 255;
-        if (!(B(D_0019B2E8, B(moby, 0xB0) + (gCurrentMapIndex << 4)) & 128)) {
-            if (gHeroState.mode == 1) {
+        if (!(B(D_0019B2E8, B(moby, 0xB0) + (g_current_map_index << 4)) & 128)) {
+            if (g_hero_state.mode == 1) {
                 func_31B920(moby, 2, -1);
                 func_32F140(I(vars, 0x20), -1);
             } else {
@@ -94,13 +94,13 @@ void func_L03_003D19C8(char *moby)
                 }
             }
             func_31C988(I(vars, 0xC), 1);
-            gHeroState.flag = 1;
+            g_hero_state.flag = 1;
         } else {
             if (!D_001395B8.seen) {
                 func_368958();
                 func_2BEE78(moby + 0x10, moby + 0xF0, 0, 1);
             }
-            if (gHeroState.mode == 1) {
+            if (g_hero_state.mode == 1) {
                 func_32F140(I(vars, 0x24), -1);
                 func_2B8510(0);
                 func_311758(D_L03_001B2A1C + (I(vars, 0) << 8));
@@ -110,13 +110,13 @@ void func_L03_003D19C8(char *moby)
             /* Resident flag bytes, 8 bytes further on in USA v2.00. A symbol-plus-offset
                .sdata address is neither split nor a one-insn operand, so each store stays
                retail's lui $at/sb macro (see L00_002CAB08.c). */
-            gItemOwnedFlags[2] = 1;
-            gItemOwnedFlags[0x3A] = 1;
-            gItemOwnedFlags[3] = 1;
-            gItemOwnedFlags[0x3B] = 1;
-            gItemOwnedFlags[4] = 1;
-            gItemOwnedFlags[0x3C] = 1;
-            gHeroState.flag = 0;
+            g_item_owned_flags[2] = 1;
+            g_item_owned_flags[0x3A] = 1;
+            g_item_owned_flags[3] = 1;
+            g_item_owned_flags[0x3B] = 1;
+            g_item_owned_flags[4] = 1;
+            g_item_owned_flags[0x3C] = 1;
+            g_hero_state.flag = 0;
             func_31C988(I(vars, 8), 1);
             func_31C988(I(vars, 0xC), 0);
             func_311758(moby);
@@ -125,10 +125,10 @@ void func_L03_003D19C8(char *moby)
     }
     case 1:
         if (!D_001395B8.first
-            && func_321988(gHeroState.position, I(vars, 4))
+            && func_321988(g_hero_state.position, I(vars, 4))
             && func_2F5010(D_L03_001BFB80, 0x31)) {
             func_2F5158(D_L03_001BFB80);
-            func_371D60(RestoreLinkedObjectAfterScene, moby);
+            func_371D60(object_restore_linked_after_scene, moby);
             D_001395B8.first = state;
         }
         if (D_L03_001A8F00 != 2) {
@@ -152,15 +152,15 @@ void func_L03_003D19C8(char *moby)
             H(P(vars, 0x2C), 0x34) &= ~0x1000;
             I(P(vars, 0x2C), 0x98) = 0;
             if (D_001395B8.second)
-                FinishClankScene(moby);
+                clank_scene_finish(moby);
             else if (func_2F5010(D_L03_001BFB80, 0x32)) {
                 func_2F5158(D_L03_001BFB80);
-                func_371D60(FinishClankScene, moby);
+                func_371D60(clank_scene_finish, moby);
             }
             func_371D70();
             func_31B920(moby, 2, -1);
             return;
-        } else if (gHeroState.mode == 1) {
+        } else if (g_hero_state.mode == 1) {
             char *spawned;
 
             func_32F140(I(vars, 0x20), -1);
@@ -175,12 +175,12 @@ void func_L03_003D19C8(char *moby)
         }
         return;
     case 2:
-        if (gHeroState.object == moby && gHeroState.active) {
+        if (g_hero_state.object == moby && g_hero_state.active) {
             func_31C988(I(vars, 8), 1);
             func_31C988(I(vars, 0xC), 0);
             if (func_2F5010(D_L03_001BFB80, 0x33)) {
                 func_2F5158(D_L03_001BFB80);
-                func_371D60(EndRemoteViewCleanup, moby);
+                func_371D60(console_remote_view_cleanup, moby);
                 func_31B920(moby, 3, -1);
             }
             return;

@@ -13,9 +13,9 @@ typedef float f32;
    -fno-signed-zeros all still emit c.lt.s. The retail's ordinary 32-bit stores in the parent
    unit are folded, so the flag is specific to the 128-bit and float-clamp shapes. */
 
-extern float func_0034EE78(float, float, float, float, float);
+extern float math_eval_cubic_hermite(float, float, float, float, float);
 
-extern s32 func_00283D38(s32, s32, f32);
+extern s32 FastTweenColor(s32, s32, f32);
 
 typedef struct { float x, y, z, w; } MorphVec;
 
@@ -40,7 +40,7 @@ typedef struct {
 
 /* Advances the morph progress by the step, clamps it to its range, lerps the two
    position pairs into the destination vectors and updates the second morph. */
-void func_00349B20(u8 *anim)
+void anim_step_morph(u8 *anim)
 {
     MorphObject *morph = (MorphObject *)anim;
     float blend, inverse;
@@ -58,7 +58,7 @@ void func_00349B20(u8 *anim)
             morph->i1C = (next >= 0.0f) ? 1 : 0;
             morph->f10 = (next >= 0.0f) ? next : 0.0f;
         }
-        blend = EvaluateCubicHermite(morph->f10, 0.0f, morph->f0, morph->f4, 1.0f);
+        blend = math_eval_cubic_hermite(morph->f10, 0.0f, morph->f0, morph->f4, 1.0f);
         for (i = 0; i < 2; i++) {
             if (morph->dst[i] != 0) {
                 inverse = 1.0f - blend;
@@ -69,7 +69,7 @@ void func_00349B20(u8 *anim)
             }
         }
         if (morph->p20 != 0) {
-            morph->p20[0] = FastTweenColor(morph->p8C, morph->p90, EvaluateCubicHermite(morph->f10, 0.0f, morph->f8, morph->fC, 1.0f));
+            morph->p20[0] = FastTweenColor(morph->p8C, morph->p90, math_eval_cubic_hermite(morph->f10, 0.0f, morph->f8, morph->fC, 1.0f));
         }
     }
 }

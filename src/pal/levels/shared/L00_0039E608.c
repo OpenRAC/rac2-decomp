@@ -26,7 +26,7 @@ void func_PAL_L00_003A06F8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 }
 
 extern int D_18C0B4;
-extern void func_002A7470(char *object, int mode, int a2, int a3);
+extern void anim_start_blended(char *object, int mode, int a2, int a3);
 
 /* The mode word at 0x18C0B4 must be 8 and the object's byte 0x43 must not be 6; the
  * helper then takes the object with mode 6, zero and ten. */
@@ -34,7 +34,7 @@ void func_PAL_L00_003A0730(char *object)
 {
     if (D_18C0B4 == 8) {
         if (*(unsigned char *)(object + 0x43) != 6)
-            func_002A7470(object, 6, 0, 8);
+            anim_start_blended(object, 6, 0, 8);
     }
 }
 
@@ -59,10 +59,10 @@ typedef struct {
 /* Incomplete sda array read as [0]: retail's tied absolute macro load of the moby table base. */
 extern char *D_L00_001B1E9C[] __attribute__((sda));
 extern Vector D_L00_001C6F40[8][2];
-extern float func_00283CE0(int), func_002A7878(float, float);
-extern int func_00283CF0(float), func_00282948(int *), func_00282978(u16 *), func_002829A8(u8 *), func_00283DB8(void *, float);
-extern void func_00291450(int), func_0029F338(void *), func_00282D30(void *, void *, float), func_00283098(void *, void *, void *), func_00282CC0(void *, void *, void *);
-extern int func_L00_002FCF18(void *, float, float, float, float, float);
+extern float IntToFloat(int), math_random_float_range(float, float);
+extern int FloatToInt(float), math_fast_float_d(int *), FastDecTimer(u16 *), vec_fast_helper_a(u8 *), math_fast_helper_a(void *, float);
+extern void gfx_free_point_light(int), moby_mark_spawned(void *), FastVecScale(void *, void *, float), matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
+extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 /* The retail code checks flag pairs through the aligned lifetime/flags doubleword. */
 /* colorReset mirrors the radius cycle's reset flag but no colour path sets it: retail keeps the
  * constant test (li v0,1; bnel v0,zero), so a nonzero interval never randomizes the channel. */
@@ -125,9 +125,9 @@ void func_PAL_L00_003A0950(u8 *actor) {
         s->timer[1] = s->interval[1];
         s->timer[2] = s->interval[2];
         s->timer[3] = s->interval[3];
-        s->rgb[0] = func_00283CE0(s->color[0].initial) * 0.01f;
-        s->rgb[1] = func_00283CE0(s->color[1].initial) * 0.01f;
-        s->rgb[2] = func_00283CE0(s->color[2].initial) * 0.01f;
+        s->rgb[0] = IntToFloat(s->color[0].initial) * 0.01f;
+        s->rgb[1] = IntToFloat(s->color[1].initial) * 0.01f;
+        s->rgb[2] = IntToFloat(s->color[2].initial) * 0.01f;
         index = s->parentIndex;
         s->radius = s->initialRadius;
         if (index != -1) s->parent = D_L00_001B1E9C[0] + index * 0x100;
@@ -136,33 +136,33 @@ void func_PAL_L00_003A0950(u8 *actor) {
         actor[0x20] = 1;
     }
     if ((u8)actor[0xBC]) { --((u8 *)actor)[0xBC]; return; }
-    if (s->lifetime != -1 && func_00282948(&s->lifetime)) {
-        if (s->light != -1) { func_00291450(s->light); s->light = -1; }
-        func_0029F338(actor); return;
+    if (s->lifetime != -1 && math_fast_float_d(&s->lifetime)) {
+        if (s->light != -1) { gfx_free_point_light(s->light); s->light = -1; }
+        moby_mark_spawned(actor); return;
     }
     qcopy(&sphere, (actor + 0x10)); sphere.f[3] = s->radius;
-    if (func_00283DB8(&sphere, 255) == -1) goto hidden;
+    if (math_fast_helper_a(&sphere, 255) == -1) goto hidden;
     if (s->parent) qcopy(&origin, (s->parent + 0x10));
     else qcopy(&origin, &s->origin);
     if (!(s->flags & 0x800000)) {
         if (s->flags & 0x100000) {
             if (s->flags & 0x200000) {
-                offset.f[0] = func_002A7878(-s->offset.f[0], s->offset.f[0]);
-                offset.f[1] = func_002A7878(-s->offset.f[1], s->offset.f[1]);
-                offset.f[2] = func_002A7878(-s->offset.f[2], s->offset.f[2]);
+                offset.f[0] = math_random_float_range(-s->offset.f[0], s->offset.f[0]);
+                offset.f[1] = math_random_float_range(-s->offset.f[1], s->offset.f[1]);
+                offset.f[2] = math_random_float_range(-s->offset.f[2], s->offset.f[2]);
             } else {
                 u32 saved = *(u32 *)&s->offset.f[3]; s->offset.f[3] = 0;
-                func_00282D30(&offset, &s->offset, func_002A7878(s->offset.f[3], 1));
+                FastVecScale(&offset, &s->offset, math_random_float_range(s->offset.f[3], 1));
                 *(u32 *)&s->offset.f[3] = saved;
             }
         } else {
             u32 saved = *(u32 *)&s->offset.f[3]; s->offset.f[3] = 0;
             qcopy(&offset, &s->offset); *(u32 *)&s->offset.f[3] = saved;
         }
-        if ((s->flags & 0x400000) && s->parent) func_00283098(&offset, &offset, s->parent + 0xC0);
-        func_00282CC0(actor + 0x10, &origin, &offset);
+        if ((s->flags & 0x400000) && s->parent) matrix_mul_vec3(&offset, &offset, s->parent + 0xC0);
+        FastVecAdd(actor + 0x10, &origin, &offset);
     } else qcopy((actor + 0x10), &origin);
-    if (s->interval[3] && func_00282978(&s->timer[3])) {
+    if (s->interval[3] && FastDecTimer(&s->timer[3])) {
         s->timer[3] = ((s32)s->interval[3] * 5 + 2) / 6;
         if (s->flags & 4) { radiusReset = 1; s->radius = s->minimumRadius; s->flags &= ~8; }
     }
@@ -184,26 +184,26 @@ void func_PAL_L00_003A0950(u8 *actor) {
                 }
             }
         } else {
-            if (s->hold[3] && func_002829A8(&s->delay[3])) s->flags ^= 2;
+            if (s->hold[3] && vec_fast_helper_a(&s->delay[3])) s->flags ^= 2;
         }
     } else {
-        if (!s->interval[3] || radiusReset == 1) s->radius = func_002A7878(s->minimumRadius, s->maximumRadius);
+        if (!s->interval[3] || radiusReset == 1) s->radius = math_random_float_range(s->minimumRadius, s->maximumRadius);
     }
     UPDATE_COLOR(0, 0x10000, 0x3000000000ULL, 0x2000000000ULL, 0x20, 0x80, 0x10, 0x40);
     UPDATE_COLOR(1, 0x20000, 0x30000000000ULL, 0x20000000000ULL, 0x200, 0x800, 0x100, 0x400);
     UPDATE_COLOR(2, 0x40000, 0x300000000000ULL, 0x200000000000ULL, 0x2000, 0x8000, 0x1000, 0x4000);
     if (s->light == -1) {
-        s->light = func_L00_002FCF18(actor + 0x10, s->radius * 0.8f, func_00283CE0(s->intensity) * 0.01f, s->rgb[0], s->rgb[1], s->rgb[2]);
+        s->light = part_l00_alloc_effect_slot_2(actor + 0x10, s->radius * 0.8f, IntToFloat(s->intensity) * 0.01f, s->rgb[0], s->rgb[1], s->rgb[2]);
     } else {
         Vector *entry = D_L00_001C6F40[s->light];
         qcopy(&entry[1], (actor + 0x10));
         entry[1].f[3] = s->radius * 0.8f;
         entry[0].f[0] = s->rgb[0]; entry[0].f[1] = s->rgb[1]; entry[0].f[2] = s->rgb[2];
-        entry[0].f[3] = func_00283CE0(s->intensity) * 0.01f;
+        entry[0].f[3] = IntToFloat(s->intensity) * 0.01f;
     }
     return;
 hidden:
-    if (s->light != -1) { func_00291450(s->light); s->light = -1; }
+    if (s->light != -1) { gfx_free_point_light(s->light); s->light = -1; }
 }
 
 /* func_PAL_L00_003A1688 is defined in L00_0039E608-rail.c. */

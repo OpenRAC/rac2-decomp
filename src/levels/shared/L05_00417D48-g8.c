@@ -1,13 +1,13 @@
 #include "common.h"
 
 extern void func_L05_00418200(void *);
-extern void func_00282C88(char *);
-extern unsigned int D_001A7AF0 MACRO_ADDR;
+extern void vec_clear_128(char *);
+extern unsigned int g_equipment_bits MACRO_ADDR;
 /* A pointer table whose slot 0 holds the active object (L30_003B3F70-g8.c also reads it as an array). */
 extern void *D_0018B650[] __attribute__((nosda));
-extern char D_L05_001B34F0[] MACRO_ADDR;
+extern char g_light_spot_sum[] MACRO_ADDR;
 extern char D_L05_001B3510[] MACRO_ADDR;
-extern float D_L05_001B3500;
+extern float g_light_spot_count;
 /* Model ids per equipment selector, one 4-entry table per D_001A7AF0 bit field. */
 extern short D_L05_001A8F70[] MACRO_ADDR;
 extern short D_L05_001A8F78[] MACRO_ADDR;
@@ -16,16 +16,16 @@ extern short D_L05_001A8F88[] MACRO_ADDR;
 extern short D_L05_001A8F90[] MACRO_ADDR;
 extern short D_L05_001A8F98[] MACRO_ADDR;
 extern short D_L05_001A8FA0[] MACRO_ADDR;
-extern char *func_L05_0041C708(void *, float, int, int);
-extern char *func_L05_00432080(void *, float);
-extern int func_002ED8A0(int);
-extern int func_L05_0037AC00(void);
-extern int func_L05_0037AC40(void);
-extern int func_00282948(char *);
-extern int func_002E59B0(void *, int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_L05_00418288(void *);
-extern void func_L00_004450C0(void *);
+extern char *equipment_spawn_part_moby(void *, float, int, int);
+extern char *CreateTransformClone(void *, float);
+extern int table_find_last_used_entry(int);
+extern int hero_get_shield_value(void);
+extern int hero_get_shield_limit(void);
+extern int math_fast_float_d(char *);
+extern int snd_is_voice_playing_for_owner(void *, int);
+extern int PlayMobySound(int, int, void *);
+extern void wobbling_light_update(void *);
+extern void load_forward_resident_address(void *);
 
 typedef struct {
     int f0;
@@ -87,7 +87,7 @@ typedef struct {
 /* State 0 spawns the equipment parts chosen by the D_001A7AF0 selector bits; state 1 updates timers and the
  * position copy. */
 /* Updates the equipment holder object (moby class 4031). On its first frame it creates the player's equipment parts; after that it keeps its sound, timers and light going. */
-void func_L05_00417D48(Obj_L05_00417D48 *object)
+void equipment_holder_update(Obj_L05_00417D48 *object)
 {
     State_L05_00417D48 *vars = object->pVar;
     int phase = object->state;
@@ -118,57 +118,57 @@ void func_L05_00417D48(Obj_L05_00417D48 *object)
         object->state = 1;
         object->modeBits |= 0x100;
         func_L05_00418200(object);
-        ClearVector128(gLightSpotSum);
+        vec_clear_128(g_light_spot_sum);
         D_0018B650[0] = object;
-        selector = gEquipmentBits & 3;
-        gLightSpotCount = 0;
+        selector = g_equipment_bits & 3;
+        g_light_spot_count = 0;
         object->modeBits |= 0x41;
-        vars->f40 = SpawnEquipmentPartMoby(object, 0.05f, 0, D_L05_001A8F70[selector]);
+        vars->f40 = equipment_spawn_part_moby(object, 0.05f, 0, D_L05_001A8F70[selector]);
         if (vars->f40) *(int *)(vars->f40 + 0x98) = 0;
-        selector = (gEquipmentBits >> 2) & 3;
+        selector = (g_equipment_bits >> 2) & 3;
         partClass = D_L05_001A8F78[selector];
-        vars->f44 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
-        vars->f48 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        vars->f44 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
+        vars->f48 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
         if (vars->f44) *(int *)(vars->f44 + 0x98) = 0;
         if (vars->f48) *(int *)(vars->f48 + 0x98) = 0;
-        selector = (gEquipmentBits >> 4) & 3;
-        vars->f4C = SpawnEquipmentPartMoby(object, 0.05f, 0, D_L05_001A8F80[selector]);
+        selector = (g_equipment_bits >> 4) & 3;
+        vars->f4C = equipment_spawn_part_moby(object, 0.05f, 0, D_L05_001A8F80[selector]);
         if (vars->f4C) *(int *)(vars->f4C + 0x98) = 0;
         vars->f50 = CreateTransformClone(object, 0.05f);
-        selector = (gEquipmentBits >> 6) & 1;
+        selector = (g_equipment_bits >> 6) & 1;
         partClass = D_L05_001A8F88[selector];
-        vars->fAC = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
-        vars->f1F0 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        vars->fAC = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
+        vars->f1F0 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
         if (vars->fAC) *(int *)(vars->fAC + 0x98) = 0;
         if (vars->f1F0) *(int *)(vars->f1F0 + 0x98) = 0;
-        selector = (gEquipmentBits >> 9) & 1;
+        selector = (g_equipment_bits >> 9) & 1;
         partClass = D_L05_001A8F98[selector];
-        vars->f1F4 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
-        vars->f1F8 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        vars->f1F4 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
+        vars->f1F8 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
         if (vars->f1F4) *(int *)(vars->f1F4 + 0x98) = 0;
         if (vars->f1F8) *(int *)(vars->f1F8 + 0x98) = 0;
-        if (FindLastUsedChainEntry(3)) {
-            selector = (gEquipmentBits >> 7) & 3;
+        if (table_find_last_used_entry(3)) {
+            selector = (g_equipment_bits >> 7) & 3;
             partClass = D_L05_001A8F90[selector];
             if (partClass) {
-                vars->f1FC = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
-                vars->f200 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+                vars->f1FC = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
+                vars->f200 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
                 if (vars->f1FC) *(int *)(vars->f1FC + 0x98) = 0;
                 if (vars->f200) *(int *)(vars->f200 + 0x98) = 0;
             }
         }
-        selector = (gEquipmentBits >> 10) & 3;
+        selector = (g_equipment_bits >> 10) & 3;
         partClass = D_L05_001A8FA0[selector];
-        vars->f204 = SpawnEquipmentPartMoby(object, 0.05f, 0, partClass);
-        vars->f208 = SpawnEquipmentPartMoby(object, 0.05f, 1, partClass);
+        vars->f204 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
+        vars->f208 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
         if (vars->f204) *(int *)(vars->f204 + 0x98) = 0;
         if (vars->f208) *(int *)(vars->f208 + 0x98) = 0;
-        if (FindLastUsedChainEntry(4) != -1) {
-            vars->f274 = SpawnEquipmentPartMoby(object, 0.05f, 0, 0x10E2 /* moby class 4322 */);
+        if (table_find_last_used_entry(4) != -1) {
+            vars->f274 = equipment_spawn_part_moby(object, 0.05f, 0, 0x10E2 /* moby class 4322 */);
             if (vars->f274) *(int *)(vars->f274 + 0x98) = 0;
         }
-        if (FindLastUsedChainEntry(5) != -1) {
-            vars->f278 = SpawnEquipmentPartMoby(object, 0.05f, 0, 0x10E4 /* moby class 4324 */);
+        if (table_find_last_used_entry(5) != -1) {
+            vars->f278 = equipment_spawn_part_moby(object, 0.05f, 0, 0x10E4 /* moby class 4324 */);
             if (vars->f278) *(int *)(vars->f278 + 0x98) = 0;
         }
         vars->f58 = 70;
@@ -177,14 +177,14 @@ void func_L05_00417D48(Obj_L05_00417D48 *object)
         vars->fA0 = 0;
         break;
     case 1:
-        if (GetShieldSlotValue() < GetShieldSlotLimit()) vars->f260 = phase;
+        if (hero_get_shield_value() < hero_get_shield_limit()) vars->f260 = phase;
         if (vars->f260) {
-            if (FastFloatHelperD((char *)&vars->f264)) vars->f268 = phase;
+            if (math_fast_float_d((char *)&vars->f264)) vars->f268 = phase;
         }
-        if (!IsVoicePlayingForOwner(object, vars->f30)) vars->f30 = PlayMobySound(0, 4, object);
-        UpdateWobblingLight(object);
+        if (!snd_is_voice_playing_for_owner(object, vars->f30)) vars->f30 = PlayMobySound(0, 4, object);
+        wobbling_light_update(object);
         qcopy(D_L05_001B3510, object->pos);
-        ForwardResidentAddress(object);
+        load_forward_resident_address(object);
         break;
     }
 }

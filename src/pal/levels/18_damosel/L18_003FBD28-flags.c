@@ -3,11 +3,11 @@
 #include "common.h"
 extern void func_PAL_002B5E30(void *,float);
 extern void func_PAL_002B5E10(void *);
-extern int func_L02_0032E998(void *,void *,void *,void *,int,void *,void *,float,float);
+extern int ComputeRegionRouteHeading(void *,void *,void *,void *,int,void *,void *,float,float);
 extern int func_PAL_002B5C98(void *,void *,float);
 extern int func_PAL_002B5BA8(void *,void *,float);
-extern void func_002A7750(void *,int,int);
-extern void func_002ACB48(void *,float);
+extern void moby_set_state(void *,int,int);
+extern void vec_add_random_offset(void *,float);
 
 void func_PAL_L18_003FCB78(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
@@ -23,14 +23,14 @@ low:
 high:
         if (*(int *)(state+0x71C)!=-1 && *(s16 *)(state+0x76A)) {
             u8 *p=state+0x700;
-            func_L02_0032E998(obj+0x10,p,state+0x748,state+0x200,*(int *)(state+0x730),state+0x73C,state+0x740,0.0f,0.4f);
+            ComputeRegionRouteHeading(obj+0x10,p,state+0x748,state+0x200,*(int *)(state+0x730),state+0x73C,state+0x740,0.0f,0.4f);
             func_PAL_002B5C98(obj,p,*(float *)(state+0x748));
         } else func_PAL_002B5BA8(obj,state+0x700,*(float *)(state+0x720));
         if (obj[0x20]!=9 && obj[0x20]!=4 && obj[0x20]!=3) {
-            if (*(int *)(state+0x190)>=5) func_002A7750(obj,3,-1);
+            if (*(int *)(state+0x190)>=5) moby_set_state(obj,3,-1);
             if (*(int *)(state+0x1A4)&3) {
-                func_002ACB48(obj+0x10,0.01f);
-                func_002A7750(obj,3,-1);
+                vec_add_random_offset(obj+0x10,0.01f);
+                moby_set_state(obj,3,-1);
             }
         }
 

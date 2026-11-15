@@ -25,10 +25,10 @@ typedef struct {
     AnimationOwner *owner;
 } AnimationResident;
 extern AnimationResident D_00189E20_2;
-extern float func_002AA2E8(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
 /* Works out how fast the hero animation should play so it reaches a wanted frame in a set time. */
-float func_L00_002A9E30(float frame, float duration, float amount, float blendRate)
+float AdjustHeroAnimationSpeedForTargetFrame(float frame, float duration, float amount, float blendRate)
 {
     float threshold = D_00189E20_2.threshold;
     float step;

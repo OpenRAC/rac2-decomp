@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial C views; original types and object ownership are unknown. */
 typedef struct {
@@ -16,7 +17,7 @@ extern QwenRecovery_538934d89776_WrapperCollectState132 ref_L00_002D6FD8_03;
 extern int ref_L00_002D6FD8_02(int words[2]);
 
 /* Adds a value to a running counter that wraps around at 256, and notes whether it wrapped. */
-void func_L00_002D6FD8(void)
+void math_add_wrapping_counter(void)
 {
     int words[4];
     ref_L00_002D6FD8_02(words);
@@ -42,7 +43,7 @@ extern unsigned char D_L00_001BB9F0[];
 extern int D_L00_001B1884;
 
 /* Switches off all 32 camera override slots and marks that none is selected. */
-int func_L00_002D7068(void)
+int cam_clear_override_slots(void)
 {
     unsigned char *slot = D_L00_001BB9F0;
     int i;
@@ -83,7 +84,7 @@ typedef struct {
 extern PoolRecord64 D_L16_001BC730[];
 
 /* Finds a free camera override slot, fills it with starting values and returns it, or returns 0 if all are used. */
-PoolRecord64 *func_L00_002D70A0(int kind)
+PoolRecord64 *cam_alloc_override_slot(int kind)
 {
     PoolRecord64 *slot = D_L16_001BC730;
     int i;

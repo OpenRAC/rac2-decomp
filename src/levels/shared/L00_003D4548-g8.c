@@ -1,8 +1,8 @@
 #include "common.h"
 
 typedef struct { char pad[0x80]; float x, y; } PositionBase;
-extern PositionBase D_00189E20 __attribute__((nosda));
-extern char D_00189EA0[] __attribute__((nosda));
+extern PositionBase g_hero_state __attribute__((nosda));
+extern char g_hero_position[] __attribute__((nosda));
 extern float D_L00_001B0290 __attribute__((sda));
 extern float D_L00_001B0294 __attribute__((sda));
 extern float D_L00_001B0298 __attribute__((sda));
@@ -26,14 +26,14 @@ extern float ref_L00_003D4548_11(float, float);
 extern void ref_L00_003D4548_12(void *, void *, void *, float, float, float);
 
 /* Keeps the moby close to its target or the hero. It eases along, backs off when too near the hero, and jumps back to its start spot when stuck for a while. */
-void func_L00_003D4548(char *object, char *state)
+void moby_keep_near_target_or_hero(char *object, char *state)
 {
     float difference[4], offset[4];
     float distance, angle, correction, speed;
     int hit;
     char *target;
     ref_L00_003D4548_00(difference, state, object + 0x10);
-    distance = ref_L00_003D4548_01(object + 0x10, gHeroPosition);
+    distance = ref_L00_003D4548_01(object + 0x10, g_hero_position);
     ref_L00_003D4548_01(object + 0x10, state);
     switch (*(unsigned char *)(object + 0xbc)) {
     case 0:
@@ -75,8 +75,8 @@ void func_L00_003D4548(char *object, char *state)
         }
         if (distance < 1.1f) {
             correction = 1.1f - distance;
-            angle = ref_L00_003D4548_08(gHeroState.x - *(float *)(object + 0x10),
-                                      gHeroState.y - *(float *)(object + 0x14));
+            angle = ref_L00_003D4548_08(g_hero_state.x - *(float *)(object + 0x10),
+                                      g_hero_state.y - *(float *)(object + 0x14));
             *(float *)(state + 0x10) -= correction * ref_L00_003D4548_09(angle) * 0.1f;
             *(float *)(state + 0x14) -= correction * ref_L00_003D4548_10(angle) * 0.1f;
         }

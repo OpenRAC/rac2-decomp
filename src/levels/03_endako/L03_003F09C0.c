@@ -41,13 +41,13 @@ extern void func_2E77F0(void *fn, void *entity);
 
 /* The entity's per-frame sub-states; several are still INCLUDE_ASM markers
  * further down this file, hence the prototypes that repeat their definition. */
-extern void func_L03_003F5B70(u8 *entity);
-extern void func_L03_003F6158(u8 *entity);
-extern void func_L03_003F64E8(u8 *entity);
-extern void func_L03_003F6610(u8 *entity);
-extern void func_L03_003F6748(u8 *entity);
-extern void func_L03_003F6948(u8 *entity);
-extern void func_L03_003F6BA8(u8 *entity);
+extern void endako_boss_move_along_path(u8 *entity);
+extern void endako_boss_update_attachment(u8 *entity);
+extern void endako_boss_ease_view_angle(u8 *entity);
+extern void endako_boss_blend_parts(u8 *entity);
+extern void endako_wake_objects_low_counters(u8 *entity);
+extern void endako_boss_draw_target_markers(u8 *entity);
+extern void gfx_draw_beam_quad_packets(u8 *entity);
 
 /* `lui $v0,%hi ; lw $v0,%lo($v0)` in the retail: one register, no HIGH/LO_SUM
  * split, which is what the sda attribute (SYMBOL_REF_FLAG) gives in -G0. */
@@ -86,11 +86,11 @@ extern Entry41D1D8 *D_L03_001FE700[];
 
 /* func_L03_003F11A0 is in L03_003F11A0-g8.c. */
 
-extern void func_L02_00327350(s32, s32);
-extern void func_00288308(s32);
-extern s32 func_002AD860(s32);
-extern void func_0029F338(u8 *);
-extern void func_0029B3E0(s32, s32);
+extern void part_start_record_effect_by_index(s32, s32);
+extern void help_unlock_entry(s32);
+extern s32 moby_handle_request_slot_state(s32);
+extern void moby_mark_spawned(u8 *);
+extern void MemcardSave(s32, s32);
 
 /* Two flag bytes of the boot's state block, reached as members of one object: the stores
  * are then `lui $at ; sb` pairs that stay out of the call's delay slot, as in retail (a
@@ -103,16 +103,16 @@ extern s32 D_L03_001B2A38[] __attribute__((sda));
  * boot steps with 13 (func_002AD860 returns a value that the caller drops; declaring it that way
  * is what fixes the register choice of the table address), then hands every entity of the
  * state's group (word 0x80) to func_0029F338 and ends with func_0029B3E0(0, -1). */
-void func_L03_003F1470(u8 *entity) {
+void endako_boss_start_area_objects(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u16 *p;
     u8 *e;
 
-    StartRecordEffectByIndex(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
+    part_start_record_effect_by_index(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
     D_001A7B08[0x04] = 1;
     D_001A7B08[0x3C] = 1;
-    UnlockHelpEntry(13);
-    HandleRequestSlotState(13);
+    help_unlock_entry(13);
+    moby_handle_request_slot_state(13);
     for (p = (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)];
          (*(s32 *)(state + 0x80) & 0xFF) != 0xFF && *(s32 *)(state + 0x80) <= D_L03_001B2A38[0] &&
          p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)]);
@@ -120,7 +120,7 @@ void func_L03_003F1470(u8 *entity) {
         e = D_L03_001B2A1C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        MarkMobySpawned(e);
+        moby_mark_spawned(e);
     }
     MemcardSave(0, -1);
 }
@@ -134,22 +134,22 @@ void func_L03_003F1470(u8 *entity) {
 /* Runs the boss's helper steps every frame and counts up its frame timer. */
 /* ticks the entity's sub-states, feeds the 0x95 counter to the engine and
  * re-arms its 200-second timer */
-void func_L03_003F6080(u8 *entity) {
+void endako_boss_update_helpers(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u32 timer;
 
     func_320318(entity, state + 0x70);
-    MoveEndakoBossAlongPath(entity);
-    EaseViewAngleToBoss(entity);
-    BlendEndakoBossParts(entity);
-    WakeObjectsWhenCountersLow(entity);
-    UpdateEndakoBossAttachment(entity);
+    endako_boss_move_along_path(entity);
+    endako_boss_ease_view_angle(entity);
+    endako_boss_blend_parts(entity);
+    endako_wake_objects_low_counters(entity);
+    endako_boss_update_attachment(entity);
     if (*(u8 *)(entity + 0x95) >= 2)
         func_2FD088(5, 0, *(float *)(state + 0x20) / func_2F0148(*(s16 *)(state + 0x24)));
     if (*(s32 *)(state + 0x3BC) != 0)
-        func_2E77F0(DrawBossTargetMarkers, entity);
+        func_2E77F0(endako_boss_draw_target_markers, entity);
     if (*(u8 *)(entity + 0x31) != 0)
-        func_2E77F0(DrawBeamQuadPackets, entity);
+        func_2E77F0(gfx_draw_beam_quad_packets, entity);
     timer = *(u16 *)(entity + 0x96);
     if (timer <= 0xFFFE) *(u16 *)(entity + 0x96) = (u16)(timer + 1);
 }
@@ -159,7 +159,7 @@ void func_L03_003F6080(u8 *entity) {
 
 /* Picks a new random pose for the boss that differs from the current one. */
 /* draws a value distinct from the state's current one and stores the table word it names */
-void func_L03_003F6458(u8 *entity, s32 selector) {
+void endako_boss_pick_pose(u8 *entity, s32 selector) {
     PickerState *state = *(PickerState **)(entity + 0x68);
     s32 value;
 
@@ -178,7 +178,7 @@ void func_L03_003F6458(u8 *entity, s32 selector) {
 
 /* Blends the boss body parts and animation speed each frame. */
 /* steps the entity's two blend channels and its rate */
-void func_L03_003F6610(u8 *entity) {
+void endako_boss_blend_parts(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
 
     if (*(u8 *)(state + 0xD1) == 0) func_312550(entity, 7, state + 0xD0);
@@ -190,7 +190,7 @@ void func_L03_003F6610(u8 *entity) {
 
 /* Passes each object in the boss's linked group to the engine. */
 /* hands every record of the stream at slot 0xAC to func_3A2F48 */
-void func_L03_003F66D8(u8 *entity) {
+void endako_boss_process_group(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 index = *(s32 *)(state + 0xAC);
     StreamEntry *entry;
@@ -209,7 +209,7 @@ void func_L03_003F66D8(u8 *entity) {
 
 /* Adds a target to the boss's list of up to 30 targets. */
 /* appends one word to the level state's 30-entry table */
-void func_L03_003F68E8(u8 *entity, u32 value) {
+void endako_boss_add_target(u8 *entity, u32 value) {
     LevelState *state = *(LevelState **)(entity + 0x68);
 
     if (state->count < 30) {
@@ -219,7 +219,7 @@ void func_L03_003F68E8(u8 *entity, u32 value) {
 }
 
 /* Removes one entry from the table by copying the last entry over it. */
-void func_L03_003F6918(u8 *entity, s32 index) {
+void endako_boss_remove_target(u8 *entity, s32 index) {
     LevelState *state = *(LevelState **)(entity + 0x68);
 
     state->entries[index] = state->entries[--state->count];
@@ -240,13 +240,13 @@ typedef struct {
     s32 active;
 } L03VoiceState;
 
-extern L03VoiceState D_001A63A8;
+extern L03VoiceState g_music_state;
 
 /* Starts a boss voice line unless one is already playing. */
 /* Picks the free voice slot the entity asks for, unless the engine is busy
    or already holds that slot. */
-void func_L03_003F71E0(u8 *entity, s32 requested) {
-    L03VoiceState *voice = &gMusicState;
+void endako_boss_start_voice_line(u8 *entity, s32 requested) {
+    L03VoiceState *voice = &g_music_state;
     s32 slotIndex = requested;
     u8 *vars = *(u8 **)(entity + 0x68);
     u8 *slot;
@@ -289,7 +289,7 @@ void func_L03_003F71E0(u8 *entity, s32 requested) {
 /* Gives every sweeper bot in the boss's group a fresh random delay. */
 /* walks entity's stream, asking func_31BA30 for the value it stores at +0x2D8
  * of every record whose halfword at +0xAA is 0xFF3 */
-void func_L03_0041D128(u8 *entity) {
+void sweeper_bot_reset_delays(u8 *entity) {
     StreamEntry *entry;
     StreamEntry *p;
     u8 *record;
@@ -314,7 +314,7 @@ void func_L03_0041D128(u8 *entity) {
 
 /* Checks whether the actor has reached its path point; 1 means it did. */
 /* asks the current entry to resolve; 1 when it consumed the query */
-u32 func_L03_0041D1D8(u8 *entity) {
+u32 path_check_point_reached(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u8 *sub = entity + 0x10;
     Entry41D1D8 *entry = D_L03_001FE700[*(s32 *)(state + 0x290)];
@@ -334,7 +334,7 @@ u32 func_L03_0041D1D8(u8 *entity) {
 /* Moves a path robot along its path and plays its engine sound. */
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */
-void func_L03_0041DCE0(u8 *entity) {
+void rivet_bot_move_along_path(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u8 *entry = (u8 *)D_L03_001FE700[*(int *)(state + 0x210)];
     float delta[4], along[4], across[4], axis[4], point[4], scaled[4];
@@ -388,7 +388,7 @@ void func_L03_0041DCE0(u8 *entity) {
 
 /* Updates the actor's small timers and effects every frame. */
 /* re-arms the entity's two channel counters and its 200-second timer */
-void func_L03_0041EF90(u8 *entity) {
+void robot_update_timers(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u32 timer;
 
@@ -401,7 +401,7 @@ void func_L03_0041EF90(u8 *entity) {
 }
 
 /* Switches the entity to state 6 and stores a value in its private data. */
-void func_L03_0041F008(u8 *entity, u32 value) {
+void robot_set_speed_state(u8 *entity, u32 value) {
     u8 *state = *(u8 **)(entity + 0x68);
 
     func_31B920(entity, 6, 2);

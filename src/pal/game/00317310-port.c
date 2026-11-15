@@ -27,36 +27,36 @@ typedef struct {
 typedef struct { char pad0[0x18]; char *target; } State_00315E20;
 
 extern PoolEffect_00315E20 D_0022AA10[3];
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern Statistics D_0018C360[];
 extern char D_001B2510[] __attribute__((sda));
 extern char D_001B2520[] __attribute__((sda));
-extern char D_001B5340[];
+extern char g_camera_eye_state[];
 extern int D_001AF548 __attribute__((sda));
 extern int D_00138324 __attribute__((nosda));
 extern u32 D_001A7390;
-extern u32 D_001A79F0;
+extern u32 g_current_map_index;
 extern u8 D_0013958C __attribute__((nosda));
 /* One 0xE0-byte entry per weapon level. */
 typedef struct { char pad0[0x70]; float range; char pad74[0x6C]; } Level_00315E20;
 
-extern Level_00315E20 D_00239BA0[];
+extern Level_00315E20 g_weapon_table[];
 
-extern void func_0029FCC0(void *, int, void *);
+extern void moby_transform_joint_to_world(void *, int, void *);
 extern unsigned int func_PAL_0026F5B8(int, int);
-extern char *func_00315C78(void *);
-extern float func_00282E48(void *, void *);
-extern float func_00282C48(float);
-extern void func_00273318(float, float, float, void *, u32, void *, int, int, int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_0026F760(void);
-extern int func_00282948(void *);
-extern void func_00282F70(void *, void *, float);
-extern void func_002A8E20(void *, void *);
+extern char *FindNearestEligibleTarget(void *);
+extern float fast_vec_dist(void *, void *);
+extern float math_fabs(float);
+extern void hud_add_moby_marker(float, float, float, void *, u32, void *, int, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void stub_empty_11(void);
+extern int math_fast_float_d(void *);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern void QueueMobyImpact(void *, void *);
 extern void func_PAL_00317928(void *, char *, int);
-extern void func_003166C8(void *);
-extern void func_0027CFD0(void *, void *);
-extern void func_00316248(void *);
+extern void UpdateEffectSlots(void *);
+extern void gfx_register_overlay_draw_callback(void *, void *);
+extern void lock_on_draw_sprites(void *);
 
 /* Update of the lock-on launcher: 0 clears the effect slots, 1 aims at the nearest target and
    waits for the fire button, 2 launches at it and starts three effects, 3 and 4 time the
@@ -79,28 +79,28 @@ void func_PAL_00317310(u8 *obj)
             D_0022AA10[i].owner = 0;
         obj[0x20] = 1;
     }
-    func_0029FCC0(obj, 1, D_001B2510);
-    func_0029FCC0(obj, 0, D_001B2520);
-    q = D_00189E20;
+    moby_transform_joint_to_world(obj, 1, D_001B2510);
+    moby_transform_joint_to_world(obj, 0, D_001B2520);
+    q = g_hero_state;
     if (*(int *)(q + 0x2294) == 1)
         func_PAL_0026F5B8(0x1D, 1);
-    func_0029FCC0(obj, 0, aim);
+    moby_transform_joint_to_world(obj, 0, aim);
 
     switch (obj[0x20]) {
     case 0:
         obj[0x20] = 1;
         st->target = 0;
     case 1:
-        p = D_00189E20;
+        p = g_hero_state;
         if (*(u8 *)(p + 0x22BC) != 0)
             break;
-        st->target = func_00315C78(obj);
+        st->target = FindNearestEligibleTarget(obj);
         if (st->target != 0) {
-            d = func_00282E48(D_001B5340, st->target + 0x10) * 0.02f;
+            d = fast_vec_dist(g_camera_eye_state, st->target + 0x10) * 0.02f;
             qcopy(pos, st->target + 0x10);
-            func_00273318(func_00282C48(0.9f - d * 0.65f), 0.0f, 90.0f, obj, 0xFF0FFF0F, pos, 0x26,
+            hud_add_moby_marker(math_fabs(0.9f - d * 0.65f), 0.0f, 90.0f, obj, 0xFF0FFF0F, pos, 0x26,
                           -1, 4);
-            func_00282CF0(dir, st->target + 0x10, aim);
+            FastVecSub(dir, st->target + 0x10, aim);
         }
         if (!(D_00138324 & *(int *)(p + 0x1230)))
             break;
@@ -111,34 +111,34 @@ void func_PAL_00317310(u8 *obj)
         else
             D_001AF548 = 3;
         obj[0x20] = 2;
-        func_0026F760();
+        stub_empty_11();
         break;
     case 2: {
         char *player;
         Level_00315E20 *level;
 
-        if (!func_00282948(&D_001AF548))
+        if (!math_fast_float_d(&D_001AF548))
             break;
-        player = D_00189E20;
+        player = g_hero_state;
         *(int *)(player + 0xC20) = 0;
         if (D_0018C360[36].count < 0xFFFF)
             D_0018C360[36].count++;
         if ((((s32)(D_001A7390) * 5 + 2) / 6) > D_0018C360[36].maximum)
             D_0018C360[36].maximum = (((s32)(D_001A7390) * 5 + 2) / 6);
-        level = &D_00239BA0[D_0013958C];
+        level = &g_weapon_table[D_0013958C];
         launch.flags = 0x10000;
-        D_0018C360[36].levels = D_0018C360[36].levels | (1 << D_001A79F0) | 0x80000000;
+        D_0018C360[36].levels = D_0018C360[36].levels | (1 << g_current_map_index) | 0x80000000;
         launch.range = level->range;
         launch.count = 1;
         launch.owner = obj;
         qcopy(&launch, dir);
-        func_00282F70(&launch, &launch, 1.0f);
+        vec_fast_normalize_helper(&launch, &launch, 1.0f);
         launch.mode = 2;
         launch.dir[2] = 1.0f;
         launch.dir[3] = 5627.925f;
         launch.klass = *(u16 *)(obj + 0xAA);
         launch.kind = 3;
-        func_002A8E20(st->target, &launch);
+        QueueMobyImpact(st->target, &launch);
         obj[0x20] = 3;
         if (*(int *)(player + 0x340)) {
             D_001AF548 = 12;
@@ -157,19 +157,19 @@ void func_PAL_00317310(u8 *obj)
     case 3: {
         char *player;
 
-        if (!func_00282948(&D_001AF548))
+        if (!math_fast_float_d(&D_001AF548))
             break;
-        player = D_00189E20;
+        player = g_hero_state;
         *(float *)(player + 0xC20) = 1.0f;
         D_001AF548 = 6;
         obj[0x20] = 4;
         break;
     }
     case 4:
-        if (func_00282948(&D_001AF548))
+        if (math_fast_float_d(&D_001AF548))
             obj[0x20] = 1;
         break;
     }
-    func_003166C8(obj);
-    func_0027CFD0(func_00316248, obj);
+    UpdateEffectSlots(obj);
+    gfx_register_overlay_draw_callback(lock_on_draw_sprites, obj);
 }

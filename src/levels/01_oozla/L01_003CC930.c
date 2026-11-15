@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L01_003CC930 (4,624 bytes, 1 place). -O2 -G16 -Wa,-G16 -ffunction-sections
  * -frac2-hazard-labels.
  * - Plain (not sda) scalars for D_L01_001B255C / 001B2088 / 001A8F40 / 001B264C /
@@ -18,12 +19,12 @@
 
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; } Hero;
 
-extern char D_00189E20[];
+extern char g_hero_state[];
 extern s32 D_L01_001B2088;
-extern u8 *D_L01_001B255C;
+extern u8 *g_moby_l01_table;
 extern u8 *D_L01_001B264C;
 extern s32 D_L01_001A8F40;
-extern s32 D_001A79F0;
+extern s32 g_current_map_index;
 extern f32 D_L01_001B0390 __attribute__((sda));
 extern s32 D_L01_001B0398 __attribute__((sda));
 extern s32 D_L01_001B039C __attribute__((sda));
@@ -81,15 +82,15 @@ extern s32 func_00337A60(void *, void *, void *, s32);
 extern void func_0034ECD0(void *, void *);
 extern s32 func_00355780(s32, s32, u8 *);
 extern s32 func_00355828(s32, s32, u8 *, s32);
-extern void func_L01_003CBCD8(u8 *, s32, s32, s32);
-extern void func_L01_003CBFA8(u8 *);
-extern void func_L01_003CBFF0(u8 *);
-extern void func_L01_003CC210(u8 *);
-extern void func_L01_003CC280(u8 *);
-extern void func_L01_003CC898(u8 *, void *, void *, u8, void *);
+extern void swamp_monster_spawn_splash(u8 *, s32, s32, s32);
+extern void swamp_monster_release_attack_slot(u8 *);
+extern void swamp_monster_arm_init(u8 *);
+extern void swamp_monster_release_arm_timers(u8 *);
+extern void UpdateOozlaLinkedGroupDamage(u8 *);
+extern void swamp_monster_test_attack_segment_hits_hero(u8 *, void *, void *, u8, void *);
 
 /* Updates the swamp monster arm. It reaches for the hero, swings and sparks on a hit, then goes back to rest. */
-void func_L01_003CC930(u8 *moby)
+void swamp_monster_arm_update(u8 *moby)
 {
     f32 vecA[4];
     f32 vecB[4];
@@ -159,10 +160,10 @@ void func_L01_003CC930(u8 *moby)
     case 0:
         if (D_L01_001B2088 < 2)
             return;
-        InitSwampMonsterArm(moby);
+        swamp_monster_arm_init(moby);
         break;
     case 1:
-        e1 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+        e1 = g_moby_l01_table + (*(s32 *)(vars + 0xB4) << 8);
         if (*(s32 *)(vars + 0xC8) != 0)
             func_00307390(moby, 7, e1 + 0x10);
         else
@@ -178,7 +179,7 @@ void func_L01_003CC930(u8 *moby)
             }
             if (*(s32 *)(vars + 0xC0) > 0)
                 flag = 1;
-            e0 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+            e0 = g_moby_l01_table + (*(s32 *)(vars + 0xB4) << 8);
             if (func_00312B68(e0, 0x10001, 0) != 0)
                 flag = 1;
             if (flag) {
@@ -190,7 +191,7 @@ void func_L01_003CC930(u8 *moby)
         case 1:
             if (*(s32 *)(vars + 0xBC) != 0)
                 break;
-            e2 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+            e2 = g_moby_l01_table + (*(s32 *)(vars + 0xB4) << 8);
             if (*(s32 *)(vars + 0xC8) != 0) {
                 if (moby[0x43] != 10)
                     func_00310138(moby, 10, 0, 7);
@@ -206,10 +207,10 @@ void func_L01_003CC930(u8 *moby)
         case 2:
             busy1 = func_003104E8(4);
             if (busy1 == 0)
-                SpawnSwampMonsterSplash(moby, 3, 10, 1);
+                swamp_monster_spawn_splash(moby, 3, 10, 1);
             if (!(moby[0x60] & 2))
                 break;
-            e3 = gMobyTable_L01 + (*(s32 *)(vars + 0xB4) << 8);
+            e3 = g_moby_l01_table + (*(s32 *)(vars + 0xB4) << 8);
             e3[0x95] = 1;
             if (*(s32 *)(vars + 0xEC) == -1)
                 goto done;
@@ -228,7 +229,7 @@ void func_L01_003CC930(u8 *moby)
     case 2:
         busy2 = func_003104E8(5);
         if (busy2 == 0)
-            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+            swamp_monster_spawn_splash(moby, 3, 10, 1);
         if ((moby[0x42] == 6 || moby[0x42] == 10) && (moby[0x60] & 2)) {
             if (*(f32 *)(vars + 0xD4) > 0.0f)
                 *(f32 *)(moby + 0x18) = *(f32 *)(vars + 0xD4);
@@ -242,7 +243,7 @@ void func_L01_003CC930(u8 *moby)
     case 3:
         busy3 = func_003104E8(5);
         if (busy3 == 0)
-            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+            swamp_monster_spawn_splash(moby, 3, 10, 1);
         if (moby[0x60] & 2) {
             *(u16 *)(moby + 0x34) |= 0x1000;
             *(s32 *)(vars + 0xC0) = 0xF0;
@@ -278,9 +279,9 @@ void func_L01_003CC930(u8 *moby)
             qcopy(vars + 0x90, vars + 0x80);
             tgt5 = vars + 0x90;
         }
-        heroTarget = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+        heroTarget = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
         if (*(u8 **)(vars + 0x70) == heroTarget) {
-            func_002E34E0(vecA, &((Hero *)gHeroState)->b[0x110], D_L01_001B0390);
+            func_002E34E0(vecA, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
             func_002E3470(vecA, vecA, *(u8 **)(vars + 0x70) + 0x10);
         } else {
             qcopy(vecA, *(u8 **)(vars + 0x70) + 0x10);
@@ -300,7 +301,7 @@ void func_L01_003CC930(u8 *moby)
         func_00310D28(moby, vars + 0xCC, f5, 0.002327106f, 0.1f, 0.13962637f);
         if (moby[0x60] & 2)
             *(f32 *)(moby + 0x48) = func_00310580(0.8f, 1.2f);
-        if (D_L01_001A8F40 != 2 && ((Hero *)gHeroState)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
+        if (D_L01_001A8F40 != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
             (moby[0x21] == 0xFF || **(s32 **)(vars + 0xD8) <= 0) && func_002E3650(pos5, vars + 0x60) < 35.0f &&
             (f5 = func_002E3B10(vecA[0] - *(f32 *)(moby + 0x10), vecA[1] - *(f32 *)(moby + 0x14)),
              func_002E4548(*(f32 *)(moby + 0xF8), f5) < 0.034906588f)) {
@@ -341,8 +342,8 @@ void func_L01_003CC930(u8 *moby)
                 func_002E3470(vecE, vecD, vecG);
                 func_002E34A0(vecB, vecB, vecF);
                 func_002E34A0(vecD, vecD, vecG);
-                TestAttackSegmentHitsHero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
-                TestAttackSegmentHitsHero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
+                swamp_monster_test_attack_segment_hits_hero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
+                swamp_monster_test_attack_segment_hits_hero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
             }
             func_00307390(moby, 6, vecB);
             qcopy(vecC, vecB);
@@ -350,8 +351,8 @@ void func_L01_003CC930(u8 *moby)
             vecD[2] += 2.0f;
             vecC[2] += 2.0f;
             vecE[2] += 0.5f;
-            TestAttackSegmentHitsHero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
-            TestAttackSegmentHitsHero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
+            swamp_monster_test_attack_segment_hits_hero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
+            swamp_monster_test_attack_segment_hits_hero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
         }
         if (animFrame >= 56.0f && vars[0xDE] == 0) {
             func_00355780(2, 0, moby);
@@ -360,16 +361,16 @@ void func_L01_003CC930(u8 *moby)
         level = func_002D9308(moby[0xB0]);
         D_L01_001B03D0 = D_L01_001B03D8[level - 1];
         if (animFrame < (f32)D_L01_001B03D0 &&
-            (animFrame < 20.0f || (((Hero *)gHeroState)->i[0x340 / 4] != 0 && ((Hero *)gHeroState)->h[0x34E / 2] == 0 &&
-                           ((Hero *)gHeroState)->i[0x229C / 4] != 4))) {
+            (animFrame < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
+                           ((Hero *)g_hero_state)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
             if (vars[0xDD] != 0)
                 dir6a = -0.09599312f;
             yaw6a = func_002E4460(*(f32 *)(moby + 0xF8), dir6a);
             *(f32 *)(moby + 0xF8) = yaw6a;
-            heroTarget6 = ((Hero *)gHeroState)->ptr[0x2290 / 4];
+            heroTarget6 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
             if (*(u8 **)(vars + 0x70) == heroTarget6) {
-                func_002E34E0(vecB, &((Hero *)gHeroState)->b[0x110], 55.0f - animFrame);
+                func_002E34E0(vecB, &((Hero *)g_hero_state)->b[0x110], 55.0f - animFrame);
                 func_002E3470(vecB, vecB, *(u8 **)(vars + 0x70) + 0x10);
             } else {
                 qcopy(vecB, *(u8 **)(vars + 0x70) + 0x10);
@@ -422,12 +423,12 @@ void func_L01_003CC930(u8 *moby)
                 rc = func_00310580(D_L01_001B03B0, D_L01_001B03B4);
                 c = func_002E45B8(rc);
                 particle = func_00327360(vecD, vecE, vecH, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
-                if (particle != 0 && (Rand() & 1))
+                if (particle != 0 && (func_001163B0() & 1))
                     particle[3] = 0x48;
             }
         }
         if (moby[0x60] & 2) {
-            ReleaseAttackSlot_L01_2(moby);
+            swamp_monster_release_attack_slot(moby);
             *(s32 *)(vars + 0xC4) = 0xB4;
             if (moby[0x43] != 1)
                 func_00310138(moby, 1, 0, func_00310528(10, 15));
@@ -480,12 +481,12 @@ void func_L01_003CC930(u8 *moby)
     case 8:
         busy8 = func_003104E8(4);
         if (busy8 == 0)
-            SpawnSwampMonsterSplash(moby, 3, 10, 1);
+            swamp_monster_spawn_splash(moby, 3, 10, 1);
         if (!(moby[0x60] & 2))
             break;
     case 9:
         func_0030F920(moby, 0x200, 3);
-        if (*(s32 *)(vars + 0xE4) != -1 && !(D_0019B2E8[moby[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
+        if (*(s32 *)(vars + 0xE4) != -1 && !(D_0019B2E8[moby[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             func_00307E70(moby[0xB0]);
             e9 = D_L01_001B264C + (*(s32 *)(vars + 0xE4) << 7);
             func_0034ECD0(e9 + 0x30, e9 + 0x70);
@@ -494,5 +495,5 @@ void func_L01_003CC930(u8 *moby)
         func_00306250(moby);
         return;
     }
-    ReleaseSwampMonsterArmTimers(moby);
+    swamp_monster_release_arm_timers(moby);
 }

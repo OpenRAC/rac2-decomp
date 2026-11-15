@@ -4,11 +4,11 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char *D_001FEAC0[];
 extern char *D_001B359C MACRO_ADDR;
-extern void func_002A7750(void *, int, int);
+extern void moby_set_state(void *, int, int);
 
 /* when the object is idle, retargets it at its state's table entry: takes the slot's limit
    and the entry's position, restarts the timer and switches to state 1 */
-void func_L02_003D7B88(char *object)
+void table_positioned_update(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     char *entry;
@@ -22,5 +22,5 @@ void func_L02_003D7B88(char *object)
     *(char **)(vars + 0x18) = entry;
     *(s32 *)(vars + 0x14) = 0;
     *(TI128 *)(object + 0x10) = *(TI128 *)(entry + 0x10);
-    SetMobyState(object, 1, -1);
+    moby_set_state(object, 1, -1);
 }

@@ -12,7 +12,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern s32 func_003062A0(u8 *a0);
 extern s32 func_0030CBA8(s32 a0);
-extern void func_00326198(s32 a0, s32 a1);
+extern void thrown_object_update(s32 a0, s32 a1);
 extern void func_002FF9F8(s32 a0);
 extern void func_0037B210(void);
 extern void func_003404B8(void);
@@ -36,11 +36,11 @@ extern void func_00306748(u8 *a0, u8 *a1, u8 *a2);
 extern void func_003068F8(u8 *a0, u8 *a1, f32 f12);
 extern void func_00329960(u8 *a0, u8 *a1, u8 *a2);
 extern void func_003298C0(u8 *a0, u8 *a1, u8 *a2);
-extern void func_L05_00420788(u8 *a0, s32 a1);
-extern void func_L05_004209D8(u8 *a0, s32 a1);
-extern void func_L05_0041FC60(u8 *a0);
-extern void func_L05_004224C8(u8 *a0);
-extern void func_L05_00422540(u8 *a0);
+extern void UpdateFeltzinMissionReward(u8 *a0, s32 a1);
+extern void feltzin_mission_handle_failure(u8 *a0, s32 a1);
+extern void feltzin_challenge_reset(u8 *a0);
+extern void feltzin_target_spawner_init(u8 *a0);
+extern void feltzin_target_spawn_random(u8 *a0);
 
 extern s32 D_001B1364 __attribute__((sda));
 extern s32 D_001B13E4 __attribute__((sda));
@@ -77,7 +77,7 @@ extern s32 D_001B1350 __attribute__((sda));
 /* State 0 waits for func_00379860, then enters state 1. State 1 calls func_0037B538 and, when the
    +0x26C timer of its state expires, picks an entry of the object's id list and passes that object
    (this one when the list has fewer than two entries) to func_L05_00422540. */
-void func_L05_00422380(u8 *moby)
+void feltzin_target_spawner_update(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *target;
@@ -88,7 +88,7 @@ void func_L05_00422380(u8 *moby)
         moby[0x30] = 0xFF;
         if (func_00379860(moby) == 0)
             return;
-        InitFeltzinTargetSpawner(moby);
+        feltzin_target_spawner_init(moby);
         if (*(s32 *)(vars + 0x264) == 0)
             return;
         func_00379E60(moby, 0, 0, 0);
@@ -124,12 +124,12 @@ found:
     }
 done:
     if (target != 0)
-        SpawnFeltzinTargetAtRandomPoint(target);
+        feltzin_target_spawn_random(target);
     *(s32 *)(vars + 0x26C) = 0x78;
 }
 
 /* Puts the spawner object into its active state and clears its timers. */
-void func_L05_004224C8(u8 *moby) {
+void feltzin_target_spawner_init(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     *(u16 *)(moby + 0x34) |= 0x100;
@@ -146,7 +146,7 @@ void func_L05_004224C8(u8 *moby) {
 
 /* shared native body of family 5a97ab89858c */
 /* Fills a block with default values: corner coordinates of -1 and 1, zeroed fields. */
-void func_L05_00433400(char *p)
+void corner_block_init_default(char *p)
 {
     *(long long *)(p + 112) = 0;
     *(float *)(p + 8) = -1.0f;

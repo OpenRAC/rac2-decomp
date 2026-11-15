@@ -1,8 +1,9 @@
+#include "names.h"
 /* func_PAL_002CB710, the PAL copy of func_002CA8A8: the same C, where rename func_002DDEC8 becomes func_PAL_002DECA0; rename func_002CAB00 becomes func_PAL_002CB968; rename func_002CADB0 becomes func_PAL_002CBC18; rename func_002E4AC8 becomes func_PAL_002E5898; rename func_002CA5D0 becomes func_PAL_002CB410. */
 #include "common.h"
 
 extern int D_001B1598 MACRO_ADDR __attribute__((sda));
-extern int D_001A7344 MACRO_ADDR __attribute__((sda));
+extern int g_screen_height MACRO_ADDR __attribute__((sda));
 /* Frozen Batch A A15-struct-pad-20; acknowledged claim 6d4515f9ca5619f8d02349c6c2ad116dc989f5a4c317c4d31105f9a9271aa080. */
 typedef unsigned char BatchA_A15_u8;
 
@@ -56,7 +57,7 @@ extern BatchA_A12_BatchA24 D_L08_001FF980;
 
 /* func_002C7F78 is defined in 002C7F78.c. */
 
-extern char D_001F2840[];
+extern char g_pause_menu_state[];
 
 /* func_002C9C60 is matched in 002C9C60.c (built with -g). */
 
@@ -66,7 +67,7 @@ extern char D_001F2840[];
    counter. */
 /* func_PAL_002CB968 is defined in 002CAB00-g8.c. */
 
-extern int func_002B49E0(int, int, int, int, void *);
+extern int request_begin_slot(int, int, int, int, void *);
 extern short D_0018A000[];
 /* The menu entries are 0x50 apart; D_001B1680 holds the selection and D_001A8B84
  * whether it is enabled. Both scalars and the enable flags are small data: the
@@ -78,7 +79,7 @@ extern ResidentFlag_2CCF68 D_001A7BCB __attribute__((sda));
 extern ResidentFlag_2CCF68 D_001A7BCC __attribute__((sda));
 extern ResidentFlag_2CCF68 D_001A7BCE __attribute__((sda));
 
-extern int func_002CB7D0(int);
+extern int menu_handle_step_simple(int);
 
 typedef struct {
     char reserved00[0x44];
@@ -140,35 +141,35 @@ typedef struct {
     int pad160;
     int err;
 } PauseCardState;
-extern PauseCardState D_001393E0;
-extern int D_001A7424 __attribute__((sda));
+extern PauseCardState g_memcard_state;
+extern int g_save_menu_flags __attribute__((sda));
 extern int D_001B1684 __attribute__((sda));
 extern s32 D_001B18A4[] __attribute__((sda));
 extern void func_PAL_002DECA0(void);
-extern void func_002CAA58(void);
-extern void func_002CAA88(void);
-extern void func_002CAAA0(void);
+extern void menu_enter_pause_mode_two(void);
+extern void menu_enter_pause_mode_three(void);
+extern void menu_enter_pause_mode_four(void);
 extern void func_PAL_002CB968(void);
 extern void func_PAL_002CBC18(void);
 extern int func_PAL_002E5898(void);
-extern void func_002B6658(void);
+extern void moby_update_visible_objects(void);
 extern void func_PAL_002CB410(void);
 
 void func_PAL_002CB710(void)
 {
-    ((PauseState *)D_001F2840)->update_count = ((PauseState *)D_001F2840)->update_count > 31999 ? 32000 : ((PauseState *)D_001F2840)->update_count + 1;
-    ((PauseState *)D_001F2840)->clear = 0;
-    if (((PauseState *)D_001F2840)->timer) --((PauseState *)D_001F2840)->timer;
-    if (D_001393E0.state < 3 && D_001393E0.err < 0) ++((PauseState *)D_001F2840)->card_error_frames;
-    else ((PauseState *)D_001F2840)->card_error_frames = 0;
+    ((PauseState *)g_pause_menu_state)->update_count = ((PauseState *)g_pause_menu_state)->update_count > 31999 ? 32000 : ((PauseState *)g_pause_menu_state)->update_count + 1;
+    ((PauseState *)g_pause_menu_state)->clear = 0;
+    if (((PauseState *)g_pause_menu_state)->timer) --((PauseState *)g_pause_menu_state)->timer;
+    if (g_memcard_state.state < 3 && g_memcard_state.err < 0) ++((PauseState *)g_pause_menu_state)->card_error_frames;
+    else ((PauseState *)g_pause_menu_state)->card_error_frames = 0;
     func_PAL_002DECA0();
-    if ((D_001A7424 & 1) && ((PauseState *)D_001F2840)->mode == 4 && D_001B1684 >= 8) {
-        if (!func_002B49E0(4, 1, 1, ((PauseState *)D_001F2840)->arg, 0)) return;
+    if ((g_save_menu_flags & 1) && ((PauseState *)g_pause_menu_state)->mode == 4 && D_001B1684 >= 8) {
+        if (!request_begin_slot(4, 1, 1, ((PauseState *)g_pause_menu_state)->arg, 0)) return;
     }
-    switch (((PauseState *)D_001F2840)->mode) {
-    case 1: func_002CAA58(); break;
-    case 2: func_002CAA88(); break;
-    case 3: func_002CAAA0(); break;
+    switch (((PauseState *)g_pause_menu_state)->mode) {
+    case 1: menu_enter_pause_mode_two(); break;
+    case 2: menu_enter_pause_mode_three(); break;
+    case 3: menu_enter_pause_mode_four(); break;
     case 4: func_PAL_002CB968(); break;
     case 5:
         func_PAL_002CBC18();
@@ -177,17 +178,17 @@ void func_PAL_002CB710(void)
         D_001B18A4[1] = 0;
         return;
     }
-    func_002B6658();
+    moby_update_visible_objects();
     func_PAL_002E5898();
-    if (((PauseState *)D_001F2840)->pending) func_PAL_002CB410();
+    if (((PauseState *)g_pause_menu_state)->pending) func_PAL_002CB410();
 }
 
-void func_002CAA58(void);
+void menu_enter_pause_mode_two(void);
 
 /* A12-struct-2field-24 freshly exact-verified under family reservation */
-void func_002CAA88(void);
+void menu_enter_pause_mode_three(void);
 
-void func_002CAAA0(void);
+void menu_enter_pause_mode_four(void);
 
 void func_PAL_002CBC18(void);
 
@@ -197,7 +198,7 @@ void func_PAL_002CBC18(void);
 
 /* func_002CB648 is defined in 002CB648-g8.c. */
 
-int func_002CB7D0(int mode);
+int menu_handle_step_simple(int mode);
 
 /* func_002CBAE0 is defined in 002C7748-g8.c. */
 

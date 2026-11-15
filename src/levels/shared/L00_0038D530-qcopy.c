@@ -18,14 +18,14 @@ typedef struct {
     int spinTime;
 } Moby_38D530;
 
-extern Moby_38D530 *func_0029EFD0(int size);
-extern float func_002A7878(float lo, float hi);
-extern int func_002FED90(Moby_38D530 *object, int a, float b, float c, float d);
+extern Moby_38D530 *CreateMoby(int size);
+extern float math_random_float_range(float lo, float hi);
+extern int part_alloc_effect_slot(Moby_38D530 *object, int a, float b, float c, float d);
 extern void func_002A0F48(Moby_38D530 *object);
 
 /* Spawns object 0x79 at A1 with the state vector A2 (the func_L00_003E7650 spawner): a random
    spin on all three axes, a 30..300 frame timer and its effect handle. */
-Moby_38D530 *func_L00_0038D530(TI128 *position, TI128 *velocity)
+Moby_38D530 *part_l00_spawn_spinning_debris(TI128 *position, TI128 *velocity)
 {
     Moby_38D530 *moby;
     char *vars;
@@ -46,12 +46,12 @@ Moby_38D530 *func_L00_0038D530(TI128 *position, TI128 *velocity)
         *(int *)(vars + 0x14) = 0;
         *(int *)(vars + 0x10) = 0x1E;
         *(int *)(vars + 0x18) = 0x12C;
-        moby->spin[0] = RandomFloatRange(minAngle, maxAngle);
-        moby->spin[1] = RandomFloatRange(minAngle, maxAngle);
-        moby->spin[2] = RandomFloatRange(minAngle, maxAngle);
+        moby->spin[0] = math_random_float_range(minAngle, maxAngle);
+        moby->spin[1] = math_random_float_range(minAngle, maxAngle);
+        moby->spin[2] = math_random_float_range(minAngle, maxAngle);
         moby->spinTime = 0;
         func_002A0F48(moby);
-        *(int *)(vars + 0x1C) = AllocEffectSlot_002FED90(moby, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(vars + 0x1C) = part_alloc_effect_slot(moby, 0, 1.0f, 1.0f, 1.0f);
     }
     return moby;
 }

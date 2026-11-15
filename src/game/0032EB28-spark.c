@@ -18,16 +18,16 @@ typedef struct Gparticle {
 extern Gf2540 D_001F2540;
 extern char D_001A8BD0[] __attribute__((sda));
 
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern float func_002A78D8(float, float);
-extern int func_002A77E0(int);
-extern Gparticle *func_002C65A0(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_below(int);
+extern Gparticle *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 
 /* The size is set once ahead of the loop, so gcse's constant propagation writes it directly
  * into both calls and it is not hoisted into a callee-saved register. */
 /* Throws a burst of eight small sparks from a point, moving along the given speed. */
-void func_00331238(TI128 *a0, void *velocity)
+void SpawnRandomParticlePairs(TI128 *a0, void *velocity)
 {
     EffectVector base;
     float vel[4];
@@ -43,14 +43,14 @@ void func_00331238(TI128 *a0, void *velocity)
     i = 8;
     do {
         i--;
-        pos[0] = base.v[0] + RandomSignedFloatRange(0.005f, 0.035f);
-        pos[1] = base.v[1] + RandomSignedFloatRange(0.005f, 0.035f);
-        pos[2] = base.v[2] + RandomSignedFloatRange(0.005f, 0.035f);
-        rnd = RandomIntBelow(0xFF);
-        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
+        pos[0] = base.v[0] + math_random_signed_float_range(0.005f, 0.035f);
+        pos[1] = base.v[1] + math_random_signed_float_range(0.005f, 0.035f);
+        pos[2] = base.v[2] + math_random_signed_float_range(0.005f, 0.035f);
+        rnd = math_random_int_below(0xFF);
+        p = part_spawn_gravity_fade(pos, D_001A8BD0, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
         if (p != 0)
             p->f2 = D_001F2540.f16C[1];
-        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
+        p = part_spawn_gravity_fade(pos, D_001A8BD0, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
         if (p != 0)
             p->f2 = *D_001F2540.fD4;
     } while (i >= 0);

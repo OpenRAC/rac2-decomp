@@ -2,7 +2,7 @@
 
 
 #include "common.h"
-extern void func_002A7750(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void func_32C010();
 extern void func_32C328(char *a0, char *a1, s32 a2);
 extern s32  func_32AB10(char *a0);
@@ -26,7 +26,7 @@ void func_PAL_L03_003D3C90(char *a0)
     case 0:
         *(s32 *)(moby + 0x5C) |= 1;
         func_32C010(a0, moby + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        func_002A7750(a0, 1, -1);
+        moby_set_state(a0, 1, -1);
         break;
     case 1:
         func_32C328(a0, moby + 0x60, 0);

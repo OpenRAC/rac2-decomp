@@ -8,16 +8,16 @@ typedef struct {
     unsigned char pad0[4]; int colour; unsigned char ticks, pad9; short timer;
     float size; TI128_BE400 position; State_BE400 state;
 } Particle_BE400;
-extern void func_00300190(void *, void *);
-extern void func_00282CC0(Vec4_BE400 *, Vec4_BE400 *, Vec4_BE400 *);
-extern int func_002761F8(Vec4_BE400 *, Vec4_BE400 *, int, int, int);
-extern void func_00282C88(Vec4_BE400 *);
-extern void func_002AFFD8(char *, char *, int);
-extern void func_00282D30(Vec4_BE400 *, Vec4_BE400 *, float);
-extern int func_00282978(short *);
-extern void func_002B9180(void *);
-extern int func_002AAE98(float, float, float, float);
-extern int D_0018C0B0;
+extern void vec_transform_or_copy(void *, void *);
+extern void FastVecAdd(Vec4_BE400 *, Vec4_BE400 *, Vec4_BE400 *);
+extern int CollLine(Vec4_BE400 *, Vec4_BE400 *, int, int, int);
+extern void vec_clear_128(Vec4_BE400 *);
+extern void cam_compute_view_direction(char *, char *, int);
+extern void FastVecScale(Vec4_BE400 *, Vec4_BE400 *, float);
+extern int FastDecTimer(short *);
+extern void part_kill(void *);
+extern int gfx_pack_color_floats(float, float, float, float);
+extern int g_hero_moby;
 extern Vec4_BE400 D_001BAFA0;
 extern int D_001A8CA0 __attribute__((sda));
 
@@ -41,26 +41,26 @@ void func_PAL_002BF0E0(Particle_BE400 *particle)
         b = -b;
     }
     position = (Vec4_BE400 *)&particle->position;
-    func_00300190(position, position);
+    vec_transform_or_copy(position, position);
     particle->size += -120.00001f;
-    func_00282CC0(&next, position, &state->motion);
+    FastVecAdd(&next, position, &state->motion);
     collisionPosition = position;
     if (state->motion.x != 0.0f || state->motion.y != 0.0f || state->motion.z != 0.0f) {
-        if (func_002761F8(collisionPosition, &next, 2, D_0018C0B0, 0)) {
+        if (CollLine(collisionPosition, &next, 2, g_hero_moby, 0)) {
             particle->position = *(TI128_BE400 *)&D_001BAFA0;
-            func_00282C88(&state->motion);
+            vec_clear_128(&state->motion);
             particle->size += particle->size;
         } else {
             particle->position = *(TI128_BE400 *)&next;
             if (D_001A8CA0) {
                 float scale;
                 direction = &correction;
-                func_002AFFD8((char *)collisionPosition, (char *)direction, 0);
+                cam_compute_view_direction((char *)collisionPosition, (char *)direction, 0);
                 scale = state->motion.w;
                 if (scale != 0.0f) scale = -scale;
                 else scale = 0.009072f;
-                func_00282D30(direction, direction, scale);
-                func_00282CC0(&state->motion, &state->motion, direction);
+                FastVecScale(direction, direction, scale);
+                FastVecAdd(&state->motion, &state->motion, direction);
             } else {
                 float acceleration = state->motion.w;
                 if (acceleration != 0.0f) state->motion.z += acceleration;
@@ -69,10 +69,10 @@ void func_PAL_002BF0E0(Particle_BE400 *particle)
         }
     }
     if (state->alpha <= 0.0f ||
-        func_00282978(&particle->timer) ||
+        FastDecTimer(&particle->timer) ||
         particle->size < 0.0f ||
         next.x < 0.01f || next.y < 0.01f || next.z < 0.01f) {
-        func_002B9180(particle);
+        part_kill(particle);
         return;
     }
     if (!negative) {
@@ -89,7 +89,7 @@ void func_PAL_002BF0E0(Particle_BE400 *particle)
     b += -0.060000002f;
     if (b < 0.0f) b = 0.0f;
     if (state->alpha < 0.0f) state->alpha = 0.0f;
-    particle->colour = func_002AAE98(r, g, b, state->alpha);
+    particle->colour = gfx_pack_color_floats(r, g, b, state->alpha);
     if (negative > 0) {
         state->r = -r;
         state->g = -g;

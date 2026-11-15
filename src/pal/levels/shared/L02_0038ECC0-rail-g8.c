@@ -44,10 +44,10 @@ struct PrivateData {
     float secondary[3][4];
 };
 
-extern short *D_L02_001FC060[];
-extern struct Rail *D_L02_001FF1C0[];
-extern char *D_L02_001B359C __attribute__((section(".sdata")));
-extern int D_001A79F0;
+extern short *g_entity_group_lists[];
+extern struct Rail *g_route_polygons[];
+extern char *g_moby_l02_pool __attribute__((section(".sdata")));
+extern int g_current_map_index;
 /* Two random ranges, each read as a lower and an upper bound. */
 extern int D_L02_001AEE30[] __attribute__((sda));
 extern float D_L02_001AEE38[] __attribute__((sda));
@@ -57,15 +57,15 @@ extern float D_L02_001AEED0[2][4];
 extern float D_L02_001AEEF0[2][4];
 extern float D_L02_001AEF10[2][4];
 extern float D_L02_001AEF30[2][4];
-extern float func_00282E48(void *, void *);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
-extern float func_002A7878(float, float);
-extern float func_002A7940(void);
-extern void func_00282C88(void *);
-extern float func_002A78D8(float, float);
-extern int func_002A7820(int, int);
-extern void func_00282D30(void *, void *, float);
+extern float fast_vec_dist(void *, void *);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
+extern float math_random_float_range(float, float);
+extern float math_random_angle(void);
+extern void vec_clear_128(void *);
+extern float math_random_signed_float_range(float, float);
+extern int math_random_int_range(int, int);
+extern void FastVecScale(void *, void *, float);
 
 void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
     float vectors[6][4];
@@ -80,25 +80,25 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
     float (*scaled)[4];
     float segmentLength, endDistance, spacing, speed, railCount, numerator;
 
-    cursor = D_L02_001FC060[group];
+    cursor = g_entity_group_lists[group];
     if (!cursor)
         return;
     data = owner->data;
     owner->flags30 = 0xFF;
-    rail = D_L02_001FF1C0[data->railIndex];
-    segmentLength = 1.0f / func_00282E48(rail->point[0], rail->point[1]);
+    rail = g_route_polygons[data->railIndex];
+    segmentLength = 1.0f / fast_vec_dist(rail->point[0], rail->point[1]);
     railCount = (float)rail->count;
-    endDistance = func_00282E48(rail->point[0], rail->point[rail->count - 1]);
+    endDistance = fast_vec_dist(rail->point[0], rail->point[rail->count - 1]);
     data->closed = endDistance < 5.0f;
     data->rail = rail;
     data->step = data->f08 * (segmentLength * 0.020000001f);
-    cursor = D_L02_001FC060[group];
+    cursor = g_entity_group_lists[group];
     i = 0;
     total = 1;
     while (!(cursor[i] & 0x8000)) {
         if (i > 0) {
             short temporary;
-            j = func_002A77E0(i);
+            j = math_random_int_below(i);
             temporary = cursor[j];
             cursor[j] = cursor[i];
             cursor[i] = temporary;
@@ -108,24 +108,24 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
     }
     spacing = ((float)rail->count * 0.4f) / (float)total;
     speed = (data->step * 0.25f) / spacing;
-    cursor = D_L02_001FC060[group];
+    cursor = g_entity_group_lists[group];
     index = total - 1;
     do {
-        object = (struct Object *)((char *)D_L02_001B359C + (*cursor & 0x7FFF) * 256);
+        object = (struct Object *)((char *)g_moby_l02_pool + (*cursor & 0x7FFF) * 256);
         data = object->data;
         if (object != owner)
             object->flags34 |= 2;
-        numerator = func_00283CE0(index);
-        data->position = numerator / func_00283CE0(total) * railCount;
+        numerator = IntToFloat(index);
+        data->position = numerator / IntToFloat(total) * railCount;
         data->spacing = spacing;
-        data->speed = speed * func_002A7878(0.75f, 1.25f);
-        data->phase = func_002A7940();
+        data->speed = speed * math_random_float_range(0.75f, 1.25f);
+        data->phase = math_random_angle();
         data->enabled = 1;
-        func_00282C88(data->vector20);
-        data->vector20[2] = data->f04 * func_002A78D8(0.5f, 1.0f);
-        data->u76 = ((s32)func_002A7820(D_L02_001AEE30[0], D_L02_001AEE30[1]) * 5 + 2) / 6;
-        data->f68 = func_002A7940();
-        data->f6c = func_002A78D8(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0003490659f;
+        vec_clear_128(data->vector20);
+        data->vector20[2] = data->f04 * math_random_signed_float_range(0.5f, 1.0f);
+        data->u76 = ((s32)math_random_int_range(D_L02_001AEE30[0], D_L02_001AEE30[1]) * 5 + 2) / 6;
+        data->f68 = math_random_angle();
+        data->f6c = math_random_signed_float_range(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0003490659f;
         scale = object->scale / *(float *)(object->model + 0x24);
         data->i18 = -1;
         data->i1c = 0;
@@ -144,11 +144,11 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][2] = 0.8600000143051147f;
             vectors[2][0] = -3.0f;
             vectors[2][2] = -0.6700000166893005f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
-            func_00282D30(vectors[2], vectors[2], data->scale);
+            FastVecScale(vectors[2], vectors[2], data->scale);
             qcopy(data->primary[2], vectors[2]);
             {
                 TI128 copy0, copy1, copy2;
@@ -162,7 +162,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[3];
             destination = data->secondary;
             for (k = 2; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
@@ -175,9 +175,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[0][2] = 0.7770000100135803f;
             vectors[1][0] = -3.7179999351501465f;
             vectors[1][2] = -0.8989999890327454f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEEB0[0];
@@ -188,7 +188,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
@@ -205,9 +205,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -3.005000114440918f;
             vectors[1][2] = 0.9300000071525574f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEED0[0];
@@ -218,7 +218,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
@@ -235,9 +235,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -0.22200000286102295f;
             vectors[1][2] = -0.14900000393390656f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEEF0[0];
@@ -248,7 +248,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
@@ -264,9 +264,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -0.8080000281333923f;
             vectors[1][2] = 0.10000000149011612f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
         }
         if (object->kind == 0xD5C) {
@@ -280,9 +280,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -0.8080000281333923f;
             vectors[1][2] = 0.10000000149011612f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
         }
         if (object->kind == 0x127D) {
@@ -298,9 +298,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -0.699999988079071f;
             vectors[1][2] = -0.16099999845027924f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             scaled = &vectors[2];
             walker = scaled;
@@ -308,7 +308,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             destination = data->secondary;
             for (; k < 2; k++) {
                 qcopy(vectors[k + 2], data->primary[k]);
-                func_00282D30(destination, walker, data->scale);
+                FastVecScale(destination, walker, data->scale);
                 walker++;
                 destination++;
             }
@@ -325,9 +325,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -0.8429999947547913f;
             vectors[1][2] = -0.30300000309944153f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEF10[0];
@@ -338,7 +338,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
@@ -359,11 +359,11 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[2][0] = -1.3760000467300415f;
             vectors[2][2] = 0.20800000429153442f;
             vectors[2][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
-            func_00282D30(vectors[2], vectors[2], data->scale);
+            FastVecScale(vectors[2], vectors[2], data->scale);
             qcopy(data->primary[2], vectors[2]);
             scaled = &vectors[3];
             source = scaled;
@@ -371,7 +371,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             destination = data->secondary;
             for (; k < 3; k++) {
                 qcopy(vectors[k + 3], data->primary[k]);
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 source++;
                 destination++;
             }
@@ -388,9 +388,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             vectors[1][1] = -2.131999969482422f;
             vectors[1][2] = -0.3190000057220459f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEF30[0];
@@ -401,13 +401,13 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
         object->state = 1;
-        if (D_001A79F0 != 3)
+        if (g_current_map_index != 3)
             object->flags32 = 0xBE;
         index--;
     } while ((short)*cursor++ >= 0);

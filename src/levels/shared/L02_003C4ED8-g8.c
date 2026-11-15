@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
 
 typedef struct {
     s32 lo;
@@ -24,14 +24,14 @@ extern f32 D_L02_001AFE70_gp[] SDATA(D_L02_001AFE70);
 extern f32 D_L02_001AFE70[] __attribute__((sda));
 extern f32 D_L02_001AFE80[] __attribute__((sda));
 
-extern int func_00282948(void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_L02_002EFB60(void *, void *, void *, int, int, int, int, float);
-extern int func_002A7820(int, int);
-extern int func_002E5DA0(int, int, char *, int);
+extern int math_fast_float_d(void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void part_spawn_spark_burst_line(void *, void *, void *, int, int, int, int, float);
+extern int math_random_int_range(int, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Every so often throws out a burst of sparks from the object and plays a sound, then picks a new random wait time. */
-void func_L02_003C4ED8(u8 *self)
+void spark_emitter_update(u8 *self)
 {
     L02Range_C4ED8 range = D_L02_001AFE90;
     L02Pair_C4ED8 speed = D_L02_001AFE98;
@@ -40,7 +40,7 @@ void func_L02_003C4ED8(u8 *self)
     f32 dir1[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(self + 0x68);
 
-    if (FastFloatHelperD(state + 0x124) == 0)
+    if (math_fast_float_d(state + 0x124) == 0)
         return;
     if (*(s32 *)(state + 0x18) != 0) {
         qcopy(origin, self + 0x10);
@@ -54,7 +54,7 @@ void func_L02_003C4ED8(u8 *self)
     vec_scale_to_length(dir1, dir1, speed.b * 0.016666668f);
     D_L02_001AFE70[1] = -D_L02_001AFE70[1];
     D_L02_001AFE80[1] = -D_L02_001AFE80[1];
-    SpawnSparkBurstAlongLine(origin, dir0, dir1, 12, 0, 0, 0, 15.0f);
-    *(s32 *)(state + 0x124) = RandomIntRange(range.lo, range.hi);
-    PlaySoundFromClassBank(4, 0, (char *)self, 0x896);
+    part_spawn_spark_burst_line(origin, dir0, dir1, 12, 0, 0, 0, 15.0f);
+    *(s32 *)(state + 0x124) = math_random_int_range(range.lo, range.hi);
+    snd_play_from_class_bank(4, 0, (char *)self, 0x896);
 }

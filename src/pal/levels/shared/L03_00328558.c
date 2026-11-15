@@ -26,14 +26,14 @@ typedef struct {
     ParticlePayload payload;
 } Particle;
 extern float D_L03_001A8F20[] __attribute__((sda));
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
-extern void func_0029FC20(void *, int, void *);
-extern float func_00282DF0(void *);
-extern void func_00282F20(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
+extern void moby_transform_joint_point(void *, int, void *);
+extern float FastVecLength(void *);
+extern void vec_scale_to_length(void *, void *, float);
 extern Particle *func_PAL_002BE9A8(void *, float, float, float, int, void *, float, unsigned int, int);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_002A77E0(int);
+extern void FastVecAdd(void *, void *, void *);
+extern int math_random_int_below(int);
 
 /* Emits two particle groups scaled by the object's transformed basis length. */
 void func_PAL_L03_00328558(Moby *object)
@@ -45,13 +45,13 @@ void func_PAL_L03_00328558(Moby *object)
     if ((type != 0x2EE && type != 0xCE0) || object == 0)
         return;
 
-    func_0029FC20(object, 0, matrix);
-    weight = func_00282DF0(matrix) * 0.9746588468551636f;
+    moby_transform_joint_point(object, 0, matrix);
+    weight = FastVecLength(matrix) * 0.9746588468551636f;
     if (weight > 1.0f)
         weight = 1.0f;
     energy = weight * 44000.0f + 6000.0f;
     radius = weight * 0.02f + 0.01f;
-    func_00282F20(velocity, matrix + 8, weight * -0.025f + -0.025f);
+    vec_scale_to_length(velocity, matrix + 8, weight * -0.025f + -0.025f);
 
     /* Larger smoke puffs with random spin. */
     {
@@ -63,14 +63,14 @@ void func_PAL_L03_00328558(Moby *object)
         duration = 5;
         mode = 2;
         alpha = 0x50;
-        func_00282CC0(point, matrix + 12, velocity);
+        FastVecAdd(point, matrix + 12, velocity);
         i = 1;
         do {
             Particle *particle;
             int spin;
 
-            spin = func_002A77E0(16);
-            if (func_002A77E0(2))
+            spin = math_random_int_below(16);
+            if (math_random_int_below(2))
                 spin = -spin;
             particle = func_PAL_002BE9A8(point, radius, 1.0f, 0.75f, spin, D_L03_001A8F20, energy, 0x503030FF, 0);
             if (particle != 0) {
@@ -87,7 +87,7 @@ void func_PAL_L03_00328558(Moby *object)
 
     energy = weight * 25000.0f + 5000.0f;
     radius = weight * 0.015000000596046448f + 0.01f;
-    func_00282F20(velocity, matrix + 8, weight * -0.015000000596046448f + -0.01f);
+    vec_scale_to_length(velocity, matrix + 8, weight * -0.015000000596046448f + -0.01f);
 
     /* Smaller, short-lived sparks. */
     {
@@ -98,7 +98,7 @@ void func_PAL_L03_00328558(Moby *object)
         duration = 2;
         mode = 2;
         alpha = 0x7F;
-        func_00282CC0(point, matrix + 12, velocity);
+        FastVecAdd(point, matrix + 12, velocity);
         {
             int j;
 
@@ -111,7 +111,7 @@ void func_PAL_L03_00328558(Moby *object)
                     ParticlePayload *payload = &particle->payload;
 
                     particle->life.duration = duration;
-                    particle->variation = func_002A77E0(255);
+                    particle->variation = math_random_int_below(255);
                     payload->mode = mode;
                     payload->alpha = alpha;
                     payload->alpha_copy = particle->life.duration_lo;

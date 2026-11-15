@@ -6,16 +6,16 @@ typedef struct { DrawVec v[9]; } DrawPacket;
 
 extern DrawVec D_L30_001B09B0[4] __attribute__((sda));
 extern DrawVec D_L30_001B9DC0;
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_00282DD8(void *, void *, void *);
-extern void func_00282D30(void *, void *, float);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00280B90(void *, int, int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void FastVecCross(void *, void *, void *);
+extern void FastVecScale(void *, void *, float);
+extern void FastVecAdd(void *, void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void draw_world_quad(void *, int, int);
 
 /* Draws a flat four-corner sprite that faces the camera, with a given size and sideways offset. */
-void func_L30_003D9CA8(DrawVec *position, DrawPacket *source, float scale, float offset) {
+void gfx_l30_draw_facing_sprite(DrawVec *position, DrawPacket *source, float scale, float offset) {
     struct { DrawPacket packet; DrawVec up, side, forward, normal, point, temp; } f;
     int i;
     f.packet = *source;

@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern float func_00283C80(float, float);
-extern void func_002B5278(u8 *, float);
-extern void func_002B5258(u8 *);
-extern float func_002AAA00(void *, float, void *, float, float, float, int);
-extern void func_L02_0032E998(void *, void *, void *, void *, int, void *, void *,
+extern float FastDiffRots(float, float);
+extern void moby_step_at_own_position_factor(u8 *, float);
+extern void moby_step_at_own_position(u8 *);
+extern float math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
+extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
                               float, float);
-extern int func_002B50E0(u8 *, void *, float);
-extern int func_002B4FF0(u8 *, void *, float);
+extern int moby_step_controller(u8 *, void *, float);
+extern int moby_turn_toward_target_and_step(u8 *, void *, float);
 
 #define W(p, o) (*(int *)((p) + (o)))
 #define H(p, o) (*(s16 *)((p) + (o)))
@@ -16,7 +16,7 @@ extern int func_002B4FF0(u8 *, void *, float);
 
 /* A unit of its own: the switch's jump table is this unit's only .rodata. */
 /* Turns the Extermibot's body and torso part toward its target, depending on which animation it is playing. */
-void func_L18_00432070(u8 *moby) {
+void extermibot_aim_torso(u8 *moby) {
     u8 *vars = P(moby, 0x68);
     int animation = moby[0x42];
 
@@ -31,19 +31,19 @@ void func_L18_00432070(u8 *moby) {
     case 10: case 11: case 12: case 13: case 14: case 15:
         if (H(vars, 0x808) == 1) {
             if (FastDiffRots(F(vars, 0x7A4), F(moby, 0xF8)) > 0.6108652949333191f) {
-                StepMovementAtOwnPositionWithFactor(moby, F(vars, 0x7A4));
+                moby_step_at_own_position_factor(moby, F(vars, 0x7A4));
             } else {
                 if (P(vars, 0x7C0))
-                    ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
+                    math_approach_target_with_direction_mode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
                                   0.006981317885220051f, 0.006981317885220051f,
                                   0.20943955f, 0);
-                StepMovementAtOwnPosition(moby);
+                moby_step_at_own_position(moby);
             }
         } else {
-            if (H(vars, 0x808) == 2) StepMovementAtOwnPositionWithFactor(moby, F(vars, 0x7A4));
-            else StepMovementAtOwnPosition(moby);
+            if (H(vars, 0x808) == 2) moby_step_at_own_position_factor(moby, F(vars, 0x7A4));
+            else moby_step_at_own_position(moby);
             if (P(vars, 0x7C0))
-                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
+                math_approach_target_with_direction_mode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
         }
@@ -52,18 +52,18 @@ void func_L18_00432070(u8 *moby) {
         if (W(vars, 0x7D4) != -1) {
             ComputeRegionRouteHeading(moby + 0x10, vars + 0x750, vars + 0x7DC, vars + 0x210, W(vars, 0x780),
                               vars + 0x78C, vars + 0x7D8, 0.0f, 0.4f);
-            StepMovementController(moby, vars + 0x750, F(vars, 0x7DC));
+            moby_step_controller(moby, vars + 0x750, F(vars, 0x7DC));
         } else {
-            TurnTowardTargetAndStepMovement(moby, vars + 0x750, F(vars, 0x7A0));
+            moby_turn_toward_target_and_step(moby, vars + 0x750, F(vars, 0x7A0));
         }
         if (P(vars, 0x7C0)) {
             if (H(vars, 0x808) == 1 &&
                 FastDiffRots(F(vars, 0x7A4), F(moby, 0xF8)) < 0.6108652949333191f) {
-                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
+                math_approach_target_with_direction_mode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
             } else {
-                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
+                math_approach_target_with_direction_mode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
             }

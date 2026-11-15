@@ -9,17 +9,17 @@
    takes the 127 from the fall-through, as in retail, and the last branch steals the bare
    $gp load of the first word from its target.  Two names for the one block: the sda scalar
    and the absolute macro form of the same address (D_L10_001B1390_4). */
-extern s32 D_L10_001B1390 __attribute__((sda));
+extern s32 g_mission_completion_counts __attribute__((sda));
 extern s32 D_L10_001B1390_4[] MACRO_ADDR;
 extern u8 D_L10_001395B8[];
 
-void func_L10_00425888(void) {
-    if (gMissionCompletionCounts > 0x7F) gMissionCompletionCounts = 0x7F;
+void mission_store_completion_counts(void) {
+    if (g_mission_completion_counts > 0x7F) g_mission_completion_counts = 0x7F;
     if (D_L10_001B1390_4[1] > 0x7F) D_L10_001B1390_4[1] = 0x7F;
     if (D_L10_001B1390_4[2] > 0x7F) D_L10_001B1390_4[2] = 0x7F;
     if (D_L10_001B1390_4[3] > 0x7F) D_L10_001B1390_4[3] = 0x7F;
 
-    D_L10_001395B8[0x66] = gMissionCompletionCounts;
+    D_L10_001395B8[0x66] = g_mission_completion_counts;
     D_L10_001395B8[0x67] = D_L10_001B1390_4[1];
     D_L10_001395B8[0x68] = D_L10_001B1390_4[2];
     D_L10_001395B8[0x69] = D_L10_001B1390_4[3];

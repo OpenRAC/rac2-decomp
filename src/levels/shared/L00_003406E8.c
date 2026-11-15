@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float func_00283CE0(int a);
+extern float IntToFloat(int a);
 extern int func_00283CF0_2(float f);
 extern int func_00283D38_1(float, int, int);
-extern float func_002A7798(float f);
-extern float func_002A7790(float f);
+extern float math_ease_out_quad(float f);
+extern float math_square(float f);
 extern void func_00282D30_13(char *a, char *b, float f);
 extern void func_00282CC0_13(char *a, char *b, char *c);
 extern void func_00300190_1(char *a, char *b);
@@ -14,7 +14,7 @@ extern void func_002B9180_6(char *p);
 
 /* Hand-adapted from func_002C8880. */
 /* Updates a puff particle each frame: it moves, fades and grows, then is removed when its time runs out. */
-void func_L00_003406E8(char *particle) {
+void part_update_puff(char *particle) {
     float step[4];
     float velocity[4];
     char *motion = particle + 0x20;
@@ -32,11 +32,11 @@ void func_L00_003406E8(char *particle) {
         color = func_00283D38_1(progress, 0x103080, *(int *)(motion + 0xC));
         *(int *)(particle + 4) = color | (*(unsigned char *)(motion + 0x12) << 24);
         *(float *)(particle + 0xC) = *(float *)(motion + 0x14) + (*(float *)(motion + 0x18) - *(float *)(motion + 0x14)) * progress;
-        func_00282D30_13(step, velocity, *(float *)(motion + 0x1C) * EaseOutQuad(progress));
+        func_00282D30_13(step, velocity, *(float *)(motion + 0x1C) * math_ease_out_quad(progress));
     } else {
         alphaStart = IntToFloat(*(unsigned char *)(motion + 0x12));
         alphaDrop = IntToFloat(*(unsigned char *)(motion + 0x12));
-        alphaDrop = alphaDrop * Square(progress);
+        alphaDrop = alphaDrop * math_square(progress);
         *(int *)(particle + 4) = *(int *)(motion + 0xC) | (func_00283CF0_2(alphaStart - alphaDrop) << 24);
         func_00282D30_13(step, velocity, *(float *)(motion + 0x1C));
     }

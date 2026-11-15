@@ -31,10 +31,10 @@ typedef struct {
     u8 flag;                      /* 0xD7 */
 } Anim;
 
-extern HeroAnim D_00189E20;
-extern float func_00283CE0(int);
-extern int func_00282978(void *);
-extern void func_003349E8(void *, int, float);
+extern HeroAnim g_hero_state;
+extern float IntToFloat(int);
+extern int FastDecTimer(void *);
+extern void cam_compute_offset(void *, int, float);
 extern int D_L00_001B1588 __attribute__((sda));
 extern int D_L00_001B1518 __attribute__((sda)), D_L00_001B152C __attribute__((sda)), D_L00_001B1530 __attribute__((sda)), D_L00_001B1534 __attribute__((sda));
 extern int D_L00_001B1540 __attribute__((sda)), D_L00_001B1544 __attribute__((sda)), D_L00_001B1548 __attribute__((sda)), D_L00_001B1550 __attribute__((sda));
@@ -59,66 +59,66 @@ void func_PAL_L00_00425F08(char *moby)
     Anim *s = (Anim *)(p + 0x60);
     if (D_L00_001B1588) { D_L00_001B1588 = 0; return; }
     if (s->state == 0) {
-        if (D_00189E20.ctrl == 2 || D_00189E20.ctrl == 30) GO(1, D_L00_001B1530)
-        if (D_00189E20.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, p + 0x90, p + 0x70, p + 0x80)
-        if (D_00189E20.state == 12) GO(8, D_L00_001B1554)
-        if (D_00189E20.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, p + 0x90, p + 0x70, p + 0x80)
-        if ((unsigned)(D_00189E20.state - 13) < 2) {
+        if (g_hero_state.ctrl == 2 || g_hero_state.ctrl == 30) GO(1, D_L00_001B1530)
+        if (g_hero_state.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, p + 0x90, p + 0x70, p + 0x80)
+        if (g_hero_state.state == 12) GO(8, D_L00_001B1554)
+        if (g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, p + 0x90, p + 0x70, p + 0x80)
+        if ((unsigned)(g_hero_state.state - 13) < 2) {
             AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, p + 0x90, p + 0x70, p + 0x80)
         }
-        if (D_00189E20.ctrl == 4) GO(2, D_L00_001B152C)
+        if (g_hero_state.ctrl == 4) GO(2, D_L00_001B152C)
         return;
     }
-    if (s->state == 2 && (D_00189E20.state == 0x81 || D_00189E20.state == 0x5B)) GO(1, D_L00_001B1530)
-    if (s->state != 9 && s->state != 1 && D_00189E20.state == 0x14) {
+    if (s->state == 2 && (g_hero_state.state == 0x81 || g_hero_state.state == 0x5B)) GO(1, D_L00_001B1530)
+    if (s->state != 9 && s->state != 1 && g_hero_state.state == 0x14) {
         s->prev = s->state; s->state = 9;
         s->timer2 = ((s32)(D_L00_001B1560) * 5 + 2) / 6;
-        s->rate2 = 1.0f / func_00283CE0(s->timer2);
+        s->rate2 = 1.0f / IntToFloat(s->timer2);
         s->timer = 0; s->rate = 1.0f; s->level = D_L00_001B1570; s->flag = 0;
-        func_003349E8(s->sound, 1, D_L00_001B1570);
+        cam_compute_offset(s->sound, 1, D_L00_001B1570);
         qcopy(s->b, s->a);
         return;
     }
-    if ((s->state == 1 || s->state == 2) && D_00189E20.ctrl != 4 && D_00189E20.ctrl != 2 && D_00189E20.ctrl != 30 && D_00189E20.state != 0x81) {
+    if ((s->state == 1 || s->state == 2) && g_hero_state.ctrl != 4 && g_hero_state.ctrl != 2 && g_hero_state.ctrl != 30 && g_hero_state.state != 0x81) {
         s->timer = 0; s->rate = 1.0f; s->state = 0;
         return;
     }
     if (s->state == 7) {
-        if (!D_00189E20.b49E) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-        if (D_00189E20.ctrl == 2) GO(1, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
+        if (!g_hero_state.b49E) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
+        if (g_hero_state.ctrl == 2) GO(1, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
     }
-    if (s->state == 4 && D_00189E20.ctrl != 4) {
-        if (D_00189E20.ctrl == 2) {
+    if (s->state == 4 && g_hero_state.ctrl != 4) {
+        if (g_hero_state.ctrl == 2) {
             s->prev = 4; s->state = 1;
-            s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         } else {
             s->prev = 4; s->state = 0;
-            s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         }
     }
-    if (s->state == 3 && D_00189E20.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-    if (s->state == 5 && D_00189E20.state == 12) GO(8, D_L00_001B1554)
-    if (s->state == 8 && D_00189E20.state != 12) GO(0, ((s32)(D_L00_001B1558) * 5 + 2) / 6)
-    if (s->state == 6 && D_00189E20.state != 11) GO(0, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
-    if ((s->state == 3 || s->state == 5) && D_00189E20.ctrl != 4) GO(0, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
-    if ((s->state == 9 && (D_00189E20.ctrl == 2 || D_00189E20.h34C >= 0x2E)) ||
-        (s->state == 10 && (D_00189E20.ctrl == 2 || D_00189E20.h34C >= 0x2E))) {
+    if (s->state == 3 && g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
+    if (s->state == 5 && g_hero_state.state == 12) GO(8, D_L00_001B1554)
+    if (s->state == 8 && g_hero_state.state != 12) GO(0, ((s32)(D_L00_001B1558) * 5 + 2) / 6)
+    if (s->state == 6 && g_hero_state.state != 11) GO(0, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
+    if ((s->state == 3 || s->state == 5) && g_hero_state.ctrl != 4) GO(0, ((s32)(D_L00_001B1548) * 5 + 2) / 6)
+    if ((s->state == 9 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x2E)) ||
+        (s->state == 10 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x2E))) {
         float one = 1.0f;
         char *q;
         s->prev = s->state; s->state = 1;
         s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6;
-        s->rate = one / func_00283CE0(s->timer);
+        s->rate = one / IntToFloat(s->timer);
         q = *(char **)(moby + 0x70) + 0x20;
         *(short *)q = ((s32)(D_L00_001B1518) * 5 + 2) / 6;
-        *(float *)(q + 0x24) = one / func_00283CE0(*(short *)q);
+        *(float *)(q + 0x24) = one / IntToFloat(*(short *)q);
         qcopy(moby + 0x40, moby);
         return;
     }
-    if (s->state == 9 && D_00189E20.state != 0x14) GO(10, D_L00_001B156C)
-    if (s->state == 10 && func_00282978(&s->timer2)) {
+    if (s->state == 9 && g_hero_state.state != 0x14) GO(10, D_L00_001B156C)
+    if (s->state == 10 && FastDecTimer(&s->timer2)) {
         s->prev = s->state; s->state = 0;
-        s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / func_00283CE0(s->timer);
+        s->timer = ((s32)(D_L00_001B1548) * 5 + 2) / 6; s->rate = 1.0f / IntToFloat(s->timer);
     }
 }

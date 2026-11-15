@@ -37,7 +37,7 @@ extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_14 __attribute__((sda));
 extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_15;
 
 /* Sets a group of counters and flags to zero. */
-void func_0027B7E0(void)
+void counter_clear_group(void)
 {
     ref_L00_002E56B0_00 = 0;
     ref_L00_002E56B0_01 = 0;
@@ -57,15 +57,15 @@ void func_0027B7E0(void)
     ref_L00_002E56B0_15 = 0;
 }
 
-extern char *D_001B22A8 __attribute__((sda));
+extern char *g_dma_packet_cursor __attribute__((sda));
 extern char *ref_L00_0027B858_00;
 extern char D_001391D0[];
 extern char D_00139120[];
 extern char D_001B9040[];
-extern void func_002FC560(unsigned int, unsigned long);
+extern void VU1_addGSregister(unsigned int, unsigned long);
 
 /* Writes two drawing packets and sends the current color to the graphics chip. */
-void func_0027B858(void)
+void gfx_write_clear_color_packets(void)
 {
     unsigned long packed;
     *(int *)(ref_L00_0027B858_00 + 0) = 0x30000013;
@@ -87,6 +87,6 @@ void func_0027B858(void)
         int w2 = *(int *)(base + 0x238);
         packed = (unsigned long)w0 | ((unsigned long)w1 << 8) | ((unsigned long)w2 << 16);
     }
-    gDmaPacketCursor = ref_L00_0027B858_00 + 16;
+    g_dma_packet_cursor = ref_L00_0027B858_00 + 16;
     VU1_addGSregister(0x3D, packed);
 }

@@ -23,21 +23,21 @@ typedef struct {
     int state;
 } Owner_002A75D8;
 
-extern Owner_002A75D8 D_00189E20;
-extern void func_002AEE70(void *, void *, void *, float, float, float);
-extern void func_00283410(void *, void *);
-extern void func_002830C0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
+extern Owner_002A75D8 g_hero_state;
+extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
+extern void euler_to_matrix(void *, void *);
+extern void transform_vector(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
 
 /* Updates the hero model for one special state. It tilts the model and copies a height value onto it, then moves the model by a small offset. */
-void func_L00_002A75D8(void)
+void hero_update_model_tilt(void)
 {
-    Owner_002A75D8 *hero = &gHeroState;
+    Owner_002A75D8 *hero = &g_hero_state;
     float offset[4];
     float matrix[16];
 
     if (hero->state == 0x7C)
-        UpdateWrappedAngleOffset(hero->obj, &hero->f7A8, &hero->f7AC, 0.3f, 0.1163553f, -1.0f);
+        math_update_wrapped_angle_offset(hero->obj, &hero->f7A8, &hero->f7AC, 0.3f, 0.1163553f, -1.0f);
     if (hero->f6BC == 0)
         return;
     if (hero->f660 != 0)

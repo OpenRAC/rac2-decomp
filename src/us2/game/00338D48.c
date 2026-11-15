@@ -1,8 +1,9 @@
+#include "names.h"
 /* func_US2_00338D48: needs -frac2-keep-block-zero-copy (cse keeps `i = length`); see
    docs/build/compiler-notes.md. */
 
-extern void *func_00115484(void *, int, unsigned int);
-extern int func_0027F178(unsigned char *text, int length); /* text width */
+extern void *memset(void *, int, unsigned int);
+extern int text_measure_width_small(unsigned char *text, int length); /* text width */
 
 /* Text box laid out by func_US2_00338CD8: text at +0xA8, its line table at +0x1D8. */
 typedef struct {
@@ -39,8 +40,8 @@ void func_US2_00338D48(TextBox *box, int mode, int duration, float x, float y)
     box->text[0xFF] = 0;
     box->maxWidth = 0;
     box->lineCount = 1;
-    func_00115484(line, 0, sizeof(line));
-    func_00115484(box->lines, 0, sizeof(box->lines));
+    memset(line, 0, sizeof(line));
+    memset(box->lines, 0, sizeof(box->lines));
     text = box->text;
     box->lines[box->lineCount - 1] = text;
     single = 1;
@@ -52,7 +53,7 @@ void func_US2_00338D48(TextBox *box, int mode, int duration, float x, float y)
             length = 0;
             box->lines[box->lineCount] = &box->text[i + 1];
             box->lineCount++;
-            width = func_0027F178(line, -1);
+            width = text_measure_width_small(line, -1);
             box->maxWidth = (box->maxWidth < width) ? width : box->maxWidth;
         } else {
             line[length] = text[i];
@@ -63,9 +64,9 @@ void func_US2_00338D48(TextBox *box, int mode, int duration, float x, float y)
         line[length] = 0;
     }
     if (single) {
-        box->maxWidth = func_0027F178(box->text, -1);
+        box->maxWidth = text_measure_width_small(box->text, -1);
     } else {
-        width = func_0027F178(line, -1);
+        width = text_measure_width_small(line, -1);
         box->maxWidth = (box->maxWidth < width) ? width : box->maxWidth;
     }
     box->scale[0] = 1.0f;

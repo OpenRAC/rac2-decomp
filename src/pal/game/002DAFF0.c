@@ -1,22 +1,23 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int undefined4;
-extern undefined4 func_002DE618(undefined4);
+extern undefined4 release_menu_stream_buffer(undefined4);
 typedef struct {
     char reserved[0x44];
     int state;
     unsigned int first, second;
     int index, pending;
 } Handles_2DCB28;
-extern void func_002B7CE0(int);
+extern void snd_pump_music_and_disc_read(int);
 
 int func_PAL_002DAFF0(Handles_2DCB28 *object) {
-    object->first = func_002DE618(object->first);
-    object->second = func_002DE618(object->second);
+    object->first = release_menu_stream_buffer(object->first);
+    object->second = release_menu_stream_buffer(object->second);
     object->index = -1;
     object->pending = -1;
     object->state = -1;
-    func_002B7CE0(1);
+    snd_pump_music_and_disc_read(1);
     return 0;
 }
 
@@ -35,8 +36,8 @@ typedef struct {
 } StreamReads2DAD18;
 extern short D_001A63AC;
 extern int D_0025E0B0;
-extern StreamReads2DAD18 D_0014B540;
-extern int func_002B7B18(int, int, int);
+extern StreamReads2DAD18 g_copy_setup_data;
+extern int load_start_disc_read(int, int, int);
 
 int func_PAL_002DBA38(Handles_2DCB28 *object)
 {
@@ -46,10 +47,10 @@ int func_PAL_002DBA38(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = &D_0014B540;
+                StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->first,
+                if (load_start_disc_read(object->first,
                                   reads->first[D_0025E0B0].start + offset,
                                   reads->first[D_0025E0B0].length) != 0)
                     object->state++;
@@ -68,10 +69,10 @@ int func_PAL_002DBA38(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = &D_0014B540;
+                StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->second,
+                if (load_start_disc_read(object->second,
                                   reads->second[D_0025E0B0].start + offset,
                                   reads->second[D_0025E0B0].length) != 0)
                     object->state++;

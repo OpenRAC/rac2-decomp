@@ -1,3 +1,4 @@
+#include "names.h"
 /* An eight-state object update (Dobbo). A -G8 unit of its own: it reads $gp data and has a jump table.
  *
  * What the bytes show about the source:
@@ -29,29 +30,29 @@ extern u8 D_001A7BD3 MACRO_ADDR, D_001A7A40 MACRO_ADDR;
 extern DobboInput D_00139768 NOT_SDA;
 extern DobboProgress D_001395B8 NOT_SDA;
 extern char D_0019B2E8[] NOT_SDA;
-extern char D_00189E20[] NOT_SDA;
+extern char g_hero_state[] NOT_SDA;
 extern char D_L09_001BFC00[] NOT_SDA;
 extern int D_L09_001A8F00 MACRO_ADDR, D_L09_001B2388 MACRO_ADDR;
 extern int D_L09_001B25A0[] MACRO_ADDR;
-extern int D_L09_001B15A0 __attribute__((sda)), D_001A79F0 __attribute__((sda));
+extern int D_L09_001B15A0 __attribute__((sda)), g_current_map_index __attribute__((sda));
 
-extern void func_L04_00423178(char *);
-extern void func_002A7750(char *, int, int);
-extern int func_002ACBC8(void *, int);
-extern void func_L01_003128C0(char *);
-extern int func_00288AA0(void *, int);
-extern void func_L01_003246D0(char *), func_00288BE8(void *);
-extern int func_002F5D10(void);
-extern void func_00288CB0(int, int), func_002F5CC8(void), func_002DF3F8(void *, void *);
-extern void func_0029B3E0(int, int), func_002AD7B8(int), func_002AF0A8(int), func_002A0430(int);
-extern void func_0029F338(char *);
-extern int func_00282978(void *), func_00283CF0(float);
-extern float func_002A7878(float, float), func_00282E80(void *, void *), func_00283248(float, float);
-extern float func_00283C80(float, float), func_00282DF0(void *), func_00283B98(float, float);
-extern float func_00283BE0(float, float), func_00282E20(void *);
-extern void func_002A7470(char *, int, int, int), func_002AF000(void *, float, float, float);
-extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
-extern void func_002AEC48(char *, void *, int, float, float);
+extern void moby_reset_matching_effects(char *);
+extern void moby_set_state(char *, int, int);
+extern int IsPointInCuboid(void *, int);
+extern void moby_reset_vars_defaults(char *);
+extern int req_push_queue(void *, int);
+extern void level_apply_index_for_key(char *), req_launch_queued(void *);
+extern int game_is_either_mode_two(void);
+extern void data_set_small_value_and_refresh(int, int), game_set_slowdown_factor(void), level_capture_checkpoint_state(void *, void *);
+extern void MemcardSave(int, int), moby_mark_flag_and_append_to_list(int), snd_play_indexed(int), moby_mark_table_entry_flagged(int);
+extern void moby_mark_spawned(char *);
+extern int FastDecTimer(void *), FloatToInt(float);
+extern float math_random_float_range(float, float), vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
+extern float FastDiffRots(float, float), FastVecLength(void *), FastAddRotations(float, float);
+extern float fast_subtract_rotations(float, float), vec_length_xy(void *);
+extern void anim_start_blended(char *, int, int, int), vec_build_spherical_offset(void *, float, float, float);
+extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
+extern void moby_update_eased_node(char *, void *, int, float, float);
 
 #define HERO_POS (D_00189E20 + 0x80)
 #define HERO_ROT (D_00189E20 + 0x90)
@@ -63,16 +64,16 @@ extern void func_002AEC48(char *, void *, int, float, float);
 #define F32(p, o) (*(float *)((p) + (o)))
 
 static inline float yawToHero(char *obj) {
-    char *hero = gHeroState;
-    return FastMatrixHelperA(F32(hero, 0xE0) - F32(obj, 0x10), F32(hero, 0xE4) - F32(obj, 0x14));
+    char *hero = g_hero_state;
+    return mat_fast_helper_a(F32(hero, 0xE0) - F32(obj, 0x10), F32(hero, 0xE4) - F32(obj, 0x14));
 }
 
 static inline void updateJoint(char *obj, char *joint, int index, float speed, float rate) {
-    UpdateEasedNode(obj, joint, index, speed, rate);
+    moby_update_eased_node(obj, joint, index, speed, rate);
 }
 
 /* Per-frame update of the talking character (moby class 3678): it offers dialogue and rewards, then watches the hero with its head and eyes. */
-void func_L09_0040A2E8(char *obj) {
+void talking_npc_update(char *obj) {
     float target[4], pos[4], delta[4];
     char *data = *(char **)(obj + 0x68);
     char *player;
@@ -80,7 +81,7 @@ void func_L09_0040A2E8(char *obj) {
     int active;
     u64 status;
 
-    ResetMatchingMobyEffects(obj);
+    moby_reset_matching_effects(obj);
     switch (U8(obj, 0x20)) {
     case 0:
         if (D_001A7BD3) {
@@ -89,25 +90,25 @@ void func_L09_0040A2E8(char *obj) {
         }
         status = D_00139768.status;
         if (status >> 7) {
-            SetMobyState(obj, 6, -1);
+            moby_set_state(obj, 6, -1);
         } else if (D_001395B8.unlocked || (D_00139768.flags & 8)) {
-            SetMobyState(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
         } else {
-            SetMobyState(obj, 1, -1);
+            moby_set_state(obj, 1, -1);
         }
         if (U8(obj, 0x20) == 3) {
             if (!IsPointInCuboid(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
                 D_L09_001B15A0 = 1;
             }
         }
-        ResetMobyVarsDefaults(obj);
+        moby_reset_vars_defaults(obj);
         break;
     case 1:
         if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
-            if (PushRequestQueue(D_L09_001BFC00, 99)) {
-                ApplyIndexForKey(obj);
-                LaunchQueuedRequest(D_L09_001BFC00);
-                SetMobyState(obj, 2, -1);
+            if (req_push_queue(D_L09_001BFC00, 99)) {
+                level_apply_index_for_key(obj);
+                req_launch_queued(D_L09_001BFC00);
+                moby_set_state(obj, 2, -1);
             }
         }
         break;
@@ -117,33 +118,33 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            SetMobyState(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
             D_001395B8.unlocked = 1;
             D_001395B8.started = 1;
-            SetSmallDataValueAndRefresh(22, 1);
+            data_set_small_value_and_refresh(22, 1);
         }
         break;
     case 3:
         if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
             if (D_001395B8.completed) {
-                if (PushRequestQueue(D_L09_001BFC00, 103)) {
-                    PushRequestQueue(D_L09_001BFC00, 11);
-                    ApplyIndexForKey(obj);
-                    LaunchQueuedRequest(D_L09_001BFC00);
-                    SetSlowdownFactorAndLowFpsFade();
+                if (req_push_queue(D_L09_001BFC00, 103)) {
+                    req_push_queue(D_L09_001BFC00, 11);
+                    level_apply_index_for_key(obj);
+                    req_launch_queued(D_L09_001BFC00);
+                    game_set_slowdown_factor();
                     D_L09_001B15A0 = 1;
-                    SetMobyState(obj, 5, -1);
+                    moby_set_state(obj, 5, -1);
                 }
             } else if (D_L09_001B2388 < 10 && D_001395B8.unlocked && !D_L09_001B15A0) {
-                if (PushRequestQueue(D_L09_001BFC00, 102)) {
-                    LaunchQueuedRequest(D_L09_001BFC00);
-                    SetSlowdownFactorAndLowFpsFade();
+                if (req_push_queue(D_L09_001BFC00, 102)) {
+                    req_launch_queued(D_L09_001BFC00);
+                    game_set_slowdown_factor();
                     D_L09_001B15A0 = 1;
-                    SetMobyState(obj, 4, -1);
+                    moby_set_state(obj, 4, -1);
                 }
             }
         }
@@ -154,13 +155,13 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
-            CaptureCheckpointState(HERO_POS, HERO_ROT);
+        if (!game_is_either_mode_two()) {
+            level_capture_checkpoint_state(HERO_POS, HERO_ROT);
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             MemcardSave(0, -1);
-            SetMobyState(obj, 3, -1);
+            moby_set_state(obj, 3, -1);
         }
         break;
     case 5:
@@ -169,29 +170,29 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             D_L09_001B25A0[2] = 0;
-            MarkFlagAndAppendToList(11);
-            PlayIndexedSound(11);
-            if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (gCurrentMapIndex << 4)) & 0x80)) {
-                MarkTableEntryFlagged(U8(obj, 0xB0));
+            moby_mark_flag_and_append_to_list(11);
+            snd_play_indexed(11);
+            if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (g_current_map_index << 4)) & 0x80)) {
+                moby_mark_table_entry_flagged(U8(obj, 0xB0));
             }
-            CaptureCheckpointState(HERO_POS, HERO_ROT);
+            level_capture_checkpoint_state(HERO_POS, HERO_ROT);
             MemcardSave(0, -1);
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
             return;
         }
         break;
     case 6:
         if (IsPointInCuboid(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
             && !D_L09_001B15A0) {
-            if (PushRequestQueue(D_L09_001BFC00, 102)) {
-                LaunchQueuedRequest(D_L09_001BFC00);
-                SetSlowdownFactorAndLowFpsFade();
+            if (req_push_queue(D_L09_001BFC00, 102)) {
+                req_launch_queued(D_L09_001BFC00);
+                game_set_slowdown_factor();
                 D_L09_001B15A0 = 1;
-                SetMobyState(obj, 7, -1);
+                moby_set_state(obj, 7, -1);
             }
         }
         break;
@@ -201,14 +202,14 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!IsEitherModeTwo()) {
+        if (!game_is_either_mode_two()) {
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             D_L09_001B25A0[2] = 0;
-            SetMobyState(obj, 8, -1);
-            CaptureCheckpointState(HERO_POS, HERO_ROT);
+            moby_set_state(obj, 8, -1);
+            level_capture_checkpoint_state(HERO_POS, HERO_ROT);
             MemcardSave(0, -1);
-            MarkMobySpawned(obj);
+            moby_mark_spawned(obj);
             return;
         }
         break;
@@ -216,12 +217,12 @@ void func_L09_0040A2E8(char *obj) {
 
     if (U8(obj, 0x20)) {
         if (U8(obj, 0x43) == 1 && FastDecTimer(data + 0x114)) {
-            S16(data, 0x114) = FloatToInt(RandomFloatRange(1200.0f, 2400.0f));
+            S16(data, 0x114) = FloatToInt(math_random_float_range(1200.0f, 2400.0f));
             if (U8(obj, 0x43) != 2) {
-                StartAnimationBlended(obj, 2, 0, 10);
+                anim_start_blended(obj, 2, 0, 10);
             }
         } else if ((U8(obj, 0x60) & 2) && U8(obj, 0x43) != 1) {
-            StartAnimationBlended(obj, 1, 0, 10);
+            anim_start_blended(obj, 1, 0, 10);
         }
     }
 
@@ -242,10 +243,10 @@ void func_L09_0040A2E8(char *obj) {
             qcopy(data + 0x100, HERO_AIM);
         }
         if (FastDecTimer(data + 0x112)) {
-            S16(data, 0x112) = FloatToInt(RandomFloatRange(180.0f, 300.0f));
-            randomYaw = FastAddRotations(F32(obj, 0xF8), RandomFloatRange(-90.0f, 90.0f) * 0.017453294f);
-            pitch = RandomFloatRange(0.0f, 30.0f) * 0.017453294f;
-            BuildSphericalOffset(data + 0x100, 6.0f, randomYaw, pitch);
+            S16(data, 0x112) = FloatToInt(math_random_float_range(180.0f, 300.0f));
+            randomYaw = FastAddRotations(F32(obj, 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.017453294f);
+            pitch = math_random_float_range(0.0f, 30.0f) * 0.017453294f;
+            vec_build_spherical_offset(data + 0x100, 6.0f, randomYaw, pitch);
             FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {
@@ -259,8 +260,8 @@ void func_L09_0040A2E8(char *obj) {
         qcopy(pos, obj + 0x10);
         pos[2] += 2.0f;
         FastVecSub(delta, target, pos);
-        yaw = fast_subtract_rotations(FastMatrixHelperA(delta[0], delta[1]), F32(obj, 0xF8));
-        pitch = -FastMatrixHelperA(vec_length_xy(delta), delta[2]);
+        yaw = fast_subtract_rotations(mat_fast_helper_a(delta[0], delta[1]), F32(obj, 0xF8));
+        pitch = -mat_fast_helper_a(vec_length_xy(delta), delta[2]);
         if (yaw > 1.57079649f) {
             yaw = 1.57079649f;
         } else if (yaw < -1.57079649f) {

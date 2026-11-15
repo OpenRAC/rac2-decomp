@@ -11,11 +11,11 @@ extern int D_L00_001A9670 __attribute__((sda));
 
 extern short D_00152CE4[];
 
-extern void func_002FC3C0(int);
+extern void gfx_wait_for_dma_status_bits(int);
 
-extern void func_002946C0(int, int, int);
+extern void load_cached_moby_class(int, int, int);
 
-int func_L00_00305600(int object, int argument)
+int menu_try_start_toc_entry(int object, int argument)
 {
     int i;
 
@@ -27,7 +27,7 @@ int func_L00_00305600(int object, int argument)
         return 1;
     if (D_L00_001A9670 != -1)
         return 0;
-    WaitForDmaStatusBits(1);
-    LoadCachedMobyClass(object, D_00152CE4[0], argument);
+    gfx_wait_for_dma_status_bits(1);
+    load_cached_moby_class(object, D_00152CE4[0], argument);
     return 1;
 }

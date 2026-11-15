@@ -1,3 +1,4 @@
+#include "names.h"
 /* SPDX-License-Identifier: MIT
  * MIT License
  *
@@ -32,7 +33,7 @@ extern void *ref_L12_00388038_02 __attribute__((sda));
 
 /* Moby class 3871 update. Resets and re-flags every object in a linked chain, but only in the
    one level state where that is wanted. */
-void func_L12_00388038(void) {
+void linked_chain_reset(void) {
     s8 *p ;
 
     if (ref_L12_00388038_00 == 2) {

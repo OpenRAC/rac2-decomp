@@ -1,35 +1,36 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
 typedef int s32;
-extern u8 *D_L23_001B1484 __attribute__((sda));
+extern u8 *g_mothership_boss_moby __attribute__((sda));
 extern u8 *D_L23_001B1484_2;
-extern s32 D_L23_001B1958 __attribute__((sda));
-extern s32 D_L23_001B1954 __attribute__((sda));
-extern s32 D_0018C0B0 __attribute__((nosda));
+extern s32 g_enemy_charged_shot_moby __attribute__((sda));
+extern s32 g_hero_charged_shot_moby __attribute__((sda));
+extern s32 g_hero_moby __attribute__((nosda));
 extern s32 D_L23_001B1430 __attribute__((sda));
 extern s16 D_L23_001B1B94 __attribute__((sda));
 extern s16 D_L23_001B1B96 __attribute__((sda));
-extern s32 func_L23_0041B948(void);
-extern s32 func_L23_0041C0C0(void);
-extern s32 func_L23_0041C0B0(void);
-extern s32 D_L23_001B194C __attribute__((sda));
-extern s32 D_L23_001B1950 __attribute__((sda));
+extern s32 mothership_is_held(void);
+extern s32 mothership_is_blast_timer_running(void);
+extern s32 mothership_is_blast_cooling_down(void);
+extern s32 g_hero_charge_sound_handle __attribute__((sda));
+extern s32 g_enemy_charge_sound_handle __attribute__((sda));
 extern s32 D_L23_001A8AB0[4] __attribute__((sda));
 extern s32 D_L23_001A8AC0[4] __attribute__((sda));
 extern s32 D_L23_001B3714;
 extern s32 D_L23_001B13E8 __attribute__((sda));
-extern s32 func_002A77E0(s32);
+extern s32 math_random_int_below(s32);
 typedef int TI16 __attribute__((mode(TI)));
 extern s32 D_L23_001A8AB4[3] __attribute__((sda));
 extern s32 D_L23_001A8AC4[3] __attribute__((sda));
 extern s32 D_L23_001A8FF0;
-extern s16 func_00291308(TI16 *, s32, float, float);
-extern u8 *func_0029EFD0(s32);
-extern s32 func_L00_0035F5A0(s32, s32, s32);
-extern void func_002A7750(void *, s32, s32);
-extern void func_L23_004278D8(u8 *);
+extern s16 gfx_add_point_light(TI16 *, s32, float, float);
+extern u8 *CreateMoby(s32);
+extern s32 snd_start_in_slot(s32, s32, s32);
+extern void moby_set_state(void *, s32, s32);
+extern void boss_part_handle_hit(u8 *);
 extern float D_L23_001B36FC __attribute__((sda));
 extern s32 D_L23_001B19C4 __attribute__((sda));
 extern s32 D_L23_001B19C8 __attribute__((sda));
@@ -48,7 +49,7 @@ void func_PAL_L23_0042CD30(u8 *moby) {
         *(float *)(vars + 0x20) = 2000.0f;
         *(s16 *)(vars + 0x24) = 2000;
         *(u16 *)(moby + 0x7C) = 0x3FF;
-        func_002A7750(moby, 1, 0);
+        moby_set_state(moby, 1, 0);
         *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x4000;
     } else if (state == 1) {
         float t = D_L23_001B36FC;
@@ -57,7 +58,7 @@ void func_PAL_L23_0042CD30(u8 *moby) {
             *(float *)(vars + 0x20) = t;
             *(s16 *)(vars + 0x24) = (s16)t;
         }
-        func_002A7750(moby, 2, 0);
+        moby_set_state(moby, 2, 0);
     }
-    func_L23_004278D8(moby);
+    boss_part_handle_hit(moby);
 }

@@ -4,8 +4,8 @@
 /* Level counterpart of func_0026F810. Scratch-array layout and pointer updates
  * follow RAC1 actuator_CalcPower, src/game/actuator.c
  * (OpenRAC/Lombyte, GPL-3.0). */
-extern float func_00283CE0(int), func_00283180(float);
-extern int func_00283CF0(float);
+extern float IntToFloat(int), math_fast_sin_or_cos_a(float);
+extern int FloatToInt(float);
 typedef struct {
     unsigned char kind, permanent, output, multiply;
     short delay, duration, frame, rise, fall;
@@ -14,7 +14,7 @@ typedef struct {
 extern WaveChannel D_L00_001B8C00[8];
 
 /* Mixes the eight active wave channels into two output values, one per output. Returns how many channels are in use. */
-int func_L00_002D6BA8(int *out)
+int LevelActuatorCalcPower(int *out)
 {
     int scratch[3][4];
     int *outputCount;
@@ -79,7 +79,7 @@ int func_L00_002D6BA8(int *out)
                 angle = IntToFloat(phase) * 3.1415927f / IntToFloat(channel->fall);
             else
                 angle = 3.1415927f - IntToFloat(phase - channel->fall) * 3.1415927f / IntToFloat(channel->rise);
-            angle = FastSinOrCosA(angle);
+            angle = math_fast_sin_or_cos_a(angle);
             {
                 float a = IntToFloat(channel->amplitude);
                 value = FloatToInt((angle * a + a) * 0.5f) + channel->bias;

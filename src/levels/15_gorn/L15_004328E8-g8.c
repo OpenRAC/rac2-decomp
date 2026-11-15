@@ -6,10 +6,10 @@
 
 extern int D_L15_001B187C __attribute__((sda));
 
-extern void func_L15_00437B68(int, int);
+extern void DrawScrollingGridLayers(int, int);
 
 /* Draws the scrolling grid layers when the grid is switched on. */
-void func_L15_00438238(int drawArg) {
+void gfx_draw_scrolling_grid_if_enabled(int drawArg) {
     if (D_L15_001B187C != 0) {
         DrawScrollingGridLayers(drawArg, 1);
     }

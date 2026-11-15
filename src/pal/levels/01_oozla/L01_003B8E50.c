@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_00282948();
-extern int func_002A7820(int, int);
+extern void math_fast_float_d();
+extern int math_random_int_range(int, int);
 extern void func_PAL_002B14F8(u8 *, u8 *, s32, s32, f32);
 extern u8 *D_L01_001B264C __attribute__((sda));
 
@@ -15,16 +15,16 @@ void func_PAL_L01_003B8E50(u8 *a0) {
     if (*(u32 *)(p + 0x350) != 0) {
         *(u32 *)(p + 0x350) = 0;
         if (*(s32 *)(p + 0x330) < 167) {
-            *(u32 *)(p + 0x330) = ((s32)(func_002A7820(300, 360)) * 5 + 2) / 6;
+            *(u32 *)(p + 0x330) = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
         }
     }
     if (*(u32 *)(p + 0x244) != 1)
-        func_00282948(p + 0x330);
+        math_fast_float_d(p + 0x330);
     flags = *(u16 *)(a0 + 0x96);
     if (flags < 65534)
         *(u16 *)(a0 + 0x96) = flags + 1;
-    func_00282948(p + 0x32C);
-    func_00282948(p + 0x334);
+    math_fast_float_d(p + 0x32C);
+    math_fast_float_d(p + 0x334);
     func_PAL_002B14F8(a0, p + 0x250, 6, 1, 4.0f);
 }
 

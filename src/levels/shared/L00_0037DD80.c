@@ -15,21 +15,21 @@ typedef struct {
     u8 gap0c[4];
 } OrbitalPairTableView16;
 
-extern u8 D_L00_00231340[];
+extern u8 g_owner_key_table[];
 
 extern u8 D_L00_001B26B4[];
 
-extern int func_00282948(void *p);
+extern int math_fast_float_d(void *p);
 
-extern void func_L00_0037FE08(void);
+extern void moby_find_nearest_pool_entry(void);
 
-extern void func_L00_00387F98(void);
+extern void state_l00_apply_shared_reset_words(void);
 
-extern void func_L00_0038A9E0(void);
+extern void state_l00_apply_shared_reset_words_2(void);
 
 /* shared native body of family 954231c412 */
 /* Returns 1 when no slot in the key table already holds this key and owner pair, otherwise 0. */
-int func_L00_0037DD80(int key, int owner)
+int pair_is_owner_key_free(int key, int owner)
 {
     int i;
     int isFree = 1;
@@ -43,8 +43,8 @@ int func_L00_0037DD80(int key, int owner)
 }
 
 /* searches 32 sixteen-byte records for matching key and owner words and returns the value word or minus one */
-s32 func_L00_0037DDE8(u32 key,u32 owner) {
-    OrbitalPairTableView16 *entry=(OrbitalPairTableView16 *)gOwnerKeyTable;
+s32 pair_find_owner_key_value(u32 key,u32 owner) {
+    OrbitalPairTableView16 *entry=(OrbitalPairTableView16 *)g_owner_key_table;
     s32 checked=0;
     do {
         ++checked;
@@ -54,11 +54,11 @@ s32 func_L00_0037DDE8(u32 key,u32 owner) {
     return -1;
 }
 
-extern int func_L00_0037DD80(int a0, int a1);
-extern int func_L00_0037DE30(char *a0, char **a1, int a2, int a3);
+extern int pair_is_owner_key_free(int a0, int a1);
+extern int pair_pick_owner_lowest_score(char *a0, char **a1, int a2, int a3);
 
 /* Picks an owner from the list that is not yet paired with the key, or falls back to the one with the best score. */
-int func_L00_0037DEF8(char *key, char **candidates, int count, int *outFreePick, int kind)
+int pair_choose_owner_for_key(char *key, char **candidates, int count, int *outFreePick, int kind)
 {
     int i;
 
@@ -66,13 +66,13 @@ int func_L00_0037DEF8(char *key, char **candidates, int count, int *outFreePick,
     for (i = 0; i < count; i++) {
         if (kind > 0 && *(short *)(*(int *)(candidates[i] + 0x24) + 0x46) != kind)
             continue;
-        if (IsOwnerKeyPairFree((int)key, (int)candidates[i]) == 1)
+        if (pair_is_owner_key_free((int)key, (int)candidates[i]) == 1)
             return (int)candidates[i];
     }
     if (count < 2)
         return 0;
     {
-        int result = PickOwnerWithLowestScore(key, candidates, count, kind);
+        int result = pair_pick_owner_lowest_score(key, candidates, count, kind);
 
         if (result != 0)
             *outFreePick = 0;
@@ -81,9 +81,9 @@ int func_L00_0037DEF8(char *key, char **candidates, int count, int *outFreePick,
 }
 
 /* clears the second word of every sixteen-byte record whose second word equals a0 */
-void func_L00_0037E0C0(int key)
+void pair_clear_owner_key_entries(int key)
 {
-    OrbitalPairTableView16 *entry = (OrbitalPairTableView16 *)gOwnerKeyTable;
+    OrbitalPairTableView16 *entry = (OrbitalPairTableView16 *)g_owner_key_table;
     u32 *field = &entry->field04;
     int i;
 
@@ -97,11 +97,11 @@ void func_L00_0037E0C0(int key)
 /* func_L00_0037E418 is built with -G8: see L00_0037DD80-init-g8.c. */
 
 /* runs the three per-frame passes in the order the level expects */
-void func_L00_0037E5C0(void)
+void level_run_per_frame_passes(void)
 {
-    ApplySharedResetToStateWords();
-    ApplySharedResetToStateWordsCopy();
-    FindNearestPoolEntry();
+    state_l00_apply_shared_reset_words();
+    state_l00_apply_shared_reset_words_2();
+    moby_find_nearest_pool_entry();
 }
 
 /* func_L00_0037E5F0 is built with -G8: see L00_0037DD80-g8.c. */

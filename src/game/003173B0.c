@@ -2,64 +2,64 @@
 #include "common.h"
 
 extern int D_001B2758 MACRO_ADDR;
-extern float func_002A7878(float, float), func_002A78D8(float, float);
-extern void func_00282C88(void *), func_002B00B0(void *, void *, int);
-extern char *func_002AB1F0(void *);
-extern void func_00282CC0(void *, void *, void *);
-extern int func_00283CF0(float), func_002A7820(int, int);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_0029FCC0(void *, int, void *);
-extern int func_002761F8(void *, void *, int, void *, int);
-extern void func_002A7750(void *, int, int), func_002A7470(void *, int, int, int);
+extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
+extern void vec_clear_128(void *), gravity_get_dir_at_object(void *, void *, int);
+extern char *moby_get_private_value_0(void *);
+extern void FastVecAdd(void *, void *, void *);
+extern int FloatToInt(float), math_random_int_range(int, int);
+extern void moby_set_controller_speed_limits(void *, float, float, float, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int CollLine(void *, void *, int, void *, int);
+extern void moby_set_state(void *, int, int), anim_start_blended(void *, int, int, int);
 extern float D_001BAFA8;
 
 typedef int TI128_00318340 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128_00318340 q[0x260]; } Hero_00318340;
-extern u8 D_00189E20[];
-extern char D_00189EA0[];
-extern u8 D_00188660[];
+extern u8 g_hero_state[];
+extern char g_hero_position[];
+extern u8 g_sound_state[];
 
 extern char D_001A8BD0[16] MACRO_ADDR;
 extern char D_001AFA80[];
-extern void func_0026FEB8(const char *, ...);
-extern void func_0027CFD0(void (*)(char *), char *);
-extern int func_00282948(void *);
-extern void func_00282DD8(void *, void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_00282E48(void *, void *);
-extern void func_00283098(void *, void *, void *);
-extern void func_002833F0(void *, void *);
-extern void func_0029F338(void *);
-extern float func_0029F530(void *);
-extern void func_002A6C58(void *, int, int);
-extern int func_002A77E0(int);
-extern void func_002A7E08(void *, void *, void *, float, float, float);
-extern float func_002A89A8(void *, int, float);
-extern float func_002AA3A8(void *, float, void *, float, float, float);
-extern float func_002AA548(void *, void *, float, float, float, float);
-extern void func_002AC728(void *, void *, int, float, float);
-extern int func_002ACBC8(void *, int);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern int func_002AEB60(void *, float);
-extern int func_002B3868(void *);
-extern int func_002B38B8(void *);
-extern void *func_002C65A0(void *, void *, int, u32, int, int, int, int, float, float, float);
-extern void func_002C9828(void *, int, void *, void *, int, float);
-extern void func_002E59F8(int);
-extern int func_002E5CF8(int, int, void *);
-extern void func_00319780(char *);
-extern void func_00319FB8(char *);
-extern void func_00319EC0(char *);
-extern int func_0031A580(char *);
-extern int func_0031A628(char *);
-extern int func_0031A708(unsigned char *);
-extern int func_0031A848(char *, float);
-extern void func_0031AAB0(char *);
-extern void *func_003280C8(char *, void *, void *, int, int, float);
-extern float func_00282E80(void *, void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AEF28(float, float, char *, char *, float, char *);
+extern void STUB_printf(const char *, ...);
+extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
+extern int math_fast_float_d(void *);
+extern void FastVecCross(void *, void *, void *);
+extern float FastVecDot(void *, void *);
+extern float fast_vec_dist(void *, void *);
+extern void matrix_mul_vec3(void *, void *, void *);
+extern void euler_rotation_basis(void *, void *);
+extern void moby_mark_spawned(void *);
+extern float moby_get_anim_value(void *);
+extern void SetDeathBits(void *, int, int);
+extern int math_random_int_below(int);
+extern void moby_turn_toward_position(void *, void *, void *, float, float, float);
+extern float coll_probe_ground_height_below(void *, int, float);
+extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
+extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
+extern int IsPointInCuboid(void *, int);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern int math_is_value_within_step(void *, float);
+extern int flag_set_first_pending(void *);
+extern int flag_is_third_pending_set(void *);
+extern void *part_spawn_gravity_fade(void *, void *, int, u32, int, int, int, int, float, float, float);
+extern void path_sample_position(void *, int, void *, void *, int, float);
+extern void snd_stop_voice(int);
+extern int PlayMobySound(int, int, void *);
+extern void hover_enemy_update_body_group(char *);
+extern void hover_enemy_draw_effects(char *);
+extern void hover_enemy_tick_timers(char *);
+extern int group_claim_lead_token(char *);
+extern int group_pass_lead_token(char *);
+extern int group_is_moby_member(unsigned char *);
+extern int moby_is_target_outside_turn_limit(char *, float);
+extern void moby_turn_toward_target(char *);
+extern void *part_spawn_spinning_effect_moby(char *, void *, void *, int, int, float);
+extern float vec_distance_xy(void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void moby_scale_owner_words_by_angles(float, float, char *, char *, float, char *);
 
 /* One of the twelve 0xA0-byte records at *D_001B2758 that func_0031DEE8 steps for their
    owner: the boot counterpart of the level records func_L00_003BBB68 updates. */
@@ -89,18 +89,18 @@ typedef struct {
     char pad_78[0xE0 - 0x78];
 } Class31DEE8;
 
-extern unsigned char D_00139568[];
-extern Class31DEE8 D_00239BA0[];
-extern float func_00283B98(float angle, float step);
-extern float func_00283180(float angle);
-extern float func_00283198(float angle);
-extern float func_00283CE0(int ticks);
-extern int func_00282948(void *timer);
-extern void func_00282D08(void *out, void *from, void *to, float t);
-extern void func_002A8C00(void *packet, char *owner, int flags, void *direction, float amount);
-extern void func_002A8E20(char *target, void *packet);
-extern void func_0031F6E8(void *pos, int count, int mode);
-extern void func_0032D758(char *target, int kind, int value);
+extern unsigned char g_item_slot_to_record[];
+extern Class31DEE8 g_weapon_table[];
+extern float FastAddRotations(float angle, float step);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float math_fast_sin_or_cos_b(float angle);
+extern float IntToFloat(int ticks);
+extern int math_fast_float_d(void *timer);
+extern void lerp_vector(void *out, void *from, void *to, float t);
+extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
+extern void QueueMobyImpact(char *target, void *packet);
+extern void part_spawn_hit_sparks(void *pos, int count, int mode);
+extern void StartAttachedEffect(char *target, int kind, int value);
 
 extern char F669d6320_D_001BAFC0[];
 
@@ -209,30 +209,30 @@ typedef struct {
 } State_001b5200;
 #endif
 
-extern State_001b5200 D_001B5200;
+extern State_001b5200 g_active_camera;
 
-extern void func_002A91F0(void *, float *);
+extern void mat_build_rotation_from_angles(void *, float *);
 
-extern int func_00317D78(char *);
-extern int func_002B3890(char *);
-extern int func_002B1C20(char *, char *);
-extern void func_002E59F8(int);
-extern void *func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
-extern int func_002E5CF8(int, int, void *);
-extern void func_002A6C58(void *, int, int);
-extern void func_0029F338(void *);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern float func_00282E80(void *, void *);
-extern float func_002A89A8(void *, int, float);
+extern int flyer_init_check_death(char *);
+extern int flag_set_second_pending(char *);
+extern int moby_dispatch_action_by_kind(char *, char *);
+extern void snd_stop_voice(int);
+extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
+extern int PlayMobySound(int, int, void *);
+extern void SetDeathBits(void *, int, int);
+extern void moby_mark_spawned(void *);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern float vec_distance_xy(void *, void *);
+extern float coll_probe_ground_height_below(void *, int, float);
 extern void func_002A677C(void *);
-extern int func_002B4FF0(void *, void *, float);
-extern int func_002A8D70(void *, int, float, float, int, float, int, int, int);
-extern void func_00318200(char *);
-extern unsigned char D_00188660[];
-extern unsigned char D_00189E20[];
+extern int moby_turn_toward_target_and_step(void *, void *, float);
+extern int coll_test_hit_at_bone(void *, int, float, float, int, float, int, int, int);
+extern void flyer_tick_timers(char *);
+extern unsigned char g_sound_state[];
+extern unsigned char g_hero_state[];
 typedef struct { char pad[0x249C]; char *target; } Hero3173;
-extern char *D_001F1700[];
+extern char *g_path_table[];
 #define FI(p,o) (*(int *)((p)+(o)))
 #define FF(p,o) (*(float *)((p)+(o)))
 #define FH(p,o) (*(short *)((p)+(o)))
@@ -244,7 +244,7 @@ extern char *D_001F1700[];
    have the same EE interface. */
 extern void changeMode3173Six(void *, int, int) __asm__("func_002A7750");
 /* Updates the flying enemy each frame: handles its moods, rises, follows its path and attacks. */
-void func_003173B0(char *self)
+void flyer_update_states(char *self)
 {
     char *vars = FP(self,0x68);
     int flags, n, i;
@@ -254,72 +254,72 @@ void func_003173B0(char *self)
     /* Written out here and at the end of state 3, not shared through a label: cross-jumping
        merges the two after sched1, which has to see func_0029F338 in the same block as the
        explosion's calls for it to set a3..t3 up before a0..a2. */
-    if (InitAndCheckEnemyDeath(self)) {
-        MarkMobySpawned(self);
+    if (flyer_init_check_death(self)) {
+        moby_mark_spawned(self);
         return;
     }
     switch (FB(self,0x95)) {
     case 0:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
-        if (FI(vars,0x258)==1 && FastFloatHelperD(vars+0x2A4) && FI(vars,0x2AC)) {
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
+        if (FI(vars,0x258)==1 && math_fast_float_d(vars+0x2A4) && FI(vars,0x2AC)) {
             if (FI(vars,0x294)==-1) {
-                SetMobyState(self,6,2);
+                moby_set_state(self,6,2);
                 FF(self,0x18)=FF(vars,0x28C);
-                if (FB(self,0x43)!=2) StartAnimationBlended(self,2,0,5);
-            } else SetMobyState(self,4,2);
+                if (FB(self,0x43)!=2) anim_start_blended(self,2,0,5);
+            } else moby_set_state(self,4,2);
         } else if (FH(vars,0x276)) {
-            SetMobyState(self,3,1);
+            moby_set_state(self,3,1);
             FH(vars,0x276)=0;
-            if (FH(vars,0x270)<300) FH(vars,0x270)=RandomIntRange(480,600);
+            if (FH(vars,0x270)<300) FH(vars,0x270)=math_random_int_range(480,600);
         }
         FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 1:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
         if ((FI(vars,0x258)==1 || FI(vars,0x25C)==1) && FI(vars,0x2AC)) {
-            if (FI(vars,0x294)!=-1) SetMobyState(self,4,2);
+            if (FI(vars,0x294)!=-1) moby_set_state(self,4,2);
             else {
-                SetMobyState(self,6,2);
+                moby_set_state(self,6,2);
                 FF(self,0x18)=FF(vars,0x28C);
-                if (FB(self,0x43)!=2) StartAnimationBlended(self,2,0,5);
+                if (FB(self,0x43)!=2) anim_start_blended(self,2,0,5);
             }
         }
         FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 2:
-        if (SetSecondPendingFlag(self))
-            SetControllerSpeedLimits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
+        if (flag_set_second_pending(self))
+            moby_set_controller_speed_limits(self,0.006666667f,0.06666667f,0.8377582f,0.8377582f);
         if (FI(vars,0x258)!=1 && FI(vars,0x25C)!=1 && FB(self,0x20)!=4) {
-            SetMobyState(self,1,1);
-            if (FB(self,0x43)) StartAnimationBlended(self,0,0,20);
-            FH(vars,0x270)=RandomIntRange(580,600);
+            moby_set_state(self,1,1);
+            if (FB(self,0x43)) anim_start_blended(self,0,0,20);
+            FH(vars,0x270)=math_random_int_range(580,600);
         }
         break;
     case 3:
-        flags=DispatchActionByKind(self,vars+0x60);
+        flags=moby_dispatch_action_by_kind(self,vars+0x60);
         if (flags&1) {
             n=FI(vars,0x2A8);
             if (n!=-1) {
-                sound=(char *)gSoundState+n*0x70;
-                if (FP(sound,0x88)==self && FB(sound,0x74)) StopSoundVoice(n);
+                sound=(char *)g_sound_state+n*0x70;
+                if (FP(sound,0x88)==self && FB(sound,0x74)) snd_stop_voice(n);
             }
             FI(vars,0x2A8)=-1;
             SpawnExplosion(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
             PlayMobySound(0,0,self);
             SetDeathBits(self,0,3);
-            MarkMobySpawned(self);
+            moby_mark_spawned(self);
             return;
         }
         if (flags&2) {
             if (FI(vars,0x258)==1 || FI(vars,0x25C)==1) {
-                SetMobyState(self,5,2);
-                if (FB(self,0x43)) StartAnimationBlended(self,0,0,5);
-                if (FI(vars,0x294)!=-1) SetMobyState(self,4,2);
+                moby_set_state(self,5,2);
+                if (FB(self,0x43)) anim_start_blended(self,0,0,5);
+                if (FI(vars,0x294)!=-1) moby_set_state(self,4,2);
             } else {
-                SetMobyState(self,3,1);
-                FH(vars,0x270)=RandomIntRange(580,600);
+                moby_set_state(self,3,1);
+                FH(vars,0x270)=math_random_int_range(580,600);
             }
         }
         break;
@@ -327,21 +327,21 @@ void func_003173B0(char *self)
     switch (FB(self,0x20)) {
     case 1:
         if (FU(self,0x96)>=26) {
-            if (FB(self,0x43)) StartAnimationBlended(self,0,0,5);
-            SetMobyState(self,2,-1);
+            if (FB(self,0x43)) anim_start_blended(self,0,0,5);
+            moby_set_state(self,2,-1);
             FF(self,0x18)=FF(vars,0x28C);
         } else {
-            f=FastSinOrCosB((float)FU(self,0x96)*0.12566361f)*0.02f;
+            f=math_fast_sin_or_cos_b((float)FU(self,0x96)*0.12566361f)*0.02f;
             if (FF(self,0x18)>FF(vars,0x28C)) FF(self,0x18)-=f;
             else FF(self,0x18)+=f;
         }
         break;
     case 4:
-        path=gPathTable_001F1700[FI(vars,0x294)];
+        path=g_path_table[FI(vars,0x294)];
         if (FI(vars,0x298)>=FI(path,0)) {
             FI(vars,0x294)=-1;
-            FF(vars,0x28C)=ProbeGroundHeightBelow(self+0x10,0,0.5f)+0.5f;
-            SetMobyState(self,5,-1);
+            FF(vars,0x28C)=coll_probe_ground_height_below(self+0x10,0,0.5f)+0.5f;
+            moby_set_state(self,5,-1);
         } else {
             qcopy(target,path+0x10+FI(vars,0x298)*16);
             FastVecSub(delta,target,self+0x10);
@@ -350,7 +350,7 @@ void func_003173B0(char *self)
             if (vec_distance_xy(self+0x10,target)<0.5f) FI(vars,0x298)++;
             if (FI(vars,0x298)>=FI(path,0)-6 && FF(vars,0x1C0)>=0.10000001f)
                 FF(vars,0x1C0)-=0.0022222223f;
-            height=ProbeGroundHeightBelow(self+0x10,0,0.5f)+0.5f;
+            height=coll_probe_ground_height_below(self+0x10,0,0.5f)+0.5f;
             if (FF(self,0x18)<height) FF(self,0x18)=height;
             FF(vars,0x28C)=FF(self,0x18);
             func_002A677C(self);
@@ -359,51 +359,51 @@ void func_003173B0(char *self)
         break;
     case 5:
         savedHeight=FF(self,0x18);
-        TurnTowardTargetAndStepMovement(self,vars+0x230,FF(vars,0x290));
+        moby_turn_toward_target_and_step(self,vars+0x230,FF(vars,0x290));
         FF(self,0x18)=savedHeight;
-        if (vec_distance_xy(self+0x10,FP(vars,0x240)+0x10)<1.3f) SetMobyState(self,7,-1);
+        if (vec_distance_xy(self+0x10,FP(vars,0x240)+0x10)<1.3f) moby_set_state(self,7,-1);
         FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
         break;
     case 6:
         if (FB(self,0x60)&2) {
-            if (FB(self,0x43)!=3) StartAnimationBlended(self,3,0,5);
+            if (FB(self,0x43)!=3) anim_start_blended(self,3,0,5);
             changeMode3173Six(self,8,-1);
         }
         break;
     case 8:
         height=1.75f;
         FF(self,0x48)=height;
-        for (i=0;i<4;i++) TestHitAtBone(self,i,0.17f,FF(vars,0x2B0),1,1.0f,0,1,0);
-        if (((Hero3173 *)gHeroState)->target==self) SetMobyState(self,9,-1);
+        for (i=0;i<4;i++) coll_test_hit_at_bone(self,i,0.17f,FF(vars,0x2B0),1,1.0f,0,1,0);
+        if (((Hero3173 *)g_hero_state)->target==self) moby_set_state(self,9,-1);
         if (vec_distance_xy(self+0x10,FP(vars,0x240)+0x10)>1.3f && (float)FU(self,0x96)>120.0f) {
-            if (FB(self,0x43)) StartAnimationBlended(self,0,0,15);
-            SetMobyState(self,5,-1);
+            if (FB(self,0x43)) anim_start_blended(self,0,0,15);
+            moby_set_state(self,5,-1);
             FF(self,0x48)=1.0f;
         }
         break;
     case 9:
         if ((float)FU(self,0x96)>20.0f) {
-            SetMobyState(self,10,-1);
-            if (FB(self,0x43)!=4) StartAnimationBlended(self,4,0,5);
+            moby_set_state(self,10,-1);
+            if (FB(self,0x43)!=4) anim_start_blended(self,4,0,5);
             FF(self,0x48)=1.0f;
         }
         break;
     case 10:
         if (FB(self,0x60)&2) {
-            if (FB(self,0x43)) StartAnimationBlended(self,0,0,15);
-            SetMobyState(self,5,-1);
+            if (FB(self,0x43)) anim_start_blended(self,0,0,15);
+            moby_set_state(self,5,-1);
         }
         break;
     case 7:
         if (FU(self,0x96)>=30) {
-            SetMobyState(self,6,-1);
-            if (FB(self,0x43)!=1) StartAnimationBlended(self,1,0,2);
+            moby_set_state(self,6,-1);
+            if (FB(self,0x43)!=1) anim_start_blended(self,1,0,2);
             FF(self,0x48)=1.0f;
         }
         break;
     }
     if (FB(self,0x20)!=4 && FB(self,0x95)==2 && FF(self,0x18)<FF(vars,0x28C)) FF(self,0x18)=FF(vars,0x28C);
-    TickEnemyTimers_00318200(self);
+    flyer_tick_timers(self);
 }
 #undef FI
 #undef FF
@@ -412,27 +412,27 @@ void func_003173B0(char *self)
 #undef FB
 #undef FP
 
-extern void func_003182C0(void *);
+extern void flyer_alert_group(void *);
 
 /* Called when the enemy dies: wakes up its group mates. */
-void func_003181E0(void *object) {
-    AlertGroupClass2460(object);
+void flyer_alert_group_on_death(void *object) {
+    flyer_alert_group(object);
 }
 
-extern void func_002AB8C0(char *, char *);
-extern int func_00282978(void *);
-extern void func_002AEE70(char *, float, float, char *, float, char *);
-extern void func_002AEF28(float, float, char *, char *, float, char *);
+extern void gfx_update_color_fade(char *, char *);
+extern int FastDecTimer(void *);
+extern void math_update_wrapped_angle_offset(char *, float, float, char *, float, char *);
+extern void moby_scale_owner_words_by_angles(float, float, char *, char *, float, char *);
 
 /* Runs the enemy's small timers and counts the frames it has been in this state. */
-void func_00318200(char *object)
+void flyer_tick_timers(char *object)
 {
     char *data = *(char **)(object + 0x68);
-    UpdateColorFade(object, data + 0x50);
+    gfx_update_color_fade(object, data + 0x50);
     FastDecTimer(data + 0x270);
     if (FastDecTimer(data + 0x272)) {
-        UpdateWrappedAngleOffset(object, 0.1f, 0.08726647496223449707f, data + 0x27C, -1.0f, data + 0x280);
-        ScaleOwnerWordsByAngles(0.13962635397911071777f, 0.026179943233728408813f, object, data + 0x284, 0.026179943233728408813f, data + 0x288);
+        math_update_wrapped_angle_offset(object, 0.1f, 0.08726647496223449707f, data + 0x27C, -1.0f, data + 0x280);
+        moby_scale_owner_words_by_angles(0.13962635397911071777f, 0.026179943233728408813f, object, data + 0x284, 0.026179943233728408813f, data + 0x288);
     }
     if (*(unsigned short *)(object + 0x96) <= 65534)
         (*(unsigned short *)(object + 0x96))++;
@@ -442,7 +442,7 @@ void func_00318200(char *object)
 /* func_00319780 is in 00319780-g8.c. */
 
 /* Sets up the hovering enemy the first time it runs: speeds, sizes, start position and first animation. */
-void func_00319B38(char *self)
+void hover_enemy_init(char *self)
 {
     char *d = *(char **)(self + 0x68);
     *(u8 *)(d+0x68) = FloatToInt(15.0f);
@@ -473,12 +473,12 @@ void func_00319B38(char *self)
     *(float *)(d+316)=0.4000000059604645f;
     *(float *)(d+352)=0.523598849773407f;
     *(int *)(d+0x168)|=5;
-    SetControllerSpeedLimits(self,0.0033333334140479565f,0.10000000894069672f,0.0011635529808700085f,0.10471977293491364f);
+    moby_set_controller_speed_limits(self,0.0033333334140479565f,0.10000000894069672f,0.0011635529808700085f,0.10471977293491364f);
     qcopy(d+0x220,self+0x10);
     *(float *)(d+0x230)=1.0f;
     *(float *)(d+0x23C)=3.0f;
     *(float *)(d+0x240)=10.0f;
-    *(int *)(d+0x2D8)=RandomIntRange(120,700);
+    *(int *)(d+0x2D8)=math_random_int_range(120,700);
     *(float *)(d+0x294)*=0.01745329424738884f;
     *(u8 *)(d+0x250)=176;
     *(u8 *)(d+0x251)=128;
@@ -491,7 +491,7 @@ void func_00319B38(char *self)
     *(int *)(d+0x2C8)=0;
     *(int *)(d+0x2CC)=0;
     *(int *)(d+0x37C)=0;
-    TransformMobyJointToWorld(self,0,d+0x2F0);
+    moby_transform_joint_to_world(self,0,d+0x2F0);
     qcopy(d+0x300,d+0x2F0);
     *(float *)(d+0x2F8)+=20.0f;
     if (CollLine(d+0x300,d+0x2F0,0,self,0))
@@ -502,69 +502,69 @@ void func_00319B38(char *self)
     *(int *)(d+0x168)|=1;
     if (*(int *)(d+0x28C)==0) {
         if (*(int *)(d+0x370)!=-1) {
-            SetMobyState(self,15,3);
-            if (*(u8 *)(self+0x43)!=7) StartAnimationBlended(self,7,0,0);
+            moby_set_state(self,15,3);
+            if (*(u8 *)(self+0x43)!=7) anim_start_blended(self,7,0,0);
         } else {
-            SetMobyState(self,1,0);
-            if (*(u8 *)(self+0x43)!=0) StartAnimationBlended(self,0,0,0);
+            moby_set_state(self,1,0);
+            if (*(u8 *)(self+0x43)!=0) anim_start_blended(self,0,0,0);
         }
     } else {
-        SetMobyState(self,3,1);
-        if (*(u8 *)(self+0x43)!=11) StartAnimationBlended(self,11,0,0);
+        moby_set_state(self,3,1);
+        if (*(u8 *)(self+0x43)!=11) anim_start_blended(self,11,0,0);
     }
 }
 
-extern void func_002AB8C0(char *, char *);
-extern int func_00282978(void *);
-extern void func_002B0990(char *, char *, int, int, float);
+extern void gfx_update_color_fade(char *, char *);
+extern int FastDecTimer(void *);
+extern void value_set_and_smooth(char *, char *, int, int, float);
 
 /* Runs the hovering enemy's timers and counts its frames. */
-void func_00319EC0(char *object)
+void hover_enemy_tick_timers(char *object)
 {
     char *data = *(char **)(object + 0x68);
-    UpdateColorFade(object, data + 0x70);
+    gfx_update_color_fade(object, data + 0x70);
     FastDecTimer(data + 0x280);
     FastDecTimer(data + 0x282);
     if (*(unsigned short *)(object + 0x96) < 65535)
         (*(unsigned short *)(object + 0x96))++;
-    SetValueAndStartSmoothChange(object, data + 0x380, 5, 1, 2.0f);
+    value_set_and_smooth(object, data + 0x380, 5, 1, 2.0f);
 }
 
-extern void func_0031A158(char *);
-extern void func_0031A340(char *, char *, float, int, int, int);
+extern void gfx_draw_beam_between_points(char *);
+extern void gfx_draw_facing_glow_quad(char *, char *, float, int, int, int);
 
 /* Draws the glow effects of the hovering enemy. */
-void func_00319FB8(char *object)
+void hover_enemy_draw_effects(char *object)
 {
     char *data = *(char **)(object + 0x68);
     int mode = *(unsigned char *)(object + 0x20);
     if (mode == 12 || mode == 14 || mode == 16 || mode == 13 || *(unsigned char *)(object + 0x95) == 1)
-        DrawBeamBetweenPoints(object);
-    DrawFacingGlowQuad(object, data + 0x310, 0.125f, 0x36F6, 0x20000000, 0x20000000);
-    DrawFacingGlowQuad(object, data + 0x320, 0.15f, 0x1050B0, 0x30000000, 0x20000000);
-    DrawFacingGlowQuad(object, data + 0x330, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
+        gfx_draw_beam_between_points(object);
+    gfx_draw_facing_glow_quad(object, data + 0x310, 0.125f, 0x36F6, 0x20000000, 0x20000000);
+    gfx_draw_facing_glow_quad(object, data + 0x320, 0.15f, 0x1050B0, 0x30000000, 0x20000000);
+    gfx_draw_facing_glow_quad(object, data + 0x330, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
 }
 
-extern void func_0031A098(void *record);
+extern void gfx_fill_quad_from_template(void *record);
 extern long long func_0027C878_1(int id);
-extern float func_00283248(float x, float y);
-extern float func_00282E80(void *a, void *b);
-extern float func_002A7940(void);
-extern void func_00283410(void *dst, void *src);
-extern void func_00282CF0(void *dst, void *a, void *b);
-extern void func_00282F20(void *dst, void *src, float scale);
-extern void func_00282D30(void *dst, void *src, float scale);
-extern void func_00280B90(void *dst, void *src, int flag);
+extern float mat_fast_helper_a(float x, float y);
+extern float vec_distance_xy(void *a, void *b);
+extern float math_random_angle(void);
+extern void euler_to_matrix(void *dst, void *src);
+extern void FastVecSub(void *dst, void *a, void *b);
+extern void vec_scale_to_length(void *dst, void *src, float scale);
+extern void FastVecScale(void *dst, void *src, float scale);
+extern void draw_world_quad(void *dst, void *src, int flag);
 
 /* Builds the 240-byte record around a position: the looked-up handle, the colour
    of the object, the position the object sits at and the scaled matrix it keeps.
    The first argument is not read. */
-void func_0031A340(char *unused, char *p1, float scale, int col0, int col1, int col2)
+void gfx_draw_facing_glow_quad(char *unused, char *p1, float scale, int col0, int col1, int col2)
 {
     Loc_0031a340 local;
     float x;
 
-    FillQuadPacketFromTemplate(&local);
+    gfx_fill_quad_from_template(&local);
     local.v120 = func_0027C878_1(11);
     local.k3 = col0 + col1;
     local.k2 = col0 + col1;
@@ -572,14 +572,14 @@ void func_0031A340(char *unused, char *p1, float scale, int col0, int col1, int 
     local.k0 = col0 + col1;
     local.v136 = 0x0000008000000048LL;
     local.v220 = 0.0f;
-    local.f216 = FastMatrixHelperA(gActiveCamera.pos[0] - *(float *)p1,
-                                gActiveCamera.pos[1] - *(float *)(p1 + 4));
-    x = FastMatrixHelperA(vec_distance_xy(p1, &gActiveCamera.pos),
-                      gActiveCamera.pos[2] - *(float *)(p1 + 8));
+    local.f216 = mat_fast_helper_a(g_active_camera.pos[0] - *(float *)p1,
+                                g_active_camera.pos[1] - *(float *)(p1 + 4));
+    x = mat_fast_helper_a(vec_distance_xy(p1, &g_active_camera.pos),
+                      g_active_camera.pos[2] - *(float *)(p1 + 8));
     local.f212 = -x;
-    local.v208 = RandomAngle();
+    local.v208 = math_random_angle();
     euler_to_matrix(&local.m00, &local.v208);
-    FastVecSub(&local.e0, &gActiveCamera.pos, p1);
+    FastVecSub(&local.e0, &g_active_camera.pos, p1);
     vec_scale_to_length(&local.e0, &local.e0, 0.5f);
     local.v192 = *(float *)p1 + local.e0;
     local.v196 = *(float *)(p1 + 4) + local.e1;
@@ -602,27 +602,27 @@ void func_0031A340(char *unused, char *p1, float scale, int col0, int col1, int 
 }
 
 /* Tells whether the object belongs to a group. */
-int func_0031A708(unsigned char *object) {
+int group_is_moby_member(unsigned char *object) {
     return object[0x21] != 255;
 }
 
 typedef union { u8 b[0x2600]; float v[0x980][1]; } Hero_0031A718;
 
-extern u8 D_00189E20[];
+extern u8 g_hero_state[];
 extern short *D_001EE5A0[];
 extern u8 *D_001B1B5C MACRO_ADDR;
-extern float func_00282E48(void *, void *);
+extern float fast_vec_dist(void *, void *);
 
 /* Picks the nearest live moby on the object's list (skipping 0x9B4 ones) that is closer than
    the hero, and records it as the object's target. */
-void func_0031A718(u8 *self)
+void group_pick_nearest_target(u8 *self)
 {
     u8 *vars = *(u8 **)(self + 0x68);
     short *list;
     u8 *moby;
     float best;
 
-    best = fast_vec_dist(self + 0x10, &((Hero_0031A718 *)gHeroState)->b[0x80]);
+    best = fast_vec_dist(self + 0x10, &((Hero_0031A718 *)g_hero_state)->b[0x80]);
     if (self[0x21] == 0xFF && D_001EE5A0[self[0x21]] == 0 && *(int *)(vars + 0x350) == 0)
         return;
     list = D_001EE5A0[self[0x21]];
@@ -639,7 +639,7 @@ void func_0031A718(u8 *self)
 
 
 /* Works out which way to push the object, away from a wall if one is just ahead. */
-void func_0031A998(char *self, char *outDir, int flip)
+void moby_compute_push_direction(char *self, char *outDir, int flip)
 {
     float a[4];
     float b[4];
@@ -658,15 +658,15 @@ void func_0031A998(char *self, char *outDir, int flip)
         F669d6320_FUN_00282D30(outDir, outDir, -1.0f);
 }
 
-extern void func_00282CF0(void *, void *, void *);
-extern unsigned int func_0031AB08(unsigned int);
-extern void func_0031AB18(void *, unsigned int, void *, int);
+extern void FastVecSub(void *, void *, void *);
+extern unsigned int moby_get_motion_params(unsigned int);
+extern void moby_turn_toward_direction(void *, unsigned int, void *, int);
 
 /* func_0031AAB0 is matched in 0031AAB0.c. */
 
 
 /* Gets the movement settings the object keeps in its private data. */
-unsigned int func_0031AB08(unsigned int moby)
+unsigned int moby_get_motion_params(unsigned int moby)
 {
     unsigned int vars;
     unsigned int result;
@@ -683,32 +683,32 @@ unsigned int func_0031AB08(unsigned int moby)
 
 /* func_0031C498 is in 0031C498.c. */
 
-extern void func_0031C970(char *);
-extern void func_0031CB78(char *, char *, int, int, int, float);
-extern void func_0031CDF8(char *, char *, float, int, int);
+extern void gfx_draw_beam_quad_between_points(char *);
+extern void gfx_draw_facing_glow_flare(char *, char *, int, int, int, float);
+extern void gfx_draw_facing_glow_two_textures(char *, char *, float, int, int);
 
 /* Refresh the auxiliary state for modes 4, 5, 10 or flag 2, then issue
    three calls with the embedded vectors and three with the referenced vectors. */
 /* Draws the glow effects of the hovering enemy and its three parts. */
-void func_0031C7A0(char *self)
+void three_part_turret_draw_effects(char *self)
 {
     char *data = *(char **)(self + 0x68);
     unsigned char mode = self[0x20];
 
     if (mode == 4 || mode == 5 || (unsigned char)self[0x95] == 2 || mode == 10)
-        DrawBeamQuadBetweenPoints_0031C970(self);
+        gfx_draw_beam_quad_between_points(self);
 
-    DrawCameraFacingGlowFlare(self, data + 0x370, 0x41DE, 0x10000000, 0x20000000, 0.125f);
-    DrawCameraFacingGlowFlare(self, data + 0x380, 0x00800000, 0x10000000, 0x30000000, 0.125f);
-    DrawCameraFacingGlowFlare(self, data + 0x390, 0x00800000, 0x10000000, 0x30000000, 0.125f);
+    gfx_draw_facing_glow_flare(self, data + 0x370, 0x41DE, 0x10000000, 0x20000000, 0.125f);
+    gfx_draw_facing_glow_flare(self, data + 0x380, 0x00800000, 0x10000000, 0x30000000, 0.125f);
+    gfx_draw_facing_glow_flare(self, data + 0x390, 0x00800000, 0x10000000, 0x30000000, 0.125f);
 
-    DrawCameraFacingGlowTwoTextures(self, *(char **)(data + 0x270) + 0x10, 0.075f, 0x204080, 0x204080);
-    DrawCameraFacingGlowTwoTextures(self, *(char **)(data + 0x274) + 0x10, 0.075f, 0x204080, 0x204080);
-    DrawCameraFacingGlowTwoTextures(self, *(char **)(data + 0x278) + 0x10, 0.075f, 0x204080, 0x204080);
+    gfx_draw_facing_glow_two_textures(self, *(char **)(data + 0x270) + 0x10, 0.075f, 0x204080, 0x204080);
+    gfx_draw_facing_glow_two_textures(self, *(char **)(data + 0x274) + 0x10, 0.075f, 0x204080, 0x204080);
+    gfx_draw_facing_glow_two_textures(self, *(char **)(data + 0x278) + 0x10, 0.075f, 0x204080, 0x204080);
 }
 
 /* Resets a draw packet to a large square (size 2) with white colour. */
-void func_0031C8E0(char *packet)
+void gfx_init_large_quad_packet(char *packet)
 {
     *(long long *)(packet + 112) = 0LL;
     *(int *)(packet + 80) = 0;
@@ -744,14 +744,14 @@ void func_0031C8E0(char *packet)
 /* func_0031CDF8 is defined in 0031CDF8.c. */
 
 /* Saves the current position as the newest point of the trail behind the object. */
-void func_0031D268(char *moby) {
+void gfx_record_trail_point(char *moby) {
     char *state = *(char **)(moby + 0x68);
 
     *(int *)(state + 0x288) = 0;
     *(int *)(state + 0x284) = (*(int *)(state + 0x284) + 1) % 4;
     if (*(int *)(state + 0x280) < 4)
         (*(int *)(state + 0x280))++;
-    BuildRotationFromAngles(state + (*(int *)(state + 0x284) * 16 + 0x4A0), (float *)(moby + 0xF0));
+    mat_build_rotation_from_angles(state + (*(int *)(state + 0x284) * 16 + 0x4A0), (float *)(moby + 0xF0));
     qcopy(state + *(int *)(state + 0x284) * 16 + 0x3A0,
           (char *)(*(int *)(state + 0x278) + 0x10));
 }
@@ -765,7 +765,7 @@ void func_0031D268(char *moby) {
 
 
 /* Starts a new spark on a free slot, flying toward the target with random spin and speed. */
-void func_0031DC18(char *self, char *target, int count)
+void spark_spawn_targeted(char *self, char *target, int count)
 {
     int pool = D_001B2758;
     char *position = self + 0x10;
@@ -781,34 +781,34 @@ void func_0031DC18(char *self, char *target, int count)
             *(char **)(p + 0x8C) = self;
             (*(int *)(data + 0x1C))++;
             qcopy(p + 0x20, position);
-            *(float *)(p + 64) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 68) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 72) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 100) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 104) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 108) = RandomFloatRange(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 76) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 80) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 84) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 112) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 116) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 120) = RandomSignedFloatRange(0.001f, 0.05f);
-            *(float *)(p + 88) = RandomFloatRange(3.25f, 6.75f);
-            *(float *)(p + 92) = RandomFloatRange(3.25f, 6.75f);
-            *(float *)(p + 96) = RandomFloatRange(3.25f, 6.75f);
-            *(float *)(p + 124) = RandomFloatRange(1.25f, 4.75f);
-            *(float *)(p + 128) = RandomFloatRange(1.25f, 4.75f);
-            *(float *)(p + 132) = RandomFloatRange(1.25f, 4.75f);
-            ClearVector128(p);
-            ClearVector128(p + 0x10);
+            *(float *)(p + 64) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 68) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 72) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 100) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 104) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 108) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(p + 76) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 80) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 84) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 112) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 116) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 120) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(p + 88) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(p + 92) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(p + 96) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(p + 124) = math_random_float_range(1.25f, 4.75f);
+            *(float *)(p + 128) = math_random_float_range(1.25f, 4.75f);
+            *(float *)(p + 132) = math_random_float_range(1.25f, 4.75f);
+            vec_clear_128(p);
+            vec_clear_128(p + 0x10);
             *(int *)(p + 0x94) = count;
             *(int *)(p + 0x98) = count;
             *(char **)(p + 0x90) = target;
             *(int *)(p + 0x9C) = 0;
             *(int *)(p + 0x88) = 20;
-            info = GetMobyPrivateValue0(target);
+            info = moby_get_private_value_0(target);
             if (info) {
-                GetGravityDirectionAtObject(target, v, 1);
+                gravity_get_dir_at_object(target, v, 1);
                 FastVecScale(v, v, *(float *)(info + 0x10));
                 FastVecAdd(p + 0x30, v, target + 0x10);
             } else {
@@ -821,7 +821,7 @@ void func_0031DC18(char *self, char *target, int count)
 
 static inline Class31DEE8 *Class31DEE8At(int index)
 {
-    return &gWeaponTable_00239BA0[index];
+    return &g_weapon_table[index];
 }
 
 /* Steps every record the owner holds: refreshes its start from the owner, advances the two
@@ -829,7 +829,7 @@ static inline Class31DEE8 *Class31DEE8At(int index)
    position towards it. When the approach timer expires and the target is still live, it
    sends one hit packet (func_002A8C00/func_002A8E20) and marks the record; when the life
    timer expires the record is released and the owner's count drops. */
-void func_0031DEE8(char *owner)
+void spark_update_targeted(char *owner)
 {
     float v[4];
     struct {
@@ -867,16 +867,16 @@ void func_0031DEE8(char *owner)
             slot->ang1[1] = FastAddRotations(slot->ang1[1], slot->rate1[1]);
             slot->ang1[2] = FastAddRotations(slot->ang1[2], slot->rate1[2]);
         }
-        slot->out0[0] = FastSinOrCosA(slot->ang0[0]) * slot->amp0[0];
-        slot->out0[1] = FastSinOrCosB(slot->ang0[1]) * slot->amp0[1];
-        slot->out0[2] = -FastSinOrCosB(slot->ang0[2]) * slot->amp0[2];
-        slot->out1[0] = FastSinOrCosA(slot->ang1[0]) * slot->amp1[0];
-        slot->out1[1] = FastSinOrCosB(slot->ang1[1]) * slot->amp1[1];
-        slot->out1[2] = -FastSinOrCosB(slot->ang1[2]) * slot->amp1[2];
+        slot->out0[0] = math_fast_sin_or_cos_a(slot->ang0[0]) * slot->amp0[0];
+        slot->out0[1] = math_fast_sin_or_cos_b(slot->ang0[1]) * slot->amp0[1];
+        slot->out0[2] = -math_fast_sin_or_cos_b(slot->ang0[2]) * slot->amp0[2];
+        slot->out1[0] = math_fast_sin_or_cos_a(slot->ang1[0]) * slot->amp1[0];
+        slot->out1[1] = math_fast_sin_or_cos_b(slot->ang1[1]) * slot->amp1[1];
+        slot->out1[2] = -math_fast_sin_or_cos_b(slot->ang1[2]) * slot->amp1[2];
         if (slot->target) {
-            other = GetMobyPrivateValue0(slot->target);
+            other = moby_get_private_value_0(slot->target);
             if (other) {
-                GetGravityDirectionAtObject(slot->target, v, 1);
+                gravity_get_dir_at_object(slot->target, v, 1);
                 FastVecScale(v, v, *(float *)(other + 0x10));
                 FastVecAdd(slot->pos, v, slot->target + 0x10);
             } else {
@@ -886,22 +886,22 @@ void func_0031DEE8(char *owner)
             ratio /= IntToFloat(slot->duration);
             lerp_vector(slot->pos, slot->start, slot->pos, 1.0f - ratio);
         }
-        if (!FastFloatHelperD(&slot->time))
+        if (!math_fast_float_d(&slot->time))
             continue;
         if (*(int *)(slot->target + 0x98) && !slot->hit) {
             FastVecSub(v, slot->pos, slot->start);
             vec_scale_to_length(v, v, 0.033333335f);
-            damage = Class31DEE8At(gItemSlotToRecord[0x1C])->f74;
+            damage = Class31DEE8At(g_item_slot_to_record[0x1C])->f74;
             make_hit_descriptor(&packet, owner, 0x210000, v, damage);
             packet.kind = 1;
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
             QueueMobyImpact(slot->target, &packet);
             slot->hit = 1;
-            SpawnHitSparks_0031F6E8(slot->pos, 10, 1);
+            part_spawn_hit_sparks(slot->pos, 10, 1);
             StartAttachedEffect(slot->target, 28, *(int *)(owner + 0xB8));
         }
-        if (FastFloatHelperD(&slot->life)) {
+        if (math_fast_float_d(&slot->life)) {
             slot->owner = 0;
             --*(int *)(ctx + 0x1C);
         }
@@ -916,7 +916,7 @@ void func_0031DEE8(char *owner)
 
 
 /* Resets a draw packet to a small square (size 1) with white colour. */
-void func_0031E750(char *packet)
+void gfx_init_small_quad_packet(char *packet)
 {
     *(long long *)(packet + 112) = 0LL;
     *(int *)(packet + 80) = 0;
@@ -947,7 +947,7 @@ void func_0031E750(char *packet)
 }
 
 /* Finds a point along a smooth curve between two points, given by how far along it is (0 to 1). */
-void func_0031E7D8(float *out, float *a, float *b, float *c, float *d, float t)
+void math_interpolate_cubic_curve(float *out, float *a, float *b, float *c, float *d, float t)
 {
     float t2, t3, x, y, z;
     if (t == 0.0f) { qcopy(out, a); return; }
@@ -964,7 +964,7 @@ void func_0031E7D8(float *out, float *a, float *b, float *c, float *d, float t)
 }
 
 /* Scales all four corners of a draw packet. */
-void func_0031E8F8(char *packet, float scale)
+void gfx_scale_quad_corners(char *packet, float scale)
 {
     F2c74c194_FUN_00282D30(packet, packet, scale);
     F2c74c194_FUN_00282D30(packet + 16, packet + 16, scale);
@@ -973,7 +973,7 @@ void func_0031E8F8(char *packet, float scale)
 }
 
 /* Spawns a burst of glowing sparks at the object. */
-void func_0031E960(char *p)
+void part_spawn_spark_burst(char *p)
 {
     char *q;
     char *o;
@@ -1015,14 +1015,14 @@ void func_0031E960(char *p)
 }
 
 extern float D_FLT_001B5200[];
-extern int func_0027C878(int);
-extern float func_00283248(float, float);
-extern float func_00282E80(void *, void *);
-extern void func_00283410(void *, void *);
-extern void func_00280B90(void *, void *, int);
+extern int GetEffectTextureDescriptor(int);
+extern float mat_fast_helper_a(float, float);
+extern float vec_distance_xy(void *, void *);
+extern void euler_to_matrix(void *, void *);
+extern void draw_world_quad(void *, void *, int);
 
 /* Draws one glowing sprite at a position, turned to face the hero. */
-void func_0031EB00(char *position, int color, float scale, char *resource, float alpha, int mode, int flag)
+void gfx_draw_glow_sprite(char *position, int color, float scale, char *resource, float alpha, int mode, int flag)
 {
     unsigned char work[0xE0];
     unsigned int rgba;
@@ -1031,7 +1031,7 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
     float second_angle;
     float distance;
 
-    InitSmallQuadPacket((char *)work);
+    gfx_init_small_quad_packet((char *)work);
     *(long long *)(work + 0x78) = GetEffectTextureDescriptor(mode);
 
     mode_bits = ((unsigned long long)flag << 2) | 0x0000008000000040ULL;
@@ -1046,12 +1046,12 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
     *(long long *)(work + 0x70) = 0;
 
     *(int *)(work + 0xDC) = 0;
-    first_angle = FastMatrixHelperA(D_FLT_001B5200[0x140 / 4] - *(float *)(position + 0),
+    first_angle = mat_fast_helper_a(D_FLT_001B5200[0x140 / 4] - *(float *)(position + 0),
                                 D_FLT_001B5200[0x144 / 4] - *(float *)(position + 4));
     *(float *)(work + 0xD8) = first_angle;
 
     distance = vec_distance_xy(position, &D_FLT_001B5200[0x140 / 4]);
-    second_angle = FastMatrixHelperA(distance, D_FLT_001B5200[0x148 / 4] - *(float *)(position + 8));
+    second_angle = mat_fast_helper_a(distance, D_FLT_001B5200[0x148 / 4] - *(float *)(position + 8));
     *(float *)(work + 0xD0) = alpha;
     *(float *)(work + 0xD4) = -second_angle;
 
@@ -1060,7 +1060,7 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
     *(float *)(work + 0xC4) = *(float *)(position + 4);
     *(float *)(work + 0xC8) = *(float *)(position + 8);
     *(float *)(work + 0xCC) = 1.0f;
-    ScaleQuadPacketCorners((char *)work, scale);
+    gfx_scale_quad_corners((char *)work, scale);
     draw_world_quad(work, work + 0x90, 0);
 }
 
@@ -1068,7 +1068,7 @@ void func_0031EB00(char *position, int color, float scale, char *resource, float
 /* func_0031EFC8 uses the profile in 003173B0-qcopy.c. */
 
 /* Adds the next ribbon point by continuing the line of the last two points. */
-void func_0031F1A8(Vec16_Fc936841d *object, int index)
+void gfx_extrapolate_ribbon_point(Vec16_Fc936841d *object, int index)
 {
     char local[16];
 

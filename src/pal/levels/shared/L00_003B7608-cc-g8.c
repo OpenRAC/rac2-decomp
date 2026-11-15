@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_PAL_L00_003B7608, the PAL copy of func_L00_003B3C40: the same C, where rename func_002BDCE8 becomes func_PAL_002BE9A8; scale D_L00_001AF904; wrap D_L00_001AF908 / func_00283CE0(angle) (({e}) * 1.2f). */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282CC0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002ACEC0(void *, void *, void *, float);
-extern float func_002A7940(void);
-extern int func_002A77E0(int);
-extern float func_00283CE0(int);
+extern void FastVecSub(void *, void *, void *);
+extern void FastVecAdd(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
+extern float math_random_angle(void);
+extern int math_random_int_below(int);
+extern float IntToFloat(int);
 extern char *func_PAL_002BE9A8(char *, float, float, float, float, int, char *, int, int);
-extern char D_L00_001B8DC0[];
+extern char g_camera_l00_position[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
 extern float D_L00_001AF8FC __attribute__((sda));
 extern int D_L00_001AF900 __attribute__((sda));
@@ -29,15 +30,15 @@ void func_PAL_L00_003B7608(char *object)
     char *p;
     position.q = 0;
     position.f[2] = D_L00_001AF908;
-    func_00282CF0(a, D_L00_001B8DC0, object + 0x10);
-    func_002ACEC0(b, &position, a, func_002A7940());
-    func_00282CC0(c, object + 0x10, b);
-    r = func_002A77E0(0x10);
-    if (func_002A77E0(2))
+    FastVecSub(a, g_camera_l00_position, object + 0x10);
+    math_apply_axis_rotation_to_quat(b, &position, a, math_random_angle());
+    FastVecAdd(c, object + 0x10, b);
+    r = math_random_int_below(0x10);
+    if (math_random_int_below(2))
         r = -r;
     angle = (((int)(D_L00_001AF904) * 5 + 2) / 6);
-    t = ((D_L00_001AF908 / func_00283CE0(angle)) * 1.2f);
-    func_00282F20(d, b, -t);
+    t = ((D_L00_001AF908 / IntToFloat(angle)) * 1.2f);
+    vec_scale_to_length(d, b, -t);
     p = func_PAL_002BE9A8((char *)c, 0.5f, 1.0f, 0.99f, D_L00_001AF8FC * 210000.0f, r, (char *)d, D_L00_001AF900, 0);
     if (p) {
         char *s = p + 0x20;
@@ -46,9 +47,9 @@ void func_PAL_L00_003B7608(char *object)
         s[0xA] = 0x7F;
         s[0xB] = *(unsigned char *)(p + 0xA);
     }
-    if (func_002A77E0(3) == 0) {
-        func_00282F20(a, a, -0.5f);
-        func_00282CC0(c, object + 0x10, a);
+    if (math_random_int_below(3) == 0) {
+        vec_scale_to_length(a, a, -0.5f);
+        FastVecAdd(c, object + 0x10, a);
         p = func_PAL_002BE9A8((char *)c, 0.1f, 1.0f, 0.8f, D_L00_001AF90C * 210000.0f, r, D_L00_001A8F20, (D_L00_001AF910 & 0xFFFFFF) | (D_L00_001AF914 << 24), 0);
         if (p) {
             char *s = p + 0x20;

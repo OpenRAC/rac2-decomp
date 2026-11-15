@@ -23,14 +23,14 @@ typedef struct {
     int x78;
 } Vars003158A8;
 
-extern char *func_0029EFD0(int kind);
-extern void func_00282C88(void *v);
-extern float func_002A7878(float lo, float hi);
-extern int D_001B1688;
+extern char *CreateMoby(int kind);
+extern void vec_clear_128(void *v);
+extern float math_random_float_range(float lo, float hi);
+extern int g_game_time;
 extern void func_002A0F48(void *moby);
 
 /* Creates the object the hero throws, at the given spot, owned by the thrower and with a small random spin. */
-unsigned char *func_003158A8(int owner, void *pos) {
+unsigned char *thrown_item_spawn(int owner, void *pos) {
     unsigned char *obj = (unsigned char *)CreateMoby(0x81F /* moby class 2079 */);
     Vars003158A8 *data;
 
@@ -45,12 +45,12 @@ unsigned char *func_003158A8(int owner, void *pos) {
         data->x36 = 0;
         data->x78 = 0;
         qcopy(obj + 0x10, pos);
-        ClearVector128(data);
-        data->x38 = RandomFloatRange(0.017453296f, 0.052359886f);
-        data->x3C = RandomFloatRange(0.017453296f, 0.052359886f);
+        vec_clear_128(data);
+        data->x38 = math_random_float_range(0.017453296f, 0.052359886f);
+        data->x3C = math_random_float_range(0.017453296f, 0.052359886f);
         data->x6C = data->x70 = data->x60 = data->x64 = 0.0f;
         data->x74 = 0;
-        data->x5C = gGameTime;
+        data->x5C = g_game_time;
         data->x68 = -1;
         *(int *)(obj + 0x98) = 0;
         func_002A0F48(obj);

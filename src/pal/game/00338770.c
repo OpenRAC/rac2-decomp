@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int func_00336A40(void *);
-extern unsigned long func_0027C878(int);
+extern int hud_draw_widget_text(void *);
+extern unsigned long GetEffectTextureDescriptor(int);
 extern void func_PAL_0027FB48(float x, float y, unsigned long color, char *text, int characterLimit,
         float scale, unsigned long texture, char *metrics);
 extern float func_PAL_00280358(char *text, int length, int maxWidth, float minScale);
@@ -29,7 +30,7 @@ void func_PAL_00338770(char *o)
     if (*(int *)(o + 64) == 0) {
         return;
     }
-    width = func_00336A40(o);
+    width = hud_draw_widget_text(o);
     x = *(float *)(*(char **)(o));
     switch (*(int *)(o + 68)) {
     case 0:
@@ -45,7 +46,7 @@ void func_PAL_00338770(char *o)
     scale = *(char **)(o + 4);
     color = *(int *)(*(char **)(o + 12));
     y = *(float *)(position + 4) + yOffset;
-    texture = func_0027C878(*(int *)(o + 56));
+    texture = GetEffectTextureDescriptor(*(int *)(o + 56));
     func_PAL_0027FB48(x, y, color, *(char **)(o + 64), width, *(float *)(scale), texture,
             *(char **)(o + 52));
 }

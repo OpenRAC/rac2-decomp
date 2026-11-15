@@ -19,20 +19,20 @@ typedef struct {
     u8 padec[4];
     int fieldf0;
 } OozlaSpawnState;
-extern s32 func_00283CF0(f32);
-extern void func_L01_003377C8(u32);
-extern void func_002A7398(u8 *, s32, s32);
-extern void func_002A7750(u8 *, s32, s32);
+extern s32 FloatToInt(f32);
+extern void path_l01_compute_segment_lengths(u32);
+extern void anim_start_immediate(u8 *, s32, s32);
+extern void moby_set_state(u8 *, s32, s32);
 extern int D_L01_001B2088[] __attribute__((sda));
 extern u32 D_L01_001FE180[];
-extern u8 *D_L01_001B255C MACRO_ADDR;
+extern u8 *g_moby_l01_table MACRO_ADDR;
 
 void func_PAL_L01_003D00C8(u8 *a0)
 {
     OozlaSpawnState *p = *(OozlaSpawnState **)(a0 + 0x68);
 
-    p->field48 = func_00283CF0(5.0f);
-    p->field4a = func_00283CF0(32.0f);
+    p->field48 = FloatToInt(5.0f);
+    p->field4a = FloatToInt(32.0f);
     p->field29 = 1;
     *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.5f;
     qcopy(p->field80, a0 + 0x10);
@@ -44,24 +44,24 @@ void func_PAL_L01_003D00C8(u8 *a0)
     p->field2e = 3;
     p->fieldbc = 0;
     if (p->fieldb8 != -1)
-        func_L01_003377C8(D_L01_001FE180[p->fieldb8]);
+        path_l01_compute_segment_lengths(D_L01_001FE180[p->fieldb8]);
     p->fieldf0 = p->fielde8;
     if (p->fielddd)
         *(u16 *)(a0 + 0x34) |= 0x8000;
     if (p->fieldb4 != -1) {
         p->fieldf0 = p->fielde0;
-        if ((D_L01_001B255C + (p->fieldb4 << 8)) &&
-            (D_L01_001B255C + (p->fieldb4 << 8))[0x20] != 254 &&
-            (D_L01_001B255C + (p->fieldb4 << 8))[0x20] != 253) {
+        if ((g_moby_l01_table + (p->fieldb4 << 8)) &&
+            (g_moby_l01_table + (p->fieldb4 << 8))[0x20] != 254 &&
+            (g_moby_l01_table + (p->fieldb4 << 8))[0x20] != 253) {
             *(u16 *)(a0 + 0x32) = 0x3FF;
             a0[0x30] = 255;
             if (p->fieldd0 > 0.0f)
                 *(float *)(a0 + 0x18) = p->fieldd0;
             if (p->fieldc8)
-                func_002A7398(a0, 8, 0);
+                anim_start_immediate(a0, 8, 0);
             else
-                func_002A7398(a0, 5, 0);
-            func_002A7750(a0, 0, 1);
+                anim_start_immediate(a0, 5, 0);
+            moby_set_state(a0, 0, 1);
         } else {
             p->fieldb4 = -1;
         }
@@ -70,9 +70,9 @@ void func_PAL_L01_003D00C8(u8 *a0)
         if (p->fieldd4 > 0.0f)
             *(float *)(a0 + 0x18) = p->fieldd4;
         p->fieldbc = 100;
-        func_002A7398(a0, 0, 0);
+        anim_start_immediate(a0, 0, 0);
         *(float *)(a0 + 0x48) = 0.0f;
         *(u16 *)(a0 + 0x34) &= 0xEFFF;
-        func_002A7750(a0, 0, 4);
+        moby_set_state(a0, 0, 4);
     }
 }

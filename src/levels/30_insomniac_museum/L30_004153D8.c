@@ -1,14 +1,14 @@
 #include "common.h"
-extern char *func_0029EFD0(int);
-extern void func_00282CF0(void *, void *, void *);
-extern void func_00282F20(void *, void *, float);
-extern void func_002AFFD8(void *, void *, int);
-extern void func_00282DD8(void *, void *, void *);
-extern int func_00283DB8(void *, float);
-extern float func_00282E48(void *, void *);
-extern float func_00282DB0(void *, void *);
-extern float func_002831B0(float);
-extern void func_L30_004158B0(void *, void *);
+extern char *CreateMoby(int);
+extern void FastVecSub(void *, void *, void *);
+extern void vec_scale_to_length(void *, void *, float);
+extern void cam_compute_view_direction(void *, void *, int);
+extern void FastVecCross(void *, void *, void *);
+extern int math_fast_helper_a(void *, float);
+extern float fast_vec_dist(void *, void *);
+extern float FastVecDot(void *, void *);
+extern float math_fast_angle_helper(float);
+extern void EmitMuseumExplosionParticles(void *, void *);
 extern struct Player153 {
     char pad[0x140];
     float position[4];
@@ -27,7 +27,7 @@ typedef struct {
 } State153;
 
 /* Spawns an explosion object at a position, aims it at the player, shakes the screen if close, then starts the particle burst. */
-char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a4, int a5, int a6, int sound, int a8, int a9, int color) {
+char *museum_explosion_spawn(void *pos, float scale, int shake, int a2, int a3, int a4, int a5, int a6, int sound, int a8, int a9, int color) {
     float direction[4] __attribute__((aligned(16)));
     float normal[4] __attribute__((aligned(16)));
     float sphere[4] __attribute__((aligned(16)));
@@ -43,7 +43,7 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
         *(float *)(moby + 0x1C) = 1.0f;
         FastVecSub(direction, D_L30_001B9C80.position, moby + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
-        ComputeViewDirection(moby + 0x10, normal, 1);
+        cam_compute_view_direction(moby + 0x10, normal, 1);
         qcopy(moby + 0xC0, direction);
         FastVecCross(moby + 0xD0, moby + 0xC0, normal);
         vec_scale_to_length(moby + 0xD0, moby + 0xD0, 1.0f);
@@ -64,7 +64,7 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
         state->scale = scale;
         qcopy(sphere, moby + 0x10);
         sphere[3] = scale * 3.0f;
-        if (FastMathHelperA(sphere, 128.0f) == 1) {
+        if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->duration = 10;
             state->strength = 0.1f;
             if (fast_vec_dist(pos, D_L30_001B9C80.position) < 48.0f && shake) {
@@ -75,7 +75,7 @@ char *func_L30_004153D8(void *pos, float scale, int shake, int a2, int a3, int a
             if (state->sound) {
                 FastVecSub(towardPlayer, moby + 0x10, D_L30_001B9C80.position);
                 vec_scale_to_length(towardPlayer, towardPlayer, 1.0f);
-                if (1.5707963705062866f - FastAngleHelper(FastVecDot(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
+                if (1.5707963705062866f - math_fast_angle_helper(FastVecDot(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
                     state->sound = 1;
                 else
                     state->sound = 0;

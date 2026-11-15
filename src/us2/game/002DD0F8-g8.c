@@ -24,7 +24,7 @@ typedef struct {
     int done;     /* 0x54: cleared and tested here, set elsewhere */
 } PageC3;
 
-extern u8 D_00138180[], D_001F2840[], D_00261A08[], D_00261AB8[], D_00261B78[];
+extern u8 g_pad_state[], g_pause_menu_state[], D_00261A08[], D_00261AB8[], D_00261B78[];
 extern u8 D_001ABBA0[] SDATA(D_001ABBA0);
 extern u8 D_001ABBB8[] SDATA(D_001ABBB8);
 extern int D_0025ED8C[];
@@ -32,20 +32,20 @@ extern int D_0025ED8C[];
 int func_US2_002DD0F8(PageC3 *menu)
 {
     int fast, previous, value, result;
-    u8 *pad = D_00138180;
-    u8 *ctx = D_001F2840;
+    u8 *pad = g_pad_state;
+    u8 *ctx = g_pause_menu_state;
     u8 *owner;
     fast = (((InputC3 *)pad)->held & 15) == 15;
     if (!((CtxC3 *)ctx)->mode || (fast && ((u32)((InputC3 *)pad)->held & 16))) {
         if ((((u32 *)&((InputC3 *)pad)->held)[1] & 0x900) && !((CtxC3 *)ctx)->active) return 1;
         {
-            u8 *pad2 = D_00138180;
+            u8 *pad2 = g_pad_state;
             if (*(int *)(pad2 + 0x1c4) & 16) {
-                owner = ((CtxC3 *)D_001F2840)->owner;
+                owner = ((CtxC3 *)g_pause_menu_state)->owner;
                 value = *(int *)(owner + 0xe0);
                 if (value) {
-                    ((CtxC3 *)D_001F2840)->next = value;
-                } else if (!((CtxC3 *)D_001F2840)->active) {
+                    ((CtxC3 *)g_pause_menu_state)->next = value;
+                } else if (!((CtxC3 *)g_pause_menu_state)->active) {
                     result = -1;
                     goto back_done;
                 }
@@ -154,7 +154,7 @@ back_done:
         break;
     case 19:
         if (menu->timer) break;
-        if (((CtxC3 *)D_001F2840)->mode) return 1;
+        if (((CtxC3 *)g_pause_menu_state)->mode) return 1;
     }
     return 0;
 }

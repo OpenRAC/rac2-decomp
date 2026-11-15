@@ -16,7 +16,7 @@ extern char D_L00_00256BC0[];
 
 /* Claims the first free record of the forty-eight 0xD0-byte records at D_L00_00256BC0, keeps
    the owner and the caller's words in it, and fills it with eighteen drawn values. */
-void func_L00_004118A8(char *owner, int target, int other, char *pos, char *vel, int flag, int timeA, int timeB, int effectSlot, float scale)
+void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *vel, int flag, int timeA, int timeB, int effectSlot, float scale)
 {
     char *records = D_L00_00256BC0;
     char *record;
